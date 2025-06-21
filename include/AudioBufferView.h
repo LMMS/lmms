@@ -27,10 +27,13 @@
 #define LMMS_AUDIO_BUFFER_VIEW_H
 
 #include <cassert>
+#include <iterator>
+#include <ranges>
 #include <span>
 #include <type_traits>
 
 #include "LmmsTypes.h"
+#include "SampleFrame.h"
 
 namespace lmms
 {
@@ -49,7 +52,7 @@ public:
 	constexpr BufferViewData() = default;
 	constexpr BufferViewData(const BufferViewData&) = default;
 
-	constexpr BufferViewData(SampleT* data, proc_ch_t channels, f_cnt_t frames) noexcept
+	constexpr BufferViewData(SampleT* data, [[maybe_unused]] proc_ch_t channels, f_cnt_t frames) noexcept
 		: m_data{data}
 		, m_frames{frames}
 	{
@@ -63,7 +66,7 @@ public:
 	}
 
 	constexpr auto data() const noexcept -> SampleT* { return m_data; }
-	constexpr auto channels() const noexcept -> proc_ch_t { return channelCount; }
+	static constexpr auto channels() noexcept -> proc_ch_t { return channelCount; }
 	constexpr auto frames() const noexcept -> f_cnt_t { return m_frames; }
 
 protected:
@@ -97,6 +100,172 @@ protected:
 	f_cnt_t m_frames = 0;
 };
 
+template<typename SampleT, proc_ch_t channelCount = DynamicChannelCount>
+class InterleavedFrameIteratorData
+{
+public:
+	constexpr InterleavedFrameIteratorData() = default;
+	constexpr explicit InterleavedFrameIteratorData(SampleT* data) noexcept
+		: m_data{data}
+	{
+	}
+
+	static constexpr auto channels() noexcept -> proc_ch_t { return channelCount; }
+
+protected:
+	SampleT* m_data = nullptr;
+};
+
+template<typename SampleT>
+class InterleavedFrameIteratorData<SampleT, DynamicChannelCount>
+{
+public:
+	constexpr InterleavedFrameIteratorData() = default;
+	constexpr InterleavedFrameIteratorData(SampleT* data, proc_ch_t channels) noexcept
+		: m_data{data}
+		, m_channels{channels}
+	{
+	}
+
+	constexpr auto channels() const noexcept -> proc_ch_t { return m_channels; }
+
+protected:
+	SampleT* m_data = nullptr;
+	proc_ch_t m_channels = 0;
+};
+
+template<typename SampleT, proc_ch_t channelCount = DynamicChannelCount>
+class InterleavedFrameIterator : public InterleavedFrameIteratorData<SampleT, channelCount>
+{
+	using Base = InterleavedFrameIteratorData<SampleT, channelCount>;
+
+public:
+	using iterator_category = std::input_iterator_tag;
+	using iterator_concept = std::contiguous_iterator_tag;
+	using value_type = SampleT*;
+	using difference_type = std::ptrdiff_t;
+
+	constexpr InterleavedFrameIterator() = default;
+	constexpr InterleavedFrameIterator(const InterleavedFrameIterator&) = default;
+
+	template<typename T = SampleT> requires (channelCount != DynamicChannelCount)
+	constexpr explicit InterleavedFrameIterator(T* data) noexcept
+		: Base{data}
+	{
+	}
+
+	template<typename T = SampleT> requires (channelCount == DynamicChannelCount)
+	constexpr InterleavedFrameIterator(T* data, proc_ch_t channels) noexcept
+		: Base{data, channels}
+	{
+	}
+
+	constexpr auto operator*() const noexcept -> value_type { return this->m_data; }
+
+	constexpr auto operator[](difference_type frames) const noexcept -> value_type
+	{
+		return this->m_data + frames * Base::channels();
+	}
+
+	constexpr auto operator++() noexcept -> InterleavedFrameIterator&
+	{
+		this->m_data += Base::channels();
+		return *this;
+	}
+
+	constexpr auto operator++(int) noexcept -> InterleavedFrameIterator
+	{
+		auto temp = *this;
+		++(*this);
+		return temp;
+	}
+
+	constexpr auto operator--() noexcept -> InterleavedFrameIterator&
+	{
+		this->m_data -= Base::channels();
+		return *this;
+	}
+
+	constexpr auto operator--(int) noexcept -> InterleavedFrameIterator
+	{
+		auto temp = *this;
+		--(*this);
+		return temp;
+	}
+
+	constexpr auto operator+=(difference_type channels) noexcept -> InterleavedFrameIterator&
+	{
+		this->m_data += channels * Base::channels();
+		return *this;
+	}
+
+	constexpr auto operator-=(difference_type channels) noexcept -> InterleavedFrameIterator&
+	{
+		this->m_data -= channels * Base::channels();
+		return *this;
+	}
+
+	friend constexpr auto operator+(InterleavedFrameIterator iter, difference_type frames) noexcept
+		-> InterleavedFrameIterator
+	{
+		if constexpr (channelCount == DynamicChannelCount)
+		{
+			return {iter.m_data + frames * Base::channels(), Base::channels()};
+		}
+		else
+		{
+			return InterleavedFrameIterator{iter.m_data + frames * Base::channels()};
+		}
+	}
+
+	friend constexpr auto operator+(difference_type frames, InterleavedFrameIterator iter) noexcept
+		-> InterleavedFrameIterator
+	{
+		return iter + frames;
+	}
+
+	constexpr auto operator-(difference_type frames) const noexcept -> InterleavedFrameIterator
+	{
+		if constexpr (channelCount == DynamicChannelCount)
+		{
+			return {this->m_data - frames * Base::channels(), Base::channels()};
+		}
+		else
+		{
+			return InterleavedFrameIterator{this->m_data - frames * Base::channels()};
+		}
+	}
+
+	constexpr auto operator-(InterleavedFrameIterator other) const noexcept -> difference_type
+	{
+		return this->m_data - other.m_data;
+	}
+
+	constexpr auto operator<=>(InterleavedFrameIterator other) const noexcept
+	{
+		return this->m_data <=> other.m_data;
+	}
+
+	constexpr auto operator==(InterleavedFrameIterator other) const noexcept -> bool
+	{
+		return this->m_data == other.m_data;
+	}
+
+	constexpr auto operator<=>(SampleT* sentinel) const noexcept
+	{
+		return this->m_data <=> sentinel;
+	}
+
+	constexpr auto operator==(SampleT* sentinel) const noexcept -> bool
+	{
+		return this->m_data == sentinel;
+	}
+
+	constexpr auto base() const noexcept -> SampleT* { return this->m_data; }
+};
+
+static_assert(std::random_access_iterator<InterleavedFrameIterator<float, 2>>);
+
 } // namespace detail
 
 
@@ -109,6 +278,9 @@ template<typename SampleT, proc_ch_t channelCount = DynamicChannelCount>
 class InterleavedBufferView : public detail::BufferViewData<SampleT, channelCount>
 {
 	using Base = detail::BufferViewData<SampleT, channelCount>;
+
+	using FrameIter = detail::InterleavedFrameIterator<SampleT, channelCount>;
+	using ConstFrameIter = detail::InterleavedFrameIterator<const SampleT, channelCount>;
 
 public:
 	using Base::Base;
@@ -137,7 +309,17 @@ public:
 
 	constexpr auto empty() const noexcept -> bool
 	{
-		return !this->m_data || this->channels() == 0 || this->m_frames == 0;
+		return !this->m_data || Base::channels() == 0 || this->m_frames == 0;
+	}
+
+	constexpr auto dataSizeBytes() const noexcept -> std::size_t
+	{
+		return Base::channels() * this->m_frames * sizeof(SampleT);
+	}
+
+	constexpr auto dataView() noexcept -> std::span<SampleT>
+	{
+		return std::span<SampleT>{this->m_data, this->m_frames * Base::channels()};
 	}
 
 	//! @return the frame at the given index
@@ -145,11 +327,11 @@ public:
 	{
 		if constexpr (channelCount == DynamicChannelCount)
 		{
-			return std::span<SampleT>{framePtr(index), this->channels()};
+			return std::span<SampleT>{framePtr(index), Base::channels()};
 		}
 		else
 		{
-			return std::span<SampleT, channelCount>{framePtr(index), this->channels()};
+			return std::span<SampleT, channelCount>{framePtr(index), Base::channels()};
 		}
 	}
 
@@ -160,7 +342,7 @@ public:
 	constexpr auto framePtr(f_cnt_t index) const noexcept -> SampleT*
 	{
 		assert(index < this->m_frames);
-		return this->m_data + index * this->channels();
+		return this->m_data + index * Base::channels();
 	}
 
 	/**
@@ -171,11 +353,78 @@ public:
 	{
 		return framePtr(index);
 	}
+
+	auto sampleFrameAt(f_cnt_t index) noexcept -> SampleFrame&
+		requires (std::is_same_v<SampleT, float> && channelCount == 2)
+	{
+		assert(index < this->m_frames);
+		return reinterpret_cast<SampleFrame*>(this->m_data)[index];
+	}
+
+	auto sampleFrameAt(f_cnt_t index) const noexcept -> const SampleFrame&
+		requires (std::is_same_v<SampleT, const float> && channelCount == 2)
+	{
+		assert(index < this->m_frames);
+		return reinterpret_cast<const SampleFrame*>(this->m_data)[index];
+	}
+
+	auto toSampleFrames() noexcept -> std::span<SampleFrame>
+		requires (std::is_same_v<SampleT, float> && channelCount == 2)
+	{
+		return {reinterpret_cast<SampleFrame*>(this->m_data), this->m_frames};
+	}
+
+	auto toSampleFrames() const noexcept -> std::span<const SampleFrame>
+		requires (std::is_same_v<SampleT, const float> && channelCount == 2)
+	{
+		return {reinterpret_cast<const SampleFrame*>(this->m_data), this->m_frames};
+	}
+
+	//! View over the frames, iterating in chunks of `channels()`
+	constexpr auto framesView() const noexcept -> std::ranges::subrange<ConstFrameIter, const SampleT*>
+	{
+		const SampleT* end = this->m_data + Base::channels() * this->m_frames;
+		if constexpr (channelCount == DynamicChannelCount)
+		{
+			return std::ranges::subrange{ConstFrameIter{this->m_data, this->m_channels}, end};
+		}
+		else
+		{
+			return std::ranges::subrange{ConstFrameIter{this->m_data}, end};
+		}
+	}
+
+	//! View over the frames, iterating in chunks of `channels()`
+	constexpr auto framesView() noexcept -> std::ranges::subrange<FrameIter, SampleT*>
+	{
+		SampleT* end = this->m_data + Base::channels() * this->m_frames;
+		if constexpr (channelCount == DynamicChannelCount)
+		{
+			return std::ranges::subrange{FrameIter{this->m_data, this->m_channels}, end};
+		}
+		else
+		{
+			return std::ranges::subrange{FrameIter{this->m_data}, end};
+		}
+	}
 };
 
 // Check that the std::span-like space optimization works
 static_assert(sizeof(InterleavedBufferView<float>) > sizeof(InterleavedBufferView<float, 2>));
 static_assert(sizeof(InterleavedBufferView<float, 2>) == sizeof(void*) + sizeof(f_cnt_t));
+
+
+inline auto toInterleavedBufferView(std::span<SampleFrame> in) -> InterleavedBufferView<float, 2>
+{
+	assert(in.data() != nullptr);
+	return {in.data()->data(), in.size()};
+}
+
+inline auto toInterleavedBufferView(std::span<const SampleFrame> in) -> InterleavedBufferView<const float, 2>
+{
+	assert(in.data() != nullptr);
+	return {in.data()->data(), in.size()};
+}
 
 
 /**
