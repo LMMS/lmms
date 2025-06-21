@@ -200,4 +200,22 @@ namespace lmms::PathUtil
 		return basePrefix(shortestBase) + relativeOrAbsolute(absolutePath, shortestBase);
 	}
 
+	std::filesystem::path LMMS_EXPORT fsConvert(const QString& path)
+	{
+#ifdef LMMS_BUILD_WIN32
+		return path.toStdWString().c_str();
+#else
+		return path.toStdString().c_str();
+#endif
+	}
+
+	QString LMMS_EXPORT fsConvert(const std::filesystem::path& path)
+	{
+#ifdef _WIN32
+		return QString::fromStdWString(path.wstring());
+#else
+		return QString::fromStdString(path.string());
+#endif
+	}
+
 } // namespace lmms::PathUtil
