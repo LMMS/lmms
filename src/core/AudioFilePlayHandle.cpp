@@ -117,7 +117,7 @@ void AudioFilePlayHandle::play(SampleFrame* dst)
 
 void AudioFilePlayHandle::convertToStereo(float* in, ch_cnt_t inChannels, float* out, f_cnt_t frames)
 {
-	for (auto frame = 0; frame < frames; ++frame)
+	for (auto frame = f_cnt_t{0}; frame < frames; ++frame)
 	{
 		out[frame * 2] = in[frame * inChannels];
 		out[frame * 2 + 1] = inChannels == 1 ? out[frame * 2] : in[frame * inChannels + 1];
