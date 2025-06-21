@@ -23,120 +23,51 @@
  */
 
 #include <QList>
+#include <QMap>
 #include <QUrl>
 #include <QListView>
 #include <QStandardPaths>
 #include <QStorageInfo>
 #include <QStringList>
+#include <qchar.h>
 
 #include "ConfigManager.h"
+#include "FileBrowser.h"
+#include "volume.h"
 #include "FileDialog.h"
 
 namespace lmms::gui
 {
 
+QMap<FileDialog::Operation, QString> FileDialog::OperationPaths = {};
+bool FileDialog::OperationPathsReady = false;
 
-FileDialog::FileDialog( QWidget *parent, const QString &caption,
-					   const QString &directory, const QString &filter ) :
-	QFileDialog( parent, caption, directory, filter )
+FileDialog::FileDialog(QWidget *parent, const QString &caption,
+					   const QString &directory, const QString &filter,
+					   const Operation operation) :
+	QFileDialog(parent, caption, getOperationPath(operation, directory), filter),
+	operation(operation),
+	m_status(QDialog::Rejected)
 {
 #if QT_VERSION > 0x050200
 	setOption( QFileDialog::DontUseCustomDirectoryIcons );
 #endif
-
 	setOption( QFileDialog::DontUseNativeDialog );
-
-#ifdef LMMS_BUILD_LINUX
-	QList<QUrl> urls;
-#else
-	QList<QUrl> urls = sidebarUrls();
-#endif
-
-	QDir desktopDir;
-	desktopDir.setPath(QStandardPaths::writableLocation(QStandardPaths::DesktopLocation));
-	if (desktopDir.exists())
-	{
-		urls << QUrl::fromLocalFile(desktopDir.absolutePath());
-	}
-	
-	QDir downloadDir(QDir::homePath() + "/Downloads");
-	if (!downloadDir.exists())
-	{
-		downloadDir.setPath(QStandardPaths::writableLocation(QStandardPaths::DownloadLocation));
-	}
-	if (downloadDir.exists())
-	{
-		urls << QUrl::fromLocalFile(downloadDir.absolutePath());
-	}
-
-	QDir musicDir;
-	musicDir.setPath(QStandardPaths::writableLocation(QStandardPaths::MusicLocation));
-	if (musicDir.exists())
-	{
-		urls << QUrl::fromLocalFile(musicDir.absolutePath());
-	}
-
-	urls << QUrl::fromLocalFile(ConfigManager::inst()->workingDir());
-	
-	// Add `/Volumes` directory on OS X systems, this allows the user to browse
-	// external disk drives.
-#ifdef LMMS_BUILD_APPLE
-	QDir volumesDir( QDir("/Volumes") );
-	if ( volumesDir.exists() )
-		urls << QUrl::fromLocalFile( volumesDir.absolutePath() );
-#endif
-
-#ifdef LMMS_BUILD_LINUX
-
-	// FileSystem types : https://www.javatpoint.com/linux-file-system
-	QStringList usableFileSystems = {"ext", "ext2", "ext3", "ext4", "jfs", "reiserfs", "ntfs3", "fuse.sshfs", "fuseblk"};
-
-	for(QStorageInfo storage : QStorageInfo::mountedVolumes())
-	{
-		storage.refresh();
-
-		if (usableFileSystems.contains(QString(storage.fileSystemType()), Qt::CaseInsensitive) && storage.isValid() && storage.isReady())
-		{			
-			urls << QUrl::fromLocalFile(storage.rootPath());	
-		}
-	}
-#endif
-
-	setSidebarUrls(urls);
 }
 
-
-QString FileDialog::getExistingDirectory(QWidget *parent,
-										const QString &caption,
-										const QString &directory,
-										QFileDialog::Options options)
+int FileDialog::exec()
 {
-	FileDialog dialog(parent, caption, directory, QString());
-	dialog.setFileMode(QFileDialog::Directory);
-	dialog.setOptions(dialog.options() | options);
-	if (dialog.exec() == QDialog::Accepted) {
-		return dialog.selectedFiles().value(0);
-	}
-	return QString();
+	m_status = this->QFileDialog::exec();
+	return m_status;
 }
 
-QString FileDialog::getOpenFileName(QWidget *parent,
-									const QString &caption,
-									const QString &directory,
-									const QString &filter,
-									QString *selectedFilter)
+FileDialog::~FileDialog()
 {
-	FileDialog dialog(parent, caption, directory, filter);
-	if (selectedFilter && !selectedFilter->isEmpty())
-		dialog.selectNameFilter(*selectedFilter);
-	if (dialog.exec() == QDialog::Accepted) {
-		if (selectedFilter)
-			*selectedFilter = dialog.selectedNameFilter();
-		return dialog.selectedFiles().value(0);
+	if (m_status == QDialog::Accepted)
+	{
+		setOperationPath(operation, directory().absolutePath());
 	}
-	return QString();
 }
-
 
 void FileDialog::clearSelection()
 {
@@ -145,5 +76,42 @@ void FileDialog::clearSelection()
 	view->clearSelection();
 }
 
+void FileDialog::prepareOperationPaths()
+{
+	if (OperationPathsReady)
+	{
+		return;
+	}
+
+	auto* config = ConfigManager::inst();
+
+	OperationPaths[Operation::Generic]		= config->workingDir();
+	OperationPaths[Operation::Project]  	= config->userProjectsDir();
+	OperationPaths[Operation::Midi]  		= config->workingDir();
+	OperationPaths[Operation::Preset]		= config->userPresetsDir();
+	OperationPaths[Operation::Plugin]		= config->userVstDir();
+	OperationPaths[Operation::Sample]		= config->userSamplesDir();
+	OperationPaths[Operation::Soundfont]	= config->userSf2Dir();
+	OperationPaths[Operation::Song]  		= config->workingDir();
+
+	OperationPathsReady = true;
+}
+
+QString FileDialog::getOperationPath(const FileDialog::Operation op, const QString& existing)
+{
+	if (!existing.isEmpty())
+	{
+		return existing;
+	}
+
+	prepareOperationPaths();
+
+	return OperationPaths[op];
+}
+
+void FileDialog::setOperationPath(const FileDialog::Operation op, const QString& path)
+{
+	OperationPaths[op] = path;
+}
 
 } // namespace lmms::gui

@@ -753,9 +753,8 @@ void MainWindow::openProject()
 {
 	if( mayChangeProject(false) )
 	{
-		FileDialog ofd( this, tr( "Open Project" ), "", tr( "LMMS (*.mmp *.mmpz)" ) );
+		FileDialog ofd( this, tr( "Open Project" ), "", tr( "LMMS (*.mmp *.mmpz)" ), FileDialog::Operation::Project );
 
-		ofd.setDirectory( ConfigManager::inst()->userProjectsDir() );
 		ofd.setFileMode( FileDialog::ExistingFiles );
 		if( ofd.exec () == QDialog::Accepted &&
 						!ofd.selectedFiles().isEmpty() )
@@ -1077,7 +1076,7 @@ void MainWindow::updateViewMenu()
 		);
 
 	m_viewMenu->addSeparator();
-	
+
 	m_viewMenu->addAction(embed::getIconPixmap( "fullscreen" ),
 				tr( "Fullscreen" ) + "\tF11",
 				this, SLOT(toggleFullscreen())
@@ -1407,7 +1406,7 @@ void MainWindow::autoSave()
 
 void MainWindow::onExportProjectMidi()
 {
-	FileDialog efd( this );
+	FileDialog efd( this, "Export Project", "", "", FileDialog::Operation::Midi);
 
 	efd.setFileMode( FileDialog::AnyFile );
 
@@ -1423,7 +1422,6 @@ void MainWindow::onExportProjectMidi()
 	}
 	else
 	{
-		efd.setDirectory( ConfigManager::inst()->userProjectsDir() );
 		base_filename = tr( "untitled" );
 	}
 	efd.selectFile( base_filename + ".mid" );
@@ -1448,16 +1446,12 @@ void MainWindow::exportProject(bool multiExport)
 {
 	QString const & projectFileName = Engine::getSong()->projectFileName();
 
-	FileDialog efd( getGUI()->mainWindow() );
+	FileDialog efd( getGUI()->mainWindow(), "", "", "", FileDialog::Operation::Song);
 
 	if ( multiExport )
 	{
 		efd.setFileMode( FileDialog::Directory);
 		efd.setWindowTitle( tr( "Select directory for writing exported tracks..." ) );
-		if( !projectFileName.isEmpty() )
-		{
-			efd.setDirectory( QFileInfo( projectFileName ).absolutePath() );
-		}
 	}
 	else
 	{
@@ -1475,12 +1469,10 @@ void MainWindow::exportProject(bool multiExport)
 		QString baseFilename;
 		if( !projectFileName.isEmpty() )
 		{
-			efd.setDirectory( QFileInfo( projectFileName ).absolutePath() );
 			baseFilename = QFileInfo( projectFileName ).completeBaseName();
 		}
 		else
 		{
-			efd.setDirectory( ConfigManager::inst()->userProjectsDir() );
 			baseFilename = tr( "untitled" );
 		}
 		efd.selectFile( baseFilename + ProjectRenderer::fileEncodeDevices[0].m_extension );
@@ -1579,13 +1571,15 @@ void MainWindow::onImportProject()
 	if (song)
 	{
 		FileDialog ofd( nullptr, tr( "Import file" ),
-				ConfigManager::inst()->userProjectsDir(),
+				"",
 				tr("MIDI sequences") +
 				" (*.mid *.midi *.rmi);;" +
 				tr("Hydrogen projects") +
 				" (*.h2song);;" +
 				tr("All file types") +
-				" (*.*)");
+				" (*.*)",
+				FileDialog::Operation::Project
+		);
 
 		ofd.setFileMode( FileDialog::ExistingFiles );
 		if( ofd.exec () == QDialog::Accepted && !ofd.selectedFiles().isEmpty() )
