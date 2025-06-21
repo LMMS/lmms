@@ -25,8 +25,6 @@
 #ifndef LMMS_GRANULAR_PITCH_SHIFTER_EFFECT_H
 #define LMMS_GRANULAR_PITCH_SHIFTER_EFFECT_H
 
-#include <numbers>
-
 #include "Effect.h"
 #include "GranularPitchShifterControls.h"
 
@@ -120,13 +118,12 @@ private:
 
 		void setCoefs(float sampleRate, float cutoff)
 		{
-			using namespace std::numbers;
-			const float g = std::tan(pi_v<float> * cutoff / sampleRate);
-			const float ginv = g / (1.f + g * (g + sqrt2_v<float>));
-			m_g1 = ginv;
-			m_g2 = 2 * (g + sqrt2_v<float>) * ginv;
-			m_g3 = g * ginv;
-			m_g4 = 2 * ginv;
+		    const float g = std::tan(numbers::pi_v<float> * cutoff / sampleRate);
+		    const float ginv = g / (1.f + g * (g + numbers::sqrt2_v<float>));
+		    m_g1 = ginv;
+		    m_g2 = 2.f * (g + numbers::sqrt2_v<float>) * ginv;
+		    m_g3 = g * ginv;
+		    m_g4 = 2.f * ginv;
 		}
 
 		float process(float input)

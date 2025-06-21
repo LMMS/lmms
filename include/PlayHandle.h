@@ -32,7 +32,7 @@
 
 #include "Flags.h"
 #include "ThreadableJob.h"
-#include "LmmsTypes.h"
+#include "lmms_basics.h"
 
 class QThread;
 
@@ -40,7 +40,7 @@ namespace lmms
 {
 
 class Track;
-class AudioBusHandle;
+class AudioPort;
 class SampleFrame;
 
 class LMMS_EXPORT PlayHandle : public ThreadableJob
@@ -65,7 +65,7 @@ public:
 		m_offset = p.m_offset;
 		m_affinity = p.m_affinity;
 		m_usesBuffer = p.m_usesBuffer;
-		m_audioBusHandle = p.m_audioBusHandle;
+		m_audioPort = p.m_audioPort;
 		return *this;
 	}
 
@@ -134,14 +134,14 @@ public:
 		m_usesBuffer = b;
 	}
 	
-	AudioBusHandle* audioBusHandle()
+	AudioPort * audioPort()
 	{
-		return m_audioBusHandle;
+		return m_audioPort;
 	}
 	
-	void setAudioBusHandle(AudioBusHandle* busHandle)
+	void setAudioPort( AudioPort * port )
 	{
-		m_audioBusHandle = busHandle;
+		m_audioPort = port;
 	}
 	
 	void releaseBuffer();
@@ -156,7 +156,7 @@ private:
 	SampleFrame* m_playHandleBuffer;
 	bool m_bufferReleased;
 	bool m_usesBuffer;
-	AudioBusHandle* m_audioBusHandle;
+	AudioPort * m_audioPort;
 } ;
 
 using PlayHandleList = QList<PlayHandle*>;

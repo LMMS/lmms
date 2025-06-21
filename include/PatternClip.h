@@ -51,11 +51,6 @@ public:
 
 	gui::ClipView * createView( gui::TrackView * _tv ) override;
 
-	PatternClip* clone() override
-	{
-		return new PatternClip(*this);
-	}
-
 private:
 	friend class PatternClipView;
 } ;

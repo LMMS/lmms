@@ -26,7 +26,6 @@
 #define LMMS_GUI_TRACK_OPERATIONS_WIDGET_H
 
 #include <QWidget>
-#include "AutomatableButton.h"
 
 class QPushButton;
 
@@ -70,8 +69,8 @@ private:
 
 	TrackGrip* m_trackGrip;
 	QPushButton * m_trackOps;
-	AutomatableButton* m_muteBtn;
-	AutomatableButton* m_soloBtn;
+	PixmapButton * m_muteBtn;
+	PixmapButton * m_soloBtn;
 
 
 	friend class TrackView;

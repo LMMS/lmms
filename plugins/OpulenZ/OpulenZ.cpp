@@ -51,6 +51,7 @@
 #include <mididata.h>
 
 #include "embed.h"
+#include "debug.h"
 
 #include "Knob.h"
 #include "PixmapButton.h"
@@ -496,7 +497,7 @@ void OpulenzInstrument::loadPatch(const unsigned char inst[14]) {
 
 void OpulenzInstrument::tuneEqual(int center, float Hz) {
 	for(int n=0; n<128; ++n) {
-		float tmp = Hz * std::exp2((n - center) / 12.0f + pitchbend / 1200.0f);
+		float tmp = Hz * pow(2.0, (n - center) * (1.0 / 12.0) + pitchbend * (1.0 / 1200.0));
 		fnums[n] = Hz2fnum( tmp );
 	}
 }
@@ -504,7 +505,7 @@ void OpulenzInstrument::tuneEqual(int center, float Hz) {
 // Find suitable F number in lowest possible block
 int OpulenzInstrument::Hz2fnum(float Hz) {
 	for(int block=0; block<8; ++block) {
-		auto fnum = static_cast<unsigned>(Hz * std::exp2(20.0f - static_cast<float>(block)) / 49716.0f);
+		unsigned int fnum = Hz * pow( 2.0, 20.0 - (double)block ) * ( 1.0 / 49716.0 );
 		if(fnum<1023) {
 			return fnum + (block << 10);
 		}

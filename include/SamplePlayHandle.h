@@ -38,13 +38,13 @@ namespace lmms
 class PatternTrack;
 class SampleClip;
 class Track;
-class AudioBusHandle;
+class AudioPort;
 
 
 class LMMS_EXPORT SamplePlayHandle : public PlayHandle
 {
 public:
-	SamplePlayHandle(Sample* sample, bool ownAudioBusHandle = true);
+	SamplePlayHandle(Sample* sample, bool ownAudioPort = true);
 	SamplePlayHandle( const QString& sampleFile );
 	SamplePlayHandle( SampleClip* clip );
 	~SamplePlayHandle() override;
@@ -88,7 +88,7 @@ private:
 	f_cnt_t m_frame;
 	Sample::PlaybackState m_state;
 
-	const bool m_ownAudioBusHandle;
+	const bool m_ownAudioPort;
 
 	FloatModel m_defaultVolumeModel;
 	FloatModel * m_volumeModel;

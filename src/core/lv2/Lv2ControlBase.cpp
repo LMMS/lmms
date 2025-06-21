@@ -31,7 +31,6 @@
 #include <QtGlobal>
 
 #include "Engine.h"
-#include "lmms_constants.h"
 #include "Lv2Manager.h"
 #include "Lv2Proc.h"
 

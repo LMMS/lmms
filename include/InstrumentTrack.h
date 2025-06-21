@@ -28,7 +28,7 @@
 
 #include <limits>
 
-#include "AudioBusHandle.h"
+#include "AudioPort.h"
 #include "InstrumentFunctions.h"
 #include "InstrumentSoundShaping.h"
 #include "Microtuner.h"
@@ -144,9 +144,9 @@ public:
 				const Plugin::Descriptor::SubPluginFeatures::Key* key = nullptr,
 				bool keyFromDnd = false);
 
-	AudioBusHandle* audioBusHandle()
+	AudioPort * audioPort()
 	{
-		return &m_audioBusHandle;
+		return &m_audioPort;
 	}
 
 	MidiPort * midiPort()
@@ -293,7 +293,7 @@ private:
 	FloatModel m_volumeModel;
 	FloatModel m_panningModel;
 
-	AudioBusHandle m_audioBusHandle;
+	AudioPort m_audioPort;
 
 	FloatModel m_pitchModel;
 	IntModel m_pitchRangeModel;

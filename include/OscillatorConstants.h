@@ -28,7 +28,7 @@
 
 #include <array>
 
-#include "LmmsTypes.h"
+#include "lmms_basics.h"
 
 namespace lmms::OscillatorConstants
 {

@@ -28,6 +28,7 @@
 #include <stdexcept>
 
 #include <QDebug>
+#include <QUuid>
 
 #include "AudioEngine.h"
 #include "ConfigManager.h"
@@ -43,7 +44,7 @@ VstSyncController::VstSyncController()
 {
 	try
 	{
-		m_syncData.create();
+		m_syncData.create(QUuid::createUuid().toString().toStdString());
 	}
 	catch (const std::runtime_error& error)
 	{

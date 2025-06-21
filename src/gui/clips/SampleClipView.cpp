@@ -34,11 +34,9 @@
 #include "PathUtil.h"
 #include "SampleClip.h"
 #include "SampleLoader.h"
-#include "SampleThumbnail.h"
+#include "SampleWaveform.h"
 #include "Song.h"
 #include "StringPairDrag.h"
-#include "TrackContainerView.h"
-#include "TrackView.h"
 
 namespace lmms::gui
 {
@@ -47,8 +45,7 @@ namespace lmms::gui
 SampleClipView::SampleClipView( SampleClip * _clip, TrackView * _tv ) :
 	ClipView( _clip, _tv ),
 	m_clip( _clip ),
-	m_paintPixmap(),
-	m_paintPixmapXPosition(0)
+	m_paintPixmap()
 {
 	// update UI and tooltip
 	updateSample();
@@ -64,9 +61,6 @@ SampleClipView::SampleClipView( SampleClip * _clip, TrackView * _tv ) :
 void SampleClipView::updateSample()
 {
 	update();
-
-	m_sampleThumbnail = SampleThumbnail{m_clip->m_sample};
-
 	// set tooltip to filename so that user can see what sample this
 	// sample-clip contains
 	setToolTip(
@@ -186,13 +180,15 @@ void SampleClipView::mouseReleaseEvent(QMouseEvent *_me)
 
 void SampleClipView::mouseDoubleClickEvent( QMouseEvent * )
 {
-	if (m_trackView->trackContainerView()->knifeMode()) { return; }
-
 	const QString selectedAudioFile = SampleLoader::openAudioFile();
 
 	if (selectedAudioFile.isEmpty()) { return; }
 	
-	if (!m_clip->hasSampleFileLoaded(selectedAudioFile))
+	if (m_clip->hasSampleFileLoaded(selectedAudioFile))
+	{
+		m_clip->changeLengthToSampleLength();
+	}
+	else
 	{
 		auto sampleBuffer = SampleLoader::createBufferFromFile(selectedAudioFile);
 		if (sampleBuffer != SampleBuffer::emptyBuffer())
@@ -200,7 +196,6 @@ void SampleClipView::mouseDoubleClickEvent( QMouseEvent * )
 			m_clip->setSampleBuffer(sampleBuffer);
 		}
 	}
-	m_clip->updateLength();
 }
 
 
@@ -212,22 +207,15 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 
 	if( !needsUpdate() )
 	{
-		painter.drawPixmap(m_paintPixmapXPosition, 0, m_paintPixmap);
+		painter.drawPixmap( 0, 0, m_paintPixmap );
 		return;
 	}
 
 	setNeedsUpdate( false );
 
-	const auto trackViewWidth = getTrackView()->rect().width();
-
-	// Use the clip's height to avoid artifacts when rendering while something else is overlaying the clip.
-	const auto viewPortRect = QRect(0, 0, trackViewWidth * 2, rect().height());
-
-	m_paintPixmapXPosition = std::max(0, pe->rect().x() - trackViewWidth);
-
-	if (m_paintPixmap.isNull() || m_paintPixmap.size() != viewPortRect.size())
+	if (m_paintPixmap.isNull() || m_paintPixmap.size() != size())
 	{
-		m_paintPixmap = QPixmap(viewPortRect.size());
+		m_paintPixmap = QPixmap(size());
 	}
 
 	QPainter p( &m_paintPixmap );
@@ -279,24 +267,14 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	float nom = Engine::getSong()->getTimeSigModel().getNumerator();
 	float den = Engine::getSong()->getTimeSigModel().getDenominator();
 	float ticksPerBar = DefaultTicksPerBar * nom / den;
-	float offsetStart = m_clip->startTimeOffset() / ticksPerBar * pixelsPerBar();
-	float sampleLength = m_clip->sampleLength() * ppb / ticksPerBar;
+
+	float offset =  m_clip->startTimeOffset() / ticksPerBar * pixelsPerBar();
+	QRect r = QRect( offset, spacing,
+			qMax( static_cast<int>( m_clip->sampleLength() * ppb / ticksPerBar ), 1 ), rect().bottom() - 2 * spacing );
 
 	const auto& sample = m_clip->m_sample;
-
-	const auto sampleRextX = static_cast<int>(offsetStart) - m_paintPixmapXPosition;
-
-	if (sample.sampleSize() > 0)
-	{
-		const auto param = SampleThumbnail::VisualizeParameters{
-			.sampleRect = QRect(sampleRextX, spacing, sampleLength, height() - spacing),
-			.viewportRect = viewPortRect,
-			.amplification = sample.amplification(),
-			.reversed = sample.reversed()
-		};
-
-		m_sampleThumbnail.visualize(param, p);
-	}
+	const auto waveform = SampleWaveform::Parameters{sample.data(), sample.sampleSize(), sample.amplification(), sample.reversed()};
+	SampleWaveform::visualize(waveform, p, r);
 
 	QString name = PathUtil::cleanName(m_clip->m_sample.sampleFile());
 	paintTextLabel(name, p);
@@ -306,15 +284,12 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 
 	// inner border
 	p.setPen( c.lighter( 135 ) );
-	p.drawRect(
-		-m_paintPixmapXPosition + 1,
-		1,
-		rect().right() - BORDER_WIDTH,
+	p.drawRect( 1, 1, rect().right() - BORDER_WIDTH,
 		rect().bottom() - BORDER_WIDTH );
 
 	// outer border
 	p.setPen( c.darker( 200 ) );
-	p.drawRect(-m_paintPixmapXPosition, 0, rect().right(), rect().bottom());
+	p.drawRect( 0, 0, rect().right(), rect().bottom() );
 
 	// draw the 'muted' pixmap only if the clip was manualy muted
 	if( m_clip->isMuted() )
@@ -327,7 +302,6 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 
 	if ( m_marker )
 	{
-		p.setPen(markerColor());
 		p.drawLine(m_markerPos, rect().bottom(), m_markerPos, rect().top());
 	}
 	// recording sample tracks is not possible at the moment
@@ -347,7 +321,7 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 
 	p.end();
 
-	painter.drawPixmap(m_paintPixmapXPosition, 0, m_paintPixmap);
+	painter.drawPixmap( 0, 0, m_paintPixmap );
 }
 
 
@@ -371,5 +345,36 @@ void SampleClipView::setAutomationGhost()
 	aEditor->show();
 	aEditor->setFocus();
 }
+
+//! Split this Clip.
+/*! \param pos the position of the split, relative to the start of the clip */
+bool SampleClipView::splitClip( const TimePos pos )
+{
+	setMarkerEnabled( false );
+
+	const TimePos splitPos = m_initialClipPos + pos;
+
+	//Don't split if we slid off the Clip or if we're on the clip's start/end
+	//Cutting at exactly the start/end position would create a zero length
+	//clip (bad), and a clip the same length as the original one (pointless).
+	if ( splitPos > m_initialClipPos && splitPos < m_initialClipEnd )
+	{
+		m_clip->getTrack()->addJournalCheckPoint();
+		m_clip->getTrack()->saveJournallingState( false );
+
+		auto rightClip = new SampleClip(*m_clip);
+
+		m_clip->changeLength( splitPos - m_initialClipPos );
+
+		rightClip->movePosition( splitPos );
+		rightClip->changeLength( m_initialClipEnd - splitPos );
+		rightClip->setStartTimeOffset( m_clip->startTimeOffset() - m_clip->length() );
+
+		m_clip->getTrack()->restoreJournallingState();
+		return true;
+	}
+	else { return false; }
+}
+
 
 } // namespace lmms::gui

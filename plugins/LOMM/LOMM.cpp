@@ -24,7 +24,6 @@
 
 #include "LOMM.h"
 
-#include "lmms_math.h"
 #include "embed.h"
 #include "plugin_export.h"
 
@@ -83,7 +82,7 @@ void LOMMEffect::changeSampleRate()
 	m_coeffPrecalc = -2.2f / (m_sampleRate * 0.001f);
 	m_needsUpdate = true;
 	
-	m_crestTimeConst = std::exp(-1.f / (0.2f * m_sampleRate));
+	m_crestTimeConst = exp(-1.f / (0.2f * m_sampleRate));
 	
 	m_lookBufLength = std::ceil((LOMM_MAX_LOOKAHEAD / 1000.f) * m_sampleRate) + 2;
 	for (int i = 0; i < 2; ++i)
@@ -172,7 +171,7 @@ Effect::ProcessStatus LOMMEffect::processImpl(SampleFrame* buf, const fpp_t fram
 	float rel[3] = {relH, relM, relL};
 	float relCoef[3] = {relCoefH, relCoefM, relCoefL};
 	const float rmsTime = m_lommControls.m_rmsTimeModel.value();
-	const float rmsTimeConst = (rmsTime == 0) ? 0 : std::exp(-1.f / (rmsTime * 0.001f * m_sampleRate));
+	const float rmsTimeConst = (rmsTime == 0) ? 0 : exp(-1.f / (rmsTime * 0.001f * m_sampleRate));
 	const float knee = m_lommControls.m_kneeModel.value() * 0.5f;
 	const float range = m_lommControls.m_rangeModel.value();
 	const float rangeAmp = dbfsToAmp(range);
@@ -313,11 +312,11 @@ Effect::ProcessStatus LOMMEffect::processImpl(SampleFrame* buf, const fpp_t fram
 				{
 					if (downward * depth <= 1)
 					{
-						aboveGain = std::lerp(yDbfs, aboveGain, downward * depth);
+						aboveGain = linearInterpolate(yDbfs, aboveGain, downward * depth);
 					}
 					else
 					{
-						aboveGain = std::lerp(aboveGain, aThresh[j], downward * depth - 1);
+						aboveGain = linearInterpolate(aboveGain, aThresh[j], downward * depth - 1);
 					}
 				}
 				
@@ -339,11 +338,11 @@ Effect::ProcessStatus LOMMEffect::processImpl(SampleFrame* buf, const fpp_t fram
 				{
 					if (upward * depth <= 1)
 					{
-						belowGain = std::lerp(yDbfs, belowGain, upward * depth);
+						belowGain = linearInterpolate(yDbfs, belowGain, upward * depth);
 					}
 					else
 					{
-						belowGain = std::lerp(belowGain, bThresh[j], upward * depth - 1);
+						belowGain = linearInterpolate(belowGain, bThresh[j], upward * depth - 1);
 					}
 				}
 				
@@ -397,12 +396,12 @@ Effect::ProcessStatus LOMMEffect::processImpl(SampleFrame* buf, const fpp_t fram
 				
 				bands[j][i] *= outBandVol[j];
 				
-				bands[j][i] = std::lerp(bandsDry[j][i], bands[j][i], mix);
+				bands[j][i] = linearInterpolate(bandsDry[j][i], bands[j][i], mix);
 			}
 			
 			s[i] = bands[0][i] + bands[1][i] + bands[2][i];
 			
-			s[i] *= std::lerp(1.f, outVol, mix * (depthScaling ? depth : 1));
+			s[i] *= linearInterpolate(1.f, outVol, mix * (depthScaling ? depth : 1));
 		}
 		
 		// Convert mid/side back to left/right.

@@ -26,6 +26,7 @@
 #define LMMS_PROJECT_RENDERER_H
 
 #include "AudioFileDevice.h"
+#include "lmmsconfig.h"
 #include "AudioEngine.h"
 #include "OutputSettings.h"
 

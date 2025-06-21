@@ -24,7 +24,7 @@
 
 #include "SamplePlayHandle.h"
 #include "AudioEngine.h"
-#include "AudioBusHandle.h"
+#include "AudioPort.h"
 #include "Engine.h"
 #include "Note.h"
 #include "PatternTrack.h"
@@ -35,20 +35,20 @@ namespace lmms
 {
 
 
-SamplePlayHandle::SamplePlayHandle(Sample* sample, bool ownAudioBusHandle) :
-	PlayHandle(Type::SamplePlayHandle),
+SamplePlayHandle::SamplePlayHandle(Sample* sample, bool ownAudioPort) :
+	PlayHandle( Type::SamplePlayHandle ),
 	m_sample(sample),
-	m_doneMayReturnTrue(true),
-	m_frame(0),
-	m_ownAudioBusHandle(ownAudioBusHandle),
-	m_defaultVolumeModel(DefaultVolume, MinVolume, MaxVolume, 1),
-	m_volumeModel(&m_defaultVolumeModel),
-	m_track(nullptr),
-	m_patternTrack(nullptr)
+	m_doneMayReturnTrue( true ),
+	m_frame( 0 ),
+	m_ownAudioPort( ownAudioPort ),
+	m_defaultVolumeModel( DefaultVolume, MinVolume, MaxVolume, 1 ),
+	m_volumeModel( &m_defaultVolumeModel ),
+	m_track( nullptr ),
+	m_patternTrack( nullptr )
 {
-	if (ownAudioBusHandle)
+	if (ownAudioPort)
 	{
-		setAudioBusHandle(new AudioBusHandle("SamplePlayHandle", false));
+		setAudioPort( new AudioPort( "SamplePlayHandle", false ) );
 	}
 }
 
@@ -67,7 +67,7 @@ SamplePlayHandle::SamplePlayHandle( SampleClip* clip ) :
 	SamplePlayHandle(&clip->sample(), false)
 {
 	m_track = clip->getTrack();
-	setAudioBusHandle(((SampleTrack *)clip->getTrack())->audioBusHandle());
+	setAudioPort( ( (SampleTrack *)clip->getTrack() )->audioPort() );
 }
 
 
@@ -75,9 +75,9 @@ SamplePlayHandle::SamplePlayHandle( SampleClip* clip ) :
 
 SamplePlayHandle::~SamplePlayHandle()
 {
-	if(m_ownAudioBusHandle)
+	if( m_ownAudioPort )
 	{
-		delete audioBusHandle();
+		delete audioPort();
 		delete m_sample;
 	}
 }

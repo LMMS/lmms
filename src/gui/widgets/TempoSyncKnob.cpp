@@ -30,7 +30,6 @@
 #include "Engine.h"
 #include "CaptionMenu.h"
 #include "embed.h"
-#include "FontHelper.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
 #include "MeterDialog.h"
@@ -52,24 +51,6 @@ TempoSyncKnob::TempoSyncKnob( KnobType _knob_num, QWidget * _parent,
 {
 }
 
-TempoSyncKnob::TempoSyncKnob(KnobType knobNum, const QString& labelText, QWidget* parent, LabelRendering labelRendering, const QString& name) :
-	TempoSyncKnob(knobNum, parent, name)
-{
-	setLabel(labelText);
-
-	if (labelRendering == Knob::LabelRendering::LegacyFixedFontSize)
-	{
-		setFixedFontSizeLabelRendering();
-	}
-}
-
-
-TempoSyncKnob::TempoSyncKnob(KnobType knobNum, const QString& labelText, int labelPixelSize, QWidget* parent, const QString& name) :
-	TempoSyncKnob(knobNum, parent, name)
-{
-	setFont(adjustedToPixelSize(font(), labelPixelSize));
-	setLabel(labelText);
-}
 
 
 
@@ -80,6 +61,8 @@ TempoSyncKnob::~TempoSyncKnob()
 		delete m_custom->parentWidget();
 	}
 }
+
+
 
 
 void TempoSyncKnob::modelChanged()

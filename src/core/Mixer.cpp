@@ -26,6 +26,7 @@
 
 #include "AudioEngine.h"
 #include "AudioEngineWorkerThread.h"
+#include "BufferManager.h"
 #include "Mixer.h"
 #include "MixHelpers.h"
 #include "Song.h"
@@ -43,7 +44,7 @@ MixerRoute::MixerRoute( MixerChannel * from, MixerChannel * to, float amount ) :
 	m_from( from ),
 	m_to( to ),
 	m_amount(amount, 0, 1, 0.001f, nullptr,
-			tr("Amount to send from channel %1 to channel %2").arg(m_from->index()).arg(m_to->index()))
+			tr("Amount to send from channel %1 to channel %2").arg(m_from->m_channelIndex).arg(m_to->m_channelIndex))
 {
 	//qDebug( "created: %d to %d", m_from->m_channelIndex, m_to->m_channelIndex );
 	// create send amount model
@@ -53,7 +54,7 @@ MixerRoute::MixerRoute( MixerChannel * from, MixerChannel * to, float amount ) :
 void MixerRoute::updateName()
 {
 	m_amount.setDisplayName(
-			tr("Amount to send from channel %1 to channel %2").arg(m_from->index()).arg(m_to->index()));
+			tr( "Amount to send from channel %1 to channel %2" ).arg( m_from->m_channelIndex ).arg( m_to->m_channelIndex ) );
 }
 
 
@@ -69,9 +70,9 @@ MixerChannel::MixerChannel( int idx, Model * _parent ) :
 	m_volumeModel(1.f, 0.f, 2.f, 0.001f, _parent),
 	m_name(),
 	m_lock(),
+	m_channelIndex( idx ),
 	m_queued( false ),
-	m_dependenciesMet(0),
-	m_channelIndex(idx)
+	m_dependenciesMet(0)
 {
 	zeroSampleFrames(m_buffer, Engine::audioEngine()->framesPerPeriod());
 }
@@ -108,55 +109,8 @@ void MixerChannel::incrementDeps()
 
 void MixerChannel::unmuteForSolo()
 {
+	//TODO: Recursively activate every channel, this channel sends to
 	m_muteModel.setValue(false);
-
-	// if channel is not master, unmute also every channel it sends to/receives from
-	if (!isMaster())
-	{
-		for (const MixerRoute* sendsRoute : m_sends)
-		{
-			sendsRoute->receiver()->unmuteSenderForSolo();
-		}
-
-		for (const MixerRoute* receiverRoute : m_receives)
-		{
-			receiverRoute->sender()->unmuteReceiverForSolo();
-		}
-	}
-}
-
-void MixerChannel::unmuteSenderForSolo()
-{
-	m_muteModel.setValue(false);
-
-	// if channel is not master, unmute every channel it sends to
-	if (!isMaster())
-	{
-		for (const MixerRoute* sendsRoute : m_sends)
-		{
-			sendsRoute->receiver()->unmuteSenderForSolo();
-		}
-	}
-}
-
-
-void MixerChannel::unmuteReceiverForSolo()
-{
-	m_muteModel.setValue(false);
-
-	// if channel is not master, unmute every channel it receives from, and of those, unmute the channels they send to
-	if (!isMaster())
-	{
-		for (const MixerRoute* receiverRoute : m_receives)
-		{
-			receiverRoute->sender()->unmuteReceiverForSolo();
-		}
-
-		for (const MixerRoute* sendsRoute : m_sends)
-		{
-			sendsRoute->receiver()->unmuteSenderForSolo();
-		}
-	}
 }
 
 
@@ -321,7 +275,7 @@ void Mixer::toggledSolo()
 		} else {
 			activateSolo();
 		}
-		// unmute the soloed chan and every channel it sends to/receives from
+		// unmute the soloed chan and every channel it sends to
 		m_mixerChannels[soloedChan]->unmuteForSolo();
 	} else {
 		deactivateSolo();
@@ -406,7 +360,7 @@ void Mixer::deleteChannel( int index )
 		validateChannelName( i, i + 1 );
 
 		// set correct channel index
-		m_mixerChannels[i]->setIndex(i);
+		m_mixerChannels[i]->m_channelIndex = i;
 
 		// now check all routes and update names of the send models
 		for( MixerRoute * r : m_mixerChannels[i]->m_sends )
@@ -479,8 +433,8 @@ void Mixer::moveChannelLeft( int index )
 	qSwap(m_mixerChannels[index], m_mixerChannels[index - 1]);
 
 	// Update m_channelIndex of both channels
-	m_mixerChannels[index]->setIndex(index);
-	m_mixerChannels[index - 1]->setIndex(index - 1);
+	m_mixerChannels[index]->m_channelIndex = index;
+	m_mixerChannels[index - 1]->m_channelIndex = index -1;
 }
 
 

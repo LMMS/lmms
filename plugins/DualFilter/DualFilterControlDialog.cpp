@@ -26,7 +26,6 @@
 
 #include "DualFilterControlDialog.h"
 #include "DualFilterControls.h"
-#include "FontHelper.h"
 #include "Knob.h"
 #include "LedCheckBox.h"
 #include "ComboBox.h"
@@ -36,9 +35,10 @@ namespace lmms::gui
 
 
 #define makeknob( name, x, y, model, label, hint, unit ) 	\
-	Knob * name = new Knob(KnobType::Bright26, label, SMALL_FONT_SIZE, this); 			\
+	Knob * name = new Knob( KnobType::Bright26, this); 			\
 	(name) -> move( x, y );									\
 	(name) ->setModel( &controls-> model );					\
+	(name) ->setLabel( label );							\
 	(name) ->setHintText( hint, unit );
 
 

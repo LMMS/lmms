@@ -1,7 +1,6 @@
 set(LMMS_SRCS
 	${LMMS_SRCS}
 
-	core/AudioBusHandle.cpp
 	core/AudioEngine.cpp
 	core/AudioEngineProfiler.cpp
 	core/AudioEngineWorkerThread.cpp
@@ -101,6 +100,7 @@ set(LMMS_SRCS
 	core/audio/AudioJack.cpp
 	core/audio/AudioOss.cpp
 	core/audio/AudioSndio.cpp
+	core/audio/AudioPort.cpp
 	core/audio/AudioPortAudio.cpp
 	core/audio/AudioSoundIo.cpp
 	core/audio/AudioPulseAudio.cpp

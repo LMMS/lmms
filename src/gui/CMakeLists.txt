@@ -14,7 +14,6 @@ SET(LMMS_SRCS
 	gui/EffectView.cpp
 	gui/embed.cpp
 	gui/FileBrowser.cpp
-	gui/FileRevealer.cpp
 	gui/GuiApplication.cpp
 	gui/LadspaControlView.cpp
 	gui/LfoControllerDialog.cpp
@@ -36,7 +35,7 @@ SET(LMMS_SRCS
 	gui/RowTableView.cpp
 	gui/SampleLoader.cpp
 	gui/SampleTrackWindow.cpp
-	gui/SampleThumbnail.cpp
+	gui/SampleWaveform.cpp
 	gui/SendButtonIndicator.cpp
 	gui/SideBar.cpp
 	gui/SideBarWidget.cpp

@@ -40,7 +40,6 @@
 #include "embed.h"
 #include "Engine.h"
 #include "GuiApplication.h"
-#include "KeyboardShortcuts.h"
 #include "MainWindow.h"
 #include "Song.h"
 

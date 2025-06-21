@@ -29,7 +29,6 @@
 #include <QTimer>
 #include <QList>
 #include <QMainWindow>
-#include <QMdiArea>
 
 #include "ConfigManager.h"
 
@@ -46,7 +45,6 @@ class ConfigManager;
 namespace gui
 {
 
-class FileBrowser;
 class PluginView;
 class SubWindow;
 class ToolButton;
@@ -59,7 +57,7 @@ class MainWindow : public QMainWindow
 public:
 	QMdiArea* workspace()
 	{
-		return static_cast<QMdiArea*>(m_workspace);
+		return m_workspace;
 	}
 
 	QWidget* toolBar()
@@ -205,22 +203,7 @@ private:
 	bool guiSaveProject();
 	bool guiSaveProjectAs( const QString & filename );
 
-	class MovableQMdiArea : public QMdiArea
-	{
-	public:
-		MovableQMdiArea(QWidget* parent = nullptr);
-		~MovableQMdiArea() {}
-	protected:
-		void mousePressEvent(QMouseEvent* event) override;
-		void mouseMoveEvent(QMouseEvent* event) override;
-		void mouseReleaseEvent(QMouseEvent* event) override;
-	private:
-		bool m_isBeingMoved;
-		int m_lastX;
-		int m_lastY;
-	};
-
-	MovableQMdiArea * m_workspace;
+	QMdiArea * m_workspace;
 
 	QWidget * m_toolBar;
 	QGridLayout * m_toolBarLayout;
@@ -274,6 +257,7 @@ signals:
 	void initProgress(const QString &msg);
 
 } ;
+
 
 } // namespace gui
 

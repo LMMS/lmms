@@ -39,10 +39,6 @@ public:
 		InlineAutomation()
 	{
 	}
-	DetuningHelper(const DetuningHelper& _copy) :
-		InlineAutomation(_copy)
-	{
-	}
 
 	~DetuningHelper() override = default;
 

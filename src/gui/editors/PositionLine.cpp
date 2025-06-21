@@ -26,13 +26,14 @@
 
 #include <QPainter>
 
+#include "Song.h"
+
 
 namespace lmms::gui
 {
 
-PositionLine::PositionLine(QWidget* parent, Song::PlayMode playMode) :
+PositionLine::PositionLine(QWidget* parent) :
 	QWidget(parent),
-	m_playMode(playMode),
 	m_hasTailGradient(false),
 	m_lineColor(0, 0, 0, 0)
 {
@@ -63,7 +64,8 @@ void PositionLine::paintEvent(QPaintEvent* pe)
 		// If gradient is enabled, we're in focus and we're playing, enable gradient
 		if (m_hasTailGradient &&
 			Engine::getSong()->isPlaying() &&
-			(Engine::getSong()->playMode() == m_playMode))
+			(Engine::getSong()->playMode() == Song::PlayMode::Song ||
+			 Engine::getSong()->playMode() == Song::PlayMode::MidiClip))
 		{
 			c.setAlpha(60);
 			gradient.setColorAt(w, c);

@@ -30,7 +30,7 @@
 #include "SampleLoader.h"
 #include "Song.h"
 
-#include "LmmsTypes.h"
+#include "lmms_basics.h"
 #include "plugin_export.h"
 
 #include <QDomElement>

@@ -113,7 +113,8 @@ bool AudioFileMP3::initEncoder()
 	lame_set_mode(m_lame, mapToMPEG_mode(stereoMode));
 
 	// Handle bit rate settings
-	int bitRate = static_cast<int>(getOutputSettings().bitrate());
+	OutputSettings::BitRateSettings bitRateSettings = getOutputSettings().getBitRateSettings();
+	int bitRate = static_cast<int>(bitRateSettings.getBitRate());
 
 	lame_set_VBR(m_lame, vbr_off);
 	lame_set_brate(m_lame, bitRate);

@@ -49,8 +49,6 @@ PatternEditor::PatternEditor(PatternStore* ps) :
 	m_ps(ps)
 {
 	setModel(ps);
-	setFocusPolicy(Qt::StrongFocus);
-	setFocus();
 }
 
 

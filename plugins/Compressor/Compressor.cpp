@@ -24,10 +24,8 @@
 
 #include "Compressor.h"
 
-#include <cmath>
-#include <numbers>
-
 #include "embed.h"
+#include "interpolation.h"
 #include "lmms_math.h"
 #include "plugin_export.h"
 
@@ -63,7 +61,7 @@ CompressorEffect::CompressorEffect(Model* parent, const Descriptor::SubPluginFea
 	m_yL[0] = m_yL[1] = COMP_NOISE_FLOOR;
 
 	// 200 ms
-	m_crestTimeConst = std::exp(-1.f / (0.2f * m_sampleRate));
+	m_crestTimeConst = exp(-1.f / (0.2f * m_sampleRate));
 
 	connect(&m_compressorControls.m_attackModel, SIGNAL(dataChanged()), this, SLOT(calcAttack()), Qt::DirectConnection);
 	connect(&m_compressorControls.m_releaseModel, SIGNAL(dataChanged()), this, SLOT(calcRelease()), Qt::DirectConnection);
@@ -99,7 +97,7 @@ CompressorEffect::CompressorEffect(Model* parent, const Descriptor::SubPluginFea
 float CompressorEffect::msToCoeff(float ms)
 {
 	// Convert time in milliseconds to applicable lowpass coefficient
-	return std::exp(m_coeffPrecalc / ms);
+	return exp(m_coeffPrecalc / ms);
 }
 
 
@@ -177,7 +175,7 @@ void CompressorEffect::calcRange()
 void CompressorEffect::resizeRMS()
 {
 	const float rmsValue = m_compressorControls.m_rmsModel.value();
-	m_rmsTimeConst = (rmsValue > 0) ? std::exp(-1.f / (rmsValue * 0.001f * m_sampleRate)) : 0;
+	m_rmsTimeConst = (rmsValue > 0) ? exp(-1.f / (rmsValue * 0.001f * m_sampleRate)) : 0;
 }
 
 void CompressorEffect::calcLookaheadLength()
@@ -211,19 +209,18 @@ void CompressorEffect::redrawKnee()
 
 void CompressorEffect::calcTiltCoeffs()
 {
-	using namespace std::numbers;
 	m_tiltVal = m_compressorControls.m_tiltModel.value();
 
-	constexpr float amp = 6.f / ln2_v<float>;
+	const float amp = 6 / log(2);
 
-	constexpr float gfactor = 5;
+	const float gfactor = 5;
 	const float g1 = m_tiltVal > 0 ? -gfactor * m_tiltVal : -m_tiltVal;
 	const float g2 = m_tiltVal > 0 ? m_tiltVal : gfactor * m_tiltVal;
 
-	m_lgain = std::exp(g1 / amp) - 1;
-	m_hgain = std::exp(g2 / amp) - 1;
+	m_lgain = exp(g1 / amp) - 1;
+	m_hgain = exp(g2 / amp) - 1;
 
-	const float omega = 2 * pi_v<float> * m_compressorControls.m_tiltFreqModel.value();
+	const float omega = numbers::tau_v<float> * m_compressorControls.m_tiltFreqModel.value();
 	const float n = 1 / (m_sampleRate * 3 + omega);
 	m_a0 = 2 * omega * n;
 	m_b1 = (m_sampleRate * 3 - omega) * n;
@@ -405,21 +402,21 @@ Effect::ProcessStatus CompressorEffect::processImpl(SampleFrame* buf, const fpp_
 					if (blend <= 1)// Blend to minimum volume
 					{
 						const float temp1 = qMin(m_gainResult[0], m_gainResult[1]);
-						m_gainResult[0] = std::lerp(m_gainResult[0], temp1, blend);
-						m_gainResult[1] = std::lerp(m_gainResult[1], temp1, blend);
+						m_gainResult[0] = linearInterpolate(m_gainResult[0], temp1, blend);
+						m_gainResult[1] = linearInterpolate(m_gainResult[1], temp1, blend);
 					}
 					else if (blend <= 2)// Blend to average volume
 					{
 						const float temp1 = qMin(m_gainResult[0], m_gainResult[1]);
 						const float temp2 = (m_gainResult[0] + m_gainResult[1]) * 0.5f;
-						m_gainResult[0] = std::lerp(temp1, temp2, blend - 1);
+						m_gainResult[0] = linearInterpolate(temp1, temp2, blend - 1);
 						m_gainResult[1] = m_gainResult[0];
 					}
 					else// Blend to maximum volume
 					{
 						const float temp1 = (m_gainResult[0] + m_gainResult[1]) * 0.5f;
 						const float temp2 = qMax(m_gainResult[0], m_gainResult[1]);
-						m_gainResult[0] = std::lerp(temp1, temp2, blend - 2);
+						m_gainResult[0] = linearInterpolate(temp1, temp2, blend - 2);
 						m_gainResult[1] = m_gainResult[0];
 					}
 				}
@@ -531,6 +528,20 @@ void CompressorEffect::processBypassedImpl()
 	}
 }
 
+// Regular modulo doesn't handle negative numbers correctly.  This does.
+inline int CompressorEffect::realmod(int k, int n)
+{
+	return (k %= n) < 0 ? k+n : k;
+}
+
+// Regular fmod doesn't handle negative numbers correctly.  This does.
+inline float CompressorEffect::realfmod(float k, float n)
+{
+	return (k = fmod(k, n)) < 0 ? k+n : k;
+}
+
+
+
 inline void CompressorEffect::calcTiltFilter(sample_t inputSample, sample_t &outputSample, int filtNum)
 {
 	m_tiltOut[filtNum] = m_a0 * inputSample + m_b1 * m_tiltOut[filtNum];
@@ -546,7 +557,7 @@ void CompressorEffect::changeSampleRate()
 	m_coeffPrecalc = COMP_LOG / (m_sampleRate * 0.001f);
 
 	// 200 ms
-	m_crestTimeConst = std::exp(-1.f / (0.2f * m_sampleRate));
+	m_crestTimeConst = exp(-1.f / (0.2f * m_sampleRate));
 
 	m_lookBufLength = std::ceil((20.f / 1000.f) * m_sampleRate) + 2;
 	for (int i = 0; i < 2; ++i)

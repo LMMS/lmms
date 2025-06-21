@@ -24,15 +24,15 @@
 
 #include "AudioFileProcessorWaveView.h"
 
-#include "Sample.h"
 #include "ConfigManager.h"
-#include "SampleThumbnail.h"
 #include "FontHelper.h"
+#include "SampleWaveform.h"
 
 #include <QPainter>
 #include <QMouseEvent>
 
 #include <algorithm>
+
 
 namespace lmms
 {
@@ -81,8 +81,7 @@ AudioFileProcessorWaveView::AudioFileProcessorWaveView(QWidget* parent, int w, i
 	m_isDragging(false),
 	m_reversed(false),
 	m_framesPlayed(0),
-	m_animation(ConfigManager::inst()->value("ui", "animateafp").toInt()),
-	m_sampleThumbnail(*buf)
+	m_animation(ConfigManager::inst()->value("ui", "animateafp").toInt())
 {
 	setFixedSize(w, h);
 	setMouseTracking(true);
@@ -339,18 +338,13 @@ void AudioFileProcessorWaveView::updateGraph()
 	m_graph.fill(Qt::transparent);
 	QPainter p(&m_graph);
 	p.setPen(QColor(255, 255, 255));
+	
+	const auto dataOffset = m_reversed ? m_sample->sampleSize() - m_to : m_from;
 
-	m_sampleThumbnail = SampleThumbnail{*m_sample};
-
-	const auto param = SampleThumbnail::VisualizeParameters{
-		.sampleRect = m_graph.rect(),
-		.amplification = m_sample->amplification(),
-		.sampleStart = static_cast<float>(m_from) / m_sample->sampleSize(),
-		.sampleEnd = static_cast<float>(m_to) / m_sample->sampleSize(),
-		.reversed = m_sample->reversed(),
-	};
-
-	m_sampleThumbnail.visualize(param, p);
+	const auto rect = QRect{0, 0, m_graph.width(), m_graph.height()};
+	const auto waveform = SampleWaveform::Parameters{
+		m_sample->data() + dataOffset, static_cast<size_t>(range()), m_sample->amplification(), m_sample->reversed()};
+	SampleWaveform::visualize(waveform, p, rect);
 }
 
 void AudioFileProcessorWaveView::zoom(const bool out)

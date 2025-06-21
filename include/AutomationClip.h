@@ -68,6 +68,7 @@ public:
 	using TimemapIterator = timeMap::const_iterator;
 
 	AutomationClip( AutomationTrack * _auto_track );
+	AutomationClip( const AutomationClip & _clip_to_copy );
 	~AutomationClip() override = default;
 
 	bool addObject( AutomatableModel * _obj, bool _search_dup = true );
@@ -89,7 +90,7 @@ public:
 	void setTension( QString _new_tension );
 
 	TimePos timeMapLength() const;
-	void updateLength() override;
+	void updateLength();
 
 	TimePos putValue(
 		const TimePos & time,
@@ -195,22 +196,12 @@ public:
 	static int quantization() { return s_quantization; }
 	static void setQuantization(int q) { s_quantization = q; }
 
-	AutomationClip* clone() override
-	{
-		return new AutomationClip(*this);
-	}
-
-	void clearObjects() { m_objects.clear(); }
-
 public slots:
 	void clear();
 	void objectDestroyed( lmms::jo_id_t );
 	void flipY( int min, int max );
 	void flipY();
-	void flipX(int start = -1, int end = -1);
-
-protected:
-	AutomationClip( const AutomationClip & _clip_to_copy );
+	void flipX( int length = -1 );
 
 private:
 	void cleanObjects();

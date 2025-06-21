@@ -27,7 +27,6 @@
 
 
 #include "Knob.h"
-#include "SampleThumbnail.h"
 
 
 namespace lmms
@@ -73,6 +72,7 @@ public:
 			m_waveView(0),
 			m_relatedKnob(0)
 		{
+			setFixedSize(37, 47);
 		}
 
 		void setWaveView(const AudioFileProcessorWaveView* wv)
@@ -144,7 +144,6 @@ private:
 	bool m_reversed;
 	f_cnt_t m_framesPlayed;
 	bool m_animation;
-	SampleThumbnail m_sampleThumbnail;
 
 	friend class AudioFileProcessorView;
 

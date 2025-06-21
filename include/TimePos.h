@@ -29,7 +29,7 @@
 #include <algorithm>
 #include <cassert>
 #include "lmms_export.h"
-#include "LmmsTypes.h"
+#include "lmms_basics.h"
 
 namespace lmms
 {
@@ -70,7 +70,7 @@ public:
 	TimePos( const bar_t bar, const tick_t ticks );
 	TimePos( const tick_t ticks = 0 );
 
-	TimePos quantize(float bars, bool forceRoundDown = false) const;
+	TimePos quantize(float) const;
 	TimePos toAbsoluteBar() const { return getBar() * s_ticksPerBar; }
 
 	TimePos& operator+=(const TimePos& time)

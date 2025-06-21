@@ -43,6 +43,7 @@
 #include "GuiApplication.h"
 #include "MainWindow.h"
 #include "TimePos.h"
+#include "debug.h"
 #include "Song.h"
 
 #include "plugin_export.h"

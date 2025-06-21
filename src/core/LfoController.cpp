@@ -29,7 +29,6 @@
 #include <QFileInfo>
 
 #include "AudioEngine.h"
-#include "Oscillator.h"
 #include "PathUtil.h"
 #include "SampleLoader.h"
 #include "Song.h"

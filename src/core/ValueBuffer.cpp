@@ -1,7 +1,6 @@
 #include "ValueBuffer.h"
 
-#include <algorithm>
-#include <cmath>
+#include "interpolation.h"
 
 namespace lmms
 {
@@ -39,7 +38,9 @@ int ValueBuffer::length() const
 void ValueBuffer::interpolate(float start, float end_)
 {
 	float i = 0;
-	std::generate(begin(), end(), [&]() { return std::lerp(start, end_, i++ / length()); });
+	std::generate(begin(), end(), [&]() {
+		return linearInterpolate( start, end_, i++ / length());
+	});
 }
 
 

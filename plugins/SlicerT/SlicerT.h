@@ -36,7 +36,7 @@
 #include "Sample.h"
 #include "SampleBuffer.h"
 #include "SlicerTView.h"
-#include "LmmsTypes.h"
+#include "lmms_basics.h"
 
 namespace lmms {
 

@@ -30,7 +30,6 @@
 #include "ModelView.h"
 #include "SampleTrack.h"
 #include "SerializingObject.h"
-#include "AutomatableButton.h"
 
 class QLineEdit;
 
@@ -91,8 +90,6 @@ private:
 	QLineEdit * m_nameLineEdit;
 	Knob * m_volumeKnob;
 	Knob * m_panningKnob;
-	AutomatableButton* m_muteBtn;
-	AutomatableButton* m_soloBtn;
 	MixerChannelLcdSpinBox * m_mixerChannelNumber;
 
 	EffectRackView * m_effectRack;

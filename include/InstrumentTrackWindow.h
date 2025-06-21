@@ -27,7 +27,6 @@
 
 #include <QWidget>
 
-#include "AutomatableButton.h"
 #include "ModelView.h"
 #include "SerializingObject.h"
 #include "PluginView.h"
@@ -148,8 +147,6 @@ private:
 	Knob * m_volumeKnob;
 	Knob * m_panningKnob;
 	Knob * m_pitchKnob;
-	AutomatableButton* m_muteBtn;
-	AutomatableButton* m_soloBtn;
 	QLabel * m_pitchLabel;
 	LcdSpinBox* m_pitchRangeSpinBox;
 	QLabel * m_pitchRangeLabel;

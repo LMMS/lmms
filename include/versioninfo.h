@@ -1,7 +1,7 @@
 #ifndef LMMS_VERSION_INFO_H
 #define LMMS_VERSION_INFO_H
 
-#include "LmmsCommonMacros.h"
+#include "lmms_basics.h"
 
 #if defined(__GNUC__)
 constexpr const char* LMMS_BUILDCONF_COMPILER_VERSION = "GCC " __VERSION__;

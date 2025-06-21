@@ -40,6 +40,8 @@
 #include "Song.h"
 
 #include "base64.h"
+#include "lmms_constants.h"
+
 #include "embed.h"
 
 #include "ExprSynth.h"
@@ -250,8 +252,7 @@ void Xpressive::smooth(float smoothness,const graphModel * in,graphModel * out)
 		const int guass_size = (int)(smoothness * 5) | 1;
 		const int guass_center = guass_size/2;
 		const float delta = smoothness;
-		constexpr float inv_sqrt2pi = std::numbers::inv_sqrtpi_v<float> / std::numbers::sqrt2_v<float>;
-		const float a = inv_sqrt2pi / delta;
+		const float a = 1.0f / (std::sqrt(numbers::tau_v<float>) * delta);
 		auto const guassian = new float[guass_size];
 		float sum = 0.0f;
 		float temp = 0.0f;

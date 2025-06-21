@@ -23,8 +23,8 @@
 */
 
 
-#ifndef LMMS_GUI_SIMPLE_TEXT_FLOAT_H
-#define LMMS_GUI_SIMPLE_TEXT_FLOAT_H
+#ifndef SIMPLE_TEXT_FLOAT_H
+#define SIMPLE_TEXT_FLOAT_H
 
 #include <QWidget>
 
@@ -47,10 +47,7 @@ public:
 
 	void showWithDelay(int msecBeforeDisplay, int msecDisplayTime);
 
-	void showWithTimeout(int msec)
-	{
-		showWithDelay(0, msec);
-	}
+	void setVisibilityTimeOut(int msecs);
 
 	void moveGlobal(QWidget * w, const QPoint & offset)
 	{
@@ -67,4 +64,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif // LMMS_GUI_SIMPLE_TEXT_FLOAT_H
+#endif

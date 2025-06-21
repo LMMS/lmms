@@ -28,7 +28,6 @@
 #include <string_view>
 
 #include <QBoxLayout>
-#include <QSizePolicy>
 
 #include "EnvelopeGraph.h"
 #include "LfoGraph.h"
@@ -57,7 +56,8 @@ EnvelopeAndLfoView::EnvelopeAndLfoView(QWidget * parent) :
 	// Helper lambdas for consistent repeated buiding of certain widgets
 	auto buildKnob = [&](const QString& label, const QString& hintText)
 	{
-		auto knob = new Knob(KnobType::Bright26, label, this, Knob::LabelRendering::LegacyFixedFontSize);
+		auto knob = new Knob(KnobType::Bright26, this);
+		knob->setLabel(label);
 		knob->setHintText(hintText, "");
 		
 		return knob;
@@ -85,7 +85,6 @@ EnvelopeAndLfoView::EnvelopeAndLfoView(QWidget * parent) :
 
 	m_envelopeGraph = new EnvelopeGraph(this);
 	graphAndAmountLayout->addWidget(m_envelopeGraph);
-	m_envelopeGraph->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
 	m_amountKnob = buildKnob(tr("AMT"), tr("Modulation amount:"));
 	graphAndAmountLayout->addWidget(m_amountKnob, 0, Qt::AlignCenter);
@@ -125,7 +124,6 @@ EnvelopeAndLfoView::EnvelopeAndLfoView(QWidget * parent) :
 	lfoLayout->addLayout(graphAndTypesLayout);
 
 	m_lfoGraph = new LfoGraph(this);
-	m_lfoGraph->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	graphAndTypesLayout->addWidget(m_lfoGraph);
 
 	QHBoxLayout* typesLayout = new QHBoxLayout();
@@ -169,7 +167,8 @@ EnvelopeAndLfoView::EnvelopeAndLfoView(QWidget * parent) :
 	m_lfoAttackKnob = buildKnob(tr("ATT"), tr("Attack:"));
 	lfoKnobsLayout->addWidget(m_lfoAttackKnob);
 
-	m_lfoSpeedKnob = new TempoSyncKnob(KnobType::Bright26, tr("SPD"), this, Knob::LabelRendering::LegacyFixedFontSize);
+	m_lfoSpeedKnob = new TempoSyncKnob(KnobType::Bright26, this);
+	m_lfoSpeedKnob->setLabel(tr("SPD"));
 	m_lfoSpeedKnob->setHintText(tr("Frequency:"), "");
 	lfoKnobsLayout->addWidget(m_lfoSpeedKnob);
 

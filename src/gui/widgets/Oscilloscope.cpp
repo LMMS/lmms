@@ -34,6 +34,7 @@
 #include "Engine.h"
 #include "Song.h"
 #include "embed.h"
+#include "BufferManager.h"
 
 namespace lmms::gui
 {
@@ -50,6 +51,7 @@ Oscilloscope::Oscilloscope( QWidget * _p ) :
 	m_clippingColor(255, 64, 64)
 {
 	setFixedSize( m_background.width(), m_background.height() );
+	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	setActive( ConfigManager::inst()->value( "ui", "displaywaveform").toInt() );
 
 	const fpp_t frames = Engine::audioEngine()->framesPerPeriod();

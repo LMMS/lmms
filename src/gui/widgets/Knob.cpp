@@ -25,14 +25,11 @@
 #include "Knob.h"
 
 #include <QPainter>
-#include <numbers>
 
 #include "lmms_math.h"
 #include "DeprecationHelper.h"
 #include "embed.h"
 #include "FontHelper.h"
-
-#include <algorithm>
 
 
 namespace lmms::gui
@@ -51,28 +48,11 @@ Knob::Knob( KnobType _knob_num, QWidget * _parent, const QString & _name ) :
 	initUi( _name );
 }
 
-Knob::Knob(KnobType knobNum, const QString& labelText, QWidget* parent, LabelRendering labelRendering, const QString& name) :
-	Knob(knobNum, parent, name)
-{
-	setLabel(labelText);
-
-	if (labelRendering == LabelRendering::LegacyFixedFontSize)
-	{
-		setFixedFontSizeLabelRendering();
-	}
-}
-
-Knob::Knob(KnobType knobNum, const QString& labelText, int labelPixelSize, QWidget* parent, const QString& name) :
-	Knob(knobNum, parent, name)
-{
-	setFont(adjustedToPixelSize(font(), labelPixelSize));
-	setLabel(labelText);
-}
-
 Knob::Knob( QWidget * _parent, const QString & _name ) :
 	Knob( KnobType::Bright26, _parent, _name )
 {
 }
+
 
 
 
@@ -148,12 +128,16 @@ void Knob::onKnobNumUpdated()
 
 
 
-void Knob::setLabel(const QString& txt)
+void Knob::setLabel( const QString & txt )
 {
 	m_label = txt;
 	m_isHtmlLabel = false;
-
-	updateFixedSize();
+	if( m_knobPixmap )
+	{
+		setFixedSize(qMax<int>( m_knobPixmap->width(),
+					horizontalAdvance(QFontMetrics(adjustedToPixelSize(font(), SMALL_FONT_SIZE)), m_label)),
+						m_knobPixmap->height() + 10);
+	}
 
 	update();
 }
@@ -180,49 +164,8 @@ void Knob::setHtmlLabel(const QString &htmltxt)
 	update();
 }
 
-void Knob::setFixedFontSizeLabelRendering()
-{
-	m_fixedFontSizeLabelRendering = true;
 
-	updateFixedSize();
 
-	update();
-}
-
-void Knob::updateFixedSize()
-{
-	if (fixedFontSizeLabelRendering())
-	{
-		if (m_knobPixmap)
-		{
-			// In legacy mode only the width of the label is taken into account while the height is not
-			const int labelWidth = horizontalAdvance(QFontMetrics(adjustedToPixelSize(font(), SMALL_FONT_SIZE)), m_label);
-			const int width = std::max(m_knobPixmap->width(), labelWidth);
-
-			// Legacy mode assumes that the label will fit into 10 pixels plus some of the pixmap area
-			setFixedSize(width, m_knobPixmap->height() + 10);
-		}
-	}
-	else
-	{
-		// Styled knobs do not use pixmaps and have no labels. Their size is set from the outside and
-		// they are painted within these limits. Hence we should not compute a new size from a pixmap
-		// and/or label the case of styled knobs.
-		if (knobNum() == KnobType::Styled)
-		{
-			return;
-		}
-
-		QSize pixmapSize = m_knobPixmap ? m_knobPixmap->size() : QSize(0, 0);
-
-		auto fm = QFontMetrics(font());
-
-		const int width = std::max(pixmapSize.width(), horizontalAdvance(fm, m_label));
-		const int height = pixmapSize.height() + fm.height();
-
-		setFixedSize(width, height);
-	}
-}
 
 void Knob::setTotalAngle( float angle )
 {
@@ -369,9 +312,9 @@ void Knob::setTextColor( const QColor & c )
 
 QLineF Knob::calculateLine( const QPointF & _mid, float _radius, float _innerRadius ) const
 {
-	const float rarc = m_angle * std::numbers::pi_v<float> / 180.0;
-	const float ca = std::cos(rarc);
-	const float sa = -std::sin(rarc);
+	const float rarc = m_angle * numbers::pi_v<float> / 180.0;
+	const float ca = cos( rarc );
+	const float sa = -sin( rarc );
 
 	return QLineF( _mid.x() - sa*_innerRadius, _mid.y() - ca*_innerRadius,
 					_mid.x() - sa*_radius, _mid.y() - ca*_radius );
@@ -503,40 +446,29 @@ void Knob::drawKnob( QPainter * _p )
 	_p->drawImage( 0, 0, m_cache );
 }
 
-void Knob::drawLabel(QPainter& p)
+void Knob::paintEvent( QPaintEvent * _me )
 {
+	QPainter p( this );
+
+	drawKnob( &p );
 	if( !m_label.isEmpty() )
 	{
 		if (!m_isHtmlLabel)
 		{
-			if (fixedFontSizeLabelRendering())
-			{
-				p.setFont(adjustedToPixelSize(p.font(), SMALL_FONT_SIZE));
-			}
-			auto fm = p.fontMetrics();
-			const auto x = (width() - horizontalAdvance(fm, m_label)) / 2;
-			const auto descent = fixedFontSizeLabelRendering() ? 2 : fm.descent();
-			const auto y = height() - descent; 
-
+			p.setFont(adjustedToPixelSize(p.font(), SMALL_FONT_SIZE));
 			p.setPen(textColor());
-			p.drawText(x, y, m_label);
+			p.drawText(width() / 2 -
+				horizontalAdvance(p.fontMetrics(), m_label) / 2,
+				height() - 2, m_label);
 		}
 		else
 		{
 			// TODO setHtmlLabel is never called so this will never be executed. Remove functionality?
-			m_tdRenderer->setDefaultFont(font());
+			m_tdRenderer->setDefaultFont(adjustedToPixelSize(p.font(), SMALL_FONT_SIZE));
 			p.translate((width() - m_tdRenderer->idealWidth()) / 2, (height() - m_tdRenderer->pageSize().height()) / 2);
 			m_tdRenderer->drawContents(&p);
 		}
 	}
-}
-
-void Knob::paintEvent(QPaintEvent*)
-{
-	QPainter p(this);
-
-	drawKnob(&p);
-	drawLabel(p);
 }
 
 void Knob::changeEvent(QEvent * ev)
@@ -549,14 +481,6 @@ void Knob::changeEvent(QEvent * ev)
 			setLabel(m_label);
 		}
 		m_cache = QImage();
-		update();
-	}
-	else if (ev->type() == QEvent::FontChange)
-	{
-		// The size of the label might have changed so update
-		// the size of this widget.
-		updateFixedSize();
-
 		update();
 	}
 }

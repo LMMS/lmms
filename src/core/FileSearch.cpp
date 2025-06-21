@@ -26,6 +26,8 @@
 
 #include <atomic>
 #include <chrono>
+#include <lmmsconfig.h>
+
 #include <thread>
 
 namespace lmms {
