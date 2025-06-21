@@ -352,7 +352,7 @@ public:
 	 */
 	using Router = detail::AudioPortsRouter<settings>;
 
-	template<AudioPortsSettings, AudioDataKind, bool>
+	template<AudioPortsSettings, bool>
 	friend class detail::AudioPortsRouter;
 
 	/**
