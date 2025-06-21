@@ -338,7 +338,8 @@ jobs:
           wget https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/gcc-mingw-w64/24.3/gcc-mingw-w64_24.3.tar.xz
           mkdir build-deps
           cd build-deps
-          mk-build-deps -i ../gcc-mingw-w64_24.3.dsc
+          mk-build-deps ../gcc-mingw-w64_24.3.dsc
+          apt-get install -y --no-install-recommends ./gcc-mingw-w64-build-deps_24.3_amd64.deb
           cd ..
           dpkg-source --no-check -x gcc-mingw-w64_24.3.dsc
           cd gcc-mingw-w64-24.3
