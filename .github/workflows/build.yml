@@ -248,7 +248,7 @@ jobs:
   mingw:
     name: mingw64
     runs-on: ubuntu-latest
-    container: ubuntu:20.10
+    container: ubuntu:20.04
     env:
       CMAKE_OPTS: >-
         -DCMAKE_BUILD_TYPE=RelWithDebInfo
@@ -326,6 +326,12 @@ jobs:
           update-alternatives --set i686-w64-mingw32-g++ /usr/bin/i686-w64-mingw32-g++-posix
           update-alternatives --set x86_64-w64-mingw32-gcc /usr/bin/x86_64-w64-mingw32-gcc-posix
           update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/x86_64-w64-mingw32-g++-posix
+      - name: Upgrade compilers
+        run: |
+          x86_64-w64-mingw32-g++ --version
+          wget -P /tmp https://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-mingw-w64/g++-mingw-w64-x86-64-posix_10.3.0-14ubuntu1+24.3_amd64.deb
+          dpkg -i /tmp/g++-mingw-w64-x86-64-posix_10.3.0-14ubuntu1+24.3_amd64.deb
+          x86_64-w64-mingw32-g++ --version
       - name: Configure
         run: |
           ccache --zero-stats
