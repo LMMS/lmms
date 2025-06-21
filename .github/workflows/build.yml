@@ -329,8 +329,11 @@ jobs:
       - name: Upgrade compilers
         run: |
           x86_64-w64-mingw32-g++ --version
-          wget -P /tmp https://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-mingw-w64/g++-mingw-w64-x86-64-posix_10.3.0-14ubuntu1+24.3_amd64.deb
-          dpkg -i /tmp/g++-mingw-w64-x86-64-posix_10.3.0-14ubuntu1+24.3_amd64.deb
+          mkdir /tmp/compiler-debs
+          wget -P /tmp/compiler-debs https://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-mingw-w64/g++-mingw-w64-x86-64-posix_10.3.0-14ubuntu1+24.3_amd64.deb
+          wget -P /tmp/compiler-debs https://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-mingw-w64/g++-mingw-w64-x86-64_10.3.0-14ubuntu1+24.3_all.deb
+          wget -P /tmp/compiler-debs https://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-mingw-w64/gcc-mingw-w64-base_10.3.0-14ubuntu1+24.3_amd64.deb
+          dpkg -i /tmp/compiler-debs/*.deb
           x86_64-w64-mingw32-g++ --version
       - name: Configure
         run: |
