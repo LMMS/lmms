@@ -203,9 +203,9 @@ namespace lmms::PathUtil
 	std::filesystem::path LMMS_EXPORT fsConvert(const QString& path)
 	{
 #ifdef LMMS_BUILD_WIN32
-		return path.toStdWString().c_str();
+		return path.toStdWString();
 #else
-		return path.toStdString().c_str();
+		return path.toStdString();
 #endif
 	}
 
