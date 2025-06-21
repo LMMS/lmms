@@ -262,6 +262,11 @@ jobs:
         run: |
           apt-get update && apt-get install -y \
             --no-install-recommends            \
+              # The following packages are for building the compiler source package
+              build-essential                  \
+              devscripts                       \
+              equivs                           \
+              # End of packages for building the compiler source package
               dirmngr                          \
               gnupg                            \
               binutils                         \
@@ -329,12 +334,19 @@ jobs:
       - name: Upgrade compilers
         run: |
           x86_64-w64-mingw32-g++ --version
-          mkdir /tmp/compiler-debs
-          wget -P /tmp/compiler-debs https://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-mingw-w64/g++-mingw-w64-x86-64-posix_10.3.0-14ubuntu1+24.3_amd64.deb
-          wget -P /tmp/compiler-debs https://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-mingw-w64/g++-mingw-w64-x86-64_10.3.0-14ubuntu1+24.3_all.deb
-          wget -P /tmp/compiler-debs https://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-mingw-w64/gcc-mingw-w64-base_10.3.0-14ubuntu1+24.3_amd64.deb
-          wget -P /tmp/compiler-debs https://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-mingw-w64/g++-mingw-w64-x86-64-win32_13.2.0-6ubuntu1+26.1_amd64.deb
-          dpkg --force-all -i /tmp/compiler-debs/*.deb
+          mkdir /tmp/build-compiler-source-package
+          cd /tmp/build-compiler-source-package
+          wget https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/gcc-mingw-w64/24.3/gcc-mingw-w64_24.3.dsc
+          wget https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/gcc-mingw-w64/24.3/gcc-mingw-w64_24.3.tar.xz
+          mkdir build-deps
+          cd build-deps
+          mk-build-deps -i ../gcc-mingw-w64_24.3.dsc
+          cd ..
+          dpkg-source --no-check -x gcc-mingw-w64_24.3.dsc
+          cd gcc-mingw-w64-24.3
+          dpkg-buildpackage -us -uc
+          cd ..
+          dpkg --force-all -i *.deb
           x86_64-w64-mingw32-g++ --version
       - name: Configure
         run: |
