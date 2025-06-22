@@ -426,7 +426,14 @@ bool VstPlugin::processMessage( const message & _m )
 	case IdVstPluginEditorGeometry:
 		m_pluginGeometry = QSize( _m.getInt( 0 ),
 								  _m.getInt( 1 ) );
-			break;
+
+		if(m_pluginWidget)
+		{
+			hideUI();
+			m_pluginWidget->setFixedSize( m_pluginGeometry );
+			showUI();
+		}
+		break;
 
 		case IdVstPluginName:
 			m_name = _m.getQString();
