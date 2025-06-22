@@ -265,7 +265,6 @@ jobs:
               build-essential                  \
               devscripts                       \
               equivs                           \
-              autoconf2.69                     \
               dirmngr                          \
               gnupg                            \
               binutils                         \
@@ -344,6 +343,7 @@ jobs:
           cd ..
           dpkg-source --no-check -x gcc-mingw-w64_24.3.dsc
           cd gcc-mingw-w64-24.3
+          ln -s /usr/bin/autoconf /usr/bin/autoconf2.69
           dpkg-buildpackage -us -uc
           cd ..
           dpkg --force-all -i *.deb
