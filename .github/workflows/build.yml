@@ -333,60 +333,38 @@ jobs:
           update-alternatives --set i686-w64-mingw32-g++ /usr/bin/i686-w64-mingw32-g++-posix
           update-alternatives --set x86_64-w64-mingw32-gcc /usr/bin/x86_64-w64-mingw32-gcc-posix
           update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/x86_64-w64-mingw32-g++-posix
-      - name: Upgrade mingw-w64
+      - name: Clear some disk space so the next step can succeed
         run: |
-          dpkg -l | fgrep -i mingw
-          mkdir /tmp/build-mingw-source-package
-          cd /tmp/build-mingw-source-package
-          wget https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/mingw-w64/8.0.0-1/mingw-w64_8.0.0-1.dsc
-          wget https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/mingw-w64/8.0.0-1/mingw-w64_8.0.0.orig.tar.bz2
-          wget https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/mingw-w64/8.0.0-1/mingw-w64_8.0.0.orig.tar.bz2.asc
-          wget https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/mingw-w64/8.0.0-1/mingw-w64_8.0.0-1.debian.tar.xz
+          df -h
+          rm -fr /runnerroot/usr/local/lib/android /runnerroot/usr/local/.ghcup /runnerroot/usr/share/swift /runnerroot/opt/hostedtoolcache/CodeQL
+          df -h
+      - name: Upgrade compilers
+        run: |
+          x86_64-w64-mingw32-g++ --version
+          mkdir /tmp/build-compiler-source-package
+          cd /tmp/build-compiler-source-package
+          wget https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/gcc-mingw-w64/24.3/gcc-mingw-w64_24.3.dsc
+          wget https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/gcc-mingw-w64/24.3/gcc-mingw-w64_24.3.tar.xz
           mkdir build-deps
           cd build-deps
-          mk-build-deps ../mingw-w64_8.0.0-1.dsc
-          ls *.deb
-          apt-get install -y --no-install-recommends ./mingw-w64-build-deps_8.0.0-1_all.deb
+          mk-build-deps ../gcc-mingw-w64_24.3.dsc
+          apt-get install -y --no-install-recommends ./gcc-mingw-w64-build-deps_24.3_amd64.deb
           cd ..
-          dpkg-source --no-check -x mingw-w64_8.0.0-1.dsc
-          cd mingw-w64-8.0.0
+          dpkg-source --no-check -x gcc-mingw-w64_24.3.dsc
+          cd gcc-mingw-w64-24.3
           ln -s /usr/bin/autoconf /usr/bin/autoconf2.69
           ln -s /usr/bin/autom4te /usr/bin/autom4te2.69
           df -h
           dpkg-buildpackage -us -uc
           cd ..
           dpkg --force-all -i *.deb
-          dpkg -l | fgrep -i mingw
-      - name: Setup tmate session
-        if: ${{ failure() }}
-        uses: mxschmitt/action-tmate@v3
-        with:
-          sudo: false
-      - name: Configure
-        run: |
-          ccache --zero-stats
-          cmake -S . \
-                -B build \
-                -DCMAKE_TOOLCHAIN_FILE="./cmake/toolchains/MinGW-W64-64.cmake" \
-                $CMAKE_OPTS
-      - name: Build
-        run: cmake --build build
-      - name: Package
-        run: cmake --build build --target package
-      - name: Upload artifacts
+          x86_64-w64-mingw32-g++ --version
+      - name: Upload resulting deb files as an artifact
         uses: actions/upload-artifact@v4
         with:
-          name: mingw64
-          path: build/lmms-*.exe
-      - name: Trim ccache and print statistics
-        run: |
-          ccache --cleanup
-          echo "[ccache config]"
-          ccache --show-config
-          echo "[ccache stats]"
-          ccache --show-stats
-        env:
-          CCACHE_MAXSIZE: 500M
+          name: gcc-mingw-w64-24.3-debs
+          path: /tmp/build-compiler-source-package/*.deb
+          compression-level: 0
   msvc:
     if: false
     name: msvc-x64
