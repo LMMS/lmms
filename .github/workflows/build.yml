@@ -350,7 +350,7 @@ jobs:
           cd build-deps
           mk-build-deps ../mingw-w64_8.0.0-1.dsc
           ls *.deb
-          apt-get install -y --no-install-recommends ./mingw-w64-build-deps_8.0.0-1_amd64.deb
+          apt-get install -y --no-install-recommends ./mingw-w64-build-deps_8.0.0-1_all.deb
           cd ..
           dpkg-source --no-check -x mingw-w64_8.0.0-1.dsc
           cd mingw-w64_8.0.0-1
