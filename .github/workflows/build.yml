@@ -333,10 +333,6 @@ jobs:
           update-alternatives --set i686-w64-mingw32-g++ /usr/bin/i686-w64-mingw32-g++-posix
           update-alternatives --set x86_64-w64-mingw32-gcc /usr/bin/x86_64-w64-mingw32-gcc-posix
           update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/x86_64-w64-mingw32-g++-posix
-#      - name: Setup tmate session
-#        uses: mxschmitt/action-tmate@v3
-#        with:
-#          sudo: false
       - name: Upgrade mingw-w64
         run: |
           dpkg -l | fgrep -i mingw
@@ -361,6 +357,11 @@ jobs:
           cd ..
           dpkg --force-all -i *.deb
           dpkg -l | fgrep -i mingw
+      - name: Setup tmate session
+        if: ${{ failure() }}
+        uses: mxschmitt/action-tmate@v3
+        with:
+          sudo: false
       - name: Configure
         run: |
           ccache --zero-stats
