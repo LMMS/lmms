@@ -353,7 +353,7 @@ jobs:
           apt-get install -y --no-install-recommends ./mingw-w64-build-deps_8.0.0-1_all.deb
           cd ..
           dpkg-source --no-check -x mingw-w64_8.0.0-1.dsc
-          cd mingw-w64_8.0.0-1
+          cd mingw-w64-8.0.0
           ln -s /usr/bin/autoconf /usr/bin/autoconf2.69
           ln -s /usr/bin/autom4te /usr/bin/autom4te2.69
           df -h
