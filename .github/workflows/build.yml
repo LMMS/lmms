@@ -258,7 +258,7 @@ jobs:
         -DUSE_COMPILE_CACHE=ON
       CCACHE_MAXSIZE: 0
       CCACHE_NOCOMPRESS: 1
-      MAKEFLAGS: -j2
+#      MAKEFLAGS: -j2
       DEBIAN_FRONTEND: noninteractive
     steps:
       - name: Install basic dependencies
