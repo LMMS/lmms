@@ -58,14 +58,14 @@ Vectorscope::Vectorscope(Model *parent, const Plugin::Descriptor::SubPluginFeatu
 
 
 // Take audio data and store them for processing and display in the GUI thread.
-ProcessStatus Vectorscope::processImpl(InterleavedBufferView<float, 2> inOut)
+ProcessStatus Vectorscope::processImpl(InterleavedBufferView<float, 2> in)
 {
 	// Skip processing if the controls dialog isn't visible, it would only waste CPU cycles.
 	if (m_controls.isViewVisible())
 	{
 		// To avoid processing spikes on audio thread, data are stored in
 		// a lockless ringbuffer and processed in a separate thread.
-		m_inputBuffer.write(reinterpret_cast<SampleFrame*>(inOut.data()), inOut.frames());
+		m_inputBuffer.write(reinterpret_cast<SampleFrame*>(in.data()), in.frames());
 	}
 
 	return ProcessStatus::Continue;

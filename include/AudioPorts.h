@@ -92,37 +92,24 @@ private:
 
 namespace detail {
 
-/**
- * Metafunction to select the appropriate non-owning audio buffer view
- * given the layout, sample type, and channel count
- */
-template<AudioDataKind kind, bool interleaved, proc_ch_t channels, bool isConst>
-struct GetAudioBufferViewTypeHelper
+//! Metafunction to select the appropriate non-owning audio buffer view
+template<AudioPortsSettings settings, bool isOutput, bool isConst>
+class GetAudioBufferViewTypeHelper
 {
-	static_assert(always_false_v<GetAudioBufferViewTypeHelper<kind, interleaved, channels, isConst>>,
-		"Unsupported audio data type");
-};
+	static constexpr auto s_channels = settings.inplace
+		? std::max(settings.inputs, settings.outputs)
+		: (isOutput ? settings.outputs : settings.inputs);
 
-//! Non-interleaved specialization
-template<AudioDataKind kind, proc_ch_t channels, bool isConst>
-struct GetAudioBufferViewTypeHelper<kind, false, channels, isConst>
-{
-	using type = PlanarBufferView<
-		std::conditional_t<isConst,
-			const GetAudioDataType<kind>,
-			GetAudioDataType<kind>
-		>, channels>;
-};
+public:
+	using SampleT = std::conditional_t<isConst,
+		const GetAudioDataType<settings.kind>,
+		GetAudioDataType<settings.kind>
+	>;
 
-//! Interleaved specialization
-template<AudioDataKind kind, proc_ch_t channels, bool isConst>
-struct GetAudioBufferViewTypeHelper<kind, true, channels, isConst>
-{
-	using type = InterleavedBufferView<
-		std::conditional_t<isConst,
-			const GetAudioDataType<kind>,
-			GetAudioDataType<kind>
-		>, channels>;
+	using type = std::conditional_t<settings.interleaved,
+		InterleavedBufferView<SampleT, s_channels>,
+		PlanarBufferView<SampleT, s_channels>
+	>;
 };
 
 } // namespace detail
@@ -130,8 +117,7 @@ struct GetAudioBufferViewTypeHelper<kind, true, channels, isConst>
 
 //! Metafunction to select the appropriate non-owning audio buffer view
 template<AudioPortsSettings settings, bool isOutput, bool isConst>
-using GetAudioBufferViewType = typename detail::GetAudioBufferViewTypeHelper<
-	settings.kind, settings.interleaved, (isOutput ? settings.outputs : settings.inputs), isConst>::type;
+using GetAudioBufferViewType = typename detail::GetAudioBufferViewTypeHelper<settings, isOutput, isConst>::type;
 
 
 // Forward declaration
@@ -139,8 +125,6 @@ template<AudioPortsSettings settings>
 class AudioPorts;
 
 namespace detail {
-
-struct AudioPortsTag {};
 
 //! Interface for accessing input/output audio buffers
 template<AudioPortsSettings settings, bool inplace = settings.inplace>
@@ -186,30 +170,44 @@ inline void processHelper(AudioPortsRouter<settings>& router, AudioBus<float> co
 {
 	if constexpr (settings.inplace)
 	{
-		// Write core to processor input buffer
 		const auto processorInOut = processorBuffers.inputOutput();
-		router.send(coreInOut, processorInOut);
+
+		// Write core to processor input buffer
+		if constexpr (settings.inputs != 0)
+		{
+			router.send(coreInOut, processorInOut);
+		}
 
 		// Process
 		if constexpr (!settings.buffered) { processFunc(processorInOut); }
 		else { processFunc(); }
 
 		// Write processor output buffer to core
-		router.receive(processorInOut, coreInOut);
+		if constexpr (settings.outputs != 0)
+		{
+			router.receive(processorInOut, coreInOut);
+		}
 	}
 	else
 	{
-		// Write core to processor input buffer
 		const auto processorIn = processorBuffers.input();
 		const auto processorOut = processorBuffers.output();
-		router.send(coreInOut, processorIn);
+
+		// Write core to processor input buffer
+		if constexpr (settings.inputs != 0)
+		{
+			router.send(coreInOut, processorIn);
+		}
 
 		// Process
 		if constexpr (!settings.buffered) { processFunc(processorIn, processorOut); }
 		else { processFunc(); }
 
 		// Write processor output buffer to core
-		router.receive(processorOut, coreInOut);
+		if constexpr (settings.outputs != 0)
+		{
+			router.receive(processorOut, coreInOut);
+		}
 	}
 }
 
@@ -301,7 +299,6 @@ private:
 template<AudioPortsSettings settings>
 class AudioPorts
 	: public AudioPortsModel
-	, public detail::AudioPortsTag
 {
 	static_assert(validate<settings>());
 
@@ -446,8 +443,6 @@ template<AudioPortsSettings settings>
 inline void AudioPortsRouter<settings, false>::send(
 	AudioBus<const float> in, PlanarBufferView<SampleT, settings.inputs> out) const
 {
-	if constexpr (settings.inputs == 0) { return; }
-
 	assert(m_ap->in().channelCount() != DynamicChannelCount);
 	if (m_ap->in().channelCount() == 0) { return; }
 
@@ -510,8 +505,6 @@ template<AudioPortsSettings settings>
 inline void AudioPortsRouter<settings, false>::receive(
 	PlanarBufferView<const SampleT, settings.outputs> in, AudioBus<float> inOut) const
 {
-	if constexpr (settings.outputs == 0) { return; }
-
 	assert(m_ap->out().channelCount() != DynamicChannelCount);
 	if (m_ap->out().channelCount() == 0) { return; }
 
@@ -652,8 +645,6 @@ template<AudioPortsSettings settings>
 inline void AudioPortsRouter<settings, true>::send(
 	AudioBus<const float> in, InterleavedBufferView<float, settings.inputs> out) const
 {
-	if constexpr (settings.inputs == 0) { return; }
-
 	assert(m_ap->in().channelCount() != DynamicChannelCount);
 	if (m_ap->in().channelCount() == 0) { return; }
 	assert(m_ap->in().channelCount() == 2); // Interleaved routing only allows exactly 0 or 2 channels
@@ -743,8 +734,6 @@ template<AudioPortsSettings settings>
 inline void AudioPortsRouter<settings, true>::receive(
 	InterleavedBufferView<const float, settings.outputs> in, AudioBus<float> inOut) const
 {
-	if constexpr (settings.outputs == 0) { return; }
-
 	assert(m_ap->out().channelCount() != DynamicChannelCount);
 	if (m_ap->out().channelCount() == 0) { return; }
 	assert(m_ap->out().channelCount() == 2); // Interleaved routing only allows exactly 0 or 2 channels

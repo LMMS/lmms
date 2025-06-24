@@ -33,7 +33,15 @@ namespace lmms
 
 
 //! Top level class; handles LMMS interface and accumulates data for processing.
-class Vectorscope : public DefaultEffect
+class Vectorscope
+	: public AudioPluginExt<Effect, AudioPortsSettings {
+		.kind = AudioDataKind::F32,
+		.interleaved = true,
+		.inputs = 2,
+		.outputs = 0,
+		.inplace = true,
+		.buffered = false
+	}>
 {
 public:
 	Vectorscope(Model *parent, const Descriptor::SubPluginFeatures::Key *key);
@@ -43,7 +51,7 @@ public:
 	LocklessRingBuffer<SampleFrame> *getBuffer() {return &m_inputBuffer;}
 
 private:
-	ProcessStatus processImpl(InterleavedBufferView<float, 2> inOut) override;
+	ProcessStatus processImpl(InterleavedBufferView<float, 2> in) override;
 
 	VecControls m_controls;
 

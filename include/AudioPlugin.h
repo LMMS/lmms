@@ -335,9 +335,7 @@ template<class ParentT, AudioPortsSettings settings, class AudioPortsT>
 class AudioPlugin
 	: public detail::AudioPlugin<ParentT, settings, AudioPortsT>
 {
-	static_assert(settings == AudioPortsT::audioPortsSettings());
-
-	static_assert(std::is_base_of_v<detail::AudioPortsTag, AudioPortsT>,
+	static_assert(std::is_base_of_v<AudioPorts<settings>, AudioPortsT>,
 		"AudioPortT must implement `AudioPorts`");
 
 	static_assert(validate<settings>());
