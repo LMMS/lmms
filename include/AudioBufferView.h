@@ -140,8 +140,7 @@ class InterleavedFrameIterator : public InterleavedFrameIteratorData<SampleT, ch
 	using Base = InterleavedFrameIteratorData<SampleT, channelCount>;
 
 public:
-	using iterator_category = std::input_iterator_tag;
-	using iterator_concept = std::contiguous_iterator_tag;
+	using iterator_concept = std::random_access_iterator_tag;
 	using value_type = SampleT*;
 	using difference_type = std::ptrdiff_t;
 
@@ -164,7 +163,7 @@ public:
 
 	constexpr auto operator[](difference_type frames) const noexcept -> value_type
 	{
-		return this->m_data + frames * Base::channels();
+		return this->m_data[frames * Base::channels()];
 	}
 
 	constexpr auto operator++() noexcept -> InterleavedFrameIterator&
