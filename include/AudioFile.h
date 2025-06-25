@@ -27,10 +27,16 @@
 
 #include <cstring>
 #include <filesystem>
-#include <sndfile.h>
 
 #include "AudioBufferView.h"
 #include "LmmsTypes.h"
+
+#ifdef LMMS_BUILD_WIN32
+#include <windows.h>
+#define ENABLE_SNDFILE_WINDOWS_PROTOTYPES 1
+#endif
+
+#include <sndfile.h>
 
 namespace lmms {
 //! @brief The AudioFile is a class that is abstraction reading from audio files on disk. DrumSynth files are also
