@@ -407,13 +407,13 @@ public:
 template<AudioPortsSettings settings>
 class CustomAudioPorts
 	: public AudioPorts<settings>
-	, public AudioPorts<settings>::Buffer
+	, protected AudioPorts<settings>::Buffer
 {
 public:
 	using AudioPorts<settings>::AudioPorts;
 
-private:
-	void bufferPropertiesChanged(proc_ch_t inChannels, proc_ch_t outChannels, f_cnt_t frames) final
+protected:
+	void bufferPropertiesChanged(proc_ch_t inChannels, proc_ch_t outChannels, f_cnt_t frames) override
 	{
 		// Connects the audio port model to the buffers
 		this->updateBuffers(inChannels, outChannels, frames);
