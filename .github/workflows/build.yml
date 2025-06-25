@@ -255,10 +255,6 @@ jobs:
     env:
       CMAKE_OPTS: >-
         -DCMAKE_BUILD_TYPE=RelWithDebInfo
-        -DUSE_COMPILE_CACHE=ON
-      CCACHE_MAXSIZE: 0
-      CCACHE_NOCOMPRESS: 1
-#      MAKEFLAGS: -j2
       DEBIAN_FRONTEND: noninteractive
     steps:
       - name: Install basic dependencies
@@ -269,12 +265,10 @@ jobs:
               build-essential                  \
               devscripts                       \
               equivs                           \
-              unzip                            \
               dirmngr                          \
               gnupg                            \
               binutils                         \
               ca-certificates                  \
-              ccache                           \
               git                              \
               gpg                              \
               libc6-dev                        \
@@ -287,116 +281,38 @@ jobs:
               software-properties-common       \
               ssh-client                       \
               wget                             \
-              qt5-qmake                        \
-              qtbase5-dev                      \
-              qttools5-dev-tools               \
           && rm -rf /var/lib/apt/lists/*
-      - name: Configure apt
+      - name: Clear some disk space so the next step can succeed
         run: |
-          sh -c 'echo "deb http://ppa.launchpad.net/tobydox/mingw-w64/ubuntu focal main" > \
-          /etc/apt/sources.list.d/tobydox-mingw-w64.list'
-          apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 72931B477E22FEFD47F8DECE02FE5F12ADDE29B2
-          apt-get update -y
-      - name: Configure git
-        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
-      - name: Check out
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-          submodules: recursive
-      - name: Cache ccache data
-        uses: actions/cache@v3
-        with:
-          key: "ccache-${{ github.job }}-64-${{ github.ref }}\
-            -${{ github.run_id }}"
-          restore-keys: |
-            ccache-${{ github.job }}-64-${{ github.ref }}-
-            ccache-${{ github.job }}-64-
-          path: ~/.ccache
-      - name: Set up Kitware APT repo for latest CMake
+          df -h
+          rm -fr /runnerroot/usr/local/lib/android /runnerroot/usr/local/.ghcup /runnerroot/usr/share/swift /runnerroot/opt/hostedtoolcache/CodeQL
+          df -h
+      - name: Upgrade compilers
         run: |
-          test -f /usr/share/doc/kitware-archive-keyring/copyright || \
-          wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null \
-            | gpg --dearmor - | tee /usr/share/keyrings/kitware-archive-keyring.gpg >/dev/null
-          echo "deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] https://apt.kitware.com/ubuntu/ $(lsb_release -c -s) main" \
-            | tee /etc/apt/sources.list.d/kitware.list >/dev/null \
-            && apt-get update
-          test -f /usr/share/doc/kitware-archive-keyring/copyright || \
-            rm /usr/share/keyrings/kitware-archive-keyring.gpg
-          apt-get install kitware-archive-keyring
-      - name: Install building dependencies
-        run: |
-          apt-get install -y --no-install-recommends \
-          $(xargs < .github/workflows/deps-ubuntu-24.04-mingw.txt)
-      - name: Enable POSIX MinGW
-        run: |
-          update-alternatives --set i686-w64-mingw32-gcc /usr/bin/i686-w64-mingw32-gcc-posix
-          update-alternatives --set i686-w64-mingw32-g++ /usr/bin/i686-w64-mingw32-g++-posix
-          update-alternatives --set x86_64-w64-mingw32-gcc /usr/bin/x86_64-w64-mingw32-gcc-posix
-          update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/x86_64-w64-mingw32-g++-posix
-      - name: Install newer compiler version
-        run: |
-          i686-w64-mingw32-gcc --version
-          mkdir /tmp/compiler-debs
-          cd /tmp/compiler-debs
-          wget -O gcc-mingw-w64-24.3-debs.zip https://lmms.io/download/artifact/3381973808
-          unzip gcc-mingw-w64-24.3-debs.zip
-          dpkg --force-all -i gcc*.deb g++*.deb
-          i686-w64-mingw32-gcc --version
-      - name: Upgrade mingw-w64
-        run: |
-          dpkg -l | fgrep -i mingw
-          mkdir /tmp/build-mingw-source-package
-          cd /tmp/build-mingw-source-package
-          wget https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/mingw-w64/8.0.0-1/mingw-w64_8.0.0-1.dsc
-          wget https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/mingw-w64/8.0.0-1/mingw-w64_8.0.0.orig.tar.bz2
-          wget https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/mingw-w64/8.0.0-1/mingw-w64_8.0.0.orig.tar.bz2.asc
-          wget https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/mingw-w64/8.0.0-1/mingw-w64_8.0.0-1.debian.tar.xz
+          mkdir /tmp/build-compiler-source-package
+          cd /tmp/build-compiler-source-package
+          wget https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/gcc-mingw-w64/26.1/gcc-mingw-w64_26.1.dsc
+          wget https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/gcc-mingw-w64/26.1/gcc-mingw-w64_26.1.tar.xz
           mkdir build-deps
           cd build-deps
-          mk-build-deps ../mingw-w64_8.0.0-1.dsc
-          ls *.deb
-          apt-get install -y --no-install-recommends ./mingw-w64-build-deps_8.0.0-1_all.deb
+          mk-build-deps ../gcc-mingw-w64_26.1.dsc
+          apt-get install -y --no-install-recommends ./gcc-mingw-w64-build-deps_26.1_amd64.deb
           cd ..
-          dpkg-source --no-check -x mingw-w64_8.0.0-1.dsc
-          cd mingw-w64-8.0.0
+          dpkg-source --no-check -x gcc-mingw-w64_26.1.dsc
+          cd gcc-mingw-w64-26.1
           ln -s /usr/bin/autoconf /usr/bin/autoconf2.69
           ln -s /usr/bin/autom4te /usr/bin/autom4te2.69
           df -h
           dpkg-buildpackage -us -uc
           cd ..
           dpkg --force-all -i *.deb
-          dpkg -l | fgrep -i mingw
-      - name: Setup tmate session
-        if: ${{ failure() }}
-        uses: mxschmitt/action-tmate@v3
-        with:
-          sudo: false
-      - name: Configure
-        run: |
-          ccache --zero-stats
-          cmake -S . \
-                -B build \
-                -DCMAKE_TOOLCHAIN_FILE="./cmake/toolchains/MinGW-W64-64.cmake" \
-                $CMAKE_OPTS
-      - name: Build
-        run: cmake --build build
-      - name: Package
-        run: cmake --build build --target package
-      - name: Upload artifacts
+          x86_64-w64-mingw32-g++ --version
+      - name: Upload resulting deb files as an artifact
         uses: actions/upload-artifact@v4
         with:
-          name: mingw64
-          path: build/lmms-*.exe
-      - name: Trim ccache and print statistics
-        run: |
-          ccache --cleanup
-          echo "[ccache config]"
-          ccache --show-config
-          echo "[ccache stats]"
-          ccache --show-stats
-        env:
-          CCACHE_MAXSIZE: 500M
+          name: gcc-mingw-w64-26.1-debs
+          path: /tmp/build-compiler-source-package/*.deb
+          compression-level: 0
   msvc:
     if: false
     name: msvc-x64
