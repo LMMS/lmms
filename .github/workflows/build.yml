@@ -307,6 +307,11 @@ jobs:
           cd ..
           dpkg --force-all -i *.deb
           x86_64-w64-mingw32-g++ --version
+      - name: Setup tmate session
+        if: ${{ failure() }}
+        uses: mxschmitt/action-tmate@v3
+        with:
+          sudo: false
       - name: Upload resulting deb files as an artifact
         uses: actions/upload-artifact@v4
         with:
