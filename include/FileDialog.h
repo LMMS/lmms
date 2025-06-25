@@ -62,11 +62,11 @@ public:
 	void clearSelection();
 
 private:
-	Operation operation;
+	Operation m_operation;
 	int m_status;
 
-	static QMap<FileDialog::Operation, QString> OperationPaths;
-	static bool OperationPathsReady;
+	static QMap<FileDialog::Operation, QString> s_operationPaths;
+	static bool s_operationPathsReady;
 	static void prepareOperationPaths();
 	// If existing path is not empty, getOperationPath returns it instead.
 	static QString getOperationPath(const enum Operation op, const QString& existing);

@@ -39,14 +39,14 @@
 namespace lmms::gui
 {
 
-QMap<FileDialog::Operation, QString> FileDialog::OperationPaths = {};
-bool FileDialog::OperationPathsReady = false;
+QMap<FileDialog::Operation, QString> FileDialog::s_operationPaths = {};
+bool FileDialog::s_operationPathsReady = false;
 
 FileDialog::FileDialog(QWidget *parent, const QString &caption,
 					   const QString &directory, const QString &filter,
 					   const Operation operation) :
 	QFileDialog(parent, caption, getOperationPath(operation, directory), filter),
-	operation(operation),
+	m_operation(operation),
 	m_status(QDialog::Rejected)
 {
 #if QT_VERSION > 0x050200
@@ -65,7 +65,7 @@ FileDialog::~FileDialog()
 {
 	if (m_status == QDialog::Accepted)
 	{
-		setOperationPath(operation, directory().absolutePath());
+		setOperationPath(m_operation, directory().absolutePath());
 	}
 }
 
@@ -78,23 +78,23 @@ void FileDialog::clearSelection()
 
 void FileDialog::prepareOperationPaths()
 {
-	if (OperationPathsReady)
+	if (s_operationPathsReady)
 	{
 		return;
 	}
 
 	auto* config = ConfigManager::inst();
 
-	OperationPaths[Operation::Generic]		= config->workingDir();
-	OperationPaths[Operation::Project]  	= config->userProjectsDir();
-	OperationPaths[Operation::Midi]  		= config->workingDir();
-	OperationPaths[Operation::Preset]		= config->userPresetsDir();
-	OperationPaths[Operation::Plugin]		= config->userVstDir();
-	OperationPaths[Operation::Sample]		= config->userSamplesDir();
-	OperationPaths[Operation::Soundfont]	= config->userSf2Dir();
-	OperationPaths[Operation::Song]  		= config->workingDir();
+	s_operationPaths[Operation::Generic]	= config->workingDir();
+	s_operationPaths[Operation::Project]	= config->userProjectsDir();
+	s_operationPaths[Operation::Midi]		= config->workingDir();
+	s_operationPaths[Operation::Preset]		= config->userPresetsDir();
+	s_operationPaths[Operation::Plugin]		= config->userVstDir();
+	s_operationPaths[Operation::Sample]		= config->userSamplesDir();
+	s_operationPaths[Operation::Soundfont]	= config->userSf2Dir();
+	s_operationPaths[Operation::Song]		= config->workingDir();
 
-	OperationPathsReady = true;
+	s_operationPathsReady = true;
 }
 
 QString FileDialog::getOperationPath(const FileDialog::Operation op, const QString& existing)
@@ -106,12 +106,12 @@ QString FileDialog::getOperationPath(const FileDialog::Operation op, const QStri
 
 	prepareOperationPaths();
 
-	return OperationPaths[op];
+	return s_operationPaths[op];
 }
 
 void FileDialog::setOperationPath(const FileDialog::Operation op, const QString& path)
 {
-	OperationPaths[op] = path;
+	s_operationPaths[op] = path;
 }
 
 } // namespace lmms::gui
