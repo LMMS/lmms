@@ -55,17 +55,14 @@ public:
 	bool affinityMatters() const override { return true; }
 
 private:
+	static constexpr auto FramesPerBuffer = 32;
 	AudioFile m_audioFile;
 	AudioResampler m_audioResampler;
+	std::vector<float> m_sourceBuffer;
 	std::vector<float> m_channelConvertBuffer;
-	std::vector<SampleFrame> m_resampleBuffer;
-	std::size_t m_resampleIndex = 0;
-	std::size_t m_resampleFrames = 0;
-	f_cnt_t m_totalFramesRead = 0;
-
-	void resample(float* in, f_cnt_t& inIndex, f_cnt_t& inFrames, float* out, f_cnt_t& outIndex, f_cnt_t& outFrames,
-		ch_cnt_t channels, double ratio);
-	static void convertToStereo(float* in, ch_cnt_t inChannels, float* out, f_cnt_t frames);
+	InterleavedBufferView<float> m_sourceBufferView;
+	InterleavedBufferView<float> m_channelConvertBufferView;
+	f_cnt_t m_framesRead = 0;
 };
 
 } // namespace lmms

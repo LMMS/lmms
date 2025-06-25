@@ -33,9 +33,9 @@ namespace lmms {
 AudioFilePlayHandle::AudioFilePlayHandle(const std::filesystem::path& path, int interpolationMode)
 	: PlayHandle(Type::SamplePlayHandle)
 	, m_audioFile(path, AudioFile::Mode::Read)
-	, m_audioResampler(interpolationMode, m_audioFile.channels())
-	, m_channelConvertBuffer(Engine::audioEngine()->framesPerPeriod() * m_audioFile.channels())
-	, m_resampleBuffer(Engine::audioEngine()->framesPerPeriod())
+	, m_audioResampler(interpolationMode, DEFAULT_CHANNELS)
+	, m_sourceBuffer(FramesPerBuffer * m_audioFile.channels())
+	, m_channelConvertBuffer(FramesPerBuffer * DEFAULT_CHANNELS)
 {
 	setAudioBusHandle(new AudioBusHandle("AudioFilePlayHandle", false));
 }
@@ -48,79 +48,84 @@ AudioFilePlayHandle::~AudioFilePlayHandle() noexcept
 void AudioFilePlayHandle::play(SampleFrame* dst)
 {
 	// TODO: Reading from the audio file technically should be done on another background thread, but since our audio
-	// threads are not made to run in real-time (yet), having an extra thread will add more thread contention for little
+	// threads do not have real-time priority (yet), having an extra thread will add more thread contention for little
 	// gain. Adding the background thread actually introduced lagspikes while testing with my system. Once
 	// the audio threads are made to run with real-time priority, we can introduce the new thread after confirming there
 	// is a noticeable improvement.
 
 	const auto needsResampling = Engine::audioEngine()->outputSampleRate() != m_audioFile.sampleRate();
+	const auto needsChannelConversion = m_audioFile.channels() != DEFAULT_CHANNELS;
+
 	const auto framesPerPeriod = Engine::audioEngine()->framesPerPeriod();
-	const auto needsChannelConversion = m_audioFile.channels() != 2;
+	const auto ratio = static_cast<double>(Engine::audioEngine()->outputSampleRate()) / m_audioFile.sampleRate();
+
+	auto sink = InterleavedBufferView<float>{&dst[0][0], DEFAULT_CHANNELS, framesPerPeriod};
 
 	if (!needsResampling && !needsChannelConversion)
 	{
-		const auto dstAudioView = InterleavedBufferView<float, 2>{&dst[0][0], framesPerPeriod};
-		const auto framesRead = m_audioFile.read(dstAudioView);
-		std::fill(dst + framesRead, dst + framesPerPeriod, SampleFrame{});
-		m_totalFramesRead += framesRead;
-		return;
-	}
-	else if (!needsResampling && needsChannelConversion)
-	{
-		const auto framesRead = m_audioFile.read({&m_channelConvertBuffer[0], m_audioFile.channels(), framesPerPeriod});
-		convertToStereo(&m_channelConvertBuffer[0], m_audioFile.channels(), &dst[0][0], framesRead);
-		m_totalFramesRead += framesRead;
-		std::fill(dst + framesRead, dst + framesPerPeriod, SampleFrame{});
+		const auto framesRead = m_audioFile.read(sink);
+		m_framesRead += framesRead;
 		return;
 	}
 
-	auto dstIndex = f_cnt_t{0};
-	auto dstFrames = framesPerPeriod;
-	const auto ratio = static_cast<double>(Engine::audioEngine()->outputSampleRate()) / m_audioFile.sampleRate();
-
-	while (dstFrames > 0)
+	while (!sink.empty())
 	{
-		if (m_resampleFrames == 0)
+		if (!m_channelConvertBufferView.empty())
 		{
-			auto framesRead = f_cnt_t{0};
-			if (needsChannelConversion)
-			{
-				framesRead = m_audioFile.read({&m_channelConvertBuffer[0], m_audioFile.channels(),
-					m_channelConvertBuffer.size() / m_audioFile.channels()});
+			auto input = m_channelConvertBufferView.data();
+			auto inputFrames = m_channelConvertBufferView.frames();
 
-				convertToStereo(
-					&m_channelConvertBuffer[0], m_audioFile.channels(), &m_resampleBuffer[0][0], framesPerPeriod);
+			auto output = sink.data();
+			auto outputFrames = sink.frames();
+
+			const auto result = m_audioResampler.resample(input, inputFrames, output, outputFrames, ratio);
+
+			input += result.inputFramesUsed * DEFAULT_CHANNELS;
+			inputFrames -= result.inputFramesUsed;
+
+			output += result.outputFramesGenerated * DEFAULT_CHANNELS;
+			outputFrames -= result.outputFramesGenerated;
+
+			m_channelConvertBufferView = {input, DEFAULT_CHANNELS, inputFrames};
+			sink = {output, DEFAULT_CHANNELS, outputFrames};
+		}
+		else if (!m_sourceBufferView.empty())
+		{
+			auto input = m_sourceBufferView.data();
+			auto inputFrames = m_sourceBufferView.frames();
+
+			auto output = m_channelConvertBuffer.data();
+			auto outputFrames = m_channelConvertBuffer.size() / DEFAULT_CHANNELS;
+
+			const auto framesToConvert = std::min(inputFrames, outputFrames);
+			const auto mono = m_audioFile.channels() == 1;
+
+			for (auto frame = std::size_t{0}; frame < framesToConvert; ++frame)
+			{
+				output[frame * 2] = input[frame * m_audioFile.channels()];
+				output[frame * 2 + 1] = mono ? output[frame * 2] : input[frame * m_audioFile.channels() + 1];
 			}
-			else { framesRead = m_audioFile.read({&m_resampleBuffer[0][0], 2, framesPerPeriod}); }
+
+			input += framesToConvert * m_audioFile.channels();
+			inputFrames -= framesToConvert;
+
+			m_sourceBufferView = {input, m_audioFile.channels(), inputFrames};
+			m_channelConvertBufferView = {output, DEFAULT_CHANNELS, framesToConvert};
+		}
+		else
+		{
+			const auto framesRead = m_audioFile.read(
+				{m_sourceBuffer.data(), m_audioFile.channels(), m_sourceBuffer.size() / m_audioFile.channels()});
 
 			if (framesRead == 0)
 			{
-				std::fill_n(dst + dstIndex, dstFrames, SampleFrame{});
-				return;
+				std::fill_n(sink.data(), sink.frames() * sink.channels(), 0.f);
+				break;
 			}
 
-			m_resampleIndex = 0;
-			m_resampleFrames = framesPerPeriod;
-			m_totalFramesRead += framesRead;
+			m_framesRead += framesRead;
+			m_sourceBufferView = {m_sourceBuffer.data(), m_audioFile.channels(), framesRead};
 		}
-
-		const auto result = m_audioResampler.resample(
-			&m_resampleBuffer[m_resampleIndex][0], m_resampleFrames, &dst[dstIndex][0], dstFrames, ratio);
-
-		m_resampleIndex += result.inputFramesUsed;
-		m_resampleFrames -= result.inputFramesUsed;
-
-		dstIndex += result.outputFramesGenerated;
-		dstFrames -= result.outputFramesGenerated;
-	}
-}
-
-void AudioFilePlayHandle::convertToStereo(float* in, ch_cnt_t inChannels, float* out, f_cnt_t frames)
-{
-	for (auto frame = f_cnt_t{0}; frame < frames; ++frame)
-	{
-		out[frame * 2] = in[frame * inChannels];
-		out[frame * 2 + 1] = inChannels == 1 ? out[frame * 2] : in[frame * inChannels + 1];
 	}
 }
 
@@ -131,7 +136,7 @@ f_cnt_t AudioFilePlayHandle::seek(f_cnt_t frames, AudioFile::Whence whence)
 
 bool AudioFilePlayHandle::isFinished() const
 {
-	return m_totalFramesRead == m_audioFile.frames();
+	return m_framesRead == m_audioFile.frames();
 }
 
 } // namespace lmms
