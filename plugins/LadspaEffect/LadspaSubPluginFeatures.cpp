@@ -35,6 +35,9 @@
 #include "Ladspa2LMMS.h"
 #include "LadspaBase.h"
 
+#include <QDebug>
+#include <typeinfo>
+
 namespace lmms
 {
 
@@ -84,6 +87,20 @@ void LadspaSubPluginFeatures::fillDescriptionWidget( QWidget * _parent,
 	makerString.replace("&lt;", "<");
 	makerString.replace("&gt;", ">");
 	makerString.replace("&amp;", "&");
+
+	if (makerString.contains("Andy Wingo"))
+	{
+		int startString = makerString.indexOf("<");
+		int endString = makerString.indexOf(">");
+		makerString.replace(startString + 1, endString - startString - 1, "wingo@pobox.com");
+	}
+	
+	if (makerString.contains("Jesse Chappel"))
+	{
+		int startString = makerString.indexOf("<");
+		int endString = makerString.indexOf(">");
+		makerString.replace(startString + 1, endString - startString - 1, "jesse@essej.net");
+	}
 
 	maker_content->setTextFormat(Qt::PlainText);
 	maker_content->setText(makerString);
