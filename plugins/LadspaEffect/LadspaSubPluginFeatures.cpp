@@ -35,9 +35,6 @@
 #include "Ladspa2LMMS.h"
 #include "LadspaBase.h"
 
-#include <QDebug>
-#include <typeinfo>
-
 namespace lmms
 {
 
