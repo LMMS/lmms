@@ -259,8 +259,8 @@ bool RemotePluginClient::processMessage( const message & _m )
 				debugMessage(std::string{"Failed to attach sync data: "} + error.what() + '\n');
 				std::exit(EXIT_FAILURE);
 			}
-			m_bufferSize = m_vstSyncData->m_bufferSize;
-			m_sampleRate = m_vstSyncData->m_sampleRate;
+			m_bufferSize = m_vstSyncData->bufferSize;
+			m_sampleRate = m_vstSyncData->sampleRate;
 			reply_message.id = IdHostInfoGotten;
 			reply = true;
 			break;
