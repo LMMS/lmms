@@ -354,6 +354,11 @@ private:
 	AudioDevice * tryAudioDevices();
 	MidiClient * tryMidiClients();
 
+	const AudioDevice* audioDev() const
+	{
+		return m_audioDev;
+	}
+
 	void renderStageNoteSetup();
 	void renderStageInstruments();
 	void renderStageEffects();

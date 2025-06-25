@@ -30,6 +30,7 @@
 #include <QPixmap>
 #include <QToolTip>
 #include <QWheelEvent>
+#include <QDebug>
 
 #include "DeprecationHelper.h"
 #include "embed.h"
@@ -71,9 +72,9 @@ TabWidget::TabWidget(const QString& caption, QWidget* parent, bool usePixmap,
 void TabWidget::addTab(QWidget* w, const QString& name, const char* pixmap, int idx)
 {
 	// Append tab when position is not given
-	if (idx < 0/* || m_widgets.contains(idx) == true*/)
+	if (idx < 0/* || m_widgets.contains(idx)*/)
 	{
-		while(m_widgets.contains(++idx) == true)
+		while(m_widgets.contains(++idx))
 		{
 		}
 	}
@@ -85,11 +86,42 @@ void TabWidget::addTab(QWidget* w, const QString& name, const char* pixmap, int 
 	widgetDesc d = {w, pixmap, name, tab_width};
 	m_widgets[idx] = d;
 
-	// Position tab's window
+	// Position tab's window and update size
 	if (!m_resizable)
 	{
+		// Tab widget is fixed -> child must be fixed
 		w->setFixedSize(width() - 4, height() - m_tabbarHeight);
 	}
+	else
+	{
+		// If the child has a maximum, we cannot grow larger
+		if(maximumHeight() > w->maximumHeight() + m_tabbarHeight)
+		{
+			setMaximumHeight(w->maximumHeight() + m_tabbarHeight);
+		}
+		if(maximumWidth() > w->maximumWidth() + 4)
+		{
+			setMaximumWidth(w->maximumWidth() + 4);
+		}
+		// If the child has a minimum, we cannot shrink smaller
+		if(minimumHeight() < w->minimumHeight() + m_tabbarHeight)
+		{
+			setMinimumHeight(w->minimumHeight() + m_tabbarHeight);
+		}
+		if(minimumWidth() < w->minimumWidth() + 4)
+		{
+			setMinimumWidth(w->minimumWidth() + 4);
+		}
+		qDebug() << "TAB min/max" << minimumSize() << maximumSize();
+		
+		// Now that the size might have changed: resize all widgets
+		for (const auto& widget : m_widgets)
+		{
+			widget.w->resize(width() - 4, height() - m_tabbarHeight);
+		}
+	}
+	//if(w->minimumHeight() > minimumHeight() || w->minimumSizeHint().height() > minimumHeight()) { setMinimumHeight(w->minimumHeight()); }
+	//if(w->minimumWidth() > minimumWidth() || w->minimumSizeHint().width() > minimumWidth()) { setMinimumWidth(w->minimumWidth()); }
 	w->move(2, m_tabbarHeight - 1);
 	w->hide();
 
@@ -197,9 +229,32 @@ void TabWidget::mousePressEvent(QMouseEvent* me)
 
 
 
-void TabWidget::resizeEvent(QResizeEvent*)
+void TabWidget::resizeEvent(QResizeEvent* ev)
 {
-	if (!m_resizable)
+	if (m_resizable)
+	{
+		for (const auto& widget : m_widgets)
+		{
+			if(widget.w->minimumSize().height() > ev->size().height() - 4 ||
+				widget.w->minimumSize().width() > ev->size().width() - m_tabbarHeight)
+			{
+				ev->ignore();
+				return;
+			}
+			if(widget.w->maximumSize().height() < ev->size().height() - 4 ||
+				widget.w->maximumSize().width() < ev->size().width() - m_tabbarHeight)
+			{
+				ev->ignore();
+				return;
+			}
+		}
+		for (const auto& widget : m_widgets)
+		{
+			widget.w->resize(width() - 4, height() - m_tabbarHeight);
+		}
+		QWidget::resizeEvent(ev);
+	}
+	else
 	{
 		for (const auto& widget : m_widgets)
 		{
