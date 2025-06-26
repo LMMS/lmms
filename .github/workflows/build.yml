@@ -296,6 +296,10 @@ jobs:
           df -h
           rm -fr /runnerroot/usr/local/lib/android /runnerroot/usr/local/.ghcup /runnerroot/usr/share/swift /runnerroot/opt/hostedtoolcache/CodeQL
           df -h
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        with:
+          sudo: false
       - name: Compile gcc-mingw-w64-26.1
         run: |
           add-apt-repository ppa:ubuntu-toolchain-r/test
