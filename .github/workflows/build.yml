@@ -341,7 +341,6 @@ jobs:
           wget -O mingw-w64-11.0.1-debs.zip https://lmms.io/download/artifact/3407929432
           unzip mingw-w64-11.0.1-debs.zip
           dpkg --force-all -i *.deb
-          apt-get -f -y install
           dpkg -l | fgrep -i mingw
       - name: Enable POSIX MinGW
         run: |
