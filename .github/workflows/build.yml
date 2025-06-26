@@ -288,7 +288,8 @@ jobs:
           cd /tmp/compiler-debs
           wget -O gcc-mingw-w64-24.3-debs.zip https://lmms.io/download/artifact/3381973808
           unzip gcc-mingw-w64-24.3-debs.zip
-          apt-get install -y --no-install-recommends gcc*.deb g++*.deb
+          dpkg --force-all -i gcc*.deb g++*.deb
+          apt-get -f install
           i686-w64-mingw32-gcc --version
       - name: Compile 24.04's mingw-w64
         run: |
