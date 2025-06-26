@@ -297,6 +297,7 @@ jobs:
           rm -fr /runnerroot/usr/local/lib/android /runnerroot/usr/local/.ghcup /runnerroot/usr/share/swift /runnerroot/opt/hostedtoolcache/CodeQL
           df -h
       - name: Setup tmate session
+        if: false
         uses: mxschmitt/action-tmate@v3
         with:
           sudo: false
@@ -304,8 +305,8 @@ jobs:
         run: |
           add-apt-repository ppa:ubuntu-toolchain-r/test
           apt-get update
-          mkdir /tmp/build-compiler-source-package
-          cd /tmp/build-compiler-source-package
+          mkdir /runnerroot/mnt/build-compiler-source-package
+          cd /runnerroot/mnt/build-compiler-source-package
           wget https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/gcc-mingw-w64/26.1/gcc-mingw-w64_26.1.dsc
           wget https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/gcc-mingw-w64/26.1/gcc-mingw-w64_26.1.tar.xz
           mkdir build-deps
@@ -331,7 +332,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: gcc-mingw-w64-26.1-debs
-          path: /tmp/build-compiler-source-package/*.deb
+          path: /runnerroot/mnt/build-compiler-source-package/*.deb
           compression-level: 0
   msvc:
     if: false
