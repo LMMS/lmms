@@ -324,12 +324,6 @@ jobs:
         run: |
           apt-get install -y --no-install-recommends \
           $(xargs < .github/workflows/deps-ubuntu-24.04-mingw.txt)
-      - name: Enable POSIX MinGW
-        run: |
-          update-alternatives --set i686-w64-mingw32-gcc /usr/bin/i686-w64-mingw32-gcc-posix
-          update-alternatives --set i686-w64-mingw32-g++ /usr/bin/i686-w64-mingw32-g++-posix
-          update-alternatives --set x86_64-w64-mingw32-gcc /usr/bin/x86_64-w64-mingw32-gcc-posix
-          update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/x86_64-w64-mingw32-g++-posix
       - name: Install newer compiler version
         run: |
           i686-w64-mingw32-gcc --version
@@ -349,11 +343,12 @@ jobs:
           dpkg --force-all -i *.deb
           apt-get -f -y install
           dpkg -l | fgrep -i mingw
-      - name: Setup tmate session
-        if: ${{ failure() }}
-        uses: mxschmitt/action-tmate@v3
-        with:
-          sudo: false
+      - name: Enable POSIX MinGW
+        run: |
+          update-alternatives --set i686-w64-mingw32-gcc /usr/bin/i686-w64-mingw32-gcc-posix
+          update-alternatives --set i686-w64-mingw32-g++ /usr/bin/i686-w64-mingw32-g++-posix
+          update-alternatives --set x86_64-w64-mingw32-gcc /usr/bin/x86_64-w64-mingw32-gcc-posix
+          update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/x86_64-w64-mingw32-g++-posix
       - name: Configure
         run: |
           ccache --zero-stats
@@ -379,6 +374,11 @@ jobs:
           ccache --show-stats
         env:
           CCACHE_MAXSIZE: 500M
+      - name: Setup tmate session
+        if: ${{ failure() }}
+        uses: mxschmitt/action-tmate@v3
+        with:
+          sudo: false
   msvc:
     if: false
     name: msvc-x64
