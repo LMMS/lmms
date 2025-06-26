@@ -309,8 +309,9 @@ jobs:
           cd ..
           dpkg-source --no-check -x mingw-w64_11.0.1-3build1.dsc
           cd mingw-w64-11.0.1
-          ln -s /usr/bin/autoconf /usr/bin/autoconf2.69
-          ln -s /usr/bin/autom4te /usr/bin/autom4te2.69
+          wget https://launchpad.net/~savoury1/+archive/ubuntu/build-tools/+build/26900116/+files/autoconf2.71_2.71-3~20.04.sav0_all.deb
+          apt-get install -y --no-install-recommends ./autoconf2.71_2.71-3~20.04.sav0_all.deb
+          rm autoconf2.71_2.71-3~20.04.sav0_all.deb
           df -h
           dpkg-buildpackage -us -uc
           cd ..
