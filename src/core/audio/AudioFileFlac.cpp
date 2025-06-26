@@ -30,6 +30,7 @@
 #include "AudioFileFlac.h"
 #include "endian_handling.h"
 #include "AudioEngine.h"
+#include "ProjectProperties.h"
 
 namespace lmms
 {
@@ -84,6 +85,11 @@ bool AudioFileFlac::startEncoding()
 
 	sf_command(m_sf, SFC_SET_CLIPPING, nullptr, SF_TRUE);
 
+	sf_set_string(m_sf, SF_STR_TITLE, ProjectProperties::inst()->value("meta", "title").toLocal8Bit().constData());
+	sf_set_string(m_sf, SF_STR_ARTIST, ProjectProperties::inst()->value("meta", "artist").toLocal8Bit().constData());
+	sf_set_string(m_sf, SF_STR_ALBUM, ProjectProperties::inst()->value("meta", "album").toLocal8Bit().constData());
+	sf_set_string(m_sf, SF_STR_DATE, ProjectProperties::inst()->value("meta", "year").toLocal8Bit().constData());
+	sf_set_string(m_sf, SF_STR_COMMENT, ProjectProperties::inst()->value("meta", "comment", "Created with LMMS").toLocal8Bit().constData());
 	sf_set_string(m_sf, SF_STR_SOFTWARE, "LMMS");
 
 	return true;
