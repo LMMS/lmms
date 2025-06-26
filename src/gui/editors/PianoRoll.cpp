@@ -454,14 +454,7 @@ void PianoRoll::showTextFloat(const QString &text, const QPoint &pos, int timeou
 	s_textFloat->setText( text );
 	// show the float, offset slightly so as to not obscure anything
 	s_textFloat->moveGlobal( this, pos + QPoint(4, 16) );
-	if (timeout == -1)
-	{
-		s_textFloat->show();
-	}
-	else
-	{
-		s_textFloat->setVisibilityTimeOut( timeout );
-	}
+	s_textFloat->showWithTimeout(timeout);
 }
 
 
