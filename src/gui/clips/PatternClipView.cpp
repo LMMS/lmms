@@ -181,7 +181,7 @@ void PatternClipView::paintEvent(QPaintEvent*)
 
 		// Compare how long the clip view is compared to the underlying pattern. First +1 for ceiling, second +1 for possible previous bar.
 		int maxPossibleRepetions = getClip()->length() / mClip->length() + 1 + 1;
-		for (const Note * note : mClip->notes())
+		for (const Note* note : mClip->notes())
 		{
 			QRect noteRect = QRect(
 				note->pos() * pixelsPerBar() / TimePos::ticksPerBar() + offset + horizontalNoteSpacing / 2,
