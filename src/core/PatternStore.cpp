@@ -152,6 +152,7 @@ void PatternStore::updatePatternTrack(Clip* clip)
 	{
 		t->dataChanged();
 	}
+	emit trackUpdated();
 }
 
 
