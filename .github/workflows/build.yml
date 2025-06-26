@@ -265,6 +265,7 @@ jobs:
               build-essential                  \
               devscripts                       \
               equivs                           \
+              unzip                            \
               dirmngr                          \
               gnupg                            \
               binutils                         \
@@ -280,35 +281,40 @@ jobs:
               perl                             \
               software-properties-common       \
               ssh-client                       \
-              wget                             \
-          && rm -rf /var/lib/apt/lists/*
-      - name: Clear some disk space so the next step can succeed
+              wget
+      - name: Install 22.04's compiler version
         run: |
-          df -h
-          rm -fr /runnerroot/usr/local/lib/android /runnerroot/usr/local/.ghcup /runnerroot/usr/share/swift /runnerroot/opt/hostedtoolcache/CodeQL
-          df -h
-      - name: Upgrade compilers
+          mkdir /tmp/compiler-debs
+          cd /tmp/compiler-debs
+          wget -O gcc-mingw-w64-24.3-debs.zip https://lmms.io/download/artifact/3381973808
+          unzip gcc-mingw-w64-24.3-debs.zip
+#          dpkg --force-all -i gcc*.deb g++*.deb
+          apt-get install -y --no-install-recommends gcc*.deb g++*.deb
+          i686-w64-mingw32-gcc --version
+      - name: Compile 24.04's mingw-w64
         run: |
-          add-apt-repository ppa:ubuntu-toolchain-r/test
-          apt-get update
-          mkdir /tmp/build-compiler-source-package
-          cd /tmp/build-compiler-source-package
-          wget https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/gcc-mingw-w64/26.1/gcc-mingw-w64_26.1.dsc
-          wget https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/gcc-mingw-w64/26.1/gcc-mingw-w64_26.1.tar.xz
+          dpkg -l | fgrep -i mingw
+          mkdir /tmp/build-mingw-source-package
+          cd /tmp/build-mingw-source-package
+          wget https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/mingw-w64/11.0.1-3build1/mingw-w64_11.0.1.orig.tar.bz2
+          wget https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/mingw-w64/11.0.1-3build1/mingw-w64_11.0.1.orig.tar.bz2.asc
+          wget https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/mingw-w64/11.0.1-3build1/mingw-w64_11.0.1-3build1.debian.tar.xz
+          wget https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/mingw-w64/11.0.1-3build1/mingw-w64_11.0.1-3build1.dsc
           mkdir build-deps
           cd build-deps
-          mk-build-deps ../gcc-mingw-w64_26.1.dsc
-          apt-get install -y --no-install-recommends ./gcc-mingw-w64-build-deps_26.1_amd64.deb
+          mk-build-deps ../mingw-w64_11.0.1-3build1.dsc
+          ls *.deb
+          apt-get install -y --no-install-recommends ./*.deb
           cd ..
-          dpkg-source --no-check -x gcc-mingw-w64_26.1.dsc
-          cd gcc-mingw-w64-26.1
+          dpkg-source --no-check -x mingw-w64_11.0.1-3build1.dsc
+          cd mingw-w64-11.0.1
           ln -s /usr/bin/autoconf /usr/bin/autoconf2.69
           ln -s /usr/bin/autom4te /usr/bin/autom4te2.69
           df -h
           dpkg-buildpackage -us -uc
           cd ..
           dpkg --force-all -i *.deb
-          x86_64-w64-mingw32-g++ --version
+          dpkg -l | fgrep -i mingw
       - name: Setup tmate session
         if: ${{ failure() }}
         uses: mxschmitt/action-tmate@v3
@@ -317,8 +323,8 @@ jobs:
       - name: Upload resulting deb files as an artifact
         uses: actions/upload-artifact@v4
         with:
-          name: gcc-mingw-w64-26.1-debs
-          path: /tmp/build-compiler-source-package/*.deb
+          name: mingw-w64-11.0.1-debs
+          path: /tmp/build-mingw-source-package/*.deb
           compression-level: 0
   msvc:
     if: false
