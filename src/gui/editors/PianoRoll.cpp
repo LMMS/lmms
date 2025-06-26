@@ -1677,6 +1677,21 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 
 	if (m_editMode == EditMode::Detuning)
 	{
+		// Let users access automation editor with shift-click, if they want the old functionality
+		if (noteUnderMouse() && me->modifiers() & Qt::ShiftModifier)
+		{
+			Note* n = noteUnderMouse();
+			if (n->detuning() == nullptr)
+			{
+				n->createDetuning();
+				AutomationClip* detuningClip = n->detuning()->automationClip();
+				connect(detuningClip, SIGNAL(dataChanged()), this, SLOT(update()));
+			}
+			getGUI()->automationEditor()->setGhostMidiClip(m_midiClip);
+			getGUI()->automationEditor()->open(n->detuning()->automationClip());
+			return;
+		}
+
 		// Setup the currently selected notes/note under mouse
 		bool notesFound = setupParameterEditNotes(Note::ParameterType::Detuning);
 		if (!notesFound) { return; }
@@ -1690,14 +1705,6 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 				AutomationClip* detuningClip = note->detuning()->automationClip();
 				connect(detuningClip, SIGNAL(dataChanged()), this, SLOT(update()));
 			}
-		}
-
-		// Let users access automation editor with shift-click, if they want the old functionality
-		if (noteUnderMouse() && me->modifiers() & Qt::ShiftModifier)
-		{
-			getGUI()->automationEditor()->setGhostMidiClip(m_midiClip);
-			getGUI()->automationEditor()->open(noteUnderMouse()->detuning()->automationClip());
-			return;
 		}
 
 		m_midiClip->addJournalCheckPoint();
@@ -2957,9 +2964,15 @@ bool PianoRoll::setupParameterEditNotes(Note::ParameterType paramType)
 	}
 	else if (noteUnderMouse())
 	{
-		m_selectedParameterEditNotes.assign(1, noteUnderMouse());
+		Note* n = noteUnderMouse();
+		m_selectedParameterEditNotes.assign(1, n);
 		// The note is also set to be selected so that it can be tracked even when the user drags automation nodes above/below the note.
-		noteUnderMouse()->setSelected(true);
+		if (!n->selected())
+		{
+			n->setSelected(true);
+			// If there are already automation nodes in the detuning curve, don't immediately place a new when the user clicks on the note to select it
+			if (n->detuning() && n->detuning()->hasAutomation()) { return false; }
+		}
 		return true;
 	}
 	return false;
