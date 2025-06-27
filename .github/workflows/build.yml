@@ -286,9 +286,6 @@ jobs:
     env:
       CMAKE_OPTS: >-
         -DCMAKE_BUILD_TYPE=RelWithDebInfo
-        -DUSE_COMPILE_CACHE=ON
-      CCACHE_MAXSIZE: 0
-      CCACHE_NOCOMPRESS: 1
       MAKEFLAGS: -j2
       DEBIAN_FRONTEND: noninteractive
     steps:
@@ -301,7 +298,6 @@ jobs:
               gnupg                            \
               binutils                         \
               ca-certificates                  \
-              ccache                           \
               git                              \
               gpg                              \
               libc6-dev                        \
@@ -331,15 +327,6 @@ jobs:
         with:
           fetch-depth: 0
           submodules: recursive
-      - name: Cache ccache data
-        uses: actions/cache@v3
-        with:
-          key: "ccache-${{ github.job }}-64-${{ github.ref }}\
-            -${{ github.run_id }}"
-          restore-keys: |
-            ccache-${{ github.job }}-64-${{ github.ref }}-
-            ccache-${{ github.job }}-64-
-          path: ~/.ccache
       - name: Set up Kitware APT repo for latest CMake
         run: |
           test -f /usr/share/doc/kitware-archive-keyring/copyright || \
@@ -381,7 +368,6 @@ jobs:
           update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/x86_64-w64-mingw32-g++-posix
       - name: Configure
         run: |
-          ccache --zero-stats
           cmake -S . \
                 -B build \
                 -DCMAKE_TOOLCHAIN_FILE="./cmake/toolchains/MinGW-W64-64.cmake" \
@@ -395,15 +381,6 @@ jobs:
         with:
           name: mingw64
           path: build/lmms-*.exe
-      - name: Trim ccache and print statistics
-        run: |
-          ccache --cleanup
-          echo "[ccache config]"
-          ccache --show-config
-          echo "[ccache stats]"
-          ccache --show-stats
-        env:
-          CCACHE_MAXSIZE: 500M
       - name: Setup tmate session
         if: ${{ failure() }}
         uses: mxschmitt/action-tmate@v3
