@@ -81,20 +81,31 @@ void OscilloscopeGraph::paintEvent(QPaintEvent* pe)
 	const int xoffset = !hq * framesPerPixel;
 	const float xscale = 1.f / (windowSize - framesPerPixel);
 	const bool stereo = m_controls->m_stereoModel.value();
-	if (!stereo)
+
+
+	auto drawWaveform = [&](QColor color, bool left, bool right, bool average)
 	{
-		p.setPen(m_monoColor);
+		p.setPen(color);
+		float minValue, maxValue;
 		for (int f = 0; f < windowSize - framesPerPixel; f += framesPerPixel)
 		{
 			const int currentIndex = (windowStartIndex + f) % bufferSize;
 			const int nextIndex = (windowStartIndex + f + framesPerPixel) % bufferSize;
-			float maxValue = buffer[hq ? currentIndex : nextIndex].average();
-			float minValue = buffer[currentIndex].average();
+
+			if (left) { maxValue = buffer[hq ? currentIndex : nextIndex].left(); }
+			else if (right) { maxValue = buffer[hq ? currentIndex : nextIndex].right(); }
+			else if (average) { maxValue = buffer[hq ? currentIndex : nextIndex].average(); }
+
+			if (left) { minValue = buffer[currentIndex].left(); }
+			else if (right) { minValue = buffer[currentIndex].right(); }
+			else if (average) { minValue = buffer[currentIndex].average(); }
+
 			for (int i = currentIndex + 1; hq && i <= nextIndex; ++i)
 			{
 				maxValue = std::max(maxValue, buffer[i].average());
 				minValue = std::min(minValue, buffer[i].average());
 			}
+
 			p.drawLine(
 				width() * f * xscale,
 				height() * (1 - minValue * amp) / 2,
@@ -102,47 +113,16 @@ void OscilloscopeGraph::paintEvent(QPaintEvent* pe)
 				height() * (1 - maxValue * amp) / 2
 			);
 		}
+	};
+
+	if (!stereo)
+	{
+		drawWaveform(m_monoColor, false, false, true);
 	}
 	else
 	{
-		p.setPen(m_leftColor);
-		for (int f = 0; f < windowSize - framesPerPixel; f += framesPerPixel)
-		{
-			const int currentIndex = (windowStartIndex + f) % bufferSize;
-			const int nextIndex = (windowStartIndex + f + framesPerPixel) % bufferSize;
-			float maxValue = buffer[hq ? currentIndex : nextIndex].left();
-			float minValue = buffer[currentIndex].left();
-			for (int i = currentIndex + 1; hq && i <= nextIndex; ++i)
-			{
-				maxValue = std::max(maxValue, buffer[i].left());
-				minValue = std::min(minValue, buffer[i].left());
-			}
-			p.drawLine(
-				width() * f * xscale,
-				height() * (1 - minValue * amp) / 2,
-				width() * (f + xoffset) * xscale,
-				height() * (1 - maxValue * amp) / 2
-			);
-		}
-		p.setPen(m_rightColor);
-		for (int f = 0; f < windowSize - framesPerPixel; f += framesPerPixel)
-		{
-			const int currentIndex = (windowStartIndex + f) % bufferSize;
-			const int nextIndex = (windowStartIndex + f + framesPerPixel) % bufferSize;
-			float maxValue = buffer[hq ? currentIndex : nextIndex].right();
-			float minValue = buffer[currentIndex].right();
-			for (int i = currentIndex + 1; hq && i <= nextIndex; ++i)
-			{
-				maxValue = std::max(maxValue, buffer[i].right());
-				minValue = std::min(minValue, buffer[i].right());
-			}
-			p.drawLine(
-				width() * f * xscale,
-				height() * (1 - minValue * amp) / 2,
-				width() * (f + xoffset) * xscale,
-				height() * (1 - maxValue * amp) / 2
-			);
-		}
+		drawWaveform(m_leftColor, true, false, false);
+		drawWaveform(m_rightColor, false, true, false);
 	}
 }
 
