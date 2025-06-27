@@ -47,6 +47,10 @@ Clip::Clip( Track * track ) :
 	m_track( track ),
 	m_startPosition(),
 	m_length(),
+	m_startCrossfadeLength(0),
+	m_endCrossfadeLength(0),
+	m_startCrossfadeTension(1.0f - std::sqrt(2) / 2),
+	m_endCrossfadeTension(1.0f - std::sqrt(2) / 2),
 	m_mutedModel( false, this, tr( "Mute" ) ),
 	m_selectViewOnCreate{false}
 {
@@ -74,6 +78,10 @@ Clip::Clip(const Clip& other):
 	m_startPosition(other.m_startPosition),
 	m_length(other.m_length),
 	m_startTimeOffset(other.m_startTimeOffset),
+	m_startCrossfadeLength(other.m_startCrossfadeLength),
+	m_endCrossfadeLength(other.m_endCrossfadeLength),
+	m_startCrossfadeTension(other.m_startCrossfadeTension),
+	m_endCrossfadeTension(other.m_endCrossfadeTension),
 	m_mutedModel(other.m_mutedModel.value(), this, tr( "Mute" )),
 	m_resizable(other.m_resizable),
 	m_autoResize(other.m_autoResize),
@@ -137,6 +145,8 @@ void Clip::movePosition( const TimePos & pos )
 void Clip::changeLength( const TimePos & length )
 {
 	m_length = length;
+	setStartCrossfadeLength(std::min(m_startCrossfadeLength, m_length));
+	setEndCrossfadeLength(std::min(m_endCrossfadeLength, m_length));
 	Engine::getSong()->updateLength();
 	emit lengthChanged();
 }
