@@ -25,6 +25,7 @@
 #ifndef LMMS_GUI_FILE_DIALOG_H
 #define LMMS_GUI_FILE_DIALOG_H
 
+#include <QMap>
 #include <QFileDialog>
 
 #include "lmms_export.h"
@@ -37,20 +38,34 @@ class LMMS_EXPORT FileDialog : public QFileDialog
 {
 	Q_OBJECT
 public:
-	explicit FileDialog( QWidget *parent = 0, const QString &caption = QString(),
-						const QString &directory = QString(),
-						const QString &filter = QString() );
+	enum class DirType
+	{
+		Generic,
+		Project,
+		Midi,
+		Preset,
+		Plugin,
+		Sample,
+		Soundfont,
+		Song,
+	};
 
-	static QString getExistingDirectory(QWidget *parent,
-										const QString &caption,
-										const QString &directory,
-										QFileDialog::Options options = QFileDialog::ShowDirsOnly);
-    static QString getOpenFileName(QWidget *parent = 0,
-									const QString &caption = QString(),
-									const QString &directory = QString(),
-									const QString &filter = QString(),
-									QString *selectedFilter = 0);
-	void clearSelection();
+	explicit FileDialog(QWidget *parent = 0, const QString &caption = QString(),
+						const DirType operation = DirType::Generic,
+						const QString &directory = QString(),
+						const QString &filter = QString());
+
+	~FileDialog() override;
+
+	int exec() override;
+
+private:
+	DirType m_dirType;
+	int m_status;
+
+	static QMap<FileDialog::DirType, QString> s_lastUsedPaths;
+	static QString getDefaultPath(const DirType ty);
+	static QString getPath(const enum DirType ty);
 };
 
 
