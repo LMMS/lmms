@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef LMMS_FONT_HELPER_H
-#define LMMS_FONT_HELPER_H
+#ifndef LMMS_GUI_FONT_HELPER_H
+#define LMMS_GUI_FONT_HELPER_H
 
 #include <QApplication>
 #include <QFont>
@@ -44,4 +44,4 @@ inline QFont adjustedToPixelSize(QFont font, int size)
 
 } // namespace lmms::gui
 
-#endif // LMMS_FONT_HELPER_H
+#endif // LMMS_GUI_FONT_HELPER_H

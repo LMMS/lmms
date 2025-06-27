@@ -32,6 +32,9 @@ endif()
 
 # Toggle command echoing & verbosity
 # 0 = no output, 1 = error/warning, 2 = normal, 3 = debug
+if(DEFINED ENV{CPACK_DEBUG})
+	set(CPACK_DEBUG "$ENV{CPACK_DEBUG}")
+endif()
 if(NOT CPACK_DEBUG)
 	set(VERBOSITY 1)
 	set(APPIMAGETOOL_VERBOSITY "")
@@ -54,19 +57,14 @@ file(GLOB cleanup "${CPACK_BINARY_DIR}/${lmms}-*.json"
 list(SORT cleanup)
 file(REMOVE ${cleanup})
 
-# Download linuxdeploy, expose bundled appimagetool to PATH
+# Download and extract linuxdeploy
 download_binary(LINUXDEPLOY_BIN
 	"https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-${ARCH}.AppImage"
 	linuxdeploy-${ARCH}.AppImage
 	FALSE)
 
-# Symlink nested appimagetool
-set(_APPIMAGETOOL_LINK "${CPACK_CURRENT_BINARY_DIR}/appimagetool")
-if(NOT EXISTS "${_APPIMAGETOOL_LINK}")
-	set(_APPIMAGETOOL "${CPACK_CURRENT_BINARY_DIR}/.linuxdeploy-${ARCH}.AppImage/squashfs-root/plugins/linuxdeploy-plugin-appimage/appimagetool-prefix/AppRun")
-	message(STATUS "Creating a symbolic link ${_APPIMAGETOOL_LINK} which points to ${_APPIMAGETOOL}")
-	create_symlink("${_APPIMAGETOOL}" "${_APPIMAGETOOL_LINK}")
-endif()
+# Guess the path to appimagetool
+set(APPIMAGETOOL_BIN "${CPACK_CURRENT_BINARY_DIR}/.linuxdeploy-${ARCH}.AppImage/squashfs-root/plugins/linuxdeploy-plugin-appimage/appimagetool-prefix/AppRun")
 
 # Download linuxdeploy-plugin-qt
 download_binary(LINUXDEPLOY_PLUGIN_BIN
@@ -108,9 +106,6 @@ endif()
 get_filename_component(QTBIN "${CPACK_QMAKE_EXECUTABLE}" DIRECTORY)
 set(ENV{PATH} "${QTBIN}:$ENV{PATH}")
 
-# Ensure "linuxdeploy-<arch>.AppImage" and "appimagetool" binaries are first on the PATH
-set(ENV{PATH} "${CPACK_CURRENT_BINARY_DIR}:$ENV{PATH}")
-
 # Promote finding our own libraries first
 set(ENV{LD_LIBRARY_PATH} "${APP}/usr/lib/${lmms}/:${APP}/usr/lib/${lmms}/optional:$ENV{LD_LIBRARY_PATH}")
 
@@ -119,6 +114,10 @@ set(ENV{DISABLE_COPYRIGHT_FILES_DEPLOYMENT} 1)
 
 # Patch desktop file
 file(APPEND "${DESKTOP_FILE}" "X-AppImage-Version=${CPACK_PROJECT_VERSION}\n")
+
+# Custom scripts to run immediately before lmms is executed
+file(COPY "${CPACK_SOURCE_DIR}/cmake/linux/apprun-hooks" DESTINATION "${APP}")
+file(REMOVE "${APP}/apprun-hooks/README.md")
 
 # Prefer a hard-copy of .DirIcon over appimagetool's symlinking
 # 256x256 default for Cinnamon Desktop https://forums.linuxmint.com/viewtopic.php?p=2585952
@@ -135,6 +134,10 @@ file(GLOB LADSPA "${APP}/usr/lib/${lmms}/ladspa/*.so")
 
 # Inform linuxdeploy about remote plugins
 file(GLOB REMOTE_PLUGINS "${APP}/usr/lib/${lmms}/*Remote*")
+
+# Inform linuxdeploy-plugin-qt about wayland plugin
+set(ENV{EXTRA_PLATFORM_PLUGINS} "libqwayland-generic.so")
+set(ENV{EXTRA_QT_MODULES} "waylandcompositor")
 
 # Collect, sort and dedupe all libraries
 list(APPEND LIBS ${LADSPA})
@@ -153,15 +156,18 @@ foreach(_lib IN LISTS LIBS)
 	endif()
 endforeach()
 
+list(APPEND SKIP_LIBRARIES "--exclude-library=*libgallium*")
+
 # Call linuxdeploy
 message(STATUS "Calling ${LINUXDEPLOY_BIN} --appdir \"${APP}\" ... [... libraries].")
 execute_process(COMMAND "${LINUXDEPLOY_BIN}"
 	--appdir "${APP}"
 	--desktop-file "${DESKTOP_FILE}"
-	--custom-apprun "${CPACK_SOURCE_DIR}/cmake/linux/launch_lmms.sh"
 	--plugin qt
 	${LIBRARIES}
+	${SKIP_LIBRARIES}
 	--verbosity ${VERBOSITY}
+	WORKING_DIRECTORY "${CPACK_CURRENT_BINARY_DIR}"
 	${OUTPUT_QUIET}
 	COMMAND_ECHO ${COMMAND_ECHO}
 	COMMAND_ERROR_IS_FATAL ANY)
@@ -169,7 +175,7 @@ execute_process(COMMAND "${LINUXDEPLOY_BIN}"
 # Remove svg ambitiously placed by linuxdeploy
 file(REMOVE "${APP}/${lmms}.svg")
 
-# Remove libraries that are normally sytem-provided
+# Remove libraries that are normally system-provided
 file(GLOB EXCLUDE_LIBS
 	"${APP}/usr/lib/libwine*"
 	"${APP}/usr/lib/libcarla_native*"
@@ -210,32 +216,58 @@ endforeach()
 
 file(REMOVE_RECURSE "${SUIL_MODULES_TARGET}" "${APP}/usr/lib/${lmms}/ladspa/")
 
-# Bundle jack to avoid crash for systems without it
-# See https://github.com/LMMS/lmms/pull/4186
-execute_process(COMMAND ldd "${APP}/usr/bin/${lmms}"
-	OUTPUT_VARIABLE LDD_OUTPUT
-	OUTPUT_STRIP_TRAILING_WHITESPACE
-	COMMAND_ECHO ${COMMAND_ECHO}
-	COMMAND_ERROR_IS_FATAL ANY)
-string(REPLACE "\n" ";" LDD_LIST "${LDD_OUTPUT}")
-foreach(line ${LDD_LIST})
-	if(line MATCHES "libjack\\.so")
-		# Assume format "libjack.so.0 => /lib/x86_64-linux-gnu/libjack.so.0 (0x00007f48d0b0e000)"
-		string(REPLACE " " ";" parts "${line}")
-		list(LENGTH parts len)
-		math(EXPR index "${len}-2")
-		list(GET parts ${index} lib)
-		# Get symlink target
-		file(REAL_PATH "${lib}" libreal)
-		get_filename_component(symname "${lib}" NAME)
-		get_filename_component(realname "${libreal}" NAME)
-		file(MAKE_DIRECTORY "${APP}/usr/lib/${lmms}/optional/")
-		# Copy, but with original symlink name
-		file(COPY "${libreal}" DESTINATION "${APP}/usr/lib/${lmms}/optional/")
-		file(RENAME "${APP}/usr/lib/${lmms}/optional/${realname}" "${APP}/usr/lib/${lmms}/optional/${symname}")
-		continue()
+# Copy "exclude-list" lib(s) into specified location
+macro(copy_excluded ldd_target name_match destination relocated_lib)
+	execute_process(COMMAND ldd
+		"${ldd_target}"
+		OUTPUT_VARIABLE ldd_output
+		OUTPUT_STRIP_TRAILING_WHITESPACE
+		COMMAND_ECHO ${COMMAND_ECHO}
+		COMMAND_ERROR_IS_FATAL ANY)
+
+	# escape periods to avoid double-escaping
+	string(REPLACE "." "\\." name_match "${name_match}")
+
+	# cli output --> list
+	string(REPLACE "\n" ";" ldd_list "${ldd_output}")
+
+	foreach(line ${ldd_list})
+		if(line MATCHES "${name_match}")
+			# Assumes format "libname.so.0 => /lib/location/libname.so.0 (0x00007f48d0b0e000)"
+			string(REPLACE " " ";" parts "${line}")
+			list(LENGTH parts len)
+			math(EXPR index "${len}-2")
+			list(GET parts ${index} lib)
+			# Resolve any possible symlinks
+			file(REAL_PATH "${lib}" libreal)
+			get_filename_component(symname "${lib}" NAME)
+			get_filename_component(realname "${libreal}" NAME)
+			file(MAKE_DIRECTORY "${destination}")
+			# Copy, but with original symlink name
+			file(COPY "${libreal}" DESTINATION "${destination}")
+			file(RENAME "${destination}/${realname}" "${destination}/${symname}")
+			set("${relocated_lib}" "${destination}/${symname}")
+			break()
+		endif()
+	endforeach()
+endmacro()
+
+# copy libjack
+copy_excluded("${APP}/usr/bin/${lmms}" "libjack.so" "${APP}/usr/lib/jack" relocated_jack)
+if(relocated_jack)
+	# libdb's not excluded however we'll re-use the macro as a convenient path calculation
+	# See https://github.com/LMMS/lmms/issues/7689s
+	copy_excluded("${relocated_jack}" "libdb-" "${APP}/usr/lib/jack" relocated_libdb)
+	get_filename_component(libdb_name "${relocated_libdb}" NAME)
+	if(relocated_libdb AND EXISTS "${APP}/usr/lib/${libdb_name}")
+		# assume a copy already resides in usr/lib and symlink
+		file(REMOVE "${relocated_libdb}")
+		create_symlink("${APP}/usr/lib/${libdb_name}" "${relocated_libdb}")
 	endif()
-endforeach()
+endif()
+
+# cleanup empty directories
+file(REMOVE_RECURSE "${APP}/usr/lib/${lmms}/optional/")
 
 if(CPACK_TOOL STREQUAL "appimagetool")
 	# Create ".AppImage" file using appimagetool (default)
@@ -243,7 +275,7 @@ if(CPACK_TOOL STREQUAL "appimagetool")
 	# appimage plugin needs ARCH set when running in extracted form from squashfs-root / CI
 	set(ENV{ARCH} "${ARCH}")
 	message(STATUS "Finishing the AppImage...")
-	execute_process(COMMAND ${CPACK_TOOL} "${APP}" "${APPIMAGE_FILE}"
+	execute_process(COMMAND "${APPIMAGETOOL_BIN}" "${APP}" "${APPIMAGE_FILE}"
 		${APPIMAGETOOL_VERBOSITY}
 		${OUTPUT_QUIET}
 		COMMAND_ECHO ${COMMAND_ECHO}
