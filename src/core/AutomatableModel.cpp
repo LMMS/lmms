@@ -296,18 +296,18 @@ void AutomatableModel::setValue(float value, bool isAutomated)
 	if (newValue == m_value) { emit dataUnchanged(); return; }
 
 	if (isAutomated == false) { addJournalCheckPoint(); }
+
+	setValueInternal(value, isAutomated);
 	// set value for this and the other linked widgets
 	if (hasLinkedModels())
 	{
-		AutomatableModel* next = this;
-		while (true)
+		AutomatableModel* next = m_nextLink;
+		while (next != this)
 		{
 			next->setValueInternal(value, isAutomated);
 			next = next->m_nextLink;
-			if (next == this) { break; }
 		}
 	}
-	else { setValueInternal(value, isAutomated); }
 }
 
 void AutomatableModel::setValueInternal(float value, bool isAutomated)
@@ -463,9 +463,8 @@ AutomatableModel* AutomatableModel::getLastLinkedModel() const
 {
 	if (hasLinkedModels() == false) { return nullptr; }
 	AutomatableModel* output = m_nextLink;
-	while (true)
+	while (output->m_nextLink != this)
 	{
-		if (output->m_nextLink == this) { break; }
 		output = output->m_nextLink;
 	}
 	return output;
@@ -474,27 +473,24 @@ AutomatableModel* AutomatableModel::getLastLinkedModel() const
 bool AutomatableModel::isModelLinked(AutomatableModel* model) const
 {
 	if (hasLinkedModels() == false || model == nullptr || model == this) { return false; }
-	bool output = false;
 	AutomatableModel* next = m_nextLink;
-	while (true)
+	while (next != this)
 	{
-		if (next->m_nextLink == this) { break; }
-		if (next->m_nextLink == model) { output = true; break; }
+		if (next == model) { return true; }
 		next = next->m_nextLink;
 	}
-	return output;
+	return false;
 }
 
 size_t AutomatableModel::countLinks() const
 {
 	if (hasLinkedModels() == false) { return 0; }
-	size_t output = 2;
+	size_t output = 1;
 	AutomatableModel* next = m_nextLink;
-	while (true)
+	while (next != this)
 	{
-		if (next->m_nextLink == this) { break; }
-		next = next->m_nextLink;
 		output++;
+		next = next->m_nextLink;
 	}
 	return output;
 }

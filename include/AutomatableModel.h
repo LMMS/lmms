@@ -264,7 +264,7 @@ public:
 
 	virtual QString displayValue( const float val ) const = 0;
 
-	constexpr bool hasLinkedModels() const
+	bool hasLinkedModels() const
 	{
 		return m_nextLink != nullptr;
 	}
