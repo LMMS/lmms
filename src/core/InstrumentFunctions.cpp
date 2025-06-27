@@ -146,6 +146,11 @@ std::array<InstrumentFunctionNoteStacking::ChordTable::Init, InstrumentFunctionN
 }};
 
 
+// Because the octave chord is actually just a single note, not a true octave, we have to redefine it here.
+// Ideally this would be fixed by actually changing the octave chord definition, but that would require some
+// very extensive upgrade routines due to how instrument chord stacking and arpeggiation use it.
+InstrumentFunctionNoteStacking::Chord InstrumentFunctionNoteStacking::ChordTable::s_alternativeOctave = InstrumentFunctionNoteStacking::Chord(QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "octave"), {0, 12, -1});
+
 
 
 InstrumentFunctionNoteStacking::Chord::Chord( const char * n, const ChordSemiTones & semi_tones ) :
