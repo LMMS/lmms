@@ -138,7 +138,8 @@ void OscilloscopeGraph::wheelEvent(QWheelEvent* we)
 	int newWindowSize = windowSize * zoomAmount;
 	float newPhase = phase - mouseOffset * (1.0f - zoomAmount);
 	m_controls->m_lengthModel.setValue(newWindowSize);
-	m_controls->m_phaseModel.setValue(newPhase - std::floor(newPhase));
+	// Clamp to prevent the user from accidentally bringing the write position discontinuity into view
+	m_controls->m_phaseModel.setValue(std::clamp(newPhase, newWindowSize / m_controls->m_lengthModel.maxValue(), 1.0f));
 }
 
 void OscilloscopeGraph::mousePressEvent(QMouseEvent* me)
