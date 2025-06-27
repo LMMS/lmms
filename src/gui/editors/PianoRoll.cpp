@@ -794,6 +794,62 @@ void PianoRoll::reverseNotes()
 	Engine::getSong()->setModified();
 }
 
+void PianoRoll::duplicateNotes(bool quanitized)
+{
+	if (!hasValidMidiClip()) { return; }
+
+	m_midiClip->addJournalCheckPoint();
+
+	const NoteVector selectedNotes = getSelectedNotes();
+	const NoteVector notes = selectedNotes.empty() ? m_midiClip->notes() : selectedNotes;
+
+	// Find the very first start position and the very last end position of all the notes.
+	Note* firstNote = *std::min_element(notes.begin(), notes.end(), [](const Note* n1, const Note* n2){ return Note::lessThan(n1, n2); });
+	Note* lastNode = *std::max_element(notes.begin(), notes.end(), [](const Note* n1, const Note* n2){ return n1->endPos() < n2->endPos(); });
+	TimePos firstPos = firstNote->pos();
+	TimePos lastPos = lastNode->endPos();
+
+	TimePos unquantizedLength = lastPos - firstPos;
+	// If the length should be inferred from the note positions, it's generally rounded up to the nearest power of 2 bar length.
+	// Except when the time signature numerator is not a power of 2. In that case, the final length is quantized
+	// to the next beat length if the length between 1/2 beat and 1 bar. Else just use power of 2 as normal.
+	// If the length is less than half of a beat, the same sort of power of 2 rounding happens, but relative to the beat length.
+	// If the length on the scale of the snap size, it's done relative to the snap size.
+	int ticksPerBeat = TimePos::ticksPerBar() / Engine::getSong()->getTimeSigModel().getNumerator();
+	int ticksPerSnap = quantization();
+	TimePos quantizedLength;
+	if (unquantizedLength > TimePos::ticksPerBar() / 2)
+	{
+		quantizedLength = TimePos::ticksPerBar() * std::exp2(std::ceil(std::log2(static_cast<float>(unquantizedLength) / TimePos::ticksPerBar())));
+	}
+	else if (unquantizedLength > ticksPerBeat / 2)
+	{
+		quantizedLength = std::ceil(static_cast<float>(unquantizedLength) / ticksPerBeat) * ticksPerBeat;
+	}
+	else if (unquantizedLength >= ticksPerSnap * 2)
+	{
+		quantizedLength = ticksPerBeat * std::exp2(std::ceil(std::log2(static_cast<float>(unquantizedLength) / ticksPerBeat)));
+	}
+	else
+	{
+		quantizedLength = std::ceil(static_cast<float>(unquantizedLength) / ticksPerSnap) * ticksPerSnap;
+	}
+
+	for (auto note : notes)
+	{
+		Note newNote = Note{*note};
+		newNote.setPos(note->pos() + (quanitized ? quantizedLength : unquantizedLength));
+		m_midiClip->addNote(newNote, false);
+		note->setSelected(false);
+	}
+
+	m_midiClip->rearrangeAllNotes();
+
+	update();
+	getGUI()->songEditor()->update();
+	Engine::getSong()->setModified();
+}
+
 
 void PianoRoll::loadMarkedSemiTones(const QDomElement & de)
 {
@@ -5072,6 +5128,16 @@ PianoRollWindow::PianoRollWindow() :
 	auto maxLengthAction = new QAction(embed::getIconPixmap("max_length"), tr("Max length as last"), noteToolsButton);
 	connect(maxLengthAction, &QAction::triggered, [this](){ m_editor->constrainNoteLengths(true); });
 
+
+	auto duplicateQuantizedAction = new QAction(embed::getIconPixmap("edit_copy"), tr("Duplicate"), noteToolsButton);
+	connect(duplicateQuantizedAction, &QAction::triggered, [this](){ m_editor->duplicateNotes(true); });
+	duplicateQuantizedAction->setShortcut(combine(Qt::CTRL, Qt::Key_D));
+
+	auto duplicateUnquantizedAction = new QAction(embed::getIconPixmap("edit_copy"), tr("Duplicate (Unquantized)"), noteToolsButton);
+	connect(duplicateUnquantizedAction, &QAction::triggered, [this](){ m_editor->duplicateNotes(false); });
+	duplicateUnquantizedAction->setShortcut(combine(Qt::CTRL, Qt::SHIFT, Qt::Key_D));
+
+
 	auto reverseAction = new QAction(embed::getIconPixmap("flip_x"), tr("Reverse Notes"), noteToolsButton);
 	connect(reverseAction, &QAction::triggered, [this](){ m_editor->reverseNotes(); });
 	reverseAction->setShortcut(combine(Qt::SHIFT, Qt::Key_R));
@@ -5084,6 +5150,8 @@ PianoRollWindow::PianoRollWindow() :
 	noteToolsButton->addAction(minLengthAction);
 	noteToolsButton->addAction(maxLengthAction);
 	noteToolsButton->addAction(reverseAction);
+	noteToolsButton->addAction(duplicateQuantizedAction);
+	noteToolsButton->addAction(duplicateUnquantizedAction);
 
 	notesActionsToolBar->addWidget(noteToolsButton);
 
