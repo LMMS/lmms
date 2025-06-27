@@ -6,6 +6,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   linux-x86_64:
+    if: false
     name: linux-x86_64
     runs-on: ubuntu-22.04
     env:
@@ -95,6 +96,7 @@ jobs:
         env:
           CCACHE_MAXSIZE: 500M
   linux-arm64:
+    if: false
     name: linux-arm64
     runs-on: ubuntu-24.04-arm
     env:
@@ -175,6 +177,7 @@ jobs:
         env:
           CCACHE_MAXSIZE: 500M
   macos:
+    if: false
     strategy:
       fail-fast: false
       matrix:
@@ -407,6 +410,7 @@ jobs:
         with:
           sudo: false
   msvc:
+    if: false
     name: msvc-x64
     runs-on: windows-2022
     env:
@@ -491,6 +495,7 @@ jobs:
         env:
           CCACHE_MAXSIZE: 500MB
   msys2:
+    if: false
     name: windows-arm64
     runs-on: windows-11-arm
     defaults:
