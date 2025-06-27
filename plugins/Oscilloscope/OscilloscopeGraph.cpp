@@ -86,7 +86,7 @@ void OscilloscopeGraph::paintEvent(QPaintEvent* pe)
 	auto drawWaveform = [&](QColor color, bool left, bool right, bool average)
 	{
 		p.setPen(color);
-		float minValue, maxValue;
+		float minValue = 0.0f, maxValue = 0.0f;
 		for (int f = 0; f < windowSize - framesPerPixel; f += framesPerPixel)
 		{
 			const int currentIndex = (windowStartIndex + f) % bufferSize;
