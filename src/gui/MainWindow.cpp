@@ -753,7 +753,7 @@ void MainWindow::openProject()
 {
 	if( mayChangeProject(false) )
 	{
-		FileDialog ofd( this, tr( "Open Project" ), "", tr( "LMMS (*.mmp *.mmpz)" ), FileDialog::Operation::Project );
+		FileDialog ofd( this, tr( "Open Project" ), FileDialog::DirType::Project, tr( "LMMS (*.mmp *.mmpz)" ) );
 
 		ofd.setFileMode( FileDialog::ExistingFiles );
 		if( ofd.exec () == QDialog::Accepted &&
@@ -1406,7 +1406,7 @@ void MainWindow::autoSave()
 
 void MainWindow::onExportProjectMidi()
 {
-	FileDialog efd( this, "Export Project", "", "", FileDialog::Operation::Midi);
+	FileDialog efd( this, "Export Project", FileDialog::DirType::Midi);
 
 	efd.setFileMode( FileDialog::AnyFile );
 
@@ -1446,7 +1446,7 @@ void MainWindow::exportProject(bool multiExport)
 {
 	QString const & projectFileName = Engine::getSong()->projectFileName();
 
-	FileDialog efd( getGUI()->mainWindow(), "", "", "", FileDialog::Operation::Song);
+	FileDialog efd( getGUI()->mainWindow(), "", FileDialog::DirType::Song);
 
 	if ( multiExport )
 	{
@@ -1571,14 +1571,13 @@ void MainWindow::onImportProject()
 	if (song)
 	{
 		FileDialog ofd( nullptr, tr( "Import file" ),
-				"",
+				FileDialog::DirType::Project,
 				tr("MIDI sequences") +
 				" (*.mid *.midi *.rmi);;" +
 				tr("Hydrogen projects") +
 				" (*.h2song);;" +
 				tr("All file types") +
-				" (*.*)",
-				FileDialog::Operation::Project
+				" (*.*)"
 		);
 
 		ofd.setFileMode( FileDialog::ExistingFiles );

@@ -1200,7 +1200,7 @@ void Sf2InstrumentView::showFileDialog()
 {
 	auto k = castModel<Sf2Instrument>();
 
-	FileDialog ofd( nullptr, tr( "Open SoundFont file" ), "", "", FileDialog::Operation::Soundfont );
+	FileDialog ofd( nullptr, tr( "Open SoundFont file" ), FileDialog::DirType::Soundfont );
 	ofd.setFileMode( FileDialog::ExistingFiles );
 
 	QStringList types;

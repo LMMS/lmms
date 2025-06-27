@@ -30,6 +30,7 @@
 #include <QStorageInfo>
 #include <QStringList>
 #include <qchar.h>
+#include <qhashfunctions.h>
 
 #include "ConfigManager.h"
 #include "FileBrowser.h"
@@ -39,14 +40,14 @@
 namespace lmms::gui
 {
 
-QMap<FileDialog::Operation, QString> FileDialog::s_operationPaths = {};
-bool FileDialog::s_operationPathsReady = false;
+QMap<FileDialog::DirType, QString> FileDialog::s_lastUsedPaths = {};
 
 FileDialog::FileDialog(QWidget *parent, const QString &caption,
-					   const QString &directory, const QString &filter,
-					   const Operation operation) :
-	QFileDialog(parent, caption, getOperationPath(operation, directory), filter),
-	m_operation(operation),
+					   const DirType dirType, 
+					   const QString &filter,
+					   const QString &directory):
+	QFileDialog(parent, caption, directory.isEmpty() ? getPath(dirType) : directory, filter),
+	m_dirType(dirType),
 	m_status(QDialog::Rejected)
 {
 #if QT_VERSION > 0x050200
@@ -65,53 +66,45 @@ FileDialog::~FileDialog()
 {
 	if (m_status == QDialog::Accepted)
 	{
-		setOperationPath(m_operation, directory().absolutePath());
+		s_lastUsedPaths[m_dirType] = directory().absolutePath();
 	}
 }
 
-void FileDialog::clearSelection()
+QString FileDialog::getDefaultPath(const DirType dirType)
 {
-	auto view = findChild<QListView*>();
-	Q_ASSERT( view );
-	view->clearSelection();
-}
-
-void FileDialog::prepareOperationPaths()
-{
-	if (s_operationPathsReady)
-	{
-		return;
-	}
-
 	auto* config = ConfigManager::inst();
 
-	s_operationPaths[Operation::Generic]	= config->workingDir();
-	s_operationPaths[Operation::Project]	= config->userProjectsDir();
-	s_operationPaths[Operation::Midi]		= config->workingDir();
-	s_operationPaths[Operation::Preset]		= config->userPresetsDir();
-	s_operationPaths[Operation::Plugin]		= config->userVstDir();
-	s_operationPaths[Operation::Sample]		= config->userSamplesDir();
-	s_operationPaths[Operation::Soundfont]	= config->userSf2Dir();
-	s_operationPaths[Operation::Song]		= config->workingDir();
-
-	s_operationPathsReady = true;
-}
-
-QString FileDialog::getOperationPath(const FileDialog::Operation op, const QString& existing)
-{
-	if (!existing.isEmpty())
+	switch (dirType)
 	{
-		return existing;
+		case DirType::Project:
+			return config->userProjectsDir();
+		case DirType::Midi:
+			return config->workingDir();
+		case DirType::Preset:
+			return config->userPresetsDir();
+		case DirType::Plugin:
+			return config->userVstDir();
+		case DirType::Sample:
+			return config->userSamplesDir();
+		case DirType::Soundfont:
+			return config->userSf2Dir();
+		case DirType::Song:
+			return config->workingDir();
+		default:
+			return config->workingDir();
 	}
-
-	prepareOperationPaths();
-
-	return s_operationPaths[op];
 }
 
-void FileDialog::setOperationPath(const FileDialog::Operation op, const QString& path)
+QString FileDialog::getPath(const FileDialog::DirType dirType)
 {
-	s_operationPaths[op] = path;
+	auto& path = s_lastUsedPaths[dirType];
+	
+	if (path.isEmpty())
+	{
+		path = getDefaultPath(dirType);
+	}
+	
+	return path;
 }
 
 } // namespace lmms::gui

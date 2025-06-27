@@ -5473,7 +5473,7 @@ void PianoRollWindow::ghostClipSet( bool state )
 
 void PianoRollWindow::exportMidiClip()
 {
-	FileDialog exportDialog(this, tr("Export clip"), "",
+	FileDialog exportDialog(this, tr("Export clip"), FileDialog::DirType::Preset,
 		tr("XML clip file (*.xpt *.xptz)"));
 
 	exportDialog.setAcceptMode(FileDialog::AcceptSave);
@@ -5520,7 +5520,7 @@ void PianoRollWindow::importMidiClip()
 		return;
 	}
 
-	FileDialog importDialog(this, tr("Open clip"), "",
+	FileDialog importDialog(this, tr("Open clip"),FileDialog::DirType::Preset,
 		tr("XML clip file (*.xpt *.xptz)"));
 	importDialog.setFileMode(FileDialog::ExistingFile);
 

@@ -28,6 +28,7 @@
 #include <QMap>
 #include <QFileDialog>
 #include <qdialog.h>
+#include <qobject.h>
 #include "lmms_export.h"
 
 namespace lmms::gui
@@ -38,7 +39,7 @@ class LMMS_EXPORT FileDialog : public QFileDialog
 {
 	Q_OBJECT
 public:
-	enum class Operation
+	enum class DirType
 	{
 		Generic,
 		Project,
@@ -51,26 +52,21 @@ public:
 	};
 
 	explicit FileDialog( QWidget *parent = 0, const QString &caption = QString(),
+						const DirType operation = DirType::Generic,
 						const QString &directory = QString(),
-						const QString &filter = QString(),
-						const Operation operation = Operation::Generic);
+						const QString &filter = QString());
 
 	~FileDialog() override;
 
 	int exec() override;
 
-	void clearSelection();
-
 private:
-	Operation m_operation;
+	DirType m_dirType;
 	int m_status;
 
-	static QMap<FileDialog::Operation, QString> s_operationPaths;
-	static bool s_operationPathsReady;
-	static void prepareOperationPaths();
-	// If existing path is not empty, getOperationPath returns it instead.
-	static QString getOperationPath(const enum Operation op, const QString& existing);
-	static void setOperationPath(const enum Operation op, const QString& path);
+	static QMap<FileDialog::DirType, QString> s_lastUsedPaths;
+	static QString getDefaultPath(const DirType ty);
+	static QString getPath(const enum DirType ty);
 };
 
 

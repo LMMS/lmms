@@ -1033,7 +1033,7 @@ void GigInstrumentView::showFileDialog()
 {
 	auto k = castModel<GigInstrument>();
 
-	FileDialog ofd( nullptr, tr( "Open GIG file" ), "", "", FileDialog::Operation::Sample );
+	FileDialog ofd( nullptr, tr( "Open GIG file" ), FileDialog::DirType::Sample );
 	ofd.setFileMode( FileDialog::ExistingFiles );
 
 	QStringList types;
