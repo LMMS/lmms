@@ -29,12 +29,9 @@
 #include <QStandardPaths>
 #include <QStorageInfo>
 #include <QStringList>
-#include <qchar.h>
-#include <qhashfunctions.h>
 
 #include "ConfigManager.h"
-#include "FileBrowser.h"
-#include "volume.h"
+
 #include "FileDialog.h"
 
 namespace lmms::gui
@@ -98,13 +95,14 @@ QString FileDialog::getDefaultPath(const DirType dirType)
 QString FileDialog::getPath(const FileDialog::DirType dirType)
 {
 	auto& path = s_lastUsedPaths[dirType];
-	
+
 	if (path.isEmpty())
 	{
 		path = getDefaultPath(dirType);
 	}
-	
+
 	return path;
 }
+
 
 } // namespace lmms::gui

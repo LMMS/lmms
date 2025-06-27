@@ -669,7 +669,7 @@ void VestigeInstrumentView::modelChanged()
 
 void VestigeInstrumentView::openPlugin()
 {
-	FileDialog ofd( nullptr, tr( "Open VST plugin" ) , FileDialog::DirType::Plugin);
+	FileDialog ofd( nullptr, tr( "Open VST plugin" ), FileDialog::DirType::Plugin );
 
 	// set filters
 	QStringList types;

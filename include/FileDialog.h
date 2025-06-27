@@ -27,8 +27,7 @@
 
 #include <QMap>
 #include <QFileDialog>
-#include <qdialog.h>
-#include <qobject.h>
+
 #include "lmms_export.h"
 
 namespace lmms::gui
@@ -51,7 +50,7 @@ public:
 		Song,
 	};
 
-	explicit FileDialog( QWidget *parent = 0, const QString &caption = QString(),
+	explicit FileDialog(QWidget *parent = 0, const QString &caption = QString(),
 						const DirType operation = DirType::Generic,
 						const QString &directory = QString(),
 						const QString &filter = QString());

@@ -1406,7 +1406,7 @@ void MainWindow::autoSave()
 
 void MainWindow::onExportProjectMidi()
 {
-	FileDialog efd( this, "Export Project", FileDialog::DirType::Midi);
+	FileDialog efd( this, "Export Project", FileDialog::DirType::Midi );
 
 	efd.setFileMode( FileDialog::AnyFile );
 
@@ -1446,7 +1446,7 @@ void MainWindow::exportProject(bool multiExport)
 {
 	QString const & projectFileName = Engine::getSong()->projectFileName();
 
-	FileDialog efd( getGUI()->mainWindow(), "", FileDialog::DirType::Song);
+	FileDialog efd( getGUI()->mainWindow(), "", FileDialog::DirType::Song );
 
 	if ( multiExport )
 	{
