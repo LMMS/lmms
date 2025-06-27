@@ -140,6 +140,9 @@ public:
 	void removeTrackView( TrackView * _tv );
 	// -------------------------------------------------------
 
+	int getTrackHeadWidth() const { return m_trackHeadWidth; }
+	void setTrackHeadWidth(int width);
+
 	void clearAllTracks();
 
 	QString nodeName() const override
@@ -196,11 +199,14 @@ private:
 
 	float m_ppb;
 
+	int m_trackHeadWidth;
+
 	RubberBand * m_rubberBand;
 
 signals:
 	void positionChanged( const lmms::TimePos & _pos );
 	void tracksRealigned();
+	void trackHeadWidthChanged(int width);
 
 
 } ;
