@@ -1961,7 +1961,7 @@ void DataFile::upgrade_octaveChordStacking()
 		// 1 is the index of the octave chord
 		if (e.attribute("chord").toInt() == 0)
 		{
-			e.setAttribute("chordrange", std::max(0, e.attribute("chordrange").toInt() - 1));
+			e.setAttribute("chordrange", std::max(1, e.attribute("chordrange").toInt() - 1));
 		}
 	}
 }
