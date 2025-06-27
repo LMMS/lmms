@@ -86,7 +86,8 @@ const std::vector<DataFile::UpgradeMethod> DataFile::UPGRADE_METHODS = {
 	&DataFile::upgrade_loopsRename      ,   &DataFile::upgrade_noteTypes,
 	&DataFile::upgrade_fixCMTDelays     ,   &DataFile::upgrade_fixBassLoopsTypo,
 	&DataFile::findProblematicLadspaPlugins,
-	&DataFile::upgrade_noHiddenAutomationTracks
+	&DataFile::upgrade_noHiddenAutomationTracks,
+	&DataFile::upgrade_octaveChordStacking,
 };
 
 // Vector of all versions that have upgrade routines.
@@ -1941,6 +1942,31 @@ void DataFile::upgrade_sampleAndHold()
 		}
 	}
 }
+
+
+
+/** \brief The "octave" note stacking feature previously didn't play an octave, but now it does.
+ *
+ * Older projetcs which utilized octave note stacking for instruments may have coped with the bug
+ * by simply increasing the "range" knob by 1. So in order to get one octave, they would set it to 2.
+ * This upgrade routine simply decrements the range knob by 1 if the chord was set to octave.
+ */
+void DataFile::upgrade_octaveChordStacking()
+{
+	QDomNodeList elements = elementsByTagName("chordcreator");
+	for (int i = 0; i < elements.length(); ++i)
+	{
+		if (elements.item(i).isNull()) { continue; }
+		auto e = elements.item(i).toElement();
+		// 1 is the index of the octave chord
+		if (e.attribute("chord").toInt() == 0)
+		{
+			e.setAttribute("chordrange", std::max(0, e.attribute("chordrange").toInt() - 1));
+		}
+	}
+}
+
+
 
 
 static QMap<QString, QString> buildReplacementMap()

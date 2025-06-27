@@ -41,7 +41,7 @@ std::array<InstrumentFunctionNoteStacking::ChordTable::Init, InstrumentFunctionN
 	InstrumentFunctionNoteStacking::ChordTable::s_initTable =
 	std::array<InstrumentFunctionNoteStacking::ChordTable::Init, NUM_CHORD_TABLES>
 {{
-	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "octave" ), { 0, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "octave" ), { 0, 12, -1 } },
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Major" ), { 0, 4, 7, -1 } },
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Majb5" ), { 0, 4, 6, -1 } },
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "minor" ), { 0, 3, 7, -1 } },
@@ -244,6 +244,8 @@ void InstrumentFunctionNoteStacking::processNote( NotePlayHandle * _n )
 		// then insert sub-notes for chord
 		const int selected_chord = m_chordsModel.value();
 
+		std::vector<int> playedKeys;
+
 		for( int octave_cnt = 0; octave_cnt < m_chordRangeModel.value(); ++octave_cnt )
 		{
 			const int sub_note_key_base = base_note_key + octave_cnt * KeysPerOctave;
@@ -253,6 +255,8 @@ void InstrumentFunctionNoteStacking::processNote( NotePlayHandle * _n )
 			{
 				// add interval to sub-note-key
 				const int sub_note_key = sub_note_key_base + (int) chord_table.chords()[selected_chord][i];
+				// If we've already played the note, don't double-play it! (like when stacking octave chords)
+				if (std::find(playedKeys.begin(), playedKeys.end(), sub_note_key) != playedKeys.end()) { continue; }
 				// maybe we're out of range -> let's get outta
 				// here!
 				if( sub_note_key > NumKeys )
@@ -261,6 +265,7 @@ void InstrumentFunctionNoteStacking::processNote( NotePlayHandle * _n )
 				}
 				// create copy of base-note
 				Note note_copy( _n->length(), 0, sub_note_key, _n->getVolume(), _n->getPanning(), _n->detuning() );
+				playedKeys.push_back(sub_note_key);
 
 				// create sub-note-play-handle, only note is
 				// different
