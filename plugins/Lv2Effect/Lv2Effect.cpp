@@ -50,6 +50,7 @@ Plugin::Descriptor PLUGIN_EXPORT lv2effect_plugin_descriptor =
 	Plugin::Type::Effect,
 	new PluginPixmapLoader("logo"),
 	nullptr,
+	nullptr,
 	new Lv2SubPluginFeatures(Plugin::Type::Effect)
 };
 
