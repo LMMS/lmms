@@ -152,7 +152,7 @@ static std::map<std::string, std::vector<std::string>> mimetypes = {{"samplefile
 		QString value("");
 		if (!urls.isEmpty())
 		{
-			value = urls.first().toLocalFile()
+			value = urls.first().toLocalFile();
 			if (isAudioFile(value)) { type = "samplefile"; }
 			else if (isVstPluginFile(value)) { type = "vstpluginfile"; }
 			else if (isPresetFile(value)) { type = "presetfile"; }
