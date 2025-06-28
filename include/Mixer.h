@@ -25,14 +25,15 @@
 #ifndef LMMS_MIXER_H
 #define LMMS_MIXER_H
 
-#include "Model.h"
-#include "EffectChain.h"
-#include "JournallingObject.h"
-#include "ThreadableJob.h"
-
+#include <QColor>
 #include <atomic>
 #include <optional>
-#include <QColor>
+
+#include "ConfigManager.h"
+#include "EffectChain.h"
+#include "JournallingObject.h"
+#include "Model.h"
+#include "ThreadableJob.h"
 
 namespace lmms
 {
@@ -88,7 +89,7 @@ class MixerChannel : public ThreadableJob
 		std::atomic_size_t m_dependenciesMet;
 		void incrementDeps();
 		void processed();
-		
+
 	private:
 		void doProcessing() override;
 		int m_channelIndex;
