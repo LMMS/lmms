@@ -147,7 +147,7 @@ void AudioSndio::run()
 {
 	auto buf = std::vector<float>(framesPerPeriod() * channels());
 
-	while (nextBuffer(buf.data(), framesPerPeriod(), channels()))
+	while (nextBuffer({buf.data(), channels(), framesPerPeriod()}))
 	{
 		sio_write(m_hdl, buf.data(), buf.size() * sizeof(float));
 	}

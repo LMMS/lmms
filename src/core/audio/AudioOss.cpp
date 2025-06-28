@@ -263,7 +263,7 @@ void AudioOss::run()
 	auto pcmBuf = std::vector<int16_t>(buf.size());
 	const auto bytesToWrite = static_cast<int>(pcmBuf.size() * sizeof(int16_t));
 
-	while (nextBuffer(buf.data(), framesPerPeriod(), channels()))
+	while (nextBuffer({buf.data(), channels(), framesPerPeriod()}))
 	{
 		for (auto i = std::size_t{0}; i < buf.size(); ++i)
 		{

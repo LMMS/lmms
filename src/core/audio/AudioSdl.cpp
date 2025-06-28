@@ -178,7 +178,7 @@ void AudioSdl::sdlAudioCallback( Uint8 * _buf, int _len )
 {
 	const auto frameCount = _len / sizeof(float) / channels();
 
-	if (!nextBuffer(reinterpret_cast<float*>(_buf), frameCount, channels()))
+	if (!nextBuffer({reinterpret_cast<float*>(_buf), channels(), frameCount}))
 	{
 		memset( _buf, 0, _len );
 		return;

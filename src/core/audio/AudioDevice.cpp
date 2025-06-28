@@ -53,7 +53,7 @@ AudioDevice::~AudioDevice()
 	unlock();
 }
 
-bool AudioDevice::nextBuffer(float* dst, const std::size_t frames, const int channels)
+bool AudioDevice::nextBuffer(InterleavedBufferView<float> dst)
 {
 	if (!m_running.test_and_set(std::memory_order_acquire))
 	{
@@ -61,20 +61,20 @@ bool AudioDevice::nextBuffer(float* dst, const std::size_t frames, const int cha
 		return false;
 	}
 
-	for (auto frame = std::size_t{0}; frame < frames; ++frame)
+	for (auto frame = std::size_t{0}; frame < dst.frames(); ++frame)
 	{
 		if (m_audioEngineBufferIndex == 0) { m_audioEngineBuffer = m_audioEngine->renderNextBuffer(); }
 		const auto audioEngineFrame = m_audioEngineBuffer[m_audioEngineBufferIndex];
 
-		for (auto channel = 0; channel < channels; ++channel)
+		for (auto channel = 0; channel < dst.channels(); ++channel)
 		{
-			if (channels == 1)
+			if (dst.channels() == 1)
 			{
-				dst[frame] = audioEngineFrame.average();
+				dst[frame][0] = audioEngineFrame.average();
 				continue;
 			}
 
-			dst[frame * channels + channel] = channel < DEFAULT_CHANNELS ? audioEngineFrame[channel] : 0.f;
+			dst[frame][channel] = channel < DEFAULT_CHANNELS ? audioEngineFrame[channel] : 0.f;
 		}
 
 		m_audioEngineBufferIndex = (m_audioEngineBufferIndex + 1) % m_audioEngine->framesPerPeriod();
@@ -83,7 +83,7 @@ bool AudioDevice::nextBuffer(float* dst, const std::size_t frames, const int cha
 	return true;
 }
 
-bool AudioDevice::nextBuffer(float** dst, const std::size_t frames, const int channels)
+bool AudioDevice::nextBuffer(PlanarBufferView<float> dst)
 {
 	if (!m_running.test_and_set(std::memory_order_acquire))
 	{
@@ -91,14 +91,14 @@ bool AudioDevice::nextBuffer(float** dst, const std::size_t frames, const int ch
 		return false;
 	}
 
-	for (auto frame = std::size_t{0}; frame < frames; ++frame)
+	for (auto frame = std::size_t{0}; frame < dst.frames(); ++frame)
 	{
 		if (m_audioEngineBufferIndex == 0) { m_audioEngineBuffer = m_audioEngine->renderNextBuffer(); }
 		const auto audioEngineFrame = m_audioEngineBuffer[m_audioEngineBufferIndex];
 
-		for (auto channel = 0; channel < channels; ++channel)
+		for (auto channel = 0; channel < dst.channels(); ++channel)
 		{
-			if (channels == 1)
+			if (dst.channels() == 1)
 			{
 				dst[channel][frame] = audioEngineFrame.average();
 				continue;

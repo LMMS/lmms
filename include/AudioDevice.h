@@ -28,6 +28,7 @@
 #include <QMutex>
 #include <samplerate.h>
 
+#include "AudioBufferView.h"
 #include "LmmsTypes.h"
 
 class QThread;
@@ -82,14 +83,12 @@ public:
 
 protected:
 	//! Render the next audio playback buffer into @p dst.
-	//! @p dst is expected to represent interleaved floating-point audio.
 	//! @return `true` if playback was rendered into @p dst.
-	bool nextBuffer(float* dst, std::size_t frames, int channels);
+	bool nextBuffer(InterleavedBufferView<float> dst);
 
 	//! Render the next audio playback buffer into @p dst.
-	//! @p dst is expected to represent planar floating-point audio.
 	//! @return `true` if playback was rendered into @p dst.
-	bool nextBuffer(float** dst, std::size_t frames, int channels);
+	bool nextBuffer(PlanarBufferView<float> dst);
 
 	// convert a given audio-buffer to a buffer in signed 16-bit samples
 	// returns num of bytes in outbuf

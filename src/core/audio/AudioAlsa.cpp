@@ -246,7 +246,7 @@ void AudioAlsa::stopProcessing()
 void AudioAlsa::run()
 {
 	auto buf = std::vector<float>(framesPerPeriod() * channels());
-	while (nextBuffer(buf.data(), framesPerPeriod(), channels()))
+	while (nextBuffer({buf.data(), channels(), framesPerPeriod()}))
 	{
 		if (const auto framesWritten = snd_pcm_writei(m_handle, buf.data(), framesPerPeriod()); framesWritten < 0)
 		{
