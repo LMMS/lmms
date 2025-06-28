@@ -340,6 +340,7 @@ jobs:
           dpkg -l | fgrep -i mingw
       - name: Upgrade binutils-mingw-w64
         run: |
+          GITDIR=`pwd`
           dpkg -l | fgrep -i mingw
           mkdir /tmp/build-mingw-source-package
           cd /tmp/build-mingw-source-package
@@ -357,6 +358,8 @@ jobs:
           cd ..
           dpkg-source --no-check -x binutils-mingw-w64_9build1.dsc
           cd binutils-mingw-w64-9build1
+          cat "$GITDIR"/rules > debian/rules
+          cat debian/rules
           ln -s /usr/bin/autoconf /usr/bin/autoconf2.69
           ln -s /usr/bin/autom4te /usr/bin/autom4te2.69
           df -h
