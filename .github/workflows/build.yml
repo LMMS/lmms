@@ -343,7 +343,7 @@ jobs:
           dpkg -l | fgrep -i mingw
           mkdir /tmp/build-mingw-source-package
           cd /tmp/build-mingw-source-package
-          wget http://launchpadlibrarian.net/782770756/binutils-source_2.38-4ubuntu2.8_all.deb
+          wget http://launchpadlibrarian.net/590253712/binutils-source_2.38-3ubuntu1_all.deb
           apt-get install -y --no-install-recommends ./*.deb
           rm *.deb
           wget https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/binutils-mingw-w64/9build1/binutils-mingw-w64_9build1.tar.xz
