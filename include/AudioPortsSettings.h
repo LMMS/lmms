@@ -142,6 +142,8 @@ struct AudioPortsSettings
 template<AudioPortsSettings settings>
 constexpr auto validate() -> bool
 {
+	static_assert(settings.inputs != 0 || settings.outputs != 0, "The input and output counts cannot both be zero");
+
 	static_assert(!settings.interleaved
 		|| ((settings.inputs == 0 || settings.inputs == 2) && (settings.outputs == 0 || settings.outputs == 2)),
 		"AudioPortsSettings: When using interleaved samples, there must be exactly 0 or 2 input and output channels");

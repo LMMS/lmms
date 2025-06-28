@@ -145,12 +145,20 @@ Effect * Effect::instantiate( const QString& pluginName,
 
 
 
-void Effect::checkGate(double outSum)
+void Effect::checkGate(InterleavedBufferView<const float, 2> coreBuffers)
 {
 	if( m_autoQuitDisabled )
 	{
 		return;
 	}
+
+	double outSum = 0.0;
+	for (const SampleFrame& frame : coreBuffers.toSampleFrames())
+	{
+		outSum += frame.sumOfSquaredAmplitudes();
+	}
+
+	outSum /= coreBuffers.frames();
 
 	// Check whether we need to continue processing input.  Restart the
 	// counter if the threshold has been exceeded.

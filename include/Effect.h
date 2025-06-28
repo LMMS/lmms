@@ -26,8 +26,7 @@
 #ifndef LMMS_EFFECT_H
 #define LMMS_EFFECT_H
 
-#include <span>
-
+#include "AudioBufferView.h"
 #include "AudioEngine.h"
 #include "AutomatableModel.h"
 #include "Engine.h"
@@ -59,9 +58,9 @@ public:
 	~Effect() override;
 
 	//! Returns true if audio was processed and should continue being processed
-	bool processAudioBuffer(SampleFrame* buf, const fpp_t frames)
+	bool processCore(SampleFrame* buf, const fpp_t frames)
 	{
-		return processAudioBufferImpl({buf, frames});
+		return processCoreImpl({reinterpret_cast<float*>(buf), frames});
 	}
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
@@ -190,7 +189,7 @@ public:
 
 
 protected:
-	virtual bool processAudioBufferImpl(std::span<SampleFrame> inOut) = 0;
+	virtual bool processCoreImpl(InterleavedBufferView<float, 2> inOut) = 0;
 
 	gui::PluginView* instantiateView( QWidget * ) override;
 
@@ -224,7 +223,7 @@ protected:
 		after "decay" ms of a signal below "gate", the effect is turned off
 		and won't be processed again until it receives new audio input
 	*/
-	void checkGate(double outSum);
+	void checkGate(InterleavedBufferView<const float, 2> coreBuffers);
 
 private:
 	EffectChain * m_parent;

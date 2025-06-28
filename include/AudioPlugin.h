@@ -251,7 +251,7 @@ protected:
 			: nullptr;
 	}
 
-	auto processAudioBufferImpl(std::span<SampleFrame> inOut) -> bool final
+	auto processCoreImpl(InterleavedBufferView<float, 2> inOut) -> bool final
 	{
 		if (isSleeping() || !m_audioPorts.active())
 		{
@@ -262,8 +262,8 @@ protected:
 		auto buffers = m_audioPorts.buffers();
 		assert(buffers != nullptr);
 
-		float* temp = inOut.data()->data();
-		const auto bus = AudioBus<float>{&temp, 1, inOut.size()};
+		float* temp = inOut.data();
+		const auto bus = AudioBus<float>{&temp, 1, inOut.frames()};
 		auto router = m_audioPorts.getRouter();
 
 		ProcessStatus status;
@@ -276,17 +276,8 @@ protected:
 			case ProcessStatus::Continue:
 				break;
 			case ProcessStatus::ContinueIfNotQuiet:
-			{
-				// TODO: Should probably use the plugin's output buffer instead
-				double outSum = 0.0;
-				for (const SampleFrame& frame : inOut)
-				{
-					outSum += frame.sumOfSquaredAmplitudes();
-				}
-
-				checkGate(outSum / inOut.size());
+				checkGate(inOut);
 				break;
-			}
 			case ProcessStatus::Sleep:
 				return false;
 			default:

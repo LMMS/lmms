@@ -198,7 +198,7 @@ bool EffectChain::processAudioBuffer( SampleFrame* _buf, const fpp_t _frames, bo
 	{
 		if (hasInputNoise || effect->isRunning())
 		{
-			moreEffects |= effect->processAudioBuffer(_buf, _frames);
+			moreEffects |= effect->processCore(_buf, _frames);
 			MixHelpers::sanitize(_buf, _frames);
 		}
 	}

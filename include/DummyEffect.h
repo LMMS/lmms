@@ -108,7 +108,7 @@ public:
 		return &m_controls;
 	}
 
-	bool processAudioBufferImpl(std::span<SampleFrame> inOut) override
+	bool processCoreImpl(InterleavedBufferView<float, 2>) override
 	{
 		return false;
 	}

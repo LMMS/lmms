@@ -644,8 +644,8 @@ private slots:
 		compareBuffers(coreBus, coreBusExpected);
 	}
 
-	//! Verifies correct default routing for 2x2 SampleFrame-based audio processor
-	void Routing_SampleFrame2x2_Default()
+	//! Verifies correct default routing for 2x2 interleaved audio processor
+	void Routing_Interleaved2x2_Default()
 	{
 		using namespace lmms;
 
@@ -785,7 +785,7 @@ private slots:
 	}
 
 	//! Verifies correct routing when the direct routing optimization is active
-	void Routing_SampleFrame2x2_DirectRouting()
+	void Routing_Interleaved2x2_DirectRouting()
 	{
 		using namespace lmms;
 
@@ -885,7 +885,7 @@ private slots:
 			testWithSettings(ap);
 		}
 
-		// TODO: If/when SampleFrame-based audio processors support dynamically in-place
+		// TODO: If/when interleaved audio processors support dynamically in-place
 		//       processing, add those tests here
 	}
 
