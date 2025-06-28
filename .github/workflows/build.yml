@@ -320,24 +320,6 @@ jobs:
           update-alternatives --set i686-w64-mingw32-g++ /usr/bin/i686-w64-mingw32-g++-posix
           update-alternatives --set x86_64-w64-mingw32-gcc /usr/bin/x86_64-w64-mingw32-gcc-posix
           update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/x86_64-w64-mingw32-g++-posix
-      - name: Install newer compiler version
-        run: |
-          i686-w64-mingw32-gcc --version
-          mkdir /tmp/compiler-debs
-          cd /tmp/compiler-debs
-          wget -O gcc-mingw-w64-24.3-debs.zip https://lmms.io/download/artifact/3381973808
-          unzip gcc-mingw-w64-24.3-debs.zip
-          dpkg --force-all -i gcc*.deb g++*.deb
-          i686-w64-mingw32-gcc --version
-      - name: Install newer mingw-w64
-        run: |
-          dpkg -l | fgrep -i mingw
-          mkdir /tmp/mingw-debs
-          cd /tmp/mingw-debs
-          wget -O mingw-w64-11.0.1-debs.zip https://lmms.io/download/artifact/3407929432
-          unzip mingw-w64-11.0.1-debs.zip
-          dpkg --force-all -i *.deb
-          dpkg -l | fgrep -i mingw
       - name: Upgrade binutils-mingw-w64
         run: |
           GITDIR=`pwd`
