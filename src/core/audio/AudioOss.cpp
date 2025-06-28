@@ -66,14 +66,10 @@ static const QString PATH_DEV_DSP =
 "/dev/dsp";
 #endif
 
-
-
-AudioOss::AudioOss( bool & _success_ful, AudioEngine*  _audioEngine ) :
-	AudioDevice(std::clamp<ch_cnt_t>(
-		ConfigManager::inst()->value("audiooss", "channels").toInt(),
-		DEFAULT_CHANNELS,
-		DEFAULT_CHANNELS), _audioEngine),
-	m_convertEndian( false )
+AudioOss::AudioOss(bool& _success_ful, AudioEngine* _audioEngine)
+	: AudioDevice(std::clamp<ch_cnt_t>(
+					  ConfigManager::inst()->value("audiooss", "channels").toInt(), DEFAULT_CHANNELS, DEFAULT_CHANNELS),
+		  _audioEngine)
 {
 	_success_ful = false;
 
@@ -113,38 +109,13 @@ AudioOss::AudioOss( bool & _success_ful, AudioEngine*  _audioEngine ) :
 		printf( "Warning: Couldn't set audio fragment size\n" );
 	}
 
-	unsigned int value;
-	// Get a list of supported hardware formats
-	if ( ioctl( m_audioFD, SNDCTL_DSP_GETFMTS, &value ) < 0 )
-	{
-		perror( "SNDCTL_DSP_GETFMTS" );
-		printf( "Couldn't get audio format list\n" );
-		return;
-	}
+	unsigned int value = AFMT_S16_NE;
 
-	// Set the audio format
-	if( value & AFMT_S16_LE )
-	{
-		value = AFMT_S16_LE;
-	}
-	else if( value & AFMT_S16_BE )
-	{
-		value = AFMT_S16_BE;
-	}
-	else
-	{
-		printf(" Soundcard doesn't support signed 16-bit-data\n");
-	}
 	if ( ioctl( m_audioFD, SNDCTL_DSP_SETFMT, &value ) < 0 )
 	{
 		perror( "SNDCTL_DSP_SETFMT" );
 		printf( "Couldn't set audio format\n" );
 		return;
-	}
-	if( ( isLittleEndian() && ( value == AFMT_S16_BE ) ) ||
-			( !isLittleEndian() && ( value == AFMT_S16_LE ) ) )
-	{
-		m_convertEndian = true;
 	}
 
 	// Set the number of channels of output

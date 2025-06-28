@@ -82,10 +82,7 @@ private:
 	void run() override;
 
 	int m_audioFD;
-
-	bool m_convertEndian;
-
-} ;
+};
 
 } // namespace lmms
 

@@ -92,8 +92,6 @@ private:
 
 	volatile bool m_quit;
 
-	bool m_convertEndian;
-
 	bool m_connected;
 	QSemaphore m_connectedSemaphore;
 
