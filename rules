@@ -76,7 +76,7 @@ unpack:
 		rm -f $(upstream_dir)/binutils/testsuite/binutils-all/windres/windres.exp; \
 	fi
 # Disable the ld tests; they won't work because gcc was configured with --with-ld
-	rm -fr $(upstream_dir)/binutils/testsuite/ld*
+	rm -fr $(upstream_dir)/ld/testsuite/ld*
 # Spelling fixes
 	@$(call spelling,allows to,allows one to)
 	@$(call spelling,complier,compiler)
