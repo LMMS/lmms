@@ -347,10 +347,13 @@ jobs:
           df -h
           dpkg-buildpackage -us -uc
           cd ..
-          dpkg --force-all -i *.deb
-          dpkg -l | fgrep -i mingw
+      - name: Upload resulting deb files as an artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: binutils-mingw-w64-9build1
+          path: /tmp/build-mingw-source-package/*.deb
+          compression-level: 0
       - name: Setup tmate session
-        if: ${{ failure() }}
         uses: mxschmitt/action-tmate@v3
         with:
           sudo: false
