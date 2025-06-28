@@ -34,7 +34,7 @@
 #include <vector>
 
 #include "AudioDevice.h"
-#include "LmmsTypes.h"
+#include "lmms_basics.h"
 #include "SampleFrame.h"
 #include "LocklessList.h"
 #include "FifoBuffer.h"
@@ -47,8 +47,9 @@ namespace lmms
 
 class AudioDevice;
 class MidiClient;
-class AudioBusHandle;
+class AudioPort;
 class AudioEngineWorkerThread;
+
 
 constexpr fpp_t MINIMUM_BUFFER_SIZE = 32;
 constexpr fpp_t DEFAULT_BUFFER_SIZE = 256;
@@ -59,8 +60,6 @@ constexpr int BYTES_PER_INT_SAMPLE = sizeof(int_sample_t);
 constexpr int BYTES_PER_FRAME = sizeof(SampleFrame);
 
 constexpr float OUTPUT_SAMPLE_MULTIPLIER = 32767.0f;
-
-constexpr auto SUPPORTED_SAMPLERATES = std::array{44100, 48000, 88200, 96000, 192000}; 
 
 class LMMS_EXPORT AudioEngine : public QObject
 {
@@ -173,15 +172,15 @@ public:
 	}
 
 
-	// audio-bus-handle-stuff
-	inline void addAudioBusHandle(AudioBusHandle* busHandle)
+	// audio-port-stuff
+	inline void addAudioPort(AudioPort * port)
 	{
 		requestChangeInModel();
-		m_audioBusHandles.push_back(busHandle);
+		m_audioPorts.push_back(port);
 		doneChangeInModel();
 	}
 
-	void removeAudioBusHandle(AudioBusHandle* busHandle);
+	void removeAudioPort(AudioPort * port);
 
 
 	// MIDI-client-stuff
@@ -367,7 +366,7 @@ private:
 
 	bool m_renderOnly;
 
-	std::vector<AudioBusHandle*> m_audioBusHandles;
+	std::vector<AudioPort *> m_audioPorts;
 
 	fpp_t m_framesPerPeriod;
 

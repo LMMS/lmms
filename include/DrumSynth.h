@@ -28,7 +28,7 @@
 
 #include <stdint.h>
 
-#include "LmmsTypes.h"
+#include "lmms_basics.h"
 
 class QString;
 

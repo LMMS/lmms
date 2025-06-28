@@ -25,7 +25,7 @@
 #ifndef LMMS_SAMPLE_TRACK_H
 #define LMMS_SAMPLE_TRACK_H
 
-#include "AudioBusHandle.h"
+#include "AudioPort.h"
 #include "Track.h"
 
 
@@ -62,9 +62,9 @@ public:
 		return &m_mixerChannelModel;
 	}
 
-	inline AudioBusHandle* audioBusHandle()
+	inline AudioPort * audioPort()
 	{
-		return &m_audioBusHandle;
+		return &m_audioPort;
 	}
 
 	QString nodeName() const override
@@ -95,7 +95,7 @@ private:
 	FloatModel m_volumeModel;
 	FloatModel m_panningModel;
 	IntModel m_mixerChannelModel;
-	AudioBusHandle m_audioBusHandle;
+	AudioPort m_audioPort;
 	bool m_isPlaying;
 
 
