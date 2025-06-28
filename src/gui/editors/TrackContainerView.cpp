@@ -478,6 +478,8 @@ void TrackContainerView::scrollArea::wheelEvent( QWheelEvent * _we )
 	{
 		QScrollArea::wheelEvent( _we );
 	}
+	// If we don't accept the event here it will be passed to the parent-widget again
+	_we->accept();
 }
 
 
