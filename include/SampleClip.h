@@ -28,6 +28,7 @@
 #include <memory>
 #include "Clip.h"
 #include "Sample.h"
+#include "Track.h"
 
 namespace lmms
 {
@@ -81,7 +82,9 @@ public:
 
 	SampleClip* clone() override
 	{
-		return new SampleClip(*this);
+		auto clip = new SampleClip(*this);
+		if (getTrack()) { getTrack()->addClip(clip); }
+		return clip;
 	}
 
 public slots:

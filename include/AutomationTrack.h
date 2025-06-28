@@ -27,6 +27,7 @@
 #ifndef LMMS_AUTOMATION_TRACK_H
 #define LMMS_AUTOMATION_TRACK_H
 
+#include "AutomationClip.h"
 #include "Track.h"
 
 namespace lmms
@@ -48,7 +49,7 @@ public:
 	}
 
 	gui::TrackView * createView( gui::TrackContainerView* ) override;
-	Clip* createClip(const TimePos & pos) override;
+	AutomationClip* createClip(const TimePos& pos = 0) override;
 
 	void saveTrackSpecificSettings(QDomDocument& doc, QDomElement& parent, bool presetMode) override;
 	void loadTrackSpecificSettings( const QDomElement & _this ) override;
