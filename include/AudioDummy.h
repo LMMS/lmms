@@ -78,15 +78,13 @@ public:
 
 
 private:
-	void startProcessing() override
+	void startProcessingImpl() override
 	{
-		AudioDevice::startProcessing();
 		start();
 	}
 
-	void stopProcessing() override
+	void stopProcessingImpl() override
 	{
-		AudioDevice::stopProcessing();
 		stopProcessingThread( this );
 	}
 

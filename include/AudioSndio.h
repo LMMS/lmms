@@ -73,8 +73,8 @@ public:
 	} ;
 
 private:
-	void startProcessing() override;
-	void stopProcessing() override;
+	void startProcessingImpl() override;
+	void stopProcessingImpl() override;
 	void run() override;
 
 	struct sio_hdl *m_hdl;

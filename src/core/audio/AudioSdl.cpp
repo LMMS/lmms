@@ -137,9 +137,8 @@ AudioSdl::~AudioSdl()
 
 
 
-void AudioSdl::startProcessing()
+void AudioSdl::startProcessingImpl()
 {
-	AudioDevice::startProcessing();
 	SDL_PauseAudioDevice (m_outputDevice, 0);
 	SDL_PauseAudioDevice (m_inputDevice, 0);
 }
@@ -147,10 +146,8 @@ void AudioSdl::startProcessing()
 
 
 
-void AudioSdl::stopProcessing()
+void AudioSdl::stopProcessingImpl()
 {
-	AudioDevice::stopProcessing();
-
 	if( SDL_GetAudioDeviceStatus(m_outputDevice) == SDL_AUDIO_PLAYING )
 	{
 		SDL_LockAudioDevice (m_inputDevice);

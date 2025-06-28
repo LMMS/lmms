@@ -66,6 +66,9 @@ protected:
 	}
 
 private:
+	void startProcessingImpl() override {}
+	void stopProcessingImpl() override {}
+
 	QFile m_outputFile;
 	OutputSettings m_outputSettings;
 } ;

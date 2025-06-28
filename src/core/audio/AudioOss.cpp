@@ -208,10 +208,8 @@ QString AudioOss::probeDevice()
 
 
 
-void AudioOss::startProcessing()
+void AudioOss::startProcessingImpl()
 {
-	AudioDevice::startProcessing();
-
 	if( !isRunning() )
 	{
 		start( QThread::HighPriority );
@@ -221,10 +219,8 @@ void AudioOss::startProcessing()
 
 
 
-void AudioOss::stopProcessing()
+void AudioOss::stopProcessingImpl()
 {
-	AudioDevice::stopProcessing();
-
 	stopProcessingThread( this );
 }
 

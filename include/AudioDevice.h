@@ -78,8 +78,17 @@ public:
 
 	fpp_t framesPerPeriod() const { return m_framesPerPeriod; }
 
-	virtual void startProcessing() { m_running.test_and_set(std::memory_order_acquire); }
-	virtual void stopProcessing() { m_running.clear(std::memory_order_release); }
+	virtual void startProcessing()
+	{
+		m_running.test_and_set(std::memory_order_acquire);
+		startProcessingImpl();
+	}
+
+	virtual void stopProcessing()
+	{
+		m_running.clear(std::memory_order_release);
+		stopProcessingImpl();
+	}
 
 protected:
 	//! Render the next audio playback buffer into @p dst.
@@ -109,6 +118,9 @@ protected:
 	bool m_supportsCapture;
 
 private:
+	virtual void startProcessingImpl() = 0;
+	virtual void stopProcessingImpl() = 0;
+
 	fpp_t m_framesPerPeriod;
 	sample_rate_t m_sampleRate;
 	ch_cnt_t m_channels;

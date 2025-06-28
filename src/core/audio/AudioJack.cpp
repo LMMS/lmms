@@ -197,10 +197,8 @@ void AudioJack::resizeInputBuffer(jack_nframes_t nframes)
 
 
 
-void AudioJack::startProcessing()
+void AudioJack::startProcessingImpl()
 {
-	AudioDevice::startProcessing();
-
 	if (m_active || m_client == nullptr)
 	{
 		m_stopped = false;
@@ -243,10 +241,8 @@ void AudioJack::startProcessing()
 
 
 
-void AudioJack::stopProcessing()
+void AudioJack::stopProcessingImpl()
 {
-	AudioDevice::stopProcessing();
-
 	m_stopped = true;
 }
 

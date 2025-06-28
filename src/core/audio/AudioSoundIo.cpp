@@ -206,10 +206,8 @@ AudioSoundIo::~AudioSoundIo()
 	}
 }
 
-void AudioSoundIo::startProcessing()
+void AudioSoundIo::startProcessingImpl()
 {
-	AudioDevice::startProcessing();
-
 	m_outBufFrameIndex = 0;
 	m_outBufFramesTotal = 0;
 	m_outBufSize = framesPerPeriod();
@@ -239,10 +237,8 @@ void AudioSoundIo::startProcessing()
 	}
 }
 
-void AudioSoundIo::stopProcessing()
+void AudioSoundIo::stopProcessingImpl()
 {
-	AudioDevice::stopProcessing();
-
 	m_stopped = true;
 	if (m_outstream)
 	{
