@@ -122,42 +122,6 @@ void Effect::loadSettings( const QDomElement & _this )
 
 
 
-bool Effect::processAudioBuffer(SampleFrame* buf, const fpp_t frames)
-{
-	if (!isOkay() || dontRun() || !isEnabled() || !isRunning())
-	{
-		processBypassedImpl();
-		return false;
-	}
-
-	const auto status = processImpl(buf, frames);
-	switch (status)
-	{
-		case ProcessStatus::Continue:
-			break;
-		case ProcessStatus::ContinueIfNotQuiet:
-		{
-			double outSum = 0.0;
-			for (std::size_t idx = 0; idx < frames; ++idx)
-			{
-				outSum += buf[idx].sumOfSquaredAmplitudes();
-			}
-
-			checkGate(outSum / frames);
-			break;
-		}
-		case ProcessStatus::Sleep:
-			return false;
-		default:
-			break;
-	}
-
-	return isRunning();
-}
-
-
-
-
 Effect * Effect::instantiate( const QString& pluginName,
 				Model * _parent,
 				Descriptor::SubPluginFeatures::Key * _key )
@@ -181,12 +145,20 @@ Effect * Effect::instantiate( const QString& pluginName,
 
 
 
-void Effect::checkGate(double outSum)
+void Effect::checkGate(InterleavedBufferView<const float, 2> coreBuffers)
 {
 	if( m_autoQuitDisabled )
 	{
 		return;
 	}
+
+	double outSum = 0.0;
+	for (const SampleFrame& frame : coreBuffers.toSampleFrames())
+	{
+		outSum += frame.sumOfSquaredAmplitudes();
+	}
+
+	outSum /= coreBuffers.frames();
 
 	// Check whether we need to continue processing input.  Restart the
 	// counter if the threshold has been exceeded.
@@ -247,8 +219,8 @@ void Effect::resample( int _i, const SampleFrame* _src_buf,
 	}
 	m_srcData[_i].input_frames = _frames;
 	m_srcData[_i].output_frames = Engine::audioEngine()->framesPerPeriod();
-	m_srcData[_i].data_in = const_cast<float*>(_src_buf[0].data());
-	m_srcData[_i].data_out = _dst_buf[0].data ();
+	m_srcData[_i].data_in = _src_buf[0].data();
+	m_srcData[_i].data_out = _dst_buf[0].data();
 	m_srcData[_i].src_ratio = (double) _dst_sr / _src_sr;
 	m_srcData[_i].end_of_input = 0;
 
