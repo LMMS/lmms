@@ -65,7 +65,7 @@ void SampleClipView::updateSample()
 {
 	update();
 
-	m_sampleThumbnail = SampleThumbnail{m_clip->m_sample};
+	m_sampleThumbnail = SampleThumbnail{m_clip->m_sample.sampleFile()};
 
 	// set tooltip to filename so that user can see what sample this
 	// sample-clip contains

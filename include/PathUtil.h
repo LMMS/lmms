@@ -28,6 +28,7 @@
 #include "lmms_export.h"
 
 #include <QDir>
+#include <filesystem>
 
 namespace lmms::PathUtil
 {
@@ -61,12 +62,19 @@ namespace lmms::PathUtil
 	//! Make this path absolute. If a pointer to boolean is given
 	//! it will indicate whether the path was converted successfully
 	QString LMMS_EXPORT toAbsolute(const QString & input, bool* error = nullptr);
+
 	//! Make this path relative to a given base, return an absolute path if that fails
 	QString LMMS_EXPORT relativeOrAbsolute(const QString & input, const Base base);
 	//! Make this path relative to any base, choosing the shortest if there are
 	//! multiple options. allowLocal defines whether local paths should be considered.
 	//! Defaults to an absolute path if all bases fail.
 	QString LMMS_EXPORT toShortestRelative(const QString & input, bool allowLocal = false);
+
+	//! Converts a `QString` to a `std::filesystem::path`.
+	std::filesystem::path LMMS_EXPORT fsConvert(const QString& path);
+
+	//! Converts a `std::filesystem::path` to a `QString`.
+	QString LMMS_EXPORT fsConvert(const std::filesystem::path& path);
 
 } // namespace lmms::PathUtil
 
