@@ -315,13 +315,16 @@ jobs:
         run: |
           sudo apt-get install -y --no-install-recommends \
           $(xargs < .github/workflows/deps-ubuntu-24.04-mingw.txt)
-      - name: Downgrade binutils-mingw-w64
+      - name: Downgrade the ld used for mingw builds
         run: |
           mkdir /tmp/downgrade
           cd /tmp/downgrade
           wget http://launchpadlibrarian.net/470274580/binutils-mingw-w64-x86-64_2.34-5ubuntu1+8.8_amd64.deb
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
+          ar x *.deb
+          tar xJf data.tar.xz
+          sudo cp usr/bin/x86_64-w64-mingw32-ld /usr/bin/x86_64-w64-mingw32-ld
+          /usr/bin/x86_64-w64-mingw32-ld --version
+          /usr/x86_64-w64-mingw32/bin/ld --version
       - name: Configure
         run: |
           ccache --zero-stats
