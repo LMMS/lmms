@@ -52,9 +52,6 @@ class TextFloat;
 class SongEditor;
 
 
-constexpr const char* AutoScrollDisabledString = "disabled";
-constexpr const char* AutoScrollSteppedString = "stepped";
-constexpr const char* AutoScrollContinuousString = "continuous";
 
 
 class TimeLineWidget : public QWidget
@@ -75,6 +72,10 @@ public:
 	Q_PROPERTY(int loopHandleWidth MEMBER m_loopHandleWidth)
 	Q_PROPERTY(QSize mouseHotspotSelLeft READ mouseHotspotSelLeft WRITE setMouseHotspotSelLeft)
 	Q_PROPERTY(QSize mouseHotspotSelRight READ mouseHotspotSelRight WRITE setMouseHotspotSelRight)
+
+	static constexpr const char* AutoScrollDisabledString = "disabled";
+	static constexpr const char* AutoScrollSteppedString = "stepped";
+	static constexpr const char* AutoScrollContinuousString = "continuous";
 
 	enum class AutoScrollState
 	{
