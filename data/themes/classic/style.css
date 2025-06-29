@@ -30,9 +30,8 @@ lmms--gui--AutomationEditor {
 	qproperty-barLineColor: #808080;
 
 	qproperty-graphColor: rgba(153, 175, 255, 200);
-	qproperty-scaleColor: qlineargradient(spread:reflect,
-                     x1:0, y1:0.5, x2:1, y2:0.5,
-                     stop:0 #333, stop:1 #202020);
+	qproperty-scaleColor: qlineargradient(spread:reflect, x1:0, y1:0.5, x2:1, y2:0.5,
+							stop:0 #333, stop:1 #202020);
 	
 	qproperty-ghostNoteColor: rgba(248, 248, 255, 125);
 	qproperty-detuningNoteColor: rgba(248, 11, 11, 125);
@@ -69,7 +68,8 @@ QTextEdit, QLineEdit:focus, QComboBox:focus, QSpinBox:focus, QDoubleSpinBox:focu
 
 QToolTip {
 	border-radius: 4px;
-	background: qlineargradient(spread:reflect, x1:0.5, y1:0.5, x2:0.5, y2:0, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(50, 50, 50, 220));
+	background: qlineargradient(spread:reflect, x1:0.5, y1:0.5, x2:0.5, y2:0,
+					stop:0 rgba(0, 0, 0, 255), stop:1 rgba(50, 50, 50, 220));
 	opacity: 175;
 	border: 1.0px solid rgba(0,0,0,255);
 	color: #4afd85;
@@ -77,7 +77,8 @@ QToolTip {
 
 lmms--gui--TextFloat, lmms--gui--SimpleTextFloat {
 	border-radius: 4px;
-	background: qlineargradient(spread:reflect, x1:0.5, y1:0.5, x2:0.5, y2:0, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(50, 50, 50, 220));
+	background: qlineargradient(spread:reflect, x1:0.5, y1:0.5, x2:0.5, y2:0,
+					stop:0 rgba(0, 0, 0, 255), stop:1 rgba(50, 50, 50, 220));
 	opacity: 175;
 	border: 1.0px solid rgba(0,0,0,255);
 	color: #4afd85;
@@ -248,45 +249,39 @@ QScrollBar::add-page:vertical:pressed, QScrollBar::sub-page:vertical:pressed {
 /* scrollbar: handles (sliders) */
 
 QScrollBar::handle:horizontal {
-    background: qlineargradient(spread:reflect,
-                     x1:0.5, y1:0, x2:0.5, y2:1,
-                     stop:0 #969696, stop:0.5 #c9c9c9, stop:1 #aaa);
+    background: qlineargradient(spread:reflect, x1:0.5, y1:0, x2:0.5, y2:1,
+					stop:0 #969696, stop:0.5 #c9c9c9, stop:1 #aaa);
     border: 1px outset #888;
     border-radius: 2px;
     min-width: 24px;
 }
 
 QScrollBar::handle:horizontal:hover {
-    background: qlineargradient(spread:reflect,
-                     x1:0.5, y1:0, x2:0.5, y2:1,
-                     stop:0 #969696, stop:0.5 #f0f0f0, stop:1 #aaa);
+    background: qlineargradient(spread:reflect, x1:0.5, y1:0, x2:0.5, y2:1,
+					stop:0 #969696, stop:0.5 #f0f0f0, stop:1 #aaa);
 }
 
 QScrollBar::handle:horizontal:pressed {
-    background: qlineargradient(spread:reflect,
-                     x1:0.5, y1:0, x2:0.5, y2:1,
-                     stop:0 #747474, stop:1 #c9c9c9);
+    background: qlineargradient(spread:reflect, x1:0.5, y1:0, x2:0.5, y2:1,
+					stop:0 #747474, stop:1 #c9c9c9);
 }
 
 QScrollBar::handle:vertical {
-    background: qlineargradient(spread:reflect,
-                     x1:0, y1:0.5, x2:1, y2:0.5,
-                     stop:0 #969696, stop:0.5 #c9c9c9, stop:1 #aaa);
+    background: qlineargradient(spread:reflect, x1:0, y1:0.5, x2:1, y2:0.5,
+					stop:0 #969696, stop:0.5 #c9c9c9, stop:1 #aaa);
     border: 1px outset #888;
     border-radius: 2px;
     min-height: 24px;
 }
 
 QScrollBar::handle:vertical:hover {
-    background: qlineargradient(spread:reflect,
-                     x1:0, y1:0.5, x2:1, y2:0.5,
-                     stop:0 #969696, stop:0.5 #f0f0f0, stop:1 #aaa);
+    background: qlineargradient(spread:reflect, x1:0, y1:0.5, x2:1, y2:0.5,
+					stop:0 #969696, stop:0.5 #f0f0f0, stop:1 #aaa);
 }
 
 QScrollBar::handle:vertical:pressed {
-    background: qlineargradient(spread:reflect,
-                     x1:0, y1:0.5, x2:1, y2:0.5,
-                     stop:0 #747474, stop:1 #c9c9c9);
+    background: qlineargradient(spread:reflect, x1:0, y1:0.5, x2:1, y2:0.5,
+					stop:0 #747474, stop:1 #c9c9c9);
 }
 
 QScrollBar::handle:horizontal:disabled, QScrollBar::handle:vertical:disabled  {
@@ -298,7 +293,8 @@ QScrollBar::handle:horizontal:disabled, QScrollBar::handle:vertical:disabled  {
 /* arrow buttons */
 
 QScrollBar::add-line, QScrollBar::sub-line {
-    background: qradialgradient(cx:0.3, cy:0.3, radius:0.8, fx:0.3, fy:0.3, stop:0 #c9c9c9, stop:1 #969696 );
+    background: qradialgradient(cx:0.3, cy:0.3, radius:0.8, fx:0.3, fy:0.3,
+					stop:0 #c9c9c9, stop:1 #969696 );
     border-radius: 1px;
     border: 1px solid #131313;
     subcontrol-origin: margin;
@@ -310,11 +306,13 @@ QScrollBar::add-line:vertical 		{ 	subcontrol-position: bottom; height: 12px;}
 QScrollBar::sub-line:vertical 		{ 	subcontrol-position: top; height: 12px;}
 
 QScrollBar::add-line:hover, QScrollBar::sub-line:hover {
-	background: qradialgradient(cx:0.3, cy:0.3, radius:0.8, fx:0.3, fy:0.3, stop:0 #e0e0e0, stop:0.5 #c9c9c9, stop:1 #969696 );
+	background: qradialgradient(cx:0.3, cy:0.3, radius:0.8, fx:0.3, fy:0.3,
+					stop:0 #e0e0e0, stop:0.5 #c9c9c9, stop:1 #969696 );
 }
 
 QScrollBar::add-line:pressed, QScrollBar::sub-line:pressed {
-	background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #969696, stop:0.5 #c9c9c9, stop:1 #969696 );
+	background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #969696,
+					stop:0.5 #c9c9c9, stop:1 #969696 );
 }
 
 QScrollBar::add-line:disabled, QScrollBar::sub-line:disabled {
@@ -356,8 +354,10 @@ lmms--gui--TrackView > QWidget {
 /* track background config */
 lmms--gui--TrackContentWidget {
 	/* colors */
-	qproperty-darkerColor: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(50, 50, 50), stop:0.33 rgb(20, 20, 20), stop:1 rgb(15, 15, 15));
-	qproperty-lighterColor: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(50, 50, 50), stop:0.33 rgb(40, 40, 40), stop:1 rgb(30, 30, 30));
+	qproperty-darkerColor: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+								stop:0 rgb(50, 50, 50), stop:0.33 rgb(20, 20, 20), stop:1 rgb(15, 15, 15));
+	qproperty-lighterColor: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
+								stop:0 rgb(50, 50, 50), stop:0.33 rgb(40, 40, 40), stop:1 rgb(30, 30, 30));
 	qproperty-coarseGridColor: rgba(0, 0, 0, 160);
 	qproperty-fineGridColor: rgba(0, 0, 0, 80);
 	qproperty-horizontalColor: rgba(0, 0, 0, 160);
@@ -376,32 +376,61 @@ lmms--gui--TrackContentWidget {
 
 /* gear button in tracks */
 
+
+/* 20px = 1px border + 2px padding + 14px icon + 2px padding + 1px border */
+QPushButton#btn-mute,
+QPushButton#btn-mute-inv:checked,
+QPushButton#btn-solo,
 lmms--gui--TrackOperationsWidget QPushButton {
-	max-height: 26px;
-	max-width: 26px;
-	min-height: 26px;
-	min-width: 26px;
-	background: none;
-	border: none;
+	min-height: 14;
+	max-height: 14;
+	min-width: 14;
+	max-width: 14;
+	padding: 2;
+	border: 1 solid #0f1621;
+	border-top: 1 solid #18202b;
+	border-bottom: 1 solid #02060f;
+	border-radius: 4;
+	background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgba(255, 255, 255, 20%), stop:0.1 rgba(255, 255, 255, 2%), stop:0.9 rgba(0, 0, 0, 2%), stop:1 rgba(0, 0, 0, 40%));
 }
 
 lmms--gui--TrackOperationsWidget QPushButton::menu-indicator {
-	image: url("resources:trackop.png");
-	subcontrol-origin: padding;
-	subcontrol-position: center;
-	position: relative;
-	top: 1px;
+	image: none;
 }
 
-lmms--gui--TrackOperationsWidget QPushButton::menu-indicator:hover {
-	image: url("resources:trackop_h.png");
+lmms--gui--TrackOperationsWidget QPushButton {
+	image: url("resources:gear.svg");
 }
 
-lmms--gui--TrackOperationsWidget QPushButton::menu-indicator:pressed,
-lmms--gui--TrackOperationsWidget QPushButton::menu-indicator:checked {
-	image: url("resources:trackop_c.png");
-	position: relative;
-	top: 2px;
+QPushButton#btn-mute,
+QPushButton#btn-mute-inv:checked {
+	image: url("resources:speaker.svg");
+}
+
+QPushButton#btn-solo {
+	image: url("resources:headphones.svg");
+}
+
+QPushButton#btn-mute:hover,
+QPushButton#btn-solo:hover,
+lmms--gui--TrackOperationsWidget QPushButton:hover {
+	background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgba(255, 255, 255, 25%), stop:0.1 rgba(255, 255, 255, 7%), stop:0.9 transparent, stop:1 rgba(0, 0, 0, 35%));
+}
+
+lmms--gui--TrackOperationsWidget QPushButton:pressed {
+	background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgba(0, 0, 0, 25%), stop:0.1 transparent, stop:0.8 rgba(0, 0, 0, 15%), stop:1 rgba(0, 0, 0, 35%));
+}
+
+QPushButton#btn-mute-inv,
+QPushButton#btn-mute:checked {
+	image: url("resources:speaker_slash.svg");
+	border: 1 solid #890120;
+	background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #e2515b, stop:0.1 #d40237, stop:0.9 #d40237, stop:1 #900122);
+}
+
+QPushButton#btn-solo:checked {
+	border: 1 solid #055f89;
+	background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #5aa8d9, stop:0.1 #2696d1, stop:0.9 #2696d1, stop:1 #16638c);
 }
 
 /* actually has no effect yet so disabled */
@@ -544,7 +573,8 @@ QToolButton:pressed {
 }
 
 QToolButton:checked  {
-	background: qradialgradient(cx:0.3, cy:0.3, radius:0.8, fx:0.3, fy:0.3, stop:0 #e0e0e0, stop:0.8 #c9c9c9, stop:1 #c0c0c0 );
+	background: qradialgradient(cx:0.3, cy:0.3, radius:0.8, fx:0.3, fy:0.3,
+					stop:0 #e0e0e0, stop:0.8 #c9c9c9, stop:1 #c0c0c0 );
 	padding: 2px 1px 0px 1px;
 	color: black;
 }
@@ -578,7 +608,8 @@ lmms--gui--TrackLabelButton {
 }
 
 lmms--gui--TrackLabelButton:hover {
-	background-color: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:0.5, stop:0 #5b6571, stop:0.75 #7b838d, stop:1 #7b838d );
+	background-color: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:0.5,
+						stop:0 #5b6571, stop:0.75 #7b838d, stop:1 #7b838d );
 	color: white;
 	border: 1px solid rgba(0,0,0,64);
 	padding: 1px 0px;
@@ -586,7 +617,8 @@ lmms--gui--TrackLabelButton:hover {
 }
 
 lmms--gui--TrackLabelButton:pressed {
-	background: qlineargradient(spread:reflect, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 #49515b, stop:0.3 #5b6571, stop:1 #6b7581 );
+	background: qlineargradient(spread:reflect, x1:0.5, y1:0, x2:0.5, y2:1,
+					stop:0 #49515b, stop:0.3 #5b6571, stop:1 #6b7581 );
 	color: white;
 	border: 1px solid rgba(0,0,0,64);
 	padding: 2px 0px 0px;
@@ -594,7 +626,8 @@ lmms--gui--TrackLabelButton:pressed {
 }
 
 lmms--gui--TrackLabelButton:checked {
-	background: qlineargradient(spread:reflect, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 #49515b, stop:0.3 #5b6571, stop:1 #6b7581 );
+	background: qlineargradient(spread:reflect, x1:0.5, y1:0, x2:0.5, y2:1,
+					stop:0 #49515b, stop:0.3 #5b6571, stop:1 #6b7581 );
 	color: white;
 	border: 1px solid rgba(0,0,0,128);
 	padding: 2px 0px 0px;
@@ -602,17 +635,19 @@ lmms--gui--TrackLabelButton:checked {
 }
 
 lmms--gui--TrackLabelButton:checked:hover {
-	background-color: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:0.5, stop:0 #5b6571, stop:0.75 #7b838d, stop:1 #7b838d );
+	background-color: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:0.5,
+						stop:0 #5b6571, stop:0.75 #7b838d, stop:1 #7b838d );
 }
 
 lmms--gui--TrackLabelButton:checked:pressed {
-	background: qlineargradient(spread:reflect, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 #49515b, stop:0.3 #5b6571, stop:1 #6b7581 );
+	background: qlineargradient(spread:reflect, x1:0.5, y1:0, x2:0.5, y2:1,
+					stop:0 #49515b, stop:0.3 #5b6571, stop:1 #6b7581 );
 }
 
 /* sidebar, sidebar buttons */
 
 lmms--gui--SideBar {
-	background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop: 0 #98a2a7, stop: 1.0 #5b646f);
+	background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #98a2a7, stop:1 #5b646f);
 }
 
 lmms--gui--SideBar QToolButton {
@@ -649,8 +684,7 @@ lmms--gui--ControllerRackView QPushButton {
 lmms--gui--MixerChannelView {
 	background: #5b6571;
 	color: #e0e0e0;
-	qproperty-backgroundActive: qlineargradient(spread:reflect, x1:0, y1:0, x2:1, y2:0,
-								stop:0 #7b838d, stop:1 #6b7581 );
+	qproperty-backgroundActive: #7d8691;
 	qproperty-strokeOuterActive: rgb( 0, 0, 0 );
 	qproperty-strokeOuterInactive: rgba( 0, 0, 0, 50 );
 	qproperty-strokeInnerActive: rgba( 255, 255, 255, 100 );
@@ -684,16 +718,14 @@ lmms--gui--TimeLineWidget {
 	min-height: 1.5em;
 	max-height: 1.5em;
 
-        background-color: qlineargradient( x1: 0, y1: 0, x2: 0, y2: 1,
-	                                   stop: 0 #8796a7, stop: 1.0 #3e454e );
+        background-color: qlineargradient( x1:0, y1:0, x2:0, y2:1, stop:0 #8796a7, stop:1 #3e454e );
 
 	qproperty-inactiveLoopColor: rgba( 52, 63, 53, 64 );
 	qproperty-inactiveLoopBrush: rgba( 255, 255, 255, 32 );
 	qproperty-inactiveLoopInnerColor: rgba( 255, 255, 255, 32 );
 	qproperty-inactiveLoopHandleColor: rgba( 192, 192, 192, 100 );
 	qproperty-activeLoopColor: rgba( 52, 63, 53, 255 );
-	qproperty-activeLoopBrush: qlineargradient( x1: 0, y1: 0, x2: 0, y2: 1,
-	                                            stop: 0 #378d59, stop: 1.0 #297e36 );
+	qproperty-activeLoopBrush: qlineargradient( x1:0, y1:0, x2:0, y2:1, stop:0 #378d59, stop:1 #297e36 );
 	qproperty-activeLoopInnerColor: rgba( 74, 155, 100, 255 );
 	qproperty-activeLoopHandleColor: rgba( 192, 192, 192, 200 );
 
@@ -729,6 +761,7 @@ lmms--gui--ClipView   {
 	qproperty-textBackgroundColor: rgba(0, 0, 0, 75);
 	qproperty-textShadowColor: rgb( 0, 0, 0 );
 	qproperty-gradient: true; /* boolean property, set true to have a gradient */
+	qproperty-markerColor: rgb(0, 0, 0);
 	/* finger tip offset of cursor */
 	qproperty-mouseHotspotHand: 3px 3px;
 	qproperty-mouseHotspotKnife: 0px 0px;
@@ -766,10 +799,8 @@ lmms--gui--PatternClipView {
 
 /* Subwindows in MDI-Area */
 lmms--gui--SubWindow {
-	color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-						stop: 0 #4b525c, stop: 1.0 #31363d);
-	qproperty-activeColor: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-						stop: 0 #33383e, stop: 1.0 #1a1c20);
+	color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #4b525c, stop:1 #31363d);
+	qproperty-activeColor: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #33383e, stop:1 #1a1c20);
 	qproperty-textShadowColor: rgb( 0, 0, 0 );
 	qproperty-borderColor: rgb( 0, 0, 0 );
 }

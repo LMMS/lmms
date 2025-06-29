@@ -48,36 +48,40 @@ MidiClip::MidiClip( InstrumentTrack * _instrument_track ) :
 	if (_instrument_track->trackContainer()	== Engine::patternStore())
 	{
 		resizeToFirstTrack();
+		setResizable(false);
+	}
+	else
+	{
+		setResizable(true);
 	}
 	init();
-	setAutoResize( true );
 }
 
 
 
 
 MidiClip::MidiClip( const MidiClip& other ) :
-	Clip( other.m_instrumentTrack ),
+	Clip(other),
 	m_instrumentTrack( other.m_instrumentTrack ),
 	m_clipType( other.m_clipType ),
 	m_steps( other.m_steps )
 {
 	for (const auto& note : other.m_notes)
 	{
-		m_notes.push_back(new Note(*note));
+		m_notes.push_back(note->clone());
 	}
 
 	init();
 	switch( getTrack()->trackContainer()->type() )
 	{
 		case TrackContainer::Type::Pattern:
-			setAutoResize( true );
+			setResizable(false);
 			break;
 
 		case TrackContainer::Type::Song:
 			// move down
 		default:
-			setAutoResize( false );
+			setResizable(true);
 			break;
 	}
 }
@@ -145,18 +149,24 @@ void MidiClip::updateLength()
 		return;
 	}
 
-	tick_t max_length = TimePos::ticksPerBar();
-
-	for (const auto& note : m_notes)
+	// If the clip has already been manually resized, don't automatically resize it.
+	// Unless we are in a pattern, where you can't resize stuff manually
+	if (getAutoResize() || !getResizable())
 	{
-		if (note->length() > 0)
+		tick_t max_length = TimePos::ticksPerBar();
+
+		for (const auto& note : m_notes)
 		{
-			max_length = std::max<tick_t>(max_length, note->endPos());
+			if (note->length() > 0)
+			{
+				max_length = std::max<tick_t>(max_length, note->endPos());
+			}
 		}
+		changeLength( TimePos( max_length ).nextFullBar() *
+							TimePos::ticksPerBar() );
+		setStartTimeOffset(TimePos(0));
+		updatePatternTrack();
 	}
-	changeLength( TimePos( max_length ).nextFullBar() *
-						TimePos::ticksPerBar() );
-	updatePatternTrack();
 }
 
 
@@ -187,7 +197,7 @@ TimePos MidiClip::beatClipLength() const
 
 Note * MidiClip::addNote( const Note & _new_note, const bool _quant_pos )
 {
-	auto new_note = new Note(_new_note);
+	auto new_note = _new_note.clone();
 	if (_quant_pos && gui::getGUI()->pianoRoll())
 	{
 		new_note->quantizePos(gui::getGUI()->pianoRoll()->quantization());
@@ -278,6 +288,7 @@ void MidiClip::clearNotes()
 	instrumentTrack()->unlock();
 
 	checkType();
+	updateLength();
 	emit dataChanged();
 }
 
@@ -314,6 +325,27 @@ void MidiClip::setStep( int step, bool enabled )
 
 
 
+void MidiClip::reverseNotes(const NoteVector& notes)
+{
+	if (notes.empty()) { return; }
+
+	addJournalCheckPoint();
+
+	// Find the very first start position and the very last end position of all the notes.
+	TimePos firstPos = (*std::min_element(notes.begin(), notes.end(), [](const Note* n1, const Note* n2){ return Note::lessThan(n1, n2); }))->pos();
+	TimePos lastPos = (*std::max_element(notes.begin(), notes.end(), [](const Note* n1, const Note* n2){ return n1->endPos() < n2->endPos(); }))->endPos();
+
+	for (auto note : notes)
+	{
+		TimePos newStart = lastPos - (note->pos() - firstPos) - note->length();
+		note->setPos(newStart);
+	}
+
+	rearrangeAllNotes();
+	emit dataChanged();
+}
+
+
 
 void MidiClip::splitNotes(const NoteVector& notes, TimePos pos)
 {
@@ -344,6 +376,48 @@ void MidiClip::splitNotes(const NoteVector& notes, TimePos pos)
 	}
 }
 
+void MidiClip::splitNotesAlongLine(const NoteVector notes, TimePos pos1, int key1, TimePos pos2, int key2, bool deleteShortEnds)
+{
+	if (notes.empty()) { return; }
+
+	// Don't split if the line is horitzontal
+	if (key1 == key2) { return; }
+
+	addJournalCheckPoint();
+
+	const auto slope = 1.f * (pos2 - pos1) / (key2 - key1);
+	const auto& [minKey, maxKey] = std::minmax(key1, key2);
+
+	for (const auto& note : notes)
+	{
+		// Skip if the key is <= to minKey, since the line is drawn from the top of minKey to the top of maxKey, but only passes through maxKey - minKey - 1 total keys.
+		if (note->key() <= minKey || note->key() > maxKey) { continue; }
+
+		// Subtracting 0.5 to get the line's intercept at the "center" of the key, not the top.
+		const TimePos keyIntercept = slope * (note->key() - 0.5 - key1) + pos1;
+		if (note->pos() < keyIntercept && note->endPos() > keyIntercept)
+		{
+			auto newNote1 = Note{*note};
+			newNote1.setLength(keyIntercept - note->pos());
+
+			auto newNote2 = Note{*note};
+			newNote2.setPos(keyIntercept);
+			newNote2.setLength(note->endPos() - keyIntercept);
+
+			if (deleteShortEnds)
+			{
+				addNote(newNote1.length() >= newNote2.length() ? newNote1 : newNote2, false);
+			}
+			else
+			{
+				addNote(newNote1, false);
+				addNote(newNote2, false);
+			}
+
+			removeNote(note);
+		}
+	}
+}
 
 
 
@@ -374,6 +448,8 @@ void MidiClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	_this.setAttribute( "type", static_cast<int>(m_clipType) );
 	_this.setAttribute( "name", name() );
+	_this.setAttribute("autoresize", QString::number(getAutoResize()));
+	_this.setAttribute("off", startTimeOffset());
 	
 	if (const auto& c = color())
 	{
@@ -393,6 +469,7 @@ void MidiClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	}
 	_this.setAttribute( "muted", isMuted() );
 	_this.setAttribute( "steps", m_steps );
+	_this.setAttribute( "len", length() );
 
 	// now save settings of all notes
 	for (auto& note : m_notes)
@@ -446,7 +523,20 @@ void MidiClip::loadSettings( const QDomElement & _this )
 	}
 
 	checkType();
-	updateLength();
+
+	int len = _this.attribute("len").toInt();
+	if (len <= 0)
+	{
+		// TODO: Handle with an upgrade method
+		updateLength();
+	}
+	else
+	{
+		changeLength(len);
+	}
+	
+	setAutoResize(_this.attribute("autoresize", "1").toInt());
+	setStartTimeOffset(_this.attribute("off").toInt());
 
 	emit dataChanged();
 }

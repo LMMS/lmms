@@ -11,6 +11,9 @@ set(APP "${CPACK_TEMPORARY_INSTALL_DIRECTORY}/${CPACK_PROJECT_NAME_UCASE}.app")
 
 # Toggle command echoing & verbosity
 # 0 = no output, 1 = error/warning, 2 = normal, 3 = debug
+if(DEFINED ENV{CPACK_DEBUG})
+	set(CPACK_DEBUG "$ENV{CPACK_DEBUG}")
+endif()
 if(NOT CPACK_DEBUG)
 	set(VERBOSITY 1)
 	set(COMMAND_ECHO NONE)
@@ -107,8 +110,8 @@ file(GLOB LIBS "${APP}/Contents/lib/${lmms}/*.so")
 # Inform macdeployqt about LADSPA plugins; may depend on bundled fftw3f, etc.
 file(GLOB LADSPA "${APP}/Contents/lib/${lmms}/ladspa/*.so")
 
-# Inform linuxdeploy about remote plugins
-list(APPEND REMOTE_PLUGINS "${APP}/Contents/MacOS/*Remote*")
+# Inform macdeployqt about remote plugins
+file(GLOB REMOTE_PLUGINS "${APP}/Contents/MacOS/*Remote*")
 
 # Collect, sort and dedupe all libraries
 list(APPEND LIBS ${LADSPA})
