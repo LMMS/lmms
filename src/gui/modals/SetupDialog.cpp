@@ -271,9 +271,9 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	guiGroupLayout->addWidget(m_loopMarkerComboBox);
 
 	m_autoScrollComboBox = new QComboBox{guiGroupBox};
-	m_autoScrollComboBox->addItem(tr("Disabled"), AUTOSCROLL_DISABLED_STRING);
-	m_autoScrollComboBox->addItem(tr("Stepped (Scroll once the playhead goes out of view)"), AUTOSCROLL_STEPPED_STRING);
-	m_autoScrollComboBox->addItem(tr("Continuous (Scroll constantly to keep the playhead in the center)"), AUTOSCROLL_CONTINUOUS_STRING);
+	m_autoScrollComboBox->addItem(tr("Disabled"), AutoScrollDisabledString);
+	m_autoScrollComboBox->addItem(tr("Stepped (Scroll once the playhead goes out of view)"), AutoScrollSteppedString);
+	m_autoScrollComboBox->addItem(tr("Continuous (Scroll constantly to keep the playhead in the center)"), AutoScrollContinuousString);
 	m_autoScrollComboBox->setCurrentIndex(m_autoScrollComboBox->findData(m_autoScroll));
 	connect(m_autoScrollComboBox, qOverload<int>(&QComboBox::currentIndexChanged),
 		this, [this](){ m_autoScroll = m_autoScrollComboBox->currentData().toString(); });

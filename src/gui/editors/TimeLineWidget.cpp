@@ -460,9 +460,9 @@ void TimeLineWidget::contextMenuEvent(QContextMenuEvent* event)
 TimeLineWidget::AutoScrollState TimeLineWidget::defaultAutoScrollState()
 {
 	QString autoScrollState = ConfigManager::inst()->value("ui", "autoscroll");
-	if (autoScrollState == AUTOSCROLL_STEPPED_STRING) { return AutoScrollState::Stepped; }
-	else if (autoScrollState == AUTOSCROLL_CONTINUOUS_STRING) { return AutoScrollState::Continuous; }
-	else if (autoScrollState == AUTOSCROLL_DISABLED_STRING) { return AutoScrollState::Disabled; }
+	if (autoScrollState == AutoScrollSteppedString) { return AutoScrollState::Stepped; }
+	else if (autoScrollState == AutoScrollContinuousString) { return AutoScrollState::Continuous; }
+	else if (autoScrollState == AutoScrollDisabledString) { return AutoScrollState::Disabled; }
 	else { return AutoScrollState::Stepped; }
 }
 

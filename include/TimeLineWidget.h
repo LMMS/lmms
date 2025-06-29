@@ -52,9 +52,9 @@ class TextFloat;
 class SongEditor;
 
 
-constexpr const char* AUTOSCROLL_DISABLED_STRING = "disabled";
-constexpr const char* AUTOSCROLL_STEPPED_STRING = "stepped";
-constexpr const char* AUTOSCROLL_CONTINUOUS_STRING = "continuous";
+constexpr const char* AutoScrollDisabledString = "disabled";
+constexpr const char* AutoScrollSteppedString = "stepped";
+constexpr const char* AutoScrollContinuousString = "continuous";
 
 
 class TimeLineWidget : public QWidget
