@@ -288,6 +288,7 @@ jobs:
       CCACHE_MAXSIZE: 0
       CCACHE_NOCOMPRESS: 1
       MAKEFLAGS: -j2
+      VERBOSE: 1
     steps:
       - name: Configure apt
         run: |
@@ -328,12 +329,12 @@ jobs:
       - name: Configure
         run: |
           ccache --zero-stats
-          cmake --verbose -S . \
+          cmake -S . \
                 -B build \
                 -DCMAKE_TOOLCHAIN_FILE="./cmake/toolchains/MinGW-W64-64.cmake" \
                 $CMAKE_OPTS
       - name: Build
-        run: cmake --verbose --build build
+        run: cmake --build build
       - name: Trim ccache and print statistics
         run: |
           ccache --cleanup
