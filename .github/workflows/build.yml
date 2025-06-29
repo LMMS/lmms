@@ -320,7 +320,6 @@ jobs:
           mkdir /tmp/downgrade
           cd /tmp/downgrade
           wget http://launchpadlibrarian.net/470274580/binutils-mingw-w64-x86-64_2.34-5ubuntu1+8.8_amd64.deb
-          sudo dpkg --force-all -i *.deb
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
       - name: Configure
