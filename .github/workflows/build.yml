@@ -316,16 +316,6 @@ jobs:
         run: |
           sudo apt-get install -y --no-install-recommends \
           $(xargs < .github/workflows/deps-ubuntu-24.04-mingw.txt)
-      - name: Downgrade the ld used for mingw builds
-        run: |
-          mkdir /tmp/downgrade
-          cd /tmp/downgrade
-          wget http://launchpadlibrarian.net/470274580/binutils-mingw-w64-x86-64_2.34-5ubuntu1+8.8_amd64.deb
-          ar x *.deb
-          tar xJf data.tar.xz
-          sudo cp usr/bin/x86_64-w64-mingw32-ld /usr/bin/x86_64-w64-mingw32-ld
-          /usr/bin/x86_64-w64-mingw32-ld --version
-          /usr/x86_64-w64-mingw32/bin/ld --version
       - name: Configure
         run: |
           ccache --zero-stats
@@ -335,6 +325,13 @@ jobs:
                 $CMAKE_OPTS
       - name: Build
         run: cmake --build build
+      - name: Package
+        run: cmake --build build --target package
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: mingw64
+          path: build/lmms-*.exe
       - name: Trim ccache and print statistics
         run: |
           ccache --cleanup

@@ -72,6 +72,13 @@ if(MSVC)
 	target_link_options(${EXE_NAME} PRIVATE "/entry:mainCRTStartup")
 endif()
 
+if(BITNESS EQUAL 32)
+	target_link_options(${EXE_NAME} PRIVATE "-Wl,--disable-dynamicbase")
+else()
+	target_link_options(${EXE_NAME} PRIVATE "-Wl,--disable-dynamicbase,--disable-high-entropy-va,--default-image-base-low")
+endif()
+
+
 if(IS_MINGW)
 	SET(CMAKE_REQUIRED_FLAGS "-std=c++17")
 endif()
