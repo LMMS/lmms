@@ -153,7 +153,7 @@ public:
 		{
 			// workaround to update linked models
 			AutomatableModel* thisModel = const_cast<AutomatableModel*>(this);
-			thisModel->setValue(controllerValue(frameOffset));
+			thisModel->setValue(controllerValue(frameOffset), true);
 		}
 		return castValue<T>( m_value );
 	}
