@@ -35,6 +35,8 @@
 #include <QSizePolicy>
 #include <QWheelEvent>
 
+#include <functional>
+
 namespace lmms::gui
 {
 
@@ -83,27 +85,21 @@ void OscilloscopeGraph::paintEvent(QPaintEvent* pe)
 	const bool stereo = m_controls->m_stereoModel.value();
 
 
-	auto drawWaveform = [&](QColor color, bool left, bool right, bool average)
+	auto drawWaveform = [&](QColor& color, std::function<float(const SampleFrame&)> getChannel)
 	{
 		p.setPen(color);
-		float minValue = 0.0f, maxValue = 0.0f;
 		for (int f = 0; f < windowSize - framesPerPixel; f += framesPerPixel)
 		{
 			const int currentIndex = (windowStartIndex + f) % bufferSize;
 			const int nextIndex = (windowStartIndex + f + framesPerPixel) % bufferSize;
 
-			if (left) { maxValue = buffer[hq ? currentIndex : nextIndex].left(); }
-			else if (right) { maxValue = buffer[hq ? currentIndex : nextIndex].right(); }
-			else if (average) { maxValue = buffer[hq ? currentIndex : nextIndex].average(); }
-
-			if (left) { minValue = buffer[currentIndex].left(); }
-			else if (right) { minValue = buffer[currentIndex].right(); }
-			else if (average) { minValue = buffer[currentIndex].average(); }
+			float maxValue = getChannel(buffer[hq ? currentIndex : nextIndex]);
+			float minValue = getChannel(buffer[currentIndex]);
 
 			for (int i = currentIndex + 1; hq && i <= nextIndex; ++i)
 			{
-				maxValue = std::max(maxValue, buffer[i].average());
-				minValue = std::min(minValue, buffer[i].average());
+				maxValue = std::max(maxValue, getChannel(buffer[i]));
+				minValue = std::min(minValue, getChannel(buffer[i]));
 			}
 
 			p.drawLine(
@@ -117,12 +113,12 @@ void OscilloscopeGraph::paintEvent(QPaintEvent* pe)
 
 	if (!stereo)
 	{
-		drawWaveform(m_monoColor, false, false, true);
+		drawWaveform(m_monoColor, [](const SampleFrame& f){ return f.average(); });
 	}
 	else
 	{
-		drawWaveform(m_leftColor, true, false, false);
-		drawWaveform(m_rightColor, false, true, false);
+		drawWaveform(m_leftColor, [](const SampleFrame& f){ return f.left(); });
+		drawWaveform(m_rightColor, [](const SampleFrame& f){ return f.right(); });
 	}
 }
 
