@@ -78,13 +78,13 @@ public:
 
 	fpp_t framesPerPeriod() const { return m_framesPerPeriod; }
 
-	virtual void startProcessing()
+	void startProcessing()
 	{
 		m_running.test_and_set(std::memory_order_acquire);
 		startProcessingImpl();
 	}
 
-	virtual void stopProcessing()
+	void stopProcessing()
 	{
 		m_running.clear(std::memory_order_release);
 		stopProcessingImpl();
