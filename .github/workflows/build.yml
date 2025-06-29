@@ -328,19 +328,12 @@ jobs:
       - name: Configure
         run: |
           ccache --zero-stats
-          cmake -S . \
+          cmake --verbose -S . \
                 -B build \
                 -DCMAKE_TOOLCHAIN_FILE="./cmake/toolchains/MinGW-W64-64.cmake" \
                 $CMAKE_OPTS
       - name: Build
-        run: cmake --build build
-      - name: Package
-        run: cmake --build build --target package
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: mingw64
-          path: build/lmms-*.exe
+        run: cmake --verbose --build build
       - name: Trim ccache and print statistics
         run: |
           ccache --cleanup
