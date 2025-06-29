@@ -75,7 +75,7 @@ endif()
 if(BITNESS EQUAL 32)
 	target_link_options(${EXE_NAME} PRIVATE "-Wl,--disable-dynamicbase")
 else()
-	target_link_options(${EXE_NAME} PRIVATE "-Wl,--disable-dynamicbase,--disable-high-entropy-va,--default-image-base-low")
+	target_link_options(${EXE_NAME} PRIVATE "-Wl,--disable-dynamicbase,--disable-high-entropy-va")
 endif()
 
 
