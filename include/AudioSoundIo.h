@@ -104,8 +104,8 @@ public:
 	} ;
 
 private:
-	virtual void startProcessing();
-	virtual void stopProcessing();
+	void startProcessingImpl() override;
+	void stopProcessingImpl() override;
 
 	SoundIo *m_soundio;
 	SoundIoOutStream *m_outstream;
