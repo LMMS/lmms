@@ -87,6 +87,7 @@ void OscilloscopeGraph::paintEvent(QPaintEvent* pe)
 
 	auto drawWaveform = [&](QColor& color, std::function<float(const SampleFrame&)> getChannel)
 	{
+		p.setCompositionMode(QPainter::CompositionMode_Plus);
 		p.setPen(color);
 		for (int f = 0; f < windowSize - framesPerPixel; f += framesPerPixel)
 		{
