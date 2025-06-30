@@ -85,7 +85,6 @@ GigInstrument::GigInstrument(InstrumentTrack* _instrument_track)
 	, m_bankNum(0, 0, 999, this, tr("Bank"))
 	, m_patchNum(0, 0, 127, this, tr("Patch"))
 	, m_gain(1.0f, 0.0f, 5.0f, 0.01f, this, tr("Gain"))
-	, m_interpolation(AudioResampler::Mode::Linear)
 	, m_RandomSeed(0)
 	, m_currentKeyDimension(0)
 {
@@ -746,8 +745,8 @@ void GigInstrument::addSamples( GigNote & gignote, bool wantReleaseSample )
 					attenuation *= pDimRegion->SampleAttenuation;
 				}
 
-				gignote.samples.push_back( GigSample( pSample, pDimRegion,
-							attenuation, m_interpolation, gignote.frequency ) );
+				auto sample = GigSample(pSample, pDimRegion, attenuation, AudioResampler::Mode::Linear, gignote.frequency);
+				gignote.samples.push_back(std::move(sample));
 			}
 		}
 

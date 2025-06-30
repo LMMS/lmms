@@ -288,9 +288,6 @@ private:
 	QMutex m_synthMutex;
 	QMutex m_notesMutex;
 
-	// Used for resampling
-	AudioResampler::Mode m_interpolation;
-
 	// List of all the currently playing notes
 	QList<GigNote> m_notes;
 
