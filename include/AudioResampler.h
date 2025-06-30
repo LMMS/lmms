@@ -62,11 +62,11 @@ public:
 	//! Destroys the resampler and frees any internal state it holds.
 	~AudioResampler();
 
-	//! Copy resampler state from one to another.
-	AudioResampler(const AudioResampler&);
+	//! Cannot copy resampler.
+	AudioResampler(const AudioResampler&) = delete;
 
-	//! Copy resampler state from one to another.
-	AudioResampler& operator=(const AudioResampler&);
+	//! Cannot copy resampler.
+	AudioResampler& operator=(const AudioResampler&) = delete;
 
 	//! Moves the internal state from one resampler to another.
 	AudioResampler(AudioResampler&&) noexcept;

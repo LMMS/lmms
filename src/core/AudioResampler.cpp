@@ -44,26 +44,6 @@ AudioResampler::~AudioResampler()
 	src_delete(m_state);
 }
 
-AudioResampler::AudioResampler(const AudioResampler& other)
-	: m_state(src_clone(other.m_state, &m_error))
-	, m_data(other.m_data)
-	, m_mode(other.m_mode)
-	, m_channels(other.m_channels)
-{
-	if (!m_state) { throw std::runtime_error{src_strerror(m_error)}; }
-}
-
-AudioResampler& AudioResampler::operator=(const AudioResampler& other)
-{
-	m_state = src_clone(other.m_state, &m_error);
-	m_mode = other.m_mode;
-	m_channels = other.m_channels;
-	m_data = other.m_data;
-
-	if (!m_state) { throw std::runtime_error{src_strerror(m_error)}; }
-	return *this;
-}
-
 AudioResampler::AudioResampler(AudioResampler&& other) noexcept
 	: m_state(std::exchange(other.m_state, nullptr))
 	, m_mode(other.m_mode)
