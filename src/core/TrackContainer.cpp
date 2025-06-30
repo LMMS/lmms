@@ -210,6 +210,7 @@ void TrackContainer::removeTrack( Track * _track )
 		{
 			Engine::getSong()->setModified();
 		}
+		emit trackRemoved();
 	}
 }
 

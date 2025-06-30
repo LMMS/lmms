@@ -99,6 +99,7 @@ public:
 
 signals:
 	void trackAdded( lmms::Track * _track );
+	void trackRemoved();
 
 protected:
 	static AutomatedValueMap automatedValuesFromTracks(const TrackList &tracks, TimePos timeStart, int clipNum = -1);
