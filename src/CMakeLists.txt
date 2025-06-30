@@ -188,6 +188,7 @@ target_static_libraries(lmmsobjs ringbuffer)
 
 if(MSVC)
 	target_link_options(lmms PRIVATE "/DYNAMICBASE:NO")
+	target_link_options(lmms PRIVATE "/NXCOMPAT:NO")
 endif()
 
 set_target_properties(lmms PROPERTIES

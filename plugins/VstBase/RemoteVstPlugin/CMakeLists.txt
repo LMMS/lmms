@@ -71,6 +71,7 @@ target_compile_definitions(${EXE_NAME} PRIVATE BUILD_REMOTE_PLUGIN_CLIENT)
 if(MSVC)
 	target_link_options(${EXE_NAME} PRIVATE "/entry:mainCRTStartup")
 	target_link_options(${EXE_NAME} PRIVATE "/DYNAMICBASE:NO")
+	target_link_options(${EXE_NAME} PRIVATE "/NXCOMPAT:NO")
 endif()
 
 
