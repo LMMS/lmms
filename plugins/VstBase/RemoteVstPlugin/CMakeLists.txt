@@ -69,7 +69,8 @@ target_compile_definitions(${EXE_NAME} PRIVATE BUILD_REMOTE_PLUGIN_CLIENT)
 
 # Workaround for missing WinMain
 if(MSVC)
-	target_link_options(${EXE_NAME} PRIVATE "/entry:mainCRTStartup /DYNAMICBASE:NO")
+	target_link_options(${EXE_NAME} PRIVATE "/entry:mainCRTStartup")
+	target_link_options(${EXE_NAME} PRIVATE "/DYNAMICBASE:NO")
 endif()
 
 
