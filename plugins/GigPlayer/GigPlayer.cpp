@@ -77,20 +77,16 @@ Plugin::Descriptor PLUGIN_EXPORT gigplayer_plugin_descriptor =
 
 }
 
-
-
-
-GigInstrument::GigInstrument( InstrumentTrack * _instrument_track ) :
-	Instrument(_instrument_track, &gigplayer_plugin_descriptor, nullptr, Flag::IsSingleStreamed | Flag::IsNotBendable),
-	m_instance( nullptr ),
-	m_instrument( nullptr ),
-	m_filename( "" ),
-	m_bankNum( 0, 0, 999, this, tr( "Bank" ) ),
-	m_patchNum( 0, 0, 127, this, tr( "Patch" ) ),
-	m_gain( 1.0f, 0.0f, 5.0f, 0.01f, this, tr( "Gain" ) ),
-	m_interpolation( SRC_LINEAR ),
-	m_RandomSeed( 0 ),
-	m_currentKeyDimension( 0 )
+GigInstrument::GigInstrument(InstrumentTrack* _instrument_track)
+	: Instrument(_instrument_track, &gigplayer_plugin_descriptor, nullptr, Flag::IsSingleStreamed | Flag::IsNotBendable)
+	, m_instance(nullptr)
+	, m_instrument(nullptr)
+	, m_filename("")
+	, m_bankNum(0, 0, 999, this, tr("Bank"))
+	, m_patchNum(0, 0, 127, this, tr("Patch"))
+	, m_gain(1.0f, 0.0f, 5.0f, 0.01f, this, tr("Gain"))
+	, m_RandomSeed(0)
+	, m_currentKeyDimension(0)
 {
 	auto iph = new InstrumentPlayHandle(this, _instrument_track);
 	Engine::audioEngine()->addPlayHandle( iph );
@@ -417,71 +413,60 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 		{
 			if (sample.sample == nullptr || sample.region == nullptr) { continue; }
 
-			// Will change if resampling
-			bool resample = false;
-			f_cnt_t samples = frames; // How many to grab
-			f_cnt_t used = frames; // How many we used
-			float freq_factor = 1.0; // How to resample
+			float freq_factor = 1.0; // How much to resample
 
 			// Resample to be the correct pitch when the sample provided isn't
 			// solely for this one note (e.g. one or two samples per octave) or
 			// we are processing at a different sample rate
 			if (sample.region->PitchTrack == true || rate != sample.sample->SamplesPerSecond)
 			{
-				resample = true;
-
 				// Factor just for resampling
 				freq_factor = 1.0 * rate / sample.sample->SamplesPerSecond;
 
 				// Factor for pitch shifting as well as resampling
 				if (sample.region->PitchTrack == true) { freq_factor *= sample.freqFactor; }
-
-				// We need a bit of margin so we don't get glitching
-				samples = frames / freq_factor + Sample::s_interpolationMargins[m_interpolation];
 			}
-
-			// Load this note's data
-			SampleFrame sampleData[samples];
-			loadSample(sample, sampleData, samples);
 
 			// Apply ADSR using a copy so if we don't use these samples when
 			// resampling, the ADSR doesn't get messed up
 			ADSR copy = sample.adsr;
 
-			for( f_cnt_t i = 0; i < samples; ++i )
-			{
-				float amplitude = copy.value();
-				sampleData[i][0] *= amplitude;
-				sampleData[i][1] *= amplitude;
-			}
+			auto numFramesMixed = f_cnt_t{0};
+			sample.m_resampler.setRatio(freq_factor);
 
-			// Output the data resampling if needed
-			if( resample == true )
+			while (numFramesMixed < frames)
 			{
-				SampleFrame convertBuf[frames];
-
-				// Only output if resampling is successful (note that "used" is output)
-				if (sample.convertSampleRate(*sampleData, *convertBuf, samples, frames, freq_factor, used))
+				if (sample.m_resampler.input().empty())
 				{
-					for( f_cnt_t i = 0; i < frames; ++i )
-					{
-						_working_buffer[i][0] += convertBuf[i][0];
-						_working_buffer[i][1] += convertBuf[i][1];
-					}
+					loadSample(sample, sample.m_inputBuffer.data(), sample.m_inputBuffer.size());
+					sample.m_resampler.setInput(
+						{&sample.m_inputBuffer[0][0], DEFAULT_CHANNELS, sample.m_inputBuffer.size()});
 				}
-			}
-			else
-			{
-				for( f_cnt_t i = 0; i < frames; ++i )
-				{
-					_working_buffer[i][0] += sampleData[i][0];
-					_working_buffer[i][1] += sampleData[i][1];
-				}
-			}
 
-			// Update note position with how many samples we actually used
-			sample.pos += used;
-			sample.adsr.inc(used);
+				if (sample.m_resampler.output().empty())
+				{
+					sample.m_resampler.setOutput(
+						{&sample.m_outputBuffer[0][0], DEFAULT_CHANNELS, sample.m_outputBuffer.size()});
+					sample.m_outputIndex = 0;
+				}
+
+				const auto result = sample.m_resampler.process();
+				const auto framesToMix = std::min(frames - numFramesMixed, result.outputFramesGenerated);
+
+				for (auto i = f_cnt_t{0}; i < framesToMix; ++i)
+				{
+					const auto amplitude = copy.value();
+					_working_buffer[numFramesMixed + i] += sample.m_outputBuffer[sample.m_outputIndex + i] * amplitude;
+				}
+
+				sample.m_resampler.advanceInput(result.inputFramesUsed);
+				sample.pos += result.inputFramesUsed;
+				sample.adsr.inc(result.inputFramesUsed);
+
+				sample.m_resampler.advanceOutput(result.outputFramesGenerated);
+				sample.m_outputIndex += framesToMix;
+				numFramesMixed += framesToMix;
+			}
 		}
 	}
 
@@ -760,8 +745,8 @@ void GigInstrument::addSamples( GigNote & gignote, bool wantReleaseSample )
 					attenuation *= pDimRegion->SampleAttenuation;
 				}
 
-				gignote.samples.push_back( GigSample( pSample, pDimRegion,
-							attenuation, m_interpolation, gignote.frequency ) );
+				auto sample = GigSample(pSample, pDimRegion, attenuation, AudioResampler::Mode::Linear, gignote.frequency);
+				gignote.samples.push_back(std::move(sample));
 			}
 		}
 
@@ -1083,19 +1068,18 @@ void GigInstrumentView::showPatchDialog()
 
 
 // Store information related to playing a sample from the GIG file
-GigSample::GigSample( gig::Sample * pSample, gig::DimensionRegion * pDimRegion,
-		float attenuation, int interpolation, float desiredFreq )
-	: sample( pSample ), region( pDimRegion ), attenuation( attenuation ),
-	  pos( 0 ), interpolation( interpolation ), srcState( nullptr ),
-	  sampleFreq( 0 ), freqFactor( 1 )
+GigSample::GigSample(gig::Sample* pSample, gig::DimensionRegion* pDimRegion, float attenuation,
+	AudioResampler::Mode interpolation, float desiredFreq)
+	: sample(pSample)
+	, region(pDimRegion)
+	, attenuation(attenuation)
+	, pos(0)
+	, m_resampler(interpolation)
+	, sampleFreq(0)
+	, freqFactor(1)
 {
 	if( sample != nullptr && region != nullptr )
 	{
-		// Note: we don't create the libsamplerate object here since we always
-		// also call the copy constructor when appending to the end of the
-		// QList. We'll create it only in the copy constructor so we only have
-		// to create it once.
-
 		// Calculate note pitch and frequency factor only if we're actually
 		// going to be changing the pitch of the notes
 		if( region->PitchTrack == true )
@@ -1112,27 +1096,16 @@ GigSample::GigSample( gig::Sample * pSample, gig::DimensionRegion * pDimRegion,
 	}
 }
 
-
-
-
-GigSample::~GigSample()
+GigSample::GigSample(const GigSample& g)
+	: sample(g.sample)
+	, region(g.region)
+	, attenuation(g.attenuation)
+	, adsr(g.adsr)
+	, pos(g.pos)
+	, m_resampler(g.m_resampler.mode(), g.m_resampler.channels())
+	, sampleFreq(g.sampleFreq)
+	, freqFactor(g.freqFactor)
 {
-	if( srcState != nullptr )
-	{
-		src_delete( srcState );
-	}
-}
-
-
-
-
-GigSample::GigSample( const GigSample& g )
-	: sample( g.sample ), region( g.region ), attenuation( g.attenuation ),
-	  adsr( g.adsr ), pos( g.pos ), interpolation( g.interpolation ),
-	  srcState( nullptr ), sampleFreq( g.sampleFreq ), freqFactor( g.freqFactor )
-{
-	// On the copy, we want to create the object
-	updateSampleRate();
 }
 
 
@@ -1145,87 +1118,10 @@ GigSample& GigSample::operator=( const GigSample& g )
 	attenuation = g.attenuation;
 	adsr = g.adsr;
 	pos = g.pos;
-	interpolation = g.interpolation;
-	srcState = nullptr;
 	sampleFreq = g.sampleFreq;
 	freqFactor = g.freqFactor;
-
-	if( g.srcState != nullptr )
-	{
-		updateSampleRate();
-	}
-
 	return *this;
 }
-
-
-
-
-void GigSample::updateSampleRate()
-{
-	if( srcState != nullptr )
-	{
-		src_delete( srcState );
-	}
-
-	int error = 0;
-	srcState = src_new( interpolation, DEFAULT_CHANNELS, &error );
-
-	if( srcState == nullptr || error != 0 )
-	{
-		qCritical( "error while creating libsamplerate data structure in GigSample" );
-	}
-}
-
-
-
-
-bool GigSample::convertSampleRate( SampleFrame & oldBuf, SampleFrame & newBuf,
-		f_cnt_t oldSize, f_cnt_t newSize, float freq_factor, f_cnt_t& used )
-{
-	if( srcState == nullptr )
-	{
-		return false;
-	}
-
-	SRC_DATA src_data;
-	src_data.data_in = &oldBuf[0];
-	src_data.data_out = &newBuf[0];
-	src_data.input_frames = oldSize;
-	src_data.output_frames = newSize;
-	src_data.src_ratio = freq_factor;
-	src_data.end_of_input = 0;
-
-	// We don't need to lock this assuming that we're only outputting the
-	// samples in one thread
-	int error = src_process( srcState, &src_data );
-
-	used = src_data.input_frames_used;
-
-	if( error != 0 )
-	{
-		qCritical( "GigInstrument: error while resampling: %s", src_strerror( error ) );
-		return false;
-	}
-
-	if( oldSize != 0 && src_data.output_frames_gen == 0 )
-	{
-		qCritical( "GigInstrument: could not resample, no frames generated" );
-		return false;
-	}
-
-	if (src_data.output_frames_gen > 0 && static_cast<f_cnt_t>(src_data.output_frames_gen) < newSize)
-	{
-		qCritical() << "GigInstrument: not enough frames, wanted"
-			<< newSize << "generated" << src_data.output_frames_gen;
-		return false;
-	}
-
-	return true;
-}
-
-
-
 
 ADSR::ADSR()
 	: preattack( 0 ), attack( 0 ), decay1( 0 ), decay2( 0 ), infiniteSustain( false ),

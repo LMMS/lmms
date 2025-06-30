@@ -131,20 +131,21 @@ void AudioFileProcessor::playNote( NotePlayHandle * _n,
 			m_nextPlayBackwards = false;
 		}
 		// set interpolation mode for libsamplerate
-		int srcmode = SRC_LINEAR;
+		auto interpolationMode = AudioResampler::Mode::Linear;
 		switch( m_interpolationModel.value() )
 		{
 			case 0:
-				srcmode = SRC_ZERO_ORDER_HOLD;
+				interpolationMode = AudioResampler::Mode::ZOH;
 				break;
 			case 1:
-				srcmode = SRC_LINEAR;
+				interpolationMode = AudioResampler::Mode::Linear;
 				break;
 			case 2:
-				srcmode = SRC_SINC_MEDIUM_QUALITY;
+				interpolationMode = AudioResampler::Mode::SincMedium;
 				break;
 		}
-		_n->m_pluginData = new Sample::PlaybackState(_n->hasDetuningInfo(), srcmode);
+
+		_n->m_pluginData = new Sample::PlaybackState(interpolationMode);
 		static_cast<Sample::PlaybackState*>(_n->m_pluginData)->setFrameIndex(m_nextPlayStartPoint);
 		static_cast<Sample::PlaybackState*>(_n->m_pluginData)->setBackwards(m_nextPlayBackwards);
 
@@ -158,8 +159,8 @@ void AudioFileProcessor::playNote( NotePlayHandle * _n,
 	{
 		if (m_sample.play(_working_buffer + offset,
 						static_cast<Sample::PlaybackState*>(_n->m_pluginData),
-						frames, _n->frequency(),
-						static_cast<Sample::Loop>(m_loopModel.value())))
+						frames, static_cast<Sample::Loop>(m_loopModel.value()),
+						DefaultBaseFreq / _n->frequency()))
 		{
 			applyRelease( _working_buffer, _n );
 			emit isPlaying(static_cast<Sample::PlaybackState*>(_n->m_pluginData)->frameIndex());

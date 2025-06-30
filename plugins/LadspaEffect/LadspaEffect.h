@@ -72,7 +72,6 @@ private:
 
 	static sample_rate_t maxSamplerate( const QString & _name );
 
-
 	QMutex m_pluginMutex;
 	LadspaControls * m_controls;
 

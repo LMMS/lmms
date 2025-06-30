@@ -375,7 +375,7 @@ int main( int argc, char * * argv )
 			new QCoreApplication( argc, argv ) :
 					new gui::MainApplication(argc, argv);
 
-	AudioEngine::qualitySettings qs(AudioEngine::qualitySettings::Interpolation::Linear);
+	AudioEngine::qualitySettings qs(AudioResampler::Mode::Linear);
 	OutputSettings os(44100, 160, OutputSettings::BitDepth::Depth16Bit, OutputSettings::StereoMode::JointStereo);
 	ProjectRenderer::ExportFileFormat eff = ProjectRenderer::ExportFileFormat::Wave;
 
@@ -624,29 +624,12 @@ int main( int argc, char * * argv )
 				return usageError( "No interpolation method specified" );
 			}
 
-
-			const QString ip = QString( argv[i] );
-
-			if( ip == "linear" )
-			{
-		qs.interpolation = AudioEngine::qualitySettings::Interpolation::Linear;
-			}
-			else if( ip == "sincfastest" )
-			{
-		qs.interpolation = AudioEngine::qualitySettings::Interpolation::SincFastest;
-			}
-			else if( ip == "sincmedium" )
-			{
-		qs.interpolation = AudioEngine::qualitySettings::Interpolation::SincMedium;
-			}
-			else if( ip == "sincbest" )
-			{
-		qs.interpolation = AudioEngine::qualitySettings::Interpolation::SincBest;
-			}
-			else
-			{
-				return usageError( QString( "Invalid interpolation method %1" ).arg( argv[i] ) );
-			}
+			const QString ip = QString(argv[i]);
+			if (ip == "linear") { qs.interpolation = AudioResampler::Mode::Linear; }
+			else if (ip == "sincfastest") { qs.interpolation = AudioResampler::Mode::SincFastest; }
+			else if (ip == "sincmedium") { qs.interpolation = AudioResampler::Mode::SincMedium; }
+			else if (ip == "sincbest") { qs.interpolation = AudioResampler::Mode::SincBest; }
+			else { return usageError(QString("Invalid interpolation method %1").arg(argv[i])); }
 		}
 		else if( arg == "--import" )
 		{
