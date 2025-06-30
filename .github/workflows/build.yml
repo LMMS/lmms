@@ -6,7 +6,6 @@ concurrency:
   cancel-in-progress: true
 jobs:
   linux-x86_64:
-    if: false
     name: linux-x86_64
     runs-on: ubuntu-22.04
     env:
@@ -18,6 +17,7 @@ jobs:
       CCACHE_MAXSIZE: 0
       CCACHE_NOCOMPRESS: 1
       MAKEFLAGS: -j2
+      VERBOSE: 1
     steps:
       - name: Configure git
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
@@ -95,6 +95,9 @@ jobs:
           ccache --show-stats
         env:
           CCACHE_MAXSIZE: 500M
+      - name: Setup tmate session
+        if: ${{ failure() }}
+        uses: mxschmitt/action-tmate@v3
   linux-arm64:
     if: false
     name: linux-arm64
@@ -289,7 +292,6 @@ jobs:
       CCACHE_MAXSIZE: 0
       CCACHE_NOCOMPRESS: 1
       MAKEFLAGS: -j2
-      VERBOSE: 1
     steps:
       - name: Configure apt
         run: |
@@ -343,12 +345,12 @@ jobs:
         env:
           CCACHE_MAXSIZE: 500M
   msvc:
+    if: false
     name: msvc-x64
     runs-on: windows-2022
     env:
       CCACHE_MAXSIZE: 0
       CCACHE_NOCOMPRESS: 1
-      VERBOSE: 1
     steps:
       - name: Check out
         uses: actions/checkout@v3
