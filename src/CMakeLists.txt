@@ -186,6 +186,10 @@ target_link_libraries(lmmsobjs
 )
 target_static_libraries(lmmsobjs ringbuffer)
 
+if(MSVC)
+	target_link_options(lmms PRIVATE "/DYNAMICBASE:NO")
+endif()
+
 set_target_properties(lmms PROPERTIES
 	ENABLE_EXPORTS ON
 	WIN32_EXECUTABLE $<NOT:$<CONFIG:DEBUG>>
