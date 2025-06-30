@@ -28,7 +28,6 @@
 
 #include <QMutex>
 
-#include "AudioResampler.h"
 #include "Effect.h"
 #include "ladspa.h"
 #include "LadspaControls.h"
