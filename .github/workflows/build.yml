@@ -277,6 +277,7 @@ jobs:
           key: "homebrew-${{ matrix.arch }}\
             -${{ hashFiles('Brewfile.lock.json') }}"
   mingw:
+    if: false
     name: mingw64
     runs-on: ubuntu-latest
     env:
@@ -342,12 +343,12 @@ jobs:
         env:
           CCACHE_MAXSIZE: 500M
   msvc:
-    if: false
     name: msvc-x64
     runs-on: windows-2022
     env:
       CCACHE_MAXSIZE: 0
       CCACHE_NOCOMPRESS: 1
+      VERBOSE: 1
     steps:
       - name: Check out
         uses: actions/checkout@v3

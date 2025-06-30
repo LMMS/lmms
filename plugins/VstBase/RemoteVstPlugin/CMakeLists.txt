@@ -69,18 +69,17 @@ target_compile_definitions(${EXE_NAME} PRIVATE BUILD_REMOTE_PLUGIN_CLIENT)
 
 # Workaround for missing WinMain
 if(MSVC)
-	target_link_options(${EXE_NAME} PRIVATE "/entry:mainCRTStartup")
-endif()
-
-if(BITNESS EQUAL 32)
-	target_link_options(${EXE_NAME} PRIVATE "-Wl,--disable-dynamicbase")
-else()
-	target_link_options(${EXE_NAME} PRIVATE "-Wl,--disable-dynamicbase,--disable-high-entropy-va")
+	target_link_options(${EXE_NAME} PRIVATE "/entry:mainCRTStartup /DYNAMICBASE:NO")
 endif()
 
 
 if(IS_MINGW)
 	SET(CMAKE_REQUIRED_FLAGS "-std=c++17")
+	if(BITNESS EQUAL 32)
+		target_link_options(${EXE_NAME} PRIVATE "-Wl,--disable-dynamicbase")
+	else()
+		target_link_options(${EXE_NAME} PRIVATE "-Wl,--disable-dynamicbase,--disable-high-entropy-va")
+	endif()
 endif()
 
 if(LMMS_BUILD_WIN32)
