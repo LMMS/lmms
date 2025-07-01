@@ -74,20 +74,18 @@ endif()
 
 # If we're building a Windows executable, add linker flags to disable ASLR
 # This is needed because several old VST dlls crash when ASLR is in use (see bug #7830)
-if(IS_WIN)
-	if(MSVC)
-		target_link_options(${EXE_NAME} PRIVATE "/DYNAMICBASE:NO")
-		if(BITNESS EQUAL 64)
-			target_link_options(${EXE_NAME} PRIVATE "/HIGHENTROPYVA:NO")
-		endif()
-		# Disable Data Execution Prevention as well, as old VSTs are unlikely to support it
-		target_link_options(${EXE_NAME} PRIVATE "/NXCOMPAT:NO")
+# TODO: Find a way to apply this fix to Linux (winegcc/wineg++) builds
+# See https://github.com/LMMS/lmms/pull/7976#issuecomment-3022377905
+if(MSVC)
+	target_link_options(${EXE_NAME} PRIVATE "/DYNAMICBASE:NO")
+	if(BITNESS EQUAL 64)
+		target_link_options(${EXE_NAME} PRIVATE "/HIGHENTROPYVA:NO")
+	endif()
+elseif(IS_MINGW)
+	if(BITNESS EQUAL 32)
+		target_link_options(${EXE_NAME} PRIVATE "-Wl,--disable-dynamicbase")
 	else()
-		if(BITNESS EQUAL 32)
-			target_link_options(${EXE_NAME} PRIVATE "-Wl,--disable-dynamicbase")
-		else()
-			target_link_options(${EXE_NAME} PRIVATE "-Wl,--disable-dynamicbase,--disable-high-entropy-va")
-		endif()
+		target_link_options(${EXE_NAME} PRIVATE "-Wl,--disable-dynamicbase,--disable-high-entropy-va")
 	endif()
 endif()
 
