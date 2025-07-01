@@ -227,11 +227,11 @@ public:
 
 	PlayMode lastPlayMode() const { return m_lastPlayMode; }
 
-	inline const TimePos & getPlayPos( PlayMode pm ) const
+	const TimePos& getPlayPos(PlayMode pm) const
 	{
 		return getTimeline(pm).getPlayPos();
 	}
-	inline const TimePos & getPlayPos() const
+	const TimePos& getPlayPos() const
 	{
 		return getPlayPos(m_playMode);
 	}
