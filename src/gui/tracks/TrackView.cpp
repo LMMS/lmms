@@ -276,17 +276,17 @@ void TrackView::mousePressEvent( QMouseEvent * me )
 	}
 	else if( me->button() == Qt::LeftButton )
 	{
-		if (me->modifiers() & Qt::ShiftModifier || (me->y() > height() - ResizeGripWidth && me->x() <= widgetTotal))
+		if (me->x() > widgetTotal - ResizeGripWidth && me->x() <= widgetTotal)
+		{
+			m_action = Action::ResizeHorizontal;
+		}
+		else if (me->modifiers() & Qt::ShiftModifier || (me->y() > height() - ResizeGripWidth && me->x() <= widgetTotal))
 		{
 			m_action = Action::ResizeVertical;
 			QCursor::setPos( mapToGlobal( QPoint( me->x(),
 								height() ) ) );
 			QCursor c( Qt::SizeVerCursor);
 			QApplication::setOverrideCursor( c );
-		}
-		else if (me->x() > widgetTotal - ResizeGripWidth)
-		{
-			m_action = Action::ResizeHorizontal;
 		}
 
 		me->accept();
