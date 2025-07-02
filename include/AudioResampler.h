@@ -75,14 +75,10 @@ public:
 	AudioResampler& operator=(AudioResampler&&) noexcept;
 
 	//! Resample audio from the input to the output.
+	//! The input and output buffers are advanced and shrunk by how many input frames were used and how many
+	//! output frames were generated respectively.
 	//! @return The resampling results. See @ref Result.
-	[[nodiscard]] auto process() -> Result;
-
-	//! Advance and shrink the input buffer by @p frames frames.
-	void advanceInput(std::size_t frames);
-
-	//! Advance and shrink the output buffer by @p frames frames.
-	void advanceOutput(std::size_t frames);
+	auto process() -> Result;
 
 	//! Set the input buffer view to @p input .
 	void setInput(InterleavedBufferView<const float> input);

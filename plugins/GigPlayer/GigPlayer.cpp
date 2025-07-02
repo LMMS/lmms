@@ -459,11 +459,9 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 					_working_buffer[numFramesMixed + i] += sample.m_outputBuffer[sample.m_outputIndex + i] * amplitude;
 				}
 
-				sample.m_resampler.advanceInput(result.inputFramesUsed);
 				sample.pos += result.inputFramesUsed;
 				sample.adsr.inc(result.inputFramesUsed);
 
-				sample.m_resampler.advanceOutput(result.outputFramesGenerated);
 				sample.m_outputIndex += framesToMix;
 				numFramesMixed += framesToMix;
 			}

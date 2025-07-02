@@ -196,9 +196,7 @@ private:
 
 		while (!resampler.output().empty())
 		{
-			const auto result = resampler.process();
-			resampler.advanceInput(result.inputFramesUsed);
-			resampler.advanceOutput(result.outputFramesGenerated);
+			resampler.process();
 			if (resampler.input().empty()) { resampler.setInput({_src, 1, GRAPHLEN}); }
 		}
 	}

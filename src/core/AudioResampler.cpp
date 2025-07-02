@@ -62,6 +62,13 @@ AudioResampler& AudioResampler::operator=(AudioResampler&& other) noexcept
 auto AudioResampler::process() -> Result
 {
 	if ((m_error = src_process(m_state, &m_data))) { throw std::runtime_error{src_strerror(m_error)}; }
+
+	m_data.data_in += m_data.input_frames_used * m_channels;
+	m_data.input_frames -= m_data.input_frames_used;
+
+	m_data.data_out += m_data.output_frames_gen * m_channels;
+	m_data.output_frames -= m_data.output_frames_gen;
+
 	return {static_cast<f_cnt_t>(m_data.input_frames_used), static_cast<f_cnt_t>(m_data.output_frames_gen)};
 }
 
@@ -77,18 +84,6 @@ void AudioResampler::setOutput(InterleavedBufferView<float> output)
 	if (output.channels() != m_channels) { throw std::runtime_error{"Invalid channel count"}; }
 	m_data.data_out = output.data();
 	m_data.output_frames = output.frames();
-}
-
-void AudioResampler::advanceInput(std::size_t frames)
-{
-	m_data.data_in += frames * m_channels;
-	m_data.input_frames -= frames;
-}
-
-void AudioResampler::advanceOutput(std::size_t frames)
-{
-	m_data.data_out += frames * m_channels;
-	m_data.output_frames -= frames;
 }
 
 auto AudioResampler::converterType(Mode mode) -> int

@@ -880,8 +880,6 @@ void Sf2Instrument::renderFrames( f_cnt_t frames, SampleFrame* buf )
 		}
 
 		const auto result = m_resampler.process();
-		m_resampler.advanceInput(result.inputFramesUsed);
-		m_resampler.advanceOutput(result.outputFramesGenerated);
 
 		if (m_resampler.input().empty() && result.outputFramesGenerated == 0)
 		{

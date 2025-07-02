@@ -129,8 +129,6 @@ bool Sample::play(SampleFrame* dst, PlaybackState* state, size_t numFrames, Loop
 		}
 
 		const auto result = state->m_resampler.process();
-		state->m_resampler.advanceInput(result.inputFramesUsed);
-		state->m_resampler.advanceOutput(result.outputFramesGenerated);
 
 		if (state->m_resampler.input().empty() && result.outputFramesGenerated == 0)
 		{
