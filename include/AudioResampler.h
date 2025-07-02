@@ -94,9 +94,6 @@ public:
 	//! @p ratio is equal to the output sample rate divided by the input sample rate.
 	void setRatio(double ratio) { m_data.src_ratio = ratio; }
 
-	//! Set the end of input flag.
-	void setEndOfInput(bool endOfInput) { m_data.end_of_input = endOfInput; }
-
 	//! @return The input buffer.
 	auto input() -> InterleavedBufferView<const float>
 	{
@@ -111,9 +108,6 @@ public:
 
 	//! @return The resampling ratio.
 	auto ratio() const -> double { return m_data.src_ratio; }
-
-	//! @return End of input flag. `true` if no more input data is available.
-	auto endOfInput() const -> bool { return m_data.end_of_input; }
 
 	//! @return The number of channels expected by the resampler.
 	auto channels() const -> ch_cnt_t { return m_channels; }
