@@ -308,6 +308,7 @@ void TabWidget::wheelEvent(QWheelEvent* we)
 
 	we->accept();
 
+	// Get both vertical and horizontal scroll
 	int steps = 0 - scroll.getSteps() - scroll.getSteps(Scroll::Flag::Horizontal);
 	if (steps == 0) { return; }
 
