@@ -73,7 +73,7 @@ protected slots:
 
 private:
 	PatternStore* m_ps;
-	TimeLineWidget * m_timeLine;
+	TimeLineWidget* m_timeLine;
 	int m_trackHeadWidth;
 	tick_t m_maxClipLength;
 	void makeSteps( bool clone );
