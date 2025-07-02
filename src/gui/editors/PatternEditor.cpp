@@ -25,6 +25,7 @@
 #include "PatternEditor.h"
 
 #include <QAction>
+#include <QVBoxLayout>
 
 #include "ClipView.h"
 #include "ComboBox.h"
@@ -35,6 +36,7 @@
 #include "PatternTrack.h"
 #include "Song.h"
 #include "StringPairDrag.h"
+#include "TimeLineWidget.h"
 #include "TrackView.h"
 
 #include "MidiClip.h"
@@ -46,9 +48,25 @@ namespace lmms::gui
 
 PatternEditor::PatternEditor(PatternStore* ps) :
 	TrackContainerView(ps),
-	m_ps(ps)
+	m_ps(ps),
+	m_trackHeadWidth(ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt() == 1
+		? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT
+		: DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH),
+	m_maxClipLength(TimePos::ticksPerBar())
 {
 	setModel(ps);
+
+	m_timeLine = new TimeLineWidget(m_trackHeadWidth, 32, pixelsPerBar(),
+		Engine::getSong()->getPlayPos(Song::PlayMode::Pattern),
+		Engine::getSong()->getTimeline(Song::PlayMode::Pattern),
+		m_currentPosition, Song::PlayMode::Pattern, this
+	);
+	connect(m_timeLine, &TimeLineWidget::positionChanged, this, &PatternEditor::updatePosition);
+	static_cast<QVBoxLayout*>(layout())->insertWidget(0, m_timeLine);
+
+	connect(m_ps, &PatternStore::trackUpdated,
+		this, &PatternEditor::updateMaxSteps);
+
 	setFocusPolicy(Qt::StrongFocus);
 	setFocus();
 }
@@ -81,6 +99,7 @@ void PatternEditor::removeSteps()
 			p->removeSteps();
 		}
 	}
+	updateMaxSteps();
 }
 
 
@@ -120,6 +139,7 @@ void PatternEditor::saveSettings(QDomDocument& doc, QDomElement& element)
 void PatternEditor::loadSettings(const QDomElement& element)
 {
 	MainWindow::restoreWidgetState(parentWidget(), element);
+	updateMaxSteps();
 }
 
 
@@ -162,18 +182,49 @@ void PatternEditor::dropEvent(QDropEvent* de)
 	{
 		TrackContainerView::dropEvent( de );
 	}
+	updateMaxSteps();
 }
 
 
+void PatternEditor::resizeEvent(QResizeEvent* re)
+{
+	updatePixelsPerBar();
+}
 
 
 void PatternEditor::updatePosition()
 {
 	//realignTracks();
+	for (const auto& trackView : trackViews())
+	{
+		trackView->update();
+	}
 	emit positionChanged( m_currentPosition );
 }
 
+void PatternEditor::updatePixelsPerBar()
+{
+	setPixelsPerBar(m_maxClipLength != 0
+		? (width() - m_trackHeadWidth) * TimePos::ticksPerBar() / m_maxClipLength
+		: (width() - m_trackHeadWidth));
+	m_timeLine->setPixelsPerBar(pixelsPerBar());
+}
 
+void PatternEditor::updateMaxSteps()
+{
+	const TrackContainer::TrackList& tl = model()->tracks();
+
+	m_maxClipLength = 0;
+	for (const auto& track : tl)
+	{
+		if (track->type() == Track::Type::Instrument)
+		{
+			auto mClip = static_cast<MidiClip*>(track->getClip(m_ps->currentPattern()));
+			m_maxClipLength = std::max(m_maxClipLength, static_cast<tick_t>(mClip->length()));
+		}
+	}
+	updatePixelsPerBar();
+}
 
 
 void PatternEditor::makeSteps( bool clone )
@@ -194,6 +245,7 @@ void PatternEditor::makeSteps( bool clone )
 			}
 		}
 	}
+	updateMaxSteps();
 }
 
 // Creates a clone of the current pattern track with the same content, but no clips in the song editor
@@ -287,6 +339,7 @@ PatternEditorWindow::PatternEditorWindow(PatternStore* ps) :
 
 	connect(&ps->m_patternComboBoxModel, SIGNAL(dataChanged()),
 			m_editor, SLOT(updatePosition()));
+	connect(&ps->m_patternComboBoxModel, &ComboBoxModel::dataChanged, m_editor, &PatternEditor::updateMaxSteps);
 
 	auto viewNext = new QAction(this);
 	connect(viewNext, SIGNAL(triggered()), m_patternComboBox, SLOT(selectNext()));
