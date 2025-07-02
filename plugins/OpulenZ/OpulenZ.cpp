@@ -514,7 +514,7 @@ int OpulenzInstrument::Hz2fnum(float Hz) {
 
 // Load one of the default patches
 void OpulenzInstrument::loadGMPatch() {
-	unsigned char *inst = midi_fm_instruments[m_patchModel.value()];
+	const unsigned char *inst = midi_fm_instruments[m_patchModel.value()];
 	loadPatch(inst);
 }
 
@@ -590,7 +590,7 @@ void OpulenzInstrument::loadFile( const QString& file ) {
 			return;
 		}
 		if( sbidata.size() != 52 ) {
-			printf("SBI size error: expected 52, got %d\n",sbidata.size() );
+			printf("SBI size error: expected 52, got %lld\n",sbidata.size() );
 		}
 
 		// Minimum size of SBI if we ignore "reserved" bytes at end
