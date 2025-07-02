@@ -53,6 +53,11 @@ namespace lmms
 {
 
 
+
+
+
+
+
 // container for everything required to store MIDI events going to the plugin
 struct MidiInputEvent
 {
@@ -191,9 +196,9 @@ private:
 
 
 
-Lv2Proc::Lv2Proc(const LilvPlugin *plugin, Model* parent) :
-	LinkedModelGroup(parent),
-	m_plugin(plugin),
+Lv2Proc::Lv2Proc(Model* parent, const QString &uri) :
+	ModelGroup(parent),
+	m_plugin(Engine::getLv2Manager()->getPlugin(uri)),
 	m_workLock(1),
 	m_midiInputBuf(m_maxMidiInputEvents),
 	m_midiInputReader(m_midiInputBuf)
@@ -325,45 +330,33 @@ void Lv2Proc::copyModelsToCore()
 
 
 
-void Lv2Proc::copyBuffersFromCore(const SampleFrame* buf,
-									unsigned firstChan, unsigned num,
-									fpp_t frames)
+void Lv2Proc::copyBuffersFromCore(const SampleFrame* buf, fpp_t frames)
 {
-	inPorts().m_left->copyBuffersFromCore(buf, firstChan, frames);
-	if (num > 1)
+	inPorts().m_left->copyBuffersFromCore(buf, 0, frames);
+	if (inPorts().m_right)
 	{
-		// if the caller requests to take input from two channels, but we only
-		// have one input channel... take medium of left and right for
-		// mono input
-		// (this happens if we have two outputs and only one input)
-		if (inPorts().m_right)
-		{
-			inPorts().m_right->copyBuffersFromCore(buf, firstChan + 1, frames);
-		}
-		else
-		{
-			inPorts().m_left->averageWithBuffersFromCore(buf, firstChan + 1, frames);
-		}
+		inPorts().m_right->copyBuffersFromCore(buf, 1, frames);
+	}
+	else
+	{
+		// LMMS is always stereo, but the effect can only do mono
+		// => merge both input buffers together on left port
+		inPorts().m_left->averageWithBuffersFromCore(buf, 1, frames);
 	}
 }
 
 
 
 
-void Lv2Proc::copyBuffersToCore(SampleFrame* buf,
-								unsigned firstChan, unsigned num,
-								fpp_t frames) const
+void Lv2Proc::copyBuffersToCore(SampleFrame* buf, fpp_t frames) const
 {
-	outPorts().m_left->copyBuffersToCore(buf, firstChan + 0, frames);
-	if (num > 1)
-	{
-		// if the caller requests to copy into two channels, but we only have
-		// one output channel, duplicate our output
-		// (this happens if we have two inputs and only one output)
-		Lv2Ports::Audio* ap = outPorts().m_right
-			? outPorts().m_right : outPorts().m_left;
-		ap->copyBuffersToCore(buf, firstChan + 1, frames);
-	}
+	outPorts().m_left->copyBuffersToCore(buf, 0, frames);
+	// if the caller requests to copy into two channels, but we only have
+	// one output channel, duplicate our output
+	// (this happens if we have two inputs and only one output)
+	Lv2Ports::Audio* ap = outPorts().m_right
+		? outPorts().m_right : outPorts().m_left;
+	ap->copyBuffersToCore(buf, 1, frames);
 }
 
 
