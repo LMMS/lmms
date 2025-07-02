@@ -32,7 +32,7 @@
 class QWheelEvent;
 
 
-namespace lmms {
+namespace lmms::gui {
 
 
 class LMMS_EXPORT Scroll
@@ -134,6 +134,6 @@ private:
 LMMS_DECLARE_OPERATORS_FOR_FLAGS(Scroll::Flag)
 
 
-} // namespace lmms
+} // namespace lmms::gui
 
 #endif

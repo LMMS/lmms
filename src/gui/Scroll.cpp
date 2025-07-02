@@ -28,7 +28,7 @@
 #include <QWheelEvent>
 
 
-namespace lmms {
+namespace lmms::gui {
 
 
 float Scroll::s_partialStepX = 0;
@@ -124,4 +124,4 @@ int Scroll::calculateSteps(const int delta, const float stepsPerTick, const bool
 
 
 
-} // namespace lmms
+} // namespace lmms::gui
