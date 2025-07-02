@@ -4965,7 +4965,6 @@ PianoRollWindow::PianoRollWindow() :
 
 	drawAction->setShortcut(combine(Qt::SHIFT, Qt::Key_D));
 	eraseAction->setShortcut(combine(Qt::SHIFT, Qt::Key_E));
-	selectAction->setShortcut(combine(Qt::SHIFT, Qt::Key_S));
 	pitchBendAction->setShortcut(combine(Qt::SHIFT, Qt::Key_T));
 
 	connect( editModeGroup, SIGNAL(triggered(int)), m_editor, SLOT(setEditMode(int)));
@@ -5056,7 +5055,7 @@ PianoRollWindow::PianoRollWindow() :
 
 	auto strumAction = new QAction(embed::getIconPixmap("arp_free"), tr("Strum"), noteToolsButton);
 	connect(strumAction, &QAction::triggered, m_editor, &PianoRoll::setStrumAction);
-	strumAction->setShortcut(combine(Qt::SHIFT, Qt::Key_J));
+	strumAction->setShortcut(combine(Qt::SHIFT, Qt::Key_S));
 
 	auto fillAction = new QAction(embed::getIconPixmap("fill"), tr("Fill"), noteToolsButton);
 	connect(fillAction, &QAction::triggered, [this](){ m_editor->fitNoteLengths(true); });
@@ -5075,9 +5074,10 @@ PianoRollWindow::PianoRollWindow() :
 	auto reverseAction = new QAction(embed::getIconPixmap("flip_x"), tr("Reverse"), noteToolsButton);
 	connect(reverseAction, &QAction::triggered, [this](){ m_editor->reverseNotes(); });
 	reverseAction->setShortcut(combine(Qt::CTRL, Qt::SHIFT, Qt::Key_R));
-
+	// Editing tools
 	noteToolsButton->addAction(knifeAction);
 	noteToolsButton->addAction(strumAction);
+	// Instant actions
 	noteToolsButton->addAction(glueAction);
 	noteToolsButton->addAction(fillAction);
 	noteToolsButton->addAction(cutOverlapsAction);
