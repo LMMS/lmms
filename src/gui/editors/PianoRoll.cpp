@@ -796,49 +796,84 @@ void PianoRoll::reverseNotes()
 
 void PianoRoll::duplicateNotes(bool quanitized)
 {
-	if (!hasValidMidiClip()) { return; }
+	auto roundUp = [](int value, int step) -> int
+	{
+		// Rounds the value up to the next step
+		return std::ceil(static_cast<float>(value) / step) * step;
+	};
 
-	m_midiClip->addJournalCheckPoint();
+	auto nextPowerOfTwo = [](int value, int step) -> int
+	{
+		// Rounds the value to the next power-of-two of step
+		// (works for fractions too, e.g. 1/2, 1/4, 1/8)
+		return std::exp2(std::ceil(std::log2(static_cast<float>(value) / step))) * step;
+	};
+
+	auto smallestSimpleDivision = [](int sectionLength, int stepLength) -> int
+	{
+		// Find the smallest simple subdivision (e.g. 1/2, 1/4, 1/8) of a section with n sized steps
+		int stepCount = std::max(1, sectionLength / stepLength);
+		while (stepCount % 2 == 0) { stepCount /= 2; }
+		return stepCount * stepLength;
+	};
+
+	if (!hasValidMidiClip()) { return; }
 
 	const NoteVector selectedNotes = getSelectedNotes();
 	const NoteVector notes = selectedNotes.empty() ? m_midiClip->notes() : selectedNotes;
 
-	// Find the very first start position and the very last end position of all the notes.
-	Note* firstNote = *std::min_element(notes.begin(), notes.end(), [](const Note* n1, const Note* n2){ return Note::lessThan(n1, n2); });
-	Note* lastNode = *std::max_element(notes.begin(), notes.end(), [](const Note* n1, const Note* n2){ return n1->endPos() < n2->endPos(); });
-	TimePos firstPos = firstNote->pos();
-	TimePos lastPos = lastNode->endPos();
+	const auto bounds = boundsForNotes(notes);
+	if (!bounds.has_value()) { return; }
 
-	TimePos unquantizedLength = lastPos - firstPos;
-	// If the length should be inferred from the note positions, it's generally rounded up to the nearest power of 2 bar length.
-	// Except when the time signature numerator is not a power of 2. In that case, the final length is quantized
-	// to the next beat length if the length between 1/2 beat and 1 bar. Else just use power of 2 as normal.
-	// If the length is less than half of a beat, the same sort of power of 2 rounding happens, but relative to the beat length.
-	// If the length on the scale of the snap size, it's done relative to the snap size.
-	int ticksPerBeat = TimePos::ticksPerBar() / Engine::getSong()->getTimeSigModel().getNumerator();
-	int ticksPerSnap = quantization();
-	TimePos quantizedLength;
-	if (unquantizedLength > TimePos::ticksPerBar() / 2)
+	m_midiClip->addJournalCheckPoint();
+
+	TimePos unquantizedLength = bounds->end - bounds->start;
+	TimePos length = unquantizedLength;
+
+	const TimePos barLength = TimePos::ticksPerBar();
+	const TimePos beatLength = barLength / Engine::getSong()->getTimeSigModel().getNumerator();
+	const TimePos smallestSimpleDivisionOfBar = smallestSimpleDivision(barLength, beatLength);
+	const TimePos smallestSimpleDivisionOfBeat = smallestSimpleDivision(beatLength, quantization());
+
+	const bool beatsAlignWithQuantization = beatLength % quantization() == 0 || quantization() % beatLength == 0;
+	const bool everyBarHasQuantization = quantization() <= barLength;
+
+	if (beatsAlignWithQuantization && everyBarHasQuantization)
 	{
-		quantizedLength = TimePos::ticksPerBar() * std::exp2(std::ceil(std::log2(static_cast<float>(unquantizedLength) / TimePos::ticksPerBar())));
-	}
-	else if (unquantizedLength > ticksPerBeat / 2)
-	{
-		quantizedLength = std::ceil(static_cast<float>(unquantizedLength) / ticksPerBeat) * ticksPerBeat;
-	}
-	else if (unquantizedLength >= ticksPerSnap * 2)
-	{
-		quantizedLength = ticksPerBeat * std::exp2(std::ceil(std::log2(static_cast<float>(unquantizedLength) / ticksPerBeat)));
+		// Step 1: Round length to the appropriate unit - quantization steps, beats or bars.
+		length = roundUp(length, quantization());
+
+		if (length > barLength)
+		{
+			length = roundUp(length, barLength);
+		}
+		else if (length > beatLength)
+		{
+			length = roundUp(length, beatLength);
+		}
+
+		// Step 2: Round length to powers of two when possible
+		if (length > smallestSimpleDivisionOfBar / 2)
+		{
+			length = nextPowerOfTwo(roundUp(length, smallestSimpleDivisionOfBar), barLength);
+		}
+		else if (length > smallestSimpleDivisionOfBeat / 2)
+		{
+			length = nextPowerOfTwo(roundUp(length, smallestSimpleDivisionOfBeat), beatLength);
+		}
 	}
 	else
 	{
-		quantizedLength = std::ceil(static_cast<float>(unquantizedLength) / ticksPerSnap) * ticksPerSnap;
+		// If the quantization grid doesn't align with beats and bars, ignore it and round to whole bars
+		length = nextPowerOfTwo(roundUp(unquantizedLength, barLength), barLength);
 	}
+
 
 	for (auto note : notes)
 	{
 		Note newNote = Note{*note};
-		newNote.setPos(note->pos() + (quanitized ? quantizedLength : unquantizedLength));
+		newNote.setPos(note->pos() + (quanitized ? length : unquantizedLength));
+		newNote.setSelected(true);
 		m_midiClip->addNote(newNote, false);
 		note->setSelected(false);
 	}
