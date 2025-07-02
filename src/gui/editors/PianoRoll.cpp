@@ -5064,7 +5064,7 @@ PianoRollWindow::PianoRollWindow() :
 
 	auto cutOverlapsAction = new QAction(embed::getIconPixmap("cut_overlaps"), tr("Cut overlaps"), noteToolsButton);
 	connect(cutOverlapsAction, &QAction::triggered, [this](){ m_editor->fitNoteLengths(false); });
-	cutOverlapsAction->setShortcut(combine(Qt::CTRL, Qt::SHIFT, Qt::Key_O));
+	cutOverlapsAction->setShortcut(combine(Qt::CTRL, Qt::SHIFT, Qt::Key_C));
 
 	auto minLengthAction = new QAction(embed::getIconPixmap("min_length"), tr("Min length as last"), noteToolsButton);
 	connect(minLengthAction, &QAction::triggered, [this](){ m_editor->constrainNoteLengths(false); });
