@@ -38,15 +38,10 @@ namespace lmms {
 class LMMS_EXPORT Scroll
 {
 public:
+	//! QWheelEvent->angleDelta() that corresponds to a "wheel tick"
 	static constexpr float ANGLE_DELTA_PER_TICK = 120;
-
-	/*! \brief Scroll delta
-	 *
-	 *  This class measures scroll delta in "wheel ticks",
-	 *  unlike QWheelEvent which measures scroll delta in 1/8ths of a degree.
-	 */
-	Scroll(QWheelEvent* event);
-
+	//! Default scroll speed for various editors
+	static constexpr int PIXELS_PER_STEP = 36;
 
 	enum class Flag {
 		NoFlag = 0x0,
@@ -63,6 +58,14 @@ public:
 	};
 
 	using Flags = lmms::Flags<Flag>;
+
+
+	/*! \brief Scroll delta
+	 *
+	 *  This class measures scroll delta in "wheel ticks",
+	 *  unlike QWheelEvent which measures scroll delta in 1/8ths of a degree.
+	 */
+	Scroll(QWheelEvent* event);
 
 
 	/*! \brief Return number of completely scrolled steps of some size

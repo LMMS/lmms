@@ -1621,14 +1621,14 @@ void AutomationEditor::wheelEvent(QWheelEvent * we )
 	{
 		// Calculate number of TimePos-ticks to move the horizontal scroll bar
 		const float ticksPerPixel = TimePos::ticksPerBar() / static_cast<float>(m_ppb);
-		const float ticksPerScroll = PIXELS_PER_SCROLL * ticksPerPixel;
+		const float ticksPerScroll = Scroll::PIXELS_PER_STEP * ticksPerPixel;
 		const int ticks = scroll.getSteps(ticksPerScroll, Scroll::Flag::SwapWithShiftOrAlt|Scroll::Flag::Horizontal);
 		m_leftRightScroll->setValue(m_leftRightScroll->value() - ticks);
 
 		// Calculate number of model-steps to move the vertical scroll bar
 		if (!m_y_auto)
 		{
-			const float modelStepsPerScroll = PIXELS_PER_SCROLL / m_y_delta;
+			const float modelStepsPerScroll = Scroll::PIXELS_PER_STEP / m_y_delta;
 			const int modelSteps = scroll.getSteps(modelStepsPerScroll, Scroll::Flag::SwapWithShiftOrAlt);
 			m_topBottomScroll->setValue(m_topBottomScroll->value() - modelSteps);
 		}
