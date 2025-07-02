@@ -5048,7 +5048,7 @@ PianoRollWindow::PianoRollWindow() :
 
 	auto glueAction = new QAction(embed::getIconPixmap("glue"), tr("Glue"), noteToolsButton);
 	connect(glueAction, SIGNAL(triggered()), m_editor, SLOT(glueNotes()));
-	glueAction->setShortcut(combine(Qt::SHIFT, Qt::Key_G));
+	glueAction->setShortcut(combine(Qt::CTRL, Qt::SHIFT, Qt::Key_G));
 
 	auto knifeAction = new QAction(embed::getIconPixmap("edit_knife"), tr("Knife"), noteToolsButton);
 	connect(knifeAction, &QAction::triggered, m_editor, &PianoRoll::setKnifeAction);
@@ -5060,10 +5060,11 @@ PianoRollWindow::PianoRollWindow() :
 
 	auto fillAction = new QAction(embed::getIconPixmap("fill"), tr("Fill"), noteToolsButton);
 	connect(fillAction, &QAction::triggered, [this](){ m_editor->fitNoteLengths(true); });
-	fillAction->setShortcut(combine(Qt::SHIFT, Qt::Key_F));
+	fillAction->setShortcut(combine(Qt::CTRL, Qt::SHIFT, Qt::Key_F));
 
 	auto cutOverlapsAction = new QAction(embed::getIconPixmap("cut_overlaps"), tr("Cut overlaps"), noteToolsButton);
 	connect(cutOverlapsAction, &QAction::triggered, [this](){ m_editor->fitNoteLengths(false); });
+	cutOverlapsAction->setShortcut(combine(Qt::CTRL, Qt::SHIFT, Qt::Key_O));
 
 	auto minLengthAction = new QAction(embed::getIconPixmap("min_length"), tr("Min length as last"), noteToolsButton);
 	connect(minLengthAction, &QAction::triggered, [this](){ m_editor->constrainNoteLengths(false); });
@@ -5071,18 +5072,18 @@ PianoRollWindow::PianoRollWindow() :
 	auto maxLengthAction = new QAction(embed::getIconPixmap("max_length"), tr("Max length as last"), noteToolsButton);
 	connect(maxLengthAction, &QAction::triggered, [this](){ m_editor->constrainNoteLengths(true); });
 
-	auto reverseAction = new QAction(embed::getIconPixmap("flip_x"), tr("Reverse Notes"), noteToolsButton);
+	auto reverseAction = new QAction(embed::getIconPixmap("flip_x"), tr("Reverse"), noteToolsButton);
 	connect(reverseAction, &QAction::triggered, [this](){ m_editor->reverseNotes(); });
-	reverseAction->setShortcut(combine(Qt::SHIFT, Qt::Key_R));
+	reverseAction->setShortcut(combine(Qt::CTRL, Qt::SHIFT, Qt::Key_R));
 
-	noteToolsButton->addAction(glueAction);
 	noteToolsButton->addAction(knifeAction);
 	noteToolsButton->addAction(strumAction);
+	noteToolsButton->addAction(glueAction);
 	noteToolsButton->addAction(fillAction);
 	noteToolsButton->addAction(cutOverlapsAction);
+	noteToolsButton->addAction(reverseAction);
 	noteToolsButton->addAction(minLengthAction);
 	noteToolsButton->addAction(maxLengthAction);
-	noteToolsButton->addAction(reverseAction);
 
 	notesActionsToolBar->addWidget(noteToolsButton);
 
