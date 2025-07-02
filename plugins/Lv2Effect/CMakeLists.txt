@@ -2,6 +2,12 @@ IF(LMMS_HAVE_LV2)
 	include_directories(SYSTEM ${LV2_INCLUDE_DIRS})
 	include_directories(SYSTEM ${Lilv_INCLUDE_DIRS})
 	include_directories(SYSTEM ${SUIL_INCLUDE_DIRS})
+	IF(SERD_INCLUDE_DIRS)
+		include_directories(SYSTEM ${SERD_INCLUDE_DIRS})
+	ENDIF()
+	IF(SRATOM_INCLUDE_DIRS)
+		include_directories(SYSTEM ${SRATOM_INCLUDE_DIRS})
+	ENDIF()
 	INCLUDE(BuildPlugin)
 	BUILD_PLUGIN(lv2effect Lv2Effect.cpp Lv2FxControls.cpp Lv2FxControlDialog.cpp Lv2Effect.h Lv2FxControls.h Lv2FxControlDialog.h
 		MOCFILES Lv2Effect.h Lv2FxControls.h Lv2FxControlDialog.h

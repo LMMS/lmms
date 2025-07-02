@@ -26,6 +26,7 @@
 
 #include <QDebug>
 
+#include "Lv2Manager.h"
 #include "Lv2SubPluginFeatures.h"
 
 #include "embed.h"
@@ -63,6 +64,9 @@ Lv2Effect::Lv2Effect(Model* parent, const Descriptor::SubPluginFeatures::Key *ke
 	m_controls(this, key->attributes["uri"]),
 	m_tmpOutputSmps(Engine::audioEngine()->framesPerPeriod())
 {
+	// even if no input, we may need to force this effect to run permanently
+	// this is required for permanent DSP<->UI communication
+	if(Lv2Manager::wantUi()) { startRunning(); }
 }
 
 
@@ -91,7 +95,9 @@ Effect::ProcessStatus Lv2Effect::processImpl(SampleFrame* buf, const fpp_t frame
 		buf[f][1] = d * buf[f][1] + w * m_tmpOutputSmps[f][1];
 	}
 
-	return ProcessStatus::ContinueIfNotQuiet;
+	return Lv2Manager::wantUi()
+		? ProcessStatus::Continue
+		: ProcessStatus::ContinueIfNotQuiet;
 }
 
 
