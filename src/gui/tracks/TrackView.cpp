@@ -89,6 +89,7 @@ TrackView::TrackView( Track * track, TrackContainerView * tcv ) :
 	setAcceptDrops( true );
 	setMouseTracking(true);
 	m_trackSettingsWidget.setMouseTracking(true);
+	m_trackSettingsWidget.setMouseTracking(true);
 	setAttribute( Qt::WA_DeleteOnClose, true );
 
 
