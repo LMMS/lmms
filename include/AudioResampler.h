@@ -87,8 +87,10 @@ public:
 	void setOutput(InterleavedBufferView<float> output);
 
 	//! Set the resampling ratio to @p ratio .
-	//! @p ratio is equal to the output sample rate divided by the input sample rate.
 	void setRatio(double ratio) { m_data.src_ratio = ratio; }
+
+	//! Set the resampling ratio to @p output / @p input .
+	void setRatio(sample_rate_t input, sample_rate_t output) { m_data.src_ratio = static_cast<double>(output) / input; }
 
 	//! @return The input buffer.
 	auto input() -> InterleavedBufferView<const float>

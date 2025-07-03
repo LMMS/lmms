@@ -118,7 +118,9 @@ bool Sample::play(SampleFrame* dst, PlaybackState* state, size_t numFrames, Loop
 {
 	state->m_frameIndex = std::max<int>(m_startFrame, state->m_frameIndex);
 	state->m_resampler.setOutput({&dst[0][0], DEFAULT_CHANNELS, numFrames});
-	state->m_resampler.setRatio(ratio * static_cast<double>(Engine::audioEngine()->outputSampleRate()) / m_buffer->sampleRate());
+
+	state->m_resampler.setRatio(m_buffer->sampleRate(), Engine::audioEngine()->outputSampleRate());
+	state->m_resampler.setRatio(state->m_resampler.ratio() * ratio);
 
 	while (!state->m_resampler.output().empty())
 	{
