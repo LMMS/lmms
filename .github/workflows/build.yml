@@ -64,13 +64,30 @@ jobs:
         run: |
           cmake --build fltk/build
           sudo cmake --install fltk/build --prefix /usr
+      - name: Build a patched winebuild to disable ASLR for RemoteVstPlugin
+        run: |
+          mkdir winebuild-patched
+          cd winebuild-patched
+          wget https://dl.winehq.org/wine/source/10.0/wine-10.0.tar.xz
+          tar xJf wine-10.0.tar.xz
+          cd wine-10.0
+          patch -Np1 < ../../.github/workflows/winebuild-disable-dynamic-base.patch
+          cd ..
+          mkdir build
+          cd build
+          ../wine-10.0/configure --enable-win64 --without-x --without-freetype
+          cd tools/winebuild
+          make
+          mv winebuild ../../..
+          echo WINEBUILD_PATCHED="$GITHUB_WORKSPACE"/winebuild-patched/winebuild >> "$GITHUB_ENV"
       - name: Configure
         run: |
           ccache --zero-stats
           source /opt/qt5*/bin/qt5*-env.sh || true
           cmake -S . \
                 -B build \
-                $CMAKE_OPTS
+                $CMAKE_OPTS \
+                "-DWINE_CXX_FLAGS=--winebuild $WINEBUILD_PATCHED"
       - name: Build
         run: cmake --build build
       - name: Run tests
