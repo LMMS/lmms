@@ -17,7 +17,6 @@ jobs:
       CCACHE_MAXSIZE: 0
       CCACHE_NOCOMPRESS: 1
       MAKEFLAGS: -j2
-      VERBOSE: 2
     steps:
       - name: Configure git
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
@@ -65,6 +64,29 @@ jobs:
         run: |
           cmake --build fltk/build
           sudo cmake --install fltk/build --prefix /usr
+      - name: Build a patched winebuild to disable ASLR for RemoteVstPlugin
+        run: |
+          mkdir winebuild-patch
+          cd winebuild-patch
+          wget https://dl.winehq.org/wine/source/10.0/wine-10.0.tar.xz
+          tar xJf wine-10.0.tar.xz
+          cd wine-10.0
+          patch -Np1 < ../../.github/workflows/winebuild-disable-dynamic-base.patch
+          cd ..
+          mkdir build
+          cd build
+          ../wine-10.0/configure --enable-win64 --without-x --without-freetype
+          cd tools/winebuild
+          make
+          mv winebuild ../../../winebuild-patched
+      - name: Setup tmate session
+        if: ${{ failure() }}
+        uses: mxschmitt/action-tmate@v3
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: winebuild-patched
+          path: winebuild-patch/winebuild-patched
       - name: Configure
         run: |
           ccache --zero-stats
@@ -95,9 +117,6 @@ jobs:
           ccache --show-stats
         env:
           CCACHE_MAXSIZE: 500M
-      - name: Setup tmate session
-        if: ${{ failure() }}
-        uses: mxschmitt/action-tmate@v3
   linux-arm64:
     if: false
     name: linux-arm64

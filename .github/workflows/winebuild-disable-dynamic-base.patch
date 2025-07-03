@@ -1,0 +1,26 @@
+diff -Naur wine-10.0/tools/winebuild/main.c wine-10.0-patched/tools/winebuild/main.c
+--- wine-10.0/tools/winebuild/main.c	2025-01-21 16:42:16.000000000 +0000
++++ wine-10.0-patched/tools/winebuild/main.c	2025-07-03 10:11:27.537239055 +0000
+@@ -592,8 +592,9 @@
+         else
+         {
+             spec->characteristics |= IMAGE_FILE_LARGE_ADDRESS_AWARE;
+-            spec->dll_characteristics |= IMAGE_DLLCHARACTERISTICS_HIGH_ENTROPY_VA;
+         }
++        /* Disable DYNAMIC_BASE to fix VST crashes */
++        spec->dll_characteristics &= ~IMAGE_DLLCHARACTERISTICS_DYNAMIC_BASE;
+ 
+         files = load_resources( files, spec );
+         if (spec_file_name && !parse_input_file( spec )) break;
+diff -Naur wine-10.0/tools/winebuild/spec32.c wine-10.0-patched/tools/winebuild/spec32.c
+--- wine-10.0/tools/winebuild/spec32.c	2025-01-21 16:42:16.000000000 +0000
++++ wine-10.0-patched/tools/winebuild/spec32.c	2025-07-03 10:12:31.507117088 +0000
+@@ -829,6 +829,8 @@
+     output( "\t.long 0\n" );              /* CheckSum */
+     output( "\t.short 0x%04x\n",          /* Subsystem */
+              spec->subsystem );
++    /* Print the dll_characteristics to help with debugging */
++    printf( "dll_characteristics: 0x%04x\n", spec->dll_characteristics );
+     output( "\t.short 0x%04x\n",          /* DllCharacteristics */
+             spec->dll_characteristics );
+     output( "\t%s %u,%u\n",               /* SizeOfStackReserve/Commit */
