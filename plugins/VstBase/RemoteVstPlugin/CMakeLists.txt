@@ -74,8 +74,6 @@ endif()
 
 # If we're building a Windows executable, add linker flags to disable ASLR
 # This is needed because several old VST dlls crash when ASLR is in use (see bug #7830)
-# TODO: Find a way to apply this fix to Linux (winegcc/wineg++) builds
-# See https://github.com/LMMS/lmms/pull/7976#issuecomment-3022377905
 if(MSVC)
 	target_link_options(${EXE_NAME} PRIVATE "/DYNAMICBASE:NO")
 	if(BITNESS EQUAL 64)
