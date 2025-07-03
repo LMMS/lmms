@@ -44,8 +44,7 @@ FileDialog::FileDialog(QWidget *parent, const QString &caption,
 					   const QString &filter,
 					   const QString &directory):
 	QFileDialog(parent, caption, directory.isEmpty() ? getPath(dirType) : directory, filter),
-	m_dirType(dirType),
-	m_status(QDialog::Rejected)
+	m_dirType(dirType)
 {
 #if QT_VERSION > 0x050200
 	setOption( QFileDialog::DontUseCustomDirectoryIcons );
@@ -53,15 +52,9 @@ FileDialog::FileDialog(QWidget *parent, const QString &caption,
 	setOption( QFileDialog::DontUseNativeDialog );
 }
 
-int FileDialog::exec()
-{
-	m_status = this->QFileDialog::exec();
-	return m_status;
-}
-
 FileDialog::~FileDialog()
 {
-	if (m_status == QDialog::Accepted)
+	if (result() == QDialog::Accepted)
 	{
 		s_lastUsedPaths[m_dirType] = directory().absolutePath();
 	}

@@ -57,11 +57,8 @@ public:
 
 	~FileDialog() override;
 
-	int exec() override;
-
 private:
 	DirType m_dirType;
-	int m_status;
 
 	static QMap<FileDialog::DirType, QString> s_lastUsedPaths;
 	static QString getDefaultPath(const DirType ty);
