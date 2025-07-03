@@ -359,13 +359,13 @@ void TrackView::mouseMoveEvent( QMouseEvent * me )
 		m_trackContainerView->setTrackHeadWidth(me->x());
 		setCursor(Qt::SizeHorCursor);
 	}
-	else if (me->y() > height() - ResizeGripWidth && me->x() < widgetTotal)
-	{
-		setCursor(Qt::SizeVerCursor);
-	}
 	else if (me->x() > widgetTotal - ResizeGripWidth && me->x() < widgetTotal)
 	{
 		setCursor(Qt::SizeHorCursor);
+	}
+	else if (me->y() > height() - ResizeGripWidth && me->x() < widgetTotal)
+	{
+		setCursor(Qt::SizeVerCursor);
 	}
 	else
 	{
