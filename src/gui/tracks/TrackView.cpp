@@ -173,6 +173,33 @@ QMenu * TrackView::createMixerMenu(QString title, QString newMixerLabel)
 	return nullptr;
 }
 
+/*! \brief Gets a DataType for this tracks, used for StringPairDrag.
+ *
+ */
+Clipboard::DataType TrackView::getTrackStringPairType(Track* track)
+{
+	switch (track->type())
+	{
+		case Track::Type::Instrument:
+			return Clipboard::DataType::InstrumentTrack;
+			break;
+		case Track::Type::Pattern:
+			return Clipboard::DataType::PatternTrack;
+			break;
+		case Track::Type::Sample:
+			return Clipboard::DataType::SampleTrack;
+			break;
+		case Track::Type::Automation:
+			return Clipboard::DataType::AutomationTrack;
+			break;
+		case Track::Type::HiddenAutomation:
+			return Clipboard::DataType::HiddenAutomationTrack;
+			break;
+		default:
+			break;
+	}
+	return Clipboard::DataType::None;
+}
 
 
 
@@ -211,8 +238,7 @@ void TrackView::modelChanged()
  */
 void TrackView::dragEnterEvent( QDragEnterEvent * dee )
 {
-	StringPairDrag::processDragEnterEvent( dee, "track_" +
-					QString::number( static_cast<int>(m_track->type()) ) );
+	StringPairDrag::processDragEnterEvent(dee, getTrackStringPairType(getTrack()));
 }
 
 
@@ -228,9 +254,9 @@ void TrackView::dragEnterEvent( QDragEnterEvent * dee )
  */
 void TrackView::dropEvent( QDropEvent * de )
 {
-	QString type = StringPairDrag::decodeKey( de );
+	Clipboard::DataType type = StringPairDrag::decodeKey(de);
 	QString value = StringPairDrag::decodeValue( de );
-	if( type == ( "track_" + QString::number( static_cast<int>(m_track->type()) ) ) )
+	if (type == getTrackStringPairType(getTrack()))
 	{
 		// value contains our XML-data so simply create a
 		// DataFile which does the rest for us...
