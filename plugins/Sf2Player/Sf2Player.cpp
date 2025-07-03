@@ -123,7 +123,7 @@ struct Sf2PluginData
 
 Sf2Instrument::Sf2Instrument( InstrumentTrack * _instrument_track ) :
 	Instrument(_instrument_track, &sf2player_plugin_descriptor, nullptr, Flag::IsSingleStreamed),
-	m_resampler(Engine::audioEngine()->currentQualitySettings().interpolation),
+	m_resampler(AudioResampler::Mode::Linear),
 	m_synth(nullptr),
 	m_font( nullptr ),
 	m_fontId( 0 ),
@@ -613,8 +613,6 @@ void Sf2Instrument::reloadSynth()
 		m_synth = new_fluid_synth( m_settings );
 		m_synthMutex.unlock();
 	}
-
-	m_resampler = AudioResamplerStream{Engine::audioEngine()->currentQualitySettings().interpolation};
 
 	m_synthMutex.lock();
 	if (Engine::audioEngine()->currentQualitySettings().interpolation >= AudioResampler::Mode::SincFastest)
