@@ -74,38 +74,22 @@ public:
 	//! Moves the internal state from one resampler to another.
 	AudioResampler& operator=(AudioResampler&&) noexcept;
 
-	//! Resample audio from the input to the output.
-	//! The input and output buffers are advanced and shrunk by how many input frames were used and how many
-	//! output frames were generated respectively.
+	//! Resample audio from the @p input into the @p output at the assigned resampling ratio.
+	//! The @p endOfInput flag lets the resampler know that no more input will be given to it. Needed when
+	//! exporting the last block of audio to a file for example. For real-time playback cases, @p endOfInput should
+	//! always be set to `false`.
 	//! @return The resampling results. See @ref Result.
-	auto process() -> Result;
-
-	//! Set the input buffer view to @p input .
-	void setInput(InterleavedBufferView<const float> input);
-
-	//! Set the output buffer view to @p output .
-	void setOutput(InterleavedBufferView<float> output);
+	[[nodiscard]] auto process(InterleavedBufferView<const float> input, InterleavedBufferView<float> output,
+		bool endOfInput = false) -> Result;
 
 	//! Set the resampling ratio to @p ratio .
-	void setRatio(double ratio) { m_data.src_ratio = ratio; }
+	void setRatio(double ratio) { m_ratio = ratio; }
 
 	//! Set the resampling ratio to @p output / @p input .
-	void setRatio(sample_rate_t input, sample_rate_t output) { m_data.src_ratio = static_cast<double>(output) / input; }
-
-	//! @return The input buffer.
-	auto input() -> InterleavedBufferView<const float>
-	{
-		return {m_data.data_in, m_channels, static_cast<f_cnt_t>(m_data.input_frames)};
-	}
-
-	//! @return The output buffer.
-	auto output() -> InterleavedBufferView<float>
-	{
-		return {m_data.data_out, m_channels, static_cast<f_cnt_t>(m_data.output_frames)};
-	}
+	void setRatio(sample_rate_t input, sample_rate_t output) { m_ratio = static_cast<double>(output) / input; }
 
 	//! @return The resampling ratio.
-	auto ratio() const -> double { return m_data.src_ratio; }
+	auto ratio() const -> double { return m_ratio; }
 
 	//! @return The number of channels expected by the resampler.
 	auto channels() const -> ch_cnt_t { return m_channels; }
@@ -116,9 +100,9 @@ public:
 private:
 	static auto converterType(Mode mode) -> int;
 	SRC_STATE* m_state = nullptr;
-	SRC_DATA m_data{};
 	Mode m_mode;
 	ch_cnt_t m_channels = 0;
+	double m_ratio = 1.0;
 	int m_error = 0;
 };
 } // namespace lmms

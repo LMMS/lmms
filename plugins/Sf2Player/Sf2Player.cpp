@@ -867,26 +867,9 @@ void Sf2Instrument::renderFrames( f_cnt_t frames, SampleFrame* buf )
 	m_synthMutex.lock();
 	fluid_synth_get_gain(m_synth); // This flushes voice updates as a side effect
 
-	m_resampler.setOutput({&buf[0][0], DEFAULT_CHANNELS, frames});
 	m_resampler.setRatio(m_internalSampleRate, Engine::audioEngine()->outputSampleRate());
 
-	while (!m_resampler.output().empty())
-	{
-		if (m_resampler.input().empty())
-		{
-			fluid_synth_write_float(m_synth, m_inputBuffer.size(), m_inputBuffer.data(), 0, DEFAULT_CHANNELS,
-				m_inputBuffer.data(), 1, DEFAULT_CHANNELS);
-			m_resampler.setInput({&m_inputBuffer[0][0], DEFAULT_CHANNELS, m_inputBuffer.size()});
-		}
-
-		const auto result = m_resampler.process();
-
-		if (m_resampler.input().empty() && result.outputFramesGenerated == 0)
-		{
-			std::fill_n(m_resampler.output().data(), m_resampler.output().frames() * m_resampler.channels(), 0.f);
-			break;
-		}
-	}
+	// TODO: Implement
 
 	m_synthMutex.unlock();
 }

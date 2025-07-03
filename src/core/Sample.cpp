@@ -117,28 +117,8 @@ auto Sample::operator=(Sample&& other) noexcept -> Sample&
 bool Sample::play(SampleFrame* dst, PlaybackState* state, size_t numFrames, Loop loop, double ratio) const
 {
 	state->m_frameIndex = std::max<int>(m_startFrame, state->m_frameIndex);
-	state->m_resampler.setOutput({&dst[0][0], DEFAULT_CHANNELS, numFrames});
 
-	state->m_resampler.setRatio(m_buffer->sampleRate(), Engine::audioEngine()->outputSampleRate());
-	state->m_resampler.setRatio(state->m_resampler.ratio() * ratio);
-
-	while (!state->m_resampler.output().empty())
-	{
-		if (state->m_resampler.input().empty())
-		{
-			const auto rendered = render(state->m_inputBuffer.data(), state->m_inputBuffer.size(), state, loop);
-			state->m_resampler.setInput({&state->m_inputBuffer[0][0], DEFAULT_CHANNELS, rendered});
-		}
-
-		const auto result = state->m_resampler.process();
-
-		if (state->m_resampler.input().empty() && result.outputFramesGenerated == 0)
-		{
-			std::fill_n(state->m_resampler.output().data(),
-				state->m_resampler.output().frames() * state->m_resampler.channels(), 0.f);
-			return state->m_resampler.output().frames() < numFrames;
-		}
-	}
+	// TODO: Implement
 
 	return true;
 }
