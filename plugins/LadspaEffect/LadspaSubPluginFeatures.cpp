@@ -79,25 +79,10 @@ void LadspaSubPluginFeatures::fillDescriptionWidget( QWidget * _parent,
 	maker_label->setAlignment( Qt::AlignTop );
 	auto maker_content = new QLabel(maker);
 
-	auto makerString = lm->getMaker(lkey).toHtmlEscaped();
+	auto makerString = lm->getMaker(lkey);
 
-	makerString.replace("&lt;", "<");
-	makerString.replace("&gt;", ">");
-	makerString.replace("&amp;", "&");
-
-	if (makerString.contains("Andy Wingo"))
-	{
-		int startString = makerString.indexOf("<");
-		int endString = makerString.indexOf(">");
-		makerString.replace(startString + 1, endString - startString - 1, "wingo@pobox.com");
-	}
-	
-	if (makerString.contains("Jesse Chappel"))
-	{
-		int startString = makerString.indexOf("<");
-		int endString = makerString.indexOf(">");
-		makerString.replace(startString + 1, endString - startString - 1, "jesse@essej.net");
-	}
+	makerString.replace(" at ", "@");
+	makerString.replace(" dot ", ".");
 
 	maker_content->setTextFormat(Qt::PlainText);
 	maker_content->setText(makerString);
