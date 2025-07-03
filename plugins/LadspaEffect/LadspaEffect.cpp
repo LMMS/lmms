@@ -71,7 +71,6 @@ Plugin::Descriptor PLUGIN_EXPORT ladspaeffect_plugin_descriptor =
 LadspaEffect::LadspaEffect(Model* _parent, const Descriptor::SubPluginFeatures::Key* _key)
 	: Effect(&ladspaeffect_plugin_descriptor, _parent, _key)
 	, m_controls(nullptr)
-	, m_maxSampleRate(0)
 	, m_key(LadspaSubPluginFeatures::subPluginKeyToLadspaKey(_key))
 {
 	Ladspa2LMMS * manager = Engine::getLADSPAManager();
@@ -255,8 +254,6 @@ void LadspaEffect::setControl( int _control, LADSPA_Data _value )
 
 void LadspaEffect::pluginInstantiation()
 {
-	m_maxSampleRate = maxSamplerate( displayName() );
-
 	Ladspa2LMMS * manager = Engine::getLADSPAManager();
 
 	// Calculate how many processing units are needed.
@@ -388,7 +385,7 @@ void LadspaEffect::pluginInstantiation()
 			if( manager->areHintsSampleRateDependent(
 								m_key, port ) )
 			{
-				p->max *= m_maxSampleRate;
+				p->max *= Engine::audioEngine()->outputSampleRate();
 			}
 
 			p->min = manager->getLowerBound( m_key, port );
@@ -400,7 +397,7 @@ void LadspaEffect::pluginInstantiation()
 			if( manager->areHintsSampleRateDependent(
 								m_key, port ) )
 			{
-				p->min *= m_maxSampleRate;
+				p->min *= Engine::audioEngine()->outputSampleRate();
 			}
 
 			p->def = manager->getDefaultSetting( m_key, port );
@@ -417,7 +414,7 @@ void LadspaEffect::pluginInstantiation()
 			}
 			else if( manager->areHintsSampleRateDependent( m_key, port ) )
 			{
-				p->def *= m_maxSampleRate;
+				p->def *= Engine::audioEngine()->outputSampleRate();
 			}
 
 
@@ -462,8 +459,7 @@ void LadspaEffect::pluginInstantiation()
 	}
 	for( ch_cnt_t proc = 0; proc < processorCount(); proc++ )
 	{
-		LADSPA_Handle effect = manager->instantiate( m_key,
-							m_maxSampleRate );
+		LADSPA_Handle effect = manager->instantiate(m_key, Engine::audioEngine()->outputSampleRate());
 		if( effect == nullptr )
 		{
 			QMessageBox::warning( 0, "Effect",
@@ -535,33 +531,6 @@ void LadspaEffect::pluginDestruction()
 	m_handles.clear();
 	m_portControls.clear();
 }
-
-
-
-
-
-
-static QMap<QString, sample_rate_t> __buggy_plugins;
-
-sample_rate_t LadspaEffect::maxSamplerate( const QString & _name )
-{
-	// TODO: Add disclaimer that using certain sample rates may cause problems with some plugins
-	if( __buggy_plugins.isEmpty() )
-	{
-		__buggy_plugins["C* AmpVTS"] = 88200;
-		__buggy_plugins["Chorus2"] = 44100;
-		__buggy_plugins["Notch Filter"] = 96000;
-		__buggy_plugins["TAP Reflector"] = 192000;
-	}
-	if( __buggy_plugins.contains( _name ) )
-	{
-		return( __buggy_plugins[_name] );
-	}
-	return( Engine::audioEngine()->outputSampleRate() );
-}
-
-
-
 
 extern "C"
 {
