@@ -110,6 +110,11 @@ public:
 	struct qualitySettings
 	{
 		AudioResampler::Mode interpolation;
+
+		explicit qualitySettings(AudioResampler::Mode interpolation)
+			: interpolation(interpolation)
+		{
+		}
 	};
 
 	void initDevices();
