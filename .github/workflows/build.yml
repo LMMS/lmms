@@ -86,7 +86,7 @@ jobs:
           source /opt/qt5*/bin/qt5*-env.sh || true
           cmake -S . \
                 -B build \
-                $CMAKE_OPTS
+                $CMAKE_OPTS \
                 "-DWINE_CXX_FLAGS=--winebuild $WINEBUILD_PATCHED"
       - name: Build
         run: cmake --build build
