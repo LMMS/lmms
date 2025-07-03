@@ -27,7 +27,7 @@
 
 #include <memory>
 
-#include "AudioResampler.h"
+#include "AudioResamplerStream.h"
 #include "Note.h"
 #include "SampleBuffer.h"
 #include "lmms_export.h"
@@ -59,8 +59,7 @@ public:
 		void setBackwards(bool backwards) { m_backwards = backwards; }
 
 	private:
-		AudioResampler m_resampler;
-		std::array<SampleFrame, 64> m_inputBuffer;
+		AudioResamplerStream m_resampler;
 		int m_frameIndex = 0;
 		bool m_backwards = false;
 		friend class Sample;

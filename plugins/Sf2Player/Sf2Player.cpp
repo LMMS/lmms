@@ -869,7 +869,13 @@ void Sf2Instrument::renderFrames( f_cnt_t frames, SampleFrame* buf )
 
 	m_resampler.setRatio(m_internalSampleRate, Engine::audioEngine()->outputSampleRate());
 
-	// TODO: Implement
+	m_resampler.resample<AudioResamplerStream::WriteMode::Copy>(
+		[&](InterleavedBufferView<float> output) {
+			const auto err = fluid_synth_write_float(
+				m_synth, output.frames(), output.data(), 0, DEFAULT_CHANNELS, output.data(), 1, DEFAULT_CHANNELS);
+			return err == FLUID_OK ? output.frames() : 0;
+		},
+		{&buf[0][0], DEFAULT_CHANNELS, frames});
 
 	m_synthMutex.unlock();
 }

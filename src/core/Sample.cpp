@@ -117,10 +117,16 @@ auto Sample::operator=(Sample&& other) noexcept -> Sample&
 bool Sample::play(SampleFrame* dst, PlaybackState* state, size_t numFrames, Loop loop, double ratio) const
 {
 	state->m_frameIndex = std::max<int>(m_startFrame, state->m_frameIndex);
+	state->m_resampler.setRatio(m_buffer->sampleRate(), Engine::audioEngine()->outputSampleRate());
+	state->m_resampler.setRatio(state->m_resampler.ratio() * ratio);
 
-	// TODO: Implement
+	const auto result = state->m_resampler.resample<AudioResamplerStream::WriteMode::Copy>(
+		[&](InterleavedBufferView<float> output) {
+			return render(reinterpret_cast<SampleFrame*>(output[0]), output.frames(), state, loop);
+		},
+		{&dst[0][0], DEFAULT_CHANNELS, numFrames});
 
-	return true;
+	return result.outputFramesGenerated > 0;
 }
 
 f_cnt_t Sample::render(SampleFrame* dst, f_cnt_t size, PlaybackState* state, Loop loop) const
@@ -133,7 +139,10 @@ f_cnt_t Sample::render(SampleFrame* dst, f_cnt_t size, PlaybackState* state, Loo
 			if (state->m_frameIndex < 0 || state->m_frameIndex >= m_endFrame) { return frame; }
 			break;
 		case Loop::On:
-			if (state->m_frameIndex < m_loopStartFrame && state->m_backwards) { state->m_frameIndex = m_loopEndFrame - 1; }
+			if (state->m_frameIndex < m_loopStartFrame && state->m_backwards)
+			{
+				state->m_frameIndex = m_loopEndFrame - 1;
+			}
 			else if (state->m_frameIndex >= m_loopEndFrame) { state->m_frameIndex = m_loopStartFrame; }
 			break;
 		case Loop::PingPong:
@@ -152,7 +161,8 @@ f_cnt_t Sample::render(SampleFrame* dst, f_cnt_t size, PlaybackState* state, Loo
 			break;
 		}
 
-		const auto value = m_buffer->data()[m_reversed ? m_buffer->size() - state->m_frameIndex - 1 : state->m_frameIndex];
+		const auto value
+			= m_buffer->data()[m_reversed ? m_buffer->size() - state->m_frameIndex - 1 : state->m_frameIndex];
 		dst[frame] = value * m_amplification;
 		state->m_backwards ? --state->m_frameIndex : ++state->m_frameIndex;
 	}

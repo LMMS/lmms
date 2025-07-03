@@ -431,10 +431,21 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 			// resampling, the ADSR doesn't get messed up
 			ADSR copy = sample.adsr;
 
-			auto numFramesMixed = f_cnt_t{0};
 			sample.m_resampler.setRatio(freq_factor);
 
-			// TODO: Implement
+			sample.m_resampler.resample<AudioResamplerStream::WriteMode::Mix>([&](InterleavedBufferView<float> output)
+			{
+				loadSample(sample, reinterpret_cast<SampleFrame*>(output[0]), output.frames());
+
+				for (auto frame = std::size_t{0}; frame < output.frames(); ++frame)
+				{
+					const auto amp = copy.value();
+					output[frame][0] *= amp;
+					output[frame][1] *= amp;
+				}
+
+				return output.frames();
+			}, {&_working_buffer[0][0], DEFAULT_CHANNELS, frames});
 		}
 	}
 
@@ -1070,7 +1081,7 @@ GigSample::GigSample(const GigSample& g)
 	, attenuation(g.attenuation)
 	, adsr(g.adsr)
 	, pos(g.pos)
-	, m_resampler(g.m_resampler.mode(), g.m_resampler.channels())
+	, m_resampler(AudioResampler::Mode::Linear, DEFAULT_CHANNELS)
 	, sampleFreq(g.sampleFreq)
 	, freqFactor(g.freqFactor)
 {

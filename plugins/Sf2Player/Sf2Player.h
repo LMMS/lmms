@@ -32,7 +32,7 @@
 #include <QMutex>
 #include <samplerate.h>
 
-#include "AudioResampler.h"
+#include "AudioResamplerStream.h"
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "LcdSpinBox.h"
@@ -106,8 +106,7 @@ public slots:
 	void updateTuning();
 
 private:
-	AudioResampler m_resampler;
-	std::array<SampleFrame, 64> m_inputBuffer;
+	AudioResamplerStream m_resampler;
 
 	fluid_settings_t* m_settings;
 	fluid_synth_t* m_synth;
