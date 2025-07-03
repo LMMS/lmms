@@ -614,6 +614,8 @@ void Sf2Instrument::reloadSynth()
 		m_synthMutex.unlock();
 	}
 
+	m_resampler = AudioResamplerStream{Engine::audioEngine()->currentQualitySettings().interpolation};
+
 	m_synthMutex.lock();
 	if (Engine::audioEngine()->currentQualitySettings().interpolation >= AudioResampler::Mode::SincFastest)
 	{
