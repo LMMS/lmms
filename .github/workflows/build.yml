@@ -88,6 +88,8 @@ jobs:
                 -B build \
                 $CMAKE_OPTS \
                 "-DWINE_CXX_FLAGS=--winebuild $WINEBUILD_PATCHED"
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
       - name: Build
         run: cmake --build build
       - name: Run tests
