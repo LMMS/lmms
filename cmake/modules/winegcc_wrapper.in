@@ -63,7 +63,7 @@ fi
 extra_args="$extra_args -D__WIDL_objidl_generated_name_0000000C="
 
 # Run winegcc
-export WINEBUILD="$GITHUB_WORKSPACE"/winebuild-patch/winebuild-patched
+export WINEBUILD=@WINE_BUILD@
 @WINE_CXX@ $extra_args $args
 
 if [ "$no_move" = true ] || [ "$no_link" = true ]; then

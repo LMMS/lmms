@@ -9,7 +9,7 @@ diff -Naur wine-10.0/tools/winebuild/main.c wine-10.0-patched/tools/winebuild/ma
          }
 +        /* Disable DYNAMIC_BASE to fix VST crashes */
 +        spec->dll_characteristics &= ~IMAGE_DLLCHARACTERISTICS_DYNAMIC_BASE;
- 
+
          files = load_resources( files, spec );
          if (spec_file_name && !parse_input_file( spec )) break;
 diff -Naur wine-10.0/tools/winebuild/spec32.c wine-10.0-patched/tools/winebuild/spec32.c

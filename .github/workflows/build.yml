@@ -79,14 +79,7 @@ jobs:
           cd tools/winebuild
           make
           mv winebuild ../../../winebuild-patched
-      - name: Setup tmate session
-        if: ${{ failure() }}
-        uses: mxschmitt/action-tmate@v3
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: winebuild-patched
-          path: winebuild-patch/winebuild-patched
+          echo WINEBUILD_PATCHED="$GITHUB_WORKSPACE"/winebuild-patch/winebuild-patched >> "$GITHUB_ENV"
       - name: Configure
         run: |
           ccache --zero-stats
@@ -94,6 +87,7 @@ jobs:
           cmake -S . \
                 -B build \
                 $CMAKE_OPTS
+                "-DWINE_CXX_FLAGS=--winebuild $WINEBUILD_PATCHED"
       - name: Build
         run: cmake --build build
       - name: Run tests
