@@ -436,6 +436,8 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 			sample.m_resampler.resample<AudioResamplerStream::WriteMode::Mix>([&](InterleavedBufferView<float> output)
 			{
 				loadSample(sample, reinterpret_cast<SampleFrame*>(output[0]), output.frames());
+				sample.pos += output.frames();
+				sample.adsr.inc(output.frames());
 
 				for (auto frame = std::size_t{0}; frame < output.frames(); ++frame)
 				{
