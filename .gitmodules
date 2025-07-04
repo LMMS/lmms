@@ -47,3 +47,7 @@
 [submodule "src/3rdparty/hiir/hiir"]
 	path = src/3rdparty/hiir/hiir
 	url = https://github.com/LostRobotMusic/hiir
+[submodule "plugins/VstBase/custom-winebuild"]
+	path = plugins/VstBase/custom-winebuild
+	url = https://github.com/Fastigium/winebuild
+	branch = disable-dynamic-base

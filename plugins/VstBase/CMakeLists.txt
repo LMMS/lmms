@@ -47,6 +47,18 @@ foreach(var ${export_variables})
 	_export_var_to_external(${var})
 endforeach()
 
+# If we're building wine-powered RemoteVstPlugins for Linux,
+# use a custom winebuild to fix ASLR-related VST crashes
+IF(LMMS_BUILD_LINUX AND (LMMS_HAVE_VST_32 OR LMMS_HAVE_VST_64))
+	ExternalProject_Add(custom-winebuild
+		SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/custom-winebuild"
+		BUILD_ALWAYS ON
+		INSTALL_COMMAND ""
+	)
+	ExternalProject_Get_property(custom-winebuild BINARY_DIR)
+	set(CUSTOM_WINEBUILD_EXECUTABLE "${BINARY_DIR}/winebuild")
+ENDIF()
+
 # build 32 bit version of RemoteVstPlugin
 if(LMMS_HAVE_VST_32)
 	INCLUDE("${CMAKE_CURRENT_LIST_DIR}/RemoteVstPlugin32.cmake")
