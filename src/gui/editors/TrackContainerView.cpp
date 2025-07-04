@@ -355,9 +355,17 @@ void TrackContainerView::setPixelsPerBar( int ppb )
 
 void TrackContainerView::setTrackHeadWidth(int width)
 {
-	m_trackHeadWidth = std::max(width, MINIMUM_TRACK_WIDTH);
-
+	m_trackHeadWidth = m_maxTrackHeadWidth > 0
+		? std::clamp(width, MINIMUM_TRACK_WIDTH, m_maxTrackHeadWidth)
+		: std::max(width, MINIMUM_TRACK_WIDTH);
 	emit trackHeadWidthChanged(m_trackHeadWidth);
+}
+
+void TrackContainerView::setMaxTrackHeadWidth(int maxWidth)
+{
+	m_maxTrackHeadWidth = maxWidth;
+	// Update width
+	setTrackHeadWidth(m_trackHeadWidth);
 }
 
 

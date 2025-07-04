@@ -143,6 +143,11 @@ public:
 	int getTrackHeadWidth() const { return m_trackHeadWidth; }
 	void setTrackHeadWidth(int width);
 
+	//! This function only exists because the pattern editor cannot yet handle scrolling, so the track head cannot
+	//! extend too far or it will cause the clips to have 0 width.
+	//! Once proper scrolling and zooming is implemented, this can be removed.
+	void setMaxTrackHeadWidth(int maxWidth);
+
 	void clearAllTracks();
 
 	QString nodeName() const override
@@ -200,6 +205,9 @@ private:
 	float m_ppb;
 
 	int m_trackHeadWidth;
+
+	//! This variable can be removed once the Pattern Editor supports scrolling.
+	int m_maxTrackHeadWidth = -1;
 
 	RubberBand * m_rubberBand;
 
