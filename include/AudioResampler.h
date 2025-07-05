@@ -82,6 +82,10 @@ public:
 	[[nodiscard]] auto process(InterleavedBufferView<const float> input, InterleavedBufferView<float> output,
 		bool endOfInput = false) -> Result;
 
+	//! Reset the resampler state.
+	//! Needed when working on unrelated pieces of audio.
+	void reset();
+
 	//! Set the resampling ratio to @p ratio .
 	void setRatio(double ratio) { m_ratio = ratio; }
 

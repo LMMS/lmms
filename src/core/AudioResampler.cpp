@@ -83,6 +83,11 @@ auto AudioResampler::process(
 	return {static_cast<f_cnt_t>(data.input_frames_used), static_cast<f_cnt_t>(data.output_frames_gen)};
 }
 
+void AudioResampler::reset()
+{
+	if ((m_error = src_reset(m_state))) { throw std::runtime_error{src_strerror(m_error)}; }
+}
+
 auto AudioResampler::converterType(Mode mode) -> int
 {
 	switch (mode)
