@@ -31,12 +31,16 @@
 namespace lmms
 {
 
-AudioDevice::AudioDevice( const ch_cnt_t _channels, AudioEngine*  _audioEngine ) :
-	m_supportsCapture( false ),
-	m_sampleRate( _audioEngine->outputSampleRate() ),
-	m_channels( _channels ),
-	m_audioEngine( _audioEngine ),
-	m_buffer(new SampleFrame[audioEngine()->framesPerPeriod()])
+AudioDevice::AudioDevice(const ch_cnt_t _channels, AudioEngine* _audioEngine)
+	: m_supportsCapture(false)
+	, m_framesPerPeriod(
+		  std::clamp<fpp_t>(ConfigManager::inst()
+								->value("audioengine", "framesperaudiobuffer", QString::number(DEFAULT_BUFFER_SIZE))
+								.toULong(),
+			  MINIMUM_BUFFER_SIZE, MAXIMUM_BUFFER_SIZE))
+	, m_sampleRate(_audioEngine->outputSampleRate())
+	, m_channels(_channels)
+	, m_audioEngine(_audioEngine)
 {
 }
 
@@ -45,53 +49,65 @@ AudioDevice::AudioDevice( const ch_cnt_t _channels, AudioEngine*  _audioEngine )
 
 AudioDevice::~AudioDevice()
 {
-	delete[] m_buffer;
 	m_devMutex.tryLock();
 	unlock();
 }
 
-
-
-
-void AudioDevice::processNextBuffer()
+void AudioDevice::startProcessing()
 {
-	const fpp_t frames = getNextBuffer( m_buffer );
-	if (frames) { writeBuffer(m_buffer, frames); }
-	else
-	{
-		m_inProcess = false;
-	}
+	m_running.test_and_set(std::memory_order_acquire);
+	startProcessingImpl();
 }
-
-fpp_t AudioDevice::getNextBuffer(SampleFrame* _ab)
-{
-	fpp_t frames = audioEngine()->framesPerPeriod();
-	const SampleFrame* b = audioEngine()->nextBuffer();
-
-	if (!b) { return 0; }
-
-	memcpy(_ab, b, frames * sizeof(SampleFrame));
-
-	if (audioEngine()->hasFifoWriter()) { delete[] b; }
-	return frames;
-}
-
-
-
 
 void AudioDevice::stopProcessing()
 {
-	if( audioEngine()->hasFifoWriter() )
+	m_running.clear(std::memory_order_release);
+	stopProcessingImpl();
+}
+
+void AudioDevice::nextBuffer(InterleavedBufferView<float> dst)
+{
+	for (auto frame = std::size_t{0}; frame < dst.frames(); ++frame)
 	{
-		while( m_inProcess )
+		if (m_audioEngineBufferIndex == 0) { m_audioEngineBuffer = m_audioEngine->renderNextBuffer(); }
+		const auto audioEngineFrame = m_audioEngineBuffer[m_audioEngineBufferIndex];
+
+		for (auto channel = 0; channel < dst.channels(); ++channel)
 		{
-			processNextBuffer();
+			if (dst.channels() == 1)
+			{
+				dst[frame][0] = audioEngineFrame.average();
+				continue;
+			}
+
+			dst[frame][channel] = channel < DEFAULT_CHANNELS ? audioEngineFrame[channel] : 0.f;
 		}
+
+		m_audioEngineBufferIndex = (m_audioEngineBufferIndex + 1) % m_audioEngine->framesPerPeriod();
 	}
 }
 
+void AudioDevice::nextBuffer(PlanarBufferView<float> dst)
+{
+	for (auto frame = std::size_t{0}; frame < dst.frames(); ++frame)
+	{
+		if (m_audioEngineBufferIndex == 0) { m_audioEngineBuffer = m_audioEngine->renderNextBuffer(); }
+		const auto audioEngineFrame = m_audioEngineBuffer[m_audioEngineBufferIndex];
 
+		for (auto channel = 0; channel < dst.channels(); ++channel)
+		{
+			if (dst.channels() == 1)
+			{
+				dst[channel][frame] = audioEngineFrame.average();
+				continue;
+			}
 
+			dst[channel][frame] = channel < DEFAULT_CHANNELS ? audioEngineFrame[channel] : 0.f;
+		}
+
+		m_audioEngineBufferIndex = (m_audioEngineBufferIndex + 1) % m_audioEngine->framesPerPeriod();
+	}
+}
 
 void AudioDevice::stopProcessingThread( QThread * thread )
 {

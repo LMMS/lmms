@@ -90,8 +90,8 @@ private:
 	bool initJackClient();
 	void resizeInputBuffer(jack_nframes_t nframes);
 
-	void startProcessing() override;
-	void stopProcessing() override;
+	void startProcessingImpl() override;
+	void stopProcessingImpl() override;
 
 	void registerPort(AudioBusHandle* port) override;
 	void unregisterPort(AudioBusHandle* port) override;
