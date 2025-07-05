@@ -433,8 +433,9 @@ void ClipView::dragEnterEvent( QDragEnterEvent * dee )
 	}
 	else
 	{
-		StringPairDrag::processDragEnterEvent( dee, "clip_" +
-					QString::number( static_cast<int>(m_clip->getTrack()->type()) ) );
+		StringPairDrag::processDragEnterEvent(dee, {
+			QString("clip_%1").arg(static_cast<int>(m_clip->getTrack()->type()))
+		});
 	}
 }
 
@@ -450,14 +451,14 @@ void ClipView::dragEnterEvent( QDragEnterEvent * dee )
  *
  * \param de The QDropEvent to handle.
  */
-void ClipView::dropEvent( QDropEvent * de )
+void ClipView::dropEvent(QDropEvent* de)
 {
-	QString type = StringPairDrag::decodeKey( de );
-	QString value = StringPairDrag::decodeValue( de );
+	const auto [type, value] = Clipboard::decodeMimeData(de->mimeData());
 
 	// Track must be the same type to paste into
 	if( type != ( "clip_" + QString::number( static_cast<int>(m_clip->getTrack()->type()) ) ) )
 	{
+		de->ignore();
 		return;
 	}
 
@@ -471,6 +472,7 @@ void ClipView::dropEvent( QDropEvent * de )
 		{
 			de->accept();
 		}
+		de->ignore();
 		return;
 	}
 
@@ -479,6 +481,7 @@ void ClipView::dropEvent( QDropEvent * de )
 	if( qwSource != nullptr &&
 	    dynamic_cast<ClipView *>( qwSource ) == this )
 	{
+		de->ignore();
 		return;
 	}
 

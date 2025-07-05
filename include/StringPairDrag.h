@@ -46,10 +46,11 @@ public:
 					const QPixmap & _icon, QWidget * _w );
 	~StringPairDrag() override;
 
-	static bool processDragEnterEvent( QDragEnterEvent * _dee,
-						const QString & _allowed_keys );
-	static QString decodeKey( QDropEvent * _de );
-	static QString decodeValue( QDropEvent * _de );
+	static bool processDragEnterEvent(QDragEnterEvent* dee, std::initializer_list<QString> allowedKeys);
+	//! use QString Clipboard::decodeKey(QMimeData) instead
+	static QString decodeKey(QDropEvent* de);
+	//! use QString Clipboard::decodeValue(QMimeData) instead
+	static QString decodeValue(QDropEvent* de);
 } ;
 
 
