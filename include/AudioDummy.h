@@ -91,7 +91,7 @@ private:
 	void run() override
 	{
 		MicroTimer timer;
-		while (true)
+		while (AudioDevice::isRunning())
 		{
 			timer.reset();
 			audioEngine()->renderNextBuffer();

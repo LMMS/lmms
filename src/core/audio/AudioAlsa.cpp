@@ -225,10 +225,7 @@ int AudioAlsa::handleError( int _err )
 
 void AudioAlsa::startProcessingImpl()
 {
-	if( !isRunning() )
-	{
-		start( QThread::HighPriority );
-	}
+	start(QThread::HighPriority);
 }
 
 
@@ -242,8 +239,10 @@ void AudioAlsa::stopProcessingImpl()
 void AudioAlsa::run()
 {
 	auto buf = std::vector<float>(framesPerPeriod() * channels());
-	while (nextBuffer({buf.data(), channels(), framesPerPeriod()}))
+	while (AudioDevice::isRunning())
 	{
+		nextBuffer({buf.data(), channels(), framesPerPeriod()});
+
 		if (const auto framesWritten = snd_pcm_writei(m_handle, buf.data(), framesPerPeriod()); framesWritten < 0)
 		{
 			handleError(framesWritten);

@@ -292,8 +292,7 @@ void AudioSoundIo::writeCallback(int frameCountMin, int frameCountMax)
 			buffers[i] = reinterpret_cast<float*>(areas[i].ptr);
 		}
 
-		if (!nextBuffer(
-				{buffers.data(), static_cast<proc_ch_t>(layout->channel_count), static_cast<f_cnt_t>(frameCount)}))
+		if (!isRunning())
 		{
 			for (auto i = 0; i < layout->channel_count; ++i)
 			{
@@ -301,6 +300,11 @@ void AudioSoundIo::writeCallback(int frameCountMin, int frameCountMax)
 			}
 
 			break;
+		}
+		else
+		{
+			nextBuffer(
+				{buffers.data(), static_cast<proc_ch_t>(layout->channel_count), static_cast<f_cnt_t>(frameCount)});
 		}
 
 		if (int err = soundio_outstream_end_write(m_outstream))

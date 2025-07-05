@@ -210,10 +210,7 @@ QString AudioOss::probeDevice()
 
 void AudioOss::startProcessingImpl()
 {
-	if( !isRunning() )
-	{
-		start( QThread::HighPriority );
-	}
+	start(QThread::HighPriority);
 }
 
 
@@ -230,8 +227,10 @@ void AudioOss::run()
 	auto pcmBuf = std::vector<int16_t>(buf.size());
 	const auto bytesToWrite = static_cast<int>(pcmBuf.size() * sizeof(int16_t));
 
-	while (nextBuffer({buf.data(), channels(), framesPerPeriod()}))
+	while (AudioDevice::isRunning())
 	{
+		nextBuffer({buf.data(), channels(), framesPerPeriod()});
+
 		for (auto i = std::size_t{0}; i < buf.size(); ++i)
 		{
 			pcmBuf[i] = static_cast<int16_t>(buf[i] * OUTPUT_SAMPLE_MULTIPLIER);

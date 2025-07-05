@@ -236,12 +236,13 @@ int AudioPortAudio::process_callback(const float* _inputBuffer, float* _outputBu
 		audioEngine()->pushInputFrames( (SampleFrame*)_inputBuffer, _framesPerBuffer );
 	}
 
-	if (!nextBuffer({_outputBuffer, channels(), _framesPerBuffer}))
+	if (!isRunning())
 	{
 		std::fill_n(_outputBuffer, _framesPerBuffer * channels(), 0.f);
 		return paComplete;
 	}
 
+	nextBuffer({_outputBuffer, channels(), _framesPerBuffer});
 	return paContinue;
 }
 

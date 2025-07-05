@@ -53,14 +53,20 @@ AudioDevice::~AudioDevice()
 	unlock();
 }
 
-bool AudioDevice::nextBuffer(InterleavedBufferView<float> dst)
+void AudioDevice::startProcessing()
 {
-	if (!m_running.test_and_set(std::memory_order_acquire))
-	{
-		m_running.clear(std::memory_order_release);
-		return false;
-	}
+	m_running.test_and_set(std::memory_order_acquire);
+	startProcessingImpl();
+}
 
+void AudioDevice::stopProcessing()
+{
+	m_running.clear(std::memory_order_release);
+	stopProcessingImpl();
+}
+
+void AudioDevice::nextBuffer(InterleavedBufferView<float> dst)
+{
 	for (auto frame = std::size_t{0}; frame < dst.frames(); ++frame)
 	{
 		if (m_audioEngineBufferIndex == 0) { m_audioEngineBuffer = m_audioEngine->renderNextBuffer(); }
@@ -79,18 +85,10 @@ bool AudioDevice::nextBuffer(InterleavedBufferView<float> dst)
 
 		m_audioEngineBufferIndex = (m_audioEngineBufferIndex + 1) % m_audioEngine->framesPerPeriod();
 	}
-
-	return true;
 }
 
-bool AudioDevice::nextBuffer(PlanarBufferView<float> dst)
+void AudioDevice::nextBuffer(PlanarBufferView<float> dst)
 {
-	if (!m_running.test_and_set(std::memory_order_acquire))
-	{
-		m_running.clear(std::memory_order_release);
-		return false;
-	}
-
 	for (auto frame = std::size_t{0}; frame < dst.frames(); ++frame)
 	{
 		if (m_audioEngineBufferIndex == 0) { m_audioEngineBuffer = m_audioEngine->renderNextBuffer(); }
@@ -109,8 +107,6 @@ bool AudioDevice::nextBuffer(PlanarBufferView<float> dst)
 
 		m_audioEngineBufferIndex = (m_audioEngineBufferIndex + 1) % m_audioEngine->framesPerPeriod();
 	}
-
-	return true;
 }
 
 void AudioDevice::stopProcessingThread( QThread * thread )

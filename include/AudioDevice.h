@@ -78,26 +78,20 @@ public:
 
 	fpp_t framesPerPeriod() const { return m_framesPerPeriod; }
 
-	void startProcessing()
-	{
-		m_running.test_and_set(std::memory_order_acquire);
-		startProcessingImpl();
-	}
+	void startProcessing();
 
-	void stopProcessing()
-	{
-		m_running.clear(std::memory_order_release);
-		stopProcessingImpl();
-	}
+	void stopProcessing();
+
+	bool isRunning() const { return m_running.test(std::memory_order_acquire); }
 
 protected:
 	//! Render the next audio playback buffer into @p dst.
 	//! @return `true` if playback was rendered into @p dst.
-	bool nextBuffer(InterleavedBufferView<float> dst);
+	void nextBuffer(InterleavedBufferView<float> dst);
 
 	//! Render the next audio playback buffer into @p dst.
 	//! @return `true` if playback was rendered into @p dst.
-	bool nextBuffer(PlanarBufferView<float> dst);
+	void nextBuffer(PlanarBufferView<float> dst);
 
 	// convert a given audio-buffer to a buffer in signed 16-bit samples
 	// returns num of bytes in outbuf
