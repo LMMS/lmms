@@ -192,6 +192,8 @@ private:
 	{
 		auto srcIndex = f_cnt_t{0};
 		auto dstIndex = f_cnt_t{0};
+
+		resampler.reset();
 		resampler.setRatio(WAVERATIO);
 
 		while (dstIndex < WAVELEN)
