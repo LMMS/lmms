@@ -75,15 +75,16 @@ public:
 	AudioResampler& operator=(AudioResampler&&) noexcept;
 
 	//! Resample audio from the @p input into the @p output at the assigned resampling ratio.
-	//! The @p endOfInput flag lets the resampler know that no more input will be given to it. Needed when
-	//! exporting the last block of audio to a file for example. For real-time playback cases, @p endOfInput should
-	//! always be set to `false`.
 	//! @return The resampling results. See @ref Result.
-	[[nodiscard]] auto process(InterleavedBufferView<const float> input, InterleavedBufferView<float> output,
-		bool endOfInput = false) -> Result;
+	[[nodiscard]] auto process(InterleavedBufferView<const float> input, InterleavedBufferView<float> output) -> Result;
 
-	//! Reset the resampler state.
-	//! Needed when working on unrelated pieces of audio.
+	//! Flushes any internally buffered samples into @p output . Can be repeatedly called to flush all samples. Flushing
+	//! should only be done when no more further calls to @ref process will be made.
+	//!
+	//! @return The number of output frames generated.
+	[[nodiscard]] auto flush(InterleavedBufferView<float> output) -> f_cnt_t;
+
+	//! Reset the resampler state. Needed when working on unrelated pieces of audio.
 	void reset();
 
 	//! Set the resampling ratio to @p ratio .

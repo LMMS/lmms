@@ -59,8 +59,7 @@ AudioResampler& AudioResampler::operator=(AudioResampler&& other) noexcept
 	return *this;
 }
 
-auto AudioResampler::process(
-	InterleavedBufferView<const float> input, InterleavedBufferView<float> output, bool endOfInput) -> Result
+auto AudioResampler::process(InterleavedBufferView<const float> input, InterleavedBufferView<float> output) -> Result
 {
 	if (input.channels() != m_channels || output.channels() != m_channels)
 	{
@@ -76,11 +75,40 @@ auto AudioResampler::process(
 	data.output_frames = output.frames();
 
 	data.src_ratio = m_ratio;
-	data.end_of_input = endOfInput;
+	data.end_of_input = 0;
 
 	if ((m_error = src_process(m_state, &data))) { throw std::runtime_error{src_strerror(m_error)}; }
 
 	return {static_cast<f_cnt_t>(data.input_frames_used), static_cast<f_cnt_t>(data.output_frames_gen)};
+}
+
+auto AudioResampler::flush(InterleavedBufferView<float> output) -> f_cnt_t
+{
+	if (output.channels() != m_channels) { throw std::invalid_argument{"Invalid channel count"}; }
+
+	auto data = SRC_DATA{};
+	auto outputFramesGenerated = f_cnt_t{0};
+
+	data.data_in = nullptr;
+	data.input_frames = 0;
+
+	data.data_out = output.data();
+	data.output_frames = output.frames();
+
+	data.src_ratio = m_ratio;
+	data.end_of_input = 1;
+
+	while (!output.empty())
+	{
+		if ((m_error = src_process(m_state, &data))) { throw std::runtime_error{src_strerror(m_error)}; }
+		if (data.output_frames_gen == 0) { break; }
+
+		outputFramesGenerated += data.output_frames_gen;
+		output = InterleavedBufferView<float>{
+			output.data() + data.output_frames_gen * m_channels, m_channels, output.frames() - data.output_frames_gen};
+	}
+
+	return outputFramesGenerated;
 }
 
 void AudioResampler::reset()
