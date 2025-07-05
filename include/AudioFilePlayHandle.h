@@ -45,7 +45,7 @@ public:
 	AudioFilePlayHandle& operator=(const AudioFilePlayHandle&) = delete;
 	AudioFilePlayHandle& operator=(AudioFilePlayHandle&&) = delete;
 
-	~AudioFilePlayHandle() noexcept;
+	~AudioFilePlayHandle();
 
 	void play(SampleFrame* dst) override;
 	f_cnt_t seek(f_cnt_t frames, AudioFile::Whence whence);

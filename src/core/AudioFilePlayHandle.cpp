@@ -40,7 +40,7 @@ AudioFilePlayHandle::AudioFilePlayHandle(const std::filesystem::path& path, int 
 	setAudioBusHandle(new AudioBusHandle("AudioFilePlayHandle", false));
 }
 
-AudioFilePlayHandle::~AudioFilePlayHandle() noexcept
+AudioFilePlayHandle::~AudioFilePlayHandle()
 {
 	delete audioBusHandle();
 }
