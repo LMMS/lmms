@@ -78,12 +78,6 @@ public:
 	//! @return The resampling results. See @ref Result.
 	[[nodiscard]] auto process(InterleavedBufferView<const float> input, InterleavedBufferView<float> output) -> Result;
 
-	//! Flushes any internally buffered samples into @p output . Can be repeatedly called to flush all samples. Flushing
-	//! should only be done when no more further calls to @ref process will be made.
-	//!
-	//! @return The number of output frames generated.
-	[[nodiscard]] auto flush(InterleavedBufferView<float> output) -> f_cnt_t;
-
 	//! Reset the resampler state. Needed when working on unrelated pieces of audio.
 	void reset();
 
