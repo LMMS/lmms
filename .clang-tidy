@@ -20,7 +20,6 @@ Checks: >
   readability-simplify-boolean-expr
 WarningsAsErrors: ''
 HeaderFilterRegex: '' # don't show errors from headers
-AnalyzeTemporaryDtors: false
 FormatStyle:     none
 User:            user
 CheckOptions:    

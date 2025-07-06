@@ -79,10 +79,14 @@ Plugin::Descriptor Q_DECL_EXPORT  vestige_plugin_descriptor =
 	0x0100,
 	Plugin::Type::Instrument,
 	new PluginPixmapLoader( "logo" ),
-#ifdef LMMS_BUILD_LINUX
-	"dll,so",
-#else
+#if defined(LMMS_BUILD_WIN32)
 	"dll",
+#elif defined(LMMS_BUILD_LINUX)
+#	if defined(LMMS_HAVE_VST_32) || defined(LMMS_HAVE_VST_64)
+		"dll,so",
+#	else
+		"so",
+#	endif
 #endif
 	nullptr,
 } ;
@@ -669,13 +673,17 @@ void VestigeInstrumentView::openPlugin()
 
 	// set filters
 	QStringList types;
-	types << tr( "DLL-files (*.dll)" )
-		<< tr( "EXE-files (*.exe)" )
-#ifdef LMMS_BUILD_LINUX
-		<< tr( "SO-files (*.so)" )
+#if defined(LMMS_BUILD_WIN32)
+	types << tr("VST2 files (*.dll)");
+#elif defined(LMMS_BUILD_LINUX)
+#	if defined(LMMS_HAVE_VST_32) || defined(LMMS_HAVE_VST_64)
+		types << tr("All VST files (*.dll *.so)")
+			<< tr("Windows VST2 files (*.dll)");
+#	endif
+	types << tr("LinuxVST files (*.so)");
 #endif
-		;
-	ofd.setNameFilters( types );
+
+	ofd.setNameFilters(types);
 
 	if( m_vi->m_pluginDLL != "" )
 	{
@@ -990,9 +998,11 @@ ManageVestigeInstrumentView::ManageVestigeInstrumentView( Instrument * _instrume
 		std::snprintf(paramStr.data(), paramStr.size(), "param%d", i);
 		s_dumpValues = dump[paramStr.data()].split(":");
 
-		vstKnobs[ i ] = new CustomTextKnob( KnobType::Bright26, this, s_dumpValues.at( 1 ) );
-		vstKnobs[ i ]->setDescription( s_dumpValues.at( 1 ) + ":" );
-		vstKnobs[ i ]->setLabel( s_dumpValues.at( 1 ).left( 15 ) );
+		const auto & description = s_dumpValues.at(1);
+
+		auto knob = new CustomTextKnob(KnobType::Bright26, description.left(15), this, description);
+		knob->setDescription(description + ":");
+		vstKnobs[i] = knob;
 
 		if( !hasKnobModel )
 		{

@@ -27,7 +27,6 @@
 #include "AudioDevice.h"
 #include "AudioEngine.h"
 #include "ConfigManager.h"
-#include "debug.h"
 
 namespace lmms
 {
@@ -109,21 +108,21 @@ void AudioDevice::stopProcessingThread( QThread * thread )
 
 
 
-void AudioDevice::registerPort( AudioPort * )
+void AudioDevice::registerPort(AudioBusHandle*)
 {
 }
 
 
 
 
-void AudioDevice::unregisterPort( AudioPort * _port )
+void AudioDevice::unregisterPort(AudioBusHandle*)
 {
 }
 
 
 
 
-void AudioDevice::renamePort( AudioPort * )
+void AudioDevice::renamePort(AudioBusHandle*)
 {
 }
 

@@ -40,6 +40,7 @@ protected:
 public:
 	CustomTextKnob(
 		KnobType knobNum,
+		const QString& label,
 		QWidget* parent = nullptr,
 		const QString& name = QString{},
 		const QString& valueText = QString{});
