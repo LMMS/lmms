@@ -28,6 +28,7 @@
 
 #include "ClapLog.h"
 #include "ClapManager.h"
+#include "PathUtil.h"
 
 namespace lmms
 {
@@ -48,7 +49,7 @@ auto ClapFile::load() -> bool
 	if (m_library && m_library->isLoaded()) { return false; }
 
 	// TODO: Replace QLibrary with in-house non-Qt alternative
-	const auto file = filename().u8string();
+	const auto file = PathUtil::pathToString(filename());
 	m_library = std::make_unique<QLibrary>(QString::fromUtf8(file.c_str(), file.size()));
 	if (!m_library->load())
 	{

@@ -303,4 +303,49 @@ namespace lmms::PathUtil
 		return (basePrefixQString(shortestBase) + relativeOrAbsolute(absolutePath, shortestBase)).toStdString();
 	}
 
+	std::string_view toStdStringView(std::u8string_view input)
+	{
+		return {reinterpret_cast<const char*>(input.data()), input.size()};
+	}
+
+	std::filesystem::path stringToPath(const QString& path)
+	{
+#ifdef _WIN32
+		return path.toStdWString();
+#else
+		return path.toStdString();
+#endif
+	}
+
+	std::string pathToString(const std::filesystem::path& path)
+	{
+#ifdef _WIN32
+		const auto utf8String = path.u8string();
+		return {reinterpret_cast<const char*>(utf8String.c_str()), utf8String.size()};
+#else
+		return path.string();
+#endif
+	}
+
+	std::filesystem::path u8path(std::string_view path)
+	{
+		// Disable decrecation warnings temporarily
+#if defined(__GNUC__) || defined(__clang__)
+#	pragma GCC diagnostic push
+#	pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#elif defined(_MSC_VER)
+#	pragma warning(push)
+#	pragma warning(disable: 4996)
+#endif
+
+		return std::filesystem::u8path(path);
+
+		// Restore deprecation warnings
+#if defined(__GNUC__) || defined(__clang__)
+#	pragma GCC diagnostic pop
+#elif defined(__MSC_VER)
+#	pragma warning(pop)
+#endif
+	}
+
 } // namespace lmms::PathUtil

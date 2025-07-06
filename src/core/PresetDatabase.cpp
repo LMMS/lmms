@@ -72,7 +72,7 @@ auto PresetDatabase::loadPresets(const Location& location, std::string_view file
 	auto preset = Preset{};
 	preset.loadData() = { std::string{file}, "" };
 
-	preset.metadata().displayName = std::filesystem::u8path(file).filename().u8string();
+	preset.metadata().displayName = PathUtil::pathToString(PathUtil::u8path(file).filename());
 
 	auto [it, added] = presets.emplace(std::move(preset));
 	if (!added) { return {}; }
@@ -158,11 +158,11 @@ auto PresetDatabase::getLocation(std::string_view path, bool add) -> PresetMap::
 	if (!add) { return m_presets.end(); }
 
 	// Use parent directory
-	const auto parentPath = std::filesystem::u8path(PathUtil::toAbsolute(path).value()).parent_path().u8string();
+	const auto parentPath = PathUtil::u8path(PathUtil::toAbsolute(path).value()).parent_path().u8string();
 	auto newLocation = Location {
-		std::string{}, // name
-		std::string{PathUtil::toShortestRelative(parentPath)}, // directory
-		PresetMetadata::Flag::UserContent // assume unknown directories are user content
+		.name = {},
+		.location = PathUtil::toShortestRelative(PathUtil::toStdStringView(parentPath)), // directory
+		.flags = PresetMetadata::Flag::UserContent // assume unknown directories are user content
 	};
 
 	return m_presets.emplace(std::move(newLocation), std::set<Preset>{}).first;

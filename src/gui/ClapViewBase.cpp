@@ -108,7 +108,7 @@ ClapViewParameters::ClapViewParameters(QWidget* parent, ClapInstance* instance, 
 
 			// CustomTextKnob calls this lambda to update value text
 			auto customTextKnob = dynamic_cast<CustomTextKnob*>(control->modelView());
-			customTextKnob->setValueText([=] {
+			customTextKnob->setValueText([=, this] {
 				return QString::fromUtf8(m_instance->params().getValueText(*param).c_str());
 			});
 

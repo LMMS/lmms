@@ -34,11 +34,11 @@
 #include <clap/ext/audio-ports.h>
 
 #include "ClapExtension.h"
-#include "lmms_basics.h"
-#include "lmms_export.h"
+#include "LmmsTypes.h"
 #include "PluginIssue.h"
 #include "PluginPortConfig.h"
 #include "SampleFrame.h"
+#include "lmms_export.h"
 
 namespace lmms
 {

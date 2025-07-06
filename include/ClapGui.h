@@ -33,8 +33,8 @@
 #include <clap/ext/gui.h>
 
 #include "ClapExtension.h"
+#include "LmmsTypes.h"
 #include "WindowEmbed.h"
-#include "lmms_basics.h"
 
 namespace lmms
 {

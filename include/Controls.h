@@ -80,7 +80,7 @@ public:
 	FloatModel* model() override;
 	AutomatableModelView* modelView() override;
 
-	KnobControl(const QString& text, QWidget* parent = nullptr);
+	KnobControl(const QString& text = QString{}, QWidget* parent = nullptr);
 	~KnobControl() override = default;
 };
 

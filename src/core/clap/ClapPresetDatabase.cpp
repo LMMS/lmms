@@ -296,7 +296,7 @@ auto ClapPresetDatabase::discoverPresets(const Location& location, std::set<Pres
 auto ClapPresetDatabase::loadPresets(const Location& location, std::string_view file,
 	std::set<Preset>& presets) -> std::vector<const Preset*>
 {
-	const auto filePath = std::filesystem::u8path(file);
+	const auto filePath = PathUtil::u8path(file);
 	if (std::error_code ec; !std::filesystem::is_regular_file(filePath, ec)) { return {}; }
 
 	auto getPresets = [&](Indexer& indexer) -> std::vector<const Preset*> {

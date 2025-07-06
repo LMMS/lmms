@@ -35,6 +35,8 @@
 
 #include "ClapLog.h"
 #include "ClapTransport.h"
+#include "PathUtil.h"
+#include "lmms_constants.h"
 #include "lmmsversion.h"
 
 namespace lmms
@@ -52,11 +54,11 @@ namespace
 				const auto pos = dir.find_first_not_of(R"(/\)", 1);
 				if (pos == std::string_view::npos) { return home; }
 				dir.remove_prefix(pos);
-				return std::filesystem::u8path(home) / dir;
+				return PathUtil::u8path(home) / dir;
 			}
 		}
 #endif
-		return std::filesystem::u8path(dir);
+		return PathUtil::u8path(dir);
 	}
 } // namespace
 
@@ -234,7 +236,7 @@ void ClapManager::loadClapFiles(const UniquePaths& searchPaths)
 			if (debugging())
 			{
 				std::string msg = "\n\n~~~CLAP FILE~~~\nfilename: ";
-				msg += entryPath.u8string();
+				msg += PathUtil::pathToString(entryPath);
 				ClapLog::plainLog(msg);
 			}
 
@@ -242,7 +244,7 @@ void ClapManager::loadClapFiles(const UniquePaths& searchPaths)
 			if (!file.load())
 			{
 				std::string msg = "Failed to load '";
-				msg += file.filename().u8string();
+				msg += PathUtil::pathToString(file.filename());
 				msg += "'";
 				ClapLog::globalLog(CLAP_LOG_ERROR, msg);
 				m_files.pop_back(); // Remove/unload invalid clap file
