@@ -61,6 +61,8 @@ public:
 
 	void setPitchWheelBendRange( int semitones );
 
+	void setKeyDetuning(int key, float detuning);
+
 	void processMidiEvent( const MidiEvent& event );
 
 	void processAudio( SampleFrame* _out );
