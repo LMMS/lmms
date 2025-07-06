@@ -136,8 +136,6 @@ public:
 	
 	Knob( const Knob& other ) = delete;
 
-	void setHtmlLabel( const QString &htmltxt );
-
 	void setTotalAngle( float angle );
 
 	// Begin styled knob accessors
@@ -216,8 +214,6 @@ private:
 
 	QString m_label;
 	bool m_fixedFontSizeLabelRendering = false;
-	bool m_isHtmlLabel;
-	QTextDocument* m_tdRenderer;
 
 	std::unique_ptr<QPixmap> m_knobPixmap;
 
