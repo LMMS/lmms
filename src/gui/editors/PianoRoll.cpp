@@ -5482,7 +5482,7 @@ void PianoRollWindow::exportMidiClip()
 	QCheckBox* onlySelectedNotesCheckBox = nullptr;
 	if (layout)
 	{
-		onlySelectedNotesCheckBox = new QCheckBox(tr("Only selected notes"), &exportDialog);
+		onlySelectedNotesCheckBox = new QCheckBox(tr("Export only selected notes"), &exportDialog);
 		layout->addWidget(onlySelectedNotesCheckBox);
 	}
 
