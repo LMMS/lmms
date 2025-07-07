@@ -316,7 +316,9 @@ void FloatModelEditorBase::wheelEvent(QWheelEvent * we)
 	const float modelStepSize = m->step<float>();
 	const float modelStepsPerWheelTick = scaledValuePerTick / modelStepSize;
 	// scroll.getSteps() will return at least 1 for every wheel tick
-	const int steps = scroll.getSteps(modelStepsPerWheelTick, Scroll::Flag::DisableNaturalScrolling);
+	const int steps = scroll.getSteps(modelStepsPerWheelTick, Scroll::Flag::DisableNaturalScrolling)
+		// Horizontal scroll does finer adjustments (useful on trackpads)
+		- scroll.getSteps(modelStepsPerWheelTick/10, Scroll::Flag::DisableNaturalScrolling|Scroll::Flag::Horizontal);
 
 	model()->incValue(steps);
 
