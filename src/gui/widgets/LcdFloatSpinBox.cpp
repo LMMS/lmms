@@ -190,8 +190,6 @@ void LcdFloatSpinBox::mouseReleaseEvent(QMouseEvent*)
 void LcdFloatSpinBox::wheelEvent(QWheelEvent *event)
 {
 	auto scroll = Scroll(event);
-	if (!scroll.isVertical()) { return; }
-
 	event->accept();
 
 	// switch between integer and fractional step based on cursor position

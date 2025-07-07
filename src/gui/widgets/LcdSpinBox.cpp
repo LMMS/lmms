@@ -143,8 +143,6 @@ void LcdSpinBox::mouseReleaseEvent(QMouseEvent*)
 void LcdSpinBox::wheelEvent(QWheelEvent * we)
 {
 	auto scroll = Scroll(we);
-	if (!scroll.isVertical()) { return; }
-
 	we->accept();
 
 	const int steps = scroll.getSteps(Scroll::Flag::DisableNaturalScrolling);

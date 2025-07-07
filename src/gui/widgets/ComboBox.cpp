@@ -220,8 +220,6 @@ void ComboBox::paintEvent( QPaintEvent * _pe )
 void ComboBox::wheelEvent( QWheelEvent* event )
 {
 	auto scroll = Scroll(event);
-	if (!scroll.isVertical()) { return; }
-
 	event->accept();
 
 	if( model() )

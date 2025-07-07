@@ -282,8 +282,6 @@ void FloatModelEditorBase::paintEvent(QPaintEvent *)
 void FloatModelEditorBase::wheelEvent(QWheelEvent * we)
 {
 	auto scroll = Scroll(we);
-	if (!scroll.isVertical()) { return; }
-
 	we->accept();
 
 	auto * m = model();

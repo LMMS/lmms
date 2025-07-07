@@ -268,14 +268,12 @@ void Fader::mouseReleaseEvent(QMouseEvent* mouseEvent)
 void Fader::wheelEvent (QWheelEvent* ev)
 {
 	auto scroll = Scroll(ev);
-	if (!scroll.isVertical()) { return; }
+	ev->accept();
 
 	const float steps = scroll.getStepsFloat(Scroll::Flag::DisableNaturalScrolling);
 	const float adjustmentDelta = determineAdjustmentDelta(ev->modifiers());
 
 	adjustByDecibelDelta(steps * adjustmentDelta);
-
-	ev->accept();
 }
 
 float Fader::determineAdjustmentDelta(const Qt::KeyboardModifiers & modifiers) const
