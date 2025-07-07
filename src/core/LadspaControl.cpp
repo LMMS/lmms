@@ -291,16 +291,15 @@ void LadspaControl::linkControls( LadspaControl * _control )
 	switch( m_port->data_type )
 	{
 		case BufferDataType::Toggled:
-			BoolModel::linkModels( &m_toggledModel, _control->toggledModel() );
+			_control->toggledModel()->linkToModel(&m_toggledModel);
 			break;
 		case BufferDataType::Integer:
 		case BufferDataType::Enum:
 		case BufferDataType::Floating:
-			FloatModel::linkModels( &m_knobModel, _control->knobModel() );
+			_control->knobModel()->linkToModel(&m_knobModel);
 			break;
 		case BufferDataType::Time:
-			TempoSyncKnobModel::linkModels( &m_tempoSyncKnobModel,
-					_control->tempoSyncKnobModel() );
+			_control->tempoSyncKnobModel()->linkToModel(&m_tempoSyncKnobModel);
 			break;
 		default:
 			break;
@@ -342,18 +341,15 @@ void LadspaControl::unlinkControls( LadspaControl * _control )
 	switch( m_port->data_type )
 	{
 		case BufferDataType::Toggled:
-			m_toggledModel.unlinkAllModels();
-			_control->toggledModel()->unlinkAllModels();
+			_control->toggledModel()->unlink();
 			break;
 		case BufferDataType::Integer:
 		case BufferDataType::Enum:
 		case BufferDataType::Floating:
-			m_knobModel.unlinkAllModels();
-			_control->knobModel()->unlinkAllModels();
+			_control->knobModel()->unlink();
 			break;
 		case BufferDataType::Time:
-			m_tempoSyncKnobModel.unlinkAllModels();
-			_control->tempoSyncKnobModel()->unlinkAllModels();
+			_control->tempoSyncKnobModel()->unlink();
 			break;
 		default:
 			break;

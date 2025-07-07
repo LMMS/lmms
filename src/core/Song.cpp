@@ -407,7 +407,7 @@ void Song::processAutomations(const TrackList &tracklist, TimePos timeStart, fpp
 	for (auto it = m_oldAutomatedValues.begin(); it != m_oldAutomatedValues.end(); it++)
 	{
 		AutomatableModel * am = it.key();
-		if (am->controllerConnection() && !values.contains(am))
+		if (!values.contains(am))
 		{
 			am->setUseControllerValue(true);
 		}
@@ -417,13 +417,18 @@ void Song::processAutomations(const TrackList &tracklist, TimePos timeStart, fpp
 	// Apply values
 	for (auto it = values.begin(); it != values.end(); it++)
 	{
-		if (! recordedModels.contains(it.key()))
+		AutomatableModel* model = it.key();
+		bool isRecording = recordedModels.contains(model);
+		model->setUseControllerValue(isRecording);
+
+		if (!isRecording)
 		{
-			it.key()->setValue(it.value(), true);
-		}
-		else if (!it.key()->useControllerValue())
-		{
-			it.key()->setUseControllerValue(true);
+			/* TODO
+			 * Remove scaleValue() from here when automation editor's
+			 * Y axis can be set to logarithmic, and automation clips store
+			 * the actual values, and not the invertedScaledValue.
+			 */
+			model->setValue(model->scaledValue(it.value()), true);
 		}
 	}
 }

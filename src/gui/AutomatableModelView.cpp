@@ -96,11 +96,11 @@ void AutomatableModelView::addDefaultActions( QMenu* menu )
 
 	menu->addSeparator();
 
-	if( model->hasLinkedModels() )
+	if (model->isLinked())
 	{
 		menu->addAction(embed::getIconPixmap("edit_unlink"),
 							AutomatableModel::tr("Remove all linked controls"),
-							amvSlots, SLOT(unlinkAllModels()));
+							model, SLOT(unlink()));
 		menu->addSeparator();
 	}
 
@@ -275,11 +275,6 @@ void AutomatableModelViewSlots::removeSongGlobalAutomation()
 	delete AutomationClip::globalAutomationClip( m_amv->modelUntyped() );
 }
 
-
-void AutomatableModelViewSlots::unlinkAllModels()
-{
-	m_amv->modelUntyped()->unlinkAllModels();
-}
 
 void AutomatableModelViewSlots::copyToClipboard()
 {
