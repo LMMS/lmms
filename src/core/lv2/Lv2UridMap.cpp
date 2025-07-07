@@ -1,7 +1,7 @@
 /*
  * Lv2UridMap.cpp - Lv2UridMap implementation
  *
- * Copyright (c) 2019 Johannes Lorenz <j.git$$$lorenz-ho.me, $$$=@>
+ * Copyright (c) 2019-2024 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -22,6 +22,7 @@
  *
  */
 
+#include <QDebug>
 
 #include "Lv2UridMap.h"
 
@@ -97,6 +98,17 @@ const char *UridMap::unmap(LV2_URID urid)
 
 	std::lock_guard<std::mutex> guard (m_MapMutex);
 	return (idx < m_unMap.size()) ? m_unMap[idx] : nullptr;
+}
+
+void UridMap::dump()
+{
+	std::lock_guard<std::mutex> guard (m_MapMutex);
+	qDebug() << "UridMap dump";
+	qDebug() << "============";
+	for(const auto & [str, urid] : m_map)
+	{
+		qDebug() << static_cast<int>(urid) << str.c_str();
+	}
 }
 
 

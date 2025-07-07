@@ -805,7 +805,7 @@ int main( int argc, char * * argv )
 	{
 		using namespace lmms::gui;
 
-		new GuiApplication();
+		new GuiApplication(&argc, &argv);
 
 		// re-intialize RNG - shared libraries might have srand() or
 		// srandom() calls in their init procedure
