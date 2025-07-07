@@ -27,8 +27,8 @@
 #ifndef _SID_H
 #define _SID_H
 
+#include "AudioPlugin.h"
 #include "AutomatableModel.h"
-#include "Instrument.h"
 #include "InstrumentView.h"
 
 namespace lmms
@@ -101,10 +101,7 @@ public:
 	SidInstrument( InstrumentTrack * _instrument_track );
 	~SidInstrument() override = default;
 
-	void playNote( NotePlayHandle * _n,
-						SampleFrame* _working_buffer ) override;
 	void deleteNotePluginData( NotePlayHandle * _n ) override;
-
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 	void loadSettings( const QDomElement & _this ) override;
@@ -121,6 +118,8 @@ public:
 	void updateKnobToolTip();*/
 
 private:
+	void playNoteImpl(NotePlayHandle* nph, std::span<SampleFrame> out) override;
+
 	// voices
 	VoiceObject * m_voice[3];
 

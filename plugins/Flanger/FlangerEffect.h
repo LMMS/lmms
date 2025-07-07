@@ -26,7 +26,7 @@
 #ifndef FLANGEREFFECT_H
 #define FLANGEREFFECT_H
 
-#include "Effect.h"
+#include "AudioPlugin.h"
 #include "FlangerControls.h"
 
 namespace lmms
@@ -36,13 +36,11 @@ class MonoDelay;
 class QuadratureLfo;
 
 
-class FlangerEffect : public Effect
+class FlangerEffect : public DefaultEffect
 {
 public:
 	FlangerEffect( Model* parent , const Descriptor::SubPluginFeatures::Key* key );
 	~FlangerEffect() override;
-
-	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
 
 	EffectControls* controls() override
 	{
@@ -52,6 +50,8 @@ public:
 	void restartLFO();
 
 private:
+	ProcessStatus processImpl(InterleavedBufferView<float, 2> inOut) override;
+
 	FlangerControls m_flangerControls;
 	MonoDelay* m_lDelay;
 	MonoDelay* m_rDelay;

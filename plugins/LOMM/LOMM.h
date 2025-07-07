@@ -26,8 +26,8 @@
 #ifndef LMMS_LOMM_H
 #define LMMS_LOMM_H
 
+#include "AudioPlugin.h"
 #include "LOMMControls.h"
-#include "Effect.h"
 
 #include "BasicFilters.h"
 
@@ -38,14 +38,12 @@ constexpr inline float LOMM_MIN_FLOOR = 0.00012589f;// -72 dBFS
 constexpr inline float LOMM_MAX_LOOKAHEAD = 20.f;
 constexpr inline float LOMM_AUTO_TIME_ADJUST = 5.f;
 
-class LOMMEffect : public Effect
+class LOMMEffect : public DefaultEffect
 {
 	Q_OBJECT
 public:
 	LOMMEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
 	~LOMMEffect() override = default;
-
-	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
 
 	EffectControls* controls() override
 	{
@@ -61,6 +59,8 @@ private slots:
 	void changeSampleRate();
 
 private:
+	ProcessStatus processImpl(InterleavedBufferView<float, 2> inOut) override;
+
 	LOMMControls m_lommControls;
 	
 	float m_sampleRate;

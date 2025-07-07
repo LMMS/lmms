@@ -36,7 +36,6 @@
 #endif
 
 #include "MidiEvent.h"
-#include "SampleFrame.h"
 
 #include <Nio/NulEngine.h>
 #include <Misc/Master.h>
@@ -266,24 +265,10 @@ void LocalZynAddSubFx::processMidiEvent( const MidiEvent& event )
 
 
 
-void LocalZynAddSubFx::processAudio( SampleFrame* _out )
+void LocalZynAddSubFx::process(PlanarBufferView<float, 2> out)
 {
-#ifdef _MSC_VER
-	const auto outputl = static_cast<float*>(_alloca(synth->buffersize * sizeof(float)));
-	const auto outputr = static_cast<float*>(_alloca(synth->buffersize * sizeof(float)));
-#else
-	float outputl[synth->buffersize];
-	float outputr[synth->buffersize];
-#endif
-
-	m_master->GetAudioOutSamples( synth->buffersize, synth->samplerate, outputl, outputr );
-
-	// TODO: move to MixHelpers
-	for( int f = 0; f < synth->buffersize; ++f )
-	{
-		_out[f][0] = outputl[f];
-		_out[f][1] = outputr[f];
-	}
+	assert(out.frames() == static_cast<f_cnt_t>(synth->buffersize));
+	m_master->GetAudioOutSamples(synth->buffersize, synth->samplerate, out.bufferPtr<0>(), out.bufferPtr<1>());
 }
 
 
