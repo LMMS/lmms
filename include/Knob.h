@@ -136,6 +136,7 @@ public:
 	
 	Knob( const Knob& other ) = delete;
 
+	void setLabel(const QString& txt);
 	void setHtmlLabel( const QString &htmltxt );
 
 	void setTotalAngle( float angle );
@@ -167,8 +168,6 @@ public:
 
 
 protected:
-	void setLabel(const QString& txt);
-	
 	void paintEvent(QPaintEvent*) override;
 
 	void changeEvent(QEvent * ev) override;
