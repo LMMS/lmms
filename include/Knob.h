@@ -136,6 +136,9 @@ public:
 	
 	Knob( const Knob& other ) = delete;
 
+	const QString& getLabel() const;
+	void setLabel(const QString& txt);
+
 	void setTotalAngle( float angle );
 
 	// Begin styled knob accessors
@@ -165,8 +168,6 @@ public:
 
 
 protected:
-	void setLabel(const QString& txt);
-	
 	void paintEvent(QPaintEvent*) override;
 
 	void changeEvent(QEvent * ev) override;

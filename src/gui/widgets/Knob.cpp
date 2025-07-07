@@ -144,6 +144,10 @@ void Knob::onKnobNumUpdated()
 }
 
 
+const QString& Knob::getLabel() const
+{
+	return m_label;
+}
 
 
 void Knob::setLabel(const QString& txt)
