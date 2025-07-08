@@ -37,46 +37,6 @@ class RelativePathsTest : public QObject
 private slots:
 	void PathUtilComparisonTests()
 	{
-		qDebug() << "HERE in PathUtilComparisonTests()";
-		QCOMPARE(1, 1);
-		/*
-		using namespace lmms;
-
-		auto fi = QFileInfo{ConfigManager::inst()->factorySamplesDir() + "/drums/kick01.ogg"};
-		QVERIFY(fi.exists());
-
-		QString absPath = fi.absoluteFilePath();
-		QString oldRelPath = "drums/kick01.ogg";
-		const std::string_view basePrefix = PathUtil::basePrefix(PathUtil::Base::FactorySample);
-		QString relPath = QString::fromUtf8(basePrefix.data(), basePrefix.size()) + "drums/kick01.ogg";
-		QString fuzPath = absPath;
-		fuzPath.replace(relPath, "drums/.///kick01.ogg");
-		qDebug() << "fuzPath:" << fuzPath;
-
-		//Test nicely formatted paths
-		QCOMPARE(PathUtil::toShortestRelative(absPath), relPath);
-		QCOMPARE(PathUtil::toAbsolute(relPath), absPath);
-
-		//Test upgrading old paths
-		QCOMPARE(PathUtil::toShortestRelative(oldRelPath), relPath);
-		QCOMPARE(PathUtil::toAbsolute(oldRelPath), absPath);
-
-		//Test weird but valid paths
-		QCOMPARE(PathUtil::toShortestRelative(fuzPath), relPath);
-		QCOMPARE(PathUtil::toAbsolute(fuzPath), absPath);
-
-		//Empty paths should stay empty
-		const QString empty = QString("");
-		QCOMPARE(PathUtil::cleanName(empty), empty);
-		QCOMPARE(PathUtil::toAbsolute(empty), empty);
-		QCOMPARE(PathUtil::toShortestRelative(empty), empty);
-		*/
-	}
-
-	void PathUtilComparisonTestsUtf8()
-	{
-		QCOMPARE(2, 2);
-		/*
 		using namespace lmms;
 
 		auto fi = QFileInfo{ConfigManager::inst()->factorySamplesDir() + "/drums/kick01.ogg"};
@@ -118,13 +78,44 @@ private slots:
 		QCOMPARE(QString::fromStdString(PathUtil::cleanName(empty)), "");
 		QCOMPARE(QString::fromStdString(PathUtil::toAbsolute(empty).value()), "");
 		QCOMPARE(QString::fromStdString(PathUtil::toShortestRelative(empty)), "");
-		*/
+	}
+
+	void PathUtilComparisonTestsQString()
+	{
+		using namespace lmms;
+
+		auto fi = QFileInfo{ConfigManager::inst()->factorySamplesDir() + "/drums/kick01.ogg"};
+		QVERIFY(fi.exists());
+
+		QString absPath = fi.absoluteFilePath();
+		QString oldRelPath = "drums/kick01.ogg";
+		const std::string_view basePrefix = PathUtil::basePrefix(PathUtil::Base::FactorySample);
+		QString relPath = QString::fromUtf8(basePrefix.data(), basePrefix.size()) + "drums/kick01.ogg";
+		QString fuzPath = absPath;
+		fuzPath.replace(relPath, "drums/.///kick01.ogg");
+		qDebug() << "fuzPath:" << fuzPath;
+
+		//Test nicely formatted paths
+		QCOMPARE(PathUtil::toShortestRelative(absPath), relPath);
+		QCOMPARE(PathUtil::toAbsolute(relPath), absPath);
+
+		//Test upgrading old paths
+		QCOMPARE(PathUtil::toShortestRelative(oldRelPath), relPath);
+		QCOMPARE(PathUtil::toAbsolute(oldRelPath), absPath);
+
+		//Test weird but valid paths
+		QCOMPARE(PathUtil::toShortestRelative(fuzPath), relPath);
+		QCOMPARE(PathUtil::toAbsolute(fuzPath), absPath);
+
+		//Empty paths should stay empty
+		const QString empty = QString("");
+		QCOMPARE(PathUtil::cleanName(empty), empty);
+		QCOMPARE(PathUtil::toAbsolute(empty), empty);
+		QCOMPARE(PathUtil::toShortestRelative(empty), empty);
 	}
 
 	void cleanNameTests()
 	{
-		QCOMPARE(3, 9001);
-		/*
 		using namespace lmms;
 
 		QString kickQ = ConfigManager::inst()->factorySamplesDir() + "/drums/kick01.ogg";
@@ -136,8 +127,8 @@ private slots:
 		auto testQ = QString{"usersample:foo/success.abc.def.ghi"};
 		auto test = testQ.toStdString();
 
-		QCOMPARE(PathUtil::cleanName(testQ), "success");
-		QCOMPARE(QString::fromStdString(PathUtil::cleanName(test)), "success");
+		QCOMPARE(PathUtil::cleanName(testQ), "success.abc.def");
+		QCOMPARE(QString::fromStdString(PathUtil::cleanName(test)), "success.abc.def");
 
 		auto noNameQ = QString{"foo/bar/.extension"};
 		auto noName = noNameQ.toStdString();
@@ -150,7 +141,6 @@ private slots:
 
 		QCOMPARE(PathUtil::cleanName(noExtensionQ), "meow");
 		QCOMPARE(QString::fromStdString(PathUtil::cleanName(noExtension)), "meow");
-		*/
 	}
 };
 

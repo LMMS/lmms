@@ -36,8 +36,6 @@
 
 namespace lmms::PathUtil
 {
-	namespace fs = std::filesystem;
-
 	namespace
 	{
 		constexpr auto relativeBases = std::array {
@@ -46,21 +44,34 @@ namespace lmms::PathUtil
 			Base::DefaultSoundfont, Base::UserGIG, Base::DefaultGIG, Base::LocalDir, Base::Internal
 		};
 
+		//! Adds a prefix to a old non-prefixed relative path
 		auto oldRelativeUpgrade(std::string_view input) -> std::string
 		{
 			auto inputStr = std::string{input};
 			if (input.empty()) { return inputStr; }
 
 			// Start by assuming that the file is a user sample
-			Base assumedBase = Base::UserSample;
+			auto assumedBase = Base::UserSample;
 
 			// Check if it's a factory sample
-			const auto factoryPath = fs::u8path(baseLocation(Base::FactorySample).value() + inputStr);
-			if (std::error_code ec; fs::exists(factoryPath, ec)) { assumedBase = Base::FactorySample; }
+			if (auto factorySampleDir = baseLocation(Base::FactorySample))
+			{
+				const auto potentialPath = u8path(*factorySampleDir + inputStr);
+				if (std::error_code ec; std::filesystem::exists(potentialPath, ec))
+				{
+					assumedBase = Base::FactorySample;
+				}
+			}
 
 			// Check if it's a VST
-			const auto vstPath = fs::u8path(baseLocation(Base::UserVST).value() + inputStr);
-			if (std::error_code ec; fs::exists(vstPath, ec)) { assumedBase = Base::UserVST; }
+			if (auto userVstDir = baseLocation(Base::UserVST))
+			{
+				const auto potentialPath = u8path(*userVstDir + inputStr);
+				if (std::error_code ec; std::filesystem::exists(potentialPath, ec))
+				{
+					assumedBase = Base::UserVST;
+				}
+			}
 
 			// Assume we've found the correct base location, return the full path
 			return std::string{basePrefix(assumedBase)} + inputStr;
@@ -68,16 +79,16 @@ namespace lmms::PathUtil
 
 		//! Return the directory associated with a given base as a fs::path.
 		//! Will return std::nullopt if the prefix could not be resolved.
-		auto baseDir(Base base) -> std::optional<fs::path>
+		auto baseDir(Base base) -> std::optional<std::filesystem::path>
 		{
 			if (base == Base::Absolute)
 			{
-				return fs::current_path().root_path();
+				return std::filesystem::current_path().root_path();
 			}
 
 			if (auto loc = baseLocation(base))
 			{
-				return fs::u8path(*loc);
+				return u8path(*loc);
 			}
 
 			return std::nullopt;
@@ -135,7 +146,7 @@ namespace lmms::PathUtil
 			default:
 				return std::string{};
 		}
-		return (QDir::cleanPath(loc) + "/").toStdString();
+		return (QDir::cleanPath(loc) + '/').toStdString();
 	}
 
 	auto basePrefix(Base base) -> std::string_view
@@ -210,7 +221,13 @@ namespace lmms::PathUtil
 
 	auto cleanName(std::string_view path) -> std::string
 	{
-		return fs::u8path(path).stem().u8string(); // TODO: Fix in C++20?
+		auto stem = pathToString(u8path(path).stem());
+
+		// If the path has no base name and is all extension (for example, "/path/.ext"),
+		// the stem will be the entire filename and start with "." or "..".
+		if (!stem.empty() && stem[0] == '.') { return std::string{}; }
+
+		return stem;
 	}
 
 	auto toAbsolute(const QString& input, bool* error /* = nullptr*/) -> QString
@@ -232,7 +249,7 @@ namespace lmms::PathUtil
 		if (hasBase(input, Base::Internal)) { return inputStr; }
 
 		// Secondly, do no harm to absolute paths
-		auto inputPath = fs::u8path(input);
+		auto inputPath = u8path(input);
 		if (inputPath.is_absolute())
 		{
 			return inputStr;
@@ -269,14 +286,14 @@ namespace lmms::PathUtil
 		if (!bd) { return absolutePath; }
 
 		std::error_code ec;
-		auto relativePath = fs::relative(absolutePath, *bd, ec).u8string(); // TODO: Fix in C++20
+		auto relativePath = std::filesystem::relative(absolutePath, *bd, ec).u8string();
 		if (ec) { return absolutePath; }
 
 		// Return the relative path if it didn't result in a path starting with ".."
 		// and the baseDir was resolved properly
-		return relativePath.rfind("..", 0) != std::string::npos
+		return relativePath.rfind(u8"..", 0) != std::u8string::npos
 			? absolutePath
-			: relativePath;
+			: toStdString(relativePath);
 	}
 
 	auto toShortestRelative(const QString& input, bool allowLocal /* = false*/) -> QString
@@ -289,10 +306,10 @@ namespace lmms::PathUtil
 		auto inputStr = std::string{input};
 		if (hasBase(input, Base::Internal)) { return inputStr; }
 
-		const auto inputPath = fs::u8path(input);
+		const auto inputPath = u8path(input);
 		auto absolutePath = toAbsolute(input).value();
 
-		Base shortestBase = Base::Absolute;
+		auto shortestBase = Base::Absolute;
 		auto shortestPath = relativeOrAbsolute(absolutePath, shortestBase);
 		for (auto base : relativeBases)
 		{
@@ -309,6 +326,61 @@ namespace lmms::PathUtil
 		}
 
 		return std::string{basePrefix(shortestBase)} + relativeOrAbsolute(absolutePath, shortestBase);
+	}
+
+	auto toStdString(std::u8string_view input) -> std::string
+	{
+		return !input.empty()
+			? std::string{reinterpret_cast<const char*>(input.data()), input.size()}
+			: std::string{};
+	}
+
+	auto toStdStringView(std::u8string_view input) -> std::string_view
+	{
+		return !input.empty()
+			? std::string_view{reinterpret_cast<const char*>(input.data()), input.size()}
+			: std::string_view{};
+	}
+
+	auto stringToPath(const QString& path) -> std::filesystem::path
+	{
+#ifdef _WIN32
+		return path.toStdWString();
+#else
+		return path.toStdString();
+#endif
+	}
+
+	auto pathToString(const std::filesystem::path& path) -> std::string
+	{
+#ifdef _WIN32
+		const auto utf8String = path.u8string();
+		return {reinterpret_cast<const char*>(utf8String.c_str()), utf8String.size()};
+#else
+		// Assume UTF-8 encoding on non-Windows
+		return path.string();
+#endif
+	}
+
+	auto u8path(std::string_view path) -> std::filesystem::path
+	{
+		// Disable decrecation warnings temporarily
+#if defined(__GNUC__) || defined(__clang__)
+#	pragma GCC diagnostic push
+#	pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#elif defined(_MSC_VER)
+#	pragma warning(push)
+#	pragma warning(disable: 4996)
+#endif
+
+		return std::filesystem::u8path(path);
+
+		// Restore deprecation warnings
+#if defined(__GNUC__) || defined(__clang__)
+#	pragma GCC diagnostic pop
+#elif defined(__MSC_VER)
+#	pragma warning(pop)
+#endif
 	}
 
 } // namespace lmms::PathUtil

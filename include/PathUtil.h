@@ -2,6 +2,7 @@
  * PathUtil.h
  *
  * Copyright (c) 2019-2022 Spekular <Spekularr@gmail.com>
+ *                    2025 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -26,11 +27,11 @@
 #define LMMS_PATHUTIL_H
 
 #include <QString>
+#include <filesystem>
 #include <optional>
 #include <string>
 #include <string_view>
 
-#include "LmmsTypes.h"
 #include "lmms_export.h"
 
 namespace lmms::PathUtil
@@ -59,10 +60,10 @@ namespace lmms::PathUtil
 	//! Return the results of baseLookup() and stripPrefix()
 	LMMS_EXPORT auto parsePath(std::string_view path) -> std::pair<Base, std::string_view>;
 
-	//! Get the filename for a path, handling prefixed paths correctly
+	//! Get the extensionless base name for a path, handling prefixed paths correctly
 	LMMS_EXPORT auto cleanName(const QString& path) -> QString;
 
-	//! Get the filename for a path, handling prefixed paths correctly
+	//! Get the extensionless base name for a path, handling prefixed paths correctly
 	LMMS_EXPORT auto cleanName(std::string_view path) -> std::string;
 
 	//! Make this path absolute. If a pointer to boolean is given
@@ -87,6 +88,21 @@ namespace lmms::PathUtil
 	//! multiple options. allowLocal defines whether local paths should be considered.
 	//! Defaults to an absolute path if all bases fail.
 	LMMS_EXPORT auto toShortestRelative(std::string_view input, bool allowLocal = false) -> std::string;
+
+	//! Converts std::u8string_view to std::string
+	LMMS_EXPORT std::string toStdString(std::u8string_view input);
+
+	//! Converts std::u8string_view to std::string_view
+	LMMS_EXPORT std::string_view toStdStringView(std::u8string_view input);
+
+	//! Converts `path` to std::filesystem::path
+	LMMS_EXPORT std::filesystem::path stringToPath(const QString& path);
+
+	//! Converts `path` to a UTF-8 encoded std::string path
+	LMMS_EXPORT std::string pathToString(const std::filesystem::path& path);
+
+	//! Warning-free replacement for the deprecated std::filesystem::u8path function
+	LMMS_EXPORT std::filesystem::path u8path(std::string_view path);
 } // namespace lmms::PathUtil
 
 #endif // LMMS_PATHUTIL_H
