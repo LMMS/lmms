@@ -49,24 +49,16 @@ int Scroll::getAngleDelta(const Flags flags)
 {
 	bool useHorizontal = flags.testFlag(Scroll::Flag::Horizontal);
 
-#ifdef LMMS_BUILD_APPLE
-	const auto swapModifiers = Qt::ShiftModifier;
-#else
-	const auto swapModifiers = Qt::ShiftModifier|Qt::AltModifier;
-#endif
-
-	// Swap x/y when shift (or alt) is pressed
-	if (m_event->modifiers() & swapModifiers && flags & Scroll::Flag::SwapWithShiftOrAlt)
+	// Swap x/y when Shift or Alt is pressed
+	if (flags & Scroll::Flag::SwapWithShiftOrAlt && m_event->modifiers() & (Qt::ShiftModifier|Qt::AltModifier))
 	{
 		useHorizontal = !useHorizontal;
 	}
 
-	// Compensate for Qt swapping x/y when Alt is pressed on Windows and Linux
+	// Compensate for Qt swapping x/y when Alt is pressed
 	if (m_event->modifiers() & Qt::AltModifier)
 	{
-#ifndef LMMS_BUILD_APPLE
 		useHorizontal = !useHorizontal;
-#endif
 	}
 
 	int delta = useHorizontal ? m_event->angleDelta().x() : m_event->angleDelta().y();
