@@ -37,6 +37,7 @@
 #include "ConfigManager.h"
 #include "embed.h"
 #include "GuiApplication.h"
+#include "KeyboardShortcuts.h"
 #include "NStateButton.h"
 #include "TextFloat.h"
 
@@ -58,7 +59,6 @@ TimeLineWidget::TimeLineWidget(const int xoff, const int yoff, const float ppb, 
 	m_begin{begin},
 	m_mode{mode}
 {
-	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	move( 0, yoff );
 
 	setMouseTracking(true);
@@ -88,9 +88,10 @@ void TimeLineWidget::setXOffset(const int x)
 void TimeLineWidget::addToolButtons( QToolBar * _tool_bar )
 {
 	auto autoScroll = new NStateButton(_tool_bar);
-	autoScroll->setGeneralToolTip( tr( "Auto scrolling" ) );
-	autoScroll->addState( embed::getIconPixmap( "autoscroll_on" ) );
-	autoScroll->addState( embed::getIconPixmap( "autoscroll_off" ) );
+	autoScroll->setGeneralToolTip(tr("Auto scrolling"));
+	autoScroll->addState(embed::getIconPixmap("autoscroll_stepped_on"), tr("Stepped auto scrolling"));
+	autoScroll->addState(embed::getIconPixmap("autoscroll_continuous_on"), tr("Continuous auto scrolling"));
+	autoScroll->addState(embed::getIconPixmap("autoscroll_off"), tr("Auto scrolling disabled"));
 	connect( autoScroll, SIGNAL(changedState(int)), this,
 					SLOT(toggleAutoScroll(int)));
 

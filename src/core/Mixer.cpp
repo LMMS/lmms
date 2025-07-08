@@ -26,7 +26,6 @@
 
 #include "AudioEngine.h"
 #include "AudioEngineWorkerThread.h"
-#include "BufferManager.h"
 #include "Mixer.h"
 #include "MixHelpers.h"
 #include "Song.h"
@@ -43,8 +42,8 @@ namespace lmms
 MixerRoute::MixerRoute( MixerChannel * from, MixerChannel * to, float amount ) :
 	m_from( from ),
 	m_to( to ),
-	m_amount( amount, 0, 1, 0.001, nullptr,
-			tr( "Amount to send from channel %1 to channel %2" ).arg( m_from->m_channelIndex ).arg( m_to->m_channelIndex ) )
+	m_amount(amount, 0, 1, 0.001f, nullptr,
+			tr("Amount to send from channel %1 to channel %2").arg(m_from->index()).arg(m_to->index()))
 {
 	//qDebug( "created: %d to %d", m_from->m_channelIndex, m_to->m_channelIndex );
 	// create send amount model
@@ -54,7 +53,7 @@ MixerRoute::MixerRoute( MixerChannel * from, MixerChannel * to, float amount ) :
 void MixerRoute::updateName()
 {
 	m_amount.setDisplayName(
-			tr( "Amount to send from channel %1 to channel %2" ).arg( m_from->m_channelIndex ).arg( m_to->m_channelIndex ) );
+			tr("Amount to send from channel %1 to channel %2").arg(m_from->index()).arg(m_to->index()));
 }
 
 
@@ -64,17 +63,17 @@ MixerChannel::MixerChannel( int idx, Model * _parent ) :
 	m_stillRunning( false ),
 	m_peakLeft( 0.0f ),
 	m_peakRight( 0.0f ),
-	m_buffer( new sampleFrame[Engine::audioEngine()->framesPerPeriod()] ),
+	m_buffer( new SampleFrame[Engine::audioEngine()->framesPerPeriod()] ),
 	m_muteModel( false, _parent ),
 	m_soloModel( false, _parent ),
-	m_volumeModel( 1.0, 0.0, 2.0, 0.001, _parent ),
+	m_volumeModel(1.f, 0.f, 2.f, 0.001f, _parent),
 	m_name(),
 	m_lock(),
-	m_channelIndex( idx ),
 	m_queued( false ),
-	m_dependenciesMet(0)
+	m_dependenciesMet(0),
+	m_channelIndex(idx)
 {
-	BufferManager::clear( m_buffer, Engine::audioEngine()->framesPerPeriod() );
+	zeroSampleFrames(m_buffer, Engine::audioEngine()->framesPerPeriod());
 }
 
 
@@ -99,7 +98,7 @@ inline void MixerChannel::processed()
 
 void MixerChannel::incrementDeps()
 {
-	int i = m_dependenciesMet++ + 1;
+	const auto i = m_dependenciesMet++ + 1;
 	if( i >= m_receives.size() && ! m_queued )
 	{
 		m_queued = true;
@@ -109,8 +108,55 @@ void MixerChannel::incrementDeps()
 
 void MixerChannel::unmuteForSolo()
 {
-	//TODO: Recursively activate every channel, this channel sends to
 	m_muteModel.setValue(false);
+
+	// if channel is not master, unmute also every channel it sends to/receives from
+	if (!isMaster())
+	{
+		for (const MixerRoute* sendsRoute : m_sends)
+		{
+			sendsRoute->receiver()->unmuteSenderForSolo();
+		}
+
+		for (const MixerRoute* receiverRoute : m_receives)
+		{
+			receiverRoute->sender()->unmuteReceiverForSolo();
+		}
+	}
+}
+
+void MixerChannel::unmuteSenderForSolo()
+{
+	m_muteModel.setValue(false);
+
+	// if channel is not master, unmute every channel it sends to
+	if (!isMaster())
+	{
+		for (const MixerRoute* sendsRoute : m_sends)
+		{
+			sendsRoute->receiver()->unmuteSenderForSolo();
+		}
+	}
+}
+
+
+void MixerChannel::unmuteReceiverForSolo()
+{
+	m_muteModel.setValue(false);
+
+	// if channel is not master, unmute every channel it receives from, and of those, unmute the channels they send to
+	if (!isMaster())
+	{
+		for (const MixerRoute* receiverRoute : m_receives)
+		{
+			receiverRoute->sender()->unmuteReceiverForSolo();
+		}
+
+		for (const MixerRoute* sendsRoute : m_sends)
+		{
+			sendsRoute->receiver()->unmuteSenderForSolo();
+		}
+	}
 }
 
 
@@ -134,7 +180,7 @@ void MixerChannel::doProcessing()
 				ValueBuffer * volBuf = sender->m_volumeModel.valueBuffer();
 
 				// mix it's output with this one's output
-				sampleFrame * ch_buf = sender->m_buffer;
+				SampleFrame* ch_buf = sender->m_buffer;
 
 				// use sample-exact mixing if sample-exact values are available
 				if( ! volBuf && ! sendBuf ) // neither volume nor send has sample-exact data...
@@ -171,9 +217,9 @@ void MixerChannel::doProcessing()
 
 		m_stillRunning = m_fxChain.processAudioBuffer( m_buffer, fpp, m_hasInput );
 
-		AudioEngine::StereoSample peakSamples = Engine::audioEngine()->getPeakValues(m_buffer, fpp);
-		m_peakLeft = std::max(m_peakLeft, peakSamples.left * v);
-		m_peakRight = std::max(m_peakRight, peakSamples.right * v);
+		SampleFrame peakSamples = getAbsPeakValues(m_buffer, fpp);
+		m_peakLeft = std::max(m_peakLeft, peakSamples[0] * v);
+		m_peakRight = std::max(m_peakRight, peakSamples[1] * v);
 	}
 	else
 	{
@@ -235,7 +281,7 @@ int Mixer::createChannel()
 
 void Mixer::activateSolo()
 {
-	for (int i = 1; i < m_mixerChannels.size(); ++i)
+	for (auto i = std::size_t{1}; i < m_mixerChannels.size(); ++i)
 	{
 		m_mixerChannels[i]->m_muteBeforeSolo = m_mixerChannels[i]->m_muteModel.value();
 		m_mixerChannels[i]->m_muteModel.setValue( true );
@@ -244,7 +290,7 @@ void Mixer::activateSolo()
 
 void Mixer::deactivateSolo()
 {
-	for (int i = 1; i < m_mixerChannels.size(); ++i)
+	for (auto i = std::size_t{1}; i < m_mixerChannels.size(); ++i)
 	{
 		m_mixerChannels[i]->m_muteModel.setValue( m_mixerChannels[i]->m_muteBeforeSolo );
 	}
@@ -260,7 +306,7 @@ void Mixer::toggledSolo()
 		m_mixerChannels[m_lastSoloed]->m_soloModel.setValue( false );
 	}
 	//determine the soloed channel
-	for (int i = 0; i < m_mixerChannels.size(); ++i)
+	for (auto i = std::size_t{0}; i < m_mixerChannels.size(); ++i)
 	{
 		if (m_mixerChannels[i]->m_soloModel.value() == true)
 			soloedChan = i;
@@ -275,7 +321,7 @@ void Mixer::toggledSolo()
 		} else {
 			activateSolo();
 		}
-		// unmute the soloed chan and every channel it sends to
+		// unmute the soloed chan and every channel it sends to/receives from
 		m_mixerChannels[soloedChan]->unmuteForSolo();
 	} else {
 		deactivateSolo();
@@ -355,12 +401,12 @@ void Mixer::deleteChannel( int index )
 	m_mixerChannels.erase(m_mixerChannels.begin() + index);
 	delete ch;
 
-	for( int i = index; i < m_mixerChannels.size(); ++i )
+	for (auto i = static_cast<std::size_t>(index); i < m_mixerChannels.size(); ++i)
 	{
 		validateChannelName( i, i + 1 );
 
 		// set correct channel index
-		m_mixerChannels[i]->m_channelIndex = i;
+		m_mixerChannels[i]->setIndex(i);
 
 		// now check all routes and update names of the send models
 		for( MixerRoute * r : m_mixerChannels[i]->m_sends )
@@ -381,7 +427,7 @@ void Mixer::deleteChannel( int index )
 void Mixer::moveChannelLeft( int index )
 {
 	// can't move master or first channel
-	if( index <= 1 || index >= m_mixerChannels.size() )
+	if (index <= 1 || static_cast<std::size_t>(index) >= m_mixerChannels.size())
 	{
 		return;
 	}
@@ -433,8 +479,8 @@ void Mixer::moveChannelLeft( int index )
 	qSwap(m_mixerChannels[index], m_mixerChannels[index - 1]);
 
 	// Update m_channelIndex of both channels
-	m_mixerChannels[index]->m_channelIndex = index;
-	m_mixerChannels[index - 1]->m_channelIndex = index -1;
+	m_mixerChannels[index]->setIndex(index);
+	m_mixerChannels[index - 1]->setIndex(index - 1);
 }
 
 
@@ -596,7 +642,7 @@ FloatModel * Mixer::channelSendModel( mix_ch_t fromChannel, mix_ch_t toChannel )
 
 
 
-void Mixer::mixToChannel( const sampleFrame * _buf, mix_ch_t _ch )
+void Mixer::mixToChannel( const SampleFrame* _buf, mix_ch_t _ch )
 {
 	if( m_mixerChannels[_ch]->m_muteModel.value() == false )
 	{
@@ -612,13 +658,12 @@ void Mixer::mixToChannel( const sampleFrame * _buf, mix_ch_t _ch )
 
 void Mixer::prepareMasterMix()
 {
-	BufferManager::clear( m_mixerChannels[0]->m_buffer,
-					Engine::audioEngine()->framesPerPeriod() );
+	zeroSampleFrames(m_mixerChannels[0]->m_buffer, Engine::audioEngine()->framesPerPeriod());
 }
 
 
 
-void Mixer::masterMix( sampleFrame * _buf )
+void Mixer::masterMix( SampleFrame* _buf )
 {
 	const int fpp = Engine::audioEngine()->framesPerPeriod();
 
@@ -685,8 +730,7 @@ void Mixer::masterMix( sampleFrame * _buf )
 	// reset channel process state
 	for( int i = 0; i < numChannels(); ++i)
 	{
-		BufferManager::clear( m_mixerChannels[i]->m_buffer,
-				Engine::audioEngine()->framesPerPeriod() );
+		zeroSampleFrames(m_mixerChannels[i]->m_buffer, Engine::audioEngine()->framesPerPeriod());
 		m_mixerChannels[i]->reset();
 		m_mixerChannels[i]->m_queued = false;
 		// also reset hasInput
@@ -746,7 +790,7 @@ void Mixer::clearChannel(mix_ch_t index)
 void Mixer::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	// save channels
-	for( int i = 0; i < m_mixerChannels.size(); ++i )
+	for (auto i = std::size_t{0}; i < m_mixerChannels.size(); ++i)
 	{
 		MixerChannel * ch = m_mixerChannels[i];
 
@@ -757,7 +801,7 @@ void Mixer::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		ch->m_volumeModel.saveSettings( _doc, mixch, "volume" );
 		ch->m_muteModel.saveSettings( _doc, mixch, "muted" );
 		ch->m_soloModel.saveSettings( _doc, mixch, "soloed" );
-		mixch.setAttribute( "num", i );
+		mixch.setAttribute("num", static_cast<qulonglong>(i));
 		mixch.setAttribute( "name", ch->m_name );
 		if (const auto& color = ch->color()) { mixch.setAttribute("color", color->name()); }
 
@@ -776,7 +820,8 @@ void Mixer::saveSettings( QDomDocument & _doc, QDomElement & _this )
 // make sure we have at least num channels
 void Mixer::allocateChannelsTo(int num)
 {
-	while( num > m_mixerChannels.size() - 1 )
+	if (num <= 0) { return; }
+	while (static_cast<std::size_t>(num) > m_mixerChannels.size() - 1)
 	{
 		createChannel();
 
@@ -815,7 +860,7 @@ void Mixer::loadSettings( const QDomElement & _this )
 
 		// mixer sends
 		QDomNodeList chData = mixch.childNodes();
-		for( unsigned int i=0; i<chData.length(); ++i )
+		for (auto i = 0; i < chData.length(); ++i)
 		{
 			QDomElement chDataItem = chData.at(i).toElement();
 			if( chDataItem.nodeName() == QString( "send" ) )

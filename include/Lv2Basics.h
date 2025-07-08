@@ -1,7 +1,7 @@
 /*
  * Lv2Basics.h - basic Lv2 utils
  *
- * Copyright (c) 2018-2023 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
+ * Copyright (c) 2018-2024 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -37,6 +37,12 @@
 namespace lmms
 {
 
+template<class T>
+struct LilvPtrDeleter
+{
+	void operator()(T* n) { lilv_free(static_cast<void*>(n)); }
+};
+
 struct LilvNodeDeleter
 {
 	void operator()(LilvNode* n) { lilv_node_free(n); }
@@ -52,6 +58,8 @@ struct LilvScalePointsDeleter
 	void operator()(LilvScalePoints* s) { lilv_scale_points_free(s); }
 };
 
+template<class T>
+using AutoLilvPtr = std::unique_ptr<T, LilvPtrDeleter<T>>;
 using AutoLilvNode = std::unique_ptr<LilvNode, LilvNodeDeleter>;
 using AutoLilvNodes = std::unique_ptr<LilvNodes, LilvNodesDeleter>;
 using AutoLilvScalePoints = std::unique_ptr<LilvScalePoints, LilvScalePointsDeleter>;

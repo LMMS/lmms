@@ -24,6 +24,7 @@
 
 #include "TrackOperationsWidget.h"
 
+#include <QBoxLayout>
 #include <QMenu>
 #include <QMessageBox>
 #include <QMouseEvent>
@@ -39,11 +40,13 @@
 #include "embed.h"
 #include "Engine.h"
 #include "InstrumentTrackView.h"
+#include "KeyboardShortcuts.h"
 #include "PixmapButton.h"
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "Track.h"
 #include "TrackContainerView.h"
+#include "TrackGrip.h"
 #include "TrackView.h"
 
 namespace lmms::gui
@@ -68,41 +71,40 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 
 	setObjectName( "automationEnabled" );
 
+	auto layout = new QHBoxLayout(this);
+	layout->setContentsMargins(0, 0, 0, 0);
+	layout->setSpacing(0);
+	layout->setAlignment(Qt::AlignTop);
 
-	m_trackOps = new QPushButton( this );
-	m_trackOps->move( 12, 1 );
+	m_trackGrip = new TrackGrip(m_trackView->getTrack(), this);
+	layout->addWidget(m_trackGrip);
+
+	// This widget holds the gear icon and the mute and solo
+	// buttons in a layout.
+	auto operationsWidget = new QWidget(this);
+	auto operationsLayout = new QHBoxLayout(operationsWidget);
+	operationsLayout->setContentsMargins(2, 6, 0, 6);
+	operationsLayout->setSpacing(2);
+
+	m_trackOps = new QPushButton(operationsWidget);
 	m_trackOps->setFocusPolicy( Qt::NoFocus );
 	m_trackOps->setMenu( toMenu );
 	m_trackOps->setToolTip(tr("Actions"));
 
-
-	m_muteBtn = new PixmapButton( this, tr( "Mute" ) );
-	m_muteBtn->setActiveGraphic( embed::getIconPixmap( "led_off" ) );
-	m_muteBtn->setInactiveGraphic( embed::getIconPixmap( "led_green" ) );
-	m_muteBtn->setCheckable( true );
-
-	m_soloBtn = new PixmapButton( this, tr( "Solo" ) );
-	m_soloBtn->setActiveGraphic( embed::getIconPixmap( "led_red" ) );
-	m_soloBtn->setInactiveGraphic( embed::getIconPixmap( "led_off" ) );
-	m_soloBtn->setCheckable( true );
-
-	if( ConfigManager::inst()->value( "ui",
-					  "compacttrackbuttons" ).toInt() )
-	{
-		m_muteBtn->move( 46, 0 );
-		m_soloBtn->move( 46, 16 );
-	}
-	else
-	{
-		m_muteBtn->move( 46, 8 );
-		m_soloBtn->move( 62, 8 );
-	}
-
-	m_muteBtn->show();
+	m_muteBtn = new AutomatableButton(operationsWidget, tr("Mute"));
+	m_muteBtn->setCheckable(true);
 	m_muteBtn->setToolTip(tr("Mute"));
-
-	m_soloBtn->show();
+	m_muteBtn->setObjectName("btn-mute");
+	m_soloBtn = new AutomatableButton(operationsWidget, tr("Solo"));
+	m_soloBtn->setCheckable(true);
 	m_soloBtn->setToolTip(tr("Solo"));
+	m_soloBtn->setObjectName("btn-solo");
+
+	operationsLayout->addWidget(m_trackOps);
+	operationsLayout->addWidget(m_muteBtn);
+	operationsLayout->addWidget(m_soloBtn);
+
+	layout->addWidget(operationsWidget, 0, Qt::AlignTop | Qt::AlignLeading);
 
 	connect( this, SIGNAL(trackRemovalScheduled(lmms::gui::TrackView*)),
 			m_trackView->trackContainerView(),
@@ -114,11 +116,6 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 
 	connect(m_trackView->getTrack(), SIGNAL(colorChanged()), this, SLOT(update()));
 }
-
-
-
-
-
 
 
 /*! \brief Respond to trackOperationsWidget mouse events
@@ -133,9 +130,8 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
  */
 void TrackOperationsWidget::mousePressEvent( QMouseEvent * me )
 {
-	if( me->button() == Qt::LeftButton &&
-		me->modifiers() & Qt::ControlModifier &&
-			m_trackView->getTrack()->type() != Track::Type::Pattern)
+	if (me->button() == Qt::LeftButton && me->modifiers() & KBD_COPY_MODIFIER &&
+		m_trackView->getTrack()->type() != Track::Type::Pattern)
 	{
 		DataFile dataFile( DataFile::Type::DragNDropData );
 		m_trackView->getTrack()->saveState( dataFile, dataFile.content() );
@@ -152,33 +148,17 @@ void TrackOperationsWidget::mousePressEvent( QMouseEvent * me )
 }
 
 
-
-
-/*! \brief Repaint the trackOperationsWidget
+/*!
+ * \brief Repaint the trackOperationsWidget
  *
- *  If we're not moving, and in the Pattern Editor, then turn
- *  automation on or off depending on its previous state and show
- *  ourselves.
- *
- *  Otherwise, hide ourselves.
- *
- *  \todo Flesh this out a bit - is it correct?
- *  \param pe The paint event to respond to
+ * Only things that's done for now is to paint the background
+ * with the brush of the window from the palette.
  */
-void TrackOperationsWidget::paintEvent( QPaintEvent * pe )
+void TrackOperationsWidget::paintEvent(QPaintEvent*)
 {
 	QPainter p( this );
 
 	p.fillRect(rect(), palette().brush(QPalette::Window));
-
-	if (m_trackView->getTrack()->color().has_value() && !m_trackView->getTrack()->getMutedModel()->value()) 
-	{
-		QRect coloredRect( 0, 0, 10, m_trackView->getTrack()->getHeight() );
-
-		p.fillRect(coloredRect, m_trackView->getTrack()->color().value());
-	}
-
-	p.drawPixmap(2, 2, embed::getIconPixmap(m_trackView->isMovingTrack() ? "track_op_grip_c" : "track_op_grip"));
 }
 
 
@@ -199,7 +179,7 @@ bool TrackOperationsWidget::confirmRemoval()
 		ConfigManager::inst()->setValue("ui", "trackdeletionwarning", state ? "0" : "1");
 	});
 
-	QMessageBox mb(this);
+	QMessageBox mb;
 	mb.setText(messageRemoveTrack);
 	mb.setWindowTitle(messageTitleRemoveTrack);
 	mb.setIcon(QMessageBox::Warning);
@@ -208,16 +188,8 @@ bool TrackOperationsWidget::confirmRemoval()
 	mb.setCheckBox(askAgainCheckBox);
 	mb.setDefaultButton(QMessageBox::Cancel);
 
-	int answer = mb.exec();
-
-	if( answer == QMessageBox::Ok )
-	{
-		return true;
-	}
-	return false;
+	return mb.exec() == QMessageBox::Ok;
 }
-
-
 
 /*! \brief Clone this track
  *
@@ -236,6 +208,12 @@ void TrackOperationsWidget::cloneTrack()
 		tcView->moveTrackView( newTrackView, i - 1 );
 		i--;
 	}
+
+	if (m_soloBtn->model()->value())
+	{
+		// if this track was solo, make the new track the new solo
+		newTrack->toggleSolo();
+	}
 }
 
 
@@ -248,7 +226,6 @@ void TrackOperationsWidget::clearTrack()
 	t->deleteClips();
 	t->unlock();
 }
-
 
 
 /*! \brief Remove this track from the track list
@@ -303,6 +280,7 @@ void TrackOperationsWidget::resetClipColors()
 	}
 	Engine::getSong()->setModified();
 }
+
 
 /*! \brief Update the trackOperationsWidget context menu
  *
@@ -368,7 +346,6 @@ void TrackOperationsWidget::toggleRecording( bool on )
 		atv->update();
 	}
 }
-
 
 
 void TrackOperationsWidget::recordingOn()

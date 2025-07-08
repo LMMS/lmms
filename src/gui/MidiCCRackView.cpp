@@ -79,6 +79,7 @@ MidiCCRackView::MidiCCRackView(InstrumentTrack * track) :
 	auto knobsScrollArea = new QScrollArea();
 	auto knobsArea = new QWidget();
 	auto knobsAreaLayout = new QGridLayout();
+	knobsAreaLayout->setVerticalSpacing(10);
 
 	knobsArea->setLayout(knobsAreaLayout);
 	knobsScrollArea->setWidget(knobsArea);
@@ -86,23 +87,20 @@ MidiCCRackView::MidiCCRackView(InstrumentTrack * track) :
 
 	knobsGroupBoxLayout->addWidget(knobsScrollArea);
 
-	// Adds the controller knobs
+	// Adds the controller knobs and sets their models
 	for (int i = 0; i < MidiControllerCount; ++i)
 	{
-		m_controllerKnob[i] = new Knob(KnobType::Bright26);
-		m_controllerKnob[i]->setLabel(tr("CC %1").arg(i));
-		knobsAreaLayout->addWidget(m_controllerKnob[i], i/4, i%4);
+		auto knob = new Knob(KnobType::Bright26, tr("CC %1").arg(i), this);
+		knob->setModel(m_track->m_midiCCModel[i].get());
+		knobsAreaLayout->addWidget(knob, i/4, i%4, Qt::AlignHCenter);
+
+		// TODO It seems that this is not really used/needed?
+		m_controllerKnob[i] = knob;
 	}
 
 	// Set all the models
 	// Set the LED button to enable/disable the track midi cc
 	m_midiCCGroupBox->setModel(m_track->m_midiCCEnable.get());
-
-	// Set the model for each Knob
-	for (int i = 0; i < MidiControllerCount; ++i)
-	{
-		m_controllerKnob[i]->setModel(m_track->m_midiCCModel[i].get());
-	}
 
 	// Connection to update the name of the track on the label
 	connect(m_track, SIGNAL(nameChanged()),

@@ -235,9 +235,6 @@ void Song::processNextBuffer()
 			return;
 	}
 
-	// If we have no tracks to play, there is nothing to do
-	if (trackList.empty()) { return; }
-
 	// If the playback position is outside of the range [begin, end), move it to
 	// begin and inform interested parties.
 	// Returns true if the playback position was moved, else false.
@@ -293,7 +290,7 @@ void Song::processNextBuffer()
 			}
 			else if (m_playMode == PlayMode::MidiClip && m_loopMidiClip && !loopEnabled)
 			{
-				enforceLoop(TimePos{0}, m_midiClipToPlay->length());
+				enforceLoop(-m_midiClipToPlay->startTimeOffset(), m_midiClipToPlay->length() - m_midiClipToPlay->startTimeOffset());
 			}
 
 			// Handle loop points, and inform VST plugins of the loop status
@@ -335,6 +332,8 @@ void Song::processNextBuffer()
 		{
 			// First frame of tick: process automation and play tracks
 			processAutomations(trackList, getPlayPos(), framesToPlay);
+			processMetronome(frameOffsetInPeriod);
+
 			for (const auto track : trackList)
 			{
 				track->play(getPlayPos(), framesToPlay, frameOffsetInPeriod, clipNum);
@@ -367,7 +366,7 @@ void Song::processAutomations(const TrackList &tracklist, TimePos timeStart, fpp
 		break;
 	case PlayMode::Pattern:
 	{
-		Q_ASSERT(tracklist.size() == 1);
+		if (tracklist.empty()) { return; }
 		Q_ASSERT(tracklist.at(0)->type() == Track::Type::Pattern);
 		auto patternTrack = dynamic_cast<PatternTrack*>(tracklist.at(0));
 		container = Engine::patternStore();
@@ -397,7 +396,14 @@ void Song::processAutomations(const TrackList &tracklist, TimePos timeStart, fpp
 		if (p->isRecording() && relTime >= 0 && relTime < p->length())
 		{
 			const AutomatableModel* recordedModel = p->firstObject();
-			p->recordValue(relTime, recordedModel->value<float>());
+			// The automation system really needs to be reworked.
+			// For whatever reason, the values in an automation clip are stored in un-un-scaled format, so if you
+			// are automating a log knob, when you draw an curve, the values being stored are not the actual values the
+			// knob will take, but instead the unscaled version of the unscaled numbers. The tooltip shows the number you expect, but if you double-click,
+			// you can see that the true values are stored by their inverse scaled value....which is wrong, since they weren't scaled in the first place...?
+			// Anyhow, in the meantime before we redo the automation system, when recording automations, we have to get the inverseScaledValue
+			// and store that so that when playing it back, it scales the value correctly.
+			p->recordValue(relTime, recordedModel->inverseScaledValue(recordedModel->value<float>()));
 
 			recordedModels << recordedModel;
 		}
@@ -427,6 +433,17 @@ void Song::processAutomations(const TrackList &tracklist, TimePos timeStart, fpp
 			it.key()->setUseControllerValue(true);
 		}
 	}
+}
+
+void Song::processMetronome(size_t bufferOffset)
+{
+	const auto currentPlayMode = playMode();
+	const auto supported = currentPlayMode == PlayMode::MidiClip
+		|| currentPlayMode == PlayMode::Song
+		|| currentPlayMode == PlayMode::Pattern;
+
+	if (!supported || m_exporting) { return; } 
+	m_metronome.processTick(currentTick(), ticksPerBar(), m_timeSigModel.getNumerator(), bufferOffset);
 }
 
 void Song::setModified(bool value)
@@ -483,6 +500,7 @@ void Song::playSong()
 	}
 
 	m_playMode = PlayMode::Song;
+	m_lastPlayMode = m_playMode;
 	m_playing = true;
 	m_paused = false;
 
@@ -522,6 +540,7 @@ void Song::playPattern()
 	}
 
 	m_playMode = PlayMode::Pattern;
+	m_lastPlayMode = m_playMode;
 	m_playing = true;
 	m_paused = false;
 
@@ -548,6 +567,7 @@ void Song::playMidiClip( const MidiClip* midiClipToPlay, bool loop )
 	if( m_midiClipToPlay != nullptr )
 	{
 		m_playMode = PlayMode::MidiClip;
+		m_lastPlayMode = m_playMode;
 		m_playing = true;
 		m_paused = false;
 	}
@@ -562,6 +582,8 @@ void Song::playMidiClip( const MidiClip* midiClipToPlay, bool loop )
 
 void Song::updateLength()
 {
+	if (m_loadingProject) { return; }
+
 	m_length = 0;
 	m_tracksMutex.lockForRead();
 	for (auto track : tracks())
@@ -648,7 +670,14 @@ void Song::stop()
 	switch (timeline.stopBehaviour())
 	{
 		case Timeline::StopBehaviour::BackToZero:
-			getPlayPos().setTicks(0);
+			if (m_playMode == PlayMode::MidiClip)
+			{
+				getPlayPos().setTicks(std::max(0, -m_midiClipToPlay->startTimeOffset()));
+			}
+			else
+			{
+				getPlayPos().setTicks(0);
+			}
 			m_elapsedMilliSeconds[static_cast<std::size_t>(m_playMode)] = 0;
 			break;
 
@@ -845,7 +874,7 @@ void Song::clearProject()
 		stop();
 	}
 
-	for( int i = 0; i < PlayModeCount; i++ )
+	for (auto i = std::size_t{0}; i < PlayModeCount; i++)
 	{
 		setPlayPos( 0, ( PlayMode )i );
 	}
@@ -963,7 +992,7 @@ void Song::createNewProject()
 	QCoreApplication::instance()->processEvents();
 
 	m_loadingProject = false;
-
+	updateLength();
 	Engine::patternStore()->updateAfterTrackAdd();
 
 	Engine::projectJournal()->setJournalling( true );
@@ -1066,12 +1095,6 @@ void Song::loadProject( const QString & fileName )
 	m_masterPitchModel.loadSettings( dataFile.head(), "masterpitch" );
 
 	getTimeline(PlayMode::Song).setLoopEnabled(false);
-
-	if( !dataFile.content().firstChildElement( "track" ).isNull() )
-	{
-		m_globalAutomationTrack->restoreState( dataFile.content().
-						firstChildElement( "track" ) );
-	}
 
 	//Backward compatibility for LMMS <= 0.4.15
 	PeakController::initGetControllerBySetting();
@@ -1206,6 +1229,7 @@ void Song::loadProject( const QString & fileName )
 	}
 
 	m_loadingProject = false;
+	updateLength();
 	setModified(false);
 	m_loadOnLaunch = false;
 }
@@ -1226,7 +1250,6 @@ bool Song::saveProjectFile(const QString & filename, bool withResources)
 
 	saveState( dataFile, dataFile.content() );
 
-	m_globalAutomationTrack->saveState( dataFile, dataFile.content() );
 	Engine::mixer()->saveState( dataFile, dataFile.content() );
 	if( getGUI() != nullptr )
 	{
@@ -1346,7 +1369,7 @@ void Song::restoreScaleStates(const QDomElement &element)
 {
 	QDomNode node = element.firstChild();
 
-	for (int i = 0; i < MaxScaleCount && !node.isNull() && !isCancelled(); i++)
+	for (auto i = std::size_t{0}; i < MaxScaleCount && !node.isNull() && !isCancelled(); i++)
 	{
 		m_scales[i]->restoreState(node.toElement());
 		node = node.nextSibling();
@@ -1371,7 +1394,7 @@ void Song::restoreKeymapStates(const QDomElement &element)
 {
 	QDomNode node = element.firstChild();
 
-	for (int i = 0; i < MaxKeymapCount && !node.isNull() && !isCancelled(); i++)
+	for (auto i = std::size_t{0}; i < MaxKeymapCount && !node.isNull() && !isCancelled(); i++)
 	{
 		m_keymaps[i]->restoreState(node.toElement());
 		node = node.nextSibling();
@@ -1542,6 +1565,4 @@ void Song::setKeymap(unsigned int index, std::shared_ptr<Keymap> newMap)
 	emit keymapListChanged(index);
 	Engine::audioEngine()->doneChangeInModel();
 }
-
-
 } // namespace lmms

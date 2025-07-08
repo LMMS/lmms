@@ -50,6 +50,8 @@ protected:
 	void contextMenuEvent(QContextMenuEvent* event) override;
 
 private:
+	void enterValue();
+
 	TrackView * m_tv;
 };
 

@@ -62,7 +62,7 @@ PluginBrowser::PluginBrowser( QWidget * _parent ) :
 
 	auto hint = new QLabel( tr( "Drag an instrument "
 					"into either the Song Editor, the "
-					"Pattern Editor or into an "
+					"Pattern Editor or an "
 					"existing instrument track." ),
 								m_view );
 	hint->setWordWrap( true );
@@ -297,7 +297,7 @@ void PluginDescWidget::contextMenuEvent(QContextMenuEvent* e)
 	QMenu contextMenu(this);
 	contextMenu.addAction(
 		tr("Send to new instrument track"),
-		[=]{ openInNewInstrumentTrack(m_pluginKey.desc->name); }
+		[=, this]{ openInNewInstrumentTrack(m_pluginKey.desc->name); }
 	);
 	contextMenu.exec(e->globalPos());
 }

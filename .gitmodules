@@ -16,6 +16,7 @@
 [submodule "plugins/Xpressive/exprtk"]
 	path = plugins/Xpressive/exprtk
 	url = https://github.com/ArashPartow/exprtk
+	branch = release
 [submodule "plugins/LadspaEffect/swh/ladspa"]
 	path = plugins/LadspaEffect/swh/ladspa
 	url = https://github.com/swh/ladspa
@@ -25,9 +26,6 @@
 [submodule "src/3rdparty/weakjack/weakjack"]
 	path = src/3rdparty/weakjack/weakjack
 	url = https://github.com/x42/weakjack.git
-[submodule "src/3rdparty/mingw-std-threads"]
-	path = src/3rdparty/mingw-std-threads
-	url = https://github.com/meganz/mingw-std-threads.git
 [submodule "doc/wiki"]
 	path = doc/wiki
 	url = https://github.com/lmms/lmms.wiki.git

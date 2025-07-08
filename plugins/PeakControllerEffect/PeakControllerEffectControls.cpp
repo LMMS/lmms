@@ -38,14 +38,14 @@ PeakControllerEffectControls::
 PeakControllerEffectControls( PeakControllerEffect * _eff ) :
 	EffectControls( _eff ),
 	m_effect( _eff ),
-	m_baseModel( 0.5, 0.0, 1.0, 0.001, this, tr( "Base value" ) ),
-	m_amountModel( 1.0, -1.0, 1.0, 0.005, this, tr( "Modulation amount" ) ),
-	m_attackModel( 0, 0, 0.999, 0.001, this, tr( "Attack" ) ),
-	m_decayModel( 0, 0, 0.999, 0.001, this, tr( "Release" ) ),
-	m_tresholdModel( 0, 0, 1.0, 0.001, this, tr( "Treshold" ) ),
+	m_baseModel(0.5f, 0.f, 1.f, 0.001f, this, tr("Base value")),
+	m_amountModel(1.f, -1.f, 1.f, 0.005f, this, tr("Modulation amount")),
+	m_attackModel(0, 0, 0.999f, 0.001f, this, tr("Attack")),
+	m_decayModel(0, 0, 0.999f, 0.001f, this, tr("Release")),
+	m_tresholdModel(0, 0, 1.f, 0.001f, this, tr("Treshold")),
 	m_muteModel( false, this, tr( "Mute output" ) ),
 	m_absModel( true, this, tr("Absolute value") ),
-	m_amountMultModel( 1.0, 0, 32, 0.2, this, tr("Amount multiplicator") )
+	m_amountMultModel(1.f, 0, 32, 0.2f, this, tr("Amount multiplicator"))
 {
 }
 

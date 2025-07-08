@@ -71,8 +71,8 @@ public:
 
 	private:
 		std::atomic<ThreadableJob*> m_items[JOB_QUEUE_SIZE];
-		std::atomic_int m_writeIndex;
-		std::atomic_int m_itemsDone;
+		std::atomic_size_t m_writeIndex;
+		std::atomic_size_t m_itemsDone;
 		OperationMode m_opMode;
 	} ;
 

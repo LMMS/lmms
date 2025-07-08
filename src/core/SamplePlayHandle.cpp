@@ -24,7 +24,7 @@
 
 #include "SamplePlayHandle.h"
 #include "AudioEngine.h"
-#include "AudioPort.h"
+#include "AudioBusHandle.h"
 #include "Engine.h"
 #include "Note.h"
 #include "PatternTrack.h"
@@ -35,20 +35,20 @@ namespace lmms
 {
 
 
-SamplePlayHandle::SamplePlayHandle(Sample* sample, bool ownAudioPort) :
-	PlayHandle( Type::SamplePlayHandle ),
+SamplePlayHandle::SamplePlayHandle(Sample* sample, bool ownAudioBusHandle) :
+	PlayHandle(Type::SamplePlayHandle),
 	m_sample(sample),
-	m_doneMayReturnTrue( true ),
-	m_frame( 0 ),
-	m_ownAudioPort( ownAudioPort ),
-	m_defaultVolumeModel( DefaultVolume, MinVolume, MaxVolume, 1 ),
-	m_volumeModel( &m_defaultVolumeModel ),
-	m_track( nullptr ),
-	m_patternTrack( nullptr )
+	m_doneMayReturnTrue(true),
+	m_frame(0),
+	m_ownAudioBusHandle(ownAudioBusHandle),
+	m_defaultVolumeModel(DefaultVolume, MinVolume, MaxVolume, 1),
+	m_volumeModel(&m_defaultVolumeModel),
+	m_track(nullptr),
+	m_patternTrack(nullptr)
 {
-	if (ownAudioPort)
+	if (ownAudioBusHandle)
 	{
-		setAudioPort( new AudioPort( "SamplePlayHandle", false ) );
+		setAudioBusHandle(new AudioBusHandle("SamplePlayHandle", false));
 	}
 }
 
@@ -67,7 +67,7 @@ SamplePlayHandle::SamplePlayHandle( SampleClip* clip ) :
 	SamplePlayHandle(&clip->sample(), false)
 {
 	m_track = clip->getTrack();
-	setAudioPort( ( (SampleTrack *)clip->getTrack() )->audioPort() );
+	setAudioBusHandle(((SampleTrack *)clip->getTrack())->audioBusHandle());
 }
 
 
@@ -75,9 +75,9 @@ SamplePlayHandle::SamplePlayHandle( SampleClip* clip ) :
 
 SamplePlayHandle::~SamplePlayHandle()
 {
-	if( m_ownAudioPort )
+	if(m_ownAudioBusHandle)
 	{
-		delete audioPort();
+		delete audioBusHandle();
 		delete m_sample;
 	}
 }
@@ -85,23 +85,23 @@ SamplePlayHandle::~SamplePlayHandle()
 
 
 
-void SamplePlayHandle::play( sampleFrame * buffer )
+void SamplePlayHandle::play( SampleFrame* buffer )
 {
 	const fpp_t fpp = Engine::audioEngine()->framesPerPeriod();
 	//play( 0, _try_parallelizing );
 	if( framesDone() >= totalFrames() )
 	{
-		memset( buffer, 0, sizeof( sampleFrame ) * fpp );
+		zeroSampleFrames(buffer, fpp);
 		return;
 	}
 
-	sampleFrame * workingBuffer = buffer;
+	SampleFrame* workingBuffer = buffer;
 	f_cnt_t frames = fpp;
 
 	// apply offset for the first period
 	if( framesDone() == 0 )
 	{
-		memset( buffer, 0, sizeof( sampleFrame ) * offset() );
+		zeroSampleFrames(buffer, offset());
 		workingBuffer += offset();
 		frames -= offset();
 	}
@@ -116,7 +116,7 @@ void SamplePlayHandle::play( sampleFrame * buffer )
 		// it is used only for previews, SampleTracks and the metronome.
 		if (!m_sample->play(workingBuffer, &m_state, frames, DefaultBaseFreq))
 		{
-			memset(workingBuffer, 0, frames * sizeof(sampleFrame));
+			zeroSampleFrames(workingBuffer, frames);
 		}
 	}
 

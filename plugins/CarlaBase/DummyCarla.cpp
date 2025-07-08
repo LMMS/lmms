@@ -1,6 +1,6 @@
 // A dummy Carla interface
 #define BUILDING_CARLA
-#include "CarlaNativePlugin.h"
+#include <CarlaNativePlugin.h>
 
 #ifndef CARLA_PLUGIN_EXPORT
 #define CARLA_PLUGIN_EXPORT CARLA_EXPORT

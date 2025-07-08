@@ -1,4 +1,5 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 3.9)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.13)
+SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Set the given policy to NEW. If it does not exist, it will not be set. If it
 # is already set to NEW (most likely due to predating the minimum required CMake
@@ -15,8 +16,7 @@ function(enable_policy_if_exists id)
 	endif()
 endfunction()
 
-# Needed for the SWH Ladspa plugins. See below.
-enable_policy_if_exists(CMP0074) # find_package() uses <PackageName>_ROOT variables.
+enable_policy_if_exists(CMP0092) # MSVC warning flags are not in CMAKE_<LANG>_FLAGS by default.
 # Needed for ccache support with MSVC
 enable_policy_if_exists(CMP0141) # MSVC debug information format flags are selected by an abstraction.
 
@@ -43,10 +43,11 @@ INCLUDE(AddFileDependencies)
 INCLUDE(CheckIncludeFiles)
 INCLUDE(FindPkgConfig)
 INCLUDE(GenerateExportHeader)
+include(StaticDependencies)
 
 STRING(TOUPPER          "${CMAKE_PROJECT_NAME}" PROJECT_NAME_UCASE)
 
-SET(PROJECT_YEAR 2024)
+SET(PROJECT_YEAR 2025)
 
 SET(PROJECT_AUTHOR      "LMMS Developers")
 SET(PROJECT_URL         "https://lmms.io")
@@ -102,7 +103,10 @@ option(WANT_DEBUG_ASAN	"Enable AddressSanitizer" OFF)
 option(WANT_DEBUG_TSAN	"Enable ThreadSanitizer" OFF)
 option(WANT_DEBUG_MSAN	"Enable MemorySanitizer" OFF)
 option(WANT_DEBUG_UBSAN	"Enable UndefinedBehaviorSanitizer" OFF)
+option(WANT_DEBUG_GPROF	"Enable gprof profiler" OFF)
 OPTION(BUNDLE_QT_TRANSLATIONS	"Install Qt translation files for LMMS" OFF)
+option(WANT_DEBUG_CPACK "Show detailed logs for packaging commands" OFF)
+option(WANT_CPACK_TARBALL "Request CPack to create a tarball instead of an installer" OFF)
 
 
 IF(LMMS_BUILD_APPLE)
@@ -154,6 +158,7 @@ CHECK_INCLUDE_FILES(sys/types.h LMMS_HAVE_SYS_TYPES_H)
 CHECK_INCLUDE_FILES(sys/ipc.h LMMS_HAVE_SYS_IPC_H)
 CHECK_INCLUDE_FILES(sys/time.h LMMS_HAVE_SYS_TIME_H)
 CHECK_INCLUDE_FILES(sys/times.h LMMS_HAVE_SYS_TIMES_H)
+CHECK_INCLUDE_FILES(sys/prctl.h LMMS_HAVE_SYS_PRCTL_H)
 CHECK_INCLUDE_FILES(sched.h LMMS_HAVE_SCHED_H)
 CHECK_INCLUDE_FILES(sys/soundcard.h LMMS_HAVE_SYS_SOUNDCARD_H)
 CHECK_INCLUDE_FILES(soundcard.h LMMS_HAVE_SOUNDCARD_H)
@@ -169,10 +174,10 @@ check_library_exists(rt shm_open "" LMMS_HAVE_LIBRT)
 
 LIST(APPEND CMAKE_PREFIX_PATH "${CMAKE_INSTALL_PREFIX}")
 
-FIND_PACKAGE(Qt5 5.9.0 COMPONENTS Core Gui Widgets Xml REQUIRED)
+FIND_PACKAGE(Qt5 5.9.0 COMPONENTS Core Gui Widgets Xml Svg REQUIRED)
 FIND_PACKAGE(Qt5 COMPONENTS LinguistTools QUIET)
 
-INCLUDE_DIRECTORIES(
+include_directories(SYSTEM
 	${Qt5Core_INCLUDE_DIRS}
 	${Qt5Gui_INCLUDE_DIRS}
 	${Qt5Widgets_INCLUDE_DIRS}
@@ -184,6 +189,7 @@ SET(QT_LIBRARIES
 	Qt5::Gui
 	Qt5::Widgets
 	Qt5::Xml
+	Qt5::Svg
 )
 
 IF(LMMS_BUILD_LINUX AND WANT_VST)
@@ -235,29 +241,28 @@ if(LMMS_BUILD_APPLE)
 endif()
 find_package(Perl)
 
-IF(WANT_LV2)
-	IF(PKG_CONFIG_FOUND)
-		PKG_CHECK_MODULES(LV2 lv2)
-		PKG_CHECK_MODULES(LILV lilv-0)
-	ENDIF()
-	IF(NOT LV2_FOUND AND NOT LILV_FOUND)
-		UNSET(LV2_FOUND CACHE)
-		UNSET(LILV_FOUND CACHE)
-		FIND_PACKAGE(LV2 CONFIG)
-		FIND_PACKAGE(LILV CONFIG)
-		IF(LILV_FOUND)
-			SET(LILV_LIBRARIES "lilv::lilv")
-		ENDIF()
-	ENDIF()
-	IF(LV2_FOUND AND LILV_FOUND)
-		SET(LMMS_HAVE_LV2 TRUE)
-		SET(STATUS_LV2 "OK")
-	ELSE()
-		SET(STATUS_LV2 "not found, install it or set PKG_CONFIG_PATH appropriately")
-	ENDIF()
-ELSE(WANT_LV2)
-	SET(STATUS_LV2 "not built as requested")
-ENDIF(WANT_LV2)
+if(WANT_LV2)
+	if(PKG_CONFIG_FOUND)
+		pkg_check_modules(LV2 lv2)
+	endif()
+
+	find_package(Lilv)
+	if(Lilv_FOUND)
+		set(LILV_LIBRARIES Lilv::lilv)
+	endif()
+
+	# Ensure both dependencies are found
+	if(NOT LV2_FOUND)
+		set(STATUS_LV2 "not found, install lv2 or set PKG_CONFIG_PATH appropriately")
+	elseif(NOT Lilv_FOUND)
+		set(STATUS_LV2 "not found, install lilv or set PKG_CONFIG_PATH appropriately")
+	else()
+		set(LMMS_HAVE_LV2 TRUE)
+		set(STATUS_LV2 "OK")
+	endif()
+else()
+	set(STATUS_LV2 "not built as requested")
+endif()
 
 IF(WANT_SUIL)
 	IF(PKG_CONFIG_FOUND)
@@ -265,6 +270,7 @@ IF(WANT_SUIL)
 		IF(SUIL_FOUND)
 			SET(LMMS_HAVE_SUIL TRUE)
 			SET(STATUS_SUIL "OK")
+			find_package(SuilModules)
 		ELSE()
 			SET(STATUS_SUIL "not found, install it or set PKG_CONFIG_PATH appropriately")
 		ENDIF()
@@ -337,34 +343,11 @@ IF(WANT_SDL)
 	FIND_PACKAGE(SDL2)
 	IF(SDL2_FOUND)
 		SET(LMMS_HAVE_SDL TRUE)
-		SET(LMMS_HAVE_SDL2 TRUE)
-		SET(STATUS_SDL "OK, using SDL2")
+		SET(STATUS_SDL "OK")
 		SET(SDL2_LIBRARY "SDL2::SDL2")
-		SET(SDL_INCLUDE_DIR "")
-		SET(SDL_LIBRARY "")
 	ELSE()
+		SET(STATUS_SDL "not found, please install libsdl2-dev (or similar) if you require SDL support")
 		SET(SDL2_LIBRARY "")
-	ENDIF()
-ENDIF()
-
-# fallback to SDL1
-IF(WANT_SDL AND NOT LMMS_HAVE_SDL2)
-	# Fallback to SDL1.2
-	SET(SDL_BUILDING_LIBRARY TRUE)
-	FIND_PACKAGE(SDL)
-	IF(SDL_FOUND)
-		SET(LMMS_HAVE_SDL TRUE)
-		SET(STATUS_SDL "OK, using SDL1.2")
-		# fix mingw since 53abd65
-		IF(NOT SDL_INCLUDE_DIR)
-			SET(SDL_INCLUDE_DIR "${CMAKE_FIND_ROOT_PATH}/include")
-		ENDIF()
-
-	ELSE()
-		SET(STATUS_SDL "not found, please install libsdl2-dev (or similar) "
-			"if you require SDL support")
-		SET(SDL_INCLUDE_DIR "")
-		SET(SDL_LIBRARY "")
 	ENDIF()
 ENDIF()
 
@@ -410,7 +393,7 @@ IF(WANT_SOUNDIO)
   IF(SOUNDIO_FOUND)
 	SET(LMMS_HAVE_SOUNDIO TRUE)
 	SET(STATUS_SOUNDIO "OK")
-	INCLUDE_DIRECTORIES("${SOUNDIO_INCLUDE_DIR}")
+	include_directories(SYSTEM "${SOUNDIO_INCLUDE_DIR}")
   ELSE(SOUNDIO_FOUND)
 	SET(SOUNDIO_INCLUDE_DIR "")
 	SET(STATUS_SOUNDIO "not found, please install libsoundio if you require libsoundio support")
@@ -491,11 +474,9 @@ ENDIF(NOT LMMS_HAVE_ALSA)
 IF(WANT_JACK)
 	IF(WANT_WEAKJACK)
 		SET(LMMS_HAVE_WEAKJACK TRUE)
-		SET(WEAKJACK_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/src/3rdparty/weakjack/weakjack)
-		SET(JACK_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/src/3rdparty/jack2/common)
 		SET(STATUS_JACK "OK (weak linking enabled)")
-		# use dlsym instead
-		SET(JACK_LIBRARIES ${CMAKE_DL_LIBS})
+		set(JACK_INCLUDE_DIRS "")
+		set(JACK_LIBRARIES weakjack)
 		SET(LMMS_HAVE_JACK TRUE)
 		SET(LMMS_HAVE_JACK_PRENAME TRUE)
 		SET(JACK_FOUND TRUE)
@@ -628,31 +609,19 @@ ELSE()
 	SET (STATUS_DEBUG_FPE "Disabled")
 ENDIF(WANT_DEBUG_FPE)
 
+if(WANT_DEBUG_CPACK)
+	if((LMMS_BUILD_WIN32 AND CMAKE_VERSION VERSION_LESS "3.19") OR WANT_CPACK_TARBALL)
+		set(STATUS_DEBUG_CPACK "Wanted but disabled due to unsupported configuration")
+	else()
+		set(CPACK_DEBUG TRUE)
+		set(STATUS_DEBUG_CPACK "Enabled")
+	endif()
+else()
+	set(STATUS_DEBUG_CPACK "Disabled")
+endif()
+
 # check for libsamplerate
 FIND_PACKAGE(Samplerate 0.1.8 MODULE REQUIRED)
-
-# set compiler flags
-IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-	SET(WERROR_FLAGS "-Wall -Werror=unused-function -Wno-sign-compare -Wno-strict-overflow")
-	OPTION(USE_WERROR "Add -werror to the build flags. Stops the build on warnings" OFF)
-	IF(${USE_WERROR})
-		SET(WERROR_FLAGS "${WERROR_FLAGS} -Werror")
-	ENDIF()
-
-	# Due to a regression in gcc-4.8.X, we need to disable array-bounds check
-	IF (CMAKE_COMPILER_IS_GNUCXX AND ((CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL "4.8.0") OR (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER "4.8.0") OR LMMS_BUILD_WIN32))
-		SET(WERROR_FLAGS "${WERROR_FLAGS} -Wno-array-bounds -Wno-attributes")
-	ENDIF()
-ELSEIF(MSVC)
-	# Remove any existing /W flags
-	string(REGEX REPLACE "/W[0-4]" "" CMAKE_C_FLAGS ${CMAKE_C_FLAGS})
-	STRING(REGEX REPLACE "/W[0-4]" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
-	SET(WERROR_FLAGS "/W2")
-	IF(${USE_WERROR})
-		SET(WERROR_FLAGS "${WERROR_FLAGS} /WX")
-	ENDIF()
-ENDIF()
-
 
 IF(NOT CMAKE_BUILD_TYPE)
 	message(STATUS "Setting build type to 'Release' as none was specified.")
@@ -662,16 +631,23 @@ IF(NOT CMAKE_BUILD_TYPE)
 		"MinSizeRel" "RelWithDebInfo")
 ENDIF()
 
-SET(CMAKE_C_FLAGS "${WERROR_FLAGS} ${CMAKE_C_FLAGS}")
-SET(CMAKE_CXX_FLAGS "${WERROR_FLAGS} ${CMAKE_CXX_FLAGS}")
 SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DLMMS_DEBUG")
 SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DLMMS_DEBUG")
+
+if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_compile_definitions(NDEBUG)
+	SET(STATUS_ASSERTIONS "Disabled")
+else()
+    remove_definitions(-DNDEBUG)
+	SET(STATUS_ASSERTIONS "Enabled")
+endif()
 
 if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.16")
 	set(NOOP_COMMAND "${CMAKE_COMMAND}" "-E" "true")
 else()
 	set(NOOP_COMMAND "${CMAKE_COMMAND}" "-E" "echo")
 endif()
+
 if(STRIP)
 	# TODO CMake 3.19: Now that CONFIG generator expressions support testing for
 	# multiple configurations, combine the OR into a single CONFIG expression.
@@ -705,16 +681,29 @@ ENDIF()
 # we somehow have to make LMMS-binary depend on MOC-files
 ADD_FILE_DEPENDENCIES("${CMAKE_BINARY_DIR}/lmmsconfig.h")
 
-IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-	IF(WIN32)
-		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-attributes")
-	ELSE(WIN32)
-		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -DPIC")
-	ENDIF(WIN32)
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang" AND NOT WIN32)
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC -DPIC")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -DPIC")
 elseif(MSVC)
 	# Use UTF-8 as the source and execution character set
 	add_compile_options("/utf-8")
 ENDIF()
+
+# gcc builds support gprof for profiling
+# clang too seems to support gprof, but i couldn't get it working.
+# if needed, change the if condition to "GNU|CLANG"
+if(NOT CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+	set(STATUS_GPROF ", NOT SUPPORTED BY THIS COMPILER")
+	set(WANT_DEBUG_GPROF OFF)
+endif()
+
+if(WANT_DEBUG_GPROF)
+	add_compile_options(-pg)
+	add_link_options(-pg)
+	set(STATUS_GPROF "OK")
+else()
+	set(STATUS_GPROF "Disabled ${STATUS_GPROF}")
+endif()
 
 # add enabled sanitizers
 function(add_sanitizer sanitizer supported_compilers want_flag status_flag)
@@ -740,6 +729,8 @@ add_sanitizer(memory "Clang" WANT_DEBUG_MSAN STATUS_DEBUG_MSAN -fno-omit-frame-p
 # not being found by PeakController
 add_sanitizer(undefined "GNU|Clang" WANT_DEBUG_UBSAN STATUS_DEBUG_UBSAN -fno-sanitize=vptr)
 
+# Add warning and error flags
+include(ErrorFlags)
 
 # use ccache
 include(CompileCache)
@@ -777,7 +768,7 @@ IF(LMMS_BUILD_LINUX)
 		"${CMAKE_BINARY_DIR}/lmmsconfig.h"
 		"${CMAKE_BINARY_DIR}/lmmsversion.h"
 		"${CMAKE_SOURCE_DIR}/src/gui/embed.cpp"
-		DESTINATION "${CMAKE_INSTALL_PREFIX}/include/lmms/")
+		DESTINATION "include/lmms/")
 ENDIF(LMMS_BUILD_LINUX)
 
 #
@@ -881,6 +872,9 @@ MESSAGE(
 "* Debug using ThreadSanitizer       : ${STATUS_DEBUG_TSAN}\n"
 "* Debug using MemorySanitizer       : ${STATUS_DEBUG_MSAN}\n"
 "* Debug using UBSanitizer           : ${STATUS_DEBUG_UBSAN}\n"
+"* Debug packaging commands          : ${STATUS_DEBUG_CPACK}\n"
+"* Profile using GNU profiler        : ${STATUS_GPROF}\n"
+"* Debug assertions                  : ${STATUS_ASSERTIONS}\n"
 )
 
 MESSAGE(

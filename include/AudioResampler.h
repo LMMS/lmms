@@ -52,6 +52,7 @@ public:
 	auto resample(const float* in, long inputFrames, float* out, long outputFrames, double ratio) -> ProcessResult;
 	auto interpolationMode() const -> int { return m_interpolationMode; }
 	auto channels() const -> int { return m_channels; }
+	void setRatio(double ratio);
 
 private:
 	int m_interpolationMode = -1;

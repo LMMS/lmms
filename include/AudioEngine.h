@@ -25,18 +25,17 @@
 #ifndef LMMS_AUDIO_ENGINE_H
 #define LMMS_AUDIO_ENGINE_H
 
-#ifdef __MINGW32__
-#include <mingw.mutex.h>
-#else
 #include <mutex>
-#endif
 
 #include <QThread>
 #include <samplerate.h>
 
+#include <memory>
 #include <vector>
 
-#include "lmms_basics.h"
+#include "AudioDevice.h"
+#include "LmmsTypes.h"
+#include "SampleFrame.h"
 #include "LocklessList.h"
 #include "FifoBuffer.h"
 #include "AudioEngineProfiler.h"
@@ -48,19 +47,20 @@ namespace lmms
 
 class AudioDevice;
 class MidiClient;
-class AudioPort;
+class AudioBusHandle;
 class AudioEngineWorkerThread;
 
+constexpr fpp_t MINIMUM_BUFFER_SIZE = 32;
+constexpr fpp_t DEFAULT_BUFFER_SIZE = 256;
+constexpr fpp_t MAXIMUM_BUFFER_SIZE = 4096;
 
-const fpp_t MINIMUM_BUFFER_SIZE = 32;
-const fpp_t DEFAULT_BUFFER_SIZE = 256;
+constexpr int BYTES_PER_SAMPLE = sizeof(sample_t);
+constexpr int BYTES_PER_INT_SAMPLE = sizeof(int_sample_t);
+constexpr int BYTES_PER_FRAME = sizeof(SampleFrame);
 
-const int BYTES_PER_SAMPLE = sizeof( sample_t );
-const int BYTES_PER_INT_SAMPLE = sizeof( int_sample_t );
-const int BYTES_PER_FRAME = sizeof( sampleFrame );
-const int BYTES_PER_SURROUND_FRAME = sizeof( surroundSampleFrame );
+constexpr float OUTPUT_SAMPLE_MULTIPLIER = 32767.0f;
 
-const float OUTPUT_SAMPLE_MULTIPLIER = 32767.0f;
+constexpr auto SUPPORTED_SAMPLERATES = std::array{44100, 48000, 88200, 96000, 192000}; 
 
 class LMMS_EXPORT AudioEngine : public QObject
 {
@@ -173,15 +173,15 @@ public:
 	}
 
 
-	// audio-port-stuff
-	inline void addAudioPort(AudioPort * port)
+	// audio-bus-handle-stuff
+	inline void addAudioBusHandle(AudioBusHandle* busHandle)
 	{
 		requestChangeInModel();
-		m_audioPorts.push_back(port);
+		m_audioBusHandles.push_back(busHandle);
 		doneChangeInModel();
 	}
 
-	void removeAudioPort(AudioPort * port);
+	void removeAudioBusHandle(AudioBusHandle* busHandle);
 
 
 	// MIDI-client-stuff
@@ -237,9 +237,20 @@ public:
 	}
 
 
-	sample_rate_t baseSampleRate() const;
-	sample_rate_t outputSampleRate() const;
-	sample_rate_t inputSampleRate() const;
+	sample_rate_t baseSampleRate() const { return m_baseSampleRate; }
+
+
+	sample_rate_t outputSampleRate() const
+	{
+		return m_audioDev != nullptr ? m_audioDev->sampleRate() : m_baseSampleRate;
+	}
+	
+
+	sample_rate_t inputSampleRate() const	
+	{
+		return m_audioDev != nullptr ? m_audioDev->sampleRate() : m_baseSampleRate;
+	}
+
 
 	inline float masterGain() const
 	{
@@ -266,15 +277,6 @@ public:
 	}
 
 
-	struct StereoSample
-	{
-		StereoSample(sample_t _left, sample_t _right) : left(_left), right(_right) {}
-		sample_t left;
-		sample_t right;
-	};
-	StereoSample getPeakValues(sampleFrame * ab, const f_cnt_t _frames) const;
-
-
 	bool criticalXRuns() const;
 
 	inline bool hasFifoWriter() const
@@ -282,9 +284,9 @@ public:
 		return m_fifoWriter != nullptr;
 	}
 
-	void pushInputFrames( sampleFrame * _ab, const f_cnt_t _frames );
+	void pushInputFrames( SampleFrame* _ab, const f_cnt_t _frames );
 
-	inline const sampleFrame * inputBuffer()
+	inline const SampleFrame* inputBuffer()
 	{
 		return m_inputBuffer[ m_inputBufferRead ];
 	}
@@ -294,15 +296,12 @@ public:
 		return m_inputBufferFrames[ m_inputBufferRead ];
 	}
 
-	inline const surroundSampleFrame * nextBuffer()
+	inline const SampleFrame* nextBuffer()
 	{
 		return hasFifoWriter() ? m_fifo->read() : renderNextBuffer();
 	}
 
 	void changeQuality(const struct qualitySettings & qs);
-
-	inline bool isMetronomeActive() const { return m_metronomeActive; }
-	inline void setMetronomeActive(bool value = true) { m_metronomeActive = value; }
 
 	//! Block until a change in model can be done (i.e. wait for audio thread)
 	void requestChangeInModel();
@@ -320,11 +319,11 @@ public:
 signals:
 	void qualitySettingsChanged();
 	void sampleRateChanged();
-	void nextAudioBuffer( const lmms::surroundSampleFrame * buffer );
+	void nextAudioBuffer(const lmms::SampleFrame* buffer);
 
 
 private:
-	using Fifo = FifoBuffer<surroundSampleFrame*>;
+	using Fifo = FifoBuffer<SampleFrame*>;
 
 	class fifoWriter : public QThread
 	{
@@ -341,7 +340,7 @@ private:
 
 		void run() override;
 
-		void write( surroundSampleFrame * buffer );
+		void write(SampleFrame* buffer);
 	} ;
 
 
@@ -360,28 +359,27 @@ private:
 	void renderStageEffects();
 	void renderStageMix();
 
-	const surroundSampleFrame * renderNextBuffer();
+	const SampleFrame* renderNextBuffer();
 
 	void swapBuffers();
-
-	void handleMetronome();
 
 	void clearInternal();
 
 	bool m_renderOnly;
 
-	std::vector<AudioPort *> m_audioPorts;
+	std::vector<AudioBusHandle*> m_audioBusHandles;
 
 	fpp_t m_framesPerPeriod;
 
-	sampleFrame * m_inputBuffer[2];
+	SampleFrame* m_inputBuffer[2];
 	f_cnt_t m_inputBufferFrames[2];
 	f_cnt_t m_inputBufferSize[2];
+	sample_rate_t m_baseSampleRate;
 	int m_inputBufferRead;
 	int m_inputBufferWrite;
 
-	surroundSampleFrame * m_outputBufferRead;
-	surroundSampleFrame * m_outputBufferWrite;
+	std::unique_ptr<SampleFrame[]> m_outputBufferRead;
+	std::unique_ptr<SampleFrame[]> m_outputBufferWrite;
 
 	// worker thread stuff
 	std::vector<AudioEngineWorkerThread *> m_workers;
@@ -414,11 +412,9 @@ private:
 
 	AudioEngineProfiler m_profiler;
 
-	bool m_metronomeActive;
-
 	bool m_clearSignal;
 
-	std::mutex m_changeMutex;
+	std::recursive_mutex m_changeMutex;
 
 	friend class Engine;
 	friend class AudioEngineWorkerThread;

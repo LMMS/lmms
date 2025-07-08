@@ -66,8 +66,7 @@ Clip* AutomationTrack::createClip(const TimePos & pos)
 
 
 
-void AutomationTrack::saveTrackSpecificSettings( QDomDocument & _doc,
-							QDomElement & _this )
+void AutomationTrack::saveTrackSpecificSettings(QDomDocument& doc, QDomElement& _this, bool presetMode)
 {
 }
 

@@ -96,11 +96,11 @@ public:
 
 	void renderOutput( fpp_t _frames );
 
-	inline sampleFrame * abuf() const
+	inline SampleFrame* abuf() const
 	{
 		return m_abuf;
 	}
-	inline sampleFrame * bbuf() const
+	inline SampleFrame* bbuf() const
 	{
 		return m_bbuf;
 	}
@@ -120,8 +120,8 @@ private:
 
 	WatsynInstrument * m_parent;
 
-	sampleFrame * m_abuf;
-	sampleFrame * m_bbuf;
+	SampleFrame* m_abuf;
+	SampleFrame* m_bbuf;
 
 	float m_lphase [NUM_OSCS];
 	float m_rphase [NUM_OSCS];
@@ -140,7 +140,7 @@ public:
 	~WatsynInstrument() override = default;
 
 	void playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer ) override;
+						SampleFrame* _working_buffer ) override;
 	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
 

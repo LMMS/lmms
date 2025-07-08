@@ -177,14 +177,14 @@ public:
 	MonstroSynth( MonstroInstrument * _i, NotePlayHandle * _nph );
 	virtual ~MonstroSynth() = default;
 
-	void renderOutput( fpp_t _frames, sampleFrame * _buf );
+	void renderOutput( fpp_t _frames, SampleFrame* _buf );
 
 private:
 
 	MonstroInstrument * m_parent;
 	NotePlayHandle * m_nph;
 
-	inline void updateModulators( float * env1, float * env2, float * lfo1, float * lfo2, int frames );
+	inline void updateModulators(float * env1, float * env2, float * lfo1, float * lfo2, f_cnt_t frames);
 
 	// linear interpolation
 /*	inline sample_t interpolate( sample_t s1, sample_t s2, float x )
@@ -357,7 +357,7 @@ public:
 	~MonstroInstrument() override = default;
 
 	void playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer ) override;
+						SampleFrame* _working_buffer ) override;
 	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
 	void saveSettings( QDomDocument & _doc,

@@ -25,11 +25,11 @@
 #include "Instrument.h"
 
 #include <cmath>
+#include <numbers>
 
 #include "DummyInstrument.h"
 #include "InstrumentTrack.h"
-#include "lmms_constants.h"
-
+#include "LmmsTypes.h"
 
 namespace lmms
 {
@@ -45,7 +45,7 @@ Instrument::Instrument(InstrumentTrack * _instrument_track,
 {
 }
 
-void Instrument::play( sampleFrame * )
+void Instrument::play( SampleFrame* )
 {
 }
 
@@ -89,7 +89,7 @@ bool Instrument::isFromTrack( const Track * _track ) const
 }
 
 // helper function for Instrument::applyFadeIn
-static int countZeroCrossings(sampleFrame *buf, fpp_t start, fpp_t frames)
+static int countZeroCrossings(SampleFrame* buf, fpp_t start, fpp_t frames)
 {
 	// zero point crossing counts of all channels
 	auto zeroCrossings = std::array<int, DEFAULT_CHANNELS>{};
@@ -128,7 +128,7 @@ fpp_t getFadeInLength(float maxLength, fpp_t frames, int zeroCrossings)
 }
 
 
-void Instrument::applyFadeIn(sampleFrame * buf, NotePlayHandle * n)
+void Instrument::applyFadeIn(SampleFrame* buf, NotePlayHandle * n)
 {
 	const static float MAX_FADE_IN_LENGTH = 85.0;
 	f_cnt_t total = n->totalFramesPlayed();
@@ -151,7 +151,7 @@ void Instrument::applyFadeIn(sampleFrame * buf, NotePlayHandle * n)
 		{
 			for (ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch)
 			{
-				buf[offset + f][ch] *= 0.5 - 0.5 * cosf(F_PI * (float) f / (float) n->m_fadeInLength);
+				buf[offset + f][ch] *= 0.5 - 0.5 * std::cos(std::numbers::pi_v<float> * static_cast<float>(f) / static_cast<float>(n->m_fadeInLength));
 			}
 		}
 	}
@@ -167,7 +167,7 @@ void Instrument::applyFadeIn(sampleFrame * buf, NotePlayHandle * n)
 			for (ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch)
 			{
 				float currentLength = n->m_fadeInLength * (1.0f - (float) f / frames) + new_length * ((float) f / frames);
-				buf[f][ch] *= 0.5 - 0.5 * cosf(F_PI * (float) (total + f) / currentLength);
+				buf[f][ch] *= 0.5 - 0.5 * std::cos(std::numbers::pi_v<float> * static_cast<float>(total + f) / currentLength);
 				if (total + f >= currentLength)
 				{
 					n->m_fadeInLength = currentLength;
@@ -179,13 +179,13 @@ void Instrument::applyFadeIn(sampleFrame * buf, NotePlayHandle * n)
 	}
 }
 
-void Instrument::applyRelease( sampleFrame * buf, const NotePlayHandle * _n )
+void Instrument::applyRelease( SampleFrame* buf, const NotePlayHandle * _n )
 {
 	const auto fpp = Engine::audioEngine()->framesPerPeriod();
 	const auto releaseFrames = desiredReleaseFrames();
 
 	const auto endFrame = _n->framesLeft();
-	const auto startFrame = std::max(0, endFrame - releaseFrames);
+	const auto startFrame = endFrame - std::min(endFrame, releaseFrames);
 
 	for (auto f = startFrame; f < endFrame && f < fpp; f++)
 	{

@@ -37,7 +37,8 @@
 #include "MidiClip.h"
 #include "SampleClip.h"
 #include "TimePos.h"
-#include "lmms_basics.h"
+#include "LmmsTypes.h"
+#include "SampleThumbnail.h"
 
 class QPainter;
 class QPixmap;
@@ -73,6 +74,7 @@ class AutomationEditor : public QWidget, public JournallingObject
 	Q_PROPERTY(QColor ghostNoteColor MEMBER m_ghostNoteColor)
 	Q_PROPERTY(QColor detuningNoteColor MEMBER m_detuningNoteColor)
 	Q_PROPERTY(QColor ghostSampleColor MEMBER m_ghostSampleColor)
+	Q_PROPERTY(QColor outOfBoundsShade MEMBER m_outOfBoundsShade)
 public:
 	void setCurrentClip(AutomationClip * new_clip);
 	void setGhostMidiClip(MidiClip* newMidiClip);
@@ -241,6 +243,8 @@ private:
 	QScrollBar * m_leftRightScroll;
 	QScrollBar * m_topBottomScroll;
 
+	void adjustLeftRightScoll(int value);
+
 	TimePos m_currentPosition;
 
 	Action m_action;
@@ -288,6 +292,9 @@ private:
 	QColor m_ghostNoteColor;
 	QColor m_detuningNoteColor;
 	QColor m_ghostSampleColor;
+	QColor m_outOfBoundsShade;
+	
+	SampleThumbnail m_sampleThumbnail;
 
 	friend class AutomationEditorWindow;
 

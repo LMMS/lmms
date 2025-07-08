@@ -23,6 +23,7 @@
 #include "EqSpectrumView.h"
 
 #include <cmath>
+#include <numbers>
 #include <QPainter>
 #include <QPen>
 
@@ -31,7 +32,6 @@
 #include "EqCurve.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
-#include "lmms_constants.h"
 
 namespace lmms
 {
@@ -43,22 +43,23 @@ EqAnalyser::EqAnalyser() :
 	m_sampleRate ( 1 ),
 	m_active ( true )
 {
+	using namespace std::numbers;
 	m_inProgress=false;
 	m_specBuf = ( fftwf_complex * ) fftwf_malloc( ( FFT_BUFFER_SIZE + 1 ) * sizeof( fftwf_complex ) );
 	m_fftPlan = fftwf_plan_dft_r2c_1d( FFT_BUFFER_SIZE*2, m_buffer, m_specBuf, FFTW_MEASURE );
 
 	//initialize Blackman-Harris window, constants taken from
 	//https://en.wikipedia.org/wiki/Window_function#A_list_of_window_functions
-	const float a0 = 0.35875;
-	const float a1 = 0.48829;
-	const float a2 = 0.14128;
-	const float a3 = 0.01168;
+	const float a0 = 0.35875f;
+	const float a1 = 0.48829f;
+	const float a2 = 0.14128f;
+	const float a3 = 0.01168f;
 
-	for (int i = 0; i < FFT_BUFFER_SIZE; i++)
+	for (auto i = std::size_t{0}; i < FFT_BUFFER_SIZE; i++)
 	{
-		m_fftWindow[i] = (a0 - a1 * cos(2 * F_PI * i / ((float)FFT_BUFFER_SIZE - 1.0))
-								+ a2 * cos(4 * F_PI * i / ((float)FFT_BUFFER_SIZE - 1.0))
-								- a3 * cos(6 * F_PI * i / ((float)FFT_BUFFER_SIZE - 1.0)));
+		m_fftWindow[i] = a0 - a1 * std::cos(2 * pi_v<float> * i / static_cast<float>(FFT_BUFFER_SIZE - 1.0))
+			+ a2 * std::cos(4 * pi_v<float> * i / static_cast<float>(FFT_BUFFER_SIZE - 1.0))
+			- a3 * std::cos(6 * pi_v<float> * i / static_cast<float>(FFT_BUFFER_SIZE - 1.0));
 	}
 	clear();
 }
@@ -75,7 +76,7 @@ EqAnalyser::~EqAnalyser()
 
 
 
-void EqAnalyser::analyze( sampleFrame *buf, const fpp_t frames )
+void EqAnalyser::analyze( SampleFrame* buf, const fpp_t frames )
 {
 	//only analyse if the view is visible
 	if ( m_active )
@@ -193,7 +194,7 @@ EqSpectrumView::EqSpectrumView(EqAnalyser *b, QWidget *_parent) :
 	connect( getGUI()->mainWindow(), SIGNAL( periodicUpdate() ), this, SLOT( periodicalUpdate() ) );
 	setAttribute( Qt::WA_TranslucentBackground, true );
 	m_skipBands = MAX_BANDS * 0.5;
-	float totalLength = log10( 20000 );
+	const float totalLength = std::log10(20000);
 	m_pixelsPerUnitWidth = width() / totalLength ;
 	m_scale = 1.5;
 	m_color = QColor( 255, 255, 255, 255 );
@@ -230,10 +231,10 @@ void EqSpectrumView::paintEvent(QPaintEvent *event)
 	float *bands = m_analyser->m_bands;
 	m_path.moveTo( 0, height() );
 	m_peakSum = 0;
-	const float fallOff = 1.07;
+	const float fallOff = 1.07f;
 	for( int x = 0; x < MAX_BANDS; ++x, ++bands )
 	{
-		float peak = *bands != 0. ? (fh * 2.0 / 3.0 * (20. * log10(*bands / energy) - LOWER_Y) / (-LOWER_Y)) : 0.;
+		float peak = *bands != 0. ? (fh * 2.0 / 3.0 * (20. * std::log10(*bands / energy) - LOWER_Y) / (-LOWER_Y)) : 0.;
 
 		if( peak < 0 )
 		{

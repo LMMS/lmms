@@ -295,7 +295,7 @@ ControllerConnectionDialog::~ControllerConnectionDialog()
 void ControllerConnectionDialog::selectController()
 {
 	// Midi
-	if( m_midiGroupBox->model()->value() > 0 )
+	if (m_midiGroupBox->model()->value())
 	{
 		if( m_midiControllerSpinBox->model()->value() > 0 )
 		{
@@ -321,8 +321,7 @@ void ControllerConnectionDialog::selectController()
 	// User
 	else 
 	{
-		if( m_userGroupBox->model()->value() > 0 && 
-				Engine::getSong()->controllers().size() )
+		if (m_userGroupBox->model()->value() && Engine::getSong()->controllers().size())
 		{
 			m_controller = Engine::getSong()->controllers().at( 
 					m_userController->model()->value() );

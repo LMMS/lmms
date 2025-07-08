@@ -25,34 +25,34 @@
 
 #include "FileBrowser.h"
 
+#include <PathUtil.h>
 #include <QApplication>
-#include <QDesktopServices>
 #include <QDirIterator>
 #include <QHBoxLayout>
-#include <QKeyEvent>
 #include <QLineEdit>
-#include <QMenu>
-#include <QPushButton>
 #include <QMdiArea>
 #include <QMdiSubWindow>
+#include <QMenu>
 #include <QMessageBox>
+#include <QProcess>
+#include <QPushButton>
 #include <QShortcut>
 #include <QStringList>
-
+#include <cassert>
 #include <queue>
 
-#include "FileBrowser.h"
-#include "FileBrowserSearcher.h"
 #include "AudioEngine.h"
 #include "ConfigManager.h"
 #include "DataFile.h"
-#include "embed.h"
 #include "Engine.h"
+#include "FileRevealer.h"
+#include "FileSearch.h"
 #include "GuiApplication.h"
 #include "ImportFilter.h"
 #include "Instrument.h"
 #include "InstrumentTrack.h"
 #include "InstrumentTrackWindow.h"
+#include "KeyboardShortcuts.h"
 #include "MainWindow.h"
 #include "PatternStore.h"
 #include "PluginFactory.h"
@@ -65,6 +65,8 @@
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "TextFloat.h"
+#include "ThreadPool.h"
+#include "embed.h"
 
 namespace lmms::gui
 {
@@ -76,50 +78,19 @@ enum TreeWidgetItemTypes
 	TypeDirectoryItem
 } ;
 
-
-
-void FileBrowser::addContentCheckBox()
-{
-	auto filterWidget = new QWidget(contentParent());
-	filterWidget->setFixedHeight(15);
-	auto filterWidgetLayout = new QHBoxLayout(filterWidget);
-	filterWidgetLayout->setContentsMargins(0, 0, 0, 0);
-	filterWidgetLayout->setSpacing(0);
-
-	auto configCheckBox = [this, &filterWidgetLayout](QCheckBox* box)
-	{
-		box->setCheckState(Qt::Checked);
-		connect(box, SIGNAL(stateChanged(int)), this, SLOT(reloadTree()));
-		filterWidgetLayout->addWidget(box);
-	};
-
-	m_showUserContent = new QCheckBox(tr("User content"));
-	configCheckBox(m_showUserContent);
-	m_showFactoryContent = new QCheckBox(tr("Factory content"));
-	configCheckBox(m_showFactoryContent);
-
-	addContentWidget(filterWidget);
-};
-
-
-FileBrowser::FileBrowser(const QString & directories, const QString & filter,
-			const QString & title, const QPixmap & pm,
-			QWidget * parent, bool dirs_as_items,
-			const QString& userDir,
-			const QString& factoryDir):
-	SideBarWidget( title, pm, parent ),
-	m_directories( directories ),
-	m_filter( filter ),
-	m_dirsAsItems( dirs_as_items ),
-	m_userDir(userDir),
-	m_factoryDir(factoryDir)
+FileBrowser::FileBrowser(Type type, const QString& directories, const QString& filter, const QString& title, const QPixmap& pm,
+	QWidget* parent, bool dirs_as_items, const QString& userDir, const QString& factoryDir)
+	: SideBarWidget(title, pm, parent)
+	, m_type(type)
+	, m_directories(directories)
+	, m_filter(filter)
+	, m_dirsAsItems(dirs_as_items)
+	, m_userDir(userDir)
+	, m_factoryDir(factoryDir)
 {
 	setWindowTitle( tr( "Browser" ) );
 
-	if (!userDir.isEmpty() && !factoryDir.isEmpty())
-	{
-		addContentCheckBox();
-	}
+	addContentCheckBox();
 
 	auto searchWidget = new QWidget(contentParent());
 	searchWidget->setFixedHeight( 24 );
@@ -152,10 +123,6 @@ FileBrowser::FileBrowser(const QString & directories, const QString & filter,
 	m_searchTreeWidget->hide();
 	addContentWidget(m_searchTreeWidget);
 
-	auto searchTimer = new QTimer(this);
-	connect(searchTimer, &QTimer::timeout, this, &FileBrowser::buildSearchTree);
-	searchTimer->start(FileBrowserSearcher::MillisecondsPerMatch);
-
 	m_searchIndicator = new QProgressBar(this);
 	m_searchIndicator->setMinimum(0);
 	m_searchIndicator->setMaximum(100);
@@ -167,8 +134,64 @@ FileBrowser::FileBrowser(const QString & directories, const QString & filter,
 
 	m_previousFilterValue = "";
 
+	if (m_type == Type::Favorites)
+	{
+		connect(ConfigManager::inst(), &ConfigManager::favoritesChanged, [this] {
+			m_directories = ConfigManager::inst()->favoriteItems().join("*");
+			reloadTree();
+		});
+	}
+
 	reloadTree();
 	show();
+}
+
+void FileBrowser::addContentCheckBox()
+{
+	// user dir and factory dir checkboxes will display individually depending on whether they are empty.
+	const bool user_checkbox = !m_userDir.isEmpty();
+	const bool factory = !m_factoryDir.isEmpty();
+
+	auto filterWidget = new QWidget(contentParent());
+
+	outerLayout = new QBoxLayout(QBoxLayout::Direction::TopToBottom, filterWidget);
+	outerLayout->setSpacing(0);
+
+	if (user_checkbox || factory){
+		filterWidgetLayout = new QBoxLayout(QBoxLayout::Direction::LeftToRight);
+		filterWidgetLayout->setContentsMargins(0, 0, 0, 0);
+		filterWidgetLayout->setSpacing(0);
+
+		outerLayout->addLayout(filterWidgetLayout);
+	}
+
+	hiddenWidgetLayout = new QBoxLayout(QBoxLayout::Direction::LeftToRight);
+	hiddenWidgetLayout->setContentsMargins(0, 0, 0, 0);
+	hiddenWidgetLayout->setSpacing(0);
+
+	outerLayout->addLayout(hiddenWidgetLayout);
+
+	auto configCheckBox = [this](QBoxLayout* boxLayout, QCheckBox* box, Qt::CheckState checkState)
+	{
+		box->setCheckState(checkState);
+		connect(box, SIGNAL(stateChanged(int)), this, SLOT(reloadTree()));
+		boxLayout->addWidget(box);
+	};
+
+	if (user_checkbox) {
+		m_showUserContent = new QCheckBox(tr("User content"));
+		configCheckBox(filterWidgetLayout, m_showUserContent, Qt::Checked);
+	}
+
+	if (factory) {
+		m_showFactoryContent = new QCheckBox(tr("Factory content"));
+		configCheckBox(filterWidgetLayout, m_showFactoryContent, Qt::Checked);
+	}
+
+	m_showHiddenContent = new QCheckBox(tr("Hidden content"));
+	configCheckBox(hiddenWidgetLayout, m_showHiddenContent, Qt::Unchecked);
+
+	addContentWidget(filterWidget);
 }
 
 void FileBrowser::saveDirectoriesStates()
@@ -181,20 +204,10 @@ void FileBrowser::restoreDirectoriesStates()
 	expandItems(m_savedExpandedDirs);
 }
 
-void FileBrowser::buildSearchTree()
+void FileBrowser::foundSearchMatch(FileSearch* search, const QString& match)
 {
-	if (!m_currentSearch) { return; }
-
-	const auto match = m_currentSearch->match();
-	using State = FileBrowserSearcher::SearchFuture::State;
-	if ((m_currentSearch->state() == State::Completed && match.isEmpty())
-		|| m_currentSearch->state() == State::Cancelled)
-	{
-		m_currentSearch = nullptr;
-		m_searchIndicator->setMaximum(100);
-		return;
-	}
-	else if (match.isEmpty()) { return; }
+	assert(search != nullptr);
+	if (m_currentSearch.get() != search) { return; }
 
 	auto basePath = QString{};
 	for (const auto& path : m_directories.split('*'))
@@ -258,13 +271,22 @@ void FileBrowser::buildSearchTree()
 	}
 }
 
-	
+void FileBrowser::searchCompleted(FileSearch* search)
+{
+	assert(search != nullptr);
+	if (m_currentSearch.get() != search) { return; }
+
+	m_currentSearch.reset();
+	m_searchIndicator->setMaximum(100);
+}
+
 void FileBrowser::onSearch(const QString& filter)
 {
+	if (m_currentSearch) { m_currentSearch->cancel(); }
+
 	if (filter.isEmpty())
 	{
-		toggleSearch(false);
-		FileBrowserSearcher::instance()->cancel();
+		displaySearch(false);
 		return;
 	}
 
@@ -274,14 +296,21 @@ void FileBrowser::onSearch(const QString& filter)
 	if (directories.isEmpty()) { return; }
 
 	m_searchTreeWidget->clear();
-	toggleSearch(true);
+	displaySearch(true);
 
 	auto browserExtensions = m_filter;
 	const auto searchExtensions = browserExtensions.remove("*.").split(' ');
-	m_currentSearch = FileBrowserSearcher::instance()->search(filter, directories, searchExtensions);
+
+	auto search = std::make_shared<FileSearch>(
+		filter, directories, searchExtensions, excludedPaths(), dirFilters(), sortFlags());
+	connect(search.get(), &FileSearch::foundMatch, this, &FileBrowser::foundSearchMatch, Qt::QueuedConnection);
+	connect(search.get(), &FileSearch::searchCompleted, this, &FileBrowser::searchCompleted, Qt::QueuedConnection);
+
+	m_currentSearch = search;
+	ThreadPool::instance().enqueue([search] { (*search)(); });
 }
 
-void FileBrowser::toggleSearch(bool on)
+void FileBrowser::displaySearch(bool on)
 {
 	if (on)
 	{
@@ -306,7 +335,7 @@ void FileBrowser::reloadTree()
 
 	m_fileBrowserTreeWidget->clear();
 
-	QStringList paths = m_directories.split('*');
+	auto paths = m_directories.isEmpty() ? QStringList{} : m_directories.split('*');
 
 	if (m_showUserContent && !m_showUserContent->isChecked())
 	{
@@ -318,12 +347,37 @@ void FileBrowser::reloadTree()
 		paths.removeAll(m_factoryDir);
 	}
 
-	if (!paths.isEmpty())
+	switch (m_type)
 	{
+	case Type::Favorites:
+		for (auto& path : paths)
+		{
+			while (path.endsWith('/') || path.endsWith('\\') || path.endsWith("."))
+			{
+				path.chop(1);
+			}
+
+			auto info = QFileInfo{PathUtil::toAbsolute(path)};
+
+			if (info.isDir())
+			{
+				auto dir = new Directory(info.fileName(), info.absolutePath(), m_filter);
+				dir->update();
+				m_fileBrowserTreeWidget->addTopLevelItem(dir);
+			}
+			else if (info.isFile())
+			{
+				auto file = new FileItem(info.fileName(), info.path());
+				m_fileBrowserTreeWidget->addTopLevelItem(file);
+			}
+		}
+		break;
+	case Type::Normal:
 		for (const auto& path : paths)
 		{
 			addItems(path);
 		}
+		break;
 	}
 
 	if (m_filterEdit->text().isEmpty())
@@ -376,7 +430,7 @@ void FileBrowser::giveFocusToFilter()
 
 void FileBrowser::addItems(const QString & path )
 {
-	if (FileBrowser::directoryBlacklist().contains(path)) { return; }
+	if (FileBrowser::excludedPaths().contains(path)) { return; }
 
 	if( m_dirsAsItems )
 	{
@@ -388,12 +442,15 @@ void FileBrowser::addItems(const QString & path )
 	QDir cdir(path);
 	if (!cdir.isReadable()) { return; }
 	QFileInfoList entries = cdir.entryInfoList(
-		m_filter.split(' '), dirFilters(), QDir::LocaleAware | QDir::DirsFirst | QDir::Name | QDir::IgnoreCase);
+		m_filter.split(' '),
+		dirFilters(),
+		QDir::LocaleAware | QDir::DirsFirst | QDir::Name | QDir::IgnoreCase);
 	for (const auto& entry : entries)
 	{
-		if (FileBrowser::directoryBlacklist().contains(entry.absoluteFilePath())) { continue; }
+		if (FileBrowser::excludedPaths().contains(entry.absoluteFilePath())) { continue; }
 
 		QString fileName = entry.fileName();
+		if (entry.isHidden() && m_showHiddenContent && !m_showHiddenContent->isChecked()) continue;
 		if (entry.isDir())
 		{
 			// Merge dir's together
@@ -597,28 +654,47 @@ void FileBrowserTreeWidget::focusOutEvent(QFocusEvent* fe)
 	QTreeWidget::focusOutEvent(fe);
 }
 
-
-
-
-void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent * e )
+void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 {
-	auto file = dynamic_cast<FileItem*>(itemAt(e->pos()));
-	if( file != nullptr && file->isTrack() )
+#ifdef LMMS_BUILD_APPLE
+	QString fileManager = tr("Finder");
+#elif defined(LMMS_BUILD_WIN32)
+	QString fileManager = tr("Explorer");
+#else
+	QString fileManager = tr("file manager");
+#endif
+
+	QTreeWidgetItem* item = itemAt(e->pos());
+	if (item == nullptr) { return; } // program hangs when right-clicking on empty space otherwise
+
+	QMenu contextMenu(this);
+
+	switch (item->type())
 	{
-		QMenu contextMenu( this );
+	case TypeFileItem: {
+		auto file = dynamic_cast<FileItem*>(item);
+		const auto path = QFileInfo{file->fullName()}.absoluteFilePath();
 
-		contextMenu.addAction(
-			tr( "Send to active instrument-track" ),
-			[=]{ sendToActiveInstrumentTrack(file); }
-		);
+		contextMenu.addAction(QIcon(embed::getIconPixmap("folder")), tr("Show in %1").arg(fileManager),
+			[=] { FileRevealer::reveal(file->fullName()); });
 
-		contextMenu.addSeparator();
+		if (ConfigManager::inst()->isFavoriteItem(file->fullName()))
+		{
+			contextMenu.addAction(
+				QIcon(embed::getIconPixmap("star")), tr("Remove favorite file"), [path] { ConfigManager::inst()->removeFavoriteItem(path); });
+		}
+		else
+		{
+			contextMenu.addAction(
+				QIcon(embed::getIconPixmap("star")), tr("Add favorite file"), [path] { ConfigManager::inst()->addFavoriteItem(path); });
+		}
 
-		contextMenu.addAction(
-			QIcon(embed::getIconPixmap("folder")),
-			tr("Open containing folder"),
-			[=]{ openContainingFolder(file); }
-		);
+		if (file->isTrack())
+		{
+			contextMenu.addSeparator();
+			contextMenu.addAction(
+				tr("Send to active instrument-track"), [=, this] { sendToActiveInstrumentTrack(file); });
+		}
 
 		auto songEditorHeader = new QAction(tr("Song Editor"), nullptr);
 		songEditorHeader->setDisabled(true);
@@ -629,14 +705,31 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent * e )
 		patternEditorHeader->setDisabled(true);
 		contextMenu.addAction(patternEditorHeader);
 		contextMenu.addActions( getContextActions(file, false) );
-
-		// We should only show the menu if it contains items
-		if (!contextMenu.isEmpty()) { contextMenu.exec( e->globalPos() ); }
+		break;
 	}
+	case TypeDirectoryItem: {
+		auto dir = dynamic_cast<Directory*>(item);
+		const auto path = QFileInfo{dir->fullName()}.absoluteFilePath();
+
+		contextMenu.addAction(QIcon(embed::getIconPixmap("folder")), tr("Open in %1").arg(fileManager), [=] {
+			FileRevealer::openDir(dir->fullName());
+		});
+
+		if (ConfigManager::inst()->isFavoriteItem(dir->fullName()))
+		{
+			contextMenu.addAction(QIcon(embed::getIconPixmap("star")), tr("Remove favorite folder"), [path] { ConfigManager::inst()->removeFavoriteItem(path); });
+		}
+		else
+		{
+			contextMenu.addAction(QIcon(embed::getIconPixmap("star")), tr("Add favorite folder"), [path] { ConfigManager::inst()->addFavoriteItem(path); });
+		}
+		break;
+	}
+	}
+
+	// Only show the menu if it contains items
+	if (!contextMenu.isEmpty()) { contextMenu.exec(e->globalPos()); }
 }
-
-
-
 
 QList<QAction*> FileBrowserTreeWidget::getContextActions(FileItem* file, bool songEditor)
 {
@@ -650,14 +743,14 @@ QList<QAction*> FileBrowserTreeWidget::getContextActions(FileItem* file, bool so
 
 	auto toInstrument = new QAction(instrumentAction + tr(" (%2Enter)").arg(shortcutMod), nullptr);
 	connect(toInstrument, &QAction::triggered,
-		[=]{ openInNewInstrumentTrack(file, songEditor); });
+		[=, this]{ openInNewInstrumentTrack(file, songEditor); });
 	result.append(toInstrument);
 
 	if (songEditor && fileIsSample)
 	{
 		auto toSampleTrack = new QAction(tr("Send to new sample track (Shift + Enter)"), nullptr);
 		connect(toSampleTrack, &QAction::triggered,
-			[=]{ openInNewSampleTrack(file); });
+			[=, this]{ openInNewSampleTrack(file); });
 		result.append(toSampleTrack);
 	}
 
@@ -964,22 +1057,6 @@ bool FileBrowserTreeWidget::openInNewSampleTrack(FileItem* item)
 
 
 
-
-void FileBrowserTreeWidget::openContainingFolder(FileItem* item)
-{
-	// Delegate to QDesktopServices::openUrl with the directory of the selected file. Please note that
-	// this will only open the directory but not select the file as this is much more complicated due
-	// to different implementations that are needed for different platforms (Linux/Windows/MacOS).
-
-	// Using QDesktopServices::openUrl seems to be the most simple cross platform way which uses
-	// functionality that's already available in Qt.
-	QFileInfo fileInfo(item->fullName());
-	QDesktopServices::openUrl(QUrl::fromLocalFile(fileInfo.dir().path()));
-}
-
-
-
-
 void FileBrowserTreeWidget::sendToActiveInstrumentTrack( FileItem* item )
 {
 	// get all windows opened in the workspace
@@ -1066,7 +1143,7 @@ void Directory::update()
 
 bool Directory::addItems(const QString& path)
 {
-	if (FileBrowser::directoryBlacklist().contains(path)) { return false; }
+	if (FileBrowser::excludedPaths().contains(path)) { return false; }
 
 	QDir thisDir(path);
 	if (!thisDir.isReadable()) { return false; }
@@ -1077,7 +1154,7 @@ bool Directory::addItems(const QString& path)
 		= thisDir.entryInfoList(m_filter.split(' '), FileBrowser::dirFilters(), FileBrowser::sortFlags());
 	for (const auto& entry : entries)
 	{
-		if (FileBrowser::directoryBlacklist().contains(entry.absoluteFilePath())) { continue; }
+		if (FileBrowser::excludedPaths().contains(entry.absoluteFilePath())) { continue; }
 
 		QString fileName = entry.fileName();
 		if (entry.isDir())
@@ -1199,15 +1276,21 @@ void FileItem::determineFileType()
 		m_type = FileType::Midi;
 		m_handling = FileHandling::ImportAsProject;
 	}
-	else if( ext == "dll"
-#ifdef LMMS_BUILD_LINUX
-		|| ext == "so" 
-#endif
+#ifdef LMMS_HAVE_VST
+	else if (
+#	if defined(LMMS_BUILD_LINUX)
+		ext == "so" ||
+#	endif
+#	if defined(LMMS_HAVE_VST_32) || defined(LMMS_HAVE_VST_64)
+		ext == "dll" ||
+#	endif
+		false
 	)
 	{
 		m_type = FileType::VstPlugin;
 		m_handling = FileHandling::LoadByPlugin;
 	}
+#endif
 	else if ( ext == "lv2" )
 	{
 		m_type = FileType::Preset;

@@ -54,6 +54,7 @@ SaWaterfallView::SaWaterfallView(SaControls *controls, SaProcessor *processor, Q
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
 	connect(getGUI()->mainWindow(), SIGNAL(periodicUpdate()), this, SLOT(periodicUpdate()));
+	connect(&controls->m_waterfallModel, &BoolModel::dataChanged, this, &SaWaterfallView::updateVisibility);
 
 	m_displayTop = 1;
 	m_displayBottom = height() -2;
@@ -218,8 +219,7 @@ std::vector<std::pair<float, std::string>> SaWaterfallView::makeTimeTics()
 	float limit = yPixelToTime(m_displayBottom, m_displayHeight);
 
 	// set increment to about 30 pixels (but min. 0.1 s)
-	float increment = std::round(10 * limit / (m_displayHeight / 30)) / 10;
-	if (increment < 0.1) {increment = 0.1;}
+	const float increment = std::max(std::round(10 * limit / (m_displayHeight / 30)) / 10, 0.1f);
 
 	// NOTE: labels positions are rounded to match the (rounded) label value
 	for (float i = 0; i <= limit; i += increment)

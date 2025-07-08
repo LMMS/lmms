@@ -3,7 +3,7 @@
  *                            Plugin::Descriptor::SubPluginFeatures for
  *                            hosting LV2 plugins
  *
- * Copyright (c) 2018-2023 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
+ * Copyright (c) 2018-2024 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -28,8 +28,10 @@
 
 #ifdef LMMS_HAVE_LV2
 
+#include <QDesktopServices>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QUrl>
 
 #include "Engine.h"
 #include "Lv2Basics.h"
@@ -39,8 +41,8 @@ namespace lmms
 {
 
 
-const LilvPlugin *Lv2SubPluginFeatures::getPlugin(
-	const Plugin::Descriptor::SubPluginFeatures::Key &k)
+const LilvPlugin* Lv2SubPluginFeatures::getPlugin(
+	const Plugin::Descriptor::SubPluginFeatures::Key& k)
 {
 	const LilvPlugin* result = Engine::getLv2Manager()->
 		getPlugin(k.attributes["uri"]);
@@ -51,7 +53,7 @@ const LilvPlugin *Lv2SubPluginFeatures::getPlugin(
 
 
 
-QString Lv2SubPluginFeatures::pluginName(const LilvPlugin *plug)
+QString Lv2SubPluginFeatures::pluginName(const LilvPlugin* plug)
 {
 	return qStringFromPluginNode(plug, lilv_plugin_get_name);
 }
@@ -67,61 +69,132 @@ Lv2SubPluginFeatures::Lv2SubPluginFeatures(Plugin::Type type) :
 
 
 
-void Lv2SubPluginFeatures::fillDescriptionWidget(QWidget *parent,
-													const Key *k) const
+static void addHbox(QWidget* parent, QString left, QString right)
 {
-	const LilvPlugin *plug = getPlugin(*k);
+	if (right.isEmpty()) { return; }
 
-	auto label = new QLabel(parent);
-	label->setText(QWidget::tr("Name: ") + pluginName(plug));
-
-	auto label2 = new QLabel(parent);
-	label2->setText(QWidget::tr("URI: ") +
-		lilv_node_as_uri(lilv_plugin_get_uri(plug)));
-
-	auto maker = new QWidget(parent);
-	auto l = new QHBoxLayout(maker);
+	auto container = new QWidget(parent);
+	auto l = new QHBoxLayout(container);
 	l->setContentsMargins(0, 0, 0, 0);
 	l->setSpacing(0);
 
-	auto maker_label = new QLabel(maker);
-	maker_label->setText(QWidget::tr("Maker: "));
-	maker_label->setAlignment(Qt::AlignTop);
+	auto leftLabel = new QLabel(container);
+	leftLabel->setText(left);
+	leftLabel->setAlignment(Qt::AlignTop);
 
-	auto maker_content = new QLabel(maker);
-	maker_content->setText(
+	auto rightLabel = new QLabel(container);
+	if (right.startsWith("http") && !right.contains(' ') && !right.contains('\n'))
+	{
+		right = QString("<a href=\"%1\">%1</a>").arg(right);
+		rightLabel->setTextInteractionFlags(rightLabel->textInteractionFlags()
+			| Qt::LinksAccessibleByMouse | Qt::LinksAccessibleByKeyboard);
+		rightLabel->setTextFormat(Qt::RichText);
+		rightLabel->setOpenExternalLinks(true);
+	}
+	rightLabel->setText(right);
+	rightLabel->setWordWrap(true);
+
+	l->addWidget(leftLabel);
+	l->addWidget(rightLabel, 1);
+}
+
+
+
+
+static void addLabel(QWidget* parent, QString left, QString right)
+{
+	auto lbl = new QLabel(parent);
+	if (right.isEmpty()) { return; }
+	if (right.startsWith("http") && !right.contains(' ') && !right.contains('\n'))
+	{
+		right = QString("<a href=\"%1\">%1</a>").arg(right);
+		lbl->setTextInteractionFlags(lbl->textInteractionFlags()
+			| Qt::LinksAccessibleByMouse | Qt::LinksAccessibleByKeyboard);
+		lbl->setTextFormat(Qt::RichText);
+		lbl->setOpenExternalLinks(true);
+	}
+	lbl->setText(left + right);
+}
+
+
+
+
+AutoLilvNodes pluginGetValues(const LilvPlugin* plug, const char* valueUri)
+{
+	assert(plug);
+	AutoLilvNode valueUriNode{Engine::getLv2Manager()->uri(valueUri)};
+	return AutoLilvNodes{lilv_plugin_get_value(plug, valueUriNode.get())};
+}
+
+
+
+
+void Lv2SubPluginFeatures::fillDescriptionWidget(QWidget* parent,
+													const Key* k) const
+{
+	const LilvPlugin* plug = getPlugin(*k);
+
+	QString pluginNameAndVersion = "<b>" + pluginName(plug) + "</b>";
+	{
+		AutoLilvNodes minorVersions = pluginGetValues(plug, LILV_NS_LV2 "minorVersion");
+		AutoLilvNodes microVersions = pluginGetValues(plug, LILV_NS_LV2 "microVersion");
+		if (minorVersions && microVersions)
+		{
+			QString min = lilv_node_as_string(lilv_nodes_get_first(minorVersions.get()));
+			QString mic = lilv_node_as_string(lilv_nodes_get_first(microVersions.get()));
+			pluginNameAndVersion += QString(" v%1.%2").arg(min).arg(mic);
+		}
+	}
+
+	(new QLabel(parent))->setText(pluginNameAndVersion);
+	{
+		AutoLilvNodes comments = pluginGetValues(plug, LILV_NS_RDFS "comment");
+		if (comments)
+		{
+			QString description{lilv_node_as_string(lilv_nodes_get_first(comments.get()))};
+			auto descLabel = new QLabel(parent);
+			descLabel->setText("<i>" + description.trimmed() + "</i>");
+			descLabel->setWordWrap(true);
+		}
+	}
+
+	addLabel(parent, QObject::tr("URI: "), lilv_node_as_uri(lilv_plugin_get_uri(plug)));
+	addHbox(parent, QObject::tr("Project: "),
+		qStringFromPluginNode(plug, lilv_plugin_get_project));
+	addHbox(parent, QObject::tr("Maker: "),
 		qStringFromPluginNode(plug, lilv_plugin_get_author_name));
-	maker_content->setWordWrap(true);
-
-	l->addWidget(maker_label);
-	l->addWidget(maker_content, 1);
-
-	auto copyright = new QWidget(parent);
-	l = new QHBoxLayout(copyright);
-	l->setContentsMargins(0, 0, 0, 0);
-	l->setSpacing(0);
-	copyright->setMinimumWidth(parent->minimumWidth());
-
-	auto copyright_label = new QLabel(copyright);
-	copyright_label->setText(QWidget::tr("Copyright: "));
-	copyright_label->setAlignment(Qt::AlignTop);
-
-	auto copyright_content = new QLabel(copyright);
-	copyright_content->setText("<unknown>");
-	copyright_content->setWordWrap(true);
-	l->addWidget(copyright_label);
-	l->addWidget(copyright_content, 1);
-
-	AutoLilvNodes extensions(lilv_plugin_get_extension_data(plug));
-	(void)extensions;
-	// possibly TODO: version, project, plugin type, number of channels
+	{
+		AutoLilvNodes homepages = pluginGetValues(plug, LILV_NS_DOAP "homepage");
+		if (homepages)
+		{
+			const char* homepage = lilv_node_as_uri(lilv_nodes_get_first(homepages.get()));
+			QString homepageStr{homepage};
+			addLabel(parent, QObject::tr("Homepage: "), homepageStr);
+		}
+	}
+	{
+		AutoLilvNodes licenses = pluginGetValues(plug, LILV_NS_DOAP "license");
+		addLabel(parent, QObject::tr("License: "),
+			licenses
+			? lilv_node_as_uri(lilv_nodes_get_first(licenses.get()))
+			: "<unknown>");
+	}
+	{
+		const LilvNode* libraryUriNode = lilv_plugin_get_bundle_uri(plug);
+		const char* libraryUri = lilv_node_as_uri(libraryUriNode);
+		auto filename = AutoLilvPtr<char>(lilv_file_uri_parse(libraryUri, nullptr));
+		if (filename)
+		{
+			new QLabel(QObject::tr("File: %1").arg(filename.get()), parent);
+		}
+	}
 }
 
 
 
 
 QString Lv2SubPluginFeatures::additionalFileExtensions(
-	const Plugin::Descriptor::SubPluginFeatures::Key &k) const
+	const Plugin::Descriptor::SubPluginFeatures::Key& k) const
 {
 	(void)k;
 	// lv2 only loads .lv2 files
@@ -133,7 +206,7 @@ QString Lv2SubPluginFeatures::additionalFileExtensions(
 
 
 QString Lv2SubPluginFeatures::displayName(
-	const Plugin::Descriptor::SubPluginFeatures::Key &k) const
+	const Plugin::Descriptor::SubPluginFeatures::Key& k) const
 {
 	return pluginName(getPlugin(k));
 }
@@ -142,30 +215,44 @@ QString Lv2SubPluginFeatures::displayName(
 
 
 QString Lv2SubPluginFeatures::description(
-	const Plugin::Descriptor::SubPluginFeatures::Key &k) const
+	const Plugin::Descriptor::SubPluginFeatures::Key& k) const
+{
+	auto mgr = Engine::getLv2Manager();
+	const LilvPlugin* plug = mgr->getPlugin(k.attributes["uri"]);
+	if (plug)
+	{
+		QString result;
+		AutoLilvNode rdfs_comment{mgr->uri(LILV_NS_RDFS "comment")};
+		AutoLilvNodes comments{lilv_plugin_get_value(plug, rdfs_comment.get())};
+		if (comments)
+		{
+			result += lilv_node_as_string(lilv_nodes_get_first(comments.get()));
+			result += "\n\n";
+		}
+		result += lilv_node_as_uri(lilv_plugin_get_uri(plug));
+		return result.trimmed();
+	}
+	return QObject::tr("failed to load description");
+}
+
+
+
+
+const PixmapLoader* Lv2SubPluginFeatures::logo(
+	const Plugin::Descriptor::SubPluginFeatures::Key& k) const
 {
 	(void)k;
-	return QString::fromUtf8("description not implemented yet"); // TODO
+	return nullptr; // Lv2 currently does not support this
 }
 
 
 
 
-const PixmapLoader *Lv2SubPluginFeatures::logo(
-	const Plugin::Descriptor::SubPluginFeatures::Key &k) const
+void Lv2SubPluginFeatures::listSubPluginKeys(const Plugin::Descriptor* desc,
+												KeyList& kl) const
 {
-	(void)k; // TODO
-	return nullptr;
-}
-
-
-
-
-void Lv2SubPluginFeatures::listSubPluginKeys(const Plugin::Descriptor *desc,
-												KeyList &kl) const
-{
-	Lv2Manager *lv2Mgr = Engine::getLv2Manager();
-	for (const auto &uriInfoPair : *lv2Mgr)
+	Lv2Manager* lv2Mgr = Engine::getLv2Manager();
+	for (const auto& uriInfoPair : *lv2Mgr)
 	{
 		if (uriInfoPair.second.type() == m_type && uriInfoPair.second.isValid())
 		{

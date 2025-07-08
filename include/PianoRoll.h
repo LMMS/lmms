@@ -35,7 +35,7 @@
 #include "ComboBoxModel.h"
 #include "SerializingObject.h"
 #include "Note.h"
-#include "lmms_basics.h"
+#include "LmmsTypes.h"
 #include "Song.h"
 #include "StepRecorder.h"
 #include "StepRecorderWidget.h"
@@ -74,6 +74,7 @@ class PianoRoll : public QWidget
 	Q_PROPERTY(QColor noteModeColor MEMBER m_noteModeColor)
 	Q_PROPERTY(QColor noteColor MEMBER m_noteColor)
 	Q_PROPERTY(QColor stepNoteColor MEMBER m_stepNoteColor)
+	Q_PROPERTY(QColor currentStepNoteColor MEMBER m_currentStepNoteColor)
 	Q_PROPERTY(QColor ghostNoteColor MEMBER m_ghostNoteColor)
 	Q_PROPERTY(QColor noteTextColor MEMBER m_noteTextColor)
 	Q_PROPERTY(QColor ghostNoteTextColor MEMBER m_ghostNoteTextColor)
@@ -89,6 +90,7 @@ class PianoRoll : public QWidget
 	Q_PROPERTY(int ghostNoteOpacity MEMBER m_ghostNoteOpacity)
 	Q_PROPERTY(bool ghostNoteBorders MEMBER m_ghostNoteBorders)
 	Q_PROPERTY(QColor backgroundShade MEMBER m_backgroundShade)
+	Q_PROPERTY(QColor outOfBoundsShade MEMBER m_outOfBoundsShade)
 
 	/* white key properties */
 	Q_PROPERTY(int whiteKeyWidth MEMBER m_whiteKeyWidth)
@@ -111,7 +113,8 @@ public:
 		Erase,
 		Select,
 		Detuning,
-		Knife
+		Knife,
+		Strum
 	};
 
 	/*! \brief Resets settings to default when e.g. creating a new project */
@@ -246,6 +249,7 @@ protected slots:
 	void clearGhostClip();
 	void glueNotes();
 	void fitNoteLengths(bool fill);
+	void reverseNotes();
 	void constrainNoteLengths(bool constrainMax);
 
 	void changeSnapMode();
@@ -267,7 +271,8 @@ private:
 		SelectNotes,
 		ChangeNoteProperty,
 		ResizeNoteEditArea,
-		Knife
+		Knife,
+		Strum
 	};
 
 	enum class NoteEditMode
@@ -323,6 +328,9 @@ private:
 	void setKnifeAction();
 	void cancelKnifeAction();
 
+	void setStrumAction();
+	void cancelStrumAction();
+
 	void updateScrollbars();
 	void updatePositionLineHeight();
 
@@ -346,6 +354,7 @@ private:
 	QPixmap m_toolMove = embed::getIconPixmap("edit_move");
 	QPixmap m_toolOpen = embed::getIconPixmap("automation");
 	QPixmap m_toolKnife = embed::getIconPixmap("edit_knife");
+	QPixmap m_toolStrum = embed::getIconPixmap("arp_free");
 
 	static std::array<KeyType, 12> prKeyOrder;
 
@@ -373,6 +382,8 @@ private:
 
 	QScrollBar * m_leftRightScroll;
 	QScrollBar * m_topBottomScroll;
+
+	void adjustLeftRightScoll(int value);
 
 	TimePos m_currentPosition;
 	bool m_recording;
@@ -434,6 +445,7 @@ private:
 	EditMode m_editMode;
 	EditMode m_ctrlMode; // mode they were in before they hit ctrl
 	EditMode m_knifeMode; // mode they where in before entering knife mode
+	EditMode m_strumMode; //< mode they where in before entering strum mode
 
 	bool m_mouseDownRight; //true if right click is being held down
 
@@ -453,9 +465,29 @@ private:
 	// did we start a mouseclick with shift pressed
 	bool m_startedWithShift;
 
-	// Variable that holds the position in ticks for the knife action
-	int m_knifeTickPos;
-	void updateKnifePos(QMouseEvent* me);
+	// Variables that hold the start and end position for the knife line
+	TimePos m_knifeStartTickPos;
+	int m_knifeStartKey;
+	TimePos m_knifeEndTickPos;
+	int m_knifeEndKey;
+	bool m_knifeDown;
+
+	void updateKnifePos(QMouseEvent* me, bool initial);
+
+	//! Stores the chords for the strum tool
+	std::vector<NoteVector> m_selectedChords;
+	//! Computes which notes belong to which chords from the selection
+	void setupSelectedChords();
+
+	TimePos m_strumStartTime;
+	TimePos m_strumCurrentTime;
+	int m_strumStartVertical = 0;
+	int m_strumCurrentVertical = 0;
+	float m_strumHeightRatio = 0.0f;
+	bool m_strumEnabled = false;
+	//! Handles updating all of the note positions when performing a strum
+	void updateStrumPos(QMouseEvent* me, bool initial, bool warp);
+
 
 	friend class PianoRollWindow;
 
@@ -469,6 +501,7 @@ private:
 	QColor m_noteModeColor;
 	QColor m_noteColor;
 	QColor m_stepNoteColor;
+	QColor m_currentStepNoteColor;
 	QColor m_noteTextColor;
 	QColor m_ghostNoteColor;
 	QColor m_ghostNoteTextColor;
@@ -484,6 +517,7 @@ private:
 	bool m_noteBorders;
 	bool m_ghostNoteBorders;
 	QColor m_backgroundShade;
+	QColor m_outOfBoundsShade;
 	/* white key properties */
 	int m_whiteKeyWidth;
 	QColor m_whiteKeyActiveTextColor;

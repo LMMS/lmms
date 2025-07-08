@@ -37,8 +37,8 @@
 #include "RemotePluginClient.h"
 #include "LocalZynAddSubFx.h"
 
-#include "zynaddsubfx/src/Nio/Nio.h"
-#include "zynaddsubfx/src/UI/MasterUI.h"
+#include <Nio/Nio.h>
+#include <UI/MasterUI.h>
 
 using namespace lmms;
 
@@ -141,7 +141,7 @@ public:
 	}
 
 
-	void process( const sampleFrame * _in, sampleFrame * _out ) override
+	void process( const SampleFrame* _in, SampleFrame* _out ) override
 	{
 		LocalZynAddSubFx::processAudio( _out );
 	}

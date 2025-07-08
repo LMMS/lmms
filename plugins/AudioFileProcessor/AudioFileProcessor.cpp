@@ -104,7 +104,7 @@ AudioFileProcessor::AudioFileProcessor( InstrumentTrack * _instrument_track ) :
 
 
 void AudioFileProcessor::playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer )
+						SampleFrame* _working_buffer )
 {
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();
@@ -121,7 +121,7 @@ void AudioFileProcessor::playNote( NotePlayHandle * _n,
 
 	if( !_n->m_pluginData )
 	{
-		if (m_stutterModel.value() == true && m_nextPlayStartPoint >= m_sample.endFrame())
+		if (m_stutterModel.value() == true && m_nextPlayStartPoint >= static_cast<std::size_t>(m_sample.endFrame()))
 		{
 			// Restart playing the note if in stutter mode, not in loop mode,
 			// and we're at the end of the sample.
@@ -164,7 +164,7 @@ void AudioFileProcessor::playNote( NotePlayHandle * _n,
 		}
 		else
 		{
-			memset( _working_buffer, 0, ( frames + offset ) * sizeof( sampleFrame ) );
+			zeroSampleFrames(_working_buffer, frames + offset);
 			emit isPlaying( 0 );
 		}
 	}
@@ -275,7 +275,7 @@ QString AudioFileProcessor::nodeName() const
 
 
 
-auto AudioFileProcessor::beatLen(NotePlayHandle* note) const -> int
+auto AudioFileProcessor::beatLen(NotePlayHandle* note) const -> f_cnt_t
 {
 	// If we can play indefinitely, use the default beat note duration
 	if (static_cast<Sample::Loop>(m_loopModel.value()) != Sample::Loop::Off) { return 0; }
@@ -286,12 +286,12 @@ auto AudioFileProcessor::beatLen(NotePlayHandle* note) const -> int
 		* Engine::audioEngine()->outputSampleRate()
 		/ Engine::audioEngine()->baseSampleRate();
 
-	const auto startFrame = m_nextPlayStartPoint >= m_sample.endFrame()
+	const auto startFrame = m_nextPlayStartPoint >= static_cast<std::size_t>(m_sample.endFrame())
 		? m_sample.startFrame()
 		: m_nextPlayStartPoint;
 	const auto duration = m_sample.endFrame() - startFrame;
 
-	return static_cast<int>(std::floor(duration * freqFactor));
+	return static_cast<f_cnt_t>(std::floor(duration * freqFactor));
 }
 
 

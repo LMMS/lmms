@@ -110,7 +110,7 @@ public:
 	float currentDetuning() const { return m_baseDetuning->value(); }
 
 	/*! Renders one chunk using the attached instrument into the buffer */
-	void play( sampleFrame* buffer ) override;
+	void play( SampleFrame* buffer ) override;
 
 	/*! Returns whether playback of note is finished and thus handle can be deleted */
 	bool isFinished() const override

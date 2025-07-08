@@ -36,12 +36,12 @@ namespace lmms
 FlangerControls::FlangerControls( FlangerEffect *effect ) :
 	EffectControls ( effect ),
 	m_effect ( effect ),
-	m_delayTimeModel(0.001, 0.0001, 0.050, 0.0001,  this, tr( "Delay samples" ) ),
-	m_lfoFrequencyModel( 0.25, 0.01, 60, 0.0001, 60000.0, this, tr( "LFO frequency" ) ),
-	m_lfoAmountModel( 0.0, 0.0, 0.0025, 0.0001, this, tr( "Amount" ) ),
-	m_lfoPhaseModel( 90.0, 0.0, 360.0, 0.0001, this, tr( "Stereo phase" ) ),
-	m_feedbackModel( 0.0, -1.0, 1.0, 0.0001, this, tr( "Feedback" ) ),
-	m_whiteNoiseAmountModel( 0.0, 0.0, 0.05, 0.0001, this, tr( "Noise" ) ),
+	m_delayTimeModel(0.001f, 0.0001f, 0.050f, 0.0001f, this, tr("Delay samples")),
+	m_lfoFrequencyModel(0.25f, 0.01f, 60, 0.0001f, 60000.f, this, tr("LFO frequency")),
+	m_lfoAmountModel(0.f, 0.f, 0.0025f, 0.0001f, this, tr("Amount")),
+	m_lfoPhaseModel(90.f, 0.f, 360.f, 0.0001f, this, tr("Stereo phase")),
+	m_feedbackModel(0.f, -1.f, 1.f, 0.0001f, this, tr("Feedback")),
+	m_whiteNoiseAmountModel(0.f, 0.f, 0.05f, 0.0001f, this, tr("Noise")),
 	m_invertFeedbackModel ( false, this, tr( "Invert" ) )
 
 {

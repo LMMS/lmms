@@ -56,14 +56,13 @@ class MixerChannel : public ThreadableJob
 
 		float m_peakLeft;
 		float m_peakRight;
-		sampleFrame * m_buffer;
+		SampleFrame* m_buffer;
 		bool m_muteBeforeSolo;
 		BoolModel m_muteModel;
 		BoolModel m_soloModel;
 		FloatModel m_volumeModel;
 		QString m_name;
 		QMutex m_lock;
-		int m_channelIndex; // what channel index are we
 		bool m_queued; // are we queued up for rendering yet?
 		bool m_muted; // are we muted? updated per period so we don't have to call m_muteModel.value() twice
 
@@ -73,19 +72,26 @@ class MixerChannel : public ThreadableJob
 		// pointers to other channels that send to this one
 		MixerRouteVector m_receives;
 
+		int index() const { return m_channelIndex; }
+		void setIndex(int index) { m_channelIndex = index; }
+
+		bool isMaster() { return m_channelIndex == 0; }
+
 		bool requiresProcessing() const override { return true; }
 		void unmuteForSolo();
+		void unmuteSenderForSolo();
+		void unmuteReceiverForSolo();
 
 		auto color() const -> const std::optional<QColor>& { return m_color; }
 		void setColor(const std::optional<QColor>& color) { m_color = color; }
 
-		std::atomic_int m_dependenciesMet;
+		std::atomic_size_t m_dependenciesMet;
 		void incrementDeps();
 		void processed();
 		
 	private:
 		void doProcessing() override;
-
+		int m_channelIndex;
 		std::optional<QColor> m_color;
 };
 
@@ -98,12 +104,12 @@ public:
 
 	mix_ch_t senderIndex() const
 	{
-		return m_from->m_channelIndex;
+		return m_from->index();
 	}
 
 	mix_ch_t receiverIndex() const
 	{
-		return m_to->m_channelIndex;
+		return m_to->index();
 	}
 
 	FloatModel * amount()
@@ -137,10 +143,10 @@ public:
 	Mixer();
 	~Mixer() override;
 
-	void mixToChannel( const sampleFrame * _buf, mix_ch_t _ch );
+	void mixToChannel( const SampleFrame* _buf, mix_ch_t _ch );
 
 	void prepareMasterMix();
-	void masterMix( sampleFrame * _buf );
+	void masterMix( SampleFrame* _buf );
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 	void loadSettings( const QDomElement & _this ) override;

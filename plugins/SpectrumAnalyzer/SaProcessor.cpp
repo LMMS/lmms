@@ -26,11 +26,10 @@
 #include "SaProcessor.h"
 
 #include <algorithm>
-#ifdef SA_DEBUG
-	#include <chrono>
-#endif
+#include "lmms_math.h"
 #include <cmath>
 #ifdef SA_DEBUG
+	#include <chrono>
 	#include <iomanip>
 	#include <iostream>
 #endif
@@ -98,9 +97,9 @@ SaProcessor::~SaProcessor()
 
 
 // Load data from audio thread ringbuffer and run FFT analysis if buffer is full enough.
-void SaProcessor::analyze(LocklessRingBuffer<sampleFrame> &ring_buffer)
+void SaProcessor::analyze(LocklessRingBuffer<SampleFrame> &ring_buffer)
 {
-	LocklessRingBufferReader<sampleFrame> reader(ring_buffer);
+	LocklessRingBufferReader<SampleFrame> reader(ring_buffer);
 
 	// Processing thread loop
 	while (!m_terminate)
@@ -232,7 +231,7 @@ void SaProcessor::analyze(LocklessRingBuffer<sampleFrame> &ring_buffer)
 							if (band_end - band_start > 1.0)
 							{
 								// band spans multiple pixels: draw all pixels it covers
-								for (int target = std::max(static_cast<int>(band_start), 0);
+								for (auto target = static_cast<std::size_t>(std::max(band_start, 0.f));
 									 target < band_end && target < waterfallWidth(); target++)
 								{
 									pixel[target] = makePixel(m_normSpectrumL[i], m_normSpectrumR[i]);
@@ -259,7 +258,9 @@ void SaProcessor::analyze(LocklessRingBuffer<sampleFrame> &ring_buffer)
 									accL += ((int)band_end - band_start) * m_normSpectrumL[i];
 									accR += ((int)band_end - band_start) * m_normSpectrumR[i];
 
-									if (target >= 0 && target < waterfallWidth()) {pixel[target] = makePixel(accL, accR);}
+									if (target >= 0 && static_cast<std::size_t>(target) < waterfallWidth()) {
+										pixel[target] = makePixel(accL, accR);
+									}
 
 									// save remaining portion of the band for the following band / pixel
 									accL = (band_end - (int)band_end) * m_normSpectrumL[i];
@@ -270,7 +271,7 @@ void SaProcessor::analyze(LocklessRingBuffer<sampleFrame> &ring_buffer)
 						else
 						{
 							// Linear: always draws one or more pixels per band
-							for (int target = std::max(static_cast<int>(band_start), 0);
+							for (auto target = static_cast<std::size_t>(std::max(band_start, 0.f));
 								 target < band_end && target < waterfallWidth(); target++)
 							{
 								pixel[target] = makePixel(m_normSpectrumL[i], m_normSpectrumR[i]);
@@ -329,15 +330,15 @@ QRgb SaProcessor::makePixel(float left, float right) const
 	const float gamma_correction = m_controls->m_waterfallGammaModel.value();
 	if (m_controls->m_stereoModel.value())
 	{
-		float ampL = pow(left, gamma_correction);
-		float ampR = pow(right, gamma_correction);
+		float ampL = std::pow(left, gamma_correction);
+		float ampR = std::pow(right, gamma_correction);
 		return qRgb(m_controls->m_colorL.red() * ampL + m_controls->m_colorR.red() * ampR,
 					m_controls->m_colorL.green() * ampL + m_controls->m_colorR.green() * ampR,
 					m_controls->m_colorL.blue() * ampL + m_controls->m_colorR.blue() * ampR);
 	}
 	else
 	{
-		float ampL = pow(left, gamma_correction);
+		float ampL = std::pow(left, gamma_correction);
 		// make mono color brighter to compensate for the fact it is not summed
 		return qRgb(m_controls->m_colorMonoW.red() * ampL,
 					m_controls->m_colorMonoW.green() * ampL,
@@ -574,9 +575,9 @@ float SaProcessor::freqToXPixel(float freq, unsigned int width) const
 	if (m_controls->m_logXModel.value())
 	{
 		if (freq <= 1) {return 0;}
-		float min = log10(getFreqRangeMin());
-		float range = log10(getFreqRangeMax()) - min;
-		return (log10(freq) - min) / range * width;
+		float min = std::log10(getFreqRangeMin());
+		float range = std::log10(getFreqRangeMax()) - min;
+		return (std::log10(freq) - min) / range * width;
 	}
 	else
 	{
@@ -592,10 +593,10 @@ float SaProcessor::xPixelToFreq(float x, unsigned int width) const
 {
 	if (m_controls->m_logXModel.value())
 	{
-		float min = log10(getFreqRangeMin());
-		float max = log10(getFreqRangeMax());
+		float min = std::log10(getFreqRangeMin());
+		float max = std::log10(getFreqRangeMax());
 		float range = max - min;
-		return pow(10, min + x / width * range);
+		return fastPow10f(min + x / width * range);
 	}
 	else
 	{
@@ -660,8 +661,8 @@ float SaProcessor::ampToYPixel(float amplitude, unsigned int height) const
 	else
 	{
 		// linear scale: convert returned ranges from dB to linear scale
-		float max = pow(10, getAmpRangeMax() / 10);
-		float range = pow(10, getAmpRangeMin() / 10) - max;
+		float max = fastPow10f(getAmpRangeMax() / 10);
+		float range = fastPow10f(getAmpRangeMin() / 10) - max;
 		return (amplitude - max) / range * height;
 	}
 }
@@ -681,8 +682,8 @@ float SaProcessor::yPixelToAmp(float y, unsigned int height) const
 	else
 	{
 		// linear scale: convert returned ranges from dB to linear scale
-		float max = pow(10, getAmpRangeMax() / 10);
-		float range = pow(10, getAmpRangeMin() / 10) - max;
+		float max = fastPow10f(getAmpRangeMax() / 10);
+		float range = fastPow10f(getAmpRangeMin() / 10) - max;
 		return max + range * (y / height);
 	}
 }

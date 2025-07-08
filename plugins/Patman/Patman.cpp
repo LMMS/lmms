@@ -33,7 +33,7 @@
 #include "endian_handling.h"
 #include "Engine.h"
 #include "FileDialog.h"
-#include "gui_templates.h"
+#include "FontHelper.h"
 #include "InstrumentTrack.h"
 #include "NotePlayHandle.h"
 #include "PathUtil.h"
@@ -134,7 +134,7 @@ QString PatmanInstrument::nodeName() const
 
 
 void PatmanInstrument::playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer )
+						SampleFrame* _working_buffer )
 {
 	if( m_patchFile == "" )
 	{
@@ -160,7 +160,7 @@ void PatmanInstrument::playNote( NotePlayHandle * _n,
 	}
 	else
 	{
-		memset( _working_buffer, 0, ( frames + offset ) * sizeof( sampleFrame ) );
+		zeroSampleFrames(_working_buffer, frames + offset);
 	}
 }
 
@@ -342,7 +342,7 @@ PatmanInstrument::LoadError PatmanInstrument::loadPatch(
 			}
 		}
 
-		auto data = new sampleFrame[frames];
+		auto data = new SampleFrame[frames];
 
 		for( f_cnt_t frame = 0; frame < frames; ++frame )
 		{
@@ -545,7 +545,7 @@ void PatmanView::updateFilename()
  	m_displayFilename = "";
 	int idx = m_pi->m_patchFile.length();
 
-	QFontMetrics fm(adjustedToPixelSize(font(), 8));
+	QFontMetrics fm(adjustedToPixelSize(font(), SMALL_FONT_SIZE));
 
 	// simple algorithm for creating a text from the filename that
 	// matches in the white rectangle
@@ -615,7 +615,7 @@ void PatmanView::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
 
-	p.setFont(adjustedToPixelSize(font() ,8));
+	p.setFont(adjustedToPixelSize(font(), SMALL_FONT_SIZE));
 	p.drawText( 8, 116, 235, 16,
 			Qt::AlignLeft | Qt::TextSingleLine | Qt::AlignVCenter,
 			m_displayFilename );

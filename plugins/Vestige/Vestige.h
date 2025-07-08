@@ -61,7 +61,7 @@ public:
 	VestigeInstrument( InstrumentTrack * _instrument_track );
 	virtual ~VestigeInstrument();
 
-	virtual void play( sampleFrame * _working_buffer );
+	virtual void play( SampleFrame* _working_buffer );
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );

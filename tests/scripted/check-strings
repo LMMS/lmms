@@ -141,26 +141,6 @@ for cur_file in sorted(Path('.').glob('*/patches/*.patch')):
                 error(cur_file.as_posix(), f'Source file does not exist: {mpath.as_posix()}')
 
 
-caption('debian docs (only one string)')
-
-# Checks for caps.html. This gets relevant when #4027 will be merged
-for line in Path('debian/lmms-common.docs').read_text(errors='replace').splitlines():
-    line = line.rstrip()
-    if 'caps.html' in line and not Path(line).is_file():
-        error('debian/lmms-common.docs', f'Path does not exist: {line}')
-
-
-caption('debian/copyright')
-
-pat = re.compile(r'^Files:\s*(\S+).*$', re.MULTILINE)
-ladspa_swh = re.compile(r'(plugins/LadspaEffect/swh/ladspa/[^/.]+)\.c')
-for mpath in pat.findall(Path('debian/copyright').read_text(errors='replace')):
-    # in case of LADSPA SWH effects, check that the XML exists, not the C file
-    # (because the C files are not generated until a build is done)
-    if res2 := ladspa_swh.match(mpath):
-        mpath = res2.group(1) + '.xml'
-    if not any(Path('.').glob(mpath)):
-        error('debian/copyright', f'Glob/Path does not exist: {mpath}')
 
 
 # summary

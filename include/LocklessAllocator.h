@@ -50,8 +50,8 @@ private:
 	std::atomic_int * m_freeState;
 	size_t m_freeStateSets;
 
-	std::atomic_int m_available;
-	std::atomic_int m_startIndex;
+	std::atomic_size_t m_available;
+	std::atomic_size_t m_startIndex;
 
 } ;
 

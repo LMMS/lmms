@@ -43,7 +43,7 @@ public:
 	Q_OBJECT
 public:
 	EqFader( FloatModel * model, const QString & name, QWidget * parent,  float* lPeak, float* rPeak ) :
-		Fader( model, name, parent )
+		Fader(model, name, parent, false)
 	{
 		setMinimumSize( 23, 116 );
 		setMaximumSize( 23, 116 );
@@ -67,7 +67,7 @@ private slots:
 	{
 		const float opl = getPeak_L();
 		const float opr = getPeak_R();
-		const float fallOff = 1.07;
+		const float fallOff = 1.07f;
 		if( *m_lPeak > opl )
 		{
 			setPeak_L( *m_lPeak );

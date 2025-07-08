@@ -221,7 +221,7 @@ QString OrganicInstrument::nodeName() const
 
 
 void OrganicInstrument::playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer )
+						SampleFrame* _working_buffer )
 {
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();
@@ -236,9 +236,9 @@ void OrganicInstrument::playNote( NotePlayHandle * _n,
 		for( int i = m_numOscillators - 1; i >= 0; --i )
 		{
 			static_cast<oscPtr *>( _n->m_pluginData )->phaseOffsetLeft[i]
-				= rand() / ( RAND_MAX + 1.0f );
+				= rand() / (static_cast<float>(RAND_MAX) + 1.0f);
 			static_cast<oscPtr *>( _n->m_pluginData )->phaseOffsetRight[i]
-				= rand() / ( RAND_MAX + 1.0f );
+				= rand() / (static_cast<float>(RAND_MAX) + 1.0f);
 
 			// initialise ocillators
 
@@ -302,7 +302,7 @@ void OrganicInstrument::playNote( NotePlayHandle * _n,
 	// fxKnob is [0;1]
 	float t =  m_fx1Model.value();
 
-	for (int i=0 ; i < frames + offset ; i++)
+	for (auto i = std::size_t{0}; i < frames + offset; i++)
 	{
 		_working_buffer[i][0] = waveshape( _working_buffer[i][0], t ) *
 						m_volModel.value() / 100.0f;
@@ -342,8 +342,7 @@ void OrganicInstrument::deleteNotePluginData( NotePlayHandle * _n )
 float inline OrganicInstrument::waveshape(float in, float amount)
 {
 	float k = 2.0f * amount / ( 1.0f - amount );
-
-	return( ( 1.0f + k ) * in / ( 1.0f + k * fabs( in ) ) );
+	return (1.0f + k) * in / (1.0f + k * std::abs(in));
 }
 
 
@@ -603,12 +602,11 @@ void OscillatorObject::updateVolume()
 
 void OscillatorObject::updateDetuning()
 {
-	m_detuningLeft = powf( 2.0f, OrganicInstrument::s_harmonics[ static_cast<int>( m_harmModel.value() ) ]
-				+ (float)m_detuneModel.value() * CENT ) /
-				Engine::audioEngine()->outputSampleRate();
-	m_detuningRight = powf( 2.0f, OrganicInstrument::s_harmonics[ static_cast<int>( m_harmModel.value() ) ]
-				- (float)m_detuneModel.value() * CENT ) /
-				Engine::audioEngine()->outputSampleRate();
+	const auto harmonic = OrganicInstrument::s_harmonics[static_cast<int>(m_harmModel.value())];
+	const auto sr = Engine::audioEngine()->outputSampleRate();
+
+	m_detuningLeft = std::exp2(harmonic + m_detuneModel.value() * CENT) / sr;
+	m_detuningRight = std::exp2(harmonic - m_detuneModel.value() * CENT) / sr;
 }
 
 

@@ -36,7 +36,7 @@
 #include "Sample.h"
 #include "SampleBuffer.h"
 #include "SlicerTView.h"
-#include "lmms_basics.h"
+#include "LmmsTypes.h"
 
 namespace lmms {
 
@@ -75,7 +75,7 @@ signals:
 public:
 	SlicerT(InstrumentTrack* instrumentTrack);
 
-	void playNote(NotePlayHandle* handle, sampleFrame* workingBuffer) override;
+	void playNote(NotePlayHandle* handle, SampleFrame* workingBuffer) override;
 	void deleteNotePluginData(NotePlayHandle* handle) override;
 
 	void saveSettings(QDomDocument& document, QDomElement& element) override;
@@ -83,6 +83,8 @@ public:
 
 	void findSlices();
 	void findBPM();
+
+	QString getSampleName() { return m_originalSample.sampleFile(); }
 
 	QString nodeName() const override;
 	gui::PluginView* instantiateView(QWidget* parent) override;

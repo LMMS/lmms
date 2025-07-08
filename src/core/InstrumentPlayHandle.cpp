@@ -37,10 +37,10 @@ InstrumentPlayHandle::InstrumentPlayHandle(Instrument * instrument, InstrumentTr
 	PlayHandle(Type::InstrumentPlayHandle),
 	m_instrument(instrument)
 {
-	setAudioPort(instrumentTrack->audioPort());
+	setAudioBusHandle(instrumentTrack->audioBusHandle());
 }
 
-void InstrumentPlayHandle::play(sampleFrame * working_buffer)
+void InstrumentPlayHandle::play(SampleFrame* working_buffer)
 {
 	InstrumentTrack * instrumentTrack = m_instrument->instrumentTrack();
 

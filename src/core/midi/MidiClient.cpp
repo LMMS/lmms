@@ -24,8 +24,10 @@
  */
 
 #include "MidiClient.h"
-#include "MidiPort.h"
 
+#include <array>
+
+#include "MidiPort.h"
 
 namespace lmms
 {

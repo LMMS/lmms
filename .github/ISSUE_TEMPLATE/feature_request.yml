@@ -10,7 +10,8 @@ body:
       label: Enhancement Summary
       description: |
         - Briefly describe the enhancement.
-        - Explain why you believe the proposed enhancement to be a good idea, and (if applicable) how it helps overcome a limitation of LMMS you are currently facing.
+        - Explain why you believe the proposed enhancement to be a good idea, and (if applicable) how it helps
+          overcome a limitation of LMMS you are currently facing.
     validations:
       required: true
   - type: textarea

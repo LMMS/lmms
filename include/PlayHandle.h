@@ -32,7 +32,7 @@
 
 #include "Flags.h"
 #include "ThreadableJob.h"
-#include "lmms_basics.h"
+#include "LmmsTypes.h"
 
 class QThread;
 
@@ -40,7 +40,8 @@ namespace lmms
 {
 
 class Track;
-class AudioPort;
+class AudioBusHandle;
+class SampleFrame;
 
 class LMMS_EXPORT PlayHandle : public ThreadableJob
 {
@@ -64,7 +65,7 @@ public:
 		m_offset = p.m_offset;
 		m_affinity = p.m_affinity;
 		m_usesBuffer = p.m_usesBuffer;
-		m_audioPort = p.m_audioPort;
+		m_audioBusHandle = p.m_audioBusHandle;
 		return *this;
 	}
 
@@ -105,7 +106,7 @@ public:
 	{
 		return m_processingLock.tryLock();
 	}
-	virtual void play( sampleFrame* buffer ) = 0;
+	virtual void play( SampleFrame* buffer ) = 0;
 	virtual bool isFinished() const = 0;
 
 	// returns the frameoffset at the start of the playhandle,
@@ -133,29 +134,29 @@ public:
 		m_usesBuffer = b;
 	}
 	
-	AudioPort * audioPort()
+	AudioBusHandle* audioBusHandle()
 	{
-		return m_audioPort;
+		return m_audioBusHandle;
 	}
 	
-	void setAudioPort( AudioPort * port )
+	void setAudioBusHandle(AudioBusHandle* busHandle)
 	{
-		m_audioPort = port;
+		m_audioBusHandle = busHandle;
 	}
 	
 	void releaseBuffer();
 	
-	sampleFrame * buffer();
+	SampleFrame* buffer();
 
 private:
 	Type m_type;
 	f_cnt_t m_offset;
 	QThread* m_affinity;
 	QMutex m_processingLock;
-	sampleFrame* m_playHandleBuffer;
+	SampleFrame* m_playHandleBuffer;
 	bool m_bufferReleased;
 	bool m_usesBuffer;
-	AudioPort * m_audioPort;
+	AudioBusHandle* m_audioBusHandle;
 } ;
 
 using PlayHandleList = QList<PlayHandle*>;

@@ -63,9 +63,8 @@ public:
 		return "effect";
 	}
 
-	
-	virtual bool processAudioBuffer( sampleFrame * _buf,
-						const fpp_t _frames ) = 0;
+	//! Returns true if audio was processed and should continue being processed
+	bool processAudioBuffer(SampleFrame* buf, const fpp_t frames);
 
 	inline ch_cnt_t processorCount() const
 	{
@@ -174,21 +173,36 @@ public:
 
 
 protected:
-	/**
-		Effects should call this at the end of audio processing
+	enum class ProcessStatus
+	{
+		//! Unconditionally continue processing
+		Continue,
 
-		If the setting "Keep effects running even without input" is disabled,
-		after "decay" ms of a signal below "gate", the effect is turned off
-		and won't be processed again until it receives new audio input
-	*/
-	void checkGate( double _out_sum );
+		//! Calculate the RMS out sum and call `checkGate` to determine whether to stop processing
+		ContinueIfNotQuiet,
+
+		//! Do not continue processing
+		Sleep
+	};
+
+	/**
+	 * The main audio processing method that runs when plugin is not asleep
+	 */
+	virtual ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) = 0;
+
+	/**
+	 * Optional method that runs when plugin is sleeping (not enabled,
+	 * not running, not in the Okay state, or in the Don't Run state)
+	 */
+	virtual void processBypassedImpl() {}
+
 
 	gui::PluginView* instantiateView( QWidget * ) override;
 
 	// some effects might not be capable of higher sample-rates so they can
 	// sample it down before processing and back after processing
-	inline void sampleDown( const sampleFrame * _src_buf,
-							sampleFrame * _dst_buf,
+	inline void sampleDown( const SampleFrame* _src_buf,
+							SampleFrame* _dst_buf,
 							sample_rate_t _dst_sr )
 	{
 		resample( 0, _src_buf,
@@ -197,8 +211,8 @@ protected:
 					Engine::audioEngine()->framesPerPeriod() );
 	}
 
-	inline void sampleBack( const sampleFrame * _src_buf,
-							sampleFrame * _dst_buf,
+	inline void sampleBack( const SampleFrame* _src_buf,
+							SampleFrame* _dst_buf,
 							sample_rate_t _src_sr )
 	{
 		resample( 1, _src_buf, _src_sr, _dst_buf,
@@ -212,10 +226,18 @@ protected:
 
 
 private:
+	/**
+		If the setting "Keep effects running even without input" is disabled,
+		after "decay" ms of a signal below "gate", the effect is turned off
+		and won't be processed again until it receives new audio input
+	*/
+	void checkGate(double outSum);
+
+
 	EffectChain * m_parent;
-	void resample( int _i, const sampleFrame * _src_buf,
+	void resample( int _i, const SampleFrame* _src_buf,
 					sample_rate_t _src_sr,
-					sampleFrame * _dst_buf, sample_rate_t _dst_sr,
+					SampleFrame* _dst_buf, sample_rate_t _dst_sr,
 					const f_cnt_t _frames );
 
 	ch_cnt_t m_processors;

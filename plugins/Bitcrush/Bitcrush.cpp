@@ -24,6 +24,7 @@
  */
 
 #include "Bitcrush.h"
+#include "lmms_math.h"
 #include "embed.h"
 #include "plugin_export.h"
 
@@ -62,7 +63,7 @@ BitcrushEffect::BitcrushEffect( Model * parent, const Descriptor::SubPluginFeatu
 	m_sampleRate( Engine::audioEngine()->outputSampleRate() ),
 	m_filter( m_sampleRate )
 {
-	m_buffer = new sampleFrame[Engine::audioEngine()->framesPerPeriod() * OS_RATE];
+	m_buffer = new SampleFrame[Engine::audioEngine()->framesPerPeriod() * OS_RATE];
 	m_filter.setLowpass( m_sampleRate * ( CUTOFF_RATIO * OS_RATIO ) );
 	m_needsUpdate = true;
 
@@ -97,16 +98,11 @@ inline float BitcrushEffect::depthCrush( float in )
 
 inline float BitcrushEffect::noise( float amt )
 {
-	return fastRandf( amt * 2.0f ) - amt;
+	return fastRand(-amt, +amt);
 }
 
-bool BitcrushEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
+Effect::ProcessStatus BitcrushEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 {
-	if( !isEnabled() || !isRunning () )
-	{
-		return( false );
-	}
-
 	// update values
 	if( m_needsUpdate || m_controls.m_rateEnabled.isValueChanged() )
 	{
@@ -153,7 +149,7 @@ bool BitcrushEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 	// read input buffer and write it to oversampled buffer
 	if( m_rateEnabled ) // rate crushing enabled so do that
 	{
-		for( int f = 0; f < frames; ++f )
+		for (auto f = std::size_t{0}; f < frames; ++f)
 		{
 			for( int o = 0; o < OS_RATE; ++o )
 			{
@@ -180,7 +176,7 @@ bool BitcrushEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 	}
 	else // rate crushing disabled: simply oversample with zero-order hold
 	{
-		for( int f = 0; f < frames; ++f )
+		for (auto f = std::size_t{0}; f < frames; ++f)
 		{
 			for( int o = 0; o < OS_RATE; ++o )
 			{
@@ -196,7 +192,7 @@ bool BitcrushEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 
 	// the oversampled buffer is now written, so filter it to reduce aliasing
 
-	for( int f = 0; f < frames * OS_RATE; ++f )
+	for (auto f = std::size_t{0}; f < frames * OS_RATE; ++f)
 	{
 		if( qMax( qAbs( m_buffer[f][0] ), qAbs( m_buffer[f][1] ) ) >= 1.0e-10f )
 		{
@@ -222,10 +218,9 @@ bool BitcrushEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 
 	// now downsample and write it back to main buffer
 
-	double outSum = 0.0;
 	const float d = dryLevel();
 	const float w = wetLevel();
-	for( int f = 0; f < frames; ++f )
+	for (auto f = std::size_t{0}; f < frames; ++f)
 	{
 		float lsum = 0.0f;
 		float rsum = 0.0f;
@@ -236,12 +231,9 @@ bool BitcrushEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 		}
 		buf[f][0] = d * buf[f][0] + w * qBound( -m_outClip, lsum, m_outClip ) * m_outGain;
 		buf[f][1] = d * buf[f][1] + w * qBound( -m_outClip, rsum, m_outClip ) * m_outGain;
-		outSum += buf[f][0]*buf[f][0] + buf[f][1]*buf[f][1];
 	}
 
-	checkGate( outSum / frames );
-
-	return isRunning();
+	return ProcessStatus::ContinueIfNotQuiet;
 }
 
 

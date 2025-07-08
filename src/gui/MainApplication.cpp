@@ -92,7 +92,7 @@ bool MainApplication::winEventFilter(MSG* msg, long* result)
 	switch(msg->message)
 	{
 		case WM_STYLECHANGING:
-			if(msg->wParam == GWL_EXSTYLE)
+			if (msg->wParam == static_cast<WPARAM>(GWL_EXSTYLE))
 			{
 				// Prevent plugins making the main window transparent
 				STYLESTRUCT * style = reinterpret_cast<STYLESTRUCT *>(msg->lParam);

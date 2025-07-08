@@ -31,14 +31,20 @@
 #ifndef LMMS_HAVE_WEAKJACK
 #include <jack/jack.h>
 #else
-#include "weak_libjack.h"
+#include <weak_libjack.h>
 #endif
 
 #include <atomic>
 #include <vector>
+#ifdef AUDIO_BUS_HANDLE_SUPPORT
+#include <QMap>
+#endif
 
 #include "AudioDevice.h"
 #include "AudioDeviceSetupWidget.h"
+#ifdef AUDIO_BUS_HANDLE_SUPPORT
+#include "AudioBusHandle.h"
+#endif
 
 class QLineEdit;
 
@@ -46,11 +52,6 @@ namespace lmms
 {
 
 class MidiJack;
-
-namespace gui
-{
-class LcdSpinBox;
-}
 
 
 class AudioJack : public QObject, public AudioDevice
@@ -76,13 +77,10 @@ public:
 	{
 	public:
 		setupWidget(QWidget* parent);
-		~setupWidget() override;
-
 		void saveSettings() override;
 
 	private:
 		QLineEdit* m_clientName;
-		gui::LcdSpinBox* m_channels;
 	};
 
 private slots:
@@ -90,13 +88,14 @@ private slots:
 
 private:
 	bool initJackClient();
+	void resizeInputBuffer(jack_nframes_t nframes);
 
 	void startProcessing() override;
 	void stopProcessing() override;
 
-	void registerPort(AudioPort* port) override;
-	void unregisterPort(AudioPort* port) override;
-	void renamePort(AudioPort* port) override;
+	void registerPort(AudioBusHandle* port) override;
+	void unregisterPort(AudioBusHandle* port) override;
+	void renamePort(AudioBusHandle* port) override;
 
 	int processCallback(jack_nframes_t nframes);
 
@@ -110,19 +109,21 @@ private:
 
 	std::atomic<MidiJack*> m_midiClient;
 	std::vector<jack_port_t*> m_outputPorts;
+	std::vector<jack_port_t*> m_inputPorts;
 	jack_default_audio_sample_t** m_tempOutBufs;
-	surroundSampleFrame* m_outBuf;
+	std::vector<SampleFrame> m_inputFrameBuffer;
+	SampleFrame* m_outBuf;
 
 	f_cnt_t m_framesDoneInCurBuf;
 	f_cnt_t m_framesToDoInCurBuf;
 
-#ifdef AUDIO_PORT_SUPPORT
+#ifdef AUDIO_BUS_HANDLE_SUPPORT
 	struct StereoPort
 	{
 		jack_port_t* ports[2];
 	};
 
-	using JackPortMap = QMap<AudioPort*, StereoPort>;
+	using JackPortMap = QMap<AudioBusHandle*, StereoPort>;
 	JackPortMap m_portMap;
 #endif
 

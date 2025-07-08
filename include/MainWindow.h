@@ -29,6 +29,7 @@
 #include <QTimer>
 #include <QList>
 #include <QMainWindow>
+#include <QMdiArea>
 
 #include "ConfigManager.h"
 
@@ -45,6 +46,7 @@ class ConfigManager;
 namespace gui
 {
 
+class FileBrowser;
 class PluginView;
 class SubWindow;
 class ToolButton;
@@ -57,7 +59,7 @@ class MainWindow : public QMainWindow
 public:
 	QMdiArea* workspace()
 	{
-		return m_workspace;
+		return static_cast<QMdiArea*>(m_workspace);
 	}
 
 	QWidget* toolBar()
@@ -71,6 +73,8 @@ public:
 	// wrap the widget with a window decoration and add it to the workspace
 	LMMS_EXPORT SubWindow* addWindowedWidget(QWidget *w, Qt::WindowFlags windowFlags = QFlag(0));
 
+
+	void refocus();
 
 	///
 	/// \brief	Asks whether changes made to the project are to be saved.
@@ -195,14 +199,28 @@ private:
 	void finalize();
 
 	void toggleWindow( QWidget *window, bool forceShow = false );
-	void refocus();
 
 	void exportProject(bool multiExport = false);
 	void handleSaveResult(QString const & filename, bool songSavedSuccessfully);
 	bool guiSaveProject();
 	bool guiSaveProjectAs( const QString & filename );
 
-	QMdiArea * m_workspace;
+	class MovableQMdiArea : public QMdiArea
+	{
+	public:
+		MovableQMdiArea(QWidget* parent = nullptr);
+		~MovableQMdiArea() {}
+	protected:
+		void mousePressEvent(QMouseEvent* event) override;
+		void mouseMoveEvent(QMouseEvent* event) override;
+		void mouseReleaseEvent(QMouseEvent* event) override;
+	private:
+		bool m_isBeingMoved;
+		int m_lastX;
+		int m_lastY;
+	};
+
+	MovableQMdiArea * m_workspace;
 
 	QWidget * m_toolBar;
 	QGridLayout * m_toolBarLayout;
@@ -256,7 +274,6 @@ signals:
 	void initProgress(const QString &msg);
 
 } ;
-
 
 } // namespace gui
 

@@ -28,6 +28,7 @@
 #include <QDir>
 #include <QFileInfo>
 #include <filesystem>
+#include <stdexcept>
 
 #include "ConfigManager.h"
 #include "Engine.h"
@@ -39,13 +40,15 @@ namespace lmms::PathUtil
 
 	namespace
 	{
-		constexpr auto relativeBases = std::array{ Base::ProjectDir, Base::FactorySample, Base::UserSample, Base::UserVST, Base::Preset,
-			Base::UserLADSPA, Base::DefaultLADSPA, Base::UserSoundfont, Base::DefaultSoundfont, Base::UserGIG, Base::DefaultGIG,
-			Base::LocalDir, Base::Internal };
+		constexpr auto relativeBases = std::array {
+			Base::ProjectDir, Base::FactoryProjects, Base::FactorySample, Base::UserSample, Base::UserVST,
+			Base::Preset, Base::FactoryPresets, Base::UserLADSPA, Base::DefaultLADSPA, Base::UserSoundfont,
+			Base::DefaultSoundfont, Base::UserGIG, Base::DefaultGIG, Base::LocalDir, Base::Internal
+		};
 
-		auto oldRelativeUpgrade(u8string_view input) -> u8string
+		auto oldRelativeUpgrade(std::string_view input) -> std::string
 		{
-			auto inputStr = u8string{input};
+			auto inputStr = std::string{input};
 			if (input.empty()) { return inputStr; }
 
 			// Start by assuming that the file is a user sample
@@ -60,7 +63,7 @@ namespace lmms::PathUtil
 			if (std::error_code ec; fs::exists(vstPath, ec)) { assumedBase = Base::UserVST; }
 
 			// Assume we've found the correct base location, return the full path
-			return u8string{basePrefix(assumedBase)} + inputStr;
+			return std::string{basePrefix(assumedBase)} + inputStr;
 		}
 
 		//! Return the directory associated with a given base as a fs::path.
@@ -81,12 +84,18 @@ namespace lmms::PathUtil
 		}
 	} // namespace
 
-	auto baseLocation(Base base) -> std::optional<u8string>
+	auto baseLocation(Base base) -> std::optional<std::string>
 	{
 		QString loc;
 		switch (base)
 		{
 			case Base::ProjectDir       : loc = ConfigManager::inst()->userProjectsDir(); break;
+			case Base::FactoryProjects  :
+			{
+				const auto fpd = QDir{ConfigManager::inst()->factoryProjectsDir()};
+				loc = fpd.absolutePath();
+				break;
+			}
 			case Base::FactorySample    :
 			{
 				const auto fsd = QDir{ConfigManager::inst()->factorySamplesDir()};
@@ -96,6 +105,12 @@ namespace lmms::PathUtil
 			case Base::UserSample       : loc = ConfigManager::inst()->userSamplesDir(); break;
 			case Base::UserVST          : loc = ConfigManager::inst()->userVstDir(); break;
 			case Base::Preset           : loc = ConfigManager::inst()->userPresetsDir(); break;
+			case Base::FactoryPresets   :
+			{
+				const auto fpd = QDir{ConfigManager::inst()->factoryPresetsDir()};
+				loc = fpd.absolutePath();
+				break;
+			}
 			case Base::UserLADSPA       : loc = ConfigManager::inst()->ladspaDir(); break;
 			case Base::DefaultLADSPA    : loc = ConfigManager::inst()->userLadspaDir(); break;
 			case Base::UserSoundfont    : loc = ConfigManager::inst()->sf2Dir(); break;
@@ -118,20 +133,23 @@ namespace lmms::PathUtil
 			case Base::Internal:
 				return std::nullopt;
 			default:
-				return u8string{};
+				return std::string{};
 		}
 		return (QDir::cleanPath(loc) + "/").toStdString();
 	}
 
-	auto basePrefix(Base base) -> u8string_view
+	auto basePrefix(Base base) -> std::string_view
 	{
 		switch (base)
 		{
+			case Base::Absolute         : return "";
 			case Base::ProjectDir       : return "userprojects:";
+			case Base::FactoryProjects  : return "factoryprojects:";
 			case Base::FactorySample    : return "factorysample:";
 			case Base::UserSample       : return "usersample:";
 			case Base::UserVST          : return "uservst:";
 			case Base::Preset           : return "preset:";
+			case Base::FactoryPresets   : return "factorypreset:";
 			case Base::UserLADSPA       : return "userladspa:";
 			case Base::DefaultLADSPA    : return "defaultladspa:";
 			case Base::UserSoundfont    : return "usersoundfont:";
@@ -140,11 +158,11 @@ namespace lmms::PathUtil
 			case Base::DefaultGIG       : return "defaultgig:";
 			case Base::LocalDir         : return "local:";
 			case Base::Internal         : return "internal:";
-			default                     : return "";
+			default                     : throw std::invalid_argument{"PathUtil::basePrefix: Invalid base"};
 		}
 	}
 
-	auto hasBase(u8string_view path, Base base) -> bool
+	auto hasBase(std::string_view path, Base base) -> bool
 	{
 		if (base == Base::Absolute)
 		{
@@ -155,7 +173,7 @@ namespace lmms::PathUtil
 		return path.rfind(prefix, 0) == 0;
 	}
 
-	auto baseLookup(u8string_view path) -> Base
+	auto baseLookup(std::string_view path) -> Base
 	{
 		for (auto base : relativeBases)
 		{
@@ -165,13 +183,13 @@ namespace lmms::PathUtil
 		return Base::Absolute;
 	}
 
-	auto stripPrefix(u8string_view path) -> u8string_view
+	auto stripPrefix(std::string_view path) -> std::string_view
 	{
 		path.remove_prefix(basePrefix(baseLookup(path)).length());
 		return path;
 	}
 
-	auto parsePath(u8string_view path) -> std::pair<Base, u8string_view>
+	auto parsePath(std::string_view path) -> std::pair<Base, std::string_view>
 	{
 		for (auto base : relativeBases)
 		{
@@ -190,13 +208,9 @@ namespace lmms::PathUtil
 		return QString::fromStdString(cleanName(path.toStdString()));
 	}
 
-	auto cleanName(u8string_view path) -> u8string
+	auto cleanName(std::string_view path) -> std::string
 	{
-		auto filename = fs::u8path(path).filename().u8string(); // TODO: Fix in C++20?
-
-		// filename.stem() would return the name up until the last '.' but
-		//   Qt's QFileInfo.baseName() returns up until the *first* '.'
-		return filename.substr(0, filename.find('.'));
+		return fs::u8path(path).stem().u8string(); // TODO: Fix in C++20?
 	}
 
 	auto toAbsolute(const QString& input, bool* error /* = nullptr*/) -> QString
@@ -211,10 +225,10 @@ namespace lmms::PathUtil
 		return QString{};
 	}
 
-	auto toAbsolute(u8string_view input) -> std::optional<u8string>
+	auto toAbsolute(std::string_view input) -> std::optional<std::string>
 	{
 		// First, check if it's Internal
-		auto inputStr = u8string{input};
+		auto inputStr = std::string{input};
 		if (hasBase(input, Base::Internal)) { return inputStr; }
 
 		// Secondly, do no harm to absolute paths
@@ -225,7 +239,7 @@ namespace lmms::PathUtil
 		}
 
 		// Next, handle old relative paths with no prefix
-		const u8string upgraded = input.find(':') != u8string_view::npos
+		const std::string upgraded = input.find(':') != std::string_view::npos
 			? inputStr
 			: oldRelativeUpgrade(input);
 
@@ -244,11 +258,11 @@ namespace lmms::PathUtil
 		return QString::fromStdString(relativeOrAbsolute(input.toStdString(), base));
 	}
 
-	auto relativeOrAbsolute(u8string_view input, const Base base) -> u8string
+	auto relativeOrAbsolute(std::string_view input, const Base base) -> std::string
 	{
-		if (input.empty()) { return u8string{input}; }
+		if (input.empty()) { return std::string{input}; }
 
-		u8string absolutePath = toAbsolute(input).value_or(u8string{});
+		auto absolutePath = toAbsolute(input).value_or(std::string{});
 		if (base == Base::Absolute || base == Base::Internal) { return absolutePath; }
 
 		auto bd = baseDir(base);
@@ -260,7 +274,7 @@ namespace lmms::PathUtil
 
 		// Return the relative path if it didn't result in a path starting with ".."
 		// and the baseDir was resolved properly
-		return relativePath.rfind("..", 0) != u8string::npos
+		return relativePath.rfind("..", 0) != std::string::npos
 			? absolutePath
 			: relativePath;
 	}
@@ -270,23 +284,23 @@ namespace lmms::PathUtil
 		return QString::fromStdString(toShortestRelative(input.toStdString(), allowLocal));
 	}
 
-	auto toShortestRelative(u8string_view input, bool allowLocal /* = false*/) -> u8string
+	auto toShortestRelative(std::string_view input, bool allowLocal /* = false*/) -> std::string
 	{
-		auto inputStr = u8string{input};
+		auto inputStr = std::string{input};
 		if (hasBase(input, Base::Internal)) { return inputStr; }
 
 		const auto inputPath = fs::u8path(input);
-		u8string absolutePath = toAbsolute(input).value();
+		auto absolutePath = toAbsolute(input).value();
 
 		Base shortestBase = Base::Absolute;
-		u8string shortestPath = relativeOrAbsolute(absolutePath, shortestBase);
+		auto shortestPath = relativeOrAbsolute(absolutePath, shortestBase);
 		for (auto base : relativeBases)
 		{
 			// Skip local paths when searching for the shortest relative if those
 			// are not allowed for that resource
 			if (base == Base::LocalDir && !allowLocal) { continue; }
 
-			u8string otherPath = relativeOrAbsolute(absolutePath, base);
+			auto otherPath = relativeOrAbsolute(absolutePath, base);
 			if (otherPath.length() < shortestPath.length())
 			{
 				shortestBase = base;
@@ -294,7 +308,7 @@ namespace lmms::PathUtil
 			}
 		}
 
-		return u8string{basePrefix(shortestBase)} + relativeOrAbsolute(absolutePath, shortestBase);
+		return std::string{basePrefix(shortestBase)} + relativeOrAbsolute(absolutePath, shortestBase);
 	}
 
 } // namespace lmms::PathUtil

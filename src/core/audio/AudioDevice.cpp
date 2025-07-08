@@ -27,7 +27,6 @@
 #include "AudioDevice.h"
 #include "AudioEngine.h"
 #include "ConfigManager.h"
-#include "debug.h"
 
 namespace lmms
 {
@@ -37,7 +36,7 @@ AudioDevice::AudioDevice( const ch_cnt_t _channels, AudioEngine*  _audioEngine )
 	m_sampleRate( _audioEngine->outputSampleRate() ),
 	m_channels( _channels ),
 	m_audioEngine( _audioEngine ),
-	m_buffer( new surroundSampleFrame[audioEngine()->framesPerPeriod()] )
+	m_buffer(new SampleFrame[audioEngine()->framesPerPeriod()])
 {
 }
 
@@ -64,14 +63,14 @@ void AudioDevice::processNextBuffer()
 	}
 }
 
-fpp_t AudioDevice::getNextBuffer(surroundSampleFrame* _ab)
+fpp_t AudioDevice::getNextBuffer(SampleFrame* _ab)
 {
 	fpp_t frames = audioEngine()->framesPerPeriod();
+	const SampleFrame* b = audioEngine()->nextBuffer();
 
-	const surroundSampleFrame* b = audioEngine()->nextBuffer();
 	if (!b) { return 0; }
 
-	memcpy(_ab, b, frames * sizeof(surroundSampleFrame));
+	memcpy(_ab, b, frames * sizeof(SampleFrame));
 
 	if (audioEngine()->hasFifoWriter()) { delete[] b; }
 	return frames;
@@ -109,25 +108,25 @@ void AudioDevice::stopProcessingThread( QThread * thread )
 
 
 
-void AudioDevice::registerPort( AudioPort * )
+void AudioDevice::registerPort(AudioBusHandle*)
 {
 }
 
 
 
 
-void AudioDevice::unregisterPort( AudioPort * _port )
+void AudioDevice::unregisterPort(AudioBusHandle*)
 {
 }
 
 
 
 
-void AudioDevice::renamePort( AudioPort * )
+void AudioDevice::renamePort(AudioBusHandle*)
 {
 }
 
-int AudioDevice::convertToS16( const surroundSampleFrame * _ab,
+int AudioDevice::convertToS16(const SampleFrame* _ab,
 								const fpp_t _frames,
 								int_sample_t * _output_buffer,
 								const bool _convert_endian )

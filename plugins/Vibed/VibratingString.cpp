@@ -26,6 +26,7 @@
 #include "interpolation.h"
 #include "AudioEngine.h"
 #include "Engine.h"
+#include "LmmsTypes.h"
 
 #include <algorithm>
 #include <cstdlib>
@@ -39,7 +40,7 @@ VibratingString::VibratingString(float pitch, float pick, float pickup, const fl
 	m_oversample{2 * oversample / static_cast<int>(sampleRate / Engine::audioEngine()->baseSampleRate())},
 	m_randomize{randomize},
 	m_stringLoss{1.0f - stringLoss},
-	m_choice{static_cast<int>(m_oversample * static_cast<float>(std::rand()) / RAND_MAX)},
+	m_choice{static_cast<int>(m_oversample * static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX))},
 	m_state{0.1f},
 	m_outsamp{std::make_unique<sample_t[]>(m_oversample)}
 {
@@ -77,7 +78,7 @@ std::unique_ptr<VibratingString::DelayLine> VibratingString::initDelayLine(int l
 		dl->data = std::make_unique<sample_t[]>(len);
 		for (int i = 0; i < dl->length; ++i)
 		{
-			float r = static_cast<float>(std::rand()) / RAND_MAX;
+			float r = static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX);
 			float offset = (m_randomize / 2.0f - m_randomize) * r;
 			dl->data[i] = offset;
 		}
@@ -99,7 +100,7 @@ void VibratingString::resample(const float* src, f_cnt_t srcFrames, f_cnt_t dstF
 	{
 		const float srcFrameFloat = frame * static_cast<float>(srcFrames) / dstFrames;
 		const float fracPos = srcFrameFloat - static_cast<f_cnt_t>(srcFrameFloat);
-		const f_cnt_t srcFrame = std::clamp(static_cast<f_cnt_t>(srcFrameFloat), 1, srcFrames - 3);
+		const f_cnt_t srcFrame = std::clamp(static_cast<f_cnt_t>(srcFrameFloat), f_cnt_t{1}, srcFrames - 3);
 		m_impulse[frame] = cubicInterpolate(
 			src[srcFrame - 1],
 			src[srcFrame + 0],

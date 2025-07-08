@@ -35,9 +35,9 @@ DispersionControls::DispersionControls(DispersionEffect* effect) :
 	EffectControls(effect),
 	m_effect(effect),
 	m_amountModel(0, 0, MAX_DISPERSION_FILTERS, this, tr("Amount")),
-	m_freqModel(200, 20, 20000, 0.001, this, tr("Frequency")),
-	m_resoModel(0.707, 0.01, 8, 0.0001, this, tr("Resonance")),
-	m_feedbackModel(0.f, -1.f, 1.f, 0.0001, this, tr("Feedback")),
+	m_freqModel(200, 20, 20000, 0.001f, this, tr("Frequency")),
+	m_resoModel(0.707f, 0.01f, 8, 0.0001f, this, tr("Resonance")),
+	m_feedbackModel(0.f, -1.f, 1.f, 0.0001f, this, tr("Feedback")),
 	m_dcModel(false, this, tr("DC Offset Removal"))
 {
 	m_freqModel.setScaleLogarithmic(true);

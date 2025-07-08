@@ -46,12 +46,11 @@
 #include <cassert>
 #include <cmath>
 
-#include "opl.h"
-#include "temuopl.h"
-#include "mididata.h"
+#include <opl.h>
+#include <temuopl.h>
+#include <mididata.h>
 
 #include "embed.h"
-#include "debug.h"
 
 #include "Knob.h"
 #include "PixmapButton.h"
@@ -390,7 +389,7 @@ gui::PluginView* OpulenzInstrument::instantiateView( QWidget * _parent )
 }
 
 
-void OpulenzInstrument::play( sampleFrame * _working_buffer )
+void OpulenzInstrument::play( SampleFrame* _working_buffer )
 {
 	emulatorMutex.lock();
 	theEmulator->update(renderbuffer, frameCount);
@@ -497,7 +496,7 @@ void OpulenzInstrument::loadPatch(const unsigned char inst[14]) {
 
 void OpulenzInstrument::tuneEqual(int center, float Hz) {
 	for(int n=0; n<128; ++n) {
-		float tmp = Hz * pow(2.0, (n - center) * (1.0 / 12.0) + pitchbend * (1.0 / 1200.0));
+		float tmp = Hz * std::exp2((n - center) / 12.0f + pitchbend / 1200.0f);
 		fnums[n] = Hz2fnum( tmp );
 	}
 }
@@ -505,7 +504,7 @@ void OpulenzInstrument::tuneEqual(int center, float Hz) {
 // Find suitable F number in lowest possible block
 int OpulenzInstrument::Hz2fnum(float Hz) {
 	for(int block=0; block<8; ++block) {
-		unsigned int fnum = Hz * pow( 2.0, 20.0 - (double)block ) * ( 1.0 / 49716.0 );
+		auto fnum = static_cast<unsigned>(Hz * std::exp2(20.0f - static_cast<float>(block)) / 49716.0f);
 		if(fnum<1023) {
 			return fnum + (block << 10);
 		}
@@ -770,15 +769,15 @@ void OpulenzInstrumentView::updateKnobHints()
 	// Envelope times in ms: t[0] = 0, t[n] = ( 1<<n ) * X, X = 0.11597 for A, 0.6311 for D/R
 	// Here some rounding has been applied.
 	const auto attack_times = std::array<float, 16>{
-		0.0, 0.2, 0.4, 0.9, 1.8, 3.7, 7.4,
-		15.0, 30.0, 60.0, 120.0, 240.0, 480.0,
-		950.0, 1900.0, 3800.0
+		0.f, 0.2f, 0.4f, 0.9f, 1.8f, 3.7f, 7.4f,
+		15.f, 30.f, 60.f, 120.f, 240.f, 480.f,
+		950.f, 1900.f, 3800.f
 	};
 
 	const auto dr_times = std::array<float, 16>{
-		0.0, 1.2, 2.5, 5.0, 10.0, 20.0, 40.0,
-		80.0, 160.0, 320.0, 640.0, 1300.0, 2600.0,
-		5200.0, 10000.0, 20000.0
+		0.f, 1.2f, 2.5f, 5.f, 10.f, 20.f, 40.f,
+		80.f, 160.f, 320.f, 640.f, 1300.f, 2600.f,
+		5200.f, 10000.f, 20000.f
 	};
 
 	const auto fmultipliers = std::array<int, 16>{

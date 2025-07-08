@@ -68,7 +68,7 @@ public:
 	Xpressive(InstrumentTrack* instrument_track );
 
 	void playNote(NotePlayHandle* nph,
-						sampleFrame* working_buffer ) override;
+						SampleFrame* working_buffer ) override;
 	void deleteNotePluginData( NotePlayHandle* nph ) override;
 
 

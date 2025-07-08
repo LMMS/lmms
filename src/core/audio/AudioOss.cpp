@@ -72,7 +72,7 @@ AudioOss::AudioOss( bool & _success_ful, AudioEngine*  _audioEngine ) :
 	AudioDevice(std::clamp<ch_cnt_t>(
 		ConfigManager::inst()->value("audiooss", "channels").toInt(),
 		DEFAULT_CHANNELS,
-		SURROUND_CHANNELS), _audioEngine),
+		DEFAULT_CHANNELS), _audioEngine),
 	m_convertEndian( false )
 {
 	_success_ful = false;
@@ -99,10 +99,9 @@ AudioOss::AudioOss( bool & _success_ful, AudioEngine*  _audioEngine ) :
 	fcntl( m_audioFD, F_SETFD, fcntl( m_audioFD, F_GETFD ) | FD_CLOEXEC );
 
 	int frag_spec;
-	for( frag_spec = 0; static_cast<int>( 0x01 << frag_spec ) <
-		audioEngine()->framesPerPeriod() * channels() *
-							BYTES_PER_INT_SAMPLE;
-		++frag_spec )
+	for (frag_spec = 0;
+		1u << frag_spec < audioEngine()->framesPerPeriod() * channels() * BYTES_PER_INT_SAMPLE;
+		++frag_spec)
 	{
 	}
 
@@ -256,7 +255,7 @@ void AudioOss::stopProcessing()
 
 void AudioOss::run()
 {
-	auto temp = new surroundSampleFrame[audioEngine()->framesPerPeriod()];
+	auto temp = new SampleFrame[audioEngine()->framesPerPeriod()];
 	auto outbuf = new int_sample_t[audioEngine()->framesPerPeriod() * channels()];
 
 	while( true )
@@ -291,7 +290,7 @@ AudioOss::setupWidget::setupWidget( QWidget * _parent ) :
 	form->addRow(tr("Device"), m_device);
 
 	auto m = new gui::LcdSpinBoxModel(/* this */);
-	m->setRange( DEFAULT_CHANNELS, SURROUND_CHANNELS );
+	m->setRange(DEFAULT_CHANNELS, DEFAULT_CHANNELS);
 	m->setStep( 2 );
 	m->setValue( ConfigManager::inst()->value( "audiooss",
 							"channels" ).toInt() );

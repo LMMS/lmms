@@ -1,7 +1,7 @@
 /*
- * PluginIssue.h - PluginIssue class
+ * PluginIssue.cpp - PluginIssue class implementation
  *
- * Copyright (c) 2019 Johannes Lorenz <j.git$$$lorenz-ho.me, $$$=@>
+ * Copyright (c) 2019-2024 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -68,8 +68,8 @@ const char *PluginIssue::msgFor(const PluginIssueType &it)
 			return "required feature not supported";
 		case PluginIssueType::BadPortType:
 			return "unsupported port type";
-		case PluginIssueType::Blacklisted:
-			return "blacklisted plugin";
+		case PluginIssueType::Blocked:
+			return "blocked plugin";
 		case PluginIssueType::NoIssue:
 			return nullptr;
 	}

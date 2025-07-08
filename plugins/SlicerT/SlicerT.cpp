@@ -35,7 +35,7 @@
 #include "SampleLoader.h"
 #include "Song.h"
 #include "embed.h"
-#include "lmms_constants.h"
+#include "interpolation.h"
 #include "plugin_export.h"
 
 namespace lmms {
@@ -76,7 +76,7 @@ SlicerT::SlicerT(InstrumentTrack* instrumentTrack)
 	m_sliceSnap.setValue(0);
 }
 
-void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
+void SlicerT::playNote(NotePlayHandle* handle, SampleFrame* workingBuffer)
 {
 	if (m_originalSample.sampleSize() <= 1) { return; }
 
@@ -97,7 +97,7 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 		sliceStart = 0;
 		sliceEnd = 1;
 	}
-	else if (noteIndex > 0 && noteIndex < m_slicePoints.size())
+	else if (noteIndex > 0 && static_cast<std::size_t>(noteIndex) < m_slicePoints.size())
 	{
 		noteIndex -= 1;
 		sliceStart = m_slicePoints[noteIndex];
@@ -135,9 +135,9 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 		// exponential fade out, applyRelease() not used since it extends the note length
 		int fadeOutFrames = m_fadeOutFrames.value() / 1000.0f * Engine::audioEngine()->outputSampleRate();
 		int noteFramesLeft = noteLeft * m_originalSample.sampleSize() * speedRatio;
-		for (int i = 0; i < frames; i++)
+		for (auto i = std::size_t{0}; i < frames; i++)
 		{
-			float fadeValue = static_cast<float>(noteFramesLeft - i) / fadeOutFrames;
+			float fadeValue = static_cast<float>(noteFramesLeft - static_cast<int>(i)) / fadeOutFrames;
 			fadeValue = std::clamp(fadeValue, 0.0f, 1.0f);
 			fadeValue = cosinusInterpolate(0, 1, fadeValue);
 
@@ -153,6 +153,7 @@ void SlicerT::playNote(NotePlayHandle* handle, sampleFrame* workingBuffer)
 void SlicerT::deleteNotePluginData(NotePlayHandle* handle)
 {
 	delete static_cast<PlaybackState*>(handle->m_pluginData);
+	emit isPlaying(-1, 0, 0);
 }
 
 // uses the spectral flux to determine the change in magnitude
@@ -171,7 +172,7 @@ void SlicerT::findSlices()
 
 	float maxMag = -1;
 	std::vector<float> singleChannel(m_originalSample.sampleSize(), 0);
-	for (int i = 0; i < m_originalSample.sampleSize(); i++)
+	for (auto i = std::size_t{0}; i < m_originalSample.sampleSize(); i++)
 	{
 		singleChannel[i] = (m_originalSample.data()[i][0] + m_originalSample.data()[i][1]) / 2;
 		maxMag = std::max(maxMag, singleChannel[i]);
@@ -180,10 +181,10 @@ void SlicerT::findSlices()
 	// normalize and find 0 crossings
 	std::vector<int> zeroCrossings;
 	float lastValue = 1;
-	for (int i = 0; i < singleChannel.size(); i++)
+	for (auto i = std::size_t{0}; i < singleChannel.size(); i++)
 	{
 		singleChannel[i] /= maxMag;
-		if (sign(lastValue) != sign(singleChannel[i]))
+		if ((lastValue >= 0) != (singleChannel[i] >= 0))
 		{
 			zeroCrossings.push_back(i);
 			lastValue = singleChannel[i];
@@ -198,9 +199,9 @@ void SlicerT::findSlices()
 
 	int lastPoint = -minDist - 1; // to always store 0 first
 	float spectralFlux = 0;
-	float prevFlux = 1E-10; // small value, no divison by zero
+	float prevFlux = 1E-10f; // small value, no divison by zero
 
-	for (int i = 0; i < singleChannel.size() - windowSize; i += windowSize)
+	for (int i = 0; i < static_cast<int>(singleChannel.size()) - windowSize; i += windowSize)
 	{
 		// fft
 		std::copy_n(singleChannel.data() + i, windowSize, fftIn.data());
@@ -214,7 +215,7 @@ void SlicerT::findSlices()
 			float magnitude = std::sqrt(real * real + imag * imag);
 
 			// using L2-norm (euclidean distance)
-			float diff = std::sqrt(std::pow(magnitude - prevMags[j], 2));
+			float diff = std::abs(magnitude - prevMags[j]);
 			spectralFlux += diff;
 
 			prevMags[j] = magnitude;
@@ -228,7 +229,7 @@ void SlicerT::findSlices()
 		}
 
 		prevFlux = spectralFlux;
-		spectralFlux = 1E-10; // again for no divison by zero
+		spectralFlux = 1E-10f; // again for no divison by zero
 	}
 
 	m_slicePoints.push_back(m_originalSample.sampleSize());
@@ -247,7 +248,7 @@ void SlicerT::findSlices()
 	if (noteSnap == 0) { sliceLock = 1; }
 	for (float& sliceValue : m_slicePoints)
 	{
-		sliceValue += sliceLock / 2;
+		sliceValue += sliceLock / 2.f;
 		sliceValue -= static_cast<int>(sliceValue) % sliceLock;
 	}
 
@@ -301,7 +302,7 @@ std::vector<Note> SlicerT::getMidi()
 	float totalTicks = outFrames / framesPerTick;
 	float lastEnd = 0;
 
-	for (int i = 0; i < m_slicePoints.size() - 1; i++)
+	for (auto i = std::size_t{0}; i < m_slicePoints.size() - 1; i++)
 	{
 		float sliceStart = lastEnd;
 		float sliceEnd = totalTicks * m_slicePoints[i + 1];
@@ -343,7 +344,7 @@ void SlicerT::saveSettings(QDomDocument& document, QDomElement& element)
 	}
 
 	element.setAttribute("totalSlices", static_cast<int>(m_slicePoints.size()));
-	for (int i = 0; i < m_slicePoints.size(); i++)
+	for (auto i = std::size_t{0}; i < m_slicePoints.size(); i++)
 	{
 		element.setAttribute(tr("slice_%1").arg(i), m_slicePoints[i]);
 	}
