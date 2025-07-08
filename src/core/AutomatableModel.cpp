@@ -553,17 +553,20 @@ void AutomatableModel::setControllerConnection( ControllerConnection* c )
 
 float AutomatableModel::controllerValue( int frameOffset ) const
 {
-	if( m_controllerConnection )
+	if( m_controllerConnection && (m_useControllerValue || m_controllerConnection->modulation()))
 	{
 		float v = 0;
 		switch(m_scaleType)
 		{
 		case ScaleType::Linear:
-			v = minValue<float>() + ( range() * controllerConnection()->currentValue( frameOffset ) );
+			v = controllerConnection()->modulation() ?
+				fittedValue(m_value + range() * (controllerConnection()->currentValue( frameOffset )-0.5) )
+				: minValue<float>() + ( range() * controllerConnection()->currentValue( frameOffset ) );
 			break;
 		case ScaleType::Logarithmic:
-			v = logToLinearScale(
-				controllerConnection()->currentValue( frameOffset ));
+			v = controllerConnection()->modulation() ?
+				fittedValue(m_value + logToLinearScale(controllerConnection()->currentValue( frameOffset )-0.5)) // idk
+				: logToLinearScale(controllerConnection()->currentValue( frameOffset ));
 			break;
 		default:
 			qFatal("AutomatableModel::controllerValue(int)"
@@ -578,12 +581,12 @@ float AutomatableModel::controllerValue( int frameOffset ) const
 	}
 
 	AutomatableModel* lm = m_linkedModels.front();
-	if (lm->controllerConnection() && lm->useControllerValue())
+	if (lm && lm->controllerConnection() && lm->useControllerValue())
 	{
 		return fittedValue( lm->controllerValue( frameOffset ) );
 	}
 
-	return fittedValue( lm->m_value );
+	return m_value;
 }
 
 
@@ -599,9 +602,10 @@ ValueBuffer * AutomatableModel::valueBuffer()
 	}
 
 	float val = m_value; // make sure our m_value doesn't change midway
-
-	if (m_controllerConnection && m_useControllerValue && m_controllerConnection->getController()->isSampleExact())
+	
+	if (m_controllerConnection && (m_useControllerValue||m_controllerConnection->modulation()) && m_controllerConnection->getController()->isSampleExact())
 	{
+		const bool modulation = m_controllerConnection->modulation();
 		auto vb = m_controllerConnection->valueBuffer();
 		if( vb )
 		{
@@ -612,13 +616,17 @@ ValueBuffer * AutomatableModel::valueBuffer()
 			case ScaleType::Linear:
 				for( int i = 0; i < m_valueBuffer.length(); i++ )
 				{
-					nvalues[i] = minValue<float>() + ( range() * values[i] );
+					nvalues[i] = modulation
+						? fittedValue(m_value + ( range() * (values[i]-0.5) ))
+						: minValue<float>() + ( range() * values[i] );
 				}
 				break;
 			case ScaleType::Logarithmic:
 				for( int i = 0; i < m_valueBuffer.length(); i++ )
 				{
-					nvalues[i] = logToLinearScale( values[i] );
+					nvalues[i] = modulation
+						? fittedValue(m_value + logToLinearScale( (values[i]-0.5) )) // idk
+						: logToLinearScale( values[i] );
 				}
 				break;
 			default:

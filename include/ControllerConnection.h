@@ -67,7 +67,17 @@ public:
 	void setController( Controller * _controller );
 
 	inline void setController( int _controllerId );
-
+	
+	bool modulation()
+	{
+		return m_modulation;
+	}
+	
+	void setModulation(bool m)
+	{
+		m_modulation = m;
+	}
+	
 	float currentValue( int _offset )
 	{
 		return m_controller->currentValue( _offset );
@@ -113,6 +123,7 @@ protected:
 	Controller * m_controller;
 	QString m_targetName;
 	int m_controllerId;
+	bool m_modulation;
 	
 	bool m_ownsController;
 

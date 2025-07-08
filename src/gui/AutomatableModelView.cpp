@@ -227,11 +227,13 @@ void AutomatableModelViewSlots::execConnectionDialog()
 			if( m->controllerConnection() )
 			{
 				m->controllerConnection()->setController( d.chosenController() );
+				m->controllerConnection()->setModulation(d.modulation());
 			}
 			// New
 			else
 			{
 				auto cc = new ControllerConnection(d.chosenController());
+				cc->setModulation(d.modulation());
 				m->setControllerConnection( cc );
 				//cc->setTargetName( m->displayName() );
 			}

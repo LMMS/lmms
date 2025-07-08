@@ -347,7 +347,7 @@ void FloatModelEditorBase::wheelEvent(QWheelEvent * we)
 void FloatModelEditorBase::setPosition(const QPoint & p)
 {
 	const float valueOffset = getValue(p) + m_leftOver;
-	const float currentValue = model()->value();
+	const float currentValue = model()->value(0, /*modulated*/ false);
 	const float scaledValueOffset = currentValue - model()->scaledValue(model()->inverseScaledValue(currentValue) - valueOffset);
 	const auto step = model()->step<float>();
 	const float roundedValue = std::round((currentValue - scaledValueOffset) / step) * step;

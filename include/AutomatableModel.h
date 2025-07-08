@@ -149,20 +149,9 @@ public:
 
 
 	template<class T>
-	inline T value( int frameOffset = 0 ) const
+	inline T value( int frameOffset = 0, bool modulated = true ) const
 	{
-		if (m_controllerConnection)
-		{
-			if (!m_useControllerValue)
-			{
-				return castValue<T>(m_value);
-			}
-			else
-			{
-				return castValue<T>(controllerValue(frameOffset));
-			}
-		}
-		else if (hasLinkedModels())
+		if ((m_controllerConnection || hasLinkedModels()) && modulated)
 		{
 			return castValue<T>( controllerValue( frameOffset ) );
 		}
@@ -430,9 +419,9 @@ template <typename T> class LMMS_EXPORT TypedAutomatableModel : public Automatab
 {
 public:
 	using AutomatableModel::AutomatableModel;
-	T value( int frameOffset = 0 ) const
+	T value( int frameOffset = 0, bool modulated = true ) const
 	{
-		return AutomatableModel::value<T>( frameOffset );
+		return AutomatableModel::value<T>( frameOffset, modulated );
 	}
 
 	T initValue() const
