@@ -164,6 +164,7 @@ void FloatModelEditorBase::mousePressEvent(QMouseEvent * me)
 		{
 			thisModel->addJournalCheckPoint();
 			thisModel->saveJournallingState(false);
+			thisModel->useAutomation = false;
 		}
 
 		const QPoint & p = me->pos();
@@ -216,6 +217,7 @@ void FloatModelEditorBase::mouseReleaseEvent(QMouseEvent* event)
 		AutomatableModel *thisModel = model();
 		if (thisModel)
 		{
+			thisModel->useAutomation = true;
 			thisModel->restoreJournallingState();
 		}
 	}

@@ -417,7 +417,7 @@ void Song::processAutomations(const TrackList &tracklist, TimePos timeStart, fpp
 	// Apply values
 	for (auto it = values.begin(); it != values.end(); it++)
 	{
-		if (! recordedModels.contains(it.key()))
+		if (! recordedModels.contains(it.key()) && it.key()->useAutomation)
 		{
 			it.key()->setAutomatedValue(it.value());
 		}

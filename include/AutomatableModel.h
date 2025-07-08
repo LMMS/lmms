@@ -305,6 +305,8 @@ public:
 	{
 		return m_useControllerValue;
 	}
+	
+	bool useAutomation = true;
 
 public slots:
 	virtual void reset();
