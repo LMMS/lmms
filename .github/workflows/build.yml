@@ -404,7 +404,7 @@ jobs:
       - name: Run tests
         run: |
           cd build/tests
-          ctest --verbose
+          ctest --verbose --output-on-failure
       - name: Package
         run: cmake --build build --target package
       - name: Upload artifacts

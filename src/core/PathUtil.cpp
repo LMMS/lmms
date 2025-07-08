@@ -2,7 +2,7 @@
  * PathUtil.cpp
  *
  * Copyright (c) 2019-2022 Spekular <Spekularr@gmail.com>
- *               2024      Dalton Messmer <messmer.dalton/at/gmail.com>
+ * Copyright (c) 2025      Dalton Messmer <messmer.dalton/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -27,6 +27,7 @@
 
 #include <QDir>
 #include <QFileInfo>
+#include <cassert>
 #include <filesystem>
 #include <stdexcept>
 
@@ -77,7 +78,7 @@ namespace lmms::PathUtil
 			return std::string{basePrefix(assumedBase)} + inputStr;
 		}
 
-		//! Return the directory associated with a given base as a fs::path.
+		//! Return the directory associated with a given base as a std::filesystem::path.
 		//! Will return std::nullopt if the prefix could not be resolved.
 		auto baseDir(Base base) -> std::optional<std::filesystem::path>
 		{
@@ -177,41 +178,34 @@ namespace lmms::PathUtil
 	{
 		if (base == Base::Absolute)
 		{
-			return baseLookup(path) == base;
+			// Assume it's absolute if it's not a recognized relative path
+			return parsePath(path).first == Base::Absolute;
 		}
 
 		auto prefix = basePrefix(base);
 		return path.rfind(prefix, 0) == 0;
 	}
 
-	auto baseLookup(std::string_view path) -> Base
-	{
-		for (auto base : relativeBases)
-		{
-			const auto prefix = basePrefix(base);
-			if (path.rfind(prefix, 0) == 0) { return base; }
-		}
-		return Base::Absolute;
-	}
-
-	auto stripPrefix(std::string_view path) -> std::string_view
-	{
-		path.remove_prefix(basePrefix(baseLookup(path)).length());
-		return path;
-	}
-
 	auto parsePath(std::string_view path) -> std::pair<Base, std::string_view>
 	{
+		if (path.empty())
+		{
+			// avoid loop
+			return {Base::Absolute, path};
+		}
+
 		for (auto base : relativeBases)
 		{
 			auto prefix = basePrefix(base);
 			if (path.rfind(prefix, 0) == 0)
 			{
 				path.remove_prefix(prefix.length());
-				return { base, path };
+				return {base, path};
 			}
 		}
-		return { Base::Absolute, path };
+
+		// None of our recognized base prefixes are present, so assume it's absolute
+		return {Base::Absolute, path};
 	}
 
 	auto cleanName(const QString& path) -> QString
@@ -244,56 +238,49 @@ namespace lmms::PathUtil
 
 	auto toAbsolute(std::string_view input) -> std::optional<std::string>
 	{
-		// First, check if it's Internal
-		auto inputStr = std::string{input};
-		if (hasBase(input, Base::Internal)) { return inputStr; }
+		// 1) Check if empty
+		if (input.empty()) { return std::string{}; }
 
-		// Secondly, do no harm to absolute paths
-		auto inputPath = u8path(input);
-		if (inputPath.is_absolute())
+		// 2) Check if it's an internal path since they can never be made absolute
+		if (hasBase(input, Base::Internal)) { return std::nullopt; }
+
+		// 3) Return absolute path if it is already absolute
+		auto inputStr = std::string{input};
+		if (u8path(input).is_absolute())
 		{
 			return inputStr;
 		}
 
-		// Next, handle old relative paths with no prefix
-		const std::string upgraded = input.find(':') != std::string_view::npos
-			? inputStr
-			: oldRelativeUpgrade(input);
-
-		const Base base = baseLookup(upgraded);
-		if (auto loc = baseLocation(base))
+		// 4) Handle old relative paths which have no prefix
+		if (input.find(':') == std::string_view::npos)
 		{
-			const auto noPrefix = stripPrefix(upgraded);
-			return loc->append(noPrefix.data(), noPrefix.size());
+			// Upgrade to prefixed relative path
+			inputStr = oldRelativeUpgrade(input);
 		}
 
+		// 5) Get the base prefix
+		auto [base, noPrefix] = parsePath(inputStr);
+		if (base == Base::Absolute)
+		{
+			// Unknown base prefix - cannot convert to absolute path
+			return std::nullopt;
+		}
+
+		// 6) Try to convert relative path to absolute path
+		if (auto loc = baseLocation(base))
+		{
+			// Append relative path to create absolute path
+			loc->append(noPrefix.data(), noPrefix.size());
+
+			if (u8path(*loc).is_absolute())
+			{
+				// Successful conversion
+				return *loc;
+			}
+		}
+
+		// Failed to convert to absolute path
 		return std::nullopt;
-	}
-
-	auto relativeOrAbsolute(const QString& input, const Base base) -> QString
-	{
-		return QString::fromStdString(relativeOrAbsolute(input.toStdString(), base));
-	}
-
-	auto relativeOrAbsolute(std::string_view input, const Base base) -> std::string
-	{
-		if (input.empty()) { return std::string{input}; }
-
-		auto absolutePath = toAbsolute(input).value_or(std::string{});
-		if (base == Base::Absolute || base == Base::Internal) { return absolutePath; }
-
-		auto bd = baseDir(base);
-		if (!bd) { return absolutePath; }
-
-		std::error_code ec;
-		auto relativePath = std::filesystem::relative(absolutePath, *bd, ec).u8string();
-		if (ec) { return absolutePath; }
-
-		// Return the relative path if it didn't result in a path starting with ".."
-		// and the baseDir was resolved properly
-		return relativePath.rfind(u8"..", 0) != std::u8string::npos
-			? absolutePath
-			: toStdString(relativePath);
 	}
 
 	auto toShortestRelative(const QString& input, bool allowLocal /* = false*/) -> QString
@@ -303,29 +290,66 @@ namespace lmms::PathUtil
 
 	auto toShortestRelative(std::string_view input, bool allowLocal /* = false*/) -> std::string
 	{
+		// First, check if it's an internal path since they can never be modified
 		auto inputStr = std::string{input};
 		if (hasBase(input, Base::Internal)) { return inputStr; }
 
-		const auto inputPath = u8path(input);
-		auto absolutePath = toAbsolute(input).value();
+		auto absolutePath = toAbsolute(input);
+		if (!absolutePath)
+		{
+			// There's no hope of finding a shortest relative path
+			// if the absolute path cannot be found.
+			// TODO: Return std::nullopt?
+			return inputStr;
+		}
+
+		auto makeRelativeTo = [](std::string_view absolutePath, Base base) -> std::optional<std::string> {
+			assert(base != Base::Absolute);
+
+			// No path can be made internal if it isn't already
+			if (base == Base::Internal) { return std::nullopt; }
+
+			const auto bd = baseDir(base);
+			if (!bd) { return std::nullopt; }
+
+			std::error_code ec;
+			const auto relativePath = std::filesystem::relative(absolutePath, *bd, ec).u8string();
+			if (ec) { return std::nullopt; }
+
+			// Check if the path starts with ".." which would indicate `absolutePath`
+			// is not contained within the base directory
+			if (relativePath.rfind(u8"..", 0) != std::u8string::npos)
+			{
+				return std::nullopt;
+			}
+
+			// The relative path resolved properly
+			return toStdString(relativePath);
+		};
 
 		auto shortestBase = Base::Absolute;
-		auto shortestPath = relativeOrAbsolute(absolutePath, shortestBase);
+		auto shortestPath = *absolutePath;
+
 		for (auto base : relativeBases)
 		{
 			// Skip local paths when searching for the shortest relative if those
 			// are not allowed for that resource
 			if (base == Base::LocalDir && !allowLocal) { continue; }
 
-			auto otherPath = relativeOrAbsolute(absolutePath, base);
-			if (otherPath.length() < shortestPath.length())
+			if (auto relativePath = makeRelativeTo(*absolutePath, base))
 			{
-				shortestBase = base;
-				shortestPath = otherPath;
+				if (relativePath->length() < shortestPath.length())
+				{
+					shortestBase = base;
+					shortestPath = *relativePath;
+				}
 			}
 		}
 
-		return std::string{basePrefix(shortestBase)} + relativeOrAbsolute(absolutePath, shortestBase);
+		// TODO: Return std::nullopt if a shortest relative path was not found?
+		return shortestBase == Base::Absolute
+			? *absolutePath
+			: std::string{basePrefix(shortestBase)} + shortestPath;
 	}
 
 	auto toStdString(std::u8string_view input) -> std::string

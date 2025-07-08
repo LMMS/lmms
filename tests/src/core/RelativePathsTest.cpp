@@ -73,7 +73,8 @@ private slots:
 
 		//Empty paths should stay empty
 		const auto empty = std::string_view{""};
-		const std::string_view prefixStripped = PathUtil::stripPrefix(empty);
+		const auto [base, prefixStripped] = PathUtil::parsePath(empty);
+		QCOMPARE(base, PathUtil::Base::Absolute);
 		QCOMPARE(QString::fromUtf8(prefixStripped.data(), prefixStripped.size()), "");
 		QCOMPARE(QString::fromStdString(PathUtil::cleanName(empty)), "");
 		QCOMPARE(QString::fromStdString(PathUtil::toAbsolute(empty).value()), "");

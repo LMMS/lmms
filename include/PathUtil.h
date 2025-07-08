@@ -2,7 +2,7 @@
  * PathUtil.h
  *
  * Copyright (c) 2019-2022 Spekular <Spekularr@gmail.com>
- *                    2025 Dalton Messmer <messmer.dalton/at/gmail.com>
+ * Copyright (c) 2025      Dalton Messmer <messmer.dalton/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -50,14 +50,9 @@ namespace lmms::PathUtil
 	//! Return whether `path` uses the `base` prefix
 	LMMS_EXPORT auto hasBase(std::string_view path, Base base) -> bool;
 
-	//! Check the prefix of a path and return the base it corresponds to.
-	//! Defaults to Base::Absolute
-	LMMS_EXPORT auto baseLookup(std::string_view path) -> Base;
-
-	//! Remove the prefix from a path, iff there is one
-	LMMS_EXPORT auto stripPrefix(std::string_view path) -> std::string_view;
-
-	//! Return the results of baseLookup() and stripPrefix()
+	//! Checks if the path contains any known base prefix.
+	//! Returns the base prefix + the path with the prefix stripped off.
+	//! If the base prefix cannot be determined, assumes the path is absolute.
 	LMMS_EXPORT auto parsePath(std::string_view path) -> std::pair<Base, std::string_view>;
 
 	//! Get the extensionless base name for a path, handling prefixed paths correctly
@@ -73,12 +68,6 @@ namespace lmms::PathUtil
 	//! Make this path absolute. Returns std::nullopt upon failure
 	LMMS_EXPORT auto toAbsolute(std::string_view input) -> std::optional<std::string>;
 
-	//! Make this path relative to a given base, return an absolute path if that fails
-	LMMS_EXPORT auto relativeOrAbsolute(const QString& input, const Base base) -> QString;
-
-	//! Make this path relative to a given base, return an absolute path if that fails.
-	LMMS_EXPORT auto relativeOrAbsolute(std::string_view input, const Base base) -> std::string;
-
 	//! Make this path relative to any base, choosing the shortest if there are
 	//! multiple options. allowLocal defines whether local paths should be considered.
 	//! Defaults to an absolute path if all bases fail.
@@ -90,19 +79,19 @@ namespace lmms::PathUtil
 	LMMS_EXPORT auto toShortestRelative(std::string_view input, bool allowLocal = false) -> std::string;
 
 	//! Converts std::u8string_view to std::string
-	LMMS_EXPORT std::string toStdString(std::u8string_view input);
+	LMMS_EXPORT auto toStdString(std::u8string_view input) -> std::string;
 
 	//! Converts std::u8string_view to std::string_view
-	LMMS_EXPORT std::string_view toStdStringView(std::u8string_view input);
+	LMMS_EXPORT auto toStdStringView(std::u8string_view input) -> std::string_view;
 
-	//! Converts `path` to std::filesystem::path
-	LMMS_EXPORT std::filesystem::path stringToPath(const QString& path);
+	//! Converts QString to std::filesystem::path
+	LMMS_EXPORT auto stringToPath(const QString& path) -> std::filesystem::path;
 
-	//! Converts `path` to a UTF-8 encoded std::string path
-	LMMS_EXPORT std::string pathToString(const std::filesystem::path& path);
+	//! Converts std::filesystem::path to a UTF-8 encoded std::string
+	LMMS_EXPORT auto pathToString(const std::filesystem::path& path) -> std::string;
 
 	//! Warning-free replacement for the deprecated std::filesystem::u8path function
-	LMMS_EXPORT std::filesystem::path u8path(std::string_view path);
+	LMMS_EXPORT auto u8path(std::string_view path) -> std::filesystem::path;
 } // namespace lmms::PathUtil
 
 #endif // LMMS_PATHUTIL_H
