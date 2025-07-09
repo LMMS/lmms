@@ -46,6 +46,7 @@ namespace
 {
 static const QString audioJackClass("audiojack");
 static const QString clientNameKey("clientname");
+static const QString disconnectedRepresentation("-");
 
 QString getOutputKeyByChannel(size_t channel)
 {
@@ -232,7 +233,6 @@ void AudioJack::resizeInputBuffer(jack_nframes_t nframes)
 
 void AudioJack::attemptToConnect(size_t index, const char *lmms_port_type, const char *source_port, const char *destination_port)
 {
-	// #ifdef LMMS_DEBUG
 	const auto result = jack_connect(m_client, source_port, destination_port);
 
 #ifdef LMMS_DEBUG
@@ -252,6 +252,14 @@ void AudioJack::attemptToReconnectOutput(size_t outputIndex, const QString& targ
 {
 	if (outputIndex > m_outputPorts.size()) return;
 
+	if (targetPort == disconnectedRepresentation)
+	{
+#ifdef LMMS_DEBUG
+	printf("Output port %u is not connected.\n", static_cast<unsigned int>(outputIndex));
+#endif
+		return;
+	}
+
 	auto outputName = jack_port_name(m_outputPorts[outputIndex]);
 	auto targetName = targetPort.toLatin1().constData();
 
@@ -261,6 +269,14 @@ void AudioJack::attemptToReconnectOutput(size_t outputIndex, const QString& targ
 void AudioJack::attemptToReconnectInput(size_t inputIndex, const QString& sourcePort)
 {
 	if (inputIndex > m_inputPorts.size()) return;
+
+	if (sourcePort == disconnectedRepresentation)
+	{
+#ifdef LMMS_DEBUG
+	printf("Input port %u is not connected.\n", static_cast<unsigned int>(inputIndex));
+#endif
+		return;
+	}
 
 	auto inputName = jack_port_name(m_inputPorts[inputIndex]);
 	auto sourceName = sourcePort.toLatin1().constData();
@@ -646,6 +662,11 @@ QMenu* AudioJack::setupWidget::buildMenu(QToolButton* toolButton, const std::vec
 	// They must be sorted explicitly
 	std::sort(topLevelActions.begin(), topLevelActions.end(), [](QAction* a, QAction* b) { return a->text() < b->text(); });
 	menu->addActions(topLevelActions);
+
+	// Add the menu entry which represents the disconnected state at the very end
+	auto disconnectedAction = new QAction(disconnectedRepresentation, menu);
+	connect(disconnectedAction, &QAction::triggered, [toolButton](bool checked)	{ toolButton->setText(disconnectedRepresentation); });
+	menu->addAction(disconnectedAction);
 
 	return menu;
 }
