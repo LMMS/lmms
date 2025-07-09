@@ -313,7 +313,7 @@ namespace lmms::PathUtil
 			if (!bd) { return std::nullopt; }
 
 			std::error_code ec;
-			const auto relativePath = std::filesystem::relative(absolutePath, *bd, ec).u8string();
+			const auto relativePath = std::filesystem::relative(absolutePath, *bd, ec).generic_u8string();
 			if (ec) { return std::nullopt; }
 
 			// Check if the path starts with ".." which would indicate `absolutePath`
@@ -378,7 +378,7 @@ namespace lmms::PathUtil
 	auto pathToString(const std::filesystem::path& path) -> std::string
 	{
 #ifdef _WIN32
-		const auto utf8String = path.u8string();
+		const auto utf8String = path.generic_u8string();
 		return {reinterpret_cast<const char*>(utf8String.c_str()), utf8String.size()};
 #else
 		// Assume UTF-8 encoding on non-Windows
