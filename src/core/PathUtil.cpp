@@ -40,9 +40,21 @@ namespace lmms::PathUtil
 	namespace
 	{
 		constexpr auto relativeBases = std::array {
-			Base::ProjectDir, Base::FactoryProjects, Base::FactorySample, Base::UserSample, Base::UserVST,
-			Base::Preset, Base::FactoryPresets, Base::UserLADSPA, Base::DefaultLADSPA, Base::UserSoundfont,
-			Base::DefaultSoundfont, Base::UserGIG, Base::DefaultGIG, Base::LocalDir, Base::Internal
+			Base::ProjectDir,
+			Base::FactoryProjects,
+			Base::FactorySample,
+			Base::UserSample,
+			Base::UserVST,
+			Base::Preset,
+			Base::FactoryPresets,
+			Base::UserLADSPA,
+			Base::DefaultLADSPA,
+			Base::UserSoundfont,
+			Base::DefaultSoundfont,
+			Base::UserGIG,
+			Base::DefaultGIG,
+			Base::LocalDir,
+			Base::Internal
 		};
 
 		//! Adds a prefix to a old non-prefixed relative path
@@ -290,8 +302,10 @@ namespace lmms::PathUtil
 
 	auto toShortestRelative(std::string_view input, bool allowLocal /* = false*/) -> std::string
 	{
-		// First, check if it's an internal path since they can never be modified
 		auto inputStr = std::string{input};
+		if (input.empty()) { return inputStr; }
+
+		// Check if it's an internal path since they can never be modified
 		if (hasBase(input, Base::Internal)) { return inputStr; }
 
 		auto absolutePath = toAbsolute(input);
@@ -328,7 +342,7 @@ namespace lmms::PathUtil
 		};
 
 		auto shortestBase = Base::Absolute;
-		auto shortestPath = *absolutePath;
+		std::optional<std::string> shortestPath;
 
 		for (auto base : relativeBases)
 		{
@@ -338,7 +352,12 @@ namespace lmms::PathUtil
 
 			if (auto relativePath = makeRelativeTo(*absolutePath, base))
 			{
-				if (relativePath->length() < shortestPath.length())
+				if (!shortestPath)
+				{
+					shortestBase = base;
+					shortestPath = *relativePath;
+				}
+				else if (relativePath->length() < shortestPath->length())
 				{
 					shortestBase = base;
 					shortestPath = *relativePath;
@@ -347,9 +366,9 @@ namespace lmms::PathUtil
 		}
 
 		// TODO: Return std::nullopt if a shortest relative path was not found?
-		return shortestBase == Base::Absolute
-			? *absolutePath
-			: std::string{basePrefix(shortestBase)} + shortestPath;
+		return shortestPath.has_value()
+			? std::string{basePrefix(shortestBase)} + *shortestPath
+			: *absolutePath;
 	}
 
 	auto toStdString(std::u8string_view input) -> std::string
