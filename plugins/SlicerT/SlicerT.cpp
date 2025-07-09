@@ -24,6 +24,7 @@
 
 #include "SlicerT.h"
 
+#include <QDir>
 #include <QDomElement>
 #include <cmath>
 #include <fftw3.h>

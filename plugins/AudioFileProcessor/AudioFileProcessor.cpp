@@ -23,18 +23,16 @@
  */
 
 #include "AudioFileProcessor.h"
-#include "AudioFileProcessorView.h"
 
-#include "InstrumentTrack.h"
-#include "PathUtil.h"
-#include "SampleLoader.h"
-#include "Song.h"
-
-#include "LmmsTypes.h"
-#include "plugin_export.h"
-
+#include <QDir>
 #include <QDomElement>
 
+#include "AudioFileProcessorView.h"
+#include "InstrumentTrack.h"
+#include "PathUtil.h"
+#include "plugin_export.h"
+#include "SampleLoader.h"
+#include "Song.h"
 
 namespace lmms
 {
