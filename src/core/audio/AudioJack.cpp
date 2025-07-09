@@ -233,11 +233,8 @@ void AudioJack::resizeInputBuffer(jack_nframes_t nframes)
 
 void AudioJack::attemptToConnect(size_t index, const char *lmms_port_type, const char *source_port, const char *destination_port)
 {
-	const auto result = jack_connect(m_client, source_port, destination_port);
-
-#ifdef LMMS_DEBUG
 	printf("Attempting to reconnect %s port %u: %s -> %s", lmms_port_type, static_cast<unsigned int>(index), source_port, destination_port);
-	if (!result)
+	if (!jack_connect(m_client, source_port, destination_port))
 	{
 		printf(" - Success!\n");
 	}
@@ -245,7 +242,6 @@ void AudioJack::attemptToConnect(size_t index, const char *lmms_port_type, const
 	{
 		printf(" - Failure\n");
 	}
-#endif
 }
 
 void AudioJack::attemptToReconnectOutput(size_t outputIndex, const QString& targetPort)
@@ -254,9 +250,7 @@ void AudioJack::attemptToReconnectOutput(size_t outputIndex, const QString& targ
 
 	if (targetPort == disconnectedRepresentation)
 	{
-#ifdef LMMS_DEBUG
-	printf("Output port %u is not connected.\n", static_cast<unsigned int>(outputIndex));
-#endif
+		printf("Output port %u is not connected.\n", static_cast<unsigned int>(outputIndex));
 		return;
 	}
 
@@ -272,9 +266,7 @@ void AudioJack::attemptToReconnectInput(size_t inputIndex, const QString& source
 
 	if (sourcePort == disconnectedRepresentation)
 	{
-#ifdef LMMS_DEBUG
-	printf("Input port %u is not connected.\n", static_cast<unsigned int>(inputIndex));
-#endif
+		printf("Input port %u is not connected.\n", static_cast<unsigned int>(inputIndex));
 		return;
 	}
 
