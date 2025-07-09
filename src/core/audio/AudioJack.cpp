@@ -232,8 +232,12 @@ void AudioJack::resizeInputBuffer(jack_nframes_t nframes)
 
 void AudioJack::attemptToConnect(size_t index, const char *lmms_port_type, const char *source_port, const char *destination_port)
 {
+	// #ifdef LMMS_DEBUG
+	const auto result = jack_connect(m_client, source_port, destination_port);
+
+#ifdef LMMS_DEBUG
 	printf("Attempting to reconnect %s port %u: %s -> %s", lmms_port_type, static_cast<unsigned int>(index), source_port, destination_port);
-	if (!jack_connect(m_client, source_port, destination_port))
+	if (!result)
 	{
 		printf(" - Success!\n");
 	}
@@ -241,6 +245,7 @@ void AudioJack::attemptToConnect(size_t index, const char *lmms_port_type, const
 	{
 		printf(" - Failure\n");
 	}
+#endif
 }
 
 void AudioJack::attemptToReconnectOutput(size_t outputIndex, const QString& targetPort)
