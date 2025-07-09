@@ -32,7 +32,7 @@
 #include <QMutexLocker>
 #include <samplerate.h>
 
-#include "AudioResamplerStream.h"
+#include "AudioResampler.h"
 #include "Instrument.h"
 #include "PixmapButton.h"
 #include "InstrumentView.h"
@@ -170,7 +170,7 @@ public:
 	bool pitchtrack;
 
 	// Used to convert sample rates
-	AudioResamplerStream m_resampler;
+	AudioResampler::Stream m_resampler;
 
 	// Used changing the pitch of the note if desired
 	float sampleFreq;

@@ -433,7 +433,7 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 
 			sample.m_resampler.setRatio(freq_factor);
 
-			sample.m_resampler.resample<AudioResamplerStream::WriteMode::Mix>([&](InterleavedBufferView<float> output)
+			sample.m_resampler.resample<AudioResampler::Stream::WriteMode::Mix>([&](InterleavedBufferView<float> output)
 			{
 				loadSample(sample, reinterpret_cast<SampleFrame*>(output[0]), output.frames());
 				sample.pos += output.frames();
