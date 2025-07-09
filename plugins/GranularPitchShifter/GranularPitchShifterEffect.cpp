@@ -46,6 +46,7 @@ Plugin::Descriptor PLUGIN_EXPORT granularpitchshifter_plugin_descriptor =
 	new PluginPixmapLoader("logo"),
 	nullptr,
 	nullptr,
+	nullptr,
 } ;
 }
 

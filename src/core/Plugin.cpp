@@ -52,7 +52,8 @@ static Plugin::Descriptor dummyPluginDescriptor =
 	0x0100,
 	Plugin::Type::Undefined,
 	&dummyLoader,
-	nullptr
+	nullptr,
+	nullptr,
 } ;
 
 

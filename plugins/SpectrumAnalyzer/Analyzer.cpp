@@ -52,6 +52,7 @@ extern "C" {
 		new PluginPixmapLoader("logo"),
 		nullptr,
 		nullptr,
+		nullptr,
 	};
 }
 

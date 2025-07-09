@@ -52,6 +52,7 @@ Plugin::Descriptor PLUGIN_EXPORT peakcontrollereffect_plugin_descriptor =
 	new PluginPixmapLoader("logo"),
 	nullptr,
 	nullptr,
+	nullptr,
 } ;
 
 }
