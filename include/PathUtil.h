@@ -34,48 +34,105 @@
 
 #include "lmms_export.h"
 
+//! Every std::string and std::string_view used by PathUtil is UTF-8 encoded
 namespace lmms::PathUtil
 {
-	enum class Base { Absolute, ProjectDir, FactoryProjects, FactorySample, UserSample, UserVST, Preset,
-		FactoryPresets, UserLADSPA, DefaultLADSPA, UserSoundfont, DefaultSoundfont, UserGIG, DefaultGIG,
-		LocalDir, Internal };
+	/**
+	 * Each of the following represents a different base directory. A base directory
+	 * has a prefix string (see `basePrefix`) which, when combined with a path relative
+	 * to that base directory, forms a portable and flexible file path representation
+	 * appropriate for storing in project files.
+	 */
+	enum class Base
+	{
+		//! Just a full filepath, no prefix
+		Absolute,
 
-	//! Return the directory associated with a given base.
-	//! Will return std::nullopt if the prefix could not be resolved.
+		ProjectDir,
+		FactoryProjects,
+		FactorySample,
+		UserSample,
+		UserVST,
+		Preset,
+		FactoryPresets,
+		UserLADSPA,
+		DefaultLADSPA,
+		UserSoundfont,
+		DefaultSoundfont,
+		UserGIG,
+		DefaultGIG,
+
+		//! The directory of the current project file
+		LocalDir,
+
+		//! A virtual path within LMMS or a plugin
+		Internal
+	};
+
+	/**
+	 * @returns The directory associated with the given base,
+	 *          or std::nullopt if the prefix could not be resolved
+	 */
 	LMMS_EXPORT auto baseLocation(Base base) -> std::optional<std::string>;
 
-	//! Return the prefix used to denote this base in path strings
+	//! @returns The prefix used to denote this base in path strings
 	LMMS_EXPORT auto basePrefix(Base base) -> std::string_view;
 
-	//! Return whether `path` uses the `base` prefix
+	//! @returns Whether `path` uses the `base` prefix
 	LMMS_EXPORT auto hasBase(std::string_view path, Base base) -> bool;
 
-	//! Checks if the path contains any known base prefix.
-	//! Returns the base prefix + the path with the prefix stripped off.
-	//! If the base prefix cannot be determined, assumes the path is absolute.
+	/**
+	 * @brief Parses a path by checking if it contains any known base prefix
+	 *
+	 * @param path A prefixed or absolute path
+	 * @returns The base prefix + the path with the prefix stripped off.
+	 *          If the base prefix cannot be determined, assumes the path is absolute.
+	 */
 	LMMS_EXPORT auto parsePath(std::string_view path) -> std::pair<Base, std::string_view>;
 
-	//! Get the extensionless base name for a path, handling prefixed paths correctly
+	//! @returns The extensionless base name (stem) of the given path
 	LMMS_EXPORT auto cleanName(const QString& path) -> QString;
 
-	//! Get the extensionless base name for a path, handling prefixed paths correctly
+	//! @returns The extensionless base name (stem) of the given path
 	LMMS_EXPORT auto cleanName(std::string_view path) -> std::string;
 
-	//! Make this path absolute. If a pointer to boolean is given
-	//! it will indicate whether the path was converted successfully
+	/**
+	 * @brief Converts a path to an absolute path
+	 *
+	 * @param input A prefixed path, absolute path, or a (legacy) non-prefixed relative path
+	 * @param error For optional error reporting
+	 * @returns An absolute path if successful, else an empty string
+	 */
 	LMMS_EXPORT auto toAbsolute(const QString& input, bool* error = nullptr) -> QString;
 
-	//! Make this path absolute. Returns std::nullopt upon failure
+	/**
+	 * @brief Converts a path to an absolute path
+	 *
+	 * @param input A prefixed path, absolute path, or a (legacy) non-prefixed relative path
+	 * @returns An absolute path if successful, else std::nullopt
+	 */
 	LMMS_EXPORT auto toAbsolute(std::string_view input) -> std::optional<std::string>;
 
-	//! Make this path relative to any base, choosing the shortest if there are
-	//! multiple options. allowLocal defines whether local paths should be considered.
-	//! Defaults to an absolute path if all bases fail.
+	/**
+	 * @brief Makes this path relative to any base, choosing the shortest path if there
+	 *        are multiple options.
+	 *
+	 * @param input Any path
+	 * @param allowLocal Whether local paths (the project file's directory) should be considered
+	 * @returns The shortest relative path if successful. If all bases fail, returns an absolute path.
+	 *          And if the absolute path conversion fails, returns the input unchanged.
+	 */
 	LMMS_EXPORT auto toShortestRelative(const QString& input, bool allowLocal = false) -> QString;
 
-	//! Make this path relative to any base, choosing the shortest if there are
-	//! multiple options. allowLocal defines whether local paths should be considered.
-	//! Defaults to an absolute path if all bases fail.
+	/**
+	 * @brief Makes this path relative to any base, choosing the shortest path if there
+	 *        are multiple options.
+	 *
+	 * @param input Any path
+	 * @param allowLocal Whether local paths (the project file's directory) should be considered
+	 * @returns The shortest relative path if successful. If all bases fail, returns an absolute path.
+	 *          And if the absolute path conversion fails, returns the input unchanged.
+	 */
 	LMMS_EXPORT auto toShortestRelative(std::string_view input, bool allowLocal = false) -> std::string;
 
 	//! Converts std::u8string_view to std::string
