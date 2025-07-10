@@ -47,6 +47,7 @@ Plugin::Descriptor PLUGIN_EXPORT stereoenhancer_plugin_descriptor =
 	new PluginPixmapLoader("logo"),
 	nullptr,
 	nullptr,
+	nullptr,
 } ;
 
 }

@@ -412,7 +412,7 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 
 void AutomationClipView::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	StringPairDrag::processDragEnterEvent( _dee, "automatable_model" );
+	StringPairDrag::processDragEnterEvent( _dee, {"automatable_model"});
 	if( !_dee->isAccepted() )
 	{
 		ClipView::dragEnterEvent( _dee );

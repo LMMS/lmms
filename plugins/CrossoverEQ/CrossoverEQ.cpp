@@ -47,6 +47,7 @@ Plugin::Descriptor PLUGIN_EXPORT crossovereq_plugin_descriptor =
 	new PluginPixmapLoader( "logo" ),
 	nullptr,
 	nullptr,
+	nullptr,
 };
 
 }

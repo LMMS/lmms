@@ -55,6 +55,7 @@ Plugin::Descriptor PLUGIN_EXPORT watsyn_plugin_descriptor =
 	new PluginPixmapLoader( "logo" ),
 	nullptr,
 	nullptr,
+	nullptr,
 } ;
 
 }
