@@ -2163,14 +2163,14 @@ void PianoRoll::pauseChordNotes(int key)
 	}
 }
 
-void PianoRoll::knifeToolSelected()
+void PianoRoll::setKnifeAction()
 {
 	m_knifeMode = m_editMode;
 	m_editMode = EditMode::Knife;
 	m_action = Action::Knife;
 	m_knifeDown = false;
 	setCursor(Qt::ArrowCursor);
-	TextFloat::displayMessage("Hint", "Click and drag to make a cut ; Press shift to automatically remove the tail.", embed::getIconPixmap( "hint" ), 5000);
+	TextFloat::displayMessage(tr("Hint"), tr("Click and drag to make a cut ; Press <Shift> to automatically remove the tail."), embed::getIconPixmap("hint"), 5000);
 	update();
 }
 
@@ -4371,9 +4371,9 @@ void PianoRoll::setEditMode(int mode)
 {
 	m_ctrlMode = m_editMode = (EditMode) mode;
 	
-	if ( m_ctrlMode == EditMode::Knife )
+	if (m_ctrlMode == EditMode::Knife)
 	{
-		knifeToolSelected();
+		setKnifeAction();
 	}
 }
 
