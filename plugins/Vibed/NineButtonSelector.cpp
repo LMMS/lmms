@@ -26,6 +26,7 @@
 #include "NineButtonSelector.h"
 
 #include "CaptionMenu.h"
+#include "PixmapButton.h"
 
 namespace lmms::gui
 {
@@ -40,7 +41,8 @@ NineButtonSelector::NineButtonSelector(std::array<QPixmap, 18> onOffIcons, int d
 
 	for (int i = 0; i < 9; ++i)
 	{
-		m_buttons[i] = std::make_unique<PixmapButton>(this, nullptr);
+		m_buttons[i] = std::unique_ptr<PixmapButton, PixmapButtonDeleter>(
+			new PixmapButton(this, nullptr), PixmapButtonDeleter{});
 		const int buttonX = 1 + (i % 3) * 17;
 		const int buttonY = 1 + (i / 3) * 17;
 		m_buttons[i]->move(buttonX, buttonY);
@@ -86,6 +88,12 @@ void NineButtonSelector::contextMenuEvent(QContextMenuEvent*)
 {
 	CaptionMenu contextMenu{windowTitle(), this};
 	contextMenu.exec(QCursor::pos());
+}
+
+
+void NineButtonSelector::PixmapButtonDeleter::operator()(PixmapButton* ptr)
+{
+	delete ptr;
 }
 
 

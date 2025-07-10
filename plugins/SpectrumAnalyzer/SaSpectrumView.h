@@ -34,8 +34,6 @@
 #include <QPainterPath>
 #include <QWidget>
 
-class QMouseEvent;
-class QPainter;
 
 namespace lmms
 {

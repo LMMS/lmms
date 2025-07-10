@@ -27,10 +27,11 @@
 
 #include <QWidget>
 
-#include "InstrumentSoundShaping.h"
 #include "ModelView.h"
 
 class QLabel;
+
+namespace lmms { class InstrumentSoundShaping; }
 
 namespace lmms::gui
 {

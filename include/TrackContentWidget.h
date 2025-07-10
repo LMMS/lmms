@@ -26,12 +26,12 @@
 #define LMMS_GUI_TRACK_CONTENT_WIDGET_H
 
 #include <QWidget>
+class QMimeData;  // IWYU pragma: keep
 
 #include "JournallingObject.h"
 #include "TimePos.h"
 
 
-class QMimeData;
 
 namespace lmms
 {
@@ -41,8 +41,8 @@ class Track;
 namespace gui
 {
 
+class ClipView;  // IWYU pragma: keep
 class TrackView;
-class ClipView;
 
 class TrackContentWidget : public QWidget, public JournallingObject
 {

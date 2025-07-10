@@ -24,14 +24,16 @@
 
 #include "InstrumentSoundShapingView.h"
 
+#include <QHBoxLayout>
 #include <QLabel>
-#include <QBoxLayout>
+#include <QVBoxLayout>
 
 #include "EnvelopeAndLfoParameters.h"
 #include "EnvelopeAndLfoView.h"
 #include "ComboBox.h"
 #include "GroupBox.h"
 #include "FontHelper.h"
+#include "InstrumentSoundShaping.h"
 #include "Knob.h"
 #include "TabWidget.h"
 

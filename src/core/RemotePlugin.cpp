@@ -35,6 +35,7 @@
 
 #include "AudioEngine.h"
 #include "Engine.h"
+#include "MidiEvent.h"
 #include "Song.h"
 
 #include <QCoreApplication>

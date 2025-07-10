@@ -36,7 +36,6 @@
 #include "ProjectJournal.h"
 #include "Song.h"
 
-#include <cmath>
 
 namespace lmms
 {

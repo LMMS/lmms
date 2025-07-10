@@ -24,12 +24,12 @@
 
 #include "FlangerControlsDialog.h"
 
+#include <QVBoxLayout>
+
 #include "embed.h"
 #include "FlangerControls.h"
 #include "LedCheckBox.h"
 #include "TempoSyncKnob.h"
-
-#include <QBoxLayout>
 
 namespace lmms::gui
 {

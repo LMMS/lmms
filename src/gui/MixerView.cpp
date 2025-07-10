@@ -24,25 +24,32 @@
 
 #include "MixerView.h"
 
+#include <QHBoxLayout>
 #include <QLayout>
+#include <QLineEdit>
 #include <QPushButton>
 #include <QScrollArea>
 #include <QStyle>
 #include <QKeyEvent>
+#include <QStackedLayout>
+#include <QStackedWidget>
 
-#include "MixerChannelView.h"
-#include "Knob.h"
-#include "Mixer.h"
+#include "EffectRackView.h"
+#include "Engine.h"
+#include "Fader.h"
 #include "GuiApplication.h"
-#include "MainWindow.h"
-#include "AudioEngine.h"
+#include "Knob.h"
 #include "InstrumentTrack.h"
+#include "MainWindow.h"
+#include "Mixer.h"
+#include "MixerChannelView.h"
 #include "PatternStore.h"
 #include "SampleTrack.h"
 #include "SendButtonIndicator.h"
 #include "Song.h"
 #include "SubWindow.h"
 #include "TrackContainer.h" // For TrackContainer::TrackList typedef
+#include "embed.h"
 
 namespace lmms::gui
 {

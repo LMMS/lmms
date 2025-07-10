@@ -24,14 +24,15 @@
 
 #include "TrackOperationsWidget.h"
 
-#include <QBoxLayout>
+#include <QCheckBox>
+#include <QHBoxLayout>
 #include <QMenu>
 #include <QMessageBox>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QPushButton>
-#include <QCheckBox>
 
+#include "AutomatableButton.h"
 #include "AutomationClip.h"
 #include "AutomationTrackView.h"
 #include "ColorChooser.h"
@@ -41,7 +42,6 @@
 #include "Engine.h"
 #include "InstrumentTrackView.h"
 #include "KeyboardShortcuts.h"
-#include "PixmapButton.h"
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "Track.h"

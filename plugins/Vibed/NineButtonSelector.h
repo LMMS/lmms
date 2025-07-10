@@ -31,7 +31,6 @@
 #include <QWidget>
 
 #include "AutomatableModelView.h"
-#include "PixmapButton.h"
 
 namespace lmms
 {
@@ -39,6 +38,8 @@ namespace lmms
 
 namespace gui
 {
+
+class PixmapButton;
 
 
 class NineButtonSelector : public QWidget, public IntModelView
@@ -62,7 +63,11 @@ private:
 	void modelChanged() override;
 	void updateButton(int);
 
-	std::array<std::unique_ptr<PixmapButton>, 9> m_buttons;
+	struct PixmapButtonDeleter
+	{
+		void operator()(PixmapButton* ptr);
+	};
+	std::array<std::unique_ptr<PixmapButton, PixmapButtonDeleter>, 9> m_buttons;
 	PixmapButton* m_lastBtn;
 };
 

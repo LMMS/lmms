@@ -29,7 +29,6 @@
 
 #ifdef LMMS_HAVE_LV2
 
-#include <lilv/lilv.h>
 #include <lv2/worker/worker.h>
 #include <thread>
 #include <vector>
@@ -41,7 +40,7 @@ namespace lmms
 {
 
 /**
-	Worker container
+	Worker contain
 */
 class Lv2Worker
 {

@@ -23,9 +23,15 @@
  */
 
 
-#include "LOMM.h"
 #include "LOMMControlDialog.h"
+
+#include <QMouseEvent>
+#include <QPainter>
+
+#include "GuiApplication.h"
+#include "LOMM.h"
 #include "LOMMControls.h"
+#include "MainWindow.h"
 
 
 namespace lmms::gui

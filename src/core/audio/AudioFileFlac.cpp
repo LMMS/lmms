@@ -22,10 +22,8 @@
  *
  */
 
-#include <QtGlobal>
 
 #include <cmath>
-#include <memory>
 
 #include "AudioFileFlac.h"
 #include "endian_handling.h"

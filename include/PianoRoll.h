@@ -40,11 +40,8 @@
 #include "StepRecorder.h"
 #include "StepRecorderWidget.h"
 
-class QPainter;
-class QPixmap;
 class QPushButton;
 class QScrollBar;
-class QString;
 class QMenu;
 class QToolButton;
 
@@ -52,7 +49,6 @@ namespace lmms
 {
 
 
-class NotePlayHandle;
 class MidiClip;
 
 

@@ -30,7 +30,6 @@
 #include "Effect.h"
 #include "GranularPitchShifterControls.h"
 
-#include "BasicFilters.h"
 #include "interpolation.h"
 
 namespace lmms

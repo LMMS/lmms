@@ -27,8 +27,8 @@
 
 #include <string_view>
 
-#include <QBoxLayout>
 #include <QSizePolicy>
+#include <QVBoxLayout>
 
 #include "EnvelopeGraph.h"
 #include "LfoGraph.h"

@@ -52,7 +52,6 @@
 #include <cstdint>
 #include <cstring>
 #include <istream>
-#include <ostream>
 
 #define ALG_EPS 0.000001 // epsilon
 #define ALG_DEFAULT_BPM 100.0 // default tempo

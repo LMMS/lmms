@@ -32,7 +32,6 @@
 
 #include "AudioEngine.h"
 #include "ConfigManager.h"
-#include "Engine.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
 #include "MidiJack.h"

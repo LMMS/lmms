@@ -54,7 +54,6 @@
 #include "ProjectNotes.h"
 #include "Scale.h"
 #include "SongEditor.h"
-#include "TimeLineWidget.h"
 #include "PeakController.h"
 
 

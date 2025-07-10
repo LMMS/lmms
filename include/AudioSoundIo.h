@@ -25,10 +25,9 @@
 #ifndef LMMS_AUDIO_SOUNDIO_H
 #define LMMS_AUDIO_SOUNDIO_H
 
-#include <QObject>
 
 #include "lmmsconfig.h"
-#include "ComboBoxModel.h"
+#include "ComboBoxModel.h"  // IWYU pragma: keep
 
 #ifdef LMMS_HAVE_SOUNDIO
 

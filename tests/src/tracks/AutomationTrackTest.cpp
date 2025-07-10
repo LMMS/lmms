@@ -24,7 +24,6 @@
 
 #include <QtTest/QtTest>
 
-#include "QCoreApplication"
 
 #include "AutomationClip.h"
 #include "AutomationTrack.h"
@@ -34,7 +33,6 @@
 #include "PatternClip.h"
 #include "PatternTrack.h"
 #include "PatternStore.h"
-#include "TrackContainer.h"
 
 #include "Engine.h"
 #include "Song.h"

@@ -34,6 +34,7 @@
 
 #include "Lb302.h"
 #include "AutomatableButton.h"
+#include "DspEffectLibrary.h"
 #include "Engine.h"
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"

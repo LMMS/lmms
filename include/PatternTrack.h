@@ -37,7 +37,6 @@ class TrackContainer;
 namespace gui
 {
 
-class TrackLabelButton;
 class PatternTrackView;
 
 } // namespace gui

@@ -25,26 +25,26 @@
 #ifndef LMMS_GUI_MIXER_CHANNEL_VIEW_H
 #define LMMS_GUI_MIXER_CHANNEL_VIEW_H
 
-#include <QGraphicsView>
-#include <QLabel>
-#include <QLineEdit>
-#include <QPixmap>
-#include <QStackedWidget>
 #include <QWidget>
 
-#include "EffectRackView.h"
-#include "Fader.h"
-#include "Knob.h"
-#include "LcdWidget.h"
-#include "PixmapButton.h"
-#include "SendButtonIndicator.h"
+class QGraphicsView;
+class QLabel;
+class QLineEdit;
+class QStackedWidget;
 
 namespace lmms {
 class MixerChannel;
 }
 
 namespace lmms::gui {
+class AutomatableButton;
+class EffectRackView;
+class Fader;
+class Knob;
+class LcdWidget;
+class MixerView;
 class PeakIndicator;
+class SendButtonIndicator;
 
 
 class MixerChannelView : public QWidget

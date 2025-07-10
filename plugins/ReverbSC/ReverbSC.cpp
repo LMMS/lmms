@@ -20,7 +20,6 @@
  *
  */
 
-#include <cmath>
 #include "ReverbSC.h"
 
 #include "embed.h"
