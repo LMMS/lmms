@@ -28,6 +28,7 @@
 #include <QMenu>
 
 #include "ConfigManager.h"
+#include "DeprecationHelper.h"
 #include "embed.h"
 #include "Engine.h"
 #include "FadeButton.h"
@@ -208,9 +209,10 @@ void SampleTrackView::dropEvent(QDropEvent *de)
 				? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT
 				: DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH;
 
-		int xPos = de->pos().x() < trackHeadWidth
+		const int deX = position(de).x();
+		int xPos = deX < trackHeadWidth
 				? trackHeadWidth
-				: de->pos().x();
+				: deX;
 
 		const float snapSize = getGUI()->songEditor()->m_editor->getSnapSize();
 		TimePos clipPos = trackContainerView()->fixedClips()

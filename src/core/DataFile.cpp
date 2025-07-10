@@ -40,6 +40,7 @@
 
 #include "base64.h"
 #include "ConfigManager.h"
+#include "DeprecationHelper.h"
 #include "Effect.h"
 #include "embed.h"
 #include "GuiApplication.h"
@@ -1022,19 +1023,19 @@ void DataFile::upgrade_0_4_0_beta1()
 		if( !k.isEmpty() )
 		{
 			const QList<QVariant> l =
-				base64::decode( k, QVariant::List ).toList();
+				base64::decode(k, QMetaType::QVariantList).toList();
 			if( !l.isEmpty() )
 			{
 				QString name = l[0].toString();
 				QVariant u = l[1];
 				EffectKey::AttributeMap m;
 				// VST-effect?
-				if( u.type() == QVariant::String )
+				if (typeId(u) == QMetaType::QString)
 				{
 					m["file"] = u.toString();
 				}
 				// LADSPA-effect?
-				else if( u.type() == QVariant::StringList )
+				else if (typeId(u) == QMetaType::QStringList)
 				{
 					const QStringList sl = u.toStringList();
 					m["plugin"] = sl.value( 0 );

@@ -31,6 +31,7 @@
 
 #include <QFontMetrics>
 #include <QKeySequence>
+#include <QVariant>
 #include <QWheelEvent>
 
 namespace lmms
@@ -67,27 +68,19 @@ inline QPoint position(const QWheelEvent *wheelEvent)
 #endif
 }
 
-namespace detail
-{
-
-template<typename T>
-inline constexpr bool IsKeyOrModifier = std::is_same_v<T, Qt::Key>
-	|| std::is_same_v<T, Qt::Modifier> || std::is_same_v<T, Qt::KeyboardModifier>;
-
-} // namespace detail
-
-
 /**
- * @brief Combines Qt key and modifier arguments together,
- * replacing `A | B` which was deprecated in C++20
- * due to the enums being different types. (P1120R0)
- * @param args Any number of Qt::Key, Qt::Modifier, or Qt::KeyboardModifier
- * @return The combination of the given keys/modifiers as an int
+ * @brief position is a backwards-compatible adapter for
+ * QDropEvent::position and pos functions.
+ * @param me
+ * @return the position of the drop event
  */
-template<typename... Args, std::enable_if_t<(detail::IsKeyOrModifier<Args> && ...), bool> = true>
-constexpr int combine(Args... args)
+inline QPoint position(const QDropEvent* de)
 {
-	return (0 | ... | static_cast<int>(args));
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+	return de->position().toPoint();
+#else
+	return de->pos();
+#endif
 }
 
 /**
@@ -106,19 +99,89 @@ inline QPoint position(const QMouseEvent* me)
 }
 
 /**
- * @brief position is a backwards-compatible adapter for
- * QDropEvent::position and pos functions.
+ * @brief positionF is a backwards-compatible adapter for
+ * QMouseEvent::position and localPos functions.
  * @param me
- * @return the position of the drop event
+ * @return the position of the mouse event
  */
-inline QPoint position(const QDropEvent* de)
+inline QPointF positionF(const QMouseEvent* me)
 {
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
-	return de->position().toPoint();
+	return me->position();
 #else
-	return de->pos();
+	return me->localPos();
 #endif
 }
+
+/**
+ * @brief globalPosition is a backwards-compatible adapter for
+ * QMouseEvent::globalPosition and globalPos functions.
+ * @param me
+ * @return the global position of the mouse event
+ */
+inline QPoint globalPosition(const QMouseEvent* me)
+{
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+	return me->globalPosition().toPoint();
+#else
+	return me->globalPos();
+#endif
+}
+
+/**
+ * @brief scenePosition is a backwards-compatible adapter for
+ * QMouseEvent::scenePosition and windowPos functions.
+ * @param me
+ * @return the scene position of the mouse event
+ */
+inline QPointF scenePosition(const QMouseEvent* me)
+{
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+	return me->scenePosition();
+#else
+	return me->windowPos();
+#endif
+}
+
+namespace detail
+{
+
+template<typename T>
+inline constexpr bool IsKeyOrModifier = std::is_same_v<T, Qt::Key>
+	|| std::is_same_v<T, Qt::Modifier> || std::is_same_v<T, Qt::KeyboardModifier>;
+
+} // namespace detail
+
+
+/**
+ * @brief Combines Qt key and modifier arguments together,
+ * replacing `A | B` which was deprecated in C++20
+ * due to the enums being different types. (P1120R0)
+ * @param args Any number of Qt::Key, Qt::Modifier, or Qt::KeyboardModifier
+ * @return The combination of the given keys/modifiers as an int
+ */
+template<typename... Args, std::enable_if_t<(detail::IsKeyOrModifier<Args> && ...), bool> = true>
+constexpr QKeySequence keySequence(Args... args)
+{
+	return (0 | ... | static_cast<int>(args));
+}
+
+
+/**
+ * @brief typeId is a backwards-compatible adapter for
+ * QVariant::typeId and type functions.
+ * @param variant
+ * @return the type id of the variant
+ */
+inline QMetaType::Type typeId(const QVariant& variant)
+{
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+	return static_cast<QMetaType::Type>(variant.typeId());
+#else
+	return static_cast<QMetaType::Type>(variant.type());
+#endif
+}
+
 
 } // namespace lmms
 

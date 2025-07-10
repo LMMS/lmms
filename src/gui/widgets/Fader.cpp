@@ -55,8 +55,8 @@
 #include "embed.h"
 #include "CaptionMenu.h"
 #include "ConfigManager.h"
-#include "KeyboardShortcuts.h"
 #include "DeprecationHelper.h"
+#include "KeyboardShortcuts.h"
 #include "SimpleTextFloat.h"
 
 namespace
@@ -174,7 +174,7 @@ void Fader::contextMenuEvent(QContextMenuEvent* ev)
 
 void Fader::mouseMoveEvent(QMouseEvent* mouseEvent)
 {
-	const int localY = mouseEvent->y();
+	const int localY = position(mouseEvent).y();
 
 	setVolumeByLocalPixelValue(localY);
 

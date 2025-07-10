@@ -28,11 +28,13 @@
 #include <QBuffer>
 #include <QDataStream>
 
+#include "DeprecationHelper.h"
+
 namespace lmms::base64
 {
 
 
-QVariant decode( const QString & _b64, QVariant::Type _force_type )
+QVariant decode(const QString& _b64, QMetaType::Type _force_type)
 {
 	char * dst = nullptr;
 	int dsize = 0;
@@ -43,7 +45,7 @@ QVariant decode( const QString & _b64, QVariant::Type _force_type )
 	QDataStream in( &buf );
 	QVariant ret;
 	in >> ret;
-	if( _force_type != QVariant::Invalid && ret.type() != _force_type )
+	if (_force_type != QMetaType::UnknownType && typeId(ret) != _force_type)
 	{
 		buf.reset();
 		in.setVersion( QDataStream::Qt_3_3 );

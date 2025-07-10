@@ -33,6 +33,7 @@
 #include <QPainter>
 #include <QString>
 
+#include "DeprecationHelper.h"
 #include "fft_helpers.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
@@ -823,14 +824,18 @@ void SaSpectrumView::periodicUpdate()
 // the fractional part is taken from windowPos() (which works correctly).
 void SaSpectrumView::mouseMoveEvent(QMouseEvent *event)
 {
-	m_cursor = QPointF(	event->localPos().x() - (event->windowPos().x() - (long)event->windowPos().x()),
-						event->localPos().y() - (event->windowPos().y() - (long)event->windowPos().y()));
+	const auto pos = positionF(event);
+	const auto scenePos = scenePosition(event);
+	m_cursor = QPointF(pos.x() - (scenePos.x() - (long)scenePos.x()),
+						pos.y() - (scenePos.y() - (long)scenePos.y()));
 }
 
 void SaSpectrumView::mousePressEvent(QMouseEvent *event)
 {
-	m_cursor = QPointF(	event->localPos().x() - (event->windowPos().x() - (long)event->windowPos().x()),
-						event->localPos().y() - (event->windowPos().y() - (long)event->windowPos().y()));
+	const auto pos = positionF(event);
+	const auto scenePos = scenePosition(event);
+	m_cursor = QPointF(pos.x() - (scenePos.x() - (long)scenePos.x()),
+						pos.y() - (scenePos.y() - (long)scenePos.y()));
 }
 
 

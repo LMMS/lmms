@@ -177,7 +177,7 @@ void AudioFileProcessorWaveView::mouseMoveEvent(QMouseEvent * me)
 			slide(step);
 			break;
 		case DraggingType::ZoomWave:
-			zoom(me->y() < m_draggingLastPoint.y());
+			zoom(pos.y() < m_draggingLastPoint.y());
 			break;
 		case DraggingType::Wave:
 		default:

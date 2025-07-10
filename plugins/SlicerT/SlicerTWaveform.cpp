@@ -454,9 +454,9 @@ void SlicerTWaveform::mouseMoveEvent(QMouseEvent* me)
 
 void SlicerTWaveform::mouseDoubleClickEvent(QMouseEvent* me)
 {
-	if (me->button() != Qt::MouseButton::LeftButton || me->y() < m_seekerHeight) { return; }
-
 	const auto pos = position(me);
+
+	if (me->button() != Qt::MouseButton::LeftButton || pos.y() < m_seekerHeight) { return; }
 
 	float normalizedClickEditor = static_cast<float>(pos.x()) / m_editorWidth;
 	float startFrame = m_seekerStart;

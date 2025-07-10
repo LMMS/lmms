@@ -87,7 +87,7 @@ void LcdSpinBox::mousePressEvent( QMouseEvent* event )
 						pos.y() < cellHeight() + 2  )
 	{
 		m_mouseMoving = true;
-		m_lastMousePos = event->globalPos();
+		m_lastMousePos = globalPosition(event);
 
 		AutomatableModel *thisModel = model();
 		if( thisModel )
@@ -109,7 +109,8 @@ void LcdSpinBox::mouseMoveEvent( QMouseEvent* event )
 {
 	if( m_mouseMoving )
 	{
-		int dy = event->globalY() - m_lastMousePos.y();
+		const auto globalPos = globalPosition(event);
+		int dy = globalPos.y() - m_lastMousePos.y();
 		if( dy )
 		{
 			auto fdy = static_cast<float>(dy);
@@ -122,7 +123,7 @@ void LcdSpinBox::mouseMoveEvent( QMouseEvent* event )
 			m_remainder = floatValNotRounded - floatValRounded;
 			model()->setValue( floatValRounded );
 			emit manualChange();
-			m_lastMousePos = event->globalPos();
+			m_lastMousePos = globalPos;
 		}
 	}
 }

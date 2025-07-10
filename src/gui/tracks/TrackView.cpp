@@ -351,7 +351,7 @@ void TrackView::mouseMoveEvent( QMouseEvent * me )
 	{
 		// look which track-widget the mouse-cursor is over
 		const int yPos =
-			m_trackContainerView->contentWidget()->mapFromGlobal( me->globalPos() ).y();
+			m_trackContainerView->contentWidget()->mapFromGlobal(globalPosition(me)).y();
 		const TrackView * trackAtY = m_trackContainerView->trackViewAt( yPos );
 
 		// debug code
