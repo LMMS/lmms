@@ -158,10 +158,10 @@ inline constexpr bool IsKeyOrModifier = std::is_same_v<T, Qt::Key>
  * replacing `A | B` which was deprecated in C++20
  * due to the enums being different types. (P1120R0)
  * @param args Any number of Qt::Key, Qt::Modifier, or Qt::KeyboardModifier
- * @return The combination of the given keys/modifiers as an int
+ * @return The combination of the given keys/modifiers as a QKeySequence
  */
 template<typename... Args, std::enable_if_t<(detail::IsKeyOrModifier<Args> && ...), bool> = true>
-constexpr QKeySequence keySequence(Args... args)
+inline QKeySequence keySequence(Args... args)
 {
 	return (0 | ... | static_cast<int>(args));
 }
