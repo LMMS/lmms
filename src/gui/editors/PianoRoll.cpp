@@ -45,7 +45,6 @@
 
 #include <cmath>
 #include <utility>
-#include <iostream>
 
 #include "AutomationEditor.h"
 #include "ActionGroup.h"
