@@ -294,9 +294,9 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	vlayout->addWidget( m_pianoView );
 	setModel( _itv->model() );
 
-	updateInstrumentView();
-
 	QMdiSubWindow* subWin = getGUI()->mainWindow()->addWindowedWidget( this );
+
+	updateInstrumentView();
 
 	// The previous call should have given us a sub window parent. Therefore
 	// we can reuse this method.

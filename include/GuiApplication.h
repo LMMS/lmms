@@ -55,6 +55,7 @@ public:
 
 	static GuiApplication* instance();
 	static void sigintHandler(int);
+	static bool isWayland();
 #ifdef LMMS_BUILD_WIN32
 	static QFont getWin32SystemFont();
 #endif

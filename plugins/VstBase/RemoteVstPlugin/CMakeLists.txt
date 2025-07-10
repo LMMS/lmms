@@ -6,7 +6,7 @@ endif()
 
 project(RemoteVstPlugin 
 	LANGUAGES CXX)
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 
 include(CheckCXXPreprocessor)
 include(CheckCXXSourceCompiles)
@@ -59,8 +59,7 @@ if(LMMS_HAVE_LIBRT)
 endif()
 
 target_include_directories(${EXE_NAME}
-	PRIVATE 
-		"${LMMS_SOURCE_DIR}/plugins/vst_base/common"
+	PRIVATE
 		"${LMMS_SOURCE_DIR}/include"
 		"${LMMS_BINARY_DIR}"
 )
@@ -73,7 +72,7 @@ if(MSVC)
 endif()
 
 if(IS_MINGW)
-	SET(CMAKE_REQUIRED_FLAGS "-std=c++17")
+	SET(CMAKE_REQUIRED_FLAGS "-std=c++20")
 endif()
 
 if(LMMS_BUILD_WIN32)

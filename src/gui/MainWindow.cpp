@@ -310,7 +310,7 @@ void MainWindow::finalize()
 	addAction(project_menu, "project_export", tr("E&xport..."),
 		keySequence(Qt::CTRL, Qt::Key_E), &MainWindow::onExportProject);
 
-	addAction(project_menu, "project_export", tr("E&xport Tracks..."),
+	addAction(project_menu, "project_export", tr("Export &Tracks..."),
 		keySequence(Qt::CTRL, Qt::SHIFT, Qt::Key_E), &MainWindow::onExportProjectTracks);
 
 	addAction(project_menu, "midi_file", tr("Export &MIDI..."),
