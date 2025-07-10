@@ -373,8 +373,8 @@ jobs:
       - name: Install Qt
         uses: jurplel/install-qt-action@b3ea5275e37b734d027040e2c7fe7a10ea2ef946
         with:
-          version: '6.5.*'
-          arch: "win64_msvc2019_64"
+          version: '6.8.*'
+          arch: "win64_msvc2022_64"
           archives: qtbase qtsvg qttools
           cache: true
       - name: Set up build environment
