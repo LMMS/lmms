@@ -4962,10 +4962,10 @@ PianoRollWindow::PianoRollWindow() :
 	// init edit-buttons at the top
 	auto editModeGroup = new ActionGroup(this);
 	QAction* drawAction = editModeGroup->addAction( embed::getIconPixmap( "edit_draw" ), tr( "Draw mode (Shift+D)" ) );
-	QAction* eraseAction = editModeGroup->addAction( embed::getIconPixmap( "edit_erase" ), tr( "Erase mode (Shift+E)" ) );
+	QAction* eraseAction = editModeGroup->addAction( embed::getIconPixmap( "edit_erase" ), tr("Erase mode (Shift+E)" ) );
 	QAction* selectAction = editModeGroup->addAction( embed::getIconPixmap( "edit_select" ), tr( "Select mode (Shift+S)" ) );
-	QAction* pitchBendAction = editModeGroup->addAction( embed::getIconPixmap( "automation" ), tr( "Pitch Bend mode (Shift+T)" ) );
-	QAction* knifeAction = editModeGroup->addAction( embed::getIconPixmap( "edit_knife" ), tr( "Knife" ) );
+	QAction* pitchBendAction = editModeGroup->addAction( embed::getIconPixmap( "automation" ), tr("Pitch Bend mode (Shift+T)" ) );
+	QAction* knifeAction = editModeGroup->addAction( embed::getIconPixmap("edit_knife"), tr("Knife"));
 
 	drawAction->setChecked( true );
 
