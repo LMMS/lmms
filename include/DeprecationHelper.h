@@ -29,6 +29,7 @@
 
 #include <type_traits>
 
+#include <QDomDocument>
 #include <QFontMetrics>
 #include <QKeySequence>
 #include <QVariant>
@@ -59,9 +60,9 @@ inline int horizontalAdvance(const QFontMetrics& metrics, const QString& text)
  * @param wheelEvent
  * @return the position of wheelEvent
  */
-inline QPoint position(const QWheelEvent *wheelEvent)
+inline QPoint position(const QWheelEvent* wheelEvent)
 {
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 15, 0))
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
 	return wheelEvent->position().toPoint();
 #else
 	return wheelEvent->pos();
@@ -152,7 +153,6 @@ inline constexpr bool IsKeyOrModifier = std::is_same_v<T, Qt::Key>
 
 } // namespace detail
 
-
 /**
  * @brief Combines Qt key and modifier arguments together,
  * replacing `A | B` which was deprecated in C++20
@@ -160,12 +160,11 @@ inline constexpr bool IsKeyOrModifier = std::is_same_v<T, Qt::Key>
  * @param args Any number of Qt::Key, Qt::Modifier, or Qt::KeyboardModifier
  * @return The combination of the given keys/modifiers as a QKeySequence
  */
-template<typename... Args, std::enable_if_t<(detail::IsKeyOrModifier<Args> && ...), bool> = true>
+template<typename... Args> requires (detail::IsKeyOrModifier<Args> && ...)
 inline QKeySequence keySequence(Args... args)
 {
 	return (0 | ... | static_cast<int>(args));
 }
-
 
 /**
  * @brief typeId is a backwards-compatible adapter for
@@ -182,6 +181,38 @@ inline QMetaType::Type typeId(const QVariant& variant)
 #endif
 }
 
+//! Backwards-compatible adapter for QDomDocument::setContent
+inline bool setContent(QDomDocument& doc, const QByteArray& text,
+	QString* errorMsg = nullptr, int* errorLine = nullptr, int* errorColumn = nullptr)
+{
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
+	auto result = doc.setContent(text, QDomDocument::ParseOption::Default);
+	if (errorMsg) { *errorMsg = std::move(result.errorMessage); }
+	if (errorLine) { *errorLine = static_cast<int>(result.errorLine); }
+	if (errorColumn) { *errorColumn = static_cast<int>(result.errorColumn); }
+	return static_cast<bool>(result);
+#else
+	return doc.setContent(text, errorMsg, errorLine, errorColumn);
+#endif
+}
+
+//! Backwards-compatible adapter for QDomDocument::setContent
+inline bool setContent(QDomDocument& doc, QIODevice* dev, bool namespaceProcessing,
+	QString* errorMsg = nullptr, int* errorLine = nullptr, int* errorColumn = nullptr)
+{
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
+	const auto options = namespaceProcessing
+		? QDomDocument::ParseOption::UseNamespaceProcessing
+		: QDomDocument::ParseOption::Default;
+	auto result = doc.setContent(dev, options);
+	if (errorMsg) { *errorMsg = std::move(result.errorMessage); }
+	if (errorLine) { *errorLine = static_cast<int>(result.errorLine); }
+	if (errorColumn) { *errorColumn = static_cast<int>(result.errorColumn); }
+	return static_cast<bool>(result);
+#else
+	return doc.setContent(dev, namespaceProcessing, errorMsg, errorLine, errorColumn);
+#endif
+}
 
 } // namespace lmms
 

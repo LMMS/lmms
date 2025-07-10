@@ -2558,12 +2558,12 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 			if( m_noteEditMode == NoteEditMode::Volume )
 			{
 				m_lastNoteVolume = vol;
-				showVolTextFloat( vol, me->pos() );
+				showVolTextFloat(vol, position(me));
 			}
 			else if( m_noteEditMode == NoteEditMode::Panning )
 			{
 				m_lastNotePanning = pan;
-				showPanTextFloat( pan, me->pos() );
+				showPanTextFloat(pan, position(me));
 			}
 
 			// When alt is pressed we only edit the note under the cursor

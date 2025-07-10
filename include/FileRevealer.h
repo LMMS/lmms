@@ -48,7 +48,7 @@ public:
 	 */
 	static void openDir(const QFileInfo item);
 
-	static inline void openDir(const QString& itemPath)
+	static void openDir(const QString& itemPath)
 	{
 		openDir(QFileInfo(itemPath));
 	}
@@ -65,7 +65,7 @@ public:
 	 */
 	static void reveal(const QFileInfo item);
 
-	static inline void reveal(const QString& itemPath)
+	static void reveal(const QString& itemPath)
 	{
 		reveal(QFileInfo(itemPath));
 	}

@@ -2125,13 +2125,13 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 {
 	QString errorMsg;
 	int line = -1, col = -1;
-	if( !setContent( _data, &errorMsg, &line, &col ) )
+	if (!lmms::setContent(*this, _data, &errorMsg, &line, &col))
 	{
 		// parsing failed? then try to uncompress data
 		QByteArray uncompressed = qUncompress( _data );
 		if( !uncompressed.isEmpty() )
 		{
-			if( setContent( uncompressed, &errorMsg, &line, &col ) )
+			if (lmms::setContent(*this, uncompressed, &errorMsg, &line, &col))
 			{
 				line = col = -1;
 			}

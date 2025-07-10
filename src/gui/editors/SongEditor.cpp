@@ -593,7 +593,7 @@ void SongEditor::mousePressEvent(QMouseEvent *me)
 	{
 		//we save the position of scrollbars, mouse position and zooming level
 		m_scrollPos = QPoint(m_leftRightScroll->value(), contentWidget()->verticalScrollBar()->value());
-		m_origin = contentWidget()->mapFromParent(QPoint(me->pos().x(), me->pos().y()));
+		m_origin = contentWidget()->mapFromParent(pos);
 		m_rubberbandPixelsPerBar = pixelsPerBar();
 
 		//paint the rubberband
@@ -615,7 +615,7 @@ void SongEditor::mousePressEvent(QMouseEvent *me)
 
 void SongEditor::mouseMoveEvent(QMouseEvent *me)
 {
-	m_mousePos = me->pos();
+	m_mousePos = position(me);
 	updateRubberband();
 	QWidget::mouseMoveEvent(me);
 }

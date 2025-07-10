@@ -119,7 +119,7 @@ void AudioFileProcessorWaveView::mousePressEvent(QMouseEvent * me)
 	const auto pos = position(me);
 
 	m_isDragging = true;
-	m_draggingLastPoint = me->pos();
+	m_draggingLastPoint = pos;
 
 	const int x = pos.x();
 
@@ -192,7 +192,7 @@ void AudioFileProcessorWaveView::mouseMoveEvent(QMouseEvent * me)
 			}
 	}
 
-	m_draggingLastPoint = me->pos();
+	m_draggingLastPoint = pos;
 	update();
 }
 
