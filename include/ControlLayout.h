@@ -98,9 +98,9 @@ class ControlLayout : public QLayout
 {
 	Q_OBJECT
 
-#if (QT_VERSION > QT_VERSION_CHECK(6, 0, 0))
-	using ControlLayoutMap = QMultiMap<QString, QLayoutItem *>;
-	using ControlLayoutMapIterator = QMultiMapIterator<QString, QLayoutItem *>;
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+	using ControlLayoutMap = QMultiMap<QString, QLayoutItem*>;
+	using ControlLayoutMapIterator = QMultiMapIterator<QString, QLayoutItem*>;
 #else
 	using ControlLayoutMap = QMap<QString, QLayoutItem*>;
 	using ControlLayoutMapIterator = QMapIterator<QString, QLayoutItem*>;

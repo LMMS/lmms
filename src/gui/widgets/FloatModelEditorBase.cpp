@@ -229,10 +229,10 @@ void FloatModelEditorBase::mouseReleaseEvent(QMouseEvent* event)
 	s_textFloat->hide();
 }
 
-#if (QT_VERSION > QT_VERSION_CHECK(6, 0, 0))
-void FloatModelEditorBase::enterEvent(QEnterEvent* event)
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+void FloatModelEditorBase::enterEvent(QEnterEvent*)
 #else
-void FloatModelEditorBase::enterEvent(QEvent* event)
+void FloatModelEditorBase::enterEvent(QEvent*)
 #endif
 {
 	showTextFloat(700, 2000);
