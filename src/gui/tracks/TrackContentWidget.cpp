@@ -32,6 +32,7 @@
 #include "AutomationClip.h"
 #include "Clipboard.h"
 #include "DataFile.h"
+#include "DeprecationHelper.h"
 #include "Engine.h"
 #include "GuiApplication.h"
 #include "PatternEditor.h"
@@ -321,7 +322,7 @@ TimePos TrackContentWidget::getPosition( int mouseX )
  */
 void TrackContentWidget::dragEnterEvent( QDragEnterEvent * dee )
 {
-	TimePos clipPos = getPosition( dee->pos().x() );
+	TimePos clipPos = getPosition(position(dee).x());
 	if( canPasteSelection( clipPos, dee ) == false )
 	{
 		dee->ignore();
@@ -557,7 +558,9 @@ bool TrackContentWidget::pasteSelection( TimePos clipPos, const QMimeData * md, 
  */
 void TrackContentWidget::dropEvent( QDropEvent * de )
 {
-	TimePos clipPos = TimePos( getPosition( de->pos().x() ) );
+	const auto pos = position(de);
+
+	TimePos clipPos = TimePos(getPosition(pos.x()));
 	if( pasteSelection( clipPos, de ) == true )
 	{
 		de->accept();
@@ -573,6 +576,8 @@ void TrackContentWidget::dropEvent( QDropEvent * de )
  */
 void TrackContentWidget::mousePressEvent( QMouseEvent * me )
 {
+	const auto pos = position(me);
+
 	// Enable box select if control is held when clicking an empty space
 	// (If we had clicked a Clip it would have intercepted the mouse event)
 	if( me->modifiers() & Qt::ControlModifier ){
@@ -599,8 +604,8 @@ void TrackContentWidget::mousePressEvent( QMouseEvent * me )
 		}
 		getTrack()->addJournalCheckPoint();
 		const float snapSize = getGUI()->songEditor()->m_editor->getSnapSize();
-		const TimePos pos = TimePos(getPosition(me->x())).quantize(snapSize, true);
-		getTrack()->createClip(pos);
+		const TimePos timePos = TimePos(getPosition(pos.x())).quantize(snapSize, true);
+		getTrack()->createClip(timePos);
 	}
 }
 

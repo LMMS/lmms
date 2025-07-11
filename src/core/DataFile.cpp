@@ -40,6 +40,7 @@
 
 #include "base64.h"
 #include "ConfigManager.h"
+#include "DeprecationHelper.h"
 #include "Effect.h"
 #include "embed.h"
 #include "GuiApplication.h"
@@ -1027,19 +1028,19 @@ void DataFile::upgrade_0_4_0_beta1()
 		if( !k.isEmpty() )
 		{
 			const QList<QVariant> l =
-				base64::decode( k, QVariant::List ).toList();
+				base64::decode(k, QMetaType::QVariantList).toList();
 			if( !l.isEmpty() )
 			{
 				QString name = l[0].toString();
 				QVariant u = l[1];
 				EffectKey::AttributeMap m;
 				// VST-effect?
-				if( u.type() == QVariant::String )
+				if (typeId(u) == QMetaType::QString)
 				{
 					m["file"] = u.toString();
 				}
 				// LADSPA-effect?
-				else if( u.type() == QVariant::StringList )
+				else if (typeId(u) == QMetaType::QStringList)
 				{
 					const QStringList sl = u.toStringList();
 					m["plugin"] = sl.value( 0 );
@@ -2124,13 +2125,13 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 {
 	QString errorMsg;
 	int line = -1, col = -1;
-	if( !setContent( _data, &errorMsg, &line, &col ) )
+	if (!lmms::setContent(*this, _data, &errorMsg, &line, &col))
 	{
 		// parsing failed? then try to uncompress data
 		QByteArray uncompressed = qUncompress( _data );
 		if( !uncompressed.isEmpty() )
 		{
-			if( setContent( uncompressed, &errorMsg, &line, &col ) )
+			if (lmms::setContent(*this, uncompressed, &errorMsg, &line, &col))
 			{
 				line = col = -1;
 			}
