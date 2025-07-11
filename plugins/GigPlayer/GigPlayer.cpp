@@ -55,6 +55,8 @@
 #include "embed.h"
 #include "plugin_export.h"
 
+#include <algorithm>
+
 namespace lmms
 {
 
@@ -322,6 +324,10 @@ void GigInstrument::playNote( NotePlayHandle * _n, SampleFrame* )
 // the preferences)
 void GigInstrument::play( SampleFrame* _working_buffer )
 {
+	// These must remain thread_local or will cause collisions/bad data with play buffers
+	thread_local static std::vector<SampleFrame> sampleData(32768);
+	thread_local static std::vector<SampleFrame> convertBuf(32768);
+
 	const fpp_t frames = Engine::audioEngine()->framesPerPeriod();
 	const auto rate = Engine::audioEngine()->outputSampleRate();
 
@@ -333,89 +339,73 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 
 	if( m_instance == nullptr || m_instrument == nullptr )
 	{
-		m_synthMutex.unlock();
 		m_notesMutex.unlock();
+		m_synthMutex.unlock();
 		return;
 	}
 
-	for( QList<GigNote>::iterator it = m_notes.begin(); it != m_notes.end(); ++it )
-	{
-		// Process notes in the KeyUp state, adding release samples if desired
-		if( it->state == GigState::KeyUp )
-		{
-			// If there are no samples, we're done
-			if( it->samples.empty() )
+	// TODO: C++20 std::erase_if
+	// Process and remove if complete
+	m_notes.erase(std::remove_if(m_notes.begin(), m_notes.end(),
+		[&](GigNote& gigNote) {
+			// Process notes in the KeyUp state, adding release samples if desired
+			if (gigNote.state == GigState::KeyUp)
 			{
-				it->state = GigState::Completed;
-			}
-			else
-			{
-				it->state = GigState::PlayingKeyUp;
-
-				// Notify each sample that the key has been released
-				for (auto& sample : it->samples)
+				// If there are no samples, we're done
+				if (gigNote.samples.empty()) { gigNote.state = GigState::Completed; }
+				else
 				{
-					sample.adsr.keyup();
-				}
+					gigNote.state = GigState::PlayingKeyUp;
 
-				// Add release samples if available
-				if( it->release == true )
-				{
-					addSamples( *it, true );
+					// Notify each sample that the key has been released
+					for (auto& sample : gigNote.samples) { sample.adsr.keyup(); }
+
+					// Add release samples if available
+					if (gigNote.release) { addSamples(gigNote, true); }
 				}
 			}
-		}
-		// Process notes in the KeyDown state, adding samples for the notes
-		else if( it->state == GigState::KeyDown )
-		{
-			it->state = GigState::PlayingKeyDown;
-			addSamples( *it, false );
-		}
-
-		// Delete ended samples
-		for( QList<GigSample>::iterator sample = it->samples.begin();
-				sample != it->samples.end(); ++sample )
-		{
-			// Delete if the ADSR for a sample is complete for normal
-			// notes, or if a release sample, then if we've reached
-			// the end of the sample
-			if( sample->sample == nullptr || sample->adsr.done() ||
-				( it->isRelease == true &&
-				  sample->pos >= sample->sample->SamplesTotal - 1 ) )
+			// Process notes in the KeyDown state, adding samples for the notes
+			else if (gigNote.state == GigState::KeyDown)
 			{
-				sample = it->samples.erase( sample );
-
-				if( sample == it->samples.end() )
-				{
-					break;
-				}
+				gigNote.state = GigState::PlayingKeyDown;
+				addSamples(gigNote, false);
 			}
-		}
 
-		// Delete ended notes (either in the completed state or all the samples ended)
-		if( it->state == GigState::Completed || it->samples.empty() )
+			// TODO: C++20 std::erase_if
+			// Delete ended samples
+			gigNote.samples.erase(std::remove_if(gigNote.samples.begin(), gigNote.samples.end(),
+				[&](GigSample& sample) {
+					if (sample.adsr.done()) { return true; }
+					if (sample.sample == nullptr) { return true; }
+					if (gigNote.isRelease && sample.pos >= (sample.sample->SamplesTotal - 1))
+					{
+						return true;
+					}
+					return false;
+				}),
+				gigNote.samples.end()
+			);
+
+			// Delete ended notes (either in the completed state or all the samples ended)
+			return gigNote.state == GigState::Completed || gigNote.samples.empty();
+		}),
+		m_notes.end()
+	);
+
+	auto updateWorkingBufferByData = [&](const auto& data) {
+		for (f_cnt_t i = 0; i < frames; ++i)
 		{
-			it = m_notes.erase( it );
-
-			if( it == m_notes.end() )
-			{
-				break;
-			}
+			_working_buffer[i][0] += data[i][0];
+			_working_buffer[i][1] += data[i][1];
 		}
-	}
+	};
 
 	// Fill buffer with portions of the note samples
-	for (auto& note : m_notes)
-	{
-		// Only process the notes if we're in a playing state
-		if (!(note.state == GigState::PlayingKeyDown || note.state == GigState::PlayingKeyUp ))
-		{
-			continue;
-		}
+	std::for_each(m_notes.begin(), m_notes.end(), [&](GigNote& note) {
+		if (note.state != GigState::PlayingKeyDown && note.state != GigState::PlayingKeyUp) { return; }
 
-		for (auto& sample : note.samples)
-		{
-			if (sample.sample == nullptr || sample.region == nullptr) { continue; }
+		std::for_each(note.samples.begin(), note.samples.end(), [&](GigSample& sample) {
+			if (sample.sample == nullptr || sample.region == nullptr) { return; }
 
 			// Will change if resampling
 			bool resample = false;
@@ -440,50 +430,36 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 				samples = frames / freq_factor + Sample::s_interpolationMargins[m_interpolation];
 			}
 
+			const auto neededCapacity = static_cast<std::vector<SampleFrame>::size_type>(samples);
+			sampleData.resize(std::max(neededCapacity, sampleData.capacity()));
+			convertBuf.resize(std::max(neededCapacity, convertBuf.capacity()));
+
 			// Load this note's data
-			SampleFrame sampleData[samples];
 			loadSample(sample, sampleData, samples);
 
 			// Apply ADSR using a copy so if we don't use these samples when
 			// resampling, the ADSR doesn't get messed up
 			ADSR copy = sample.adsr;
-
-			for( f_cnt_t i = 0; i < samples; ++i )
-			{
-				float amplitude = copy.value();
-				sampleData[i][0] *= amplitude;
-				sampleData[i][1] *= amplitude;
-			}
+			const auto amplitude = copy.value();
+			std::for_each_n(sampleData.begin(), samples, [&](auto& frame) {
+				frame[0] *= amplitude;
+				frame[1] *= amplitude;
+			});
 
 			// Output the data resampling if needed
-			if( resample == true )
-			{
-				SampleFrame convertBuf[frames];
+			// Only output if resampling is successful (note that "used" is output)
+			if (resample && sample.convertSampleRate(sampleData, convertBuf, samples, frames, freq_factor, used))
 
-				// Only output if resampling is successful (note that "used" is output)
-				if (sample.convertSampleRate(*sampleData, *convertBuf, samples, frames, freq_factor, used))
-				{
-					for( f_cnt_t i = 0; i < frames; ++i )
-					{
-						_working_buffer[i][0] += convertBuf[i][0];
-						_working_buffer[i][1] += convertBuf[i][1];
-					}
-				}
-			}
-			else
 			{
-				for( f_cnt_t i = 0; i < frames; ++i )
-				{
-					_working_buffer[i][0] += sampleData[i][0];
-					_working_buffer[i][1] += sampleData[i][1];
-				}
+				updateWorkingBufferByData(convertBuf);
 			}
+			else { updateWorkingBufferByData(sampleData); }
 
 			// Update note position with how many samples we actually used
 			sample.pos += used;
 			sample.adsr.inc(used);
-		}
-	}
+		});
+	});
 
 	m_notesMutex.unlock();
 	m_synthMutex.unlock();
@@ -499,25 +475,24 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 
 
 
-void GigInstrument::loadSample( GigSample& sample, SampleFrame* sampleData, f_cnt_t samples )
+void GigInstrument::loadSample(GigSample& sample, std::vector<SampleFrame>& sampleData, gig::file_offset_t samples)
 {
-	if( sampleData == nullptr || samples < 1 )
-	{
-		return;
-	}
+	// This must remain thread_local or will cause collisions/bad data with play buffers
+	thread_local static std::vector<int8_t> buffer(32768);
+	if (samples < 1) { return; }
 
 	// Determine if we need to loop part of this sample
 	bool loop = false;
 	gig::loop_type_t loopType = gig::loop_type_normal;
-	f_cnt_t loopStart = 0;
-	f_cnt_t loopLength = 0;
+	gig::file_offset_t loopStart = 0;
+	gig::file_offset_t loopLength = 0;
 
-	if( sample.region->pSampleLoops != nullptr )
+	if (sample.region->pSampleLoops != nullptr)
 	{
-		for( uint32_t i = 0; i < sample.region->SampleLoops; ++i )
+		for (uint32_t i = 0; i < sample.region->SampleLoops; ++i)
 		{
 			loop = true;
-			loopType = static_cast<gig::loop_type_t>( sample.region->pSampleLoops[i].LoopType );
+			loopType = static_cast<gig::loop_type_t>(sample.region->pSampleLoops[i].LoopType);
 			loopStart = sample.region->pSampleLoops[i].LoopStart;
 			loopLength = sample.region->pSampleLoops[i].LoopLength;
 
@@ -526,142 +501,108 @@ void GigInstrument::loadSample( GigSample& sample, SampleFrame* sampleData, f_cn
 		}
 	}
 
-	unsigned long allocationsize = samples * sample.sample->FrameSize;
-	int8_t buffer[allocationsize];
+	const auto allocationSize = samples * sample.sample->FrameSize;
+	const auto neededCapacity = static_cast<std::vector<int8_t>::size_type>(allocationSize);
+	buffer.resize(std::max(neededCapacity, buffer.capacity()));
 
 	// Load the sample in different ways depending on if we're looping or not
-	if( loop == true && ( sample.pos >= loopStart || sample.pos + samples > loopStart ) )
+	if (loop && (sample.pos >= loopStart || sample.pos + samples > loopStart))
 	{
 		// Calculate the new position based on the type of loop
-		if( loopType == gig::loop_type_bidirectional )
+		if (loopType == gig::loop_type_bidirectional)
 		{
-			sample.pos = getPingPongIndex( sample.pos, loopStart, loopStart + loopLength );
+			const auto loopPos = (sample.pos - loopStart + loopLength) % (loopLength * 2);
+			sample.pos = (sample.pos < loopStart + loopLength) ? sample.pos 
+						: (loopStart + ((loopPos < loopLength) ? loopLength - loopPos : loopPos - loopLength));
 		}
 		else
 		{
-			sample.pos = getLoopedIndex( sample.pos, loopStart, loopStart + loopLength );
+			sample.pos = (sample.pos < loopStart + loopLength) ? sample.pos 
+						: loopStart + (sample.pos - loopStart) % loopLength;
 			// TODO: also implement loop_type_backward support
 		}
 
-		sample.sample->SetPos( sample.pos );
+		sample.sample->SetPos(sample.pos);
 
 		// Load the samples (based on gig::Sample::ReadAndLoop) even around the end
 		// of a loop boundary wrapping to the beginning of the loop region
-		long samplestoread = samples;
-		long samplestoloopend = 0;
-		long readsamples = 0;
-		long totalreadsamples = 0;
-		long loopEnd = loopStart + loopLength;
+		gig::file_offset_t samplesToRead = samples;
+		gig::file_offset_t samplesToLoopEnd = 0;
+		gig::file_offset_t readSamples = 0;
+		gig::file_offset_t totalReadSamples = 0;
+		gig::file_offset_t loopEnd = loopStart + loopLength;
 
 		do
 		{
-			samplestoloopend = loopEnd - sample.sample->GetPos();
-			readsamples = sample.sample->Read( &buffer[totalreadsamples * sample.sample->FrameSize],
-					std::min( samplestoread, samplestoloopend ) );
-			samplestoread -= readsamples;
-			totalreadsamples += readsamples;
+			samplesToLoopEnd = loopEnd - sample.sample->GetPos();
+			readSamples = sample.sample->Read(
+				&buffer[totalReadSamples * sample.sample->FrameSize],
+				std::min(samplesToRead, samplesToLoopEnd)
+			);
+			samplesToRead -= readSamples;
+			totalReadSamples += readSamples;
 
-			if( readsamples >= samplestoloopend )
-			{
-				sample.sample->SetPos( loopStart );
-			}
+			if (readSamples >= samplesToLoopEnd) { sample.sample->SetPos(loopStart); }
 		}
-		while( samplestoread > 0 && readsamples > 0 );
+		while (samplesToRead > 0 && readSamples > 0);
 	}
 	else
 	{
-		sample.sample->SetPos( sample.pos );
+		sample.sample->SetPos(sample.pos);
 
-		unsigned long size = sample.sample->Read( &buffer, samples ) * sample.sample->FrameSize;
-		std::memset( (int8_t*) &buffer + size, 0, allocationsize - size );
+		auto size = sample.sample->Read(&buffer[0], samples) * sample.sample->FrameSize;
+		std::fill_n(buffer.begin(), allocationSize - size, 0);
 	}
 
 	// Convert from 16 or 24 bit into 32-bit float
-	if( sample.sample->BitDepth == 24 ) // 24 bit
+	if (sample.sample->BitDepth == 24) // 24 bit
 	{
-		auto pInt = reinterpret_cast<uint8_t*>(&buffer);
-
-		for( f_cnt_t i = 0; i < samples; ++i )
+		auto pInt = reinterpret_cast<uint8_t*>(&buffer[0]);
+		const auto base_offset = 3 * sample.sample->Channels;
+		const auto factor = 1.0 / 0x100000000 * sample.attenuation;
+		for (f_cnt_t i = 0; i < samples; ++i)
 		{
 			// libgig gives 24-bit data as little endian, so we must
 			// convert if on a big endian system
 			int32_t valueLeft = swap32IfBE(
-						( pInt[ 3 * sample.sample->Channels * i ] << 8 ) |
-						( pInt[ 3 * sample.sample->Channels * i + 1 ] << 16 ) |
-						( pInt[ 3 * sample.sample->Channels * i + 2 ] << 24 ) );
+				(pInt[base_offset * i] << 8)
+				| (pInt[base_offset * i + 1] << 16)
+				| (pInt[base_offset * i + 2] << 24)
+			);
 
 			// Store the notes to this buffer before saving to output
 			// so we can fade them out as needed
-			sampleData[i][0] = 1.0 / 0x100000000 * sample.attenuation * valueLeft;
+			sampleData[i][0] = factor * valueLeft;
 
-			if( sample.sample->Channels == 1 )
+			if (sample.sample->Channels == 1)
 			{
 				sampleData[i][1] = sampleData[i][0];
 			}
 			else
 			{
 				int32_t valueRight = swap32IfBE(
-							( pInt[ 3 * sample.sample->Channels * i + 3 ] << 8 ) |
-							( pInt[ 3 * sample.sample->Channels * i + 4 ] << 16 ) |
-							( pInt[ 3 * sample.sample->Channels * i + 5 ] << 24 ) );
-
-				sampleData[i][1] = 1.0 / 0x100000000 * sample.attenuation * valueRight;
+					(pInt[base_offset * i + 3] << 8)
+					| (pInt[base_offset * i + 4] << 16)
+					| (pInt[base_offset * i + 5] << 24)
+				);
+				sampleData[i][1] = factor * valueRight;
 			}
 		}
 	}
 	else // 16 bit
 	{
-		auto pInt = reinterpret_cast<int16_t*>(&buffer);
-
-		for( f_cnt_t i = 0; i < samples; ++i )
+		auto pInt = reinterpret_cast<int16_t*>(&buffer[0]);
+		const auto factor = 1.0 / 0x10000 * sample.attenuation;
+		for (f_cnt_t i = 0; i < samples; ++i)
 		{
-			sampleData[i][0] = 1.0 / 0x10000 *
-				pInt[ sample.sample->Channels * i ] * sample.attenuation;
-
-			if( sample.sample->Channels == 1 )
-			{
-				sampleData[i][1] = sampleData[i][0];
-			}
-			else
-			{
-				sampleData[i][1] = 1.0 / 0x10000 *
-					pInt[ sample.sample->Channels * i + 1 ] * sample.attenuation;
-			}
+			auto l = pInt[sample.sample->Channels * i];
+			auto r = pInt[sample.sample->Channels * i + 1];
+			sampleData[i][0] = factor * l;
+			sampleData[i][1] = sample.sample->Channels == 1
+				? sampleData[i][0]
+				: factor * r;
 		}
 	}
-}
-
-
-
-
-// These two loop index functions taken from SampleBuffer.cpp
-f_cnt_t GigInstrument::getLoopedIndex( f_cnt_t index, f_cnt_t startf, f_cnt_t endf ) const
-{
-	if( index < endf )
-	{
-		return index;
-	}
-
-	return startf + ( index - startf )
-				% ( endf - startf );
-}
-
-
-
-
-f_cnt_t GigInstrument::getPingPongIndex( f_cnt_t index, f_cnt_t startf, f_cnt_t endf ) const
-{
-	if( index < endf )
-	{
-		return index;
-	}
-
-	const f_cnt_t looplen = endf - startf;
-	const f_cnt_t looppos = ( index - endf ) % ( looplen * 2 );
-
-	return ( looppos < looplen )
-		? endf - looppos
-		: startf + ( looppos - looplen );
 }
 
 
@@ -1180,7 +1121,7 @@ void GigSample::updateSampleRate()
 
 
 
-bool GigSample::convertSampleRate( SampleFrame & oldBuf, SampleFrame & newBuf,
+bool GigSample::convertSampleRate(std::vector<SampleFrame>& oldBuf, std::vector<SampleFrame>& newBuf,
 		f_cnt_t oldSize, f_cnt_t newSize, float freq_factor, f_cnt_t& used )
 {
 	if( srcState == nullptr )
@@ -1188,13 +1129,16 @@ bool GigSample::convertSampleRate( SampleFrame & oldBuf, SampleFrame & newBuf,
 		return false;
 	}
 
-	SRC_DATA src_data;
-	src_data.data_in = &oldBuf[0];
-	src_data.data_out = &newBuf[0];
-	src_data.input_frames = oldSize;
-	src_data.output_frames = newSize;
-	src_data.src_ratio = freq_factor;
-	src_data.end_of_input = 0;
+	SRC_DATA src_data{
+		/* .data_in */ reinterpret_cast<const float*>(oldBuf.data()),
+		/* .data_out */ reinterpret_cast<float*>(newBuf.data()),
+		/* .input_frames */ static_cast<long int>(oldSize),
+		/* .output_frames */ static_cast<long int>(newSize),
+		/* .input_frames_used */ 0,
+		/* .output_frames_gen */ 0,
+		/* .end_of_input */ 0,
+		/* .src_ratio */ freq_factor
+	};
 
 	// We don't need to lock this assuming that we're only outputting the
 	// samples in one thread
