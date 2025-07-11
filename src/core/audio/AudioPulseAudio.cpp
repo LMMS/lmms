@@ -42,21 +42,16 @@ static void stream_write_callback(pa_stream *s, size_t length, void *userdata)
 	static_cast<AudioPulseAudio *>( userdata )->streamWriteCallback( s, length );
 }
 
-
-
-
-AudioPulseAudio::AudioPulseAudio( bool & _success_ful, AudioEngine*  _audioEngine ) :
-	AudioDevice(std::clamp<ch_cnt_t>(
-		ConfigManager::inst()->value("audiopa", "channels").toInt(),
-		DEFAULT_CHANNELS,
-		DEFAULT_CHANNELS), _audioEngine),
-	m_s( nullptr ),
-	m_quit( false ),
-	m_convertEndian( false )
+AudioPulseAudio::AudioPulseAudio(bool& _success_ful, AudioEngine* _audioEngine)
+	: AudioDevice(std::clamp<ch_cnt_t>(
+					  ConfigManager::inst()->value("audiopa", "channels").toInt(), DEFAULT_CHANNELS, DEFAULT_CHANNELS),
+		  _audioEngine)
+	, m_s(nullptr)
+	, m_quit(false)
 {
 	_success_ful = false;
 
-	m_sampleSpec.format = PA_SAMPLE_S16LE;
+	m_sampleSpec.format = PA_SAMPLE_FLOAT32;
 	m_sampleSpec.rate = sampleRate();
 	m_sampleSpec.channels = channels();
 
@@ -91,18 +86,15 @@ QString AudioPulseAudio::probeDevice()
 
 
 
-void AudioPulseAudio::startProcessing()
+void AudioPulseAudio::startProcessingImpl()
 {
-	if( !isRunning() )
-	{
-		start( QThread::HighPriority );
-	}
+	start(QThread::HighPriority);
 }
 
 
 
 
-void AudioPulseAudio::stopProcessing()
+void AudioPulseAudio::stopProcessingImpl()
 {
 	m_quit = true;
 	stopProcessingThread( this );
@@ -160,7 +152,7 @@ static void context_state_callback(pa_context *c, void *userdata)
 			buffer_attr.minreq = (uint32_t)(-1);
 			buffer_attr.fragsize = (uint32_t)(-1);
 
-			double latency = (double)( Engine::audioEngine()->framesPerPeriod() ) / (double)_this->sampleRate();
+			double latency = static_cast<double>(_this->framesPerPeriod()) / _this->sampleRate();
 
 			// ask PulseAudio for the desired latency (which might not be approved)
 			buffer_attr.tlength = pa_usec_to_bytes( latency * PA_USEC_PER_MSEC,
@@ -229,12 +221,10 @@ void AudioPulseAudio::run()
 	}
 	else
 	{
-		const fpp_t fpp = audioEngine()->framesPerPeriod();
-		auto temp = new SampleFrame[fpp];
-		while( getNextBuffer( temp ) )
+		while (true)
 		{
+			audioEngine()->renderNextBuffer();
 		}
-		delete[] temp;
 	}
 
 	pa_context_disconnect( context );
@@ -243,35 +233,24 @@ void AudioPulseAudio::run()
 	pa_mainloop_free( mainLoop );
 }
 
-
-
-
-void AudioPulseAudio::streamWriteCallback( pa_stream *s, size_t length )
+void AudioPulseAudio::streamWriteCallback(pa_stream*, size_t)
 {
-	const fpp_t fpp = audioEngine()->framesPerPeriod();
-	auto temp = new SampleFrame[fpp];
-	auto pcmbuf = (int_sample_t*)pa_xmalloc(fpp * channels() * sizeof(int_sample_t));
+	auto buf = static_cast<void*>(nullptr);
+	auto maxBufSizeInBytes = framesPerPeriod() * channels() * sizeof(float);
 
-	size_t fd = 0;
-	while( fd < length/4 && m_quit == false )
+	pa_stream_begin_write(m_s, &buf, &maxBufSizeInBytes);
+	if (!buf) { return; }
+
+	const auto numSamples = maxBufSizeInBytes / sizeof(float);
+	const auto numFrames = numSamples / channels();
+
+	if (!AudioDevice::isRunning())
 	{
-		const fpp_t frames = getNextBuffer( temp );
-		if( !frames )
-		{
-			m_quit = true;
-			break;
-		}
-		int bytes = convertToS16(temp, frames, pcmbuf, m_convertEndian);
-		if( bytes > 0 )
-		{
-			pa_stream_write( m_s, pcmbuf, bytes, nullptr, 0,
-							PA_SEEK_RELATIVE );
-		}
-		fd += frames;
+		std::fill_n(static_cast<float*>(buf), numSamples, 0.f);
 	}
+	else { nextBuffer({reinterpret_cast<float*>(buf), channels(), numFrames}); }
 
-	pa_xfree( pcmbuf );
-	delete[] temp;
+	pa_stream_write(m_s, buf, maxBufSizeInBytes, nullptr, 0, PA_SEEK_RELATIVE);
 }
 
 
