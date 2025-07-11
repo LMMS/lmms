@@ -325,22 +325,14 @@ void SaWaterfallView::drawCursor(QPainter &painter)
 
 
 // Handle mouse input: set new cursor position.
-// For some reason (a bug?), localPos() only returns integers. As a workaround
-// the fractional part is taken from windowPos() (which works correctly).
-void SaWaterfallView::mouseMoveEvent(QMouseEvent *event)
+void SaWaterfallView::mouseMoveEvent(QMouseEvent* event)
 {
-	const auto pos = positionF(event);
-	const auto scenePos = scenePosition(event);
-	m_cursor = QPointF(pos.x() - (scenePos.x() - (long)scenePos.x()),
-						pos.y() - (scenePos.y() - (long)scenePos.y()));
+	m_cursor = positionF(event);
 }
 
-void SaWaterfallView::mousePressEvent(QMouseEvent *event)
+void SaWaterfallView::mousePressEvent(QMouseEvent* event)
 {
-	const auto pos = positionF(event);
-	const auto scenePos = scenePosition(event);
-	m_cursor = QPointF(pos.x() - (scenePos.x() - (long)scenePos.x()),
-						pos.y() - (scenePos.y() - (long)scenePos.y()));
+	m_cursor = positionF(event);
 }
 
 

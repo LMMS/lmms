@@ -820,22 +820,14 @@ void SaSpectrumView::periodicUpdate()
 
 
 // Handle mouse input: set new cursor position.
-// For some reason (a bug?), localPos() only returns integers. As a workaround
-// the fractional part is taken from windowPos() (which works correctly).
-void SaSpectrumView::mouseMoveEvent(QMouseEvent *event)
+void SaSpectrumView::mouseMoveEvent(QMouseEvent* event)
 {
-	const auto pos = positionF(event);
-	const auto scenePos = scenePosition(event);
-	m_cursor = QPointF(pos.x() - (scenePos.x() - (long)scenePos.x()),
-						pos.y() - (scenePos.y() - (long)scenePos.y()));
+	m_cursor = positionF(event);
 }
 
-void SaSpectrumView::mousePressEvent(QMouseEvent *event)
+void SaSpectrumView::mousePressEvent(QMouseEvent* event)
 {
-	const auto pos = positionF(event);
-	const auto scenePos = scenePosition(event);
-	m_cursor = QPointF(pos.x() - (scenePos.x() - (long)scenePos.x()),
-						pos.y() - (scenePos.y() - (long)scenePos.y()));
+	m_cursor = positionF(event);
 }
 
 

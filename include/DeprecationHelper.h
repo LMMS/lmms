@@ -129,21 +129,6 @@ inline QPoint globalPosition(const QMouseEvent* me)
 #endif
 }
 
-/**
- * @brief scenePosition is a backwards-compatible adapter for
- * QMouseEvent::scenePosition and windowPos functions.
- * @param me
- * @return the scene position of the mouse event
- */
-inline QPointF scenePosition(const QMouseEvent* me)
-{
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
-	return me->scenePosition();
-#else
-	return me->windowPos();
-#endif
-}
-
 namespace detail
 {
 
