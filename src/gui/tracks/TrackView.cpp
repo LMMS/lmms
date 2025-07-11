@@ -293,7 +293,7 @@ void TrackView::mousePressEvent( QMouseEvent * me )
 		{
 			if (pos.x() > 10) // 10 = The width of the grip + 2 pixels to the left and right.
 			{
-				QWidget::mousePressEvent( me );
+				QWidget::mousePressEvent(me);
 				return;
 			}
 

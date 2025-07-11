@@ -2025,8 +2025,8 @@ void PianoRoll::mouseDoubleClickEvent(QMouseEvent * me )
 	const auto pos = position(me);
 
 	// if they clicked in the note edit area, enter value for the volume bar
-	if( pos.x() > noteEditLeft() && pos.x() < noteEditRight()
-		&& pos.y() > noteEditTop() && pos.y() < noteEditBottom() )
+	if (pos.x() > noteEditLeft() && pos.x() < noteEditRight()
+		&& pos.y() > noteEditTop() && pos.y() < noteEditBottom())
 	{
 		// get values for going through notes
 		int pixel_range = 4;
