@@ -47,6 +47,7 @@
 #include "Note.h"
 #include "PatternClip.h"
 #include "PatternStore.h"
+#include "ProjectJournal.h"
 #include "SampleClip.h"
 #include "Song.h"
 #include "SongEditor.h"
@@ -385,6 +386,8 @@ void ClipView::resetColor()
  */
 void ClipView::setColor(const std::optional<QColor>& color)
 {
+	auto batchActionScopeGuard = Engine::projectJournal()->newBatchAction();
+
 	std::set<Track*> journaledTracks;
 
 	auto selectedClips = getClickedClips();
@@ -625,6 +628,8 @@ void ClipView::paintTextLabel(QString const & text, QPainter & painter)
  */
 void ClipView::mousePressEvent( QMouseEvent * me )
 {
+	auto batchActionScopeGuard = Engine::projectJournal()->newBatchAction();
+
 	// Right now, active is only used on right/mid clicks actions, so we use a ternary operator
 	// to avoid the overhead of calling getClickedClips when it's not used
 	auto active = me->button() == Qt::LeftButton
@@ -1147,6 +1152,8 @@ void ClipView::contextMenuEvent( QContextMenuEvent * cme )
 // This method processes the actions from the context menu of the Clip View.
 void ClipView::contextMenuAction( ContextMenuAction action )
 {
+	auto batchActionScopeGuard = Engine::projectJournal()->newBatchAction();
+
 	QVector<ClipView *> active = getClickedClips();
 	// active will be later used for the remove, copy, cut or toggleMute methods
 
@@ -1252,6 +1259,8 @@ void ClipView::toggleMute( QVector<ClipView *> clipvs )
 
 void ClipView::toggleSelectedAutoResize()
 {
+	auto batchActionScopeGuard = Engine::projectJournal()->newBatchAction();
+
 	const bool newState = !m_clip->getAutoResize();
 	std::set<Track*> journaledTracks;
 	for (auto clipv: getClickedClips())
