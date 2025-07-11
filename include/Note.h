@@ -41,6 +41,7 @@ namespace lmms
 
 
 class DetuningHelper;
+class AutomationClip;
 
 
 enum class Key : int
@@ -122,6 +123,12 @@ public:
 
 	Type type() const { return m_type; }
 	inline void setType(Type t) { m_type = t; }
+
+	enum class ParameterType
+	{
+		Detuning = 0
+	};
+	AutomationClip* getParameterCurve(ParameterType paramType);
 
 	// used by GUI
 	inline void setSelected( const bool selected ) { m_selected = selected; }
