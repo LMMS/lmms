@@ -62,7 +62,7 @@ void ProjectJournal::undo()
 		{
 			DataFile curState( DataFile::Type::JournalData );
 			jo->saveState( curState, curState.content() );
-			m_redoCheckPoints.push( CheckPoint( c.joID, curState ) );
+			m_redoCheckPoints.push(CheckPoint(c.joID, curState, c.m_batchID));
 
 			bool prev = isJournalling();
 			setJournalling( false );
@@ -75,7 +75,7 @@ void ProjectJournal::undo()
 			{
 				AutomationClip::resolveAllIDs();
 			}
-			break;
+			if (m_undoCheckPoints.empty() || m_undoCheckPoints.last().m_batchID != c.m_batchID) { break; }
 		}
 	}
 }
@@ -93,14 +93,14 @@ void ProjectJournal::redo()
 		{
 			DataFile curState( DataFile::Type::JournalData );
 			jo->saveState( curState, curState.content() );
-			m_undoCheckPoints.push( CheckPoint( c.joID, curState ) );
+			m_undoCheckPoints.push(CheckPoint(c.joID, curState, c.m_batchID));
 
 			bool prev = isJournalling();
 			setJournalling( false );
 			jo->restoreState( c.data.content().firstChildElement() );
 			setJournalling( prev );
 			Engine::getSong()->setModified();
-			break;
+			if (m_redoCheckPoints.empty() || m_redoCheckPoints.last().m_batchID != c.m_batchID) { break; }
 		}
 	}
 }
@@ -126,11 +126,14 @@ void ProjectJournal::addJournalCheckPoint( JournallingObject *jo )
 		DataFile dataFile( DataFile::Type::JournalData );
 		jo->saveState( dataFile, dataFile.content() );
 
-		m_undoCheckPoints.push( CheckPoint( jo->id(), dataFile ) );
+		m_undoCheckPoints.push(CheckPoint(jo->id(), dataFile, m_currentBatchID));
 		if( m_undoCheckPoints.size() > MAX_UNDO_STATES )
 		{
 			m_undoCheckPoints.remove( 0, m_undoCheckPoints.size() - MAX_UNDO_STATES );
 		}
+
+		// If there is no batch action going on, assign the next CheckPoint a unique ID
+		if (m_batchActionNestingLevel == 0) { m_currentBatchID++; }
 	}
 }
 
@@ -208,6 +211,17 @@ void ProjectJournal::stopAllJournalling()
 	setJournalling(false);
 }
 
+
+BatchActionScopeGuard::BatchActionScopeGuard(ProjectJournal* pj):
+	m_journal(pj)
+{
+	m_journal->m_batchActionNestingLevel++;
+}
+
+BatchActionScopeGuard::~BatchActionScopeGuard()
+{
+	m_journal->m_batchActionNestingLevel--;
+}
 
 
 } // namespace lmms
