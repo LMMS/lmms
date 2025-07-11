@@ -297,7 +297,7 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 	{
 		const auto nit = std::next(it);
 
-		if( nit == m_clip->getTimeMap().end() )
+		if (nit == m_clip->getTimeMap().end())
 		{
 			const float x1 = POS(it) * ppTick + offset;
 			const auto x2 = (float)(width() - BORDER_WIDTH);
@@ -330,7 +330,7 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 		QPointF origin = QPointF(POS(it) * ppTick + offset, 0.0f);
 		path.moveTo(origin);
 		path.moveTo(QPointF(POS(it) * ppTick + offset, values[0]));
-		for (int i = POS(it) + 1; i < POS(nit); i++)
+		for (int i = POS(it) + 1; i < POS(nit); ++i)
 		{
 			float x = i * ppTick + offset;
 			if(x > (width() - BORDER_WIDTH)) break;

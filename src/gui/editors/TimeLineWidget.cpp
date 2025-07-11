@@ -397,7 +397,7 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 			break;
 		}
 		case Action::SelectSongClip:
-			emit regionSelectedFromPixels( m_initalXSelect , pos.x() );
+			emit regionSelectedFromPixels(m_initalXSelect, pos.x());
 			break;
 
 		default:

@@ -900,7 +900,7 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 		if( m_action == Action::Resize )
 		{
 			// The clip's new length
-			TimePos l = static_cast<int>(pos.x() * TimePos::ticksPerBar() / ppb );
+			TimePos l = static_cast<int>(pos.x() * TimePos::ticksPerBar() / ppb);
 
 			// If the user is holding alt, or pressed ctrl after beginning the drag, don't quantize
 			if ( unquantizedModHeld(me) )

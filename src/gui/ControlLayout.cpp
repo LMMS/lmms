@@ -242,7 +242,7 @@ int ControlLayout::doLayout(const QRect &rect, bool testOnly) const
 	const QString filterText = m_searchBar->text();
 	bool first = true;
 
-	ControlLayoutMapIterator itr(m_itemMap);
+	ControlLayoutMapIterator itr = m_itemMap;
 	while (itr.hasNext())
 	{
 		itr.next();

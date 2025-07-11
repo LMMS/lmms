@@ -277,7 +277,7 @@ void TrackView::mousePressEvent( QMouseEvent * me )
 							"compacttrackbuttons" ).toInt()==1 ?
 		DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT :
 		DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH;
-	if( m_trackContainerView->allowRubberband() == true  && pos.x() > widgetTotal )
+	if (m_trackContainerView->allowRubberband() == true  && pos.x() > widgetTotal)
 	{
 		QWidget::mousePressEvent( me );
 	}
@@ -286,23 +286,20 @@ void TrackView::mousePressEvent( QMouseEvent * me )
 		if( me->modifiers() & Qt::ShiftModifier )
 		{
 			m_action = Action::Resize;
-			QCursor::setPos( mapToGlobal( QPoint( pos.x(),
-								height() ) ) );
-			QCursor c( Qt::SizeVerCursor);
-			QApplication::setOverrideCursor( c );
+			QCursor::setPos(mapToGlobal(QPoint(pos.x(), height())));
+			QApplication::setOverrideCursor(Qt::SizeVerCursor);
 		}
 		else
 		{
-			if( pos.x()>10 ) // 10 = The width of the grip + 2 pixels to the left and right.
+			if (pos.x() > 10) // 10 = The width of the grip + 2 pixels to the left and right.
 			{
 				QWidget::mousePressEvent( me );
 				return;
 			}
 
 			m_action = Action::Move;
+			QApplication::setOverrideCursor(Qt::SizeVerCursor);
 
-			QCursor c( Qt::SizeVerCursor );
-			QApplication::setOverrideCursor( c );
 			// update because in move-mode, all elements in
 			// track-op-widgets are hidden as a visual feedback
 			m_trackOperationsWidget.update();
@@ -343,7 +340,7 @@ void TrackView::mouseMoveEvent( QMouseEvent * me )
 							"compacttrackbuttons" ).toInt()==1 ?
 		DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT :
 		DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH;
-	if( m_trackContainerView->allowRubberband() == true && pos.x() > widgetTotal )
+	if (m_trackContainerView->allowRubberband() == true && pos.x() > widgetTotal)
 	{
 		QWidget::mouseMoveEvent( me );
 	}
@@ -361,7 +358,7 @@ void TrackView::mouseMoveEvent( QMouseEvent * me )
 		if( trackAtY != nullptr && trackAtY != this )
 		{
 			// then move us up/down there!
-			if( pos.y() < 0 )
+			if (pos.y() < 0)
 			{
 				m_trackContainerView->moveTrackViewUp( this );
 			}

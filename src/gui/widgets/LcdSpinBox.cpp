@@ -82,9 +82,9 @@ void LcdSpinBox::mousePressEvent( QMouseEvent* event )
 {
 	const auto pos = position(event);
 
-	if( event->button() == Qt::LeftButton &&
-		! ( event->modifiers() & KBD_COPY_MODIFIER ) &&
-						pos.y() < cellHeight() + 2  )
+	if (event->button() == Qt::LeftButton
+		&& !(event->modifiers() & KBD_COPY_MODIFIER)
+		&& pos.y() < cellHeight() + 2)
 	{
 		m_mouseMoving = true;
 		m_lastMousePos = globalPosition(event);

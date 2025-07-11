@@ -138,18 +138,18 @@ void XyPad::mouseMoveEvent(QMouseEvent *event)
 {
 	const auto pos = position(event);
 
-	if( m_acceptInput && (pos.x() >= 0) && ( pos.x() < width() )
-			&& ( pos.y() >= 0) && ( pos.y() < height() ) )
+	if (m_acceptInput && (pos.x() >= 0) && (pos.x() < width())
+		&& (pos.y() >= 0) && (pos.y() < height()))
 	{
 		//set xmodel
 		float xRange = m_xModel->maxValue() - m_xModel->minValue();
 		float xInc = xRange / width();
-		m_xModel->setValue( m_xModel->minValue() + ( pos.x() * xInc ) );
+		m_xModel->setValue(m_xModel->minValue() + (pos.x() * xInc));
 
 		//set ymodel
 		float yRange = m_yModel->maxValue() - m_yModel->minValue();
 		float yInc = yRange / height();
-		m_yModel->setValue( m_yModel->minValue() + ( pos.y() * yInc ) );
+		m_yModel->setValue(m_yModel->minValue() + (pos.y() * yInc));
 	}
 }
 

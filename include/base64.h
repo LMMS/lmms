@@ -48,9 +48,10 @@ namespace lmms::base64
 		*_data = new T[*_size / sizeof(T)];
 		memcpy( *_data, data.constData(), *_size );
 	}
+
 	// for compatibility-code only
-	QVariant decode(const QString& _b64,
-		QMetaType::Type _force_type = QMetaType::UnknownType);
+	QVariant decode(const QString& b64,
+		QMetaType::Type forceType = QMetaType::UnknownType);
 
 } // namespace lmms::base64
 

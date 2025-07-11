@@ -434,8 +434,8 @@ void MidiClipView::mousePressEvent( QMouseEvent * _me )
 	{
 //	get the step number that was clicked on and
 //	do calculations in floats to prevent rounding errors...
-		float tmp = ( ( float(pos.x()) - BORDER_WIDTH ) *
-				float( m_clip -> m_steps ) ) / float(width() - BORDER_WIDTH*2);
+		float tmp = ((static_cast<float>(pos.x()) - BORDER_WIDTH)
+			* static_cast<float>(m_clip->m_steps)) / static_cast<float>(width() - BORDER_WIDTH * 2);
 
 		int step = int( tmp );
 

@@ -1354,7 +1354,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 				p.setRenderHints( QPainter::Antialiasing, true );
 				QPainterPath path;
 				path.moveTo(QPointF(xCoordOfTick(POS(it)), yCoordOfLevel(0)));
-				for (int i = 0; i < POS(nit) - POS(it); i++)
+				for (int i = 0; i < POS(nit) - POS(it); ++i)
 				{
 					path.lineTo(QPointF(xCoordOfTick(POS(it) + i), yCoordOfLevel(values[i])));
 				}

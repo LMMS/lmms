@@ -1697,19 +1697,19 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 		m_moveStartY = pos.y();
 	}
 
-	if(me->button() == Qt::LeftButton &&
-		pos.y() > keyAreaBottom() && pos.y() < noteEditTop())
+	if (me->button() == Qt::LeftButton
+		&& pos.y() > keyAreaBottom() && pos.y() < noteEditTop())
 	{
 		// resizing the note edit area
 		m_action = Action::ResizeNoteEditArea;
 		return;
 	}
 
-	if( pos.y() > PR_TOP_MARGIN )
+	if (pos.y() > PR_TOP_MARGIN)
 	{
-		bool edit_note = ( pos.y() > noteEditTop() );
+		bool edit_note = (pos.y() > noteEditTop());
 
-		int key_num = getKey( pos.y() );
+		int key_num = getKey(pos.y());
 
 		int x = pos.x();
 
@@ -1968,7 +1968,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 
 			update();
 		}
-		else if( pos.y() < keyAreaBottom() )
+		else if (pos.y() < keyAreaBottom())
 		{
 			// reference to last key needed for both
 			// right click (used for copy all keys on note)
@@ -1979,8 +1979,8 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 			if( me->buttons() == Qt::RightButton )
 			{
 				// right click - tone marker contextual menu
-				m_pianoKeySelected = getKey( pos.y() );
-				m_semiToneMarkerMenu->popup( mapToGlobal( QPoint( pos.x(), pos.y() ) ) );
+				m_pianoKeySelected = getKey(pos.y());
+				m_semiToneMarkerMenu->popup(mapToGlobal(pos));
 			}
 			else if( me->buttons() == Qt::LeftButton )
 			{
@@ -2006,7 +2006,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 			else if( me->buttons() == Qt::RightButton )
 			{
 				// pop menu asking which one they want to edit
-				m_noteEditMenu->popup( mapToGlobal( QPoint( pos.x(), pos.y() ) ) );
+				m_noteEditMenu->popup(mapToGlobal(pos));
 			}
 		}
 	}
@@ -2424,7 +2424,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 	{
 		// When cursor is between note editing area and volume/panning
 		// area show vertical size cursor.
-		if( pos.y() > keyAreaBottom() && pos.y() < noteEditTop() )
+		if (pos.y() > keyAreaBottom() && pos.y() < noteEditTop())
 		{
 			setCursor( Qt::SizeVerCursor );
 			return;
@@ -2465,13 +2465,13 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 		updateStrumPos(me, false, me->modifiers() & Qt::ShiftModifier);
 	}
 
-	if( pos.y() > PR_TOP_MARGIN || m_action != Action::None )
+	if (pos.y() > PR_TOP_MARGIN || m_action != Action::None)
 	{
-		bool edit_note = ( pos.y() > noteEditTop() )
-						&& m_action != Action::SelectNotes;
+		bool edit_note = (pos.y() > noteEditTop())
+			&& m_action != Action::SelectNotes;
 
 
-		int key_num = getKey( pos.y() );
+		int key_num = getKey(pos.y());
 		int x = pos.x();
 
 		// see if they clicked on the keyboard on the left
@@ -2541,18 +2541,15 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 
 			if( me->buttons() & Qt::LeftButton )
 			{
-				vol = qBound<int>( MinVolume,
-								MinVolume +
-								( ( (float)noteEditBottom() ) - ( (float)pos.y() ) ) /
-								( (float)( noteEditBottom() - noteEditTop() ) ) *
-								( MaxVolume - MinVolume ),
-											MaxVolume );
-				pan = qBound<panning_t>( PanningLeft,
-								static_cast<panning_t>(PanningLeft +
-								( (float)( noteEditBottom() - pos.y() ) ) /
-								( (float)( noteEditBottom() - noteEditTop() ) ) *
-								( (float)( PanningRight - PanningLeft ) )),
-										  PanningRight);
+				vol = qBound(MinVolume, static_cast<volume_t>(MinVolume
+					+ static_cast<float>(noteEditBottom() - pos.y())
+					/ static_cast<float>(noteEditBottom() - noteEditTop())
+					* (MaxVolume - MinVolume)), MaxVolume);
+
+				pan = qBound(PanningLeft, static_cast<panning_t>(PanningLeft
+					+ static_cast<float>(noteEditBottom() - pos.y())
+					/ static_cast<float>(noteEditBottom() - noteEditTop())
+					* (PanningRight - PanningLeft)), PanningRight);
 			}
 
 			if( m_noteEditMode == NoteEditMode::Volume )
@@ -2765,9 +2762,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 			if( x < 0 && m_currentPosition > 0 )
 			{
 				x = 0;
-				QCursor::setPos( mapToGlobal( QPoint(
-							m_whiteKeyWidth,
-							pos.y() ) ) );
+				QCursor::setPos(mapToGlobal(QPoint(m_whiteKeyWidth, pos.y())));
 				if( m_currentPosition >= 4 )
 				{
 					m_leftRightScroll->setValue(
@@ -2781,10 +2776,8 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 			else if (x > width() - m_whiteKeyWidth)
 			{
 				x = width() - m_whiteKeyWidth;
-				QCursor::setPos( mapToGlobal( QPoint( width(),
-							pos.y() ) ) );
-				m_leftRightScroll->setValue( m_currentPosition +
-									4 );
+				QCursor::setPos(mapToGlobal(QPoint(width(), pos.y())));
+				m_leftRightScroll->setValue(m_currentPosition + 4);
 			}
 
 			// get tick in which the cursor is posated
@@ -2801,7 +2794,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 			}
 
 
-			int key_num = getKey( pos.y() );
+			int key_num = getKey(pos.y());
 			int visible_keys = ( height() - PR_TOP_MARGIN -
 						PR_BOTTOM_MARGIN -
 						m_notesEditHeight ) /
@@ -2810,16 +2803,14 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 
 			if( key_num <= s_key )
 			{
-				QCursor::setPos( mapToGlobal( QPoint( pos.x(),
-							keyAreaBottom() ) ) );
+				QCursor::setPos(mapToGlobal(QPoint(pos.x(), keyAreaBottom())));
 				m_topBottomScroll->setValue(
 					m_topBottomScroll->value() + 1 );
 				key_num = s_key;
 			}
 			else if( key_num >= s_key + visible_keys )
 			{
-				QCursor::setPos( mapToGlobal( QPoint( pos.x(),
-							PR_TOP_MARGIN ) ) );
+				QCursor::setPos(mapToGlobal(QPoint(pos.x(), PR_TOP_MARGIN)));
 				m_topBottomScroll->setValue(
 					m_topBottomScroll->value() - 1 );
 				key_num = s_key + visible_keys;
@@ -4011,8 +4002,8 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 			{
 				for ( Note * n : nv )
 				{
-					panning_t pan = qBound<panning_t>( PanningLeft, n->getPanning() + static_cast<panning_t>(step), PanningRight );
-					n->setPanning( pan );
+					panning_t pan = qBound(PanningLeft, static_cast<panning_t>(n->getPanning() + step), PanningRight);
+					n->setPanning(pan);
 				}
 				bool allPansEqual = std::all_of( nv.begin(), nv.end(),
 					[nv](const Note *note)

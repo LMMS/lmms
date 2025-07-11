@@ -684,7 +684,7 @@ float *AutomationClip::valuesAfter( const TimePos & _time ) const
 	timeMap::const_iterator v = m_timeMap.lowerBound(_time);
 	auto const nv = std::next(v);
 
-	if( v == m_timeMap.end() || nv == m_timeMap.end() )
+	if (v == m_timeMap.end() || nv == m_timeMap.end())
 	{
 		return nullptr;
 	}
