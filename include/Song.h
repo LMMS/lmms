@@ -103,36 +103,6 @@ public:
 	bool hasErrors();
 	QString errorSummary();
 
-	class PlayPos : public TimePos
-	{
-	public:
-		PlayPos( const int abs = 0 ) :
-			TimePos( abs ),
-			m_currentFrame( 0.0f )
-		{
-		}
-		inline void setCurrentFrame( const float f )
-		{
-			m_currentFrame = f;
-		}
-		inline float currentFrame() const
-		{
-			return m_currentFrame;
-		}
-		inline void setJumped( const bool jumped )
-		{
-			m_jumped = jumped;
-		}
-		inline bool jumped() const
-		{
-			return m_jumped;
-		}
-
-	private:
-		float m_currentFrame;
-		bool m_jumped;
-	};
-
 	void processNextBuffer();
 
 	inline int getLoadingTrackCount() const
@@ -147,7 +117,7 @@ public:
 
 	inline int getMilliseconds(PlayMode playMode) const
 	{
-		return m_elapsedMilliSeconds[static_cast<std::size_t>(playMode)];
+		return 1000 * getFrames() / Engine::audioEngine()->outputSampleRate();
 	}
 
 	inline void setToTime(TimePos const & pos)
@@ -157,8 +127,7 @@ public:
 
 	inline void setToTime(TimePos const & pos, PlayMode playMode)
 	{
-		m_elapsedMilliSeconds[static_cast<std::size_t>(playMode)] = pos.getTimeInMilliseconds(getTempo());
-		getPlayPos(playMode).setTicks(pos.getTicks());
+		getTimeline(playMode).setTicks(pos.getTicks());
 	}
 
 	inline void setToTimeByTicks(tick_t ticks)
@@ -168,8 +137,7 @@ public:
 
 	inline void setToTimeByTicks(tick_t ticks, PlayMode playMode)
 	{
-		m_elapsedMilliSeconds[static_cast<std::size_t>(playMode)] = TimePos::ticksToMilliseconds(ticks, getTempo());
-		getPlayPos(playMode).setTicks(ticks);
+		getTimeline(playMode).setTicks(ticks);
 	}
 
 	inline int getBars() const
@@ -258,19 +226,12 @@ public:
 	}
 
 	PlayMode lastPlayMode() const { return m_lastPlayMode; }
-	inline PlayPos & getPlayPos( PlayMode pm )
+
+	const TimePos& getPlayPos(PlayMode pm) const
 	{
-		return m_playPos[static_cast<std::size_t>(pm)];
+		return getTimeline(pm).getPlayPos();
 	}
-	inline const PlayPos & getPlayPos( PlayMode pm ) const
-	{
-		return m_playPos[static_cast<std::size_t>(pm)];
-	}
-	inline PlayPos & getPlayPos()
-	{
-		return getPlayPos(m_playMode);
-	}
-	inline const PlayPos & getPlayPos() const
+	const TimePos& getPlayPos() const
 	{
 		return getPlayPos(m_playMode);
 	}
@@ -434,8 +395,7 @@ private:
 
 	inline f_cnt_t currentFrame() const
 	{
-		return getPlayPos(m_playMode).getTicks() * Engine::framesPerTick() +
-			getPlayPos(m_playMode).currentFrame();
+		return getTimeline(m_playMode).getTicks() * Engine::framesPerTick() + getTimeline(m_playMode).getFrameOffset();
 	}
 
 	void setPlayPos( tick_t ticks, PlayMode playMode );
@@ -494,15 +454,11 @@ private:
 
 	PlayMode m_playMode;
 	PlayMode m_lastPlayMode;
-	PlayPos m_playPos[PlayModeCount];
+
 	bar_t m_length;
 
 	const MidiClip* m_midiClipToPlay;
 	bool m_loopMidiClip;
-
-	double m_elapsedMilliSeconds[PlayModeCount];
-	tick_t m_elapsedTicks;
-	bar_t m_elapsedBars;
 
 	VstSyncController m_vstSyncController;
     
