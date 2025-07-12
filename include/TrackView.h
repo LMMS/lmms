@@ -48,12 +48,11 @@ class FadeButton;
 class TrackContainerView;
 
 
-const int DEFAULT_SETTINGS_WIDGET_WIDTH = 260;
 const int TRACK_OP_WIDTH = 78;
-// This shaves 150-ish pixels off track buttons,
-// ruled from config: ui.compacttrackbuttons
-const int DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT = 136;
-const int TRACK_OP_WIDTH_COMPACT = TRACK_OP_WIDTH;
+
+const int DEFAULT_TRACK_WIDTH = 338;
+const int COMPACT_TRACK_WIDTH = 214;
+const int MINIMUM_TRACK_WIDTH = 168;
 
 
 class TrackView : public QWidget, public ModelView, public JournallingObject
@@ -104,6 +103,9 @@ public:
 	// Currently instrument track and sample track supports it
 	virtual QMenu * createMixerMenu(QString title, QString newMixerLabel);
 
+	/*! The width of the resize grip in pixels */
+	static constexpr int ResizeGripWidth = 6;
+
 
 public slots:
 	virtual bool close();
@@ -146,7 +148,8 @@ private:
 	{
 		None,
 		Move,
-		Resize
+		ResizeVertical,
+		ResizeHorizontal
 	} ;
 
 	Track * m_track;
@@ -173,6 +176,7 @@ private slots:
 	void muteChanged();
 	void onTrackGripGrabbed();
 	void onTrackGripReleased();
+	void updateWidth(int width);
 } ;
 
 

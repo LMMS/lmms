@@ -25,6 +25,7 @@
 #include "PatternEditor.h"
 
 #include <QAction>
+#include <QDomElement>
 #include <QVBoxLayout>
 
 #include "ClipView.h"
@@ -49,19 +50,17 @@ namespace lmms::gui
 PatternEditor::PatternEditor(PatternStore* ps) :
 	TrackContainerView(ps),
 	m_ps(ps),
-	m_trackHeadWidth(ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt() == 1
-		? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT
-		: DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH),
 	m_maxClipLength(TimePos::ticksPerBar())
 {
 	setModel(ps);
 
-	m_timeLine = new TimeLineWidget(m_trackHeadWidth, 32, pixelsPerBar(),
+	m_timeLine = new TimeLineWidget(getTrackHeadWidth(), 32, pixelsPerBar(),
 		Engine::getSong()->getPlayPos(Song::PlayMode::Pattern),
 		Engine::getSong()->getTimeline(Song::PlayMode::Pattern),
 		m_currentPosition, Song::PlayMode::Pattern, this
 	);
 	connect(m_timeLine, &TimeLineWidget::positionChanged, this, &PatternEditor::updatePosition);
+	connect(this, &TrackContainerView::trackHeadWidthChanged, m_timeLine, [this](int width){ m_timeLine->setXOffset(width); updatePixelsPerBar(); });
 	static_cast<QVBoxLayout*>(layout())->insertWidget(0, m_timeLine);
 
 	connect(m_ps, &PatternStore::trackUpdated,
@@ -134,11 +133,13 @@ void PatternEditor::removeViewsForPattern(int pattern)
 void PatternEditor::saveSettings(QDomDocument& doc, QDomElement& element)
 {
 	MainWindow::saveWidgetState( parentWidget(), element );
+	element.setAttribute("trackheadwidth", getTrackHeadWidth());
 }
 
 void PatternEditor::loadSettings(const QDomElement& element)
 {
 	MainWindow::restoreWidgetState(parentWidget(), element);
+	setTrackHeadWidth(element.attribute("trackheadwidth", QString::number(getTrackHeadWidth())).toInt());
 	updateMaxSteps();
 }
 
@@ -189,6 +190,7 @@ void PatternEditor::dropEvent(QDropEvent* de)
 void PatternEditor::resizeEvent(QResizeEvent* re)
 {
 	updatePixelsPerBar();
+	setMaxTrackHeadWidth(width() - MinPatternWidthPixels - 2 * ClipView::BORDER_WIDTH);
 }
 
 
@@ -205,8 +207,8 @@ void PatternEditor::updatePosition()
 void PatternEditor::updatePixelsPerBar()
 {
 	setPixelsPerBar(m_maxClipLength != 0
-		? (width() - m_trackHeadWidth) * TimePos::ticksPerBar() / m_maxClipLength
-		: (width() - m_trackHeadWidth));
+		? (width() - getTrackHeadWidth()) * TimePos::ticksPerBar() / m_maxClipLength
+		: (width() - getTrackHeadWidth()));
 	m_timeLine->setPixelsPerBar(pixelsPerBar());
 }
 
@@ -287,15 +289,7 @@ PatternEditorWindow::PatternEditorWindow(PatternStore* ps) :
 	connect(m_toolBar, SIGNAL(dragEntered(QDragEnterEvent*)), m_editor, SLOT(dragEnterEvent(QDragEnterEvent*)));
 	connect(m_toolBar, SIGNAL(dropped(QDropEvent*)), m_editor, SLOT(dropEvent(QDropEvent*)));
 
-	// TODO: Use style sheet
-	if (ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt())
-	{
-		setMinimumWidth(TRACK_OP_WIDTH_COMPACT + DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + 2 * ClipView::BORDER_WIDTH + 384);
-	}
-	else
-	{
-		setMinimumWidth(TRACK_OP_WIDTH + DEFAULT_SETTINGS_WIDGET_WIDTH + 2 * ClipView::BORDER_WIDTH + 384);
-	}
+	setMinimumWidth(MINIMUM_TRACK_WIDTH + 2 * ClipView::BORDER_WIDTH + PatternEditor::MinPatternWidthPixels);
 
 	m_playAction->setToolTip(tr("Play/pause current pattern (Space)"));
 	m_stopAction->setToolTip(tr("Stop playback of current pattern (Space)"));
@@ -355,7 +349,7 @@ PatternEditorWindow::PatternEditorWindow(PatternStore* ps) :
 
 QSize PatternEditorWindow::sizeHint() const
 {
-	return {minimumWidth() + 10, 300};
+	return {m_editor->getTrackHeadWidth() + 2 * ClipView::BORDER_WIDTH + PatternEditor::MinPatternWidthPixels, 300};
 }
 
 

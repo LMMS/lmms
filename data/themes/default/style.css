@@ -664,14 +664,12 @@ lmms--gui--TrackLabelButton:pressed {
 lmms--gui--TrackLabelButton:checked {
 	border: 1px solid #485059;
 	background: #1C1F24;
-	background-image: url("resources:track_shadow_p.png");
 	border-radius: none;
 }
 
 lmms--gui--TrackLabelButton:checked:pressed {
 	border: 1px solid #2f353b;
 	background: #0e1012;
-	background-image: url("resources:track_shadow_p.png");
 	font-weight: solid;
 }
 
