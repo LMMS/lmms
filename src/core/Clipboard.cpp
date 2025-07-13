@@ -84,7 +84,7 @@ static std::map<std::string, std::vector<std::string>> mimetypes =
 	}
 
 	bool isAudioFile(const QString& ext)	 { return isType(ext, "samplefile"); }
-	bool isProjectFile(const QString& ext)   { return isType(ext, "midifile"); }
+	bool isProjectFile(const QString& ext)   { return isType(ext, "projectfile"); }
 	bool isPresetFile(const QString& ext)    { return isType(ext, "presetfile"); }
 	bool isSoundFontFile(const QString& ext) { return isType(ext, "soundfontfile"); }
 	bool isPatchFile(const QString& ext)     { return isType(ext, "patchfile"); }

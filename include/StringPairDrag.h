@@ -28,7 +28,6 @@
 
 #include <QDrag>
 #include <QDragEnterEvent>
-#include <QDropEvent>
 #include <QMimeData>
 
 #include "lmms_export.h"
