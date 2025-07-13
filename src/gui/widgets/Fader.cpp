@@ -122,7 +122,7 @@ void Fader::adjustByDecibelDelta(float value)
 	adjustModelByDBDelta(value);
 
 	updateTextFloat();
-	s_textFloat->setVisibilityTimeOut(1000);
+	s_textFloat->showWithTimeout(1000);
 }
 
 void Fader::adjustByDialog()

@@ -85,6 +85,7 @@ FlangerControlsDialog::FlangerControlsDialog( FlangerControls *controls ) :
 	knobLayout->addWidget(whiteNoiseKnob);
 
 	auto invertCb = new LedCheckBox(tr("Invert"), this);
+	invertCb->setModel(&controls->m_invertFeedbackModel);
 	
 	mainLayout->addWidget(invertCb, 0, Qt::AlignLeft);
 }

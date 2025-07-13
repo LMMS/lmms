@@ -338,7 +338,7 @@ void FloatModelEditorBase::wheelEvent(QWheelEvent * we)
 
 	s_textFloat->setText(displayValue());
 	s_textFloat->moveGlobal(this, QPoint(width() + 2, 0));
-	s_textFloat->setVisibilityTimeOut(1000);
+	s_textFloat->showWithTimeout(1000);
 
 	emit sliderMoved(model()->value());
 }

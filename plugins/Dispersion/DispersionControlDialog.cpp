@@ -24,14 +24,14 @@
 
 
 #include "DispersionControlDialog.h"
-#include "DispersionControls.h"
 
+#include <QHBoxLayout>
+
+#include "AutomatableButton.h"
+#include "DispersionControls.h"
 #include "embed.h"
 #include "Knob.h"
 #include "LcdSpinBox.h"
-#include "PixmapButton.h"
-
-#include <QHBoxLayout>
 
 
 namespace lmms::gui
@@ -42,40 +42,36 @@ DispersionControlDialog::DispersionControlDialog(DispersionControls* controls) :
 	EffectControlDialog(controls)
 {
 	setAutoFillBackground(true);
-	QPalette pal;
-	pal.setBrush(backgroundRole(), PLUGIN_NAME::getIconPixmap("artwork"));
-	setPalette(pal);
-
 	auto layout = new QHBoxLayout(this);
+	layout->setSpacing(5);
 
-	LcdSpinBox * m_amountBox = new LcdSpinBox(3, this, "Amount");
-	m_amountBox->setModel(&controls->m_amountModel);
-	m_amountBox->setLabel(tr("AMOUNT"));
-	m_amountBox->setToolTip(tr("Number of all-pass filters"));
+	auto amountBox = new LcdSpinBox(3, this, "Amount");
+	amountBox->setModel(&controls->m_amountModel);
+	amountBox->setLabel(tr("AMOUNT"));
+	amountBox->setToolTip(tr("Number of all-pass filters"));
+	layout->addWidget(amountBox);
 	
-	Knob * freqKnob = new Knob(KnobType::Bright26, tr("FREQ"), this);
+	auto freqKnob = new Knob(KnobType::Bright26, tr("FREQ"), this);
 	freqKnob->setModel(&controls->m_freqModel);
-	freqKnob->setHintText(tr("Frequency:") , " Hz");
+	freqKnob->setHintText(tr("Frequency:") , tr("Hz"));
+	layout->addWidget(freqKnob);
 	
-	Knob * resoKnob = new Knob(KnobType::Bright26, tr("RESO"), this);
+	auto resoKnob = new Knob(KnobType::Bright26, tr("RESO"), this);
 	resoKnob->setModel(&controls->m_resoModel);
-	resoKnob->setHintText(tr("Resonance:") , " octaves");
+	resoKnob->setHintText(tr("Resonance:") , tr("octaves"));
+	layout->addWidget(resoKnob);
 	
-	Knob * feedbackKnob = new Knob(KnobType::Bright26, tr("FEED"), this);
+	auto feedbackKnob = new Knob(KnobType::Bright26, tr("FEED"), this);
 	feedbackKnob->setModel(&controls->m_feedbackModel);
 	feedbackKnob->setHintText(tr("Feedback:") , "");
+	layout->addWidget(feedbackKnob);
 	
-	PixmapButton * dcButton = new PixmapButton(this, tr("DC Offset Removal"));
-	dcButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("dc_active"));
-	dcButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("dc_inactive"));
+	auto dcButton = new AutomatableButton(this, tr("DC Offset Removal"));
 	dcButton->setCheckable(true);
+	dcButton->setText(tr("DC"));
 	dcButton->setModel(&controls->m_dcModel);
 	dcButton->setToolTip(tr("Remove DC Offset"));
-
-	layout->addWidget(m_amountBox);
-	layout->addWidget(freqKnob);
-	layout->addWidget(resoKnob);
-	layout->addWidget(feedbackKnob);
+	dcButton->setObjectName("btn");
 	layout->addWidget(dcButton);
 }
 
