@@ -777,7 +777,7 @@ bool MainWindow::saveProject()
 {
 	if( Engine::getSong()->projectFileName() == "" )
 	{
-		return( saveProjectAs() );
+		return saveProjectAs();
 	}
 	else if( this->guiSaveProject() )
 	{
