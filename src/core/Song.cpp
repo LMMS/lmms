@@ -396,7 +396,14 @@ void Song::processAutomations(const TrackList &tracklist, TimePos timeStart, fpp
 		if (p->isRecording() && relTime >= 0 && relTime < p->length())
 		{
 			const AutomatableModel* recordedModel = p->firstObject();
-			p->recordValue(relTime, recordedModel->value<float>());
+			// The automation system really needs to be reworked.
+			// For whatever reason, the values in an automation clip are stored in un-un-scaled format, so if you
+			// are automating a log knob, when you draw an curve, the values being stored are not the actual values the
+			// knob will take, but instead the unscaled version of the unscaled numbers. The tooltip shows the number you expect, but if you double-click,
+			// you can see that the true values are stored by their inverse scaled value....which is wrong, since they weren't scaled in the first place...?
+			// Anyhow, in the meantime before we redo the automation system, when recording automations, we have to get the inverseScaledValue
+			// and store that so that when playing it back, it scales the value correctly.
+			p->recordValue(relTime, recordedModel->inverseScaledValue(recordedModel->value<float>()));
 
 			recordedModels << recordedModel;
 		}
