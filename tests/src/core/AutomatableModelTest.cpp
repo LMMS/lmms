@@ -104,8 +104,8 @@ private slots: // tests
 
 		resetChanged();
 		BoolModel m3(false);
-		m1.setValue(1.f); // true
-		m2.setValue(1.f); // true
+		m1.setValue(1.f);
+		m2.setValue(1.f);
 		m1.linkToModel(&m2);
 		QVERIFY(m1.value());
 		QVERIFY(m2.value());

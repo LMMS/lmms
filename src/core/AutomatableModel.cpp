@@ -441,11 +441,12 @@ AutomatableModel* AutomatableModel::getLastLinkedModel() const
 
 bool AutomatableModel::isLinkedToModel(AutomatableModel* model) const
 {
-	for (auto next = m_nextLink; ; next = next->m_nextLink)
+	if (model == this) { return true; }
+	for (auto next = m_nextLink; next != this; next = next->m_nextLink)
 	{
 		if (next == model) { return true; }
-		if (next == this) { return false; }
 	}
+	return false;
 }
 
 size_t AutomatableModel::countLinks() const
@@ -511,6 +512,8 @@ void AutomatableModel::setControllerConnection( ControllerConnection* c )
 
 float AutomatableModel::controllerValue( int frameOffset ) const
 {
+	assert(m_controllerConnection != nullptr);
+
 	float v = 0;
 	switch (m_scaleType)
 	{
@@ -713,9 +716,16 @@ float AutomatableModel::globalAutomationValueAt( const TimePos& time )
 
 void AutomatableModel::setUseControllerValue(bool b)
 {
-	if (m_useControllerValue == b) { return; }
-	m_useControllerValue = b;
-	if (m_controllerConnection) { emit dataChanged(); }
+	if (b)
+	{
+		m_useControllerValue = true;
+		emit dataChanged();
+	}
+	else if (m_controllerConnection && m_useControllerValue)
+	{
+		m_useControllerValue = false;
+		emit dataChanged();
+	}
 }
 
 float FloatModel::getRoundedValue() const

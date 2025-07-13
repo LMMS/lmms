@@ -163,7 +163,6 @@ public:
 				}
 			}
 		}
-
 		return castValue<T>( m_value );
 	}
 
