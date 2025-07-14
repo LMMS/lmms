@@ -40,7 +40,7 @@ namespace lmms
 {
 
 /**
-	Worker contain
+	Worker container
 */
 class Lv2Worker
 {
