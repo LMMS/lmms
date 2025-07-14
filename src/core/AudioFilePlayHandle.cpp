@@ -59,7 +59,7 @@ void AudioFilePlayHandle::play(SampleFrame* dst)
 	const auto framesPerPeriod = Engine::audioEngine()->framesPerPeriod();
 	const auto ratio = static_cast<double>(Engine::audioEngine()->outputSampleRate()) / m_audioFile.sampleRate();
 
-	auto sink = InterleavedBufferView<float>{&dst[0][0], DEFAULT_CHANNELS, framesPerPeriod};
+	auto sink = InterleavedBufferView<float, DEFAULT_CHANNELS>{&dst[0][0], framesPerPeriod};
 
 	if (!needsResampling && !needsChannelConversion)
 	{
@@ -86,8 +86,8 @@ void AudioFilePlayHandle::play(SampleFrame* dst)
 			output += result.outputFramesGenerated * DEFAULT_CHANNELS;
 			outputFrames -= result.outputFramesGenerated;
 
-			m_channelConvertBufferView = {input, DEFAULT_CHANNELS, inputFrames};
-			sink = {output, DEFAULT_CHANNELS, outputFrames};
+			m_channelConvertBufferView = {input, inputFrames};
+			sink = {output, outputFrames};
 		}
 		else if (!m_sourceBufferView.empty())
 		{
@@ -109,8 +109,8 @@ void AudioFilePlayHandle::play(SampleFrame* dst)
 			input += framesToConvert * m_audioFile.channels();
 			inputFrames -= framesToConvert;
 
-			m_sourceBufferView = {input, m_audioFile.channels(), inputFrames};
-			m_channelConvertBufferView = {output, DEFAULT_CHANNELS, framesToConvert};
+			m_sourceBufferView = {input, inputFrames};
+			m_channelConvertBufferView = {output, framesToConvert};
 		}
 		else
 		{
@@ -124,7 +124,7 @@ void AudioFilePlayHandle::play(SampleFrame* dst)
 			}
 
 			m_framesRead += framesRead;
-			m_sourceBufferView = {m_sourceBuffer.data(), m_audioFile.channels(), framesRead};
+			m_sourceBufferView = {m_sourceBuffer.data(), framesRead};
 		}
 	}
 }

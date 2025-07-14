@@ -60,8 +60,8 @@ private:
 	AudioResampler m_audioResampler;
 	std::vector<float> m_sourceBuffer;
 	std::vector<float> m_channelConvertBuffer;
-	InterleavedBufferView<float> m_sourceBufferView;
-	InterleavedBufferView<float> m_channelConvertBufferView;
+	InterleavedBufferView<float, DEFAULT_CHANNELS> m_sourceBufferView;
+	InterleavedBufferView<float, DEFAULT_CHANNELS> m_channelConvertBufferView;
 	f_cnt_t m_framesRead = 0;
 };
 
