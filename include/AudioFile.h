@@ -80,7 +80,7 @@ public:
 
 	//! Write audio data to the audio file from @p src .
 	//! @return The number of audio frames written.
-	[[nodiscard]] auto write(InterleavedBufferView<float> src) -> f_cnt_t;
+	[[nodiscard]] auto write(InterleavedBufferView<const float> src) -> f_cnt_t;
 
 	//! Read audio data from the audio file into @p dst .
 	//! @return The number of audio frames read.

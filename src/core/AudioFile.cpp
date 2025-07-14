@@ -82,7 +82,7 @@ AudioFile& AudioFile::operator=(AudioFile&& other) noexcept
 	return *this;
 }
 
-auto AudioFile::write(InterleavedBufferView<float> src) -> f_cnt_t
+auto AudioFile::write(InterleavedBufferView<const float> src) -> f_cnt_t
 {
 	if (src.channels() != m_info.channels) { throw std::invalid_argument{"Invalid channel count"}; }
 	return sf_writef_float(m_sndfile, src.data(), src.frames());
