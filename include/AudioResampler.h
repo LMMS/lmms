@@ -120,9 +120,7 @@ public:
 	struct Result
 	{
 		f_cnt_t inputFramesGenerated;
-		f_cnt_t inputFramesUsed;
-		f_cnt_t outputFramesGenerated;
-		f_cnt_t outputFramesConsumed;
+		f_cnt_t outputFramesWritten;
 	};
 
 	//! Specifies how the resampled output should be written.
@@ -139,7 +137,7 @@ public:
 		, m_inputBuffer(bufferSize(channels))
 		, m_outputBuffer(bufferSize(channels))
 		, m_inputWindow({m_inputBuffer.data(), channels, 0})
-		, m_outputWindow({m_outputBuffer.data(), channels, m_outputBuffer.size() / channels})
+		, m_outputWindow({m_outputBuffer.data(), channels, 0})
 	{
 	}
 
@@ -154,48 +152,47 @@ public:
 		auto resampleResult = Result{};
 		while (!output.empty())
 		{
-			if (m_inputWindow.empty())
+			if (!m_outputWindow.empty())
 			{
-				const auto rendered = input(
-					{m_inputBuffer.data(), m_resampler.channels(), m_inputBuffer.size() / m_resampler.channels()});
+				const auto numFramesToWrite = std::min(m_outputWindow.frames(), output.frames());
 
-				resampleResult.inputFramesGenerated += rendered;
+				if constexpr (writeMode == WriteMode::Copy)
+				{
+					std::copy_n(m_outputWindow.data(), numFramesToWrite * m_resampler.channels(), output.data());
+				}
+				else if constexpr (writeMode == WriteMode::Mix)
+				{
+					std::transform(m_outputWindow.data(),
+						m_outputWindow.data() + numFramesToWrite * m_resampler.channels(), output.data(),
+						output.data(), std::plus{});
+				}
+
+				m_outputWindow = {m_outputWindow.data() + numFramesToWrite * m_resampler.channels(),
+					m_resampler.channels(), m_outputWindow.frames() - numFramesToWrite};
+
+				output = {output.data() + numFramesToWrite * m_resampler.channels(), m_resampler.channels(),
+					output.frames() - numFramesToWrite};
+
+				resampleResult.outputFramesWritten += numFramesToWrite;
+			}
+			else if (!m_inputWindow.empty())
+			{
+				const auto result = m_resampler.process(m_inputWindow,
+					{m_outputBuffer.data(), m_resampler.channels(), m_outputBuffer.size() / m_resampler.channels()});
+
+				m_inputWindow = {m_inputWindow.data() + result.inputFramesUsed * m_resampler.channels(),
+					m_resampler.channels(), m_inputWindow.frames() - result.inputFramesUsed};
+
+				m_outputWindow = {m_outputBuffer.data(), m_resampler.channels(), result.outputFramesGenerated};
+			}
+			else
+			{
+				const auto rendered = input({m_inputBuffer.data(), m_resampler.channels(), m_inputBuffer.size() / m_resampler.channels()});
+				if (rendered == 0) { break; }
+
 				m_inputWindow = {m_inputBuffer.data(), m_resampler.channels(), rendered};
+				resampleResult.inputFramesGenerated += rendered;
 			}
-
-			if (m_outputWindow.empty())
-			{
-				m_outputWindow
-					= {m_outputBuffer.data(), m_resampler.channels(), m_outputBuffer.size() / m_resampler.channels()};
-			}
-
-			const auto result = m_resampler.process(m_inputWindow, m_outputWindow);
-			const auto outputFrames = std::min(result.outputFramesGenerated, output.frames());
-
-			if (m_inputWindow.empty() && outputFrames == 0) { break; }
-
-			if constexpr (writeMode == WriteMode::Copy)
-			{
-				std::copy_n(m_outputWindow.data(), outputFrames * m_outputWindow.channels(), output.data());
-			}
-			else if constexpr (writeMode == WriteMode::Mix)
-			{
-				std::transform(m_outputWindow.data(), m_outputWindow.data() + outputFrames * m_outputWindow.channels(),
-					output.data(), output.data(), std::plus{});
-			}
-
-			m_inputWindow = {m_inputWindow.data() + result.inputFramesUsed * m_resampler.channels(),
-				m_resampler.channels(), m_inputWindow.frames() - result.inputFramesUsed};
-
-			m_outputWindow = {m_outputWindow.data() + outputFrames * m_resampler.channels(), m_resampler.channels(),
-				m_outputWindow.frames() - outputFrames};
-
-			output = {output.data() + outputFrames * m_resampler.channels(), m_resampler.channels(),
-				output.frames() - outputFrames};
-
-			resampleResult.inputFramesUsed += result.inputFramesUsed;
-			resampleResult.outputFramesGenerated += result.outputFramesGenerated;
-			resampleResult.outputFramesConsumed += outputFrames;
 		}
 
 		return resampleResult;

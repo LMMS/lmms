@@ -126,7 +126,7 @@ bool Sample::play(SampleFrame* dst, PlaybackState* state, size_t numFrames, Loop
 		},
 		{&dst[0][0], DEFAULT_CHANNELS, numFrames});
 
-	return result.outputFramesGenerated > 0;
+	return result.outputFramesWritten > 0;
 }
 
 f_cnt_t Sample::render(SampleFrame* dst, f_cnt_t size, PlaybackState* state, Loop loop) const
