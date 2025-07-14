@@ -163,34 +163,27 @@ public:
 				else if constexpr (writeMode == WriteMode::Mix)
 				{
 					std::transform(m_outputWindow.data(),
-						m_outputWindow.data() + numFramesToWrite * m_resampler.channels(), output.data(),
-						output.data(), std::plus{});
+						m_outputWindow.data() + numFramesToWrite * m_resampler.channels(), output.data(), output.data(),
+						std::plus{});
 				}
 
-				m_outputWindow = {m_outputWindow.data() + numFramesToWrite * m_resampler.channels(),
-					m_resampler.channels(), m_outputWindow.frames() - numFramesToWrite};
-
-				output = {output.data() + numFramesToWrite * m_resampler.channels(), m_resampler.channels(),
-					output.frames() - numFramesToWrite};
-
+				m_outputWindow = m_outputWindow.subspan(numFramesToWrite, m_outputWindow.frames() - numFramesToWrite);
+				output = output.subspan(numFramesToWrite, output.frames() - numFramesToWrite);
 				resampleResult.outputFramesWritten += numFramesToWrite;
 			}
 			else if (!m_inputWindow.empty())
 			{
-				const auto result = m_resampler.process(m_inputWindow,
-					{m_outputBuffer.data(), m_resampler.channels(), m_outputBuffer.size() / m_resampler.channels()});
-
-				m_inputWindow = {m_inputWindow.data() + result.inputFramesUsed * m_resampler.channels(),
-					m_resampler.channels(), m_inputWindow.frames() - result.inputFramesUsed};
-
-				m_outputWindow = {m_outputBuffer.data(), m_resampler.channels(), result.outputFramesGenerated};
+				const auto result = m_resampler.process(m_inputWindow, outputBufferView());
+				m_inputWindow
+					= m_inputWindow.subspan(result.inputFramesUsed, m_inputWindow.frames() - result.inputFramesUsed);
+				m_outputWindow = outputBufferView().subspan(0, result.outputFramesGenerated);
 			}
 			else
 			{
-				const auto rendered = input({m_inputBuffer.data(), m_resampler.channels(), m_inputBuffer.size() / m_resampler.channels()});
+				const auto rendered = input(inputBufferView());
 				if (rendered == 0) { break; }
 
-				m_inputWindow = {m_inputBuffer.data(), m_resampler.channels(), rendered};
+				m_inputWindow = inputBufferView().subspan(0, rendered);
 				resampleResult.inputFramesGenerated += rendered;
 			}
 		}
@@ -212,6 +205,16 @@ private:
 	{
 		constexpr auto BufferSize = 64 / sizeof(float);
 		return std::max(BufferSize, static_cast<std::size_t>(channels));
+	}
+
+	auto inputBufferView() -> InterleavedBufferView<float>
+	{
+		return {m_inputBuffer.data(), m_resampler.channels(), m_inputBuffer.size() / m_resampler.channels()};
+	}
+
+	auto outputBufferView() -> InterleavedBufferView<float>
+	{
+		return {m_outputBuffer.data(), m_resampler.channels(), m_outputBuffer.size() / m_resampler.channels()};
 	}
 
 	AudioResampler m_resampler;

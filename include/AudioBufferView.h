@@ -153,6 +153,14 @@ public:
 		}
 	}
 
+	//! @return a subview at the given frame offset `offset` with a frame count of `frames`
+	constexpr auto subspan(f_cnt_t offset, f_cnt_t frames) const
+	{
+		assert(offset <= this->m_frames);
+		assert(offset + frames <= this->m_frames);
+		return InterleavedBufferView<SampleT>{this->m_data + offset * this->channels(), this->channels(), frames};
+	}
+
 	/**
 	 * @return pointer to the frame at the given index.
 	 * The size of the frame is `channels()`.
