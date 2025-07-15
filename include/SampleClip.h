@@ -32,6 +32,7 @@
 namespace lmms
 {
 
+class ThreadedExportManager;
 class SampleBuffer;
 
 namespace gui
@@ -95,6 +96,8 @@ protected:
 	SampleClip( const SampleClip& orig );
 
 private:
+	void exportSampleBuffer(const QString& fileName);
+
 	Sample m_sample;
 	BoolModel m_recordModel;
 	bool m_isPlaying;

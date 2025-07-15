@@ -78,6 +78,7 @@ set(LMMS_SRCS
 	core/SerializingObject.cpp
 	core/Song.cpp
 	core/TempoSyncKnobModel.cpp
+	core/ThreadedExportManager.cpp
 	core/ThreadPool.cpp
 	core/Timeline.cpp
 	core/TimePos.cpp
@@ -106,6 +107,7 @@ set(LMMS_SRCS
 	core/audio/AudioPulseAudio.cpp
 	core/audio/AudioSampleRecorder.cpp
 	core/audio/AudioSdl.cpp
+	core/audio/FlacExporter.cpp
 
 	core/lv2/Lv2Basics.cpp
 	core/lv2/Lv2ControlBase.cpp
