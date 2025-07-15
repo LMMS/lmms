@@ -26,8 +26,8 @@
 #ifndef LMMS_DISPERSION_H
 #define LMMS_DISPERSION_H
 
+#include "AudioPlugin.h"
 #include "DispersionControls.h"
-#include "Effect.h"
 
 #include "lmms_math.h"
 
@@ -36,13 +36,11 @@ namespace lmms
 
 constexpr inline int MAX_DISPERSION_FILTERS = 999;
 
-class DispersionEffect : public Effect
+class DispersionEffect : public DefaultEffect
 {
 public:
 	DispersionEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
 	~DispersionEffect() override = default;
-
-	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
 
 	EffectControls* controls() override
 	{
@@ -52,6 +50,8 @@ public:
 	void runDispersionAP(const int filtNum, const float apCoeff1, const float apCoeff2, std::array<sample_t, 2> &put);
 
 private:
+	ProcessStatus processImpl(InterleavedBufferView<float, 2> inOut) override;
+
 	DispersionControls m_dispersionControls;
 	
 	float m_sampleRate;

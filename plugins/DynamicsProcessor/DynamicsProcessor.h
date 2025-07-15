@@ -27,7 +27,7 @@
 #ifndef DYNPROC_H
 #define DYNPROC_H
 
-#include "Effect.h"
+#include "AudioPlugin.h"
 #include "DynamicsProcessorControls.h"
 
 namespace lmms
@@ -36,23 +36,22 @@ namespace lmms
 class RmsHelper;
 
 
-class DynProcEffect : public Effect
+class DynProcEffect : public DefaultEffect
 {
 public:
 	DynProcEffect( Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key );
 	~DynProcEffect() override;
 
-	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
-	void processBypassedImpl() override;
-
 	EffectControls * controls() override
 	{
 		return( &m_dpControls );
 	}
 
-
 private:
+	ProcessStatus processImpl(InterleavedBufferView<float, 2> inOut) override;
+	void processBypassedImpl() override;
+
 	void calcAttack();
 	void calcRelease();
 

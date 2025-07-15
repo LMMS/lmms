@@ -351,8 +351,6 @@ enum RemoteMessageIDs
 	IdStartProcessing,
 	IdProcessingDone,
 	IdChangeSharedMemoryKey,
-	IdChangeInputCount,
-	IdChangeOutputCount,
 	IdChangeInputOutputCount,
 	IdShowUI,
 	IdHideUI,
