@@ -67,18 +67,6 @@ SampleClip::SampleClip(Track* _track, Sample sample, bool isPlaying)
 	//care about Clip position
 	connect( this, SIGNAL(positionChanged()), this, SLOT(updateTrackClips()));
 
-	switch( getTrack()->trackContainer()->type() )
-	{
-		case TrackContainer::Type::Pattern:
-			setResizable(false);
-			break;
-
-		case TrackContainer::Type::Song:
-			// move down
-		default:
-			setResizable(true);
-			break;
-	}
 	updateTrackClips();
 }
 
@@ -117,18 +105,6 @@ SampleClip::SampleClip(const SampleClip& orig) :
 	//care about Clip position
 	connect( this, SIGNAL(positionChanged()), this, SLOT(updateTrackClips()));
 
-	switch( getTrack()->trackContainer()->type() )
-	{
-		case TrackContainer::Type::Pattern:
-			setResizable(false);
-			break;
-
-		case TrackContainer::Type::Song:
-			// move down
-		default:
-			setResizable(true);
-			break;
-	}
 	updateTrackClips();
 }
 
@@ -251,8 +227,7 @@ void SampleClip::setIsPlaying(bool isPlaying)
 void SampleClip::updateLength()
 {
 	// If the clip has already been manually resized, don't automatically resize it.
-	// Unless we are in a pattern, where you can't resize stuff manually
-	if (getAutoResize() || !getResizable())
+	if (getAutoResize())
 	{
 		changeLength(sampleLength());
 		setStartTimeOffset(0);
