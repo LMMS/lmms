@@ -55,6 +55,7 @@
 #include "embed.h"
 #include "CaptionMenu.h"
 #include "ConfigManager.h"
+#include "DeprecationHelper.h"
 #include "KeyboardShortcuts.h"
 #include "SimpleTextFloat.h"
 
@@ -173,7 +174,7 @@ void Fader::contextMenuEvent(QContextMenuEvent* ev)
 
 void Fader::mouseMoveEvent(QMouseEvent* mouseEvent)
 {
-	const int localY = mouseEvent->y();
+	const int localY = position(mouseEvent).y();
 
 	setVolumeByLocalPixelValue(localY);
 
@@ -187,6 +188,8 @@ void Fader::mouseMoveEvent(QMouseEvent* mouseEvent)
 
 void Fader::mousePressEvent(QMouseEvent* mouseEvent)
 {
+	const auto pos = position(mouseEvent);
+
 	if (mouseEvent->button() == Qt::LeftButton &&
 			!(mouseEvent->modifiers() & KBD_COPY_MODIFIER))
 	{
@@ -197,7 +200,7 @@ void Fader::mousePressEvent(QMouseEvent* mouseEvent)
 			thisModel->saveJournallingState(false);
 		}
 
-		const int localY = mouseEvent->y();
+		const int localY = pos.y();
 		const auto knobLowerPosY = calculateKnobPosYFromModel();
 		const auto knobUpperPosY = knobLowerPosY - m_knobSize.height();
 

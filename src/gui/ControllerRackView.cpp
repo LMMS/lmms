@@ -169,13 +169,13 @@ void ControllerRackView::addController(Controller* controller)
 	connect(controllerView, &ControllerView::removedController, this, &ControllerRackView::deleteController, Qt::QueuedConnection);
 
 	auto moveUpAction = new QAction(controllerView);
-	moveUpAction->setShortcut(combine(Qt::Key_Up, Qt::AltModifier));
+	moveUpAction->setShortcut(keySequence(Qt::Key_Up, Qt::AltModifier));
 	moveUpAction->setShortcutContext(Qt::WidgetShortcut);
 	connect(moveUpAction, &QAction::triggered, controllerView, &ControllerView::moveUp);
 	controllerView->addAction(moveUpAction);
 
 	auto moveDownAction = new QAction(controllerView);
-	moveDownAction->setShortcut(combine(Qt::Key_Down, Qt::AltModifier));
+	moveDownAction->setShortcut(keySequence(Qt::Key_Down, Qt::AltModifier));
 	moveDownAction->setShortcutContext(Qt::WidgetShortcut);
 	connect(moveDownAction, &QAction::triggered, controllerView, &ControllerView::moveDown);
 	controllerView->addAction(moveDownAction);

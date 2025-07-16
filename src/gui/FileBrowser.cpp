@@ -44,6 +44,7 @@
 #include "AudioEngine.h"
 #include "ConfigManager.h"
 #include "DataFile.h"
+#include "DeprecationHelper.h"
 #include "Engine.h"
 #include "FileRevealer.h"
 #include "FileSearch.h"
@@ -762,8 +763,10 @@ QList<QAction*> FileBrowserTreeWidget::getContextActions(FileItem* file, bool so
 
 void FileBrowserTreeWidget::mousePressEvent(QMouseEvent * me )
 {
+	const auto pos = position(me);
+
 	// Forward the event
-	QTreeWidgetItem * i = itemAt(me->pos());
+	QTreeWidgetItem* i = itemAt(pos);
 	QTreeWidget::mousePressEvent(me);
 	// QTreeWidget handles right clicks for us, so we only care about left clicks
 	if(me->button() != Qt::LeftButton) { return; }
@@ -771,13 +774,13 @@ void FileBrowserTreeWidget::mousePressEvent(QMouseEvent * me )
 	if (i)
 	{
 		// TODO: Restrict to visible selection
-//		if ( _me->x() > header()->cellPos( header()->mapToActual( 0 ) )
+//		if ( pos.x() > header()->cellPos( header()->mapToActual( 0 ) )
 //			+ treeStepSize() * ( i->depth() + ( rootIsDecorated() ?
 //						1 : 0 ) ) + itemMargin() ||
-//				_me->x() < header()->cellPos(
+//				pos.x() < header()->cellPos(
 //						header()->mapToActual( 0 ) ) )
 //		{
-			m_pressPos = me->pos();
+			m_pressPos = pos;
 			m_mousePressed = true;
 //		}
 	}
@@ -871,9 +874,7 @@ void FileBrowserTreeWidget::stopPreview()
 
 void FileBrowserTreeWidget::mouseMoveEvent( QMouseEvent * me )
 {
-	if( m_mousePressed == true &&
-		( m_pressPos - me->pos() ).manhattanLength() >
-					QApplication::startDragDistance() )
+	if (m_mousePressed && (m_pressPos - position(me)).manhattanLength() > QApplication::startDragDistance())
 	{
 		// make sure any playback is stopped
 		mouseReleaseEvent( nullptr );

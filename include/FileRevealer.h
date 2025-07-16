@@ -48,6 +48,11 @@ public:
 	 */
 	static void openDir(const QFileInfo item);
 
+	static void openDir(const QString& itemPath)
+	{
+		openDir(QFileInfo(itemPath));
+	}
+
 	/**
 	 * @brief Checks whether the file manager supports selecting a specific file.
 	 * @return True if selection is supported, otherwise false.
@@ -59,6 +64,11 @@ public:
 	 * @param item The QFileInfo object representing the file to reveal.
 	 */
 	static void reveal(const QFileInfo item);
+
+	static void reveal(const QString& itemPath)
+	{
+		reveal(QFileInfo(itemPath));
+	}
 
 private:
 	static bool s_canSelect;
