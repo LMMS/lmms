@@ -1,7 +1,7 @@
 /*
  * LinkedModelGroupViews.h - view for groups of linkable models
  *
- * Copyright (c) 2019-2019 Johannes Lorenz <j.git$$$lorenz-ho.me, $$$=@>
+ * Copyright (c) 2019-2024 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -28,6 +28,8 @@
 #include <cstddef>
 #include <memory>
 #include <QWidget>
+
+class QVBoxLayout;
 
 namespace lmms
 {
@@ -83,11 +85,14 @@ protected:
 
 	void removeFocusFromSearchBar();
 
+	const LinkedModelGroup* model() const { return m_model; }
+
 private:
 	class LinkedModelGroup* m_model;
 
 	//! column number in surrounding grid in LinkedModelGroupsView
 	std::size_t m_colNum;
+	QVBoxLayout* m_vbox;
 	class ControlLayout* m_layout;
 	std::map<std::string, std::unique_ptr<class Control>> m_widgets;
 };

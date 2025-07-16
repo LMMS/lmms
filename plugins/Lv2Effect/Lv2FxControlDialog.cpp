@@ -36,6 +36,7 @@ Lv2FxControlDialog::Lv2FxControlDialog(Lv2FxControls *controls) :
 	EffectControlDialog(controls),
 	Lv2ViewBase(this, controls)
 {
+	setMinimumSize(440, 60);
 	if (m_reloadPluginButton) {
 		connect(m_reloadPluginButton, &QPushButton::clicked,
 				this, [this](){ lv2Controls()->reload(); });
@@ -78,6 +79,14 @@ void Lv2FxControlDialog::hideEvent(QHideEvent *event)
 {
 	closeHelpWindow();
 	QWidget::hideEvent(event);
+}
+
+
+
+
+QSize Lv2FxControlDialog::sizeHint() const
+{
+	return Lv2ViewBase::uiWidgetSize();
 }
 
 

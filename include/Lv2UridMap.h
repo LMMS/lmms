@@ -1,7 +1,7 @@
 /*
  * Lv2UridMap.cpp - Lv2UridMap class
  *
- * Copyright (c) 2019 Johannes Lorenz <j.git$$$lorenz-ho.me, $$$=@>
+ * Copyright (c) 2019-2024 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -63,6 +63,8 @@ public:
 	LV2_URID map(const char* uri);
 	//! unmap feature function
 	const char* unmap(LV2_URID urid);
+	//! debug dumping
+	void dump();
 
 	// access the features
 	LV2_URID_Map* mapFeature() { return &m_mapFeature; }

@@ -66,7 +66,7 @@ public:
 	//! Mark option as supported
 	static void supportOption(LV2_URID key);
 
-	//! Initialize an option
+	//! Initialize an option from Cache ID
 	template<typename Opt, typename Arg>
 	void initOption(Lv2UridCache::Id key, Arg&& value,
 			LV2_Options_Context context = LV2_OPTIONS_INSTANCE,
@@ -88,7 +88,7 @@ public:
 
 private:
 	//! Initialize an option internally
-	void initOption(LV2_URID key,
+	void initOption(LV2_URID keyAsUrid,
 		uint32_t size,
 		LV2_URID type,
 		std::shared_ptr<void> value,
