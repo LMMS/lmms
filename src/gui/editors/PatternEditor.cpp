@@ -147,10 +147,14 @@ void PatternEditor::loadSettings(const QDomElement& element)
 
 void PatternEditor::dropEvent(QDropEvent* de)
 {
-	QString type = StringPairDrag::decodeKey( de );
+	Clipboard::DataType type = StringPairDrag::decodeKey(de);
 	QString value = StringPairDrag::decodeValue( de );
 
-	if( type.left( 6 ) == "track_" )
+	if (type == Clipboard::DataType::InstrumentTrack
+		|| type == Clipboard::DataType::PatternTrack
+		|| type == Clipboard::DataType::SampleTrack
+		|| type == Clipboard::DataType::AutomationTrack
+		|| type == Clipboard::DataType::HiddenAutomationTrack)
 	{
 		DataFile dataFile( value.toUtf8() );
 		Track * t = Track::create( dataFile.content().firstChild().toElement(), model() );
