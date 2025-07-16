@@ -55,12 +55,14 @@
 #include "KeyboardShortcuts.h"
 #include "MainWindow.h"
 #include "PatternStore.h"
+#include "PathUtil.h"
 #include "PluginFactory.h"
 #include "PresetPreviewPlayHandle.h"
 #include "Sample.h"
 #include "SampleClip.h"
 #include "SampleLoader.h"
 #include "SamplePlayHandle.h"
+#include "AudioFilePlayHandle.h"
 #include "SampleTrack.h"
 #include "Song.h"
 #include "StringPairDrag.h"
@@ -804,19 +806,14 @@ void FileBrowserTreeWidget::previewFileItem(FileItem* file)
 	// handling() rather than directly creating a SamplePlayHandle
 	if (file->type() == FileItem::FileType::Sample)
 	{
-		TextFloat * tf = TextFloat::displayMessage(
-			tr("Loading sample"),
-			tr("Please wait, loading sample for preview..."),
-			embed::getIconPixmap("sample_file", 24, 24), 0);
-		// TODO: this can be removed once we do this outside the event thread
-		qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-		if (auto buffer = SampleLoader::createBufferFromFile(fileName))
+		try
 		{
-			auto s = new SamplePlayHandle(new lmms::Sample{std::move(buffer)});
-			s->setDoneMayReturnTrue(false);
-			newPPH = s;
+			newPPH = new AudioFilePlayHandle(PathUtil::fsConvert(fileName));
 		}
-		delete tf;
+		catch (const std::runtime_error& error)
+		{
+			QMessageBox::critical(nullptr, tr("Error"), tr("Failed to load audio file"));
+		}
 	}
 	else if (
 		(ext == "xiz" || ext == "sf2" || ext == "sf3" ||
