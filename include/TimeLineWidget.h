@@ -27,7 +27,6 @@
 
 #include <array>
 
-#include <QBrush>
 #include <QSize>
 #include <QWidget>
 
@@ -35,7 +34,6 @@
 #include "embed.h"
 
 
-class QPixmap;
 class QToolBar;
 
 namespace lmms {
@@ -47,9 +45,7 @@ class Timeline;
 namespace lmms::gui
 {
 
-class NStateButton;
 class TextFloat;
-class SongEditor;
 
 
 class TimeLineWidget : public QWidget

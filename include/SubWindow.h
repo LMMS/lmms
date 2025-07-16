@@ -34,9 +34,7 @@
 
 class QGraphicsDropShadowEffect;
 class QLabel;
-class QMoveEvent;
 class QPushButton;
-class QResizeEvent;
 class QWidget;
 
 namespace lmms::gui

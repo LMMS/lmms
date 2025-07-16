@@ -30,9 +30,7 @@
 #include <QDebug>
 
 #include "AudioEngine.h"
-#include "ConfigManager.h"
 #include "Engine.h"
-#include "RemotePlugin.h"
 
 
 namespace lmms

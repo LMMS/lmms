@@ -40,7 +40,6 @@
 #    include <semaphore.h>
 #endif
 
-#include <system_error>
 
 namespace lmms {
 

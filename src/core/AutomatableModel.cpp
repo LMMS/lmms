@@ -24,6 +24,8 @@
 
 #include "AutomatableModel.h"
 
+#include <QRegularExpression>
+
 #include "lmms_math.h"
 
 #include "AudioEngine.h"

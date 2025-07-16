@@ -27,8 +27,8 @@
 
 #include <string_view>
 
-#include <QBoxLayout>
 #include <QSizePolicy>
+#include <QVBoxLayout>
 
 #include "EnvelopeGraph.h"
 #include "LfoGraph.h"
@@ -149,7 +149,7 @@ EnvelopeAndLfoView::EnvelopeAndLfoView(QWidget * parent) :
 	typesLayout->addWidget(random_lfo_btn);
 	typesLayout->addWidget(m_userLfoBtn);
 
-	m_lfoWaveBtnGrp = new automatableButtonGroup(this);
+	m_lfoWaveBtnGrp = new AutomatableButtonGroup(this);
 	m_lfoWaveBtnGrp->addButton(sin_lfo_btn);
 	m_lfoWaveBtnGrp->addButton(triangle_lfo_btn);
 	m_lfoWaveBtnGrp->addButton(saw_lfo_btn);

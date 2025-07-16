@@ -99,7 +99,7 @@ AudioFileProcessorView::AudioFileProcessorView(Instrument* instrument,
 							"loop_pingpong_off"));
 	m_loopPingPongButton->setToolTip(tr("Enable ping-pong loop"));
 
-	m_loopGroup = new automatableButtonGroup(this);
+	m_loopGroup = new AutomatableButtonGroup(this);
 	m_loopGroup->addButton(m_loopOffButton);
 	m_loopGroup->addButton(m_loopOnButton);
 	m_loopGroup->addButton(m_loopPingPongButton);

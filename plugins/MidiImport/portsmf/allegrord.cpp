@@ -2,7 +2,6 @@
 #include "stdlib.h"
 #include "string.h"
 #include "ctype.h"
-#include "trace.h"
 #include <string>
 #include <fstream>
 #include <algorithm>

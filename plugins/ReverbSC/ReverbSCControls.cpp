@@ -23,7 +23,6 @@
  */
 
 
-#include <QDomElement>
 
 #include "ReverbSCControls.h"
 #include "ReverbSC.h"

@@ -26,7 +26,7 @@
 
 #include "PianoRoll.h"
 
-#include <QtMath>
+#include <QtMath>  // IWYU pragma: keep
 #include <QApplication>
 #include <QCheckBox>
 #include <QGridLayout>

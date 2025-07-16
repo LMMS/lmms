@@ -27,12 +27,10 @@
 
 
 #include <algorithm>
-#include <cmath>
 #include <QApplication>
 #include <QInputDialog>
 #include <QMenu>
 #include <QPainter>
-#include <cmath>
 #include <set>
 
 #include "AutomationEditor.h"

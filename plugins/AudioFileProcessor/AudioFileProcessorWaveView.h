@@ -38,8 +38,6 @@ class Sample;
 namespace gui
 {
 
-class AudioFileProcessorView;
-
 class AudioFileProcessorWaveView : public QWidget
 {
 	Q_OBJECT

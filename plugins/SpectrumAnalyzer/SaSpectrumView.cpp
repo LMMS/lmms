@@ -26,11 +26,11 @@
 
 #include "SaSpectrumView.h"
 
-#include <algorithm>
 #include <cmath>
 #include <QMouseEvent>
 #include <QMutexLocker>
 #include <QPainter>
+#include <QPainterPath>
 #include <QString>
 
 #include "fft_helpers.h"

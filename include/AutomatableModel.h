@@ -28,7 +28,6 @@
 #include <cmath>
 #include <QMap>
 #include <QMutex>
-#include <QRegularExpression>
 
 #include "JournallingObject.h"
 #include "Model.h"

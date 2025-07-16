@@ -32,11 +32,6 @@ namespace lmms
 {
 class LOMMEffect;
 
-namespace gui
-{
-class LOMMControlDialog;
-}
-
 class LOMMControls : public EffectControls
 {
 	Q_OBJECT

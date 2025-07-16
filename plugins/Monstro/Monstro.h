@@ -666,9 +666,9 @@ private:
 	TempoSyncKnob *	m_env2RelKnob;
 	Knob *	m_env2SlopeKnob;
 
-	automatableButtonGroup * m_o23ModGroup;
+	AutomatableButtonGroup * m_o23ModGroup;
 
-	automatableButtonGroup * m_selectedViewGroup;
+	AutomatableButtonGroup * m_selectedViewGroup;
 
 	QWidget * m_operatorsView;
 	QWidget * m_matrixView;

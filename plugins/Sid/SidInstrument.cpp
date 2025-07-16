@@ -24,7 +24,6 @@
  */
 
 
-#include <QDomElement>
 
 #include <cmath>
 #include <cstdio>
@@ -511,7 +510,7 @@ SidInstrumentView::SidInstrumentView( Instrument * _instrument,
 	lp_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "lp" ) );
 	lp_btn->setToolTip(tr("Low-pass filter "));
 
-	m_passBtnGrp = new automatableButtonGroup( this );
+	m_passBtnGrp = new AutomatableButtonGroup( this );
 	m_passBtnGrp->addButton( hp_btn );
 	m_passBtnGrp->addButton( bp_btn );
 	m_passBtnGrp->addButton( lp_btn );
@@ -535,7 +534,7 @@ SidInstrumentView::SidInstrumentView( Instrument * _instrument,
 	mos8580_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "8580" ) );
 	mos8580_btn->setToolTip(tr("MOS8580 SID "));
 
-	m_sidTypeBtnGrp = new automatableButtonGroup( this );
+	m_sidTypeBtnGrp = new AutomatableButtonGroup( this );
 	m_sidTypeBtnGrp->addButton( mos6581_btn );
 	m_sidTypeBtnGrp->addButton( mos8580_btn );
 
@@ -597,7 +596,7 @@ SidInstrumentView::SidInstrumentView( Instrument * _instrument,
 			PLUGIN_NAME::getIconPixmap( "noise" ) );
 		noise_btn->setToolTip(tr("Noise"));
 
-		auto wfbg = new automatableButtonGroup(this);
+		auto wfbg = new AutomatableButtonGroup(this);
 
 		wfbg->addButton( pulse_btn );
 		wfbg->addButton( triangle_btn );

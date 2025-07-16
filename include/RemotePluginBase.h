@@ -25,17 +25,14 @@
 #ifndef LMMS_REMOTE_PLUGIN_BASE_H
 #define LMMS_REMOTE_PLUGIN_BASE_H
 
-#include "MidiEvent.h"
-
-#include "lmmsconfig.h"
-
-#include <atomic>
+#include <atomic>  // IWYU pragma: keep
 #include <vector>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <string>
-#include <cassert>
+
+#include "lmmsconfig.h"
 
 #if !(defined(LMMS_HAVE_SYS_IPC_H) && defined(LMMS_HAVE_SEMAPHORE_H))
 #define SYNC_WITH_SHM_FIFO
@@ -50,7 +47,7 @@
 #endif // !(LMMS_HAVE_SYS_IPC_H && LMMS_HAVE_SEMAPHORE_H)
 
 #ifdef LMMS_HAVE_LOCALE_H
-#include <clocale>
+#include <clocale>  // IWYU pragma: keep
 #endif
 
 #ifdef LMMS_HAVE_PTHREAD_H
@@ -69,14 +66,11 @@
 
 #else // BUILD_REMOTE_PLUGIN_CLIENT
 #include "lmms_export.h"
-#include <QMutex>
-#include <QProcess>
-#include <QThread>
 #include <QString>
 
 #ifndef SYNC_WITH_SHM_FIFO
 #include <poll.h>
-#include <unistd.h>
+#include <unistd.h>  // IWYU pragma: keep
 #endif // SYNC_WITH_SHM_FIFO
 
 #endif // BUILD_REMOTE_PLUGIN_CLIENT

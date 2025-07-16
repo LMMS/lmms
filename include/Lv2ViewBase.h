@@ -37,7 +37,6 @@
 
 class QPushButton;
 class QMdiSubWindow;
-class QLabel;
 namespace lmms
 {
 
@@ -49,7 +48,6 @@ class Lv2ControlBase;
 namespace gui
 {
 
-class LedCheckBox;
 
 //! View for one processor, Lv2ViewBase contains 2 of those for mono plugins
 class Lv2ViewProc : public LinkedModelGroupView

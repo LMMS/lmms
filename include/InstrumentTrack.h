@@ -26,7 +26,6 @@
 #ifndef LMMS_INSTRUMENT_TRACK_H
 #define LMMS_INSTRUMENT_TRACK_H
 
-#include <limits>
 
 #include "AudioBusHandle.h"
 #include "InstrumentFunctions.h"

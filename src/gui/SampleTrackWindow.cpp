@@ -31,6 +31,7 @@
 #include <QMenu>
 #include <QVBoxLayout>
 
+#include "AutomatableButton.h"
 #include "EffectRackView.h"
 #include "embed.h"
 #include "GuiApplication.h"

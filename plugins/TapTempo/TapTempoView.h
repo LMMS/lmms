@@ -29,13 +29,8 @@
 
 #include "ToolPluginView.h"
 
-class QVBoxLayout;
-class QHBoxLayout;
 class QPushButton;
 class QLabel;
-class QCloseEvent;
-class QKeyEvent;
-class QCheckBox;
 
 namespace lmms {
 class TapTempo;

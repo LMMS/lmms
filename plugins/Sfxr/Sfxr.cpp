@@ -662,7 +662,7 @@ SfxrInstrumentView::SfxrInstrumentView( Instrument * _instrument,
 	createButtonLocalGraphic(m_sinWaveBtn,		KNOBS_BASE_X+WAVEFORM_BUTTON_WIDTH*2, WAVEFORM_BASE_Y, "Sine Wave", "sfxr_sin_wave");
 	createButtonLocalGraphic(m_noiseWaveBtn,	KNOBS_BASE_X+WAVEFORM_BUTTON_WIDTH*3, WAVEFORM_BASE_Y, "Noise", "sfxr_white_noise_wave");
 
-	m_waveBtnGroup = new automatableButtonGroup( this );
+	m_waveBtnGroup = new AutomatableButtonGroup( this );
 	m_waveBtnGroup->addButton(m_sqrWaveBtn);
 	m_waveBtnGroup->addButton(m_sawWaveBtn);
 	m_waveBtnGroup->addButton(m_sinWaveBtn);

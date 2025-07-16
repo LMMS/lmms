@@ -25,28 +25,25 @@
 #ifndef LMMS_GUI_FILE_BROWSER_H
 #define LMMS_GUI_FILE_BROWSER_H
 
-#include <QCheckBox>
 #include <QDir>
 #include <QMutex>
-#include <QProgressBar>
 #include <memory>
 
-#include "FileSearch.h"
 #include "embed.h"
 
-#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
-	#include <QRecursiveMutex>
-#endif
 #include <QTreeWidget>
 
 #include "SideBarWidget.h"
 #include "lmmsconfig.h"
 
+class QCheckBox;
 class QLineEdit;
+class QProgressBar;
 
 namespace lmms
 {
 
+class FileSearch;
 class InstrumentTrack;
 class PlayHandle;
 class TrackContainer;
@@ -54,8 +51,8 @@ class TrackContainer;
 namespace gui
 {
 
-class FileItem;
 class FileBrowserTreeWidget;
+class FileItem;
 
 class FileBrowser : public SideBarWidget
 {
