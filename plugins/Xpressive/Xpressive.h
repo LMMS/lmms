@@ -52,7 +52,7 @@ const int	NUM_EXPRS = 5;
 
 namespace gui
 {
-class automatableButtonGroup;
+class AutomatableButtonGroup;
 class Knob;
 class LedCheckBox;
 class PixmapButton;
@@ -182,7 +182,7 @@ private:
 	Knob *m_smoothKnob;
 	QPlainTextEdit * m_expressionEditor;
 
-	automatableButtonGroup *m_selectedGraphGroup;
+	AutomatableButtonGroup *m_selectedGraphGroup;
 	PixmapButton *m_w1Btn;
 	PixmapButton *m_w2Btn;
 	PixmapButton *m_w3Btn;

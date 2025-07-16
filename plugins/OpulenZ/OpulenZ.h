@@ -41,7 +41,7 @@ namespace gui
 class Knob;
 class LcdSpinBox;
 class PixmapButton;
-class automatableButtonGroup;
+class AutomatableButtonGroup;
 }
 
 
@@ -177,7 +177,7 @@ public:
 	PixmapButton *op1_w1_btn;
 	PixmapButton *op1_w2_btn;
 	PixmapButton *op1_w3_btn;
-	automatableButtonGroup *op1_waveform;
+	AutomatableButtonGroup *op1_waveform;
 
 
 	Knob *op2_a_kn;
@@ -195,7 +195,7 @@ public:
 	PixmapButton *op2_w1_btn;
 	PixmapButton *op2_w2_btn;
 	PixmapButton *op2_w3_btn;
-	automatableButtonGroup *op2_waveform;
+	AutomatableButtonGroup *op2_waveform;
 
 
 	PixmapButton *fm_btn;

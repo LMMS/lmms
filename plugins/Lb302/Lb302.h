@@ -51,7 +51,7 @@ class Distortion;
 
 namespace gui
 {
-class automatableButtonGroup;
+class AutomatableButtonGroup;
 class Knob;
 class Lb302SynthView;
 class LedCheckBox;
@@ -280,7 +280,7 @@ private:
 
 	Knob * m_distKnob;
 	Knob * m_slideDecKnob;
-	automatableButtonGroup * m_waveBtnGrp;
+	AutomatableButtonGroup * m_waveBtnGrp;
 
 	LedCheckBox * m_slideToggle;
 	/*LedCheckBox * m_accentToggle;*/ // removed pending accent implementation

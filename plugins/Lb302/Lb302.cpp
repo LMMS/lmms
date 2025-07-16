@@ -983,7 +983,7 @@ Lb302SynthView::Lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
 			tr( "Click here for bandlimited moog saw wave." ) );
 
 
-	m_waveBtnGrp = new automatableButtonGroup( this );
+	m_waveBtnGrp = new AutomatableButtonGroup( this );
 	m_waveBtnGrp->addButton( sawWaveBtn );
 	m_waveBtnGrp->addButton( triangleWaveBtn );
 	m_waveBtnGrp->addButton( sqrWaveBtn );

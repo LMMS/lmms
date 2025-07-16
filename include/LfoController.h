@@ -38,7 +38,7 @@ namespace lmms
 namespace gui
 {
 
-class automatableButtonGroup;
+class AutomatableButtonGroup;
 class PixmapButton;
 class Knob;
 class TempoSyncKnob;
@@ -117,8 +117,8 @@ protected:
 	Knob * m_amountKnob;
 	Knob * m_phaseKnob;
 	PixmapButton * m_userLfoBtn;
-	automatableButtonGroup * m_waveBtnGrp;
-	automatableButtonGroup * m_multiplierBtnGrp;
+	AutomatableButtonGroup * m_waveBtnGrp;
+	AutomatableButtonGroup * m_multiplierBtnGrp;
 
 
 private:
