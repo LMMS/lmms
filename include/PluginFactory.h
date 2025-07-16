@@ -32,11 +32,11 @@
 #include <QFileInfo>
 #include <QList>
 #include <QString>
-class QLibrary;  // IWYU pragma: keep
 
 #include "lmms_export.h"
 #include "Plugin.h"
 
+class QLibrary;  // IWYU pragma: keep
 
 namespace lmms
 {

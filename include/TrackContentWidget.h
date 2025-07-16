@@ -26,11 +26,11 @@
 #define LMMS_GUI_TRACK_CONTENT_WIDGET_H
 
 #include <QWidget>
-class QMimeData;  // IWYU pragma: keep
 
 #include "JournallingObject.h"
 #include "TimePos.h"
 
+class QMimeData;  // IWYU pragma: keep
 
 
 namespace lmms

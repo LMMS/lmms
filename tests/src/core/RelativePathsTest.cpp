@@ -23,7 +23,7 @@
  */
 
 #include <QObject>
-#include <QtTest/QtTest>
+#include <QtTest>
 
 #include "ConfigManager.h"
 #include "PathUtil.h"

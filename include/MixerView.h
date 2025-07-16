@@ -26,15 +26,16 @@
 #define LMMS_GUI_MIXER_VIEW_H
 
 #include <QWidget>
+
+#include "MixerChannelView.h"
+#include "ModelView.h"
+#include "SerializingObject.h"
+
 class QDomDocument;  // IWYU pragma: keep
 class QDomElement;  // IWYU pragma: keep
 class QHBoxLayout;
 class QStackedLayout;
 class QScrollArea;
-
-#include "MixerChannelView.h"
-#include "ModelView.h"
-#include "SerializingObject.h"
 
 namespace lmms
 {

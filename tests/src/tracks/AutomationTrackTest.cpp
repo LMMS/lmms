@@ -22,7 +22,7 @@
  *
  */
 
-#include <QtTest/QtTest>
+#include <QtTest>
 
 
 #include "AutomationClip.h"

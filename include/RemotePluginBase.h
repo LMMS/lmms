@@ -25,9 +25,6 @@
 #ifndef LMMS_REMOTE_PLUGIN_BASE_H
 #define LMMS_REMOTE_PLUGIN_BASE_H
 
-
-#include "lmmsconfig.h"
-
 #include <atomic>  // IWYU pragma: keep
 #include <vector>
 #include <cstdio>
