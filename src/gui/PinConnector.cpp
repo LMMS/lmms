@@ -428,19 +428,7 @@ void PinConnector::MatrixView::mousePressEvent(QMouseEvent* me)
 	}
 
 	const auto [tc, pc] = *pin;
-
-#if PIN_CONNECTOR_AUTOMATABLE_PINS
-	if (me->modifiers() & Qt::ControlModifier)
-	{
-		// Taken from AutomatableModelView::mousePressEvent
-		BoolModel* model = m_matrix->pins().at(tc).at(pc);
-		new gui::StringPairDrag{"automatable_model", QString::number(model->id()), QPixmap{}, this};
-	}
-	else
-#endif
-	{
-		m_matrix->setPin(tc, pc, !m_matrix->enabled(tc, pc));
-	}
+	m_matrix->setPin(tc, pc, !m_matrix->enabled(tc, pc));
 
 	me->accept();
 }

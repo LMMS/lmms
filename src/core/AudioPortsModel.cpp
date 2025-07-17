@@ -145,8 +145,8 @@ auto AudioPortsModel::setTrackChannelCountImpl(track_ch_t count) -> bool
 	m_usedTrackChannels.resize(count);
 	m_totalTrackChannels = count;
 
-	m_in.setTrackChannelCount(count, QString::fromUtf16(u"Pin in [%1 \U0001F82E %2]"));
-	m_out.setTrackChannelCount(count, QString::fromUtf16(u"Pin out [%2 \U0001F82E %1]"));
+	m_in.setTrackChannelCount(count);
+	m_out.setTrackChannelCount(count);
 
 	return true;
 }
@@ -172,8 +172,8 @@ auto AudioPortsModel::setProcessorChannelCountsImpl(proc_ch_t inCount, proc_ch_t
 
 	m_usedProcessorChannels.resize(outCount);
 
-	m_in.setChannelCount(inCount, QString::fromUtf16(u"Pin in [%1 \U0001F82E %2]"));
-	m_out.setChannelCount(outCount, QString::fromUtf16(u"Pin out [%2 \U0001F82E %1]"));
+	m_in.setChannelCount(inCount);
+	m_out.setChannelCount(outCount);
 
 	return true;
 }
@@ -221,20 +221,14 @@ void AudioPortsModel::loadSettings(const QDomElement& elem)
 	updateAllUsedChannels();
 	updateDirectRouting();
 
-#if !PIN_CONNECTOR_AUTOMATABLE_PINS
 	emit dataChanged();
-#endif
 }
 
 void AudioPortsModel::updateUsedTrackChannels(track_ch_t trackChannel)
 {
 	const auto& pins = m_out.m_pins.at(trackChannel);
-	m_usedTrackChannels[trackChannel] = std::any_of(pins.begin(), pins.end(), [](auto m) {
-#if PIN_CONNECTOR_AUTOMATABLE_PINS
-		return m->value();
-#else
+	m_usedTrackChannels[trackChannel] = std::any_of(pins.begin(), pins.end(), [](bool m) {
 		return m;
-#endif
 	});
 }
 
@@ -242,11 +236,7 @@ void AudioPortsModel::updateUsedProcessorChannels(proc_ch_t outChannel)
 {
 	const auto& pins = m_out.m_pins;
 	m_usedProcessorChannels[outChannel] = std::any_of(pins.begin(), pins.end(), [=](const auto& p) {
-#if PIN_CONNECTOR_AUTOMATABLE_PINS
-		return p[outChannel]->value();
-#else
 		return p[outChannel];
-#endif
 	});
 }
 
@@ -407,9 +397,6 @@ auto AudioPortsModel::Matrix::channelName(proc_ch_t channel) const -> QString
 
 void AudioPortsModel::Matrix::setPin(track_ch_t trackChannel, proc_ch_t processorChannel, bool value)
 {
-#if PIN_CONNECTOR_AUTOMATABLE_PINS
-	m_pins[trackChannel][processorChannel]->setValue(value);
-#else
 	const bool oldValue = m_pins[trackChannel][processorChannel];
 	m_pins[trackChannel][processorChannel] = value;
 
@@ -418,12 +405,10 @@ void AudioPortsModel::Matrix::setPin(track_ch_t trackChannel, proc_ch_t processo
 	{
 		emit m_parent->dataChanged();
 	}
-#endif
 }
 
 void AudioPortsModel::Matrix::updateCache(track_ch_t trackChannel, proc_ch_t processorChannel)
 {
-	// TODO: Updating is expensive when loading/saving all the pins and PIN_CONNECTOR_AUTOMATABLE_PINS == true
 	if (isOutput())
 	{
 		m_parent->updateUsedTrackChannels(trackChannel);
@@ -432,29 +417,15 @@ void AudioPortsModel::Matrix::updateCache(track_ch_t trackChannel, proc_ch_t pro
 	m_parent->updateDirectRouting();
 }
 
-void AudioPortsModel::Matrix::setTrackChannelCount(track_ch_t count, const QString& nameFormat)
+void AudioPortsModel::Matrix::setTrackChannelCount(track_ch_t count)
 {
 	auto oldSize = static_cast<track_ch_t>(m_pins.size());
 	if (oldSize > count)
 	{
-#if PIN_CONNECTOR_AUTOMATABLE_PINS
-		for (auto tcIdx = count; tcIdx < oldSize; ++tcIdx)
-		{
-			for (BoolModel* model : m_pins[tcIdx])
-			{
-				delete model;
-			}
-		}
-#endif
 		m_pins.resize(count);
 	}
 	else if (oldSize < count)
 	{
-#if PIN_CONNECTOR_AUTOMATABLE_PINS
-		auto parentModel = m_parent->parentModel();
-		assert(parentModel != nullptr);
-#endif
-
 		m_pins.resize(count);
 		for (auto tcIdx = oldSize; tcIdx < count; ++tcIdx)
 		{
@@ -462,29 +433,14 @@ void AudioPortsModel::Matrix::setTrackChannelCount(track_ch_t count, const QStri
 			channels.reserve(m_channelCount);
 			for (proc_ch_t pcIdx = 0; pcIdx < m_channelCount; ++pcIdx)
 			{
-#if PIN_CONNECTOR_AUTOMATABLE_PINS
-				const auto name = nameFormat.arg(tcIdx + 1).arg(channelName(pcIdx));
-				BoolModel* model = channels.emplace_back(new BoolModel{false, parentModel, name});
-
-				parentModel->connect(model, &BoolModel::dataChanged, [=, this]() {
-					updateCache(tcIdx);
-					emit m_parent->dataChanged();
-				});
-#else
 				channels.emplace_back(false);
-#endif
 			}
 		}
 	}
 }
 
-void AudioPortsModel::Matrix::setChannelCount(proc_ch_t count, const QString& nameFormat)
+void AudioPortsModel::Matrix::setChannelCount(proc_ch_t count)
 {
-#if PIN_CONNECTOR_AUTOMATABLE_PINS
-	auto parentModel = m_parent->parentModel();
-	assert(parentModel != nullptr);
-#endif
-
 	const bool initialSetup = m_channelCount == 0;
 
 	if (channelCount() < count)
@@ -495,17 +451,7 @@ void AudioPortsModel::Matrix::setChannelCount(proc_ch_t count, const QString& na
 			processorChannels.reserve(count);
 			for (proc_ch_t pcIdx = channelCount(); pcIdx < count; ++pcIdx)
 			{
-#if PIN_CONNECTOR_AUTOMATABLE_PINS
-				const auto name = nameFormat.arg(tcIdx + 1).arg(channelName(pcIdx));
-				BoolModel* model = processorChannels.emplace_back(new BoolModel{false, parentModel, name});
-
-				parentModel->connect(model, &BoolModel::dataChanged, [=, this]() {
-					updateCache(tcIdx);
-					emit m_parent->dataChanged();
-				});
-#else
 				processorChannels.emplace_back(false);
-#endif
 			}
 		}
 	}
@@ -513,21 +459,14 @@ void AudioPortsModel::Matrix::setChannelCount(proc_ch_t count, const QString& na
 	{
 		for (auto& processorChannels : m_pins)
 		{
-#if PIN_CONNECTOR_AUTOMATABLE_PINS
-			for (proc_ch_t pcIdx = count; pcIdx < channelCount(); ++pcIdx)
-			{
-				delete processorChannels[pcIdx];
-			}
-#endif
 			processorChannels.erase(processorChannels.begin() + count, processorChannels.end());
 		}
 	}
 
 	m_channelCount = count;
 
-	if (initialSetup && (!m_parent->isInstrument() || isOutput()))
+	if (initialSetup)
 	{
-		// Set default connections, unless this is the input matrix for an instrument
 		setDefaultConnections();
 	}
 }
@@ -535,6 +474,12 @@ void AudioPortsModel::Matrix::setChannelCount(proc_ch_t count, const QString& na
 void AudioPortsModel::Matrix::setDefaultConnections()
 {
 	assert(m_pins.size() >= 2u);
+
+	if (m_parent->isInstrument() && !isOutput())
+	{
+		// Don't set the input matrix for an instrument
+		return;
+	}
 
 	switch (channelCount())
 	{
@@ -565,24 +510,13 @@ void AudioPortsModel::Matrix::saveSettings(QDomDocument& doc, QDomElement& elem)
 		auto& processorChannels = m_pins[trackChannel];
 		for (std::size_t processorChannel = 0; processorChannel < processorChannels.size(); ++processorChannel)
 		{
-#if PIN_CONNECTOR_AUTOMATABLE_PINS
-			if (processorChannels[processorChannel]->value()
-				|| processorChannels[processorChannel]->isAutomatedOrControlled())
-			{
-				const auto name = QString{"c%1_%2"}.arg(trackChannel + 1).arg(processorChannel + 1);
-				assert(!AutomatableModel::mustQuoteName(name));
-
-				processorChannels[processorChannel]->saveSettings(doc, elem, name);
-			}
-#else
 			if (processorChannels[processorChannel])
 			{
-				const auto name = QString{"c%1_%2"}.arg(trackChannel + 1).arg(processorChannel + 1);
+				const auto name = QStringLiteral("c%1_%2").arg(trackChannel + 1).arg(processorChannel + 1);
 				assert(!AutomatableModel::mustQuoteName(name));
 
 				elem.setAttribute(name, true);
 			}
-#endif
 		}
 	}
 }
@@ -591,21 +525,11 @@ void AudioPortsModel::Matrix::loadSettings(const QDomElement& elem)
 {
 	assert(m_channelCount == (trackChannelCount() > 0 ? static_cast<proc_ch_t>(m_pins[0].size()) : 0));
 
-#if PIN_CONNECTOR_AUTOMATABLE_PINS
-	// Helper to delay loading/setting each AutomatableModel until the end
-	std::vector<std::vector<bool>> connectionsToLoad;
-	connectionsToLoad.resize(trackChannelCount());
-	for (auto& processorChannels : connectionsToLoad)
-	{
-		processorChannels.resize(m_channelCount);
-	}
-#else
 	// Initialize all pins to OFF
 	for (auto& processorChannels : m_pins)
 	{
 		std::fill(processorChannels.begin(), processorChannels.end(), false);
 	}
-#endif
 
 	auto addConnection = [&](const QString& name) {
 		const auto pos = name.indexOf('_');
@@ -622,49 +546,16 @@ void AudioPortsModel::Matrix::loadSettings(const QDomElement& elem)
 		if (trackChannel == 0 || processorChannel == 0) { throw std::runtime_error{"failed to parse integer"}; }
 #endif
 
-#if PIN_CONNECTOR_AUTOMATABLE_PINS
-		connectionsToLoad.at(trackChannel - 1).at(processorChannel - 1) = true;
-#else
-		setPinSilent(trackChannel - 1, processorChannel - 1, true);
-#endif
+		setPinBatch(trackChannel - 1, processorChannel - 1, true);
 	};
 
-	// Get non-automated pin connector connections
+	// Get pin connector connections
 	const auto& attrs = elem.attributes();
 	for (int idx = 0; idx < attrs.size(); ++idx)
 	{
 		const auto node = attrs.item(idx);
 		addConnection(node.nodeName());
 	}
-
-#if PIN_CONNECTOR_AUTOMATABLE_PINS
-	// Get automated pin connector connections
-	const auto children = elem.childNodes();
-	for (int idx = 0; idx < children.size(); ++idx)
-	{
-		const auto node = children.item(idx);
-		addConnection(node.nodeName());
-	}
-
-	// Lastly, load the connections
-	for (std::size_t trackChannel = 0; trackChannel < m_pins.size(); ++trackChannel)
-	{
-		auto& processorChannels = m_pins[trackChannel];
-		auto& processorChannelsToLoad = connectionsToLoad[trackChannel];
-		for (std::size_t processorChannel = 0; processorChannel < processorChannels.size(); ++processorChannel)
-		{
-			if (processorChannelsToLoad[processorChannel])
-			{
-				const auto name = QString{"c%1_%2"}.arg(trackChannel + 1).arg(processorChannel + 1);
-				processorChannels[processorChannel]->loadSettings(elem, name);
-			}
-			else
-			{
-				processorChannels[processorChannel]->setValue(0);
-			}
-		}
-	}
-#endif
 }
 
 } // namespace lmms
