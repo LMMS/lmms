@@ -176,6 +176,11 @@ public:
 		return &m_autoQuitModel;
 	}
 
+	auto autoQuitEnabled() const -> bool
+	{
+		return !m_autoQuitDisabled;
+	}
+
 	EffectChain * effectChain() const
 	{
 		return m_parent;
@@ -223,7 +228,7 @@ protected:
 		after "decay" ms of a signal below "gate", the effect is turned off
 		and won't be processed again until it receives new audio input
 	*/
-	void checkGate(InterleavedBufferView<const float, 2> coreBuffers);
+	void checkGate(double rms);
 
 private:
 	EffectChain * m_parent;

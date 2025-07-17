@@ -167,24 +167,52 @@ private slots:
 	{
 		using namespace lmms;
 
-		// Channel counts should stay zero until known
+		int propertiesChangedCount = 0;
+		auto getPropertiesChangedCount = [&]() { return std::exchange(propertiesChangedCount, 0); };
+
 		auto apmNxN = AudioPortsModel{DynamicChannelCount, DynamicChannelCount, false};
+		connect(&apmNxN, &AudioPortsModel::propertiesChanged, [&]() { ++propertiesChangedCount; });
+
+		// Channel counts should stay zero until known
 		QCOMPARE(apmNxN.in().channelCount(), 0);
 		QCOMPARE(apmNxN.out().channelCount(), 0);
+		QCOMPARE(getPropertiesChangedCount(), 0);
 
 		apmNxN.setChannelCountIn(4);
 		QCOMPARE(apmNxN.in().channelCount(), 4);
 		QCOMPARE(apmNxN.out().channelCount(), 0);
+		QCOMPARE(getPropertiesChangedCount(), 1);
 
 		apmNxN.setChannelCountOut(8);
 		QCOMPARE(apmNxN.in().channelCount(), 4);
 		QCOMPARE(apmNxN.out().channelCount(), 8);
+		QCOMPARE(getPropertiesChangedCount(), 1);
+
+		// Change both the input and output counts at once
+		apmNxN.setChannelCounts(5, 9);
+		QCOMPARE(apmNxN.in().channelCount(), 5);
+		QCOMPARE(apmNxN.out().channelCount(), 9);
+		QCOMPARE(getPropertiesChangedCount(), 1);
 
 		// The track channel count is 2 by default
 		QCOMPARE(apmNxN.trackChannelCount(), 2);
 
+		// Can change track channel count
 		apmNxN.setTrackChannelCount(4);
 		QCOMPARE(apmNxN.trackChannelCount(), 4);
+		QCOMPARE(getPropertiesChangedCount(), 1);
+
+		// Track channel count must be a even number (at least for now)
+		QVERIFY_EXCEPTION_THROWN(apmNxN.setTrackChannelCount(5), std::exception);
+		QCOMPARE(apmNxN.trackChannelCount(), 4);
+		QCOMPARE(getPropertiesChangedCount(), 0);
+
+		// Change all channel counts at once
+		apmNxN.setAllChannelCounts(2, 3, 4);
+		QCOMPARE(apmNxN.trackChannelCount(), 2);
+		QCOMPARE(apmNxN.in().channelCount(), 3);
+		QCOMPARE(apmNxN.out().channelCount(), 4);
+		QCOMPARE(getPropertiesChangedCount(), 1);
 
 		// stereo/stereo effect
 		auto apm2x2 = AudioPortsModel{2, 2, false};
@@ -277,8 +305,8 @@ private slots:
 		QCOMPARE(apm2x2Inst.out().enabled(1, 1), true);
 	}
 
-	//! Verifies that the routed channels optimization works
-	void RoutedChannelsOptimization()
+	//! Verifies that the used track channels cache works
+	void UsedTrackChannelsCache()
 	{
 		using namespace lmms;
 
@@ -292,8 +320,8 @@ private slots:
 		//  ---
 
 		// Track channels 0 and 1 should both have a processor output channel routed to them
-		QCOMPARE(apm.m_routedChannels[0], true);
-		QCOMPARE(apm.m_routedChannels[1], true);
+		QCOMPARE(apm.m_usedTrackChannels[0], true);
+		QCOMPARE(apm.m_usedTrackChannels[1], true);
 
 		// Out
 		//  ___
@@ -304,8 +332,8 @@ private slots:
 		apm.out().setPin(0, 0, false);
 
 		// Now only track channel 1 should have a processor channel routed to it
-		QCOMPARE(apm.m_routedChannels[0], false);
-		QCOMPARE(apm.m_routedChannels[1], true);
+		QCOMPARE(apm.m_usedTrackChannels[0], false);
+		QCOMPARE(apm.m_usedTrackChannels[1], true);
 
 		// Out
 		//  ___
@@ -315,8 +343,8 @@ private slots:
 
 		apm.out().setPin(0, 1, true);
 
-		QCOMPARE(apm.m_routedChannels[0], true);
-		QCOMPARE(apm.m_routedChannels[1], true);
+		QCOMPARE(apm.m_usedTrackChannels[0], true);
+		QCOMPARE(apm.m_usedTrackChannels[1], true);
 
 		// Out
 		//  ___
@@ -326,8 +354,109 @@ private slots:
 
 		apm.out().setPin(1, 0, true);
 
-		QCOMPARE(apm.m_routedChannels[0], true);
-		QCOMPARE(apm.m_routedChannels[1], true);
+		QCOMPARE(apm.m_usedTrackChannels[0], true);
+		QCOMPARE(apm.m_usedTrackChannels[1], true);
+	}
+
+	//! Verifies that the used processor channels cache works
+	void UsedProcessorChannelsCache()
+	{
+		using namespace lmms;
+
+		// Setup
+		auto apm = AudioPortsModel{2, 2, false};
+
+		// Out
+		//  ___
+		// |X| | 0
+		// | |X| 1
+		//  ---
+
+		// Processor channels 0 and 1 should both be routed to a track channel
+		QCOMPARE(apm.m_usedProcessorChannels[0], true);
+		QCOMPARE(apm.m_usedProcessorChannels[1], true);
+
+		// Out
+		//  ___
+		// | | | 0
+		// | |X| 1
+		//  ---
+
+		apm.out().setPin(0, 0, false);
+
+		// Now only processor channel 1 should be routed to a track channel
+		QCOMPARE(apm.m_usedProcessorChannels[0], false);
+		QCOMPARE(apm.m_usedProcessorChannels[1], true);
+
+		// Out
+		//  ___
+		// | |X| 0
+		// | |X| 1
+		//  ---
+
+		apm.out().setPin(0, 1, true);
+
+		QCOMPARE(apm.m_usedProcessorChannels[0], false);
+		QCOMPARE(apm.m_usedProcessorChannels[1], true);
+
+		// Out
+		//  ___
+		// | |X| 0
+		// | |X| 1
+		// | | | 2
+		// | | | 3
+		//  ---
+
+		apm.setTrackChannelCount(4);
+
+		// Should remain the same after increasing the number of track channels
+		QCOMPARE(apm.m_usedProcessorChannels[0], false);
+		QCOMPARE(apm.m_usedProcessorChannels[1], true);
+
+		// Out
+		//  ___
+		// | |X| 0
+		// | |X| 1
+		// | | | 2
+		// |X| | 3
+		//  ---
+
+		apm.out().setPin(3, 0, true);
+
+		QCOMPARE(apm.m_usedProcessorChannels[0], true);
+		QCOMPARE(apm.m_usedProcessorChannels[1], true);
+
+		// Out
+		//  ___
+		// | |X| 0
+		// | |X| 1
+		//  ---
+
+		apm.setTrackChannelCount(2);
+
+		// The 1st processor channel should no longer be routed to any track channels
+		QCOMPARE(apm.m_usedProcessorChannels[0], false);
+		QCOMPARE(apm.m_usedProcessorChannels[1], true);
+
+		// Out
+		//  _____
+		// | |X| | 0
+		// | |X| | 1
+		//  -----
+
+		apm.setChannelCountOut(3);
+
+		// The new processor channel should not be routed to anything, and the rest stays the same
+		QCOMPARE(apm.m_usedProcessorChannels[0], false);
+		QCOMPARE(apm.m_usedProcessorChannels[1], true);
+		QCOMPARE(apm.m_usedProcessorChannels[2], false);
+
+		apm.setChannelCountIn(1);
+
+		// Setting the input channel count has no effect
+		QCOMPARE(apm.m_usedProcessorChannels[0], false);
+		QCOMPARE(apm.m_usedProcessorChannels[1], true);
+		QCOMPARE(apm.m_usedProcessorChannels[2], false);
 	}
 
 	//! Verifies that the direct routing optimization works
@@ -815,34 +944,36 @@ private slots:
 				PluginAudioPorts<settings>& ap;
 
 				// Statically in-place settings
-				void operator()(InterleavedBufferView<float, 2> inOut)
+				auto operator()(InterleavedBufferView<float, 2> inOut)
 				{
 					for (auto& s : inOut.toSampleFrames()) { s *= 2; }
+					return ProcessStatus::Continue;
 				}
 
 				// Dynamically in-place settings
-				void operator()(InterleavedBufferView<const float, 2> in, InterleavedBufferView<float, 2> out)
+				auto operator()(InterleavedBufferView<const float, 2> in, InterleavedBufferView<float, 2> out)
 				{
 					for (std::size_t frame = 0; frame < in.frames(); ++frame)
 					{
 						out[frame][0] = in[frame][0] * 2;
 						out[frame][1] = in[frame][1] * 2;
 					}
+					return ProcessStatus::Continue;
 				}
 
 				// Buffered settings
-				void operator()()
+				auto operator()()
 				{
 					if constexpr (settings.inplace)
 					{
 						auto inOut = ap.buffers()->inputOutput();
-						(*this)(inOut);
+						return (*this)(inOut);
 					}
 					else
 					{
 						auto in = ap.buffers()->input();
 						auto out = ap.buffers()->output();
-						(*this)(in, out);
+						return (*this)(in, out);
 					}
 				}
 			};

@@ -135,8 +135,8 @@ public:
 
 		auto isOutput() const -> bool { return m_isOutput; }
 
-		//! Calls the parent's updateRoutedChannels and updateDirectRouting methods
-		void updateCache(track_ch_t trackChannel);
+		//! Calls the parent's cache update methods
+		void updateCache(track_ch_t trackChannel, proc_ch_t processorChannel);
 
 		friend class AudioPortsModel;
 
@@ -175,6 +175,8 @@ public:
 	/**
 	 * Setters
 	 */
+	void setAllChannelCounts(track_ch_t trackChannels, proc_ch_t inCount, proc_ch_t outCount);
+	void setTrackChannelCount(track_ch_t count);
 	void setChannelCounts(proc_ch_t inCount, proc_ch_t outCount);
 	void setChannelCountIn(proc_ch_t inCount);
 	void setChannelCountOut(proc_ch_t outCount);
@@ -200,10 +202,6 @@ signals:
 	//! Called when channel counts change (whether audio processor or track channel counts)
 	//void propertiesChanged(); // from Model
 
-public slots:
-	void setTrackChannelCount(track_ch_t count);
-	void updateRoutedChannels(track_ch_t trackChannel);
-
 protected:
 	/**
 	 * To be implemented by the audio ports class.
@@ -223,13 +221,24 @@ protected:
 	track_ch_t m_trackChannelsUpperBound = DEFAULT_CHANNELS; // TODO: Need to recalculate when pins are set/unset
 
 	/**
-	 * Caches whether any output channels are routed to a given track channel (meaning the
-	 * track channel is not "bypassed"), which eliminates need for O(N) checking in `AudioPorts::Router::receive()`.
+	 * Caches whether any processor output channels are routed to a given track channel (meaning the
+	 * track channel is used and not "bypassed"), which eliminates need for O(N) checking in
+	 * `AudioPorts::Router::receive()`.
 	 *
-	 * This means m_routedChannels[i] == true if and only if m_out.enabled(i, x) == true
+	 * This means m_usedTrackChannels[i] == true if and only if m_out.enabled(i, x) == true
 	 * for any audio processor channel x.
 	 */
-	std::vector<bool> m_routedChannels;
+	std::vector<bool> m_usedTrackChannels;
+
+	/**
+	 * Caches whether a given processor output channel is routed to any track channel (meaning the
+	 * processor channel is being used), which eliminates need for O(N) checking when calculating
+	 * the RMS for a processor that returned `ProcessStatus::ContinueIfNotQuiet`.
+	 *
+	 * This means m_usedProcessorChannels[i] == true if and only if m_out.enabled(x, i) == true
+	 * for any track channel x.
+	 */
+	std::vector<bool> m_usedProcessorChannels;
 
 	/**
 	 * Any processor with 2-channel interleaved buffers connected to the track channels in the default
@@ -246,8 +255,18 @@ protected:
 	std::optional<track_ch_t> m_directRouting;
 
 private:
-	void setChannelCountsImpl(proc_ch_t inCount, proc_ch_t outCount);
-	void updateAllRoutedChannels();
+	auto setTrackChannelCountImpl(track_ch_t count) -> bool;
+	auto setProcessorChannelCountsImpl(proc_ch_t inCount, proc_ch_t outCount) -> bool;
+
+	/*
+	 * Cache update methods
+	 */
+
+	void updateAllUsedChannels();
+	void updateAllUsedTrackChannels();
+	void updateAllUsedProcessorChannels();
+	void updateUsedTrackChannels(track_ch_t trackChannel);
+	void updateUsedProcessorChannels(proc_ch_t outChannel);
 	void updateDirectRouting();
 
 	Matrix m_in{this, false}; //!< LMMS --> audio processor

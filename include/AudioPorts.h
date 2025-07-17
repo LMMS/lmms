@@ -89,6 +89,18 @@ private:
 	const f_cnt_t m_frames = 0;
 };
 
+enum class ProcessStatus
+{
+	//! Unconditionally continue processing
+	Continue,
+
+	//! Calculate the RMS out sum and call `checkGate` to determine whether to stop processing
+	ContinueIfNotQuiet,
+
+	//! Do not continue processing
+	Sleep
+};
+
 
 namespace detail {
 
@@ -157,133 +169,96 @@ public:
 
 
 //! Performs pin connector routing. See `AudioPorts::Router`
-template<AudioPortsSettings settings, bool interleaved = settings.interleaved>
+template<AudioPortsSettings settings>
 class AudioPortsRouter
 {
-	static_assert(always_false_v<AudioPortsRouter<settings, interleaved>>,
-		"A router for the requested settings is not implemented yet");
-};
-
-template<AudioPortsSettings settings, class F>
-inline void processHelper(AudioPortsRouter<settings>& router, AudioBus<float> coreInOut,
-	AudioPortsBuffer<settings>& processorBuffers, F&& processFunc)
-{
-	if constexpr (settings.inplace)
-	{
-		const auto processorInOut = processorBuffers.inputOutput();
-
-		// Write core to processor input buffer
-		if constexpr (settings.inputs != 0)
-		{
-			router.send(coreInOut, processorInOut);
-		}
-
-		// Process
-		if constexpr (!settings.buffered) { processFunc(processorInOut); }
-		else { processFunc(); }
-
-		// Write processor output buffer to core
-		if constexpr (settings.outputs != 0)
-		{
-			router.receive(processorInOut, coreInOut);
-		}
-	}
-	else
-	{
-		const auto processorIn = processorBuffers.input();
-		const auto processorOut = processorBuffers.output();
-
-		// Write core to processor input buffer
-		if constexpr (settings.inputs != 0)
-		{
-			router.send(coreInOut, processorIn);
-		}
-
-		// Process
-		if constexpr (!settings.buffered) { processFunc(processorIn, processorOut); }
-		else { processFunc(); }
-
-		// Write processor output buffer to core
-		if constexpr (settings.outputs != 0)
-		{
-			router.receive(processorOut, coreInOut);
-		}
-	}
-}
-
-//! Non-interleaved specialization
-template<AudioPortsSettings settings>
-class AudioPortsRouter<settings, false>
-{
 	using SampleT = GetAudioDataType<settings.kind>;
 
-public:
-	explicit AudioPortsRouter(const AudioPorts<settings>& parent) : m_ap{&parent} {}
-
-	template<class F>
-	void process(AudioBus<float> inOut, AudioPortsBuffer<settings>& processorBuffers, F&& processFunc)
-	{
-		processHelper<settings>(*this, inOut, processorBuffers, std::forward<F>(processFunc));
-	}
-
-	void send(AudioBus<const float> in, PlanarBufferView<SampleT, settings.inputs> out) const;
-	void receive(PlanarBufferView<const SampleT, settings.outputs> in, AudioBus<float> inOut) const;
-
-private:
-	const AudioPorts<settings>* const m_ap;
-};
-
-//! Interleaved specialization
-template<AudioPortsSettings settings>
-class AudioPortsRouter<settings, true>
-{
-	using SampleT = GetAudioDataType<settings.kind>;
-
-	static_assert(settings.sampleFrameCompatible(),
+	static_assert(!settings.interleaved || settings.sampleFrameCompatible(),
 		"Interleaved audio port routers are currently limited to SampleFrame-compatible buffers only");
 
 public:
-	explicit AudioPortsRouter(const AudioPorts<settings>& parent) : m_ap{&parent} {}
+	explicit AudioPortsRouter(const AudioPorts<settings>& parent, bool autoQuitEnabled)
+		: m_ap{&parent}
+		, m_autoQuitEnabled{autoQuitEnabled}
+	{
+	}
 
 	/**
 	 * Routes core audio to audio processor inputs, calls `processFunc`, then routes audio from
 	 * processor outputs back to the core.
 	 */
 	template<class F>
-	void process(AudioBus<float> inOut, AudioPortsBuffer<settings>& processorBuffers, F&& processFunc)
+	auto process(AudioBus<float> inOut, AudioPortsBuffer<settings>& processorBuffers, F&& processFunc)
+		-> ProcessStatus
 	{
+		m_rms = 0;
 		if constexpr (settings.sampleFrameCompatible())
 		{
 			if (const auto dr = m_ap->m_directRouting)
 			{
 				// The "direct routing" optimization can be applied
-				processDirectRouting(inOut.trackChannelPair(*dr), processorBuffers, std::forward<F>(processFunc));
+				return processWithDirectRouting(inOut.trackChannelPair(*dr),
+					processorBuffers, std::forward<F>(processFunc));
 			}
 			else
 			{
-				// Route normally without "direct routing" optimization
-				processHelper<settings>(*this, inOut, processorBuffers, std::forward<F>(processFunc));
+				return processNormally(inOut, processorBuffers, std::forward<F>(processFunc));
 			}
 		}
 		else
 		{
-			processHelper<settings>(*this, inOut, processorBuffers, std::forward<F>(processFunc));
+			return processNormally(inOut, processorBuffers, std::forward<F>(processFunc));
 		}
 	}
 
-	void send(AudioBus<const float> in, InterleavedBufferView<float, settings.inputs> out) const;
-	void receive(InterleavedBufferView<const float, settings.outputs> in, AudioBus<float> inOut) const;
+	/**
+	 * RMS calculated from the in-use processor output channels (processor channels that are routed to
+	 * at least one track channel).
+	 *
+	 * Only available when `process()` returns `ProcessStatus::ContinueIfNotQuiet` and auto-quit is enabled.
+	 */
+	auto rms() const -> double { return m_rms; }
+
+#ifdef LMMS_TESTING
+	friend class ::AudioPortsTest;
+#endif
 
 private:
+	void send(AudioBus<const float> in, PlanarBufferView<SampleT, settings.inputs> out) const
+		requires (!settings.interleaved);
+	void receive(PlanarBufferView<const SampleT, settings.outputs> in, AudioBus<float> inOut) const
+		requires (!settings.interleaved);
+
+	void send(AudioBus<const float> in, InterleavedBufferView<float, settings.inputs> out) const
+		requires (settings.interleaved);
+	void receive(InterleavedBufferView<const float, settings.outputs> in, AudioBus<float> inOut) const
+		requires (settings.interleaved);
+
+	auto calculateRms(InterleavedBufferView<const float, 2> output) -> double;
+
+	template<proc_ch_t channelCount> requires (!settings.interleaved)
+	auto calculateRms(PlanarBufferView<const SampleT, channelCount> output) -> double;
+
 	/**
-	 * Applies the "direct routing" optimization for more efficient processing.
+	 * Processes audio normally (no "direct routing").
+	 * Uses `send` and `receive` to route audio to and from the processor.
+	 */
+	template<class F>
+	auto processNormally(AudioBus<float> coreInOut, AudioPortsBuffer<settings>& processorBuffers, F&& processFunc)
+		-> ProcessStatus;
+
+	/**
+	 * Processes audio using the "direct routing" optimization for more efficient processing.
 	 * Does not use `send` or `receive` at all.
 	 */
 	template<class F>
-	void processDirectRouting(InterleavedBufferView<float, 2> coreBuffer,
-		AudioPortsBuffer<settings>& processorBuffers, F&& processFunc);
+	auto processWithDirectRouting(InterleavedBufferView<float, 2> coreBuffer,
+		AudioPortsBuffer<settings>& processorBuffers, F&& processFunc) -> ProcessStatus;
 
 	const AudioPorts<settings>* const m_ap;
+	double m_rms = 0;
+	const bool m_autoQuitEnabled;
 };
 
 } // namespace detail
@@ -327,6 +302,11 @@ public:
 	 *                          `void(buffers...)` where `buffers` is the expected audio buffer(s) (if any)
 	 *                          for the given `settings`.
 	 *
+	 * `rms`
+	 *     The RMS is calculated from the in-use processor output channels (processor channels that are
+	 *     routed to at least one track channel).
+	 *     Only available when `process()` returns `ProcessStatus::ContinueIfNotQuiet` and auto-quit is enabled.
+	 *
 	 * `send`
 	 *     Routes audio from LMMS track channels to processor inputs according to the pin connections.
 	 *
@@ -349,7 +329,7 @@ public:
 	 */
 	using Router = detail::AudioPortsRouter<settings>;
 
-	template<AudioPortsSettings, bool>
+	template<AudioPortsSettings>
 	friend class detail::AudioPortsRouter;
 
 	/**
@@ -394,7 +374,10 @@ public:
 		return *static_cast<AudioPortsModel*>(this);
 	}
 
-	auto getRouter() const -> Router { return Router{*this}; }
+	auto getRouter(bool autoQuitEnabled = false) const -> Router
+	{
+		return Router{*this, autoQuitEnabled};
+	}
 
 	static constexpr auto audioPortsSettings() -> AudioPortsSettings { return settings; }
 };
@@ -437,11 +420,12 @@ inline auto convertSample(const In sample) -> Out
 	}
 }
 
-// Non-interleaved AudioPortsRouter out-of-class definitions
+// AudioPorts::Router out-of-class definitions
 
 template<AudioPortsSettings settings>
-inline void AudioPortsRouter<settings, false>::send(
+inline void AudioPortsRouter<settings>::send(
 	AudioBus<const float> in, PlanarBufferView<SampleT, settings.inputs> out) const
+	requires (!settings.interleaved)
 {
 	assert(m_ap->in().channelCount() != DynamicChannelCount);
 	if (m_ap->in().channelCount() == 0) { return; }
@@ -502,8 +486,9 @@ inline void AudioPortsRouter<settings, false>::send(
 }
 
 template<AudioPortsSettings settings>
-inline void AudioPortsRouter<settings, false>::receive(
+inline void AudioPortsRouter<settings>::receive(
 	PlanarBufferView<const SampleT, settings.outputs> in, AudioBus<float> inOut) const
+	requires (!settings.interleaved)
 {
 	assert(m_ap->out().channelCount() != DynamicChannelCount);
 	if (m_ap->out().channelCount() == 0) { return; }
@@ -517,10 +502,10 @@ inline void AudioPortsRouter<settings, false>::receive(
 	 * without any processor audio routed to it, the track channel is unmodified for "bypass"
 	 * behavior.
 	 */
-	const auto routeNx2 = [&](float* outPtr, track_ch_t outChannel, auto routedChannels) {
-		constexpr std::uint8_t rc = routedChannels();
+	const auto routeNx2 = [&](float* outPtr, track_ch_t outChannel, auto usedTrackChannels) {
+		constexpr std::uint8_t utc = usedTrackChannels();
 
-		if constexpr (rc == 0b00)
+		if constexpr (utc == 0b00)
 		{
 			// Both track channels bypassed - nothing to do
 			return;
@@ -532,7 +517,7 @@ inline void AudioPortsRouter<settings, false>::receive(
 		// rather than bypassing, so it is safe to set the output buffer of those channels
 		// to zero prior to accumulation
 
-		if constexpr (rc == 0b11)
+		if constexpr (utc == 0b11)
 		{
 			std::fill_n(outPtr, samples, 0.f);
 		}
@@ -540,11 +525,11 @@ inline void AudioPortsRouter<settings, false>::receive(
 		{
 			for (f_cnt_t sampleIdx = 0; sampleIdx < samples; sampleIdx += 2)
 			{
-				if constexpr ((rc & 0b10) != 0)
+				if constexpr ((utc & 0b10) != 0)
 				{
 					outPtr[sampleIdx] = 0.f;
 				}
-				if constexpr ((rc & 0b01) != 0)
+				if constexpr ((utc & 0b01) != 0)
 				{
 					outPtr[sampleIdx + 1] = 0.f;
 				}
@@ -555,7 +540,7 @@ inline void AudioPortsRouter<settings, false>::receive(
 		{
 			const SampleT* inPtr = in.bufferPtr(inChannel);
 
-			if constexpr (rc == 0b11)
+			if constexpr (utc == 0b11)
 			{
 				// This input channel could be routed to either left, right, both, or neither output channels
 				if (m_ap->out().enabled(outChannel, inChannel))
@@ -584,7 +569,7 @@ inline void AudioPortsRouter<settings, false>::receive(
 					}
 				}
 			}
-			else if constexpr (rc == 0b10)
+			else if constexpr (utc == 0b10)
 			{
 				// This input channel may or may not be routed to the left output channel
 				if (!m_ap->out().enabled(outChannel, inChannel)) { continue; }
@@ -594,7 +579,7 @@ inline void AudioPortsRouter<settings, false>::receive(
 					outPtr[sampleIdx] += inPtr[sampleIdx / 2];
 				}
 			}
-			else if constexpr (rc == 0b01)
+			else if constexpr (utc == 0b01)
 			{
 				// This input channel may or may not be routed to the right output channel
 				if (!m_ap->out().enabled(outChannel + 1, inChannel)) { continue; }
@@ -613,11 +598,11 @@ inline void AudioPortsRouter<settings, false>::receive(
 		float* outPtr = inOut[outChannelPairIdx]; // track channel pair - 2-channel interleaved
 		const auto outChannel = static_cast<track_ch_t>(outChannelPairIdx * 2);
 
-		const std::uint8_t routedChannels =
-				(static_cast<std::uint8_t>(m_ap->m_routedChannels[outChannel]) << 1u)
-				| static_cast<std::uint8_t>(m_ap->m_routedChannels[outChannel + 1]);
+		const std::uint8_t usedTrackChannels =
+				(static_cast<std::uint8_t>(m_ap->m_usedTrackChannels[outChannel]) << 1u)
+				| static_cast<std::uint8_t>(m_ap->m_usedTrackChannels[outChannel + 1]);
 
-		switch (routedChannels)
+		switch (usedTrackChannels)
 		{
 			case 0b00:
 				// Both track channels are bypassed, so nothing is allowed to be written to output
@@ -638,12 +623,10 @@ inline void AudioPortsRouter<settings, false>::receive(
 	}
 }
 
-
-// Interleaved AudioPortsRouter out-of-class definitions
-
 template<AudioPortsSettings settings>
-inline void AudioPortsRouter<settings, true>::send(
+inline void AudioPortsRouter<settings>::send(
 	AudioBus<const float> in, InterleavedBufferView<float, settings.inputs> out) const
+	requires (settings.interleaved)
 {
 	assert(m_ap->in().channelCount() != DynamicChannelCount);
 	if (m_ap->in().channelCount() == 0) { return; }
@@ -731,8 +714,9 @@ inline void AudioPortsRouter<settings, true>::send(
 }
 
 template<AudioPortsSettings settings>
-inline void AudioPortsRouter<settings, true>::receive(
+inline void AudioPortsRouter<settings>::receive(
 	InterleavedBufferView<const float, settings.outputs> in, AudioBus<float> inOut) const
+	requires (settings.interleaved)
 {
 	assert(m_ap->out().channelCount() != DynamicChannelCount);
 	if (m_ap->out().channelCount() == 0) { return; }
@@ -829,10 +813,112 @@ inline void AudioPortsRouter<settings, true>::receive(
 }
 
 template<AudioPortsSettings settings>
-template<class F>
-inline void AudioPortsRouter<settings, true>::processDirectRouting(
-	InterleavedBufferView<float, 2> coreBuffer, AudioPortsBuffer<settings>& processorBuffers, F&& processFunc)
+inline auto AudioPortsRouter<settings>::calculateRms(InterleavedBufferView<const float, 2> output) -> double
 {
+	assert(m_ap->m_usedProcessorChannels.size() == 2);
+
+	double rms = 0;
+	if (m_ap->m_usedProcessorChannels[0] && m_ap->m_usedProcessorChannels[1])
+	{
+		for (const SampleFrame& sf : output.toSampleFrames())
+		{
+			rms += sf.sumOfSquaredAmplitudes();
+		}
+		return rms / output.frames();
+	}
+
+	const auto usedIndex = static_cast<std::uint8_t>(m_ap->m_usedProcessorChannels[0] ? 0 : 1);
+	for (const SampleFrame& sf : output.toSampleFrames())
+	{
+		rms += sf[usedIndex] * sf[usedIndex];
+	}
+	return rms / output.frames();
+}
+
+template<AudioPortsSettings settings>
+template<proc_ch_t channelCount> requires (!settings.interleaved)
+inline auto AudioPortsRouter<settings>::calculateRms(PlanarBufferView<const SampleT, channelCount> output) -> double
+{
+	assert(output.channels() == m_ap->m_usedProcessorChannels.size());
+
+	double rms = 0;
+	proc_ch_t pc = 0;
+	for (bool used : m_ap->m_usedProcessorChannels)
+	{
+		if (!used) { continue; }
+		for (SampleT sample : output.buffer(pc))
+		{
+			rms += double{sample * sample};
+		}
+		++pc;
+	}
+	return rms / output.frames();
+}
+
+template<AudioPortsSettings settings>
+template<class F>
+inline auto AudioPortsRouter<settings>::processNormally(AudioBus<float> coreInOut,
+	AudioPortsBuffer<settings>& processorBuffers, F&& processFunc) -> ProcessStatus
+{
+	ProcessStatus status;
+	if constexpr (settings.inplace)
+	{
+		const auto processorInOut = processorBuffers.inputOutput();
+
+		// Write core to processor input buffer
+		if constexpr (settings.inputs != 0)
+		{
+			send(coreInOut, processorInOut);
+		}
+
+		// Process
+		if constexpr (!settings.buffered) { status = processFunc(processorInOut); }
+		else { status = processFunc(); }
+
+		// Write processor output buffer to core
+		if constexpr (settings.outputs != 0)
+		{
+			receive(processorInOut, coreInOut);
+			if (status == ProcessStatus::ContinueIfNotQuiet && m_autoQuitEnabled)
+			{
+				m_rms = calculateRms(processorInOut);
+			}
+		}
+	}
+	else
+	{
+		const auto processorIn = processorBuffers.input();
+		const auto processorOut = processorBuffers.output();
+
+		// Write core to processor input buffer
+		if constexpr (settings.inputs != 0)
+		{
+			send(coreInOut, processorIn);
+		}
+
+		// Process
+		if constexpr (!settings.buffered) { status = processFunc(processorIn, processorOut); }
+		else { status = processFunc(); }
+
+		// Write processor output buffer to core
+		if constexpr (settings.outputs != 0)
+		{
+			receive(processorOut, coreInOut);
+			if (status == ProcessStatus::ContinueIfNotQuiet && m_autoQuitEnabled)
+			{
+				m_rms = calculateRms(processorOut);
+			}
+		}
+	}
+	return status;
+}
+
+template<AudioPortsSettings settings>
+template<class F>
+inline auto AudioPortsRouter<settings>::processWithDirectRouting(InterleavedBufferView<float, 2> coreBuffer,
+	AudioPortsBuffer<settings>& processorBuffers, F&& processFunc) -> ProcessStatus
+{
+	ProcessStatus status;
 	if constexpr (settings.inplace)
 	{
 		if constexpr (settings.buffered)
@@ -851,7 +937,7 @@ inline void AudioPortsRouter<settings, true>::processDirectRouting(
 			}
 
 			// Process
-			processFunc();
+			status = processFunc();
 
 			// Write processor output buffer (if it has one) to core
 			if constexpr (settings.outputs != 0)
@@ -866,7 +952,7 @@ inline void AudioPortsRouter<settings, true>::processDirectRouting(
 		else
 		{
 			// Can avoid using processor's input/output buffers AND avoid calling routing methods
-			processFunc(coreBuffer);
+			status = processFunc(coreBuffer);
 		}
 	}
 	else
@@ -887,7 +973,7 @@ inline void AudioPortsRouter<settings, true>::processDirectRouting(
 			}
 
 			// Process
-			processFunc();
+			status = processFunc();
 
 			// Write processor output buffer (if it has one) to core
 			const auto processorOut = processorBuffers.output();
@@ -924,7 +1010,7 @@ inline void AudioPortsRouter<settings, true>::processDirectRouting(
 						assert(processorOut.data() != nullptr);
 
 						// Process
-						processFunc(coreBuffer, processorOut);
+						status = processFunc(coreBuffer, processorOut);
 
 						// Write processor output buffer to core
 						std::memcpy(coreBuffer.data(), processorOut.data(), coreBuffer.dataSizeBytes());
@@ -932,23 +1018,45 @@ inline void AudioPortsRouter<settings, true>::processDirectRouting(
 					else
 					{
 						// Input-only processor - no buffer copy needed
-						processFunc(coreBuffer, processorOut);
+						status = processFunc(coreBuffer, processorOut);
 					}
 				}
 				else
 				{
 					// Output-only processor - no buffer copy needed
-					processFunc(processorIn, coreBuffer);
+					status = processFunc(processorIn, coreBuffer);
 				}
 			}
 			else
 			{
 				// Using in-place processing - the input and output buffers
 				// are allowed to be the same buffer, so no buffer copy is needed.
-				processFunc(coreBuffer, coreBuffer);
+				status = processFunc(coreBuffer, coreBuffer);
 			}
 		}
 	}
+
+	// Calculate the RMS if needed
+	if constexpr (settings.outputs != 0)
+	{
+		if (status == ProcessStatus::ContinueIfNotQuiet
+			&& m_autoQuitEnabled
+			&& m_ap->out().channelCount() != 0)
+		{
+			// The RMS is calculated using the processor output channels that are currently in use.
+			// When "direct routing" is active (as it is here), the data on the track channels
+			// is the same as the data on the in-use processor output channels, making this easy
+			// to calculate.
+			double rms = 0;
+			for (const SampleFrame& sf : coreBuffer.toSampleFrames())
+			{
+				rms += sf.sumOfSquaredAmplitudes();
+			}
+			m_rms = rms / coreBuffer.frames();
+		}
+	}
+
+	return status;
 }
 
 } // namespace detail

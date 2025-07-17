@@ -39,31 +39,86 @@ namespace lmms
 {
 
 AudioPortsModel::AudioPortsModel(bool isInstrument, Model* parent)
-	: Model{parent}
-	, m_isInstrument{isInstrument}
+	: AudioPortsModel{DynamicChannelCount, DynamicChannelCount, isInstrument, parent}
 {
-	setTrackChannelCount(DEFAULT_CHANNELS); // TODO: Will be >=2 once support for additional track channels is added
-
-	connect(Engine::audioEngine(), &AudioEngine::sampleRateChanged, [this]() {
-		bufferPropertiesChanged(in().channelCount(), out().channelCount(), Engine::audioEngine()->framesPerPeriod());
-	});
 }
 
 AudioPortsModel::AudioPortsModel(proc_ch_t channelCountIn, proc_ch_t channelCountOut, bool isInstrument, Model* parent)
 	: Model{parent}
 	, m_isInstrument{isInstrument}
 {
-	setTrackChannelCount(DEFAULT_CHANNELS); // TODO: Will be >=2 once support for additional track channels is added
-	setChannelCountsImpl(channelCountIn, channelCountOut);
+	setTrackChannelCountImpl(DEFAULT_CHANNELS); // TODO: Will be >=2 once support for additional track channels is added
+	setProcessorChannelCountsImpl(channelCountIn, channelCountOut);
+
+	updateDirectRouting();
+	updateAllUsedChannels();
 
 	connect(Engine::audioEngine(), &AudioEngine::sampleRateChanged, [this]() {
 		bufferPropertiesChanged(in().channelCount(), out().channelCount(), Engine::audioEngine()->framesPerPeriod());
 	});
 }
 
+void AudioPortsModel::setAllChannelCounts(track_ch_t trackChannels, proc_ch_t inCount, proc_ch_t outCount)
+{
+	const auto oldTrackChannelCount = m_totalTrackChannels;
+	const auto oldOutCount = m_out.channelCount();
+
+	const bool tcChanged = setTrackChannelCountImpl(trackChannels);
+	const bool pcChanged = setProcessorChannelCountsImpl(inCount, outCount);
+	if (!tcChanged && !pcChanged) { return; }
+
+	// Now update the cache
+	updateDirectRouting();
+	if (m_totalTrackChannels < oldTrackChannelCount && m_out.channelCount() < oldOutCount)
+	{
+		updateAllUsedChannels();
+	}
+	else if (m_totalTrackChannels < oldTrackChannelCount)
+	{
+		updateAllUsedProcessorChannels();
+	}
+	else if (m_out.channelCount() < oldOutCount)
+	{
+		updateAllUsedTrackChannels();
+	}
+
+	if (pcChanged)
+	{
+		// Now tell the audio buffer to update
+		bufferPropertiesChanged(inCount, outCount, Engine::audioEngine()->framesPerPeriod());
+	}
+
+	emit propertiesChanged();
+}
+
+void AudioPortsModel::setTrackChannelCount(track_ch_t count)
+{
+	const auto oldTrackChannelCount = m_totalTrackChannels;
+
+	if (!setTrackChannelCountImpl(count)) { return; }
+
+	// Now update the cache
+	updateDirectRouting();
+	if (m_totalTrackChannels < oldTrackChannelCount)
+	{
+		updateAllUsedProcessorChannels();
+	}
+
+	emit propertiesChanged();
+}
+
 void AudioPortsModel::setChannelCounts(proc_ch_t inCount, proc_ch_t outCount)
 {
-	setChannelCountsImpl(inCount, outCount);
+	const auto oldOutCount = m_out.channelCount();
+
+	if (!setProcessorChannelCountsImpl(inCount, outCount)) { return; }
+
+	// Now update the cache
+	updateDirectRouting();
+	if (m_out.channelCount() < oldOutCount)
+	{
+		updateAllUsedTrackChannels();
+	}
 
 	// Now tell the audio buffer to update
 	bufferPropertiesChanged(inCount, outCount, Engine::audioEngine()->framesPerPeriod());
@@ -71,29 +126,56 @@ void AudioPortsModel::setChannelCounts(proc_ch_t inCount, proc_ch_t outCount)
 	emit propertiesChanged();
 }
 
-void AudioPortsModel::setChannelCountsImpl(proc_ch_t inCount, proc_ch_t outCount)
+auto AudioPortsModel::setTrackChannelCountImpl(track_ch_t count) -> bool
+{
+	if (count < 2) { throw std::invalid_argument{"There must be at least 2 track channels"}; }
+	if (count % 2 != 0) { throw std::invalid_argument{"There must be an even number of track channels"}; }
+
+	if (count > MaxTrackChannels)
+	{
+		throw std::invalid_argument{"Only up to 256 track channels are allowed"};
+	}
+
+	if (in().pins().size() == count && out().pins().size() == count)
+	{
+		return false;
+	}
+
+	m_trackChannelsUpperBound = std::min(m_trackChannelsUpperBound, count);
+	m_usedTrackChannels.resize(count);
+	m_totalTrackChannels = count;
+
+	m_in.setTrackChannelCount(count, QString::fromUtf16(u"Pin in [%1 \U0001F82E %2]"));
+	m_out.setTrackChannelCount(count, QString::fromUtf16(u"Pin out [%2 \U0001F82E %1]"));
+
+	return true;
+}
+
+auto AudioPortsModel::setProcessorChannelCountsImpl(proc_ch_t inCount, proc_ch_t outCount) -> bool
 {
 	if (inCount == DynamicChannelCount || outCount == DynamicChannelCount)
 	{
-		return;
+		return false;
 	}
 
 	if (inCount == 0 && outCount == 0)
 	{
 		qWarning() << "At least one port count must be non-zero";
-		return;
+		return false;
 	}
 
 	if (in().channelCount() == inCount && out().channelCount() == outCount)
 	{
 		// No action needed
-		return;
+		return false;
 	}
+
+	m_usedProcessorChannels.resize(outCount);
 
 	m_in.setChannelCount(inCount, QString::fromUtf16(u"Pin in [%1 \U0001F82E %2]"));
 	m_out.setChannelCount(outCount, QString::fromUtf16(u"Pin out [%2 \U0001F82E %1]"));
 
-	updateDirectRouting();
+	return true;
 }
 
 void AudioPortsModel::setChannelCountIn(proc_ch_t inCount)
@@ -136,7 +218,7 @@ void AudioPortsModel::loadSettings(const QDomElement& elem)
 	m_in.loadSettings(pins.firstChildElement("in_matrix"));
 	m_out.loadSettings(pins.firstChildElement("out_matrix"));
 
-	updateAllRoutedChannels();
+	updateAllUsedChannels();
 	updateDirectRouting();
 
 #if !PIN_CONNECTOR_AUTOMATABLE_PINS
@@ -144,37 +226,10 @@ void AudioPortsModel::loadSettings(const QDomElement& elem)
 #endif
 }
 
-void AudioPortsModel::setTrackChannelCount(track_ch_t count)
-{
-	if (count < 2) { throw std::invalid_argument{"There must be at least 2 track channels"}; }
-	if (count % 2 != 0) { throw std::invalid_argument{"There must be an even number of track channels"}; }
-
-	if (count > MaxTrackChannels)
-	{
-		throw std::invalid_argument{"Only up to 256 track channels are allowed"};
-	}
-
-	if (in().pins().size() == count && out().pins().size() == count)
-	{
-		return;
-	}
-
-	m_trackChannelsUpperBound = std::min(m_trackChannelsUpperBound, count);
-	m_routedChannels.resize(count);
-	m_totalTrackChannels = count;
-
-	m_in.setTrackChannelCount(count, QString::fromUtf16(u"Pin in [%1 \U0001F82E %2]"));
-	m_out.setTrackChannelCount(count, QString::fromUtf16(u"Pin out [%2 \U0001F82E %1]"));
-
-	updateAllRoutedChannels();
-
-	emit propertiesChanged();
-}
-
-void AudioPortsModel::updateRoutedChannels(track_ch_t trackChannel)
+void AudioPortsModel::updateUsedTrackChannels(track_ch_t trackChannel)
 {
 	const auto& pins = m_out.m_pins.at(trackChannel);
-	m_routedChannels[trackChannel] = std::any_of(pins.begin(), pins.end(), [](auto m) {
+	m_usedTrackChannels[trackChannel] = std::any_of(pins.begin(), pins.end(), [](auto m) {
 #if PIN_CONNECTOR_AUTOMATABLE_PINS
 		return m->value();
 #else
@@ -183,11 +238,52 @@ void AudioPortsModel::updateRoutedChannels(track_ch_t trackChannel)
 	});
 }
 
-void AudioPortsModel::updateAllRoutedChannels()
+void AudioPortsModel::updateUsedProcessorChannels(proc_ch_t outChannel)
+{
+	const auto& pins = m_out.m_pins;
+	m_usedProcessorChannels[outChannel] = std::any_of(pins.begin(), pins.end(), [=](const auto& p) {
+#if PIN_CONNECTOR_AUTOMATABLE_PINS
+		return p[outChannel]->value();
+#else
+		return p[outChannel];
+#endif
+	});
+}
+
+void AudioPortsModel::updateAllUsedChannels()
+{
+	std::fill(m_usedProcessorChannels.begin(), m_usedProcessorChannels.end(), false);
+
+	for (track_ch_t tc = 0; tc < m_totalTrackChannels; ++tc)
+	{
+		m_usedTrackChannels[tc] = false;
+		for (proc_ch_t pc = 0; pc < m_out.channelCount(); ++pc)
+		{
+			const bool enabled = m_out.enabled(tc, pc);
+			m_usedTrackChannels[tc] = m_usedTrackChannels[tc] | enabled;
+			m_usedProcessorChannels[pc] = m_usedProcessorChannels[pc] | enabled;
+		}
+	}
+}
+
+void AudioPortsModel::updateAllUsedTrackChannels()
 {
 	for (track_ch_t tc = 0; tc < m_totalTrackChannels; ++tc)
 	{
-		updateRoutedChannels(tc);
+		updateUsedTrackChannels(tc);
+	}
+}
+
+void AudioPortsModel::updateAllUsedProcessorChannels()
+{
+	std::fill(m_usedProcessorChannels.begin(), m_usedProcessorChannels.end(), false);
+
+	for (track_ch_t tc = 0; tc < m_totalTrackChannels; ++tc)
+	{
+		for (proc_ch_t pc = 0; pc < m_out.channelCount(); ++pc)
+		{
+			m_usedProcessorChannels[pc] = m_usedProcessorChannels[pc] | m_out.enabled(tc, pc);
+		}
 	}
 }
 
@@ -317,7 +413,7 @@ void AudioPortsModel::Matrix::setPin(track_ch_t trackChannel, proc_ch_t processo
 	const bool oldValue = m_pins[trackChannel][processorChannel];
 	m_pins[trackChannel][processorChannel] = value;
 
-	updateCache(trackChannel);
+	updateCache(trackChannel, processorChannel);
 	if (value != oldValue)
 	{
 		emit m_parent->dataChanged();
@@ -325,12 +421,13 @@ void AudioPortsModel::Matrix::setPin(track_ch_t trackChannel, proc_ch_t processo
 #endif
 }
 
-void AudioPortsModel::Matrix::updateCache(track_ch_t trackChannel)
+void AudioPortsModel::Matrix::updateCache(track_ch_t trackChannel, proc_ch_t processorChannel)
 {
 	// TODO: Updating is expensive when loading/saving all the pins and PIN_CONNECTOR_AUTOMATABLE_PINS == true
 	if (isOutput())
 	{
-		m_parent->updateRoutedChannels(trackChannel);
+		m_parent->updateUsedTrackChannels(trackChannel);
+		m_parent->updateUsedProcessorChannels(processorChannel);
 	}
 	m_parent->updateDirectRouting();
 }

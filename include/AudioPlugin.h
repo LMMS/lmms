@@ -36,18 +36,6 @@
 namespace lmms
 {
 
-enum class ProcessStatus
-{
-	//! Unconditionally continue processing
-	Continue,
-
-	//! Calculate the RMS out sum and call `checkGate` to determine whether to stop processing
-	ContinueIfNotQuiet,
-
-	//! Do not continue processing
-	Sleep
-};
-
 class NotePlayHandle;
 
 namespace detail
@@ -203,6 +191,7 @@ protected:
 
 		router.process(bus, *buffers, [this](auto... buffers) {
 			this->processImpl(buffers...);
+			return ProcessStatus::Continue;
 		});
 	}
 
@@ -264,11 +253,10 @@ protected:
 
 		float* temp = inOut.data();
 		const auto bus = AudioBus<float>{&temp, 1, inOut.frames()};
-		auto router = m_audioPorts.getRouter();
+		auto router = m_audioPorts.getRouter(this->autoQuitEnabled());
 
-		ProcessStatus status;
-		router.process(bus, *buffers, [&status, this](auto... buffers) {
-			status = this->processImpl(buffers...);
+		const auto status = router.process(bus, *buffers, [this](auto... buffers) {
+			return this->processImpl(buffers...);
 		});
 
 		switch (status)
@@ -276,7 +264,7 @@ protected:
 			case ProcessStatus::Continue:
 				break;
 			case ProcessStatus::ContinueIfNotQuiet:
-				checkGate(inOut);
+				checkGate(router.rms());
 				break;
 			case ProcessStatus::Sleep:
 				return false;
