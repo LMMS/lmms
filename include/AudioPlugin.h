@@ -42,13 +42,12 @@ namespace detail
 {
 
 //! Provides the correct `processImpl` interface for instruments or effects to implement
-template<class ParentT, AudioPortsSettings settings,
-	bool inplace = settings.inplace, bool buffered = settings.buffered>
+template<class ParentT, AudioPortsSettings settings, bool inplace = settings.inplace>
 class AudioProcessingMethod;
 
 //! Instrument specialization
 template<AudioPortsSettings settings>
-class AudioProcessingMethod<Instrument, settings, false, false>
+class AudioProcessingMethod<Instrument, settings, false>
 {
 	using InBufferT = GetAudioBufferViewType<settings, false, true>;
 	using OutBufferT = GetAudioBufferViewType<settings, true, false>;
@@ -64,7 +63,7 @@ protected:
 
 //! Instrument specialization (in-place)
 template<AudioPortsSettings settings>
-class AudioProcessingMethod<Instrument, settings, true, false>
+class AudioProcessingMethod<Instrument, settings, true>
 {
 	using InOutBufferT = GetAudioBufferViewType<settings, false, false>;
 
@@ -77,28 +76,9 @@ protected:
 	virtual void processImpl(InOutBufferT inOut) = 0;
 };
 
-//! Instrument specialization (buffered)
-template<AudioPortsSettings settings, bool inplace>
-class AudioProcessingMethod<Instrument, settings, inplace, true>
-{
-protected:
-	/**
-	 * The main audio processing method for NotePlayHandle-based Instruments.
-	 * The implementation knows how to provide the working buffers.
-	 * NOTE: NotePlayHandle-based instruments are currently unsupported
-	 */
-	//virtual void processImpl(NotePlayHandle* nph) {}
-
-	/**
-	 * The main audio processing method for MIDI-based Instruments.
-	 * The implementation knows how to provide the working buffers.
-	 */
-	virtual void processImpl() = 0;
-};
-
 //! Effect specialization
 template<AudioPortsSettings settings>
-class AudioProcessingMethod<Effect, settings, false, false>
+class AudioProcessingMethod<Effect, settings, false>
 {
 	using InBufferT = GetAudioBufferViewType<settings, false, true>;
 	using OutBufferT = GetAudioBufferViewType<settings, true, false>;
@@ -113,7 +93,7 @@ protected:
 
 //! Effect specialization (in-place)
 template<AudioPortsSettings settings>
-class AudioProcessingMethod<Effect, settings, true, false>
+class AudioProcessingMethod<Effect, settings, true>
 {
 	using InOutBufferT = GetAudioBufferViewType<settings, false, false>;
 
@@ -125,18 +105,6 @@ protected:
 	virtual auto processImpl(InOutBufferT inOut) -> ProcessStatus = 0;
 };
 
-//! Effect specialization (buffered)
-template<AudioPortsSettings settings, bool inplace>
-class AudioProcessingMethod<Effect, settings, inplace, true>
-{
-protected:
-	/**
-	 * The main audio processing method for Effects. Runs when plugin is not asleep.
-	 * The implementation knows how to provide the working buffers.
-	 * The implementation is expected to perform wet/dry mixing for the first 2 channels.
-	 */
-	virtual auto processImpl() -> ProcessStatus = 0;
-};
 
 //! Connects the core audio channels to the instrument or effect using the audio ports
 template<class ParentT, AudioPortsSettings settings, class AudioPortsT>

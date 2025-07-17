@@ -52,8 +52,8 @@ public:
 	{
 		// TODO: Support custom channel names here
 		return isOutput
-			? this->tr("VST Out %1").arg(channel + 1)
-			: this->tr("VST In %1").arg(channel + 1);
+			? tr("VST Out %1").arg(channel + 1)
+			: tr("VST In %1").arg(channel + 1);
 	}
 };
 
@@ -72,7 +72,7 @@ public:
 
 
 private:
-	auto processImpl() -> ProcessStatus override;
+	auto processImpl(PlanarBufferView<const float> in, PlanarBufferView<float> out) -> ProcessStatus override;
 
 	//! Returns true if plugin was loaded (m_plugin != nullptr)
 	bool openPlugin(const QString& plugin);

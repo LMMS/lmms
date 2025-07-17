@@ -960,22 +960,6 @@ private slots:
 					}
 					return ProcessStatus::Continue;
 				}
-
-				// Buffered settings
-				auto operator()()
-				{
-					if constexpr (settings.inplace)
-					{
-						auto inOut = ap.buffers()->inputOutput();
-						return (*this)(inOut);
-					}
-					else
-					{
-						auto in = ap.buffers()->input();
-						auto out = ap.buffers()->output();
-						return (*this)(in, out);
-					}
-				}
 			};
 
 			QCOMPARE(ap.m_directRouting.value_or(99), 0);

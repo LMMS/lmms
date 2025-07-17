@@ -108,7 +108,7 @@ private slots:
 
 
 private:
-	void processImpl() override;
+	void processImpl(PlanarBufferView<const float, 0> in, PlanarBufferView<float, 2> out) override;
 
 	void initPlugin();
 	void sendControlChange( MidiControllers midiCtl, float value );

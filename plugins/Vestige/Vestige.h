@@ -70,8 +70,8 @@ public:
 	{
 		// TODO: Support custom channel names here
 		return isOutput
-			? this->tr("VST Out %1").arg(channel + 1)
-			: this->tr("VST In %1").arg(channel + 1);
+			? tr("VST Out %1").arg(channel + 1)
+			: tr("VST In %1").arg(channel + 1);
 	}
 };
 
@@ -100,7 +100,7 @@ protected slots:
 	void reloadPlugin();
 
 private:
-	void processImpl() override;
+	void processImpl(PlanarBufferView<const float> in, PlanarBufferView<float> out) override;
 
 	void closePlugin();
 

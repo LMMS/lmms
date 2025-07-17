@@ -79,7 +79,7 @@ struct AudioPortsSettings
 	 * In-place processing
 	 *
 	 * When true, the processor always uses in-place processing and its process method
-	 *   will only need a single in/out buffer parameter rather than two separate parameters.
+	 *   will have a single in/out buffer parameter rather than two separate parameters.
 	 *
 	 * When false, the processor may be dynamically in-place if the audio buffer implementation
 	 *   supports it, otherwise the processor never uses in-place processing.
@@ -89,9 +89,6 @@ struct AudioPortsSettings
 	 *   using such a buffer implementation must design their process method to check whether the
 	 *   input and output buffers are the same buffer (indicating in-place processing is active),
 	 *   and safely handle both possibilities.
-	 *
-	 * NOTE: Regardless of whether `inplace` is true or false, if `buffered` is true, the process method
-	 *   will have no buffer parameters.
 	 *
 	 * TODO: Once `RemotePluginAudioPorts` supports statically in-place processing, replace this setting with
 	 *       `forceInplace` and use statically in-place processing when `forceInplace || inputs == 0 || outputs == 0`.
@@ -105,10 +102,6 @@ struct AudioPortsSettings
 	 *   to and from the processor. This lessens the extent to which the audio port can apply the
 	 *   "direct routing" optimization, but some processors with custom audio buffers (such as Vestige)
 	 *   have no choice because they require their buffers to always be written to and read from.
-	 *
-	 *   For processors that manage their own buffers, passing those buffers to itself through
-	 *   the process method is pointless, so this option also removes the buffer parameter(s)
-	 *   from the process method. TODO: Remove this feature/quirk?
 	 *
 	 * When false, the processor's audio buffers may not always be written to or read from when routing
 	 *   to and from the processor. This can allow for better performance from the "direct routing"

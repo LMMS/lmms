@@ -327,7 +327,7 @@ QString ZynAddSubFxInstrument::nodeName() const
 
 
 
-void ZynAddSubFxInstrument::processImpl()
+void ZynAddSubFxInstrument::processImpl(PlanarBufferView<const float, 0> in, PlanarBufferView<float, 2> out)
 {
 	if (!m_pluginMutex.tryLock(Engine::getSong()->isExporting() ? -1 : 0)) { return; }
 	if (m_remotePlugin)
@@ -336,9 +336,11 @@ void ZynAddSubFxInstrument::processImpl()
 	}
 	else
 	{
-		m_localPlugin->process(audioPorts().buffers()->output());
+		m_localPlugin->process(out);
 	}
 	m_pluginMutex.unlock();
+
+	(void)in;
 }
 
 

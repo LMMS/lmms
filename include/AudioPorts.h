@@ -872,8 +872,7 @@ inline auto AudioPortsRouter<settings>::processNormally(AudioBus<float> coreInOu
 		}
 
 		// Process
-		if constexpr (!settings.buffered) { status = processFunc(processorInOut); }
-		else { status = processFunc(); }
+		status = processFunc(processorInOut);
 
 		// Write processor output buffer to core
 		if constexpr (settings.outputs != 0)
@@ -897,8 +896,7 @@ inline auto AudioPortsRouter<settings>::processNormally(AudioBus<float> coreInOu
 		}
 
 		// Process
-		if constexpr (!settings.buffered) { status = processFunc(processorIn, processorOut); }
-		else { status = processFunc(); }
+		status = processFunc(processorIn, processorOut);
 
 		// Write processor output buffer to core
 		if constexpr (settings.outputs != 0)
@@ -937,7 +935,7 @@ inline auto AudioPortsRouter<settings>::processWithDirectRouting(InterleavedBuff
 			}
 
 			// Process
-			status = processFunc();
+			status = processFunc(processorInOut);
 
 			// Write processor output buffer (if it has one) to core
 			if constexpr (settings.outputs != 0)
@@ -961,8 +959,10 @@ inline auto AudioPortsRouter<settings>::processWithDirectRouting(InterleavedBuff
 		{
 			// Can avoid calling routing methods, but must write to and read from processor's buffers
 
-			// Write core to processor input buffer (if it has one)
 			const auto processorIn = processorBuffers.input();
+			const auto processorOut = processorBuffers.output();
+
+			// Write core to processor input buffer (if it has one)
 			if constexpr (settings.inputs != 0)
 			{
 				if (m_ap->in().channelCount() != 0)
@@ -973,10 +973,9 @@ inline auto AudioPortsRouter<settings>::processWithDirectRouting(InterleavedBuff
 			}
 
 			// Process
-			status = processFunc();
+			status = processFunc(processorIn, processorOut);
 
 			// Write processor output buffer (if it has one) to core
-			const auto processorOut = processorBuffers.output();
 			if constexpr (settings.outputs != 0)
 			{
 				if (m_ap->out().channelCount() != 0)

@@ -79,7 +79,7 @@ VstEffect::VstEffect( Model * _parent,
 
 
 
-auto VstEffect::processImpl() -> ProcessStatus
+auto VstEffect::processImpl(PlanarBufferView<const float> in, PlanarBufferView<float> out) -> ProcessStatus
 {
 	assert(m_plugin != nullptr);
 	if (m_pluginMutex.tryLock(Engine::getSong()->isExporting() ? -1 : 0))
@@ -98,18 +98,12 @@ auto VstEffect::processImpl() -> ProcessStatus
 	// Wet/dry mixing only applies to those channels and any additional
 	// channels remain as-is.
 
-	auto buffers = audioPorts().buffers();
-	assert(buffers != nullptr);
-
-	const auto in = buffers->input();
 	if (in.channels() == 0)
 	{
 		// Do not process wet/dry for an instrument loaded as an effect
 		// TODO: Prevent instruments from loading as effects?
 		return ProcessStatus::ContinueIfNotQuiet;
 	}
-
-	auto out = buffers->output();
 
 	const float w = wetLevel();
 	const float d = dryLevel();
