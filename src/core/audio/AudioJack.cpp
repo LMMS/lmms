@@ -460,7 +460,7 @@ int AudioJack::processCallback(jack_nframes_t nframes)
 
 
 
-int AudioJack::staticProcessCallback(jack_nframes_t nframes, void* udata)
+int AudioJack::staticProcessCallback(jack_nframes_t nframes, void* udata) noexcept LMMS_NONBLOCKING
 {
 	return static_cast<AudioJack*>(udata)->processCallback(nframes);
 }
@@ -468,7 +468,7 @@ int AudioJack::staticProcessCallback(jack_nframes_t nframes, void* udata)
 
 
 
-void AudioJack::shutdownCallback(void* udata)
+void AudioJack::shutdownCallback(void* udata) noexcept LMMS_NONBLOCKING
 {
 	auto thisClass = static_cast<AudioJack*>(udata);
 	thisClass->m_client = nullptr;
