@@ -37,6 +37,18 @@ namespace lmms
 
 
 class JournallingObject;
+class ProjectJournal;
+
+
+class BatchActionScopeGuard
+{
+public:
+	BatchActionScopeGuard(ProjectJournal* pj);
+	~BatchActionScopeGuard();
+
+private:
+	ProjectJournal* m_journal;
+};
 
 
 //! @warning many parts of this class may be rewritten soon
@@ -53,6 +65,15 @@ public:
 
 	bool canUndo() const;
 	bool canRedo() const;
+
+	//! \brief Begin a new batch action
+	//! All journal check points created from now will be treated like a single check point.
+	//! The batch action ends when the returned BatchActionScopeGuard is deleted.
+	//! There is no harm calling this even if no checkpoints are created.
+	BatchActionScopeGuard newBatchAction()
+	{
+		return BatchActionScopeGuard(this);
+	}
 
 	void addJournalCheckPoint( JournallingObject *jo );
 
@@ -104,13 +125,16 @@ private:
 
 	struct CheckPoint
 	{
-		CheckPoint( jo_id_t initID = 0, const DataFile& initData = DataFile( DataFile::Type::JournalData ) ) :
+		// Note: default arguments needed internally by QStack::push and pop
+		CheckPoint(jo_id_t initID = 0, const DataFile& initData = DataFile(DataFile::Type::JournalData), int batchID = 0):
 			joID( initID ),
-			data( initData )
+			data(initData),
+			m_batchID(batchID)
 		{
 		}
 		jo_id_t joID;
 		DataFile data;
+		int m_batchID;
 	} ;
 	using CheckPointStack = QStack<CheckPoint>;
 
@@ -120,7 +144,10 @@ private:
 	CheckPointStack m_redoCheckPoints;
 
 	bool m_journalling;
+	int m_batchActionNestingLevel = 0;
+	int m_currentBatchID = 0;
 
+	friend class BatchActionScopeGuard;
 } ;
 
 
