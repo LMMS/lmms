@@ -171,31 +171,33 @@ Effect * Effect::instantiate( const QString& pluginName,
 
 void Effect::handleAutoQuit(std::span<const SampleFrame> output)
 {
-	if( m_autoQuitDisabled )
+	if (m_autoQuitDisabled)
 	{
 		return;
 	}
 
-	double outSum = 0.0;
-	for (const SampleFrame& frame : output)
-	{
-		outSum += frame.sumOfSquaredAmplitudes();
-	}
-	outSum / output.size();
+	static constexpr auto threshold = 1e-4f;
 
 	// Check whether we need to continue processing input. Restart the
 	// counter if the threshold has been exceeded.
-	if (outSum <= F_EPSILON)
+
+	for (const SampleFrame& frame : output)
 	{
-		incrementBufferCount();
-		if( bufferCount() > timeout() )
+		const auto abs = frame.abs();
+		if (abs.left() >= threshold || abs.right() >= threshold)
 		{
-			stopRunning();
+			// The output buffer is not quiet
 			resetBufferCount();
+			return;
 		}
 	}
-	else
+
+	// The output buffer is quiet, so check if auto-quit should be activated yet
+	incrementBufferCount();
+	if (bufferCount() > timeout())
 	{
+		// Activate auto-quit
+		stopRunning();
 		resetBufferCount();
 	}
 }
