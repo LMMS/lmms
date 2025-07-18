@@ -26,10 +26,12 @@
 #ifndef LMMS_EFFECT_H
 #define LMMS_EFFECT_H
 
-#include "Plugin.h"
-#include "Engine.h"
+#include <span>
+
 #include "AudioEngine.h"
 #include "AutomatableModel.h"
+#include "Engine.h"
+#include "Plugin.h"
 #include "TempoSyncKnobModel.h"
 
 namespace lmms
@@ -65,16 +67,6 @@ public:
 
 	//! Returns true if audio was processed and should continue being processed
 	bool processAudioBuffer(SampleFrame* buf, const fpp_t frames);
-
-	inline ch_cnt_t processorCount() const
-	{
-		return m_processors;
-	}
-
-	inline void setProcessorCount( ch_cnt_t _processors )
-	{
-		m_processors = _processors;
-	}
 
 	inline bool isOkay() const
 	{
@@ -122,12 +114,6 @@ public:
 	inline float dryLevel() const
 	{
 		return 1.0f - m_wetDryModel.value();
-	}
-
-	inline float gate() const
-	{
-		const float level = m_gateModel.value();
-		return level*level * m_processors;
 	}
 
 	inline f_cnt_t bufferCount() const
@@ -227,11 +213,11 @@ protected:
 
 private:
 	/**
-		If the setting "Keep effects running even without input" is disabled,
-		after "decay" ms of a signal below "gate", the effect is turned off
-		and won't be processed again until it receives new audio input
-	*/
-	void checkGate(double outSum);
+	 * If auto-quit is enabled ("Keep effects running even without input" setting is disabled),
+	 * after "decay" ms of a signal below the silence threshold, the effect is
+	 * turned off and won't be processed again until it receives new audio input.
+	 */
+	void handleAutoQuit(std::span<const SampleFrame> output);
 
 
 	EffectChain * m_parent;
@@ -240,8 +226,6 @@ private:
 					SampleFrame* _dst_buf, sample_rate_t _dst_sr,
 					const f_cnt_t _frames );
 
-	ch_cnt_t m_processors;
-
 	bool m_okay;
 	bool m_noRun;
 	bool m_running;
@@ -249,7 +233,6 @@ private:
 
 	BoolModel m_enabledModel;
 	FloatModel m_wetDryModel;
-	FloatModel m_gateModel;
 	TempoSyncKnobModel m_autoQuitModel;
 	
 	bool m_autoQuitDisabled;
