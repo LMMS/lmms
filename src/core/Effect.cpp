@@ -43,7 +43,6 @@ Effect::Effect( const Plugin::Descriptor * _desc,
 			const Descriptor::SubPluginFeatures::Key * _key ) :
 	Plugin( _desc, _parent, _key ),
 	m_parent( nullptr ),
-	m_processors( 1 ),
 	m_okay( true ),
 	m_noRun( false ),
 	m_running( false ),

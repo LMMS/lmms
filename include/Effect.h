@@ -66,16 +66,6 @@ public:
 	//! Returns true if audio was processed and should continue being processed
 	bool processAudioBuffer(SampleFrame* buf, const fpp_t frames);
 
-	inline ch_cnt_t processorCount() const
-	{
-		return m_processors;
-	}
-
-	inline void setProcessorCount( ch_cnt_t _processors )
-	{
-		m_processors = _processors;
-	}
-
 	inline bool isOkay() const
 	{
 		return m_okay;
@@ -233,8 +223,6 @@ private:
 					sample_rate_t _src_sr,
 					SampleFrame* _dst_buf, sample_rate_t _dst_sr,
 					const f_cnt_t _frames );
-
-	ch_cnt_t m_processors;
 
 	bool m_okay;
 	bool m_noRun;
