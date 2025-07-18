@@ -132,16 +132,8 @@ bool Effect::processAudioBuffer(SampleFrame* buf, const fpp_t frames)
 		case ProcessStatus::Continue:
 			break;
 		case ProcessStatus::ContinueIfNotQuiet:
-		{
-			double outSum = 0.0;
-			for (std::size_t idx = 0; idx < frames; ++idx)
-			{
-				outSum += buf[idx].sumOfSquaredAmplitudes();
-			}
-
-			checkGate(outSum / frames);
+			handleAutoQuit({buf, frames});
 			break;
-		}
 		case ProcessStatus::Sleep:
 			return false;
 		default:
@@ -177,14 +169,21 @@ Effect * Effect::instantiate( const QString& pluginName,
 
 
 
-void Effect::checkGate(double outSum)
+void Effect::handleAutoQuit(std::span<const SampleFrame> output)
 {
 	if( m_autoQuitDisabled )
 	{
 		return;
 	}
 
-	// Check whether we need to continue processing input.  Restart the
+	double outSum = 0.0;
+	for (const SampleFrame& frame : output)
+	{
+		outSum += frame.sumOfSquaredAmplitudes();
+	}
+	outSum / output.size();
+
+	// Check whether we need to continue processing input. Restart the
 	// counter if the threshold has been exceeded.
 	if (outSum <= F_EPSILON)
 	{

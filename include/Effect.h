@@ -26,10 +26,12 @@
 #ifndef LMMS_EFFECT_H
 #define LMMS_EFFECT_H
 
-#include "Plugin.h"
-#include "Engine.h"
+#include <span>
+
 #include "AudioEngine.h"
 #include "AutomatableModel.h"
+#include "Engine.h"
+#include "Plugin.h"
 #include "TempoSyncKnobModel.h"
 
 namespace lmms
@@ -211,11 +213,11 @@ protected:
 
 private:
 	/**
-		If the setting "Keep effects running even without input" is disabled,
-		after "decay" ms of a signal below "gate", the effect is turned off
-		and won't be processed again until it receives new audio input
-	*/
-	void checkGate(double outSum);
+	 * If auto-quit is enabled ("Keep effects running even without input" setting is disabled),
+	 * after "decay" ms of a signal below the silence threshold, the effect is
+	 * turned off and won't be processed again until it receives new audio input.
+	 */
+	void handleAutoQuit(std::span<const SampleFrame> output);
 
 
 	EffectChain * m_parent;
