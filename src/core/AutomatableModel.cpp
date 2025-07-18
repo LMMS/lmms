@@ -549,6 +549,10 @@ ValueBuffer * AutomatableModel::valueBuffer()
 
 	float val = m_value; // make sure our m_value doesn't change midway
 
+	// TODO
+	// Let the Controller set the value of connected Models,
+	// instead of each Model checking the Controller value every time.
+
 	// Get value buffer from our controller
 	if (m_controllerConnection && m_useControllerValue && m_controllerConnection->getController()->isSampleExact())
 	{
@@ -603,6 +607,10 @@ ValueBuffer * AutomatableModel::valueBuffer()
 				}
 		}
 	}
+
+	// Note: if there are linked models but no controller, `setValue()` will have
+	// updated `m_value` and `m_oldValue` across all linked models, so the `valueBuffer()`
+	// will be the same (even if it is calculated separatly for each model).
 
 	// Populate value buffer by interpolatating between the old and new value
 	if (m_oldValue != val)

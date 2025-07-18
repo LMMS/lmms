@@ -149,6 +149,12 @@ public:
 	template<class T>
 	inline T value( int frameOffset = 0 ) const
 	{
+		// TODO
+		// The `m_value` should only be updated whenever the Controller value changes,
+		// instead of the Model calling `controller->currentValue()` every time.
+		// This becomes even worse in the case of linked Models, where it has to
+		// loop through the list of all links.
+
 		if (m_useControllerValue)
 		{
 			if (m_controllerConnection)
