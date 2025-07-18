@@ -342,8 +342,8 @@ private:
 	int noteEditRight() const;
 	int noteEditLeft() const;
 
-	int getKey(const int y) const;
-	int yCoordOfKey(const int key) const;
+	int getKey(int y) const;
+	int yCoordOfKey(int key) const;
 
 	void dragNotes(int x, int y, bool alt, bool shift, bool ctrl);
 

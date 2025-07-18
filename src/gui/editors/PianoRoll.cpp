@@ -4059,14 +4059,15 @@ void PianoRoll::focusInEvent( QFocusEvent * ev )
 
 int PianoRoll::getKey(const int y) const
 {
-	// If y == keyAreaBottom() the cursor is on the first pixel BELOW the editor
-	// and thus its distanceFromBottom should be -1. We calculate the distance from
-	// ABSOLUTE bottom before dividing, because integer division with negative numbers
-	// causes rounding issues.
-
+	// Since keys are numbered from the bottom up, we must get the cursors
+	// distance from the bottom of the editor, as if the bottom pixel was number 0.
+	// keyAreaBottom() is the first row BELOW the editor, therefore we subtract 1.
 	const int distanceFromBottom = keyAreaBottom() - 1 - y;
+	// As we divide the distance by keyLineHeight we want to floor() the result,
+	// which is exactly what integer division does, but only for POSITIVE numbers.
+	// Therefore we calculate the distance from absolute 0 (to ensure it is positive)
+	// before dividing.
 	const int fromAbsoluteBottom = m_startKey * m_keyLineHeight + distanceFromBottom;
-
 	return std::clamp(fromAbsoluteBottom / m_keyLineHeight, 0, NumKeys - 1);
 }
 
@@ -4074,7 +4075,9 @@ int PianoRoll::getKey(const int y) const
 
 int PianoRoll::yCoordOfKey(const int key) const
 {
-	// If key == m_startKey it should be 1 keyLineHeight above keyAreaBottom (the top of the resize line)
+	// m_startKey is the bottomost visible key and keyAreaBottom() is the first pixel BELOW the editor.
+	// Count number of keys from bottom, multiply by key height, and add one key height
+	// since we want to return the TOP pixel of given key
 	return keyAreaBottom() - ((key - m_startKey + 1) * m_keyLineHeight);
 }
 
