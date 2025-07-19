@@ -1,4 +1,15 @@
 #!/bin/bash
+
+# Where generated source strings are saved
+OUTPUT_TS="data/locale/en.ts"
+
+# From lupdate --help
+EXTENSIONS='\.(java|jui|ui|c|c[+][+]|cc|cpp|cxx|ch|h|h[+][+]|hh|hpp|hxx|js|qs|qml|qrc)$'
+
+# Temporary files
+LIST_FILE="$(mktemp -u lupdate_XXXXX.txt)"
+QM_TEST_FILE="$(mktemp -u lconvert_XXXXX.qm)"
+
 aberr(){ printf "[\e[31mERROR\e[0m]: \e[1m%s\e[0m\n" "$*" >&2; }
 abinfo(){ printf "[\e[96mINFO\e[0m]: \e[1m%s\e[0m\n" "$*" >&2; }
 
@@ -20,7 +31,7 @@ function validate() {
   ERR_LANG=""
   ERR_BUF=""
   for i in data/locale/*.ts; do
-    if ! ERR_BUF=$(lconvert-qt5 -i "${i}" -o "/tmp/test.qm" -of qm 2>&1); then
+    if ! ERR_BUF=$(lconvert-qt5 -i "${i}" -o "$QM_TEST_FILE" -of qm 2>&1); then
       ERR_LANG+="\e[96m$(basename "${i}")\e[0m: \e[93m${ERR_BUF}\e[0m "
       printf "\e[31mx\e[0m"
       continue
@@ -34,6 +45,15 @@ function validate() {
   fi
 }
 
+# disable "code unreachable" warning for this function
+# shellcheck disable=SC2317
+function cleanup() {
+  [[ -f $LIST_FILE ]] && rm "$LIST_FILE"
+  [[ -f $QM_TEST_FILE ]] && rm "$QM_TEST_FILE"
+}
+
+trap cleanup EXIT
+
 abinfo "Checking for your environment..."
 if ! which lupdate-qt5 > /dev/null; then
   aberr "You don't seem to have Qt i18n tools installed."
@@ -44,12 +64,8 @@ fi
 
 abinfo "Scanning directories..."
 
-if test -d src/3rdparty/qt5-x11embed/3rdparty/ECM/; then
-  # prevent from collecting strings in ECM
-  rm -rf src/3rdparty/qt5-x11embed/3rdparty/ECM/
-fi
-
-if ! lupdate-qt5 -I include/ src/ plugins/ -ts data/locale/en.ts; then
+git ls-files | grep -E "$EXTENSIONS" > "$LIST_FILE"
+if ! lupdate -no-obsolete -I include/ "@$LIST_FILE" -ts "$OUTPUT_TS"; then
   aberr "There are some problems when collecting the strings."
   exit 1
 fi
