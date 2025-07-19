@@ -126,13 +126,14 @@ bool Sample::play(SampleFrame* dst, PlaybackState* state, size_t numFrames, Loop
 		if (state->m_window.empty())
 		{
 			const auto rendered = render(state->m_buffer.data(), state->m_buffer.size(), state, loop);
+			if (rendered == 0) { break; }
 			state->m_window = {state->m_buffer.data(), rendered};
 		}
 
 		const auto result = state->m_resampler.process(
 			{&state->m_window[0][0], 2, state->m_window.size()}, {&dst[0][0], 2, numFrames});
 
-		if (result.inputFramesUsed == 0 && result.outputFramesGenerated == 0) { break; }
+		if (result.outputFramesGenerated == 0) { break; }
 
 		state->m_window = state->m_window.subspan(result.inputFramesUsed, state->m_window.size() - result.inputFramesUsed);
 		dst += result.outputFramesGenerated;
