@@ -4059,11 +4059,11 @@ void PianoRoll::focusInEvent( QFocusEvent * ev )
 
 int PianoRoll::getKey(const int y) const
 {
-	// Since keys are numbered from the bottom up, we must get the cursors
+	// Since keys are numbered from the bottom up, we must get the cursor's
 	// distance from the bottom of the editor, as if the bottom pixel was number 0.
 	// keyAreaBottom() is the first row BELOW the editor, therefore we subtract 1.
 	const int distanceFromBottom = keyAreaBottom() - 1 - y;
-	// As we divide the distance by keyLineHeight we want to floor() the result,
+	// As we divide the distance by keyLineHeight, we want to floor() the result,
 	// which is exactly what integer division does, but only for POSITIVE numbers.
 	// Therefore we calculate the distance from absolute 0 (to ensure it is positive)
 	// before dividing.
