@@ -59,7 +59,7 @@ public:
 		void setBackwards(bool backwards) { m_backwards = backwards; }
 
 	private:
-		AudioResampler::Stream m_resampler;
+		AudioResampler m_resampler;
 		int m_frameIndex = 0;
 		bool m_backwards = false;
 		friend class Sample;

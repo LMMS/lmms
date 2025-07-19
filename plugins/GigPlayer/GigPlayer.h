@@ -170,7 +170,7 @@ public:
 	bool pitchtrack;
 
 	// Used to convert sample rates
-	AudioResampler::Stream m_resampler;
+	AudioResampler m_resampler;
 
 	// Used changing the pitch of the note if desired
 	float sampleFreq;
@@ -313,6 +313,8 @@ private:
 	void addSamples( GigNote & gignote, bool wantReleaseSample );
 
 	friend class gui::GigInstrumentView;
+
+	std::vector<SampleFrame> m_mixBuffer;
 
 signals:
 	void fileLoading();

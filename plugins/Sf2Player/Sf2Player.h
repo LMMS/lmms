@@ -106,7 +106,7 @@ public slots:
 	void updateTuning();
 
 private:
-	AudioResampler::Stream m_resampler;
+	AudioResampler m_resampler;
 
 	fluid_settings_t* m_settings;
 	fluid_synth_t* m_synth;

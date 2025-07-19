@@ -120,13 +120,13 @@ bool Sample::play(SampleFrame* dst, PlaybackState* state, size_t numFrames, Loop
 	state->m_resampler.setRatio(m_buffer->sampleRate(), Engine::audioEngine()->outputSampleRate());
 	state->m_resampler.setRatio(state->m_resampler.ratio() * (frequency() / DefaultBaseFreq) * ratio);
 
-	const auto result = state->m_resampler.resample<AudioResampler::Stream::WriteMode::Copy>(
-		[&](InterleavedBufferView<float> output) {
-			return render(reinterpret_cast<SampleFrame*>(output[0]), output.frames(), state, loop);
+	const auto count = state->m_resampler.process(
+		[this, &state, &loop](InterleavedBufferView<float> out) {
+			return render(reinterpret_cast<SampleFrame*>(out.data()), out.frames(), state, loop);
 		},
-		{&dst[0][0], DEFAULT_CHANNELS, numFrames});
+		{&dst[0][0], 2, numFrames});
 
-	return result.outputFramesWritten > 0;
+	return count > 0;
 }
 
 f_cnt_t Sample::render(SampleFrame* dst, f_cnt_t size, PlaybackState* state, Loop loop) const

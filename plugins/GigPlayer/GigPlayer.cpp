@@ -44,6 +44,7 @@
 #include "InstrumentTrack.h"
 #include "InstrumentPlayHandle.h"
 #include "Knob.h"
+#include "MixHelpers.h"
 #include "NotePlayHandle.h"
 #include "PathUtil.h"
 #include "Sample.h"
@@ -87,6 +88,7 @@ GigInstrument::GigInstrument(InstrumentTrack* _instrument_track)
 	, m_gain(1.0f, 0.0f, 5.0f, 0.01f, this, tr("Gain"))
 	, m_RandomSeed(0)
 	, m_currentKeyDimension(0)
+	, m_mixBuffer(Engine::audioEngine()->framesPerPeriod())
 {
 	auto iph = new InstrumentPlayHandle(this, _instrument_track);
 	Engine::audioEngine()->addPlayHandle( iph );
@@ -433,21 +435,24 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 
 			sample.m_resampler.setRatio(freq_factor);
 
-			sample.m_resampler.resample<AudioResampler::Stream::WriteMode::Mix>([&](InterleavedBufferView<float> output)
-			{
-				loadSample(sample, reinterpret_cast<SampleFrame*>(output[0]), output.frames());
-				sample.pos += output.frames();
-				sample.adsr.inc(output.frames());
+			const auto count = sample.m_resampler.process(
+				[this, &copy, &sample](InterleavedBufferView<float> output) {
+					loadSample(sample, reinterpret_cast<SampleFrame*>(output.data()), output.frames());
+					sample.pos += output.frames();
+					sample.adsr.inc(output.frames());
 
-				for (auto frame = std::size_t{0}; frame < output.frames(); ++frame)
-				{
-					const auto amp = copy.value();
-					output[frame][0] *= amp;
-					output[frame][1] *= amp;
-				}
+					for (auto frame = std::size_t{0}; frame < output.frames(); ++frame)
+					{
+						const auto amp = copy.value();
+						output[frame][0] *= amp;
+						output[frame][1] *= amp;
+					}
 
-				return output.frames();
-			}, {&_working_buffer[0][0], DEFAULT_CHANNELS, frames});
+					return output.frames();
+				},
+				{&m_mixBuffer[0][0], 2, m_mixBuffer.size()});
+
+			MixHelpers::add(_working_buffer, m_mixBuffer.data(), count);
 		}
 	}
 

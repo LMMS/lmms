@@ -25,7 +25,6 @@
 #ifndef LMMS_AUDIO_RESAMPLER_H
 #define LMMS_AUDIO_RESAMPLER_H
 
-#include <algorithm>
 #include <samplerate.h>
 #include <stdexcept>
 #include <vector>
@@ -58,11 +57,6 @@ public:
 		f_cnt_t outputFramesGenerated; //!< The number of output frames generated.
 	};
 
-	//! A class with additional functionality on top of a resampler to meant for resampling audio streams.
-	//! Audio streams are simply functions that output audio. Usually, clients that want to resample audio streams have
-	//! to handle a bit of buffer logic to do so. This class handles those use cases.
-	class Stream;
-
 	//! Create a resampler with the given interpolation mode and number of channels.
 	//! The constructor assumes stereo audio by default.
 	AudioResampler(Mode mode, ch_cnt_t channels = DEFAULT_CHANNELS);
@@ -86,6 +80,33 @@ public:
 	//! @return The resampling results. See @ref Result.
 	[[nodiscard]] auto process(InterleavedBufferView<const float> input, InterleavedBufferView<float> output) -> Result;
 
+	template <typename InterleavedBufferSource>
+		requires(std::is_invocable_r_v<std::size_t, InterleavedBufferSource, InterleavedBufferView<float>>)
+	auto process(InterleavedBufferSource input, InterleavedBufferView<float> output) -> std::size_t
+	{
+		if (output.channels() != m_channels) { throw std::runtime_error{"Invalid channel count"}; }
+
+		auto outputFramesGenerated = std::size_t{0};
+		while (!output.empty())
+		{
+			if (m_bufferWindow.empty())
+			{
+				const auto rendered = input({m_buffer.data(), m_channels, m_buffer.size() / m_channels});
+				m_bufferWindow = {m_buffer.data(), m_channels, rendered};
+			}
+
+			const auto result = process(m_bufferWindow, output);
+			if (result.inputFramesUsed == 0 && result.outputFramesGenerated == 0) { break; }
+
+			m_bufferWindow
+				= m_bufferWindow.subspan(result.inputFramesUsed, m_bufferWindow.frames() - result.inputFramesUsed);
+			output = output.subspan(result.outputFramesGenerated, output.frames() - result.outputFramesGenerated);
+			outputFramesGenerated += result.outputFramesGenerated;
+		}
+
+		return outputFramesGenerated;
+	}
+
 	//! Reset the resampler state. Needed when working on unrelated pieces of audio.
 	void reset();
 
@@ -106,122 +127,14 @@ public:
 
 private:
 	static auto converterType(Mode mode) -> int;
+	static constexpr auto DefaultFrames = 16;
+	std::vector<float> m_buffer;
+	InterleavedBufferView<float> m_bufferWindow;
 	SRC_STATE* m_state = nullptr;
 	Mode m_mode;
 	ch_cnt_t m_channels = 0;
 	double m_ratio = 1.0;
 	int m_error = 0;
-};
-
-class AudioResampler::Stream
-{
-public:
-	//! The resampling results returned from calls to @ref resample.
-	struct Result
-	{
-		f_cnt_t inputFramesGenerated;
-		f_cnt_t outputFramesWritten;
-	};
-
-	//! Specifies how the resampled output should be written.
-	enum class WriteMode
-	{
-		Copy, //! The resampled output will be copied.
-		Mix	  //! The resampled output will be mixed.
-	};
-
-	//! Create an audio resampler stream with the given @p mode and channel count @p channels .
-	//! Assumes stereo audio by default.
-	Stream(Mode mode, ch_cnt_t channels = DEFAULT_CHANNELS)
-		: m_resampler(mode, channels)
-		, m_inputBuffer(bufferSize(channels))
-		, m_outputBuffer(bufferSize(channels))
-		, m_inputWindow({m_inputBuffer.data(), channels, 0})
-		, m_outputWindow({m_outputBuffer.data(), channels, 0})
-	{
-	}
-
-	//! Resample audio from the @p input into the @p output at the assigned resampling ratio .
-	//! If @p writeMode is set to `WriteMode::Copy`, then the resampled output will be copied directly into @p output .
-	//! If @p writeMode is set to `WriteMode::Mix`, then the resampled output will be mixed additively into @p output .
-	template <WriteMode writeMode, typename Input>
-	auto resample(Input input, InterleavedBufferView<float> output) -> Result
-	{
-		if (output.channels() != m_resampler.channels()) { throw std::invalid_argument{"Invalid channel count"}; }
-
-		auto resampleResult = Result{};
-		while (!output.empty())
-		{
-			if (!m_outputWindow.empty())
-			{
-				const auto numFramesToWrite = std::min(m_outputWindow.frames(), output.frames());
-
-				if constexpr (writeMode == WriteMode::Copy)
-				{
-					std::copy_n(m_outputWindow.data(), numFramesToWrite * m_resampler.channels(), output.data());
-				}
-				else if constexpr (writeMode == WriteMode::Mix)
-				{
-					std::transform(m_outputWindow.data(),
-						m_outputWindow.data() + numFramesToWrite * m_resampler.channels(), output.data(), output.data(),
-						std::plus{});
-				}
-
-				m_outputWindow = m_outputWindow.subspan(numFramesToWrite, m_outputWindow.frames() - numFramesToWrite);
-				output = output.subspan(numFramesToWrite, output.frames() - numFramesToWrite);
-				resampleResult.outputFramesWritten += numFramesToWrite;
-			}
-			else if (!m_inputWindow.empty())
-			{
-				const auto result = m_resampler.process(m_inputWindow, outputBufferView());
-				m_inputWindow
-					= m_inputWindow.subspan(result.inputFramesUsed, m_inputWindow.frames() - result.inputFramesUsed);
-				m_outputWindow = outputBufferView().subspan(0, result.outputFramesGenerated);
-			}
-			else
-			{
-				const auto rendered = input(inputBufferView());
-				if (rendered == 0) { break; }
-
-				m_inputWindow = inputBufferView().subspan(0, rendered);
-				resampleResult.inputFramesGenerated += rendered;
-			}
-		}
-
-		return resampleResult;
-	}
-
-	//! See @ref `AudioResampler::ratio`.
-	auto ratio() const -> double { return m_resampler.ratio(); }
-
-	//! See @ref `AudioResampler::setRatio`.
-	void setRatio(double ratio) { m_resampler.setRatio(ratio); }
-
-	//! See @ref `AudioResampler::setRatio`.
-	void setRatio(sample_rate_t input, sample_rate_t output) { m_resampler.setRatio(input, output); }
-
-private:
-	static constexpr auto bufferSize(ch_cnt_t channels) -> std::size_t
-	{
-		constexpr auto BufferSize = 64 / sizeof(float);
-		return std::max(BufferSize, static_cast<std::size_t>(channels));
-	}
-
-	auto inputBufferView() -> InterleavedBufferView<float>
-	{
-		return {m_inputBuffer.data(), m_resampler.channels(), m_inputBuffer.size() / m_resampler.channels()};
-	}
-
-	auto outputBufferView() -> InterleavedBufferView<float>
-	{
-		return {m_outputBuffer.data(), m_resampler.channels(), m_outputBuffer.size() / m_resampler.channels()};
-	}
-
-	AudioResampler m_resampler;
-	std::vector<float> m_inputBuffer;
-	std::vector<float> m_outputBuffer;
-	InterleavedBufferView<float> m_inputWindow;
-	InterleavedBufferView<float> m_outputWindow;
 };
 
 } // namespace lmms
