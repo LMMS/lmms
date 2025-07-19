@@ -120,13 +120,27 @@ bool Sample::play(SampleFrame* dst, PlaybackState* state, size_t numFrames, Loop
 	state->m_resampler.setRatio(m_buffer->sampleRate(), Engine::audioEngine()->outputSampleRate());
 	state->m_resampler.setRatio(state->m_resampler.ratio() * (frequency() / DefaultBaseFreq) * ratio);
 
-	const auto count = state->m_resampler.process(
-		[this, &state, &loop](InterleavedBufferView<float> out) {
-			return render(reinterpret_cast<SampleFrame*>(out.data()), out.frames(), state, loop);
-		},
-		{&dst[0][0], 2, numFrames});
+	auto framesWritten = 0;
+	while (numFrames > 0)
+	{
+		if (state->m_window.empty())
+		{
+			const auto rendered = render(state->m_buffer.data(), state->m_buffer.size(), state, loop);
+			state->m_window = {state->m_buffer.data(), rendered};
+		}
 
-	return count > 0;
+		const auto result = state->m_resampler.process(
+			{&state->m_window[0][0], 2, state->m_window.size()}, {&dst[0][0], 2, numFrames});
+
+		if (result.inputFramesUsed == 0 && result.outputFramesGenerated == 0) { break; }
+
+		state->m_window = state->m_window.subspan(result.inputFramesUsed, state->m_window.size() - result.inputFramesUsed);
+		dst += result.outputFramesGenerated;
+		numFrames -= result.outputFramesGenerated;
+		framesWritten += result.outputFramesGenerated;
+	}
+
+	return framesWritten > 0;
 }
 
 f_cnt_t Sample::render(SampleFrame* dst, f_cnt_t size, PlaybackState* state, Loop loop) const
@@ -162,8 +176,9 @@ f_cnt_t Sample::render(SampleFrame* dst, f_cnt_t size, PlaybackState* state, Loo
 		}
 
 		const auto value
-			= m_buffer->data()[m_reversed ? m_buffer->size() - state->m_frameIndex - 1 : state->m_frameIndex];
-		dst[frame] = value * m_amplification;
+			= m_buffer->data()[m_reversed ? m_buffer->size() - state->m_frameIndex - 1 : state->m_frameIndex]
+			* m_amplification;
+		dst[frame] = value;
 		state->m_backwards ? --state->m_frameIndex : ++state->m_frameIndex;
 	}
 

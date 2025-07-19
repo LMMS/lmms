@@ -869,13 +869,23 @@ void Sf2Instrument::renderFrames( f_cnt_t frames, SampleFrame* buf )
 
 	m_resampler.setRatio(m_internalSampleRate, Engine::audioEngine()->outputSampleRate());
 
-	m_resampler.process(
-		[this](InterleavedBufferView<float> output) {
-			const auto err = fluid_synth_write_float(
-				m_synth, output.frames(), output.data(), 0, 2, output.data(), 1, 2);
-			return err == FLUID_OK ? output.frames() : 0;
-		},
-		{&buf[0][0], 2, frames});
+	while (frames > 0)
+	{
+		if (m_window.empty())
+		{
+			const auto err
+				= fluid_synth_write_float(m_synth, m_buffer.size(), m_buffer.data(), 0, 2, m_buffer.data(), 1, 2);
+			const auto rendered = (err == FLUID_OK ? m_buffer.size() : 0);
+			m_window = {m_buffer.data(), rendered};
+		}
+
+		const auto result = m_resampler.process({&m_window[0][0], 2, m_window.size()}, {&buf[0][0], 2, frames});
+		if (result.inputFramesUsed == 0 && result.outputFramesGenerated == 0) { break; }
+
+		m_window = m_window.subspan(result.inputFramesUsed, m_window.size() - result.inputFramesUsed);
+		buf += result.outputFramesGenerated;
+		frames -= result.outputFramesGenerated;
+	}
 
 	m_synthMutex.unlock();
 }

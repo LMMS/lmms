@@ -47,7 +47,8 @@ public:
 	{
 	public:
 		PlaybackState(AudioResampler::Mode interpolationMode = AudioResampler::Mode::Linear, int frameIndex = 0)
-			: m_resampler(interpolationMode)
+			: m_window(m_buffer.data(), 0)
+			, m_resampler(interpolationMode)
 			, m_frameIndex(frameIndex)
 		{
 		}
@@ -59,6 +60,9 @@ public:
 		void setBackwards(bool backwards) { m_backwards = backwards; }
 
 	private:
+		static constexpr auto BufferSize = f_cnt_t{16};
+		std::array<SampleFrame, BufferSize> m_buffer{};
+		std::span<SampleFrame> m_window{};
 		AudioResampler m_resampler;
 		int m_frameIndex = 0;
 		bool m_backwards = false;
@@ -108,7 +112,7 @@ public:
 	void setReversed(bool reversed) { m_reversed.store(reversed, std::memory_order_relaxed); }
 
 private:
-	std::size_t render(SampleFrame* dst, f_cnt_t size, PlaybackState* state, Loop loop) const;
+	f_cnt_t render(SampleFrame* dst, f_cnt_t size, PlaybackState* state, Loop loop) const;
 	std::shared_ptr<const SampleBuffer> m_buffer = SampleBuffer::emptyBuffer();
 	std::atomic<int> m_startFrame = 0;
 	std::atomic<int> m_endFrame = 0;

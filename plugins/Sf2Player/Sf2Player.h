@@ -108,6 +108,10 @@ public slots:
 private:
 	AudioResampler m_resampler;
 
+	static constexpr auto BufferSize = f_cnt_t{16};
+	std::array<SampleFrame, BufferSize> m_buffer;
+	std::span<SampleFrame> m_window;
+
 	fluid_settings_t* m_settings;
 	fluid_synth_t* m_synth;
 

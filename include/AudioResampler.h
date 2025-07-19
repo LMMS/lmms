@@ -26,8 +26,6 @@
 #define LMMS_AUDIO_RESAMPLER_H
 
 #include <samplerate.h>
-#include <stdexcept>
-#include <vector>
 
 #include "AudioBufferView.h"
 #include "lmms_export.h"
@@ -36,7 +34,7 @@ namespace lmms {
 
 /**
  * @class AudioResampler
- * @brief A utility for resampling interleaved audio buffers using various resampling algorithms.
+ * @brief A utility class for resampling interleaved audio buffers using various resampling algorithms.
  *
  * This class provides support for zero-order hold, linear, and several levels of sinc-based resampling.
  */
@@ -89,56 +87,23 @@ public:
 	AudioResampler& operator=(AudioResampler&&) noexcept;
 
 	/**
-	 * @brief Processes a block of interleaved audio input and writes resampled output.
+	 * @brief Process a block of interleaved audio input from `input` and resample it into `output`.
 	 *
-	 * @param input Interleaved input buffer view of type `InterleavedBufferView<const float>`.
-	 * @param output Interleaved output buffer view of type `InterleavedBufferView<float>`.
-	 * @return Result containing input/output frame counts.
+	 * @param input The interleaved audio input.
+	 * @param output The interleaved audio output.
+	 *
+	 * @throws `std::invalid_argument` if a channel mismatch has been detected.
+	 * @throws `std::runtime_error` if the resampling process has failed.
+	 *
+	 * @remark This utility class does not cache the input and output buffers, making it stateless. In other words,
+	 * `input` is directly resampled into the `output`.
+	 *
+	 * @returns the result of the resampling process. See @ref Result for more details.
 	 */
 	[[nodiscard]] auto process(InterleavedBufferView<const float> input, InterleavedBufferView<float> output) -> Result;
 
 	/**
-	 * @brief Processes resampling using a pull-based input provider.
-	 *
-	 * This variant uses a callable `input` source that accepts an output buffer view and returns
-	 * the number of frames it filled.
-	 *
-	 * @tparam InterleavedBufferSource as the callable type.
-	 * @param input Function providing input audio frames on demand.
-	 * @param output Destination buffer for resampled frames of type `InterleavedBufferView<float>`.
-	 * @return Total number of output frames written.
-	 * @throws `std::runtime_error` if channel mismatch is detected.
-	 */
-	template <typename InterleavedBufferSource>
-		requires(std::is_invocable_r_v<std::size_t, InterleavedBufferSource, InterleavedBufferView<float>>)
-	[[nodiscard]] auto process(InterleavedBufferSource input, InterleavedBufferView<float> output) -> f_cnt_t
-	{
-		if (output.channels() != m_channels) { throw std::runtime_error{"Invalid channel count"}; }
-
-		auto outputFramesGenerated = std::size_t{0};
-		while (!output.empty())
-		{
-			if (m_bufferWindow.empty())
-			{
-				const auto rendered = input({m_buffer.data(), m_channels, m_buffer.size() / m_channels});
-				m_bufferWindow = {m_buffer.data(), m_channels, rendered};
-			}
-
-			const auto result = process(m_bufferWindow, output);
-			if (result.inputFramesUsed == 0 && result.outputFramesGenerated == 0) { break; }
-
-			m_bufferWindow
-				= m_bufferWindow.subspan(result.inputFramesUsed, m_bufferWindow.frames() - result.inputFramesUsed);
-			output = output.subspan(result.outputFramesGenerated, output.frames() - result.outputFramesGenerated);
-			outputFramesGenerated += result.outputFramesGenerated;
-		}
-
-		return outputFramesGenerated;
-	}
-
-	/**
 	 * @brief Resets the internal resampler state.
-	 *
 	 * Useful when working with unreleated pieces of audio.
 	 */
 	void reset();
@@ -156,20 +121,17 @@ public:
 	 */
 	void setRatio(sample_rate_t input, sample_rate_t output) { m_ratio = static_cast<double>(output) / input; }
 
-	//! @return The resampling ratio.
+	//! @returns the resampling ratio.
 	auto ratio() const -> double { return m_ratio; }
 
-	//! @return The number of channels expected by the resampler.
+	//! @returns the number of channels expected by the resampler.
 	auto channels() const -> ch_cnt_t { return m_channels; }
 
-	//! @return The interpolation mode used by this resampler.
+	//! @returns the interpolation mode used by this resampler.
 	auto mode() const -> Mode { return m_mode; }
 
 private:
 	static auto converterType(Mode mode) -> int;
-	static constexpr auto DefaultFrames = 16;
-	std::vector<float> m_buffer;
-	InterleavedBufferView<float> m_bufferWindow;
 	SRC_STATE* m_state = nullptr;
 	Mode m_mode;
 	ch_cnt_t m_channels = 0;

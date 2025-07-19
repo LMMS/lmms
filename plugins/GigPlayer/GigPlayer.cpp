@@ -88,7 +88,6 @@ GigInstrument::GigInstrument(InstrumentTrack* _instrument_track)
 	, m_gain(1.0f, 0.0f, 5.0f, 0.01f, this, tr("Gain"))
 	, m_RandomSeed(0)
 	, m_currentKeyDimension(0)
-	, m_mixBuffer(Engine::audioEngine()->framesPerPeriod())
 {
 	auto iph = new InstrumentPlayHandle(this, _instrument_track);
 	Engine::audioEngine()->addPlayHandle( iph );
@@ -435,24 +434,38 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 
 			sample.m_resampler.setRatio(freq_factor);
 
-			const auto count = sample.m_resampler.process(
-				[this, &copy, &sample](InterleavedBufferView<float> output) {
-					loadSample(sample, reinterpret_cast<SampleFrame*>(output.data()), output.frames());
-					sample.pos += output.frames();
-					sample.adsr.inc(output.frames());
+			auto framesProcessed = f_cnt_t{0};
+			while (framesProcessed < frames)
+			{
+				if (sample.m_sourceWindow.empty())
+				{
+					loadSample(sample, sample.m_sourceBuffer.data(), sample.m_sourceBuffer.size());
+					sample.pos += sample.m_sourceBuffer.size();
+					sample.adsr.inc(sample.m_sourceBuffer.size());
+					sample.m_sourceWindow = {sample.m_sourceBuffer.begin(), sample.m_sourceBuffer.end()};
+				}
 
-					for (auto frame = std::size_t{0}; frame < output.frames(); ++frame)
-					{
-						const auto amp = copy.value();
-						output[frame][0] *= amp;
-						output[frame][1] *= amp;
-					}
+				if (sample.m_mixWindow.empty())
+				{
+					sample.m_mixWindow = {sample.m_mixBuffer.begin(), sample.m_mixBuffer.end()};
+				}
 
-					return output.frames();
-				},
-				{&m_mixBuffer[0][0], 2, m_mixBuffer.size()});
+				const auto result
+					= sample.m_resampler.process({&sample.m_sourceWindow[0][0], 2, sample.m_sourceWindow.size()},
+						{&sample.m_mixWindow[0][0], 2, sample.m_mixWindow.size()});
 
-			MixHelpers::add(_working_buffer, m_mixBuffer.data(), count);
+				const auto framesToProcess = std::min(frames - framesProcessed, result.outputFramesGenerated);
+
+				for (auto i = f_cnt_t{0}; i < framesToProcess; ++i)
+				{
+					const auto amp = copy.value();
+					_working_buffer[framesProcessed + i] += sample.m_mixWindow[i] * amp;
+				}
+
+				sample.m_sourceWindow = sample.m_sourceWindow.subspan(result.inputFramesUsed, sample.m_sourceWindow.size() - result.inputFramesUsed);
+				sample.m_mixWindow = sample.m_mixWindow.subspan(framesToProcess, sample.m_mixWindow.size() - framesToProcess);
+				framesProcessed += framesToProcess;
+			}
 		}
 	}
 

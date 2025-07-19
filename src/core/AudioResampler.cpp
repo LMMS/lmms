@@ -31,9 +31,7 @@
 namespace lmms {
 
 AudioResampler::AudioResampler(Mode mode, ch_cnt_t channels)
-	: m_buffer(channels * DefaultFrames)
-	, m_bufferWindow({m_buffer.data(), channels, DefaultFrames})
-	, m_state(src_new(converterType(mode), channels, &m_error))
+	: m_state(src_new(converterType(mode), channels, &m_error))
 	, m_mode(mode)
 	, m_channels(channels)
 {

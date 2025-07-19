@@ -172,6 +172,12 @@ public:
 	// Used to convert sample rates
 	AudioResampler m_resampler;
 
+	static constexpr auto BufferSize = f_cnt_t{16};
+	std::array<SampleFrame, BufferSize> m_sourceBuffer{};
+	std::array<SampleFrame, BufferSize> m_mixBuffer{};
+	std::span<SampleFrame> m_sourceWindow{};
+	std::span<SampleFrame> m_mixWindow{};
+
 	// Used changing the pitch of the note if desired
 	float sampleFreq;
 	float freqFactor;
@@ -313,8 +319,6 @@ private:
 	void addSamples( GigNote & gignote, bool wantReleaseSample );
 
 	friend class gui::GigInstrumentView;
-
-	std::vector<SampleFrame> m_mixBuffer;
 
 signals:
 	void fileLoading();
