@@ -434,6 +434,7 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 
 			sample.m_resampler.setRatio(freq_factor);
 
+			// TODO: Add an abstraction for these audio pipeline workflows
 			auto framesProcessed = f_cnt_t{0};
 			while (framesProcessed < frames)
 			{

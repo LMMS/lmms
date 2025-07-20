@@ -120,6 +120,7 @@ bool Sample::play(SampleFrame* dst, PlaybackState* state, size_t numFrames, Loop
 	state->m_resampler.setRatio(m_buffer->sampleRate(), Engine::audioEngine()->outputSampleRate());
 	state->m_resampler.setRatio(state->m_resampler.ratio() * (frequency() / DefaultBaseFreq) * ratio);
 
+	// TODO: Add an abstraction for these audio pipeline workflows
 	auto framesWritten = 0;
 	while (numFrames > 0)
 	{

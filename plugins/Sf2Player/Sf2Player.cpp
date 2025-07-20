@@ -869,6 +869,7 @@ void Sf2Instrument::renderFrames( f_cnt_t frames, SampleFrame* buf )
 
 	m_resampler.setRatio(m_internalSampleRate, Engine::audioEngine()->outputSampleRate());
 
+	// TODO: Add an abstraction for these audio pipeline workflows
 	while (frames > 0)
 	{
 		if (m_window.empty())
