@@ -32,13 +32,50 @@
 
 class QMimeData;
 
-namespace lmms::Clipboard
+namespace lmms
+{
+
+class AutomatableModel;
+
+namespace Clipboard
 {
 
 	enum class MimeType
 	{
 		StringPair,
 		Default
+	};
+	
+	enum DataType
+	{
+		None, //!< only use for error handling
+		FloatValue,
+		AutomatableModelLink,
+		Instrument,
+		
+		PresetFile,
+		PluginPresetFile,
+		SampleFile,
+		SoundFontFile,
+		PatchFile,
+		VstPluginFile,
+		ImportedProject,
+		ProjectFile,
+		
+		SampleData,
+		
+		InstrumentTrack,
+		PatternTrack,
+		SampleTrack,
+		AutomationTrack,
+		HiddenAutomationTrack,
+		
+		MidiClip,
+		PatternClip,
+		SampleClip,
+		AutomationClip,
+		
+		Count //!< utility, do not use
 	};
 
 	// Convenience Methods
@@ -50,9 +87,13 @@ namespace lmms::Clipboard
 	QString getString( MimeType mT );
 
 	// Helper methods for String Pair data
-	void copyStringPair( const QString & key, const QString & value );
-	QString decodeKey( const QMimeData * mimeData );
+	QString getStringPairKeyName(DataType type);
+	void copyStringPair(DataType key, const QString& value, bool shouldHighlightWidgets = true);
+	DataType LMMS_EXPORT decodeKey(const QMimeData* mimeData);
 	QString decodeValue( const QMimeData * mimeData );
+
+	QString encodeFloatValue(float value);
+	QString encodeAutomatableModelLink(const AutomatableModel& model);
 
 	inline const char * mimeType( MimeType type )
 	{
@@ -67,7 +108,8 @@ namespace lmms::Clipboard
 				break;
 		}
 	}
+} // namespace Clipboard
 
-} // namespace lmms::Clipboard
+} // namespace lmms
 
 #endif // LMMS_CLIPBOARD_H

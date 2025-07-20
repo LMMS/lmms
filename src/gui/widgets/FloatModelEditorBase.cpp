@@ -47,7 +47,7 @@ namespace lmms::gui
 SimpleTextFloat * FloatModelEditorBase::s_textFloat = nullptr;
 
 FloatModelEditorBase::FloatModelEditorBase(DirectionOfManipulation directionOfManipulation, QWidget * parent, const QString & name) :
-	QWidget(parent),
+	InteractiveModelView(parent),
 	FloatModelView(new FloatModel(0, 0, 0, 1, nullptr, name, true), this),
 	m_volumeKnob(false),
 	m_volumeRatio(100.0, 0.0, 1000000.0),
@@ -127,28 +127,24 @@ void FloatModelEditorBase::toggleScale()
 
 void FloatModelEditorBase::dragEnterEvent(QDragEnterEvent * dee)
 {
-	StringPairDrag::processDragEnterEvent(dee, "float_value,"
-							"automatable_model");
+	static std::vector<Clipboard::DataType> acceptedKeys = {
+		Clipboard::DataType::FloatValue,
+		Clipboard::DataType::AutomatableModelLink
+	};
+	StringPairDrag::processDragEnterEvent(dee, &acceptedKeys);
 }
 
 
 void FloatModelEditorBase::dropEvent(QDropEvent * de)
 {
-	QString type = StringPairDrag::decodeKey(de);
-	QString val = StringPairDrag::decodeValue(de);
-	if (type == "float_value")
+	bool canAccept = processPaste(de->mimeData());
+	if (canAccept == true)
 	{
-		model()->setValue(LocaleHelper::toFloat(val));
 		de->accept();
 	}
-	else if (type == "automatable_model")
+	else
 	{
-		auto mod = dynamic_cast<AutomatableModel*>(Engine::projectJournal()->journallingObject(val.toInt()));
-		if (mod != nullptr)
-		{
-			AutomatableModel::linkModels(model(), mod);
-			mod->setValue(model()->value());
-		}
+		de->ignore();
 	}
 }
 
@@ -183,8 +179,8 @@ void FloatModelEditorBase::mousePressEvent(QMouseEvent * me)
 	else if (me->button() == Qt::LeftButton &&
 			(me->modifiers() & Qt::ShiftModifier))
 	{
-		new StringPairDrag("float_value",
-					QString::number(model()->value()),
+		new StringPairDrag(Clipboard::DataType::FloatValue,
+					Clipboard::encodeFloatValue(model()->value()),
 							QPixmap(), this);
 	}
 	else
@@ -232,12 +228,14 @@ void FloatModelEditorBase::mouseReleaseEvent(QMouseEvent* event)
 
 void FloatModelEditorBase::enterEvent(QEvent *event)
 {
+	InteractiveModelView::enterEvent(event);
 	showTextFloat(700, 2000);
 }
 
 
 void FloatModelEditorBase::leaveEvent(QEvent *event)
 {
+	InteractiveModelView::leaveEvent(event);
 	s_textFloat->hide();
 }
 
@@ -275,8 +273,35 @@ void FloatModelEditorBase::paintEvent(QPaintEvent *)
 	p.setPen(foreground);
 	p.setBrush(foreground);
 	p.drawRect(QRect(r.topLeft(), QPoint(r.width() * percentage, r.height())));
+	drawAutoHighlight(&p);
 }
 
+bool FloatModelEditorBase::canAcceptClipboardData(Clipboard::DataType dataType)
+{
+	return dataType == Clipboard::DataType::FloatValue
+		|| dataType == Clipboard::DataType::AutomatableModelLink;
+}
+
+bool FloatModelEditorBase::processPasteImplementation(Clipboard::DataType type, QString& value)
+{
+	bool shouldAccept = false;
+	if (type == Clipboard::DataType::FloatValue)
+	{
+		model()->setValue(LocaleHelper::toFloat(value));
+		shouldAccept = true;
+	}
+	else if (type == Clipboard::DataType::AutomatableModelLink)
+	{
+		auto mod = dynamic_cast<AutomatableModel*>(Engine::projectJournal()->journallingObject(value.toInt()));
+		if (mod != nullptr)
+		{
+			AutomatableModel::linkModels(model(), mod);
+			mod->setValue(model()->value());
+			shouldAccept = true;
+		}
+	}
+	return shouldAccept;
+}
 
 void FloatModelEditorBase::wheelEvent(QWheelEvent * we)
 {
@@ -418,11 +443,24 @@ void FloatModelEditorBase::enterValue()
 
 void FloatModelEditorBase::friendlyUpdate()
 {
-	if (model() && (model()->controllerConnection() == nullptr ||
-		model()->controllerConnection()->getController()->frequentUpdates() == false ||
-				Controller::runningFrames() % (256*4) == 0))
+	if (model())
 	{
-		update();
+		bool shouldUpdate = false;
+		if (model()->controllerConnection() == nullptr)
+		{
+			shouldUpdate = true;
+		}
+		else
+		{
+			if (model()->controllerConnection()->getController()->frequentUpdates() == false)
+			{
+				if (Controller::runningFrames() % (256*4) == 0) { shouldUpdate = true; }
+			}
+		}
+		if (shouldUpdate)
+		{
+			update();
+		}
 	}
 }
 

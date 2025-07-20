@@ -30,22 +30,21 @@
 
 
 #include "StringPairDrag.h"
-#include "GuiApplication.h"
-#include "MainWindow.h"
+
 #include "Clipboard.h"
+#include "GuiApplication.h"
+#include "InteractiveModelView.h"
+#include "MainWindow.h"
 
 
 namespace lmms::gui
 {
 
 
-StringPairDrag::StringPairDrag( const QString & _key, const QString & _value,
-					const QPixmap & _icon, QWidget * _w ) :
+StringPairDrag::StringPairDrag(Clipboard::DataType key, const QString& _value,
+				const QPixmap& _icon, QWidget* _w, bool shouldHighlightWidgets) :
 	QDrag( _w )
 {
-	// For mimeType() and MimeType enum class
-	using namespace Clipboard;
-
 	if( _icon.isNull() && _w )
 	{
 		setPixmap( _w->grab().scaled(
@@ -57,10 +56,15 @@ StringPairDrag::StringPairDrag( const QString & _key, const QString & _value,
 	{
 		setPixmap( _icon );
 	}
-	QString txt = _key + ":" + _value;
+	QString txt = Clipboard::getStringPairKeyName(key) + ":" + _value;
 	auto m = new QMimeData();
-	m->setData( mimeType( MimeType::StringPair ), txt.toUtf8() );
-	setMimeData( m );
+	m->setData(Clipboard::mimeType(Clipboard::MimeType::StringPair), txt.toUtf8());
+	setMimeData(m); // QDrag
+	if (shouldHighlightWidgets)
+	{
+		InteractiveModelView::startHighlighting(key);
+	}
+
 	exec( Qt::CopyAction, Qt::CopyAction );
 }
 
@@ -78,34 +82,47 @@ StringPairDrag::~StringPairDrag()
 }
 
 
-
-
-bool StringPairDrag::processDragEnterEvent( QDragEnterEvent * _dee,
-						const QString & _allowed_keys )
+bool StringPairDrag::processDragEnterEvent(QDragEnterEvent* _dee,
+	Clipboard::DataType allowedKey)
 {
-	// For mimeType() and MimeType enum class
-	using namespace Clipboard;
-
-	if( !_dee->mimeData()->hasFormat( mimeType( MimeType::StringPair ) ) )
+	if (!_dee->mimeData()->hasFormat(Clipboard::mimeType(Clipboard::MimeType::StringPair)))
 	{
-		return( false );
+		return(false);
 	}
-	QString txt = _dee->mimeData()->data( mimeType( MimeType::StringPair ) );
-	if( _allowed_keys.split( ',' ).contains( txt.section( ':', 0, 0 ) ) )
+	Clipboard::DataType curKey = Clipboard::decodeKey(_dee->mimeData());
+	if (allowedKey == curKey)
 	{
 		_dee->acceptProposedAction();
-		return( true );
+		return(true);
 	}
 	_dee->ignore();
-	return( false );
+	return(false);
+}
+
+bool StringPairDrag::processDragEnterEvent(QDragEnterEvent* _dee,
+	const std::vector<Clipboard::DataType>* allowedKeys)
+{
+	if (!_dee->mimeData()->hasFormat(Clipboard::mimeType(Clipboard::MimeType::StringPair)))
+	{
+		return(false);
+	}
+	Clipboard::DataType curKey = Clipboard::decodeKey(_dee->mimeData());
+	for (auto& i : (*allowedKeys))
+	{
+		if (i == curKey)
+		{
+			_dee->acceptProposedAction();
+			return(true);
+		}
+	}
+	_dee->ignore();
+	return(false);
 }
 
 
-
-
-QString StringPairDrag::decodeKey( QDropEvent * _de )
+Clipboard::DataType StringPairDrag::decodeKey(QDropEvent * _de)
 {
-	return Clipboard::decodeKey( _de->mimeData() );
+	return Clipboard::decodeKey(_de->mimeData());
 }
 
 

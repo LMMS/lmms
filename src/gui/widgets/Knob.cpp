@@ -499,6 +499,9 @@ void Knob::drawLabel(QPainter& p)
 		p.setPen(textColor());
 		p.drawText(x, y, m_label);
 	}
+	
+	// draw `InteractiveModelView` highlight
+	drawAutoHighlight(&p);
 }
 
 void Knob::paintEvent(QPaintEvent*)

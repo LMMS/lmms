@@ -29,16 +29,18 @@
 #include <QRubberBand>
 #include <QVector>
 
+#include "InteractiveModelView.h"
+
 namespace lmms::gui
 {
 
 
-class selectableObject : public QWidget
+class selectableObject : public InteractiveModelView
 {
 	Q_OBJECT
 public:
-	selectableObject( QWidget * _parent ) :
-		QWidget( _parent ),
+	selectableObject(QWidget* parent) :
+		InteractiveModelView(parent),
 		m_selected( false )
 	{
 	}
@@ -64,10 +66,11 @@ public slots:
 		QWidget::update();
 	}
 
+protected:
 
 private:
 	bool m_selected;
-
+	//QString m_tempString = "";
 } ;
 
 

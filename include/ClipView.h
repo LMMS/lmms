@@ -32,6 +32,7 @@
 #include "ModelView.h"
 #include "Rubberband.h"
 #include "Clip.h"
+#include "Clipboard.h"
 
 
 class QMenu;
@@ -126,6 +127,9 @@ public:
 	static void toggleMute( QVector<ClipView *> clipvs );
 
 	void toggleSelectedAutoResize();
+	
+	//! used for getting the correct clip `DataType` for a given track
+	static Clipboard::DataType getClipStringPairType(Track* track);
 
 	QColor getColorForDisplay( QColor );
 
@@ -174,6 +178,11 @@ protected:
 		m_needsUpdate = true;
 		selectableObject::resizeEvent( re );
 	}
+	
+	// InteractiveModelView methods
+	bool canAcceptClipboardData(Clipboard::DataType dataType) override;
+	bool processPasteImplementation(Clipboard::DataType type, QString& value) override;
+	void overrideSetIsHighlighted(bool isHighlighted, bool shouldOverrideUpdate) override;
 
 	bool unquantizedModHeld( QMouseEvent * me );
 	TimePos quantizeSplitPos(TimePos);
@@ -190,8 +199,6 @@ protected:
 protected slots:
 	void updateLength();
 	void updatePosition();
-
-
 private:
 	enum class Action
 	{

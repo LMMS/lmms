@@ -30,6 +30,7 @@
 #include <QPoint>
 
 #include "AutomatableModelView.h"
+#include "InteractiveModelView.h"
 
 
 namespace lmms::gui
@@ -37,7 +38,7 @@ namespace lmms::gui
 
 class SimpleTextFloat;
 
-class LMMS_EXPORT FloatModelEditorBase : public QWidget, public FloatModelView
+class LMMS_EXPORT FloatModelEditorBase : public InteractiveModelView, public FloatModelView
 {
 	Q_OBJECT
 
@@ -83,6 +84,10 @@ protected:
 
 	void enterEvent(QEvent *event) override;
 	void leaveEvent(QEvent *event) override;
+
+	// InteractiveModelView methods
+	bool canAcceptClipboardData(Clipboard::DataType dataType) override;
+	bool processPasteImplementation(Clipboard::DataType type, QString& value) override;
 
 	virtual float getValue(const QPoint & p);
 
