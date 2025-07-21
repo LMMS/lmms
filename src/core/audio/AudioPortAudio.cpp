@@ -98,14 +98,14 @@ QString numChannelsFromConfig(Direction direction)
 	return numChannels;
 }
 
-PaStreamParameters createStreamParameters(PaDeviceIndex index, double suggestedLatency, Direction direction)
+PaStreamParameters createStreamParameters(PaDeviceIndex index, Direction direction)
 {
 	using namespace lmms;
 
 	return PaStreamParameters{.device = index,
 		.channelCount = numChannelsFromConfig(direction).toInt(),
 		.sampleFormat = paFloat32,
-		.suggestedLatency = suggestedLatency,
+		.suggestedLatency = Pa_GetDeviceInfo(index)->defaultLowOutputLatency,
 		.hostApiSpecificStreamInfo = nullptr};
 }
 
@@ -152,10 +152,8 @@ AudioPortAudio::AudioPortAudio(AudioEngine* engine)
 	: AudioDevice(DEFAULT_CHANNELS, engine)
 	, m_inputDeviceIndex(findDeviceFromConfig(Direction::Input))
 	, m_outputDeviceIndex(findDeviceFromConfig(Direction::Output))
-	, m_inputParameters(createStreamParameters(m_inputDeviceIndex,
-		  static_cast<double>(engine->framesPerPeriod()) / engine->baseSampleRate(), Direction::Input))
-	, m_outputParameters(createStreamParameters(m_outputDeviceIndex,
-		  static_cast<double>(engine->framesPerPeriod()) / engine->baseSampleRate(), Direction::Output))
+	, m_inputParameters(createStreamParameters(m_inputDeviceIndex, Direction::Input))
+	, m_outputParameters(createStreamParameters(m_outputDeviceIndex, Direction::Output))
 	, m_outBuf(engine->framesPerPeriod())
 {
 	// TODO PortAudio >= v19.5.0: Use Pa_GetVersionInfo()->versionText instead
