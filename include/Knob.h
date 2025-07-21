@@ -26,18 +26,14 @@
 #define LMMS_GUI_KNOB_H
 
 #include <memory>
-#include <QTextDocument>
 
 #include "FloatModelEditorBase.h"
 
 
-class QPixmap;
 
 namespace lmms::gui
 {
 
-
-class SimpleTextFloat;
 
 enum class KnobType
 {

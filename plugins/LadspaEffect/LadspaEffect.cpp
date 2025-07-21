@@ -29,7 +29,6 @@
 
 #include "LadspaEffect.h"
 #include "DataFile.h"
-#include "AudioDevice.h"
 #include "AudioEngine.h"
 #include "Ladspa2LMMS.h"
 #include "LadspaBase.h"

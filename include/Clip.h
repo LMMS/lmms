@@ -36,7 +36,6 @@ namespace lmms
 {
 
 class Track;
-class TrackContainer;
 
 namespace gui
 {

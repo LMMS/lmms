@@ -28,11 +28,10 @@
 #include <QFileInfo>
 
 #include "PathUtil.h"
-#include "SampleBuffer.h"
 #include "SampleClipView.h"
 #include "SampleLoader.h"
 #include "SampleTrack.h"
-#include "TimeLineWidget.h"
+#include "Song.h"
 
 namespace lmms
 {

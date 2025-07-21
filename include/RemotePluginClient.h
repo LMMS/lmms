@@ -38,6 +38,8 @@
 #	include <unistd.h>
 #endif
 
+#include "LmmsTypes.h"
+#include "MidiEvent.h"
 #include "SharedMemory.h"
 #include "VstSyncData.h"
 

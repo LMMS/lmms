@@ -92,6 +92,7 @@
 #include <queue>
 #include <string>
 #include <vector>
+#include <cassert>
 
 #include <aeffectx.h>
 
