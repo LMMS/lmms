@@ -130,19 +130,6 @@ PaDeviceIndex findDeviceFromConfig(Direction direction)
 		}
 	}
 
-	if (deviceIndex == paNoDevice)
-	{
-		switch (direction)
-		{
-		case Direction::Input:
-			deviceIndex = Pa_GetDefaultInputDevice();
-			break;
-		case Direction::Output:
-			deviceIndex = Pa_GetDefaultOutputDevice();
-			break;
-		}
-	}
-
 	return deviceIndex;
 }
 } // namespace
