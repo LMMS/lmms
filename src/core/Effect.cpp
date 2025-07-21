@@ -213,12 +213,10 @@ void Effect::handleAutoQuit(std::span<const SampleFrame> output)
 	}
 
 	// The output buffer is quiet, so check if auto-quit should be activated yet
-	++m_quietBufferCount;
-	if (m_quietBufferCount > timeout())
+	if (++m_quietBufferCount > timeout())
 	{
 		// Activate auto-quit
 		stopRunning();
-		m_quietBufferCount = 0;
 	}
 }
 

@@ -84,14 +84,15 @@ public:
 		return m_running;
 	}
 
-	inline void startRunning() 
-	{ 
+	void startRunning()
+	{
 		m_quietBufferCount = 0;
-		m_running = true; 
+		m_running = true;
 	}
 
-	inline void stopRunning()
+	void stopRunning()
 	{
+		m_quietBufferCount = 0;
 		m_running = false;
 	}
 
