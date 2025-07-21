@@ -67,8 +67,11 @@ public:
 	};
 
 	SampleThumbnail() = default;
-	SampleThumbnail(const Sample& sample);
+	SampleThumbnail(const QString& audioFile);
+	SampleThumbnail(const std::filesystem::path& audioFile);
 	void visualize(VisualizeParameters parameters, QPainter& painter) const;
+
+	static auto loadFromCache(const QString& audioFile) -> std::shared_ptr<const SampleThumbnail>;
 
 private:
 	class Thumbnail
@@ -103,8 +106,7 @@ private:
 
 		Thumbnail zoomOut(float factor) const;
 
-		Peak* data() { return m_peaks.data(); }
-		Peak& operator[](size_t index) { return m_peaks[index]; }
+		const Peak* data() const { return m_peaks.data(); }
 		const Peak& operator[](size_t index) const { return m_peaks[index]; }
 
 		int width() const { return m_peaks.size(); }
@@ -131,10 +133,9 @@ private:
 		std::size_t operator()(const SampleThumbnailEntry& entry) const noexcept { return qHash(entry.filePath); }
 	};
 
-	using ThumbnailCache = std::vector<Thumbnail>;
-	std::shared_ptr<ThumbnailCache> m_thumbnailCache = std::make_shared<ThumbnailCache>();
+	std::vector<Thumbnail> m_thumbnails;
 	std::shared_ptr<const SampleBuffer> m_buffer = SampleBuffer::emptyBuffer();
-	inline static std::unordered_map<SampleThumbnailEntry, std::shared_ptr<ThumbnailCache>, Hash> s_sampleThumbnailCacheMap;
+	inline static FileCache<SampleThumbnail> s_fileCache;
 };
 
 } // namespace lmms

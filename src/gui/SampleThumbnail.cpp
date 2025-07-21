@@ -26,11 +26,11 @@
 #include "SampleThumbnail.h"
 
 #include <QDebug>
-#include <QFileInfo>
+
+#include "PathUtil.h"
 
 namespace {
-	constexpr auto MaxSampleThumbnailCacheSize = 32;
-	constexpr auto AggregationPerZoomStep = 10;
+constexpr auto AggregationPerZoomStep = 10;
 }
 
 namespace lmms {
@@ -69,38 +69,22 @@ SampleThumbnail::Thumbnail SampleThumbnail::Thumbnail::zoomOut(float factor) con
 	return Thumbnail{std::move(peaks), m_samplesPerPeak * factor};
 }
 
-SampleThumbnail::SampleThumbnail(const Sample& sample)
-	: m_buffer(sample.buffer())
+SampleThumbnail::SampleThumbnail(const QString& path)
+	: m_buffer(SampleBuffer::loadFromCache(path))
 {
-	auto entry = SampleThumbnailEntry{sample.sampleFile(), QFileInfo{sample.sampleFile()}.lastModified()};
-	if (!entry.filePath.isEmpty())
+	const auto fullResolutionWidth = m_buffer->size() * DEFAULT_CHANNELS;
+	m_thumbnails.emplace_back(&m_buffer->data()->left(), fullResolutionWidth, fullResolutionWidth);
+
+	while (m_thumbnails.back().width() >= AggregationPerZoomStep)
 	{
-		const auto it = s_sampleThumbnailCacheMap.find(entry);
-		if (it != s_sampleThumbnailCacheMap.end())
-		{
-			m_thumbnailCache = it->second;
-			return;
-		}
-
-		if (s_sampleThumbnailCacheMap.size() == MaxSampleThumbnailCacheSize)
-		{
-			const auto leastUsed = std::min_element(s_sampleThumbnailCacheMap.begin(), s_sampleThumbnailCacheMap.end(),
-				[](const auto& a, const auto& b) { return a.second.use_count() < b.second.use_count(); });
-			s_sampleThumbnailCacheMap.erase(leastUsed->first);
-		}
-
-		s_sampleThumbnailCacheMap[std::move(entry)] = m_thumbnailCache;
+		auto zoomedOutThumbnail = m_thumbnails.back().zoomOut(AggregationPerZoomStep);
+		m_thumbnails.emplace_back(std::move(zoomedOutThumbnail));
 	}
+}
 
-	const auto flatBuffer = m_buffer->data()->data();
-	const auto flatBufferSize = m_buffer->size() * DEFAULT_CHANNELS;
-	m_thumbnailCache->emplace_back(flatBuffer, flatBufferSize, flatBufferSize / AggregationPerZoomStep);
-
-	while (m_thumbnailCache->back().width() >= AggregationPerZoomStep)
-	{
-		auto zoomedOutThumbnail = m_thumbnailCache->back().zoomOut(AggregationPerZoomStep);
-		m_thumbnailCache->emplace_back(std::move(zoomedOutThumbnail));
-	}
+SampleThumbnail::SampleThumbnail(const std::filesystem::path& path)
+	: SampleThumbnail(PathUtil::fsConvert(path))
+{
 }
 
 void SampleThumbnail::visualize(VisualizeParameters parameters, QPainter& painter) const
@@ -115,10 +99,10 @@ void SampleThumbnail::visualize(VisualizeParameters parameters, QPainter& painte
 	if (sampleRange <= 0.0f || sampleRange > 1.0f) { return; }
 
 	const auto targetThumbnailWidth = static_cast<int>(sampleRect.width() / sampleRange);
-	const auto finerThumbnail = std::find_if(m_thumbnailCache->rbegin(), m_thumbnailCache->rend(),
+	const auto finerThumbnail = std::find_if(m_thumbnails.rbegin(), m_thumbnails.rend(),
 		[&](const auto& thumbnail) { return thumbnail.width() >= targetThumbnailWidth; });
 
-	const auto useOriginalBuffer = finerThumbnail == m_thumbnailCache->rend();
+	const auto useOriginalBuffer = finerThumbnail == m_thumbnails.rend();
 	const auto drawOriginalBuffer = static_cast<size_t>(targetThumbnailWidth) == m_buffer->size();
 
 	painter.save();
@@ -174,6 +158,11 @@ void SampleThumbnail::visualize(VisualizeParameters parameters, QPainter& painte
 	}
 
 	painter.restore();
+}
+
+auto SampleThumbnail::loadFromCache(const QString& audioFile) -> std::shared_ptr<const SampleThumbnail>
+{
+	return s_fileCache.get(PathUtil::fsConvert(audioFile));
 }
 
 } // namespace lmms

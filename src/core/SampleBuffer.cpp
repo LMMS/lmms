@@ -23,6 +23,7 @@
  */
 
 #include "SampleBuffer.h"
+
 #include <cstring>
 
 #include "PathUtil.h"
@@ -39,19 +40,23 @@ SampleBuffer::SampleBuffer(const SampleFrame* data, size_t numFrames, int sample
 SampleBuffer::SampleBuffer(const QString& audioFile)
 {
 	if (audioFile.isEmpty()) { throw std::runtime_error{"Failure loading audio file: Audio file path is empty."}; }
-	const auto absolutePath = PathUtil::toAbsolute(audioFile);
 
-	if (auto decodedResult = SampleDecoder::decode(absolutePath))
+	if (auto decodedResult = SampleDecoder::decode(audioFile))
 	{
 		auto& [data, sampleRate] = *decodedResult;
 		m_data = std::move(data);
 		m_sampleRate = sampleRate;
-		m_audioFile = PathUtil::toShortestRelative(audioFile);
+		m_audioFile = audioFile;
 		return;
 	}
 
 	throw std::runtime_error{
 		"Failed to decode audio file: Either the audio codec is unsupported, or the file is corrupted."};
+}
+
+SampleBuffer::SampleBuffer(const std::filesystem::path& path)
+	: SampleBuffer(PathUtil::fsConvert(path))
+{
 }
 
 SampleBuffer::SampleBuffer(const QString& base64, int sampleRate)
@@ -90,6 +95,11 @@ auto SampleBuffer::emptyBuffer() -> std::shared_ptr<const SampleBuffer>
 {
 	static auto s_buffer = std::make_shared<const SampleBuffer>();
 	return s_buffer;
+}
+
+auto SampleBuffer::loadFromCache(const QString& path) -> std::shared_ptr<const SampleBuffer>
+{
+	return m_fileCache.get(PathUtil::fsConvert(path));
 }
 
 } // namespace lmms
