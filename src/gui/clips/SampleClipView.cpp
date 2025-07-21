@@ -298,6 +298,11 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 		m_sampleThumbnail.visualize(param, p);
 	}
 
+	p.setBrush(clipColor);
+	p.setPen(QColor(0,0,0));
+	drawCrossfade(p, rect());
+	p.setBrush(QColor(0,0,0,0));
+
 	QString name = PathUtil::cleanName(m_clip->m_sample.sampleFile());
 	paintTextLabel(name, p);
 

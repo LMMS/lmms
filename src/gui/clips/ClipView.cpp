@@ -30,6 +30,7 @@
 #include <QMenu>
 #include <QMouseEvent>
 #include <QPainter>
+#include <QPainterPath>
 
 #include "AutomationClip.h"
 #include "Clipboard.h"
@@ -42,6 +43,7 @@
 #include "InstrumentTrack.h"
 #include "InstrumentTrackView.h"
 #include "KeyboardShortcuts.h"
+#include "lmms_math.h"
 #include "MidiClip.h"
 #include "MidiClipView.h"
 #include "Note.h"
@@ -63,6 +65,11 @@ namespace lmms::gui
 /*! The width of the resize grip in pixels
  */
 const int RESIZE_GRIP_WIDTH = 4;
+
+/*! The square radius (half width/height) of the crossfade handle in pixels
+ */
+const int CROSSFADE_GRIP_RADIUS = 3;
+const int CROSSFADE_GRIP_ACTIVE_RADIUS = 5;
 
 
 /*! A pointer for that text bubble used when moving segments, etc.
@@ -107,6 +114,10 @@ ClipView::ClipView( Clip * clip,
 	m_cursorHand( QCursor( embed::getIconPixmap( "hand" ) ) ),
 	m_cursorKnife( QCursor( embed::getIconPixmap( "cursor_knife" ) ) ),
 	m_cursorSetYet( false ),
+	m_mouseOverStartCrossfadeHandle(false),
+	m_mouseOverStartCrossfadeTensionHandle(false),
+	m_mouseOverEndCrossfadeHandle(false),
+	m_mouseOverEndCrossfadeTensionHandle(false),
 	m_needsUpdate( true )
 {
 	if( s_textFloat == nullptr )
@@ -608,6 +619,109 @@ void ClipView::paintTextLabel(QString const & text, QPainter & painter)
 	painter.drawText( textLeft, finalTextTop, elidedClipName );
 }
 
+void ClipView::drawCrossfade(QPainter& painter, QRect rect)
+{
+	float nom = Engine::getSong()->getTimeSigModel().getNumerator();
+	float den = Engine::getSong()->getTimeSigModel().getDenominator();
+	float ticksPerBar = DefaultTicksPerBar * nom / den;
+	int startCrossfadeLength = m_clip->startCrossfadeLength() / ticksPerBar * pixelsPerBar();
+	int endCrossfadeLength = m_clip->endCrossfadeLength() / ticksPerBar * pixelsPerBar();
+	float startCrossfadeTension = m_clip->startCrossfadeTension();
+	float endCrossfadeTension = m_clip->endCrossfadeTension();
+
+	auto drawHandle = [&](int x, int y, int radius)
+	{
+		painter.drawEllipse(
+			std::clamp(x - radius, 0, rect.width() - radius * 2),
+			std::clamp(y - radius, 0, rect.height() - radius * 2),
+			radius * 2,
+			radius * 2
+		);
+	};
+
+	// Draw fade in curve
+	if (m_clip->startCrossfadeLength() > 0)
+	{
+		QPainterPath startPath;
+		startPath.moveTo(QPoint(0,0));
+		startPath.lineTo(QPoint(0, rect.height()));
+		float lastValue = 0;
+		for (int i = 0; i < startCrossfadeLength; ++i)
+		{
+			float nextValue = fastPow(static_cast<float>(i) / static_cast<float>(startCrossfadeLength), std::log(1.0f - startCrossfadeTension) / -std::numbers::ln2);
+			startPath.lineTo(QPoint(i + 1, (1.0f - nextValue) * rect.height()));
+			painter.drawLine(i, (1.0f - lastValue) * rect.height(), i + 1, (1.0f - nextValue) * rect.height());
+			lastValue = nextValue;
+		}
+		startPath.lineTo(QPoint(startCrossfadeLength, 0));
+		painter.fillPath(startPath, QColor(0,0,0,200));
+	};
+
+	// Draw fade out curve
+	if (m_clip->endCrossfadeLength() > 0)
+	{
+		QPainterPath endPath;
+		endPath.moveTo(QPoint(rect.width(),0));
+		endPath.lineTo(QPoint(rect.width(), rect.height()));
+		float lastValue = 0;
+		for (int i = 1; i < endCrossfadeLength; ++i)
+		{
+			float nextValue = fastPow(static_cast<float>(i) / static_cast<float>(endCrossfadeLength), std::log(1.0f - endCrossfadeTension) / -std::numbers::ln2);
+			endPath.lineTo(QPoint(rect.width() - i - 1, (1.0f - nextValue) * rect.height()));
+			painter.drawLine(rect.width() - i, (1.0f - lastValue) * rect.height(), rect.width() - i - 1, (1.0f - nextValue) * rect.height());
+			lastValue = nextValue;
+		}
+		endPath.lineTo(QPoint(rect.width() - endCrossfadeLength, 0));
+		painter.fillPath(endPath, QColor(0,0,0,200));
+	}
+
+	// Draw handles
+	if (m_mouseOverStartCrossfadeHandle || m_action == Action::EditStartCrossfade)
+	{
+		drawHandle(startCrossfadeLength, 0, CROSSFADE_GRIP_ACTIVE_RADIUS);
+	}
+	else if (m_clip->startCrossfadeLength() > 0)
+	{
+		drawHandle(startCrossfadeLength, 0, CROSSFADE_GRIP_RADIUS);
+	}
+
+	if (m_mouseOverEndCrossfadeHandle || m_action == Action::EditEndCrossfade)
+	{
+		drawHandle(rect.width() - endCrossfadeLength, 0, CROSSFADE_GRIP_ACTIVE_RADIUS);
+	}
+	else if (m_clip->endCrossfadeLength() > 0)
+	{
+		drawHandle(rect.width() - endCrossfadeLength, 0, CROSSFADE_GRIP_RADIUS);
+	}
+
+	if ((m_mouseOverStartCrossfadeTensionHandle || m_action == Action::EditStartCrossfadeTension) && m_clip->startCrossfadeLength() > 0)
+	{
+		drawHandle(startCrossfadeLength / 2, startCrossfadeTension * rect.height(), CROSSFADE_GRIP_ACTIVE_RADIUS);
+	}
+	else if (m_clip->startCrossfadeLength() > 0)
+	{
+		drawHandle(startCrossfadeLength / 2, startCrossfadeTension * rect.height(), CROSSFADE_GRIP_RADIUS);
+	}
+
+	if ((m_mouseOverEndCrossfadeTensionHandle || m_action == Action::EditEndCrossfadeTension) && m_clip->endCrossfadeLength() > 0)
+	{
+		drawHandle(rect.width() - endCrossfadeLength / 2, endCrossfadeTension * rect.height(), CROSSFADE_GRIP_ACTIVE_RADIUS);
+	}
+	else if (m_clip->endCrossfadeLength() > 0)
+	{
+		drawHandle(rect.width() - endCrossfadeLength / 2, endCrossfadeTension * rect.height(), CROSSFADE_GRIP_RADIUS);
+	}
+}
+
+void ClipView::leaveEvent(QEvent* e)
+{
+	m_mouseOverStartCrossfadeHandle = false;
+	m_mouseOverEndCrossfadeHandle = false;
+	m_mouseOverStartCrossfadeTensionHandle = false;
+	m_mouseOverEndCrossfadeTensionHandle = false;
+	update();
+}
+
 /*! \brief Handle a mouse press on this ClipView.
  *
  *  Handles the various ways in which a ClipView can be
@@ -652,19 +766,37 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 		{
 			if( isSelected() )
 			{
-				m_action = Action::MoveSelection;
+				for (auto clipv: getClickedClips()) { clipv->getClip()->addJournalCheckPoint(); }
+
+				if (m_mouseOverStartCrossfadeHandle && m_clip->isCrossfadeable())
+				{
+					m_action = Action::EditStartCrossfade;
+					setCursor(Qt::SizeHorCursor);
+				}
+				else if (m_mouseOverEndCrossfadeHandle && m_clip->isCrossfadeable())
+				{
+					m_action = Action::EditEndCrossfade;
+					setCursor(Qt::SizeHorCursor);
+				}
+				else if (m_mouseOverStartCrossfadeTensionHandle && m_clip->startCrossfadeLength() > 0 && m_clip->isCrossfadeable())
+				{
+					m_action = Action::EditStartCrossfadeTension;
+					setCursor(Qt::SizeVerCursor);
+				}
+				else if (m_mouseOverEndCrossfadeTensionHandle && m_clip->endCrossfadeLength() > 0 && m_clip->isCrossfadeable())
+				{
+					m_action = Action::EditEndCrossfadeTension;
+					setCursor(Qt::SizeVerCursor);
+				}
+				else
+				{
+					m_action = Action::MoveSelection;
+				}
 			}
 			else
 			{
 				getGUI()->songEditor()->m_editor->selectAllClips( false );
 				m_clip->addJournalCheckPoint();
-
-				// Action::Move, Action::Resize and Action::ResizeLeft
-				// Action::Split action doesn't disable Clip journalling
-				if (m_action == Action::Move || m_action == Action::Resize || m_action == Action::ResizeLeft)
-				{
-					m_clip->setJournalling(false);
-				}
 
 				setInitialPos( me->pos() );
 				setInitialOffsets();
@@ -673,6 +805,26 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 				{	// Always move clips that can't be manually resized
 					m_action = Action::Move;
 					setCursor( Qt::SizeAllCursor );
+				}
+				else if (m_mouseOverStartCrossfadeHandle && m_clip->isCrossfadeable())
+				{
+					m_action = Action::EditStartCrossfade;
+					setCursor(Qt::SizeHorCursor);
+				}
+				else if (m_mouseOverEndCrossfadeHandle && m_clip->isCrossfadeable())
+				{
+					m_action = Action::EditEndCrossfade;
+					setCursor(Qt::SizeHorCursor);
+				}
+				else if (m_mouseOverStartCrossfadeTensionHandle && m_clip->startCrossfadeLength() > 0 && m_clip->isCrossfadeable())
+				{
+					m_action = Action::EditStartCrossfadeTension;
+					setCursor(Qt::SizeVerCursor);
+				}
+				else if (m_mouseOverEndCrossfadeTensionHandle && m_clip->endCrossfadeLength() > 0 && m_clip->isCrossfadeable())
+				{
+					m_action = Action::EditEndCrossfadeTension;
+					setCursor(Qt::SizeVerCursor);
 				}
 				else if( me->x() >= width() - RESIZE_GRIP_WIDTH )
 				{
@@ -720,6 +872,32 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 							arg( m_clip->endPosition().getTicks() %
 									TimePos::ticksPerBar() ) );
 				}
+				else if (m_action == Action::EditStartCrossfade)
+				{
+					s_textFloat->setTitle(tr("Fade length"));
+					s_textFloat->setText(QString("%1:%2").
+						arg(m_clip->startCrossfadeLength().getBar() + 1).
+						arg(m_clip->startCrossfadeLength().getTicks() %
+								TimePos::ticksPerBar()));
+				}
+				else if (m_action == Action::EditEndCrossfade)
+				{
+					s_textFloat->setTitle(tr("Fade length"));
+					s_textFloat->setText(QString("%1:%2").
+						arg(m_clip->endCrossfadeLength().getBar() + 1).
+						arg(m_clip->endCrossfadeLength().getTicks() %
+								TimePos::ticksPerBar()));
+				}
+				else if (m_action == Action::EditStartCrossfadeTension)
+				{
+					s_textFloat->setTitle(tr("Tension"));
+					s_textFloat->setText(QString("%1").arg(m_clip->startCrossfadeTension()));
+				}
+				else if (m_action == Action::EditEndCrossfadeTension)
+				{
+					s_textFloat->setTitle(tr("Tension"));
+					s_textFloat->setText(QString("%1").arg(m_clip->endCrossfadeTension()));
+				}
 				// s_textFloat->reparent( this );
 				// setup text-float as if Clip was already moved/resized
 				s_textFloat->moveGlobal( this, QPoint( width() + 2, height() + 2) );
@@ -738,12 +916,23 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 					? tr("Press <%1> or <Alt> for unquantized splitting.\nPress <Shift> for destructive splitting.")
 					: tr("Press <%1> or <Alt> for unquantized splitting.");
 			}
-			else
+			else if (m_action == Action::Resize || m_action == Action::ResizeLeft)
 			{
 				hint = tr("Press <%1> or <Alt> for unquantized resizing.");
 			}
-			m_hint = TextFloat::displayMessage( tr( "Hint" ), hint.arg(UI_COPY_KEY),
-					embed::getIconPixmap( "hint" ), 0 );
+			else if (m_action == Action::EditStartCrossfade || m_action == Action::EditEndCrossfade)
+			{
+				hint = tr("Press <%1> or <Alt> for quantized fading.");
+			}
+			else if (m_action == Action::EditStartCrossfadeTension || m_action == Action::EditEndCrossfadeTension)
+			{
+				hint = tr("Press <%1> or <Alt> to snap tension.");
+			}
+			if (hint != "")
+			{
+				m_hint = TextFloat::displayMessage(tr("Hint"), hint.arg(UI_COPY_KEY),
+						embed::getIconPixmap("hint"), 0);
+			}
 		}
 	}
 	else if( me->button() == Qt::RightButton )
@@ -1000,6 +1189,87 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 						TimePos::ticksPerBar() ) );
 		s_textFloat->moveGlobal( this, QPoint( width() + 2, height() + 2) );
 	}
+	else if (m_action == Action::EditStartCrossfade || m_action == Action::EditEndCrossfade)
+	{
+		const float snapSize = getGUI()->songEditor()->m_editor->getSnapSize();
+
+		TimePos pos = static_cast<int>(me->x() * TimePos::ticksPerBar() / ppb);
+		TimePos length;
+
+		if (m_action == Action::EditStartCrossfade)
+		{
+			// If alt or ctrl is held, quantize the length
+			length = unquantizedModHeld(me)
+				? pos.quantize(snapSize)
+				: pos;
+			m_clip->setStartCrossfadeLength(std::clamp(static_cast<int>(length), 0, static_cast<int>(m_clip->length())));
+			s_textFloat->setText(QString("%1:%2").
+				arg(m_clip->startCrossfadeLength().getBar() + 1).
+				arg(m_clip->startCrossfadeLength().getTicks() %
+						TimePos::ticksPerBar()));
+		}
+		else if (m_action == Action::EditEndCrossfade)
+		{
+			// If alt or ctrl is held, quantize the length
+			length = unquantizedModHeld(me)
+				? TimePos(m_clip->length() - pos).quantize(snapSize)
+				: TimePos(m_clip->length() - pos);
+			m_clip->setEndCrossfadeLength(std::clamp(static_cast<int>(length), 0, static_cast<int>(m_clip->length())));
+			s_textFloat->setText(QString("%1:%2").
+				arg(m_clip->endCrossfadeLength().getBar() + 1).
+				arg(m_clip->endCrossfadeLength().getTicks() %
+						TimePos::ticksPerBar()));
+		}
+		update();
+
+		// If multiple clips are selected, also set their crossfades
+		for (auto clipv: getClickedClips())
+		{
+			if (clipv->getClip()->isCrossfadeable())
+			{
+				if (m_action == Action::EditStartCrossfade)
+				{
+					clipv->getClip()->setStartCrossfadeLength(std::clamp(static_cast<int>(length), 0, static_cast<int>(clipv->getClip()->length())));
+				}
+				else if (m_action == Action::EditEndCrossfade)
+				{
+					clipv->getClip()->setEndCrossfadeLength(std::clamp(static_cast<int>(length), 0, static_cast<int>(clipv->getClip()->length())));
+				}
+				clipv->update();
+			}
+		}
+	}
+	else if (m_action == Action::EditStartCrossfadeTension || m_action == Action::EditEndCrossfadeTension)
+	{
+		float tension = static_cast<float>(me->y()) / height();
+		// If alt or ctrl is held, snap to 0.5 or 1-sqrt(2)/2
+		if (unquantizedModHeld(me))
+		{
+			if (std::abs(tension - 0.5f) <= std::abs(tension - (1.0f - 0.5f * static_cast<float>(std::numbers::sqrt2)))) { tension = 0.5f; }
+			else { tension = 1.0f - 0.5f * static_cast<float>(std::numbers::sqrt2); }
+		}
+
+		if (m_action == Action::EditStartCrossfadeTension) { m_clip->setStartCrossfadeTension(tension); }
+		if (m_action == Action::EditEndCrossfadeTension) { m_clip->setEndCrossfadeTension(tension); }
+		update();
+
+		// If multiple clips are selected, also set their tensions
+		for (auto clipv: getClickedClips())
+		{
+			if (clipv->getClip()->isCrossfadeable())
+			{
+				if (m_action == Action::EditStartCrossfadeTension)
+				{
+					clipv->getClip()->setStartCrossfadeTension(tension);
+				}
+				else if (m_action == Action::EditEndCrossfadeTension)
+				{
+					clipv->getClip()->setEndCrossfadeTension(tension);
+				}
+				clipv->update();
+			}
+		}
+	}
 	else if( m_action == Action::Split )
 	{
 		setCursor(m_cursorKnife);
@@ -1008,6 +1278,49 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 	}
 	// None of the actions above, we will just handle the cursor
 	else { updateCursor(me); }
+
+	bool oldStartState = m_mouseOverStartCrossfadeHandle;
+	bool oldEndState = m_mouseOverEndCrossfadeHandle;
+	bool oldStartTensionState = m_mouseOverStartCrossfadeTensionHandle;
+	bool oldEndTensionState = m_mouseOverEndCrossfadeTensionHandle;
+
+	m_mouseOverStartCrossfadeHandle =
+		// Is the x coordinate within the radius of the handle?
+		(std::abs(me->x() - m_clip->startCrossfadeLength() * ppb / TimePos::ticksPerBar()) <= CROSSFADE_GRIP_ACTIVE_RADIUS
+		// Or, if there is no current fade, is the x coordinate close to the clip start?
+		|| (m_clip->startCrossfadeLength() == 0
+			&& me->x() < CROSSFADE_GRIP_ACTIVE_RADIUS * 2))
+		// And, is the y coordinate up by the top of the clip?
+		&& me->y() <= CROSSFADE_GRIP_ACTIVE_RADIUS * 2;
+
+	m_mouseOverEndCrossfadeHandle =
+		// Is the x coordinate within the radius of the handle?
+		(std::abs(me->x() - (m_clip->length() - m_clip->endCrossfadeLength()) * ppb / TimePos::ticksPerBar()) <= CROSSFADE_GRIP_ACTIVE_RADIUS
+		// Or, if there is no current fade, is the x coordinate close to the clip end?
+		|| (m_clip->endCrossfadeLength() == 0
+			&& m_clip->length() * ppb / TimePos::ticksPerBar() - me->x() < CROSSFADE_GRIP_ACTIVE_RADIUS * 2))
+		// And, is the y coordinate up by the top of the clip?
+		&& me->y() <= CROSSFADE_GRIP_ACTIVE_RADIUS * 2;
+
+	m_mouseOverStartCrossfadeTensionHandle =
+		// Is the x coordinate within the radius of the handle?
+		std::abs(me->x() - m_clip->startCrossfadeLength() / 2 * ppb / TimePos::ticksPerBar()) <= CROSSFADE_GRIP_ACTIVE_RADIUS
+		// And, is the y coordinate at the height of the tension?
+		&& std::abs(me->y() - m_clip->startCrossfadeTension() * height()) <= CROSSFADE_GRIP_ACTIVE_RADIUS * 2;
+
+	m_mouseOverEndCrossfadeTensionHandle =
+		// Is the x coordinate within the radius of the handle?
+		std::abs(me->x() - (m_clip->length() - m_clip->endCrossfadeLength() / 2) * ppb / TimePos::ticksPerBar()) <= CROSSFADE_GRIP_ACTIVE_RADIUS
+		// And, is the y coordinate at the height of the tension?
+		&& std::abs(me->y() - m_clip->endCrossfadeTension() * height()) <= CROSSFADE_GRIP_ACTIVE_RADIUS * 2;
+
+	if (oldStartState != m_mouseOverStartCrossfadeHandle
+		|| oldEndState != m_mouseOverEndCrossfadeHandle
+		|| oldStartTensionState != m_mouseOverStartCrossfadeTensionHandle
+		|| oldEndTensionState != m_mouseOverEndCrossfadeTensionHandle)
+	{
+		update();
+	}
 }
 
 
@@ -1031,10 +1344,13 @@ void ClipView::mouseReleaseEvent( QMouseEvent * me )
 	{
 		setSelected( !isSelected() );
 	}
-	else if( m_action == Action::Move || m_action == Action::Resize || m_action == Action::ResizeLeft )
+
+	if (m_action == Action::EditStartCrossfade
+		|| m_action == Action::EditEndCrossfade
+		|| m_action == Action::EditStartCrossfadeTension
+		|| m_action == Action::EditEndCrossfadeTension)
 	{
-		// TODO: Fix m_clip->setJournalling() consistency
-		m_clip->setJournalling( true );
+		update();
 	}
 	else if( m_action == Action::Split )
 	{
