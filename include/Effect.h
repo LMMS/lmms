@@ -132,6 +132,11 @@ public:
 		return &m_autoQuitModel;
 	}
 
+	bool autoQuitEnabled() const
+	{
+		return m_autoQuitEnabled;
+	}
+
 	EffectChain * effectChain() const
 	{
 		return m_parent;
@@ -222,8 +227,8 @@ private:
 	BoolModel m_enabledModel;
 	FloatModel m_wetDryModel;
 	TempoSyncKnobModel m_autoQuitModel;
-	
-	bool m_autoQuitDisabled;
+
+	bool m_autoQuitEnabled = false;
 
 	SRC_DATA m_srcData[2];
 	SRC_STATE * m_srcState[2];

@@ -71,7 +71,7 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 
 	m_autoQuit = new TempoSyncKnob(KnobType::Bright26, tr("DECAY"), this, Knob::LabelRendering::LegacyFixedFontSize);
 	m_autoQuit->move( 78 - m_autoQuit->width() / 2, 5 );
-	m_autoQuit->setEnabled( isEnabled && !effect()->m_autoQuitDisabled );
+	m_autoQuit->setEnabled(isEnabled && effect()->autoQuitEnabled());
 	m_autoQuit->setHintText( tr( "Time:" ), "ms" );
 
 	setModel( _model );
