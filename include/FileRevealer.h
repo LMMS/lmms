@@ -22,12 +22,12 @@
  *
  */
 
-#ifndef LMMS_FILE_REVEALER_H
-#define LMMS_FILE_REVEALER_H
+#ifndef LMMS_GUI_FILE_REVEALER_H
+#define LMMS_GUI_FILE_REVEALER_H
 
 #include <QFileInfo>
 
-namespace lmms {
+namespace lmms::gui {
 
 /**
  * @class FileRevealer
@@ -73,5 +73,6 @@ protected:
 	static bool supportsArg(const QString& command, const QString& arg);
 };
 
-} // namespace lmms
-#endif // LMMS_FILE_REVEALER_H
+} // namespace lmms::gui
+
+#endif // LMMS_GUI_FILE_REVEALER_H

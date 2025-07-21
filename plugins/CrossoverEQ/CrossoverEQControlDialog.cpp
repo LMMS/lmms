@@ -28,6 +28,7 @@
 #include "CrossoverEQControlDialog.h"
 #include "CrossoverEQControls.h"
 #include "embed.h"
+#include "FontHelper.h"
 #include "LedCheckBox.h"
 #include "Knob.h"
 #include "Fader.h"
@@ -56,13 +57,12 @@ CrossoverEQControlDialog::CrossoverEQControlDialog(CrossoverEQControls *controls
 	layout->addLayout(knobsLayout);
 
 	const auto makeKnob = [this, knobsLayout](
-		FloatModel *model,
-		const QString &label,
-		const QString &txt_before
+		FloatModel* model,
+		const QString& label,
+		const QString& txt_before
 	) {
-		auto k = new Knob(KnobType::Bright26, this);
+		auto k = new Knob(KnobType::Bright26, label, SMALL_FONT_SIZE, this);
 		k->setModel(model);
-		k->setLabel(label);
 		k->setHintText(txt_before, "Hz");
 		knobsLayout->addWidget(k, 0, Qt::AlignHCenter);
 	};
@@ -76,8 +76,8 @@ CrossoverEQControlDialog::CrossoverEQControlDialog(CrossoverEQControls *controls
 	layout->addLayout(bandsLayout);
 
 	const auto makeFader = [this, bandsLayout](
-		FloatModel *model,
-		const QString &label,
+		FloatModel* model,
+		const QString& label,
 		int column
 	) {
 		auto f = new Fader(model, label, this, false);
@@ -92,20 +92,16 @@ CrossoverEQControlDialog::CrossoverEQControlDialog(CrossoverEQControls *controls
 	makeFader(&controls->m_gain3, tr("Band 3 gain"), 2);
 	makeFader(&controls->m_gain4, tr("Band 4 gain"), 3);
 
-	const auto muteOn = embed::getIconPixmap("mute_active");
-	const auto muteOff = embed::getIconPixmap("mute_inactive");
-
-	const auto makeMuteBtn = [this, bandsLayout, muteOn, muteOff](
-		BoolModel *model,
-		const QString &label,
+	const auto makeMuteBtn = [this, bandsLayout](
+		BoolModel* model,
+		const QString& label,
 		int column
 	) {
-		auto b = new PixmapButton(this, label);
-		b->setActiveGraphic(muteOff);
-		b->setInactiveGraphic(muteOn);
+		auto b = new AutomatableButton(this, label);
 		b->setCheckable(true);
 		b->setModel(model);
 		b->setToolTip(label);
+		b->setObjectName("btn-mute-inv");
 		bandsLayout->addWidget(b, 1, column, Qt::AlignCenter);
 	};
 
