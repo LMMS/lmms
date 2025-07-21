@@ -41,7 +41,7 @@ NineButtonSelector::NineButtonSelector(std::array<QPixmap, 18> onOffIcons, int d
 
 	for (int i = 0; i < 9; ++i)
 	{
-		m_buttons[i] = new PixmapButton(this, nullptr);
+		m_buttons[i] = new PixmapButton(this);
 		const int buttonX = 1 + (i % 3) * 17;
 		const int buttonY = 1 + (i / 3) * 17;
 		m_buttons[i]->move(buttonX, buttonY);
