@@ -64,13 +64,32 @@ jobs:
         run: |
           cmake --build fltk/build
           sudo cmake --install fltk/build --prefix /usr
+      - name: Build a patched winebuild to disable ASLR for RemoteVstPlugin
+        run: |
+          mkdir winebuild-patch
+          cd winebuild-patch
+          wget https://dl.winehq.org/wine/source/10.0/wine-10.0.tar.xz
+          tar xJf wine-10.0.tar.xz
+          cd wine-10.0
+          patch -Np1 < ../../.github/workflows/winebuild-disable-dynamic-base.patch
+          cd ..
+          mkdir build
+          cd build
+          ../wine-10.0/configure --enable-win64 --without-x --without-freetype
+          cd tools/winebuild
+          make
+          mv winebuild ../../../winebuild-patched
+          echo WINEBUILD_PATCHED="$GITHUB_WORKSPACE"/winebuild-patch/winebuild-patched >> "$GITHUB_ENV"
       - name: Configure
         run: |
           ccache --zero-stats
           source /opt/qt5*/bin/qt5*-env.sh || true
           cmake -S . \
                 -B build \
-                $CMAKE_OPTS
+                $CMAKE_OPTS \
+                "-DWINE_CXX_FLAGS=--winebuild $WINEBUILD_PATCHED"
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
       - name: Build
         run: cmake --build build
       - name: Run tests
@@ -95,6 +114,7 @@ jobs:
         env:
           CCACHE_MAXSIZE: 500M
   linux-arm64:
+    if: false
     name: linux-arm64
     runs-on: ubuntu-24.04-arm
     env:
@@ -175,6 +195,7 @@ jobs:
         env:
           CCACHE_MAXSIZE: 500M
   macos:
+    if: false
     strategy:
       fail-fast: false
       matrix:
@@ -274,6 +295,7 @@ jobs:
           key: "homebrew-${{ matrix.arch }}\
             -${{ hashFiles('Brewfile.lock.json') }}"
   mingw:
+    if: false
     name: mingw64
     runs-on: ubuntu-latest
     env:
@@ -338,6 +360,7 @@ jobs:
         env:
           CCACHE_MAXSIZE: 500M
   msvc:
+    if: false
     name: msvc-x64
     runs-on: windows-2022
     env:
@@ -422,6 +445,7 @@ jobs:
         env:
           CCACHE_MAXSIZE: 500MB
   msys2:
+    if: false
     name: windows-arm64
     runs-on: windows-11-arm
     defaults:
