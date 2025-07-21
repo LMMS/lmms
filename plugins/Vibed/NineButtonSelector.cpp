@@ -32,7 +32,7 @@ namespace lmms::gui
 {
 
 
-NineButtonSelector::NineButtonSelector(std::array<QPixmap, 18> onOffIcons, int defaultButton, int x, int y, QWidget* parent) :
+NineButtonSelector::NineButtonSelector(const std::array<QPixmap, 18>& onOffIcons, int defaultButton, int x, int y, QWidget* parent) :
 	QWidget{parent},
 	IntModelView{new NineButtonSelectorModel{defaultButton, 0, 8, nullptr, QString{}, true}, this}
 {

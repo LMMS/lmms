@@ -45,7 +45,7 @@ class NineButtonSelector : public QWidget, public IntModelView
 {
 	Q_OBJECT
 public:
-	NineButtonSelector(std::array<QPixmap, 18> onOffIcons, int defaultButton, int x, int y, QWidget* parent);
+	NineButtonSelector(const std::array<QPixmap, 18>& onOffIcons, int defaultButton, int x, int y, QWidget* parent);
 	~NineButtonSelector() override = default;
 
 protected:
