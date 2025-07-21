@@ -136,7 +136,8 @@ public:
 	
 	Knob( const Knob& other ) = delete;
 
-	void setHtmlLabel( const QString &htmltxt );
+	const QString& getLabel() const;
+	void setLabel(const QString& txt);
 
 	void setTotalAngle( float angle );
 
@@ -167,8 +168,6 @@ public:
 
 
 protected:
-	void setLabel(const QString& txt);
-	
 	void paintEvent(QPaintEvent*) override;
 
 	void changeEvent(QEvent * ev) override;
@@ -216,8 +215,6 @@ private:
 
 	QString m_label;
 	bool m_fixedFontSizeLabelRendering = false;
-	bool m_isHtmlLabel;
-	QTextDocument* m_tdRenderer;
 
 	std::unique_ptr<QPixmap> m_knobPixmap;
 
