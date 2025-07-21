@@ -86,7 +86,7 @@ public:
 
 	inline void startRunning() 
 	{ 
-		m_bufferCount = 0;
+		m_quietBufferCount = 0;
 		m_running = true; 
 	}
 
@@ -114,21 +114,6 @@ public:
 	inline float dryLevel() const
 	{
 		return 1.0f - m_wetDryModel.value();
-	}
-
-	inline f_cnt_t bufferCount() const
-	{
-		return m_bufferCount;
-	}
-
-	inline void resetBufferCount()
-	{
-		m_bufferCount = 0;
-	}
-
-	inline void incrementBufferCount()
-	{
-		++m_bufferCount;
 	}
 
 	inline bool dontRun() const
@@ -214,7 +199,7 @@ protected:
 private:
 	/**
 	 * If auto-quit is enabled ("Keep effects running even without input" setting is disabled),
-	 * after "decay" ms of a signal below the silence threshold, the effect is
+	 * after "decay" ms of the output buffer remaining below the silence threshold, the effect is
 	 * turned off and won't be processed again until it receives new audio input.
 	 */
 	void handleAutoQuit(std::span<const SampleFrame> output);
@@ -229,7 +214,9 @@ private:
 	bool m_okay;
 	bool m_noRun;
 	bool m_running;
-	f_cnt_t m_bufferCount;
+
+	//! The number of consecutive periods where output buffers remain below the silence threshold
+	f_cnt_t m_quietBufferCount = 0;
 
 	BoolModel m_enabledModel;
 	FloatModel m_wetDryModel;

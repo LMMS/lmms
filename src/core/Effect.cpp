@@ -46,7 +46,6 @@ Effect::Effect( const Plugin::Descriptor * _desc,
 	m_okay( true ),
 	m_noRun( false ),
 	m_running( false ),
-	m_bufferCount( 0 ),
 	m_enabledModel( true, this, tr( "Effect enabled" ) ),
 	m_wetDryModel( 1.0f, -1.0f, 1.0f, 0.01f, this, tr( "Wet/Dry mix" ) ),
 	m_autoQuitModel( 1.0f, 1.0f, 8000.0f, 100.0f, 1.0f, this, tr( "Decay" ) ),
@@ -208,18 +207,18 @@ void Effect::handleAutoQuit(std::span<const SampleFrame> output)
 		if (abs.left() >= threshold || abs.right() >= threshold)
 		{
 			// The output buffer is not quiet
-			resetBufferCount();
+			m_quietBufferCount = 0;
 			return;
 		}
 	}
 
 	// The output buffer is quiet, so check if auto-quit should be activated yet
-	incrementBufferCount();
-	if (bufferCount() > timeout())
+	++m_quietBufferCount;
+	if (m_quietBufferCount > timeout())
 	{
 		// Activate auto-quit
 		stopRunning();
-		resetBufferCount();
+		m_quietBufferCount = 0;
 	}
 }
 
