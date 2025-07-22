@@ -387,6 +387,21 @@ public:
 		return framePtr(index);
 	}
 
+	//! @returns a subview at the given frame offset `offset` with a frame count of `frames`
+	constexpr auto subspan(f_cnt_t offset, f_cnt_t frames) const -> InterleavedBufferView<SampleT, channelCount>
+	{
+		assert(offset <= this->m_frames);
+		assert(offset + frames <= this->m_frames);
+		if constexpr (channelCount == DynamicChannelCount)
+		{
+			return {this->m_data + offset * Base::channels(), Base::channels(), frames};
+		}
+		else
+		{
+			return {this->m_data + offset * Base::channels(), frames};
+		}
+	}
+
 	//! @returns a const view over the frames. Iterates in chunks containing `channels()` elements.
 	constexpr auto framesView() const noexcept -> std::ranges::subrange<ConstFrameIter, const SampleT*>
 	{
