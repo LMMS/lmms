@@ -210,16 +210,30 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 	p.drawRect( innerRectangle );
 	
 	// Draw loop handles if necessary
-	const auto handleMode = ConfigManager::inst()->value("app", "loopmarkermode") == "handles";
-	if (handleMode && underMouse() && QGuiApplication::keyboardModifiers().testFlag(Qt::ShiftModifier))
+	const auto markerMode = ConfigManager::inst()->value("app", "loopmarkermode");
+	const auto handleMode = markerMode == "handles" || markerMode == "closest"; // for compatibility
+	const auto shiftPressed = QGuiApplication::keyboardModifiers().testFlag(Qt::ShiftModifier);
+	const auto bigEnough = loopRectWidth >= (m_loopHandleWidth * 4 + m_loopMoveHandleWidth);
+
+	if (handleMode && underMouse() && shiftPressed && bigEnough)
 	{
-		const auto handleWidth = std::min(m_loopHandleWidth, loopRectWidth / 2 - 1);
-		const auto leftHandle = QRectF(loopStart - .5, loopRectMargin - .5, handleWidth, loopRectHeight);
-		const auto rightHandle = QRectF(loopEndR - handleWidth - .5, loopRectMargin - .5, handleWidth, loopRectHeight);
+		const auto leftMostVisible = std::max(loopStart, m_xOffset);
+		const auto rightMostVisible = std::min(loopEndR, width());
+		const auto middle = leftMostVisible + (rightMostVisible - leftMostVisible) / 2;
+
+		const auto leftHandle = QRectF(loopStart - .5, loopRectMargin - .5, m_loopHandleWidth, loopRectHeight);
+		const auto rightHandle = QRectF(loopEndR - m_loopHandleWidth - .5, loopRectMargin - .5, m_loopHandleWidth, loopRectHeight);
+		const auto middleHandle = QRectF(middle - m_loopMoveHandleWidth / 2.0, loopRectMargin - .5, m_loopMoveHandleWidth, loopRectHeight);
 		const auto color = loopPointsActive ? m_activeLoopHandleColor : m_inactiveLoopHandleColor;
 
 		p.fillRect(leftHandle, color);
 		p.fillRect(rightHandle, color);
+		// Hide middle handle during move because it slides away
+		// from under the cursor when a loop end goes off screen
+		if (m_action == Action::NoAction)
+		{
+			p.fillRect(middleHandle, color);
+		}
 	}
 
 	// Only draw the position marker if the position line is in view
@@ -246,24 +260,21 @@ auto TimeLineWidget::getLoopAction(QMouseEvent* event) const -> TimeLineWidget::
 	const auto xPos = event->x();
 	const auto button = event->button();
 
-	if (mode == "handles")
+	if (mode == "handles" || mode == "closest" /* for compatibility */)
 	{
 		// Loop start and end pos, or closest edge of screen if loop extends off it
 		const auto leftMost = std::max(markerX(m_timeline->loopBegin()), m_xOffset);
 		const auto rightMost = std::min(markerX(m_timeline->loopEnd()), width());
-		// Distance from click to handle, positive aimed towards center of loop
-		const auto deltaLeft = xPos - leftMost;
-		const auto deltaRight = rightMost - xPos;
+		const auto middle = leftMost + (rightMost - leftMost) / 2;
 
-		if (deltaLeft < 0 || deltaRight < 0) { return Action::NoAction; } // Clicked outside loop
-		else if (deltaLeft <= m_loopHandleWidth && deltaLeft < deltaRight) { return Action::MoveLoopBegin; }
-		else if (deltaRight <= m_loopHandleWidth) { return Action::MoveLoopEnd; }
-		else { return Action::MoveLoop; }
-	}
-	else if (mode == "closest")
-	{
-		const TimePos loopMid = (m_timeline->loopBegin() + m_timeline->loopEnd()) / 2;
-		return getClickedTime(xPos) < loopMid ? Action::MoveLoopBegin : Action::MoveLoopEnd;
+		// If the loop is tiny, don't show resize handles
+		const bool noHandles = (rightMost - leftMost) < (m_loopHandleWidth * 4 + m_loopMoveHandleWidth);
+		const auto moveHandleLeft = noHandles ? leftMost : middle - m_loopMoveHandleWidth / 2;
+		const auto moveHandleRight = noHandles ? rightMost : middle + m_loopMoveHandleWidth / 2;
+
+		if (xPos < moveHandleLeft) { return Action::MoveLoopBegin; }
+		else if (xPos < moveHandleRight) { return Action::MoveLoop; }
+		else { return Action::MoveLoopEnd; }
 	}
 	else // Default to dual-button mode
 	{
@@ -276,7 +287,7 @@ auto TimeLineWidget::getLoopAction(QMouseEvent* event) const -> TimeLineWidget::
 auto TimeLineWidget::actionCursor(Action action) const -> QCursor
 {
 	switch (action) {
-		case Action::MoveLoop: return Qt::SizeHorCursor;
+		case Action::MoveLoop: return m_action == action ? Qt::ClosedHandCursor : Qt::OpenHandCursor;
 		case Action::MoveLoopBegin: return m_cursorSelectLeft;
 		case Action::MoveLoopEnd: return m_cursorSelectRight;
 		// Fall back to normal cursor if no action or action cursor not specified
@@ -449,7 +460,6 @@ void TimeLineWidget::contextMenuEvent(QContextMenuEvent* event)
 		if (loopMode == mode) { action->setChecked(true); }
 	};
 	addLoopModeAction(tr("Dual-button"), "dual");
-	addLoopModeAction(tr("Grab closest"), "closest");
 	addLoopModeAction(tr("Handles"), "handles");
 
 	menu.exec(event->globalPos());

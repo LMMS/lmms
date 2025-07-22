@@ -68,6 +68,7 @@ public:
 	Q_PROPERTY(QColor activeLoopHandleColor MEMBER m_activeLoopHandleColor)
 	Q_PROPERTY( int loopRectangleVerticalPadding READ getLoopRectangleVerticalPadding WRITE setLoopRectangleVerticalPadding )
 	Q_PROPERTY(int loopHandleWidth MEMBER m_loopHandleWidth)
+	Q_PROPERTY(int loopMoveHandleWidth MEMBER m_loopMoveHandleWidth)
 	Q_PROPERTY(QSize mouseHotspotSelLeft READ mouseHotspotSelLeft WRITE setMouseHotspotSelLeft)
 	Q_PROPERTY(QSize mouseHotspotSelRight READ mouseHotspotSelRight WRITE setMouseHotspotSelRight)
 
@@ -206,6 +207,7 @@ private:
 
 	int m_loopRectangleVerticalPadding = 1;
 	int m_loopHandleWidth = 5;
+	int m_loopMoveHandleWidth = 30;
 
 	QColor m_barLineColor = QColor{192, 192, 192};
 	QColor m_barNumberColor = m_barLineColor.darker(120);
