@@ -31,6 +31,7 @@
 #include <type_traits>
 
 #include "LmmsTypes.h"
+#include "SampleFrame.h"
 
 namespace lmms
 {
@@ -154,6 +155,20 @@ public:
 	{
 	}
 
+	//! Construct from std::span<SampleFrame>
+	InterleavedBufferView(std::span<SampleFrame> buffer) noexcept
+		requires (std::is_same_v<std::remove_const_t<SampleT>, float> && channelCount == 2)
+		: Base{reinterpret_cast<float*>(buffer.data()), buffer.size()}
+	{
+	}
+
+	//! Construct from std::span<const SampleFrame>
+	InterleavedBufferView(std::span<const SampleFrame> buffer) noexcept
+		requires (std::is_same_v<SampleT, const float> && channelCount == 2)
+		: Base{reinterpret_cast<const float*>(buffer.data()), buffer.size()}
+	{
+	}
+
 	constexpr auto empty() const noexcept -> bool
 	{
 		return !this->m_data || Base::channels() == 0 || this->m_frames == 0;
@@ -199,6 +214,32 @@ public:
 	constexpr auto operator[](f_cnt_t index) const noexcept -> SampleT*
 	{
 		return framePtr(index);
+	}
+
+	auto sampleFrameAt(f_cnt_t index) noexcept -> SampleFrame&
+		requires (std::is_same_v<SampleT, float> && channelCount == 2)
+	{
+		assert(index < this->m_frames);
+		return reinterpret_cast<SampleFrame*>(this->m_data)[index];
+	}
+
+	auto sampleFrameAt(f_cnt_t index) const noexcept -> const SampleFrame&
+		requires (std::is_same_v<SampleT, const float> && channelCount == 2)
+	{
+		assert(index < this->m_frames);
+		return reinterpret_cast<const SampleFrame*>(this->m_data)[index];
+	}
+
+	auto toSampleFrames() noexcept -> std::span<SampleFrame>
+		requires (std::is_same_v<SampleT, float> && channelCount == 2)
+	{
+		return {reinterpret_cast<SampleFrame*>(this->m_data), this->m_frames};
+	}
+
+	auto toSampleFrames() const noexcept -> std::span<const SampleFrame>
+		requires (std::is_same_v<SampleT, const float> && channelCount == 2)
+	{
+		return {reinterpret_cast<const SampleFrame*>(this->m_data), this->m_frames};
 	}
 };
 
