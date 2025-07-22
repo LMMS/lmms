@@ -97,7 +97,26 @@ protected:
 	f_cnt_t m_frames = 0;
 };
 
+template<typename T, typename... AllowedTs>
+inline constexpr bool OneOf = (std::is_same_v<T, AllowedTs> || ...);
+
 } // namespace detail
+
+
+//! Recognized sample types, either const or non-const
+template<typename T>
+concept SampleType = detail::OneOf<std::remove_const_t<T>,
+	float,
+	double,
+	std::int8_t,
+	std::uint8_t,
+	std::int16_t,
+	std::uint16_t,
+	std::int32_t,
+	std::uint32_t,
+	std::int64_t,
+	std::uint64_t
+>;
 
 
 /**
@@ -105,7 +124,7 @@ protected:
  *
  * TODO C++23: Use std::mdspan?
  */
-template<typename SampleT, proc_ch_t channelCount = DynamicChannelCount>
+template<SampleType SampleT, proc_ch_t channelCount = DynamicChannelCount>
 class InterleavedBufferView : public detail::BufferViewData<SampleT, channelCount>
 {
 	using Base = detail::BufferViewData<SampleT, channelCount>;
@@ -186,7 +205,7 @@ static_assert(sizeof(InterleavedBufferView<float, 2>) == sizeof(void*) + sizeof(
  *
  * TODO C++23: Use std::mdspan?
  */
-template<typename SampleT, proc_ch_t channelCount = DynamicChannelCount>
+template<SampleType SampleT, proc_ch_t channelCount = DynamicChannelCount>
 class PlanarBufferView : public detail::BufferViewData<SampleT* const, channelCount>
 {
 	using Base = detail::BufferViewData<SampleT* const, channelCount>;
