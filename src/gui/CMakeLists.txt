@@ -105,6 +105,7 @@ SET(LMMS_SRCS
 	gui/widgets/CaptionMenu.cpp
 	gui/widgets/ComboBox.cpp
 	gui/widgets/CustomTextKnob.cpp
+	gui/widgets/Draggable.cpp
 	gui/widgets/Fader.cpp
 	gui/widgets/FloatModelEditorBase.cpp
 	gui/widgets/Graph.cpp
