@@ -63,7 +63,7 @@ public:
 	}
 
 	constexpr auto data() const noexcept -> SampleT* { return m_data; }
-	constexpr auto channels() const noexcept -> proc_ch_t { return channelCount; }
+	static constexpr auto channels() noexcept -> proc_ch_t { return channelCount; }
 	constexpr auto frames() const noexcept -> f_cnt_t { return m_frames; }
 
 protected:
@@ -156,7 +156,7 @@ public:
 
 	constexpr auto empty() const noexcept -> bool
 	{
-		return !this->m_data || this->channels() == 0 || this->m_frames == 0;
+		return !this->m_data || Base::channels() == 0 || this->m_frames == 0;
 	}
 
 	//! @return the frame at the given index
@@ -164,11 +164,11 @@ public:
 	{
 		if constexpr (channelCount == DynamicChannelCount)
 		{
-			return std::span<SampleT>{framePtr(index), this->channels()};
+			return std::span<SampleT>{framePtr(index), Base::channels()};
 		}
 		else
 		{
-			return std::span<SampleT, channelCount>{framePtr(index), this->channels()};
+			return std::span<SampleT, channelCount>{framePtr(index), Base::channels()};
 		}
 	}
 
@@ -179,7 +179,7 @@ public:
 	constexpr auto framePtr(f_cnt_t index) const noexcept -> SampleT*
 	{
 		assert(index < this->m_frames);
-		return this->m_data + index * this->channels();
+		return this->m_data + index * Base::channels();
 	}
 
 	/**
@@ -237,7 +237,7 @@ public:
 
 	constexpr auto empty() const noexcept -> bool
 	{
-		return !this->m_data || this->channels() == 0 || this->m_frames == 0;
+		return !this->m_data || Base::channels() == 0 || this->m_frames == 0;
 	}
 
 	//! @return the buffer of the given channel
@@ -259,7 +259,7 @@ public:
 	 */
 	constexpr auto bufferPtr(proc_ch_t channel) const noexcept -> SampleT*
 	{
-		assert(channel < this->channels());
+		assert(channel < Base::channels());
 		assert(this->m_data != nullptr);
 		return this->m_data[channel];
 	}
