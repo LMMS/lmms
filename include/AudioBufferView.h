@@ -49,7 +49,7 @@ public:
 	constexpr BufferViewData() = default;
 	constexpr BufferViewData(const BufferViewData&) = default;
 
-	constexpr BufferViewData(SampleT* data, proc_ch_t channels, f_cnt_t frames) noexcept
+	constexpr BufferViewData(SampleT* data, [[maybe_unused]] proc_ch_t channels, f_cnt_t frames) noexcept
 		: m_data{data}
 		, m_frames{frames}
 	{
@@ -157,6 +157,16 @@ public:
 	constexpr auto empty() const noexcept -> bool
 	{
 		return !this->m_data || Base::channels() == 0 || this->m_frames == 0;
+	}
+
+	constexpr auto dataSizeBytes() const noexcept -> std::size_t
+	{
+		return Base::channels() * this->m_frames * sizeof(SampleT);
+	}
+
+	constexpr auto dataView() noexcept -> std::span<SampleT>
+	{
+		return std::span<SampleT>{this->m_data, this->m_frames * Base::channels()};
 	}
 
 	//! @return the frame at the given index
