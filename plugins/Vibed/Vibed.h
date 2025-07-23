@@ -40,13 +40,10 @@ namespace lmms
 {
 
 
-class NotePlayHandle;
-class graphModel;
+class NotePlayHandle;  // IWYU pragma: keep
 
 namespace gui
 {
-class Graph;
-class LedCheckBox;
 class VibedView;
 }
 

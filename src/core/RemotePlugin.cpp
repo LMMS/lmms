@@ -37,17 +37,16 @@
 #include <windows.h>
 #endif
 
+#include "AudioEngine.h"
+#include "Engine.h"
+#include "MidiEvent.h"
+#include "RemotePluginAudioPorts.h"
+#include "Song.h"
+
 #include <QCoreApplication>
 #include <QDebug>
 #include <QDir>
 #include <QUuid>
-
-#include "AudioEngine.h"
-#include "Engine.h"
-#include "Model.h"
-#include "RemotePluginAudioPorts.h"
-#include "Song.h"
-
 
 #ifdef LMMS_BUILD_WIN32
 

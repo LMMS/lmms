@@ -27,7 +27,6 @@
 #define _VESTIGE_H
 
 
-#include <QMdiSubWindow>
 #include <QMutex>
 
 #include "AudioPlugin.h"
@@ -35,10 +34,10 @@
 #include "RemotePluginAudioPorts.h"
 
 
-class QPixmap;
+class QGridLayout;
+class QMdiSubWindow;
 class QPushButton;
 class QScrollArea;
-class QGridLayout;
 
 namespace lmms
 {

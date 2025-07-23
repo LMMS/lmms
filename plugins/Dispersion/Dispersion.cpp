@@ -24,6 +24,8 @@
 
 #include "Dispersion.h"
 
+#include <numbers>
+
 #include "embed.h"
 #include "plugin_export.h"
 

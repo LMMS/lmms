@@ -28,7 +28,6 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 
-#include "Knob.h"
 #include "LedCheckBox.h"
 #include "VecControls.h"
 #include "Vectorscope.h"

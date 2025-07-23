@@ -25,20 +25,21 @@
 #ifndef LMMS_SLICERT_H
 #define LMMS_SLICERT_H
 
-#include <algorithm>
-#include <fftw3.h>
 #include <stdexcept>
 
 #include "AutomatableModel.h"
+#include "ComboBoxModel.h"
 #include "Instrument.h"
-#include "InstrumentView.h"
 #include "Note.h"
 #include "Sample.h"
-#include "SampleBuffer.h"
-#include "SlicerTView.h"
-#include "LmmsTypes.h"
 
 namespace lmms {
+
+class InstrumentTrack;
+namespace gui {
+class SlicerTView;
+class SlicerTWaveform;
+}
 
 class PlaybackState
 {

@@ -69,7 +69,6 @@ public:
 namespace gui
 {
 class ComboBox;
-class LcdSpinBox;
 }
 
 

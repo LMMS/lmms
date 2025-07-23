@@ -387,6 +387,24 @@ lmms--gui--TrackView > QWidget {
 }
 
 
+QPushButton#btn {
+	color: #d1d8e4;
+	padding: 2 4;
+	border: 1 solid #000;
+	border-radius: 3;
+	background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgba(255, 255, 255, 20%), stop:0.1 rgba(255, 255, 255, 4%), stop:0.9 rgba(0, 0, 0, 4%), stop:1 rgba(0, 0, 0, 40%));
+}
+
+QPushButton#btn:hover {
+	background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgba(255, 255, 255, 25%), stop:0.1 rgba(255, 255, 255, 7%), stop:0.9 rgba(255, 255, 255, 4%), stop:1 rgba(0, 0, 0, 35%));
+}
+
+QPushButton#btn:pressed,
+QPushButton#btn:checked {
+	color: #02ee89;
+	background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgba(0, 0, 0, 25%), stop:0.1 transparent, stop:0.9 rgba(0, 0, 0, 15%), stop:1 rgba(0, 0, 0, 35%));
+}
+
 /* autoscroll, loop, stop behaviour toggle buttons */
 
 /* track background config */

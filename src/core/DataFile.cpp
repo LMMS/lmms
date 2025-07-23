@@ -605,6 +605,11 @@ DataFile::Type DataFile::type( const QString& typeName )
 		return Type::InstrumentTrackSettings;
 	}
 
+	if (typeName == "pattern")
+	{
+		return Type::MidiClip;
+	}
+
 	return Type::Unknown;
 }
 

@@ -24,9 +24,7 @@
 
 #include "TimeLineWidget.h"
 
-#include <cmath>
 
-#include <QDomElement>
 #include <QGuiApplication>
 #include <QMenu>
 #include <QMouseEvent>
@@ -36,7 +34,6 @@
 
 #include "ConfigManager.h"
 #include "embed.h"
-#include "GuiApplication.h"
 #include "KeyboardShortcuts.h"
 #include "NStateButton.h"
 #include "TextFloat.h"
