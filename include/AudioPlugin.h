@@ -153,7 +153,7 @@ protected:
 		auto buffers = m_audioPorts.buffers();
 		assert(buffers != nullptr);
 
-		float* temp = inOut.data()->data();
+		auto temp = reinterpret_cast<float*>(inOut.data());
 		const auto bus = AudioBus<float>{&temp, 1, inOut.size()};
 		auto router = m_audioPorts.getRouter();
 
@@ -232,7 +232,7 @@ protected:
 			case ProcessStatus::Continue:
 				break;
 			case ProcessStatus::ContinueIfNotQuiet:
-				checkGate(router.rms());
+				handleAutoQuit(router.silentOutput());
 				break;
 			case ProcessStatus::Sleep:
 				return false;

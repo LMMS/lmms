@@ -198,7 +198,7 @@ protected:
 	 * after "decay" ms of the output buffer remaining below the silence threshold, the effect is
 	 * turned off and won't be processed again until it receives new audio input.
 	 */
-	void handleAutoQuit(std::span<const SampleFrame> output); // TODO
+	void handleAutoQuit(bool silentOutput);
 
 private:
 	EffectChain * m_parent;

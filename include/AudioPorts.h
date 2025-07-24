@@ -94,7 +94,14 @@ enum class ProcessStatus
 	//! Unconditionally continue processing
 	Continue,
 
-	//! Calculate the RMS out sum and call `checkGate` to determine whether to stop processing
+	/**
+	 * When the "Keep effects running even without input" setting is off (i.e. "auto-quit" is on):
+	 *    The samples of each processor output channel currently in use (that is, output channels routed to
+	 *    a track channel) are compared to a silence threshold, and if all the samples are silent for enough
+	 *    periods (see `Effect::handleAutoQuit`), the plugin will be put to sleep (`ProcessStatus::Sleep`).
+	 *
+	 * Otherwise, this is equivalent to `ProcessStatus::Continue`.
+	 */
 	ContinueIfNotQuiet,
 
 	//! Do not continue processing
@@ -192,7 +199,7 @@ public:
 	auto process(AudioBus<float> inOut, AudioPortsBuffer<settings>& processorBuffers, F&& processFunc)
 		-> ProcessStatus
 	{
-		m_rms = 0;
+		m_silentOutput = false;
 		if constexpr (settings.sampleFrameCompatible())
 		{
 			if (const auto dr = m_ap->m_directRouting)
@@ -213,12 +220,13 @@ public:
 	}
 
 	/**
-	 * RMS calculated from the in-use processor output channels (processor channels that are routed to
-	 * at least one track channel).
+	 * Whether the processor output channels currently in use (processor channels that are routed to
+	 * at least one track channel) are silent.
 	 *
 	 * Only available when `process()` returns `ProcessStatus::ContinueIfNotQuiet` and auto-quit is enabled.
+	 * Otherwise the outputs are assumed to not be silent.
 	 */
-	auto rms() const -> double { return m_rms; }
+	auto silentOutput() const -> bool { return m_silentOutput; }
 
 #ifdef LMMS_TESTING
 	friend class ::AudioPortsTest;
@@ -235,10 +243,10 @@ private:
 	void receive(InterleavedBufferView<const float, settings.outputs> in, AudioBus<float> inOut) const
 		requires (settings.interleaved);
 
-	auto calculateRms(InterleavedBufferView<const float, 2> output) -> double;
+	auto isOutputSilent(InterleavedBufferView<const float, 2> output) const -> bool;
 
 	template<proc_ch_t channelCount> requires (!settings.interleaved)
-	auto calculateRms(PlanarBufferView<const SampleT, channelCount> output) -> double;
+	auto isOutputSilent(PlanarBufferView<const SampleT, channelCount> output) const -> bool;
 
 	/**
 	 * Processes audio normally (no "direct routing").
@@ -257,8 +265,31 @@ private:
 		AudioPortsBuffer<settings>& processorBuffers, F&& processFunc) -> ProcessStatus;
 
 	const AudioPorts<settings>* const m_ap;
-	double m_rms = 0;
+	bool m_silentOutput = false;
 	const bool m_autoQuitEnabled;
+
+	/*
+	 * In the past, the RMS was calculated then compared with a threshold of 10^(-10).
+	 * Now we use a different algorithm to determine whether a buffer is non-quiet, so
+	 * a new threshold is needed for the best compatibility. The following is how it's derived.
+	 *
+	 * Old method:
+	 * RMS = average (L^2 + R^2) across stereo buffer.
+	 * RMS threshold = 10^(-10)
+	 *
+	 * So for a single channel, it would be:
+	 * RMS/2 = average M^2 across single channel buffer.
+	 * RMS/2 threshold = 5^(-11)
+	 *
+	 * The new algorithm for determining whether a buffer is non-silent compares M with the threshold,
+	 * not M^2, so the square root of M^2's threshold should give us the most compatible threshold for
+	 * the new algorithm:
+	 *
+	 * (RMS/2)^0.5 = (5^(-11))^0.5 = 0.0001431 (approx.)
+	 *
+	 * In practice though, the exact value shouldn't really matter so long as it's sufficiently small.
+	 */
+	static constexpr auto s_silenceThreshold = 0.0001431f;
 };
 
 } // namespace detail
@@ -813,46 +844,54 @@ inline void AudioPortsRouter<settings>::receive(
 }
 
 template<AudioPortsSettings settings>
-inline auto AudioPortsRouter<settings>::calculateRms(InterleavedBufferView<const float, 2> output) -> double
+inline auto AudioPortsRouter<settings>::isOutputSilent(InterleavedBufferView<const float, 2> output) const -> bool
 {
 	assert(m_ap->m_usedProcessorChannels.size() == 2);
 
-	double rms = 0;
-	if (m_ap->m_usedProcessorChannels[0] && m_ap->m_usedProcessorChannels[1])
+	// TODO C++26: Use std::simd::all_of
+	switch ((m_ap->m_usedProcessorChannels[0] << 1) | m_ap->m_usedProcessorChannels[1])
 	{
-		for (const SampleFrame& sf : output.toSampleFrames())
-		{
-			rms += sf.sumOfSquaredAmplitudes();
-		}
-		return rms / output.frames();
+		case 0b11:
+			return std::ranges::all_of(output.dataView(), [](const float sample) {
+				return std::abs(sample) < s_silenceThreshold;
+			});
+		case 0b10:
+			return std::ranges::all_of(output.framesView(), [](const float* frame) {
+				return std::abs(frame[0]) < s_silenceThreshold;
+			});
+		case 0b01:
+			return std::ranges::all_of(output.framesView(), [](const float* frame) {
+				return std::abs(frame[1]) < s_silenceThreshold;
+			});
+		case 0b00:
+			// No outputs are used
+			return true;
+		default:
+			unreachable();
+			return true;
 	}
-
-	const auto usedIndex = static_cast<std::uint8_t>(m_ap->m_usedProcessorChannels[0] ? 0 : 1);
-	for (const SampleFrame& sf : output.toSampleFrames())
-	{
-		rms += sf[usedIndex] * sf[usedIndex];
-	}
-	return rms / output.frames();
 }
 
 template<AudioPortsSettings settings>
 template<proc_ch_t channelCount> requires (!settings.interleaved)
-inline auto AudioPortsRouter<settings>::calculateRms(PlanarBufferView<const SampleT, channelCount> output) -> double
+inline auto AudioPortsRouter<settings>::isOutputSilent(
+	PlanarBufferView<const SampleT, channelCount> output) const -> bool
 {
 	assert(output.channels() == m_ap->m_usedProcessorChannels.size());
 
-	double rms = 0;
 	proc_ch_t pc = 0;
 	for (bool used : m_ap->m_usedProcessorChannels)
 	{
-		if (!used) { continue; }
-		for (SampleT sample : output.buffer(pc))
+		if (used)
 		{
-			rms += double{sample * sample};
+			const bool silent = std::ranges::all_of(output.buffer(pc), [](const SampleT sample) {
+				return std::abs(sample) < s_silenceThreshold;
+			});
+			if (!silent) { return false; }
 		}
 		++pc;
 	}
-	return rms / output.frames();
+	return true;
 }
 
 template<AudioPortsSettings settings>
@@ -880,7 +919,7 @@ inline auto AudioPortsRouter<settings>::processNormally(AudioBus<float> coreInOu
 			receive(processorInOut, coreInOut);
 			if (status == ProcessStatus::ContinueIfNotQuiet && m_autoQuitEnabled)
 			{
-				m_rms = calculateRms(processorInOut);
+				m_silentOutput = isOutputSilent(processorInOut);
 			}
 		}
 	}
@@ -904,7 +943,7 @@ inline auto AudioPortsRouter<settings>::processNormally(AudioBus<float> coreInOu
 			receive(processorOut, coreInOut);
 			if (status == ProcessStatus::ContinueIfNotQuiet && m_autoQuitEnabled)
 			{
-				m_rms = calculateRms(processorOut);
+				m_silentOutput = isOutputSilent(processorOut);
 			}
 		}
 	}
@@ -1035,23 +1074,22 @@ inline auto AudioPortsRouter<settings>::processWithDirectRouting(InterleavedBuff
 		}
 	}
 
-	// Calculate the RMS if needed
+	// Check if output buffers are silent (if needed)
 	if constexpr (settings.outputs != 0)
 	{
 		if (status == ProcessStatus::ContinueIfNotQuiet
 			&& m_autoQuitEnabled
 			&& m_ap->out().channelCount() != 0)
 		{
-			// The RMS is calculated using the processor output channels that are currently in use.
+			// Silent output is determined using the processor output channels that are currently in use.
 			// When "direct routing" is active (as it is here), the data on the track channels
 			// is the same as the data on the in-use processor output channels, making this easy
 			// to calculate.
-			double rms = 0;
-			for (const SampleFrame& sf : coreBuffer.toSampleFrames())
-			{
-				rms += sf.sumOfSquaredAmplitudes();
-			}
-			m_rms = rms / coreBuffer.frames();
+
+			// TODO C++26: Use std::simd::all_of
+			m_silentOutput = std::ranges::all_of(coreBuffer.dataView(), [](float sample) {
+				return std::abs(sample) < s_silenceThreshold;
+			});
 		}
 	}
 
