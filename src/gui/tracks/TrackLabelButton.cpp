@@ -30,7 +30,6 @@
 
 #include "ConfigManager.h"
 #include "embed.h"
-#include "InstrumentTrackView.h"
 #include "Instrument.h"
 #include "InstrumentTrack.h"
 #include "RenameDialog.h"

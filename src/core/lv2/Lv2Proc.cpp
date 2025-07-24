@@ -32,7 +32,6 @@
 #include <lv2/resize-port/resize-port.h>
 #include <lv2/worker/worker.h>
 #include <QDebug>
-#include <QDomDocument>
 #include <QtGlobal>
 
 #include "AudioEngine.h"

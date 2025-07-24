@@ -25,7 +25,6 @@
 #ifndef LMMS_SAMPLE_H
 #define LMMS_SAMPLE_H
 
-#include <cmath>
 #include <memory>
 
 #include "AudioResampler.h"

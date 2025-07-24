@@ -32,7 +32,8 @@
 #include <QKeyEvent>
 #include <QLabel>
 #include <QPainter>
-#include <QPainterPath>
+#include <QPainterPath>  // IWYU pragma: keep
+#include <QPushButton>
 #include <QScrollBar>
 #include <QStyleOption>
 #include <QToolTip>
@@ -54,7 +55,6 @@
 #include "PatternStore.h"
 #include "PianoRoll.h"
 #include "ProjectJournal.h"
-#include "SampleBuffer.h"
 #include "StringPairDrag.h"
 #include "TextFloat.h"
 #include "TimeLineWidget.h"
