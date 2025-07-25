@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef LMMS_TEMPLATE_EFFECT_H
-#define LMMS_TEMPLATE_EFFECT_H
+#ifndef LMMS_OSCILLOSCOPE_H
+#define LMMS_OSCILLOSCOPE_H
 
 #include "Effect.h"
 #include "OscilloscopeControls.h"
@@ -62,4 +62,4 @@ private:
 
 } // namespace lmms
 
-#endif // LMMS_TEMPLATE_EFFECT_H
+#endif // LMMS_OSCILLOSCOPE_H
