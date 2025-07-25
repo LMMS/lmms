@@ -50,14 +50,8 @@ public:
 
 	void saveSettings(QDomDocument& doc, QDomElement& parent) override;
 	void loadSettings(const QDomElement& parent) override;
-	inline QString nodeName() const override
-	{
-		return "OscilloscopeControls";
-	}
-	gui::EffectControlDialog* createView() override
-	{
-		return new gui::OscilloscopeControlDialog(this);
-	}
+	QString nodeName() const override { return "OscilloscopeControls"; }
+	gui::EffectControlDialog* createView() override { return new gui::OscilloscopeControlDialog(this); }
 	int controlCount() override { return 5; }
 
 private:
