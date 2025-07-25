@@ -250,8 +250,8 @@ void AudioPortsModel::updateAllUsedChannels()
 		for (proc_ch_t pc = 0; pc < m_out.channelCount(); ++pc)
 		{
 			const bool enabled = m_out.enabled(tc, pc);
-			m_usedTrackChannels[tc] = m_usedTrackChannels[tc] | enabled;
-			m_usedProcessorChannels[pc] = m_usedProcessorChannels[pc] | enabled;
+			m_usedTrackChannels[tc] = m_usedTrackChannels[tc] || enabled;
+			m_usedProcessorChannels[pc] = m_usedProcessorChannels[pc] || enabled;
 		}
 	}
 }
@@ -272,7 +272,7 @@ void AudioPortsModel::updateAllUsedProcessorChannels()
 	{
 		for (proc_ch_t pc = 0; pc < m_out.channelCount(); ++pc)
 		{
-			m_usedProcessorChannels[pc] = m_usedProcessorChannels[pc] | m_out.enabled(tc, pc);
+			m_usedProcessorChannels[pc] = m_usedProcessorChannels[pc] || m_out.enabled(tc, pc);
 		}
 	}
 }

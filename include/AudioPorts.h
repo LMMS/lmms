@@ -245,8 +245,8 @@ private:
 
 	auto isOutputSilent(InterleavedBufferView<const float, 2> output) const -> bool;
 
-	template<proc_ch_t channelCount> requires (!settings.interleaved)
-	auto isOutputSilent(PlanarBufferView<const SampleT, channelCount> output) const -> bool;
+	auto isOutputSilent(PlanarBufferView<const SampleT, settings.outputs> output) const -> bool
+		requires (!settings.interleaved);
 
 	/**
 	 * Processes audio normally (no "direct routing").
@@ -873,9 +873,9 @@ inline auto AudioPortsRouter<settings>::isOutputSilent(InterleavedBufferView<con
 }
 
 template<AudioPortsSettings settings>
-template<proc_ch_t channelCount> requires (!settings.interleaved)
 inline auto AudioPortsRouter<settings>::isOutputSilent(
-	PlanarBufferView<const SampleT, channelCount> output) const -> bool
+	PlanarBufferView<const SampleT, settings.outputs> output) const -> bool
+	requires (!settings.interleaved)
 {
 	assert(output.channels() == m_ap->m_usedProcessorChannels.size());
 
