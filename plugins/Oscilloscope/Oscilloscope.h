@@ -37,7 +37,6 @@ class Oscilloscope : public Effect
 {
 public:
 	Oscilloscope(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
-	~Oscilloscope() override;
 
 	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
 
@@ -54,7 +53,7 @@ public:
 private:
 	OscilloscopeControls m_controls;
 
-	SampleFrame* m_ringBuffer;
+	std::array<SampleFrame, BUFFER_SIZE> m_ringBuffer;
 	int m_ringBufferIndex = 0;
 
 	friend class OscilloscopeControls;

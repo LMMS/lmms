@@ -53,12 +53,6 @@ Oscilloscope::Oscilloscope(Model* parent, const Descriptor::SubPluginFeatures::K
 	Effect(&oscilloscope_plugin_descriptor, parent, key),
 	m_controls(this)
 {
-	m_ringBuffer = new SampleFrame[BUFFER_SIZE];
-}
-
-Oscilloscope::~Oscilloscope()
-{
-	delete[] m_ringBuffer;
 }
 
 
