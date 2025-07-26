@@ -65,7 +65,7 @@ Plugin::Descriptor PLUGIN_EXPORT peakcontrollereffect_plugin_descriptor =
 PeakControllerEffect::PeakControllerEffect(
 			Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key ) :
-	Effect( &peakcontrollereffect_plugin_descriptor, _parent, _key ),
+	AudioPlugin(&peakcontrollereffect_plugin_descriptor, _parent, _key),
 	m_effectId( rand() ),
 	m_peakControls( this ),
 	m_lastSample( 0 ),
@@ -93,7 +93,7 @@ PeakControllerEffect::~PeakControllerEffect()
 }
 
 
-Effect::ProcessStatus PeakControllerEffect::processImpl(SampleFrame* buf, const fpp_t frames)
+ProcessStatus PeakControllerEffect::processImpl(InterleavedBufferView<float, 2> inOut)
 {
 	PeakControllerEffectControls & c = m_peakControls;
 
@@ -102,20 +102,20 @@ Effect::ProcessStatus PeakControllerEffect::processImpl(SampleFrame* buf, const 
 
 	if( c.m_absModel.value() )
 	{
-		for (auto i = std::size_t{0}; i < frames; ++i)
+		for (SampleFrame& frame : inOut.toSampleFrames())
 		{
 			// absolute value is achieved because the squares are > 0
-			sum += buf[i][0] * buf[i][0] + buf[i][1] * buf[i][1];
+			sum += frame.sumOfSquaredAmplitudes();
 		}
 	}
 	else
 	{
-		for (auto i = std::size_t{0}; i < frames; ++i)
+		for (float* frame : inOut.framesView())
 		{
 			// the value is absolute because of squaring,
 			// so we need to correct it
-			sum += buf[i][0] * buf[i][0] * sign(buf[i][0])
-				+ buf[i][1] * buf[i][1] * sign(buf[i][1]);
+			sum += frame[0] * frame[0] * sign(frame[0])
+				+ frame[1] * frame[1] * sign(frame[1]);
 		}
 	}
 
@@ -123,13 +123,13 @@ Effect::ProcessStatus PeakControllerEffect::processImpl(SampleFrame* buf, const 
 	// this will mute the output after the values were measured
 	if( c.m_muteModel.value() )
 	{
-		for (auto i = std::size_t{0}; i < frames; ++i)
+		for (float* frame : inOut.framesView())
 		{
-			buf[i][0] = buf[i][1] = 0.0f;
+			frame[0] = frame[1] = 0.0f;
 		}
 	}
 
-	float curRMS = sqrt_neg(sum / frames);
+	float curRMS = sqrt_neg(sum / inOut.frames());
 	const float tres = c.m_tresholdModel.value();
 	const float amount = c.m_amountModel.value() * c.m_amountMultModel.value();
 	curRMS = qAbs( curRMS ) < tres ? 0.0f : curRMS;

@@ -70,7 +70,7 @@ Plugin::Descriptor PLUGIN_EXPORT malletsstk_plugin_descriptor =
 
 
 MalletsInstrument::MalletsInstrument( InstrumentTrack * _instrument_track ):
-	Instrument( _instrument_track, &malletsstk_plugin_descriptor ),
+	Instrument(&malletsstk_plugin_descriptor, _instrument_track),
 	m_hardnessModel(64.0f, 0.0f, 128.0f, 0.1f, this, tr( "Hardness" )),
 	m_positionModel(64.0f, 0.0f, 64.0f, 0.1f, this, tr( "Position" )),
 	m_vibratoGainModel(0.0f, 0.0f, 128.0f, 0.1f, this, tr( "Vibrato gain" )),
@@ -279,8 +279,7 @@ QString MalletsInstrument::nodeName() const
 
 
 
-void MalletsInstrument::playNote( NotePlayHandle * _n,
-						SampleFrame* _working_buffer )
+void MalletsInstrument::playNoteImpl(NotePlayHandle* _n, std::span<SampleFrame> out)
 {
 	if( m_filesMissing )
 	{
@@ -403,10 +402,8 @@ void MalletsInstrument::playNote( NotePlayHandle * _n,
 
 	for( fpp_t frame = offset; frame < frames + offset; ++frame )
 	{
-		_working_buffer[frame][0] = ps->nextSampleLeft() *
-				( m_scalers[p] + add_scale );
-		_working_buffer[frame][1] = ps->nextSampleRight() *
-				( m_scalers[p] + add_scale );
+		out[frame][0] = ps->nextSampleLeft() * (m_scalers[p] + add_scale);
+		out[frame][1] = ps->nextSampleRight() * (m_scalers[p] + add_scale);
 	}
 }
 
