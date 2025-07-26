@@ -45,10 +45,10 @@ public:
 		return &m_controls;
 	}
 
-	SampleFrame* buffer() const { return m_ringBuffer; }
-	int bufferIndex() const { return m_ringBufferIndex; }
-
 	static const int BUFFER_SIZE = 44100*3;
+
+	std::array<SampleFrame, BUFFER_SIZE> buffer() const { return m_ringBuffer; }
+	int bufferIndex() const { return m_ringBufferIndex; }
 
 private:
 	OscilloscopeControls m_controls;
