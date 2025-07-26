@@ -849,7 +849,7 @@ inline auto AudioPortsRouter<settings>::isOutputSilent(InterleavedBufferView<con
 	assert(m_ap->m_usedProcessorChannels.size() == 2);
 
 	// TODO C++26: Use std::simd::all_of
-	switch ((m_ap->m_usedProcessorChannels[0] << 1) | m_ap->m_usedProcessorChannels[1])
+	switch ((m_ap->m_usedProcessorChannels[0] << 1) | std::uint8_t{m_ap->m_usedProcessorChannels[1]})
 	{
 		case 0b11:
 			return std::ranges::all_of(output.dataView(), [](const float sample) {
