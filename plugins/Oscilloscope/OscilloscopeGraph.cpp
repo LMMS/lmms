@@ -65,7 +65,7 @@ void OscilloscopeGraph::paintEvent(QPaintEvent* pe)
 	int framesPerPixel = std::max(1, windowSize / width());
 
 
-	SampleFrame* buffer = effect->buffer();
+	auto buffer = effect->buffer();
 	int bufferSize = Oscilloscope::BUFFER_SIZE;
 	int bufferIndex = effect->bufferIndex();
 	int windowStartIndex = bufferIndex + (bufferSize - windowSize) + (phase) * bufferSize;
