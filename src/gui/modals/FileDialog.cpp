@@ -46,37 +46,7 @@ FileDialog::FileDialog( QWidget *parent, const QString &caption,
 
 	setOption( QFileDialog::DontUseNativeDialog );
 
-#ifdef LMMS_BUILD_LINUX
-	QList<QUrl> urls;
-#else
 	QList<QUrl> urls = sidebarUrls();
-#endif
-
-	QDir desktopDir;
-	desktopDir.setPath(QStandardPaths::writableLocation(QStandardPaths::DesktopLocation));
-	if (desktopDir.exists())
-	{
-		urls << QUrl::fromLocalFile(desktopDir.absolutePath());
-	}
-	
-	QDir downloadDir(QDir::homePath() + "/Downloads");
-	if (!downloadDir.exists())
-	{
-		downloadDir.setPath(QStandardPaths::writableLocation(QStandardPaths::DownloadLocation));
-	}
-	if (downloadDir.exists())
-	{
-		urls << QUrl::fromLocalFile(downloadDir.absolutePath());
-	}
-
-	QDir musicDir;
-	musicDir.setPath(QStandardPaths::writableLocation(QStandardPaths::MusicLocation));
-	if (musicDir.exists())
-	{
-		urls << QUrl::fromLocalFile(musicDir.absolutePath());
-	}
-
-	urls << QUrl::fromLocalFile(ConfigManager::inst()->workingDir());
 	
 	// Add `/Volumes` directory on OS X systems, this allows the user to browse
 	// external disk drives.
@@ -87,22 +57,29 @@ FileDialog::FileDialog( QWidget *parent, const QString &caption,
 #endif
 
 #ifdef LMMS_BUILD_LINUX
+	QList<QUrl> m_addedSidebarUrls;
 
 	// FileSystem types : https://www.javatpoint.com/linux-file-system
-	QStringList usableFileSystems = {"ext", "ext2", "ext3", "ext4", "jfs", "reiserfs", "ntfs3", "fuse.sshfs", "fuseblk"};
+	QStringList usableFileSystems = {"ext", "ext2", "ext3", "ext4", "jfs", "reiserfs", "ntfs3", "fuse.sshfs", "fuseblk", "vfat"};
 
 	for(QStorageInfo storage : QStorageInfo::mountedVolumes())
 	{
-		storage.refresh();
-
 		if (usableFileSystems.contains(QString(storage.fileSystemType()), Qt::CaseInsensitive) && storage.isValid() && storage.isReady())
-		{			
-			urls << QUrl::fromLocalFile(storage.rootPath());	
+		{
+			auto url = QUrl::fromLocalFile(storage.rootPath());
+			if (!urls.contains(url))
+			{
+				m_addedSidebarUrls << url;
+			}
 		}
 	}
 #endif
 
+#ifdef LMMS_BUILD_APPLE
 	setSidebarUrls(urls);
+#else
+	setSidebarUrls(urls << m_addedSidebarUrls);
+#endif
 }
 
 
