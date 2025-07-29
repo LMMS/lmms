@@ -32,7 +32,8 @@
 
 #include <vorbis/vorbisenc.h>
 
-#include "AudioEngine.h"
+#include "SampleFrame.h"
+#include "lmms_constants.h"
 
 namespace lmms
 {

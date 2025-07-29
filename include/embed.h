@@ -32,8 +32,9 @@
 #include <QString>
 
 #include "lmms_export.h"
+#ifdef PLUGIN_NAME
 #include "LmmsCommonMacros.h"
-
+#endif
 
 namespace lmms {
 

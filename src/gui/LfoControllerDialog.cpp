@@ -154,7 +154,7 @@ LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent
 	m_userWaveBtn->setToolTip(
 				tr( "User-defined shape.\nDouble click to pick a file." ) );
 	
-	m_waveBtnGrp = new automatableButtonGroup( this );
+	m_waveBtnGrp = new AutomatableButtonGroup( this );
 	m_waveBtnGrp->addButton( sin_wave_btn );
 	m_waveBtnGrp->addButton( triangle_wave_btn );
 	m_waveBtnGrp->addButton( saw_wave_btn );
@@ -182,7 +182,7 @@ LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent
 	d100->setInactiveGraphic(embed::getIconPixmap("lfo_d100_inactive"));
 	d100->setToolTip(tr("Divide modulation frequency by 100"));
 
-	m_multiplierBtnGrp = new automatableButtonGroup( this );
+	m_multiplierBtnGrp = new AutomatableButtonGroup( this );
 	m_multiplierBtnGrp->addButton( x1 );
 	m_multiplierBtnGrp->addButton( x100 );
 	m_multiplierBtnGrp->addButton( d100 );

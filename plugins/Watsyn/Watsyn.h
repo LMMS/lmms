@@ -81,7 +81,7 @@ class WatsynInstrument;
 
 namespace gui
 {
-class automatableButtonGroup;
+class AutomatableButtonGroup;
 class PixmapButton;
 class WatsynView;
 }
@@ -361,9 +361,9 @@ private:
 
 	Knob * m_xtalkKnob;
 
-	automatableButtonGroup * m_selectedGraphGroup;
-	automatableButtonGroup * m_aModGroup;
-	automatableButtonGroup * m_bModGroup;
+	AutomatableButtonGroup * m_selectedGraphGroup;
+	AutomatableButtonGroup * m_aModGroup;
+	AutomatableButtonGroup * m_bModGroup;
 
 	Graph * a1_graph;
 	Graph * a2_graph;

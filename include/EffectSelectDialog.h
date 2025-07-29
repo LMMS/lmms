@@ -29,15 +29,13 @@
 #include "Effect.h"
 
 #include <QDialog>
-#include <QHeaderView>
-#include <QKeyEvent>
-#include <QMouseEvent>
-#include <QPushButton>
 #include <QRegularExpression>
-#include <QScrollArea>
 #include <QSortFilterProxyModel>
 #include <QStandardItemModel>
-#include <QTableView>
+
+class QScrollArea;
+class QTableView;
+class QLineEdit;
 
 namespace lmms::gui
 {

@@ -32,7 +32,8 @@
 #include <QKeyEvent>
 #include <QLabel>
 #include <QPainter>
-#include <QPainterPath>
+#include <QPainterPath>  // IWYU pragma: keep
+#include <QPushButton>
 #include <QScrollBar>
 #include <QStyleOption>
 #include <QToolTip>
@@ -54,7 +55,6 @@
 #include "PatternStore.h"
 #include "PianoRoll.h"
 #include "ProjectJournal.h"
-#include "SampleBuffer.h"
 #include "StringPairDrag.h"
 #include "TextFloat.h"
 #include "TimeLineWidget.h"
@@ -114,10 +114,13 @@ AutomationEditor::AutomationEditor() :
 	//keeps the direction of the widget, undepended on the locale
 	setLayoutDirection( Qt::LeftToRight );
 
+	// Set up tension model
 	m_tensionModel = new FloatModel(1.f, 0.f, 1.f, 0.01f);
+	m_tensionModel->setJournalling(false);
 	connect( m_tensionModel, SIGNAL(dataChanged()),
 				this, SLOT(setTension()));
 
+	// Set up quantization model
 	for (auto q : Quantizations) {
 		m_quantizeModel.addItem(QString("1/%1").arg(q));
 	}

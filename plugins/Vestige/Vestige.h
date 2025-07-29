@@ -27,17 +27,16 @@
 #define _VESTIGE_H
 
 
-#include <QMdiSubWindow>
 #include <QMutex>
 
 #include "Instrument.h"
 #include "InstrumentView.h"
 
 
-class QPixmap;
+class QGridLayout;
+class QMdiSubWindow;
 class QPushButton;
 class QScrollArea;
-class QGridLayout;
 
 namespace lmms
 {

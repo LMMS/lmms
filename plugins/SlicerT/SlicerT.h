@@ -25,9 +25,8 @@
 #ifndef LMMS_SLICERT_H
 #define LMMS_SLICERT_H
 
-#include <fftw3.h>
-
 #include "AutomatableModel.h"
+#include "ComboBoxModel.h"
 #include "Instrument.h"
 #include "Note.h"
 #include "Sample.h"

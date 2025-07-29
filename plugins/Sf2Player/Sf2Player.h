@@ -44,7 +44,6 @@ namespace lmms
 {
 
 
-class Sf2Font;
 struct Sf2PluginData;
 class NotePlayHandle;
 

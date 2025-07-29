@@ -46,9 +46,8 @@
 namespace lmms
 {
 
-class AudioDevice;
 class MidiClient;
-class AudioBusHandle;
+class AudioBusHandle;  // IWYU pragma: keep
 class AudioEngineWorkerThread;
 
 constexpr fpp_t MINIMUM_BUFFER_SIZE = 32;

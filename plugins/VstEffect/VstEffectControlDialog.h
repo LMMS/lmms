@@ -29,7 +29,6 @@
 
 #include <QSharedPointer>
 
-class QPixmap;
 class QPushButton;
 class QLabel;
 
