@@ -1,7 +1,7 @@
 /*
- * AudioResampler.cpp - wrapper for libsamplerate
+ * AudioResampler.cpp
  *
- * Copyright (c) 2023 saker <sakertooth@gmail.com>
+ * Copyright (c) 2025 Sotonye Atemie <sakertooth@gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -26,21 +26,17 @@
 
 #include <samplerate.h>
 #include <stdexcept>
-#include <string>
+#include <utility>
 
 namespace lmms {
 
-AudioResampler::AudioResampler(int interpolationMode, int channels)
-	: m_interpolationMode(interpolationMode)
+AudioResampler::AudioResampler(Mode mode, ch_cnt_t channels)
+	: m_state(src_new(converterType(mode), channels, &m_error))
+	, m_mode(mode)
 	, m_channels(channels)
-	, m_state(src_new(interpolationMode, channels, &m_error))
 {
-	if (!m_state)
-	{
-		const auto errorMessage = std::string{src_strerror(m_error)};
-		const auto fullMessage = std::string{"Failed to create an AudioResampler: "} + errorMessage;
-		throw std::runtime_error{fullMessage};
-	}
+	if (channels <= 0) { throw std::logic_error{"Invalid channel count"}; }
+	if (!m_state) { throw std::runtime_error{src_strerror(m_error)}; }
 }
 
 AudioResampler::~AudioResampler()
@@ -48,22 +44,66 @@ AudioResampler::~AudioResampler()
 	src_delete(m_state);
 }
 
-auto AudioResampler::resample(const float* in, long inputFrames, float* out, long outputFrames, double ratio)
-	-> ProcessResult
+AudioResampler::AudioResampler(AudioResampler&& other) noexcept
+	: m_state(std::exchange(other.m_state, nullptr))
+	, m_mode(other.m_mode)
+	, m_channels(other.m_channels)
 {
-	auto data = SRC_DATA{};
-	data.data_in = in;
-	data.input_frames = inputFrames;
-	data.data_out = out;
-	data.output_frames = outputFrames;
-	data.src_ratio = ratio;
-	data.end_of_input = 0;
-	return {src_process(m_state, &data), data.input_frames_used, data.output_frames_gen};
 }
 
-void AudioResampler::setRatio(double ratio)
+AudioResampler& AudioResampler::operator=(AudioResampler&& other) noexcept
 {
-	src_set_ratio(m_state, ratio);
+	m_state = std::exchange(other.m_state, nullptr);
+	m_mode = other.m_mode;
+	m_channels = other.m_channels;
+	return *this;
+}
+
+auto AudioResampler::process(InterleavedBufferView<const float> input, InterleavedBufferView<float> output) -> Result
+{
+	if (input.channels() != m_channels || output.channels() != m_channels)
+	{
+		throw std::invalid_argument{"Invalid channel count"};
+	}
+
+	auto data = SRC_DATA{};
+
+	data.data_in = input.data();
+	data.input_frames = input.frames();
+
+	data.data_out = output.data();
+	data.output_frames = output.frames();
+
+	data.src_ratio = m_ratio;
+	data.end_of_input = 0;
+
+	if ((m_error = src_process(m_state, &data))) { throw std::runtime_error{src_strerror(m_error)}; }
+
+	return {static_cast<f_cnt_t>(data.input_frames_used), static_cast<f_cnt_t>(data.output_frames_gen)};
+}
+
+void AudioResampler::reset()
+{
+	if ((m_error = src_reset(m_state))) { throw std::runtime_error{src_strerror(m_error)}; }
+}
+
+auto AudioResampler::converterType(Mode mode) -> int
+{
+	switch (mode)
+	{
+	case Mode::ZOH:
+		return SRC_ZERO_ORDER_HOLD;
+	case Mode::Linear:
+		return SRC_LINEAR;
+	case Mode::SincFastest:
+		return SRC_SINC_FASTEST;
+	case Mode::SincMedium:
+		return SRC_SINC_MEDIUM_QUALITY;
+	case Mode::SincBest:
+		return SRC_SINC_BEST_QUALITY;
+	default:
+		throw std::invalid_argument{"Invalid interpolation mode"};
+	}
 }
 
 } // namespace lmms

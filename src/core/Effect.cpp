@@ -52,30 +52,10 @@ Effect::Effect( const Plugin::Descriptor * _desc,
 {
 	m_wetDryModel.setCenterValue(0);
 
-	m_srcState[0] = m_srcState[1] = nullptr;
-	reinitSRC();
-
 	// Call the virtual method onEnabledChanged so that effects can react to changes,
 	// e.g. by resetting state.
 	connect(&m_enabledModel, &BoolModel::dataChanged, [this] { onEnabledChanged(); });
 }
-
-
-
-
-Effect::~Effect()
-{
-	for (const auto& state : m_srcState)
-	{
-		if (state != nullptr)
-		{
-			src_delete(state);
-		}
-	}
-}
-
-
-
 
 void Effect::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
@@ -220,52 +200,6 @@ void Effect::handleAutoQuit(std::span<const SampleFrame> output)
 gui::PluginView * Effect::instantiateView( QWidget * _parent )
 {
 	return new gui::EffectView( this, _parent );
-}
-
-	
-
-
-void Effect::reinitSRC()
-{
-	for (auto& state : m_srcState)
-	{
-		if (state != nullptr)
-		{
-			src_delete(state);
-		}
-		int error;
-		const int currentInterpolation = Engine::audioEngine()->currentQualitySettings().libsrcInterpolation();
-		if((state = src_new(currentInterpolation, DEFAULT_CHANNELS, &error)) == nullptr)
-		{
-			qFatal( "Error: src_new() failed in effect.cpp!\n" );
-		}
-	}
-}
-
-
-
-
-void Effect::resample( int _i, const SampleFrame* _src_buf,
-							sample_rate_t _src_sr,
-				SampleFrame* _dst_buf, sample_rate_t _dst_sr,
-								f_cnt_t _frames )
-{
-	if( m_srcState[_i] == nullptr )
-	{
-		return;
-	}
-	m_srcData[_i].input_frames = _frames;
-	m_srcData[_i].output_frames = Engine::audioEngine()->framesPerPeriod();
-	m_srcData[_i].data_in = const_cast<float*>(_src_buf[0].data());
-	m_srcData[_i].data_out = _dst_buf[0].data ();
-	m_srcData[_i].src_ratio = (double) _dst_sr / _src_sr;
-	m_srcData[_i].end_of_input = 0;
-
-	if (int error = src_process(m_srcState[_i], &m_srcData[_i]))
-	{
-		qFatal( "Effect::resample(): error while resampling: %s\n",
-							src_strerror( error ) );
-	}
 }
 
 } // namespace lmms
