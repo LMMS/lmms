@@ -46,17 +46,15 @@ FileDialog::FileDialog( QWidget *parent, const QString &caption,
 
 	setOption( QFileDialog::DontUseNativeDialog );
 
-#ifdef LMMS_BUILD_LINUX
-	QList<QUrl> urls;
-#else
-	QList<QUrl> urls = sidebarUrls();
-#endif
+	m_urls = sidebarUrls();
+	m_beforeUrls = sidebarUrls();
 
+#ifdef LMMS_BUILD_LINUX
 	QDir desktopDir;
 	desktopDir.setPath(QStandardPaths::writableLocation(QStandardPaths::DesktopLocation));
 	if (desktopDir.exists())
 	{
-		urls << QUrl::fromLocalFile(desktopDir.absolutePath());
+		m_urls << QUrl::fromLocalFile(desktopDir.absolutePath());
 	}
 	
 	QDir downloadDir(QDir::homePath() + "/Downloads");
@@ -66,43 +64,58 @@ FileDialog::FileDialog( QWidget *parent, const QString &caption,
 	}
 	if (downloadDir.exists())
 	{
-		urls << QUrl::fromLocalFile(downloadDir.absolutePath());
+		m_urls << QUrl::fromLocalFile(downloadDir.absolutePath());
 	}
 
 	QDir musicDir;
 	musicDir.setPath(QStandardPaths::writableLocation(QStandardPaths::MusicLocation));
 	if (musicDir.exists())
 	{
-		urls << QUrl::fromLocalFile(musicDir.absolutePath());
+		m_urls << QUrl::fromLocalFile(musicDir.absolutePath());
 	}
 
-	urls << QUrl::fromLocalFile(ConfigManager::inst()->workingDir());
-	
+	m_urls << QUrl::fromLocalFile(ConfigManager::inst()->workingDir());
+#endif
+
+#ifdef LMMS_BUILD_APPLE
 	// Add `/Volumes` directory on OS X systems, this allows the user to browse
 	// external disk drives.
-#ifdef LMMS_BUILD_APPLE
 	QDir volumesDir( QDir("/Volumes") );
 	if ( volumesDir.exists() )
-		urls << QUrl::fromLocalFile( volumesDir.absolutePath() );
+		m_urls << QUrl::fromLocalFile( volumesDir.absolutePath() );
 #endif
 
 #ifdef LMMS_BUILD_LINUX
 
 	// FileSystem types : https://www.javatpoint.com/linux-file-system
-	QStringList usableFileSystems = {"ext", "ext2", "ext3", "ext4", "jfs", "reiserfs", "ntfs3", "fuse.sshfs", "fuseblk"};
+	QStringList usableFileSystems = {"ext", "ext2", "ext3", "ext4", "jfs", "reiserfs", "ntfs3", "fuse.sshfs", "fuseblk", "vfat"};
 
 	for(QStorageInfo storage : QStorageInfo::mountedVolumes())
 	{
-		storage.refresh();
-
 		if (usableFileSystems.contains(QString(storage.fileSystemType()), Qt::CaseInsensitive) && storage.isValid() && storage.isReady())
-		{			
-			urls << QUrl::fromLocalFile(storage.rootPath());	
+		{
+			auto url = QUrl::fromLocalFile(storage.rootPath());
+			if (!m_urls.contains(url))
+			{
+				m_urls << url;
+			}
 		}
 	}
 #endif
 
-	setSidebarUrls(urls);
+	setSidebarUrls(m_urls);
+}
+
+FileDialog::~FileDialog()
+{
+	QList<QUrl> newUrls;
+	for (auto url : m_urls) {
+		if (m_beforeUrls.contains(url)) {
+			newUrls.append(url);
+		}
+	}
+	
+	setSidebarUrls(newUrls);
 }
 
 
