@@ -26,6 +26,7 @@
 
 #include "AudioDevice.h"
 #include "AudioEngine.h"
+#include "ConfigManager.h"
 
 namespace lmms
 {
