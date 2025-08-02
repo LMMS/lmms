@@ -400,14 +400,15 @@ void VestigeInstrument::loadFile( const QString & _file )
 
 
 
-void VestigeInstrument::processImpl(PlanarBufferView<const float> in, PlanarBufferView<float> out)
+auto VestigeInstrument::processImpl(PlanarBufferView<const float> in, PlanarBufferView<float> out)
+	-> ProcessStatus
 {
-	if (!m_pluginMutex.tryLock(Engine::getSong()->isExporting() ? -1 : 0)) { return; }
+	if (!m_pluginMutex.tryLock(Engine::getSong()->isExporting() ? -1 : 0)) { return ProcessStatus::Continue; }
 
 	if (m_plugin == nullptr)
 	{
 		m_pluginMutex.unlock();
-		return;
+		return ProcessStatus::Continue;
 	}
 
 	m_plugin->process();
@@ -416,6 +417,7 @@ void VestigeInstrument::processImpl(PlanarBufferView<const float> in, PlanarBuff
 
 	(void)in;
 	(void)out;
+	return ProcessStatus::Continue;
 }
 
 

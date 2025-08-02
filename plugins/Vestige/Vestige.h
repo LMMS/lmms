@@ -99,7 +99,7 @@ protected slots:
 	void reloadPlugin();
 
 private:
-	void processImpl(PlanarBufferView<const float> in, PlanarBufferView<float> out) override;
+	auto processImpl(PlanarBufferView<const float> in, PlanarBufferView<float> out) -> ProcessStatus override;
 
 	void closePlugin();
 

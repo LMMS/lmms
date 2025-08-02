@@ -55,10 +55,10 @@ class AudioProcessingMethod<Instrument, settings, false>
 protected:
 	//! The main audio processing method for NotePlayHandle-based Instruments
 	//! NOTE: NotePlayHandle-based instruments are currently unsupported
-	//virtual void processImpl(NotePlayHandle* nph, InBufferT in, OutBufferT out) {}
+	//virtual auto processImpl(NotePlayHandle* nph, InBufferT in, OutBufferT out) -> ProcessStatus {}
 
 	//! The main audio processing method for MIDI-based Instruments
-	virtual void processImpl(InBufferT in, OutBufferT out) = 0;
+	virtual auto processImpl(InBufferT in, OutBufferT out) -> ProcessStatus = 0;
 };
 
 //! Instrument specialization (in-place)
@@ -70,10 +70,10 @@ class AudioProcessingMethod<Instrument, settings, true>
 protected:
 	//! The main audio processing method for NotePlayHandle-based Instruments
 	//! NOTE: NotePlayHandle-based instruments are currently unsupported
-	//virtual void processImpl(NotePlayHandle* nph, InOutBufferT inOut) {}
+	//virtual auto processImpl(NotePlayHandle* nph, InOutBufferT inOut) -> ProcessStatus {}
 
 	//! The main audio processing method for MIDI-based Instruments
-	virtual void processImpl(InOutBufferT inOut) = 0;
+	virtual auto processImpl(InOutBufferT inOut) -> ProcessStatus = 0;
 };
 
 //! Effect specialization
@@ -158,7 +158,8 @@ protected:
 		auto router = m_audioPorts.getRouter();
 
 		router.process(bus, *buffers, [this](auto... buffers) {
-			this->processImpl(buffers...);
+			[[maybe_unused]] const auto status = this->processImpl(buffers...);
+			assert(status == ProcessStatus::Continue); // Only Continue is allowed for now
 			return ProcessStatus::Continue;
 		});
 	}
