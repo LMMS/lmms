@@ -48,11 +48,6 @@ MidiClip::MidiClip( InstrumentTrack * _instrument_track ) :
 	if (_instrument_track->trackContainer()	== Engine::patternStore())
 	{
 		resizeToFirstTrack();
-		setResizable(false);
-	}
-	else
-	{
-		setResizable(true);
 	}
 	init();
 }
@@ -68,22 +63,10 @@ MidiClip::MidiClip( const MidiClip& other ) :
 {
 	for (const auto& note : other.m_notes)
 	{
-		m_notes.push_back(new Note(*note));
+		m_notes.push_back(note->clone());
 	}
 
 	init();
-	switch( getTrack()->trackContainer()->type() )
-	{
-		case TrackContainer::Type::Pattern:
-			setResizable(false);
-			break;
-
-		case TrackContainer::Type::Song:
-			// move down
-		default:
-			setResizable(true);
-			break;
-	}
 }
 
 
@@ -149,9 +132,8 @@ void MidiClip::updateLength()
 		return;
 	}
 
-	// If the clip has already been manually resized, don't automatically resize it.
-	// Unless we are in a pattern, where you can't resize stuff manually
-	if (getAutoResize() || !getResizable())
+	// If the clip hasn't already been manually resized, automatically resize it.
+	if (getAutoResize())
 	{
 		tick_t max_length = TimePos::ticksPerBar();
 
@@ -197,7 +179,7 @@ TimePos MidiClip::beatClipLength() const
 
 Note * MidiClip::addNote( const Note & _new_note, const bool _quant_pos )
 {
-	auto new_note = new Note(_new_note);
+	auto new_note = _new_note.clone();
 	if (_quant_pos && gui::getGUI()->pianoRoll())
 	{
 		new_note->quantizePos(gui::getGUI()->pianoRoll()->quantization());
@@ -288,6 +270,7 @@ void MidiClip::clearNotes()
 	instrumentTrack()->unlock();
 
 	checkType();
+	updateLength();
 	emit dataChanged();
 }
 
@@ -326,6 +309,8 @@ void MidiClip::setStep( int step, bool enabled )
 
 void MidiClip::reverseNotes(const NoteVector& notes)
 {
+	if (notes.empty()) { return; }
+
 	addJournalCheckPoint();
 
 	// Find the very first start position and the very last end position of all the notes.
@@ -439,40 +424,47 @@ void MidiClip::checkType()
 }
 
 
-
-
-void MidiClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
+void MidiClip::exportToXML(QDomDocument& doc, QDomElement& midiClipElement, bool onlySelectedNotes)
 {
-	_this.setAttribute( "type", static_cast<int>(m_clipType) );
-	_this.setAttribute( "name", name() );
-	_this.setAttribute("autoresize", QString::number(getAutoResize()));
-	_this.setAttribute("off", startTimeOffset());
+	midiClipElement.setAttribute("type", static_cast<int>(m_clipType));
+	midiClipElement.setAttribute("name", name());
+	midiClipElement.setAttribute("autoresize", QString::number(getAutoResize()));
+	midiClipElement.setAttribute("off", startTimeOffset());
 	
 	if (const auto& c = color())
 	{
-		_this.setAttribute("color", c->name());
+		midiClipElement.setAttribute("color", c->name());
 	}
 	// as the target of copied/dragged MIDI clip is always an existing
 	// MIDI clip, we must not store actual position, instead we store -1
 	// which tells loadSettings() not to mess around with position
-	if( _this.parentNode().nodeName() == "clipboard" ||
-			_this.parentNode().nodeName() == "dnddata" )
+	if (midiClipElement.parentNode().nodeName() == "clipboard" ||
+			midiClipElement.parentNode().nodeName() == "dnddata")
 	{
-		_this.setAttribute( "pos", -1 );
+		midiClipElement.setAttribute("pos", -1);
 	}
 	else
 	{
-		_this.setAttribute( "pos", startPosition() );
+		midiClipElement.setAttribute("pos", startPosition());
 	}
-	_this.setAttribute( "muted", isMuted() );
-	_this.setAttribute( "steps", m_steps );
-	_this.setAttribute( "len", length() );
+	midiClipElement.setAttribute("muted", isMuted());
+	midiClipElement.setAttribute("steps", m_steps);
+	midiClipElement.setAttribute("len", length());
 
 	// now save settings of all notes
 	for (auto& note : m_notes)
 	{
-		note->saveState(_doc, _this);
+		if (!onlySelectedNotes || note->selected())
+		{
+			note->saveState(doc, midiClipElement);
+		}
 	}
+}
+
+
+void MidiClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
+{
+	exportToXML(_doc, _this);
 }
 
 
@@ -532,7 +524,7 @@ void MidiClip::loadSettings( const QDomElement & _this )
 		changeLength(len);
 	}
 	
-	setAutoResize(_this.attribute("autoresize").toInt());
+	setAutoResize(_this.attribute("autoresize", "1").toInt());
 	setStartTimeOffset(_this.attribute("off").toInt());
 
 	emit dataChanged();

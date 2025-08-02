@@ -26,8 +26,10 @@
 
 #include "PianoRoll.h"
 
-#include <QtMath>
+#include <QtMath>  // IWYU pragma: keep
 #include <QApplication>
+#include <QCheckBox>
+#include <QGridLayout>
 #include <QHBoxLayout>
 #include <QInputDialog>
 #include <QKeyEvent>
@@ -283,7 +285,7 @@ PianoRoll::PianoRoll() :
 			this, SLOT( updatePosition( const lmms::TimePos& ) ) );
 
 	// white position line follows timeline marker
-	m_positionLine = new PositionLine(this);
+	m_positionLine = new PositionLine(this, Song::PlayMode::MidiClip);
 
 	//update timeline when in step-recording mode
 	connect( &m_stepRecorderWidget, SIGNAL( positionChanged( const lmms::TimePos& ) ),
@@ -451,14 +453,7 @@ void PianoRoll::showTextFloat(const QString &text, const QPoint &pos, int timeou
 	s_textFloat->setText( text );
 	// show the float, offset slightly so as to not obscure anything
 	s_textFloat->moveGlobal( this, pos + QPoint(4, 16) );
-	if (timeout == -1)
-	{
-		s_textFloat->show();
-	}
-	else
-	{
-		s_textFloat->setVisibilityTimeOut( timeout );
-	}
+	s_textFloat->showWithTimeout(timeout);
 }
 
 
@@ -1300,6 +1295,7 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 			//  if a chord is set, play all chord notes (simulate click on all):
 			playChordNotes(key_num);
 			ke->accept();
+			return;
 		}
 	}
 
@@ -1536,6 +1532,7 @@ void PianoRoll::keyReleaseEvent(QKeyEvent* ke )
 			// if a chord is set, simulate click release on all chord notes
 			pauseChordNotes(key_num);
 			ke->accept();
+			return;
 		}
 	}
 
@@ -1559,6 +1556,9 @@ void PianoRoll::keyReleaseEvent(QKeyEvent* ke )
 			{
 				update();
 			}
+			break;
+		default:
+			ke->ignore();
 			break;
 	}
 
@@ -5478,6 +5478,14 @@ void PianoRollWindow::exportMidiClip()
 	FileDialog exportDialog(this, tr("Export clip"), "",
 		tr("XML clip file (*.xpt *.xptz)"));
 
+	auto layout = dynamic_cast<QGridLayout*>(exportDialog.layout());
+	QCheckBox* onlySelectedNotesCheckBox = nullptr;
+	if (layout)
+	{
+		onlySelectedNotesCheckBox = new QCheckBox(tr("Export only selected notes"), &exportDialog);
+		layout->addWidget(onlySelectedNotesCheckBox);
+	}
+
 	exportDialog.setAcceptMode(FileDialog::AcceptSave);
 
 	if (exportDialog.exec() == QDialog::Accepted &&
@@ -5491,8 +5499,14 @@ void PianoRollWindow::exportMidiClip()
 		exportDialog.setDefaultSuffix(suffix);
 
 		const QString fullPath = exportDialog.selectedFiles()[0];
+
+		// Check if only the selected notes should be exported
+		auto* midiClip = m_editor->m_midiClip;
+
+		const bool onlySelectedNotes = onlySelectedNotesCheckBox && onlySelectedNotesCheckBox->isChecked();
+
 		DataFile dataFile(DataFile::Type::MidiClip);
-		m_editor->m_midiClip->saveSettings(dataFile, dataFile.content());
+		midiClip->exportToXML(dataFile, dataFile.content(), onlySelectedNotes);
 
 		if (dataFile.writeFile(fullPath))
 		{

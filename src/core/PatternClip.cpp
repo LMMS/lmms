@@ -45,7 +45,6 @@ PatternClip::PatternClip(Track* track) :
 		changeLength( TimePos( t, 0 ) );
 		restoreJournallingState();
 	}
-	setResizable(true);
 }
 
 void PatternClip::saveSettings(QDomDocument& doc, QDomElement& element)
@@ -80,7 +79,7 @@ void PatternClip::loadSettings(const QDomElement& element)
 		movePosition( element.attribute( "pos" ).toInt() );
 	}
 	changeLength( element.attribute( "len" ).toInt() );
-	setAutoResize(element.attribute("autoresize").toInt());
+	setAutoResize(element.attribute("autoresize", "1").toInt());
 	setStartTimeOffset(element.attribute("off").toInt());
 	if (static_cast<bool>(element.attribute("muted").toInt()) != isMuted())
 	{

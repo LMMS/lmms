@@ -47,16 +47,13 @@
 #endif
 
 class QLineEdit;
+class QMenu;
+class QToolButton;
 
 namespace lmms
 {
 
 class MidiJack;
-
-namespace gui
-{
-class LcdSpinBox;
-}
 
 
 class AudioJack : public QObject, public AudioDevice
@@ -82,13 +79,21 @@ public:
 	{
 	public:
 		setupWidget(QWidget* parent);
-		~setupWidget() override;
-
 		void saveSettings() override;
 
 	private:
+		std::vector<std::string> getAudioPortNames(JackPortFlags portFlags) const;
+		std::vector<std::string> getAudioInputNames() const;
+		std::vector<std::string> getAudioOutputNames() const;
+		static QMenu* buildMenu(QToolButton* toolButton, const std::vector<std::string>& names, const QString& filteredLMMSClientName);
+
+	private:
 		QLineEdit* m_clientName;
-		gui::LcdSpinBox* m_channels;
+		// Because we do not have access to a JackAudio driver instance we have to be our own client to display inputs and outputs...
+		jack_client_t* m_client;
+
+		std::vector<QToolButton*> m_outputDevices;
+		std::vector<QToolButton*> m_inputDevices;
 	};
 
 private slots:
@@ -96,6 +101,11 @@ private slots:
 
 private:
 	bool initJackClient();
+	void resizeInputBuffer(jack_nframes_t nframes);
+
+	void attemptToConnect(size_t index, const char *lmms_port_type, const char *source_port, const char *destination_port);
+	void attemptToReconnectOutput(size_t outputIndex, const QString& targetPort);
+	void attemptToReconnectInput(size_t inputIndex, const QString& sourcePort);
 
 	void startProcessing() override;
 	void stopProcessing() override;
@@ -116,7 +126,9 @@ private:
 
 	std::atomic<MidiJack*> m_midiClient;
 	std::vector<jack_port_t*> m_outputPorts;
+	std::vector<jack_port_t*> m_inputPorts;
 	jack_default_audio_sample_t** m_tempOutBufs;
+	std::vector<SampleFrame> m_inputFrameBuffer;
 	SampleFrame* m_outBuf;
 
 	f_cnt_t m_framesDoneInCurBuf;

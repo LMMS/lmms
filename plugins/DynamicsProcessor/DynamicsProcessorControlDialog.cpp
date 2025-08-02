@@ -28,6 +28,7 @@
 #include "DynamicsProcessorControlDialog.h"
 #include "DynamicsProcessorControls.h"
 #include "embed.h"
+#include "FontHelper.h"
 #include "Graph.h"
 #include "Knob.h"
 #include "PixmapButton.h"
@@ -58,32 +59,28 @@ DynProcControlDialog::DynProcControlDialog(
 	waveGraph->setGraphColor( QColor( 85, 204, 145 ) );
 	waveGraph -> setMaximumSize( 204, 205 );
 
-	auto inputKnob = new Knob(KnobType::Bright26, this);
+	auto inputKnob = new Knob(KnobType::Bright26, tr("INPUT"), SMALL_FONT_SIZE, this);
 	inputKnob -> setVolumeKnob( true );
 	inputKnob -> setVolumeRatio( 1.0 );
 	inputKnob -> move( 26, 223 );
 	inputKnob->setModel( &_controls->m_inputModel );
-	inputKnob->setLabel( tr( "INPUT" ) );
 	inputKnob->setHintText( tr( "Input gain:" ) , "" );
 
-	auto outputKnob = new Knob(KnobType::Bright26, this);
+	auto outputKnob = new Knob(KnobType::Bright26, tr("OUTPUT"), SMALL_FONT_SIZE, this);
 	outputKnob -> setVolumeKnob( true );
 	outputKnob -> setVolumeRatio( 1.0 );
 	outputKnob -> move( 76, 223 );
 	outputKnob->setModel( &_controls->m_outputModel );
-	outputKnob->setLabel( tr( "OUTPUT" ) );
 	outputKnob->setHintText( tr( "Output gain:" ) , "" );
 
-	auto attackKnob = new Knob(KnobType::Bright26, this);
+	auto attackKnob = new Knob(KnobType::Bright26, tr("ATTACK"), SMALL_FONT_SIZE, this);
 	attackKnob -> move( 24, 268 );
 	attackKnob->setModel( &_controls->m_attackModel );
-	attackKnob->setLabel( tr( "ATTACK" ) );
 	attackKnob->setHintText( tr( "Peak attack time:" ) , "ms" );
 
-	auto releaseKnob = new Knob(KnobType::Bright26, this);
+	auto releaseKnob = new Knob(KnobType::Bright26, tr("RELEASE"), SMALL_FONT_SIZE, this);
 	releaseKnob -> move( 74, 268 );
 	releaseKnob->setModel( &_controls->m_releaseModel );
-	releaseKnob->setLabel( tr( "RELEASE" ) );
 	releaseKnob->setHintText( tr( "Peak release time:" ) , "ms" );
 
 //wavegraph control buttons
@@ -138,7 +135,7 @@ DynProcControlDialog::DynProcControlDialog(
 	smUnlButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "unl_inactive" ) );
 	smUnlButton->setToolTip(tr("Process each stereo channel independently"));
 
-	auto smGroup = new automatableButtonGroup(this);
+	auto smGroup = new AutomatableButtonGroup(this);
 	smGroup -> addButton( smMaxButton );
 	smGroup -> addButton( smAvgButton );
 	smGroup -> addButton( smUnlButton );

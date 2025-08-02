@@ -61,14 +61,13 @@
 #include "ProjectNotes.h"
 #include "ProjectRenderer.h"
 #include "RecentProjectsMenu.h"
-#include "RemotePlugin.h"
+#include "RemotePluginBase.h"
 #include "SetupDialog.h"
 #include "SideBar.h"
 #include "SongEditor.h"
 #include "SubWindow.h"
 #include "TemplatesMenu.h"
 #include "TextFloat.h"
-#include "TimeLineWidget.h"
 #include "ToolButton.h"
 #include "ToolPlugin.h"
 #include "VersionedSaveDialog.h"
@@ -312,7 +311,7 @@ void MainWindow::finalize()
 					SLOT(onExportProject()),
 					combine(Qt::CTRL, Qt::Key_E));
 	project_menu->addAction( embed::getIconPixmap( "project_export" ),
-					tr( "E&xport Tracks..." ),
+					tr("Export &Tracks..."),
 					this,
 					SLOT(onExportProjectTracks()),
 					combine(Qt::CTRL, Qt::SHIFT, Qt::Key_E));

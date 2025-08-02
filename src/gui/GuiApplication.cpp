@@ -44,11 +44,11 @@
 #include <QDebug>
 #include <QDir>
 #include <QtGlobal>
+#include <QHBoxLayout>
 #include <QLabel>
 #include <QMessageBox>
 #include <QSplashScreen>
 #include <QSocketNotifier>
-#include <csignal>
 
 #ifdef LMMS_BUILD_WIN32
 #include <io.h>
@@ -77,6 +77,11 @@ GuiApplication* GuiApplication::s_instance = nullptr;
 GuiApplication* GuiApplication::instance()
 {
 	return s_instance;
+}
+
+bool GuiApplication::isWayland()
+{
+	return QGuiApplication::platformName().contains("wayland");
 }
 
 

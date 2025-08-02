@@ -26,12 +26,14 @@
 
 #include <QGridLayout>
 #include <QLabel>
+#include <QPainterPath>
 #include <QSizePolicy>
 #include <QSplitter>
 #include <QWidget>
 
 #include "ComboBox.h"
 #include "ComboBoxModel.h"
+#include "FontHelper.h"
 #include "Knob.h"
 #include "LedCheckBox.h"
 #include "PixmapButton.h"
@@ -236,41 +238,36 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	controls_layout->setStretchFactor(advanced_widget, 10);
 
 	// Peak envelope resolution
-	auto envelopeResolutionKnob = new Knob(KnobType::Small17, this);
+	auto envelopeResolutionKnob = new Knob(KnobType::Small17, tr("Envelope res."), SMALL_FONT_SIZE, this);
 	envelopeResolutionKnob->setModel(&controls->m_envelopeResolutionModel);
-	envelopeResolutionKnob->setLabel(tr("Envelope res."));
 	envelopeResolutionKnob->setToolTip(tr("Increase envelope resolution for better details, decrease for better GUI performance."));
 	envelopeResolutionKnob->setHintText(tr("Maximum number of envelope points drawn per pixel:"), "");
 	advanced_layout->addWidget(envelopeResolutionKnob, 0, 0, 1, 1, Qt::AlignCenter);
 
 	// Spectrum graph resolution
-	auto spectrumResolutionKnob = new Knob(KnobType::Small17, this);
+	auto spectrumResolutionKnob = new Knob(KnobType::Small17, tr("Spectrum res."), SMALL_FONT_SIZE, this);
 	spectrumResolutionKnob->setModel(&controls->m_spectrumResolutionModel);
-	spectrumResolutionKnob->setLabel(tr("Spectrum res."));
 	spectrumResolutionKnob->setToolTip(tr("Increase spectrum resolution for better details, decrease for better GUI performance."));
 	spectrumResolutionKnob->setHintText(tr("Maximum number of spectrum points drawn per pixel:"), "");
 	advanced_layout->addWidget(spectrumResolutionKnob, 1, 0, 1, 1, Qt::AlignCenter);
 
 	// Peak falloff speed
-	auto peakDecayFactorKnob = new Knob(KnobType::Small17, this);
+	auto peakDecayFactorKnob = new Knob(KnobType::Small17, tr("Falloff factor"), SMALL_FONT_SIZE, this);
 	peakDecayFactorKnob->setModel(&controls->m_peakDecayFactorModel);
-	peakDecayFactorKnob->setLabel(tr("Falloff factor"));
 	peakDecayFactorKnob->setToolTip(tr("Decrease to make peaks fall faster."));
 	peakDecayFactorKnob->setHintText(tr("Multiply buffered value by"), "");
 	advanced_layout->addWidget(peakDecayFactorKnob, 0, 1, 1, 1, Qt::AlignCenter);
 
 	// Averaging weight
-	auto averagingWeightKnob = new Knob(KnobType::Small17, this);
+	auto averagingWeightKnob = new Knob(KnobType::Small17, tr("Averaging weight"), SMALL_FONT_SIZE, this);
 	averagingWeightKnob->setModel(&controls->m_averagingWeightModel);
-	averagingWeightKnob->setLabel(tr("Averaging weight"));
 	averagingWeightKnob->setToolTip(tr("Decrease to make averaging slower and smoother."));
 	averagingWeightKnob->setHintText(tr("New sample contributes"), "");
 	advanced_layout->addWidget(averagingWeightKnob, 1, 1, 1, 1, Qt::AlignCenter);
 
 	// Waterfall history size
-	auto waterfallHeightKnob = new Knob(KnobType::Small17, this);
+	auto waterfallHeightKnob = new Knob(KnobType::Small17, tr("Waterfall height"), SMALL_FONT_SIZE, this);
 	waterfallHeightKnob->setModel(&controls->m_waterfallHeightModel);
-	waterfallHeightKnob->setLabel(tr("Waterfall height"));
 	waterfallHeightKnob->setToolTip(tr("Increase to get slower scrolling, decrease to see fast transitions better. Warning: medium CPU usage."));
 	waterfallHeightKnob->setHintText(tr("Number of lines to keep:"), "");
 	advanced_layout->addWidget(waterfallHeightKnob, 0, 2, 1, 1, Qt::AlignCenter);
@@ -278,25 +275,22 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	connect(&controls->m_waterfallHeightModel, &FloatModel::dataChanged, [=] {processor->reallocateBuffers();});
 
 	// Waterfall gamma correction
-	auto waterfallGammaKnob = new Knob(KnobType::Small17, this);
+	auto waterfallGammaKnob = new Knob(KnobType::Small17, tr("Waterfall gamma"), SMALL_FONT_SIZE, this);
 	waterfallGammaKnob->setModel(&controls->m_waterfallGammaModel);
-	waterfallGammaKnob->setLabel(tr("Waterfall gamma"));
 	waterfallGammaKnob->setToolTip(tr("Decrease to see very weak signals, increase to get better contrast."));
 	waterfallGammaKnob->setHintText(tr("Gamma value:"), "");
 	advanced_layout->addWidget(waterfallGammaKnob, 1, 2, 1, 1, Qt::AlignCenter);
 
 	// FFT window overlap
-	auto windowOverlapKnob = new Knob(KnobType::Small17, this);
+	auto windowOverlapKnob = new Knob(KnobType::Small17, tr("Window overlap"), SMALL_FONT_SIZE, this);
 	windowOverlapKnob->setModel(&controls->m_windowOverlapModel);
-	windowOverlapKnob->setLabel(tr("Window overlap"));
 	windowOverlapKnob->setToolTip(tr("Increase to prevent missing fast transitions arriving near FFT window edges. Warning: high CPU usage."));
 	windowOverlapKnob->setHintText(tr("Number of times each sample is processed:"), "");
 	advanced_layout->addWidget(windowOverlapKnob, 0, 3, 1, 1, Qt::AlignCenter);
 
 	// FFT zero padding
-	auto zeroPaddingKnob = new Knob(KnobType::Small17, this);
+	auto zeroPaddingKnob = new Knob(KnobType::Small17, tr("Zero padding"), SMALL_FONT_SIZE, this);
 	zeroPaddingKnob->setModel(&controls->m_zeroPaddingModel);
-	zeroPaddingKnob->setLabel(tr("Zero padding"));
 	zeroPaddingKnob->setToolTip(tr("Increase to get smoother-looking spectrum. Warning: high CPU usage."));
 	zeroPaddingKnob->setHintText(tr("Processing buffer is"), tr(" steps larger than input block"));
 	advanced_layout->addWidget(zeroPaddingKnob, 1, 3, 1, 1, Qt::AlignCenter);

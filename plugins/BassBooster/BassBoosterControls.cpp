@@ -23,7 +23,6 @@
  */
 
 
-#include <QDomElement>
 
 #include "BassBoosterControls.h"
 #include "BassBooster.h"

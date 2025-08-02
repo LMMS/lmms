@@ -33,12 +33,6 @@ namespace lmms
 
 class DispersionEffect;
 
-namespace gui
-{
-class DispersionControlDialog;
-}
-
-
 class DispersionControls : public EffectControls
 {
 	Q_OBJECT

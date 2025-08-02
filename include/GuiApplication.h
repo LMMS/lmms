@@ -26,12 +26,12 @@
 #define LMMS_GUI_GUI_APPLICATION_H
 
 #include <QObject>
-#include <QSocketNotifier>
 
 #include "lmms_export.h"
 #include "lmmsconfig.h"
 
 class QLabel;
+class QSocketNotifier;
 
 namespace lmms::gui
 {
@@ -55,6 +55,7 @@ public:
 
 	static GuiApplication* instance();
 	static void sigintHandler(int);
+	static bool isWayland();
 #ifdef LMMS_BUILD_WIN32
 	static QFont getWin32SystemFont();
 #endif
