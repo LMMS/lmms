@@ -63,6 +63,49 @@ using GetAudioDataType = typename detail::GetAudioDataTypeHelper<kind>::type;
 //! Compile-time customizations for audio ports
 struct AudioPortsSettings
 {
+	/**
+	 * NOTE: The following five members (`kind`, `interleaved`, `inputs`, `outputs`, and `inplace`)
+	 *       determine the signature of the process method that will need to be implemented.
+	 *
+	 * For an `Effect` or a MIDI-based `Instrument`, the signature will one of two options:
+	 *     ProcessStatus processImpl(InputBuffers in, OutputBuffers out);
+	 * Or:
+	 *     ProcessStatus processImpl(InputOutputBuffers inOut);
+	 *
+	 * Explanation:
+	 * - If `inplace == false`, the 1st option (separate in and output buffers) is used, otherwise the
+	 *     2nd option (combined in/out buffers) is used. The channel count when `inplace == true`
+	 *     is `std::max(inputs, outputs)`.
+	 * - If `kind == AudioDataKind::F32`, `float` samples are used for the input and output buffers.
+	 * - If `interleaved == false`, `PlanarBufferView` is used for the input and output buffers,
+	 *     otherwise `InterleavedBufferView` is used.
+	 * - The `DynamicChannelCount` constant works the same way that `std::dynamic_extent` does
+	 *     for `std::span`, so when the channel count is not explicitly specified in `PlanarBufferView` or
+	 *     `InterleavedBufferView`, it is `DynamicChannelCount` by default.
+	 *
+	 * Here are a couple examples:
+	 *
+	 * - When `kind == AudioDataKind::F32`, `interleaved == false`, `inputs == 3`, `outputs == DynamicChannelCount`,
+	 *   and `inplace == false`, then the `processImpl` signature is:
+	 *
+	 *       `ProcessStatus processImpl(PlanarBufferView<const float, 3> in, PlanarBufferView<float> out);`
+	 *
+	 *     (Note that the input is always const, and just like `std::span` the `PlanarBufferView` output buffers
+	 *      have a dynamic channel count by default since the count is not explicitly specified.)
+	 *
+	 * - When `kind == AudioDataKind::F32`, `interleaved == true`, `inputs == 2`, `outputs == 0`,
+	 *   and `inplace == true`, then the `processImpl` signature is:
+	 *
+	 *       `ProcessStatus processImpl(InterleavedBufferView<float, 2> inOut);`
+	 *
+	 *     (Note that when `inplace == true`, the channel count is `std::max(inputs, outputs)` and the channel counts
+	 *      are not allowed to differ unless one of them is zero. This cannot be an instrument because the output
+	 *      count is zero.)
+	 *
+	 * Also keep in mind that if you are unsure whether your desired `AudioPortsSettings` is valid, you may check it
+	 *   by calling `validate<settings>()`.
+	 */
+
 	//! The audio data type used by the processor
 	AudioDataKind kind;
 
@@ -146,6 +189,8 @@ constexpr auto validate() -> bool
 
 	static_assert(!settings.interleaved || settings.inplace,
 		"AudioPortsSettings: Interleaved samples must use in-place processing");
+
+	static_assert(!settings.);
 
 	return true;
 }

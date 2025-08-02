@@ -89,9 +89,14 @@ private:
 	const f_cnt_t m_frames = 0;
 };
 
+//! Tells the Core what to do with a processor after processing
 enum class ProcessStatus
 {
-	//! Unconditionally continue processing
+	/**
+	 * Unconditionally continue processing.
+	 *
+	 * NOTE: Instruments currently only support this option, so they must return this value.
+	 */
 	Continue,
 
 	/**
