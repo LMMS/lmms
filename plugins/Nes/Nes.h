@@ -202,11 +202,8 @@ class NesInstrument : public Instrument
 public:
 	NesInstrument( InstrumentTrack * instrumentTrack );
 	~NesInstrument() override = default;
-	
-	void playNote( NotePlayHandle * n,
-						SampleFrame* workingBuffer ) override;
-	void deleteNotePluginData( NotePlayHandle * n ) override;
 
+	void deleteNotePluginData( NotePlayHandle * n ) override;
 
 	void saveSettings( QDomDocument & doc,
 							QDomElement & element ) override;
@@ -233,6 +230,8 @@ protected:
 	float m_freq3;
 	
 private:
+	void playNoteImpl(NotePlayHandle* nph, std::span<SampleFrame> out) override;
+
 	// channel 1
 	BoolModel	m_ch1Enabled;
 	FloatModel	m_ch1Crs;

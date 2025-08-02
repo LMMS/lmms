@@ -59,7 +59,7 @@ Plugin::Descriptor PLUGIN_EXPORT lv2effect_plugin_descriptor =
 
 
 Lv2Effect::Lv2Effect(Model* parent, const Descriptor::SubPluginFeatures::Key *key) :
-	Effect(&lv2effect_plugin_descriptor, parent, key),
+	AudioPlugin(&lv2effect_plugin_descriptor, parent, key),
 	m_controls(this, key->attributes["uri"]),
 	m_tmpOutputSmps(Engine::audioEngine()->framesPerPeriod())
 {
@@ -68,27 +68,27 @@ Lv2Effect::Lv2Effect(Model* parent, const Descriptor::SubPluginFeatures::Key *ke
 
 
 
-Effect::ProcessStatus Lv2Effect::processImpl(SampleFrame* buf, const fpp_t frames)
+ProcessStatus Lv2Effect::processImpl(InterleavedBufferView<float, 2> inOut)
 {
-	Q_ASSERT(frames <= static_cast<fpp_t>(m_tmpOutputSmps.size()));
+	Q_ASSERT(inOut.frames() <= static_cast<fpp_t>(m_tmpOutputSmps.size()));
 
-	m_controls.copyBuffersFromLmms(buf, frames);
+	m_controls.copyBuffersFromLmms(reinterpret_cast<SampleFrame*>(inOut.data()), inOut.frames());
 	m_controls.copyModelsFromLmms();
 
 //	m_pluginMutex.lock();
-	m_controls.run(frames);
+	m_controls.run(inOut.frames());
 //	m_pluginMutex.unlock();
 
 	m_controls.copyModelsToLmms();
-	m_controls.copyBuffersToLmms(m_tmpOutputSmps.data(), frames);
+	m_controls.copyBuffersToLmms(m_tmpOutputSmps.data(), inOut.frames());
 
 	bool corrupt = wetLevel() < 0; // #3261 - if w < 0, bash w := 0, d := 1
 	const float d = corrupt ? 1 : dryLevel();
 	const float w = corrupt ? 0 : wetLevel();
-	for(fpp_t f = 0; f < frames; ++f)
+	for (fpp_t f = 0; f < inOut.frames(); ++f)
 	{
-		buf[f][0] = d * buf[f][0] + w * m_tmpOutputSmps[f][0];
-		buf[f][1] = d * buf[f][1] + w * m_tmpOutputSmps[f][1];
+		inOut[f][0] = d * inOut[f][0] + w * m_tmpOutputSmps[f][0];
+		inOut[f][1] = d * inOut[f][1] + w * m_tmpOutputSmps[f][1];
 	}
 
 	return ProcessStatus::ContinueIfNotQuiet;

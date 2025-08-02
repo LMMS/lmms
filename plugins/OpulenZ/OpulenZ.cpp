@@ -94,7 +94,7 @@ QMutex OpulenzInstrument::emulatorMutex;
 const auto adlib_opadd = std::array<unsigned int, OPL2_VOICES>{0x00, 0x01, 0x02, 0x08, 0x09, 0x0A, 0x10, 0x11, 0x12};
 
 OpulenzInstrument::OpulenzInstrument( InstrumentTrack * _instrument_track ) :
-	Instrument(_instrument_track, &opulenz_plugin_descriptor, nullptr, Flag::IsSingleStreamed | Flag::IsMidiBased),
+	Instrument(&opulenz_plugin_descriptor, _instrument_track, nullptr, Flag::IsSingleStreamed | Flag::IsMidiBased),
 	m_patchModel( 0, 0, 127, this, tr( "Patch" ) ),
 	op1_a_mdl(14.0, 0.0, 15.0, 1.0, this, tr( "Op 1 attack" )  ),
 	op1_d_mdl(14.0, 0.0, 15.0, 1.0, this, tr( "Op 1 decay" )   ),
@@ -389,7 +389,7 @@ gui::PluginView* OpulenzInstrument::instantiateView( QWidget * _parent )
 }
 
 
-void OpulenzInstrument::play( SampleFrame* _working_buffer )
+void OpulenzInstrument::playImpl(std::span<SampleFrame> out)
 {
 	emulatorMutex.lock();
 	theEmulator->update(renderbuffer, frameCount);
@@ -399,7 +399,7 @@ void OpulenzInstrument::play( SampleFrame* _working_buffer )
                 sample_t s = float(renderbuffer[frame]) / 8192.0;
                 for( ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch )
                 {
-                        _working_buffer[frame][ch] = s;
+                        out[frame][ch] = s;
                 }
 	}
 	emulatorMutex.unlock();
