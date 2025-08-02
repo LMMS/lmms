@@ -604,7 +604,7 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 						distOut = std::abs(std::abs(std::fmod(distIn - 1.f, 4.f)) - 2.f) - 1.f;
 						break;
 					}
-					case SlewDistortionType::Rectify: {
+					case SlewDistortionType::FullRectify: {
 						distOut = std::abs(distIn);
 						break;
 					}
