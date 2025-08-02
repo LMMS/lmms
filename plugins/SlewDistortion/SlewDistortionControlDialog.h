@@ -49,7 +49,6 @@ public:
 	
 	void paintEvent(QPaintEvent *event) override;
 public slots:
-	void updateDisplay();
 	void showHelpWindow();
 private:
 	SlewDistortionControls* m_controls;
