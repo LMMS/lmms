@@ -137,7 +137,7 @@ SlewDistortionControlDialog::SlewDistortionControlDialog(SlewDistortionControls*
 	outVol2Draggable->move(594, outVol2Draggable->y());
 	outVol2Draggable->setDefaultValPixmap(PLUGIN_NAME::getIconPixmap("handle_zero"));
 	
-	PixmapButton* slewLink1Button = makeToggleButton(132, 70, tr("Slew Link 1"), "link_on", "link_off", &controls->m_slewLink1Model);
+	makeToggleButton(132, 70, tr("Slew Link 1"), "link_on", "link_off", &controls->m_slewLink1Model);
 	connect(&controls->m_slewLink1Model, &BoolModel::dataChanged, this, [this, controls]{
 		if (controls->m_slewLink1Model.value())
 		{
@@ -149,7 +149,7 @@ SlewDistortionControlDialog::SlewDistortionControlDialog(SlewDistortionControls*
 			m_slewDown1Knob->setModel(&controls->m_slewDown1Model);
 		}
 	});
-	PixmapButton* slewLink2Button = makeToggleButton(132, 191, tr("Slew Link 2"), "link_on", "link_off", &controls->m_slewLink2Model);
+	makeToggleButton(132, 191, tr("Slew Link 2"), "link_on", "link_off", &controls->m_slewLink2Model);
 	connect(&controls->m_slewLink2Model, &BoolModel::dataChanged, this, [this, controls]{
 		if (controls->m_slewLink2Model.value())
 		{
@@ -197,11 +197,6 @@ SlewDistortionControlDialog::SlewDistortionControlDialog(SlewDistortionControls*
 
 void SlewDistortionControlDialog::paintEvent(QPaintEvent *event)
 {
-	if (!isVisible())
-	{
-		return;
-	}
-
 	QPainter p(this);
 	p.setRenderHint(QPainter::Antialiasing);
 	
