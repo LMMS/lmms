@@ -174,7 +174,10 @@ struct AudioPortsSettings
 	constexpr auto operator==(const AudioPortsSettings& rhs) const -> bool = default;
 };
 
-//! For use in static_assert()
+/**
+ * Checks that an `AudioPortsSettings` is valid.
+ * Intended for use in static_assert().
+ */
 template<AudioPortsSettings settings>
 constexpr auto validate() -> bool
 {
@@ -190,7 +193,9 @@ constexpr auto validate() -> bool
 	static_assert(!settings.interleaved || settings.inplace,
 		"AudioPortsSettings: Interleaved samples must use in-place processing");
 
-	static_assert(!settings.);
+	static_assert(!settings.inplace || settings.inputs == settings.outputs
+		|| settings.inputs == 0 || settings.outputs == 0,
+		"AudioPortsSettings: In-place processors must have equivalent input/output counts, or one must be zero.");
 
 	return true;
 }
