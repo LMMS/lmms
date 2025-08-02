@@ -38,6 +38,7 @@ class QMimeData;
 
 namespace lmms::Clipboard
 {
+void updateExtensionMap();
 
 bool isType(const QString& ext, const QString& mimetype);
 bool isAudioFile(const QString& ext);

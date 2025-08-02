@@ -35,16 +35,13 @@
 namespace lmms::Clipboard
 {
 
-static std::map<std::string, std::vector<std::string>> mimetypes =
-{
-	{"samplefile", {}},
-	{"vstpluginfile", {}},
-	{"presetfile", {"xpf", "xml", "xiz", "lv2"}},
-	{"midifile", {"mid", "midi", "rmi"}},
-	{"projectfile", {"mmp", "mpt", "mmpz"}},
-	{"patchfile", {}},
-	{"soundfontfile", {}}
-};
+	// there are other mimetypes, such as "samplefile", "patchfile" and "vstplugin" but they are generated dynamically.
+	static std::map<std::string, std::vector<std::string>> mimetypes =
+	{
+		{"presetfile", {"xpf", "xml", "xiz", "lv2"}},
+		{"midifile", {"mid", "midi", "rmi"}},
+		{"projectfile", {"mmp", "mpt", "mmpz"}},
+	};
 
 	//! gets the extension of a file, or returns the string back if no extension is found
 	inline QString getExtension(const QString& file)
@@ -64,24 +61,34 @@ static std::map<std::string, std::vector<std::string>> mimetypes =
 
 			if (mimetype == nullptr || mimetype[0] == '\0') { continue; }
 
-			std::vector<std::string> fileTypes = {};
+			std::vector<std::string> fileTypes;
 
 			for (auto& fileType : QString(pluginInfo.descriptor->supportedFileTypes).split(","))
 			{
 				fileTypes.push_back(fileType.toStdString());
 			}
 
-			mimetypes.insert_or_assign(mimetype, fileTypes);
+			auto& existingTypes = mimetypes[mimetype]; // creates key if not present
+
+			for (const auto& ext : fileTypes)
+			{
+				if (std::find(existingTypes.begin(), existingTypes.end(), ext) == existingTypes.end())
+				{
+					existingTypes.push_back(ext); // add only if not already present
+				}
+			}
 		}
 	}
 
-	bool isType(const QString& ext, const QString& mimetype)
+bool isType(const QString& ext, const QString& mimetype)
 	{
-		auto& fileTypes = mimetypes.find(mimetype.toStdString())->second;
-		if (fileTypes.empty()) { updateExtensionMap(); }
+		auto it = mimetypes.find(mimetype.toStdString());
+		if (it == mimetypes.end()) { return false; }
 
+		const auto& fileTypes = it->second;
 		return std::ranges::find(fileTypes, getExtension(ext).toStdString()) != fileTypes.end();
 	}
+
 
 	bool isAudioFile(const QString& ext)	 { return isType(ext, "samplefile"); }
 	bool isProjectFile(const QString& ext)   { return isType(ext, "projectfile"); }
