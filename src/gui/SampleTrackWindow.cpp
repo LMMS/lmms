@@ -31,6 +31,7 @@
 #include <QMenu>
 #include <QVBoxLayout>
 
+#include "AutomatableButton.h"
 #include "EffectRackView.h"
 #include "embed.h"
 #include "GuiApplication.h"
@@ -267,7 +268,7 @@ void SampleTrackWindow::closeEvent(QCloseEvent* ce)
 		hide();
 	}
 
-	m_stv->m_tlb->setFocus();
+	m_stv->setFocus();
 	m_stv->m_tlb->setChecked(false);
 }
 

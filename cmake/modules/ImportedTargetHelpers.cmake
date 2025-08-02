@@ -44,7 +44,7 @@ function(determine_version_from_source _version_out _target _source)
 		_dvfs_run_result _dvfs_compile_result "${CMAKE_CURRENT_BINARY_DIR}"
 		SOURCES "${_source_file}"
 		LINK_LIBRARIES "${_target}"
-		CXX_STANDARD 17
+		CXX_STANDARD 20
 		RUN_OUTPUT_VARIABLE _run_output
 		COMPILE_OUTPUT_VARIABLE _compile_output
 	)

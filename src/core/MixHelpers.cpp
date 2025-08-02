@@ -29,7 +29,6 @@
 #endif
 
 #include <cmath>
-#include <QtGlobal>
 
 #include "ValueBuffer.h"
 #include "SampleFrame.h"

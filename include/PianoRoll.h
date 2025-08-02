@@ -40,11 +40,8 @@
 #include "StepRecorder.h"
 #include "StepRecorderWidget.h"
 
-class QPainter;
-class QPixmap;
 class QPushButton;
 class QScrollBar;
-class QString;
 class QMenu;
 class QToolButton;
 
@@ -52,7 +49,6 @@ namespace lmms
 {
 
 
-class NotePlayHandle;
 class MidiClip;
 
 
@@ -90,6 +86,7 @@ class PianoRoll : public QWidget
 	Q_PROPERTY(int ghostNoteOpacity MEMBER m_ghostNoteOpacity)
 	Q_PROPERTY(bool ghostNoteBorders MEMBER m_ghostNoteBorders)
 	Q_PROPERTY(QColor backgroundShade MEMBER m_backgroundShade)
+	Q_PROPERTY(QColor outOfBoundsShade MEMBER m_outOfBoundsShade)
 
 	/* white key properties */
 	Q_PROPERTY(int whiteKeyWidth MEMBER m_whiteKeyWidth)
@@ -248,6 +245,7 @@ protected slots:
 	void clearGhostClip();
 	void glueNotes();
 	void fitNoteLengths(bool fill);
+	void reverseNotes();
 	void constrainNoteLengths(bool constrainMax);
 
 	void changeSnapMode();
@@ -515,6 +513,7 @@ private:
 	bool m_noteBorders;
 	bool m_ghostNoteBorders;
 	QColor m_backgroundShade;
+	QColor m_outOfBoundsShade;
 	/* white key properties */
 	int m_whiteKeyWidth;
 	QColor m_whiteKeyActiveTextColor;

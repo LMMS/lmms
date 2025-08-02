@@ -36,12 +36,9 @@
 class QAction;
 class QDomElement;
 class QGridLayout;
-class QMdiArea;
 
 namespace lmms
 {
-
-class ConfigManager;
 
 namespace gui
 {
@@ -49,7 +46,6 @@ namespace gui
 class PluginView;
 class SubWindow;
 class ToolButton;
-class GuiApplication;
 
 
 class MainWindow : public QMainWindow

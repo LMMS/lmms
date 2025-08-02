@@ -25,21 +25,20 @@
 
 #include "FileBrowser.h"
 
-
+#include <PathUtil.h>
 #include <QApplication>
-#include <QDirIterator>
+#include <QCheckBox>
 #include <QHBoxLayout>
 #include <QLineEdit>
 #include <QMdiArea>
 #include <QMdiSubWindow>
 #include <QMenu>
 #include <QMessageBox>
-#include <QProcess>
+#include <QProgressBar>
 #include <QPushButton>
 #include <QShortcut>
 #include <QStringList>
 #include <cassert>
-#include <queue>
 
 #include "AudioEngine.h"
 #include "Clipboard.h"

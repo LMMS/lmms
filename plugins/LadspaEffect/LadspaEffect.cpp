@@ -29,7 +29,6 @@
 
 #include "LadspaEffect.h"
 #include "DataFile.h"
-#include "AudioDevice.h"
 #include "AudioEngine.h"
 #include "Ladspa2LMMS.h"
 #include "LadspaBase.h"
@@ -281,7 +280,7 @@ void LadspaEffect::pluginInstantiation()
 
 	// Calculate how many processing units are needed.
 	int effect_channels = manager->getDescription( m_key )->inputChannels;
-	setProcessorCount(DEFAULT_CHANNELS / effect_channels);
+	m_processors = DEFAULT_CHANNELS / effect_channels;
 
 	// get inPlaceBroken property
 	m_inPlaceBroken = manager->isInplaceBroken( m_key );

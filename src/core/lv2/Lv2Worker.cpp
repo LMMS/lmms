@@ -25,11 +25,9 @@
 #include "Lv2Worker.h"
 
 #include <cassert>
-#include <QDebug>
 
 #ifdef LMMS_HAVE_LV2
 
-#include "Engine.h"
 
 
 namespace lmms

@@ -22,11 +22,13 @@
  *
  */
 
+#include "embed.h"
+#include "ComboBox.h"
 #include "GranularPitchShifterControlDialog.h"
 #include "GranularPitchShifterControls.h"
-#include "embed.h"
-#include "LcdFloatSpinBox.h"
 #include "Knob.h"
+#include "LcdFloatSpinBox.h"
+#include "MainWindow.h"
 #include "GuiApplication.h"
 #include "PixmapButton.h"
 

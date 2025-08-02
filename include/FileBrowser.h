@@ -25,28 +25,25 @@
 #ifndef LMMS_GUI_FILE_BROWSER_H
 #define LMMS_GUI_FILE_BROWSER_H
 
-#include <QCheckBox>
 #include <QDir>
 #include <QMutex>
-#include <QProgressBar>
 #include <memory>
 
-#include "FileSearch.h"
 #include "embed.h"
 
-#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
-	#include <QRecursiveMutex>
-#endif
 #include <QTreeWidget>
 
 #include "SideBarWidget.h"
 #include "lmmsconfig.h"
 
+class QCheckBox;
 class QLineEdit;
+class QProgressBar;
 
 namespace lmms
 {
 
+class FileSearch;
 class InstrumentTrack;
 class PlayHandle;
 class TrackContainer;
@@ -54,26 +51,29 @@ class TrackContainer;
 namespace gui
 {
 
-class FileItem;
 class FileBrowserTreeWidget;
+class FileItem;
 
 class FileBrowser : public SideBarWidget
 {
 	Q_OBJECT
 public:
+	enum class Type
+	{
+		Normal,
+		Favorites
+	};
+
 	/**
-		Create a file browser side bar widget
-		@param directories '*'-separated list of directories to search for.
-			If a directory of factory files should be in the list it
-			must be the last one (for the factory files delimiter to work)
-		@param filter Filter as used in QDir::match
-		@param recurse *to be documented*
-	*/
-	FileBrowser( const QString & directories, const QString & filter,
-			const QString & title, const QPixmap & pm,
-			QWidget * parent, bool dirs_as_items = false,
-			const QString& userDir = "",
-			const QString& factoryDir = "");
+			Create a file browser side bar widget
+			@param directories '*'-separated list of directories to search for.
+				If a directory of factory files should be in the list it
+				must be the last one (for the factory files delimiter to work)
+			@param filter Filter as used in QDir::match
+			@param recurse *to be documented*
+		*/
+	FileBrowser(Type type, const QString& directories, const QString& filter, const QString& title, const QPixmap& pm,
+		QWidget* parent, bool dirs_as_items = false, const QString& userDir = "", const QString& factoryDir = "");
 
 	~FileBrowser() override = default;
 
@@ -90,6 +90,7 @@ public:
 		};
 		return s_excludedPaths;
 	}
+
 	static QDir::Filters dirFilters() { return QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot | QDir::Hidden; }
 	static QDir::SortFlags sortFlags() { return QDir::LocaleAware | QDir::DirsFirst | QDir::Name | QDir::IgnoreCase; }
 
@@ -101,7 +102,7 @@ private slots:
 private:
 	void keyPressEvent( QKeyEvent * ke ) override;
 
-	void addItems( const QString & path );
+	void addItems(const QString & path);
 
 	void saveDirectoriesStates();
 	void restoreDirectoriesStates();
@@ -117,6 +118,7 @@ private:
 	FileBrowserTreeWidget * m_searchTreeWidget;
 
 	QLineEdit * m_filterEdit;
+	Type m_type;
 
 	std::shared_ptr<FileSearch> m_currentSearch;
 	QProgressBar* m_searchIndicator = nullptr;
@@ -216,8 +218,7 @@ public:
 		{
 			path += QDir::separator();
 		}
-		return( QDir::cleanPath( path + text( 0 ) ) +
-							QDir::separator() );
+		return QDir::cleanPath(path + text(0));
 	}
 
 	inline void addDirectory( const QString & dir )
