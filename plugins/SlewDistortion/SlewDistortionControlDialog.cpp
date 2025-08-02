@@ -296,49 +296,58 @@ void SlewDistortionControlDialog::paintEvent(QPaintEvent *event)
 			float distIn = (biasedIn - copysign(warp / crush, biasedIn)) / (1.0f - warp);
 			float distOut;
 
-			switch (distType)
+			switch (static_cast<SlewDistortionType>(distType))
 			{
-				case 0: {// hard clip
+				case SlewDistortionType::HardClip: {
 					distOut = std::clamp(distIn, -1.f, 1.f);
 					break;
 				}
-				case 1: {// tanh
-					distOut = 2.f / (1.f + std::exp(-2.f * distIn)) - 1;
+				case SlewDistortionType::Tanh: {
+					const float temp = std::clamp(distIn, -40.f, 40.f);
+					distOut = 2.f / (1.f + std::exp(-2.f * temp)) - 1;
 					break;
 				}
-				case 2: {// fast soft clip 1
+				case SlewDistortionType::FastSoftClip1: {
 					const float temp = std::clamp(distIn, -2.f, 2.f);
 					distOut = temp / (1 + 0.25f * temp * temp);
 					break;
 				}
-				case 3: {// fast soft clip 2
+				case SlewDistortionType::FastSoftClip2: {
 					const float temp = std::clamp(distIn, -1.5f, 1.5f);
 					distOut = temp - (4.f / 27.f) * temp * temp * temp;
 					break;
 				}
-				case 4: {// sinusoidal
-					distOut = std::sin(distIn);
+				case SlewDistortionType::Sinusoidal: {
+					// using a polynomial approximation so it matches with the SSE2 code
+					// x - x^3 / 6 + x^5 / 120
+					float modInput = std::fmod(distIn - std::numbers::pi_v<float> * 0.5f, 2.f * std::numbers::pi_v<float>);
+					if (modInput < 0) {modInput += 2.f * std::numbers::pi_v<float>;}
+					const float x = std::abs(modInput - std::numbers::pi_v<float>) - std::numbers::pi_v<float> * 0.5f;
+					const float x2 = x * x;
+					const float x3 = x2 * x;
+					const float x5 = x3 * x2;
+					distOut = x - (x3 / 6.0f) + (x5 / 120.0f);
 					break;
 				}
-				case 5: {// foldback distortion
+				case SlewDistortionType::Foldback: {
 					distOut = std::abs(std::abs(std::fmod(distIn - 1.f, 4.f)) - 2.f) - 1.f;
 					break;
 				}
-				case 6: {// rectify
+				case SlewDistortionType::FullRectify: {
 					distOut = std::abs(distIn);
 					break;
 				}
-				case 7: // half-wave rectify
-				{
-					distOut = std::max(0.0f, distIn);
-					break;
-				}
-				case 8: // smooth rectify
+				case SlewDistortionType::SmoothRectify:
 				{
 					distOut = std::sqrt(distIn * distIn + 0.04f) - 0.2f;
 					break;
 				}
-				case 9: // bitcrush
+				case SlewDistortionType::HalfRectify:
+				{
+					distOut = std::max(0.0f, distIn);
+					break;
+				}
+				case SlewDistortionType::Bitcrush:
 				{
 					const float scale = 16 / drive;
 					distOut = std::round(distIn / drive * scale) / scale;

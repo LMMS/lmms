@@ -41,6 +41,21 @@ namespace gui
 class SlewDistortionControlDialog;
 }
 
+enum class SlewDistortionType : int
+{
+	HardClip = 0,
+	Tanh,
+	FastSoftClip1,
+	FastSoftClip2,
+	Sinusoidal,
+	Foldback,
+	FullRectify,
+	HalfRectify,
+	SmoothRectify,
+	Bitcrush,
+	Count
+};
+
 class SlewDistortionControls : public EffectControls
 {
 	Q_OBJECT

@@ -37,21 +37,6 @@ namespace lmms
 constexpr inline float SLEW_DISTORTION_MIN_FLOOR = 0.0012589f;// -72 dBFS
 constexpr inline float SLEW_DISTORTION_DC_FREQ = 7.f;
 
-enum class SlewDistortionType : int
-{
-	HardClip = 0,
-	Tanh,
-	FastSoftClip1,
-	FastSoftClip2,
-	Sinusoidal,
-	Foldback,
-	FullRectify,
-	HalfRectify,
-	SmoothRectify,
-	Bitcrush,
-	Count
-};
-
 class SlewDistortion : public Effect
 {
 	Q_OBJECT

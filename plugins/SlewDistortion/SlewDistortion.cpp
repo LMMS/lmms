@@ -575,7 +575,8 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 						break;
 					}
 					case SlewDistortionType::Tanh: {
-						distOut = 2.f / (1.f + std::exp(-2.f * distIn)) - 1;
+						const float temp = std::clamp(distIn, -40.f, 40.f);
+						distOut = 2.f / (1.f + std::exp(-2.f * temp)) - 1;
 						break;
 					}
 					case SlewDistortionType::FastSoftClip1: {
