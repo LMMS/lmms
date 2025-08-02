@@ -138,15 +138,29 @@ SlewDistortionControlDialog::SlewDistortionControlDialog(SlewDistortionControls*
 	outVol2Draggable->setDefaultValPixmap(PLUGIN_NAME::getIconPixmap("handle_zero"));
 	
 	PixmapButton* slewLink1Button = makeToggleButton(132, 70, tr("Slew Link 1"), "link_on", "link_off", &controls->m_slewLink1Model);
-	connect(slewLink1Button, &PixmapButton::clicked, this, [this, controls]{
-		controls->m_slewDown1Model.setValue(controls->m_slewUp1Model.value());
-		m_slewDown1Knob->setModel(controls->m_slewLink1Model.value() ? &controls->m_slewUp1Model : &controls->m_slewDown1Model);
-	}, Qt::DirectConnection);
+	connect(&controls->m_slewLink1Model, &BoolModel::dataChanged, this, [this, controls]{
+		if (controls->m_slewLink1Model.value())
+		{
+			controls->m_slewDown1Model.setValue(controls->m_slewUp1Model.value());
+			m_slewDown1Knob->setModel(&controls->m_slewUp1Model);
+		}
+		else
+		{
+			m_slewDown1Knob->setModel(&controls->m_slewDown1Model);
+		}
+	});
 	PixmapButton* slewLink2Button = makeToggleButton(132, 191, tr("Slew Link 2"), "link_on", "link_off", &controls->m_slewLink2Model);
-	connect(slewLink2Button, &PixmapButton::clicked, this, [this, controls]{
-		controls->m_slewDown2Model.setValue(controls->m_slewUp2Model.value());
-		m_slewDown2Knob->setModel(controls->m_slewLink2Model.value() ? &controls->m_slewUp2Model : &controls->m_slewDown2Model);
-	}, Qt::DirectConnection);
+	connect(&controls->m_slewLink2Model, &BoolModel::dataChanged, this, [this, controls]{
+		if (controls->m_slewLink2Model.value())
+		{
+			controls->m_slewDown2Model.setValue(controls->m_slewUp2Model.value());
+			m_slewDown2Knob->setModel(&controls->m_slewUp2Model);
+		}
+		else
+		{
+			m_slewDown2Knob->setModel(&controls->m_slewDown2Model);
+		}
+	});
 	
 	makeToggleButton(9, 248, tr("DC Offset Removal"), "dc_on", "dc_off", &controls->m_dcRemoveModel);
 	makeToggleButton(99, 248, tr("Multiband"), "mb_on", "mb_off", &controls->m_multibandModel);
@@ -162,7 +176,7 @@ SlewDistortionControlDialog::SlewDistortionControlDialog(SlewDistortionControls*
 	PixmapButton* oversample16xButton = makeGroupButton(554, 248, tr("16x Oversampling"), "oversample_16x_on", "oversample_16x_off");
 	PixmapButton* oversample32xButton = makeGroupButton(579, 248, tr("32x Oversampling"), "oversample_32x_on", "oversample_32x_off");
 
-	automatableButtonGroup* oversampleGroup = new automatableButtonGroup(this);
+	AutomatableButtonGroup* oversampleGroup = new AutomatableButtonGroup(this);
 	oversampleGroup->addButton(oversample1xButton);
 	oversampleGroup->addButton(oversample2xButton);
 	oversampleGroup->addButton(oversample4xButton);
@@ -178,12 +192,7 @@ SlewDistortionControlDialog::SlewDistortionControlDialog(SlewDistortionControls*
 	m_helpBtn->setToolTip(tr("Open help window"));
 	connect(m_helpBtn, SIGNAL(clicked()), this, SLOT(showHelpWindow()));
 	
-	connect(getGUI()->mainWindow(), SIGNAL(periodicUpdate()), this, SLOT(updateDisplay()));
-}
-
-void SlewDistortionControlDialog::updateDisplay()
-{
-	update();
+	connect(getGUI()->mainWindow(), SIGNAL(periodicUpdate()), this, SLOT(update()));
 }
 
 void SlewDistortionControlDialog::paintEvent(QPaintEvent *event)
@@ -381,7 +390,7 @@ void SlewDistortionControlDialog::showHelpWindow()
 }
 
 
-QString SlewDistortionHelpView::s_helpText =
+QString SlewDistortionHelpView::s_helpText = tr(
 "<div style='text-align: center;'>"
 "<b>Slew Distortion</b><br><br>"
 "Plugin by Lost Robot<br>"
@@ -453,7 +462,7 @@ QString SlewDistortionHelpView::s_helpText =
 "Each stage provides an extra 2 octaves of headroom before frequencies alias far enough to become audible.<br>"
 "The number on the button is how much the sample rate is increased by. THE PLUGIN'S CPU USAGE WILL BE INCREASED BY APPROXIMATELY THE SAME AMOUNT.<br>"
 "Even just 2x oversampling can make a massive difference and is oftentimes all you need, but up to 32x oversampling is supported.<br>"
-;
+);
 
 
 

@@ -30,11 +30,22 @@
 namespace lmms::gui
 {
 
+/**
+ * @brief A pixmap that can be dragged from one location to another to control a FloatModel
+ */
 class LMMS_EXPORT Draggable : public FloatModelEditorBase
 {
 	Q_OBJECT
 
 public:
+	/**
+	 * @param directionOfManipulation Direction the user can drag the control
+	 * @param floatModel Pointer to the FloatModel this draggable modifies
+	 * @param pixmap The pixmap shown for this handle
+	 * @param pointA Starting pixel position (Y if vertical, X if horizontal)
+	 * @param pointB Ending pixel position (Y if vertical, X if horizontal)
+	 * @param parent Parent QWidget
+	 */
 	Draggable(FloatModelEditorBase::DirectionOfManipulation directionOfManipulation,
 		FloatModel* floatModel, const QPixmap &pixmap, int pointA, int pointB, QWidget* parent = nullptr);
 

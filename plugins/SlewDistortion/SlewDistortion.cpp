@@ -73,8 +73,8 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 		changeSampleRate();
 	}
 
-	const int distType1 = m_slewdistortionControls.m_distType1Model.value();
-	const int distType2 = m_slewdistortionControls.m_distType2Model.value();
+	const SlewDistortionType distType1 = static_cast<SlewDistortionType>(m_slewdistortionControls.m_distType1Model.value());
+	const SlewDistortionType distType2 = static_cast<SlewDistortionType>(m_slewdistortionControls.m_distType2Model.value());
 	const float drive1 = dbfsToAmp(m_slewdistortionControls.m_drive1Model.value());
 	const float drive2 = dbfsToAmp(m_slewdistortionControls.m_drive2Model.value());
 	const float slewUp1 = dbfsToAmp(m_slewdistortionControls.m_slewUp1Model.value()) / oversampleVal;
@@ -224,7 +224,7 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 
 			for (int pair = 0; pair < loopCount; ++pair)
 			{
-				int currentDistType = (pair == 0) ? distType1 : distType2;
+				SlewDistortionType currentDistType = (pair == 0) ? distType1 : distType2;
 
 				__m128 distInFull = _mm_load_ps(&distInArr[0]);
 				__m128 distOutFull;
@@ -232,14 +232,14 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 				// switch-case applies the distortion to the full set of 4 values
 				switch (currentDistType)
 				{
-					case 0:// Hard Clip => clamp(x, -1, 1)
+					case SlewDistortionType::HardClip:// Hard Clip => clamp(x, -1, 1)
 					{
 						__m128 minVal = _mm_set1_ps(-1.0f);
 						__m128 maxVal = one;
 						distOutFull = _mm_max_ps(_mm_min_ps(distInFull, maxVal), minVal);
 						break;
 					}
-					case 1: // Tanh => 2 / (1 + exp(-2x)) - 1
+					case SlewDistortionType::Tanh: // Tanh => 2 / (1 + exp(-2x)) - 1
 					{
 						// clamp to [-87.0f, 87.0f] since fast_exp_sse breaks outside of those bounds
 						__m128 clampedInput = _mm_max_ps(_mm_min_ps(_mm_mul_ps(_mm_set1_ps(-2.0f),
@@ -248,21 +248,21 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 						distOutFull = _mm_sub_ps(_mm_div_ps(_mm_set1_ps(2.0f), _mm_add_ps(one, expResult)), one);
 						break;
 					}
-					case 2: // Fast Soft Clip 1 => x / (1 + x^2 / 4)
+					case SlewDistortionType::FastSoftClip1: // Fast Soft Clip 1 => x / (1 + x^2 / 4)
 					{
 						__m128 temp = _mm_max_ps(_mm_min_ps(distInFull, _mm_set1_ps(2.f)), _mm_set1_ps(-2.f));// clamp
 						distOutFull = _mm_div_ps(temp, _mm_add_ps(one,
 							_mm_mul_ps(_mm_set1_ps(0.25f), _mm_mul_ps(temp, temp))));
 						break;
 					}
-					case 3: // Fast Soft Clip 2 => x - (4/27) * x^3
+					case SlewDistortionType::FastSoftClip2: // Fast Soft Clip 2 => x - (4/27) * x^3
 					{
 						__m128 temp = _mm_max_ps(_mm_min_ps(distInFull, _mm_set1_ps(1.5f)), _mm_set1_ps(-1.5f));// clamp
 						distOutFull = _mm_sub_ps(temp, _mm_mul_ps(_mm_set1_ps(4.f / 27.f),
 							_mm_mul_ps(_mm_mul_ps(temp, temp), temp)));
 						break;
 					}
-					case 4: // Sinusoidal => sin(x)
+					case SlewDistortionType::Sinusoidal: // Sinusoidal => sin(x)
 					{
 						// SSE2 sine approximation I created
 						__m128 pi = _mm_set1_ps(3.14159265358979323846f);
@@ -292,7 +292,7 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 						distOutFull = _mm_add_ps(sinApprox, _mm_mul_ps(x5, _mm_set1_ps(1.0f / 120.0f)));
 						break;
 					}
-					case 5: // Foldback => |(|x - 1| mod 4) - 2| - 1 = |2 - |(x - 1) - 4 * floor((x - 1) / 4)|| - 1
+					case SlewDistortionType::Foldback: // Foldback => |(|x - 1| mod 4) - 2| - 1 = |2 - |(x - 1) - 4 * floor((x - 1) / 4)|| - 1
 					{
 						__m128 four = _mm_set1_ps(4.0f);
 						__m128 distInMinusOne = _mm_sub_ps(distInFull, one);
@@ -307,23 +307,23 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 							distInMinusOne, _mm_mul_ps(floorOverFour, four)), _mm_set1_ps(2.0f))), one);
 						break;
 					}
-					case 6: // Full-wave Rectify => |x|
+					case SlewDistortionType::FullRectify: // Full-wave Rectify => |x|
 					{
 						distOutFull = _mm_and_ps(distInFull, _mm_castsi128_ps(_mm_set1_epi32(0x7FFFFFFF)));
 						break;
 					}
-					case 7: // Smooth Rectify => sqrt(x^2 + 0.04) - 0.2
+					case SlewDistortionType::SmoothRectify: // Smooth Rectify => sqrt(x^2 + 0.04) - 0.2
 					{
 						distOutFull = _mm_sub_ps(_mm_sqrt_ps(_mm_add_ps(_mm_mul_ps(distInFull, distInFull), 
 							_mm_set1_ps(0.04f))),_mm_set1_ps(0.2f));
 						break;
 					}
-					case 8:  // Half-wave Rectify => max(0, x)
+					case SlewDistortionType::HalfRectify:  // Half-wave Rectify => max(0, x)
 					{
 						distOutFull = _mm_max_ps(_mm_setzero_ps(), distInFull);
 						break;
 					}
-					case 9:  // Bitcrush => round(x / drive * scale) / scale
+					case SlewDistortionType::Bitcrush:  // Bitcrush => round(x / drive * scale) / scale
 					{
 						// scale = 16 / drive
 						__m128 scale = _mm_div_ps(_mm_set1_ps(16.f), drive);
@@ -454,8 +454,8 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 		changeSampleRate();
 	}
 	
-	const int distType1 = m_slewdistortionControls.m_distType1Model.value();
-	const int distType2 = m_slewdistortionControls.m_distType2Model.value();
+	const SlewDistortionType distType1 = static_cast<SlewDistortionType>(m_slewdistortionControls.m_distType1Model.value());
+	const SlewDistortionType distType2 = static_cast<SlewDistortionType>(m_slewdistortionControls.m_distType2Model.value());
 	const float drive1 = dbfsToAmp(m_slewdistortionControls.m_drive1Model.value());
 	const float drive2 = dbfsToAmp(m_slewdistortionControls.m_drive2Model.value());
 	const float slewUp1 = dbfsToAmp(m_slewdistortionControls.m_slewUp1Model.value()) / oversampleVal;
@@ -495,7 +495,7 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 	const std::array<float, 4> drive = {drive1, drive1, drive2, drive2};
 	const std::array<float, 4> slewUp = {slewUp1, slewUp1, slewUp2, slewUp2};
 	const std::array<float, 4> slewDown = {slewDown1, slewDown1, slewDown2, slewDown2};
-	const std::array<int, 4> distType = {distType1, distType1, distType2, distType2};
+	const std::array<SlewDistortionType, 4> distType = {distType1, distType1, distType2, distType2};
 	const std::array<float, 4> warp = {warp1, warp1, warp2, warp2};
 	const std::array<float, 4> crush = {crush1, crush1, crush2, crush2};
 	const std::array<float, 4> outVol = {outVol1, outVol1, outVol2, outVol2};
@@ -568,26 +568,27 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 				float biasedIn = m_slewOut[i] * drive[i] + bias[i];
 				float distIn = (biasedIn - copysign(warp[i] / crush[i], biasedIn)) / (1.f - warp[i]);
 				float distOut;
-				switch(distType[i]) {
-					case 0: {// hard clip
+				switch (static_cast<SlewDistortionType>(distType[i]))
+				{
+					case SlewDistortionType::HardClip: {
 						distOut = std::clamp(distIn, -1.f, 1.f);
 						break;
 					}
-					case 1: {// tanh
+					case SlewDistortionType::Tanh: {
 						distOut = 2.f / (1.f + std::exp(-2.f * distIn)) - 1;
 						break;
 					}
-					case 2: {// fast soft clip 1
+					case SlewDistortionType::FastSoftClip1: {
 						const float temp = std::clamp(distIn, -2.f, 2.f);
 						distOut = temp / (1 + 0.25f * temp * temp);
 						break;
 					}
-					case 3: {// fast soft clip 2
+					case SlewDistortionType::FastSoftClip2: {
 						const float temp = std::clamp(distIn, -1.5f, 1.5f);
 						distOut = temp - (4.f / 27.f) * temp * temp * temp;
 						break;
 					}
-					case 4: { // sinusodal
+					case SlewDistortionType::Sinusoidal: {
 						// using a polynomial approximation so it matches with the SSE2 code
 						// x - x^3 / 6 + x^5 / 120
 						float modInput = std::fmod(distIn - std::numbers::pi_v<float> * 0.5f, 2.f * std::numbers::pi_v<float>);
@@ -599,25 +600,25 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 						distOut = x - (x3 / 6.0f) + (x5 / 120.0f);
 						break;
 					}
-					case 5: {// foldback distortion
+					case SlewDistortionType::Foldback: {
 						distOut = std::abs(std::abs(std::fmod(distIn - 1.f, 4.f)) - 2.f) - 1.f;
 						break;
 					}
-					case 6: {// rectify
+					case SlewDistortionType::Rectify: {
 						distOut = std::abs(distIn);
 						break;
 					}
-					case 7: // smooth rectify
+					case SlewDistortionType::SmoothRectify:
 					{
 						distOut = std::sqrt(distIn * distIn + 0.04f) - 0.2f;
 						break;
 					}
-					case 8: // half-wave rectify
+					case SlewDistortionType::HalfRectify:
 					{
 						distOut = std::max(0.0f, distIn);
 						break;
 					}
-					case 9: // bitcrush
+					case SlewDistortionType::Bitcrush:
 					{
 						const float scale = 16 / drive[i];
 						distOut = std::round(distIn / drive[i] * scale) / scale;
