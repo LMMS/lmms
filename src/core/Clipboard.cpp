@@ -64,14 +64,22 @@ static std::map<std::string, std::vector<std::string>> mimetypes =
 
 			if (mimetype == nullptr || mimetype[0] == '\0') { continue; }
 
-			std::vector<std::string> fileTypes = {};
+			std::vector<std::string> fileTypes;
 
 			for (auto& fileType : QString(pluginInfo.descriptor->supportedFileTypes).split(","))
 			{
 				fileTypes.push_back(fileType.toStdString());
 			}
 
-			mimetypes.insert_or_assign(mimetype, fileTypes);
+			auto& existingTypes = mimetypes[mimetype]; // creates key if not present
+
+			for (const auto& ext : fileTypes)
+			{
+				if (std::find(existingTypes.begin(), existingTypes.end(), ext) == existingTypes.end())
+				{
+					existingTypes.push_back(ext); // add only if not already present
+				}
+			}
 		}
 	}
 
