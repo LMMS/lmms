@@ -560,7 +560,7 @@ void InstrumentTrackWindow::focusInEvent( QFocusEvent* )
 
 void InstrumentTrackWindow::dragEnterEventGeneric( QDragEnterEvent* event )
 {
-	StringPairDrag::processDragEnterEvent( event, "instrument,presetfile,pluginpresetfile" );
+	StringPairDrag::processDragEnterEvent(event, {"instrument", "presetfile", "pluginpresetfile"});
 }
 
 
