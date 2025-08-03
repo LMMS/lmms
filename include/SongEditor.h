@@ -74,8 +74,8 @@ public:
 	float getSnapSize() const;
 	QString getSnapSizeString() const;
 
-	TimeLineWidget* timeLine;
-	PositionLine* positionLine;
+	TimeLineWidget* timeLine() const { return m_timeLine; }
+	PositionLine* positionLine() const { return m_positionLine; }
 
 public slots:
 	void scrolled( int new_pos );
@@ -135,6 +135,8 @@ private:
 
 	LcdSpinBox * m_tempoSpinBox;
 
+	TimeLineWidget* m_timeLine;
+	PositionLine* m_positionLine;
 
 	MeterDialog * m_timeSigDisplay;
 	AutomatableSlider * m_masterVolumeSlider;

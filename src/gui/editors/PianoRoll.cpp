@@ -4235,8 +4235,8 @@ void PianoRoll::recordAccompany()
 
 	auto* songEditor = GuiApplication::instance()->songEditor()->m_editor;
 
-	songEditor->timeLine->isRecoridng = true;
-	songEditor->positionLine->isRecording = true;
+	songEditor->timeLine()->isRecoridng = true;
+	songEditor->positionLine()->isRecording = true;
 	m_positionLine->update();
 }
 
@@ -4287,8 +4287,8 @@ void PianoRoll::stop()
 
 	auto* songEditor = GuiApplication::instance()->songEditor()->m_editor;
 
-	songEditor->timeLine->isRecoridng = false;
-	songEditor->positionLine->isRecording = false;
+	songEditor->timeLine()->isRecoridng = false;
+	songEditor->positionLine()->isRecording = false;
 	m_timeLine->isRecoridng = false;
 	m_positionLine->isRecording = false;
 	m_positionLine->update();
