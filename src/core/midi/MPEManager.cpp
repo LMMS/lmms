@@ -136,24 +136,29 @@ void MPEManager::sendMPEConfigSignals()
 	m_instrumentTrack->processOutEvent(MidiEvent(MidiControlChange, 0, MidiControllerRegisteredParameterNumberLSB, MidiMPEConfigurationRPN & 0x7F));
 	m_instrumentTrack->processOutEvent(MidiEvent(MidiControlChange, 0, MidiControllerDataEntry, m_instrumentTrack->midiPort()->MPELowerZoneChannels()));
 
+	// Send null RPN signals to end the control change. I heard this was good practice.
+	m_instrumentTrack->processOutEvent(MidiEvent(MidiControlChange, 0, MidiControllerRegisteredParameterNumberMSB, (MidiNullFunctionNumberRPN >> 8) & 0x7F));
+	m_instrumentTrack->processOutEvent(MidiEvent(MidiControlChange, 0, MidiControllerRegisteredParameterNumberLSB, MidiNullFunctionNumberRPN & 0x7F));
 	// Setup MPE Zone 2
 	m_instrumentTrack->processOutEvent(MidiEvent(MidiControlChange, 0xF, MidiControllerRegisteredParameterNumberMSB, (MidiMPEConfigurationRPN >> 8) & 0x7F));
 	m_instrumentTrack->processOutEvent(MidiEvent(MidiControlChange, 0xF, MidiControllerRegisteredParameterNumberLSB, MidiMPEConfigurationRPN & 0x7F));
 	m_instrumentTrack->processOutEvent(MidiEvent(MidiControlChange, 0xF, MidiControllerDataEntry, m_instrumentTrack->midiPort()->MPEUpperZoneChannels()));
 
-	// Set pitch bend range to 60 on all member channels
-	// TODO rework this, this should not be hardcocded probably? 60 is just nice because lmms uses +/-60
+	m_instrumentTrack->processOutEvent(MidiEvent(MidiControlChange, 0xF, MidiControllerRegisteredParameterNumberMSB, (MidiNullFunctionNumberRPN >> 8) & 0x7F));
+	m_instrumentTrack->processOutEvent(MidiEvent(MidiControlChange, 0xF, MidiControllerRegisteredParameterNumberLSB, MidiNullFunctionNumberRPN & 0x7F));
+
+	// Set pitch bend range to on all Member channels
+	// TODO this doesn't always work on all VSTs. I have the default at 48 because that seems to be the default in the MPE spec, but lmms likes to use 60 so...
 	// Also currently this doesn't affect the manager channels, 0 and 15. But I think that's fine, since the pitch wheel is supposed to handle that.
 	for (int channel = 1; channel < 15; ++channel)
 	{
 		m_instrumentTrack->processOutEvent(MidiEvent(MidiControlChange, channel, MidiControllerRegisteredParameterNumberMSB, (MidiPitchBendSensitivityRPN >> 8) & 0x7F));
 		m_instrumentTrack->processOutEvent(MidiEvent(MidiControlChange, channel, MidiControllerRegisteredParameterNumberLSB, MidiPitchBendSensitivityRPN & 0x7F));
-		m_instrumentTrack->processOutEvent(MidiEvent(MidiControlChange, channel, MidiControllerDataEntry, 60));
+		m_instrumentTrack->processOutEvent(MidiEvent(MidiControlChange, channel, MidiControllerDataEntry, m_instrumentTrack->midiPort()->MPEPitchRange()));
+		m_instrumentTrack->processOutEvent(MidiEvent(MidiControlChange, channel, MidiControllerRegisteredParameterNumberMSB, (MidiNullFunctionNumberRPN >> 8) & 0x7F));
+		m_instrumentTrack->processOutEvent(MidiEvent(MidiControlChange, channel, MidiControllerRegisteredParameterNumberLSB, MidiNullFunctionNumberRPN & 0x7F));
 	}
 
-	// Send null RPN signals to end the control change. I heard this was good practice.
-	m_instrumentTrack->processOutEvent(MidiEvent(MidiControlChange, 0, MidiControllerRegisteredParameterNumberMSB, (MidiNullFunctionNumberRPN >> 8) & 0x7F));
-	m_instrumentTrack->processOutEvent(MidiEvent(MidiControlChange, 0, MidiControllerRegisteredParameterNumberLSB, MidiNullFunctionNumberRPN & 0x7F));
 }
 
 

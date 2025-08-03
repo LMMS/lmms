@@ -86,7 +86,10 @@ InstrumentTrack::InstrumentTrack(TrackContainer* tc) :
 	for( int i = 0; i < NumKeys; ++i )
 	{
 		m_notes[i] = nullptr;
-		m_runningMidiNotes[i] = 0;
+		for (int channel = 0; channel < 16; ++channel)
+		{
+			m_runningMidiNotes[channel][i] = 0;
+		}
 	}
 
 
@@ -358,7 +361,6 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const TimePos& tim
 								nullptr, eventChannel,
 								NotePlayHandle::Origin::MidiInput);
 					m_notes[event.key()] = nph;
-					// TODO do we need to also do a noteOff if this fails?
 					if( ! Engine::audioEngine()->addPlayHandle( nph ) )
 					{
 						m_notes[event.key()] = nullptr;
@@ -501,12 +503,14 @@ void InstrumentTrack::processOutEvent( const MidiEvent& event, const TimePos& ti
 
 			if( key >= 0 && key < NumKeys )
 			{
-				if( m_runningMidiNotes[key] > 0 )
+				if( m_runningMidiNotes[handleEventOutputChannel][key] > 0 )
 				{
 					m_instrument->handleMidiEvent( MidiEvent( MidiNoteOff, handleEventOutputChannel, key, 0 ), time, offset );
+					m_eventHistory[handleEventOutputChannel].push_back(static_cast<int>(event.type()));
 				}
-				++m_runningMidiNotes[key];
+				++m_runningMidiNotes[handleEventOutputChannel][key];
 				m_instrument->handleMidiEvent( MidiEvent( MidiNoteOn, handleEventOutputChannel, key, event.velocity() ), time, offset );
+				m_eventHistory[handleEventOutputChannel].push_back(static_cast<int>(event.type()));
 
 			}
 			m_midiNotesMutex.unlock();
@@ -517,9 +521,10 @@ void InstrumentTrack::processOutEvent( const MidiEvent& event, const TimePos& ti
 			m_midiNotesMutex.lock();
 			m_piano.setKeyState( event.key(), false );	// event.key() = original key
 
-			if( key >= 0 && key < NumKeys && --m_runningMidiNotes[key] <= 0 )
+			if( key >= 0 && key < NumKeys && --m_runningMidiNotes[handleEventOutputChannel][key] <= 0 )
 			{
 				m_instrument->handleMidiEvent( MidiEvent( MidiNoteOff, handleEventOutputChannel, key, 0 ), time, offset );
+				m_eventHistory[handleEventOutputChannel].push_back(static_cast<int>(event.type()));
 			}
 			m_midiNotesMutex.unlock();
 			emit endNote();
@@ -527,6 +532,7 @@ void InstrumentTrack::processOutEvent( const MidiEvent& event, const TimePos& ti
 
 		default:
 			m_instrument->handleMidiEvent( transposedEvent, time, offset );
+			m_eventHistory[handleEventOutputChannel].push_back(static_cast<int>(event.type()));
 			break;
 	}
 
@@ -543,7 +549,10 @@ void InstrumentTrack::silenceAllNotes( bool removeIPH )
 	for( int i = 0; i < NumKeys; ++i )
 	{
 		m_notes[i] = nullptr;
-		m_runningMidiNotes[i] = 0;
+		for (int channel = 0; channel < 16; ++channel)
+		{
+			m_runningMidiNotes[channel][i] = 0;
+		}
 	}
 	m_midiNotesMutex.unlock();
 
@@ -685,6 +694,38 @@ void InstrumentTrack::updatePitchRange()
 void InstrumentTrack::updateMixerChannel()
 {
 	m_audioBusHandle.setNextMixerChannel(m_mixerChannelModel.value());
+	for (int i = 0; i<16; i++)
+	{
+		QString hist = "";
+		int net = 0;
+		for (int event: m_eventHistory[i])
+		{
+			if (event == MidiNoteOn)
+			{
+				hist += "^";
+				net++;
+			}
+			else if (event == MidiNoteOff)
+			{
+				hist += "_";
+				net--;
+			}
+			else if (event == MidiKeyPressure)
+			{
+				hist += "V";
+			}
+			else if (event == MidiPitchBend)
+			{
+				hist += "P";
+			}
+			else
+			{
+				hist += "?";
+			}
+		}
+		qDebug() << "Channel" << i << hist << "Net" << net;
+		m_eventHistory[i].clear();
+	}
 }
 
 

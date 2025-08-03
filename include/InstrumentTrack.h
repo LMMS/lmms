@@ -275,8 +275,10 @@ private:
 	NotePlayHandle* m_notes[NumKeys];
 	NotePlayHandleList m_sustainedNotes;
 
-	int m_runningMidiNotes[NumKeys];
+	std::array<std::array<int, NumKeys>, 16> m_runningMidiNotes;
 	QMutex m_midiNotesMutex;
+
+	std::array<std::vector<int>,16> m_eventHistory = {};
 
 	bool m_sustainPedalPressed;
 
