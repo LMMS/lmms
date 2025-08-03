@@ -63,7 +63,7 @@ void printJackStatus(jack_status_t status)
 
 	if (status & JackFailure)
 	{
-		printf("Overall operation failed. JACK dependencies might need to get installed.\n");
+		printf("Overall operation failed. JACK dependencies might need to be installed.\n");
 	}
 
 	if (status & JackServerFailed)
