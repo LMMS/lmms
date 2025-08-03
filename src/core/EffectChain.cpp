@@ -104,7 +104,7 @@ void EffectChain::loadSettings( const QDomElement & _this )
 			else
 			{
 				delete e;
-				e = new DummyEffect( parentModel(), effectData );
+				e = new DummyEffect(this, effectData);
 			}
 
 			m_effects.push_back( e );
