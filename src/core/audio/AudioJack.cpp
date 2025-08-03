@@ -583,7 +583,7 @@ std::vector<std::string> AudioJack::setupWidget::getAudioPortNames(JackPortFlags
 {
 	std::vector<std::string> audioPorts;
 
-	// We are using weak_ libjack. If JACK is not installed this will result in the client being nullptr.
+	// We are using weak_libjack. If JACK is not installed this will result in the client being nullptr.
 	// Because jack_get_ports in weak_libjack does not check for nullptr we have to do this here and fail gracefully,
 	// i.e. with an empty list of audio ports.
 	if (!m_client)
