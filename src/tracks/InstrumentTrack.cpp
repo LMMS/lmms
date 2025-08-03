@@ -570,6 +570,21 @@ void InstrumentTrack::silenceAllNotes( bool removeIPH )
 }
 
 
+void InstrumentTrack::resetAllMidiNotes()
+{
+	m_midiNotesMutex.lock();
+	for (int channel = 0; channel < 16; ++channel)
+	{
+		for(int key = 0; key < NumKeys; ++key)
+		{
+			m_instrument->handleMidiEvent(MidiEvent(MidiNoteOff, channel, key, 0));
+			m_runningMidiNotes[channel][key] = 0;
+		}
+		m_instrument->handleMidiEvent(MidiEvent(MidiPitchBend, channel, 8192));
+	}
+	m_midiNotesMutex.unlock();
+}
+
 
 
 f_cnt_t InstrumentTrack::beatLen( NotePlayHandle * _n ) const
@@ -732,6 +747,7 @@ void InstrumentTrack::updateMixerChannel()
 
 void InstrumentTrack::updateMPEConfiguration()
 {
+	resetAllMidiNotes();
 	m_MPEManager.sendMPEConfigSignals();
 }
 
