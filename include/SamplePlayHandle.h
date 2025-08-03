@@ -27,7 +27,6 @@
 #define LMMS_SAMPLE_PLAY_HANDLE_H
 
 #include "Sample.h"
-#include "SampleBuffer.h"
 #include "AutomatableModel.h"
 #include "PlayHandle.h"
 
@@ -38,7 +37,6 @@ namespace lmms
 class PatternTrack;
 class SampleClip;
 class Track;
-class AudioBusHandle;
 
 
 class LMMS_EXPORT SamplePlayHandle : public PlayHandle

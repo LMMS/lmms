@@ -26,12 +26,12 @@
 #define LMMS_GUI_GUI_APPLICATION_H
 
 #include <QObject>
-#include <QSocketNotifier>
 
 #include "lmms_export.h"
 #include "lmmsconfig.h"
 
 class QLabel;
+class QSocketNotifier;
 
 namespace lmms::gui
 {

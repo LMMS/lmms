@@ -24,7 +24,7 @@
 
 #include "ProjectVersion.h"
 
-#include <QtTest/QtTest>
+#include <QtTest>
 
 class ProjectVersionTest : public QObject
 {
