@@ -292,6 +292,8 @@ private:
 
 	void updateFrequency();
 
+	void sendMPEDetuning();
+
 	InstrumentTrack* m_instrumentTrack;		// needed for calling
 											// InstrumentTrack::playNote
 	f_cnt_t m_frames;						// total frames to play

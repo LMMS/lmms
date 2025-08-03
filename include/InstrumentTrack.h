@@ -34,6 +34,7 @@
 #include "Midi.h"
 #include "MidiEventProcessor.h"
 #include "MidiPort.h"
+#include "MPEManager.h"
 #include "NotePlayHandle.h"
 #include "Piano.h"
 #include "Plugin.h"
@@ -261,12 +262,15 @@ protected slots:
 	void updatePitch();
 	void updatePitchRange();
 	void updateMixerChannel();
+	void updateMPEConfiguration();
 
 
 private:
 	void processCCEvent(int controller);
 
 	MidiPort m_midiPort;
+
+	MPEManager m_MPEManager;
 
 	NotePlayHandle* m_notes[NumKeys];
 	NotePlayHandleList m_sustainedNotes;
@@ -316,6 +320,7 @@ private:
 	friend class NotePlayHandle;
 	friend class gui::InstrumentTuningView;
 	friend class gui::MidiCCRackView;
+	friend class MPEManager;
 
 } ;
 

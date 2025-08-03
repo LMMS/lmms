@@ -68,6 +68,11 @@ private:
 	LcdSpinBox * m_fixedOutputNoteSpinBox;
 	QToolButton * m_wpBtn;
 
+	GroupBox * m_MPEGroupBox;
+	LcdSpinBox * m_MPELowerZoneChannelsSpinBox;
+	LcdSpinBox * m_MPEUpperZoneChannelsSpinBox;
+	LcdSpinBox * m_MPEPitchRangeSpinBox;
+
 	LcdSpinBox* m_baseVelocitySpinBox;
 
 } ;

@@ -32,6 +32,7 @@
 #include "Instrument.h"
 #include "Song.h"
 #include "lmms_math.h"
+#include <QDebug>
 
 namespace lmms
 {
@@ -115,6 +116,12 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 	}
 
 	setAudioBusHandle(instrumentTrack->audioBusHandle());
+
+	// Notify MPE manager that a new note was created on this channel to update note counts
+	// Normally this would be done on the actual NoteOn event, but those are only sent
+	// once the processing starts, which is too late when trying to route chords.
+	m_instrumentTrack->m_MPEManager.noteOn(midiChannel());
+	qDebug() << "MPE Note On tally!";
 
 	unlock();
 }
@@ -226,6 +233,12 @@ void NotePlayHandle::play( SampleFrame* _working_buffer )
 		m_hasMidiNote = true;
 
 		const int baseVelocity = m_instrumentTrack->midiPort()->baseVelocity();
+
+		// According to the MPE specification (page 16, section 2.4), The initial pitch/pressure/timbre should be sent before the NoteOn event.
+		if (m_instrumentTrack->midiPort()->MPEEnabled())
+		{
+			sendMPEDetuning();
+		}
 
 		// send MidiNoteOn event
 		m_instrumentTrack->processOutEvent(
@@ -406,6 +419,10 @@ void NotePlayHandle::noteOff( const f_cnt_t _s )
 			m_instrumentTrack->midiNoteOff( *this );
 		}
 	}
+
+	// Notify MPE Manager to update channel note counts
+	m_instrumentTrack->m_MPEManager.noteOff(midiChannel());
+	qDebug() << "MPE Note Off tally!";
 }
 
 
@@ -572,10 +589,22 @@ void NotePlayHandle::processTimePos(const TimePos& time, float pitchValue, bool 
 		{
 			m_baseDetuning->setValue(v);
 			updateFrequency();
+			if (m_instrumentTrack->midiPort()->MPEEnabled())
+			{
+				sendMPEDetuning();
+			}
 		}
 	}
 }
 
+
+void NotePlayHandle::sendMPEDetuning()
+{
+	const float v = m_baseDetuning->value();
+	const int pitchRange = m_instrumentTrack->midiPort()->MPEPitchRange();
+	const int pitchBendValue = static_cast<int>(std::clamp(0.5f * v / pitchRange + 0.5f, 0.0f, 1.0f) * 16384);
+	m_instrumentTrack->processOutEvent(MidiEvent(MidiPitchBend, midiChannel(), pitchBendValue));
+}
 
 
 

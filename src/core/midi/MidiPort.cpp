@@ -63,7 +63,11 @@ MidiPort::MidiPort( const QString& name,
 	m_outputProgramModel( 1, 1, MidiProgramCount, this, tr( "Output MIDI program" ) ),
 	m_baseVelocityModel( MidiMaxVelocity/2, 1, MidiMaxVelocity, this, tr( "Base velocity" ) ),
 	m_readableModel( false, this, tr( "Receive MIDI-events" ) ),
-	m_writableModel( false, this, tr( "Send MIDI-events" ) )
+	m_writableModel( false, this, tr( "Send MIDI-events" ) ),
+	m_MPEModel(false, this, tr("Send MPE Config Message and route note events across multiple channels")),
+	m_MPELowerZoneChannelsModel(16, 0, MidiChannelCount, this, tr("Number of channels used for MPE Lower Zone")),
+	m_MPEUpperZoneChannelsModel(0, 0, MidiChannelCount, this, tr("Number of channels used for MPE Upper Zone")),
+	m_MPEPitchRangeModel(48, 0, 96, this, tr( "Semitone pitch bend range for member channels (both MPE zones)"))
 {
 	m_midiClient->addPort( this );
 
@@ -76,6 +80,23 @@ MidiPort::MidiPort( const QString& name,
 			this, SLOT(updateMidiPortMode()), Qt::DirectConnection );
 	connect( &m_outputProgramModel, SIGNAL(dataChanged()),
 			this, SLOT(updateOutputProgram()), Qt::DirectConnection );
+	connect(&m_MPEModel, &AutomatableModel::dataChanged, this, &MidiPort::MPEConfigurationChanged, Qt::DirectConnection);
+	connect(&m_MPEUpperZoneChannelsModel, &AutomatableModel::dataChanged, this, &MidiPort::MPEConfigurationChanged, Qt::DirectConnection);
+	connect(&m_MPELowerZoneChannelsModel, &AutomatableModel::dataChanged, this, &MidiPort::MPEConfigurationChanged, Qt::DirectConnection);
+	connect(&m_MPEPitchRangeModel, &AutomatableModel::dataChanged, this, &MidiPort::MPEConfigurationChanged, Qt::DirectConnection);
+	// Ensure the zones do not overlap
+	connect(&m_MPEUpperZoneChannelsModel, &AutomatableModel::dataChanged, this, [&](){
+		if (m_MPELowerZoneChannelsModel.value() > 16 - m_MPEUpperZoneChannelsModel.value())
+		{
+			m_MPELowerZoneChannelsModel.setValue(16 - m_MPEUpperZoneChannelsModel.value());
+		}
+	});
+	connect(&m_MPELowerZoneChannelsModel, &AutomatableModel::dataChanged, this, [&](){
+		if (m_MPEUpperZoneChannelsModel.value() > 16 - m_MPELowerZoneChannelsModel.value())
+		{
+			m_MPEUpperZoneChannelsModel.setValue(16 - m_MPELowerZoneChannelsModel.value());
+		}
+	});
 
 
 	// when using with non-raw-clients we can provide buttons showing
@@ -196,6 +217,10 @@ void MidiPort::saveSettings( QDomDocument& doc, QDomElement& thisElement )
 	m_baseVelocityModel.saveSettings( doc, thisElement, "basevelocity" );
 	m_readableModel.saveSettings( doc, thisElement, "readable" );
 	m_writableModel.saveSettings( doc, thisElement, "writable" );
+	m_MPEModel.saveSettings(doc, thisElement, "mpe");
+	m_MPELowerZoneChannelsModel.saveSettings(doc, thisElement, "mpelowerchannels");
+	m_MPEUpperZoneChannelsModel.saveSettings(doc, thisElement, "mpeupperchannels");
+	m_MPEPitchRangeModel.saveSettings(doc, thisElement, "mpepitchrange");
 
 	if( isInputEnabled() )
 	{
@@ -250,6 +275,12 @@ void MidiPort::loadSettings( const QDomElement& thisElement )
 	m_baseVelocityModel.loadSettings( thisElement, "basevelocity" );
 	m_readableModel.loadSettings( thisElement, "readable" );
 	m_writableModel.loadSettings( thisElement, "writable" );
+	m_MPEModel.loadSettings(thisElement, "mpe");
+	m_MPELowerZoneChannelsModel.loadSettings(thisElement, "mpelowerchannels");
+	m_MPEUpperZoneChannelsModel.loadSettings(thisElement, "mpeupperchannels");
+	m_MPEPitchRangeModel.loadSettings(thisElement, "mpepitchrange");
+
+	emit MPEConfigurationChanged();
 
 	// restore connections
 

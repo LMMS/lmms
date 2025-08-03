@@ -66,6 +66,8 @@ class MidiPort : public Model, public SerializingObject
 	mapPropertyFromModel(int,baseVelocity,setBaseVelocity,m_baseVelocityModel);
 	mapPropertyFromModel(bool,isReadable,setReadable,m_readableModel);
 	mapPropertyFromModel(bool,isWritable,setWritable,m_writableModel);
+	mapPropertyFromModel(bool, MPEEnabled, setMPEEnabled, m_MPEModel);
+	mapPropertyFromModel(int, MPEPitchRange, setMPEPitchRange, m_MPEPitchRangeModel);
 public:
 	using Map = QMap<QString, bool>;
 
@@ -109,6 +111,19 @@ public:
 		// midi channels when forwarding. In that case, realOutputChannel will return the
 		// default channel 1 (whose value is 0).
 		return outputChannel() ? outputChannel() - 1 : 0;
+	}
+
+	int MPELowerZoneChannels() const
+	{
+		return MPEEnabled()
+			? m_MPELowerZoneChannelsModel.value()
+			: 0;
+	}
+	int MPEUpperZoneChannels() const
+	{
+		return MPEEnabled()
+			? m_MPEUpperZoneChannelsModel.value()
+			: 0;
 	}
 
 	void processInEvent( const MidiEvent& event, const TimePos& time = TimePos() );
@@ -170,6 +185,11 @@ private:
 	BoolModel m_readableModel;
 	BoolModel m_writableModel;
 
+	BoolModel m_MPEModel;
+	IntModel m_MPELowerZoneChannelsModel;
+	IntModel m_MPEUpperZoneChannelsModel;
+	IntModel m_MPEPitchRangeModel;
+
 	Map m_readablePorts;
 	Map m_writablePorts;
 
@@ -181,6 +201,7 @@ private:
 signals:
 	void readablePortsChanged();
 	void writablePortsChanged();
+	void MPEConfigurationChanged();
 	void modeChanged();
 
 } ;

@@ -23,6 +23,7 @@
  */
 #include "InstrumentTrack.h"
 
+#include <QDebug>
 #include "AudioEngine.h"
 #include "AutomationClip.h"
 #include "ConfigManager.h"
@@ -50,6 +51,7 @@ InstrumentTrack::InstrumentTrack(TrackContainer* tc) :
 	Track(Track::Type::Instrument, tc),
 	MidiEventProcessor(),
 	m_midiPort(tr("unnamed_track"), Engine::audioEngine()->midiClient(), this, this),
+	m_MPEManager(this),
 	m_notes(),
 	m_sustainPedalPressed(false),
 	m_silentBuffersProcessed(false),
@@ -109,6 +111,7 @@ InstrumentTrack::InstrumentTrack(TrackContainer* tc) :
 	connect(&m_pitchModel, SIGNAL(dataChanged()), this, SLOT(updatePitch()), Qt::DirectConnection);
 	connect(&m_pitchRangeModel, SIGNAL(dataChanged()), this, SLOT(updatePitchRange()), Qt::DirectConnection);
 	connect(&m_mixerChannelModel, SIGNAL(dataChanged()), this, SLOT(updateMixerChannel()), Qt::DirectConnection);
+	connect(&m_midiPort, &MidiPort::MPEConfigurationChanged, this, &InstrumentTrack::updateMPEConfiguration, Qt::DirectConnection);
 
 	autoAssignMidiDevice(true);
 }
@@ -340,15 +343,22 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const TimePos& tim
 				// play a note only if it is not already playing and if it is within configured bounds
 				if (m_notes[event.key()] == nullptr && event.key() >= firstKey() && event.key() <= lastKey())
 				{
+					// If MPE is enabled, the MPE manager must figure out which of the 16 midi channels is most available to route this note.
+					const int eventChannel = midiPort()->MPEEnabled()
+						? m_MPEManager.findAvailableChannel(event.key())
+						: event.channel();
+					qDebug() << "Playing note channel" << eventChannel << event.channel();
+
 					NotePlayHandle* nph =
 						NotePlayHandleManager::acquire(
 								this, offset,
 								std::numeric_limits<f_cnt_t>::max() / 2,
 								Note(TimePos(), Engine::getSong()->getPlayPos(Engine::getSong()->playMode()),
 										event.key(), event.volume(midiPort()->baseVelocity())),
-								nullptr, event.channel(),
+								nullptr, eventChannel,
 								NotePlayHandle::Origin::MidiInput);
 					m_notes[event.key()] = nph;
+					// TODO do we need to also do a noteOff if this fails?
 					if( ! Engine::audioEngine()->addPlayHandle( nph ) )
 					{
 						m_notes[event.key()] = nullptr;
@@ -478,7 +488,8 @@ void InstrumentTrack::processOutEvent( const MidiEvent& event, const TimePos& ti
 
 	// If we have a selected output midi channel between 1-16, we will use that channel to handle the midi event.
 	// But if our selected midi output channel is 0 ("--"), we will use the event channel instead.
-	const auto handleEventOutputChannel = midiPort()->outputChannel() == 0
+	// TODO what about MPE? Should it override this?
+	const auto handleEventOutputChannel = midiPort()->outputChannel() == 0 || midiPort()->MPEEnabled()
 		? event.channel()
 		: midiPort()->realOutputChannel();
 
@@ -678,6 +689,13 @@ void InstrumentTrack::updateMixerChannel()
 
 
 
+void InstrumentTrack::updateMPEConfiguration()
+{
+	m_MPEManager.sendMPEConfigSignals();
+}
+
+
+
 
 int InstrumentTrack::masterKey( int _midi_key ) const
 {
@@ -790,7 +808,13 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 				? 0
 				: (currentNote->endPos() - cur_start - noteOverlap) * frames_per_tick;
 
-			NotePlayHandle* notePlayHandle = NotePlayHandleManager::acquire(this, _offset, noteFrames, *currentNote);
+			// If MPE is enabled, the MPE manager will figure out which of the 16 midi channels is most available to route this note to.
+			// By default, clip-based notes have no midi channel, so NotePlayHandleManager defaults them to -1, which gets replaced with the default output channel
+			const int eventChannel = midiPort()->MPEEnabled()
+				? m_MPEManager.findAvailableChannel(currentNote->key())
+				: -1;
+			qDebug() << "Playing note channel from clip" << eventChannel;
+			NotePlayHandle* notePlayHandle = NotePlayHandleManager::acquire(this, _offset, noteFrames, *currentNote, nullptr, eventChannel);
 			notePlayHandle->setPatternTrack(pattern_track);
 			// are we playing global song?
 			if( _clip_num < 0 )

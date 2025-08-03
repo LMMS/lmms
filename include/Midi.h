@@ -121,6 +121,7 @@ enum MidiControllerRegisteredParameterNumbers
 	MidiTuningProgramChangeRPN = 0x0003,
 	MidiTuningBankSelectRPN = 0x0004,
 	MidiModulationDepthRangeRPN = 0x0005,
+	MidiMPEConfigurationRPN = 0x0006,
 	MidiNullFunctionNumberRPN = 0x7F7F
 };
 

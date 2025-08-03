@@ -142,6 +142,38 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 		midiOutputLayout->insertWidget( 0, m_wpBtn );
 	}
 
+
+
+	m_MPEGroupBox = new GroupBox(tr("ENABLE MPE"));
+	layout->addWidget( m_MPEGroupBox );
+
+
+	auto MPELayout = new QHBoxLayout(m_MPEGroupBox);
+	MPELayout->setContentsMargins( 8, 18, 8, 8 );
+	MPELayout->setSpacing( 4 );
+
+	m_MPELowerZoneChannelsSpinBox = new LcdSpinBox(2, m_MPEGroupBox);
+	m_MPELowerZoneChannelsSpinBox->addTextForValue(0, "--");
+	m_MPELowerZoneChannelsSpinBox->setLabel(tr("LOWER"));
+	MPELayout->addWidget( m_MPELowerZoneChannelsSpinBox );
+
+	m_MPEUpperZoneChannelsSpinBox = new LcdSpinBox(2, m_MPEGroupBox);
+	m_MPEUpperZoneChannelsSpinBox->addTextForValue( 0, "--" );
+	m_MPEUpperZoneChannelsSpinBox->setLabel(tr("UPPER"));
+	MPELayout->addWidget( m_MPEUpperZoneChannelsSpinBox );
+
+	m_MPEPitchRangeSpinBox = new LcdSpinBox(2, m_MPEGroupBox);
+	m_MPEPitchRangeSpinBox->setLabel(tr("RANGE"));
+	MPELayout->addWidget(m_MPEPitchRangeSpinBox);
+
+	MPELayout->addStretch();
+
+	connect( m_midiOutputGroupBox->ledButton(), SIGNAL(toggled(bool)),
+		m_fixedOutputVelocitySpinBox, SLOT(setEnabled(bool)));
+	connect( m_midiOutputGroupBox->ledButton(), SIGNAL(toggled(bool)),
+			m_outputProgramSpinBox, SLOT(setEnabled(bool)));
+
+
 	auto baseVelocityGroupBox = new GroupBox(tr("VELOCITY MAPPING"));
 	baseVelocityGroupBox->setLedButtonShown(false);
 	layout->addWidget( baseVelocityGroupBox );
@@ -175,6 +207,11 @@ void InstrumentMidiIOView::modelChanged()
 	m_fixedOutputVelocitySpinBox->setModel( &mp->m_fixedOutputVelocityModel );
 	m_fixedOutputNoteSpinBox->setModel( &mp->m_fixedOutputNoteModel );
 	m_outputProgramSpinBox->setModel( &mp->m_outputProgramModel );
+
+	m_MPEGroupBox->setModel(&mp->m_MPEModel);
+	m_MPELowerZoneChannelsSpinBox->setModel(&mp->m_MPELowerZoneChannelsModel);
+	m_MPEUpperZoneChannelsSpinBox->setModel(&mp->m_MPEUpperZoneChannelsModel);
+	m_MPEPitchRangeSpinBox->setModel(&mp->m_MPEPitchRangeModel);
 
 	m_baseVelocitySpinBox->setModel( &mp->m_baseVelocityModel );
 
