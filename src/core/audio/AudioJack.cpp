@@ -57,6 +57,21 @@ QString getInputKeyByChannel(size_t channel)
 	return "input" + QString::number(channel + 1);
 }
 
+void printJackStatus(jack_status_t status)
+{
+	printf("Status: 0x%2.0x\n", status);
+
+	if (status & JackFailure)
+	{
+		printf("Overall operation failed. JACK dependencies might need to get installed.\n");
+	}
+
+	if (status & JackServerFailed)
+	{
+		printf("Could not connect to JACK server.\n");
+	}
+}
+
 }
 
 namespace lmms
@@ -172,8 +187,9 @@ bool AudioJack::initJackClient()
 	m_client = jack_client_open(clientName.toLatin1().constData(), JackNullOption, &status, serverName);
 	if (m_client == nullptr)
 	{
-		printf("jack_client_open() failed, status 0x%2.0x\n", status);
-		if (status & JackServerFailed) { printf("Could not connect to JACK server.\n"); }
+		printf("jack_client_open() failed, ");
+		printJackStatus(status);
+
 		return false;
 	}
 	if (status & JackNameNotUnique)
@@ -483,6 +499,11 @@ AudioJack::setupWidget::setupWidget(QWidget* parent)
 	const char* serverName = nullptr;
 	jack_status_t status;
 	m_client = jack_client_open("LMMS-Setup Dialog", JackNullOption, &status, serverName);
+	if (!m_client)
+	{
+		printf("jack_client_open() failed, ");
+		printJackStatus(status);
+	}
 
 	QFormLayout * form = new QFormLayout(this);
 
@@ -561,6 +582,14 @@ void AudioJack::setupWidget::saveSettings()
 std::vector<std::string> AudioJack::setupWidget::getAudioPortNames(JackPortFlags portFlags) const
 {
 	std::vector<std::string> audioPorts;
+
+	// We are using weak_ libjack. If JACK is not installed this will result in the client being nullptr.
+	// Because jack_get_ports in weak_libjack does not check for nullptr we have to do this here and fail gracefully,
+	// i.e. with an empty list of audio ports.
+	if (!m_client)
+	{
+		return audioPorts;
+	}
 
 	const char **inputAudioPorts = jack_get_ports(m_client, nullptr, JACK_DEFAULT_AUDIO_TYPE, portFlags);
 	if (inputAudioPorts)
