@@ -45,7 +45,7 @@ AudioBusHandle::AudioBusHandle(const QString& name, bool hasEffectChain,
 	m_extOutputEnabled(false),
 	m_nextMixerChannel(0),
 	m_name(name),
-	m_effects(hasEffectChain ? new EffectChain(nullptr) : nullptr),
+	m_effects(hasEffectChain ? new EffectChain : nullptr),
 	m_volumeModel(volumeModel),
 	m_panningModel(panningModel),
 	m_mutedModel(mutedModel)
