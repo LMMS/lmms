@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef SLEW_DISTORTION_CONTROL_DIALOG_H
-#define SLEW_DISTORTION_CONTROL_DIALOG_H
+#ifndef LMMS_GUI_SLEW_DISTORTION_CONTROL_DIALOG_H
+#define LMMS_GUI_SLEW_DISTORTION_CONTROL_DIALOG_H
 
 #include "EffectControlDialog.h"
 #include <QTextEdit>
@@ -47,7 +47,7 @@ public:
 	SlewDistortionControlDialog(SlewDistortionControls* controls);
 	~SlewDistortionControlDialog() override = default;
 	
-	void paintEvent(QPaintEvent *event) override;
+	void paintEvent(QPaintEvent* event) override;
 public slots:
 	void showHelpWindow();
 private:
@@ -81,4 +81,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_SLEW_DISTORTION_CONTROL_DIALOG_H

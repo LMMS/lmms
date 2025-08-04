@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef SLEW_DISTORTION_CONTROLS_H
-#define SLEW_DISTORTION_CONTROLS_H
+#ifndef LMMS_SLEW_DISTORTION_CONTROLS_H
+#define LMMS_SLEW_DISTORTION_CONTROLS_H
 
 #include "EffectControls.h"
 #include "SlewDistortionControlDialog.h"
@@ -117,4 +117,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_SLEW_DISTORTION_CONTROLS_H

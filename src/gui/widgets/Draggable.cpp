@@ -1,7 +1,7 @@
 /*
  * Draggable.cpp
  *
- * Copyright (c) 2022 Lost Robot <r94231/at/gmail/dot/com>
+ * Copyright (c) 2025 Lost Robot <r94231/at/gmail/dot/com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -34,7 +34,7 @@ namespace lmms::gui
 {
 
 Draggable::Draggable(FloatModelEditorBase::DirectionOfManipulation directionOfManipulation, 
-	FloatModel* floatModel, const QPixmap &pixmap, int pointA, int pointB, QWidget* parent)
+	FloatModel* floatModel, const QPixmap& pixmap, int pointA, int pointB, QWidget* parent)
 	: FloatModelEditorBase(directionOfManipulation, parent),
 	  m_pixmap(pixmap),
 	  m_defaultValPixmap(),
@@ -53,13 +53,13 @@ QSize Draggable::sizeHint() const
 	return m_pixmap.size();
 }
 
-void Draggable::setPixmap(const QPixmap &pixmap)
+void Draggable::setPixmap(const QPixmap& pixmap)
 {
 	m_pixmap = pixmap;
 	update();
 }
 
-void Draggable::setDefaultValPixmap(const QPixmap &pixmap, float value)
+void Draggable::setDefaultValPixmap(const QPixmap& pixmap, float value)
 {
 	m_defaultValPixmap = pixmap;
 	m_defaultValue = value;
@@ -67,7 +67,7 @@ void Draggable::setDefaultValPixmap(const QPixmap &pixmap, float value)
 	update();
 }
 
-void Draggable::paintEvent(QPaintEvent *event)
+void Draggable::paintEvent(QPaintEvent* event)
 {
 	Q_UNUSED(event);
 	QPainter painter(this);
@@ -82,7 +82,7 @@ void Draggable::paintEvent(QPaintEvent *event)
 	}
 }
 
-void Draggable::mouseMoveEvent(QMouseEvent *me)
+void Draggable::mouseMoveEvent(QMouseEvent* me)
 {
 	QPoint pPos = mapToParent(me->pos());
 

@@ -195,7 +195,7 @@ SlewDistortionControlDialog::SlewDistortionControlDialog(SlewDistortionControls*
 	connect(getGUI()->mainWindow(), SIGNAL(periodicUpdate()), this, SLOT(update()));
 }
 
-void SlewDistortionControlDialog::paintEvent(QPaintEvent *event)
+void SlewDistortionControlDialog::paintEvent(QPaintEvent* event)
 {
 	QPainter p(this);
 	p.setRenderHint(QPainter::Antialiasing);
@@ -470,7 +470,7 @@ QString SlewDistortionHelpView::s_helpText = tr(
 
 
 
-SlewDistortionHelpView::SlewDistortionHelpView():QTextEdit(s_helpText)
+SlewDistortionHelpView::SlewDistortionHelpView() : QTextEdit(s_helpText)
 {
 #if (QT_VERSION < QT_VERSION_CHECK(5,12,0))
 	// Bug workaround: https://codereview.qt-project.org/c/qt/qtbase/+/225348

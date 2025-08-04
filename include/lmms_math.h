@@ -287,7 +287,7 @@ private:
 #ifdef __SSE2__
 // exp approximation for SSE2: https://stackoverflow.com/a/47025627/5759631
 // Maximum relative error of 1.72863156e-3 on [-87.33654, 88.72283]
-static inline __m128 fast_exp_sse(__m128 x)
+inline __m128 fastExp(__m128 x)
 {
 	__m128 f, p, r;
 	__m128i t, j;
@@ -313,7 +313,8 @@ static inline __m128 fast_exp_sse(__m128 x)
 
 // Lost Robot's SSE2 adaptation of Kari's vectorized log approximation: https://stackoverflow.com/a/65537754/5759631
 // Maximum relative error of 7.922410e-4 on [1.0279774e-38f, 3.4028235e+38f]
-static inline __m128 fast_log_sse(__m128 a) {
+inline __m128 fastLog(__m128 a)
+{
 	__m128i aInt = _mm_castps_si128(a);
 	__m128i e = _mm_sub_epi32(aInt, _mm_set1_epi32(0x3f2aaaab));
 	e = _mm_and_si128(e, _mm_set1_epi32(0xff800000));

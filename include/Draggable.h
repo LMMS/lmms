@@ -22,8 +22,8 @@
  *
  */
  
-#ifndef DRAGGABLE_H
-#define DRAGGABLE_H
+#ifndef LMMS_GUI_DRAGGABLE_H
+#define LMMS_GUI_DRAGGABLE_H
 
 #include "FloatModelEditorBase.h"
 
@@ -47,15 +47,15 @@ public:
 	 * @param parent Parent QWidget
 	 */
 	Draggable(FloatModelEditorBase::DirectionOfManipulation directionOfManipulation,
-		FloatModel* floatModel, const QPixmap &pixmap, int pointA, int pointB, QWidget* parent = nullptr);
+		FloatModel* floatModel, const QPixmap& pixmap, int pointA, int pointB, QWidget* parent = nullptr);
 
 	QSize sizeHint() const override;
-	void setPixmap(const QPixmap &pixmap);
-	void setDefaultValPixmap(const QPixmap &pixmap, float value = 0.f);
+	void setPixmap(const QPixmap& pixmap);
+	void setDefaultValPixmap(const QPixmap& pixmap, float value = 0.f);
 
 protected:
-	void paintEvent(QPaintEvent *event) override;
-	void mouseMoveEvent(QMouseEvent *me) override;
+	void paintEvent(QPaintEvent* event) override;
+	void mouseMoveEvent(QMouseEvent* me) override;
 
 protected slots:
 	void handleMovement();
@@ -71,4 +71,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_DRAGGABLE_H

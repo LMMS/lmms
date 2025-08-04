@@ -1,7 +1,7 @@
 /*
  * OversamplingHelpers.h
  *
- * Copyright (c) 2023 Lost Robot <r94231/at/gmail/dot/com>
+ * Copyright (c) 2025 Lost Robot <r94231/at/gmail/dot/com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -22,18 +22,18 @@
  *
  */
 
-#ifndef OVERSAMPLING_HELPERS_H
-#define OVERSAMPLING_HELPERS_H
+#ifndef LMMS_OVERSAMPLING_HELPERS_H
+#define LMMS_OVERSAMPLING_HELPERS_H
 
 #include <algorithm>
 #include <array>
 
-#include "hiir/PolyphaseIir2Designer.h"
-#include "hiir/Downsampler2xFpu.h"
-#include "hiir/Upsampler2xFpu.h"
+#include <hiir/PolyphaseIir2Designer.h>
+#include <hiir/Downsampler2xFpu.h>
+#include <hiir/Upsampler2xFpu.h>
 
-constexpr float HIIR_DEFAULT_PASSBAND = 19600;
-constexpr int HIIR_DEFAULT_MAX_COEFS = 8;
+inline constexpr float HIIR_DEFAULT_PASSBAND = 19600;
+inline constexpr int HIIR_DEFAULT_MAX_COEFS = 8;
 
 namespace lmms
 {
@@ -222,5 +222,5 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_OVERSAMPLING_HELPERS_H
 

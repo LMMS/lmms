@@ -22,9 +22,10 @@
  *
  */
 
+#include "SlewDistortionControls.h"
+
 #include <QDomElement>
 
-#include "SlewDistortionControls.h"
 #include "SlewDistortion.h"
 
 namespace lmms
@@ -144,7 +145,7 @@ void SlewDistortionControls::loadSettings(const QDomElement& parent)
 
 void SlewDistortionControls::saveSettings(QDomDocument& doc, QDomElement& parent)
 {
-   m_distType1Model.saveSettings(doc, parent, "distType1");
+	m_distType1Model.saveSettings(doc, parent, "distType1");
 	m_distType2Model.saveSettings(doc, parent, "distType2");
 	m_drive1Model.saveSettings(doc, parent, "drive1");
 	m_drive2Model.saveSettings(doc, parent, "drive2");

@@ -191,10 +191,10 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 			// this is the input signal's slew rate
 			__m128 rate = _mm_sub_ps(in, slewOut);
 
-			__m128 scaledLog = _mm_mul_ps(dynamicSlew, fast_log_sse(inEnv));
-			// clamp to [-87.0f, 87.0f] since fast_exp_sse breaks outside of those bounds
+			__m128 scaledLog = _mm_mul_ps(dynamicSlew, fastLog(inEnv));
+			// clamp to [-87.0f, 87.0f] since fastExp for SSE breaks outside of those bounds
 			__m128 clampedScaledLog = _mm_max_ps(_mm_min_ps(scaledLog, _mm_set1_ps(87.0f)), _mm_set1_ps(-87.0f));
-			__m128 slewMult = fast_exp_sse(clampedScaledLog);
+			__m128 slewMult = fastExp(clampedScaledLog);
 
 			// determine whether we should use the slew up or slew down parameter
 			__m128 finalMask = _mm_or_ps(_mm_cmpge_ps(rate, zero), slewLinkMask);
@@ -241,10 +241,10 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 					}
 					case SlewDistortionType::Tanh: // Tanh => 2 / (1 + exp(-2x)) - 1
 					{
-						// clamp to [-87.0f, 87.0f] since fast_exp_sse breaks outside of those bounds
+						// clamp to [-87.0f, 87.0f] since fastExp for SSE breaks outside of those bounds
 						__m128 clampedInput = _mm_max_ps(_mm_min_ps(_mm_mul_ps(_mm_set1_ps(-2.0f),
 							distInFull), _mm_set1_ps(87.0f)), _mm_set1_ps(-87.0f));
-						__m128 expResult = fast_exp_sse(clampedInput);
+						__m128 expResult = fastExp(clampedInput);
 						distOutFull = _mm_sub_ps(_mm_div_ps(_mm_set1_ps(2.0f), _mm_add_ps(one, expResult)), one);
 						break;
 					}
