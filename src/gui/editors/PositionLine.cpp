@@ -46,7 +46,7 @@ PositionLine::PositionLine(QWidget* parent, Song::PlayMode playMode) :
 void PositionLine::paintEvent(QPaintEvent* pe)
 {
 	QPainter p(this);
-	auto c = !isRecording ? m_lineColor : m_recordingColor;
+	auto c = !m_isRecording ? m_lineColor : m_recordingColor;
 
 	// If width is 1, we don't need a gradient
 	if (width() == 1)

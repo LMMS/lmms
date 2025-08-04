@@ -219,14 +219,14 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 		p.fillRect(rightHandle, color);
 	}
 
-	QPixmap marker = !isRecoridng ? m_posMarkerPixmap : m_recordingPosMarkerPixmap;
+	const QPixmap& marker = !m_isRecording ? m_posMarkerPixmap : m_recordingPosMarkerPixmap;
 
 	// Only draw the position marker if the position line is in view
 	if (markerX(m_pos) >= m_xOffset && markerX(m_pos) < width() - marker.width() / 2)
 	{
 		// Let the position marker extrude to the left
 		p.setClipping(false);
-		p.setOpacity(isPlayheadVisible ? 0.6 : 0);
+		p.setOpacity(m_isPlayheadVisible ? 0.6 : 0);
 		p.drawPixmap(markerX(m_pos) - (marker.width() / 2),
 			height() - marker.height(), marker);
 	}

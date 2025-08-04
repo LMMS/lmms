@@ -153,8 +153,13 @@ public:
 					m_ppb / TimePos::ticksPerBar() );
 	}
 
-	bool isRecoridng = false;
-	bool isPlayheadVisible = true;
+	bool isRecording() const { return m_isRecording; }
+
+	void setRecording(bool recording) { m_isRecording = recording; }
+
+	bool isPlayheadVisible() const { return m_isPlayheadVisible; }
+
+	void setPlayheadVisible(bool visible) { m_isPlayheadVisible = visible; }
 
 signals:
 	void positionChanged(const lmms::TimePos& postion);
@@ -228,6 +233,9 @@ private:
 	// position allows for unquantized drag but fails when toggling quantization.
 	std::array<TimePos, 2> m_oldLoopPos;
 	TimePos m_dragStartPos;
+
+	bool m_isRecording = false;
+	bool m_isPlayheadVisible = true;
 
 	TextFloat* m_hint = nullptr;
 	int m_initalXSelect;

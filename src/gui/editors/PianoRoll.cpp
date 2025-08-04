@@ -4203,8 +4203,8 @@ void PianoRoll::record()
 
 	Engine::getSong()->playMidiClip( m_midiClip, false );
 
-	m_timeLine->isRecoridng = true;
-	m_positionLine->isRecording = true;
+	m_timeLine->setRecording(true);
+	m_positionLine->setRecording(true);
 }
 
 
@@ -4235,8 +4235,8 @@ void PianoRoll::recordAccompany()
 
 	auto* songEditor = GuiApplication::instance()->songEditor()->m_editor;
 
-	songEditor->timeLine()->isRecoridng = true;
-	songEditor->positionLine()->isRecording = true;
+	songEditor->timeLine()->setRecording(true);
+	songEditor->positionLine()->setRecording(true);
 	m_positionLine->update();
 }
 
@@ -4269,7 +4269,7 @@ bool PianoRoll::toggleStepRecording()
 	bool isRecording = m_stepRecorder.isRecording();
 
 	// hide playhead when step recording
-	m_timeLine->isPlayheadVisible = !isRecording;
+	m_timeLine->setPlayheadVisible(!isRecording);
 	m_positionLine->setVisible(!isRecording);
 	m_positionLine->update();
 
@@ -4287,10 +4287,10 @@ void PianoRoll::stop()
 
 	auto* songEditor = GuiApplication::instance()->songEditor()->m_editor;
 
-	songEditor->timeLine()->isRecoridng = false;
-	songEditor->positionLine()->isRecording = false;
-	m_timeLine->isRecoridng = false;
-	m_positionLine->isRecording = false;
+	songEditor->timeLine()->setRecording(false);
+	songEditor->positionLine()->setRecording(false);
+	m_timeLine->setRecording(false);
+	m_positionLine->setRecording(false);
 	m_positionLine->update();
 }
 

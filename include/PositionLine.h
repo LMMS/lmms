@@ -41,7 +41,14 @@ class PositionLine : public QWidget
 	Q_PROPERTY(QColor recordingColor MEMBER m_recordingColor)
 public:
 	PositionLine(QWidget* parent, Song::PlayMode playMode);
-	bool isRecording = false;
+
+	bool isRecording() const {
+		return m_isRecording;
+	}
+
+	void setRecording(bool recording) {
+		m_isRecording = recording;
+	}
 
 public slots:
 	void zoomChange(float zoom);
@@ -50,6 +57,7 @@ private:
 	void paintEvent(QPaintEvent* pe) override;
 
 	Song::PlayMode m_playMode;
+	bool m_isRecording = false;
 
 	bool m_hasTailGradient;
 	QColor m_lineColor;
