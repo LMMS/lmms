@@ -104,6 +104,8 @@ class InterleavedFrameIteratorData
 {
 public:
 	constexpr InterleavedFrameIteratorData() = default;
+	constexpr InterleavedFrameIteratorData(const InterleavedFrameIteratorData&) = default;
+
 	constexpr explicit InterleavedFrameIteratorData(T* data) noexcept
 		: m_data{data}
 	{
@@ -121,6 +123,8 @@ class InterleavedFrameIteratorData<T, DynamicChannelCount>
 {
 public:
 	constexpr InterleavedFrameIteratorData() = default;
+	constexpr InterleavedFrameIteratorData(const InterleavedFrameIteratorData&) = default;
+
 	constexpr InterleavedFrameIteratorData(T* data, proc_ch_t channels) noexcept
 		: m_data{data}
 		, m_channels{channels}
@@ -145,20 +149,7 @@ public:
 	using value_type = T*;
 	using difference_type = std::ptrdiff_t;
 
-	constexpr InterleavedFrameIterator() = default;
-	constexpr InterleavedFrameIterator(const InterleavedFrameIterator&) = default;
-
-	template<typename U = T> requires (channelCount != DynamicChannelCount)
-	constexpr explicit InterleavedFrameIterator(U* data) noexcept
-		: Base{data}
-	{
-	}
-
-	template<typename U = T> requires (channelCount == DynamicChannelCount)
-	constexpr InterleavedFrameIterator(U* data, proc_ch_t channels) noexcept
-		: Base{data, channels}
-	{
-	}
+	using Base::Base;
 
 	constexpr auto operator*() const noexcept -> value_type { return this->m_data; }
 
