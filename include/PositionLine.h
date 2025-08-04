@@ -46,9 +46,7 @@ public:
 		return m_isRecording;
 	}
 
-	void setRecording(bool recording) {
-		m_isRecording = recording;
-	}
+	void setRecording(bool recording);
 
 public slots:
 	void zoomChange(float zoom);

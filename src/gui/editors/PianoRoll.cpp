@@ -4237,7 +4237,6 @@ void PianoRoll::recordAccompany()
 
 	songEditor->timeLine()->setRecording(true);
 	songEditor->positionLine()->setRecording(true);
-	m_positionLine->update();
 }
 
 
@@ -4271,7 +4270,6 @@ bool PianoRoll::toggleStepRecording()
 	// hide playhead when step recording
 	m_timeLine->setPlayheadVisible(!isRecording);
 	m_positionLine->setVisible(!isRecording);
-	m_positionLine->update();
 
 	return isRecording;
 }
@@ -4291,7 +4289,6 @@ void PianoRoll::stop()
 	songEditor->positionLine()->setRecording(false);
 	m_timeLine->setRecording(false);
 	m_positionLine->setRecording(false);
-	m_positionLine->update();
 }
 
 

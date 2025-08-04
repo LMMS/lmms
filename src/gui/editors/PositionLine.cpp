@@ -43,6 +43,15 @@ PositionLine::PositionLine(QWidget* parent, Song::PlayMode playMode) :
 	setAttribute(Qt::WA_TransparentForMouseEvents);
 }
 
+void PositionLine::setRecording(bool recording)
+{
+	if (m_isRecording != recording)
+	{
+		m_isRecording = recording;
+		update();
+	}
+}
+
 void PositionLine::paintEvent(QPaintEvent* pe)
 {
 	QPainter p(this);
