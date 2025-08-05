@@ -27,6 +27,7 @@
 #define LMMS_AUDIO_BUFFER_VIEW_H
 
 #include <cassert>
+#include <concepts>
 #include <span>
 #include <type_traits>
 
@@ -446,6 +447,9 @@ public:
 	{
 		return {reinterpret_cast<const SampleFrame*>(this->m_data), this->m_frames};
 	}
+
+	//! Use to distinguish between `InterleavedBufferView` and `PlanarBufferView` when using `AnyBufferView`
+	static constexpr bool Interleaved = true;
 };
 
 // Check that the std::span-like space optimization works
@@ -540,11 +544,20 @@ public:
 	{
 		return bufferPtr(channel);
 	}
+
+	//! Use to distinguish between `InterleavedBufferView` and `PlanarBufferView` when using `AnyBufferView`
+	static constexpr bool Interleaved = false;
 };
 
 // Check that the std::span-like space optimization works
 static_assert(sizeof(PlanarBufferView<float>) > sizeof(PlanarBufferView<float, 2>));
 static_assert(sizeof(PlanarBufferView<float, 2>) == sizeof(void**) + sizeof(f_cnt_t));
+
+
+//! Concept for any buffer view - interleaved or planar
+template<class T, typename U, proc_ch_t channels = DynamicChannelCount>
+concept AnyBufferView = SampleType<U> && (std::convertible_to<T, InterleavedBufferView<U, channels>>
+	|| std::convertible_to<T, PlanarBufferView<U, channels>>);
 
 } // namespace lmms
 
