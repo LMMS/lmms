@@ -42,9 +42,7 @@ class PositionLine : public QWidget
 public:
 	PositionLine(QWidget* parent, Song::PlayMode playMode);
 
-	bool isRecording() const {
-		return m_isRecording;
-	}
+	bool isRecording() const { return m_isRecording; }
 
 	void setRecording(bool recording);
 
