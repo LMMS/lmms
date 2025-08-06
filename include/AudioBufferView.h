@@ -28,6 +28,7 @@
 
 #include <cassert>
 #include <concepts>
+#include <ranges>
 #include <span>
 #include <type_traits>
 
@@ -448,7 +449,7 @@ public:
 		return {reinterpret_cast<const SampleFrame*>(this->m_data), this->m_frames};
 	}
 
-	//! Use to distinguish between `InterleavedBufferView` and `PlanarBufferView` when using `AnyBufferView`
+	//! Use to distinguish between `InterleavedBufferView` and `PlanarBufferView` when using `AudioBufferView`
 	static constexpr bool Interleaved = true;
 };
 
@@ -545,7 +546,7 @@ public:
 		return bufferPtr(channel);
 	}
 
-	//! Use to distinguish between `InterleavedBufferView` and `PlanarBufferView` when using `AnyBufferView`
+	//! Use to distinguish between `InterleavedBufferView` and `PlanarBufferView` when using `AudioBufferView`
 	static constexpr bool Interleaved = false;
 };
 
@@ -554,9 +555,9 @@ static_assert(sizeof(PlanarBufferView<float>) > sizeof(PlanarBufferView<float, 2
 static_assert(sizeof(PlanarBufferView<float, 2>) == sizeof(void**) + sizeof(f_cnt_t));
 
 
-//! Concept for any buffer view - interleaved or planar
+//! Concept for any audio buffer view, interleaved or planar
 template<class T, typename U, proc_ch_t channels = DynamicChannelCount>
-concept AnyBufferView = SampleType<U> && (std::convertible_to<T, InterleavedBufferView<U, channels>>
+concept AudioBufferView = SampleType<U> && (std::convertible_to<T, InterleavedBufferView<U, channels>>
 	|| std::convertible_to<T, PlanarBufferView<U, channels>>);
 
 } // namespace lmms
