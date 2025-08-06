@@ -40,6 +40,8 @@
 #include "MainWindow.h"
 #include "MidiJack.h"
 
+#include <cstdio>
+
 
 namespace
 {
@@ -59,16 +61,16 @@ QString getInputKeyByChannel(size_t channel)
 
 void printJackStatus(jack_status_t status)
 {
-	printf("Status: 0x%2.0x\n", status);
+	std::fprintf(stderr, "Status: 0x%2.0x\n", static_cast<unsigned int>(status));
 
 	if (status & JackFailure)
 	{
-		printf("Overall operation failed. JACK dependencies might need to be installed.\n");
+		std::fprintf(stderr, "Overall operation failed. JACK dependencies might need to be installed.\n");
 	}
 
 	if (status & JackServerFailed)
 	{
-		printf("Could not connect to JACK server.\n");
+		std::fprintf(stderr, "Could not connect to JACK server.\n");
 	}
 }
 
@@ -187,16 +189,16 @@ bool AudioJack::initJackClient()
 	m_client = jack_client_open(clientName.toLatin1().constData(), JackNullOption, &status, serverName);
 	if (m_client == nullptr)
 	{
-		printf("jack_client_open() failed, ");
+		std::fprintf(stderr, "jack_client_open() failed, ");
 		printJackStatus(status);
 
 		return false;
 	}
 	if (status & JackNameNotUnique)
 	{
-		printf(	"there's already a client with name '%s', so unique "
-				"name '%s' was assigned\n",
-				clientName.toLatin1().constData(), jack_get_client_name(m_client));
+		std::printf("there's already a client with name '%s', so unique "
+					"name '%s' was assigned\n",
+					clientName.toLatin1().constData(), jack_get_client_name(m_client));
 	}
 
 	resizeInputBuffer(jack_get_buffer_size(m_client));
@@ -228,7 +230,7 @@ bool AudioJack::initJackClient()
 
 		if (m_outputPorts.back() == nullptr)
 		{
-			printf("no more JACK-ports available!\n");
+			std::fprintf(stderr, "no more JACK-ports available!\n");
 			return false;
 		}
 	}
@@ -246,14 +248,14 @@ void AudioJack::resizeInputBuffer(jack_nframes_t nframes)
 
 void AudioJack::attemptToConnect(size_t index, const char *lmms_port_type, const char *source_port, const char *destination_port)
 {
-	printf("Attempting to reconnect %s port %u: %s -> %s", lmms_port_type, static_cast<unsigned int>(index), source_port, destination_port);
+	std::printf("Attempting to reconnect %s port %u: %s -> %s", lmms_port_type, static_cast<unsigned int>(index), source_port, destination_port);
 	if (!jack_connect(m_client, source_port, destination_port))
 	{
-		printf(" - Success!\n");
+		std::printf(" - Success!\n");
 	}
 	else
 	{
-		printf(" - Failure\n");
+		std::printf(" - Failure\n");
 	}
 }
 
@@ -263,7 +265,7 @@ void AudioJack::attemptToReconnectOutput(size_t outputIndex, const QString& targ
 
 	if (targetPort == disconnectedRepresentation)
 	{
-		printf("Output port %u is not connected.\n", static_cast<unsigned int>(outputIndex));
+		std::fprintf(stderr, "Output port %u is not connected.\n", static_cast<unsigned int>(outputIndex));
 		return;
 	}
 
@@ -279,7 +281,7 @@ void AudioJack::attemptToReconnectInput(size_t inputIndex, const QString& source
 
 	if (sourcePort == disconnectedRepresentation)
 	{
-		printf("Input port %u is not connected.\n", static_cast<unsigned int>(inputIndex));
+		std::fprintf(stderr, "Input port %u is not connected.\n", static_cast<unsigned int>(inputIndex));
 		return;
 	}
 
@@ -300,7 +302,7 @@ void AudioJack::startProcessing()
 
 	if (jack_activate(m_client))
 	{
-		printf("cannot activate client\n");
+		std::fprintf(stderr, "cannot activate client\n");
 		return;
 	}
 
@@ -501,7 +503,7 @@ AudioJack::setupWidget::setupWidget(QWidget* parent)
 	m_client = jack_client_open("LMMS-Setup Dialog", JackNullOption, &status, serverName);
 	if (!m_client)
 	{
-		printf("jack_client_open() failed, ");
+		std::fprintf(stderr, "jack_client_open() failed, ");
 		printJackStatus(status);
 	}
 
