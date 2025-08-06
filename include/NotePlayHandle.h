@@ -79,11 +79,15 @@ public:
 	void setVolume( volume_t volume ) override;
 	void setPanning( panning_t panning ) override;
 
-	int midiKey() const;
 	int midiChannel() const
 	{
 		return m_midiChannel;
 	}
+
+	//! Returns the index of the piano key which would need to be played in order to generate this note.
+	//! WARNING: This value can change during the lifetime of the NotePlayHandle if the user changes the
+	//! base note or global detuning. Do not use this in critical code such as emitting NoteOff events.
+	int physicalKey() const;
 
 	/*! convenience function that returns offset for the first period and zero otherwise,
 		used by instruments to handle the offset: instruments have to check this property and
@@ -319,8 +323,6 @@ private:
 	// tempo reaction
 	bpm_t m_origTempo;						// original tempo
 	f_cnt_t m_origFrames;					// original m_frames
-
-	int m_origBaseNote;
 
 	float m_frequency;
 	float m_unpitchedFrequency;

@@ -38,6 +38,7 @@ MPEManager::MPEManager(InstrumentTrack* instrumentTrack):
 }
 
 // TODO add support for upper zone?
+// TODO currently no calls use `willNotChange`
 int MPEManager::findAvailableChannel(int key, bool willNotChange)
 {
 	// For the lower zone, the first channel, channel 0, is the Manager channel. The channels after that are Member channels.
@@ -62,7 +63,7 @@ int MPEManager::findAvailableChannel(int key, bool willNotChange)
 
 	// However, this method can be improved in the case where LMMS knows for certain that a note will not be pitch bent, as
 	// then it can route them all to a single channel (perhaps the manager channel?) without having to worry about one of them suddenly bending everything at once.
-	// This is only really possible for MidiClip-based notes where we know what the detuning curve looks like in advance. Notes 
+	// This is only really possible for MidiClip-based notes where we know what the detuning curve looks like in advance. Notes
 	// coming in from input midi events cannot be guaranteed not to bend at some later point in time.
 
 	// If LMMS cannot guarantee that the incoming note will not bend, then it will be routed as normal to the channel with the fewest and/or

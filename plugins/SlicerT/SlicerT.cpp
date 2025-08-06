@@ -80,7 +80,7 @@ void SlicerT::playNote(NotePlayHandle* handle, SampleFrame* workingBuffer)
 {
 	if (m_originalSample.sampleSize() <= 1) { return; }
 
-	int noteIndex = handle->key() - m_parentTrack->baseNote();
+	int noteIndex = handle->key() - DefaultBaseKey;
 	const fpp_t frames = handle->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = handle->noteOffset();
 	const int bpm = Engine::getSong()->getTempo();
@@ -308,7 +308,7 @@ std::vector<Note> SlicerT::getMidi()
 		float sliceEnd = totalTicks * m_slicePoints[i + 1];
 
 		Note sliceNote = Note();
-		sliceNote.setKey(i + m_parentTrack->baseNote() + 1);
+		sliceNote.setKey(DefaultBaseKey + i - m_parentTrack->transposeAmount() + 1);
 		sliceNote.setPos(sliceStart);
 		sliceNote.setLength(sliceEnd - sliceStart + 1); // + 1 so that the notes allign
 		outputNotes.push_back(sliceNote);

@@ -435,7 +435,6 @@ void PianoView::mousePressEvent(QMouseEvent *me)
 			}
 			// set note on
 			m_piano->midiEventProcessor()->processInEvent(MidiEvent(MidiNoteOn, -1, key_num, velocity));
-			m_piano->setKeyState(key_num, true);
 			m_lastKey = key_num;
 
 			emit keyPressed(key_num);
@@ -484,7 +483,6 @@ void PianoView::mouseReleaseEvent( QMouseEvent * )
 		if( m_piano != nullptr )
 		{
 			m_piano->midiEventProcessor()->processInEvent( MidiEvent( MidiNoteOff, -1, m_lastKey, 0 ) );
-			m_piano->setKeyState( m_lastKey, false );
 		}
 
 		// and let the user see that he released a key... :)
@@ -546,7 +544,6 @@ void PianoView::mouseMoveEvent( QMouseEvent * _me )
 		if( m_lastKey != -1 )
 		{
 			m_piano->midiEventProcessor()->processInEvent( MidiEvent( MidiNoteOff, -1, m_lastKey, 0 ) );
-			m_piano->setKeyState( m_lastKey, false );
 			m_lastKey = -1;
 		}
 		if( _me->buttons() & Qt::LeftButton )
@@ -554,7 +551,6 @@ void PianoView::mouseMoveEvent( QMouseEvent * _me )
 			if( _me->pos().y() > PIANO_BASE )
 			{
 				m_piano->midiEventProcessor()->processInEvent( MidiEvent( MidiNoteOn, -1, key_num, velocity ) );
-				m_piano->setKeyState( key_num, true );
 				m_lastKey = key_num;
 			}
 			else if (m_movedNoteModel != nullptr)
@@ -666,7 +662,6 @@ void PianoView::focusOutEvent( QFocusEvent * )
 	for( int i = 0; i < NumKeys; ++i )
 	{
 		m_piano->midiEventProcessor()->processInEvent( MidiEvent( MidiNoteOff, -1, i, 0 ) );
-		m_piano->setKeyState( i, false );
 	}
 
 

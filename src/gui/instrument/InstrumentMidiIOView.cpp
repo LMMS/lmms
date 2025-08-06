@@ -145,12 +145,12 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 
 
 	m_MPEGroupBox = new GroupBox(tr("ENABLE MPE"));
-	layout->addWidget( m_MPEGroupBox );
+	layout->addWidget(m_MPEGroupBox);
 
 
 	auto MPELayout = new QHBoxLayout(m_MPEGroupBox);
-	MPELayout->setContentsMargins( 8, 18, 8, 8 );
-	MPELayout->setSpacing( 4 );
+	MPELayout->setContentsMargins(8, 18, 8, 8);
+	MPELayout->setSpacing(4);
 
 	m_MPELowerZoneChannelsSpinBox = new LcdSpinBox(2, m_MPEGroupBox);
 	m_MPELowerZoneChannelsSpinBox->addTextForValue(0, "--");
@@ -158,9 +158,9 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 	MPELayout->addWidget( m_MPELowerZoneChannelsSpinBox );
 
 	m_MPEUpperZoneChannelsSpinBox = new LcdSpinBox(2, m_MPEGroupBox);
-	m_MPEUpperZoneChannelsSpinBox->addTextForValue( 0, "--" );
+	m_MPEUpperZoneChannelsSpinBox->addTextForValue(0, "--");
 	m_MPEUpperZoneChannelsSpinBox->setLabel(tr("UPPER"));
-	MPELayout->addWidget( m_MPEUpperZoneChannelsSpinBox );
+	MPELayout->addWidget(m_MPEUpperZoneChannelsSpinBox);
 
 	m_MPEPitchRangeSpinBox = new LcdSpinBox(2, m_MPEGroupBox);
 	m_MPEPitchRangeSpinBox->setLabel(tr("RANGE"));
@@ -168,9 +168,9 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 
 	MPELayout->addStretch();
 
-	connect( m_midiOutputGroupBox->ledButton(), SIGNAL(toggled(bool)),
+	connect(m_midiOutputGroupBox->ledButton(), SIGNAL(toggled(bool)),
 		m_fixedOutputVelocitySpinBox, SLOT(setEnabled(bool)));
-	connect( m_midiOutputGroupBox->ledButton(), SIGNAL(toggled(bool)),
+	connect(m_midiOutputGroupBox->ledButton(), SIGNAL(toggled(bool)),
 			m_outputProgramSpinBox, SLOT(setEnabled(bool)));
 
 

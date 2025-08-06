@@ -77,7 +77,7 @@ InstrumentTrack::InstrumentTrack(TrackContainer* tc) :
 	m_pitchModel.setCenterValue( 0 );
 	m_pitchModel.setStrictStepSize(true);
 	m_panningModel.setCenterValue( DefaultPanning );
-	m_baseNoteModel.setInitValue( DefaultKey );
+	m_baseNoteModel.setInitValue(DefaultBaseKey);
 	m_firstKeyModel.setInitValue(0);
 	m_lastKeyModel.setInitValue(NumKeys - 1);
 
@@ -116,6 +116,11 @@ InstrumentTrack::InstrumentTrack(TrackContainer* tc) :
 	connect(&m_mixerChannelModel, SIGNAL(dataChanged()), this, SLOT(updateMixerChannel()), Qt::DirectConnection);
 	connect(&m_midiPort, &MidiPort::MPEConfigurationChanged, this, &InstrumentTrack::updateMPEConfiguration, Qt::DirectConnection);
 
+	// Send signals when the base note or master transpose changes so that the piano widget can redraw itself..
+	connect(&m_baseNoteModel, &AutomatableModel::dataChanged, this, &InstrumentTrack::transposeChanged);
+	connect(&m_useMasterPitchModel, &AutomatableModel::dataChanged, this, &InstrumentTrack::transposeChanged);
+	connect(Engine::getSong()->masterPitchModel(), &AutomatableModel::dataChanged, this, &InstrumentTrack::transposeChanged);
+
 	autoAssignMidiDevice(true);
 }
 
@@ -129,15 +134,16 @@ bool InstrumentTrack::keyRangeImport() const
 
 /** \brief Check if there is a valid mapping for the given key and it is within defined of range.
  */
-bool InstrumentTrack::isKeyMapped(int key) const
+bool InstrumentTrack::isKeyMapped(int physicalKey) const
 {
-	if (key < firstKey() || key > lastKey()) {return false;}
+	if (physicalKey < firstKey() || physicalKey > lastKey()) {return false;}
 	if (!m_microtuner.enabled()) {return true;}
 
 	Song *song = Engine::getSong();
 	if (!song) {return false;}
 
-	return song->getKeymap(m_microtuner.currentKeymap())->getDegree(key) != -1;
+	// TODO is this right?
+	return song->getKeymap(m_microtuner.currentKeymap())->getDegree(physicalKey) != -1;
 }
 
 
@@ -178,15 +184,13 @@ int InstrumentTrack::lastKey() const
  */
 int InstrumentTrack::baseNote() const
 {
-	int mp = m_useMasterPitchModel.value() ? Engine::getSong()->masterPitch() : 0;
-
 	if (keyRangeImport())
 	{
-		return Engine::getSong()->getKeymap(m_microtuner.currentKeymap())->getBaseKey() - mp;
+		return Engine::getSong()->getKeymap(m_microtuner.currentKeymap())->getBaseKey();
 	}
 	else
 	{
-		return m_baseNoteModel.value() - mp;
+		return m_baseNoteModel.value();
 	}
 }
 
@@ -289,23 +293,6 @@ void InstrumentTrack::processAudioBuffer( SampleFrame* buf, const fpp_t frames, 
 
 
 
-MidiEvent InstrumentTrack::applyMasterKey( const MidiEvent& event )
-{
-	MidiEvent copy( event );
-	switch( event.type() )
-	{
-		case MidiNoteOn:
-		case MidiNoteOff:
-		case MidiKeyPressure:
-			copy.setKey( masterKey( event.key() ) );
-			break;
-		default:
-			break;
-	}
-	return copy;
-}
-
-
 
 
 void InstrumentTrack::processCCEvent(int controller)
@@ -326,44 +313,43 @@ void InstrumentTrack::processCCEvent(int controller)
 
 
 
-void InstrumentTrack::processInEvent( const MidiEvent& event, const TimePos& time, f_cnt_t offset )
+void InstrumentTrack::processInEvent(const MidiEvent& event, const TimePos& time, f_cnt_t offset)
 {
+	qDebug() << "In Event" << event.type() << event.channel() << event.param(0) << event.param(1);
 	if (Engine::getSong()->isExporting() && event.source() == MidiEvent::Source::External)
 	{
 		return;
 	}
 
+	const int physicalKey = event.key();
+	const int transposedKey = physicalKey + transposeAmount();
+
 	bool eventHandled = false;
 
-	switch( event.type() )
+	switch (event.type())
 	{
 		// we don't send MidiNoteOn, MidiNoteOff and MidiKeyPressure
 		// events to instrument as NotePlayHandle will send them on its
 		// own
 		case MidiNoteOn:
-			if( event.velocity() > 0 )
+			if (event.velocity() > 0)
 			{
 				// play a note only if it is not already playing and if it is within configured bounds
-				if (m_notes[event.key()] == nullptr && event.key() >= firstKey() && event.key() <= lastKey())
+				if (m_notes[physicalKey] == nullptr && physicalKey >= firstKey() && physicalKey <= lastKey())
 				{
-					// If MPE is enabled, the MPE manager must figure out which of the 16 midi channels is most available to route this note.
-					const int eventChannel = midiPort()->MPEEnabled()
-						? m_MPEManager.findAvailableChannel(event.key())
-						: event.channel();
-					qDebug() << "Playing note channel" << eventChannel << event.channel();
-
 					NotePlayHandle* nph =
 						NotePlayHandleManager::acquire(
 								this, offset,
 								std::numeric_limits<f_cnt_t>::max() / 2,
 								Note(TimePos(), Engine::getSong()->getPlayPos(Engine::getSong()->playMode()),
-										event.key(), event.volume(midiPort()->baseVelocity())),
-								nullptr, eventChannel,
+										transposedKey, event.volume(midiPort()->baseVelocity())),
+								nullptr, event.channel(),
 								NotePlayHandle::Origin::MidiInput);
-					m_notes[event.key()] = nph;
-					if( ! Engine::audioEngine()->addPlayHandle( nph ) )
+					m_notes[physicalKey] = nph;
+					// TODO Why is this here?
+					if(!Engine::audioEngine()->addPlayHandle(nph))
 					{
-						m_notes[event.key()] = nullptr;
+						m_notes[physicalKey] = nullptr;
 					}
 				}
 				eventHandled = true;
@@ -371,30 +357,29 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const TimePos& tim
 			}
 
 		case MidiNoteOff:
-			if( m_notes[event.key()] != nullptr )
+			if (m_notes[physicalKey] != nullptr)
 			{
 				// do actual note off and remove internal reference to NotePlayHandle (which itself will
 				// be deleted later automatically)
 				Engine::audioEngine()->requestChangeInModel();
-				m_notes[event.key()]->noteOff( offset );
-				if (isSustainPedalPressed() &&
-					m_notes[event.key()]->origin() ==
-					NotePlayHandle::Origin::MidiInput)
+				// TODO Should this be done via nph's destructor instead?
+				m_notes[physicalKey]->noteOff(offset);
+				if (isSustainPedalPressed() && m_notes[physicalKey]->origin() == NotePlayHandle::Origin::MidiInput)
 				{
-					m_sustainedNotes << m_notes[event.key()];
+					m_sustainedNotes << m_notes[physicalKey];
 				}
-				m_notes[event.key()] = nullptr;
+				m_notes[physicalKey] = nullptr;
 				Engine::audioEngine()->doneChangeInModel();
 			}
 			eventHandled = true;
 			break;
 
 		case MidiKeyPressure:
-			if( m_notes[event.key()] != nullptr )
+			if (m_notes[physicalKey] != nullptr)
 			{
 				// setVolume() calls processOutEvent() with MidiKeyPressure so the
 				// attached instrument will receive the event as well
-				m_notes[event.key()]->setVolume( event.volume( midiPort()->baseVelocity() ) );
+				m_notes[physicalKey]->setVolume(event.volume(midiPort()->baseVelocity()));
 			}
 			eventHandled = true;
 			break;
@@ -402,13 +387,13 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const TimePos& tim
 		case MidiPitchBend:
 			// updatePitch() is connected to m_pitchModel::dataChanged() which will send out
 			// MidiPitchBend events
-			m_pitchModel.setValue( m_pitchModel.minValue() + event.pitchBend() * m_pitchModel.range() / MidiMaxPitchBend );
+			m_pitchModel.setValue(m_pitchModel.minValue() + event.pitchBend() * m_pitchModel.range() / MidiMaxPitchBend);
 			break;
 
 		case MidiControlChange:
-			if( event.controllerNumber() == MidiControllerSustain )
+			if (event.controllerNumber() == MidiControllerSustain)
 			{
-				if( event.controllerValue() > MidiMaxControllerValue/2 )
+				if (event.controllerValue() > MidiMaxControllerValue / 2)
 				{
 					m_sustainPedalPressed = true;
 				}
@@ -446,17 +431,17 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const TimePos& tim
 
 		case MidiMetaEvent:
 			// handle special cases such as note panning
-			switch( event.metaEvent() )
+			switch (event.metaEvent())
 			{
 				case MidiNotePanning:
-					if( m_notes[event.key()] != nullptr )
+					if (m_notes[physicalKey] != nullptr)
 					{
 						eventHandled = true;
-						m_notes[event.key()]->setPanning( event.panning() );
+						m_notes[physicalKey]->setPanning(event.panning());
 					}
 					break;
 				default:
-					qWarning( "InstrumentTrack: unhandled MIDI meta event: %i", event.metaEvent() );
+					qWarning("InstrumentTrack: unhandled MIDI meta event: %i", event.metaEvent());
 					break;
 			}
 			break;
@@ -467,11 +452,11 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const TimePos& tim
 
 	// If the event wasn't handled, check if there's a loaded instrument and if so send the
 	// event to it. If it returns false means the instrument didn't handle the event, so we trigger a warning.
+	// UHHHHHH...... we're not supposed to call the instrument here right????
 	if (eventHandled == false && !(instrument() && instrument()->handleMidiEvent(event, time, offset)))
 	{
 		qWarning("InstrumentTrack: unhandled MIDI event %d", event.type());
 	}
-
 }
 
 
@@ -479,65 +464,52 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const TimePos& tim
 
 void InstrumentTrack::processOutEvent( const MidiEvent& event, const TimePos& time, f_cnt_t offset )
 {
-	// do nothing if we do not have an instrument instance (e.g. when loading settings)
-	if( m_instrument == nullptr )
+	qDebug() << "Out Event" << event.type() << event.channel() << event.param(0) << event.param(1);
+	// Do nothing if we do not have an instrument instance (e.g. when loading settings)
+	if (m_instrument == nullptr) { return; }
+
+	const int channel = event.channel();
+	const int key = event.key();
+
+	if (key < 0 || key >= NumKeys) { return; }
+
+	// Before passing the event to the plugin, do some checks to make sure there isn't a note already on.
+	// TODO turn into switch and move lock into cases?
+	m_midiNotesMutex.lock();
+	if (event.type() == MidiNoteOn)
 	{
-		return;
+		// If there's already another note playing on this key, cut it off before this one starts.
+		if (m_runningMidiNotes[channel][key] > 0)
+		{
+			m_instrument->handleMidiEvent(MidiEvent(MidiNoteOff, channel, key, 0), time, offset);
+			m_runningMidiNotes[channel][key]--;
+		}
+		m_runningMidiNotes[channel][key]++;
+		// Update the track activity indicator
+		emit newNote();
 	}
-
-	const MidiEvent transposedEvent = applyMasterKey( event );
-	const int key = transposedEvent.key();
-
-	// If we have a selected output midi channel between 1-16, we will use that channel to handle the midi event.
-	// But if our selected midi output channel is 0 ("--"), we will use the event channel instead.
-	// TODO what about MPE? Should it override this?
-	const auto handleEventOutputChannel = midiPort()->outputChannel() == 0 || midiPort()->MPEEnabled()
-		? event.channel()
-		: midiPort()->realOutputChannel();
-
-	switch( event.type() )
+	if (event.type() == MidiNoteOff)
 	{
-		case MidiNoteOn:
-			m_midiNotesMutex.lock();
-			m_piano.setKeyState( event.key(), true );	// event.key() = original key
-
-			if( key >= 0 && key < NumKeys )
-			{
-				if( m_runningMidiNotes[handleEventOutputChannel][key] > 0 )
-				{
-					m_instrument->handleMidiEvent( MidiEvent( MidiNoteOff, handleEventOutputChannel, key, 0 ), time, offset );
-					m_eventHistory[handleEventOutputChannel].push_back(static_cast<int>(event.type()));
-				}
-				++m_runningMidiNotes[handleEventOutputChannel][key];
-				m_instrument->handleMidiEvent( MidiEvent( MidiNoteOn, handleEventOutputChannel, key, event.velocity() ), time, offset );
-				m_eventHistory[handleEventOutputChannel].push_back(static_cast<int>(event.type()));
-
-			}
-			m_midiNotesMutex.unlock();
-			emit newNote();
-			break;
-
-		case MidiNoteOff:
-			m_midiNotesMutex.lock();
-			m_piano.setKeyState( event.key(), false );	// event.key() = original key
-
-			if( key >= 0 && key < NumKeys && --m_runningMidiNotes[handleEventOutputChannel][key] <= 0 )
-			{
-				m_instrument->handleMidiEvent( MidiEvent( MidiNoteOff, handleEventOutputChannel, key, 0 ), time, offset );
-				m_eventHistory[handleEventOutputChannel].push_back(static_cast<int>(event.type()));
-			}
-			m_midiNotesMutex.unlock();
-			emit endNote();
-			break;
-
-		default:
-			m_instrument->handleMidiEvent( transposedEvent, time, offset );
-			m_eventHistory[handleEventOutputChannel].push_back(static_cast<int>(event.type()));
-			break;
+		m_runningMidiNotes[channel][key]--;
+		// Don't send a note off signal unless this is the only note on this key--we don't want to cut off any other notes currently playing.
+		if (m_runningMidiNotes[channel][key] > 0) { return; }
+		// Update the track activity indicator
+		emit endNote();
 	}
+	m_midiNotesMutex.unlock();
 
-	// if appropriate, midi-port does futher routing
-	m_midiPort.processOutEvent( event, time );
+
+	// Now for real, pass the event to the instrument
+	m_instrument->handleMidiEvent(event, time, offset);
+
+	// If appropriate, midi-port can do futher routing
+	m_midiPort.processOutEvent(event, time);
+
+	// And send the event to the piano widget to update the pressed keys
+	m_piano.processInEvent(event, time, offset);
+
+	// Debug
+	m_eventHistory[channel].push_back(static_cast<int>(event.type()));
 }
 
 
@@ -570,6 +542,7 @@ void InstrumentTrack::silenceAllNotes( bool removeIPH )
 }
 
 
+// TODO don't send 2048 noteOff signals, just reset the pitch bends.
 void InstrumentTrack::resetAllMidiNotes()
 {
 	m_midiNotesMutex.lock();
@@ -747,18 +720,19 @@ void InstrumentTrack::updateMixerChannel()
 
 void InstrumentTrack::updateMPEConfiguration()
 {
-	resetAllMidiNotes();
+	//resetAllMidiNotes();
 	m_MPEManager.sendMPEConfigSignals();
 }
 
 
 
-
-int InstrumentTrack::masterKey( int _midi_key ) const
+/** \brief Returns the total transposition offset applied to outgoing notes
+ * Accounts for transposition due to both the base note and the master pitch/transposition slider.
+*/
+int InstrumentTrack::transposeAmount() const
 {
-
-	int key = baseNote();
-	return std::clamp(_midi_key - (key - DefaultKey), 0, NumKeys);
+	int mp = m_useMasterPitchModel.value() ? Engine::getSong()->masterPitch() : 0;
+	return DefaultBaseKey - baseNote() + mp;
 }
 
 
@@ -865,13 +839,13 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 				? 0
 				: (currentNote->endPos() - cur_start - noteOverlap) * frames_per_tick;
 
-			// If MPE is enabled, the MPE manager will figure out which of the 16 midi channels is most available to route this note to.
-			// By default, clip-based notes have no midi channel, so NotePlayHandleManager defaults them to -1, which gets replaced with the default output channel
-			const int eventChannel = midiPort()->MPEEnabled()
-				? m_MPEManager.findAvailableChannel(currentNote->key())
-				: -1;
-			qDebug() << "Playing note channel from clip" << eventChannel;
-			NotePlayHandle* notePlayHandle = NotePlayHandleManager::acquire(this, _offset, noteFrames, *currentNote, nullptr, eventChannel);
+			const int physicalKey = currentNote->key();
+			const int transposedKey = physicalKey + transposeAmount();
+			// Create a shallow copy of the note to apply the transposition to (do not deep copy the detuning clip)
+			Note noteCopy = *currentNote;
+			noteCopy.setKey(transposedKey);
+
+			NotePlayHandle* notePlayHandle = NotePlayHandleManager::acquire(this, _offset, noteFrames, noteCopy);
 			notePlayHandle->setPatternTrack(pattern_track);
 			// are we playing global song?
 			if( _clip_num < 0 )

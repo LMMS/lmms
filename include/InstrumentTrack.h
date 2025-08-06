@@ -71,8 +71,6 @@ public:
 	void processAudioBuffer( SampleFrame* _buf, const fpp_t _frames,
 							NotePlayHandle * _n );
 
-	MidiEvent applyMasterKey( const MidiEvent& event );
-
 	void processInEvent( const MidiEvent& event, const TimePos& time = TimePos(), f_cnt_t offset = 0 ) override;
 	void processOutEvent( const MidiEvent& event, const TimePos& time = TimePos(), f_cnt_t offset = 0 ) override;
 	// silence all running notes played by this track
@@ -108,9 +106,8 @@ public:
 	// name-stuff
 	void setName( const QString & _new_name ) override;
 
-	// translate given key of a note-event to absolute key (i.e.
-	// add global master-pitch and base-note of this instrument track)
-	int masterKey( int _midi_key ) const;
+	//! Get the midi transpose amount based on the offset from the base note from the default base note, plus the global transposition
+	int transposeAmount() const;
 
 	// translate pitch to midi-pitch [0,16383]
 	int midiPitch() const
@@ -177,7 +174,7 @@ public:
 	}
 
 	bool keyRangeImport() const;
-	bool isKeyMapped(int key) const;
+	bool isKeyMapped(int physicalKey) const;
 	int firstKey() const;
 	int lastKey() const;
 	int baseNote() const;
@@ -248,6 +245,7 @@ signals:
 	void midiNoteOff( const lmms::Note& );
 	void newNote();
 	void endNote();
+	void transposeChanged();
 
 protected:
 	QString nodeName() const override
@@ -274,9 +272,13 @@ private:
 
 	MPEManager m_MPEManager;
 
+	//! Stores a list of active NotePlayHandles for this instrument track TODO VERIFY
+	//! NOTE: The indicies refer to the index of the physical piano key used to generate the NotePlayHandle, not the output (potentially transposed) key.
 	NotePlayHandle* m_notes[NumKeys];
 	NotePlayHandleList m_sustainedNotes;
 
+	//! Stores a count of the number of active midi notes on every output midi key on every channel.
+	//! NOTE: The indicies refer to the output (transposed) key stored in the midi event, not the physical piano key used to generate the note.
 	std::array<std::array<int, NumKeys>, 16> m_runningMidiNotes;
 	QMutex m_midiNotesMutex;
 
