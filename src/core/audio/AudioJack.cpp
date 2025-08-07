@@ -261,7 +261,7 @@ void AudioJack::attemptToConnect(size_t index, const char *lmms_port_type, const
 
 void AudioJack::attemptToReconnectOutput(size_t outputIndex, const QString& targetPort)
 {
-	if (outputIndex > m_outputPorts.size()) return;
+	if (outputIndex >= m_outputPorts.size()) { return; }
 
 	if (targetPort == disconnectedRepresentation)
 	{
@@ -270,14 +270,14 @@ void AudioJack::attemptToReconnectOutput(size_t outputIndex, const QString& targ
 	}
 
 	auto outputName = jack_port_name(m_outputPorts[outputIndex]);
-	auto targetName = targetPort.toLatin1().constData();
+	auto targetName = targetPort.toLatin1();
 
-	attemptToConnect(outputIndex, "output", outputName, targetName);
+	attemptToConnect(outputIndex, "output", outputName, targetName.constData());
 }
 
 void AudioJack::attemptToReconnectInput(size_t inputIndex, const QString& sourcePort)
 {
-	if (inputIndex > m_inputPorts.size()) return;
+	if (inputIndex >= m_inputPorts.size()) { return; }
 
 	if (sourcePort == disconnectedRepresentation)
 	{
@@ -286,9 +286,9 @@ void AudioJack::attemptToReconnectInput(size_t inputIndex, const QString& source
 	}
 
 	auto inputName = jack_port_name(m_inputPorts[inputIndex]);
-	auto sourceName = sourcePort.toLatin1().constData();
+	auto sourceName = sourcePort.toLatin1();
 
-	attemptToConnect(inputIndex, "input", sourceName, inputName);
+	attemptToConnect(inputIndex, "input", sourceName.constData(), inputName);
 }
 
 
