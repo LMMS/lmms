@@ -49,6 +49,7 @@ Plugin::Descriptor PLUGIN_EXPORT waveshaper_plugin_descriptor =
 	new PluginPixmapLoader("logo"),
 	nullptr,
 	nullptr,
+	nullptr,
 } ;
 
 }
