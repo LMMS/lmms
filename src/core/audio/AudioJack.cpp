@@ -261,7 +261,7 @@ void AudioJack::attemptToConnect(size_t index, const char *lmms_port_type, const
 
 void AudioJack::attemptToReconnectOutput(size_t outputIndex, const QString& targetPort)
 {
-	if (outputIndex >= m_outputPorts.size()) return;
+	if (outputIndex >= m_outputPorts.size()) { return; }
 
 	if (targetPort == disconnectedRepresentation)
 	{
@@ -277,7 +277,7 @@ void AudioJack::attemptToReconnectOutput(size_t outputIndex, const QString& targ
 
 void AudioJack::attemptToReconnectInput(size_t inputIndex, const QString& sourcePort)
 {
-	if (inputIndex >= m_inputPorts.size()) return;
+	if (inputIndex >= m_inputPorts.size()) { return; }
 
 	if (sourcePort == disconnectedRepresentation)
 	{
