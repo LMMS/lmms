@@ -49,6 +49,7 @@ int MPEManager::findAvailableChannel(int key, bool willNotChange)
 	// without affecting the pitch of the whole instrument.
 
 	// Unless there are no member channels, in which case we default to just sending everything on one channel.
+	// TODO Page 23, B.6, if there are no member channels the zone should deactivate.
 	if (numMemberChannels <= 0) { return managerChannel; }
 
 	// The MPE specification (page 17, Appendix A.3) gives some ideas on how to implement a good note routing system which aims to minimize the
@@ -72,7 +73,8 @@ int MPEManager::findAvailableChannel(int key, bool willNotChange)
 	// Starting at channel 1 to avoid Manager Channel
 	int bestChannel = 1;
 	int bestNoteCount = m_channelNoteCounts[bestChannel];
-	std::time_t bestNoteOffTime = m_channelNoteOffTimes[bestChannel];
+	// Technically we are not using time, but instead the count of NoteOff events up to that point. This way it does not depend on the current time.
+	int bestNoteOffTime = m_channelNoteOffTimes[bestChannel];
 	for (int channel = 1; channel < numMemberChannels + 1; ++channel)
 	{
 		if (m_channelNoteCounts[channel] < bestNoteCount
@@ -83,43 +85,6 @@ int MPEManager::findAvailableChannel(int key, bool willNotChange)
 			bestNoteOffTime = m_channelNoteOffTimes[channel];
 		}
 	}
-
-
-	qDebug() << "Channel Counts:"
-		<< m_channelNoteCounts[0]
-		<< m_channelNoteCounts[1]
-		<< m_channelNoteCounts[2]
-		<< m_channelNoteCounts[3]
-		<< m_channelNoteCounts[4]
-		<< m_channelNoteCounts[5]
-		<< m_channelNoteCounts[6]
-		<< m_channelNoteCounts[7]
-		<< m_channelNoteCounts[8]
-		<< m_channelNoteCounts[9]
-		<< m_channelNoteCounts[10]
-		<< m_channelNoteCounts[11]
-		<< m_channelNoteCounts[12]
-		<< m_channelNoteCounts[13]
-		<< m_channelNoteCounts[14]
-		<< m_channelNoteCounts[15];
-	qDebug() << "note off times relative:"
-		<< m_channelNoteOffTimes[0] - std::time(nullptr)
-		<< m_channelNoteOffTimes[1] - std::time(nullptr)
-		<< m_channelNoteOffTimes[2] - std::time(nullptr)
-		<< m_channelNoteOffTimes[3] - std::time(nullptr)
-		<< m_channelNoteOffTimes[4] - std::time(nullptr)
-		<< m_channelNoteOffTimes[5] - std::time(nullptr)
-		<< m_channelNoteOffTimes[6] - std::time(nullptr)
-		<< m_channelNoteOffTimes[7] - std::time(nullptr)
-		<< m_channelNoteOffTimes[8] - std::time(nullptr)
-		<< m_channelNoteOffTimes[9] - std::time(nullptr)
-		<< m_channelNoteOffTimes[10] - std::time(nullptr)
-		<< m_channelNoteOffTimes[11] - std::time(nullptr)
-		<< m_channelNoteOffTimes[12] - std::time(nullptr)
-		<< m_channelNoteOffTimes[13] - std::time(nullptr)
-		<< m_channelNoteOffTimes[14] - std::time(nullptr)
-		<< m_channelNoteOffTimes[15] - std::time(nullptr);
-
 	return bestChannel;
 }
 
@@ -136,6 +101,7 @@ void MPEManager::sendMPEConfigSignals(MidiEventProcessor* proc)
 	proc->processOutEvent(MidiEvent(MidiControlChange, 0, MidiControllerRegisteredParameterNumberMSB, (MidiNullFunctionNumberRPN >> 8) & 0x7F));
 	proc->processOutEvent(MidiEvent(MidiControlChange, 0, MidiControllerRegisteredParameterNumberLSB, MidiNullFunctionNumberRPN & 0x7F));
 	// Setup MPE Zone 2
+	// Actually, section 2.2.1, if a sender intends to only use one zone, it should only send the config message for that one zone. ??? should we only send signals for the lower zone currently?
 	proc->processOutEvent(MidiEvent(MidiControlChange, 0xF, MidiControllerRegisteredParameterNumberMSB, (MidiMPEConfigurationRPN >> 8) & 0x7F));
 	proc->processOutEvent(MidiEvent(MidiControlChange, 0xF, MidiControllerRegisteredParameterNumberLSB, MidiMPEConfigurationRPN & 0x7F));
 	proc->processOutEvent(MidiEvent(MidiControlChange, 0xF, MidiControllerDataEntry, m_numChannelsUpperZone));
@@ -159,6 +125,7 @@ void MPEManager::sendMPEConfigSignals(MidiEventProcessor* proc)
 	for (int channel = 0; channel < 16; ++channel)
 	{
 		// And reset the pitch bend values so that they don't get stuck after disabling MPE.
+		// This should not be necessary, since according to 2.2.3, the reciever should handle resetting the values when a channel leaves/enters an MPE zone. But some vst's (vital) don't appear to do that.
 		// TODO is this okay to do based on the mpe spec? Technically this probably shoulnd't be done for the manager channel, but there is the possibility
 		// that notes were spawned there if we had no other channels
 		proc->processOutEvent(MidiEvent(MidiPitchBend, channel, 8192));

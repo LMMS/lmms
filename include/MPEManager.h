@@ -40,12 +40,14 @@ class MPEManager
 public:
 	void config(int numChannelsLowerZone = 16, int numChannelsUpperZone = 0, int pitchBendRange = 48)
 	{
+		// Ensure the zones do not overlap
+		Q_ASSERT(numChannelsLowerZone + numChannelsUpperZone <= 16);
 		m_numChannelsLowerZone = numChannelsLowerZone;
 		m_numChannelsUpperZone = numChannelsUpperZone;
 		m_pitchBendRange = pitchBendRange;
 	}
 
-	int findAvailableChannel(int key, bool willNotChange = false);
+	int findAvailableChannel(int key = 0, bool willNotChange = false);
 	void sendMPEConfigSignals(MidiEventProcessor* proc);
 
 	void noteOn(int channel)
@@ -55,7 +57,8 @@ public:
 	void noteOff(int channel)
 	{
 		m_channelNoteCounts[channel]--;
-		m_channelNoteOffTimes[channel] = std::time(nullptr);// TODO replace with a counter or something, since if two notes arrive during the same second, it gives the same value.
+		m_noteOffCount++;
+		m_channelNoteOffTimes[channel] = m_noteOffCount;
 	}
 
 private:
@@ -64,6 +67,7 @@ private:
 	int m_numChannelsLowerZone = 16;
 	int m_numChannelsUpperZone = 0;
 	int m_pitchBendRange = 48;
+	int m_noteOffCount = 0; // Used in place of the current time as a way to compare the age of NoteOff events
 } ;
 
 } // namespace lmms
