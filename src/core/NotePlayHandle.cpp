@@ -30,6 +30,7 @@
 #include "InstrumentSoundShaping.h"
 #include "InstrumentTrack.h"
 #include "Instrument.h"
+#include "MPEManager.h"
 #include "Song.h"
 #include "lmms_math.h"
 #include <QDebug>
@@ -123,7 +124,7 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 		: std::clamp(m_midiChannel, 0, 15); // The clamp ensures that if the channel was passed as -1, it will be set to 0 by default. TODO: should there be a better way for handling default channels?
 
 	// The MPE manager will determine which of the 16 midi channels is best to route this note, if MPE is enabled.
-	const int MPEChannel = m_instrumentTrack->m_MPEManager.findAvailableChannel(key());
+	const int MPEChannel = m_instrumentTrack->midiPort()->mpeManager()->findAvailableChannel(key());
 
 	m_midiChannel = m_instrumentTrack->midiPort()->MPEEnabled()
 		? MPEChannel
@@ -134,7 +135,7 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 	// Normally this would be done on the actual midi NoteOn event, but those are only sent
 	// once the processing starts, which is too late when trying to route chords.
 	// Note: This is called even if MPE is disabled, so that if it is suddenly enabled, the MPEManager will still have the correct knowledge about which notes are where.
-	m_instrumentTrack->m_MPEManager.noteOn(midiChannel());
+	m_instrumentTrack->midiPort()->mpeManager()->noteOn(midiChannel());
 	qDebug() << "MPE Note On tally!";
 
 	unlock();
@@ -429,7 +430,7 @@ void NotePlayHandle::noteOff( const f_cnt_t _s )
 	}
 
 	// Notify MPE Manager to update channel note counts
-	m_instrumentTrack->m_MPEManager.noteOff(midiChannel());
+	m_instrumentTrack->midiPort()->mpeManager()->noteOff(midiChannel());
 	qDebug() << "MPE Note Off tally!";
 }
 
@@ -606,6 +607,7 @@ void NotePlayHandle::sendMPEDetuning()
 {
 	const float v = m_baseDetuning->value();
 	const int pitchRange = m_instrumentTrack->midiPort()->MPEPitchRange();
+	// TODO verify equation
 	const int pitchBendValue = static_cast<int>(std::clamp(0.5f * v / pitchRange + 0.5f, 0.0f, 1.0f) * 16384);
 	m_instrumentTrack->processOutEvent(MidiEvent(MidiPitchBend, midiChannel(), pitchBendValue));
 }

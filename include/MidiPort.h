@@ -33,6 +33,7 @@
 #include "Midi.h"
 #include "TimePos.h"
 #include "AutomatableModel.h"
+#include "MPEManager.h"
 
 namespace lmms
 {
@@ -126,6 +127,11 @@ public:
 			: 0;
 	}
 
+	MPEManager* mpeManager()
+	{
+		return &m_mpeManager;
+	}
+
 	void processInEvent( const MidiEvent& event, const TimePos& time = TimePos() );
 	void processOutEvent( const MidiEvent& event, const TimePos& time = TimePos() );
 
@@ -165,11 +171,14 @@ private slots:
 	void updateReadablePorts();
 	void updateWritablePorts();
 	void updateOutputProgram();
+	void updateMPEConfiguration();
 
 
 private:
 	MidiClient* m_midiClient;
 	MidiEventProcessor* m_midiEventProcessor;
+
+	MPEManager m_mpeManager;
 
 	Mode m_mode;
 
@@ -201,7 +210,6 @@ private:
 signals:
 	void readablePortsChanged();
 	void writablePortsChanged();
-	void MPEConfigurationChanged();
 	void modeChanged();
 
 } ;

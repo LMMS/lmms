@@ -24,18 +24,11 @@
 
 #include "MPEManager.h"
 
-#include "InstrumentTrack.h"
+#include "MidiEventProcessor.h"
 #include "MidiPort.h"
-
-#include <QDebug>
 
 namespace lmms
 {
-
-MPEManager::MPEManager(InstrumentTrack* instrumentTrack):
-	m_instrumentTrack(instrumentTrack)
-{
-}
 
 // TODO add support for upper zone?
 // TODO currently no calls use `willNotChange`
@@ -44,9 +37,9 @@ int MPEManager::findAvailableChannel(int key, bool willNotChange)
 	// For the lower zone, the first channel, channel 0, is the Manager channel. The channels after that are Member channels.
 	// For the upper zone, the last channel, channel 15, is the Manager channel. The channels below 15 are Member channels.
 
-	const int masterChannel = 0; // TODO add support for upper zone
+	const int managerChannel = 0; // TODO add support for upper zone
 
-	const int numChannels = m_instrumentTrack->midiPort()->MPELowerZoneChannels();
+	const int numChannels = m_numChannelsLowerZone;
 	const int numMemberChannels = numChannels - 1;
 
 	// The MPE specification, page 27 Appendix E, does not prohibit NoteOn/NoteOff signals on the Manager channels.
@@ -54,7 +47,7 @@ int MPEManager::findAvailableChannel(int key, bool willNotChange)
 	// without affecting the pitch of the whole instrument.
 
 	// Unless there are no member channels, in which case we default to just sending everything on one channel.
-	if (numMemberChannels <= 0) { return masterChannel; }
+	if (numMemberChannels <= 0) { return managerChannel; }
 
 	// The MPE specification (page 17, Appendix A.3) gives some ideas on how to implement a good note routing system which aims to minimize the
 	// chance for notes being incorrectly pitch bent due to being on the same channel as another note being pitch bent.
@@ -71,7 +64,7 @@ int MPEManager::findAvailableChannel(int key, bool willNotChange)
 
 
 	// Route static note to Manager channel as described above.
-	if (willNotChange) { return masterChannel; }
+	if (willNotChange) { return managerChannel; }
 
 	// Find channel with fewest notes/oldest NoteOff signal
 	// Starting at channel 1 to avoid Manager Channel
@@ -130,36 +123,44 @@ int MPEManager::findAvailableChannel(int key, bool willNotChange)
 
 
 // TODO add comments
-void MPEManager::sendMPEConfigSignals()
+void MPEManager::sendMPEConfigSignals(MidiEventProcessor* proc)
 {
 	// Setup MPE Zone 1
-	m_instrumentTrack->processOutEvent(MidiEvent(MidiControlChange, 0, MidiControllerRegisteredParameterNumberMSB, (MidiMPEConfigurationRPN >> 8) & 0x7F));
-	m_instrumentTrack->processOutEvent(MidiEvent(MidiControlChange, 0, MidiControllerRegisteredParameterNumberLSB, MidiMPEConfigurationRPN & 0x7F));
-	m_instrumentTrack->processOutEvent(MidiEvent(MidiControlChange, 0, MidiControllerDataEntry, m_instrumentTrack->midiPort()->MPELowerZoneChannels()));
+	proc->processOutEvent(MidiEvent(MidiControlChange, 0, MidiControllerRegisteredParameterNumberMSB, (MidiMPEConfigurationRPN >> 8) & 0x7F));
+	proc->processOutEvent(MidiEvent(MidiControlChange, 0, MidiControllerRegisteredParameterNumberLSB, MidiMPEConfigurationRPN & 0x7F));
+	proc->processOutEvent(MidiEvent(MidiControlChange, 0, MidiControllerDataEntry, m_numChannelsLowerZone));
 
 	// Send null RPN signals to end the control change. I heard this was good practice.
-	m_instrumentTrack->processOutEvent(MidiEvent(MidiControlChange, 0, MidiControllerRegisteredParameterNumberMSB, (MidiNullFunctionNumberRPN >> 8) & 0x7F));
-	m_instrumentTrack->processOutEvent(MidiEvent(MidiControlChange, 0, MidiControllerRegisteredParameterNumberLSB, MidiNullFunctionNumberRPN & 0x7F));
+	proc->processOutEvent(MidiEvent(MidiControlChange, 0, MidiControllerRegisteredParameterNumberMSB, (MidiNullFunctionNumberRPN >> 8) & 0x7F));
+	proc->processOutEvent(MidiEvent(MidiControlChange, 0, MidiControllerRegisteredParameterNumberLSB, MidiNullFunctionNumberRPN & 0x7F));
 	// Setup MPE Zone 2
-	m_instrumentTrack->processOutEvent(MidiEvent(MidiControlChange, 0xF, MidiControllerRegisteredParameterNumberMSB, (MidiMPEConfigurationRPN >> 8) & 0x7F));
-	m_instrumentTrack->processOutEvent(MidiEvent(MidiControlChange, 0xF, MidiControllerRegisteredParameterNumberLSB, MidiMPEConfigurationRPN & 0x7F));
-	m_instrumentTrack->processOutEvent(MidiEvent(MidiControlChange, 0xF, MidiControllerDataEntry, m_instrumentTrack->midiPort()->MPEUpperZoneChannels()));
+	proc->processOutEvent(MidiEvent(MidiControlChange, 0xF, MidiControllerRegisteredParameterNumberMSB, (MidiMPEConfigurationRPN >> 8) & 0x7F));
+	proc->processOutEvent(MidiEvent(MidiControlChange, 0xF, MidiControllerRegisteredParameterNumberLSB, MidiMPEConfigurationRPN & 0x7F));
+	proc->processOutEvent(MidiEvent(MidiControlChange, 0xF, MidiControllerDataEntry, m_numChannelsUpperZone));
 
-	m_instrumentTrack->processOutEvent(MidiEvent(MidiControlChange, 0xF, MidiControllerRegisteredParameterNumberMSB, (MidiNullFunctionNumberRPN >> 8) & 0x7F));
-	m_instrumentTrack->processOutEvent(MidiEvent(MidiControlChange, 0xF, MidiControllerRegisteredParameterNumberLSB, MidiNullFunctionNumberRPN & 0x7F));
+	proc->processOutEvent(MidiEvent(MidiControlChange, 0xF, MidiControllerRegisteredParameterNumberMSB, (MidiNullFunctionNumberRPN >> 8) & 0x7F));
+	proc->processOutEvent(MidiEvent(MidiControlChange, 0xF, MidiControllerRegisteredParameterNumberLSB, MidiNullFunctionNumberRPN & 0x7F));
 
 	// Set pitch bend range to on all Member channels
-	// TODO this doesn't always work on all VSTs. I have the default at 48 because that seems to be the default in the MPE spec, but lmms likes to use 60 so...
+	// TODO this doesn't always work on all VSTs (Vital). I have the default at 48 because that seems to be the default in the MPE spec, but lmms likes to use 60 so...
 	// Also currently this doesn't affect the manager channels, 0 and 15. But I think that's fine, since the pitch wheel is supposed to handle that.
 	for (int channel = 1; channel < 15; ++channel)
 	{
-		m_instrumentTrack->processOutEvent(MidiEvent(MidiControlChange, channel, MidiControllerRegisteredParameterNumberMSB, (MidiPitchBendSensitivityRPN >> 8) & 0x7F));
-		m_instrumentTrack->processOutEvent(MidiEvent(MidiControlChange, channel, MidiControllerRegisteredParameterNumberLSB, MidiPitchBendSensitivityRPN & 0x7F));
-		m_instrumentTrack->processOutEvent(MidiEvent(MidiControlChange, channel, MidiControllerDataEntry, m_instrumentTrack->midiPort()->MPEPitchRange()));
-		m_instrumentTrack->processOutEvent(MidiEvent(MidiControlChange, channel, MidiControllerRegisteredParameterNumberMSB, (MidiNullFunctionNumberRPN >> 8) & 0x7F));
-		m_instrumentTrack->processOutEvent(MidiEvent(MidiControlChange, channel, MidiControllerRegisteredParameterNumberLSB, MidiNullFunctionNumberRPN & 0x7F));
+		proc->processOutEvent(MidiEvent(MidiControlChange, channel, MidiControllerRegisteredParameterNumberMSB, (MidiPitchBendSensitivityRPN >> 8) & 0x7F));
+		proc->processOutEvent(MidiEvent(MidiControlChange, channel, MidiControllerRegisteredParameterNumberLSB, MidiPitchBendSensitivityRPN & 0x7F));
+		proc->processOutEvent(MidiEvent(MidiControlChange, channel, MidiControllerDataEntry, m_pitchBendRange));
+		proc->processOutEvent(MidiEvent(MidiControlChange, channel, MidiControllerRegisteredParameterNumberMSB, (MidiNullFunctionNumberRPN >> 8) & 0x7F));
+		proc->processOutEvent(MidiEvent(MidiControlChange, channel, MidiControllerRegisteredParameterNumberLSB, MidiNullFunctionNumberRPN & 0x7F));
+
 	}
 
+	for (int channel = 0; channel < 16; ++channel)
+	{
+		// And reset the pitch bend values so that they don't get stuck after disabling MPE.
+		// TODO is this okay to do based on the mpe spec? Technically this probably shoulnd't be done for the manager channel, but there is the possibility
+		// that notes were spawned there if we had no other channels
+		proc->processOutEvent(MidiEvent(MidiPitchBend, channel, 8192));
+	}
 }
 
 

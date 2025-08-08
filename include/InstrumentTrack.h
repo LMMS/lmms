@@ -34,7 +34,6 @@
 #include "Midi.h"
 #include "MidiEventProcessor.h"
 #include "MidiPort.h"
-#include "MPEManager.h"
 #include "NotePlayHandle.h"
 #include "Piano.h"
 #include "Plugin.h"
@@ -269,15 +268,12 @@ protected slots:
 	void updatePitch();
 	void updatePitchRange();
 	void updateMixerChannel();
-	void updateMPEConfiguration();
 
 
 private:
 	void processCCEvent(int controller);
 
 	MidiPort m_midiPort;
-
-	MPEManager m_MPEManager;
 
 	//! Stores a list of active NotePlayHandles for this instrument track TODO VERIFY
 	//! NOTE: The indicies refer to the index of the physical piano key used to generate the NotePlayHandle, not the output (potentially transposed) key.
@@ -333,7 +329,6 @@ private:
 	friend class NotePlayHandle;
 	friend class gui::InstrumentTuningView;
 	friend class gui::MidiCCRackView;
-	friend class MPEManager;
 
 } ;
 

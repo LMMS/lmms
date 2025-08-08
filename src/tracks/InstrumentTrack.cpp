@@ -51,7 +51,6 @@ InstrumentTrack::InstrumentTrack(TrackContainer* tc) :
 	Track(Track::Type::Instrument, tc),
 	MidiEventProcessor(),
 	m_midiPort(tr("unnamed_track"), Engine::audioEngine()->midiClient(), this, this),
-	m_MPEManager(this),
 	m_notes(),
 	m_sustainPedalPressed(false),
 	m_silentBuffersProcessed(false),
@@ -114,7 +113,6 @@ InstrumentTrack::InstrumentTrack(TrackContainer* tc) :
 	connect(&m_pitchModel, SIGNAL(dataChanged()), this, SLOT(updatePitch()), Qt::DirectConnection);
 	connect(&m_pitchRangeModel, SIGNAL(dataChanged()), this, SLOT(updatePitchRange()), Qt::DirectConnection);
 	connect(&m_mixerChannelModel, SIGNAL(dataChanged()), this, SLOT(updateMixerChannel()), Qt::DirectConnection);
-	connect(&m_midiPort, &MidiPort::MPEConfigurationChanged, this, &InstrumentTrack::updateMPEConfiguration, Qt::DirectConnection);
 
 	// Send signals when the base note or master transpose changes so that the piano widget can redraw itself..
 	connect(&m_baseNoteModel, &AutomatableModel::dataChanged, this, &InstrumentTrack::transposeChanged);
@@ -470,32 +468,36 @@ void InstrumentTrack::processOutEvent( const MidiEvent& event, const TimePos& ti
 	const int channel = event.channel();
 	const int key = event.key();
 
-	if (key < 0 || key >= NumKeys) { return; }
-
 	// Before passing the event to the plugin, do some checks to make sure there isn't a note already on.
-	// TODO turn into switch and move lock into cases?
-	m_midiNotesMutex.lock();
-	if (event.type() == MidiNoteOn)
+	switch (event.type())
 	{
-		// If there's already another note playing on this key, cut it off before this one starts.
-		if (m_runningMidiNotes[channel][key] > 0)
-		{
-			m_instrument->handleMidiEvent(MidiEvent(MidiNoteOff, channel, key, 0), time, offset);
+		case MidiNoteOn:
+			if (key < 0 || key >= NumKeys) { return; }
+			// If there's already another note playing on this key, cut it off before this one starts.
+			m_midiNotesMutex.lock();
+			if (m_runningMidiNotes[channel][key] > 0)
+			{
+				m_instrument->handleMidiEvent(MidiEvent(MidiNoteOff, channel, key, 0), time, offset);
+				m_runningMidiNotes[channel][key]--;
+			}
+			m_runningMidiNotes[channel][key]++;
+			m_midiNotesMutex.unlock();
+			// Update the track activity indicator
+			emit newNote();
+			break;
+		case MidiNoteOff:
+			if (key < 0 || key >= NumKeys) { return; }
+			m_midiNotesMutex.lock();
 			m_runningMidiNotes[channel][key]--;
-		}
-		m_runningMidiNotes[channel][key]++;
-		// Update the track activity indicator
-		emit newNote();
+			m_midiNotesMutex.unlock();
+			// Don't send a note off signal unless this is the only note on this key--we don't want to cut off any other notes currently playing.
+			if (m_runningMidiNotes[channel][key] > 0) { return; }
+			// Update the track activity indicator
+			emit endNote();
+			break;
+		default:
+			break;
 	}
-	if (event.type() == MidiNoteOff)
-	{
-		m_runningMidiNotes[channel][key]--;
-		// Don't send a note off signal unless this is the only note on this key--we don't want to cut off any other notes currently playing.
-		if (m_runningMidiNotes[channel][key] > 0) { return; }
-		// Update the track activity indicator
-		emit endNote();
-	}
-	m_midiNotesMutex.unlock();
 
 
 	// Now for real, pass the event to the instrument
@@ -715,13 +717,6 @@ void InstrumentTrack::updateMixerChannel()
 	}
 }
 
-
-
-void InstrumentTrack::updateMPEConfiguration()
-{
-	//resetAllMidiNotes();
-	m_MPEManager.sendMPEConfigSignals();
-}
 
 
 

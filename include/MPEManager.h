@@ -31,17 +31,22 @@
 namespace lmms
 {
 
-class InstrumentTrack;
+class MidiEventProcessor;
 class MidiPort;
 
 
 class MPEManager
 {
 public:
-	MPEManager(InstrumentTrack* instrumentTrack);
+	void config(int numChannelsLowerZone = 16, int numChannelsUpperZone = 0, int pitchBendRange = 48)
+	{
+		m_numChannelsLowerZone = numChannelsLowerZone;
+		m_numChannelsUpperZone = numChannelsUpperZone;
+		m_pitchBendRange = pitchBendRange;
+	}
 
 	int findAvailableChannel(int key, bool willNotChange = false);
-	void sendMPEConfigSignals();
+	void sendMPEConfigSignals(MidiEventProcessor* proc);
 
 	void noteOn(int channel)
 	{
@@ -50,13 +55,15 @@ public:
 	void noteOff(int channel)
 	{
 		m_channelNoteCounts[channel]--;
-		m_channelNoteOffTimes[channel] = std::time(nullptr);
+		m_channelNoteOffTimes[channel] = std::time(nullptr);// TODO replace with a counter or something, since if two notes arrive during the same second, it gives the same value.
 	}
+
 private:
 	std::array<int, 16> m_channelNoteCounts = {};
 	std::array<std::time_t, 16> m_channelNoteOffTimes = {};
-
-	InstrumentTrack* m_instrumentTrack;
+	int m_numChannelsLowerZone = 16;
+	int m_numChannelsUpperZone = 0;
+	int m_pitchBendRange = 48;
 } ;
 
 } // namespace lmms
