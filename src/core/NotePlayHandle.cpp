@@ -603,8 +603,7 @@ void NotePlayHandle::sendMPEDetuning()
 {
 	const float v = m_baseDetuning->value();
 	const int pitchRange = m_instrumentTrack->midiPort()->MPEPitchRange();
-	// TODO verify equation
-	const int pitchBendValue = static_cast<int>(std::clamp(0.5f * v / pitchRange + 0.5f, 0.0f, 1.0f) * 16384);
+	const int pitchBendValue = std::clamp(static_cast<int>(v * 8192 / pitchRange + 8192), 0, 16383);
 	m_instrumentTrack->processOutEvent(MidiEvent(MidiPitchBend, midiChannel(), pitchBendValue));
 }
 
