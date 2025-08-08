@@ -27,6 +27,8 @@
 #include "MidiEventProcessor.h"
 #include "MidiPort.h"
 
+#include <QDebug>
+
 namespace lmms
 {
 

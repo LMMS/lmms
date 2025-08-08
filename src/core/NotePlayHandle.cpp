@@ -33,7 +33,6 @@
 #include "MPEManager.h"
 #include "Song.h"
 #include "lmms_math.h"
-#include <QDebug>
 
 namespace lmms
 {
@@ -129,14 +128,12 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 	m_midiChannel = m_instrumentTrack->midiPort()->MPEEnabled()
 		? MPEChannel
 		: outputChannel;
-	qDebug() << "New NotePlayHandle on channel " << m_midiChannel;
 
 	// Notify MPE manager that a new note was created on this channel to update note counts
 	// Normally this would be done on the actual midi NoteOn event, but those are only sent
 	// once the processing starts, which is too late when trying to route chords.
 	// Note: This is called even if MPE is disabled, so that if it is suddenly enabled, the MPEManager will still have the correct knowledge about which notes are where.
 	m_instrumentTrack->midiPort()->mpeManager()->noteOn(midiChannel());
-	qDebug() << "MPE Note On tally!";
 
 	unlock();
 }
@@ -431,7 +428,6 @@ void NotePlayHandle::noteOff( const f_cnt_t _s )
 
 	// Notify MPE Manager to update channel note counts
 	m_instrumentTrack->midiPort()->mpeManager()->noteOff(midiChannel());
-	qDebug() << "MPE Note Off tally!";
 }
 
 

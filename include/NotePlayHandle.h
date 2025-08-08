@@ -296,6 +296,7 @@ private:
 
 	void updateFrequency();
 
+	//! Calls processOutEvent on the instrument track to send a MidiPitchBend event with the current detuning value on the correct midi channel.
 	void sendMPEDetuning();
 
 	InstrumentTrack* m_instrumentTrack;		// needed for calling

@@ -449,7 +449,6 @@ void InstrumentTrack::processInEvent(const MidiEvent& event, const TimePos& time
 
 	// If the event wasn't handled, check if there's a loaded instrument and if so send the
 	// event to it. If it returns false means the instrument didn't handle the event, so we trigger a warning.
-	// UHHHHHH...... we're not supposed to call the instrument here right????
 	if (eventHandled == false && !(instrument() && instrument()->handleMidiEvent(event, time, offset)))
 	{
 		qWarning("InstrumentTrack: unhandled MIDI event %d", event.type());
@@ -542,22 +541,6 @@ void InstrumentTrack::silenceAllNotes( bool removeIPH )
 	Engine::audioEngine()->doneChangeInModel();
 }
 
-
-// TODO don't send 2048 noteOff signals, just reset the pitch bends.
-void InstrumentTrack::resetAllMidiNotes()
-{
-	m_midiNotesMutex.lock();
-	for (int channel = 0; channel < 16; ++channel)
-	{
-		for(int key = 0; key < NumKeys; ++key)
-		{
-			m_instrument->handleMidiEvent(MidiEvent(MidiNoteOff, channel, key, 0));
-			m_runningMidiNotes[channel][key] = 0;
-		}
-		m_instrument->handleMidiEvent(MidiEvent(MidiPitchBend, channel, 8192));
-	}
-	m_midiNotesMutex.unlock();
-}
 
 
 
@@ -835,7 +818,7 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 
 			const int physicalKey = currentNote->key();
 			const int transposedKey = physicalKey + transposeAmount();
-			// Create a shallow copy of the note to apply the transposition to (do not deep copy the detuning clip)
+			// Create a shallow copy of the note to apply the transposition (do not deep copy the detuning clip)
 			Note noteCopy = *currentNote;
 			noteCopy.setKey(transposedKey);
 
