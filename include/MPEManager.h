@@ -25,8 +25,8 @@
 #ifndef LMMS_MPE_MANAGER_H
 #define LMMS_MPE_MANAGER_H
 
-#include <ctime>
 #include <array>
+#include <cassert>
 
 namespace lmms
 {
@@ -41,7 +41,7 @@ public:
 	void config(int numChannelsLowerZone = 16, int numChannelsUpperZone = 0, int pitchBendRange = 48)
 	{
 		// Ensure the zones do not overlap
-		Q_ASSERT(numChannelsLowerZone + numChannelsUpperZone <= 16);
+		assert(numChannelsLowerZone + numChannelsUpperZone <= 16);
 		m_numChannelsLowerZone = numChannelsLowerZone;
 		m_numChannelsUpperZone = numChannelsUpperZone;
 		m_pitchBendRange = pitchBendRange;
@@ -63,7 +63,7 @@ public:
 
 private:
 	std::array<int, 16> m_channelNoteCounts = {};
-	std::array<std::time_t, 16> m_channelNoteOffTimes = {};
+	std::array<int, 16> m_channelNoteOffTimes = {};
 	int m_numChannelsLowerZone = 16;
 	int m_numChannelsUpperZone = 0;
 	int m_pitchBendRange = 48;
