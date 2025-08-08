@@ -101,6 +101,13 @@ public:
 		return m_instrument;
 	}
 
+	//! Forcefully set the current instrument
+	//! Currently only used for unit testing
+	void setInstrument(Instrument* instrument)
+	{
+		m_instrument = instrument;
+	}
+
 	void deleteNotePluginData( NotePlayHandle * _n );
 
 	// name-stuff

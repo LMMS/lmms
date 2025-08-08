@@ -300,6 +300,8 @@ public:
 		return hasFifoWriter() ? m_fifo->read() : renderNextBuffer();
 	}
 
+	const SampleFrame* renderNextBuffer();
+
 	void changeQuality(const struct qualitySettings & qs);
 
 	//! Block until a change in model can be done (i.e. wait for audio thread)
@@ -357,8 +359,6 @@ private:
 	void renderStageInstruments();
 	void renderStageEffects();
 	void renderStageMix();
-
-	const SampleFrame* renderNextBuffer();
 
 	void swapBuffers();
 

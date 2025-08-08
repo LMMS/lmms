@@ -315,7 +315,7 @@ void InstrumentTrack::processCCEvent(int controller)
 
 void InstrumentTrack::processInEvent(const MidiEvent& event, const TimePos& time, f_cnt_t offset)
 {
-	qDebug() << "In Event" << event.type() << event.channel() << event.param(0) << event.param(1);
+	//qDebug() << "In Event" << event.type() << event.channel() << event.param(0) << event.param(1);
 	if (Engine::getSong()->isExporting() && event.source() == MidiEvent::Source::External)
 	{
 		return;
@@ -362,7 +362,6 @@ void InstrumentTrack::processInEvent(const MidiEvent& event, const TimePos& time
 				// do actual note off and remove internal reference to NotePlayHandle (which itself will
 				// be deleted later automatically)
 				Engine::audioEngine()->requestChangeInModel();
-				// TODO Should this be done via nph's destructor instead?
 				m_notes[physicalKey]->noteOff(offset);
 				if (isSustainPedalPressed() && m_notes[physicalKey]->origin() == NotePlayHandle::Origin::MidiInput)
 				{
@@ -464,7 +463,7 @@ void InstrumentTrack::processInEvent(const MidiEvent& event, const TimePos& time
 
 void InstrumentTrack::processOutEvent( const MidiEvent& event, const TimePos& time, f_cnt_t offset )
 {
-	qDebug() << "Out Event" << event.type() << event.channel() << event.param(0) << event.param(1);
+	//qDebug() << "Out Event" << event.type() << event.channel() << event.param(0) << event.param(1);
 	// Do nothing if we do not have an instrument instance (e.g. when loading settings)
 	if (m_instrument == nullptr) { return; }
 
