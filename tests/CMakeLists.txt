@@ -10,7 +10,7 @@ set(LMMS_TESTS
 	src/core/ProjectVersionTest.cpp
 	src/core/RelativePathsTest.cpp
 	src/core/midi/MPETest.cpp
-	src/core/midi/MidiTransposeTest.cpp
+	src/core/midi/InstrumentMidiOutputTest.cpp
 	src/tracks/AutomationTrackTest.cpp
 )
 

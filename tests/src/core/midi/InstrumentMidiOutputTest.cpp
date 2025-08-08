@@ -1,5 +1,5 @@
 /*
-* MidiTransposeTest.cpp
+* InstrumentMidiOutputTest.cpp
 *
 * Copyright (c) 2025 Keratin
 *
@@ -35,7 +35,6 @@
 
 #include <iostream>
 
-// TODO rename to InstrumentMidiOutputTest.cpp or something, since this is not only about tranposition.
 
 extern "C"
 {
@@ -71,7 +70,7 @@ DummyMidiRelayInstrument * lmms_plugin_main(lmms::Model * model, void *)
 }*/
 
 
-class MidiTransposeTest : public QObject
+class InstrumentMidiOutputTest : public QObject
 {
 	Q_OBJECT
 public:
@@ -244,5 +243,5 @@ private slots:
 	}
 };
 
-QTEST_GUILESS_MAIN(MidiTransposeTest)
-#include "MidiTransposeTest.moc"
+QTEST_GUILESS_MAIN(InstrumentMidiOutputTest)
+#include "InstrumentMidiOutputTest.moc"
