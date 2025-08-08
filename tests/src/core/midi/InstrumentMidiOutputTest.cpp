@@ -36,17 +36,11 @@
 #include <iostream>
 
 
-extern "C"
-{
-lmms::Plugin::Descriptor dummy_midi_relay_instrument_descriptor =
-	{"test", "DummyMidiRelayInstrument", "", "", 0x0100, lmms::Plugin::Type::Instrument, nullptr, "", nullptr};
-}
-
 class DummyMidiRelayInstrument : public lmms::Instrument
 {
 public:
 	DummyMidiRelayInstrument(lmms::InstrumentTrack * _instrument_track):
-		Instrument(_instrument_track, &dummy_midi_relay_instrument_descriptor) {}
+		Instrument(_instrument_track, nullptr) {}
 	inline bool handleMidiEvent(const lmms::MidiEvent& event, const lmms::TimePos& = lmms::TimePos(), lmms::f_cnt_t offset = 0) override
 	{
 		m_lastEvent = event;
@@ -59,15 +53,6 @@ public:
 
 	lmms::MidiEvent m_lastEvent;
 };
-/*
-extern "C"
-{
-// necessary for getting instance out of shared lib
-DummyMidiRelayInstrument * lmms_plugin_main(lmms::Model * model, void *)
-{
-	return new DummyMidiRelayInstrument(static_cast<lmms::InstrumentTrack *>(model));
-}
-}*/
 
 
 class InstrumentMidiOutputTest : public QObject
