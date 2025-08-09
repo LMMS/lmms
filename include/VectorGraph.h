@@ -40,20 +40,9 @@
 namespace lmms
 {
 
-class VectorGraphModel;
-class VectorGraphPoint;
-
-
-namespace gui
+class LMMS_EXPORT VectorGraphPoint
 {
-
-class LMMS_EXPORT VectorGraph : public QWidget, public ModelView
-{
-	Q_OBJECT
 public:
-	VectorGraph( QWidget * _parent, int _width, int _height );
-	virtual ~VectorGraph() = default;
-
 	enum class TensionType
 	{
 		Hold,
@@ -64,95 +53,140 @@ public:
 		Wave
 	};
 
-	inline void setResolution(int resolution)
+	VectorGraphPoint(float x, float y, float tension, TensionType type);
+	VectorGraphPoint(VectorGraphPoint * point);
+	VectorGraphPoint();
+	inline float x()
 	{
-		m_resolution = resolution;
+		return m_x;
 	}
-
-	inline VectorGraphModel * model()
+	inline float y()
 	{
-		return castModel<VectorGraphModel>();
+		return m_y;
 	}
-
-	inline int getWidth()
+	inline void setX(float x)
 	{
-		return m_width;
+		m_x = x;
 	}
-
-	inline int getHeight()
+	inline void setY(float y)
 	{
-		return m_height;
+		m_y = y;
 	}
-
-	inline int getMargin()
+	inline float tension()
 	{
-		return m_margin;
+		return m_tension;
 	}
-
-	inline float rawToCoordX(float input)
+	TensionType tensionType()
 	{
-		auto result = input * (m_width - 1) * (((m_width - 1) - 2 * m_margin)/(float) (m_width - 1)) + m_margin;
-		return result;
+		return m_tensionType;
 	}
-
-	inline float rawToCoordY(float input)
+	inline float tensionPower()
 	{
-		auto result = (1 - input) * (m_height - 1) * ((m_height - 1) - 2 * m_margin)/(float) (m_height - 1) + m_margin;
-		return result;
+		return m_tensionPower;
 	}
-
-	inline float coordToRawX(float input)
+	inline float absTensionPower()
 	{
-		return (input - m_margin) * ((m_width - 1)/(float) ((m_width - 1) - 2 * m_margin)) / (m_width - 1);
+		return m_absTensionPower;
 	}
-
-	inline float coordToRawY(float input)
+	inline float dryAmt()
 	{
-		return ((m_height - input) - m_margin) * ((m_height - 1)/(float) ((m_height - 1) - 2 * m_margin)) / (m_height - 1);
+		return m_dryAmt;
 	}
-
-	inline void setMargin(int margin)
+	inline void setTension(float tension)
 	{
-		// The extra space is necessary for the
-		// 2-pixel border, and because the
-		// canvas goes from 1 to (m_width - 1) in
-		// the X and 1 to (m_height - 1) in the y
-		m_margin = margin + 3;
+		m_tension = tension;
+
+		// Variables for single curve
+		m_tensionPower = qPow(20, -1 * tension);
+		m_absTensionPower = qPow(20, qAbs(tension));
+
+		m_invTensionPower = qPow(20, tension);
+		m_invAbsTensionPower = qPow(20, qAbs(-1 * tension));
+
+		m_dryAmt = qPow(1 - qAbs(tension), 5);
 	}
-
-	float calculateSample(float input);
-
-signals:
-	void drawn();
-protected:
-	void contextMenuEvent(QContextMenuEvent* event) override;
-	void paintEvent(QPaintEvent* event) override;
-	void mousePressEvent(QMouseEvent* event) override;
-	void mouseMoveEvent(QMouseEvent* event) override;
-	void mouseReleaseEvent(QMouseEvent* event) override;
-
-private slots:
-	void deletePoint();
-	void setTensionToHold();
-	void setTensionToSingle();
-	void setTensionToDouble();
-	void setTensionToStairs();
-	void setTensionToPulse();
-	void setTensionToWave();
-
+	inline void invertTension()
+	{
+		auto tensionPowerStore = m_tensionPower;
+		auto absTensionPowerStore = m_absTensionPower;
+		m_tensionPower = m_invTensionPower;
+		m_absTensionPower = m_invAbsTensionPower;
+		m_invTensionPower = tensionPowerStore;
+		m_invAbsTensionPower = absTensionPowerStore;
+		m_tension = -1 * m_tension;
+	}
+	inline void lockX()
+	{
+		m_isXLocked = true;
+	}
+	inline void lockY()
+	{
+		m_isYLocked = true;
+	}
+	inline void permaLockX()
+	{
+		m_isXPermaLocked = true;
+	}
+	inline void permaLockY()
+	{
+		m_isYPermaLocked = true;
+	}
+	inline void unlockX()
+	{
+		m_isXLocked = false;
+	}
+	inline void unlockY()
+	{
+		m_isYLocked = false;
+	}
+	inline void permaUnlockX()
+	{
+		m_isXPermaLocked = false;
+	}
+	inline void permaUnlockY()
+	{
+		m_isYPermaLocked = false;
+	}
+	inline bool isXLocked()
+	{
+		return m_isXLocked || m_isXPermaLocked;
+	}
+	inline bool isYLocked()
+	{
+		return m_isYLocked || m_isYPermaLocked;
+	}
+	void setTensionType(TensionType type)
+	{
+		m_tensionType = type;
+	}
+	TensionType getTensionType()
+	{
+		return m_tensionType;
+	}
+	inline bool canBeDeleted()
+	{
+		return m_canBeDeleted;
+	}
+	inline void setDeletable(bool deletable)
+	{
+		m_canBeDeleted = deletable;
+	}
 private:
-	QPainter m_canvas;
-	int m_resolution;
-	int m_width;
-	int m_height;
-	int m_currentPoint; //!< -1 means no current point; TODO: Use std::optional
-	int m_margin;
-	float getTensionHandleYVal(int index);
-	float getTensionHandleXVal(int index);
-	void setLastModifiedPoint(int pointIndex);
+	float m_x;
+	float m_y;
+	float m_tension;
+	float m_tensionPower;
+	float m_absTensionPower;
+	float m_invTensionPower;
+	float m_invAbsTensionPower;
+	float m_dryAmt;
+	TensionType m_tensionType;
+	bool m_isXLocked;
+	bool m_isYLocked;
+	bool m_isXPermaLocked;
+	bool m_isYPermaLocked;
+	bool m_canBeDeleted;
 };
-
-} // namespace gui
 
 class LMMS_EXPORT VectorGraphModel : public Model
 {
@@ -161,7 +195,7 @@ public:
 	VectorGraphModel(Model *_parent, bool _default_constructed);
 	virtual ~VectorGraphModel() = default;
 
-	using TensionType = gui::VectorGraph::TensionType;
+	using TensionType = VectorGraphPoint::TensionType;
 
 	void setPoints(std::vector<VectorGraphPoint> points)
 	{
@@ -309,146 +343,106 @@ private:
 };
 
 
+namespace gui {
 
-class VectorGraphPoint
+class LMMS_EXPORT VectorGraph : public QWidget, public ModelView
 {
+	Q_OBJECT
 public:
-	using TensionType = VectorGraphModel::TensionType;
+	VectorGraph( QWidget * _parent, int _width, int _height );
+	virtual ~VectorGraph() = default;
 
-	VectorGraphPoint(float x, float y, float tension, TensionType type);
-	VectorGraphPoint(VectorGraphPoint * point);
-	VectorGraphPoint();
-	inline float x()
-	{
-		return m_x;
-	}
-	inline float y()
-	{
-		return m_y;
-	}
-	inline void setX(float x)
-	{
-		m_x = x;
-	}
-	inline void setY(float y)
-	{
-		m_y = y;
-	}
-	inline float tension()
-	{
-		return m_tension;
-	}
-	TensionType tensionType()
-	{
-		return m_tensionType;
-	}
-	inline float tensionPower()
-	{
-		return m_tensionPower;
-	}
-	inline float absTensionPower()
-	{
-		return m_absTensionPower;
-	}
-	inline float dryAmt()
-	{
-		return m_dryAmt;
-	}
-	inline void setTension(float tension)
-	{
-		m_tension = tension;
+	using TensionType = VectorGraphPoint::TensionType;
 
-		// Variables for single curve
-		m_tensionPower = qPow(20, -1 * tension);
-		m_absTensionPower = qPow(20, qAbs(tension));
+	inline void setResolution(int resolution)
+	{
+		m_resolution = resolution;
+	}
 
-		m_invTensionPower = qPow(20, tension);
-		m_invAbsTensionPower = qPow(20, qAbs(-1 * tension));
+	inline VectorGraphModel * model()
+	{
+		return castModel<VectorGraphModel>();
+	}
 
-		m_dryAmt = qPow(1 - qAbs(tension), 5);
-	}
-	inline void invertTension()
+	inline int getWidth()
 	{
-		auto tensionPowerStore = m_tensionPower;
-		auto absTensionPowerStore = m_absTensionPower;
-		m_tensionPower = m_invTensionPower;
-		m_absTensionPower = m_invAbsTensionPower;
-		m_invTensionPower = tensionPowerStore;
-		m_invAbsTensionPower = absTensionPowerStore;
-		m_tension = -1 * m_tension;
+		return m_width;
 	}
-	inline void lockX()
+
+	inline int getHeight()
 	{
-		m_isXLocked = true;
+		return m_height;
 	}
-	inline void lockY()
+
+	inline int getMargin()
 	{
-		m_isYLocked = true;
+		return m_margin;
 	}
-	inline void permaLockX()
+
+	inline float rawToCoordX(float input)
 	{
-		m_isXPermaLocked = true;
+		auto result = input * (m_width - 1) * (((m_width - 1) - 2 * m_margin)/(float) (m_width - 1)) + m_margin;
+		return result;
 	}
-	inline void permaLockY()
+
+	inline float rawToCoordY(float input)
 	{
-		m_isYPermaLocked = true;
+		auto result = (1 - input) * (m_height - 1) * ((m_height - 1) - 2 * m_margin)/(float) (m_height - 1) + m_margin;
+		return result;
 	}
-	inline void unlockX()
+
+	inline float coordToRawX(float input)
 	{
-		m_isXLocked = false;
+		return (input - m_margin) * ((m_width - 1)/(float) ((m_width - 1) - 2 * m_margin)) / (m_width - 1);
 	}
-	inline void unlockY()
+
+	inline float coordToRawY(float input)
 	{
-		m_isYLocked = false;
+		return ((m_height - input) - m_margin) * ((m_height - 1)/(float) ((m_height - 1) - 2 * m_margin)) / (m_height - 1);
 	}
-	inline void permaUnlockX()
+
+	inline void setMargin(int margin)
 	{
-		m_isXPermaLocked = false;
+		// The extra space is necessary for the
+		// 2-pixel border, and because the
+		// canvas goes from 1 to (m_width - 1) in
+		// the X and 1 to (m_height - 1) in the y
+		m_margin = margin + 3;
 	}
-	inline void permaUnlockY()
-	{
-		m_isYPermaLocked = false;
-	}
-	inline bool isXLocked()
-	{
-		return m_isXLocked || m_isXPermaLocked;
-	}
-	inline bool isYLocked()
-	{
-		return m_isYLocked || m_isYPermaLocked;
-	}
-	void setTensionType(TensionType type)
-	{
-		m_tensionType = type;
-	}
-	TensionType getTensionType()
-	{
-		return m_tensionType;
-	}
-	inline bool canBeDeleted()
-	{
-		return m_canBeDeleted;
-	}
-	inline void setDeletable(bool deletable)
-	{
-		m_canBeDeleted = deletable;
-	}
+
+	float calculateSample(float input);
+
+signals:
+	void drawn();
+protected:
+	void contextMenuEvent(QContextMenuEvent* event) override;
+	void paintEvent(QPaintEvent* event) override;
+	void mousePressEvent(QMouseEvent* event) override;
+	void mouseMoveEvent(QMouseEvent* event) override;
+	void mouseReleaseEvent(QMouseEvent* event) override;
+
+private slots:
+	void deletePoint();
+	void setTensionToHold();
+	void setTensionToSingle();
+	void setTensionToDouble();
+	void setTensionToStairs();
+	void setTensionToPulse();
+	void setTensionToWave();
+
 private:
-	float m_x;
-	float m_y;
-	float m_tension;
-	float m_tensionPower;
-	float m_absTensionPower;
-	float m_invTensionPower;
-	float m_invAbsTensionPower;
-	float m_dryAmt;
-	TensionType m_tensionType;
-	bool m_isXLocked;
-	bool m_isYLocked;
-	bool m_isXPermaLocked;
-	bool m_isYPermaLocked;
-	bool m_canBeDeleted;
+	QPainter m_canvas;
+	int m_resolution;
+	int m_width;
+	int m_height;
+	int m_currentPoint; //!< -1 means no current point; TODO: Use std::optional
+	int m_margin;
+	float getTensionHandleYVal(int index);
+	float getTensionHandleXVal(int index);
+	void setLastModifiedPoint(int pointIndex);
 };
+
+} // namespace gui
 
 } // namespace lmms
 
