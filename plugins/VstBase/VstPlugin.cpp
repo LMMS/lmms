@@ -36,7 +36,7 @@
 
 #ifdef LMMS_BUILD_LINUX
 #	include <QX11Info>
-#	include "X11EmbedContainer.h"
+#	include <X11EmbedContainer.h>
 #endif
 
 #include <QWindow>
@@ -49,12 +49,12 @@
 
 #include "AudioEngine.h"
 #include "ConfigManager.h"
+#include "FileDialog.h"
 #include "GuiApplication.h"
 #include "LocaleHelper.h"
 #include "MainWindow.h"
 #include "PathUtil.h"
 #include "Song.h"
-#include "FileDialog.h"
 
 #ifdef LMMS_BUILD_LINUX
 #	include <X11/Xlib.h>
@@ -216,18 +216,18 @@ void VstPlugin::tryLoad( const QString &remoteVstPluginExecutable )
 
 	lock();
 
-	VstHostLanguages hlang = LanguageEnglish;
+	VstHostLanguage hlang = VstHostLanguage::English;
 	switch( QLocale::system().language() )
 	{
-		case QLocale::French: hlang = LanguageFrench; break;
-		case QLocale::German: hlang = LanguageGerman; break;
-		case QLocale::Italian: hlang = LanguageItalian; break;
-		case QLocale::Japanese: hlang = LanguageJapanese; break;
-		case QLocale::Korean: hlang = LanguageKorean; break;
-		case QLocale::Spanish: hlang = LanguageSpanish; break;
+		case QLocale::French: hlang = VstHostLanguage::French; break;
+		case QLocale::German: hlang = VstHostLanguage::German; break;
+		case QLocale::Italian: hlang = VstHostLanguage::Italian; break;
+		case QLocale::Japanese: hlang = VstHostLanguage::Japanese; break;
+		case QLocale::Korean: hlang = VstHostLanguage::Korean; break;
+		case QLocale::Spanish: hlang = VstHostLanguage::Spanish; break;
 		default: break;
 	}
-	sendMessage( message( IdVstSetLanguage ).addInt( hlang ) );
+	sendMessage( message( IdVstSetLanguage ).addInt( static_cast<int>(hlang) ) );
 	sendMessage( message( IdVstLoadPlugin ).addString( QSTR_TO_STDSTR( m_plugin ) ) );
 
 	waitForInitDone();
@@ -338,7 +338,7 @@ void VstPlugin::updateSampleRate()
 {
 	lock();
 	sendMessage( message( IdSampleRateInformation ).
-			addInt( Engine::audioEngine()->processingSampleRate() ) );
+			addInt( Engine::audioEngine()->outputSampleRate() ) );
 	waitForMessage( IdInformationUpdated, true );
 	unlock();
 }
@@ -404,9 +404,8 @@ bool VstPlugin::processMessage( const message & _m )
 	{
 	case IdVstPluginWindowID:
 		m_pluginWindowID = _m.getInt();
-		if( m_embedMethod == "none"
-			&& ConfigManager::inst()->value(
-				"ui", "vstalwaysontop" ).toInt() )
+		if (m_embedMethod == "none" && !gui::GuiApplication::isWayland()
+			&& ConfigManager::inst()->value("ui", "vstalwaysontop").toInt())
 		{
 #ifdef LMMS_BUILD_WIN32
 			// We're changing the owner, not the parent,
@@ -735,14 +734,12 @@ void VstPlugin::createUI( QWidget * parent )
 
 	QWidget* container = nullptr;
 
-#if QT_VERSION >= 0x050100
 	if (m_embedMethod == "qt" )
 	{
 		QWindow* vw = QWindow::fromWinId(m_pluginWindowID);
 		container = QWidget::createWindowContainer(vw, parent );
 		container->installEventFilter(this);
 	} else
-#endif
 
 #ifdef LMMS_BUILD_WIN32
 	if (m_embedMethod == "win32" )
@@ -751,7 +748,7 @@ void VstPlugin::createUI( QWidget * parent )
 		QHBoxLayout * l = new QHBoxLayout( helper );
 		QWidget * target = new QWidget( helper );
 		l->setSpacing( 0 );
-		l->setMargin( 0 );
+		l->setContentsMargins(0, 0, 0, 0);
 		l->addWidget( target );
 
 		// we've to call that for making sure, Qt created the windows
@@ -801,7 +798,6 @@ void VstPlugin::createUI( QWidget * parent )
 
 bool VstPlugin::eventFilter(QObject *obj, QEvent *event)
 {
-#if QT_VERSION >= 0x050100
 	if (embedMethod() == "qt" && obj == m_pluginWidget)
 	{
 		if (event->type() == QEvent::Show) {
@@ -809,7 +805,6 @@ bool VstPlugin::eventFilter(QObject *obj, QEvent *event)
 		}
 		qDebug() << obj << event;
 	}
-#endif
 	return false;
 }
 

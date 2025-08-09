@@ -95,12 +95,12 @@ int ProjectVersion::compare(const ProjectVersion & a, const ProjectVersion & b, 
 	if(aPat != bPat){ return aPat - bPat; }
 
 	// Decide how many optional identifiers we care about
-	const int maxLabels = qMax(0, limit - 3);
+	const int maxLabels = std::max(0, limit - 3);
 	const auto aLabels = a.getLabels().mid(0, maxLabels);
 	const auto bLabels = b.getLabels().mid(0, maxLabels);
 
 	// We can only compare identifiers if both versions have them
-	const int commonLabels = qMin(aLabels.size(), bLabels.size());
+	const int commonLabels = std::min(aLabels.size(), bLabels.size());
 	// If one version has optional labels and the other doesn't,
 	// the one without them is bigger
 	if (commonLabels == 0){ return bLabels.size() - aLabels.size(); }

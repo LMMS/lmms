@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef PATHUTIL_H
-#define PATHUTIL_H
+#ifndef LMMS_PATHUTIL_H
+#define LMMS_PATHUTIL_H
 
 #include "lmms_export.h"
 
@@ -31,8 +31,8 @@
 
 namespace lmms::PathUtil
 {
-	enum class Base { Absolute, ProjectDir, FactorySample, UserSample, UserVST, Preset,
-		UserLADSPA, DefaultLADSPA, UserSoundfont, DefaultSoundfont, UserGIG, DefaultGIG,
+	enum class Base { Absolute, ProjectDir, FactoryProjects, FactorySample, UserSample, UserVST, Preset,
+		FactoryPresets, UserLADSPA, DefaultLADSPA, UserSoundfont, DefaultSoundfont, UserGIG, DefaultGIG,
 		LocalDir };
 
 	//! Return the directory associated with a given base as a QString
@@ -70,4 +70,4 @@ namespace lmms::PathUtil
 
 } // namespace lmms::PathUtil
 
-#endif
+#endif // LMMS_PATHUTIL_H

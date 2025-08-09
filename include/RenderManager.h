@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef RENDER_MANAGER_H
-#define RENDER_MANAGER_H
+#ifndef LMMS_RENDER_MANAGER_H
+#define LMMS_RENDER_MANAGER_H
 
 #include <memory>
 
@@ -43,7 +43,7 @@ public:
 	RenderManager(
 		const AudioEngine::qualitySettings & qualitySettings,
 		const OutputSettings & outputSettings,
-		ProjectRenderer::ExportFileFormats fmt,
+		ProjectRenderer::ExportFileFormat fmt,
 		QString outputPath);
 
 	~RenderManager() override;
@@ -73,16 +73,16 @@ private:
 	const AudioEngine::qualitySettings m_qualitySettings;
 	const AudioEngine::qualitySettings m_oldQualitySettings;
 	const OutputSettings m_outputSettings;
-	ProjectRenderer::ExportFileFormats m_format;
+	ProjectRenderer::ExportFileFormat m_format;
 	QString m_outputPath;
 
 	std::unique_ptr<ProjectRenderer> m_activeRenderer;
 
-	QVector<Track*> m_tracksToRender;
-	QVector<Track*> m_unmuted;
+	std::vector<Track*> m_tracksToRender;
+	std::vector<Track*> m_unmuted;
 } ;
 
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_RENDER_MANAGER_H

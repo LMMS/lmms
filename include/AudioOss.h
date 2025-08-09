@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef AUDIO_OSS_H
-#define AUDIO_OSS_H
+#ifndef LMMS_AUDIO_OSS_H
+#define LMMS_AUDIO_OSS_H
 
 #include "lmmsconfig.h"
 
@@ -79,7 +79,6 @@ class setupWidget : public gui::AudioDeviceSetupWidget
 private:
 	void startProcessing() override;
 	void stopProcessing() override;
-	void applyQualitySettings() override;
 	void run() override;
 
 	int m_audioFD;
@@ -92,4 +91,4 @@ private:
 
 #endif // LMMS_HAVE_OSS
 
-#endif
+#endif // LMMS_AUDIO_OSS_H

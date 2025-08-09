@@ -32,7 +32,6 @@
 #include <QLabel>
 
 
-#include "gui_templates.h"
 #include "LadspaDescription.h"
 #include "LadspaPortDialog.h"
 #include "TabBar.h"
@@ -56,7 +55,7 @@ Plugin::Descriptor PLUGIN_EXPORT ladspabrowser_plugin_descriptor =
 				"List installed LADSPA plugins" ),
 	"Danny McRae <khjklujn/at/users.sourceforge.net>",
 	0x0100,
-	Plugin::Tool,
+	Plugin::Type::Tool,
 	new PluginPixmapLoader("logo"),
 	nullptr,
 	nullptr,
@@ -98,7 +97,7 @@ LadspaBrowserView::LadspaBrowserView( ToolPlugin * _tool ) :
 {
 	auto hlayout = new QHBoxLayout(this);
 	hlayout->setSpacing( 0 );
-	hlayout->setMargin( 0 );
+	hlayout->setContentsMargins(0, 0, 0, 0);
 
 	m_tabBar = new TabBar( this, QBoxLayout::TopToBottom );
 	m_tabBar->setExclusive( true );
@@ -107,12 +106,12 @@ LadspaBrowserView::LadspaBrowserView( ToolPlugin * _tool ) :
 	auto ws = new QWidget(this);
 	ws->setFixedSize( 500, 480 );
 
-	QWidget * available = createTab( ws, tr( "Available Effects" ), VALID );
+	QWidget * available = createTab( ws, tr( "Available Effects" ), LadspaPluginType::Valid );
 	QWidget * unavailable = createTab( ws, tr( "Unavailable Effects" ),
-								INVALID );
-	QWidget * instruments = createTab( ws, tr( "Instruments" ), SOURCE );
-	QWidget * analysis = createTab( ws, tr( "Analysis Tools" ), SINK );
-	QWidget * other = createTab( ws, tr( "Don't know" ), OTHER );
+								LadspaPluginType::Invalid );
+	QWidget * instruments = createTab( ws, tr( "Instruments" ), LadspaPluginType::Source );
+	QWidget * analysis = createTab( ws, tr( "Analysis Tools" ), LadspaPluginType::Sink );
+	QWidget * other = createTab( ws, tr( "Don't know" ), LadspaPluginType::Other );
 
 
 	m_tabBar->addTab( available, tr( "Available Effects" ), 
@@ -166,13 +165,12 @@ QWidget * LadspaBrowserView::createTab( QWidget * _parent, const QString & _txt,
 	tab->setFixedSize( 500, 400 );
 	auto layout = new QVBoxLayout(tab);
 	layout->setSpacing( 0 );
-	layout->setMargin( 0 );
+	layout->setContentsMargins(0, 0, 0, 0);
 
 	const QString type = "<b>" + tr( "Type:" ) + "</b> ";
 	auto title = new QLabel(type + _txt, tab);
 	QFont f = title->font();
 	f.setBold( true );
-	title->setFont( pointSize<12>( f ) );
 
 	layout->addSpacing( 5 );
 	layout->addWidget( title );

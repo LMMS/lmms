@@ -27,7 +27,6 @@
 #include "WaveShaper.h"
 #include "lmms_math.h"
 #include "embed.h"
-#include "interpolation.h"
 
 #include "plugin_export.h"
 
@@ -46,7 +45,7 @@ Plugin::Descriptor PLUGIN_EXPORT waveshaper_plugin_descriptor =
 				"plugin for waveshaping" ),
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
 	0x0100,
-	Plugin::Effect,
+	Plugin::Type::Effect,
 	new PluginPixmapLoader("logo"),
 	nullptr,
 	nullptr,
@@ -66,18 +65,11 @@ WaveShaperEffect::WaveShaperEffect( Model * _parent,
 
 
 
-bool WaveShaperEffect::processAudioBuffer( sampleFrame * _buf,
-							const fpp_t _frames )
+Effect::ProcessStatus WaveShaperEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 {
-	if( !isEnabled() || !isRunning () )
-	{
-		return( false );
-	}
-
 // variables for effect
 	int i = 0;
 
-	double out_sum = 0.0;
 	const float d = dryLevel();
 	const float w = wetLevel();
 	float input = m_wsControls.m_inputModel.value();
@@ -94,9 +86,9 @@ bool WaveShaperEffect::processAudioBuffer( sampleFrame * _buf,
 	const float *inputPtr = inputBuffer ? &( inputBuffer->values()[ 0 ] ) : &input;
 	const float *outputPtr = outputBufer ? &( outputBufer->values()[ 0 ] ) : &output;
 
-	for( fpp_t f = 0; f < _frames; ++f )
+	for (fpp_t f = 0; f < frames; ++f)
 	{
-		float s[2] = { _buf[f][0], _buf[f][1] };
+		auto s = std::array{buf[f][0], buf[f][1]};
 
 // apply input gain
 		s[0] *= *inputPtr;
@@ -114,7 +106,7 @@ bool WaveShaperEffect::processAudioBuffer( sampleFrame * _buf,
 		for( i=0; i <= 1; ++i )
 		{
 			const int lookup = static_cast<int>( qAbs( s[i] ) * 200.0f );
-			const float frac = fraction( qAbs( s[i] ) * 200.0f ); 
+			const float frac = fraction( qAbs( s[i] ) * 200.0f );
 			const float posneg = s[i] < 0 ? -1.0f : 1.0f;
 
 			if( lookup < 1 )
@@ -122,10 +114,8 @@ bool WaveShaperEffect::processAudioBuffer( sampleFrame * _buf,
 				s[i] = frac * samples[0] * posneg;
 			}
 			else if( lookup < 200 )
-			{	
-				s[i] = linearInterpolate( samples[ lookup - 1 ], 
-						samples[ lookup ], frac )
-						* posneg;
+			{
+				s[i] = std::lerp(samples[lookup - 1], samples[lookup], frac) * posneg;
 			}
 			else
 			{
@@ -138,17 +128,14 @@ bool WaveShaperEffect::processAudioBuffer( sampleFrame * _buf,
 		s[1] *= *outputPtr;
 
 // mix wet/dry signals
-		_buf[f][0] = d * _buf[f][0] + w * s[0];
-		_buf[f][1] = d * _buf[f][1] + w * s[1];
-		out_sum += _buf[f][0] * _buf[f][0] + _buf[f][1] * _buf[f][1];
+		buf[f][0] = d * buf[f][0] + w * s[0];
+		buf[f][1] = d * buf[f][1] + w * s[1];
 
 		outputPtr += outputInc;
 		inputPtr += inputInc;
 	}
 
-	checkGate( out_sum / _frames );
-
-	return( isRunning() );
+	return ProcessStatus::ContinueIfNotQuiet;
 }
 
 

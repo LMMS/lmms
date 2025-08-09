@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef EDITOR_COMMON_H
-#define EDITOR_COMMON_H
+#ifndef LMMS_GUI_EDITOR_H
+#define LMMS_GUI_EDITOR_H
 
 #include <QMainWindow>
 #include <QToolBar>
@@ -56,7 +56,14 @@ protected:
 	DropToolBar * addDropToolBar(Qt::ToolBarArea whereToAdd, QString const & windowTitle);
 	DropToolBar * addDropToolBar(QWidget * parent, Qt::ToolBarArea whereToAdd, QString const & windowTitle);
 
-	void closeEvent( QCloseEvent * _ce ) override;
+	void closeEvent(QCloseEvent * event) override;
+	void keyPressEvent(QKeyEvent *ke) override;
+public slots:
+	//! Called by pressing the space key. Plays or stops.
+	void togglePlayStop();
+	//! Called by pressing shift+space. Toggles pause state.
+	void togglePause();
+
 protected slots:
 	virtual void play() {}
 	virtual void record() {}
@@ -65,12 +72,6 @@ protected slots:
 	virtual void stop() {}
 
 private slots:
-	/// Called by pressing the space key. Plays or stops.
-	void togglePlayStop();
-	
-	/// Called by pressing shift+space. Toggles pause state.
-	void togglePause();
-
 	void toggleMaximize();
 
 signals:
@@ -113,4 +114,4 @@ protected:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_EDITOR_H

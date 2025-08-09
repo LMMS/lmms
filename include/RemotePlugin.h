@@ -22,21 +22,25 @@
  *
  */
 
-#ifndef REMOTE_PLUGIN_H
-#define REMOTE_PLUGIN_H
+#ifndef LMMS_REMOTE_PLUGIN_H
+#define LMMS_REMOTE_PLUGIN_H
+
+#include <QThread>
+#include <QProcess>
+#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
+#include <QRecursiveMutex>  // IWYU pragma: keep
+#endif
 
 #include "RemotePluginBase.h"
 #include "SharedMemory.h"
-
-#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
-	#include <QRecursiveMutex>
-#endif
+#include "LmmsTypes.h"
 
 namespace lmms
 {
 
-
+class MidiEvent;
 class RemotePlugin;
+class SampleFrame;
 
 class ProcessWatcher : public QThread
 {
@@ -96,7 +100,7 @@ public:
 
 	bool processMessage( const message & _m ) override;
 
-	bool process( const sampleFrame * _in_buf, sampleFrame * _out_buf );
+	bool process( const SampleFrame* _in_buf, SampleFrame* _out_buf );
 
 	void processMidiEvent( const MidiEvent&, const f_cnt_t _offset );
 
@@ -188,13 +192,11 @@ private slots:
 	void processErrored(QProcess::ProcessError err );
 } ;
 
-
-LMMS_EXPORT inline std::string QSTR_TO_STDSTR(QString const& qstr)
+inline std::string QSTR_TO_STDSTR(QString const& qstr)
 {
 	return qstr.toStdString();
 }
 
-
 } // namespace lmms
 
-#endif // REMOTE_PLUGIN_H
+#endif // LMMS_REMOTE_PLUGIN_H

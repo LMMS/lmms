@@ -21,10 +21,9 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
 
-#ifndef PATTERN_CLIP_H
-#define PATTERN_CLIP_H
+#ifndef LMMS_PATTERN_CLIP_H
+#define LMMS_PATTERN_CLIP_H
 
 #include "Clip.h"
 
@@ -52,6 +51,11 @@ public:
 
 	gui::ClipView * createView( gui::TrackView * _tv ) override;
 
+	PatternClip* clone() override
+	{
+		return new PatternClip(*this);
+	}
+
 private:
 	friend class PatternClipView;
 } ;
@@ -59,4 +63,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_PATTERN_CLIP_H

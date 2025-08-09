@@ -70,16 +70,14 @@
 **
 ****************************************************************************/
 
-#ifndef CONTROLLAYOUT_H
-#define CONTROLLAYOUT_H
+#ifndef LMMS_GUI_CONTROL_LAYOUT_H
+#define LMMS_GUI_CONTROL_LAYOUT_H
 
 #include <QLayout>
 #include <QMultiMap>
 #include <QStyle>
 
 class QLayoutItem;
-class QRect;
-class QString;
 class QLineEdit;
 
 
@@ -141,4 +139,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif // CONTROLLAYOUT_H
+#endif // LMMS_GUI_CONTROL_LAYOUT_H

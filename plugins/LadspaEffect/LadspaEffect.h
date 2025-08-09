@@ -47,9 +47,8 @@ public:
 			const Descriptor::SubPluginFeatures::Key * _key );
 	~LadspaEffect() override;
 
-	bool processAudioBuffer( sampleFrame * _buf,
-							const fpp_t _frames ) override;
-	
+	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
+
 	void setControl( int _control, LADSPA_Data _data );
 
 	EffectControls * controls() override
@@ -62,6 +61,10 @@ public:
 		return m_portControls;
 	}
 
+	ch_cnt_t processorCount() const
+	{
+		return m_processors;
+	}
 
 private slots:
 	void changeSampleRate();
@@ -88,7 +91,8 @@ private:
 	QVector<multi_proc_t> m_ports;
 	multi_proc_t m_portControls;
 
-} ;
+	ch_cnt_t m_processors = 1;
+};
 
 
 } // namespace lmms

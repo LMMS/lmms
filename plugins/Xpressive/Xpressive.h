@@ -29,6 +29,7 @@
 
 #include <QTextEdit>
 
+#include "AutomatableModel.h"
 #include "Graph.h"
 #include "Instrument.h"
 #include "InstrumentView.h"
@@ -41,8 +42,6 @@ namespace lmms
 {
 
 
-class oscillator;
-
 const int	W1_EXPR = 0;
 const int	W2_EXPR = 1;
 const int	W3_EXPR = 2;
@@ -51,14 +50,13 @@ const int	O2_EXPR = 4;
 const int	NUM_EXPRS = 5;
 
 
-class ExprFront;
-
 namespace gui
 {
-class SubWindow;
-class XpressiveView;
+class AutomatableButtonGroup;
+class Knob;
+class LedCheckBox;
+class PixmapButton;
 }
-
 
 
 class Xpressive : public Instrument
@@ -68,7 +66,7 @@ public:
 	Xpressive(InstrumentTrack* instrument_track );
 
 	void playNote(NotePlayHandle* nph,
-						sampleFrame* working_buffer ) override;
+						SampleFrame* working_buffer ) override;
 	void deleteNotePluginData( NotePlayHandle* nph ) override;
 
 
@@ -184,12 +182,13 @@ private:
 	Knob *m_smoothKnob;
 	QPlainTextEdit * m_expressionEditor;
 
-	automatableButtonGroup *m_selectedGraphGroup;
+	AutomatableButtonGroup *m_selectedGraphGroup;
 	PixmapButton *m_w1Btn;
 	PixmapButton *m_w2Btn;
 	PixmapButton *m_w3Btn;
 	PixmapButton *m_o1Btn;
 	PixmapButton *m_o2Btn;
+	PixmapButton *m_helpBtn;
 	PixmapButton *m_sinWaveBtn;
 	PixmapButton *m_triangleWaveBtn;
 	PixmapButton *m_sqrWaveBtn;

@@ -19,10 +19,11 @@
  * License along with this program (see COPYING); if not, write to the
  * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA 02110-1301 USA.
+ *
  */
 
-#ifndef RAII_HELPERS_H
-#define RAII_HELPERS_H
+#ifndef LMMS_RAII_HELPERS_H
+#define LMMS_RAII_HELPERS_H
 
 #include <cstddef>
 #include <memory>
@@ -63,4 +64,4 @@ using UniqueNullableResource = std::unique_ptr<T, NullableResourceDeleter<T, Nul
 
 } // namespace lmms
 
-#endif // RAII_HELPERS_H
+#endif // LMMS_RAII_HELPERS_H

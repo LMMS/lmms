@@ -22,14 +22,14 @@
  *
  */
 
-
-#ifndef TEXT_FLOAT_H
-#define TEXT_FLOAT_H
+#ifndef LMMS_GUI_TEXT_FLOAT_H
+#define LMMS_GUI_TEXT_FLOAT_H
 
 #include <QWidget>
-#include <QPixmap>
 
 #include "lmms_export.h"
+
+class QLabel;
 
 namespace lmms::gui
 {
@@ -41,45 +41,38 @@ public:
 	TextFloat();
 	~TextFloat() override = default;
 
-	void setTitle( const QString & _title );
-	void setText( const QString & _text );
-	void setPixmap( const QPixmap & _pixmap );
+	void setTitle(const QString & title);
+	void setText(const QString & text);
+	void setPixmap(const QPixmap & pixmap);
 
-	void setVisibilityTimeOut( int _msecs );
+	void setVisibilityTimeOut(int msecs);
 
+	static TextFloat * displayMessage(const QString & title,
+						const QString & msg,
+						const QPixmap & pixmap = QPixmap(),
+						int timeout = 2000,
+						QWidget * parent = nullptr);
 
-	static TextFloat * displayMessage( const QString & _msg,
-						int _timeout = 2000,
-						QWidget * _parent = nullptr,
-						int _add_y_margin = 0 );
-	static TextFloat * displayMessage( const QString & _title,
-						const QString & _msg,
-						const QPixmap & _pixmap =
-								QPixmap(),
-						int _timeout = 2000,
-						QWidget * _parent = nullptr );
-
-	void moveGlobal( QWidget * _w, const QPoint & _offset )
+	void moveGlobal(QWidget * w, const QPoint & offset)
 	{
-		move( _w->mapToGlobal( QPoint( 0, 0 ) )+_offset );
+		move(w->mapToGlobal(QPoint(0, 0)) + offset);
 	}
 
 
 protected:
-	void paintEvent( QPaintEvent * _me ) override;
-	void mousePressEvent( QMouseEvent * _me ) override;
+	void mousePressEvent(QMouseEvent * me) override;
 
 
 private:
-	void updateSize();
+	TextFloat(const QString & title, const QString & text, const QPixmap & pixmap);
 
-	QString m_title;
-	QString m_text;
-	QPixmap m_pixmap;
+	QLabel * m_pixmapLabel;
+	QLabel * m_titleLabel;
+	QLabel * m_textLabel;
 
 };
 
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_TEXT_FLOAT_H

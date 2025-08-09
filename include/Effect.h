@@ -23,15 +23,16 @@
  *
  */
 
-#ifndef EFFECT_H
-#define EFFECT_H
+#ifndef LMMS_EFFECT_H
+#define LMMS_EFFECT_H
 
-#include "Plugin.h"
-#include "Engine.h"
+#include <span>
+
 #include "AudioEngine.h"
 #include "AutomatableModel.h"
+#include "Engine.h"
+#include "Plugin.h"
 #include "TempoSyncKnobModel.h"
-#include "MemoryManager.h"
 
 namespace lmms
 {
@@ -49,7 +50,6 @@ class EffectView;
 
 class LMMS_EXPORT Effect : public Plugin
 {
-	MM_OPERATORS
 	Q_OBJECT
 public:
 	Effect( const Plugin::Descriptor * _desc,
@@ -65,19 +65,8 @@ public:
 		return "effect";
 	}
 
-	
-	virtual bool processAudioBuffer( sampleFrame * _buf,
-						const fpp_t _frames ) = 0;
-
-	inline ch_cnt_t processorCount() const
-	{
-		return m_processors;
-	}
-
-	inline void setProcessorCount( ch_cnt_t _processors )
-	{
-		m_processors = _processors;
-	}
+	//! Returns true if audio was processed and should continue being processed
+	bool processAudioBuffer(SampleFrame* buf, const fpp_t frames);
 
 	inline bool isOkay() const
 	{
@@ -95,14 +84,15 @@ public:
 		return m_running;
 	}
 
-	inline void startRunning() 
-	{ 
-		m_bufferCount = 0;
-		m_running = true; 
+	void startRunning()
+	{
+		m_quietBufferCount = 0;
+		m_running = true;
 	}
 
-	inline void stopRunning()
+	void stopRunning()
 	{
+		m_quietBufferCount = 0;
 		m_running = false;
 	}
 
@@ -113,7 +103,7 @@ public:
 
 	inline f_cnt_t timeout() const
 	{
-		const float samples = Engine::audioEngine()->processingSampleRate() * m_autoQuitModel.value() / 1000.0f;
+		const float samples = Engine::audioEngine()->outputSampleRate() * m_autoQuitModel.value() / 1000.0f;
 		return 1 + ( static_cast<int>( samples ) / Engine::audioEngine()->framesPerPeriod() );
 	}
 
@@ -127,27 +117,6 @@ public:
 		return 1.0f - m_wetDryModel.value();
 	}
 
-	inline float gate() const
-	{
-		const float level = m_gateModel.value();
-		return level*level * m_processors;
-	}
-
-	inline f_cnt_t bufferCount() const
-	{
-		return m_bufferCount;
-	}
-
-	inline void resetBufferCount()
-	{
-		m_bufferCount = 0;
-	}
-
-	inline void incrementBufferCount()
-	{
-		++m_bufferCount;
-	}
-
 	inline bool dontRun() const
 	{
 		return m_noRun;
@@ -156,6 +125,16 @@ public:
 	inline void setDontRun( bool _state )
 	{
 		m_noRun = _state;
+	}
+	
+	inline TempoSyncKnobModel* autoQuitModel()
+	{
+		return &m_autoQuitModel;
+	}
+
+	bool autoQuitEnabled() const
+	{
+		return m_autoQuitEnabled;
 	}
 
 	EffectChain * effectChain() const
@@ -171,61 +150,85 @@ public:
 
 
 protected:
-	/**
-		Effects should call this at the end of audio processing
+	enum class ProcessStatus
+	{
+		//! Unconditionally continue processing
+		Continue,
 
-		If the setting "Keep effects running even without input" is disabled,
-		after "decay" ms of a signal below "gate", the effect is turned off
-		and won't be processed again until it receives new audio input
-	*/
-	void checkGate( double _out_sum );
+		//! Calculate the RMS out sum and call `checkGate` to determine whether to stop processing
+		ContinueIfNotQuiet,
+
+		//! Do not continue processing
+		Sleep
+	};
+
+	/**
+	 * The main audio processing method that runs when plugin is not asleep
+	 */
+	virtual ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) = 0;
+
+	/**
+	 * Optional method that runs when plugin is sleeping (not enabled,
+	 * not running, not in the Okay state, or in the Don't Run state)
+	 */
+	virtual void processBypassedImpl() {}
+
 
 	gui::PluginView* instantiateView( QWidget * ) override;
 
 	// some effects might not be capable of higher sample-rates so they can
 	// sample it down before processing and back after processing
-	inline void sampleDown( const sampleFrame * _src_buf,
-							sampleFrame * _dst_buf,
+	inline void sampleDown( const SampleFrame* _src_buf,
+							SampleFrame* _dst_buf,
 							sample_rate_t _dst_sr )
 	{
 		resample( 0, _src_buf,
-				Engine::audioEngine()->processingSampleRate(),
+				Engine::audioEngine()->outputSampleRate(),
 					_dst_buf, _dst_sr,
 					Engine::audioEngine()->framesPerPeriod() );
 	}
 
-	inline void sampleBack( const sampleFrame * _src_buf,
-							sampleFrame * _dst_buf,
+	inline void sampleBack( const SampleFrame* _src_buf,
+							SampleFrame* _dst_buf,
 							sample_rate_t _src_sr )
 	{
 		resample( 1, _src_buf, _src_sr, _dst_buf,
-				Engine::audioEngine()->processingSampleRate(),
+				Engine::audioEngine()->outputSampleRate(),
 			Engine::audioEngine()->framesPerPeriod() * _src_sr /
-				Engine::audioEngine()->processingSampleRate() );
+				Engine::audioEngine()->outputSampleRate() );
 	}
 	void reinitSRC();
 
+	virtual void onEnabledChanged() {}
+
 
 private:
-	EffectChain * m_parent;
-	void resample( int _i, const sampleFrame * _src_buf,
-					sample_rate_t _src_sr,
-					sampleFrame * _dst_buf, sample_rate_t _dst_sr,
-					const f_cnt_t _frames );
+	/**
+	 * If auto-quit is enabled ("Keep effects running even without input" setting is disabled),
+	 * after "decay" ms of the output buffer remaining below the silence threshold, the effect is
+	 * turned off and won't be processed again until it receives new audio input.
+	 */
+	void handleAutoQuit(std::span<const SampleFrame> output);
 
-	ch_cnt_t m_processors;
+
+	EffectChain * m_parent;
+	void resample( int _i, const SampleFrame* _src_buf,
+					sample_rate_t _src_sr,
+					SampleFrame* _dst_buf, sample_rate_t _dst_sr,
+					const f_cnt_t _frames );
 
 	bool m_okay;
 	bool m_noRun;
 	bool m_running;
-	f_cnt_t m_bufferCount;
+
+	//! The number of consecutive periods where output buffers remain below the silence threshold
+	f_cnt_t m_quietBufferCount = 0;
 
 	BoolModel m_enabledModel;
 	FloatModel m_wetDryModel;
-	FloatModel m_gateModel;
 	TempoSyncKnobModel m_autoQuitModel;
-	
-	bool m_autoQuitDisabled;
+
+	bool m_autoQuitEnabled = false;
 
 	SRC_DATA m_srcData[2];
 	SRC_STATE * m_srcState[2];
@@ -241,4 +244,4 @@ using EffectKeyList = Effect::Descriptor::SubPluginFeatures::KeyList;
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_EFFECT_H

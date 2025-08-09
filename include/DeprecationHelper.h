@@ -24,10 +24,13 @@
  *
  */
 
-#ifndef DEPRECATIONHELPER_H
-#define DEPRECATIONHELPER_H
+#ifndef LMMS_DEPRECATIONHELPER_H
+#define LMMS_DEPRECATIONHELPER_H
+
+#include <type_traits>
 
 #include <QFontMetrics>
+#include <QKeySequence>
 #include <QWheelEvent>
 
 namespace lmms
@@ -64,6 +67,30 @@ inline QPoint position(QWheelEvent *wheelEvent)
 #endif
 }
 
+
+namespace detail
+{
+
+template<typename T>
+inline constexpr bool IsKeyOrModifier = std::is_same_v<T, Qt::Key>
+	|| std::is_same_v<T, Qt::Modifier> || std::is_same_v<T, Qt::KeyboardModifier>;
+
+} // namespace detail
+
+
+/**
+ * @brief Combines Qt key and modifier arguments together,
+ * replacing `A | B` which was deprecated in C++20
+ * due to the enums being different types. (P1120R0)
+ * @param args Any number of Qt::Key, Qt::Modifier, or Qt::KeyboardModifier
+ * @return The combination of the given keys/modifiers as an int
+ */
+template<typename... Args, std::enable_if_t<(detail::IsKeyOrModifier<Args> && ...), bool> = true>
+constexpr int combine(Args... args)
+{
+	return (0 | ... | static_cast<int>(args));
+}
+
 } // namespace lmms
 
-#endif // DEPRECATIONHELPER_H
+#endif // LMMS_DEPRECATIONHELPER_H

@@ -22,19 +22,19 @@
  *
  */
 
+#include "ConfigManager.h"
 
-#include <QDomElement>
-#include <QDir>
-#include <QMessageBox>
+#include <PathUtil.h>
 #include <QApplication>
+#include <QDir>
+#include <QDomElement>
+#include <QMessageBox>
 #include <QStandardPaths>
 #include <QTextStream>
 
-#include "ConfigManager.h"
+#include "GuiApplication.h"
 #include "MainWindow.h"
 #include "ProjectVersion.h"
-#include "GuiApplication.h"
-
 #include "lmmsversion.h"
 
 namespace lmms
@@ -77,9 +77,9 @@ ConfigManager::ConfigManager() :
 	m_sf2Dir = m_workingDir + SF2_PATH;
 	m_gigDir = m_workingDir + GIG_PATH;
 	m_themeDir = defaultThemeDir();
-	if (!qgetenv("LMMS_DATA_DIR").isEmpty())
+	if (std::getenv("LMMS_DATA_DIR"))
 	{
-		QDir::addSearchPath("data", QString::fromLocal8Bit(qgetenv("LMMS_DATA_DIR")));
+		QDir::addSearchPath("data", QString::fromLocal8Bit(std::getenv("LMMS_DATA_DIR")));
 	}
 	initDevelopmentWorkingDir();
 
@@ -173,7 +173,7 @@ void ConfigManager::upgrade()
 	ProjectVersion createdWith = m_version;
 	
 	// Don't use old themes as they break the UI (i.e. 0.4 != 1.0, etc)
-	if (createdWith.setCompareType(ProjectVersion::Minor) != LMMS_VERSION)
+	if (createdWith.setCompareType(ProjectVersion::CompareType::Minor) != LMMS_VERSION)
 	{
 		m_themeDir = defaultThemeDir();
 	}
@@ -188,13 +188,17 @@ QString ConfigManager::defaultVersion() const
 	return LMMS_VERSION;
 }
 
+bool ConfigManager::enableBlockedPlugins()
+{
+	const char* envVar = getenv("LMMS_ENABLE_BLOCKED_PLUGINS");
+	return (envVar && *envVar);
+}
+
 QStringList ConfigManager::availableVstEmbedMethods()
 {
 	QStringList methods;
 	methods.append("none");
-#if QT_VERSION >= 0x050100
 	methods.append("qt");
-#endif
 #ifdef LMMS_BUILD_WIN32
 	methods.append("win32");
 #endif
@@ -295,9 +299,6 @@ void ConfigManager::setBackgroundPicFile(const QString & backgroundPicFile)
 	m_backgroundPicFile = backgroundPicFile;
 }
 
-
-
-
 void ConfigManager::createWorkingDir()
 {
 	QDir().mkpath(m_workingDir);
@@ -331,13 +332,31 @@ void ConfigManager::addRecentlyOpenedProject(const QString & file)
 	}
 }
 
-
-
-
-const QString & ConfigManager::value(const QString & cls,
-					const QString & attribute) const
+void ConfigManager::addFavoriteItem(const QString& item)
 {
-	if(m_settings.contains(cls))
+	m_favoriteItems.push_back(item);
+	saveConfigFile();
+	emit favoritesChanged();
+}
+
+void ConfigManager::removeFavoriteItem(const QString& item)
+{
+	m_favoriteItems.removeAll(item);
+	saveConfigFile();
+	emit favoritesChanged();
+}
+
+bool ConfigManager::isFavoriteItem(const QString& item)
+{
+	const auto& items = favoriteItems();
+	const auto it = std::find_if(items.begin(), items.end(),
+		[&](const auto& favoriteItem) { return QFileInfo{item} == QFileInfo{favoriteItem}; });
+	return it != items.end();
+}
+
+QString ConfigManager::value(const QString& cls, const QString& attribute, const QString& defaultVal) const
+{
+	if (m_settings.find(cls) != m_settings.end())
 	{
 		for (const auto& setting : m_settings[cls])
 		{
@@ -347,18 +366,7 @@ const QString & ConfigManager::value(const QString & cls,
 			}
 		}
 	}
-	static QString empty;
-	return empty;
-}
-
-
-
-const QString & ConfigManager::value(const QString & cls,
-				      const QString & attribute,
-				      const QString & defaultVal) const
-{
-	const QString & val = value(cls, attribute);
-	return val.isEmpty() ? defaultVal : val;
+	return defaultVal;
 }
 
 
@@ -474,8 +482,20 @@ void ConfigManager::loadConfigFile(const QString & configFile)
 					{
 						if(n.isElement() && n.toElement().hasAttributes())
 						{
-							m_recentlyOpenedProjects <<
-									n.toElement().attribute("path");
+							m_recentlyOpenedProjects << n.toElement().attribute("path");
+						}
+						n = n.nextSibling();
+					}
+				}
+				else if (node.nodeName() == "favoriteitems")
+				{
+					m_favoriteItems.clear();
+					QDomNode n = node.firstChild();
+					while (!n.isNull())
+					{
+						if (n.isElement() && n.toElement().hasAttributes())
+						{
+							m_favoriteItems << n.toElement().attribute("path");
 						}
 						n = n.nextSibling();
 					}
@@ -526,7 +546,7 @@ void ConfigManager::loadConfigFile(const QString & configFile)
 		cfg_file.close();
 	}
 
-	// Plugins are searched recursively, blacklist problematic locations
+	// Plugins are searched recursively, block problematic locations
 	if( m_vstDir.isEmpty() || m_vstDir == QDir::separator() || m_vstDir == "/" ||
 			m_vstDir == ensureTrailingSlash( QDir::homePath() ) ||
 			!QDir( m_vstDir ).exists() )
@@ -569,8 +589,8 @@ void ConfigManager::loadConfigFile(const QString & configFile)
 	upgrade();
 
 	QStringList searchPaths;
-	if(! qgetenv("LMMS_THEME_PATH").isNull())
-		searchPaths << qgetenv("LMMS_THEME_PATH");
+	if (std::getenv("LMMS_THEME_PATH"))
+		searchPaths << std::getenv("LMMS_THEME_PATH");
 	searchPaths << themeDir() << defaultThemeDir();
 	QDir::setSearchPaths("resources", searchPaths);
 
@@ -578,6 +598,16 @@ void ConfigManager::loadConfigFile(const QString & configFile)
 	if(hasWorkingDir())
 	{
 		createWorkingDir();
+	}
+
+	for (auto& file : m_recentlyOpenedProjects)
+	{
+		file = PathUtil::toAbsolute(file);
+	}
+
+	for (auto& file : m_favoriteItems)
+	{
+		file = PathUtil::toAbsolute(file);
 	}
 }
 
@@ -622,10 +652,21 @@ void ConfigManager::saveConfigFile()
 	for (const auto& recentlyOpenedProject : m_recentlyOpenedProjects)
 	{
 		QDomElement n = doc.createElement("file");
-		n.setAttribute("path", recentlyOpenedProject);
+		n.setAttribute("path", PathUtil::toShortestRelative(recentlyOpenedProject));
 		recent_files.appendChild(n);
 	}
 	lmms_config.appendChild(recent_files);
+
+	QDomElement favorite_items = doc.createElement("favoriteitems");
+
+	for (const auto& favoriteItem : m_favoriteItems)
+	{
+		QDomElement n = doc.createElement("item");
+		n.setAttribute("path", PathUtil::toShortestRelative(favoriteItem));
+		favorite_items.appendChild(n);
+	}
+
+	lmms_config.appendChild(favorite_items);
 
 	QString xml = "<?xml version=\"1.0\"?>\n" + doc.toString(2);
 
@@ -719,7 +760,7 @@ unsigned int ConfigManager::legacyConfigVersion()
 {
 	ProjectVersion createdWith = m_version;
 
-	createdWith.setCompareType(ProjectVersion::Build);
+	createdWith.setCompareType(ProjectVersion::CompareType::Build);
 
 	if( createdWith < "1.1.90" )
 	{

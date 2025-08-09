@@ -22,9 +22,8 @@
  *
  */
 
-
-#ifndef TRACK_CONTAINER_VIEW_H
-#define TRACK_CONTAINER_VIEW_H
+#ifndef LMMS_GUI_TRACK_CONTAINER_VIEW_H
+#define LMMS_GUI_TRACK_CONTAINER_VIEW_H
 
 #include <QVector>
 #include <QScrollArea>
@@ -167,20 +166,12 @@ public slots:
 
 
 protected:
-	static const int DEFAULT_PIXELS_PER_BAR = 16;
-
-	void resizeEvent( QResizeEvent * ) override;
+	static const int DEFAULT_PIXELS_PER_BAR = 128;
 
 	TimePos m_currentPosition;
 
 
 private:
-	enum Actions
-	{
-		AddTrack,
-		RemoveTrack
-	} ;
-
 	class scrollArea : public QScrollArea
 	{
 	public:
@@ -219,4 +210,4 @@ signals:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_TRACK_CONTAINER_VIEW_H

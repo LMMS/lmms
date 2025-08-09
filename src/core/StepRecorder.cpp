@@ -91,7 +91,7 @@ void StepRecorder::notePressed(const Note & n)
 	StepNote* stepNote = findCurStepNote(n.key());
 	if(stepNote == nullptr)
 	{
-		m_curStepNotes.append(new StepNote(Note(m_curStepLength, m_curStepStartPos, n.key(), n.getVolume(), n.getPanning())));
+		m_curStepNotes.push_back(new StepNote(Note(m_curStepLength, m_curStepStartPos, n.key(), n.getVolume(), n.getPanning())));
 		m_pianoRoll.update();
 	}
 	else if (stepNote->isReleased())
@@ -175,15 +175,15 @@ void StepRecorder::setStepsLength(const TimePos& newLength)
 	updateWidget();
 }
 
-QVector<Note*> StepRecorder::getCurStepNotes()
+std::vector<Note*> StepRecorder::getCurStepNotes()
 {
-	QVector<Note*> notes;
+	std::vector<Note*> notes;
 
 	if(m_isStepInProgress)
 	{
-		for(StepNote* stepNote: m_curStepNotes)
+		for (StepNote* stepNote: m_curStepNotes)
 		{
-			notes.append(&stepNote->m_note);
+			notes.push_back(&stepNote->m_note);
 		}
 	}
 
@@ -288,18 +288,13 @@ void StepRecorder::removeNotesReleasedForTooLong()
 	int nextTimout = std::numeric_limits<int>::max();
 	bool notesRemoved = false;
 
-	QMutableVectorIterator<StepNote*> itr(m_curStepNotes);
-	while (itr.hasNext())
+	for (const auto& stepNote : m_curStepNotes)
 	{
-		StepNote* stepNote = itr.next();
-
-		if(stepNote->isReleased())
+		if (stepNote->isReleased())
 		{
 			const int timeSinceReleased = stepNote->timeSinceReleased(); // capture value to avoid wraparound when calculting nextTimout
 			if (timeSinceReleased >= REMOVE_RELEASED_NOTE_TIME_THRESHOLD_MS)
 			{
-				delete stepNote;
-				itr.remove();
 				notesRemoved = true;
 			}
 			else
@@ -308,6 +303,17 @@ void StepRecorder::removeNotesReleasedForTooLong()
 			}
 		}
 	}
+
+	m_curStepNotes.erase(std::remove_if(m_curStepNotes.begin(), m_curStepNotes.end(), [](auto stepNote)
+	{
+		bool shouldRemove = stepNote->isReleased() && stepNote->timeSinceReleased() >= REMOVE_RELEASED_NOTE_TIME_THRESHOLD_MS;
+		if (shouldRemove)
+		{
+			delete stepNote;
+		}
+
+		return shouldRemove;
+	}), m_curStepNotes.end());
 
 	if(notesRemoved)
 	{

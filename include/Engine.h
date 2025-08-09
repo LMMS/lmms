@@ -22,17 +22,15 @@
  *
  */
 
-
-#ifndef ENGINE_H
-#define ENGINE_H
+#ifndef LMMS_ENGINE_H
+#define LMMS_ENGINE_H
 
 #include <QString>
 #include <QObject>
 
-
 #include "lmmsconfig.h"
 #include "lmms_export.h"
-#include "lmms_basics.h"
+#include "LmmsTypes.h"
 
 namespace lmms
 {
@@ -82,8 +80,6 @@ public:
 	{
 		return s_projectJournal;
 	}
-
-	static bool ignorePluginBlacklist();
 
 #ifdef LMMS_HAVE_LV2
 	static class Lv2Manager * getLv2Manager()
@@ -157,5 +153,4 @@ private:
 
 } // namespace lmms
 
-#endif
-
+#endif // LMMS_ENGINE_H

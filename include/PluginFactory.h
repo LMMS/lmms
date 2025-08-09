@@ -22,21 +22,21 @@
  *
  */
 
-#ifndef PLUGINFACTORY_H
-#define PLUGINFACTORY_H
+#ifndef LMMS_PLUGIN_FACTORY_H
+#define LMMS_PLUGIN_FACTORY_H
 
 #include <memory>
 #include <string>
+#include <vector>
 
 #include <QFileInfo>
 #include <QList>
 #include <QString>
-#include <QVector>
 
 #include "lmms_export.h"
 #include "Plugin.h"
 
-class QLibrary;
+class QLibrary;  // IWYU pragma: keep
 
 namespace lmms
 {
@@ -46,7 +46,7 @@ class LMMS_EXPORT PluginFactory
 public:
 	struct PluginInfo
 	{
-		const QString name() const;
+		QString name() const;
 		QFileInfo file;
 		std::shared_ptr<QLibrary> library = nullptr;
 		Plugin::Descriptor* descriptor = nullptr;
@@ -54,20 +54,21 @@ public:
 		bool isNull() const {return ! library;}
 	};
 	using PluginInfoList = QList<PluginInfo>;
-	using DescriptorMap = QMultiMap<Plugin::PluginTypes, Plugin::Descriptor*>;
+	using DescriptorMap = QMultiMap<Plugin::Type, Plugin::Descriptor*>;
 
 	PluginFactory();
 	~PluginFactory() = default;
 
 	static void setupSearchPaths();
+	static QList<QRegularExpression> getExcludePatterns(const char* envVar);
 
 	/// Returns the singleton instance of PluginFactory. You won't need to call
 	/// this directly, use pluginFactory instead.
 	static PluginFactory* instance();
 
 	/// Returns a list of all found plugins' descriptors.
-	const Plugin::DescriptorList descriptors() const;
-	const Plugin::DescriptorList descriptors(Plugin::PluginTypes type) const;
+	Plugin::DescriptorList descriptors() const;
+	Plugin::DescriptorList descriptors(Plugin::Type type) const;
 
 	struct PluginInfoAndKey
 	{
@@ -79,12 +80,12 @@ public:
 	/// Returns a list of all found plugins' PluginFactory::PluginInfo objects.
 	const PluginInfoList& pluginInfos() const;
 	/// Returns a plugin that support the given file extension
-	const PluginInfoAndKey pluginSupportingExtension(const QString& ext);
+	PluginInfoAndKey pluginSupportingExtension(const QString& ext);
 
 	/// Returns the PluginInfo object of the plugin with the given name.
 	/// If the plugin is not found, an empty PluginInfo is returned (use
 	/// PluginInfo::isNull() to check this).
-	const PluginInfo pluginInfo(const char* name) const;
+	PluginInfo pluginInfo(const char* name) const;
 
 	/// When loading a library fails during discovery, the error string is saved.
 	/// It can be retrieved by calling this function.
@@ -98,11 +99,13 @@ private:
 	PluginInfoList m_pluginInfos;
 
 	QMap<QString, PluginInfoAndKey> m_pluginByExt;
-	QVector<std::string> m_garbage; //!< cleaned up at destruction
+	std::vector<std::string> m_garbage; //!< cleaned up at destruction
 
 	QHash<QString, QString> m_errors;
 
 	static std::unique_ptr<PluginFactory> s_instance;
+
+	static void filterPlugins(QSet<QFileInfo>& files);
 };
 
 //Short-hand function
@@ -111,4 +114,4 @@ LMMS_EXPORT PluginFactory* getPluginFactory();
 
 } // namespace lmms
 
-#endif // PLUGINFACTORY_H
+#endif // LMMS_PLUGIN_FACTORY_H

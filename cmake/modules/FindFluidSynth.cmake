@@ -22,7 +22,7 @@ find_path(FluidSynth_INCLUDE_DIR
 )
 
 find_library(FluidSynth_LIBRARY
-	NAMES "fluidsynth"
+	NAMES "fluidsynth" "fluidsynth-3" "fluidsynth-2" "fluidsynth-1"
 	HINTS ${FLUIDSYNTH_PKG_LIBRARY_DIRS}
 )
 
@@ -34,7 +34,7 @@ if(FluidSynth_INCLUDE_DIR AND FluidSynth_LIBRARY)
 
 	if(VCPKG_INSTALLED_DIR)
 		include(ImportedTargetHelpers)
-		_get_vcpkg_library_configs(FluidSynth_IMPLIB_RELEASE FluidSynth_IMPLIB_DEBUG "${FluidSynth_LIBRARY}")
+		get_vcpkg_library_configs(FluidSynth_IMPLIB_RELEASE FluidSynth_IMPLIB_DEBUG "${FluidSynth_LIBRARY}")
 	else()
 		set(FluidSynth_IMPLIB_RELEASE "${FluidSynth_LIBRARY}")
 	endif()

@@ -27,6 +27,7 @@
 #ifndef SF2_PLAYER_H
 #define SF2_PLAYER_H
 
+#include <array>
 #include <fluidsynth/types.h>
 #include <QMutex>
 #include <samplerate.h>
@@ -34,7 +35,6 @@
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "LcdSpinBox.h"
-#include "MemoryManager.h"
 
 class QLabel;
 
@@ -42,7 +42,6 @@ namespace lmms
 {
 
 
-class Sf2Font;
 struct Sf2PluginData;
 class NotePlayHandle;
 
@@ -65,10 +64,10 @@ public:
 	Sf2Instrument( InstrumentTrack * _instrument_track );
 	~Sf2Instrument() override;
 
-	void play( sampleFrame * _working_buffer ) override;
+	void play( SampleFrame* _working_buffer ) override;
 
 	void playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer ) override;
+						SampleFrame* _working_buffer ) override;
 	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
 
@@ -80,16 +79,6 @@ public:
 	AutomatableModel * childModel( const QString & _modelName ) override;
 
 	QString nodeName() const override;
-
-	f_cnt_t desiredReleaseFrames() const override
-	{
-		return 0;
-	}
-
-	Flags flags() const override
-	{
-		return IsSingleStreamed;
-	}
 
 	gui::PluginView* instantiateView( QWidget * _parent ) override;
 	
@@ -111,19 +100,15 @@ public slots:
 	void updateChorusOn();
 	void updateChorus();
 	void updateGain();
-
+	void updateTuning();
 
 private:
-	static QMutex s_fontsMutex;
-	static QMap<QString, Sf2Font*> s_fonts;
-	static int (* s_origFree)( fluid_sfont_t * );
-
 	SRC_STATE * m_srcState;
 
 	fluid_settings_t* m_settings;
 	fluid_synth_t* m_synth;
 
-	Sf2Font* m_font;
+	fluid_sfont_t* m_font;
 
 	int m_fontId;
 	QString m_filename;
@@ -165,7 +150,7 @@ private:
 	void freeFont();
 	void noteOn( Sf2PluginData * n );
 	void noteOff( Sf2PluginData * n );
-	void renderFrames( f_cnt_t frames, sampleFrame * buf );
+	void renderFrames( f_cnt_t frames, SampleFrame* buf );
 
 	friend class gui::Sf2InstrumentView;
 
@@ -175,22 +160,6 @@ signals:
 	void patchChanged();
 
 } ;
-
-
-
-// A soundfont in our font-map
-class Sf2Font
-{
-	MM_OPERATORS
-public:
-	Sf2Font( fluid_sfont_t * f ) :
-		fluidFont( f ),
-		refCount( 1 )
-	{};
-
-	fluid_sfont_t * fluidFont;
-	int refCount;
-};
 
 
 namespace gui

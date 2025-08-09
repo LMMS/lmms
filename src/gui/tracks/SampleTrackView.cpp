@@ -21,22 +21,27 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
+
 #include "SampleTrackView.h"
 
 #include <QApplication>
+#include <QHBoxLayout>
 #include <QMenu>
+#include <QSpacerItem>
+#include <QVBoxLayout>
 
 #include "ConfigManager.h"
 #include "embed.h"
 #include "Engine.h"
 #include "FadeButton.h"
 #include "Mixer.h"
+#include "MixerChannelLcdSpinBox.h"
 #include "MixerView.h"
 #include "GuiApplication.h"
 #include "Knob.h"
 #include "SampleClip.h"
 #include "SampleTrackWindow.h"
+#include "SongEditor.h"
 #include "StringPairDrag.h"
 #include "TrackContainerView.h"
 #include "TrackLabelButton.h"
@@ -56,39 +61,44 @@ SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 	connect(m_tlb, SIGNAL(clicked(bool)),
 			this, SLOT(showEffects()));
 	m_tlb->setIcon(embed::getIconPixmap("sample_track"));
-	m_tlb->move(3, 1);
 	m_tlb->show();
 
-	m_volumeKnob = new Knob( knobSmall_17, getTrackSettingsWidget(),
-						    tr( "Track volume" ) );
+	m_mixerChannelNumber = new MixerChannelLcdSpinBox(2, getTrackSettingsWidget(), tr("Mixer channel"), this);
+	m_mixerChannelNumber->show();
+
+	m_volumeKnob = new Knob(KnobType::Small17, tr("VOL"), getTrackSettingsWidget(), Knob::LabelRendering::LegacyFixedFontSize, tr("Track volume"));
 	m_volumeKnob->setVolumeKnob( true );
 	m_volumeKnob->setModel( &_t->m_volumeModel );
 	m_volumeKnob->setHintText( tr( "Channel volume:" ), "%" );
-
-	int settingsWidgetWidth = ConfigManager::inst()->
-					value( "ui", "compacttrackbuttons" ).toInt()
-				? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT
-				: DEFAULT_SETTINGS_WIDGET_WIDTH;
-	m_volumeKnob->move( settingsWidgetWidth - 2 * 24, 2 );
-	m_volumeKnob->setLabel( tr( "VOL" ) );
 	m_volumeKnob->show();
 
-	m_panningKnob = new Knob( knobSmall_17, getTrackSettingsWidget(),
-							tr( "Panning" ) );
+	m_panningKnob = new Knob(KnobType::Small17, tr("PAN"), getTrackSettingsWidget(), Knob::LabelRendering::LegacyFixedFontSize, tr("Panning"));
 	m_panningKnob->setModel( &_t->m_panningModel );
 	m_panningKnob->setHintText( tr( "Panning:" ), "%" );
-	m_panningKnob->move( settingsWidgetWidth - 24, 2 );
-	m_panningKnob->setLabel( tr( "PAN" ) );
 	m_panningKnob->show();
 
 	m_activityIndicator = new FadeButton(
-		QApplication::palette().color(QPalette::Active, QPalette::Background),
+		QApplication::palette().color(QPalette::Active, QPalette::Window),
 		QApplication::palette().color(QPalette::Active, QPalette::BrightText),
 		QApplication::palette().color(QPalette::Active, QPalette::BrightText).darker(),
 		getTrackSettingsWidget()
 	);
-	m_activityIndicator->setGeometry(settingsWidgetWidth - 2 * 24 - 11, 2, 8, 28);
+	m_activityIndicator->setFixedSize(8, 28);
 	m_activityIndicator->show();
+
+	auto masterLayout = new QVBoxLayout(getTrackSettingsWidget());
+	masterLayout->setContentsMargins(0, 1, 0, 0);
+	auto layout = new QHBoxLayout();
+	layout->setContentsMargins(0, 0, 0, 0);
+	layout->setSpacing(0);
+	layout->addWidget(m_tlb);
+	layout->addWidget(m_mixerChannelNumber);
+	layout->addWidget(m_activityIndicator);
+	layout->addWidget(m_volumeKnob);
+	layout->addWidget(m_panningKnob);
+	masterLayout->addLayout(layout);
+	masterLayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
+
 	connect(_t, SIGNAL(playingChanged()), this, SLOT(updateIndicator()));
 
 	setModel( _t );
@@ -145,8 +155,8 @@ QMenu * SampleTrackView::createMixerMenu(QString title, QString newMixerLabel)
 
 		if (currentChannel != mixerChannel)
 		{
-			const auto index = currentChannel->m_channelIndex;
-			QString label = tr("%1: %2").arg(currentChannel->m_channelIndex).arg(currentChannel->m_name);
+			const auto index = currentChannel->index();
+			QString label = tr("%1: %2").arg(index).arg(currentChannel->m_name);
 			mixerMenu->addAction(label, [this, index](){
 				assignMixerLine(index);
 			});
@@ -170,6 +180,7 @@ void SampleTrackView::modelChanged()
 {
 	auto st = castModel<SampleTrack>();
 	m_volumeKnob->setModel(&st->m_volumeModel);
+	m_mixerChannelNumber->setModel(&st->m_mixerChannelModel);
 
 	TrackView::modelChanged();
 }
@@ -200,11 +211,12 @@ void SampleTrackView::dropEvent(QDropEvent *de)
 				? trackHeadWidth
 				: de->pos().x();
 
+		const float snapSize = getGUI()->songEditor()->m_editor->getSnapSize();
 		TimePos clipPos = trackContainerView()->fixedClips()
 				? TimePos(0)
 				: TimePos(((xPos - trackHeadWidth) / trackContainerView()->pixelsPerBar()
 							* TimePos::ticksPerBar()) + trackContainerView()->currentPosition()
-						).quantize(1.0);
+						).quantize(snapSize, true);
 
 		auto sClip = static_cast<SampleClip*>(getTrack()->createClip(clipPos));
 		if (sClip) { sClip->setSampleFile(value); }
@@ -221,7 +233,7 @@ void SampleTrackView::createMixerLine()
 	auto channel = Engine::mixer()->mixerChannel(channelIndex);
 
 	channel->m_name = getTrack()->name();
-	if (getTrack()->useColor()) { channel->setColor (getTrack()->color()); }
+	channel->setColor(getTrack()->color());
 
 	assignMixerLine(channelIndex);
 }
@@ -234,7 +246,7 @@ void SampleTrackView::assignMixerLine(int channelIndex)
 {
 	model()->mixerChannelModel()->setValue(channelIndex);
 
-	getGUI()->mixerView()->setCurrentMixerLine(channelIndex);
+	getGUI()->mixerView()->setCurrentMixerChannel(channelIndex);
 }
 
 

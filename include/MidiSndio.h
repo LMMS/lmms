@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _MIDI_SNDIO_H
-#define _MIDI_SNDIO_H
+#ifndef LMMS_MIDI_SNDIO_H
+#define LMMS_MIDI_SNDIO_H
 
 #include "lmmsconfig.h"
 
@@ -75,4 +75,4 @@ private:
 
 #endif // LMMS_HAVE_SNDIO
 
-#endif	// _MIDI_SNDIO_H
+#endif // LMMS_MIDI_SNDIO_H

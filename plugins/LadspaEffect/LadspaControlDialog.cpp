@@ -86,19 +86,11 @@ void LadspaControlDialog::updateEffectView( LadspaControls * _ctl )
 		control_list_t & controls = _ctl->m_controls[proc];
 		int row = 0;
 		int col = 0;
-		buffer_data_t last_port = NONE;
+		BufferDataType last_port = BufferDataType::None;
 
-		QGroupBox * grouper;
-		if( _ctl->m_processors > 1 )
-		{
-			grouper = new QGroupBox( tr( "Channel " ) +
-						QString::number( proc + 1 ),
-								this );
-		}
-		else
-		{
-			grouper = new QGroupBox( this );
-		}
+		auto grouper = _ctl->m_processors > 1
+			? new QGroupBox(tr("Channel ") + QString::number(proc + 1), this)
+			: new QGroupBox(this);
 
 		auto gl = new QGridLayout(grouper);
 		grouper->setLayout( gl );
@@ -108,10 +100,10 @@ void LadspaControlDialog::updateEffectView( LadspaControls * _ctl )
 		{
 			if (control->port()->proc == proc)
 			{
-				buffer_data_t this_port = control->port()->data_type;
-				if( last_port != NONE &&
-					( this_port == TOGGLED || this_port == ENUM ) &&
-					( last_port != TOGGLED && last_port != ENUM ) )
+				BufferDataType this_port = control->port()->data_type;
+				if( last_port != BufferDataType::None &&
+					( this_port == BufferDataType::Toggled || this_port == BufferDataType::Enum ) &&
+					( last_port != BufferDataType::Toggled && last_port != BufferDataType::Enum ) )
 				{
 					++row;
 					col = 0;

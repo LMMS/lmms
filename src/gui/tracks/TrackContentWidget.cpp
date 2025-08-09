@@ -43,14 +43,15 @@
 #include "ClipView.h"
 #include "TrackView.h"
 
-
 namespace lmms::gui
 {
 
 /*! Alternate between a darker and a lighter background color every 4 bars
  */
 const int BARS_PER_GROUP = 4;
-
+/* Lines between bars will disappear if zoomed too far out (i.e
+	if there are less than 4 pixels between lines)*/
+const int MIN_PIXELS_BETWEEN_LINES = 4;
 
 /*! \brief Create a new trackContentWidget
  *
@@ -65,14 +66,29 @@ TrackContentWidget::TrackContentWidget( TrackView * parent ) :
 	m_trackView( parent ),
 	m_darkerColor( Qt::SolidPattern ),
 	m_lighterColor( Qt::SolidPattern ),
-	m_gridColor( Qt::SolidPattern ),
-	m_embossColor( Qt::SolidPattern )
+	m_coarseGridColor( Qt::SolidPattern ),
+	m_fineGridColor( Qt::SolidPattern ),
+	m_horizontalColor( Qt::SolidPattern ),
+	m_embossColor( Qt::SolidPattern ),
+	m_coarseGridWidth(2),
+	m_fineGridWidth(1),
+	m_horizontalWidth(1),
+	m_embossWidth(0),
+	m_embossOffset(0)
 {
 	setAcceptDrops( true );
 
 	connect( parent->trackContainerView(),
 			SIGNAL( positionChanged( const lmms::TimePos& ) ),
 			this, SLOT( changePosition( const lmms::TimePos& ) ) );
+
+	// Update background if snap size changes
+	connect(getGUI()->songEditor()->m_editor->snappingModel(), &Model::dataChanged,
+			this, &TrackContentWidget::updateBackground);
+
+	// Also update background if proportional snap is enabled/disabled
+	connect(getGUI()->songEditor()->m_editor, &SongEditor::proportionalSnapChanged,
+			this, &TrackContentWidget::updateBackground);
 
 	setStyle( QApplication::style() );
 
@@ -82,15 +98,29 @@ TrackContentWidget::TrackContentWidget( TrackView * parent ) :
 
 
 
-
-
-
 void TrackContentWidget::updateBackground()
-{
+{		
+	// use snapSize to determine number of lines to draw
+	float snapSize = getGUI()->songEditor()->m_editor->getSnapSize();
+
 	const TrackContainerView * tcv = m_trackView->trackContainerView();
 
 	// Assume even-pixels-per-bar. Makes sense, should be like this anyways
 	int ppb = static_cast<int>( tcv->pixelsPerBar() );
+
+	// Coarse grid appears every bar (less frequently if quantization > 1 bar)
+	float coarseGridResolution = (snapSize >= 1) ? snapSize : 1;
+	// Fine grid appears within bars
+	float fineGridResolution = snapSize;
+	// Increase fine grid resolution (size between lines) if it results in less than	
+	// 4 pixels between each line to avoid cluttering
+	float pixelsBetweenLines = ppb * snapSize;
+	if (pixelsBetweenLines < MIN_PIXELS_BETWEEN_LINES) {
+		// Scale fineGridResolution so that there are enough pixels between lines
+		// scaleFactor should be a power of 2
+		int scaleFactor = 1 << static_cast<int>( std::ceil( std::log2( MIN_PIXELS_BETWEEN_LINES / pixelsBetweenLines ) ) );
+		fineGridResolution *= scaleFactor;
+	}
 
 	int w = ppb * BARS_PER_GROUP;
 	int h = height();
@@ -101,22 +131,29 @@ void TrackContentWidget::updateBackground()
 	pmp.fillRect( w, 0, w , h, lighterColor() );
 
 	// draw lines
-	// vertical lines
-	pmp.setPen( QPen( gridColor(), 1 ) );
-	for( float x = 0; x < w * 2; x += ppb )
+	// draw fine grid
+	pmp.setPen( QPen( fineGridColor(), fineGridWidth() ) );
+	for (float x = 0; x < w * 2; x += ppb * fineGridResolution)
 	{
 		pmp.drawLine( QLineF( x, 0.0, x, h ) );
 	}
 
-	pmp.setPen( QPen( embossColor(), 1 ) );
-	for( float x = 1.0; x < w * 2; x += ppb )
+	// draw coarse grid
+	pmp.setPen( QPen( coarseGridColor(), coarseGridWidth() ) );
+	for (float x = 0; x <= w * 2; x += ppb * coarseGridResolution)
 	{
 		pmp.drawLine( QLineF( x, 0.0, x, h ) );
 	}
 
-	// horizontal line
-	pmp.setPen( QPen( gridColor(), 1 ) );
-	pmp.drawLine( 0, h-1, w*2, h-1 );
+	pmp.setPen( QPen( embossColor(), embossWidth() ) );
+	for (float x = (coarseGridWidth() + embossOffset()); x < w * 2; x += ppb * coarseGridResolution)
+	{
+		pmp.drawLine( QLineF( x, 0.0, x, h ) );
+	}
+
+	// draw horizontal line
+	pmp.setPen( QPen( horizontalColor(), horizontalWidth() ) );
+	pmp.drawLine(0, h - (horizontalWidth() + 1) / 2, w * 2, h - (horizontalWidth() + 1) / 2);
 
 	pmp.end();
 
@@ -255,6 +292,7 @@ void TrackContentWidget::changePosition( const TimePos & newPos )
 	setUpdatesEnabled( true );
 
 	// redraw background
+	updateBackground();
 //	update();
 }
 
@@ -291,7 +329,7 @@ void TrackContentWidget::dragEnterEvent( QDragEnterEvent * dee )
 	else
 	{
 		StringPairDrag::processDragEnterEvent( dee, "clip_" +
-						QString::number( getTrack()->type() ) );
+						QString::number( static_cast<int>(getTrack()->type()) ) );
 	}
 }
 
@@ -325,8 +363,7 @@ bool TrackContentWidget::canPasteSelection( TimePos clipPos, const QMimeData* md
 	QString value = decodeValue( md );
 
 	// We can only paste into tracks of the same type
-	if( type != ( "clip_" + QString::number( t->type() ) ) ||
-		m_trackView->trackContainerView()->fixedClips() == true )
+	if (type != ("clip_" + QString::number(static_cast<int>(t->type()))))
 	{
 		return false;
 	}
@@ -345,8 +382,9 @@ bool TrackContentWidget::canPasteSelection( TimePos clipPos, const QMimeData* md
 	const int initialTrackIndex = tiAttr.value().toInt();
 
 	// Get the current track's index
-	const TrackContainer::TrackList tracks = t->trackContainer()->tracks();
-	const int currentTrackIndex = tracks.indexOf( t );
+	const TrackContainer::TrackList& tracks = t->trackContainer()->tracks();
+	const auto currentTrackIt = std::find(tracks.begin(), tracks.end(), t);
+	const int currentTrackIndex = currentTrackIt != tracks.end() ? std::distance(tracks.begin(), currentTrackIt) : -1;
 
 	// Don't paste if we're on the same bar and allowSameBar is false
 	auto sourceTrackContainerId = metadata.attributeNode( "trackContainerId" ).value().toUInt();
@@ -360,6 +398,14 @@ bool TrackContentWidget::canPasteSelection( TimePos clipPos, const QMimeData* md
 	QDomElement clipParent = dataFile.content().firstChildElement("clips");
 	QDomNodeList clipNodes = clipParent.childNodes();
 
+	// If we are pasting into the PatternEditor, only a single Clip is allowed to be pasted
+	// so we don't have the unexpected behavior of pasting on different PatternTracks
+	if (m_trackView->trackContainerView()->fixedClips() == true &&
+			clipNodes.length() > 1)
+	{
+		return false;
+	}
+
 	// Determine if all the Clips will land on a valid track
 	for( int i = 0; i < clipNodes.length(); i++ )
 	{
@@ -368,13 +414,13 @@ bool TrackContentWidget::canPasteSelection( TimePos clipPos, const QMimeData* md
 		int finalTrackIndex = trackIndex + currentTrackIndex - initialTrackIndex;
 
 		// Track must be in TrackContainer's tracks
-		if( finalTrackIndex < 0 || finalTrackIndex >= tracks.size() )
+		if (finalTrackIndex < 0 || static_cast<std::size_t>(finalTrackIndex) >= tracks.size())
 		{
 			return false;
 		}
 
 		// Track must be of the same type
-		auto startTrackType = clipElement.attributeNode("trackType").value().toInt();
+		auto startTrackType = static_cast<Track::Type>(clipElement.attributeNode("trackType").value().toInt());
 		Track * endTrack = tracks.at( finalTrackIndex );
 		if( startTrackType != endTrack->type() )
 		{
@@ -435,8 +481,9 @@ bool TrackContentWidget::pasteSelection( TimePos clipPos, const QMimeData * md, 
 	TimePos grabbedClipPos = clipPosAttr.value().toInt();
 
 	// Snap the mouse position to the beginning of the dropped bar, in ticks
-	const TrackContainer::TrackList tracks = getTrack()->trackContainer()->tracks();
-	const int currentTrackIndex = tracks.indexOf( getTrack() );
+	const TrackContainer::TrackList& tracks = getTrack()->trackContainer()->tracks();
+	const auto currentTrackIt = std::find(tracks.begin(), tracks.end(), getTrack());
+	const int currentTrackIndex = currentTrackIt != tracks.end() ? std::distance(tracks.begin(), currentTrackIt) : -1;
 
 	bool wasSelection = m_trackView->trackContainerView()->rubberBand()->selectedObjects().count();
 
@@ -529,7 +576,7 @@ void TrackContentWidget::mousePressEvent( QMouseEvent * me )
 	// Enable box select if control is held when clicking an empty space
 	// (If we had clicked a Clip it would have intercepted the mouse event)
 	if( me->modifiers() & Qt::ControlModifier ){
-		getGUI()->songEditor()->m_editor->setEditMode(SongEditor::EditMode::SelectMode);
+		getGUI()->songEditor()->m_editor->setEditMode(SongEditor::EditMode::Select);
 	}
 	// Forward event to allow box select if the editor supports it and is in that mode
 	if( m_trackView->trackContainerView()->allowRubberband() == true )
@@ -551,8 +598,8 @@ void TrackContentWidget::mousePressEvent( QMouseEvent * me )
 			so.at( i )->setSelected( false);
 		}
 		getTrack()->addJournalCheckPoint();
-		const TimePos pos = getPosition( me->x() ).getBar() *
-						TimePos::ticksPerBar();
+		const float snapSize = getGUI()->songEditor()->m_editor->getSnapSize();
+		const TimePos pos = TimePos(getPosition(me->x())).quantize(snapSize, true);
 		getTrack()->createClip(pos);
 	}
 }
@@ -582,8 +629,8 @@ void TrackContentWidget::paintEvent( QPaintEvent * pe )
 	// Don't draw background on Pattern Editor
 	if (m_trackView->trackContainerView() != getGUI()->patternEditor()->m_editor)
 	{
-		p.drawTiledPixmap( rect(), m_background, QPoint(
-				tcv->currentPosition().getBar() * ppb, 0 ) );
+		p.drawTiledPixmap(rect(), m_background, QPoint(
+				tcv->currentPosition().getTicks() * ppb / TimePos::ticksPerBar(), 0));
 	}
 }
 
@@ -646,7 +693,7 @@ void TrackContentWidget::contextMenuEvent( QContextMenuEvent * cme )
 
 	QMenu contextMenu( this );
 	QAction *pasteA = contextMenu.addAction( embed::getIconPixmap( "edit_paste" ),
-					tr( "Paste" ), [this, cme](){ contextMenuAction( cme, Paste ); } );
+					tr( "Paste" ), [this, cme](){ contextMenuAction( cme, ContextMenuAction::Paste ); } );
 	// If we can't paste in the current TCW for some reason, disable the action so the user knows
 	pasteA->setEnabled( canPasteSelection( getPosition( cme->x() ), getMimeData() ) ? true : false );
 
@@ -660,7 +707,7 @@ void TrackContentWidget::contextMenuAction( QContextMenuEvent * cme, ContextMenu
 
 	switch( action )
 	{
-		case Paste:
+		case ContextMenuAction::Paste:
 		// Paste the selection on the TimePos of the context menu event
 		TimePos clipPos = getPosition( cme->x() );
 
@@ -681,12 +728,40 @@ QBrush TrackContentWidget::lighterColor() const
 { return m_lighterColor; }
 
 //! \brief CSS theming qproperty access method
-QBrush TrackContentWidget::gridColor() const
-{ return m_gridColor; }
+QBrush TrackContentWidget::coarseGridColor() const
+{ return m_coarseGridColor; }
+
+//! \brief CSS theming qproperty access method
+QBrush TrackContentWidget::fineGridColor() const
+{ return m_fineGridColor; }
+
+//! \brief CSS theming qproperty access method
+QBrush TrackContentWidget::horizontalColor() const
+{ return m_horizontalColor; }
 
 //! \brief CSS theming qproperty access method
 QBrush TrackContentWidget::embossColor() const
 { return m_embossColor; }
+
+//! \brief CSS theming qproperty access method
+int TrackContentWidget::coarseGridWidth() const
+{ return m_coarseGridWidth; }
+
+//! \brief CSS theming qproperty access method
+int TrackContentWidget::fineGridWidth() const
+{ return m_fineGridWidth; }
+
+//! \brief CSS theming qproperty access method
+int TrackContentWidget::horizontalWidth() const
+{ return m_horizontalWidth; }
+
+//! \brief CSS theming qproperty access method
+int TrackContentWidget::embossWidth() const
+{ return m_embossWidth; }
+
+//! \brief CSS theming qproperty access method
+int TrackContentWidget::embossOffset() const
+{ return m_embossOffset; }
 
 //! \brief CSS theming qproperty access method
 void TrackContentWidget::setDarkerColor( const QBrush & c )
@@ -697,12 +772,39 @@ void TrackContentWidget::setLighterColor( const QBrush & c )
 { m_lighterColor = c; }
 
 //! \brief CSS theming qproperty access method
-void TrackContentWidget::setGridColor( const QBrush & c )
-{ m_gridColor = c; }
+void TrackContentWidget::setCoarseGridColor( const QBrush & c )
+{ m_coarseGridColor = c; }
+
+//! \brief CSS theming qproperty access method
+void TrackContentWidget::setFineGridColor( const QBrush & c )
+{ m_fineGridColor = c; }
+
+//! \brief CSS theming qproperty access method
+void TrackContentWidget::setHorizontalColor( const QBrush & c )
+{ m_horizontalColor = c; }
 
 //! \brief CSS theming qproperty access method
 void TrackContentWidget::setEmbossColor( const QBrush & c )
 { m_embossColor = c; }
 
+//! \brief CSS theming qproperty access method
+void TrackContentWidget::setCoarseGridWidth(int c)
+{ m_coarseGridWidth = c; }
+
+//! \brief CSS theming qproperty access method
+void TrackContentWidget::setFineGridWidth(int c)
+{ m_fineGridWidth = c; }
+
+//! \brief CSS theming qproperty access method
+void TrackContentWidget::setHorizontalWidth(int c)
+{ m_horizontalWidth = c; }
+
+//! \brief CSS theming qproperty access method
+void TrackContentWidget::setEmbossWidth(int c)
+{ m_embossWidth = c; }
+
+//! \brief CSS theming qproperty access method
+void TrackContentWidget::setEmbossOffset(int c)
+{ m_embossOffset = c; }
 
 } // namespace lmms::gui

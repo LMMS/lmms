@@ -71,7 +71,7 @@
          <number>1</number>
         </property>
         <property name="maximum">
-         <number>99</number>
+         <number>2147483647</number> <!-- INT_MAX -->
         </property>
         <property name="value">
          <number>1</number>
@@ -122,33 +122,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QComboBox" name="samplerateCB">
-             <item>
-              <property name="text">
-               <string>44100 Hz</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>48000 Hz</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>88200 Hz</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>96000 Hz</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>192000 Hz</string>
-              </property>
-             </item>
-            </widget>
+            <widget class="QComboBox" name="samplerateCB" />
            </item>
           </layout>
          </widget>
@@ -338,13 +312,6 @@
              </item>
             </widget>
            </item>
-           <item>
-            <widget class="QCheckBox" name="checkBoxVariableBitRate">
-             <property name="text">
-              <string>Use variable bitrate</string>
-             </property>
-            </widget>
-           </item>
           </layout>
          </widget>
         </item>
@@ -400,37 +367,6 @@
           <item>
            <property name="text">
             <string>Sinc best (slowest)</string>
-           </property>
-          </item>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLabel" name="label_4">
-          <property name="text">
-           <string>Oversampling:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QComboBox" name="oversamplingCB">
-          <item>
-           <property name="text">
-            <string>1x (None)</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>2x</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>4x</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>8x</string>
            </property>
           </item>
          </widget>

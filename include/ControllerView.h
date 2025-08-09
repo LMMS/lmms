@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef CONTROLLER_VIEW_H
-#define CONTROLLER_VIEW_H
+#ifndef LMMS_GUI_CONTROLLER_VIEW_H
+#define LMMS_GUI_CONTROLLER_VIEW_H
 
 #include <QFrame>
 
@@ -63,12 +63,16 @@ public:
 
 public slots:
 	void editControls();
-	void deleteController();
+	void removeController();
 	void closeControls();
 	void renameController();
+	void moveUp();
+	void moveDown();
 
 signals:
-	void deleteController( lmms::gui::ControllerView * _view );
+	void movedUp(ControllerView* view);
+	void movedDown(ControllerView* view);
+	void removedController(ControllerView* view);
 
 
 protected:
@@ -88,4 +92,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_CONTROLLER_VIEW_H

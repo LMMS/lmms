@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef LADSPA_CONTROL_H
-#define LADSPA_CONTROL_H
+#ifndef LMMS_LADSPA_CONTROL_H
+#define LMMS_LADSPA_CONTROL_H
 
 #include <ladspa.h>
 
@@ -41,6 +41,7 @@ namespace gui
 {
 
 class LadspaControlView;
+class LadspaMatrixControlDialog;
 
 } // namespace gui
 
@@ -125,10 +126,11 @@ private:
 
 
 	friend class gui::LadspaControlView;
+	friend class gui::LadspaMatrixControlDialog;
 
 } ;
 
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_LADSPA_CONTROL_H

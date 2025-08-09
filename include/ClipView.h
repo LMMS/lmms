@@ -22,9 +22,10 @@
  *
  */
 
-#ifndef TRACK_CONTENT_OBJECT_VIEW_H
-#define TRACK_CONTENT_OBJECT_VIEW_H
+#ifndef LMMS_GUI_CLIP_VIEW_H
+#define LMMS_GUI_CLIP_VIEW_H
 
+#include <optional>
 
 #include <QVector>
 
@@ -34,13 +35,11 @@
 
 
 class QMenu;
-class QContextMenuEvent;
 
 namespace lmms
 {
 
 class DataFile;
-class Clip;
 
 namespace gui
 {
@@ -62,6 +61,7 @@ class ClipView : public selectableObject, public ModelView
 	Q_PROPERTY( QColor textShadowColor READ textShadowColor WRITE setTextShadowColor )
 	Q_PROPERTY( QColor patternClipBackground READ patternClipBackground WRITE setPatternClipBackground )
 	Q_PROPERTY( bool gradient READ gradient WRITE setGradient )
+	Q_PROPERTY(QColor markerColor READ markerColor WRITE setMarkerColor)
 	// We have to use a QSize here because using QPoint isn't supported.
 	// width -> x, height -> y
 	Q_PROPERTY( QSize mouseHotspotHand MEMBER m_mouseHotspotHand )
@@ -93,6 +93,7 @@ public:
 	QColor textBackgroundColor() const;
 	QColor textShadowColor() const;
 	QColor patternClipBackground() const;
+	QColor markerColor() const;
 	bool gradient() const;
 	void setMutedColor( const QColor & c );
 	void setMutedBackgroundColor( const QColor & c );
@@ -102,6 +103,7 @@ public:
 	void setTextShadowColor( const QColor & c );
 	void setPatternClipBackground(const QColor& c);
 	void setGradient( const bool & b );
+	void setMarkerColor(const QColor& c);
 
 	// access needsUpdate member variable
 	bool needsUpdate();
@@ -120,10 +122,8 @@ public:
 	// some metadata to be written to the clipboard.
 	static void remove( QVector<ClipView *> clipvs );
 	static void toggleMute( QVector<ClipView *> clipvs );
-	static void mergeClips(QVector<ClipView*> clipvs);
 
-	// Returns true if selection can be merged and false if not
-	static bool canMergeSelection(QVector<ClipView*> clipvs);
+	void toggleSelectedAutoResize();
 
 	QColor getColorForDisplay( QColor );
 
@@ -140,14 +140,13 @@ public slots:
 	void resetColor();
 
 protected:
-	enum ContextMenuAction
+	enum class ContextMenuAction
 	{
 		Remove,
 		Cut,
 		Copy,
 		Paste,
-		Mute,
-		Merge
+		Mute
 	};
 
 	TrackView * m_trackView;
@@ -175,7 +174,7 @@ protected:
 	}
 
 	bool unquantizedModHeld( QMouseEvent * me );
-	TimePos quantizeSplitPos( TimePos, bool shiftMode );
+	TimePos quantizeSplitPos(TimePos);
 
 	float pixelsPerBar();
 
@@ -184,6 +183,7 @@ protected:
 
 	virtual void paintTextLabel(QString const & text, QPainter & painter);
 
+	auto hasCustomColor() const -> bool;
 
 protected slots:
 	void updateLength();
@@ -191,9 +191,9 @@ protected slots:
 
 
 private:
-	enum Actions
+	enum class Action
 	{
-		NoAction,
+		None,
 		Move,
 		MoveSelection,
 		Resize,
@@ -206,7 +206,7 @@ private:
 	static TextFloat * s_textFloat;
 
 	Clip * m_clip;
-	Actions m_action;
+	Action m_action;
 	QPoint m_initialMousePos;
 	QPoint m_initialMouseGlobalPos;
 	QVector<TimePos> m_initialOffsets;
@@ -222,6 +222,7 @@ private:
 	QColor m_textShadowColor;
 	QColor m_patternClipBackground;
 	bool m_gradient;
+	QColor m_markerColor;
 	QSize m_mouseHotspotHand; // QSize must be used because QPoint
 	QSize m_mouseHotspotKnife; // isn't supported by property system
 	QCursor m_cursorHand;
@@ -241,9 +242,25 @@ private:
 	bool mouseMovedDistance( QMouseEvent * me, int distance );
 	TimePos draggedClipPos( QMouseEvent * me );
 	int knifeMarkerPos( QMouseEvent * me );
-	void setColor(const QColor* color);
-	//! Return true iff the clip could be split. Currently only implemented for samples
-	virtual bool splitClip( const TimePos pos ){ return false; };
+	void setColor(const std::optional<QColor>& color);
+	
+	//! Returns whether the user can left-resize this clip so that the start of the clip bounds is before the start of the clip content.
+	virtual bool isResizableBeforeStart() { return true; };
+	/**
+	* Split this Clip into two clips
+	* @param pos the position of the split, relative to the start of the clip
+	* @return true if the clip could be split
+	*/
+	bool splitClip(const TimePos pos);
+	/**
+	* Destructively split this Clip into two clips. If the clip type does not implement this feature, it will default to normal splitting.
+	* @param pos the position of the split, relative to the start of the clip
+	* @return true if the clip could be split
+	*/
+	virtual bool destructiveSplitClip(const TimePos pos)
+	{
+		return splitClip(pos);
+	}
 	void updateCursor(QMouseEvent * me);
 } ;
 
@@ -252,4 +269,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_CLIP_VIEW_H

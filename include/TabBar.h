@@ -22,9 +22,8 @@
  *
  */
 
-
-#ifndef TAB_BAR_H
-#define TAB_BAR_H
+#ifndef LMMS_GUI_TAB_BAR_H
+#define LMMS_GUI_TAB_BAR_H
 
 #include <QBoxLayout>
 #include <QMap>
@@ -50,7 +49,12 @@ public:
 
 	TabButton * addTab( QWidget * _w, const QString & _text,
 					int _id, bool _add_stretch = false,
-					bool _text_is_tooltip = false );
+					bool _text_is_tooltip = false,
+					// TODO Remove fixWidgetToParentSize once it is used
+					//      with false everywhere.
+					//      At the time of writing it is only used in
+					//      LadspaBrowser with default parameters.
+					bool fixWidgetToParentSize = true );
 	void removeTab( int _id );
 
 	inline void setExclusive( bool _on )
@@ -91,4 +95,4 @@ signals:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_TAB_BAR_H

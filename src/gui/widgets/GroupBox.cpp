@@ -25,14 +25,9 @@
 #include <QMouseEvent>
 #include <QPainter>
 
-#ifndef __USE_XOPEN
-#define __USE_XOPEN
-#endif
-
 #include "GroupBox.h"
 #include "embed.h"
-#include "gui_templates.h"
-
+#include "FontHelper.h"
 
 namespace lmms::gui
 {
@@ -72,13 +67,23 @@ void GroupBox::modelChanged()
 }
 
 
+bool GroupBox::ledButtonShown() const
+{
+	return m_led->isVisible();
+}
+
+
+void GroupBox::setLedButtonShown(bool value)
+{
+	m_led->setVisible(value);
+}
 
 
 void GroupBox::mousePressEvent( QMouseEvent * _me )
 {
-	if( _me->y() > 1 && _me->y() < 13 && _me->button() == Qt::LeftButton )
+	if (ledButtonShown() && _me->y() > 1 && _me->y() < 13 && _me->button() == Qt::LeftButton)
 	{
-		model()->setValue( !model()->value() );
+		model()->setValue(!model()->value());
 	}
 }
 
@@ -101,8 +106,10 @@ void GroupBox::paintEvent( QPaintEvent * pe )
 
 	// draw text
 	p.setPen( palette().color( QPalette::Active, QPalette::Text ) );
-	p.setFont( pointSize<8>( font() ) );
-	p.drawText( 22, m_titleBarHeight, m_caption );
+	p.setFont(adjustedToPixelSize(font(), DEFAULT_FONT_SIZE));
+
+	int const captionX = ledButtonShown() ? 22 : 6;
+	p.drawText(captionX, m_titleBarHeight, m_caption);
 }
 
 

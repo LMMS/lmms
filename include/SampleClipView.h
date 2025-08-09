@@ -22,12 +22,12 @@
  *
  */
 
-#ifndef SAMPLE_CLIP_VIEW_H
-#define SAMPLE_CLIP_VIEW_H
+#ifndef LMMS_GUI_SAMPLE_CLIP_VIEW_H
+#define LMMS_GUI_SAMPLE_CLIP_VIEW_H
 
 #include "ClipView.h"
 
-
+#include "SampleThumbnail.h"
 
 namespace lmms
 {
@@ -49,6 +49,7 @@ public:
 public slots:
 	void updateSample();
 	void reverseSample();
+	void setAutomationGhost();
 
 
 
@@ -64,8 +65,9 @@ protected:
 
 private:
 	SampleClip * m_clip;
+	SampleThumbnail m_sampleThumbnail;
 	QPixmap m_paintPixmap;
-	bool splitClip( const TimePos pos ) override;
+	long m_paintPixmapXPosition;
 } ;
 
 
@@ -73,4 +75,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_SAMPLE_CLIP_VIEW_H

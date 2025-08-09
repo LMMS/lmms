@@ -61,10 +61,10 @@ private:
 
 	inline int readInt( int _bytes )
 	{
-		int c, value = 0;
+		int value = 0;
 		do
 		{
-			c = readByte();
+			int c = readByte();
 			if( c == -1 )
 			{
 				return( -1 );

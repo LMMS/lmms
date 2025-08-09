@@ -26,22 +26,25 @@
 #ifndef _TRIPLE_OSCILLATOR_H
 #define _TRIPLE_OSCILLATOR_H
 
+#include <memory>
+
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "AutomatableModel.h"
+#include "OscillatorConstants.h"
+#include "SampleBuffer.h"
 
 namespace lmms
 {
 
 
-class NotePlayHandle;
-class SampleBuffer;
+class NotePlayHandle;  // IWYU pragma: keep
 class Oscillator;
 
 
 namespace gui
 {
-class automatableButtonGroup;
+class AutomatableButtonGroup;
 class Knob;
 class PixmapButton;
 class TripleOscillatorView;
@@ -53,13 +56,9 @@ const int NUM_OF_OSCILLATORS = 3;
 
 class OscillatorObject : public Model
 {
-	MM_OPERATORS
 	Q_OBJECT
 public:
 	OscillatorObject( Model * _parent, int _idx );
-	~OscillatorObject() override;
-
-
 private:
 	FloatModel m_volumeModel;
 	FloatModel m_panModel;
@@ -71,7 +70,8 @@ private:
 	IntModel m_waveShapeModel;
 	IntModel m_modulationAlgoModel;
 	BoolModel m_useWaveTableModel;
-	SampleBuffer* m_sampleBuffer;
+	std::shared_ptr<const SampleBuffer> m_sampleBuffer = SampleBuffer::emptyBuffer();
+	std::shared_ptr<const OscillatorConstants::waveform_t> m_userAntiAliasWaveTable;
 
 	float m_volumeLeft;
 	float m_volumeRight;
@@ -111,7 +111,7 @@ public:
 	~TripleOscillator() override = default;
 
 	void playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer ) override;
+						SampleFrame* _working_buffer ) override;
 	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
 
@@ -120,9 +120,9 @@ public:
 
 	QString nodeName() const override;
 
-	f_cnt_t desiredReleaseFrames() const override
+	float desiredReleaseTimeMs() const override
 	{
-		return( 128 );
+		return 3.f;
 	}
 
 	gui::PluginView* instantiateView( QWidget * _parent ) override;
@@ -137,7 +137,6 @@ private:
 
 	struct oscPtr
 	{
-		MM_OPERATORS
 		Oscillator * oscLeft;
 		Oscillator * oscRight;
 	} ;
@@ -163,12 +162,11 @@ public:
 private:
 	void modelChanged() override;
 
-	automatableButtonGroup * m_mod1BtnGrp;
-	automatableButtonGroup * m_mod2BtnGrp;
+	AutomatableButtonGroup * m_mod1BtnGrp;
+	AutomatableButtonGroup * m_mod2BtnGrp;
 
 	struct OscillatorKnobs
 	{
-		MM_OPERATORS
 		OscillatorKnobs( Knob * v,
 					Knob * p,
 					Knob * c,
@@ -177,7 +175,7 @@ private:
 					Knob * po,
 					Knob * spd,
 					PixmapButton * uwb,
-					automatableButtonGroup * wsbg,
+					AutomatableButtonGroup * wsbg,
 					PixmapButton * wt) :
 			m_volKnob( v ),
 			m_panKnob( p ),
@@ -200,7 +198,7 @@ private:
 		Knob * m_phaseOffsetKnob;
 		Knob * m_stereoPhaseDetuningKnob;
 		PixmapButton * m_userWaveButton;
-		automatableButtonGroup * m_waveShapeBtnGrp;
+		AutomatableButtonGroup * m_waveShapeBtnGrp;
 		PixmapButton * m_multiBandWaveTableButton;
 
 	} ;

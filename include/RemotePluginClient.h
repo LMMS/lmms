@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef REMOTE_PLUGIN_CLIENT_H
-#define REMOTE_PLUGIN_CLIENT_H
+#ifndef LMMS_REMOTE_PLUGIN_CLIENT_H
+#define LMMS_REMOTE_PLUGIN_CLIENT_H
 
 #include "RemotePluginBase.h"
 
@@ -38,11 +38,15 @@
 #	include <unistd.h>
 #endif
 
+#include "LmmsTypes.h"
+#include "MidiEvent.h"
 #include "SharedMemory.h"
 #include "VstSyncData.h"
 
 namespace lmms
 {
+
+class SampleFrame;
 
 class RemotePluginClient : public RemotePluginBase
 {
@@ -58,8 +62,8 @@ public:
 
 	bool processMessage( const message & _m ) override;
 
-	virtual void process( const sampleFrame * _in_buf,
-					sampleFrame * _out_buf ) = 0;
+	virtual void process( const SampleFrame* _in_buf,
+					SampleFrame* _out_buf ) = 0;
 
 	virtual void processMidiEvent( const MidiEvent&, const f_cnt_t /* _offset */ )
 	{
@@ -257,8 +261,8 @@ bool RemotePluginClient::processMessage( const message & _m )
 				debugMessage(std::string{"Failed to attach sync data: "} + error.what() + '\n');
 				std::exit(EXIT_FAILURE);
 			}
-			m_bufferSize = m_vstSyncData->m_bufferSize;
-			m_sampleRate = m_vstSyncData->m_sampleRate;
+			m_bufferSize = m_vstSyncData->bufferSize;
+			m_sampleRate = m_vstSyncData->sampleRate;
 			reply_message.id = IdHostInfoGotten;
 			reply = true;
 			break;
@@ -307,7 +311,7 @@ bool RemotePluginClient::processMessage( const message & _m )
 		default:
 		{
 			char buf[64];
-			sprintf( buf, "undefined message: %d\n", (int) _m.id );
+			std::snprintf(buf, 64, "undefined message: %d\n", _m.id);
 			debugMessage( buf );
 			break;
 		}
@@ -342,8 +346,8 @@ void RemotePluginClient::doProcessing()
 {
 	if (m_audioBuffer)
 	{
-		process( (sampleFrame *)( m_inputCount > 0 ? m_audioBuffer.get() : nullptr ),
-				(sampleFrame *)( m_audioBuffer.get() +
+		process( (SampleFrame*)( m_inputCount > 0 ? m_audioBuffer.get() : nullptr ),
+				(SampleFrame*)( m_audioBuffer.get() +
 					( m_inputCount*m_bufferSize ) ) );
 	}
 	else
@@ -355,4 +359,4 @@ void RemotePluginClient::doProcessing()
 
 } // namespace lmms
 
-#endif // REMOTE_PLUGIN_CLIENT_H
+#endif // LMMS_REMOTE_PLUGIN_CLIENT_H

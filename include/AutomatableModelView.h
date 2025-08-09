@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef AUTOMATABLE_MODEL_VIEW_H
-#define AUTOMATABLE_MODEL_VIEW_H
+#ifndef LMMS_GUI_AUTOMATABLE_MODEL_VIEW_H
+#define LMMS_GUI_AUTOMATABLE_MODEL_VIEW_H
 
 #include "ModelView.h"
 #include "AutomatableModel.h"
@@ -137,5 +137,4 @@ using BoolModelView = TypedModelView<BoolModel>;
 
 } // namespace lmms::gui
 
-#endif
-
+#endif // LMMS_GUI_AUTOMATABLE_MODEL_VIEW_H

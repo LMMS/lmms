@@ -22,14 +22,12 @@
  *
  */
 
-#ifndef LINKEDMODELGROUPS_H
-#define LINKEDMODELGROUPS_H
-
+#ifndef LMMS_LINKED_MODEL_GROUPS_H
+#define LMMS_LINKED_MODEL_GROUPS_H
 
 #include <cstddef>
 
 #include "Model.h"
-
 
 class QDomDocument;
 class QDomElement;
@@ -133,6 +131,8 @@ public:
 
 private:
 	//! models for the controls
+	//! @note The AutomatableModels behind the ModelInfo are not owned,
+	//!   but referenced after `addModel` is being called.
 	std::map<std::string, ModelInfo> m_models;
 };
 
@@ -178,4 +178,4 @@ public:
 
 } // namespace lmms
 
-#endif // LINKEDMODELGROUPS_H
+#endif // LMMS_LINKED_MODEL_GROUPS_H

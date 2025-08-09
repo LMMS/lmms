@@ -22,10 +22,8 @@
  *
  */
 
-#ifndef CONTROLS_H
-#define CONTROLS_H
-
-
+#ifndef LMMS_GUI_CONTROLS_H
+#define LMMS_GUI_CONTROLS_H
 
 // headers only required for covariance
 #include "AutomatableModel.h"
@@ -38,8 +36,6 @@ class QLabel;
 
 namespace lmms
 {
-
-class AutomatableModel;
 
 namespace gui
 {
@@ -82,7 +78,7 @@ public:
 	FloatModel* model() override;
 	AutomatableModelView* modelView() override;
 
-	KnobControl(QWidget* parent = nullptr);
+	KnobControl(const QString& text, QWidget* parent = nullptr);
 	~KnobControl() override = default;
 };
 
@@ -146,4 +142,4 @@ public:
 
 } // namespace lmms
 
-#endif // CONTROLS_H
+#endif // LMMS_GUI_CONTROLS_H

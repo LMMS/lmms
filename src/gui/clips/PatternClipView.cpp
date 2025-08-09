@@ -34,6 +34,8 @@
 #include "PatternClip.h"
 #include "PatternStore.h"
 #include "RenameDialog.h"
+#include "TrackContainerView.h"
+#include "TrackView.h"
 
 namespace lmms::gui
 {
@@ -70,6 +72,8 @@ void PatternClipView::constructContextMenu(QMenu* _cm)
 
 void PatternClipView::mouseDoubleClickEvent(QMouseEvent*)
 {
+	if (m_trackView->trackContainerView()->knifeMode()) { return; }
+
 	openInPatternEditor();
 }
 
@@ -115,14 +119,18 @@ void PatternClipView::paintEvent(QPaintEvent*)
 	
 	// bar lines
 	const int lineSize = 3;
+	int pixelsPerPattern = Engine::patternStore()->lengthOfPattern(m_patternClip->patternIndex()) * pixelsPerBar();
+	int offset = static_cast<int>(m_patternClip->startTimeOffset() * (pixelsPerBar() / TimePos::ticksPerBar()))
+			% pixelsPerPattern;
+	if (offset < 2) {
+		offset += pixelsPerPattern;
+	}
+
 	p.setPen( c.darker( 200 ) );
 
-	bar_t t = Engine::patternStore()->lengthOfPattern(m_patternClip->patternIndex());
-	if (m_patternClip->length() > TimePos::ticksPerBar() && t > 0)
+	if (pixelsPerPattern > 0)
 	{
-		for( int x = static_cast<int>( t * pixelsPerBar() );
-								x < width() - 2;
-			x += static_cast<int>( t * pixelsPerBar() ) )
+		for (int x = offset; x < width() - 2; x += pixelsPerPattern)
 		{
 			p.drawLine( x, BORDER_WIDTH, x, BORDER_WIDTH + lineSize );
 			p.drawLine( x, rect().bottom() - ( BORDER_WIDTH + lineSize ),
@@ -149,6 +157,12 @@ void PatternClipView::paintEvent(QPaintEvent*)
 		const int size = 14;
 		p.drawPixmap( spacing, height() - ( size + spacing ),
 			embed::getIconPixmap( "muted", size, size ) );
+	}
+	
+	if (m_marker)
+	{
+		p.setPen(markerColor());
+		p.drawLine(m_markerPos, rect().bottom(), m_markerPos, rect().top());
 	}
 	
 	p.end();
@@ -190,6 +204,5 @@ void PatternClipView::update()
 
 	ClipView::update();
 }
-
 
 } // namespace lmms::gui
