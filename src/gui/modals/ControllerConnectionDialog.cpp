@@ -130,6 +130,7 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 	QDialog( _parent ),
 	m_readablePorts( nullptr ),
 	m_midiAutoDetect( false ),
+	m_modulationModel(false),
 	m_controller( nullptr ),
 	m_targetModel( _target_model ),
 	m_midiController( nullptr )
@@ -184,7 +185,7 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 
 	// User stuff
 	m_userGroupBox = new GroupBox( tr( "USER CONTROLLER" ), this );
-	m_userGroupBox->setGeometry( 8, 100, 240, 60 );
+	m_userGroupBox->setGeometry( 8, 100, 240, 120 );
 	connect( m_userGroupBox->model(), SIGNAL(dataChanged()),
 			this, SLOT(userToggled()));
 
@@ -198,6 +199,11 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 			this, SLOT(userSelected()));
 	connect( m_userController->model(), SIGNAL(dataChanged()),
 			this, SLOT(userSelected()));
+	
+	m_modulationModel.setValue(_target_model->controllerConnection() && _target_model->controllerConnection()->modulation());
+	auto modulationLed = new LedCheckBox(tr("Apply as modulation"), m_userGroupBox);
+	modulationLed->setGeometry(10, 48, 200, 30);
+	modulationLed->setModel(&m_modulationModel);
 
 
 	// Mapping functions
