@@ -164,7 +164,7 @@ void VectorGraph::paintEvent( QPaintEvent * event )
 			continue;
 		}
 
-		if (model()->floatEqual(thisPoint->x(), prevPoint->x(), 0.00001))
+		if (model()->floatEqual(thisPoint->x(), prevPoint->x(), 0.00001f))
 		{
 			canvas.drawEllipse(QPointF(rawToCoordX(thisPoint->x()), rawToCoordY((thisPoint->y() + prevPoint->y()) / 2)), ths, ths);
 			continue;
@@ -456,7 +456,7 @@ int VectorGraphModel::getSectionStartIndex(float input)
 
 	for (int i = 1; i < m_points.size(); i++)
 	{
-		if (m_points[i].x() > input || floatEqual(m_points[i].x(), input, 0.000001)) // unsure if this is a good epsilon
+		if (m_points[i].x() > input || floatEqual(m_points[i].x(), input, 0.000001f)) // unsure if this is a good epsilon
 		{
 			return i - 1;
 		}
@@ -544,7 +544,7 @@ float VectorGraphModel::calculateSingleCurve(float input, VectorGraphPoint * poi
 	// I'm not convinced that the code below provides any sort of speedup.
 	// Might be useful for preventing edge cases though.
 	// It would if the power function is much less efficient, which I think it might be.
-	if (floatEqual(point->tension(), 0, 0.00001)) // I have no idea what epsilon to use, probably doesn't matter in this case though
+	if (floatEqual(point->tension(), 0, 0.00001f)) // I have no idea what epsilon to use, probably doesn't matter in this case though
 	{
 		return input;
 	}
