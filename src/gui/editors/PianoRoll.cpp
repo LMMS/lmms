@@ -495,7 +495,7 @@ void PianoRoll::changeNoteEditMode( int i )
 void PianoRoll::markSemiTone(SemiToneMarkerAction i, bool fromMenu)
 {
 	const int key = fromMenu
-		? getKey(mapFromGlobal(m_semiToneMarkerMenu->pos()).y())
+		? m_pianoKeySelected
 		: m_keyModel.value() - 1;
 	const InstrumentFunctionNoteStacking::Chord * chord = nullptr;
 
@@ -2747,81 +2747,6 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 	}
 	else
 	{
-		if( me->buttons() & Qt::LeftButton &&
-					m_editMode == EditMode::Select &&
-					m_action == Action::SelectNotes )
-		{
-
-			int x = me->x() - m_whiteKeyWidth;
-			if( x < 0 && m_currentPosition > 0 )
-			{
-				x = 0;
-				QCursor::setPos( mapToGlobal( QPoint(
-							m_whiteKeyWidth,
-							me->y() ) ) );
-				if( m_currentPosition >= 4 )
-				{
-					m_leftRightScroll->setValue(
-							m_currentPosition - 4 );
-				}
-				else
-				{
-					m_leftRightScroll->setValue( 0 );
-				}
-			}
-			else if (x > width() - m_whiteKeyWidth)
-			{
-				x = width() - m_whiteKeyWidth;
-				QCursor::setPos( mapToGlobal( QPoint( width(),
-							me->y() ) ) );
-				m_leftRightScroll->setValue( m_currentPosition +
-									4 );
-			}
-
-			// get tick in which the cursor is posated
-			int pos_ticks = x * TimePos::ticksPerBar()/ m_ppb +
-							m_currentPosition;
-
-			m_selectedTick = pos_ticks -
-							m_selectStartTick;
-			if( (int) m_selectStartTick + m_selectedTick <
-									0 )
-			{
-				m_selectedTick = -static_cast<int>(
-							m_selectStartTick );
-			}
-
-
-			int key_num = getKey( me->y() );
-			int visible_keys = ( height() - PR_TOP_MARGIN -
-						PR_BOTTOM_MARGIN -
-						m_notesEditHeight ) /
-							m_keyLineHeight + 2;
-			const int s_key = m_startKey - 1;
-
-			if( key_num <= s_key )
-			{
-				QCursor::setPos( mapToGlobal( QPoint( me->x(),
-							keyAreaBottom() ) ) );
-				m_topBottomScroll->setValue(
-					m_topBottomScroll->value() + 1 );
-				key_num = s_key;
-			}
-			else if( key_num >= s_key + visible_keys )
-			{
-				QCursor::setPos( mapToGlobal( QPoint( me->x(),
-							PR_TOP_MARGIN ) ) );
-				m_topBottomScroll->setValue(
-					m_topBottomScroll->value() - 1 );
-				key_num = s_key + visible_keys;
-			}
-
-			m_selectedKeys = key_num - m_selectStartKey;
-			if( key_num <= m_selectStartKey )
-			{
-				--m_selectedKeys;
-			}
-		}
 		setCursor( Qt::ArrowCursor );
 	}
 
@@ -3522,13 +3447,12 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 		for(x = 0; x < m_markedSemiTones.size(); ++x)
 		{
 			const int key_num = m_markedSemiTones.at(x);
-			const int y = keyAreaBottom() - 1 - m_keyLineHeight *
-				(key_num - m_startKey + 1);
+			const int y = yCoordOfKey(key_num);
 			if(y >= keyAreaBottom() - 1) { break; }
 			p.fillRect(m_whiteKeyWidth + 1,
 				y,
 				width() - 10,
-				m_keyLineHeight + 1,
+				m_keyLineHeight,
 				m_markedSemitoneColor);
 		}
 	}
@@ -3846,8 +3770,12 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	if(hasValidMidiClip() && getGUI()->pianoRoll()->hasFocus())
 	{
 		int key_num = getKey( mapFromGlobal( QCursor::pos() ).y() );
-		p.fillRect( 10, keyAreaBottom() + 3 - m_keyLineHeight *
-					( key_num - m_startKey + 1 ), width() - 10, m_keyLineHeight - 7, currentKeyCol );
+		p.fillRect(
+			10,
+			yCoordOfKey(key_num) + 3,
+			width() - 10,
+			m_keyLineHeight - 7,
+			currentKeyCol);
 	}
 
 	// bar to resize note edit area
@@ -4129,18 +4057,31 @@ void PianoRoll::focusInEvent( QFocusEvent * ev )
 
 
 
-int PianoRoll::getKey(int y) const
+int PianoRoll::getKey(const int y) const
 {
-	// handle case that very top pixel maps to next key above
-	if (y - keyAreaTop() <= 1) { y = keyAreaTop() + 2; }
-	int key_num = qBound(
-		0,
-		// add + 1 to stay within the grid lines
-		((keyAreaBottom() - y + 1) / m_keyLineHeight) + m_startKey,
-		NumKeys - 1
-	);
-	return key_num;
+	// Since keys are numbered from the bottom up, we must get the cursor's
+	// distance from the bottom of the editor, as if the bottom pixel was number 0.
+	// keyAreaBottom() is the first row BELOW the editor, therefore we subtract 1.
+	const int distanceFromBottom = keyAreaBottom() - 1 - y;
+	// As we divide the distance by keyLineHeight, we want to floor() the result,
+	// which is exactly what integer division does, but only for POSITIVE numbers.
+	// Therefore we calculate the distance from absolute 0 (to ensure it is positive)
+	// before dividing.
+	const int fromAbsoluteBottom = m_startKey * m_keyLineHeight + distanceFromBottom;
+	return std::clamp(fromAbsoluteBottom / m_keyLineHeight, 0, NumKeys - 1);
 }
+
+
+
+int PianoRoll::yCoordOfKey(const int key) const
+{
+	// m_startKey is the bottomost visible key and keyAreaBottom() is the first pixel BELOW the editor.
+	// Count number of keys from bottom, multiply by key height, and add one key height
+	// since we want to return the TOP pixel of given key
+	return keyAreaBottom() - ((key - m_startKey + 1) * m_keyLineHeight);
+}
+
+
 
 QList<int> PianoRoll::getAllOctavesForKey( int keyToMirror ) const
 {
