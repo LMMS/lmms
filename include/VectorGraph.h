@@ -32,8 +32,8 @@
 
 #include <QWidget>
 #include <QPainter>
-#include <QVector>
 #include <QtMath>
+#include <vector>
 
 #include "ModelView.h"
 
@@ -144,7 +144,7 @@ private:
 	int m_resolution;
 	int m_width;
 	int m_height;
-	int m_currentPoint;
+	int m_currentPoint; //!< -1 means no current point; TODO: Use std::optional
 	int m_margin;
 	float getTensionHandleYVal(int index);
 	float getTensionHandleXVal(int index);
@@ -160,14 +160,14 @@ public:
 	VectorGraphModel(Model *_parent, bool _default_constructed);
 	virtual ~VectorGraphModel() = default;
 
-	inline void setPoints(QVector<VectorGraphPoint> points)
+	void setPoints(std::vector<VectorGraphPoint> points)
 	{
-		m_points = points;
+		m_points = std::move(points);
 	}
 
 	inline int getPointCount()
 	{
-		return m_points.size();
+		return static_cast<int>(m_points.size());
 	}
 
 	inline void setCurrentDraggedPoint(int index)
@@ -282,7 +282,7 @@ public:
 	}
 
 private:
-	QVector<VectorGraphPoint> m_points;
+	std::vector<VectorGraphPoint> m_points;
 	int m_currentDraggedPoint;
 	int m_currentDraggedTensionHandle;
 	QPoint m_storedCursorPos;

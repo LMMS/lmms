@@ -418,16 +418,13 @@ void VectorGraph::setLastModifiedPoint(int pointIndex)
 VectorGraphModel::VectorGraphModel(Model * _parent, bool _default_constructed):
 	Model(_parent, tr("VectorGraph"), _default_constructed)
 {
-	m_points = QVector<VectorGraphPoint>();
-
-	auto firstPoint = VectorGraphPoint(0, 0, 0, gui::VectorGraph::TensionType::SingleCurve);
+	auto& firstPoint = m_points.emplace_back(0, 0, 0, gui::VectorGraph::TensionType::SingleCurve);
 	firstPoint.permaLockX();
 	firstPoint.setDeletable(false);
-	m_points.append(firstPoint);
-	auto finalPoint = VectorGraphPoint(1, 1, 0, gui::VectorGraph::TensionType::SingleCurve);
+
+	auto& finalPoint = m_points.emplace_back(1, 1, 0, gui::VectorGraph::TensionType::SingleCurve);
 	finalPoint.permaLockX();
 	finalPoint.setDeletable(false);
-	m_points.append(finalPoint);
 
 	m_currentDraggedPoint = -1;
 	m_currentDraggedTensionHandle = -1;
@@ -440,7 +437,9 @@ VectorGraphModel::VectorGraphModel(Model * _parent, bool _default_constructed):
 
 VectorGraphPoint * VectorGraphModel::getPoint(int index)
 {
-	return & m_points[index];
+	assert(index >= 0);
+	assert(static_cast<std::size_t>(index) < m_points.size());
+	return &m_points[static_cast<std::size_t>(index)];
 }
 
 int VectorGraphModel::getSectionStartIndex(float input)
@@ -454,11 +453,11 @@ int VectorGraphModel::getSectionStartIndex(float input)
 		return 0;
 	}
 
-	for (int i = 1; i < m_points.size(); i++)
+	for (std::size_t i = 1; i < m_points.size(); ++i)
 	{
 		if (m_points[i].x() > input || floatEqual(m_points[i].x(), input, 0.000001f)) // unsure if this is a good epsilon
 		{
-			return i - 1;
+			return static_cast<int>(i - 1);
 		}
 	}
 
@@ -584,7 +583,8 @@ float VectorGraphModel::calculateSample(float input)
 
 void VectorGraphModel::insertPointAfter(int index, VectorGraphPoint point)
 {
-	m_points.insert(index + 1, point);
+	assert(index >= -1);
+	m_points.insert(m_points.begin() + static_cast<std::size_t>(index + 1), point);
 }
 
 void VectorGraphModel::tryMove(int index, float x, float y)
@@ -595,7 +595,7 @@ void VectorGraphModel::tryMove(int index, float x, float y)
 	{
 		bool checkRight = true;
 
-		if (index + 1 == m_points.size())
+		if (index + 1 == static_cast<int>(m_points.size()))
 		{
 			checkRight = false;
 		}
@@ -671,7 +671,7 @@ void VectorGraphModel::tryMove(int index, float x, float y)
 
 int VectorGraphModel::getPointIndexFromCoords(int x, int y, int canvasWidth, int canvasHeight)
 {
-	for (int i = 0; i < m_points.size(); i++)
+	for (int i = 0; i < static_cast<int>(m_points.size()); ++i)
 	{
 		VectorGraphPoint * point = getPoint(i);
 		if (point->isXLocked() && point->isYLocked())
@@ -688,7 +688,7 @@ int VectorGraphModel::getPointIndexFromCoords(int x, int y, int canvasWidth, int
 
 int VectorGraphModel::getPointIndexFromTensionHandleCoords(int x, int y, int canvasWidth, int canvasHeight)
 {
-	for (int i = 1; i < m_points.size(); i++)
+	for (int i = 1; i < static_cast<int>(m_points.size()); ++i)
 	{
 		VectorGraphPoint * startPoint = getPoint(i - 1);
 		VectorGraphPoint * endPoint = getPoint(i);
@@ -721,7 +721,8 @@ int VectorGraphModel::getPointIndexFromTensionHandleCoords(int x, int y, int can
 
 void VectorGraphModel::deletePoint(int index)
 {
-	m_points.removeAt(index);
+	assert(index >= 0);
+	m_points.erase(m_points.begin() + static_cast<std::size_t>(index));
 }
 
 void VectorGraphModel::setTensionTypeOnPoint(int index, gui::VectorGraph::TensionType type)
