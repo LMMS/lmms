@@ -32,12 +32,13 @@
 #include <QMutexLocker>
 #include <samplerate.h>
 
+#include "AudioResampler.h"
 #include "Instrument.h"
 #include "PixmapButton.h"
 #include "InstrumentView.h"
 #include "Knob.h"
 #include "LcdSpinBox.h"
-#include "LedCheckBox.h"
+#include "SampleFrame.h"
 #include "gig.h"
 
 
@@ -147,18 +148,13 @@ public:
 class GigSample
 {
 public:
-	GigSample( gig::Sample * pSample, gig::DimensionRegion * pDimRegion,
-			float attenuation, int interpolation, float desiredFreq );
-	~GigSample();
+	GigSample(gig::Sample* pSample, gig::DimensionRegion* pDimRegion, float attenuation,
+		AudioResampler::Mode interpolation, float desiredFreq);
+	~GigSample() = default;
 
 	// Needed when initially creating in QList
 	GigSample( const GigSample& g );
 	GigSample& operator=( const GigSample& g );
-
-	// Needed since libsamplerate stores data internally between calls
-	void updateSampleRate();
-	bool convertSampleRate( SampleFrame & oldBuf, SampleFrame & newBuf,
-		f_cnt_t oldSize, f_cnt_t newSize, float freq_factor, f_cnt_t& used );
 
 	gig::Sample * sample;
 	gig::DimensionRegion * region;
@@ -174,8 +170,13 @@ public:
 	bool pitchtrack;
 
 	// Used to convert sample rates
-	int interpolation;
-	SRC_STATE * srcState;
+	AudioResampler m_resampler;
+
+	static constexpr auto BufferSize = f_cnt_t{16};
+	std::array<SampleFrame, BufferSize> m_sourceBuffer{};
+	std::array<SampleFrame, BufferSize> m_mixBuffer{};
+	std::span<SampleFrame> m_sourceWindow{};
+	std::span<SampleFrame> m_mixWindow{};
 
 	// Used changing the pitch of the note if desired
 	float sampleFreq;
@@ -289,9 +290,6 @@ private:
 	// Locking for the data
 	QMutex m_synthMutex;
 	QMutex m_notesMutex;
-
-	// Used for resampling
-	int m_interpolation;
 
 	// List of all the currently playing notes
 	QList<GigNote> m_notes;
