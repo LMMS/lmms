@@ -51,7 +51,10 @@ class LMMS_EXPORT VectorGraph : public QWidget, public ModelView
 {
 	Q_OBJECT
 public:
-	enum TensionType
+	VectorGraph( QWidget * _parent, int _width, int _height );
+	virtual ~VectorGraph() = default;
+
+	enum class TensionType
 	{
 		Hold,
 		SingleCurve,
@@ -60,8 +63,6 @@ public:
 		Pulse,
 		Wave
 	};
-	VectorGraph( QWidget * _parent, int _width, int _height );
-	virtual ~VectorGraph() = default;
 
 	inline void setResolution(int resolution)
 	{
@@ -160,6 +161,8 @@ public:
 	VectorGraphModel(Model *_parent, bool _default_constructed);
 	virtual ~VectorGraphModel() = default;
 
+	using TensionType = gui::VectorGraph::TensionType;
+
 	void setPoints(std::vector<VectorGraphPoint> points)
 	{
 		m_points = std::move(points);
@@ -220,17 +223,17 @@ public:
 		return m_lastModifiedTension;
 	}
 
-	inline void setLastModifiedTensionType(gui::VectorGraph::TensionType tensionType)
+	void setLastModifiedTensionType(TensionType tensionType)
 	{
 		m_lastModifiedTensionType = tensionType;
 	}
 
-	inline gui::VectorGraph::TensionType getLastModifiedTensionType()
+	TensionType getLastModifiedTensionType()
 	{
 		return m_lastModifiedTensionType;
 	}
 
-	void setTensionTypeOnPoint(int index, gui::VectorGraph::TensionType type);
+	void setTensionTypeOnPoint(int index, TensionType type);
 
 	static inline bool floatEqual(float a, float b, float epsilon)
 	{
@@ -287,7 +290,7 @@ private:
 	int m_currentDraggedTensionHandle;
 	QPoint m_storedCursorPos;
 	float m_lastModifiedTension;
-	gui::VectorGraph::TensionType m_lastModifiedTensionType;
+	TensionType m_lastModifiedTensionType;
 	bool m_gridEnabled;
 	int m_numGridLines;
 	bool m_gridSnapEnabled;
@@ -310,7 +313,9 @@ private:
 class VectorGraphPoint
 {
 public:
-	VectorGraphPoint(float x, float y, float tension, gui::VectorGraph::TensionType type);
+	using TensionType = VectorGraphModel::TensionType;
+
+	VectorGraphPoint(float x, float y, float tension, TensionType type);
 	VectorGraphPoint(VectorGraphPoint * point);
 	VectorGraphPoint();
 	inline float x()
@@ -333,7 +338,7 @@ public:
 	{
 		return m_tension;
 	}
-	inline gui::VectorGraph::TensionType tensionType()
+	TensionType tensionType()
 	{
 		return m_tensionType;
 	}
@@ -412,11 +417,11 @@ public:
 	{
 		return m_isYLocked || m_isYPermaLocked;
 	}
-	inline void setTensionType(gui::VectorGraph::TensionType type)
+	void setTensionType(TensionType type)
 	{
 		m_tensionType = type;
 	}
-	inline gui::VectorGraph::TensionType getTensionType()
+	TensionType getTensionType()
 	{
 		return m_tensionType;
 	}
@@ -437,7 +442,7 @@ private:
 	float m_invTensionPower;
 	float m_invAbsTensionPower;
 	float m_dryAmt;
-	gui::VectorGraph::TensionType m_tensionType;
+	TensionType m_tensionType;
 	bool m_isXLocked;
 	bool m_isYLocked;
 	bool m_isXPermaLocked;
