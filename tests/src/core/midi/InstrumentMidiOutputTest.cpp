@@ -23,17 +23,14 @@
 */
 
 #include <QtTest>
-#include <QDebug>
 
-#include "TrackContainer.h"
 #include "Engine.h"
-#include "Track.h"
-#include "Song.h"
+#include "Instrument.h"
 #include "InstrumentTrack.h"
 #include "MidiEvent.h"
-#include "Instrument.h"
-
-#include <iostream>
+#include "Song.h"
+#include "Track.h"
+#include "TrackContainer.h"
 
 
 class DummyMidiRelayInstrument : public lmms::Instrument

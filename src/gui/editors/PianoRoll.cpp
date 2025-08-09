@@ -4097,7 +4097,6 @@ void PianoRoll::focusOutEvent( QFocusEvent * )
 	{
 		for( int i = 0; i < NumKeys; ++i )
 		{
-			// TODO, maybe send for all channels? Actually maybe not.
 			m_midiClip->instrumentTrack()->pianoModel()->midiEventProcessor()->processInEvent( MidiEvent( MidiNoteOff, -1, i, 0 ) );
 		}
 	}

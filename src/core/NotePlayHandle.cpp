@@ -116,8 +116,8 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 
 	setAudioBusHandle(instrumentTrack->audioBusHandle());
 
-	// If midi output is enabled and we have a selected output midi channel between 1-16, we will use that channel to handle the midi event.
-	// If it is disabled, or if our selected midi output channel is 0 ("--"), we will use the event channel instead.
+	// If midi output is enabled and we have a selected output midi channel between 1-16, use that channel to handle the midi event.
+	// If it is disabled, or if our selected midi output channel is 0 ("--"), use the event channel instead.
 	const int outputChannel = m_instrumentTrack->midiPort()->isWritable() && m_instrumentTrack->midiPort()->outputChannel() != 0
 		? m_instrumentTrack->midiPort()->realOutputChannel()
 		: std::clamp(m_midiChannel, 0, 15); // The clamp ensures that if the channel was passed as -1, it will be set to 0 by default. TODO: should there be a better way for handling default channels?
@@ -248,7 +248,7 @@ void NotePlayHandle::play( SampleFrame* _working_buffer )
 
 		// send MidiNoteOn event
 		m_instrumentTrack->processOutEvent(
-			MidiEvent( MidiNoteOn, midiChannel(), key(), midiVelocity( baseVelocity ) ),
+			MidiEvent(MidiNoteOn, midiChannel(), key(), midiVelocity(baseVelocity)),
 			TimePos::fromFrames( offset(), Engine::framesPerTick() ),
 			offset() );
 	}
@@ -411,7 +411,7 @@ void NotePlayHandle::noteOff( const f_cnt_t _s )
 
 		// send MidiNoteOff event
 		m_instrumentTrack->processOutEvent(
-				MidiEvent( MidiNoteOff, midiChannel(), key(), 0 ),
+				MidiEvent(MidiNoteOff, midiChannel(), key(), 0),
 				TimePos::fromFrames( _s, Engine::framesPerTick() ),
 				_s );
 	}
@@ -546,9 +546,9 @@ void NotePlayHandle::updateFrequency()
 	if (m_instrumentTrack->m_microtuner.enabled())
 	{
 		// custom key mapping and scale: get frequency from the microtuner
+		// TODO does the key map accept a tranposed key or physical key?
 		if (m_instrumentTrack->isKeyMapped(physicalKey()))
 		{
-			// TODO does the microtuner accept a tranposed key or physical key?
 			const auto frequency = m_instrumentTrack->m_microtuner.keyToFreq(key(), DefaultBaseKey);
 			m_frequency = frequency * std::exp2((detune + instrumentPitch / 100) / 12.f);
 			m_unpitchedFrequency = frequency * std::exp2(detune / 12.f);
