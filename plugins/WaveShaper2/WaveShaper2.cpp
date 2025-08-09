@@ -47,10 +47,10 @@ Plugin::Descriptor PLUGIN_EXPORT waveshaper2_plugin_descriptor =
 				"plugin for waveshaping" ),
 	"Joshua Wade <lastname/firstinitial/at/southern/dot/edu>",
 	0x0100,
-	Plugin::Effect,
+	Plugin::Type::Effect,
 	new PluginPixmapLoader("logo"),
-	NULL,
-	NULL
+	nullptr,
+	nullptr,
 } ;
 
 }
@@ -73,18 +73,11 @@ WaveShaper2Effect::~WaveShaper2Effect()
 
 
 
-bool WaveShaper2Effect::processAudioBuffer( sampleFrame * _buf,
-							const fpp_t _frames )
+Effect::ProcessStatus WaveShaper2Effect::processImpl(SampleFrame* buf, const fpp_t frames)
 {
-	if( !isEnabled() || !isRunning () )
-	{
-		return( false );
-	}
-
 // variables for effect
 	int i = 0;
 
-	double out_sum = 0.0;
 	const float d = dryLevel();
 	const float w = wetLevel();
 	float input = m_wsControls.m_inputModel.value();
@@ -99,9 +92,9 @@ bool WaveShaper2Effect::processAudioBuffer( sampleFrame * _buf,
 	const float *inputPtr = inputBuffer ? &( inputBuffer->values()[ 0 ] ) : &input;
 	const float *outputPtr = outputBufer ? &( outputBufer->values()[ 0 ] ) : &output;
 
-	for( fpp_t f = 0; f < _frames; ++f )
+	for (fpp_t f = 0; f < frames; ++f)
 	{
-		float s[2] = { _buf[f][0], _buf[f][1] };
+		float s[2] = {buf[f][0], buf[f][1]};
 
 // apply input gain
 		s[0] *= *inputPtr;
@@ -135,18 +128,15 @@ bool WaveShaper2Effect::processAudioBuffer( sampleFrame * _buf,
 		s[0] *= *outputPtr;
 		s[1] *= *outputPtr;
 
-		out_sum += _buf[f][0]*_buf[f][0] + _buf[f][1]*_buf[f][1];
 // mix wet/dry signals
-		_buf[f][0] = d * _buf[f][0] + w * s[0];
-		_buf[f][1] = d * _buf[f][1] + w * s[1];
+		buf[f][0] = d * buf[f][0] + w * s[0];
+		buf[f][1] = d * buf[f][1] + w * s[1];
 
 		outputPtr += outputInc;
 		inputPtr += inputInc;
 	}
 
-	checkGate( out_sum / _frames );
-
-	return( isRunning() );
+	return ProcessStatus::ContinueIfNotQuiet;
 }
 
 

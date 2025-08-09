@@ -29,6 +29,7 @@
 #include "WaveShaper2ControlDialog.h"
 #include "WaveShaper2Controls.h"
 #include "embed.h"
+#include "FontHelper.h"
 //#include "Graph.h"
 #include "VectorGraph.h"
 #include "PixmapButton.h"
@@ -55,24 +56,21 @@ WaveShaper2ControlDialog::WaveShaper2ControlDialog(
 
 
 
-	Knob * inputKnob = new Knob( knobBright_26, this);
+	auto inputKnob = new Knob(KnobType::Bright26, tr("INPUT"), SMALL_FONT_SIZE, this);
 	inputKnob -> setVolumeKnob( true );
 	inputKnob -> setVolumeRatio( 1.0 );
 	inputKnob -> move( 26, 225 );
 	inputKnob->setModel( &_controls->m_inputModel );
-	inputKnob->setLabel( tr( "INPUT" ) );
 	inputKnob->setHintText( tr( "Input gain:" ) , "" );
 
-	Knob * outputKnob = new Knob( knobBright_26, this );
+	auto outputKnob = new Knob(KnobType::Bright26, tr("OUTPUT"), SMALL_FONT_SIZE, this);
 	outputKnob -> setVolumeKnob( true );
 	outputKnob -> setVolumeRatio( 1.0 );
 	outputKnob -> move( 76, 225 );
 	outputKnob->setModel( &_controls->m_outputModel );
-	outputKnob->setLabel( tr( "OUTPUT" ) );
 	outputKnob->setHintText( tr( "Output gain:" ), "" );
 
-	LedCheckBox * clipInputToggle = new LedCheckBox( "Clip input", this,
-							tr( "Clip input" ), LedCheckBox::Green );
+	auto clipInputToggle = new LedCheckBox("Clip input", this, tr("Clip input"), LedCheckBox::LedColor::Green);
 	clipInputToggle -> move( 131, 252 );
 	clipInputToggle -> setModel( &_controls -> m_clipModel );
 	clipInputToggle->setToolTip( tr( "Clip input signal to 0dB" ) );

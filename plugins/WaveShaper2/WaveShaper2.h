@@ -40,8 +40,8 @@ public:
 	WaveShaper2Effect( Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key );
 	virtual ~WaveShaper2Effect();
-	virtual bool processAudioBuffer( sampleFrame * _buf,
-							const fpp_t _frames );
+
+	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
 
 	virtual EffectControls * controls()
 	{
