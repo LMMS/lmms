@@ -507,9 +507,6 @@ void InstrumentTrack::processOutEvent( const MidiEvent& event, const TimePos& ti
 
 	// And send the event to the piano widget to update the pressed keys
 	m_piano.processInEvent(event, time, offset);
-
-	// Debug
-	m_eventHistory[channel].push_back(static_cast<int>(event.type()));
 }
 
 
@@ -666,38 +663,6 @@ void InstrumentTrack::updatePitchRange()
 void InstrumentTrack::updateMixerChannel()
 {
 	m_audioBusHandle.setNextMixerChannel(m_mixerChannelModel.value());
-	for (int i = 0; i<16; i++)
-	{
-		QString hist = "";
-		int net = 0;
-		for (int event: m_eventHistory[i])
-		{
-			if (event == MidiNoteOn)
-			{
-				hist += "^";
-				net++;
-			}
-			else if (event == MidiNoteOff)
-			{
-				hist += "_";
-				net--;
-			}
-			else if (event == MidiKeyPressure)
-			{
-				hist += "V";
-			}
-			else if (event == MidiPitchBend)
-			{
-				hist += "P";
-			}
-			else
-			{
-				hist += "?";
-			}
-		}
-		qDebug() << "Channel" << i << hist << "Net" << net;
-		m_eventHistory[i].clear();
-	}
 }
 
 

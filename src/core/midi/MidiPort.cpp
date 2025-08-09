@@ -65,14 +65,19 @@ MidiPort::MidiPort( const QString& name,
 	m_readableModel( false, this, tr( "Receive MIDI-events" ) ),
 	m_writableModel( false, this, tr( "Send MIDI-events" ) ),
 	m_MPEModel(false, this, tr("Send MPE Config Message and route note events across multiple channels")),
-	m_MPELowerZoneChannelsModel(16, 0, MidiChannelCount, this, tr("Number of channels used for MPE Lower Zone")),
-	m_MPEUpperZoneChannelsModel(0, 0, MidiChannelCount, this, tr("Number of channels used for MPE Upper Zone")),
-	m_MPEPitchRangeModel(48, 0, 96, this, tr( "Semitone pitch bend range for member channels (both MPE zones)"))
+	m_MPELowerZoneChannelsModel(16, 1, MidiChannelCount, this, tr("Number of channels used for MPE Lower Zone")),
+	m_MPEUpperZoneChannelsModel(1, 1, MidiChannelCount, this, tr("Number of channels used for MPE Upper Zone")),
+	m_MPEPitchRangeModel(48, 0, 96, this, tr( "Semitone pitch bend range for member channels (both MPE zones)")),
+	m_MPEZoneModel()
 {
 	m_midiClient->addPort( this );
 
 	m_readableModel.setValue( m_mode == Mode::Input || m_mode == Mode::Duplex );
 	m_writableModel.setValue( m_mode == Mode::Output || m_mode == Mode::Duplex );
+
+	m_MPEZoneModel.addItem("Lower");
+	m_MPEZoneModel.addItem("Upper");
+	m_MPEZoneModel.setValue(0);
 
 	connect( &m_readableModel, SIGNAL(dataChanged()),
 			this, SLOT(updateMidiPortMode()), Qt::DirectConnection );
@@ -81,21 +86,22 @@ MidiPort::MidiPort( const QString& name,
 	connect( &m_outputProgramModel, SIGNAL(dataChanged()),
 			this, SLOT(updateOutputProgram()), Qt::DirectConnection );
 	connect(&m_MPEModel, &AutomatableModel::dataChanged, this, &MidiPort::updateMPEConfiguration, Qt::DirectConnection);
-	connect(&m_MPEUpperZoneChannelsModel, &AutomatableModel::dataChanged, this, &MidiPort::updateMPEConfiguration, Qt::DirectConnection);
-	connect(&m_MPELowerZoneChannelsModel, &AutomatableModel::dataChanged, this, &MidiPort::updateMPEConfiguration, Qt::DirectConnection);
 	connect(&m_MPEPitchRangeModel, &AutomatableModel::dataChanged, this, &MidiPort::updateMPEConfiguration, Qt::DirectConnection);
+	connect(&m_MPEZoneModel, &AutomatableModel::dataChanged, this, &MidiPort::updateMPEConfiguration, Qt::DirectConnection);
 	// Ensure the zones do not overlap
 	connect(&m_MPEUpperZoneChannelsModel, &AutomatableModel::dataChanged, this, [&](){
 		if (m_MPELowerZoneChannelsModel.value() > 16 - m_MPEUpperZoneChannelsModel.value())
 		{
-			m_MPELowerZoneChannelsModel.setValue(16 - m_MPEUpperZoneChannelsModel.value());
+			m_MPELowerZoneChannelsModel.setValue(std::clamp(16 - m_MPEUpperZoneChannelsModel.value(), 1, 16));
 		}
+		updateMPEConfiguration();
 	});
 	connect(&m_MPELowerZoneChannelsModel, &AutomatableModel::dataChanged, this, [&](){
 		if (m_MPEUpperZoneChannelsModel.value() > 16 - m_MPELowerZoneChannelsModel.value())
 		{
-			m_MPEUpperZoneChannelsModel.setValue(16 - m_MPELowerZoneChannelsModel.value());
+			m_MPEUpperZoneChannelsModel.setValue(std::clamp(16 - m_MPELowerZoneChannelsModel.value(), 1, 16));
 		}
+		updateMPEConfiguration();
 	});
 
 
@@ -221,6 +227,7 @@ void MidiPort::saveSettings( QDomDocument& doc, QDomElement& thisElement )
 	m_MPELowerZoneChannelsModel.saveSettings(doc, thisElement, "mpelowerchannels");
 	m_MPEUpperZoneChannelsModel.saveSettings(doc, thisElement, "mpeupperchannels");
 	m_MPEPitchRangeModel.saveSettings(doc, thisElement, "mpepitchrange");
+	m_MPEZoneModel.saveSettings(doc, thisElement, "mpezone");
 
 	if( isInputEnabled() )
 	{
@@ -279,6 +286,7 @@ void MidiPort::loadSettings( const QDomElement& thisElement )
 	m_MPELowerZoneChannelsModel.loadSettings(thisElement, "mpelowerchannels");
 	m_MPEUpperZoneChannelsModel.loadSettings(thisElement, "mpeupperchannels");
 	m_MPEPitchRangeModel.loadSettings(thisElement, "mpepitchrange");
+	m_MPEZoneModel.loadSettings(thisElement, "mpezone");
 
 	updateMPEConfiguration();
 
@@ -463,7 +471,7 @@ void MidiPort::updateOutputProgram()
 
 void MidiPort::updateMPEConfiguration()
 {
-	m_mpeManager.config(MPELowerZoneChannels(), MPEUpperZoneChannels(), MPEPitchRange());
+	m_mpeManager.config(MPELowerZoneChannels(), MPEUpperZoneChannels(), MPEPitchRange(), MPEActiveZone());
 	m_mpeManager.sendMPEConfigSignals(m_midiEventProcessor);
 }
 

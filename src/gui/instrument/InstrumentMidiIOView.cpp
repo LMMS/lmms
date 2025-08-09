@@ -29,6 +29,7 @@
 #include "InstrumentMidiIOView.h"
 #include "MidiPortMenu.h"
 #include "AudioEngine.h"
+#include "ComboBox.h"
 #include "Engine.h"
 #include "embed.h"
 #include "GroupBox.h"
@@ -153,18 +154,26 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 	MPELayout->setSpacing(4);
 
 	m_MPELowerZoneChannelsSpinBox = new LcdSpinBox(2, m_MPEGroupBox);
-	m_MPELowerZoneChannelsSpinBox->addTextForValue(0, "--");
+	m_MPELowerZoneChannelsSpinBox->addTextForValue(1, "--");
 	m_MPELowerZoneChannelsSpinBox->setLabel(tr("LOWER"));
+	m_MPELowerZoneChannelsSpinBox->setToolTip(tr("Number of channels to use for the upper zone, counting from 0"));
 	MPELayout->addWidget( m_MPELowerZoneChannelsSpinBox );
 
 	m_MPEUpperZoneChannelsSpinBox = new LcdSpinBox(2, m_MPEGroupBox);
-	m_MPEUpperZoneChannelsSpinBox->addTextForValue(0, "--");
+	m_MPEUpperZoneChannelsSpinBox->addTextForValue(1, "--");
 	m_MPEUpperZoneChannelsSpinBox->setLabel(tr("UPPER"));
+	m_MPEUpperZoneChannelsSpinBox->setToolTip(tr("Number of channels to use for the upper zone, counting back from 16"));
 	MPELayout->addWidget(m_MPEUpperZoneChannelsSpinBox);
 
 	m_MPEPitchRangeSpinBox = new LcdSpinBox(2, m_MPEGroupBox);
 	m_MPEPitchRangeSpinBox->setLabel(tr("RANGE"));
+	m_MPEPitchRangeSpinBox->setToolTip(tr("Pitchbend range for all member channels, in semitones"));
 	MPELayout->addWidget(m_MPEPitchRangeSpinBox);
+
+	m_MPEZoneComboBox = new ComboBox(m_MPEGroupBox);
+	m_MPEZoneComboBox->setFixedSize(64, ComboBox::DEFAULT_HEIGHT);
+	m_MPEZoneComboBox->setToolTip(tr("Zone selection"));
+	MPELayout->addWidget(m_MPEZoneComboBox);
 
 	MPELayout->addStretch();
 
@@ -212,6 +221,7 @@ void InstrumentMidiIOView::modelChanged()
 	m_MPELowerZoneChannelsSpinBox->setModel(&mp->m_MPELowerZoneChannelsModel);
 	m_MPEUpperZoneChannelsSpinBox->setModel(&mp->m_MPEUpperZoneChannelsModel);
 	m_MPEPitchRangeSpinBox->setModel(&mp->m_MPEPitchRangeModel);
+	m_MPEZoneComboBox->setModel(&mp->m_MPEZoneModel);
 
 	m_baseVelocitySpinBox->setModel( &mp->m_baseVelocityModel );
 

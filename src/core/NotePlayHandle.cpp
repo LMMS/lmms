@@ -124,8 +124,8 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 
 	// The MPE manager will determine which of the 16 midi channels is best to route this note, if MPE is enabled.
 	const int MPEChannel = m_instrumentTrack->midiPort()->mpeManager()->findAvailableChannel(key());
-
-	m_midiChannel = m_instrumentTrack->midiPort()->MPEEnabled()
+	// If no channels have been allocated to the current zone, the MPE manager may return -1, meaning it should be routed normally.
+	m_midiChannel = m_instrumentTrack->midiPort()->MPEEnabled() && MPEChannel != -1
 		? MPEChannel
 		: outputChannel;
 

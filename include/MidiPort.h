@@ -33,6 +33,7 @@
 #include "Midi.h"
 #include "TimePos.h"
 #include "AutomatableModel.h"
+#include "ComboBoxModel.h"
 #include "MPEManager.h"
 
 namespace lmms
@@ -116,15 +117,28 @@ public:
 
 	int MPELowerZoneChannels() const
 	{
-		return MPEEnabled()
+		return MPEEnabled() && m_MPELowerZoneChannelsModel.value() > 1
 			? m_MPELowerZoneChannelsModel.value()
 			: 0;
 	}
 	int MPEUpperZoneChannels() const
 	{
-		return MPEEnabled()
+		return MPEEnabled() && m_MPEUpperZoneChannelsModel.value() > 1
 			? m_MPEUpperZoneChannelsModel.value()
 			: 0;
+	}
+
+	MPEManager::MPEZone MPEActiveZone() const
+	{
+		switch (m_MPEZoneModel.value())
+		{
+			case 0:
+				return MPEManager::MPEZone::Lower;
+			case 1:
+				return MPEManager::MPEZone::Upper;
+			default:
+				return MPEManager::MPEZone::Lower;
+		}
 	}
 
 	MPEManager* mpeManager()
@@ -198,6 +212,7 @@ private:
 	IntModel m_MPELowerZoneChannelsModel;
 	IntModel m_MPEUpperZoneChannelsModel;
 	IntModel m_MPEPitchRangeModel;
+	ComboBoxModel m_MPEZoneModel;
 
 	Map m_readablePorts;
 	Map m_writablePorts;

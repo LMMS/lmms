@@ -273,7 +273,7 @@ private:
 
 	MidiPort m_midiPort;
 
-	//! Stores a list of active NotePlayHandles for this instrument track TODO VERIFY
+	//! Stores a list of active NotePlayHandles for this instrument track
 	//! NOTE: The indicies refer to the index of the physical piano key used to generate the NotePlayHandle, not the output (potentially transposed) key.
 	NotePlayHandle* m_notes[NumKeys];
 	NotePlayHandleList m_sustainedNotes;
@@ -282,8 +282,6 @@ private:
 	//! NOTE: The indicies refer to the output (transposed) key stored in the midi event, not the physical piano key used to generate the note.
 	std::array<std::array<int, NumKeys>, 16> m_runningMidiNotes;
 	QMutex m_midiNotesMutex;
-
-	std::array<std::vector<int>,16> m_eventHistory = {};
 
 	bool m_sustainPedalPressed;
 

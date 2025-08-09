@@ -38,13 +38,20 @@ class MidiPort;
 class MPEManager
 {
 public:
-	void config(int numChannelsLowerZone = 16, int numChannelsUpperZone = 0, int pitchBendRange = 48)
+	enum MPEZone
+	{
+		Lower,
+		Upper
+	};
+
+	void config(int numChannelsLowerZone = 16, int numChannelsUpperZone = 0, int pitchBendRange = 48, MPEZone zone = MPEZone::Lower)
 	{
 		// Ensure the zones do not overlap
 		assert(numChannelsLowerZone + numChannelsUpperZone <= 16);
 		m_numChannelsLowerZone = numChannelsLowerZone;
 		m_numChannelsUpperZone = numChannelsUpperZone;
 		m_pitchBendRange = pitchBendRange;
+		m_zone = zone;
 	}
 
 	int findAvailableChannel(int key = 0, bool willNotChange = false);
@@ -64,10 +71,11 @@ public:
 private:
 	std::array<int, 16> m_channelNoteCounts = {};
 	std::array<int, 16> m_channelNoteOffTimes = {};
+	int m_noteOffCount = 0; // Used in place of the current time as a way to compare the age of NoteOff events
 	int m_numChannelsLowerZone = 16;
 	int m_numChannelsUpperZone = 0;
 	int m_pitchBendRange = 48;
-	int m_noteOffCount = 0; // Used in place of the current time as a way to compare the age of NoteOff events
+	MPEZone m_zone = MPEZone::Lower;
 } ;
 
 } // namespace lmms
