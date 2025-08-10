@@ -119,6 +119,11 @@ InstrumentTrack::InstrumentTrack(TrackContainer* tc) :
 	connect(&m_useMasterPitchModel, &AutomatableModel::dataChanged, this, &InstrumentTrack::transposeChanged);
 	connect(Engine::getSong()->masterPitchModel(), &AutomatableModel::dataChanged, this, &InstrumentTrack::transposeChanged);
 
+	// Resend the master pitch knob and pitch range midi signals just in case it was originally sent on a non-manager channel before MPE was enabled
+	// With MPE, all the master pitch wheel signals must go to either channel 0 or channel 15.
+	connect(&m_midiPort, &MidiPort::MPEConfigurationChanged, this, &InstrumentTrack::updatePitchRange);
+	connect(&m_midiPort, &MidiPort::MPEConfigurationChanged, this, &InstrumentTrack::updatePitch);
+
 	autoAssignMidiDevice(true);
 }
 
@@ -639,7 +644,11 @@ void InstrumentTrack::updatePitch()
 {
 	updateBaseNote();
 
-	processOutEvent( MidiEvent( MidiPitchBend, midiPort()->realOutputChannel(), midiPitch() ) );
+	int channel = midiPort()->MPEEnabled()
+		? midiPort()->mpeManager()->managerChannel()
+		: midiPort()->realOutputChannel(); // TODO this sends the signal on the output channel, regardless of whether midi output is enabled or not.
+
+	processOutEvent(MidiEvent(MidiPitchBend, channel, midiPitch()));
 }
 
 
@@ -650,11 +659,15 @@ void InstrumentTrack::updatePitchRange()
 	const int r = m_pitchRangeModel.value();
 	m_pitchModel.setRange( MinPitchDefault * r, MaxPitchDefault * r );
 
-	processOutEvent( MidiEvent( MidiControlChange, midiPort()->realOutputChannel(),
-								MidiControllerRegisteredParameterNumberLSB, MidiPitchBendSensitivityRPN & 0x7F ) );
-	processOutEvent( MidiEvent( MidiControlChange, midiPort()->realOutputChannel(),
-								MidiControllerRegisteredParameterNumberMSB, ( MidiPitchBendSensitivityRPN >> 8 ) & 0x7F ) );
-	processOutEvent( MidiEvent( MidiControlChange, midiPort()->realOutputChannel(), MidiControllerDataEntry, midiPitchRange() ) );
+	int channel = midiPort()->MPEEnabled()
+		? midiPort()->mpeManager()->managerChannel()
+		: midiPort()->realOutputChannel(); // TODO this sends the signal on the output channel, regardless of whether midi output is enabled or not.
+
+	processOutEvent(MidiEvent(MidiControlChange, channel,
+								MidiControllerRegisteredParameterNumberLSB, MidiPitchBendSensitivityRPN & 0x7F));
+	processOutEvent(MidiEvent(MidiControlChange, channel,
+								MidiControllerRegisteredParameterNumberMSB, (MidiPitchBendSensitivityRPN >> 8) & 0x7F));
+	processOutEvent(MidiEvent(MidiControlChange, channel, MidiControllerDataEntry, midiPitchRange()));
 }
 
 

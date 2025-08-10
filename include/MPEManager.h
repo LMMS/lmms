@@ -44,6 +44,13 @@ public:
 		Upper
 	};
 
+	int managerChannel()
+	{
+		return m_zone == MPEZone::Lower
+			? 0
+			: 16;
+	}
+
 	void config(int numChannelsLowerZone = 16, int numChannelsUpperZone = 0, int pitchBendRange = 48, MPEZone zone = MPEZone::Lower)
 	{
 		// Ensure the zones do not overlap

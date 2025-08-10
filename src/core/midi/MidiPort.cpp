@@ -32,6 +32,7 @@
 #include "Note.h"
 #include "Song.h"
 #include "MidiController.h"
+#include "InstrumentTrack.h"
 
 
 namespace lmms
@@ -473,6 +474,9 @@ void MidiPort::updateMPEConfiguration()
 {
 	m_mpeManager.config(MPELowerZoneChannels(), MPEUpperZoneChannels(), MPEPitchRange(), MPEActiveZone());
 	m_mpeManager.sendMPEConfigSignals(m_midiEventProcessor);
+	// Let the track know to resend the master pitch knob/range, since the channel may have changed if MPE is enabled/disabled
+	// (MPE master pitch bends are always sent on manager channels, either channel 0 or 15. However, when MPE is disabled, the track sends it on the normal output channel, which may not be 0)
+	emit MPEConfigurationChanged();
 }
 
 

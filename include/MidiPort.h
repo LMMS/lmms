@@ -226,6 +226,7 @@ signals:
 	void readablePortsChanged();
 	void writablePortsChanged();
 	void modeChanged();
+	void MPEConfigurationChanged();
 
 } ;
 

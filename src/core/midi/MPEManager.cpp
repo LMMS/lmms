@@ -37,10 +37,6 @@ int MPEManager::findAvailableChannel(int key, bool willNotChange)
 {
 	// For the lower zone, the first channel, channel 0, is the Manager channel. The channels after that are Member channels.
 	// For the upper zone, the last channel, channel 15, is the Manager channel. The channels below 15 are Member channels.
-	int managerChannel = 0;
-	if (m_zone == MPEZone::Lower) { managerChannel = 0; }
-	else if (m_zone == MPEZone::Upper) { managerChannel = 15; }
-	else { return -1; }
 
 	const int numChannels = m_zone == MPEZone::Lower
 		? m_numChannelsLowerZone
@@ -77,7 +73,7 @@ int MPEManager::findAvailableChannel(int key, bool willNotChange)
 
 	// Route static note to Manager channel as described above.
 	// TODO this has not been tested
-	if (willNotChange) { return managerChannel; }
+	if (willNotChange) { return managerChannel(); }
 
 	// Find member channel with fewest notes/oldest NoteOff signal
 	int bestChannel = firstMemberChannel;
@@ -119,8 +115,7 @@ void MPEManager::sendMPEConfigSignals(MidiEventProcessor* proc)
 	proc->processOutEvent(MidiEvent(MidiControlChange, 0xF, MidiControllerRegisteredParameterNumberLSB, MidiNullFunctionNumberRPN & 0x7F));
 
 	// Set pitch bend range to on all Member channels
-	// TODO this doesn't always work on all VSTs (Vital). I have the default at 48 because that seems to be the default in the MPE spec, but lmms likes to use 60 so...
-	// Also currently this doesn't affect the manager channels, 0 and 15. But I think that's fine, since the pitch wheel is supposed to handle that.
+	// The manager channels are untouched, since those are controlled by the instrument track's pitch knob.
 	// Lower zone
 	for (int channel = 1; channel <= m_numChannelsLowerZone; ++channel)
 	{
@@ -140,6 +135,7 @@ void MPEManager::sendMPEConfigSignals(MidiEventProcessor* proc)
 		proc->processOutEvent(MidiEvent(MidiControlChange, channel, MidiControllerRegisteredParameterNumberLSB, MidiNullFunctionNumberRPN & 0x7F));
 	}
 
+	// Sending on all channels 0-15 rather than 1-14, since the lower zone can sometimes extend to channel 15 if the upper zone is inactive, and vice versa.
 	for (int channel = 0; channel < 16; ++channel)
 	{
 		// And reset the pitch bend values so that they don't get stuck after disabling MPE.
