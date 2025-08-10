@@ -279,7 +279,7 @@ private slots:
 		//
 		QCOMPARE(receivedLowerZoneChannels, lowerZoneChannels);
 		QCOMPARE(receivedUpperZoneChannels, upperZoneChannels);
-		// We currently only set the pitch bend range on member channels, not the manager channels, since that's supposed to be handled by the pitch bend range knob (Well, there are some instances were this doesn't work, like if the output midi channel is nonzero, it wouldn't get routed to a manager channel... TODO).
+		// We currently only set the pitch bend range on member channels, not the manager channels, since that's supposed to be handled by the pitch bend range knob.
 		for (int channel = 1; channel <= receivedLowerZoneChannels; ++channel)
 		{
 			QCOMPARE(receivedPitchBendRanges[channel], pitchBendRange);
@@ -291,6 +291,7 @@ private slots:
 		// Currently we also reset the pitch bends when changing the MPE config. This is not required for the sender in the specification, but it can prevent some bugs with plugins which don't automatically reset it themselves.
 		for (int bend: receivedPitchBends)
 		{
+			// Pitch bend values go from 0 to 16383, so the zero point is 8192.
 			QCOMPARE(bend, 8192);
 		}
 		// And just for good practice, make sure the MSB/LSB's are set to null at the end for all the channels we touched

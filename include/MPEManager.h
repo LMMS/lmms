@@ -44,6 +44,7 @@ public:
 		Upper
 	};
 
+	//! Returns the manager channel of the current zone, for sending global events (such as master pitch wheel)
 	int managerChannel()
 	{
 		return m_zone == MPEZone::Lower
@@ -51,6 +52,7 @@ public:
 			: 16;
 	}
 
+	//! Sets the MPE configuration before sending it as MIDI events
 	void config(int numChannelsLowerZone = 16, int numChannelsUpperZone = 0, int pitchBendRange = 48, MPEZone zone = MPEZone::Lower)
 	{
 		// Ensure the zones do not overlap
@@ -61,13 +63,18 @@ public:
 		m_zone = zone;
 	}
 
-	int findAvailableChannel(int key = 0, bool willNotChange = false);
+	//! Returns the channel in the current zone with the fewest notes, or with the oldest NoteOff. Returns -1 if the zone has no channels.
+	int findAvailableChannel();
+
+	//! Calls processOutEvent on the given MidiEventProcessor (such as an InstrumentTrack) to send all the MPE configuration and pitch bend range events and reset the pitch bends for all channels.
 	void sendMPEConfigSignals(MidiEventProcessor* proc);
 
+	//! Increments the internal counter of active notes on the given channel
 	void noteOn(int channel)
 	{
 		m_channelNoteCounts[channel]++;
 	}
+	//! Decrements the internal counter of active notes on the given channel, and records the total count of the NoteOff signals up to this point to compare which channel has the oldest NoteOff
 	void noteOff(int channel)
 	{
 		m_channelNoteCounts[channel]--;

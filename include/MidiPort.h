@@ -115,12 +115,14 @@ public:
 		return outputChannel() ? outputChannel() - 1 : 0;
 	}
 
+	//! Returns the current number of channels in the Lower MPE Zone, or 0 if there are no member channels or MPE is disabled
 	int MPELowerZoneChannels() const
 	{
 		return MPEEnabled() && m_MPELowerZoneChannelsModel.value() > 1
 			? m_MPELowerZoneChannelsModel.value()
 			: 0;
 	}
+	//! Returns the current number of channels in the Upper MPE Zone, or 0 if there are no member channels or MPE is disabled
 	int MPEUpperZoneChannels() const
 	{
 		return MPEEnabled() && m_MPEUpperZoneChannelsModel.value() > 1
@@ -128,6 +130,7 @@ public:
 			: 0;
 	}
 
+	// Returns the current active MPE zone (Lower or Upper)
 	MPEManager::MPEZone MPEActiveZone() const
 	{
 		switch (m_MPEZoneModel.value())

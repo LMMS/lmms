@@ -123,7 +123,7 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 		: std::clamp(m_midiChannel, 0, 15); // The clamp ensures that if the channel was passed as -1, it will be set to 0 by default. TODO: should there be a better way for handling default channels?
 
 	// The MPE manager will determine which of the 16 midi channels is best to route this note, if MPE is enabled.
-	const int MPEChannel = m_instrumentTrack->midiPort()->mpeManager()->findAvailableChannel(key());
+	const int MPEChannel = m_instrumentTrack->midiPort()->mpeManager()->findAvailableChannel();
 	// If no channels have been allocated to the current zone, the MPE manager may return -1, meaning it should be routed normally.
 	m_midiChannel = m_instrumentTrack->midiPort()->MPEEnabled() && MPEChannel != -1
 		? MPEChannel
@@ -546,7 +546,6 @@ void NotePlayHandle::updateFrequency()
 	if (m_instrumentTrack->m_microtuner.enabled())
 	{
 		// custom key mapping and scale: get frequency from the microtuner
-		// TODO does the key map accept a tranposed key or physical key?
 		if (m_instrumentTrack->isKeyMapped(physicalKey()))
 		{
 			const auto frequency = m_instrumentTrack->m_microtuner.keyToFreq(key(), DefaultBaseKey);

@@ -27,13 +27,10 @@
 #include "MidiEventProcessor.h"
 #include "MidiPort.h"
 
-#include <QDebug>
-
 namespace lmms
 {
 
-// TODO currently no calls use `willNotChange`
-int MPEManager::findAvailableChannel(int key, bool willNotChange)
+int MPEManager::findAvailableChannel()
 {
 	// For the lower zone, the first channel, channel 0, is the Manager channel. The channels after that are Member channels.
 	// For the upper zone, the last channel, channel 15, is the Manager channel. The channels below 15 are Member channels.
@@ -52,28 +49,15 @@ int MPEManager::findAvailableChannel(int key, bool willNotChange)
 		? numMemberChannels
 		: 14;
 
-
 	// The MPE specification, page 27 Appendix E, does not prohibit NoteOn/NoteOff signals on the Manager channels.
 	// However, notes should ideally not be routed to Manager channels, since then you can't control their pitch individually
 	// without affecting the pitch of the whole instrument.
 
-	// page 17, Appendix A.3 gives some ideas on how to implement a good note routing system which aims to minimize the
+	// Page 17, Appendix A.3 gives some ideas on how to implement a good note routing system which aims to minimize the
 	// chance for notes being incorrectly pitch bent due to being on the same channel as another note being pitch bent.
 
-	// Their proposed method routes notes to the channels which have the fewest active notes. If two channels have the same number of notes, the ones with the oldest NoteOff signal is preferred.
-
-	// However, this method can be improved in the case where LMMS knows for certain that a note will not be pitch bent, as
-	// then it can route them all to a single channel (perhaps the manager channel?) without having to worry about one of them suddenly bending everything at once.
-	// This is only really possible for MidiClip-based notes where we know what the detuning curve looks like in advance. Notes
-	// coming in from input midi events cannot be guaranteed not to bend at some later point in time.
-
-	// If LMMS cannot guarantee that the incoming note will not bend, then it will be routed as normal to the channel with the fewest and/or
-	// oldest note off signal
-
-
-	// Route static note to Manager channel as described above.
-	// TODO this has not been tested
-	if (willNotChange) { return managerChannel(); }
+	// Their proposed method routes notes to the channels which have the fewest active notes.
+	// If two channels have the same number of notes, the ones with the oldest NoteOff signal is preferred.
 
 	// Find member channel with fewest notes/oldest NoteOff signal
 	int bestChannel = firstMemberChannel;
@@ -94,19 +78,19 @@ int MPEManager::findAvailableChannel(int key, bool willNotChange)
 }
 
 
-// TODO add comments
 void MPEManager::sendMPEConfigSignals(MidiEventProcessor* proc)
 {
-	// Setup MPE Zone 1
+	// The MPE config signal is sent just like the pitch bend range signal. The first 7 bits of the message id is sent (Most Significant Bits / MSB), then the last 7 bits (Least Significant Bits / LSB),
+	// The plugin now knows that the next MidiControllerDataEntry message is meant to set the MPE config
+	// The channel of the message in this case determines whether it is for the Lower or Upper zone (0 = lower, 15 = upper)
 	proc->processOutEvent(MidiEvent(MidiControlChange, 0, MidiControllerRegisteredParameterNumberMSB, (MidiMPEConfigurationRPN >> 8) & 0x7F));
 	proc->processOutEvent(MidiEvent(MidiControlChange, 0, MidiControllerRegisteredParameterNumberLSB, MidiMPEConfigurationRPN & 0x7F));
 	proc->processOutEvent(MidiEvent(MidiControlChange, 0, MidiControllerDataEntry, m_numChannelsLowerZone));
-
-	// Send null RPN signals to end the control change. I heard this was good practice.
+	// Send null RPN signals to end the control change. This is not explicitly required by the MPE spec, but I heard it was good practice to prevent accidental signals from editing the last sent config
 	proc->processOutEvent(MidiEvent(MidiControlChange, 0, MidiControllerRegisteredParameterNumberMSB, (MidiNullFunctionNumberRPN >> 8) & 0x7F));
 	proc->processOutEvent(MidiEvent(MidiControlChange, 0, MidiControllerRegisteredParameterNumberLSB, MidiNullFunctionNumberRPN & 0x7F));
-	// Setup MPE Zone 2
-	// Actually, section 2.2.1, if a sender intends to only use one zone, it should only send the config message for that one zone. ??? should we only send signals for the lower zone currently?
+	// Send the same signals, but for the upper zone.
+	// TODO section 2.2.1, if a sender intends to only use one zone, it should only send the config message for that one zone. This is not mandatory, but perhaps in the future we should implement that.
 	proc->processOutEvent(MidiEvent(MidiControlChange, 0xF, MidiControllerRegisteredParameterNumberMSB, (MidiMPEConfigurationRPN >> 8) & 0x7F));
 	proc->processOutEvent(MidiEvent(MidiControlChange, 0xF, MidiControllerRegisteredParameterNumberLSB, MidiMPEConfigurationRPN & 0x7F));
 	proc->processOutEvent(MidiEvent(MidiControlChange, 0xF, MidiControllerDataEntry, m_numChannelsUpperZone));
@@ -114,7 +98,7 @@ void MPEManager::sendMPEConfigSignals(MidiEventProcessor* proc)
 	proc->processOutEvent(MidiEvent(MidiControlChange, 0xF, MidiControllerRegisteredParameterNumberMSB, (MidiNullFunctionNumberRPN >> 8) & 0x7F));
 	proc->processOutEvent(MidiEvent(MidiControlChange, 0xF, MidiControllerRegisteredParameterNumberLSB, MidiNullFunctionNumberRPN & 0x7F));
 
-	// Set pitch bend range to on all Member channels
+	// Set pitch bend range on all Member channels.
 	// The manager channels are untouched, since those are controlled by the instrument track's pitch knob.
 	// Lower zone
 	for (int channel = 1; channel <= m_numChannelsLowerZone; ++channel)
@@ -135,11 +119,12 @@ void MPEManager::sendMPEConfigSignals(MidiEventProcessor* proc)
 		proc->processOutEvent(MidiEvent(MidiControlChange, channel, MidiControllerRegisteredParameterNumberLSB, MidiNullFunctionNumberRPN & 0x7F));
 	}
 
+	// And reset the pitch bend values so that they don't get stuck after disabling MPE.
 	// Sending on all channels 0-15 rather than 1-14, since the lower zone can sometimes extend to channel 15 if the upper zone is inactive, and vice versa.
+	// Technically, this should not be necessary, since according to 2.2.3, the reciever should handle resetting the values when a channel leaves/enters an MPE zone. But some vst's (vital) don't appear to do that, so we still do it for compatability.
 	for (int channel = 0; channel < 16; ++channel)
 	{
-		// And reset the pitch bend values so that they don't get stuck after disabling MPE.
-		// This should not be necessary, since according to 2.2.3, the reciever should handle resetting the values when a channel leaves/enters an MPE zone. But some vst's (vital) don't appear to do that.
+		// Pitch bend values go from 0 to 16383, so the zero point is 8192.
 		proc->processOutEvent(MidiEvent(MidiPitchBend, channel, 8192));
 	}
 }

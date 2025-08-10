@@ -23,7 +23,6 @@
  */
 #include "InstrumentTrack.h"
 
-#include <QDebug>
 #include "AudioEngine.h"
 #include "AutomationClip.h"
 #include "ConfigManager.h"
@@ -145,7 +144,6 @@ bool InstrumentTrack::isKeyMapped(int physicalKey) const
 	Song *song = Engine::getSong();
 	if (!song) {return false;}
 
-	// TODO is this right?
 	return song->getKeymap(m_microtuner.currentKeymap())->getDegree(physicalKey) != -1;
 }
 
@@ -318,7 +316,6 @@ void InstrumentTrack::processCCEvent(int controller)
 
 void InstrumentTrack::processInEvent(const MidiEvent& event, const TimePos& time, f_cnt_t offset)
 {
-	//qDebug() << "In Event" << event.type() << event.channel() << event.param(0) << event.param(1);
 	if (Engine::getSong()->isExporting() && event.source() == MidiEvent::Source::External)
 	{
 		return;
@@ -349,7 +346,6 @@ void InstrumentTrack::processInEvent(const MidiEvent& event, const TimePos& time
 								nullptr, event.channel(),
 								NotePlayHandle::Origin::MidiInput);
 					m_notes[physicalKey] = nph;
-					// TODO Why is this here?
 					if(!Engine::audioEngine()->addPlayHandle(nph))
 					{
 						m_notes[physicalKey] = nullptr;
@@ -463,9 +459,8 @@ void InstrumentTrack::processInEvent(const MidiEvent& event, const TimePos& time
 
 
 
-void InstrumentTrack::processOutEvent( const MidiEvent& event, const TimePos& time, f_cnt_t offset )
+void InstrumentTrack::processOutEvent(const MidiEvent& event, const TimePos& time, f_cnt_t offset)
 {
-	//qDebug() << "Out Event" << event.type() << event.channel() << event.param(0) << event.param(1);
 	// Do nothing if we do not have an instrument instance (e.g. when loading settings)
 	if (m_instrument == nullptr) { return; }
 

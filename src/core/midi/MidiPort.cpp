@@ -78,6 +78,7 @@ MidiPort::MidiPort( const QString& name,
 
 	m_MPEZoneModel.addItem("Lower");
 	m_MPEZoneModel.addItem("Upper");
+	// Default to Lower Zone
 	m_MPEZoneModel.setValue(0);
 
 	connect( &m_readableModel, SIGNAL(dataChanged()),
