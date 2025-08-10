@@ -146,6 +146,7 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 
 
 	m_MPEGroupBox = new GroupBox(tr("ENABLE MPE"));
+	m_MPEGroupBox->ledButton()->setToolTip(tr("MIDI Polyphonic Expression (MPE) automatically routes incoming notes to separate MIDI channels to allow per-note pitch bending/pressure/timbre control"));
 	layout->addWidget(m_MPEGroupBox);
 
 
