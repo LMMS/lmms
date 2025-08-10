@@ -468,27 +468,24 @@ void InstrumentTrack::processOutEvent(const MidiEvent& event, const TimePos& tim
 	const int key = event.key();
 
 	// Before passing the event to the plugin, do some checks to make sure there isn't a note already on.
+	// Lock the mutex to ensure the checks and handling are not interleaved with other threads.
+	QMutexLocker lock(&m_midiOutputMutex);
 	switch (event.type())
 	{
 		case MidiNoteOn:
 			if (key < 0 || key >= NumKeys) { return; }
 			// If there's already another note playing on this key, cut it off before this one starts.
-			m_midiNotesMutex.lock();
 			if (m_runningMidiNotes[channel][key] > 0)
 			{
 				m_instrument->handleMidiEvent(MidiEvent(MidiNoteOff, channel, key, 0), time, offset);
-				m_runningMidiNotes[channel][key]--;
 			}
 			m_runningMidiNotes[channel][key]++;
-			m_midiNotesMutex.unlock();
 			// Update the track activity indicator
 			emit newNote();
 			break;
 		case MidiNoteOff:
 			if (key < 0 || key >= NumKeys) { return; }
-			m_midiNotesMutex.lock();
 			m_runningMidiNotes[channel][key]--;
-			m_midiNotesMutex.unlock();
 			// Don't send a note off signal unless this is the only note on this key--we don't want to cut off any other notes currently playing.
 			if (m_runningMidiNotes[channel][key] > 0) { return; }
 			// Update the track activity indicator
@@ -514,17 +511,6 @@ void InstrumentTrack::processOutEvent(const MidiEvent& event, const TimePos& tim
 
 void InstrumentTrack::silenceAllNotes( bool removeIPH )
 {
-	m_midiNotesMutex.lock();
-	for( int i = 0; i < NumKeys; ++i )
-	{
-		m_notes[i] = nullptr;
-		for (int channel = 0; channel < 16; ++channel)
-		{
-			m_runningMidiNotes[channel][i] = 0;
-		}
-	}
-	m_midiNotesMutex.unlock();
-
 	Engine::audioEngine()->requestChangeInModel();
 	// invalidate all NotePlayHandles and PresetPreviewHandles linked to this track
 	m_processHandles.clear();
@@ -536,6 +522,18 @@ void InstrumentTrack::silenceAllNotes( bool removeIPH )
 	}
 	Engine::audioEngine()->removePlayHandlesOfTypes( this, flags );
 	Engine::audioEngine()->doneChangeInModel();
+
+	// The active note counts must be reset AFTER all NotePlayHandles have been destructed, since by default they also decrement the counter when they noteOff.
+	m_midiOutputMutex.lock();
+	for( int i = 0; i < NumKeys; ++i )
+	{
+		m_notes[i] = nullptr;
+		for (int channel = 0; channel < 16; ++channel)
+		{
+			m_runningMidiNotes[channel][i] = 0;
+		}
+	}
+	m_midiOutputMutex.unlock();
 }
 
 
