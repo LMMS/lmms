@@ -24,6 +24,22 @@
 
 #include <QtTest>
 #include "MPEManager.h"
+#include "MidiEventProcessor.h"
+
+
+class DummyMidiEventProcessor : public lmms::MidiEventProcessor
+{
+public:
+	void processInEvent( const lmms::MidiEvent& event, const lmms::TimePos& time = lmms::TimePos(), lmms::f_cnt_t offset = 0 ) override {};
+	void processOutEvent( const lmms::MidiEvent& event, const lmms::TimePos& time = lmms::TimePos(), lmms::f_cnt_t offset = 0 ) override
+	{
+		m_eventHistory.push_back(event);
+	}
+	std::vector<lmms::MidiEvent> m_eventHistory;
+};
+
+
+
 
 
 class MPETest : public QObject
@@ -165,6 +181,127 @@ private slots:
 		QCOMPARE(mpeManager.findAvailableChannel(), -1);
 		mpeManager.config(16, 0, 48, MPEManager::MPEZone::Upper);
 		QCOMPARE(mpeManager.findAvailableChannel(), -1);
+
+		// Likewise, if there is only one channel (the master channel), there are no member channels, so the mpe spec says the zone should deactivate (Page 23, B.6).
+		mpeManager.config(1, 15, 48, MPEManager::MPEZone::Lower);
+		QCOMPARE(mpeManager.findAvailableChannel(), -1);
+		mpeManager.config(15, 1, 48, MPEManager::MPEZone::Upper);
+		QCOMPARE(mpeManager.findAvailableChannel(), -1);
+	}
+
+	/** @brief Ensures MPE configuration messages are sent correctly
+	 */
+	void MPEConfigurationTest()
+	{
+		using namespace lmms;
+		MPEManager mpeManager;
+		DummyMidiEventProcessor proc;
+
+		// Set some random channel amounts and pitch bend range
+		int lowerZoneChannels = 7;
+		int upperZoneChannels = 5;
+		int pitchBendRange = 54;
+		mpeManager.config(lowerZoneChannels, upperZoneChannels, pitchBendRange);
+		mpeManager.sendMPEConfigSignals(&proc);
+
+		//
+		// Loop through the events, pretending to be a plugin receiving them and updating its internal state, then ensure the end state is correct.
+		//
+		int receivedLowerZoneChannels, receivedUpperZoneChannels;
+		// Technically the pitch bend range can be different on different zones, but for now we set the same range for both.
+		std::array<int, 16> receivedPitchBendRanges = {};
+		receivedPitchBendRanges.fill(-1);
+		std::array<int, 16> receivedPitchBends = {};
+		receivedPitchBends.fill(-1);
+		// The config/range is sent via controller RPNs (Registered Parameter Numbers)
+		// In order to give more options, the id of the RPN is sent in two steps:
+		// -- The first 7 bits are sent (Most Significant Bits / MSB) with a MidiControlChange event, where param0 = 101 and param1 = the first 7 bits
+		// -- The last 7 bits are sent (Least Significant Bits / LSB) with a MidiControlChange event, where param0 = 100 and param1 = the last 7 bits
+		// (Those numbers, 101 and 100, are standardized values in the specification for this purpose)
+		// Now that the plugin knows what RPN the sender is talking about, it waits for the next MidiControlChange events to send to actual value.
+		// Depending on the parameter, two messages may be sent to specify fine and coarse values, or just one. In our case, we will only be setting the coarse value.
+		// -- The value is sent via another MidiControlChange event, with param0 = 6, and param1 = the value
+		// (And once again, 6 is a standardized value for setting the coarse value)
+		// I also heard it was good practice to send 0x7F as the MSB and LSB after finishing the config, to prevent an accidental controller event from changing something
+		std::array<int, 16> LSBValues = {};
+		std::array<int, 16> MSBValues = {};
+		// Keep track of which channesl we have sent RPN signals to, so we can make sure we reset the MSB/LSB's at the end.
+		std::array<bool, 16> touchedChannels = {};
+
+		for (auto it = proc.m_eventHistory.begin(); it != proc.m_eventHistory.end(); ++it)
+		{
+			MidiEvent& event = *it;
+			int channel = event.channel();
+			QVERIFY(channel >= 0 && channel < 16);
+
+			switch (event.type())
+			{
+				case MidiControlChange:
+					switch (event.param(0))
+					{
+						case MidiControllerRegisteredParameterNumberMSB:
+							MSBValues[channel] = event.param(1);
+							touchedChannels[channel] = true;
+							break;
+						case MidiControllerRegisteredParameterNumberLSB:
+							LSBValues[channel] = event.param(1);
+							touchedChannels[channel] = true;
+							break;
+						case MidiControllerDataEntry:
+							if ((MSBValues[channel] << 8) + LSBValues[channel] == MidiMPEConfigurationRPN)
+							{
+								// The MPE config message should only be sent on either the first or last channel
+								QVERIFY(channel == 0x0 || channel == 0xF);
+								if (channel == 0x0) { receivedLowerZoneChannels = event.param(1); }
+								if (channel == 0xF) { receivedUpperZoneChannels = event.param(1); }
+							}
+							else if ((MSBValues[channel] << 8) + LSBValues[channel] == MidiPitchBendSensitivityRPN)
+							{
+								receivedPitchBendRanges[channel] = event.param(1);
+							}
+							break;
+						default:
+							QFAIL("MidiControlChange sent which was not MSB, LSB, or Coarse Data Entry");
+							break;
+					}
+					break;
+				case MidiPitchBend:
+					receivedPitchBends[channel] = event.pitchBend();
+					break;
+				default:
+					QFAIL("MIDI Event sent during configuration which was not MidiControlChange or MidiPitchBend");
+					break;
+			}
+		}
+
+		//
+		// Confirm the current state is correct
+		//
+		QCOMPARE(receivedLowerZoneChannels, lowerZoneChannels);
+		QCOMPARE(receivedUpperZoneChannels, upperZoneChannels);
+		// We currently only set the pitch bend range on member channels, not the manager channels, since that's supposed to be handled by the pitch bend range knob (Well, there are some instances were this doesn't work, like if the output midi channel is nonzero, it wouldn't get routed to a manager channel... TODO).
+		for (int channel = 1; channel <= receivedLowerZoneChannels; ++channel)
+		{
+			QCOMPARE(receivedPitchBendRanges[channel], pitchBendRange);
+		}
+		for (int channel = 15 - receivedUpperZoneChannels; channel <= 14; ++channel)
+		{
+			QCOMPARE(receivedPitchBendRanges[channel], pitchBendRange);
+		}
+		// Currently we also reset the pitch bends when changing the MPE config. This is not required for the sender in the specification, but it can prevent some bugs with plugins which don't automatically reset it themselves.
+		for (int bend: receivedPitchBends)
+		{
+			QCOMPARE(bend, 8192);
+		}
+		// And just for good practice, make sure the MSB/LSB's are set to null at the end for all the channels we touched
+		for (int channel = 0; channel < 16; ++channel)
+		{
+			if (touchedChannels[channel])
+			{
+				QCOMPARE(MSBValues[channel], (MidiNullFunctionNumberRPN >> 8) & 0x7F);
+				QCOMPARE(LSBValues[channel], MidiNullFunctionNumberRPN & 0x7F);
+			}
+		}
 	}
 };
 
