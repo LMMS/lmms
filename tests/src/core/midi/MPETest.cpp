@@ -207,19 +207,19 @@ private slots:
 		//
 		// Loop through the events, pretending to be a plugin receiving them and updating its internal state, then ensure the end state is correct.
 		//
-		int receivedLowerZoneChannels, receivedUpperZoneChannels;
+		int receivedLowerZoneChannels = -1, receivedUpperZoneChannels = -1;
 		// Technically the pitch bend range can be different on different zones, but for now we set the same range for both.
 		std::array<int, 16> receivedPitchBendRanges = {};
 		receivedPitchBendRanges.fill(-1);
 		std::array<int, 16> receivedPitchBends = {};
 		receivedPitchBends.fill(-1);
 		// The config/range is sent via controller RPNs (Registered Parameter Numbers)
-		// In order to give more options, the id of the RPN is sent in two steps:
+		// The id of the RPN is sent in two steps:
 		// -- The first 7 bits are sent (Most Significant Bits / MSB) with a MidiControlChange event, where param0 = 101 and param1 = the first 7 bits
 		// -- The last 7 bits are sent (Least Significant Bits / LSB) with a MidiControlChange event, where param0 = 100 and param1 = the last 7 bits
 		// (Those numbers, 101 and 100, are standardized values in the specification for this purpose)
 		// Now that the plugin knows what RPN the sender is talking about, it waits for the next MidiControlChange events to send to actual value.
-		// Depending on the parameter, two messages may be sent to specify fine and coarse values, or just one. In our case, we will only be setting the coarse value.
+		// Depending on the parameter, two messages may be sent to specify both fine and coarse values, or just one. In our case, we will only be setting the coarse value.
 		// -- The value is sent via another MidiControlChange event, with param0 = 6, and param1 = the value
 		// (And once again, 6 is a standardized value for setting the coarse value)
 		// I also heard it was good practice to send 0x7F as the MSB and LSB after finishing the config, to prevent an accidental controller event from changing something
