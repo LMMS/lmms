@@ -817,7 +817,6 @@ void VestigeInstrumentView::toggleGUI( void )
 
 void VestigeInstrumentView::noteOffAll( void )
 {
-	// TODO figure out why this sometimes crashes the plugin
 	m_vi->m_pluginMutex.lock();
 	if( m_vi->m_plugin != nullptr )
 	{
@@ -826,7 +825,6 @@ void VestigeInstrumentView::noteOffAll( void )
 			for(int key = 0; key <= MidiMaxKey; ++key)
 			{
 				m_vi->m_plugin->processMidiEvent(MidiEvent(MidiNoteOff, channel, key, 0), 0);
-				//usleep(100);
 			}
 		}
 	}
