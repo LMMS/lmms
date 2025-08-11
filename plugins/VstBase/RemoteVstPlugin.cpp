@@ -1022,7 +1022,7 @@ void RemoteVstPlugin::process( const SampleFrame* _in, SampleFrame* _out )
 		// have to have them stored somewhere even after
 		// dispatcher-call, so we create static copies of the
 		// data and post them
-#define MIDI_EVENT_BUFFER_COUNT		1024
+		#define MIDI_EVENT_BUFFER_COUNT 4096
 		static char eventsBuffer[sizeof( VstEvents ) + sizeof( VstMidiEvent * ) * MIDI_EVENT_BUFFER_COUNT];
 		static VstMidiEvent vme[MIDI_EVENT_BUFFER_COUNT];
 
@@ -1034,6 +1034,15 @@ void RemoteVstPlugin::process( const SampleFrame* _in, SampleFrame* _out )
 				{
 					return a.deltaFrames < b.deltaFrames;
 				} );
+
+		// If there are more events than the buffer size, drop the extra
+		// TODO: Could the events be sent in chunks?
+		if (m_midiEvents.size() > MIDI_EVENT_BUFFER_COUNT)
+		{
+			fprintf(stderr, "%d VstMidiEvents were sent, which is more than the max midi event buffer size of %d. Dropping %d events.\n",
+				m_midiEvents.size(), MIDI_EVENT_BUFFER_COUNT, m_midiEvents.size() - MIDI_EVENT_BUFFER_COUNT);
+			m_midiEvents.resize(MIDI_EVENT_BUFFER_COUNT);
+		}
 
 		auto events = (VstEvents*)eventsBuffer;
 		events->reserved = 0;
