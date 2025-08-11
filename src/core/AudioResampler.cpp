@@ -48,6 +48,8 @@ AudioResampler::AudioResampler(AudioResampler&& other) noexcept
 	: m_state(std::exchange(other.m_state, nullptr))
 	, m_mode(other.m_mode)
 	, m_channels(other.m_channels)
+	, m_ratio(other.m_ratio)
+	, m_error(other.m_error)
 {
 }
 
@@ -56,6 +58,8 @@ AudioResampler& AudioResampler::operator=(AudioResampler&& other) noexcept
 	m_state = std::exchange(other.m_state, nullptr);
 	m_mode = other.m_mode;
 	m_channels = other.m_channels;
+	m_ratio = other.m_ratio;
+	m_error = other.m_error;
 	return *this;
 }
 
