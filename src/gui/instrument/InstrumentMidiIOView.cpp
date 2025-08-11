@@ -168,7 +168,7 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 
 	m_MPEPitchRangeSpinBox = new LcdSpinBox(2, m_MPEGroupBox);
 	m_MPEPitchRangeSpinBox->setLabel(tr("RANGE"));
-	m_MPEPitchRangeSpinBox->setToolTip(tr("Pitchbend range for all member channels, in semitones"));
+	m_MPEPitchRangeSpinBox->setToolTip(tr("Pitch bend range for all member channels, in semitones"));
 	MPELayout->addWidget(m_MPEPitchRangeSpinBox);
 
 	m_MPEZoneComboBox = new ComboBox(m_MPEGroupBox);
