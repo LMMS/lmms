@@ -745,8 +745,7 @@ void GigInstrument::addSamples( GigNote & gignote, bool wantReleaseSample )
 					attenuation *= pDimRegion->SampleAttenuation;
 				}
 
-				auto sample = GigSample(pSample, pDimRegion, attenuation, AudioResampler::Mode::Linear, gignote.frequency);
-				gignote.samples.push_back(std::move(sample));
+				gignote.samples.emplace_back(pSample, pDimRegion, attenuation, AudioResampler::Mode::Linear, gignote.frequency);
 			}
 		}
 
