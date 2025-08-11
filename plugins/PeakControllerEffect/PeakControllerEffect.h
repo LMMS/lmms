@@ -26,7 +26,7 @@
 #ifndef PEAK_CONTROLLER_EFFECT_H
 #define PEAK_CONTROLLER_EFFECT_H
 
-#include "Effect.h"
+#include "AudioPlugin.h"
 #include "PeakControllerEffectControls.h"
 
 namespace lmms
@@ -35,14 +35,12 @@ namespace lmms
 
 class PeakController;
 
-class PeakControllerEffect : public Effect
+class PeakControllerEffect : public DefaultEffect
 {
 public:
 	PeakControllerEffect( Model * parent, 
 						const Descriptor::SubPluginFeatures::Key * _key );
 	~PeakControllerEffect() override;
-
-	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
 
 	EffectControls * controls() override
 	{
@@ -72,6 +70,8 @@ public:
 	int m_effectId;
 
 private:
+	ProcessStatus processImpl(InterleavedBufferView<float, 2> inOut) override;
+
 	PeakControllerEffectControls m_peakControls;
 
 	float m_lastSample;

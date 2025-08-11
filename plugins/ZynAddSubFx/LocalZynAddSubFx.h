@@ -27,6 +27,7 @@
 
 #include <array>
 
+#include "AudioBufferView.h"
 #include "Note.h"
 
 class Master;
@@ -41,7 +42,6 @@ class SampleFrame;
 
 class LocalZynAddSubFx
 {
-
 public:
 	LocalZynAddSubFx();
 	~LocalZynAddSubFx();
@@ -63,7 +63,7 @@ public:
 
 	void processMidiEvent( const MidiEvent& event );
 
-	void processAudio( SampleFrame* _out );
+	void process(PlanarBufferView<float, 2> out);
 
 	inline Master * master()
 	{

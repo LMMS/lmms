@@ -38,6 +38,7 @@
 
 #include "AudioEngine.h"
 #include "ConfigManager.h"
+#include "SampleFrame.h"
 #include "endian_handling.h"
 #include "Engine.h"
 #include "FileDialog.h"
@@ -81,7 +82,7 @@ Plugin::Descriptor PLUGIN_EXPORT gigplayer_plugin_descriptor =
 
 
 GigInstrument::GigInstrument( InstrumentTrack * _instrument_track ) :
-	Instrument(_instrument_track, &gigplayer_plugin_descriptor, nullptr, Flag::IsSingleStreamed | Flag::IsNotBendable),
+	Instrument(&gigplayer_plugin_descriptor, _instrument_track, nullptr, Flag::IsSingleStreamed | Flag::IsNotBendable),
 	m_instance( nullptr ),
 	m_instrument( nullptr ),
 	m_filename( "" ),
@@ -289,7 +290,7 @@ QString GigInstrument::getCurrentPatchName()
 
 
 // A key has been pressed
-void GigInstrument::playNote( NotePlayHandle * _n, SampleFrame* )
+void GigInstrument::playNoteImpl(NotePlayHandle* _n, std::span<SampleFrame>)
 {
 	const float LOG440 = 2.643452676f;
 
@@ -320,13 +321,13 @@ void GigInstrument::playNote( NotePlayHandle * _n, SampleFrame* )
 
 // Process the notes and output a certain number of frames (e.g. 256, set in
 // the preferences)
-void GigInstrument::play( SampleFrame* _working_buffer )
+void GigInstrument::playImpl(std::span<SampleFrame> out)
 {
 	const fpp_t frames = Engine::audioEngine()->framesPerPeriod();
 	const auto rate = Engine::audioEngine()->outputSampleRate();
 
 	// Initialize to zeros
-	std::memset( &_working_buffer[0][0], 0, DEFAULT_CHANNELS * frames * sizeof( float ) );
+	zeroSampleFrames(out.data(), out.size());
 
 	m_synthMutex.lock();
 	m_notesMutex.lock();
@@ -465,8 +466,8 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 				{
 					for( f_cnt_t i = 0; i < frames; ++i )
 					{
-						_working_buffer[i][0] += convertBuf[i][0];
-						_working_buffer[i][1] += convertBuf[i][1];
+						out[i][0] += convertBuf[i][0];
+						out[i][1] += convertBuf[i][1];
 					}
 				}
 			}
@@ -474,8 +475,8 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 			{
 				for( f_cnt_t i = 0; i < frames; ++i )
 				{
-					_working_buffer[i][0] += sampleData[i][0];
-					_working_buffer[i][1] += sampleData[i][1];
+					out[i][0] += sampleData[i][0];
+					out[i][1] += sampleData[i][1];
 				}
 			}
 
@@ -491,8 +492,8 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 	// Set gain properly based on volume control
 	for( f_cnt_t i = 0; i < frames; ++i )
 	{
-		_working_buffer[i][0] *= m_gain.value();
-		_working_buffer[i][1] *= m_gain.value();
+		out[i][0] *= m_gain.value();
+		out[i][1] *= m_gain.value();
 	}
 }
 

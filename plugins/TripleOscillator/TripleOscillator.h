@@ -110,10 +110,7 @@ public:
 	TripleOscillator( InstrumentTrack * _track );
 	~TripleOscillator() override = default;
 
-	void playNote( NotePlayHandle * _n,
-						SampleFrame* _working_buffer ) override;
 	void deleteNotePluginData( NotePlayHandle * _n ) override;
-
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 	void loadSettings( const QDomElement & _this ) override;
@@ -133,6 +130,8 @@ protected slots:
 
 
 private:
+	void playNoteImpl(NotePlayHandle* _n, std::span<SampleFrame> out) override;
+
 	OscillatorObject * m_osc[NUM_OF_OSCILLATORS];
 
 	struct oscPtr
