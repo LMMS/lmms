@@ -45,8 +45,6 @@ public:
 class MPETest : public QObject
 {
 	Q_OBJECT
-public:
-
 private slots:
 	/** @brief Checks that notes are routed to the channels with the least number of active notes, or the channel with the oldest NoteOff in the case of a tie.
 	 */
