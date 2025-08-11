@@ -51,7 +51,10 @@ endforeach()
 # use a custom winebuild to fix ASLR-related VST crashes
 IF(LMMS_BUILD_LINUX AND (LMMS_HAVE_VST_32 OR LMMS_HAVE_VST_64))
 	ExternalProject_Add(custom-winebuild
-		SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/custom-winebuild"
+		GIT_REPOSITORY https://github.com/Fastigium/winebuild
+		GIT_TAG 7f9e27e44cfb8eba79f3850f46e12fbe3f4875a5
+		UPDATE_DISCONNECTED 1
+		PREFIX "${CMAKE_CURRENT_LIST_DIR}/custom-winebuild"
 		BUILD_ALWAYS ON
 		INSTALL_COMMAND ""
 	)
