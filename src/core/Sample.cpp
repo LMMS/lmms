@@ -117,8 +117,10 @@ auto Sample::operator=(Sample&& other) noexcept -> Sample&
 bool Sample::play(SampleFrame* dst, PlaybackState* state, size_t numFrames, Loop loop, double ratio) const
 {
 	state->m_frameIndex = std::max<int>(m_startFrame, state->m_frameIndex);
-	state->m_resampler.setRatio(m_buffer->sampleRate(), Engine::audioEngine()->outputSampleRate());
-	state->m_resampler.setRatio(state->m_resampler.ratio() * (frequency() / DefaultBaseFreq) * ratio);
+
+	const auto sampleRateRatio = static_cast<double>(Engine::audioEngine()->outputSampleRate()) / m_buffer->sampleRate();
+	const auto freqRatio = frequency() / DefaultBaseFreq;
+	state->m_resampler.setRatio(sampleRateRatio * freqRatio * ratio);
 
 	// TODO: Add an abstraction for these audio pipeline workflows
 	auto framesWritten = 0;
