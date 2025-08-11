@@ -24,6 +24,7 @@
 
 #include <cstdlib>
 #include <QDomElement>
+#include <QDebug>
 
 #include "ProjectJournal.h"
 #include "Engine.h"
@@ -62,7 +63,7 @@ void ProjectJournal::undo()
 		{
 			DataFile curState( DataFile::Type::JournalData );
 			jo->saveState( curState, curState.content() );
-			m_redoCheckPoints.push( CheckPoint( c.joID, curState ) );
+			m_redoCheckPoints.push(CheckPoint(c.joID, curState, c.description));
 
 			bool prev = isJournalling();
 			setJournalling( false );
@@ -75,8 +76,10 @@ void ProjectJournal::undo()
 			{
 				AutomationClip::resolveAllIDs();
 			}
+			emit undoTriggered();
 			break;
 		}
+		qWarning() << "Journalling object id" << c.joID << "for" << c.description << "is not valid! This may point to an unresolved issue somewhere in the undo system.";
 	}
 }
 
@@ -93,15 +96,17 @@ void ProjectJournal::redo()
 		{
 			DataFile curState( DataFile::Type::JournalData );
 			jo->saveState( curState, curState.content() );
-			m_undoCheckPoints.push( CheckPoint( c.joID, curState ) );
+			m_undoCheckPoints.push(CheckPoint(c.joID, curState, c.description));
 
 			bool prev = isJournalling();
 			setJournalling( false );
 			jo->restoreState( c.data.content().firstChildElement() );
 			setJournalling( prev );
 			Engine::getSong()->setModified();
+			emit redoTriggered();
 			break;
 		}
+		qWarning() << "Journalling object id" << c.joID << "for" << c.description << "is not valid! This may point to an unresolved issue somewhere in the undo system.";
 	}
 }
 
@@ -117,7 +122,7 @@ bool ProjectJournal::canRedo() const
 
 
 
-void ProjectJournal::addJournalCheckPoint( JournallingObject *jo )
+void ProjectJournal::addJournalCheckPoint(JournallingObject* jo, QString reason)
 {
 	if( isJournalling() )
 	{
@@ -126,11 +131,12 @@ void ProjectJournal::addJournalCheckPoint( JournallingObject *jo )
 		DataFile dataFile( DataFile::Type::JournalData );
 		jo->saveState( dataFile, dataFile.content() );
 
-		m_undoCheckPoints.push( CheckPoint( jo->id(), dataFile ) );
+		m_undoCheckPoints.push(CheckPoint(jo->id(), dataFile, std::move(reason)));
 		if( m_undoCheckPoints.size() > MAX_UNDO_STATES )
 		{
 			m_undoCheckPoints.remove( 0, m_undoCheckPoints.size() - MAX_UNDO_STATES );
 		}
+		emit checkPointAdded();
 	}
 }
 
