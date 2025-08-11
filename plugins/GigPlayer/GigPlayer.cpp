@@ -370,8 +370,7 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 		}
 
 		// Delete ended samples
-		for( QList<GigSample>::iterator sample = it->samples.begin();
-				sample != it->samples.end(); ++sample )
+		for (auto sample = it->samples.begin(); sample != it->samples.end(); ++sample)
 		{
 			// Delete if the ADSR for a sample is complete for normal
 			// notes, or if a release sample, then if we've reached
