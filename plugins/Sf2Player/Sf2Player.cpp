@@ -876,9 +876,8 @@ void Sf2Instrument::renderFrames( f_cnt_t frames, SampleFrame* buf )
 		{
 			const auto err
 				= fluid_synth_write_float(m_synth, m_buffer.size(), m_buffer.data(), 0, 2, m_buffer.data(), 1, 2);
-			const auto rendered = (err == FLUID_OK ? m_buffer.size() : 0);
-			if (rendered == 0) { break; }
-			m_window = {m_buffer.data(), rendered};
+			if (err != FLUID_OK) { break; }
+			m_window = {m_buffer.data(), m_buffer.size()};
 		}
 
 		const auto result = m_resampler.process({&m_window[0][0], 2, m_window.size()}, {&buf[0][0], 2, frames});
