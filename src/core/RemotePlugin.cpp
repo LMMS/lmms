@@ -28,7 +28,6 @@
 #ifdef DEBUG_REMOTE_PLUGIN
 #include <QDebug>
 #endif
-#include <QDebug>
 
 #ifdef LMMS_BUILD_WIN32
 #include <windows.h>
@@ -453,14 +452,6 @@ bool RemotePlugin::process( const SampleFrame* _in_buf, SampleFrame* _out_buf )
 void RemotePlugin::processMidiEvent( const MidiEvent & _e,
 							const f_cnt_t _offset )
 {
-	qDebug()
-		<< "Type:" << _e.type()
-		<< "=" << QString::number( _e.type(), 16)
-		<< "Channel:" << _e.channel()
-		<< "Param1" << _e.param( 0 )
-		<< "=" << QString::number(_e.param( 0 ), 16)
-		<< "Param2" << _e.param( 1 )
-		<< "=" << QString::number(_e.param( 1 ), 16);
 	message m( IdMidiEvent );
 	m.addInt( _e.type() );
 	m.addInt( _e.channel() );
