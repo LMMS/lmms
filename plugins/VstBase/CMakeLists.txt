@@ -48,8 +48,9 @@ foreach(var ${export_variables})
 endforeach()
 
 # If we're building wine-powered RemoteVstPlugins for Linux,
-# use a custom winebuild to fix ASLR-related VST crashes
-IF(LMMS_BUILD_LINUX AND (LMMS_HAVE_VST_32 OR LMMS_HAVE_VST_64))
+# use a custom winebuild to fix ASLR-related VST crashes.
+# See upstream bug report: https://bugs.winehq.org/show_bug.cgi?id=58480
+if(LMMS_BUILD_LINUX AND (LMMS_HAVE_VST_32 OR LMMS_HAVE_VST_64))
 	ExternalProject_Add(custom-winebuild
 		GIT_REPOSITORY https://github.com/Fastigium/winebuild
 		GIT_TAG 7f9e27e44cfb8eba79f3850f46e12fbe3f4875a5
@@ -60,7 +61,7 @@ IF(LMMS_BUILD_LINUX AND (LMMS_HAVE_VST_32 OR LMMS_HAVE_VST_64))
 	)
 	ExternalProject_Get_property(custom-winebuild BINARY_DIR)
 	set(CUSTOM_WINEBUILD_EXECUTABLE "${BINARY_DIR}/winebuild")
-ENDIF()
+endif()
 
 # build 32 bit version of RemoteVstPlugin
 if(LMMS_HAVE_VST_32)
