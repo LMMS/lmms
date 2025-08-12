@@ -71,16 +71,6 @@ DropToolBar * Editor::addDropToolBar(QWidget * parent, Qt::ToolBarArea whereToAd
 	return toolBar;
 }
 
-void Editor::togglePlayStopLastEditor()
-{
-	if (s_lastPlayedEditor) { s_lastPlayedEditor->togglePlayStop(); }
-}
-
-void Editor::togglePauseLastEditor()
-{
-	if (s_lastPlayedEditor) { s_lastPlayedEditor->togglePause(); }
-}
-
 void Editor::togglePlayStop()
 {
 	s_lastPlayedEditor = this;

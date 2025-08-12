@@ -51,8 +51,7 @@ class Editor : public QMainWindow
 public:
 	void setPauseIcon(bool displayPauseIcon=true);
 	QAction *playAction() const;
-	static void togglePlayStopLastEditor();
-	static void togglePauseLastEditor();
+	inline static Editor* s_lastPlayedEditor = nullptr;
 protected:
 	DropToolBar * addDropToolBarToTop(QString const & windowTitle);
 	DropToolBar * addDropToolBar(Qt::ToolBarArea whereToAdd, QString const & windowTitle);
@@ -75,8 +74,6 @@ protected slots:
 
 private slots:
 	void toggleMaximize();
-private:
-	inline static Editor* s_lastPlayedEditor = nullptr;
 
 signals:
 
