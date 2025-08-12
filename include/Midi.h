@@ -131,7 +131,7 @@ const int MidiProgramCount = 128;
 const int MidiMaxVelocity = 127;
 const int MidiDefaultVelocity = MidiMaxVelocity / 2;
 const int MidiMaxControllerValue = 127;
-const int MidiMaxKey = 127;
+const int MidiNumKeys = 128;
 
 const int MidiMaxPanning = 127;
 const int MidiMinPanning = -128;
