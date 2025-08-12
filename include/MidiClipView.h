@@ -97,6 +97,7 @@ private:
 	QPixmap m_stepBtnOn200 = embed::getIconPixmap("step_btn_on_200");
 	QPixmap m_stepBtnOff = embed::getIconPixmap("step_btn_off");
 	QPixmap m_stepBtnOffLight = embed::getIconPixmap("step_btn_off_light");
+	QPixmap m_stepBtnHighlight = embed::getIconPixmap("step_btn_highlight");
 
 	MidiClip* m_clip;
 	QPixmap m_paintPixmap;

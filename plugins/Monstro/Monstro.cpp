@@ -24,7 +24,6 @@
 
 #include "Monstro.h"
 
-#include <QDomElement>
 
 #include "ComboBox.h"
 #include "Engine.h"
@@ -1503,7 +1502,7 @@ MonstroView::MonstroView( Instrument * _instrument,
 	m_matViewButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "matview_inactive" ) );
 	m_matViewButton->setToolTip(tr("Matrix view"));
 
-	m_selectedViewGroup = new automatableButtonGroup( this );
+	m_selectedViewGroup = new AutomatableButtonGroup( this );
 	m_selectedViewGroup -> addButton( m_opViewButton );
 	m_selectedViewGroup -> addButton( m_matViewButton );
 
@@ -1767,7 +1766,7 @@ QWidget * MonstroView::setupOperatorsView( QWidget * _parent )
 	m_pmButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "pm_inactive" ) );
 	m_pmButton->setToolTip(tr("Modulate phase of osc 3 by osc 2"));
 
-	m_o23ModGroup = new automatableButtonGroup( view );
+	m_o23ModGroup = new AutomatableButtonGroup( view );
 	m_o23ModGroup-> addButton( m_mixButton );
 	m_o23ModGroup-> addButton( m_amButton );
 	m_o23ModGroup-> addButton( m_fmButton );

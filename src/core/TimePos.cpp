@@ -25,7 +25,6 @@
 
 #include "TimePos.h"
 
-#include <cassert>
 #include "MeterModel.h"
 
 namespace lmms

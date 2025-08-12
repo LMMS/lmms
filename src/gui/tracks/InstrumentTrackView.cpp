@@ -27,25 +27,28 @@
 #include <QAction>
 #include <QApplication>
 #include <QDragEnterEvent>
+#include <QHBoxLayout>
 #include <QMdiArea>
 #include <QMdiSubWindow>
 #include <QMenu>
+#include <QSpacerItem>
+#include <QVBoxLayout>
 
 #include "AudioEngine.h"
 #include "ConfigManager.h"
 #include "Engine.h"
 #include "FadeButton.h"
-#include "FontHelper.h"
-#include "Knob.h"
-#include "MidiCCRackView.h"
-#include "Mixer.h"
-#include "MixerView.h"
 #include "GuiApplication.h"
 #include "Instrument.h"
 #include "InstrumentTrackWindow.h"
+#include "Knob.h"
 #include "MainWindow.h"
 #include "MidiClient.h"
+#include "MidiCCRackView.h"
 #include "MidiPortMenu.h"
+#include "Mixer.h"
+#include "MixerChannelLcdSpinBox.h"
+#include "MixerView.h"
 #include "TrackLabelButton.h"
 
 

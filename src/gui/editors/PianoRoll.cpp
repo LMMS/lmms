@@ -26,8 +26,10 @@
 
 #include "PianoRoll.h"
 
-#include <QtMath>
+#include <QtMath>  // IWYU pragma: keep
 #include <QApplication>
+#include <QCheckBox>
+#include <QGridLayout>
 #include <QHBoxLayout>
 #include <QInputDialog>
 #include <QKeyEvent>
@@ -5683,6 +5685,14 @@ void PianoRollWindow::exportMidiClip()
 	FileDialog exportDialog(this, tr("Export clip"), "",
 		tr("XML clip file (*.xpt *.xptz)"));
 
+	auto layout = dynamic_cast<QGridLayout*>(exportDialog.layout());
+	QCheckBox* onlySelectedNotesCheckBox = nullptr;
+	if (layout)
+	{
+		onlySelectedNotesCheckBox = new QCheckBox(tr("Export only selected notes"), &exportDialog);
+		layout->addWidget(onlySelectedNotesCheckBox);
+	}
+
 	exportDialog.setAcceptMode(FileDialog::AcceptSave);
 
 	if (exportDialog.exec() == QDialog::Accepted &&
@@ -5696,8 +5706,14 @@ void PianoRollWindow::exportMidiClip()
 		exportDialog.setDefaultSuffix(suffix);
 
 		const QString fullPath = exportDialog.selectedFiles()[0];
+
+		// Check if only the selected notes should be exported
+		auto* midiClip = m_editor->m_midiClip;
+
+		const bool onlySelectedNotes = onlySelectedNotesCheckBox && onlySelectedNotesCheckBox->isChecked();
+
 		DataFile dataFile(DataFile::Type::MidiClip);
-		m_editor->m_midiClip->saveSettings(dataFile, dataFile.content());
+		midiClip->exportToXML(dataFile, dataFile.content(), onlySelectedNotes);
 
 		if (dataFile.writeFile(fullPath))
 		{
