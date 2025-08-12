@@ -1031,7 +1031,7 @@ void RemoteVstPlugin::process( const SampleFrame* _in, SampleFrame* _out )
 		// have to have them stored somewhere even after
 		// dispatcher-call, so we create static copies of the
 		// data and post them
-		static char eventsBuffer[sizeof( VstEvents ) + sizeof( VstMidiEvent * ) * MidiEventBufferSize];
+		static char eventsBuffer[sizeof(VstEvents) + sizeof(VstMidiEvent*) * MidiEventBufferSize];
 		static VstMidiEvent vme[MidiEventBufferSize];
 
 		// first sort events chronologically, since some plugins
@@ -1141,7 +1141,7 @@ void RemoteVstPlugin::processMidiEvent( const MidiEvent& event, const f_cnt_t of
 	if (m_midiEvents.size() < MidiEventBufferSize)
 	{
 		// TODO: Would this cause a data race with the process method? The two methods must not be called concurrently
-		m_midiEvents.push_back( vme );
+		m_midiEvents.push_back(vme);
 	}
 	else
 	{
