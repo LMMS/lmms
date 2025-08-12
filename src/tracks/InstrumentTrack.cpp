@@ -469,7 +469,8 @@ void InstrumentTrack::processOutEvent(const MidiEvent& event, const TimePos& tim
 
 	// Before passing the event to the plugin, do some checks to make sure there isn't a note already on.
 	// Lock the mutex to ensure the checks and handling are not interleaved with other threads.
-	QMutexLocker lock(&m_midiOutputMutex);
+	// TODO: Mutexes should not be used in realtime code. In the future, it may be better to restructure this system to use a lockless buffer of midi events which get processed by a single thread.
+	const std::lock_guard<std::mutex> lock(m_midiOutputMutex);
 	switch (event.type())
 	{
 		case MidiNoteOn:
@@ -524,7 +525,7 @@ void InstrumentTrack::silenceAllNotes( bool removeIPH )
 	Engine::audioEngine()->doneChangeInModel();
 
 	// The active note counts must be reset AFTER all NotePlayHandles have been destructed, since by default they also decrement the counter when they noteOff.
-	m_midiOutputMutex.lock();
+	const std::lock_guard<std::mutex> lock(m_midiOutputMutex);
 	for( int i = 0; i < NumKeys; ++i )
 	{
 		m_notes[i] = nullptr;
@@ -533,7 +534,6 @@ void InstrumentTrack::silenceAllNotes( bool removeIPH )
 			m_runningMidiNotes[channel][i] = 0;
 		}
 	}
-	m_midiOutputMutex.unlock();
 }
 
 

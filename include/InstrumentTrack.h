@@ -282,7 +282,8 @@ private:
 	//! NOTE: The indicies refer to the output (transposed) key stored in the midi event, not the physical piano key used to generate the note.
 	std::array<std::array<int, NumKeys>, 16> m_runningMidiNotes;
 	//! Locks to ensure the checks for whether a note is already active and the actual sending of the MIDI events are not interleved betweeh threads. Otherwise, NoteOff and NoteOn events could theoretically get out of order.
-	QMutex m_midiOutputMutex;
+	//! TODO: Replace the mutex system with a lockless buffer, where NotePlayHandles add their midi events to the buffer, and a separate thread loops over it and handles the events in order.
+	std::mutex m_midiOutputMutex;
 
 	bool m_sustainPedalPressed;
 
