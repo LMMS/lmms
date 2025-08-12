@@ -29,6 +29,7 @@
 #include <QString>
 #include <QList>
 #include <QMap>
+#include <stdexcept>
 
 #include "Midi.h"
 #include "TimePos.h"
@@ -131,16 +132,16 @@ public:
 	}
 
 	// Returns the current active MPE zone (Lower or Upper)
-	MPEManager::MPEZone mpeActiveZone() const
+	MPEManager::Zone mpeActiveZone() const
 	{
 		switch (m_MPEZoneModel.value())
 		{
 			case 0:
-				return MPEManager::MPEZone::Lower;
+				return MPEManager::Zone::Lower;
 			case 1:
-				return MPEManager::MPEZone::Upper;
+				return MPEManager::Zone::Upper;
 			default:
-				return MPEManager::MPEZone::Lower;
+				throw std::invalid_argument("The value of m_MPEZoneModel is not 0 or 1, corresponding to an invalid MPE zone.");
 		}
 	}
 

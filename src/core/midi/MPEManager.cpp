@@ -35,17 +35,17 @@ int MPEManager::findAvailableChannel()
 	// For the lower zone, the first channel, channel 0, is the Manager channel. The channels after that are Member channels.
 	// For the upper zone, the last channel, channel 15, is the Manager channel. The channels below 15 are Member channels.
 
-	const int numChannels = m_zone == MPEZone::Lower
+	const int numChannels = m_zone == Zone::Lower
 		? m_numChannelsLowerZone
 		: m_numChannelsUpperZone;
 	const int numMemberChannels = numChannels - 1;
 	// Page 23, B.6, if there are no member channels the zone should deactivate.
 	if (numMemberChannels <= 0) { return -1; }
 
-	const int firstMemberChannel = m_zone == MPEZone::Lower
+	const int firstMemberChannel = m_zone == Zone::Lower
 		? 1
 		: 15 - numMemberChannels;
-	const int lastMemberChannel = m_zone == MPEZone::Lower
+	const int lastMemberChannel = m_zone == Zone::Lower
 		? numMemberChannels
 		: 14;
 

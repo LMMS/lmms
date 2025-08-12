@@ -59,7 +59,7 @@ private slots:
 		//
 
 		// Setup lower zone to use first 5 channels (0 is the manager channel, 1-4 are member channels), 0 channels for the upper zone, 48 semitone pitch bend range, and use the lower zone.
-		mpeManager.config(5, 0, 48, MPEManager::MPEZone::Lower);
+		mpeManager.config(5, 0, 48, MPEManager::Zone::Lower);
 
 		// Currently, the active note counts should be 0 on all channels (bracketed are the member channels)
 		// 0 [0 0 0 0] 0 0 0 0 0 0 0 0 0 0 0
@@ -112,7 +112,7 @@ private slots:
 		// UPPER ZONE
 		//
 
-		mpeManager.config(0, 5, 48, MPEManager::MPEZone::Upper);
+		mpeManager.config(0, 5, 48, MPEManager::Zone::Upper);
 
 		// Currently, the active note counts should be 0 on all channels
 		// 0 0 0 0 0 0 0 0 0 0 0 [0 0 0 0] 0
@@ -165,25 +165,25 @@ private slots:
 		MPEManager mpeManager;
 
 		// With two channels in total, the first is manager, and the second is the only member channel. Therefore, all notes should be routed through the member channel.
-		mpeManager.config(2, 0, 48, MPEManager::MPEZone::Lower);
+		mpeManager.config(2, 0, 48, MPEManager::Zone::Lower);
 		// Channel 0 is manager, channel 1 is member
 		QCOMPARE(mpeManager.findAvailableChannel(), 1);
 
 		// Same thing for upper zone
-		mpeManager.config(0, 2, 48, MPEManager::MPEZone::Upper);
+		mpeManager.config(0, 2, 48, MPEManager::Zone::Upper);
 		// Channel 15 is manager, channel 14 is member
 		QCOMPARE(mpeManager.findAvailableChannel(), 14);
 
 		// With no channels on a zone, the output channel should be -1, signifying that it should be routed to some default channel.
-		mpeManager.config(0, 16, 48, MPEManager::MPEZone::Lower);
+		mpeManager.config(0, 16, 48, MPEManager::Zone::Lower);
 		QCOMPARE(mpeManager.findAvailableChannel(), -1);
-		mpeManager.config(16, 0, 48, MPEManager::MPEZone::Upper);
+		mpeManager.config(16, 0, 48, MPEManager::Zone::Upper);
 		QCOMPARE(mpeManager.findAvailableChannel(), -1);
 
 		// Likewise, if there is only one channel (the master channel), there are no member channels, so the mpe spec says the zone should deactivate (Page 23, B.6).
-		mpeManager.config(1, 15, 48, MPEManager::MPEZone::Lower);
+		mpeManager.config(1, 15, 48, MPEManager::Zone::Lower);
 		QCOMPARE(mpeManager.findAvailableChannel(), -1);
-		mpeManager.config(15, 1, 48, MPEManager::MPEZone::Upper);
+		mpeManager.config(15, 1, 48, MPEManager::Zone::Upper);
 		QCOMPARE(mpeManager.findAvailableChannel(), -1);
 	}
 

@@ -38,7 +38,7 @@ class MidiPort;
 class MPEManager
 {
 public:
-	enum MPEZone
+	enum class Zone
 	{
 		Lower,
 		Upper
@@ -47,13 +47,13 @@ public:
 	//! Returns the manager channel of the current zone, for sending global events (such as master pitch wheel)
 	int managerChannel()
 	{
-		return m_zone == MPEZone::Lower
+		return m_zone == Zone::Lower
 			? 0
 			: 16;
 	}
 
 	//! Sets the MPE configuration before sending it as MIDI events
-	void config(int numChannelsLowerZone = 16, int numChannelsUpperZone = 0, int pitchBendRange = 48, MPEZone zone = MPEZone::Lower)
+	void config(int numChannelsLowerZone = 16, int numChannelsUpperZone = 0, int pitchBendRange = 48, Zone zone = Zone::Lower)
 	{
 		// Ensure the zones do not overlap
 		assert(numChannelsLowerZone + numChannelsUpperZone <= 16);
@@ -89,7 +89,7 @@ private:
 	int m_numChannelsLowerZone = 16;
 	int m_numChannelsUpperZone = 0;
 	int m_pitchBendRange = 48;
-	MPEZone m_zone = MPEZone::Lower;
+	Zone m_zone = Zone::Lower;
 } ;
 
 } // namespace lmms
