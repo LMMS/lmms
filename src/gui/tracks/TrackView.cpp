@@ -30,15 +30,14 @@
 #include <QMouseEvent>
 #include <QPainter>
 #include <QStyleOption>
-#include <QtGlobal>
 
 
 #include "AudioEngine.h"
+#include "AutomatableButton.h"
 #include "ConfigManager.h"
 #include "DataFile.h"
 #include "Engine.h"
 #include "FadeButton.h"
-#include "PixmapButton.h"
 #include "StringPairDrag.h"
 #include "Track.h"
 #include "TrackGrip.h"

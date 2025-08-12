@@ -33,7 +33,6 @@
 #include "GuiApplication.h"
 #include "PathUtil.h"
 #include "SampleDecoder.h"
-#include "Song.h"
 
 namespace lmms::gui {
 QString SampleLoader::openAudioFile(const QString& previousFile)

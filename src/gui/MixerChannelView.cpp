@@ -28,19 +28,28 @@
 #include <QFont>
 #include <QGraphicsProxyWidget>
 #include <QGraphicsScene>
+#include <QGraphicsView>
+#include <QLineEdit>
 #include <QMenu>
 #include <QMessageBox>
 #include <QPainter>
-#include <cassert>
+#include <QStackedWidget>
+#include <QVBoxLayout>
 
+#include "AutomatableButton.h"
 #include "CaptionMenu.h"
 #include "ColorChooser.h"
 #include "ConfigManager.h"
+#include "EffectRackView.h"
+#include "Fader.h"
 #include "FontHelper.h"
 #include "GuiApplication.h"
+#include "Knob.h"
+#include "LcdWidget.h"
 #include "Mixer.h"
 #include "MixerView.h"
 #include "PeakIndicator.h"
+#include "SendButtonIndicator.h"
 #include "Song.h"
 
 namespace lmms::gui {

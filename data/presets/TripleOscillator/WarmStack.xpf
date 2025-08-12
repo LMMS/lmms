@@ -16,7 +16,7 @@
       <arpeggiator arptime="108" arprange="2" arptime_denominator="4" syncmode="0" arpmode="1" arp-enabled="0" arp="0" arptime_numerator="4" arpdir="0" arpgate="1"/>
       <midiport inputcontroller="0" fixedoutputvelocity="-1" inputchannel="0" outputcontroller="0" writable="0" outputchannel="1" fixedinputvelocity="-1" fixedoutputnote="-1" outputprogram="1" basevelocity="127" readable="0"/>
       <fxchain numofeffects="3" enabled="1">
-        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" autoquit="8000" gate="0" name="ladspaeffect" wet="1" on="1">
+        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" autoquit="8000" name="ladspaeffect" wet="1" on="1">
           <ladspacontrols ports="6">
             <port04 data="0"/>
             <port05 data="0.8"/>
@@ -30,7 +30,7 @@
             <attribute value="freeverb3" name="plugin"/>
           </key>
         </effect>
-        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" autoquit="8000" gate="0" name="ladspaeffect" wet="1" on="1">
+        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" autoquit="8000" name="ladspaeffect" wet="1" on="1">
           <ladspacontrols link="1" ports="6">
             <port00 data_numerator="4" data_denominator="4" syncmode="4" link="1" data="412.5"/>
             <port01 link="1" data="0.31"/>
@@ -44,7 +44,7 @@
             <attribute value="fbdelay_5s" name="plugin"/>
           </key>
         </effect>
-        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" autoquit="1" gate="0" name="ladspaeffect" wet="1" on="1">
+        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" autoquit="1" name="ladspaeffect" wet="1" on="1">
           <ladspacontrols ports="3">
             <port00 data="0"/>
             <port01 data="0"/>
