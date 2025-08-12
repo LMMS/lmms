@@ -25,8 +25,6 @@
 #ifndef LMMS_AUDIO_RESAMPLER_H
 #define LMMS_AUDIO_RESAMPLER_H
 
-#include <samplerate.h>
-
 #include "AudioBufferView.h"
 #include "lmms_export.h"
 
@@ -132,7 +130,7 @@ public:
 
 private:
 	static auto converterType(Mode mode) -> int;
-	SRC_STATE* m_state = nullptr;
+	void* m_state = nullptr;
 	Mode m_mode;
 	ch_cnt_t m_channels = 0;
 	double m_ratio = 1.0;

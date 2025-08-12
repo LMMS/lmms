@@ -41,7 +41,7 @@ AudioResampler::AudioResampler(Mode mode, ch_cnt_t channels)
 
 AudioResampler::~AudioResampler()
 {
-	src_delete(m_state);
+	src_delete(static_cast<SRC_STATE*>(m_state));
 }
 
 AudioResampler::AudioResampler(AudioResampler&& other) noexcept
@@ -81,14 +81,14 @@ auto AudioResampler::process(InterleavedBufferView<const float> input, Interleav
 	data.src_ratio = m_ratio;
 	data.end_of_input = 0;
 
-	if ((m_error = src_process(m_state, &data))) { throw std::runtime_error{src_strerror(m_error)}; }
+	if ((m_error = src_process(static_cast<SRC_STATE*>(m_state), &data))) { throw std::runtime_error{src_strerror(m_error)}; }
 
 	return {static_cast<f_cnt_t>(data.input_frames_used), static_cast<f_cnt_t>(data.output_frames_gen)};
 }
 
 void AudioResampler::reset()
 {
-	if ((m_error = src_reset(m_state))) { throw std::runtime_error{src_strerror(m_error)}; }
+	if ((m_error = src_reset(static_cast<SRC_STATE*>(m_state)))) { throw std::runtime_error{src_strerror(m_error)}; }
 }
 
 auto AudioResampler::converterType(Mode mode) -> int
