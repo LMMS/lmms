@@ -80,6 +80,7 @@ int MPEManager::findAvailableChannel()
 
 void MPEManager::sendMPEConfigSignals(MidiEventProcessor* proc)
 {
+	if (proc == nullptr) { return; }
 	// The MPE config signal is sent just like the pitch bend range signal. The first 7 bits of the message id is sent (Most Significant Bits / MSB), then the last 7 bits (Least Significant Bits / LSB),
 	// The plugin now knows that the next MidiControllerDataEntry message is meant to set the MPE config
 	// The channel of the message in this case determines whether it is for the Lower or Upper zone (0 = lower, 15 = upper)
