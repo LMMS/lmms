@@ -26,7 +26,6 @@
 
 #include <samplerate.h>
 #include <stdexcept>
-#include <utility>
 
 namespace lmms {
 
@@ -37,30 +36,6 @@ AudioResampler::AudioResampler(Mode mode, ch_cnt_t channels)
 {
 	if (channels <= 0) { throw std::logic_error{"Invalid channel count"}; }
 	if (!m_state) { throw std::runtime_error{src_strerror(m_error)}; }
-}
-
-AudioResampler::~AudioResampler()
-{
-	src_delete(static_cast<SRC_STATE*>(m_state));
-}
-
-AudioResampler::AudioResampler(AudioResampler&& other) noexcept
-	: m_state(std::exchange(other.m_state, nullptr))
-	, m_mode(other.m_mode)
-	, m_channels(other.m_channels)
-	, m_ratio(other.m_ratio)
-	, m_error(other.m_error)
-{
-}
-
-AudioResampler& AudioResampler::operator=(AudioResampler&& other) noexcept
-{
-	m_state = std::exchange(other.m_state, nullptr);
-	m_mode = other.m_mode;
-	m_channels = other.m_channels;
-	m_ratio = other.m_ratio;
-	m_error = other.m_error;
-	return *this;
 }
 
 auto AudioResampler::process(InterleavedBufferView<const float> input, InterleavedBufferView<float> output) -> Result
@@ -81,14 +56,14 @@ auto AudioResampler::process(InterleavedBufferView<const float> input, Interleav
 	data.src_ratio = m_ratio;
 	data.end_of_input = 0;
 
-	if ((m_error = src_process(static_cast<SRC_STATE*>(m_state), &data))) { throw std::runtime_error{src_strerror(m_error)}; }
+	if ((m_error = src_process(static_cast<SRC_STATE*>(m_state.get()), &data))) { throw std::runtime_error{src_strerror(m_error)}; }
 
 	return {static_cast<f_cnt_t>(data.input_frames_used), static_cast<f_cnt_t>(data.output_frames_gen)};
 }
 
 void AudioResampler::reset()
 {
-	if ((m_error = src_reset(static_cast<SRC_STATE*>(m_state)))) { throw std::runtime_error{src_strerror(m_error)}; }
+	if ((m_error = src_reset(static_cast<SRC_STATE*>(m_state.get())))) { throw std::runtime_error{src_strerror(m_error)}; }
 }
 
 auto AudioResampler::converterType(Mode mode) -> int
@@ -108,6 +83,11 @@ auto AudioResampler::converterType(Mode mode) -> int
 	default:
 		throw std::invalid_argument{"Invalid interpolation mode"};
 	}
+}
+
+void AudioResampler::StateDeleter::operator()(void* state)
+{
+	src_delete(static_cast<SRC_STATE*>(state));
 }
 
 } // namespace lmms

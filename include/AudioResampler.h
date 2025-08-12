@@ -25,6 +25,7 @@
 #ifndef LMMS_AUDIO_RESAMPLER_H
 #define LMMS_AUDIO_RESAMPLER_H
 
+#include <memory>
 #include "AudioBufferView.h"
 #include "lmms_export.h"
 
@@ -68,21 +69,6 @@ public:
 	 * @param channels Number of audio channels. Defaults to `2` (stereo).
 	 */
 	AudioResampler(Mode mode, ch_cnt_t channels = 2);
-
-	//! @brief Destructor. Releases any internal state or buffers.
-	~AudioResampler();
-
-	//! @brief Cannot copy.
-	AudioResampler(const AudioResampler&) = delete;
-
-	//! @brief Cannot copy.
-	AudioResampler& operator=(const AudioResampler&) = delete;
-
-	//! @brief Moves the internal state from one resampler to another.
-	AudioResampler(AudioResampler&&) noexcept;
-
-	//! @brief Moves the internal state from one resampler to another.
-	AudioResampler& operator=(AudioResampler&&) noexcept;
 
 	/**
 	 * @brief Process a block of interleaved audio input from `input` and resample it into `output`.
@@ -130,7 +116,10 @@ public:
 
 private:
 	static auto converterType(Mode mode) -> int;
-	void* m_state = nullptr;
+
+	struct StateDeleter { void operator()(void* state); };
+	std::unique_ptr<void, StateDeleter> m_state = nullptr;
+
 	Mode m_mode;
 	ch_cnt_t m_channels = 0;
 	double m_ratio = 1.0;
