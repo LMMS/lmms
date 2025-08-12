@@ -68,8 +68,8 @@ class MidiPort : public Model, public SerializingObject
 	mapPropertyFromModel(int,baseVelocity,setBaseVelocity,m_baseVelocityModel);
 	mapPropertyFromModel(bool,isReadable,setReadable,m_readableModel);
 	mapPropertyFromModel(bool,isWritable,setWritable,m_writableModel);
-	mapPropertyFromModel(bool, MPEEnabled, setMPEEnabled, m_MPEModel);
-	mapPropertyFromModel(int, MPEPitchRange, setMPEPitchRange, m_MPEPitchRangeModel);
+	mapPropertyFromModel(bool, mpeEnabled, setMPEEnabled, m_MPEModel);
+	mapPropertyFromModel(int, mpePitchRange, setMPEPitchRange, m_MPEPitchRangeModel);
 public:
 	using Map = QMap<QString, bool>;
 
@@ -116,22 +116,22 @@ public:
 	}
 
 	//! Returns the current number of channels in the Lower MPE Zone, or 0 if there are no member channels or MPE is disabled
-	int MPELowerZoneChannels() const
+	int mpeLowerZoneChannels() const
 	{
-		return MPEEnabled() && m_MPELowerZoneChannelsModel.value() > 1
+		return mpeEnabled() && m_MPELowerZoneChannelsModel.value() > 1
 			? m_MPELowerZoneChannelsModel.value()
 			: 0;
 	}
 	//! Returns the current number of channels in the Upper MPE Zone, or 0 if there are no member channels or MPE is disabled
-	int MPEUpperZoneChannels() const
+	int mpeUpperZoneChannels() const
 	{
-		return MPEEnabled() && m_MPEUpperZoneChannelsModel.value() > 1
+		return mpeEnabled() && m_MPEUpperZoneChannelsModel.value() > 1
 			? m_MPEUpperZoneChannelsModel.value()
 			: 0;
 	}
 
 	// Returns the current active MPE zone (Lower or Upper)
-	MPEManager::MPEZone MPEActiveZone() const
+	MPEManager::MPEZone mpeActiveZone() const
 	{
 		switch (m_MPEZoneModel.value())
 		{
@@ -229,7 +229,7 @@ signals:
 	void readablePortsChanged();
 	void writablePortsChanged();
 	void modeChanged();
-	void MPEConfigurationChanged();
+	void mpeConfigurationChanged();
 
 } ;
 

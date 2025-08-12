@@ -77,7 +77,7 @@ void Piano::processInEvent(const MidiEvent& event, const TimePos& time, f_cnt_t 
 	if (!isValidKey(key)) { return; }
 
 	if (event.type() == MidiNoteOn) { m_pressedKeys[key] = true; }
-	if (event.type() == MidiNoteOff) { m_pressedKeys[key] = false; }
+	else if (event.type() == MidiNoteOff) { m_pressedKeys[key] = false; }
 
 	emit dataChanged();
 }

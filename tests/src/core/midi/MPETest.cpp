@@ -48,7 +48,7 @@ class MPETest : public QObject
 private slots:
 	/** @brief Checks that notes are routed to the channels with the least number of active notes, or the channel with the oldest NoteOff in the case of a tie.
 	 */
-	void MPEChannelRoutingTest()
+	void mpeChannelRoutingTest()
 	{
 		using namespace lmms;
 
@@ -159,7 +159,7 @@ private slots:
 
 	/** @brief Checks edge cases with zone channel counts to ensure it handles them properly
 	 */
-	void MPEZoneChannelCountTest()
+	void mpeZoneChannelCountTest()
 	{
 		using namespace lmms;
 		MPEManager mpeManager;
@@ -189,7 +189,7 @@ private slots:
 
 	/** @brief Ensures MPE configuration messages are sent correctly
 	 */
-	void MPEConfigurationTest()
+	void mpeConfigurationTest()
 	{
 		using namespace lmms;
 		MPEManager mpeManager;

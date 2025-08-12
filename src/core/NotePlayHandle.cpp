@@ -123,10 +123,10 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 		: std::clamp(m_midiChannel, 0, 15); // The clamp ensures that if the channel was passed as -1, it will be set to 0 by default. TODO: should there be a better way for handling default channels?
 
 	// The MPE manager will determine which of the 16 midi channels is best to route this note, if MPE is enabled.
-	const int MPEChannel = m_instrumentTrack->midiPort()->mpeManager()->findAvailableChannel();
+	const int mpeChannel = m_instrumentTrack->midiPort()->mpeManager()->findAvailableChannel();
 	// If no channels have been allocated to the current zone, the MPE manager may return -1, meaning it should be routed normally.
-	m_midiChannel = m_instrumentTrack->midiPort()->MPEEnabled() && MPEChannel != -1
-		? MPEChannel
+	m_midiChannel = m_instrumentTrack->midiPort()->mpeEnabled() && mpeChannel != -1
+		? mpeChannel
 		: outputChannel;
 
 	// Notify MPE manager that a new note was created on this channel to update note counts
@@ -175,7 +175,7 @@ void NotePlayHandle::setVolume( volume_t _volume )
 
 	const int baseVelocity = m_instrumentTrack->midiPort()->baseVelocity();
 
-	m_instrumentTrack->processOutEvent( MidiEvent( MidiKeyPressure, midiChannel(), key(), midiVelocity( baseVelocity ) ) );
+	m_instrumentTrack->processOutEvent(MidiEvent(MidiKeyPressure, midiChannel(), key(), midiVelocity(baseVelocity)));
 }
 
 
@@ -241,7 +241,7 @@ void NotePlayHandle::play( SampleFrame* _working_buffer )
 		const int baseVelocity = m_instrumentTrack->midiPort()->baseVelocity();
 
 		// According to the MPE specification (page 16, section 2.4), The initial pitch/pressure/timbre should be sent before the NoteOn event.
-		if (m_instrumentTrack->midiPort()->MPEEnabled())
+		if (m_instrumentTrack->midiPort()->mpeEnabled())
 		{
 			sendMPEDetuning();
 		}
@@ -589,7 +589,7 @@ void NotePlayHandle::processTimePos(const TimePos& time, float pitchValue, bool 
 		{
 			m_baseDetuning->setValue(v);
 			updateFrequency();
-			if (m_instrumentTrack->midiPort()->MPEEnabled())
+			if (m_instrumentTrack->midiPort()->mpeEnabled())
 			{
 				sendMPEDetuning();
 			}
@@ -601,7 +601,7 @@ void NotePlayHandle::processTimePos(const TimePos& time, float pitchValue, bool 
 void NotePlayHandle::sendMPEDetuning()
 {
 	const float v = m_baseDetuning->value();
-	const int pitchRange = m_instrumentTrack->midiPort()->MPEPitchRange();
+	const int pitchRange = m_instrumentTrack->midiPort()->mpePitchRange();
 	const int pitchBendValue = std::clamp(static_cast<int>(v * 8192 / pitchRange + 8192), 0, 16383);
 	m_instrumentTrack->processOutEvent(MidiEvent(MidiPitchBend, midiChannel(), pitchBendValue));
 }

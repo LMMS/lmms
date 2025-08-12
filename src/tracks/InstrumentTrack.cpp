@@ -120,8 +120,8 @@ InstrumentTrack::InstrumentTrack(TrackContainer* tc) :
 
 	// Resend the master pitch knob and pitch range midi signals just in case it was originally sent on a non-manager channel before MPE was enabled
 	// With MPE, all the master pitch wheel signals must go to either channel 0 or channel 15.
-	connect(&m_midiPort, &MidiPort::MPEConfigurationChanged, this, &InstrumentTrack::updatePitchRange);
-	connect(&m_midiPort, &MidiPort::MPEConfigurationChanged, this, &InstrumentTrack::updatePitch);
+	connect(&m_midiPort, &MidiPort::mpeConfigurationChanged, this, &InstrumentTrack::updatePitchRange);
+	connect(&m_midiPort, &MidiPort::mpeConfigurationChanged, this, &InstrumentTrack::updatePitch);
 
 	autoAssignMidiDevice(true);
 }
@@ -637,7 +637,7 @@ void InstrumentTrack::updatePitch()
 {
 	updateBaseNote();
 
-	int channel = midiPort()->MPEEnabled()
+	int channel = midiPort()->mpeEnabled()
 		? midiPort()->mpeManager()->managerChannel()
 		: midiPort()->realOutputChannel(); // TODO this sends the signal on the output channel, regardless of whether midi output is enabled or not.
 
@@ -652,7 +652,7 @@ void InstrumentTrack::updatePitchRange()
 	const int r = m_pitchRangeModel.value();
 	m_pitchModel.setRange( MinPitchDefault * r, MaxPitchDefault * r );
 
-	int channel = midiPort()->MPEEnabled()
+	int channel = midiPort()->mpeEnabled()
 		? midiPort()->mpeManager()->managerChannel()
 		: midiPort()->realOutputChannel(); // TODO this sends the signal on the output channel, regardless of whether midi output is enabled or not.
 
