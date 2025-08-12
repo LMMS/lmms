@@ -638,7 +638,7 @@ void InstrumentTrack::updatePitch()
 	updateBaseNote();
 
 	int channel = midiPort()->mpeEnabled()
-		? midiPort()->mpeManager()->managerChannel()
+		? midiPort()->mpeManager().managerChannel()
 		: midiPort()->realOutputChannel(); // TODO this sends the signal on the output channel, regardless of whether midi output is enabled or not.
 
 	processOutEvent(MidiEvent(MidiPitchBend, channel, midiPitch()));
@@ -653,7 +653,7 @@ void InstrumentTrack::updatePitchRange()
 	m_pitchModel.setRange( MinPitchDefault * r, MaxPitchDefault * r );
 
 	int channel = midiPort()->mpeEnabled()
-		? midiPort()->mpeManager()->managerChannel()
+		? midiPort()->mpeManager().managerChannel()
 		: midiPort()->realOutputChannel(); // TODO this sends the signal on the output channel, regardless of whether midi output is enabled or not.
 
 	processOutEvent(MidiEvent(MidiControlChange, channel,

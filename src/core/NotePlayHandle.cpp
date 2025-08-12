@@ -123,7 +123,7 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 		: std::clamp(m_midiChannel, 0, 15); // The clamp ensures that if the channel was passed as -1, it will be set to 0 by default. TODO: should there be a better way for handling default channels?
 
 	// The MPE manager will determine which of the 16 midi channels is best to route this note, if MPE is enabled.
-	const int mpeChannel = m_instrumentTrack->midiPort()->mpeManager()->findAvailableChannel();
+	const int mpeChannel = m_instrumentTrack->midiPort()->mpeManager().findAvailableChannel();
 	// If no channels have been allocated to the current zone, the MPE manager may return -1, meaning it should be routed normally.
 	m_midiChannel = m_instrumentTrack->midiPort()->mpeEnabled() && mpeChannel != -1
 		? mpeChannel
@@ -133,7 +133,7 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 	// Normally this would be done on the actual midi NoteOn event, but those are only sent
 	// once the processing starts, which is too late when trying to route chords.
 	// Note: This is called even if MPE is disabled, so that if it is suddenly enabled, the MPEManager will still have the correct knowledge about which notes are where.
-	m_instrumentTrack->midiPort()->mpeManager()->noteOn(midiChannel());
+	m_instrumentTrack->midiPort()->mpeManager().noteOn(midiChannel());
 
 	unlock();
 }
@@ -427,7 +427,7 @@ void NotePlayHandle::noteOff( const f_cnt_t _s )
 	}
 
 	// Notify MPE Manager to update channel note counts
-	m_instrumentTrack->midiPort()->mpeManager()->noteOff(midiChannel());
+	m_instrumentTrack->midiPort()->mpeManager().noteOff(midiChannel());
 }
 
 

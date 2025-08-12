@@ -145,9 +145,9 @@ public:
 		}
 	}
 
-	MPEManager* mpeManager()
+	MPEManager& mpeManager()
 	{
-		return &m_mpeManager;
+		return m_mpeManager;
 	}
 
 	void processInEvent( const MidiEvent& event, const TimePos& time = TimePos() );
