@@ -602,7 +602,10 @@ void NotePlayHandle::sendMPEDetuning()
 {
 	const float v = m_baseDetuning->value();
 	const int pitchRange = m_instrumentTrack->midiPort()->mpePitchRange();
-	const int pitchBendValue = std::clamp(static_cast<int>(v * 8192 / pitchRange + 8192), 0, 16383);
+	// MIDI sends the pitch bend value as a 14 bit unsigned integer, which means there are 2^14 = 16384 possible values (0 to 16383).
+	// The zero point is right in the middle, 2^13 = 8192
+	// This formula is also given on page 24, section C.3 of the MPE sepcification.
+	const int pitchBendValue = std::clamp(static_cast<int>(std::round(v * 8192 / pitchRange) + 8192), 0, 16383);
 	m_instrumentTrack->processOutEvent(MidiEvent(MidiPitchBend, midiChannel(), pitchBendValue));
 }
 

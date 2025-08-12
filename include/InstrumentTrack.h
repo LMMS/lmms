@@ -113,10 +113,11 @@ public:
 	//! Get the midi transpose amount based on the offset from the base note from the default base note, plus the global transposition
 	int transposeAmount() const;
 
-	// translate pitch to midi-pitch [0,16383]
+	//! Convert the pitch knob amount into the range 0 to 2^14, since MIDI pitch bends are sent as 14 bit unsigned integers
+	//! 2^14 = 16384, and the zero point is in the middle at 2^13 = 8192.
 	int midiPitch() const
 	{
-		return static_cast<int>( ( ( m_pitchModel.value() + m_pitchModel.range()/2 ) * MidiMaxPitchBend ) / m_pitchModel.range() );
+		return std::clamp(static_cast<int>(std::round(2 * 8192 * m_pitchModel.value() / m_pitchModel.range()) + 8192), 0, 16383);
 	}
 
 	/*! \brief Returns current range for pitch bend in semitones */
