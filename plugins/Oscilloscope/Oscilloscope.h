@@ -53,7 +53,7 @@ public:
 private:
 	OscilloscopeControls m_controls;
 
-	std::array<SampleFrame, BUFFER_SIZE> m_ringBuffer;
+	std::array<SampleFrame, BUFFER_SIZE> m_ringBuffer = {};
 	int m_ringBufferIndex = 0;
 
 	friend class OscilloscopeControls;
