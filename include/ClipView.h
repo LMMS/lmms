@@ -35,13 +35,11 @@
 
 
 class QMenu;
-class QContextMenuEvent;
 
 namespace lmms
 {
 
 class DataFile;
-class Clip;
 
 namespace gui
 {

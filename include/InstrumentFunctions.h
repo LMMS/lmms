@@ -35,7 +35,7 @@
 namespace lmms
 {
 
-class InstrumentTrack;
+class InstrumentTrack;  // IWYU pragma: keep
 class NotePlayHandle;
 
 namespace gui

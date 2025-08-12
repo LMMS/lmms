@@ -51,7 +51,6 @@ void AudioPortAudioSetupUtil::updateChannels()
 
 #include <QFormLayout>
 
-#include "Engine.h"
 #include "ConfigManager.h"
 #include "ComboBox.h"
 #include "AudioEngine.h"
