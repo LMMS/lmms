@@ -30,8 +30,8 @@
 class DummyMidiEventProcessor : public lmms::MidiEventProcessor
 {
 public:
-	void processInEvent(const lmms::MidiEvent& event, const lmms::TimePos& time = lmms::TimePos(), lmms::f_cnt_t offset = 0) override {};
-	void processOutEvent(const lmms::MidiEvent& event, const lmms::TimePos& time = lmms::TimePos(), lmms::f_cnt_t offset = 0) override
+	void processInEvent(const lmms::MidiEvent& event, const lmms::TimePos& time, lmms::f_cnt_t offset) override {};
+	void processOutEvent(const lmms::MidiEvent& event, const lmms::TimePos& time, lmms::f_cnt_t offset) override
 	{
 		m_eventHistory.push_back(event);
 	}
