@@ -224,7 +224,7 @@ void Note::loadSettings( const QDomElement & _this )
 }
 
 
-AutomationClip* Note::getParameterCurve(ParameterType paramType)
+AutomationClip* Note::parameterCurve(ParameterType paramType)
 {
 	switch (paramType)
 	{
