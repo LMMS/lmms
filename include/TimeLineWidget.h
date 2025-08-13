@@ -75,7 +75,7 @@ public:
 	};
 
 	TimeLineWidget(int xoff, int yoff, float ppb, Timeline* timeline,
-				const TimePos& begin, Song::PlayMode mode, QWidget* parent);
+				const TimePos& begin, QWidget* parent);
 	~TimeLineWidget() override;
 
 	inline QColor const & getBarLineColor() const { return m_barLineColor; }
@@ -216,7 +216,6 @@ private:
 	Timeline* m_timeline;
 	// Leftmost position visible in parent editor
 	const TimePos & m_begin;
-	const Song::PlayMode m_mode;
 	// When in MoveLoop mode we need the initial positions. Storing only the latest
 	// position allows for unquantized drag but fails when toggling quantization.
 	std::array<TimePos, 2> m_oldLoopPos;

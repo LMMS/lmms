@@ -58,7 +58,7 @@ PatternEditor::PatternEditor(PatternStore* ps) :
 
 	m_timeLine = new TimeLineWidget(m_trackHeadWidth, 32, pixelsPerBar(),
 		&Engine::getSong()->getTimeline(Song::PlayMode::Pattern),
-		m_currentPosition, Song::PlayMode::Pattern, this
+		m_currentPosition, this
 	);
 	connect(this, &PatternEditor::positionChanged, m_timeLine, qOverload<>(&QWidget::update));
 	connect(m_timeLine->model(), &Timeline::positionChanged, this, &PatternEditor::updatePosition, Qt::QueuedConnection);

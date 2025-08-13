@@ -132,7 +132,7 @@ AutomationEditor::AutomationEditor() :
 	// add time-line
 	m_timeLine = new TimeLineWidget(VALUES_WIDTH, 0, m_ppb,
 		&Engine::getSong()->getTimeline(Song::PlayMode::AutomationClip),
-		m_currentPosition, Song::PlayMode::AutomationClip, this
+		m_currentPosition, this
 	);
 	connect(this, &AutomationEditor::positionChanged, m_timeLine, qOverload<>(&QWidget::update));
 	connect(m_timeLine->model(), &Timeline::positionChanged, this, &AutomationEditor::updatePosition, Qt::QueuedConnection);

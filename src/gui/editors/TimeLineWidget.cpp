@@ -47,13 +47,12 @@ namespace
 }
 
 TimeLineWidget::TimeLineWidget(const int xoff, const int yoff, const float ppb, Timeline* timeline,
-		const TimePos& begin, Song::PlayMode mode, QWidget* parent) :
+		const TimePos& begin, QWidget* parent) :
 	QWidget{parent},
 	m_xOffset{xoff},
 	m_ppb{ppb},
 	m_timeline{timeline},
-	m_begin{begin},
-	m_mode{mode}
+	m_begin{begin}
 {
 	move( 0, yoff );
 

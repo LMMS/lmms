@@ -277,7 +277,7 @@ PianoRoll::PianoRoll() :
 	// add time-line
 	m_timeLine = new TimeLineWidget(m_whiteKeyWidth, 0, m_ppb,
 		&Engine::getSong()->getTimeline(Song::PlayMode::MidiClip),
-		m_currentPosition, Song::PlayMode::MidiClip, this
+		m_currentPosition, this
 	);
 	connect(this, &PianoRoll::positionChanged, m_timeLine, qOverload<>(&QWidget::update));
 	connect(m_timeLine->model(), &Timeline::positionChanged, this, &PianoRoll::updatePosition, Qt::QueuedConnection);
