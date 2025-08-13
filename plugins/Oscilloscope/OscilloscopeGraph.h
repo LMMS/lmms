@@ -44,12 +44,12 @@ class Knob;
 class OscilloscopeGraph : public QWidget
 {
 	Q_OBJECT
-	Q_PROPERTY(QColor monoColor READ monoColor WRITE setMonoColor)
-	Q_PROPERTY(QColor leftColor READ leftColor WRITE setLeftColor)
-	Q_PROPERTY(QColor rightColor READ rightColor WRITE setRightColor)
-	Q_PROPERTY(QColor minorLineColor READ minorLineColor WRITE setMinorLineColor)
-	Q_PROPERTY(QColor clippingLineColor READ clippingLineColor WRITE setClippingLineColor)
-	Q_PROPERTY(QColor backgroundColor READ backgroundColor WRITE setBackgroundColor)
+	Q_PROPERTY(QColor monoColor MEMBER m_monoColor)
+	Q_PROPERTY(QColor leftColor MEMBER m_leftColor)
+	Q_PROPERTY(QColor rightColor MEMBER m_rightColor)
+	Q_PROPERTY(QColor minorLineColor MEMBER m_minorLineColor)
+	Q_PROPERTY(QColor clippingLineColor MEMBER m_clippingLineColor)
+	Q_PROPERTY(QColor backgroundColor MEMBER m_backgroundColor)
 public:
 	OscilloscopeGraph(QWidget* parent, OscilloscopeControls* controls);
 	~OscilloscopeGraph() override = default;
@@ -59,19 +59,6 @@ public:
 	void mousePressEvent(QMouseEvent* me) override;
 	void mouseReleaseEvent(QMouseEvent* me) override;
 	void mouseMoveEvent(QMouseEvent* me) override;
-
-	QColor monoColor() const { return m_monoColor; }
-	void setMonoColor(QColor c) { m_monoColor = c; }
-	QColor leftColor() const { return m_leftColor; }
-	void setLeftColor(QColor c) { m_leftColor = c; }
-	QColor rightColor() const { return m_rightColor; }
-	void setRightColor(QColor c) { m_rightColor = c; }
-	QColor minorLineColor() const { return m_minorLineColor; }
-	void setMinorLineColor(QColor c) { m_minorLineColor = c; }
-	QColor clippingLineColor() const { return m_clippingLineColor; }
-	void setClippingLineColor(QColor c) { m_clippingLineColor = c; }
-	QColor backgroundColor() const { return m_backgroundColor; }
-	void setBackgroundColor(QColor c) { m_backgroundColor = c; }
 private:
 	OscilloscopeControls* m_controls;
 	int m_mousePos;
