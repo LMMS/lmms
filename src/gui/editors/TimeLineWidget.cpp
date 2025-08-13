@@ -324,11 +324,10 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 	{
 		case Action::MovePositionMarker:
 			m_timeline->setTicks(timeAtCursor.getTicks());
-			Engine::getSong()->setToTime(timeAtCursor, m_mode);
 			if (!( Engine::getSong()->isPlaying()))
 			{
 				//Song::PlayMode::None is used when nothing is being played.
-				Engine::getSong()->setToTime(timeAtCursor, Song::PlayMode::None);
+				Engine::getSong()->getTimeline(Song::PlayMode::None).setTicks(timeAtCursor.getTicks());
 			}
 			m_timeline->setFrameOffset(0);
 			m_timeline->setJumped(true);

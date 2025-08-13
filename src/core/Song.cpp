@@ -238,7 +238,7 @@ void Song::processNextBuffer()
 	{
 		if (getPlayPos() < begin || getPlayPos() >= end)
 		{
-			setToTime(begin);
+			getTimeline().setTicks(begin.getTicks());
 			m_vstSyncController.setPlaybackJumped(true);
 			emit updateSampleTracks();
 			return true;
@@ -674,7 +674,6 @@ void Song::stop()
 			if (timeline.playStartPosition() >= 0)
 			{
 				getTimeline().setTicks(timeline.playStartPosition().getTicks());
-				setToTime(timeline.playStartPosition());
 
 				timeline.setPlayStartPosition(-1);
 			}

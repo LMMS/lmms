@@ -117,26 +117,6 @@ public:
 		return 1000 * getFrames() / Engine::audioEngine()->outputSampleRate();
 	}
 
-	inline void setToTime(TimePos const & pos)
-	{
-		setToTime(pos, m_playMode);
-	}
-
-	inline void setToTime(TimePos const & pos, PlayMode playMode)
-	{
-		getTimeline(playMode).setTicks(pos.getTicks());
-	}
-
-	inline void setToTimeByTicks(tick_t ticks)
-	{
-		setToTimeByTicks(ticks, m_playMode);
-	}
-
-	inline void setToTimeByTicks(tick_t ticks, PlayMode playMode)
-	{
-		getTimeline(playMode).setTicks(ticks);
-	}
-
 	inline int getBars() const
 	{
 		return currentBar();
