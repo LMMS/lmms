@@ -230,7 +230,7 @@ void LocalZynAddSubFx::processMidiEvent( const MidiEvent& event )
 		case MidiNoteOn:
 			if( event.velocity() > 0 )
 			{
-				if (event.key() < 0 || event.key() >= MidiNumKeys)
+				if (event.key() < 0 || event.key() >= MidiKeyCount)
 				{
 					break;
 				}
@@ -243,7 +243,7 @@ void LocalZynAddSubFx::processMidiEvent( const MidiEvent& event )
 				break;
 			}
 		case MidiNoteOff:
-			if (event.key() < 0 || event.key() >= MidiNumKeys)
+			if (event.key() < 0 || event.key() >= MidiKeyCount)
 			{
 				break;
 			}

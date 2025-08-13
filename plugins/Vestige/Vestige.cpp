@@ -822,7 +822,7 @@ void VestigeInstrumentView::noteOffAll( void )
 	{
 		for (int channel = 0; channel < 16; ++channel)
 		{
-			for(int key = 0; key < MidiNumKeys; ++key)
+			for(int key = 0; key < MidiKeyCount; ++key)
 			{
 				m_vi->m_plugin->processMidiEvent(MidiEvent(MidiNoteOff, channel, key, 0), 0);
 			}

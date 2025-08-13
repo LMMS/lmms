@@ -125,13 +125,13 @@ enum MidiControllerRegisteredParameterNumbers
 	MidiNullFunctionNumberRPN = 0x7F7F
 };
 
+const int MidiKeyCount = 128;
 const int MidiChannelCount = 16;
 const int MidiControllerCount = 128;
 const int MidiProgramCount = 128;
 const int MidiMaxVelocity = 127;
 const int MidiDefaultVelocity = MidiMaxVelocity / 2;
 const int MidiMaxControllerValue = 127;
-const int MidiNumKeys = 128;
 
 const int MidiMaxPanning = 127;
 const int MidiMinPanning = -128;
