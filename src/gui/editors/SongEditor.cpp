@@ -96,13 +96,11 @@ SongEditor::SongEditor( Song * song ) :
 {
 	// Set up timeline
 	m_timeLine = new TimeLineWidget(m_trackHeadWidth, 32, pixelsPerBar(),
-		m_song->getPlayPos(Song::PlayMode::Song),
-		m_song->getTimeline(Song::PlayMode::Song),
-		m_currentPosition, Song::PlayMode::Song, this
+		&m_song->getTimeline(Song::PlayMode::Song),
+		m_currentPosition, this
 	);
-	connect(this, &TrackContainerView::positionChanged, m_timeLine, &TimeLineWidget::updatePosition);
-	connect( m_timeLine, SIGNAL( positionChanged( const lmms::TimePos& ) ),
-			this, SLOT( updatePosition( const lmms::TimePos& ) ) );
+	connect(this, &TrackContainerView::positionChanged, m_timeLine, qOverload<>(&QWidget::update));
+	connect(m_timeLine->model(), &Timeline::positionChanged, this, &SongEditor::updatePosition, Qt::QueuedConnection);
 	connect( m_timeLine, SIGNAL(regionSelectedFromPixels(int,int)),
 			this, SLOT(selectRegionFromPixels(int,int)));
 	connect( m_timeLine, SIGNAL(selectionFinished()),
@@ -120,7 +118,10 @@ SongEditor::SongEditor( Song * song ) :
 	// When zoom changes, update position line
 	// But we must convert pixels per bar to a zoom factor where 1.0 is 100%
 	connect(this, &SongEditor::pixelsPerBarChanged, m_positionLine,
-		[this]() { m_positionLine->zoomChange(pixelsPerBar() / float(DEFAULT_PIXELS_PER_BAR)); });
+		[this]() {
+			m_positionLine->zoomChange(pixelsPerBar() / float(DEFAULT_PIXELS_PER_BAR));
+			updatePositionLine();
+		});
 
 	// Ensure loop markers snap to same increments as clips. Zoom & proportional
 	// snap changes are handled in zoomingChanged() and toggleProportionalSnap()
@@ -329,6 +330,7 @@ void SongEditor::scrolled( int new_pos )
 {
 	update();
 	emit positionChanged(m_currentPosition = TimePos(new_pos));
+	updatePositionLine();
 }
 
 
@@ -757,8 +759,9 @@ static inline void animateScroll( QScrollBar *scrollBar, int newVal, bool smooth
 
 
 
-void SongEditor::updatePosition( const TimePos & t )
+void SongEditor::updatePosition()
 {
+	const TimePos& t = m_timeLine->model()->getPlayPos();
 	const bool compactTrackButtons = ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt();
 	const auto widgetWidth = compactTrackButtons ? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT : DEFAULT_SETTINGS_WIDGET_WIDTH;
 	const auto trackOpWidth = compactTrackButtons ? TRACK_OP_WIDTH_COMPACT : TRACK_OP_WIDTH;
@@ -786,7 +789,18 @@ void SongEditor::updatePosition( const TimePos & t )
 		m_scrollBack = false;
 	}
 
-	const int x = m_timeLine->markerX(t);
+	updatePositionLine();
+}
+
+
+
+
+void SongEditor::updatePositionLine()
+{
+	const bool compactTrackButtons = ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt();
+	const auto widgetWidth = compactTrackButtons ? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT : DEFAULT_SETTINGS_WIDGET_WIDTH;
+	const auto trackOpWidth = compactTrackButtons ? TRACK_OP_WIDTH_COMPACT : TRACK_OP_WIDTH;
+	const int x = m_timeLine->markerX(m_timeLine->model()->getPlayPos());
 	if( x >= trackOpWidth + widgetWidth -1 )
 	{
 		m_positionLine->show();
@@ -797,14 +811,6 @@ void SongEditor::updatePosition( const TimePos & t )
 		m_positionLine->hide();
 	}
 
-	updatePositionLine();
-}
-
-
-
-
-void SongEditor::updatePositionLine()
-{
 	m_positionLine->setFixedHeight(totalHeightOfTracks());
 }
 

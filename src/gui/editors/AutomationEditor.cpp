@@ -131,13 +131,10 @@ AutomationEditor::AutomationEditor() :
 
 	// add time-line
 	m_timeLine = new TimeLineWidget(VALUES_WIDTH, 0, m_ppb,
-		Engine::getSong()->getPlayPos(Song::PlayMode::AutomationClip),
-		Engine::getSong()->getTimeline(Song::PlayMode::AutomationClip),
-		m_currentPosition, Song::PlayMode::AutomationClip, this
+		&Engine::getSong()->getTimeline(Song::PlayMode::AutomationClip),
+		m_currentPosition, this
 	);
-	connect(this, &AutomationEditor::positionChanged, m_timeLine, &TimeLineWidget::updatePosition);
-	connect( m_timeLine, SIGNAL( positionChanged( const lmms::TimePos& ) ),
-			this, SLOT( updatePosition( const lmms::TimePos& ) ) );
+	connect(m_timeLine->model(), &Timeline::positionChanged, this, &AutomationEditor::updatePosition, Qt::QueuedConnection);
 
 	// init scrollbars
 	m_leftRightScroll = new QScrollBar( Qt::Horizontal, this );
@@ -271,23 +268,24 @@ void AutomationEditor::keyPressEvent(QKeyEvent * ke )
 			break;
 
 		case Qt::Key_Left:
-			if( ( m_timeLine->pos() -= 16 ) < 0 )
+			if(m_timeLine->model()->getTicks() - 16 > 0)
 			{
-				m_timeLine->pos().setTicks( 0 );
+				m_timeLine->model()->setTicks(m_timeLine->model()->getTicks() - 16);
 			}
-			m_timeLine->updatePosition();
+			else
+			{
+				m_timeLine->model()->setTicks(0);
+			}
 			ke->accept();
 			break;
 
 		case Qt::Key_Right:
-			m_timeLine->pos() += 16;
-			m_timeLine->updatePosition();
+			m_timeLine->model()->setTicks(m_timeLine->model()->getTicks() + 16);
 			ke->accept();
 			break;
 
 		case Qt::Key_Home:
-			m_timeLine->pos().setTicks( 0 );
-			m_timeLine->updatePosition();
+			m_timeLine->model()->setTicks(0);
 			ke->accept();
 			break;
 
@@ -1759,7 +1757,7 @@ void AutomationEditor::stop()
 void AutomationEditor::horScrolled(int new_pos )
 {
 	m_currentPosition = new_pos;
-	emit positionChanged( m_currentPosition );
+	m_timeLine->update();
 	update();
 }
 
@@ -1828,8 +1826,9 @@ void AutomationEditor::setTension()
 
 
 
-void AutomationEditor::updatePosition(const TimePos & t )
+void AutomationEditor::updatePosition()
 {
+	const TimePos& t = m_timeLine->model()->getPlayPos();
 	if( ( Engine::getSong()->isPlaying() &&
 			Engine::getSong()->playMode() ==
 					Song::PlayMode::AutomationClip ) ||
