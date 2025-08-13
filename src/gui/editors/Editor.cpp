@@ -159,7 +159,14 @@ void Editor::closeEvent(QCloseEvent * event)
  {
 	if (ke->key() == Qt::Key_Space)
 	{
-		togglePlayStop();
+		if (ke->modifiers() & Qt::ShiftModifier)
+		{
+			togglePause();
+		}
+		else
+		{
+			togglePlayStop();
+		}
 		return;
 	}
 	ke->ignore();
