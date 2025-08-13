@@ -1,5 +1,5 @@
 /*
- * AutomatableButton.h - class automatableButton, the base for all buttons
+ * AutomatableButton.h - class AutomatableButton, the base for all buttons
  *
  * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -32,7 +32,7 @@
 namespace lmms::gui
 {
 
-class automatableButtonGroup;
+class AutomatableButtonGroup;
 
 
 class LMMS_EXPORT AutomatableButton : public QPushButton, public BoolModelView
@@ -69,10 +69,10 @@ protected:
 
 
 private:
-	automatableButtonGroup * m_group;
+	AutomatableButtonGroup * m_group;
 
 
-	friend class automatableButtonGroup;
+	friend class AutomatableButtonGroup;
 
 	using QPushButton::setChecked;
 	using QPushButton::isChecked;
@@ -80,13 +80,13 @@ private:
 
 
 
-class LMMS_EXPORT automatableButtonGroup : public QWidget, public IntModelView
+class LMMS_EXPORT AutomatableButtonGroup : public QWidget, public IntModelView
 {
 	Q_OBJECT
 public:
-	automatableButtonGroup( QWidget * _parent, const QString & _name
+	AutomatableButtonGroup( QWidget * _parent, const QString & _name
 			= QString() );
-	~automatableButtonGroup() override;
+	~AutomatableButtonGroup() override;
 
 	void addButton( AutomatableButton * _btn );
 	void removeButton( AutomatableButton * _btn );

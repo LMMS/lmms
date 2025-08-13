@@ -27,8 +27,8 @@
 
 #include <string_view>
 
-#include <QBoxLayout>
 #include <QSizePolicy>
+#include <QVBoxLayout>
 
 #include "EnvelopeGraph.h"
 #include "LfoGraph.h"
@@ -57,8 +57,7 @@ EnvelopeAndLfoView::EnvelopeAndLfoView(QWidget * parent) :
 	// Helper lambdas for consistent repeated buiding of certain widgets
 	auto buildKnob = [&](const QString& label, const QString& hintText)
 	{
-		auto knob = new Knob(KnobType::Bright26, this);
-		knob->setLabel(label);
+		auto knob = new Knob(KnobType::Bright26, label, this, Knob::LabelRendering::LegacyFixedFontSize);
 		knob->setHintText(hintText, "");
 		
 		return knob;
@@ -150,7 +149,7 @@ EnvelopeAndLfoView::EnvelopeAndLfoView(QWidget * parent) :
 	typesLayout->addWidget(random_lfo_btn);
 	typesLayout->addWidget(m_userLfoBtn);
 
-	m_lfoWaveBtnGrp = new automatableButtonGroup(this);
+	m_lfoWaveBtnGrp = new AutomatableButtonGroup(this);
 	m_lfoWaveBtnGrp->addButton(sin_lfo_btn);
 	m_lfoWaveBtnGrp->addButton(triangle_lfo_btn);
 	m_lfoWaveBtnGrp->addButton(saw_lfo_btn);
@@ -170,8 +169,7 @@ EnvelopeAndLfoView::EnvelopeAndLfoView(QWidget * parent) :
 	m_lfoAttackKnob = buildKnob(tr("ATT"), tr("Attack:"));
 	lfoKnobsLayout->addWidget(m_lfoAttackKnob);
 
-	m_lfoSpeedKnob = new TempoSyncKnob(KnobType::Bright26, this);
-	m_lfoSpeedKnob->setLabel(tr("SPD"));
+	m_lfoSpeedKnob = new TempoSyncKnob(KnobType::Bright26, tr("SPD"), this, Knob::LabelRendering::LegacyFixedFontSize);
 	m_lfoSpeedKnob->setHintText(tr("Frequency:"), "");
 	lfoKnobsLayout->addWidget(m_lfoSpeedKnob);
 

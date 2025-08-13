@@ -26,7 +26,6 @@
 
 #include "lmms_math.h"
 
-#include <QBoxLayout>
 #include <QMouseEvent>
 
 

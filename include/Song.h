@@ -28,8 +28,8 @@
 #include <array>
 #include <memory>
 
-#include <QHash>
 #include <QString>
+#include <QHash>  // IWYU pragma: keep
 
 #include "AudioEngine.h"
 #include "Controller.h"
@@ -50,11 +50,8 @@ class Scale;
 
 namespace gui
 {
-
-class TimeLineWidget;
 class SongEditor;
 class ControllerRackView;
-
 }
 
 

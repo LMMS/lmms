@@ -26,7 +26,6 @@
 #ifndef LMMS_GUI_AUTOMATION_EDITOR_H
 #define LMMS_GUI_AUTOMATION_EDITOR_H
 
-#include <QPushButton>
 #include <QWidget>
 #include <array>
 
@@ -34,26 +33,24 @@
 #include "ComboBoxModel.h"
 #include "Editor.h"
 #include "JournallingObject.h"
-#include "MidiClip.h"
 #include "SampleClip.h"
 #include "TimePos.h"
 #include "LmmsTypes.h"
 #include "SampleThumbnail.h"
 
-class QPainter;
-class QPixmap;
+class QPushButton;
 class QScrollBar;
 
 namespace lmms
 {
 
-class NotePlayHandle;
+class MidiClip;
 
 namespace gui
 {
 
-class Knob;
 class ComboBox;
+class Knob;
 class TimeLineWidget;
 
 
