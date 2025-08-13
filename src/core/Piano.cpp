@@ -101,7 +101,7 @@ void Piano::handleKeyPress(int key, int midiVelocity)
 	}
 	if (isValidKey(key))
 	{
-		m_midiEvProc->processInEvent(MidiEvent(MidiNoteOn, -1, key, midiVelocity));
+		m_midiEvProc->processInEvent(MidiEvent(MidiNoteOn, 0, key, midiVelocity));
 	}
 }
 
@@ -117,7 +117,7 @@ void Piano::handleKeyRelease(int key)
 {
 	if (isValidKey(key))
 	{
-		m_midiEvProc->processInEvent(MidiEvent(MidiNoteOff, -1, key, 0));
+		m_midiEvProc->processInEvent(MidiEvent(MidiNoteOff, 0, key, 0));
 	}
 }
 

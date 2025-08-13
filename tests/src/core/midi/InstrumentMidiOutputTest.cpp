@@ -63,8 +63,8 @@ public:
 	{
 		using namespace lmms;
 		// Reset last event so that it doesn't accidentally get returned if this sent event doesn't generate an out event.
-		// Using MidiSystemReset as a temporary value. The -1 parameters are what should be checked to make sure the event is invalid (i.e., no event was recieved.)
-		m_instrument->m_lastEvent = MidiEvent(MidiSystemReset, -1, -1);
+		// Using MidiSystemReset as a temporary value. The -1 key/velocity is what should be checked to make sure the event is invalid (i.e., no event was recieved.)
+		m_instrument->m_lastEvent = MidiEvent(MidiSystemReset, 0, -1, -1);
 		m_track->processInEvent(event, 0, 0);
 		Engine::audioEngine()->renderNextBuffer();
 		return m_instrument->m_lastEvent;

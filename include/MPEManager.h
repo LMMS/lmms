@@ -28,6 +28,7 @@
 #include <array>
 #include <cassert>
 #include <cstdint>
+#include <optional>
 
 namespace lmms
 {
@@ -54,7 +55,7 @@ public:
 	}
 
 	//! Sets the MPE configuration before sending it as MIDI events
-	void config(std::uint8_t numChannelsLowerZone = 16, std::uint8_t numChannelsUpperZone = 0, std::uint8_t pitchBendRange = 48, Zone zone = Zone::Lower)
+	void config(uint8_t numChannelsLowerZone = 16, uint8_t numChannelsUpperZone = 0, uint8_t pitchBendRange = 48, Zone zone = Zone::Lower)
 	{
 		// Ensure the zones do not overlap
 		assert(numChannelsLowerZone + numChannelsUpperZone <= 16);
@@ -65,7 +66,7 @@ public:
 	}
 
 	//! Returns the channel in the current zone with the fewest notes, or with the oldest NoteOff. Returns -1 if the zone has no channels.
-	int findAvailableChannel();
+	std::optional<uint8_t> findAvailableChannel();
 
 	//! Calls processOutEvent on the given MidiEventProcessor (such as an InstrumentTrack) to send all the MPE configuration and pitch bend range events and reset the pitch bends for all channels.
 	void sendMPEConfigSignals(MidiEventProcessor* proc);
@@ -87,9 +88,9 @@ private:
 	std::array<int, 16> m_channelNoteCounts = {};
 	std::array<int, 16> m_channelNoteOffTimes = {};
 	int m_noteOffCount = 0; // Used in place of the current time as a way to compare the age of NoteOff events
-	std::uint8_t m_numChannelsLowerZone = 16;
-	std::uint8_t m_numChannelsUpperZone = 0;
-	std::uint8_t m_pitchBendRange = 48;
+	uint8_t m_numChannelsLowerZone = 16;
+	uint8_t m_numChannelsUpperZone = 0;
+	uint8_t m_pitchBendRange = 48;
 	Zone m_zone = Zone::Lower;
 } ;
 

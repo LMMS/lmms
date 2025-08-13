@@ -464,7 +464,7 @@ void InstrumentTrack::processOutEvent(const MidiEvent& event, const TimePos& tim
 	// Do nothing if we do not have an instrument instance (e.g. when loading settings)
 	if (m_instrument == nullptr) { return; }
 
-	const int channel = event.channel();
+	const uint8_t channel = event.channel();
 	const int key = event.key();
 
 	// Before passing the event to the plugin, do some checks to make sure there isn't a note already on.

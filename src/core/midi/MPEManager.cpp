@@ -30,7 +30,7 @@
 namespace lmms
 {
 
-int MPEManager::findAvailableChannel()
+std::optional<uint8_t> MPEManager::findAvailableChannel()
 {
 	// For the lower zone, the first channel, channel 0, is the Manager channel. The channels after that are Member channels.
 	// For the upper zone, the last channel, channel 15, is the Manager channel. The channels below 15 are Member channels.
@@ -40,7 +40,7 @@ int MPEManager::findAvailableChannel()
 		: m_numChannelsUpperZone;
 	const int numMemberChannels = numChannels - 1;
 	// Page 23, B.6, if there are no member channels the zone should deactivate.
-	if (numMemberChannels <= 0) { return -1; }
+	if (numMemberChannels <= 0) { return std::nullopt; }
 
 	const int firstMemberChannel = m_zone == Zone::Lower
 		? 1
@@ -102,7 +102,7 @@ void MPEManager::sendMPEConfigSignals(MidiEventProcessor* proc)
 	// Set pitch bend range on all Member channels.
 	// The manager channels are untouched, since those are controlled by the instrument track's pitch knob.
 	// Lower zone
-	for (int channel = 1; channel <= m_numChannelsLowerZone; ++channel)
+	for (int channel = 1; channel < m_numChannelsLowerZone; ++channel)
 	{
 		proc->processOutEvent(MidiEvent(MidiControlChange, channel, MidiControllerRegisteredParameterNumberMSB, (MidiPitchBendSensitivityRPN >> 8) & 0x7F));
 		proc->processOutEvent(MidiEvent(MidiControlChange, channel, MidiControllerRegisteredParameterNumberLSB, MidiPitchBendSensitivityRPN & 0x7F));

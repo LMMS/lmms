@@ -67,7 +67,7 @@ public:
 					const f_cnt_t frames,
 					const Note& noteToPlay,
 					NotePlayHandle* parent = nullptr,
-					int midiEventChannel = -1,
+					uint8_t midiEventChannel = 0,
 					Origin origin = Origin::MidiClip );
 	~NotePlayHandle() override;
 
@@ -331,7 +331,7 @@ private:
 	BaseDetuning* m_baseDetuning;
 	TimePos m_songGlobalParentOffset;
 
-	int m_midiChannel;
+	uint8_t m_midiChannel;
 	Origin m_origin;
 
 	bool m_frequencyNeedsUpdate;				// used to update pitch
@@ -350,7 +350,7 @@ public:
 					const f_cnt_t frames,
 					const Note& noteToPlay,
 					NotePlayHandle* parent = nullptr,
-					int midiEventChannel = -1,
+					uint8_t midiEventChannel = 0,
 					NotePlayHandle::Origin origin = NotePlayHandle::Origin::MidiClip );
 	static void release( NotePlayHandle * nph );
 	static void extend( int i );

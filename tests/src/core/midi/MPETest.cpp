@@ -174,17 +174,17 @@ private slots:
 		// Channel 15 is manager, channel 14 is member
 		QCOMPARE(mpeManager.findAvailableChannel(), 14);
 
-		// With no channels on a zone, the output channel should be -1, signifying that it should be routed to some default channel.
+		// With no channels on a zone, the output channel should be std::nullopt, signifying that it should be routed to some default channel.
 		mpeManager.config(0, 16, 48, MPEManager::Zone::Lower);
-		QCOMPARE(mpeManager.findAvailableChannel(), -1);
+		QCOMPARE(mpeManager.findAvailableChannel(), std::nullopt);
 		mpeManager.config(16, 0, 48, MPEManager::Zone::Upper);
-		QCOMPARE(mpeManager.findAvailableChannel(), -1);
+		QCOMPARE(mpeManager.findAvailableChannel(), std::nullopt);
 
 		// Likewise, if there is only one channel (the master channel), there are no member channels, so the mpe spec says the zone should deactivate (Page 23, B.6).
 		mpeManager.config(1, 15, 48, MPEManager::Zone::Lower);
-		QCOMPARE(mpeManager.findAvailableChannel(), -1);
+		QCOMPARE(mpeManager.findAvailableChannel(), std::nullopt);
 		mpeManager.config(15, 1, 48, MPEManager::Zone::Upper);
-		QCOMPARE(mpeManager.findAvailableChannel(), -1);
+		QCOMPARE(mpeManager.findAvailableChannel(), std::nullopt);
 	}
 
 	/** @brief Ensures MPE configuration messages are sent correctly
@@ -229,7 +229,7 @@ private slots:
 		for (auto it = proc.m_eventHistory.begin(); it != proc.m_eventHistory.end(); ++it)
 		{
 			MidiEvent& event = *it;
-			int channel = event.channel();
+			uint8_t channel = event.channel();
 			QVERIFY(channel >= 0 && channel < 16);
 
 			switch (event.type())
