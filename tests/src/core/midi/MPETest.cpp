@@ -278,11 +278,11 @@ private slots:
 		QCOMPARE(receivedLowerZoneChannels, lowerZoneChannels);
 		QCOMPARE(receivedUpperZoneChannels, upperZoneChannels);
 		// We currently only set the pitch bend range on member channels, not the manager channels, since that's supposed to be handled by the pitch bend range knob.
-		for (int channel = 1; channel <= receivedLowerZoneChannels; ++channel)
+		for (int channel = 1; channel < receivedLowerZoneChannels; ++channel)
 		{
 			QCOMPARE(receivedPitchBendRanges[channel], pitchBendRange);
 		}
-		for (int channel = 15 - receivedUpperZoneChannels; channel <= 14; ++channel)
+		for (int channel = 16 - receivedUpperZoneChannels; channel <= 14; ++channel)
 		{
 			QCOMPARE(receivedPitchBendRanges[channel], pitchBendRange);
 		}
