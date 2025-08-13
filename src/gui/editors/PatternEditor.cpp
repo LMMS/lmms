@@ -57,11 +57,11 @@ PatternEditor::PatternEditor(PatternStore* ps) :
 	setModel(ps);
 
 	m_timeLine = new TimeLineWidget(m_trackHeadWidth, 32, pixelsPerBar(),
-		Engine::getSong()->getPlayPos(Song::PlayMode::Pattern),
-		Engine::getSong()->getTimeline(Song::PlayMode::Pattern),
+		&Engine::getSong()->getTimeline(Song::PlayMode::Pattern),
 		m_currentPosition, Song::PlayMode::Pattern, this
 	);
-	connect(m_timeLine, &TimeLineWidget::positionChanged, this, &PatternEditor::updatePosition);
+	connect(this, &PatternEditor::positionChanged, m_timeLine, qOverload<>(&QWidget::update));
+	connect(m_timeLine->model(), &Timeline::positionChanged, this, &PatternEditor::updatePosition, Qt::QueuedConnection);
 	static_cast<QVBoxLayout*>(layout())->insertWidget(0, m_timeLine);
 
 	connect(m_ps, &PatternStore::trackUpdated,
