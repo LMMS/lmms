@@ -279,7 +279,6 @@ PianoRoll::PianoRoll() :
 		&Engine::getSong()->getTimeline(Song::PlayMode::MidiClip),
 		m_currentPosition, this
 	);
-	connect(this, &PianoRoll::positionChanged, m_timeLine, qOverload<>(&QWidget::update));
 	connect(m_timeLine->model(), &Timeline::positionChanged, this, &PianoRoll::updatePosition, Qt::QueuedConnection);
 
 	// white position line follows timeline marker
@@ -4291,8 +4290,8 @@ void PianoRoll::horScrolled(int new_pos )
 {
 	m_currentPosition = new_pos;
 	m_stepRecorderWidget.setCurrentPosition(m_currentPosition);
+	m_timeLine->update();
 	updatePositionLinePos();
-	emit positionChanged( m_currentPosition );
 	update();
 }
 

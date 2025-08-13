@@ -298,7 +298,6 @@ private:
 
 signals:
 	void currentClipChanged();
-	void positionChanged( const lmms::TimePos & );
 } ;
 
 

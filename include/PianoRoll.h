@@ -531,9 +531,6 @@ private:
 	QBrush m_blackKeyActiveBackground;
 	QBrush m_blackKeyInactiveBackground;
 	QBrush m_blackKeyDisabledBackground;
-
-signals:
-	void positionChanged( const lmms::TimePos & );
 } ;
 
 
