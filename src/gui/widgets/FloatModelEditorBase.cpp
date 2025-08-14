@@ -127,8 +127,8 @@ void FloatModelEditorBase::toggleScale()
 
 void FloatModelEditorBase::dragEnterEvent(QDragEnterEvent * dee)
 {
-	StringPairDrag::processDragEnterEvent(dee, "float_value,"
-							"automatable_model");
+	StringPairDrag::processDragEnterEvent(dee, {"float_value",
+							"automatable_model"});
 }
 
 

@@ -166,31 +166,16 @@ void SlicerTView::openFiles()
 // all the drag stuff is copied from AudioFileProcessor
 void SlicerTView::dragEnterEvent(QDragEnterEvent* dee)
 {
-	// For mimeType() and MimeType enum class
-	using namespace Clipboard;
-
-	if (dee->mimeData()->hasFormat(mimeType(MimeType::StringPair)))
-	{
-		QString txt = dee->mimeData()->data(mimeType(MimeType::StringPair));
-		if (txt.section(':', 0, 0) == QString("clip_%1").arg(static_cast<int>(Track::Type::Sample)))
-		{
-			dee->acceptProposedAction();
-		}
-		else if (txt.section(':', 0, 0) == "samplefile") { dee->acceptProposedAction(); }
-		else { dee->ignore(); }
-	}
-	else { dee->ignore(); }
+	StringPairDrag::processDragEnterEvent(dee, {"samplefile", QString("clip_%1").arg(static_cast<int>(Track::Type::Sample))});
 }
 
 void SlicerTView::dropEvent(QDropEvent* de)
 {
-	QString type = StringPairDrag::decodeKey(de);
-	QString value = StringPairDrag::decodeValue(de);
+	const auto [type, value] = Clipboard::decodeMimeData(de->mimeData());
+
 	if (type == "samplefile")
 	{
-		// set m_wf wave file
 		m_slicerTParent->updateFile(value);
-		return;
 	}
 	else if (type == QString("clip_%1").arg(static_cast<int>(Track::Type::Sample)))
 	{

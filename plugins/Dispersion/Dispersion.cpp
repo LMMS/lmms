@@ -45,7 +45,8 @@ Plugin::Descriptor PLUGIN_EXPORT dispersion_plugin_descriptor =
 	Plugin::Type::Effect,
 	new PluginPixmapLoader("logo"),
 	nullptr,
-	nullptr
+	nullptr,
+	nullptr,
 };
 
 }
