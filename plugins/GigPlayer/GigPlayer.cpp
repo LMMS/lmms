@@ -437,34 +437,38 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 			auto framesProcessed = f_cnt_t{0};
 			while (framesProcessed < frames)
 			{
-				if (sample.m_sourceWindow.empty())
-				{
-					loadSample(sample, sample.m_sourceBuffer.data(), sample.m_sourceBuffer.size());
-					sample.pos += sample.m_sourceBuffer.size();
-					sample.adsr.inc(sample.m_sourceBuffer.size());
-					sample.m_sourceWindow = {sample.m_sourceBuffer.begin(), sample.m_sourceBuffer.end()};
-				}
-
 				if (sample.m_mixWindow.empty())
 				{
-					sample.m_mixWindow = {sample.m_mixBuffer.begin(), sample.m_mixBuffer.end()};
+					if (sample.m_sourceWindow.empty())
+					{
+						loadSample(sample, sample.m_sourceBuffer.data(), sample.m_sourceBuffer.size());
+						sample.pos += sample.m_sourceBuffer.size();
+						sample.adsr.inc(sample.m_sourceBuffer.size());
+						sample.m_sourceWindow = {sample.m_sourceBuffer.begin(), sample.m_sourceBuffer.end()};
+
+						for (auto& frame : sample.m_sourceWindow)
+						{
+							frame *= copy.value();
+						}
+					}
+
+					const auto result = sample.m_resampler.process(
+						InterleavedBufferView<const float, 2>{sample.m_sourceWindow}, {&sample.m_mixBuffer[0][0], 2, sample.m_mixBuffer.size()});
+					
+					sample.m_sourceWindow = sample.m_sourceWindow.subspan(result.inputFramesUsed, sample.m_sourceWindow.size() - result.inputFramesUsed);
+					sample.m_mixWindow = {sample.m_mixBuffer.begin(), result.outputFramesGenerated};
 				}
 
-				const auto result
-					= sample.m_resampler.process({&sample.m_sourceWindow[0][0], 2, sample.m_sourceWindow.size()},
-						{&sample.m_mixWindow[0][0], 2, sample.m_mixWindow.size()});
+				const auto framesToMix = std::min(sample.m_mixWindow.size(), frames - framesProcessed);
 
-				const auto framesToProcess = std::min(frames - framesProcessed, result.outputFramesGenerated);
-
-				for (auto i = f_cnt_t{0}; i < framesToProcess; ++i)
+				for (auto i = f_cnt_t{0}; i < framesToMix; ++i)
 				{
-					const auto amp = copy.value();
-					_working_buffer[framesProcessed + i] += sample.m_mixWindow[i] * amp;
+					_working_buffer[framesProcessed + i][0] += sample.m_mixWindow[i][0];
+					_working_buffer[framesProcessed + i][1] += sample.m_mixWindow[i][1];
 				}
 
-				sample.m_sourceWindow = sample.m_sourceWindow.subspan(result.inputFramesUsed, sample.m_sourceWindow.size() - result.inputFramesUsed);
-				sample.m_mixWindow = sample.m_mixWindow.subspan(framesToProcess, sample.m_mixWindow.size() - framesToProcess);
-				framesProcessed += framesToProcess;
+				sample.m_mixWindow = sample.m_mixWindow.subspan(framesToMix, sample.m_mixWindow.size() - framesToMix);
+				framesProcessed += framesToMix;
 			}
 		}
 	}
