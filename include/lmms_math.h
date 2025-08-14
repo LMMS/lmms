@@ -148,14 +148,15 @@ inline float signedPowf(float v, float e)
 inline float logToLinearScale(float min, float max, float value)
 {
 	using namespace std::numbers;
+	const float valueLimited = std::clamp(value, 0.f, 1.f);
 	if (min < 0)
 	{
 		const float mmax = std::max(std::abs(min), std::abs(max));
-		const float val = value * (max - min) + min;
+		const float val = valueLimited * (max - min) + min;
 		float result = signedPowf(val / mmax, e_v<float>) * mmax;
 		return std::isnan(result) ? 0 : result;
 	}
-	float result = std::pow(value, e_v<float>) * (max - min) + min;
+	float result = std::pow(valueLimited, e_v<float>) * (max - min) + min;
 	return std::isnan(result) ? 0 : result;
 }
 
