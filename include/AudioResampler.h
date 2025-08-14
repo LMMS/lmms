@@ -117,7 +117,7 @@ public:
 private:
 	static auto converterType(Mode mode) -> int;
 
-	struct StateDeleter { void operator()(void* state); };
+	struct LMMS_EXPORT StateDeleter { void operator()(void* state); };
 	std::unique_ptr<void, StateDeleter> m_state = nullptr;
 
 	Mode m_mode;
