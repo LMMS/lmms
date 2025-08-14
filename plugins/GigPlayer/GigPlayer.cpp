@@ -463,8 +463,7 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 
 				for (auto i = f_cnt_t{0}; i < framesToMix; ++i)
 				{
-					_working_buffer[framesProcessed + i][0] += sample.m_mixWindow[i][0];
-					_working_buffer[framesProcessed + i][1] += sample.m_mixWindow[i][1];
+					_working_buffer[framesProcessed + i] += sample.m_mixWindow[i];
 				}
 
 				sample.m_mixWindow = sample.m_mixWindow.subspan(framesToMix, sample.m_mixWindow.size() - framesToMix);
