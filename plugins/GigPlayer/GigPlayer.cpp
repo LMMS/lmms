@@ -452,9 +452,10 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 						}
 					}
 
-					const auto result = sample.m_resampler.process(
-						InterleavedBufferView<const float, 2>{sample.m_sourceWindow}, {&sample.m_mixBuffer[0][0], 2, sample.m_mixBuffer.size()});
-					
+					const auto result
+						= sample.m_resampler.process({&sample.m_sourceWindow[0][0], 2, sample.m_sourceWindow.size()},
+							{&sample.m_mixBuffer[0][0], 2, sample.m_mixBuffer.size()});
+
 					sample.m_sourceWindow = sample.m_sourceWindow.subspan(result.inputFramesUsed, sample.m_sourceWindow.size() - result.inputFramesUsed);
 					sample.m_mixWindow = {sample.m_mixBuffer.begin(), result.outputFramesGenerated};
 				}
