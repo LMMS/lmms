@@ -32,9 +32,11 @@
 #include <QMutex>
 #include <samplerate.h>
 
+#include "AudioResampler.h"
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "LcdSpinBox.h"
+#include "SampleFrame.h"
 
 class QLabel;
 
@@ -103,7 +105,11 @@ public slots:
 	void updateTuning();
 
 private:
-	SRC_STATE * m_srcState;
+	AudioResampler m_resampler;
+
+	static constexpr auto BufferSize = f_cnt_t{16};
+	std::array<SampleFrame, BufferSize> m_buffer;
+	std::span<SampleFrame> m_window;
 
 	fluid_settings_t* m_settings;
 	fluid_synth_t* m_synth;
