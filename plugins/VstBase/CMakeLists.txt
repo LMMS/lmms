@@ -52,15 +52,17 @@ endforeach()
 # See upstream bug report: https://bugs.winehq.org/show_bug.cgi?id=58480
 if(LMMS_BUILD_LINUX AND (LMMS_HAVE_VST_32 OR LMMS_HAVE_VST_64))
 	ExternalProject_Add(custom-winebuild
-		GIT_REPOSITORY https://github.com/Fastigium/winebuild
-		GIT_TAG 7f9e27e44cfb8eba79f3850f46e12fbe3f4875a5
+		GIT_REPOSITORY https://github.com/tresf/wine
+		GIT_TAG dcad619b4c737fa7f964ad671ddd4732f26e0fcc
 		UPDATE_DISCONNECTED 1
 		PREFIX "${CMAKE_CURRENT_LIST_DIR}/custom-winebuild"
 		BUILD_ALWAYS ON
+		BUILD_IN_SOURCE 1
+		BUILD_COMMAND cd tools/winebuild && make
 		INSTALL_COMMAND ""
 	)
-	ExternalProject_Get_property(custom-winebuild BINARY_DIR)
-	set(CUSTOM_WINEBUILD_EXECUTABLE "${BINARY_DIR}/winebuild")
+	ExternalProject_Get_Property(custom-winebuild BINARY_DIR)
+	set(CUSTOM_WINEBUILD_EXECUTABLE "${BINARY_DIR}/tools/winebuild")
 endif()
 
 # build 32 bit version of RemoteVstPlugin
