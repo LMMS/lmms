@@ -46,37 +46,7 @@ FileDialog::FileDialog( QWidget *parent, const QString &caption,
 
 	setOption( QFileDialog::DontUseNativeDialog );
 
-#ifdef LMMS_BUILD_LINUX
-	QList<QUrl> urls;
-#else
 	QList<QUrl> urls = sidebarUrls();
-#endif
-
-	QDir desktopDir;
-	desktopDir.setPath(QStandardPaths::writableLocation(QStandardPaths::DesktopLocation));
-	if (desktopDir.exists())
-	{
-		urls << QUrl::fromLocalFile(desktopDir.absolutePath());
-	}
-	
-	QDir downloadDir(QDir::homePath() + "/Downloads");
-	if (!downloadDir.exists())
-	{
-		downloadDir.setPath(QStandardPaths::writableLocation(QStandardPaths::DownloadLocation));
-	}
-	if (downloadDir.exists())
-	{
-		urls << QUrl::fromLocalFile(downloadDir.absolutePath());
-	}
-
-	QDir musicDir;
-	musicDir.setPath(QStandardPaths::writableLocation(QStandardPaths::MusicLocation));
-	if (musicDir.exists())
-	{
-		urls << QUrl::fromLocalFile(musicDir.absolutePath());
-	}
-
-	urls << QUrl::fromLocalFile(ConfigManager::inst()->workingDir());
 	
 	// Add `/Volumes` directory on OS X systems, this allows the user to browse
 	// external disk drives.
