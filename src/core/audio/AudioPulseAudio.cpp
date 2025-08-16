@@ -221,7 +221,7 @@ void AudioPulseAudio::run()
 	}
 	else
 	{
-		while (true)
+		while (AudioDevice::isRunning())
 		{
 			audioEngine()->renderNextBuffer();
 		}
