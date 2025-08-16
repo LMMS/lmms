@@ -435,7 +435,7 @@ int AudioJack::processCallback(jack_nframes_t nframes)
 	}
 	else
 	{
-		nextBuffer({m_tempOutBufs, channels(), nframes});
+		nextBuffer(PlanarBufferView<float>{m_tempOutBufs, channels(), nframes});
 	}
 
 	return 0;

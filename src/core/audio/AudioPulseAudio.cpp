@@ -248,7 +248,7 @@ void AudioPulseAudio::streamWriteCallback(pa_stream*, size_t)
 	{
 		std::fill_n(static_cast<float*>(buf), numSamples, 0.f);
 	}
-	else { nextBuffer({reinterpret_cast<float*>(buf), channels(), numFrames}); }
+	else { nextBuffer(InterleavedBufferView<float>{reinterpret_cast<float*>(buf), channels(), numFrames}); }
 
 	pa_stream_write(m_s, buf, maxBufSizeInBytes, nullptr, 0, PA_SEEK_RELATIVE);
 }

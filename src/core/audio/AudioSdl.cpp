@@ -180,7 +180,7 @@ void AudioSdl::sdlAudioCallback( Uint8 * _buf, int _len )
 		return;
 	}
 
-	nextBuffer({reinterpret_cast<float*>(_buf), channels(), frameCount});
+	nextBuffer(InterleavedBufferView<float>{reinterpret_cast<float*>(_buf), channels(), frameCount});
 }
 
 void AudioSdl::sdlInputAudioCallback(void *_udata, Uint8 *_buf, int _len) {

@@ -65,7 +65,9 @@ void AudioDevice::stopProcessing()
 	stopProcessingImpl();
 }
 
-void AudioDevice::nextBuffer(InterleavedBufferView<float> dst)
+template void AudioDevice::nextBuffer<InterleavedBufferView<float>>(InterleavedBufferView<float> dst);
+template void AudioDevice::nextBuffer<PlanarBufferView<float>>(PlanarBufferView<float> dst);
+void AudioDevice::nextBuffer(AudioBufferView<float> auto dst)
 {
 	for (auto frame = std::size_t{0}; frame < dst.frames(); ++frame)
 	{
@@ -76,33 +78,16 @@ void AudioDevice::nextBuffer(InterleavedBufferView<float> dst)
 		{
 			if (dst.channels() == 1)
 			{
-				dst[frame][0] = audioEngineFrame.average();
+				if constexpr (decltype(dst)::Interleaved) { dst[frame][0] = audioEngineFrame.average(); }
+				else { dst[channel][frame] = audioEngineFrame.average(); }
 				continue;
 			}
 
-			dst[frame][channel] = channel < DEFAULT_CHANNELS ? audioEngineFrame[channel] : 0.f;
-		}
-
-		m_audioEngineBufferIndex = (m_audioEngineBufferIndex + 1) % m_audioEngine->framesPerPeriod();
-	}
-}
-
-void AudioDevice::nextBuffer(PlanarBufferView<float> dst)
-{
-	for (auto frame = std::size_t{0}; frame < dst.frames(); ++frame)
-	{
-		if (m_audioEngineBufferIndex == 0) { m_audioEngineBuffer = m_audioEngine->renderNextBuffer(); }
-		const auto audioEngineFrame = m_audioEngineBuffer[m_audioEngineBufferIndex];
-
-		for (auto channel = 0; channel < dst.channels(); ++channel)
-		{
-			if (dst.channels() == 1)
+			if constexpr (decltype(dst)::Interleaved)
 			{
-				dst[channel][frame] = audioEngineFrame.average();
-				continue;
+				dst[frame][channel] = channel < DEFAULT_CHANNELS ? audioEngineFrame[channel] : 0.f;
 			}
-
-			dst[channel][frame] = channel < DEFAULT_CHANNELS ? audioEngineFrame[channel] : 0.f;
+			else { dst[channel][frame] = channel < DEFAULT_CHANNELS ? audioEngineFrame[channel] : 0.f; }
 		}
 
 		m_audioEngineBufferIndex = (m_audioEngineBufferIndex + 1) % m_audioEngine->framesPerPeriod();

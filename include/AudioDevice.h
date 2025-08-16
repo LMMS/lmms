@@ -87,11 +87,7 @@ public:
 protected:
 	//! Render the next audio playback buffer into @p dst.
 	//! @return `true` if playback was rendered into @p dst.
-	void nextBuffer(InterleavedBufferView<float> dst);
-
-	//! Render the next audio playback buffer into @p dst.
-	//! @return `true` if playback was rendered into @p dst.
-	void nextBuffer(PlanarBufferView<float> dst);
+	void nextBuffer(AudioBufferView<float> auto dst);
 
 	// convert a given audio-buffer to a buffer in signed 16-bit samples
 	// returns num of bytes in outbuf
