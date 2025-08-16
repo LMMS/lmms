@@ -2,8 +2,6 @@
  * OscilloscopeControls.cpp - Oscilloscope effect controls/models
  *
  * Copyright (c) 2025 Keratin
- * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
- * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of LMMS - https://lmms.io
  *

@@ -2,8 +2,6 @@
 * OscilloscopeGraph.cpp - Oscilloscope graph widget to handle drawing the waveform and user scrolling/zooming
 *
 * Copyright (c) 2025 Keratin
-* Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
-* Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
 *
 * This file is part of LMMS - https://lmms.io
 *
