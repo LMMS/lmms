@@ -37,7 +37,6 @@
 #include "LmmsTypes.h"
 #include "SampleFrame.h"
 #include "LocklessList.h"
-#include "FifoBuffer.h"
 #include "AudioEngineProfiler.h"
 #include "PlayHandle.h"
 
@@ -160,10 +159,7 @@ public:
 
 	//! Set new audio device. Old device will be deleted,
 	//! unless it's stored using storeAudioDevice
-	void setAudioDevice( AudioDevice * _dev,
-				const struct qualitySettings & _qs,
-				bool _needs_fifo,
-				bool startNow );
+	void setAudioDevice(AudioDevice* _dev, const struct qualitySettings& _qs, bool startNow);
 	void storeAudioDevice();
 	void restoreAudioDevice();
 	inline AudioDevice * audioDev()
@@ -278,11 +274,6 @@ public:
 
 	bool criticalXRuns() const;
 
-	inline bool hasFifoWriter() const
-	{
-		return m_fifoWriter != nullptr;
-	}
-
 	void pushInputFrames( SampleFrame* _ab, const f_cnt_t _frames );
 
 	inline const SampleFrame* inputBuffer()
@@ -295,10 +286,7 @@ public:
 		return m_inputBufferFrames[ m_inputBufferRead ];
 	}
 
-	inline const SampleFrame* nextBuffer()
-	{
-		return hasFifoWriter() ? m_fifo->read() : renderNextBuffer();
-	}
+	const SampleFrame* renderNextBuffer();
 
 	void changeQuality(const struct qualitySettings & qs);
 
@@ -322,32 +310,11 @@ signals:
 
 
 private:
-	using Fifo = FifoBuffer<SampleFrame*>;
-
-	class fifoWriter : public QThread
-	{
-	public:
-		fifoWriter( AudioEngine * audioEngine, Fifo * fifo );
-
-		void finish();
-
-
-	private:
-		AudioEngine * m_audioEngine;
-		Fifo * m_fifo;
-		volatile bool m_writing;
-
-		void run() override;
-
-		void write(SampleFrame* buffer);
-	} ;
-
-
 	AudioEngine( bool renderOnly );
 	~AudioEngine() override;
 
-	void startProcessing(bool needsFifo = true);
-	void stopProcessing();
+	void startProcessing() { m_audioDev->startProcessing(); }
+	void stopProcessing() { m_audioDev->stopProcessing(); }
 
 
 	AudioDevice * tryAudioDevices();
@@ -358,7 +325,6 @@ private:
 	void renderStageEffects();
 	void renderStageMix();
 
-	const SampleFrame* renderNextBuffer();
 
 	void swapBuffers();
 
@@ -404,10 +370,6 @@ private:
 	// MIDI device stuff
 	MidiClient * m_midiClient;
 	QString m_midiClientName;
-
-	// FIFO stuff
-	Fifo * m_fifo;
-	fifoWriter * m_fifoWriter;
 
 	AudioEngineProfiler m_profiler;
 

@@ -103,12 +103,12 @@ private:
 	bool initJackClient();
 	void resizeInputBuffer(jack_nframes_t nframes);
 
+	void startProcessingImpl() override;
+	void stopProcessingImpl() override;
+
 	void attemptToConnect(size_t index, const char *lmms_port_type, const char *source_port, const char *destination_port);
 	void attemptToReconnectOutput(size_t outputIndex, const QString& targetPort);
 	void attemptToReconnectInput(size_t inputIndex, const QString& sourcePort);
-
-	void startProcessing() override;
-	void stopProcessing() override;
 
 	void registerPort(AudioBusHandle* port) override;
 	void unregisterPort(AudioBusHandle* port) override;
