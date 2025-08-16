@@ -47,7 +47,6 @@ AudioPulseAudio::AudioPulseAudio(bool& _success_ful, AudioEngine* _audioEngine)
 					  ConfigManager::inst()->value("audiopa", "channels").toInt(), DEFAULT_CHANNELS, DEFAULT_CHANNELS),
 		  _audioEngine)
 	, m_s(nullptr)
-	, m_quit(false)
 {
 	_success_ful = false;
 
@@ -96,7 +95,6 @@ void AudioPulseAudio::startProcessingImpl()
 
 void AudioPulseAudio::stopProcessingImpl()
 {
-	m_quit = true;
 	stopProcessingThread( this );
 }
 
@@ -210,11 +208,7 @@ void AudioPulseAudio::run()
 	if( m_connected )
 	{
 		int ret = 0;
-		m_quit = false;
-		while( m_quit == false
-			&& pa_mainloop_iterate( mainLoop, 1, &ret ) >= 0 )
-		{
-		}
+		while (AudioDevice::isRunning() && pa_mainloop_iterate(mainLoop, 1, &ret) >= 0) {}
 
 		pa_stream_disconnect( m_s );
 		pa_stream_unref( m_s );

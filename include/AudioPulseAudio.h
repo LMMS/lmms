@@ -90,8 +90,6 @@ private:
 	void stopProcessingImpl() override;
 	void run() override;
 
-	volatile bool m_quit;
-
 	bool m_connected;
 	QSemaphore m_connectedSemaphore;
 
