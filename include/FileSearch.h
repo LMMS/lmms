@@ -46,7 +46,7 @@ public:
 		QFlags<QDir::Filter> dirFilters; //! The directory filter flag.
 	};
 
-	//! Create a search objec with the given @p parent (if any).
+	//! Create a search object with the given @p parent (if any).
 	FileSearch(QObject* parent = nullptr);
 
 	//! Stop processing and destroys the object.
