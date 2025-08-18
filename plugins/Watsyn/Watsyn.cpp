@@ -754,7 +754,7 @@ WatsynView::WatsynView( Instrument * _instrument,
 	b2_selectButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "b2_inactive" ) );
 	b2_selectButton->setToolTip(tr("Select oscillator B2"));
 
-	m_selectedGraphGroup = new automatableButtonGroup( this );
+	m_selectedGraphGroup = new AutomatableButtonGroup( this );
 	m_selectedGraphGroup -> addButton( a1_selectButton );
 	m_selectedGraphGroup -> addButton( a2_selectButton );
 	m_selectedGraphGroup -> addButton( b1_selectButton );
@@ -787,7 +787,7 @@ WatsynView::WatsynView( Instrument * _instrument,
 	amod_pmButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "apm_inactive" ) );
 	amod_pmButton->setToolTip(tr("Modulate phase of A1 by output of A2"));
 
-	m_aModGroup = new automatableButtonGroup( this );
+	m_aModGroup = new AutomatableButtonGroup( this );
 	m_aModGroup -> addButton( amod_mixButton );
 	m_aModGroup -> addButton( amod_amButton );
 	m_aModGroup -> addButton( amod_rmButton );
@@ -818,7 +818,7 @@ WatsynView::WatsynView( Instrument * _instrument,
 	bmod_pmButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "bpm_inactive" ) );
 	bmod_pmButton->setToolTip(tr("Modulate phase of B1 by output of B2"));
 
-	m_bModGroup = new automatableButtonGroup( this );
+	m_bModGroup = new AutomatableButtonGroup( this );
 	m_bModGroup -> addButton( bmod_mixButton );
 	m_bModGroup -> addButton( bmod_amButton );
 	m_bModGroup -> addButton( bmod_rmButton );
