@@ -514,7 +514,7 @@ int OpulenzInstrument::Hz2fnum(float Hz) {
 
 // Load one of the default patches
 void OpulenzInstrument::loadGMPatch() {
-	unsigned char *inst = midi_fm_instruments[m_patchModel.value()];
+	const unsigned char* inst = midi_fm_instruments[m_patchModel.value()];
 	loadPatch(inst);
 }
 
