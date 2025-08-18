@@ -151,6 +151,7 @@ protected:
 
 	TrackView * m_trackView;
 	TimePos m_initialClipPos;
+	TimePos m_initialClipStartOffset;
 	TimePos m_initialClipEnd;
 
 	bool m_marker = false;
@@ -196,6 +197,7 @@ private:
 		None,
 		Move,
 		MoveSelection,
+		MoveContent,
 		Resize,
 		ResizeLeft,
 		Split,
@@ -235,12 +237,14 @@ private:
 		m_initialMousePos = pos;
 		m_initialMouseGlobalPos = mapToGlobal( pos );
 		m_initialClipPos = m_clip->startPosition();
+		m_initialClipStartOffset = m_clip->startTimeOffset();
 		m_initialClipEnd = m_initialClipPos + m_clip->length();
 	}
 	void setInitialOffsets();
 
 	bool mouseMovedDistance( QMouseEvent * me, int distance );
-	TimePos draggedClipPos( QMouseEvent * me );
+	TimePos draggedClipPos(QMouseEvent * me);
+	TimePos draggedClipContentOffset(QMouseEvent * me);
 	int knifeMarkerPos( QMouseEvent * me );
 	void setColor(const std::optional<QColor>& color);
 	
