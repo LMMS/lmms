@@ -71,8 +71,8 @@ void FileSearch::runSearch(Task task)
 		const auto token = match.captured(1);
 		const auto quotedToken = match.captured(2);
 
-		if (!token.isNull()) { tokens.push_back(token); }
-		if (!quotedToken.isNull()) { tokens.push_back(quotedToken); }
+		if (!token.isEmpty()) { tokens.push_back(token); }
+		if (!quotedToken.isEmpty()) { tokens.push_back(quotedToken); }
 	}
 
 	emit started();
