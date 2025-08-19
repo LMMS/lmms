@@ -30,9 +30,9 @@
 namespace lmms {
 
 AudioResampler::AudioResampler(Mode mode, ch_cnt_t channels)
-	: m_state(src_new(converterType(mode), channels, &m_error))
-	, m_mode(mode)
-	, m_channels(channels)
+	: m_state{src_new(converterType(mode), channels, &m_error)}
+	, m_mode{mode}
+	, m_channels{channels}
 {
 	if (channels <= 0) { throw std::logic_error{"Invalid channel count"}; }
 	if (!m_state) { throw std::runtime_error{src_strerror(m_error)}; }
