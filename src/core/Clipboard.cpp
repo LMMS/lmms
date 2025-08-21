@@ -44,7 +44,7 @@ namespace lmms::Clipboard
 	};
 
 	//! gets the extension of a file, or returns the string back if no extension is found
-	inline QString getExtension(const QString& file)
+	static QString getExtension(const QString& file)
 	{
 		QFileInfo fi(file);
 		const QString ext = fi.suffix().toLower();
