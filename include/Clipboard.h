@@ -31,33 +31,35 @@
 #include "lmms_export.h"
 
 
-namespace lmms::gui {
-class FileItem;
+namespace lmms::gui
+{
+	class FileItem;
 }
+
 class QMimeData;
 
 namespace lmms::Clipboard
 {
-void updateExtensionMap();
+	void updateExtensionMap();
 
-bool isType(const QString& ext, const QString& mimetype);
-bool isAudioFile(const QString& ext);
-bool isProjectFile(const QString& ext);
-bool isPresetFile(const QString& ext);
-bool isSoundFontFile(const QString& ext);
-bool isPatchFile(const QString& ext);
-bool isMidiFile(const QString& ext);
-bool isVstPluginFile(const QString& ext);
+	bool isType(const QString& ext, const QString& mimetype);
+	bool isAudioFile(const QString& ext);
+	bool isProjectFile(const QString& ext);
+	bool isPresetFile(const QString& ext);
+	bool isSoundFontFile(const QString& ext);
+	bool isPatchFile(const QString& ext);
+	bool isMidiFile(const QString& ext);
+	bool isVstPluginFile(const QString& ext);
 
 
-enum class MimeType
+	enum class MimeType
 	{
 		StringPair,
 		Default
 	};
 
 	// Convenience Methods
-	const QMimeData * getMimeData();
+	static const QMimeData * getMimeData();
 	bool hasFormat( MimeType mT );
 
 	// Helper methods for String data

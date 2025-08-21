@@ -24,7 +24,6 @@
 
 #include "PluginFactory.h"
 
-#include <Clipboard.h>
 #include <QCoreApplication>
 #include <QDebug>
 #include <QDir>
@@ -32,6 +31,7 @@
 #include <QRegularExpression>
 #include <memory>
 
+#include "Clipboard.h"
 #include "ConfigManager.h"
 #include "Plugin.h"
 #include "lmmsconfig.h"

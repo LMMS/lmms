@@ -80,7 +80,7 @@ namespace lmms::Clipboard
 		}
 	}
 
-bool isType(const QString& ext, const QString& mimetype)
+	bool isType(const QString& ext, const QString& mimetype)
 	{
 		auto it = mimetypes.find(mimetype.toStdString());
 		if (it == mimetypes.end()) { return false; }
@@ -99,7 +99,7 @@ bool isType(const QString& ext, const QString& mimetype)
 	bool isVstPluginFile(const QString& ext) { return isType(ext, "vstpluginfile"); }
 
 	//! Gets the clipboard mimedata. NOT the drag mimedata
-	const QMimeData* getMimeData()
+	static const QMimeData* getMimeData()
 	{
 		return QApplication::clipboard()->mimeData(QClipboard::Clipboard);
 	}
