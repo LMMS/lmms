@@ -517,11 +517,11 @@ FreeBoyInstrumentView::FreeBoyInstrumentView( Instrument * _instrument,
 
 
 	m_so1VolumeKnob = new FreeBoyKnob( this );
-	m_so1VolumeKnob->setHintText( tr( "Main volume (Right):" ), "" );
+	m_so1VolumeKnob->setHintText( tr( "Main volume (Left):" ), "" );
 	m_so1VolumeKnob->move( 5, 58 );
 
 	m_so2VolumeKnob = new FreeBoyKnob( this );
-	m_so2VolumeKnob->setHintText( tr( "Main volume (Left):" ), "" );
+	m_so2VolumeKnob->setHintText( tr( "Main volume (Right):" ), "" );
 	m_so2VolumeKnob->move( 5 + 32, 58 );
 
 	m_trebleKnob = new FreeBoyKnob( this );
