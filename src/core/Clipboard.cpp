@@ -24,6 +24,8 @@
 
 #include "Clipboard.h"
 
+#include <set>
+
 #include <QApplication>
 #include <QClipboard>
 
@@ -36,9 +38,9 @@ namespace lmms::Clipboard
 {
 
 	// there are other mimetypes, such as "samplefile", "patchfile" and "vstplugin" but they are generated dynamically.
-	static std::map<std::string, std::vector<std::string>> mimetypes =
+	static std::map<std::string, std::set<std::string>> mimetypes =
 	{
-		{"presetfile", {"xpf", "xml", "xiz", "lv2"}},
+		{"presetfile", {"xpf", "xml"}},
 		{"midifile", {"mid", "midi", "rmi"}},
 		{"projectfile", {"mmp", "mpt", "mmpz"}},
 	};
@@ -61,24 +63,18 @@ namespace lmms::Clipboard
 
 			if (mimetype == nullptr || mimetype[0] == '\0') { continue; }
 
-			std::vector<std::string> fileTypes;
+			std::set<std::string> fileTypes;
 
 			for (auto& fileType : QString(pluginInfo.descriptor->supportedFileTypes).split(","))
 			{
-				fileTypes.push_back(fileType.toStdString());
+				fileTypes.insert(fileType.toStdString());
 			}
 
 			auto& existingTypes = mimetypes[mimetype]; // creates key if not present
-
-			for (const auto& ext : fileTypes)
-			{
-				if (std::find(existingTypes.begin(), existingTypes.end(), ext) == existingTypes.end())
-				{
-					existingTypes.push_back(ext); // add only if not already present
-				}
-			}
+			existingTypes.insert(fileTypes.begin(), fileTypes.end()); // merge sets, no duplicates
 		}
 	}
+
 
 	bool isType(const QString& ext, const QString& mimetype)
 	{
