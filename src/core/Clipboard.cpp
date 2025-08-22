@@ -158,8 +158,8 @@ namespace lmms::Clipboard
 	{
 		const QList<QUrl> urls = mimeData->urls();
 
-		QString type("missing_type");
-		QString value("");
+		QString type{"missing_type"};
+		QString value;
 		if (!urls.isEmpty())
 		{
 			value = urls.first().toLocalFile();
