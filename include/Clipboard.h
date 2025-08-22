@@ -59,7 +59,7 @@ namespace lmms::Clipboard
 	};
 
 	// Convenience Methods
-	static const QMimeData * getMimeData();
+	const QMimeData * getMimeData();
 	bool hasFormat( MimeType mT );
 
 	// Helper methods for String data

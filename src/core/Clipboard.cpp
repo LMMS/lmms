@@ -99,7 +99,7 @@ namespace lmms::Clipboard
 	bool isVstPluginFile(const QString& ext) { return isType(ext, "vstpluginfile"); }
 
 	//! Gets the clipboard mimedata. NOT the drag mimedata
-	static const QMimeData* getMimeData()
+	const QMimeData* getMimeData()
 	{
 		return QApplication::clipboard()->mimeData(QClipboard::Clipboard);
 	}
