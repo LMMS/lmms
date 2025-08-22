@@ -842,10 +842,7 @@ void VestigeInstrumentView::dragEnterEvent(QDragEnterEvent* _dee)
 
 void VestigeInstrumentView::dropEvent(QDropEvent* _de)
 {
-	auto data = Clipboard::decodeMimeData(_de->mimeData());
-
-	QString type = data.first;
-	QString value = data.second;
+	const auto [type, value] = Clipboard::decodeMimeData(_de->mimeData());
 
 	if (type == "vstpluginfile")
 	{

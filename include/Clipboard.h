@@ -87,7 +87,7 @@ namespace lmms::Clipboard
 	 *         - first is a QString representing the inferred type (e.g., "presetfile", "midifile").
 	 *         - second is the QString value (e.g., file path or identifier).
 	 */
-	std::pair<QString, QString> decodeMimeData(const QMimeData* mimeData);
+	LMMS_EXPORT std::pair<QString, QString> decodeMimeData(const QMimeData* mimeData);
 	void startFileDrag(gui::FileItem* file, QObject* qo);
 
 	inline const char * mimeType( MimeType type )
