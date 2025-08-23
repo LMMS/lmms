@@ -51,16 +51,19 @@ endforeach()
 # use a custom winebuild to fix ASLR-related VST crashes.
 # See upstream bug report: https://bugs.winehq.org/show_bug.cgi?id=58480
 if(LMMS_BUILD_LINUX AND (LMMS_HAVE_VST_32 OR LMMS_HAVE_VST_64))
-	ExternalProject_Add(custom-winebuild
-		GIT_REPOSITORY https://github.com/Fastigium/winebuild
-		GIT_TAG 7f9e27e44cfb8eba79f3850f46e12fbe3f4875a5
-		UPDATE_DISCONNECTED 1
-		PREFIX "${CMAKE_CURRENT_LIST_DIR}/custom-winebuild"
+	ExternalProject_Add(wine
+		GIT_REPOSITORY https://github.com/tresf/wine
+		GIT_TAG 1f8bb63e75baa5c9f901c8f50b4ea9dd69e0baa0
+		GIT_SHALLOW ON
+		SOURCE_DIR "${CMAKE_CURRENT_BINARY_DIR}/wine"
+		SOURCE_SUBDIR tools/winebuild
 		BUILD_ALWAYS ON
+		BUILD_IN_SOURCE ON
 		INSTALL_COMMAND ""
 	)
-	ExternalProject_Get_property(custom-winebuild BINARY_DIR)
-	set(CUSTOM_WINEBUILD_EXECUTABLE "${BINARY_DIR}/winebuild")
+	ExternalProject_Get_Property(wine SOURCE_DIR)
+	set(CUSTOM_WINEBUILD_EXECUTABLE "${SOURCE_DIR}/tools/winebuild/winebuild")
+	message(STATUS "Using custom winebuild: ${CUSTOM_WINEBUILD_EXECUTABLE}")
 endif()
 
 # build 32 bit version of RemoteVstPlugin
