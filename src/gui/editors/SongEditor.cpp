@@ -226,6 +226,20 @@ SongEditor::SongEditor( Song * song ) :
 
 	getGUI()->mainWindow()->addWidgetToToolBar( vc_w );
 
+	// Active note counts
+	auto activeNoteCountSpinBox = new LcdSpinBox(3, tb, tr("Active Notes"));
+	activeNoteCountSpinBox->setModel(&m_song->m_activeNoteCountModel);
+	activeNoteCountSpinBox->setLabel( tr( "ACTIVE" ) );
+
+	auto maxActiveNoteCountSpinBox = new LcdSpinBox(3, tb, tr("Max Active Notes"));
+	maxActiveNoteCountSpinBox->setModel(&m_song->m_maxActiveNoteCountModel);
+	maxActiveNoteCountSpinBox->setLabel( tr( "MAX" ) );
+
+	getGUI()->mainWindow()->addWidgetToToolBar( activeNoteCountSpinBox );
+	getGUI()->mainWindow()->addWidgetToToolBar( maxActiveNoteCountSpinBox );
+	
+	getGUI()->mainWindow()->addSpacingToToolBar( 10 );
+
 	static_cast<QVBoxLayout *>( layout() )->insertWidget( 0, m_timeLine );
 
 	m_leftRightScroll = new QScrollBar( Qt::Horizontal, this );

@@ -65,6 +65,7 @@ InstrumentTrack::InstrumentTrack(TrackContainer* tc) :
 	m_pitchRangeModel(1, 1, 60, this, tr("Pitch range")),
 	m_mixerChannelModel(0, 0, 0, this, tr("Mixer channel")),
 	m_useMasterPitchModel(true, this, tr("Master pitch")),
+	m_activeNoteCountModel( 0, 0, 999, this, tr( "Number of active midi notes" ) ),
 	m_instrument(nullptr),
 	m_soundShaping(this),
 	m_arpeggio(this),
@@ -500,6 +501,7 @@ void InstrumentTrack::processOutEvent( const MidiEvent& event, const TimePos& ti
 			}
 			m_midiNotesMutex.unlock();
 			emit newNote();
+			m_activeNoteCountModel.setAutomatedValue(std::max(0, m_activeNoteCountModel.value() + 1));
 			break;
 
 		case MidiNoteOff:
@@ -512,6 +514,7 @@ void InstrumentTrack::processOutEvent( const MidiEvent& event, const TimePos& ti
 			}
 			m_midiNotesMutex.unlock();
 			emit endNote();
+			m_activeNoteCountModel.setAutomatedValue(std::max(0, m_activeNoteCountModel.value() - 1));
 			break;
 
 		default:
@@ -535,6 +538,7 @@ void InstrumentTrack::silenceAllNotes( bool removeIPH )
 		m_runningMidiNotes[i] = 0;
 	}
 	m_midiNotesMutex.unlock();
+	m_activeNoteCountModel.setAutomatedValue(0);
 
 	Engine::audioEngine()->requestChangeInModel();
 	// invalidate all NotePlayHandles and PresetPreviewHandles linked to this track

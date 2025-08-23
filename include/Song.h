@@ -462,6 +462,9 @@ private:
 	IntModel m_masterVolumeModel;
 	IntModel m_masterPitchModel;
 
+	IntModel m_activeNoteCountModel;
+	IntModel m_maxActiveNoteCountModel;
+
 	ControllerVector m_controllers;
 
 	int m_nLoadingTrack;

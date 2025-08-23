@@ -74,6 +74,8 @@ Song::Song() :
 	m_oldTicksPerBar( DefaultTicksPerBar ),
 	m_masterVolumeModel( 100, 0, 200, this, tr( "Master volume" ) ),
 	m_masterPitchModel( 0, -12, 12, this, tr( "Master pitch" ) ),
+	m_activeNoteCountModel( 0, 0, 999, this, tr( "Active note acount" ) ),
+	m_maxActiveNoteCountModel( 0, 0, 999, this, tr( "Max active note count" ) ),
 	m_nLoadingTrack( 0 ),
 	m_fileName(),
 	m_oldFileName(),
@@ -333,10 +335,16 @@ void Song::processNextBuffer()
 			processAutomations(trackList, getPlayPos(), framesToPlay);
 			processMetronome(frameOffsetInPeriod);
 
+			m_activeNoteCountModel.setAutomatedValue(0);
 			for (const auto track : trackList)
 			{
 				track->play(getPlayPos(), framesToPlay, frameOffsetInPeriod, clipNum);
+				if (dynamic_cast<InstrumentTrack*>(track))
+				{
+					m_activeNoteCountModel.setAutomatedValue(m_activeNoteCountModel.value() + dynamic_cast<InstrumentTrack*>(track)->activeNoteCountModel()->value());
+				}
 			}
+			m_maxActiveNoteCountModel.setAutomatedValue(std::max(m_maxActiveNoteCountModel.value(), m_activeNoteCountModel.value()));
 		}
 
 		// Update frame counters
@@ -717,6 +725,9 @@ void Song::stop()
 	m_playMode = PlayMode::None;
 
 	Engine::audioEngine()->doneChangeInModel();
+
+	m_activeNoteCountModel.setAutomatedValue(0);
+	m_maxActiveNoteCountModel.setAutomatedValue(0);
 
 	emit stopped();
 	emit playbackStateChanged();

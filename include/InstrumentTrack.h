@@ -228,6 +228,11 @@ public:
 		return &m_useMasterPitchModel;
 	}
 
+	IntModel* activeNoteCountModel()
+	{
+		return &m_activeNoteCountModel;
+	}
+
 	void setPreviewMode( const bool );
 
 	bool isPreviewMode() const
@@ -298,6 +303,8 @@ private:
 	IntModel m_pitchRangeModel;
 	IntModel m_mixerChannelModel;
 	BoolModel m_useMasterPitchModel;
+
+	IntModel m_activeNoteCountModel;
 
 	Instrument * m_instrument;
 	InstrumentSoundShaping m_soundShaping;

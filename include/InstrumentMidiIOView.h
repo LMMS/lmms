@@ -69,6 +69,7 @@ private:
 	QToolButton * m_wpBtn;
 
 	LcdSpinBox* m_baseVelocitySpinBox;
+	LcdSpinBox* m_activeNoteCountSpinBox;
 
 } ;
 

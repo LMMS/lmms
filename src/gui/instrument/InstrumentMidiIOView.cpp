@@ -27,6 +27,7 @@
 #include <QVBoxLayout>
 
 #include "InstrumentMidiIOView.h"
+#include "InstrumentTrack.h"
 #include "MidiPortMenu.h"
 #include "AudioEngine.h"
 #include "Engine.h"
@@ -155,6 +156,10 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 	m_baseVelocitySpinBox->setToolTip(tr("MIDI notes at this velocity correspond to 100% note velocity."));
 	baseVelocityLayout->addWidget( m_baseVelocitySpinBox );
 
+	m_activeNoteCountSpinBox = new LcdSpinBox(3, this);
+	m_activeNoteCountSpinBox->setLabel(tr("ACTIVE NOTES"));
+	layout->addWidget(m_activeNoteCountSpinBox);
+
 	layout->addStretch();
 }
 
@@ -177,6 +182,9 @@ void InstrumentMidiIOView::modelChanged()
 	m_outputProgramSpinBox->setModel( &mp->m_outputProgramModel );
 
 	m_baseVelocitySpinBox->setModel( &mp->m_baseVelocityModel );
+
+	InstrumentTrack* track = dynamic_cast<InstrumentTrack*>(mp->m_midiEventProcessor);
+	m_activeNoteCountSpinBox->setModel(track->activeNoteCountModel());
 
 	if( m_rpBtn )
 	{

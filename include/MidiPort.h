@@ -140,6 +140,7 @@ public:
 
 	gui::MidiPortMenu* m_readablePortsMenu;
 	gui::MidiPortMenu* m_writablePortsMenu;
+	MidiEventProcessor* m_midiEventProcessor;
 
 
 public slots:
@@ -154,7 +155,6 @@ private slots:
 
 private:
 	MidiClient* m_midiClient;
-	MidiEventProcessor* m_midiEventProcessor;
 
 	Mode m_mode;
 
