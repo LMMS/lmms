@@ -63,15 +63,13 @@ namespace lmms::Clipboard
 
 			if (mimetype == nullptr || mimetype[0] == '\0') { continue; }
 
-			std::set<std::string> fileTypes;
-
-			for (auto& fileType : QString(pluginInfo.descriptor->supportedFileTypes).split(","))
-			{
-				fileTypes.insert(fileType.toStdString());
-			}
-
 			auto& existingTypes = mimetypes[mimetype]; // creates key if not present
-			existingTypes.insert(fileTypes.begin(), fileTypes.end()); // merge sets, no duplicates
+
+			const auto fileTypes = QString(pluginInfo.descriptor->supportedFileTypes).split(",");
+			for (auto& fileType : fileTypes)
+			{
+				existingTypes.insert(fileType.toStdString());
+			}
 		}
 	}
 
