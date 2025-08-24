@@ -55,7 +55,6 @@ public:
 	void paintEvent(QPaintEvent* pe) override;
 	void wheelEvent(QWheelEvent* we) override;
 	void mousePressEvent(QMouseEvent* me) override;
-	void mouseReleaseEvent(QMouseEvent* me) override;
 	void mouseMoveEvent(QMouseEvent* me) override;
 private:
 	OscilloscopeControls* m_controls;
