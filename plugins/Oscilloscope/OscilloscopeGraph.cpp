@@ -83,7 +83,7 @@ void OscilloscopeGraph::paintEvent(QPaintEvent* pe)
 	const bool stereo = m_controls->m_stereoModel.value();
 
 
-	auto drawWaveform = [&](QColor& color, std::function<float(const SampleFrame&)> getChannel)
+	auto drawWaveform = [&](QColor& color, auto&& getChannel)
 	{
 		p.setCompositionMode(QPainter::CompositionMode_Plus);
 		p.setPen(color);
