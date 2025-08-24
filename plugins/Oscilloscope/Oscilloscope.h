@@ -43,7 +43,7 @@ public:
 		return &m_controls;
 	}
 
-	static constexpr int BufferSize = 44100*3;
+	static constexpr int BufferSize = 44100 * 3;
 
 	std::span<const SampleFrame, BufferSize> buffer() const { return m_ringBuffer; }
 	int bufferIndex() const { return m_ringBufferIndex; }
