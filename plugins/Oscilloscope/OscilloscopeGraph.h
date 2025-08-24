@@ -60,7 +60,6 @@ public:
 private:
 	OscilloscopeControls* m_controls;
 	int m_mousePos;
-	bool m_mousePressed = false;
 
 	QColor m_monoColor = QColor(255, 255, 255);
 	QColor m_leftColor = QColor(126, 146, 255, 128);

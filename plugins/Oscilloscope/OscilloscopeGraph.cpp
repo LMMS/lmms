@@ -139,12 +139,7 @@ void OscilloscopeGraph::wheelEvent(QWheelEvent* we)
 
 void OscilloscopeGraph::mousePressEvent(QMouseEvent* me)
 {
-	m_mousePressed = true;
 	m_mousePos = me->x();
-}
-void OscilloscopeGraph::mouseReleaseEvent(QMouseEvent* me)
-{
-	m_mousePressed = false;
 }
 
 void OscilloscopeGraph::mouseMoveEvent(QMouseEvent* me)
