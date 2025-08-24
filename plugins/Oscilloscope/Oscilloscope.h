@@ -43,15 +43,15 @@ public:
 		return &m_controls;
 	}
 
-	static const int BUFFER_SIZE = 44100*3;
+	static constexpr int BufferSize = 44100*3;
 
-	std::span<const SampleFrame, BUFFER_SIZE> buffer() const { return m_ringBuffer; }
+	std::span<const SampleFrame, BufferSize> buffer() const { return m_ringBuffer; }
 	int bufferIndex() const { return m_ringBufferIndex; }
 
 private:
 	OscilloscopeControls m_controls;
 
-	std::array<SampleFrame, BUFFER_SIZE> m_ringBuffer = {};
+	std::array<SampleFrame, BufferSize> m_ringBuffer = {};
 	int m_ringBufferIndex = 0;
 
 	friend class OscilloscopeControls;

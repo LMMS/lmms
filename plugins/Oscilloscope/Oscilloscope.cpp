@@ -61,7 +61,7 @@ Effect::ProcessStatus Oscilloscope::processImpl(SampleFrame* buffer, const fpp_t
 		for (f_cnt_t f = 0; f < frames; ++f)
 		{
 			m_ringBuffer[m_ringBufferIndex] = buffer[f];
-			m_ringBufferIndex = (m_ringBufferIndex + 1) % BUFFER_SIZE;
+			m_ringBufferIndex = (m_ringBufferIndex + 1) % BufferSize;
 		}
 	}
 	return ProcessStatus::Continue;
