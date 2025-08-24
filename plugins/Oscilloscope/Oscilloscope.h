@@ -45,7 +45,7 @@ public:
 
 	static const int BUFFER_SIZE = 44100*3;
 
-	const std::array<SampleFrame, BUFFER_SIZE>& buffer() const { return m_ringBuffer; }
+	std::span<const SampleFrame, BUFFER_SIZE> buffer() const { return m_ringBuffer; }
 	int bufferIndex() const { return m_ringBufferIndex; }
 
 private:
