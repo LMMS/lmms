@@ -57,7 +57,7 @@ Plugin::Descriptor PLUGIN_EXPORT lv2instrument_plugin_descriptor =
 	Plugin::Type::Instrument,
 	new PluginPixmapLoader("logo"),
 	"lv2",
-	"presetfile",
+	"pluginpresetfile",
 	new Lv2SubPluginFeatures(Plugin::Type::Instrument)
 };
 
@@ -257,7 +257,7 @@ Lv2InsView::Lv2InsView(Lv2Instrument *_instrument, QWidget *_parent) :
 
 void Lv2InsView::dragEnterEvent(QDragEnterEvent *_dee)
 {
-	StringPairDrag::processDragEnterEvent(_dee, {"presetfile"});
+	StringPairDrag::processDragEnterEvent(_dee, {"pluginpresetfile"});
 }
 
 
@@ -267,7 +267,7 @@ void Lv2InsView::dropEvent(QDropEvent* _de)
 {
 	const auto [type, value] = Clipboard::decodeMimeData(_de->mimeData());
 
-	if (type == "presetfile")
+	if (type == "pluginpresetfile")
 	{
 		castModel<Lv2Instrument>()->loadFile(value);
 		_de->accept();

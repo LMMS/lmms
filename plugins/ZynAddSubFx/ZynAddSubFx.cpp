@@ -70,7 +70,7 @@ Plugin::Descriptor PLUGIN_EXPORT zynaddsubfx_plugin_descriptor =
 	Plugin::Type::Instrument,
 	new PluginPixmapLoader( "logo" ),
 	"xiz",
-	"presetfile",
+	"pluginpresetfile",
 	nullptr,
 } ;
 
@@ -564,7 +564,7 @@ ZynAddSubFxView::ZynAddSubFxView( Instrument * _instrument, QWidget * _parent ) 
 
 void ZynAddSubFxView::dragEnterEvent(QDragEnterEvent* _dee)
 {
-	StringPairDrag::processDragEnterEvent(_dee, {"pluginpresetfile", "presetfile"});
+	StringPairDrag::processDragEnterEvent(_dee, {"pluginpresetfile"});
 }
 
 
