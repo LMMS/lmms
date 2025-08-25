@@ -281,12 +281,10 @@ private:
  */
 template<class ParentT, AudioPortsSettings settings, class AudioPortsT>
 class AudioPlugin
-	: public detail::AudioPlugin<ParentT, settings, AudioPortsT>
+	: public detail::AudioPlugin<ParentT, Validate<settings>::value, AudioPortsT>
 {
 	static_assert(std::is_base_of_v<AudioPorts<settings>, AudioPortsT>,
 		"AudioPortT must implement `AudioPorts`");
-
-	static_assert(validate<settings>());
 
 	using Base = typename detail::AudioPlugin<ParentT, settings, AudioPortsT>;
 

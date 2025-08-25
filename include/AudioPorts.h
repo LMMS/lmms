@@ -311,7 +311,7 @@ template<AudioPortsSettings settings>
 class AudioPorts
 	: public AudioPortsModel
 {
-	static_assert(validate<settings>());
+	static_assert(Validate<settings>{}());
 
 public:
 	AudioPorts(bool isInstrument, Model* parent = nullptr)

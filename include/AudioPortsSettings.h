@@ -103,7 +103,7 @@ struct AudioPortsSettings
 	 *      count is zero.)
 	 *
 	 * Also keep in mind that if you are unsure whether your desired `AudioPortsSettings` is valid, you may check it
-	 *   by calling `validate<settings>()`.
+	 *   by calling `Validate<settings>{}()`.
 	 */
 
 	//! The audio data type used by the processor
@@ -111,6 +111,12 @@ struct AudioPortsSettings
 
 	//! The audio data layout: interleaved or non-interleaved
 	bool interleaved;
+
+	/**
+	 * NOTE: When `DynamicChannelCount` is used for `inputs` or `outputs`, `AudioPorts` is inactive upon
+	 *     creation and must be provided with the channel counts (i.e. using `AudioPortsModel::setChannelCounts`)
+	 *     by the plugin implementation at runtime, then activated. Only then can the audio ports be used.
+	 */
 
 	//! The number of input channels, or `DynamicChannelCount` if unknown at compile time
 	proc_ch_t inputs = DynamicChannelCount;
@@ -174,12 +180,9 @@ struct AudioPortsSettings
 	constexpr auto operator==(const AudioPortsSettings& rhs) const -> bool = default;
 };
 
-/**
- * Checks that an `AudioPortsSettings` is valid.
- * Intended for use in static_assert().
- */
+//! Wrapper for checking that an `AudioPortsSettings` is valid
 template<AudioPortsSettings settings>
-constexpr auto validate() -> bool
+struct Validate
 {
 	static_assert(settings.inputs != 0 || settings.outputs != 0, "The input and output counts cannot both be zero");
 
@@ -197,8 +200,11 @@ constexpr auto validate() -> bool
 		|| settings.inputs == 0 || settings.outputs == 0,
 		"AudioPortsSettings: In-place processors must have equivalent input/output counts, or one must be zero.");
 
-	return true;
-}
+	static constexpr AudioPortsSettings value = settings;
+
+	//! Makes this struct usable in static_assert()
+	constexpr auto operator()() const noexcept -> bool { return true; }
+};
 
 } // namespace lmms
 
