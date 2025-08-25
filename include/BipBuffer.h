@@ -81,18 +81,34 @@ public:
 	}
 
 	/**
-	 * @brief Commit to writing @a size elements into the buffer.
+	 * @brief Acknowledge writing @a size elements into the buffer.
 	 *
 	 * @param size
 	 */
 	void commit(std::size_t size) { m_writeIndex = (m_writeIndex + size) % m_buffer.size(); }
 
 	/**
-	 * @brief Commit to reading @a size elements from the buffer.
+	 * @brief Acknowledge reading @a size elements from the buffer.
 	 *
 	 * @param size
 	 */
 	void decommit(std::size_t size) { m_readIndex = (m_readIndex + size) % m_buffer.size(); }
+
+	/**
+	 * @brief Checks if the buffer is empty
+	 * 
+	 * @return true if the buffer is empty
+	 * @return false if the buffer is not empty
+	 */
+	auto empty() const -> bool { return m_readIndex == m_writeIndex; }
+
+	/**
+	 * @brief Checks if the buffer is full
+	 * 
+	 * @return true if the buffer is full
+	 * @return false if the buffer is not full
+	 */
+	auto full() const -> bool { return (m_writeIndex + 1) % m_buffer.size() == m_readIndex; }
 
 private:
 	std::vector<T> m_buffer;
