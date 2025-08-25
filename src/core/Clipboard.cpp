@@ -80,7 +80,9 @@ namespace lmms::Clipboard
 		if (it == mimetypes.end()) { return false; }
 
 		const auto& fileTypes = it->second;
-		return std::ranges::find(fileTypes, getExtension(ext).toStdString()) != fileTypes.end();
+		const auto extStr = getExtension(ext).toStdString();
+
+		return fileTypes.find(extStr) != fileTypes.end();
 	}
 
 	bool isAudioFile(const QString& ext)		{ return isType(ext, "samplefile"); }
