@@ -28,6 +28,7 @@
 #include <algorithm>
 #include <span>
 #include <vector>
+#include "AudioEngine.h"
 
 namespace lmms {
 /**
@@ -43,11 +44,11 @@ template <typename T> class BipBuffer
 {
 public:
 	/**
-	 * @brief Construct a new Bip Buffer object that contains with a capacity of @a capacity elements
+	 * @brief Construct a new Bip Buffer object that contains with a capacity of @a capacity elements (default @a capacity is @ref DEFAULT_BUFFER_SIZE)
 	 *
 	 * @param capacity
 	 */
-	BipBuffer(std::size_t capacity)
+	BipBuffer(std::size_t capacity = DEFAULT_BUFFER_SIZE)
 		: m_buffer(capacity)
 	{
 	}
