@@ -61,9 +61,10 @@ public:
 	 */
 	[[nodiscard]] auto reserve(std::size_t size = static_cast<std::size_t>(-1)) -> std::span<T>
 	{
+		if (size == static_cast<std::size_t>(-1)) { size = m_buffer.size(); }
+
 		const auto available = m_writeIndex < m_readIndex ? m_readIndex - m_writeIndex - 1
 														  : m_buffer.size() - m_writeIndex - (m_readIndex == 0 ? 1 : 0);
-		size = std::clamp(size, std::size_t{0}, m_buffer.size());
 		return {&m_buffer[m_writeIndex], std::min(size, available)};
 	}
 
@@ -75,8 +76,9 @@ public:
 	 */
 	[[nodiscard]] auto retrieve(std::size_t size = static_cast<std::size_t>(-1)) -> std::span<const T>
 	{
+		if (size == static_cast<std::size_t>(-1)) { size = m_buffer.size(); }
+
 		const auto available = m_readIndex < m_writeIndex ? m_writeIndex - m_readIndex : m_buffer.size() - m_readIndex;
-		size = std::clamp(size, std::size_t{0}, m_buffer.size());
 		return {&m_buffer[m_readIndex], std::min(size, available)};
 	}
 
