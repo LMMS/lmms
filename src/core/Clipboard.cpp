@@ -40,7 +40,7 @@ namespace lmms::Clipboard
 	// there are other mimetypes, such as "samplefile", "patchfile" and "vstplugin" but they are generated dynamically.
 	static std::map<std::string, std::set<std::string>> mimetypes =
 	{
-		{"presetfile", {"xpf", "xml"}},
+		{"trackpresetfile", {"xpf", "xml"}},
 		{"midifile", {"mid", "midi", "rmi"}},
 		{"projectfile", {"mmp", "mpt", "mmpz"}},
 	};
@@ -88,7 +88,7 @@ namespace lmms::Clipboard
 	bool isAudioFile(const QString& ext)		{ return isType(ext, "samplefile"); }
 	bool isProjectFile(const QString& ext)		{ return isType(ext, "projectfile"); }
 	bool isPluginPresetFile(const QString& ext)	{ return isType(ext, "pluginpresetfile"); }
-	bool isPresetFile(const QString& ext)		{ return isType(ext, "presetfile"); }
+	bool isTrackPresetFile(const QString& ext)		{ return isType(ext, "trackpresetfile"); }
 	bool isSoundFontFile(const QString& ext)	{ return isType(ext, "soundfontfile"); }
 	bool isPatchFile(const QString& ext)		{ return isType(ext, "patchfile"); }
 	bool isMidiFile(const QString& ext)			{ return isType(ext, "midifile"); }
@@ -166,7 +166,7 @@ namespace lmms::Clipboard
 			if (isAudioFile(value)) { type = "samplefile"; }
 			else if (isVstPluginFile(value)) { type = "vstpluginfile"; }
 			else if (isPluginPresetFile(value)) { type = "pluginpresetfile"; }
-			else if (isPresetFile(value)) { type = "presetfile"; }
+			else if (isTrackPresetFile(value)) { type = "trackpresetfile"; }
 			else if (isMidiFile(value)) { type = "midifile"; }
 			else if (isProjectFile(value)) { type = "projectfile"; }
 			else if (isPatchFile(value)) { type = "patchfile"; }
@@ -194,7 +194,7 @@ namespace lmms::Clipboard
 		switch (f->type())
 		{
 		case gui::FileItem::FileType::Preset:
-			internalType = f->handling() == gui::FileItem::FileHandling::LoadAsPreset ? "presetfile" : "pluginpresetfile";
+			internalType = f->handling() == gui::FileItem::FileHandling::LoadAsPreset ? "trackpresetfile" : "pluginpresetfile";
 			iconName = "preset_file";
 			break;
 		case gui::FileItem::FileType::Sample:

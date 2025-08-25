@@ -369,7 +369,7 @@ void TrackContainerView::clearAllTracks()
 
 void TrackContainerView::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	StringPairDrag::processDragEnterEvent(_dee, {"presetfile", "pluginpresetfile", "samplefile", "instrument",
+	StringPairDrag::processDragEnterEvent(_dee, {"trackpresetfile", "pluginpresetfile", "samplefile", "instrument",
 				"midifile", "soundfontfile","patchfile","vstpluginfile","projectfile",
 				QString("track_%1").arg(static_cast<int>(Track::Type::Instrument)), QString("track_%1").arg(static_cast<int>(Track::Type::Sample))});
 }
@@ -411,7 +411,7 @@ void TrackContainerView::dropEvent(QDropEvent* _de)
 		//it->toggledInstrumentTrackButton( true );
 		_de->accept();
 	}
-	else if (type == "presetfile")
+	else if (type == "trackpresetfile")
 	{
 		QString ext = QFileInfo(value).suffix().toLower();
 

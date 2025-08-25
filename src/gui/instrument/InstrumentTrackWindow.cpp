@@ -560,7 +560,7 @@ void InstrumentTrackWindow::focusInEvent( QFocusEvent* )
 
 void InstrumentTrackWindow::dragEnterEventGeneric( QDragEnterEvent* event )
 {
-	StringPairDrag::processDragEnterEvent(event, {"instrument", "presetfile", "pluginpresetfile"});
+	StringPairDrag::processDragEnterEvent(event, {"instrument", "trackpresetfile", "pluginpresetfile"});
 }
 
 
@@ -588,7 +588,7 @@ void InstrumentTrackWindow::dropEvent( QDropEvent* event )
 		event->accept();
 		setFocus();
 	}
-	else if( type == "presetfile" )
+	else if( type == "trackpresetfile" )
 	{
 		DataFile dataFile(value);
 		m_track->replaceInstrument(dataFile);
