@@ -49,18 +49,18 @@ private:
 		using Type = ::lmms::Note::Type;
 
 		//! The pitch (tone), which can be lower or higher
-		uint8_t m_pitch;
+		uint8_t m_pitch = 0;
 
 		//! Volume (loudness)
-		uint8_t m_volume;
+		uint8_t m_volume = 0;
 
 		//! Absolute time (from song start) when the note starts playing
-		int m_time;
+		int m_time = 0;
 
 		//! For how long the note plays
-		int m_duration;
+		int m_duration = 0;
 
-		Type type;
+		Type type = Type::Regular;
 
 		//! Sort notes by time
 		inline bool operator<(const Note &b) const
@@ -97,13 +97,13 @@ private:
 	/*-----------------------------------------------------------------------*/
 
 	//! MIDI file object to work with
-	MidiFile *m_file;
+	MidiFile* m_file = nullptr;
 
 	//! Song global tempo
-	int m_tempo;
+	int m_tempo = 0;
 
 	//! Song master pitch
-	int m_masterPitch;
+	int m_masterPitch = 0;
 
 	//! Current (incremental) track channel number for non drum tracks
 	uint8_t m_channel = 0;
