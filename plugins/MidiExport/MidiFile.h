@@ -115,13 +115,13 @@ private:
 		{
 			NOTE_ON, NOTE_OFF, TEMPO, PROG_CHANGE, TRACK_NAME
 		}
-		m_type;
+		m_type = Type::NOTE_ON;
 
 		//! Time count when event happens
-		int m_time; // FIXME: was uint32_t
+		int m_time = 0; // FIXME: was uint32_t
 
 		//! Channel number where event is
-		uint8_t m_channel;
+		uint8_t m_channel = 0;
 
 		//! Union for saving space
 		union
@@ -141,7 +141,7 @@ private:
 			uint32_t m_tempo;
 
 			//! Program (patch) number of instrument
-			uint8_t m_programNumber;
+			uint8_t m_programNumber = 0;
 		};
 
 		//! Name of track where event is
