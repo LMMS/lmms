@@ -85,14 +85,14 @@ namespace lmms::Clipboard
 		return fileTypes.find(extStr) != fileTypes.end();
 	}
 
-	bool isAudioFile(const QString& ext)		{ return isType(ext, "samplefile"); }
-	bool isProjectFile(const QString& ext)		{ return isType(ext, "projectfile"); }
-	bool isPluginPresetFile(const QString& ext)	{ return isType(ext, "pluginpresetfile"); }
-	bool isTrackPresetFile(const QString& ext)		{ return isType(ext, "trackpresetfile"); }
-	bool isSoundFontFile(const QString& ext)	{ return isType(ext, "soundfontfile"); }
-	bool isPatchFile(const QString& ext)		{ return isType(ext, "patchfile"); }
-	bool isMidiFile(const QString& ext)			{ return isType(ext, "midifile"); }
-	bool isVstPluginFile(const QString& ext)	{ return isType(ext, "vstpluginfile"); }
+	bool isAudioFile(const QString& ext)        { return isType(ext, "samplefile"); }
+	bool isProjectFile(const QString& ext)      { return isType(ext, "projectfile"); }
+	bool isPluginPresetFile(const QString& ext) { return isType(ext, "pluginpresetfile"); }
+	bool isTrackPresetFile(const QString& ext)  { return isType(ext, "trackpresetfile"); }
+	bool isSoundFontFile(const QString& ext)    { return isType(ext, "soundfontfile"); }
+	bool isPatchFile(const QString& ext)        { return isType(ext, "patchfile"); }
+	bool isMidiFile(const QString& ext)         { return isType(ext, "midifile"); }
+	bool isVstPluginFile(const QString& ext)    { return isType(ext, "vstpluginfile"); }
 
 	//! Gets the clipboard mimedata. NOT the drag mimedata
 	const QMimeData* getMimeData()
