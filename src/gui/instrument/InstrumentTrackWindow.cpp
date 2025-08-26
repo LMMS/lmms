@@ -588,7 +588,7 @@ void InstrumentTrackWindow::dropEvent( QDropEvent* event )
 		event->accept();
 		setFocus();
 	}
-	else if( type == "trackpresetfile" )
+	else if (type == "trackpresetfile")
 	{
 		DataFile dataFile(value);
 		m_track->replaceInstrument(dataFile);
