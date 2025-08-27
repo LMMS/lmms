@@ -4,7 +4,6 @@
 .DS_Store
 *~
 /CMakeLists.txt.user
-/plugins/VstBase/custom-winebuild/
 /plugins/ZynAddSubFx/zynaddsubfx/ExternalPrograms/Controller/Makefile
 /plugins/ZynAddSubFx/zynaddsubfx/ExternalPrograms/Spliter/Makefile
 /plugins/ZynAddSubFx/zynaddsubfx/doc/Makefile
