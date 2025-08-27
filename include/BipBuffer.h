@@ -28,12 +28,13 @@
 #include <algorithm>
 #include <span>
 #include <vector>
+
 #include "AudioEngine.h"
 
 namespace lmms {
 /**
  * @brief BipBuffer is a class that implements the bip buffer (also known as the bipartite buffer). It is a specialized
- * version of the circular buffer, but only deals with contiguous regions. Users can @a reserve or @a retrieve
+ * version of the circular buffer that only deals with contiguous regions. Users can @a reserve or @a retrieve
  * contiguous regions within the buffer for writing data to or reading data from respectively. When the read or write
  * operation is complete, users can @a commit if to acknowledge data being written into the buffer, or @a decommit to
  * acknowledge reading elements from the buffer.
@@ -44,7 +45,8 @@ template <typename T> class BipBuffer
 {
 public:
 	/**
-	 * @brief Construct a new Bip Buffer object that contains with a capacity of @a capacity elements (default @a capacity is @ref DEFAULT_BUFFER_SIZE)
+	 * @brief Construct a new Bip Buffer object that contains with a capacity of @a capacity elements (default @a
+	 * capacity is @ref DEFAULT_BUFFER_SIZE)
 	 *
 	 * @param capacity
 	 */
@@ -61,8 +63,6 @@ public:
 	 */
 	[[nodiscard]] auto reserve(std::size_t size = static_cast<std::size_t>(-1)) -> std::span<T>
 	{
-		if (size == static_cast<std::size_t>(-1)) { size = m_buffer.size(); }
-
 		const auto available = m_writeIndex < m_readIndex ? m_readIndex - m_writeIndex - 1
 														  : m_buffer.size() - m_writeIndex - (m_readIndex == 0 ? 1 : 0);
 		return {&m_buffer[m_writeIndex], std::min(size, available)};
@@ -76,9 +76,7 @@ public:
 	 */
 	[[nodiscard]] auto retrieve(std::size_t size = static_cast<std::size_t>(-1)) -> std::span<const T>
 	{
-		if (size == static_cast<std::size_t>(-1)) { size = m_buffer.size(); }
-
-		const auto available = m_readIndex < m_writeIndex ? m_writeIndex - m_readIndex : m_buffer.size() - m_readIndex;
+		const auto available = m_readIndex <= m_writeIndex ? m_writeIndex - m_readIndex : m_buffer.size() - m_readIndex;
 		return {&m_buffer[m_readIndex], std::min(size, available)};
 	}
 
@@ -96,26 +94,10 @@ public:
 	 */
 	void decommit(std::size_t size) { m_readIndex = (m_readIndex + size) % m_buffer.size(); }
 
-	/**
-	 * @brief Checks if the buffer is empty
-	 * 
-	 * @return true if the buffer is empty
-	 * @return false if the buffer is not empty
-	 */
-	auto empty() const -> bool { return m_readIndex == m_writeIndex; }
-
-	/**
-	 * @brief Checks if the buffer is full
-	 * 
-	 * @return true if the buffer is full
-	 * @return false if the buffer is not full
-	 */
-	auto full() const -> bool { return (m_writeIndex + 1) % m_buffer.size() == m_readIndex; }
-
 private:
 	std::vector<T> m_buffer;
-	std::size_t m_readIndex = 0;
 	std::size_t m_writeIndex = 0;
+	std::size_t m_readIndex = 0;
 };
 } // namespace lmms
 
