@@ -30,10 +30,11 @@
 #include <QLibrary>
 #include <QRegularExpression>
 #include <memory>
-#include "lmmsconfig.h"
 
+#include "Clipboard.h"
 #include "ConfigManager.h"
 #include "Plugin.h"
+#include "lmmsconfig.h"
 
 // QT qHash specialization, needs to be in global namespace
 qint64 qHash(const QFileInfo& fi)
@@ -95,7 +96,10 @@ void PluginFactory::setupSearchPaths()
 PluginFactory* PluginFactory::instance()
 {
 	if (s_instance == nullptr)
+	{
 		s_instance = std::make_unique<PluginFactory>();
+		Clipboard::updateExtensionMap();
+	}
 
 	return s_instance.get();
 }

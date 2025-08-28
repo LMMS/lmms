@@ -34,9 +34,19 @@
 namespace lmms {
 
 extern "C" {
-Plugin::Descriptor PLUGIN_EXPORT taptempo_plugin_descriptor
-	= {LMMS_STRINGIFY(PLUGIN_NAME), "Tap Tempo", QT_TRANSLATE_NOOP("PluginBrowser", "Tap to the beat"),
-		"saker <sakertooth@gmail.com>", 0x0100, Plugin::Type::Tool, new PluginPixmapLoader("logo"), nullptr, nullptr};
+Plugin::Descriptor PLUGIN_EXPORT taptempo_plugin_descriptor =
+{
+	LMMS_STRINGIFY(PLUGIN_NAME),
+	"Tap Tempo",
+	QT_TRANSLATE_NOOP("PluginBrowser", "Tap to the beat"),
+	"saker <sakertooth@gmail.com>",
+	0x0100,
+	Plugin::Type::Tool,
+	new PluginPixmapLoader("logo"),
+	nullptr,
+	nullptr,
+	nullptr,
+};
 
 PLUGIN_EXPORT Plugin* lmms_plugin_main(Model*, void*)
 {
