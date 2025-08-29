@@ -1130,6 +1130,15 @@ lmms--gui--CompressorControlDialog lmms--gui--Knob {
 	qproperty-lineWidth: 2;
 }
 
+lmms--gui--OscilloscopeGraph {
+	qproperty-monoColor: rgb(255, 255, 255);
+	qproperty-leftColor: rgba(126, 146, 255, 0.5);
+	qproperty-rightColor: rgba(255, 128, 128, 0.5);
+	qproperty-minorLineColor: rgb(100, 100, 100);
+	qproperty-clippingLineColor: rgb(100, 0, 0);
+	qproperty-backgroundColor: rgb(0, 0, 0);
+}
+
 lmms--gui--VectorView {
 	qproperty-colorTrace: rgba(60, 255, 130, 255);
 	qproperty-colorGrid: rgba(76, 80, 84, 128);
