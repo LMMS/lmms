@@ -57,7 +57,7 @@ extern "C" {
 
 
 Analyzer::Analyzer(Model *parent, const Plugin::Descriptor::SubPluginFeatures::Key *key) :
-	Effect(&analyzer_plugin_descriptor, parent, key),
+	AudioPlugin(&analyzer_plugin_descriptor, parent, key),
 	m_processor(&m_controls),
 	m_controls(this),
 	m_processorThread(m_processor, m_inputBuffer),
@@ -77,7 +77,7 @@ Analyzer::~Analyzer()
 }
 
 // Take audio data and pass them to the spectrum processor.
-Effect::ProcessStatus Analyzer::processImpl(SampleFrame* buf, const fpp_t frames)
+ProcessStatus Analyzer::processImpl(InterleavedBufferView<float, 2> in)
 {
 	// Measure time spent in audio thread; both average and peak should be well under 1 ms.
 	#ifdef SA_DEBUG
@@ -96,7 +96,7 @@ Effect::ProcessStatus Analyzer::processImpl(SampleFrame* buf, const fpp_t frames
 	{
 		// To avoid processing spikes on audio thread, data are stored in
 		// a lockless ringbuffer and processed in a separate thread.
-		m_inputBuffer.write(buf, frames, true);
+		m_inputBuffer.write(reinterpret_cast<SampleFrame*>(in.data()), in.frames(), true);
 	}
 	#ifdef SA_DEBUG
 		audio_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - audio_time;

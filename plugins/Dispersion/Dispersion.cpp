@@ -52,7 +52,7 @@ Plugin::Descriptor PLUGIN_EXPORT dispersion_plugin_descriptor =
 
 
 DispersionEffect::DispersionEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key) :
-	Effect(&dispersion_plugin_descriptor, parent, key),
+	AudioPlugin(&dispersion_plugin_descriptor, parent, key),
 	m_dispersionControls(this),
 	m_sampleRate(Engine::audioEngine()->outputSampleRate()),
 	m_amountVal(0)
@@ -60,7 +60,7 @@ DispersionEffect::DispersionEffect(Model* parent, const Descriptor::SubPluginFea
 }
 
 
-Effect::ProcessStatus DispersionEffect::processImpl(SampleFrame* buf, const fpp_t frames)
+ProcessStatus DispersionEffect::processImpl(InterleavedBufferView<float, 2> inOut)
 {
 	const float d = dryLevel();
 	const float w = wetLevel();
@@ -98,9 +98,9 @@ Effect::ProcessStatus DispersionEffect::processImpl(SampleFrame* buf, const fpp_
 		m_feedbackVal[0] = m_feedbackVal[1] = 0;
 	}
 
-	for (fpp_t f = 0; f < frames; ++f)
+	for (float* frame : inOut.framesView())
 	{
-		std::array<sample_t, 2> s = { buf[f][0] + m_feedbackVal[0], buf[f][1] + m_feedbackVal[1] };
+		std::array<sample_t, 2> s = { frame[0] + m_feedbackVal[0], frame[1] + m_feedbackVal[1] };
 		
 		runDispersionAP(m_amountVal, apCoeff1, apCoeff2, s);
 		m_feedbackVal[0] = s[0] * feedback;
@@ -116,8 +116,8 @@ Effect::ProcessStatus DispersionEffect::processImpl(SampleFrame* buf, const fpp_
 			}
 		}
 
-		buf[f][0] = d * buf[f][0] + w * s[0];
-		buf[f][1] = d * buf[f][1] + w * s[1];
+		frame[0] = d * frame[0] + w * s[0];
+		frame[1] = d * frame[1] + w * s[1];
 	}
 
 	return ProcessStatus::ContinueIfNotQuiet;
