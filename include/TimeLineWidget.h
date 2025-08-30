@@ -68,8 +68,6 @@ public:
 	Q_PROPERTY(QColor activeLoopHandleColor MEMBER m_activeLoopHandleColor)
 	Q_PROPERTY( int loopRectangleVerticalPadding READ getLoopRectangleVerticalPadding WRITE setLoopRectangleVerticalPadding )
 	Q_PROPERTY(int loopHandleWidth MEMBER m_loopHandleWidth)
-	Q_PROPERTY(QSize mouseHotspotSelLeft READ mouseHotspotSelLeft WRITE setMouseHotspotSelLeft)
-	Q_PROPERTY(QSize mouseHotspotSelRight READ mouseHotspotSelRight WRITE setMouseHotspotSelRight)
 
 	enum class AutoScrollState
 	{
@@ -108,28 +106,6 @@ public:
 
 	inline int const & getLoopRectangleVerticalPadding() const { return m_loopRectangleVerticalPadding; }
 	inline void setLoopRectangleVerticalPadding(int const & loopRectangleVerticalPadding) { m_loopRectangleVerticalPadding = loopRectangleVerticalPadding; }
-
-	auto mouseHotspotSelLeft() const -> QSize
-	{
-		const auto point = m_cursorSelectLeft.hotSpot();
-		return QSize{point.x(), point.y()};
-	}
-
-	void setMouseHotspotSelLeft(const QSize& s)
-	{
-		m_cursorSelectLeft = QCursor{m_cursorSelectLeft.pixmap(), s.width(), s.height()};
-	}
-
-	auto mouseHotspotSelRight() const -> QSize
-	{
-		const auto point = m_cursorSelectRight.hotSpot();
-		return QSize{point.x(), point.y()};
-	}
-
-	void setMouseHotspotSelRight(const QSize& s)
-	{
-		m_cursorSelectRight = QCursor{m_cursorSelectRight.pixmap(), s.width(), s.height()};
-	}
 
 	inline Song::PlayPos & pos()
 	{
