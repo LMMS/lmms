@@ -209,31 +209,23 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 	p.setBrush( Qt::NoBrush );
 	p.drawRect( innerRectangle );
 	
-	// Draw loop handles if necessary
+	// Draw loop move handle if necessary
 	const auto markerMode = ConfigManager::inst()->value("app", "loopmarkermode");
 	const auto handleMode = markerMode == "handles" || markerMode == "closest"; // for compatibility
 	const auto shiftPressed = QGuiApplication::keyboardModifiers().testFlag(Qt::ShiftModifier);
-	const auto bigEnough = loopRectWidth >= (m_loopHandleWidth * 4 + m_loopMoveHandleWidth);
+	const auto bigEnough = loopRectWidth >= m_loopHandleWidth * 3;
+   // Hide handle during move because it moves slower than the cursor when a loop end goes off screen
+	const auto notDragging = m_action == Action::NoAction;
 
-	if (handleMode && underMouse() && shiftPressed && bigEnough)
+	if (handleMode && underMouse() && shiftPressed && bigEnough && notDragging)
 	{
 		const auto leftMostVisible = std::max(loopStart, m_xOffset);
 		const auto rightMostVisible = std::min(loopEndR, width());
 		const auto middle = leftMostVisible + (rightMostVisible - leftMostVisible) / 2;
-
-		const auto leftHandle = QRectF(loopStart - .5, loopRectMargin - .5, m_loopHandleWidth, loopRectHeight);
-		const auto rightHandle = QRectF(loopEndR - m_loopHandleWidth - .5, loopRectMargin - .5, m_loopHandleWidth, loopRectHeight);
-		const auto middleHandle = QRectF(middle - m_loopMoveHandleWidth / 2.0, loopRectMargin - .5, m_loopMoveHandleWidth, loopRectHeight);
+		const auto handle = QRectF(middle - m_loopHandleWidth / 2.0, loopRectMargin - .5,
+									m_loopHandleWidth, loopRectHeight);
 		const auto color = loopPointsActive ? m_activeLoopHandleColor : m_inactiveLoopHandleColor;
-
-		p.fillRect(leftHandle, color);
-		p.fillRect(rightHandle, color);
-		// Hide middle handle during move because it slides away
-		// from under the cursor when a loop end goes off screen
-		if (m_action == Action::NoAction)
-		{
-			p.fillRect(middleHandle, color);
-		}
+		p.fillRect(handle, color);
 	}
 
 	// Only draw the position marker if the position line is in view
@@ -267,13 +259,11 @@ auto TimeLineWidget::getLoopAction(QMouseEvent* event) const -> TimeLineWidget::
 		const auto rightMost = std::min(markerX(m_timeline->loopEnd()), width());
 		const auto middle = leftMost + (rightMost - leftMost) / 2;
 
-		// If the loop is tiny, don't show resize handles
-		const bool noHandles = (rightMost - leftMost) < (m_loopHandleWidth * 4 + m_loopMoveHandleWidth);
-		const auto moveHandleLeft = noHandles ? leftMost : middle - m_loopMoveHandleWidth / 2;
-		const auto moveHandleRight = noHandles ? rightMost : middle + m_loopMoveHandleWidth / 2;
+		const auto handleLeft = std::max(leftMost, middle - m_loopHandleWidth / 2);
+		const auto handleRight = std::min(rightMost, middle + m_loopHandleWidth / 2);
 
-		if (xPos < moveHandleLeft) { return Action::MoveLoopBegin; }
-		else if (xPos < moveHandleRight) { return Action::MoveLoop; }
+		if (xPos < handleLeft) { return Action::MoveLoopBegin; }
+		else if (xPos < handleRight) { return Action::MoveLoop; }
 		else { return Action::MoveLoopEnd; }
 	}
 	else // Default to dual-button mode

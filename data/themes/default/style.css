@@ -795,7 +795,7 @@ lmms--gui--TimeLineWidget {
 	   A value of zero draws the rectangle at the full height of the widget. */
 	qproperty-loopRectangleVerticalPadding: 1;
 	/* Width of loop marker handles (when handle mode is active) */
-	qproperty-loopHandleWidth: 8;
+	qproperty-loopHandleWidth: 30;
 
 	qproperty-barLineColor: rgb( 192, 192, 192 );
 	qproperty-barNumberColor: rgb( 192, 192, 192 );
