@@ -211,7 +211,7 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 	
 	// Draw loop move handle if necessary
 	const auto markerMode = ConfigManager::inst()->value("app", "loopmarkermode");
-	const auto handleMode = markerMode == "handles" || markerMode == "closest"; // for compatibility
+	const auto handleMode = markerMode == "closest" || markerMode == "handles"; // for backwards-compatibility
 	const auto shiftPressed = QGuiApplication::keyboardModifiers().testFlag(Qt::ShiftModifier);
 	const auto bigEnough = loopRectWidth >= m_loopHandleWidth * 3;
    // Hide handle during move because it moves slower than the cursor when a loop end goes off screen
@@ -252,7 +252,7 @@ auto TimeLineWidget::getLoopAction(QMouseEvent* event) const -> TimeLineWidget::
 	const auto xPos = event->x();
 	const auto button = event->button();
 
-	if (mode == "handles" || mode == "closest" /* for compatibility */)
+	if (mode == "closest" || mode == "handles" /* for compatibility */)
 	{
 		// Loop start and end pos, or closest edge of screen if loop extends off it
 		const auto leftMost = std::max(markerX(m_timeline->loopBegin()), m_xOffset);
@@ -450,7 +450,7 @@ void TimeLineWidget::contextMenuEvent(QContextMenuEvent* event)
 		if (loopMode == mode) { action->setChecked(true); }
 	};
 	addLoopModeAction(tr("Dual-button"), "dual");
-	addLoopModeAction(tr("Handles"), "handles");
+	addLoopModeAction(tr("Grab closest"), "closest");
 
 	menu.exec(event->globalPos());
 }
