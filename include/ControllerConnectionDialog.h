@@ -66,6 +66,11 @@ public:
 	{
 		return m_controller;
 	}
+	
+	bool modulation()
+	{
+		return m_modulationModel.value();
+	}
 
 public slots:
 //	void setSelection( const effectKey & _selection );
@@ -93,12 +98,14 @@ private:
 	// User
 	GroupBox * m_userGroupBox;
 	ComboBox * m_userController;
+	BoolModel m_modulationModel;
 
 	// Mapping
 	TabWidget * m_mappingBox;
 	QLineEdit * m_mappingFunction;
 
 	Controller * m_controller;
+	bool m_modulation;
 	const AutomatableModel * m_targetModel;
 
 	// Temporary midiController
