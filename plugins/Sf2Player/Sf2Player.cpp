@@ -585,7 +585,9 @@ void Sf2Instrument::reloadSynth()
 	// Set & get, returns the true sample rate
 	fluid_settings_setnum( m_settings, (char *) "synth.sample-rate", Engine::audioEngine()->outputSampleRate() );
 	fluid_settings_getnum( m_settings, (char *) "synth.sample-rate", &tempRate );
+
 	m_internalSampleRate = static_cast<int>( tempRate );
+	m_resampler.setRatio(m_internalSampleRate, Engine::audioEngine()->outputSampleRate());
 
 	if( m_font )
 	{
@@ -864,31 +866,28 @@ void Sf2Instrument::play( SampleFrame* _working_buffer )
 
 void Sf2Instrument::renderFrames( f_cnt_t frames, SampleFrame* buf )
 {
-	m_synthMutex.lock();
+	const auto guard = std::lock_guard{m_synthMutex};
+
 	fluid_synth_get_gain(m_synth); // This flushes voice updates as a side effect
 
-	m_resampler.setRatio(m_internalSampleRate, Engine::audioEngine()->outputSampleRate());
-
-	// TODO: Add an abstraction for these audio pipeline workflows
-	while (frames > 0)
-	{
-		if (m_window.empty())
-		{
-			const auto err
-				= fluid_synth_write_float(m_synth, m_buffer.size(), m_buffer.data(), 0, 2, m_buffer.data(), 1, 2);
-			if (err != FLUID_OK) { break; }
-			m_window = {m_buffer.data(), m_buffer.size()};
-		}
-
-		const auto result = m_resampler.process({&m_window[0][0], 2, m_window.size()}, {&buf[0][0], 2, frames});
-		if (result.outputFramesGenerated == 0) { break; }
-
-		m_window = m_window.subspan(result.inputFramesUsed, m_window.size() - result.inputFramesUsed);
-		buf += result.outputFramesGenerated;
-		frames -= result.outputFramesGenerated;
+	if (m_internalSampleRate == Engine::audioEngine()->outputSampleRate()) {
+		fluid_synth_write_float(m_synth, frames, buf, 0, 2, buf, 1, 2);
+		return;
 	}
 
-	m_synthMutex.unlock();
+	while (frames > 0)
+	{
+		const auto writeRegion = m_resampleBuffer.reserve();
+		fluid_synth_write_float(m_synth, writeRegion.size(), writeRegion.data(), 0, 2, writeRegion.data(), 1, 2);
+		m_resampleBuffer.commit(writeRegion.size());
+
+		const auto readRegion = m_resampleBuffer.retrieve();
+		const auto results = m_resampler.process({&readRegion[0][0], 2, readRegion.size()}, {&buf[0][0], 2, frames});
+		m_resampleBuffer.decommit(results.inputFramesUsed);
+
+		buf += results.outputFramesGenerated;
+		frames -= results.outputFramesGenerated;
+	}
 }
 
 

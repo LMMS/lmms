@@ -28,6 +28,7 @@
 #include <memory>
 
 #include "AudioResampler.h"
+#include "BipBuffer.h"
 #include "Note.h"
 #include "SampleBuffer.h"
 #include "lmms_export.h"
@@ -47,8 +48,7 @@ public:
 	{
 	public:
 		PlaybackState(AudioResampler::Mode interpolationMode = AudioResampler::Mode::Linear, int frameIndex = 0)
-			: m_window(m_buffer.data(), 0)
-			, m_resampler(interpolationMode)
+			: m_resampler(interpolationMode)
 			, m_frameIndex(frameIndex)
 		{
 		}
@@ -60,10 +60,8 @@ public:
 		void setBackwards(bool backwards) { m_backwards = backwards; }
 
 	private:
-		static constexpr auto BufferSize = f_cnt_t{16};
-		std::array<SampleFrame, BufferSize> m_buffer{};
-		std::span<SampleFrame> m_window{};
 		AudioResampler m_resampler;
+		BipBuffer<SampleFrame> m_buffer;
 		int m_frameIndex = 0;
 		bool m_backwards = false;
 		friend class Sample;

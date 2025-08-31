@@ -122,26 +122,27 @@ bool Sample::play(SampleFrame* dst, PlaybackState* state, size_t numFrames, Loop
 	const auto freqRatio = frequency() / DefaultBaseFreq;
 	state->m_resampler.setRatio(sampleRateRatio * freqRatio * ratio);
 
-	// TODO: Add an abstraction for these audio pipeline workflows
 	auto framesWritten = 0;
 	while (numFrames > 0)
 	{
-		if (state->m_window.empty())
+		const auto writeRegion = state->m_buffer.reserve();
+		const auto rendered = render(writeRegion.data(), writeRegion.size(), state, loop);
+		state->m_buffer.commit(rendered);
+
+		const auto readRegion = state->m_buffer.retrieve();
+		if (readRegion.empty())
 		{
-			const auto rendered = render(state->m_buffer.data(), state->m_buffer.size(), state, loop);
-			if (rendered == 0) { break; }
-			state->m_window = {state->m_buffer.data(), rendered};
+			std::fill_n(dst, numFrames, SampleFrame{});
+			break;
 		}
 
-		const auto result = state->m_resampler.process(
-			{&state->m_window[0][0], 2, state->m_window.size()}, {&dst[0][0], 2, numFrames});
+		const auto results
+			= state->m_resampler.process({&readRegion[0][0], 2, readRegion.size()}, {&dst[0][0], 2, numFrames});
+		state->m_buffer.decommit(results.inputFramesUsed);
 
-		if (result.outputFramesGenerated == 0) { break; }
-
-		state->m_window = state->m_window.subspan(result.inputFramesUsed, state->m_window.size() - result.inputFramesUsed);
-		dst += result.outputFramesGenerated;
-		numFrames -= result.outputFramesGenerated;
-		framesWritten += result.outputFramesGenerated;
+		dst += results.outputFramesGenerated;
+		numFrames -= results.outputFramesGenerated;
+		framesWritten += results.outputFramesGenerated;
 	}
 
 	return framesWritten > 0;

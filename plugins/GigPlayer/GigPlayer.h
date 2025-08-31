@@ -33,6 +33,7 @@
 #include <samplerate.h>
 
 #include "AudioResampler.h"
+#include "BipBuffer.h"
 #include "Instrument.h"
 #include "PixmapButton.h"
 #include "InstrumentView.h"
@@ -171,12 +172,8 @@ public:
 
 	// Used to convert sample rates
 	AudioResampler m_resampler;
-
-	static constexpr auto BufferSize = f_cnt_t{16};
-	std::array<SampleFrame, BufferSize> m_sourceBuffer{};
-	std::array<SampleFrame, BufferSize> m_mixBuffer{};
-	std::span<SampleFrame> m_sourceWindow{};
-	std::span<SampleFrame> m_mixWindow{};
+	BipBuffer<SampleFrame> m_sourceBuffer{};
+	BipBuffer<SampleFrame> m_mixBuffer{};
 
 	// Used changing the pitch of the note if desired
 	float sampleFreq;

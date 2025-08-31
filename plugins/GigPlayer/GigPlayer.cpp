@@ -433,42 +433,45 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 
 			sample.m_resampler.setRatio(freq_factor);
 
-			// TODO: Add an abstraction for these audio pipeline workflows
-			auto framesProcessed = f_cnt_t{0};
-			while (framesProcessed < frames)
+			auto framesMixed = f_cnt_t{0};
+			while (framesMixed < frames)
 			{
-				if (sample.m_mixWindow.empty())
 				{
-					if (sample.m_sourceWindow.empty())
-					{
-						loadSample(sample, sample.m_sourceBuffer.data(), sample.m_sourceBuffer.size());
-						sample.pos += sample.m_sourceBuffer.size();
-						sample.adsr.inc(sample.m_sourceBuffer.size());
-						sample.m_sourceWindow = {sample.m_sourceBuffer.begin(), sample.m_sourceBuffer.end()};
+					const auto region = sample.m_sourceBuffer.reserve();
+					loadSample(sample, region.data(), region.size());
 
-						for (auto& frame : sample.m_sourceWindow)
-						{
-							frame *= copy.value();
-						}
+					for (auto& frame : region)
+					{
+						frame *= copy.value();
 					}
 
-					const auto result
-						= sample.m_resampler.process({&sample.m_sourceWindow[0][0], 2, sample.m_sourceWindow.size()},
-							{&sample.m_mixBuffer[0][0], 2, sample.m_mixBuffer.size()});
-
-					sample.m_sourceWindow = sample.m_sourceWindow.subspan(result.inputFramesUsed, sample.m_sourceWindow.size() - result.inputFramesUsed);
-					sample.m_mixWindow = {sample.m_mixBuffer.begin(), result.outputFramesGenerated};
+					sample.pos += region.size();
+					sample.adsr.inc(region.size());
+					sample.m_sourceBuffer.commit(region.size());
 				}
 
-				const auto framesToMix = std::min(sample.m_mixWindow.size(), frames - framesProcessed);
-
-				for (auto i = f_cnt_t{0}; i < framesToMix; ++i)
 				{
-					_working_buffer[framesProcessed + i] += sample.m_mixWindow[i];
+					const auto readRegion = sample.m_sourceBuffer.retrieve();
+					const auto writeRegion = sample.m_mixBuffer.reserve();
+					const auto result = sample.m_resampler.process(
+						{&readRegion[0][0], 2, readRegion.size()}, {&writeRegion[0][0], 2, writeRegion.size()});
+
+					sample.m_sourceBuffer.decommit(result.inputFramesUsed);
+					sample.m_mixBuffer.commit(result.outputFramesGenerated);
 				}
 
-				sample.m_mixWindow = sample.m_mixWindow.subspan(framesToMix, sample.m_mixWindow.size() - framesToMix);
-				framesProcessed += framesToMix;
+				{
+					const auto region = sample.m_mixBuffer.retrieve();
+					const auto framesToMix = std::min(frames - framesMixed, region.size());
+
+					for (auto i = f_cnt_t{0}; i < framesToMix; ++i)
+					{
+						_working_buffer[framesMixed + i] += region[i];
+					}
+
+					framesMixed += framesToMix;
+					sample.m_mixBuffer.decommit(framesToMix);
+				}
 			}
 		}
 	}
