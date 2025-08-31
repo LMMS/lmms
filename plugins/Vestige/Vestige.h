@@ -101,6 +101,9 @@ protected slots:
 private:
 	auto processImpl(PlanarBufferView<const float> in, PlanarBufferView<float> out) -> ProcessStatus override;
 
+	auto processLock() -> bool override;
+	void processUnlock() override;
+
 	void closePlugin();
 
 	VstPlugin * m_plugin;

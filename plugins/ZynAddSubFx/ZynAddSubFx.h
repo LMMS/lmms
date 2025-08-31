@@ -110,6 +110,9 @@ private slots:
 private:
 	auto processImpl(PlanarBufferView<const float, 0> in, PlanarBufferView<float, 2> out) -> ProcessStatus override;
 
+	auto processLock() -> bool override;
+	void processUnlock() override;
+
 	void initPlugin();
 	void sendControlChange( MidiControllers midiCtl, float value );
 

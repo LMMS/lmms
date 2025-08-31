@@ -82,14 +82,9 @@ VstEffect::VstEffect( Model * _parent,
 auto VstEffect::processImpl(PlanarBufferView<const float> in, PlanarBufferView<float> out) -> ProcessStatus
 {
 	assert(m_plugin != nullptr);
-	if (m_pluginMutex.tryLock(Engine::getSong()->isExporting() ? -1 : 0))
+	if (!m_plugin->process())
 	{
-		if (!m_plugin->process())
-		{
-			m_pluginMutex.unlock();
-			return ProcessStatus::Sleep;
-		}
-		m_pluginMutex.unlock();
+		return ProcessStatus::Sleep;
 	}
 
 	// Lastly, perform wet/dry mixing on the output channels.
@@ -120,6 +115,22 @@ auto VstEffect::processImpl(PlanarBufferView<const float> in, PlanarBufferView<f
 	}
 
 	return ProcessStatus::ContinueIfNotQuiet;
+}
+
+
+
+
+auto VstEffect::processLock() -> bool
+{
+	return m_pluginMutex.tryLock(Engine::getSong()->isExporting() ? -1 : 0);
+}
+
+
+
+
+void VstEffect::processUnlock()
+{
+	m_pluginMutex.unlock();
 }
 
 

@@ -71,6 +71,9 @@ private slots:
 private:
 	ProcessStatus processImpl(InterleavedBufferView<float, 2> inOut) override;
 
+	auto processLock() -> bool override;
+	void processUnlock() override;
+
 	void pluginInstantiation();
 	void pluginDestruction();
 

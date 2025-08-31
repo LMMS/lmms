@@ -331,7 +331,6 @@ QString ZynAddSubFxInstrument::nodeName() const
 auto ZynAddSubFxInstrument::processImpl(PlanarBufferView<const float, 0> in, PlanarBufferView<float, 2> out)
 	-> ProcessStatus
 {
-	if (!m_pluginMutex.tryLock(Engine::getSong()->isExporting() ? -1 : 0)) { return ProcessStatus::Continue; }
 	if (m_remotePlugin)
 	{
 		m_remotePlugin->process();
@@ -340,10 +339,25 @@ auto ZynAddSubFxInstrument::processImpl(PlanarBufferView<const float, 0> in, Pla
 	{
 		m_localPlugin->process(out);
 	}
-	m_pluginMutex.unlock();
 
 	(void)in;
 	return ProcessStatus::Continue;
+}
+
+
+
+
+auto ZynAddSubFxInstrument::processLock() -> bool
+{
+	return m_pluginMutex.tryLock(Engine::getSong()->isExporting() ? -1 : 0);
+}
+
+
+
+
+void ZynAddSubFxInstrument::processUnlock()
+{
+	m_pluginMutex.unlock();
 }
 
 

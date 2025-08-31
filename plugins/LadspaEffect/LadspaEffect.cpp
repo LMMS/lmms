@@ -130,13 +130,6 @@ void LadspaEffect::changeSampleRate()
 
 ProcessStatus LadspaEffect::processImpl(InterleavedBufferView<float, 2> inOut)
 {
-	m_pluginMutex.lock();
-	if (!isOkay() || dontRun() || !isEnabled() || !isRunning())
-	{
-		m_pluginMutex.unlock();
-		return ProcessStatus::Sleep;
-	}
-
 	auto inOutSF = inOut.toSampleFrames();
 	const auto frames = inOutSF.size();
 	auto outFrames = frames;
@@ -253,9 +246,23 @@ ProcessStatus LadspaEffect::processImpl(InterleavedBufferView<float, 2> inOut)
 		sampleBack(inOutSF.data(), outBuf, m_maxSampleRate);
 	}
 
-	m_pluginMutex.unlock();
-
 	return ProcessStatus::ContinueIfNotQuiet;
+}
+
+
+
+
+auto LadspaEffect::processLock() -> bool
+{
+	return m_pluginMutex.tryLock(Engine::getSong()->isExporting() ? -1 : 0);
+}
+
+
+
+
+void LadspaEffect::processUnlock()
+{
+	m_pluginMutex.unlock();
 }
 
 

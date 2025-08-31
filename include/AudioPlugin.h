@@ -106,6 +106,23 @@ protected:
 };
 
 
+/**
+ * Some LMMS plugins currently require a lock around their process method to
+ * prevent threading issues.
+ *
+ * Until all process methods are made lock-free, plugins may override these lock/unlock
+ * methods to ensure their process method is protected.
+ */
+class ProcessMutex
+{
+protected:
+	//! @returns true if the lock was successfully acquired
+	virtual auto processLock() -> bool { return true; }
+
+	virtual void processUnlock() {}
+};
+
+
 //! Connects the core audio channels to the instrument or effect using the audio ports
 template<class ParentT, AudioPortsSettings settings, class AudioPortsT>
 class AudioPlugin
@@ -118,6 +135,7 @@ template<AudioPortsSettings settings, class AudioPortsT>
 class AudioPlugin<Instrument, settings, AudioPortsT>
 	: public Instrument
 	, public AudioProcessingMethod<Instrument, settings>
+	, public ProcessMutex
 {
 public:
 	template<typename... AudioPortsArgsT>
@@ -144,9 +162,16 @@ protected:
 
 	void playImpl(std::span<SampleFrame> inOut) final
 	{
+		if (!processLock())
+		{
+			// Failed to acquire lock
+			return;
+		}
+
 		if (!m_audioPorts.active())
 		{
 			// Plugin is not running
+			processUnlock();
 			return;
 		}
 
@@ -162,6 +187,8 @@ protected:
 			assert(status == ProcessStatus::Continue); // Only Continue is allowed for now
 			return ProcessStatus::Continue;
 		});
+
+		processUnlock();
 	}
 
 	void playNoteImpl(NotePlayHandle* notesToPlay, std::span<SampleFrame> inOut) final
@@ -186,6 +213,7 @@ template<AudioPortsSettings settings, class AudioPortsT>
 class AudioPlugin<Effect, settings, AudioPortsT>
 	: public Effect
 	, public AudioProcessingMethod<Effect, settings>
+	, public ProcessMutex
 {
 public:
 	template<typename... AudioPortsArgsT>
@@ -211,9 +239,17 @@ protected:
 
 	auto processCoreImpl(InterleavedBufferView<float, 2> inOut) -> bool final
 	{
+		if (!processLock())
+		{
+			// Failed to acquire lock
+			return true;
+		}
+
 		if (isSleeping() || !m_audioPorts.active())
 		{
+			// Plugin is not running
 			this->processBypassedImpl();
+			processUnlock();
 			return false;
 		}
 
@@ -236,12 +272,15 @@ protected:
 				handleAutoQuit(router.silentOutput());
 				break;
 			case ProcessStatus::Sleep:
+				processUnlock();
 				return false;
 			default:
 				break;
 		}
 
-		return isRunning();
+		const auto running = isRunning();
+		processUnlock();
+		return running;
 	}
 
 	/**

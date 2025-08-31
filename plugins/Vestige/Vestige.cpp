@@ -403,21 +403,32 @@ void VestigeInstrument::loadFile( const QString & _file )
 auto VestigeInstrument::processImpl(PlanarBufferView<const float> in, PlanarBufferView<float> out)
 	-> ProcessStatus
 {
-	if (!m_pluginMutex.tryLock(Engine::getSong()->isExporting() ? -1 : 0)) { return ProcessStatus::Continue; }
-
-	if (m_plugin == nullptr)
+	if (!m_plugin)
 	{
-		m_pluginMutex.unlock();
 		return ProcessStatus::Continue;
 	}
 
 	m_plugin->process();
 
-	m_pluginMutex.unlock();
-
 	(void)in;
 	(void)out;
 	return ProcessStatus::Continue;
+}
+
+
+
+
+auto VestigeInstrument::processLock() -> bool
+{
+	return m_pluginMutex.tryLock(Engine::getSong()->isExporting() ? -1 : 0);
+}
+
+
+
+
+void VestigeInstrument::processUnlock()
+{
+	m_pluginMutex.unlock();
 }
 
 
