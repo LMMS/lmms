@@ -1,0 +1,3 @@
+INCLUDE(BuildPlugin)
+
+BUILD_PLUGIN(PredictionDistort PredictionDistort.cpp PredictionDistortControls.cpp PredictionDistortControlDialog.cpp MOCFILES PredictionDistortControls.h PredictionDistortControlDialog.h EMBEDDED_RESOURCES artwork.svg logo.svg reverse_off.png reverse_on.png)
