@@ -145,7 +145,12 @@ public:
 	auto out() const -> const Matrix& { return m_out; }
 	auto trackChannelCount() const -> track_ch_t { return m_totalTrackChannels; }
 
-	//! This class is initialized once the number of in/out channels are known TODO: Remove?
+	/**
+	 * The model is initialized once the number of in/out channels are known.
+	 *
+	 * Audio processors with a dynamic number of input or output channels must manually set
+	 * the channel counts (i.e. with `setChannelCounts()`) to initialize the model.
+	 */
 	auto initialized() const -> bool { return m_in.m_channelCount != 0 || m_out.m_channelCount != 0; }
 
 	auto isInstrument() const -> bool { return m_isInstrument; }
@@ -182,12 +187,12 @@ signals:
 
 protected:
 	/**
-	 * To be implemented by the audio ports class.
-	 * Called when channel counts or sample rate changes.
+	 * Called when channel counts or the frame count are changing.
 	 *
-	 * NOTE: Virtual method, do not call in constructor.
+	 * The parameters will contain the new values, but `in().channelCount()` and `out().channelCount()`
+	 * will still return the old values until after this method is called.
 	 */
-	virtual void bufferPropertiesChanged(proc_ch_t inChannels, proc_ch_t outChannels, f_cnt_t frames) {}
+	virtual void bufferPropertiesChanging(proc_ch_t inChannels, proc_ch_t outChannels, f_cnt_t frames) = 0;
 
 	/**
 	 * Audio port implementations can override this to provide custom channel names,
@@ -195,28 +200,34 @@ protected:
 	 */
 	virtual auto channelName(proc_ch_t channel, bool isOutput) const -> QString;
 
-	//! This value is <= to the total number of track channels (currently always 2)
-	track_ch_t m_trackChannelsUpperBound = DEFAULT_CHANNELS; // TODO: Need to recalculate when pins are set/unset
+	/**
+	 * Caches the highest indexed track channel in use, so that the audio ports router can
+	 * loop over [0, trackChannelsUpperBound) rather than [0, totalTrackChannels).
+	 *
+	 * This value is always <= to the total number of track channels (currently always 2).
+	 * TODO: Need to recalculate when pins are set/unset
+	 */
+	auto trackChannelsUpperBound() const -> track_ch_t { return m_trackChannelsUpperBound; }
 
 	/**
 	 * Caches whether any processor output channels are routed to a given track channel (meaning the
 	 * track channel is used and not "bypassed"), which eliminates need for O(N) checking in
 	 * `AudioPorts::Router::receive()`.
 	 *
-	 * This means m_usedTrackChannels[i] == true if and only if m_out.enabled(i, x) == true
+	 * This means usedTrackChannels()[i] == true if and only if out().enabled(i, x) == true
 	 * for any audio processor channel x.
 	 */
-	std::vector<bool> m_usedTrackChannels;
+	auto usedTrackChannels() const -> const std::vector<bool>& { return m_usedTrackChannels; }
 
 	/**
 	 * Caches whether a given processor output channel is routed to any track channel (meaning the
 	 * processor channel is being used), which eliminates need for O(N) checking when calculating
 	 * the RMS for a processor that returned `ProcessStatus::ContinueIfNotQuiet`.
 	 *
-	 * This means m_usedProcessorChannels[i] == true if and only if m_out.enabled(x, i) == true
+	 * This means usedProcessorChannels()[i] == true if and only if out().enabled(x, i) == true
 	 * for any track channel x.
 	 */
-	std::vector<bool> m_usedProcessorChannels;
+	auto usedProcessorChannels() const -> const std::vector<bool>& { return m_usedProcessorChannels; }
 
 	/**
 	 * Any processor with 2-channel interleaved buffers connected to the track channels in the default
@@ -230,11 +241,11 @@ protected:
 	 * When std::nullopt, the optimization is disabled, otherwise the value equals the index of the track channel
 	 * pair currently routed to/from the processor.
 	 */
-	std::optional<track_ch_t> m_directRouting;
+	auto directRouting() const -> std::optional<track_ch_t> { return m_directRouting; }
 
 private:
 	auto setTrackChannelCountImpl(track_ch_t count) -> bool;
-	auto setProcessorChannelCountsImpl(proc_ch_t inCount, proc_ch_t outCount) -> bool;
+	auto setProcessorChannelCountsImpl(proc_ch_t inCount, proc_ch_t outCount, bool silent) -> bool;
 
 	/*
 	 * Cache update methods
@@ -258,6 +269,15 @@ private:
 	 * inputs is different from effects, even though they may both have the same channel counts.
 	 */
 	const bool m_isInstrument = false;
+
+	/*
+	 * The following are cached values meant to improve `AudioPorts::Router` performance
+	 */
+
+	track_ch_t m_trackChannelsUpperBound = DEFAULT_CHANNELS;
+	std::vector<bool> m_usedTrackChannels;
+	std::vector<bool> m_usedProcessorChannels;
+	std::optional<track_ch_t> m_directRouting;
 };
 
 } // namespace lmms

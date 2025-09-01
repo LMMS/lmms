@@ -47,14 +47,17 @@ AudioPortsModel::AudioPortsModel(proc_ch_t channelCountIn, proc_ch_t channelCoun
 	: Model{parent}
 	, m_isInstrument{isInstrument}
 {
-	setTrackChannelCountImpl(DEFAULT_CHANNELS); // TODO: Will be >=2 once support for additional track channels is added
-	setProcessorChannelCountsImpl(channelCountIn, channelCountOut);
+	setTrackChannelCountImpl(DEFAULT_CHANNELS);
+
+	// Set channel counts using silent==true because virtual methods like `bufferPropertiesChanging`
+	// should not be called in a constructor.
+	setProcessorChannelCountsImpl(channelCountIn, channelCountOut, true);
 
 	updateDirectRouting();
 	updateAllUsedChannels();
 
 	connect(Engine::audioEngine(), &AudioEngine::sampleRateChanged, [this]() {
-		bufferPropertiesChanged(in().channelCount(), out().channelCount(), Engine::audioEngine()->framesPerPeriod());
+		bufferPropertiesChanging(in().channelCount(), out().channelCount(), Engine::audioEngine()->framesPerPeriod());
 	});
 }
 
@@ -64,7 +67,7 @@ void AudioPortsModel::setAllChannelCounts(track_ch_t trackChannels, proc_ch_t in
 	const auto oldOutCount = m_out.channelCount();
 
 	const bool tcChanged = setTrackChannelCountImpl(trackChannels);
-	const bool pcChanged = setProcessorChannelCountsImpl(inCount, outCount);
+	const bool pcChanged = setProcessorChannelCountsImpl(inCount, outCount, false);
 	if (!tcChanged && !pcChanged) { return; }
 
 	// Now update the cache
@@ -80,12 +83,6 @@ void AudioPortsModel::setAllChannelCounts(track_ch_t trackChannels, proc_ch_t in
 	else if (m_out.channelCount() < oldOutCount)
 	{
 		updateAllUsedTrackChannels();
-	}
-
-	if (pcChanged)
-	{
-		// Now tell the audio buffer to update
-		bufferPropertiesChanged(inCount, outCount, Engine::audioEngine()->framesPerPeriod());
 	}
 
 	emit propertiesChanged();
@@ -111,7 +108,7 @@ void AudioPortsModel::setChannelCounts(proc_ch_t inCount, proc_ch_t outCount)
 {
 	const auto oldOutCount = m_out.channelCount();
 
-	if (!setProcessorChannelCountsImpl(inCount, outCount)) { return; }
+	if (!setProcessorChannelCountsImpl(inCount, outCount, false)) { return; }
 
 	// Now update the cache
 	updateDirectRouting();
@@ -119,9 +116,6 @@ void AudioPortsModel::setChannelCounts(proc_ch_t inCount, proc_ch_t outCount)
 	{
 		updateAllUsedTrackChannels();
 	}
-
-	// Now tell the audio buffer to update
-	bufferPropertiesChanged(inCount, outCount, Engine::audioEngine()->framesPerPeriod());
 
 	emit propertiesChanged();
 }
@@ -151,7 +145,7 @@ auto AudioPortsModel::setTrackChannelCountImpl(track_ch_t count) -> bool
 	return true;
 }
 
-auto AudioPortsModel::setProcessorChannelCountsImpl(proc_ch_t inCount, proc_ch_t outCount) -> bool
+auto AudioPortsModel::setProcessorChannelCountsImpl(proc_ch_t inCount, proc_ch_t outCount, bool silent) -> bool
 {
 	if (inCount == DynamicChannelCount || outCount == DynamicChannelCount)
 	{
@@ -168,6 +162,12 @@ auto AudioPortsModel::setProcessorChannelCountsImpl(proc_ch_t inCount, proc_ch_t
 	{
 		// No action needed
 		return false;
+	}
+
+	if (!silent)
+	{
+		// Tell the buffers to update
+		bufferPropertiesChanging(inCount, outCount, Engine::audioEngine()->framesPerPeriod());
 	}
 
 	m_usedProcessorChannels.resize(outCount);
@@ -419,22 +419,15 @@ void AudioPortsModel::Matrix::updateCache(track_ch_t trackChannel, proc_ch_t pro
 
 void AudioPortsModel::Matrix::setTrackChannelCount(track_ch_t count)
 {
-	auto oldSize = static_cast<track_ch_t>(m_pins.size());
-	if (oldSize > count)
+	const auto oldSize = static_cast<track_ch_t>(m_pins.size());
+	m_pins.resize(count);
+
+	if (count > oldSize)
 	{
-		m_pins.resize(count);
-	}
-	else if (oldSize < count)
-	{
-		m_pins.resize(count);
 		for (auto tcIdx = oldSize; tcIdx < count; ++tcIdx)
 		{
-			auto& channels = m_pins[tcIdx];
-			channels.reserve(m_channelCount);
-			for (proc_ch_t pcIdx = 0; pcIdx < m_channelCount; ++pcIdx)
-			{
-				channels.emplace_back(false);
-			}
+			auto& processorChannels = m_pins[tcIdx];
+			processorChannels.resize(m_channelCount, false);
 		}
 	}
 }
@@ -443,24 +436,9 @@ void AudioPortsModel::Matrix::setChannelCount(proc_ch_t count)
 {
 	const bool initialSetup = m_channelCount == 0;
 
-	if (channelCount() < count)
+	for (auto& processorChannels : m_pins)
 	{
-		for (track_ch_t tcIdx = 0; tcIdx < m_pins.size(); ++tcIdx)
-		{
-			auto& processorChannels = m_pins[tcIdx];
-			processorChannels.reserve(count);
-			for (proc_ch_t pcIdx = channelCount(); pcIdx < count; ++pcIdx)
-			{
-				processorChannels.emplace_back(false);
-			}
-		}
-	}
-	else if (channelCount() > count)
-	{
-		for (auto& processorChannels : m_pins)
-		{
-			processorChannels.erase(processorChannels.begin() + count, processorChannels.end());
-		}
+		processorChannels.resize(count, false);
 	}
 
 	m_channelCount = count;

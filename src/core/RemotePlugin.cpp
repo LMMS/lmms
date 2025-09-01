@@ -325,11 +325,23 @@ bool RemotePlugin::init(const QString &pluginExecutable,
 		waitForInitDone();
 	}
 
-	m_audioPorts->activate(Engine::audioEngine()->framesPerPeriod());
-
 	unlock();
 
 	return failed();
+}
+
+
+
+
+void RemotePlugin::waitForInitDone(bool busyWaiting)
+{
+	m_failed = waitForMessage(IdInitDone, busyWaiting).id != IdInitDone;
+
+	if (!m_failed)
+	{
+		// Activate audio ports after remote plugin is initialized
+		m_audioPorts->activate(Engine::audioEngine()->framesPerPeriod());
+	}
 }
 
 

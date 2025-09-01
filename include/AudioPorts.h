@@ -150,37 +150,57 @@ class AudioPorts;
 
 namespace detail {
 
-//! Interface for accessing input/output audio buffers
+/**
+ * Base interface for input/output audio buffers.
+ * Only the methods found here are safe to call when the buffers are not initialized.
+ */
+class AudioPortsBufferBase
+{
+public:
+	virtual ~AudioPortsBufferBase() = default;
+
+	//! Whether the buffers can be used
+	virtual auto initialized() const -> bool = 0;
+
+	//! May not return a meaningful result unless initialized
+	virtual auto frames() const -> fpp_t = 0;
+
+	/**
+	 * Initialize or update the buffers.
+	 * Never call while `AudioPorts` is active because the processor could be using the buffers.
+	 *
+	 * TODO: Rework plugin threading conventions + introduce plugin state (inactive/active/processing)
+	 *       so that this can be safely called after buffers are already initialized.
+	 */
+	virtual void updateBuffers(proc_ch_t channelsIn, proc_ch_t channelsOut, f_cnt_t frames) = 0;
+};
+
+/**
+ * Interface for accessing input/output audio buffers.
+ * Do not call the methods here unless the buffers are initialized.
+ */
 template<AudioPortsSettings settings, bool inplace = settings.inplace>
 class AudioPortsBuffer;
 
 //! Dynamically in-place specialization
 template<AudioPortsSettings settings>
-class AudioPortsBuffer<settings, false>
+class AudioPortsBuffer<settings, false> : public AudioPortsBufferBase
 {
 public:
-	virtual ~AudioPortsBuffer() = default;
-
 	virtual auto input() -> GetAudioBufferViewType<settings, false, false> = 0;
 	virtual auto output() -> GetAudioBufferViewType<settings, true, false> = 0;
-	virtual auto frames() const -> fpp_t = 0;
-	virtual void updateBuffers(proc_ch_t channelsIn, proc_ch_t channelsOut, f_cnt_t frames) = 0;
 };
 
 //! Statically in-place specialization
 template<AudioPortsSettings settings>
-class AudioPortsBuffer<settings, true>
+class AudioPortsBuffer<settings, true> : public AudioPortsBufferBase
 {
 public:
-	virtual ~AudioPortsBuffer() = default;
-
 	virtual auto inputOutput() -> GetAudioBufferViewType<settings, false, false> = 0;
-	virtual auto frames() const -> fpp_t = 0;
-	virtual void updateBuffers(proc_ch_t channelsIn, proc_ch_t channelsOut, f_cnt_t frames) = 0;
 };
 
 
-//! Performs pin connector routing. See `AudioPorts::Router`
+//! Performs pin connector routing. See `AudioPorts::Router`.
 template<AudioPortsSettings settings>
 class AudioPortsRouter
 {
@@ -201,26 +221,26 @@ public:
 	 * processor outputs back to the core.
 	 */
 	template<class F>
-	auto process(AudioBus<float> inOut, AudioPortsBuffer<settings>& processorBuffers, F&& processFunc)
+	auto process(AudioBus<float> coreInOut, AudioPortsBuffer<settings>& processorBuffers, F&& processFunc)
 		-> ProcessStatus
 	{
 		m_silentOutput = false;
 		if constexpr (settings.sampleFrameCompatible())
 		{
-			if (const auto dr = m_ap->m_directRouting)
+			if (const auto dr = m_ap->directRouting())
 			{
 				// The "direct routing" optimization can be applied
-				return processWithDirectRouting(inOut.trackChannelPair(*dr),
+				return processWithDirectRouting(coreInOut.trackChannelPair(*dr),
 					processorBuffers, std::forward<F>(processFunc));
 			}
 			else
 			{
-				return processNormally(inOut, processorBuffers, std::forward<F>(processFunc));
+				return processNormally(coreInOut, processorBuffers, std::forward<F>(processFunc));
 			}
 		}
 		else
 		{
-			return processNormally(inOut, processorBuffers, std::forward<F>(processFunc));
+			return processNormally(coreInOut, processorBuffers, std::forward<F>(processFunc));
 		}
 	}
 
@@ -302,7 +322,7 @@ private:
 
 /**
  * Interface for an audio port implementation.
- * Contains the audio port model and provides access to the audio buffers.
+ * Contains the `AudioPortsModel` and provides access to the audio buffers.
  *
  * Used by `AudioPlugin` to handle all the customizable aspects of the plugin's
  * audio ports.
@@ -314,7 +334,7 @@ class AudioPorts
 	static_assert(Validate<settings>{}());
 
 public:
-	AudioPorts(bool isInstrument, Model* parent = nullptr)
+	explicit AudioPorts(bool isInstrument, Model* parent = nullptr)
 		: AudioPortsModel{settings.inputs, settings.outputs, isInstrument, parent}
 	{
 	}
@@ -332,16 +352,18 @@ public:
 	 *     Routes audio to the processor's input buffers, then calls `processFunc` (the processor's process
 	 *     method), then routes audio from the processor's output buffers back to LMMS track channels.
 	 *
-	 *     `inOut`            : track channels from LMMS core (currently just the main track channel pair)
-	 *     `processorBuffers` : the processor's AudioPorts::Buffer
+	 *     `coreInOut`        : track channels from LMMS core (currently just the main track channel pair)
+	 *     `processorBuffers` : the processor's `AudioPorts::Buffer`
 	 *     `processFunc`      : the processor's process method - a callable object with the signature
-	 *                          `void(buffers...)` where `buffers` is the expected audio buffer(s) (if any)
-	 *                          for the given `settings`.
+	 *                          `ProcessStatus(buffers...)` where `buffers` is the expected audio buffer(s)
+	 *                          (if any) for the given `settings`.
 	 *
-	 * `rms`
-	 *     The RMS is calculated from the in-use processor output channels (processor channels that are
-	 *     routed to at least one track channel).
+	 * `silentOutput`
+	 *     Whether the processor output channels currently in use (processor channels that are routed to
+	 *     at least one track channel) are silent.
+	 *
 	 *     Only available when `process()` returns `ProcessStatus::ContinueIfNotQuiet` and auto-quit is enabled.
+	 *     Otherwise the outputs are assumed to not be silent.
 	 *
 	 * `send`
 	 *     Routes audio from LMMS track channels to processor inputs according to the pin connections.
@@ -369,13 +391,14 @@ public:
 	friend class detail::AudioPortsRouter;
 
 	/**
-	 * Must be called after constructing an audio port.
+	 * Must be called after construction.
 	 *
 	 * NOTE: This cannot be called in the constructor due
 	 *       to the use of a virtual method.
 	 */
 	void init()
 	{
+		if (!AudioPortsModel::initialized()) { return; }
 		if (auto buffers = this->buffers())
 		{
 			buffers->updateBuffers(in().channelCount(), out().channelCount(),
@@ -384,16 +407,28 @@ public:
 	}
 
 	/**
-	 * Returns true if the audio port can be used.
-	 * Active implies `buffers()` is non-null.
-	 * Custom audio ports with an unusable state (i.e. a "plugin not loaded" state) must override this.
+	 * @returns whether `AudioPorts` is ready for use in the audio processor's process method.
+	 *
+	 * This requires `AudioPortsModel` to be initialized and the audio buffers to be available
+	 * and initialized.
 	 */
-	virtual auto active() const -> bool { return true; }
+	auto active() const -> bool
+	{
+		if (!AudioPortsModel::initialized()) { return false; }
+		if (auto buffers = constBuffers())
+		{
+			return buffers->initialized();
+		}
+		return false;
+	}
 
-	//! Never nullptr when `active()` is true
+	/**
+	 * @returns the audio buffers if available, otherwise nullptr.
+	 *
+	 * If the buffers are available but not initialized, the input/output methods must not be called.
+	 */
 	virtual auto buffers() -> Buffer* = 0;
 
-	//! Never nullptr when `active()` is true
 	auto constBuffers() const -> const Buffer*
 	{
 		// const cast to avoid duplicate code - should be safe since buffers() doesn't modify
@@ -432,7 +467,7 @@ public:
 	using AudioPorts<settings>::AudioPorts;
 
 protected:
-	void bufferPropertiesChanged(proc_ch_t inChannels, proc_ch_t outChannels, f_cnt_t frames) override
+	void bufferPropertiesChanging(proc_ch_t inChannels, proc_ch_t outChannels, f_cnt_t frames) override
 	{
 		// Connects the audio port model to the buffers
 		this->updateBuffers(inChannels, outChannels, frames);
@@ -467,7 +502,7 @@ inline void AudioPortsRouter<settings>::send(
 	if (m_ap->in().channelCount() == 0) { return; }
 
 	// Ignore all unused track channels for better performance
-	const auto inSizeConstrained = m_ap->m_trackChannelsUpperBound / 2;
+	const auto inSizeConstrained = m_ap->trackChannelsUpperBound() / 2;
 	assert(inSizeConstrained <= in.channelPairs());
 
 	for (proc_ch_t outChannel = 0; outChannel < out.channels(); ++outChannel)
@@ -530,7 +565,7 @@ inline void AudioPortsRouter<settings>::receive(
 	if (m_ap->out().channelCount() == 0) { return; }
 
 	// Ignore all unused track channels for better performance
-	const auto inOutSizeConstrained = m_ap->m_trackChannelsUpperBound / 2;
+	const auto inOutSizeConstrained = m_ap->trackChannelsUpperBound() / 2;
 	assert(inOutSizeConstrained <= inOut.channelPairs());
 
 	/*
@@ -635,8 +670,8 @@ inline void AudioPortsRouter<settings>::receive(
 		const auto outChannel = static_cast<track_ch_t>(outChannelPairIdx * 2);
 
 		const std::uint8_t usedTrackChannels =
-				(static_cast<std::uint8_t>(m_ap->m_usedTrackChannels[outChannel]) << 1u)
-				| static_cast<std::uint8_t>(m_ap->m_usedTrackChannels[outChannel + 1]);
+				(static_cast<std::uint8_t>(m_ap->usedTrackChannels()[outChannel]) << 1u)
+				| static_cast<std::uint8_t>(m_ap->usedTrackChannels()[outChannel + 1]);
 
 		switch (usedTrackChannels)
 		{
@@ -669,7 +704,7 @@ inline void AudioPortsRouter<settings>::send(
 	assert(m_ap->in().channelCount() == 2); // Interleaved routing only allows exactly 0 or 2 channels
 
 	// Ignore all unused track channels for better performance
-	const auto inSizeConstrained = m_ap->m_trackChannelsUpperBound / 2;
+	const auto inSizeConstrained = m_ap->trackChannelsUpperBound() / 2;
 	assert(inSizeConstrained <= in.channelPairs());
 	assert(out.data() != nullptr);
 
@@ -759,7 +794,7 @@ inline void AudioPortsRouter<settings>::receive(
 	assert(m_ap->out().channelCount() == 2); // Interleaved routing only allows exactly 0 or 2 channels
 
 	// Ignore all unused track channels for better performance
-	const auto inOutSizeConstrained = m_ap->m_trackChannelsUpperBound / 2;
+	const auto inOutSizeConstrained = m_ap->trackChannelsUpperBound() / 2;
 	assert(inOutSizeConstrained <= inOut.channelPairs());
 	assert(in.data() != nullptr);
 
@@ -851,10 +886,10 @@ inline void AudioPortsRouter<settings>::receive(
 template<AudioPortsSettings settings>
 inline auto AudioPortsRouter<settings>::isOutputSilent(InterleavedBufferView<const float, 2> output) const -> bool
 {
-	assert(m_ap->m_usedProcessorChannels.size() == 2);
+	assert(m_ap->usedProcessorChannels().size() == 2);
 
 	// TODO C++26: Use std::simd::all_of
-	switch ((m_ap->m_usedProcessorChannels[0] << 1) | std::uint8_t{m_ap->m_usedProcessorChannels[1]})
+	switch ((m_ap->usedProcessorChannels()[0] << 1) | std::uint8_t{m_ap->usedProcessorChannels()[1]})
 	{
 		case 0b11:
 			return std::ranges::all_of(output.dataView(), [](const float sample) {
@@ -882,10 +917,10 @@ inline auto AudioPortsRouter<settings>::isOutputSilent(
 	PlanarBufferView<const SampleT, settings.outputs> output) const -> bool
 	requires (!settings.interleaved)
 {
-	assert(output.channels() == m_ap->m_usedProcessorChannels.size());
+	assert(output.channels() == m_ap->usedProcessorChannels().size());
 
 	proc_ch_t pc = 0;
-	for (bool used : m_ap->m_usedProcessorChannels)
+	for (bool used : m_ap->usedProcessorChannels())
 	{
 		if (used)
 		{

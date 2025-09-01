@@ -25,8 +25,6 @@
 #ifndef LMMS_REMOTE_PLUGIN_AUDIO_PORTS_H
 #define LMMS_REMOTE_PLUGIN_AUDIO_PORTS_H
 
-#include <optional>
-
 #include "PluginAudioPorts.h"
 #include "RemotePlugin.h"
 #include "lmms_export.h"
@@ -40,9 +38,8 @@ namespace lmms {
  *       template with an `AudioPortsSettings` template parameter.
  *       There would also be RemotePluginAudioPortsBuffer, a custom buffer implementation
  *       for remote plugins and remote plugin clients which RemotePlugin would
- *       derive from. However, this design requires C++20's class type NTTP on the
- *       remote plugin's client side but we're compiling that with C++17 due to a
- *       weird regression.
+ *       derive from. This design would require C++20's class type NTTP on the
+ *       remote plugin's client side.
  */
 
 class LMMS_EXPORT RemotePluginAudioPortsController
@@ -110,20 +107,16 @@ public:
 	{
 		assert(m_buffers != nullptr);
 		updateBuffers(this->in().channelCount(), this->out().channelCount(), frames);
-
-		m_remoteActive = true;
 	}
 
 	/*
 	 * `AudioPorts` implementation
 	 */
 
-	auto active() const -> bool override { return remoteActive(); }
-
 	//! Only returns the buffer interface if it's available
 	auto buffers() -> AudioPorts<settings>::Buffer* override
 	{
-		return remoteActive() ? this : nullptr;
+		return m_buffers != nullptr ? this : nullptr;
 	}
 
 protected:
@@ -131,23 +124,26 @@ protected:
 	 * `AudioPorts::Buffer` implementation
 	 */
 
+	auto initialized() const -> bool override
+	{
+		return m_frames != 0; // See updateBuffers()
+	}
+
 	auto input() -> PlanarBufferView<SampleT, settings.inputs> override
 	{
-		if (!remoteActive()) { return {}; }
-
+		assert(m_insOuts != nullptr);
 		return {m_insOuts, this->in().channelCount(), m_frames};
 	}
 
 	auto output() -> PlanarBufferView<SampleT, settings.outputs> override
 	{
-		if (!remoteActive()) { return {}; }
-
+		assert(m_insOuts != nullptr);
 		return {m_insOuts + this->in().channelCount(), this->out().channelCount(), m_frames};
 	}
 
 	auto frames() const -> fpp_t override
 	{
-		return remoteActive() ? m_frames : 0;
+		return m_frames;
 	}
 
 	void updateBuffers(proc_ch_t channelsIn, proc_ch_t channelsOut, f_cnt_t frames) override
@@ -176,8 +172,6 @@ protected:
 			assert(channelsOut == settings.outputs);
 		}
 
-		m_frames = frames;
-
 		for (proc_ch_t channel = 0; channel < channels; ++channel)
 		{
 			m_accessBuffer[channel] = ptr;
@@ -185,17 +179,15 @@ protected:
 		}
 
 		m_insOuts = m_accessBuffer.data();
+
+		// `m_frames` is last to be set, so non-zero `m_frames` means the buffers are initialized
+		m_frames = frames;
 	}
 
 private:
-	auto remoteActive() const -> bool { return m_buffers != nullptr && m_remoteActive; }
-
 	// Views into RemotePlugin's shared memory buffer
 	detail::AccessBufferType<settings> m_accessBuffer;
 	SampleT** m_insOuts = nullptr;
-
-protected:
-	bool m_remoteActive = false;
 };
 
 
@@ -213,13 +205,17 @@ public:
 		setBufferType(beginAsRemote);
 	}
 
-	//! Call this to switch to a different buffer type, then call `activate`
-	void setBufferType(bool remote = true)
+	/**
+	 * Call this to switch to a different buffer type, then call `activate`.
+	 *
+	 * It's unsafe to call while the current buffers are initialized *unless* the processor's
+	 * process method is protected by a mutex.
+	 *
+	 * TODO: Threading conventions and plugin states (inactive/active/processing) need to be defined
+	 *       and a pre-process event introduced so this can be used without a mutex.
+	 */
+	void setBufferType(bool remote)
 	{
-		// Deactivate both buffers until activation
-		m_localActive = false;
-		RemotePluginAudioPorts<settings>::m_remoteActive = false;
-
 		m_isRemote = remote;
 	}
 
@@ -231,25 +227,17 @@ public:
 		if (isRemote()) { RemotePluginAudioPorts<settings>::activate(frames); return; }
 
 		updateBuffers(this->in().channelCount(), this->out().channelCount(), frames);
-
-		m_localActive = true;
 	}
 
 	/*
 	 * `AudioPorts` implementation
 	 */
 
-	auto active() const -> bool override
-	{
-		return isRemote()
-			? RemotePluginAudioPorts<settings>::active()
-			: localActive();
-	}
-
 	auto buffers() -> AudioPorts<settings>::Buffer* override
 	{
-		if (isRemote()) { return RemotePluginAudioPorts<settings>::buffers(); }
-		return localActive() ? &m_localBuffer.value() : nullptr;
+		return isRemote()
+			? RemotePluginAudioPorts<settings>::buffers()
+			: &m_localBuffer;
 	}
 
 protected:
@@ -257,26 +245,32 @@ protected:
 	 * `AudioPorts::Buffer` implementation
 	 */
 
+	auto initialized() const -> bool override
+	{
+		return isRemote()
+			? RemotePluginAudioPorts<settings>::initialized()
+			: m_localBuffer.initialized();
+	}
+
 	auto input() -> PlanarBufferView<SampleT, settings.inputs> override
 	{
-		if (isRemote()) { return RemotePluginAudioPorts<settings>::input(); }
-		return localActive()
-			? m_localBuffer->input()
-			: PlanarBufferView<SampleT, settings.inputs>{};
+		return isRemote()
+			? RemotePluginAudioPorts<settings>::input()
+			: m_localBuffer.input();
 	}
 
 	auto output() -> PlanarBufferView<SampleT, settings.outputs> override
 	{
-		if (isRemote()) { return RemotePluginAudioPorts<settings>::output(); }
-		return localActive()
-			? m_localBuffer->output()
-			: PlanarBufferView<SampleT, settings.outputs>{};
+		return isRemote()
+			? RemotePluginAudioPorts<settings>::output()
+			: m_localBuffer.output();
 	}
 
 	auto frames() const -> fpp_t override
 	{
-		if (isRemote()) { return RemotePluginAudioPorts<settings>::frames(); }
-		return localActive() ? m_localBuffer->frames() : 0;
+		return isRemote()
+			? RemotePluginAudioPorts<settings>::frames()
+			: m_localBuffer.frames();
 	}
 
 	void updateBuffers(proc_ch_t channelsIn, proc_ch_t channelsOut, f_cnt_t frames) override
@@ -287,16 +281,12 @@ protected:
 		}
 		else
 		{
-			if (!m_localBuffer) { m_localBuffer.emplace(); }
-			m_localBuffer->updateBuffers(channelsIn, channelsOut, frames);
+			m_localBuffer.updateBuffers(channelsIn, channelsOut, frames);
 		}
 	}
 
 private:
-	auto localActive() const -> bool { return m_localBuffer.has_value() && m_localActive; }
-
-	std::optional<LocalBufferT<settings>> m_localBuffer;
-	bool m_localActive = false;
+	LocalBufferT<settings> m_localBuffer;
 	bool m_isRemote = true;
 };
 

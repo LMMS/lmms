@@ -95,10 +95,7 @@ public:
 							!= IdHostInfoGotten;
 	}
 
-	inline void waitForInitDone( bool _busyWaiting = true )
-	{
-		m_failed = waitForMessage( IdInitDone, _busyWaiting ).id != IdInitDone;
-	}
+	void waitForInitDone(bool busyWaiting = true);
 
 	bool processMessage( const message & _m ) override;
 

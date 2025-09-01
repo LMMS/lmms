@@ -29,7 +29,6 @@
 #include <QDomElement>
 #include <QObject>
 #include <QtTest/QtTest>
-#include <qtestcase.h>
 
 #define LMMS_TESTING
 #include "PluginAudioPorts.h"
@@ -124,6 +123,38 @@ void compareBuffers(PlanarBufferView<SampleT, extent> actual, PlanarBufferView<S
 	}
 }
 
+class AudioPortsModelImpl : public AudioPortsModel
+{
+public:
+	using AudioPortsModel::AudioPortsModel;
+
+	// TODO: Test the bufferPropertiesChanging method
+	auto popBufferPropertiesChangingCount() -> int { return std::exchange(m_bufferChangeCount, 0); }
+
+	auto inputs() const -> proc_ch_t { return m_inputs; }
+	auto outputs() const -> proc_ch_t { return m_outputs; }
+	auto frames() const -> f_cnt_t { return m_frames; }
+
+	using AudioPortsModel::trackChannelsUpperBound;
+	using AudioPortsModel::usedTrackChannels;
+	using AudioPortsModel::usedProcessorChannels;
+	using AudioPortsModel::directRouting;
+
+private:
+	void bufferPropertiesChanging(proc_ch_t inChannels, proc_ch_t outChannels, f_cnt_t frames) override
+	{
+		++m_bufferChangeCount;
+		m_inputs = inChannels;
+		m_outputs = outChannels;
+		m_frames = frames;
+	}
+
+	int m_bufferChangeCount = 0;
+	proc_ch_t m_inputs = 0;
+	proc_ch_t m_outputs = 0;
+	f_cnt_t m_frames = 0;
+};
+
 } // namespace
 } // namespace lmms
 
@@ -170,7 +201,7 @@ private slots:
 		int propertiesChangedCount = 0;
 		auto getPropertiesChangedCount = [&]() { return std::exchange(propertiesChangedCount, 0); };
 
-		auto apmNxN = AudioPortsModel{DynamicChannelCount, DynamicChannelCount, false};
+		auto apmNxN = AudioPortsModelImpl{DynamicChannelCount, DynamicChannelCount, false};
 		connect(&apmNxN, &AudioPortsModel::propertiesChanged, [&]() { ++propertiesChangedCount; });
 
 		// Channel counts should stay zero until known
@@ -215,12 +246,12 @@ private slots:
 		QCOMPARE(getPropertiesChangedCount(), 1);
 
 		// stereo/stereo effect
-		auto apm2x2 = AudioPortsModel{2, 2, false};
+		auto apm2x2 = AudioPortsModelImpl{2, 2, false};
 		QCOMPARE(apm2x2.in().channelCount(), 2);
 		QCOMPARE(apm2x2.out().channelCount(), 2);
 
 		// stereo instrument
-		auto apm0x2 = AudioPortsModel{0, 2, true};
+		auto apm0x2 = AudioPortsModelImpl{0, 2, true};
 		QCOMPARE(apm0x2.in().channelCount(), 0);
 		QCOMPARE(apm0x2.out().channelCount(), 2);
 	}
@@ -238,7 +269,7 @@ private slots:
 		// | |X| | |X|
 		//  ---   ---
 
-		auto apm2x2 = AudioPortsModel{2, 2, false};
+		auto apm2x2 = AudioPortsModelImpl{2, 2, false};
 		QCOMPARE(apm2x2.in().enabled(0, 0), true);
 		QCOMPARE(apm2x2.in().enabled(0, 1), false);
 		QCOMPARE(apm2x2.in().enabled(1, 0), false);
@@ -257,7 +288,7 @@ private slots:
 		// | |   |X|
 		//  -     -
 
-		auto apm1x1 = AudioPortsModel{1, 1, false};
+		auto apm1x1 = AudioPortsModelImpl{1, 1, false};
 		QCOMPARE(apm1x1.in().enabled(0, 0), true);
 		QCOMPARE(apm1x1.in().enabled(1, 0), false);
 
@@ -272,7 +303,7 @@ private slots:
 		// | |   | |X| | |
 		//  -     -------
 
-		auto apm1x4 = AudioPortsModel{1, 4, false};
+		auto apm1x4 = AudioPortsModelImpl{1, 4, false};
 		QCOMPARE(apm1x4.in().enabled(0, 0), true);
 		QCOMPARE(apm1x4.in().enabled(1, 0), false);
 
@@ -293,7 +324,7 @@ private slots:
 		// | | | | |X|
 		//  ---   ---
 
-		auto apm2x2Inst = AudioPortsModel{2, 2, true};
+		auto apm2x2Inst = AudioPortsModelImpl{2, 2, true};
 		QCOMPARE(apm2x2Inst.in().enabled(0, 0), false);
 		QCOMPARE(apm2x2Inst.in().enabled(0, 1), false);
 		QCOMPARE(apm2x2Inst.in().enabled(1, 0), false);
@@ -311,7 +342,7 @@ private slots:
 		using namespace lmms;
 
 		// Setup
-		auto apm = AudioPortsModel{2, 2, false};
+		auto apm = AudioPortsModelImpl{2, 2, false};
 
 		// Out
 		//  ___
@@ -320,8 +351,8 @@ private slots:
 		//  ---
 
 		// Track channels 0 and 1 should both have a processor output channel routed to them
-		QCOMPARE(apm.m_usedTrackChannels[0], true);
-		QCOMPARE(apm.m_usedTrackChannels[1], true);
+		QCOMPARE(apm.usedTrackChannels()[0], true);
+		QCOMPARE(apm.usedTrackChannels()[1], true);
 
 		// Out
 		//  ___
@@ -332,8 +363,8 @@ private slots:
 		apm.out().setPin(0, 0, false);
 
 		// Now only track channel 1 should have a processor channel routed to it
-		QCOMPARE(apm.m_usedTrackChannels[0], false);
-		QCOMPARE(apm.m_usedTrackChannels[1], true);
+		QCOMPARE(apm.usedTrackChannels()[0], false);
+		QCOMPARE(apm.usedTrackChannels()[1], true);
 
 		// Out
 		//  ___
@@ -343,8 +374,8 @@ private slots:
 
 		apm.out().setPin(0, 1, true);
 
-		QCOMPARE(apm.m_usedTrackChannels[0], true);
-		QCOMPARE(apm.m_usedTrackChannels[1], true);
+		QCOMPARE(apm.usedTrackChannels()[0], true);
+		QCOMPARE(apm.usedTrackChannels()[1], true);
 
 		// Out
 		//  ___
@@ -354,8 +385,8 @@ private slots:
 
 		apm.out().setPin(1, 0, true);
 
-		QCOMPARE(apm.m_usedTrackChannels[0], true);
-		QCOMPARE(apm.m_usedTrackChannels[1], true);
+		QCOMPARE(apm.usedTrackChannels()[0], true);
+		QCOMPARE(apm.usedTrackChannels()[1], true);
 	}
 
 	//! Verifies that the used processor channels cache works
@@ -364,7 +395,7 @@ private slots:
 		using namespace lmms;
 
 		// Setup
-		auto apm = AudioPortsModel{2, 2, false};
+		auto apm = AudioPortsModelImpl{2, 2, false};
 
 		// Out
 		//  ___
@@ -373,8 +404,8 @@ private slots:
 		//  ---
 
 		// Processor channels 0 and 1 should both be routed to a track channel
-		QCOMPARE(apm.m_usedProcessorChannels[0], true);
-		QCOMPARE(apm.m_usedProcessorChannels[1], true);
+		QCOMPARE(apm.usedProcessorChannels()[0], true);
+		QCOMPARE(apm.usedProcessorChannels()[1], true);
 
 		// Out
 		//  ___
@@ -385,8 +416,8 @@ private slots:
 		apm.out().setPin(0, 0, false);
 
 		// Now only processor channel 1 should be routed to a track channel
-		QCOMPARE(apm.m_usedProcessorChannels[0], false);
-		QCOMPARE(apm.m_usedProcessorChannels[1], true);
+		QCOMPARE(apm.usedProcessorChannels()[0], false);
+		QCOMPARE(apm.usedProcessorChannels()[1], true);
 
 		// Out
 		//  ___
@@ -396,8 +427,8 @@ private slots:
 
 		apm.out().setPin(0, 1, true);
 
-		QCOMPARE(apm.m_usedProcessorChannels[0], false);
-		QCOMPARE(apm.m_usedProcessorChannels[1], true);
+		QCOMPARE(apm.usedProcessorChannels()[0], false);
+		QCOMPARE(apm.usedProcessorChannels()[1], true);
 
 		// Out
 		//  ___
@@ -410,8 +441,8 @@ private slots:
 		apm.setTrackChannelCount(4);
 
 		// Should remain the same after increasing the number of track channels
-		QCOMPARE(apm.m_usedProcessorChannels[0], false);
-		QCOMPARE(apm.m_usedProcessorChannels[1], true);
+		QCOMPARE(apm.usedProcessorChannels()[0], false);
+		QCOMPARE(apm.usedProcessorChannels()[1], true);
 
 		// Out
 		//  ___
@@ -423,8 +454,8 @@ private slots:
 
 		apm.out().setPin(3, 0, true);
 
-		QCOMPARE(apm.m_usedProcessorChannels[0], true);
-		QCOMPARE(apm.m_usedProcessorChannels[1], true);
+		QCOMPARE(apm.usedProcessorChannels()[0], true);
+		QCOMPARE(apm.usedProcessorChannels()[1], true);
 
 		// Out
 		//  ___
@@ -435,8 +466,8 @@ private slots:
 		apm.setTrackChannelCount(2);
 
 		// The 1st processor channel should no longer be routed to any track channels
-		QCOMPARE(apm.m_usedProcessorChannels[0], false);
-		QCOMPARE(apm.m_usedProcessorChannels[1], true);
+		QCOMPARE(apm.usedProcessorChannels()[0], false);
+		QCOMPARE(apm.usedProcessorChannels()[1], true);
 
 		// Out
 		//  _____
@@ -447,16 +478,16 @@ private slots:
 		apm.setChannelCountOut(3);
 
 		// The new processor channel should not be routed to anything, and the rest stays the same
-		QCOMPARE(apm.m_usedProcessorChannels[0], false);
-		QCOMPARE(apm.m_usedProcessorChannels[1], true);
-		QCOMPARE(apm.m_usedProcessorChannels[2], false);
+		QCOMPARE(apm.usedProcessorChannels()[0], false);
+		QCOMPARE(apm.usedProcessorChannels()[1], true);
+		QCOMPARE(apm.usedProcessorChannels()[2], false);
 
 		apm.setChannelCountIn(1);
 
 		// Setting the input channel count has no effect
-		QCOMPARE(apm.m_usedProcessorChannels[0], false);
-		QCOMPARE(apm.m_usedProcessorChannels[1], true);
-		QCOMPARE(apm.m_usedProcessorChannels[2], false);
+		QCOMPARE(apm.usedProcessorChannels()[0], false);
+		QCOMPARE(apm.usedProcessorChannels()[1], true);
+		QCOMPARE(apm.usedProcessorChannels()[2], false);
 	}
 
 	//! Verifies that the direct routing optimization works
@@ -465,7 +496,7 @@ private slots:
 		using namespace lmms;
 
 		// Setup
-		auto apm = AudioPortsModel{2, 2, false};
+		auto apm = AudioPortsModelImpl{2, 2, false};
 
 		// In    Out
 		//  ___   ___
@@ -474,12 +505,12 @@ private slots:
 		//  ---   ---
 
 		// The default pin connections for a 2x2 audio processor should allow direct routing
-		QCOMPARE(apm.m_directRouting.value_or(99), 0);
+		QCOMPARE(apm.directRouting().value_or(99), 0);
 
 		// Should still work after increasing the track channel count
 		apm.setTrackChannelCount(4);
 		QCOMPARE(apm.trackChannelCount(), 4);
-		QCOMPARE(apm.m_directRouting.value_or(99), 0);
+		QCOMPARE(apm.directRouting().value_or(99), 0);
 
 		// In    Out
 		//  ___   ___
@@ -491,7 +522,7 @@ private slots:
 
 		// Disabling a pin should prevent the optimization
 		apm.in().setPin(0, 0, false);
-		QCOMPARE(apm.m_directRouting.has_value(), false);
+		QCOMPARE(apm.directRouting().has_value(), false);
 
 		// In    Out
 		//  ___   ___
@@ -505,7 +536,7 @@ private slots:
 		apm.in().setPin(1, 1, false);
 		apm.in().setPin(2, 0, true);
 		apm.in().setPin(3, 1, true);
-		QCOMPARE(apm.m_directRouting.has_value(), false);
+		QCOMPARE(apm.directRouting().has_value(), false);
 
 		// In    Out
 		//  ___   ___
@@ -520,7 +551,7 @@ private slots:
 		apm.out().setPin(1, 1, false);
 		apm.out().setPin(2, 0, true);
 		apm.out().setPin(3, 1, true);
-		QCOMPARE(apm.m_directRouting.value_or(99), 1);
+		QCOMPARE(apm.directRouting().value_or(99), 1);
 
 		// Out
 		//  ___
@@ -532,7 +563,7 @@ private slots:
 
 		// If processor input channels are removed, the optimization should still apply
 		apm.setChannelCountIn(0);
-		QCOMPARE(apm.m_directRouting.value_or(99), 1);
+		QCOMPARE(apm.directRouting().value_or(99), 1);
 
 		// Out
 		//  _____
@@ -544,7 +575,7 @@ private slots:
 
 		// Adding a 3rd output channel should disable the optimization (only 0 or 2 channels allowed)
 		apm.setChannelCountOut(3);
-		QCOMPARE(apm.m_directRouting.has_value(), false);
+		QCOMPARE(apm.directRouting().has_value(), false);
 	}
 
 	//! Verifies correct default routing for 1x1 non-interleaved audio processor
@@ -962,7 +993,7 @@ private slots:
 				}
 			};
 
-			QCOMPARE(ap.m_directRouting.value_or(99), 0);
+			QCOMPARE(ap.directRouting().value_or(99), 0);
 
 			// Use the Router::process method which handles routing into and out of the audio processor,
 			// and calls the processor's process method we provide (in this case it doubles the amplitude).
@@ -1010,7 +1041,7 @@ private slots:
 		using namespace lmms;
 
 		// Setup
-		auto apm = AudioPortsModel{2, 4, false};
+		auto apm = AudioPortsModelImpl{2, 4, false};
 
 		/*
 		// For debugging
@@ -1054,7 +1085,7 @@ private slots:
 		apm.saveSettings(doc, elem);
 
 		// New model with wrong channel counts and wrong pin connections
-		auto apm2 = AudioPortsModel{1, 1, false};
+		auto apm2 = AudioPortsModelImpl{1, 1, false};
 
 		int dataChangedCount = 0;
 		int propertiesChangedCount = 0;

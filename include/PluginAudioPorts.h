@@ -60,6 +60,11 @@ public:
 	PluginAudioPortsBuffer() = default;
 	~PluginAudioPortsBuffer() override = default;
 
+	auto initialized() const -> bool final
+	{
+		return m_frames != 0; // See updateBuffers()
+	}
+
 	auto input() -> PlanarBufferView<SampleT, settings.inputs> final
 	{
 		return {m_accessBuffer.data(), m_channelsIn, m_frames};
@@ -77,6 +82,7 @@ public:
 
 	void updateBuffers(proc_ch_t channelsIn, proc_ch_t channelsOut, f_cnt_t frames) final
 	{
+		assert(frames != 0);
 		if (channelsIn == DynamicChannelCount || channelsOut == DynamicChannelCount) { return; }
 
 		const auto channels = static_cast<std::size_t>(channelsIn + channelsOut);
@@ -93,8 +99,6 @@ public:
 			assert(channelsOut == settings.outputs);
 		}
 
-		m_frames = frames;
-
 		SampleT* ptr = m_sourceBuffer.data();
 		for (std::size_t channel = 0; channel < channels; ++channel)
 		{
@@ -104,6 +108,9 @@ public:
 
 		m_channelsIn = channelsIn;
 		m_channelsOut = channelsOut;
+
+		// `m_frames` is last to be set, so non-zero `m_frames` means the buffers are initialized
+		m_frames = frames;
 	}
 
 private:
@@ -134,6 +141,11 @@ public:
 	PluginAudioPortsBuffer() = default;
 	~PluginAudioPortsBuffer() override = default;
 
+	auto initialized() const -> bool final
+	{
+		return m_frames != 0; // See updateBuffers()
+	}
+
 	auto inputOutput() -> PlanarBufferView<SampleT, settings.outputs> final
 	{
 		return {m_accessBuffer.data(), m_channels, m_frames};
@@ -163,8 +175,6 @@ public:
 			assert(channelsOut == settings.outputs);
 		}
 
-		m_frames = frames;
-
 		SampleT* ptr = m_sourceBuffer.data();
 		for (proc_ch_t channel = 0; channel < channels; ++channel)
 		{
@@ -173,6 +183,9 @@ public:
 		}
 
 		m_channels = channelsOut;
+
+		// `m_frames` is last to be set, so non-zero `m_frames` means the buffers are initialized
+		m_frames = frames;
 	}
 
 private:
@@ -204,6 +217,11 @@ public:
 	PluginAudioPortsBuffer() = default;
 	~PluginAudioPortsBuffer() override = default;
 
+	auto initialized() const -> bool final
+	{
+		return m_frames != 0; // See updateBuffers()
+	}
+
 	auto inputOutput() -> InterleavedBufferView<SampleT, s_channels> final
 	{
 		return InterleavedBufferView<SampleT, s_channels> {
@@ -222,9 +240,10 @@ public:
 		if (channelsIn == DynamicChannelCount || channelsOut == DynamicChannelCount) { return; }
 
 		m_channels = std::max(channelsIn, channelsOut);
-		m_frames = frames;
-
 		m_buffer.resize(frames * m_channels);
+
+		// `m_frames` is last to be set, so non-zero `m_frames` means the buffers are initialized
+		m_frames = frames;
 	}
 
 private:
@@ -287,7 +306,7 @@ public:
 	}
 
 private:
-	void bufferPropertiesChanged(proc_ch_t inChannels, proc_ch_t outChannels, f_cnt_t frames) final
+	void bufferPropertiesChanging(proc_ch_t inChannels, proc_ch_t outChannels, f_cnt_t frames) final
 	{
 		// Connects the audio port model to the buffers
 		this->updateBuffers(inChannels, outChannels, frames);
