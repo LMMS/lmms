@@ -245,7 +245,7 @@ protected:
 			return true;
 		}
 
-		if (isSleeping() || !m_audioPorts.active())
+		if (!isRunning() || !m_audioPorts.active())
 		{
 			// Plugin is not running
 			this->processBypassedImpl();
@@ -278,9 +278,9 @@ protected:
 				break;
 		}
 
-		const auto running = isRunning();
+		const auto continueProcessing = isAwake();
 		processUnlock();
-		return running;
+		return continueProcessing;
 	}
 
 	/**

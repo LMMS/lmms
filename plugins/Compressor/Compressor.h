@@ -42,8 +42,6 @@ public:
 	CompressorEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
 	~CompressorEffect() override = default;
 
-	void processBypassedImpl() override;
-
 	EffectControls* controls() override
 	{
 		return &m_compressorControls;
@@ -71,6 +69,7 @@ private slots:
 
 private:
 	ProcessStatus processImpl(InterleavedBufferView<float, 2> inOut) override;
+	void processBypassedImpl() override;
 
 	float msToCoeff(float ms);
 

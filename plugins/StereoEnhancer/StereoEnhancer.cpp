@@ -119,7 +119,8 @@ ProcessStatus StereoEnhancerEffect::processImpl(InterleavedBufferView<float, 2> 
 		m_currFrame %= DEFAULT_BUFFER_SIZE;
 	}
 
-	if( !isRunning() )
+	// TODO: Move this to processBypassedImpl?
+	if (!isAwake())
 	{
 		clearMyBuffer();
 	}

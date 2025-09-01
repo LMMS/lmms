@@ -196,7 +196,7 @@ bool EffectChain::processAudioBuffer( SampleFrame* _buf, const fpp_t _frames, bo
 	bool moreEffects = false;
 	for (const auto& effect : m_effects)
 	{
-		if (hasInputNoise || effect->isRunning())
+		if (hasInputNoise || effect->isAwake())
 		{
 			moreEffects |= effect->processCore(_buf, _frames);
 			MixHelpers::sanitize(_buf, _frames);

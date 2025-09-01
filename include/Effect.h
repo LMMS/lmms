@@ -81,22 +81,22 @@ public:
 		m_okay = _state;
 	}
 
-
-	inline bool isRunning() const
+	//! "Awake" means the effect has not been put to sleep by auto-quit
+	bool isAwake() const
 	{
-		return m_running;
+		return m_awake;
 	}
 
 	void startRunning()
 	{
 		m_quietBufferCount = 0;
-		m_running = true;
+		m_awake = true;
 	}
 
 	void stopRunning()
 	{
 		m_quietBufferCount = 0;
-		m_running = false;
+		m_awake = false;
 	}
 
 	inline bool isEnabled() const
@@ -130,9 +130,10 @@ public:
 		m_noRun = _state;
 	}
 
-	bool isSleeping() const
+	//! "Running" means the effect will be processing audio
+	bool isRunning() const
 	{
-		return !isOkay() || dontRun() || !isEnabled() || !isRunning();
+		return isEnabled() && isAwake() && isOkay() && !dontRun();
 	}
 
 	//! Returns nullptr if the effect does not have audio ports
@@ -196,7 +197,7 @@ protected:
 	/**
 	 * If auto-quit is enabled ("Keep effects running even without input" setting is disabled),
 	 * after "decay" ms of the output buffer remaining below the silence threshold, the effect is
-	 * turned off and won't be processed again until it receives new audio input.
+	 * put to sleep and won't be processed again until it receives new audio input.
 	 */
 	void handleAutoQuit(bool silentOutput);
 
@@ -209,7 +210,7 @@ private:
 
 	bool m_okay;
 	bool m_noRun;
-	bool m_running;
+	bool m_awake;
 
 	//! The number of consecutive periods where output buffers remain below the silence threshold
 	f_cnt_t m_quietBufferCount = 0;
