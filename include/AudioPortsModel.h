@@ -62,9 +62,6 @@ class PinConnector;
  * - Pin connections for audio routing in/out of an audio processor
  * - Audio port channel counts
  * - Audio port channel names
- *
- * Also provides a nested `Router` class which uses the model
- * to perform routing of audio in and out of the audio processor.
  */
 class LMMS_EXPORT AudioPortsModel
 	: public Model
@@ -103,8 +100,9 @@ public:
 
 		/**
 		 * Sets a pin connector pin without updating the cache or emitting a dataChanged signal.
-		 * Meant for setting multiple pins in one batch efficiently. Remember to update the cache
-		 * and emit the dataChanged signal afterwards!
+		 * Meant for setting multiple pins in one batch efficiently.
+		 *
+		 * Remember to update the cache and emit the dataChanged signal afterwards!
 		 */
 		void setPinBatch(track_ch_t trackChannel, proc_ch_t processorChannel, bool value)
 		{
@@ -221,8 +219,8 @@ protected:
 
 	/**
 	 * Caches whether a given processor output channel is routed to any track channel (meaning the
-	 * processor channel is being used), which eliminates need for O(N) checking when calculating
-	 * the RMS for a processor that returned `ProcessStatus::ContinueIfNotQuiet`.
+	 * processor channel is being used), which eliminates need for O(N) checking when detecting
+	 * quiet output buffers for a processor that returned `ProcessStatus::ContinueIfNotQuiet`.
 	 *
 	 * This means usedProcessorChannels()[i] == true if and only if out().enabled(x, i) == true
 	 * for any track channel x.
@@ -231,8 +229,8 @@ protected:
 
 	/**
 	 * Any processor with 2-channel interleaved buffers connected to the track channels in the default
-	 * pin configuration (L --> L, R --> R) can be connected directly without the need for the audio port
-	 * buffers or the audio port router, which allows a significant performance optimization.
+	 * pin configuration (L --> L, R --> R) can be connected directly without any complicated routing.
+	 * This greatly simplifies the job of `AudioPorts::Router` and should bring a significant performance boost.
 	 *
 	 * In theory, the performance when this optimization is enabled (which should be the case for most processors
 	 * most of the time) should be about the same as if the processor did not use the pin connector at all.

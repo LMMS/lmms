@@ -50,13 +50,13 @@ public:
 	{
 	}
 
-	//! Connects RemotePlugin's buffers to audio port; Call after buffers are created
+	//! Connects RemotePlugin's buffers to the audio ports; Call after buffers are created
 	void connectBuffers(RemotePlugin* buffers)
 	{
 		m_buffers = buffers;
 	}
 
-	//! Disconnects RemotePlugin's buffers from audio port; Call before buffers are destroyed
+	//! Disconnects RemotePlugin's buffers from the audio ports; Call before buffers are destroyed
 	void disconnectBuffers()
 	{
 		m_buffers = nullptr;
@@ -191,7 +191,7 @@ private:
 };
 
 
-//! An audio port that can choose between RemotePlugin or a local buffer at runtime
+//! An `AudioPorts` implementation that can choose between RemotePlugin or a local buffer at runtime
 template<AudioPortsSettings settings, template<AudioPortsSettings> class LocalBufferT>
 class ConfigurableAudioPorts
 	: public RemotePluginAudioPorts<settings>
@@ -221,7 +221,7 @@ public:
 
 	auto isRemote() const -> bool { return m_isRemote; }
 
-	//! Activates the audio port after switching buffer types
+	//! Activates `AudioPorts` after switching buffer types
 	void activate(f_cnt_t frames) override
 	{
 		if (isRemote()) { RemotePluginAudioPorts<settings>::activate(frames); return; }

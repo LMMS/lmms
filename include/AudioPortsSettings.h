@@ -148,7 +148,7 @@ struct AudioPortsSettings
 	 * Audio buffer usage
 	 *
 	 * When true, the processor's audio buffers are always written to and read from when routing
-	 *   to and from the processor. This lessens the extent to which the audio port can apply the
+	 *   to and from the processor. This lessens the extent to which the audio ports router can apply the
 	 *   "direct routing" optimization, but some processors with custom audio buffers (such as Vestige)
 	 *   have no choice because they require their buffers to always be written to and read from.
 	 *
@@ -166,7 +166,7 @@ struct AudioPortsSettings
 	}
 
 	/**
-	 * Whether the audio port buffers can be converted to/from
+	 * Whether the `AudioPorts` buffers can be converted to/from
 	 * `std::span<SampleFrame>` or `InterleavedBufferView<float, 2>`
 	 */
 	constexpr auto sampleFrameCompatible() const -> bool

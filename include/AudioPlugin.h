@@ -1,5 +1,5 @@
 /*
- * AudioPlugin.h - Interface for audio plugins which provides
+ * AudioPlugin.h - An interface for audio plugins which provides
  *                 audio ports and compile-time customizations
  *
  * Copyright (c) 2025 Dalton Messmer <messmer.dalton/at/gmail.com>
@@ -316,7 +316,7 @@ private:
  *
  * @tparam ParentT Either `Instrument` or `Effect`
  * @tparam settings Compile-time settings to customize `AudioPlugin`
- * @tparam AudioPortsT The plugin's audio port - must fully implement `AudioPorts`
+ * @tparam AudioPortsT The plugin's `AudioPorts` implementation
  */
 template<class ParentT, AudioPortsSettings settings, class AudioPortsT>
 class AudioPlugin
@@ -328,7 +328,7 @@ class AudioPlugin
 	using Base = typename detail::AudioPlugin<ParentT, settings, AudioPortsT>;
 
 public:
-	//! The last parameter(s) are variadic template parameters passed to the audio port constructor
+	//! The last parameter(s) are variadic parameters passed to the `AudioPorts` implementation's constructor
 	using Base::Base;
 
 	static constexpr auto audioPortsSettings() -> AudioPortsSettings { return settings; }
@@ -367,11 +367,11 @@ private:
 
 
 /**
- * Same as `AudioPlugin` but the audio port is passed as a template template parameter.
+ * Same as `AudioPlugin` but the `AudioPorts` implementation is passed as a template template parameter.
  *
  * @tparam ParentT Either `Instrument` or `Effect`
  * @tparam settings Compile-time settings to customize `AudioPlugin`
- * @tparam AudioPortsT The plugin's audio port - must fully implement `AudioPorts`
+ * @tparam AudioPortsT The plugin's `AudioPorts` implementation
  */
 template<class ParentT, AudioPortsSettings settings,
 	template<AudioPortsSettings> class AudioPortsT = PluginAudioPorts>

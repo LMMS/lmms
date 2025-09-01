@@ -207,7 +207,7 @@ class AudioPortsRouter
 	using SampleT = GetAudioDataType<settings.kind>;
 
 	static_assert(!settings.interleaved || settings.sampleFrameCompatible(),
-		"Interleaved audio port routers are currently limited to SampleFrame-compatible buffers only");
+		"AudioPorts::Router currently only supports interleaved buffers if they are SampleFrame-compatible");
 
 public:
 	explicit AudioPortsRouter(const AudioPorts<settings>& parent, bool autoQuitEnabled)
@@ -258,6 +258,28 @@ public:
 #endif
 
 private:
+	/**
+	 * `send`
+	 *     Routes audio from LMMS track channels to processor inputs according to the pin connections.
+	 *
+	 *     Iterates through each output channel, mixing together all input audio routed to the output channel.
+	 *     If no audio is routed to an output channel, the output channel's buffer is zeroed.
+	 *
+	 *     `in`     : track channels from LMMS core (currently just the main track channel pair)
+	 *                `in.frames` provides the number of frames in each `in`/`out` audio buffer
+	 *     `out`    : processor input buffers
+	 *
+	 * `receive`
+	 *     Routes audio from processor outputs to LMMS track channels according to the pin connections.
+	 *
+	 *     Iterates through each output channel, mixing together all input audio routed to the output channel.
+	 *     If no audio is routed to an output channel, `inOut` remains unchanged for audio bypass behavior.
+	 *
+	 *     `in`      : processor output buffers
+	 *     `inOut`   : track channels from/to LMMS core (currently just the main track channel pair)
+	 *                 `inOut.frames` provides the number of frames in each `in`/`inOut` audio buffer
+	 */
+
 	void send(AudioBus<const float> in, PlanarBufferView<SampleT, settings.inputs> out) const
 		requires (!settings.interleaved);
 	void receive(PlanarBufferView<const SampleT, settings.outputs> in, AudioBus<float> inOut) const
@@ -268,8 +290,10 @@ private:
 	void receive(InterleavedBufferView<const float, settings.outputs> in, AudioBus<float> inOut) const
 		requires (settings.interleaved);
 
+	//! Determines whether all the used output channels are silent
 	auto isOutputSilent(InterleavedBufferView<const float, 2> output) const -> bool;
 
+	//! Determines whether all the used output channels are silent
 	auto isOutputSilent(PlanarBufferView<const SampleT, settings.outputs> output) const -> bool
 		requires (!settings.interleaved);
 
@@ -321,11 +345,10 @@ private:
 
 
 /**
- * Interface for an audio port implementation.
+ * Interface for an audio ports implementation.
  * Contains the `AudioPortsModel` and provides access to the audio buffers.
  *
- * Used by `AudioPlugin` to handle all the customizable aspects of the plugin's
- * audio ports.
+ * Used by `AudioPlugin` to handle all the customizable aspects of the plugin's audio ports.
  */
 template<AudioPortsSettings settings>
 class AudioPorts
@@ -340,13 +363,15 @@ public:
 	}
 
 	/**
+	 * AudioPorts buffer
+	 *
 	 * Interface for accessing input/output audio buffers.
-	 * Implement this for custom audio port buffers.
+	 * Implement this for custom AudioPorts buffers.
 	 */
 	using Buffer = detail::AudioPortsBuffer<settings>;
 
 	/**
-	 * Audio port router
+	 * AudioPorts router
 	 *
 	 * `process`
 	 *     Routes audio to the processor's input buffers, then calls `processFunc` (the processor's process
@@ -364,26 +389,6 @@ public:
 	 *
 	 *     Only available when `process()` returns `ProcessStatus::ContinueIfNotQuiet` and auto-quit is enabled.
 	 *     Otherwise the outputs are assumed to not be silent.
-	 *
-	 * `send`
-	 *     Routes audio from LMMS track channels to processor inputs according to the pin connections.
-	 *
-	 *     Iterates through each output channel, mixing together all input audio routed to the output channel.
-	 *     If no audio is routed to an output channel, the output channel's buffer is zeroed.
-	 *
-	 *     `in`     : track channels from LMMS core (currently just the main track channel pair)
-	 *                `in.frames` provides the number of frames in each `in`/`out` audio buffer
-	 *     `out`    : processor input buffers
-	 *
-	 * `receive`
-	 *     Routes audio from processor outputs to LMMS track channels according to the pin connections.
-	 *
-	 *     Iterates through each output channel, mixing together all input audio routed to the output channel.
-	 *     If no audio is routed to an output channel, `inOut` remains unchanged for audio bypass behavior.
-	 *
-	 *     `in`      : processor output buffers
-	 *     `inOut`   : track channels from/to LMMS core (currently just the main track channel pair)
-	 *                 `inOut.frames` provides the number of frames in each `in`/`inOut` audio buffer
 	 */
 	using Router = detail::AudioPortsRouter<settings>;
 
@@ -455,8 +460,8 @@ public:
 
 
 /**
- * Custom audio port.
- * AudioPorts::Buffer must be implemented in child class.
+ * Interface to help create a custom `AudioPorts` implementation.
+ * `AudioPorts::Buffer` must be implemented in child class.
  */
 template<AudioPortsSettings settings>
 class CustomAudioPorts
@@ -469,7 +474,7 @@ public:
 protected:
 	void bufferPropertiesChanging(proc_ch_t inChannels, proc_ch_t outChannels, f_cnt_t frames) override
 	{
-		// Connects the audio port model to the buffers
+		// Connects `AudioPortsModel` to the buffers
 		this->updateBuffers(inChannels, outChannels, frames);
 	}
 };

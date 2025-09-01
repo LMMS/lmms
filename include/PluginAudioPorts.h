@@ -46,7 +46,7 @@ template<AudioPortsSettings settings,
 	bool interleaved = settings.interleaved, bool inplace = settings.inplace>
 class PluginAudioPortsBuffer
 {
-	static_assert(always_false_v<PluginAudioPortsBuffer<settings>>, "Unsupported audio port settings");
+	static_assert(always_false_v<PluginAudioPortsBuffer<settings>>, "Unsupported AudioPortsSettings");
 };
 
 //! Specialization for dynamically in-place, non-interleaved buffers
@@ -254,11 +254,12 @@ private:
 
 
 /**
- * The default audio port for audio plugins that do not provide their own.
- * Contains an audio port model and audio buffers.
+ * The default `AudioPorts` implementation for audio plugins that do not provide their own.
+ * Contains an `AudioPortsModel` and audio buffers.
  *
- * This audio port still has *some* ability for customization by using a custom `BufferT`,
- * but for full control, you'll need to provide your own audio port implementation.
+ * This class still has *some* ability for customization by using a custom `BufferT`,
+ * but for full control, you'll need to create your own `AudioPorts` implementation.
+ * You may also derive from this class.
  */
 template<AudioPortsSettings settings, template<AudioPortsSettings> class BufferT>
 class PluginAudioPorts
@@ -308,7 +309,7 @@ public:
 private:
 	void bufferPropertiesChanging(proc_ch_t inChannels, proc_ch_t outChannels, f_cnt_t frames) final
 	{
-		// Connects the audio port model to the buffers
+		// Connects `AudioPortsModel` to the buffers
 		this->updateBuffers(inChannels, outChannels, frames);
 	}
 };
