@@ -860,9 +860,6 @@ void RemoteVstPlugin::initEditor()
 	// change name
 	XStoreName(m_display, m_window, pluginName());
 
-	XMapWindow(m_display, m_window);
-	XFlush(m_display);
-
 	ERect* er = nullptr;
 	pluginDispatch(effEditGetRect, 0, 0, &er);
 
@@ -875,6 +872,9 @@ void RemoteVstPlugin::initEditor()
 		XResizeWindow(m_display, m_window,
 			static_cast<unsigned int>(m_windowWidth), static_cast<unsigned int>(m_windowHeight));
 	}
+
+	XMapWindow(m_display, m_window);
+	XFlush(m_display);
 
 	pluginDispatch(effEditOpen, 0, (intptr_t) m_display, (void*) m_window);
 
