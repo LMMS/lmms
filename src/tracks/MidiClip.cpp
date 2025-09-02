@@ -592,17 +592,15 @@ void MidiClip::cloneSteps()
 
 	for (const auto& note: oldStepNotes)
 	{
-		auto step = note->pos() * TimePos::stepsPerBar() / TimePos::ticksPerBar(); 
+		Note newNote = Note(TimePos(0), endPosition + note->pos());
 
-		Note * newNote = addStepNote(oldLength + step);
+		newNote.setType(Note::Type::Step);
+		newNote.setKey(note->key());
+		newNote.setLength(note->length());
+		newNote.setPanning(note->getPanning());
+		newNote.setVolume(note->getVolume());
 
-		if (newNote)
-		{
-			newNote->setKey(note->key());
-			newNote->setLength(note->length());
-			newNote->setPanning(note->getPanning());
-			newNote->setVolume(note->getVolume());
-		}
+		addNote(newNote, false);
 	}
 
 	updateLength();
