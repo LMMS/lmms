@@ -1,7 +1,7 @@
 /*
- * FileSearch.h - File system search task
+ * FileSearch.h
  *
- * Copyright (c) 2024 saker
+ * Copyright (c) 2025 Sotonye Atemie <sakertooth@gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -22,52 +22,68 @@
  *
  */
 
-#ifndef LMMS_FILE_SEARCH_H
-#define LMMS_FILE_SEARCH_H
+#ifndef LMMS_GUI_FILE_SEARCH_H
+#define LMMS_GUI_FILE_SEARCH_H
 
 #include <QDir>
 #include <QObject>
-#include <atomic>
+#include <QString>
+#include <future>
 
-namespace lmms {
-//! A Qt object that encapsulates the operation of searching the file system.
+namespace lmms::gui {
+//! The `FileSearch` class allows for searching for files on the filesystem.
+//! Searching occurs on a background thread, and results are emitted as a Qt slot back to the user.
 class FileSearch : public QObject
 {
 	Q_OBJECT
 public:
-	//! Number of milliseconds the search waits before signaling a matching result.
-	static constexpr int MillisecondsBetweenResults = 1;
+	//! Represents a search task to be carried out by the search object.
+	struct Task
+	{
+		QString filter;					 //! The filter to be tokenized.
+		QStringList paths;				 //! The list of paths to search recursively through.
+		QStringList extensions;			 //! The list of allowed extensions.
+		QFlags<QDir::Filter> dirFilters; //! The directory filter flag.
+	};
 
-	//! Create a `FileSearch` object that uses the specified string filter `filter` and extension filters in
-	//! `extensions` to search within the given `paths`.
-	//! `excludedPaths`, `dirFilters`, and `sortFlags` can optionally be specified to exclude certain directories, filter
-	//! out certain types of entries, and sort the matches.
-	FileSearch(const QString& filter, const QStringList& paths, const QStringList& extensions,
-		const QStringList& excludedPaths = {}, QDir::Filters dirFilters = QDir::Filters{},
-		QDir::SortFlags sortFlags = QDir::SortFlags{});
+	//! Create a search object with the given @p parent (if any).
+	FileSearch(QObject* parent = nullptr);
 
-	//! Execute the search, emitting the `foundResult` signal when matches are found.
-	void operator()();
+	//! Stop processing and destroys the object.
+	~FileSearch();
 
-	//! Cancel the search.
-	void cancel();
+	//! Cannot be copied.
+	FileSearch(const FileSearch&) = delete;
+
+	//! Cannot be moved.
+	FileSearch(FileSearch&&) = delete;
+
+	//! Cannot be copied.
+	FileSearch& operator=(const FileSearch&) = delete;
+
+	//! Cannot be moved.
+	FileSearch& operator=(FileSearch&&) = delete;
+
+	//! Commit to searching with the given @p task.
+	//! Cancels any previous search.
+	//! Callers can connect to the provided signals to interact with the search and its progress.
+	void search(Task task);
 
 signals:
-	//! Emitted when a result is found when searching the file system.
-	void foundMatch(FileSearch* search, const QString& match);
+	//! Emitted when the search object has found a matching path.
+	void foundMatch(const QString& path);
 
-	//! Emitted when the search completes.
-	void searchCompleted(FileSearch* search);
+	//! Emitted when the search object has started searching.
+	void started();
+
+	//! Emitted when the search object has finished searching.
+	void finished();
 
 private:
-	static auto isPathExcluded(const QString& path) -> bool;
-	QString m_filter;
-	QStringList m_paths;
-	QStringList m_extensions;
-	QStringList m_excludedPaths;
-	QDir::Filters m_dirFilters;
-	QDir::SortFlags m_sortFlags;
-	std::atomic<bool> m_cancel = false;
+	void runSearch(Task task);
+	std::future<void> m_task;
+	std::atomic_flag m_stop = ATOMIC_FLAG_INIT;
 };
-} // namespace lmms
-#endif // LMMS_FILE_SEARCH_H
+} // namespace lmms::gui
+
+#endif // LMMS_GUI_FILE_SEARCH_H
