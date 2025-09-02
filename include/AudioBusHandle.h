@@ -27,10 +27,12 @@
 #define LMMS_AUDIO_BUS_HANDLE_H
 
 #include <memory>
+#include <vector>
 #include <QString>
 #include <QMutex>
 
 #include "PlayHandle.h"
+#include "SampleFrame.h"
 
 namespace lmms
 {
@@ -58,7 +60,7 @@ public:
 		BoolModel* mutedModel = nullptr);
 	virtual ~AudioBusHandle();
 
-	SampleFrame* buffer() { return m_buffer; }
+	std::span<SampleFrame> buffer() { return m_buffer; }
 
 	// indicate whether JACK & Co should provide output-buffer at ext. port
 	bool extOutputEnabled() const { return m_extOutputEnabled; }
@@ -85,7 +87,7 @@ public:
 private:
 	volatile bool m_bufferUsage;
 
-	SampleFrame* const m_buffer;
+	std::vector<SampleFrame> m_buffer;
 
 	bool m_extOutputEnabled;
 	mix_ch_t m_nextMixerChannel;

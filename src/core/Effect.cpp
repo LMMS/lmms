@@ -44,7 +44,7 @@ Effect::Effect( const Plugin::Descriptor * _desc,
 	m_parent( nullptr ),
 	m_okay( true ),
 	m_noRun( false ),
-	m_running( false ),
+	m_awake(false),
 	m_enabledModel( true, this, tr( "Effect enabled" ) ),
 	m_wetDryModel( 1.0f, -1.0f, 1.0f, 0.01f, this, tr( "Wet/Dry mix" ) ),
 	m_autoQuitModel( 1.0f, 1.0f, 8000.0f, 100.0f, 1.0f, this, tr( "Decay" ) ),
@@ -111,34 +111,6 @@ void Effect::loadSettings( const QDomElement & _this )
 
 
 
-bool Effect::processAudioBuffer(SampleFrame* buf, const fpp_t frames)
-{
-	if (!isOkay() || dontRun() || !isEnabled() || !isRunning())
-	{
-		processBypassedImpl();
-		return false;
-	}
-
-	const auto status = processImpl(buf, frames);
-	switch (status)
-	{
-		case ProcessStatus::Continue:
-			break;
-		case ProcessStatus::ContinueIfNotQuiet:
-			handleAutoQuit({buf, frames});
-			break;
-		case ProcessStatus::Sleep:
-			return false;
-		default:
-			break;
-	}
-
-	return isRunning();
-}
-
-
-
-
 Effect * Effect::instantiate( const QString& pluginName,
 				Model * _parent,
 				Descriptor::SubPluginFeatures::Key * _key )
@@ -162,55 +134,29 @@ Effect * Effect::instantiate( const QString& pluginName,
 
 
 
-void Effect::handleAutoQuit(std::span<const SampleFrame> output)
+void Effect::handleAutoQuit(bool silentOutput)
 {
 	if (!m_autoQuitEnabled)
 	{
 		return;
 	}
 
-	/*
-	 * In the past, the RMS was calculated then compared with a threshold of 10^(-10).
-	 * Now we use a different algorithm to determine whether a buffer is non-quiet, so
-	 * a new threshold is needed for the best compatibility. The following is how it's derived.
-	 *
-	 * Old method:
-	 * RMS = average (L^2 + R^2) across stereo buffer.
-	 * RMS threshold = 10^(-10)
-	 *
-	 * So for a single channel, it would be:
-	 * RMS/2 = average M^2 across single channel buffer.
-	 * RMS/2 threshold = 5^(-11)
-	 *
-	 * The new algorithm for determining whether a buffer is non-silent compares M with the threshold,
-	 * not M^2, so the square root of M^2's threshold should give us the most compatible threshold for
-	 * the new algorithm:
-	 *
-	 * (RMS/2)^0.5 = (5^(-11))^0.5 = 0.0001431 (approx.)
-	 *
-	 * In practice though, the exact value shouldn't really matter so long as it's sufficiently small.
-	 */
-	static constexpr auto threshold = 0.0001431f;
-
 	// Check whether we need to continue processing input. Restart the
 	// counter if the threshold has been exceeded.
 
-	for (const SampleFrame& frame : output)
+	if (silentOutput)
 	{
-		const auto abs = frame.abs();
-		if (abs.left() >= threshold || abs.right() >= threshold)
+		// The output buffer is quiet, so check if auto-quit should be activated yet
+		if (++m_quietBufferCount > timeout())
 		{
-			// The output buffer is not quiet
-			m_quietBufferCount = 0;
-			return;
+			// Activate auto-quit
+			stopRunning();
 		}
 	}
-
-	// The output buffer is quiet, so check if auto-quit should be activated yet
-	if (++m_quietBufferCount > timeout())
+	else
 	{
-		// Activate auto-quit
-		stopRunning();
+		// The output buffer is not quiet
+		m_quietBufferCount = 0;
 	}
 }
 
@@ -256,8 +202,8 @@ void Effect::resample( int _i, const SampleFrame* _src_buf,
 	}
 	m_srcData[_i].input_frames = _frames;
 	m_srcData[_i].output_frames = Engine::audioEngine()->framesPerPeriod();
-	m_srcData[_i].data_in = const_cast<float*>(_src_buf[0].data());
-	m_srcData[_i].data_out = _dst_buf[0].data ();
+	m_srcData[_i].data_in = _src_buf[0].data();
+	m_srcData[_i].data_out = _dst_buf[0].data();
 	m_srcData[_i].src_ratio = (double) _dst_sr / _src_sr;
 	m_srcData[_i].end_of_input = 0;
 

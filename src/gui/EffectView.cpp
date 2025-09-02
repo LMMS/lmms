@@ -23,23 +23,26 @@
  *
  */
 
+#include "EffectView.h"
+
 #include <QGraphicsOpacityEffect>
 #include <QLayout>
 #include <QMouseEvent>
 #include <QPushButton>
 #include <QPainter>
 
-#include "EffectView.h"
-#include "DummyEffect.h"
+#include "AudioPortsModel.h"
 #include "CaptionMenu.h"
-#include "embed.h"
-#include "GuiApplication.h"
+#include "DummyEffect.h"
 #include "FontHelper.h"
+#include "GuiApplication.h"
 #include "Knob.h"
 #include "LedCheckBox.h"
 #include "MainWindow.h"
+#include "PinConnector.h"
 #include "SubWindow.h"
 #include "TempoSyncKnob.h"
+#include "embed.h"
 
 
 namespace lmms::gui
@@ -78,10 +81,9 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 
 	if( effect()->controls()->controlCount() > 0 )
 	{
-		auto ctls_btn = new QPushButton(tr("Controls"), this);
-		QFont f = ctls_btn->font();
-		ctls_btn->setFont(adjustedToPixelSize(f, DEFAULT_FONT_SIZE));
-		ctls_btn->setGeometry( 150, 14, 50, 20 );
+		auto ctls_btn = new QPushButton(embed::getIconPixmap("gear", 20, 20), "", this);
+		ctls_btn->setToolTip(tr("Controls"));
+		ctls_btn->setGeometry(144, 12, 28, 28);
 		ctls_btn->setFocusPolicy(Qt::NoFocus);
 		connect( ctls_btn, SIGNAL(clicked()),
 					this, SLOT(editControls()));
@@ -110,7 +112,22 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 			m_subWindow->hide();
 		}
 	}
-	
+
+	if (auto ap = effect()->audioPortsModel())
+	{
+		const auto formatString = tr("Pin connector\n%1");
+
+		m_pinConnectorButton = new QPushButton(embed::getIconPixmap("tool", 20, 20), "", this);
+		m_pinConnectorButton->setToolTip(formatString.arg(ap->getChannelCountText()));
+
+		connect(ap, &AudioPortsModel::propertiesChanged, [=, this]() {
+			m_pinConnectorButton->setToolTip(formatString.arg(effect()->audioPortsModel()->getChannelCountText()));
+		});
+
+		m_pinConnectorButton->setGeometry(144 + 32, 12, 28, 28);
+		connect(m_pinConnectorButton, &QPushButton::clicked, this, &EffectView::togglePinConnector);
+	}
+
 	m_opacityEffect = new QGraphicsOpacityEffect(this);
 	m_opacityEffect->setOpacity(1);
 	setGraphicsEffect(m_opacityEffect);
@@ -124,6 +141,7 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 
 EffectView::~EffectView()
 {
+	if (m_pinConnectorView) { m_pinConnectorView->closeWindow(); }
 	delete m_subWindow;
 }
 
@@ -145,6 +163,24 @@ void EffectView::editControls()
 			m_subWindow->hide();
 			effect()->controls()->setViewVisible( false );
 		}
+	}
+}
+
+
+
+
+void EffectView::togglePinConnector()
+{
+	auto ap = effect()->audioPortsModel();
+	if (!ap) { return; }
+
+	if (!m_pinConnectorView)
+	{
+		m_pinConnectorView = ap->instantiateView();
+	}
+	else
+	{
+		m_pinConnectorView->toggleVisibility();
 	}
 }
 

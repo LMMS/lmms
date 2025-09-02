@@ -377,7 +377,7 @@ void CompressorControlDialog::updateDisplay()
 		return;
 	}
 
-	if (!m_controls->m_effect->isEnabled() || !m_controls->m_effect->isRunning())
+	if (!m_controls->m_effect->isEnabled() || !m_controls->m_effect->isAwake())
 	{
 		m_controls->m_effect->m_displayPeak[0] = COMP_NOISE_FLOOR;
 		m_controls->m_effect->m_displayPeak[1] = COMP_NOISE_FLOOR;
@@ -616,7 +616,7 @@ void CompressorControlDialog::paintEvent(QPaintEvent *event)
 	m_p.setOpacity(0.25);
 	m_p.drawPixmap(0, 0, m_kneePixmap);
 	m_p.setOpacity(1);
-	if (m_controls->m_effect->isEnabled() && m_controls->m_effect->isRunning())
+	if (m_controls->m_effect->isEnabled() && m_controls->m_effect->isAwake())
 	{
 		m_p.drawPixmap(0, 0, m_kneePixmap2);
 	}

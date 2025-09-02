@@ -64,12 +64,7 @@ public:
 	Sf2Instrument( InstrumentTrack * _instrument_track );
 	~Sf2Instrument() override;
 
-	void play( SampleFrame* _working_buffer ) override;
-
-	void playNote( NotePlayHandle * _n,
-						SampleFrame* _working_buffer ) override;
 	void deleteNotePluginData( NotePlayHandle * _n ) override;
-
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 	void loadSettings( const QDomElement & _this ) override;
@@ -103,6 +98,9 @@ public slots:
 	void updateTuning();
 
 private:
+	void playImpl(std::span<SampleFrame> out) override;
+	void playNoteImpl(NotePlayHandle* nph, std::span<SampleFrame> out) override;
+
 	SRC_STATE * m_srcState;
 
 	fluid_settings_t* m_settings;

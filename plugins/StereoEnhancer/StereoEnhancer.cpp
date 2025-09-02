@@ -56,7 +56,7 @@ Plugin::Descriptor PLUGIN_EXPORT stereoenhancer_plugin_descriptor =
 StereoEnhancerEffect::StereoEnhancerEffect(
 			Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key ) :
-	Effect( &stereoenhancer_plugin_descriptor, _parent, _key ),
+	AudioPlugin(&stereoenhancer_plugin_descriptor, _parent, _key),
 	m_seFX( DspEffectLibrary::StereoEnhancer( 0.0f ) ),
 	m_delayBuffer( new SampleFrame[DEFAULT_BUFFER_SIZE] ),
 	m_currFrame( 0 ),
@@ -82,17 +82,17 @@ StereoEnhancerEffect::~StereoEnhancerEffect()
 
 
 
-Effect::ProcessStatus StereoEnhancerEffect::processImpl(SampleFrame* buf, const fpp_t frames)
+ProcessStatus StereoEnhancerEffect::processImpl(InterleavedBufferView<float, 2> inOut)
 {
 	const float d = dryLevel();
 	const float w = wetLevel();
 
-	for (fpp_t f = 0; f < frames; ++f)
+	for (float* frame : inOut.framesView())
 	{
 
 		// copy samples into the delay buffer
-		m_delayBuffer[m_currFrame][0] = buf[f][0];
-		m_delayBuffer[m_currFrame][1] = buf[f][1];
+		m_delayBuffer[m_currFrame][0] = frame[0];
+		m_delayBuffer[m_currFrame][1] = frame[1];
 
 		// Get the width knob value from the Stereo Enhancer effect
 		float width = m_seFX.wideCoeff();
@@ -107,19 +107,20 @@ Effect::ProcessStatus StereoEnhancerEffect::processImpl(SampleFrame* buf, const 
 		}
 
 		//sample_t s[2] = { buf[f][0], buf[f][1] };	//Vanilla
-		auto s = std::array{buf[f][0], m_delayBuffer[frameIndex][1]};	//Chocolate
+		auto s = std::array{frame[0], m_delayBuffer[frameIndex][1]};	//Chocolate
 
 		m_seFX.nextSample( s[0], s[1] );
 
-		buf[f][0] = d * buf[f][0] + w * s[0];
-		buf[f][1] = d * buf[f][1] + w * s[1];
+		frame[0] = d * frame[0] + w * s[0];
+		frame[1] = d * frame[1] + w * s[1];
 
 		// Update currFrame
 		m_currFrame += 1;
 		m_currFrame %= DEFAULT_BUFFER_SIZE;
 	}
 
-	if( !isRunning() )
+	// TODO: Move this to processBypassedImpl?
+	if (!isAwake())
 	{
 		clearMyBuffer();
 	}
