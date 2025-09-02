@@ -51,6 +51,7 @@ class LMMS_EXPORT PinConnector
 	Q_OBJECT
 
 	Q_PROPERTY(QColor backgroundColor MEMBER m_backgroundColor)
+	Q_PROPERTY(QColor passthroughLineColor MEMBER m_passthroughLineColor)
 
 public:
 	explicit PinConnector(AudioPortsModel* model);
@@ -81,6 +82,7 @@ private:
 	MatrixView* m_outView = nullptr;
 
 	QColor m_backgroundColor;
+	QColor m_passthroughLineColor;
 };
 
 

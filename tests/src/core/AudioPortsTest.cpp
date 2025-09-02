@@ -720,8 +720,8 @@ private slots:
 		compareBuffers(coreBus, coreBusExpected);
 	}
 
-	//! Verifies correct partially-bypassed routing for 2x2 non-interleaved audio processor
-	void Routing_NonInterleaved2x2_Bypass()
+	//! Verifies correct partially-passthrough routing for 2x2 non-interleaved audio processor
+	void Routing_NonInterleaved2x2_Passthrough()
 	{
 		using namespace lmms;
 
@@ -785,7 +785,7 @@ private slots:
 			sampleL = coreBus[0][sampleIdx] * 2; // left channel:  doubled output from processor
 
 			float& sampleR = coreBusExpected[0][sampleIdx + 1];
-			sampleR = coreBus[0][sampleIdx + 1]; // right channel: bypassed
+			sampleR = coreBus[0][sampleIdx + 1]; // right channel: passthrough
 		}
 
 		// Route from processor back to Core

@@ -733,6 +733,7 @@ lmms--gui--PianoView {
 
 lmms--gui--PinConnector {
 	qproperty-backgroundColor: rgb(80, 80, 80);
+	qproperty-passthroughLineColor: rgb(47, 204, 113);
 }
 
 lmms--gui--PinConnector--MatrixView {

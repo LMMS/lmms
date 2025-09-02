@@ -65,6 +65,7 @@ PinConnector::PinConnector(AudioPortsModel* model)
 
 	assert(model != nullptr);
 	connect(model, &AudioPortsModel::propertiesChanged, this, &PinConnector::updateProperties);
+	connect(model, &AudioPortsModel::dataChanged, this, static_cast<void(QWidget::*)()>(&QWidget::update));
 
 	m_scrollArea = new QScrollArea{};
 	m_scrollArea->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
@@ -194,7 +195,9 @@ void PinConnector::paintEvent(QPaintEvent*)
 	auto f = adjustedToPixelSize(font(), static_cast<int>(cellSize * 0.9));
 	f.setBold(false);
 	p.setFont(f);
-	p.setPen(palette().text().color());
+
+	const auto normalTextColor = palette().text().color();
+	p.setPen(normalTextColor);
 
 	// Get matrix postions/sizes
 	auto inMatrixRect = m_inView->rect();
@@ -207,9 +210,9 @@ void PinConnector::paintEvent(QPaintEvent*)
 	{
 		const auto width = inMatrixRect.left() - 4;
 		int yPos = inMatrixRect.y() + MatrixView::BorderWidth - 2;
-		for (unsigned idx = 0; idx < model->trackChannelCount(); ++idx)
+		for (track_ch_t channel = 0; channel < model->trackChannelCount(); ++channel)
 		{
-			const auto name = trackChannelName(*model, idx);
+			const auto name = trackChannelName(*model, channel);
 			p.drawText(0, yPos, width, cellSize, Qt::AlignRight,
 				QString::fromUtf16(u"%1 \U0001F82E").arg(name));
 
@@ -223,9 +226,9 @@ void PinConnector::paintEvent(QPaintEvent*)
 		const int xPos = outMatrixRect.right() + 4;
 		int yPos = outMatrixRect.y() + MatrixView::BorderWidth - 2;
 		const int width = this->width() - outMatrixRect.right() - 4;
-		for (unsigned idx = 0; idx < model->trackChannelCount(); ++idx)
+		for (track_ch_t channel = 0; channel < model->trackChannelCount(); ++channel)
 		{
-			const auto name = trackChannelName(*model, idx);
+			const auto name = trackChannelName(*model, channel);
 			p.drawText(xPos, yPos, width, cellSize, Qt::AlignLeft,
 				QString::fromUtf16(u"\U0001F82E %1").arg(name));
 
@@ -240,12 +243,12 @@ void PinConnector::paintEvent(QPaintEvent*)
 	// Draw processor channel text (in)
 	int yPos = inMatrixRect.top() - 4;
 	int xPos = inMatrixRect.x() + MatrixView::BorderWidth - 2;
-	for (int idx = 0; idx < model->in().channelCount(); ++idx)
+	for (proc_ch_t channel = 0; channel < model->in().channelCount(); ++channel)
 	{
 		const auto transform = QTransform{}.translate(xPos, yPos).rotate(-90);
 		p.setTransform(transform);
 
-		const auto name = model->in().channelName(idx);
+		const auto name = model->in().channelName(channel);
 		p.drawText(0, 0, yPos, cellSize * 2, Qt::AlignLeft,
 			QString::fromUtf16(u"\U0001F82E %1").arg(name));
 
@@ -255,12 +258,16 @@ void PinConnector::paintEvent(QPaintEvent*)
 	// Draw processor channel text (out)
 	yPos = outMatrixRect.top() - 4;
 	xPos = outMatrixRect.x() + MatrixView::BorderWidth - 2;
-	for (int idx = 0; idx < model->out().channelCount(); ++idx)
+	const auto inactiveTextColor = normalTextColor.darker(150);
+	for (proc_ch_t channel = 0; channel < model->out().channelCount(); ++channel)
 	{
+		const bool channelUsed = model->usedProcessorChannels().at(channel);
+		p.setPen(channelUsed ?  normalTextColor : inactiveTextColor);
+
 		const auto transform = QTransform{}.translate(xPos, yPos).rotate(-90);
 		p.setTransform(transform);
 
-		const auto name = model->out().channelName(idx);
+		const auto name = model->out().channelName(channel);
 		p.drawText(0, 0, yPos, cellSize * 2, Qt::AlignLeft,
 			QString::fromUtf16(u"\U0001F82C %1").arg(name));
 
@@ -268,6 +275,38 @@ void PinConnector::paintEvent(QPaintEvent*)
 	}
 
 	p.restore();
+
+	// Draw dotted arrows to indicate track channels that pass through
+	// when no processor output channels are using it
+	if (model->in().channelCount() > 0 && model->out().channelCount() > 0)
+	{
+		constexpr auto length = CenterMargin.width() * 0.8;
+		constexpr auto centerPoint = QPointF{CenterMargin.width() / 2, cellSize / 2};
+
+		auto line = QLineF{centerPoint - QPointF{length / 2, 0}, centerPoint + QPointF{length / 2, 0}};
+		line.translate(m_spacer->pos());
+
+		constexpr double arrowheadSize = 10.0;
+
+		QPolygonF arrowhead;
+		arrowhead << line.p2() // tip
+			<< (line.p2() + QPointF{-arrowheadSize, -arrowheadSize / 2}) // left point
+			<< (line.p2() + QPointF{-arrowheadSize, arrowheadSize / 2}); // right point
+
+		for (track_ch_t channel = 0; channel < model->trackChannelCount(); ++channel)
+		{
+			const bool bypassed = !model->usedTrackChannels().at(channel);
+			if (bypassed)
+			{
+				p.setPen(QPen{m_passthroughLineColor, 2, Qt::PenStyle::DotLine});
+				p.drawLine(line.translated(0, channel * cellSize));
+
+				p.setPen(Qt::PenStyle::NoPen);
+				p.setBrush(m_passthroughLineColor);
+				p.drawPolygon(arrowhead.translated(2, channel * cellSize));
+			}
+		}
+	}
 }
 
 auto PinConnector::trackChannelName(const AudioPortsModel& model, track_ch_t channel) const -> QString

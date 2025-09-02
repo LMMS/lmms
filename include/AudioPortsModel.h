@@ -173,31 +173,6 @@ public:
 
 	auto getChannelCountText() const -> QString;
 
-	static constexpr track_ch_t MaxTrackChannels = 256; // TODO: Move somewhere else
-
-#ifdef LMMS_TESTING
-	friend class ::AudioPortsTest;
-#endif
-
-signals:
-	//! Called when channel counts change (whether audio processor or track channel counts)
-	//void propertiesChanged(); // from Model
-
-protected:
-	/**
-	 * Called when channel counts or the frame count are changing.
-	 *
-	 * The parameters will contain the new values, but `in().channelCount()` and `out().channelCount()`
-	 * will still return the old values until after this method is called.
-	 */
-	virtual void bufferPropertiesChanging(proc_ch_t inChannels, proc_ch_t outChannels, f_cnt_t frames) = 0;
-
-	/**
-	 * Audio port implementations can override this to provide custom channel names,
-	 * otherwise the default channel names are used.
-	 */
-	virtual auto channelName(proc_ch_t channel, bool isOutput) const -> QString;
-
 	/**
 	 * Caches the highest indexed track channel in use, so that the audio ports router can
 	 * loop over [0, trackChannelsUpperBound) rather than [0, totalTrackChannels).
@@ -209,7 +184,7 @@ protected:
 
 	/**
 	 * Caches whether any processor output channels are routed to a given track channel (meaning the
-	 * track channel is used and not "bypassed"), which eliminates need for O(N) checking in
+	 * track channel is used and not a "passthrough"), which eliminates need for O(N) checking in
 	 * `AudioPorts::Router::receive()`.
 	 *
 	 * This means usedTrackChannels()[i] == true if and only if out().enabled(i, x) == true
@@ -240,6 +215,31 @@ protected:
 	 * pair currently routed to/from the processor.
 	 */
 	auto directRouting() const -> std::optional<track_ch_t> { return m_directRouting; }
+
+	static constexpr track_ch_t MaxTrackChannels = 256; // TODO: Move somewhere else
+
+#ifdef LMMS_TESTING
+	friend class ::AudioPortsTest;
+#endif
+
+signals:
+	//! Called when channel counts change (whether audio processor or track channel counts)
+	//void propertiesChanged(); // from Model
+
+protected:
+	/**
+	 * Called when channel counts or the frame count are changing.
+	 *
+	 * The parameters will contain the new values, but `in().channelCount()` and `out().channelCount()`
+	 * will still return the old values until after this method is called.
+	 */
+	virtual void bufferPropertiesChanging(proc_ch_t inChannels, proc_ch_t outChannels, f_cnt_t frames) = 0;
+
+	/**
+	 * Audio port implementations can override this to provide custom channel names,
+	 * otherwise the default channel names are used.
+	 */
+	virtual auto channelName(proc_ch_t channel, bool isOutput) const -> QString;
 
 private:
 	auto setTrackChannelCountImpl(track_ch_t count) -> bool;
