@@ -189,7 +189,6 @@ protected:
 
 protected slots:
 	void play() override;
-	void record() override;
 	void recordAccompany() override;
 	void stop() override;
 
