@@ -581,27 +581,22 @@ void MidiClip::cloneSteps()
 	int oldLength = m_steps;
 	m_steps *= 2; // cloning doubles the track
 
-	// clones step notes into a separate vector
 	const TimePos endPosition = TimePos::stepPosition(oldLength);
-	NoteVector oldStepNotes;
-	std::copy_if(
-		m_notes.begin(), m_notes.end(),
-		std::back_inserter(oldStepNotes),
-		[=](Note* n) { return n->type() == Note::Type::Step && n->pos() < endPosition; }
-	);
 
-	for (const auto& note: oldStepNotes)
-	{
-		Note newNote = Note(TimePos(0), endPosition + note->pos());
+	// Must reserve so that we don't accidentally grow the vector.
+	m_notes.reserve(m_notes.size() * 2);
 
-		newNote.setType(Note::Type::Step);
-		newNote.setKey(note->key());
-		newNote.setLength(note->length());
-		newNote.setPanning(note->getPanning());
-		newNote.setVolume(note->getVolume());
+	instrumentTrack()->lock();
 
-		addNote(newNote, false);
+	for (auto& note: m_notes)  {
+		if (note->pos() >= endPosition) { continue; }
+		auto newNote = note->clone();
+
+		newNote->setPos(endPosition + note->pos());
+		m_notes.push_back(newNote);
 	}
+
+	instrumentTrack()->unlock();
 
 	updateLength();
 	emit dataChanged();
