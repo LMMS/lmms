@@ -151,6 +151,16 @@ void Editor::closeEvent(QCloseEvent * event)
 	event->ignore();
  }
 
+ void Editor::keyPressEvent(QKeyEvent *ke)
+ {
+	if (ke->key() == Qt::Key_Space)
+	{
+		togglePlayStop();
+		return;
+	}
+	ke->ignore();
+ }
+
 DropToolBar::DropToolBar(QWidget* parent) : QToolBar(parent)
 {
 	setAcceptDrops(true);
