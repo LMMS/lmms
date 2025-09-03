@@ -63,10 +63,8 @@ public:
 	 */
 	[[nodiscard]] auto reserve(std::size_t size = static_cast<std::size_t>(-1)) -> std::span<T>
 	{
-		assert(!m_reserved && "attempt to reserve with another reservation already in progress");
 		const auto available = m_writeIndex < m_readIndex ? m_readIndex - m_writeIndex - 1
 														  : m_buffer.size() - m_writeIndex - (m_readIndex == 0 ? 1 : 0);
-		m_reserved = true;
 		return {&m_buffer[m_writeIndex], std::min(size, available)};
 	}
 
@@ -78,9 +76,7 @@ public:
 	 */
 	[[nodiscard]] auto retrieve(std::size_t size = static_cast<std::size_t>(-1)) -> std::span<const T>
 	{
-		assert(!m_reserved && "attempt to retrieve with another retrieval already in progress");
 		const auto available = m_readIndex <= m_writeIndex ? m_writeIndex - m_readIndex : m_buffer.size() - m_readIndex;
-		m_retrieved = true;
 		return {&m_buffer[m_readIndex], std::min(size, available)};
 	}
 
@@ -89,31 +85,19 @@ public:
 	 *
 	 * @param size
 	 */
-	void commit(std::size_t size)
-	{
-		assert(m_reserved && "attempt to commit with no reservation");
-		m_writeIndex = (m_writeIndex + size) % m_buffer.size();
-		m_reserved = false;
-	}
+	void commit(std::size_t size) { m_writeIndex = (m_writeIndex + size) % m_buffer.size(); }
 
 	/**
 	 * @brief Acknowledge reading @a size elements from the buffer.
 	 *
 	 * @param size
 	 */
-	void decommit(std::size_t size)
-	{
-		assert(m_retrieved && "attempt to decommit with no retrieval");
-		m_readIndex = (m_readIndex + size) % m_buffer.size();
-		m_retrieved = false;
-	}
+	void decommit(std::size_t size) { m_readIndex = (m_readIndex + size) % m_buffer.size(); }
 
 private:
 	std::vector<T> m_buffer;
 	std::size_t m_writeIndex = 0;
 	std::size_t m_readIndex = 0;
-	bool m_reserved = false;
-	bool m_retrieved = false;
 };
 } // namespace lmms
 
