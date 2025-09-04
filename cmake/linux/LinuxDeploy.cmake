@@ -89,7 +89,7 @@ endforeach()
 
 # Copy Suil modules
 if(CPACK_SUIL_MODULES)
-	set(SUIL_MODULES_TARGET "${APP}/usr/lib/${CPACK_SUIL_MODULES_PREFIX}")
+	set(SUIL_MODULES_TARGET "${APP}/usr/lib/suil-0")
 	file(MAKE_DIRECTORY "${SUIL_MODULES_TARGET}")
 	file(COPY ${CPACK_SUIL_MODULES} DESTINATION "${SUIL_MODULES_TARGET}")
 endif()
@@ -125,38 +125,9 @@ file(COPY "${APP}/usr/share/icons/hicolor/256x256/apps/${lmms}.png" DESTINATION 
 file(RENAME "${APP}/${lmms}.png" "${APP}/.DirIcon")
 file(COPY "${APP}/usr/share/icons/hicolor/256x256/apps/${lmms}.png" DESTINATION "${APP}")
 
-# Build list of libraries to inform linuxdeploy about
-# e.g. --library=foo.so --library=bar.so
-file(GLOB LIBS "${APP}/usr/lib/${lmms}/*.so")
-
-# Inform linuxdeploy about LADSPA plugins; may depend on bundled fftw3f, etc.
-file(GLOB LADSPA "${APP}/usr/lib/${lmms}/ladspa/*.so")
-
-# Inform linuxdeploy about remote plugins
-file(GLOB REMOTE_PLUGINS "${APP}/usr/lib/${lmms}/*Remote*")
-
 # Inform linuxdeploy-plugin-qt about wayland plugin
 set(ENV{EXTRA_PLATFORM_PLUGINS} "libqwayland-generic.so")
 set(ENV{EXTRA_QT_MODULES} "waylandcompositor")
-
-# Collect, sort and dedupe all libraries
-list(APPEND LIBS ${LADSPA})
-list(APPEND LIBS ${REMOTE_PLUGINS})
-list(APPEND LIBS ${CPACK_SUIL_MODULES})
-list(REMOVE_DUPLICATES LIBS)
-list(SORT LIBS)
-
-# Handle non-relinkable files (e.g. RemoveVstPlugin[32|64], but not NativeLinuxRemoteVstPlugin)
-list(FILTER LIBS EXCLUDE REGEX "\\/RemoteVst")
-
-# Construct linuxdeploy parameters
-foreach(_lib IN LISTS LIBS)
-	if(EXISTS "${_lib}")
-		list(APPEND LIBRARIES "--library=${_lib}")
-	endif()
-endforeach()
-
-list(APPEND SKIP_LIBRARIES "--exclude-library=*libgallium*")
 
 # Call linuxdeploy
 message(STATUS "Calling ${LINUXDEPLOY_BIN} --appdir \"${APP}\" ... [... libraries].")
@@ -164,8 +135,9 @@ execute_process(COMMAND "${LINUXDEPLOY_BIN}"
 	--appdir "${APP}"
 	--desktop-file "${DESKTOP_FILE}"
 	--plugin qt
-	${LIBRARIES}
-	${SKIP_LIBRARIES}
+	--deploy-deps-only "${APP}/usr/lib/${lmms}/"
+   	--deploy-deps-only "${APP}/usr/lib/${lmms}/ladspa/"
+   	--exclude-library "*libgallium*"
 	--verbosity ${VERBOSITY}
 	WORKING_DIRECTORY "${CPACK_CURRENT_BINARY_DIR}"
 	${OUTPUT_QUIET}
@@ -188,33 +160,6 @@ foreach(_lib IN LISTS EXCLUDE_LIBS)
 		file(REMOVE "${_lib}")
 	endif()
 endforeach()
-
-# FIXME: Remove when linuxdeploy supports subfolders https://github.com/linuxdeploy/linuxdeploy/issues/305
-foreach(_lib IN LISTS LIBS)
-	if(EXISTS "${_lib}")
-		file(REMOVE "${_lib}")
-	endif()
-endforeach()
-# Move RemotePlugins into to LMMS_PLUGIN_DIR
-file(GLOB WINE_VST_LIBS
-	"${APP}/usr/lib/${lmms}/RemoteVstPlugin*"
-	"${APP}/usr/lib/${lmms}/32")
-foreach(_file IN LISTS WINE_VST_LIBS)
-	if(EXISTS "${_file}")
-		get_filename_component(_name "${_file}" NAME)
-		file(RENAME "${_file}" "${APP}/usr/lib/${_name}")
-	endif()
-endforeach()
-file(GLOB WINE_32_LIBS
-	"${APP}/usr/lib/${lmms}/RemoteVstPlugin*")
-foreach(_lib IN LISTS WINE_64_LIBS)
-	if(EXISTS "${_lib}")
-		get_filename_component(_file "${_lib}" NAME)
-		file(RENAME "${_lib}" "${APP}/usr/lib/${_file}")
-	endif()
-endforeach()
-
-file(REMOVE_RECURSE "${SUIL_MODULES_TARGET}" "${APP}/usr/lib/${lmms}/ladspa/")
 
 # Copy "exclude-list" lib(s) into specified location
 macro(copy_excluded ldd_target name_match destination relocated_lib)
