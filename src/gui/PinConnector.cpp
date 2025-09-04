@@ -261,7 +261,7 @@ void PinConnector::paintEvent(QPaintEvent*)
 	const auto inactiveTextColor = normalTextColor.darker(150);
 	for (proc_ch_t channel = 0; channel < model->out().channelCount(); ++channel)
 	{
-		const bool channelUsed = model->usedProcessorChannels().at(channel);
+		const bool channelUsed = model->out().usedChannels().at(channel);
 		p.setPen(channelUsed ?  normalTextColor : inactiveTextColor);
 
 		const auto transform = QTransform{}.translate(xPos, yPos).rotate(-90);
@@ -295,8 +295,8 @@ void PinConnector::paintEvent(QPaintEvent*)
 
 		for (track_ch_t channel = 0; channel < model->trackChannelCount(); ++channel)
 		{
-			const bool bypassed = !model->usedTrackChannels().at(channel);
-			if (bypassed)
+			const bool passthrough = !model->out().usedTrackChannels()[channel];
+			if (passthrough)
 			{
 				p.setPen(QPen{m_passthroughLineColor, 2, Qt::PenStyle::DotLine});
 				p.drawLine(line.translated(0, channel * cellSize));

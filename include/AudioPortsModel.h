@@ -27,6 +27,7 @@
 #define LMMS_AUDIO_PORTS_MODEL_H
 
 #include <algorithm>
+#include <bitset>
 #include <cassert>
 #include <cstdint>
 #include <cstring>
@@ -111,8 +112,27 @@ public:
 
 		auto isOutput() const -> bool { return m_isOutput; }
 
-		//! Calls the parent's cache update methods
-		void updateCache(track_ch_t trackChannel, proc_ch_t processorChannel);
+		/**
+		 * @brief Fast lookup for which track channels are used by the processor.
+		 *
+		 * @returns a bitset whose index represents a track channel and whose value at that index tells
+		 *          whether the track channel is connected to at least one processor channel.
+		 *
+		 * For the input matrix, this means which track channels are routed to one or more processor input.
+		 * For the output matrix, this means which track channels have one or more processor outputs routed to them.
+		 */
+		auto usedTrackChannels() const -> const std::bitset<MaxTrackChannels>& { return m_usedTrackChannels; }
+
+		/**
+		 * @brief Fast lookup for which processor channels are used by the track channels.
+		 *
+		 * @returns a dynamic bitset whose index represents a processor channel and whose value at that index tells
+		 *          whether the processor channel is connected to at least one track channel.
+		 *
+		 * For the input matrix, this means which processor inputs have one or more track channel routed to them.
+		 * For the output matrix, this means which processor outputs are routed to one or more track channel.
+		 */
+		auto usedChannels() const -> const std::vector<bool>& { return m_usedChannels; }
 
 		friend class AudioPortsModel;
 
@@ -122,6 +142,14 @@ public:
 
 		void setDefaultConnections();
 
+		void updateUsedTrackChannels(track_ch_t channel);
+		void updateUsedTrackChannels();
+
+		void updateUsedChannels(proc_ch_t channel);
+		void updateUsedChannels();
+
+		void updateAllUsedChannels();
+
 		void saveSettings(QDomDocument& doc, QDomElement& elem) const;
 		void loadSettings(const QDomElement& elem);
 
@@ -129,6 +157,9 @@ public:
 		proc_ch_t m_channelCount = 0;
 		const bool m_isOutput = false;
 		AudioPortsModel* m_parent = nullptr;
+
+		std::bitset<MaxTrackChannels> m_usedTrackChannels;
+		std::vector<bool> m_usedChannels;
 	};
 
 	AudioPortsModel(bool isInstrument, Model* parent = nullptr);
@@ -183,26 +214,6 @@ public:
 	auto trackChannelsUpperBound() const -> track_ch_t { return m_trackChannelsUpperBound; }
 
 	/**
-	 * Caches whether any processor output channels are routed to a given track channel (meaning the
-	 * track channel is used and not a "passthrough"), which eliminates need for O(N) checking in
-	 * `AudioPorts::Router::receive()`.
-	 *
-	 * This means usedTrackChannels()[i] == true if and only if out().enabled(i, x) == true
-	 * for any audio processor channel x.
-	 */
-	auto usedTrackChannels() const -> const std::vector<bool>& { return m_usedTrackChannels; }
-
-	/**
-	 * Caches whether a given processor output channel is routed to any track channel (meaning the
-	 * processor channel is being used), which eliminates need for O(N) checking when detecting
-	 * quiet output buffers for a processor that returned `ProcessStatus::ContinueIfNotQuiet`.
-	 *
-	 * This means usedProcessorChannels()[i] == true if and only if out().enabled(x, i) == true
-	 * for any track channel x.
-	 */
-	auto usedProcessorChannels() const -> const std::vector<bool>& { return m_usedProcessorChannels; }
-
-	/**
 	 * Any processor with 2-channel interleaved buffers connected to the track channels in the default
 	 * pin configuration (L --> L, R --> R) can be connected directly without any complicated routing.
 	 * This greatly simplifies the job of `AudioPorts::Router` and should bring a significant performance boost.
@@ -215,8 +226,6 @@ public:
 	 * pair currently routed to/from the processor.
 	 */
 	auto directRouting() const -> std::optional<track_ch_t> { return m_directRouting; }
-
-	static constexpr track_ch_t MaxTrackChannels = 256; // TODO: Move somewhere else
 
 #ifdef LMMS_TESTING
 	friend class ::AudioPortsTest;
@@ -245,15 +254,6 @@ private:
 	auto setTrackChannelCountImpl(track_ch_t count) -> bool;
 	auto setProcessorChannelCountsImpl(proc_ch_t inCount, proc_ch_t outCount, bool silent) -> bool;
 
-	/*
-	 * Cache update methods
-	 */
-
-	void updateAllUsedChannels();
-	void updateAllUsedTrackChannels();
-	void updateAllUsedProcessorChannels();
-	void updateUsedTrackChannels(track_ch_t trackChannel);
-	void updateUsedProcessorChannels(proc_ch_t outChannel);
 	void updateDirectRouting();
 
 	Matrix m_in{this, false}; //!< LMMS --> audio processor
@@ -269,12 +269,10 @@ private:
 	const bool m_isInstrument = false;
 
 	/*
-	 * The following are cached values meant to improve `AudioPorts::Router` performance
+	 * The following are cached values primarily meant to improve `AudioPorts::Router` performance
 	 */
 
 	track_ch_t m_trackChannelsUpperBound = DEFAULT_CHANNELS;
-	std::vector<bool> m_usedTrackChannels;
-	std::vector<bool> m_usedProcessorChannels;
 	std::optional<track_ch_t> m_directRouting;
 };
 
