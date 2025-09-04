@@ -136,6 +136,8 @@ execute_process(COMMAND "${LINUXDEPLOY_BIN}"
 	--desktop-file "${DESKTOP_FILE}"
 	--plugin qt
 	--deploy-deps-only "${APP}/usr/lib/${lmms}/"
+	--deploy-deps-only "${APP}/usr/lib/${lmms}/32/"
+	--deploy-deps-only "${APP}/usr/lib/suil-0/"
    	--deploy-deps-only "${APP}/usr/lib/${lmms}/ladspa/"
    	--exclude-library "*libgallium*"
 	--verbosity ${VERBOSITY}
@@ -201,7 +203,7 @@ endmacro()
 copy_excluded("${APP}/usr/bin/${lmms}" "libjack.so" "${APP}/usr/lib/jack" relocated_jack)
 if(relocated_jack)
 	# libdb's not excluded however we'll re-use the macro as a convenient path calculation
-	# See https://github.com/LMMS/lmms/issues/7689s
+	# See https://github.com/LMMS/lmms/issues/7689
 	copy_excluded("${relocated_jack}" "libdb-" "${APP}/usr/lib/jack" relocated_libdb)
 	get_filename_component(libdb_name "${relocated_libdb}" NAME)
 	if(relocated_libdb AND EXISTS "${APP}/usr/lib/${libdb_name}")
