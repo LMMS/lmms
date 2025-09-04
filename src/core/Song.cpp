@@ -611,7 +611,7 @@ void Song::setPlayPos( tick_t ticks, PlayMode playMode )
 	getPlayPos(playMode).setTicks( ticks );
 	getPlayPos(playMode).setCurrentFrame( 0.0f );
 	getPlayPos(playMode).setJumped( true );
-	setToTime(0);
+	setToTimeByTicks(ticks);
 
 // send a signal if playposition changes during playback
 	if( isPlaying() )
