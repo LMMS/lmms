@@ -7,7 +7,7 @@ macro(copy_dependency source_lib name_match destination relocated_lib)
 		set(_command_echo "${COMMAND_ECHO}")
 	endif()
 
-	execute_process(COMMAND file -b --mime-type ${source_lib} OUTPUT_VARIABLE file_type)
+	execute_process(COMMAND file -b --mime-type "${source_lib}" OUTPUT_VARIABLE file_type)
 
 	set(_is_linux_lib false)
 	set(_is_mac_lib false)
@@ -25,11 +25,11 @@ macro(copy_dependency source_lib name_match destination relocated_lib)
 	endif()
 
 	execute_process(COMMAND ${_lib_command}
-    		"${source_lib}"
-    		OUTPUT_VARIABLE raw_output
-    		OUTPUT_STRIP_TRAILING_WHITESPACE
-    		COMMAND_ECHO ${_command_echo}
-    		COMMAND_ERROR_IS_FATAL ANY)
+		"${source_lib}"
+		OUTPUT_VARIABLE raw_output
+		OUTPUT_STRIP_TRAILING_WHITESPACE
+		COMMAND_ECHO ${_command_echo}
+		COMMAND_ERROR_IS_FATAL ANY)
 
     # escape periods to avoid double-escaping
     string(REPLACE "." "\\." name_match "${name_match}")
