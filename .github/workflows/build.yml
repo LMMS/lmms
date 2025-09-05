@@ -183,11 +183,9 @@ jobs:
           - arch: x86_64
             os: macos-13
             xcode: "15.2"
-            minimum_deployment_target: "10.13"
           - arch: arm64
             os: macos-14
             xcode: "15.4"
-            minimum_deployment_target: "11.0"
     name: macos-${{ matrix.arch }}
     runs-on: ${{ matrix.os }}
     env:
@@ -219,11 +217,11 @@ jobs:
       - name: Cache ccache data
         uses: actions/cache@v3
         with:
-          key: "ccache-${{ github.job }}-${{ matrix.arch }}-${{ matrix.minimum_deployment_target }}\
-            -${{ github.ref }}-${{ github.run_id }}"
+          key: "ccache-${{ github.job }}-${{ matrix.arch }}-${{ github.ref }}\
+            -${{ github.run_id }}"
           restore-keys: |
-            ccache-${{ github.job }}-${{ matrix.arch }}-${{ matrix.minimum_deployment_target }}-${{ github.ref }}-
-            ccache-${{ github.job }}-${{ matrix.arch }}-${{ matrix.minimum_deployment_target }}-
+            ccache-${{ github.job }}-${{ matrix.arch }}-${{ github.ref }}-
+            ccache-${{ github.job }}-${{ matrix.arch }}-
           path: ~/Library/Caches/ccache
       - name: Install dependencies
         run: |
@@ -238,10 +236,13 @@ jobs:
         run: |
           ccache --zero-stats
           mkdir build
+          OTOOL_OUT="$(otool -l "$(brew --prefix qt@5)/bin/qmake")"
+          MIN_VER="$(echo "$OTOOL_OUT" |grep minos || echo "$OTOOL_OUT" |grep -A 2 LC_VERSION_MIN_MACOS|grep version)"
+          export MACOSX_DEPLOYMENT_TARGET="$(echo "$MIN_VER"|awk '{print $2}')"
+          echo "Inferring 'MACOSX_DEPLOYMENT_TARGET=$MACOSX_DEPLOYMENT_TARGET' based on qmake"
           cmake -S . \
                 -B build \
                 -DCMAKE_OSX_ARCHITECTURES=${{ matrix.arch }} \
-                -DCMAKE_OSX_DEPLOYMENT_TARGET=${{ matrix.minimum_deployment_target }} \
                 $CMAKE_OPTS \
                 -DUSE_WERROR=OFF
       - name: Build
@@ -271,7 +272,7 @@ jobs:
         if: ${{ steps.cache-homebrew.outputs.cache-matched-key != env.key }}
         uses: actions/cache/save@v3
         with:
-          key: ${{ env.key }}
+          key: ${{ env.key }} 
           path: ~/Library/Caches/Homebrew/downloads
         env:
           key: "homebrew-${{ matrix.arch }}\
