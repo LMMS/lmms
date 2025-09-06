@@ -41,7 +41,7 @@ else
 	fi
 fi
 
-# Obtain the binary name
+# Obtain the package name
 if [ -n "$2" ]; then
 	package_name="$2"
 else
@@ -58,7 +58,7 @@ else
 	binary_name="$package_name"
 fi
 
-# Obtain the binary version
+# Obtain the package version
 if [ -n "$3" ]; then
 	package_version="$3"
 else
