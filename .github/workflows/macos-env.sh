@@ -80,12 +80,10 @@ if [ -n "$package_version" ]; then
                 ;;
             	*)
             		package_name="$package_name$package_version"
-            		;;
+            	;;
             esac
             ;;
-        "brew")
-        	;&  # fall through
-        *)
+        "brew" | *)
             package_name="$package_name@$package_version"
             ;;
     esac
@@ -98,9 +96,7 @@ if [ -n "$package_manager" ]; then
             "port")
 				binary_path="$(port contents "$package_name" |grep "bin/${binary_name}\$" |head -1 |sed -e 's/^[[:space:]]*//')"
                 ;;
-            "brew")
-            	;&  # fall through
-            *)
+            "brew" | *)
             	binary_path="$("$package_manager" --prefix "$package_name")/bin/$binary_name"
                 ;;
         esac
