@@ -80,8 +80,9 @@ ClipView::ClipView( Clip * clip,
 	selectableObject( tv->getTrackContentWidget() ),
 	ModelView( nullptr, this ),
 	m_trackView( tv ),
-	m_initialClipPos( TimePos(0) ),
-	m_initialClipEnd( TimePos(0) ),
+	m_initialClipPos(TimePos(0)),
+	m_initialClipStartOffset(TimePos(0)),
+	m_initialClipEnd(TimePos(0)),
 	m_clip( clip ),
 	m_action( Action::None ),
 	m_initialMousePos( QPoint( 0, 0 ) ),
@@ -653,9 +654,9 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 				getGUI()->songEditor()->m_editor->selectAllClips( false );
 				m_clip->addJournalCheckPoint();
 
-				// Action::Move, Action::Resize and Action::ResizeLeft
+				// Action::Move, Action::Resize, Action::ResizeLeft, and Action::MoveContent
 				// Action::Split action doesn't disable Clip journalling
-				if (m_action == Action::Move || m_action == Action::Resize || m_action == Action::ResizeLeft)
+				if (m_action == Action::Move || m_action == Action::Resize || m_action == Action::ResizeLeft || m_action == Action::MoveContent)
 				{
 					m_clip->setJournalling(false);
 				}
@@ -665,7 +666,8 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 
 				if (!m_clip->manuallyResizable() && !knifeMode)
 				{	// Always move clips that can't be manually resized
-					m_action = Action::Move;
+					if (me->modifiers() & Qt::ShiftModifier) { m_action = Action::MoveContent; }
+					else { m_action = Action::Move; }
 					setCursor( Qt::SizeAllCursor );
 				}
 				else if( me->x() >= width() - RESIZE_GRIP_WIDTH )
@@ -686,10 +688,15 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 					setMarkerEnabled( true );
 					update();
 				}
+				else if (me->modifiers() & Qt::ShiftModifier)
+				{
+					m_action = Action::MoveContent;
+					setCursor(Qt::SizeAllCursor);
+				}
 				else
 				{
 					m_action = Action::Move;
-					setCursor( Qt::SizeAllCursor );
+					setCursor(Qt::SizeAllCursor);
 				}
 
 				if( m_action == Action::Move )
@@ -731,6 +738,10 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 				hint = dynamic_cast<MidiClipView*>(this)
 					? tr("Press <%1> or <Alt> for unquantized splitting.\nPress <Shift> for destructive splitting.")
 					: tr("Press <%1> or <Alt> for unquantized splitting.");
+			}
+			else if (m_action == Action::MoveContent)
+			{
+				hint = tr("Press <%1> or <Alt> for quantized shifting.");
 			}
 			else
 			{
@@ -849,6 +860,18 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 						TimePos::ticksPerBar() ) );
 		s_textFloat->moveGlobal( this, QPoint( width() + 2, height() + 2 ) );
 	}
+	else if (m_action == Action::MoveContent)
+	{
+		TimePos offset = draggedClipContentOffset(me);
+		m_clip->setStartTimeOffset(offset);
+		m_clip->updateLength();
+		update();
+		s_textFloat->setText(QString( "%1:%2" ).
+				arg(offset.getBar() + 1).
+				arg(offset.getTicks() %
+						TimePos::ticksPerBar()));
+		s_textFloat->moveGlobal(this, QPoint(width() + 2, height() + 2));
+	}
 	else if( m_action == Action::MoveSelection )
 	{
 		// 1: Find the position we want to move the grabbed Clip to
@@ -882,42 +905,39 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 	else if( m_action == Action::Resize || m_action == Action::ResizeLeft )
 	{
 		const float snapSize = getGUI()->songEditor()->m_editor->getSnapSize();
-		// Length in ticks of one snap increment
-		const TimePos snapLength = TimePos( (int)(snapSize * TimePos::ticksPerBar()) );
+
+		TimePos initialLength = m_initialClipEnd - m_initialClipPos;
 
 		if( m_action == Action::Resize )
 		{
 			// The clip's new length
-			TimePos l = static_cast<int>( me->x() * TimePos::ticksPerBar() / ppb );
+			TimePos mouseOffset = static_cast<int>(me->x() * TimePos::ticksPerBar() / ppb);
+			TimePos newLength;
 
 			// If the user is holding alt, or pressed ctrl after beginning the drag, don't quantize
-			if ( unquantizedModHeld(me) )
-			{	// We want to preserve this adjusted offset,
+			if (unquantizedModHeld(me))
+			{
+				// We want to preserve this adjusted offset,
 				// even if the user switches to snapping later
 				setInitialPos( m_initialMousePos );
 				// Don't resize to less than 1 tick
-				m_clip->changeLength( qMax<int>( 1, l ) );
-				m_clip->setAutoResize(false);
-			}
-			else if ( me->modifiers() & Qt::ShiftModifier )
-			{	// If shift is held, quantize clip's end position
-				TimePos end = TimePos( m_initialClipPos + l ).quantize( snapSize );
-				// The end position has to be after the clip's start
-				TimePos min = m_initialClipPos.quantize( snapSize );
-				if ( min <= m_initialClipPos ) min += snapLength;
-				m_clip->changeLength( qMax<int>(min - m_initialClipPos, end - m_initialClipPos) );
-				m_clip->setAutoResize(false);
+				newLength = std::max(TimePos(1), mouseOffset);
 			}
 			else
-			{	// Otherwise, resize in fixed increments
-				TimePos initialLength = m_initialClipEnd - m_initialClipPos;
-				TimePos offset = TimePos( l - initialLength ).quantize( snapSize );
-				// Don't resize to less than 1 tick
-				auto min = TimePos(initialLength % snapLength);
-				if (min < 1) min += snapLength;
-				m_clip->changeLength( qMax<int>( min, initialLength + offset) );
-				m_clip->setAutoResize(false);
+			{
+				// Quantize length
+				TimePos lengthQ = std::max(TimePos(1), TimePos(mouseOffset).quantize(snapSize));
+				// Quantize global end position
+				TimePos endQ = std::max(TimePos(1), static_cast<TimePos>(TimePos(m_initialClipPos + mouseOffset).quantize(snapSize) - m_initialClipPos));
+				// Quantize length increment
+				TimePos deltaQ = std::max(TimePos(1), static_cast<TimePos>(initialLength + TimePos(mouseOffset - initialLength).quantize(snapSize)));
+				// Pick the one closest to the mouse position
+				if (std::abs(lengthQ - mouseOffset) <= std::abs(endQ - mouseOffset) && std::abs(lengthQ - mouseOffset) <= std::abs(deltaQ - mouseOffset)) { newLength = lengthQ; }
+				else if (std::abs(endQ - mouseOffset) <= std::abs(lengthQ - mouseOffset) && std::abs(endQ - mouseOffset) <= std::abs(deltaQ - mouseOffset)) { newLength = endQ; }
+				else { newLength = deltaQ; }
 			}
+			m_clip->changeLength(newLength);
+			m_clip->setAutoResize(false);
 		}
 		else
 		{
@@ -925,43 +945,40 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 
 			const int x = mapToParent( me->pos() ).x() - m_initialMousePos.x();
 
-			TimePos t = qMax( 0, (int)
-								m_trackView->trackContainerView()->currentPosition() +
-								static_cast<int>( x * TimePos::ticksPerBar() / ppb ) );
-
-			if (!isResizableBeforeStart())
-			{
-				t = std::max(t, static_cast<TimePos>(m_clip->startPosition() + m_clip->startTimeOffset()));
-			}
+			TimePos mousePos = std::max(0, m_trackView->trackContainerView()->currentPosition() +
+								static_cast<int>(x * TimePos::ticksPerBar() / ppb));
+			TimePos newStart;
 
 			if( unquantizedModHeld(me) )
 			{	// We want to preserve this adjusted offset,
 				// even if the user switches to snapping later
-				setInitialPos( m_initialMousePos );
-				//Don't resize to less than 1 tick
-				t = qMin<int>( m_initialClipEnd - 1, t);
-			}
-			else if( me->modifiers() & Qt::ShiftModifier )
-			{	// If shift is held, quantize clip's start position
-				// Don't let the start position move past the end position
-				TimePos max = m_initialClipEnd.quantize( snapSize );
-				if ( max >= m_initialClipEnd ) max -= snapLength;
-				t = qMin<int>( max, t.quantize( snapSize ) );
+				setInitialPos(m_initialMousePos);
+				// Don't resize to less than 1 tick
+				newStart = std::min(mousePos, TimePos(m_initialClipEnd - 1));
 			}
 			else
-			{	// Otherwise, resize in fixed increments
-				// Don't resize to less than 1 tick
-				TimePos initialLength = m_initialClipEnd - m_initialClipPos;
-				auto minLength = TimePos(initialLength % snapLength);
-				if (minLength < 1) minLength += snapLength;
-				TimePos offset = TimePos(t - m_initialClipPos).quantize( snapSize );
-				t = qMin<int>( m_initialClipEnd - minLength, m_initialClipPos + offset );
+			{
+				// Quantize length
+				TimePos lengthQ = std::min(m_initialClipEnd - TimePos(m_initialClipEnd - mousePos).quantize(snapSize), m_initialClipEnd - 1);
+				// Quantize global start position
+				TimePos startQ = std::min(mousePos.quantize(snapSize), TimePos(m_initialClipEnd - 1));
+				// Quantize length increment
+				TimePos deltaQ = std::min(m_initialClipPos - TimePos(m_initialClipPos - mousePos).quantize(snapSize), m_initialClipEnd - 1);
+				// Pick the one closest to the mouse position
+				if (std::abs(lengthQ - mousePos) <= std::abs(startQ - mousePos) && std::abs(lengthQ - mousePos) <= std::abs(deltaQ - mousePos)) { newStart = lengthQ; }
+				else if (std::abs(startQ - mousePos) <= std::abs(lengthQ - mousePos) && std::abs(startQ - mousePos) <= std::abs(deltaQ - mousePos)) { newStart = startQ; }
+				else { newStart = deltaQ; }
 			}
 
-			TimePos positionOffset = m_clip->startPosition() - t;
+			if (!isResizableBeforeStart())
+			{
+				newStart = std::max(newStart, static_cast<TimePos>(m_clip->startPosition() + m_clip->startTimeOffset()));
+			}
+
+			TimePos positionOffset = m_clip->startPosition() - newStart;
 			if (m_clip->length() + positionOffset >= 1)
 			{
-				m_clip->movePosition(t);
+				m_clip->movePosition(newStart);
 				m_clip->changeLength(m_clip->length() + positionOffset);
 				if (pClip)
 				{
@@ -1025,7 +1042,7 @@ void ClipView::mouseReleaseEvent( QMouseEvent * me )
 	{
 		setSelected( !isSelected() );
 	}
-	else if( m_action == Action::Move || m_action == Action::Resize || m_action == Action::ResizeLeft )
+	else if (m_action == Action::Move || m_action == Action::Resize || m_action == Action::ResizeLeft || m_action == Action::MoveContent)
 	{
 		// TODO: Fix m_clip->setJournalling() consistency
 		m_clip->setJournalling( true );
@@ -1316,39 +1333,66 @@ bool ClipView::unquantizedModHeld( QMouseEvent * me )
  *
  * \param me The QMouseEvent
  */
-TimePos ClipView::draggedClipPos( QMouseEvent * me )
+TimePos ClipView::draggedClipPos(QMouseEvent * me)
 {
-	//Pixels per bar
+	// Pixels per bar
 	const float ppb = m_trackView->trackContainerView()->pixelsPerBar();
 	// The pixel distance that the mouse has moved
 	const int mouseOff = mapToGlobal(me->pos()).x() - m_initialMouseGlobalPos.x();
 	TimePos newPos = m_initialClipPos + mouseOff * TimePos::ticksPerBar() / ppb;
 	TimePos offset = newPos - m_initialClipPos;
 	// If the user is holding alt, or pressed ctrl after beginning the drag, don't quantize
-	if ( me->button() != Qt::NoButton || unquantizedModHeld(me) )
+	if (me->button() != Qt::NoButton || unquantizedModHeld(me))
 	{	// We want to preserve this adjusted offset,  even if the user switches to snapping
-		setInitialPos( m_initialMousePos );
+		setInitialPos(m_initialMousePos);
+		return newPos;
 	}
-	else if ( me->modifiers() & Qt::ShiftModifier )
-	{	// If shift is held, quantize position (Default in 1.2.0 and earlier)
-		// or end position, whichever is closest to the actual position
-		TimePos startQ = newPos.quantize( getGUI()->songEditor()->m_editor->getSnapSize() );
-		// Find start position that gives snapped clip end position
-		TimePos endQ = ( newPos + m_clip->length() );
-		endQ = endQ.quantize( getGUI()->songEditor()->m_editor->getSnapSize() );
-		endQ = endQ - m_clip->length();
 
-		// Select the position closest to actual position
-		if (std::abs(newPos - startQ) < std::abs(newPos - endQ)) { newPos = startQ; }
-		else newPos = endQ;
-	}
-	else
-	{	// Otherwise, quantize moved distance (preserves user offsets)
-		newPos = m_initialClipPos + offset.quantize( getGUI()->songEditor()->m_editor->getSnapSize() );
-	}
-	return newPos;
+	// Quantize position, (Default in 1.2.0 and earlier)
+	// end position, or offset, whichever is closest to the actual position
+	TimePos startQ = newPos.quantize(getGUI()->songEditor()->m_editor->getSnapSize());
+	// Find start position that gives snapped clip end position
+	TimePos endQ = TimePos(newPos + m_clip->length()).quantize(getGUI()->songEditor()->m_editor->getSnapSize()) - m_clip->length();
+	// Calculate quantized offset position
+	TimePos offsetQ = m_initialClipPos + offset.quantize(getGUI()->songEditor()->m_editor->getSnapSize());
+
+	// Select the position closest to actual position
+	if (std::abs(newPos - startQ) <= std::abs(newPos - endQ) && std::abs(newPos - startQ) <= std::abs(newPos - offsetQ)) { return startQ; }
+	if (std::abs(newPos - endQ) <= std::abs(newPos - startQ) && std::abs(newPos - endQ) <= std::abs(newPos - offsetQ)) { return endQ; }
+	else { return offsetQ; }
 }
 
+
+TimePos ClipView::draggedClipContentOffset(QMouseEvent * me)
+{
+	const float ppb = m_trackView->trackContainerView()->pixelsPerBar();
+	const int mouseOffset = mapToGlobal(me->pos()).x() - m_initialMouseGlobalPos.x();
+	TimePos delta = mouseOffset * TimePos::ticksPerBar() / ppb;
+	// Prevent midi and automation clips from being shifted backwards out of editor bounds.
+	if (!isResizableBeforeStart())
+	{
+		delta = std::max(m_initialClipStartOffset + delta, 0) - m_initialClipStartOffset;
+	}
+	TimePos newOffset = m_initialClipStartOffset + delta;
+	// If the user is holding alt, or pressed ctrl after beginning the drag, quantize
+	// This is the opposite of normal behavior, but it makes more sense.
+	if (!unquantizedModHeld(me))
+	{
+		return newOffset;
+	}
+
+	// Quantized offset relative to the start of the clip
+	TimePos startQ = newOffset.quantize(getGUI()->songEditor()->m_editor->getSnapSize());
+	// Quantized offset relative to the end of the clip
+	TimePos endQ = TimePos(newOffset + m_clip->length()).quantize(getGUI()->songEditor()->m_editor->getSnapSize()) - m_clip->length();
+	// Quantized change in offset
+	TimePos offsetQ = m_initialClipStartOffset + delta.quantize(getGUI()->songEditor()->m_editor->getSnapSize());
+
+	// Select the offset closest to actual offset
+	if (std::abs(newOffset - startQ) <= std::abs(newOffset - endQ) && std::abs(newOffset - startQ) <= std::abs(newOffset - offsetQ)) { return startQ; }
+	if (std::abs(newOffset - endQ) <= std::abs(newOffset - startQ) && std::abs(newOffset - endQ) <= std::abs(newOffset - offsetQ)) { return endQ; }
+	else { return offsetQ; }
+}
 
 int ClipView::knifeMarkerPos( QMouseEvent * me )
 {
