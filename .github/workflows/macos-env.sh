@@ -51,7 +51,7 @@ fi
 # Special fallback handling for when package_name != binary_name, adjust as needed
 if [ "$package_name" = "qt" ]; then
 	binary_name="qmake"
-elif [ "$binary_name" = "fltk" ]; then
+elif [ "$package_name" = "fltk" ]; then
 	binary_name="fluid"
 else
 	# Assume the binary_name is the package_name
