@@ -235,11 +235,8 @@ jobs:
       - name: Configure
         run: |
           ccache --zero-stats
+          source .github/workflows/macos-env.sh
           mkdir build
-          OTOOL_OUT="$(otool -l "$(brew --prefix qt@5)/bin/qmake")"
-          MIN_VER="$(echo "$OTOOL_OUT" |grep minos || echo "$OTOOL_OUT" |grep -A 2 LC_VERSION_MIN_MACOS|grep version)"
-          export MACOSX_DEPLOYMENT_TARGET="$(echo "$MIN_VER"|awk '{print $2}')"
-          echo "Inferring 'MACOSX_DEPLOYMENT_TARGET=$MACOSX_DEPLOYMENT_TARGET' based on qmake"
           cmake -S . \
                 -B build \
                 -DCMAKE_OSX_ARCHITECTURES=${{ matrix.arch }} \
