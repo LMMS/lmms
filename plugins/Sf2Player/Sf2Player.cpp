@@ -877,13 +877,13 @@ void Sf2Instrument::renderFrames( f_cnt_t frames, SampleFrame* buf )
 
 	while (frames > 0)
 	{
-		const auto writeRegion = m_resampleBuffer.reserve();
+		const auto writeRegion = m_resampleBuffer.reserveWrite();
 		fluid_synth_write_float(m_synth, writeRegion.size(), writeRegion.data(), 0, 2, writeRegion.data(), 1, 2);
-		m_resampleBuffer.commit(writeRegion.size());
+		m_resampleBuffer.commitWrite(writeRegion.size());
 
-		const auto readRegion = m_resampleBuffer.retrieve();
+		const auto readRegion = m_resampleBuffer.reserveRead();
 		const auto results = m_resampler.process({&readRegion[0][0], 2, readRegion.size()}, {&buf[0][0], 2, frames});
-		m_resampleBuffer.decommit(results.inputFramesUsed);
+		m_resampleBuffer.commitRead(results.inputFramesUsed);
 
 		buf += results.outputFramesGenerated;
 		frames -= results.outputFramesGenerated;

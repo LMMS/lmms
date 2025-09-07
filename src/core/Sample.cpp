@@ -125,11 +125,11 @@ bool Sample::play(SampleFrame* dst, PlaybackState* state, size_t numFrames, Loop
 	auto framesWritten = 0;
 	while (numFrames > 0)
 	{
-		const auto writeRegion = state->m_buffer.reserve();
+		const auto writeRegion = state->m_buffer.reserveWrite();
 		const auto rendered = render(writeRegion.data(), writeRegion.size(), state, loop);
-		state->m_buffer.commit(rendered);
+		state->m_buffer.commitWrite(rendered);
 
-		const auto readRegion = state->m_buffer.retrieve();
+		const auto readRegion = state->m_buffer.reserveRead();
 		if (readRegion.empty())
 		{
 			std::fill_n(dst, numFrames, SampleFrame{});
@@ -138,7 +138,7 @@ bool Sample::play(SampleFrame* dst, PlaybackState* state, size_t numFrames, Loop
 
 		const auto results
 			= state->m_resampler.process({&readRegion[0][0], 2, readRegion.size()}, {&dst[0][0], 2, numFrames});
-		state->m_buffer.decommit(results.inputFramesUsed);
+		state->m_buffer.commitRead(results.inputFramesUsed);
 
 		dst += results.outputFramesGenerated;
 		numFrames -= results.outputFramesGenerated;

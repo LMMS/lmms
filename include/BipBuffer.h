@@ -61,7 +61,7 @@ public:
 	 * @param size
 	 * @return std::span<T> the contiguous region, may have a size less than @a size
 	 */
-	[[nodiscard]] auto reserve(std::size_t size = static_cast<std::size_t>(-1)) -> std::span<T>
+	[[nodiscard]] auto reserveWrite(std::size_t size = static_cast<std::size_t>(-1)) -> std::span<T>
 	{
 		const auto available = m_writeIndex < m_readIndex ? m_readIndex - m_writeIndex - 1
 														  : m_buffer.size() - m_writeIndex - (m_readIndex == 0 ? 1 : 0);
@@ -74,7 +74,7 @@ public:
 	 * @param size
 	 * @return std::span<const T> the contiguous region, may have a size less than @a size
 	 */
-	[[nodiscard]] auto retrieve(std::size_t size = static_cast<std::size_t>(-1)) -> std::span<const T>
+	[[nodiscard]] auto reserveRead(std::size_t size = static_cast<std::size_t>(-1)) -> std::span<const T>
 	{
 		const auto available = m_readIndex <= m_writeIndex ? m_writeIndex - m_readIndex : m_buffer.size() - m_readIndex;
 		return {&m_buffer[m_readIndex], std::min(size, available)};
@@ -85,14 +85,14 @@ public:
 	 *
 	 * @param size
 	 */
-	void commit(std::size_t size) { m_writeIndex = (m_writeIndex + size) % m_buffer.size(); }
+	void commitWrite(std::size_t size) { m_writeIndex = (m_writeIndex + size) % m_buffer.size(); }
 
 	/**
 	 * @brief Acknowledge reading @a size elements from the buffer.
 	 *
 	 * @param size
 	 */
-	void decommit(std::size_t size) { m_readIndex = (m_readIndex + size) % m_buffer.size(); }
+	void commitRead(std::size_t size) { m_readIndex = (m_readIndex + size) % m_buffer.size(); }
 
 private:
 	std::vector<T> m_buffer;

@@ -437,7 +437,7 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 			while (framesMixed < frames)
 			{
 				{
-					const auto region = sample.m_sourceBuffer.reserve();
+					const auto region = sample.m_sourceBuffer.reserveWrite();
 					loadSample(sample, region.data(), region.size());
 
 					for (auto& frame : region)
@@ -447,21 +447,21 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 
 					sample.pos += region.size();
 					sample.adsr.inc(region.size());
-					sample.m_sourceBuffer.commit(region.size());
+					sample.m_sourceBuffer.commitWrite(region.size());
 				}
 
 				{
-					const auto readRegion = sample.m_sourceBuffer.retrieve();
-					const auto writeRegion = sample.m_mixBuffer.reserve();
+					const auto readRegion = sample.m_sourceBuffer.reserveRead();
+					const auto writeRegion = sample.m_mixBuffer.reserveWrite();
 					const auto result = sample.m_resampler.process(
 						{&readRegion[0][0], 2, readRegion.size()}, {&writeRegion[0][0], 2, writeRegion.size()});
 
-					sample.m_sourceBuffer.decommit(result.inputFramesUsed);
-					sample.m_mixBuffer.commit(result.outputFramesGenerated);
+					sample.m_sourceBuffer.commitRead(result.inputFramesUsed);
+					sample.m_mixBuffer.commitWrite(result.outputFramesGenerated);
 				}
 
 				{
-					const auto region = sample.m_mixBuffer.retrieve();
+					const auto region = sample.m_mixBuffer.reserveRead();
 					const auto framesToMix = std::min(frames - framesMixed, region.size());
 
 					for (auto i = f_cnt_t{0}; i < framesToMix; ++i)
@@ -470,7 +470,7 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 					}
 
 					framesMixed += framesToMix;
-					sample.m_mixBuffer.decommit(framesToMix);
+					sample.m_mixBuffer.commitRead(framesToMix);
 				}
 			}
 		}
