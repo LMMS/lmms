@@ -69,10 +69,6 @@ template void AudioDevice::nextBuffer<InterleavedBufferView<float>>(InterleavedB
 template void AudioDevice::nextBuffer<PlanarBufferView<float>>(PlanarBufferView<float> dst);
 void AudioDevice::nextBuffer(AudioBufferView<float> auto dst)
 {
-	auto dstAt = [&dst](ch_cnt_t channel, f_cnt_t frame) -> float& {
-		return decltype(dst)::Interleaved ? dst[frame][channel] : dst[channel][frame];
-	};
-
 	for (auto frame = f_cnt_t{0}; frame < dst.frames(); ++frame)
 	{
 		if (m_audioEngineBufferIndex == 0) { m_audioEngineBuffer = m_audioEngine->renderNextBuffer(); }
@@ -84,18 +80,18 @@ void AudioDevice::nextBuffer(AudioBufferView<float> auto dst)
 			assert(false);
 			break;
 		case 1:
-			dstAt(0, frame) = audioEngineFrame.average();
+			dst.sample(0, frame) = audioEngineFrame.average();
 			break;
 		case 2:
-			dstAt(0, frame) = audioEngineFrame[0];
-			dstAt(1, frame) = audioEngineFrame[1];
+			dst.sample(0, frame) = audioEngineFrame[0];
+			dst.sample(1, frame) = audioEngineFrame[1];
 			break;
 		default:
-			dstAt(0, frame) = audioEngineFrame[0];
-			dstAt(1, frame) = audioEngineFrame[1];
+			dst.sample(0, frame) = audioEngineFrame[0];
+			dst.sample(1, frame) = audioEngineFrame[1];
 			for (auto channel = 2; channel < dst.channels(); ++channel)
 			{
-				dst[frame][channel] = 0.f;
+				dst.sample(channel, frame) = 0.f;
 			}
 			break;
 		}
