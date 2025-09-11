@@ -95,7 +95,7 @@ AudioOss::AudioOss(bool& _success_ful, AudioEngine* _audioEngine)
 
 	int frag_spec;
 	for (frag_spec = 0;
-		1u << frag_spec < audioEngine()->framesPerPeriod() * channels() * BYTES_PER_INT_SAMPLE;
+		1u << frag_spec < audioEngine()->framesPerAudioBuffer() * channels() * BYTES_PER_INT_SAMPLE;
 		++frag_spec)
 	{
 	}

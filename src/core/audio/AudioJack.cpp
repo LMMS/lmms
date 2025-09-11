@@ -407,7 +407,7 @@ int AudioJack::processCallback(jack_nframes_t nframes)
 	}
 
 #ifdef AUDIO_BUS_HANDLE_SUPPORT
-	const int frames = std::min<int>(nframes, audioEngine()->framesPerPeriod());
+	const int frames = std::min<int>(nframes, audioEngine()->framesPerAudioBuffer());
 	for (JackPortMap::iterator it = m_portMap.begin(); it != m_portMap.end(); ++it)
 	{
 		for (ch_cnt_t ch = 0; ch < channels(); ++ch)
