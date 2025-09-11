@@ -306,7 +306,7 @@ void AudioJack::startProcessingImpl()
 	m_active = true;
 
 	// try to sync JACK's and LMMS's buffer-size
-	//	jack_set_buffer_size( m_client, audioEngine()->framesPerPeriod() );
+	jack_set_buffer_size(m_client, audioEngine()->framesPerAudioBuffer());
 
 	const auto cm = ConfigManager::inst();
 
