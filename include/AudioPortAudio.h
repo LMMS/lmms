@@ -144,13 +144,7 @@ private:
 	PaStreamParameters m_inputParameters;
 
 	bool m_wasPAInitError;
-
-	SampleFrame* m_outBuf;
-	std::size_t m_outBufPos;
-	fpp_t m_outBufSize;
-
 	bool m_stopped;
-
 } ;
 
 #endif // LMMS_HAVE_PORTAUDIO

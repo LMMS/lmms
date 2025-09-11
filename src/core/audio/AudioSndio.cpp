@@ -71,7 +71,7 @@ AudioSndio::AudioSndio(bool& _success_ful, AudioEngine* _audioEngine)
 	m_par.bits = 16;
 	m_par.le = SIO_LE_NATIVE;
 	m_par.rate = sampleRate();
-	m_par.round = framesPerPeriod();
+	m_par.round = audioEngine()->framesPerAudioBuffer();
 	m_par.appbufsz = m_par.round * 2;
 
 	struct sio_par reqpar = m_par;
@@ -130,11 +130,11 @@ void AudioSndio::stopProcessingImpl()
 
 void AudioSndio::run()
 {
-	auto buf = std::vector<float>(framesPerPeriod() * channels());
+	auto buf = std::vector<float>(audioEngine()->framesPerAudioBuffer() * channels());
 
 	while (AudioDevice::isRunning())
 	{
-		nextBuffer(InterleavedBufferView<float>{buf.data(), channels(), framesPerPeriod()});
+		nextBuffer(InterleavedBufferView<float>{buf.data(), channels(), audioEngine()->framesPerAudioBuffer()});
 		sio_write(m_hdl, buf.data(), buf.size() * sizeof(float));
 	}
 }

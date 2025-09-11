@@ -58,6 +58,8 @@ constexpr int BYTES_PER_FRAME = sizeof(SampleFrame);
 
 constexpr float OUTPUT_SAMPLE_MULTIPLIER = 32767.0f;
 
+constexpr sample_rate_t DEFAULT_SAMPLE_RATE = 44100;
+
 constexpr auto SUPPORTED_SAMPLERATES = std::array{44100, 48000, 88200, 96000, 192000}; 
 
 class LMMS_EXPORT AudioEngine : public QObject
@@ -203,13 +205,19 @@ public:
 
 	void removePlayHandlesOfTypes(Track * track, PlayHandle::Types types);
 
-
-	// methods providing information for other classes
-	inline fpp_t framesPerPeriod() const
+	//! @return the number of frames rendered per period
+	//! @note this represents the size of the buffer for each call to @ref renderNextBuffer
+	fpp_t framesPerPeriod() const
 	{
 		return m_framesPerPeriod;
 	}
 
+	//! @returns the number of audio frames per audio buffer
+	//! @note this represents the size of the underlying device buffer
+	fpp_t framesPerAudioBuffer() const
+	{
+		return m_framesPerAudioBuffer;
+	}
 
 	AudioEngineProfiler& profiler()
 	{
@@ -334,12 +342,13 @@ private:
 
 	std::vector<AudioBusHandle*> m_audioBusHandles;
 
+	fpp_t m_framesPerAudioBuffer;
 	fpp_t m_framesPerPeriod;
+	sample_rate_t m_baseSampleRate;
 
 	SampleFrame* m_inputBuffer[2];
 	f_cnt_t m_inputBufferFrames[2];
 	f_cnt_t m_inputBufferSize[2];
-	sample_rate_t m_baseSampleRate;
 	int m_inputBufferRead;
 	int m_inputBufferWrite;
 

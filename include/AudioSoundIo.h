@@ -109,11 +109,6 @@ private:
 	SoundIo *m_soundio;
 	SoundIoOutStream *m_outstream;
 
-	SampleFrame* m_outBuf;
-	int m_outBufSize;
-	fpp_t m_outBufFramesTotal;
-	fpp_t m_outBufFrameIndex;
-
 	bool m_stopped;
 	bool m_outstreamStarted;
 

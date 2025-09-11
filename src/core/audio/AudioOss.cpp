@@ -222,13 +222,13 @@ void AudioOss::stopProcessingImpl()
 
 void AudioOss::run()
 {
-	auto buf = std::vector<float>(framesPerPeriod() * channels());
+	auto buf = std::vector<float>(audioEngine()->framesPerAudioBuffer() * channels());
 	auto pcmBuf = std::vector<int16_t>(buf.size());
 	const auto bytesToWrite = static_cast<int>(pcmBuf.size() * sizeof(int16_t));
 
 	while (AudioDevice::isRunning())
 	{
-		nextBuffer(InterleavedBufferView<float>{buf.data(), channels(), framesPerPeriod()});
+		nextBuffer(InterleavedBufferView<float>{buf.data(), channels(), audioEngine()->framesPerAudioBuffer()});
 
 		for (auto i = std::size_t{0}; i < buf.size(); ++i)
 		{

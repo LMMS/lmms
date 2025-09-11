@@ -65,13 +65,9 @@ AudioPortAudio::AudioPortAudio( bool & _success_ful, AudioEngine * _audioEngine 
 		DEFAULT_CHANNELS,
 		DEFAULT_CHANNELS), _audioEngine),
 	m_paStream( nullptr ),
-	m_wasPAInitError( false ),
-	m_outBuf(new SampleFrame[framesPerPeriod()]),
-	m_outBufPos( 0 )
+	m_wasPAInitError( false )
 {
 	_success_ful = false;
-
-	m_outBufSize = framesPerPeriod();
 
 	PaError err = Pa_Initialize();
 	
@@ -117,12 +113,12 @@ AudioPortAudio::AudioPortAudio( bool & _success_ful, AudioEngine * _audioEngine 
 		return;
 	}
 
-	double inLatency = 0;//(double)audioEngine()->framesPerPeriod() / (double)sampleRate();
-	double outLatency = 0;//(double)audioEngine()->framesPerPeriod() / (double)sampleRate();
+	double inLatency = 0;//(double)audioEngine()->framesPerAudioBuffer() / (double)sampleRate();
+	double outLatency = 0;//(double)audioEngine()->framesPerAudioBuffer() / (double)sampleRate();
 
 	//inLatency = Pa_GetDeviceInfo( inDevIdx )->defaultLowInputLatency;
 	//outLatency = Pa_GetDeviceInfo( outDevIdx )->defaultLowOutputLatency;
-	const int samples = audioEngine()->framesPerPeriod();
+	const int samples = audioEngine()->framesPerAudioBuffer();
 	
 	// Configure output parameters.
 	m_outputParameters.device = outDevIdx;
@@ -192,7 +188,6 @@ AudioPortAudio::~AudioPortAudio()
 	{
 		Pa_Terminate();
 	}
-	delete[] m_outBuf;
 }
 
 

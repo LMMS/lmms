@@ -82,14 +82,12 @@ private:
 	static void sdlInputAudioCallback( void * _udata, Uint8 * _buf, int _len );
 	void sdlInputAudioCallback( Uint8 * _buf, int _len );
 
-	SDL_AudioSpec m_audioHandle;
-
-	SampleFrame* m_outBuf;
-
 	size_t m_currentBufferFramePos;
 	size_t m_currentBufferFramesCount;
 
+	SDL_AudioSpec m_audioHandle;
 	SDL_AudioDeviceID m_outputDevice;
+
 	SDL_AudioSpec m_inputAudioHandle;
 	SDL_AudioDeviceID m_inputDevice;
 } ;

@@ -47,6 +47,7 @@ AudioPulseAudio::AudioPulseAudio(bool& _success_ful, AudioEngine* _audioEngine)
 					  ConfigManager::inst()->value("audiopa", "channels").toInt(), DEFAULT_CHANNELS, DEFAULT_CHANNELS),
 		  _audioEngine)
 	, m_s(nullptr)
+	, m_latency(static_cast<double>(_audioEngine->framesPerAudioBuffer()) / sampleRate())
 {
 	_success_ful = false;
 
@@ -150,11 +151,8 @@ static void context_state_callback(pa_context *c, void *userdata)
 			buffer_attr.minreq = (uint32_t)(-1);
 			buffer_attr.fragsize = (uint32_t)(-1);
 
-			double latency = static_cast<double>(_this->framesPerPeriod()) / _this->sampleRate();
-
 			// ask PulseAudio for the desired latency (which might not be approved)
-			buffer_attr.tlength = pa_usec_to_bytes( latency * PA_USEC_PER_MSEC,
-														&_this->m_sampleSpec );
+			buffer_attr.tlength = pa_usec_to_bytes(_this->m_latency * PA_USEC_PER_MSEC, &_this->m_sampleSpec);
 
 			pa_stream_connect_playback( _this->m_s, nullptr, &buffer_attr,
 										PA_STREAM_ADJUST_LATENCY,
@@ -230,7 +228,7 @@ void AudioPulseAudio::run()
 void AudioPulseAudio::streamWriteCallback(pa_stream*, size_t)
 {
 	auto buf = static_cast<void*>(nullptr);
-	auto maxBufSizeInBytes = framesPerPeriod() * channels() * sizeof(float);
+	auto maxBufSizeInBytes = audioEngine()->framesPerAudioBuffer() * channels() * sizeof(float);
 
 	pa_stream_begin_write(m_s, &buf, &maxBufSizeInBytes);
 	if (!buf) { return; }

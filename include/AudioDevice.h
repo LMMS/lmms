@@ -76,8 +76,6 @@ public:
 		return m_sampleRate;
 	}
 
-	fpp_t framesPerPeriod() const { return m_framesPerPeriod; }
-
 	void startProcessing();
 
 	void stopProcessing();
@@ -111,7 +109,6 @@ private:
 	virtual void startProcessingImpl() = 0;
 	virtual void stopProcessingImpl() = 0;
 
-	fpp_t m_framesPerPeriod;
 	sample_rate_t m_sampleRate;
 	ch_cnt_t m_channels;
 

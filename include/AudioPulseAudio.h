@@ -83,7 +83,7 @@ public:
 
 	pa_stream * m_s;
 	pa_sample_spec m_sampleSpec;
-
+	double m_latency;
 
 private:
 	void startProcessingImpl() override;

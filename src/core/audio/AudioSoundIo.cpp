@@ -46,10 +46,7 @@ AudioSoundIo::AudioSoundIo( bool & outSuccessful, AudioEngine * _audioEngine ) :
 	outSuccessful = false;
 	m_soundio = nullptr;
 	m_outstream = nullptr;
-	m_outBuf = nullptr;
 	m_disconnectErr = 0;
-	m_outBufFrameIndex = 0;
-	m_outBufFramesTotal = 0;
 	m_stopped = true;
 	m_outstreamStarted = false;
 
@@ -164,7 +161,7 @@ AudioSoundIo::AudioSoundIo( bool & outSuccessful, AudioEngine * _audioEngine ) :
 	}
 
 	m_outstream->name = "LMMS";
-	m_outstream->software_latency = static_cast<double>(framesPerPeriod()) / currentSampleRate;
+	m_outstream->software_latency = static_cast<double>(audioEngine()->framesPerAudioBuffer()) / currentSampleRate;
 	m_outstream->userdata = this;
 	m_outstream->write_callback = staticWriteCallback;
 	m_outstream->error_callback = staticErrorCallback;
@@ -208,12 +205,6 @@ AudioSoundIo::~AudioSoundIo()
 
 void AudioSoundIo::startProcessingImpl()
 {
-	m_outBufFrameIndex = 0;
-	m_outBufFramesTotal = 0;
-	m_outBufSize = framesPerPeriod();
-
-	m_outBuf = new SampleFrame[m_outBufSize];
-
 	if (! m_outstreamStarted)
 	{
 		if (int err = soundio_outstream_start(m_outstream))
@@ -248,12 +239,6 @@ void AudioSoundIo::stopProcessingImpl()
 				"AudioSoundIo::stopProcessing() :: pausing result error: %s\n",
 				soundio_strerror(err));
 		}
-	}
-
-	if (m_outBuf)
-	{
-		delete[] m_outBuf;
-		m_outBuf = nullptr;
 	}
 }
 
