@@ -58,7 +58,8 @@ Plugin::Descriptor PLUGIN_EXPORT vibedstrings_plugin_descriptor =
 	Plugin::Type::Instrument,
 	new PluginPixmapLoader("logo"),
 	nullptr,
-	nullptr
+	nullptr,
+	nullptr,
 };
 
 }

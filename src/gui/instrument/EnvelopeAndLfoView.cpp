@@ -229,8 +229,7 @@ void EnvelopeAndLfoView::modelChanged()
 void EnvelopeAndLfoView::dragEnterEvent( QDragEnterEvent * _dee )
 {
 	StringPairDrag::processDragEnterEvent( _dee,
-					QString( "samplefile,clip_%1" ).arg(
-							static_cast<int>(Track::Type::Sample) ) );
+					{"samplefile", QString("clip_%1").arg(static_cast<int>(Track::Type::Sample)) });
 }
 
 
