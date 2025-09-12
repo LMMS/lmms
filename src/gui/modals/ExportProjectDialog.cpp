@@ -106,11 +106,6 @@ ExportProjectDialog::ExportProjectDialog( const QString & _file_name,
 	const auto currentIndex = std::max(0, samplerateCB->findData(Engine::audioEngine()->outputSampleRate()));
 	samplerateCB->setCurrentIndex(currentIndex);
 
-	interpolationCB->setItemData(0, static_cast<int>(AudioResampler::Mode::ZOH));
-	interpolationCB->setItemData(1, static_cast<int>(AudioResampler::Mode::SincFastest));
-	interpolationCB->setItemData(2, static_cast<int>(AudioResampler::Mode::SincMedium));
-	interpolationCB->setItemData(3, static_cast<int>(AudioResampler::Mode::SincBest));
-
 	connect( startButton, SIGNAL(clicked()),
 			this, SLOT(startBtnClicked()));
 }
@@ -167,7 +162,6 @@ OutputSettings::StereoMode mapToStereoMode(int index)
 
 void ExportProjectDialog::startExport()
 {
-	auto qs = AudioEngine::qualitySettings{static_cast<AudioResampler::Mode>(interpolationCB->currentData().toInt())};
 	const auto bitrates = std::array{64, 128, 160, 192, 256, 320};
 
 	OutputSettings os = OutputSettings(samplerateCB->currentData().toInt(), bitrates[bitrateCB->currentIndex()],
@@ -187,7 +181,8 @@ void ExportProjectDialog::startExport()
 	{
 		output_name+=m_fileExtension;
 	}
-	m_renderManager.reset(new RenderManager( qs, os, m_ft, output_name ));
+
+	m_renderManager.reset(new RenderManager(os, m_ft, output_name));
 
 	Engine::getSong()->setExportLoop( exportLoopCB->isChecked() );
 	Engine::getSong()->setRenderBetweenMarkers( renderMarkersCB->isChecked() );

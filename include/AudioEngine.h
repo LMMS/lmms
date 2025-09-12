@@ -34,7 +34,6 @@
 #include <vector>
 
 #include "AudioDevice.h"
-#include "AudioResampler.h"
 #include "LmmsTypes.h"
 #include "SampleFrame.h"
 #include "LocklessList.h"
@@ -106,16 +105,6 @@ public:
 		AudioEngine* m_audioEngine;
 	};
 
-	struct qualitySettings
-	{
-		AudioResampler::Mode interpolation;
-
-		explicit qualitySettings(AudioResampler::Mode interpolation)
-			: interpolation(interpolation)
-		{
-		}
-	};
-
 	void initDevices();
 	void clear();
 	void clearNewPlayHandles();
@@ -137,10 +126,7 @@ public:
 
 	//! Set new audio device. Old device will be deleted,
 	//! unless it's stored using storeAudioDevice
-	void setAudioDevice( AudioDevice * _dev,
-				const struct qualitySettings & _qs,
-				bool _needs_fifo,
-				bool startNow );
+	void setAudioDevice(AudioDevice* _dev, bool _needs_fifo, bool startNow);
 	void storeAudioDevice();
 	void restoreAudioDevice();
 	inline AudioDevice * audioDev()
@@ -207,12 +193,6 @@ public:
 		return m_profiler.detailLoad(type);
 	}
 
-	const qualitySettings & currentQualitySettings() const
-	{
-		return m_qualitySettings;
-	}
-
-
 	sample_rate_t baseSampleRate() const { return m_baseSampleRate; }
 
 
@@ -276,8 +256,6 @@ public:
 	{
 		return hasFifoWriter() ? m_fifo->read() : renderNextBuffer();
 	}
-
-	void changeQuality(const struct qualitySettings & qs);
 
 	//! Block until a change in model can be done (i.e. wait for audio thread)
 	void requestChangeInModel();
@@ -367,8 +345,6 @@ private:
 	LocklessList<PlayHandle *> m_newPlayHandles;
 	ConstPlayHandleList m_playHandlesToRemove;
 
-
-	struct qualitySettings m_qualitySettings;
 	float m_masterGain;
 
 	// audio device stuff
