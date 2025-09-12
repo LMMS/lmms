@@ -26,7 +26,6 @@
 
 #include <QVarLengthArray>
 #include <QMessageBox>
-#include <iostream>
 
 #include "LadspaEffect.h"
 #include "DataFile.h"
