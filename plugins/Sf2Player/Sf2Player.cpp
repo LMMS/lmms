@@ -618,12 +618,15 @@ void Sf2Instrument::reloadSynth()
 
 	m_synthMutex.lock();
 
-	// LMMS supports a sample rate of 192 kHZ, while FluidSynth only supports up to 96 kHZ.
-	// Because of this, the instrument is resampled using libsamplerate when necessary.
-	// This uses linear interpolation, so the instrument's interpolation is set to FLUID_INTERP_LINEAR
-	// to match. A better option might be to make the interpolation option modifiable by the user, as well as only
-	// supporting only up to 96 kHZ (though that may be a problem if theres a strong need for 192 kHZ).
-	fluid_synth_set_interp_method(m_synth, -1, FLUID_INTERP_LINEAR);
+	if (m_internalSampleRate != Engine::audioEngine()->outputSampleRate())
+	{
+		// LMMS supports a sample rate of 192 kHZ, while FluidSynth only supports up to 96 kHZ.
+		// Because of this, the instrument is resampled using libsamplerate when necessary.
+		// This uses linear interpolation, so the instrument's interpolation is set to FLUID_INTERP_LINEAR
+		// to match. A better option might be to make the interpolation option modifiable by the user, as well as only
+		// supporting only up to 96 kHZ (though that may be a problem if theres a strong need for 192 kHZ).
+		fluid_synth_set_interp_method(m_synth, -1, FLUID_INTERP_LINEAR);
+	}
 
 	m_synthMutex.unlock();
 
