@@ -30,67 +30,67 @@
 namespace lmms
 {
 
-AudioDevice::AudioDevice( const ch_cnt_t _channels, AudioEngine*  _audioEngine ) :
-	m_supportsCapture( false ),
-	m_sampleRate( _audioEngine->outputSampleRate() ),
-	m_channels( _channels ),
-	m_audioEngine( _audioEngine ),
-	m_buffer(new SampleFrame[audioEngine()->framesPerPeriod()])
+AudioDevice::AudioDevice(const ch_cnt_t _channels, AudioEngine* _audioEngine)
+	: m_supportsCapture(false)
+	, m_sampleRate(_audioEngine->outputSampleRate())
+	, m_channels(_channels)
+	, m_audioEngine(_audioEngine)
 {
 }
-
 
 
 
 AudioDevice::~AudioDevice()
 {
-	delete[] m_buffer;
+	assert(m_running.test() && "device should have been stopped before being destroyed");
 	m_devMutex.tryLock();
 	unlock();
 }
 
-
-
-
-void AudioDevice::processNextBuffer()
+void AudioDevice::startProcessing()
 {
-	const fpp_t frames = getNextBuffer( m_buffer );
-	if (frames) { writeBuffer(m_buffer, frames); }
-	else
-	{
-		m_inProcess = false;
-	}
+	m_running.test_and_set(std::memory_order_acquire);
+	startProcessingImpl();
 }
-
-fpp_t AudioDevice::getNextBuffer(SampleFrame* _ab)
-{
-	fpp_t frames = audioEngine()->framesPerPeriod();
-	const SampleFrame* b = audioEngine()->nextBuffer();
-
-	if (!b) { return 0; }
-
-	memcpy(_ab, b, frames * sizeof(SampleFrame));
-
-	if (audioEngine()->hasFifoWriter()) { delete[] b; }
-	return frames;
-}
-
-
-
 
 void AudioDevice::stopProcessing()
 {
-	if( audioEngine()->hasFifoWriter() )
-	{
-		while( m_inProcess )
-		{
-			processNextBuffer();
-		}
-	}
+	m_running.clear(std::memory_order_release);
+	stopProcessingImpl();
 }
 
+void AudioDevice::nextBuffer(AudioBufferView<float> auto dst)
+{
+	for (auto frame = f_cnt_t{0}; frame < dst.frames(); ++frame)
+	{
+		if (m_audioEngineBufferIndex == 0) { m_audioEngineBuffer = m_audioEngine->renderNextBuffer(); }
+		const auto audioEngineFrame = m_audioEngineBuffer[m_audioEngineBufferIndex];
 
+		switch (dst.channels())
+		{
+		case 0:
+			assert(false);
+			break;
+		case 1:
+			dst.sample(0, frame) = audioEngineFrame.average();
+			break;
+		case 2:
+			dst.sample(0, frame) = audioEngineFrame[0];
+			dst.sample(1, frame) = audioEngineFrame[1];
+			break;
+		default:
+			dst.sample(0, frame) = audioEngineFrame[0];
+			dst.sample(1, frame) = audioEngineFrame[1];
+			for (auto channel = 2; channel < dst.channels(); ++channel)
+			{
+				dst.sample(channel, frame) = 0.f;
+			}
+			break;
+		}
 
+		m_audioEngineBufferIndex = (m_audioEngineBufferIndex + 1) % m_audioEngine->framesPerPeriod();
+	}
+}
 
 void AudioDevice::stopProcessingThread( QThread * thread )
 {
@@ -169,5 +169,8 @@ void AudioDevice::clearS16Buffer( int_sample_t * _outbuf, const fpp_t _frames )
 
 	memset( _outbuf, 0,  _frames * channels() * BYTES_PER_INT_SAMPLE );
 }
+
+template void AudioDevice::nextBuffer<InterleavedBufferView<float>>(InterleavedBufferView<float> dst);
+template void AudioDevice::nextBuffer<PlanarBufferView<float>>(PlanarBufferView<float> dst);
 
 } // namespace lmms
