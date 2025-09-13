@@ -59,8 +59,6 @@ void AudioDevice::stopProcessing()
 	stopProcessingImpl();
 }
 
-template void AudioDevice::nextBuffer<InterleavedBufferView<float>>(InterleavedBufferView<float> dst);
-template void AudioDevice::nextBuffer<PlanarBufferView<float>>(PlanarBufferView<float> dst);
 void AudioDevice::nextBuffer(AudioBufferView<float> auto dst)
 {
 	for (auto frame = f_cnt_t{0}; frame < dst.frames(); ++frame)
@@ -171,5 +169,8 @@ void AudioDevice::clearS16Buffer( int_sample_t * _outbuf, const fpp_t _frames )
 
 	memset( _outbuf, 0,  _frames * channels() * BYTES_PER_INT_SAMPLE );
 }
+
+template void AudioDevice::nextBuffer<InterleavedBufferView<float>>(InterleavedBufferView<float> dst);
+template void AudioDevice::nextBuffer<PlanarBufferView<float>>(PlanarBufferView<float> dst);
 
 } // namespace lmms
