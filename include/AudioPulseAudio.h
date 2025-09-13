@@ -52,7 +52,6 @@ class AudioPulseAudio : public QThread, public AudioDevice
 	Q_OBJECT
 public:
 	AudioPulseAudio( bool & _success_ful, AudioEngine* audioEngine );
-	~AudioPulseAudio() override;
 
 	inline static QString name()
 	{

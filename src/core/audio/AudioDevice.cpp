@@ -40,9 +40,9 @@ AudioDevice::AudioDevice(const ch_cnt_t _channels, AudioEngine* _audioEngine)
 
 
 
-
 AudioDevice::~AudioDevice()
 {
+	assert(m_running.test() && "device should have been stopped before being destroyed");
 	m_devMutex.tryLock();
 	unlock();
 }

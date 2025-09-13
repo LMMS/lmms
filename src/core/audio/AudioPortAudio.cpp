@@ -182,8 +182,6 @@ AudioPortAudio::AudioPortAudio( bool & _success_ful, AudioEngine * _audioEngine 
 
 AudioPortAudio::~AudioPortAudio()
 {
-	stopProcessing();
-
 	if( !m_wasPAInitError )
 	{
 		Pa_Terminate();

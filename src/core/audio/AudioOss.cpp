@@ -159,7 +159,6 @@ AudioOss::AudioOss(bool& _success_ful, AudioEngine* _audioEngine)
 
 AudioOss::~AudioOss()
 {
-	stopProcessing();
 	close( m_audioFD );
 }
 

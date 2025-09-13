@@ -120,8 +120,6 @@ AudioSdl::AudioSdl(bool& _success_ful, AudioEngine* _audioEngine)
 
 AudioSdl::~AudioSdl()
 {
-	stopProcessing();
-
 	if (m_inputDevice != 0)
 		SDL_CloseAudioDevice(m_inputDevice);
 	if (m_outputDevice != 0)

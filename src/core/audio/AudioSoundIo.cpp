@@ -189,8 +189,6 @@ void AudioSoundIo::onBackendDisconnect(int err)
 
 AudioSoundIo::~AudioSoundIo()
 {
-	stopProcessing();
-	
 	if (m_outstream)
 	{
 		soundio_outstream_destroy(m_outstream);

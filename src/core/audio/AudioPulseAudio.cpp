@@ -58,17 +58,6 @@ AudioPulseAudio::AudioPulseAudio(bool& _success_ful, AudioEngine* _audioEngine)
 	_success_ful = true;
 }
 
-
-
-
-AudioPulseAudio::~AudioPulseAudio()
-{
-	stopProcessing();
-}
-
-
-
-
 QString AudioPulseAudio::probeDevice()
 {
 	QString dev = ConfigManager::inst()->value( "audiopa", "device" );

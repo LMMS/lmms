@@ -96,7 +96,6 @@ AudioAlsa::AudioAlsa( bool & _success_ful, AudioEngine*  _audioEngine ) :
 
 AudioAlsa::~AudioAlsa()
 {
-	stopProcessing();
 	if( m_handle != nullptr )
 	{
 		snd_pcm_close( m_handle );

@@ -108,7 +108,6 @@ AudioSndio::AudioSndio(bool& _success_ful, AudioEngine* _audioEngine)
 
 AudioSndio::~AudioSndio()
 {
-	stopProcessing();
 	if (m_hdl != nullptr)
 	{
 		sio_close( m_hdl );

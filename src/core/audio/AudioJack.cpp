@@ -105,8 +105,6 @@ AudioJack::AudioJack(bool& successful, AudioEngine* audioEngineParam)
 	, m_framesDoneInCurBuf(0)
 	, m_framesToDoInCurBuf(0)
 {
-	m_stopped = true;
-
 	successful = initJackClient();
 	if (successful) {
 		connect(this, SIGNAL(zombified()), this, SLOT(restartAfterZombified()), Qt::QueuedConnection);
@@ -120,7 +118,6 @@ AudioJack::AudioJack(bool& successful, AudioEngine* audioEngineParam)
 
 AudioJack::~AudioJack()
 {
-	AudioJack::stopProcessing();
 #ifdef AUDIO_BUS_HANDLE_SUPPORT
 	while (m_portMap.size())
 	{
@@ -291,11 +288,7 @@ void AudioJack::attemptToReconnectInput(size_t inputIndex, const QString& source
 
 void AudioJack::startProcessingImpl()
 {
-	if (m_active || m_client == nullptr)
-	{
-		m_stopped = false;
-		return;
-	}
+	if (m_active || m_client == nullptr) { return; }
 
 	if (jack_activate(m_client))
 	{
@@ -320,8 +313,6 @@ void AudioJack::startProcessingImpl()
 	{
 		attemptToReconnectInput(i, cm->value(audioJackClass, getInputKeyByChannel(i)));
 	}
-
-	m_stopped = false;
 }
 
 
@@ -329,7 +320,6 @@ void AudioJack::startProcessingImpl()
 
 void AudioJack::stopProcessingImpl()
 {
-	m_stopped = true;
 }
 
 void AudioJack::registerPort(AudioBusHandle* port)
