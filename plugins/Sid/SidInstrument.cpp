@@ -130,7 +130,7 @@ SidInstrument::SidInstrument( InstrumentTrack * _instrument_track ) :
 {
     // A Filter object needs to be created only once to do some initialization, avoiding
 	// dropouts down the line when we have to play a note for the first time.
-	[[maybe_unused]] static auto s_filter = reSID::Filter{};
+	[[maybe_unused]] static auto s_filter = Filter{};
 
 	for( int i = 0; i < 3; ++i )
 	{
