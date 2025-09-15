@@ -30,6 +30,7 @@
 #include "AudioBufferView.h"
 #include "LmmsTypes.h"
 #include "lmms_constants.h"
+#include "lmms_export.h"
 #include "SampleFrame.h"
 
 namespace lmms
@@ -48,7 +49,7 @@ class AudioPortsModel;
  *   0 <= channel pair index < channelPairs()
  *   0 <= sample index < frames() * 2
  */
-class AudioBus
+class LMMS_EXPORT AudioBus
 {
 public:
 	AudioBus() = default;
