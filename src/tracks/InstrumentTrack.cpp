@@ -250,10 +250,6 @@ void InstrumentTrack::processAudioBuffer( SampleFrame* buf, const fpp_t frames, 
 		m_silentBuffersProcessed = false;
 	}
 
-	// if effects "went to sleep" because there was no input, wake them up
-	// now
-	m_audioBusHandle.effects()->startRunning();
-
 	// get volume knob data
 	static const float DefaultVolumeRatio = 1.0f / DefaultVolume;
 	/*ValueBuffer * volBuf = m_volumeModel.valueBuffer();

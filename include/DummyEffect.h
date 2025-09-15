@@ -108,7 +108,7 @@ public:
 		return &m_controls;
 	}
 
-	bool processCoreImpl(InterleavedBufferView<float, 2>) override
+	bool processCoreImpl(AudioBus&) override
 	{
 		return false;
 	}

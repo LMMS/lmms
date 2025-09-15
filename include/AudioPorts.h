@@ -26,6 +26,7 @@
 #define LMMS_AUDIO_PORTS_H
 
 #include "AudioBufferView.h"
+#include "AudioBus.h"
 #include "AudioEngine.h"
 #include "AudioPortsSettings.h"
 #include "AudioPortsModel.h"
@@ -34,60 +35,6 @@
 
 namespace lmms
 {
-
-/**
- * A non-owning span of InterleavedBufferView<const float, 2>.
- *
- * Access like this:
- *   myAudioBus[channel pair index][sample index]
- *
- * where
- *   0 <= channel pair index < channelPairs()
- *   0 <= sample index < frames() * 2
- *
- * TODO C++23: Use std::mdspan
- */
-template<typename T>
-class AudioBus
-{
-public:
-	static_assert(std::is_same_v<std::remove_const_t<T>, float>);
-
-	AudioBus() = default;
-	AudioBus(const AudioBus&) = default;
-
-	AudioBus(T* const* bus, track_ch_t channelPairs, f_cnt_t frames)
-		: m_bus{bus}
-		, m_channelPairs{channelPairs}
-		, m_frames{frames}
-	{
-	}
-
-	template<typename U = T> requires (std::is_const_v<U>)
-	AudioBus(const AudioBus<std::remove_const_t<U>>& other)
-		: m_bus{other.bus()}
-		, m_channelPairs{other.channelPairs()}
-		, m_frames{other.frames()}
-	{
-	}
-
-	auto trackChannelPair(track_ch_t pairIndex) const -> InterleavedBufferView<T, 2>
-	{
-		return {m_bus[pairIndex], m_frames};
-	}
-
-	//! @return 2-channel interleaved buffer for the given track channel pair
-	auto operator[](track_ch_t channelPairIndex) const -> T* { return m_bus[channelPairIndex]; }
-
-	auto bus() const -> T* const* { return m_bus; }
-	auto channelPairs() const -> track_ch_t { return m_channelPairs; }
-	auto frames() const -> f_cnt_t { return m_frames; }
-
-private:
-	T* const* m_bus = nullptr; //!< [channel pair index][sample index]
-	const track_ch_t m_channelPairs = 0;
-	const f_cnt_t m_frames = 0;
-};
 
 //! Tells the Core what to do with a processor after processing
 enum class ProcessStatus
@@ -210,46 +157,62 @@ class AudioPortsRouter
 		"AudioPorts::Router currently only supports interleaved buffers if they are SampleFrame-compatible");
 
 public:
-	explicit AudioPortsRouter(const AudioPorts<settings>& parent, bool autoQuitEnabled)
+	explicit AudioPortsRouter(const AudioPorts<settings>& parent)
 		: m_ap{&parent}
-		, m_autoQuitEnabled{autoQuitEnabled}
 	{
 	}
 
 	/**
-	 * Routes core audio to audio processor inputs, calls `processFunc`, then routes audio from
-	 * processor outputs back to the core.
+	 * Routes core audio to the processor's input buffers, calls `processFunc` (the processor's process
+	 * method), then routes audio from the processor's output buffers back to the track channels.
+	 *
+	 * `coreInOut`        : track channels from LMMS core (currently just the main track channel pair)
+	 * `processorBuffers` : the processor's `AudioPorts::Buffer` TODO: The Router shouldn't need to be given this by users
+	 * `processFunc`      : the processor's process method - a callable object with the signature
+	 *                      `ProcessStatus(buffers...)` where `buffers` is the expected audio buffer(s)
+	 *                      (if any) for the given `settings`.
 	 */
 	template<class F>
-	auto process(AudioBus<float> coreInOut, AudioPortsBuffer<settings>& processorBuffers, F&& processFunc)
+	auto process(AudioBus& coreInOut, AudioPortsBuffer<settings>& processorBuffers, F&& processFunc)
 		-> ProcessStatus
 	{
 		m_silentOutput = false;
+
+		ProcessStatus status;
 		if constexpr (settings.sampleFrameCompatible())
 		{
 			if (const auto dr = m_ap->directRouting())
 			{
 				// The "direct routing" optimization can be applied
-				return processWithDirectRouting(coreInOut.trackChannelPair(*dr),
+				status = processWithDirectRouting(coreInOut.trackChannelPair(*dr),
 					processorBuffers, std::forward<F>(processFunc));
 			}
 			else
 			{
-				return processNormally(coreInOut, processorBuffers, std::forward<F>(processFunc));
+				status = processNormally(coreInOut, processorBuffers, std::forward<F>(processFunc));
 			}
 		}
 		else
 		{
-			return processNormally(coreInOut, processorBuffers, std::forward<F>(processFunc));
+			status = processNormally(coreInOut, processorBuffers, std::forward<F>(processFunc));
 		}
+
+		coreInOut.sanitize(*m_ap);
+
+		// Update silence status for track channels the processor wrote to
+		if (!m_ap->isInstrument()) // TODO: Remove condition once NotePlayHandle-based instruments are supported?
+		{
+			m_silentOutput = coreInOut.update(*m_ap);
+		}
+
+		return status;
 	}
 
 	/**
 	 * Whether the processor output channels currently in use (processor channels that are routed to
 	 * at least one track channel) are silent.
 	 *
-	 * Only available when `process()` returns `ProcessStatus::ContinueIfNotQuiet` and auto-quit is enabled.
-	 * Otherwise the outputs are assumed to not be silent.
+	 * Only calculated for effects. Otherwise the outputs are assumed to not be silent.
 	 */
 	auto silentOutput() const -> bool { return m_silentOutput; }
 
@@ -260,49 +223,44 @@ public:
 private:
 	/**
 	 * `send`
-	 *     Routes audio from LMMS track channels to processor inputs according to the pin connections.
+	 *     Routes audio from track channels to processor inputs according to the pin connections.
 	 *
-	 *     Iterates through each output channel, mixing together all input audio routed to the output channel.
-	 *     If no audio is routed to an output channel, the output channel's buffer is zeroed.
+	 *     For each processor input channel, mixes together audio from all track channels
+	 *     that are routed to that processor input channel, then writes the result to that channel.
+	 *     If no audio is routed to a processor input channel, that channel's buffer is zeroed.
 	 *
 	 *     `in`     : track channels from LMMS core (currently just the main track channel pair)
 	 *                `in.frames` provides the number of frames in each `in`/`out` audio buffer
 	 *     `out`    : processor input buffers
 	 *
 	 * `receive`
-	 *     Routes audio from processor outputs to LMMS track channels according to the pin connections.
+	 *     Routes audio from processor outputs to track channels according to the pin connections.
 	 *
-	 *     Iterates through each output channel, mixing together all input audio routed to the output channel.
-	 *     If no audio is routed to an output channel, `inOut` remains unchanged for audio bypass behavior.
+	 *     For each track channel, mixes together audio from all processor output channels
+	 *     that are routed to that track channel, then writes the result to that channel.
+	 *     If no audio is routed to a track channel, that channel remains unchanged for "passthrough" behavior.
 	 *
 	 *     `in`      : processor output buffers
 	 *     `inOut`   : track channels from/to LMMS core (currently just the main track channel pair)
 	 *                 `inOut.frames` provides the number of frames in each `in`/`inOut` audio buffer
 	 */
 
-	void send(AudioBus<const float> in, PlanarBufferView<SampleT, settings.inputs> out) const
+	void send(const AudioBus& in, PlanarBufferView<SampleT, settings.inputs> out) const
 		requires (!settings.interleaved);
-	void receive(PlanarBufferView<const SampleT, settings.outputs> in, AudioBus<float> inOut) const
+	void receive(PlanarBufferView<const SampleT, settings.outputs> in, AudioBus& inOut) const
 		requires (!settings.interleaved);
 
-	void send(AudioBus<const float> in, InterleavedBufferView<float, settings.inputs> out) const
+	void send(const AudioBus& in, InterleavedBufferView<float, settings.inputs> out) const
 		requires (settings.interleaved);
-	void receive(InterleavedBufferView<const float, settings.outputs> in, AudioBus<float> inOut) const
+	void receive(InterleavedBufferView<const float, settings.outputs> in, AudioBus& inOut) const
 		requires (settings.interleaved);
-
-	//! Determines whether all the used output channels are silent
-	auto isOutputSilent(InterleavedBufferView<const float, 2> output) const -> bool;
-
-	//! Determines whether all the used output channels are silent
-	auto isOutputSilent(PlanarBufferView<const SampleT, settings.outputs> output) const -> bool
-		requires (!settings.interleaved);
 
 	/**
 	 * Processes audio normally (no "direct routing").
 	 * Uses `send` and `receive` to route audio to and from the processor.
 	 */
 	template<class F>
-	auto processNormally(AudioBus<float> coreInOut, AudioPortsBuffer<settings>& processorBuffers, F&& processFunc)
+	auto processNormally(AudioBus& coreInOut, AudioPortsBuffer<settings>& processorBuffers, F&& processFunc)
 		-> ProcessStatus;
 
 	/**
@@ -315,30 +273,6 @@ private:
 
 	const AudioPorts<settings>* const m_ap;
 	bool m_silentOutput = false;
-	const bool m_autoQuitEnabled;
-
-	/*
-	 * In the past, the RMS was calculated then compared with a threshold of 10^(-10).
-	 * Now we use a different algorithm to determine whether a buffer is non-quiet, so
-	 * a new threshold is needed for the best compatibility. The following is how it's derived.
-	 *
-	 * Old method:
-	 * RMS = average (L^2 + R^2) across stereo buffer.
-	 * RMS threshold = 10^(-10)
-	 *
-	 * So for a single channel, it would be:
-	 * RMS/2 = average M^2 across single channel buffer.
-	 * RMS/2 threshold = 5^(-11)
-	 *
-	 * The new algorithm for determining whether a buffer is non-silent compares M with the threshold,
-	 * not M^2, so the square root of M^2's threshold should give us the most compatible threshold for
-	 * the new algorithm:
-	 *
-	 * (RMS/2)^0.5 = (5^(-11))^0.5 = 0.0001431 (approx.)
-	 *
-	 * In practice though, the exact value shouldn't really matter so long as it's sufficiently small.
-	 */
-	static constexpr auto s_silenceThreshold = 0.0001431f;
 };
 
 } // namespace detail
@@ -373,22 +307,7 @@ public:
 	/**
 	 * AudioPorts router
 	 *
-	 * `process`
-	 *     Routes audio to the processor's input buffers, then calls `processFunc` (the processor's process
-	 *     method), then routes audio from the processor's output buffers back to LMMS track channels.
-	 *
-	 *     `coreInOut`        : track channels from LMMS core (currently just the main track channel pair)
-	 *     `processorBuffers` : the processor's `AudioPorts::Buffer`
-	 *     `processFunc`      : the processor's process method - a callable object with the signature
-	 *                          `ProcessStatus(buffers...)` where `buffers` is the expected audio buffer(s)
-	 *                          (if any) for the given `settings`.
-	 *
-	 * `silentOutput`
-	 *     Whether the processor output channels currently in use (processor channels that are routed to
-	 *     at least one track channel) are silent.
-	 *
-	 *     Only available when `process()` returns `ProcessStatus::ContinueIfNotQuiet` and auto-quit is enabled.
-	 *     Otherwise the outputs are assumed to not be silent.
+	 * Performs pin connector routing for an audio processor.
 	 */
 	using Router = detail::AudioPortsRouter<settings>;
 
@@ -450,9 +369,9 @@ public:
 		return *static_cast<AudioPortsModel*>(this);
 	}
 
-	auto getRouter(bool autoQuitEnabled = false) const -> Router
+	auto getRouter() const -> Router
 	{
-		return Router{*this, autoQuitEnabled};
+		return Router{*this};
 	}
 
 	static constexpr auto audioPortsSettings() -> AudioPortsSettings { return settings; }
@@ -500,7 +419,7 @@ inline auto convertSample(const In sample) -> Out
 
 template<AudioPortsSettings settings>
 inline void AudioPortsRouter<settings>::send(
-	AudioBus<const float> in, PlanarBufferView<SampleT, settings.inputs> out) const
+	const AudioBus& in, PlanarBufferView<SampleT, settings.inputs> out) const
 	requires (!settings.interleaved)
 {
 	assert(m_ap->in().channelCount() != DynamicChannelCount);
@@ -563,7 +482,7 @@ inline void AudioPortsRouter<settings>::send(
 
 template<AudioPortsSettings settings>
 inline void AudioPortsRouter<settings>::receive(
-	PlanarBufferView<const SampleT, settings.outputs> in, AudioBus<float> inOut) const
+	PlanarBufferView<const SampleT, settings.outputs> in, AudioBus& inOut) const
 	requires (!settings.interleaved)
 {
 	assert(m_ap->out().channelCount() != DynamicChannelCount);
@@ -575,7 +494,7 @@ inline void AudioPortsRouter<settings>::receive(
 
 	/*
 	 * Routes processor audio to track channel pair and normalizes the result. For track channels
-	 * without any processor audio routed to it, the track channel is unmodified for "bypass"
+	 * without any processor audio routed to it, the track channel is unmodified for "passthrough"
 	 * behavior.
 	 */
 	const auto routeNx2 = [&](float* outPtr, track_ch_t outChannel, auto usedTrackChannels) {
@@ -583,15 +502,16 @@ inline void AudioPortsRouter<settings>::receive(
 
 		if constexpr (utc == 0b00)
 		{
-			// Both track channels bypassed - nothing to do
+			// Both track channels pass through - nothing to do
 			return;
 		}
 
 		const auto samples = inOut.frames() * 2;
 
-		// We know at this point that we are writing to at least one of the output channels
-		// rather than bypassing, so it is safe to set the output buffer of those channels
-		// to zero prior to accumulation
+		// We know at this point that we are writing to at least one of the track channels
+		// rather than letting them pass through, so it is safe to set the output buffer of those
+		// channels to zero prior to accumulation
+		// TODO: This would benefit from keeping track of silent track channels
 
 		if constexpr (utc == 0b11)
 		{
@@ -675,13 +595,13 @@ inline void AudioPortsRouter<settings>::receive(
 		const auto outChannel = static_cast<track_ch_t>(outChannelPairIdx * 2);
 
 		const std::uint8_t usedTrackChannels =
-				(static_cast<std::uint8_t>(m_ap->usedTrackChannels()[outChannel]) << 1u)
-				| static_cast<std::uint8_t>(m_ap->usedTrackChannels()[outChannel + 1]);
+			(static_cast<std::uint8_t>(m_ap->out().usedTrackChannels()[outChannel]) << 1u)
+			| static_cast<std::uint8_t>(m_ap->out().usedTrackChannels()[outChannel + 1]);
 
 		switch (usedTrackChannels)
 		{
 			case 0b00:
-				// Both track channels are bypassed, so nothing is allowed to be written to output
+				// Both track channels pass through, so nothing is allowed to be written to output
 				break;
 			case 0b01:
 				routeNx2(outPtr, outChannel, std::integral_constant<std::uint8_t, 0b01>{});
@@ -701,7 +621,7 @@ inline void AudioPortsRouter<settings>::receive(
 
 template<AudioPortsSettings settings>
 inline void AudioPortsRouter<settings>::send(
-	AudioBus<const float> in, InterleavedBufferView<float, settings.inputs> out) const
+	const AudioBus& in, InterleavedBufferView<float, settings.inputs> out) const
 	requires (settings.interleaved)
 {
 	assert(m_ap->in().channelCount() != DynamicChannelCount);
@@ -791,7 +711,7 @@ inline void AudioPortsRouter<settings>::send(
 
 template<AudioPortsSettings settings>
 inline void AudioPortsRouter<settings>::receive(
-	InterleavedBufferView<const float, settings.outputs> in, AudioBus<float> inOut) const
+	InterleavedBufferView<const float, settings.outputs> in, AudioBus& inOut) const
 	requires (settings.interleaved)
 {
 	assert(m_ap->out().channelCount() != DynamicChannelCount);
@@ -815,8 +735,8 @@ inline void AudioPortsRouter<settings>::receive(
 
 		if constexpr (enabledPins() == 0) { return; }
 
-		// We know at this point that we are writing to at least one of the output channels
-		// rather than bypassing, so it is safe to overwrite the contents of the output buffer
+		// We know at this point that we are writing to at least one of the track channels rather
+		// than letting them pass through, so it is safe to overwrite the contents of the output buffer
 
 		for (f_cnt_t sampleIdx = 0; sampleIdx < samples; sampleIdx += 2)
 		{
@@ -889,59 +809,8 @@ inline void AudioPortsRouter<settings>::receive(
 }
 
 template<AudioPortsSettings settings>
-inline auto AudioPortsRouter<settings>::isOutputSilent(InterleavedBufferView<const float, 2> output) const -> bool
-{
-	assert(m_ap->usedProcessorChannels().size() == 2);
-
-	// TODO C++26: Use std::simd::all_of
-	switch ((m_ap->usedProcessorChannels()[0] << 1) | std::uint8_t{m_ap->usedProcessorChannels()[1]})
-	{
-		case 0b11:
-			return std::ranges::all_of(output.dataView(), [](const float sample) {
-				return std::abs(sample) < s_silenceThreshold;
-			});
-		case 0b10:
-			return std::ranges::all_of(output.framesView(), [](const float* frame) {
-				return std::abs(frame[0]) < s_silenceThreshold;
-			});
-		case 0b01:
-			return std::ranges::all_of(output.framesView(), [](const float* frame) {
-				return std::abs(frame[1]) < s_silenceThreshold;
-			});
-		case 0b00:
-			// No outputs are used
-			return true;
-		default:
-			unreachable();
-			return true;
-	}
-}
-
-template<AudioPortsSettings settings>
-inline auto AudioPortsRouter<settings>::isOutputSilent(
-	PlanarBufferView<const SampleT, settings.outputs> output) const -> bool
-	requires (!settings.interleaved)
-{
-	assert(output.channels() == m_ap->usedProcessorChannels().size());
-
-	proc_ch_t pc = 0;
-	for (bool used : m_ap->usedProcessorChannels())
-	{
-		if (used)
-		{
-			const bool silent = std::ranges::all_of(output.buffer(pc), [](const SampleT sample) {
-				return std::abs(sample) < s_silenceThreshold;
-			});
-			if (!silent) { return false; }
-		}
-		++pc;
-	}
-	return true;
-}
-
-template<AudioPortsSettings settings>
 template<class F>
-inline auto AudioPortsRouter<settings>::processNormally(AudioBus<float> coreInOut,
+inline auto AudioPortsRouter<settings>::processNormally(AudioBus& coreInOut,
 	AudioPortsBuffer<settings>& processorBuffers, F&& processFunc) -> ProcessStatus
 {
 	ProcessStatus status;
@@ -962,10 +831,6 @@ inline auto AudioPortsRouter<settings>::processNormally(AudioBus<float> coreInOu
 		if constexpr (settings.outputs != 0)
 		{
 			receive(processorInOut, coreInOut);
-			if (status == ProcessStatus::ContinueIfNotQuiet && m_autoQuitEnabled)
-			{
-				m_silentOutput = isOutputSilent(processorInOut);
-			}
 		}
 	}
 	else
@@ -986,10 +851,6 @@ inline auto AudioPortsRouter<settings>::processNormally(AudioBus<float> coreInOu
 		if constexpr (settings.outputs != 0)
 		{
 			receive(processorOut, coreInOut);
-			if (status == ProcessStatus::ContinueIfNotQuiet && m_autoQuitEnabled)
-			{
-				m_silentOutput = isOutputSilent(processorOut);
-			}
 		}
 	}
 	return status;
@@ -1116,25 +977,6 @@ inline auto AudioPortsRouter<settings>::processWithDirectRouting(InterleavedBuff
 				// are allowed to be the same buffer, so no buffer copy is needed.
 				status = processFunc(coreBuffer, coreBuffer);
 			}
-		}
-	}
-
-	// Check if output buffers are silent (if needed)
-	if constexpr (settings.outputs != 0)
-	{
-		if (status == ProcessStatus::ContinueIfNotQuiet
-			&& m_autoQuitEnabled
-			&& m_ap->out().channelCount() != 0)
-		{
-			// Silent output is determined using the processor output channels that are currently in use.
-			// When "direct routing" is active (as it is here), the data on the track channels
-			// is the same as the data on the in-use processor output channels, making this easy
-			// to calculate.
-
-			// TODO C++26: Use std::simd::all_of
-			m_silentOutput = std::ranges::all_of(coreBuffer.dataView(), [](float sample) {
-				return std::abs(sample) < s_silenceThreshold;
-			});
 		}
 	}
 

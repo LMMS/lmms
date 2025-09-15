@@ -31,6 +31,7 @@
 #include <QString>
 #include <QMutex>
 
+#include "AudioBus.h"
 #include "PlayHandle.h"
 #include "SampleFrame.h"
 
@@ -88,6 +89,9 @@ private:
 	volatile bool m_bufferUsage;
 
 	std::vector<SampleFrame> m_buffer;
+
+	SampleFrame* m_trackChannels = nullptr; // TODO: Move to AudioBus?
+	AudioBus m_bus;
 
 	bool m_extOutputEnabled;
 	mix_ch_t m_nextMixerChannel;

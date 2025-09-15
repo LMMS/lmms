@@ -47,7 +47,7 @@ void zeroBuffer(PlanarBufferView<SampleT, extent> buffer)
 	}
 }
 
-void zeroBuffer(AudioBus<float> bus)
+void zeroBuffer(AudioBus& bus)
 {
 	for (track_ch_t channelPair = 0; channelPair < bus.channelPairs(); ++channelPair)
 	{
@@ -57,7 +57,7 @@ void zeroBuffer(AudioBus<float> bus)
 }
 
 template<class F>
-void transformBuffer(AudioBus<const float> in, AudioBus<float> out, const F& func)
+void transformBuffer(const AudioBus& in, AudioBus& out, const F& func)
 {
 	assert(in.channelPairs() == out.channelPairs());
 	assert(in.frames() == out.frames());
@@ -93,7 +93,7 @@ void transformBuffer(PlanarBufferView<SampleT, extent> in, PlanarBufferView<Samp
 	}
 }
 
-void compareBuffers(AudioBus<const float> actual, AudioBus<const float> expected)
+void compareBuffers(const AudioBus& actual, const AudioBus& expected)
 {
 	QCOMPARE(actual.channelPairs(), expected.channelPairs());
 	QCOMPARE(actual.frames(), expected.frames());
@@ -135,11 +135,6 @@ public:
 	auto outputs() const -> proc_ch_t { return m_outputs; }
 	auto frames() const -> f_cnt_t { return m_frames; }
 
-	using AudioPortsModel::trackChannelsUpperBound;
-	using AudioPortsModel::usedTrackChannels;
-	using AudioPortsModel::usedProcessorChannels;
-	using AudioPortsModel::directRouting;
-
 private:
 	void bufferPropertiesChanging(proc_ch_t inChannels, proc_ch_t outChannels, f_cnt_t frames) override
 	{
@@ -167,17 +162,17 @@ public:
 	static constexpr lmms::f_cnt_t MaxFrames = lmms::DEFAULT_BUFFER_SIZE;
 
 private:
-	std::vector<float> m_coreBuffer;
-	float* m_coreBufferPtr = nullptr;
+	std::vector<lmms::SampleFrame> m_coreBuffer;
+	lmms::SampleFrame* m_coreBufferPtr = nullptr;
 
-	auto getCoreBus() -> lmms::AudioBus<float>
+	auto getCoreBus() -> lmms::AudioBus
 	{
-		m_coreBuffer.resize(MaxFrames * 2);
+		m_coreBuffer.resize(MaxFrames);
 		m_coreBufferPtr = m_coreBuffer.data();
 
-		std::fill_n(m_coreBuffer.data(), m_coreBuffer.size(), 0.f);
+		std::fill_n(m_coreBuffer.data(), m_coreBuffer.size(), lmms::SampleFrame{});
 
-		return lmms::AudioBus<float>{&m_coreBufferPtr, 1, MaxFrames};
+		return lmms::AudioBus{&m_coreBufferPtr, 1, MaxFrames};
 	}
 
 private slots:
@@ -336,8 +331,8 @@ private slots:
 		QCOMPARE(apm2x2Inst.out().enabled(1, 1), true);
 	}
 
-	//! Verifies that the used track channels cache works
-	void UsedTrackChannelsCache()
+	//! Verifies that the used output track channels cache works
+	void UsedOutputTrackChannelsCache()
 	{
 		using namespace lmms;
 
@@ -351,8 +346,8 @@ private slots:
 		//  ---
 
 		// Track channels 0 and 1 should both have a processor output channel routed to them
-		QCOMPARE(apm.usedTrackChannels()[0], true);
-		QCOMPARE(apm.usedTrackChannels()[1], true);
+		QCOMPARE(apm.out().usedTrackChannels()[0], true);
+		QCOMPARE(apm.out().usedTrackChannels()[1], true);
 
 		// Out
 		//  ___
@@ -363,8 +358,8 @@ private slots:
 		apm.out().setPin(0, 0, false);
 
 		// Now only track channel 1 should have a processor channel routed to it
-		QCOMPARE(apm.usedTrackChannels()[0], false);
-		QCOMPARE(apm.usedTrackChannels()[1], true);
+		QCOMPARE(apm.out().usedTrackChannels()[0], false);
+		QCOMPARE(apm.out().usedTrackChannels()[1], true);
 
 		// Out
 		//  ___
@@ -374,8 +369,8 @@ private slots:
 
 		apm.out().setPin(0, 1, true);
 
-		QCOMPARE(apm.usedTrackChannels()[0], true);
-		QCOMPARE(apm.usedTrackChannels()[1], true);
+		QCOMPARE(apm.out().usedTrackChannels()[0], true);
+		QCOMPARE(apm.out().usedTrackChannels()[1], true);
 
 		// Out
 		//  ___
@@ -385,12 +380,12 @@ private slots:
 
 		apm.out().setPin(1, 0, true);
 
-		QCOMPARE(apm.usedTrackChannels()[0], true);
-		QCOMPARE(apm.usedTrackChannels()[1], true);
+		QCOMPARE(apm.out().usedTrackChannels()[0], true);
+		QCOMPARE(apm.out().usedTrackChannels()[1], true);
 	}
 
-	//! Verifies that the used processor channels cache works
-	void UsedProcessorChannelsCache()
+	//! Verifies that the used output processor channels cache works
+	void UsedOutputChannelsCache()
 	{
 		using namespace lmms;
 
@@ -404,8 +399,8 @@ private slots:
 		//  ---
 
 		// Processor channels 0 and 1 should both be routed to a track channel
-		QCOMPARE(apm.usedProcessorChannels()[0], true);
-		QCOMPARE(apm.usedProcessorChannels()[1], true);
+		QCOMPARE(apm.out().usedChannels()[0], true);
+		QCOMPARE(apm.out().usedChannels()[1], true);
 
 		// Out
 		//  ___
@@ -416,8 +411,8 @@ private slots:
 		apm.out().setPin(0, 0, false);
 
 		// Now only processor channel 1 should be routed to a track channel
-		QCOMPARE(apm.usedProcessorChannels()[0], false);
-		QCOMPARE(apm.usedProcessorChannels()[1], true);
+		QCOMPARE(apm.out().usedChannels()[0], false);
+		QCOMPARE(apm.out().usedChannels()[1], true);
 
 		// Out
 		//  ___
@@ -427,8 +422,8 @@ private slots:
 
 		apm.out().setPin(0, 1, true);
 
-		QCOMPARE(apm.usedProcessorChannels()[0], false);
-		QCOMPARE(apm.usedProcessorChannels()[1], true);
+		QCOMPARE(apm.out().usedChannels()[0], false);
+		QCOMPARE(apm.out().usedChannels()[1], true);
 
 		// Out
 		//  ___
@@ -441,8 +436,8 @@ private slots:
 		apm.setTrackChannelCount(4);
 
 		// Should remain the same after increasing the number of track channels
-		QCOMPARE(apm.usedProcessorChannels()[0], false);
-		QCOMPARE(apm.usedProcessorChannels()[1], true);
+		QCOMPARE(apm.out().usedChannels()[0], false);
+		QCOMPARE(apm.out().usedChannels()[1], true);
 
 		// Out
 		//  ___
@@ -454,8 +449,8 @@ private slots:
 
 		apm.out().setPin(3, 0, true);
 
-		QCOMPARE(apm.usedProcessorChannels()[0], true);
-		QCOMPARE(apm.usedProcessorChannels()[1], true);
+		QCOMPARE(apm.out().usedChannels()[0], true);
+		QCOMPARE(apm.out().usedChannels()[1], true);
 
 		// Out
 		//  ___
@@ -466,8 +461,8 @@ private slots:
 		apm.setTrackChannelCount(2);
 
 		// The 1st processor channel should no longer be routed to any track channels
-		QCOMPARE(apm.usedProcessorChannels()[0], false);
-		QCOMPARE(apm.usedProcessorChannels()[1], true);
+		QCOMPARE(apm.out().usedChannels()[0], false);
+		QCOMPARE(apm.out().usedChannels()[1], true);
 
 		// Out
 		//  _____
@@ -478,16 +473,16 @@ private slots:
 		apm.setChannelCountOut(3);
 
 		// The new processor channel should not be routed to anything, and the rest stays the same
-		QCOMPARE(apm.usedProcessorChannels()[0], false);
-		QCOMPARE(apm.usedProcessorChannels()[1], true);
-		QCOMPARE(apm.usedProcessorChannels()[2], false);
+		QCOMPARE(apm.out().usedChannels()[0], false);
+		QCOMPARE(apm.out().usedChannels()[1], true);
+		QCOMPARE(apm.out().usedChannels()[2], false);
 
 		apm.setChannelCountIn(1);
 
 		// Setting the input channel count has no effect
-		QCOMPARE(apm.usedProcessorChannels()[0], false);
-		QCOMPARE(apm.usedProcessorChannels()[1], true);
-		QCOMPARE(apm.usedProcessorChannels()[2], false);
+		QCOMPARE(apm.out().usedChannels()[0], false);
+		QCOMPARE(apm.out().usedChannels()[1], true);
+		QCOMPARE(apm.out().usedChannels()[2], false);
 	}
 
 	//! Verifies that the direct routing optimization works
@@ -627,9 +622,9 @@ private slots:
 		transformBuffer(ins, outs, [](auto s) { return s * 2; });
 
 		// Construct buffer with the expected core bus result
-		auto coreBufferExpected = std::vector<float>(MaxFrames * 2);
+		auto coreBufferExpected = std::vector<SampleFrame>(MaxFrames);
 		auto coreBufferPtrExpected = coreBufferExpected.data();
-		auto coreBusExpected = AudioBus<float>{&coreBufferPtrExpected, 1, MaxFrames};
+		auto coreBusExpected = AudioBus{&coreBufferPtrExpected, 1, MaxFrames};
 		coreBusExpected.trackChannelPair(0).sampleFrameAt(0) = SampleFrame{123.f * 2, 123.f * 2};
 		coreBusExpected.trackChannelPair(0).sampleFrameAt(1) = SampleFrame{456.f * 2, 456.f * 2};
 		coreBusExpected.trackChannelPair(0).sampleFrameAt(33) = SampleFrame{789.f * 2, 789.f * 2};
@@ -689,9 +684,9 @@ private slots:
 		transformBuffer(ins, outs, [](auto s) { return s * 2; });
 
 		// Construct buffer with the expected core bus result
-		auto coreBufferExpected = std::vector<float>(MaxFrames * 2);
+		auto coreBufferExpected = std::vector<SampleFrame>(MaxFrames);
 		auto coreBufferPtrExpected = coreBufferExpected.data();
-		auto coreBusExpected = AudioBus<float>{&coreBufferPtrExpected, 1, MaxFrames};
+		auto coreBusExpected = AudioBus{&coreBufferPtrExpected, 1, MaxFrames};
 		transformBuffer(coreBus, coreBusExpected, [](auto s) { return s * 2; });
 
 		// Sanity check for transformBuffer
@@ -776,9 +771,9 @@ private slots:
 		transformBuffer(ins, outs, [](auto s) { return s * 2; });
 
 		// Construct buffer with the expected core bus result
-		auto coreBufferExpected = std::vector<float>(MaxFrames * 2);
+		auto coreBufferExpected = std::vector<SampleFrame>(MaxFrames);
 		auto coreBufferPtrExpected = coreBufferExpected.data();
-		auto coreBusExpected = AudioBus<float>{&coreBufferPtrExpected, 1, MaxFrames};
+		auto coreBusExpected = AudioBus{&coreBufferPtrExpected, 1, MaxFrames};
 		for (f_cnt_t sampleIdx = 0; sampleIdx < coreBus.frames() * 2; sampleIdx += 2)
 		{
 			float& sampleL = coreBusExpected[0][sampleIdx];
@@ -845,9 +840,9 @@ private slots:
 		transformBuffer(inOut, [](auto s) { return s * 2; });
 
 		// Construct buffer with the expected core bus result
-		auto coreBufferExpected = std::vector<float>(MaxFrames * 2);
+		auto coreBufferExpected = std::vector<SampleFrame>(MaxFrames);
 		auto coreBufferPtrExpected = coreBufferExpected.data();
-		auto coreBusExpected = AudioBus<float>{&coreBufferPtrExpected, 1, MaxFrames};
+		auto coreBusExpected = AudioBus{&coreBufferPtrExpected, 1, MaxFrames};
 		transformBuffer(coreBus, coreBusExpected, [](auto s) { return s * 2; });
 
 		// Zero core bus just to be sure what the processor output is
@@ -922,9 +917,9 @@ private slots:
 		std::transform(ins.bufferPtr(0), ins.bufferPtr(0) + ins.frames(), outs.bufferPtr(1), process);
 
 		// Construct buffer with the expected core bus result
-		auto coreBufferExpected = std::vector<float>(MaxFrames * 2);
+		auto coreBufferExpected = std::vector<SampleFrame>(MaxFrames);
 		auto coreBufferPtrExpected = coreBufferExpected.data();
-		auto coreBusExpected = AudioBus<float>{&coreBufferPtrExpected, 1, MaxFrames};
+		auto coreBusExpected = AudioBus{&coreBufferPtrExpected, 1, MaxFrames};
 		coreBusExpected.trackChannelPair(0).sampleFrameAt(0) = SampleFrame{(123.f + 321.f) * 2, 321.f};
 		coreBusExpected.trackChannelPair(0).sampleFrameAt(1) = SampleFrame{(456.f + 654.f) * 2, 654.f};
 		coreBusExpected.trackChannelPair(0).sampleFrameAt(33) = SampleFrame{(789.f + 987.f) * 2, 987.f};
@@ -964,9 +959,9 @@ private slots:
 			trackChannels.sampleFrameAt(33).setRight(987.f);
 
 			// Construct buffer with the expected core bus result
-			auto coreBufferExpected = std::vector<float>(MaxFrames * 2);
+			auto coreBufferExpected = std::vector<SampleFrame>(MaxFrames);
 			auto coreBufferPtrExpected = coreBufferExpected.data();
-			auto coreBusExpected = AudioBus<float>{&coreBufferPtrExpected, 1, MaxFrames};
+			auto coreBusExpected = AudioBus{&coreBufferPtrExpected, 1, MaxFrames};
 			transformBuffer(coreBus, coreBusExpected, [](auto s) { return s * 2; });
 
 			// Audio processor's process method that doubles the amplitude. Works for any AudioPortsSettings.

@@ -36,6 +36,7 @@
 namespace lmms
 {
 
+class AudioBus;
 class AudioPortsModel;
 class EffectChain;
 class EffectControls;
@@ -58,9 +59,9 @@ public:
 	~Effect() override;
 
 	//! Returns true if audio was processed and should continue being processed
-	bool processCore(SampleFrame* buf, const fpp_t frames)
+	bool processCore(AudioBus& inOut)
 	{
-		return processCoreImpl({reinterpret_cast<float*>(buf), frames});
+		return processCoreImpl(inOut);
 	}
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
@@ -85,18 +86,6 @@ public:
 	bool isAwake() const
 	{
 		return m_awake;
-	}
-
-	void startRunning()
-	{
-		m_quietBufferCount = 0;
-		m_awake = true;
-	}
-
-	void stopRunning()
-	{
-		m_quietBufferCount = 0;
-		m_awake = false;
 	}
 
 	inline bool isEnabled() const
@@ -165,9 +154,21 @@ public:
 
 
 protected:
-	virtual bool processCoreImpl(InterleavedBufferView<float, 2> inOut) = 0;
+	virtual bool processCoreImpl(AudioBus& inOut) = 0;
 
 	gui::PluginView* instantiateView( QWidget * ) override;
+
+	void startRunning()
+	{
+		m_quietBufferCount = 0;
+		m_awake = true;
+	}
+
+	void stopRunning()
+	{
+		m_quietBufferCount = 0;
+		m_awake = false;
+	}
 
 	// some effects might not be capable of higher sample-rates so they can
 	// sample it down before processing and back after processing

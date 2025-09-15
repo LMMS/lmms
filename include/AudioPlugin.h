@@ -178,8 +178,8 @@ protected:
 		auto buffers = m_audioPorts.buffers();
 		assert(buffers != nullptr);
 
-		auto temp = reinterpret_cast<float*>(inOut.data());
-		const auto bus = AudioBus<float>{&temp, 1, inOut.size()};
+		auto temp = inOut.data();
+		auto bus = AudioBus{&temp, 1, inOut.size()};
 		auto router = m_audioPorts.getRouter();
 
 		router.process(bus, *buffers, [this](auto... buffers) {
@@ -237,8 +237,26 @@ protected:
 			: nullptr;
 	}
 
-	auto processCoreImpl(InterleavedBufferView<float, 2> inOut) -> bool final
+	auto processCoreImpl(AudioBus& inOut) -> bool final
 	{
+		if (!isAwake())
+		{
+			if (inOut.hasInputNoise(m_audioPorts))
+			{
+				startRunning();
+			}
+			else
+			{
+				// Sleeping plugins need to zero any track channels their output is routed to in order to
+				// prevent sudden track channel passthrough behavior when the plugin is put to sleep.
+				// Otherwise auto-quit could become audibly noticeable, which is not intended.
+
+				inOut.silenceChannels(m_audioPorts);
+
+				return false;
+			}
+		}
+
 		if (!processLock())
 		{
 			// Failed to acquire lock
@@ -247,7 +265,7 @@ protected:
 
 		if (!isRunning() || !m_audioPorts.active())
 		{
-			// Plugin is not running
+			// Plugin is awake but not running
 			this->processBypassedImpl();
 			processUnlock();
 			return false;
@@ -256,11 +274,9 @@ protected:
 		auto buffers = m_audioPorts.buffers();
 		assert(buffers != nullptr);
 
-		float* temp = inOut.data();
-		const auto bus = AudioBus<float>{&temp, 1, inOut.frames()};
-		auto router = m_audioPorts.getRouter(this->autoQuitEnabled());
+		auto router = m_audioPorts.getRouter();
 
-		const auto status = router.process(bus, *buffers, [this](auto... buffers) {
+		const auto status = router.process(inOut, *buffers, [this](auto... buffers) {
 			return this->processImpl(buffers...);
 		});
 
@@ -272,6 +288,7 @@ protected:
 				handleAutoQuit(router.silentOutput());
 				break;
 			case ProcessStatus::Sleep:
+				stopRunning();
 				processUnlock();
 				return false;
 			default:
@@ -284,8 +301,8 @@ protected:
 	}
 
 	/**
-	 * Optional method that runs when an effect is asleep (not enabled,
-	 * not running, not in the Okay state, or in the Don't Run state)
+	 * Optional method that runs instead of `processImpl` when an effect
+	 * is awake but not running.
 	 */
 	virtual void processBypassedImpl()
 	{
