@@ -907,23 +907,14 @@ AudioDevice * AudioEngine::tryAudioDevices()
 
 
 #ifdef LMMS_HAVE_PORTAUDIO
-	// TODO: Eventually move all devices to use exception handling instead of passing in a boolean parameter
-	// to the constructor
-	try
+	if ( dev_name == AudioPortAudio::name() || dev_name == "" )
 	{
-		if (dev_name == AudioPortAudio::name() || dev_name == "")
+		dev = new AudioPortAudio( success_ful, this );
+		if( success_ful )
 		{
-			dev = new AudioPortAudio(this);
 			m_audioDevName = AudioPortAudio::name();
 			return dev;
 		}
-
-		success_ful = true;
-	}
-	catch (std::runtime_error& error)
-	{
-		std::cerr << error.what() << '\n';
-		success_ful = false;
 		delete dev;
 	}
 #endif

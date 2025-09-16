@@ -65,7 +65,7 @@ private:
 class AudioPortAudio : public AudioDevice
 {
 public:
-	AudioPortAudio(AudioEngine* engine);
+	AudioPortAudio(bool& successful, AudioEngine* engine);
 	~AudioPortAudio() override;
 
 	AudioPortAudio(const AudioPortAudio&) = delete;
@@ -85,10 +85,6 @@ private:
 	PortAudioInitializationGuard m_initGuard;
 
 	PaStream* m_paStream = nullptr;
-	PaDeviceIndex m_inputDeviceIndex = paNoDevice;
-	PaDeviceIndex m_outputDeviceIndex = paNoDevice;
-	PaStreamParameters m_inputParameters = PaStreamParameters{};
-	PaStreamParameters m_outputParameters = PaStreamParameters{};
 	std::vector<SampleFrame> m_outBuf;
 	std::size_t m_outBufPos = 0;
 };

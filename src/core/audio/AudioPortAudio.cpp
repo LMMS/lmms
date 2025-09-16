@@ -98,76 +98,100 @@ QString numChannelsFromConfig(Direction direction)
 	return numChannels;
 }
 
-PaStreamParameters createStreamParameters(PaDeviceIndex index, Direction direction)
+} // namespace
+
+namespace lmms {
+AudioPortAudio::AudioPortAudio(bool& successful, AudioEngine* engine)
+	: AudioDevice(DEFAULT_CHANNELS, engine)
+	, m_outBuf(engine->framesPerPeriod())
 {
-	using namespace lmms;
+	const auto backend = ConfigManager::inst()->value(tag(), backendAttribute());
+	
+	const auto inputDeviceName = ConfigManager::inst()->value(tag(), deviceNameAttribute(Direction::Input));
+	const auto inputDeviceChannels = ConfigManager::inst()->value(tag(), channelsAttribute(Direction::Input)).toInt();
 
-	return PaStreamParameters{.device = index,
-		.channelCount = numChannelsFromConfig(direction).toInt(),
-		.sampleFormat = paFloat32,
-		.suggestedLatency = Pa_GetDeviceInfo(index)->defaultLowOutputLatency,
-		.hostApiSpecificStreamInfo = nullptr};
-}
+	const auto outputDeviceName = ConfigManager::inst()->value(tag(), deviceNameAttribute(Direction::Output));
+	const auto outputDeviceChannels = ConfigManager::inst()->value(tag(), channelsAttribute(Direction::Output)).toInt();
 
-PaDeviceIndex findDeviceFromConfig(Direction direction)
-{
-	using namespace lmms;
+	if (backend.isEmpty() || inputDeviceName.isEmpty() || inputDeviceChannels == 0 || outputDeviceName.isEmpty()
+		|| outputDeviceChannels == 0)
+	{
+		successful = false;
+		return;
+	}
 
-	const auto backendName = ConfigManager::inst()->value(tag(), backendAttribute());
-	const auto deviceName = ConfigManager::inst()->value(tag(), deviceNameAttribute(direction));
+	const auto numDevices = Pa_GetDeviceCount();
+	if (numDevices < 0)
+	{
+		successful = false;
+		return;
+	}
 
-	auto deviceIndex = paNoDevice;
+	auto inputDeviceIndex = paNoDevice;
+	auto outputDeviceIndex = paNoDevice;
 
-	for (auto i = 0, deviceCount = Pa_GetDeviceCount(); i < deviceCount; ++i)
+	for (auto i = 0; i < numDevices; ++i)
 	{
 		const auto deviceInfo = Pa_GetDeviceInfo(i);
-		const auto backendInfo = Pa_GetHostApiInfo(deviceInfo->hostApi);
+		const auto hostApiInfo = Pa_GetHostApiInfo(deviceInfo->hostApi);
 
-		if (deviceInfo->name == deviceName && backendInfo->name == backendName)
+		if (deviceInfo->name == inputDeviceName && hostApiInfo->name == backend)
 		{
-			deviceIndex = i;
+			inputDeviceIndex = i;
 			break;
 		}
 	}
 
-	return deviceIndex;
-}
-} // namespace
-
-namespace lmms {
-AudioPortAudio::AudioPortAudio(AudioEngine* engine)
-	: AudioDevice(DEFAULT_CHANNELS, engine)
-	, m_inputDeviceIndex(findDeviceFromConfig(Direction::Input))
-	, m_outputDeviceIndex(findDeviceFromConfig(Direction::Output))
-	, m_inputParameters(createStreamParameters(m_inputDeviceIndex, Direction::Input))
-	, m_outputParameters(createStreamParameters(m_outputDeviceIndex, Direction::Output))
-	, m_outBuf(engine->framesPerPeriod())
-{
-	// TODO PortAudio >= v19.5.0: Use Pa_GetVersionInfo()->versionText instead
-	std::cout << Pa_GetVersionText() << '\n';
-
-	const auto inputParameters = m_inputDeviceIndex == paNoDevice ? nullptr : &m_inputParameters;
-	if (!inputParameters) { std::cerr << "PortAudio: no input device can be found, capture support will be disabled\n"; }
-
-	const auto outputParameters = m_outputDeviceIndex == paNoDevice ? nullptr : &m_outputParameters;
-	if (!outputParameters) { throw std::runtime_error{"PortAudio: no output device can be found"}; }
-
-	const auto formatErr = Pa_IsFormatSupported(inputParameters, outputParameters, engine->baseSampleRate());
-	if (formatErr != paFormatIsSupported)
+	for (auto i = 0; i < numDevices; ++i)
 	{
-		throw std::runtime_error{"PortAudio: unsupported format - " + std::string{Pa_GetErrorText(formatErr)}};
+		const auto deviceInfo = Pa_GetDeviceInfo(i);
+		const auto hostApiInfo = Pa_GetHostApiInfo(deviceInfo->hostApi);
+
+		if (deviceInfo->name == outputDeviceName && hostApiInfo->name == backend)
+		{
+			outputDeviceIndex = i;
+			break;
+		}
 	}
 
-	const auto openErr = Pa_OpenStream(&m_paStream, inputParameters, outputParameters, engine->baseSampleRate(),
-		engine->framesPerPeriod(), paNoFlag, &processCallback, this);
-	if (openErr != paNoError)
+	const auto sampleRate = engine->baseSampleRate();
+	const auto framesPerBuffer = engine->framesPerPeriod();
+	const auto latency = static_cast<PaTime>(framesPerBuffer) / sampleRate;
+
+	auto inputParameters = PaStreamParameters{.device = inputDeviceIndex,
+		.channelCount = inputDeviceChannels,
+		.hostApiSpecificStreamInfo = nullptr,
+		.sampleFormat = paFloat32,
+		.suggestedLatency = latency};
+	
+	auto outputParameters = PaStreamParameters{.device = outputDeviceIndex,
+		.channelCount = outputDeviceChannels,
+		.hostApiSpecificStreamInfo = nullptr,
+		.sampleFormat = paFloat32,
+		.suggestedLatency = latency
+	};
+
+	const auto inputParametersPtr = inputDeviceIndex == paNoDevice ? nullptr : &inputParameters; 
+	const auto outputParametersPtr = outputDeviceIndex == paNoDevice ? nullptr : &outputParameters;
+	auto err = Pa_IsFormatSupported(inputParametersPtr, outputParametersPtr, sampleRate);
+
+	if (err != paFormatIsSupported)
 	{
-		throw std::runtime_error{"PortAudio: failure to open stream - " + std::string{Pa_GetErrorText(openErr)}};
+		successful = false;
+		return;
 	}
 
+	err = Pa_OpenStream(&m_paStream, inputParametersPtr, outputParametersPtr, sampleRate, framesPerBuffer, paNoFlag,
+		&AudioPortAudio::processCallback, this);
+	
+	if (err != paNoError)
+	{
+		successful = false;
+		return;
+	}
+
+	successful = true;
 	setSampleRate(engine->baseSampleRate());
-	setChannels(m_outputParameters.channelCount);
-	m_supportsCapture = inputParameters != nullptr;
 }
 
 AudioPortAudio::~AudioPortAudio()
