@@ -165,7 +165,7 @@ AudioPortAudio::AudioPortAudio(bool& successful, AudioEngine* engine)
 	}
 
 	successful = true;
-	setSampleRate(engine->baseSampleRate());
+	setSampleRate(sampleRate);
 }
 
 AudioPortAudio::~AudioPortAudio()
