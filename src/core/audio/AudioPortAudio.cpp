@@ -250,6 +250,7 @@ public:
 		: QGroupBox{parent}
 		, m_deviceComboBox{new QComboBox{this}}
 		, m_channelSpinBox{new LcdSpinBox{1, this}}
+		, m_direction(direction)
 	{
 		m_channelSpinBox->setModel(&m_channelModel);
 
@@ -258,10 +259,10 @@ public:
 		layout->addRow(tr("Channels"), m_channelSpinBox);
 
 		connect(m_deviceComboBox, qOverload<int>(&QComboBox::currentIndexChanged), this,
-			[this, direction](int index) { refreshChannels(m_deviceComboBox->itemData(index).toInt(), direction); });
+			[this](int index) { refreshChannels(m_deviceComboBox->itemData(index).toInt()); });
 	}
 
-	void refreshFromConfig(PaHostApiIndex backendIndex, Direction direction)
+	void refreshFromConfig(PaHostApiIndex backendIndex)
 	{
 		using namespace lmms;
 
@@ -271,35 +272,36 @@ public:
 		{
 			const auto deviceInfo = Pa_GetDeviceInfo(i);
 
-			if (maxChannels(deviceInfo, direction) > 0 && deviceInfo->hostApi == backendIndex)
+			if (maxChannels(deviceInfo, m_direction) > 0 && deviceInfo->hostApi == backendIndex)
 			{
 				m_deviceComboBox->addItem(deviceInfo->name, i);
 			}
 		}
 
-		const auto selectedDeviceName = ConfigManager::inst()->value(tag(), deviceNameAttribute(direction));
+		const auto selectedDeviceName = ConfigManager::inst()->value(tag(), deviceNameAttribute(m_direction));
 		const auto selectedDeviceIndex = std::max(0, m_deviceComboBox->findText(selectedDeviceName));
 		m_deviceComboBox->setCurrentIndex(selectedDeviceIndex);
 	}
 
-	void refreshChannels(PaDeviceIndex deviceIndex, Direction direction)
+	void refreshChannels(PaDeviceIndex deviceIndex)
 	{
-		const auto maxChannelCount = maxChannels(Pa_GetDeviceInfo(deviceIndex), direction);
+		const auto maxChannelCount = maxChannels(Pa_GetDeviceInfo(deviceIndex), m_direction);
 		m_channelModel.setRange(1, static_cast<float>(maxChannelCount));
-		m_channelModel.setValue(static_cast<float>(numChannelsFromConfig(direction).toInt()));
+		m_channelModel.setValue(static_cast<float>(numChannelsFromConfig(m_direction).toInt()));
 		m_channelSpinBox->setNumDigits(QString::number(maxChannelCount).length());
 	}
 
-	void saveToConfig(Direction direction)
+	void saveToConfig()
 	{
-		ConfigManager::inst()->setValue(tag(), deviceNameAttribute(direction), m_deviceComboBox->currentText());
-		ConfigManager::inst()->setValue(tag(), channelsAttribute(direction), QString::number(m_channelModel.value()));
+		ConfigManager::inst()->setValue(tag(), deviceNameAttribute(m_direction), m_deviceComboBox->currentText());
+		ConfigManager::inst()->setValue(tag(), channelsAttribute(m_direction), QString::number(m_channelModel.value()));
 	}
 
 private:
 	QComboBox* m_deviceComboBox = nullptr;
 	lmms::gui::LcdSpinBox* m_channelSpinBox = nullptr;
 	lmms::IntModel m_channelModel;
+	Direction m_direction;
 };
 
 AudioPortAudioSetupWidget::AudioPortAudioSetupWidget(QWidget* parent)
@@ -318,8 +320,8 @@ AudioPortAudioSetupWidget::AudioPortAudioSetupWidget(QWidget* parent)
 	form->addRow(m_inputDevice);
 
 	connect(m_backendComboBox, qOverload<int>(&QComboBox::currentIndexChanged), this, [this](int index) {
-		m_inputDevice->refreshFromConfig(m_backendComboBox->itemData(index).toInt(), Direction::Input);
-		m_outputDevice->refreshFromConfig(m_backendComboBox->itemData(index).toInt(), Direction::Output);
+		m_inputDevice->refreshFromConfig(m_backendComboBox->itemData(index).toInt());
+		m_outputDevice->refreshFromConfig(m_backendComboBox->itemData(index).toInt());
 	});
 
 }
@@ -346,8 +348,8 @@ void AudioPortAudioSetupWidget::show()
 void AudioPortAudioSetupWidget::saveSettings()
 {
 	ConfigManager::inst()->setValue(tag(), backendAttribute(), m_backendComboBox->currentText());
-	m_inputDevice->saveToConfig(Direction::Input);
-	m_outputDevice->saveToConfig(Direction::Output);
+	m_inputDevice->saveToConfig();
+	m_outputDevice->saveToConfig();
 }
 } // namespace lmms::gui
 
