@@ -88,14 +88,6 @@ int maxChannels(const PaDeviceInfo* info, Direction direction)
 	return 0;
 }
 
-QString numChannelsFromConfig(Direction direction)
-{
-	using namespace lmms;
-	const auto defaultNumChannels = QString::number(DEFAULT_CHANNELS);
-	const auto numChannels = ConfigManager::inst()->value(tag(), channelsAttribute(direction), defaultNumChannels);
-	return numChannels;
-}
-
 } // namespace
 
 namespace lmms {
@@ -284,8 +276,9 @@ public:
 	void refreshChannels(PaDeviceIndex deviceIndex)
 	{
 		const auto maxChannelCount = maxChannels(Pa_GetDeviceInfo(deviceIndex), m_direction);
-		m_channelModel.setRange(1, static_cast<float>(maxChannelCount));
-		m_channelModel.setValue(static_cast<float>(numChannelsFromConfig(m_direction).toInt()));
+		const auto channelCount = ConfigManager::inst()->value(tag(), channelsAttribute(m_direction)).toInt();
+		m_channelModel.setRange(1, maxChannelCount);
+		m_channelModel.setValue(channelCount == 0 ? DEFAULT_CHANNELS : channelCount);
 		m_channelSpinBox->setNumDigits(QString::number(maxChannelCount).length());
 	}
 
