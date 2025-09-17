@@ -27,8 +27,6 @@
 
 #ifdef LMMS_HAVE_PORTAUDIO
 
-#include <iostream>
-
 #include "AudioEngine.h"
 #include "AudioPortAudio.h"
 #include "ConfigManager.h"
