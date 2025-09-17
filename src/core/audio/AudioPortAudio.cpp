@@ -95,6 +95,13 @@ AudioPortAudio::AudioPortAudio(bool& successful, AudioEngine* engine)
 	: AudioDevice(DEFAULT_CHANNELS, engine)
 	, m_outBuf(engine->framesPerPeriod())
 {
+	const auto numDevices = Pa_GetDeviceCount();
+	if (numDevices < 0)
+	{
+		successful = false;
+		return;
+	}
+
 	const auto backend = ConfigManager::inst()->value(tag(), backendAttribute());
 	
 	const auto inputDeviceName = ConfigManager::inst()->value(tag(), deviceNameAttribute(Direction::Input));
@@ -102,20 +109,6 @@ AudioPortAudio::AudioPortAudio(bool& successful, AudioEngine* engine)
 
 	const auto outputDeviceName = ConfigManager::inst()->value(tag(), deviceNameAttribute(Direction::Output));
 	const auto outputDeviceChannels = ConfigManager::inst()->value(tag(), channelsAttribute(Direction::Output)).toInt();
-
-	if (backend.isEmpty() || inputDeviceName.isEmpty() || inputDeviceChannels == 0 || outputDeviceName.isEmpty()
-		|| outputDeviceChannels == 0)
-	{
-		successful = false;
-		return;
-	}
-
-	const auto numDevices = Pa_GetDeviceCount();
-	if (numDevices < 0)
-	{
-		successful = false;
-		return;
-	}
 
 	auto inputDeviceIndex = paNoDevice;
 	auto outputDeviceIndex = paNoDevice;
