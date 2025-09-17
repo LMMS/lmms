@@ -490,7 +490,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 							"fm_inactive" ) );
 	fm_osc1_btn->setToolTip(tr("Modulate frequency of oscillator 1 by oscillator 2"));
 
-	m_mod1BtnGrp = new automatableButtonGroup( this );
+	m_mod1BtnGrp = new AutomatableButtonGroup( this );
 	m_mod1BtnGrp->addButton( pm_osc1_btn );
 	m_mod1BtnGrp->addButton( am_osc1_btn );
 	m_mod1BtnGrp->addButton( mix_osc1_btn );
@@ -537,7 +537,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 							"fm_inactive" ) );
 	fm_osc2_btn->setToolTip(tr("Modulate frequency of oscillator 2 by oscillator 3"));
 
-	m_mod2BtnGrp = new automatableButtonGroup( this );
+	m_mod2BtnGrp = new AutomatableButtonGroup( this );
 
 	m_mod2BtnGrp->addButton( pm_osc2_btn );
 	m_mod2BtnGrp->addButton( am_osc2_btn );
@@ -679,7 +679,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 		uwt->setCheckable(true);
 		uwt->setToolTip(tr("Use alias-free wavetable oscillators."));
 
-		auto wsbg = new automatableButtonGroup(this);
+		auto wsbg = new AutomatableButtonGroup(this);
 
 		wsbg->addButton( sin_wave_btn );
 		wsbg->addButton( triangle_wave_btn );

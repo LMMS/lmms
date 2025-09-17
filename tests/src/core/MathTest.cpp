@@ -22,9 +22,8 @@
  *
  */
 
-#include <QDir>
 #include <QObject>
-#include <QtTest/QtTest>
+#include <QtTest>
 
 #include "lmms_math.h"
 
