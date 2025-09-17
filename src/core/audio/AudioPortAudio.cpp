@@ -120,28 +120,12 @@ AudioPortAudio::AudioPortAudio(bool& successful, AudioEngine* engine)
 	auto inputDeviceIndex = paNoDevice;
 	auto outputDeviceIndex = paNoDevice;
 
-	for (auto i = 0; i < numDevices; ++i)
+	for (auto i = 0; i < numDevices && (inputDeviceIndex == paNoDevice || outputDeviceIndex == paNoDevice); ++i)
 	{
 		const auto deviceInfo = Pa_GetDeviceInfo(i);
 		const auto hostApiInfo = Pa_GetHostApiInfo(deviceInfo->hostApi);
-
-		if (deviceInfo->name == inputDeviceName && hostApiInfo->name == backend)
-		{
-			inputDeviceIndex = i;
-			break;
-		}
-	}
-
-	for (auto i = 0; i < numDevices; ++i)
-	{
-		const auto deviceInfo = Pa_GetDeviceInfo(i);
-		const auto hostApiInfo = Pa_GetHostApiInfo(deviceInfo->hostApi);
-
-		if (deviceInfo->name == outputDeviceName && hostApiInfo->name == backend)
-		{
-			outputDeviceIndex = i;
-			break;
-		}
+		if (deviceInfo->name == inputDeviceName && hostApiInfo->name == backend) { inputDeviceIndex = i; }
+		if (deviceInfo->name == outputDeviceName && hostApiInfo->name == backend) { outputDeviceIndex = i; }
 	}
 
 	const auto sampleRate = engine->baseSampleRate();
