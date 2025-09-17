@@ -106,7 +106,16 @@ else
 	otool_out="$(otool -l "$(which "$binary_name")")"
 fi
 
+echo "Using '$binary_name' (from $package_manager) to calculate the macOS deployment target..."
+
 min_ver="$(echo "$otool_out" |grep "minos" || echo "$otool_out" |grep -A 2 "LC_VERSION_MIN_MACOS"|grep "version")"
 MACOSX_DEPLOYMENT_TARGET="$(echo "$min_ver"|awk '{print $2}')"
+
+# Echo the lowest target macOS version supported by this SDK
+sdk_settings="$(xcrun --sdk macosx --show-sdk-path)/SDKSettings.plist"
+sdk_min="$(plutil -extract SupportedTargets.macosx.MinimumDeploymentTarget raw "$sdk_settings")"
+echo "- Lowest SDK supported by this environment is '$sdk_min' based on $sdk_settings"
+
+# Echo the sane target macOS version based on another build dependency
 export MACOSX_DEPLOYMENT_TARGET
-echo "Inferring 'MACOSX_DEPLOYMENT_TARGET=$MACOSX_DEPLOYMENT_TARGET' based on $binary_name"
+echo "- Exporting 'MACOSX_DEPLOYMENT_TARGET=$MACOSX_DEPLOYMENT_TARGET' based on $binary_name"
