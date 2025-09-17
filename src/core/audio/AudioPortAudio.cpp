@@ -197,27 +197,17 @@ AudioPortAudio::AudioPortAudio(bool& successful, AudioEngine* engine)
 AudioPortAudio::~AudioPortAudio()
 {
 	stopProcessing();
-
-	if (const auto err = Pa_CloseStream(m_paStream); err != paNoError)
-	{
-		std::cerr << "PortAudio: failure to close stream - " << Pa_GetErrorText(err) << '\n';
-	}
+	Pa_CloseStream(m_paStream);
 }
 
 void AudioPortAudio::startProcessing()
 {
-	if (const auto err = Pa_StartStream(m_paStream); err != paNoError)
-	{
-		std::cerr << "PortAudio: failure to start stream - " << Pa_GetErrorText(err) << '\n';
-	}
+	Pa_StartStream(m_paStream);
 }
 
 void AudioPortAudio::stopProcessing()
 {
-	if (const auto err = Pa_StopStream(m_paStream); err != paNoError)
-	{
-		std::cerr << "PortAudio: failure to stop stream - " << Pa_GetErrorText(err) << '\n';
-	}
+	Pa_StopStream(m_paStream);
 }
 
 int AudioPortAudio::processCallback(const void*, void* output, unsigned long frameCount,
