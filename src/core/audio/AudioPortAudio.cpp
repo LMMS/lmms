@@ -134,15 +134,16 @@ AudioPortAudio::AudioPortAudio(bool& successful, AudioEngine* engine)
 
 	auto inputParameters = PaStreamParameters{.device = inputDeviceIndex,
 		.channelCount = inputDeviceChannels,
-		.hostApiSpecificStreamInfo = nullptr,
 		.sampleFormat = paFloat32,
-		.suggestedLatency = latency};
+		.suggestedLatency = latency,
+		.hostApiSpecificStreamInfo = nullptr
+	};
 	
 	auto outputParameters = PaStreamParameters{.device = outputDeviceIndex,
 		.channelCount = outputDeviceChannels,
-		.hostApiSpecificStreamInfo = nullptr,
 		.sampleFormat = paFloat32,
-		.suggestedLatency = latency
+		.suggestedLatency = latency,
+		.hostApiSpecificStreamInfo = nullptr
 	};
 
 	const auto inputParametersPtr = inputDeviceIndex == paNoDevice ? nullptr : &inputParameters; 
