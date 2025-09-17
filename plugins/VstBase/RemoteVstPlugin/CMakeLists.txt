@@ -72,18 +72,12 @@ if(MSVC)
 endif()
 
 # If we're building a Windows executable, add linker flags to disable ASLR
-# This is needed because several old VST dlls crash when ASLR is in use (see bug #7830)
+# This is needed because several old VST dlls crash when high entropy ASLR is in use
+# /HIGHENTROPYVA:YES relies on /DYNAMICBASE:YES so this ensures maximum VST compatiblity
 if(MSVC)
 	target_link_options(${EXE_NAME} PRIVATE "/DYNAMICBASE:NO")
-	if(BITNESS EQUAL 64)
-		target_link_options(${EXE_NAME} PRIVATE "/HIGHENTROPYVA:NO")
-	endif()
 elseif(IS_MINGW)
-	if(BITNESS EQUAL 32)
-		target_link_options(${EXE_NAME} PRIVATE "-Wl,--disable-dynamicbase")
-	else()
-		target_link_options(${EXE_NAME} PRIVATE "-Wl,--disable-dynamicbase,--disable-high-entropy-va")
-	endif()
+	target_link_options(${EXE_NAME} PRIVATE "-Wl,--disable-dynamicbase")
 endif()
 
 if(IS_MINGW)
