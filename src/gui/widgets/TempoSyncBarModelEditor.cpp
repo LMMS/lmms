@@ -89,6 +89,9 @@ void TempoSyncBarModelEditor::contextMenuEvent(QContextMenuEvent *)
 
 	CaptionMenu contextMenu(tempoSyncModel->displayName(), this);
 	addDefaultActions(&contextMenu);
+	contextMenu.addAction(QPixmap(),
+		model()->isScaleLogarithmic() ? tr("Set linear") : tr("Set logarithmic"),
+		this, SLOT(toggleScale()));
 
 	contextMenu.addSeparator();
 

@@ -24,21 +24,17 @@
  */
 
 
-#include <QGroupBox>
-#include <QLayout>
 #include <QLabel>
 #include <QScrollArea>
 #include <QScrollBar>
 #include <QSpacerItem>
-#include <QMdiArea>
+#include <QVBoxLayout>
 
 
-#include "LadspaBase.h"
 #include "LadspaControl.h"
-#include "LadspaEffect.h"
+#include "LadspaControls.h"
 #include "LadspaMatrixControlDialog.h"
 #include "LadspaWidgetFactory.h"
-#include "LadspaControlView.h"
 #include "LedCheckBox.h"
 
 

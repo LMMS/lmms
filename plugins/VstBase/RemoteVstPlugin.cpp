@@ -86,12 +86,13 @@
 #include <mutex>
 
 #include <algorithm>
-#include <vector>
+#include <cstdint>
+#include <cstring>
+#include <iostream>
 #include <queue>
 #include <string>
-#include <iostream>
-#include <string>
-#include <cstring>
+#include <vector>
+#include <cassert>
 
 #include <aeffectx.h>
 
@@ -101,11 +102,11 @@
 
 struct ERect
 {
-    short top;
-    short left;
-    short bottom;
-    short right;
-} ;
+	std::int16_t top;
+	std::int16_t left;
+	std::int16_t bottom;
+	std::int16_t right;
+};
 
 #endif
 
@@ -474,15 +475,15 @@ private:
 	double m_currentSamplePos;
 	int m_currentProgram;
 
-	// host to plugin synchronisation data structure
-	struct in
+	//! Host to plugin synchronisation data structure
+	struct Sync
 	{
-		double lastppqPos;
-		double m_Timestamp;
-		int32_t m_lastFlags;
-	} ;
+		double lastppqPos = 0;
+		double timestamp = -1;
+		std::int32_t lastFlags = 0;
+	};
 
-	in * m_in;
+	Sync m_sync;
 };
 
 
@@ -511,15 +512,9 @@ RemoteVstPlugin::RemoteVstPlugin( const char * socketPath ) :
 	m_midiEvents(),
 	m_bpm( 0 ),
 	m_currentSamplePos( 0 ),
-	m_currentProgram( -1 ),
-	m_in( nullptr )
+	m_currentProgram(-1)
 {
 	__plugin = this;
-
-	m_in = ( in* ) new char[ sizeof( in ) ];
-	m_in->lastppqPos = 0;
-	m_in->m_Timestamp = -1;
-	m_in->m_lastFlags = 0;
 
 	// process until we have loaded the plugin
 	while( 1 )
@@ -817,7 +812,7 @@ void RemoteVstPlugin::initEditor()
 
 	pluginDispatch( effEditOpen, 0, 0, m_window );
 
-	ERect * er;
+	ERect* er = nullptr;
 	pluginDispatch( effEditGetRect, 0, 0, &er );
 
 	m_windowWidth = er->right - er->left;
@@ -857,7 +852,7 @@ void RemoteVstPlugin::initEditor()
 	// change name
 	XStoreName(m_display, m_window, pluginName());
 	
-	ERect * er;
+	ERect* er = nullptr;
 	pluginDispatch(effEditGetRect, 0, 0, &er);
 
 	m_windowWidth = er->right - er->left;
@@ -946,7 +941,7 @@ void RemoteVstPlugin::destroyEditor()
 bool RemoteVstPlugin::load( const std::string & _plugin_file )
 {
 #ifndef NATIVE_LINUX_VST
-	if( ( m_libInst = LoadLibraryW( toWString(_plugin_file).c_str() ) ) == nullptr )
+	if ((m_libInst = LoadLibraryW(toWString(_plugin_file).get())) == nullptr)
 	{
 		DWORD error = GetLastError();
 		debugMessage( "LoadLibrary failed: " + GetErrorAsString(error) );
@@ -1033,6 +1028,7 @@ void RemoteVstPlugin::process( const SampleFrame* _in, SampleFrame* _out )
 
 		// first sort events chronologically, since some plugins
 		// (e.g. Sinnah) can hang if they're out of order
+		// TODO: Sort on the server side instead
 		std::stable_sort( m_midiEvents.begin(), m_midiEvents.end(),
 				[]( const VstMidiEvent &a, const VstMidiEvent &b )
 				{
@@ -1131,6 +1127,7 @@ void RemoteVstPlugin::processMidiEvent( const MidiEvent& event, const f_cnt_t of
 	}
 	vme.midiData[3] = 0;
 
+	// TODO: Would this cause a data race with the process method? The two methods must not be called concurrently
 	m_midiEvents.push_back( vme );
 }
 
@@ -1288,10 +1285,10 @@ void RemoteVstPlugin::saveChunkToFile( const std::string & _file )
 	if( m_plugin->flags & 32 )
 	{
 		void * chunk = nullptr;
-		const int len = pluginDispatch( 23, 0, 0, &chunk );
+		const int len = pluginDispatch(effGetChunk, 0, 0, &chunk);
 		if( len > 0 )
 		{
-			FILE* fp = F_OPEN_UTF8( _file, "wb" );
+			FILE* fp = fopenUtf8(_file, "wb");
 			if (!fp)
 			{
 				fprintf( stderr,
@@ -1364,13 +1361,13 @@ void RemoteVstPlugin::getProgramNames()
 	char presName[1024+256*30];
 	char curProgName[30];
 	if (isInitialized() == false) return;
-	bool progNameIndexed = ( pluginDispatch( 29, 0, -1, curProgName ) == 1 );
+	bool progNameIndexed = pluginDispatch(effGetProgramNameIndexed, 0, -1, curProgName) == 1;
 
 	if (m_plugin->numPrograms > 1) {
 		if (progNameIndexed) {
 			for (int i = 0; i< (m_plugin->numPrograms >= 256?256:m_plugin->numPrograms); i++)
 			{
-				pluginDispatch( 29, i, -1, curProgName );
+				pluginDispatch(effGetProgramNameIndexed, i, -1, curProgName);
 				if (i == 0) 	sprintf( presName, "%s", curProgName );
 				else		sprintf( presName + strlen(presName), "|%s", curProgName );
 			}
@@ -1401,7 +1398,7 @@ inline unsigned int endian_swap(unsigned int& x)
     return (x>>24) | ((x<<8) & 0x00FF0000) | ((x>>8) & 0x0000FF00) | (x<<24);
 }
 
-struct sBank
+struct Bank
 {
 	unsigned int chunkMagic;
 	unsigned int byteSize;
@@ -1416,9 +1413,9 @@ struct sBank
 void RemoteVstPlugin::savePreset( const std::string & _file )
 {
 	unsigned int chunk_size = 0;
-	auto pBank = (sBank*)new char[sizeof(sBank)];
+	auto bank = Bank{};
 	char progName[ 128 ] = { 0 };
-	char* data = nullptr;
+	char* data = nullptr; // TODO: Fix convoluted and potentially leaky memory management
 	const bool chunky = ( m_plugin->flags & ( 1 << 5 ) ) != 0;
 	bool isPreset = _file.substr( _file.find_last_of( "." ) + 1 )  == "fxp";
 	int presNameLen = _file.find_last_of( "/" ) + _file.find_last_of( "\\" ) + 2;
@@ -1426,73 +1423,90 @@ void RemoteVstPlugin::savePreset( const std::string & _file )
 	if (isPreset)
 	{
 		for (size_t i = 0; i < _file.length() - 4 - presNameLen; i++)
+		{
 			progName[i] = i < 23 ? _file[presNameLen + i] : 0;
-		pluginDispatch( 4, 0, 0, progName );
+		}
+		pluginDispatch(effSetProgramName, 0, 0, progName);
 	}
-	if ( chunky )
-		chunk_size = pluginDispatch( 23, isPreset, 0, &data );
-	else {
-		if (isPreset) {
+
+	if (chunky)
+	{
+		chunk_size = pluginDispatch(effGetChunk, isPreset, 0, &data);
+	}
+	else
+	{
+		if (isPreset)
+		{
 			chunk_size = m_plugin->numParams * sizeof( float );
 			data = new char[ chunk_size ];
 			auto toUIntArray = reinterpret_cast<unsigned int*>(data);
 			for ( int i = 0; i < m_plugin->numParams; i++ )
 			{
 				float value = m_plugin->getParameter( m_plugin, i );
-				auto pValue = (unsigned int*)&value;
+				auto pValue = reinterpret_cast<unsigned int*>(&value);
 				toUIntArray[ i ] = endian_swap( *pValue );
 			}
-		} else chunk_size = (((m_plugin->numParams * sizeof( float )) + 56)*m_plugin->numPrograms);
+		}
+		else
+		{
+			chunk_size = (((m_plugin->numParams * sizeof(float)) + 56) * m_plugin->numPrograms);
+		}
 	}
 
-	pBank->chunkMagic = 0x4B6E6343;
-	pBank->byteSize = chunk_size + ( chunky ? sizeof( int ) : 0 ) + 48;
-	if (!isPreset) pBank->byteSize += 100;
-	pBank->byteSize = endian_swap( pBank->byteSize );
-	pBank->fxMagic = chunky ? 0x68435046 : 0x6B437846;
-	if (!isPreset && chunky) pBank->fxMagic = 0x68434246;
-	if (!isPreset &&!chunky) pBank->fxMagic = 0x6B427846;
+	bank.chunkMagic = 0x4B6E6343;
+	bank.byteSize = chunk_size + (chunky ? sizeof(int) : 0) + 48;
+	if (!isPreset) { bank.byteSize += 100; }
+	bank.byteSize = endian_swap(bank.byteSize);
+	bank.fxMagic = chunky ? 0x68435046 : 0x6B437846;
+	if (!isPreset &&  chunky) { bank.fxMagic = 0x68434246; }
+	if (!isPreset && !chunky) { bank.fxMagic = 0x6B427846; }
 
-	pBank->version = 0x01000000;
+	bank.version = 0x01000000;
 	auto uIntToFile = (unsigned int)m_plugin->uniqueID;
-	pBank->fxID = endian_swap( uIntToFile );
+	bank.fxID = endian_swap(uIntToFile);
 	uIntToFile = (unsigned int) pluginVersion();
-	pBank->fxVersion = endian_swap( uIntToFile );
+	bank.fxVersion = endian_swap(uIntToFile);
 	uIntToFile = (unsigned int) chunky ? m_plugin->numPrograms : m_plugin->numParams;
 	if (!isPreset &&!chunky) uIntToFile = (unsigned int) m_plugin->numPrograms;
-	pBank->numPrograms = endian_swap( uIntToFile );
+	bank.numPrograms = endian_swap(uIntToFile);
 
-	FILE * stream = F_OPEN_UTF8( _file, "wb" );
+	FILE* stream = fopenUtf8(_file, "wb");
 	if (!stream)
 	{
 		fprintf( stderr,
 			"Error opening file for saving preset.\n" );
 		return;
 	}
-	fwrite ( pBank, 1, 28, stream );
+	fwrite(&bank, 1, 28, stream);
 	fwrite ( progName, 1, isPreset ? 28 : 128, stream );
 	if ( chunky ) {
 		uIntToFile = endian_swap( chunk_size );
 		fwrite ( &uIntToFile, 1, 4, stream );
 	}
-	if (pBank->fxMagic != 0x6B427846 )
+
+	if (bank.fxMagic != 0x6B427846)
+	{
 		fwrite ( data, 1, chunk_size, stream );
-	else {
+	}
+	else
+	{
 		int numPrograms = m_plugin->numPrograms;
 		int currProgram = pluginDispatch( effGetProgram );
 		chunk_size = (m_plugin->numParams * sizeof( float ));
-		pBank->byteSize = chunk_size + 48;
-		pBank->byteSize = endian_swap( pBank->byteSize );
-		pBank->fxMagic = 0x6B437846;
+		bank.byteSize = chunk_size + 48;
+		bank.byteSize = endian_swap(bank.byteSize);
+		bank.fxMagic = 0x6B437846;
 		uIntToFile = (unsigned int) m_plugin->numParams;
-		pBank->numPrograms = endian_swap( uIntToFile );
+		bank.numPrograms = endian_swap(uIntToFile);
 		data = new char[ chunk_size ];
-		unsigned int* pValue,* toUIntArray = reinterpret_cast<unsigned int*>( data );
+		unsigned int* pValue;
+		unsigned int* toUIntArray = reinterpret_cast<unsigned int*>(data);
 		float value;
-		for (int j = 0; j < numPrograms; j++) {
+		for (int j = 0; j < numPrograms; j++)
+		{
 			pluginDispatch( effSetProgram, 0, j );
-			pluginDispatch( effGetProgramName, 0, 0, pBank->prgName );
-			fwrite ( pBank, 1, 56, stream );
+			pluginDispatch(effGetProgramName, 0, 0, bank.prgName);
+			fwrite(&bank, 1, 56, stream);
 			for ( int i = 0; i < m_plugin->numParams; i++ )
 			{
 				value = m_plugin->getParameter( m_plugin, i );
@@ -1505,10 +1519,10 @@ void RemoteVstPlugin::savePreset( const std::string & _file )
 	}
 	fclose( stream );
 
-	if ( !chunky ) 
+	if (!chunky)
+	{
 		delete[] data;
-	delete[] (sBank*)pBank;
-
+	}
 }
 
 
@@ -1516,93 +1530,120 @@ void RemoteVstPlugin::savePreset( const std::string & _file )
 
 void RemoteVstPlugin::loadPresetFile( const std::string & _file )
 {
-	void * chunk = nullptr;
-	unsigned int pLen;
+	std::unique_ptr<char[]> chunk;
+	unsigned int pLen = 0;
 	unsigned int len = 0;
-	sBank pBank;
-	FILE * stream = F_OPEN_UTF8( _file, "rb" );
+	auto bank = Bank{};
+	FILE* stream = fopenUtf8(_file, "rb");
 	if (!stream)
 	{
 		fprintf( stderr,
 			"Error opening file for loading preset.\n" );
 		return;
 	}
-	if ( fread ( &pBank, 1, 56, stream ) != 56 )
+
+	if (fread(&bank, 1, 56, stream) != 56)
 	{
 		fprintf( stderr, "Error loading preset file.\n" );
 	}
-    pBank.fxID = endian_swap( pBank.fxID );
-	pBank.numPrograms = endian_swap( pBank.numPrograms );
+	bank.fxID = endian_swap(bank.fxID);
+	bank.numPrograms = endian_swap(bank.numPrograms);
 	unsigned int toUInt;
 	float * pFloat;
 
-	if (static_cast<std::uint_fast32_t>(m_plugin->uniqueID) != pBank.fxID) {
+	if (static_cast<std::uint_fast32_t>(m_plugin->uniqueID) != bank.fxID)
+	{
 		sendMessage( message( IdVstCurrentProgramName ).
 					addString( "Error: Plugin UniqID not match" ) );
 		fclose( stream );
 		return;
 	}
 
-	if( _file.substr( _file.find_last_of( "." ) + 1 ) != "fxp" )
-		fseek ( stream , 156 , SEEK_SET );
+	if (_file.substr(_file.find_last_of('.') + 1) != "fxp")
+	{
+		fseek(stream, 156, SEEK_SET);
+	}
 
-	if(pBank.fxMagic != 0x6B427846) {
-		if(pBank.fxMagic != 0x6B437846) {
+	if (bank.fxMagic != 0x6B427846)
+	{
+		if (bank.fxMagic != 0x6B437846)
+		{
 			if ( fread (&pLen, 1, 4, stream) != 4 )
 			{
 				fprintf( stderr,
 					"Error loading preset file.\n" );
 			}
-			chunk = new char[len = endian_swap(pLen)];
-		} else chunk = new char[len = sizeof(float)*pBank.numPrograms];
-		if ( fread (chunk, len, 1, stream) != 1 )
+			len = endian_swap(pLen);
+		}
+		else
+		{
+			len = static_cast<unsigned int>(sizeof(float) * bank.numPrograms);
+		}
+
+		chunk = std::make_unique_for_overwrite<char[]>(len);
+		if (fread(chunk.get(), len, 1, stream) != 1)
 		{
 			fprintf( stderr, "Error loading preset file.\n" );
 		}
 		fclose( stream );
 	}
 
-	if(_file.substr(_file.find_last_of(".") + 1) == "fxp") {
-		pBank.prgName[23] = 0;
-		pluginDispatch( 4, 0, 0, pBank.prgName );
-		if(pBank.fxMagic != 0x6B437846)
-			pluginDispatch( 24, 1, len, chunk );
+	if (_file.substr(_file.find_last_of(".") + 1) == "fxp")
+	{
+		// TODO: Could this crash if chunk is null?
+		bank.prgName[23] = '\0';
+		pluginDispatch(effSetProgramName, 0, 0, bank.prgName);
+		if (bank.fxMagic != 0x6B437846)
+		{
+			pluginDispatch(effSetChunk, 1, len, chunk.get());
+		}
 		else
 		{
-			auto toUIntArray = reinterpret_cast<unsigned int*>(chunk);
-			for (auto i = 0u; i < pBank.numPrograms; i++)
+			auto toUIntArray = reinterpret_cast<unsigned int*>(chunk.get());
+			for (auto i = 0u; i < bank.numPrograms; i++)
 			{
 				toUInt = endian_swap( toUIntArray[ i ] );
-				pFloat = ( float* ) &toUInt;
+				pFloat = reinterpret_cast<float*>(&toUInt);
 				m_plugin->setParameter( m_plugin, i, *pFloat );
 			}
 		}
-	} else {
-		if(pBank.fxMagic != 0x6B427846) {
-			pluginDispatch( 24, 0, len, chunk );
-		} else {
-			int numPrograms = pBank.numPrograms;
+	}
+	else
+	{
+		if (bank.fxMagic != 0x6B427846)
+		{
+			// TODO: Could this crash if chunk is null?
+			pluginDispatch(effSetChunk, 0, len, chunk.get());
+		}
+		else
+		{
+			int numPrograms = static_cast<int>(bank.numPrograms);
 			unsigned int * toUIntArray;
 			int currProgram = pluginDispatch( effGetProgram );
-			chunk = new char[ len = sizeof(float)*m_plugin->numParams ];
-			toUIntArray = reinterpret_cast<unsigned int *>( chunk );
-			for (int i =0; i < numPrograms; i++) {
-				if ( fread (&pBank, 1, 56, stream) != 56 )
+
+			len = static_cast<unsigned int>(sizeof(float) * m_plugin->numParams);
+			chunk = std::make_unique_for_overwrite<char[]>(len);
+			toUIntArray = reinterpret_cast<unsigned int*>(chunk.get());
+
+			for (int i = 0; i < numPrograms; i++)
+			{
+				if (fread(&bank, 1, 56, stream) != 56)
 				{
 					fprintf( stderr,
 					"Error loading preset file.\n" );
 				}
-				if ( fread (chunk, len, 1, stream) != 1 )
+				if (fread(chunk.get(), len, 1, stream) != 1)
 				{
 					fprintf( stderr,
 					"Error loading preset file.\n" );
 				}
 				pluginDispatch( effSetProgram, 0, i );
-				pBank.prgName[23] = 0;
-				pluginDispatch( 4, 0, 0, pBank.prgName );
-				for (int j = 0; j < m_plugin->numParams; j++ ) {
+				bank.prgName[23] = '\0';
+				pluginDispatch(effSetProgramName, 0, 0, bank.prgName);
+				for (int j = 0; j < m_plugin->numParams; j++)
+				{
 					toUInt = endian_swap( toUIntArray[ j ] );
-					pFloat = ( float* ) &toUInt;
+					pFloat = reinterpret_cast<float*>(&toUInt);
 					m_plugin->setParameter( m_plugin, j, *pFloat );
 				}
 			}
@@ -1612,30 +1653,26 @@ void RemoteVstPlugin::loadPresetFile( const std::string & _file )
 	}
 
 	sendCurrentProgramName();
-
-	delete[] (char*)chunk;
 }
 
 void RemoteVstPlugin::loadChunkFromFile(const std::string& _file, std::size_t _len)
 {
-	auto chunk = new char[_len];
-
-	FILE* fp = F_OPEN_UTF8( _file, "rb" );
+	FILE* fp = fopenUtf8(_file, "rb");
 	if (!fp)
 	{
 		fprintf( stderr,
 			"Error opening file for loading chunk.\n" );
 		return;
 	}
-	if ( fread( chunk, 1, _len, fp ) != _len )
+
+	auto chunk = std::make_unique_for_overwrite<char[]>(_len);
+	if (fread(chunk.get(), 1, _len, fp) != _len)
 	{
 		fprintf( stderr, "Error loading chunk from file.\n" );
 	}
 	close_check( fp );
 
-	pluginDispatch( effSetChunk, 0, _len, chunk );
-
-	delete[] chunk;
+	pluginDispatch(effSetChunk, 0, _len, chunk.get());
 }
 
 
@@ -1775,9 +1812,9 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 
 			memset( &_timeInfo, 0, sizeof( _timeInfo ) );
 			_timeInfo.samplePos = __plugin->m_currentSamplePos;
-			_timeInfo.sampleRate = syncData->m_sampleRate;
+			_timeInfo.sampleRate = syncData->sampleRate;
 			_timeInfo.flags = 0;
-			_timeInfo.tempo = syncData->m_bpm;
+			_timeInfo.tempo = syncData->bpm;
 			_timeInfo.timeSigNumerator = syncData->timeSigNumer;
 			_timeInfo.timeSigDenominator = syncData->timeSigDenom;
 			_timeInfo.flags |= kVstTempoValid;
@@ -1791,19 +1828,19 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 				_timeInfo.flags |= kVstTransportCycleActive;
 			}
 
-			if (syncData->ppqPos != __plugin->m_in->m_Timestamp)
+			if (syncData->ppqPos != __plugin->m_sync.timestamp)
 			{
 				_timeInfo.ppqPos = syncData->ppqPos;
-				__plugin->m_in->lastppqPos = syncData->ppqPos;
-				__plugin->m_in->m_Timestamp = syncData->ppqPos;
+				__plugin->m_sync.lastppqPos = syncData->ppqPos;
+				__plugin->m_sync.timestamp = syncData->ppqPos;
 			}
 			else if (syncData->isPlaying)
 			{
-				__plugin->m_in->lastppqPos +=
-					syncData->m_bpm / 60.0
-					* syncData->m_bufferSize
-					/ syncData->m_sampleRate;
-				_timeInfo.ppqPos = __plugin->m_in->lastppqPos;
+				__plugin->m_sync.lastppqPos +=
+					syncData->bpm / 60.0
+					* syncData->bufferSize
+					/ syncData->sampleRate;
+				_timeInfo.ppqPos = __plugin->m_sync.lastppqPos;
 			}
 //			_timeInfo.ppqPos = syncData->ppqPos;
 			_timeInfo.flags |= kVstPpqPosValid;
@@ -1819,12 +1856,12 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 			_timeInfo.flags |= kVstBarsValid;
 
 			if ((_timeInfo.flags & (kVstTransportPlaying | kVstTransportCycleActive))
-				!= (__plugin->m_in->m_lastFlags & (kVstTransportPlaying | kVstTransportCycleActive))
-				|| syncData->m_playbackJumped)
+				!= (__plugin->m_sync.lastFlags & (kVstTransportPlaying | kVstTransportCycleActive))
+				|| syncData->playbackJumped)
 			{
 				_timeInfo.flags |= kVstTransportChanged;
 			}
-			__plugin->m_in->m_lastFlags = _timeInfo.flags;
+			__plugin->m_sync.lastFlags = _timeInfo.flags;
 
 			return (intptr_t) &_timeInfo;
 		}
@@ -2219,7 +2256,7 @@ void * RemoteVstPlugin::processingThread(void * _param)
 			PostMessage( __MessageHwnd,
 					WM_USER,
 					static_cast<WPARAM>(GuiThreadMessage::ProcessPluginMessage),
-					(LPARAM) new message( m ) );
+					reinterpret_cast<LPARAM>(new message(m)));
 #else
 		_this->queueMessage( m );
 #endif

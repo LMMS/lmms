@@ -1,15 +1,12 @@
 // midifile reader
 
-#include "stdlib.h"
 #include "stdio.h"
 #include "string.h"
 #include "assert.h"
-#include <string>
 #include <fstream>
 #include "allegro.h"
 #include "algsmfrd_internal.h"
 #include "mfmidi.h"
-#include "trace.h"
 
 using namespace std;
 

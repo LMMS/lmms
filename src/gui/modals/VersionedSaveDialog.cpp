@@ -23,11 +23,12 @@
  */
 
 
+#include <QGroupBox>
 #include <QLayout>
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QPushButton>
-#include <QGroupBox>
+#include <QRegularExpression>
 
 #include "DeprecationHelper.h"
 #include "VersionedSaveDialog.h"

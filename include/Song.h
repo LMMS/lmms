@@ -28,8 +28,8 @@
 #include <array>
 #include <memory>
 
-#include <QHash>
 #include <QString>
+#include <QHash>  // IWYU pragma: keep
 
 #include "AudioEngine.h"
 #include "Controller.h"
@@ -50,11 +50,8 @@ class Scale;
 
 namespace gui
 {
-
-class TimeLineWidget;
 class SongEditor;
 class ControllerRackView;
-
 }
 
 
@@ -257,7 +254,6 @@ public:
 		return m_playMode;
 	}
 
-	PlayMode lastPlayMode() const { return m_lastPlayMode; }
 	inline PlayPos & getPlayPos( PlayMode pm )
 	{
 		return m_playPos[static_cast<std::size_t>(pm)];
@@ -493,7 +489,6 @@ private:
 	std::array<Timeline, PlayModeCount> m_timelines;
 
 	PlayMode m_playMode;
-	PlayMode m_lastPlayMode;
 	PlayPos m_playPos[PlayModeCount];
 	bar_t m_length;
 

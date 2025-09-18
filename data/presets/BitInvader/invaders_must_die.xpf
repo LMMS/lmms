@@ -16,7 +16,7 @@
       <arpeggiator arptime="27" arprange="2" arptime_denominator="16" syncmode="8" arpmode="0" arp-enabled="1" arp="0" arptime_numerator="1" arpdir="0" arpgate="100"/>
       <midiport inputcontroller="0" fixedoutputvelocity="-1" inputchannel="0" outputcontroller="0" writable="0" outputchannel="1" fixedinputvelocity="-1" fixedoutputnote="-1" outputprogram="1" basevelocity="63" readable="0"/>
       <fxchain numofeffects="2" enabled="1">
-        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" autoquit="1" gate="0" name="ladspaeffect" wet="1" on="1">
+        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" autoquit="1" name="ladspaeffect" wet="1" on="1">
           <ladspacontrols ports="4">
             <port02 data="0.99897"/>
             <port03 data="0.749"/>
@@ -28,7 +28,7 @@
             <attribute value="Plate2x2" name="plugin"/>
           </key>
         </effect>
-        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" autoquit="1" gate="0" name="stereoenhancer" wet="1" on="0">
+        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" autoquit="1" name="stereoenhancer" wet="1" on="0">
           <stereoenhancercontrols width="42"/>
           <key/>
         </effect>

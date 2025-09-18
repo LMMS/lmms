@@ -25,8 +25,6 @@
 #include "TextFloat.h"
 
 #include <QTimer>
-#include <QPainter>
-#include <QStyleOption>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QLabel>

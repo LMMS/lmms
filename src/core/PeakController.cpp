@@ -25,7 +25,6 @@
 
 #include "PeakController.h"
 
-#include <cmath>
 
 #include <QDomElement>
 #include <QMessageBox>

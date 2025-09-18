@@ -36,7 +36,6 @@
 #include "ProjectJournal.h"
 #include "Song.h"
 
-#include <cmath>
 
 namespace lmms
 {
@@ -60,21 +59,6 @@ AutomationClip::AutomationClip( AutomationTrack * _auto_track ) :
 	m_lastRecordedValue( 0 )
 {
 	changeLength( TimePos( 1, 0 ) );
-	if( getTrack() )
-	{
-		switch( getTrack()->trackContainer()->type() )
-		{
-			case TrackContainer::Type::Pattern:
-				setResizable(false);
-				break;
-
-			case TrackContainer::Type::Song:
-				// move down
-			default:
-				setResizable(true);
-				break;
-		}
-	}
 }
 
 
@@ -104,19 +88,6 @@ AutomationClip::AutomationClip( const AutomationClip & _clip_to_copy ) :
 		m_timeMap[POS(it)] = it.value();
 		// Sets the node's clip to this one
 		m_timeMap[POS(it)].setClip(this);
-	}
-	if (!getTrack()){ return; }
-	switch( getTrack()->trackContainer()->type() )
-	{
-		case TrackContainer::Type::Pattern:
-			setResizable(false);
-			break;
-
-		case TrackContainer::Type::Song:
-			// move down
-		default:
-			setResizable(true);
-			break;
 	}
 }
 

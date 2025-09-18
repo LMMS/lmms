@@ -32,10 +32,15 @@
 #include <QApplication>
 #include <QDialogButtonBox>
 #include <QHBoxLayout>
+#include <QHeaderView>
+#include <QItemSelectionModel>
+#include <QKeyEvent>
 #include <QLabel>
 #include <QLineEdit>
+#include <QPushButton>
 #include <QRegularExpression>
 #include <QScrollArea>
+#include <QTableView>
 #include <QVBoxLayout>
 
 

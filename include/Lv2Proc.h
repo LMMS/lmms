@@ -57,10 +57,6 @@ namespace Lv2Ports
 	struct Audio;
 	struct PortBase;
 	struct AtomSeq;
-
-	enum class Type;
-	enum class Flow;
-	enum class Vis;
 }
 
 

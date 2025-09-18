@@ -32,7 +32,6 @@
 
 #include "ConfigManager.h"
 #include "SampleFrame.h"
-#include "lmms_math.h"
 
 namespace lmms
 {
@@ -43,26 +42,18 @@ Effect::Effect( const Plugin::Descriptor * _desc,
 			const Descriptor::SubPluginFeatures::Key * _key ) :
 	Plugin( _desc, _parent, _key ),
 	m_parent( nullptr ),
-	m_processors( 1 ),
 	m_okay( true ),
 	m_noRun( false ),
 	m_running( false ),
-	m_bufferCount( 0 ),
 	m_enabledModel( true, this, tr( "Effect enabled" ) ),
 	m_wetDryModel( 1.0f, -1.0f, 1.0f, 0.01f, this, tr( "Wet/Dry mix" ) ),
-	m_gateModel( 0.0f, 0.0f, 1.0f, 0.01f, this, tr( "Gate" ) ),
 	m_autoQuitModel( 1.0f, 1.0f, 8000.0f, 100.0f, 1.0f, this, tr( "Decay" ) ),
-	m_autoQuitDisabled( false )
+	m_autoQuitEnabled(ConfigManager::inst()->value("ui", "disableautoquit", "1").toInt() == 0)
 {
 	m_wetDryModel.setCenterValue(0);
 
 	m_srcState[0] = m_srcState[1] = nullptr;
 	reinitSRC();
-
-	if( ConfigManager::inst()->value( "ui", "disableautoquit").toInt() )
-	{
-		m_autoQuitDisabled = true;
-	}
 
 	// Call the virtual method onEnabledChanged so that effects can react to changes,
 	// e.g. by resetting state.
@@ -91,7 +82,6 @@ void Effect::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	m_enabledModel.saveSettings( _doc, _this, "on" );
 	m_wetDryModel.saveSettings( _doc, _this, "wet" );
 	m_autoQuitModel.saveSettings( _doc, _this, "autoquit" );
-	m_gateModel.saveSettings( _doc, _this, "gate" );
 	controls()->saveState( _doc, _this );
 }
 
@@ -103,7 +93,6 @@ void Effect::loadSettings( const QDomElement & _this )
 	m_enabledModel.loadSettings( _this, "on" );
 	m_wetDryModel.loadSettings( _this, "wet" );
 	m_autoQuitModel.loadSettings( _this, "autoquit" );
-	m_gateModel.loadSettings( _this, "gate" );
 
 	QDomNode node = _this.firstChild();
 	while( !node.isNull() )
@@ -136,16 +125,8 @@ bool Effect::processAudioBuffer(SampleFrame* buf, const fpp_t frames)
 		case ProcessStatus::Continue:
 			break;
 		case ProcessStatus::ContinueIfNotQuiet:
-		{
-			double outSum = 0.0;
-			for (std::size_t idx = 0; idx < frames; ++idx)
-			{
-				outSum += buf[idx].sumOfSquaredAmplitudes();
-			}
-
-			checkGate(outSum / frames);
+			handleAutoQuit({buf, frames});
 			break;
-		}
 		case ProcessStatus::Sleep:
 			return false;
 		default:
@@ -181,27 +162,55 @@ Effect * Effect::instantiate( const QString& pluginName,
 
 
 
-void Effect::checkGate(double outSum)
+void Effect::handleAutoQuit(std::span<const SampleFrame> output)
 {
-	if( m_autoQuitDisabled )
+	if (!m_autoQuitEnabled)
 	{
 		return;
 	}
 
-	// Check whether we need to continue processing input.  Restart the
+	/*
+	 * In the past, the RMS was calculated then compared with a threshold of 10^(-10).
+	 * Now we use a different algorithm to determine whether a buffer is non-quiet, so
+	 * a new threshold is needed for the best compatibility. The following is how it's derived.
+	 *
+	 * Old method:
+	 * RMS = average (L^2 + R^2) across stereo buffer.
+	 * RMS threshold = 10^(-10)
+	 *
+	 * So for a single channel, it would be:
+	 * RMS/2 = average M^2 across single channel buffer.
+	 * RMS/2 threshold = 5^(-11)
+	 *
+	 * The new algorithm for determining whether a buffer is non-silent compares M with the threshold,
+	 * not M^2, so the square root of M^2's threshold should give us the most compatible threshold for
+	 * the new algorithm:
+	 *
+	 * (RMS/2)^0.5 = (5^(-11))^0.5 = 0.0001431 (approx.)
+	 *
+	 * In practice though, the exact value shouldn't really matter so long as it's sufficiently small.
+	 */
+	static constexpr auto threshold = 0.0001431f;
+
+	// Check whether we need to continue processing input. Restart the
 	// counter if the threshold has been exceeded.
-	if (approximatelyEqual(outSum, gate()))
+
+	for (const SampleFrame& frame : output)
 	{
-		incrementBufferCount();
-		if( bufferCount() > timeout() )
+		const auto abs = frame.abs();
+		if (abs.left() >= threshold || abs.right() >= threshold)
 		{
-			stopRunning();
-			resetBufferCount();
+			// The output buffer is not quiet
+			m_quietBufferCount = 0;
+			return;
 		}
 	}
-	else
+
+	// The output buffer is quiet, so check if auto-quit should be activated yet
+	if (++m_quietBufferCount > timeout())
 	{
-		resetBufferCount();
+		// Activate auto-quit
+		stopRunning();
 	}
 }
 

@@ -26,7 +26,6 @@
 #include "CompressorControls.h"
 #include "Compressor.h"
 
-#include <QDomElement>
 
 
 namespace lmms

@@ -61,14 +61,13 @@
 #include "ProjectNotes.h"
 #include "ProjectRenderer.h"
 #include "RecentProjectsMenu.h"
-#include "RemotePlugin.h"
+#include "RemotePluginBase.h"
 #include "SetupDialog.h"
 #include "SideBar.h"
 #include "SongEditor.h"
 #include "SubWindow.h"
 #include "TemplatesMenu.h"
 #include "TextFloat.h"
-#include "TimeLineWidget.h"
 #include "ToolButton.h"
 #include "ToolPlugin.h"
 #include "VersionedSaveDialog.h"
@@ -1286,27 +1285,11 @@ void MainWindow::keyPressEvent( QKeyEvent * _ke )
 		case Qt::Key_Alt: m_keyMods.m_alt = true; break;
 		case Qt::Key_Space:
 		{
-			Editor* lastEditor = nullptr;
-			switch (Engine::getSong()->lastPlayMode())
+			if (Editor::lastPlayedEditor() != nullptr)
 			{
-			case Song::PlayMode::Song:
-				lastEditor = getGUI()->songEditor();
-				break;
-			case Song::PlayMode::MidiClip:
-				lastEditor = getGUI()->pianoRoll();
-				break;
-			case Song::PlayMode::Pattern:
-				lastEditor = getGUI()->patternEditor();
-				break;
-			case Song::PlayMode::AutomationClip:
-				lastEditor = getGUI()->automationEditor();
-				break;
-			default:
-				lastEditor = getGUI()->songEditor();
-				break;
+				if (m_keyMods.m_shift) { Editor::lastPlayedEditor()->togglePause(); }
+				else { Editor::lastPlayedEditor()->togglePlayStop(); }
 			}
-			if (m_keyMods.m_shift) { lastEditor->togglePause(); }
-			else { lastEditor->togglePlayStop(); }
 			break;
 		}
 		default:

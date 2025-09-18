@@ -117,6 +117,7 @@ bool AudioFileMP3::initEncoder()
 
 	lame_set_VBR(m_lame, vbr_off);
 	lame_set_brate(m_lame, bitRate);
+	lame_set_in_samplerate(m_lame, static_cast<int>(getOutputSettings().getSampleRate()));
 
 	// Add a comment
 	id3tag_init(m_lame);

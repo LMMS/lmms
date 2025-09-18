@@ -40,8 +40,6 @@ namespace lmms
 {
 
 
-class Engine;
-
 const QString PROJECTS_PATH = "projects/";
 const QString TEMPLATE_PATH = "templates/";
 const QString PRESETS_PATH = "presets/";

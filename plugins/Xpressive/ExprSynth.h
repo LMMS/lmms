@@ -28,7 +28,6 @@
 #include <cmath>
 #include <cstddef>
 #include <limits>
-#include "AutomatableModel.h"
 #include "Graph.h"
 
 namespace lmms
@@ -36,16 +35,9 @@ namespace lmms
 
 
 class ExprFrontData;
+class FloatModel;
 class NotePlayHandle;
 class SampleFrame;
-
-namespace gui
-{
-class automatableButtonGroup;
-class Knob;
-class LedCheckBox;
-class PixmapButton;
-}
 
 
 class ExprFront

@@ -28,7 +28,6 @@
 #ifdef LMMS_HAVE_SDL
 
 #include <QFormLayout>
-#include <QLineEdit>
 #include <QComboBox>
 #include <SDL.h>
 

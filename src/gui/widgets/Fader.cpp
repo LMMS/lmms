@@ -49,10 +49,9 @@
 #include <QInputDialog>
 #include <QMouseEvent>
 #include <QPainter>
-#include <QPainterPath>
+#include <QPainterPath>  // IWYU pragma: keep
 
 #include "lmms_math.h"
-#include "embed.h"
 #include "CaptionMenu.h"
 #include "ConfigManager.h"
 #include "KeyboardShortcuts.h"
@@ -122,7 +121,7 @@ void Fader::adjustByDecibelDelta(float value)
 	adjustModelByDBDelta(value);
 
 	updateTextFloat();
-	s_textFloat->setVisibilityTimeOut(1000);
+	s_textFloat->showWithTimeout(1000);
 }
 
 void Fader::adjustByDialog()

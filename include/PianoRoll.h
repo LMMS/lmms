@@ -40,11 +40,8 @@
 #include "StepRecorder.h"
 #include "StepRecorderWidget.h"
 
-class QPainter;
-class QPixmap;
 class QPushButton;
 class QScrollBar;
-class QString;
 class QMenu;
 class QToolButton;
 
@@ -52,7 +49,6 @@ namespace lmms
 {
 
 
-class NotePlayHandle;
 class MidiClip;
 
 
@@ -192,7 +188,6 @@ protected:
 	void focusOutEvent( QFocusEvent * ) override;
 	void focusInEvent( QFocusEvent * ) override;
 
-	int getKey( int y ) const;
 	void drawNoteRect( QPainter & p, int x, int y,
 					int  width, const Note * n, const QColor & noteCol, const QColor & noteTextColor,
 					const QColor & selCol, const int noteOpc, const bool borderless, bool drawNoteName );
@@ -342,6 +337,9 @@ private:
 	int keyAreaTop() const;
 	int noteEditRight() const;
 	int noteEditLeft() const;
+
+	int getKey(int y) const;
+	int yCoordOfKey(int key) const;
 
 	void dragNotes(int x, int y, bool alt, bool shift, bool ctrl);
 

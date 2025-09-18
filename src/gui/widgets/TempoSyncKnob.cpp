@@ -107,6 +107,9 @@ void TempoSyncKnob::contextMenuEvent( QContextMenuEvent * )
 
 	CaptionMenu contextMenu( model()->displayName(), this );
 	addDefaultActions( &contextMenu );
+	contextMenu.addAction(QPixmap(),
+		model()->isScaleLogarithmic() ? tr("Set linear") : tr("Set logarithmic"),
+		this, SLOT(toggleScale()));
 	contextMenu.addSeparator();
 
 	float limit = 60000.0f / ( Engine::getSong()->getTempo() *

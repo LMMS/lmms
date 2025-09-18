@@ -23,7 +23,6 @@
  *
  */
 
-#include <QDomElement>
 
 #include "AmplifierControls.h"
 #include "Amplifier.h"

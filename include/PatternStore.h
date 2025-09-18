@@ -98,8 +98,9 @@ public slots:
 	void play();
 	void stop();
 	void updateComboBox();
-	void currentPatternChanged();
 
+signals:
+	void trackUpdated();
 
 private:
 	ComboBoxModel m_patternComboBoxModel;

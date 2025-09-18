@@ -1,6 +1,6 @@
 /*
- * AutomatableButton.cpp - implementation of class automatableButton and
- *                          automatableButtonGroup
+ * AutomatableButton.cpp - implementation of class AutomatableButton and
+ *                         AutomatableButtonGroup
  *
  * Copyright (c) 2006-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -179,7 +179,7 @@ void AutomatableButton::toggle()
 
 
 
-automatableButtonGroup::automatableButtonGroup( QWidget * _parent,
+AutomatableButtonGroup::AutomatableButtonGroup( QWidget * _parent,
 						const QString & _name ) :
 	QWidget( _parent ),
 	IntModelView( new IntModel( 0, 0, 0, nullptr, _name, true ), this )
@@ -191,7 +191,7 @@ automatableButtonGroup::automatableButtonGroup( QWidget * _parent,
 
 
 
-automatableButtonGroup::~automatableButtonGroup()
+AutomatableButtonGroup::~AutomatableButtonGroup()
 {
 	for (const auto& button : m_buttons)
 	{
@@ -202,7 +202,7 @@ automatableButtonGroup::~automatableButtonGroup()
 
 
 
-void automatableButtonGroup::addButton( AutomatableButton * _btn )
+void AutomatableButtonGroup::addButton( AutomatableButton * _btn )
 {
 	_btn->m_group = this;
 	_btn->setCheckable( true );
@@ -219,7 +219,7 @@ void automatableButtonGroup::addButton( AutomatableButton * _btn )
 
 
 
-void automatableButtonGroup::removeButton( AutomatableButton * _btn )
+void AutomatableButtonGroup::removeButton( AutomatableButton * _btn )
 {
 	m_buttons.erase( std::find( m_buttons.begin(), m_buttons.end(), _btn ) );
 	_btn->m_group = nullptr;
@@ -228,7 +228,7 @@ void automatableButtonGroup::removeButton( AutomatableButton * _btn )
 
 
 
-void automatableButtonGroup::activateButton( AutomatableButton * _btn )
+void AutomatableButtonGroup::activateButton( AutomatableButton * _btn )
 {
 	if( _btn != m_buttons[model()->value()] &&
 					m_buttons.indexOf( _btn ) != -1 )
@@ -244,7 +244,7 @@ void automatableButtonGroup::activateButton( AutomatableButton * _btn )
 
 
 
-void automatableButtonGroup::modelChanged()
+void AutomatableButtonGroup::modelChanged()
 {
 	connect( model(), SIGNAL(dataChanged()),
 			this, SLOT(updateButtons()));
@@ -255,7 +255,7 @@ void automatableButtonGroup::modelChanged()
 
 
 
-void automatableButtonGroup::updateButtons()
+void AutomatableButtonGroup::updateButtons()
 {
 	model()->setRange( 0, m_buttons.size() - 1 );
 	int i = 0;
