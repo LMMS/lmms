@@ -28,12 +28,15 @@
 #include <QDebug>
 #include <QDir>
 #include <QLibrary>
+#include <QList>
+#include <QRegularExpression>
 
 #include <cmath>
 
 #include "ConfigManager.h"
 #include "LadspaManager.h"
 #include "PluginFactory.h"
+#include "lmms_constants.h"
 
 
 namespace lmms
@@ -44,6 +47,8 @@ LadspaManager::LadspaManager()
 {
 	// Make sure plugin search paths are set up
 	PluginFactory::setupSearchPaths();
+
+	QList<QRegularExpression> excludePatterns = PluginFactory::getExcludePatterns("LMMS_EXCLUDE_LADSPA");
 
 	QStringList ladspaDirectories = QString( getenv( "LADSPA_PATH" ) ).
 								split( LADSPA_PATH_SEPERATOR );
@@ -67,7 +72,15 @@ LadspaManager::LadspaManager()
 		QFileInfoList list = directory.entryInfoList();
 		for (const auto& f : list)
 		{
-				if(!f.isFile() || f.fileName().right( 3 ).toLower() !=
+			bool exclude = false;
+			for (const auto& pattern : excludePatterns) {
+				if (pattern.match(f.filePath()).hasMatch()) {
+					exclude = true;
+					break;
+				}
+			}
+
+			if (exclude || !f.isFile() || f.fileName().right(3).toLower() !=
 #ifdef LMMS_BUILD_WIN32
 													"dll"
 #else

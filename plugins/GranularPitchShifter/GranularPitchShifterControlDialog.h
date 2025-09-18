@@ -28,20 +28,14 @@
 #include "EffectControlDialog.h"
 
 #include <QTextEdit>
-#include "ComboBox.h"
-#include "GuiApplication.h"
-#include "MainWindow.h"
 
 namespace lmms
 {
 
 class GranularPitchShifterControls;
-class FloatModel;
 
 namespace gui
 {
-
-class Knob;
 
 class GranularPitchShifterControlDialog : public EffectControlDialog
 {

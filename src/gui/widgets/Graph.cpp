@@ -28,7 +28,6 @@
 #include "Graph.h"
 #include "SampleLoader.h"
 #include "StringPairDrag.h"
-#include "SampleBuffer.h"
 #include "Oscillator.h"
 
 namespace lmms
@@ -459,38 +458,30 @@ void Graph::updateGraph()
 
 } // namespace gui
 
-graphModel::graphModel( float _min, float _max, int _length,
-			Model* _parent, bool _default_constructed,  float _step ) :
-	Model( _parent, tr( "Graph" ), _default_constructed ),
-	m_samples( _length ),
-	m_length( _length ),
-	m_minValue( _min ),
-	m_maxValue( _max ),
-	m_step( _step )
+graphModel::graphModel(float ymin, float ymax, int length, Model* parent, bool defaultConstructed, float step) :
+	Model(parent, tr("Graph"), defaultConstructed),
+	m_samples(length),
+	m_length(length),
+	m_minValue(ymin),
+	m_maxValue(ymax),
+	m_step(std::clamp(step, 0.f, std::abs(ymax - ymin)))
 {
 }
 
-void graphModel::setRange( float _min, float _max )
+void graphModel::setRange(float ymin, float ymax)
 {
-	if( _min != m_minValue || _max != m_maxValue )
-	{
-		m_minValue = _min;
-		m_maxValue = _max;
-
-		if( !m_samples.isEmpty() )
-		{
-			// Trim existing values
-			for( int i=0; i < length(); i++ )
-			{
-				m_samples[i] = fmaxf( _min, fminf( m_samples[i], _max ) );
-			}
-		}
-
-		emit rangeChanged();
+	if (ymin == m_minValue && ymax == m_maxValue) { return; }
+	// Step sizes less than zero or larger than the entire range of
+	// values are nonsense, clamp those
+	m_step = std::clamp(m_step, 0.f, std::abs(ymax - ymin));
+	m_minValue = ymin;
+	m_maxValue = ymax;
+	// Trim existing values
+	for (float& sample : m_samples) {
+		sample = std::clamp(sample, ymin, ymax);
 	}
+	emit rangeChanged();
 }
-
-
 
 void graphModel::setLength( int _length )
 {
@@ -732,15 +723,13 @@ void graphModel::clearInvisible()
 	emit samplesChanged( graph_length, full_graph_length - 1 );
 }
 
-void graphModel::drawSampleAt( int x, float val )
+void graphModel::drawSampleAt(int x, float val)
 {
-	//snap to the grid
-	val -= (m_step != 0.0) ? std::fmod(val, m_step) * m_step : 0;
-
+	// snap to the grid
+	if (m_step > 0) { val = std::floor(val / m_step) * m_step; }
 	// boundary crop
-	x = qMax( 0, qMin( length()-1, x ) );
-	val = qMax( minValue(), qMin( maxValue(), val ) );
-
+	x = std::clamp(x, 0, length() - 1);
+	val = std::clamp(val, minValue(), maxValue());
 	// change sample shape
 	m_samples[x] = val;
 }

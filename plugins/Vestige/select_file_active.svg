@@ -1,0 +1,25 @@
+<svg version="1.1" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+	<defs>
+		<filter id="filter10" x="-.088376" y="-.13743" width="1.1768" height="1.2749" color-interpolation-filters="sRGB">
+			<feGaussianBlur stdDeviation="0.51538085"/>
+		</filter>
+	</defs>
+	<g stroke-width="1.4291">
+		<path transform="translate(-.0058599 -1.5059)" d="m2.0078 11h19.996v9h-13.996z" fill="#404040" filter="url(#filter10)" opacity=".75"/>
+		<path transform="translate(-.0058599 -1.5059)" d="m8.0078 7.0117h13.996v12.988h-13.996z" fill="#404040" filter="url(#filter10)" opacity=".75"/>
+		<path d="m2.002 9.4941h19.996v9h-13.996z" fill="#1ecc00"/>
+		<path d="m8.002 5.5059h13.996v12.988h-13.996z" fill="#23f500"/>
+	</g>
+	<metadata>
+		<rdf:RDF>
+			<cc:Work rdf:about="">
+				<cc:license rdf:resource="http://creativecommons.org/publicdomain/zero/1.0/"/>
+			</cc:Work>
+			<cc:License rdf:about="http://creativecommons.org/publicdomain/zero/1.0/">
+				<cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction"/>
+				<cc:permits rdf:resource="http://creativecommons.org/ns#Distribution"/>
+				<cc:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks"/>
+			</cc:License>
+		</rdf:RDF>
+	</metadata>
+</svg>

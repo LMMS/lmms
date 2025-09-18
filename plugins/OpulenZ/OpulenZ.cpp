@@ -51,7 +51,6 @@
 #include <mididata.h>
 
 #include "embed.h"
-#include "debug.h"
 
 #include "Knob.h"
 #include "PixmapButton.h"
@@ -515,7 +514,7 @@ int OpulenzInstrument::Hz2fnum(float Hz) {
 
 // Load one of the default patches
 void OpulenzInstrument::loadGMPatch() {
-	unsigned char *inst = midi_fm_instruments[m_patchModel.value()];
+	const unsigned char* inst = midi_fm_instruments[m_patchModel.value()];
 	loadPatch(inst);
 }
 
@@ -712,7 +711,7 @@ OpulenzInstrumentView::OpulenzInstrumentView( Instrument * _instrument,
 	BUTTON_GEN(op1_vib_btn, "Vibrato", 93, 87);
 	KNOB_GEN(feedback_kn, "Feedback", "", 128, 48);
 
-	op1_waveform = new automatableButtonGroup( this );
+	op1_waveform = new AutomatableButtonGroup( this );
 	WAVEBUTTON_GEN(op1_w0_btn,"Sine", 154, 86, "wave1_on", "wave1_off", op1_waveform);
 	WAVEBUTTON_GEN(op1_w1_btn,"Half sine", 178, 86, "wave2_on", "wave2_off", op1_waveform);
 	WAVEBUTTON_GEN(op1_w2_btn,"Absolute sine", 199, 86, "wave3_on", "wave3_off", op1_waveform);
@@ -732,7 +731,7 @@ OpulenzInstrumentView::OpulenzInstrumentView( Instrument * _instrument,
 	BUTTON_GEN(op2_trem_btn, "Tremolo", 65, 177);
 	BUTTON_GEN(op2_vib_btn, "Vibrato", 93, 177);
 
-	op2_waveform = new automatableButtonGroup( this );
+	op2_waveform = new AutomatableButtonGroup( this );
 	WAVEBUTTON_GEN(op2_w0_btn,"Sine", 154, 176, "wave1_on", "wave1_off", op2_waveform);
 	WAVEBUTTON_GEN(op2_w1_btn,"Half sine", 178, 176, "wave2_on", "wave2_off", op2_waveform);
 	WAVEBUTTON_GEN(op2_w2_btn,"Absolute sine", 199, 176, "wave3_on", "wave3_off", op2_waveform);

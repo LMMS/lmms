@@ -32,8 +32,8 @@
 #include <map>
 #include <string_view>
 #include <vector>
-#include "Lv2Manager.h"
 
+#include <lv2/core/lv2.h>
 
 namespace lmms
 {

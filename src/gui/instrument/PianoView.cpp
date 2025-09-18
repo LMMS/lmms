@@ -41,14 +41,13 @@
 #include <QCursor>
 #include <QKeyEvent>
 #include <QPainter>
-#include <QPainterPath>
+#include <QPainterPath>  // IWYU pragma: keep
 #include <QVBoxLayout>
 
 #include "AutomatableModelView.h"
 #include "PianoView.h"
 #include "Piano.h"
 #include "CaptionMenu.h"
-#include "embed.h"
 #include "Engine.h"
 #include "FontHelper.h"
 #include "InstrumentTrack.h"
@@ -90,7 +89,6 @@ PianoView::PianoView(QWidget *parent) :
 	m_lastKey(-1),                   /*!< The last key displayed? */
 	m_movedNoteModel(nullptr)        /*!< Key marker which is being moved */
 {
-	setAttribute(Qt::WA_OpaquePaintEvent, true);
 	setFocusPolicy(Qt::StrongFocus);
 
 	// Black keys are drawn halfway between successive white keys, so they do not
