@@ -2089,11 +2089,11 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 
 		case audioMasterCanDo:
 			SHOW_CALLBACK("amc: audioMasterCanDo\n");
-			return !std::strcmp(p, "sendVstEvents")
-				|| !std::strcmp(p, "sendVstMidiEvent")
-				|| !std::strcmp(p, "sendVstTimeInfo")
-				|| !std::strcmp(p, "sizeWindow")
-				|| !std::strcmp(p, "supplyIdle");
+			return !(std::strcmp(p, "sendVstEvents")
+				&& std::strcmp(p, "sendVstMidiEvent")
+				&& std::strcmp(p, "sendVstTimeInfo")
+				&& std::strcmp(p, "sizeWindow")
+				&& std::strcmp(p, "supplyIdle"));
 
 		case audioMasterGetLanguage:
 			SHOW_CALLBACK( "amc: audioMasterGetLanguage\n" );
