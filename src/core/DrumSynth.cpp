@@ -26,6 +26,7 @@
 #include "DrumSynth.h"
 
 #include <QFile>
+#include <array>
 #include <cmath>
 #include <cstring>
 #include <sstream>
