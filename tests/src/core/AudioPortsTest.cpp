@@ -331,61 +331,109 @@ private slots:
 		QCOMPARE(apm2x2Inst.out().enabled(1, 1), true);
 	}
 
-	//! Verifies that the used output track channels cache works
-	void UsedOutputTrackChannelsCache()
+	//! Verifies that the used processor channels cache on the input side works
+	void UsedProcessorChannels_Input()
 	{
 		using namespace lmms;
 
 		// Setup
 		auto apm = AudioPortsModelImpl{2, 2, false};
 
-		// Out
-		//  ___
-		// |X| | 0
-		// | |X| 1
-		//  ---
+		// In
+		//    ___
+		// 0 |X| |
+		// 1 | |X|
+		//    ---
 
-		// Track channels 0 and 1 should both have a processor output channel routed to them
-		QCOMPARE(apm.out().usedTrackChannels()[0], true);
-		QCOMPARE(apm.out().usedTrackChannels()[1], true);
+		// Processor channels 0 and 1 should both have a track channel routed to them
+		QCOMPARE(apm.in().usedChannels()[0], true);
+		QCOMPARE(apm.in().usedChannels()[1], true);
 
-		// Out
-		//  ___
-		// | | | 0
-		// | |X| 1
-		//  ---
+		// In
+		//    ___
+		// 0 | | |
+		// 1 | |X|
+		//    ---
 
-		apm.out().setPin(0, 0, false);
+		apm.in().setPin(0, 0, false);
 
-		// Now only track channel 1 should have a processor channel routed to it
-		QCOMPARE(apm.out().usedTrackChannels()[0], false);
-		QCOMPARE(apm.out().usedTrackChannels()[1], true);
+		// Now only processor channel 1 should have a track channel routed to it
+		QCOMPARE(apm.in().usedChannels()[0], false);
+		QCOMPARE(apm.in().usedChannels()[1], true);
 
-		// Out
-		//  ___
-		// | |X| 0
-		// | |X| 1
-		//  ---
+		// In
+		//    ___
+		// 0 | |X|
+		// 1 | |X|
+		//    ---
 
-		apm.out().setPin(0, 1, true);
+		apm.in().setPin(0, 1, true);
 
-		QCOMPARE(apm.out().usedTrackChannels()[0], true);
-		QCOMPARE(apm.out().usedTrackChannels()[1], true);
+		QCOMPARE(apm.in().usedChannels()[0], false);
+		QCOMPARE(apm.in().usedChannels()[1], true);
 
-		// Out
-		//  ___
-		// | |X| 0
-		// |X|X| 1
-		//  ---
+		// In
+		//    ___
+		// 0 | |X|
+		// 1 | |X|
+		// 2 | | |
+		// 3 | | |
+		//    ---
 
-		apm.out().setPin(1, 0, true);
+		apm.setTrackChannelCount(4);
 
-		QCOMPARE(apm.out().usedTrackChannels()[0], true);
-		QCOMPARE(apm.out().usedTrackChannels()[1], true);
+		// Should remain the same after increasing the number of track channels
+		QCOMPARE(apm.in().usedChannels()[0], false);
+		QCOMPARE(apm.in().usedChannels()[1], true);
+
+		// In
+		//    ___
+		// 0 | |X|
+		// 1 | |X|
+		// 2 | | |
+		// 3 |X| |
+		//    ---
+
+		apm.in().setPin(3, 0, true);
+
+		QCOMPARE(apm.in().usedChannels()[0], true);
+		QCOMPARE(apm.in().usedChannels()[1], true);
+
+		// In
+		//    ___
+		// 0 | |X|
+		// 1 | |X|
+		//    ---
+
+		apm.setTrackChannelCount(2);
+
+		// The 1st processor channel should no longer have any track channels routed to it
+		QCOMPARE(apm.in().usedChannels()[0], false);
+		QCOMPARE(apm.in().usedChannels()[1], true);
+
+		// In
+		//    _____
+		// 0 | |X| |
+		// 1 | |X| |
+		//    -----
+
+		apm.setChannelCountIn(3);
+
+		// The new processor channel should not have anything routed to it, and the rest stays the same
+		QCOMPARE(apm.in().usedChannels()[0], false);
+		QCOMPARE(apm.in().usedChannels()[1], true);
+		QCOMPARE(apm.in().usedChannels()[2], false);
+
+		apm.setChannelCountOut(1);
+
+		// Setting the output channel count has no effect
+		QCOMPARE(apm.in().usedChannels()[0], false);
+		QCOMPARE(apm.in().usedChannels()[1], true);
+		QCOMPARE(apm.in().usedChannels()[2], false);
 	}
 
-	//! Verifies that the used output processor channels cache works
-	void UsedOutputChannelsCache()
+	//! Verifies that the used processor channels cache on the output side works
+	void UsedProcessorChannels_Output()
 	{
 		using namespace lmms;
 
@@ -483,6 +531,112 @@ private slots:
 		QCOMPARE(apm.out().usedChannels()[0], false);
 		QCOMPARE(apm.out().usedChannels()[1], true);
 		QCOMPARE(apm.out().usedChannels()[2], false);
+	}
+
+	//! Verifies that the used track channels cache on the input side works
+	void UsedTrackChannels_Input()
+	{
+		using namespace lmms;
+
+		// Setup
+		auto apm = AudioPortsModelImpl{2, 2, false};
+
+		// In
+		//    ___
+		// 0 |X| |
+		// 1 | |X|
+		//    ---
+
+		// Track channels 0 and 1 should both be routed to a processor input channel
+		QCOMPARE(apm.in().usedTrackChannels()[0], true);
+		QCOMPARE(apm.in().usedTrackChannels()[1], true);
+
+		// In
+		//    ___
+		// 0 | | |
+		// 1 | |X|
+		//    ---
+
+		apm.in().setPin(0, 0, false);
+
+		// Now only track channel 1 should be routed to a processor input channel
+		QCOMPARE(apm.in().usedTrackChannels()[0], false);
+		QCOMPARE(apm.in().usedTrackChannels()[1], true);
+
+		// In
+		//    ___
+		// 0 | |X|
+		// 1 | |X|
+		//    ---
+
+		apm.in().setPin(0, 1, true);
+
+		QCOMPARE(apm.in().usedTrackChannels()[0], true);
+		QCOMPARE(apm.in().usedTrackChannels()[1], true);
+
+		// In
+		//    ___
+		// 0 | |X|
+		// 1 |X|X|
+		//    ---
+
+		apm.in().setPin(1, 0, true);
+
+		QCOMPARE(apm.in().usedTrackChannels()[0], true);
+		QCOMPARE(apm.in().usedTrackChannels()[1], true);
+	}
+
+	//! Verifies that the used track channels cache on the output side works
+	void UsedTrackChannels_Output()
+	{
+		using namespace lmms;
+
+		// Setup
+		auto apm = AudioPortsModelImpl{2, 2, false};
+
+		// Out
+		//  ___
+		// |X| | 0
+		// | |X| 1
+		//  ---
+
+		// Track channels 0 and 1 should both have a processor output channel routed to them
+		QCOMPARE(apm.out().usedTrackChannels()[0], true);
+		QCOMPARE(apm.out().usedTrackChannels()[1], true);
+
+		// Out
+		//  ___
+		// | | | 0
+		// | |X| 1
+		//  ---
+
+		apm.out().setPin(0, 0, false);
+
+		// Now only track channel 1 should have a processor channel routed to it
+		QCOMPARE(apm.out().usedTrackChannels()[0], false);
+		QCOMPARE(apm.out().usedTrackChannels()[1], true);
+
+		// Out
+		//  ___
+		// | |X| 0
+		// | |X| 1
+		//  ---
+
+		apm.out().setPin(0, 1, true);
+
+		QCOMPARE(apm.out().usedTrackChannels()[0], true);
+		QCOMPARE(apm.out().usedTrackChannels()[1], true);
+
+		// Out
+		//  ___
+		// | |X| 0
+		// |X|X| 1
+		//  ---
+
+		apm.out().setPin(1, 0, true);
+
+		QCOMPARE(apm.out().usedTrackChannels()[0], true);
+		QCOMPARE(apm.out().usedTrackChannels()[1], true);
 	}
 
 	//! Verifies that the direct routing optimization works
