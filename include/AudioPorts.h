@@ -157,7 +157,7 @@ class AudioPortsRouter
 		"AudioPorts::Router currently only supports interleaved buffers if they are SampleFrame-compatible");
 
 public:
-	explicit AudioPortsRouter(const AudioPorts<settings>& parent)
+	explicit AudioPortsRouter(AudioPorts<settings>& parent)
 		: m_ap{&parent}
 	{
 	}
@@ -167,16 +167,18 @@ public:
 	 * method), then routes audio from the processor's output buffers back to the track channels.
 	 *
 	 * `coreInOut`        : track channels from LMMS core (currently just the main track channel pair)
-	 * `processorBuffers` : the processor's `AudioPorts::Buffer` TODO: The Router shouldn't need to be given this by users
 	 * `processFunc`      : the processor's process method - a callable object with the signature
 	 *                      `ProcessStatus(buffers...)` where `buffers` is the expected audio buffer(s)
 	 *                      (if any) for the given `settings`.
 	 */
 	template<class F>
-	auto process(AudioBus& coreInOut, AudioPortsBuffer<settings>& processorBuffers, F&& processFunc)
-		-> ProcessStatus
+	auto process(AudioBus& coreInOut, F&& processFunc) -> ProcessStatus
 	{
 		m_silentOutput = false;
+
+		assert(m_ap->active() == true);
+		auto processorBuffers = m_ap->buffers();
+		assert(processorBuffers != nullptr);
 
 		ProcessStatus status;
 		if constexpr (settings.sampleFrameCompatible())
@@ -185,16 +187,16 @@ public:
 			{
 				// The "direct routing" optimization can be applied
 				status = processWithDirectRouting(coreInOut.trackChannelPair(*dr),
-					processorBuffers, std::forward<F>(processFunc));
+					*processorBuffers, std::forward<F>(processFunc));
 			}
 			else
 			{
-				status = processNormally(coreInOut, processorBuffers, std::forward<F>(processFunc));
+				status = processNormally(coreInOut, *processorBuffers, std::forward<F>(processFunc));
 			}
 		}
 		else
 		{
-			status = processNormally(coreInOut, processorBuffers, std::forward<F>(processFunc));
+			status = processNormally(coreInOut, *processorBuffers, std::forward<F>(processFunc));
 		}
 
 		coreInOut.sanitize(*m_ap);
@@ -230,7 +232,7 @@ private:
 	 *     If no audio is routed to a processor input channel, that channel's buffer is zeroed.
 	 *
 	 *     `in`     : track channels from LMMS core (currently just the main track channel pair)
-	 *                `in.frames` provides the number of frames in each `in`/`out` audio buffer
+	 *                `in.frames()` provides the number of frames in each `in`/`out` audio buffer
 	 *     `out`    : processor input buffers
 	 *
 	 * `receive`
@@ -242,7 +244,7 @@ private:
 	 *
 	 *     `in`      : processor output buffers
 	 *     `inOut`   : track channels from/to LMMS core (currently just the main track channel pair)
-	 *                 `inOut.frames` provides the number of frames in each `in`/`inOut` audio buffer
+	 *                 `inOut.frames()` provides the number of frames in each `in`/`inOut` audio buffer
 	 */
 
 	void send(const AudioBus& in, PlanarBufferView<SampleT, settings.inputs> out) const
@@ -271,7 +273,7 @@ private:
 	auto processWithDirectRouting(InterleavedBufferView<float, 2> coreBuffer,
 		AudioPortsBuffer<settings>& processorBuffers, F&& processFunc) -> ProcessStatus;
 
-	const AudioPorts<settings>* const m_ap;
+	AudioPorts<settings>* const m_ap;
 	bool m_silentOutput = false;
 };
 
@@ -369,7 +371,7 @@ public:
 		return *static_cast<AudioPortsModel*>(this);
 	}
 
-	auto getRouter() const -> Router
+	auto getRouter() -> Router
 	{
 		return Router{*this};
 	}

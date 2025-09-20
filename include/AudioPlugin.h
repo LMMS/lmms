@@ -175,14 +175,11 @@ protected:
 			return;
 		}
 
-		auto buffers = m_audioPorts.buffers();
-		assert(buffers != nullptr);
-
 		auto temp = inOut.data();
 		auto bus = AudioBus{&temp, 1, inOut.size()};
 		auto router = m_audioPorts.getRouter();
 
-		router.process(bus, *buffers, [this](auto... buffers) {
+		router.process(bus, [this](auto... buffers) {
 			[[maybe_unused]] const auto status = this->processImpl(buffers...);
 			assert(status == ProcessStatus::Continue); // Only Continue is allowed for now
 			return ProcessStatus::Continue;
@@ -271,12 +268,9 @@ protected:
 			return false;
 		}
 
-		auto buffers = m_audioPorts.buffers();
-		assert(buffers != nullptr);
-
 		auto router = m_audioPorts.getRouter();
 
-		const auto status = router.process(inOut, *buffers, [this](auto... buffers) {
+		const auto status = router.process(inOut, [this](auto... buffers) {
 			return this->processImpl(buffers...);
 		});
 

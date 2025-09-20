@@ -994,7 +994,7 @@ private slots:
 			// and calls the processor's process method we provide (in this case it doubles the amplitude).
 			// Also applies the "direct routing" optimization.
 			auto router = ap.getRouter();
-			router.process(coreBus, *ap.buffers(), Process{ap});
+			router.process(coreBus, Process{ap});
 
 			// Should be double the original
 			QCOMPARE(coreBus.trackChannelPair(0).frame(0)[0], 123.f * 2);
