@@ -775,6 +775,12 @@ int main( int argc, char * * argv )
 				ProjectRenderer::getFileExtensionFromFormat(eff);
 		}
 
+		if (auto file = QFile{renderOut}; !renderTracks && !file.open(QFile::WriteOnly | QFile::Truncate))
+		{
+			fprintf(stderr, "Failed to open %s for writing, aborting!\n", renderOut.toUtf8().constData());
+			exit(EXIT_FAILURE);
+		}
+
 		// create renderer
 		auto r = new RenderManager(qs, os, eff, renderOut);
 		QCoreApplication::instance()->connect( r,

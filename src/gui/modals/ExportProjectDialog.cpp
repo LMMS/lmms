@@ -183,7 +183,23 @@ void ExportProjectDialog::startExport()
 	{
 		output_name+=m_fileExtension;
 	}
-	m_renderManager.reset(new RenderManager( qs, os, m_ft, output_name ));
+
+	if (auto file = QFile{output_name}; !file.open(QFile::WriteOnly | QFile::Truncate))
+	{
+		const auto title = tr("Could not open file");
+		const auto message = tr("Could not open file %1 "
+						  "for writing.\nPlease make "
+						  "sure you have write "
+						  "permission to the file and "
+						  "the directory containing the "
+						  "file and try again!")
+						   .arg(output_name);
+
+		QMessageBox::critical(nullptr, title, message, QMessageBox::Ok, QMessageBox::NoButton);
+		return;
+	}
+
+	m_renderManager.reset(new RenderManager(qs, os, m_ft, output_name));
 
 	Engine::getSong()->setExportLoop( exportLoopCB->isChecked() );
 	Engine::getSong()->setRenderBetweenMarkers( renderMarkersCB->isChecked() );
