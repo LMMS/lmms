@@ -238,7 +238,8 @@ float SidInstrument::desiredReleaseTimeMs() const
 
 static int sid_fillbuffer(unsigned char* sidreg, reSID::SID *sid, int tdelta, short *ptr, int samples)
 {
-	int total = 0, badline = fastRand(NUMSIDREGS - 1);
+	int total = 0;
+	int badline = fastRand(NUMSIDREGS - 1);
 	int residdelay = 0; // customly added
 
 	for (int c = 0; c < NUMSIDREGS; c++)

@@ -43,7 +43,6 @@
 namespace lmms
 {
 using namespace std::numbers;
-using std::integral, std::floating_point, std::is_arithmetic_v, std::is_floating_point_v, std::conditional_t;
 
 
 // TODO C++23: Make constexpr since std::abs() will be constexpr
@@ -62,7 +61,7 @@ inline bool approximatelyEqual(float x, float y) noexcept
  * Note that if the return value is used as a phase of an oscillator, that the oscillator must support
  * negative phases.
  */
-inline auto fraction(floating_point auto x) noexcept
+inline auto fraction(std::floating_point auto x) noexcept
 {
 	return x - std::trunc(x);
 }
@@ -79,13 +78,13 @@ inline auto fraction(floating_point auto x) noexcept
  * If the result is interpreted as a phase of an oscillator, it makes that negative phases are
  * converted to positive phases.
  */
-inline auto absFraction(floating_point auto x) noexcept
+inline auto absFraction(std::floating_point auto x) noexcept
 {
 	return x - std::floor(x);
 }
 
 //! @brief Returns a psuedorandom integer between 0 and 32767, inclusive.
-inline integral auto fastRand() noexcept
+inline std::integral auto fastRand() noexcept
 {
 	thread_local unsigned long s_next = 1;
 	s_next = s_next * 1103515245 + 12345;
@@ -94,16 +93,17 @@ inline integral auto fastRand() noexcept
 
 
 //! @brief Returns a psuedorandom number between 0 and @p range, inclusive.
-template<typename T> requires is_arithmetic_v<T>
+template<typename T> requires std::is_arithmetic_v<T>
 inline auto fastRand(T range) noexcept
 {
-	constexpr auto FAST_RAND_RATIO = static_cast<conditional_t<is_floating_point_v<T>, T, float>>(1.0 / 32767);
+	constexpr auto FAST_RAND_RATIO = static_cast<std::conditional_t<std::is_floating_point_v<T>, T, float>>(1.0 / 32767);
 	return fastRand() * range * FAST_RAND_RATIO;
 }
 
 
 //! @brief Returns a psuedorandom number between @p from and @p to, inclusive.
-inline auto fastRand(auto from, auto to) noexcept { return from + fastRand(to - from); }
+template<typename T> requires std::is_arithmetic_v<T>
+inline auto fastRand(T from, T to) noexcept { return from + fastRand(to - from); }
 
 
 //! @brief Returns true one in @p chance times at random.
@@ -191,18 +191,18 @@ inline float linearToLogScale(float min, float max, float value)
 
 
 // TODO C++26: Make constexpr since std::exp() will be constexpr
-template<typename T> requires is_arithmetic_v<T>
+template<typename T> requires std::is_arithmetic_v<T>
 inline auto fastPow10f(T x)
 {
-	return std::exp(ln10_v<conditional_t<is_floating_point_v<T>, T, float>> * x);
+	return std::exp(ln10_v<std::conditional_t<std::is_floating_point_v<T>, T, float>> * x);
 }
 
 
 // TODO C++26: Make constexpr since std::log() will be constexpr
-template<typename T> requires is_arithmetic_v<T>
+template<typename T> requires std::is_arithmetic_v<T>
 inline auto fastLog10f(T x)
 {
-	constexpr auto inv_ln10 = static_cast<conditional_t<is_floating_point_v<T>, T, float>>(1.0 / ln10);
+	constexpr auto inv_ln10 = static_cast<std::conditional_t<std::is_floating_point_v<T>, T, float>>(1.0 / ln10);
 	return std::log(x) * inv_ln10;
 }
 
