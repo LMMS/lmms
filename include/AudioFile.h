@@ -32,6 +32,10 @@
 #include "OutputSettings.h"
 
 namespace lmms {
+/**
+ * @brief An abstraction for a handle to an audio file on disk.
+ *
+ */
 class AudioFile
 {
 public:
@@ -73,15 +77,17 @@ public:
      * @brief Read from the audio file using the given @a dst buffer
      * 
      * @param dst The buffer to read the data into.
+     * @returns The number of frames written into @a dst.
      */
-	void read(InterleavedBufferView<float> dst);
+	auto read(InterleavedBufferView<float> dst) -> std::size_t;
 
     /**
      * @brief Write audio to the audio file using the given @a src buffer.
      * 
      * @param src The audio data to write into the audio file.
+     * @returns The number of frames read from @a src.
      */
-	void write(InterleavedBufferView<const float> src);
+	auto write(InterleavedBufferView<const float> src) -> std::size_t;
 
     //! @returns the number of frames within the audio file.
 	auto frames() const -> f_cnt_t;
