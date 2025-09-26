@@ -27,43 +27,77 @@
 
 #include <filesystem>
 
+#include "AudioBufferView.h"
 #include "AudioFileFormats.h"
 #include "OutputSettings.h"
-#include "AudioBufferView.h"
 
 namespace lmms {
 class AudioFile
 {
 public:
+	/**
+	 * @brief Construct a new audio file object for reading using the given @a path.
+	 *
+	 * @param path The path to the audio file to read from.
+	 */
 	explicit AudioFile(std::filesystem::path path);
 
+	/**
+	 * @brief Construct a new Audio File object for writing to the given @a path.
+	 *
+	 * @param path The path to the audio file to write to.
+	 * @param format The audio file format to use
+	 * @param settings The various output settings for the write (e.g., bit rate, sample rate, bit depth, etc).
+	 */
 	AudioFile(std::filesystem::path path, AudioFileFormat format, OutputSettings settings);
 
-    ~AudioFile();
+	/**
+	 * @brief Destroy the audio file object, closing the internal handle if necessary.
+	 *
+	 */
+	~AudioFile();
 
+    //! Deleted copy constructor.
 	AudioFile(const AudioFile&) = delete;
 
+    //! Deleted move constructor.
 	AudioFile(AudioFile&&) = default;
 
+    //! Deleted copy assignment operator.
 	AudioFile& operator=(const AudioFile&) = delete;
 
+    //! Deleted move assignment operator.
 	AudioFile& operator=(AudioFile&&) = default;
 
-    void read(InterleavedBufferView<float> dst);
+    /**
+     * @brief Read from the audio file using the given @a dst buffer
+     * 
+     * @param dst The buffer to read the data into.
+     */
+	void read(InterleavedBufferView<float> dst);
 
-    void write(InterleavedBufferView<const float> src);
+    /**
+     * @brief Write audio to the audio file using the given @a src buffer.
+     * 
+     * @param src The audio data to write into the audio file.
+     */
+	void write(InterleavedBufferView<const float> src);
 
-    auto frames() const -> f_cnt_t;
+    //! @returns the number of frames within the audio file.
+	auto frames() const -> f_cnt_t;
 
-    auto channels() const -> ch_cnt_t;
+    //! @returns the number of channels the audio file has.
+	auto channels() const -> ch_cnt_t;
 
-    auto sampleRate() const -> sample_rate_t;
+    //! @returns the sample rate of the audio file.
+	auto sampleRate() const -> sample_rate_t;
 
-    auto path() const -> std::filesystem::path;
+    //! @returns the path to the audio file.
+	auto path() const -> std::filesystem::path;
 
 private:
-    struct Impl;
-    std::unique_ptr<Impl> m_impl;
+	struct Impl;
+	std::unique_ptr<Impl> m_impl;
 };
 } // namespace lmms
 
