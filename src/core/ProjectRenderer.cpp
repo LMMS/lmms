@@ -62,8 +62,8 @@ void ProjectRenderer::run()
 
 	m_progress = 0;
 
-	// Now start processing
-	Engine::audioEngine()->startProcessing(false);
+	// Stop proceessing of live playback
+	Engine::audioEngine()->stopProcessing();
 
 	// Continually track and emit progress percentage to listeners.
 	while (!Engine::getSong()->isExportDone() && !m_abort)
@@ -90,8 +90,8 @@ void ProjectRenderer::run()
 		}
 	}
 
-	// Notify the audio engine of the end of processing.
-	Engine::audioEngine()->stopProcessing();
+	// Start processing of live playback
+	Engine::audioEngine()->startProcessing();
 
 	Engine::getSong()->stopExport();
 
