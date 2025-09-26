@@ -133,6 +133,20 @@ AudioFile::Impl::Impl(std::filesystem::path path, AudioFileFormat format, Output
 	, m_sndfile(openAudioFile(path, SFM_WRITE, &m_info))
 	, m_path(path)
 {
+	if (format == AudioFileFormat::FLAC)
+	{
+		auto compressionLevel = settings.getCompressionLevel();
+		sf_command(m_sndfile, SFC_SET_COMPRESSION_LEVEL, &compressionLevel, sizeof(int));
+	}
+	else if (format == AudioFileFormat::MP3 || format == AudioFileFormat::OGG)
+	{
+		constexpr auto minBitRate = 32;
+		constexpr auto maxBitRate = 320;
+		const auto targetBitRate = settings.bitrate();
+
+		auto compressionLevel = (maxBitRate - targetBitRate) / static_cast<double>(maxBitRate - minBitRate);
+		sf_command(m_sndfile, SFC_SET_COMPRESSION_LEVEL, &compressionLevel, sizeof(double));
+	}
 }
 
 void AudioFile::read(InterleavedBufferView<float> dst)
