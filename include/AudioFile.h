@@ -27,8 +27,8 @@
 
 #include <filesystem>
 
+#include "AudioFileFormats.h"
 #include "OutputSettings.h"
-#include "ProjectRenderer.h"
 #include "AudioBufferView.h"
 
 namespace lmms {
@@ -37,7 +37,7 @@ class AudioFile
 public:
 	explicit AudioFile(std::filesystem::path path);
 
-	AudioFile(std::filesystem::path path, ProjectRenderer::ExportFileFormat format, OutputSettings settings);
+	AudioFile(std::filesystem::path path, AudioFileFormat format, OutputSettings settings);
 
     ~AudioFile();
 

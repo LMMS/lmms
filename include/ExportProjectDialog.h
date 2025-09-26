@@ -28,10 +28,9 @@
 
 #include <QDialog>
 #include <memory>
-#include "ui_export_project.h"
 
-#include "ProjectRenderer.h"
 #include "RenderManager.h"
+#include "ui_export_project.h"
 
 namespace lmms::gui
 {
@@ -62,7 +61,7 @@ private:
 	QString m_fileExtension;
 	bool m_multiExport;
 
-	ProjectRenderer::ExportFileFormat m_ft;
+	AudioFileFormat m_ft;
 	std::unique_ptr<RenderManager> m_renderManager;
 } ;
 

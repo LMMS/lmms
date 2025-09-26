@@ -38,55 +38,40 @@
 namespace lmms
 {
 
+const std::array<ProjectRenderer::FileEncodeDevice, 5> ProjectRenderer::fileEncodeDevices{
 
-const std::array<ProjectRenderer::FileEncodeDevice, 5> ProjectRenderer::fileEncodeDevices
-{
-
-	FileEncodeDevice{ ProjectRenderer::ExportFileFormat::Wave,
-		QT_TRANSLATE_NOOP( "ProjectRenderer", "WAV (*.wav)" ),
-					".wav", &AudioFileWave::getInst },
-	FileEncodeDevice{ ProjectRenderer::ExportFileFormat::Flac,
-		QT_TRANSLATE_NOOP("ProjectRenderer", "FLAC (*.flac)"),
-		".flac",
-		&AudioFileFlac::getInst
-	},
-	FileEncodeDevice{ ProjectRenderer::ExportFileFormat::Ogg,
-		QT_TRANSLATE_NOOP( "ProjectRenderer", "OGG (*.ogg)" ),
-					".ogg",
+	FileEncodeDevice{
+		AudioFileFormat::WAV, QT_TRANSLATE_NOOP("ProjectRenderer", "WAV (*.wav)"), ".wav", &AudioFileWave::getInst},
+	FileEncodeDevice{
+		AudioFileFormat::FLAC, QT_TRANSLATE_NOOP("ProjectRenderer", "FLAC (*.flac)"), ".flac", &AudioFileFlac::getInst},
+	FileEncodeDevice{AudioFileFormat::OGG, QT_TRANSLATE_NOOP("ProjectRenderer", "OGG (*.ogg)"), ".ogg",
 #ifdef LMMS_HAVE_OGGVORBIS
-					&AudioFileOgg::getInst
+		&AudioFileOgg::getInst
 #else
-					nullptr
+		nullptr
 #endif
-									},
-	FileEncodeDevice{ ProjectRenderer::ExportFileFormat::MP3,
-		QT_TRANSLATE_NOOP( "ProjectRenderer", "MP3 (*.mp3)" ),
-					".mp3",
+	},
+	FileEncodeDevice{AudioFileFormat::MP3, QT_TRANSLATE_NOOP("ProjectRenderer", "MP3 (*.mp3)"), ".mp3",
 #ifdef LMMS_HAVE_MP3LAME
-					&AudioFileMP3::getInst
+		&AudioFileMP3::getInst
 #else
-					nullptr
+		nullptr
 #endif
-									},
+	},
 	// Insert your own file-encoder infos here.
 	// Maybe one day the user can add own encoders inside the program.
 
-	FileEncodeDevice{ ProjectRenderer::ExportFileFormat::Count, nullptr, nullptr, nullptr }
+	FileEncodeDevice{AudioFileFormat::Count, nullptr, nullptr, nullptr}
 
-} ;
+};
 
-
-
-
-ProjectRenderer::ProjectRenderer( const AudioEngine::qualitySettings & qualitySettings,
-					const OutputSettings & outputSettings,
-					ExportFileFormat exportFileFormat,
-					const QString & outputFilename ) :
-	QThread( Engine::audioEngine() ),
-	m_fileDev( nullptr ),
-	m_qualitySettings( qualitySettings ),
-	m_progress( 0 ),
-	m_abort( false )
+ProjectRenderer::ProjectRenderer(const AudioEngine::qualitySettings& qualitySettings,
+	const OutputSettings& outputSettings, AudioFileFormat exportFileFormat, const QString& outputFilename)
+	: QThread(Engine::audioEngine())
+	, m_fileDev(nullptr)
+	, m_qualitySettings(qualitySettings)
+	, m_progress(0)
+	, m_abort(false)
 {
 	AudioFileDeviceInstantiaton audioEncoderFactory = fileEncodeDevices[static_cast<std::size_t>(exportFileFormat)].m_getDevInst;
 
@@ -110,11 +95,11 @@ ProjectRenderer::ProjectRenderer( const AudioEngine::qualitySettings & qualitySe
 
 // Little help function for getting file format from a file extension
 // (only for registered file-encoders).
-ProjectRenderer::ExportFileFormat ProjectRenderer::getFileFormatFromExtension(
+AudioFileFormat ProjectRenderer::getFileFormatFromExtension(
 							const QString & _ext )
 {
 	int idx = 0;
-	while( fileEncodeDevices[idx].m_fileFormat != ExportFileFormat::Count )
+	while (fileEncodeDevices[idx].m_fileFormat != AudioFileFormat::Count)
 	{
 		if( QString( fileEncodeDevices[idx].m_extension ) == _ext )
 		{
@@ -123,14 +108,10 @@ ProjectRenderer::ExportFileFormat ProjectRenderer::getFileFormatFromExtension(
 		++idx;
 	}
 
-	return( ExportFileFormat::Wave ); // Default.
+	return AudioFileFormat::WAV; // Default.
 }
 
-
-
-
-QString ProjectRenderer::getFileExtensionFromFormat(
-		ExportFileFormat fmt )
+QString ProjectRenderer::getFileExtensionFromFormat(AudioFileFormat fmt)
 {
 	return fileEncodeDevices[static_cast<std::size_t>(fmt)].m_extension;
 }

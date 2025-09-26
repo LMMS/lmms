@@ -1447,7 +1447,7 @@ void MainWindow::exportProject(bool multiExport)
 		efd.setFileMode( FileDialog::AnyFile );
 		int idx = 0;
 		QStringList types;
-		while( ProjectRenderer::fileEncodeDevices[idx].m_fileFormat != ProjectRenderer::ExportFileFormat::Count)
+		while (idx != static_cast<int>(AudioFileFormat::Count))
 		{
 			if(ProjectRenderer::fileEncodeDevices[idx].isAvailable()) {
 				types << tr(ProjectRenderer::fileEncodeDevices[idx].m_description);

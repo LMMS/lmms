@@ -38,7 +38,7 @@ SNDFILE* openAudioFile(std::filesystem::path path, int mode, SF_INFO* sfinfo)
 #endif
 }
 
-SF_INFO sfInfoFromOutputSettings(ProjectRenderer::ExportFileFormat format, OutputSettings settings)
+SF_INFO sfInfoFromOutputSettings(AudioFileFormat format, OutputSettings settings)
 {
     auto sfFormat = 0;
     auto sfBitDepth = 0;
@@ -59,16 +59,16 @@ SF_INFO sfInfoFromOutputSettings(ProjectRenderer::ExportFileFormat format, Outpu
 
 	switch (format)
     {
-	case ProjectRenderer::ExportFileFormat::Wave:
+	case AudioFileFormat::WAV:
         sfFormat = SF_FORMAT_WAV | sfBitDepth;
         break;
-	case ProjectRenderer::ExportFileFormat::Flac:
+	case AudioFileFormat::FLAC:
         sfFormat = SF_FORMAT_FLAC | sfBitDepth;
         break;
-	case ProjectRenderer::ExportFileFormat::Ogg:
+	case AudioFileFormat::OGG:
         sfFormat = SF_FORMAT_OGG | SF_FORMAT_VORBIS;
         break;
-	case ProjectRenderer::ExportFileFormat::MP3:
+	case AudioFileFormat::MP3:
         sfFormat = SF_FORMAT_MPEG | SF_FORMAT_MPEG_LAYER_III;
         break;
     default:
@@ -95,7 +95,7 @@ namespace lmms {
 struct AudioFile::Impl
 {
 	Impl(std::filesystem::path path);
-	Impl(std::filesystem::path path, ProjectRenderer::ExportFileFormat format, OutputSettings settings);
+	Impl(std::filesystem::path path, AudioFileFormat format, OutputSettings settings);
 	SF_INFO m_info;
 	SNDFILE* m_sndfile;
 	std::filesystem::path m_path;
@@ -110,7 +110,7 @@ AudioFile::AudioFile(std::filesystem::path path)
 	}
 }
 
-AudioFile::AudioFile(std::filesystem::path path, ProjectRenderer::ExportFileFormat format, OutputSettings settings)
+AudioFile::AudioFile(std::filesystem::path path, AudioFileFormat format, OutputSettings settings)
 	: m_impl(std::make_unique<Impl>(path, format, settings))
 {
     if (!m_impl->m_sndfile)
@@ -128,7 +128,7 @@ AudioFile::Impl::Impl(std::filesystem::path path)
 {
 }
 
-AudioFile::Impl::Impl(std::filesystem::path path, ProjectRenderer::ExportFileFormat format, OutputSettings settings)
+AudioFile::Impl::Impl(std::filesystem::path path, AudioFileFormat format, OutputSettings settings)
 	: m_info(sfInfoFromOutputSettings(format, settings))
 	, m_sndfile(openAudioFile(path, SFM_WRITE, &m_info))
 	, m_path(path)

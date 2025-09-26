@@ -231,25 +231,23 @@ void ExportProjectDialog::onFileFormatChanged(int index)
 	// and adjust the UI properly.
 	QVariant format_tag = fileFormatCB->itemData(index);
 	bool successful_conversion = false;
-	auto exportFormat = static_cast<ProjectRenderer::ExportFileFormat>(
-		format_tag.toInt(&successful_conversion)
-	);
+	auto exportFormat = static_cast<AudioFileFormat>(format_tag.toInt(&successful_conversion));
 	Q_ASSERT(successful_conversion);
 
-	bool stereoModeVisible = (exportFormat == ProjectRenderer::ExportFileFormat::MP3);
+	bool stereoModeVisible = (exportFormat == AudioFileFormat::MP3);
 
-	bool sampleRateControlsVisible = (exportFormat != ProjectRenderer::ExportFileFormat::MP3);
+	bool sampleRateControlsVisible = (exportFormat != AudioFileFormat::MP3);
 
 	bool bitRateControlsEnabled =
-			(exportFormat == ProjectRenderer::ExportFileFormat::Ogg ||
-			 exportFormat == ProjectRenderer::ExportFileFormat::MP3);
+			(exportFormat == AudioFileFormat::OGG ||
+			 exportFormat == AudioFileFormat::MP3);
 
 	bool bitDepthControlEnabled =
-			(exportFormat == ProjectRenderer::ExportFileFormat::Wave ||
-			 exportFormat == ProjectRenderer::ExportFileFormat::Flac);
+			(exportFormat == AudioFileFormat::WAV ||
+			 exportFormat == AudioFileFormat::FLAC);
 
 #ifdef LMMS_HAVE_SF_COMPLEVEL
-	bool compressionLevelVisible = (exportFormat == ProjectRenderer::ExportFileFormat::Flac);
+	bool compressionLevelVisible = (exportFormat == AudioFileFormat::FLAC);
 	compressionWidget->setVisible(compressionLevelVisible);
 #endif
 
@@ -263,14 +261,12 @@ void ExportProjectDialog::onFileFormatChanged(int index)
 
 void ExportProjectDialog::startBtnClicked()
 {
-	m_ft = ProjectRenderer::ExportFileFormat::Count;
+	m_ft = AudioFileFormat::Count;
 
 	// Get file format from current menu selection.
 	bool successful_conversion = false;
 	QVariant tag = fileFormatCB->itemData(fileFormatCB->currentIndex());
-	m_ft = static_cast<ProjectRenderer::ExportFileFormat>(
-			tag.toInt(&successful_conversion)
-	);
+	m_ft = static_cast<AudioFileFormat>(tag.toInt(&successful_conversion));
 
 	if( !successful_conversion )
 	{
