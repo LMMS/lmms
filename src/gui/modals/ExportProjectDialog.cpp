@@ -56,28 +56,20 @@ ExportProjectDialog::ExportProjectDialog( const QString & _file_name,
 	}
 
 	int cbIndex = 0;
-	for (auto i = std::size_t{0}; i < ProjectRenderer::NumFileFormats; ++i)
+	for (auto i = std::size_t{0}; i < static_cast<std::size_t>(AudioFileFormat::Count); ++i)
 	{
-		if( ProjectRenderer::fileEncodeDevices[i].isAvailable() )
-		{
-			// Get the extension of this format.
-			QString renderExt = ProjectRenderer::fileEncodeDevices[i].m_extension;
+		// Get the name and extension of this format.
+		QString ext = AudioFileFormats[i].extension.data();
+		QString name = AudioFileFormats[i].name.data();
 
-			// Add to combo box.
-			fileFormatCB->addItem( ProjectRenderer::tr(
-				ProjectRenderer::fileEncodeDevices[i].m_description ),
-				QVariant( static_cast<int>(ProjectRenderer::fileEncodeDevices[i].m_fileFormat) ) // Format tag; later used for identification.
-			);
+		// Add to combo box.
+		fileFormatCB->addItem(QString{"%1 (*%2)"}.arg(name, ext),
+			QVariant(static_cast<int>(i))); // Format tag; later used for identification.
 
-			// If this is our extension, select it.
-			if( QString::compare( renderExt, fileExt,
-									Qt::CaseInsensitive ) == 0 )
-			{
-				fileFormatCB->setCurrentIndex( cbIndex );
-			}
+		// If this is our extension, select it.
+		if (QString::compare(ext, fileExt, Qt::CaseInsensitive) == 0) { fileFormatCB->setCurrentIndex(cbIndex); }
 
-			cbIndex++;
-		}
+		cbIndex++;
 	}
 
 	int const MAX_LEVEL=8;
@@ -279,11 +271,11 @@ void ExportProjectDialog::startBtnClicked()
 	}
 
 	// Find proper file extension.
-	for (auto i = std::size_t{0}; i < ProjectRenderer::NumFileFormats; ++i)
+	for (auto i = std::size_t{0}; i < static_cast<std::size_t>(AudioFileFormat::Count); ++i)
 	{
-		if (m_ft == ProjectRenderer::fileEncodeDevices[i].m_fileFormat)
+		if (m_ft == AudioFileFormats[i].format)
 		{
-			m_fileExtension = QString( QLatin1String( ProjectRenderer::fileEncodeDevices[i].m_extension ) );
+			m_fileExtension = QString(QLatin1String(AudioFileFormats[i].extension.data()));
 			break;
 		}
 	}

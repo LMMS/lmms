@@ -59,6 +59,8 @@ public:
 
     auto sampleRate() const -> sample_rate_t;
 
+    auto path() const -> std::filesystem::path;
+
 private:
     struct Impl;
     std::unique_ptr<Impl> m_impl;

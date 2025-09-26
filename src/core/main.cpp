@@ -769,10 +769,9 @@ int main( int argc, char * * argv )
 
 		// when rendering multiple tracks, renderOut is a directory
 		// otherwise, it is a file, so we need to append the file extension
-		if ( !renderTracks )
+		if (!renderTracks)
 		{
-			renderOut = baseName( renderOut ) +
-				ProjectRenderer::getFileExtensionFromFormat(eff);
+			renderOut = baseName(renderOut) + AudioFileFormats[static_cast<int>(eff)].extension.data();
 		}
 
 		if (auto file = QFile{renderOut}; !renderTracks && !file.open(QFile::WriteOnly | QFile::Truncate))
