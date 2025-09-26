@@ -158,14 +158,6 @@ public:
 		return m_audioDevStartFailed;
 	}
 
-	//! Set new audio device. Old device will be deleted,
-	//! unless it's stored using storeAudioDevice
-	void setAudioDevice( AudioDevice * _dev,
-				const struct qualitySettings & _qs,
-				bool _needs_fifo,
-				bool startNow );
-	void storeAudioDevice();
-	void restoreAudioDevice();
 	inline AudioDevice * audioDev()
 	{
 		return m_audioDev;
@@ -395,9 +387,7 @@ private:
 	float m_masterGain;
 
 	// audio device stuff
-	void doSetAudioDevice( AudioDevice *_dev );
 	AudioDevice * m_audioDev;
-	AudioDevice * m_oldAudioDev;
 	QString m_audioDevName;
 	bool m_audioDevStartFailed;
 
