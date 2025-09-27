@@ -138,13 +138,39 @@ AudioFile::Impl::Impl(std::filesystem::path path, AudioFileFormat format, Output
 		auto compressionLevel = settings.getCompressionLevel();
 		sf_command(m_sndfile, SFC_SET_COMPRESSION_LEVEL, &compressionLevel, sizeof(int));
 	}
-	else if (format == AudioFileFormat::MP3 || format == AudioFileFormat::OGG)
+	else if (format == AudioFileFormat::MP3)
 	{
 		constexpr auto minBitRate = 32;
 		constexpr auto maxBitRate = 320;
 		const auto targetBitRate = settings.bitrate();
 
 		auto compressionLevel = (maxBitRate - targetBitRate) / static_cast<double>(maxBitRate - minBitRate);
+		sf_command(m_sndfile, SFC_SET_COMPRESSION_LEVEL, &compressionLevel, sizeof(double));
+	}
+	else if (format == AudioFileFormat::OGG)
+	{
+		assert(m_info.channels == 1 || m_info.channels == 2 && "invalid channel count");
+
+		constexpr auto monoBitrateTargets = std::array<double, 12>{
+			32000., 48000., 60000., 70000., 80000., 86000., 96000., 110000., 120000., 140000., 160000., 240001.};
+
+		constexpr auto stereoBitrateTargets = std::array<double, 12>{
+			22500., 32000., 40000., 48000., 56000., 64000., 80000., 96000., 112000., 128000., 160000., 250001.};
+
+		const auto& bitrateTargets = m_info.channels == 1 ? monoBitrateTargets : stereoBitrateTargets;
+		const auto bitrateTargetIt = std::lower_bound(bitrateTargets.begin(), bitrateTargets.end(), settings.bitrate() * 1000);
+		assert(bitrateTargetIt != bitrateTargets.end() && "invalid bitrate");
+
+		const auto upperIndex = std::distance(bitrateTargets.begin(), bitrateTargetIt);
+		const auto lowerIndex = upperIndex == 0 ? 0 : upperIndex - 1;
+
+		const auto bitrateLow = bitrateTargets[lowerIndex];
+		const auto bitrateHigh = bitrateTargets[upperIndex];
+		const auto bitrateFractionalIndex = (settings.bitrate() * 1000 - bitrateLow) / (bitrateHigh - bitrateLow);
+		const auto bitrateIndex = lowerIndex + bitrateFractionalIndex;
+
+		const auto qualityLevel = 1.1 / static_cast<double>(bitrateTargets.size() - 1) * bitrateIndex - .1;
+		auto compressionLevel = std::clamp(1 - qualityLevel, 0., 1.);
 		sf_command(m_sndfile, SFC_SET_COMPRESSION_LEVEL, &compressionLevel, sizeof(double));
 	}
 }
