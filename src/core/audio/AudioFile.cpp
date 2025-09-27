@@ -106,7 +106,7 @@ AudioFile::AudioFile(std::filesystem::path path)
 {
 	if (!m_impl->m_sndfile)
 	{
-		throw std::runtime_error{"failed to construct audio file: " + std::string{sf_strerror(m_impl->m_sndfile)}};
+		throw std::runtime_error{"failed to open audio file: " + std::string{sf_strerror(m_impl->m_sndfile)}};
 	}
 }
 
@@ -115,7 +115,7 @@ AudioFile::AudioFile(std::filesystem::path path, AudioFileFormat format, OutputS
 {
     if (!m_impl->m_sndfile)
 	{
-		throw std::runtime_error{"failed to construct audio file: " + std::string{sf_strerror(m_impl->m_sndfile)}};
+		throw std::runtime_error{"failed to open audio file: " + std::string{sf_strerror(m_impl->m_sndfile)}};
 	}
 }
 
