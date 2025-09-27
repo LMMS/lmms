@@ -32,9 +32,9 @@ using namespace lmms;
 SNDFILE* openAudioFile(const std::filesystem::path& path, int mode, SF_INFO* sfinfo)
 {
 #ifdef LMMS_BUILD_WIN32
-	return sf_wchar_open(path.wstring().c_str(), mode, sfinfo);
+	return sf_wchar_open(path.c_str(), mode, sfinfo);
 #else
-	return sf_open(path.string().c_str(), mode, sfinfo);
+	return sf_open(path.c_str(), mode, sfinfo);
 #endif
 }
 
