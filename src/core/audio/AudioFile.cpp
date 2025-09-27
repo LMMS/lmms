@@ -29,7 +29,7 @@
 namespace {
 using namespace lmms;
 
-SNDFILE* openAudioFile(std::filesystem::path path, int mode, SF_INFO* sfinfo)
+SNDFILE* openAudioFile(const std::filesystem::path& path, int mode, SF_INFO* sfinfo)
 {
 #ifdef LMMS_BUILD_WIN32
 	return sf_wchar_open(path.wstring().c_str(), mode, sfinfo);
@@ -102,7 +102,7 @@ struct AudioFile::Impl
 };
 
 AudioFile::AudioFile(std::filesystem::path path)
-	: m_impl(std::make_unique<Impl>(path))
+	: m_impl(std::make_unique<Impl>(std::move(path)))
 {
 	if (!m_impl->m_sndfile)
 	{
@@ -111,7 +111,7 @@ AudioFile::AudioFile(std::filesystem::path path)
 }
 
 AudioFile::AudioFile(std::filesystem::path path, AudioFileFormat format, OutputSettings settings)
-	: m_impl(std::make_unique<Impl>(path, format, settings))
+	: m_impl(std::make_unique<Impl>(std::move(path), format, settings))
 {
     if (!m_impl->m_sndfile)
 	{
@@ -124,14 +124,14 @@ AudioFile::~AudioFile() = default;
 AudioFile::Impl::Impl(std::filesystem::path path)
 	: m_info()
 	, m_sndfile(openAudioFile(path, SFM_READ, &m_info))
-	, m_path(path)
+	, m_path(std::move(path))
 {
 }
 
 AudioFile::Impl::Impl(std::filesystem::path path, AudioFileFormat format, OutputSettings settings)
 	: m_info(sfInfoFromOutputSettings(format, settings))
 	, m_sndfile(openAudioFile(path, SFM_WRITE, &m_info))
-	, m_path(path)
+	, m_path(std::move(path))
 {
 	if (format == AudioFileFormat::FLAC)
 	{
