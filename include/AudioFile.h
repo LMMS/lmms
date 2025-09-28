@@ -99,7 +99,7 @@ public:
 	auto sampleRate() const -> sample_rate_t;
 
     //! @returns the path to the audio file.
-	auto path() const -> std::filesystem::path;
+	auto path() const -> const std::filesystem::path&;
 
 private:
 	struct Impl;

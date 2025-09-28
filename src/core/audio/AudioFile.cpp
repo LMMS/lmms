@@ -202,7 +202,7 @@ auto AudioFile::sampleRate() const -> sample_rate_t
 	return m_impl->m_info.samplerate;
 }
 
-auto AudioFile::path() const -> std::filesystem::path
+auto AudioFile::path() const -> const std::filesystem::path&
 {
 	return m_impl->m_path;
 }
