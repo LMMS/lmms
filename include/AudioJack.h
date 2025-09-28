@@ -103,12 +103,12 @@ private:
 	bool initJackClient();
 	void resizeInputBuffer(jack_nframes_t nframes);
 
+	void startProcessingImpl() override;
+	void stopProcessingImpl() override;
+
 	void attemptToConnect(size_t index, const char *lmms_port_type, const char *source_port, const char *destination_port);
 	void attemptToReconnectOutput(size_t outputIndex, const QString& targetPort);
 	void attemptToReconnectInput(size_t inputIndex, const QString& sourcePort);
-
-	void startProcessing() override;
-	void stopProcessing() override;
 
 	void registerPort(AudioBusHandle* port) override;
 	void unregisterPort(AudioBusHandle* port) override;
@@ -122,14 +122,12 @@ private:
 	jack_client_t* m_client;
 
 	bool m_active;
-	std::atomic<bool> m_stopped;
 
 	std::atomic<MidiJack*> m_midiClient;
 	std::vector<jack_port_t*> m_outputPorts;
 	std::vector<jack_port_t*> m_inputPorts;
 	jack_default_audio_sample_t** m_tempOutBufs;
 	std::vector<SampleFrame> m_inputFrameBuffer;
-	SampleFrame* m_outBuf;
 
 	f_cnt_t m_framesDoneInCurBuf;
 	f_cnt_t m_framesToDoInCurBuf;

@@ -57,10 +57,8 @@ public:
 					 outputFilename, audioEngine );
 	}
 
-protected:
-	void writeBuffer(const SampleFrame* /* _buf*/, const fpp_t /*_frames*/) override;
-
 private:
+	void writeBuffer(const SampleFrame* /* _buf*/, const fpp_t /*_frames*/) override;
 	void flushRemainingBuffers();
 	bool initEncoder();
 	void tearDownEncoder();
