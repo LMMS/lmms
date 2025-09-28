@@ -68,6 +68,9 @@ SF_INFO sfInfoFromOutputSettings(AudioFileFormat format, OutputSettings settings
 	case AudioFileFormat::OGG:
         sfFormat = SF_FORMAT_OGG | SF_FORMAT_VORBIS;
         break;
+	case AudioFileFormat::OPUS:
+		sfFormat = SF_FORMAT_OGG | SF_FORMAT_OPUS;
+		break;
 	case AudioFileFormat::MP3:
         sfFormat = SF_FORMAT_MPEG | SF_FORMAT_MPEG_LAYER_III;
         break;
