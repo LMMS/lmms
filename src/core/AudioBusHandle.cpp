@@ -23,9 +23,11 @@
  *
  */
 
+#include "AudioBusHandle.h"
+
 #include <QMutexLocker>
 
-#include "AudioBusHandle.h"
+#include "AudioBus.h"
 #include "AudioDevice.h"
 #include "AudioEngine.h"
 #include "EffectChain.h"
@@ -42,6 +44,7 @@ AudioBusHandle::AudioBusHandle(const QString& name, bool hasEffectChain,
 	BoolModel* mutedModel) :
 	m_bufferUsage(false),
 	m_buffer(BufferManager::acquire()),
+	m_bus(&m_buffer, 1, Engine::audioEngine()->framesPerPeriod()),
 	m_extOutputEnabled(false),
 	m_nextMixerChannel(0),
 	m_name(name),
@@ -50,6 +53,9 @@ AudioBusHandle::AudioBusHandle(const QString& name, bool hasEffectChain,
 	m_panningModel(panningModel),
 	m_mutedModel(mutedModel)
 {
+	// Mark all track channels as quiet
+	m_bus.quietChannels().set();
+
 	Engine::audioEngine()->addAudioBusHandle(this);
 	setExtOutputEnabled(true);
 }
@@ -99,7 +105,7 @@ bool AudioBusHandle::processEffects()
 {
 	if (m_effects)
 	{
-		bool more = m_effects->processAudioBuffer(m_buffer, Engine::audioEngine()->framesPerPeriod(), m_bufferUsage);
+		bool more = m_effects->processAudioBuffer(m_bus);
 		return more;
 	}
 	return false;
@@ -116,7 +122,7 @@ void AudioBusHandle::doProcessing()
 	const fpp_t fpp = Engine::audioEngine()->framesPerPeriod();
 
 	// clear the buffer
-	zeroSampleFrames(m_buffer, fpp);
+	m_bus.silenceAllChannels();
 
 	//qDebug( "Playhandles: %d", m_playHandles.size() );
 	for (PlayHandle* ph : m_playHandles) // now we mix all playhandle buffers into our internal buffer
@@ -219,6 +225,11 @@ void AudioBusHandle::doProcessing()
 				}
 			}
 		}
+
+		m_bus.sanitizeAll();
+
+		// Update silence status of track channels for instrument output
+		m_bus.updateAll();
 	}
 	// as of now there's no situation where we only have panning model but no volume model
 	// if we have neither, we don't have to do anything here - just pass the audio as is
@@ -227,8 +238,8 @@ void AudioBusHandle::doProcessing()
 	const bool anyOutputAfterEffects = processEffects();
 	if (anyOutputAfterEffects || m_bufferUsage)
 	{
-		Engine::mixer()->mixToChannel(m_buffer, m_nextMixerChannel);	// send output to mixer
-																		// TODO: improve the flow here - convert to pull model
+		// TODO: improve the flow here - convert to pull model
+		Engine::mixer()->mixToChannel(m_bus, m_nextMixerChannel); // send output to mixer
 		m_bufferUsage = false;
 	}
 }

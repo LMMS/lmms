@@ -30,6 +30,7 @@
 #include <QString>
 #include <QMutex>
 
+#include "AudioBus.h"
 #include "PlayHandle.h"
 
 namespace lmms
@@ -86,6 +87,7 @@ private:
 	volatile bool m_bufferUsage;
 
 	SampleFrame* const m_buffer;
+	AudioBus m_bus;
 
 	bool m_extOutputEnabled;
 	mix_ch_t m_nextMixerChannel;
