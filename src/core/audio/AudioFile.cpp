@@ -75,7 +75,7 @@ SF_INFO sfInfoFromOutputSettings(AudioFileFormat format, OutputSettings settings
         sfFormat = SF_FORMAT_MPEG | SF_FORMAT_MPEG_LAYER_III;
         break;
     default:
-        return SF_INFO{};
+		break;
 	}
 
     switch (settings.getStereoMode())
