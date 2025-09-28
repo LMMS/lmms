@@ -77,8 +77,6 @@ class LMMS_EXPORT AutomatableModel : public Model, public JournallingObject
 {
 	Q_OBJECT
 public:
-	using AutoModelVector = std::vector<AutomatableModel*>;
-
 	enum class ScaleType
 	{
 		Linear,
@@ -150,22 +148,26 @@ public:
 	template<class T>
 	inline T value( int frameOffset = 0 ) const
 	{
-		if (m_controllerConnection)
+		// TODO
+		// The `m_value` should only be updated whenever the Controller value changes,
+		// instead of the Model calling `controller->currentValue()` every time.
+		// This becomes even worse in the case of linked Models, where it has to
+		// loop through the list of all links.
+
+		if (m_useControllerValue)
 		{
-			if (!m_useControllerValue)
-			{
-				return castValue<T>(m_value);
-			}
-			else
+			if (m_controllerConnection)
 			{
 				return castValue<T>(controllerValue(frameOffset));
 			}
+			for (auto next = m_nextLink; next != this; next = next->m_nextLink)
+			{
+				if (next->controllerConnection() && next->useControllerValue())
+				{
+					return castValue<T>(fittedValue(next->controllerValue(frameOffset)));
+				}
+			}
 		}
-		else if (hasLinkedModels())
-		{
-			return castValue<T>( controllerValue( frameOffset ) );
-		}
-
 		return castValue<T>( m_value );
 	}
 
@@ -211,8 +213,7 @@ public:
 
 	void setInitValue( const float value );
 
-	void setAutomatedValue( const float value );
-	void setValue( const float value );
+	void setValue(const float value, const bool isAutomated = false);
 
 	void incValue( int steps )
 	{
@@ -249,11 +250,10 @@ public:
 		m_centerValue = centerVal;
 	}
 
-	//! link @p m1 and @p m2, let @p m1 take the values of @p m2
-	static void linkModels( AutomatableModel* m1, AutomatableModel* m2 );
-	static void unlinkModels( AutomatableModel* m1, AutomatableModel* m2 );
-
-	void unlinkAllModels();
+	//! link this to @p model, copying the value from @p model
+	void linkToModel(AutomatableModel* model);
+	//! @return number of other models linked to this
+	size_t countLinks() const;
 
 	/**
 	 * @brief Saves settings (value, automation links and controller connections) of AutomatableModel into
@@ -276,9 +276,9 @@ public:
 
 	virtual QString displayValue( const float val ) const = 0;
 
-	bool hasLinkedModels() const
+	bool isLinked() const
 	{
-		return !m_linkedModels.empty();
+		return m_nextLink != this;
 	}
 
 	// a way to track changed values in the model and avoid using signals/slots - useful for speed-critical code.
@@ -311,13 +311,14 @@ public:
 		s_periodCounter = 0;
 	}
 
-	bool useControllerValue()
+	bool useControllerValue() const
 	{
 		return m_useControllerValue;
 	}
 
 public slots:
 	virtual void reset();
+	void unlink();
 	void unlinkControllerConnection();
 	void setUseControllerValue(bool b = true);
 
@@ -367,9 +368,15 @@ private:
 		loadSettings( element, "value" );
 	}
 
-	void linkModel( AutomatableModel* model );
-	void unlinkModel( AutomatableModel* model );
+	void setValueInternal(const float value);
 
+	//! linking is stored in a linked list ring
+	//! @return the model whose `m_nextLink` is `this`,
+	//! or `this` if there are no linked models
+	AutomatableModel* getLastLinkedModel() const;
+	//! @return true if the `model` is in the linked list
+	bool isLinkedToModel(AutomatableModel* model) const;
+	
 	//! @brief Scales @value from linear to logarithmic.
 	//! Value should be within [0,1]
 	template<class T> T logToLinearScale( T value ) const;
@@ -389,16 +396,15 @@ private:
 	float m_centerValue;
 
 	bool m_valueChanged;
-
-	// currently unused?
-	float m_oldValue;
-	int m_setValueDepth;
+	float m_oldValue; //!< used by valueBuffer for interpolation
 
 	// used to determine if step size should be applied strictly (ie. always)
 	// or only when value set from gui (default)
 	bool m_hasStrictStepSize;
 
-	AutoModelVector m_linkedModels;
+	//! an `AutomatableModel` can be linked together with others in a linked list
+	//! the list has no end, the last model is connected to the first forming a ring
+	AutomatableModel* m_nextLink;
 
 
 	//! NULL if not appended to controller, otherwise connection info
