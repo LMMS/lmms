@@ -27,6 +27,7 @@
 #include <QDomElement>
 #include <cassert>
 
+#include "AudioBus.h"
 #include "EffectChain.h"
 #include "Effect.h"
 #include "DummyEffect.h"
@@ -184,42 +185,22 @@ void EffectChain::moveUp( Effect * _effect )
 
 
 
-bool EffectChain::processAudioBuffer( SampleFrame* _buf, const fpp_t _frames, bool hasInputNoise )
+bool EffectChain::processAudioBuffer(AudioBus& bus)
 {
 	if( m_enabledModel.value() == false )
 	{
 		return false;
 	}
 
-	MixHelpers::sanitize( _buf, _frames );
+	bus.sanitizeAll();
 
 	bool moreEffects = false;
-	for (const auto& effect : m_effects)
+	for (Effect* effect : m_effects)
 	{
-		if (hasInputNoise || effect->isRunning())
-		{
-			moreEffects |= effect->processAudioBuffer(_buf, _frames);
-			MixHelpers::sanitize(_buf, _frames);
-		}
+		moreEffects |= effect->processCore(bus);
 	}
 
 	return moreEffects;
-}
-
-
-
-
-void EffectChain::startRunning()
-{
-	if( m_enabledModel.value() == false )
-	{
-		return;
-	}
-
-	for (const auto& effect : m_effects)
-	{
-		effect->startRunning();
-	}
 }
 
 

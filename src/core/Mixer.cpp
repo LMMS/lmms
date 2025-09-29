@@ -64,6 +64,7 @@ MixerChannel::MixerChannel( int idx, Model * _parent ) :
 	m_peakLeft( 0.0f ),
 	m_peakRight( 0.0f ),
 	m_buffer( new SampleFrame[Engine::audioEngine()->framesPerPeriod()] ),
+	m_bus(&m_buffer, 1, Engine::audioEngine()->framesPerPeriod()),
 	m_muteModel( false, _parent ),
 	m_soloModel( false, _parent ),
 	m_volumeModel(1.f, 0.f, 2.f, 0.001f, _parent),
@@ -73,7 +74,7 @@ MixerChannel::MixerChannel( int idx, Model * _parent ) :
 	m_dependenciesMet(0),
 	m_channelIndex(idx)
 {
-	zeroSampleFrames(m_buffer, Engine::audioEngine()->framesPerPeriod());
+	m_bus.silenceAllChannels();
 }
 
 
@@ -202,6 +203,7 @@ void MixerChannel::doProcessing()
 					const float v = sender->m_volumeModel.value();
 					MixHelpers::addSanitizedMultipliedByBuffer( m_buffer, ch_buf, v, sendBuf, fpp );
 				}
+				m_bus.quietChannels() &= sender->m_bus.quietChannels(); // mix silence status
 				m_hasInput = true;
 			}
 		}
@@ -209,13 +211,7 @@ void MixerChannel::doProcessing()
 
 		const float v = m_volumeModel.value();
 
-		if( m_hasInput )
-		{
-			// only start fxchain when we have input...
-			m_fxChain.startRunning();
-		}
-
-		m_stillRunning = m_fxChain.processAudioBuffer( m_buffer, fpp, m_hasInput );
+		m_stillRunning = m_fxChain.processAudioBuffer(m_bus);
 
 		SampleFrame peakSamples = getAbsPeakValues(m_buffer, fpp);
 		m_peakLeft = std::max(m_peakLeft, peakSamples[0] * v);
@@ -642,14 +638,18 @@ FloatModel * Mixer::channelSendModel( mix_ch_t fromChannel, mix_ch_t toChannel )
 
 
 
-void Mixer::mixToChannel( const SampleFrame* _buf, mix_ch_t _ch )
+void Mixer::mixToChannel(const AudioBus& bus, mix_ch_t channel)
 {
-	if( m_mixerChannels[_ch]->m_muteModel.value() == false )
+	auto mixerChannel = m_mixerChannels[channel];
+	if (mixerChannel->m_muteModel.value() == false)
 	{
-		m_mixerChannels[_ch]->m_lock.lock();
-		MixHelpers::add( m_mixerChannels[_ch]->m_buffer, _buf, Engine::audioEngine()->framesPerPeriod() );
-		m_mixerChannels[_ch]->m_hasInput = true;
-		m_mixerChannels[_ch]->m_lock.unlock();
+		mixerChannel->m_lock.lock();
+
+		MixHelpers::add(mixerChannel->m_bus.bus()[0], bus.bus()[0], bus.frames());
+		mixerChannel->m_bus.quietChannels() &= bus.quietChannels(); // mix silence status
+		mixerChannel->m_hasInput = true;
+
+		mixerChannel->m_lock.unlock();
 	}
 }
 
@@ -658,7 +658,7 @@ void Mixer::mixToChannel( const SampleFrame* _buf, mix_ch_t _ch )
 
 void Mixer::prepareMasterMix()
 {
-	zeroSampleFrames(m_mixerChannels[0]->m_buffer, Engine::audioEngine()->framesPerPeriod());
+	m_mixerChannels[0]->m_bus.silenceAllChannels();
 }
 
 
@@ -730,7 +730,7 @@ void Mixer::masterMix( SampleFrame* _buf )
 	// reset channel process state
 	for( int i = 0; i < numChannels(); ++i)
 	{
-		zeroSampleFrames(m_mixerChannels[i]->m_buffer, Engine::audioEngine()->framesPerPeriod());
+		m_mixerChannels[i]->m_bus.silenceAllChannels();
 		m_mixerChannels[i]->reset();
 		m_mixerChannels[i]->m_queued = false;
 		// also reset hasInput

@@ -26,14 +26,11 @@
 #ifndef LMMS_DUMMY_INSTRUMENT_H
 #define LMMS_DUMMY_INSTRUMENT_H
 
-#include "Instrument.h"
-#include "InstrumentView.h"
-#include "Engine.h"
-
 #include <cstring>
 
-#include "AudioEngine.h"
-
+#include "Instrument.h"
+#include "InstrumentView.h"
+#include "SampleFrame.h"
 
 namespace lmms
 {
@@ -43,15 +40,15 @@ class DummyInstrument : public Instrument
 {
 public:
 	DummyInstrument( InstrumentTrack * _instrument_track ) :
-		Instrument( _instrument_track, nullptr )
+		Instrument(nullptr, _instrument_track)
 	{
 	}
 
 	~DummyInstrument() override = default;
 
-	void playNote( NotePlayHandle*, SampleFrame* buffer ) override
+	void playNoteImpl(NotePlayHandle*, std::span<SampleFrame> buffer) override
 	{
-		zeroSampleFrames(buffer, Engine::audioEngine()->framesPerPeriod());
+		zeroSampleFrames(buffer.data(), buffer.size());
 	}
 
 	void saveSettings( QDomDocument &, QDomElement & ) override

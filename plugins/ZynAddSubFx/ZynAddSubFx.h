@@ -28,12 +28,15 @@
 #include <QMap>
 #include <QMutex>
 
+#include <optional>
+
 #include <globals.h>
 
+#include "AudioPlugin.h"
 #include "AutomatableModel.h"
-#include "Instrument.h"
 #include "InstrumentView.h"
 #include "RemotePlugin.h"
+#include "RemotePluginAudioPorts.h"
 
 class QPushButton;
 
@@ -51,30 +54,32 @@ class LedCheckBox;
 class ZynAddSubFxView;
 }
 
-class ZynAddSubFxRemotePlugin : public RemotePlugin
+class ZynAddSubFxRemotePlugin
+	: public RemotePlugin
 {
 	Q_OBJECT
 public:
-	ZynAddSubFxRemotePlugin();
+	ZynAddSubFxRemotePlugin(RemotePluginAudioPortsController& audioPort);
 
 	bool processMessage( const message & _m ) override;
 
-
 signals:
 	void clickedCloseButton();
-
-} ;
-
+};
 
 
-class ZynAddSubFxInstrument : public Instrument
+class ZynAddSubFxInstrument
+	: public AudioPluginExt<Instrument, AudioPortsSettings {
+			.kind = AudioDataKind::F32,
+			.interleaved = false,
+			.inputs = 0,
+			.outputs = 2
+		}, DefaultConfigurableAudioPorts>
 {
 	Q_OBJECT
 public:
 	ZynAddSubFxInstrument( InstrumentTrack * _instrument_track );
 	~ZynAddSubFxInstrument() override;
-
-	void play( SampleFrame* _working_buffer ) override;
 
 	bool handleMidiEvent( const MidiEvent& event, const TimePos& time = TimePos(), f_cnt_t offset = 0 ) override;
 
@@ -87,7 +92,6 @@ public:
 	QString nodeName() const override;
 
 	gui::PluginView* instantiateView( QWidget * _parent ) override;
-
 
 private slots:
 	void reloadPlugin();
@@ -104,12 +108,17 @@ private slots:
 
 
 private:
+	auto processImpl(PlanarBufferView<const float, 0> in, PlanarBufferView<float, 2> out) -> ProcessStatus override;
+
+	auto processLock() -> bool override;
+	void processUnlock() override;
+
 	void initPlugin();
 	void sendControlChange( MidiControllers midiCtl, float value );
 
 	bool m_hasGUI;
 	QMutex m_pluginMutex;
-	LocalZynAddSubFx * m_plugin;
+	LocalZynAddSubFx * m_localPlugin;
 	ZynAddSubFxRemotePlugin * m_remotePlugin;
 
 	FloatModel m_portamentoModel;

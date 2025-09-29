@@ -24,9 +24,13 @@
 
 #include "RemotePlugin.h"
 
-//#define DEBUG_REMOTE_PLUGIN
-#ifdef DEBUG_REMOTE_PLUGIN
-#include <QDebug>
+#include <algorithm>
+#include <iostream>
+#include <stdexcept>
+
+#ifndef SYNC_WITH_SHM_FIFO
+#include <sys/socket.h>
+#include <sys/un.h>
 #endif
 
 #ifdef LMMS_BUILD_WIN32
@@ -36,17 +40,13 @@
 #include "AudioEngine.h"
 #include "Engine.h"
 #include "MidiEvent.h"
+#include "RemotePluginAudioPorts.h"
 #include "Song.h"
 
 #include <QCoreApplication>
 #include <QDebug>
 #include <QDir>
 #include <QUuid>
-
-#ifndef SYNC_WITH_SHM_FIFO
-#include <sys/socket.h>
-#include <sys/un.h>
-#endif
 
 #ifdef LMMS_BUILD_WIN32
 
@@ -77,10 +77,10 @@ namespace lmms
 
 // simple helper thread monitoring our RemotePlugin - if process terminates
 // unexpectedly invalidate plugin so LMMS doesn't lock up
-ProcessWatcher::ProcessWatcher( RemotePlugin * _p ) :
-	QThread(),
-	m_plugin( _p ),
-	m_quit( false )
+ProcessWatcher::ProcessWatcher(RemotePlugin* plugin)
+	: QThread{}
+	, m_plugin{plugin}
+	, m_quit{false}
 {
 }
 
@@ -130,22 +130,19 @@ void ProcessWatcher::run()
 
 
 
-RemotePlugin::RemotePlugin() :
-	QObject(),
+RemotePlugin::RemotePlugin(RemotePluginAudioPortsController& audioPorts)
+	: QObject{}
 #ifdef SYNC_WITH_SHM_FIFO
-	RemotePluginBase( new shmFifo(), new shmFifo() ),
+	, RemotePluginBase{new shmFifo(), new shmFifo()}
 #else
-	RemotePluginBase(),
+	, RemotePluginBase{}
 #endif
-	m_failed( true ),
-	m_watcher( this ),
+	, m_failed{true}
+	, m_watcher{this}
 #if (QT_VERSION < QT_VERSION_CHECK(5,14,0))
-	m_commMutex(QMutex::Recursive),
+	, m_commMutex{QMutex::Recursive}
 #endif
-	m_splitChannels( false ),
-	m_audioBufferSize( 0 ),
-	m_inputCount( DEFAULT_CHANNELS ),
-	m_outputCount( DEFAULT_CHANNELS )
+	, m_audioPorts{&audioPorts}
 {
 #ifndef SYNC_WITH_SHM_FIFO
 	struct sockaddr_un sa;
@@ -176,6 +173,8 @@ RemotePlugin::RemotePlugin() :
 	}
 #endif
 
+	m_audioPorts->connectBuffers(this);
+
 	connect( &m_process, SIGNAL(finished(int,QProcess::ExitStatus)),
 		this, SLOT(processFinished(int,QProcess::ExitStatus)),
 		Qt::DirectConnection );
@@ -191,6 +190,8 @@ RemotePlugin::RemotePlugin() :
 
 RemotePlugin::~RemotePlugin()
 {
+	m_audioPorts->disconnectBuffers();
+
 	m_watcher.stop();
 	m_watcher.wait();
 
@@ -236,9 +237,11 @@ bool RemotePlugin::init(const QString &pluginExecutable,
 	}
 	QString exec = QFileInfo(QDir("plugins:"), pluginExecutable).absoluteFilePath();
 
-	// We may have received a directory via a environment variable
-	if (const char* env_path = std::getenv("LMMS_PLUGIN_DIR"))
-			exec = QFileInfo(QDir(env_path), pluginExecutable).absoluteFilePath();
+	// We may have received a directory via an environment variable
+	if (const char* envPath = std::getenv("LMMS_PLUGIN_DIR"))
+	{
+		exec = QFileInfo(QDir(envPath), pluginExecutable).absoluteFilePath();
+	}
 
 #ifdef LMMS_BUILD_APPLE
 	// search current directory first
@@ -316,12 +319,12 @@ bool RemotePlugin::init(const QString &pluginExecutable,
 #endif
 
 	sendMessage(message(IdSyncKey).addString(Engine::getSong()->syncKey()));
-	resizeSharedProcessingMemory();
 
 	if( waitForInitDoneMsg )
 	{
 		waitForInitDone();
 	}
+
 	unlock();
 
 	return failed();
@@ -330,120 +333,98 @@ bool RemotePlugin::init(const QString &pluginExecutable,
 
 
 
-bool RemotePlugin::process( const SampleFrame* _in_buf, SampleFrame* _out_buf )
+void RemotePlugin::waitForInitDone(bool busyWaiting)
 {
-	const fpp_t frames = Engine::audioEngine()->framesPerPeriod();
+	m_failed = waitForMessage(IdInitDone, busyWaiting).id != IdInitDone;
 
-	if( m_failed || !isRunning() )
+	if (!m_failed)
 	{
-		if( _out_buf != nullptr )
-		{
-			zeroSampleFrames(_out_buf, frames);
-		}
+		// Activate audio ports after remote plugin is initialized
+		m_audioPorts->activate(Engine::audioEngine()->framesPerPeriod());
+	}
+}
+
+
+
+
+bool RemotePlugin::process()
+{
+	if (m_failed || !isRunning())
+	{
+		std::ranges::fill(m_audioOutputs, 0.f);
 		return false;
 	}
 
 	if (!m_audioBuffer)
 	{
-		// m_audioBuffer being zero means we didn't initialize everything so
+		// TODO: Is the following logic still correct?
+		// m_audioBuffer being null means we didn't initialize everything so
 		// far so process one message each time (and hope we get
 		// information like SHM-key etc.) until we process messages
 		// in a later stage of this procedure
-		if( m_audioBufferSize == 0 )
+		if (m_audioBuffer.size() == 0)
 		{
 			lock();
 			fetchAndProcessAllMessages();
 			unlock();
 		}
-		if( _out_buf != nullptr )
-		{
-			zeroSampleFrames(_out_buf, frames);
-		}
+
+		std::ranges::fill(m_audioOutputs, 0.f);
 		return false;
 	}
 
-	memset( m_audioBuffer.get(), 0, m_audioBufferSize );
-
-	ch_cnt_t inputs = std::min<ch_cnt_t>(m_inputCount, DEFAULT_CHANNELS);
-
-	if( _in_buf != nullptr && inputs > 0 )
-	{
-		if( m_splitChannels )
-		{
-			for( ch_cnt_t ch = 0; ch < inputs; ++ch )
-			{
-				for( fpp_t frame = 0; frame < frames; ++frame )
-				{
-					m_audioBuffer[ch * frames + frame] =
-							_in_buf[frame][ch];
-				}
-			}
-		}
-		else if( inputs == DEFAULT_CHANNELS )
-		{
-			auto target = m_audioBuffer.get();
-			copyFromSampleFrames(target, _in_buf, frames);
-		}
-		else
-		{
-			auto o = (SampleFrame*)m_audioBuffer.get();
-			for( ch_cnt_t ch = 0; ch < inputs; ++ch )
-			{
-				for( fpp_t frame = 0; frame < frames; ++frame )
-				{
-					o[frame][ch] = _in_buf[frame][ch];
-				}
-			}
-		}
-	}
-
 	lock();
-	sendMessage( IdStartProcessing );
+	sendMessage(IdStartProcessing);
 
-	if( m_failed || _out_buf == nullptr || m_outputCount == 0 )
+	if (m_failed || m_audioOutputs.empty())
 	{
 		unlock();
 		return false;
 	}
 
-	waitForMessage( IdProcessingDone );
+	waitForMessage(IdProcessingDone);
 	unlock();
 
-	const ch_cnt_t outputs = std::min<ch_cnt_t>(m_outputCount,
-							DEFAULT_CHANNELS);
-	if( m_splitChannels )
-	{
-		for( ch_cnt_t ch = 0; ch < outputs; ++ch )
-		{
-			for( fpp_t frame = 0; frame < frames; ++frame )
-			{
-				_out_buf[frame][ch] = m_audioBuffer[( m_inputCount+ch )*
-								frames + frame];
-			}
-		}
-	}
-	else if( outputs == DEFAULT_CHANNELS )
-	{
-		auto source = m_audioBuffer.get() + m_inputCount * frames;
-		copyToSampleFrames(_out_buf, source, frames);
-	}
-	else
-	{
-		auto o = (SampleFrame*)(m_audioBuffer.get() + m_inputCount * frames);
-		// clear buffer, if plugin didn't fill up both channels
-		zeroSampleFrames(_out_buf, frames);
-
-		for (ch_cnt_t ch = 0; ch <
-				std::min<int>(DEFAULT_CHANNELS, outputs); ++ch)
-		{
-			for( fpp_t frame = 0; frame < frames; ++frame )
-			{
-				_out_buf[frame][ch] = o[frame][ch];
-			}
-		}
-	}
-
 	return true;
+}
+
+
+
+
+auto RemotePlugin::updateAudioBuffer(proc_ch_t channelsIn, proc_ch_t channelsOut, fpp_t frames) -> float*
+{
+	if (channelsIn == 0 && channelsOut == 0)
+	{
+		std::cerr << "Invalid channel count for shared audio buffer\n";
+		return nullptr;
+	}
+
+	if (channelsIn == m_channelsIn && channelsOut == m_channelsOut && frames == m_frames)
+	{
+		return m_audioBuffer.get();
+	}
+
+	try
+	{
+		m_audioOutputs = {};
+		m_audioBuffer.create((channelsIn + channelsOut) * frames);
+	}
+	catch (const std::runtime_error& error)
+	{
+		std::cerr << "Failed to allocate shared audio buffer: " << error.what() << '\n';
+		m_audioBuffer.detach();
+		return nullptr;
+	}
+
+	m_channelsIn = channelsIn;
+	m_channelsOut = channelsOut;
+	m_frames = frames;
+
+	m_audioOutputs = std::span{m_audioBuffer.get() + channelsIn * frames, channelsOut * frames};
+
+	sendMessage(message(IdChangeSharedMemoryKey).addString(m_audioBuffer.key()));
+
+	return m_audioBuffer.get();
 }
 
 
@@ -475,26 +456,6 @@ void RemotePlugin::hideUI()
 	lock();
 	sendMessage( IdHideUI );
 	unlock();
-}
-
-
-
-
-void RemotePlugin::resizeSharedProcessingMemory()
-{
-	const size_t s = (m_inputCount + m_outputCount) * Engine::audioEngine()->framesPerPeriod();
-	try
-	{
-		m_audioBuffer.create(s);
-	}
-	catch (const std::runtime_error& error)
-	{
-		qCritical() << "Failed to allocate shared audio buffer:" << error.what();
-		m_audioBuffer.detach();
-		return;
-	}
-	m_audioBufferSize = s * sizeof(float);
-	sendMessage(message(IdChangeSharedMemoryKey).addString(m_audioBuffer.key()));
 }
 
 
@@ -549,20 +510,9 @@ bool RemotePlugin::processMessage( const message & _m )
 			reply_message.addInt( Engine::audioEngine()->framesPerPeriod() );
 			break;
 
-		case IdChangeInputCount:
-			m_inputCount = _m.getInt( 0 );
-			resizeSharedProcessingMemory();
-			break;
-
-		case IdChangeOutputCount:
-			m_outputCount = _m.getInt( 0 );
-			resizeSharedProcessingMemory();
-			break;
-
 		case IdChangeInputOutputCount:
-			m_inputCount = _m.getInt( 0 );
-			m_outputCount = _m.getInt( 1 );
-			resizeSharedProcessingMemory();
+			m_audioPorts->audioPortsModel().setChannelCounts(
+				static_cast<proc_ch_t>(_m.getInt(0)), static_cast<proc_ch_t>(_m.getInt(1)));
 			break;
 
 		case IdDebugMessage:

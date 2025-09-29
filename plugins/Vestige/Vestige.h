@@ -29,8 +29,9 @@
 
 #include <QMutex>
 
-#include "Instrument.h"
+#include "AudioPlugin.h"
 #include "InstrumentView.h"
+#include "RemotePluginAudioPorts.h"
 
 
 class QGridLayout;
@@ -46,32 +47,51 @@ class VstPlugin;
 
 namespace gui
 {
-class PixmapButton;
 class CustomTextKnob;
-class VestigeInstrumentView;
 class ManageVestigeInstrumentView;
+class PixmapButton;
+class VestigeInstrumentView;
 } // namespace gui
 
 
-class VestigeInstrument : public Instrument
+inline constexpr auto VestigeSettings = AudioPortsSettings {
+	.kind = AudioDataKind::F32,
+	.interleaved = false
+};
+
+class VestigeAudioPorts final
+	: public RemotePluginAudioPorts<VestigeSettings>
+{
+public:
+	using RemotePluginAudioPorts<VestigeSettings>::RemotePluginAudioPorts;
+
+	auto channelName(proc_ch_t channel, bool isOutput) const -> QString override
+	{
+		// TODO: Support custom channel names here
+		return isOutput
+			? tr("VST Out %1").arg(channel + 1)
+			: tr("VST In %1").arg(channel + 1);
+	}
+};
+
+class VestigeInstrument
+	: public AudioPlugin<Instrument, VestigeSettings, VestigeAudioPorts>
 {
 	Q_OBJECT
 public:
 	VestigeInstrument( InstrumentTrack * _instrument_track );
-	virtual ~VestigeInstrument();
+	~VestigeInstrument() override;
 
-	virtual void play( SampleFrame* _working_buffer );
+	void saveSettings(QDomDocument& _doc, QDomElement& _parent) override;
+	void loadSettings(const QDomElement& _this) override;
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
+	QString nodeName() const override;
 
-	virtual QString nodeName() const;
+	void loadFile(const QString& _file) override;
 
-	virtual void loadFile( const QString & _file );
+	bool handleMidiEvent(const MidiEvent& event, const TimePos& time, f_cnt_t offset = 0) override;
 
-	virtual bool handleMidiEvent( const MidiEvent& event, const TimePos& time, f_cnt_t offset = 0 );
-
-	virtual gui::PluginView* instantiateView( QWidget * _parent );
+	gui::PluginView* instantiateView(QWidget* _parent) override;
 
 protected slots:
 	void setParameter( lmms::Model * action );
@@ -79,8 +99,12 @@ protected slots:
 	void reloadPlugin();
 
 private:
-	void closePlugin();
+	auto processImpl(PlanarBufferView<const float> in, PlanarBufferView<float> out) -> ProcessStatus override;
 
+	auto processLock() -> bool override;
+	void processUnlock() override;
+
+	void closePlugin();
 
 	VstPlugin * m_plugin;
 	QMutex m_pluginMutex;
@@ -106,7 +130,7 @@ class ManageVestigeInstrumentView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:
-	ManageVestigeInstrumentView( Instrument * _instrument, QWidget * _parent, VestigeInstrument * m_vi2 );
+	ManageVestigeInstrumentView( VestigeInstrument * _instrument, QWidget * _parent, VestigeInstrument * _vi2 );
 	virtual ~ManageVestigeInstrumentView();
 
 
@@ -141,7 +165,7 @@ class VestigeInstrumentView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:
-	VestigeInstrumentView( Instrument * _instrument, QWidget * _parent );
+	VestigeInstrumentView( VestigeInstrument * _instrument, QWidget * _parent );
 	virtual ~VestigeInstrumentView() = default;
 
 
@@ -181,7 +205,7 @@ private:
 	PixmapButton * m_managePluginButton;
 	PixmapButton * m_savePresetButton;
 
-	Instrument * _instrument2;
+	VestigeInstrument* m_instrument2;
 	QWidget * _parent2;
 
 } ;

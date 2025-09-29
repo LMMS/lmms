@@ -28,24 +28,42 @@
 #include <QMutex>
 #include <QSharedPointer>
 
-#include "Effect.h"
+#include "AudioPlugin.h"
+#include "RemotePluginAudioPorts.h"
 #include "VstEffectControls.h"
 
 namespace lmms
 {
 
-
 class VstPlugin;
 
+inline constexpr auto VstEffectSettings = AudioPortsSettings {
+	.kind = AudioDataKind::F32,
+	.interleaved = false
+};
 
-class VstEffect : public Effect
+class VstEffectAudioPorts final
+	: public RemotePluginAudioPorts<VstEffectSettings>
+{
+public:
+	using RemotePluginAudioPorts<VstEffectSettings>::RemotePluginAudioPorts;
+
+	auto channelName(proc_ch_t channel, bool isOutput) const -> QString override
+	{
+		// TODO: Support custom channel names here
+		return isOutput
+			? tr("VST Out %1").arg(channel + 1)
+			: tr("VST In %1").arg(channel + 1);
+	}
+};
+
+class VstEffect
+	: public AudioPlugin<Effect, VstEffectSettings, VstEffectAudioPorts>
 {
 public:
 	VstEffect( Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key );
 	~VstEffect() override = default;
-
-	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
 
 	EffectControls * controls() override
 	{
@@ -54,6 +72,11 @@ public:
 
 
 private:
+	auto processImpl(PlanarBufferView<const float> in, PlanarBufferView<float> out) -> ProcessStatus override;
+
+	auto processLock() -> bool override;
+	void processUnlock() override;
+
 	//! Returns true if plugin was loaded (m_plugin != nullptr)
 	bool openPlugin(const QString& plugin);
 	void closePlugin();

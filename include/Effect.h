@@ -26,8 +26,7 @@
 #ifndef LMMS_EFFECT_H
 #define LMMS_EFFECT_H
 
-#include <span>
-
+#include "AudioBufferView.h"
 #include "AudioEngine.h"
 #include "AutomatableModel.h"
 #include "Engine.h"
@@ -37,6 +36,8 @@
 namespace lmms
 {
 
+class AudioBus;
+class AudioPortsModel;
 class EffectChain;
 class EffectControls;
 
@@ -57,6 +58,12 @@ public:
 			const Descriptor::SubPluginFeatures::Key * _key );
 	~Effect() override;
 
+	//! Returns true if audio was processed and should continue being processed
+	bool processCore(AudioBus& inOut)
+	{
+		return processCoreImpl(inOut);
+	}
+
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 	void loadSettings( const QDomElement & _this ) override;
 
@@ -64,9 +71,6 @@ public:
 	{
 		return "effect";
 	}
-
-	//! Returns true if audio was processed and should continue being processed
-	bool processAudioBuffer(SampleFrame* buf, const fpp_t frames);
 
 	inline bool isOkay() const
 	{
@@ -78,22 +82,10 @@ public:
 		m_okay = _state;
 	}
 
-
-	inline bool isRunning() const
+	//! "Awake" means the effect has not been put to sleep by auto-quit
+	bool isAwake() const
 	{
-		return m_running;
-	}
-
-	void startRunning()
-	{
-		m_quietBufferCount = 0;
-		m_running = true;
-	}
-
-	void stopRunning()
-	{
-		m_quietBufferCount = 0;
-		m_running = false;
+		return m_awake;
 	}
 
 	inline bool isEnabled() const
@@ -126,7 +118,19 @@ public:
 	{
 		m_noRun = _state;
 	}
-	
+
+	//! "Running" means the effect will be processing audio
+	bool isRunning() const
+	{
+		return isEnabled() && isAwake() && isOkay() && !dontRun();
+	}
+
+	//! Returns nullptr if the effect does not have audio ports
+	virtual auto audioPortsModel() const -> const AudioPortsModel*
+	{
+		return nullptr;
+	}
+
 	inline TempoSyncKnobModel* autoQuitModel()
 	{
 		return &m_autoQuitModel;
@@ -150,31 +154,21 @@ public:
 
 
 protected:
-	enum class ProcessStatus
-	{
-		//! Unconditionally continue processing
-		Continue,
-
-		//! Calculate the RMS out sum and call `checkGate` to determine whether to stop processing
-		ContinueIfNotQuiet,
-
-		//! Do not continue processing
-		Sleep
-	};
-
-	/**
-	 * The main audio processing method that runs when plugin is not asleep
-	 */
-	virtual ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) = 0;
-
-	/**
-	 * Optional method that runs when plugin is sleeping (not enabled,
-	 * not running, not in the Okay state, or in the Don't Run state)
-	 */
-	virtual void processBypassedImpl() {}
-
+	virtual bool processCoreImpl(AudioBus& inOut) = 0;
 
 	gui::PluginView* instantiateView( QWidget * ) override;
+
+	void startRunning()
+	{
+		m_quietBufferCount = 0;
+		m_awake = true;
+	}
+
+	void stopRunning()
+	{
+		m_quietBufferCount = 0;
+		m_awake = false;
+	}
 
 	// some effects might not be capable of higher sample-rates so they can
 	// sample it down before processing and back after processing
@@ -201,16 +195,14 @@ protected:
 
 	virtual void onEnabledChanged() {}
 
-
-private:
 	/**
 	 * If auto-quit is enabled ("Keep effects running even without input" setting is disabled),
 	 * after "decay" ms of the output buffer remaining below the silence threshold, the effect is
-	 * turned off and won't be processed again until it receives new audio input.
+	 * put to sleep and won't be processed again until it receives new audio input.
 	 */
-	void handleAutoQuit(std::span<const SampleFrame> output);
+	void handleAutoQuit(bool silentOutput);
 
-
+private:
 	EffectChain * m_parent;
 	void resample( int _i, const SampleFrame* _src_buf,
 					sample_rate_t _src_sr,
@@ -219,7 +211,7 @@ private:
 
 	bool m_okay;
 	bool m_noRun;
-	bool m_running;
+	bool m_awake;
 
 	//! The number of consecutive periods where output buffers remain below the silence threshold
 	f_cnt_t m_quietBufferCount = 0;

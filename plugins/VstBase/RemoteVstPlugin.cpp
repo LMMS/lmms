@@ -174,9 +174,9 @@ public:
 #else
 	RemoteVstPlugin( const char * socketPath );
 #endif
-	virtual ~RemoteVstPlugin();
+	~RemoteVstPlugin() override;
 
-	virtual bool processMessage( const message & _m );
+	bool processMessage(const message& _m) override;
 
 	void init( const std::string & _plugin_file );
 	void initEditor();
@@ -184,13 +184,13 @@ public:
 	void hideEditor();
 	void destroyEditor();
 
-	virtual void process( const SampleFrame* _in, SampleFrame* _out );
+	void process(const float* _in, float* _out) override;
 
 
-	virtual void processMidiEvent( const MidiEvent& event, const f_cnt_t offset );
+	void processMidiEvent(const MidiEvent& event, const f_cnt_t offset) override;
 
 	// set given sample-rate for plugin
-	virtual void updateSampleRate()
+	void updateSampleRate() override
 	{
 		SuspendPlugin suspend( this );
 		pluginDispatch( effSetSampleRate, 0, 0,
@@ -198,7 +198,7 @@ public:
 	}
 
 	// set given buffer-size for plugin
-	virtual void updateBufferSize()
+	void updateBufferSize() override
 	{
 		SuspendPlugin suspend( this );
 		pluginDispatch( effSetBlockSize, 0, bufferSize() );
@@ -280,21 +280,21 @@ public:
 	void savePreset( const std::string & _file );
 
 	// number of inputs
-	virtual int inputCount() const
+	proc_ch_t inputCount() const override
 	{
 		if( m_plugin )
 		{
-			return m_plugin->numInputs;
+			return static_cast<proc_ch_t>(m_plugin->numInputs);
 		}
 		return 0;
 	}
 
 	// number of outputs
-	virtual int outputCount() const
+	proc_ch_t outputCount() const override
 	{
 		if( m_plugin )
 		{
-			return m_plugin->numOutputs;
+			return static_cast<proc_ch_t>(m_plugin->numOutputs);
 		}
 		return 0;
 	}
@@ -1027,7 +1027,7 @@ bool RemoteVstPlugin::load( const std::string & _plugin_file )
 
 
 
-void RemoteVstPlugin::process( const SampleFrame* _in, SampleFrame* _out )
+void RemoteVstPlugin::process(const float* _in, float* _out)
 {
 	// first we gonna post all MIDI-events we enqueued so far
 	if( m_midiEvents.size() )
@@ -1077,14 +1077,15 @@ void RemoteVstPlugin::process( const SampleFrame* _in, SampleFrame* _out )
 		return;
 	}
 
+	// NOTE: VST in/out channels are always provided split: in[0..frames] (left), in[frames..2*frames] (right)
 	for( int i = 0; i < inputCount(); ++i )
 	{
-		m_inputs[i] = &((float *) _in)[i * bufferSize()];
+		m_inputs[i] = const_cast<float*>(&_in[i * bufferSize()]);
 	}
 
 	for( int i = 0; i < outputCount(); ++i )
 	{
-		m_outputs[i] = &((float *) _out)[i * bufferSize()];
+		m_outputs[i] = &_out[i * bufferSize()];
 		memset( m_outputs[i], 0, bufferSize() * sizeof( float ) );
 	}
 

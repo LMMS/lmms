@@ -29,6 +29,7 @@
  */
 
 // Need to include this first to ensure we get M_PI in MinGW with C++11
+#include "SampleFrame.h"
 #define _USE_MATH_DEFINES
 #include <cmath>
 
@@ -280,7 +281,7 @@ static float computeDecayFactor(float decayTimeInSeconds, float targetedAttenuat
 }
 
 Lb302Synth::Lb302Synth( InstrumentTrack * _instrumentTrack ) :
-	Instrument(_instrumentTrack, &lb302_plugin_descriptor, nullptr, Flag::IsSingleStreamed),
+	Instrument(&lb302_plugin_descriptor, _instrumentTrack, nullptr, Flag::IsSingleStreamed),
 	vcf_cut_knob( 0.75f, 0.0f, 1.5f, 0.005f, this, tr( "VCF Cutoff Frequency" ) ),
 	vcf_res_knob( 0.75f, 0.0f, 1.25f, 0.005f, this, tr( "VCF Resonance" ) ),
 	vcf_mod_knob( 0.1f, 0.0f, 1.0f, 0.005f, this, tr( "VCF Envelope Mod" ) ),
@@ -730,7 +731,7 @@ void Lb302Synth::initSlide()
 }
 
 
-void Lb302Synth::playNote( NotePlayHandle * _n, SampleFrame* _working_buffer )
+void Lb302Synth::playNoteImpl(NotePlayHandle* _n, std::span<SampleFrame>)
 {
 	if( _n->isMasterNote() || ( _n->hasParent() && _n->isReleased() ) )
 	{
@@ -789,7 +790,7 @@ void Lb302Synth::processNote( NotePlayHandle * _n )
 
 
 
-void Lb302Synth::play( SampleFrame* _working_buffer )
+void Lb302Synth::playImpl(std::span<SampleFrame> out)
 {
 	m_notesMutex.lock();
 	while( ! m_notes.isEmpty() )
@@ -797,10 +798,8 @@ void Lb302Synth::play( SampleFrame* _working_buffer )
 		processNote( m_notes.takeFirst() );
 	};
 	m_notesMutex.unlock();
-	
-	const fpp_t frames = Engine::audioEngine()->framesPerPeriod();
 
-	process( _working_buffer, frames );
+	process(out.data(), out.size());
 //	release_frame = 0; //removed for issue # 1432
 }
 

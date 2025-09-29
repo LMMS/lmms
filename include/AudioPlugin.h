@@ -1,0 +1,412 @@
+/*
+ * AudioPlugin.h - An interface for audio plugins which provides
+ *                 audio ports and compile-time customizations
+ *
+ * Copyright (c) 2025 Dalton Messmer <messmer.dalton/at/gmail.com>
+ *
+ * This file is part of LMMS - https://lmms.io
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program (see COPYING); if not, write to the
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA.
+ *
+ */
+
+#ifndef LMMS_AUDIO_PLUGIN_H
+#define LMMS_AUDIO_PLUGIN_H
+
+#include <type_traits>
+
+#include "Effect.h"
+#include "Instrument.h"
+#include "InstrumentTrack.h"
+#include "PluginAudioPorts.h"
+
+namespace lmms
+{
+
+class NotePlayHandle;
+
+namespace detail
+{
+
+//! Provides the correct `processImpl` interface for instruments or effects to implement
+template<class ParentT, AudioPortsSettings settings, bool inplace = settings.inplace>
+class AudioProcessingMethod;
+
+//! Instrument specialization
+template<AudioPortsSettings settings>
+class AudioProcessingMethod<Instrument, settings, false>
+{
+	using InBufferT = GetAudioBufferViewType<settings, false, true>;
+	using OutBufferT = GetAudioBufferViewType<settings, true, false>;
+
+protected:
+	//! The main audio processing method for NotePlayHandle-based Instruments
+	//! NOTE: NotePlayHandle-based instruments are currently unsupported
+	//virtual auto processImpl(NotePlayHandle* nph, InBufferT in, OutBufferT out) -> ProcessStatus {}
+
+	//! The main audio processing method for MIDI-based Instruments
+	virtual auto processImpl(InBufferT in, OutBufferT out) -> ProcessStatus = 0;
+};
+
+//! Instrument specialization (in-place)
+template<AudioPortsSettings settings>
+class AudioProcessingMethod<Instrument, settings, true>
+{
+	using InOutBufferT = GetAudioBufferViewType<settings, false, false>;
+
+protected:
+	//! The main audio processing method for NotePlayHandle-based Instruments
+	//! NOTE: NotePlayHandle-based instruments are currently unsupported
+	//virtual auto processImpl(NotePlayHandle* nph, InOutBufferT inOut) -> ProcessStatus {}
+
+	//! The main audio processing method for MIDI-based Instruments
+	virtual auto processImpl(InOutBufferT inOut) -> ProcessStatus = 0;
+};
+
+//! Effect specialization
+template<AudioPortsSettings settings>
+class AudioProcessingMethod<Effect, settings, false>
+{
+	using InBufferT = GetAudioBufferViewType<settings, false, true>;
+	using OutBufferT = GetAudioBufferViewType<settings, true, false>;
+
+protected:
+	/**
+	 * The main audio processing method for Effects. Runs when plugin is not asleep.
+	 * The implementation is expected to perform wet/dry mixing for the first 2 channels.
+	 */
+	virtual auto processImpl(InBufferT in, OutBufferT out) -> ProcessStatus = 0;
+};
+
+//! Effect specialization (in-place)
+template<AudioPortsSettings settings>
+class AudioProcessingMethod<Effect, settings, true>
+{
+	using InOutBufferT = GetAudioBufferViewType<settings, false, false>;
+
+protected:
+	/**
+	 * The main audio processing method for inplace Effects. Runs when plugin is not asleep.
+	 * The implementation is expected to perform wet/dry mixing for the first 2 channels.
+	 */
+	virtual auto processImpl(InOutBufferT inOut) -> ProcessStatus = 0;
+};
+
+
+/**
+ * Some LMMS plugins currently require a lock around their process method to
+ * prevent threading issues.
+ *
+ * Until all process methods are made lock-free, plugins may override these lock/unlock
+ * methods to ensure their process method is protected.
+ */
+class ProcessMutex
+{
+protected:
+	//! @returns true if the lock was successfully acquired
+	virtual auto processLock() -> bool { return true; }
+
+	virtual void processUnlock() {}
+};
+
+
+//! Connects the core audio channels to the instrument or effect using the audio ports
+template<class ParentT, AudioPortsSettings settings, class AudioPortsT>
+class AudioPlugin
+{
+	static_assert(always_false_v<ParentT>, "ParentT must be either Instrument or Effect");
+};
+
+//! Instrument specialization
+template<AudioPortsSettings settings, class AudioPortsT>
+class AudioPlugin<Instrument, settings, AudioPortsT>
+	: public Instrument
+	, public AudioProcessingMethod<Instrument, settings>
+	, public ProcessMutex
+{
+public:
+	template<typename... AudioPortsArgsT>
+	AudioPlugin(const Plugin::Descriptor* desc, InstrumentTrack* parent = nullptr,
+		const Plugin::Descriptor::SubPluginFeatures::Key* key = nullptr,
+		Instrument::Flags flags = Instrument::Flag::NoFlags,
+		AudioPortsArgsT&&... audioPortArgs)
+		: Instrument{desc, parent, key, flags}
+		, m_audioPorts{true, this, std::forward<AudioPortsArgsT>(audioPortArgs)...}
+	{
+		m_audioPorts.init();
+	}
+
+protected:
+	auto audioPorts() -> AudioPortsT& { return m_audioPorts; }
+	auto audioPorts() const -> const AudioPortsT& { return m_audioPorts; }
+
+	auto audioPortsModel() const -> const AudioPortsModel* final
+	{
+		return m_audioPorts.active()
+			? &m_audioPorts.model()
+			: nullptr;
+	}
+
+	void playImpl(std::span<SampleFrame> inOut) final
+	{
+		if (!processLock())
+		{
+			// Failed to acquire lock
+			return;
+		}
+
+		if (!m_audioPorts.active())
+		{
+			// Plugin is not running
+			processUnlock();
+			return;
+		}
+
+		auto temp = inOut.data();
+		auto bus = AudioBus{&temp, 1, inOut.size()};
+		auto router = m_audioPorts.getRouter();
+
+		router.process(bus, [this](auto... buffers) {
+			[[maybe_unused]] const auto status = this->processImpl(buffers...);
+			assert(status == ProcessStatus::Continue); // Only Continue is allowed for now
+			return ProcessStatus::Continue;
+		});
+
+		processUnlock();
+	}
+
+	void playNoteImpl(NotePlayHandle* notesToPlay, std::span<SampleFrame> inOut) final
+	{
+		/**
+		 * NOTE: Only MIDI-based instruments are currently supported by AudioPlugin.
+		 * NotePlayHandle-based instruments use buffers from their play handles, and more work
+		 * would be needed to integrate that system with the AudioPorts::Buffer system
+		 * used by AudioPlugin. AudioPorts::Buffer is also not thread-safe.
+		 *
+		 * The `Instrument::playNote()` method is still called for MIDI-based instruments when
+		 * notes are played, so this method is a no-op.
+		 */
+	}
+
+private:
+	AudioPortsT m_audioPorts;
+};
+
+//! Effect specialization
+template<AudioPortsSettings settings, class AudioPortsT>
+class AudioPlugin<Effect, settings, AudioPortsT>
+	: public Effect
+	, public AudioProcessingMethod<Effect, settings>
+	, public ProcessMutex
+{
+public:
+	template<typename... AudioPortsArgsT>
+	AudioPlugin(const Plugin::Descriptor* desc, Model* parent = nullptr,
+		const Plugin::Descriptor::SubPluginFeatures::Key* key = nullptr,
+		AudioPortsArgsT&&... audioPortArgs)
+		: Effect{desc, parent, key}
+		, m_audioPorts{false, this, std::forward<AudioPortsArgsT>(audioPortArgs)...}
+	{
+		m_audioPorts.init();
+	}
+
+protected:
+	auto audioPorts() -> AudioPortsT& { return m_audioPorts; }
+	auto audioPorts() const -> const AudioPortsT& { return m_audioPorts; }
+
+	auto audioPortsModel() const -> const AudioPortsModel* final
+	{
+		return m_audioPorts.active()
+			? &m_audioPorts.model()
+			: nullptr;
+	}
+
+	auto processCoreImpl(AudioBus& inOut) -> bool final
+	{
+		if (!isAwake())
+		{
+			if (inOut.hasInputNoise(m_audioPorts))
+			{
+				startRunning();
+			}
+			else
+			{
+				// Sleeping plugins need to zero any track channels their output is routed to in order to
+				// prevent sudden track channel passthrough behavior when the plugin is put to sleep.
+				// Otherwise auto-quit could become audibly noticeable, which is not intended.
+
+				inOut.silenceChannels(m_audioPorts);
+
+				return false;
+			}
+		}
+
+		if (!processLock())
+		{
+			// Failed to acquire lock
+			return true;
+		}
+
+		if (!isRunning() || !m_audioPorts.active())
+		{
+			// Plugin is awake but not running
+			this->processBypassedImpl();
+			processUnlock();
+			return false;
+		}
+
+		auto router = m_audioPorts.getRouter();
+
+		const auto status = router.process(inOut, [this](auto... buffers) {
+			return this->processImpl(buffers...);
+		});
+
+		switch (status)
+		{
+			case ProcessStatus::Continue:
+				break;
+			case ProcessStatus::ContinueIfNotQuiet:
+				handleAutoQuit(router.silentOutput());
+				break;
+			case ProcessStatus::Sleep:
+				stopRunning();
+				processUnlock();
+				return false;
+			default:
+				break;
+		}
+
+		const auto continueProcessing = isAwake();
+		processUnlock();
+		return continueProcessing;
+	}
+
+	/**
+	 * Optional method that runs instead of `processImpl` when an effect
+	 * is awake but not running.
+	 */
+	virtual void processBypassedImpl()
+	{
+	}
+
+private:
+	AudioPortsT m_audioPorts;
+};
+
+
+} // namespace detail
+
+
+/**
+ * AudioPlugin is the bridge connecting an Instrument/Effect base class used by the Core
+ * with its derived class used by a plugin implementation.
+ *
+ * Pin connector routing and other common tasks are handled here to allow plugin implementations
+ * to focus solely on audio processing or generation without needing to worry about how their plugin
+ * interfaces with LMMS Core.
+ *
+ * This design allows for some compile-time customization over aspects of the plugin implementation
+ * such as the number of in/out channels and whether samples are interleaved, so plugin developers can
+ * implement their plugin in whatever way works best for them. All the mapping of their plugin to/from
+ * LMMS Core is handled here, at compile-time where possible for best performance.
+ *
+ * A `processImpl` interface method is provided which must be implemented by the plugin implementation.
+ *
+ * @tparam ParentT Either `Instrument` or `Effect`
+ * @tparam settings Compile-time settings to customize `AudioPlugin`
+ * @tparam AudioPortsT The plugin's `AudioPorts` implementation
+ */
+template<class ParentT, AudioPortsSettings settings, class AudioPortsT>
+class AudioPlugin
+	: public detail::AudioPlugin<ParentT, Validate<settings>::value, AudioPortsT>
+{
+	static_assert(std::is_base_of_v<AudioPorts<settings>, AudioPortsT>,
+		"AudioPortT must implement `AudioPorts`");
+
+	using Base = typename detail::AudioPlugin<ParentT, settings, AudioPortsT>;
+
+public:
+	//! The last parameter(s) are variadic parameters passed to the `AudioPorts` implementation's constructor
+	using Base::Base;
+
+	static constexpr auto audioPortsSettings() -> AudioPortsSettings { return settings; }
+
+private:
+	/**
+	 * Hooks into the plugin's SerializingObject in order to save and load the audio ports.
+	 * Plugin implementations do not have to do anything and audio ports will be
+	 * saved and loaded when they need to be.
+	 */
+	class AudioPortSerializer final : public SerializingObjectHook
+	{
+	public:
+		AudioPortSerializer(AudioPlugin* ap)
+			: m_ap{ap}
+		{
+			ap->setHook(this);
+		}
+
+		void saveSettings(QDomDocument& doc, QDomElement& element) final
+		{
+			m_ap->audioPorts().saveSettings(doc, element);
+		}
+
+		void loadSettings(const QDomElement& element) final
+		{
+			m_ap->audioPorts().loadSettings(element);
+		}
+
+	private:
+		AudioPlugin* m_ap;
+	};
+
+	AudioPortSerializer m_serializer{this};
+};
+
+
+/**
+ * Same as `AudioPlugin` but the `AudioPorts` implementation is passed as a template template parameter.
+ *
+ * @tparam ParentT Either `Instrument` or `Effect`
+ * @tparam settings Compile-time settings to customize `AudioPlugin`
+ * @tparam AudioPortsT The plugin's `AudioPorts` implementation
+ */
+template<class ParentT, AudioPortsSettings settings,
+	template<AudioPortsSettings> class AudioPortsT = PluginAudioPorts>
+using AudioPluginExt = AudioPlugin<ParentT, settings, AudioPortsT<settings>>;
+
+
+// NOTE: NotePlayHandle-based instruments are not supported yet
+using DefaultMidiInstrument = AudioPluginExt<Instrument, AudioPortsSettings {
+	.kind = AudioDataKind::F32,
+	.interleaved = true,
+	.inputs = 0,
+	.outputs = 2,
+	.inplace = true,
+	.buffered = false }>;
+
+using DefaultEffect = AudioPluginExt<Effect, AudioPortsSettings {
+	.kind = AudioDataKind::F32,
+	.interleaved = true,
+	.inputs = 2,
+	.outputs = 2,
+	.inplace = true,
+	.buffered = false }>;
+
+
+} // namespace lmms
+
+#endif // LMMS_AUDIO_PLUGIN_H
