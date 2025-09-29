@@ -31,7 +31,6 @@
 #include "AudioEngine.h"
 #include "Oscillator.h"
 #include "PathUtil.h"
-#include "SampleLoader.h"
 #include "Song.h"
 
 namespace lmms
@@ -51,7 +50,7 @@ LfoController::LfoController( Model * _parent ) :
 	m_phaseOffset( 0 ),
 	m_currentPhase( 0 ),
 	m_sampleFunction( &Oscillator::sinSample ),
-	m_userDefSampleBuffer(std::make_shared<SampleBuffer>())
+	m_userDefSampleBuffer(SampleBuffer::emptyBuffer())
 {
 	setSampleExact( true );
 	connect( &m_waveModel, SIGNAL(dataChanged()),
@@ -242,11 +241,7 @@ void LfoController::loadSettings( const QDomElement & _this )
 
 	if (const auto userWaveFile = _this.attribute("userwavefile"); !userWaveFile.isEmpty())
 	{
-		if (QFileInfo(PathUtil::toAbsolute(userWaveFile)).exists())
-		{
-			m_userDefSampleBuffer = gui::SampleLoader::createBufferFromFile(_this.attribute("userwavefile"));
-		}
-		else { Engine::getSong()->collectError(QString("%1: %2").arg(tr("Sample not found"), userWaveFile)); }
+		m_userDefSampleBuffer = SampleBuffer::createFromFile(_this.attribute("userwavefile"));
 	}
 
 	updateSampleFunction();

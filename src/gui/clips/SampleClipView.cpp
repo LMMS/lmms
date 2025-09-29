@@ -21,24 +21,24 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
+
 #include "SampleClipView.h"
 
 #include <QApplication>
 #include <QMenu>
 #include <QPainter>
 
-#include "GuiApplication.h"
 #include "AutomationEditor.h"
-#include "embed.h"
+#include "FileDialog.h"
+#include "GuiApplication.h"
 #include "PathUtil.h"
 #include "SampleClip.h"
-#include "SampleLoader.h"
 #include "SampleThumbnail.h"
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "TrackContainerView.h"
 #include "TrackView.h"
+#include "embed.h"
 
 namespace lmms::gui
 {
@@ -129,7 +129,7 @@ void SampleClipView::dropEvent( QDropEvent * _de )
 	}
 	else if( StringPairDrag::decodeKey( _de ) == "sampledata" )
 	{
-		m_clip->setSampleBuffer(SampleLoader::createBufferFromBase64(StringPairDrag::decodeValue(_de)));
+		m_clip->setSampleBuffer(SampleBuffer::createFromBase64(StringPairDrag::decodeValue(_de)));
 		m_clip->updateLength();
 		update();
 		_de->accept();
@@ -188,17 +188,13 @@ void SampleClipView::mouseDoubleClickEvent( QMouseEvent * )
 {
 	if (m_trackView->trackContainerView()->knifeMode()) { return; }
 
-	const QString selectedAudioFile = SampleLoader::openAudioFile();
+	const QString selectedAudioFile = FileDialog::openAudioFile();
 
 	if (selectedAudioFile.isEmpty()) { return; }
 	
 	if (!m_clip->hasSampleFileLoaded(selectedAudioFile))
 	{
-		auto sampleBuffer = SampleLoader::createBufferFromFile(selectedAudioFile);
-		if (sampleBuffer != SampleBuffer::emptyBuffer())
-		{
-			m_clip->setSampleBuffer(sampleBuffer);
-		}
+		m_clip->setSampleBuffer(SampleBuffer::createFromFile(selectedAudioFile));
 	}
 	m_clip->updateLength();
 }

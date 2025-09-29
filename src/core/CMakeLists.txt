@@ -70,7 +70,6 @@ set(LMMS_SRCS
 	core/Sample.cpp
 	core/SampleBuffer.cpp
 	core/SampleClip.cpp
-	core/SampleDecoder.cpp
 	core/SamplePlayHandle.cpp
 	core/SampleRecordHandle.cpp
 	core/Scale.cpp
@@ -90,14 +89,9 @@ set(LMMS_SRCS
 	core/ValueBuffer.cpp
 	core/VstSyncController.cpp
 	core/StepRecorder.cpp
-
 	core/audio/AudioAlsa.cpp
 	core/audio/AudioDevice.cpp
-	core/audio/AudioFileDevice.cpp
-	core/audio/AudioFileMP3.cpp
-	core/audio/AudioFileOgg.cpp
-	core/audio/AudioFileFlac.cpp
-	core/audio/AudioFileWave.cpp
+	core/audio/AudioFile.cpp
 	core/audio/AudioJack.cpp
 	core/audio/AudioOss.cpp
 	core/audio/AudioSndio.cpp

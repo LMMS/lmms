@@ -198,9 +198,8 @@ void printHelp()
 		"            - sincbest\n"
 		"  -l, --loop                     Render as a loop\n"
 		"  -m, --mode                     Stereo mode used for MP3 export\n"
-		"          Possible values: s, j, m\n"
+		"          Possible values: s, m\n"
 		"            s: Stereo\n"
-		"            j: Joint Stereo\n"
 		"            m: Mono\n"
 		"          Default: j\n"
 		"  -o, --output <path>            Render into <path>\n"
@@ -376,8 +375,8 @@ int main( int argc, char * * argv )
 					new gui::MainApplication(argc, argv);
 
 	AudioEngine::qualitySettings qs(AudioEngine::qualitySettings::Interpolation::Linear);
-	OutputSettings os(44100, 160, OutputSettings::BitDepth::Depth16Bit, OutputSettings::StereoMode::JointStereo);
-	ProjectRenderer::ExportFileFormat eff = ProjectRenderer::ExportFileFormat::Wave;
+	OutputSettings os(44100, 160, OutputSettings::BitDepth::Depth16Bit, OutputSettings::StereoMode::Stereo);
+	auto eff = AudioFileFormat::WAV;
 
 	// second of two command-line parsing stages
 	for( int i = 1; i < argc; ++i )
@@ -519,23 +518,23 @@ int main( int argc, char * * argv )
 
 			if( ext == "wav" )
 			{
-				eff = ProjectRenderer::ExportFileFormat::Wave;
+				eff = AudioFileFormat::WAV;
 			}
 #ifdef LMMS_HAVE_OGGVORBIS
 			else if( ext == "ogg" )
 			{
-				eff = ProjectRenderer::ExportFileFormat::Ogg;
+				eff = AudioFileFormat::OGG;
 			}
 #endif
 #ifdef LMMS_HAVE_MP3LAME
 			else if( ext == "mp3" )
 			{
-				eff = ProjectRenderer::ExportFileFormat::MP3;
+				eff = AudioFileFormat::MP3;
 			}
 #endif
 			else if (ext == "flac")
 			{
-				eff = ProjectRenderer::ExportFileFormat::Flac;
+				eff = AudioFileFormat::FLAC;
 			}
 			else
 			{
@@ -597,10 +596,6 @@ int main( int argc, char * * argv )
 			if( mode == "s" )
 			{
 				os.setStereoMode(OutputSettings::StereoMode::Stereo);
-			}
-			else if( mode == "j" )
-			{
-				os.setStereoMode(OutputSettings::StereoMode::JointStereo);
 			}
 			else if( mode == "m" )
 			{
@@ -769,10 +764,15 @@ int main( int argc, char * * argv )
 
 		// when rendering multiple tracks, renderOut is a directory
 		// otherwise, it is a file, so we need to append the file extension
-		if ( !renderTracks )
+		if (!renderTracks)
 		{
-			renderOut = baseName( renderOut ) +
-				ProjectRenderer::getFileExtensionFromFormat(eff);
+			renderOut = baseName(renderOut) + AudioFileFormats[static_cast<int>(eff)].extension.data();
+		}
+
+		if (auto file = QFile{renderOut}; !renderTracks && !file.open(QFile::WriteOnly | QFile::Truncate))
+		{
+			fprintf(stderr, "Failed to open %s for writing, aborting!\n", renderOut.toUtf8().constData());
+			exit(EXIT_FAILURE);
 		}
 
 		// create renderer

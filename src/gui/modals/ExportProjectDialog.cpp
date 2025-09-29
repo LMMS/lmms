@@ -56,28 +56,20 @@ ExportProjectDialog::ExportProjectDialog( const QString & _file_name,
 	}
 
 	int cbIndex = 0;
-	for (auto i = std::size_t{0}; i < ProjectRenderer::NumFileFormats; ++i)
+	for (auto i = std::size_t{0}; i < static_cast<std::size_t>(AudioFileFormat::Count); ++i)
 	{
-		if( ProjectRenderer::fileEncodeDevices[i].isAvailable() )
-		{
-			// Get the extension of this format.
-			QString renderExt = ProjectRenderer::fileEncodeDevices[i].m_extension;
+		// Get the name and extension of this format.
+		QString ext = AudioFileFormats[i].extension.data();
+		QString name = AudioFileFormats[i].name.data();
 
-			// Add to combo box.
-			fileFormatCB->addItem( ProjectRenderer::tr(
-				ProjectRenderer::fileEncodeDevices[i].m_description ),
-				QVariant( static_cast<int>(ProjectRenderer::fileEncodeDevices[i].m_fileFormat) ) // Format tag; later used for identification.
-			);
+		// Add to combo box.
+		fileFormatCB->addItem(QString{"%1 (*%2)"}.arg(name, ext),
+			QVariant(static_cast<int>(i))); // Format tag; later used for identification.
 
-			// If this is our extension, select it.
-			if( QString::compare( renderExt, fileExt,
-									Qt::CaseInsensitive ) == 0 )
-			{
-				fileFormatCB->setCurrentIndex( cbIndex );
-			}
+		// If this is our extension, select it.
+		if (QString::compare(ext, fileExt, Qt::CaseInsensitive) == 0) { fileFormatCB->setCurrentIndex(cbIndex); }
 
-			cbIndex++;
-		}
+		cbIndex++;
 	}
 
 	int const MAX_LEVEL=8;
@@ -151,10 +143,6 @@ OutputSettings::StereoMode mapToStereoMode(int index)
 	{
 	case 0:
 		return OutputSettings::StereoMode::Mono;
-	case 1:
-		return OutputSettings::StereoMode::Stereo;
-	case 2:
-		return OutputSettings::StereoMode::JointStereo;
 	default:
 		return OutputSettings::StereoMode::Stereo;
 	}
@@ -183,7 +171,23 @@ void ExportProjectDialog::startExport()
 	{
 		output_name+=m_fileExtension;
 	}
-	m_renderManager.reset(new RenderManager( qs, os, m_ft, output_name ));
+
+	if (auto file = QFile{output_name}; !file.open(QFile::WriteOnly | QFile::Truncate))
+	{
+		const auto title = tr("Could not open file");
+		const auto message = tr("Could not open file %1 "
+						  "for writing.\nPlease make "
+						  "sure you have write "
+						  "permission to the file and "
+						  "the directory containing the "
+						  "file and try again!")
+						   .arg(output_name);
+
+		QMessageBox::critical(nullptr, title, message, QMessageBox::Ok, QMessageBox::NoButton);
+		return;
+	}
+
+	m_renderManager.reset(new RenderManager(qs, os, m_ft, output_name));
 
 	Engine::getSong()->setExportLoop( exportLoopCB->isChecked() );
 	Engine::getSong()->setRenderBetweenMarkers( renderMarkersCB->isChecked() );
@@ -215,25 +219,23 @@ void ExportProjectDialog::onFileFormatChanged(int index)
 	// and adjust the UI properly.
 	QVariant format_tag = fileFormatCB->itemData(index);
 	bool successful_conversion = false;
-	auto exportFormat = static_cast<ProjectRenderer::ExportFileFormat>(
-		format_tag.toInt(&successful_conversion)
-	);
+	auto exportFormat = static_cast<AudioFileFormat>(format_tag.toInt(&successful_conversion));
 	Q_ASSERT(successful_conversion);
 
-	bool stereoModeVisible = (exportFormat == ProjectRenderer::ExportFileFormat::MP3);
+	bool stereoModeVisible = (exportFormat == AudioFileFormat::MP3);
 
-	bool sampleRateControlsVisible = (exportFormat != ProjectRenderer::ExportFileFormat::MP3);
+	bool sampleRateControlsVisible = (exportFormat != AudioFileFormat::MP3);
 
 	bool bitRateControlsEnabled =
-			(exportFormat == ProjectRenderer::ExportFileFormat::Ogg ||
-			 exportFormat == ProjectRenderer::ExportFileFormat::MP3);
+			(exportFormat == AudioFileFormat::OGG ||
+			 exportFormat == AudioFileFormat::MP3);
 
 	bool bitDepthControlEnabled =
-			(exportFormat == ProjectRenderer::ExportFileFormat::Wave ||
-			 exportFormat == ProjectRenderer::ExportFileFormat::Flac);
+			(exportFormat == AudioFileFormat::WAV ||
+			 exportFormat == AudioFileFormat::FLAC);
 
 #ifdef LMMS_HAVE_SF_COMPLEVEL
-	bool compressionLevelVisible = (exportFormat == ProjectRenderer::ExportFileFormat::Flac);
+	bool compressionLevelVisible = (exportFormat == AudioFileFormat::FLAC);
 	compressionWidget->setVisible(compressionLevelVisible);
 #endif
 
@@ -247,14 +249,12 @@ void ExportProjectDialog::onFileFormatChanged(int index)
 
 void ExportProjectDialog::startBtnClicked()
 {
-	m_ft = ProjectRenderer::ExportFileFormat::Count;
+	m_ft = AudioFileFormat::Count;
 
 	// Get file format from current menu selection.
 	bool successful_conversion = false;
 	QVariant tag = fileFormatCB->itemData(fileFormatCB->currentIndex());
-	m_ft = static_cast<ProjectRenderer::ExportFileFormat>(
-			tag.toInt(&successful_conversion)
-	);
+	m_ft = static_cast<AudioFileFormat>(tag.toInt(&successful_conversion));
 
 	if( !successful_conversion )
 	{
@@ -267,11 +267,11 @@ void ExportProjectDialog::startBtnClicked()
 	}
 
 	// Find proper file extension.
-	for (auto i = std::size_t{0}; i < ProjectRenderer::NumFileFormats; ++i)
+	for (auto i = std::size_t{0}; i < static_cast<std::size_t>(AudioFileFormat::Count); ++i)
 	{
-		if (m_ft == ProjectRenderer::fileEncodeDevices[i].m_fileFormat)
+		if (m_ft == AudioFileFormats[i].format)
 		{
-			m_fileExtension = QString( QLatin1String( ProjectRenderer::fileEncodeDevices[i].m_extension ) );
+			m_fileExtension = QString(QLatin1String(AudioFileFormats[i].extension.data()));
 			break;
 		}
 	}

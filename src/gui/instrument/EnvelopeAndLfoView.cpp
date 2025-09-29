@@ -25,18 +25,17 @@
 
 #include "EnvelopeAndLfoView.h"
 
-#include <string_view>
-
 #include <QSizePolicy>
 #include <QVBoxLayout>
+#include <string_view>
 
-#include "EnvelopeGraph.h"
-#include "LfoGraph.h"
+#include "DataFile.h"
 #include "EnvelopeAndLfoParameters.h"
-#include "SampleLoader.h"
+#include "EnvelopeGraph.h"
+#include "FileDialog.h"
 #include "Knob.h"
 #include "LedCheckBox.h"
-#include "DataFile.h"
+#include "LfoGraph.h"
 #include "PixmapButton.h"
 #include "StringPairDrag.h"
 #include "TempoSyncKnob.h"
@@ -242,7 +241,7 @@ void EnvelopeAndLfoView::dropEvent( QDropEvent * _de )
 	QString value = StringPairDrag::decodeValue( _de );
 	if( type == "samplefile" )
 	{
-		m_params->m_userWave = SampleLoader::createBufferFromFile(value);
+		m_params->m_userWave = SampleBuffer::createFromFile(value);
 		m_userLfoBtn->model()->setValue( true );
 		m_params->m_lfoWaveModel.setValue(static_cast<int>(EnvelopeAndLfoParameters::LfoShape::UserDefinedWave));
 		_de->accept();
@@ -254,7 +253,7 @@ void EnvelopeAndLfoView::dropEvent( QDropEvent * _de )
 		auto file = dataFile.content().
 					firstChildElement().firstChildElement().
 					firstChildElement().attribute("src");
-		m_params->m_userWave = SampleLoader::createBufferFromFile(file);
+		m_params->m_userWave = SampleBuffer::createFromFile(file);
 		m_userLfoBtn->model()->setValue( true );
 		m_params->m_lfoWaveModel.setValue(static_cast<int>(EnvelopeAndLfoParameters::LfoShape::UserDefinedWave));
 		_de->accept();

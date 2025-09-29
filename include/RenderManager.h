@@ -28,6 +28,7 @@
 
 #include <memory>
 
+#include "AudioFileFormats.h"
 #include "ProjectRenderer.h"
 #include "OutputSettings.h"
 
@@ -43,7 +44,7 @@ public:
 	RenderManager(
 		const AudioEngine::qualitySettings & qualitySettings,
 		const OutputSettings & outputSettings,
-		ProjectRenderer::ExportFileFormat fmt,
+		AudioFileFormat fmt,
 		QString outputPath);
 
 	~RenderManager() override;
@@ -73,7 +74,7 @@ private:
 	const AudioEngine::qualitySettings m_qualitySettings;
 	const AudioEngine::qualitySettings m_oldQualitySettings;
 	const OutputSettings m_outputSettings;
-	ProjectRenderer::ExportFileFormat m_format;
+	AudioFileFormat m_format;
 	QString m_outputPath;
 
 	std::unique_ptr<ProjectRenderer> m_activeRenderer;

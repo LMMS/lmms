@@ -215,7 +215,7 @@ void AudioPortAudio::startProcessing()
 
 void AudioPortAudio::stopProcessing()
 {
-	if( m_paStream && Pa_IsStreamActive( m_paStream ) )
+	if( m_paStream && !Pa_IsStreamStopped( m_paStream ) )
 	{
 		m_stopped = true;
 		PaError err = Pa_StopStream( m_paStream );

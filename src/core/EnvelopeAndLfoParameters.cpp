@@ -31,7 +31,6 @@
 #include "Engine.h"
 #include "Oscillator.h"
 #include "PathUtil.h"
-#include "SampleLoader.h"
 #include "Song.h"
 
 namespace lmms
@@ -387,11 +386,7 @@ void EnvelopeAndLfoParameters::loadSettings( const QDomElement & _this )
 
 	if (const auto userWaveFile = _this.attribute("userwavefile"); !userWaveFile.isEmpty())
 	{
-		if (QFileInfo(PathUtil::toAbsolute(userWaveFile)).exists())
-		{
-			m_userWave = gui::SampleLoader::createBufferFromFile(_this.attribute("userwavefile"));
-		}
-		else { Engine::getSong()->collectError(QString("%1: %2").arg(tr("Sample not found"), userWaveFile)); }  
+		m_userWave = SampleBuffer::createFromFile(_this.attribute("userwavefile"));
 	}
 
 	updateSampleVars();

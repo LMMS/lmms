@@ -23,48 +23,96 @@
  */
 
 #include "SampleBuffer.h"
-#include <cstring>
 
+#include <cstring>
+#include <fstream>
+
+#include "AudioFile.h"
+#include "DrumSynth.h"
 #include "PathUtil.h"
-#include "SampleDecoder.h"
+#include "Song.h"
+
+namespace {
+using namespace lmms;
+
+auto isDrumSynthPreset(const std::filesystem::path& path) -> bool
+{
+	auto f = std::ifstream{path};
+	if (!f) { return false; }
+
+	auto line = std::string{};
+
+	std::getline(f, line);
+	if (line != "[General]") { return false; }
+
+	std::getline(f, line);
+	return line.find("Version=DrumSynth") != std::string::npos;
+}
+
+auto loadFromDrumSynthPreset(const std::filesystem::path& path) -> std::unique_ptr<SampleBuffer>
+{
+	auto data = static_cast<int16_t*>(nullptr);
+	const auto sampleRate = Engine::audioEngine()->outputSampleRate();
+	const auto frames = DrumSynth{}.GetDSFileSamples(PathUtil::fsConvert(path), data, 2, sampleRate);
+
+	auto buffer = std::vector<SampleFrame>(frames);
+	for (auto frame = 0; frame < frames; ++frame)
+	{
+		const auto left = std::clamp(data[frame * 2] / OUTPUT_SAMPLE_MULTIPLIER, -1.0f, 1.0f);
+		const auto right = std::clamp(data[frame * 2 + 1] / OUTPUT_SAMPLE_MULTIPLIER, -1.0f, 1.0f);
+		buffer[frame] = {left, right};
+	}
+
+	delete data;
+	return std::make_unique<SampleBuffer>(std::move(buffer), sampleRate);
+}
+
+auto loadFromAudioFile(const std::filesystem::path& path) -> std::unique_ptr<SampleBuffer>
+{
+	auto audioFile = AudioFile{path};
+
+	if (audioFile.channels() == 2)
+	{
+		auto buffer = std::vector<SampleFrame>(audioFile.frames());
+		audioFile.read({&buffer[0][0], 2, audioFile.frames()});
+		return std::make_unique<SampleBuffer>(std::move(buffer), audioFile.sampleRate());
+	}
+	else if (audioFile.channels() == 1)
+	{
+		auto buffer = std::vector<SampleFrame>(audioFile.frames());
+		auto monoBuffer = std::vector<float>(audioFile.frames());
+		audioFile.read({&monoBuffer[0], 1, audioFile.frames()});
+		std::transform(monoBuffer.begin(), monoBuffer.end(), buffer.begin(),
+			[](auto& sample) { return SampleFrame{sample, sample}; });
+		return std::make_unique<SampleBuffer>(std::move(buffer), audioFile.sampleRate());
+	}
+	else
+	{
+		auto dst = std::vector<SampleFrame>(audioFile.frames());
+		auto src = std::vector<float>(audioFile.frames() * audioFile.channels());
+		audioFile.read({&src[0], audioFile.channels(), audioFile.frames()});
+
+		for (auto frame = 0; frame < audioFile.frames(); ++frame)
+		{
+			dst[frame][0] = src[frame * audioFile.channels()];
+			dst[frame][1] = src[frame * audioFile.channels() + 1];
+		}
+
+		return std::make_unique<SampleBuffer>(std::move(dst), audioFile.sampleRate());
+	}
+}
+} // namespace
 
 namespace lmms {
 
-SampleBuffer::SampleBuffer(const SampleFrame* data, size_t numFrames, int sampleRate)
-	: m_data(data, data + numFrames)
+SampleBuffer::SampleBuffer(std::vector<SampleFrame> data, int sampleRate)
+	: m_data(std::move(data))
 	, m_sampleRate(sampleRate)
 {
 }
 
-SampleBuffer::SampleBuffer(const QString& audioFile)
-{
-	if (audioFile.isEmpty()) { throw std::runtime_error{"Failure loading audio file: Audio file path is empty."}; }
-	const auto absolutePath = PathUtil::toAbsolute(audioFile);
-
-	if (auto decodedResult = SampleDecoder::decode(absolutePath))
-	{
-		auto& [data, sampleRate] = *decodedResult;
-		m_data = std::move(data);
-		m_sampleRate = sampleRate;
-		m_audioFile = PathUtil::toShortestRelative(audioFile);
-		return;
-	}
-
-	throw std::runtime_error{
-		"Failed to decode audio file: Either the audio codec is unsupported, or the file is corrupted."};
-}
-
-SampleBuffer::SampleBuffer(const QString& base64, int sampleRate)
-	: m_sampleRate(sampleRate)
-{
-	// TODO: Replace with non-Qt equivalent
-	const auto bytes = QByteArray::fromBase64(base64.toUtf8());
-	m_data.resize(bytes.size() / sizeof(SampleFrame));
-	std::memcpy(reinterpret_cast<char*>(m_data.data()), bytes, m_data.size() * sizeof(SampleFrame));
-}
-
-SampleBuffer::SampleBuffer(std::vector<SampleFrame> data, int sampleRate)
-	: m_data(std::move(data))
+SampleBuffer::SampleBuffer(const SampleFrame* data, size_t numFrames, int sampleRate)
+	: m_data(data, data + numFrames)
 	, m_sampleRate(sampleRate)
 {
 }
@@ -90,6 +138,31 @@ auto SampleBuffer::emptyBuffer() -> std::shared_ptr<const SampleBuffer>
 {
 	static auto s_buffer = std::make_shared<const SampleBuffer>();
 	return s_buffer;
+}
+
+auto SampleBuffer::createFromFile(const QString& path) -> std::shared_ptr<const SampleBuffer>
+{
+	try
+	{
+		auto fsPath = PathUtil::fsConvert(path);
+		if (isDrumSynthPreset(fsPath)) { return loadFromDrumSynthPreset(fsPath); }
+		return loadFromAudioFile(fsPath);
+	}
+	catch (const std::runtime_error& error)
+	{
+		auto message = Song::tr("Failed to load %1: %2").arg(path, error.what());
+		Engine::getSong()->handleError(message);
+		return SampleBuffer::emptyBuffer();
+	}
+}
+
+auto SampleBuffer::createFromBase64(const QString& base64Str, int sampleRate) -> std::shared_ptr<const SampleBuffer>
+{
+	// TODO: Replace with non-Qt equivalent
+	const auto byteArray = QByteArray::fromBase64(base64Str.toUtf8());
+	auto buffer = std::vector<SampleFrame>(byteArray.size() / sizeof(SampleFrame));
+	std::memcpy(buffer.data(), byteArray.data(), byteArray.size());
+	return std::make_unique<SampleBuffer>(std::move(buffer), Engine::audioEngine()->outputSampleRate());
 }
 
 } // namespace lmms
