@@ -27,6 +27,7 @@
 #include <algorithm>
 #include <type_traits>
 
+#include "ConfigManager.h"
 #include "LmmsPolyfill.h"
 #include "MixHelpers.h"
 
@@ -60,8 +61,25 @@ constexpr auto SilenceThreshold = 0.0001431f;
 
 } // namespace
 
+AudioBus::AudioBus(SampleFrame* const* bus, track_ch_t channelPairs, f_cnt_t frames)
+	: m_bus{bus}
+	, m_channelPairs{channelPairs}
+	, m_frames{frames}
+	, m_autoQuitEnabled{ConfigManager::inst()->value("ui", "disableautoquit", "1").toInt() == 0}
+{
+	m_quietChannels.set();
+}
+
+void AudioBus::mixQuietChannels(const AudioBus& other)
+{
+	m_quietChannels &= other.quietChannels();
+}
+
 auto AudioBus::hasInputNoise(const std::bitset<MaxTrackChannels>& usedChannels) const -> bool
 {
+	// Assume non-quiet when auto-quit is disabled
+	if (!m_autoQuitEnabled) { return usedChannels.any(); }
+
 	auto nonQuiet = ~m_quietChannels;
 	nonQuiet &= usedChannels;
 	return nonQuiet.any();

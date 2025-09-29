@@ -53,9 +53,6 @@ AudioBusHandle::AudioBusHandle(const QString& name, bool hasEffectChain,
 	m_panningModel(panningModel),
 	m_mutedModel(mutedModel)
 {
-	// Mark all track channels as quiet
-	m_bus.quietChannels().set();
-
 	Engine::audioEngine()->addAudioBusHandle(this);
 	setExtOutputEnabled(true);
 }

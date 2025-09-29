@@ -74,7 +74,6 @@ MixerChannel::MixerChannel( int idx, Model * _parent ) :
 	m_dependenciesMet(0),
 	m_channelIndex(idx)
 {
-	m_bus.silenceAllChannels();
 }
 
 
@@ -203,7 +202,7 @@ void MixerChannel::doProcessing()
 					const float v = sender->m_volumeModel.value();
 					MixHelpers::addSanitizedMultipliedByBuffer( m_buffer, ch_buf, v, sendBuf, fpp );
 				}
-				m_bus.quietChannels() &= sender->m_bus.quietChannels(); // mix silence status
+				m_bus.mixQuietChannels(sender->m_bus);
 				m_hasInput = true;
 			}
 		}
@@ -646,7 +645,7 @@ void Mixer::mixToChannel(const AudioBus& bus, mix_ch_t channel)
 		mixerChannel->m_lock.lock();
 
 		MixHelpers::add(mixerChannel->m_bus.bus()[0], bus.bus()[0], bus.frames());
-		mixerChannel->m_bus.quietChannels() &= bus.quietChannels(); // mix silence status
+		mixerChannel->m_bus.mixQuietChannels(bus);
 		mixerChannel->m_hasInput = true;
 
 		mixerChannel->m_lock.unlock();

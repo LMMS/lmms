@@ -46,12 +46,8 @@ public:
 	AudioBus() = default;
 	AudioBus(const AudioBus&) = default;
 
-	AudioBus(SampleFrame* const* bus, track_ch_t channelPairs, f_cnt_t frames)
-		: m_bus{bus}
-		, m_channelPairs{channelPairs}
-		, m_frames{frames}
-	{
-	}
+	//! `bus` is assumed to be silent
+	AudioBus(SampleFrame* const* bus, track_ch_t channelPairs, f_cnt_t frames);
 
 	auto trackChannelPair(track_ch_t pairIndex) const -> InterleavedBufferView<const float, 2>
 	{
@@ -85,8 +81,22 @@ public:
 	auto channelPairs() const -> track_ch_t { return m_channelPairs; }
 	auto frames() const -> f_cnt_t { return m_frames; }
 
+	/**
+	 * Track channels which are known to be quiet, AKA the silence status.
+	 * 1 = track channel is quiet
+	 * 0 = track channel is assumed to carry a signal (non-quiet)
+	 */
 	auto quietChannels() const -> const std::bitset<MaxTrackChannels>& { return m_quietChannels; }
+
+#ifdef LMMS_TESTING
 	auto quietChannels() -> std::bitset<MaxTrackChannels>& { return m_quietChannels; }
+#endif
+
+	auto autoQuitEnabled() const -> bool { return m_autoQuitEnabled; }
+	void setAutoQuitEnabled(bool enabled) { m_autoQuitEnabled = enabled; }
+
+	//! Mixes the silence status of the other `AudioBus` with this `AudioBus`
+	void mixQuietChannels(const AudioBus& other);
 
 	/**
 	 * Determines whether a processor has input noise given
@@ -97,6 +107,7 @@ public:
 	 *   1 = track channel is routed to at least one processor input
 	 *
 	 * If the processor is sleeping and has input noise, it should wake up.
+	 * If auto-quit is disabled, all channels are assumed to have input noise.
 	 */
 	auto hasInputNoise(const std::bitset<MaxTrackChannels>& usedChannels) const -> bool;
 
@@ -108,6 +119,7 @@ public:
 	 */
 	void sanitize(const std::bitset<MaxTrackChannels>& channels, track_ch_t upperBound = MaxTrackChannels);
 
+	//! @see sanitize
 	void sanitizeAll();
 
 	/**
@@ -119,6 +131,7 @@ public:
 	 */
 	auto update(const std::bitset<MaxTrackChannels>& channels, track_ch_t upperBound = MaxTrackChannels) -> bool;
 
+	//! @see update
 	auto updateAll() -> bool;
 
 	/**
@@ -129,6 +142,7 @@ public:
 	 */
 	void silenceChannels(const std::bitset<MaxTrackChannels>& channels, track_ch_t upperBound = MaxTrackChannels);
 
+	//! @see silenceChannels
 	void silenceAllChannels();
 
 private:
@@ -136,12 +150,9 @@ private:
 	const track_ch_t m_channelPairs = 0;
 	const f_cnt_t m_frames = 0;
 
-	/**
-	 * Track channels which are known to be quiet.
-	 * 1 = track channel is quiet
-	 * 0 = track channel is assumed to carry a signal
-	 */
 	std::bitset<MaxTrackChannels> m_quietChannels;
+
+	bool m_autoQuitEnabled = false;
 };
 
 } // namespace lmms

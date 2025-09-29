@@ -30,4 +30,5 @@ foreach(LMMS_TEST_SRC IN LISTS LMMS_TESTS)
 	)
 
 	target_compile_features(${LMMS_TEST_NAME} PRIVATE cxx_std_20)
+	target_compile_definitions(${LMMS_TEST_NAME} PRIVATE LMMS_TESTING)
 endforeach()
