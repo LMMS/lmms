@@ -157,8 +157,8 @@ AudioFile::Impl::Impl(std::filesystem::path path, AudioFileFormat format, Output
 		constexpr auto monoBitrateTargets = std::array<double, 12>{
 			32000., 48000., 60000., 70000., 80000., 86000., 96000., 110000., 120000., 140000., 160000., 240001.};
 
-		constexpr auto stereoBitrateTargets = std::array<double, 12>{
-			22500., 32000., 40000., 48000., 56000., 64000., 80000., 96000., 112000., 128000., 160000., 250001.};
+		constexpr auto stereoBitrateTargets = std::array<double, 12>{22500. * 2, 32000. * 2, 40000. * 2, 48000. * 2,
+			56000. * 2, 64000. * 2, 80000. * 2, 96000. * 2, 112000. * 2, 128000. * 2, 160000. * 2, 250001. * 2};
 
 		const auto& bitrateTargets = m_info.channels == 1 ? monoBitrateTargets : stereoBitrateTargets;
 		const auto bitrateTargetIt = std::lower_bound(bitrateTargets.begin(), bitrateTargets.end(), settings.bitrate() * 1000);
