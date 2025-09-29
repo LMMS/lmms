@@ -45,7 +45,6 @@ public:
 	enum class StereoMode
 	{
 		Stereo,
-		JointStereo,
 		Mono
 	};
 

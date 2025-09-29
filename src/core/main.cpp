@@ -198,9 +198,8 @@ void printHelp()
 		"            - sincbest\n"
 		"  -l, --loop                     Render as a loop\n"
 		"  -m, --mode                     Stereo mode used for MP3 export\n"
-		"          Possible values: s, j, m\n"
+		"          Possible values: s, m\n"
 		"            s: Stereo\n"
-		"            j: Joint Stereo\n"
 		"            m: Mono\n"
 		"          Default: j\n"
 		"  -o, --output <path>            Render into <path>\n"
@@ -376,7 +375,7 @@ int main( int argc, char * * argv )
 					new gui::MainApplication(argc, argv);
 
 	AudioEngine::qualitySettings qs(AudioEngine::qualitySettings::Interpolation::Linear);
-	OutputSettings os(44100, 160, OutputSettings::BitDepth::Depth16Bit, OutputSettings::StereoMode::JointStereo);
+	OutputSettings os(44100, 160, OutputSettings::BitDepth::Depth16Bit, OutputSettings::StereoMode::Stereo);
 	auto eff = AudioFileFormat::WAV;
 
 	// second of two command-line parsing stages
@@ -597,10 +596,6 @@ int main( int argc, char * * argv )
 			if( mode == "s" )
 			{
 				os.setStereoMode(OutputSettings::StereoMode::Stereo);
-			}
-			else if( mode == "j" )
-			{
-				os.setStereoMode(OutputSettings::StereoMode::JointStereo);
 			}
 			else if( mode == "m" )
 			{

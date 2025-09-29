@@ -81,7 +81,6 @@ SF_INFO sfInfoFromOutputSettings(AudioFileFormat format, OutputSettings settings
     switch (settings.getStereoMode())
     {
 	case OutputSettings::StereoMode::Stereo:
-	case OutputSettings::StereoMode::JointStereo:
         sfChannels = 2;
         break;
 	case OutputSettings::StereoMode::Mono:

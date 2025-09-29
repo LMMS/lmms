@@ -211,11 +211,6 @@
                <string>Stereo</string>
               </property>
              </item>
-             <item>
-              <property name="text">
-               <string>Joint stereo</string>
-              </property>
-             </item>
             </widget>
            </item>
           </layout>
