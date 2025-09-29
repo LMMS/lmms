@@ -91,70 +91,32 @@ void AudioBus::sanitize(const std::bitset<MaxTrackChannels>& channels, track_ch_
 
 	const auto numTrackChannels = std::min(upperBound, this->channels());
 
-	// Like MixHelpers::sanitize(), but works for a single channel
-	auto sanitizeChannel = [](InterleavedBufferView<float, 2> output, auto channelIndex) -> bool {
-		constexpr auto channel = channelIndex();
-		for (float* frame : output.framesView())
-		{
-			float& sample = frame[channel];
-
-			if (std::isinf(sample) || std::isnan(sample))
-			{
-#ifdef LMMS_DEBUG
-				// TODO: don't use std::cout here?
-				std::cout << "Bad data, clearing buffer. frame: " << static_cast<std::size_t>(frame - output.data());
-				std::cout << ": value " << sample << " (" << (channel == 0 ? "L" : "R") << ")\n";
-#endif
-
-				// Clear the whole channel if a problem is found
-				for (float* f : output.framesView())
-				{
-					f[channel] = 0.f;
-				}
-
-				return true;
-			}
-			else
-			{
-				sample = std::clamp(sample, sample_t(-1000.0), sample_t(1000.0));
-			}
-		}
-		return false;
-	};
-
 	for (track_ch_t tc = 0; tc < numTrackChannels; tc += 2)
 	{
 		switch ((channels[tc] << 1) | std::uint8_t{channels[tc + 1]})
 		{
 			case 0b11:
-			{
-				const auto tcPair = m_bus[tc / 2];
-				if (MixHelpers::sanitize(tcPair, m_frames))
+				if (MixHelpers::sanitize(m_bus[tc / 2], m_frames))
 				{
 					// Inf/NaN detected and buffer cleared
 					m_quietChannels[tc] = true;
 					m_quietChannels[tc + 1] = true;
 				}
 				break;
-			}
 			case 0b10:
-			{
-				if (sanitizeChannel(trackChannelPair(tc / 2), std::integral_constant<proc_ch_t, 0>{}))
+				if (MixHelpers::sanitizeL(m_bus[tc / 2], m_frames))
 				{
 					// Inf/NaN detected and buffer cleared
 					m_quietChannels[tc] = true;
 				}
 				break;
-			}
 			case 0b01:
-			{
-				if (sanitizeChannel(trackChannelPair(tc / 2), std::integral_constant<proc_ch_t, 1>{}))
+			if (MixHelpers::sanitizeR(m_bus[tc / 2], m_frames))
 				{
 					// Inf/NaN detected and buffer cleared
 					m_quietChannels[tc + 1] = true;
 				}
 				break;
-			}
 			case 0b00:
 				// Neither track channel needs to be sanitized
 				break;
