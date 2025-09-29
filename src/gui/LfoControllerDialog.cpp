@@ -23,16 +23,13 @@
  *
  */
 
-
-#include "embed.h"
-
-
+#include "FileDialog.h"
 #include "FontHelper.h"
-#include "LfoController.h"
 #include "Knob.h"
-#include "TempoSyncKnob.h"
+#include "LfoController.h"
 #include "PixmapButton.h"
-#include "SampleLoader.h"
+#include "TempoSyncKnob.h"
+#include "embed.h"
 
 namespace lmms::gui
 {
@@ -208,12 +205,12 @@ LfoControllerDialog::~LfoControllerDialog()
 
 void LfoControllerDialog::askUserDefWave()
 {
-	const auto fileName = SampleLoader::openWaveformFile();
+	const auto fileName = FileDialog::openWaveformFile();
 	if (fileName.isEmpty()) { return; }
 
 	auto lfoModel = dynamic_cast<LfoController*>(model());
 	auto& buffer = lfoModel->m_userDefSampleBuffer;
-	buffer = SampleLoader::createBufferFromFile(fileName);
+	buffer = SampleBuffer::createFromFile(fileName);
 
 	m_userWaveBtn->setToolTip(buffer->audioFile());
 }

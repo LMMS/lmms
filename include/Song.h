@@ -96,6 +96,7 @@ public:
 	};
 
 	void clearErrors();
+	void handleError(const QString& error);
 	void collectError( const QString error );
 	bool hasErrors();
 	QString errorSummary();

@@ -29,7 +29,9 @@
 #include <QStorageInfo>
 #include <QStringList>
 
+#include "AudioFileFormats.h"
 #include "ConfigManager.h"
+#include "PathUtil.h"
 #include "FileDialog.h"
 
 namespace lmms::gui
@@ -136,6 +138,63 @@ QString FileDialog::getOpenFileName(QWidget *parent,
 	}
 	return QString();
 }
+
+QString FileDialog::openAudioFile(const QString& previousFile)
+{
+	auto openFileDialog = FileDialog(nullptr, QObject::tr("Open audio file"));
+	auto dir = !previousFile.isEmpty() ? QFileInfo(PathUtil::toAbsolute(previousFile)).absolutePath() : ConfigManager::inst()->userSamplesDir();
+
+	// change dir to position of previously opened file
+	openFileDialog.setDirectory(dir);
+	openFileDialog.setFileMode(FileDialog::ExistingFiles);
+
+	// set filters
+	auto fileTypes = QStringList{};
+	auto allFileTypes = QStringList{};
+	auto nameFilters = QStringList{};
+
+	for (const auto& format : AudioFileFormats)
+	{
+		const auto name = QString::fromStdString(format.name.data());
+		const auto extension = QString::fromStdString(format.extension.data());
+		const auto displayExtension = QString{"*.%1"}.arg(extension);
+		fileTypes.append(QString{"%1 (%2)"}.arg(FileDialog::tr("%1 files").arg(name), displayExtension));
+		allFileTypes.append(displayExtension);
+	}
+
+	// Include DrumSynth Presets in the dialog. These are not audio files, but are used as such. LMMS allows for
+	// rendering and importing these files using the internal DrumSynth engine.
+	fileTypes.append("DrumSynth files (*.ds)");
+	allFileTypes.append("*.ds");
+
+	nameFilters.append(QString{"%1 (%2)"}.arg(FileDialog::tr("All audio files"), allFileTypes.join(" ")));
+	nameFilters.append(fileTypes);
+	nameFilters.append(QString("%1 (*)").arg(FileDialog::tr("Other files")));
+
+	openFileDialog.setNameFilters(nameFilters);
+
+	if (!previousFile.isEmpty())
+	{
+		// select previously opened file
+		openFileDialog.selectFile(QFileInfo{previousFile}.fileName());
+	}
+
+	if (openFileDialog.exec() == QDialog::Accepted)
+	{
+		if (openFileDialog.selectedFiles().isEmpty()) { return ""; }
+
+		return PathUtil::toShortestRelative(openFileDialog.selectedFiles()[0]);
+	}
+
+	return "";
+}
+
+QString FileDialog::openWaveformFile(const QString& previousFile)
+{
+	return openAudioFile(
+		previousFile.isEmpty() ? ConfigManager::inst()->factorySamplesDir() + "waveforms/10saw.flac" : previousFile);
+}
+
 
 
 void FileDialog::clearSelection()

@@ -1481,7 +1481,12 @@ void Song::clearErrors()
 	m_errors.clear();
 }
 
-
+void Song::handleError(const QString& error)
+{
+	// TODO: Improve error handling, do not call into GUI code
+	if (m_loadingProject) { collectError(error); }
+	if (gui::getGUI()) { QMessageBox::critical(nullptr, Song::tr("An error has occurred"), error); }
+}
 
 void Song::collectError( const QString error )
 {

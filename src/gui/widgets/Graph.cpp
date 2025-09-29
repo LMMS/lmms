@@ -23,12 +23,13 @@
  *
  */
 
+#include "Graph.h"
+
 #include <QPainter>
 
-#include "Graph.h"
-#include "SampleLoader.h"
-#include "StringPairDrag.h"
+#include "FileDialog.h"
 #include "Oscillator.h"
+#include "StringPairDrag.h"
 
 namespace lmms
 {
@@ -580,10 +581,10 @@ void graphModel::setWaveToNoise()
 
 QString graphModel::setWaveToUser()
 {
-	QString fileName = gui::SampleLoader::openWaveformFile();
+	QString fileName = gui::FileDialog::openWaveformFile();
 	if( fileName.isEmpty() == false )
 	{
-		auto sampleBuffer = gui::SampleLoader::createBufferFromFile(fileName);
+		auto sampleBuffer = SampleBuffer::createFromFile(fileName);
 		for( int i = 0; i < length(); i++ )
 		{
 			m_samples[i] = Oscillator::userWaveSample(sampleBuffer.get(), i / static_cast<float>(length()));

@@ -49,11 +49,8 @@ public:
 	using const_reverse_iterator = std::vector<SampleFrame>::const_reverse_iterator;
 
 	SampleBuffer() = default;
-	explicit SampleBuffer(const QString& audioFile);
-	SampleBuffer(const QString& base64, int sampleRate);
 	SampleBuffer(std::vector<SampleFrame> data, int sampleRate);
-	SampleBuffer(
-		const SampleFrame* data, size_t numFrames, int sampleRate = Engine::audioEngine()->outputSampleRate());
+	SampleBuffer(const SampleFrame* data, size_t numFrames, int sampleRate = Engine::audioEngine()->outputSampleRate());
 
 	friend void swap(SampleBuffer& first, SampleBuffer& second) noexcept;
 	auto toBase64() const -> QString;
@@ -84,6 +81,11 @@ public:
 	auto empty() const -> bool { return m_data.empty(); }
 
 	static auto emptyBuffer() -> std::shared_ptr<const SampleBuffer>;
+
+	static auto createFromFile(const QString& path) -> std::shared_ptr<const SampleBuffer>;
+
+	static auto createFromBase64(const QString& base64Str, int sampleRate = Engine::audioEngine()->outputSampleRate())
+		-> std::shared_ptr<const SampleBuffer>;
 
 private:
 	std::vector<SampleFrame> m_data;

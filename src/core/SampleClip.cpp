@@ -29,7 +29,6 @@
 
 #include "PathUtil.h"
 #include "SampleClipView.h"
-#include "SampleLoader.h"
 #include "SampleTrack.h"
 #include "Song.h"
 
@@ -158,7 +157,7 @@ void SampleClip::setSampleFile(const QString& sf)
 	setStartTimeOffset(0);
 	if (!sf.isEmpty())
 	{
-		m_sample = Sample(gui::SampleLoader::createBufferFromFile(sf));
+		m_sample = Sample{SampleBuffer::createFromFile(sf)};
 		updateLength();
 	}
 	else
@@ -309,11 +308,7 @@ void SampleClip::loadSettings( const QDomElement & _this )
 
 	if (const auto srcFile = _this.attribute("src"); !srcFile.isEmpty())
 	{
-		if (QFileInfo(PathUtil::toAbsolute(srcFile)).exists())
-		{
-			setSampleFile(srcFile);
-		}
-		else { Engine::getSong()->collectError(QString("%1: %2").arg(tr("Sample not found"), srcFile)); }
+		setSampleFile(srcFile);
 	}
 
 	if( sampleFile().isEmpty() && _this.hasAttribute( "data" ) )
@@ -321,8 +316,8 @@ void SampleClip::loadSettings( const QDomElement & _this )
 		auto sampleRate = _this.hasAttribute("sample_rate") ? _this.attribute("sample_rate").toInt() :
 			Engine::audioEngine()->outputSampleRate();
 
-		auto buffer = gui::SampleLoader::createBufferFromBase64(_this.attribute("data"), sampleRate);
-		m_sample = Sample(std::move(buffer));
+		auto buffer = SampleBuffer::createFromBase64(_this.attribute("data"), sampleRate);
+		m_sample = Sample{std::move(buffer)};
 	}
 	changeLength( _this.attribute( "len" ).toInt() );
 	setMuted( _this.attribute( "muted" ).toInt() );
