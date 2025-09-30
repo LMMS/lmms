@@ -328,7 +328,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: mingw64
-          path: build/lmms-*.exe
+          path: |
+            build/lmms-*.exe
+            !build/lmms-console.exe
       - name: Trim ccache and print statistics
         run: |
           ccache --cleanup
@@ -412,7 +414,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: msvc-x64
-          path: build\lmms-*.exe
+          path: |
+            build\lmms-*.exe
+            !build\lmms-console.exe
       - name: Trim ccache and print statistics
         run: |
           ccache --cleanup
