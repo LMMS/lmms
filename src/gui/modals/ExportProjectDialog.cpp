@@ -162,8 +162,6 @@ OutputSettings::StereoMode mapToStereoMode(int index)
 
 void ExportProjectDialog::startExport()
 {
-	auto qs = AudioEngine::qualitySettings(
-		static_cast<AudioEngine::qualitySettings::Interpolation>(interpolationCB->currentIndex()));
 	const auto bitrates = std::array{64, 128, 160, 192, 256, 320};
 
 	OutputSettings os = OutputSettings(samplerateCB->currentData().toInt(), bitrates[bitrateCB->currentIndex()],
@@ -183,7 +181,8 @@ void ExportProjectDialog::startExport()
 	{
 		output_name+=m_fileExtension;
 	}
-	m_renderManager.reset(new RenderManager( qs, os, m_ft, output_name ));
+
+	m_renderManager.reset(new RenderManager(os, m_ft, output_name));
 
 	Engine::getSong()->setExportLoop( exportLoopCB->isChecked() );
 	Engine::getSong()->setRenderBetweenMarkers( renderMarkersCB->isChecked() );
