@@ -47,6 +47,7 @@ Plugin::Descriptor PLUGIN_EXPORT dualfilter_plugin_descriptor =
 	new PluginPixmapLoader( "logo" ),
 	nullptr,
 	nullptr,
+	nullptr,
 } ;
 
 }

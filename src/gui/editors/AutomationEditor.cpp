@@ -2289,7 +2289,7 @@ void AutomationEditorWindow::dragEnterEvent( QDragEnterEvent *_dee )
 	if (! m_editor->validClip() ) {
 		return;
 	}
-	StringPairDrag::processDragEnterEvent( _dee, "automatable_model" );
+	StringPairDrag::processDragEnterEvent(_dee, {"automatable_model"});
 }
 
 void AutomationEditorWindow::open(AutomationClip* clip)

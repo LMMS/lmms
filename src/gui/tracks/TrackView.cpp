@@ -22,7 +22,6 @@
  *
  */
 
-
 #include "TrackView.h"
 
 #include <QApplication>
@@ -31,19 +30,18 @@
 #include <QPainter>
 #include <QStyleOption>
 
-
 #include "AudioEngine.h"
 #include "AutomatableButton.h"
+#include "Clipboard.h"
+#include "ClipView.h"
 #include "ConfigManager.h"
 #include "DataFile.h"
 #include "Engine.h"
 #include "FadeButton.h"
 #include "StringPairDrag.h"
 #include "Track.h"
-#include "TrackGrip.h"
 #include "TrackContainerView.h"
-#include "ClipView.h"
-
+#include "TrackGrip.h"
 
 namespace lmms::gui
 {
@@ -210,12 +208,10 @@ void TrackView::modelChanged()
  */
 void TrackView::dragEnterEvent( QDragEnterEvent * dee )
 {
-	StringPairDrag::processDragEnterEvent( dee, "track_" +
-					QString::number( static_cast<int>(m_track->type()) ) );
+	StringPairDrag::processDragEnterEvent(dee, {
+		QString("track_%1").arg(static_cast<int>(m_track->type()))
+	});
 }
-
-
-
 
 /*! \brief Accept a drop event on this track View.
  *
@@ -225,10 +221,10 @@ void TrackView::dragEnterEvent( QDragEnterEvent * dee )
  *
  *  \param de the DropEvent to handle.
  */
-void TrackView::dropEvent( QDropEvent * de )
+void TrackView::dropEvent(QDropEvent* de)
 {
-	QString type = StringPairDrag::decodeKey( de );
-	QString value = StringPairDrag::decodeValue( de );
+	const auto [type, value] = Clipboard::decodeMimeData(de->mimeData());
+
 	if( type == ( "track_" + QString::number( static_cast<int>(m_track->type()) ) ) )
 	{
 		// value contains our XML-data so simply create a
