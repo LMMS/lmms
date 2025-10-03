@@ -58,7 +58,7 @@ SET(LMMS_PLUGIN_LIST
 	PeakControllerEffect
 	GigPlayer
 	ReverbSC
-	Sf2Player
+	SoundFontPlayer
 	Sfxr
 	Sid
 	SlicerT

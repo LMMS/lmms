@@ -42,8 +42,8 @@ namespace lmms::PathUtil
 			}
 			case Base::UserLADSPA       : loc = ConfigManager::inst()->ladspaDir(); break;
 			case Base::DefaultLADSPA    : loc = ConfigManager::inst()->userLadspaDir(); break;
-			case Base::UserSoundfont    : loc = ConfigManager::inst()->sf2Dir(); break;
-			case Base::DefaultSoundfont : loc = ConfigManager::inst()->userSf2Dir(); break;
+			case Base::UserSoundfont    : loc = ConfigManager::inst()->soundFontDir(); break;
+			case Base::DefaultSoundfont : loc = ConfigManager::inst()->userSoundFontDir(); break;
 			case Base::UserGIG          : loc = ConfigManager::inst()->gigDir(); break;
 			case Base::DefaultGIG       : loc = ConfigManager::inst()->userGigDir(); break;
 			case Base::LocalDir:
