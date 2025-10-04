@@ -34,17 +34,13 @@
 namespace lmms
 {
 
-
-RenderManager::RenderManager(
-		const AudioEngine::qualitySettings & qualitySettings,
-		const OutputSettings & outputSettings,
-		ProjectRenderer::ExportFileFormat fmt,
-		QString outputPath) :
-	m_qualitySettings(qualitySettings),
-	m_oldQualitySettings( Engine::audioEngine()->currentQualitySettings() ),
-	m_outputSettings(outputSettings),
-	m_format(fmt),
-	m_outputPath(outputPath)
+RenderManager::RenderManager(const AudioEngine::qualitySettings& qualitySettings, const OutputSettings& outputSettings,
+	AudioFileFormat fmt, QString outputPath)
+	: m_qualitySettings(qualitySettings)
+	, m_oldQualitySettings(Engine::audioEngine()->currentQualitySettings())
+	, m_outputSettings(outputSettings)
+	, m_format(fmt)
+	, m_outputPath(outputPath)
 {
 	Engine::audioEngine()->storeAudioDevice();
 }
@@ -147,24 +143,16 @@ void RenderManager::render(QString outputPath)
 			m_format,
 			outputPath);
 
-	if( m_activeRenderer->isReady() )
-	{
-		// pass progress signals through
-		connect( m_activeRenderer.get(), SIGNAL(progressChanged(int)),
-				this, SIGNAL(progressChanged(int)));
+	// pass progress signals through
+	connect( m_activeRenderer.get(), SIGNAL(progressChanged(int)),
+			this, SIGNAL(progressChanged(int)));
 
-		// when it is finished, render the next track.
-		// if we have not queued any tracks, renderNextTrack will just clean up
-		connect( m_activeRenderer.get(), SIGNAL(finished()),
-				this, SLOT(renderNextTrack()));
+	// when it is finished, render the next track.
+	// if we have not queued any tracks, renderNextTrack will just clean up
+	connect( m_activeRenderer.get(), SIGNAL(finished()),
+			this, SLOT(renderNextTrack()));
 
-		m_activeRenderer->startProcessing();
-	}
-	else
-	{
-		qDebug( "Renderer failed to acquire a file device!" );
-		renderNextTrack();
-	}
+	m_activeRenderer->startProcessing();
 }
 
 // Unmute all tracks that were muted while rendering tracks
@@ -181,7 +169,7 @@ void RenderManager::restoreMutedState()
 // Determine the output path for a track when rendering tracks individually
 QString RenderManager::pathForTrack(const Track *track, int num)
 {
-	QString extension = ProjectRenderer::getFileExtensionFromFormat( m_format );
+	QString extension = AudioFileFormats[static_cast<std::size_t>(m_format)].extension.data();
 	QString name = track->name();
 	name = name.remove(QRegularExpression(FILENAME_FILTER));
 	name = QString( "%1_%2%3" ).arg( num ).arg( name ).arg( extension );

@@ -1445,14 +1445,10 @@ void MainWindow::exportProject(bool multiExport)
 	else
 	{
 		efd.setFileMode( FileDialog::AnyFile );
-		int idx = 0;
 		QStringList types;
-		while( ProjectRenderer::fileEncodeDevices[idx].m_fileFormat != ProjectRenderer::ExportFileFormat::Count)
+		for (const auto& format : AudioFileFormats)
 		{
-			if(ProjectRenderer::fileEncodeDevices[idx].isAvailable()) {
-				types << tr(ProjectRenderer::fileEncodeDevices[idx].m_description);
-			}
-			++idx;
+			types << QString{"%1 (*%2)"}.arg(format.name.data(), format.extension.data());
 		}
 		efd.setNameFilters( types );
 		QString baseFilename;
@@ -1466,7 +1462,7 @@ void MainWindow::exportProject(bool multiExport)
 			efd.setDirectory( ConfigManager::inst()->userProjectsDir() );
 			baseFilename = tr( "untitled" );
 		}
-		efd.selectFile( baseFilename + ProjectRenderer::fileEncodeDevices[0].m_extension );
+		efd.selectFile(baseFilename + AudioFileFormats[0].extension.data());
 		efd.setWindowTitle( tr( "Select file for project-export..." ) );
 	}
 

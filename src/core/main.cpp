@@ -377,7 +377,7 @@ int main( int argc, char * * argv )
 
 	AudioEngine::qualitySettings qs(AudioEngine::qualitySettings::Interpolation::Linear);
 	OutputSettings os(44100, 160, OutputSettings::BitDepth::Depth16Bit, OutputSettings::StereoMode::JointStereo);
-	ProjectRenderer::ExportFileFormat eff = ProjectRenderer::ExportFileFormat::Wave;
+	auto eff = AudioFileFormat::WAV;
 
 	// second of two command-line parsing stages
 	for( int i = 1; i < argc; ++i )
@@ -519,23 +519,23 @@ int main( int argc, char * * argv )
 
 			if( ext == "wav" )
 			{
-				eff = ProjectRenderer::ExportFileFormat::Wave;
+				eff = AudioFileFormat::WAV;
 			}
 #ifdef LMMS_HAVE_OGGVORBIS
 			else if( ext == "ogg" )
 			{
-				eff = ProjectRenderer::ExportFileFormat::Ogg;
+				eff = AudioFileFormat::OGG;
 			}
 #endif
 #ifdef LMMS_HAVE_MP3LAME
 			else if( ext == "mp3" )
 			{
-				eff = ProjectRenderer::ExportFileFormat::MP3;
+				eff = AudioFileFormat::MP3;
 			}
 #endif
 			else if (ext == "flac")
 			{
-				eff = ProjectRenderer::ExportFileFormat::Flac;
+				eff = AudioFileFormat::FLAC;
 			}
 			else
 			{
@@ -771,8 +771,7 @@ int main( int argc, char * * argv )
 		// otherwise, it is a file, so we need to append the file extension
 		if ( !renderTracks )
 		{
-			renderOut = baseName( renderOut ) +
-				ProjectRenderer::getFileExtensionFromFormat(eff);
+			renderOut = baseName(renderOut) + AudioFileFormats[static_cast<std::size_t>(eff)].extension.data();
 		}
 
 		if (auto f = QFile{renderOut}; !f.open(QFile::WriteOnly | QFile::Truncate))
