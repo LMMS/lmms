@@ -92,7 +92,7 @@ void ProjectRenderer::run()
 
 void ProjectRenderer::processNextBuffer()
 {
-	assert(m_audioFile.channels() == 1 || m_audioFile.channels == 2 && "invalid channel count");
+	assert(m_audioFile.channels() == 1 || m_audioFile.channels()  == 2 && "invalid channel count");
 	const auto framesPerPeriod = Engine::audioEngine()->framesPerPeriod();
 
 	if (m_audioFile.channels() == 1)
