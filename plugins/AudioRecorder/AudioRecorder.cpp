@@ -1,73 +1,138 @@
-/*
- * AudioRecorder.cpp - Plugin to count beats per minute
- *
- *
- * Copyright (c) 2022 saker <sakertooth@gmail.com>
- *
- *
- * This file is part of LMMS - https://lmms.io
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
- *
- * You should have received a copy of the GNU General Public
- * License along with this program (see COPYING); if not, write to the
- * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
- * Boston, MA 02110-1301 USA.
- *
- */
-
 #include "AudioRecorder.h"
-
-#include <string>
-
+#include "AudioRecorderView.h"
 #include "embed.h"
 #include "plugin_export.h"
+
+#include <QDateTime>
+#include <QDir>
+#include <QStandardPaths>
+#include <QDebug>
+
+#include <sndfile.h>
+
+#ifdef __linux__
+#include <alsa/asoundlib.h>
+#endif
 
 namespace lmms {
 
 extern "C" {
-Plugin::Descriptor PLUGIN_EXPORT taptempo_plugin_descriptor
-	= {LMMS_STRINGIFY(PLUGIN_NAME), "Tap Tempo", QT_TRANSLATE_NOOP("PluginBrowser", "Tap to the beat"),
-		"saker <sakertooth@gmail.com>", 0x0100, Plugin::Type::Tool, new PluginPixmapLoader("logo"), nullptr, nullptr};
+Plugin::Descriptor PLUGIN_EXPORT audiorecorder_plugin_descriptor = {
+    LMMS_STRINGIFY(PLUGIN_NAME),
+    "Audio Recorder",
+    QT_TRANSLATE_NOOP("PluginBrowser", "Record audio from a microphone to WAV"),
+    "Your Name <you@example.com>",
+    0x0100,
+    Plugin::Type::Tool,
+    new PluginPixmapLoader("logo"),
+    nullptr,
+    nullptr
+};
 
-PLUGIN_EXPORT Plugin* lmms_plugin_main(Model*, void*)
-{
-	return new AudioRecorder;
+PLUGIN_EXPORT Plugin* lmms_plugin_main(Model*, void*) { return new AudioRecorder; }
 }
+
+static QString recordingsDir() {
+    const QString music = QStandardPaths::writableLocation(QStandardPaths::MusicLocation);
+    QDir dir(music.isEmpty() ? QDir::homePath() : music);
+    dir.mkpath("LMMS Recordings");
+    return dir.filePath("LMMS Recordings");
+}
+
+QString AudioRecorder::makeDefaultOutPath() {
+    return recordingsDir() + "/" +
+           QString("LMMS-Record_%1.wav").arg(QDateTime::currentDateTime().toString("yyyyMMdd_HHmmss"));
 }
 
 AudioRecorder::AudioRecorder()
-	: ToolPlugin(&taptempo_plugin_descriptor, nullptr)
+    : ToolPlugin(&audiorecorder_plugin_descriptor, nullptr) {}
+
+AudioRecorder::~AudioRecorder() { stop(); }
+
+void AudioRecorder::start()
 {
+    // already recording?
+    if (m_recording.exchange(true))
+        return;
+
+    // join any old thread
+    if (m_worker.joinable())
+        m_worker.join();
+
+#ifdef __linux__
+    // Build save location: ~/Music/LMMS Recordings/LMMS-Record_YYYYmmdd_HHmmss.wav
+    const QString music = QStandardPaths::writableLocation(QStandardPaths::MusicLocation);
+    QDir dir(music.isEmpty() ? QDir::homePath() : music);
+    dir.mkpath("LMMS Recordings");
+    m_lastPath = dir.filePath(QString("LMMS Recordings/LMMS-Record_%1.wav")
+                 .arg(QDateTime::currentDateTime().toString("yyyyMMdd_HHmmss")));
+
+    m_worker = std::thread([this]() {
+        const unsigned sampleRate = 44100;
+        const int channels = 1;
+        const snd_pcm_format_t fmt = SND_PCM_FORMAT_S16_LE;
+
+        snd_pcm_t* pcm = nullptr;
+        if (snd_pcm_open(&pcm, "default", SND_PCM_STREAM_CAPTURE, 0) < 0) {
+            m_recording.store(false);
+            return;
+        }
+        if (snd_pcm_set_params(pcm, fmt, SND_PCM_ACCESS_RW_INTERLEAVED,
+                               channels, sampleRate, 1, 500000) < 0) {
+            snd_pcm_close(pcm);
+            m_recording.store(false);
+            return;
+        }
+
+        SF_INFO sfinfo{};
+        sfinfo.channels   = channels;
+        sfinfo.samplerate = sampleRate;
+        sfinfo.format     = SF_FORMAT_WAV | SF_FORMAT_PCM_16;
+
+        SNDFILE* sf = sf_open(m_lastPath.toUtf8().constData(), SFM_WRITE, &sfinfo);
+        if (!sf) {
+            snd_pcm_close(pcm);
+            m_recording.store(false);
+            return;
+        }
+
+        const size_t frames = 1024;
+        std::vector<int16_t> buf(frames * channels);
+
+        while (m_recording.load()) {
+            snd_pcm_sframes_t got = snd_pcm_readi(pcm, buf.data(), frames);
+            if (got < 0) { snd_pcm_prepare(pcm); continue; }
+            if (got > 0)  sf_write_short(sf, buf.data(), got * channels);
+        }
+
+        sf_write_sync(sf);
+        sf_close(sf);
+        snd_pcm_close(pcm);
+    });
+#else
+    // Not implemented on this platform
+    m_recording.store(false);
+#endif
 }
 
-void AudioRecorder::onBpmClick()
+void AudioRecorder::stop()
 {
-	const auto currentTime = clock::now();
-	if (m_numTaps == 0)
-	{
-		m_startTime = currentTime;
-	}
-	else
-	{
-		using namespace std::chrono_literals;
-		const auto secondsElapsed = (currentTime - m_startTime) / 1.0s;
-		if (m_numTaps >= m_tapsNeededToDisplay) { m_bpm = m_numTaps / secondsElapsed * 60; }
-	}
+    // flip flag and join thread; writer closes the WAV
+    if (!m_recording.exchange(false))
+        return;
 
-	++m_numTaps;
+    if (m_worker.joinable())
+        m_worker.join();
+
+    // optional: log where it went
+    qInfo() << "AudioRecorder: saved to" << m_lastPath;
 }
 
-QString AudioRecorder::nodeName() const
-{
-	return taptempo_plugin_descriptor.name;
+gui::PluginView* AudioRecorder::instantiateView(QWidget* parent) {
+    return new gui::AudioRecorderView(this, parent);
+}
+
+QString AudioRecorder::nodeName() const {
+    return QString::fromLatin1(audiorecorder_plugin_descriptor.name);
 }
 } // namespace lmms

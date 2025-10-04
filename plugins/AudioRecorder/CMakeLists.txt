@@ -1,3 +1,4 @@
 INCLUDE(BuildPlugin)
-
-BUILD_PLUGIN(audiorecorder TapTempo.cpp TapTempoView.cpp MOCFILES TapTempo.h TapTempoView.h EMBEDDED_RESOURCES logo.png)
+BUILD_PLUGIN(audiorecorder AudioRecorder.cpp AudioRecorderView.cpp
+             MOCFILES AudioRecorder.h AudioRecorderView.h
+             EMBEDDED_RESOURCES logo.png)

@@ -15,4 +15,6 @@ include_directories("${CMAKE_BINARY_DIR}/src")
 FOREACH(PLUGIN ${PLUGIN_LIST})
 	ADD_SUBDIRECTORY(${PLUGIN})
 ENDFOREACH()
+
+
 add_subdirectory(AudioRecorder)

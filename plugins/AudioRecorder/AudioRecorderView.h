@@ -1,59 +1,28 @@
-/*
- * AudioRecorderView.h - Plugin to count beats per minute
- *
- *
- * Copyright (c) 2022 saker <sakertooth@gmail.com>
- *
- *
- * This file is part of LMMS - https://lmms.io
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
- *
- * You should have received a copy of the GNU General Public
- * License along with this program (see COPYING); if not, write to the
- * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
- * Boston, MA 02110-1301 USA.
- *
- */
-
-#ifndef LMMS_GUI_TAP_TEMPO_VIEW_H
-#define LMMS_GUI_TAP_TEMPO_VIEW_H
+#pragma once
 
 #include "ToolPluginView.h"
+#include <QWidget>
 
 class QPushButton;
 class QLabel;
 
 namespace lmms {
 class AudioRecorder;
-}
 
-namespace lmms::gui {
+namespace gui {
 
-class AudioRecorderView : public ToolPluginView
-{
-	Q_OBJECT
+class AudioRecorderView final : public ToolPluginView {
+    Q_OBJECT
 public:
-	AudioRecorderView(AudioRecorder* plugin);
-	void updateLabels();
-	void keyPressEvent(QKeyEvent* event) override;
-	void closeEvent(QCloseEvent*) override;
+    explicit AudioRecorderView(AudioRecorder* plugin, QWidget* parent = nullptr);
+    ~AudioRecorderView() override = default;
 
 private:
-	QPushButton* m_tapButton;
-	QLabel* m_msLabel;
-	QLabel* m_hzLabel;
-	AudioRecorder* m_plugin;
-	friend class AudioRecorder;
+    AudioRecorder* m_plugin{};
+    QPushButton*   m_startBtn{};
+    QPushButton*   m_stopBtn{};
+    QLabel*        m_pathVal{};
 };
-} // namespace lmms::gui
 
-#endif // LMMS_GUI_TAP_TEMPO_VIEW_H
+} // namespace gui
+} // namespace lmms
