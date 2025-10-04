@@ -775,6 +775,20 @@ int main( int argc, char * * argv )
 				ProjectRenderer::getFileExtensionFromFormat(eff);
 		}
 
+		if (auto f = QFile{renderOut}; !f.open(QFile::WriteOnly | QFile::Truncate))
+		{
+			const auto message = QString{"Could not open file %1 "
+										 "for writing.\nPlease make "
+										 "sure you have write "
+										 "permission to the file and "
+										 "the directory containing the "
+										 "file and try again!"}
+									 .arg(renderOut);
+
+			fprintf(stderr, "%s\n", message.toUtf8().constData());
+			exit(EXIT_FAILURE);
+		}
+
 		// create renderer
 		auto r = new RenderManager(qs, os, eff, renderOut);
 		QCoreApplication::instance()->connect( r,
