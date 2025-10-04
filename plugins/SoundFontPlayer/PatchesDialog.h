@@ -1,5 +1,5 @@
 /*
- * PatchesDialog.h - display sf2 patches
+ * PatchesDialog.h - display soundfont patches
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail/dot/com>
  * 

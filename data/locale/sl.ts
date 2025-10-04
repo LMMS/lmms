@@ -1793,8 +1793,8 @@ Do you want to do this now?</source>
     </message>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2149"/>
-        <source>SF2/3</source>
-        <translation>SF2/3</translation>
+        <source>SoundFont/3</source>
+        <translation>SoundFont/3</translation>
     </message>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2154"/>
@@ -3140,49 +3140,49 @@ Reactvate them to start the process again, with the last saved state applied to 
     <name>PatchesDialog</name>
     <message>
         <location filename="../../plugins/GigPlayer/PatchesDialog.ui" line="39"/>
-        <location filename="../../plugins/Sf2Player/PatchesDialog.ui" line="39"/>
+        <location filename="../../plugins/SoundFontPlayer/PatchesDialog.ui" line="39"/>
         <source>Qsynth: Channel Preset</source>
         <translation>QSynth: Predloga kanala</translation>
     </message>
     <message>
         <location filename="../../plugins/GigPlayer/PatchesDialog.ui" line="67"/>
-        <location filename="../../plugins/Sf2Player/PatchesDialog.ui" line="67"/>
+        <location filename="../../plugins/SoundFontPlayer/PatchesDialog.ui" line="67"/>
         <source>Bank selector</source>
         <translation>Izbirnik tabele</translation>
     </message>
     <message>
         <location filename="../../plugins/GigPlayer/PatchesDialog.ui" line="92"/>
-        <location filename="../../plugins/Sf2Player/PatchesDialog.ui" line="92"/>
+        <location filename="../../plugins/SoundFontPlayer/PatchesDialog.ui" line="92"/>
         <source>Bank</source>
         <translation>Tabela</translation>
     </message>
     <message>
         <location filename="../../plugins/GigPlayer/PatchesDialog.ui" line="98"/>
-        <location filename="../../plugins/Sf2Player/PatchesDialog.ui" line="98"/>
+        <location filename="../../plugins/SoundFontPlayer/PatchesDialog.ui" line="98"/>
         <source>Program selector</source>
         <translation>Izbirnik programa</translation>
     </message>
     <message>
         <location filename="../../plugins/GigPlayer/PatchesDialog.ui" line="123"/>
-        <location filename="../../plugins/Sf2Player/PatchesDialog.ui" line="123"/>
+        <location filename="../../plugins/SoundFontPlayer/PatchesDialog.ui" line="123"/>
         <source>Patch</source>
         <translation>Program</translation>
     </message>
     <message>
         <location filename="../../plugins/GigPlayer/PatchesDialog.ui" line="128"/>
-        <location filename="../../plugins/Sf2Player/PatchesDialog.ui" line="128"/>
+        <location filename="../../plugins/SoundFontPlayer/PatchesDialog.ui" line="128"/>
         <source>Name</source>
         <translation>Ime</translation>
     </message>
     <message>
         <location filename="../../plugins/GigPlayer/PatchesDialog.ui" line="173"/>
-        <location filename="../../plugins/Sf2Player/PatchesDialog.ui" line="173"/>
+        <location filename="../../plugins/SoundFontPlayer/PatchesDialog.ui" line="173"/>
         <source>OK</source>
         <translation>V redu</translation>
     </message>
     <message>
         <location filename="../../plugins/GigPlayer/PatchesDialog.ui" line="192"/>
-        <location filename="../../plugins/Sf2Player/PatchesDialog.ui" line="192"/>
+        <location filename="../../plugins/SoundFontPlayer/PatchesDialog.ui" line="192"/>
         <source>Cancel</source>
         <translation>Preklic</translation>
     </message>
@@ -3360,7 +3360,7 @@ Reactvate them to start the process again, with the last saved state applied to 
         <translation>Algoritem odjeka je ustvaril Sean Costello</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="64"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="64"/>
         <source>Player for SoundFont files</source>
         <translation>Predvajalnik za SoundFont datoteke</translation>
     </message>
@@ -4084,7 +4084,7 @@ Ime vtičnika
     </message>
     <message>
         <location filename="../../plugins/CarlaBase/carla/source/frontend/pluginlist/pluginlistdialog.cpp" line="1278"/>
-        <source>Discovering SF2 kits...</source>
+        <source>Discovering SoundFont kits...</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -8465,74 +8465,74 @@ Razlog: &quot;%2&quot;</translation>
     </message>
 </context>
 <context>
-    <name>lmms::Sf2Instrument</name>
+    <name>lmms::SoundFontInstrument</name>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="134"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="134"/>
         <source>Bank</source>
         <translation>Tabela</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="135"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="135"/>
         <source>Patch</source>
         <translation>Program</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="136"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="136"/>
         <source>Gain</source>
         <translation>Jakost</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="137"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="137"/>
         <source>Reverb</source>
         <translation>Odjek</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="138"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="138"/>
         <source>Reverb room size</source>
         <translation>Velikost prostora odjeka</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="139"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="139"/>
         <source>Reverb damping</source>
         <translation>Dušenje odjeka</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="140"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="140"/>
         <source>Reverb width</source>
         <translation>Širina odjeka</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="141"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="141"/>
         <source>Reverb level</source>
         <translation>Nivo odjeka</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="142"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="142"/>
         <source>Chorus</source>
         <translation>Kor</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="143"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="143"/>
         <source>Chorus voices</source>
         <translation>Glasovi kora</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="144"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="144"/>
         <source>Chorus level</source>
         <translation>Nivo kora</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="145"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="145"/>
         <source>Chorus speed</source>
         <translation>Hitrost kora</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="146"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="146"/>
         <source>Chorus depth</source>
         <translation>Globina kora</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="411"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="411"/>
         <source>A soundfont %1 could not be loaded.</source>
         <translation>Soundfont %1 ni bilo mogoče naložiti</translation>
     </message>
@@ -16666,13 +16666,13 @@ Warning: This operation can not be undone.</source>
     </message>
     <message>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="789"/>
-        <source>SF2 directory</source>
-        <translation>SF2 mapa</translation>
+        <source>SoundFont directory</source>
+        <translation>SoundFont mapa</translation>
     </message>
     <message>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="794"/>
-        <source>Default SF2</source>
-        <translation>Privzeti SF2</translation>
+        <source>Default SoundFont</source>
+        <translation>Privzeti SoundFont</translation>
     </message>
     <message>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="799"/>
@@ -16758,13 +16758,13 @@ Latenca: %2 ms</translation>
     </message>
     <message>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="1320"/>
-        <source>Choose your SF2 directory</source>
-        <translation>Izberite SF2 mapo</translation>
+        <source>Choose your SoundFont directory</source>
+        <translation>Izberite SoundFont mapo</translation>
     </message>
     <message>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="1338"/>
-        <source>Choose your default SF2</source>
-        <translation>Izberite privzeti SF2</translation>
+        <source>Choose your default SoundFont</source>
+        <translation>Izberite privzeti SoundFont</translation>
     </message>
     <message>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="1359"/>
@@ -16783,71 +16783,71 @@ Latenca: %2 ms</translation>
     </message>
 </context>
 <context>
-    <name>lmms::gui::Sf2InstrumentView</name>
+    <name>lmms::gui::SoundFontInstrumentView</name>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="994"/>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1203"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="994"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="1203"/>
         <source>Open SoundFont file</source>
         <translation>Odpri SoundFont datoteko</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1006"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="1006"/>
         <source>Choose patch</source>
         <translation>Izberi program</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1040"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="1040"/>
         <source>Gain:</source>
         <translation>Jakost:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1053"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="1053"/>
         <source>Apply reverb (if supported)</source>
         <translation>Uporabi odjek (če je podprt)</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1057"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="1057"/>
         <source>Room size:</source>
         <translation>Velikost prostora:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1061"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="1061"/>
         <source>Damping:</source>
         <translation>Dušenje:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1065"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="1065"/>
         <source>Width:</source>
         <translation>Širina:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1069"/>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1096"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="1069"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="1096"/>
         <source>Level:</source>
         <translation>Nivo:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1089"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="1089"/>
         <source>Apply chorus (if supported)</source>
         <translation>Uporabi zbor (če je podprt)</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1092"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="1092"/>
         <source>Voices:</source>
         <translation>Glasovi:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1100"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="1100"/>
         <source>Speed:</source>
         <translation>Hitrost:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1104"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="1104"/>
         <source>Depth:</source>
         <translation>Globina</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1207"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="1207"/>
         <source>SoundFont Files (*.sf2 *.sf3)</source>
         <translation>SoundFont datoteke (*.sf2 *.sf3)</translation>
     </message>

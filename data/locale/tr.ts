@@ -1973,8 +1973,8 @@ Bunu şimdi yapmak istiyor musun?</translation>
     </message>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2149"/>
-        <source>SF2/3</source>
-        <translation>SF2/3</translation>
+        <source>SoundFont/3</source>
+        <translation>SoundFont/3</translation>
     </message>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2154"/>
@@ -3320,49 +3320,49 @@ Reactvate them to start the process again, with the last saved state applied to 
     <name>PatchesDialog</name>
     <message>
         <location filename="../../plugins/GigPlayer/PatchesDialog.ui" line="39"/>
-        <location filename="../../plugins/Sf2Player/PatchesDialog.ui" line="39"/>
+        <location filename="../../plugins/SoundFontPlayer/PatchesDialog.ui" line="39"/>
         <source>Qsynth: Channel Preset</source>
         <translation>Qsynth: Kanal Ön Ayarı</translation>
     </message>
     <message>
         <location filename="../../plugins/GigPlayer/PatchesDialog.ui" line="67"/>
-        <location filename="../../plugins/Sf2Player/PatchesDialog.ui" line="67"/>
+        <location filename="../../plugins/SoundFontPlayer/PatchesDialog.ui" line="67"/>
         <source>Bank selector</source>
         <translation>Yuva seçici</translation>
     </message>
     <message>
         <location filename="../../plugins/GigPlayer/PatchesDialog.ui" line="92"/>
-        <location filename="../../plugins/Sf2Player/PatchesDialog.ui" line="92"/>
+        <location filename="../../plugins/SoundFontPlayer/PatchesDialog.ui" line="92"/>
         <source>Bank</source>
         <translation>Yuva</translation>
     </message>
     <message>
         <location filename="../../plugins/GigPlayer/PatchesDialog.ui" line="98"/>
-        <location filename="../../plugins/Sf2Player/PatchesDialog.ui" line="98"/>
+        <location filename="../../plugins/SoundFontPlayer/PatchesDialog.ui" line="98"/>
         <source>Program selector</source>
         <translation>Program seçici</translation>
     </message>
     <message>
         <location filename="../../plugins/GigPlayer/PatchesDialog.ui" line="123"/>
-        <location filename="../../plugins/Sf2Player/PatchesDialog.ui" line="123"/>
+        <location filename="../../plugins/SoundFontPlayer/PatchesDialog.ui" line="123"/>
         <source>Patch</source>
         <translation>Yama</translation>
     </message>
     <message>
         <location filename="../../plugins/GigPlayer/PatchesDialog.ui" line="128"/>
-        <location filename="../../plugins/Sf2Player/PatchesDialog.ui" line="128"/>
+        <location filename="../../plugins/SoundFontPlayer/PatchesDialog.ui" line="128"/>
         <source>Name</source>
         <translation>İsim</translation>
     </message>
     <message>
         <location filename="../../plugins/GigPlayer/PatchesDialog.ui" line="173"/>
-        <location filename="../../plugins/Sf2Player/PatchesDialog.ui" line="173"/>
+        <location filename="../../plugins/SoundFontPlayer/PatchesDialog.ui" line="173"/>
         <source>OK</source>
         <translation>Tamam</translation>
     </message>
     <message>
         <location filename="../../plugins/GigPlayer/PatchesDialog.ui" line="192"/>
-        <location filename="../../plugins/Sf2Player/PatchesDialog.ui" line="192"/>
+        <location filename="../../plugins/SoundFontPlayer/PatchesDialog.ui" line="192"/>
         <source>Cancel</source>
         <translation>İptal</translation>
     </message>
@@ -3540,7 +3540,7 @@ Reactvate them to start the process again, with the last saved state applied to 
         <translation>Sean Costello&apos;dan yankı algoritması</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="64"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="64"/>
         <source>Player for SoundFont files</source>
         <translation>Soundfont dosyaları için oynatıcı</translation>
     </message>
@@ -4264,7 +4264,7 @@ Eklenti İsmi
     </message>
     <message>
         <location filename="../../plugins/CarlaBase/carla/source/frontend/pluginlist/pluginlistdialog.cpp" line="1278"/>
-        <source>Discovering SF2 kits...</source>
+        <source>Discovering SoundFont kits...</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -8645,74 +8645,74 @@ Nedeni: &quot;%2&quot;</translation>
     </message>
 </context>
 <context>
-    <name>lmms::Sf2Instrument</name>
+    <name>lmms::SoundFontInstrument</name>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="134"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="134"/>
         <source>Bank</source>
         <translation>Yuva</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="135"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="135"/>
         <source>Patch</source>
         <translation>Yama</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="136"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="136"/>
         <source>Gain</source>
         <translation>Kazanç</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="137"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="137"/>
         <source>Reverb</source>
         <translation>Yankı</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="138"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="138"/>
         <source>Reverb room size</source>
         <translation>Yankı odası boyutu</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="139"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="139"/>
         <source>Reverb damping</source>
         <translation>Yankı sönümleme</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="140"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="140"/>
         <source>Reverb width</source>
         <translation>Yankı genişliği</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="141"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="141"/>
         <source>Reverb level</source>
         <translation>Yankı seviyesi</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="142"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="142"/>
         <source>Chorus</source>
         <translation>Koro</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="143"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="143"/>
         <source>Chorus voices</source>
         <translation>Koro sesleri</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="144"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="144"/>
         <source>Chorus level</source>
         <translation>Koro seviyesi</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="145"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="145"/>
         <source>Chorus speed</source>
         <translation>Koro hızı</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="146"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="146"/>
         <source>Chorus depth</source>
         <translation>Koro derinliği</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="411"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="411"/>
         <source>A soundfont %1 could not be loaded.</source>
         <translation>%1 ses yazı tipi yüklenemedi.</translation>
     </message>
@@ -16846,13 +16846,13 @@ Warning: This operation can not be undone.</source>
     </message>
     <message>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="789"/>
-        <source>SF2 directory</source>
-        <translation>SF2 dizini</translation>
+        <source>SoundFont directory</source>
+        <translation>SoundFont dizini</translation>
     </message>
     <message>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="794"/>
-        <source>Default SF2</source>
-        <translation>Varsayılan SF2</translation>
+        <source>Default SoundFont</source>
+        <translation>Varsayılan SoundFont</translation>
     </message>
     <message>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="799"/>
@@ -16938,13 +16938,13 @@ Gecikme: %2 ms</translation>
     </message>
     <message>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="1320"/>
-        <source>Choose your SF2 directory</source>
-        <translation>SF2 dizininizi seçin</translation>
+        <source>Choose your SoundFont directory</source>
+        <translation>SoundFont dizininizi seçin</translation>
     </message>
     <message>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="1338"/>
-        <source>Choose your default SF2</source>
-        <translation>Varsayılan SF2&apos;nizi seçin</translation>
+        <source>Choose your default SoundFont</source>
+        <translation>Varsayılan SoundFont&apos;nizi seçin</translation>
     </message>
     <message>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="1359"/>
@@ -16963,71 +16963,71 @@ Gecikme: %2 ms</translation>
     </message>
 </context>
 <context>
-    <name>lmms::gui::Sf2InstrumentView</name>
+    <name>lmms::gui::SoundFontInstrumentView</name>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="994"/>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1203"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="994"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="1203"/>
         <source>Open SoundFont file</source>
         <translation>Ses Yazı Tipi dosyasını aç</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1006"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="1006"/>
         <source>Choose patch</source>
         <translation>Yama seçin</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1040"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="1040"/>
         <source>Gain:</source>
         <translation>Kazanç:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1053"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="1053"/>
         <source>Apply reverb (if supported)</source>
         <translation>Yankı uygula (destekleniyorsa)</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1057"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="1057"/>
         <source>Room size:</source>
         <translation>Oda boyutu:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1061"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="1061"/>
         <source>Damping:</source>
         <translation>Sönümleme:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1065"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="1065"/>
         <source>Width:</source>
         <translation>En:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1069"/>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1096"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="1069"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="1096"/>
         <source>Level:</source>
         <translation>Düzey:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1089"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="1089"/>
         <source>Apply chorus (if supported)</source>
         <translation>Koro uygula (destekleniyorsa)</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1092"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="1092"/>
         <source>Voices:</source>
         <translation>Sesler:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1100"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="1100"/>
         <source>Speed:</source>
         <translation>Hız:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1104"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="1104"/>
         <source>Depth:</source>
         <translation>Derinlik:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1207"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="1207"/>
         <source>SoundFont Files (*.sf2 *.sf3)</source>
         <translation>Ses Yazı Tipi Dosyaları (*.sf2 *.sf3)</translation>
     </message>
