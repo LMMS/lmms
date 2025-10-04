@@ -490,7 +490,7 @@ QPushButton#btn-solo:checked {
 
 /* font sizes */
 
-lmms--gui--Sf2InstrumentView > QLabel {
+lmms--gui--SoundFontInstrumentView > QLabel {
 	font-size:10px;
 }
 
@@ -976,7 +976,7 @@ lmms--gui--OrganicInstrumentView lmms--gui--Knob#volKnob {
 	qproperty-lineWidth: 2;
 }
 
-lmms--gui--Sf2InstrumentView lmms--gui--Knob {
+lmms--gui--SoundFontInstrumentView lmms--gui--Knob {
 	color: #ff00ea;
 	qproperty-outerColor: rgb(20, 5, 18);
 	qproperty-innerRadius: 2;
