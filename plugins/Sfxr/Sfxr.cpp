@@ -771,7 +771,7 @@ void SfxrInstrumentView::genLaser()
 		s->m_slideModel.setValue(fastRand(-0.35f,-0.65f));
 	}
 
-	if (oneIn(2))
+	if (oneIn(3))
 	{
 		s->m_sqrDutyModel.setValue(fastRand(0.5f));
 		s->m_sqrSweepModel.setValue(0.2f);
@@ -813,7 +813,7 @@ void SfxrInstrumentView::genExplosion()
 	else
 	{
 		s->m_startFreqModel.setValue(fastRand(0.2f, 0.9f));
-		s->m_slideModel.setValue(fastRand(-0.2f, -0.4f));
+		s->m_slideModel.setValue(fastRand(-0.4f, -0.2f));
 	}
 	s->m_startFreqModel.setValue(s->m_startFreqModel.value() * s->m_startFreqModel.value());
 
@@ -885,7 +885,7 @@ void SfxrInstrumentView::genHit()
 	if (s->m_waveFormModel.value() == 0) { s->m_sqrDutyModel.setValue(fastRand(0.6f)); }
 
 	s->m_startFreqModel.setValue(fastRand(0.2f, 0.8f));
-	s->m_slideModel.setValue(fastRand(-0.3f, -0.7f));
+	s->m_slideModel.setValue(fastRand(-0.7f, -0.3f));
 	s->m_attModel.setValue(0.f);
 	s->m_holdModel.setValue(fastRand(0.1f));
 	s->m_decModel.setValue(fastRand(0.1f, 0.3f));
@@ -980,7 +980,7 @@ void SfxrInstrumentView::randomize()
 	}
 
 	s->m_lpFilResoModel.setValue(fastRand(-1.f, +1.f));
-	s->m_lpFilCutModel.setValue(1.0f - pow_hack<3>(fastRand(-1.f, +1.f)));
+	s->m_lpFilCutModel.setValue(1.0f - pow_hack<3>(fastRand(1.f)));
 	s->m_lpFilCutSweepModel.setValue(pow_hack<3>(fastRand(-1.f, +1.f)));
 	if (s->m_lpFilCutModel.value() < 0.1f && s->m_lpFilCutSweepModel.value() < -0.05f)
 	{
