@@ -27,6 +27,7 @@
 
 #include "InstrumentTrack.h"
 #include "PathUtil.h"
+#include "SampleDecoder.h"
 #include "SampleLoader.h"
 #include "Song.h"
 
@@ -38,6 +39,18 @@
 
 namespace lmms
 {
+
+
+static QString audioFileExtensions()
+{
+	QStringList extensions;
+	for (const auto& audioType : SampleDecoder::supportedAudioTypes())
+	{
+		extensions << QString::fromStdString(audioType.extension);
+	}
+	return extensions.join(",");
+}
+
 
 extern "C"
 {
@@ -54,11 +67,7 @@ Plugin::Descriptor PLUGIN_EXPORT audiofileprocessor_plugin_descriptor =
 	0x0100,
 	Plugin::Type::Instrument,
 	new PluginPixmapLoader( "logo" ),
-	"wav,ogg,ds,spx,au,voc,aif,aiff,flac,raw"
-#ifdef LMMS_HAVE_SNDFILE_MP3
-	",mp3"
-#endif
-	,
+	audioFileExtensions(),
 	nullptr,
 } ;
 

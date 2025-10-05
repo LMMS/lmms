@@ -44,6 +44,7 @@
 #include "ExportProjectDialog.h"
 #include "FileBrowser.h"
 #include "FileDialog.h"
+#include "FileTypes.h"
 #include "Metronome.h"
 #include "MixerView.h"
 #include "GuiApplication.h"
@@ -111,16 +112,20 @@ MainWindow::MainWindow() :
 	sideBar->appendTab( new PluginBrowser( splitter ) );
 	emit initProgress(tr("Preparing file browsers"));
 
-	sideBar->appendTab(new FileBrowser(FileBrowser::Type::Favorites, ConfigManager::inst()->favoriteItems().join("*"), FileItem::defaultFilters(), "My Favorites",
+	const auto defaultFilter = FileTypes::compileFilter();
+	const auto projectFilter = FileTypes::compileFilter({FileType::Project, FileType::ProjectTemplate,
+														FileType::ImportableProject});
+
+	sideBar->appendTab(new FileBrowser(FileBrowser::Type::Favorites, ConfigManager::inst()->favoriteItems().join("*"), defaultFilter, "My Favorites",
 		embed::getIconPixmap("star").transformed(QTransform().rotate(90)), splitter, false, "", ""));
 
 	sideBar->appendTab(new FileBrowser(FileBrowser::Type::Normal,
-		confMgr->userProjectsDir() + "*" + confMgr->factoryProjectsDir(), "*.mmp *.mmpz *.xml *.mid *.mpt",
+		confMgr->userProjectsDir() + "*" + confMgr->factoryProjectsDir(), projectFilter,
 		tr("My Projects"), embed::getIconPixmap("project_file").transformed(QTransform().rotate(90)), splitter, false,
 		confMgr->userProjectsDir(), confMgr->factoryProjectsDir()));
 
 	sideBar->appendTab(new FileBrowser(FileBrowser::Type::Normal,
-		confMgr->userSamplesDir() + "*" + confMgr->factorySamplesDir(), FileItem::defaultFilters(), tr("My Samples"),
+		confMgr->userSamplesDir() + "*" + confMgr->factorySamplesDir(), defaultFilter, tr("My Samples"),
 		embed::getIconPixmap("sample_file").transformed(QTransform().rotate(90)), splitter, false,
 		confMgr->userSamplesDir(), confMgr->factorySamplesDir()));
 
@@ -129,7 +134,7 @@ MainWindow::MainWindow() :
 		embed::getIconPixmap("preset_file").transformed(QTransform().rotate(90)), splitter, false,
 		confMgr->userPresetsDir(), confMgr->factoryPresetsDir()));
 
-	sideBar->appendTab(new FileBrowser(FileBrowser::Type::Normal, QDir::homePath(), FileItem::defaultFilters(),
+	sideBar->appendTab(new FileBrowser(FileBrowser::Type::Normal, QDir::homePath(), defaultFilter,
 		tr("My Home"), embed::getIconPixmap("home").transformed(QTransform().rotate(90)), splitter, false));
 
 	QStringList root_paths;
@@ -152,7 +157,7 @@ MainWindow::MainWindow() :
 	}
 #endif
 
-	sideBar->appendTab(new FileBrowser(FileBrowser::Type::Normal, root_paths.join("*"), FileItem::defaultFilters(), title,
+	sideBar->appendTab(new FileBrowser(FileBrowser::Type::Normal, root_paths.join("*"), defaultFilter, title,
 		embed::getIconPixmap("computer").transformed(QTransform().rotate(90)), splitter, dirs_as_items));
 
 	m_workspace = new MovableQMdiArea(splitter);
@@ -810,10 +815,7 @@ bool MainWindow::saveProjectAs()
 	}
 
 	// Don't write over file with suffix if no suffix is provided.
-	QString suffix = ConfigManager::inst()->value( "app",
-							"nommpz" ).toInt() == 0
-						? "mmpz"
-						: "mmp" ;
+	QString suffix = DataFile::extension(DataFile::Type::SongProject);
 	sfd.setDefaultSuffix( suffix );
 
 	if( sfd.exec () == FileDialog::Accepted &&

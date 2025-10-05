@@ -42,13 +42,17 @@ namespace lmms::gui
 class LMMS_EXPORT StringPairDrag : public QDrag
 {
 public:
+	[[deprecated("Use DragAndDrop::execStringPairDrag instead")]]
 	StringPairDrag( const QString & _key, const QString & _value,
 					const QPixmap & _icon, QWidget * _w );
 	~StringPairDrag() override;
 
+	[[deprecated("Use DragAndDrop::acceptStringPair instead")]]
 	static bool processDragEnterEvent( QDragEnterEvent * _dee,
 						const QString & _allowed_keys );
+	[[deprecated("Use MimeData::toStringPair instead")]]
 	static QString decodeKey( QDropEvent * _de );
+	[[deprecated("Use MimeData::toStringPair instead")]]
 	static QString decodeValue( QDropEvent * _de );
 } ;
 

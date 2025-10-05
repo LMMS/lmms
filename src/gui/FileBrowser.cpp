@@ -34,6 +34,7 @@
 #include <QMdiSubWindow>
 #include <QMenu>
 #include <QMessageBox>
+#include <QMimeData>
 #include <QProgressBar>
 #include <QPushButton>
 #include <QShortcut>
@@ -41,6 +42,7 @@
 #include <cassert>
 
 #include "AudioEngine.h"
+#include "Clipboard.h"
 #include "ConfigManager.h"
 #include "DataFile.h"
 #include "Engine.h"
@@ -53,6 +55,7 @@
 #include "InstrumentTrackWindow.h"
 #include "KeyboardShortcuts.h"
 #include "MainWindow.h"
+#include "PathUtil.h"
 #include "PatternStore.h"
 #include "PluginFactory.h"
 #include "PresetPreviewPlayHandle.h"
@@ -62,7 +65,6 @@
 #include "SamplePlayHandle.h"
 #include "SampleTrack.h"
 #include "Song.h"
-#include "StringPairDrag.h"
 #include "TextFloat.h"
 #include "ThreadPool.h"
 #include "embed.h"
@@ -497,7 +499,7 @@ void FileBrowser::addItems(const QString & path )
 			{
 				delete existing.front();
 			}
-			(void) new FileItem(m_fileBrowserTreeWidget, fileName, path);
+			m_fileBrowserTreeWidget->addTopLevelItem(new FileItem(fileName, path));
 		}
 	}
 }
@@ -602,7 +604,7 @@ void FileBrowserTreeWidget::keyPressEvent(QKeyEvent * ke )
 	if (file == nullptr) { return; }
 
 	// When moving to a new sound, preview it. Skip presets, they can play forever
-	if (vertical && file->type() == FileItem::FileType::Sample)
+	if (vertical && file->type() == FileType::Sample)
 	{
 		previewFileItem(file);
 	}
@@ -733,7 +735,7 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 QList<QAction*> FileBrowserTreeWidget::getContextActions(FileItem* file, bool songEditor)
 {
 	QList<QAction*> result = QList<QAction*>();
-	const bool fileIsSample = file->type() == FileItem::FileType::Sample;
+	const bool fileIsSample = file->type() == FileType::Sample;
 
 	QString instrumentAction = fileIsSample ?
 		tr("Send to new AudioFileProcessor instance") :
@@ -799,9 +801,8 @@ void FileBrowserTreeWidget::previewFileItem(FileItem* file)
 	const QString fileName = file->fullName();
 	const QString ext = file->extension();
 
-	// In special case of sample-files we do not care about
-	// handling() rather than directly creating a SamplePlayHandle
-	if (file->type() == FileItem::FileType::Sample)
+	// In case of sample-files we directly create a SamplePlayHandle
+	if (file->type() == FileType::Sample)
 	{
 		TextFloat * tf = TextFloat::displayMessage(
 			tr("Loading sample"),
@@ -817,28 +818,18 @@ void FileBrowserTreeWidget::previewFileItem(FileItem* file)
 		}
 		delete tf;
 	}
-	else if (
-		(ext == "xiz" || ext == "sf2" || ext == "sf3" ||
-		 ext == "gig" || ext == "pat")
-		&& !getPluginFactory()->pluginSupportingExtension(ext).isNull())
+	else if (file->type() == FileType::InstrumentAsset
+				&& ext != "dll" && ext != "so")
 	{
-		const bool isPlugin = file->handling() == FileItem::FileHandling::LoadByPlugin;
+		const bool isPlugin = true; // load with plugin
 		newPPH = new PresetPreviewPlayHandle(fileName, isPlugin);
 	}
-	else if (file->type() != FileItem::FileType::VstPlugin && file->isTrack())
+	else if (file->type() == FileType::InstrumentPreset)
 	{
 		DataFile dataFile(fileName);
-		if (dataFile.validate(ext))
 		{
-			const bool isPlugin = file->handling() == FileItem::FileHandling::LoadByPlugin;
+			const bool isPlugin = false; // load from DataFile
 			newPPH = new PresetPreviewPlayHandle(fileName, isPlugin, &dataFile);
-		}
-		else
-		{
-			QMessageBox::warning(0, tr ("Error"),
-				tr("%1 does not appear to be a valid %2 file")
-				.arg(fileName, ext),
-				QMessageBox::Ok, QMessageBox::NoButton);
 		}
 	}
 
@@ -880,45 +871,25 @@ void FileBrowserTreeWidget::mouseMoveEvent( QMouseEvent * me )
 		auto f = dynamic_cast<FileItem*>(itemAt(m_pressPos));
 		if( f != nullptr )
 		{
-			switch( f->type() )
-			{
-				case FileItem::FileType::Preset:
-					new StringPairDrag( f->handling() == FileItem::FileHandling::LoadAsPreset ?
-							"presetfile" : "pluginpresetfile",
-							f->fullName(),
-							embed::getIconPixmap( "preset_file" ), this );
-					break;
-
-				case FileItem::FileType::Sample:
-					new StringPairDrag( "samplefile", f->fullName(),
-							embed::getIconPixmap( "sample_file" ), this );
-					break;
-				case FileItem::FileType::SoundFont:
-					new StringPairDrag( "soundfontfile", f->fullName(),
-							embed::getIconPixmap( "soundfont_file" ), this );
-					break;
-				case FileItem::FileType::Patch:
-					new StringPairDrag( "patchfile", f->fullName(),
-							embed::getIconPixmap( "sample_file" ), this );
-					break;
-				case FileItem::FileType::VstPlugin:
-					new StringPairDrag( "vstpluginfile", f->fullName(),
-							embed::getIconPixmap( "vst_plugin_file" ), this );
-					break;
-				case FileItem::FileType::Midi:
-					new StringPairDrag( "importedproject", f->fullName(),
-							embed::getIconPixmap( "midi_file" ), this );
-					break;
-				case FileItem::FileType::Project:
-					new StringPairDrag( "projectfile", f->fullName(),
-							embed::getIconPixmap( "project_file" ), this );
-					break;
-
-				default:
-					break;
-			}
+			f->startFileDrag(this);
 		}
 	}
+}
+
+
+
+
+void FileItem::startFileDrag(QWidget* dragSource)
+{
+	auto mimeData = new QMimeData;
+
+	// This sets the "text/uri-list" MIME type
+	mimeData->setUrls({QUrl::fromLocalFile(fullName())});
+
+	// Load a larger icon
+	auto icon = embed::getIconPixmap(FileTypes::iconName(extension()));
+
+	DragAndDrop::exec(dragSource, mimeData, icon);
 }
 
 
@@ -945,18 +916,28 @@ void FileBrowserTreeWidget::mouseReleaseEvent(QMouseEvent * me )
 
 void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it)
 {
-	Engine::audioEngine()->requestChangeInModel();
-	switch( f->handling() )
+	// Lambda to create new track
+	auto newInstrumentTrack = []
 	{
-		case FileItem::FileHandling::LoadAsProject:
+		return dynamic_cast<InstrumentTrack*>(Track::create(Track::Type::Instrument, Engine::patternStore()));
+	};
+
+	Engine::audioEngine()->requestChangeInModel();
+	switch (f->type())
+	{
+		case FileType::Project:
+		case FileType::ProjectTemplate:
 			if( getGUI()->mainWindow()->mayChangeProject(true) )
 			{
 				Engine::getSong()->loadProject( f->fullName() );
 			}
 			break;
 
-		case FileItem::FileHandling::LoadByPlugin:
+		case FileType::Sample:
+		case FileType::InstrumentAsset:
 		{
+			if (it == nullptr) { it = newInstrumentTrack();	}
+
 			const QString e = f->extension();
 			Instrument * i = it->instrument();
 			if( i == nullptr ||
@@ -970,17 +951,18 @@ void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it)
 			break;
 		}
 
-		case FileItem::FileHandling::LoadAsPreset: {
+		case FileType::InstrumentPreset: {
+			if (it == nullptr) { it = newInstrumentTrack();	}
+
 			DataFile dataFile(f->fullName());
 			it->replaceInstrument(dataFile);
 			break;
 		}
-		case FileItem::FileHandling::ImportAsProject:
+		case FileType::ImportableProject:
 			ImportFilter::import( f->fullName(),
 							Engine::getSong() );
 			break;
 
-		case FileItem::FileHandling::NotSupported:
 		default:
 			break;
 
@@ -995,20 +977,9 @@ void FileBrowserTreeWidget::activateListItem(QTreeWidgetItem * item,
 								int column )
 {
 	auto f = dynamic_cast<FileItem*>(item);
-	if( f == nullptr )
-	{
-		return;
-	}
-
-	if( f->handling() == FileItem::FileHandling::LoadAsProject ||
-		f->handling() == FileItem::FileHandling::ImportAsProject )
+	if (f != nullptr)
 	{
 		handleFile( f, nullptr );
-	}
-	else if( f->handling() != FileItem::FileHandling::NotSupported )
-	{
-		auto it = dynamic_cast<InstrumentTrack*>(Track::create(Track::Type::Instrument, Engine::patternStore()));
-		handleFile( f, it );
 	}
 }
 
@@ -1041,7 +1012,7 @@ void FileBrowserTreeWidget::openInNewInstrumentTrack(FileItem* item, bool songEd
 bool FileBrowserTreeWidget::openInNewSampleTrack(FileItem* item)
 {
 	// Can't add non-samples to a sample track
-	if (item->type() != FileItem::FileType::Sample) { return false; }
+	if (item->type() != FileType::Sample) { return false; }
 
 	// Create a new sample track for this sample
 	auto sampleTrack = static_cast<SampleTrack*>(Track::create(Track::Type::Sample, Engine::getSong()));
@@ -1178,140 +1149,18 @@ bool Directory::addItems(const QString& path)
 
 
 
-FileItem::FileItem(QTreeWidget * parent, const QString & name,
-						const QString & path ) :
-	QTreeWidgetItem( parent, QStringList( name) , TypeFileItem ),
-	m_path( path )
-{
-	determineFileType();
-	initPixmaps();
-}
-
-
 
 
 FileItem::FileItem(const QString & name, const QString & path ) :
 	QTreeWidgetItem( QStringList( name ), TypeFileItem ),
 	m_path( path )
 {
-	determineFileType();
-	initPixmaps();
+	m_type = FileTypes::find(extension());
+	setIcon(0, embed::getIconPixmap(FileTypes::iconName(extension()), 16, 16));
 }
 
 
 
-
-void FileItem::initPixmaps()
-{
-	static auto s_projectFilePixmap = embed::getIconPixmap("project_file", 16, 16);
-	static auto s_presetFilePixmap = embed::getIconPixmap("preset_file", 16, 16);
-	static auto s_sampleFilePixmap = embed::getIconPixmap("sample_file", 16, 16);
-	static auto s_soundfontFilePixmap = embed::getIconPixmap("soundfont_file", 16, 16);
-	static auto s_vstPluginFilePixmap = embed::getIconPixmap("vst_plugin_file", 16, 16);
-	static auto s_midiFilePixmap = embed::getIconPixmap("midi_file", 16, 16);
-	static auto s_unknownFilePixmap = embed::getIconPixmap("unknown_file");
-
-	switch( m_type )
-	{
-		case FileType::Project:
-			setIcon(0, s_projectFilePixmap);
-			break;
-		case FileType::Preset:
-			setIcon(0, s_presetFilePixmap);
-			break;
-		case FileType::SoundFont:
-			setIcon(0, s_soundfontFilePixmap);
-			break;
-		case FileType::VstPlugin:
-			setIcon(0, s_vstPluginFilePixmap);
-			break;
-		case FileType::Sample:
-		case FileType::Patch:			// TODO
-			setIcon(0, s_sampleFilePixmap);
-			break;
-		case FileType::Midi:
-			setIcon(0, s_midiFilePixmap);
-			break;
-		case FileType::Unknown:
-		default:
-			setIcon(0, s_unknownFilePixmap);
-			break;
-	}
-}
-
-
-
-
-void FileItem::determineFileType()
-{
-	m_handling = FileHandling::NotSupported;
-
-	const QString ext = extension();
-	if( ext == "mmp" || ext == "mpt" || ext == "mmpz" )
-	{
-		m_type = FileType::Project;
-		m_handling = FileHandling::LoadAsProject;
-	}
-	else if( ext == "xpf" || ext == "xml" )
-	{
-		m_type = FileType::Preset;
-		m_handling = FileHandling::LoadAsPreset;
-	}
-	else if( ext == "xiz" && ! getPluginFactory()->pluginSupportingExtension(ext).isNull() )
-	{
-		m_type = FileType::Preset;
-		m_handling = FileHandling::LoadByPlugin;
-	}
-	else if( ext == "sf2" || ext == "sf3" )
-	{
-		m_type = FileType::SoundFont;
-	}
-	else if( ext == "pat" )
-	{
-		m_type = FileType::Patch;
-	}
-	else if( ext == "mid" || ext == "midi" || ext == "rmi" )
-	{
-		m_type = FileType::Midi;
-		m_handling = FileHandling::ImportAsProject;
-	}
-#ifdef LMMS_HAVE_VST
-	else if (
-#	if defined(LMMS_BUILD_LINUX)
-		ext == "so" ||
-#	endif
-#	if defined(LMMS_HAVE_VST_32) || defined(LMMS_HAVE_VST_64)
-		ext == "dll" ||
-#	endif
-		false
-	)
-	{
-		m_type = FileType::VstPlugin;
-		m_handling = FileHandling::LoadByPlugin;
-	}
-#endif
-	else if ( ext == "lv2" )
-	{
-		m_type = FileType::Preset;
-		m_handling = FileHandling::LoadByPlugin;
-	}
-	else
-	{
-		m_type = FileType::Unknown;
-	}
-
-	if( m_handling == FileHandling::NotSupported &&
-		!ext.isEmpty() && ! getPluginFactory()->pluginSupportingExtension(ext).isNull() )
-	{
-		m_handling = FileHandling::LoadByPlugin;
-		// classify as sample if not classified by anything yet but can
-		// be handled by a certain plugin
-		if( m_type == FileType::Unknown )
-		{
-			m_type = FileType::Sample;
-		}
-	}
-}
 
 
 
@@ -1328,31 +1177,5 @@ QString FileItem::extension(const QString & file )
 {
 	return QFileInfo( file ).suffix().toLower();
 }
-
-QString FileItem::defaultFilters()
-{
-	const auto projectFilters = QStringList{"*.mmp", "*.mpt", "*.mmpz"};
-	const auto presetFilters = QStringList{"*.xpf", "*.xml", "*.xiz", "*.lv2"};
-	const auto soundFontFilters = QStringList{"*.sf2", "*.sf3"};
-	const auto patchFilters = QStringList{"*.pat"};
-	const auto midiFilters = QStringList{"*.mid", "*.midi", "*.rmi"};
-	
-	auto vstPluginFilters = QStringList{"*.dll"};
-#ifdef LMMS_BUILD_LINUX
-	vstPluginFilters.append("*.so");
-#endif
-
-	auto audioFilters
-		= QStringList{"*.wav", "*.ogg", "*.ds", "*.flac", "*.spx", "*.voc", "*.aif", "*.aiff", "*.au", "*.raw"};
-#ifdef LMMS_HAVE_SNDFILE_MP3
-	audioFilters.append("*.mp3");
-#endif
-
-	const auto extensions = projectFilters + presetFilters + soundFontFilters + patchFilters + midiFilters
-		+ vstPluginFilters + audioFilters;
-
-	return extensions.join(" ");
-}
-
 
 } // namespace lmms::gui

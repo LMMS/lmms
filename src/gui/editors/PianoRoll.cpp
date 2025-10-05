@@ -5429,10 +5429,7 @@ void PianoRollWindow::exportMidiClip()
 		!exportDialog.selectedFiles().isEmpty() &&
 		!exportDialog.selectedFiles().first().isEmpty())
 	{
-		QString suffix =
-			ConfigManager::inst()->value("app", "nommpz").toInt() == 0
-				? "xptz"
-				: "xpt";
+		QString suffix = DataFile::extension(DataFile::Type::MidiClip);
 		exportDialog.setDefaultSuffix(suffix);
 
 		const QString fullPath = exportDialog.selectedFiles()[0];

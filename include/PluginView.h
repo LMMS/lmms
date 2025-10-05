@@ -25,8 +25,11 @@
 #ifndef LMMS_GUI_PLUGIN_VIEW_H
 #define LMMS_GUI_PLUGIN_VIEW_H
 
+#include <QDragEnterEvent>
+#include <QDropEvent>
 #include <QWidget>
 
+#include "Clipboard.h"
 #include "ModelView.h"
 #include "Plugin.h"
 
@@ -42,6 +45,28 @@ public:
 	}
 
 	virtual bool isResizable() const { return false; }
+
+protected:
+	void dragEnterEvent(QDragEnterEvent* dee) override
+	{
+		const auto [path, ext] = DragAndDrop::getFileAndExt(dee);
+
+		if (castModel<Plugin>()->descriptor()->supportsFileType(ext))
+		{
+			dee->acceptProposedAction();
+		}
+	}
+
+	void dropEvent(QDropEvent* de) override
+	{
+		const auto [path, ext] = DragAndDrop::getFileAndExt(de);
+
+		if (castModel<Plugin>()->descriptor()->supportsFileType(ext))
+		{
+			castModel<Plugin>()->loadFile(path);
+			de->accept();
+		}
+	}
 };
 
 } // namespace lmms::gui

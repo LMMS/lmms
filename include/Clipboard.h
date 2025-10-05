@@ -26,8 +26,10 @@
 #define LMMS_CLIPBOARD_H
 
 #include <QDomElement>
-#include <QMap>
+#include <QDropEvent>
+#include <QPixmap>
 
+#include "FileTypes.h"
 #include "lmms_export.h"
 
 class QMimeData;
@@ -38,10 +40,14 @@ namespace lmms::Clipboard
 	enum class MimeType
 	{
 		StringPair,
-		Default
+		// TODO rename Default to DataFile or something
+		// It is used as piano roll clipboard to hold DataFile XML
+		Default,
+		PlainText,
 	};
 
 	// Convenience Methods
+	void copyMimeData(QMimeData* m);
 	const QMimeData * getMimeData();
 	bool hasFormat( MimeType mT );
 
@@ -51,7 +57,10 @@ namespace lmms::Clipboard
 
 	// Helper methods for String Pair data
 	void copyStringPair( const QString & key, const QString & value );
+
+	[[deprecated("Use MimeData::toStringPair instead")]]
 	QString decodeKey( const QMimeData * mimeData );
+	[[deprecated("Use MimeData::toStringPair instead")]]
 	QString decodeValue( const QMimeData * mimeData );
 
 	inline const char * mimeType( MimeType type )
@@ -60,14 +69,51 @@ namespace lmms::Clipboard
 		{
 			case MimeType::StringPair:
 				return "application/x-lmms-stringpair";
-			break;
 			case MimeType::Default:
-			default:
 				return "application/x-lmms-clipboard";
-				break;
+			case MimeType::PlainText:
+			default:
+				return "text/plain";
 		}
 	}
 
 } // namespace lmms::Clipboard
+
+
+
+
+namespace lmms::MimeData
+{
+	//! Create a new QMimeData from a string pair
+	QMimeData* fromStringPair(const QString& key, const QString& value);
+
+	//! Extract string pair from QMimeData
+	std::pair<QString, QString> toStringPair(const QMimeData* md);
+
+} // namespace lmms::MimeData
+
+
+
+
+namespace lmms::DragAndDrop
+{
+	//! Start a QDrag from given widget, return mouse is released
+	void exec(QWidget* widget, QMimeData* md, const QPixmap& icon = {});
+
+	//! Start a QDrag containing a string pair
+	void execStringPairDrag(const QString& key, const QString& value, const QPixmap& icon, QWidget* widget);
+
+	//! Accept drag enter event if it contains a file of allowed type
+	bool acceptFile(QDragEnterEvent* dee, const std::initializer_list<FileType> allowedTypes);
+
+	//! Accept drag enter event if it contains a string pair of allowed type
+	bool acceptStringPair(QDragEnterEvent* dee, const std::initializer_list<QString> allowedKeys);
+
+	//! Get file path from drop event (empty if it doesn't match allowedType)
+	LMMS_EXPORT QString getFile(const QDropEvent* de, FileType allowedType);
+	LMMS_EXPORT std::pair<QString, FileType> getFileAndType(const QDropEvent* de);
+	LMMS_EXPORT std::pair<QString, QString> getFileAndExt(const QDropEvent* de);
+
+} // namespace lmms::DragAndDrop
 
 #endif // LMMS_CLIPBOARD_H

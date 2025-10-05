@@ -355,12 +355,8 @@ bool TrackContentWidget::canPasteSelection( TimePos clipPos, const QDropEvent* d
 // Overloaded method to make it possible to call this method without a Drag&Drop event
 bool TrackContentWidget::canPasteSelection( TimePos clipPos, const QMimeData* md , bool allowSameBar )
 {
-	// For decodeKey() and decodeValue()
-	using namespace Clipboard;
-
 	Track * t = getTrack();
-	QString type = decodeKey( md );
-	QString value = decodeValue( md );
+	const auto [type, value] = MimeData::toStringPair(md);
 
 	// We can only paste into tracks of the same type
 	if (type != ("clip_" + QString::number(static_cast<int>(t->type()))))
@@ -461,8 +457,7 @@ bool TrackContentWidget::pasteSelection( TimePos clipPos, const QMimeData * md, 
 		return false;
 	}
 
-	QString type = decodeKey( md );
-	QString value = decodeValue( md );
+	const auto [type, value] = MimeData::toStringPair(md);
 
 	getTrack()->addJournalCheckPoint();
 

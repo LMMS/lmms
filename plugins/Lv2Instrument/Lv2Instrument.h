@@ -113,8 +113,6 @@ public:
 	Lv2InsView(Lv2Instrument *_instrument, QWidget *_parent);
 
 protected:
-	void dragEnterEvent(QDragEnterEvent *_dee) override;
-	void dropEvent(QDropEvent *_de) override;
 	void hideEvent(QHideEvent* event) override;
 
 private:

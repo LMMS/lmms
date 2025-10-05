@@ -30,6 +30,7 @@
 #include <QSizePolicy>
 #include <QVBoxLayout>
 
+#include "Clipboard.h"
 #include "EnvelopeGraph.h"
 #include "LfoGraph.h"
 #include "EnvelopeAndLfoParameters.h"
@@ -38,7 +39,6 @@
 #include "LedCheckBox.h"
 #include "DataFile.h"
 #include "PixmapButton.h"
-#include "StringPairDrag.h"
 #include "TempoSyncKnob.h"
 #include "TextFloat.h"
 #include "Track.h"
@@ -228,9 +228,7 @@ void EnvelopeAndLfoView::modelChanged()
 
 void EnvelopeAndLfoView::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	StringPairDrag::processDragEnterEvent( _dee,
-					QString( "samplefile,clip_%1" ).arg(
-							static_cast<int>(Track::Type::Sample) ) );
+	DragAndDrop::acceptFile(_dee, {FileType::Sample});
 }
 
 
@@ -238,22 +236,9 @@ void EnvelopeAndLfoView::dragEnterEvent( QDragEnterEvent * _dee )
 
 void EnvelopeAndLfoView::dropEvent( QDropEvent * _de )
 {
-	QString type = StringPairDrag::decodeKey( _de );
-	QString value = StringPairDrag::decodeValue( _de );
-	if( type == "samplefile" )
+	auto file = DragAndDrop::getFile(_de, FileType::Sample);
+	if (!file.isEmpty())
 	{
-		m_params->m_userWave = SampleLoader::createBufferFromFile(value);
-		m_userLfoBtn->model()->setValue( true );
-		m_params->m_lfoWaveModel.setValue(static_cast<int>(EnvelopeAndLfoParameters::LfoShape::UserDefinedWave));
-		_de->accept();
-		update();
-	}
-	else if( type == QString( "clip_%1" ).arg( static_cast<int>(Track::Type::Sample) ) )
-	{
-		DataFile dataFile( value.toUtf8() );
-		auto file = dataFile.content().
-					firstChildElement().firstChildElement().
-					firstChildElement().attribute("src");
 		m_params->m_userWave = SampleLoader::createBufferFromFile(file);
 		m_userLfoBtn->model()->setValue( true );
 		m_params->m_lfoWaveModel.setValue(static_cast<int>(EnvelopeAndLfoParameters::LfoShape::UserDefinedWave));

@@ -55,8 +55,6 @@ protected slots:
 	void openAudioFile();
 
 protected:
-	virtual void dragEnterEvent(QDragEnterEvent* dee);
-	virtual void dropEvent(QDropEvent* de);
 	virtual void paintEvent(QPaintEvent*);
 
 	// Private methods

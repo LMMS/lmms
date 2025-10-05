@@ -30,10 +30,13 @@
 #include <QSpacerItem>
 #include <QVBoxLayout>
 
+#include "Clipboard.h"
 #include "ConfigManager.h"
 #include "embed.h"
 #include "Engine.h"
 #include "FadeButton.h"
+#include "FileTypes.h"
+#include "FontHelper.h"
 #include "Mixer.h"
 #include "MixerChannelLcdSpinBox.h"
 #include "MixerView.h"
@@ -42,7 +45,6 @@
 #include "SampleClip.h"
 #include "SampleTrackWindow.h"
 #include "SongEditor.h"
-#include "StringPairDrag.h"
 #include "TrackContainerView.h"
 #include "TrackLabelButton.h"
 
@@ -188,20 +190,18 @@ void SampleTrackView::modelChanged()
 
 
 
-void SampleTrackView::dragEnterEvent(QDragEnterEvent *dee)
+void SampleTrackView::dragEnterEvent(QDragEnterEvent* dee)
 {
-	StringPairDrag::processDragEnterEvent(dee, QString("samplefile"));
+	DragAndDrop::acceptFile(dee, {FileType::Sample});
 }
 
 
 
 
-void SampleTrackView::dropEvent(QDropEvent *de)
+void SampleTrackView::dropEvent(QDropEvent* de)
 {
-	QString type  = StringPairDrag::decodeKey(de);
-	QString value = StringPairDrag::decodeValue(de);
-
-	if (type == "samplefile")
+	const auto value = DragAndDrop::getFile(de, FileType::Sample);
+	if (!value.isEmpty())
 	{
 		int trackHeadWidth = ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt()==1
 				? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT

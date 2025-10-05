@@ -36,12 +36,14 @@
 #include "AutomatableButton.h"
 #include "ComboBox.h"
 #include "ConfigManager.h"
+#include "Clipboard.h"
 #include "DataFile.h"
 #include "EffectRackView.h"
 #include "embed.h"
 #include "Engine.h"
 #include "FileBrowser.h"
 #include "FileDialog.h"
+#include "FileTypes.h"
 #include "GroupBox.h"
 #include "MixerChannelLcdSpinBox.h"
 #include "GuiApplication.h"
@@ -560,7 +562,8 @@ void InstrumentTrackWindow::focusInEvent( QFocusEvent* )
 
 void InstrumentTrackWindow::dragEnterEventGeneric( QDragEnterEvent* event )
 {
-	StringPairDrag::processDragEnterEvent( event, "instrument,presetfile,pluginpresetfile" );
+	DragAndDrop::acceptStringPair(event, {"instrument"});
+	DragAndDrop::acceptFile(event, {FileType::InstrumentPreset, FileType::InstrumentAsset});
 }
 
 
@@ -578,6 +581,7 @@ void InstrumentTrackWindow::dropEvent( QDropEvent* event )
 {
 	QString type = StringPairDrag::decodeKey( event );
 	QString value = StringPairDrag::decodeValue( event );
+	const auto [path, fileType] = DragAndDrop::getFileAndType(event);
 
 	if( type == "instrument" )
 	{
@@ -588,16 +592,16 @@ void InstrumentTrackWindow::dropEvent( QDropEvent* event )
 		event->accept();
 		setFocus();
 	}
-	else if( type == "presetfile" )
+	else if (fileType == FileType::InstrumentPreset)
 	{
-		DataFile dataFile(value);
+		DataFile dataFile(path);
 		m_track->replaceInstrument(dataFile);
 		event->accept();
 		setFocus();
 	}
-	else if( type == "pluginpresetfile" )
+	else if (fileType == FileType::InstrumentAsset)
 	{
-		const QString ext = FileItem::extension( value );
+		const QString ext = FileItem::extension(path);
 		Instrument * i = m_track->instrument();
 
 		if( !i->descriptor()->supportsFileType( ext ) )
@@ -607,7 +611,7 @@ void InstrumentTrackWindow::dropEvent( QDropEvent* event )
 			i = m_track->loadInstrument(piakn.info.name(), &piakn.key);
 		}
 
-		i->loadFile( value );
+		i->loadFile(path);
 
 		event->accept();
 		setFocus();

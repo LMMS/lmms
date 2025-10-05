@@ -33,8 +33,6 @@
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
 #include "Lv2SubPluginFeatures.h"
-#include "StringPairDrag.h"
-#include "Clipboard.h"
 
 #include "embed.h"
 #include "plugin_export.h"
@@ -57,7 +55,7 @@ Plugin::Descriptor PLUGIN_EXPORT lv2instrument_plugin_descriptor =
 	0x0100,
 	Plugin::Type::Instrument,
 	new PluginPixmapLoader("logo"),
-	nullptr,
+	"lv2",
 	new Lv2SubPluginFeatures(Plugin::Type::Instrument)
 };
 
@@ -250,44 +248,6 @@ Lv2InsView::Lv2InsView(Lv2Instrument *_instrument, QWidget *_parent) :
 		connect(m_helpButton, &QPushButton::toggled,
 			this, [this](bool visible){ toggleHelp(visible); });
 	}
-}
-
-
-
-
-void Lv2InsView::dragEnterEvent(QDragEnterEvent *_dee)
-{
-	// For mimeType() and MimeType enum class
-	using namespace Clipboard;
-
-	void (QDragEnterEvent::*reaction)() = &QDragEnterEvent::ignore;
-
-	if (_dee->mimeData()->hasFormat( mimeType( MimeType::StringPair )))
-	{
-		const QString txt =
-			_dee->mimeData()->data( mimeType( MimeType::StringPair ) );
-		if (txt.section(':', 0, 0) == "pluginpresetfile") {
-			reaction = &QDragEnterEvent::acceptProposedAction;
-		}
-	}
-
-	(_dee->*reaction)();
-}
-
-
-
-
-void Lv2InsView::dropEvent(QDropEvent *_de)
-{
-	const QString type = StringPairDrag::decodeKey(_de);
-	const QString value = StringPairDrag::decodeValue(_de);
-	if (type == "pluginpresetfile")
-	{
-		castModel<Lv2Instrument>()->loadFile(value);
-		_de->accept();
-		return;
-	}
-	_de->ignore();
 }
 
 

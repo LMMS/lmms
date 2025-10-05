@@ -97,7 +97,7 @@ public:
 		int version;
 		Type type;
 		const PixmapLoader * logo;
-		const char * supportedFileTypes; //!< csv list of extensions
+		const QString supportedFileTypes; //!< comma separated list of file extensions
 
 		inline bool supportsFileType( const QString& extension ) const
 		{
@@ -124,7 +124,7 @@ public:
 				its sub plugin (using the attributes).
 				When keys are saved, those attributes are
 				written to XML in order to find the right sub
-				plugin when realoading.
+				plugin when reloading.
 
 				@note Any data that is not required to reference
 					the right Plugin or sub plugin should

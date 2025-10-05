@@ -143,11 +143,6 @@ public:
 	ZynAddSubFxView( Instrument * _instrument, QWidget * _parent );
 
 
-protected:
-	void dragEnterEvent( QDragEnterEvent * _dee ) override;
-	void dropEvent( QDropEvent * _de ) override;
-
-
 private:
 	void modelChanged() override;
 

@@ -39,7 +39,6 @@
 #include "PathUtil.h"
 #include "PixmapButton.h"
 #include "Song.h"
-#include "StringPairDrag.h"
 #include "Clipboard.h"
 
 #include "embed.h"
@@ -562,50 +561,6 @@ void PatmanView::updateFilename()
 	}
 
 	update();
-}
-
-
-
-
-void PatmanView::dragEnterEvent( QDragEnterEvent * _dee )
-{
-	// For mimeType() and MimeType enum class
-	using namespace Clipboard;
-
-	if( _dee->mimeData()->hasFormat( mimeType( MimeType::StringPair ) ) )
-	{
-		QString txt = _dee->mimeData()->data(
-						mimeType( MimeType::StringPair ) );
-		if( txt.section( ':', 0, 0 ) == "samplefile" )
-		{
-			_dee->acceptProposedAction();
-		}
-		else
-		{
-			_dee->ignore();
-		}
-	}
-	else
-	{
-		_dee->ignore();
-	}
-}
-
-
-
-
-void PatmanView::dropEvent( QDropEvent * _de )
-{
-	QString type = StringPairDrag::decodeKey( _de );
-	QString value = StringPairDrag::decodeValue( _de );
-	if( type == "samplefile" )
-	{
-		m_pi->setFile( value );
-		_de->accept();
-		return;
-	}
-
-	_de->ignore();
 }
 
 

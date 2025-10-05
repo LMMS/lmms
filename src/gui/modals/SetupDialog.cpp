@@ -1375,7 +1375,8 @@ void SetupDialog::openSF2File()
 {
 #ifdef LMMS_HAVE_FLUIDSYNTH
 	QString new_file = FileDialog::getOpenFileName(this,
-		tr("Choose your default SF2"), m_sf2File, "SoundFont 2 files (*.sf2)");
+		// TODO should this be linked to SoundFont player's formats in some way?
+		tr("Choose your default soundfont"), m_sf2File, "SoundFont files (*.sf2 *.sf3)");
 
 	if (!new_file.isEmpty())
 	{

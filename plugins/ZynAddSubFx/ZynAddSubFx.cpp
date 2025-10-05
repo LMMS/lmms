@@ -42,7 +42,6 @@
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
 #include "Song.h"
-#include "StringPairDrag.h"
 #include "RemoteZynAddSubFx.h"
 #include "LocalZynAddSubFx.h"
 #include "AudioEngine.h"
@@ -556,49 +555,6 @@ ZynAddSubFxView::ZynAddSubFxView( Instrument * _instrument, QWidget * _parent ) 
 	l->setColumnStretch( 4, 10 );
 
 	setAcceptDrops( true );
-}
-
-
-
-
-void ZynAddSubFxView::dragEnterEvent( QDragEnterEvent * _dee )
-{
-	// For mimeType() and MimeType enum class
-	using namespace Clipboard;
-
-	if( _dee->mimeData()->hasFormat( mimeType( MimeType::StringPair ) ) )
-	{
-		QString txt = _dee->mimeData()->data(
-						mimeType( MimeType::StringPair ) );
-		if( txt.section( ':', 0, 0 ) == "pluginpresetfile" )
-		{
-			_dee->acceptProposedAction();
-		}
-		else
-		{
-			_dee->ignore();
-		}
-	}
-	else
-	{
-		_dee->ignore();
-	}
-}
-
-
-
-
-void ZynAddSubFxView::dropEvent( QDropEvent * _de )
-{
-	const QString type = StringPairDrag::decodeKey( _de );
-	const QString value = StringPairDrag::decodeValue( _de );
-	if( type == "pluginpresetfile" )
-	{
-		castModel<ZynAddSubFxInstrument>()->loadFile( value );
-		_de->accept();
-		return;
-	}
-	_de->ignore();
 }
 
 
