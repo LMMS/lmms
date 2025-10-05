@@ -127,6 +127,12 @@ AudioFile::Impl::Impl(std::filesystem::path path, AudioFileFormat format, Output
 	, m_sndfile(openAudioFile(path, SFM_WRITE, &m_info))
 	, m_path(std::move(path))
 {
+	// This only works for a select number of formats.
+	// Formats like MP3 silently fail/do nothing (according to local testing).
+	// one option could be to introduce TagLib and use that instead for metadata,
+	// or we transition to using FFmpeg which can handle metadata.
+	sf_set_string(m_sndfile, SF_STR_COMMENT, "Created with LMMS");
+
 	if (format == AudioFileFormat::FLAC)
 	{
 		auto compressionLevel = settings.getCompressionLevel();
