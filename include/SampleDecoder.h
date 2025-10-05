@@ -30,6 +30,7 @@
 #include <string>
 #include <vector>
 
+#include "lmms_export.h"
 #include "SampleFrame.h"
 
 namespace lmms {
@@ -49,7 +50,7 @@ public:
 	};
 
 	static auto decode(const QString& audioFile) -> std::optional<Result>;
-	static auto supportedAudioTypes() -> const std::vector<AudioType>&;
+	LMMS_EXPORT static auto supportedAudioTypes() -> const std::vector<AudioType>&;
 };
 } // namespace lmms
 
