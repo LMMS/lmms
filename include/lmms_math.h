@@ -83,8 +83,9 @@ inline auto absFraction(std::floating_point auto x) noexcept
 	return x - std::floor(x);
 }
 
+
 //! @brief Returns a psuedorandom integer between 0 and 32767, inclusive.
-inline std::integral auto fastRand() noexcept
+inline int fastRand() noexcept
 {
 	thread_local unsigned long s_next = 1;
 	s_next = s_next * 1103515245 + 12345;
@@ -93,11 +94,20 @@ inline std::integral auto fastRand() noexcept
 
 
 //! @brief Returns a psuedorandom number between 0 and @p range, inclusive.
-template<typename T> requires std::is_arithmetic_v<T>
-inline auto fastRand(T range) noexcept
+template<typename T> requires std::is_floating_point_v<T>
+inline T fastRand(T range) noexcept
 {
-	constexpr auto FAST_RAND_RATIO = static_cast<std::conditional_t<std::is_floating_point_v<T>, T, float>>(1.0 / 32767);
+	constexpr auto FAST_RAND_RATIO = static_cast<T>(1.0 / 32767);
 	return fastRand() * range * FAST_RAND_RATIO;
+}
+
+
+//! @brief Returns a psuedorandom integer between 0 and @p range, inclusive.
+template<typename T> requires std::is_integral_v<T>
+inline T fastRand(T range) noexcept
+{
+	constexpr float FAST_RAND_RATIO = 1.f / 32768;
+	return static_cast<T>(std::floor(fastRand() * (1 + range) * FAST_RAND_RATIO));
 }
 
 
