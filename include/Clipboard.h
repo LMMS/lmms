@@ -58,9 +58,9 @@ namespace lmms::Clipboard
 	// Helper methods for String Pair data
 	void copyStringPair( const QString & key, const QString & value );
 
-	[[deprecated("Use MimeData::toStringPair instead")]]
+	//! deprecated - use MimeData::toStringPair instead
 	QString decodeKey( const QMimeData * mimeData );
-	[[deprecated("Use MimeData::toStringPair instead")]]
+	//! deprecated - use MimeData::toStringPair instead
 	QString decodeValue( const QMimeData * mimeData );
 
 	inline const char * mimeType( MimeType type )
@@ -71,7 +71,6 @@ namespace lmms::Clipboard
 				return "application/x-lmms-stringpair";
 			case MimeType::Default:
 				return "application/x-lmms-clipboard";
-			case MimeType::PlainText:
 			default:
 				return "text/plain";
 		}
