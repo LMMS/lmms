@@ -84,7 +84,6 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 	m_qualitySettings(qualitySettings::Interpolation::Linear),
 	m_masterGain( 1.0f ),
 	m_audioDev( nullptr ),
-	m_oldAudioDev( nullptr ),
 	m_audioDevStartFailed( false ),
 	m_profiler(),
 	m_clearSignal(false)
@@ -463,97 +462,6 @@ void AudioEngine::clearInternal()
 		}
 	}
 }
-
-
-
-
-void AudioEngine::changeQuality(const struct qualitySettings & qs)
-{
-	// don't delete the audio-device
-	stopProcessing();
-
-	m_qualitySettings = qs;
-
-	emit sampleRateChanged();
-	emit qualitySettingsChanged();
-
-	startProcessing();
-}
-
-
-
-
-void AudioEngine::doSetAudioDevice( AudioDevice * _dev )
-{
-	// TODO: Use shared_ptr here in the future.
-	// Currently, this is safe, because this is only called by
-	// ProjectRenderer, and after ProjectRenderer calls this function,
-	// it does not access the old device anymore.
-	if( m_audioDev != m_oldAudioDev ) {delete m_audioDev;}
-
-	if( _dev )
-	{
-		m_audioDev = _dev;
-	}
-	else
-	{
-		printf( "param _dev == NULL in AudioEngine::setAudioDevice(...). "
-					"Trying any working audio-device\n" );
-		m_audioDev = tryAudioDevices();
-	}
-}
-
-
-
-
-void AudioEngine::setAudioDevice(AudioDevice * _dev,
-				const struct qualitySettings & _qs,
-				bool _needs_fifo,
-				bool startNow)
-{
-	stopProcessing();
-
-	m_qualitySettings = _qs;
-
-	doSetAudioDevice( _dev );
-
-	emit qualitySettingsChanged();
-	emit sampleRateChanged();
-
-	if (startNow) {startProcessing( _needs_fifo );}
-}
-
-
-
-
-void AudioEngine::storeAudioDevice()
-{
-	if( !m_oldAudioDev )
-	{
-		m_oldAudioDev = m_audioDev;
-	}
-}
-
-
-
-
-void AudioEngine::restoreAudioDevice()
-{
-	if( m_oldAudioDev && m_audioDev != m_oldAudioDev )
-	{
-		stopProcessing();
-		delete m_audioDev;
-
-		m_audioDev = m_oldAudioDev;
-		emit sampleRateChanged();
-
-		startProcessing();
-	}
-	m_oldAudioDev = nullptr;
-}
-
-
-
 
 void AudioEngine::removeAudioBusHandle(AudioBusHandle* busHandle)
 {

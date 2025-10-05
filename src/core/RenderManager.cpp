@@ -42,13 +42,12 @@ RenderManager::RenderManager(const AudioEngine::qualitySettings& qualitySettings
 	, m_format(fmt)
 	, m_outputPath(outputPath)
 {
-	Engine::audioEngine()->storeAudioDevice();
+	Engine::audioEngine()->stopProcessing();
 }
 
 RenderManager::~RenderManager()
 {
-	Engine::audioEngine()->restoreAudioDevice();  // Also deletes audio dev.
-	Engine::audioEngine()->changeQuality( m_oldQualitySettings );
+	Engine::audioEngine()->startProcessing();
 }
 
 void RenderManager::abortProcessing()
