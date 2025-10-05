@@ -26,6 +26,7 @@
 
 #include <QString>
 
+#include "lmms_export.h"
 
 namespace lmms
 {
@@ -48,16 +49,16 @@ enum class FileType
 namespace FileTypes
 {
 	//! Create a filter string to be used in file dialogs
-	QString compileFilter(const std::initializer_list<FileType> fileTypes = {}, const QString& label = {});
+	LMMS_EXPORT QString compileFilter(const std::initializer_list<FileType> fileTypes = {}, const QString& label = {});
 
 	//! Return a FileType for the given file extension
-	FileType find(const QString& ext);
+	LMMS_EXPORT FileType find(const QString& ext);
 
 	//! Return an icon name for the given file extension
-	std::string iconName(const QString& ext);
+	LMMS_EXPORT std::string iconName(const QString& ext);
 
 	//! True if any of the file types matches the path
-	bool matchPath(const std::initializer_list<FileType> fileTypes, const QString& path);
+	LMMS_EXPORT bool matchPath(const std::initializer_list<FileType> fileTypes, const QString& path);
 
 } // namespace FileTypes
 

@@ -85,10 +85,10 @@ namespace lmms::Clipboard
 namespace lmms::MimeData
 {
 	//! Create a new QMimeData from a string pair
-	QMimeData* fromStringPair(const QString& key, const QString& value);
+	LMMS_EXPORT QMimeData* fromStringPair(const QString& key, const QString& value);
 
 	//! Extract string pair from QMimeData
-	std::pair<QString, QString> toStringPair(const QMimeData* md);
+	LMMS_EXPORT std::pair<QString, QString> toStringPair(const QMimeData* md);
 
 } // namespace lmms::MimeData
 
@@ -98,16 +98,16 @@ namespace lmms::MimeData
 namespace lmms::DragAndDrop
 {
 	//! Start a QDrag from given widget, return mouse is released
-	void exec(QWidget* widget, QMimeData* md, const QPixmap& icon = {});
+	LMMS_EXPORT void exec(QWidget* widget, QMimeData* md, const QPixmap& icon = {});
 
 	//! Start a QDrag containing a string pair
-	void execStringPairDrag(const QString& key, const QString& value, const QPixmap& icon, QWidget* widget);
+	LMMS_EXPORT void execStringPairDrag(const QString& key, const QString& value, const QPixmap& icon, QWidget* widget);
 
 	//! Accept drag enter event if it contains a file of allowed type
-	bool acceptFile(QDragEnterEvent* dee, const std::initializer_list<FileType> allowedTypes);
+	LMMS_EXPORT bool acceptFile(QDragEnterEvent* dee, const std::initializer_list<FileType> allowedTypes);
 
 	//! Accept drag enter event if it contains a string pair of allowed type
-	bool acceptStringPair(QDragEnterEvent* dee, const std::initializer_list<QString> allowedKeys);
+	LMMS_EXPORT bool acceptStringPair(QDragEnterEvent* dee, const std::initializer_list<QString> allowedKeys);
 
 	//! Get file path from drop event (empty if it doesn't match allowedType)
 	LMMS_EXPORT QString getFile(const QDropEvent* de, FileType allowedType);
