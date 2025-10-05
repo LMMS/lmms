@@ -138,6 +138,9 @@ AudioFile::Impl::Impl(std::filesystem::path path, AudioFileFormat format, Output
 		constexpr auto maxBitRate = 320;
 		const auto targetBitRate = settings.bitrate();
 
+		auto mode = SF_BITRATE_MODE_CONSTANT;
+		sf_command(m_sndfile, SFC_SET_BITRATE_MODE, &mode, sizeof(int));
+
 		auto compressionLevel = (maxBitRate - targetBitRate) / static_cast<double>(maxBitRate - minBitRate);
 		sf_command(m_sndfile, SFC_SET_COMPRESSION_LEVEL, &compressionLevel, sizeof(double));
 	}
