@@ -27,6 +27,29 @@
 #include <samplerate.h>
 #include <stdexcept>
 
+namespace {
+using namespace lmms;
+
+constexpr auto converterType(AudioResampler::Mode mode) -> int
+{
+	switch (mode)
+	{
+	case AudioResampler::Mode::ZOH:
+		return SRC_ZERO_ORDER_HOLD;
+	case AudioResampler::Mode::Linear:
+		return SRC_LINEAR;
+	case AudioResampler::Mode::SincFastest:
+		return SRC_SINC_FASTEST;
+	case AudioResampler::Mode::SincMedium:
+		return SRC_SINC_MEDIUM_QUALITY;
+	case AudioResampler::Mode::SincBest:
+		return SRC_SINC_BEST_QUALITY;
+	default:
+		throw std::invalid_argument{"Invalid interpolation mode"};
+	}
+}
+} // namespace
+
 namespace lmms {
 
 AudioResampler::AudioResampler(Mode mode, ch_cnt_t channels)
@@ -56,32 +79,19 @@ auto AudioResampler::process(InterleavedBufferView<const float> input, Interleav
 	data.src_ratio = m_ratio;
 	data.end_of_input = 0;
 
-	if ((m_error = src_process(static_cast<SRC_STATE*>(m_state.get()), &data))) { throw std::runtime_error{src_strerror(m_error)}; }
+	if ((m_error = src_process(static_cast<SRC_STATE*>(m_state.get()), &data)))
+	{
+		throw std::runtime_error{src_strerror(m_error)};
+	}
 
 	return {static_cast<f_cnt_t>(data.input_frames_used), static_cast<f_cnt_t>(data.output_frames_gen)};
 }
 
 void AudioResampler::reset()
 {
-	if ((m_error = src_reset(static_cast<SRC_STATE*>(m_state.get())))) { throw std::runtime_error{src_strerror(m_error)}; }
-}
-
-auto AudioResampler::converterType(Mode mode) -> int
-{
-	switch (mode)
+	if ((m_error = src_reset(static_cast<SRC_STATE*>(m_state.get()))))
 	{
-	case Mode::ZOH:
-		return SRC_ZERO_ORDER_HOLD;
-	case Mode::Linear:
-		return SRC_LINEAR;
-	case Mode::SincFastest:
-		return SRC_SINC_FASTEST;
-	case Mode::SincMedium:
-		return SRC_SINC_MEDIUM_QUALITY;
-	case Mode::SincBest:
-		return SRC_SINC_BEST_QUALITY;
-	default:
-		throw std::invalid_argument{"Invalid interpolation mode"};
+		throw std::runtime_error{src_strerror(m_error)};
 	}
 }
 
