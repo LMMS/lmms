@@ -31,6 +31,7 @@
 #include "AudioEngine.h"
 #include "AutomationClip.h"
 #include "ControllerConnection.h"
+#include "Engine.h"
 #include "LocaleHelper.h"
 #include "ProjectJournal.h"
 #include "Song.h"
@@ -46,6 +47,9 @@ AutomatableModel::AutomatableModel(
 						const float val, const float min, const float max, const float step,
 						Model* parent, const QString & displayName, bool defaultConstructed ) :
 	Model( parent, displayName, defaultConstructed ),
+	m_setValueC{new ParamCommandLambda(Engine::projectJournal()->getCommandStack(),
+		[this](int newVal, int& oldVal) { oldVal = m_value; setValue(newVal); },
+		[this](int oldVal) { setValue(oldVal); }, static_cast<float>(0.0f))},
 	m_scaleType( ScaleType::Linear ),
 	m_minValue( min ),
 	m_maxValue( max ),
@@ -81,6 +85,7 @@ AutomatableModel::~AutomatableModel()
 	{
 		delete m_controllerConnection;
 	}
+	delete m_setValueC;
 
 	m_valueBuffer.clear();
 
