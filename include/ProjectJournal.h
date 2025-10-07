@@ -28,6 +28,7 @@
 #include <QHash>
 #include <QStack>
 
+#include "CommandStack.h"
 #include "LmmsTypes.h"
 #include "DataFile.h"
 
@@ -98,6 +99,7 @@ public:
 		return nullptr;
 	}
 
+	CommandStack& getCommandStack() { return m_commandStack; }
 
 private:
 	using JoIdMap = QHash<jo_id_t, JournallingObject*>;
@@ -118,6 +120,7 @@ private:
 
 	CheckPointStack m_undoCheckPoints;
 	CheckPointStack m_redoCheckPoints;
+	CommandStack m_commandStack;
 
 	bool m_journalling;
 
