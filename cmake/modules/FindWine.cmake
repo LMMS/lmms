@@ -11,6 +11,7 @@
 #  WINE_32_FLAGS - 32-bit linker flags
 #  WINE_64_LIBRARY_DIRS - Path(s) to 64-bit wine libs
 #  WINE_64_FLAGS - 64-bit linker flags
+#  WINE_VERSION - Wine version
 #
 
 MACRO(_findwine_find_flags output expression result)
@@ -69,7 +70,20 @@ FIND_PROGRAM(WINE_GCC NAMES
 	NO_DEFAULT_PATH
 )
 
+FIND_PROGRAM(WINE NAMES wine PATHS ${WINE_CXX_LOCATIONS} NO_DEFAULT_PATH)
 FIND_PROGRAM(WINE_BUILD NAMES winebuild PATHS ${WINE_CXX_LOCATIONS} NO_DEFAULT_PATH)
+
+# Detect wine version
+if(WINE)
+	# Wine version can be formatted:
+	#   wine-1.4
+    #   wine-6.0.3 (Ubuntu 6.0.3~repack-1)
+    #   wine-9.8 (Staging)
+    #   wine-9.22
+    execute_process(COMMAND "${WINE}" --version OUTPUT_VARIABLE WINE_VERSION_OUTPUT ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
+    string(REGEX REPLACE "^wine-([^\ \t]+).*$" "\\1"  WINE_VERSION "${WINE_VERSION_OUTPUT}")
+endif()
+
 # Detect wine paths and handle linking problems
 IF(WINE_CXX)
 	# call wineg++ to obtain implied includes and libs
@@ -179,6 +193,7 @@ message(STATUS "  WINE_CXX:             ${WINE_CXX}")
 message(STATUS "  WINE_GCC:             ${WINE_GCC}")
 message(STATUS "  WINE_32_FLAGS:        ${WINE_32_FLAGS}")
 message(STATUS "  WINE_64_FLAGS:        ${WINE_64_FLAGS}")
+message(STATUS "  WINE_VERSION:         ${WINE_VERSION}")
 
 # Create winegcc (technically, wineg++) wrapper
 configure_file(${CMAKE_CURRENT_LIST_DIR}/winegcc_wrapper.in winegcc_wrapper @ONLY)

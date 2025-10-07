@@ -4,13 +4,16 @@ ELSEIF(LMMS_BUILD_LINUX)
 	if(LMMS_HOST_X86_64)
 		set(CXX_FLAGS -m64)
 	endif()
+	if(WINE_VERSION_NUMBER VERSION_GREATER_EQUAL 10.14)
+		# Pass /DYNAMICBASE:NO to custom winebuild per #7987
+        set(WINEBUILD_FLAGS "-Wb,--disable-dynamicbase")
+    endif()
 	ExternalProject_Add(RemoteVstPlugin64
 		"${EXTERNALPROJECT_ARGS}"
 		CMAKE_ARGS
 			"${EXTERNALPROJECT_CMAKE_ARGS}"
 			"-DCMAKE_CXX_COMPILER=${WINEGCC}"
-			# Pass /DYNAMICBASE:NO to custom winebuild per #7987
-			"-DCMAKE_CXX_FLAGS=${CXX_FLAGS} --winebuild \"${CUSTOM_WINEBUILD_EXECUTABLE}\" -Wb,--disable-dynamicbase"
+			"-DCMAKE_CXX_FLAGS=${CXX_FLAGS} ${WINEBUILD_FLAGS}"
 		DEPENDS wine
 	)
 	INSTALL(PROGRAMS "${CMAKE_CURRENT_BINARY_DIR}/../RemoteVstPlugin64" "${CMAKE_CURRENT_BINARY_DIR}/../RemoteVstPlugin64.exe.so" DESTINATION "${PLUGIN_DIR}")
