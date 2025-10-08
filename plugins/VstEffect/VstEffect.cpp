@@ -68,7 +68,12 @@ VstEffect::VstEffect( Model * _parent,
 	bool loaded = false;
 	if( !m_key.attributes["file"].isEmpty() )
 	{
-		loaded = openPlugin(m_key.attributes["file"]);
+		// Replace / and \ path indicators with platform native path indicators on load.
+		#if defined(LMMS_BUILD_LINUX) || defined(LMMS_BUILD_APPLE) || defined(LMMS_BUILD_OPENBSD) || defined(LMMS_BUILD_FREEBSD)|| defined(LMMS_BUILD_HAIKU)
+			loaded = openPlugin(m_key.attributes["file"].replace(R"(\)", R"(/)"));
+		#elif defined(LMMS_BUILD_WIN32)|| defined(LMMS_BUILD_WIN64)
+			loaded = openPlugin(m_key.attributes["file"].replace(R"(/)", R"(\)"));
+		#endif
 	}
 	setDisplayName( m_key.attributes["file"].section( ".dll", 0, 0 ).isEmpty()
 		? m_key.name : m_key.attributes["file"].section( ".dll", 0, 0 ) );
