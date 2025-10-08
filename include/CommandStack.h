@@ -49,7 +49,7 @@ public:
 	void remove(const CommandBase& command);
 private:
 	void popBack();
-	size_t m_topIndex;
+	size_t m_undoSize;
 	//! stores the used commands (not nullptr) among with the changed data (that could be nullptr)
 	std::vector<std::pair<const CommandBase*, CommandDataBase*>> m_stack;
 };

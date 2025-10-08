@@ -26,11 +26,13 @@
 
 #include "Command.h"
 
+#include <stdio.h> // debug
+
 namespace lmms
 {
 
 CommandStack::CommandStack()
-	: m_topIndex{0}
+	: m_undoSize{0}
 	, m_stack()
 {}
 
@@ -44,9 +46,11 @@ CommandStack::~CommandStack()
 
 void CommandStack::pushBack(const CommandBase& command, CommandDataBase* commandData)
 {
-	size_t diff{m_stack.size() - m_topIndex};
+	printf("pushBack 1\n");
+	size_t diff{m_stack.size() - m_undoSize};
 	for (size_t i{0}; i < diff; ++i)
 	{
+		printf("pop\n");
 		popBack();
 	}
 
@@ -56,32 +60,37 @@ void CommandStack::pushBack(const CommandBase& command, CommandDataBase* command
 
 void CommandStack::undo()
 {
-	if (m_topIndex <= 0) { return; }
+	if (m_undoSize <= 0) { return; }
 
-	if (m_stack[m_topIndex].second != nullptr)
+	--m_undoSize;
+	if (m_stack[m_undoSize].second != nullptr)
 	{
-		m_stack[m_topIndex].first->executeCommand(*m_stack[m_topIndex].second);
+		m_stack[m_undoSize].first->undoCommand(*m_stack[m_undoSize].second);
 	}
 	else
 	{
-		m_stack[m_topIndex].first->executeCommand();
+		m_stack[m_undoSize].first->undoCommand();
 	}
-	--m_topIndex;
 }
 
 void CommandStack::redo()
 {
-	if (m_topIndex + 1 >= m_stack.size()) { return; }
-	++m_topIndex;
+	printf("redo 1\n");
+	if (m_undoSize >= m_stack.size()) { return; }
+	printf("redo 2\n");
 
-	if (m_stack[m_topIndex].second != nullptr)
+	if (m_stack[m_undoSize].second != nullptr)
 	{
-		m_stack[m_topIndex].first->undoCommand(*m_stack[m_topIndex].second);
+		printf("redo 3\n");
+		m_stack[m_undoSize].first->executeCommand(*m_stack[m_undoSize].second);
 	}
 	else
 	{
-		m_stack[m_topIndex].first->undoCommand();
+		printf("redo 4\n");
+		m_stack[m_undoSize].first->executeCommand();
 	}
+
+	++m_undoSize;
 }
 
 void CommandStack::remove(const CommandBase& command)
@@ -97,6 +106,7 @@ void CommandStack::remove(const CommandBase& command)
 		}
 	}
 	if (found == false) { return; }
+	if (foundIndex < m_undoSize) { --m_undoSize; }
 
 	// could be optimized by deleting [foundIndex].second and just copying instead of swaping
 	for (size_t i{foundIndex}; i + 1 < m_stack.size(); ++i)
