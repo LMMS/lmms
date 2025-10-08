@@ -60,7 +60,7 @@ Plugin::Descriptor PLUGIN_EXPORT tripleoscillator_plugin_descriptor =
 	0x0110,
 	Plugin::Type::Instrument,
 	new PluginPixmapLoader( "logo" ),
-	nullptr,
+	{},
 	nullptr,
 } ;
 

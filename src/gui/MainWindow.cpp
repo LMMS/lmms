@@ -114,7 +114,7 @@ MainWindow::MainWindow() :
 
 	const auto defaultFilter = FileTypes::compileFilter();
 	const auto projectFilter = FileTypes::compileFilter({FileType::Project, FileType::ProjectTemplate,
-														FileType::ImportableProject});
+														FileType::ImportableProject, FileType::MidiClipData});
 
 	sideBar->appendTab(new FileBrowser(FileBrowser::Type::Favorites, ConfigManager::inst()->favoriteItems().join("*"), defaultFilter, "My Favorites",
 		embed::getIconPixmap("star").transformed(QTransform().rotate(90)), splitter, false, "", ""));

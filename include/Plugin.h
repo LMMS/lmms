@@ -97,11 +97,23 @@ public:
 		int version;
 		Type type;
 		const PixmapLoader * logo;
-		const QString supportedFileTypes; //!< comma separated list of file extensions
+
+		struct FileTypeInfo
+		{
+			QString ext;
+			std::string iconName = {};
+			bool enablePreview = true;
+		};
+
+		const std::vector<FileTypeInfo> supportedFileTypes;
 
 		inline bool supportsFileType( const QString& extension ) const
 		{
-			return QString( supportedFileTypes ).split( QChar( ',' ) ).contains( extension );
+			for (const auto& fileTypeInfo : supportedFileTypes)
+			{
+				if (fileTypeInfo.ext == extension) { return true; }
+			}
+			return false;
 		}
 
 		/**

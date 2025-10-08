@@ -44,7 +44,7 @@ Plugin::Descriptor PLUGIN_EXPORT granularpitchshifter_plugin_descriptor =
 	0x0100,
 	Plugin::Type::Effect,
 	new PluginPixmapLoader("logo"),
-	nullptr,
+	{},
 	nullptr,
 } ;
 }

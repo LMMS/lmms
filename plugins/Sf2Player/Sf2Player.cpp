@@ -66,7 +66,7 @@ Plugin::Descriptor PLUGIN_EXPORT sf2player_plugin_descriptor =
 	0x0100,
 	Plugin::Type::Instrument,
 	new PluginPixmapLoader( "logo" ),
-	"sf2,sf3",
+	{{"sf2", "soundfont_file"}, {"sf3", "soundfont_file"}},
 	nullptr,
 } ;
 

@@ -268,13 +268,12 @@ public:
 		return( m_type );
 	}
 
-	//! True if the file can be added to a track
+	//! True if the file can be used to create a new instrument track
 	inline bool isTrack() const
 	{
 		return m_type == FileType::InstrumentPreset
 			|| m_type == FileType::InstrumentAsset
-			|| m_type == FileType::Sample
-			|| m_type == FileType::MidiClipData;
+			|| m_type == FileType::Sample;
 	}
 
 	QString extension();

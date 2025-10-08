@@ -30,55 +30,59 @@
 #include "SampleDecoder.h"
 
 
-namespace lmms
-{
-
-namespace FileTypes
+namespace lmms::FileTypes
 {
 
 namespace
 {
 
-// Static map of supported extensions and their FileType, only updated on first call
-std::map<QString, FileType> extensionMap()
-{
-	static std::map<QString, FileType> s_extensions;
+// Extension to FileType
+static std::map<QString, FileType> s_types;
 
-	if (!s_extensions.empty()) { return s_extensions; }
+// Extension to icon name (only from plugin data)
+static std::map<QString, std::string> s_icons;
+
+
+void initExtensions()
+{
+	if (!s_types.empty()) { return; }
 
 	// Get file extensions that can be opened or imported by a plugin
 	for (const auto& desc: getPluginFactory()->descriptors())
 	{
-		for (const auto& ext: desc->supportedFileTypes)
+		for (const auto& fileTypeInfo: desc->supportedFileTypes)
 		{
 			switch (desc->type)
 			{
 			case Plugin::Type::Instrument:
-				s_extensions[ext] = FileType::InstrumentAsset;
+				s_types[fileTypeInfo.ext] = FileType::InstrumentAsset;
 				break;
 			case Plugin::Type::ImportFilter:
-				s_extensions[ext] = FileType::InstrumentAsset;
+				s_types[fileTypeInfo.ext] = FileType::InstrumentAsset;
 				break;
 			default:
 				break;
 			}
+
+			if (!fileTypeInfo.iconName.empty())
+			{
+				s_icons[fileTypeInfo.ext] = fileTypeInfo.iconName;
+			}
 		}
 	}
 
-	// Get audio file extensions
-	// Do this AFTER the plugins so it doesn't map AudioFileProcessor to all audio files
+   // Get audio file extensions
+   // Do this AFTER the plugins so it doesn't map AudioFileProcessor to all audio files
 	for (const auto& [name, ext]: SampleDecoder::supportedAudioTypes())
 	{
-		s_extensions[QString::fromStdString(ext)] = FileType::Sample;
+		s_types[QString::fromStdString(ext)] = FileType::Sample;
 	}
 
 	// Get DataFile extensions
 	for (const auto& [type, ext]: DataFile::allSupportedFileTypes())
 	{
-		s_extensions[ext] = type;
+		s_types[ext] = type;
 	}
-
-	return s_extensions;
 };
 
 }
@@ -88,10 +92,12 @@ std::map<QString, FileType> extensionMap()
 
 QString compileFilter(const std::initializer_list<FileType> fileTypes, const QString& label)
 {
+	initExtensions();
+
 	bool includeAll = fileTypes.size() == 0;
 
 	QStringList filterParts;
-	for (const auto& [ext, type]: extensionMap())
+	for (const auto& [ext, type]: s_types)
 	{
 		if (includeAll || std::find(fileTypes.begin(), fileTypes.end(), type) != fileTypes.end())
 		{
@@ -108,7 +114,9 @@ QString compileFilter(const std::initializer_list<FileType> fileTypes, const QSt
 
 FileType find(const QString& ext)
 {
-	return extensionMap().contains(ext) ? extensionMap().at(ext) : FileType::Unknown;
+	initExtensions();
+
+	return s_types.contains(ext) ? s_types.at(ext) : FileType::Unknown;
 }
 
 
@@ -116,51 +124,28 @@ FileType find(const QString& ext)
 
 std::string iconName(const QString& ext)
 {
-	// TODO icon for .pat files
+	initExtensions();
 
-	if (ext == "sf2" || ext == "sf3")
+	if (s_icons.contains(ext)) { return s_icons.at(ext); }
+
+	switch (FileTypes::find(ext))
 	{
-		return "soundfont_file";
-	}
-	else if (ext == "dll" || ext == "so")
-	{
-		return "vst_plugin_file";
-	}
-	else if (ext == "mid" || ext == "midi" || ext == "rmi")
-	{
+	case FileType::Sample:
+		return "sample_file";
+	case FileType::Project:
+	case FileType::ProjectTemplate:
+	case FileType::ImportableProject:
+		return "project_file";
+	case FileType::InstrumentPreset:
+	case FileType::InstrumentAsset:
+		return "preset_file";
+	case FileType::MidiClipData:
+		// TODO this .xpt (exported midi notes from piano roll) not .mid
 		return "midi_file";
-	}
-	else
-	{
-		switch (FileTypes::find(ext))
-		{
-		case FileType::Sample:
-			return "sample_file";
-		case FileType::Project:
-		case FileType::ProjectTemplate:
-		case FileType::ImportableProject:
-			return "project_file";
-		case FileType::InstrumentPreset:
-		case FileType::InstrumentAsset:
-			return "preset_file";
-		default:
-			return "unknown_file";
-		}
+	default:
+		return "unknown_file";
 	}
 }
 
 
-
-
-bool matchPath(const std::initializer_list<FileType> types, const QString& path)
-{
-	auto type = FileTypes::find(QFileInfo(path).suffix().toLower());
-	auto it = std::find(types.begin(), types.end(), type);
-	return it != types.end();
-}
-
-
-} // namespace FileTypes
-
-
-} // namespace lmms
+} // namespace lmms::FileTypes

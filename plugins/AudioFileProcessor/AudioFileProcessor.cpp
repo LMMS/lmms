@@ -41,14 +41,14 @@ namespace lmms
 {
 
 
-static QString audioFileExtensions()
+static std::vector<Plugin::Descriptor::FileTypeInfo> audioFileExtensions()
 {
-	QStringList extensions;
+	std::vector<Plugin::Descriptor::FileTypeInfo> fileTypes;
 	for (const auto& audioType : SampleDecoder::supportedAudioTypes())
 	{
-		extensions << QString::fromStdString(audioType.extension);
+		fileTypes.push_back({QString::fromStdString(audioType.extension)});
 	}
-	return extensions.join(",");
+	return fileTypes;
 }
 
 

@@ -231,8 +231,13 @@ void PluginFactory::discoverPlugins()
 				}
 			};
 
-			if (!info.descriptor->supportedFileTypes.isEmpty())
-				addSupportedFileTypes(QString(info.descriptor->supportedFileTypes), info);
+			for (const auto& fileType : info.descriptor->supportedFileTypes)
+			{
+				if (!fileType.ext.isEmpty())
+				{
+					m_pluginByExt.insert(fileType.ext, {info, nullptr});
+				}
+			}
 
 			if (info.descriptor->subPluginFeatures)
 			{

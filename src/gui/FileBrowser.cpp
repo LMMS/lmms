@@ -818,11 +818,17 @@ void FileBrowserTreeWidget::previewFileItem(FileItem* file)
 		}
 		delete tf;
 	}
-	else if (file->type() == FileType::InstrumentAsset
-				&& ext != "dll" && ext != "so")
+	else if (file->type() == FileType::InstrumentAsset)
 	{
-		const bool isPlugin = true; // load with plugin
-		newPPH = new PresetPreviewPlayHandle(fileName, isPlugin);
+		const auto& pluginDescriptor = getPluginFactory()->pluginSupportingExtension(ext).info.descriptor;
+		for (const auto& fileType : pluginDescriptor->supportedFileTypes)
+		{
+			if (fileType.ext == ext && fileType.enablePreview)
+			{
+				newPPH = new PresetPreviewPlayHandle(fileName, /*isPlugin*/ true);
+				break;
+			}
+		}
 	}
 	else if (file->type() == FileType::InstrumentPreset)
 	{
@@ -962,7 +968,7 @@ void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it)
 			ImportFilter::import( f->fullName(),
 							Engine::getSong() );
 			break;
-
+		case FileType::MidiClipData:
 		default:
 			break;
 

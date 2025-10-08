@@ -45,7 +45,7 @@ Plugin::Descriptor PLUGIN_EXPORT stereomatrix_plugin_descriptor =
 	0x0100,
 	Plugin::Type::Effect,
 	new PluginPixmapLoader("logo"),
-	nullptr,
+	{},
 	nullptr,
 } ;
 

@@ -33,7 +33,7 @@ Plugin::Descriptor PLUGIN_EXPORT hydrogenimport_plugin_descriptor =
 	0x0100,
 	Plugin::Type::ImportFilter,
 	nullptr,
-	"h2song",
+	{{"h2song"}}, // TODO icon
 	nullptr,
 } ;
 

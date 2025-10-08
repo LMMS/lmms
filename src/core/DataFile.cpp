@@ -106,18 +106,19 @@ namespace
 		DataFile::Type m_type;
 		QString m_name;
 		std::vector<QString> m_extensions = {};
+		FileType m_fileType = FileType::Unknown;
 	};
 
 	const auto s_types = std::array{
 		TypeDescStruct{ DataFile::Type::Unknown, "unknown" },
-		TypeDescStruct{ DataFile::Type::SongProject, "song" , {"mmp", "mmpz"}},
-		TypeDescStruct{ DataFile::Type::SongProjectTemplate, "songtemplate", {"mpt"}},
-		TypeDescStruct{ DataFile::Type::InstrumentTrackSettings, "instrumenttracksettings", {"xpf", "xml"}},
+		TypeDescStruct{ DataFile::Type::SongProject, "song" , {"mmp", "mmpz"}, FileType::Project},
+		TypeDescStruct{ DataFile::Type::SongProjectTemplate, "songtemplate", {"mpt"}, FileType::ProjectTemplate},
+		TypeDescStruct{ DataFile::Type::InstrumentTrackSettings, "instrumenttracksettings", {"xpf", "xml"}, FileType::InstrumentPreset},
 		TypeDescStruct{ DataFile::Type::DragNDropData, "dnddata" },
 		TypeDescStruct{ DataFile::Type::ClipboardData, "clipboard-data" },
 		TypeDescStruct{ DataFile::Type::JournalData, "journaldata" },
 		TypeDescStruct{ DataFile::Type::EffectSettings, "effectsettings" },
-		TypeDescStruct{ DataFile::Type::MidiClip, "midiclip", {"xpt", "xptz"}},
+		TypeDescStruct{ DataFile::Type::MidiClip, "midiclip", {"xpt", "xptz"}, FileType::MidiClipData},
 	};
 
 	bool isCompressed(const QString& ext)
@@ -585,31 +586,14 @@ std::vector<std::pair<FileType, QString>> DataFile::allSupportedFileTypes()
 {
 	std::vector<std::pair<FileType, QString>> result;
 
-	for (const auto& desc : s_types)
+	for (const auto& typeDesc : s_types)
 	{
-		// Convert the DataFile::Type to a more generic FileType
-		auto type = FileType::Unknown;
-		switch (desc.m_type)
+		if (typeDesc.m_fileType != FileType::Unknown)
 		{
-		case Type::SongProject:
-			type = FileType::Project;
-			break;
-		case Type::SongProjectTemplate:
-			type = FileType::ProjectTemplate;
-			break;
-		case Type::InstrumentTrackSettings:
-			type = FileType::InstrumentPreset;
-			break;
-		case Type::MidiClip:
-			type = FileType::MidiClipData;
-			break;
-		default:
-			continue;
-		}
-
-		for (const auto& ext: desc.m_extensions)
-		{
-			result.push_back({type, ext});
+			for (const auto& ext: typeDesc.m_extensions)
+			{
+				result.emplace_back(typeDesc.m_fileType, ext);
+			}
 		}
 	}
 	return result;

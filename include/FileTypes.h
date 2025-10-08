@@ -57,9 +57,6 @@ namespace FileTypes
 	//! Return an icon name for the given file extension
 	LMMS_EXPORT std::string iconName(const QString& ext);
 
-	//! True if any of the file types matches the path
-	LMMS_EXPORT bool matchPath(const std::initializer_list<FileType> fileTypes, const QString& path);
-
 } // namespace FileTypes
 
 } // namespace lmms
