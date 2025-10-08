@@ -332,6 +332,24 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 	switch( m_action )
 	{
 		case Action::MovePositionMarker:
+			// Using both setToTime and setPlayPos are required in this context.
+			// setToTime sets the time display at the top.
+			// setPlayPos updated the LFO Controller and probably other stuff as well.
+			m_pos.setTicks(timeAtCursor.getTicks());
+			if (!( Engine::getSong()->isPlaying()))
+			{
+				//Song::PlayMode::None is used when nothing is being played.
+				Engine::getSong()->setToTime(timeAtCursor, Song::PlayMode::None);
+				Engine::getSong()->setPlayPos(timeAtCursor.getTicks(), Song::PlayMode::None);
+			} else {
+				Engine::getSong()->setToTime(timeAtCursor, m_mode);
+				Engine::getSong()->setPlayPos(timeAtCursor.getTicks(), m_mode);
+			}
+			m_pos.setCurrentFrame( 0 );
+			m_pos.setJumped( true );
+			updatePosition();
+			break;
+
 			m_pos.setTicks(timeAtCursor.getTicks());
 			Engine::getSong()->setToTime(timeAtCursor, m_mode);
 			if (!( Engine::getSong()->isPlaying()))

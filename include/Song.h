@@ -410,7 +410,9 @@ private slots:
 
 	void updateFramesPerTick();
 
+public:
 
+	void setPlayPos( tick_t ticks, PlayMode playMode );
 
 private:
 	Song();
@@ -434,7 +436,6 @@ private:
 			getPlayPos(m_playMode).currentFrame();
 	}
 
-	void setPlayPos( tick_t ticks, PlayMode playMode );
 
 	void saveControllerStates( QDomDocument & doc, QDomElement & element );
 	void restoreControllerStates( const QDomElement & element );
