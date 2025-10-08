@@ -1367,6 +1367,9 @@ void MainWindow::browseHelp()
 
 void MainWindow::autoSave()
 {
+	Song * song = Engine::getSong();
+	QString autoSaveVersionedName = song->projectFileName();
+
 	if( !Engine::getSong()->isExporting() &&
 		!Engine::getSong()->isLoadingProject() &&
 		!RemotePluginBase::isMainThreadWaiting() &&
@@ -1375,7 +1378,12 @@ void MainWindow::autoSave()
 				"enablerunningautosave" ).toInt() ||
 			! Engine::getSong()->isPlaying() ) )
 	{
+		//Recovery file is still needed for post-crash recovery dialog.
 		Engine::getSong()->saveProjectFile(ConfigManager::inst()->recoveryFile());
+		if( Engine::getSong()->projectFileName() != "" )
+		{
+			Engine::getSong()->saveProjectFile( autoSaveVersionedName.section('.', 0, 0).append(".").append("autosave").append(".").append(QDateTime::currentDateTime().toString("dd-MM-yyyy-hh-mm-ss-zzz")).append(".").append(autoSaveVersionedName.section('.', -1)) );
+		}
 		autoSaveTimerReset();  // Reset timer
 	}
 	else
