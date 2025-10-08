@@ -354,7 +354,7 @@ void FloatModelEditorBase::setPosition(const QPoint & p)
 
 	if (!approximatelyEqual(roundedValue, currentValue))
 	{
-		model()->setValue(roundedValue);
+		model()->m_setValueC->push(roundedValue);
 		m_leftOver = 0.0f;
 	}
 	else
@@ -411,7 +411,7 @@ void FloatModelEditorBase::enterValue()
 
 	if (ok)
 	{
-		model()->setValue(new_val);
+		model()->m_setValueCB(new_val);
 	}
 }
 
