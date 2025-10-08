@@ -15,8 +15,8 @@
 #
 
 MACRO(_findwine_find_flags output expression result)
-	STRING(REPLACE " " ";" WINEBUILD_FLAGS "${output}")
-	FOREACH(FLAG ${WINEBUILD_FLAGS})
+	STRING(REPLACE " " ";" _winebuild_flags "${output}")
+	FOREACH(FLAG ${_winebuild_flags})
 		IF("${FLAG}" MATCHES "${expression}")
 			LIST(APPEND ${result} "${FLAG}")
 		ENDIF()

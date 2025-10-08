@@ -4,7 +4,7 @@ ELSEIF(LMMS_BUILD_LINUX)
 	if(LMMS_HOST_X86_64)
 		set(CXX_FLAGS -m64)
 	endif()
-	if(WINE_VERSION_NUMBER VERSION_GREATER_EQUAL 10.14)
+	if(WINE_VERSION VERSION_GREATER_EQUAL 10.14)
 		# Pass /DYNAMICBASE:NO to winebuild per #7987
         set(WINEBUILD_FLAGS "-Wb,--disable-dynamicbase")
     endif()
