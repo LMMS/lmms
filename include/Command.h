@@ -32,9 +32,12 @@
 #ifndef LMMS_COMMAND
 #define LMMS_COMMAND
 
-#include "CommandStack.h"
+#include <cassert> // assert
 
+#include "CommandStack.h"
 #include "lmms_export.h"
+
+#include <stdio.h> // debug
 
 namespace lmms
 {
@@ -42,7 +45,7 @@ namespace lmms
 class LMMS_EXPORT CommandDataBase
 {
 public:
-	virtual ~CommandDataBase() = 0;
+	virtual ~CommandDataBase() {};
 };
 
 template<typename T>
@@ -53,7 +56,7 @@ public:
 		: m_currentState{executeData}
 		, m_undoState{}
 	{}
-	~CommandData() override = default;
+	~CommandData() override {};
 	T& getExecuteState() { return m_currentState; }
 	T& getUndoState() { return m_undoState; }
 private:
@@ -74,10 +77,10 @@ public:
 		m_container->remove(*this);
 	}
 
-	virtual void executeCommand() const {};
-	virtual void undoCommand() const {};
-	virtual void executeCommand(CommandDataBase& data) const {};
-	virtual void undoCommand(CommandDataBase& data) const {};
+	virtual void executeCommand() const { printf("debug CommandBase execA\n"); }
+	virtual void undoCommand() const {}
+	virtual void executeCommand(CommandDataBase& data) const = 0;// { printf("debug CommandBase execB\n"); }
+	virtual void undoCommand(CommandDataBase& data) const {}
 	
 protected:
 	CommandStack* m_container;
@@ -92,24 +95,26 @@ public:
 		, m_doFn(doFn)
 		, m_undoFn(undoFn)
 	{}
-	~Command() override = default;
+	~Command() override {};
 	
 	//! pushes the command onto the stack and executes it
 	void push() const
 	{
-		m_container->pushBack(static_cast<CommandBase>(*this), nullptr);
+		m_container->pushBack(*this, nullptr);
 	}
 	void operator()() const { push(); }
 
 	//! executes the command without pushing it to the undo stack
 	void executeCommand() const override
 	{
+		printf("debug Command exec\n");
 		m_doFn();
 	}
 	void undoCommand() const override
 	{
 		m_undoFn();
 	}
+	void executeCommand(CommandDataBase& data) const {};
 private:
 	DoFn m_doFn;
 	UndoFn m_undoFn;
@@ -127,7 +132,7 @@ public:
 	//! pushes the command onto the stack and executes it
 	void push(T data) const
 	{
-		m_container->pushBack(static_cast<CommandBase>(*this), static_cast<CommandDataBase*>(new CommandData<T>{data}));
+		m_container->pushBack(*this, static_cast<CommandDataBase*>(new CommandData<T>{data}));
 	}
 	void operator()(T data) const { push(data); }
 };
@@ -136,33 +141,104 @@ template<typename T, typename DoFn, typename UndoFn>
 class LMMS_EXPORT ParamCommandLambda : public ParamCommand<T>
 {
 public:
-	ParamCommandLambda(CommandStack& container, DoFn doFn, UndoFn undoFn, T unused)
+	ParamCommandLambda(CommandStack& container, DoFn doFn, UndoFn undoFn, T* paramPtr)
 		: ParamCommand<T>{container}
 		, m_doFn(doFn)
 		, m_undoFn(undoFn)
+		, m_paramPtr(paramPtr)
 	{}
-	~ParamCommandLambda() override = default;
+	~ParamCommandLambda() override {};
 
 	//! executes the command without pushing it to the undo stack
-	void execute(CommandDataBase& data)
+	void executeCommand(CommandDataBase& data) const override
 	{
-		T* castedData = dynamic_cast<CommandData<T>*>(&data);
+		printf("debug ParamCommandLambda exec\n");
+		auto* castedData = dynamic_cast<CommandData<T>*>(&data);
 		if (castedData != nullptr)
 		{
-			m_doFn(castedData->getExecuteState(), castedData->getUndoState());
+			if (m_paramPtr != nullptr)
+			{
+				castedData->getUndoState() = *m_paramPtr;
+				//m_doFn(castedData->getExecuteState());
+			}
+			else
+			{
+				m_doFn(castedData->getExecuteState(), castedData->getUndoState());
+			}
 		}
 	}
-	void undo(CommandDataBase& data)
+	void undoCommand(CommandDataBase& data) const override
 	{
-		T* castedData = dynamic_cast<CommandData<T>*>(&data);
+		auto* castedData = dynamic_cast<CommandData<T>*>(&data);
 		if (castedData != nullptr)
 		{
-			m_undoFn(castedData->getUndoState());
+			if (m_paramPtr != nullptr)
+			{
+				//m_undoFn(castedData->getUndoState());
+			}
+			else
+			{
+				m_undoFn(castedData->getExecuteState(), castedData->getUndoState());
+			}
 		}
 	}
 private:
 	DoFn m_doFn;
 	UndoFn m_undoFn;
+	const T* m_paramPtr;
+};
+
+template<typename T, typename Parent, typename returnT>
+class LMMS_EXPORT ParamCommandFnPtr : public ParamCommand<T>
+{
+public:
+	typedef T (Parent::*GetterFn)();
+	typedef returnT (Parent::*SetterFn)(T);
+
+	ParamCommandFnPtr(CommandStack& container, Parent& parentInstance, GetterFn getFnPtr, SetterFn setFnPtr, const T* paramPtr)
+		: ParamCommand<T>{container}
+		, m_getFnPtr{getFnPtr}
+		, m_setFnPtr{setFnPtr}
+		, m_parent{&parentInstance}
+		, m_paramPtr(paramPtr)
+	{
+		assert((m_paramPtr == nullptr && m_getFnPtr != nullptr)
+			|| (m_paramPtr != nullptr && m_getFnPtr == nullptr));
+	}
+	~ParamCommandFnPtr() override {};
+
+	//! executes the command without pushing it to the undo stack
+	void executeCommand(CommandDataBase& data) const override
+	{
+		printf("debug ParamCommandFnPtr exec\n");
+		auto* castedData = dynamic_cast<CommandData<T>*>(&data);
+		if (castedData != nullptr)
+		{
+			if (m_getFnPtr != nullptr)
+			{
+				castedData->getUndoState() = (m_parent->*m_getFnPtr)();
+			}
+			else
+			{
+				castedData->getUndoState() = *m_paramPtr;
+			}
+			
+			(m_parent->*m_setFnPtr)(castedData->getExecuteState());
+		}
+	}
+	void undoCommand(CommandDataBase& data) const override
+	{
+		auto* castedData = dynamic_cast<CommandData<T>*>(&data);
+		if (castedData != nullptr)
+		{
+			(m_parent->*m_setFnPtr)(castedData->getUndoState());
+		}
+	}
+private:
+	GetterFn m_getFnPtr;
+	SetterFn m_setFnPtr;
+	Parent* m_parent;
+	const T* m_paramPtr;
 };
 
 } // namespace lmms
