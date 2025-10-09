@@ -26,8 +26,6 @@
 
 #include "Command.h"
 
-#include <stdio.h> // debug
-
 namespace lmms
 {
 
@@ -46,11 +44,9 @@ CommandStack::~CommandStack()
 
 void CommandStack::pushBack(const CommandBase& command, CommandDataBase* commandData)
 {
-	printf("pushBack 1\n");
 	size_t diff{m_stack.size() - m_undoSize};
 	for (size_t i{0}; i < diff; ++i)
 	{
-		printf("pop\n");
 		popBack();
 	}
 
@@ -75,18 +71,14 @@ void CommandStack::undo()
 
 void CommandStack::redo()
 {
-	printf("redo 1\n");
 	if (m_undoSize >= m_stack.size()) { return; }
-	printf("redo 2\n");
 
 	if (m_stack[m_undoSize].second != nullptr)
 	{
-		printf("redo 3\n");
 		m_stack[m_undoSize].first->executeCommand(*m_stack[m_undoSize].second);
 	}
 	else
 	{
-		printf("redo 4\n");
 		m_stack[m_undoSize].first->executeCommand();
 	}
 
