@@ -1367,10 +1367,10 @@ void MainWindow::browseHelp()
 
 void MainWindow::autoSave()
 {
-	Song * song = Engine::getSong();
-	QString autoSaveVersionedName = song->projectFileName();
+	QString autoSaveVersionedName = Engine::getSong()->projectFileName();
 
-	if( !Engine::getSong()->isExporting() &&
+	if( Engine::getSong()->isModifiedAutosave() &&
+		!Engine::getSong()->isExporting() &&
 		!Engine::getSong()->isLoadingProject() &&
 		!RemotePluginBase::isMainThreadWaiting() &&
 		!QApplication::mouseButtons() &&
@@ -1384,6 +1384,7 @@ void MainWindow::autoSave()
 		{
 			Engine::getSong()->saveProjectFile( autoSaveVersionedName.section('.', 0, 0).append(".").append("autosave").append(".").append(QDateTime::currentDateTime().toString("dd-MM-yyyy-hh-mm-ss-zzz")).append(".").append(autoSaveVersionedName.section('.', -1)) );
 		}
+		Engine::getSong()->setModifiedAutosave(false);
 		autoSaveTimerReset();  // Reset timer
 	}
 	else
