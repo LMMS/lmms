@@ -37,8 +37,6 @@
 #include "CommandStack.h"
 #include "lmms_export.h"
 
-#include <stdio.h> // debug
-
 namespace lmms
 {
 
@@ -77,94 +75,119 @@ public:
 		m_container->remove(*this);
 	}
 
-	virtual void executeCommand() const { printf("debug CommandBase execA\n"); }
+	virtual void executeCommand() const {}
 	virtual void undoCommand() const {}
-	virtual void executeCommand(CommandDataBase& data) const = 0;// { printf("debug CommandBase execB\n"); }
+	virtual void executeCommand(CommandDataBase& data) const {}
 	virtual void undoCommand(CommandDataBase& data) const {}
 	
 protected:
 	CommandStack* m_container;
 };
 
-template<typename DoFn, typename UndoFn>
-class LMMS_EXPORT Command : public CommandBase
+
+/* A command for functions without input, use this in pair with `CommandLambda`
+ *
+*/
+class LMMS_EXPORT TypelessCommand : public CommandBase //< command with param
 {
 public:
-	Command(CommandStack& container, DoFn doFn, UndoFn undoFn)
-		: CommandBase{container}
+	TypelessCommand(CommandStack& container)
+		: CommandBase{container} {}
+	//! pushes the command onto the stack and executes it
+	void push() const { m_container->pushBack(*this, nullptr); }
+	void operator()() const { push(); }
+};
+
+/* A command for functions without input using lambda
+ * To use this, declare a `TypelessCommand*` variable and pass in a `new` `CommandLambda*`
+*/
+template<typename DoFn, typename UndoFn>
+class LMMS_EXPORT CommandLambda : public TypelessCommand
+{
+public:
+	CommandLambda(CommandStack& container, DoFn doFn, UndoFn undoFn)
+		: TypelessCommand{container}
 		, m_doFn(doFn)
 		, m_undoFn(undoFn)
 	{}
-	~Command() override {};
-	
-	//! pushes the command onto the stack and executes it
-	void push() const
-	{
-		m_container->pushBack(*this, nullptr);
-	}
-	void operator()() const { push(); }
-
+	~CommandLambda() override {};
 	//! executes the command without pushing it to the undo stack
-	void executeCommand() const override
-	{
-		printf("debug Command exec\n");
-		m_doFn();
-	}
-	void undoCommand() const override
-	{
-		m_undoFn();
-	}
-	void executeCommand(CommandDataBase& data) const {};
+	void executeCommand() const override { m_doFn(); }
+	void undoCommand() const override { m_undoFn(); }
 private:
 	DoFn m_doFn;
 	UndoFn m_undoFn;
 };
 
+/* A command for functions without input using function pointers
+ * construct this on stack
+*/
+template<typename Parent, typename returnTDo, typename returnTUndo>
+class LMMS_EXPORT CommandFnPtr : public CommandBase
+{
+public:
+	typedef returnTDo (Parent::*DoFnPtr)();
+	typedef returnTUndo (Parent::*UndoFnPtr)();
 
+	CommandFnPtr(CommandStack& container, Parent& parentInstance, DoFnPtr doFn, UndoFnPtr undoFn)
+		: CommandBase{container}
+		, m_doFn(doFn)
+		, m_undoFn(undoFn)
+		, m_parent(&parentInstance)
+	{}
+	~CommandFnPtr() override {};
+	
+	//! pushes the command onto the stack and executes it
+	void push() const { m_container->pushBack(*this, nullptr); }
+	void operator()() const { push(); }
+
+	//! executes the command without pushing it to the undo stack
+	void executeCommand() const override { (m_parent->*m_doFn)(); }
+	void undoCommand() const override { (m_parent->*m_undoFn)(); }
+private:
+	DoFnPtr m_doFn;
+	UndoFnPtr m_undoFn;
+	Parent* m_parent;
+};
+
+
+
+
+/* A command for functions with input, use this in pair with `ParamCommandLambda`
+ * construct this on stack
+*/
 template<typename T>
 class LMMS_EXPORT ParamCommand : public CommandBase //< command with param
 {
 public:
 	ParamCommand(CommandStack& container)
-		: CommandBase{container}
-	{}
-
+		: CommandBase{container} {}
 	//! pushes the command onto the stack and executes it
-	void push(T data) const
-	{
-		m_container->pushBack(*this, static_cast<CommandDataBase*>(new CommandData<T>{data}));
-	}
+	void push(T data) const { m_container->pushBack(*this, static_cast<CommandDataBase*>(new CommandData<T>{data})); }
 	void operator()(T data) const { push(data); }
 };
 
+/* A command for functions with input using lambda
+ * To use this, declare a `ParamCommand<T>*` variable and pass in a `new` `ParamCommandLambda*`
+*/
 template<typename T, typename DoFn, typename UndoFn>
 class LMMS_EXPORT ParamCommandLambda : public ParamCommand<T>
 {
 public:
-	ParamCommandLambda(CommandStack& container, DoFn doFn, UndoFn undoFn, T* paramPtr)
+	ParamCommandLambda(CommandStack& container, DoFn doFn, UndoFn undoFn, T unused)
 		: ParamCommand<T>{container}
 		, m_doFn(doFn)
 		, m_undoFn(undoFn)
-		, m_paramPtr(paramPtr)
 	{}
 	~ParamCommandLambda() override {};
 
 	//! executes the command without pushing it to the undo stack
 	void executeCommand(CommandDataBase& data) const override
 	{
-		printf("debug ParamCommandLambda exec\n");
 		auto* castedData = dynamic_cast<CommandData<T>*>(&data);
 		if (castedData != nullptr)
 		{
-			if (m_paramPtr != nullptr)
-			{
-				castedData->getUndoState() = *m_paramPtr;
-				//m_doFn(castedData->getExecuteState());
-			}
-			else
-			{
-				m_doFn(castedData->getExecuteState(), castedData->getUndoState());
-			}
+			m_doFn(castedData->getExecuteState(), castedData->getUndoState());
 		}
 	}
 	void undoCommand(CommandDataBase& data) const override
@@ -172,22 +195,17 @@ public:
 		auto* castedData = dynamic_cast<CommandData<T>*>(&data);
 		if (castedData != nullptr)
 		{
-			if (m_paramPtr != nullptr)
-			{
-				//m_undoFn(castedData->getUndoState());
-			}
-			else
-			{
-				m_undoFn(castedData->getExecuteState(), castedData->getUndoState());
-			}
+			m_undoFn(castedData->getExecuteState(), castedData->getUndoState());
 		}
 	}
 private:
 	DoFn m_doFn;
 	UndoFn m_undoFn;
-	const T* m_paramPtr;
 };
 
+/* A command for functions with input using function pointers
+ * construct this on stack
+*/
 template<typename T, typename Parent, typename returnT>
 class LMMS_EXPORT ParamCommandFnPtr : public ParamCommand<T>
 {
@@ -210,7 +228,6 @@ public:
 	//! executes the command without pushing it to the undo stack
 	void executeCommand(CommandDataBase& data) const override
 	{
-		printf("debug ParamCommandFnPtr exec\n");
 		auto* castedData = dynamic_cast<CommandData<T>*>(&data);
 		if (castedData != nullptr)
 		{
