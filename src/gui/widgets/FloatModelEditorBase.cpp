@@ -138,7 +138,7 @@ void FloatModelEditorBase::dropEvent(QDropEvent * de)
 	QString val = StringPairDrag::decodeValue(de);
 	if (type == "float_value")
 	{
-		model()->setValue(LocaleHelper::toFloat(val));
+		model()->m_setValueC(LocaleHelper::toFloat(val));
 		de->accept();
 	}
 	else if (type == "automatable_model")
@@ -147,7 +147,7 @@ void FloatModelEditorBase::dropEvent(QDropEvent * de)
 		if (mod != nullptr)
 		{
 			AutomatableModel::linkModels(model(), mod);
-			mod->setValue(model()->value());
+			mod->m_setValueC(model()->value());
 		}
 	}
 }
@@ -354,7 +354,7 @@ void FloatModelEditorBase::setPosition(const QPoint & p)
 
 	if (!approximatelyEqual(roundedValue, currentValue))
 	{
-		model()->m_setValueC->push(roundedValue);
+		model()->m_setValueC(roundedValue);
 		m_leftOver = 0.0f;
 	}
 	else
@@ -411,7 +411,7 @@ void FloatModelEditorBase::enterValue()
 
 	if (ok)
 	{
-		model()->m_setValueCB(new_val);
+		model()->m_setValueC(new_val);
 	}
 }
 
