@@ -36,8 +36,6 @@
 #include "ProjectJournal.h"
 #include "Song.h"
 
-#include <stdio.h>
-
 namespace lmms
 {
 
@@ -49,10 +47,7 @@ AutomatableModel::AutomatableModel(
 						const float val, const float min, const float max, const float step,
 						Model* parent, const QString & displayName, bool defaultConstructed ) :
 	Model( parent, displayName, defaultConstructed ),
-	m_setValueC{new ParamCommandLambda(Engine::projectJournal()->getCommandStack(),
-		[this](float newVal, float& oldVal) { printf("setVal lambda 1"); oldVal = m_value; setValue(newVal); },
-		[this](float newVal, float oldVal) { printf("setVal lambda 2"); setValue(oldVal); }, static_cast<float*>(nullptr))},
-	m_setValueCB(Engine::projectJournal()->getCommandStack(),
+	m_setValueC(Engine::projectJournal()->getCommandStack(),
 			*this, nullptr, &AutomatableModel::setValue, &m_value),
 	m_scaleType( ScaleType::Linear ),
 	m_minValue( min ),
@@ -89,7 +84,6 @@ AutomatableModel::~AutomatableModel()
 	{
 		delete m_controllerConnection;
 	}
-	delete m_setValueC;
 
 	m_valueBuffer.clear();
 

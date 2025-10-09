@@ -318,9 +318,7 @@ public:
 	}
 
 public:
-	const ParamCommand<float>* m_setValueC;
-	const ParamCommandFnPtr<float, AutomatableModel, void> m_setValueCB;
-	const Command* m_setValueC;
+	const ParamCommandFnPtr<float, AutomatableModel, void> m_setValueC;
 
 public slots:
 	virtual void reset();
