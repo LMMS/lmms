@@ -32,8 +32,8 @@
 #include <QMutex>
 #include <samplerate.h>
 
+#include "AudioEngine.h"
 #include "AudioResampler.h"
-#include "BipBuffer.h"
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "LcdSpinBox.h"
@@ -107,7 +107,9 @@ public slots:
 
 private:
 	AudioResampler m_resampler;
-	BipBuffer<SampleFrame> m_resampleBuffer;
+	std::array<SampleFrame, DEFAULT_BUFFER_SIZE> m_buffer;
+	f_cnt_t m_bufferIndex = 0;
+	f_cnt_t m_bufferSize = 0;
 
 	fluid_settings_t* m_settings;
 	fluid_synth_t* m_synth;

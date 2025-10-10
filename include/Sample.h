@@ -28,7 +28,6 @@
 #include <memory>
 
 #include "AudioResampler.h"
-#include "BipBuffer.h"
 #include "Note.h"
 #include "SampleBuffer.h"
 #include "lmms_export.h"
@@ -61,7 +60,9 @@ public:
 
 	private:
 		AudioResampler m_resampler;
-		BipBuffer<SampleFrame> m_buffer;
+		std::array<SampleFrame, DEFAULT_BUFFER_SIZE> m_buffer;
+		f_cnt_t m_bufferIndex = 0;
+		f_cnt_t m_bufferSize = 0;
 		int m_frameIndex = 0;
 		bool m_backwards = false;
 		friend class Sample;

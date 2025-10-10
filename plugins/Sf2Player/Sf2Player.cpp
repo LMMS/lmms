@@ -878,18 +878,30 @@ void Sf2Instrument::renderFrames( f_cnt_t frames, SampleFrame* buf )
 		return;
 	}
 
+	// TODO: These kind of playback pipelines/graphs are repeated within other parts of the codebase that work with
+	// audio samples. We should find a way to unify this but the right abstraction is not so clear yet.
 	while (frames > 0)
 	{
-		const auto writeRegion = m_resampleBuffer.reserveWrite();
-		fluid_synth_write_float(m_synth, writeRegion.size(), writeRegion.data(), 0, 2, writeRegion.data(), 1, 2);
-		m_resampleBuffer.commitWrite(writeRegion.size());
+		if (m_bufferSize == 0)
+		{
+			fluid_synth_write_float(m_synth, m_buffer.size(), m_buffer.data(), 0, 2, m_buffer.data(), 1, 2);
+			m_bufferIndex = 0;
+			m_bufferSize = m_buffer.size();
+		}
 
-		const auto readRegion = m_resampleBuffer.reserveRead();
-		const auto results = m_resampler.process({&readRegion[0][0], 2, readRegion.size()}, {&buf[0][0], 2, frames});
-		m_resampleBuffer.commitRead(results.inputFramesUsed);
+		const auto [inputFramesUsed, outputFramesGenerated]
+			= m_resampler.process({&m_buffer[m_bufferIndex][0], 2, m_bufferSize}, {&buf[0][0], 2, frames});
 
-		buf += results.outputFramesGenerated;
-		frames -= results.outputFramesGenerated;
+		if (inputFramesUsed == 0 && outputFramesGenerated == 0)
+		{
+			std::fill_n(buf, frames, SampleFrame{});
+			break;
+		}
+
+		m_bufferIndex += inputFramesUsed;
+		m_bufferSize -= inputFramesUsed;
+		buf += outputFramesGenerated;
+		frames -= outputFramesGenerated;
 	}
 }
 

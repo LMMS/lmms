@@ -433,45 +433,53 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 
 			sample.m_resampler.setRatio(freq_factor);
 
+			// TODO: These kind of playback pipelines/graphs are repeated within other parts of the codebase that work
+			// with audio samples. We should find a way to unify this but the right abstraction is not so clear yet.
 			auto framesMixed = f_cnt_t{0};
 			while (framesMixed < frames)
 			{
+				if (sample.m_sourceBufferSize == 0)
 				{
-					const auto region = sample.m_sourceBuffer.reserveWrite();
-					loadSample(sample, region.data(), region.size());
+					loadSample(sample, sample.m_sourceBuffer.data(), sample.m_sourceBuffer.size());
 
-					for (auto& frame : region)
+					for (auto& frame : sample.m_sourceBuffer)
 					{
 						frame *= copy.value();
 					}
 
-					sample.pos += region.size();
-					sample.adsr.inc(region.size());
-					sample.m_sourceBuffer.commitWrite(region.size());
+					sample.pos += sample.m_sourceBuffer.size();
+					sample.adsr.inc(sample.m_sourceBuffer.size());
+					sample.m_sourceBufferIndex = 0;
+					sample.m_sourceBufferSize = sample.m_sourceBuffer.size();
 				}
 
+				if (sample.m_mixBufferSize == 0)
 				{
-					const auto readRegion = sample.m_sourceBuffer.reserveRead();
-					const auto writeRegion = sample.m_mixBuffer.reserveWrite();
-					const auto result = sample.m_resampler.process(
-						{&readRegion[0][0], 2, readRegion.size()}, {&writeRegion[0][0], 2, writeRegion.size()});
-
-					sample.m_sourceBuffer.commitRead(result.inputFramesUsed);
-					sample.m_mixBuffer.commitWrite(result.outputFramesGenerated);
+					sample.m_mixBufferIndex = 0;
+					sample.m_mixBufferSize = sample.m_mixBuffer.size();
 				}
 
+				const auto [inputFramesUsed, outputFramesGenerated] = sample.m_resampler.process(
+					{&sample.m_sourceBuffer[sample.m_sourceBufferIndex][0], 2, sample.m_sourceBufferSize},
+					{&sample.m_mixBuffer[sample.m_mixBufferIndex][0], 2, sample.m_mixBufferSize});
+
+				if (inputFramesUsed == 0 && outputFramesGenerated == 0)
 				{
-					const auto region = sample.m_mixBuffer.reserveRead();
-					const auto framesToMix = std::min(frames - framesMixed, region.size());
-
-					for (auto i = f_cnt_t{0}; i < framesToMix; ++i)
-					{
-						_working_buffer[framesMixed + i] += region[i];
-					}
-
-					framesMixed += framesToMix;
-					sample.m_mixBuffer.commitRead(framesToMix);
+					std::fill_n(&_working_buffer[framesMixed], frames - framesMixed, SampleFrame{});
+					break;
 				}
+
+				const auto framesToMix = std::min(outputFramesGenerated, frames - framesMixed);
+				for (auto i = 0; i < framesToMix; ++i)
+				{
+					_working_buffer[framesMixed + i] += sample.m_mixBuffer[sample.m_mixBufferIndex + i];
+				}
+
+				sample.m_sourceBufferIndex += inputFramesUsed;
+				sample.m_sourceBufferSize -= inputFramesUsed;
+				sample.m_mixBufferIndex += framesToMix;
+				sample.m_mixBufferSize -= framesToMix;
+				framesMixed += framesToMix;
 			}
 		}
 	}

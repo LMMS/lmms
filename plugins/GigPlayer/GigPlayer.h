@@ -32,8 +32,8 @@
 #include <QMutexLocker>
 #include <samplerate.h>
 
+#include "AudioEngine.h"
 #include "AudioResampler.h"
-#include "BipBuffer.h"
 #include "Instrument.h"
 #include "PixmapButton.h"
 #include "InstrumentView.h"
@@ -172,8 +172,15 @@ public:
 
 	// Used to convert sample rates
 	AudioResampler m_resampler;
-	BipBuffer<SampleFrame> m_sourceBuffer{};
-	BipBuffer<SampleFrame> m_mixBuffer{};
+
+	std::array<SampleFrame, DEFAULT_BUFFER_SIZE> m_sourceBuffer;
+	std::array<SampleFrame, DEFAULT_BUFFER_SIZE> m_mixBuffer;
+
+	f_cnt_t m_sourceBufferIndex = 0;
+	f_cnt_t m_mixBufferIndex = 0;
+
+	f_cnt_t m_sourceBufferSize = 0;
+	f_cnt_t m_mixBufferSize = 0;
 
 	// Used changing the pitch of the note if desired
 	float sampleFreq;

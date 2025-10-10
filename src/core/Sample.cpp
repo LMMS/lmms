@@ -122,30 +122,33 @@ bool Sample::play(SampleFrame* dst, PlaybackState* state, size_t numFrames, Loop
 	const auto freqRatio = frequency() / DefaultBaseFreq;
 	state->m_resampler.setRatio(sampleRateRatio * freqRatio * ratio);
 
-	auto framesWritten = 0;
+	// TODO: These kind of playback pipelines/graphs are repeated within other parts of the codebase that work with
+	// audio samples. We should find a way to unify this but the right abstraction is not so clear yet.
 	while (numFrames > 0)
 	{
-		const auto writeRegion = state->m_buffer.reserveWrite();
-		const auto rendered = render(writeRegion.data(), writeRegion.size(), state, loop);
-		state->m_buffer.commitWrite(rendered);
+		if (state->m_bufferSize == 0)
+		{
+			const auto rendered = render(state->m_buffer.data(), state->m_buffer.size(), state, loop);
+			state->m_bufferIndex = 0;
+			state->m_bufferSize = rendered;
+		}
 
-		const auto readRegion = state->m_buffer.reserveRead();
-		if (readRegion.empty())
+		const auto [inputFramesUsed, outputFramesGenerated] = state->m_resampler.process(
+			{&state->m_buffer[state->m_bufferIndex][0], 2, state->m_bufferSize}, {&dst[0][0], 2, numFrames});
+
+		if (inputFramesUsed == 0 && outputFramesGenerated == 0)
 		{
 			std::fill_n(dst, numFrames, SampleFrame{});
 			break;
 		}
 
-		const auto results
-			= state->m_resampler.process({&readRegion[0][0], 2, readRegion.size()}, {&dst[0][0], 2, numFrames});
-		state->m_buffer.commitRead(results.inputFramesUsed);
-
-		dst += results.outputFramesGenerated;
-		numFrames -= results.outputFramesGenerated;
-		framesWritten += results.outputFramesGenerated;
+		state->m_bufferIndex += inputFramesUsed;
+		state->m_bufferSize -= inputFramesUsed;
+		dst += outputFramesGenerated;
+		numFrames -= outputFramesGenerated;
 	}
 
-	return framesWritten > 0;
+	return numFrames < Engine::audioEngine()->framesPerPeriod();
 }
 
 f_cnt_t Sample::render(SampleFrame* dst, f_cnt_t size, PlaybackState* state, Loop loop) const
