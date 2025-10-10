@@ -100,10 +100,10 @@ private slots: // tests
 		obj.m_setValueA->push(1.0f);
 		obj.m_setValueB(2.0f);
 		obj.m_setValueC(3.0f);
-		QVERIFY(obj.m_value == 3.0f); // failed to perform multiple command
+		QVERIFY(obj.m_value == 3.0f); // failed to perform multiple commands
 		stack.undo();
 		stack.undo();
-		QVERIFY(obj.m_value == 1.0f); // failed to undo multiple command
+		QVERIFY(obj.m_value == 1.0f); // failed to undo multiple commands
 		obj.m_setValueC(3.0f);
 		stack.undo();
 		QVERIFY(obj.m_value == 1.0f);
