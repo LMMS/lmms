@@ -336,29 +336,19 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 			// setToTime sets the time display at the top.
 			// setPlayPos updated the LFO Controller and probably other stuff as well.
 			m_pos.setTicks(timeAtCursor.getTicks());
-			if (!( Engine::getSong()->isPlaying()))
+			if (!Engine::getSong()->isPlaying())
 			{
 				//Song::PlayMode::None is used when nothing is being played.
 				Engine::getSong()->setToTime(timeAtCursor, Song::PlayMode::None);
 				Engine::getSong()->setPlayPos(timeAtCursor.getTicks(), Song::PlayMode::None);
-			} else {
+			}
+			else
+			{
 				Engine::getSong()->setToTime(timeAtCursor, m_mode);
 				Engine::getSong()->setPlayPos(timeAtCursor.getTicks(), m_mode);
 			}
-			m_pos.setCurrentFrame( 0 );
-			m_pos.setJumped( true );
-			updatePosition();
-			break;
-
-			m_pos.setTicks(timeAtCursor.getTicks());
-			Engine::getSong()->setToTime(timeAtCursor, m_mode);
-			if (!( Engine::getSong()->isPlaying()))
-			{
-				//Song::PlayMode::None is used when nothing is being played.
-				Engine::getSong()->setToTime(timeAtCursor, Song::PlayMode::None);
-			}
-			m_pos.setCurrentFrame( 0 );
-			m_pos.setJumped( true );
+			m_pos.setCurrentFrame(0);
+			m_pos.setJumped(true);
 			updatePosition();
 			break;
 

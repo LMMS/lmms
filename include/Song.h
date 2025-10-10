@@ -410,8 +410,9 @@ private slots:
 
 	void updateFramesPerTick();
 
+
 public:
-	void setPlayPos( tick_t ticks, PlayMode playMode );
+	void setPlayPos(tick_t ticks, PlayMode playMode);
 
 private:
 	Song();
