@@ -88,7 +88,7 @@ protected:
 /* A command for functions without input, use this in pair with `CommandLambda`
  *
 */
-class LMMS_EXPORT TypelessCommand : public CommandBase //< command with param
+class LMMS_EXPORT TypelessCommand : public CommandBase
 {
 public:
 	TypelessCommand(CommandStack& container)
@@ -154,7 +154,7 @@ private:
 
 
 /* A command for functions with input, use this in pair with `ParamCommandLambda`
- * construct this on stack
+ *
 */
 template<typename T>
 class LMMS_EXPORT ParamCommand : public CommandBase //< command with param
