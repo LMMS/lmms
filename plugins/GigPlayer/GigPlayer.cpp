@@ -470,7 +470,7 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 				}
 
 				const auto framesToMix = std::min(outputFramesGenerated, frames - framesMixed);
-				for (auto i = 0; i < framesToMix; ++i)
+				for (auto i = f_cnt_t{0}; i < framesToMix; ++i)
 				{
 					_working_buffer[framesMixed + i] += sample.m_mixBuffer[sample.m_mixBufferIndex + i];
 				}
