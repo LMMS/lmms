@@ -25,6 +25,7 @@
 #include "SampleClipView.h"
 
 #include <QApplication>
+#include <QFileInfo> // esists
 #include <QMenu>
 #include <QPainter>
 
@@ -32,6 +33,7 @@
 #include "AutomationEditor.h"
 #include "embed.h"
 #include "ExportProjectDialog.h"
+#include "MidiClipView.h"
 #include "PathUtil.h"
 #include "SampleClip.h"
 #include "SampleLoader.h"
@@ -116,10 +118,10 @@ void SampleClipView::constructContextMenu(QMenu* cm)
 
 void SampleClipView::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	if( StringPairDrag::processDragEnterEvent( _dee,
-					"samplefile,sampledata" ) == false )
+	if (StringPairDrag::processDragEnterEvent(_dee,
+		"samplefile,sampledata,clip_" + QString::number(static_cast<int>(Track::Type::Instrument))) == false)
 	{
-		ClipView::dragEnterEvent( _dee );
+		ClipView::dragEnterEvent(_dee);
 	}
 }
 
@@ -141,6 +143,27 @@ void SampleClipView::dropEvent( QDropEvent * _de )
 		m_clip->updateLength();
 		update();
 		_de->accept();
+	}
+	else if (StringPairDrag::decodeKey( _de ) == "clip_" + QString::number(static_cast<int>(Track::Type::Instrument)))
+	{
+		QObject* qwSource = _de->source();
+		if (qwSource != nullptr)
+		{
+			auto sourceMidiClip = dynamic_cast<MidiClipView*>(qwSource);
+			if (sourceMidiClip != nullptr)
+			{
+				QString name = sourceMidiClip->exportClipAudio();
+				QFileInfo fileInfo(name);
+				if (name.isEmpty() == false && fileInfo.exists() && fileInfo.isFile())
+				{
+					m_clip->setSampleFile(name);
+					m_clip->updateLength();
+					update();
+					_de->accept();
+				}
+			}
+		}
+
 	}
 	else
 	{
