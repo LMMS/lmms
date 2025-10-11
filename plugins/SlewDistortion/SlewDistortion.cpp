@@ -126,7 +126,7 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 	const int link1Mask = -static_cast<int>(slewLink1);
 	const int link2Mask = -static_cast<int>(slewLink2);
 	const __m128 slewLinkMask = _mm_castsi128_ps(_mm_set_epi32(link2Mask, link2Mask, link1Mask, link1Mask));
-	
+
 	const __m128 zero = _mm_setzero_ps();
 	const __m128 one = _mm_set1_ps(1.0f);
 
@@ -142,7 +142,7 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 		m_trueBias1 = m_biasInterpCoef * m_trueBias1 + (1.f - m_biasInterpCoef) * bias1;
 		m_trueBias2 = m_biasInterpCoef * m_trueBias2 + (1.f - m_biasInterpCoef) * bias2;
 		const __m128 bias = _mm_set_ps(m_trueBias2, m_trueBias2, m_trueBias1, m_trueBias1);
-		
+
 		if (oversampleVal > 1)
 		{
 			m_upsampler[0].process_sample(m_overOuts[0].data(), buf[f][0]);
@@ -171,9 +171,9 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 				inArr[2] = 0;
 				inArr[3] = 0;
 			}
-			
+
 			__m128 in = _mm_load_ps(&inArr[0]);
-			__m128 absIn = _mm_and_ps(in, _mm_castsi128_ps(_mm_set1_epi32(0x7FFFFFFF)));
+			__m128 absIn = sse2_abs_ps(in);
 
 			// store volume for display
 			_mm_store_ps(&m_inPeakDisplay[0], _mm_max_ps(_mm_load_ps(&m_inPeakDisplay[0]), _mm_mul_ps(absIn, drive)));
@@ -200,10 +200,10 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 			__m128 finalMask = _mm_or_ps(_mm_cmpge_ps(rate, zero), slewLinkMask);
 			__m128 finalSlew = _mm_or_ps(_mm_and_ps(finalMask, _mm_mul_ps(slewUp, slewMult)),
 				_mm_andnot_ps(finalMask, _mm_mul_ps(slewDown, slewMult)));
-			
+
 			__m128 clampedRate = _mm_max_ps(_mm_sub_ps(zero, finalSlew), _mm_min_ps(rate, finalSlew));
 			slewOut = _mm_add_ps(slewOut, clampedRate);
-			
+
 			// apply drive and bias
 			__m128 biasedIn = _mm_add_ps(_mm_mul_ps(slewOut, drive), bias);
 
@@ -217,7 +217,7 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 			alignas(16) std::array<float, 4> distInArr;
 			_mm_store_ps(&distInArr[0], distIn);
 			alignas(16) std::array<float, 4> distOutArr;
-			
+
 			// if both bands have the same distortion type, we can process all four channels simultaneously
 			// otherwise we have to do two at a time
 			int loopCount = (distType1 == distType2 || !multiband) ? 1 : 2;
@@ -273,15 +273,14 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 						__m128 divByTwoPi = _mm_div_ps(distMinusPiOverTwo, tau);
 
 						// SSE2 floor replacement
-						__m128 trunc = _mm_cvtepi32_ps(_mm_cvttps_epi32(divByTwoPi));
-						__m128 floorDivByTwoPi = _mm_sub_ps(trunc, _mm_and_ps(_mm_cmplt_ps(divByTwoPi, trunc), one));
+						__m128 floorDivByTwoPi = sse2_floor_ps(divByTwoPi);
 
 						// x mod 2pi = x - floor(x / 2pi) * 2pi
 						__m128 floorMulTwoPi = _mm_mul_ps(floorDivByTwoPi, tau);
 						__m128 modInput = _mm_sub_ps(distMinusPiOverTwo, floorMulTwoPi);
 
 						// abs(in - pi) - pi/2
-						__m128 x = _mm_sub_ps(_mm_andnot_ps(_mm_set1_ps(-0.0f), _mm_sub_ps(modInput, pi)), piOverTwo);
+						__m128 x = _mm_sub_ps(sse2_abs_ps(_mm_sub_ps(modInput, pi)), piOverTwo);
 
 						// polynomial sine approximation
 						// sin(x) ≈ x - x^3 / 6 + x^5 / 120
@@ -299,41 +298,36 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 						__m128 divByFour = _mm_div_ps(distInMinusOne, four);
 						
 						// floor
-						__m128 trunc = _mm_cvtepi32_ps(_mm_cvttps_epi32(divByFour));
-						__m128 correction = _mm_and_ps(_mm_cmplt_ps(divByFour, trunc), one);
-						__m128 floorOverFour = _mm_sub_ps(trunc, correction);
+						__m128 floorOverFour = sse2_floor_ps(divByFour);
 
-						distOutFull = _mm_sub_ps(_mm_andnot_ps(_mm_set1_ps(-0.0f), _mm_sub_ps(_mm_sub_ps(
+						distOutFull = _mm_sub_ps(sse2_abs_ps(_mm_sub_ps(_mm_sub_ps(
 							distInMinusOne, _mm_mul_ps(floorOverFour, four)), _mm_set1_ps(2.0f))), one);
 						break;
 					}
-					case SlewDistortionType::FullRectify: // Full-wave Rectify => |x|
+					case SlewDistortionType::FullRectify: // |x|
 					{
-						distOutFull = _mm_and_ps(distInFull, _mm_castsi128_ps(_mm_set1_epi32(0x7FFFFFFF)));
+						distOutFull = sse2_abs_ps(distInFull);
 						break;
 					}
-					case SlewDistortionType::SmoothRectify: // Smooth Rectify => sqrt(x^2 + 0.04) - 0.2
+					case SlewDistortionType::SmoothRectify: // sqrt(x^2 + 0.04) - 0.2
 					{
-						distOutFull = _mm_sub_ps(_mm_sqrt_ps(_mm_add_ps(_mm_mul_ps(distInFull, distInFull), 
+						distOutFull = _mm_sub_ps(_mm_sqrt_ps(_mm_add_ps(_mm_mul_ps(distInFull, distInFull),
 							_mm_set1_ps(0.04f))), _mm_set1_ps(0.2f));
 						break;
 					}
-					case SlewDistortionType::HalfRectify:  // Half-wave Rectify => max(0, x)
+					case SlewDistortionType::HalfRectify:  // max(0, x)
 					{
 						distOutFull = _mm_max_ps(_mm_setzero_ps(), distInFull);
 						break;
 					}
-					case SlewDistortionType::Bitcrush:  // Bitcrush => round(x / drive * scale) / scale
+					case SlewDistortionType::Bitcrush:  // round(x / drive * scale) / scale
 					{
 						// scale = 16 / drive
 						__m128 scale = _mm_div_ps(_mm_set1_ps(16.f), drive);
 						__m128 scaledVal = _mm_mul_ps(_mm_div_ps(distInFull, drive), scale);
-						
-						// round to nearest integer
-						__m128 signMask = _mm_cmplt_ps(scaledVal, zero);
-						__m128 half = _mm_set1_ps(0.5f);
-						__m128 addVal = _mm_or_ps(_mm_andnot_ps(signMask, half), _mm_and_ps(signMask, _mm_set1_ps(-0.5f)));
-						__m128 rounded = _mm_cvtepi32_ps(_mm_cvttps_epi32(_mm_add_ps(scaledVal, addVal)));
+
+						// round to nearest, half away from zero
+						__m128 rounded = sse2_round_ps(scaledVal);
 
 						distOutFull = _mm_div_ps(rounded, scale);
 						break;
@@ -371,7 +365,7 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 			__m128 distOutScaled = _mm_add_ps(_mm_mul_ps(distOut, _mm_sub_ps(one, warp)), _mm_or_ps(warp, signBiasedIn));
 
 			// if (abs(biasedIn) < warp / crush) {distOut = biasedIn * crush;}
-			__m128 absBiasedIn = _mm_and_ps(biasedIn, _mm_castsi128_ps(_mm_set1_epi32(0x7FFFFFFF)));
+			__m128 absBiasedIn = sse2_abs_ps(biasedIn);
 			__m128 condition = _mm_cmplt_ps(absBiasedIn, _mm_div_ps(warp, crush));
 			__m128 biasedInCrush = _mm_mul_ps(biasedIn, crush);
 
@@ -386,8 +380,8 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 
 			// even with DC offset removal disabled, we should still apply it for the envelope follower
 			__m128 outEnv = _mm_load_ps(&m_outEnv[0]);
-			__m128 absOut = _mm_and_ps(distOutMinusDC, _mm_castsi128_ps(_mm_set1_epi32(0x7FFFFFFF)));
-			
+			__m128 absOut = sse2_abs_ps(distOutMinusDC);
+
 			cmp = _mm_cmpgt_ps(absOut, outEnv);
 			__m128 outEnvRise = _mm_add_ps(_mm_mul_ps(outEnv, attack), _mm_mul_ps(absOut, attackInv));
 			__m128 outEnvFall = _mm_add_ps(_mm_mul_ps(outEnv, release), _mm_mul_ps(absOut, releaseInv));
@@ -404,7 +398,7 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 			__m128 outFinal = _mm_mul_ps(_mm_add_ps(in, _mm_mul_ps(mix, _mm_sub_ps(distDyn, in))), outVol);
 
 			// store volume for display
-			__m128 outAbs = _mm_and_ps(outFinal, _mm_castsi128_ps(_mm_set1_epi32(0x7FFFFFFF)));
+			__m128 outAbs = sse2_abs_ps(outFinal);
 			_mm_store_ps(&m_outPeakDisplay[0], _mm_max_ps(_mm_load_ps(&m_outPeakDisplay[0]), outAbs));
 
 			// write updated stuff back into member variables
@@ -438,6 +432,7 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 
 	return ProcessStatus::ContinueIfNotQuiet;
 }
+
 
 
 #else

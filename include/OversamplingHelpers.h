@@ -29,8 +29,15 @@
 #include <array>
 
 #include <hiir/PolyphaseIir2Designer.h>
+
+#ifdef __SSE2__
+#include <hiir/Downsampler2xSse.h>
+#include <hiir/Upsampler2xSse.h>
+#else
 #include <hiir/Downsampler2xFpu.h>
 #include <hiir/Upsampler2xFpu.h>
+#endif
+
 
 inline constexpr float HIIR_DEFAULT_PASSBAND = 19600;
 inline constexpr int HIIR_DEFAULT_MAX_COEFS = 8;
@@ -82,6 +89,7 @@ public:
 		reset();
 	}
 
+	// expects `2 ^ m_stages` elements for the output
 	void process_sample(float* outSamples, float inSample)
 	{
 		int total = 1 << m_stages;
@@ -121,9 +129,15 @@ public:
 	void setPassband(float passband) { m_passband = passband; reset(); }
 
 private:
+#ifdef __SSE2__
+	hiir::Upsampler2xSse<MaxCoefs> m_upsampleFirst;
+	hiir::Upsampler2xSse<std::max(MaxCoefs / 2, 2)> m_upsampleSecond;
+	std::array<hiir::Upsampler2xSse<std::max(MaxCoefs / 4, 2)>, MaxStages - 2> m_upsampleRest;
+#else
 	hiir::Upsampler2xFpu<MaxCoefs> m_upsampleFirst;
 	hiir::Upsampler2xFpu<std::max(MaxCoefs / 2, 2)> m_upsampleSecond;
 	std::array<hiir::Upsampler2xFpu<std::max(MaxCoefs / 4, 2)>, MaxStages - 2> m_upsampleRest;
+#endif
 
 	int m_stages = 0;
 	float m_sampleRate = 44100;
@@ -175,6 +189,7 @@ public:
 		reset();
 	}
 
+	// expects `2 ^ m_stages` elements for the input
 	float process_sample(float* inSamples)
 	{
 		for (int i = m_stages - 1; i >= 2; --i)
@@ -210,9 +225,15 @@ public:
 	void setPassband(float passband) { m_passband = passband; reset(); }
 
 private:
+#ifdef __SSE2__
+	hiir::Downsampler2xSse<MaxCoefs> m_downsampleFirst;
+	hiir::Downsampler2xSse<std::max(MaxCoefs / 2, 2)> m_downsampleSecond;
+	std::array<hiir::Downsampler2xSse<std::max(MaxCoefs / 4, 2)>, MaxStages - 2> m_downsampleRest;
+#else
 	hiir::Downsampler2xFpu<MaxCoefs> m_downsampleFirst;
 	hiir::Downsampler2xFpu<std::max(MaxCoefs / 2, 2)> m_downsampleSecond;
 	std::array<hiir::Downsampler2xFpu<std::max(MaxCoefs / 4, 2)>, MaxStages - 2> m_downsampleRest;
+#endif
 
 	int m_stages = 0;
 	float m_sampleRate = 44100;
