@@ -45,7 +45,7 @@ public:
 	{
 		Project, // export the project
 		Track, // export a track
-		MultipleTrack // export multiple track
+		MultipleTrack // export multiple tracks
 	};
 
 	ExportProjectDialog(const QString & _file_name, QWidget * _parent, bool multi_export);
