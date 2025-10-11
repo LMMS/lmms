@@ -91,12 +91,38 @@ void RenderManager::renderNextTrack()
 		// for multi-render, prefix each output file with a different number
 		int trackNum = m_tracksToRender.size() + 1;
 
-		render( pathForTrack(renderTrack, trackNum) );
+		render(pathForTrack(renderTrack, trackNum));
 	}
 }
 
 // Render the song into individual tracks
 void RenderManager::renderTracks()
+{
+	setupTrackLists();
+	renderNextTrack();
+}
+
+void RenderManager::renderSingleTrack(Track& track)
+{
+	setupTrackLists();
+
+	// mute everything but the track we are about to render
+	for (auto curTrack : m_unmuted)
+	{
+		curTrack->setMuted(curTrack != &track);
+	}
+	render(m_outputPath);
+
+	restoreMutedState();
+}
+
+// Render the song into a single track
+void RenderManager::renderProject()
+{
+	render( m_outputPath );
+}
+
+void RenderManager::setupTrackLists()
 {
 	const TrackContainer::TrackList& tl = Engine::getSong()->tracks();
 
@@ -106,8 +132,8 @@ void RenderManager::renderTracks()
 		Track::Type type = tk->type();
 
 		// Don't render automation tracks
-		if ( tk->isMuted() == false &&
-				( type == Track::Type::Instrument || type == Track::Type::Sample ) )
+		if (tk->isMuted() == false
+			&& (type == Track::Type::Instrument || type == Track::Type::Sample))
 		{
 			m_unmuted.push_back(tk);
 		}
@@ -119,8 +145,8 @@ void RenderManager::renderTracks()
 		Track::Type type = tk->type();
 
 		// Don't render automation tracks
-		if ( tk->isMuted() == false &&
-				( type == Track::Type::Instrument || type == Track::Type::Sample ) )
+		if (tk->isMuted() == false
+			&& (type == Track::Type::Instrument || type == Track::Type::Sample))
 		{
 			m_unmuted.push_back(tk);
 		}
@@ -129,14 +155,6 @@ void RenderManager::renderTracks()
 	// copy the list of unmuted tracks into our rendering queue.
 	// we need to remember which tracks were unmuted to restore state at the end.
 	m_tracksToRender = m_unmuted;
-
-	renderNextTrack();
-}
-
-// Render the song into a single track
-void RenderManager::renderProject()
-{
-	render( m_outputPath );
 }
 
 void RenderManager::render(QString outputPath)
@@ -170,12 +188,12 @@ void RenderManager::render(QString outputPath)
 // Unmute all tracks that were muted while rendering tracks
 void RenderManager::restoreMutedState()
 {
-	while (!m_unmuted.empty())
+	for (auto curTrack : m_unmuted)
 	{
-		Track* restoreTrack = m_unmuted.back();
-		m_unmuted.pop_back();
-		restoreTrack->setMuted( false );
+		curTrack->setMuted(false);
 	}
+	m_unmuted.clear();
+	m_tracksToRender.clear();
 }
 
 // Determine the output path for a track when rendering tracks individually
