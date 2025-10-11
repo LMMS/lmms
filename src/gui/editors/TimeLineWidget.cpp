@@ -333,9 +333,15 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 	{
 		case Action::MovePositionMarker:
 			m_pos.setTicks(timeAtCursor.getTicks());
-			
-			Engine::getSong()->setPlayPos(timeAtCursor.getTicks(), m_mode);
-			
+			//We have to explicitly specify both of these cases, otherwise the timer does not get updated.
+			if (!Engine::getSong()->isPlaying())
+			{
+				Engine::getSong()->setPlayPos(timeAtCursor.getTicks(), Song::PlayMode::None);
+			}
+			else
+			{
+				Engine::getSong()->setPlayPos(timeAtCursor.getTicks(), m_mode);
+			}
 			m_pos.setCurrentFrame(0);
 			m_pos.setJumped(true);
 			updatePosition();
