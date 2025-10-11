@@ -31,6 +31,7 @@
 #include "GuiApplication.h"
 #include "AutomationEditor.h"
 #include "embed.h"
+#include "ExportProjectDialog.h"
 #include "PathUtil.h"
 #include "SampleClip.h"
 #include "SampleLoader.h"
@@ -39,6 +40,7 @@
 #include "StringPairDrag.h"
 #include "TrackContainerView.h"
 #include "TrackView.h"
+#include "VersionedSaveDialog.h"
 
 namespace lmms::gui
 {
@@ -101,6 +103,12 @@ void SampleClipView::constructContextMenu(QMenu* cm)
 		SLOT(setAutomationGhost())
 	);
 
+	cm->addAction(
+		embed::getIconPixmap("project_export"),
+		tr("Export sample"),
+		this,
+		SLOT(exportStoredSample())
+	);
 }
 
 
@@ -359,6 +367,27 @@ void SampleClipView::reverseSample()
 	m_clip->setStartTimeOffset(m_clip->length() - m_clip->startTimeOffset() - m_clip->sampleLength());
 	Engine::getSong()->setModified();
 	update();
+}
+
+void SampleClipView::exportStoredSample()
+{
+	const auto outputFilename = VersionedSaveDialog::getSaveFileName(nullptr, tr("Export audio file"), QString(), tr("FLAC (*.flac)"));
+
+	if (!outputFilename.isEmpty())
+	{
+		auto& timeline = Engine::getSong()->getTimeline(Song::PlayMode::Song);
+		TimePos startPos{timeline.loopBegin()};
+		TimePos endPos{timeline.loopEnd()};
+
+		timeline.setLoopBegin(m_clip->startPosition());
+		timeline.setLoopEnd(m_clip->endPosition());
+
+		ExportProjectDialog epd(outputFilename, this, *m_clip->getTrack());
+		epd.exec();
+
+		timeline.setLoopBegin(startPos);
+		timeline.setLoopEnd(endPos);
+	}
 }
 
 
