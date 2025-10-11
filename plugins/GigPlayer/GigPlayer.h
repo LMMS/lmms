@@ -172,15 +172,10 @@ public:
 
 	// Used to convert sample rates
 	AudioResampler m_resampler;
-
 	std::array<SampleFrame, DEFAULT_BUFFER_SIZE> m_sourceBuffer;
 	std::array<SampleFrame, DEFAULT_BUFFER_SIZE> m_mixBuffer;
-
-	f_cnt_t m_sourceBufferIndex = 0;
-	f_cnt_t m_mixBufferIndex = 0;
-
-	f_cnt_t m_sourceBufferSize = 0;
-	f_cnt_t m_mixBufferSize = 0;
+	std::span<SampleFrame> m_sourceBufferView;
+	std::span<SampleFrame> m_mixBufferView;
 
 	// Used changing the pitch of the note if desired
 	float sampleFreq;

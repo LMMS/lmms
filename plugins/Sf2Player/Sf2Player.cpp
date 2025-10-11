@@ -882,15 +882,14 @@ void Sf2Instrument::renderFrames( f_cnt_t frames, SampleFrame* buf )
 	// audio samples. We should find a way to unify this but the right abstraction is not so clear yet.
 	while (frames > 0)
 	{
-		if (m_bufferSize == 0)
+		if (m_bufferView.empty())
 		{
 			fluid_synth_write_float(m_synth, m_buffer.size(), m_buffer.data(), 0, 2, m_buffer.data(), 1, 2);
-			m_bufferIndex = 0;
-			m_bufferSize = m_buffer.size();
+			m_bufferView = m_buffer;
 		}
 
 		const auto [inputFramesUsed, outputFramesGenerated]
-			= m_resampler.process({&m_buffer[m_bufferIndex][0], 2, m_bufferSize}, {&buf[0][0], 2, frames});
+			= m_resampler.process({&m_bufferView.data()[0][0], 2, m_bufferView.size()}, {&buf[0][0], 2, frames});
 
 		if (inputFramesUsed == 0 && outputFramesGenerated == 0)
 		{
@@ -898,8 +897,7 @@ void Sf2Instrument::renderFrames( f_cnt_t frames, SampleFrame* buf )
 			break;
 		}
 
-		m_bufferIndex += inputFramesUsed;
-		m_bufferSize -= inputFramesUsed;
+		m_bufferView = m_bufferView.subspan(inputFramesUsed);
 		buf += outputFramesGenerated;
 		frames -= outputFramesGenerated;
 	}

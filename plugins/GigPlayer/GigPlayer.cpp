@@ -438,7 +438,7 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 			auto framesMixed = f_cnt_t{0};
 			while (framesMixed < frames)
 			{
-				if (sample.m_sourceBufferSize == 0)
+				if (sample.m_sourceBufferView.empty())
 				{
 					loadSample(sample, sample.m_sourceBuffer.data(), sample.m_sourceBuffer.size());
 
@@ -449,19 +449,14 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 
 					sample.pos += sample.m_sourceBuffer.size();
 					sample.adsr.inc(sample.m_sourceBuffer.size());
-					sample.m_sourceBufferIndex = 0;
-					sample.m_sourceBufferSize = sample.m_sourceBuffer.size();
+					sample.m_sourceBufferView = sample.m_sourceBuffer;
 				}
 
-				if (sample.m_mixBufferSize == 0)
-				{
-					sample.m_mixBufferIndex = 0;
-					sample.m_mixBufferSize = sample.m_mixBuffer.size();
-				}
+				if (sample.m_mixBufferView.empty()) { sample.m_mixBufferView = sample.m_mixBuffer; }
 
 				const auto [inputFramesUsed, outputFramesGenerated] = sample.m_resampler.process(
-					{&sample.m_sourceBuffer[sample.m_sourceBufferIndex][0], 2, sample.m_sourceBufferSize},
-					{&sample.m_mixBuffer[sample.m_mixBufferIndex][0], 2, sample.m_mixBufferSize});
+					{&sample.m_sourceBufferView.data()[0][0], 2, sample.m_sourceBufferView.size()},
+					{&sample.m_mixBufferView.data()[0][0], 2, sample.m_mixBufferView.size()});
 
 				if (inputFramesUsed == 0 && outputFramesGenerated == 0)
 				{
@@ -472,13 +467,11 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 				const auto framesToMix = std::min(outputFramesGenerated, frames - framesMixed);
 				for (auto i = f_cnt_t{0}; i < framesToMix; ++i)
 				{
-					_working_buffer[framesMixed + i] += sample.m_mixBuffer[sample.m_mixBufferIndex + i];
+					_working_buffer[framesMixed + i] += sample.m_mixBufferView[i];
 				}
 
-				sample.m_sourceBufferIndex += inputFramesUsed;
-				sample.m_sourceBufferSize -= inputFramesUsed;
-				sample.m_mixBufferIndex += framesToMix;
-				sample.m_mixBufferSize -= framesToMix;
+				sample.m_sourceBufferView = sample.m_sourceBufferView.subspan(inputFramesUsed);
+				sample.m_mixBufferView = sample.m_mixBufferView.subspan(framesToMix);
 				framesMixed += framesToMix;
 			}
 		}

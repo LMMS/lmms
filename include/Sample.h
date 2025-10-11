@@ -61,8 +61,7 @@ public:
 	private:
 		AudioResampler m_resampler;
 		std::array<SampleFrame, DEFAULT_BUFFER_SIZE> m_buffer;
-		f_cnt_t m_bufferIndex = 0;
-		f_cnt_t m_bufferSize = 0;
+		std::span<SampleFrame> m_bufferView;
 		int m_frameIndex = 0;
 		bool m_backwards = false;
 		friend class Sample;

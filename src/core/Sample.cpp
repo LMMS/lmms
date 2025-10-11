@@ -126,15 +126,14 @@ bool Sample::play(SampleFrame* dst, PlaybackState* state, size_t numFrames, Loop
 	// audio samples. We should find a way to unify this but the right abstraction is not so clear yet.
 	while (numFrames > 0)
 	{
-		if (state->m_bufferSize == 0)
+		if (state->m_bufferView.empty())
 		{
 			const auto rendered = render(state->m_buffer.data(), state->m_buffer.size(), state, loop);
-			state->m_bufferIndex = 0;
-			state->m_bufferSize = rendered;
+			state->m_bufferView = {state->m_buffer.data(), rendered};
 		}
-
+ 
 		const auto [inputFramesUsed, outputFramesGenerated] = state->m_resampler.process(
-			{&state->m_buffer[state->m_bufferIndex][0], 2, state->m_bufferSize}, {&dst[0][0], 2, numFrames});
+			{&state->m_bufferView.data()[0][0], 2, state->m_bufferView.size()}, {&dst[0][0], 2, numFrames});
 
 		if (inputFramesUsed == 0 && outputFramesGenerated == 0)
 		{
@@ -142,8 +141,7 @@ bool Sample::play(SampleFrame* dst, PlaybackState* state, size_t numFrames, Loop
 			break;
 		}
 
-		state->m_bufferIndex += inputFramesUsed;
-		state->m_bufferSize -= inputFramesUsed;
+		state->m_bufferView = state->m_bufferView.subspan(inputFramesUsed);
 		dst += outputFramesGenerated;
 		numFrames -= outputFramesGenerated;
 	}
