@@ -33,7 +33,7 @@
 namespace lmms::gui
 {
 
-Draggable::Draggable(FloatModelEditorBase::DirectionOfManipulation directionOfManipulation, 
+Draggable::Draggable(DirectionOfManipulation directionOfManipulation, 
 	FloatModel* floatModel, const QPixmap& pixmap, int pointA, int pointB, QWidget* parent)
 	: FloatModelEditorBase(directionOfManipulation, parent),
 	  m_pixmap(pixmap),

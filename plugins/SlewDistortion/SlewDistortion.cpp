@@ -54,7 +54,7 @@ SlewDistortion::SlewDistortion(Model* parent, const Descriptor::SubPluginFeature
 	m_hp(m_sampleRate),
 	m_slewdistortionControls(this)
 {
-	connect(Engine::audioEngine(), SIGNAL(sampleRateChanged()), this, SLOT(changeSampleRate()));
+	connect(Engine::audioEngine(), &AudioEngine::sampleRateChanged, this, &SlewDistortion::changeSampleRate);
 	changeSampleRate();
 }
 
@@ -178,8 +178,8 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 			// store volume for display
 			_mm_store_ps(&m_inPeakDisplay[0], _mm_max_ps(_mm_load_ps(&m_inPeakDisplay[0]), _mm_mul_ps(absIn, drive)));
 
-			__m128 inEnv   = _mm_load_ps(&this->m_inEnv[0]);
-			__m128 slewOut = _mm_load_ps(&this->m_slewOut[0]);
+			__m128 inEnv   = _mm_load_ps(&m_inEnv[0]);
+			__m128 slewOut = _mm_load_ps(&m_slewOut[0]);
 
 			// apply attack and release to envelope follower
 			__m128 cmp = _mm_cmpgt_ps(absIn, inEnv);
@@ -192,8 +192,8 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 			__m128 rate = _mm_sub_ps(in, slewOut);
 
 			__m128 scaledLog = _mm_mul_ps(dynamicSlew, fastLog(inEnv));
-			// clamp to [-87.0f, 87.0f] since fastExp for SSE breaks outside of those bounds
-			__m128 clampedScaledLog = _mm_max_ps(_mm_min_ps(scaledLog, _mm_set1_ps(87.0f)), _mm_set1_ps(-87.0f));
+			// clamp to [-80.0f, 80.0f] since float std::exp breaks outside of those bounds
+			__m128 clampedScaledLog = _mm_max_ps(_mm_min_ps(scaledLog, _mm_set1_ps(80.0f)), _mm_set1_ps(-80.0f));
 			__m128 slewMult = fastExp(clampedScaledLog);
 
 			// determine whether we should use the slew up or slew down parameter
@@ -208,7 +208,7 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 			__m128 biasedIn = _mm_add_ps(_mm_mul_ps(slewOut, drive), bias);
 
 			// apply warp and crush
-			// distIn = (biasedIn - copysign(warp[i] / crush[i], biasedIn)) / (1.f - warp[i]);
+			// distIn = (biasedIn - std::copysign(warp[i] / crush[i], biasedIn)) / (1.f - warp[i]);
 			__m128 signBiasedIn = _mm_and_ps(biasedIn, _mm_castsi128_ps(_mm_set1_epi32(0x80000000)));
 			__m128 warpOverCrush = _mm_div_ps(warp, crush);
 			__m128 copysignWarpOverCrush = _mm_or_ps(warpOverCrush, signBiasedIn);
@@ -241,9 +241,9 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 					}
 					case SlewDistortionType::Tanh: // Tanh => 2 / (1 + exp(-2x)) - 1
 					{
-						// clamp to [-87.0f, 87.0f] since fastExp for SSE breaks outside of those bounds
+						// clamp to [-80.0f, 80.0f] since float std::exp breaks outside of those bounds
 						__m128 clampedInput = _mm_max_ps(_mm_min_ps(_mm_mul_ps(_mm_set1_ps(-2.0f),
-							distInFull), _mm_set1_ps(87.0f)), _mm_set1_ps(-87.0f));
+							distInFull), _mm_set1_ps(80.0f)), _mm_set1_ps(-80.0f));
 						__m128 expResult = fastExp(clampedInput);
 						distOutFull = _mm_sub_ps(_mm_div_ps(_mm_set1_ps(2.0f), _mm_add_ps(one, expResult)), one);
 						break;
@@ -265,9 +265,9 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 					case SlewDistortionType::Sinusoidal: // Sinusoidal => sin(x)
 					{
 						// SSE2 sine approximation I created
-						__m128 pi = _mm_set1_ps(3.14159265358979323846f);
-						__m128 piOverTwo = _mm_set1_ps(1.57079632679489661923f);
-						__m128 tau = _mm_set1_ps(6.28318530717958647692f);
+						__m128 pi = _mm_set1_ps(std::numbers::pi_v<float>);
+						__m128 piOverTwo = _mm_set1_ps(std::numbers::pi_v<float> * 0.5f);
+						__m128 tau = _mm_set1_ps(std::numbers::pi_v<float> * 2.f);
 
 						__m128 distMinusPiOverTwo = _mm_sub_ps(distInFull, piOverTwo);
 						__m128 divByTwoPi = _mm_div_ps(distMinusPiOverTwo, tau);
@@ -315,7 +315,7 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 					case SlewDistortionType::SmoothRectify: // Smooth Rectify => sqrt(x^2 + 0.04) - 0.2
 					{
 						distOutFull = _mm_sub_ps(_mm_sqrt_ps(_mm_add_ps(_mm_mul_ps(distInFull, distInFull), 
-							_mm_set1_ps(0.04f))),_mm_set1_ps(0.2f));
+							_mm_set1_ps(0.04f))), _mm_set1_ps(0.2f));
 						break;
 					}
 					case SlewDistortionType::HalfRectify:  // Half-wave Rectify => max(0, x)
@@ -332,7 +332,7 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 						// round to nearest integer
 						__m128 signMask = _mm_cmplt_ps(scaledVal, zero);
 						__m128 half = _mm_set1_ps(0.5f);
-						__m128 addVal = _mm_or_ps(_mm_andnot_ps(signMask, half), _mm_and_ps(signMask, _mm_sub_ps(zero, half)));
+						__m128 addVal = _mm_or_ps(_mm_andnot_ps(signMask, half), _mm_and_ps(signMask, _mm_set1_ps(-0.5f)));
 						__m128 rounded = _mm_cvtepi32_ps(_mm_cvttps_epi32(_mm_add_ps(scaledVal, addVal)));
 
 						distOutFull = _mm_div_ps(rounded, scale);
@@ -355,19 +355,19 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 					if (pair == 0)
 					{
 						// for elements 0 and 1
-						_mm_storel_pi((__m64*)&distOutArr[0], distOutFull);
+						_mm_storel_pi(reinterpret_cast<__m64*>(&distOutArr[0]), distOutFull);
 					}
 					else
 					{
 						// for elements 2 and 3
-						_mm_storeh_pi((__m64*)&distOutArr[2], distOutFull);
+						_mm_storeh_pi(reinterpret_cast<__m64*>(&distOutArr[2]), distOutFull);
 					}
 				}
 			}
 
 			__m128 distOut = _mm_load_ps(&distOutArr[0]);
 
-			// (1 - warp) * distOut + copysign(warp, biasedIn)
+			// (1 - warp) * distOut + std::copysign(warp, biasedIn)
 			__m128 distOutScaled = _mm_add_ps(_mm_mul_ps(distOut, _mm_sub_ps(one, warp)), _mm_or_ps(warp, signBiasedIn));
 
 			// if (abs(biasedIn) < warp / crush) {distOut = biasedIn * crush;}
@@ -378,14 +378,14 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 			distOut = _mm_or_ps(_mm_and_ps(condition, biasedInCrush), _mm_andnot_ps(condition, distOutScaled));
 
 			// DC offset calculation
-			__m128 dcOffset = _mm_load_ps(&this->m_dcOffset[0]);
+			__m128 dcOffset = _mm_load_ps(&m_dcOffset[0]);
 			__m128 dcCoeff  = _mm_set1_ps(m_dcCoeff);
 			dcOffset = _mm_add_ps(_mm_mul_ps(dcOffset, dcCoeff), _mm_mul_ps(distOut, _mm_sub_ps(one, dcCoeff)));
 
 			__m128 distOutMinusDC = _mm_sub_ps(distOut, dcOffset);
 
 			// even with DC offset removal disabled, we should still apply it for the envelope follower
-			__m128 outEnv = _mm_load_ps(&this->m_outEnv[0]);
+			__m128 outEnv = _mm_load_ps(&m_outEnv[0]);
 			__m128 absOut = _mm_and_ps(distOutMinusDC, _mm_castsi128_ps(_mm_set1_epi32(0x7FFFFFFF)));
 			
 			cmp = _mm_cmpgt_ps(absOut, outEnv);
@@ -408,10 +408,10 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 			_mm_store_ps(&m_outPeakDisplay[0], _mm_max_ps(_mm_load_ps(&m_outPeakDisplay[0]), outAbs));
 
 			// write updated stuff back into member variables
-			_mm_store_ps(&this->m_inEnv[0],   inEnv);
-			_mm_store_ps(&this->m_slewOut[0], slewOut);
-			_mm_store_ps(&this->m_dcOffset[0], dcOffset);
-			_mm_store_ps(&this->m_outEnv[0],  outEnv);
+			_mm_store_ps(&m_inEnv[0], inEnv);
+			_mm_store_ps(&m_slewOut[0], slewOut);
+			_mm_store_ps(&m_dcOffset[0], dcOffset);
+			_mm_store_ps(&m_outEnv[0], outEnv);
 
 			alignas(16) std::array<float, 4> outArr;
 			_mm_store_ps(&outArr[0], outFinal);
@@ -566,7 +566,7 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 				m_slewOut[i] = m_slewOut[i] + rate;
 				
 				float biasedIn = m_slewOut[i] * drive[i] + bias[i];
-				float distIn = (biasedIn - copysign(warp[i] / crush[i], biasedIn)) / (1.f - warp[i]);
+				float distIn = (biasedIn - std::copysign(warp[i] / crush[i], biasedIn)) / (1.f - warp[i]);
 				float distOut;
 				switch (static_cast<SlewDistortionType>(distType[i]))
 				{
@@ -630,7 +630,7 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 						distOut = distIn;
 					}
 				}
-				distOut = distOut * (1.f - warp[i]) + copysign(warp[i], biasedIn);
+				distOut = distOut * (1.f - warp[i]) + std::copysign(warp[i], biasedIn);
 				if (std::abs(biasedIn) < warp[i] / crush[i]) {distOut = biasedIn * crush[i];}
 				
 				m_dcOffset[i] = m_dcOffset[i] * m_dcCoeff + distOut * (1.f - m_dcCoeff);

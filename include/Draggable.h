@@ -1,7 +1,7 @@
 /*
  * Draggable.h
  *
- * Copyright (c) 2022 Lost Robot <r94231/at/gmail/dot/com>
+ * Copyright (c) 2025 Lost Robot <r94231/at/gmail/dot/com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -38,6 +38,8 @@ class LMMS_EXPORT Draggable : public FloatModelEditorBase
 	Q_OBJECT
 
 public:
+	using FloatModelEditorBase::DirectionOfManipulation;
+	
 	/**
 	 * @param directionOfManipulation Direction the user can drag the control
 	 * @param floatModel Pointer to the FloatModel this draggable modifies
@@ -46,7 +48,7 @@ public:
 	 * @param pointB Ending pixel position (Y if vertical, X if horizontal)
 	 * @param parent Parent QWidget
 	 */
-	Draggable(FloatModelEditorBase::DirectionOfManipulation directionOfManipulation,
+	Draggable(DirectionOfManipulation directionOfManipulation,
 		FloatModel* floatModel, const QPixmap& pixmap, int pointA, int pointB, QWidget* parent = nullptr);
 
 	QSize sizeHint() const override;

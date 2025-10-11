@@ -44,6 +44,8 @@ SlewDistortionControlDialog::SlewDistortionControlDialog(SlewDistortionControls*
 	EffectControlDialog(controls),
 	m_controls(controls)
 {
+	using DirectionOfManipulation = FloatModelEditorBase::DirectionOfManipulation;
+
 	setAutoFillBackground(true);
 	QPalette pal;
 	pal.setBrush(backgroundRole(), PLUGIN_NAME::getIconPixmap("artwork"));
@@ -91,20 +93,20 @@ SlewDistortionControlDialog::SlewDistortionControlDialog(SlewDistortionControls*
 	//distType2Box->setFont(pointSize<8>(distType2Box->font()));
 	distType2Box->setModel(&controls->m_distType2Model);
 	
-	Draggable* drive1Draggable = new Draggable(FloatModelEditorBase::DirectionOfManipulation::Vertical,
+	Draggable* drive1Draggable = new Draggable(DirectionOfManipulation::Vertical,
 		&controls->m_drive1Model, PLUGIN_NAME::getIconPixmap("handle"), 108, 34, this);
 	drive1Draggable->move(16, drive1Draggable->y());
 	drive1Draggable->setDefaultValPixmap(PLUGIN_NAME::getIconPixmap("handle_zero"));
-	Draggable* drive2Draggable = new Draggable(FloatModelEditorBase::DirectionOfManipulation::Vertical,
+	Draggable* drive2Draggable = new Draggable(DirectionOfManipulation::Vertical,
 		&controls->m_drive2Model, PLUGIN_NAME::getIconPixmap("handle"), 229, 155, this);
 	drive2Draggable->move(16, drive2Draggable->y());
 	drive2Draggable->setDefaultValPixmap(PLUGIN_NAME::getIconPixmap("handle_zero"));
 	
-	Draggable* bias1Draggable = new Draggable(FloatModelEditorBase::DirectionOfManipulation::Vertical,
+	Draggable* bias1Draggable = new Draggable(DirectionOfManipulation::Vertical,
 		&controls->m_bias1Model, PLUGIN_NAME::getIconPixmap("handle"), 112, 34, this);
 	bias1Draggable->move(416, bias1Draggable->y());
 	bias1Draggable->setDefaultValPixmap(PLUGIN_NAME::getIconPixmap("handle_zero"));
-	Draggable* bias2Draggable = new Draggable(FloatModelEditorBase::DirectionOfManipulation::Vertical,
+	Draggable* bias2Draggable = new Draggable(DirectionOfManipulation::Vertical,
 		&controls->m_bias2Model, PLUGIN_NAME::getIconPixmap("handle"), 233, 155, this);
 	bias2Draggable->move(416, bias2Draggable->y());
 	bias2Draggable->setDefaultValPixmap(PLUGIN_NAME::getIconPixmap("handle_zero"));
@@ -128,11 +130,11 @@ SlewDistortionControlDialog::SlewDistortionControlDialog(SlewDistortionControls*
 	makeKnob(267, 26, tr("Dynamic Slew 1:"), "", &controls->m_dynamicSlew1Model);
 	makeKnob(267, 147, tr("Dynamic Slew 2:"), "", &controls->m_dynamicSlew2Model);
 	
-	Draggable* outVol1Draggable = new Draggable(FloatModelEditorBase::DirectionOfManipulation::Vertical,
+	Draggable* outVol1Draggable = new Draggable(DirectionOfManipulation::Vertical,
 		&controls->m_outVol1Model, PLUGIN_NAME::getIconPixmap("handle"), 108, 34, this);
 	outVol1Draggable->move(594, outVol1Draggable->y());
 	outVol1Draggable->setDefaultValPixmap(PLUGIN_NAME::getIconPixmap("handle_zero"));
-	Draggable* outVol2Draggable = new Draggable(FloatModelEditorBase::DirectionOfManipulation::Vertical,
+	Draggable* outVol2Draggable = new Draggable(DirectionOfManipulation::Vertical,
 		&controls->m_outVol2Model, PLUGIN_NAME::getIconPixmap("handle"), 229, 155, this);
 	outVol2Draggable->move(594, outVol2Draggable->y());
 	outVol2Draggable->setDefaultValPixmap(PLUGIN_NAME::getIconPixmap("handle_zero"));
@@ -190,9 +192,9 @@ SlewDistortionControlDialog::SlewDistortionControlDialog(SlewDistortionControls*
 	m_helpBtn->setActiveGraphic(PLUGIN_NAME::getIconPixmap("help_on"));
 	m_helpBtn->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("help_off"));
 	m_helpBtn->setToolTip(tr("Open help window"));
-	connect(m_helpBtn, SIGNAL(clicked()), this, SLOT(showHelpWindow()));
+	connect(m_helpBtn, &PixmapButton::clicked, this, &SlewDistortionControlDialog::showHelpWindow);
 	
-	connect(getGUI()->mainWindow(), SIGNAL(periodicUpdate()), this, SLOT(update()));
+	connect(getGUI()->mainWindow(), &MainWindow::periodicUpdate, this, qOverload<>(&QWidget::update));
 }
 
 void SlewDistortionControlDialog::paintEvent(QPaintEvent* event)
