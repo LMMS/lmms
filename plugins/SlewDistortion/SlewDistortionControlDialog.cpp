@@ -194,7 +194,7 @@ SlewDistortionControlDialog::SlewDistortionControlDialog(SlewDistortionControls*
 	m_helpBtn->setToolTip(tr("Open help window"));
 	connect(m_helpBtn, &PixmapButton::clicked, this, &SlewDistortionControlDialog::showHelpWindow);
 	
-	connect(getGUI()->mainWindow(), &MainWindow::periodicUpdate, this, qOverload<>(&QWidget::update));
+	connect(getGUI()->mainWindow(), SIGNAL(periodicUpdate()), this, SLOT(update()));
 }
 
 void SlewDistortionControlDialog::paintEvent(QPaintEvent* event)
