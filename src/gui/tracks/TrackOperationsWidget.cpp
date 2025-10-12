@@ -256,20 +256,7 @@ void TrackOperationsWidget::exportTrack()
 	{
 		const auto fileDestination = dialog.selectedFiles()[0];
 		auto exportDialog = ExportProjectDialog{fileDestination, false, m_trackView->getTrack(), this};
-
-		if (exportDialog.exec() == QDialog::Accepted)
-		{
-			auto guard = Engine::audioEngine()->requestChangesGuard();
-			auto containerView = m_trackView->trackContainerView();
-
-			auto exportedTrack = Track::create(Track::Type::Sample, containerView->model());
-			auto exportedClip = dynamic_cast<SampleClip*>(exportedTrack->createClip(TimePos{}));
-			exportedClip->setSampleFile(fileDestination);
-			track->setMuted(true);
-
-			auto exportedTrackView = containerView->createTrackView(exportedTrack);
-			containerView->moveTrackView(exportedTrackView, containerView->trackViews().indexOf(m_trackView));
-		}
+		exportDialog.exec();
 	}
 }
 
