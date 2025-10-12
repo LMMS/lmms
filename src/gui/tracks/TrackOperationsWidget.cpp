@@ -263,7 +263,7 @@ void TrackOperationsWidget::exportTrack()
 			auto containerView = m_trackView->trackContainerView();
 
 			auto exportedTrack = Track::create(Track::Type::Sample, containerView->model());
-			auto exportedClip = static_cast<SampleClip*>(exportedTrack->createClip(TimePos{}));
+			auto exportedClip = dynamic_cast<SampleClip*>(exportedTrack->createClip(TimePos{}));
 			exportedClip->setSampleFile(fileDestination);
 			track->setMuted(true);
 
