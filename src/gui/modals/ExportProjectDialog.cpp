@@ -38,6 +38,8 @@ ExportProjectDialog::ExportProjectDialog(const QString& exportLocation, Mode mod
 	: QDialog(parent)
 	, Ui::ExportProjectDialog()
 	, m_exportLocation(exportLocation)
+	, m_mode(mode)
+	, m_track(track)
 	, m_renderManager(nullptr)
 {
 	setupUi( this );
@@ -199,7 +201,7 @@ void ExportProjectDialog::startExport()
 		m_renderManager->renderProject();
 		break;
 	case Mode::ExportTrack:
-		m_renderManager->renderTrack(m_trackToExport);
+		m_renderManager->renderTrack(m_track);
 		break;
 	case Mode::ExportTracks:
 		m_renderManager->renderTracks();

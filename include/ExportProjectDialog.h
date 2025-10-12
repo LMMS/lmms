@@ -71,7 +71,7 @@ private:
 	QString m_exportLocation;
 	QString m_exportExtension;
 	Mode m_mode;
-	Track* m_trackToExport = nullptr;
+	Track* m_track = nullptr;
 	ProjectRenderer::ExportFileFormat m_ft;
 	std::unique_ptr<RenderManager> m_renderManager;
 };
