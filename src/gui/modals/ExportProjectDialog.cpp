@@ -40,7 +40,7 @@ ExportProjectDialog::ExportProjectDialog(
 	, Ui::ExportProjectDialog()
 	, m_exportLocation(exportLocation)
 	, m_exportTracks(exportStems)
-	, m_trackToBounce(trackToBounce)
+	, m_trackToExport(trackToBounce)
 	, m_renderManager(nullptr)
 {
 	setupUi( this );
@@ -196,7 +196,7 @@ void ExportProjectDialog::startExport()
 	connect( m_renderManager.get(), SIGNAL(finished()),
 			getGUI()->mainWindow(), SLOT(resetWindowTitle()));
 
-	if (m_trackToBounce) { m_renderManager->renderTrack(m_trackToBounce); }
+	if (m_trackToExport) { m_renderManager->renderTrack(m_trackToExport); }
 	else if (m_exportTracks) { m_renderManager->renderTracks(); }
 	else { m_renderManager->renderProject(); }
 }

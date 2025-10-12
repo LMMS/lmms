@@ -61,7 +61,7 @@ private:
 	QString m_exportLocation;
 	QString m_exportExtension;
 	bool m_exportTracks = false;
-	Track* m_trackToBounce = nullptr;
+	Track* m_trackToExport = nullptr;
 
 	ProjectRenderer::ExportFileFormat m_ft;
 	std::unique_ptr<RenderManager> m_renderManager;
