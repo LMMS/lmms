@@ -16,11 +16,11 @@
       <arpeggiator arptime="273" arprange="3" arptime_denominator="4" syncmode="5" arpmode="0" arp-enabled="0" arp="0" arptime_numerator="4" arpdir="1" arpgate="100"/>
       <midiport inputcontroller="0" inports="" fixedoutputvelocity="-1" inputchannel="0" outputcontroller="0" writable="0" outputchannel="1" fixedinputvelocity="-1" fixedoutputnote="-1" outputprogram="1" basevelocity="127" readable="0"/>
       <fxchain numofeffects="7" enabled="1">
-        <effect autoquit_numerator="1" autoquit_denominator="1" syncmode="0" autoquit="1" gate="0" name="stereomatrix" wet="0.38" on="1">
+        <effect autoquit_numerator="1" autoquit_denominator="1" syncmode="0" autoquit="1" name="stereomatrix" wet="0.38" on="1">
           <stereomatrixcontrols l-l="-0.5" l-r="-0.5" r-l="-0.5" r-r="-0.5"/>
           <key/>
         </effect>
-        <effect autoquit_numerator="1" autoquit_denominator="1" syncmode="0" autoquit="1" gate="0" name="ladspaeffect" wet="1" on="1">
+        <effect autoquit_numerator="1" autoquit_denominator="1" syncmode="0" autoquit="1" name="ladspaeffect" wet="1" on="1">
           <ladspacontrols link="0" ports="8">
             <port01 link="0" data="0.16"/>
             <port02 link="1" data="1"/>
@@ -36,7 +36,7 @@
             <attribute value="PhaserII" name="plugin"/>
           </key>
         </effect>
-        <effect autoquit_numerator="1" autoquit_denominator="1" syncmode="0" autoquit="1" gate="0" name="ladspaeffect" wet="0.75" on="1">
+        <effect autoquit_numerator="1" autoquit_denominator="1" syncmode="0" autoquit="1" name="ladspaeffect" wet="0.75" on="1">
           <ladspacontrols link="1" ports="8">
             <port01 link="1" data="0"/>
             <port02 link="1" data="0.5"/>
@@ -52,14 +52,14 @@
             <attribute value="ToneStack" name="plugin"/>
           </key>
         </effect>
-        <effect autoquit_numerator="1" autoquit_denominator="1" syncmode="0" autoquit="1" gate="0" name="ladspaeffect" wet="1" on="0">
+        <effect autoquit_numerator="1" autoquit_denominator="1" syncmode="0" autoquit="1" name="ladspaeffect" wet="1" on="0">
           <ladspacontrols link="1" ports="0"/>
           <key>
             <attribute value="dc_remove_1207" name="file"/>
             <attribute value="dcRemove" name="plugin"/>
           </key>
         </effect>
-        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" autoquit="8000" gate="0" name="ladspaeffect" wet="0.25" on="1">
+        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" autoquit="8000" name="ladspaeffect" wet="0.25" on="1">
           <ladspacontrols ports="10">
             <port00 data="365"/>
             <port01 data="50"/>
@@ -77,7 +77,7 @@
             <attribute value="tap_stereo_echo" name="plugin"/>
           </key>
         </effect>
-        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" autoquit="1" gate="0" name="ladspaeffect" wet="1" on="1">
+        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" autoquit="1" name="ladspaeffect" wet="1" on="1">
           <ladspacontrols ports="1">
             <port00 data="1.5"/>
           </ladspacontrols>
@@ -86,7 +86,7 @@
             <attribute value="amp_stereo" name="plugin"/>
           </key>
         </effect>
-        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" autoquit="1" gate="0" name="ladspaeffect" wet="1" on="1">
+        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" autoquit="1" name="ladspaeffect" wet="1" on="1">
           <ladspacontrols ports="10">
             <port02 data="-48"/>
             <port03 data="-48"/>

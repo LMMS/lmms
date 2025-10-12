@@ -25,22 +25,22 @@
 #ifndef LMMS_GUI_SLICERT_VIEW_H
 #define LMMS_GUI_SLICERT_VIEW_H
 
-#include <QPushButton>
-#include <qpixmap.h>
 
-#include "ComboBox.h"
 #include "InstrumentView.h"
-#include "Knob.h"
-#include "LcdSpinBox.h"
-#include "LedCheckBox.h"
-#include "PixmapButton.h"
-#include "SlicerTWaveform.h"
+
+class QPushButton;
 
 namespace lmms {
 
 class SlicerT;
 
 namespace gui {
+
+class ComboBox;
+class Knob;
+class LcdSpinBox;
+class PixmapButton;
+class SlicerTWaveform;
 
 class SlicerTView : public InstrumentView
 {
@@ -49,6 +49,7 @@ class SlicerTView : public InstrumentView
 public slots:
 	void exportMidi();
 	void openFiles();
+	void clearSlices();
 
 public:
 	SlicerTView(SlicerT* instrument, QWidget* parent);
@@ -87,6 +88,7 @@ private:
 	LcdSpinBox* m_bpmBox;
 	ComboBox* m_snapSetting;
 	PixmapButton* m_syncToggle;
+	PixmapButton* m_clearButton;
 	PixmapButton* m_folderButton;
 
 	QPushButton* m_resetButton;

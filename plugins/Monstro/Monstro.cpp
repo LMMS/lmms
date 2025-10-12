@@ -22,10 +22,8 @@
  *
  */
 
-
-#include <QDomElement>
-
 #include "Monstro.h"
+
 
 #include "ComboBox.h"
 #include "Engine.h"
@@ -34,7 +32,6 @@
 #include "interpolation.h"
 
 #include "embed.h"
-
 #include "plugin_export.h"
 
 namespace lmms
@@ -120,7 +117,7 @@ void MonstroSynth::renderOutput( fpp_t _frames, SampleFrame* _buf  )
 		if( mod##_e2 != 0.0f ) modtmp += m_env[1][f] * mod##_e2; \
 		if( mod##_l1 != 0.0f ) modtmp += m_lfo[0][f] * mod##_l1; \
 		if( mod##_l2 != 0.0f ) modtmp += m_lfo[1][f] * mod##_l2; \
-		car = qBound( MIN_FREQ, car * powf( 2.0f, modtmp ), MAX_FREQ );
+		(car) = qBound( MIN_FREQ, (car) * std::exp2(modtmp), MAX_FREQ);
 
 #define modulateabs( car, mod ) \
 		if( mod##_e1 != 0.0f ) car += m_env[0][f] * mod##_e1; \
@@ -625,8 +622,8 @@ void MonstroSynth::renderOutput( fpp_t _frames, SampleFrame* _buf  )
 			sub = qBound( 0.0f, sub, 1.0f );
 		}
 
-		sample_t O3L = linearInterpolate( O3AL, O3BL, sub );
-		sample_t O3R = linearInterpolate( O3AR, O3BR, sub );
+		sample_t O3L = std::lerp(O3AL, O3BL, sub);
+		sample_t O3R = std::lerp(O3AR, O3BR, sub);
 
 		// modulate volume
 		O3L *= o3lv;
@@ -665,8 +662,8 @@ void MonstroSynth::renderOutput( fpp_t _frames, SampleFrame* _buf  )
 		sample_t L = O1L + O3L + ( omod == MOD_MIX ? O2L : 0.0f );
 		sample_t R = O1R + O3R + ( omod == MOD_MIX ? O2R : 0.0f );
 
-		_buf[f][0] = linearInterpolate( L, m_l_last, m_parent->m_integrator );
-		_buf[f][1] = linearInterpolate( R, m_r_last, m_parent->m_integrator );
+		_buf[f][0] = std::lerp(L, m_l_last, m_parent->m_integrator);
+		_buf[f][1] = std::lerp(R, m_r_last, m_parent->m_integrator);
 
 		m_l_last = L;
 		m_r_last = R;
@@ -1361,25 +1358,25 @@ void MonstroInstrument::updateVolume3()
 
 void MonstroInstrument::updateFreq1()
 {
-	m_osc1l_freq = powf( 2.0f, m_osc1Crs.value() / 12.0f ) *
-					powf( 2.0f, m_osc1Ftl.value() / 1200.0f );
-	m_osc1r_freq = powf( 2.0f, m_osc1Crs.value() / 12.0f ) *
-					powf( 2.0f, m_osc1Ftr.value() / 1200.0f );
+	m_osc1l_freq = std::exp2(m_osc1Crs.value() / 12.0f)
+		* std::exp2(m_osc1Ftl.value() / 1200.0f);
+	m_osc1r_freq = std::exp2(m_osc1Crs.value() / 12.0f)
+		* std::exp2(m_osc1Ftr.value() / 1200.0f);
 }
 
 
 void MonstroInstrument::updateFreq2()
 {
-	m_osc2l_freq = powf( 2.0f, m_osc2Crs.value() / 12.0f ) *
-					powf( 2.0f, m_osc2Ftl.value() / 1200.0f );
-	m_osc2r_freq = powf( 2.0f, m_osc2Crs.value() / 12.0f ) *
-					powf( 2.0f, m_osc2Ftr.value() / 1200.0f );
+	m_osc2l_freq = std::exp2(m_osc2Crs.value() / 12.0f)
+		* std::exp2(m_osc2Ftl.value() / 1200.0f);
+	m_osc2r_freq = std::exp2(m_osc2Crs.value() / 12.0f)
+		* std::exp2(m_osc2Ftr.value() / 1200.0f);
 }
 
 
 void MonstroInstrument::updateFreq3()
 {
-	m_osc3_freq = powf( 2.0f, m_osc3Crs.value() / 12.0f );
+	m_osc3_freq = std::exp2(m_osc3Crs.value() / 12.0f);
 }
 
 
@@ -1505,7 +1502,7 @@ MonstroView::MonstroView( Instrument * _instrument,
 	m_matViewButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "matview_inactive" ) );
 	m_matViewButton->setToolTip(tr("Matrix view"));
 
-	m_selectedViewGroup = new automatableButtonGroup( this );
+	m_selectedViewGroup = new AutomatableButtonGroup( this );
 	m_selectedViewGroup -> addButton( m_opViewButton );
 	m_selectedViewGroup -> addButton( m_matViewButton );
 
@@ -1769,7 +1766,7 @@ QWidget * MonstroView::setupOperatorsView( QWidget * _parent )
 	m_pmButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "pm_inactive" ) );
 	m_pmButton->setToolTip(tr("Modulate phase of osc 3 by osc 2"));
 
-	m_o23ModGroup = new automatableButtonGroup( view );
+	m_o23ModGroup = new AutomatableButtonGroup( view );
 	m_o23ModGroup-> addButton( m_mixButton );
 	m_o23ModGroup-> addButton( m_amButton );
 	m_o23ModGroup-> addButton( m_fmButton );

@@ -38,7 +38,7 @@ namespace lmms
 #define KICKER_PRESET_VERSION 1
 
 
-class NotePlayHandle;
+class NotePlayHandle;  // IWYU pragma: keep
 
 namespace gui
 {

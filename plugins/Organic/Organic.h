@@ -31,13 +31,12 @@
 #include "InstrumentView.h"
 #include "AutomatableModel.h"
 
-class QPixmap;
 
 namespace lmms
 {
 
 
-class NotePlayHandle;
+class NotePlayHandle;  // IWYU pragma: keep
 class Oscillator;
 
 namespace gui

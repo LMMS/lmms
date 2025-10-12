@@ -26,20 +26,8 @@
 
 #include "TapTempo.h"
 
-#include <QFont>
-#include <QKeyEvent>
-#include <QLabel>
-#include <QPushButton>
-#include <QVBoxLayout>
-#include <cfloat>
-#include <cmath>
 #include <string>
 
-#include "AudioEngine.h"
-#include "Engine.h"
-#include "LedCheckBox.h"
-#include "SamplePlayHandle.h"
-#include "Song.h"
 #include "embed.h"
 #include "plugin_export.h"
 

@@ -22,7 +22,6 @@
  *
  */
 
-#include <QDomElement>
 
 #include "DelayControls.h"
 #include "DelayEffect.h"

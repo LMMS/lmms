@@ -30,14 +30,13 @@
 #include <vector>
 
 #include <QFileInfo>
-#include <QHash>
 #include <QList>
 #include <QString>
 
 #include "lmms_export.h"
 #include "Plugin.h"
 
-class QLibrary;
+class QLibrary;  // IWYU pragma: keep
 
 namespace lmms
 {
@@ -61,6 +60,7 @@ public:
 	~PluginFactory() = default;
 
 	static void setupSearchPaths();
+	static QList<QRegularExpression> getExcludePatterns(const char* envVar);
 
 	/// Returns the singleton instance of PluginFactory. You won't need to call
 	/// this directly, use pluginFactory instead.
@@ -104,6 +104,8 @@ private:
 	QHash<QString, QString> m_errors;
 
 	static std::unique_ptr<PluginFactory> s_instance;
+
+	static void filterPlugins(QSet<QFileInfo>& files);
 };
 
 //Short-hand function

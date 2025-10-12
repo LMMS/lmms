@@ -1,12 +1,17 @@
 IF(LMMS_BUILD_WIN64)
 	ADD_SUBDIRECTORY(RemoteVstPlugin)
 ELSEIF(LMMS_BUILD_LINUX)
+	if(LMMS_HOST_X86_64)
+		set(CXX_FLAGS -m64)
+	endif()
 	ExternalProject_Add(RemoteVstPlugin64
 		"${EXTERNALPROJECT_ARGS}"
 		CMAKE_ARGS
 			"${EXTERNALPROJECT_CMAKE_ARGS}"
 			"-DCMAKE_CXX_COMPILER=${WINEGCC}"
-			"-DCMAKE_CXX_FLAGS=-m64"
+			# Pass /DYNAMICBASE:NO to custom winebuild per #7987
+			"-DCMAKE_CXX_FLAGS=${CXX_FLAGS} --winebuild \"${CUSTOM_WINEBUILD_EXECUTABLE}\" -Wb,--disable-dynamicbase"
+		DEPENDS wine
 	)
 	INSTALL(PROGRAMS "${CMAKE_CURRENT_BINARY_DIR}/../RemoteVstPlugin64" "${CMAKE_CURRENT_BINARY_DIR}/../RemoteVstPlugin64.exe.so" DESTINATION "${PLUGIN_DIR}")
 ENDIF()

@@ -25,7 +25,6 @@
 
 #include "PeakController.h"
 
-#include <cmath>
 
 #include <QDomElement>
 #include <QMessageBox>
@@ -80,7 +79,9 @@ void PeakController::updateValueBuffer()
 {
 	if( m_coeffNeedsUpdate )
 	{
-		m_coeff = 100.0f / Engine::audioEngine()->outputSampleRate();
+		const float ratio = 44100.0f / Engine::audioEngine()->outputSampleRate();
+		m_attackCoeff = 1.0f - powf( 2.0f, -0.3f * ( 1.0f - m_peakEffect->attackModel()->value() ) * ratio );
+		m_decayCoeff = 1.0f -  powf( 2.0f, -0.3f * ( 1.0f - m_peakEffect->decayModel()->value()  ) * ratio );
 		m_coeffNeedsUpdate = false;
 	}
 
@@ -95,7 +96,14 @@ void PeakController::updateValueBuffer()
 			for( f_cnt_t f = 0; f < frames; ++f )
 			{
 				const float diff = ( targetSample - m_currentSample );
-				m_currentSample += diff * m_coeff;
+				if( m_currentSample < targetSample ) // going up...
+				{
+					m_currentSample += diff * m_attackCoeff;
+				}
+				else if( m_currentSample > targetSample ) // going down
+				{
+					m_currentSample += diff * m_decayCoeff;
+				}
 				values[f] = m_currentSample;
 			}
 		}

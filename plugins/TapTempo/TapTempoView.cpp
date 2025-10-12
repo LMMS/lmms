@@ -31,7 +31,6 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QVBoxLayout>
-#include <QVariant>
 #include <QWidget>
 
 #include "Engine.h"

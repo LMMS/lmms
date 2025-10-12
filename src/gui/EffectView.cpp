@@ -63,27 +63,16 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 
 	m_bypass->setToolTip(tr("On/Off"));
 
-
-	m_wetDry = new Knob( KnobType::Bright26, this );
-	m_wetDry->setLabel( tr( "W/D" ) );
+	m_wetDry = new Knob(KnobType::Bright26, tr("W/D"), this, Knob::LabelRendering::LegacyFixedFontSize);
 	m_wetDry->move( 40 - m_wetDry->width() / 2, 5 );
 	m_wetDry->setEnabled( isEnabled );
 	m_wetDry->setHintText( tr( "Wet Level:" ), "" );
 
 
-	m_autoQuit = new TempoSyncKnob( KnobType::Bright26, this );
-	m_autoQuit->setLabel( tr( "DECAY" ) );
+	m_autoQuit = new TempoSyncKnob(KnobType::Bright26, tr("DECAY"), this, Knob::LabelRendering::LegacyFixedFontSize);
 	m_autoQuit->move( 78 - m_autoQuit->width() / 2, 5 );
-	m_autoQuit->setEnabled( isEnabled && !effect()->m_autoQuitDisabled );
+	m_autoQuit->setEnabled(isEnabled && effect()->autoQuitEnabled());
 	m_autoQuit->setHintText( tr( "Time:" ), "ms" );
-
-
-	m_gate = new Knob( KnobType::Bright26, this );
-	m_gate->setLabel( tr( "GATE" ) );
-	m_gate->move( 116 - m_gate->width() / 2, 5 );
-	m_gate->setEnabled( isEnabled && !effect()->m_autoQuitDisabled );
-	m_gate->setHintText( tr( "Gate:" ), "" );
-
 
 	setModel( _model );
 
@@ -93,6 +82,7 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 		QFont f = ctls_btn->font();
 		ctls_btn->setFont(adjustedToPixelSize(f, DEFAULT_FONT_SIZE));
 		ctls_btn->setGeometry( 150, 14, 50, 20 );
+		ctls_btn->setFocusPolicy(Qt::NoFocus);
 		connect( ctls_btn, SIGNAL(clicked()),
 					this, SLOT(editControls()));
 
@@ -278,7 +268,6 @@ void EffectView::modelChanged()
 	m_bypass->setModel( &effect()->m_enabledModel );
 	m_wetDry->setModel( &effect()->m_wetDryModel );
 	m_autoQuit->setModel( &effect()->m_autoQuitModel );
-	m_gate->setModel( &effect()->m_gateModel );
 }
 
 } // namespace lmms::gui

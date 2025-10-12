@@ -26,9 +26,8 @@
 #ifndef LMMS_INSTRUMENT_TRACK_H
 #define LMMS_INSTRUMENT_TRACK_H
 
-#include <limits>
 
-#include "AudioPort.h"
+#include "AudioBusHandle.h"
 #include "InstrumentFunctions.h"
 #include "InstrumentSoundShaping.h"
 #include "Microtuner.h"
@@ -144,9 +143,9 @@ public:
 				const Plugin::Descriptor::SubPluginFeatures::Key* key = nullptr,
 				bool keyFromDnd = false);
 
-	AudioPort * audioPort()
+	AudioBusHandle* audioBusHandle()
 	{
-		return &m_audioPort;
+		return &m_audioBusHandle;
 	}
 
 	MidiPort * midiPort()
@@ -293,7 +292,7 @@ private:
 	FloatModel m_volumeModel;
 	FloatModel m_panningModel;
 
-	AudioPort m_audioPort;
+	AudioBusHandle m_audioBusHandle;
 
 	FloatModel m_pitchModel;
 	IntModel m_pitchRangeModel;

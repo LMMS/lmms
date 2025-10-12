@@ -27,20 +27,22 @@
 
 
 #include <algorithm>
-#include <cmath>
 #include <QApplication>
 #include <QInputDialog>
 #include <QMenu>
 #include <QPainter>
-#include <cmath>
+#include <set>
 
 #include "AutomationEditor.h"
 #include "ConfigManager.h"
 #include "DeprecationHelper.h"
 #include "GuiApplication.h"
+#include "InstrumentTrackView.h"
 #include "MidiClip.h"
 #include "PianoRoll.h"
 #include "RenameDialog.h"
+#include "SongEditor.h"
+#include "TrackContainerView.h"
 #include "TrackView.h"
 
 namespace lmms::gui
@@ -215,6 +217,18 @@ void MidiClipView::constructContextMenu( QMenu * _cm )
 
 	_cm->addAction( embed::getIconPixmap( "edit_erase" ),
 			tr( "Clear all notes" ), m_clip, SLOT(clear()));
+
+	if (canMergeSelection(getClickedClips()))
+	{
+		_cm->addAction(
+			embed::getIconPixmap("edit_merge"),
+			tr("Merge Selection"),
+			[this]() { mergeClips(getClickedClips()); }
+		);
+	}
+
+	_cm->addAction(embed::getIconPixmap("clear_notes_out_of_bounds"), tr("Clear notes out of bounds"), [this]() { bulkClearNotesOutOfBounds(getClickedClips()); });
+
 	if (!isBeat)
 	{
 		_cm->addAction(embed::getIconPixmap("scale"), tr("Transpose"), this, &MidiClipView::transposeSelection);
@@ -241,6 +255,168 @@ void MidiClipView::constructContextMenu( QMenu * _cm )
 }
 
 
+
+bool MidiClipView::canMergeSelection(QVector<ClipView*> clipvs)
+{
+	// Can't merge a single Clip
+	if (clipvs.size() < 2) { return false; }
+
+	// We check if the owner of the first Clip is an Instrument Track
+	bool isInstrumentTrack = dynamic_cast<InstrumentTrackView*>(clipvs.at(0)->getTrackView());
+
+	// Then we create a set with all the Clips owners
+	std::set<TrackView*> ownerTracks;
+	for (auto clipv: clipvs) { ownerTracks.insert(clipv->getTrackView()); }
+
+	// Can merge if there's only one owner track and it's an Instrument Track
+	return isInstrumentTrack && ownerTracks.size() == 1;
+}
+
+void MidiClipView::mergeClips(QVector<ClipView*> clipvs)
+{
+	// Get the track that we are merging Clips in
+	auto track = dynamic_cast<InstrumentTrack*>(clipvs.at(0)->getTrackView()->getTrack());
+
+	if (!track)
+	{
+		qWarning("Warning: Couldn't retrieve InstrumentTrack in mergeClips()");
+		return;
+	}
+
+	// For Undo/Redo
+	track->addJournalCheckPoint();
+	track->saveJournallingState(false);
+
+	// Find the earliest position of all the selected ClipVs
+	const auto earliestClipV = std::min_element(clipvs.constBegin(), clipvs.constEnd(),
+		[](ClipView* a, ClipView* b)
+		{
+			return a->getClip()->startPosition() <
+				b->getClip()->startPosition();
+		}
+	);
+	const TimePos earliestPos = (*earliestClipV)->getClip()->startPosition();
+
+	// Find the latest position of all the selected ClipVs
+	const auto latestClipV = std::max_element(clipvs.constBegin(), clipvs.constEnd(),
+	[](ClipView* a, ClipView* b)
+	{
+		return a->getClip()->endPosition() <
+			b->getClip()->endPosition();
+	}
+	);
+	const TimePos latestPos = (*latestClipV)->getClip()->endPosition();
+
+
+	// Create a clip where all notes will be added
+	auto newMidiClip = dynamic_cast<MidiClip*>(track->createClip(earliestPos));
+	if (!newMidiClip)
+	{
+		qWarning("Warning: Failed to convert Clip to MidiClip on mergeClips");
+		return;
+	}
+
+	newMidiClip->saveJournallingState(false);
+
+	// Add the notes and remove the Clips that are being merged
+	for (auto clipv: clipvs)
+	{
+		// Convert ClipV to MidiClipView
+		auto mcView = dynamic_cast<MidiClipView*>(clipv);
+
+		if (!mcView)
+		{
+			qWarning("Warning: Non-MidiClip Clip on InstrumentTrack");
+			continue;
+		}
+
+		const NoteVector& currentClipNotes = mcView->getMidiClip()->notes();
+		TimePos mcViewPos = mcView->getMidiClip()->startPosition() + mcView->getMidiClip()->startTimeOffset();
+
+		const TimePos clipStartTime = -mcView->getMidiClip()->startTimeOffset();
+		const TimePos clipEndTime = mcView->getMidiClip()->length() - mcView->getMidiClip()->startTimeOffset();
+
+		for (Note* note: currentClipNotes)
+		{
+			const TimePos newNoteStart = std::max(note->pos(), clipStartTime);
+			const TimePos newNoteEnd = std::min(note->endPos(), clipEndTime);
+			const TimePos newLength = newNoteEnd - newNoteStart;
+			if (newLength > 0)
+			{
+				Note* newNote = newMidiClip->addNote(*note, false);
+				newNote->setPos(newNoteStart + (mcViewPos - earliestPos));
+				newNote->setLength(newLength);
+			}
+		}
+
+		// We disable the journalling system before removing, so the
+		// removal doesn't get added to the undo/redo history
+		clipv->getClip()->saveJournallingState(false);
+		// No need to check for nullptr because we check while building the clipvs QVector
+		clipv->remove();
+	}
+
+	// Update length to extend from the start of the first clip to the end of the last clip
+	newMidiClip->changeLength(latestPos - earliestPos);
+	newMidiClip->setAutoResize(false);
+	// Rearrange notes because we might have moved them
+	newMidiClip->rearrangeAllNotes();
+	// Restore journalling states now that the operation is finished
+	newMidiClip->restoreJournallingState();
+	track->restoreJournallingState();
+	// Update song
+	Engine::getSong()->setModified();
+	getGUI()->songEditor()->update();
+}
+
+void MidiClipView::clearNotesOutOfBounds()
+{
+	m_clip->getTrack()->addJournalCheckPoint();
+	m_clip->getTrack()->saveJournallingState(false);
+
+	auto newClip = new MidiClip(static_cast<InstrumentTrack*>(m_clip->getTrack()));
+	newClip->setAutoResize(m_clip->getAutoResize());
+	newClip->movePosition(m_clip->startPosition());
+
+	TimePos startBound = -m_clip->startTimeOffset();
+	TimePos endBound = m_clip->length() - m_clip->startTimeOffset();
+
+	for (Note const* note: m_clip->m_notes)
+	{
+		const TimePos newNoteStart = std::max(note->pos(), startBound) - startBound;
+		const TimePos newNoteEnd = std::min(note->endPos(), endBound) - startBound;
+		const TimePos newLength = newNoteEnd - newNoteStart;
+		if (newLength > 0)
+		{
+			Note newNote = Note{*note};
+			newNote.setPos(newNoteStart);
+			newNote.setLength(newLength);
+			newClip->addNote(newNote, false);
+		}
+	}
+	newClip->changeLength(m_clip->length());
+	newClip->updateLength();
+
+	remove();
+	m_clip->getTrack()->restoreJournallingState();
+}
+
+void MidiClipView::bulkClearNotesOutOfBounds(QVector<ClipView*> clipvs)
+{
+	for (auto clipv: clipvs)
+	{
+		// Convert ClipV to MidiClipView
+		auto mcView = dynamic_cast<MidiClipView*>(clipv);
+		if (!mcView)
+		{
+			qWarning("Warning: Non-MidiClip Clip on InstrumentTrack");
+			continue;
+		}
+		mcView->clearNotesOutOfBounds();
+	}
+	Engine::getSong()->setModified();
+	getGUI()->songEditor()->update();
+}
 
 
 void MidiClipView::mousePressEvent( QMouseEvent * _me )
@@ -299,6 +475,8 @@ void MidiClipView::mousePressEvent( QMouseEvent * _me )
 
 void MidiClipView::mouseDoubleClickEvent(QMouseEvent *_me)
 {
+	if (m_trackView->trackContainerView()->knifeMode()) { return; }
+
 	if( _me->button() != Qt::LeftButton )
 	{
 		_me->ignore();
@@ -442,11 +620,12 @@ void MidiClipView::paintEvent( QPaintEvent * )
 	// Compute pixels per bar
 	const int baseWidth = fixedClips() ? parentWidget()->width() - 2 * BORDER_WIDTH
 						: width() - BORDER_WIDTH;
-	const float pixelsPerBar = baseWidth / (float) m_clip->length().getBar();
+	const float pixelsPerBar = 1.0f * baseWidth / m_clip->length() * TimePos::ticksPerBar();
+
+	const int offset = m_clip->startTimeOffset();
 
 	// Length of one bar/beat in the [0,1] x [0,1] coordinate system
-	const float barLength = 1. / m_clip->length().getBar();
-	const float tickLength = barLength / TimePos::ticksPerBar();
+	const float tickLength = 1.0f / m_clip->length();
 
 	const int x_base = BORDER_WIDTH;
 
@@ -460,6 +639,7 @@ void MidiClipView::paintEvent( QPaintEvent * )
 		QPixmap stepon200;
 		QPixmap stepoff;
 		QPixmap stepoffl;
+		QPixmap stephighlight;
 		const int steps = std::max(1, m_clip->m_steps);
 		const int w = width() - 2 * BORDER_WIDTH;
 
@@ -472,6 +652,8 @@ void MidiClipView::paintEvent( QPaintEvent * )
 			= m_stepBtnOff.scaled(w / steps, m_stepBtnOff.height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 		stepoffl = m_stepBtnOffLight.scaled(
 			w / steps, m_stepBtnOffLight.height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+		stephighlight = m_stepBtnHighlight.scaled(
+			w / steps, m_stepBtnHighlight.height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 
 		for (int it = 0; it < steps; it++)	// go through all the steps in the beat clip
 		{
@@ -480,6 +662,9 @@ void MidiClipView::paintEvent( QPaintEvent * )
 			// figure out x and y coordinates for step graphic
 			const int x = BORDER_WIDTH + static_cast<int>(it * w / steps);
 			const int y = BeatStepButtonOffset;
+
+			const bool isAtPlayPos = Engine::getSong()->getPlayPos(Song::PlayMode::Pattern) * TimePos::stepsPerBar() / TimePos::ticksPerBar() == it
+				&& Engine::getSong()->playMode() == Song::PlayMode::Pattern;
 
 			if (n)
 			{
@@ -497,6 +682,10 @@ void MidiClipView::paintEvent( QPaintEvent * )
 			else
 			{
 				p.drawPixmap(x, y, stepoff);
+			}
+			if (isAtPlayPos)
+			{
+				p.drawPixmap(x, y, stephighlight);
 			}
 		} // end for loop
 
@@ -608,7 +797,7 @@ void MidiClipView::paintEvent( QPaintEvent * )
 			int mappedNoteKey = currentNote->key() - minKey;
 			int invertedMappedNoteKey = adjustedNoteRange - mappedNoteKey - 1;
 
-			float const noteStartX = currentNote->pos() * tickLength;
+			float const noteStartX = (currentNote->pos() + offset) * tickLength;
 			float const noteLength = currentNote->length() * tickLength;
 
 			float const noteStartY = invertedMappedNoteKey * noteHeight;
@@ -633,14 +822,15 @@ void MidiClipView::paintEvent( QPaintEvent * )
 	const int lineSize = 3;
 	p.setPen( c.darker( 200 ) );
 
-	for( bar_t t = 1; t < m_clip->length().getBar(); ++t )
+	for(float t = (offset % TimePos::ticksPerBar()) * pixelsPerBar / TimePos::ticksPerBar(); t < m_clip->length(); t += pixelsPerBar)
 	{
-		p.drawLine( x_base + static_cast<int>( pixelsPerBar * t ) - 1,
-				BORDER_WIDTH, x_base + static_cast<int>(
-						pixelsPerBar * t ) - 1, BORDER_WIDTH + lineSize );
-		p.drawLine( x_base + static_cast<int>( pixelsPerBar * t ) - 1,
+		p.drawLine( x_base + t - 1,
+				BORDER_WIDTH,
+				x_base + t - 1,
+				BORDER_WIDTH + lineSize );
+		p.drawLine( x_base + t - 1,
 				rect().bottom() - ( lineSize + BORDER_WIDTH ),
-				x_base + static_cast<int>( pixelsPerBar * t ) - 1,
+				x_base + t - 1,
 				rect().bottom() - BORDER_WIDTH );
 	}
 
@@ -670,8 +860,79 @@ void MidiClipView::paintEvent( QPaintEvent * )
 		p.drawPixmap( spacing, height() - ( size + spacing ),
 			embed::getIconPixmap( "muted", size, size ) );
 	}
+	
+	if (m_marker)
+	{
+		p.setPen(markerColor());
+		p.drawLine(m_markerPos, rect().bottom(), m_markerPos, rect().top());
+	}
 
 	painter.drawPixmap( 0, 0, m_paintPixmap );
+}
+
+
+bool MidiClipView::destructiveSplitClip(const TimePos pos)
+{
+	const TimePos splitPos = m_initialClipPos + pos;
+	const TimePos internalSplitPos = pos - m_clip->startTimeOffset();
+
+	// Don't split if we slid off the Clip or if we're on the clip's start/end
+	// Cutting at exactly the start/end position would create a zero length
+	// clip (bad), and a clip the same length as the original one (pointless).
+	if (splitPos <= m_initialClipPos || splitPos >= m_initialClipEnd) { return false; }
+
+	m_clip->getTrack()->addJournalCheckPoint();
+	m_clip->getTrack()->saveJournallingState(false);
+
+	auto leftClip = m_clip->clone();
+	leftClip->clearNotes();
+	auto rightClip =  m_clip->clone();
+	rightClip->clearNotes();
+
+	for (Note const* note : m_clip->m_notes)
+	{
+		if (note->pos() >= internalSplitPos)
+		{
+			auto movedNote = Note{*note};
+			movedNote.setPos(note->pos() - internalSplitPos);
+			rightClip->addNote(movedNote, false);
+		}
+		else if (note->endPos() > internalSplitPos)
+		{
+			auto movedNote = Note{*note};
+			movedNote.setPos(0);
+			movedNote.setLength(note->endPos() - internalSplitPos);
+			rightClip->addNote(movedNote, false);
+		}
+	}
+
+	for (Note const* note : m_clip->m_notes)
+	{
+		if (note->endPos() <= internalSplitPos)
+		{
+			leftClip->addNote(*note, false);
+		}
+		else if (note->pos() < internalSplitPos)
+		{
+			auto movedNote = Note{*note};
+			movedNote.setLength(internalSplitPos - note->pos());
+			leftClip->addNote(movedNote, false);
+		}
+	}
+
+	leftClip->movePosition(m_initialClipPos);
+	leftClip->setAutoResize(false);
+	leftClip->changeLength(splitPos - m_initialClipPos);
+	leftClip->setStartTimeOffset(m_clip->startTimeOffset());
+
+	rightClip->movePosition(splitPos);
+	rightClip->setAutoResize(false);
+	rightClip->changeLength(m_initialClipEnd - splitPos);
+	rightClip->setStartTimeOffset(0);
+
+	remove();
+	m_clip->getTrack()->restoreJournallingState();
+	return true;
 }
 
 

@@ -9,19 +9,15 @@
 04 apr 03 -- fixed bug in add_track that caused infinite loop
 */
 
-#include "assert.h"
-#include "stdlib.h"
-#include "stdio.h"
-#include "string.h"
-#include "memory.h"
-#include <iostream>
+#include <cassert>
+#include <cstdio>
+#include <cmath>
 #include <fstream>
 using namespace std;
 #include "allegro.h"
 #include "algrd_internal.h"
 #include "algsmfrd_internal.h"
 // #include "trace.h" -- only needed for debugging
-#include "math.h"
 
 #define STREQL(x, y) (strcmp(x, y) == 0)
 #define MAX(x, y) ((x) > (y) ? (x) : (y))

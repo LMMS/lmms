@@ -28,6 +28,9 @@
 #include "embed.h"
 #include "Knob.h"
 
+#include <QGridLayout>
+
+
 namespace lmms::gui
 {
 
@@ -38,23 +41,22 @@ AmplifierControlDialog::AmplifierControlDialog(AmplifierControls* controls) :
 	QPalette pal;
 	pal.setBrush(backgroundRole(), PLUGIN_NAME::getIconPixmap("artwork"));
 	setPalette(pal);
-	setFixedSize(100, 110);
-	
-	auto makeKnob = [this](int x, int y, const QString& label, const QString& hintText, const QString& unit, FloatModel* model, bool isVolume)
-	{
-        Knob* newKnob = new Knob(KnobType::Bright26, this);
-        newKnob->move(x, y);
-        newKnob->setModel(model);
-        newKnob->setLabel(label);
-        newKnob->setHintText(hintText, unit);
-        newKnob->setVolumeKnob(isVolume);
-        return newKnob;
-    };
 
-	makeKnob(16, 10, tr("VOL"), tr("Volume:"), "%", &controls->m_volumeModel, true);
-	makeKnob(57, 10, tr("PAN"), tr("Panning:"), "%", &controls->m_panModel, false);
-	makeKnob(16, 65, tr("LEFT"), tr("Left gain:"), "%", &controls->m_leftModel, true);
-	makeKnob(57, 65, tr("RIGHT"), tr("Right gain:"), "%", &controls->m_rightModel, true);
+	QGridLayout* gridLayout = new QGridLayout(this);
+	
+	auto makeKnob = [this](const QString& label, const QString& hintText, const QString& unit, FloatModel* model, bool isVolume)
+	{
+		Knob* newKnob = new Knob(KnobType::Bright26, label, this);
+		newKnob->setModel(model);
+		newKnob->setHintText(hintText, unit);
+		newKnob->setVolumeKnob(isVolume);
+		return newKnob;
+	};
+
+	gridLayout->addWidget(makeKnob(tr("VOL"), tr("Volume:"), "%", &controls->m_volumeModel, true), 0, 0, Qt::AlignHCenter);
+	gridLayout->addWidget(makeKnob(tr("PAN"), tr("Panning:"), "%", &controls->m_panModel, false), 0, 1, Qt::AlignHCenter);
+	gridLayout->addWidget(makeKnob(tr("LEFT"), tr("Left gain:"), "%", &controls->m_leftModel, true), 1, 0, Qt::AlignHCenter);
+	gridLayout->addWidget(makeKnob(tr("RIGHT"), tr("Right gain:"), "%", &controls->m_rightModel, true), 1, 1, Qt::AlignHCenter);
 }
 
 } // namespace lmms::gui

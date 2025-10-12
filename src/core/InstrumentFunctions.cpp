@@ -22,7 +22,6 @@
  *
  */
 
-#include <QDomElement>
 
 #include "InstrumentFunctions.h"
 #include "AudioEngine.h"

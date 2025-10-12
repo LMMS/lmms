@@ -23,12 +23,11 @@
  */
 
 #include "AudioSdl.h"
-#include "lmms_basics.h"
+#include "LmmsTypes.h"
 
 #ifdef LMMS_HAVE_SDL
 
 #include <QFormLayout>
-#include <QLineEdit>
 #include <QComboBox>
 #include <SDL.h>
 

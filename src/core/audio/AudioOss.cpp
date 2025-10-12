@@ -33,7 +33,6 @@
 #include "endian_handling.h"
 #include "LcdSpinBox.h"
 #include "AudioEngine.h"
-#include "Engine.h"
 
 #ifdef LMMS_HAVE_UNISTD_H
 #include <unistd.h>

@@ -63,7 +63,6 @@ class MixerChannel : public ThreadableJob
 		FloatModel m_volumeModel;
 		QString m_name;
 		QMutex m_lock;
-		int m_channelIndex; // what channel index are we
 		bool m_queued; // are we queued up for rendering yet?
 		bool m_muted; // are we muted? updated per period so we don't have to call m_muteModel.value() twice
 
@@ -73,8 +72,15 @@ class MixerChannel : public ThreadableJob
 		// pointers to other channels that send to this one
 		MixerRouteVector m_receives;
 
+		int index() const { return m_channelIndex; }
+		void setIndex(int index) { m_channelIndex = index; }
+
+		bool isMaster() { return m_channelIndex == 0; }
+
 		bool requiresProcessing() const override { return true; }
 		void unmuteForSolo();
+		void unmuteSenderForSolo();
+		void unmuteReceiverForSolo();
 
 		auto color() const -> const std::optional<QColor>& { return m_color; }
 		void setColor(const std::optional<QColor>& color) { m_color = color; }
@@ -85,7 +91,7 @@ class MixerChannel : public ThreadableJob
 		
 	private:
 		void doProcessing() override;
-
+		int m_channelIndex;
 		std::optional<QColor> m_color;
 };
 
@@ -98,12 +104,12 @@ public:
 
 	mix_ch_t senderIndex() const
 	{
-		return m_from->m_channelIndex;
+		return m_from->index();
 	}
 
 	mix_ch_t receiverIndex() const
 	{
-		return m_to->m_channelIndex;
+		return m_to->index();
 	}
 
 	FloatModel * amount()

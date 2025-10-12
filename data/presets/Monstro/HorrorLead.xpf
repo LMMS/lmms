@@ -16,7 +16,7 @@
       <arpeggiator arptime="100" arprange="1" arptime_denominator="4" syncmode="0" arpmode="0" arp-enabled="0" arp="0" arptime_numerator="4" arpdir="0" arpgate="100"/>
       <midiport inputcontroller="0" inports="" fixedoutputvelocity="-1" inputchannel="0" outputcontroller="0" writable="0" outputchannel="1" fixedinputvelocity="62" fixedoutputnote="-1" outputprogram="1" basevelocity="63" readable="0"/>
       <fxchain numofeffects="3" enabled="1">
-        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" autoquit="8000" gate="0.15" name="ladspaeffect" wet="1" on="1">
+        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" autoquit="8000" name="ladspaeffect" wet="1" on="1">
           <ladspacontrols ports="4">
             <port02 data="0.99897"/>
             <port03 data="0.749"/>
@@ -28,7 +28,7 @@
             <attribute value="Plate2x2" name="plugin"/>
           </key>
         </effect>
-        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" autoquit="1" gate="0" name="ladspaeffect" wet="1" on="1">
+        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" autoquit="1" name="ladspaeffect" wet="1" on="1">
           <ladspacontrols link="1" ports="6">
             <port00 link="1" data="-10.5"/>
             <port01 link="1" data="1"/>
@@ -42,7 +42,7 @@
             <attribute value="hardLimiter" name="plugin"/>
           </key>
         </effect>
-        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" autoquit="1" gate="0" name="amplifier" wet="1" on="1">
+        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" autoquit="1" name="amplifier" wet="1" on="1">
           <AmplifierControls right="100" pan="0" left="100" volume="200"/>
           <key/>
         </effect>
