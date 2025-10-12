@@ -237,7 +237,7 @@ void TrackOperationsWidget::exportTrack()
 {
 	// TODO: Considering creating new projects in their own folders to have a dedicated place to store samples like
 	// these, removing the need for `FileDialog`
-	auto dialog = FileDialog{this};
+	auto dialog = FileDialog{};
 	dialog.setFileMode(FileDialog::AnyFile);
 	dialog.setAcceptMode(FileDialog::AcceptSave);
 	dialog.setDirectory(ConfigManager::inst()->userProjectsDir());
