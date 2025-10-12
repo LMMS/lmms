@@ -255,7 +255,7 @@ void TrackOperationsWidget::exportTrack()
 	if (dialog.exec() == QDialog::Accepted && !dialog.selectedFiles().isEmpty() && !dialog.selectedFiles()[0].isEmpty())
 	{
 		const auto fileDestination = dialog.selectedFiles()[0];
-		auto exportDialog = ExportProjectDialog{fileDestination, false, m_trackView->getTrack(), this};
+		auto exportDialog = ExportProjectDialog::exportTrack(fileDestination, m_trackView->getTrack());
 		exportDialog.exec();
 	}
 }

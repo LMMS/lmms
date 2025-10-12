@@ -34,13 +34,10 @@
 namespace lmms::gui
 {
 
-ExportProjectDialog::ExportProjectDialog(
-	const QString& exportLocation, bool exportStems, Track* trackToBounce, QWidget* parent)
+ExportProjectDialog::ExportProjectDialog(const QString& exportLocation, Mode mode, Track* track, QWidget* parent)
 	: QDialog(parent)
 	, Ui::ExportProjectDialog()
 	, m_exportLocation(exportLocation)
-	, m_exportTracks(exportStems)
-	, m_trackToExport(trackToBounce)
 	, m_renderManager(nullptr)
 {
 	setupUi( this );
@@ -177,7 +174,7 @@ void ExportProjectDialog::startExport()
 	// Make sure we have the the correct file extension
 	// so there's no confusion about the codec in use.
 	auto output_name = m_exportLocation;
-	if (!(m_exportTracks || output_name.endsWith(m_exportLocation,Qt::CaseInsensitive)))
+	if (m_mode != Mode::ExportTracks && !output_name.endsWith(m_exportLocation, Qt::CaseInsensitive))
 	{
 		output_name += m_exportExtension;
 	}
@@ -196,9 +193,18 @@ void ExportProjectDialog::startExport()
 	connect( m_renderManager.get(), SIGNAL(finished()),
 			getGUI()->mainWindow(), SLOT(resetWindowTitle()));
 
-	if (m_trackToExport) { m_renderManager->renderTrack(m_trackToExport); }
-	else if (m_exportTracks) { m_renderManager->renderTracks(); }
-	else { m_renderManager->renderProject(); }
+	switch (m_mode)
+	{
+	case Mode::ExportProject:
+		m_renderManager->renderProject();
+		break;
+	case Mode::ExportTrack:
+		m_renderManager->renderTrack(m_trackToExport);
+		break;
+	case Mode::ExportTracks:
+		m_renderManager->renderTracks();
+		break;
+	}
 }
 
 
@@ -284,6 +290,21 @@ void ExportProjectDialog::updateTitleBar( int _prog )
 {
 	getGUI()->mainWindow()->setWindowTitle(
 					tr( "Rendering: %1%" ).arg( _prog ) );
+}
+
+ExportProjectDialog ExportProjectDialog::exportProject(const QString& exportLocation, QWidget* parent)
+{
+	return ExportProjectDialog{exportLocation, Mode::ExportProject, nullptr, parent};
+}
+
+ExportProjectDialog ExportProjectDialog::exportTrack(const QString& exportLocation, Track* track, QWidget* parent)
+{
+	return ExportProjectDialog{exportLocation, Mode::ExportTrack, track, parent};
+}
+
+ExportProjectDialog ExportProjectDialog::exportTracks(const QString& exportLocation, QWidget* parent)
+{
+	return ExportProjectDialog{exportLocation, Mode::ExportTracks};
 }
 
 } // namespace lmms::gui

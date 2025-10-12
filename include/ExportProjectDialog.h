@@ -41,8 +41,9 @@ class ExportProjectDialog : public QDialog, public Ui::ExportProjectDialog
 {
 	Q_OBJECT
 public:
-	ExportProjectDialog(const QString& exportLocation, bool exportTracks = false, Track* trackToBounce = nullptr,
-		QWidget* parent = nullptr);
+	static ExportProjectDialog exportProject(const QString& exportLocation, QWidget* parent = nullptr);
+	static ExportProjectDialog exportTrack(const QString& exportLocation, Track* track, QWidget* parent = nullptr);
+	static ExportProjectDialog exportTracks(const QString& exportLocation, QWidget* parent = nullptr);
 
 protected:
 	void reject() override;
@@ -58,15 +59,22 @@ private slots:
 	void onFileFormatChanged(int);
 
 private:
+	enum class Mode
+	{
+		ExportProject, //! Export the entire project
+		ExportTrack,   //! Export a specific track
+		ExportTracks   //! Export multiple tracks
+	};
+
+	ExportProjectDialog(const QString& exportLocation, Mode mode, Track* track = nullptr, QWidget* parent = nullptr);
+
 	QString m_exportLocation;
 	QString m_exportExtension;
-	bool m_exportTracks = false;
+	Mode m_mode;
 	Track* m_trackToExport = nullptr;
-
 	ProjectRenderer::ExportFileFormat m_ft;
 	std::unique_ptr<RenderManager> m_renderManager;
-} ;
-
+};
 
 } // namespace lmms::gui
 

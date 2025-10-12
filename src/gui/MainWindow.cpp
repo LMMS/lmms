@@ -1506,8 +1506,16 @@ void MainWindow::exportProject(bool multiExport)
 			}
 		}
 
-		auto exportDialog = ExportProjectDialog{exportFileName, multiExport, nullptr, getGUI()->mainWindow()};
-		exportDialog.exec();
+		if (multiExport)
+		{
+			auto exportDialog = ExportProjectDialog::exportTracks(exportFileName);
+			exportDialog.exec();
+		}
+		else
+		{
+			auto exportDialog = ExportProjectDialog::exportProject(exportFileName);
+			exportDialog.exec();
+		}
 	}
 }
 
