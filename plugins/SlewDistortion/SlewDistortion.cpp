@@ -173,7 +173,7 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 			}
 
 			__m128 in = _mm_load_ps(&inArr[0]);
-			__m128 absIn = sse2_abs(in);
+			__m128 absIn = sse2Abs(in);
 
 			// store volume for display
 			_mm_store_ps(&m_inPeakDisplay[0], _mm_max_ps(_mm_load_ps(&m_inPeakDisplay[0]), _mm_mul_ps(absIn, drive)));
@@ -273,14 +273,14 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 						__m128 divByTwoPi = _mm_div_ps(distMinusPiOverTwo, tau);
 
 						// SSE2 floor replacement
-						__m128 floorDivByTwoPi = sse2_floor(divByTwoPi);
+						__m128 floorDivByTwoPi = sse2Floor(divByTwoPi);
 
 						// x mod 2pi = x - floor(x / 2pi) * 2pi
 						__m128 floorMulTwoPi = _mm_mul_ps(floorDivByTwoPi, tau);
 						__m128 modInput = _mm_sub_ps(distMinusPiOverTwo, floorMulTwoPi);
 
 						// abs(in - pi) - pi/2
-						__m128 x = _mm_sub_ps(sse2_abs(_mm_sub_ps(modInput, pi)), piOverTwo);
+						__m128 x = _mm_sub_ps(sse2Abs(_mm_sub_ps(modInput, pi)), piOverTwo);
 
 						// polynomial sine approximation
 						// sin(x) ≈ x - x^3 / 6 + x^5 / 120
@@ -298,15 +298,15 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 						__m128 divByFour = _mm_div_ps(distInMinusOne, four);
 						
 						// floor
-						__m128 floorOverFour = sse2_floor(divByFour);
+						__m128 floorOverFour = sse2Floor(divByFour);
 
-						distOutFull = _mm_sub_ps(sse2_abs(_mm_sub_ps(_mm_sub_ps(
+						distOutFull = _mm_sub_ps(sse2Abs(_mm_sub_ps(_mm_sub_ps(
 							distInMinusOne, _mm_mul_ps(floorOverFour, four)), _mm_set1_ps(2.0f))), one);
 						break;
 					}
 					case SlewDistortionType::FullRectify: // |x|
 					{
-						distOutFull = sse2_abs(distInFull);
+						distOutFull = sse2Abs(distInFull);
 						break;
 					}
 					case SlewDistortionType::SmoothRectify: // sqrt(x^2 + 0.04) - 0.2
@@ -327,7 +327,7 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 						__m128 scaledVal = _mm_mul_ps(_mm_div_ps(distInFull, drive), scale);
 
 						// round to nearest, half away from zero
-						__m128 rounded = sse2_round(scaledVal);
+						__m128 rounded = sse2Round(scaledVal);
 
 						distOutFull = _mm_div_ps(rounded, scale);
 						break;
@@ -365,7 +365,7 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 			__m128 distOutScaled = _mm_add_ps(_mm_mul_ps(distOut, _mm_sub_ps(one, warp)), _mm_or_ps(warp, signBiasedIn));
 
 			// if (abs(biasedIn) < warp / crush) {distOut = biasedIn * crush;}
-			__m128 absBiasedIn = sse2_abs(biasedIn);
+			__m128 absBiasedIn = sse2Abs(biasedIn);
 			__m128 condition = _mm_cmplt_ps(absBiasedIn, _mm_div_ps(warp, crush));
 			__m128 biasedInCrush = _mm_mul_ps(biasedIn, crush);
 
@@ -380,7 +380,7 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 
 			// even with DC offset removal disabled, we should still apply it for the envelope follower
 			__m128 outEnv = _mm_load_ps(&m_outEnv[0]);
-			__m128 absOut = sse2_abs(distOutMinusDC);
+			__m128 absOut = sse2Abs(distOutMinusDC);
 
 			cmp = _mm_cmpgt_ps(absOut, outEnv);
 			__m128 outEnvRise = _mm_add_ps(_mm_mul_ps(outEnv, attack), _mm_mul_ps(absOut, attackInv));
@@ -398,7 +398,7 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 			__m128 outFinal = _mm_mul_ps(_mm_add_ps(in, _mm_mul_ps(mix, _mm_sub_ps(distDyn, in))), outVol);
 
 			// store volume for display
-			__m128 outAbs = sse2_abs(outFinal);
+			__m128 outAbs = sse2Abs(outFinal);
 			_mm_store_ps(&m_outPeakDisplay[0], _mm_max_ps(_mm_load_ps(&m_outPeakDisplay[0]), outAbs));
 
 			// write updated stuff back into member variables
