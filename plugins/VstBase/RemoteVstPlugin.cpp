@@ -817,16 +817,24 @@ void RemoteVstPlugin::initEditor()
 	pluginDispatch( effEditOpen, 0, 0, m_window );
 
 	ERect* er = nullptr;
-	pluginDispatch( effEditGetRect, 0, 0, &er );
+	pluginDispatch(effEditGetRect, 0, 0, &er);
 
-	m_windowWidth = er->right - er->left;
-	m_windowHeight = er->bottom - er->top;
+	if (er)
+	{
+		assert(er->right > er->left);
+		m_windowWidth = er->right - er->left;
+		assert(er->bottom > er->top);
+		m_windowHeight = er->bottom - er->top;
 
-	RECT windowSize = { 0, 0, m_windowWidth, m_windowHeight };
-	AdjustWindowRect( &windowSize, dwStyle, false );
-	SetWindowPos( m_window, 0, 0, 0, windowSize.right - windowSize.left,
-			windowSize.bottom - windowSize.top, SWP_NOACTIVATE |
-						SWP_NOMOVE | SWP_NOZORDER );
+		RECT windowSize = { 0, 0, m_windowWidth, m_windowHeight };
+		AdjustWindowRect(&windowSize, dwStyle, false);
+		SetWindowPos(m_window, 0, 0, 0,
+			windowSize.right - windowSize.left,
+			windowSize.bottom - windowSize.top,
+			SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOZORDER
+		);
+	}
+
 	pluginDispatch( effEditTop );
 
 #ifdef LMMS_BUILD_LINUX
@@ -838,36 +846,42 @@ void RemoteVstPlugin::initEditor()
 
 #else
 	Atom prop_atom, val_atom;
-	
+
 	if (m_display == nullptr)
 	{
 		m_display = XOpenDisplay(nullptr);
 	}
 	m_window = XCreateSimpleWindow(m_display, DefaultRootWindow(m_display), 0, 0, 400, 400, 0, 0, 0);
-	
+
 	m_wmDeleteMessage = XInternAtom(m_display, "WM_DELETE_WINDOW", false);
 	XSetWMProtocols(m_display, m_window, &m_wmDeleteMessage, 1);
-	
+
 	// make tool window
 	prop_atom = XInternAtom(m_display, "_NET_WM_WINDOW_TYPE", False);
 	val_atom = XInternAtom(m_display, "_NET_WM_WINDOW_TYPE_DIALOG", False);
 	XChangeProperty(m_display, m_window, prop_atom, XA_ATOM, 32, PropModeReplace, (unsigned char *)&val_atom, 1);
-	
+
 	// change name
 	XStoreName(m_display, m_window, pluginName());
-	
+
 	ERect* er = nullptr;
 	pluginDispatch(effEditGetRect, 0, 0, &er);
 
-	m_windowWidth = er->right - er->left;
-	m_windowHeight = er->bottom - er->top;
-	XResizeWindow(m_display, m_window, m_windowWidth, m_windowHeight);
-	
+	if (er)
+	{
+		assert(er->right > er->left);
+		m_windowWidth = er->right - er->left;
+		assert(er->bottom > er->top);
+		m_windowHeight = er->bottom - er->top;
+		XResizeWindow(m_display, m_window,
+			static_cast<unsigned int>(m_windowWidth), static_cast<unsigned int>(m_windowHeight));
+	}
+
 	XMapWindow(m_display, m_window);
 	XFlush(m_display);
-	
+
 	pluginDispatch(effEditOpen, 0, (intptr_t) m_display, (void*) m_window);
-	
+
 	XSelectInput(m_display, m_window, SubstructureNotifyMask | ButtonPressMask | ButtonReleaseMask
 			| ButtonMotionMask | ExposureMask | KeyPressMask);
 	
