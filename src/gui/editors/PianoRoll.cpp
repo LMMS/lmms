@@ -2843,9 +2843,10 @@ void PianoRoll::updateParameterEditPos(QMouseEvent* me, Note::ParameterType para
 		// If right-clicking, remove nodes.
 		else if (m_parameterEditDownRight)
 		{
+			// If the last position of the mouse is not -1, remove all nodes which the mouse has dragged over since the last mouse event.
+			// -1 means there is no previous mouse position, meaning that the drag just started.
 			if (m_lastParameterEditTick != -1)
 			{
-				// If the last position of the mouse is not -1, remove all nodes in that range.
 				aClip->removeNodes(m_lastParameterEditTick - m_parameterEditClickedNote->pos(), relativePos);
 			}
 			else
