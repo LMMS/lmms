@@ -5042,8 +5042,8 @@ Note * PianoRoll::parameterEditNoteUnderMouse(Note::ParameterType paramType)
 	}
 
 	// Get the key and time pos of the cursor
-	int key_num = getKey(pos.y());
-	int pos_ticks = (pos.x() - m_whiteKeyWidth) *
+	int keyNum = getKey(pos.y());
+	int posTicks = (pos.x() - m_whiteKeyWidth) *
 			TimePos::ticksPerBar() / m_ppb + m_currentPosition;
 
 	// Loop through all notes having their detuning/parameter being edited, and find the one whose automation curve is closest to the mouse.
@@ -5052,10 +5052,10 @@ Note * PianoRoll::parameterEditNoteUnderMouse(Note::ParameterType paramType)
 	for (Note* note : m_selectedParameterEditNotes)
 	{
 		// Skip note if the mouse is outside of its start time
-		if (pos_ticks < note->pos()) { continue; }
+		if (posTicks < note->pos()) { continue; }
 
-		TimePos relativePos = pos_ticks - note->pos();
-		int relativeKey = key_num - note->key();
+		TimePos relativePos = posTicks - note->pos();
+		int relativeKey = keyNum - note->key();
 
 		AutomationClip* aClip = note->parameterCurve(paramType);
 		if (aClip == nullptr) { continue; }
@@ -5064,7 +5064,7 @@ Note * PianoRoll::parameterEditNoteUnderMouse(Note::ParameterType paramType)
 		int verticalPixelOffset = differenceFromCurve * m_keyLineHeight;
 
 		int lastNodeTime = !aClip->getTimeMap().isEmpty() ? aClip->getTimeMap().lastKey() : 0;
-		int horizontalPixelOffset = (pos_ticks > note->endPos() && relativePos > lastNodeTime) ? (relativePos - lastNodeTime) * m_ppb / TimePos::ticksPerBar() : 0;
+		int horizontalPixelOffset = (posTicks > note->endPos() && relativePos > lastNodeTime) ? (relativePos - lastNodeTime) * m_ppb / TimePos::ticksPerBar() : 0;
 		
 		int distanceScore = verticalPixelOffset * verticalPixelOffset + horizontalPixelOffset * horizontalPixelOffset;
 
