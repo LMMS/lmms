@@ -646,11 +646,7 @@ void PianoRoll::glueNotes()
 		NoteVector selectedNotes = getSelectedNotes();
 		if (selectedNotes.empty())
 		{
-			TextFloat::displayMessage( tr( "Glue notes failed" ),
-					tr( "Please select notes to glue first." ),
-					embed::getIconPixmap( "glue", 24, 24 ),
-					3000 );
-			return;
+			selectedNotes = m_midiClip->notes();
 		}
 
 		// Make undo possible
