@@ -106,8 +106,8 @@ Effect::ProcessStatus FlangerEffect::processImpl(SampleFrame* buf, const fpp_t f
 		float leftLfo;
 		float rightLfo;
 
-		buf[f][0] += fastRand(-1.f, +1.f) * noise;
-		buf[f][1] += fastRand(-1.f, +1.f) * noise;
+		buf[f][0] += fastRand(-1.f, 1.f) * noise;
+		buf[f][1] += fastRand(-1.f, 1.f) * noise;
 		dryS[0] = buf[f][0];
 		dryS[1] = buf[f][1];
 		m_lfo->tick(&leftLfo, &rightLfo);

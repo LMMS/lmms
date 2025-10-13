@@ -343,7 +343,7 @@ void OrganicInstrument::randomiseSettings()
 	for (auto i = 0; i < m_numOscillators; ++i)
 	{
 		m_osc[i]->m_volModel.setValue(fastRand(100));
-		m_osc[i]->m_detuneModel.setValue(fastRand(-5, +5));
+		m_osc[i]->m_detuneModel.setValue(fastRand(-5, 5));
 		m_osc[i]->m_panModel.setValue(0);
 		m_osc[i]->m_oscModel.setValue(fastRand(5));
 	}
