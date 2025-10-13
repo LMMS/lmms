@@ -54,26 +54,24 @@ public:
 		float bw = 0.5f - m_passband / m_sampleRate;
 
 		// Stage 1
-		double coefsFirst[MaxCoefs];
-		hiir::PolyphaseIir2Designer::compute_coefs_spec_order_tbw(coefsFirst, MaxCoefs, bw);
+		double coefsFirst[s_firstCoefCount];
+		hiir::PolyphaseIir2Designer::compute_coefs_spec_order_tbw(coefsFirst, s_firstCoefCount, bw);
 		m_upsampleFirst.set_coefs(coefsFirst);
 		m_upsampleFirst.clear_buffers();
 		bw = (bw + 0.5f) * 0.5f;
 
 		// Stage 2
-		constexpr int secondCoefCount = std::max(MaxCoefs / 2, 2);
-		double coefsSecond[secondCoefCount];
-		hiir::PolyphaseIir2Designer::compute_coefs_spec_order_tbw(coefsSecond, secondCoefCount, bw);
+		double coefsSecond[s_secondCoefCount];
+		hiir::PolyphaseIir2Designer::compute_coefs_spec_order_tbw(coefsSecond, s_secondCoefCount, bw);
 		m_upsampleSecond.set_coefs(coefsSecond);
 		m_upsampleSecond.clear_buffers();
 		bw = (bw + 0.5f) * 0.5f;
 
 		// Remaining stages
-		constexpr int restCoefCount = std::max(MaxCoefs / 4, 2);
 		for (int i = 0; i < m_stages - 2; ++i)
 		{
-			double coefsRest[restCoefCount];
-			hiir::PolyphaseIir2Designer::compute_coefs_spec_order_tbw(coefsRest, restCoefCount, bw);
+			double coefsRest[s_restCoefCount];
+			hiir::PolyphaseIir2Designer::compute_coefs_spec_order_tbw(coefsRest, s_restCoefCount, bw);
 			m_upsampleRest[i].set_coefs(coefsRest);
 			m_upsampleRest[i].clear_buffers();
 			bw = (bw + 0.5f) * 0.5f;
@@ -90,7 +88,7 @@ public:
 	}
 
 	// expects `2 ^ m_stages` elements for the output
-	void process_sample(float* outSamples, float inSample)
+	void processSample(float* outSamples, float inSample)
 	{
 		int total = 1 << m_stages;
 		outSamples[0] = inSample;
@@ -129,14 +127,17 @@ public:
 	void setPassband(float passband) { m_passband = passband; reset(); }
 
 private:
+	static constexpr int s_firstCoefCount = MaxCoefs;
+	static constexpr int s_secondCoefCount = std::max(MaxCoefs / 2, 2);
+	static constexpr int s_restCoefCount = std::max(MaxCoefs / 4, 2);
 #ifdef __SSE2__
-	hiir::Upsampler2xSse<MaxCoefs> m_upsampleFirst;
-	hiir::Upsampler2xSse<std::max(MaxCoefs / 2, 2)> m_upsampleSecond;
-	std::array<hiir::Upsampler2xSse<std::max(MaxCoefs / 4, 2)>, MaxStages - 2> m_upsampleRest;
+	hiir::Upsampler2xSse<s_firstCoefCount> m_upsampleFirst;
+	hiir::Upsampler2xSse<s_secondCoefCount> m_upsampleSecond;
+	std::array<hiir::Upsampler2xSse<s_restCoefCount>, MaxStages - 2> m_upsampleRest;
 #else
-	hiir::Upsampler2xFpu<MaxCoefs> m_upsampleFirst;
-	hiir::Upsampler2xFpu<std::max(MaxCoefs / 2, 2)> m_upsampleSecond;
-	std::array<hiir::Upsampler2xFpu<std::max(MaxCoefs / 4, 2)>, MaxStages - 2> m_upsampleRest;
+	hiir::Upsampler2xFpu<s_firstCoefCount> m_upsampleFirst;
+	hiir::Upsampler2xFpu<s_secondCoefCount> m_upsampleSecond;
+	std::array<hiir::Upsampler2xFpu<s_restCoefCount>, MaxStages - 2> m_upsampleRest;
 #endif
 
 	int m_stages = 0;
@@ -154,26 +155,24 @@ public:
 		float bw = 0.5f - m_passband / m_sampleRate;
 
 		// Stage 1
-		double coefsFirst[MaxCoefs];
-		hiir::PolyphaseIir2Designer::compute_coefs_spec_order_tbw(coefsFirst, MaxCoefs, bw);
+		double coefsFirst[s_firstCoefCount];
+		hiir::PolyphaseIir2Designer::compute_coefs_spec_order_tbw(coefsFirst, s_firstCoefCount, bw);
 		m_downsampleFirst.set_coefs(coefsFirst);
 		m_downsampleFirst.clear_buffers();
 		bw = (bw + 0.5f) * 0.5f;
 
 		// Stage 2
-		constexpr int secondCoefCount = std::max(MaxCoefs / 2, 2);
-		double coefsSecond[secondCoefCount];
-		hiir::PolyphaseIir2Designer::compute_coefs_spec_order_tbw(coefsSecond, secondCoefCount, bw);
+		double coefsSecond[s_secondCoefCount];
+		hiir::PolyphaseIir2Designer::compute_coefs_spec_order_tbw(coefsSecond, s_secondCoefCount, bw);
 		m_downsampleSecond.set_coefs(coefsSecond);
 		m_downsampleSecond.clear_buffers();
 		bw = (bw + 0.5f) * 0.5f;
 
 		// Remaining stages
-		constexpr int restCoefCount = std::max(MaxCoefs / 4, 2);
 		for (int i = 0; i < m_stages - 2; ++i)
 		{
-			double coefsRest[restCoefCount];
-			hiir::PolyphaseIir2Designer::compute_coefs_spec_order_tbw(coefsRest, restCoefCount, bw);
+			double coefsRest[s_restCoefCount];
+			hiir::PolyphaseIir2Designer::compute_coefs_spec_order_tbw(coefsRest, s_restCoefCount, bw);
 			m_downsampleRest[i].set_coefs(coefsRest);
 			m_downsampleRest[i].clear_buffers();
 			bw = (bw + 0.5f) * 0.5f;
@@ -190,7 +189,7 @@ public:
 	}
 
 	// expects `2 ^ m_stages` elements for the input
-	float process_sample(float* inSamples)
+	float processSample(float* inSamples)
 	{
 		for (int i = m_stages - 1; i >= 2; --i)
 		{
@@ -225,14 +224,17 @@ public:
 	void setPassband(float passband) { m_passband = passband; reset(); }
 
 private:
+	static constexpr int s_firstCoefCount = MaxCoefs;
+	static constexpr int s_secondCoefCount = std::max(MaxCoefs / 2, 2);
+	static constexpr int s_restCoefCount = std::max(MaxCoefs / 4, 2);
 #ifdef __SSE2__
-	hiir::Downsampler2xSse<MaxCoefs> m_downsampleFirst;
-	hiir::Downsampler2xSse<std::max(MaxCoefs / 2, 2)> m_downsampleSecond;
-	std::array<hiir::Downsampler2xSse<std::max(MaxCoefs / 4, 2)>, MaxStages - 2> m_downsampleRest;
+	hiir::Downsampler2xSse<s_firstCoefCount> m_downsampleFirst;
+	hiir::Downsampler2xSse<s_secondCoefCount> m_downsampleSecond;
+	std::array<hiir::Downsampler2xSse<s_restCoefCount>, MaxStages - 2> m_downsampleRest;
 #else
-	hiir::Downsampler2xFpu<MaxCoefs> m_downsampleFirst;
-	hiir::Downsampler2xFpu<std::max(MaxCoefs / 2, 2)> m_downsampleSecond;
-	std::array<hiir::Downsampler2xFpu<std::max(MaxCoefs / 4, 2)>, MaxStages - 2> m_downsampleRest;
+	hiir::Downsampler2xFpu<s_firstCoefCount> m_downsampleFirst;
+	hiir::Downsampler2xFpu<s_secondCoefCount> m_downsampleSecond;
+	std::array<hiir::Downsampler2xFpu<s_restCoefCount>, MaxStages - 2> m_downsampleRest;
 #endif
 
 	int m_stages = 0;

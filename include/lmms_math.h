@@ -331,19 +331,19 @@ inline __m128 fastLog(__m128 a)
 	return r;
 }
 
-static inline __m128 sse2_abs_ps(__m128 x)
+inline __m128 sse2_abs(__m128 x)
 {
 	return _mm_and_ps(x, _mm_castsi128_ps(_mm_set1_epi32(0x7fffffff)));// clear sign bit
 }
 
-static inline __m128 sse2_floor_ps(__m128 x)
+inline __m128 sse2_floor(__m128 x)
 {
 	__m128 t = _mm_cvtepi32_ps(_mm_cvttps_epi32(x)); // trunc toward 0
 	__m128 needs_correction = _mm_cmplt_ps(x, t); // checks if x < trunc
 	return _mm_sub_ps(t, _mm_and_ps(needs_correction, _mm_set1_ps(1.0f)));
 }
 
-static inline __m128 sse2_round_ps(__m128 x)
+inline __m128 sse2_round(__m128 x)
 {
 	__m128 sign_mask = _mm_cmplt_ps(x, _mm_setzero_ps());// checks if x < 0
 	__m128 bias_pos = _mm_set1_ps(0.5f);
