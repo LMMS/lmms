@@ -2847,12 +2847,13 @@ void PianoRoll::updateParameterEditPos(QMouseEvent* me, Note::ParameterType para
 			// -1 means there is no previous mouse position, meaning that the drag just started.
 			if (m_lastParameterEditTick != -1)
 			{
-				aClip->removeNodes(m_lastParameterEditTick - m_parameterEditClickedNote->pos(), relativePos);
+				// Using std::max to not allow the user to accidentally remove the default node at the very start of the note by making sure the tick range is >= 1
+				aClip->removeNodes(std::max(1, m_lastParameterEditTick - m_parameterEditClickedNote->pos()), std::max(TimePos{1}, relativePos));
 			}
 			else
 			{
-				// Or just remove at that one time pos
-				aClip->removeNode(relativePos);
+				// If the drag just started, only remove at that one time pos
+				aClip->removeNode(std::max(TimePos{1}, relativePos));
 			}
 		}
 	}
