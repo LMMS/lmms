@@ -160,10 +160,16 @@ void SubWindow::changeEvent( QEvent *event )
 
 }
 
-void SubWindow::showEvent(QShowEvent* e)
+void SubWindow::setVisible(bool visible)
 {
-	attach();
-	QMdiSubWindow::showEvent(e);
+	if (isDetached() && visible)  // avoid showing titlebar here
+	{
+		widget()->show();
+		// raise the detached window in case it was minimized
+		widget()->setWindowState((widget()->windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
+		return;
+	}
+	QMdiSubWindow::setVisible(visible);
 }
 
 bool SubWindow::isDetached() const

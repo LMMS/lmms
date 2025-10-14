@@ -78,6 +78,7 @@ public:
 public slots:
 	void detach();
 	void attach();
+	void setVisible(bool visible) override;
 
 protected:
 	// hook the QWidget move/resize events to update the tracked geometry
@@ -85,7 +86,6 @@ protected:
 	void resizeEvent( QResizeEvent * event ) override;
 	void paintEvent( QPaintEvent * pe ) override;
 	void changeEvent( QEvent * event ) override;
-	void showEvent(QShowEvent* event) override;
 	bool eventFilter(QObject* obj, QEvent* event) override;
 
 	bool isDetached() const;
