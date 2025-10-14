@@ -37,7 +37,7 @@ void DetachableWindow::closeEvent(QCloseEvent* ce)
 {
 	if (windowFlags().testFlag(Qt::Window))
 	{
-		((SubWindow*) parentWidget())->attach();
+		dynamic_cast<SubWindow&>(*parentWidget()).attach();
 		ce->ignore();
 	}
 	else if (getGUI()->mainWindow()->workspace())
