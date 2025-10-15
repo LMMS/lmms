@@ -358,7 +358,7 @@ int main( int argc, char * * argv )
 	// initialize memory managers
 	NotePlayHandleManager::init();
 
-	// intialize RNG
+	// initialize RNG
 	srand( getpid() + time( 0 ) );
 
 	disable_denormals();

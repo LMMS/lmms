@@ -48,7 +48,7 @@ const int PNT = 2;
 const int dENV = 3;
 const int NEXTT = 4;
 
-// Bah, I'll move these into the class once I sepearate DrumsynthFile from DrumSynth
+// Bah, I'll move these into the class once I separate DrumsynthFile from DrumSynth
 // llama
 float envpts[8][3][32];	 // envelope/time-level/point
 float envData[8][6];	 // envelope running status
