@@ -2838,6 +2838,11 @@ void PianoRoll::updateParameterEditPos(QMouseEvent* me, Note::ParameterType para
 		// If left-clicking, add/drag a node.
 		if (m_parameterEditDownLeft)
 		{
+			// Don't allow the user to drag the first node from the start of the note. They can drag it up and down, but if they try to move it from the first tick, apply the previous drag and start a new one to preserve the node
+			if (Note::quantized(m_lastParameterEditTick - m_parameterEditClickedNote->pos(), quantization()) == 0 && Note::quantized(relativePos, quantization()) != 0)
+			{
+				aClip->applyDragValue();
+			}
 			aClip->setDragValue(relativePos, relativeKey);
 		}
 		// If right-clicking, remove nodes.
@@ -2848,12 +2853,19 @@ void PianoRoll::updateParameterEditPos(QMouseEvent* me, Note::ParameterType para
 			if (m_lastParameterEditTick != -1)
 			{
 				// Don't allow the user to accidentally remove the default node at the very start of the note, by making sure the tick range is >= 1
-				aClip->removeNodes(std::max(1, m_lastParameterEditTick - m_parameterEditClickedNote->pos()), std::max(TimePos{1}, relativePos));
+				if (!(m_lastParameterEditTick - m_parameterEditClickedNote->pos() == 0 && relativePos == 0))
+				{
+					aClip->removeNodes(std::max(1, m_lastParameterEditTick - m_parameterEditClickedNote->pos()), std::max(TimePos{1}, relativePos));
+				}
 			}
 			else
 			{
 				// If the drag just started, only remove at that one time pos
-				aClip->removeNode(std::max(TimePos{1}, relativePos));
+				// But don't allow the user to delete the first node
+				if (relativePos != 0)
+				{
+					aClip->removeNode(relativePos);
+				}
 			}
 		}
 	}
