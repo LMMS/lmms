@@ -1,7 +1,5 @@
 /*
- * SubWindow.h - Implementation of QMdiSubWindow that correctly tracks
- *   the geometry that windows should be restored to.
- *   Workaround for https://bugreports.qt.io/browse/QTBUG-256
+ * DetachedWindow.h - Substitute for SubWindow class to be used when window is detached.
  *
  * Copyright (c) 2015 Colin Wallace <wallace.colin.a@gmail.com>
  *
@@ -38,47 +36,34 @@ namespace lmms::gui
 
 
 /**
- * @brief The SubWindow class
+ * @brief The DetachedWindow class
  * 
- *  Because of a bug in the QMdiSubWindow class to save the right position and size
- *  of a subwindow in a project and because of the inability
- *  for cusomizing the title bar appearance, lmms implements its own subwindow
- *  class.
+ *  Substitute for SubWindow class to be used when window is detached.
+ *  This handles window-specific features like icon, title and close event.
+ *  Could include additional decorations, common to all detached windows.
  */
 class LMMS_EXPORT DetachedWindow : public QWidget
 {
 	Q_OBJECT
-//	Q_PROPERTY( QBrush activeColor READ activeColor WRITE setActiveColor )
-//	Q_PROPERTY( QColor textShadowColor READ textShadowColor WRITE setTextShadowColor )
-//	Q_PROPERTY( QColor borderColor READ borderColor WRITE setBorderColor )
 
 public:
 	DetachedWindow(QWidget *child = nullptr, QWidget *parent = nullptr, Qt::WindowFlags windowFlags = QFlag(0));
 	QWidget* widget() const;
 	void setWidget(QWidget* widget);
-	// same as QWidet::normalGeometry, but works properly under X11 (see https://bugreports.qt.io/browse/QTBUG-256)
-	// TODO Needed to update the title bar when replacing instruments.
-	// Update works automatically if QMdiSubWindows are used.
 
 public slots:
 	void detach();
 	void attach();
 
 protected:
-	// hook the QWidget move/resize events to update the tracked geometry
 	void closeEvent(QCloseEvent* e) override;
 
 	bool isDetached() const;
 	QVBoxLayout* m_layout;
-
-//private:
-
-//private slots:
-//	void focusChanged( QMdiSubWindow * subWindow );
 };
 
 
 
 } // namespace lmms::gui
 
-#endif // LMMS_GUI_SUBWINDOW_H
+#endif // LMMS_GUI_DETACHEDWINDOW
