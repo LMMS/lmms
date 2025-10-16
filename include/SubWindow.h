@@ -107,7 +107,7 @@ private:
 	QRect m_trackedNormalGeom;
 	QLabel * m_windowTitle;
 	QGraphicsDropShadowEffect * m_shadow;
-	DetachedWindow* m_detachedwindow;
+	DetachedWindow* m_detachedWindow;
 	bool m_hasFocus;
 
 	static void elideText( QLabel *label, QString text );

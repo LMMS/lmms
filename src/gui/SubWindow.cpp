@@ -62,7 +62,7 @@ SubWindow::SubWindow(QWidget *parent, Qt::WindowFlags windowFlags) :
 	m_activeColor = Qt::SolidPattern;
 	m_textShadowColor = Qt::black;
 	m_borderColor = Qt::black;
-	m_detachedwindow = nullptr;
+	m_detachedWindow = nullptr;
 
 	// close, maximize, restore, and detach buttons
 	auto createButton = [this](const std::string& iconName, const QString& tooltip) -> QPushButton* {
@@ -166,14 +166,14 @@ void SubWindow::changeEvent( QEvent *event )
 void SubWindow::setVisible(bool visible)
 {
 	if (isDetached())  // avoid showing titlebar here if asked by external force
-		m_detachedwindow->setVisible(visible);
+		m_detachedWindow->setVisible(visible);
 	else
 		QMdiSubWindow::setVisible(visible);
 }
 
 bool SubWindow::isDetached() const
 {
-	return m_detachedwindow != nullptr;
+	return m_detachedWindow != nullptr;
 }
 
 
@@ -267,10 +267,10 @@ void SubWindow::detach()
 	const auto pos = mapToGlobal(widget()->pos());
 
 	hide();
-	m_detachedwindow = new DetachedWindow(widget(), this);
+	m_detachedWindow = new DetachedWindow(widget(), this);
 	setWidget(nullptr);
-	m_detachedwindow->show();
-	m_detachedwindow->windowHandle()->setPosition(pos);
+	m_detachedWindow->show();
+	m_detachedWindow->windowHandle()->setPosition(pos);
 }
 
 void SubWindow::attach()
@@ -278,9 +278,9 @@ void SubWindow::attach()
 	if (!isDetached())
 		return;
 
- 	auto frame = m_detachedwindow->windowHandle()->frameGeometry();
-	auto w = m_detachedwindow->widget();
-	m_detachedwindow->setWidget(nullptr);
+ 	auto frame = m_detachedWindow->windowHandle()->frameGeometry();
+	auto w = m_detachedWindow->widget();
+	m_detachedWindow->setWidget(nullptr);
 	setWidget(w);
 
 	// Delay moving & resizing using event queue. Ensures that this widget is
@@ -295,8 +295,8 @@ void SubWindow::attach()
 		resize(frame.size());
 	}, Qt::QueuedConnection);
 
-	delete m_detachedwindow;
-	m_detachedwindow = nullptr;
+	delete m_detachedWindow;
+	m_detachedWindow = nullptr;
 
 	show();
 }
