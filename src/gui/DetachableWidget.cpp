@@ -29,6 +29,7 @@
 
 #include "GuiApplication.h"
 #include "MainWindow.h"
+#include "SubWindow.h"
 
 namespace lmms::gui {
 
@@ -36,7 +37,8 @@ void DetachableWidget::closeEvent(QCloseEvent* ce)
 {
 	if (windowFlags().testFlag(Qt::Window))
 	{
-		ce->accept();
+		dynamic_cast<SubWindow&>(*parentWidget()).attach();
+		ce->ignore();
 	}
 	else if (getGUI()->mainWindow()->workspace())
 	{
