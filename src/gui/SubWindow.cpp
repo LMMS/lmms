@@ -267,7 +267,7 @@ void SubWindow::detach()
 	const auto pos = mapToGlobal(widget()->pos());
 
 	hide();
-	m_detachedWindow = new DetachedWindow(widget(), this);
+	m_detachedWindow = new DetachedWindow(widget(), this, windowFlags());
 	setWidget(nullptr);
 	m_detachedWindow->show();
 	m_detachedWindow->windowHandle()->setPosition(pos);
