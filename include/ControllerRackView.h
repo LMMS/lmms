@@ -27,7 +27,6 @@
 
 #include "DetachableWidget.h"
 #include "SerializingObject.h"
-#include "lmms_basics.h"
 
 class QPushButton;
 class QScrollArea;

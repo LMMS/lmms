@@ -31,14 +31,15 @@
 #include <QGraphicsDropShadowEffect>
 #include <QGuiApplication>
 #include <QLabel>
+#include <QLayout>
 #include <QMdiArea>
 #include <QMetaMethod>
 #include <QMoveEvent>
 #include <QPainter>
 #include <QPushButton>
-#include <QWindow>
 #include <QStyleOption>
-#include <QLayout>
+#include <QStyleOptionTitleBar>
+#include <QWindow>
 
 #include "embed.h"
 

@@ -27,7 +27,7 @@
 #include "fft_helpers.h"
 
 #include <cmath>
-#include "lmms_constants.h"
+#include <numbers>
 
 namespace lmms
 {
@@ -104,6 +104,7 @@ int notEmpty(const std::vector<float> &spectrum)
  */
 int precomputeWindow(float *window, unsigned int length, FFTWindow type, bool normalized)
 {
+	using namespace std::numbers;
 	if (window == nullptr) {return -1;}
 
 	float gain = 0;
@@ -144,9 +145,9 @@ int precomputeWindow(float *window, unsigned int length, FFTWindow type, bool no
 	// common computation for cosine-sum based windows
 	for (unsigned int i = 0; i < length; i++)
 	{
-		window[i] = (a0 - a1 * std::cos(2 * numbers::pi_v<float> * i / ((float)length - 1.0))
-			+ a2 * std::cos(4 * numbers::pi_v<float> * i / ((float)length - 1.0))
-			- a3 * std::cos(6 * numbers::pi_v<float> * i / ((float)length - 1.0)));
+		window[i] = (a0 - a1 * std::cos(2 * pi_v<float> * i / (static_cast<float>(length) - 1.0))
+			+ a2 * std::cos(4 * pi_v<float> * i / (static_cast<float>(length) - 1.0))
+			- a3 * std::cos(6 * pi_v<float> * i / (static_cast<float>(length) - 1.0)));
 		gain += window[i];
 	}
 

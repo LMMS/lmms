@@ -1,6 +1,18 @@
 ADD_SUBDIRECTORY(3rdparty)
 
 CONFIGURE_FILE("lmmsconfig.h.in"        "${CMAKE_BINARY_DIR}/lmmsconfig.h")
+
+# Provide config flags to lmmsversion.h
+get_cmake_property(_define_vars VARIABLES)
+foreach (_define_var ${_define_vars})
+    if(_define_var MATCHES "^WANT|LMMS_(HAVE|DEBUG)" )
+        list(APPEND LMMS_BUILD_OPTIONS "${_define_var}='${${_define_var}}'")
+    endif()
+endforeach()
+
+# Format for readibility
+string(REPLACE ";" " " LMMS_BUILD_OPTIONS "${LMMS_BUILD_OPTIONS}")
+
 CONFIGURE_FILE("lmmsversion.h.in"       "${CMAKE_BINARY_DIR}/lmmsversion.h")
 
 SET(LMMS_SRCS "")
@@ -60,19 +72,19 @@ include_directories(SYSTEM
 	${FFTW3F_INCLUDE_DIRS}
 )
 
-IF(NOT ("${PULSEAUDIO_INCLUDE_DIR}" STREQUAL ""))
+IF(PULSEAUDIO_INCLUDE_DIR)
 	include_directories(SYSTEM "${PULSEAUDIO_INCLUDE_DIR}")
 ENDIF()
 
-IF(NOT ("${LV2_INCLUDE_DIRS}" STREQUAL ""))
+IF(LV2_INCLUDE_DIRS)
 	include_directories(SYSTEM ${LV2_INCLUDE_DIRS})
 ENDIF()
 
-IF(NOT ("${LILV_INCLUDE_DIRS}" STREQUAL ""))
-	include_directories(SYSTEM ${LILV_INCLUDE_DIRS})
+IF(Lilv_INCLUDE_DIRS)
+	include_directories(SYSTEM ${Lilv_INCLUDE_DIRS})
 ENDIF()
 
-IF(NOT ("${SUIL_INCLUDE_DIRS}" STREQUAL ""))
+IF(SUIL_INCLUDE_DIRS)
 	include_directories(SYSTEM ${SUIL_INCLUDE_DIRS})
 ENDIF()
 

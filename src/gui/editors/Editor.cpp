@@ -70,6 +70,7 @@ DropToolBar * Editor::addDropToolBar(QWidget * parent, Qt::ToolBarArea whereToAd
 
 void Editor::togglePlayStop()
 {
+	s_lastPlayedEditor = this;
 	if (Engine::getSong()->isPlaying())
 		stop();
 	else
@@ -78,6 +79,7 @@ void Editor::togglePlayStop()
 
 void Editor::togglePause()
 {
+	s_lastPlayedEditor = this;
 	Engine::getSong()->togglePause();
 }
 
@@ -116,8 +118,6 @@ Editor::Editor(bool record, bool stepRecord) :
 	connect(m_recordAccompanyAction, SIGNAL(triggered()), this, SLOT(recordAccompany()));
 	connect(m_toggleStepRecordingAction, SIGNAL(triggered()), this, SLOT(toggleStepRecording()));
 	connect(m_stopAction, SIGNAL(triggered()), this, SLOT(stop()));
-	new QShortcut(Qt::Key_Space, this, SLOT(togglePlayStop()));
-	new QShortcut(QKeySequence(combine(Qt::SHIFT, Qt::Key_Space)), this, SLOT(togglePause()));
 	new QShortcut(QKeySequence(combine(Qt::SHIFT, Qt::Key_F11)), this, SLOT(toggleMaximize()));
 
 	// Add actions to toolbar
@@ -137,6 +137,23 @@ Editor::Editor(bool record, bool stepRecord) :
 QAction *Editor::playAction() const
 {
 	return m_playAction;
+}
+
+void Editor::keyPressEvent(QKeyEvent* ke)
+{
+	if (ke->key() == Qt::Key_Space)
+	{
+		if (ke->modifiers() & Qt::ShiftModifier)
+		{
+			togglePause();
+		}
+		else
+		{
+			togglePlayStop();
+		}
+		return;
+	}
+	ke->ignore();
 }
 
 DropToolBar::DropToolBar(QWidget* parent) : QToolBar(parent)

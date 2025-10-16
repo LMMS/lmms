@@ -102,10 +102,10 @@ float Microtuner::keyToFreq(int key, int userBaseNote) const
 
 	// Compute frequency of the middle note and return the final frequency
 	const double octaveRatio = intervals[octaveDegree].getRatio();
-	const float middleFreq = (keymap->getBaseFreq() / pow(octaveRatio, (baseScaleOctave + baseKeymapOctave)))
-								/ intervals[baseScaleDegree].getRatio();
+	const float middleFreq = (keymap->getBaseFreq() / std::pow(octaveRatio, baseScaleOctave + baseKeymapOctave))
+		/ intervals[baseScaleDegree].getRatio();
 
-	return middleFreq * intervals[scaleDegree].getRatio() * pow(octaveRatio, keymapOctave + scaleOctave);
+	return middleFreq * intervals[scaleDegree].getRatio() * std::pow(octaveRatio, keymapOctave + scaleOctave);
 }
 
 int Microtuner::octaveSize() const

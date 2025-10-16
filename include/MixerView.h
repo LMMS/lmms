@@ -25,18 +25,16 @@
 #ifndef LMMS_GUI_MIXER_VIEW_H
 #define LMMS_GUI_MIXER_VIEW_H
 
-#include <QHBoxLayout>
-#include <QStackedLayout>
-#include <QScrollArea>
-
 #include "MixerChannelView.h"
 #include "DetachableWidget.h"
 #include "ModelView.h"
-#include "Engine.h"
-#include "Fader.h"
-#include "PixmapButton.h"
-#include "embed.h"
-#include "EffectRackView.h"
+#include "SerializingObject.h"
+
+class QDomDocument;  // IWYU pragma: keep
+class QDomElement;  // IWYU pragma: keep
+class QHBoxLayout;
+class QStackedLayout;
+class QScrollArea;
 
 namespace lmms
 {

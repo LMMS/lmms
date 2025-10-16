@@ -23,7 +23,7 @@
  */
 
 
-#include <QtTest/QtTest>
+#include <QtTest>
 #include "AutomatableModel.h"
 #include "ComboBoxModel.h"
 #include "Engine.h"
