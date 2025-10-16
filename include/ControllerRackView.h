@@ -25,8 +25,9 @@
 #ifndef LMMS_GUI_CONTROLLER_RACK_VIEW_H
 #define LMMS_GUI_CONTROLLER_RACK_VIEW_H
 
-#include "DetachableWidget.h"
 #include "SerializingObject.h"
+
+#include <QWidget>
 
 class QPushButton;
 class QScrollArea;
@@ -42,7 +43,7 @@ namespace gui
 
 class ControllerView;
 
-class ControllerRackView : public DetachableWidget, public SerializingObject
+class ControllerRackView : public QWidget, public SerializingObject
 {
 	Q_OBJECT
 public:

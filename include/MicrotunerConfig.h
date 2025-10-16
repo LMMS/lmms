@@ -27,8 +27,9 @@
 
 #include "AutomatableModel.h"
 #include "ComboBoxModel.h"
-#include "DetachableWidget.h"
 #include "SerializingObject.h"
+
+#include <QWidget>
 
 class QLineEdit;
 class QPlainTextEdit;
@@ -37,7 +38,7 @@ namespace lmms::gui
 {
 
 
-class LMMS_EXPORT MicrotunerConfig : public DetachableWidget, public SerializingObject
+class LMMS_EXPORT MicrotunerConfig : public QWidget, public SerializingObject
 {
 	Q_OBJECT
 public:
