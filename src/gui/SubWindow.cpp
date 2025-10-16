@@ -40,6 +40,7 @@
 #include <QStyleOption>
 #include <QStyleOptionTitleBar>
 #include <QWindow>
+#include <QDebug>
 
 #include "embed.h"
 
@@ -61,6 +62,7 @@ SubWindow::SubWindow(QWidget *parent, Qt::WindowFlags windowFlags) :
 	m_activeColor = Qt::SolidPattern;
 	m_textShadowColor = Qt::black;
 	m_borderColor = Qt::black;
+	m_detachedwindow = nullptr;
 
 	// close, maximize, restore, and detach buttons
 	auto createButton = [this](const std::string& iconName, const QString& tooltip) -> QPushButton* {
@@ -163,19 +165,15 @@ void SubWindow::changeEvent( QEvent *event )
 
 void SubWindow::setVisible(bool visible)
 {
-	if (isDetached() && visible)  // avoid showing titlebar here
-	{
-		widget()->show();
-		// raise the detached window in case it was minimized
-		widget()->setWindowState((widget()->windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
-		return;
-	}
-	QMdiSubWindow::setVisible(visible);
+	if (isDetached())  // avoid showing titlebar here if asked by external force
+		m_detachedwindow->setVisible(visible);
+	else
+		QMdiSubWindow::setVisible(visible);
 }
 
 bool SubWindow::isDetached() const
 {
-	return widget()->windowFlags().testFlag(Qt::Window);
+	return m_detachedwindow != nullptr;
 }
 
 
@@ -263,55 +261,31 @@ void SubWindow::setBorderColor( const QColor &c )
 
 void SubWindow::detach()
 {
-#if QT_VERSION < 0x50C00
-	// Workaround for a bug in Qt versions below 5.12,
-	// where argument-dependent-lookup fails for QFlags operators
-	// declared inside a namepsace.
-	// This affects the Q_DECLARE_OPERATORS_FOR_FLAGS macro in Instrument.h
-	// See also: https://codereview.qt-project.org/c/qt/qtbase/+/225348
-
-	using ::operator|;
-#endif
-
-	if (isDetached()) { return; }
+	if (isDetached())
+		return;
 
 	const auto pos = mapToGlobal(widget()->pos());
 
-	auto flags = windowFlags();
-	flags |= Qt::Window;
-	flags &= ~Qt::Widget;
-	widget()->setWindowFlags(flags);
-	widget()->show();
 	hide();
-
-	widget()->windowHandle()->setPosition(pos);
+	m_detachedwindow = new DetachedWindow(widget(), this);
+	setWidget(nullptr);
+	m_detachedwindow->show();
+	m_detachedwindow->windowHandle()->setPosition(pos);
 }
 
 void SubWindow::attach()
 {
-#if QT_VERSION < 0x50C00
-	// Workaround for a bug in Qt versions below 5.12,
-	// where argument-dependent-lookup fails for QFlags operators
-	// declared inside a namepsace.
-	// This affects the Q_DECLARE_OPERATORS_FOR_FLAGS macro in Instrument.h
-	// See also: https://codereview.qt-project.org/c/qt/qtbase/+/225348
+	if (!isDetached())
+		return;
 
-	using ::operator|;
-#endif
-
-	if (!isDetached()) { return; }
-
-	auto frame = widget()->windowHandle()->frameGeometry();
-
-	auto flags = windowFlags();
-	flags &= ~Qt::Window;
-	flags |= Qt::Widget;
-	widget()->setWindowFlags(flags);
-	widget()->show();
-	show();
+ 	auto frame = m_detachedwindow->windowHandle()->frameGeometry();
+	auto w = m_detachedwindow->widget();
+	m_detachedwindow->setWidget(nullptr);
+	setWidget(w);
 
 	// Delay moving & resizing using event queue. Ensures that this widget is
 	// visible first, so that resizing works.
+	// TODO: take decorations into account while doing this
 	QObject obj;
 	connect(&obj, &QObject::destroyed, this, [this, frame]() {
 		if (QGuiApplication::platformName() != "wayland")
@@ -320,6 +294,11 @@ void SubWindow::attach()
 		}
 		resize(frame.size());
 	}, Qt::QueuedConnection);
+
+	delete m_detachedwindow;
+	m_detachedwindow = nullptr;
+
+	show();
 }
 
 

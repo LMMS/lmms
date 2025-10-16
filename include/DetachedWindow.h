@@ -24,20 +24,14 @@
  *
  */
 
-#ifndef LMMS_GUI_SUBWINDOW_H
-#define LMMS_GUI_SUBWINDOW_H
+#ifndef LMMS_GUI_DETACHEDWINDOW
+#define LMMS_GUI_DETACHEDWINDOW
 
-#include <QMdiSubWindow>
+#include <QWidget>
 #include <QString>
-
-#include "DetachedWindow.h"
+#include <QVBoxLayout>
 
 #include "lmms_export.h"
-
-class QGraphicsDropShadowEffect;
-class QLabel;
-class QPushButton;
-class QWidget;
 
 namespace lmms::gui
 {
@@ -51,70 +45,36 @@ namespace lmms::gui
  *  for cusomizing the title bar appearance, lmms implements its own subwindow
  *  class.
  */
-class LMMS_EXPORT SubWindow : public QMdiSubWindow
+class LMMS_EXPORT DetachedWindow : public QWidget
 {
 	Q_OBJECT
-	Q_PROPERTY( QBrush activeColor READ activeColor WRITE setActiveColor )
-	Q_PROPERTY( QColor textShadowColor READ textShadowColor WRITE setTextShadowColor )
-	Q_PROPERTY( QColor borderColor READ borderColor WRITE setBorderColor )
+//	Q_PROPERTY( QBrush activeColor READ activeColor WRITE setActiveColor )
+//	Q_PROPERTY( QColor textShadowColor READ textShadowColor WRITE setTextShadowColor )
+//	Q_PROPERTY( QColor borderColor READ borderColor WRITE setBorderColor )
 
 public:
-	SubWindow( QWidget *parent = nullptr, Qt::WindowFlags windowFlags = QFlag(0) );
+	DetachedWindow(QWidget *child = nullptr, QWidget *parent = nullptr, Qt::WindowFlags windowFlags = QFlag(0));
+	QWidget* widget() const;
+	void setWidget(QWidget* widget);
 	// same as QWidet::normalGeometry, but works properly under X11 (see https://bugreports.qt.io/browse/QTBUG-256)
-	QRect getTrueNormalGeometry() const;
-	QBrush activeColor() const;
-	QColor textShadowColor() const;
-	QColor borderColor() const;
-	void setActiveColor( const QBrush & b );
-	void setTextShadowColor( const QColor &c );
-	void setBorderColor( const QColor &c );
-	int titleBarHeight() const;
-	int frameWidth() const;
-
 	// TODO Needed to update the title bar when replacing instruments.
 	// Update works automatically if QMdiSubWindows are used.
-	void updateTitleBar();
 
 public slots:
 	void detach();
 	void attach();
-	void setVisible(bool visible) override;
 
 protected:
 	// hook the QWidget move/resize events to update the tracked geometry
-	void moveEvent( QMoveEvent * event ) override;
-	void resizeEvent( QResizeEvent * event ) override;
-	void paintEvent( QPaintEvent * pe ) override;
-	void changeEvent( QEvent * event ) override;
-	bool eventFilter(QObject* obj, QEvent* event) override;
+	void closeEvent(QCloseEvent* e) override;
 
 	bool isDetached() const;
+	QVBoxLayout* m_layout;
 
-signals:
-	void focusLost();
+//private:
 
-private:
-	const QSize m_buttonSize;
-	const int m_titleBarHeight;
-	QPushButton * m_closeBtn;
-	QPushButton * m_maximizeBtn;
-	QPushButton * m_restoreBtn;
-	QPushButton* m_detachBtn;
-	QBrush m_activeColor;
-	QColor m_textShadowColor;
-	QColor m_borderColor;
-	QPoint m_position;
-	QRect m_trackedNormalGeom;
-	QLabel * m_windowTitle;
-	QGraphicsDropShadowEffect * m_shadow;
-	DetachedWindow* m_detachedwindow;
-	bool m_hasFocus;
-
-	static void elideText( QLabel *label, QString text );
-	void adjustTitleBar();
-
-private slots:
-	void focusChanged( QMdiSubWindow * subWindow );
+//private slots:
+//	void focusChanged( QMdiSubWindow * subWindow );
 };
 
 
