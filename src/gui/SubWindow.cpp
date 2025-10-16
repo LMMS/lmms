@@ -101,6 +101,29 @@ SubWindow::SubWindow(QWidget *parent, Qt::WindowFlags windowFlags) :
 	setWindowFlags((this->windowFlags() & ~Qt::WindowMinimizeButtonHint) | Qt::CustomizeWindowHint);
 
 	connect( mdiArea(), SIGNAL(subWindowActivated(QMdiSubWindow*)), this, SLOT(focusChanged(QMdiSubWindow*)));
+
+	m_detachHandler = new DetachableWidget();
+	connect(m_detachHandler, &DetachableWidget::attach, this, &SubWindow::attach);
+}
+
+
+
+
+/**
+ * @brief SubWindow::setWidget
+ *
+ *  This is a wrapper to initialize everything
+ *  that depends on a child widget.
+ */
+void SubWindow::setWidget(QWidget* w)
+{
+	if (widget())
+		widget()->removeEventFilter(m_detachHandler);
+
+	QMdiSubWindow::setWidget(w);
+
+	if (widget())
+		widget()->installEventFilter(m_detachHandler);
 }
 
 
@@ -158,16 +181,22 @@ void SubWindow::changeEvent( QEvent *event )
 	{
 		adjustTitleBar();
 	}
-
 }
 
 void SubWindow::setVisible(bool visible)
 {
-	if (isDetached() && visible)  // avoid showing titlebar here
+	if (isDetached())  // avoid showing titlebar here
 	{
-		widget()->show();
-		// raise the detached window in case it was minimized
-		widget()->setWindowState((widget()->windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
+		if (visible)
+		{
+			widget()->show();
+			// raise the detached window in case it was minimized
+			widget()->setWindowState((widget()->windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
+		}
+		else
+		{
+			widget()->hide();
+		}
 		return;
 	}
 	QMdiSubWindow::setVisible(visible);
@@ -280,9 +309,10 @@ void SubWindow::detach()
 	auto flags = windowFlags();
 	flags |= Qt::Window;
 	flags &= ~Qt::Widget;
+
+	hide();
 	widget()->setWindowFlags(flags);
 	widget()->show();
-	hide();
 
 	widget()->windowHandle()->setPosition(pos);
 }

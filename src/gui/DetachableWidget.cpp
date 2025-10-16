@@ -25,32 +25,42 @@
 
 #include "DetachableWidget.h"
 
-#include <QCloseEvent>
+//#include <QCloseEvent>
+#include <QEvent>
 
 #include "GuiApplication.h"
 #include "MainWindow.h"
-#include "SubWindow.h"
 
 namespace lmms::gui {
 
-void DetachableWidget::closeEvent(QCloseEvent* ce)
+
+bool DetachableWidget::eventFilter(QObject* obj, QEvent* e)
 {
-	if (windowFlags().testFlag(Qt::Window))
+	if (!obj->isWidgetType())
+		return false;
+	auto w = static_cast<QWidget*>(obj);
+	if (e->type() == QEvent::Close)
 	{
-		dynamic_cast<SubWindow&>(*parentWidget()).attach();
-		ce->ignore();
+		if (w->windowFlags().testFlag(Qt::Window))
+		{
+			emit attach();  // we'll handle this in SubWinoow
+			e->ignore();
+			return true;
+		}
+		else if (getGUI()->mainWindow()->workspace())  // mdiArea exists
+		{
+			w->parentWidget()->hide();
+			e->ignore();
+		}
+		else  // is this even reachable?
+		{
+			w->hide();
+			e->ignore();
+		}
+		return false;
 	}
-	else if (getGUI()->mainWindow()->workspace())
-	{
-		parentWidget()->hide();
-		ce->ignore();
-	}
-	else
-	{
-		hide();
-		ce->ignore();
-	}
-	emit closed();
+	return false;
 }
+
 
 } // namespace lmms::gui

@@ -26,22 +26,23 @@
 #ifndef LMMS_GUI_DETACHABLE_WIDGET
 #define LMMS_GUI_DETACHABLE_WIDGET
 
-#include <QWidget>
+#include <QObject>
 
 #include "lmms_export.h"
 
+class QWidget;
+class QEvent;
+
 namespace lmms::gui {
 
-class LMMS_EXPORT DetachableWidget : public QWidget
+class LMMS_EXPORT DetachableWidget : public QObject
 {
 	Q_OBJECT
 public:
-	using QWidget::QWidget;
-
-	void closeEvent(QCloseEvent* ce) override;
+	bool eventFilter(QObject* obj, QEvent* e) override;
 
 signals:
-	void closed();
+	void attach();
 };
 
 } // namespace lmms::gui

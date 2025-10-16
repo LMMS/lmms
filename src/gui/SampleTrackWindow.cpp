@@ -48,7 +48,7 @@ namespace lmms::gui
 
 
 SampleTrackWindow::SampleTrackWindow(SampleTrackView* stv)
-	: DetachableWidget{}
+	: QWidget{}
 	, ModelView{nullptr, this}
 	, m_track{stv->model()}
 	, m_stv{stv}
@@ -266,8 +266,6 @@ void SampleTrackWindow::toggleVisibility(bool on)
 
 void SampleTrackWindow::closeEvent(QCloseEvent* ce)
 {
-	DetachableWidget::closeEvent(ce);
-
 	m_stv->setFocus();
 	m_stv->m_tlb->setChecked(false);
 }

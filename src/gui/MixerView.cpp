@@ -56,7 +56,7 @@ namespace lmms::gui
 
 
 MixerView::MixerView(Mixer* mixer) :
-	DetachableWidget{},
+	QWidget{},
 	ModelView{nullptr, this},
 	SerializingObjectHook{},
 	m_mixer(mixer)

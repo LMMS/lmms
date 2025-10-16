@@ -26,9 +26,10 @@
 #define LMMS_GUI_MIXER_VIEW_H
 
 #include "MixerChannelView.h"
-#include "DetachableWidget.h"
 #include "ModelView.h"
 #include "SerializingObject.h"
+
+#include <QWidget>
 
 class QDomDocument;  // IWYU pragma: keep
 class QDomElement;  // IWYU pragma: keep
@@ -45,7 +46,7 @@ namespace lmms::gui
 {
 
 class LMMS_EXPORT MixerView
-	: public DetachableWidget
+	: public QWidget
 	, public ModelView
 	, public SerializingObjectHook
 {

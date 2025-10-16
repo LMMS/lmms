@@ -30,6 +30,7 @@
 #include <QMdiSubWindow>
 #include <QString>
 
+#include "DetachableWidget.h"
 #include "lmms_export.h"
 
 class QGraphicsDropShadowEffect;
@@ -68,6 +69,7 @@ public:
 	void setBorderColor( const QColor &c );
 	int titleBarHeight() const;
 	int frameWidth() const;
+	void setWidget(QWidget* widget);  // Hook for QMdiSubWindow::setWidget
 
 	// TODO Needed to update the title bar when replacing instruments.
 	// Update works automatically if QMdiSubWindows are used.
@@ -106,6 +108,7 @@ private:
 	QLabel * m_windowTitle;
 	QGraphicsDropShadowEffect * m_shadow;
 	bool m_hasFocus;
+	DetachableWidget* m_detachHandler;
 
 	static void elideText( QLabel *label, QString text );
 	void adjustTitleBar();
