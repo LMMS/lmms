@@ -26,6 +26,7 @@
 #include "SubWindow.h"
 
 #include <QLayout>
+#include <QIcon>
 
 namespace lmms::gui
 {
@@ -54,6 +55,11 @@ void DetachedWindow::closeEvent(QCloseEvent* ce)
 	// mirroring behavior of SubWindow.
 }
 
+void DetachedWindow::showEvent(QShowEvent* e)
+{
+	updateTitleBar();
+}
+
 bool DetachedWindow::isDetached() const
 {
 	return true;
@@ -62,9 +68,17 @@ bool DetachedWindow::isDetached() const
 void DetachedWindow::setWidget(QWidget* w)
 {
 	if (widget())
+	{
+		disconnect(widget(), &QWidget::windowTitleChanged, this, &DetachedWindow::updateTitleBar);
+		disconnect(widget(), &QWidget::windowIconChanged, this, &DetachedWindow::updateTitleBar);
 		m_layout->removeWidget(widget());
+	}
 	if (w)
+	{
 		m_layout->addWidget(w);
+		connect(w, &QWidget::windowTitleChanged, this, &DetachedWindow::updateTitleBar);
+		connect(w, &QWidget::windowIconChanged, this, &DetachedWindow::updateTitleBar);
+	}
 }
 
 QWidget* DetachedWindow::widget() const
@@ -75,6 +89,12 @@ QWidget* DetachedWindow::widget() const
 	if (m_layout->count())
 		return m_layout->itemAt(0)->widget();
 	return nullptr;
+}
+
+void DetachedWindow::updateTitleBar()
+{
+	setWindowTitle(widget()->windowTitle());
+	setWindowIcon(widget()->windowIcon());
 }
 
 void DetachedWindow::detach()

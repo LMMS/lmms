@@ -50,6 +50,7 @@ public:
 	DetachedWindow(QWidget *child = nullptr, QWidget *parent = nullptr, Qt::WindowFlags windowFlags = QFlag(0));
 	QWidget* widget() const;
 	void setWidget(QWidget* widget);
+	void updateTitleBar();
 
 public slots:
 	void detach();
@@ -57,7 +58,7 @@ public slots:
 
 protected:
 	void closeEvent(QCloseEvent* e) override;
-
+	void showEvent(QShowEvent* e) override;
 	bool isDetached() const;
 	QVBoxLayout* m_layout;
 };
