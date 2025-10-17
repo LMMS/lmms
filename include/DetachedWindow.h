@@ -1,7 +1,7 @@
 /*
  * DetachedWindow.h - Substitute for SubWindow class to be used when window is detached.
  *
- * Copyright (c) 2015 Colin Wallace <wallace.colin.a@gmail.com>
+ * Copyright (c) 2025 Mikhail Marushkin <mihail.an.mar@gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *

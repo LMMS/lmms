@@ -1,8 +1,7 @@
 /*
  * DetachedWindow.cpp - Substitute for SubWindow.cpp to be used when window is detached.
  *
- * Copyright (c) 2015 Colin Wallace <wallace.colin.a@gmail.com>
- * Copyright (c) 2016 Steffen Baranowsky <baramgb@freenet.de>
+ * Copyright (c) 2025 Mikhail Marushkin <mihail.an.mar@gmail.com>
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
