@@ -2849,7 +2849,8 @@ void PianoRoll::updateParameterEditPos(QMouseEvent* me, Note::ParameterType para
 		if (m_parameterEditDownLeft)
 		{
 			// Don't allow the user to drag the first node from the start of the note. They can drag it up and down, but if they try to move it from the first tick, apply the previous drag and start a new one to preserve the node
-			if (m_lastParameterEditTick != std::nullopt && Note::quantized(m_lastParameterEditTick.value() - m_parameterEditClickedNote->pos(), quantization()) == 0 && Note::quantized(relativePos, quantization()) != 0)
+			if (m_lastParameterEditTick != std::nullopt && Note::quantized(m_lastParameterEditTick.value() - m_parameterEditClickedNote->pos(), quantization()) == 0 && Note::quantized(relativePos, quantization()) != 0 && !(me->modifiers() & Qt::AltModifier))
+
 			{
 				updateLastEditTick = false;
 				aClip->setDragValue(0, relativeKey);
@@ -2859,6 +2860,22 @@ void PianoRoll::updateParameterEditPos(QMouseEvent* me, Note::ParameterType para
 			{
 				updateLastEditTick = false;
 				aClip->setDragValue(quantization(), relativeKey);
+			}
+			else
+			{
+				aClip->setDragValue(relativePos, relativeKey);
+			}
+
+			if ((Note::quantized(relativePos, quantization()) != 0) && (me->modifiers() & Qt::AltModifier))
+			{
+				timeMap & map = aClip->getTimeMap();
+				for (timeMap::const_iterator it = map.begin(); it != map.end(); ++it)
+				{
+					if (POS(it) == Note::quantized(relativePos, quantization()))
+					{
+						aClip->putValues(relativePos, aClip->valueAt(Note::quantized(relativePos, quantization())), relativeKey);
+					}
+				}
 			}
 			else
 			{
@@ -2877,6 +2894,10 @@ void PianoRoll::updateParameterEditPos(QMouseEvent* me, Note::ParameterType para
 				{
 					aClip->removeNodes(std::max(1, m_lastParameterEditTick.value() - m_parameterEditClickedNote->pos()), std::max(TimePos{1}, relativePos));
 				}
+				else
+				{
+					aClip->putValue(0, 0.0f);
+				}
 			}
 			else
 			{
@@ -2885,6 +2906,10 @@ void PianoRoll::updateParameterEditPos(QMouseEvent* me, Note::ParameterType para
 				if (relativePos != 0)
 				{
 					aClip->removeNode(relativePos);
+				}
+				else
+				{
+					aClip->putValue(relativePos, 0.0f);
 				}
 			}
 		}
@@ -2901,8 +2926,11 @@ void PianoRoll::applyParameterEditPos(Note::ParameterType paramType)
 		{
 			AutomationClip* aClip = note->parameterCurve(paramType);
 			if (aClip == nullptr) { continue; }
-
-			aClip->applyDragValue();
+			
+			if (!(me->modifiers() & Qt::AltModifier))
+			{
+				aClip->applyDragValue();
+			}
 		}
 	}
 	m_parameterEditDownRight = false;
