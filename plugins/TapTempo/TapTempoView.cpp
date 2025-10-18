@@ -32,10 +32,9 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QWidget>
+#include <cmath>
 
-#include "Engine.h"
 #include "FontHelper.h"
-#include "Song.h"
 #include "TapTempo.h"
 
 namespace lmms::gui {
