@@ -74,7 +74,8 @@ void TapTempo::tap(bool play)
 
 		const auto total = std::accumulate(m_intervals.begin(), m_intervals.end(), 0.0);
 		const auto avg = total / m_intervals.size();
-		m_bpm = 60000. / avg;
+		constexpr auto alpha = 0.2; // a smoothing factor to minimize jitter in the BPM calculation
+		m_bpm = alpha * (60000. / avg) + (1.0 - alpha) * m_bpm;
 	}
 
 	const auto timeSigNumerator = Engine::getSong()->getTimeSigModel().getNumerator();
