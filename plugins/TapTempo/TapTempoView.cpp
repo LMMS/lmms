@@ -103,17 +103,13 @@ TapTempoView::TapTempoView(TapTempo* plugin)
 	mainLayout->addLayout(buttonsLayout);
 	mainLayout->addLayout(sidebarLayout);
 
-	connect(m_tapButton, &QPushButton::pressed, this, [this]() {
+	connect(m_tapButton, &QPushButton::pressed, this, [this] {
 		m_plugin->tap(!m_muteCheckBox->isChecked());
 		update();
 	});
 
-	connect(m_resetButton, &QPushButton::pressed, this, [this]() { closeEvent(nullptr); });
-
-	connect(m_precisionCheckBox, &QCheckBox::toggled, [this](bool checked) {
-		update();
-	});
-
+	connect(m_resetButton, &QPushButton::pressed, this, [this] { closeEvent(nullptr); });
+	connect(m_precisionCheckBox, &QCheckBox::toggled, this, &TapTempoView::update);
 	connect(m_syncButton, &QPushButton::clicked, m_plugin, &TapTempo::sync);
 
 	hide();
