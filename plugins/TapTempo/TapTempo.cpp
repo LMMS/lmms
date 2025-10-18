@@ -28,6 +28,8 @@
 
 #include <string>
 
+#include "SamplePlayHandle.h"
+#include "Song.h"
 #include "embed.h"
 #include "plugin_export.h"
 
@@ -49,8 +51,15 @@ TapTempo::TapTempo()
 {
 }
 
-void TapTempo::tap()
+void TapTempo::tap(bool play)
 {
+	if (play)
+	{
+		const auto timeSigNumerator = Engine::getSong()->getTimeSigModel().getNumerator();
+		const auto metronomeFile = m_numTaps % timeSigNumerator == 0 ? "misc/metronome02.ogg" : "misc/metronome01.ogg";
+		Engine::audioEngine()->addPlayHandle(new SamplePlayHandle(metronomeFile));
+	}
+
 	const auto currentTime = clock::now();
 	if (m_numTaps == 0)
 	{

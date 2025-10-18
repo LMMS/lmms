@@ -35,7 +35,6 @@
 
 #include "Engine.h"
 #include "FontHelper.h"
-#include "SamplePlayHandle.h"
 #include "Song.h"
 #include "TapTempo.h"
 
@@ -105,14 +104,7 @@ TapTempoView::TapTempoView(TapTempo* plugin)
 	mainLayout->addLayout(sidebarLayout);
 
 	connect(m_tapButton, &QPushButton::pressed, this, [this]() {
-		if (!m_muteCheckBox->isChecked())
-		{
-			const auto timeSigNumerator = Engine::getSong()->getTimeSigModel().getNumerator();
-			Engine::audioEngine()->addPlayHandle(new SamplePlayHandle(
-				m_plugin->m_numTaps % timeSigNumerator == 0 ? "misc/metronome02.ogg" : "misc/metronome01.ogg"));
-		}
-
-		m_plugin->tap();
+		m_plugin->tap(!m_muteCheckBox->isChecked());
 		updateLabels();
 	});
 
