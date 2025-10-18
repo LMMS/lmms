@@ -131,6 +131,7 @@ set(LMMS_SRCS
 	core/midi/MidiApple.cpp
 	core/midi/MidiPort.cpp
 	core/midi/MidiWinMM.cpp
+	core/midi/MPEManager.cpp
 
 	PARENT_SCOPE
 )
