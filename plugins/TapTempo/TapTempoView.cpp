@@ -42,48 +42,50 @@
 namespace lmms::gui {
 TapTempoView::TapTempoView(TapTempo* plugin)
 	: ToolPluginView(plugin)
+	, m_tapButton(new QPushButton())
+	, m_resetButton(new QPushButton())
+	, m_syncButton(new QPushButton())
+	, m_precisionCheckBox(new QCheckBox())
+	, m_muteCheckBox(new QCheckBox())
+	, m_msLabel(new QLabel())
+	, m_hzLabel(new QLabel())
 	, m_plugin(plugin)
 {
 	setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
 	auto font = QFont();
 
-	m_tapButton = new QPushButton();
 	m_tapButton->setFixedSize(200, 200);
 	m_tapButton->setFont(adjustedToPixelSize(font, 32));
 	m_tapButton->setText(tr("0"));
 
-	auto precisionCheckBox = new QCheckBox(tr("Precision"));
-	precisionCheckBox->setFocusPolicy(Qt::NoFocus);
-	precisionCheckBox->setToolTip(tr("Display in high precision"));
-	precisionCheckBox->setText(tr("Precision"));
+	m_precisionCheckBox->setFocusPolicy(Qt::NoFocus);
+	m_precisionCheckBox->setToolTip(tr("Display in high precision"));
+	m_precisionCheckBox->setText(tr("Precision"));
 
-	auto muteCheckBox = new QCheckBox(tr("0.0 ms"));
-	muteCheckBox->setFocusPolicy(Qt::NoFocus);
-	muteCheckBox->setToolTip(tr("Mute metronome"));
-	muteCheckBox->setText(tr("Mute"));
+	m_muteCheckBox->setFocusPolicy(Qt::NoFocus);
+	m_muteCheckBox->setToolTip(tr("Mute metronome"));
+	m_muteCheckBox->setText(tr("Mute"));
 
-	m_msLabel = new QLabel();
 	m_msLabel->setFocusPolicy(Qt::NoFocus);
 	m_msLabel->setToolTip(tr("BPM in milliseconds"));
 	m_msLabel->setText(tr("0 ms"));
 
-	m_hzLabel = new QLabel();
 	m_hzLabel->setFocusPolicy(Qt::NoFocus);
 	m_hzLabel->setToolTip(tr("Frequency of BPM"));
 	m_hzLabel->setText(tr("0.0000 hz"));
 
-	auto resetButton = new QPushButton(tr("Reset"));
-	resetButton->setFocusPolicy(Qt::NoFocus);
-	resetButton->setToolTip(tr("Reset counter and sidebar information"));
+	m_resetButton->setFocusPolicy(Qt::NoFocus);
+	m_resetButton->setToolTip(tr("Reset counter and sidebar information"));
+	m_resetButton->setText(tr("Reset"));
 
-	auto syncButton = new QPushButton(tr("Sync"));
-	syncButton->setFocusPolicy(Qt::NoFocus);
-	syncButton->setToolTip(tr("Sync with project tempo"));
+	m_syncButton->setFocusPolicy(Qt::NoFocus);
+	m_syncButton->setToolTip(tr("Sync with project tempo"));
+	m_syncButton->setText(tr("Sync"));
 
 	auto optionLayout = new QVBoxLayout();
-	optionLayout->addWidget(precisionCheckBox);
-	optionLayout->addWidget(muteCheckBox);
+	optionLayout->addWidget(m_precisionCheckBox);
+	optionLayout->addWidget(m_muteCheckBox);
 
 	auto bpmInfoLayout = new QVBoxLayout();
 	bpmInfoLayout->addWidget(m_msLabel, 0, Qt::AlignHCenter);
@@ -94,16 +96,16 @@ TapTempoView::TapTempoView(TapTempo* plugin)
 	sidebarLayout->addLayout(bpmInfoLayout);
 
 	auto buttonsLayout = new QHBoxLayout();
-	buttonsLayout->addWidget(resetButton, 0, Qt::AlignCenter);
-	buttonsLayout->addWidget(syncButton, 0, Qt::AlignCenter);
+	buttonsLayout->addWidget(m_resetButton, 0, Qt::AlignCenter);
+	buttonsLayout->addWidget(m_syncButton, 0, Qt::AlignCenter);
 
 	auto mainLayout = new QVBoxLayout(this);
 	mainLayout->addWidget(m_tapButton, 0, Qt::AlignCenter);
 	mainLayout->addLayout(buttonsLayout);
 	mainLayout->addLayout(sidebarLayout);
 
-	connect(m_tapButton, &QPushButton::pressed, this, [this, muteCheckBox]() {
-		if (!muteCheckBox->isChecked())
+	connect(m_tapButton, &QPushButton::pressed, this, [this]() {
+		if (!m_muteCheckBox->isChecked())
 		{
 			const auto timeSigNumerator = Engine::getSong()->getTimeSigModel().getNumerator();
 			Engine::audioEngine()->addPlayHandle(new SamplePlayHandle(
@@ -114,14 +116,14 @@ TapTempoView::TapTempoView(TapTempo* plugin)
 		updateLabels();
 	});
 
-	connect(resetButton, &QPushButton::pressed, this, [this]() { closeEvent(nullptr); });
+	connect(m_resetButton, &QPushButton::pressed, this, [this]() { closeEvent(nullptr); });
 
-	connect(precisionCheckBox, &QCheckBox::toggled, [this](bool checked) {
+	connect(m_precisionCheckBox, &QCheckBox::toggled, [this](bool checked) {
 		m_plugin->m_showDecimal = checked;
 		updateLabels();
 	});
 
-	connect(syncButton, &QPushButton::clicked, this, [this]() {
+	connect(m_syncButton, &QPushButton::clicked, this, [this]() {
 		const auto& tempoModel = Engine::getSong()->tempoModel();
 		if (m_plugin->m_bpm < tempoModel.minValue() || m_plugin->m_bpm > tempoModel.maxValue()) { return; }
 		Engine::getSong()->setTempo(std::round(m_plugin->m_bpm));
