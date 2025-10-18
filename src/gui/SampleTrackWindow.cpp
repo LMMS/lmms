@@ -30,6 +30,7 @@
 #include <QLineEdit>
 #include <QMenu>
 #include <QVBoxLayout>
+#include <QSizePolicy>
 
 #include "AutomatableButton.h"
 #include "EffectRackView.h"
@@ -169,27 +170,14 @@ SampleTrackWindow::SampleTrackWindow(SampleTrackView* stv)
 
 	QMdiSubWindow * subWin = getGUI()->mainWindow()->addWindowedWidget(this);
 	Qt::WindowFlags flags = subWin->windowFlags();
-	flags |= Qt::MSWindowsFixedSizeDialogHint;
+	flags |= Qt::MSWindowsFixedSizeDialogHint;  // resizing is disabled regardless, this makes SubWindow hide related actions
 	flags &= ~Qt::WindowMaximizeButtonHint;
 	subWin->setWindowFlags(flags);
 
-	// adjust window size
-	layout()->invalidate();
-	resize(sizeHint());
-	if (parentWidget())
-	{
-		parentWidget()->resize(parentWidget()->sizeHint());
-	}
-	setFixedSize(size());
+	layout()->setSizeConstraint(QLayout::SetFixedSize);
+	// better than setFixedSize because it still responds to layout changes
 
-	// Hide the Size and Maximize options from the system menu
-	// since the dialog size is fixed.
-	QMenu * systemMenu = subWin->systemMenu();
-	systemMenu->actions().at(2)->setVisible(false); // Size
-	systemMenu->actions().at(4)->setVisible(false); // Maximize
-
-	subWin->setWindowIcon(embed::getIconPixmap("sample_track"));
-	subWin->setFixedSize(subWin->size());
+	setWindowIcon(embed::getIconPixmap("sample_track"));
 	subWin->hide();
 }
 
