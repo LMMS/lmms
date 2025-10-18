@@ -105,13 +105,13 @@ TapTempoView::TapTempoView(TapTempo* plugin)
 
 	connect(m_tapButton, &QPushButton::pressed, this, [this]() {
 		m_plugin->tap(!m_muteCheckBox->isChecked());
-		updateLabels();
+		update();
 	});
 
 	connect(m_resetButton, &QPushButton::pressed, this, [this]() { closeEvent(nullptr); });
 
 	connect(m_precisionCheckBox, &QCheckBox::toggled, [this](bool checked) {
-		updateLabels();
+		update();
 	});
 
 	connect(m_syncButton, &QPushButton::clicked, this, [this]() {
@@ -133,7 +133,7 @@ TapTempoView::TapTempoView(TapTempo* plugin)
 	}
 }
 
-void TapTempoView::updateLabels()
+void TapTempoView::update()
 {
 	const double bpm = m_precisionCheckBox->isChecked() ? m_plugin->m_bpm : std::round(m_plugin->m_bpm);
 	const double hz = bpm / 60;
@@ -148,7 +148,7 @@ void TapTempoView::closeEvent(QCloseEvent*)
 {
 	m_plugin->m_numTaps = 0;
 	m_plugin->m_bpm = 0;
-	updateLabels();
+	update();
 }
 
 } // namespace lmms::gui
