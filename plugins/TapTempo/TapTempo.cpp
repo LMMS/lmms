@@ -61,8 +61,15 @@ void TapTempo::tap(bool play)
 
 	if (m_lastTap.time_since_epoch() != 0ms)
 	{
-		const auto delta = std::chrono::duration_cast<std::chrono::milliseconds>(clock::now() - m_lastTap).count();
-		m_intervals.emplace_back(delta);
+		const auto delta = std::chrono::duration_cast<std::chrono::milliseconds>(clock::now() - m_lastTap);
+
+		if (delta > 2000ms)
+		{
+			reset();
+			return;
+		}
+
+		m_intervals.emplace_back(delta.count());
 		if (m_intervals.size() > MaxIntervals) { m_intervals.pop_front(); }
 
 		const auto total = std::accumulate(m_intervals.begin(), m_intervals.end(), 0.0);
