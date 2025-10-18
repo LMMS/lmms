@@ -108,7 +108,11 @@ TapTempoView::TapTempoView(TapTempo* plugin)
 		update();
 	});
 
-	connect(m_resetButton, &QPushButton::pressed, this, [this] { closeEvent(nullptr); });
+	connect(m_resetButton, &QPushButton::pressed, this, [this] {
+		m_plugin->reset();
+		update();
+	});
+
 	connect(m_precisionCheckBox, &QCheckBox::toggled, this, &TapTempoView::update);
 	connect(m_syncButton, &QPushButton::clicked, m_plugin, &TapTempo::sync);
 
@@ -138,8 +142,7 @@ void TapTempoView::update()
 
 void TapTempoView::closeEvent(QCloseEvent*)
 {
-	m_plugin->m_numTaps = 0;
-	m_plugin->m_bpm = 0;
+	m_plugin->reset();
 	update();
 }
 

@@ -80,6 +80,12 @@ void TapTempo::sync()
 	Engine::getSong()->setTempo(std::round(m_bpm));
 }
 
+void TapTempo::reset()
+{
+	m_bpm = 0;
+	m_numTaps = 0;	
+}
+
 QString TapTempo::nodeName() const
 {
 	return taptempo_plugin_descriptor.name;

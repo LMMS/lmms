@@ -41,6 +41,7 @@ public:
 	TapTempo();
 	void tap(bool play);
 	void sync();
+	void reset();
 
 	QString nodeName() const override;
 	void saveSettings(QDomDocument&, QDomElement&) override {}
