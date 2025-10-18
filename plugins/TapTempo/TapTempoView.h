@@ -44,9 +44,9 @@ class TapTempoView : public ToolPluginView
 	Q_OBJECT
 public:
 	TapTempoView(TapTempo* plugin);
-	void closeEvent(QCloseEvent*) override;
 
 private:
+	void closeEvent(QCloseEvent*) override;
 	void update();
 	QPushButton* m_tapButton;
 	QPushButton* m_resetButton;
