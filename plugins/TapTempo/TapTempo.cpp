@@ -51,26 +51,28 @@ TapTempo::TapTempo()
 
 void TapTempo::tap(bool play)
 {
+	using namespace std::literals;
+
 	if (play)
 	{
-		const auto timeSigNumerator = Engine::getSong()->getTimeSigModel().getNumerator();
-		const auto metronomeFile = m_numTaps % timeSigNumerator == 0 ? "misc/metronome02.ogg" : "misc/metronome01.ogg";
+		const auto metronomeFile = m_beat == 0 ? "misc/metronome02.ogg" : "misc/metronome01.ogg";
 		Engine::audioEngine()->addPlayHandle(new SamplePlayHandle(metronomeFile));
 	}
 
-	const auto currentTime = clock::now();
-	if (m_numTaps == 0)
+	if (m_lastTap.time_since_epoch() != 0ms)
 	{
-		m_startTime = currentTime;
-	}
-	else
-	{
-		using namespace std::chrono_literals;
-		const auto secondsElapsed = (currentTime - m_startTime) / 1.0s;
-		if (m_numTaps >= m_tapsNeededToDisplay) { m_bpm = m_numTaps / secondsElapsed * 60; }
+		const auto delta = std::chrono::duration_cast<std::chrono::milliseconds>(clock::now() - m_lastTap).count();
+		m_intervals.emplace_back(delta);
+		if (m_intervals.size() > MaxIntervals) { m_intervals.pop_front(); }
+
+		const auto total = std::accumulate(m_intervals.begin(), m_intervals.end(), 0.0);
+		const auto avg = total / m_intervals.size();
+		m_bpm = 60000. / avg;
 	}
 
-	++m_numTaps;
+	const auto timeSigNumerator = Engine::getSong()->getTimeSigModel().getNumerator();
+	m_beat = (m_beat + 1) % timeSigNumerator;
+	m_lastTap = clock::now();
 }
 
 void TapTempo::sync()
@@ -81,7 +83,9 @@ void TapTempo::sync()
 void TapTempo::reset()
 {
 	m_bpm = 0;
-	m_numTaps = 0;	
+	m_beat = 0;
+	m_intervals.clear();
+	m_lastTap = std::chrono::time_point<clock>{};
 }
 
 QString TapTempo::nodeName() const

@@ -26,6 +26,7 @@
 #define LMMS_TAP_TEMPO_H
 
 #include <chrono>
+#include <deque>
 
 #include "TapTempoView.h"
 #include "ToolPlugin.h"
@@ -36,8 +37,6 @@ class TapTempo : public ToolPlugin
 {
 	Q_OBJECT
 public:
-	using clock = std::chrono::steady_clock;
-
 	TapTempo();
 	void tap(bool play);
 	void sync();
@@ -51,10 +50,12 @@ public:
 	gui::PluginView* instantiateView(QWidget*) override { return new gui::TapTempoView(this); }
 
 private:
-	std::chrono::time_point<clock> m_startTime;
-	int m_numTaps = 0;
-	int m_tapsNeededToDisplay = 2;
-	double m_bpm = 0.0;
+	static constexpr auto MaxIntervals = 5;
+	using clock = std::chrono::steady_clock;
+	std::deque<long> m_intervals{};
+	std::chrono::time_point<clock> m_lastTap;
+	int m_beat = 0;
+	double m_bpm = 0;
 };
 } // namespace lmms
 
