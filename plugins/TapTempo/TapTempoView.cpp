@@ -144,12 +144,6 @@ void TapTempoView::updateLabels()
 	m_hzLabel->setText(tr("%1 hz").arg(hz, 0, 'f', 4));
 }
 
-void TapTempoView::keyPressEvent(QKeyEvent* event)
-{
-	QWidget::keyPressEvent(event);
-	if (!event->isAutoRepeat()) { m_plugin->tap(!m_muteCheckBox->isChecked()); }
-}
-
 void TapTempoView::closeEvent(QCloseEvent*)
 {
 	m_plugin->m_numTaps = 0;

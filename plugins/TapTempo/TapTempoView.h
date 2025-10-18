@@ -45,7 +45,6 @@ class TapTempoView : public ToolPluginView
 public:
 	TapTempoView(TapTempo* plugin);
 	void updateLabels();
-	void keyPressEvent(QKeyEvent* event) override;
 	void closeEvent(QCloseEvent*) override;
 
 private:
