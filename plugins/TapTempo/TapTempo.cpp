@@ -88,4 +88,10 @@ QString TapTempo::nodeName() const
 {
 	return taptempo_plugin_descriptor.name;
 }
+
+double TapTempo::bpm() const
+{
+	return m_bpm;
+}
+
 } // namespace lmms

@@ -128,7 +128,7 @@ TapTempoView::TapTempoView(TapTempo* plugin)
 
 void TapTempoView::update()
 {
-	const double bpm = m_precisionCheckBox->isChecked() ? m_plugin->m_bpm : std::round(m_plugin->m_bpm);
+	const double bpm = m_precisionCheckBox->isChecked() ? m_plugin->bpm() : std::round(m_plugin->bpm());
 	const double hz = bpm / 60;
 	const double ms = bpm > 0 ? 1 / hz * 1000 : 0;
 

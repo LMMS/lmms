@@ -42,6 +42,7 @@ public:
 	void tap(bool play);
 	void sync();
 	void reset();
+	double bpm() const;
 
 	QString nodeName() const override;
 	void saveSettings(QDomDocument&, QDomElement&) override {}
@@ -54,7 +55,6 @@ private:
 	int m_numTaps = 0;
 	int m_tapsNeededToDisplay = 2;
 	double m_bpm = 0.0;
-	friend class gui::TapTempoView;
 };
 } // namespace lmms
 
