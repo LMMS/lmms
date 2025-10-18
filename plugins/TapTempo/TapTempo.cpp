@@ -75,6 +75,11 @@ void TapTempo::tap(bool play)
 	++m_numTaps;
 }
 
+void TapTempo::sync()
+{
+	Engine::getSong()->setTempo(std::round(m_bpm));
+}
+
 QString TapTempo::nodeName() const
 {
 	return taptempo_plugin_descriptor.name;
