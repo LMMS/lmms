@@ -1,9 +1,7 @@
 /*
  * TapTempo.cpp - Plugin to count beats per minute
  *
- *
  * Copyright (c) 2022 saker <sakertooth@gmail.com>
- *
  *
  * This file is part of LMMS - https://lmms.io
  *
