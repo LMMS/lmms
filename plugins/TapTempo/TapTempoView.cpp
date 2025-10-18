@@ -119,7 +119,6 @@ TapTempoView::TapTempoView(TapTempo* plugin)
 	connect(m_resetButton, &QPushButton::pressed, this, [this]() { closeEvent(nullptr); });
 
 	connect(m_precisionCheckBox, &QCheckBox::toggled, [this](bool checked) {
-		m_plugin->m_showDecimal = checked;
 		updateLabels();
 	});
 
@@ -144,12 +143,12 @@ TapTempoView::TapTempoView(TapTempo* plugin)
 
 void TapTempoView::updateLabels()
 {
-	const double bpm = m_plugin->m_showDecimal ? m_plugin->m_bpm : std::round(m_plugin->m_bpm);
+	const double bpm = m_precisionCheckBox->isChecked() ? m_plugin->m_bpm : std::round(m_plugin->m_bpm);
 	const double hz = bpm / 60;
 	const double ms = bpm > 0 ? 1 / hz * 1000 : 0;
 
-	m_tapButton->setText(QString::number(bpm, 'f', m_plugin->m_showDecimal ? 1 : 0));
-	m_msLabel->setText(tr("%1 ms").arg(ms, 0, 'f', m_plugin->m_showDecimal ? 1 : 0));
+	m_tapButton->setText(QString::number(bpm, 'f', m_precisionCheckBox->isChecked() ? 1 : 0));
+	m_msLabel->setText(tr("%1 ms").arg(ms, 0, 'f', m_precisionCheckBox->isChecked() ? 1 : 0));
 	m_hzLabel->setText(tr("%1 hz").arg(hz, 0, 'f', 4));
 }
 

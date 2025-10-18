@@ -52,8 +52,6 @@ private:
 	int m_numTaps = 0;
 	int m_tapsNeededToDisplay = 2;
 	double m_bpm = 0.0;
-	bool m_showDecimal = false;
-
 	friend class gui::TapTempoView;
 };
 } // namespace lmms
