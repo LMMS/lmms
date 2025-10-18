@@ -175,7 +175,6 @@ MixerView::MixerView(Mixer* mixer) :
 	// adjust window size
 	layout()->invalidate();
 	resize(sizeHint());
-	setFixedHeight(height());
 	layout()->setSizeConstraint(QLayout::SetMinimumSize);
 
 	// add ourself to workspace
