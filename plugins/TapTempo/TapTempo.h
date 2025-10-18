@@ -39,7 +39,7 @@ public:
 	using clock = std::chrono::steady_clock;
 
 	TapTempo();
-	void onBpmClick();
+	void tap();
 
 	QString nodeName() const override;
 	void saveSettings(QDomDocument&, QDomElement&) override {}

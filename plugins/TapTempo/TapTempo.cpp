@@ -49,7 +49,7 @@ TapTempo::TapTempo()
 {
 }
 
-void TapTempo::onBpmClick()
+void TapTempo::tap()
 {
 	const auto currentTime = clock::now();
 	if (m_numTaps == 0)

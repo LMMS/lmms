@@ -112,7 +112,7 @@ TapTempoView::TapTempoView(TapTempo* plugin)
 				m_plugin->m_numTaps % timeSigNumerator == 0 ? "misc/metronome02.ogg" : "misc/metronome01.ogg"));
 		}
 
-		m_plugin->onBpmClick();
+		m_plugin->tap();
 		updateLabels();
 	});
 
@@ -155,7 +155,7 @@ void TapTempoView::updateLabels()
 void TapTempoView::keyPressEvent(QKeyEvent* event)
 {
 	QWidget::keyPressEvent(event);
-	if (!event->isAutoRepeat()) { m_plugin->onBpmClick(); }
+	if (!event->isAutoRepeat()) { m_plugin->tap(!m_muteCheckBox->isChecked()); }
 }
 
 void TapTempoView::closeEvent(QCloseEvent*)
