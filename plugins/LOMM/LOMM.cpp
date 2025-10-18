@@ -43,7 +43,8 @@ extern "C"
 		Plugin::Type::Effect,
 		new PluginPixmapLoader("logo"),
 		nullptr,
-		nullptr
+		nullptr,
+		nullptr,
 	};
 }
 

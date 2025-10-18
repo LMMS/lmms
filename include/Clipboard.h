@@ -26,14 +26,32 @@
 #define LMMS_CLIPBOARD_H
 
 #include <QDomElement>
-#include <QMap>
+#include <QDropEvent>
 
 #include "lmms_export.h"
+
+
+namespace lmms::gui
+{
+	class FileItem;
+}
 
 class QMimeData;
 
 namespace lmms::Clipboard
 {
+	void updateExtensionMap();
+
+	bool isType(const QString& ext, const QString& mimetype);
+	bool isAudioFile(const QString& ext);
+	bool isProjectFile(const QString& ext);
+	bool isPluginPresetFile(const QString& ext);
+	bool isTrackPresetFile(const QString& ext);
+	bool isSoundFontFile(const QString& ext);
+	bool isPatchFile(const QString& ext);
+	bool isMidiFile(const QString& ext);
+	bool isVstPluginFile(const QString& ext);
+
 
 	enum class MimeType
 	{
@@ -53,6 +71,25 @@ namespace lmms::Clipboard
 	void copyStringPair( const QString & key, const QString & value );
 	QString decodeKey( const QMimeData * mimeData );
 	QString decodeValue( const QMimeData * mimeData );
+
+	/**
+	 * @brief Extracts and classifies drag-and-drop data from a QDropEvent.
+	 *
+	 * This function inspects a drop event to determine the type of file or action being dropped
+	 * and retrieves the associated value (typically a file path or an ID). If the event contains URLs,
+	 * it uses the first URL to determine the file extension and classifies the type accordingly,
+	 * such as "samplefile", "trackpresetfile", "vstpluginfile", etc.
+	 *
+	 * The function also uses fallback decoding via StringPairDrag in case the type and value
+	 * were encoded in a non-file-based drag operation.
+	 *
+	 * @param _de Pointer to the QDropEvent containing drag-and-drop data.
+	 * @return A std::pair where:
+	 *         - first is a QString representing the inferred type (e.g., "trackpresetfile", "midifile").
+	 *         - second is the QString value (e.g., file path or identifier).
+	 */
+	LMMS_EXPORT std::pair<QString, QString> decodeMimeData(const QMimeData* mimeData);
+	void startFileDrag(gui::FileItem* file, QObject* qo);
 
 	inline const char * mimeType( MimeType type )
 	{

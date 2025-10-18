@@ -26,19 +26,18 @@
 
 #include <QDebug>
 #include <QDragEnterEvent>
+#include <QFileInfo>
 #include <QPushButton>
 
 #include "AudioEngine.h"
+#include "Clipboard.h"
 #include "Engine.h"
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
 #include "Lv2SubPluginFeatures.h"
 #include "StringPairDrag.h"
-#include "Clipboard.h"
-
 #include "embed.h"
 #include "plugin_export.h"
-
 
 namespace lmms
 {
@@ -57,7 +56,8 @@ Plugin::Descriptor PLUGIN_EXPORT lv2instrument_plugin_descriptor =
 	0x0100,
 	Plugin::Type::Instrument,
 	new PluginPixmapLoader("logo"),
-	nullptr,
+	"lv2",
+	"pluginpresetfile",
 	new Lv2SubPluginFeatures(Plugin::Type::Instrument)
 };
 
@@ -257,30 +257,16 @@ Lv2InsView::Lv2InsView(Lv2Instrument *_instrument, QWidget *_parent) :
 
 void Lv2InsView::dragEnterEvent(QDragEnterEvent *_dee)
 {
-	// For mimeType() and MimeType enum class
-	using namespace Clipboard;
-
-	void (QDragEnterEvent::*reaction)() = &QDragEnterEvent::ignore;
-
-	if (_dee->mimeData()->hasFormat( mimeType( MimeType::StringPair )))
-	{
-		const QString txt =
-			_dee->mimeData()->data( mimeType( MimeType::StringPair ) );
-		if (txt.section(':', 0, 0) == "pluginpresetfile") {
-			reaction = &QDragEnterEvent::acceptProposedAction;
-		}
-	}
-
-	(_dee->*reaction)();
+	StringPairDrag::processDragEnterEvent(_dee, {"pluginpresetfile"});
 }
 
 
 
 
-void Lv2InsView::dropEvent(QDropEvent *_de)
+void Lv2InsView::dropEvent(QDropEvent* _de)
 {
-	const QString type = StringPairDrag::decodeKey(_de);
-	const QString value = StringPairDrag::decodeValue(_de);
+	const auto [type, value] = Clipboard::decodeMimeData(_de->mimeData());
+
 	if (type == "pluginpresetfile")
 	{
 		castModel<Lv2Instrument>()->loadFile(value);

@@ -52,10 +52,18 @@ namespace lmms
 
 extern "C" {
 
-Plugin::Descriptor PLUGIN_EXPORT xpressive_plugin_descriptor = { LMMS_STRINGIFY(
-	PLUGIN_NAME), "Xpressive", QT_TRANSLATE_NOOP("PluginBrowser",
-	"Mathematical expression parser"), "Orr Dvori", 0x0100,
-	Plugin::Type::Instrument, new PluginPixmapLoader("logo"), nullptr, nullptr };
+Plugin::Descriptor PLUGIN_EXPORT xpressive_plugin_descriptor =
+{
+	LMMS_STRINGIFY(PLUGIN_NAME),
+	"Xpressive",
+	QT_TRANSLATE_NOOP("PluginBrowser", "Mathematical expression parser"),
+	"Orr Dvori",
+	0x0100,
+	Plugin::Type::Instrument,
+	new PluginPixmapLoader("logo"),
+	nullptr,
+	nullptr
+};
 
 }
 

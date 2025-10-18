@@ -56,6 +56,7 @@ Plugin::Descriptor PLUGIN_EXPORT organic_plugin_descriptor =
 	new PluginPixmapLoader( "logo" ),
 	nullptr,
 	nullptr,
+	nullptr,
 } ;
 
 }

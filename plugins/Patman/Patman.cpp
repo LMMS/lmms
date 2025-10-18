@@ -64,6 +64,7 @@ Plugin::Descriptor PLUGIN_EXPORT patman_plugin_descriptor =
 	Plugin::Type::Instrument,
 	new PluginPixmapLoader( "logo" ),
 	"pat",
+	"patchfile",
 	nullptr,
 } ;
 
@@ -567,28 +568,9 @@ void PatmanView::updateFilename()
 
 
 
-void PatmanView::dragEnterEvent( QDragEnterEvent * _dee )
+void PatmanView::dragEnterEvent(QDragEnterEvent* _dee)
 {
-	// For mimeType() and MimeType enum class
-	using namespace Clipboard;
-
-	if( _dee->mimeData()->hasFormat( mimeType( MimeType::StringPair ) ) )
-	{
-		QString txt = _dee->mimeData()->data(
-						mimeType( MimeType::StringPair ) );
-		if( txt.section( ':', 0, 0 ) == "samplefile" )
-		{
-			_dee->acceptProposedAction();
-		}
-		else
-		{
-			_dee->ignore();
-		}
-	}
-	else
-	{
-		_dee->ignore();
-	}
+	StringPairDrag::processDragEnterEvent(_dee, {"samplefile"});
 }
 
 
@@ -596,11 +578,11 @@ void PatmanView::dragEnterEvent( QDragEnterEvent * _dee )
 
 void PatmanView::dropEvent( QDropEvent * _de )
 {
-	QString type = StringPairDrag::decodeKey( _de );
-	QString value = StringPairDrag::decodeValue( _de );
-	if( type == "samplefile" )
+	const auto [type, value] = Clipboard::decodeMimeData(_de->mimeData());
+
+	if (type == "samplefile")
 	{
-		m_pi->setFile( value );
+		m_pi->setFile(value);
 		_de->accept();
 		return;
 	}

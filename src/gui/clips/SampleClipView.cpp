@@ -21,16 +21,16 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
+
 #include "SampleClipView.h"
 
 #include <QApplication>
 #include <QMenu>
 #include <QPainter>
 
-#include "GuiApplication.h"
 #include "AutomationEditor.h"
-#include "embed.h"
+#include "Clipboard.h"
+#include "GuiApplication.h"
 #include "PathUtil.h"
 #include "SampleClip.h"
 #include "SampleLoader.h"
@@ -39,6 +39,7 @@
 #include "StringPairDrag.h"
 #include "TrackContainerView.h"
 #include "TrackView.h"
+#include "embed.h"
 
 namespace lmms::gui
 {
@@ -105,38 +106,30 @@ void SampleClipView::constructContextMenu(QMenu* cm)
 
 
 
-
-void SampleClipView::dragEnterEvent( QDragEnterEvent * _dee )
+void SampleClipView::dragEnterEvent(QDragEnterEvent* _dee)
 {
-	if( StringPairDrag::processDragEnterEvent( _dee,
-					"samplefile,sampledata" ) == false )
-	{
-		ClipView::dragEnterEvent( _dee );
-	}
+	StringPairDrag::processDragEnterEvent(_dee, {"samplefile", "sampledata"});
 }
 
-
-
-
-
-
-void SampleClipView::dropEvent( QDropEvent * _de )
+void SampleClipView::dropEvent(QDropEvent* _de )
 {
-	if( StringPairDrag::decodeKey( _de ) == "samplefile" )
+	const auto [type, value] = Clipboard::decodeMimeData(_de->mimeData());
+
+	if (type == "samplefile")
 	{
-		m_clip->setSampleFile( StringPairDrag::decodeValue( _de ) );
+		m_clip->setSampleFile(value);
 		_de->accept();
 	}
-	else if( StringPairDrag::decodeKey( _de ) == "sampledata" )
+	else if (type == "sampledata")
 	{
-		m_clip->setSampleBuffer(SampleLoader::createBufferFromBase64(StringPairDrag::decodeValue(_de)));
+		m_clip->setSampleBuffer(SampleLoader::createBufferFromBase64(value));
 		m_clip->updateLength();
 		update();
 		_de->accept();
 	}
 	else
 	{
-		ClipView::dropEvent( _de );
+		ClipView::dropEvent(_de);
 	}
 }
 

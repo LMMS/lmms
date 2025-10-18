@@ -30,10 +30,12 @@
 #include <QSpacerItem>
 #include <QVBoxLayout>
 
+#include "Clipboard.h"
 #include "ConfigManager.h"
 #include "embed.h"
 #include "Engine.h"
 #include "FadeButton.h"
+#include "FontHelper.h"
 #include "Mixer.h"
 #include "MixerChannelLcdSpinBox.h"
 #include "MixerView.h"
@@ -188,18 +190,17 @@ void SampleTrackView::modelChanged()
 
 
 
-void SampleTrackView::dragEnterEvent(QDragEnterEvent *dee)
+void SampleTrackView::dragEnterEvent(QDragEnterEvent* dee)
 {
-	StringPairDrag::processDragEnterEvent(dee, QString("samplefile"));
+	StringPairDrag::processDragEnterEvent(dee, {"samplefile"});
 }
 
 
 
 
-void SampleTrackView::dropEvent(QDropEvent *de)
+void SampleTrackView::dropEvent(QDropEvent* de)
 {
-	QString type  = StringPairDrag::decodeKey(de);
-	QString value = StringPairDrag::decodeValue(de);
+	const auto [type, value] = Clipboard::decodeMimeData(de->mimeData());
 
 	if (type == "samplefile")
 	{

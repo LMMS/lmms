@@ -24,11 +24,13 @@
 
 #include "AudioFileProcessorView.h"
 
+#include <QFileInfo>
+#include <QPainter>
+#include <iostream>
+
 #include "AudioFileProcessor.h"
 #include "AudioFileProcessorWaveView.h"
-
-#include <QPainter>
-
+#include "Clipboard.h"
 #include "ComboBox.h"
 #include "DataFile.h"
 #include "FontHelper.h"
@@ -37,8 +39,6 @@
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "Track.h"
-#include "Clipboard.h"
-
 
 namespace lmms
 {
@@ -149,31 +149,7 @@ AudioFileProcessorView::AudioFileProcessorView(Instrument* instrument,
 
 void AudioFileProcessorView::dragEnterEvent(QDragEnterEvent* dee)
 {
-	// For mimeType() and MimeType enum class
-	using namespace Clipboard;
-
-	if (dee->mimeData()->hasFormat(mimeType(MimeType::StringPair)))
-	{
-		QString txt = dee->mimeData()->data(
-						mimeType(MimeType::StringPair));
-		if (txt.section(':', 0, 0) == QString("clip_%1").arg(
-							static_cast<int>(Track::Type::Sample)))
-		{
-			dee->acceptProposedAction();
-		}
-		else if (txt.section(':', 0, 0) == "samplefile")
-		{
-			dee->acceptProposedAction();
-		}
-		else
-		{
-			dee->ignore();
-		}
-	}
-	else
-	{
-		dee->ignore();
-	}
+	StringPairDrag::processDragEnterEvent(dee, {"samplefile"});
 }
 
 void AudioFileProcessorView::newWaveView()
@@ -194,10 +170,13 @@ void AudioFileProcessorView::newWaveView()
 
 void AudioFileProcessorView::dropEvent(QDropEvent* de)
 {
-	const auto type = StringPairDrag::decodeKey(de);
-	const auto value = StringPairDrag::decodeValue(de);
+	const auto [type, value] = Clipboard::decodeMimeData(de->mimeData());
 
-	if (type == "samplefile") { castModel<AudioFileProcessor>()->setAudioFile(value); }
+	if (type == "samplefile")
+	{
+		castModel<AudioFileProcessor>()->setAudioFile(value);
+	}
+
 	else if (type == QString("clip_%1").arg(static_cast<int>(Track::Type::Sample)))
 	{
 		DataFile dataFile(value.toUtf8());

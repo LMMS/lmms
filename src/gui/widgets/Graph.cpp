@@ -420,13 +420,9 @@ void Graph::dropEvent( QDropEvent * _de )
 	}
 }
 
-void Graph::dragEnterEvent( QDragEnterEvent * _dee )
+void Graph::dragEnterEvent(QDragEnterEvent* _dee)
 {
-	if( StringPairDrag::processDragEnterEvent( _dee,
-		QString( "samplefile" ) ) == false )
-	{
-		_dee->ignore();
-	}
+	StringPairDrag::processDragEnterEvent(_dee, {"samplefile"});
 }
 
 

@@ -55,6 +55,7 @@ Plugin::Descriptor PLUGIN_EXPORT midiexport_plugin_descriptor =
 	nullptr,
 	nullptr,
 	nullptr,
+	nullptr,
 } ;
 
 }

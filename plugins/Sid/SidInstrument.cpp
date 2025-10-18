@@ -86,6 +86,7 @@ Plugin::Descriptor PLUGIN_EXPORT sid_plugin_descriptor =
 	new PluginPixmapLoader( "logo" ),
 	nullptr,
 	nullptr,
+	nullptr,
 } ;
 
 }
