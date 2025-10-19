@@ -84,7 +84,6 @@ LfoController::~LfoController()
 void LfoController::updateValueBuffer()
 {
 	m_phaseOffset = m_phaseModel.value() / 360.0;
-	float phase = 0.0f;
 	float phasePrev = 0.0f;
 	float phaseDiff = 0.0f;
 
