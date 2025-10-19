@@ -193,14 +193,14 @@ private:
 		auto srcIndex = f_cnt_t{0};
 		auto dstIndex = f_cnt_t{0};
 
-		resampler.reset();
-		resampler.setRatio(WAVERATIO);
+		m_resampler.reset();
+		m_resampler.setRatio(WAVERATIO);
 
 		while (dstIndex < WAVELEN)
 		{
 			const auto input = InterleavedBufferView<const float, 1>{_src + srcIndex, GRAPHLEN - srcIndex};
 			const auto output = InterleavedBufferView<float, 1>{_dst + dstIndex, WAVELEN - dstIndex};
-			const auto result = resampler.process(input, output);
+			const auto result = m_resampler.process(input, output);
 
 			srcIndex = (srcIndex + result.inputFramesUsed) % GRAPHLEN;
 			dstIndex += result.outputFramesGenerated;
@@ -238,7 +238,7 @@ private:
 		}
 	}*/
 
-	AudioResampler resampler = AudioResampler{AudioResampler::Mode::SincFastest, 1};
+	AudioResampler m_resampler = AudioResampler{AudioResampler::Mode::SincFastest, 1};
 
 	FloatModel a1_vol;
 	FloatModel a2_vol;
