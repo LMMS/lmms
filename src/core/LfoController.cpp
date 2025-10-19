@@ -97,7 +97,7 @@ void LfoController::updateValueBuffer()
 		m_bufferLastUpdated += diff;
 	}
 
-	phase = m_currentPhase + m_phaseOffset + phaseDiff;
+	float phase{m_currentPhase + m_phaseOffset + phaseDiff};
 
 	float amount = m_amountModel.value();
 	ValueBuffer *amountBuffer = m_amountModel.valueBuffer();
