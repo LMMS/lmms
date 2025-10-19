@@ -304,7 +304,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	// we can reuse this method.
 	updateSubWindow();
 
-	subWin->setWindowIcon(embed::getIconPixmap("instrument_track"));
+	setWindowIcon(embed::getIconPixmap("instrument_track"));
 	subWin->hide();
 }
 
@@ -732,6 +732,7 @@ void InstrumentTrackWindow::updateSubWindow()
 		if (instrumentViewResizable)
 		{
 			// TODO As of writing SlicerT is the only resizable instrument. Is this code specific to SlicerT?
+			// TODO Expand extraSpace in terms of specific widget sizes or replace with QLayout::setSizeConstraint.
 			const auto extraSpace = QSize(12, 208);
 			setMaximumSize(m_instrumentView->maximumSize() + extraSpace);
 			setMinimumSize(m_instrumentView->minimumSize() + extraSpace);
