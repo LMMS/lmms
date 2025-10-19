@@ -25,7 +25,6 @@
 
 #include "DetachableWidget.h"
 
-//#include <QCloseEvent>
 #include <QEvent>
 
 #include "GuiApplication.h"
