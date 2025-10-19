@@ -202,9 +202,23 @@ void SubWindow::setVisible(bool visible)
 	QMdiSubWindow::setVisible(visible);
 }
 
+
+
+
 bool SubWindow::isDetached() const
 {
 	return widget()->windowFlags().testFlag(Qt::Window);
+}
+
+
+
+
+void SubWindow::setDetached(bool on)
+{
+	if (on)
+		detach();
+	else
+		attach();
 }
 
 
@@ -290,6 +304,9 @@ void SubWindow::setBorderColor( const QColor &c )
 	m_borderColor = c;
 }
 
+
+
+
 void SubWindow::detach()
 {
 #if QT_VERSION < 0x50C00
@@ -340,16 +357,11 @@ void SubWindow::attach()
 	widget()->show();
 	show();
 
-	// Delay moving & resizing using event queue. Ensures that this widget is
-	// visible first, so that resizing works.
-	QObject obj;
-	connect(&obj, &QObject::destroyed, this, [this, frame]() {
-		if (QGuiApplication::platformName() != "wayland")
-		{  // Workaround for wayland reporting on-screen pos as 0-0. If ever solved on wayland side, this check is safe to remove.
-			move(mdiArea()->mapFromGlobal(frame.topLeft()));
-		}
-		resize(frame.size());
-	}, Qt::QueuedConnection);
+	if (QGuiApplication::platformName() != "wayland")
+	{  // Workaround for wayland reporting on-screen pos as 0-0. If ever solved on wayland side, this check is safe to remove.
+		move(mdiArea()->mapFromGlobal(frame.topLeft()));
+	}
+	resize(frame.size());
 }
 
 

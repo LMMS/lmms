@@ -70,6 +70,8 @@ public:
 	int titleBarHeight() const;
 	int frameWidth() const;
 	void setWidget(QWidget* widget);  // Hook for QMdiSubWindow::setWidget
+	bool isDetached() const;
+	void setDetached(bool on);
 
 	// TODO Needed to update the title bar when replacing instruments.
 	// Update works automatically if QMdiSubWindows are used.
@@ -88,7 +90,6 @@ protected:
 	void changeEvent( QEvent * event ) override;
 	bool eventFilter(QObject* obj, QEvent* event) override;
 
-	bool isDetached() const;
 
 signals:
 	void focusLost();

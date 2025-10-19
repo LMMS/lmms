@@ -661,13 +661,33 @@ void InstrumentTrackWindow::viewInstrumentInDirection(int d)
 	// avoid reloading the window if there is only one instrument, as that will just change the active tab
 	if (idxOfNext != idxOfMe)
 	{
+		SubWindow* source_subwin = static_cast<SubWindow*>(parentWidget());
+		SubWindow* target_subwin = static_cast<SubWindow*>(newView->getInstrumentTrackWindow()->parentWidget());
+		QWidget* source_widget;
+		QWidget* target_widget;
+
+		// set widgets we move and get our position from
+		if (source_subwin->isDetached())
+		{
+			source_widget = this;
+			target_widget = newView->getInstrumentTrackWindow();
+		}
+		else
+		{
+			source_widget = parentWidget();
+			target_widget = newView->getInstrumentTrackWindow()->parentWidget();
+		}
+
 		// save current window pos and then hide the window by unchecking its button in the track list
-		QPoint curPos = parentWidget()->pos();
+		QPoint curPos = source_widget->pos();
 		m_itv->m_tlb->setChecked(false);
+
+		// sync detached state with current widget like we do with position
+		target_subwin->setDetached(source_subwin->isDetached());
 
 		// enable the new window by checking its track list button & moving it to where our window just was
 		newView->m_tlb->setChecked(true);
-		newView->getInstrumentTrackWindow()->parentWidget()->move(curPos); // TODO
+		target_widget->move(curPos);
 
 		// scroll the SongEditor/PatternEditor to make sure the new trackview label is visible
 		bringToFront->trackContainerView()->scrollToTrackView(bringToFront);
