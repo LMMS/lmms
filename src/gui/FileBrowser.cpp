@@ -745,13 +745,6 @@ void FileBrowserTreeWidget::openInSlicerT(FileItem* item)
 
 	track->instrument()->loadFile(item->fullName());
 
-	/* auto* slicer = dynamic_cast<lmms::SlicerT*>(track->instrument());
-	if (slicer) {
-		slicer->updateFile(item->fullName());
-	}*/
-
-    tc->addTrack(track);
-
 }
 
 QList<QAction*> FileBrowserTreeWidget::getContextActions(FileItem* file, bool songEditor)
@@ -779,7 +772,7 @@ QList<QAction*> FileBrowserTreeWidget::getContextActions(FileItem* file, bool so
 
 	if (fileIsSample)
 	{
-		auto openInSlicer = new QAction(tr("Open in SlicerT"), nullptr);
+		auto openInSlicer = new QAction(tr("Send to new SlicerT instance"), nullptr);
 		connect(openInSlicer, &QAction::triggered,
 			[=, this]{ openInSlicerT(file); });
 		result.append(openInSlicer);
