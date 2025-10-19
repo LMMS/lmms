@@ -882,8 +882,8 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 						? yCoordOfLevel(OUTVAL(it))
 						: yCoordOfLevel(INVAL(it));
 					float dy = m_draggedOutTangent
-						? y - mouseEvent->y()
-						: mouseEvent->y() - y;
+						? (y - mouseEvent->y()) / m_y_delta
+						: (mouseEvent->y() - y) / m_y_delta;
 					float dx = std::abs(posTicks - POS(it));
 					float newTangent = dy / std::max(dx, 1.0f);
 
