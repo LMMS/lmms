@@ -1155,6 +1155,15 @@ void PianoRoll::drawDetuningInfo( QPainter & _p, const Note * _n, int _x,
 				{
 					int last_y = middle_y - last_level * m_keyLineHeight;
 					_p.drawLine(cur_x, cur_y, cur_x, last_y);
+					// Draw a little hook to signal end of automation.
+					_p.drawLine(cur_x, last_y - 1, cur_x + 5 * m_ppb / TimePos::ticksPerBar(), last_y - 1);
+					_p.drawLine(cur_x, last_y + 1, cur_x + 5 * m_ppb / TimePos::ticksPerBar(), last_y + 1);
+				}
+				else
+				{
+					// Draw a little hook to signal end of automation.
+					_p.drawLine(cur_x, cur_y - 1, cur_x + 5 * m_ppb / TimePos::ticksPerBar(), cur_y - 1);
+					_p.drawLine(cur_x, cur_y + 1, cur_x + 5 * m_ppb / TimePos::ticksPerBar(), cur_y + 1);
 				}
 			}
 		}
@@ -1170,7 +1179,19 @@ void PianoRoll::drawDetuningInfo( QPainter & _p, const Note * _n, int _x,
 			int curTicks = POS(it);
 			int curX = _x + curTicks * m_ppb / TimePos::ticksPerBar();
 			const float curLevel = INVAL(it);
+			const float outLevel = OUTVAL(it);
 			int curY = middle_y - curLevel * m_keyLineHeight;
+			int outY = middle_y - outLevel * m_keyLineHeight;
+
+			if (curLevel != outLevel)
+			{
+				_p.drawEllipse(
+					curX - DETUNING_HANDLE_RADIUS / 2,
+					outY - DETUNING_HANDLE_RADIUS / 2,
+					2 * DETUNING_HANDLE_RADIUS / 2,
+					2 * DETUNING_HANDLE_RADIUS / 2);
+			}
+
 			_p.drawEllipse(
 				curX - DETUNING_HANDLE_RADIUS,
 				curY - DETUNING_HANDLE_RADIUS,
@@ -2433,6 +2454,7 @@ void PianoRoll::mouseReleaseEvent( QMouseEvent * me )
 		pauseChordNotes(m_lastKey);
 	}
 
+	m_lastKey = 0;
 	m_currentNote = nullptr;
 
 	if (m_action != Action::Knife && m_action != Action::Strum)
@@ -2828,6 +2850,7 @@ void PianoRoll::updateParameterEditPos(QMouseEvent* me, Note::ParameterType para
 	if (!m_parameterEditClickedNote) { return; }
 
 	// Calculate the key and time of the mouse cursor in the piano roll
+
 	int keyNum = getKey(me->y());
 	int posTicks = (me->x() - m_whiteKeyWidth) *
 			TimePos::ticksPerBar() / m_ppb + m_currentPosition;
@@ -2881,6 +2904,13 @@ void PianoRoll::updateParameterEditPos(QMouseEvent* me, Note::ParameterType para
 			{
 				aClip->setDragValue(relativePos, relativeKey);
 			}
+			
+			// Preview note
+			if (m_lastKey != keyNum)
+			{
+				testPlayKey(keyNum, MidiDefaultVelocity, 0);
+			}
+			
 		}
 		// If right-clicking, remove nodes.
 		else if (m_parameterEditDownRight)
