@@ -94,7 +94,7 @@ void LfoController::updateValueBuffer()
 	{
 		int diff = s_periods - m_bufferLastUpdated;
 		// I do not know if this part of the code is required, but the diff will be calculated and applied just to be safe.
-		phaseDiff = static_cast<float>( Engine::audioEngine()->framesPerPeriod() * diff ) / m_duration;
+		phaseDiff = static_cast<float>(Engine::audioEngine()->framesPerPeriod() * diff) / m_duration;
 		m_bufferLastUpdated += diff;
 	}
 
