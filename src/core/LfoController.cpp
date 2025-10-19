@@ -139,7 +139,7 @@ void LfoController::updateValueBuffer()
 		f = std::clamp(m_baseModel.value() + (*amountPtr * currentSample / 2.0f), 0.0f, 1.0f);
 
 		phasePrev = phase;
-		m_currentPhase = ( Engine::getSong()->getFrames() ) / m_duration;
+		m_currentPhase = (Engine::getSong()->getFrames()) / m_duration;
 		phase = m_currentPhase + m_phaseOffset + phaseDiff;
 		amountPtr += amountInc;
 	}
