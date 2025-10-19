@@ -22,15 +22,15 @@
  *
  */
 
-#include <QDir>
-#include <QRegularExpression>
-
-#include "AutomationTrack.h"
 #include "RenderManager.h"
 
+#include <QDir>
+#include <QRegularExpression>
+#include <ranges>
+
+#include "AutomationTrack.h"
 #include "PatternStore.h"
 #include "Song.h"
-
 
 namespace lmms
 {
@@ -98,20 +98,16 @@ void RenderManager::renderNextTrack()
 
 void RenderManager::renderTrack(Track* track)
 {
-	const auto songTracks = Engine::getSong()->tracks();
-	const auto patternTracks = Engine::patternStore()->tracks();
+	const auto tracks = {Engine::getSong()->tracks(), Engine::patternStore()->tracks()};
 
-	for (const auto& trackGroup : {songTracks, patternTracks})
+	for (const auto& other : tracks | std::views::join)
 	{
-		for (const auto& otherTrack : trackGroup)
-		{
-			if (dynamic_cast<AutomationTrack*>(otherTrack)) { continue; }
+		if (dynamic_cast<AutomationTrack*>(other)) { continue; }
 
-			if (!otherTrack->isMuted() && otherTrack != track)
-			{
-				m_unmuted.push_back(otherTrack);
-				otherTrack->setMuted(true);
-			}
+		if (!other->isMuted() && other != track)
+		{
+			m_unmuted.push_back(other);
+			other->setMuted(true);
 		}
 	}
 
