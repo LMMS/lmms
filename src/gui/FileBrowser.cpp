@@ -54,6 +54,7 @@
 #include "KeyboardShortcuts.h"
 #include "MainWindow.h"
 #include "PatternStore.h"
+#include "Plugin.h"
 #include "PluginFactory.h"
 #include "PresetPreviewPlayHandle.h"
 #include "Sample.h"
@@ -65,6 +66,7 @@
 #include "StringPairDrag.h"
 #include "TextFloat.h"
 #include "ThreadPool.h"
+#include "Track.h"
 #include "embed.h"
 
 namespace lmms::gui
@@ -730,6 +732,28 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 	if (!contextMenu.isEmpty()) { contextMenu.exec(e->globalPos()); }
 }
 
+void FileBrowserTreeWidget::openInSlicerT(FileItem* item)
+{
+    TrackContainer* tc = Engine::getSong();
+
+    auto* track = dynamic_cast<InstrumentTrack*>(Track::create(Track::Type::Instrument, tc));
+    if (!track) {
+        return;
+	}
+
+	track->loadInstrument("slicert");
+
+	track->instrument()->loadFile(item->fullName());
+
+	/* auto* slicer = dynamic_cast<lmms::SlicerT*>(track->instrument());
+	if (slicer) {
+		slicer->updateFile(item->fullName());
+	}*/
+
+    tc->addTrack(track);
+
+}
+
 QList<QAction*> FileBrowserTreeWidget::getContextActions(FileItem* file, bool songEditor)
 {
 	QList<QAction*> result = QList<QAction*>();
@@ -751,6 +775,14 @@ QList<QAction*> FileBrowserTreeWidget::getContextActions(FileItem* file, bool so
 		connect(toSampleTrack, &QAction::triggered,
 			[=, this]{ openInNewSampleTrack(file); });
 		result.append(toSampleTrack);
+	}
+
+	if (fileIsSample)
+	{
+		auto openInSlicer = new QAction(tr("Open in SlicerT"), nullptr);
+		connect(openInSlicer, &QAction::triggered,
+			[=, this]{ openInSlicerT(file); });
+		result.append(openInSlicer);
 	}
 
 	return result;
