@@ -105,7 +105,6 @@ void LfoController::updateValueBuffer()
 	float *amountPtr = amountBuffer ? &(amountBuffer->values()[ 0 ] ) : &amount;
 	Oscillator::WaveShape waveshape = static_cast<Oscillator::WaveShape>(m_waveModel.value());
 
-	
 	for( float& f : m_valueBuffer )
 	{
 		float currentSample = 0;
