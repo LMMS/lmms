@@ -2,7 +2,7 @@
  * SampleThumbnail.cpp
  *
  * Copyright (c) 2024 Khoi Dau <casboi86@gmail.com>
- * Copyright (c) 2024 Sotonye Atemie <sakertooth@gmail.com>
+ * Copyright (c) 2024 saker <sakertooth@gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
