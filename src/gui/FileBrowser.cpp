@@ -1008,7 +1008,6 @@ void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it)
 		case FileItem::FileHandling::NotSupported:
 		default:
 			break;
-
 	}
 	Engine::audioEngine()->doneChangeInModel();
 }
