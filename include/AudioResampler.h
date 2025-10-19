@@ -116,7 +116,7 @@ public:
 
 private:
 	struct LMMS_EXPORT StateDeleter { void operator()(void* state); };
-	std::unique_ptr<void, StateDeleter> m_state = nullptr;
+	std::unique_ptr<void, StateDeleter> m_state;
 	Mode m_mode;
 	ch_cnt_t m_channels = 0;
 	double m_ratio = 1.0;
