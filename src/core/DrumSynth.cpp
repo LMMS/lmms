@@ -222,17 +222,17 @@ std::size_t DrumSynth::GetPrivateProfileString(const char* sec,
 			is.getline(line.data(), line.size());
 			if (line[0] == '[') { break; }
 
-			char* k = strtok(line.data(), " \t=");
+			char* k = std::strtok(line.data(), " \t=");
 			char* b = strtok(nullptr, "\n\r\0");
 			if (k && !strcasecmp(k, key))
 			{
 				if (b)
 				{
 					// Trim trailing whitespace
-					k = &b[strlen(b)];
+					k = &b[std::strlen(b)];
 					while (k >= b && (*k == ' ' || *k == '\t')) { --k; }
 					k[1] = '\0'; // k == b - 1 when string is empty or all whitespace
-					strncpy(buffer, b, maxlen);
+					std::strncpy(buffer, b, maxlen);
 				}
 				break;
 			}
@@ -240,9 +240,9 @@ std::size_t DrumSynth::GetPrivateProfileString(const char* sec,
 	}
 
 	// Use default value `def` if value is missing
-	if (!buffer[0]) { strncpy(buffer, def, maxlen); }
+	if (!buffer[0]) { std::strncpy(buffer, def, maxlen); }
 	// Since nothing ever copies past `maxlen`, buffer must be null-terminated
-	const auto len = strlen(buffer);
+	const auto len = std::strlen(buffer);
 	return len;
 }
 
