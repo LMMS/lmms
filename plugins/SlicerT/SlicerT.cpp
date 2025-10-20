@@ -329,7 +329,8 @@ void SlicerT::updateFile(QString file)
 	emit dataChanged();
 }
 
-void SlicerT::loadFile(const QString& file) {
+void SlicerT::loadFile(const QString& file)
+{
 	updateFile(file);
 }
 
