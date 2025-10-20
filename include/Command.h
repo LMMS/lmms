@@ -55,7 +55,9 @@ public:
 		, m_undoState{}
 	{}
 	~CommandData() override {};
+	//! gets the data that should be used to execute a command
 	T& getExecuteState() { return m_currentState; }
+	//! gets the data that should be used to undo a command
 	T& getUndoState() { return m_undoState; }
 private:
 	// this can be optimized by using 1 value and swapping between current and old state
@@ -63,6 +65,22 @@ private:
 	T m_currentState;
 	T m_undoState;
 };
+
+/*
+	Here is Command inheritance:
+
+	CommandBase -----> TypelessCommand -> CommandLambda
+	            |
+	            |----> CommandFnPtr
+	            \
+	             ----> ParamCommand ----> ParamCommandLambda
+	                               \
+	                                ----> ParamCommandFnPtr
+	Use these functions / methods:
+	1. push(), operator() -> pushes a command onto a stack
+	2. push(param), operator(param) -> pushes a command onto a stack with a parameter
+*/
+
 
 class LMMS_EXPORT CommandBase
 {
@@ -75,7 +93,9 @@ public:
 		m_container->remove(*this);
 	}
 
+	//! executes the command (without pushing it to the undo stack)
 	virtual void executeCommand() const {}
+	//! undoes the command (without pushing it to the undo stack)
 	virtual void undoCommand() const {}
 	virtual void executeCommand(CommandDataBase& data) const {}
 	virtual void undoCommand(CommandDataBase& data) const {}
@@ -85,9 +105,10 @@ protected:
 };
 
 
-/* A command for functions without input, use this in pair with `CommandLambda`
- *
-*/
+
+
+
+//! use this command if you need to construct a `CommandLambda`
 class LMMS_EXPORT TypelessCommand : public CommandBase
 {
 public:
@@ -98,30 +119,37 @@ public:
 	void operator()() const { push(); }
 };
 
-/* A command for functions without input using lambda
- * To use this, declare a `TypelessCommand*` variable and pass in a `new` `CommandLambda*`
-*/
+
+
+
+
+
+//! use this command if you need to use a lambda (init `TypelessCommand*` with this)
 template<typename DoFn, typename UndoFn>
 class LMMS_EXPORT CommandLambda : public TypelessCommand
 {
 public:
-	CommandLambda(CommandStack& container, DoFn doFn, UndoFn undoFn)
+	//! @param doFn lambda that does the action
+	//! @undoFn doFn lambda that does the action
+	CommandLambda(CommandStack& container, DoFn doLambda, UndoFn undoLambda)
 		: TypelessCommand{container}
-		, m_doFn(doFn)
-		, m_undoFn(undoFn)
+		, m_doLambda(doLambda)
+		, m_undoLambda(undoLambda)
 	{}
 	~CommandLambda() override {};
-	//! executes the command without pushing it to the undo stack
-	void executeCommand() const override { m_doFn(); }
-	void undoCommand() const override { m_undoFn(); }
+	void executeCommand() const override { m_doLambda(); }
+	void undoCommand() const override { m_undoLambda(); }
 private:
-	DoFn m_doFn;
-	UndoFn m_undoFn;
+	DoFn m_doLambda;
+	UndoFn m_undoLambda;
 };
 
-/* A command for functions without input using function pointers
- * construct this on stack
-*/
+
+
+
+
+
+//! use this command if "do" and "undo" functions are already available
 template<typename Parent, typename returnTDo, typename returnTUndo>
 class LMMS_EXPORT CommandFnPtr : public CommandBase
 {
@@ -153,9 +181,11 @@ private:
 
 
 
-/* A command for functions with input, use this in pair with `ParamCommandLambda`
- *
-*/
+
+
+
+
+//! use this command if you need to construct a `ParamCommandLambda`, this command has inputs
 template<typename T>
 class LMMS_EXPORT ParamCommand : public CommandBase //< command with param
 {
@@ -167,27 +197,31 @@ public:
 	void operator()(T data) const { push(data); }
 };
 
-/* A command for functions with input using lambda
- * To use this, declare a `ParamCommand<T>*` variable and pass in a `new` `ParamCommandLambda*`
-*/
+
+
+
+
+
+//! use this command if you need to use a lambda (init `ParamCommand*` with this), this command has inputs
 template<typename T, typename DoFn, typename UndoFn>
 class LMMS_EXPORT ParamCommandLambda : public ParamCommand<T>
 {
 public:
-	ParamCommandLambda(CommandStack& container, DoFn doFn, UndoFn undoFn, T unused)
+	//! @param unused pass this in so the type can be deducted
+	ParamCommandLambda(CommandStack& container, DoFn doLambda, UndoFn undoLambda, T unused)
 		: ParamCommand<T>{container}
-		, m_doFn(doFn)
-		, m_undoFn(undoFn)
+		, m_doLambda(doLambda)
+		, m_undoLambda(undoLambda)
 	{}
 	~ParamCommandLambda() override {};
 
-	//! executes the command without pushing it to the undo stack
 	void executeCommand(CommandDataBase& data) const override
 	{
 		auto* castedData = dynamic_cast<CommandData<T>*>(&data);
 		if (castedData != nullptr)
 		{
-			m_doFn(castedData->getExecuteState(), castedData->getUndoState());
+			//! `m_doLambda` gets T& do data and T& undo data, it must set the undo data
+			m_doLambda(castedData->getExecuteState(), castedData->getUndoState());
 		}
 	}
 	void undoCommand(CommandDataBase& data) const override
@@ -195,17 +229,21 @@ public:
 		auto* castedData = dynamic_cast<CommandData<T>*>(&data);
 		if (castedData != nullptr)
 		{
-			m_undoFn(castedData->getExecuteState(), castedData->getUndoState());
+			//! `m_undoLambda` gets T& do data and T& undo data
+			m_undoLambda(castedData->getExecuteState(), castedData->getUndoState());
 		}
 	}
 private:
-	DoFn m_doFn;
-	UndoFn m_undoFn;
+	DoFn m_doLambda;
+	UndoFn m_undoLambda;
 };
 
-/* A command for functions with input using function pointers
- * construct this on stack
-*/
+
+
+
+
+
+//! use this command if "getter" and "setter" functions are already available, this command has inputs
 template<typename T, typename Parent, typename returnT>
 class LMMS_EXPORT ParamCommandFnPtr : public ParamCommand<T>
 {
@@ -225,7 +263,6 @@ public:
 	}
 	~ParamCommandFnPtr() override {};
 
-	//! executes the command without pushing it to the undo stack
 	void executeCommand(CommandDataBase& data) const override
 	{
 		auto* castedData = dynamic_cast<CommandData<T>*>(&data);
