@@ -42,6 +42,8 @@
 #include <QWindow>
 
 #include "embed.h"
+#include "GuiApplication.h"
+#include "MainWindow.h"
 
 namespace lmms::gui
 {
@@ -101,9 +103,6 @@ SubWindow::SubWindow(QWidget *parent, Qt::WindowFlags windowFlags) :
 	setWindowFlags((this->windowFlags() & ~Qt::WindowMinimizeButtonHint) | Qt::CustomizeWindowHint);
 
 	connect( mdiArea(), SIGNAL(subWindowActivated(QMdiSubWindow*)), this, SLOT(focusChanged(QMdiSubWindow*)));
-
-	m_detachHandler = new DetachableWidget();
-	connect(m_detachHandler, &DetachableWidget::attach, this, &SubWindow::attach);
 }
 
 
@@ -117,13 +116,7 @@ SubWindow::SubWindow(QWidget *parent, Qt::WindowFlags windowFlags) :
  */
 void SubWindow::setWidget(QWidget* w)
 {
-	if (widget())
-		widget()->removeEventFilter(m_detachHandler);
-
 	QMdiSubWindow::setWidget(w);
-
-	if (widget())
-		widget()->installEventFilter(m_detachHandler);
 }
 
 
@@ -581,6 +574,24 @@ bool SubWindow::eventFilter(QObject* obj, QEvent* event)
 	case QEvent::WindowStateChange:
 		event->accept();
 		return true;
+	case QEvent::Close:
+		if (widget()->windowFlags().testFlag(Qt::Window))
+		{
+			attach();
+			event->ignore();
+			return true;
+		}
+		else if (getGUI()->mainWindow()->workspace())  // mdiArea exists
+		{
+			widget()->parentWidget()->hide();
+			event->ignore();
+		}
+		else  // is this even reachable?
+		{
+			widget()->hide();
+			event->ignore();
+		}
+		return QMdiSubWindow::eventFilter(obj, event);
 	default:
 		return QMdiSubWindow::eventFilter(obj, event);
 	}

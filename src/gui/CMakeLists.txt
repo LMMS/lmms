@@ -9,7 +9,6 @@ SET(LMMS_SRCS
 	gui/ControllerRackView.cpp
 	gui/ControllerView.cpp
 	gui/Controls.cpp
-	gui/DetachableWidget.cpp
 	gui/EffectControlDialog.cpp
 	gui/EffectRackView.cpp
 	gui/EffectView.cpp

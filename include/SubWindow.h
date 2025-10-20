@@ -30,7 +30,6 @@
 #include <QMdiSubWindow>
 #include <QString>
 
-#include "DetachableWidget.h"
 #include "lmms_export.h"
 
 class QGraphicsDropShadowEffect;
@@ -110,7 +109,6 @@ private:
 	QLabel * m_windowTitle;
 	QGraphicsDropShadowEffect * m_shadow;
 	bool m_hasFocus;
-	DetachableWidget* m_detachHandler;
 
 	static void elideText( QLabel *label, QString text );
 	void adjustTitleBar();
