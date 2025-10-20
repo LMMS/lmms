@@ -765,7 +765,7 @@ QList<QAction*> FileBrowserTreeWidget::getContextActions(FileItem* file, bool so
 		result.append(toSampleTrack);
 	}
 
-	if (fileIsSample)
+	if (fileIsSample && !PluginFactory::instance()->pluginInfo("slicert").isNull())
 	{
 		auto openInSlicer = new QAction(tr("Send to new SlicerT instance"));
 		connect(openInSlicer, &QAction::triggered,
