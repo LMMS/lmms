@@ -1975,8 +1975,8 @@ Do you want to do this now?</source>
     </message>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2149"/>
-        <source>SF2/3</source>
-        <translation>SF2/3</translation>
+        <source>SoundFont/3</source>
+        <translation>SoundFont/3</translation>
     </message>
     <message>
         <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2154"/>
@@ -3322,49 +3322,49 @@ Reactvate them to start the process again, with the last saved state applied to 
     <name>PatchesDialog</name>
     <message>
         <location filename="../../plugins/GigPlayer/PatchesDialog.ui" line="39"/>
-        <location filename="../../plugins/Sf2Player/PatchesDialog.ui" line="39"/>
+        <location filename="../../plugins/SoundFontPlayer/PatchesDialog.ui" line="39"/>
         <source>Qsynth: Channel Preset</source>
         <translation>Qsynth: 채널 프리셋</translation>
     </message>
     <message>
         <location filename="../../plugins/GigPlayer/PatchesDialog.ui" line="67"/>
-        <location filename="../../plugins/Sf2Player/PatchesDialog.ui" line="67"/>
+        <location filename="../../plugins/SoundFontPlayer/PatchesDialog.ui" line="67"/>
         <source>Bank selector</source>
         <translation>뱅크 선택기</translation>
     </message>
     <message>
         <location filename="../../plugins/GigPlayer/PatchesDialog.ui" line="92"/>
-        <location filename="../../plugins/Sf2Player/PatchesDialog.ui" line="92"/>
+        <location filename="../../plugins/SoundFontPlayer/PatchesDialog.ui" line="92"/>
         <source>Bank</source>
         <translation>뱅크</translation>
     </message>
     <message>
         <location filename="../../plugins/GigPlayer/PatchesDialog.ui" line="98"/>
-        <location filename="../../plugins/Sf2Player/PatchesDialog.ui" line="98"/>
+        <location filename="../../plugins/SoundFontPlayer/PatchesDialog.ui" line="98"/>
         <source>Program selector</source>
         <translation>프로그램 선택기</translation>
     </message>
     <message>
         <location filename="../../plugins/GigPlayer/PatchesDialog.ui" line="123"/>
-        <location filename="../../plugins/Sf2Player/PatchesDialog.ui" line="123"/>
+        <location filename="../../plugins/SoundFontPlayer/PatchesDialog.ui" line="123"/>
         <source>Patch</source>
         <translation>패치</translation>
     </message>
     <message>
         <location filename="../../plugins/GigPlayer/PatchesDialog.ui" line="128"/>
-        <location filename="../../plugins/Sf2Player/PatchesDialog.ui" line="128"/>
+        <location filename="../../plugins/SoundFontPlayer/PatchesDialog.ui" line="128"/>
         <source>Name</source>
         <translation>이름</translation>
     </message>
     <message>
         <location filename="../../plugins/GigPlayer/PatchesDialog.ui" line="173"/>
-        <location filename="../../plugins/Sf2Player/PatchesDialog.ui" line="173"/>
+        <location filename="../../plugins/SoundFontPlayer/PatchesDialog.ui" line="173"/>
         <source>OK</source>
         <translation>확인</translation>
     </message>
     <message>
         <location filename="../../plugins/GigPlayer/PatchesDialog.ui" line="192"/>
-        <location filename="../../plugins/Sf2Player/PatchesDialog.ui" line="192"/>
+        <location filename="../../plugins/SoundFontPlayer/PatchesDialog.ui" line="192"/>
         <source>Cancel</source>
         <translation>취소</translation>
     </message>
@@ -3542,7 +3542,7 @@ Reactvate them to start the process again, with the last saved state applied to 
         <translation>Sean Costello의 리버브 알고리즘</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="64"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="64"/>
         <source>Player for SoundFont files</source>
         <translation>사운드폰트 파일용 재생기</translation>
     </message>
@@ -4266,7 +4266,7 @@ Plugin Name
     </message>
     <message>
         <location filename="../../plugins/CarlaBase/carla/source/frontend/pluginlist/pluginlistdialog.cpp" line="1278"/>
-        <source>Discovering SF2 kits...</source>
+        <source>Discovering SoundFont kits...</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -8647,74 +8647,74 @@ Reason: &quot;%2&quot;</source>
     </message>
 </context>
 <context>
-    <name>lmms::Sf2Instrument</name>
+    <name>lmms::SoundFontInstrument</name>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="134"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="134"/>
         <source>Bank</source>
         <translation>뱅크</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="135"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="135"/>
         <source>Patch</source>
         <translation>패치</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="136"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="136"/>
         <source>Gain</source>
         <translation>게인</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="137"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="137"/>
         <source>Reverb</source>
         <translation>리버브</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="138"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="138"/>
         <source>Reverb room size</source>
         <translation>리버브 공간 크기</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="139"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="139"/>
         <source>Reverb damping</source>
         <translation>리버브 진폭 감소</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="140"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="140"/>
         <source>Reverb width</source>
         <translation>리버브 폭</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="141"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="141"/>
         <source>Reverb level</source>
         <translation>리버브 레벨</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="142"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="142"/>
         <source>Chorus</source>
         <translation>코러스</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="143"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="143"/>
         <source>Chorus voices</source>
         <translation>코러스 보이스</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="144"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="144"/>
         <source>Chorus level</source>
         <translation>코러스 레벨</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="145"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="145"/>
         <source>Chorus speed</source>
         <translation>코러스 속도</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="146"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="146"/>
         <source>Chorus depth</source>
         <translation>코러스 깊이</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="411"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="411"/>
         <source>A soundfont %1 could not be loaded.</source>
         <translation>%1 사운드폰트를 불러올 수 없습니다.</translation>
     </message>
@@ -16848,13 +16848,13 @@ Warning: This operation can not be undone.</source>
     </message>
     <message>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="789"/>
-        <source>SF2 directory</source>
-        <translation>SF2 디렉터리</translation>
+        <source>SoundFont directory</source>
+        <translation>SoundFont 디렉터리</translation>
     </message>
     <message>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="794"/>
-        <source>Default SF2</source>
-        <translation>기본 SF2</translation>
+        <source>Default SoundFont</source>
+        <translation>기본 SoundFont</translation>
     </message>
     <message>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="799"/>
@@ -16940,13 +16940,13 @@ Latency: %2 ms</source>
     </message>
     <message>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="1320"/>
-        <source>Choose your SF2 directory</source>
-        <translation>사용자의 SF2 디렉터리 고르기</translation>
+        <source>Choose your SoundFont directory</source>
+        <translation>사용자의 SoundFont 디렉터리 고르기</translation>
     </message>
     <message>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="1338"/>
-        <source>Choose your default SF2</source>
-        <translation>사용자의 기본 SF2 고르기</translation>
+        <source>Choose your default SoundFont</source>
+        <translation>사용자의 기본 SoundFont 고르기</translation>
     </message>
     <message>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="1359"/>
@@ -16965,71 +16965,71 @@ Latency: %2 ms</source>
     </message>
 </context>
 <context>
-    <name>lmms::gui::Sf2InstrumentView</name>
+    <name>lmms::gui::SoundFontInstrumentView</name>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="994"/>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1203"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="994"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="1203"/>
         <source>Open SoundFont file</source>
         <translation>사운드폰트 파일 열기</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1006"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="1006"/>
         <source>Choose patch</source>
         <translation>패치 고르기</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1040"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="1040"/>
         <source>Gain:</source>
         <translation>게인:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1053"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="1053"/>
         <source>Apply reverb (if supported)</source>
         <translation>리버브 적용 (지원될 경우)</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1057"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="1057"/>
         <source>Room size:</source>
         <translation>공간 크기:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1061"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="1061"/>
         <source>Damping:</source>
         <translation>진폭 감소:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1065"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="1065"/>
         <source>Width:</source>
         <translation>폭:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1069"/>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1096"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="1069"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="1096"/>
         <source>Level:</source>
         <translation>레벨:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1089"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="1089"/>
         <source>Apply chorus (if supported)</source>
         <translation>코러스 적용 (지원될 경우)</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1092"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="1092"/>
         <source>Voices:</source>
         <translation>보이스:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1100"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="1100"/>
         <source>Speed:</source>
         <translation>속도:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1104"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="1104"/>
         <source>Depth:</source>
         <translation>깊이:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1207"/>
+        <location filename="../../plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="1207"/>
         <source>SoundFont Files (*.sf2 *.sf3)</source>
         <translation>사운드폰트 파일 (*.sf2 *.sf3)</translation>
     </message>
