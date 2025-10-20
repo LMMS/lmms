@@ -192,11 +192,12 @@ private:
 
 
 private slots:
-	void activateListItem( QTreeWidgetItem * item, int column );
-	void openInNewInstrumentTrack( lmms::gui::FileItem* item, bool songEditor );
-	bool openInNewSampleTrack( lmms::gui::FileItem* item );
-	void sendToActiveInstrumentTrack( lmms::gui::FileItem* item );
-	void updateDirectory( QTreeWidgetItem * item );
+	void activateListItem(QTreeWidgetItem* item, int column);
+	void openInNewInstrumentTrack(FileItem* item, bool songEditor);
+	bool openInNewSampleTrack(FileItem* item);
+	void openInSlicerT(FileItem* item);
+	void sendToActiveInstrumentTrack(FileItem* item);
+	void updateDirectory(QTreeWidgetItem* item);
 } ;
 
 

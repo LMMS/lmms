@@ -54,6 +54,7 @@
 #include "KeyboardShortcuts.h"
 #include "MainWindow.h"
 #include "PatternStore.h"
+#include "Plugin.h"
 #include "PluginFactory.h"
 #include "PresetPreviewPlayHandle.h"
 #include "Sample.h"
@@ -65,6 +66,7 @@
 #include "StringPairDrag.h"
 #include "TextFloat.h"
 #include "ThreadPool.h"
+#include "Track.h"
 #include "embed.h"
 
 namespace lmms::gui
@@ -730,6 +732,16 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 	if (!contextMenu.isEmpty()) { contextMenu.exec(e->globalPos()); }
 }
 
+void FileBrowserTreeWidget::openInSlicerT(FileItem* item)
+{
+    TrackContainer* tc = Engine::getSong();
+
+    auto* track = dynamic_cast<InstrumentTrack*>(Track::create(Track::Type::Instrument, tc));
+
+	track->loadInstrument("slicert");
+	track->instrument()->loadFile(item->fullName());
+}
+
 QList<QAction*> FileBrowserTreeWidget::getContextActions(FileItem* file, bool songEditor)
 {
 	QList<QAction*> result = QList<QAction*>();
@@ -740,17 +752,25 @@ QList<QAction*> FileBrowserTreeWidget::getContextActions(FileItem* file, bool so
 		tr("Send to new instrument track");
 	QString shortcutMod = songEditor ? "" : UI_CTRL_KEY + QString(" + ");
 
-	auto toInstrument = new QAction(instrumentAction + tr(" (%2Enter)").arg(shortcutMod), nullptr);
+	auto toInstrument = new QAction(instrumentAction + tr(" (%2Enter)").arg(shortcutMod));
 	connect(toInstrument, &QAction::triggered,
 		[=, this]{ openInNewInstrumentTrack(file, songEditor); });
 	result.append(toInstrument);
 
 	if (songEditor && fileIsSample)
 	{
-		auto toSampleTrack = new QAction(tr("Send to new sample track (Shift + Enter)"), nullptr);
+		auto toSampleTrack = new QAction(tr("Send to new sample track (Shift + Enter)"));
 		connect(toSampleTrack, &QAction::triggered,
 			[=, this]{ openInNewSampleTrack(file); });
 		result.append(toSampleTrack);
+	}
+
+	if (fileIsSample && !PluginFactory::instance()->pluginInfo("slicert").isNull())
+	{
+		auto openInSlicer = new QAction(tr("Send to new SlicerT instance"));
+		connect(openInSlicer, &QAction::triggered,
+			[=, this]{ openInSlicerT(file); });
+		result.append(openInSlicer);
 	}
 
 	return result;
@@ -983,7 +1003,6 @@ void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it)
 		case FileItem::FileHandling::NotSupported:
 		default:
 			break;
-
 	}
 	Engine::audioEngine()->doneChangeInModel();
 }

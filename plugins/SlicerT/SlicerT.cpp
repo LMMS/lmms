@@ -329,6 +329,11 @@ void SlicerT::updateFile(QString file)
 	emit dataChanged();
 }
 
+void SlicerT::loadFile(const QString& file)
+{
+	updateFile(file);
+}
+
 void SlicerT::updateSlices()
 {
 	findSlices();
