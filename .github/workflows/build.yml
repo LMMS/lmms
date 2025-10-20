@@ -181,11 +181,11 @@ jobs:
         arch: [ x86_64, arm64 ]
         include:
           - arch: x86_64
-            os: macos-13
-            xcode: "15.2"
+            os: macos-15-intel
+            xcode: "16.4"
           - arch: arm64
-            os: macos-14
-            xcode: "15.4"
+            os: macos-15
+            xcode: "16.4"
     name: macos-${{ matrix.arch }}
     runs-on: ${{ matrix.os }}
     env:
@@ -235,6 +235,7 @@ jobs:
       - name: Configure
         run: |
           ccache --zero-stats
+          source .github/workflows/macos-env.sh
           mkdir build
           cmake -S . \
                 -B build \

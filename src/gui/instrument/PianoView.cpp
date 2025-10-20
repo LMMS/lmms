@@ -41,7 +41,7 @@
 #include <QCursor>
 #include <QKeyEvent>
 #include <QPainter>
-#include <QPainterPath>
+#include <QPainterPath>  // IWYU pragma: keep
 #include <QVBoxLayout>
 
 #include "AutomatableModelView.h"
@@ -49,7 +49,6 @@
 #include "PianoView.h"
 #include "Piano.h"
 #include "CaptionMenu.h"
-#include "embed.h"
 #include "Engine.h"
 #include "FontHelper.h"
 #include "InstrumentTrack.h"

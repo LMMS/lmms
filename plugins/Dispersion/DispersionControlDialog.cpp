@@ -29,7 +29,6 @@
 
 #include "AutomatableButton.h"
 #include "DispersionControls.h"
-#include "embed.h"
 #include "Knob.h"
 #include "LcdSpinBox.h"
 

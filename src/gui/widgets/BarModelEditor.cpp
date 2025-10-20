@@ -1,7 +1,6 @@
 #include <BarModelEditor.h>
 
 #include <QPainter>
-#include <QStyle>
 
 
 namespace lmms::gui

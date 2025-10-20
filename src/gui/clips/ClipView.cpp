@@ -34,21 +34,15 @@
 #include "AutomationClip.h"
 #include "Clipboard.h"
 #include "ColorChooser.h"
-#include "ComboBoxModel.h"
 #include "DataFile.h"
 #include "DeprecationHelper.h"
 #include "Engine.h"
 #include "embed.h"
 #include "GuiApplication.h"
-#include "InstrumentTrack.h"
-#include "InstrumentTrackView.h"
 #include "KeyboardShortcuts.h"
-#include "MidiClip.h"
 #include "MidiClipView.h"
-#include "Note.h"
 #include "PatternClip.h"
 #include "PatternStore.h"
-#include "SampleClip.h"
 #include "Song.h"
 #include "SongEditor.h"
 #include "StringPairDrag.h"
@@ -505,7 +499,7 @@ void ClipView::updateCursor(QMouseEvent * me)
 	const auto posX = position(me).x();
 
 	// If we are at the edges, use the resize cursor
-	if (!me->buttons() && m_clip->getResizable() && !isSelected()
+	if (!me->buttons() && m_clip->manuallyResizable() && !isSelected()
 		&& ((posX > width() - RESIZE_GRIP_WIDTH) || (posX < RESIZE_GRIP_WIDTH)))
 	{
 		setCursor(Qt::SizeHorCursor);
@@ -674,7 +668,7 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 				setInitialPos(pos);
 				setInitialOffsets();
 
-				if (!m_clip->getResizable() && !knifeMode)
+				if (!m_clip->manuallyResizable() && !knifeMode)
 				{	// Always move clips that can't be manually resized
 					m_action = Action::Move;
 					setCursor( Qt::SizeAllCursor );

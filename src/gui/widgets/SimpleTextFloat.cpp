@@ -25,7 +25,6 @@
 #include "SimpleTextFloat.h"
 
 #include <QTimer>
-#include <QStyleOption>
 #include <QHBoxLayout>
 #include <QLabel>
 

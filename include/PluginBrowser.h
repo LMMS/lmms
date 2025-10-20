@@ -30,7 +30,6 @@
 #include "SideBarWidget.h"
 #include "Plugin.h"
 
-class QLineEdit;
 class QTreeWidget;
 
 namespace lmms::gui

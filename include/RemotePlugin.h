@@ -25,17 +25,20 @@
 #ifndef LMMS_REMOTE_PLUGIN_H
 #define LMMS_REMOTE_PLUGIN_H
 
+#include <QThread>
+#include <QProcess>
+#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
+#include <QRecursiveMutex>  // IWYU pragma: keep
+#endif
+
 #include "RemotePluginBase.h"
 #include "SharedMemory.h"
-
-#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
-	#include <QRecursiveMutex>
-#endif
+#include "LmmsTypes.h"
 
 namespace lmms
 {
 
-
+class MidiEvent;
 class RemotePlugin;
 class SampleFrame;
 

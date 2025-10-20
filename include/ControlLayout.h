@@ -78,8 +78,6 @@
 #include <QStyle>
 
 class QLayoutItem;
-class QRect;
-class QString;
 class QLineEdit;
 
 

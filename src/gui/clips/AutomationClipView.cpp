@@ -23,12 +23,10 @@
  */
 #include "AutomationClipView.h"
 
-#include <set>
-
 #include <QApplication>
 #include <QMouseEvent>
 #include <QPainter>
-#include <QPainterPath>
+#include <QPainterPath>  // IWYU pragma: keep
 #include <QMenu>
 
 #include "AutomationEditor.h"

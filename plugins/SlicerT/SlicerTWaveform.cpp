@@ -25,7 +25,9 @@
 #include "SlicerTWaveform.h"
 
 #include <QBitmap>
-#include <qpainterpath.h>
+#include <QMouseEvent>
+#include <QPainter>
+#include <QPainterPath>
 
 #include "DeprecationHelper.h"
 #include "SampleThumbnail.h"
