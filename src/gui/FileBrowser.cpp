@@ -737,12 +737,8 @@ void FileBrowserTreeWidget::openInSlicerT(FileItem* item)
     TrackContainer* tc = Engine::getSong();
 
     auto* track = dynamic_cast<InstrumentTrack*>(Track::create(Track::Type::Instrument, tc));
-    if (!track) {
-        return;
-	}
 
 	track->loadInstrument("slicert");
-
 	track->instrument()->loadFile(item->fullName());
 
 }
@@ -757,14 +753,14 @@ QList<QAction*> FileBrowserTreeWidget::getContextActions(FileItem* file, bool so
 		tr("Send to new instrument track");
 	QString shortcutMod = songEditor ? "" : UI_CTRL_KEY + QString(" + ");
 
-	auto toInstrument = new QAction(instrumentAction + tr(" (%2Enter)").arg(shortcutMod), nullptr);
+	auto toInstrument = new QAction(instrumentAction + tr(" (%2Enter)").arg(shortcutMod));
 	connect(toInstrument, &QAction::triggered,
 		[=, this]{ openInNewInstrumentTrack(file, songEditor); });
 	result.append(toInstrument);
 
 	if (songEditor && fileIsSample)
 	{
-		auto toSampleTrack = new QAction(tr("Send to new sample track (Shift + Enter)"), nullptr);
+		auto toSampleTrack = new QAction(tr("Send to new sample track (Shift + Enter)"));
 		connect(toSampleTrack, &QAction::triggered,
 			[=, this]{ openInNewSampleTrack(file); });
 		result.append(toSampleTrack);
@@ -772,7 +768,7 @@ QList<QAction*> FileBrowserTreeWidget::getContextActions(FileItem* file, bool so
 
 	if (fileIsSample)
 	{
-		auto openInSlicer = new QAction(tr("Send to new SlicerT instance"), nullptr);
+		auto openInSlicer = new QAction(tr("Send to new SlicerT instance"));
 		connect(openInSlicer, &QAction::triggered,
 			[=, this]{ openInSlicerT(file); });
 		result.append(openInSlicer);
