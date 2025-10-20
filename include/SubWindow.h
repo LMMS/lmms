@@ -64,6 +64,7 @@ public:
 	QBrush activeColor() const;
 	QColor textShadowColor() const;
 	QColor borderColor() const;
+	QMargins decorationMargins() const;
 	void setActiveColor( const QBrush & b );
 	void setTextShadowColor( const QColor &c );
 	void setBorderColor( const QColor &c );

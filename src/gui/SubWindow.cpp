@@ -348,7 +348,9 @@ void SubWindow::attach()
 
 	if (!isDetached()) { return; }
 
-	auto frame = widget()->windowHandle()->frameGeometry();
+	auto frame = widget()->windowHandle()->geometry();
+	frame.moveTo(mdiArea()->mapFromGlobal(frame.topLeft()));
+	frame += decorationMargins();
 
 	auto flags = windowFlags();
 	flags &= ~Qt::Window;
@@ -357,11 +359,10 @@ void SubWindow::attach()
 	widget()->show();
 	show();
 
-	if (QGuiApplication::platformName() != "wayland")
-	{  // Workaround for wayland reporting on-screen pos as 0-0. If ever solved on wayland side, this check is safe to remove.
-		move(mdiArea()->mapFromGlobal(frame.topLeft()));
-	}
-	resize(frame.size());
+	if (QGuiApplication::platformName() == "wayland")
+		resize(frame.size());  // Workaround for wayland reporting position as 0-0.
+	else
+		setGeometry(frame);
 }
 
 
@@ -382,6 +383,17 @@ int SubWindow::frameWidth() const
 	QStyleOptionFrame so;
 	return style()->pixelMetric(QStyle::PM_MdiSubWindowFrameWidth, &so, this);
 }
+
+
+
+
+QMargins SubWindow::decorationMargins() const
+{
+	//              left,         top,              right,        bottom
+	return QMargins(frameWidth(), titleBarHeight(), frameWidth(), frameWidth());
+}
+
+
 
 
 void SubWindow::updateTitleBar()
