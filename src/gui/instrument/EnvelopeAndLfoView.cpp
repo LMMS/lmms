@@ -54,7 +54,7 @@ EnvelopeAndLfoView::EnvelopeAndLfoView(QWidget * parent) :
 	ModelView(nullptr, this),
 	m_params(nullptr)
 {
-	// Helper lambdas for consistent repeated buiding of certain widgets
+	// Helper lambdas for consistent repeated building of certain widgets
 	auto buildKnob = [&](const QString& label, const QString& hintText)
 	{
 		auto knob = new Knob(KnobType::Bright26, label, this, Knob::LabelRendering::LegacyFixedFontSize);

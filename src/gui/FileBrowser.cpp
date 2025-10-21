@@ -1148,7 +1148,7 @@ void Directory::update()
 							"--- Factory files ---" ) );
 					sep->setIcon( 0, embed::getIconPixmap(
 								"factory_files" ) );
-					// add delimeter after last file before appending our files
+					// add delimiter after last file before appending our files
 					insertChild( filesBeforeAdd + m_dirCount, sep );
 				}
 			}

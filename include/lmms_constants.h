@@ -86,7 +86,7 @@ inline constexpr auto ARANGE_SILENT_START   = -60;
 inline constexpr auto ARANGE_SILENT_END     = -10;
 
 
-// This macro is used to handle path seperation properly in windows
+// This macro is used to handle path separation properly in windows
 constexpr char LADSPA_PATH_SEPERATOR =
 #ifdef LMMS_BUILD_WIN32
 ';';

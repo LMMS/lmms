@@ -140,7 +140,7 @@ void MidiClipView::transposeSelection()
 {
 	const auto selection = getClickedClips();
 
-	// Calculate the key boundries for all clips
+	// Calculate the key boundaries for all clips
 	int highest = 0;
 	int lowest = NumKeys - 1;
 	for (ClipView* clipview: selection)
@@ -759,7 +759,7 @@ void MidiClipView::paintEvent( QPaintEvent * )
 
 		int const notesBorder = 4; // Border for the notes towards the top and bottom in pixels
 
-		// The relavant painting code starts here
+		// The relevant painting code starts here
 		p.save();
 
 		p.translate(0., distanceToTop + notesBorder);
