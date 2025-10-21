@@ -174,7 +174,13 @@ void FileBrowser::addContentCheckBox()
 	auto configCheckBox = [this](QBoxLayout* boxLayout, QCheckBox* box, Qt::CheckState checkState)
 	{
 		box->setCheckState(checkState);
-		connect(box, SIGNAL(stateChanged(int)), this, SLOT(reloadTree()));
+
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
+		connect(box, &QCheckBox::checkStateChanged, this, &FileBrowser::reloadTree);
+#else
+		connect(box, &QCheckBox::stateChanged, this, &FileBrowser::reloadTree);
+#endif
+
 		boxLayout->addWidget(box);
 	};
 
