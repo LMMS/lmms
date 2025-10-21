@@ -49,8 +49,9 @@ void CommandStack::pushBack(const CommandBase& command, CommandDataBase* command
 	{
 		popBack();
 	}
+	auto test = std::unique_ptr(new int(2));
 
-	m_stack.push_back(std::make_pair(&command, commandData));
+	m_stack.push_back(std::make_pair(&command, std::unique_ptr<CommandDataBase*>(new CommandDataBase(*commandData))));
 	redo();
 }
 
@@ -59,7 +60,7 @@ void CommandStack::undo()
 	if (m_undoSize <= 0) { return; }
 
 	--m_undoSize;
-	if (m_stack[m_undoSize].second != nullptr)
+	if (m_stack[m_undoSize].second.get() != nullptr)
 	{
 		m_stack[m_undoSize].first->undoCommand(*m_stack[m_undoSize].second);
 	}
@@ -73,7 +74,7 @@ void CommandStack::redo()
 {
 	if (m_undoSize >= m_stack.size()) { return; }
 
-	if (m_stack[m_undoSize].second != nullptr)
+	if (m_stack[m_undoSize].second.get() != nullptr)
 	{
 		m_stack[m_undoSize].first->executeCommand(*m_stack[m_undoSize].second);
 	}
@@ -103,16 +104,17 @@ void CommandStack::remove(const CommandBase& command)
 	// could be optimized by deleting [foundIndex].second and just copying instead of swaping
 	for (size_t i{foundIndex}; i + 1 < m_stack.size(); ++i)
 	{
-		auto swap{m_stack[foundIndex]};
-		m_stack[foundIndex] = m_stack[foundIndex + 1];
-		m_stack[foundIndex + 1] = swap;
+		std::swap(m_stack[foundIndex].second, m_stack[foundIndex + 1].second);
+
+		auto swap{m_stack[foundIndex].first};
+		m_stack[foundIndex].first = m_stack[foundIndex + 1].first;
+		m_stack[foundIndex + 1].first = swap;
 	}
 	popBack();
 }
 
 void CommandStack::popBack()
 {
-	delete m_stack[m_stack.size() - 1].second;
 	m_stack.pop_back();
 }
 

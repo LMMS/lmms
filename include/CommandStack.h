@@ -25,7 +25,8 @@
 #ifndef LMMS_COMMAND_STACK
 #define LMMS_COMMAND_STACK
 
-#include <utility>
+#include <memory> // unique_ptr
+#include <utility> // pair
 #include <vector>
 
 #include "lmms_export.h"
@@ -51,7 +52,7 @@ private:
 	void popBack();
 	size_t m_undoSize;
 	//! stores the used commands (not nullptr) among with the changed data (that could be nullptr)
-	std::vector<std::pair<const CommandBase*, CommandDataBase*>> m_stack;
+	std::vector<std::pair<const CommandBase*, std::unique_ptr<CommandDataBase*>>> m_stack;
 };
 
 } // namespace lmms

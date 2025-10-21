@@ -193,7 +193,7 @@ public:
 	ParamCommand(CommandStack& container)
 		: CommandBase{container} {}
 	//! pushes the command onto the stack and executes it
-	void push(T data) const { m_container->pushBack(*this, static_cast<CommandDataBase*>(new CommandData<T>{data})); }
+	void push(T data) const { m_container->pushBack(*this, new CommandData<T>{data}); }
 	void operator()(T data) const { push(data); }
 };
 
