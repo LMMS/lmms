@@ -580,19 +580,24 @@ void MidiClip::cloneSteps()
 {
 	int oldLength = m_steps;
 	m_steps *= 2; // cloning doubles the track
-	for(int i = 0; i < oldLength; ++i )
-	{
-		Note *toCopy = noteAtStep( i );
-		if( toCopy )
-		{
-			setStep( oldLength + i, true );
-			Note *newNote = noteAtStep( oldLength + i );
-			newNote->setKey( toCopy->key() );
-			newNote->setLength( toCopy->length() );
-			newNote->setPanning( toCopy->getPanning() );
-			newNote->setVolume( toCopy->getVolume() );
-		}
+
+	const TimePos endPosition = TimePos::stepPosition(oldLength);
+
+	// Must reserve so that we don't accidentally grow the vector.
+	m_notes.reserve(m_notes.size() * 2);
+
+	instrumentTrack()->lock();
+
+	for (auto& note: m_notes)  {
+		if (note->pos() >= endPosition) { continue; }
+		auto newNote = note->clone();
+
+		newNote->setPos(endPosition + note->pos());
+		m_notes.push_back(newNote);
 	}
+
+	instrumentTrack()->unlock();
+
 	updateLength();
 	emit dataChanged();
 }
