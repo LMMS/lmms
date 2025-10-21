@@ -64,11 +64,6 @@ LfoController::LfoController( Model * _parent ) :
 	connect( Engine::audioEngine(), SIGNAL(sampleRateChanged()),
 			this, SLOT(updateDuration()));
 
-	connect( Engine::getSong(), SIGNAL(playbackStateChanged()),
-			this, SLOT(updatePhase()));
-	connect( Engine::getSong(), SIGNAL(playbackPositionChanged()),
-			this, SLOT(updatePhase()));
-
 	updateDuration();
 }
 
@@ -89,17 +84,20 @@ LfoController::~LfoController()
 void LfoController::updateValueBuffer()
 {
 	m_phaseOffset = m_phaseModel.value() / 360.0;
-	float phase = m_currentPhase + m_phaseOffset;
 	float phasePrev = 0.0f;
+	float phaseDiff = 0.0f;
 
 	// roll phase up until we're in sync with period counter
 	m_bufferLastUpdated++;
 	if( m_bufferLastUpdated < s_periods )
 	{
 		int diff = s_periods - m_bufferLastUpdated;
-		phase += static_cast<float>( Engine::audioEngine()->framesPerPeriod() * diff ) / m_duration;
+		// I do not know if this part of the code is required, but the diff will be calculated and applied just to be safe.
+		phaseDiff = static_cast<float>(Engine::audioEngine()->framesPerPeriod() * diff) / m_duration;
 		m_bufferLastUpdated += diff;
 	}
+
+	float phase{m_currentPhase + m_phaseOffset + phaseDiff};
 
 	float amount = m_amountModel.value();
 	ValueBuffer *amountBuffer = m_amountModel.valueBuffer();
@@ -139,12 +137,10 @@ void LfoController::updateValueBuffer()
 		f = std::clamp(m_baseModel.value() + (*amountPtr * currentSample / 2.0f), 0.0f, 1.0f);
 
 		phasePrev = phase;
-		phase += 1.0 / m_duration;
+		m_currentPhase = (Engine::getSong()->getFrames()) / m_duration;
+		phase = m_currentPhase + m_phaseOffset + phaseDiff;
 		amountPtr += amountInc;
 	}
-
-	m_currentPhase = absFraction(phase - m_phaseOffset);
-	m_bufferLastUpdated = s_periods;
 }
 
 void LfoController::updatePhase()
