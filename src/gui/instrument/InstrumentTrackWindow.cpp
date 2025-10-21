@@ -682,11 +682,11 @@ void InstrumentTrackWindow::viewInstrumentInDirection(int d)
 		QPoint curPos = source_widget->pos();
 		m_itv->m_tlb->setChecked(false);
 
-		// sync detached state with current widget like we do with position
-		target_subwin->setDetached(source_subwin->isDetached());
-
 		// enable the new window by checking its track list button & moving it to where our window just was
 		newView->m_tlb->setChecked(true);
+
+		// sync detached state with current widget like we do with position
+		target_subwin->setDetached(source_subwin->isDetached());
 
 		target_widget->move(curPos);
 
