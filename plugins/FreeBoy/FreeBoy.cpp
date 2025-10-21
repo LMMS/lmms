@@ -72,7 +72,7 @@ Plugin::Descriptor PLUGIN_EXPORT freeboy_plugin_descriptor =
 
 
 FreeBoyInstrument::FreeBoyInstrument( InstrumentTrack * _instrument_track ) :
-	Instrument( _instrument_track, &freeboy_plugin_descriptor ),
+	Instrument(&freeboy_plugin_descriptor, _instrument_track),
 
 	m_ch1SweepTimeModel( 4.0f, 0.0f, 7.0f, 1.0f, this, tr( "Sweep time" ) ),
 	m_ch1SweepDirModel( false, this, tr( "Sweep direction" ) ),
@@ -228,7 +228,7 @@ float FreeBoyInstrument::desiredReleaseTimeMs() const
 
 
 
-void FreeBoyInstrument::playNote(NotePlayHandle* nph, SampleFrame* workingBuffer)
+void FreeBoyInstrument::playNoteImpl(NotePlayHandle* nph, std::span<SampleFrame> out)
 {
 	const f_cnt_t tfp = nph->totalFramesPlayed();
 	const int samplerate = Engine::audioEngine()->outputSampleRate();
@@ -400,7 +400,7 @@ void FreeBoyInstrument::playNote(NotePlayHandle* nph, SampleFrame* workingBuffer
 			for (ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch)
 			{
 				sample_t s = static_cast<float>(buf[(frame * 2) + ch]) / 32768.0f;
-				workingBuffer[frames - framesLeft + frame + offset][ch] = s;
+				out[frames - framesLeft + frame + offset][ch] = s;
 			}
 		}
 		framesLeft -= count;

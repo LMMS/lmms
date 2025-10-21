@@ -48,6 +48,7 @@ class Lv2InsView;
 
 }
 
+// TODO: Add support for pin connector and a variable number of audio input/output ports
 class Lv2Instrument : public Instrument, public Lv2ControlBase
 {
 	Q_OBJECT
@@ -78,9 +79,9 @@ public:
 	bool handleMidiEvent(const MidiEvent &event,
 		const TimePos &time = TimePos(), f_cnt_t offset = 0) override;
 #else
-	void playNote(NotePlayHandle *nph, SampleFrame*) override;
+	void playNoteImpl(NotePlayHandle* nph, std::span<SampleFrame>) override;
 #endif
-	void play(SampleFrame* buf) override;
+	void playImpl(std::span<SampleFrame> out) override;
 
 	/*
 		misc

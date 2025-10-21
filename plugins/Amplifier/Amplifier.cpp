@@ -51,13 +51,13 @@ Plugin::Descriptor PLUGIN_EXPORT amplifier_plugin_descriptor =
 
 
 AmplifierEffect::AmplifierEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key) :
-	Effect(&amplifier_plugin_descriptor, parent, key),
+	AudioPlugin(&amplifier_plugin_descriptor, parent, key),
 	m_ampControls(this)
 {
 }
 
 
-Effect::ProcessStatus AmplifierEffect::processImpl(SampleFrame* buf, const fpp_t frames)
+ProcessStatus AmplifierEffect::processImpl(InterleavedBufferView<float, 2> inOut)
 {
 	const float d = dryLevel();
 	const float w = wetLevel();
@@ -67,7 +67,7 @@ Effect::ProcessStatus AmplifierEffect::processImpl(SampleFrame* buf, const fpp_t
 	const ValueBuffer* leftBuf = m_ampControls.m_leftModel.valueBuffer();
 	const ValueBuffer* rightBuf = m_ampControls.m_rightModel.valueBuffer();
 
-	for (fpp_t f = 0; f < frames; ++f)
+	for (fpp_t f = 0; f < inOut.frames(); ++f)
 	{
 		const float volume = (volumeBuf ? volumeBuf->value(f) : m_ampControls.m_volumeModel.value()) * 0.01f;
 		const float pan = (panBuf ? panBuf->value(f) : m_ampControls.m_panModel.value()) * 0.01f;
@@ -77,7 +77,7 @@ Effect::ProcessStatus AmplifierEffect::processImpl(SampleFrame* buf, const fpp_t
 		const float panLeft = std::min(1.0f, 1.0f - pan);
 		const float panRight = std::min(1.0f, 1.0f + pan);
 
-		auto& currentFrame = buf[f];
+		auto& currentFrame = inOut.sampleFrameAt(f);
 
 		const auto s = currentFrame * SampleFrame(left * panLeft, right * panRight) * volume;
 

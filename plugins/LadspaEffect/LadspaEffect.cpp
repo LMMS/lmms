@@ -69,7 +69,7 @@ Plugin::Descriptor PLUGIN_EXPORT ladspaeffect_plugin_descriptor =
 
 LadspaEffect::LadspaEffect( Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key ) :
-	Effect( &ladspaeffect_plugin_descriptor, _parent, _key ),
+	AudioPlugin(&ladspaeffect_plugin_descriptor, _parent, _key),
 	m_controls( nullptr ),
 	m_maxSampleRate( 0 ),
 	m_key( LadspaSubPluginFeatures::subPluginKeyToLadspaKey( _key ) )
@@ -128,24 +128,19 @@ void LadspaEffect::changeSampleRate()
 
 
 
-Effect::ProcessStatus LadspaEffect::processImpl(SampleFrame* buf, const fpp_t frames)
+ProcessStatus LadspaEffect::processImpl(InterleavedBufferView<float, 2> inOut)
 {
-	m_pluginMutex.lock();
-	if (!isOkay() || dontRun() || !isEnabled() || !isRunning())
-	{
-		m_pluginMutex.unlock();
-		return ProcessStatus::Sleep;
-	}
-
+	auto inOutSF = inOut.toSampleFrames();
+	const auto frames = inOutSF.size();
 	auto outFrames = frames;
 	SampleFrame* outBuf = nullptr;
 	QVarLengthArray<SampleFrame> sBuf(frames);
 
 	if( m_maxSampleRate < Engine::audioEngine()->outputSampleRate() )
 	{
-		outBuf = buf;
-		buf = sBuf.data();
-		sampleDown(outBuf, buf, m_maxSampleRate);
+		outBuf = inOutSF.data();
+		inOutSF = std::span{sBuf.data(), static_cast<std::size_t>(sBuf.size())};
+		sampleDown(outBuf, inOutSF.data(), m_maxSampleRate);
 		outFrames = frames * m_maxSampleRate /
 				Engine::audioEngine()->outputSampleRate();
 	}
@@ -163,7 +158,7 @@ Effect::ProcessStatus LadspaEffect::processImpl(SampleFrame* buf, const fpp_t fr
 				case BufferRate::ChannelIn:
 					for (fpp_t frame = 0; frame < outFrames; ++frame)
 					{
-						pp->buffer[frame] = buf[frame][channel];
+						pp->buffer[frame] = inOut[frame][channel];
 					}
 					++channel;
 					break;
@@ -233,7 +228,7 @@ Effect::ProcessStatus LadspaEffect::processImpl(SampleFrame* buf, const fpp_t fr
 				case BufferRate::ChannelOut:
 					for (fpp_t frame = 0; frame < outFrames; ++frame)
 					{
-						buf[frame][channel] = d * buf[frame][channel] + w * pp->buffer[frame];
+						inOut[frame][channel] = d * inOut[frame][channel] + w * pp->buffer[frame];
 					}
 					++channel;
 					break;
@@ -248,12 +243,26 @@ Effect::ProcessStatus LadspaEffect::processImpl(SampleFrame* buf, const fpp_t fr
 
 	if (outBuf != nullptr)
 	{
-		sampleBack(buf, outBuf, m_maxSampleRate);
+		sampleBack(inOutSF.data(), outBuf, m_maxSampleRate);
 	}
 
-	m_pluginMutex.unlock();
-
 	return ProcessStatus::ContinueIfNotQuiet;
+}
+
+
+
+
+auto LadspaEffect::processLock() -> bool
+{
+	return m_pluginMutex.tryLock(Engine::getSong()->isExporting() ? -1 : 0);
+}
+
+
+
+
+void LadspaEffect::processUnlock()
+{
+	m_pluginMutex.unlock();
 }
 
 

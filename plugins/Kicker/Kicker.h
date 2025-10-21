@@ -55,8 +55,6 @@ public:
 	KickerInstrument( InstrumentTrack * _instrument_track );
 	~KickerInstrument() override = default;
 
-	void playNote( NotePlayHandle * _n,
-						SampleFrame* _working_buffer ) override;
 	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
 	void saveSettings(QDomDocument& doc, QDomElement& elem) override;
@@ -73,6 +71,8 @@ public:
 
 
 private:
+	void playNoteImpl(NotePlayHandle* nph, std::span<SampleFrame> out) override;
+
 	FloatModel m_startFreqModel;
 	FloatModel m_endFreqModel;
 	TempoSyncKnobModel m_decayModel;

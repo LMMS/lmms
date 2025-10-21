@@ -55,7 +55,7 @@ Plugin::Descriptor PLUGIN_EXPORT compressor_plugin_descriptor =
 
 
 CompressorEffect::CompressorEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key) :
-	Effect(&compressor_plugin_descriptor, parent, key),
+	AudioPlugin(&compressor_plugin_descriptor, parent, key),
 	m_compressorControls(this)
 {
 	m_sampleRate = Engine::audioEngine()->outputSampleRate();
@@ -236,7 +236,7 @@ void CompressorEffect::calcMix()
 
 
 
-Effect::ProcessStatus CompressorEffect::processImpl(SampleFrame* buf, const fpp_t frames)
+ProcessStatus CompressorEffect::processImpl(InterleavedBufferView<float, 2> inOut)
 {
 	m_cleanedBuffers = false;
 
@@ -261,9 +261,9 @@ Effect::ProcessStatus CompressorEffect::processImpl(SampleFrame* buf, const fpp_
 	const bool feedback = m_compressorControls.m_feedbackModel.value();
 	const bool lookahead = m_compressorControls.m_lookaheadModel.value();
 
-	for(fpp_t f = 0; f < frames; ++f)
+	for (float* frame : inOut.framesView())
 	{
-		auto drySignal = std::array{buf[f][0], buf[f][1]};
+		auto drySignal = std::array{frame[0], frame[1]};
 		auto s = std::array{drySignal[0] * m_inGainVal, drySignal[1] * m_inGainVal};
 
 		// Calculate tilt filters, to bias the sidechain to the low or high frequencies
@@ -493,10 +493,10 @@ Effect::ProcessStatus CompressorEffect::processImpl(SampleFrame* buf, const fpp_
 		// Calculate wet/dry value results
 		const float temp1 = delayedDrySignal[0];
 		const float temp2 = delayedDrySignal[1];
-		buf[f][0] = d * temp1 + w * s[0];
-		buf[f][1] = d * temp2 + w * s[1];
-		buf[f][0] = (1 - m_mixVal) * temp1 + m_mixVal * buf[f][0];
-		buf[f][1] = (1 - m_mixVal) * temp2 + m_mixVal * buf[f][1];
+		frame[0] = d * temp1 + w * s[0];
+		frame[1] = d * temp2 + w * s[1];
+		frame[0] = (1 - m_mixVal) * temp1 + m_mixVal * frame[0];
+		frame[1] = (1 - m_mixVal) * temp2 + m_mixVal * frame[1];
 
 		if (--m_lookWrite < 0) { m_lookWrite = m_lookBufLength - 1; }
 

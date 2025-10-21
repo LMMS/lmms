@@ -58,7 +58,7 @@ Plugin::Descriptor PLUGIN_EXPORT flanger_plugin_descriptor =
 
 
 FlangerEffect::FlangerEffect( Model *parent, const Plugin::Descriptor::SubPluginFeatures::Key *key ) :
-	Effect( &flanger_plugin_descriptor, parent, key ),
+	AudioPlugin(&flanger_plugin_descriptor, parent, key),
 	m_flangerControls( this )
 {
 	m_lfo = new QuadratureLfo( Engine::audioEngine()->outputSampleRate() );
@@ -88,7 +88,7 @@ FlangerEffect::~FlangerEffect()
 
 
 
-Effect::ProcessStatus FlangerEffect::processImpl(SampleFrame* buf, const fpp_t frames)
+ProcessStatus FlangerEffect::processImpl(InterleavedBufferView<float, 2> inOut)
 {
 	const float d = dryLevel();
 	const float w = wetLevel();
@@ -101,30 +101,30 @@ Effect::ProcessStatus FlangerEffect::processImpl(SampleFrame* buf, const fpp_t f
 	m_lDelay->setFeedback( m_flangerControls.m_feedbackModel.value() );
 	m_rDelay->setFeedback( m_flangerControls.m_feedbackModel.value() );
 	auto dryS = std::array<sample_t, 2>{};
-	for( fpp_t f = 0; f < frames; ++f )
+	for (float* frame : inOut.framesView())
 	{
 		float leftLfo;
 		float rightLfo;
 
-		buf[f][0] += fastRand(-1.f, +1.f) * noise;
-		buf[f][1] += fastRand(-1.f, +1.f) * noise;
-		dryS[0] = buf[f][0];
-		dryS[1] = buf[f][1];
+		frame[0] += fastRand(-1.f, +1.f) * noise;
+		frame[1] += fastRand(-1.f, +1.f) * noise;
+		dryS[0] = frame[0];
+		dryS[1] = frame[1];
 		m_lfo->tick(&leftLfo, &rightLfo);
 		m_lDelay->setLength( ( float )length + amplitude * (leftLfo+1.0)  );
 		m_rDelay->setLength( ( float )length + amplitude * (rightLfo+1.0)  );
 		if(invertFeedback)
 		{
-			m_lDelay->tick( &buf[f][1] );
-			m_rDelay->tick(&buf[f][0] );
+			m_lDelay->tick(&frame[1]);
+			m_rDelay->tick(&frame[0]);
 		} else
 		{
-			m_lDelay->tick( &buf[f][0] );
-			m_rDelay->tick( &buf[f][1] );
+			m_lDelay->tick(&frame[0]);
+			m_rDelay->tick(&frame[1]);
 		}
 
-		buf[f][0] = ( d * dryS[0] ) + ( w * buf[f][0] );
-		buf[f][1] = ( d * dryS[1] ) + ( w * buf[f][1] );
+		frame[0] = (d * dryS[0]) + (w * frame[0]);
+		frame[1] = (d * dryS[1]) + (w * frame[1]);
 	}
 
 	return ProcessStatus::ContinueIfNotQuiet;

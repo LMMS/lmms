@@ -76,7 +76,6 @@ signals:
 public:
 	SlicerT(InstrumentTrack* instrumentTrack);
 
-	void playNote(NotePlayHandle* handle, SampleFrame* workingBuffer) override;
 	void deleteNotePluginData(NotePlayHandle* handle) override;
 
 	void saveSettings(QDomDocument& document, QDomElement& element) override;
@@ -94,6 +93,8 @@ public:
 	std::vector<Note> getMidi();
 
 private:
+	void playNoteImpl(NotePlayHandle* handle, std::span<SampleFrame> out) override;
+
 	FloatModel m_noteThreshold;
 	FloatModel m_fadeOutFrames;
 	IntModel m_originalBPM;

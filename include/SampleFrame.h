@@ -53,42 +53,44 @@ public:
 	{
 	}
 
+	//! 2 channels, interleaved
 	sample_t* data()
 	{
 		return m_samples.data();
 	}
 
+	//! 2 channels, interleaved
 	const sample_t* data() const
 	{
 		return m_samples.data();
 	}
 
-	sample_t& left()
+	sample_t& leftRef()
 	{
 		return m_samples[0];
 	}
 
-	const sample_t& left() const
+	sample_t left() const
 	{
 		return m_samples[0];
 	}
 
-	void setLeft(const sample_t& value)
+	void setLeft(sample_t value)
 	{
 		m_samples[0] = value;
 	}
 
-	sample_t& right()
+	sample_t& rightRef()
 	{
 		return m_samples[1];
 	}
 
-	const sample_t& right() const
+	sample_t right() const
 	{
 		return m_samples[1];
 	}
 
-	void setRight(const sample_t& value)
+	void setRight(sample_t value)
 	{
 		m_samples[1] = value;
 	}
@@ -98,7 +100,7 @@ public:
 		return m_samples[index];
 	}
 
-	const sample_t& operator[](size_t index) const
+	sample_t operator[](size_t index) const
 	{
 		return m_samples[index];
 	}
@@ -110,8 +112,8 @@ public:
 
 	SampleFrame& operator+=(const SampleFrame& other)
 	{
-		auto & l = left();
-		auto & r = right();
+		auto& l = leftRef();
+		auto& r = rightRef();
 
 		l += other.left();
 		r += other.right();
@@ -139,8 +141,8 @@ public:
 
 	void operator*=(const SampleFrame& other)
 	{
-		left() *= other.left();
-		right() *= other.right();
+		leftRef() *= other.left();
+		rightRef() *= other.right();
 	}
 
 	sample_t sumOfSquaredAmplitudes() const
@@ -168,10 +170,10 @@ public:
 
 	void clamp(sample_t low, sample_t high)
 	{
-		auto & l = left();
+		auto& l = leftRef();
 		l = std::clamp(l, low, high);
 
-		auto & r = right();
+		auto& r = rightRef();
 		r = std::clamp(r, low, high);
 	}
 
@@ -209,6 +211,7 @@ inline SampleFrame getAbsPeakValues(SampleFrame* buffer, size_t frames)
 	return peaks;
 }
 
+//! `source` is 2-channel interleaved data with length of 2 * `frames`
 inline void copyToSampleFrames(SampleFrame* target, const float* source, size_t frames)
 {
 	for (size_t i = 0; i < frames; ++i)
@@ -218,6 +221,7 @@ inline void copyToSampleFrames(SampleFrame* target, const float* source, size_t 
 	}
 }
 
+//! `target` is 2-channel interleaved data with length of 2 * `frames`
 inline void copyFromSampleFrames(float* target, const SampleFrame* source, size_t frames)
 {
 	for (size_t i = 0; i < frames; ++i)

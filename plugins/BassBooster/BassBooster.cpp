@@ -52,7 +52,7 @@ Plugin::Descriptor PLUGIN_EXPORT bassbooster_plugin_descriptor =
 
 
 BassBoosterEffect::BassBoosterEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key ) :
-	Effect( &bassbooster_plugin_descriptor, parent, key ),
+	AudioPlugin(&bassbooster_plugin_descriptor, parent, key),
 	m_frequencyChangeNeeded( false ),
 	m_bbFX( DspEffectLibrary::FastBassBoost( 70.0f, 1.0f, 2.8f ) ),
 	m_bbControls( this )
@@ -69,7 +69,7 @@ BassBoosterEffect::BassBoosterEffect( Model* parent, const Descriptor::SubPlugin
 
 
 
-Effect::ProcessStatus BassBoosterEffect::processImpl(SampleFrame* buf, const fpp_t frames)
+ProcessStatus BassBoosterEffect::processImpl(InterleavedBufferView<float, 2> inOut)
 {
 	// check out changed controls
 	if( m_frequencyChangeNeeded || m_bbControls.m_freqModel.isValueChanged() )
@@ -86,9 +86,9 @@ Effect::ProcessStatus BassBoosterEffect::processImpl(SampleFrame* buf, const fpp
 	const float d = dryLevel();
 	const float w = wetLevel();
 
-	for (fpp_t f = 0; f < frames; ++f)
+	for (fpp_t f = 0; f < inOut.frames(); ++f)
 	{
-		auto& currentFrame = buf[f];
+		auto& currentFrame = inOut.sampleFrameAt(f);
 
 		// Process copy of current sample frame
 		m_bbFX.setGain(gainBuffer ? gainBuffer->value(f) : const_gain);

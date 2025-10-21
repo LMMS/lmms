@@ -38,6 +38,7 @@ class InstrumentTrackWindow;
 class Knob;
 class MidiCCRackView;
 class MixerChannelLcdSpinBox;
+class PinConnector;
 class TrackContainerView;
 class TrackLabelButton;
 
@@ -71,6 +72,7 @@ public:
 	// Create a menu for assigning/creating channels for this track
 	QMenu * createMixerMenu( QString title, QString newMixerLabel ) override;
 
+	void addPinConnectorAction(QMenu* menu);
 
 protected:
 	void modelChanged() override;
@@ -81,6 +83,7 @@ protected:
 private slots:
 	void toggleInstrumentWindow( bool _on );
 	void toggleMidiCCRack();
+	void togglePinConnector();
 	void activityIndicatorPressed();
 	void activityIndicatorReleased();
 
@@ -112,6 +115,7 @@ private:
 	QAction * m_midiOutputAction;
 
 	std::unique_ptr<MidiCCRackView> m_midiCCRackView;
+	PinConnector* m_pinConnectorView = nullptr;
 
 	QPoint m_lastPos;
 

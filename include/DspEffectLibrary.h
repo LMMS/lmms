@@ -87,9 +87,9 @@ namespace lmms::DspEffectLibrary
 			rightFX().setGain(gain);
 		}
 
-		void nextSample(SampleFrame & in)
+		void nextSample(SampleFrame& in)
 		{
-			nextSample(in.left(), in.right());
+			nextSample(in.leftRef(), in.rightRef());
 		}
 
 		void nextSample( sample_t& inLeft, sample_t& inRight )

@@ -58,7 +58,7 @@ Plugin::Descriptor PLUGIN_EXPORT bitcrush_plugin_descriptor =
 }
 
 BitcrushEffect::BitcrushEffect( Model * parent, const Descriptor::SubPluginFeatures::Key * key ) :
-	Effect( &bitcrush_plugin_descriptor, parent, key ),
+	AudioPlugin(&bitcrush_plugin_descriptor, parent, key),
 	m_controls( this ),
 	m_sampleRate( Engine::audioEngine()->outputSampleRate() ),
 	m_filter( m_sampleRate )
@@ -101,7 +101,7 @@ inline float BitcrushEffect::noise( float amt )
 	return fastRand(-amt, +amt);
 }
 
-Effect::ProcessStatus BitcrushEffect::processImpl(SampleFrame* buf, const fpp_t frames)
+ProcessStatus BitcrushEffect::processImpl(InterleavedBufferView<float, 2> inOut)
 {
 	// update values
 	if( m_needsUpdate || m_controls.m_rateEnabled.isValueChanged() )
@@ -149,7 +149,7 @@ Effect::ProcessStatus BitcrushEffect::processImpl(SampleFrame* buf, const fpp_t 
 	// read input buffer and write it to oversampled buffer
 	if( m_rateEnabled ) // rate crushing enabled so do that
 	{
-		for (auto f = std::size_t{0}; f < frames; ++f)
+		for (auto f = std::size_t{0}; f < inOut.frames(); ++f)
 		{
 			for( int o = 0; o < OS_RATE; ++o )
 			{
@@ -161,38 +161,38 @@ Effect::ProcessStatus BitcrushEffect::processImpl(SampleFrame* buf, const fpp_t 
 				{
 					m_bitCounterL -= m_rateCoeffL;
 					m_left = m_depthEnabled
-						? depthCrush( buf[f][0] * m_inGain + noise( buf[f][0] * noiseAmt ) )
-						: buf[f][0] * m_inGain + noise( buf[f][0] * noiseAmt );
+						? depthCrush(inOut[f][0] * m_inGain + noise(inOut[f][0] * noiseAmt))
+						: inOut[f][0] * m_inGain + noise(inOut[f][0] * noiseAmt);
 				}
 				if( m_bitCounterR > m_rateCoeffR )
 				{
 					m_bitCounterR -= m_rateCoeffR;
 					m_right = m_depthEnabled
-						? depthCrush( buf[f][1] * m_inGain + noise( buf[f][1] * noiseAmt ) )
-						: buf[f][1] * m_inGain + noise( buf[f][1] * noiseAmt );
+						? depthCrush(inOut[f][1] * m_inGain + noise(inOut[f][1] * noiseAmt))
+						: inOut[f][1] * m_inGain + noise(inOut[f][1] * noiseAmt);
 				}
 			}
 		}
 	}
 	else // rate crushing disabled: simply oversample with zero-order hold
 	{
-		for (auto f = std::size_t{0}; f < frames; ++f)
+		for (auto f = std::size_t{0}; f < inOut.frames(); ++f)
 		{
 			for( int o = 0; o < OS_RATE; ++o )
 			{
 				m_buffer[f * OS_RATE + o][0] = m_depthEnabled
-					? depthCrush( buf[f][0] * m_inGain + noise( buf[f][0] * noiseAmt ) )
-					: buf[f][0] * m_inGain + noise( buf[f][0] * noiseAmt );
+					? depthCrush(inOut[f][0] * m_inGain + noise(inOut[f][0] * noiseAmt))
+					: inOut[f][0] * m_inGain + noise(inOut[f][0] * noiseAmt);
 				m_buffer[f * OS_RATE + o][1] = m_depthEnabled
-					? depthCrush( buf[f][1] * m_inGain + noise( buf[f][1] * noiseAmt ) )
-					: buf[f][1] * m_inGain + noise( buf[f][1] * noiseAmt );
+					? depthCrush(inOut[f][1] * m_inGain + noise(inOut[f][1] * noiseAmt))
+					: inOut[f][1] * m_inGain + noise(inOut[f][1] * noiseAmt);
 			}
 		}
 	}
 
 	// the oversampled buffer is now written, so filter it to reduce aliasing
 
-	for (auto f = std::size_t{0}; f < frames * OS_RATE; ++f)
+	for (auto f = std::size_t{0}; f < inOut.frames() * OS_RATE; ++f)
 	{
 		if( qMax( qAbs( m_buffer[f][0] ), qAbs( m_buffer[f][1] ) ) >= 1.0e-10f )
 		{
@@ -220,7 +220,7 @@ Effect::ProcessStatus BitcrushEffect::processImpl(SampleFrame* buf, const fpp_t 
 
 	const float d = dryLevel();
 	const float w = wetLevel();
-	for (auto f = std::size_t{0}; f < frames; ++f)
+	for (auto f = std::size_t{0}; f < inOut.frames(); ++f)
 	{
 		float lsum = 0.0f;
 		float rsum = 0.0f;
@@ -229,8 +229,8 @@ Effect::ProcessStatus BitcrushEffect::processImpl(SampleFrame* buf, const fpp_t 
 			lsum += m_buffer[f * OS_RATE + o][0] * OS_RESAMPLE[o];
 			rsum += m_buffer[f * OS_RATE + o][1] * OS_RESAMPLE[o];
 		}
-		buf[f][0] = d * buf[f][0] + w * qBound( -m_outClip, lsum, m_outClip ) * m_outGain;
-		buf[f][1] = d * buf[f][1] + w * qBound( -m_outClip, rsum, m_outClip ) * m_outGain;
+		inOut[f][0] = d * inOut[f][0] + w * qBound( -m_outClip, lsum, m_outClip ) * m_outGain;
+		inOut[f][1] = d * inOut[f][1] + w * qBound( -m_outClip, rsum, m_outClip ) * m_outGain;
 	}
 
 	return ProcessStatus::ContinueIfNotQuiet;

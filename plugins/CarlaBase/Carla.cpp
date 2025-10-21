@@ -150,7 +150,7 @@ static const char* host_ui_save_file(NativeHostHandle, bool isDir, const char* t
 
 
 CarlaInstrument::CarlaInstrument(InstrumentTrack* const instrumentTrack, const Descriptor* const descriptor, const bool isPatchbay)
-    : Instrument(instrumentTrack, descriptor, nullptr, Flag::IsSingleStreamed | Flag::IsMidiBased | Flag::IsNotBendable),
+    : Instrument(descriptor, instrumentTrack, nullptr, Flag::IsSingleStreamed | Flag::IsMidiBased | Flag::IsNotBendable),
       kIsPatchbay(isPatchbay),
       fHandle(nullptr),
       fDescriptor(isPatchbay ? carla_get_native_patchbay_plugin() : carla_get_native_rack_plugin()),
@@ -193,7 +193,7 @@ CarlaInstrument::CarlaInstrument(InstrumentTrack* const instrumentTrack, const D
     if (fHandle != nullptr && fDescriptor->activate != nullptr)
         fDescriptor->activate(fHandle);
 
-    // we need a play-handle which cares for calling play()
+    // we need a play-handle which cares for calling play(), TODO: Move responsibility for this to AudioPlugin
 	auto iph = new InstrumentPlayHandle(this, instrumentTrack);
 	Engine::audioEngine()->addPlayHandle( iph );
 
@@ -495,11 +495,11 @@ void CarlaInstrument::loadSettings(const QDomElement& elem)
 #endif
 }
 
-void CarlaInstrument::play(SampleFrame* workingBuffer)
+void CarlaInstrument::playImpl(std::span<SampleFrame> out)
 {
-    const uint bufsize = Engine::audioEngine()->framesPerPeriod();
+    const auto bufsize = static_cast<std::uint32_t>(out.size());
 
-	zeroSampleFrames(workingBuffer, bufsize);
+	zeroSampleFrames(out.data(), bufsize);
 
     if (fHandle == nullptr)
     {
@@ -547,8 +547,8 @@ void CarlaInstrument::play(SampleFrame* workingBuffer)
 
     for (uint i=0; i < bufsize; ++i)
     {
-        workingBuffer[i][0] = buf1[i];
-        workingBuffer[i][1] = buf2[i];
+        out[i][0] = buf1[i];
+        out[i][1] = buf2[i];
     }
 }
 

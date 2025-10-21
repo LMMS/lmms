@@ -28,8 +28,8 @@
 #define ANALYZER_H
 
 
+#include "AudioPlugin.h"
 #include "DataprocLauncher.h"
-#include "Effect.h"
 #include "LocklessRingBuffer.h"
 #include "SaControls.h"
 #include "SaProcessor.h"
@@ -39,19 +39,27 @@ namespace lmms
 
 
 //! Top level class; handles LMMS interface and feeds data to the data processor.
-class Analyzer : public Effect
+class Analyzer
+	: public AudioPluginExt<Effect, AudioPortsSettings {
+		.kind = AudioDataKind::F32,
+		.interleaved = true,
+		.inputs = 2,
+		.outputs = 0,
+		.inplace = true,
+		.buffered = false
+	}>
 {
 public:
 	Analyzer(Model *parent, const Descriptor::SubPluginFeatures::Key *key);
 	~Analyzer() override;
-
-	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
 
 	EffectControls *controls() override {return &m_controls;}
 
 	SaProcessor *getProcessor() {return &m_processor;}
 
 private:
+	ProcessStatus processImpl(InterleavedBufferView<float, 2> in) override;
+
 	SaProcessor m_processor;
 	SaControls m_controls;
 

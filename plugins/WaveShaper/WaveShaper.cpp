@@ -57,7 +57,7 @@ Plugin::Descriptor PLUGIN_EXPORT waveshaper_plugin_descriptor =
 
 WaveShaperEffect::WaveShaperEffect( Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key ) :
-	Effect( &waveshaper_plugin_descriptor, _parent, _key ),
+	AudioPlugin(&waveshaper_plugin_descriptor, _parent, _key),
 	m_wsControls( this )
 {
 }
@@ -65,7 +65,7 @@ WaveShaperEffect::WaveShaperEffect( Model * _parent,
 
 
 
-Effect::ProcessStatus WaveShaperEffect::processImpl(SampleFrame* buf, const fpp_t frames)
+ProcessStatus WaveShaperEffect::processImpl(InterleavedBufferView<float, 2> inOut)
 {
 // variables for effect
 	int i = 0;
@@ -86,9 +86,9 @@ Effect::ProcessStatus WaveShaperEffect::processImpl(SampleFrame* buf, const fpp_
 	const float *inputPtr = inputBuffer ? &( inputBuffer->values()[ 0 ] ) : &input;
 	const float *outputPtr = outputBufer ? &( outputBufer->values()[ 0 ] ) : &output;
 
-	for (fpp_t f = 0; f < frames; ++f)
+	for (float* frame : inOut.framesView())
 	{
-		auto s = std::array{buf[f][0], buf[f][1]};
+		auto s = std::array{frame[0], frame[1]};
 
 // apply input gain
 		s[0] *= *inputPtr;
@@ -128,8 +128,8 @@ Effect::ProcessStatus WaveShaperEffect::processImpl(SampleFrame* buf, const fpp_
 		s[1] *= *outputPtr;
 
 // mix wet/dry signals
-		buf[f][0] = d * buf[f][0] + w * s[0];
-		buf[f][1] = d * buf[f][1] + w * s[1];
+		frame[0] = d * frame[0] + w * s[0];
+		frame[1] = d * frame[1] + w * s[1];
 
 		outputPtr += outputInc;
 		inputPtr += inputInc;

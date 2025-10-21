@@ -72,7 +72,7 @@ float * OrganicInstrument::s_harmonics = nullptr;
 
 
 OrganicInstrument::OrganicInstrument( InstrumentTrack * _instrument_track ) :
-	Instrument( _instrument_track, &organic_plugin_descriptor ),
+	Instrument(&organic_plugin_descriptor, _instrument_track),
 	m_modulationAlgo(static_cast<int>(Oscillator::ModulationAlgo::SignalMix),
 		static_cast<int>(Oscillator::ModulationAlgo::SignalMix),
 		static_cast<int>(Oscillator::ModulationAlgo::SignalMix)),
@@ -220,8 +220,7 @@ QString OrganicInstrument::nodeName() const
 
 
 
-void OrganicInstrument::playNote( NotePlayHandle * _n,
-						SampleFrame* _working_buffer )
+void OrganicInstrument::playNoteImpl(NotePlayHandle* _n, std::span<SampleFrame> out)
 {
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();
@@ -293,8 +292,8 @@ void OrganicInstrument::playNote( NotePlayHandle * _n,
 	Oscillator * osc_l = static_cast<oscPtr *>( _n->m_pluginData )->oscLeft;
 	Oscillator * osc_r = static_cast<oscPtr *>( _n->m_pluginData)->oscRight;
 
-	osc_l->update( _working_buffer + offset, frames, 0 );
-	osc_r->update( _working_buffer + offset, frames, 1 );
+	osc_l->update(out.data() + offset, frames, 0);
+	osc_r->update(out.data() + offset, frames, 1);
 
 
 	// -- fx section --
@@ -304,10 +303,8 @@ void OrganicInstrument::playNote( NotePlayHandle * _n,
 
 	for (auto i = std::size_t{0}; i < frames + offset; i++)
 	{
-		_working_buffer[i][0] = waveshape( _working_buffer[i][0], t ) *
-						m_volModel.value() / 100.0f;
-		_working_buffer[i][1] = waveshape( _working_buffer[i][1], t ) *
-						m_volModel.value() / 100.0f;
+		out[i][0] = waveshape(out[i][0], t) * m_volModel.value() / 100.0f;
+		out[i][1] = waveshape(out[i][1], t) * m_volModel.value() / 100.0f;
 	}
 
 	// -- --

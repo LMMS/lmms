@@ -108,9 +108,9 @@ public:
 		return &m_controls;
 	}
 
-	ProcessStatus processImpl(SampleFrame*, const fpp_t) override
+	bool processCoreImpl(AudioBus&) override
 	{
-		return ProcessStatus::Sleep;
+		return false;
 	}
 
 	const QDomElement& originalPluginData() const

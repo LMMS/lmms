@@ -80,7 +80,7 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 
 
 PatmanInstrument::PatmanInstrument( InstrumentTrack * _instrument_track ) :
-	Instrument( _instrument_track, &patman_plugin_descriptor ),
+	Instrument(&patman_plugin_descriptor, _instrument_track),
 	m_loopedModel( true, this ),
 	m_tunedModel( true, this )
 {
@@ -133,8 +133,7 @@ QString PatmanInstrument::nodeName() const
 
 
 
-void PatmanInstrument::playNote( NotePlayHandle * _n,
-						SampleFrame* _working_buffer )
+void PatmanInstrument::playNoteImpl(NotePlayHandle* _n, std::span<SampleFrame> out)
 {
 	if( m_patchFile == "" )
 	{
@@ -153,14 +152,14 @@ void PatmanInstrument::playNote( NotePlayHandle * _n,
 	float play_freq = hdata->tuned ? _n->frequency() :
 						hdata->sample->frequency();
 
-	if (hdata->sample->play(_working_buffer + offset, hdata->state, frames,
+	if (hdata->sample->play(out.data() + offset, hdata->state, frames,
 					play_freq, m_loopedModel.value() ? Sample::Loop::On : Sample::Loop::Off))
 	{
-		applyRelease( _working_buffer, _n );
+		applyRelease(out.data(), _n);
 	}
 	else
 	{
-		zeroSampleFrames(_working_buffer, frames + offset);
+		zeroSampleFrames(out.data(), frames + offset);
 	}
 }
 

@@ -97,7 +97,7 @@ private:
 };
 
 Vibed::Vibed(InstrumentTrack* instrumentTrack) :
-	Instrument(instrumentTrack, &vibedstrings_plugin_descriptor, nullptr, Flag::IsNotBendable)
+	Instrument(&vibedstrings_plugin_descriptor, instrumentTrack, nullptr, Flag::IsNotBendable)
 {
 	for (int harm = 0; harm < s_stringCount; ++harm)
 	{
@@ -201,7 +201,7 @@ QString Vibed::nodeName() const
 	return vibedstrings_plugin_descriptor.name;
 }
 
-void Vibed::playNote(NotePlayHandle* n, SampleFrame* workingBuffer)
+void Vibed::playNoteImpl(NotePlayHandle* n, std::span<SampleFrame> out)
 {
 	if (!n->m_pluginData)
 	{
@@ -235,8 +235,8 @@ void Vibed::playNote(NotePlayHandle* n, SampleFrame* workingBuffer)
 
 	for (fpp_t i = offset; i < frames + offset; ++i)
 	{
-		workingBuffer[i][0] = 0.0f;
-		workingBuffer[i][1] = 0.0f;
+		out[i][0] = 0.0f;
+		out[i][1] = 0.0f;
 		for (int str = 0; str < s_stringCount; ++str)
 		{
 			if (ps->exists(str))
@@ -244,8 +244,8 @@ void Vibed::playNote(NotePlayHandle* n, SampleFrame* workingBuffer)
 				// pan: 0 -> left, 1 -> right
 				const float pan = (m_panModels[str]->value() + 1) / 2.0f;
 				const sample_t sample = ps->getStringSample(str) * m_volumeModels[str]->value() / 100.0f;
-				workingBuffer[i][0] += (1.0f - pan) * sample;
-				workingBuffer[i][1] += pan * sample;
+				out[i][0] += (1.0f - pan) * sample;
+				out[i][1] += pan * sample;
 			}
 		}
 	}

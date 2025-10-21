@@ -24,7 +24,7 @@
 #ifndef VECTORSCOPE_H
 #define VECTORSCOPE_H
 
-#include "Effect.h"
+#include "AudioPlugin.h"
 #include "LocklessRingBuffer.h"
 #include "VecControls.h"
 
@@ -33,18 +33,26 @@ namespace lmms
 
 
 //! Top level class; handles LMMS interface and accumulates data for processing.
-class Vectorscope : public Effect
+class Vectorscope
+	: public AudioPluginExt<Effect, AudioPortsSettings {
+		.kind = AudioDataKind::F32,
+		.interleaved = true,
+		.inputs = 2,
+		.outputs = 0,
+		.inplace = true,
+		.buffered = false
+	}>
 {
 public:
 	Vectorscope(Model *parent, const Descriptor::SubPluginFeatures::Key *key);
 	~Vectorscope() override = default;
 
-	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
-
 	EffectControls *controls() override {return &m_controls;}
 	LocklessRingBuffer<SampleFrame> *getBuffer() {return &m_inputBuffer;}
 
 private:
+	ProcessStatus processImpl(InterleavedBufferView<float, 2> in) override;
+
 	VecControls m_controls;
 
 	// Maximum LMMS buffer size (hard coded, the actual constant is hard to get)

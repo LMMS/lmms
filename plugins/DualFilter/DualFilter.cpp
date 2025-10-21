@@ -54,7 +54,7 @@ Plugin::Descriptor PLUGIN_EXPORT dualfilter_plugin_descriptor =
 
 
 DualFilterEffect::DualFilterEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key ) :
-	Effect( &dualfilter_plugin_descriptor, parent, key ),
+	AudioPlugin(&dualfilter_plugin_descriptor, parent, key),
 	m_dfControls( this )
 {
 	m_filter1 = new BasicFilters<2>( Engine::audioEngine()->outputSampleRate() );
@@ -77,7 +77,7 @@ DualFilterEffect::~DualFilterEffect()
 
 
 
-Effect::ProcessStatus DualFilterEffect::processImpl(SampleFrame* buf, const fpp_t frames)
+ProcessStatus DualFilterEffect::processImpl(InterleavedBufferView<float, 2> inOut)
 {
 	const float d = dryLevel();
 	const float w = wetLevel();
@@ -132,7 +132,7 @@ Effect::ProcessStatus DualFilterEffect::processImpl(SampleFrame* buf, const fpp_
 
 
 	// buffer processing loop
-	for( fpp_t f = 0; f < frames; ++f )
+	for (float* frame : inOut.framesView())
 	{
 		// get mix amounts for wet signals of both filters
 		const float mix2 = ( ( *mixPtr + 1.0f ) * 0.5f );
@@ -140,8 +140,8 @@ Effect::ProcessStatus DualFilterEffect::processImpl(SampleFrame* buf, const fpp_
 		const float gain1 = *gain1Ptr * 0.01f;
 		const float gain2 = *gain2Ptr * 0.01f;
 		auto s = std::array{0.0f, 0.0f};	// mix
-		auto s1 = std::array{buf[f][0], buf[f][1]};	// filter 1
-		auto s2 = std::array{buf[f][0], buf[f][1]};	// filter 2
+		auto s1 = std::array{frame[0], frame[1]};	// filter 1
+		auto s2 = std::array{frame[0], frame[1]};	// filter 2
 
 		// update filter 1
 		if( enabled1 )
@@ -193,8 +193,8 @@ Effect::ProcessStatus DualFilterEffect::processImpl(SampleFrame* buf, const fpp_
 		}
 
 		// do another mix with dry signal
-		buf[f][0] = d * buf[f][0] + w * s[0];
-		buf[f][1] = d * buf[f][1] + w * s[1];
+		frame[0] = d * frame[0] + w * s[0];
+		frame[1] = d * frame[1] + w * s[1];
 
 		//increment pointers
 		cut1Ptr += cut1Inc;

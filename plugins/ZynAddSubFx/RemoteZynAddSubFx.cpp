@@ -58,7 +58,7 @@ public:
 	{
 		Nio::start();
 
-		setInputCount( 0 );
+		setInputOutputCount(0, 2);
 		sendMessage( IdInitDone );
 		waitForMessage( IdInitDone );
 
@@ -141,9 +141,11 @@ public:
 	}
 
 
-	void process( const SampleFrame* _in, SampleFrame* _out ) override
+	void process(const float* in, float* out) override
 	{
-		LocalZynAddSubFx::processAudio( _out );
+		(void)in;
+		const auto accessBuffer = std::array{out, out + bufferSize()};
+		LocalZynAddSubFx::process({accessBuffer.data(), bufferSize()});
 	}
 
 	void guiLoop();

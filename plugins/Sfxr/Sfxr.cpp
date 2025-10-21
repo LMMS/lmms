@@ -322,7 +322,7 @@ bool SfxrSynth::isPlaying() const
 
 
 SfxrInstrument::SfxrInstrument( InstrumentTrack * _instrument_track ) :
-	Instrument( _instrument_track, &sfxr_plugin_descriptor ),
+	Instrument(&sfxr_plugin_descriptor, _instrument_track),
 	m_attModel(0.0f, this, "Attack Time"),
 	m_holdModel(0.3f, this, "Sustain Time"),
 	m_susModel(0.0f, this, "Sustain Punch"),
@@ -443,7 +443,7 @@ QString SfxrInstrument::nodeName() const
 
 
 
-void SfxrInstrument::playNote( NotePlayHandle * _n, SampleFrame* _working_buffer )
+void SfxrInstrument::playNoteImpl(NotePlayHandle* _n, std::span<SampleFrame> out)
 {
 	float currentSampleRate = Engine::audioEngine()->outputSampleRate();
 
@@ -455,7 +455,7 @@ void SfxrInstrument::playNote( NotePlayHandle * _n, SampleFrame* _working_buffer
 	}
 	else if( static_cast<SfxrSynth*>(_n->m_pluginData)->isPlaying() == false )
 	{
-		zeroSampleFrames(_working_buffer + offset, frameNum);
+		zeroSampleFrames(out.data() + offset, frameNum);
 		_n->noteOff();
 		return;
 	}
@@ -474,13 +474,13 @@ void SfxrInstrument::playNote( NotePlayHandle * _n, SampleFrame* _working_buffer
 	{
 		for( ch_cnt_t j=0; j<DEFAULT_CHANNELS; j++ )
 		{
-			_working_buffer[i+offset][j] = pitchedBuffer[i*pitchedFrameNum/frameNum][j];
+			out[i+offset][j] = pitchedBuffer[i*pitchedFrameNum/frameNum][j];
 		}
 	}
 
 	delete[] pitchedBuffer;
 
-	applyRelease( _working_buffer, _n );
+	applyRelease(out.data(), _n);
 }
 
 

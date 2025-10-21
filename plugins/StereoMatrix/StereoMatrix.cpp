@@ -56,7 +56,7 @@ Plugin::Descriptor PLUGIN_EXPORT stereomatrix_plugin_descriptor =
 StereoMatrixEffect::StereoMatrixEffect(
 			Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key ) :
-	Effect( &stereomatrix_plugin_descriptor, _parent, _key ),
+	AudioPlugin(&stereomatrix_plugin_descriptor, _parent, _key),
 	m_smControls( this )
 {
 }
@@ -64,25 +64,26 @@ StereoMatrixEffect::StereoMatrixEffect(
 
 
 
-Effect::ProcessStatus StereoMatrixEffect::processImpl(SampleFrame* buf, const fpp_t frames)
+ProcessStatus StereoMatrixEffect::processImpl(InterleavedBufferView<float, 2> inOut)
 {
-	for (fpp_t f = 0; f < frames; ++f)
-	{	
-		const float d = dryLevel();
-		const float w = wetLevel();
-		
-		sample_t l = buf[f][0];
-		sample_t r = buf[f][1];
+	const float d = dryLevel();
+	const float w = wetLevel();
+
+	for (fpp_t f = 0; f < inOut.frames(); ++f)
+	{
+		float* frame = inOut.framePtr(f);
+		sample_t l = frame[0];
+		sample_t r = frame[1];
 
 		// Init with dry-mix
-		buf[f][0] = l * d;
-		buf[f][1] = r * d;
+		frame[0] = l * d;
+		frame[1] = r * d;
 
 		// Add it wet
-		buf[f][0] += ( m_smControls.m_llModel.value( f ) * l  +
+		frame[0] += ( m_smControls.m_llModel.value( f ) * l  +
 					m_smControls.m_rlModel.value( f ) * r ) * w;
 
-		buf[f][1] += ( m_smControls.m_lrModel.value( f ) * l  +
+		frame[1] += ( m_smControls.m_lrModel.value( f ) * l  +
 					m_smControls.m_rrModel.value( f ) * r ) * w;
 	}
 

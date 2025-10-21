@@ -860,7 +860,7 @@ inline sample_t MonstroSynth::calcSlope( int slope, sample_t s )
 
 
 MonstroInstrument::MonstroInstrument( InstrumentTrack * _instrument_track ) :
-		Instrument( _instrument_track, &monstro_plugin_descriptor ),
+		Instrument(&monstro_plugin_descriptor, _instrument_track),
 
 		m_osc1Vol(33.f, 0.f, 200.f, 0.1f, this, tr("Osc 1 volume")),
 		m_osc1Pan(0.f, -100.f, 100.f, 0.1f, this, tr("Osc 1 panning")),
@@ -1058,22 +1058,21 @@ MonstroInstrument::MonstroInstrument( InstrumentTrack * _instrument_track ) :
 }
 
 
-void MonstroInstrument::playNote( NotePlayHandle * _n,
-						SampleFrame* _working_buffer )
+void MonstroInstrument::playNoteImpl(NotePlayHandle* nph, std::span<SampleFrame> out)
 {
-	const fpp_t frames = _n->framesLeftForCurrentPeriod();
-	const f_cnt_t offset = _n->noteOffset();
+	const fpp_t frames = nph->framesLeftForCurrentPeriod();
+	const f_cnt_t offset = nph->noteOffset();
 
-	if (!_n->m_pluginData)
+	if (!nph->m_pluginData)
 	{
-		_n->m_pluginData = new MonstroSynth( this, _n );
+		nph->m_pluginData = new MonstroSynth(this, nph);
 	}
 
-	auto ms = static_cast<MonstroSynth*>(_n->m_pluginData);
+	auto ms = static_cast<MonstroSynth*>(nph->m_pluginData);
 
-	ms->renderOutput( frames, _working_buffer + offset );
+	ms->renderOutput(frames, out.data() + offset);
 
-	//applyRelease( _working_buffer, _n ); // we have our own release
+	//applyRelease(out.data(), nph); // we have our own release
 }
 
 void MonstroInstrument::deleteNotePluginData( NotePlayHandle * _n )

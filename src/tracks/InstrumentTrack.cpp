@@ -23,6 +23,7 @@
  */
 #include "InstrumentTrack.h"
 
+#include "AudioPlugin.h"
 #include "AudioEngine.h"
 #include "AutomationClip.h"
 #include "ConfigManager.h"
@@ -249,10 +250,6 @@ void InstrumentTrack::processAudioBuffer( SampleFrame* buf, const fpp_t frames, 
 		m_silentBuffersProcessed = false;
 	}
 
-	// if effects "went to sleep" because there was no input, wake them up
-	// now
-	m_audioBusHandle.effects()->startRunning();
-
 	// get volume knob data
 	static const float DefaultVolumeRatio = 1.0f / DefaultVolume;
 	/*ValueBuffer * volBuf = m_volumeModel.valueBuffer();
@@ -455,9 +452,12 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const TimePos& tim
 
 	// If the event wasn't handled, check if there's a loaded instrument and if so send the
 	// event to it. If it returns false means the instrument didn't handle the event, so we trigger a warning.
-	if (eventHandled == false && !(instrument() && instrument()->handleMidiEvent(event, time, offset)))
+	if (eventHandled == false)
 	{
-		qWarning("InstrumentTrack: unhandled MIDI event %d", event.type());
+		if (!instrument() || instrument()->handleMidiEvent(event, time, offset))
+		{
+			qWarning("InstrumentTrack: unhandled MIDI event %d", event.type());
+		}
 	}
 
 }
@@ -554,9 +554,9 @@ void InstrumentTrack::silenceAllNotes( bool removeIPH )
 
 f_cnt_t InstrumentTrack::beatLen( NotePlayHandle * _n ) const
 {
-	if( m_instrument != nullptr )
+	if (m_instrument)
 	{
-		const f_cnt_t len = m_instrument->beatLen( _n );
+		const f_cnt_t len = m_instrument->beatLen(_n);
 		if( len > 0 )
 		{
 			return len;
@@ -568,7 +568,7 @@ f_cnt_t InstrumentTrack::beatLen( NotePlayHandle * _n ) const
 
 
 
-void InstrumentTrack::playNote( NotePlayHandle* n, SampleFrame* workingBuffer )
+void InstrumentTrack::playNote(NotePlayHandle* n, std::span<SampleFrame> workingBuffer)
 {
 	// Note: under certain circumstances the working buffer is a nullptr.
 	// These cases are triggered in PlayHandle::doProcessing when the play method is called with a nullptr.
@@ -590,7 +590,7 @@ void InstrumentTrack::playNote( NotePlayHandle* n, SampleFrame* workingBuffer )
 		{
 			const fpp_t frames = n->framesLeftForCurrentPeriod();
 			const f_cnt_t offset = n->noteOffset();
-			processAudioBuffer(workingBuffer, frames + offset, n);
+			processAudioBuffer(workingBuffer.data(), frames + offset, n);
 		}
 	}
 }
@@ -612,9 +612,9 @@ QString InstrumentTrack::instrumentName() const
 
 void InstrumentTrack::deleteNotePluginData( NotePlayHandle* n )
 {
-	if( m_instrument != nullptr )
+	if (m_instrument)
 	{
-		m_instrument->deleteNotePluginData( n );
+		m_instrument->deleteNotePluginData(n);
 	}
 }
 

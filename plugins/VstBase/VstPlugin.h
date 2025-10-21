@@ -39,12 +39,15 @@
 namespace lmms
 {
 
+class RemotePluginAudioPortsController;
 
-class VSTBASE_EXPORT VstPlugin : public RemotePlugin, public JournallingObject
+class VSTBASE_EXPORT VstPlugin
+	: public RemotePlugin
+	, public JournallingObject
 {
 	Q_OBJECT
 public:
-	VstPlugin( const QString & _plugin );
+	VstPlugin(const QString& plugin, RemotePluginAudioPortsController& audioPorts);
 	~VstPlugin() override;
 
 	void tryLoad( const QString &remoteVstPluginExecutable );
@@ -170,8 +173,7 @@ private:
 	int m_currentProgram;
 
 	QTimer m_idleTimer;
-
-} ;
+};
 
 
 } // namespace lmms

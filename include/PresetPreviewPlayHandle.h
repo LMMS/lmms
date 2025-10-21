@@ -47,7 +47,7 @@ public:
 		return true;
 	}
 
-	void play( SampleFrame* buffer ) override;
+	void play(std::span<SampleFrame> buffer) override;
 	bool isFinished() const override;
 
 	bool isFromTrack( const Track * _track ) const override;

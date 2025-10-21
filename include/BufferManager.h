@@ -26,6 +26,9 @@
 #ifndef LMMS_BUFFER_MANAGER_H
 #define LMMS_BUFFER_MANAGER_H
 
+#include <vector>
+
+#include "SampleFrame.h"
 #include "lmms_export.h"
 #include "LmmsTypes.h"
 
@@ -34,12 +37,12 @@ namespace lmms
 
 class SampleFrame;
 
+// TODO: Use memory pool?
 class LMMS_EXPORT BufferManager
 {
 public:
 	static void init( fpp_t fpp );
-	static SampleFrame* acquire();
-	static void release( SampleFrame* buf );
+	static std::vector<SampleFrame> acquire();
 
 private:
 	static fpp_t s_framesPerPeriod;
