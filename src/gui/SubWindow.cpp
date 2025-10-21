@@ -181,24 +181,27 @@ void SubWindow::changeEvent( QEvent *event )
 	}
 }
 
+
+
+
 void SubWindow::setVisible(bool visible)
 {
-	if (isDetached())  // avoid showing titlebar here
+	if (isDetached())
+		widget()->setVisible(visible);
+	else
+		QMdiSubWindow::setVisible(visible);
+}
+
+
+
+
+void SubWindow::showEvent(QShowEvent* e)
+{
+	if (isDetached())
 	{
-		if (visible)
-		{
-			widget()->show();
-			widget()->setGeometry(m_childGeom);
-			// raise the detached window in case it was minimized
-			widget()->setWindowState((widget()->windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
-		}
-		else
-		{
-			widget()->hide();
-		}
-		return;
+		widget()->setGeometry(m_childGeom);
+		widget()->setWindowState((widget()->windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
 	}
-	QMdiSubWindow::setVisible(visible);
 }
 
 
@@ -362,7 +365,10 @@ void SubWindow::attach()
 	widget()->setWindowFlags(flags);
 
 	if (shown)
+	{
+		widget()->show();
 		show();
+	}
 
 	if (QGuiApplication::platformName() == "wayland")
 		resize(frame.size());  // Workaround for wayland reporting position as 0-0.
@@ -588,20 +594,15 @@ bool SubWindow::eventFilter(QObject* obj, QEvent* event)
 			return true;
 
 		case QEvent::Close:
-			if (widget()->windowFlags().testFlag(Qt::Window))
+			if (isDetached())
 			{
 				attach();
 				event->ignore();
 				return true;
 			}
-			else if (getGUI()->mainWindow()->workspace())  // mdiArea exists
+			else
 			{
 				widget()->parentWidget()->hide();
-				event->ignore();
-			}
-			else  // is this even reachable?
-			{
-				widget()->hide();
 				event->ignore();
 			}
 			return QMdiSubWindow::eventFilter(obj, event);
