@@ -426,7 +426,7 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 
 		// Miss notes randomly. We intercept int dir and abuse it
 		// after need.  :)
-		if (m_arpMissModel.value() && fastRand(100) < m_arpMissModel.value())
+		if (m_arpMissModel.value() && fastRand(100.f) <= m_arpMissModel.value())
 		{
 			dir = ArpDirection::Random;
 		}
