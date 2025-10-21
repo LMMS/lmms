@@ -319,17 +319,17 @@ public:
 	{
 	}
 
-	//! Construct from std::span<SampleFrame>
-	InterleavedBufferView(std::span<SampleFrame> buffer) noexcept
+	//! Construct from SampleFrame*
+	InterleavedBufferView(SampleFrame* data, f_cnt_t frames) noexcept
 		requires (std::is_same_v<std::remove_const_t<T>, float> && channelCount == 2)
-		: Base{reinterpret_cast<float*>(buffer.data()), buffer.size()}
+		: Base{reinterpret_cast<float*>(data), frames}
 	{
 	}
 
-	//! Construct from std::span<const SampleFrame>
-	InterleavedBufferView(std::span<const SampleFrame> buffer) noexcept
+	//! Construct from const SampleFrame*
+	InterleavedBufferView(const SampleFrame* data, f_cnt_t frames) noexcept
 		requires (std::is_same_v<T, const float> && channelCount == 2)
-		: Base{reinterpret_cast<const float*>(buffer.data()), buffer.size()}
+		: Base{reinterpret_cast<const float*>(data), frames}
 	{
 	}
 
