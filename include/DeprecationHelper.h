@@ -172,10 +172,11 @@ inline bool setContent(QDomDocument& doc, const QByteArray& text,
 {
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
 	auto result = doc.setContent(text, QDomDocument::ParseOption::Default);
+	if (result) { return true; }
 	if (errorMsg) { *errorMsg = std::move(result.errorMessage); }
 	if (errorLine) { *errorLine = static_cast<int>(result.errorLine); }
 	if (errorColumn) { *errorColumn = static_cast<int>(result.errorColumn); }
-	return static_cast<bool>(result);
+	return false;
 #else
 	return doc.setContent(text, errorMsg, errorLine, errorColumn);
 #endif
@@ -190,10 +191,11 @@ inline bool setContent(QDomDocument& doc, QIODevice* dev, bool namespaceProcessi
 		? QDomDocument::ParseOption::UseNamespaceProcessing
 		: QDomDocument::ParseOption::Default;
 	auto result = doc.setContent(dev, options);
+	if (result) { return true; }
 	if (errorMsg) { *errorMsg = std::move(result.errorMessage); }
 	if (errorLine) { *errorLine = static_cast<int>(result.errorLine); }
 	if (errorColumn) { *errorColumn = static_cast<int>(result.errorColumn); }
-	return static_cast<bool>(result);
+	return false;
 #else
 	return doc.setContent(dev, namespaceProcessing, errorMsg, errorLine, errorColumn);
 #endif
