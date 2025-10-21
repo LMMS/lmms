@@ -415,9 +415,8 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 		frames_processed += remaining_frames_for_cur_arp;
 
 		// Skip notes randomly
-		if (m_arpSkipModel.value() && fastRand(100) < m_arpSkipModel.value())
+		if (m_arpSkipModel.value() && fastRand(100.f) <= m_arpSkipModel.value())
 		{
-			// update counters
 			frames_processed += arp_frames;
 			cur_frame += arp_frames;
 			continue;
