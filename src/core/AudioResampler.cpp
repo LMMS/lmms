@@ -27,8 +27,9 @@
 #include <samplerate.h>
 #include <stdexcept>
 
+namespace lmms {
+
 namespace {
-using namespace lmms;
 
 constexpr auto converterType(AudioResampler::Mode mode) -> int
 {
@@ -49,8 +50,6 @@ constexpr auto converterType(AudioResampler::Mode mode) -> int
 	}
 }
 } // namespace
-
-namespace lmms {
 
 AudioResampler::AudioResampler(Mode mode, ch_cnt_t channels)
 	: m_state{src_new(converterType(mode), channels, &m_error)}
