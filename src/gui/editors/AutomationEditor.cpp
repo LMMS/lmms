@@ -882,8 +882,8 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 						? yCoordOfLevel(OUTVAL(it))
 						: yCoordOfLevel(INVAL(it));
 					float dy = m_draggedOutTangent
-						? y - mouseEvent->y()
-						: mouseEvent->y() - y;
+						? (y - mouseEvent->y()) / m_y_delta
+						: (mouseEvent->y() - y) / m_y_delta;
 					float dx = std::abs(posTicks - POS(it));
 					float newTangent = dy / std::max(dx, 1.0f);
 
@@ -1077,8 +1077,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 		else
 		{
 			int level = (int) m_bottomLevel;
-			int printable = qMax( 1, 5 * DEFAULT_Y_DELTA
-								/ m_y_delta );
+			int printable = qMax(1.0f, 5 * DEFAULT_Y_DELTA / m_y_delta);
 			int module = level % printable;
 			if( module )
 			{
@@ -1580,6 +1579,7 @@ void AutomationEditor::resizeEvent(QResizeEvent * re)
 	m_timeLine->setFixedWidth(width());
 
 	updateTopBottomLevels();
+	updateYDelta();
 	update();
 }
 
@@ -1870,6 +1870,12 @@ void AutomationEditor::zoomingXChanged()
 
 void AutomationEditor::zoomingYChanged()
 {
+	updateYDelta();
+	resizeEvent(nullptr);
+}
+
+void AutomationEditor::updateYDelta()
+{
 	const QString & zfac = m_zoomingYModel.currentText();
 	m_y_auto = zfac == "Auto";
 	if( !m_y_auto )
@@ -1877,10 +1883,11 @@ void AutomationEditor::zoomingYChanged()
 		m_y_delta = zfac.left( zfac.length() - 1 ).toInt()
 							* DEFAULT_Y_DELTA / 100;
 	}
-#ifdef LMMS_DEBUG
-	assert( m_y_delta > 0 );
-#endif
-	resizeEvent(nullptr);
+	else
+	{
+		int gridBottom = height() - SCROLLBAR_SIZE - 1;
+		m_y_delta = static_cast<float>(gridBottom - TOP_MARGIN) / (m_maxLevel - m_minLevel);
+	}
 }
 
 
@@ -1914,22 +1921,22 @@ void AutomationEditor::updateTopBottomLevels()
 		int centralLevel = (int)( m_minLevel + m_maxLevel - m_scrollLevel );
 
 		m_bottomLevel = centralLevel - ( half_grid
-							/ (float)m_y_delta );
+							/ m_y_delta );
 		if( m_bottomLevel < m_minLevel )
 		{
 			m_bottomLevel = m_minLevel;
 			m_topLevel = m_minLevel + (int)floorf( grid_height
-							/ (float)m_y_delta );
+							/ m_y_delta );
 		}
 		else
 		{
 			m_topLevel = m_bottomLevel + (int)floorf( grid_height
-							/ (float)m_y_delta );
+							/ m_y_delta );
 			if( m_topLevel > m_maxLevel )
 			{
 				m_topLevel = m_maxLevel;
 				m_bottomLevel = m_maxLevel - (int)floorf(
-					grid_height / (float)m_y_delta );
+					grid_height / m_y_delta );
 			}
 		}
 	}
