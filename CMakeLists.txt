@@ -597,7 +597,7 @@ if(WANT_VST)
 		set(STATUS_VST "No hosts selected and available")
 	endif()
 	if(WINE_ASLR_ENABLED)
-		set(STATUS_VST_64 "${STATUS_VST_64}\n\tWARNING: You are using wine ${WINE_VERSION} which cannot disable ASLR, please consider upgrading.  ASLR may cause crashes with older VSTs.")
+		set(STATUS_VST_64 "${STATUS_VST_64}\n\tWARNING: You are using wine ${WINE_VERSION} which cannot disable ASLR, please consider upgrading to wine 10.14 or higher.  ASLR may cause crashes with older VSTs.")
 	endif()
 endif()
 
