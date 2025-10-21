@@ -117,6 +117,11 @@ SubWindow::SubWindow(QWidget *parent, Qt::WindowFlags windowFlags) :
 void SubWindow::setWidget(QWidget* w)
 {
 	QMdiSubWindow::setWidget(w);
+
+	if (widget())
+	{
+		m_childGeom = widget()->geometry();
+	}
 }
 
 
@@ -183,6 +188,7 @@ void SubWindow::setVisible(bool visible)
 		if (visible)
 		{
 			widget()->show();
+			widget()->setGeometry(m_childGeom);
 			// raise the detached window in case it was minimized
 			widget()->setWindowState((widget()->windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
 		}
@@ -315,6 +321,7 @@ void SubWindow::detach()
 	if (isDetached()) { return; }
 
 	const auto pos = mapToGlobal(widget()->pos());
+	const bool shown = isVisible();
 
 	auto flags = windowFlags();
 	flags |= Qt::Window;
@@ -322,9 +329,11 @@ void SubWindow::detach()
 
 	hide();
 	widget()->setWindowFlags(flags);
-	widget()->show();
 
-	widget()->windowHandle()->setPosition(pos);
+	if (shown)
+		widget()->show();
+
+	widget()->move(pos);
 }
 
 void SubWindow::attach()
@@ -341,6 +350,8 @@ void SubWindow::attach()
 
 	if (!isDetached()) { return; }
 
+	const bool shown = widget()->isVisible();
+
 	auto frame = widget()->windowHandle()->geometry();
 	frame.moveTo(mdiArea()->mapFromGlobal(frame.topLeft()));
 	frame += decorationMargins();
@@ -349,8 +360,9 @@ void SubWindow::attach()
 	flags &= ~Qt::Window;
 	flags |= Qt::Widget;
 	widget()->setWindowFlags(flags);
-	widget()->show();
-	show();
+
+	if (shown)
+		show();
 
 	if (QGuiApplication::platformName() == "wayland")
 		resize(frame.size());  // Workaround for wayland reporting position as 0-0.
@@ -571,29 +583,39 @@ bool SubWindow::eventFilter(QObject* obj, QEvent* event)
 
 	switch (event->type())
 	{
-	case QEvent::WindowStateChange:
-		event->accept();
-		return true;
-	case QEvent::Close:
-		if (widget()->windowFlags().testFlag(Qt::Window))
-		{
-			attach();
-			event->ignore();
+		case QEvent::WindowStateChange:
+			event->accept();
 			return true;
-		}
-		else if (getGUI()->mainWindow()->workspace())  // mdiArea exists
-		{
-			widget()->parentWidget()->hide();
-			event->ignore();
-		}
-		else  // is this even reachable?
-		{
-			widget()->hide();
-			event->ignore();
-		}
-		return QMdiSubWindow::eventFilter(obj, event);
-	default:
-		return QMdiSubWindow::eventFilter(obj, event);
+
+		case QEvent::Close:
+			if (widget()->windowFlags().testFlag(Qt::Window))
+			{
+				attach();
+				event->ignore();
+				return true;
+			}
+			else if (getGUI()->mainWindow()->workspace())  // mdiArea exists
+			{
+				widget()->parentWidget()->hide();
+				event->ignore();
+			}
+			else  // is this even reachable?
+			{
+				widget()->hide();
+				event->ignore();
+			}
+			return QMdiSubWindow::eventFilter(obj, event);
+
+		case QEvent::Move:
+			m_childGeom.moveTo(static_cast<QMoveEvent*>(event)->pos());
+			return QMdiSubWindow::eventFilter(obj, event);
+
+		case QEvent::Resize:
+			m_childGeom.setSize(static_cast<QResizeEvent*>(event)->size());
+			return QMdiSubWindow::eventFilter(obj, event);
+
+		default:
+			return QMdiSubWindow::eventFilter(obj, event);
 	}
 }
 

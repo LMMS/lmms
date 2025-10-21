@@ -109,6 +109,7 @@ private:
 	QLabel * m_windowTitle;
 	QGraphicsDropShadowEffect * m_shadow;
 	bool m_hasFocus;
+	QRect m_childGeom;
 
 	static void elideText( QLabel *label, QString text );
 	void adjustTitleBar();
