@@ -68,7 +68,6 @@ public:
 	};
 
 	Sample() = default;
-	~Sample() = default;
 
 	Sample(const QByteArray& base64, int sampleRate = Engine::audioEngine()->outputSampleRate());
 	Sample(const SampleFrame* data, size_t numFrames, int sampleRate = Engine::audioEngine()->outputSampleRate());
