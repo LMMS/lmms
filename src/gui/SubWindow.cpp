@@ -329,10 +329,7 @@ void SubWindow::detach()
 	hide();
 	widget()->setWindowFlags(flags);
 
-	if (shown)
-	{
-		widget()->show();
-	}
+	if (shown) { widget()->show(); }
 
 	widget()->move(pos);
 }
