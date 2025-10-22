@@ -174,7 +174,7 @@ SampleTrackWindow::SampleTrackWindow(SampleTrackView* stv)
 	flags &= ~Qt::WindowMaximizeButtonHint;
 	subWin->setWindowFlags(flags);
 
-	// better than setFixedSize because it still responds to layout changes
+	// better than `setFixedSize` because it still responds to layout changes
 	layout()->setSizeConstraint(QLayout::SetFixedSize);
 
 	setWindowIcon(embed::getIconPixmap("sample_track"));
