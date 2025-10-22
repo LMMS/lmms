@@ -186,10 +186,8 @@ void SubWindow::changeEvent( QEvent *event )
 
 void SubWindow::setVisible(bool visible)
 {
-	if (isDetached())
-		widget()->setVisible(visible);
-	else
-		QMdiSubWindow::setVisible(visible);
+	if (isDetached()) { widget()->setVisible(visible); }
+	else { QMdiSubWindow::setVisible(visible); }
 }
 
 
@@ -217,10 +215,8 @@ bool SubWindow::isDetached() const
 
 void SubWindow::setDetached(bool on)
 {
-	if (on)
-		detach();
-	else
-		attach();
+	if (on) { detach(); }
+	else { attach(); }
 }
 
 
@@ -334,7 +330,9 @@ void SubWindow::detach()
 	widget()->setWindowFlags(flags);
 
 	if (shown)
+	{
 		widget()->show();
+	}
 
 	widget()->move(pos);
 }
@@ -371,9 +369,13 @@ void SubWindow::attach()
 	}
 
 	if (QGuiApplication::platformName() == "wayland")
+	{
 		resize(frame.size());  // Workaround for wayland reporting position as 0-0.
+	}
 	else
+	{
 		setGeometry(frame);
+	}
 }
 
 
@@ -400,8 +402,10 @@ int SubWindow::frameWidth() const
 
 QMargins SubWindow::decorationMargins() const
 {
-	//              left,         top,              right,        bottom
-	return QMargins(frameWidth(), titleBarHeight(), frameWidth(), frameWidth());
+	return QMargins(frameWidth(),     // left
+	                titleBarHeight(), // top
+	                frameWidth(),     // right
+	                frameWidth());    // bottom
 }
 
 
