@@ -242,7 +242,7 @@ static int sid_fillbuffer(unsigned char* sidreg, reSID::SID *sid, int tdelta, sh
 	int badline = fastRand(NUMSIDREGS - 1);
 	int residdelay = 0; // customly added
 
-	for (int c = 0; c < NUMSIDREGS; c++)
+	for (int c = 0; c < NUMSIDREGS; ++c)
 	{
 		unsigned char o = sidorder[c];
 
