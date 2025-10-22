@@ -109,16 +109,6 @@ namespace lmms::PathUtil
 
 
 
-	QString stripPrefix(const QString & input)
-	{
-		return input.mid(basePrefix(baseLookup(input)).length());
-	}
-
-	QString cleanName(const QString & input)
-	{
-		return stripPrefix(QFileInfo(input).completeBaseName());
-	}
-
 	QString serializePath(const QString & input)
 	{
 		//VstEffect saved as a platform native path in previous versions of LMMS. (PR#8082)
@@ -127,6 +117,20 @@ namespace lmms::PathUtil
 		//2. No other supported OS will use backslashes.
 		QString path = input;
 		return path.replace(R"(\)", R"(/)");
+	}
+
+	QString stripPrefix(const QString & input)
+	{
+		QString path = serializePath(input);
+
+		return path.mid(basePrefix(baseLookup(path)).length());
+	}
+
+	QString cleanName(const QString & input)
+	{
+		QString path = serializePath(input);
+
+		return stripPrefix(QFileInfo(path).completeBaseName());
 	}
 
 

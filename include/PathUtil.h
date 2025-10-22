@@ -50,12 +50,12 @@ namespace lmms::PathUtil
 	//! Defaults to Base::Absolute
 	Base LMMS_EXPORT baseLookup(const QString & input);
 
+	//! Enforce forward slash (/) for folder paths for uniform handling.
+	QString LMMS_EXPORT serializePath(const QString & input);
 	//! Remove the prefix from a path, iff there is one
 	QString LMMS_EXPORT stripPrefix(const QString & input);
 	//! Get the filename for a path, handling prefixed paths correctly
 	QString LMMS_EXPORT cleanName(const QString & input);
-	//! Enforce forward slash (/) for folder paths for uniform handling.
-	QString LMMS_EXPORT serializePath(const QString & input);
 
 	//! Upgrade prefix-less relative paths to the new format
 	QString LMMS_EXPORT oldRelativeUpgrade(const QString & input);
