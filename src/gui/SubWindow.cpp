@@ -111,8 +111,9 @@ SubWindow::SubWindow(QWidget *parent, Qt::WindowFlags windowFlags) :
 /**
  * @brief SubWindow::setWidget
  *
- *  This is a wrapper to initialize everything
- *  that depends on a child widget.
+ *  This is a wrapper to initialize everything that depends on a child widget.
+ *  Though technically not an override, this is the only way
+ *  to set the child widget, and the best way to track that.
  */
 void SubWindow::setWidget(QWidget* w)
 {
