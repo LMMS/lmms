@@ -129,7 +129,7 @@ bool VstEffect::openPlugin(const QString& plugin)
 
 	delete tf;
 
-	m_key.attributes["file"] = PathUtil::toShortestRelative(plugin);
+	m_key.attributes["file"] = PathUtil::stripPrefix(PathUtil::toShortestRelative(plugin));
 	return true;
 }
 
