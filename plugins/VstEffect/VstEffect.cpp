@@ -26,6 +26,7 @@
 #include "VstEffect.h"
 
 #include "GuiApplication.h"
+#include "PathUtil.h"
 #include "Song.h"
 #include "TextFloat.h"
 #include "VstPlugin.h"
@@ -68,12 +69,7 @@ VstEffect::VstEffect( Model * _parent,
 	bool loaded = false;
 	if( !m_key.attributes["file"].isEmpty() )
 	{
-		// Replace / and \ path indicators with platform native path indicators on load.
-		#if defined(LMMS_BUILD_LINUX) || defined(LMMS_BUILD_APPLE) || defined(LMMS_BUILD_OPENBSD) || defined(LMMS_BUILD_FREEBSD)|| defined(LMMS_BUILD_HAIKU)
-			loaded = openPlugin(m_key.attributes["file"].replace(R"(\)", R"(/)"));
-		#elif defined(LMMS_BUILD_WIN32)|| defined(LMMS_BUILD_WIN64)
-			loaded = openPlugin(m_key.attributes["file"].replace(R"(/)", R"(\)"));
-		#endif
+		loaded = openPlugin(m_key.attributes["file"]);
 	}
 	setDisplayName( m_key.attributes["file"].section( ".dll", 0, 0 ).isEmpty()
 		? m_key.name : m_key.attributes["file"].section( ".dll", 0, 0 ) );
@@ -122,7 +118,7 @@ bool VstEffect::openPlugin(const QString& plugin)
 	}
 
 	QMutexLocker ml( &m_pluginMutex ); Q_UNUSED( ml );
-	m_plugin = QSharedPointer<VstPlugin>(new VstPlugin(plugin));
+	m_plugin = QSharedPointer<VstPlugin>(new VstPlugin(PathUtil::toAbsolute(plugin)));
 	if( m_plugin->failed() )
 	{
 		m_plugin.clear();
@@ -133,7 +129,7 @@ bool VstEffect::openPlugin(const QString& plugin)
 
 	delete tf;
 
-	m_key.attributes["file"] = plugin;
+	m_key.attributes["file"] = PathUtil::toShortestRelative(plugin);
 	return true;
 }
 
