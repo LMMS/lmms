@@ -43,8 +43,6 @@
 #include <QWindow>
 
 #include "embed.h"
-#include "GuiApplication.h"
-#include "MainWindow.h"
 
 namespace lmms::gui
 {
