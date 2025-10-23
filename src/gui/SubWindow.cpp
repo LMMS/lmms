@@ -611,12 +611,13 @@ bool SubWindow::eventFilter(QObject* obj, QEvent* event)
 			if (isDetached())
 			{
 				attach();
+				hide();
 				event->ignore();
 				return true;
 			}
 			else
 			{
-				widget()->parentWidget()->hide();
+				hide();
 				event->ignore();
 			}
 			return QMdiSubWindow::eventFilter(obj, event);
