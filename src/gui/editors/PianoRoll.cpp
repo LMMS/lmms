@@ -2924,7 +2924,7 @@ void PianoRoll::updateParameterEditPos(QMouseEvent* me, Note::ParameterType para
 			// Preview note
 			if (m_lastKey != keyNum)
 			{
-				testPlayKey(keyNum, MidiDefaultVelocity, 0);
+				testPlayKey(keyNum, note->midiVelocity(m_midiClip->instrumentTrack()->midiPort()->baseVelocity()), note->getPanning());
 			}
 			
 		}
