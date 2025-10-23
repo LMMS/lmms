@@ -1365,7 +1365,6 @@ void RemoteVstPlugin::rotateProgram( int offset )
 void RemoteVstPlugin::getProgramNames()
 {
 	char presName[1024 + 256 * 30] = {};
-	constexpr auto maxlen = sizeof(presName) - 1;
 	char curProgName[30] = {};
 	if (!isInitialized()) { return; }
 	const bool progNameIndexed = pluginDispatch(effGetProgramNameIndexed, 0, -1, curProgName) == 1;
@@ -1378,11 +1377,11 @@ void RemoteVstPlugin::getProgramNames()
 			for (int i = 0; i < maxPrograms; i++)
 			{
 				pluginDispatch(effGetProgramNameIndexed, i, -1, curProgName);
-				if (i == 0) { std::snprintf(presName, maxlen, "%s", curProgName); }
+				if (i == 0) { std::snprintf(presName, sizeof(presName), "%s", curProgName); }
 				else
 				{
 					const auto len = std::strlen(presName);
-					std::snprintf(presName + len, maxlen - len, "|%s", curProgName);
+					std::snprintf(presName + len, sizeof(presName) - len, "|%s", curProgName);
 				}
 			}
 		}
@@ -1392,17 +1391,17 @@ void RemoteVstPlugin::getProgramNames()
 			for (int i = 0; i < maxPrograms; i++)
 			{
 				pluginDispatch(effSetProgram, 0, i);
-				if (i == 0) { std::snprintf(presName, maxlen, "%s", programName()); }
+				if (i == 0) { std::snprintf(presName, sizeof(presName), "%s", programName()); }
 				else
 				{
 					const auto len = std::strlen(presName);
-					std::snprintf(presName + len, maxlen - len, "|%s", programName());
+					std::snprintf(presName + len, sizeof(presName) - len, "|%s", programName());
 				}
 			}
 			pluginDispatch(effSetProgram, 0, currProgram);
 		}
 	}
-	else { std::snprintf(presName, maxlen, "%s", programName()); }
+	else { std::snprintf(presName, sizeof(presName), "%s", programName()); }
 
 	sendMessage(message(IdVstProgramNames).addString(presName));
 }

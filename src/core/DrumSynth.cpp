@@ -223,7 +223,7 @@ std::size_t DrumSynth::GetPrivateProfileString(const char* sec,
 			if (line[0] == '[') { break; }
 
 			char* k = std::strtok(line.data(), " \t=");
-			char* b = strtok(nullptr, "\n\r\0");
+			char* b = std::strtok(nullptr, "\n\r\0");
 			if (k && !strcasecmp(k, key))
 			{
 				if (b)
