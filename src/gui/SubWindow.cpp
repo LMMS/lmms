@@ -380,7 +380,7 @@ void SubWindow::attach()
 
 	if (QGuiApplication::platformName() == "wayland")
 	{
-		resize(frame.size());  // Workaround for wayland reporting position as 0-0.
+		resize(frame.size());  // Workaround for wayland reporting position as 0-0, see https://doc.qt.io/qt-6.9/application-windows.html#wayland-peculiarities
 	}
 	else
 	{
