@@ -286,11 +286,7 @@ int main( int argc, char * * argv )
 		}
 		else if (arg == "--geometry" || arg == "-geometry")
 		{
-			if (arg == "--geometry")
-			{
-				// Delete the first "-" so Qt recognize the option
-				strcpy(argv[i], "-geometry");
-			}
+			if (arg == "--geometry") { argv[i]++; } // Delete the first "-" so Qt recognize the option
 			// option -geometry is filtered by Qt later,
 			// so we need to check its presence now to
 			// determine, if the application should run in
