@@ -559,15 +559,16 @@ void NotePlayHandle::updateFrequency()
 
 void NotePlayHandle::processTimePos(const TimePos& time, float pitchValue, bool isRecording)
 {
-	if (!detuning() || time < songGlobalParentOffset() + pos()) { return; }
+	// Have + 1 on each time to not have a 1 tick delay on note slides.
+	if (!detuning() || time + 1 < songGlobalParentOffset() + pos()) { return; }
 
 	if (isRecording && m_origin == Origin::MidiInput)
 	{
-		detuning()->automationClip()->recordValue(time - songGlobalParentOffset() - pos(), pitchValue / 100);
+		detuning()->automationClip()->recordValue(time + 1 - songGlobalParentOffset() - pos(), pitchValue / 100);
 	}
 	else
 	{
-		const float v = detuning()->automationClip()->valueAt(time - songGlobalParentOffset() - pos());
+		const float v = detuning()->automationClip()->valueAt(time + 1 - songGlobalParentOffset() - pos());
 		if (!approximatelyEqual(v, m_baseDetuning->value()))
 		{
 			m_baseDetuning->setValue(v);
