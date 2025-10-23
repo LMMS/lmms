@@ -611,7 +611,6 @@ bool SubWindow::eventFilter(QObject* obj, QEvent* event)
 				attach();
 				hide();
 				event->ignore();
-				return true;
 			}
 			else
 			{
