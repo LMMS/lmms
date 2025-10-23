@@ -35,6 +35,8 @@
 
 
 class QMenu;
+class QMimeData;
+
 
 namespace lmms
 {
@@ -178,8 +180,9 @@ protected:
 
 	float pixelsPerBar();
 
-
+	//! Turn a selection of clips into a DataFile used for drag-and-drop or copy
 	DataFile createClipDataFiles(const QVector<ClipView *> & clips) const;
+	virtual QMimeData* createClipboardData();
 
 	virtual void paintTextLabel(QString const & text, QPainter & painter);
 

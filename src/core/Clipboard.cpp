@@ -24,10 +24,14 @@
 
 #include <QApplication>
 #include <QClipboard>
+#include <QDrag>
+#include <QFileInfo>
 #include <QMimeData>
 
 #include "Clipboard.h"
 
+#include "GuiApplication.h"
+#include "MainWindow.h"
 
 namespace lmms::Clipboard
 {
@@ -43,6 +47,14 @@ namespace lmms::Clipboard
 	bool hasFormat( MimeType mT )
 	{
 		return getMimeData()->hasFormat( mimeType( mT ) );
+	}
+
+
+
+
+	void copyMimeData(QMimeData* m)
+	{
+		QApplication::clipboard()->setMimeData(m, QClipboard::Clipboard);
 	}
 
 
@@ -64,33 +76,142 @@ namespace lmms::Clipboard
 		return QString( getMimeData()->data( mimeType( mT ) ) );
 	}
 
+} // namespace lmms::Clipboard
 
 
 
-	void copyStringPair( const QString & key, const QString & value )
+
+namespace lmms::MimeData
+{
+	using lmms::Clipboard::MimeType;
+
+
+	QMimeData* fromStringPair(const QString& key, const QString& value)
 	{
 		QString finalString = key + ":" + value;
 
 		auto content = new QMimeData;
 		content->setData( mimeType( MimeType::StringPair ), finalString.toUtf8() );
-		QApplication::clipboard()->setMimeData( content, QClipboard::Clipboard );
+		return content;
 	}
 
-
-
-
-	QString decodeKey( const QMimeData * mimeData )
+	std::pair<QString, QString> toStringPair(const QMimeData* md)
 	{
-		return( QString::fromUtf8( mimeData->data( mimeType( MimeType::StringPair ) ) ).section( ':', 0, 0 ) );
+		auto string = QString::fromUtf8(md->data(mimeType(MimeType::StringPair)));
+		return {string.section(':', 0, 0), string.section(':', 1, -1)};
 	}
 
-
-
-
-	QString decodeValue( const QMimeData * mimeData )
+	QString toPath(const QMimeData* md)
 	{
-		return( QString::fromUtf8( mimeData->data( mimeType( MimeType::StringPair ) ) ).section( ':', 1, -1 ) );
+		const auto& urls = md->urls();
+
+		if (urls.isEmpty()) { return {}; }
+
+		return urls.first().toLocalFile();
+
+	}
+
+} // namespace lmms::MimeData
+
+
+
+
+namespace lmms::DragAndDrop
+{
+
+	void exec(QWidget* widget, QMimeData* mimeData, const QPixmap& icon)
+	{
+		auto drag = new QDrag(widget);
+
+		drag->setPixmap(icon);
+		drag->setMimeData(mimeData);
+
+			   // This blocks until the drag ends
+		drag->exec(Qt::CopyAction, Qt::CopyAction);
+
+			   // during a drag, we might have lost key-press-events, so reset modifiers of main-win
+			   // TODO still needed?
+		if (gui::getGUI()->mainWindow())
+		{
+			gui::getGUI()->mainWindow()->clearKeyModifiers();
+		}
 	}
 
 
-} // namespace lmms::Clipboard
+
+
+	void execStringPairDrag(const QString& key, const QString& value, const QPixmap& icon, QWidget* widget)
+	{
+		auto mimeData = MimeData::fromStringPair(key, value);
+
+		if (icon.isNull())
+		{
+			exec(widget, mimeData, widget->grab().scaled(64, 64, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+		}
+		else
+		{
+			exec(widget, mimeData, icon);
+		}
+
+	}
+
+
+
+
+	bool acceptFile(QDragEnterEvent* dee, const std::initializer_list<FileType> allowed_types)
+	{
+		const auto [path, type] = getFileAndType(dee);
+
+		if (std::ranges::find(allowed_types, type) != allowed_types.end())
+		{
+			dee->acceptProposedAction();
+			return true;
+		}
+		return false;
+	}
+
+
+
+
+	bool acceptStringPair(QDragEnterEvent* dee, const std::initializer_list<QString> allowedKeys)
+	{
+		const auto type = MimeData::toStringPair(dee->mimeData()).first;
+
+		if (std::ranges::find(allowedKeys, type) != allowedKeys.end())
+		{
+			dee->acceptProposedAction();
+			return true;
+		}
+		return false;
+	}
+
+
+
+
+	QString getFile(const QDropEvent* de, const FileType allowedType)
+	{
+		const auto [file, type] = getFileAndType(de);
+		return type == allowedType ? file : QString{};
+	}
+
+
+
+
+	std::pair<QString, FileType> getFileAndType(const QDropEvent* de)
+	{
+		const auto [path, ext] = getFileAndExt(de);
+		return {path, FileTypes::find(ext)};
+	}
+
+
+
+
+	std::pair<QString, QString> getFileAndExt(const QDropEvent* de)
+	{
+		auto path = MimeData::toPath(de->mimeData());
+		auto suffix = QFileInfo(path).suffix().toLower();
+
+		return {path, suffix};
+	}
+
+} // namespace lmms::DragAndDrop

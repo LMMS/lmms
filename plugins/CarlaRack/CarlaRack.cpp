@@ -45,7 +45,7 @@ Plugin::Descriptor PLUGIN_EXPORT carlarack_plugin_descriptor =
     CARLA_VERSION_HEX,
     Plugin::Type::Instrument,
     new PluginPixmapLoader( "logo" ),
-    nullptr,
+    {},
     nullptr,
 } ;
 

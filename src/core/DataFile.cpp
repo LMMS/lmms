@@ -105,19 +105,26 @@ namespace
 	{
 		DataFile::Type m_type;
 		QString m_name;
+		std::vector<QString> m_extensions = {};
+		FileType m_fileType = FileType::Unknown;
 	};
 
 	const auto s_types = std::array{
 		TypeDescStruct{ DataFile::Type::Unknown, "unknown" },
-		TypeDescStruct{ DataFile::Type::SongProject, "song" },
-		TypeDescStruct{ DataFile::Type::SongProjectTemplate, "songtemplate" },
-		TypeDescStruct{ DataFile::Type::InstrumentTrackSettings, "instrumenttracksettings" },
+		TypeDescStruct{ DataFile::Type::SongProject, "song" , {"mmp", "mmpz"}, FileType::Project},
+		TypeDescStruct{ DataFile::Type::SongProjectTemplate, "songtemplate", {"mpt"}, FileType::ProjectTemplate},
+		TypeDescStruct{ DataFile::Type::InstrumentTrackSettings, "instrumenttracksettings", {"xpf", "xml"}, FileType::InstrumentPreset},
 		TypeDescStruct{ DataFile::Type::DragNDropData, "dnddata" },
 		TypeDescStruct{ DataFile::Type::ClipboardData, "clipboard-data" },
 		TypeDescStruct{ DataFile::Type::JournalData, "journaldata" },
 		TypeDescStruct{ DataFile::Type::EffectSettings, "effectsettings" },
-		TypeDescStruct{ DataFile::Type::MidiClip, "midiclip" }
+		TypeDescStruct{ DataFile::Type::MidiClip, "midiclip", {"xpt", "xptz"}, FileType::MidiClipData},
 	};
+
+	bool isCompressed(const QString& ext)
+	{
+		return ext == "mmpz" || ext == "xptz";
+	}
 }
 
 
@@ -193,101 +200,21 @@ DataFile::DataFile( const QByteArray & _data ) :
 
 
 
-
-bool DataFile::validate( QString extension )
-{
-	switch( m_type )
-	{
-	case Type::SongProject:
-		if( extension == "mmp" || extension == "mmpz" )
-		{
-			return true;
-		}
-		break;
-	case Type::SongProjectTemplate:
-		if(  extension == "mpt" )
-		{
-			return true;
-		}
-		break;
-	case Type::InstrumentTrackSettings:
-		if ( extension == "xpf" || extension == "xml" )
-		{
-			return true;
-		}
-		break;
-	case Type::MidiClip:
-		if (extension == "xpt" || extension == "xptz")
-		{
-			return true;
-		}
-		break;
-	case Type::Unknown:
-		if (! ( extension == "mmp" || extension == "mpt" || extension == "mmpz" ||
-				extension == "xpf" || extension == "xml" ||
-				( extension == "xiz" && ! getPluginFactory()->pluginSupportingExtension(extension).isNull()) ||
-				extension == "sf2" || extension == "sf3" || extension == "pat" || extension == "mid" ||
-				extension == "dll"
-#ifdef LMMS_BUILD_LINUX
-				|| extension == "so"
-#endif
-#ifdef LMMS_HAVE_LV2
-				|| extension == "lv2"
-#endif
-				) )
-		{
-			return true;
-		}
-		if( extension == "wav" || extension == "ogg" || extension == "ds"
-#ifdef LMMS_HAVE_SNDFILE_MP3
-				|| extension == "mp3"
-#endif
-				)
-		{
-			return true;
-		}
-		break;
-	default:
-		return false;
-	}
-	return false;
-}
-
-
-
-
 QString DataFile::nameWithExtension( const QString & _fn ) const
 {
 	const QString extension = _fn.section( '.', -1 );
 
-	switch( type() )
+	// SongProjects may be saved with template extension
+	if (type() == Type::SongProject && FileTypes::find(extension) == FileType::ProjectTemplate)
 	{
-		case Type::SongProject:
-			if( extension != "mmp" &&
-					extension != "mpt" &&
-					extension != "mmpz" )
-			{
-				if( ConfigManager::inst()->value( "app",
-						"nommpz" ).toInt() == 0 )
-				{
-					return _fn + ".mmpz";
-				}
-				return _fn + ".mmp";
-			}
-			break;
-		case Type::SongProjectTemplate:
-			if( extension != "mpt" )
-			{
-				return _fn + ".mpt";
-			}
-			break;
-		case Type::InstrumentTrackSettings:
-			if( extension != "xpf" )
-			{
-				return _fn + ".xpf";
-			}
-			break;
-		default: ;
+		return _fn;
+	}
+
+	// Add extension if it's missing
+	QString correctExt = DataFile::extension(type());
+	if (!correctExt.isEmpty() && extension != correctExt)
+	{
+			return _fn + "." + correctExt;
 	}
 	return _fn;
 }
@@ -399,7 +326,7 @@ bool DataFile::writeFile(const QString& filename, bool withResources)
 	}
 
 	const QString extension = fullName.section('.', -1);
-	if (extension == "mmpz" || extension == "xptz")
+	if (isCompressed(extension))
 	{
 		QString xml;
 		QTextStream ts( &xml );
@@ -619,6 +546,57 @@ DataFile::Type DataFile::type( const QString& typeName )
 QString DataFile::typeName( Type type )
 {
 	return s_types[static_cast<std::size_t>(type)].m_name;
+}
+
+
+
+
+QString DataFile::extension(Type type)
+{
+	bool wantCompressed = ConfigManager::inst()->value("app", "nommpz" ).toInt() == 0;
+
+	QString firstMatch;
+	for (const auto& desc : s_types)
+	{
+		if (desc.m_type == type)
+		{
+			for (const auto& ext: desc.m_extensions)
+			{
+				// In case there's a suffix that matches the user setting for compressed files, use that
+				// Otherwise use the first suffix in the list
+				if (isCompressed(ext) == wantCompressed)
+				{
+					return ext;
+				}
+				else if (firstMatch.isEmpty())
+				{
+					firstMatch = ext;
+				}
+			}
+
+		}
+	}
+	return firstMatch;
+}
+
+
+
+
+std::vector<std::pair<FileType, QString>> DataFile::allSupportedFileTypes()
+{
+	std::vector<std::pair<FileType, QString>> result;
+
+	for (const auto& typeDesc : s_types)
+	{
+		if (typeDesc.m_fileType != FileType::Unknown)
+		{
+			for (const auto& ext: typeDesc.m_extensions)
+			{
+				result.emplace_back(typeDesc.m_fileType, ext);
+			}
+		}
+	}
+	return result;
 }
 
 

@@ -97,11 +97,23 @@ public:
 		int version;
 		Type type;
 		const PixmapLoader * logo;
-		const char * supportedFileTypes; //!< csv list of extensions
+
+		struct FileTypeInfo
+		{
+			QString ext;
+			std::string iconName = {};
+			bool enablePreview = true;
+		};
+
+		const std::vector<FileTypeInfo> supportedFileTypes;
 
 		inline bool supportsFileType( const QString& extension ) const
 		{
-			return QString( supportedFileTypes ).split( QChar( ',' ) ).contains( extension );
+			for (const auto& fileTypeInfo : supportedFileTypes)
+			{
+				if (fileTypeInfo.ext == extension) { return true; }
+			}
+			return false;
 		}
 
 		/**
@@ -124,7 +136,7 @@ public:
 				its sub plugin (using the attributes).
 				When keys are saved, those attributes are
 				written to XML in order to find the right sub
-				plugin when realoading.
+				plugin when reloading.
 
 				@note Any data that is not required to reference
 					the right Plugin or sub plugin should

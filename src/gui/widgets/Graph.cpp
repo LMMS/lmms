@@ -25,9 +25,10 @@
 
 #include <QPainter>
 
+#include "Clipboard.h"
+#include "FileTypes.h"
 #include "Graph.h"
 #include "SampleLoader.h"
-#include "StringPairDrag.h"
 #include "Oscillator.h"
 
 namespace lmms
@@ -409,24 +410,13 @@ void Graph::paintEvent( QPaintEvent * )
 
 void Graph::dropEvent( QDropEvent * _de )
 {
-	QString type = StringPairDrag::decodeKey( _de );
-	QString value = StringPairDrag::decodeValue( _de );
-
-	if( type == "samplefile" )
-	{
 		// TODO: call setWaveToUser
 		// loadSampleFromFile( value );
-		_de->accept();
-	}
 }
 
-void Graph::dragEnterEvent( QDragEnterEvent * _dee )
+void Graph::dragEnterEvent(QDragEnterEvent* _dee)
 {
-	if( StringPairDrag::processDragEnterEvent( _dee,
-		QString( "samplefile" ) ) == false )
-	{
-		_dee->ignore();
-	}
+	DragAndDrop::acceptFile(_dee, {FileType::Sample});
 }
 
 

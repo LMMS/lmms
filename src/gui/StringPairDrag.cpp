@@ -105,7 +105,7 @@ bool StringPairDrag::processDragEnterEvent( QDragEnterEvent * _dee,
 
 QString StringPairDrag::decodeKey( QDropEvent * _de )
 {
-	return Clipboard::decodeKey( _de->mimeData() );
+	return MimeData::toStringPair(_de->mimeData()).first;
 }
 
 
@@ -113,7 +113,7 @@ QString StringPairDrag::decodeKey( QDropEvent * _de )
 
 QString StringPairDrag::decodeValue( QDropEvent * _de )
 {
-	return Clipboard::decodeValue( _de->mimeData() );
+	return MimeData::toStringPair(_de->mimeData()).second;
 }
 
 

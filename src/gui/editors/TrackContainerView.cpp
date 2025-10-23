@@ -31,6 +31,7 @@
 
 #include "TrackContainer.h"
 #include "AudioEngine.h"
+#include "Clipboard.h"
 #include "DataFile.h"
 #include "MainWindow.h"
 #include "FileBrowser.h"
@@ -369,12 +370,20 @@ void TrackContainerView::clearAllTracks()
 
 void TrackContainerView::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	StringPairDrag::processDragEnterEvent( _dee,
-		QString( "presetfile,pluginpresetfile,samplefile,instrument,"
-				"importedproject,soundfontfile,patchfile,vstpluginfile,projectfile,"
-				"track_%1,track_%2" ).
-						arg( static_cast<int>(Track::Type::Instrument) ).
-						arg( static_cast<int>(Track::Type::Sample) ) );
+	DragAndDrop::acceptStringPair(_dee, {
+		"instrument",
+		QString("track_%1").arg(static_cast<int>(Track::Type::Instrument)),
+		QString("track_%1").arg(static_cast<int>(Track::Type::Sample))
+	});
+
+	DragAndDrop::acceptFile(_dee, {
+		FileType::Project,
+		FileType::ProjectTemplate,
+		FileType::InstrumentPreset,
+		FileType::InstrumentAsset,
+		FileType::Sample,
+		FileType::ImportableProject,
+	});
 }
 
 
@@ -393,6 +402,8 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 {
 	QString type = StringPairDrag::decodeKey( _de );
 	QString value = StringPairDrag::decodeValue( _de );
+	const auto& [path, fileType] = DragAndDrop::getFileAndType(_de);
+
 	if( type == "instrument" )
 	{
 		auto it = dynamic_cast<InstrumentTrack*>(Track::create(Track::Type::Instrument, m_tc));
@@ -401,38 +412,37 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 		//it->toggledInstrumentTrackButton( true );
 		_de->accept();
 	}
-	else if( type == "samplefile" || type == "pluginpresetfile"
-		|| type == "soundfontfile" || type == "vstpluginfile"
-		|| type == "patchfile" )
+	else if (fileType == FileType::Sample || fileType == FileType::InstrumentAsset)
 	{
 		auto it = dynamic_cast<InstrumentTrack*>(Track::create(Track::Type::Instrument, m_tc));
 		PluginFactory::PluginInfoAndKey piakn =
-			getPluginFactory()->pluginSupportingExtension(FileItem::extension(value));
+			getPluginFactory()->pluginSupportingExtension(FileItem::extension(path));
+
 		Instrument * i = it->loadInstrument(piakn.info.name(), &piakn.key);
-		i->loadFile( value );
+		i->loadFile(path);
 		//it->toggledInstrumentTrackButton( true );
 		_de->accept();
 	}
-	else if( type == "presetfile" )
+	else if (fileType == FileType::InstrumentPreset)
 	{
-		DataFile dataFile( value );
+		DataFile dataFile(path);
 		auto it = dynamic_cast<InstrumentTrack*>(Track::create(Track::Type::Instrument, m_tc));
 		it->loadPreset(dataFile.content().toElement());
 
 		//it->toggledInstrumentTrackButton( true );
 		_de->accept();
 	}
-	else if( type == "importedproject" )
+	else if (fileType == FileType::ImportableProject)
 	{
-		ImportFilter::import( value, m_tc );
+		ImportFilter::import(path, m_tc);
 		_de->accept();
 	}
 
-	else if( type == "projectfile")
+	else if (fileType == FileType::Project || fileType == FileType::ProjectTemplate)
 	{
-		if( getGUI()->mainWindow()->mayChangeProject(true) )
+		if (getGUI()->mainWindow()->mayChangeProject(true))
 		{
-			Engine::getSong()->loadProject( value );
+			Engine::getSong()->loadProject(path);
 		}
 		_de->accept();
 	}

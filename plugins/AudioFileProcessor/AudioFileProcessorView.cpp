@@ -35,7 +35,6 @@
 #include "PixmapButton.h"
 #include "SampleLoader.h"
 #include "Song.h"
-#include "StringPairDrag.h"
 #include "Track.h"
 #include "Clipboard.h"
 
@@ -147,34 +146,6 @@ AudioFileProcessorView::AudioFileProcessorView(Instrument* instrument,
 	setAcceptDrops(true);
 }
 
-void AudioFileProcessorView::dragEnterEvent(QDragEnterEvent* dee)
-{
-	// For mimeType() and MimeType enum class
-	using namespace Clipboard;
-
-	if (dee->mimeData()->hasFormat(mimeType(MimeType::StringPair)))
-	{
-		QString txt = dee->mimeData()->data(
-						mimeType(MimeType::StringPair));
-		if (txt.section(':', 0, 0) == QString("clip_%1").arg(
-							static_cast<int>(Track::Type::Sample)))
-		{
-			dee->acceptProposedAction();
-		}
-		else if (txt.section(':', 0, 0) == "samplefile")
-		{
-			dee->acceptProposedAction();
-		}
-		else
-		{
-			dee->ignore();
-		}
-	}
-	else
-	{
-		dee->ignore();
-	}
-}
 
 void AudioFileProcessorView::newWaveView()
 {
@@ -192,27 +163,6 @@ void AudioFileProcessorView::newWaveView()
 	m_waveView->show();
 }
 
-void AudioFileProcessorView::dropEvent(QDropEvent* de)
-{
-	const auto type = StringPairDrag::decodeKey(de);
-	const auto value = StringPairDrag::decodeValue(de);
-
-	if (type == "samplefile") { castModel<AudioFileProcessor>()->setAudioFile(value); }
-	else if (type == QString("clip_%1").arg(static_cast<int>(Track::Type::Sample)))
-	{
-		DataFile dataFile(value.toUtf8());
-		castModel<AudioFileProcessor>()->setAudioFile(dataFile.content().firstChild().toElement().attribute("src"));
-	}
-	else
-	{
-		de->ignore();
-		return;
-	}
-
-	m_waveView->updateSampleRange();
-	Engine::getSong()->setModified();
-	de->accept();
-}
 
 void AudioFileProcessorView::paintEvent(QPaintEvent*)
 {

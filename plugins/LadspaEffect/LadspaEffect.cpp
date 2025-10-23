@@ -60,7 +60,7 @@ Plugin::Descriptor PLUGIN_EXPORT ladspaeffect_plugin_descriptor =
 	0x0100,
 	Plugin::Type::Effect,
 	new PluginPixmapLoader("logo"),
-	nullptr,
+	{},
 	new LadspaSubPluginFeatures( Plugin::Type::Effect )
 } ;
 

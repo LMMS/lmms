@@ -31,6 +31,7 @@
 #include "Clipboard.h"
 #include "ComboBox.h"
 #include "DataFile.h"
+#include "FileTypes.h"
 #include "InstrumentView.h"
 #include "Knob.h"
 #include "LcdSpinBox.h"
@@ -38,7 +39,6 @@
 #include "SampleLoader.h"
 #include "SlicerT.h"
 #include "SlicerTWaveform.h"
-#include "StringPairDrag.h"
 #include "Track.h"
 #include "embed.h"
 
@@ -163,44 +163,19 @@ void SlicerTView::openFiles()
 	m_slicerTParent->updateFile(audioFile);
 }
 
-// all the drag stuff is copied from AudioFileProcessor
 void SlicerTView::dragEnterEvent(QDragEnterEvent* dee)
 {
-	// For mimeType() and MimeType enum class
-	using namespace Clipboard;
-
-	if (dee->mimeData()->hasFormat(mimeType(MimeType::StringPair)))
-	{
-		QString txt = dee->mimeData()->data(mimeType(MimeType::StringPair));
-		if (txt.section(':', 0, 0) == QString("clip_%1").arg(static_cast<int>(Track::Type::Sample)))
-		{
-			dee->acceptProposedAction();
-		}
-		else if (txt.section(':', 0, 0) == "samplefile") { dee->acceptProposedAction(); }
-		else { dee->ignore(); }
-	}
-	else { dee->ignore(); }
+	DragAndDrop::acceptFile(dee, {FileType::Sample});
 }
 
 void SlicerTView::dropEvent(QDropEvent* de)
 {
-	QString type = StringPairDrag::decodeKey(de);
-	QString value = StringPairDrag::decodeValue(de);
-	if (type == "samplefile")
-	{
-		// set m_wf wave file
-		m_slicerTParent->updateFile(value);
-		return;
-	}
-	else if (type == QString("clip_%1").arg(static_cast<int>(Track::Type::Sample)))
-	{
-		DataFile dataFile(value.toUtf8());
-		m_slicerTParent->updateFile(dataFile.content().firstChild().toElement().attribute("src"));
-		de->accept();
-		return;
-	}
+	const auto path = DragAndDrop::getFile(de, FileType::Sample);
 
-	de->ignore();
+	if (!path.isEmpty())
+	{
+		m_slicerTParent->updateFile(path);
+	}
 }
 
 void SlicerTView::paintEvent(QPaintEvent* pe)

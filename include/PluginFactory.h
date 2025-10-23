@@ -79,6 +79,8 @@ public:
 
 	/// Returns a list of all found plugins' PluginFactory::PluginInfo objects.
 	const PluginInfoList& pluginInfos() const;
+	/// Returns a list of all file extensions supported by any plugin
+	QStringList allSupportedExtensions();
 	/// Returns a plugin that support the given file extension
 	PluginInfoAndKey pluginSupportingExtension(const QString& ext);
 

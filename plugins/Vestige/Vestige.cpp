@@ -54,7 +54,6 @@
 #include "PathUtil.h"
 #include "PixmapButton.h"
 #include "Song.h"
-#include "StringPairDrag.h"
 #include "SubWindow.h"
 #include "TextFloat.h"
 #include "Clipboard.h"
@@ -79,15 +78,14 @@ Plugin::Descriptor Q_DECL_EXPORT  vestige_plugin_descriptor =
 	0x0100,
 	Plugin::Type::Instrument,
 	new PluginPixmapLoader( "logo" ),
-#if defined(LMMS_BUILD_WIN32)
-	"dll",
-#elif defined(LMMS_BUILD_LINUX)
-#	if defined(LMMS_HAVE_VST_32) || defined(LMMS_HAVE_VST_64)
-		"dll,so",
-#	else
-		"so",
-#	endif
+	{
+#if defined(LMMS_BUILD_WIN32) || defined(LMMS_HAVE_VST_32) || defined(LMMS_HAVE_VST_64)
+		{"dll", "vst_plugin_file", /*preview in browser*/ false},
 #endif
+#if defined(LMMS_BUILD_LINUX)
+		{"so", "vst_plugin_file", /*preview in browser*/ false},
+#endif
+	},
 	nullptr,
 } ;
 
@@ -831,49 +829,6 @@ void VestigeInstrumentView::noteOffAll( void )
 
 
 
-void VestigeInstrumentView::dragEnterEvent( QDragEnterEvent * _dee )
-{
-	// For mimeType() and MimeType enum class
-	using namespace Clipboard;
-
-	if( _dee->mimeData()->hasFormat( mimeType( MimeType::StringPair ) ) )
-	{
-		QString txt = _dee->mimeData()->data(
-						mimeType( MimeType::StringPair ) );
-		if( txt.section( ':', 0, 0 ) == "vstplugin" )
-		{
-			_dee->acceptProposedAction();
-		}
-		else
-		{
-			_dee->ignore();
-		}
-	}
-	else
-	{
-		_dee->ignore();
-	}
-}
-
-
-
-
-void VestigeInstrumentView::dropEvent( QDropEvent * _de )
-{
-	QString type = StringPairDrag::decodeKey( _de );
-	QString value = StringPairDrag::decodeValue( _de );
-	if( type == "vstplugin" )
-	{
-		m_vi->loadFile( value );
-		_de->accept();
-		return;
-	}
-	_de->ignore();
-}
-
-
-
-
 void VestigeInstrumentView::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
@@ -1185,48 +1140,6 @@ void ManageVestigeInstrumentView::syncParameterText()
 	{
 		vstKnobs[i]->setValueText(paramDisplayList[i] + ' ' + paramLabelList[i]);
 	}
-}
-
-
-
-void ManageVestigeInstrumentView::dragEnterEvent( QDragEnterEvent * _dee )
-{
-	// For mimeType() and MimeType enum class
-	using namespace Clipboard;
-
-	if( _dee->mimeData()->hasFormat( mimeType( MimeType::StringPair ) ) )
-	{
-		QString txt = _dee->mimeData()->data(
-						mimeType( MimeType::StringPair ) );
-		if( txt.section( ':', 0, 0 ) == "vstplugin" )
-		{
-			_dee->acceptProposedAction();
-		}
-		else
-		{
-			_dee->ignore();
-		}
-	}
-	else
-	{
-		_dee->ignore();
-	}
-}
-
-
-
-
-void ManageVestigeInstrumentView::dropEvent( QDropEvent * _de )
-{
-	QString type = StringPairDrag::decodeKey( _de );
-	QString value = StringPairDrag::decodeValue( _de );
-	if( type == "vstplugin" )
-	{
-		m_vi->loadFile( value );
-		_de->accept();
-		return;
-	}
-	_de->ignore();
 }
 
 

@@ -33,6 +33,7 @@
 
 #include <QTreeWidget>
 
+#include "FileTypes.h"
 #include "SideBarWidget.h"
 #include "lmmsconfig.h"
 
@@ -256,30 +257,6 @@ private:
 class FileItem : public QTreeWidgetItem
 {
 public:
-	enum class FileType
-	{
-		Project,
-		Preset,
-		Sample,
-		SoundFont,
-		Patch,
-		Midi,
-		VstPlugin,
-		Unknown
-	} ;
-
-	enum class FileHandling
-	{
-		NotSupported,
-		LoadAsProject,
-		LoadAsPreset,
-		LoadByPlugin,
-		ImportAsProject
-	} ;
-
-
-	FileItem( QTreeWidget * parent, const QString & name,
-							const QString & path );
 	FileItem( const QString & name, const QString & path );
 
 	QString fullName() const
@@ -292,29 +269,23 @@ public:
 		return( m_type );
 	}
 
-	inline FileHandling handling() const
-	{
-		return( m_handling );
-	}
-
+	//! True if the file can be used to create a new instrument track
 	inline bool isTrack() const
 	{
-		return m_handling == FileHandling::LoadAsPreset || m_handling == FileHandling::LoadByPlugin;
+		return m_type == FileType::InstrumentPreset
+			|| m_type == FileType::InstrumentAsset
+			|| m_type == FileType::Sample;
 	}
 
 	QString extension();
 	static QString extension( const QString & file );
 	static QString defaultFilters();
 
+	void startFileDrag(QWidget* dragSource);
 
 private:
-	void initPixmaps();
-	void determineFileType();
-
 	QString m_path;
 	FileType m_type;
-	FileHandling m_handling;
-
 } ;
 
 

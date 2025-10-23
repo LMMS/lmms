@@ -125,6 +125,13 @@ PluginFactory::PluginInfoAndKey PluginFactory::pluginSupportingExtension(const Q
 	return m_pluginByExt.value(ext, PluginInfoAndKey());
 }
 
+
+QStringList PluginFactory::allSupportedExtensions()
+{
+	return QStringList(m_pluginByExt.keys());
+}
+
+
 PluginFactory::PluginInfo PluginFactory::pluginInfo(const char* name) const
 {
 	for (const PluginInfo& info : m_pluginInfos)
@@ -224,8 +231,13 @@ void PluginFactory::discoverPlugins()
 				}
 			};
 
-			if (info.descriptor->supportedFileTypes)
-				addSupportedFileTypes(QString(info.descriptor->supportedFileTypes), info);
+			for (const auto& fileType : info.descriptor->supportedFileTypes)
+			{
+				if (!fileType.ext.isEmpty())
+				{
+					m_pluginByExt.insert(fileType.ext, {info, nullptr});
+				}
+			}
 
 			if (info.descriptor->subPluginFeatures)
 			{

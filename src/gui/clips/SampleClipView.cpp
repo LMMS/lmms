@@ -26,10 +26,12 @@
 
 #include <QApplication>
 #include <QMenu>
+#include <QMimeData>
 #include <QPainter>
 
 #include "GuiApplication.h"
 #include "AutomationEditor.h"
+#include "Clipboard.h"
 #include "embed.h"
 #include "PathUtil.h"
 #include "SampleClip.h"
@@ -106,10 +108,24 @@ void SampleClipView::constructContextMenu(QMenu* cm)
 
 
 
+QMimeData* SampleClipView::createClipboardData()
+{
+	auto mimeData = ClipView::createClipboardData();
+
+	// Add sample path to drag-and-drop objects so they can be dragged into other apps
+	const auto path = PathUtil::toAbsolute(m_clip->sampleFile());
+	mimeData->setUrls({QUrl::fromLocalFile(path)});
+
+	return mimeData;
+}
+
+
+
+
 void SampleClipView::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	if( StringPairDrag::processDragEnterEvent( _dee,
-					"samplefile,sampledata" ) == false )
+	if (!DragAndDrop::acceptFile(_dee, {FileType::Sample})
+	 && !DragAndDrop::acceptStringPair(_dee, {"sampledata"}))
 	{
 		ClipView::dragEnterEvent( _dee );
 	}
@@ -122,9 +138,11 @@ void SampleClipView::dragEnterEvent( QDragEnterEvent * _dee )
 
 void SampleClipView::dropEvent( QDropEvent * _de )
 {
-	if( StringPairDrag::decodeKey( _de ) == "samplefile" )
+	const auto path = DragAndDrop::getFile(_de, FileType::Sample);
+
+	if (!path.isEmpty())
 	{
-		m_clip->setSampleFile( StringPairDrag::decodeValue( _de ) );
+		m_clip->setSampleFile(path);
 		_de->accept();
 	}
 	else if( StringPairDrag::decodeKey( _de ) == "sampledata" )

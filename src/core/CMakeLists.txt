@@ -25,6 +25,7 @@ set(LMMS_SRCS
 	core/EnvelopeAndLfoParameters.cpp
 	core/fft_helpers.cpp
 	core/FileSearch.cpp
+	core/FileTypes.cpp
 	core/Mixer.cpp
 	core/ImportFilter.cpp
 	core/InlineAutomation.cpp
