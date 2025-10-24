@@ -110,8 +110,7 @@ namespace lmms::PathUtil
 	}
 
 
-	// Enforce forward slashes for cross-platform compatibility.
-	// See issue #8107.
+	// Enforce forward slashes for cross-platform compatibility, see #8107.
 	QString serializePath(const QString & input)
 	{
 		if (input.isEmpty()) { return input; }
@@ -139,13 +138,14 @@ namespace lmms::PathUtil
 
 
 
+
 	QString oldRelativeUpgrade(const QString & input)
 	{
-		if (input.isEmpty()) { return basePrefix(Base::Absolute); }
+		Base assumedBase = Base::Absolute;
+
+		if (input.isEmpty()) { return basePrefix(assumedBase); }
 
 		QString path = serializePath(input);
-
-		Base assumedBase = Base::Absolute;
 
 		// Check if it's a user sample.
 		QString userPath = baseLocation(Base::UserSample) + path;
@@ -194,9 +194,7 @@ namespace lmms::PathUtil
 	{
 		if (input.isEmpty()) { return input; }
 
-		QString path = serializePath(input);
-
-		QString absolutePath = toAbsolute(path);
+		QString absolutePath = toAbsolute(serializePath(input));
 		if (base == Base::Absolute) { return absolutePath; }
 		bool error;
 		QString relativePath = baseQDir(base, &error).relativeFilePath(absolutePath);
