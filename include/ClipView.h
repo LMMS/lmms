@@ -225,7 +225,6 @@ private:
 	QColor m_markerColor;
 	QSize m_mouseHotspotHand; // QSize must be used because QPoint
 	QSize m_mouseHotspotKnife; // isn't supported by property system
-	QCursor m_cursorHand;
 	QCursor m_cursorKnife;
 	bool m_cursorSetYet;
 
