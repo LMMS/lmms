@@ -1,5 +1,5 @@
 /*
- * FileSearch.cpp
+ * FileSearchJob.cpp
  *
  * Copyright (c) 2025 saker <sakertooth@gmail.com>
  *
@@ -22,7 +22,7 @@
  *
  */
 
-#include "FileSearch.h"
+#include "FileSearchJob.h"
 
 #include <QDirIterator>
 #include <QRegularExpression>
@@ -30,12 +30,12 @@
 #include "ThreadPool.h"
 
 namespace lmms::gui {
-FileSearch::FileSearch(QObject* parent)
+FileSearchJob::FileSearchJob(QObject* parent)
 	: QObject(parent)
 {
 }
 
-FileSearch::~FileSearch()
+FileSearchJob::~FileSearchJob()
 {
 	if (m_task.valid())
 	{
@@ -44,7 +44,7 @@ FileSearch::~FileSearch()
 	}
 }
 
-void FileSearch::search(Task task)
+void FileSearchJob::search(Task task)
 {
 	if (m_task.valid())
 	{
@@ -57,7 +57,7 @@ void FileSearch::search(Task task)
 	m_task = ThreadPool::instance().enqueue(std::move(fn));
 }
 
-void FileSearch::runSearch(Task task)
+void FileSearchJob::runSearch(Task task)
 {
 	// RE expression that matches regular tokens, and tokens with double quotes around them
 	static auto s_tokenRe = QRegularExpression{R"(\"([^"]+)\"|(\S+))"};

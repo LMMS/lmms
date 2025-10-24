@@ -28,7 +28,7 @@
 #include <QDir>
 #include <QMutex>
 
-#include "FileSearch.h"
+#include "FileSearchJob.h"
 #include "embed.h"
 
 #include <QTreeWidget>
@@ -52,7 +52,7 @@ namespace gui
 
 class FileBrowserTreeWidget;
 class FileItem;
-class FileSearch;
+class FileSearchJob;
 
 class FileBrowser : public SideBarWidget
 {
@@ -107,7 +107,7 @@ private:
 	Type m_type;
 
 	QProgressBar* m_searchIndicator = nullptr;
-	FileSearch m_search;
+	FileSearchJob m_searchJob;
 
 	QString m_directories; //!< Directories to search, split with '*'
 	QString m_filter; //!< Filter as used in QDir::match()

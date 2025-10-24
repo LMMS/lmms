@@ -1,5 +1,5 @@
 /*
- * FileSearch.h
+ * FileSearchJob.h
  *
  * Copyright (c) 2025 saker <sakertooth@gmail.com>
  *
@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef LMMS_GUI_FILE_SEARCH_H
-#define LMMS_GUI_FILE_SEARCH_H
+#ifndef LMMS_GUI_FILE_SEARCH_JOB_H
+#define LMMS_GUI_FILE_SEARCH_JOB_H
 
 #include <QDir>
 #include <QObject>
@@ -31,13 +31,13 @@
 #include <future>
 
 namespace lmms::gui {
-//! The `FileSearch` class allows for searching for files on the filesystem.
+//! The `FileSearchJob` class allows for searching for files on the filesystem.
 //! Searching occurs on a background thread, and results are emitted as a Qt slot back to the user.
-class FileSearch : public QObject
+class FileSearchJob : public QObject
 {
 	Q_OBJECT
 public:
-	//! Represents a search task to be carried out by the search object.
+	//! Represents a search task to be carried out by the search job.
 	struct Task
 	{
 		QString filter;					 //! The filter to be tokenized.
@@ -46,11 +46,11 @@ public:
 		QFlags<QDir::Filter> dirFilters; //! The directory filter flag.
 	};
 
-	//! Create a search object with the given @p parent (if any).
-	FileSearch(QObject* parent = nullptr);
+	//! Create a search job with the given @p parent (if any).
+	FileSearchJob(QObject* parent = nullptr);
 
 	//! Stop processing and destroys the object.
-	~FileSearch();
+	~FileSearchJob();
 
 	//! Commit to searching with the given @p task.
 	//! Cancels any previous search.
@@ -58,21 +58,21 @@ public:
 	void search(Task task);
 
 signals:
-	//! Emitted when the search object has found a matching path.
+	//! Emitted when the search job has found a matching path.
 	void foundMatch(const QString& path);
 
-	//! Emitted when the search object has started searching.
+	//! Emitted when the search job has started searching.
 	void started();
 
-	//! Emitted when the search object has finished searching.
+	//! Emitted when the search job has finished searching.
 	void finished();
 
 private:
-	Q_DISABLE_MOVE(FileSearch)
+	Q_DISABLE_MOVE(FileSearchJob)
 	void runSearch(Task task);
 	std::future<void> m_task;
 	std::atomic_flag m_stop = ATOMIC_FLAG_INIT;
 };
 } // namespace lmms::gui
 
-#endif // LMMS_GUI_FILE_SEARCH_H
+#endif // LMMS_GUI_FILE_SEARCH_JOB_H

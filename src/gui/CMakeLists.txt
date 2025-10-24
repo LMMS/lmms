@@ -15,7 +15,7 @@ SET(LMMS_SRCS
 	gui/embed.cpp
 	gui/FileBrowser.cpp
 	gui/FileRevealer.cpp
-	gui/FileSearch.cpp
+	gui/FileSearchJob.cpp
 	gui/GuiApplication.cpp
 	gui/LadspaControlView.cpp
 	gui/LfoControllerDialog.cpp

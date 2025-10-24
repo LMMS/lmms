@@ -104,9 +104,9 @@ FileBrowser::FileBrowser(Type type, const QString& directories, const QString& f
 	m_filterEdit->addAction(embed::getIconPixmap("zoom"), QLineEdit::LeadingPosition);
 
 	connect(m_filterEdit, &QLineEdit::textEdited, this, &FileBrowser::onSearch);
-	connect(&m_search, &FileSearch::started, this, &FileBrowser::onSearchStarted, Qt::QueuedConnection);
-	connect(&m_search, &FileSearch::finished, this, &FileBrowser::onSearchFinished, Qt::QueuedConnection);
-	connect(&m_search, &FileSearch::foundMatch, this, &FileBrowser::onSearchMatch, Qt::QueuedConnection);
+	connect(&m_searchJob, &FileSearchJob::started, this, &FileBrowser::onSearchStarted, Qt::QueuedConnection);
+	connect(&m_searchJob, &FileSearchJob::finished, this, &FileBrowser::onSearchFinished, Qt::QueuedConnection);
+	connect(&m_searchJob, &FileSearchJob::foundMatch, this, &FileBrowser::onSearchMatch, Qt::QueuedConnection);
 
 	auto reload_btn = new QPushButton(embed::getIconPixmap("reload"), QString(), searchWidget);
 	reload_btn->setToolTip( tr( "Refresh list" ) );
@@ -222,7 +222,7 @@ void FileBrowser::onSearch(const QString& filter)
 	auto directoryFilters = QDir::AllEntries | QDir::NoDotAndDotDot;
 	if (m_showHiddenContent) { directoryFilters |= QDir::Hidden; }
 
-	const auto searchTask = FileSearch::Task{.filter = filter,
+	const auto searchTask = FileSearchJob::Task{.filter = filter,
 		.paths = directories,
 		.extensions = FileItem::defaultFilters().split(" "),
 		.dirFilters = directoryFilters};
@@ -230,7 +230,7 @@ void FileBrowser::onSearch(const QString& filter)
 	m_searchTreeWidget->clear();
 	m_searchTreeWidget->show();
 	m_fileBrowserTreeWidget->hide();
-	m_search.search(searchTask);
+	m_searchJob.search(searchTask);
 }
 
 void FileBrowser::onSearchMatch(const QString& path)
