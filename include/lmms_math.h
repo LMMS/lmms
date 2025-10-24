@@ -42,7 +42,6 @@
 
 namespace lmms
 {
-using namespace std::numbers;
 
 
 // TODO C++23: Make constexpr since std::abs() will be constexpr
@@ -186,7 +185,7 @@ inline float logToLinearScale(float min, float max, float value)
 //! @brief Scales value from logarithmic to linear. Value should be in min-max range.
 inline float linearToLogScale(float min, float max, float value)
 {
-	constexpr auto inv_e = static_cast<float>(1.0 / e);
+	constexpr auto inv_e = static_cast<float>(1.0 / std::numbers::e);
 	const float valueLimited = std::clamp(value, min, max);
 	const float val = (valueLimited - min) / (max - min);
 	if (min < 0)
@@ -204,7 +203,7 @@ inline float linearToLogScale(float min, float max, float value)
 template<typename T> requires std::is_arithmetic_v<T>
 inline auto fastPow10f(T x)
 {
-	return std::exp(ln10_v<std::conditional_t<std::is_floating_point_v<T>, T, float>> * x);
+	return std::exp(std::numbers::ln10_v<std::conditional_t<std::is_floating_point_v<T>, T, float>> * x);
 }
 
 
@@ -212,7 +211,7 @@ inline auto fastPow10f(T x)
 template<typename T> requires std::is_arithmetic_v<T>
 inline auto fastLog10f(T x)
 {
-	constexpr auto inv_ln10 = static_cast<std::conditional_t<std::is_floating_point_v<T>, T, float>>(1.0 / ln10);
+	constexpr auto inv_ln10 = static_cast<std::conditional_t<std::is_floating_point_v<T>, T, float>>(1.0 / std::numbers::ln10);
 	return std::log(x) * inv_ln10;
 }
 
