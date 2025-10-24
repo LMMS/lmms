@@ -407,7 +407,7 @@ bool MidiImport::readSMF(TrackContainer* tc)
 			{
 				smfMidiChannel* ch = chs[evt->chan].create(tc, trackName);
 				auto noteEvt = dynamic_cast<Alg_note_ptr>(evt);
-				int ticks = noteEvt->get_duration() * ticksPerBeat;
+				tick_t ticks = noteEvt->get_duration() * ticksPerBeat;
 				Note n(
 					ticks < 1 ? 1 : ticks,
 					noteEvt->get_start_time() * ticksPerBeat,
@@ -562,8 +562,8 @@ invalid_format:
 	// search for "data" chunk
 	while (true)
 	{
-		const int id = read32LE();
-		const int len = read32LE();
+		const std::int32_t id = read32LE();
+		const std::int32_t len = read32LE();
 		if (file().atEnd())
 		{
 data_not_found:
