@@ -1367,9 +1367,8 @@ void MainWindow::browseHelp()
 
 void MainWindow::autoSave()
 {
-	QString autoSaveVersionedName = Engine::getSong()->projectFileName();
 
-	if( Engine::getSong()->isModifiedAutosave() &&
+	if ( Engine::getSong()->isModifiedAutosave() &&
 		!Engine::getSong()->isExporting() &&
 		!Engine::getSong()->isLoadingProject() &&
 		!RemotePluginBase::isMainThreadWaiting() &&
@@ -1380,9 +1379,16 @@ void MainWindow::autoSave()
 	{
 		//Recovery file is still needed for post-crash recovery dialog.
 		Engine::getSong()->saveProjectFile(ConfigManager::inst()->recoveryFile());
-		if( Engine::getSong()->projectFileName() != "" )
+		if (Engine::getSong()->projectFileName() != "" &&
+			ConfigManager::inst()->value( "ui", "enableversionedautosave" ).toInt())
 		{
-			Engine::getSong()->saveProjectFile( autoSaveVersionedName.section('.', 0, 0).append(".").append("autosave").append(".").append(QDateTime::currentDateTime().toString("dd-MM-yyyy-hh-mm-ss-zzz")).append(".").append(autoSaveVersionedName.section('.', -1)) );
+			QString currentProjectName = Engine::getSong()->projectFileName();
+			QString autoSaveTimestamp = QDateTime::currentDateTime().toString("dd-MM-yyyy-hh-mm-ss");
+			QString autoSaveVersionedName = currentProjectName.section('.', 0, 0).append(".autosave.")	//filename.autosave.
+											.append(autoSaveTimestamp).append(".")						//timestamp.
+											.append(currentProjectName.section('.', -1));				//extension
+
+			Engine::getSong()->saveProjectFile(autoSaveVersionedName);
 		}
 		Engine::getSong()->setModifiedAutosave(false);
 		autoSaveTimerReset();  // Reset timer
