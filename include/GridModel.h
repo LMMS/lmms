@@ -22,53 +22,93 @@
  *
 */
 
-#ifndef LMMS_GRID_VIEW_H
-#define LMMS_GRID_VIEW_H
+#ifndef LMMS_GRID_MODEl_H
+#define LMMS_GRID_MODEl_H
+
+#include <set>
+#include <memory> // shared_ptr
+#include <vector>
+
+namespace lmms
+{
 
 class GridModel : public Model
 {
 public:
-	GridModel(size_t length, size_t height, bool isXWhole, bool isYWhole);
-	~GridModel();
-
-private:
-	size_t findItem(void* item);
-	size_t findItem(size_t x, size_t y);
-
-	//! @return start and end index of the object inside that column
-	std::pair<size_t, size_t> findCol(size_t x);
-	std::pair<size_t, size_t> findBetweenRows(size_t minY, size_t maxY);
-
-	//! @return first index found in column, -1 if not found
-	ssize_t findColFirst(float xPos);
-	size_t findColLast();
-
-	struct Item
+	struct ItemInfo
 	{
 		float x;
 		float y;
-		uint8_t data;
-		void* object;
+	}
+
+	//! @return index if found inside radius, else -1
+	//! (the first index is returned where `xPos` is found)
+	int findIndexFromPos(float xPos, float radius);
+
+	void removeItem(size_t index);
+	//! @return index of an item with larger or equal x pos
+	size_t getNextItem(size_t index) { return index + 1; }
+
+	//! @return new / final index (if x changed)
+	size_t setInfo(size_t index, const ItemInfo& info);
+	size_t setInfo(size_t index, const ItemInfo& info, unsigned int horizontalSteps, unsigned int verticalSteps);
+	const ItemInfo& getInfo(size_t index);
+
+	void resizeGrid(size_t length, size_t height);
+	virtual ~GridModel();
+protected:
+	GridModel(size_t length, size_t height, unsigned int horizontalSteps, unsigned int verticalSteps);
+
+	//! @return index if found, -1 if not
+	int findObject(void* object);
+	//! @return index if found, index after xPos if not found
+	size_t findIndex(float xPos);
+
+	//! @return index where added
+	size_t addItem(Item itemIn);
+
+	//! only call these with fitted values (`fitPos`)
+	//! @return new / final index (if x changed)
+	size_t setX(size_t index, float newX);
+	void setY(size_t index, float newY);
+
+	struct Item
+	{
+		ItemInfo info;
+		std::shared_ptr<void>* object;
 	};
 
+	float fitPos(float position, size_t max, unsigned int horizontalSteps);
+
+private:
 	size_t m_length;
 	size_t m_height;
+	unsigned int m_horizontalSteps;
+	unsigned int m_verticalSteps;
 
-	bool m_isXWhole;
-	bool m_isYWhole;
-
-	//! items are sorted by whole x position ascending
-	std::list<Item> m_items;
-	std::vector<size_t> m_selecion;
+	//! items are sorted by x position ascending
+	std::vector<Item> m_items;
+	std::set<size_t> m_selecion;
 };
 
 template<typename T>
 class GridModelTyped : public GridModel
 {
 public:
-	
-private:
-	
+	GridModelTyped(size_t length, size_t height, unsigned int horizontalSteps, unsigned int verticalSteps)
+		: GridModel{length, height, horizontalSteps, verticalSteps} {}
+	~GridModelTyped() = default;
+
+	//! @return index if found, -1 if not
+	int findObject(T* object) { return GridModel::findObject(object); }
+
+	//! @return index where added
+	size_t addItem(T* object, ItemInfo info)
+	{
+		return GridModel::addItem(ItemInfo{info, std::make_shared<T>(object)});
+	}
 };
 
-#endif // LMMS_GRID_VIEW_H
+} // namespace lmms
+
+#endif // LMMS_GRID_MODEl_H
