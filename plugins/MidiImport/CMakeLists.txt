@@ -1,5 +1,12 @@
 INCLUDE(BuildPlugin)
 
+# For now, portsmf files are included directly in the plugin.
+INCLUDE_DIRECTORIES("portsmf/include")
 BUILD_PLUGIN(midiimport MidiImport.cpp MidiImport.h
 	portsmf/include/allegro.h portsmf/src/allegro.cpp
+	portsmf/include/mfmidi.h portsmf/src/mfmidi.cpp
+	portsmf/include/strparse.h portsmf/src/strparse.cpp
+	# portsmf/src/allegrosmfwr.cpp portsmf/src/allegrowr.cpp
+	portsmf/src/allegrosmfrd.cpp portsmf/src/allegrord.cpp
+	portsmf/src/algsmfrd_internal.h portsmf/src/algsmfrd_internal.h
 	MOCFILES MidiImport.h)
