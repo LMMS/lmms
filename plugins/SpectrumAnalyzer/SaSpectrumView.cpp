@@ -728,17 +728,18 @@ std::vector<std::pair<float, std::string>> SaSpectrumView::makeLogAmpTics(int lo
 
 	// Base zoom level on selected range and how close is the current height
 	// to the sizeHint() (denser scale for bigger window).
-	if ((high - low) < 20 * ((float)height() / sizeHint().height()))
+	const float heightScale = static_cast<float>(height()) / sizeHint().height();
+	if ((high - low) < 20 * heightScale)
 	{
-		increment = fastPow10f(0.3f); // 3 dB steps when really zoomed in
+		increment = fastPow10f(0.3); // 3 dB steps when really zoomed in
 	}
-	else if (high - low < 45 * ((float)height() / sizeHint().height()))
+	else if ((high - low) < 45 * heightScale)
 	{
-		increment = fastPow10f(0.6f); // 6 dB steps when sufficiently zoomed in
+		increment = fastPow10f(0.6); // 6 dB steps when sufficiently zoomed in
 	}
 	else
 	{
-		increment = 10;				// 10 dB steps otherwise
+		increment = 10.0; // 10 dB steps otherwise
 	}
 
 	// Generate n dB increments, start checking at -90 dB. Limits are tweaked
