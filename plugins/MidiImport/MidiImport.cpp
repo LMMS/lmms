@@ -49,14 +49,13 @@
 
 #include "portsmf/include/allegro.h"
 
+namespace
+{
+	constexpr std::int32_t makeID(const char c[4]) { return c[0] | (c[1] << 8) | (c[2] << 16) | (c[3] << 24); }
+}
+
 namespace lmms
 {
-
-
-constexpr auto makeID(char c0, char c1, char c2, char c3)
-{
-	return c0 | (c1 << 8) | (c2 << 16) | (c3 << 24);
-}
 
 
 extern "C"
@@ -122,19 +121,18 @@ bool MidiImport::tryImport( TrackContainer* tc )
 	}
 #endif
 
-	switch( readID() )
+	switch (read32LE()) // Read ID
 	{
-		case makeID( 'M', 'T', 'h', 'd' ):
-			printf( "MidiImport::tryImport(): found MThd\n");
-			return readSMF( tc );
+		case makeID("MThd"):
+			// printf("MidiImport::tryImport(): found MThd\n");
+			return readSMF(tc);
 
-		case makeID( 'R', 'I', 'F', 'F' ):
-			printf( "MidiImport::tryImport(): found RIFF\n");
-			return readRIFF( tc );
+		case makeID("RIFF"):
+			// printf("MidiImport::tryImport(): found RIFF\n");
+			return readRIFF(tc);
 
 		default:
-			printf( "MidiImport::tryImport(): not a Standard MIDI "
-								"file\n" );
+			printf("MidiImport::tryImport(): not a Standard MIDI file\n");
 			return false;
 	}
 }
@@ -430,7 +428,7 @@ bool MidiImport::readSMF( TrackContainer* tc )
 				if (!handled) {
 					// Write debug output
 					printf("MISSING GLOBAL HANDLER\n");
-					printf("\tChn: %l, Type Code: %d, Time: %f", evt->chan, evt->get_type_code(), evt->time);
+					printf("\tChn: %ld, Type Code: %d, Time: %f", evt->chan, evt->get_type_code(), evt->time);
 					if (evt->is_update())
 					{
 						printf(", Update Type: %s", evt->get_attribute());
@@ -594,7 +592,7 @@ bool MidiImport::readRIFF( TrackContainer* tc )
 	skip( 4 );
 
 	// check file type ("RMID" = RIFF MIDI)
-	if( readID() != makeID( 'R', 'M', 'I', 'D' ) )
+	if (read32LE() != makeID("RMID"))
 	{
 invalid_format:
 			qWarning( "MidiImport::readRIFF(): invalid file format" );
@@ -604,7 +602,7 @@ invalid_format:
 	// search for "data" chunk
 	while( true )
 	{
-		const int id = readID();
+		const int id = read32LE();
 		const int len = read32LE();
 		if( file().atEnd() )
 		{
@@ -612,10 +610,7 @@ data_not_found:
 				qWarning( "MidiImport::readRIFF(): data chunk not found" );
 				return false;
 		}
-		if( id == makeID( 'd', 'a', 't', 'a' ) )
-		{
-				break;
-		}
+		if (id == makeID("data")) { break; }
 		if( len < 0 )
 		{
 				goto data_not_found;
@@ -624,7 +619,7 @@ data_not_found:
 	}
 
 	// the "data" chunk must contain data in SMF format
-	if( readID() != makeID( 'M', 'T', 'h', 'd' ) )
+	if (read32LE() != makeID("MThd"))
 	{
 		goto invalid_format;
 	}

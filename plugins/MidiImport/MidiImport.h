@@ -25,6 +25,7 @@
 #ifndef _MIDI_IMPORT_H
 #define _MIDI_IMPORT_H
 
+#include <cstdint>
 #include <QString>
 #include <QPair>
 #include <QVector>
@@ -59,7 +60,7 @@ private:
 	void error();
 
 
-	inline int readInt( int _bytes )
+	inline std::int32_t readInt(int _bytes)
 	{
 		int value = 0;
 		do
@@ -73,7 +74,8 @@ private:
 		} while( --_bytes );
 		return( value );
 	}
-	inline int read32LE()
+
+	inline std::int32_t read32LE()
 	{
 		int value = readByte();
 		value |= readByte() << 8;
@@ -81,6 +83,7 @@ private:
 		value |= readByte() << 24;
 		return value;
 	}
+
 	inline int readVar()
 	{
 		int c = readByte();
@@ -107,10 +110,6 @@ private:
 		return( !file().atEnd() ? value : -1 );
 	}
 
-	inline int readID()
-	{
-		return read32LE();
-	}
 	inline void skip( int _bytes )
 	{
 		while( _bytes > 0 )
@@ -120,8 +119,7 @@ private:
 		}
 	}
 
-	using EventVector = QVector<QPair<int, MidiEvent>>;
-	EventVector m_events;
+	QVector<QPair<int, MidiEvent>> m_events;
 	int m_timingDivision;
 
 } ;
