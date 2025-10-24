@@ -35,6 +35,12 @@ ADD_SUBDIRECTORY(tracks)
 
 LIST(APPEND LMMS_SRCS ${LMMS_COMMON_SRCS})
 
+IF(WANT_QT6)
+	QT6_WRAP_UI(LMMS_UI_OUT ${LMMS_UIS})
+ELSE()
+	QT5_WRAP_UI(LMMS_UI_OUT ${LMMS_UIS})
+ENDIF()
+
 INCLUDE_DIRECTORIES(
 	"${CMAKE_CURRENT_BINARY_DIR}"
 	"${CMAKE_BINARY_DIR}"
@@ -113,6 +119,11 @@ TARGET_INCLUDE_DIRECTORIES(lmms
 	PUBLIC ${CMAKE_CURRENT_BINARY_DIR}
 )
 target_static_libraries(lmms PUBLIC lmmsobjs)
+
+# Enable updated C++ language standards
+IF(MSVC)
+	TARGET_COMPILE_OPTIONS(lmmsobjs PUBLIC "/Zc:__cplusplus" "/permissive-")
+ENDIF()
 
 # CMake doesn't define target_EXPORTS for OBJECT libraries.
 # See the documentation of DEFINE_SYMBOL for details.

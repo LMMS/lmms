@@ -590,7 +590,7 @@ void OpulenzInstrument::loadFile( const QString& file ) {
 			return;
 		}
 		if( sbidata.size() != 52 ) {
-			printf("SBI size error: expected 52, got %d\n",sbidata.size() );
+			printf("SBI size error: expected 52, got %d\n", static_cast<int>(sbidata.size()));
 		}
 
 		// Minimum size of SBI if we ignore "reserved" bytes at end

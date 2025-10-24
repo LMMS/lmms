@@ -120,7 +120,7 @@ Editor::Editor(bool record, bool stepRecord) :
 	connect(m_recordAccompanyAction, SIGNAL(triggered()), this, SLOT(recordAccompany()));
 	connect(m_toggleStepRecordingAction, SIGNAL(triggered()), this, SLOT(toggleStepRecording()));
 	connect(m_stopAction, SIGNAL(triggered()), this, SLOT(stop()));
-	new QShortcut(QKeySequence(combine(Qt::SHIFT, Qt::Key_F11)), this, SLOT(toggleMaximize()));
+	new QShortcut(keySequence(Qt::SHIFT, Qt::Key_F11), this, SLOT(toggleMaximize()));
 
 	// Add actions to toolbar
 	addButton(m_playAction, "playButton");

@@ -29,6 +29,7 @@
 #include <QMouseEvent>
 
 #include "ConfigManager.h"
+#include "DeprecationHelper.h"
 #include "embed.h"
 #include "Instrument.h"
 #include "InstrumentTrack.h"
@@ -181,7 +182,8 @@ void TrackLabelButton::mouseDoubleClickEvent( QMouseEvent * _me )
 
 void TrackLabelButton::mouseReleaseEvent( QMouseEvent *_me )
 {
-	if( m_buttonRect.contains( _me->globalPos(), true ) && m_renameLineEdit->isHidden() )
+	const auto globalPos = globalPosition(_me);
+	if (m_buttonRect.contains(globalPos, true) && m_renameLineEdit->isHidden())
 	{
 		QToolButton::mousePressEvent( _me );
 	}
