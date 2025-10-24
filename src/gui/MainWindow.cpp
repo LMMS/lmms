@@ -1492,7 +1492,6 @@ void MainWindow::exportProject(bool multiExport)
 	if( efd.exec() == QDialog::Accepted && !efd.selectedFiles().isEmpty() &&
 					 !efd.selectedFiles()[0].isEmpty() )
 	{
-
 		QString exportFileName = efd.selectedFiles()[0];
 		if ( !multiExport )
 		{

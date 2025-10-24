@@ -1165,6 +1165,7 @@ void SetupDialog::toggleAutoSave(bool enabled)
 	m_enableAutoSave = enabled;
 	m_saveIntervalSlider->setEnabled(enabled);
 	m_runningAutoSave->setVisible(enabled);
+	m_versionedAutoSave->setVisible(enabled);
 	setAutoSaveInterval(m_saveIntervalSlider->value());
 }
 
@@ -1185,6 +1186,7 @@ void SetupDialog::resetAutoSave()
 	setAutoSaveInterval(MainWindow::DEFAULT_SAVE_INTERVAL_MINUTES);
 	m_autoSave->setChecked(true);
 	m_runningAutoSave->setChecked(false);
+	m_versionedAutoSave->setChecked(false);
 }
 
 
