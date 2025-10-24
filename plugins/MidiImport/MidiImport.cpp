@@ -370,8 +370,7 @@ bool MidiImport::readSMF( TrackContainer* tc )
 		for( int i = 0; i < beats.len - 1; i++ )
 		{
 			Alg_beat_ptr b = &(beats[i]);
-			double tempo = ( beats[i + 1].beat - b->beat ) /
-						   ( beats[i + 1].time - beats[i].time );
+			double tempo = (beats[i + 1].beat - b->beat) / (beats[i + 1].time - beats[i].time);
 			tap->putValue( b->beat * ticksPerBeat, tempo * 60.0 );
 		}
 		if( timeMap->last_tempo_flag )
@@ -417,7 +416,7 @@ bool MidiImport::readSMF( TrackContainer* tc )
 			if( evt->chan == -1 )
 			{
 				bool handled = false;
-                if( evt->is_update() )
+				if( evt->is_update() )
 				{
 					QString attr = evt->get_attribute();
 					// seqnames is a track0 identifier (see allegro code)
@@ -428,20 +427,19 @@ bool MidiImport::readSMF( TrackContainer* tc )
 						handled = true;
 					}
 				}
-                if( !handled ) {
-                    // Write debug output
-                    printf("MISSING GLOBAL HANDLER\n");
-                    printf("     Chn: %d, Type Code: %d, Time: %f", (int) evt->chan,
-                           evt->get_type_code(), evt->time );
-                    if ( evt->is_update() )
-                    {
-                        printf( ", Update Type: %s", evt->get_attribute() );
-                        if ( evt->get_update_type() == 'a' )
-                        {
-                            printf( ", Atom: %s", evt->get_atom_value() );
-                        }
-                    }
-                    printf( "\n" );
+				if (!handled) {
+					// Write debug output
+					printf("MISSING GLOBAL HANDLER\n");
+					printf("\tChn: %l, Type Code: %d, Time: %f", evt->chan, evt->get_type_code(), evt->time);
+					if (evt->is_update())
+					{
+						printf(", Update Type: %s", evt->get_attribute());
+						if (evt->get_update_type() == 'a')
+						{
+							printf(", Atom: %s", evt->get_atom_value());
+						}
+					}
+					printf("\n");
 				}
 			}
 			else if (evt->is_note())

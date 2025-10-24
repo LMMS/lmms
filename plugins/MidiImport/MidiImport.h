@@ -103,8 +103,8 @@ private:
 					}
 				}
 			}
-	        }
-        	return( !file().atEnd() ? value : -1 );
+		}
+		return( !file().atEnd() ? value : -1 );
 	}
 
 	inline int readID()
