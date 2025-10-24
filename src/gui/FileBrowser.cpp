@@ -594,7 +594,7 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 
 	const auto fontMetrics = QFontMetrics{qApp->font()};
 	const auto maxHeaderWidth = 50 * fontMetrics.averageCharWidth();
-	const auto elidedPath = fontMetrics.elidedText(item->fullName(), Qt::TextElideMode::ElideMiddle, maxHeaderWidth);
+	const auto elidedPath = fontMetrics.elidedText(PathUtil::toShortestRelative(item->fullName()), Qt::TextElideMode::ElideMiddle, maxHeaderWidth);
 
 	auto header = new QAction{elidedPath};
 	header->setDisabled(true);
