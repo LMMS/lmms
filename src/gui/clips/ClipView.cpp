@@ -96,10 +96,6 @@ ClipView::ClipView( Clip * clip,
 	m_patternClipBackground( 0, 0, 0 ),
 	m_gradient( true ),
 	m_markerColor(0, 0, 0),
-	m_mouseHotspotHand( 0, 0 ),
-	m_mouseHotspotKnife( 0, 0 ),
-	m_cursorKnife( QCursor( embed::getIconPixmap( "cursor_knife" ) ) ),
-	m_cursorSetYet( false ),
 	m_needsUpdate( true )
 {
 	if( s_textFloat == nullptr )
@@ -166,14 +162,6 @@ ClipView::~ClipView()
  */
 void ClipView::update()
 {
-	// TODO: Remove this entire block if possible
-	if( !m_cursorSetYet )
-	{
-		m_cursorKnife = QCursor( embed::getIconPixmap( "cursor_knife" ), m_mouseHotspotKnife.width(), m_mouseHotspotKnife.height() );
-		setCursor(Qt::PointingHandCursor);
-		m_cursorSetYet = true;
-	}
-
 	if( fixedClips() )
 	{
 		updateLength();
@@ -503,7 +491,7 @@ void ClipView::updateCursor(QMouseEvent * me)
 	// If we are in the middle on knife mode, use the knife cursor
 	else if (m_trackView->trackContainerView()->knifeMode() && !isSelected())
 	{
-		setCursor(m_cursorKnife);
+		setCursor(Qt::IBeamCursor);
 	}
 	// If we are in the middle in any other mode, use the hand cursor
 	else { setCursor(Qt::PointingHandCursor); }
@@ -680,7 +668,7 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 				else if (knifeMode)
 				{
 					m_action = Action::Split;
-					setCursor( m_cursorKnife );
+					setCursor(Qt::IBeamCursor);
 					setMarkerPos( knifeMarkerPos( me ) );
 					setMarkerEnabled( true );
 					update();
@@ -995,7 +983,7 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 	}
 	else if( m_action == Action::Split )
 	{
-		setCursor(m_cursorKnife);
+		setCursor(Qt::IBeamCursor);
 		setMarkerPos(knifeMarkerPos(me));
 		update();
 	}
