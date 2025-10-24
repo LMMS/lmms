@@ -52,18 +52,6 @@ public:
 	//! Stop processing and destroys the object.
 	~FileSearch();
 
-	//! Cannot be copied.
-	FileSearch(const FileSearch&) = delete;
-
-	//! Cannot be moved.
-	FileSearch(FileSearch&&) = delete;
-
-	//! Cannot be copied.
-	FileSearch& operator=(const FileSearch&) = delete;
-
-	//! Cannot be moved.
-	FileSearch& operator=(FileSearch&&) = delete;
-
 	//! Commit to searching with the given @p task.
 	//! Cancels any previous search.
 	//! Callers can connect to the provided signals to interact with the search and its progress.
@@ -80,6 +68,7 @@ signals:
 	void finished();
 
 private:
+	Q_DISABLE_MOVE(FileSearch)
 	void runSearch(Task task);
 	std::future<void> m_task;
 	std::atomic_flag m_stop = ATOMIC_FLAG_INIT;
