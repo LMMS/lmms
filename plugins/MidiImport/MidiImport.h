@@ -27,8 +27,6 @@
 
 #include <cstdint>
 #include <QString>
-#include <QPair>
-#include <QVector>
 
 #include "MidiEvent.h"
 #include "ImportFilter.h"
@@ -119,10 +117,8 @@ private:
 		}
 	}
 
-	QVector<QPair<int, MidiEvent>> m_events;
 	int m_timingDivision;
-
-} ;
+};
 
 
 } // namespace lmms

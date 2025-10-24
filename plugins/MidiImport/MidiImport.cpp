@@ -80,7 +80,6 @@ Plugin::Descriptor PLUGIN_EXPORT midiimport_plugin_descriptor =
 
 MidiImport::MidiImport( const QString & _file ) :
 	ImportFilter( _file, &midiimport_plugin_descriptor ),
-	m_events(),
 	m_timingDivision( 0 )
 {
 }
