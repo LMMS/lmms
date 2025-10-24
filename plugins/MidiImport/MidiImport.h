@@ -84,7 +84,7 @@ private:
 
 	inline void skip(unsigned num_bytes) { while (num_bytes--) { readByte(); } }
 
-	int m_timingDivision;
+	int m_timingDivision = 0;
 };
 
 
