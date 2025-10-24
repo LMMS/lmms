@@ -109,9 +109,7 @@ namespace lmms::PathUtil
 
 
 	//VstEffect saved as a platform native path in previous versions of LMMS. (PR#8082)
-	//We're now ensuring that it's always a forward slash under the assumptions that:
-	//1. Windows supports forward slashes for folder operations.
-	//2. No other supported OS will use backslashes.
+	//Enforce forward slashes for compatibility.
 	QString serializePath(const QString & input)
 	{
 		return QString(input).replace("\\", "/");
