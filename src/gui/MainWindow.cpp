@@ -1367,7 +1367,9 @@ void MainWindow::browseHelp()
 
 void MainWindow::autoSave()
 {
-	if( !Engine::getSong()->isExporting() &&
+
+	if ( Engine::getSong()->isModifiedAutosave() &&
+		!Engine::getSong()->isExporting() &&
 		!Engine::getSong()->isLoadingProject() &&
 		!RemotePluginBase::isMainThreadWaiting() &&
 		!QApplication::mouseButtons() &&
@@ -1375,7 +1377,20 @@ void MainWindow::autoSave()
 				"enablerunningautosave" ).toInt() ||
 			! Engine::getSong()->isPlaying() ) )
 	{
+		//Recovery file is still needed for post-crash recovery dialog.
 		Engine::getSong()->saveProjectFile(ConfigManager::inst()->recoveryFile());
+		if (Engine::getSong()->projectFileName() != "" &&
+			ConfigManager::inst()->value( "ui", "enableversionedautosave" ).toInt())
+		{
+			QString currentProjectName = Engine::getSong()->projectFileName();
+			QString autoSaveTimestamp = QDateTime::currentDateTime().toString("dd-MM-yyyy-hh-mm-ss");
+			QString autoSaveVersionedName = currentProjectName.section('.', 0, 0).append(".autosave.")	//filename.autosave.
+											.append(autoSaveTimestamp).append(".")						//timestamp.
+											.append(currentProjectName.section('.', -1));				//extension
+
+			Engine::getSong()->saveProjectFile(autoSaveVersionedName);
+		}
+		Engine::getSong()->setModifiedAutosave(false);
 		autoSaveTimerReset();  // Reset timer
 	}
 	else
@@ -1477,7 +1492,6 @@ void MainWindow::exportProject(bool multiExport)
 	if( efd.exec() == QDialog::Accepted && !efd.selectedFiles().isEmpty() &&
 					 !efd.selectedFiles()[0].isEmpty() )
 	{
-
 		QString exportFileName = efd.selectedFiles()[0];
 		if ( !multiExport )
 		{

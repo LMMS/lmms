@@ -130,6 +130,8 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 			"ui", "enableautosave", "1").toInt()),
 	m_enableRunningAutoSave(ConfigManager::inst()->value(
 			"ui", "enablerunningautosave", "0").toInt()),
+	m_enableVersionedAutoSave(ConfigManager::inst()->value(
+			"ui", "enableversionedautosave", "0").toInt()),
 	m_smoothScroll(ConfigManager::inst()->value(
 			"ui", "smoothscroll").toInt()),
 	m_animateAFP(ConfigManager::inst()->value(
@@ -400,8 +402,12 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	m_runningAutoSave = addCheckBox(tr("Allow autosave while playing"), autoSaveBox, autoSaveLayout,
 		m_enableRunningAutoSave, SLOT(toggleRunningAutoSave(bool)), false);
 
+	m_versionedAutoSave = addCheckBox(tr("Create timestamped autosaves"), autoSaveBox, autoSaveLayout,
+		m_enableVersionedAutoSave, SLOT(toggleVersionedAutoSave(bool)), false);
+
 	m_saveIntervalSlider->setEnabled(m_enableAutoSave);
 	m_runningAutoSave->setVisible(m_enableAutoSave);
+	m_versionedAutoSave->setVisible(m_enableAutoSave);
 
 
 	// UI effect vs. performance tab.
@@ -989,6 +995,8 @@ void SetupDialog::accept()
 					QString::number(m_enableAutoSave));
 	ConfigManager::inst()->setValue("ui", "enablerunningautosave",
 					QString::number(m_enableRunningAutoSave));
+	ConfigManager::inst()->setValue("ui", "enableversionedautosave",
+					QString::number(m_enableVersionedAutoSave));
 	ConfigManager::inst()->setValue("ui", "smoothscroll",
 					QString::number(m_smoothScroll));
 	ConfigManager::inst()->setValue("ui", "animateafp",
@@ -1157,6 +1165,7 @@ void SetupDialog::toggleAutoSave(bool enabled)
 	m_enableAutoSave = enabled;
 	m_saveIntervalSlider->setEnabled(enabled);
 	m_runningAutoSave->setVisible(enabled);
+	m_versionedAutoSave->setVisible(enabled);
 	setAutoSaveInterval(m_saveIntervalSlider->value());
 }
 
@@ -1166,12 +1175,18 @@ void SetupDialog::toggleRunningAutoSave(bool enabled)
 	m_enableRunningAutoSave = enabled;
 }
 
+void SetupDialog::toggleVersionedAutoSave(bool enabled)
+{
+	m_enableVersionedAutoSave = enabled;
+}
+
 
 void SetupDialog::resetAutoSave()
 {
 	setAutoSaveInterval(MainWindow::DEFAULT_SAVE_INTERVAL_MINUTES);
 	m_autoSave->setChecked(true);
 	m_runningAutoSave->setChecked(false);
+	m_versionedAutoSave->setChecked(false);
 }
 
 
