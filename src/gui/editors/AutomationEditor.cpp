@@ -479,7 +479,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 					}
 					else // No shift, we are just creating/moving nodes
 					{
-						// Starts actually moving/draging the node
+						// Starts actually moving/dragging the node
 						TimePos newTime = m_clip->setDragValue(
 							// The TimePos of either the clicked node or a new one
 							TimePos(
@@ -814,7 +814,7 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 				{
 					if (m_action == Action::ResetOutValues)
 					{
-						// Reseting outValues
+						// Resetting outValues
 
 						// Resets all values from the last clicked tick up to the current position tick
 						m_clip->resetNodes(m_drawLastTick, posTicks);
@@ -850,7 +850,7 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 				{
 					if (m_action == Action::ResetOutValues)
 					{
-						// Reseting outValues
+						// Resetting outValues
 
 						// Resets all values from the last clicked tick up to the current position tick
 						m_clip->resetNodes(m_drawLastTick, posTicks);
