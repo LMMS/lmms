@@ -70,8 +70,8 @@ private slots:
 private:
 	QString pathForTrack( const Track *track, int num );
 	void restoreMutedState();
-
 	void render( QString outputPath );
+	void populateUnmutedTracks();
 
 	const AudioEngine::qualitySettings m_qualitySettings;
 	const AudioEngine::qualitySettings m_oldQualitySettings;

@@ -235,27 +235,16 @@ void TrackOperationsWidget::clearTrack()
 /*! \brief Export this track to an audio file and add it to the project */
 void TrackOperationsWidget::exportTrack()
 {
-	// TODO: Considering creating new projects in their own folders to have a dedicated place to store samples like
-	// these, removing the need for `FileDialog`
+	// TODO: FileDialog would not be needed here if we had a dedicated place to put these files in
 	auto dialog = FileDialog{};
-	dialog.setFileMode(FileDialog::AnyFile);
+	dialog.setFileMode(FileDialog::Directory);
 	dialog.setAcceptMode(FileDialog::AcceptSave);
 	dialog.setDirectory(ConfigManager::inst()->userProjectsDir());
-	dialog.setNameFilters(ProjectRenderer::availableDescriptions());
-	dialog.setWindowTitle(tr("Select file to export track to..."));
+	dialog.setWindowTitle(tr("Select directory for writing the exported track..."));
 
-	const auto defaultExtension = ProjectRenderer::fileEncodeDevices[0].m_extension;
-	dialog.setDefaultSuffix(defaultExtension);
-
-	auto track = m_trackView->getTrack();
-	const auto projectName = Engine::getSong()->projectFileName().split('.')[0];
-	const auto fileNamePrefix = projectName.isEmpty() ? "" : projectName + "_";
-	dialog.selectFile(fileNamePrefix + track->name() + defaultExtension);
-
-	if (dialog.exec() == QDialog::Accepted && !dialog.selectedFiles().isEmpty() && !dialog.selectedFiles()[0].isEmpty())
+	if (dialog.exec() == QDialog::Accepted)
 	{
-		const auto fileDestination = dialog.selectedFiles()[0];
-		auto exportDialog = ExportProjectDialog::exportTrack(fileDestination, m_trackView->getTrack());
+		auto exportDialog = ExportProjectDialog::exportTrack(dialog.selectedFiles()[0], m_trackView->getTrack());
 		exportDialog.exec();
 	}
 }

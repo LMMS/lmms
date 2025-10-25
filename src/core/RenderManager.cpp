@@ -96,54 +96,29 @@ void RenderManager::renderNextTrack()
 	}
 }
 
-void RenderManager::renderTrack(Track* track)
+void RenderManager::populateUnmutedTracks()
 {
+	m_unmuted.clear();
+
 	const auto tracks = {Engine::getSong()->tracks(), Engine::patternStore()->tracks()};
 
 	for (const auto& other : tracks | std::views::join)
 	{
-		if (dynamic_cast<AutomationTrack*>(other)) { continue; }
-
-		if (!other->isMuted() && other != track)
-		{
-			m_unmuted.push_back(other);
-			other->setMuted(true);
-		}
+		if (!other->isMuted() && !dynamic_cast<AutomationTrack*>(other)) { m_unmuted.emplace_back(other); }
 	}
+}
 
-	render(m_outputPath);
+void RenderManager::renderTrack(Track* track)
+{
+	populateUnmutedTracks();
+	m_tracksToRender = {track};
+	renderNextTrack();
 }
 
 // Render the song into individual tracks
 void RenderManager::renderTracks()
 {
-	const TrackContainer::TrackList& tl = Engine::getSong()->tracks();
-
-	// find all currently unnmuted tracks -- we want to render these.
-	for (const auto& tk : tl)
-	{
-		Track::Type type = tk->type();
-
-		// Don't render automation tracks
-		if ( tk->isMuted() == false &&
-				( type == Track::Type::Instrument || type == Track::Type::Sample ) )
-		{
-			m_unmuted.push_back(tk);
-		}
-	}
-
-	const TrackContainer::TrackList& t2 = Engine::patternStore()->tracks();
-	for (const auto& tk : t2)
-	{
-		Track::Type type = tk->type();
-
-		// Don't render automation tracks
-		if ( tk->isMuted() == false &&
-				( type == Track::Type::Instrument || type == Track::Type::Sample ) )
-		{
-			m_unmuted.push_back(tk);
-		}
-	}
+	populateUnmutedTracks();
 
 	// copy the list of unmuted tracks into our rendering queue.
 	// we need to remember which tracks were unmuted to restore state at the end.
