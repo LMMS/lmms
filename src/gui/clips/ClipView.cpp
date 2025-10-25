@@ -491,7 +491,7 @@ void ClipView::updateCursor(QMouseEvent * me)
 	// If we are in the middle on knife mode, use the knife cursor
 	else if (m_trackView->trackContainerView()->knifeMode() && !isSelected())
 	{
-		setCursor(Qt::IBeamCursor);
+		setCursor(Qt::SplitHCursor);
 	}
 	// If we are in the middle in any other mode, use the hand cursor
 	else { setCursor(Qt::PointingHandCursor); }
@@ -668,7 +668,7 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 				else if (knifeMode)
 				{
 					m_action = Action::Split;
-					setCursor(Qt::IBeamCursor);
+					setCursor(Qt::SplitHCursor);
 					setMarkerPos( knifeMarkerPos( me ) );
 					setMarkerEnabled( true );
 					update();
@@ -983,7 +983,7 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 	}
 	else if( m_action == Action::Split )
 	{
-		setCursor(Qt::IBeamCursor);
+		setCursor(Qt::SplitHCursor);
 		setMarkerPos(knifeMarkerPos(me));
 		update();
 	}
