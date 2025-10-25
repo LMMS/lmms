@@ -26,6 +26,7 @@
 #include "VstEffect.h"
 
 #include "GuiApplication.h"
+#include "PathUtil.h"
 #include "Song.h"
 #include "TextFloat.h"
 #include "VstPlugin.h"
@@ -117,7 +118,7 @@ bool VstEffect::openPlugin(const QString& plugin)
 	}
 
 	QMutexLocker ml( &m_pluginMutex ); Q_UNUSED( ml );
-	m_plugin = QSharedPointer<VstPlugin>(new VstPlugin(plugin));
+	m_plugin = QSharedPointer<VstPlugin>(new VstPlugin(PathUtil::toAbsolute(plugin)));
 	if( m_plugin->failed() )
 	{
 		m_plugin.clear();
@@ -128,7 +129,7 @@ bool VstEffect::openPlugin(const QString& plugin)
 
 	delete tf;
 
-	m_key.attributes["file"] = plugin;
+	m_key.attributes["file"] = PathUtil::stripPrefix(PathUtil::toShortestRelative(plugin));
 	return true;
 }
 
