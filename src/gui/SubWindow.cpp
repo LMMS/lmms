@@ -309,7 +309,7 @@ void SubWindow::setBorderColor( const QColor &c )
 
 
 
-#ifndef LMMS_BUILD_APPLE
+#ifdef LMMS_BUILD_APPLE
 // FIXME: For some reason detaching on MacOS seems to never show the detached window.
 void SubWindow::detach()
 {
