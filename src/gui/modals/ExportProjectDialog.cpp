@@ -34,12 +34,13 @@
 namespace lmms::gui
 {
 
-ExportProjectDialog::ExportProjectDialog(const QString& exportLocation, Mode mode, Track* track, QWidget* parent)
+ExportProjectDialog::ExportProjectDialog(const QString& exportLocation, Mode mode, Track* track, Clip* clip, QWidget* parent)
 	: QDialog(parent)
 	, Ui::ExportProjectDialog()
 	, m_exportLocation(exportLocation)
 	, m_mode(mode)
 	, m_track(track)
+	, m_clip(clip)
 	, m_renderManager(nullptr)
 {
 	setupUi( this );
@@ -182,9 +183,32 @@ void ExportProjectDialog::startExport()
 	}
 	m_renderManager.reset(new RenderManager( qs, os, m_ft, output_name ));
 
-	Engine::getSong()->setExportLoop( exportLoopCB->isChecked() );
-	Engine::getSong()->setRenderBetweenMarkers( renderMarkersCB->isChecked() );
-	Engine::getSong()->setLoopRenderCount(loopCountSB->value());
+	if (m_mode == Mode::ExportClip)
+	{
+		Engine::getSong()->setExportLoop(true);
+		exportLoopCB->setDisabled(true);
+
+		Engine::getSong()->setRenderBetweenMarkers(true);
+		renderMarkersCB->setDisabled(true);
+
+		Engine::getSong()->setLoopRenderCount(1);
+		loopCountSB->setDisabled(true);
+
+		const auto prevLoopBegin = Engine::getSong()->getTimeline(Song::PlayMode::Song).loopBegin();
+		const auto prevLoopEnd = Engine::getSong()->getTimeline(Song::PlayMode::Song).loopEnd();
+
+		Engine::getSong()->getTimeline(Song::PlayMode::Song).setLoopPoints(m_clip->startPosition(), m_clip->endPosition());
+
+		connect(m_renderManager.get(), &RenderManager::finished, this, [prevLoopBegin, prevLoopEnd] {
+			Engine::getSong()->getTimeline(Song::PlayMode::Song).setLoopPoints(prevLoopBegin, prevLoopEnd);
+		});
+	}
+	else
+	{
+		Engine::getSong()->setExportLoop(exportLoopCB->isChecked());
+		Engine::getSong()->setRenderBetweenMarkers(renderMarkersCB->isChecked());
+		Engine::getSong()->setLoopRenderCount(loopCountSB->value());
+	}
 
 	connect( m_renderManager.get(), SIGNAL(progressChanged(int)),
 			progressBar, SLOT(setValue(int)));
@@ -205,6 +229,9 @@ void ExportProjectDialog::startExport()
 		break;
 	case Mode::ExportTracks:
 		m_renderManager->renderTracks();
+		break;
+	case Mode::ExportClip:
+		m_renderManager->renderClip(m_clip);
 		break;
 	}
 }
@@ -296,17 +323,22 @@ void ExportProjectDialog::updateTitleBar( int _prog )
 
 ExportProjectDialog ExportProjectDialog::exportProject(const QString& exportLocation, QWidget* parent)
 {
-	return ExportProjectDialog{exportLocation, Mode::ExportProject, nullptr, parent};
+	return ExportProjectDialog{exportLocation, Mode::ExportProject, nullptr, nullptr, parent};
 }
 
 ExportProjectDialog ExportProjectDialog::exportTrack(const QString& exportLocation, Track* track, QWidget* parent)
 {
-	return ExportProjectDialog{exportLocation, Mode::ExportTrack, track, parent};
+	return ExportProjectDialog{exportLocation, Mode::ExportTrack, track, nullptr, parent};
 }
 
 ExportProjectDialog ExportProjectDialog::exportTracks(const QString& exportLocation, QWidget* parent)
 {
 	return ExportProjectDialog{exportLocation, Mode::ExportTracks};
+}
+
+ExportProjectDialog ExportProjectDialog::exportClip(const QString &exportLocation, Clip *clip, QWidget* parent)
+{
+	return ExportProjectDialog(exportLocation, Mode::ExportClip, nullptr, clip, parent);
 }
 
 } // namespace lmms::gui

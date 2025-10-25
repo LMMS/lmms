@@ -115,6 +115,13 @@ void RenderManager::renderTrack(Track* track)
 	renderNextTrack();
 }
 
+void RenderManager::renderClip(Clip* clip)
+{
+	populateUnmutedTracks();
+	m_tracksToRender = {clip->getTrack()};
+	renderNextTrack();
+}
+
 // Render the song into individual tracks
 void RenderManager::renderTracks()
 {
@@ -161,7 +168,7 @@ void RenderManager::render(QString outputPath)
 	}
 }
 
-// Unmute all tracks that were muted while rendering tracks
+// Unmute all tracks and clips that were muted while rendering
 void RenderManager::restoreMutedState()
 {
 	while (!m_unmuted.empty())

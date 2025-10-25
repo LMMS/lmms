@@ -28,6 +28,7 @@
 
 #include <memory>
 
+#include "Clip.h"
 #include "ProjectRenderer.h"
 #include "OutputSettings.h"
 
@@ -53,6 +54,9 @@ public:
 
 	//! Export `track` to an audio file.
 	void renderTrack(Track* track);
+
+	//! Export `clip` to an audio file.
+	void renderClip(Clip* clip);
 
 	/// Export all unmuted tracks into individual file
 	void renderTracks();
