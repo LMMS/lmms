@@ -25,16 +25,25 @@
 #include "SimpleTextFloat.h"
 
 #include <QTimer>
-#include <QToolTip>
+#include <QHBoxLayout>
+#include <QLabel>
+
+#include "GuiApplication.h"
+#include "MainWindow.h"
 
 namespace lmms::gui
 {
 
 
 SimpleTextFloat::SimpleTextFloat() :
-	QWidget()
+	QWidget(getGUI()->mainWindow(), Qt::ToolTip)
 {
-	m_text = QString();
+	QHBoxLayout * layout = new QHBoxLayout(this);
+	layout->setMargin(3);
+	setLayout(layout);
+
+	m_textLabel = new QLabel(this);
+	layout->addWidget(m_textLabel);
 
 	m_showTimer = new QTimer(this);
 	m_showTimer->setSingleShot(true);
@@ -47,7 +56,7 @@ SimpleTextFloat::SimpleTextFloat() :
 
 void SimpleTextFloat::setText(const QString & text)
 {
-	m_text = text;
+	m_textLabel->setText(text);
 }
 
 void SimpleTextFloat::showWithDelay(int msecBeforeDisplay, int msecDisplayTime)
@@ -67,16 +76,11 @@ void SimpleTextFloat::showWithDelay(int msecBeforeDisplay, int msecDisplayTime)
 	}
 }
 
-void SimpleTextFloat::show()
-{
-	QToolTip::showText(mapToGlobal(QPoint(0, 0)), m_text);
-}
-
 void SimpleTextFloat::hide()
 {
 	m_showTimer->stop();
 	m_hideTimer->stop();
-	QToolTip::hideText();
+	QWidget::hide();
 }
 
 } // namespace lmms::gui

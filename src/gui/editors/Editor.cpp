@@ -89,7 +89,7 @@ void Editor::toggleMaximize()
 }
 
 Editor::Editor(bool record, bool stepRecord) :
-	DetachableWindow(),
+	QMainWindow(),
 	m_toolBar(new DropToolBar(this)),
 	m_playAction(nullptr),
 	m_recordAction(nullptr),
@@ -137,6 +137,14 @@ Editor::Editor(bool record, bool stepRecord) :
 QAction *Editor::playAction() const
 {
 	return m_playAction;
+}
+
+// Workaround: for some reason editor windows minimize their height when close is unhandled
+void Editor::closeEvent(QCloseEvent* ce)
+{
+	if (!parentWidget()) { hide(); }
+	getGUI()->mainWindow()->refocus();
+	ce->ignore();
 }
 
 void Editor::keyPressEvent(QKeyEvent* ke)

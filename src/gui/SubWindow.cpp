@@ -28,6 +28,7 @@
 
 #include "SubWindow.h"
 
+#include <algorithm>
 #include <QGraphicsDropShadowEffect>
 #include <QGuiApplication>
 #include <QLabel>
@@ -42,6 +43,12 @@
 #include <QWindow>
 
 #include "embed.h"
+
+// Only needed for error display for missing detach feature
+#include "lmmsconfig.h"
+#ifdef LMMS_BUILD_APPLE
+#include "TextFloat.h"
+#endif
 
 namespace lmms::gui
 {
@@ -81,7 +88,7 @@ SubWindow::SubWindow(QWidget *parent, Qt::WindowFlags windowFlags) :
 	m_restoreBtn = createButton("restore", tr("Restore"));
 	connect(m_restoreBtn, &QPushButton::clicked, this, &QWidget::showNormal);
 
-	m_detachBtn = createButton("window", tr("Detach"));
+	m_detachBtn = createButton("detach", tr("Detach"));
 	connect(m_detachBtn, &QPushButton::clicked, this, &SubWindow::detach);
 
 	// QLabel for the window title and the shadow effect
@@ -101,6 +108,26 @@ SubWindow::SubWindow(QWidget *parent, Qt::WindowFlags windowFlags) :
 	setWindowFlags((this->windowFlags() & ~Qt::WindowMinimizeButtonHint) | Qt::CustomizeWindowHint);
 
 	connect( mdiArea(), SIGNAL(subWindowActivated(QMdiSubWindow*)), this, SLOT(focusChanged(QMdiSubWindow*)));
+}
+
+
+
+
+/**
+ * @brief SubWindow::setWidget
+ *
+ *  This is a wrapper to initialize everything that depends on a child widget.
+ *  Though technically not an override, this is the only way
+ *  to set the child widget, and the best way to track that.
+ */
+void SubWindow::setWidget(QWidget* w)
+{
+	QMdiSubWindow::setWidget(w);
+
+	if (widget())
+	{
+		m_childGeom = widget()->geometry();
+	}
 }
 
 
@@ -158,24 +185,44 @@ void SubWindow::changeEvent( QEvent *event )
 	{
 		adjustTitleBar();
 	}
-
 }
+
+
+
 
 void SubWindow::setVisible(bool visible)
 {
-	if (isDetached() && visible)  // avoid showing titlebar here
-	{
-		widget()->show();
-		// raise the detached window in case it was minimized
-		widget()->setWindowState((widget()->windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
-		return;
-	}
-	QMdiSubWindow::setVisible(visible);
+	if (isDetached()) { widget()->setVisible(visible); }
+	else { QMdiSubWindow::setVisible(visible); }
 }
+
+
+
+
+void SubWindow::showEvent(QShowEvent* e)
+{
+	if (isDetached())
+	{
+		widget()->setGeometry(m_childGeom);
+		widget()->setWindowState((widget()->windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
+	}
+}
+
+
+
 
 bool SubWindow::isDetached() const
 {
 	return widget()->windowFlags().testFlag(Qt::Window);
+}
+
+
+
+
+void SubWindow::setDetached(bool on)
+{
+	if (on) { detach(); }
+	else { attach(); }
 }
 
 
@@ -261,6 +308,18 @@ void SubWindow::setBorderColor( const QColor &c )
 	m_borderColor = c;
 }
 
+
+
+
+#ifdef LMMS_BUILD_APPLE
+// FIXME: For some reason detaching on MacOS seems to never show the detached window.
+void SubWindow::detach()
+{
+	TextFloat::displayMessage("Missing Feature",\
+		tr("Sorry, detach is not yet available on this platform."), embed::getIconPixmap("error"), 2000);
+}
+
+#else
 void SubWindow::detach()
 {
 #if QT_VERSION < 0x50C00
@@ -276,16 +335,21 @@ void SubWindow::detach()
 	if (isDetached()) { return; }
 
 	const auto pos = mapToGlobal(widget()->pos());
+	const bool shown = isVisible();
 
 	auto flags = windowFlags();
 	flags |= Qt::Window;
 	flags &= ~Qt::Widget;
-	widget()->setWindowFlags(flags);
-	widget()->show();
-	hide();
+	flags |= Qt::WindowMinimizeButtonHint;
 
-	widget()->windowHandle()->setPosition(pos);
+	hide();
+	widget()->setWindowFlags(flags);
+
+	if (shown) { widget()->show(); }
+
+	widget()->move(pos);
 }
+#endif
 
 void SubWindow::attach()
 {
@@ -301,25 +365,43 @@ void SubWindow::attach()
 
 	if (!isDetached()) { return; }
 
-	auto frame = widget()->windowHandle()->frameGeometry();
+	const bool shown = widget()->isVisible();
+
+	auto frame = widget()->windowHandle()->geometry();
+	frame.moveTo(mdiArea()->mapFromGlobal(frame.topLeft()));
+	frame += decorationMargins();
+
+	// arbitrary values, require window to touch `mdiArea - margin`
+	// min(max(a, b), c) ensures that a <= b <= c
+	// TODO make this live configurble maybe?
+	const auto margin = QMargins(40, 40, 40, 40);
+	frame.moveTo(std::min(std::max(margin.left() - frame.width(),
+	                               frame.left()),
+	                               mdiArea()->rect().width() - margin.right()),
+	             std::min(std::max(margin.top() - frame.height(),
+	                               frame.top()),
+	                               mdiArea()->rect().height() - margin.bottom()));
 
 	auto flags = windowFlags();
 	flags &= ~Qt::Window;
 	flags |= Qt::Widget;
+	flags &= ~Qt::WindowMinimizeButtonHint;
 	widget()->setWindowFlags(flags);
-	widget()->show();
-	show();
 
-	// Delay moving & resizing using event queue. Ensures that this widget is
-	// visible first, so that resizing works.
-	QObject obj;
-	connect(&obj, &QObject::destroyed, this, [this, frame]() {
-		if (QGuiApplication::platformName() != "wayland")
-		{  // Workaround for wayland reporting on-screen pos as 0-0. If ever solved on wayland side, this check is safe to remove.
-			move(mdiArea()->mapFromGlobal(frame.topLeft()));
-		}
-		resize(frame.size());
-	}, Qt::QueuedConnection);
+	if (shown)
+	{
+		widget()->show();
+		show();
+	}
+
+	if (QGuiApplication::platformName() == "wayland")
+	{
+		resize(frame.size());  // Workaround for wayland reporting position as 0-0, see https://doc.qt.io/qt-6.9/application-windows.html#wayland-peculiarities
+	}
+	else
+	{
+		setGeometry(frame);
+	}
 }
 
 
@@ -340,6 +422,19 @@ int SubWindow::frameWidth() const
 	QStyleOptionFrame so;
 	return style()->pixelMetric(QStyle::PM_MdiSubWindowFrameWidth, &so, this);
 }
+
+
+
+
+QMargins SubWindow::decorationMargins() const
+{
+	return QMargins(frameWidth(),     // left
+	                titleBarHeight(), // top
+	                frameWidth(),     // right
+	                frameWidth());    // bottom
+}
+
+
 
 
 void SubWindow::updateTitleBar()
@@ -524,11 +619,34 @@ bool SubWindow::eventFilter(QObject* obj, QEvent* event)
 
 	switch (event->type())
 	{
-	case QEvent::WindowStateChange:
-		event->accept();
-		return true;
-	default:
-		return QMdiSubWindow::eventFilter(obj, event);
+		case QEvent::WindowStateChange:
+			event->accept();
+			return true;
+
+		case QEvent::Close:
+			if (isDetached())
+			{
+				attach();
+				hide();
+				event->ignore();
+			}
+			else
+			{
+				hide();
+				event->ignore();
+			}
+			return QMdiSubWindow::eventFilter(obj, event);
+
+		case QEvent::Move:
+			m_childGeom.moveTo(static_cast<QMoveEvent*>(event)->pos());
+			return QMdiSubWindow::eventFilter(obj, event);
+
+		case QEvent::Resize:
+			m_childGeom.setSize(static_cast<QResizeEvent*>(event)->size());
+			return QMdiSubWindow::eventFilter(obj, event);
+
+		default:
+			return QMdiSubWindow::eventFilter(obj, event);
 	}
 }
 

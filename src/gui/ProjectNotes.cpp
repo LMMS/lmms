@@ -49,7 +49,7 @@ namespace lmms::gui
 
 
 ProjectNotes::ProjectNotes()
-	: DetachableWindow{getGUI()->mainWindow()->workspace()}
+	: QMainWindow{getGUI()->mainWindow()->workspace()}
 {
 	m_edit = new QTextEdit( this );
 	m_edit->setAutoFillBackground( true );

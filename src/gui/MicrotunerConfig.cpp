@@ -55,7 +55,7 @@ namespace lmms::gui
 
 
 MicrotunerConfig::MicrotunerConfig() :
-	DetachableWidget(),
+	QWidget(),
 	m_scaleComboModel(nullptr, tr("Selected scale slot")),
 	m_keymapComboModel(nullptr, tr("Selected keymap slot")),
 	m_firstKeyModel(0, 0, NumKeys - 1, nullptr, tr("First key")),

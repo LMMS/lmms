@@ -25,7 +25,8 @@
 #ifndef LMMS_GUI_PROJECT_NOTES_H
 #define LMMS_GUI_PROJECT_NOTES_H
 
-#include "DetachableWindow.h"
+#include <QMainWindow>
+
 #include "SerializingObject.h"
 
 class QAction;
@@ -37,7 +38,7 @@ namespace lmms::gui
 {
 
 
-class LMMS_EXPORT ProjectNotes : public DetachableWindow, public SerializingObject
+class LMMS_EXPORT ProjectNotes : public QMainWindow, public SerializingObject
 {
 	Q_OBJECT
 public:

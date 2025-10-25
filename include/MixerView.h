@@ -25,8 +25,9 @@
 #ifndef LMMS_GUI_MIXER_VIEW_H
 #define LMMS_GUI_MIXER_VIEW_H
 
+#include <QWidget>
+
 #include "MixerChannelView.h"
-#include "DetachableWidget.h"
 #include "ModelView.h"
 #include "SerializingObject.h"
 
@@ -45,7 +46,7 @@ namespace lmms::gui
 {
 
 class LMMS_EXPORT MixerView
-	: public DetachableWidget
+	: public QWidget
 	, public ModelView
 	, public SerializingObjectHook
 {

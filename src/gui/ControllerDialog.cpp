@@ -31,7 +31,7 @@ namespace lmms::gui
 {
 
 ControllerDialog::ControllerDialog(Controller* controller, QWidget* parent)
-	: DetachableWidget{parent}
+	: QWidget{parent}
 	, ModelView{controller, this}
 {
 }

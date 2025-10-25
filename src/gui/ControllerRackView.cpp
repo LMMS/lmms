@@ -47,7 +47,7 @@ namespace lmms::gui
 
 
 ControllerRackView::ControllerRackView()
-	: DetachableWidget{}
+	: QWidget{}
 	, m_nextIndex{0}
 {
 	setWindowIcon( embed::getIconPixmap( "controller" ) );

@@ -113,15 +113,8 @@ public:
 	{
 		// ignore close-events - for some reason otherwise the VST GUI
 		// remains hidden when re-opening
-		if (windowFlags().testFlag(Qt::Window))
-		{
-			e->accept();
-		}
-		else
-		{
-			hide();
-			e->ignore();
-		}
+		hide();
+		e->ignore();
 	}
 };
 
