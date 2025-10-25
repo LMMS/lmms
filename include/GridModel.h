@@ -29,8 +29,12 @@
 #include <memory> // shared_ptr
 #include <vector>
 
+#include "Model.h"
+
 namespace lmms
 {
+
+static const unsigned int GRID_MAX_STEPS = 100000;
 
 class GridModel : public Model
 {
@@ -39,7 +43,7 @@ public:
 	{
 		float x;
 		float y;
-	}
+	};
 
 	//! @return index if found inside radius, else -1
 	//! (the first index is returned where `xPos` is found)
@@ -57,7 +61,14 @@ public:
 	void resizeGrid(size_t length, size_t height);
 	virtual ~GridModel();
 protected:
-	GridModel(size_t length, size_t height, unsigned int horizontalSteps, unsigned int verticalSteps);
+	GridModel(size_t length, size_t height, unsigned int horizontalSteps, unsigned int verticalSteps,
+		Model* parent, QString displayName, bool defaultConstructed);
+
+	struct Item
+	{
+		ItemInfo info;
+		std::shared_ptr<void> object;
+	};
 
 	//! @return index if found, -1 if not
 	int findObject(void* object);
@@ -72,13 +83,7 @@ protected:
 	size_t setX(size_t index, float newX);
 	void setY(size_t index, float newY);
 
-	struct Item
-	{
-		ItemInfo info;
-		std::shared_ptr<void>* object;
-	};
-
-	float fitPos(float position, size_t max, unsigned int horizontalSteps);
+	float fitPos(float position, size_t max, unsigned int steps);
 
 private:
 	size_t m_length;
@@ -89,14 +94,17 @@ private:
 	//! items are sorted by x position ascending
 	std::vector<Item> m_items;
 	std::set<size_t> m_selecion;
+
+	friend class gui::GridView;
 };
 
 template<typename T>
 class GridModelTyped : public GridModel
 {
 public:
-	GridModelTyped(size_t length, size_t height, unsigned int horizontalSteps, unsigned int verticalSteps)
-		: GridModel{length, height, horizontalSteps, verticalSteps} {}
+	GridModelTyped(size_t length, size_t height, unsigned int horizontalSteps, unsigned int verticalSteps,
+		Model* parent, QString displayName = QString(), bool defaultConstructed = false)
+		: GridModel{length, height, horizontalSteps, verticalSteps, parent, displayName, defaultConstructed} {}
 	~GridModelTyped() = default;
 
 	//! @return index if found, -1 if not
@@ -105,7 +113,7 @@ public:
 	//! @return index where added
 	size_t addItem(T* object, ItemInfo info)
 	{
-		return GridModel::addItem(ItemInfo{info, std::make_shared<T>(object)});
+		return GridModel::addItem(Item{info, std::make_shared<T>(object)});
 	}
 };
 
