@@ -433,7 +433,7 @@ AutomatableModel* AutomatableModel::getLastLinkedModel() const
 {
 	for (auto model = m_nextLink; ; model = model->m_nextLink)
 	{
-		// The last model in the circual reference links back to this
+		// The last model in the circular reference links back to this
 		if (model->m_nextLink == this) { return model; }
 	}
 }
@@ -597,8 +597,8 @@ ValueBuffer * AutomatableModel::valueBuffer()
 						next->controllerConnection()->getController()->isSampleExact())
 				{
 					auto vb = next->valueBuffer();
-					float * values = vb->values();
-					float * nvalues = m_valueBuffer.values();
+					float* values = vb->values();
+					float* nvalues = m_valueBuffer.values();
 					for (int i = 0; i < vb->length(); i++)
 					{
 						nvalues[i] = fittedValue(values[i]);
