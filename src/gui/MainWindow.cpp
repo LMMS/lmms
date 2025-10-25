@@ -1445,15 +1445,7 @@ void MainWindow::exportProject(bool multiExport)
 	else
 	{
 		efd.setFileMode( FileDialog::AnyFile );
-		int idx = 0;
-		QStringList types;
-		while( ProjectRenderer::fileEncodeDevices[idx].m_fileFormat != ProjectRenderer::ExportFileFormat::Count)
-		{
-			if(ProjectRenderer::fileEncodeDevices[idx].isAvailable()) {
-				types << tr(ProjectRenderer::fileEncodeDevices[idx].m_description);
-			}
-			++idx;
-		}
+		auto types = ProjectRenderer::availableDescriptions();
 		efd.setNameFilters( types );
 		QString baseFilename;
 		if( !projectFileName.isEmpty() )
@@ -1506,8 +1498,16 @@ void MainWindow::exportProject(bool multiExport)
 			}
 		}
 
-		ExportProjectDialog epd( exportFileName, getGUI()->mainWindow(), multiExport );
-		epd.exec();
+		if (multiExport)
+		{
+			auto exportDialog = ExportProjectDialog::exportTracks(exportFileName);
+			exportDialog.exec();
+		}
+		else
+		{
+			auto exportDialog = ExportProjectDialog::exportProject(exportFileName);
+			exportDialog.exec();
+		}
 	}
 }
 

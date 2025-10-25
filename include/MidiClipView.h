@@ -93,6 +93,8 @@ protected:
 
 
 private:
+	void exportClip();
+
 	QPixmap m_stepBtnOn0 = embed::getIconPixmap("step_btn_on_0");
 	QPixmap m_stepBtnOn200 = embed::getIconPixmap("step_btn_on_200");
 	QPixmap m_stepBtnOff = embed::getIconPixmap("step_btn_off");

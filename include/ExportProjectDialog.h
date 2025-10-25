@@ -28,6 +28,7 @@
 
 #include <QDialog>
 #include <memory>
+#include "Clip.h"
 #include "ui_export_project.h"
 
 #include "ProjectRenderer.h"
@@ -41,7 +42,10 @@ class ExportProjectDialog : public QDialog, public Ui::ExportProjectDialog
 {
 	Q_OBJECT
 public:
-	ExportProjectDialog( const QString & _file_name, QWidget * _parent, bool multi_export );
+	static ExportProjectDialog exportProject(const QString& exportLocation, QWidget* parent = nullptr);
+	static ExportProjectDialog exportTrack(const QString& exportLocation, Track* track, QWidget* parent = nullptr);
+	static ExportProjectDialog exportTracks(const QString& exportLocation, QWidget* parent = nullptr);
+	static ExportProjectDialog exportClip(const QString& exportLocation, Clip* clip, QWidget* parent = nullptr);
 
 protected:
 	void reject() override;
@@ -57,15 +61,24 @@ private slots:
 	void onFileFormatChanged(int);
 
 private:
-	QString m_fileName;
-	QString m_dirName;
-	QString m_fileExtension;
-	bool m_multiExport;
+	enum class Mode
+	{
+		ExportProject, 	//! Export the entire project
+		ExportTrack,   	//! Export a specific track
+		ExportTracks,  	//! Export multiple tracks
+		ExportClip		//! Export a specific clip
+	};
 
+	ExportProjectDialog(const QString& exportLocation, Mode mode, Track* track = nullptr, Clip* clip = nullptr, QWidget* parent = nullptr);
+
+	QString m_exportLocation;
+	QString m_exportExtension;
+	Mode m_mode;
+	Track* m_track = nullptr;
+	Clip* m_clip = nullptr;
 	ProjectRenderer::ExportFileFormat m_ft;
 	std::unique_ptr<RenderManager> m_renderManager;
-} ;
-
+};
 
 } // namespace lmms::gui
 

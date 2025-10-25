@@ -99,7 +99,15 @@ ProjectRenderer::ProjectRenderer(
 	}
 }
 
-
+QStringList ProjectRenderer::availableDescriptions()
+{
+	auto descriptions = QStringList{};
+	for (const auto& device : fileEncodeDevices)
+	{
+		if (device.isAvailable()) { descriptions.push_back(device.m_description); }
+	}
+	return descriptions;
+}
 
 
 // Little help function for getting file format from a file extension
