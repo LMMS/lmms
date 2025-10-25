@@ -63,6 +63,14 @@ if(CPACK_DEBUG)
 endif()
 
 # Windows resource compilers
+set(PROJECT_ICON "cmake/nsis/project.ico")
+
+# lmms-console.exe icon
+set(EXE_ICON "cmake/nsis/console.ico")
+configure_file("lmms.rc.in" "${CMAKE_BINARY_DIR}/lmms-console.rc")
+
+# lmms.exe icon
+set(EXE_ICON "cmake/nsis/icon.ico")
 CONFIGURE_FILE("lmms.rc.in"             "${CMAKE_BINARY_DIR}/lmms.rc")
 CONFIGURE_FILE("zynaddsubfx.rc.in"      "${CMAKE_BINARY_DIR}/plugins/ZynAddSubFx/zynaddsubfx.rc")
 

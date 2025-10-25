@@ -1,5 +1,5 @@
-lmmsicon ICON cmake/nsis/icon.ico
-lmmsprojecticon ICON cmake/nsis/project.ico
+lmmsicon ICON ${EXE_ICON}
+lmmsprojecticon ICON ${PROJECT_ICON}
 #include <windows.h>
 
 VS_VERSION_INFO VERSIONINFO
