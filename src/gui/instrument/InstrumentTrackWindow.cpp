@@ -522,6 +522,7 @@ void InstrumentTrackWindow::toggleVisibility( bool on )
 	else
 	{
 		parentWidget()->hide();
+		hide();
 	}
 }
 
@@ -530,15 +531,20 @@ void InstrumentTrackWindow::toggleVisibility( bool on )
 
 void InstrumentTrackWindow::closeEvent( QCloseEvent* event )
 {
-	event->ignore();
-
-	if( getGUI()->mainWindow()->workspace() )
+	// TODO: When is this event used?
+	if (windowFlags().testFlag(Qt::Window))
+	{
+		event->accept();
+	}
+	else if (getGUI()->mainWindow()->workspace())
 	{
 		parentWidget()->hide();
+		event->ignore();
 	}
 	else
 	{
 		hide();
+		event->ignore();
 	}
 
 	m_itv->setFocus();
@@ -677,7 +683,7 @@ void InstrumentTrackWindow::viewInstrumentInDirection(int d)
 
 		// enable the new window by checking its track list button & moving it to where our window just was
 		newView->m_tlb->setChecked(true);
-		newView->getInstrumentTrackWindow()->parentWidget()->move(curPos);
+		newView->getInstrumentTrackWindow()->parentWidget()->move(curPos); // TODO
 
 		// scroll the SongEditor/PatternEditor to make sure the new trackview label is visible
 		bringToFront->trackContainerView()->scrollToTrackView(bringToFront);
@@ -687,13 +693,8 @@ void InstrumentTrackWindow::viewInstrumentInDirection(int d)
 	}
 	Q_ASSERT(bringToFront);
 	bringToFront->getInstrumentTrackWindow()->setFocus();
-	Qt::WindowFlags flags = windowFlags();
-	if (!m_instrumentView->isResizable()) {
-		flags |= Qt::MSWindowsFixedSizeDialogHint;
-	} else {
-		flags &= ~Qt::MSWindowsFixedSizeDialogHint;
-	}
-	setWindowFlags( flags );
+
+	updateSubWindow();
 }
 
 void InstrumentTrackWindow::viewNextInstrument()
@@ -748,8 +749,8 @@ void InstrumentTrackWindow::updateSubWindow()
 		{
 			// TODO As of writing SlicerT is the only resizable instrument. Is this code specific to SlicerT?
 			const auto extraSpace = QSize(12, 208);
-			subWindow->setMaximumSize(m_instrumentView->maximumSize() + extraSpace);
-			subWindow->setMinimumSize(m_instrumentView->minimumSize() + extraSpace);
+			setMaximumSize(m_instrumentView->maximumSize() + extraSpace);
+			setMinimumSize(m_instrumentView->minimumSize() + extraSpace);
 
 			flags &= ~Qt::MSWindowsFixedSizeDialogHint;
 			flags |= Qt::WindowMaximizeButtonHint;
@@ -758,6 +759,8 @@ void InstrumentTrackWindow::updateSubWindow()
 		{
 			flags |= Qt::MSWindowsFixedSizeDialogHint;
 			flags &= ~Qt::WindowMaximizeButtonHint;
+
+			setFixedSize(sizeHint());
 
 			// The sub window might be reused from an instrument that was maximized. Show the sub window
 			// as normal, i.e. not maximized, if the instrument view is not resizable.
@@ -769,11 +772,6 @@ void InstrumentTrackWindow::updateSubWindow()
 
 		subWindow->setWindowFlags(flags);
 
-		// Show or hide the Size and Maximize options from the system menu depending on whether the view is resizable or not
-		QMenu * systemMenu = subWindow->systemMenu();
-		systemMenu->actions().at(2)->setVisible(instrumentViewResizable); // Size
-		systemMenu->actions().at(4)->setVisible(instrumentViewResizable); // Maximize
-		
 		// TODO This is only needed if the sub window is implemented with LMMS' own SubWindow class.
 		// If an QMdiSubWindow is used everything works automatically. It seems that SubWindow is
 		// missing some implementation details that QMdiSubWindow has.
@@ -781,6 +779,14 @@ void InstrumentTrackWindow::updateSubWindow()
 		if (subWin)
 		{
 			subWin->updateTitleBar();
+		}
+		else
+		{
+			// TODO: Can this be removed?
+			// Show or hide the Size and Maximize options from the system menu depending on whether the view is resizable or not
+			QMenu* systemMenu = subWindow->systemMenu();
+			systemMenu->actions().at(2)->setVisible(instrumentViewResizable); // Size
+			systemMenu->actions().at(4)->setVisible(instrumentViewResizable); // Maximize
 		}
 	}
 }

@@ -29,12 +29,17 @@
 #include "SubWindow.h"
 
 #include <QGraphicsDropShadowEffect>
+#include <QGuiApplication>
 #include <QLabel>
+#include <QLayout>
 #include <QMdiArea>
+#include <QMetaMethod>
 #include <QMoveEvent>
 #include <QPainter>
 #include <QPushButton>
+#include <QStyleOption>
 #include <QStyleOptionTitleBar>
+#include <QWindow>
 
 #include "embed.h"
 
@@ -57,15 +62,27 @@ SubWindow::SubWindow(QWidget *parent, Qt::WindowFlags windowFlags) :
 	m_textShadowColor = Qt::black;
 	m_borderColor = Qt::black;
 
-	// close, maximize and restore (after maximizing) buttons
-	m_closeBtn = addTitleButton("close", tr("Close"));
-	connect( m_closeBtn, SIGNAL(clicked(bool)), this, SLOT(close()));
+	// close, maximize, restore, and detach buttons
+	auto createButton = [this](const std::string& iconName, const QString& tooltip) -> QPushButton* {
+		auto button = new QPushButton{embed::getIconPixmap(iconName), QString{}, this};
+		button->resize(m_buttonSize);
+		button->setFocusPolicy(Qt::NoFocus);
+		button->setCursor(Qt::ArrowCursor);
+		button->setAttribute(Qt::WA_NoMousePropagation);
+		button->setToolTip(tooltip);
+		return button;
+	};
+	m_closeBtn = createButton("close", tr("Close"));
+	connect(m_closeBtn, &QPushButton::clicked, this, &QWidget::close);
 
-	m_maximizeBtn = addTitleButton("maximize", tr("Maximize"));
-	connect( m_maximizeBtn, SIGNAL(clicked(bool)), this, SLOT(showMaximized()));
+	m_maximizeBtn = createButton("maximize", tr("Maximize"));
+	connect(m_maximizeBtn, &QPushButton::clicked, this, &QWidget::showMaximized);
 
-	m_restoreBtn = addTitleButton("restore", tr("Restore"));
-	connect( m_restoreBtn, SIGNAL(clicked(bool)), this, SLOT(showNormal()));
+	m_restoreBtn = createButton("restore", tr("Restore"));
+	connect(m_restoreBtn, &QPushButton::clicked, this, &QWidget::showNormal);
+
+	m_detachBtn = createButton("window", tr("Detach"));
+	connect(m_detachBtn, &QPushButton::clicked, this, &SubWindow::detach);
 
 	// QLabel for the window title and the shadow effect
 	m_shadow = new QGraphicsDropShadowEffect();
@@ -77,6 +94,8 @@ SubWindow::SubWindow(QWidget *parent, Qt::WindowFlags windowFlags) :
 	m_windowTitle->setFocusPolicy( Qt::NoFocus );
 	m_windowTitle->setAttribute( Qt::WA_TransparentForMouseEvents, true );
 	m_windowTitle->setGraphicsEffect( m_shadow );
+
+	layout()->setSizeConstraint(QLayout::SetMinAndMaxSize);
 
 	// Disable the minimize button and make sure that the custom window hint is set
 	setWindowFlags((this->windowFlags() & ~Qt::WindowMinimizeButtonHint) | Qt::CustomizeWindowHint);
@@ -140,6 +159,23 @@ void SubWindow::changeEvent( QEvent *event )
 		adjustTitleBar();
 	}
 
+}
+
+void SubWindow::setVisible(bool visible)
+{
+	if (isDetached() && visible)  // avoid showing titlebar here
+	{
+		widget()->show();
+		// raise the detached window in case it was minimized
+		widget()->setWindowState((widget()->windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
+		return;
+	}
+	QMdiSubWindow::setVisible(visible);
+}
+
+bool SubWindow::isDetached() const
+{
+	return widget()->windowFlags().testFlag(Qt::Window);
 }
 
 
@@ -225,6 +261,66 @@ void SubWindow::setBorderColor( const QColor &c )
 	m_borderColor = c;
 }
 
+void SubWindow::detach()
+{
+#if QT_VERSION < 0x50C00
+	// Workaround for a bug in Qt versions below 5.12,
+	// where argument-dependent-lookup fails for QFlags operators
+	// declared inside a namepsace.
+	// This affects the Q_DECLARE_OPERATORS_FOR_FLAGS macro in Instrument.h
+	// See also: https://codereview.qt-project.org/c/qt/qtbase/+/225348
+
+	using ::operator|;
+#endif
+
+	if (isDetached()) { return; }
+
+	const auto pos = mapToGlobal(widget()->pos());
+
+	auto flags = windowFlags();
+	flags |= Qt::Window;
+	flags &= ~Qt::Widget;
+	widget()->setWindowFlags(flags);
+	widget()->show();
+	hide();
+
+	widget()->windowHandle()->setPosition(pos);
+}
+
+void SubWindow::attach()
+{
+#if QT_VERSION < 0x50C00
+	// Workaround for a bug in Qt versions below 5.12,
+	// where argument-dependent-lookup fails for QFlags operators
+	// declared inside a namepsace.
+	// This affects the Q_DECLARE_OPERATORS_FOR_FLAGS macro in Instrument.h
+	// See also: https://codereview.qt-project.org/c/qt/qtbase/+/225348
+
+	using ::operator|;
+#endif
+
+	if (!isDetached()) { return; }
+
+	auto frame = widget()->windowHandle()->frameGeometry();
+
+	auto flags = windowFlags();
+	flags &= ~Qt::Window;
+	flags |= Qt::Widget;
+	widget()->setWindowFlags(flags);
+	widget()->show();
+	show();
+
+	// Delay moving & resizing using event queue. Ensures that this widget is
+	// visible first, so that resizing works.
+	QObject obj;
+	connect(&obj, &QObject::destroyed, this, [this, frame]() {
+		if (QGuiApplication::platformName() != "wayland")
+		{  // Workaround for wayland reporting on-screen pos as 0-0. If ever solved on wayland side, this check is safe to remove.
+			move(mdiArea()->mapFromGlobal(frame.topLeft()));
+		}
+		resize(frame.size());
+	}, Qt::QueuedConnection);
+}
 
 
 
@@ -312,9 +408,8 @@ void SubWindow::adjustTitleBar()
 	const int buttonGap = 1;
 	const int menuButtonSpace = 24;
 
-	QPoint rightButtonPos( width() - rightSpace - m_buttonSize.width(), 3 );
-	QPoint middleButtonPos( width() - rightSpace - ( 2 * m_buttonSize.width() ) - buttonGap, 3 );
-	QPoint leftButtonPos( width() - rightSpace - ( 3 * m_buttonSize.width() ) - ( 2 * buttonGap ), 3 );
+	QPoint buttonPos(width() - rightSpace - m_buttonSize.width(), 3);
+	const QPoint buttonStep( m_buttonSize.width() + buttonGap, 0 );
 
 	// the buttonBarWidth depends on the number of buttons.
 	// we need it to calculate the width of window title label
@@ -322,25 +417,33 @@ void SubWindow::adjustTitleBar()
 
 	// set the buttons on their positions.
 	// the close button is always needed and on the rightButtonPos
-	m_closeBtn->move( rightButtonPos );
+	m_closeBtn->move(buttonPos);
+	buttonPos -= buttonStep;
 
 	// here we ask: is the Subwindow maximizable and
 	// then we set the buttons and show them if needed
 	if( windowFlags() & Qt::WindowMaximizeButtonHint )
 	{
 		buttonBarWidth = buttonBarWidth + m_buttonSize.width() + buttonGap;
-		m_maximizeBtn->move( middleButtonPos );
-		m_restoreBtn->move( middleButtonPos );
-		m_maximizeBtn->setVisible(true);
+		m_maximizeBtn->move(buttonPos);
+		m_restoreBtn->move(buttonPos);
+		if (!isMaximized())
+		{
+			m_maximizeBtn->show();
+			buttonPos -= buttonStep;
+		}
 	}
 
 	// we're keeping the restore button around if we open projects
 	// from older versions that have saved minimized windows
-	m_restoreBtn->setVisible(isMinimized());
-	if( isMinimized() )
+	if (isMinimized())
 	{
-		m_restoreBtn->move( m_maximizeBtn->isHidden() ?  middleButtonPos : leftButtonPos );
+		m_restoreBtn->show();
+		buttonPos -= buttonStep;
 	}
+
+	m_detachBtn->move(buttonPos);
+	m_detachBtn->show();
 
 	if( widget() )
 	{
@@ -412,16 +515,21 @@ void SubWindow::resizeEvent( QResizeEvent * event )
 	}
 }
 
-QPushButton* SubWindow::addTitleButton(const std::string& iconName, const QString& toolTip)
+bool SubWindow::eventFilter(QObject* obj, QEvent* event)
 {
-	auto button = new QPushButton(embed::getIconPixmap(iconName), QString(), this);
-	button->resize(m_buttonSize);
-	button->setFocusPolicy(Qt::NoFocus);
-	button->setCursor(Qt::ArrowCursor);
-	button->setAttribute(Qt::WA_NoMousePropagation);
-	button->setToolTip(toolTip);
+	if (obj != static_cast<QObject*>(widget()))
+	{
+		return QMdiSubWindow::eventFilter(obj, event);
+	}
 
-	return button;
+	switch (event->type())
+	{
+	case QEvent::WindowStateChange:
+		event->accept();
+		return true;
+	default:
+		return QMdiSubWindow::eventFilter(obj, event);
+	}
 }
 
 

@@ -23,30 +23,17 @@
  *
  */
 
-#include <QCloseEvent>
-
 #include "ControllerDialog.h"
+
 #include "Controller.h"
 
 namespace lmms::gui
 {
 
-
-ControllerDialog::ControllerDialog( Controller * _controller,
-							QWidget * _parent ) :
-	QWidget( _parent ),
-	ModelView( _controller, this )
+ControllerDialog::ControllerDialog(Controller* controller, QWidget* parent)
+	: DetachableWidget{parent}
+	, ModelView{controller, this}
 {
 }
-
-
-
-void ControllerDialog::closeEvent( QCloseEvent * _ce )
-{
-	_ce->ignore();
-	emit closed();
-}
-
-
 
 } // namespace lmms::gui

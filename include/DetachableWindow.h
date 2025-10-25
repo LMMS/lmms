@@ -1,8 +1,8 @@
 /*
- * EffectControlDialog.h - base-class for effect-dialogs for displaying and
- *                         editing control port values
+ * DetachableWindow.h - Allows a window to be detached from
+ *                      LMMS's main window
  *
- * Copyright (c) 2006-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2023 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -23,34 +23,27 @@
  *
  */
 
-#ifndef LMMS_GUI_EFFECT_CONTROL_DIALOG_H
-#define LMMS_GUI_EFFECT_CONTROL_DIALOG_H
+#ifndef LMMS_GUI_DETACHABLE_WINDOW
+#define LMMS_GUI_DETACHABLE_WINDOW
 
-#include "DetachableWidget.h"
-#include "ModelView.h"
+#include <QMainWindow>
 
-namespace lmms
+#include "lmms_export.h"
+
+namespace lmms::gui {
+
+class LMMS_EXPORT DetachableWindow : public QMainWindow
 {
-
-class EffectControls;
-
-namespace gui
-{
-
-class LMMS_EXPORT EffectControlDialog : public DetachableWidget, public ModelView
-{
+	Q_OBJECT
 public:
-	EffectControlDialog(EffectControls* controls);
-	~EffectControlDialog() override = default;
+	using QMainWindow::QMainWindow;
 
-	virtual bool isResizable() const { return false; }
+	void closeEvent(QCloseEvent* ce) override;
 
-protected:
-	EffectControls* m_effectControls;
+signals:
+	void closed();
 };
 
-} // namespace gui
+} // namespace lmms::gui
 
-} // namespace lmms
-
-#endif // LMMS_GUI_EFFECT_CONTROL_DIALOG_H
+#endif // LMMS_GUI_DETACHABLE_WINDOW

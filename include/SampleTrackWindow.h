@@ -25,8 +25,7 @@
 #ifndef LMMS_GUI_SAMPLE_TRACK_WINDOW_H
 #define LMMS_GUI_SAMPLE_TRACK_WINDOW_H
 
-#include <QWidget>
-
+#include "DetachableWidget.h"
 #include "ModelView.h"
 #include "SampleTrack.h"
 #include "SerializingObject.h"
@@ -43,11 +42,11 @@ class MixerChannelLcdSpinBox;
 class SampleTrackView;
 
 
-class SampleTrackWindow : public QWidget, public ModelView, public SerializingObjectHook
+class SampleTrackWindow : public DetachableWidget, public ModelView, public SerializingObjectHook
 {
 	Q_OBJECT
 public:
-	SampleTrackWindow(SampleTrackView * tv);
+	SampleTrackWindow(SampleTrackView* stv);
 	~SampleTrackWindow() override = default;
 
 	SampleTrack * model()
@@ -76,7 +75,7 @@ public slots:
 
 protected:
 	// capture close-events for toggling sample-track-button
-	void closeEvent(QCloseEvent * ce) override;
+	void closeEvent(QCloseEvent* ce) override;
 
 	void saveSettings(QDomDocument & doc, QDomElement & element) override;
 	void loadSettings(const QDomElement & element) override;
