@@ -29,6 +29,7 @@
 #include <QMap>
 #include <QMutex>
 
+#include "Command.h"
 #include "JournallingObject.h"
 #include "Model.h"
 #include "TimePos.h"
@@ -315,6 +316,9 @@ public:
 	{
 		return m_useControllerValue;
 	}
+
+public:
+	const ParamCommandFnPtr<float, AutomatableModel, void> m_setValueC;
 
 public slots:
 	virtual void reset();
