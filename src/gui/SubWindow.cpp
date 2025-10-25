@@ -44,6 +44,10 @@
 
 #include "embed.h"
 
+#ifdef LMMS_BUILD_APPLE
+#include "TextFloat.h"  // Only needed for error display for missing detach feature
+#endif
+
 namespace lmms::gui
 {
 
@@ -305,6 +309,15 @@ void SubWindow::setBorderColor( const QColor &c )
 
 
 
+#ifndef LMMS_BUILD_APPLE
+// FIXME: For some reason detaching on MacOS seems to never show the detached window.
+void SubWindow::detach()
+{
+	TextFloat::displayMessage("Missing Feature",\
+		tr("Sorry, detach is not yet available on this platform."), embed::getIconPixmap("error"), 2000);
+}
+
+#else
 void SubWindow::detach()
 {
 #if QT_VERSION < 0x50C00
@@ -334,6 +347,7 @@ void SubWindow::detach()
 
 	widget()->move(pos);
 }
+#endif
 
 void SubWindow::attach()
 {
