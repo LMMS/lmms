@@ -25,11 +25,11 @@
 #ifndef LMMS_GUI_SAMPLE_TRACK_WINDOW_H
 #define LMMS_GUI_SAMPLE_TRACK_WINDOW_H
 
+#include <QWidget>
+
 #include "ModelView.h"
 #include "SampleTrack.h"
 #include "SerializingObject.h"
-
-#include <QWidget>
 
 class QLineEdit;
 

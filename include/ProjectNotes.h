@@ -25,9 +25,9 @@
 #ifndef LMMS_GUI_PROJECT_NOTES_H
 #define LMMS_GUI_PROJECT_NOTES_H
 
-#include "SerializingObject.h"
-
 #include <QMainWindow>
+
+#include "SerializingObject.h"
 
 class QAction;
 class QComboBox;

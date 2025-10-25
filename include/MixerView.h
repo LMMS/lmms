@@ -25,11 +25,11 @@
 #ifndef LMMS_GUI_MIXER_VIEW_H
 #define LMMS_GUI_MIXER_VIEW_H
 
+#include <QWidget>
+
 #include "MixerChannelView.h"
 #include "ModelView.h"
 #include "SerializingObject.h"
-
-#include <QWidget>
 
 class QDomDocument;  // IWYU pragma: keep
 class QDomElement;  // IWYU pragma: keep

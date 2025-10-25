@@ -44,8 +44,10 @@
 
 #include "embed.h"
 
+// Only needed for error display for missing detach feature
+#include "lmmsconfig.h"
 #ifdef LMMS_BUILD_APPLE
-#include "TextFloat.h"  // Only needed for error display for missing detach feature
+#include "TextFloat.h"
 #endif
 
 namespace lmms::gui

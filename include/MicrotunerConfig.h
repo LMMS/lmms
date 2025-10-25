@@ -25,11 +25,11 @@
 #ifndef LMMS_GUI_MICROTUNER_CONFIG_H
 #define LMMS_GUI_MICROTUNER_CONFIG_H
 
+#include <QWidget>
+
 #include "AutomatableModel.h"
 #include "ComboBoxModel.h"
 #include "SerializingObject.h"
-
-#include <QWidget>
 
 class QLineEdit;
 class QPlainTextEdit;

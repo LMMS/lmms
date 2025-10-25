@@ -30,7 +30,6 @@
 #include <QLineEdit>
 #include <QMenu>
 #include <QVBoxLayout>
-#include <QSizePolicy>
 
 #include "AutomatableButton.h"
 #include "EffectRackView.h"

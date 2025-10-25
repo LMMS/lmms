@@ -25,13 +25,14 @@
 #ifndef LMMS_GUI_CONTROLLER_RACK_VIEW_H
 #define LMMS_GUI_CONTROLLER_RACK_VIEW_H
 
-#include "SerializingObject.h"
-
 #include <QWidget>
+
+#include "SerializingObject.h"
 
 class QPushButton;
 class QScrollArea;
 class QVBoxLayout;
+
 
 namespace lmms
 {
