@@ -28,11 +28,10 @@
 #include <QFileInfo>
 
 #include "PathUtil.h"
-#include "SampleBuffer.h"
 #include "SampleClipView.h"
 #include "SampleLoader.h"
 #include "SampleTrack.h"
-#include "TimeLineWidget.h"
+#include "Song.h"
 
 namespace lmms
 {
@@ -67,18 +66,6 @@ SampleClip::SampleClip(Track* _track, Sample sample, bool isPlaying)
 	//care about Clip position
 	connect( this, SIGNAL(positionChanged()), this, SLOT(updateTrackClips()));
 
-	switch( getTrack()->trackContainer()->type() )
-	{
-		case TrackContainer::Type::Pattern:
-			setAutoResize( true );
-			break;
-
-		case TrackContainer::Type::Song:
-			// move down
-		default:
-			setAutoResize( false );
-			break;
-	}
 	updateTrackClips();
 }
 
@@ -88,8 +75,36 @@ SampleClip::SampleClip(Track* track)
 }
 
 SampleClip::SampleClip(const SampleClip& orig) :
-	SampleClip(orig.getTrack(), orig.m_sample, orig.m_isPlaying)
+	Clip(orig),
+	m_sample(std::move(orig.m_sample)),
+	m_isPlaying(orig.m_isPlaying)
 {
+	saveJournallingState( false );
+	setSampleFile( "" );
+	restoreJournallingState();
+
+	// we need to receive bpm-change-events, because then we have to
+	// change length of this Clip
+	connect( Engine::getSong(), SIGNAL(tempoChanged(lmms::bpm_t)),
+					this, SLOT(updateLength()), Qt::DirectConnection );
+	connect( Engine::getSong(), SIGNAL(timeSignatureChanged(int,int)),
+					this, SLOT(updateLength()));
+
+	//playbutton clicked or space key / on Export Song set isPlaying to false
+	connect( Engine::getSong(), SIGNAL(playbackStateChanged()),
+			this, SLOT(playbackPositionChanged()), Qt::DirectConnection );
+	//care about loops and jumps
+	connect( Engine::getSong(), SIGNAL(updateSampleTracks()),
+			this, SLOT(playbackPositionChanged()), Qt::DirectConnection );
+	//care about mute Clips
+	connect( this, SIGNAL(dataChanged()), this, SLOT(playbackPositionChanged()));
+	//care about mute track
+	connect( getTrack()->getMutedModel(), SIGNAL(dataChanged()),
+			this, SLOT(playbackPositionChanged()), Qt::DirectConnection );
+	//care about Clip position
+	connect( this, SIGNAL(positionChanged()), this, SLOT(updateTrackClips()));
+
+	updateTrackClips();
 }
 
 
@@ -110,12 +125,6 @@ SampleClip::~SampleClip()
 void SampleClip::changeLength( const TimePos & _length )
 {
 	Clip::changeLength(std::max(static_cast<int>(_length), 1));
-}
-
-void SampleClip::changeLengthToSampleLength()
-{
-	int length = m_sample.sampleSize() / Engine::framesPerTick();
-	changeLength(length);
 }
 
 
@@ -145,25 +154,20 @@ void SampleClip::setSampleBuffer(std::shared_ptr<const SampleBuffer> sb)
 
 void SampleClip::setSampleFile(const QString& sf)
 {
-	int length = 0;
-
+	// Remove any prior offset in the clip
+	setStartTimeOffset(0);
 	if (!sf.isEmpty())
 	{
-		//Otherwise set it to the sample's length
 		m_sample = Sample(gui::SampleLoader::createBufferFromFile(sf));
-		length = sampleLength();
+		updateLength();
 	}
-
-	if (length == 0)
+	else
 	{
-		//If there is no sample, make the clip a bar long
+		// If there is no sample, make the clip a bar long
 		float nom = Engine::getSong()->getTimeSigModel().getNumerator();
 		float den = Engine::getSong()->getTimeSigModel().getDenominator();
-		length = DefaultTicksPerBar * (nom / den);
+		changeLength(DefaultTicksPerBar * (nom / den));
 	}
-
-	changeLength(length);
-	setStartTimeOffset(0);
 
 	emit sampleChanged();
 	emit playbackPositionChanged();
@@ -221,6 +225,13 @@ void SampleClip::setIsPlaying(bool isPlaying)
 
 void SampleClip::updateLength()
 {
+	// If the clip has already been manually resized, don't automatically resize it.
+	if (getAutoResize())
+	{
+		changeLength(sampleLength());
+		setStartTimeOffset(0);
+	}
+
 	emit sampleChanged();
 
 	Engine::getSong()->setModified();
@@ -267,6 +278,7 @@ void SampleClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "muted", isMuted() );
 	_this.setAttribute( "src", sampleFile() );
 	_this.setAttribute( "off", startTimeOffset() );
+	_this.setAttribute("autoresize", QString::number(getAutoResize()));
 	if( sampleFile() == "" )
 	{
 		QString s;
@@ -315,6 +327,7 @@ void SampleClip::loadSettings( const QDomElement & _this )
 	changeLength( _this.attribute( "len" ).toInt() );
 	setMuted( _this.attribute( "muted" ).toInt() );
 	setStartTimeOffset( _this.attribute( "off" ).toInt() );
+	setAutoResize(_this.attribute("autoresize", "1").toInt());
 
 	if (_this.hasAttribute("color"))
 	{

@@ -27,30 +27,76 @@
 #ifdef LMMS_HAVE_JACK
 
 #include <QFormLayout>
+#include <QLabel>
 #include <QLineEdit>
+#include <QMenu>
 #include <QMessageBox>
+#include <QToolButton>
+#include <QStringList>
 
 #include "AudioEngine.h"
 #include "ConfigManager.h"
-#include "Engine.h"
 #include "GuiApplication.h"
-#include "LcdSpinBox.h"
 #include "MainWindow.h"
 #include "MidiJack.h"
+
+#include <cstdio>
+
+
+namespace
+{
+static const QString audioJackClass("audiojack");
+static const QString clientNameKey("clientname");
+static const QString disconnectedRepresentation("-");
+
+QString getOutputKeyByChannel(size_t channel)
+{
+	return "output" + QString::number(channel + 1);
+}
+
+QString getInputKeyByChannel(size_t channel)
+{
+	return "input" + QString::number(channel + 1);
+}
+
+void printJackStatus(jack_status_t status)
+{
+	std::fprintf(stderr, "Status: 0x%2.0x\n", static_cast<unsigned int>(status));
+
+	if (status & JackFailure)
+	{
+		std::fprintf(stderr, "Overall operation failed. JACK dependencies might need to be installed.\n");
+	}
+
+	if (status & JackServerFailed)
+	{
+		std::fprintf(stderr, "Could not connect to JACK server.\n");
+	}
+}
+
+}
 
 namespace lmms
 {
 
+static QString buildChannelSuffix(ch_cnt_t ch)
+{
+	return (ch % 2 ? "R" : "L") + QString::number(ch / 2 + 1);
+}
+
+static QString buildOutputName(ch_cnt_t ch)
+{
+	return QString("master out ") + buildChannelSuffix(ch);
+}
+
+static QString buildInputName(ch_cnt_t ch)
+{
+	return QString("master in ") + buildChannelSuffix(ch);
+}
 
 AudioJack::AudioJack(bool& successful, AudioEngine* audioEngineParam)
 	: AudioDevice(
-		// clang-format off
-		std::clamp<int>(
-			ConfigManager::inst()->value("audiojack", "channels").toInt(),
-			DEFAULT_CHANNELS,
-			DEFAULT_CHANNELS
-		),
-		// clang-format on
+		DEFAULT_CHANNELS,
 		audioEngineParam)
 	, m_client(nullptr)
 	, m_active(false)
@@ -66,6 +112,8 @@ AudioJack::AudioJack(bool& successful, AudioEngine* audioEngineParam)
 	if (successful) {
 		connect(this, SIGNAL(zombified()), this, SLOT(restartAfterZombified()), Qt::QueuedConnection);
 	}
+
+	m_supportsCapture = true;
 }
 
 
@@ -131,11 +179,9 @@ AudioJack* AudioJack::addMidiClient(MidiJack* midiClient)
 }
 
 
-
-
 bool AudioJack::initJackClient()
 {
-	QString clientName = ConfigManager::inst()->value("audiojack", "clientname");
+	QString clientName = ConfigManager::inst()->value(audioJackClass, clientNameKey);
 	if (clientName.isEmpty()) { clientName = "lmms"; }
 
 	const char* serverName = nullptr;
@@ -143,16 +189,27 @@ bool AudioJack::initJackClient()
 	m_client = jack_client_open(clientName.toLatin1().constData(), JackNullOption, &status, serverName);
 	if (m_client == nullptr)
 	{
-		printf("jack_client_open() failed, status 0x%2.0x\n", status);
-		if (status & JackServerFailed) { printf("Could not connect to JACK server.\n"); }
+		std::fprintf(stderr, "jack_client_open() failed, ");
+		printJackStatus(status);
+
 		return false;
 	}
 	if (status & JackNameNotUnique)
 	{
-		printf(	"there's already a client with name '%s', so unique "
-				"name '%s' was assigned\n",
-				clientName.toLatin1().constData(), jack_get_client_name(m_client));
+		std::printf("there's already a client with name '%s', so unique "
+					"name '%s' was assigned\n",
+					clientName.toLatin1().constData(), jack_get_client_name(m_client));
 	}
+
+	resizeInputBuffer(jack_get_buffer_size(m_client));
+
+	// set buffer-size callback
+	jack_set_buffer_size_callback(m_client,
+		[](jack_nframes_t nframes, void* udata) -> int {
+			static_cast<AudioJack*>(udata)->resizeInputBuffer(nframes);
+			return 0;
+		},
+		this);
 
 	// set process-callback
 	jack_set_process_callback(m_client, staticProcessCallback, this);
@@ -164,12 +221,16 @@ bool AudioJack::initJackClient()
 
 	for (ch_cnt_t ch = 0; ch < channels(); ++ch)
 	{
-		QString name = QString("master out ") + ((ch % 2) ? "R" : "L") + QString::number(ch / 2 + 1);
+		const QString name = buildOutputName(ch);
 		m_outputPorts.push_back(
 			jack_port_register(m_client, name.toLatin1().constData(), JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0));
+
+		const QString input_name = buildInputName(ch);
+		m_inputPorts.push_back(jack_port_register(m_client, input_name.toLatin1().constData(), JACK_DEFAULT_AUDIO_TYPE, JackPortIsInput, 0));
+
 		if (m_outputPorts.back() == nullptr)
 		{
-			printf("no more JACK-ports available!\n");
+			std::fprintf(stderr, "no more JACK-ports available!\n");
 			return false;
 		}
 	}
@@ -178,6 +239,57 @@ bool AudioJack::initJackClient()
 }
 
 
+
+
+void AudioJack::resizeInputBuffer(jack_nframes_t nframes)
+{
+	m_inputFrameBuffer.resize(nframes);
+}
+
+void AudioJack::attemptToConnect(size_t index, const char *lmms_port_type, const char *source_port, const char *destination_port)
+{
+	std::printf("Attempting to reconnect %s port %u: %s -> %s", lmms_port_type, static_cast<unsigned int>(index), source_port, destination_port);
+	if (!jack_connect(m_client, source_port, destination_port))
+	{
+		std::printf(" - Success!\n");
+	}
+	else
+	{
+		std::printf(" - Failure\n");
+	}
+}
+
+void AudioJack::attemptToReconnectOutput(size_t outputIndex, const QString& targetPort)
+{
+	if (outputIndex >= m_outputPorts.size()) { return; }
+
+	if (targetPort == disconnectedRepresentation)
+	{
+		std::fprintf(stderr, "Output port %u is not connected.\n", static_cast<unsigned int>(outputIndex));
+		return;
+	}
+
+	auto outputName = jack_port_name(m_outputPorts[outputIndex]);
+	auto targetName = targetPort.toLatin1();
+
+	attemptToConnect(outputIndex, "output", outputName, targetName.constData());
+}
+
+void AudioJack::attemptToReconnectInput(size_t inputIndex, const QString& sourcePort)
+{
+	if (inputIndex >= m_inputPorts.size()) { return; }
+
+	if (sourcePort == disconnectedRepresentation)
+	{
+		std::fprintf(stderr, "Input port %u is not connected.\n", static_cast<unsigned int>(inputIndex));
+		return;
+	}
+
+	auto inputName = jack_port_name(m_inputPorts[inputIndex]);
+	auto sourceName = sourcePort.toLatin1();
+
+	attemptToConnect(inputIndex, "input", sourceName.constData(), inputName);
+}
 
 
 void AudioJack::startProcessing()
@@ -190,7 +302,7 @@ void AudioJack::startProcessing()
 
 	if (jack_activate(m_client))
 	{
-		printf("cannot activate client\n");
+		std::fprintf(stderr, "cannot activate client\n");
 		return;
 	}
 
@@ -199,26 +311,20 @@ void AudioJack::startProcessing()
 	// try to sync JACK's and LMMS's buffer-size
 	//	jack_set_buffer_size( m_client, audioEngine()->framesPerPeriod() );
 
-	const char** ports = jack_get_ports(m_client, nullptr, nullptr, JackPortIsPhysical | JackPortIsInput);
-	if (ports == nullptr)
+	const auto cm = ConfigManager::inst();
+
+	const auto numberOfChannels = channels();
+	for (size_t i = 0; i < numberOfChannels; ++i)
 	{
-		printf("no physical playback ports. you'll have to do "
-			   "connections at your own!\n");
+		attemptToReconnectOutput(i, cm->value(audioJackClass, getOutputKeyByChannel(i)));
 	}
-	else
+
+	for (size_t i = 0; i < numberOfChannels; ++i)
 	{
-		for (ch_cnt_t ch = 0; ch < channels(); ++ch)
-		{
-			if (jack_connect(m_client, jack_port_name(m_outputPorts[ch]), ports[ch]))
-			{
-				printf("cannot connect output ports. you'll "
-					   "have to do connections at your own!\n");
-			}
-		}
+		attemptToReconnectInput(i, cm->value(audioJackClass, getInputKeyByChannel(i)));
 	}
 
 	m_stopped = false;
-	jack_free(ports);
 }
 
 
@@ -290,7 +396,6 @@ void AudioJack::renamePort(AudioBusHandle* port)
 
 int AudioJack::processCallback(jack_nframes_t nframes)
 {
-
 	// do midi processing first so that midi input can
 	// add to the following sound processing
 	if (m_midiClient && nframes > 0)
@@ -356,6 +461,16 @@ int AudioJack::processCallback(jack_nframes_t nframes)
 		}
 	}
 
+	for (int c = 0; c < channels(); ++c)
+	{
+		jack_default_audio_sample_t* jack_input_buffer = (jack_default_audio_sample_t*) jack_port_get_buffer(m_inputPorts[c], nframes);
+
+		for (jack_nframes_t frame = 0; frame < nframes; frame++)
+		{
+			m_inputFrameBuffer[frame][c] = static_cast<sample_t>(jack_input_buffer[frame]);
+		}
+	}
+	audioEngine()->pushInputFrames (m_inputFrameBuffer.data(), nframes);
 	return 0;
 }
 
@@ -383,40 +498,197 @@ void AudioJack::shutdownCallback(void* udata)
 AudioJack::setupWidget::setupWidget(QWidget* parent)
 	: AudioDeviceSetupWidget(AudioJack::name(), parent)
 {
+	const char* serverName = nullptr;
+	jack_status_t status;
+	m_client = jack_client_open("LMMS-Setup Dialog", JackNullOption, &status, serverName);
+	if (!m_client)
+	{
+		std::fprintf(stderr, "jack_client_open() failed, ");
+		printJackStatus(status);
+	}
+
 	QFormLayout * form = new QFormLayout(this);
 
-	QString cn = ConfigManager::inst()->value("audiojack", "clientname");
+	// Set the field growth policy to allow fields to expand horizontally
+	form->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
+
+	const auto cm = ConfigManager::inst();
+	QString cn = cm->value(audioJackClass, clientNameKey);
 	if (cn.isEmpty()) { cn = "lmms"; }
 	m_clientName = new QLineEdit(cn, this);
 
 	form->addRow(tr("Client name"), m_clientName);
 
-	auto m = new gui::LcdSpinBoxModel(/* this */);
-	m->setRange(DEFAULT_CHANNELS, DEFAULT_CHANNELS);
-	m->setStep(2);
-	m->setValue(ConfigManager::inst()->value("audiojack", "channels").toInt());
+	auto buildToolButton = [this](QWidget* parent, const QString& currentSelection, const std::vector<std::string>& names, const QString& filteredLMMSClientName)
+	{
+		auto toolButton = new QToolButton(parent);
+		// Make sure that the tool button will fill out the available space in the form layout
+		toolButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+		toolButton->setPopupMode(QToolButton::InstantPopup);
+		toolButton->setText(currentSelection);
+		auto menu = AudioJack::setupWidget::buildMenu(toolButton, names, filteredLMMSClientName);
+		toolButton->setMenu(menu);
 
-	m_channels = new gui::LcdSpinBox(1, this);
-	m_channels->setModel(m);
+		return toolButton;
+	};
 
-	form->addRow(tr("Channels"), m_channels);
+	// Outputs
+	const auto audioOutputNames = getAudioOutputNames();
+
+	constexpr size_t numberOfOutputChannels = 2;
+	for (size_t i = 0; i < numberOfOutputChannels; ++i)
+	{
+		const auto outputKey = getOutputKeyByChannel(i);
+		const auto outputValue = cm->value(audioJackClass, outputKey);
+		auto outputDevice = buildToolButton(this, outputValue, audioOutputNames, cn);
+		form->addRow(buildOutputName(i) + ":", outputDevice);
+		m_outputDevices.push_back(outputDevice);
+	}
+
+	// Inputs
+	const auto audioInputNames = getAudioInputNames();
+
+	constexpr size_t numberOfInputChannels = 2;
+	for (size_t i = 0; i < numberOfInputChannels; ++i)
+	{
+		const auto inputKey = getInputKeyByChannel(i);
+		const auto inputValue = cm->value(audioJackClass, inputKey);
+		auto inputDevice = buildToolButton(this, inputValue, audioInputNames, cn);
+		form->addRow(buildInputName(i) + ":", inputDevice);
+		m_inputDevices.push_back(inputDevice);
+	}
+
+	if (m_client != nullptr)
+	{
+		jack_deactivate(m_client);
+		jack_client_close(m_client);
+	}
 }
-
-
-
-
-AudioJack::setupWidget::~setupWidget()
-{
-	delete m_channels->model();
-}
-
-
 
 
 void AudioJack::setupWidget::saveSettings()
 {
-	ConfigManager::inst()->setValue("audiojack", "clientname", m_clientName->text());
-	ConfigManager::inst()->setValue("audiojack", "channels", QString::number(m_channels->value<int>()));
+	ConfigManager::inst()->setValue(audioJackClass, clientNameKey, m_clientName->text());
+
+	for (size_t i = 0; i < m_outputDevices.size(); ++i)
+	{
+		ConfigManager::inst()->setValue(audioJackClass, getOutputKeyByChannel(i), m_outputDevices[i]->text());	
+	}
+
+	for (size_t i = 0; i < m_inputDevices.size(); ++i)
+	{
+		ConfigManager::inst()->setValue(audioJackClass, getInputKeyByChannel(i), m_inputDevices[i]->text());	
+	}
+}
+
+std::vector<std::string> AudioJack::setupWidget::getAudioPortNames(JackPortFlags portFlags) const
+{
+	std::vector<std::string> audioPorts;
+
+	// We are using weak_libjack. If JACK is not installed this will result in the client being nullptr.
+	// Because jack_get_ports in weak_libjack does not check for nullptr we have to do this here and fail gracefully,
+	// i.e. with an empty list of audio ports.
+	if (!m_client)
+	{
+		return audioPorts;
+	}
+
+	const char **inputAudioPorts = jack_get_ports(m_client, nullptr, JACK_DEFAULT_AUDIO_TYPE, portFlags);
+	if (inputAudioPorts)
+	{
+		for (int i = 0; inputAudioPorts[i] != nullptr; ++i)
+		{
+			auto currentPortName = inputAudioPorts[i];
+
+			audioPorts.push_back(currentPortName);
+		}
+		jack_free(inputAudioPorts); // Remember to free after use
+	}
+
+	return audioPorts;
+}
+
+std::vector<std::string> AudioJack::setupWidget::getAudioOutputNames() const
+{
+	return getAudioPortNames(JackPortIsInput);
+}
+
+std::vector<std::string> AudioJack::setupWidget::getAudioInputNames() const
+{
+	return getAudioPortNames(JackPortIsOutput);
+}
+
+QMenu* AudioJack::setupWidget::buildMenu(QToolButton* toolButton, const std::vector<std::string>& names, const QString& filteredLMMSClientName)
+{
+	auto menu = new QMenu(toolButton);
+	QMap<QString, QMenu*> clientNameToSubMenuMap;
+	QList<QAction*> topLevelActions;
+	for (const auto& currentName : names)
+	{
+		const auto clientNameWithPortName = QString::fromStdString(currentName);
+
+		auto actionLambda = [toolButton, clientNameWithPortName](bool checked)
+		{
+			toolButton->setText(clientNameWithPortName);
+		};
+
+		// Split into individual client name and port name
+		const auto list = clientNameWithPortName.split(":");
+		if (list.size() == 2)
+		{
+			const auto& clientName = list[0];
+			const auto& portName = list[1];
+
+			if (clientName == filteredLMMSClientName)
+			{
+				// Prevent loops by not adding port of the LMMS client to the menu
+				continue;
+			}
+
+			QMenu* clientSubMenu = nullptr;
+
+			auto it = clientNameToSubMenuMap.find(clientName);
+			if (it == clientNameToSubMenuMap.end())
+			{
+				clientSubMenu = new QMenu(menu);
+				clientSubMenu->setTitle(clientName);
+				clientNameToSubMenuMap.insert(clientName, clientSubMenu);
+			}
+			else
+			{
+				clientSubMenu = *it;
+			}
+
+			auto action = new QAction(portName, clientSubMenu);
+			connect(action, &QAction::triggered, actionLambda);
+			clientSubMenu->addAction(action);
+		}
+		else
+		{
+			// We cannot split into client and port name. Add the whole thing to the top level menu
+			auto action = new QAction(QString::fromStdString(currentName), menu);
+			connect(action, &QAction::triggered, actionLambda);
+			topLevelActions.append(action);
+		}
+	}
+
+	// First add the sub menus. By iterating the map they will be sorted automatically
+	for (auto it = clientNameToSubMenuMap.begin(); it != clientNameToSubMenuMap.end(); ++it)
+	{
+		menu->addMenu(it.value());
+	}
+
+	// Now add potential top level actions, i.e. the entries which cannot be split at exactly one ":"
+	// They must be sorted explicitly
+	std::sort(topLevelActions.begin(), topLevelActions.end(), [](QAction* a, QAction* b) { return a->text() < b->text(); });
+	menu->addActions(topLevelActions);
+
+	// Add the menu entry which represents the disconnected state at the very end
+	auto disconnectedAction = new QAction(disconnectedRepresentation, menu);
+	connect(disconnectedAction, &QAction::triggered, [toolButton](bool checked)	{ toolButton->setText(disconnectedRepresentation); });
+	menu->addAction(disconnectedAction);
+
+	return menu;
 }
 
 

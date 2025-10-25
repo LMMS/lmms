@@ -28,19 +28,28 @@
 #include <QFont>
 #include <QGraphicsProxyWidget>
 #include <QGraphicsScene>
+#include <QGraphicsView>
+#include <QLineEdit>
 #include <QMenu>
 #include <QMessageBox>
 #include <QPainter>
-#include <cassert>
+#include <QStackedWidget>
+#include <QVBoxLayout>
 
+#include "AutomatableButton.h"
 #include "CaptionMenu.h"
 #include "ColorChooser.h"
 #include "ConfigManager.h"
+#include "EffectRackView.h"
+#include "Fader.h"
 #include "FontHelper.h"
 #include "GuiApplication.h"
+#include "Knob.h"
+#include "LcdWidget.h"
 #include "Mixer.h"
 #include "MixerView.h"
 #include "PeakIndicator.h"
+#include "SendButtonIndicator.h"
 #include "Song.h"
 
 namespace lmms::gui {
@@ -147,6 +156,8 @@ MixerChannelView::MixerChannelView(QWidget* parent, MixerView* mixerView, int ch
 	mainLayout->addWidget(m_fader, 1, Qt::AlignHCenter);
 
 	connect(m_renameLineEdit, &QLineEdit::editingFinished, this, &MixerChannelView::renameFinished);
+
+	setFocusPolicy(Qt::StrongFocus);
 }
 
 void MixerChannelView::contextMenuEvent(QContextMenuEvent*)
@@ -220,23 +231,19 @@ void MixerChannelView::mouseDoubleClickEvent(QMouseEvent*)
 	renameChannel();
 }
 
-bool MixerChannelView::eventFilter(QObject*, QEvent* event)
+void MixerChannelView::keyPressEvent(QKeyEvent* ke)
 {
-	// If we are in a rename, capture the enter/return events and handle them
-	if (event->type() == QEvent::KeyPress)
+	if (ke->key() == Qt::Key_Enter || ke->key() == Qt::Key_Return)
 	{
-		auto keyEvent = static_cast<QKeyEvent*>(event);
-		if (keyEvent->key() == Qt::Key_Enter || keyEvent->key() == Qt::Key_Return)
+		if (m_inRename)
 		{
-			if (m_inRename)
-			{
-				renameFinished();
-				event->accept(); // Stop the event from propagating
-				return true;
-			}
+			renameFinished();
 		}
 	}
-	return false;
+	else
+	{
+		ke->ignore();
+	}
 }
 
 void MixerChannelView::setChannelIndex(int index)

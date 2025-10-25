@@ -54,7 +54,7 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 								int midiEventChannel,
 								Origin origin ) :
 	PlayHandle( PlayHandle::Type::NotePlayHandle, _offset ),
-	Note( n.length(), n.pos(), n.key(), n.getVolume(), n.getPanning(), n.detuning() ),
+	Note(n),
 	m_pluginData( nullptr ),
 	m_instrumentTrack( instrumentTrack ),
 	m_frames( 0 ),
@@ -84,7 +84,7 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 	lock();
 	if( hasParent() == false )
 	{
-		m_baseDetuning = new BaseDetuning( detuning() );
+		m_baseDetuning = new BaseDetuning(detuning().get());
 		m_instrumentTrack->m_processHandles.push_back( this );
 	}
 	else

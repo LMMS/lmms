@@ -925,7 +925,7 @@ ManageVestigeInstrumentView::ManageVestigeInstrumentView( Instrument * _instrume
 #if QT_VERSION < 0x50C00
 	// Workaround for a bug in Qt versions below 5.12,
 	// where argument-dependent-lookup fails for QFlags operators
-	// declared inside a namepsace.
+	// declared inside a namespace.
 	// This affects the Q_DECLARE_OPERATORS_FOR_FLAGS macro in Instrument.h
 	// See also: https://codereview.qt-project.org/c/qt/qtbase/+/225348
 
@@ -998,9 +998,11 @@ ManageVestigeInstrumentView::ManageVestigeInstrumentView( Instrument * _instrume
 		std::snprintf(paramStr.data(), paramStr.size(), "param%d", i);
 		s_dumpValues = dump[paramStr.data()].split(":");
 
-		vstKnobs[ i ] = new CustomTextKnob( KnobType::Bright26, this, s_dumpValues.at( 1 ) );
-		vstKnobs[ i ]->setDescription( s_dumpValues.at( 1 ) + ":" );
-		vstKnobs[ i ]->setLabel( s_dumpValues.at( 1 ).left( 15 ) );
+		const auto & description = s_dumpValues.at(1);
+
+		auto knob = new CustomTextKnob(KnobType::Bright26, description.left(15), this, description);
+		knob->setDescription(description + ":");
+		vstKnobs[i] = knob;
 
 		if( !hasKnobModel )
 		{

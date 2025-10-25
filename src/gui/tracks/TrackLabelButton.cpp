@@ -30,7 +30,6 @@
 
 #include "ConfigManager.h"
 #include "embed.h"
-#include "InstrumentTrackView.h"
 #include "Instrument.h"
 #include "InstrumentTrack.h"
 #include "RenameDialog.h"
@@ -47,6 +46,7 @@ TrackLabelButton::TrackLabelButton( TrackView * _tv, QWidget * _parent ) :
 	m_iconName()
 {
 	setAcceptDrops( true );
+	setFocusPolicy(Qt::NoFocus);
 	setCursor( QCursor( embed::getIconPixmap( "hand" ), 3, 3 ) );
 	setToolButtonStyle( Qt::ToolButtonTextBesideIcon );
 

@@ -222,7 +222,7 @@ void TrackContentWidget::update()
 
 
 
-// resposible for moving track-content-widgets to appropriate position after
+// responsible for moving track-content-widgets to appropriate position after
 // change of visible viewport
 /*! \brief Move the trackContentWidget to a new place in time
  *
@@ -598,8 +598,8 @@ void TrackContentWidget::mousePressEvent( QMouseEvent * me )
 			so.at( i )->setSelected( false);
 		}
 		getTrack()->addJournalCheckPoint();
-		const TimePos pos = getPosition( me->x() ).getBar() *
-						TimePos::ticksPerBar();
+		const float snapSize = getGUI()->songEditor()->m_editor->getSnapSize();
+		const TimePos pos = TimePos(getPosition(me->x())).quantize(snapSize, true);
 		getTrack()->createClip(pos);
 	}
 }
@@ -643,7 +643,7 @@ void TrackContentWidget::paintEvent( QPaintEvent * pe )
  */
 void TrackContentWidget::resizeEvent( QResizeEvent * resizeEvent )
 {
-	// Update backgroud
+	// Update background
 	updateBackground();
 	// Force redraw
 	QWidget::resizeEvent( resizeEvent );

@@ -33,6 +33,7 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
+#include "AutomatableButton.h"
 #include "ComboBox.h"
 #include "ConfigManager.h"
 #include "DataFile.h"
@@ -59,6 +60,7 @@
 #include "MainWindow.h"
 #include "PianoView.h"
 #include "PluginFactory.h"
+#include "PluginView.h"
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "SubWindow.h"
@@ -128,7 +130,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 #if QT_VERSION < 0x50C00
 	// Workaround for a bug in Qt versions below 5.12,
 	// where argument-dependent-lookup fails for QFlags operators
-	// declared inside a namepsace.
+	// declared inside a namespace.
 	// This affects the Q_DECLARE_OPERATORS_FOR_FLAGS macro in Instrument.h
 	// See also: https://codereview.qt-project.org/c/qt/qtbase/+/225348
 
@@ -294,9 +296,9 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	vlayout->addWidget( m_pianoView );
 	setModel( _itv->model() );
 
-	updateInstrumentView();
-
 	QMdiSubWindow* subWin = getGUI()->mainWindow()->addWindowedWidget( this );
+
+	updateInstrumentView();
 
 	// The previous call should have given us a sub window parent. Therefore
 	// we can reuse this method.
@@ -539,8 +541,8 @@ void InstrumentTrackWindow::closeEvent( QCloseEvent* event )
 		hide();
 	}
 
-	m_itv->m_tlb->setFocus();
-	m_itv->m_tlb->setChecked( false );
+	m_itv->setFocus();
+	m_itv->m_tlb->setChecked(false);
 }
 
 

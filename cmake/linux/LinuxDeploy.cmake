@@ -49,6 +49,7 @@ endif()
 
 include(DownloadBinary)
 include(CreateSymlink)
+include(CopyDependency)
 
 # Cleanup CPack "External" json, txt files, old AppImage files
 file(GLOB cleanup "${CPACK_BINARY_DIR}/${lmms}-*.json"
@@ -87,11 +88,29 @@ foreach(_file ${files})
 	endif()
 endforeach()
 
+# Gather deps
+list(APPEND DEPLOY_DEPS
+	--deploy-deps-only "${APP}/usr/lib/${lmms}/"
+	--deploy-deps-only "${APP}/usr/lib/${lmms}/ladspa/"
+)
+
+# If usr/bin/lmms is hard-linked to libjack, copy it to a new location
+# See https://github.com/LMMS/lmms/issues/7689
+copy_dependency("${APP}/usr/bin/lmms" "libjack.so" "${APP}/usr/lib/jack" JACK_LIB_RELOC)
+if(JACK_LIB_RELOC)
+	list(APPEND DEPLOY_DEPS --deploy-deps-only "${JACK_LIB_RELOC}")
+endif()
+
+if(CPACK_HAVE_VST_32)
+	list(APPEND DEPLOY_DEPS --deploy-deps-only "${APP}/usr/lib/${lmms}/32/")
+endif()
+
 # Copy Suil modules
 if(CPACK_SUIL_MODULES)
-	set(SUIL_MODULES_TARGET "${APP}/usr/lib/${CPACK_SUIL_MODULES_PREFIX}")
+	set(SUIL_MODULES_TARGET "${APP}/usr/lib/suil-0/")
 	file(MAKE_DIRECTORY "${SUIL_MODULES_TARGET}")
 	file(COPY ${CPACK_SUIL_MODULES} DESTINATION "${SUIL_MODULES_TARGET}")
+	list(APPEND DEPLOY_DEPS --deploy-deps-only "${APP}/usr/lib/suil-0/")
 endif()
 
 # Copy stk/rawwaves
@@ -125,38 +144,9 @@ file(COPY "${APP}/usr/share/icons/hicolor/256x256/apps/${lmms}.png" DESTINATION 
 file(RENAME "${APP}/${lmms}.png" "${APP}/.DirIcon")
 file(COPY "${APP}/usr/share/icons/hicolor/256x256/apps/${lmms}.png" DESTINATION "${APP}")
 
-# Build list of libraries to inform linuxdeploy about
-# e.g. --library=foo.so --library=bar.so
-file(GLOB LIBS "${APP}/usr/lib/${lmms}/*.so")
-
-# Inform linuxdeploy about LADSPA plugins; may depend on bundled fftw3f, etc.
-file(GLOB LADSPA "${APP}/usr/lib/${lmms}/ladspa/*.so")
-
-# Inform linuxdeploy about remote plugins
-file(GLOB REMOTE_PLUGINS "${APP}/usr/lib/${lmms}/*Remote*")
-
 # Inform linuxdeploy-plugin-qt about wayland plugin
 set(ENV{EXTRA_PLATFORM_PLUGINS} "libqwayland-generic.so")
 set(ENV{EXTRA_QT_MODULES} "waylandcompositor")
-
-# Collect, sort and dedupe all libraries
-list(APPEND LIBS ${LADSPA})
-list(APPEND LIBS ${REMOTE_PLUGINS})
-list(APPEND LIBS ${CPACK_SUIL_MODULES})
-list(REMOVE_DUPLICATES LIBS)
-list(SORT LIBS)
-
-# Handle non-relinkable files (e.g. RemoveVstPlugin[32|64], but not NativeLinuxRemoteVstPlugin)
-list(FILTER LIBS EXCLUDE REGEX "\\/RemoteVst")
-
-# Construct linuxdeploy parameters
-foreach(_lib IN LISTS LIBS)
-	if(EXISTS "${_lib}")
-		list(APPEND LIBRARIES "--library=${_lib}")
-	endif()
-endforeach()
-
-list(APPEND SKIP_LIBRARIES "--exclude-library=*libgallium*")
 
 # Call linuxdeploy
 message(STATUS "Calling ${LINUXDEPLOY_BIN} --appdir \"${APP}\" ... [... libraries].")
@@ -164,8 +154,8 @@ execute_process(COMMAND "${LINUXDEPLOY_BIN}"
 	--appdir "${APP}"
 	--desktop-file "${DESKTOP_FILE}"
 	--plugin qt
-	${LIBRARIES}
-	${SKIP_LIBRARIES}
+	${DEPLOY_DEPS}
+   	--exclude-library "*libgallium*"
 	--verbosity ${VERBOSITY}
 	WORKING_DIRECTORY "${CPACK_CURRENT_BINARY_DIR}"
 	${OUTPUT_QUIET}
@@ -188,83 +178,6 @@ foreach(_lib IN LISTS EXCLUDE_LIBS)
 		file(REMOVE "${_lib}")
 	endif()
 endforeach()
-
-# FIXME: Remove when linuxdeploy supports subfolders https://github.com/linuxdeploy/linuxdeploy/issues/305
-foreach(_lib IN LISTS LIBS)
-	if(EXISTS "${_lib}")
-		file(REMOVE "${_lib}")
-	endif()
-endforeach()
-# Move RemotePlugins into to LMMS_PLUGIN_DIR
-file(GLOB WINE_VST_LIBS
-	"${APP}/usr/lib/${lmms}/RemoteVstPlugin*"
-	"${APP}/usr/lib/${lmms}/32")
-foreach(_file IN LISTS WINE_VST_LIBS)
-	if(EXISTS "${_file}")
-		get_filename_component(_name "${_file}" NAME)
-		file(RENAME "${_file}" "${APP}/usr/lib/${_name}")
-	endif()
-endforeach()
-file(GLOB WINE_32_LIBS
-	"${APP}/usr/lib/${lmms}/RemoteVstPlugin*")
-foreach(_lib IN LISTS WINE_64_LIBS)
-	if(EXISTS "${_lib}")
-		get_filename_component(_file "${_lib}" NAME)
-		file(RENAME "${_lib}" "${APP}/usr/lib/${_file}")
-	endif()
-endforeach()
-
-file(REMOVE_RECURSE "${SUIL_MODULES_TARGET}" "${APP}/usr/lib/${lmms}/ladspa/")
-
-# Copy "exclude-list" lib(s) into specified location
-macro(copy_excluded ldd_target name_match destination relocated_lib)
-	execute_process(COMMAND ldd
-		"${ldd_target}"
-		OUTPUT_VARIABLE ldd_output
-		OUTPUT_STRIP_TRAILING_WHITESPACE
-		COMMAND_ECHO ${COMMAND_ECHO}
-		COMMAND_ERROR_IS_FATAL ANY)
-
-	# escape periods to avoid double-escaping
-	string(REPLACE "." "\\." name_match "${name_match}")
-
-	# cli output --> list
-	string(REPLACE "\n" ";" ldd_list "${ldd_output}")
-
-	foreach(line ${ldd_list})
-		if(line MATCHES "${name_match}")
-			# Assumes format "libname.so.0 => /lib/location/libname.so.0 (0x00007f48d0b0e000)"
-			string(REPLACE " " ";" parts "${line}")
-			list(LENGTH parts len)
-			math(EXPR index "${len}-2")
-			list(GET parts ${index} lib)
-			# Resolve any possible symlinks
-			file(REAL_PATH "${lib}" libreal)
-			get_filename_component(symname "${lib}" NAME)
-			get_filename_component(realname "${libreal}" NAME)
-			file(MAKE_DIRECTORY "${destination}")
-			# Copy, but with original symlink name
-			file(COPY "${libreal}" DESTINATION "${destination}")
-			file(RENAME "${destination}/${realname}" "${destination}/${symname}")
-			set("${relocated_lib}" "${destination}/${symname}")
-			break()
-		endif()
-	endforeach()
-endmacro()
-
-# copy libjack
-copy_excluded("${APP}/usr/bin/${lmms}" "libjack.so" "${APP}/usr/lib/jack" relocated_jack)
-if(relocated_jack)
-	# libdb's not excluded however we'll re-use the macro as a convenient path calculation
-	# See https://github.com/LMMS/lmms/issues/7689s
-	copy_excluded("${relocated_jack}" "libdb-" "${APP}/usr/lib/jack" relocated_libdb)
-	get_filename_component(libdb_name "${relocated_libdb}" NAME)
-	if(relocated_libdb AND EXISTS "${APP}/usr/lib/${libdb_name}")
-		# assume a copy already resides in usr/lib and symlink
-		file(REMOVE "${relocated_libdb}")
-		create_symlink("${APP}/usr/lib/${libdb_name}" "${relocated_libdb}")
-	endif()
-endif()
 
 # cleanup empty directories
 file(REMOVE_RECURSE "${APP}/usr/lib/${lmms}/optional/")
