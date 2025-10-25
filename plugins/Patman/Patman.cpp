@@ -154,7 +154,7 @@ void PatmanInstrument::playNote( NotePlayHandle * _n,
 						hdata->sample->frequency();
 
 	if (hdata->sample->play(_working_buffer + offset, hdata->state, frames,
-					play_freq, m_loopedModel.value() ? Sample::Loop::On : Sample::Loop::Off))
+			m_loopedModel.value() ? Sample::Loop::On : Sample::Loop::Off, DefaultBaseFreq / play_freq))
 	{
 		applyRelease( _working_buffer, _n );
 	}
@@ -407,7 +407,7 @@ void PatmanInstrument::selectSample( NotePlayHandle * _n )
 	auto hdata = new handle_data;
 	hdata->tuned = m_tunedModel.value();
 	hdata->sample = sample ? sample : std::make_shared<Sample>();
-	hdata->state = new Sample::PlaybackState(_n->hasDetuningInfo());
+	hdata->state = new Sample::PlaybackState(AudioResampler::Mode::Linear);
 
 	_n->m_pluginData = hdata;
 }
