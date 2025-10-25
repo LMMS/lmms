@@ -105,40 +105,6 @@ public:
 		AudioEngine* m_audioEngine;
 	};
 
-	struct qualitySettings
-	{
-		enum class Interpolation
-		{
-			Linear,
-			SincFastest,
-			SincMedium,
-			SincBest
-		} ;
-
-		Interpolation interpolation;
-
-		qualitySettings(Interpolation i) :
-			interpolation(i)
-		{
-		}
-
-		int libsrcInterpolation() const
-		{
-			switch( interpolation )
-			{
-				case Interpolation::Linear:
-					return SRC_ZERO_ORDER_HOLD;
-				case Interpolation::SincFastest:
-					return SRC_SINC_FASTEST;
-				case Interpolation::SincMedium:
-					return SRC_SINC_MEDIUM_QUALITY;
-				case Interpolation::SincBest:
-					return SRC_SINC_BEST_QUALITY;
-			}
-			return SRC_LINEAR;
-		}
-	} ;
-
 	void initDevices();
 	void clear();
 	void clearNewPlayHandles();
@@ -160,10 +126,7 @@ public:
 
 	//! Set new audio device. Old device will be deleted,
 	//! unless it's stored using storeAudioDevice
-	void setAudioDevice( AudioDevice * _dev,
-				const struct qualitySettings & _qs,
-				bool _needs_fifo,
-				bool startNow );
+	void setAudioDevice(AudioDevice* _dev, bool _needs_fifo, bool startNow);
 	void storeAudioDevice();
 	void restoreAudioDevice();
 	inline AudioDevice * audioDev()
@@ -230,12 +193,6 @@ public:
 		return m_profiler.detailLoad(type);
 	}
 
-	const qualitySettings & currentQualitySettings() const
-	{
-		return m_qualitySettings;
-	}
-
-
 	sample_rate_t baseSampleRate() const { return m_baseSampleRate; }
 
 
@@ -299,8 +256,6 @@ public:
 	{
 		return hasFifoWriter() ? m_fifo->read() : renderNextBuffer();
 	}
-
-	void changeQuality(const struct qualitySettings & qs);
 
 	//! Block until a change in model can be done (i.e. wait for audio thread)
 	void requestChangeInModel();
@@ -390,8 +345,6 @@ private:
 	LocklessList<PlayHandle *> m_newPlayHandles;
 	ConstPlayHandleList m_playHandlesToRemove;
 
-
-	struct qualitySettings m_qualitySettings;
 	float m_masterGain;
 
 	// audio device stuff

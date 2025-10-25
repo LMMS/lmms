@@ -45,7 +45,7 @@ jobs:
           sudo apt-get update -y
           sudo apt-get install -y --no-install-recommends \
             $(xargs < .github/workflows/deps-ubuntu-24.04-gcc.txt)
-          sudo apt-get install -y --install-recommends g++-multilib gcc-multilib winehq-stable wine-stable-dev
+          sudo apt-get install -y --install-recommends g++-multilib gcc-multilib winehq-devel wine-devel-dev
           sudo apt-get install -y --install-recommends \
             $(xargs < .github/workflows/deps-ubuntu-24.04-fltk.txt)
       - name: Cache ccache data
@@ -181,11 +181,11 @@ jobs:
         arch: [ x86_64, arm64 ]
         include:
           - arch: x86_64
-            os: macos-13
-            xcode: "15.2"
+            os: macos-15-intel
+            xcode: "16.4"
           - arch: arm64
-            os: macos-14
-            xcode: "15.4"
+            os: macos-15
+            xcode: "16.4"
     name: macos-${{ matrix.arch }}
     runs-on: ${{ matrix.os }}
     env:

@@ -176,7 +176,7 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 	bar_t barNumber = m_begin.getBar();
 	int const x = m_xOffset - ((static_cast<int>(m_begin * m_ppb) / TimePos::ticksPerBar()) % static_cast<int>(m_ppb));
 
-	// Double the interval between bar numbers until they are far enough appart
+	// Double the interval between bar numbers until they are far enough apart
 	int barLabelInterval = 1;
 	while (barLabelInterval * m_ppb < MIN_BAR_LABEL_DISTANCE) { barLabelInterval *= 2; }
 

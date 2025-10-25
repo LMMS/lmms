@@ -421,7 +421,7 @@ PianoRoll::PianoRoll() :
 	connect( Engine::getSong(), SIGNAL(timeSignatureChanged(int,int)),
 						this, SLOT(update()));
 
-	//connection for selecion from timeline
+	//connection for selection from timeline
 	connect( m_timeLine, SIGNAL(regionSelectedFromPixels(int,int)),
 			this, SLOT(selectRegionFromPixels(int,int)));
 
@@ -3176,7 +3176,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 				m_pianoKeysVisible += 1;
 				partialKeyVisible = 0;
 			}
-			// have to modifiy the notes edit area height instead
+			// have to modify the notes edit area height instead
 			m_notesEditHeight = height() - (m_pianoKeysVisible * m_keyLineHeight)
 				- PR_TOP_MARGIN - PR_BOTTOM_MARGIN;
 		}
