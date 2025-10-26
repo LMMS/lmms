@@ -1,8 +1,10 @@
 [main]
-host = https://www.transifex.com
+host = https://app.transifex.com
 minimum_perc = 51
 #Need to finish at least 51% before merging back
+# This doesn't appear to affect `tx-cli pull`, though it should
 
+# [o:Organization p:Project r:Resource]
 [o:lmms:p:lmms:r:lmms]
 file_filter = data/locale/<lang>.ts
 source_file = data/locale/en.ts
