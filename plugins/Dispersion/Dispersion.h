@@ -29,7 +29,6 @@
 #include "DispersionControls.h"
 #include "Effect.h"
 
-#include "lmms_math.h"
 
 namespace lmms
 {
@@ -41,7 +40,8 @@ class DispersionEffect : public Effect
 public:
 	DispersionEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
 	~DispersionEffect() override = default;
-	bool processAudioBuffer(sampleFrame* buf, const fpp_t frames) override;
+
+	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
 
 	EffectControls* controls() override
 	{

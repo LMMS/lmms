@@ -25,30 +25,47 @@
 #ifndef LMMS_MATH_H
 #define LMMS_MATH_H
 
-#include <cstdint>
-#include "lmms_constants.h"
-#include "lmmsconfig.h"
 #include <QtGlobal>
-
+#include <algorithm>
+#include <cassert>
 #include <cmath>
+#include <cstdint>
+#include <cstring>
+#include <numbers>
+#include <concepts>
+
+#include "lmms_constants.h"
+
+#ifdef __SSE2__
+#include <emmintrin.h>
+#endif
 
 namespace lmms
 {
 
-#ifdef __INTEL_COMPILER
-
-static inline float absFraction( const float _x )
+// TODO C++23: Make constexpr since std::abs() will be constexpr
+inline bool approximatelyEqual(float x, float y) noexcept
 {
-	return( _x - floorf( _x ) );
+	return x == y || std::abs(x - y) < F_EPSILON;
 }
 
-static inline float fraction( const float _x )
+// TODO C++23: Make constexpr since std::trunc() will be constexpr
+/*!
+ * @brief Returns the fractional part of a float, a value between -1.0f and 1.0f.
+ *
+ * fraction( 2.3) =>  0.3
+ * fraction(-2.3) => -0.3
+ *
+ * Note that if the return value is used as a phase of an oscillator, that the oscillator must support
+ * negative phases.
+ */
+inline auto fraction(std::floating_point auto x) noexcept
 {
-	return( _x - floorf( _x ) - ( _x >= 0.0f ? 0.0 : 1.0 ) );
+	return x - std::trunc(x);
 }
 
-#else
 
+// TODO C++23: Make constexpr since std::floor() will be constexpr
 /*!
  * @brief Returns the wrapped fractional part of a float, a value between 0.0f and 1.0f.
  *
@@ -59,272 +76,284 @@ static inline float fraction( const float _x )
  * If the result is interpreted as a phase of an oscillator, it makes that negative phases are
  * converted to positive phases.
  */
-static inline float absFraction( const float _x )
+inline auto absFraction(std::floating_point auto x) noexcept
 {
-	return( _x - ( _x >= 0.0f ? static_cast<int>( _x ) :
-						static_cast<int>( _x ) - 1 ) );
+	return x - std::floor(x);
 }
 
-/*!
- * @brief Returns the fractional part of a float, a value between -1.0f and 1.0f.
- *
- * fraction( 2.3) =>  0.3
- * fraction(-2.3) => -0.3
- *
- * Note that if the return value is used as a phase of an oscillator, that the oscillator must support
- * negative phases.
- */
-static inline float fraction( const float _x )
-{
-	return( _x - static_cast<int>( _x ) );
-}
-
-
-#if 0
-// SSE3-version
-static inline float absFraction( float _x )
-{
-	unsigned int tmp;
-	asm(
-		"fld %%st\n\t"
-		"fisttp %1\n\t"
-		"fild %1\n\t"
-		"ftst\n\t"
-		"sahf\n\t"
-		"jae 1f\n\t"
-		"fld1\n\t"
-		"fsubrp %%st, %%st(1)\n\t"
-	"1:\n\t"
-		"fsubrp %%st, %%st(1)"
-		: "+t"( _x ), "=m"( tmp )
-		:
-		: "st(1)", "cc" );
-	return( _x );
-}
-
-static inline float absFraction( float _x )
-{
-	unsigned int tmp;
-	asm(
-		"fld %%st\n\t"
-		"fisttp %1\n\t"
-		"fild %1\n\t"
-		"fsubrp %%st, %%st(1)"
-		: "+t"( _x ), "=m"( tmp )
-		:
-		: "st(1)" );
-	return( _x );
-}
-#endif
-
-#endif // __INTEL_COMPILER
-
-
-
-constexpr int FAST_RAND_MAX = 32767;
-static inline int fast_rand()
+inline auto fastRand() noexcept
 {
 	static unsigned long next = 1;
 	next = next * 1103515245 + 12345;
-	return( (unsigned)( next / 65536 ) % 32768 );
+	return next / 65536 % 32768;
 }
 
-static inline double fastRand( double range )
+template<std::floating_point T>
+inline auto fastRand(T range) noexcept
 {
-	static const double fast_rand_ratio = 1.0 / FAST_RAND_MAX;
-	return fast_rand() * range * fast_rand_ratio;
+	constexpr T FAST_RAND_RATIO = static_cast<T>(1.0 / 32767);
+	return fastRand() * range * FAST_RAND_RATIO;
 }
 
-static inline float fastRandf( float range )
+template<std::floating_point T>
+inline auto fastRand(T from, T to) noexcept
 {
-	static const float fast_rand_ratio = 1.0f / FAST_RAND_MAX;
-	return fast_rand() * range * fast_rand_ratio;
+	return from + fastRand(to - from);
 }
 
-//! @brief Takes advantage of fmal() function if present in hardware
-static inline long double fastFmal( long double a, long double b, long double c ) 
+//! Round `value` to `where` depending on step size
+template<class T>
+static void roundAt(T& value, const T& where, const T& stepSize)
 {
-#ifdef FP_FAST_FMAL
-	#ifdef __clang__
-		return fma( a, b, c );
-	#else
-		return fmal( a, b, c );
-	#endif
-#else
-	return a * b + c;
-#endif // FP_FAST_FMAL
-}
-
-//! @brief Takes advantage of fmaf() function if present in hardware
-static inline float fastFmaf( float a, float b, float c ) 
-{
-#ifdef FP_FAST_FMAF
-	#ifdef __clang__
-		return fma( a, b, c );
-	#else
-		return fmaf( a, b, c );
-	#endif
-#else
-	return a * b + c;
-#endif // FP_FAST_FMAF
-}
-
-//! @brief Takes advantage of fma() function if present in hardware
-static inline double fastFma( double a, double b, double c ) 
-{
-#ifdef FP_FAST_FMA
-	return fma( a, b, c );
-#else
-	return a * b + c;
-#endif
-}
-
-// source: http://martin.ankerl.com/2007/10/04/optimized-pow-approximation-for-java-and-c-c/
-static inline double fastPow( double a, double b )
-{
-	union
+	if (std::abs(value - where) < F_EPSILON * std::abs(stepSize))
 	{
-		double d;
-		int32_t x[2];
-	} u = { a };
-	u.x[1] = static_cast<int32_t>( b * ( u.x[1] - 1072632447 ) + 1072632447 );
-	u.x[0] = 0;
-	return u.d;
+		value = where;
+	}
 }
 
-// sinc function
-static inline double sinc( double _x )
+//! Source: http://martin.ankerl.com/2007/10/04/optimized-pow-approximation-for-java-and-c-c/
+inline double fastPow(double a, double b)
 {
-	return _x == 0.0 ? 1.0 : sin( F_PI * _x ) / ( F_PI * _x );
+	double d;
+	std::int32_t x[2];
+
+	std::memcpy(x, &a, sizeof(x));
+	x[1] = static_cast<std::int32_t>(b * (x[1] - 1072632447) + 1072632447);
+	x[0] = 0;
+
+	std::memcpy(&d, x, sizeof(d));
+	return d;
 }
 
+
+//! returns +1 if val >= 0, else -1
+template<typename T>
+constexpr T sign(T val) noexcept
+{ 
+	return val >= 0 ? 1 : -1; 
+}
+
+
+//! if val >= 0.0f, returns sqrt(val), else: -sqrt(-val)
+inline float sqrt_neg(float val) 
+{
+	return std::sqrt(std::abs(val)) * sign(val);
+}
 
 //! @brief Exponential function that deals with negative bases
-static inline float signedPowf( float v, float e )
+inline float signedPowf(float v, float e)
 {
-	return v < 0 
-		? powf( -v, e ) * -1.0f
-		: powf( v, e );
+	return std::pow(std::abs(v), e) * sign(v);
 }
 
 
 //! @brief Scales @value from linear to logarithmic.
 //! Value should be within [0,1]
-static inline float logToLinearScale( float min, float max, float value )
+inline float logToLinearScale(float min, float max, float value)
 {
-	if( min < 0 )
+	using namespace std::numbers;
+	if (min < 0)
 	{
-		const float mmax = qMax( qAbs( min ), qAbs( max ) );
-		const float val = value * ( max - min ) + min;
-		float result = signedPowf( val / mmax, F_E ) * mmax;
-		return std::isnan( result ) ? 0 : result;
+		const float mmax = std::max(std::abs(min), std::abs(max));
+		const float val = value * (max - min) + min;
+		float result = signedPowf(val / mmax, e_v<float>) * mmax;
+		return std::isnan(result) ? 0 : result;
 	}
-	float result = powf( value, F_E ) * ( max - min ) + min;
-	return std::isnan( result ) ? 0 : result;
+	float result = std::pow(value, e_v<float>) * (max - min) + min;
+	return std::isnan(result) ? 0 : result;
 }
 
 
 //! @brief Scales value from logarithmic to linear. Value should be in min-max range.
-static inline float linearToLogScale( float min, float max, float value )
+inline float linearToLogScale(float min, float max, float value)
 {
-	static const float EXP = 1.0f / F_E;
-	const float valueLimited = qBound( min, value, max);
-	const float val = ( valueLimited - min ) / ( max - min );
-	if( min < 0 )
+	constexpr auto inv_e = static_cast<float>(1.0 / std::numbers::e);
+	const float valueLimited = std::clamp(value, min, max);
+	const float val = (valueLimited - min) / (max - min);
+	if (min < 0)
 	{
-		const float mmax = qMax( qAbs( min ), qAbs( max ) );
-		float result = signedPowf( valueLimited / mmax, EXP ) * mmax;
-		return std::isnan( result ) ? 0 : result;
+		const float mmax = std::max(std::abs(min), std::abs(max));
+		float result = signedPowf(valueLimited / mmax, inv_e) * mmax;
+		return std::isnan(result) ? 0 : result;
 	}
-	float result = powf( val, EXP ) * ( max - min ) + min;
-	return std::isnan( result ) ? 0 : result;
+	float result = std::pow(val, inv_e) * (max - min) + min;
+	return std::isnan(result) ? 0 : result;
 }
 
-
-
-
-//! @brief Converts linear amplitude (0-1.0) to dBFS scale. Handles zeroes as -inf.
-//! @param amp Linear amplitude, where 1.0 = 0dBFS. 
-//! @return Amplitude in dBFS. -inf for 0 amplitude.
-static inline float safeAmpToDbfs( float amp )
+// TODO C++26: Make constexpr since std::exp() will be constexpr
+template<std::floating_point T>
+inline auto fastPow10f(T x)
 {
-	return amp == 0.0f
-		? -INFINITY
-		: log10f( amp ) * 20.0f;
+	return std::exp(std::numbers::ln10_v<T> * x);
 }
 
-
-//! @brief Converts dBFS-scale to linear amplitude with 0dBFS = 1.0. Handles infinity as zero.
-//! @param dbfs The dBFS value to convert: all infinites are treated as -inf and result in 0
-//! @return Linear amplitude
-static inline float safeDbfsToAmp( float dbfs )
+// TODO C++26: Make constexpr since std::exp() will be constexpr
+inline auto fastPow10f(std::integral auto x)
 {
-	return std::isinf( dbfs )
-		? 0.0f
-		: std::pow(10.f, dbfs * 0.05f );
+	return std::exp(std::numbers::ln10_v<float> * x);
 }
 
+// TODO C++26: Make constexpr since std::log() will be constexpr
+inline auto fastLog10f(float x)
+{
+	constexpr auto inv_ln10 = static_cast<float>(1.0 / std::numbers::ln10);
+	return std::log(x) * inv_ln10;
+}
 
 //! @brief Converts linear amplitude (>0-1.0) to dBFS scale. 
 //! @param amp Linear amplitude, where 1.0 = 0dBFS. ** Must be larger than zero! **
 //! @return Amplitude in dBFS. 
-static inline float ampToDbfs( float amp )
+inline float ampToDbfs(float amp)
 {
-	return log10f( amp ) * 20.0f;
+	return fastLog10f(amp) * 20.0f;
 }
 
 
 //! @brief Converts dBFS-scale to linear amplitude with 0dBFS = 1.0
 //! @param dbfs The dBFS value to convert. ** Must be a real number - not inf/nan! **
 //! @return Linear amplitude
-static inline float dbfsToAmp( float dbfs )
+inline float dbfsToAmp(float dbfs)
 {
-	return std::pow(10.f, dbfs * 0.05f );
+	return fastPow10f(dbfs * 0.05f);
 }
 
 
-
-//! returns 1.0f if val >= 0.0f, -1.0 else
-static inline float sign( float val ) 
-{ 
-	return val >= 0.0f ? 1.0f : -1.0f; 
+//! @brief Converts linear amplitude (0-1.0) to dBFS scale. Handles zeroes as -inf.
+//! @param amp Linear amplitude, where 1.0 = 0dBFS. 
+//! @return Amplitude in dBFS. -inf for 0 amplitude.
+inline float safeAmpToDbfs(float amp)
+{
+	return amp == 0.0f ? -INFINITY : ampToDbfs(amp);
 }
 
 
-//! if val >= 0.0f, returns sqrtf(val), else: -sqrtf(-val)
-static inline float sqrt_neg( float val ) 
+//! @brief Converts dBFS-scale to linear amplitude with 0dBFS = 1.0. Handles infinity as zero.
+//! @param dbfs The dBFS value to convert: all infinites are treated as -inf and result in 0
+//! @return Linear amplitude
+inline float safeDbfsToAmp(float dbfs)
 {
-	return sqrtf( fabs( val ) ) * sign( val );
+	return std::isinf(dbfs) ? 0.0f : dbfsToAmp(dbfs);
 }
 
 
-// fast approximation of square root
-static inline float fastSqrt( float n )
+// TODO C++20: use std::formatted_size
+// @brief Calculate number of digits which LcdSpinBox would show for a given number
+inline int numDigitsAsInt(float f)
 {
-	union 
+	// use rounding:
+	// LcdSpinBox sometimes uses std::round(), sometimes cast rounding
+	// we use rounding to be on the "safe side"
+	int asInt = static_cast<int>(std::round(f));
+	int digits = 1; // always at least 1
+	if(asInt < 0)
 	{
-		int32_t i;
-		float f;
-	} u;
-	u.f = n;
-	u.i = ( u.i + ( 127 << 23 ) ) >> 1;
-	return u.f;
+		++digits;
+		asInt = -asInt;
+	}
+	// "asInt" is positive from now
+	int power = 1;
+	for (int i = 1; i < 10; ++i)
+	{
+		power *= 10;
+		if (asInt >= power) { ++digits; } // 2 digits for >=10, 3 for >=100
+		else { break; }
+	}
+	return digits;
 }
 
-//! returns value furthest from zero
-template<class T>
-static inline T absMax( T a, T b )
+template <typename T>
+class LinearMap
 {
-	return qAbs<T>(a) > qAbs<T>(b) ? a : b;
-}
+public:
+	LinearMap(T x1, T y1, T x2, T y2)
+	{
+		T const dx = x2 - x1;
+		assert (dx != T(0));
 
-//! returns value nearest to zero
-template<class T>
-static inline T absMin( T a, T b )
+		m_a = (y2 - y1) / dx;
+		m_b = y1 - m_a * x1;
+	}
+
+	T map(T x) const
+	{
+		return m_a * x + m_b;
+	}
+
+private:
+	T m_a;
+	T m_b;
+};
+
+#ifdef __SSE2__
+// exp approximation for SSE2: https://stackoverflow.com/a/47025627/5759631
+// Maximum relative error of 1.72863156e-3 on [-87.33654, 88.72283]
+inline __m128 fastExp(__m128 x)
 {
-	return qAbs<T>(a) < qAbs<T>(b) ? a : b;
+	__m128 f, p, r;
+	__m128i t, j;
+	const __m128 a = _mm_set1_ps (12102203.0f); /* (1 << 23) / log(2) */
+	const __m128i m = _mm_set1_epi32 (0xff800000); /* mask for integer bits */
+	const __m128 ttm23 = _mm_set1_ps (1.1920929e-7f); /* exp2(-23) */
+	const __m128 c0 = _mm_set1_ps (0.3371894346f);
+	const __m128 c1 = _mm_set1_ps (0.657636276f);
+	const __m128 c2 = _mm_set1_ps (1.00172476f);
+
+	t = _mm_cvtps_epi32 (_mm_mul_ps (a, x));
+	j = _mm_and_si128 (t, m);            /* j = (int)(floor (x/log(2))) << 23 */
+	t = _mm_sub_epi32 (t, j);
+	f = _mm_mul_ps (ttm23, _mm_cvtepi32_ps (t)); /* f = (x/log(2)) - floor (x/log(2)) */
+	p = c0;                              /* c0 */
+	p = _mm_mul_ps (p, f);               /* c0 * f */
+	p = _mm_add_ps (p, c1);              /* c0 * f + c1 */
+	p = _mm_mul_ps (p, f);               /* (c0 * f + c1) * f */
+	p = _mm_add_ps (p, c2);              /* p = (c0 * f + c1) * f + c2 ~= 2^f */
+	r = _mm_castsi128_ps (_mm_add_epi32 (j, _mm_castps_si128 (p))); /* r = p * 2^i*/
+	return r;
 }
 
+// Lost Robot's SSE2 adaptation of Kari's vectorized log approximation: https://stackoverflow.com/a/65537754/5759631
+// Maximum relative error of 7.922410e-4 on [1.0279774e-38f, 3.4028235e+38f]
+inline __m128 fastLog(__m128 a)
+{
+	__m128i aInt = _mm_castps_si128(a);
+	__m128i e = _mm_sub_epi32(aInt, _mm_set1_epi32(0x3f2aaaab));
+	e = _mm_and_si128(e, _mm_set1_epi32(0xff800000));
+	__m128i subtr = _mm_sub_epi32(aInt, e);
+	__m128 m = _mm_castsi128_ps(subtr);
+	__m128 i = _mm_mul_ps(_mm_cvtepi32_ps(e), _mm_set1_ps(1.19209290e-7f));
+	__m128 f = _mm_sub_ps(m, _mm_set1_ps(1.0f));
+	__m128 s = _mm_mul_ps(f, f);
+	__m128 r = _mm_add_ps(_mm_mul_ps(_mm_set1_ps(0.230836749f), f), _mm_set1_ps(-0.279208571f));
+	__m128 t = _mm_add_ps(_mm_mul_ps(_mm_set1_ps(0.331826031f), f), _mm_set1_ps(-0.498910338f));
+	r = _mm_add_ps(_mm_mul_ps(r, s), t);
+	r = _mm_add_ps(_mm_mul_ps(r, s), f);
+	r = _mm_add_ps(_mm_mul_ps(i, _mm_set1_ps(0.693147182f)), r);
+	return r;
+}
+
+inline __m128 sse2Abs(__m128 x)
+{
+	return _mm_and_ps(x, _mm_castsi128_ps(_mm_set1_epi32(0x7fffffff)));// clear sign bit
+}
+
+inline __m128 sse2Floor(__m128 x)
+{
+	__m128 t = _mm_cvtepi32_ps(_mm_cvttps_epi32(x)); // trunc toward 0
+	__m128 needs_correction = _mm_cmplt_ps(x, t); // checks if x < trunc
+	return _mm_sub_ps(t, _mm_and_ps(needs_correction, _mm_set1_ps(1.0f)));
+}
+
+inline __m128 sse2Round(__m128 x)
+{
+	__m128 sign_mask = _mm_cmplt_ps(x, _mm_setzero_ps());// checks if x < 0
+	__m128 bias_pos = _mm_set1_ps(0.5f);
+	__m128 bias_neg = _mm_set1_ps(-0.5f);
+	__m128 bias = _mm_or_ps(_mm_and_ps(sign_mask, bias_neg), _mm_andnot_ps(sign_mask, bias_pos));
+	__m128 y = _mm_add_ps(x, bias);
+	return _mm_cvtepi32_ps(_mm_cvttps_epi32(y));
+}
+
+#endif // __SSE2__
 
 } // namespace lmms
 

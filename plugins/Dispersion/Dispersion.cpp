@@ -24,6 +24,8 @@
 
 #include "Dispersion.h"
 
+#include <numbers>
+
 #include "embed.h"
 #include "plugin_export.h"
 
@@ -40,7 +42,7 @@ Plugin::Descriptor PLUGIN_EXPORT dispersion_plugin_descriptor =
 	QT_TRANSLATE_NOOP("PluginBrowser", "An all-pass filter allowing for extremely high orders."),
 	"Lost Robot <r94231/at/gmail/dot/com>",
 	0x0100,
-	Plugin::Effect,
+	Plugin::Type::Effect,
 	new PluginPixmapLoader("logo"),
 	nullptr,
 	nullptr
@@ -52,20 +54,14 @@ Plugin::Descriptor PLUGIN_EXPORT dispersion_plugin_descriptor =
 DispersionEffect::DispersionEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key) :
 	Effect(&dispersion_plugin_descriptor, parent, key),
 	m_dispersionControls(this),
-	m_sampleRate(Engine::audioEngine()->processingSampleRate()),
+	m_sampleRate(Engine::audioEngine()->outputSampleRate()),
 	m_amountVal(0)
 {
 }
 
 
-bool DispersionEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
+Effect::ProcessStatus DispersionEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 {
-	if (!isEnabled() || !isRunning())
-	{
-		return false;
-	}
-
-	double outSum = 0.0;
 	const float d = dryLevel();
 	const float w = wetLevel();
 	
@@ -76,7 +72,7 @@ bool DispersionEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	const bool dc = m_dispersionControls.m_dcModel.value();
 	
 	// All-pass coefficient calculation
-	const float w0 = (F_2PI / m_sampleRate) * freq;
+	const float w0 = (2 * std::numbers::pi_v<float> / m_sampleRate) * freq;
 	const float a0 = 1 + (std::sin(w0) / (reso * 2.f));
 	float apCoeff1 = (1 - (a0 - 1)) / a0;
 	float apCoeff2 = (-2 * std::cos(w0)) / a0;
@@ -122,11 +118,9 @@ bool DispersionEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 
 		buf[f][0] = d * buf[f][0] + w * s[0];
 		buf[f][1] = d * buf[f][1] + w * s[1];
-		outSum += buf[f][0] * buf[f][0] + buf[f][1] * buf[f][1];
 	}
 
-	checkGate(outSum / frames);
-	return isRunning();
+	return ProcessStatus::ContinueIfNotQuiet;
 }
 
 

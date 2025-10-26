@@ -20,13 +20,11 @@
  *
  */
 
-#include <cmath>
 #include "ReverbSC.h"
 
 #include "embed.h"
+#include "lmms_math.h"
 #include "plugin_export.h"
-
-#define DB2LIN(X) pow(10, X / 20.0f);
 
 namespace lmms
 {
@@ -42,7 +40,7 @@ Plugin::Descriptor PLUGIN_EXPORT reverbsc_plugin_descriptor =
 	QT_TRANSLATE_NOOP( "PluginBrowser", "Reverb algorithm by Sean Costello" ),
 	"Paul Batchelor",
 	0x0123,
-	Plugin::Effect,
+	Plugin::Type::Effect,
 	new PluginPixmapLoader( "logo" ),
 	nullptr,
 	nullptr,
@@ -55,7 +53,7 @@ ReverbSCEffect::ReverbSCEffect( Model* parent, const Descriptor::SubPluginFeatur
 	m_reverbSCControls( this )
 {
 	sp_create(&sp);
-	sp->sr = Engine::audioEngine()->processingSampleRate();
+	sp->sr = Engine::audioEngine()->outputSampleRate();
 
 	sp_revsc_create(&revsc);
 	sp_revsc_init(sp, revsc);
@@ -63,8 +61,8 @@ ReverbSCEffect::ReverbSCEffect( Model* parent, const Descriptor::SubPluginFeatur
 	sp_dcblock_create(&dcblk[0]);
 	sp_dcblock_create(&dcblk[1]);
 
-	sp_dcblock_init(sp, dcblk[0], Engine::audioEngine()->currentQualitySettings().sampleRateMultiplier() );
-	sp_dcblock_init(sp, dcblk[1], Engine::audioEngine()->currentQualitySettings().sampleRateMultiplier() );
+	sp_dcblock_init(sp, dcblk[0], 1);
+	sp_dcblock_init(sp, dcblk[1], 1);
 }
 
 ReverbSCEffect::~ReverbSCEffect()
@@ -75,14 +73,8 @@ ReverbSCEffect::~ReverbSCEffect()
 	sp_destroy(&sp);
 }
 
-bool ReverbSCEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
+Effect::ProcessStatus ReverbSCEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 {
-	if( !isEnabled() || !isRunning () )
-	{
-		return( false );
-	}
-
-	double outSum = 0.0;
 	const float d = dryLevel();
 	const float w = wetLevel();
 
@@ -98,10 +90,10 @@ bool ReverbSCEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 	{
 		auto s = std::array{buf[f][0], buf[f][1]};
 
-		const auto inGain
-			= (SPFLOAT)DB2LIN((inGainBuf ? inGainBuf->values()[f] : m_reverbSCControls.m_inputGainModel.value()));
-		const auto outGain
-			= (SPFLOAT)DB2LIN((outGainBuf ? outGainBuf->values()[f] : m_reverbSCControls.m_outputGainModel.value()));
+		const auto inGain = static_cast<SPFLOAT>(fastPow10f(
+			(inGainBuf ? inGainBuf->values()[f] : m_reverbSCControls.m_inputGainModel.value()) / 20.f));
+		const auto outGain = static_cast<SPFLOAT>(fastPow10f(
+			(outGainBuf ? outGainBuf->values()[f] : m_reverbSCControls.m_outputGainModel.value()) / 20.f));
 
 		s[0] *= inGain;
 		s[1] *= inGain;
@@ -119,20 +111,15 @@ bool ReverbSCEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 		sp_dcblock_compute(sp, dcblk[1], &tmpR, &dcblkR);
 		buf[f][0] = d * buf[f][0] + w * dcblkL * outGain;
 		buf[f][1] = d * buf[f][1] + w * dcblkR * outGain;
-
-		outSum += buf[f][0]*buf[f][0] + buf[f][1]*buf[f][1];
 	}
 
-
-	checkGate( outSum / frames );
-
-	return isRunning();
+	return ProcessStatus::ContinueIfNotQuiet;
 }
 
 void ReverbSCEffect::changeSampleRate()
 {
 	// Change sr variable in Soundpipe. does not need to be destroyed
-	sp->sr = Engine::audioEngine()->processingSampleRate();
+	sp->sr = Engine::audioEngine()->outputSampleRate();
 
 	mutex.lock();
 	sp_revsc_destroy(&revsc);
@@ -145,8 +132,8 @@ void ReverbSCEffect::changeSampleRate()
 	sp_dcblock_create(&dcblk[0]);
 	sp_dcblock_create(&dcblk[1]);
 
-	sp_dcblock_init(sp, dcblk[0], Engine::audioEngine()->currentQualitySettings().sampleRateMultiplier() );
-	sp_dcblock_init(sp, dcblk[1], Engine::audioEngine()->currentQualitySettings().sampleRateMultiplier() );
+	sp_dcblock_init(sp, dcblk[0], 1);
+	sp_dcblock_init(sp, dcblk[1], 1);
 	mutex.unlock();
 }
 

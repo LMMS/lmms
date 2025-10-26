@@ -26,12 +26,12 @@
 #ifndef KICKER_OSC_H
 #define KICKER_OSC_H
 
+#include <cmath>
+
 #include "DspEffectLibrary.h"
 #include "Oscillator.h"
 
 #include "lmms_math.h"
-#include "interpolation.h"
-#include "MemoryManager.h"
 
 namespace lmms
 {
@@ -40,7 +40,6 @@ namespace lmms
 template<class FX = DspEffectLibrary::StereoBypass>
 class KickerOsc
 {
-	MM_OPERATORS
 public:
 	KickerOsc( const FX & fx, const float start, const float end, const float noise, const float offset, 
 		const float slope, const float env, const float diststart, const float distend, const float length ) :
@@ -62,11 +61,11 @@ public:
 
 	virtual ~KickerOsc() = default;
 
-	void update( sampleFrame* buf, const fpp_t frames, const float sampleRate )
+	void update( SampleFrame* buf, const fpp_t frames, const float sampleRate )
 	{
 		for( fpp_t frame = 0; frame < frames; ++frame )
 		{
-			const double gain = ( 1 - fastPow( ( m_counter < m_length ) ? m_counter / m_length : 1, m_env ) );
+			const double gain = 1 - fastPow((m_counter < m_length) ? m_counter / m_length : 1, m_env);
 			const sample_t s = ( Oscillator::sinSample( m_phase ) * ( 1 - m_noise ) ) + ( Oscillator::noiseSample( 0 ) * gain * gain * m_noise );
 			buf[frame][0] = s * gain;
 			buf[frame][1] = s * gain;
@@ -74,7 +73,7 @@ public:
 			// update distortion envelope if necessary
 			if( m_hasDistEnv && m_counter < m_length )
 			{
-				float thres = linearInterpolate( m_distStart, m_distEnd, m_counter / m_length );
+				float thres = std::lerp(m_distStart, m_distEnd, m_counter / m_length);
 				m_FX.leftFX().setThreshold( thres );
 				m_FX.rightFX().setThreshold( thres );
 			}
@@ -82,7 +81,7 @@ public:
 			m_FX.nextSample( buf[frame][0], buf[frame][1] );
 			m_phase += m_freq / sampleRate;
 
-			const double change = ( m_counter < m_length ) ? ( ( m_startFreq - m_endFreq ) * ( 1 - fastPow( m_counter / m_length, m_slope ) ) ) : 0;
+			const double change = (m_counter < m_length) ? ((m_startFreq - m_endFreq) * (1 - fastPow(m_counter / m_length, m_slope))) : 0;
 			m_freq = m_endFreq + change;
 			++m_counter;
 		}

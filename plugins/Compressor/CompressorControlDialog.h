@@ -36,7 +36,7 @@ class QLabel;
 namespace lmms
 {
 
-constexpr float COMP_NOISE_FLOOR = 0.000001;// -120 dbFs
+constexpr float COMP_NOISE_FLOOR = 0.000001f;// -120 dbFs
 
 class CompressorControls;
 
@@ -59,7 +59,7 @@ constexpr int COMP_BOX_Y = 280;
 constexpr float COMP_GRID_SPACING = 3.f;// 3 db per grid line
 constexpr float COMP_GRID_MAX = 96.f;// Can't zoom out past 96 db
 
-class automatableButtonGroup;
+class AutomatableButtonGroup;
 class Knob;
 class PixmapButton;
 class EqFader;
@@ -86,6 +86,7 @@ public:
 	Q_PROPERTY(QColor textColor MEMBER m_textColor)
 	Q_PROPERTY(QColor graphColor MEMBER m_graphColor)
 	Q_PROPERTY(QColor resetColor MEMBER m_resetColor)
+	Q_PROPERTY(QColor backgroundColor MEMBER m_backgroundColor)
 
 protected:
 	void resizeEvent(QResizeEvent *event) override;
@@ -108,6 +109,8 @@ private:
 	void drawKneePixmap2();
 	void drawMiscPixmap();
 	void drawGraph();
+	void mouseDoubleClickEvent(QMouseEvent* event) override;
+	void setGuiVisibility(bool isVisible);
 
 	QPainter m_p;
 
@@ -148,6 +151,7 @@ private:
 	QColor m_textColor = QColor(209, 216, 228, 50);
 	QColor m_graphColor = QColor(209, 216, 228, 50);
 	QColor m_resetColor = QColor(200, 100, 15, 200);
+	QColor m_backgroundColor = QColor(7, 8, 9, 255);
 
 	float m_peakAvg;
 	float m_gainAvg;
@@ -192,27 +196,29 @@ private:
 
 	PixmapButton * rmsButton;
 	PixmapButton * peakButton;
-	automatableButtonGroup * rmsPeakGroup;
+	AutomatableButtonGroup * rmsPeakGroup;
 
 	PixmapButton * leftRightButton;
 	PixmapButton * midSideButton;
-	automatableButtonGroup * leftRightMidSideGroup;
+	AutomatableButtonGroup * leftRightMidSideGroup;
 
 	PixmapButton * compressButton;
 	PixmapButton * limitButton;
-	automatableButtonGroup * compressLimitGroup;
+	AutomatableButtonGroup * compressLimitGroup;
 
 	PixmapButton * unlinkedButton;
 	PixmapButton * maximumButton;
 	PixmapButton * averageButton;
 	PixmapButton * minimumButton;
 	PixmapButton * blendButton;
-	automatableButtonGroup * stereoLinkGroup;
+	AutomatableButtonGroup * stereoLinkGroup;
 
 	PixmapButton * autoMakeupButton;
 	PixmapButton * auditionButton;
 	PixmapButton * feedbackButton;
 	PixmapButton * lookaheadButton;
+
+	bool m_guiVisibility = true;
 
 	QElapsedTimer m_timeElapsed;
 	int m_timeSinceLastUpdate = 0;

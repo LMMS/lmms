@@ -30,9 +30,10 @@
 #ifdef LMMS_HAVE_LV2
 
 #include <map>
+#include <string_view>
 #include <vector>
-#include "Lv2Manager.h"
 
+#include <lv2/core/lv2.h>
 
 namespace lmms
 {
@@ -78,7 +79,7 @@ private:
 	//! pointers to m_features, required for lilv_plugin_instantiate
 	std::vector<const LV2_Feature*> m_featurePointers;
 	//! features + data, ordered by URI
-	std::map<const char*, void*, Lv2Manager::CmpStr> m_featureByUri;
+	std::map<std::string_view, void*> m_featureByUri;
 };
 
 

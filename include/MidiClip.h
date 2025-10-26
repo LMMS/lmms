@@ -46,24 +46,24 @@ class LMMS_EXPORT MidiClip : public Clip
 {
 	Q_OBJECT
 public:
-	enum MidiClipTypes
+	enum class Type
 	{
 		BeatClip,
 		MelodyClip
 	} ;
 
 	MidiClip( InstrumentTrack* instrumentTrack );
-	MidiClip( const MidiClip& other );
 	~MidiClip() override;
 
 	void init();
 
-	void updateLength();
+	void updateLength() override;
 
 	// note management
 	Note * addNote( const Note & _new_note, const bool _quant_pos = true );
 
-	void removeNote( Note * _note_to_del );
+	NoteVector::const_iterator removeNote(NoteVector::const_iterator it);
+	NoteVector::const_iterator removeNote(Note* note);
 
 	Note * noteAtStep( int _step );
 
@@ -78,11 +78,17 @@ public:
 	Note * addStepNote( int step );
 	void setStep( int step, bool enabled );
 
+	//! Horizontally flip the positions of the given notes.
+	void reverseNotes(const NoteVector& notes);
+
 	// Split the list of notes on the given position
-	void splitNotes(NoteVector notes, TimePos pos);
+	void splitNotes(const NoteVector& notes, TimePos pos);
+
+	// Split the list of notes along a line
+	void splitNotesAlongLine(const NoteVector notes, TimePos pos1, int key1, TimePos pos2, int key2, bool deleteShortEnds);
 
 	// clip-type stuff
-	inline MidiClipTypes type() const
+	inline Type type() const
 	{
 		return m_clipType;
 	}
@@ -93,6 +99,7 @@ public:
 	MidiClip * nextMidiClip() const;
 
 	// settings-management
+	void exportToXML(QDomDocument& doc, QDomElement& midiClipElement, bool onlySelectedNotes = false);
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 	void loadSettings( const QDomElement & _this ) override;
 	inline QString nodeName() const override
@@ -110,6 +117,11 @@ public:
 
 	gui::ClipView * createView( gui::TrackView * _tv ) override;
 
+	MidiClip* clone() override
+	{
+		return new MidiClip(*this);
+	}
+
 
 	using Model::dataChanged;
 
@@ -120,6 +132,7 @@ public slots:
 	void clear();
 
 protected:
+	MidiClip( const MidiClip& other );
 	void updatePatternTrack();
 
 protected slots:
@@ -129,14 +142,14 @@ protected slots:
 private:
 	TimePos beatClipLength() const;
 
-	void setType( MidiClipTypes _new_clip_type );
+	void setType( Type _new_clip_type );
 	void checkType();
 
 	void resizeToFirstTrack();
 
 	InstrumentTrack * m_instrumentTrack;
 
-	MidiClipTypes m_clipType;
+	Type m_clipType;
 
 	// data-stuff
 	NoteVector m_notes;

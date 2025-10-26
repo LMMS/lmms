@@ -90,11 +90,11 @@ LadspaPortDialog::LadspaPortDialog( const ladspa_key_t & _key )
 		{
 			if( min != NOHINT )
 			{
-				min *= Engine::audioEngine()->processingSampleRate();
+				min *= Engine::audioEngine()->outputSampleRate();
 			}
 			if( max != NOHINT )
 			{
-				max *= Engine::audioEngine()->processingSampleRate();
+				max *= Engine::audioEngine()->outputSampleRate();
 			}
 		}
 

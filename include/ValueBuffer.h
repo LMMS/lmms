@@ -28,7 +28,6 @@
 
 #include <vector>
 
-#include "MemoryManager.h"
 #include "lmms_export.h"
 
 namespace lmms
@@ -37,7 +36,6 @@ namespace lmms
 
 class LMMS_EXPORT ValueBuffer : public std::vector<float>
 {
-	MM_OPERATORS
 public:
 	ValueBuffer() = default;
 	ValueBuffer(int length);

@@ -1,0 +1,73 @@
+{
+	"$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+	"name": "lmms",
+	"dependencies": [
+		{
+			"name": "fftw3",
+			"default-features": false,
+			"features": [
+				"sse",
+				"sse2"
+			]
+		},
+		{
+			"name": "fltk",
+			"default-features": false
+		},
+		{
+			"name": "fluidsynth",
+			"default-features": false,
+			"features": [
+				"sndfile"
+			]
+		},
+		{
+			"name": "libogg",
+			"default-features": false
+		},
+		{
+			"name": "libsamplerate",
+			"default-features": false
+		},
+		{
+			"name": "libsndfile",
+			"default-features": false,
+			"features": [
+				"external-libs",
+				"mpeg"
+			]
+		},
+		{
+			"name": "libstk",
+			"default-features": false
+		},
+		{
+			"name": "libvorbis",
+			"default-features": false
+		},
+		{
+			"name": "lilv",
+			"default-features": false
+		},
+		{
+			"name": "lv2",
+			"default-features": false
+		},
+		{
+			"name": "mp3lame",
+			"default-features": false
+		},
+		{
+			"name": "portaudio",
+			"default-features": false
+		},
+		{
+			"name": "sdl2",
+			"default-features": false
+		},
+		{
+			"name": "zlib",
+			"default-features": false
+		}
+	]
+}

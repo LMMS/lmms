@@ -27,29 +27,28 @@
 
 #include <QWidget>
 
+#include "InstrumentTrack.h"
 #include "ModelView.h"
 #include "SerializingObject.h"
 
 class QLabel;
 class QLineEdit;
-class QWidget;
+class QMdiSubWindow;
 
 namespace lmms
 {
 
-class InstrumentTrack;
-
 namespace gui
 {
 
+class AutomatableButton;
 class EffectRackView;
-class MixerLineLcdSpinBox;
+class MixerChannelLcdSpinBox;
 class InstrumentFunctionArpeggioView;
 class InstrumentFunctionNoteStackingView;
 class InstrumentMidiIOView;
-class InstrumentMiscView;
+class InstrumentTuningView;
 class InstrumentSoundShapingView;
-class InstrumentTrackShapingView;
 class InstrumentTrackView;
 class Knob;
 class LcdSpinBox;
@@ -66,6 +65,9 @@ class InstrumentTrackWindow : public QWidget, public ModelView,
 public:
 	InstrumentTrackWindow( InstrumentTrackView * _tv );
 	~InstrumentTrackWindow() override;
+
+	void resizeEvent(QResizeEvent* event) override;
+
 
 	// parent for all internal tab-widgets
 	TabWidget * tabWidgetParent()
@@ -130,6 +132,9 @@ private:
 	//! required to keep the old look when using a variable sized tab widget
 	void adjustTabSize(QWidget *w);
 
+	QMdiSubWindow* findSubWindowInParents();
+	void updateSubWindow();
+
 	InstrumentTrack * m_track;
 	InstrumentTrackView * m_itv;
 
@@ -139,10 +144,12 @@ private:
 	Knob * m_volumeKnob;
 	Knob * m_panningKnob;
 	Knob * m_pitchKnob;
+	AutomatableButton* m_muteBtn;
+	AutomatableButton* m_soloBtn;
 	QLabel * m_pitchLabel;
 	LcdSpinBox* m_pitchRangeSpinBox;
 	QLabel * m_pitchRangeLabel;
-	MixerLineLcdSpinBox * m_mixerChannelNumber;
+	MixerChannelLcdSpinBox * m_mixerChannelNumber;
 
 
 
@@ -152,9 +159,10 @@ private:
 	InstrumentSoundShapingView * m_ssView;
 	InstrumentFunctionNoteStackingView* m_noteStackingView;
 	InstrumentFunctionArpeggioView* m_arpeggioView;
+	QWidget* m_instrumentFunctionsView; // container of note stacking and arpeggio
 	InstrumentMidiIOView * m_midiView;
 	EffectRackView * m_effectView;
-	InstrumentMiscView *m_miscView;
+	InstrumentTuningView *m_tuningView;
 
 
 	// test-piano at the bottom of every instrument-settings-window

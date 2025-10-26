@@ -32,7 +32,6 @@
 #ifndef LB302_H
 #define LB302_H
 
-#include "DspEffectLibrary.h"
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "NotePlayHandle.h"
@@ -44,12 +43,15 @@ namespace lmms
 
 static const int NUM_FILTERS = 2;
 
-class NotePlayHandle;
 
+namespace DspEffectLibrary
+{
+class Distortion;
+}
 
 namespace gui
 {
-class automatableButtonGroup;
+class AutomatableButtonGroup;
 class Knob;
 class Lb302SynthView;
 class LedCheckBox;
@@ -152,9 +154,9 @@ public:
 	Lb302Synth( InstrumentTrack * _instrument_track );
 	~Lb302Synth() override;
 
-	void play( sampleFrame * _working_buffer ) override;
+	void play( SampleFrame* _working_buffer ) override;
 	void playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer ) override;
+						SampleFrame* _working_buffer ) override;
 	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
 
@@ -162,16 +164,6 @@ public:
 	void loadSettings( const QDomElement & _this ) override;
 
 	QString nodeName() const override;
-
-	Flags flags() const override
-	{
-		return IsSingleStreamed;
-	}
-
-	f_cnt_t desiredReleaseFrames() const override
-	{
-		return 0; //4048;
-	}
 
 	gui::PluginView* instantiateView( QWidget * _parent ) override;
 
@@ -213,9 +205,9 @@ private:
 	      vco_slideinc,     //* Slide base to use in next node. Nonzero=slide next note
 	      vco_slidebase;    //* The base vco_inc while sliding.
 
-	enum  vco_shape_t { SAWTOOTH, SQUARE, TRIANGLE, MOOG, ROUND_SQUARE, SINE, EXPONENTIAL, WHITE_NOISE,
-							BL_SAWTOOTH, BL_SQUARE, BL_TRIANGLE, BL_MOOG };
-	vco_shape_t vco_shape;
+	enum class VcoShape { Sawtooth, Square, Triangle, Moog, RoundSquare, Sine, Exponential, WhiteNoise,
+							BLSawtooth, BLSquare, BLTriangle, BLMoog };
+	VcoShape vco_shape;
 
 	// Filters (just keep both loaded and switch)
 	Lb302Filter* vcfs[NUM_FILTERS];
@@ -224,25 +216,24 @@ private:
 	Lb302FilterKnobState fs;
 	QAtomicPointer<Lb302Filter> vcf;
 
-	int release_frame;
+	size_t release_frame;
 
 	// More States
 	int   vcf_envpos;       // Update counter. Updates when >= ENVINC
 
 	float vca_attack,       // Amp attack
-	      vca_decay,        // Amp decay
 	      vca_a0,           // Initial amplifier coefficient
 	      vca_a;            // Amplifier coefficient.
 
 	// Envelope State
-	enum VCA_Mode
+	enum class VcaMode
 	{
-		attack = 0,
-		decay = 1,
-		idle = 2,
-		never_played = 3
+		Attack = 0,
+		Decay = 1,
+		Idle = 2,
+		NeverPlayed = 3
 	};
-	VCA_Mode vca_mode;
+	VcaMode vca_mode;
 
 	// My hacks
 	int   sample_cnt;
@@ -257,7 +248,7 @@ private:
 
 	void recalcFilter();
 
-	int process(sampleFrame *outbuf, const int size);
+	int process(SampleFrame* outbuf, const std::size_t size);
 
 	friend class gui::Lb302SynthView;
 
@@ -289,7 +280,7 @@ private:
 
 	Knob * m_distKnob;
 	Knob * m_slideDecKnob;
-	automatableButtonGroup * m_waveBtnGrp;
+	AutomatableButtonGroup * m_waveBtnGrp;
 
 	LedCheckBox * m_slideToggle;
 	/*LedCheckBox * m_accentToggle;*/ // removed pending accent implementation

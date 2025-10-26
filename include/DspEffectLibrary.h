@@ -25,10 +25,11 @@
 #ifndef LMMS_DSPEFFECTLIBRARY_H
 #define LMMS_DSPEFFECTLIBRARY_H
 
-#include "lmms_math.h"
-#include "lmms_constants.h"
-#include "lmms_basics.h"
+#include <numbers>
 
+#include "lmms_math.h"
+#include "LmmsTypes.h"
+#include "SampleFrame.h"
 
 namespace lmms::DspEffectLibrary
 {
@@ -78,6 +79,17 @@ namespace lmms::DspEffectLibrary
 			m_leftFX( leftFX ),
 			m_rightFX( rightFX )
 		{
+		}
+
+		void setGain(float gain)
+		{
+			leftFX().setGain(gain);
+			rightFX().setGain(gain);
+		}
+
+		void nextSample(SampleFrame & in)
+		{
+			nextSample(in.left(), in.right());
 		}
 
 		void nextSample( sample_t& inLeft, sample_t& inRight )
@@ -187,7 +199,7 @@ namespace lmms::DspEffectLibrary
 	template<typename sample_t>
 	inline sample_t saturate( sample_t x )
 	{
-		return qMin<sample_t>( qMax<sample_t>( -1.0f, x ), 1.0f );
+		return std::min<sample_t>(std::max<sample_t>(-1.0f, x), 1.0f);
 	}
 
 
@@ -198,7 +210,7 @@ namespace lmms::DspEffectLibrary
 				const sample_t _gain,
 				const sample_t _ratio,
 				const FastBassBoost & _orig = FastBassBoost() ) :
-			m_frequency( qMax<sample_t>( _frequency, 10.0 ) ),
+			m_frequency(std::max<sample_t>(_frequency, 10.0)),
 			m_gain1( 1.0 / ( m_frequency + 1.0 ) ),
 			m_gain2( _gain ),
 			m_ratio( _ratio ),
@@ -278,7 +290,7 @@ namespace lmms::DspEffectLibrary
 		{
 			if( in >= m_threshold || in < -m_threshold )
 			{
-				return ( fabsf( fabsf( fmodf( in - m_threshold, m_threshold*4 ) ) - m_threshold*2 ) - m_threshold ) * m_gain;
+				return (std::abs(std::abs(std::fmod(in - m_threshold, m_threshold * 4)) - m_threshold * 2) - m_threshold) * m_gain;
 			}
 			return in * m_gain;
 		}
@@ -292,7 +304,7 @@ namespace lmms::DspEffectLibrary
 
 		sample_t nextSample( sample_t in )
 		{
-			return m_gain * ( in * ( fabsf( in )+m_threshold ) / ( in*in +( m_threshold-1 )* fabsf( in ) + 1 ) );
+			return m_gain * (in * (std::abs(in) + m_threshold) / (in * in + (m_threshold - 1) * std::abs(in) + 1));
 		}
 	} ;
 
@@ -317,10 +329,10 @@ namespace lmms::DspEffectLibrary
 
 		void nextSample( sample_t& inLeft, sample_t& inRight )
 		{
-			const float toRad = F_PI / 180;
+			constexpr float toRad = std::numbers::pi_v<float> / 180.f;
 			const sample_t tmp = inLeft;
-			inLeft += inRight * sinf( m_wideCoeff * ( .5 * toRad ) );
-			inRight -= tmp * sinf( m_wideCoeff * ( .5 * toRad ) );
+			inLeft += inRight * std::sin(m_wideCoeff * toRad * .5f);
+			inRight -= tmp * std::sin(m_wideCoeff * toRad * .5f);
 		}
 
 	private:

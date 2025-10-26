@@ -62,7 +62,7 @@ private:
 	QString m_fileExtension;
 	bool m_multiExport;
 
-	ProjectRenderer::ExportFileFormats m_ft;
+	ProjectRenderer::ExportFileFormat m_ft;
 	std::unique_ptr<RenderManager> m_renderManager;
 } ;
 

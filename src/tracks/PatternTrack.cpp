@@ -41,7 +41,7 @@ PatternTrack::infoMap PatternTrack::s_infoMap;
 
 
 PatternTrack::PatternTrack(TrackContainer* tc) :
-	Track(Track::PatternTrack, tc)
+	Track(Track::Type::Pattern, tc)
 {
 	int patternNum = s_infoMap.size();
 	s_infoMap[this] = patternNum;
@@ -61,9 +61,9 @@ PatternTrack::PatternTrack(TrackContainer* tc) :
 PatternTrack::~PatternTrack()
 {
 	Engine::audioEngine()->removePlayHandlesOfTypes( this,
-					PlayHandle::TypeNotePlayHandle
-					| PlayHandle::TypeInstrumentPlayHandle
-					| PlayHandle::TypeSamplePlayHandle );
+					PlayHandle::Type::NotePlayHandle
+					| PlayHandle::Type::InstrumentPlayHandle
+					| PlayHandle::Type::SamplePlayHandle );
 
 	const int pattern = s_infoMap[this];
 	Engine::patternStore()->removePattern(pattern);
@@ -154,7 +154,7 @@ Clip* PatternTrack::createClip(const TimePos & pos)
 
 
 
-void PatternTrack::saveTrackSpecificSettings(QDomDocument& doc, QDomElement& _this)
+void PatternTrack::saveTrackSpecificSettings(QDomDocument& doc, QDomElement& _this, bool presetMode)
 {
 //	_this.setAttribute( "icon", m_trackLabel->pixmapFile() );
 /*	_this.setAttribute( "current", s_infoMap[this] ==

@@ -26,34 +26,27 @@
 #define LMMS_GUI_KNOB_H
 
 #include <memory>
-#include <QPixmap>
-#include <QWidget>
-#include <QPoint>
-#include <QTextDocument>
 
-#include "AutomatableModelView.h"
+#include "FloatModelEditorBase.h"
 
 
-class QPixmap;
 
 namespace lmms::gui
 {
 
 
-class SimpleTextFloat;
-
-enum knobTypes
+enum class KnobType
 {
-	knobDark_28, knobBright_26, knobSmall_17, knobVintage_32, knobStyled
+	Dark28, Bright26, Small17, Vintage32, Styled
 } ;
 
 
 void convertPixmapToGrayScale(QPixmap &pixMap);
 
-class LMMS_EXPORT Knob : public QWidget, public FloatModelView
+class LMMS_EXPORT Knob : public FloatModelEditorBase
 {
 	Q_OBJECT
-	Q_ENUMS( knobTypes )
+	Q_ENUMS( KnobType )
 
 	Q_PROPERTY(float innerRadius READ innerRadius WRITE setInnerRadius)
 	Q_PROPERTY(float outerRadius READ outerRadius WRITE setOuterRadius)
@@ -72,10 +65,7 @@ class LMMS_EXPORT Knob : public QWidget, public FloatModelView
 	Q_PROPERTY(QColor arcActiveColor MEMBER m_arcActiveColor)
 	Q_PROPERTY(QColor arcInactiveColor MEMBER m_arcInactiveColor)
 
-	mapPropertyFromModel(bool,isVolumeKnob,setVolumeKnob,m_volumeKnob);
-	mapPropertyFromModel(float,volumeRatio,setVolumeRatio,m_volumeRatio);
-
-	Q_PROPERTY(knobTypes knobNum READ knobNum WRITE setknobNum)
+	Q_PROPERTY(KnobType knobNum READ knobNum WRITE setknobNum)
 	
 	Q_PROPERTY(QColor textColor READ textColor WRITE setTextColor)
 
@@ -83,19 +73,67 @@ class LMMS_EXPORT Knob : public QWidget, public FloatModelView
 	void onKnobNumUpdated(); //!< to be called when you updated @a m_knobNum
 
 public:
-	Knob( knobTypes _knob_num, QWidget * _parent = nullptr, const QString & _name = QString() );
+	/**
+	 * @brief Determines how the label of the knob is rendered.
+	 * 
+	 * Labels can be rendered using the font that is set for the knob or using a
+	 * font with a fixed size which is determined by SMALL_FONT_SIZE.
+	 */
+	enum class LabelRendering
+	{
+		/**
+		 * @brief Renders the label using the font that is set for the widget.
+		 * 
+		 * The space that's needed for the label is determined using the font metrics of the knob's font.
+		 */
+		WidgetFont,
+
+		/**
+		 * @brief Renders the labels in legacy mode. This uses a fixed font size and does not adhere
+		 * to the font size that's set for the widget's font.
+		 * 
+		 * @deprecated Do not use this mode in new code as it is considered deprecated and might be removed in the future.
+		 */
+		LegacyFixedFontSize
+	};
+
+	/**
+	 * @brief Construct a Knob with the given style and no label.
+	 * 
+	 * @param _knob_num Style of the knob
+	 * @param _parent Parent widget
+	 * @param _name Object name of the widget
+	 */
+	Knob( KnobType _knob_num, QWidget * _parent = nullptr, const QString & _name = QString() );
+
+	/**
+	 * @brief Construct a Knob with the given style and label text.
+	 * 
+	 * @param knobNum Style of the knob
+	 * @param labelText Text for the label
+	 * @param parent Parent widget
+	 * @param labelRendering Determines if the label uses the widget font or a font with a fixed size of 12 pixels (LegacyFixedFontSize). The default is to use the widget font.
+	 * @param name Object name of the widget
+	 */
+	Knob(KnobType knobNum, const QString& labelText, QWidget* parent = nullptr, LabelRendering labelRendering = LabelRendering::WidgetFont, const QString& name = QString());
+
+	/**
+	 * @brief Constructs a knob with a label font in the pixel size.
+	 * 
+	 * @param knobNum Style of the knob
+	 * @param labelText Text for the label
+	 * @param labelPixelSize Pixel size for the label
+	 * @param parent Parent widget
+	 * @param name Object name of the widget
+	 */
+	Knob(KnobType knobNum, const QString& labelText, int labelPixelSize, QWidget* parent, const QString& name = QString());
+
 	Knob( QWidget * _parent = nullptr, const QString & _name = QString() ); //!< default ctor
+	
 	Knob( const Knob& other ) = delete;
 
-	// TODO: remove
-	inline void setHintText( const QString & _txt_before,
-						const QString & _txt_after )
-	{
-		setDescription( _txt_before );
-		setUnit( _txt_after );
-	}
-	void setLabel( const QString & txt );
-	void setHtmlLabel( const QString &htmltxt );
+	const QString& getLabel() const;
+	void setLabel(const QString& txt);
 
 	void setTotalAngle( float angle );
 
@@ -106,8 +144,8 @@ public:
 	float outerRadius() const;
 	void setOuterRadius( float r );
 
-	knobTypes knobNum() const;
-	void setknobNum( knobTypes k );
+	KnobType knobNum() const;
+	void setknobNum( KnobType k );
 
 	QPointF centerPoint() const;
 	float centerPointX() const;
@@ -125,42 +163,43 @@ public:
 	void setTextColor( const QColor & c );
 
 
-signals:
-	void sliderPressed();
-	void sliderReleased();
-	void sliderMoved( float value );
-
-
 protected:
-	void contextMenuEvent( QContextMenuEvent * _me ) override;
-	void dragEnterEvent( QDragEnterEvent * _dee ) override;
-	void dropEvent( QDropEvent * _de ) override;
-	void focusOutEvent( QFocusEvent * _fe ) override;
-	void mousePressEvent( QMouseEvent * _me ) override;
-	void mouseReleaseEvent( QMouseEvent * _me ) override;
-	void mouseMoveEvent( QMouseEvent * _me ) override;
-	void mouseDoubleClickEvent( QMouseEvent * _me ) override;
-	void paintEvent( QPaintEvent * _me ) override;
-	void wheelEvent( QWheelEvent * _me ) override;
+	void paintEvent(QPaintEvent*) override;
+
 	void changeEvent(QEvent * ev) override;
 
-	virtual float getValue( const QPoint & _p );
+	/*!
+	 * Affects how the label of the knob is rendered.
+	 *
+	 * The default mode returns false. The height of the label text is taken into account when a new fixed
+	 * size is computed for the Knob. When the label text is painted the descent of the font is used to
+	 * compute the base line. The default mode returns false.
+	 * 
+	 * Enabling fixed font size rendering mode leads to the following behavior:
+	 * * The height of the label is not taken into account when the new fixed height of the Knob is computed.
+	 *   Instead a fixed size of 10 is added for the label.
+	 * * When the knob is painted the baseline of the font is always set to 2 pixels away from the lower side
+	 *   of the Knob's rectangle.
+	 * * The label is always rendered with a size of SMALL_FONT_SIZE.
+	 */
+	bool fixedFontSizeLabelRendering() const { return m_fixedFontSizeLabelRendering; }
 
-private slots:
-	virtual void enterValue();
-	void friendlyUpdate();
-	void toggleScale();
+	/*!
+	 * Set the button to legacy rendering mode which uses a fixed font size and that does not take the size
+	 * of the widget's font into account.
+	 * 
+	 * This can be thought of as a legacy mode which reinstates the old behavior of the knob.
+	 *
+	 * @see fixedFontSizeLabelRendering().
+	 */
+	void setFixedFontSizeLabelRendering();
 
 private:
-	virtual QString displayValue() const;
-
-	void doConnections() override;
-
 	QLineF calculateLine( const QPointF & _mid, float _radius,
 						float _innerRadius = 1) const;
 
 	void drawKnob( QPainter * _p );
-	void setPosition( const QPoint & _p );
+	void drawLabel(QPainter& p);
 	bool updateAngle();
 
 	int angleFromValue( float value, float minValue, float maxValue, float totalAngle ) const
@@ -168,25 +207,12 @@ private:
 		return static_cast<int>( ( value - 0.5 * ( minValue + maxValue ) ) / ( maxValue - minValue ) * m_totalAngle ) % 360;
 	}
 
-	inline float pageSize() const
-	{
-		return ( model()->maxValue() - model()->minValue() ) / 100.0f;
-	}
-
-
-	static SimpleTextFloat * s_textFloat;
+	void updateFixedSize();
 
 	QString m_label;
-	bool m_isHtmlLabel;
-	QTextDocument* m_tdRenderer;
+	bool m_fixedFontSizeLabelRendering = false;
 
 	std::unique_ptr<QPixmap> m_knobPixmap;
-	BoolModel m_volumeKnob;
-	FloatModel m_volumeRatio;
-
-	QPoint m_lastMousePos; //!< mouse position in last mouseMoveEvent
-	float m_leftOver;
-	bool m_buttonPressed;
 
 	float m_totalAngle;
 	int m_angle;
@@ -206,10 +232,8 @@ private:
 	
 	QColor m_textColor;
 
-	knobTypes m_knobNum;
-
-} ;
-
+	KnobType m_knobNum;
+};
 
 } // namespace lmms::gui
 

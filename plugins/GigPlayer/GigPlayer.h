@@ -32,13 +32,14 @@
 #include <QMutexLocker>
 #include <samplerate.h>
 
+#include "AudioEngine.h"
+#include "AudioResampler.h"
 #include "Instrument.h"
 #include "PixmapButton.h"
 #include "InstrumentView.h"
 #include "Knob.h"
 #include "LcdSpinBox.h"
-#include "LedCheckBox.h"
-#include "MemoryManager.h"
+#include "SampleFrame.h"
 #include "gig.h"
 
 
@@ -148,18 +149,13 @@ public:
 class GigSample
 {
 public:
-	GigSample( gig::Sample * pSample, gig::DimensionRegion * pDimRegion,
-			float attenuation, int interpolation, float desiredFreq );
-	~GigSample();
+	GigSample(gig::Sample* pSample, gig::DimensionRegion* pDimRegion, float attenuation,
+		AudioResampler::Mode interpolation, float desiredFreq);
+	~GigSample() = default;
 
 	// Needed when initially creating in QList
 	GigSample( const GigSample& g );
 	GigSample& operator=( const GigSample& g );
-
-	// Needed since libsamplerate stores data internally between calls
-	void updateSampleRate();
-	bool convertSampleRate( sampleFrame & oldBuf, sampleFrame & newBuf,
-		f_cnt_t oldSize, f_cnt_t newSize, float freq_factor, f_cnt_t& used );
 
 	gig::Sample * sample;
 	gig::DimensionRegion * region;
@@ -175,8 +171,11 @@ public:
 	bool pitchtrack;
 
 	// Used to convert sample rates
-	int interpolation;
-	SRC_STATE * srcState;
+	AudioResampler m_resampler;
+	std::array<SampleFrame, DEFAULT_BUFFER_SIZE> m_sourceBuffer;
+	std::array<SampleFrame, DEFAULT_BUFFER_SIZE> m_mixBuffer;
+	std::span<SampleFrame> m_sourceBufferView;
+	std::span<SampleFrame> m_mixBufferView;
 
 	// Used changing the pitch of the note if desired
 	float sampleFreq;
@@ -187,7 +186,7 @@ public:
 
 
 // What portion of a note are we in?
-enum GigState
+enum class GigState
 {
 	// We just pressed the key
 	KeyDown,
@@ -214,7 +213,7 @@ public:
 	bool isRelease; // Whether this is a release sample, changes when we delete it
 	GigState state;
 	float frequency;
-	QList<GigSample> samples;
+	std::vector<GigSample> samples;
 
 	// Used to determine which note should be released on key up
 	//
@@ -224,7 +223,7 @@ public:
 
 	GigNote( int midiNote, int velocity, float frequency, GIGPluginData * handle )
 		: midiNote( midiNote ), velocity( velocity ),
-		  release( false ), isRelease( false ), state( KeyDown ),
+		  release( false ), isRelease( false ), state( GigState::KeyDown ),
 		  frequency( frequency ), handle( handle )
 	{
 	}
@@ -236,7 +235,6 @@ public:
 class GigInstrument : public Instrument
 {
 	Q_OBJECT
-	MM_OPERATORS
 
 	mapPropertyFromModel( int, getBank, setBank, m_bankNum );
 	mapPropertyFromModel( int, getPatch, setPatch, m_patchNum );
@@ -245,10 +243,10 @@ public:
 	GigInstrument( InstrumentTrack * _instrument_track );
 	~GigInstrument() override;
 
-	void play( sampleFrame * _working_buffer ) override;
+	void play( SampleFrame* _working_buffer ) override;
 
 	void playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer ) override;
+						SampleFrame* _working_buffer ) override;
 	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
 
@@ -260,16 +258,6 @@ public:
 	AutomatableModel * childModel( const QString & _modelName ) override;
 
 	QString nodeName() const override;
-
-	f_cnt_t desiredReleaseFrames() const override
-	{
-		return 0;
-	}
-
-	Flags flags() const override
-	{
-		return IsSingleStreamed|IsNotBendable;
-	}
 
 	gui::PluginView* instantiateView( QWidget * _parent ) override;
 
@@ -302,9 +290,6 @@ private:
 	QMutex m_synthMutex;
 	QMutex m_notesMutex;
 
-	// Used for resampling
-	int m_interpolation;
-
 	// List of all the currently playing notes
 	QList<GigNote> m_notes;
 
@@ -324,7 +309,7 @@ private:
 	Dimension getDimensions( gig::Region * pRegion, int velocity, bool release );
 
 	// Load sample data from the Gig file, looping the sample where needed
-	void loadSample( GigSample& sample, sampleFrame* sampleData, f_cnt_t samples );
+	void loadSample( GigSample& sample, SampleFrame* sampleData, f_cnt_t samples );
 	f_cnt_t getLoopedIndex( f_cnt_t index, f_cnt_t startf, f_cnt_t endf ) const;
 	f_cnt_t getPingPongIndex( f_cnt_t index, f_cnt_t startf, f_cnt_t endf ) const;
 

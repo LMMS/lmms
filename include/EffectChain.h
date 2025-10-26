@@ -34,6 +34,7 @@ namespace lmms
 {
 
 class Effect;
+class SampleFrame;
 
 namespace gui
 {
@@ -62,14 +63,14 @@ public:
 	void removeEffect( Effect * _effect );
 	void moveDown( Effect * _effect );
 	void moveUp( Effect * _effect );
-	bool processAudioBuffer( sampleFrame * _buf, const fpp_t _frames, bool hasInputNoise );
+	bool processAudioBuffer( SampleFrame* _buf, const fpp_t _frames, bool hasInputNoise );
 	void startRunning();
 
 	void clear();
 
 
 private:
-	using EffectList = QVector<Effect*>;
+	using EffectList = std::vector<Effect*>;
 	EffectList m_effects;
 
 	BoolModel m_enabledModel;

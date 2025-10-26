@@ -28,7 +28,7 @@
 #include <QHash>
 #include <QStack>
 
-#include "lmms_basics.h"
+#include "LmmsTypes.h"
 #include "DataFile.h"
 
 
@@ -104,7 +104,7 @@ private:
 
 	struct CheckPoint
 	{
-		CheckPoint( jo_id_t initID = 0, const DataFile& initData = DataFile( DataFile::JournalData ) ) :
+		CheckPoint( jo_id_t initID = 0, const DataFile& initData = DataFile( DataFile::Type::JournalData ) ) :
 			joID( initID ),
 			data( initData )
 		{

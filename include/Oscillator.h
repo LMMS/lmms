@@ -28,11 +28,12 @@
 
 #include <cassert>
 #include <fftw3.h>
+#include <memory>
 #include <cstdlib>
+#include <cmath>
 
 #include "Engine.h"
-#include "lmms_constants.h"
-#include "lmmsconfig.h"
+#include "lmms_math.h"
 #include "AudioEngine.h"
 #include "OscillatorConstants.h"
 #include "SampleBuffer.h"
@@ -46,33 +47,35 @@ class IntModel;
 
 class LMMS_EXPORT Oscillator
 {
-	MM_OPERATORS
 public:
-	enum WaveShapes
+	enum class WaveShape
 	{
-		SineWave,
-		TriangleWave,
-		SawWave,
-		SquareWave,
-		MoogSawWave,
-		ExponentialWave,
+		Sine,
+		Triangle,
+		Saw,
+		Square,
+		MoogSaw,
+		Exponential,
 		WhiteNoise,
-		UserDefinedWave,
-		NumWaveShapes,                                         //!< Number of all available wave shapes
-		FirstWaveShapeTable = TriangleWave,                    //!< First wave shape that has a pre-generated table
-		NumWaveShapeTables = WhiteNoise - FirstWaveShapeTable, //!< Number of band-limited wave shapes to be generated
+		UserDefined,
+		Count //!< Number of all available wave shapes
 	};
+	constexpr static auto NumWaveShapes = static_cast<std::size_t>(WaveShape::Count);
+	//! First wave shape that has a pre-generated table
+	constexpr static auto FirstWaveShapeTable = static_cast<std::size_t>(WaveShape::Triangle);
+	//! Number of band-limited wave shapes to be generated
+	constexpr static auto NumWaveShapeTables = static_cast<std::size_t>(WaveShape::WhiteNoise) - FirstWaveShapeTable;
 
-	enum ModulationAlgos
+	enum class ModulationAlgo
 	{
 		PhaseModulation,
 		AmplitudeModulation,
 		SignalMix,
 		SynchronizedBySubOsc,
 		FrequencyModulation,
-		NumModulationAlgos
+		Count
 	} ;
-
+	constexpr static auto NumModulationAlgos = static_cast<std::size_t>(ModulationAlgo::Count);
 
 	Oscillator( const IntModel *wave_shape_model,
 			const IntModel *mod_algo_model,
@@ -88,24 +91,29 @@ public:
 
 	static void waveTableInit();
 	static void destroyFFTPlans();
-	static void generateAntiAliasUserWaveTable(SampleBuffer* sampleBuffer);
+	static std::unique_ptr<OscillatorConstants::waveform_t> generateAntiAliasUserWaveTable(const SampleBuffer* sampleBuffer);
 
 	inline void setUseWaveTable(bool n)
 	{
 		m_useWaveTable = n;
 	}
 
-	inline void setUserWave( const SampleBuffer * _wave )
+	void setUserWave(std::shared_ptr<const SampleBuffer> _wave)
 	{
 		m_userWave = _wave;
 	}
 
-	void update(sampleFrame* ab, const fpp_t frames, const ch_cnt_t chnl, bool modulator = false);
+	void setUserAntiAliasWaveTable(std::shared_ptr<const OscillatorConstants::waveform_t> waveform)
+	{
+		m_userAntiAliasWaveTable = waveform;
+	}
+
+	void update(SampleFrame* ab, const fpp_t frames, const ch_cnt_t chnl, bool modulator = false);
 
 	// now follow the wave-shape-routines...
 	static inline sample_t sinSample( const float _sample )
 	{
-		return sinf( _sample * F_2PI );
+		return std::sin(_sample * 2 * std::numbers::pi_v<float>);
 	}
 
 	static inline sample_t triangleSample( const float _sample )
@@ -154,16 +162,17 @@ public:
 
 	static inline sample_t noiseSample( const float )
 	{
-		// Precise implementation
-//		return 1.0f - rand() * 2.0f / RAND_MAX;
-
-		// Fast implementation
-		return 1.0f - fast_rand() * 2.0f / FAST_RAND_MAX;
+		return 1.0f - rand() * 2.0f / static_cast<float>(RAND_MAX);
 	}
 
-	inline sample_t userWaveSample( const float _sample ) const
+	static sample_t userWaveSample(const SampleBuffer* buffer, const float sample)
 	{
-		return m_userWave->userWaveSample( _sample );
+		if (buffer == nullptr || buffer->size() == 0) { return 0; }
+		const auto frames = buffer->size();
+		const auto frame = absFraction(sample) * frames;
+		const auto f1 = static_cast<f_cnt_t>(frame);
+
+		return std::lerp(buffer->data()[f1][0], buffer->data()[(f1 + 1) % frames][0], fraction(frame));
 	}
 
 	struct wtSampleControl {
@@ -176,17 +185,13 @@ public:
 	inline wtSampleControl getWtSampleControl(const float sample) const
 	{
 		wtSampleControl control;
-		control.frame = sample * OscillatorConstants::WAVETABLE_LENGTH;
-		control.f1 = static_cast<f_cnt_t>(control.frame) % OscillatorConstants::WAVETABLE_LENGTH;
-		if (control.f1 < 0)
-		{
-			control.f1 += OscillatorConstants::WAVETABLE_LENGTH;
-		}
+		control.frame = absFraction(sample) * OscillatorConstants::WAVETABLE_LENGTH;
+		control.f1 = static_cast<f_cnt_t>(control.frame);
 		control.f2 = control.f1 < OscillatorConstants::WAVETABLE_LENGTH - 1 ?
 					control.f1 + 1 :
 					0;
 		control.band = waveTableBandFromFreq(
-			m_freq * m_detuning_div_samplerate * Engine::audioEngine()->processingSampleRate());
+			m_freq * m_detuning_div_samplerate * Engine::audioEngine()->outputSampleRate());
 		return control;
 	}
 
@@ -196,24 +201,25 @@ public:
 	{
 		assert(table != nullptr);
 		wtSampleControl control = getWtSampleControl(sample);
-		return linearInterpolate(table[control.band][control.f1],
-				table[control.band][control.f2], fraction(control.frame));
+		return std::lerp(table[control.band][control.f1], table[control.band][control.f2], fraction(control.frame));
 	}
 
-	inline sample_t wtSample(const std::unique_ptr<OscillatorConstants::waveform_t>& table, const float sample) const
+	sample_t wtSample(const OscillatorConstants::waveform_t* table, const float sample) const
 	{
 		assert(table != nullptr);
 		wtSampleControl control = getWtSampleControl(sample);
-		return linearInterpolate((*table)[control.band][control.f1],
-				(*table)[control.band][control.f2], fraction(control.frame));
+		return std::lerp(
+			(*table)[control.band][control.f1],
+			(*table)[control.band][control.f2],
+			fraction(control.frame)
+		);
 	}
 
 	inline sample_t wtSample(sample_t **table, const float sample) const
 	{
 		assert(table != nullptr);
 		wtSampleControl control = getWtSampleControl(sample);
-		return linearInterpolate(table[control.band][control.f1],
-				table[control.band][control.f2], fraction(control.frame));
+		return std::lerp(table[control.band][control.f1], table[control.band][control.f2], fraction(control.frame));
 	}
 
 	static inline int waveTableBandFromFreq(float freq)
@@ -231,7 +237,7 @@ public:
 
 	static inline float freqFromWaveTableBand(int band)
 	{
-		return 440.0f * std::pow(2.0f, (band * OscillatorConstants::SEMITONES_PER_TABLE - 69.0f) / 12.0f);
+		return 440.0f * std::exp2((band * OscillatorConstants::SEMITONES_PER_TABLE - 69.0f) / 12.0f);
 	}
 
 private:
@@ -244,14 +250,15 @@ private:
 	Oscillator * m_subOsc;
 	float m_phaseOffset;
 	float m_phase;
-	const SampleBuffer * m_userWave;
+	std::shared_ptr<const SampleBuffer> m_userWave = SampleBuffer::emptyBuffer();
+	std::shared_ptr<const OscillatorConstants::waveform_t> m_userAntiAliasWaveTable;
 	bool m_useWaveTable;
 	// There are many update*() variants; the modulator flag is stored as a member variable to avoid
 	// adding more explicit parameters to all of them. Can be converted to a parameter if needed.
 	bool m_isModulator;
 
 	/* Multiband WaveTable */
-	static sample_t s_waveTables[WaveShapes::NumWaveShapeTables][OscillatorConstants::WAVE_TABLES_PER_WAVEFORM_COUNT][OscillatorConstants::WAVETABLE_LENGTH];
+	static sample_t s_waveTables[NumWaveShapeTables][OscillatorConstants::WAVE_TABLES_PER_WAVEFORM_COUNT][OscillatorConstants::WAVETABLE_LENGTH];
 	static fftwf_plan s_fftPlan;
 	static fftwf_plan s_ifftPlan;
 	static fftwf_complex * s_specBuf;
@@ -267,43 +274,43 @@ private:
 	/* End Multiband wavetable */
 
 
-	void updateNoSub( sampleFrame * _ab, const fpp_t _frames,
+	void updateNoSub( SampleFrame* _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
-	void updatePM( sampleFrame * _ab, const fpp_t _frames,
+	void updatePM( SampleFrame* _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
-	void updateAM( sampleFrame * _ab, const fpp_t _frames,
+	void updateAM( SampleFrame* _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
-	void updateMix( sampleFrame * _ab, const fpp_t _frames,
+	void updateMix( SampleFrame* _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
-	void updateSync( sampleFrame * _ab, const fpp_t _frames,
+	void updateSync( SampleFrame* _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
-	void updateFM( sampleFrame * _ab, const fpp_t _frames,
+	void updateFM( SampleFrame* _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
 
-	float syncInit( sampleFrame * _ab, const fpp_t _frames,
+	float syncInit( SampleFrame* _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
 	inline bool syncOk( float _osc_coeff );
 
-	template<WaveShapes W>
-	void updateNoSub( sampleFrame * _ab, const fpp_t _frames,
+	template<WaveShape W>
+	void updateNoSub( SampleFrame* _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
-	template<WaveShapes W>
-	void updatePM( sampleFrame * _ab, const fpp_t _frames,
+	template<WaveShape W>
+	void updatePM( SampleFrame* _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
-	template<WaveShapes W>
-	void updateAM( sampleFrame * _ab, const fpp_t _frames,
+	template<WaveShape W>
+	void updateAM( SampleFrame* _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
-	template<WaveShapes W>
-	void updateMix( sampleFrame * _ab, const fpp_t _frames,
+	template<WaveShape W>
+	void updateMix( SampleFrame* _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
-	template<WaveShapes W>
-	void updateSync( sampleFrame * _ab, const fpp_t _frames,
+	template<WaveShape W>
+	void updateSync( SampleFrame* _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
-	template<WaveShapes W>
-	void updateFM( sampleFrame * _ab, const fpp_t _frames,
+	template<WaveShape W>
+	void updateFM( SampleFrame* _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
 
-	template<WaveShapes W>
+	template<WaveShape W>
 	inline sample_t getSample( const float _sample );
 
 	inline void recalcPhase();

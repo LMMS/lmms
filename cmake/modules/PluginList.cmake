@@ -38,9 +38,11 @@ SET(LMMS_PLUGIN_LIST
 	DynamicsProcessor
 	Eq
 	Flanger
+	GranularPitchShifter
 	HydrogenImport
 	LadspaBrowser
 	LadspaEffect
+	LOMM
 	Lv2Effect
 	Lv2Instrument
 	Lb302
@@ -59,10 +61,13 @@ SET(LMMS_PLUGIN_LIST
 	Sf2Player
 	Sfxr
 	Sid
+	SlewDistortion
+	SlicerT
 	SpectrumAnalyzer
 	StereoEnhancer
 	StereoMatrix
 	Stk
+	TapTempo
 	VstBase
 	Vestige
 	VstEffect
@@ -97,12 +102,3 @@ IF(LIST_PLUGINS)
 	UNSET(LIST_PLUGINS CACHE)
 	LIST_ALL_PLUGINS()
 ENDIF()
-
-IF(MSVC)
-	SET(MSVC_INCOMPATIBLE_PLUGINS
-		LadspaEffect
-	)
-	message(WARNING "Compiling with MSVC. The following plugins are not available: ${MSVC_INCOMPATIBLE_PLUGINS}")
-	LIST(REMOVE_ITEM PLUGIN_LIST ${MSVC_INCOMPATIBLE_PLUGINS})
-ENDIF()
-

@@ -29,12 +29,13 @@
 
 #include "VstSubPluginFeatures.h"
 #include "ConfigManager.h"
+#include "Effect.h"
 
 namespace lmms
 {
 
 
-VstSubPluginFeatures::VstSubPluginFeatures( Plugin::PluginTypes _type ) :
+VstSubPluginFeatures::VstSubPluginFeatures( Plugin::Type _type ) :
 	SubPluginFeatures( _type )
 {
 }
@@ -82,7 +83,11 @@ void VstSubPluginFeatures::addPluginsFromDir( QStringList* filenames, QString pa
 		}
 	}
 	QStringList dlls = QDir( ConfigManager::inst()->vstDir() + path ).
-				entryList( QStringList() << "*.dll",
+				entryList( QStringList() << "*.dll"
+#ifdef LMMS_BUILD_LINUX
+										 << "*.so"
+#endif
+						,
 						QDir::Files, QDir::Name );
 	for( int i = 0; i < dlls.size(); i++ )
 	{

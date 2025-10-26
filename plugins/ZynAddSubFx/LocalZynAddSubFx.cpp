@@ -36,11 +36,12 @@
 #endif
 
 #include "MidiEvent.h"
+#include "SampleFrame.h"
 
-#include "zynaddsubfx/src/Nio/NulEngine.h"
-#include "zynaddsubfx/src/Misc/Master.h"
-#include "zynaddsubfx/src/Misc/Part.h"
-#include "zynaddsubfx/src/Misc/Util.h"
+#include <Nio/NulEngine.h>
+#include <Misc/Master.h>
+#include <Misc/Part.h>
+#include <Misc/Util.h>
 
 // Global variable in zynaddsubfx/src/globals.h
 SYNTH_T* synth = nullptr;
@@ -150,7 +151,7 @@ void LocalZynAddSubFx::loadXML( const std::string & _filename )
 	m_master->applyparameters();
 
 #ifdef LMMS_BUILD_WIN32
-	_wunlink(toWString(_filename).c_str());
+	_wunlink(toWString(_filename).get());
 #else
 	unlink( f );
 #endif
@@ -265,7 +266,7 @@ void LocalZynAddSubFx::processMidiEvent( const MidiEvent& event )
 
 
 
-void LocalZynAddSubFx::processAudio( sampleFrame * _out )
+void LocalZynAddSubFx::processAudio( SampleFrame* _out )
 {
 #ifdef _MSC_VER
 	const auto outputl = static_cast<float*>(_alloca(synth->buffersize * sizeof(float)));

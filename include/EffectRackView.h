@@ -30,10 +30,8 @@
 
 #include "EffectChain.h"
 #include "ModelView.h"
-#include "lmms_basics.h"
 
 class QScrollArea;
-class QVBoxLayout;
 
 namespace lmms::gui
 {
@@ -53,10 +51,9 @@ public:
 
 public slots:
 	void clearViews();
-	void moveUp( lmms::gui::EffectView* view );
-	void moveDown( lmms::gui::EffectView* view );
-	void deletePlugin( lmms::gui::EffectView* view );
-
+	void moveUp(EffectView* view);
+	void moveDown(EffectView* view);
+	void deletePlugin(EffectView* view);
 
 private slots:
 	virtual void update();
@@ -65,6 +62,8 @@ private slots:
 
 private:
 	void modelChanged() override;
+	QSize sizeHint() const override;
+	QSize minimumSizeHint() const override { return sizeHint(); }
 
 	inline EffectChain* fxChain()
 	{

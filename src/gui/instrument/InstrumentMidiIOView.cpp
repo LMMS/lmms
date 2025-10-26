@@ -24,7 +24,6 @@
 
 #include <QToolButton>
 #include <QHBoxLayout>
-#include <QLabel>
 #include <QVBoxLayout>
 
 #include "InstrumentMidiIOView.h"
@@ -33,7 +32,6 @@
 #include "Engine.h"
 #include "embed.h"
 #include "GroupBox.h"
-#include "gui_templates.h"
 #include "LcdSpinBox.h"
 #include "MidiClient.h"
 
@@ -144,27 +142,18 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 		midiOutputLayout->insertWidget( 0, m_wpBtn );
 	}
 
-	auto baseVelocityGroupBox = new GroupBox(tr("CUSTOM BASE VELOCITY"));
+	auto baseVelocityGroupBox = new GroupBox(tr("VELOCITY MAPPING"));
+	baseVelocityGroupBox->setLedButtonShown(false);
 	layout->addWidget( baseVelocityGroupBox );
 
 	auto baseVelocityLayout = new QVBoxLayout(baseVelocityGroupBox);
 	baseVelocityLayout->setContentsMargins( 8, 18, 8, 8 );
 	baseVelocityLayout->setSpacing( 6 );
 
-	auto baseVelocityHelp
-		= new QLabel(tr("Specify the velocity normalization base for MIDI-based instruments at 100% note velocity."));
-	baseVelocityHelp->setWordWrap( true );
-    baseVelocityHelp->setFont( pointSize<8>( baseVelocityHelp->font() ) );
-
-	baseVelocityLayout->addWidget( baseVelocityHelp );
-
 	m_baseVelocitySpinBox = new LcdSpinBox( 3, baseVelocityGroupBox );
-	m_baseVelocitySpinBox->setLabel( tr( "BASE VELOCITY" ) );
-	m_baseVelocitySpinBox->setEnabled( false );
+	m_baseVelocitySpinBox->setLabel(tr("MIDI VELOCITY"));
+	m_baseVelocitySpinBox->setToolTip(tr("MIDI notes at this velocity correspond to 100% note velocity."));
 	baseVelocityLayout->addWidget( m_baseVelocitySpinBox );
-
-	connect( baseVelocityGroupBox->ledButton(), SIGNAL(toggled(bool)),
-			m_baseVelocitySpinBox, SLOT(setEnabled(bool)));
 
 	layout->addStretch();
 }

@@ -66,9 +66,9 @@ protected:
 
 
 private:
-	static QPixmap* s_background;
-	static QPixmap* s_arrow;
-	static QPixmap* s_arrowSelected;
+	QPixmap m_background = embed::getIconPixmap("combobox_bg");
+	QPixmap m_arrow = embed::getIconPixmap("combobox_arrow");
+	QPixmap m_arrowSelected = embed::getIconPixmap("combobox_arrow_selected");
 
 	QMenu m_menu;
 

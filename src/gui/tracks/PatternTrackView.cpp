@@ -26,6 +26,7 @@
 
 #include "Engine.h"
 #include "GuiApplication.h"
+#include "MainWindow.h"
 #include "PatternEditor.h"
 #include "PatternStore.h"
 #include "PatternTrack.h"
@@ -74,8 +75,7 @@ bool PatternTrackView::close()
 void PatternTrackView::clickedTrackLabel()
 {
 	Engine::patternStore()->setCurrentPattern(m_patternTrack->patternIndex());
-	getGUI()->patternEditor()->parentWidget()->show();
-	getGUI()->patternEditor()->setFocus(Qt::ActiveWindowFocusReason);
+	getGUI()->mainWindow()->togglePatternEditorWin(true);
 }
 
 

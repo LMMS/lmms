@@ -28,6 +28,7 @@
 #include "ConfigManager.h"
 #include "ControllerConnection.h"
 #include "DataFile.h"
+#include "GuiApplication.h"
 #include "Mixer.h"
 #include "InstrumentTrackView.h"
 #include "Instrument.h"
@@ -37,6 +38,7 @@
 #include "MixHelpers.h"
 #include "PatternStore.h"
 #include "PatternTrack.h"
+#include "PianoRoll.h"
 #include "Pitch.h"
 #include "Song.h"
 
@@ -44,34 +46,34 @@ namespace lmms
 {
 
 
-InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
-	Track( Track::InstrumentTrack, tc ),
+InstrumentTrack::InstrumentTrack(TrackContainer* tc) :
+	Track(Track::Type::Instrument, tc),
 	MidiEventProcessor(),
-	m_midiPort( tr( "unnamed_track" ), Engine::audioEngine()->midiClient(),
-								this, this ),
+	m_midiPort(tr("unnamed_track"), Engine::audioEngine()->midiClient(), this, this),
 	m_notes(),
-	m_sustainPedalPressed( false ),
-	m_silentBuffersProcessed( false ),
-	m_previewMode( false ),
+	m_sustainPedalPressed(false),
+	m_silentBuffersProcessed(false),
+	m_previewMode(false),
 	m_baseNoteModel(0, 0, NumKeys - 1, this, tr("Base note")),
 	m_firstKeyModel(0, 0, NumKeys - 1, this, tr("First note")),
 	m_lastKeyModel(0, 0, NumKeys - 1, this, tr("Last note")),
-	m_hasAutoMidiDev( false ),
-	m_volumeModel( DefaultVolume, MinVolume, MaxVolume, 0.1f, this, tr( "Volume" ) ),
-	m_panningModel( DefaultPanning, PanningLeft, PanningRight, 0.1f, this, tr( "Panning" ) ),
-	m_audioPort( tr( "unnamed_track" ), true, &m_volumeModel, &m_panningModel, &m_mutedModel ),
-	m_pitchModel( 0, MinPitchDefault, MaxPitchDefault, 1, this, tr( "Pitch" ) ),
-	m_pitchRangeModel( 1, 1, 60, this, tr( "Pitch range" ) ),
-	m_mixerChannelModel( 0, 0, 0, this, tr( "Mixer channel" ) ),
-	m_useMasterPitchModel( true, this, tr( "Master pitch") ),
-	m_instrument( nullptr ),
-	m_soundShaping( this ),
-	m_arpeggio( this ),
-	m_noteStacking( this ),
+	m_hasAutoMidiDev(false),
+	m_volumeModel(DefaultVolume, MinVolume, MaxVolume, 0.1f, this, tr("Volume")),
+	m_panningModel(DefaultPanning, PanningLeft, PanningRight, 0.1f, this, tr("Panning")),
+	m_audioBusHandle(tr("unnamed_track"), true, &m_volumeModel, &m_panningModel, &m_mutedModel),
+	m_pitchModel(0, MinPitchDefault, MaxPitchDefault, 1, this, tr("Pitch")),
+	m_pitchRangeModel(1, 1, 60, this, tr("Pitch range")),
+	m_mixerChannelModel(0, 0, 0, this, tr("Mixer channel")),
+	m_useMasterPitchModel(true, this, tr("Master pitch")),
+	m_instrument(nullptr),
+	m_soundShaping(this),
+	m_arpeggio(this),
+	m_noteStacking(this),
 	m_piano(this),
 	m_microtuner()
 {
 	m_pitchModel.setCenterValue( 0 );
+	m_pitchModel.setStrictStepSize(true);
 	m_panningModel.setCenterValue( DefaultPanning );
 	m_baseNoteModel.setInitValue( DefaultKey );
 	m_firstKeyModel.setInitValue(0);
@@ -107,6 +109,8 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	connect(&m_pitchModel, SIGNAL(dataChanged()), this, SLOT(updatePitch()), Qt::DirectConnection);
 	connect(&m_pitchRangeModel, SIGNAL(dataChanged()), this, SLOT(updatePitchRange()), Qt::DirectConnection);
 	connect(&m_mixerChannelModel, SIGNAL(dataChanged()), this, SLOT(updateMixerChannel()), Qt::DirectConnection);
+
+	autoAssignMidiDevice(true);
 }
 
 
@@ -217,10 +221,10 @@ InstrumentTrack::~InstrumentTrack()
 
 
 
-void InstrumentTrack::processAudioBuffer( sampleFrame* buf, const fpp_t frames, NotePlayHandle* n )
+void InstrumentTrack::processAudioBuffer( SampleFrame* buf, const fpp_t frames, NotePlayHandle* n )
 {
 	// we must not play the sound if this InstrumentTrack is muted...
-	if( isMuted() || ( Engine::getSong()->playMode() != Song::Mode_PlayMidiClip &&
+	if( isMuted() || ( Engine::getSong()->playMode() != Song::PlayMode::MidiClip &&
 				n && n->isPatternTrackMuted() ) || ! m_instrument )
 	{
 		return;
@@ -230,8 +234,7 @@ void InstrumentTrack::processAudioBuffer( sampleFrame* buf, const fpp_t frames, 
 	// We could do that in all other cases as well but the overhead for silence test is bigger than
 	// what we potentially save. While playing a note, a NotePlayHandle-driven instrument will produce sound in
 	// 99 of 100 cases so that test would be a waste of time.
-	if( m_instrument->flags().testFlag( Instrument::IsSingleStreamed ) &&
-		MixHelpers::isSilent( buf, frames ) )
+	if (m_instrument->isSingleStreamed() && MixHelpers::isSilent(buf, frames))
 	{
 		// at least pass one silent buffer to allow
 		if( m_silentBuffersProcessed )
@@ -248,7 +251,7 @@ void InstrumentTrack::processAudioBuffer( sampleFrame* buf, const fpp_t frames, 
 
 	// if effects "went to sleep" because there was no input, wake them up
 	// now
-	m_audioPort.effects()->startRunning();
+	m_audioBusHandle.effects()->startRunning();
 
 	// get volume knob data
 	static const float DefaultVolumeRatio = 1.0f / DefaultVolume;
@@ -260,12 +263,12 @@ void InstrumentTrack::processAudioBuffer( sampleFrame* buf, const fpp_t frames, 
 	// instruments using instrument-play-handles will call this method
 	// without any knowledge about notes, so they pass NULL for n, which
 	// is no problem for us since we just bypass the envelopes+LFOs
-	if( m_instrument->flags().testFlag( Instrument::IsSingleStreamed ) == false && n != nullptr )
+	if (!m_instrument->isSingleStreamed() && n != nullptr)
 	{
 		const f_cnt_t offset = n->noteOffset();
 		m_soundShaping.processAudioBuffer( buf + offset, frames - offset, n );
 		const float vol = ( (float) n->getVolume() * DefaultVolumeRatio );
-		const panning_t pan = qBound( PanningLeft, n->getPanning(), PanningRight );
+		const panning_t pan = std::clamp(n->getPanning(), PanningLeft, PanningRight);
 		StereoVolumeVector vv = panningToVolumeVector( pan, vol );
 		for( f_cnt_t f = offset; f < frames; ++f )
 		{
@@ -340,10 +343,11 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const TimePos& tim
 					NotePlayHandle* nph =
 						NotePlayHandleManager::acquire(
 								this, offset,
-								typeInfo<f_cnt_t>::max() / 2,
-								Note( TimePos(), TimePos(), event.key(), event.volume( midiPort()->baseVelocity() ) ),
+								std::numeric_limits<f_cnt_t>::max() / 2,
+								Note(TimePos(), Engine::getSong()->getPlayPos(Engine::getSong()->playMode()),
+										event.key(), event.volume(midiPort()->baseVelocity())),
 								nullptr, event.channel(),
-								NotePlayHandle::OriginMidiInput );
+								NotePlayHandle::Origin::MidiInput);
 					m_notes[event.key()] = nph;
 					if( ! Engine::audioEngine()->addPlayHandle( nph ) )
 					{
@@ -363,7 +367,7 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const TimePos& tim
 				m_notes[event.key()]->noteOff( offset );
 				if (isSustainPedalPressed() &&
 					m_notes[event.key()]->origin() ==
-					m_notes[event.key()]->OriginMidiInput)
+					NotePlayHandle::Origin::MidiInput)
 				{
 					m_sustainedNotes << m_notes[event.key()];
 				}
@@ -403,7 +407,7 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const TimePos& tim
 						if (nph && nph->isReleased())
 						{
 							if( nph->origin() ==
-								nph->OriginMidiInput)
+								NotePlayHandle::Origin::MidiInput)
 							{
 								nph->setLength(
 									TimePos( static_cast<f_cnt_t>(
@@ -515,7 +519,7 @@ void InstrumentTrack::processOutEvent( const MidiEvent& event, const TimePos& ti
 			break;
 	}
 
-	// if appropriate, midi-port does futher routing
+	// if appropriate, midi-port does further routing
 	m_midiPort.processOutEvent( event, time );
 }
 
@@ -536,10 +540,10 @@ void InstrumentTrack::silenceAllNotes( bool removeIPH )
 	// invalidate all NotePlayHandles and PresetPreviewHandles linked to this track
 	m_processHandles.clear();
 
-	quint8 flags = PlayHandle::TypeNotePlayHandle | PlayHandle::TypePresetPreviewHandle;
+	auto flags = PlayHandle::Type::NotePlayHandle | PlayHandle::Type::PresetPreviewHandle;
 	if( removeIPH )
 	{
-		flags |= PlayHandle::TypeInstrumentPlayHandle;
+		flags |= PlayHandle::Type::InstrumentPlayHandle;
 	}
 	Engine::audioEngine()->removePlayHandlesOfTypes( this, flags );
 	Engine::audioEngine()->doneChangeInModel();
@@ -564,8 +568,12 @@ f_cnt_t InstrumentTrack::beatLen( NotePlayHandle * _n ) const
 
 
 
-void InstrumentTrack::playNote( NotePlayHandle* n, sampleFrame* workingBuffer )
+void InstrumentTrack::playNote( NotePlayHandle* n, SampleFrame* workingBuffer )
 {
+	// Note: under certain circumstances the working buffer is a nullptr.
+	// These cases are triggered in PlayHandle::doProcessing when the play method is called with a nullptr.
+	// TODO: Find out if we can skip processing at a higher level if the buffer is nullptr.
+
 	// arpeggio- and chord-widget has to do its work -> adding sub-notes
 	// for chords/arpeggios
 	m_noteStacking.processNote( n );
@@ -575,6 +583,15 @@ void InstrumentTrack::playNote( NotePlayHandle* n, sampleFrame* workingBuffer )
 	{
 		// all is done, so now lets play the note!
 		m_instrument->playNote( n, workingBuffer );
+
+		// This is effectively the same as checking if workingBuffer is not a nullptr.
+		// Calling processAudioBuffer with a nullptr leads to crashes. Hence the check.
+		if (n->usesBuffer())
+		{
+			const fpp_t frames = n->framesLeftForCurrentPeriod();
+			const f_cnt_t offset = n->noteOffset();
+			processAudioBuffer(workingBuffer, frames + offset, n);
+		}
 	}
 }
 
@@ -604,11 +621,11 @@ void InstrumentTrack::deleteNotePluginData( NotePlayHandle* n )
 
 
 
-void InstrumentTrack::setName( const QString & _new_name )
+void InstrumentTrack::setName(const QString& new_name)
 {
-	Track::setName( _new_name );
-	m_midiPort.setName( name() );
-	m_audioPort.setName( name() );
+	Track::setName(new_name);
+	m_midiPort.setName(name());
+	m_audioBusHandle.setName(name());
 }
 
 
@@ -656,7 +673,7 @@ void InstrumentTrack::updatePitchRange()
 
 void InstrumentTrack::updateMixerChannel()
 {
-	m_audioPort.setNextMixerChannel( m_mixerChannelModel.value() );
+	m_audioBusHandle.setNextMixerChannel(m_mixerChannelModel.value());
 }
 
 
@@ -666,7 +683,7 @@ int InstrumentTrack::masterKey( int _midi_key ) const
 {
 
 	int key = baseNote();
-	return qBound<int>( 0, _midi_key - ( key - DefaultKey ), NumKeys );
+	return std::clamp(_midi_key - (key - DefaultKey), 0, NumKeys);
 }
 
 
@@ -710,7 +727,8 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 	// Handle automation: detuning
 	for (const auto& processHandle : m_processHandles)
 	{
-		processHandle->processTimePos(_start);
+		processHandle->processTimePos(
+			_start, m_pitchModel.value(), gui::getGUI() && gui::getGUI()->pianoRoll()->isRecording());
 	}
 
 	if ( clips.size() == 0 )
@@ -726,49 +744,60 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 		auto c = dynamic_cast<MidiClip*>(clip);
 		// everything which is not a MIDI clip won't be played
 		// A MIDI clip playing in the Piano Roll window will always play
-		if (c == nullptr || (Engine::getSong()->playMode() != Song::Mode_PlayMidiClip && clip->isMuted()))
+		if (c == nullptr || (Engine::getSong()->playMode() != Song::PlayMode::MidiClip && clip->isMuted()))
 		{
 			continue;
 		}
 		TimePos cur_start = _start;
 		if( _clip_num < 0 )
 		{
-			cur_start -= c->startPosition();
+			cur_start -= c->startPosition() + c->startTimeOffset();
 		}
 
 		// get all notes from the given clip...
 		const NoteVector & notes = c->notes();
 		// ...and set our index to zero
-		NoteVector::ConstIterator nit = notes.begin();
+		auto nit = notes.begin();
 
 		// very effective algorithm for playing notes that are
 		// posated within the current sample-frame
 
-
 		if( cur_start > 0 )
 		{
-			// skip notes which are posated before start-bar
-			while( nit != notes.end() && ( *nit )->pos() < cur_start )
+			// skip notes which end before start-bar
+			while( nit != notes.end() && ( *nit )->endPos() < cur_start )
 			{
 				++nit;
 			}
 		}
 
-		Note * cur_note;
-		while( nit != notes.end() &&
-					( cur_note = *nit )->pos() == cur_start )
+		while (nit != notes.end() && (*nit)->pos() < c->length() - c->startTimeOffset())
 		{
-			const f_cnt_t note_frames =
-				cur_note->length().frames( frames_per_tick );
+			const auto currentNote = *nit;
+			// Skip any notes note at the current time pos or not overlapping with the start.
+			if (!(currentNote->pos() == cur_start
+				|| (cur_start == -c->startTimeOffset() && (*nit)->pos() < cur_start && (*nit)->endPos() > cur_start)))
+			{
+				++nit;
+				continue;
+			}
 
-			NotePlayHandle* notePlayHandle = NotePlayHandleManager::acquire( this, _offset, note_frames, *cur_note );
+			// Calculate the overlap of the note over the clip end.
+			const auto noteOverlap = std::max(0, currentNote->endPos() - (c->length() - c->startTimeOffset()));
+			// If the note is a Step Note, frames will be 0 so the NotePlayHandle
+			// plays for the whole length of the sample
+			const auto noteFrames = currentNote->type() == Note::Type::Step
+				? 0
+				: (currentNote->endPos() - cur_start - noteOverlap) * frames_per_tick;
+
+			NotePlayHandle* notePlayHandle = NotePlayHandleManager::acquire(this, _offset, noteFrames, *currentNote);
 			notePlayHandle->setPatternTrack(pattern_track);
 			// are we playing global song?
 			if( _clip_num < 0 )
 			{
 				// then set song-global offset of clip in order to
 				// properly perform the note detuning
-				notePlayHandle->setSongGlobalParentOffset( c->startPosition() );
+				notePlayHandle->setSongGlobalParentOffset( c->startPosition() + c->startTimeOffset());
 			}
 
 			Engine::audioEngine()->addPlayHandle( notePlayHandle );
@@ -801,7 +830,7 @@ gui::TrackView* InstrumentTrack::createView( gui::TrackContainerView* tcv )
 
 
 
-void InstrumentTrack::saveTrackSpecificSettings( QDomDocument& doc, QDomElement & thisElement )
+void InstrumentTrack::saveTrackSpecificSettings(QDomDocument& doc, QDomElement& thisElement, bool presetMode)
 {
 	m_volumeModel.saveSettings( doc, thisElement, "vol" );
 	m_panningModel.saveSettings( doc, thisElement, "pan" );
@@ -838,20 +867,26 @@ void InstrumentTrack::saveTrackSpecificSettings( QDomDocument& doc, QDomElement 
 	m_noteStacking.saveState( doc, thisElement );
 	m_arpeggio.saveState( doc, thisElement );
 
-	// Don't save midi port info if the user chose to.
-	if (Engine::getSong()->isSavingProject()
-		&& !Engine::getSong()->getSaveOptions().discardMIDIConnections.value())
+	// Save the midi port info if we are not in song saving mode, e.g. in
+	// track cloning mode or if we are in song saving mode and the user
+	// has chosen not to discard the MIDI connections.
+	if (!Engine::getSong()->isSavingProject() ||
+	    !Engine::getSong()->getSaveOptions().discardMIDIConnections.value())
 	{
 		// Don't save auto assigned midi device connection
 		bool hasAuto = m_hasAutoMidiDev;
 		autoAssignMidiDevice(false);
 
-		m_midiPort.saveState( doc, thisElement );
+		// Only save the MIDI port information if we are not saving a preset.
+		if (!presetMode)
+		{
+			m_midiPort.saveState(doc, thisElement);
+		}
 
 		autoAssignMidiDevice(hasAuto);
 	}
 
-	m_audioPort.effects()->saveState( doc, thisElement );
+	m_audioBusHandle.effects()->saveState(doc, thisElement);
 }
 
 
@@ -883,7 +918,7 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 	m_microtuner.loadSettings(thisElement);
 
 	// clear effect-chain just in case we load an old preset without FX-data
-	m_audioPort.effects()->clear();
+	m_audioBusHandle.effects()->clear();
 
 	// We set MIDI CC enable to false so the knobs don't trigger MIDI CC events while
 	// they are being loaded. After all knobs are loaded we load the right value of m_midiCCEnable.
@@ -910,9 +945,9 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 			{
 				m_midiPort.restoreState( node.toElement() );
 			}
-			else if( m_audioPort.effects()->nodeName() == node.nodeName() )
+			else if (m_audioBusHandle.effects()->nodeName() == node.nodeName())
 			{
-				m_audioPort.effects()->restoreState( node.toElement() );
+				m_audioBusHandle.effects()->restoreState(node.toElement());
 			}
 			else if(node.nodeName() == "instrument")
 			{
@@ -985,14 +1020,13 @@ void InstrumentTrack::replaceInstrument(DataFile dataFile)
 	int mixerChannel = mixerChannelModel()->value();
 
 	InstrumentTrack::removeMidiPortNode(dataFile);
-	setSimpleSerializing();
 	
 	//Replacing an instrument shouldn't change the solo/mute state.
 	bool oldMute = isMuted();
 	bool oldSolo = isSolo();
 	bool oldMutedBeforeSolo = isMutedBeforeSolo();
 
-	loadSettings(dataFile.content().toElement());
+	loadPreset(dataFile.content().toElement());
 	
 	setMuted(oldMute);
 	setSolo(oldSolo);

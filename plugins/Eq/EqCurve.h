@@ -32,12 +32,12 @@ namespace lmms::gui
 {
 
 
-enum{
-	highpass=1,
-	lowshelf,
-	para,
-	highshelf,
-	lowpass
+enum class EqHandleType {
+	HighPass=1,
+	LowShelf,
+	Para,
+	HighShelf,
+	LowPass
 };
 
 
@@ -64,8 +64,8 @@ public:
 	float getHighCutCurve( float x );
 	float getResonance();
 	int getNum();
-	int getType();
-	void setType( int t );
+	EqHandleType getType();
+	void setType( EqHandleType t );
 	void setResonance( float r );
 	bool isMouseHover();
 	void setMouseHover( bool d );
@@ -104,7 +104,8 @@ private:
 	bool m_lp24;
 	bool m_lp48;
 	bool m_mouseHover;
-	int m_type, m_numb;
+	EqHandleType m_type;
+	int m_numb;
 	float m_width, m_heigth;
 	float m_resonance;
 	bool m_mousePressed;

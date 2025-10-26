@@ -25,7 +25,7 @@
 #ifndef LMMS_SAMPLE_TRACK_H
 #define LMMS_SAMPLE_TRACK_H
 
-#include "AudioPort.h"
+#include "AudioBusHandle.h"
 #include "Track.h"
 
 
@@ -54,8 +54,7 @@ public:
 	Clip* createClip(const TimePos & pos) override;
 
 
-	void saveTrackSpecificSettings( QDomDocument & _doc,
-							QDomElement & _parent ) override;
+	void saveTrackSpecificSettings(QDomDocument& doc, QDomElement& parent, bool presetMode) override;
 	void loadTrackSpecificSettings( const QDomElement & _this ) override;
 
 	inline IntModel * mixerChannelModel()
@@ -63,9 +62,9 @@ public:
 		return &m_mixerChannelModel;
 	}
 
-	inline AudioPort * audioPort()
+	inline AudioBusHandle* audioBusHandle()
 	{
-		return &m_audioPort;
+		return &m_audioBusHandle;
 	}
 
 	QString nodeName() const override
@@ -96,7 +95,7 @@ private:
 	FloatModel m_volumeModel;
 	FloatModel m_panningModel;
 	IntModel m_mixerChannelModel;
-	AudioPort m_audioPort;
+	AudioBusHandle m_audioBusHandle;
 	bool m_isPlaying;
 
 

@@ -26,10 +26,9 @@
 #ifndef LMMS_DELAY_H
 #define LMMS_DELAY_H
 
-#include "lmms_basics.h"
-#include "lmms_math.h"
-#include "interpolation.h"
-#include "MemoryManager.h"
+#include <cmath>
+
+#include "LmmsTypes.h"
 
 namespace lmms
 {
@@ -74,20 +73,20 @@ public:
 		m_delay( 0 ),
 		m_fraction( 0.0 )
 	{
-		m_buffer = MM_ALLOC<frame>(maxDelay );
+		m_buffer = new frame[maxDelay];
 		memset( m_buffer, 0, sizeof( frame ) * maxDelay );
 	}
 	virtual ~CombFeedback()
 	{
-		MM_FREE( m_buffer );
+		delete[] m_buffer;
 	}
 	
 	inline void setMaxDelay( int maxDelay )
 	{
 		if( maxDelay > m_size )
 		{
-			MM_FREE( m_buffer );
-			m_buffer = MM_ALLOC<frame>( maxDelay );
+			delete[] m_buffer;
+			m_buffer = new frame[maxDelay];
 			memset( m_buffer, 0, sizeof( frame ) * maxDelay );
 		}
 		m_size = maxDelay;
@@ -115,7 +114,7 @@ public:
 		int readPos = m_position - m_delay;
 		if( readPos < 0 ) { readPos += m_size; }
 		
-		const double y = linearInterpolate( m_buffer[readPos][ch], m_buffer[( readPos + 1 ) % m_size][ch], m_fraction );
+		const double y = std::lerp(m_buffer[readPos][ch], m_buffer[(readPos + 1) % m_size][ch], m_fraction);
 		
 		++m_position %= m_size;
 		
@@ -145,20 +144,20 @@ class CombFeedfwd
 		m_delay( 0 ),
 		m_fraction( 0.0 )
 	{
-		m_buffer = MM_ALLOC<frame>( maxDelay );
+		m_buffer = new frame[maxDelay];
 		memset( m_buffer, 0, sizeof( frame ) * maxDelay );
 	}
 	virtual ~CombFeedfwd()
 	{
-		MM_FREE( m_buffer );
+		delete[] m_buffer;
 	}
 	
 	inline void setMaxDelay( int maxDelay )
 	{
 		if( maxDelay > m_size )
 		{
-			MM_FREE( m_buffer );
-			m_buffer = MM_ALLOC<frame>( maxDelay );
+			delete[] m_buffer;
+			m_buffer = new frame[maxDelay];
 			memset( m_buffer, 0, sizeof( frame ) * maxDelay );
 		}
 		m_size = maxDelay;
@@ -186,7 +185,7 @@ class CombFeedfwd
 		int readPos = m_position - m_delay;
 		if( readPos < 0 ) { readPos += m_size; }
 		
-		const double y = linearInterpolate( m_buffer[readPos][ch], m_buffer[( readPos + 1 ) % m_size][ch], m_fraction ) + in * m_gain;
+		const double y = std::lerp(m_buffer[readPos][ch], m_buffer[(readPos + 1) % m_size][ch], m_fraction) + in * m_gain;
 		
 		++m_position %= m_size;
 		
@@ -216,20 +215,20 @@ class CombFeedbackDualtap
 		m_delay( 0 ),
 		m_fraction( 0.0 )
 	{
-		m_buffer = MM_ALLOC<frame>( maxDelay );
+		m_buffer = new frame[maxDelay];
 		memset( m_buffer, 0, sizeof( frame ) * maxDelay );
 	}
 	virtual ~CombFeedbackDualtap()
 	{
-		MM_FREE( m_buffer );
+		delete[] m_buffer;
 	}
 	
 	inline void setMaxDelay( int maxDelay )
 	{
 		if( maxDelay > m_size )
 		{
-			MM_FREE( m_buffer );
-			m_buffer = MM_ALLOC<frame>( maxDelay );
+			delete[] m_buffer;
+			m_buffer = new frame[maxDelay];
 			memset( m_buffer, 0, sizeof( frame ) * maxDelay );
 		}
 		m_size = maxDelay;
@@ -263,8 +262,8 @@ class CombFeedbackDualtap
 		int readPos2 = m_position - m_delay2;
 		if( readPos2 < 0 ) { readPos2 += m_size; }
 		
-		const double y = linearInterpolate( m_buffer[readPos1][ch], m_buffer[( readPos1 + 1 ) % m_size][ch], m_fraction1 ) + 
-			linearInterpolate( m_buffer[readPos2][ch], m_buffer[( readPos2 + 1 ) % m_size][ch], m_fraction2 );
+		const double y = std::lerp(m_buffer[readPos1][ch], m_buffer[(readPos1 + 1) % m_size][ch], m_fraction1)
+			+ std::lerp(m_buffer[readPos2][ch], m_buffer[(readPos2 + 1) % m_size][ch], m_fraction2);
 		
 		++m_position %= m_size;
 		
@@ -297,20 +296,20 @@ public:
 		m_delay( 0 ),
 		m_fraction( 0.0 )
 	{
-		m_buffer = MM_ALLOC<frame>( maxDelay );
+		m_buffer = new frame[maxDelay];
 		memset( m_buffer, 0, sizeof( frame ) * maxDelay );
 	}
 	virtual ~AllpassDelay()
 	{
-		MM_FREE( m_buffer );
+		delete[] m_buffer;
 	}
 	
 	inline void setMaxDelay( int maxDelay )
 	{
 		if( maxDelay > m_size )
 		{
-			MM_FREE( m_buffer );
-			m_buffer = MM_ALLOC<frame>( maxDelay );
+			delete[] m_buffer;
+			m_buffer = new frame[maxDelay];
 			memset( m_buffer, 0, sizeof( frame ) * maxDelay );
 		}
 		m_size = maxDelay;
@@ -338,7 +337,7 @@ public:
 		int readPos = m_position - m_delay;
 		if( readPos < 0 ) { readPos += m_size; }
 		
-		const double y = linearInterpolate( m_buffer[readPos][ch], m_buffer[( readPos + 1 ) % m_size][ch], m_fraction ) + in * -m_gain;
+		const double y = std::lerp(m_buffer[readPos][ch], m_buffer[(readPos + 1) % m_size][ch], m_fraction) + in * -m_gain;
 		const double x = in + m_gain * y;
 		
 		++m_position %= m_size;

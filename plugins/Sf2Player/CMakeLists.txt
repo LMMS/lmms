@@ -1,13 +1,10 @@
 if(LMMS_HAVE_FLUIDSYNTH)
+	SET(CMAKE_AUTOUIC ON)
 	include(BuildPlugin)
-	include_directories(${SAMPLERATE_INCLUDE_DIRS})
-	link_directories(${SAMPLERATE_LIBRARY_DIRS})
-	link_libraries(${SAMPLERATE_LIBRARIES})
 	build_plugin(sf2player
 		Sf2Player.cpp Sf2Player.h PatchesDialog.cpp PatchesDialog.h PatchesDialog.ui
 		MOCFILES Sf2Player.h PatchesDialog.h
-		UICFILES PatchesDialog.ui
 		EMBEDDED_RESOURCES *.png
 	)
-	target_link_libraries(sf2player fluidsynth)
+	target_link_libraries(sf2player fluidsynth SampleRate::samplerate)
 endif()

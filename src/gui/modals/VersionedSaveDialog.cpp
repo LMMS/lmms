@@ -23,11 +23,12 @@
  */
 
 
+#include <QGroupBox>
 #include <QLayout>
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QPushButton>
-#include <QGroupBox>
+#include <QRegularExpression>
 
 #include "DeprecationHelper.h"
 #include "VersionedSaveDialog.h"
@@ -89,9 +90,9 @@ VersionedSaveDialog::VersionedSaveDialog( QWidget *parent,
 
 bool VersionedSaveDialog::changeFileNameVersion(QString &fileName, bool increment )
 {
-	static QRegExp regexp( "[- ]\\d+(\\.\\w+)?$" );
+	static QRegularExpression regex( "[- ]\\d+(\\.\\w+)?$" );
 
-	int idx = regexp.indexIn( fileName );
+	int idx = regex.match(fileName).capturedStart();
 	// For file names without extension (no ".mmpz")
 	int insertIndex = fileName.lastIndexOf( '.' );
 	if ( insertIndex < idx+1 )

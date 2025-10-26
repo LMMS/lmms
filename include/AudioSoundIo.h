@@ -25,10 +25,9 @@
 #ifndef LMMS_AUDIO_SOUNDIO_H
 #define LMMS_AUDIO_SOUNDIO_H
 
-#include <QObject>
 
 #include "lmmsconfig.h"
-#include "ComboBoxModel.h"
+#include "ComboBoxModel.h"  // IWYU pragma: keep
 
 #ifdef LMMS_HAVE_SOUNDIO
 
@@ -110,7 +109,7 @@ private:
 	SoundIo *m_soundio;
 	SoundIoOutStream *m_outstream;
 
-	surroundSampleFrame * m_outBuf;
+	SampleFrame* m_outBuf;
 	int m_outBufSize;
 	fpp_t m_outBufFramesTotal;
 	fpp_t m_outBufFrameIndex;

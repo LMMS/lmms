@@ -26,6 +26,7 @@
 #ifndef LMMS_GUI_LMMS_STYLE_H
 #define LMMS_GUI_LMMS_STYLE_H
 
+#include <QFileSystemWatcher>
 #include <QProxyStyle>
 
 
@@ -36,34 +37,6 @@ namespace lmms::gui
 class LmmsStyle : public QProxyStyle
 {
 public:
-	enum ColorRole
-	{
-		AutomationBarFill,
-		AutomationBarValue,
-		AutomationSelectedBarFill,
-		AutomationCrosshair,
-		PianoRollStepNote,
-		PianoRollSelectedNote,
-		PianoRollDefaultNote,
-		PianoRollFrozenNote,
-		PianoRollMutedNote,
-		PianoRollEditHandle,
-		PianoRollVolumeLevel,
-		PianoRollPanningLevel,
-		PianoRollSelectedLevel,
-		TimelineForecolor,
-		StandardGraphLine,
-		StandardGraphHandle,
-		StandardGraphHandleBorder,
-		StandardGraphCrosshair,
-		TextFloatForecolor,
-		TextFloatFill,
-		VisualizationLevelLow,
-		VisualizationLevelMid,
-		VisualizationLevelPeak,
-		NumColorRoles
-	};
-
 	LmmsStyle();
 	~LmmsStyle() override = default;
 
@@ -88,8 +61,7 @@ public:
 private:
 	QImage colorizeXpm( const char * const * xpm, const QBrush& fill ) const;
 	void hoverColors( bool sunken, bool hover, bool active, QColor& color, QColor& blend ) const;
-	QColor m_colors[ LmmsStyle::NumColorRoles ];
-
+	QFileSystemWatcher m_styleReloader;
 };
 
 

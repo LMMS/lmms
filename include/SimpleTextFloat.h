@@ -23,14 +23,15 @@
 */
 
 
-#ifndef SIMPLE_TEXT_FLOAT_H
-#define SIMPLE_TEXT_FLOAT_H
+#ifndef LMMS_GUI_SIMPLE_TEXT_FLOAT_H
+#define LMMS_GUI_SIMPLE_TEXT_FLOAT_H
 
 #include <QWidget>
 
 #include "lmms_export.h"
 
 class QLabel;
+class QTimer;
 
 namespace lmms::gui
 {
@@ -44,18 +45,26 @@ public:
 
 	void setText(const QString & text);
 
-	void setVisibilityTimeOut(int msecs);
+	void showWithDelay(int msecBeforeDisplay, int msecDisplayTime);
+
+	void showWithTimeout(int msec)
+	{
+		showWithDelay(0, msec);
+	}
 
 	void moveGlobal(QWidget * w, const QPoint & offset)
 	{
 		move(w->mapToGlobal(QPoint(0, 0)) + offset);
 	}
 
+	void hide();
+
 private:
 	QLabel * m_textLabel;
+	QTimer * m_showTimer;
+	QTimer * m_hideTimer;
 };
-
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_SIMPLE_TEXT_FLOAT_H

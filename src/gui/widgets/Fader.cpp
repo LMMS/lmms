@@ -49,269 +49,443 @@
 #include <QInputDialog>
 #include <QMouseEvent>
 #include <QPainter>
+#include <QPainterPath>  // IWYU pragma: keep
 
 #include "lmms_math.h"
-#include "embed.h"
 #include "CaptionMenu.h"
 #include "ConfigManager.h"
+#include "KeyboardShortcuts.h"
 #include "SimpleTextFloat.h"
+
+namespace
+{
+	constexpr auto c_dBScalingExponent = 3.f;
+	//! The dbFS amount after which we drop down to -inf dbFS
+	constexpr auto c_faderMinDb = -120.f;
+}
 
 namespace lmms::gui
 {
 
+SimpleTextFloat* Fader::s_textFloat = nullptr;
 
-SimpleTextFloat * Fader::s_textFloat = nullptr;
-QPixmap * Fader::s_back = nullptr;
-QPixmap * Fader::s_leds = nullptr;
-QPixmap * Fader::s_knob = nullptr;
-
-Fader::Fader( FloatModel * _model, const QString & _name, QWidget * _parent ) :
-	QWidget( _parent ),
-	FloatModelView( _model, this ),
-	m_fPeakValue_L( 0.0 ),
-	m_fPeakValue_R( 0.0 ),
-	m_persistentPeak_L( 0.0 ),
-	m_persistentPeak_R( 0.0 ),
-	m_fMinPeak( 0.01f ),
-	m_fMaxPeak( 1.1 ),
-	m_levelsDisplayedInDBFS(false),
-	m_moveStartPoint( -1 ),
-	m_startValue( 0 ),
-	m_peakGreen( 0, 0, 0 ),
-	m_peakRed( 0, 0, 0 ),
-	m_peakYellow( 0, 0, 0 )
+Fader::Fader(FloatModel* model, const QString& name, QWidget* parent, bool modelIsLinear) :
+	QWidget(parent),
+	FloatModelView(model, this),
+	m_knobSize(embed::logicalSize(m_knob)),
+	m_modelIsLinear(modelIsLinear)
 {
-	if( s_textFloat == nullptr )
+	if (s_textFloat == nullptr)
 	{
 		s_textFloat = new SimpleTextFloat;
 	}
-	if( ! s_back )
-	{
-		s_back = new QPixmap( embed::getIconPixmap( "fader_background" ) );
-	}
-	if( ! s_leds )
-	{
-		s_leds = new QPixmap( embed::getIconPixmap( "fader_leds" ) );
-	}
-	if( ! s_knob )
-	{
-		s_knob = new QPixmap( embed::getIconPixmap( "fader_knob" ) );
-	}
 
-	m_back = s_back;
-	m_leds = s_leds;
-	m_knob = s_knob;
-
-	init(_model, _name);
+	setWindowTitle(name);
+	// For now resize the widget to the size of the previous background image "fader_background.png" as it was found in the classic and default theme
+	constexpr QSize minimumSize(23, 116);
+	setMinimumSize(minimumSize);
+	resize(minimumSize);
+	setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+	setModel(model);
+	setHintText("Volume:", "%");
 
 	m_conversionFactor = 100.0;
+
+	if (model)
+	{
+		// We currently assume that the model is not changed later on and only connect here once
+
+		// This is for example used to update the tool tip which shows the current value of the fader
+		connect(model, &FloatModel::dataChanged, this, &Fader::modelValueChanged);
+
+		// Trigger manually so that the tool tip is initialized correctly
+		modelValueChanged();
+	}
 }
 
 
-Fader::Fader( FloatModel * model, const QString & name, QWidget * parent, QPixmap * back, QPixmap * leds, QPixmap * knob ) :
-	QWidget( parent ),
-	FloatModelView( model, this ),
-	m_fPeakValue_L( 0.0 ),
-	m_fPeakValue_R( 0.0 ),
-	m_persistentPeak_L( 0.0 ),
-	m_persistentPeak_R( 0.0 ),
-	m_fMinPeak( 0.01f ),
-	m_fMaxPeak( 1.1 ),
-	m_levelsDisplayedInDBFS(false),
-	m_moveStartPoint( -1 ),
-	m_startValue( 0 ),
-	m_peakGreen( 0, 0, 0 ),
-	m_peakRed( 0, 0, 0 )
+Fader::Fader(FloatModel* model, const QString& name, QWidget* parent, const QPixmap& knob, bool modelIsLinear) :
+	Fader(model, name, parent, modelIsLinear)
 {
-	if( s_textFloat == nullptr )
-	{
-		s_textFloat = new SimpleTextFloat;
-	}
-
-	m_back = back;
-	m_leds = leds;
 	m_knob = knob;
-
-	init(model, name);
 }
 
-void Fader::init(FloatModel * model, QString const & name)
+void Fader::adjust(const Qt::KeyboardModifiers & modifiers, AdjustmentDirection direction)
 {
-	setWindowTitle( name );
-	setAttribute( Qt::WA_OpaquePaintEvent, false );
-	QSize backgroundSize = m_back->size();
-	setMinimumSize( backgroundSize );
-	setMaximumSize( backgroundSize );
-	resize( backgroundSize );
-	setModel( model );
-	setHintText( "Volume:","%");
+	const auto adjustmentDb = determineAdjustmentDelta(modifiers) * (direction == AdjustmentDirection::Down ? -1. : 1.);
+	adjustByDecibelDelta(adjustmentDb);
 }
 
-
-
-void Fader::contextMenuEvent( QContextMenuEvent * _ev )
+void Fader::adjustByDecibelDelta(float value)
 {
-	CaptionMenu contextMenu( windowTitle() );
-	addDefaultActions( &contextMenu );
-	contextMenu.exec( QCursor::pos() );
-	_ev->accept();
+	adjustModelByDBDelta(value);
+
+	updateTextFloat();
+	s_textFloat->showWithTimeout(1000);
 }
 
-
-
-
-void Fader::mouseMoveEvent( QMouseEvent *mouseEvent )
+void Fader::adjustByDialog()
 {
-	if( m_moveStartPoint >= 0 )
+	bool ok;
+
+	if (modelIsLinear())
 	{
-		int dy = m_moveStartPoint - mouseEvent->globalY();
+		auto maxDB = ampToDbfs(model()->maxValue());
+		const auto currentValue = model()->value() <= 0. ? c_faderMinDb : ampToDbfs(model()->value());
 
-		float delta = dy * ( model()->maxValue() - model()->minValue() ) / (float) ( height() - ( *m_knob ).height() );
+		float enteredValue = QInputDialog::getDouble(this, tr("Set value"),
+							tr("Please enter a new value between %1 and %2:").arg(c_faderMinDb).arg(maxDB),
+							currentValue, c_faderMinDb, maxDB, model()->getDigitCount(), &ok);
 
-		const auto step = model()->step<float>();
-		float newValue = static_cast<float>( static_cast<int>( ( m_startValue + delta ) / step + 0.5 ) ) * step;
-		model()->setValue( newValue );
-
-		updateTextFloat();
-	}
-}
-
-
-
-
-void Fader::mousePressEvent( QMouseEvent* mouseEvent )
-{
-	if( mouseEvent->button() == Qt::LeftButton &&
-			! ( mouseEvent->modifiers() & Qt::ControlModifier ) )
-	{
-		AutomatableModel *thisModel = model();
-		if( thisModel )
+		if (ok)
 		{
-			thisModel->addJournalCheckPoint();
-			thisModel->saveJournallingState( false );
+			model()->setValue(dbfsToAmp(enteredValue));
 		}
-
-		if( mouseEvent->y() >= knobPosY() - ( *m_knob ).height() && mouseEvent->y() < knobPosY() )
-		{
-			updateTextFloat();
-			s_textFloat->show();
-
-			m_moveStartPoint = mouseEvent->globalY();
-			m_startValue = model()->value();
-
-			mouseEvent->accept();
-		}
-		else
-		{
-			m_moveStartPoint = -1;
-		}
+		return;
 	}
 	else
 	{
-		AutomatableModelView::mousePressEvent( mouseEvent );
+		// The model already is in dB
+		auto minv = model()->minValue() * m_conversionFactor;
+		auto maxv = model()->maxValue() * m_conversionFactor;
+		float enteredValue = QInputDialog::getDouble(this, tr("Set value"),
+							tr("Please enter a new value between %1 and %2:").arg(minv).arg(maxv),
+							model()->getRoundedValue() * m_conversionFactor, minv, maxv, model()->getDigitCount(), &ok);
+
+		if (ok)
+		{
+			model()->setValue(enteredValue / m_conversionFactor);
+		}
+	}
+}
+
+void Fader::contextMenuEvent(QContextMenuEvent* ev)
+{
+	CaptionMenu contextMenu(windowTitle());
+	addDefaultActions(&contextMenu);
+	contextMenu.exec(QCursor::pos());
+	ev->accept();
+}
+
+
+
+
+void Fader::mouseMoveEvent(QMouseEvent* mouseEvent)
+{
+	const int localY = mouseEvent->y();
+
+	setVolumeByLocalPixelValue(localY);
+
+	updateTextFloat();
+
+	mouseEvent->accept();
+}
+
+
+
+
+void Fader::mousePressEvent(QMouseEvent* mouseEvent)
+{
+	if (mouseEvent->button() == Qt::LeftButton &&
+			!(mouseEvent->modifiers() & KBD_COPY_MODIFIER))
+	{
+		AutomatableModel* thisModel = model();
+		if (thisModel)
+		{
+			thisModel->addJournalCheckPoint();
+			thisModel->saveJournallingState(false);
+		}
+
+		const int localY = mouseEvent->y();
+		const auto knobLowerPosY = calculateKnobPosYFromModel();
+		const auto knobUpperPosY = knobLowerPosY - m_knobSize.height();
+
+		const auto clickedOnKnob = localY >= knobUpperPosY && localY <= knobLowerPosY;
+
+		if (clickedOnKnob)
+		{
+			// If the users clicked on the knob we want to compensate for the offset to the center line
+			// of the knob when dealing with mouse move events.
+			// This will make it feel like the users have grabbed the knob where they clicked.
+			const auto knobCenterPos = knobLowerPosY - (m_knobSize.height() / 2);
+			m_knobCenterOffset = localY - knobCenterPos;
+
+			// In this case we also will not call setVolumeByLocalPixelValue, i.e. we do not make any immediate
+			// changes. This should only happen if the users actually move the mouse while grabbing the knob.
+			// This makes the knobs less "jumpy".
+		}
+		else
+		{
+			// If the users did not click on the knob then we assume that the fader knob's center should move to
+			// the position of the click. We do not compensate for any offset.
+			m_knobCenterOffset = 0;
+
+			setVolumeByLocalPixelValue(localY);
+		}
+
+		updateTextFloat();
+		s_textFloat->show();
+
+		mouseEvent->accept();
+	}
+	else
+	{
+		AutomatableModelView::mousePressEvent(mouseEvent);
 	}
 }
 
 
 
-void Fader::mouseDoubleClickEvent( QMouseEvent* mouseEvent )
+void Fader::mouseDoubleClickEvent(QMouseEvent* mouseEvent)
 {
-	bool ok;
-	float newValue;
-	// TODO: dbV handling
-	newValue = QInputDialog::getDouble( this, tr( "Set value" ),
-				tr( "Please enter a new value between %1 and %2:" ).
-						arg( model()->minValue() * m_conversionFactor ).
-						arg( model()->maxValue() * m_conversionFactor ),
-					model()->getRoundedValue() * m_conversionFactor,
-					model()->minValue() * m_conversionFactor,
-					model()->maxValue() * m_conversionFactor, model()->getDigitCount(), &ok ) / m_conversionFactor;
+	adjustByDialog();
 
-	if( ok )
-	{
-		model()->setValue( newValue );
-	}
+	mouseEvent->accept();
 }
 
 
 
-void Fader::mouseReleaseEvent( QMouseEvent * mouseEvent )
+void Fader::mouseReleaseEvent(QMouseEvent* mouseEvent)
 {
-	if( mouseEvent && mouseEvent->button() == Qt::LeftButton )
+	if (mouseEvent && mouseEvent->button() == Qt::LeftButton)
 	{
-		AutomatableModel *thisModel = model();
-		if( thisModel )
+		AutomatableModel* thisModel = model();
+		if (thisModel)
 		{
 			thisModel->restoreJournallingState();
 		}
 	}
 
+	// Always reset the offset to 0 regardless of which mouse button is pressed
+	m_knobCenterOffset = 0;
+
 	s_textFloat->hide();
 }
 
 
-void Fader::wheelEvent ( QWheelEvent *ev )
+void Fader::wheelEvent (QWheelEvent* ev)
 {
-	ev->accept();
+	const int direction = (ev->angleDelta().y() > 0 ? 1 : -1) * (ev->inverted() ? -1 : 1);
 
-	if (ev->angleDelta().y() > 0)
+	const float increment = determineAdjustmentDelta(ev->modifiers()) * direction;
+
+	adjustByDecibelDelta(increment);
+
+	ev->accept();
+}
+
+float Fader::determineAdjustmentDelta(const Qt::KeyboardModifiers & modifiers) const
+{
+	if (modifiers == Qt::ShiftModifier)
 	{
-		model()->incValue( 1 );
+		// The shift is intended to go through the values in very coarse steps as in:
+		// "Shift into overdrive"
+		return 3.f;
+	}
+	else if (modifiers == Qt::ControlModifier)
+	{
+		// The control key gives more control, i.e. it enables more fine-grained adjustments
+		return 0.1f;
+	}
+	else if (modifiers & Qt::AltModifier)
+	{
+		// Work around a Qt bug in conjunction with the scroll wheel and the Alt key
+		return 0.f;
+	}
+
+	return 1.f;
+}
+
+void Fader::adjustModelByDBDelta(float value)
+{
+	if (modelIsLinear())
+	{
+		const auto modelValue = model()->value();
+
+		if (modelValue <= 0.)
+		{
+			// We are at -inf dB. Do nothing if we user wishes to decrease.
+			if (value > 0)
+			{
+				// Otherwise set the model to the minimum value supported by the fader.
+				model()->setValue(dbfsToAmp(c_faderMinDb));
+			}
+		}
+		else
+		{
+			// We can safely compute the dB value as the value is greater than 0
+			const auto valueInDB = ampToDbfs(modelValue);
+
+			const auto adjustedValue = valueInDB + value;
+
+			model()->setValue(adjustedValue < c_faderMinDb ? 0. : dbfsToAmp(adjustedValue));
+		}
 	}
 	else
 	{
-		model()->incValue( -1 );
+		const auto adjustedValue = std::clamp(model()->value() + value, model()->minValue(), model()->maxValue());
+
+		model()->setValue(adjustedValue);
 	}
-	updateTextFloat();
-	s_textFloat->setVisibilityTimeOut( 1000 );
 }
 
+int Fader::calculateKnobPosYFromModel() const
+{
+	auto* m = model();
+
+	auto const minV = m->minValue();
+	auto const maxV = m->maxValue();
+	auto const value = m->value();
+
+	if (modelIsLinear())
+	{
+		// This method calculates the pixel position where the lower end of
+		// the fader knob should be for the amplification value in the model.
+		//
+		// The following assumes that the model describes an amplification,
+		// i.e. that values are in [0, max] and that 1 is unity, i.e. 0 dbFS.
+
+		auto const distanceToMin = value - minV;
+
+		// Prevent dbFS calculations with zero or negative values
+		if (distanceToMin <= 0)
+		{
+			return height();
+		}
+		else
+		{
+			// Make sure that we do not get values less that the minimum fader dbFS
+			// for the calculations that will follow.
+			auto const actualDb = std::max(c_faderMinDb, ampToDbfs(value));
+
+			const auto scaledRatio = computeScaledRatio(actualDb);
+
+			// This returns results between:
+			// * m_knobSize.height()  for a ratio of 1
+			// * height()         for a ratio of 0
+			return height() - (height() - m_knobSize.height()) * scaledRatio;
+		}
+	}
+	else
+	{
+		// The model is in dB so we just show that in a linear fashion
+		
+		auto const clampedValue = std::clamp(value, minV, maxV);
+
+		auto const ratio = (clampedValue - minV) / (maxV - minV);
+
+		// This returns results between:
+		// * m_knobSize.height()  for a ratio of 1
+		// * height()         for a ratio of 0
+		return height() - (height() - m_knobSize.height()) * ratio;
+	}
+}
+
+
+void Fader::setVolumeByLocalPixelValue(int y)
+{
+	auto* m = model();
+
+	// Compensate the offset where users have actually clicked
+	y -= m_knobCenterOffset;
+
+	// The y parameter gives us where the mouse click went.
+	// Assume that the middle of the fader should go there.
+	int const lowerFaderKnob = y + (m_knobSize.height() / 2);
+
+	// In some cases we need the clamped lower position of the fader knob so we can ensure
+	// that we only set allowed values in the model range.
+	int const clampedLowerFaderKnob = std::clamp(lowerFaderKnob, m_knobSize.height(), height());
+
+	if (modelIsLinear())
+	{
+		if (lowerFaderKnob >= height())
+		{
+			// Check the non-clamped value because otherwise we wouldn't be able to set -inf dB!
+			model()->setValue(0);
+		}
+		else
+		{
+			// We are in the case where we set a value that's different from -inf dB so we use the clamped value
+			// of the lower knob position so that we only set allowed values in the model range.
+
+			// First map the lower knob position to [0, 1] so that we can apply some curve mapping, e.g.
+			// square, cube, etc.
+			LinearMap<float> knobMap(float(m_knobSize.height()), 1., float(height()), 0.);
+
+			// Apply the inverse of what is done in calculateKnobPosYFromModel
+			auto const knobPos = std::pow(knobMap.map(clampedLowerFaderKnob), 1./c_dBScalingExponent);
+
+			float const maxDb = ampToDbfs(m->maxValue());
+
+			LinearMap<float> dbMap(1., maxDb, 0., c_faderMinDb);
+
+			float const dbValue = dbMap.map(knobPos);
+
+			// Pull everything that's quieter than the minimum fader dbFS value down to 0 amplification.
+			// This should not happen due to the steps above but let's be sure.
+			// Otherwise compute the amplification value from the mapped dbFS value but make sure that we
+			// do not exceed the maximum dbValue of the model
+			float ampValue = dbValue < c_faderMinDb ? 0. : dbfsToAmp(std::min(maxDb, dbValue));
+
+			model()->setValue(ampValue);
+		}
+	}
+	else
+	{
+		LinearMap<float> valueMap(float(m_knobSize.height()), model()->maxValue(), float(height()), model()->minValue());
+
+		model()->setValue(valueMap.map(clampedLowerFaderKnob));
+	}
+}
+
+float Fader::computeScaledRatio(float dBValue) const
+{
+	const auto maxDb = ampToDbfs(model()->maxValue());
+
+	const auto ratio = (dBValue - c_faderMinDb) / (maxDb - c_faderMinDb);
+
+	return std::pow(ratio, c_dBScalingExponent);
+}
 
 
 ///
 /// Set peak value (0.0 .. 1.0)
 ///
-void Fader::setPeak( float fPeak, float &targetPeak, float &persistentPeak, QElapsedTimer &lastPeakTimer )
+void Fader::setPeak(float fPeak, float& targetPeak, float& persistentPeak, QElapsedTimer& lastPeakTimer)
 {
-	if( fPeak <  m_fMinPeak )
-	{
-		fPeak = m_fMinPeak;
-	}
-	else if( fPeak > m_fMaxPeak )
-	{
-		fPeak = m_fMaxPeak;
-	}
-
-	if( targetPeak != fPeak)
+	if (targetPeak != fPeak)
 	{
 		targetPeak = fPeak;
-		if( targetPeak >= persistentPeak )
+		if (targetPeak >= persistentPeak)
 		{
 			persistentPeak = targetPeak;
 			lastPeakTimer.restart();
+			emit peakChanged(persistentPeak);
 		}
 		update();
 	}
 
-	if( persistentPeak > 0 && lastPeakTimer.elapsed() > 1500 )
+	if (persistentPeak > 0 && lastPeakTimer.elapsed() > 1500)
 	{
-		persistentPeak = qMax<float>( 0, persistentPeak-0.05 );
+		persistentPeak = qMax<float>(0, persistentPeak-0.05);
+		emit peakChanged(persistentPeak);
 		update();
 	}
 }
 
 
 
-void Fader::setPeak_L( float fPeak )
+void Fader::setPeak_L(float fPeak)
 {
-	setPeak( fPeak, m_fPeakValue_L, m_persistentPeak_L, m_lastPeakTimer_L );
+	setPeak(fPeak, m_fPeakValue_L, m_persistentPeak_L, m_lastPeakTimer_L);
 }
 
 
 
-void Fader::setPeak_R( float fPeak )
+void Fader::setPeak_R(float fPeak)
 {
-	setPeak( fPeak, m_fPeakValue_R, m_persistentPeak_R, m_lastPeakTimer_R );
+	setPeak(fPeak, m_fPeakValue_R, m_persistentPeak_R, m_lastPeakTimer_R);
 }
 
 
@@ -319,169 +493,256 @@ void Fader::setPeak_R( float fPeak )
 // update tooltip showing value and adjust position while changing fader value
 void Fader::updateTextFloat()
 {
-	if( ConfigManager::inst()->value( "app", "displaydbfs" ).toInt() && m_conversionFactor == 100.0 )
+	if (m_conversionFactor == 100.0)
 	{
-		s_textFloat->setText( QString("Volume: %1 dBFS").
-				arg( ampToDbfs( model()->value() ), 3, 'f', 2 ) );
+		s_textFloat->setText(getModelValueAsDbString());
 	}
 	else
 	{
-		s_textFloat->setText( m_description + " " + QString("%1 ").arg( model()->value() * m_conversionFactor ) + " " + m_unit );
+		s_textFloat->setText(m_description + " " + QString("%1 ").arg(model()->value() * m_conversionFactor) + " " + m_unit);
 	}
 
-	s_textFloat->moveGlobal(this, QPoint(width() + 2, knobPosY() - s_textFloat->height() / 2));
+	s_textFloat->moveGlobal(this, QPoint(width() + 2, calculateKnobPosYFromModel() - s_textFloat->height() / 2));
 }
 
-
-inline int Fader::calculateDisplayPeak( float fPeak )
+void Fader::modelValueChanged()
 {
-	int peak = (int)( m_back->height() - ( fPeak / ( m_fMaxPeak - m_fMinPeak ) ) * m_back->height() );
-
-	return qMin( peak, m_back->height() );
+	setToolTip(getModelValueAsDbString());
 }
 
+QString Fader::getModelValueAsDbString() const
+{
+	QString label(tr("Volume: %1 dB"));
+	// Check that the pointer isn't dangling, which can happen if the
+	// model was dropped in order to load a new project from an existing one.
+	auto* newModel = model();
+	if (!newModel)
+	{
+		// model() was a dangling pointer, so return a sane default value.
+		return label.arg(tr("-inf"));
+	}
+	const auto value = newModel->value();
 
-void Fader::paintEvent( QPaintEvent * ev)
+	if (modelIsLinear())
+	{
+		if (value <= 0.)
+		{
+			return label.arg(tr("-inf"));
+		}
+		else
+		{
+			return label.arg(ampToDbfs(value), 3, 'f', 2);
+		}
+	}
+	else
+	{
+		return label.arg(value, 3, 'f', 2);
+	}
+}
+
+void Fader::paintEvent(QPaintEvent* ev)
 {
 	QPainter painter(this);
 
-	// Draw the background
-	painter.drawPixmap( ev->rect(), *m_back, ev->rect() );
-
 	// Draw the levels with peaks
-	if (getLevelsDisplayedInDBFS())
+	paintLevels(ev, painter, !m_levelsDisplayedInDBFS);
+
+	if (ConfigManager::inst()->value( "ui", "showfaderticks" ).toInt() && modelIsLinear())
 	{
-		paintDBFSLevels(ev, painter);
-	}
-	else
-	{
-		paintLinearLevels(ev, painter);
+		paintFaderTicks(painter);
 	}
 
 	// Draw the knob
-	painter.drawPixmap( 0, knobPosY() - m_knob->height(), *m_knob );
+	painter.drawPixmap((width() - m_knobSize.width()) / 2, calculateKnobPosYFromModel() - m_knobSize.height(), m_knob);
 }
 
-void Fader::paintDBFSLevels(QPaintEvent * ev, QPainter & painter)
+void Fader::paintLevels(QPaintEvent* ev, QPainter& painter, bool linear)
 {
-	int height = m_back->height();
-	int width = m_back->width() / 2;
-	int center = m_back->width() - width;
+	const auto mapper = linear
+		? +[](float value) -> float { return value; }
+		: +[](float value) -> float { return ampToDbfs(qMax(0.0001f, value)); };
 
-	float const maxDB(ampToDbfs(m_fMaxPeak));
-	float const minDB(ampToDbfs(m_fMinPeak));
+	const float mappedMinPeak = mapper(m_fMinPeak);
+	const float mappedMaxPeak = mapper(m_fMaxPeak);
+	const float mappedPeakL = mapper(m_fPeakValue_L);
+	const float mappedPeakR = mapper(m_fPeakValue_R);
+	const float mappedPersistentPeakL = mapper(m_persistentPeak_L);
+	const float mappedPersistentPeakR = mapper(m_persistentPeak_R);
+	const float mappedUnity = mapper(1.f);
 
-	// We will need to divide by the span between min and max several times. It's more
-	// efficient to calculate the reciprocal once and then to multiply.
-	float const fullSpanReciprocal = 1 / (maxDB - minDB);
+	painter.save();
 
+	const QRect baseRect = rect();
+
+	const int height = baseRect.height();
+
+	const int margin = 1;
+	const int distanceBetweenMeters = 2;
+
+	const int numberOfMeters = 2;
+
+	// Compute the width of a single meter by removing the margins and the space between meters
+	const int leftAndRightMargin = 2 * margin;
+	const int pixelsBetweenAllMeters = distanceBetweenMeters * (numberOfMeters - 1);
+	const int remainingPixelsForMeters = baseRect.width() - leftAndRightMargin - pixelsBetweenAllMeters;
+	const int meterWidth = remainingPixelsForMeters / numberOfMeters;
+
+	QRect leftMeterOutlineRect(margin, margin, meterWidth, height - 2 * margin);
+	QRect rightMeterOutlineRect(baseRect.width() - margin - meterWidth, margin, meterWidth, height - 2 * margin);
+
+	QMargins removedMargins(1, 1, 1, 1);
+	QRect leftMeterRect = leftMeterOutlineRect.marginsRemoved(removedMargins);
+	QRect rightMeterRect = rightMeterOutlineRect.marginsRemoved(removedMargins);
+
+	QPainterPath path;
+	qreal radius = 2;
+	path.addRoundedRect(leftMeterOutlineRect, radius, radius);
+	path.addRoundedRect(rightMeterOutlineRect, radius, radius);
+	painter.fillPath(path, Qt::black);
+
+	// Now clip everything to the paths of the meters
+	painter.setClipPath(path);
+
+	// This linear map performs the following mapping:
+	// Value (dbFS or linear) -> window coordinates of the widget
+	// It is for example used to determine the height of peaks, markers and to define the gradient for the levels
+	const LinearMap<float> valuesToWindowCoordinates(mappedMaxPeak, leftMeterRect.y(), mappedMinPeak, leftMeterRect.y() + leftMeterRect.height());
+
+	// This lambda takes a value (in dbFS or linear) and a rectangle and computes a rectangle
+	// that represent the value within the rectangle. It is for example used to compute the unity indicators.
+	const auto computeLevelMarkerRect = [&valuesToWindowCoordinates](const QRect& rect, float peak) -> QRect
+	{
+		return QRect(rect.x(), valuesToWindowCoordinates.map(peak), rect.width(), 1);
+	};
+
+	// This lambda takes a peak value (in dbFS or linear) and a rectangle and computes a rectangle
+	// that represent the peak value within the rectangle. It's used to compute the peak indicators
+	// which "dance" on top of the level meters.
+	const auto computePeakRect = [&valuesToWindowCoordinates](const QRect& rect, float peak) -> QRect
+	{
+		return QRect(rect.x(), valuesToWindowCoordinates.map(peak), rect.width(), 1);
+	};
+
+	// This lambda takes a peak value (in dbFS or linear) and a rectangle and returns an adjusted copy of the
+	// rectangle that represents the peak value. It is used to compute the level meters themselves.
+	const auto computeLevelRect = [&valuesToWindowCoordinates](const QRect& rect, float peak) -> QRect
+	{
+		QRect result(rect);
+		result.setTop(valuesToWindowCoordinates.map(peak));
+
+		return result;
+	};
+
+	// Draw left and right level markers for the unity lines (0 dbFS, 1.0 amplitude)
+	if (getRenderUnityLine())
+	{
+		const auto unityRectL = computeLevelMarkerRect(leftMeterRect, mappedUnity);
+		painter.fillRect(unityRectL, m_unityMarker);
+
+		const auto unityRectR = computeLevelMarkerRect(rightMeterRect, mappedUnity);
+		painter.fillRect(unityRectR, m_unityMarker);
+	}
+
+	// These values define where the gradient changes values, i.e. the ranges
+	// for clipping, warning and ok.
+	// Please ensure that "clip starts" is the maximum value and that "ok ends"
+	// is the minimum value and that all other values lie inbetween. Otherwise
+	// there will be warnings when the gradient is defined.
+	const float mappedClipStarts = mapper(dbfsToAmp(0.f));
+	const float mappedWarnEnd = mapper(dbfsToAmp(-0.01f));
+	const float mappedWarnStart = mapper(dbfsToAmp(-6.f));
+	const float mappedOkEnd = mapper(dbfsToAmp(-12.f));
+
+	// Prepare the gradient for the meters
+	//
+	// The idea is the following. We want to be able to render arbitrary ranges of min and max values.
+	// Therefore we first compute the start and end point of the gradient in window coordinates.
+	// The gradient is assumed to start with the clip color and to end with the ok color with warning values in between.
+	// We know the min and max peaks that map to a rectangle where we draw the levels. We can use the values of the min and max peaks
+	// as well as the Y-coordinates of the rectangle to compute a map which will give us the coordinates of the value where the clipping
+	// starts and where the ok area end. These coordinates are used to initialize the gradient. Please note that the gradient might thus
+	// extend the rectangle into which we paint.
+	float clipStartYCoord = valuesToWindowCoordinates.map(mappedClipStarts);
+	float okEndYCoord = valuesToWindowCoordinates.map(mappedOkEnd);
+
+	QLinearGradient linearGrad(0, clipStartYCoord, 0, okEndYCoord);
+
+	// We already know for the gradient that the clip color will be at 0 and that the ok color is at 1.
+	// What's left to do is to map the inbetween values into the interval [0,1].
+	const LinearMap<float> mapBetweenClipAndOk(mappedClipStarts, 0.f, mappedOkEnd, 1.f);
+
+	linearGrad.setColorAt(0, m_peakClip);
+	linearGrad.setColorAt(mapBetweenClipAndOk.map(mappedWarnEnd), m_peakWarn);
+	linearGrad.setColorAt(mapBetweenClipAndOk.map(mappedWarnStart), m_peakWarn);
+	linearGrad.setColorAt(1, m_peakOk);
 
 	// Draw left levels
-	float const leftSpan = ampToDbfs(qMax<float>(0.0001, m_fPeakValue_L)) - minDB;
-	int peak_L = height * leftSpan * fullSpanReciprocal;
-	QRect drawRectL( 0, height - peak_L, width, peak_L ); // Source and target are identical
-	painter.drawPixmap( drawRectL, *m_leds, drawRectL );
-
-	float const persistentLeftPeakDBFS = ampToDbfs(qMax<float>(0.0001, m_persistentPeak_L));
-	int persistentPeak_L = height * (1 - (persistentLeftPeakDBFS - minDB) * fullSpanReciprocal);
-	// the LED's have a  4px padding and we don't want the peaks
-	// to draw on the fader background
-	if( persistentPeak_L <= 4 )
+	if (mappedPeakL > mappedMinPeak)
 	{
-		persistentPeak_L = 4;
-	}
-	if( persistentLeftPeakDBFS > minDB )
-	{
-		QColor const & peakColor = clips(m_persistentPeak_L) ? peakRed() :
-			persistentLeftPeakDBFS >= -6 ? peakYellow() : peakGreen();
-		painter.fillRect( QRect( 2, persistentPeak_L, 7, 1 ), peakColor );
+		QPainterPath leftMeterPath;
+		leftMeterPath.addRoundedRect(computeLevelRect(leftMeterRect, mappedPeakL), radius, radius);
+		painter.fillPath(leftMeterPath, linearGrad);
 	}
 
+	// Draw left peaks
+	if (mappedPersistentPeakL > mappedMinPeak)
+	{
+		const auto peakRectL = computePeakRect(leftMeterRect, mappedPersistentPeakL);
+		painter.fillRect(peakRectL, linearGrad);
+	}
 
 	// Draw right levels
-	float const rightSpan = ampToDbfs(qMax<float>(0.0001, m_fPeakValue_R)) - minDB;
-	int peak_R = height * rightSpan * fullSpanReciprocal;
-	QRect const drawRectR( center, height - peak_R, width, peak_R ); // Source and target are identical
-	painter.drawPixmap( drawRectR, *m_leds, drawRectR );
-
-	float const persistentRightPeakDBFS = ampToDbfs(qMax<float>(0.0001, m_persistentPeak_R));
-	int persistentPeak_R = height * (1 - (persistentRightPeakDBFS - minDB) * fullSpanReciprocal);
-	// the LED's have a  4px padding and we don't want the peaks
-	// to draw on the fader background
-	if( persistentPeak_R <= 4 )
+	if (mappedPeakR > mappedMinPeak)
 	{
-		persistentPeak_R = 4;
-	}
-	if( persistentRightPeakDBFS > minDB )
-	{
-		QColor const & peakColor = clips(m_persistentPeak_R) ? peakRed() :
-			persistentRightPeakDBFS >= -6 ? peakYellow() : peakGreen();
-		painter.fillRect( QRect( 14, persistentPeak_R, 7, 1 ), peakColor );
-	}
-}
-
-void Fader::paintLinearLevels(QPaintEvent * ev, QPainter & painter)
-{
-	// peak leds
-	//float fRange = abs( m_fMaxPeak ) + abs( m_fMinPeak );
-
-	int height = m_back->height();
-	int width = m_back->width() / 2;
-	int center = m_back->width() - width;
-
-	int peak_L = calculateDisplayPeak( m_fPeakValue_L - m_fMinPeak );
-	int persistentPeak_L = qMax<int>( 3, calculateDisplayPeak( m_persistentPeak_L - m_fMinPeak ) );
-	painter.drawPixmap( QRect( 0, peak_L, width, height - peak_L ), *m_leds, QRect( 0, peak_L, width, height - peak_L ) );
-
-	if( m_persistentPeak_L > 0.05 )
-	{
-		painter.fillRect( QRect( 2, persistentPeak_L, 7, 1 ), ( m_persistentPeak_L < 1.0 )
-			? peakGreen()
-			: peakRed() );
+		QPainterPath rightMeterPath;
+		rightMeterPath.addRoundedRect(computeLevelRect(rightMeterRect, mappedPeakR), radius, radius);
+		painter.fillPath(rightMeterPath, linearGrad);
 	}
 
-	int peak_R = calculateDisplayPeak( m_fPeakValue_R - m_fMinPeak );
-	int persistentPeak_R = qMax<int>( 3, calculateDisplayPeak( m_persistentPeak_R - m_fMinPeak ) );
-	painter.drawPixmap( QRect( center, peak_R, width, height - peak_R ), *m_leds, QRect( center, peak_R, width, height - peak_R ) );
-
-	if( m_persistentPeak_R > 0.05 )
+	// Draw right peaks
+	if (mappedPersistentPeakR > mappedMinPeak)
 	{
-		painter.fillRect( QRect( 14, persistentPeak_R, 7, 1 ), ( m_persistentPeak_R < 1.0 )
-			? peakGreen()
-			: peakRed() );
+		const auto peakRectR = computePeakRect(rightMeterRect, mappedPersistentPeakR);
+		painter.fillRect(peakRectR, linearGrad);
 	}
+
+	painter.restore();
 }
 
-
-QColor const & Fader::peakGreen() const
+void Fader::paintFaderTicks(QPainter& painter)
 {
-	return m_peakGreen;
-}
+	painter.save();
 
-QColor const & Fader::peakRed() const
-{
-	return m_peakRed;
-}
+	const QPen zeroPen(QColor(255, 255, 255, 216), 2.5);
+	const QPen nonZeroPen(QColor(255, 255, 255, 128), 1.);
 
-QColor const & Fader::peakYellow() const
-{
-	return m_peakYellow;
-}
+	// We use the maximum dB value of the model to calculate the nearest multiple
+	// of the step size that we use to paint the ticks so that we know the start point.
+	// This code will paint ticks with steps that are defined by the step size around
+	// the 0 dB marker.
+	const auto maxDB = ampToDbfs(model()->maxValue());
+	const auto stepSize = 6.f;
+	const auto startValue = std::floor(maxDB / stepSize) * stepSize;
 
-void Fader::setPeakGreen( const QColor & c )
-{
-	m_peakGreen = c;
-}
+	for (float i = startValue; i >= c_faderMinDb; i-= stepSize)
+	{
+		const auto scaledRatio = computeScaledRatio(i);
+		const auto maxHeight = height() - (height() - m_knobSize.height()) * scaledRatio - (m_knobSize.height() / 2);
 
-void Fader::setPeakRed( const QColor & c )
-{
-	m_peakRed = c;
-}
+		if (approximatelyEqual(i, 0.))
+		{
+			painter.setPen(zeroPen);
+		}
+		else
+		{
+			painter.setPen(nonZeroPen);
+		}
 
-void Fader::setPeakYellow( const QColor & c )
-{
-	m_peakYellow = c;
-}
+		painter.drawLine(QPointF(0, maxHeight), QPointF(1, maxHeight));
+		painter.drawLine(QPointF(width() - 1, maxHeight), QPointF(width(), maxHeight));
+	}
 
+	painter.restore();
+}
 
 } // namespace lmms::gui

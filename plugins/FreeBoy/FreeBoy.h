@@ -26,8 +26,8 @@
 #ifndef LMMS_FREEBOY_H
 #define LMMS_FREEBOY_H
 
+
 #include "AutomatableModel.h"
-#include "Blip_Buffer.h"
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "Graph.h"
@@ -35,7 +35,7 @@
 namespace lmms
 {
 
-class NotePlayHandle;
+class NotePlayHandle;  // IWYU pragma: keep
 
 
 namespace gui
@@ -54,7 +54,7 @@ public:
 	FreeBoyInstrument( InstrumentTrack * _instrument_track );
 	~FreeBoyInstrument() override = default;
 
-	void playNote(NotePlayHandle* nph, sampleFrame* workingBuffer) override;
+	void playNote(NotePlayHandle* nph, SampleFrame* workingBuffer) override;
 	void deleteNotePluginData(NotePlayHandle* nph) override;
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
@@ -62,7 +62,7 @@ public:
 
 	QString nodeName() const override;
 
-	f_cnt_t desiredReleaseFrames() const override;
+	float desiredReleaseTimeMs() const override;
 
 	gui::PluginView* instantiateView( QWidget * _parent ) override;
 

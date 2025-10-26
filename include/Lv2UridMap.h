@@ -29,7 +29,7 @@
 
 #ifdef LMMS_HAVE_LV2
 
-#include <lv2/lv2plug.in/ns/ext/urid/urid.h>
+#include <lv2/urid/urid.h>
 #include <mutex> // TODO: use semaphore, even though this is not realtime critical
 #include <string>
 #include <unordered_map>
@@ -54,8 +54,6 @@ class UridMap
 
 	LV2_URID_Map m_mapFeature;
 	LV2_URID_Unmap m_unmapFeature;
-
-	LV2_URID m_lastUrid = 0;
 
 public:
 	//! constructor; will set up the features

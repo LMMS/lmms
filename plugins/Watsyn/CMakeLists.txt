@@ -1,5 +1,8 @@
-INCLUDE(BuildPlugin)
+include(BuildPlugin)
 
-LINK_DIRECTORIES(${SAMPLERATE_LIBRARY_DIRS})
-LINK_LIBRARIES(${SAMPLERATE_LIBRARIES})
-BUILD_PLUGIN(watsyn Watsyn.cpp Watsyn.h MOCFILES Watsyn.h EMBEDDED_RESOURCES *.png)
+build_plugin(watsyn
+	Watsyn.cpp Watsyn.h
+	MOCFILES Watsyn.h
+	EMBEDDED_RESOURCES *.png
+)
+target_link_libraries(watsyn SampleRate::samplerate)

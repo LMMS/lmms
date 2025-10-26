@@ -24,12 +24,11 @@
  */
 
 
-#include <QDomElement>
 
 #include <cmath>
 #include <cstdio>
 
-#include "sid.h"
+#include <sid.h>
 
 #include "SidInstrument.h"
 #include "AudioEngine.h"
@@ -83,7 +82,7 @@ Plugin::Descriptor PLUGIN_EXPORT sid_plugin_descriptor =
 	"Csaba Hruska <csaba.hruska/at/gmail.com>"
 	"Attila Herman <attila589/at/gmail.com>",
 	0x0100,
-	Plugin::Instrument,
+	Plugin::Type::Instrument,
 	new PluginPixmapLoader( "logo" ),
 	nullptr,
 	nullptr,
@@ -105,7 +104,7 @@ VoiceObject::VoiceObject( Model * _parent, int _idx ) :
 					tr( "Voice %1 release" ).arg( _idx+1 ) ),
 	m_coarseModel( 0.0f, -24.0, 24.0, 1.0f, this,
 					tr( "Voice %1 coarse detuning" ).arg( _idx+1 ) ),
-	m_waveFormModel( TriangleWave, 0, NumWaveShapes-1, this,
+	m_waveFormModel( static_cast<int>(WaveForm::Triangle), 0, NumWaveShapes-1, this,
 					tr( "Voice %1 wave shape" ).arg( _idx+1 ) ),
 
 	m_syncModel( false, this, tr( "Voice %1 sync" ).arg( _idx+1 ) ),
@@ -121,13 +120,17 @@ SidInstrument::SidInstrument( InstrumentTrack * _instrument_track ) :
 	// filter
 	m_filterFCModel( 1024.0f, 0.0f, 2047.0f, 1.0f, this, tr( "Cutoff frequency" ) ),
 	m_filterResonanceModel( 8.0f, 0.0f, 15.0f, 1.0f, this, tr( "Resonance" ) ),
-	m_filterModeModel( LowPass, 0, NumFilterTypes-1, this, tr( "Filter type" )),
+	m_filterModeModel( static_cast<int>(FilterType::LowPass), 0, NumFilterTypes-1, this, tr( "Filter type" )),
 
 	// misc
 	m_voice3OffModel( false, this, tr( "Voice 3 off" ) ),
 	m_volumeModel( 15.0f, 0.0f, 15.0f, 1.0f, this, tr( "Volume" ) ),
-	m_chipModel( sidMOS8580, 0, NumChipModels-1, this, tr( "Chip model" ) )
+	m_chipModel( static_cast<int>(ChipModel::MOS8580), 0, NumChipModels-1, this, tr( "Chip model" ) )
 {
+    // A Filter object needs to be created only once to do some initialization, avoiding
+	// dropouts down the line when we have to play a note for the first time.
+	[[maybe_unused]] static auto s_filter = reSID::Filter{};
+
 	for( int i = 0; i < 3; ++i )
 	{
 		m_voice[i] = new VoiceObject( this, i );
@@ -221,44 +224,35 @@ QString SidInstrument::nodeName() const
 }
 
 
-
-
-f_cnt_t SidInstrument::desiredReleaseFrames() const
+float SidInstrument::desiredReleaseTimeMs() const
 {
-	const float samplerate = Engine::audioEngine()->processingSampleRate();
 	int maxrel = 0;
 	for (const auto& voice : m_voice)
 	{
-		if( maxrel < voice->m_releaseModel.value() )
-			maxrel = (int)voice->m_releaseModel.value();
+		maxrel = std::max(maxrel, static_cast<int>(voice->m_releaseModel.value()));
 	}
 
-	return f_cnt_t( float(relTime[maxrel])*samplerate/1000.0 );
+	return computeReleaseTimeMsByFrameCount(relTime[maxrel]);
 }
 
 
-
-
-static int sid_fillbuffer(unsigned char* sidreg, SID *sid, int tdelta, short *ptr, int samples)
+static int sid_fillbuffer(unsigned char* sidreg, reSID::SID *sid, int tdelta, short *ptr, int samples)
 {
-  int tdelta2;
-  int result;
   int total = 0;
-  int c;
 //  customly added
   int residdelay = 0;
 
   int badline = rand() % NUMSIDREGS;
 
-  for (c = 0; c < NUMSIDREGS; c++)
+  for (int c = 0; c < NUMSIDREGS; c++)
   {
     unsigned char o = sidorder[c];
 
   	// Extra delay for loading the waveform (and mt_chngate,x)
   	if ((o == 4) || (o == 11) || (o == 18))
   	{
-  	  tdelta2 = SIDWAVEDELAY;
-      result = sid->clock(tdelta2, ptr, samples);
+  	  int tdelta2 = SIDWAVEDELAY;
+      int result = sid->clock(tdelta2, ptr, samples);
       total += result;
       ptr += result;
       samples -= result;
@@ -268,8 +262,8 @@ static int sid_fillbuffer(unsigned char* sidreg, SID *sid, int tdelta, short *pt
     // Possible random badline delay once per writing
     if ((badline == c) && (residdelay))
   	{
-      tdelta2 = residdelay;
-      result = sid->clock(tdelta2, ptr, samples);
+      int tdelta2 = residdelay;
+      int result = sid->clock(tdelta2, ptr, samples);
       total += result;
       ptr += result;
       samples -= result;
@@ -278,14 +272,14 @@ static int sid_fillbuffer(unsigned char* sidreg, SID *sid, int tdelta, short *pt
 
     sid->write(o, sidreg[o]);
 
-    tdelta2 = SIDWRITEDELAY;
-    result = sid->clock(tdelta2, ptr, samples);
+    int tdelta2 = SIDWRITEDELAY;
+    int result = sid->clock(tdelta2, ptr, samples);
     total += result;
     ptr += result;
     samples -= result;
     tdelta -= SIDWRITEDELAY;
   }
-  result = sid->clock(tdelta, ptr, samples);
+  int result = sid->clock(tdelta, ptr, samples);
   total += result;
 
   return total;
@@ -295,18 +289,16 @@ static int sid_fillbuffer(unsigned char* sidreg, SID *sid, int tdelta, short *pt
 
 
 void SidInstrument::playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer )
+						SampleFrame* _working_buffer )
 {
-	const f_cnt_t tfp = _n->totalFramesPlayed();
-
 	const int clockrate = C64_PAL_CYCLES_PER_SEC;
-	const int samplerate = Engine::audioEngine()->processingSampleRate();
+	const int samplerate = Engine::audioEngine()->outputSampleRate();
 
-	if ( tfp == 0 )
+	if (!_n->m_pluginData)
 	{
-		SID *sid = new SID();
-		sid->set_sampling_parameters( clockrate, SAMPLE_FAST, samplerate );
-		sid->set_chip_model( MOS8580 );
+		auto sid = new reSID::SID();
+		sid->set_sampling_parameters(clockrate, reSID::SAMPLE_FAST, samplerate);
+		sid->set_chip_model(reSID::MOS8580);
 		sid->enable_filter( true );
 		sid->reset();
 		_n->m_pluginData = sid;
@@ -314,10 +306,13 @@ void SidInstrument::playNote( NotePlayHandle * _n,
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();
 
-	SID *sid = static_cast<SID *>( _n->m_pluginData );
+	auto sid = static_cast<reSID::SID*>(_n->m_pluginData);
 	int delta_t = clockrate * frames / samplerate + 4;
-	// avoid variable length array for msvc compat
-	auto buf = reinterpret_cast<short*>(_working_buffer + offset);
+#ifndef _MSC_VER
+	short buf[frames];
+#else
+	const auto buf = static_cast<short*>(_alloca(frames * sizeof(short)));
+#endif
 	auto sidreg = std::array<unsigned char, NUMSIDREGS>{};
 
 	for (auto& reg : sidreg)
@@ -325,29 +320,29 @@ void SidInstrument::playNote( NotePlayHandle * _n,
 		reg = 0x00;
 	}
 
-	if( (ChipModel)m_chipModel.value() == sidMOS6581 )
+	if( (ChipModel)m_chipModel.value() == ChipModel::MOS6581 )
 	{
-		sid->set_chip_model( MOS6581 );
+		sid->set_chip_model(reSID::MOS6581);
 	}
 	else
 	{
-		sid->set_chip_model( MOS8580 );
+		sid->set_chip_model(reSID::MOS8580);
 	}
 
 	// voices
-	reg8 data8 = 0;
-	reg8 data16 = 0;
-	reg8 base = 0;
+	reSID::reg8 data8 = 0;
+	reSID::reg16 data16 = 0;
+	size_t base = 0;
 	float freq = 0.0;
 	float note = 0.0;
-	for( reg8 i = 0 ; i < 3 ; ++i )
+	for (size_t i = 0; i < 3; ++i)
 	{
 		base = i*7;
 		// freq ( Fn = Fout / Fclk * 16777216 ) + coarse detuning
 		freq = _n->frequency();
-		note = 69.0 + 12.0 * log( freq / 440.0 ) / log( 2 );
+		note = 69.0 + 12.0 * std::log2(freq / 440.0);
 		note += m_voice[i]->m_coarseModel.value();
-		freq = 440.0 * pow( 2.0, (note-69.0)/12.0 );
+		freq = 440.0 * std::exp2((note - 69.0) / 12.0);
 		data16 = int( freq / float(clockrate) * 16777216.0 );
 
 		sidreg[base+0] = data16&0x00FF;
@@ -362,13 +357,13 @@ void SidInstrument::playNote( NotePlayHandle * _n,
 		data8 += m_voice[i]->m_syncModel.value()?2:0;
 		data8 += m_voice[i]->m_ringModModel.value()?4:0;
 		data8 += m_voice[i]->m_testModel.value()?8:0;
-		switch( m_voice[i]->m_waveFormModel.value() )
+		switch( static_cast<VoiceObject::WaveForm>(m_voice[i]->m_waveFormModel.value()) )
 		{
 			default: break;
-			case VoiceObject::NoiseWave:	data8 += 128; break;
-			case VoiceObject::SquareWave:	data8 += 64; break;
-			case VoiceObject::SawWave:		data8 += 32; break;
-			case VoiceObject::TriangleWave:	data8 += 16; break;
+			case VoiceObject::WaveForm::Noise:	data8 += 128; break;
+			case VoiceObject::WaveForm::Square:	data8 += 64; break;
+			case VoiceObject::WaveForm::Saw:		data8 += 32; break;
+			case VoiceObject::WaveForm::Triangle:	data8 += 16; break;
 		}
 		sidreg[base+4] = data8&0x00FF;
 		// ad
@@ -408,22 +403,23 @@ void SidInstrument::playNote( NotePlayHandle * _n,
 	data8 = data16&0x000F;
 	data8 += m_voice3OffModel.value()?128:0;
 
-	switch( m_filterModeModel.value() )
+	switch( static_cast<FilterType>(m_filterModeModel.value()) )
 	{
 		default: break;
-		case LowPass:	data8 += 16; break;
-		case BandPass:	data8 += 32; break;
-		case HighPass:	data8 += 64; break;
+		case FilterType::LowPass:	data8 += 16; break;
+		case FilterType::BandPass:	data8 += 32; break;
+		case FilterType::HighPass:	data8 += 64; break;
 	}
 
 	sidreg[24] = data8&0x00FF;
 
-	int num = sid_fillbuffer(sidreg.data(), sid, delta_t, buf, frames);
-	if(num!=frames)
+	const auto num = static_cast<f_cnt_t>(sid_fillbuffer(sidreg.data(), sid, delta_t, buf, frames));
+	if (num != frames) {
 		printf("!!!Not enough samples\n");
+	}
 
 	// loop backwards to avoid overwriting data in the short-to-float conversion
-	for( fpp_t frame = frames - 1; frame >= 0; frame-- )
+	for (auto frame = std::size_t{0}; frame < frames; ++frame)
 	{
 		sample_t s = float(buf[frame])/32768.0;
 		for( ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch )
@@ -431,8 +427,6 @@ void SidInstrument::playNote( NotePlayHandle * _n,
 			_working_buffer[frame+offset][ch] = s;
 		}
 	}
-
-	instrumentTrack()->processAudioBuffer( _working_buffer, frames + offset, _n );
 }
 
 
@@ -440,7 +434,7 @@ void SidInstrument::playNote( NotePlayHandle * _n,
 
 void SidInstrument::deleteNotePluginData( NotePlayHandle * _n )
 {
-	delete static_cast<SID *>( _n->m_pluginData );
+	delete static_cast<reSID::SID*>(_n->m_pluginData);
 }
 
 
@@ -461,7 +455,7 @@ class sidKnob : public Knob
 {
 public:
 	sidKnob( QWidget * _parent ) :
-			Knob( knobStyled, _parent )
+			Knob( KnobType::Styled, _parent )
 	{
 		setFixedSize( 16, 16 );
 		setCenterPointX( 7.5 );
@@ -516,7 +510,7 @@ SidInstrumentView::SidInstrumentView( Instrument * _instrument,
 	lp_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "lp" ) );
 	lp_btn->setToolTip(tr("Low-pass filter "));
 
-	m_passBtnGrp = new automatableButtonGroup( this );
+	m_passBtnGrp = new AutomatableButtonGroup( this );
 	m_passBtnGrp->addButton( hp_btn );
 	m_passBtnGrp->addButton( bp_btn );
 	m_passBtnGrp->addButton( lp_btn );
@@ -540,7 +534,7 @@ SidInstrumentView::SidInstrumentView( Instrument * _instrument,
 	mos8580_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "8580" ) );
 	mos8580_btn->setToolTip(tr("MOS8580 SID "));
 
-	m_sidTypeBtnGrp = new automatableButtonGroup( this );
+	m_sidTypeBtnGrp = new AutomatableButtonGroup( this );
 	m_sidTypeBtnGrp->addButton( mos6581_btn );
 	m_sidTypeBtnGrp->addButton( mos8580_btn );
 
@@ -602,7 +596,7 @@ SidInstrumentView::SidInstrumentView( Instrument * _instrument,
 			PLUGIN_NAME::getIconPixmap( "noise" ) );
 		noise_btn->setToolTip(tr("Noise"));
 
-		auto wfbg = new automatableButtonGroup(this);
+		auto wfbg = new AutomatableButtonGroup(this);
 
 		wfbg->addButton( pulse_btn );
 		wfbg->addButton( triangle_btn );

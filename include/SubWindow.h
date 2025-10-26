@@ -34,9 +34,7 @@
 
 class QGraphicsDropShadowEffect;
 class QLabel;
-class QMoveEvent;
 class QPushButton;
-class QResizeEvent;
 class QWidget;
 
 namespace lmms::gui
@@ -48,7 +46,7 @@ namespace lmms::gui
  * 
  *  Because of a bug in the QMdiSubWindow class to save the right position and size
  *  of a subwindow in a project and because of the inability
- *  for cusomizing the title bar appearance, lmms implements its own subwindow
+ *  for customizing the title bar appearance, lmms implements its own subwindow
  *  class.
  */
 class LMMS_EXPORT SubWindow : public QMdiSubWindow
@@ -68,6 +66,12 @@ public:
 	void setActiveColor( const QBrush & b );
 	void setTextShadowColor( const QColor &c );
 	void setBorderColor( const QColor &c );
+	int titleBarHeight() const;
+	int frameWidth() const;
+
+	// TODO Needed to update the title bar when replacing instruments.
+	// Update works automatically if QMdiSubWindows are used.
+	void updateTitleBar();
 
 protected:
 	// hook the QWidget move/resize events to update the tracked geometry
@@ -75,6 +79,8 @@ protected:
 	void resizeEvent( QResizeEvent * event ) override;
 	void paintEvent( QPaintEvent * pe ) override;
 	void changeEvent( QEvent * event ) override;
+
+	QPushButton* addTitleButton(const std::string& iconName, const QString& toolTip);
 
 signals:
 	void focusLost();

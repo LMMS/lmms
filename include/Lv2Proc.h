@@ -1,7 +1,7 @@
 /*
  * Lv2Proc.h - Lv2 processor class
  *
- * Copyright (c) 2019-2020 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
+ * Copyright (c) 2019-2022 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -31,13 +31,17 @@
 
 #include <lilv/lilv.h>
 #include <memory>
+#include <optional>
 
+#include <ringbuffer/ringbuffer.h>
+
+#include "LinkedModelGroups.h"
+#include "LmmsSemaphore.h"
 #include "Lv2Basics.h"
 #include "Lv2Features.h"
 #include "Lv2Options.h"
-#include "LinkedModelGroups.h"
+#include "Lv2Worker.h"
 #include "Plugin.h"
-#include "../src/3rdparty/ringbuffer/include/ringbuffer/ringbuffer.h"
 #include "TimePos.h"
 
 
@@ -45,6 +49,7 @@ namespace lmms
 {
 
 class PluginIssue;
+class SampleFrame;
 
 // forward declare port structs/enums
 namespace Lv2Ports
@@ -52,10 +57,6 @@ namespace Lv2Ports
 	struct Audio;
 	struct PortBase;
 	struct AtomSeq;
-
-	enum class Type;
-	enum class Flow;
-	enum class Vis;
 }
 
 
@@ -63,8 +64,9 @@ namespace Lv2Ports
 //! For Mono effects, 1 Lv2ControlBase references 2 Lv2Proc.
 class Lv2Proc : public LinkedModelGroup
 {
+	friend class Lv2ProcSuspender;
 public:
-	static Plugin::PluginTypes check(const LilvPlugin* plugin,
+	static Plugin::Type check(const LilvPlugin* plugin,
 		std::vector<PluginIssue> &issues);
 
 	/*
@@ -74,8 +76,6 @@ public:
 	~Lv2Proc() override;
 	void reload();
 	void onSampleRateChanged();
-	//! Must be checked after ctor or reload
-	bool isValid() const { return m_valid; }
 
 	/*
 		port access
@@ -131,7 +131,7 @@ public:
 	 * @param num Number of channels we must read from @param buf (starting at
 	 *   @p offset)
 	 */
-	void copyBuffersFromCore(const sampleFrame *buf,
+	void copyBuffersFromCore(const SampleFrame* buf,
 								unsigned firstChan, unsigned num, fpp_t frames);
 	/**
 	 * Copy our ports into buffers passed by the core
@@ -144,7 +144,7 @@ public:
 	 * @param num Number of channels we must write to @param buf (starting at
 	 *   @p offset)
 	 */
-	void copyBuffersToCore(sampleFrame *buf, unsigned firstChan, unsigned num,
+	void copyBuffersToCore(SampleFrame* buf, unsigned firstChan, unsigned num,
 								fpp_t frames) const;
 	//! Run the Lv2 plugin instance for @param frames frames
 	void run(fpp_t frames);
@@ -169,12 +169,16 @@ protected:
 	void shutdownPlugin();
 
 private:
-	bool m_valid = true;
-
 	const LilvPlugin* m_plugin;
-	LilvInstance* m_instance;
+	LilvInstance* m_instance = nullptr;
 	Lv2Features m_features;
+
+	// options
 	Lv2Options m_options;
+
+	// worker
+	std::optional<Lv2Worker> m_worker;
+	Semaphore m_workLock; // this must be shared by different workers
 
 	// full list of ports
 	std::vector<std::unique_ptr<Lv2Ports::PortBase>> m_ports;

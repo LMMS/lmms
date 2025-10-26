@@ -27,6 +27,7 @@
 
 #include <QStaticText>
 #include "ClipView.h"
+#include "embed.h"
 
 namespace lmms
 {
@@ -62,6 +63,11 @@ public:
 	QColor const & getMutedNoteBorderColor() const { return m_mutedNoteBorderColor; }
 	void setMutedNoteBorderColor(QColor const & color) { m_mutedNoteBorderColor = color; }
 
+	// Returns true if selection can be merged and false if not
+	static bool canMergeSelection(QVector<ClipView*> clipvs);
+	static void mergeClips(QVector<ClipView*> clipvs);
+	static void bulkClearNotesOutOfBounds(QVector<ClipView*> clipvs);
+
 public slots:
 	lmms::MidiClip* getMidiClip();
 	void update() override;
@@ -70,10 +76,12 @@ public slots:
 protected slots:
 	void openInPianoRoll();
 	void setGhostInPianoRoll();
+	void setGhostInAutomationEditor();
 
 	void resetName();
 	void changeName();
 	void transposeSelection();
+	void clearNotesOutOfBounds();
 
 
 protected:
@@ -85,10 +93,11 @@ protected:
 
 
 private:
-	static QPixmap * s_stepBtnOn0;
-	static QPixmap * s_stepBtnOn200;
-	static QPixmap * s_stepBtnOff;
-	static QPixmap * s_stepBtnOffLight;
+	QPixmap m_stepBtnOn0 = embed::getIconPixmap("step_btn_on_0");
+	QPixmap m_stepBtnOn200 = embed::getIconPixmap("step_btn_on_200");
+	QPixmap m_stepBtnOff = embed::getIconPixmap("step_btn_off");
+	QPixmap m_stepBtnOffLight = embed::getIconPixmap("step_btn_off_light");
+	QPixmap m_stepBtnHighlight = embed::getIconPixmap("step_btn_highlight");
 
 	MidiClip* m_clip;
 	QPixmap m_paintPixmap;
@@ -99,8 +108,12 @@ private:
 	QColor m_mutedNoteBorderColor;
 
 	QStaticText m_staticTextName;
-	
+
 	bool m_legacySEPattern;
+
+	bool isResizableBeforeStart() override { return false; }
+	
+	bool destructiveSplitClip(const TimePos pos) override;
 } ;
 
 

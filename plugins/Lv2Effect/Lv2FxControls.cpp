@@ -24,7 +24,6 @@
 
 #include "Lv2FxControls.h"
 
-#include <QDomElement>
 
 #include "Engine.h"
 #include "Lv2Effect.h"
@@ -38,11 +37,8 @@ Lv2FxControls::Lv2FxControls(class Lv2Effect *effect, const QString& uri) :
 	EffectControls(effect),
 	Lv2ControlBase(this, uri)
 {
-	if (isValid())
-	{
-		connect(Engine::audioEngine(), &AudioEngine::sampleRateChanged,
-			this, [this](){onSampleRateChanged();});
-	}
+	connect(Engine::audioEngine(), &AudioEngine::sampleRateChanged,
+		this, &Lv2FxControls::onSampleRateChanged);
 }
 
 

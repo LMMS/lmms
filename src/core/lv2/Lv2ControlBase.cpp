@@ -31,6 +31,7 @@
 #include <QtGlobal>
 
 #include "Engine.h"
+#include "lmms_constants.h"
 #include "Lv2Manager.h"
 #include "Lv2Proc.h"
 
@@ -39,7 +40,7 @@ namespace lmms
 {
 
 
-Plugin::PluginTypes Lv2ControlBase::check(const LilvPlugin *plugin,
+Plugin::Type Lv2ControlBase::check(const LilvPlugin *plugin,
 	std::vector<PluginIssue> &issues)
 {
 	// for some reason, all checks can be done by one processor...
@@ -59,7 +60,7 @@ Lv2ControlBase::Lv2ControlBase(Model* that, const QString &uri) :
 	else
 	{
 		qCritical() << "No Lv2 plugin found for URI" << uri;
-		m_valid = false;
+		throw std::runtime_error("No Lv2 plugin found for given URI");
 	}
 }
 
@@ -77,26 +78,14 @@ void Lv2ControlBase::init(Model* meAsModel)
 	while (channelsLeft > 0)
 	{
 		std::unique_ptr<Lv2Proc> newOne = std::make_unique<Lv2Proc>(m_plugin, meAsModel);
-		if (newOne->isValid())
-		{
-			channelsLeft -= std::max(
-				1 + static_cast<bool>(newOne->inPorts().m_right),
-				1 + static_cast<bool>(newOne->outPorts().m_right));
-			Q_ASSERT(channelsLeft >= 0);
-			m_procs.push_back(std::move(newOne));
-		}
-		else
-		{
-			qCritical() << "Failed instantiating LV2 processor";
-			m_valid = false;
-			channelsLeft = 0;
-		}
+		channelsLeft -= std::max(
+			1 + static_cast<bool>(newOne->inPorts().m_right),
+			1 + static_cast<bool>(newOne->outPorts().m_right));
+		Q_ASSERT(channelsLeft >= 0);
+		m_procs.push_back(std::move(newOne));
 	}
-	if (m_valid)
-	{
-		m_channelsPerProc = DEFAULT_CHANNELS / m_procs.size();
-		linkAllModels();
-	}
+	m_channelsPerProc = DEFAULT_CHANNELS / m_procs.size();
+	linkAllModels();
 }
 
 
@@ -149,7 +138,7 @@ void Lv2ControlBase::copyModelsToLmms() const
 
 
 
-void Lv2ControlBase::copyBuffersFromLmms(const sampleFrame *buf, fpp_t frames) {
+void Lv2ControlBase::copyBuffersFromLmms(const SampleFrame* buf, fpp_t frames) {
 	unsigned firstChan = 0; // tell the procs which channels they shall read from
 	for (const auto& c : m_procs) 
 	{
@@ -161,7 +150,7 @@ void Lv2ControlBase::copyBuffersFromLmms(const sampleFrame *buf, fpp_t frames) {
 
 
 
-void Lv2ControlBase::copyBuffersToLmms(sampleFrame *buf, fpp_t frames) const {
+void Lv2ControlBase::copyBuffersToLmms(SampleFrame* buf, fpp_t frames) const {
 	unsigned firstChan = 0; // tell the procs which channels they shall write to
 	for (const auto& c : m_procs) {
 		c->copyBuffersToCore(buf, firstChan, m_channelsPerProc, frames);

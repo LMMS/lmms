@@ -25,7 +25,6 @@
 #include "SimpleTextFloat.h"
 
 #include <QTimer>
-#include <QStyleOption>
 #include <QHBoxLayout>
 #include <QLabel>
 
@@ -45,6 +44,14 @@ SimpleTextFloat::SimpleTextFloat() :
 
 	m_textLabel = new QLabel(this);
 	layout->addWidget(m_textLabel);
+
+	m_showTimer = new QTimer(this);
+	m_showTimer->setSingleShot(true);
+	QObject::connect(m_showTimer, &QTimer::timeout, this, &SimpleTextFloat::show);
+
+	m_hideTimer = new QTimer(this);
+	m_hideTimer->setSingleShot(true);
+	QObject::connect(m_hideTimer, &QTimer::timeout, this, &SimpleTextFloat::hide);
 }
 
 void SimpleTextFloat::setText(const QString & text)
@@ -52,11 +59,28 @@ void SimpleTextFloat::setText(const QString & text)
 	m_textLabel->setText(text);
 }
 
-
-void SimpleTextFloat::setVisibilityTimeOut(int msecs)
+void SimpleTextFloat::showWithDelay(int msecBeforeDisplay, int msecDisplayTime)
 {
-	QTimer::singleShot(msecs, this, SLOT(hide()));
-	show();
+	if (msecBeforeDisplay > 0)
+	{
+		m_showTimer->start(msecBeforeDisplay);
+	}
+	else
+	{
+		show();
+	}
+
+	if (msecDisplayTime > 0)
+	{
+		m_hideTimer->start(msecBeforeDisplay + msecDisplayTime);
+	}
+}
+
+void SimpleTextFloat::hide()
+{
+	m_showTimer->stop();
+	m_hideTimer->stop();
+	QWidget::hide();
 }
 
 } // namespace lmms::gui

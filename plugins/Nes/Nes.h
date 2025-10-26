@@ -25,17 +25,15 @@
 #ifndef NES_H
 #define NES_H
 
-#include <cmath>
 
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "AutomatableModel.h"
 #include "PixmapButton.h"
-#include "MemoryManager.h"
 
 
 #define makeknob( name, x, y, hint, unit, oname ) 		\
-	name = new Knob( knobStyled, this ); 				\
+	name = new Knob( KnobType::Styled, this ); 				\
 	name ->move( x, y );								\
 	name ->setHintText( hint, unit );		\
 	name ->setObjectName( oname );						\
@@ -61,22 +59,22 @@ namespace lmms
 {
 
 
-const float NES_SIMPLE_FILTER = 1.0 / 20.0; // simulate nes analog audio output
+const float NES_SIMPLE_FILTER = 1.f / 20.f; // simulate nes analog audio output
 const float NFB = 895000.0f;
 const float NOISE_FREQS[16] = 
 	{ NFB/5, NFB/9, NFB/17, NFB/33, NFB/65, NFB/97, NFB/129, NFB/161, NFB/193, NFB/255, NFB/381, NFB/509, NFB/763, NFB/1017, NFB/2035, NFB/4069 };
 const uint16_t LFSR_INIT = 1;
 const float DUTY_CYCLE[4] = { 0.125, 0.25, 0.5, 0.75 };
-const float DITHER_AMP = 1.0 / 60.0;
+const float DITHER_AMP = 1.f / 60.f;
 const float MIN_FREQ = 10.0;
 const int TRIANGLE_WAVETABLE[32] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
 									15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 };
 
 const float NES_DIST = 0.9f; // simulate the slight nonlinear distortion in nes audio output
 
-const float NES_MIXING_12 = 1.0 / 20.0;
-const float NES_MIXING_34 = 1.0 / 12.0;
-const float NES_MIXING_ALL = 1.0 / ( NES_MIXING_12 + NES_MIXING_34 ); // constants to simulate the hardwired mixing values for nes channels
+const float NES_MIXING_12 = 1.f / 20.f;
+const float NES_MIXING_34 = 1.f / 12.f;
+const float NES_MIXING_ALL = 1.f / (NES_MIXING_12 + NES_MIXING_34); // constants to simulate the hardwired mixing values for nes channels
 
 const int MIN_WLEN = 4;
 
@@ -85,19 +83,18 @@ class NesInstrument;
 
 namespace gui
 {
-class Knob;
+class Knob;  // IWYU pragma: keep
 class NesInstrumentView;
 } // namespace gui
 
 
 class NesObject
 {
-	MM_OPERATORS
 public:
 	NesObject( NesInstrument * nes, const sample_rate_t samplerate, NotePlayHandle * nph );
 	virtual ~NesObject() = default;
 	
-	void renderOutput( sampleFrame * buf, fpp_t frames );
+	void renderOutput( SampleFrame* buf, fpp_t frames );
 	void updateVibrato( float * freq );
 	void updatePitch();
 	
@@ -136,13 +133,6 @@ public:
 	inline int wavelength( float freq )
 	{
 		return static_cast<int>( m_samplerate / freq );
-	}
-	
-	inline float signedPow( float f, float e )
-	{
-		return f < 0 
-			? powf( qAbs( f ), e ) * -1.0f
-			: powf( f, e );
 	}
 	
 	inline int nearestNoiseFreq( float f )
@@ -214,7 +204,7 @@ public:
 	~NesInstrument() override = default;
 	
 	void playNote( NotePlayHandle * n,
-						sampleFrame * workingBuffer ) override;
+						SampleFrame* workingBuffer ) override;
 	void deleteNotePluginData( NotePlayHandle * n ) override;
 
 
@@ -224,9 +214,9 @@ public:
 
 	QString nodeName() const override;
 
-	f_cnt_t desiredReleaseFrames() const override
+	float desiredReleaseTimeMs() const override
 	{
-		return( 8 );
+		return 0.2f;
 	}
 	
 	gui::PluginView* instantiateView( QWidget * parent ) override;
@@ -327,7 +317,7 @@ private:
 	PixmapButton *	m_ch1EnvLoopedBtn;
 	Knob *			m_ch1EnvLenKnob;
 	
-	automatableButtonGroup *	m_ch1DutyCycleGrp;
+	AutomatableButtonGroup *	m_ch1DutyCycleGrp;
 	
 	PixmapButton *	m_ch1SweepEnabledBtn;
 	Knob *			m_ch1SweepAmtKnob;
@@ -342,7 +332,7 @@ private:
 	PixmapButton *	m_ch2EnvLoopedBtn;
 	Knob *			m_ch2EnvLenKnob;
 	
-	automatableButtonGroup *	m_ch2DutyCycleGrp;
+	AutomatableButtonGroup *	m_ch2DutyCycleGrp;
 	
 	PixmapButton *	m_ch2SweepEnabledBtn;
 	Knob *			m_ch2SweepAmtKnob;
@@ -372,7 +362,6 @@ private:
 	Knob *			m_masterVolKnob;
 	Knob *			m_vibratoKnob;	
 	
-	static QPixmap *	s_artwork;
 };
 
 

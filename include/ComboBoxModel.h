@@ -45,11 +45,7 @@ public:
 					bool isDefaultConstructed = false ) :
 		IntModel( 0, 0, 0, parent, displayName, isDefaultConstructed )
 	{
-	}
-
-	~ComboBoxModel() override
-	{
-		clear();
+		setJournalling(false);
 	}
 
 	void addItem( QString item, std::unique_ptr<PixmapLoader> loader = nullptr );
@@ -72,12 +68,12 @@ public:
 
 	const QString & itemText( int i ) const
 	{
-		return m_items[qBound<int>( minValue(), i,  maxValue() )].first;
+		return m_items[std::clamp(i, minValue(), maxValue())].first;
 	}
 
 	const PixmapLoader* itemPixmap( int i ) const
 	{
-		return m_items[qBound<int>( minValue(), i, maxValue() )].second.get();
+		return m_items[std::clamp(i, minValue(), maxValue())].second.get();
 	}
 
 	int size() const

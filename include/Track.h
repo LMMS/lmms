@@ -25,12 +25,14 @@
 #ifndef LMMS_TRACK_H
 #define LMMS_TRACK_H
 
-#include <QVector>
+#include <vector>
+
 #include <QColor>
 
 #include "AutomatableModel.h"
 #include "JournallingObject.h"
-#include "lmms_basics.h"
+#include "LmmsTypes.h"
+#include <optional>
 
 
 namespace lmms
@@ -65,35 +67,34 @@ char const *const FILENAME_FILTER = "[\\0000-\x1f\"*/:<>?\\\\|\x7f]";
 class LMMS_EXPORT Track : public Model, public JournallingObject
 {
 	Q_OBJECT
-	MM_OPERATORS
 	mapPropertyFromModel(bool,isMuted,setMuted,m_mutedModel);
 	mapPropertyFromModel(bool,isSolo,setSolo,m_soloModel);
 public:
-	using clipVector = QVector<Clip*>;
+	using clipVector = std::vector<Clip*>;
 
-	enum TrackTypes
+	enum class Type
 	{
-		InstrumentTrack,
-		PatternTrack,
-		SampleTrack,
-		EventTrack,
-		VideoTrack,
-		AutomationTrack,
-		HiddenAutomationTrack,
-		NumTrackTypes
+		Instrument,
+		Pattern,
+		Sample,
+		Event,
+		Video,
+		Automation,
+		HiddenAutomation,
+		Count
 	} ;
 
-	Track( TrackTypes type, TrackContainer * tc );
+	Track( Type type, TrackContainer * tc );
 	~Track() override;
 
-	static Track * create( TrackTypes tt, TrackContainer * tc );
+	static Track * create( Type tt, TrackContainer * tc );
 	static Track * create( const QDomElement & element,
 							TrackContainer * tc );
 	Track * clone();
 
 
 	// pure virtual functions
-	TrackTypes type() const
+	Type type() const
 	{
 		return m_type;
 	}
@@ -106,18 +107,16 @@ public:
 	virtual gui::TrackView * createView( gui::TrackContainerView * view ) = 0;
 	virtual Clip * createClip( const TimePos & pos ) = 0;
 
-	virtual void saveTrackSpecificSettings( QDomDocument & doc,
-						QDomElement & parent ) = 0;
+	virtual void saveTrackSpecificSettings(QDomDocument& doc, QDomElement& parent, bool presetMode) = 0;
 	virtual void loadTrackSpecificSettings( const QDomElement & element ) = 0;
 
+	// Saving and loading of presets which do not necessarily contain all the track information
+	void savePreset(QDomDocument & doc, QDomElement & element);
+	void loadPreset(const QDomElement & element);
 
+	// Saving and loading of full tracks
 	void saveSettings( QDomDocument & doc, QDomElement & element ) override;
 	void loadSettings( const QDomElement & element ) override;
-
-	void setSimpleSerializing()
-	{
-		m_simpleSerializingMode = true;
-	}
 
 	// -- for usage by Clip only ---------------
 	Clip * addClip( Clip * clip );
@@ -126,7 +125,7 @@ public:
 	void deleteClips();
 
 	int numOfClips();
-	Clip * getClip( int clipNum );
+	auto getClip(std::size_t clipNum) -> Clip*;
 	int getClipNum(const Clip* clip );
 
 	const clipVector & getClips() const
@@ -187,15 +186,9 @@ public:
 	{
 		return m_processingLock.tryLock();
 	}
-	
-	QColor color()
-	{
-		return m_color;
-	}
-	bool useColor()
-	{
-		return m_hasColor;
-	}
+
+	auto color() const -> const std::optional<QColor>& { return m_color; }
+	void setColor(const std::optional<QColor>& color);
 
 	bool isMutedBeforeSolo() const
 	{
@@ -205,11 +198,7 @@ public:
 	BoolModel* getMutedModel();
 
 public slots:
-	virtual void setName( const QString & newName )
-	{
-		m_name = newName;
-		emit nameChanged();
-	}
+	virtual void setName(const QString& newName);
 
 	void setMutedBeforeSolo(const bool muted)
 	{
@@ -218,30 +207,28 @@ public slots:
 
 	void toggleSolo();
 
-	void setColor(const QColor& c);
-	void resetColor();
+private:
+	void saveTrack(QDomDocument& doc, QDomElement& element, bool presetMode);
+	void loadTrack(const QDomElement& element, bool presetMode);
 
 private:
 	TrackContainer* m_trackContainer;
-	TrackTypes m_type;
+	Type m_type;
 	QString m_name;
 	int m_height;
 
 protected:
 	BoolModel m_mutedModel;
+	BoolModel m_soloModel;
 
 private:
-	BoolModel m_soloModel;
 	bool m_mutedBeforeSolo;
-
-	bool m_simpleSerializingMode;
 
 	clipVector m_clips;
 
 	QMutex m_processingLock;
 	
-	QColor m_color;
-	bool m_hasColor;
+	std::optional<QColor> m_color;
 
 	friend class gui::TrackView;
 

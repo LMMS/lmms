@@ -26,27 +26,27 @@
 #ifndef WATSYN_H
 #define WATSYN_H
 
+#include "AudioResampler.h"
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "Graph.h"
 #include "AutomatableModel.h"
 #include "TempoSyncKnob.h"
 #include <samplerate.h>
-#include "MemoryManager.h"
 
 namespace lmms
 {
 
 
 #define makeknob( name, x, y, hint, unit, oname ) 		\
-	name = new Knob( knobStyled, this ); 				\
+	name = new Knob( KnobType::Styled, this ); 				\
 	name ->move( x, y );								\
 	name ->setHintText( hint, unit );		\
 	name ->setObjectName( oname );						\
 	name ->setFixedSize( 19, 19 );
 
 #define maketsknob( name, x, y, hint, unit, oname ) 		\
-	name = new TempoSyncKnob( knobStyled, this ); 				\
+	name = new TempoSyncKnob( KnobType::Styled, this ); 				\
 	name ->move( x, y );								\
 	name ->setHintText( hint, unit );		\
 	name ->setObjectName( oname );						\
@@ -81,14 +81,13 @@ class WatsynInstrument;
 
 namespace gui
 {
-class automatableButtonGroup;
+class AutomatableButtonGroup;
 class PixmapButton;
 class WatsynView;
 }
 
 class WatsynObject
 {
-	MM_OPERATORS
 public:
 	WatsynObject( 	float * _A1wave, float * _A2wave,
 					float * _B1wave, float * _B2wave,
@@ -98,11 +97,11 @@ public:
 
 	void renderOutput( fpp_t _frames );
 
-	inline sampleFrame * abuf() const
+	inline SampleFrame* abuf() const
 	{
 		return m_abuf;
 	}
-	inline sampleFrame * bbuf() const
+	inline SampleFrame* bbuf() const
 	{
 		return m_bbuf;
 	}
@@ -122,8 +121,8 @@ private:
 
 	WatsynInstrument * m_parent;
 
-	sampleFrame * m_abuf;
-	sampleFrame * m_bbuf;
+	SampleFrame* m_abuf;
+	SampleFrame* m_bbuf;
 
 	float m_lphase [NUM_OSCS];
 	float m_rphase [NUM_OSCS];
@@ -142,7 +141,7 @@ public:
 	~WatsynInstrument() override = default;
 
 	void playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer ) override;
+						SampleFrame* _working_buffer ) override;
 	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
 
@@ -152,9 +151,9 @@ public:
 
 	QString nodeName() const override;
 
-	f_cnt_t desiredReleaseFrames() const override
+	float desiredReleaseTimeMs() const override
 	{
-		return( 64 );
+		return 1.5f;
 	}
 
 	gui::PluginView* instantiateView( QWidget * _parent ) override;
@@ -189,28 +188,23 @@ private:
 	}
 
 	// memcpy utilizing libsamplerate (src) for sinc interpolation
-	inline void srccpy( float * _dst, float * _src )
+	inline void srccpy(float* _dst, float* _src)
 	{
-		int err;
-		const int margin = 64;
-		
-		// copy to temp array
-		float tmps [ GRAPHLEN + margin ]; // temp array in stack
-		float * tmp = &tmps[0];
+		auto srcIndex = f_cnt_t{0};
+		auto dstIndex = f_cnt_t{0};
 
-		memcpy( tmp, _src, sizeof( float ) * GRAPHLEN );
-		memcpy( tmp + GRAPHLEN, _src, sizeof( float ) * margin );
-		SRC_STATE * src_state = src_new( SRC_SINC_FASTEST, 1, &err );
-		SRC_DATA src_data;
-		src_data.data_in = tmp;
-		src_data.input_frames = GRAPHLEN + margin;
-		src_data.data_out = _dst;
-		src_data.output_frames = WAVELEN;
-		src_data.src_ratio = static_cast<double>( WAVERATIO );
-		src_data.end_of_input = 0;
-		err = src_process( src_state, &src_data ); 
-		if( err ) { qDebug( "Watsyn SRC error: %s", src_strerror( err ) ); }
-		src_delete( src_state );
+		m_resampler.reset();
+		m_resampler.setRatio(WAVERATIO);
+
+		while (dstIndex < WAVELEN)
+		{
+			const auto input = InterleavedBufferView<const float, 1>{_src + srcIndex, GRAPHLEN - srcIndex};
+			const auto output = InterleavedBufferView<float, 1>{_dst + dstIndex, WAVELEN - dstIndex};
+			const auto result = m_resampler.process(input, output);
+
+			srcIndex = (srcIndex + result.inputFramesUsed) % GRAPHLEN;
+			dstIndex += result.outputFramesGenerated;
+		}
 	}
 
 	// memcpy utilizing cubic interpolation
@@ -244,6 +238,7 @@ private:
 		}
 	}*/
 
+	AudioResampler m_resampler = AudioResampler{AudioResampler::Mode::SincFastest, 1};
 
 	FloatModel a1_vol;
 	FloatModel a2_vol;
@@ -366,9 +361,9 @@ private:
 
 	Knob * m_xtalkKnob;
 
-	automatableButtonGroup * m_selectedGraphGroup;
-	automatableButtonGroup * m_aModGroup;
-	automatableButtonGroup * m_bModGroup;
+	AutomatableButtonGroup * m_selectedGraphGroup;
+	AutomatableButtonGroup * m_aModGroup;
+	AutomatableButtonGroup * m_bModGroup;
 
 	Graph * a1_graph;
 	Graph * a2_graph;

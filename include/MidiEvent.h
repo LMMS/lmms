@@ -27,7 +27,7 @@
 
 #include <cstdlib>
 #include "Midi.h"
-#include "panning_constants.h"
+#include "panning.h"
 #include "volume.h"
 
 namespace lmms
@@ -189,6 +189,8 @@ public:
 	{
 		setParam( 0, pitchBend );
 	}
+
+	auto sysExData() const -> const char* { return m_sysExData; }
 
 	Source source() const
 	{

@@ -63,7 +63,7 @@ Plugin::Descriptor PLUGIN_EXPORT freeboy_plugin_descriptor =
 	"Attila Herman <attila589/at/gmail.com>"
 	"Csaba Hruska <csaba.hruska/at/gmail.com>",
 	0x0100,
-	Plugin::Instrument,
+	Plugin::Type::Instrument,
 	new PluginPixmapLoader( "logo" ),
 	nullptr,
 } ;
@@ -220,37 +220,25 @@ QString FreeBoyInstrument::nodeName() const
 
 
 
-/*f_cnt_t FreeBoyInstrument::desiredReleaseFrames() const
+float FreeBoyInstrument::desiredReleaseTimeMs() const
 {
-	const float samplerate = Engine::audioEngine()->processingSampleRate();
-	int maxrel = 0;
-	for( int i = 0 ; i < 3 ; ++i )
-	{
-		if( maxrel < m_voice[i]->m_releaseModel.value() )
-			maxrel = m_voice[i]->m_releaseModel.value();
-	}
-
-	return f_cnt_t( float(relTime[maxrel])*samplerate/1000.0 );
-}*/
-
-f_cnt_t FreeBoyInstrument::desiredReleaseFrames() const
-{
-	return f_cnt_t( 1000 );
+	// Previous implementation was 1000 samples. At 44.1 kHz this is somewhat shy of 23. ms.
+	return 23.f;
 }
 
 
 
-void FreeBoyInstrument::playNote(NotePlayHandle* nph, sampleFrame* workingBuffer)
+void FreeBoyInstrument::playNote(NotePlayHandle* nph, SampleFrame* workingBuffer)
 {
 	const f_cnt_t tfp = nph->totalFramesPlayed();
-	const int samplerate = Engine::audioEngine()->processingSampleRate();
+	const int samplerate = Engine::audioEngine()->outputSampleRate();
 	const fpp_t frames = nph->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = nph->noteOffset();
 
 	int data = 0;
 	int freq = nph->frequency();
 
-	if ( tfp == 0 )
+	if (!nph->m_pluginData)
 	{
 		auto papu = new GbApuWrapper{};
 		papu->setSampleRate(samplerate, CLOCK_RATE);
@@ -364,14 +352,14 @@ void FreeBoyInstrument::playNote(NotePlayHandle* nph, sampleFrame* workingBuffer
 		// a unique frequency, we can start by guessing s = r = 0 here and then skip r = 0 in the loop.
 		char clock_freq = 0;
 		char div_ratio = 0;
-		float closest_freq = 524288.0 / (0.5 * std::pow(2.0, clock_freq + 1.0));
+		float closest_freq = 524288.0 / (0.5 * std::exp2(clock_freq + 1.0));
 		// This nested for loop iterates over all possible combinations of clock frequency and dividing
 		// ratio and chooses the combination whose resulting frequency is closest to the note frequency
 		for (char s = 0; s < 16; ++s)
 		{
 			for (char r = 1; r < 8; ++r)
 			{
-				float f = 524288.0 / (r * std::pow(2.0, s + 1.0));
+				float f = 524288.0 / (r * std::exp2(s + 1.0));
 				if (std::fabs(freq - closest_freq) > std::fabs(freq - f))
 				{
 					closest_freq = f;
@@ -392,9 +380,8 @@ void FreeBoyInstrument::playNote(NotePlayHandle* nph, sampleFrame* workingBuffer
 		papu->writeRegister(0xff23, 128);
 	}
 
-	constexpr int bufSize = 2048;
-	int framesLeft = frames;
-	int dataLen = 0;
+	constexpr auto bufSize = f_cnt_t{2048};
+	auto framesLeft = frames;
 	auto buf = std::array<blip_sample_t, bufSize * 2>{};
 	while (framesLeft > 0)
 	{
@@ -404,12 +391,11 @@ void FreeBoyInstrument::playNote(NotePlayHandle* nph, sampleFrame* workingBuffer
 			papu->endFrame(FRAME_LENGTH);
 			avail = papu->samplesAvail();
 		}
-		dataLen = framesLeft > avail ? avail : framesLeft;
-		dataLen = dataLen > bufSize ? bufSize : dataLen;
+		const auto dataLen = std::min({static_cast<f_cnt_t>(avail), framesLeft, bufSize});
 
-		long count = papu->readSamples(buf.data(), dataLen * 2) / 2;
+		const auto count = static_cast<f_cnt_t>(papu->readSamples(buf.data(), dataLen * 2) / 2);
 
-		for (fpp_t frame = 0; frame < count; ++frame)
+		for (auto frame = std::size_t{0}; frame < count; ++frame)
 		{
 			for (ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch)
 			{
@@ -419,7 +405,6 @@ void FreeBoyInstrument::playNote(NotePlayHandle* nph, sampleFrame* workingBuffer
 		}
 		framesLeft -= count;
 	}
-	instrumentTrack()->processAudioBuffer(workingBuffer, frames + offset, nph);
 }
 
 
@@ -446,7 +431,7 @@ class FreeBoyKnob : public Knob
 {
 public:
 	FreeBoyKnob( QWidget * _parent ) :
-			Knob( knobStyled, _parent )
+			Knob( KnobType::Styled, _parent )
 	{
 		setFixedSize( 30, 30 );
 		setCenterPointX( 15.0 );
@@ -677,7 +662,7 @@ FreeBoyInstrumentView::FreeBoyInstrumentView( Instrument * _instrument,
 
 
 	m_graph = new Graph( this );
-	m_graph->setGraphStyle( Graph::NearestStyle );
+	m_graph->setGraphStyle( Graph::Style::Nearest );
 	m_graph->setGraphColor( QColor(0x4E, 0x83, 0x2B) );
 	m_graph->move( 37, 199 );
 	m_graph->resize(208, 47);

@@ -74,10 +74,9 @@ private:
 	QPixmap m_paintPixmap;
 	
 	QStaticText m_staticTextName;
-	
-	static QPixmap * s_clip_rec;
-
 	void scaleTimemapToFit( float oldMin, float oldMax );
+	
+	bool isResizableBeforeStart() override { return false; }
 } ;
 
 

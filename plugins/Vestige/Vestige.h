@@ -27,17 +27,16 @@
 #define _VESTIGE_H
 
 
-#include <QMdiSubWindow>
 #include <QMutex>
 
 #include "Instrument.h"
 #include "InstrumentView.h"
 
 
-class QPixmap;
+class QGridLayout;
+class QMdiSubWindow;
 class QPushButton;
 class QScrollArea;
-class QGridLayout;
 
 namespace lmms
 {
@@ -61,7 +60,7 @@ public:
 	VestigeInstrument( InstrumentTrack * _instrument_track );
 	virtual ~VestigeInstrument();
 
-	virtual void play( sampleFrame * _working_buffer );
+	virtual void play( SampleFrame* _working_buffer );
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );
@@ -69,11 +68,6 @@ public:
 	virtual QString nodeName() const;
 
 	virtual void loadFile( const QString & _file );
-
-	virtual Flags flags() const
-	{
-		return IsSingleStreamed | IsMidiBased;
-	}
 
 	virtual bool handleMidiEvent( const MidiEvent& event, const TimePos& time, f_cnt_t offset = 0 );
 
@@ -131,8 +125,6 @@ protected:
 
 
 private:
-	static QPixmap * s_artwork;
-
 	VestigeInstrument * m_vi;
 
 	QWidget *widget;
@@ -175,7 +167,6 @@ protected:
 private:
 	virtual void modelChanged();
 
-	static QPixmap * s_artwork;
 
 	VestigeInstrument * m_vi;
 

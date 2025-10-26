@@ -37,6 +37,7 @@ namespace lmms::gui
 class InstrumentTrackWindow;
 class Knob;
 class MidiCCRackView;
+class MixerChannelLcdSpinBox;
 class TrackContainerView;
 class TrackLabelButton;
 
@@ -72,6 +73,7 @@ public:
 
 
 protected:
+	void modelChanged() override;
 	void dragEnterEvent( QDragEnterEvent * _dee ) override;
 	void dropEvent( QDropEvent * _de ) override;
 
@@ -91,12 +93,15 @@ private slots:
 
 	void handleConfigChange(QString cls, QString attr, QString value);
 
+private:
+	static QPixmap determinePixmap(InstrumentTrack* instrumentTrack);
 
 private:
 	InstrumentTrackWindow * m_window;
 
 	// widgets in track-settings-widget
 	TrackLabelButton * m_tlb;
+	MixerChannelLcdSpinBox* m_mixerChannelNumber;
 	Knob * m_volumeKnob;
 	Knob * m_panningKnob;
 	FadeButton * m_activityIndicator;
