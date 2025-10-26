@@ -201,6 +201,7 @@ void SubWindow::setVisible(bool visible)
 
 void SubWindow::showEvent(QShowEvent* e)
 {
+	widget()->show();
 	if (isDetached())
 	{
 		widget()->setGeometry(m_childGeom);

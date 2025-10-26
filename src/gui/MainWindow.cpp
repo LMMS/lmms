@@ -557,7 +557,6 @@ SubWindow* MainWindow::addWindowedWidget(QWidget *w, Qt::WindowFlags windowFlags
 {
 	// wrap the widget in our own *custom* window that patches some errors in QMdiSubWindow
 	auto win = new SubWindow(m_workspace->viewport(), windowFlags);
-	win->setAttribute(Qt::WA_DeleteOnClose);
 	win->setWidget(w);
 	if (w && w->sizeHint().isValid()) {
 		auto titleBarHeight = win->titleBarHeight();
