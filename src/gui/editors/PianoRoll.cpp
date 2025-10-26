@@ -4927,7 +4927,7 @@ PianoRollWindow::PianoRollWindow() :
 	quantizeButtonMenu->addAction(quantizePosAction);
 	quantizeButtonMenu->addAction(quantizeLengthAction);
 
-	quantizeAction->setShortcut( Qt::SHIFT | Qt::Key_Q );
+	quantizeAction->setShortcut(combine(Qt::SHIFT, Qt::Key_Q));
 
 	notesActionsToolBar->addAction( drawAction );
 	notesActionsToolBar->addAction( eraseAction );

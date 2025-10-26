@@ -56,7 +56,6 @@
 #include "TimeDisplayWidget.h"
 #include "TimeLineWidget.h"
 #include "TrackView.h"
-#include "qnamespace.h"
 
 namespace lmms::gui
 {

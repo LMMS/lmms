@@ -305,7 +305,7 @@ void MainWindow::finalize()
 					tr( "Import..." ),
 					this,
 					SLOT(onImportProject()),
-					Qt::CTRL + Qt::Key_I );
+					combine(Qt::CTRL, Qt::Key_I));
 	project_menu->addAction( embed::getIconPixmap( "project_export" ),
 					tr( "E&xport..." ),
 					this,
@@ -630,7 +630,7 @@ bool MainWindow::mayChangeProject(bool stopPlayback)
 	);
 
 	QAbstractButton* discardButton = mb.addButton(QMessageBox::Discard);
-	discardButton->setShortcut(Qt::CTRL | Qt::Key_D);
+	discardButton->setShortcut(combine(Qt::CTRL, Qt::Key_D));
 	int answer = mb.exec();
 
 	if( answer == QMessageBox::Save )
