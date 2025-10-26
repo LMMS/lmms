@@ -557,11 +557,11 @@ void AutomationClip::applyDragValue()
 
 
 
-float AutomationClip::valueAt( const TimePos & _time ) const
+float AutomationClip::valueAt(const TimePos& _time, bool wantInValue) const
 {
 	QMutexLocker m(&m_clipMutex);
 
-	if( m_timeMap.isEmpty() )
+	if (m_timeMap.isEmpty())
 	{
 		return 0;
 	}
@@ -569,8 +569,17 @@ float AutomationClip::valueAt( const TimePos & _time ) const
 	// If we have a node at that time, just return its value
 	if (m_timeMap.contains(_time))
 	{
-		// When the time is exactly the node's time, we want the inValue
-		return m_timeMap[_time].getInValue();
+		// When the time is exactly the node's time, we want the outValue
+		// to ensure that discrete jumps are handled correctly while playing.
+		// UI functions may want the inValue instead.
+		if (!wantInValue)
+		{
+			return m_timeMap[_time].getOutValue();
+		}
+		else
+		{
+			return m_timeMap[_time].getInValue();
+		}
 	}
 
 	// lowerBound returns next value with equal or greater key. Since we already
@@ -578,11 +587,11 @@ float AutomationClip::valueAt( const TimePos & _time ) const
 	// key than _time. Therefore we take the previous element to calculate the current value
 	timeMap::const_iterator v = m_timeMap.lowerBound(_time);
 
-	if( v == m_timeMap.begin() )
+	if (v == m_timeMap.begin())
 	{
 		return 0;
 	}
-	if( v == m_timeMap.end() )
+	if (v == m_timeMap.end())
 	{
 		// When the time is after the last node, we want the outValue of it
 		return OUTVAL(v - 1);
@@ -596,7 +605,7 @@ float AutomationClip::valueAt( const TimePos & _time ) const
 
 // This method will get the value at an offset from a node, so we use the outValue of
 // that node and the inValue of the next node for the calculations.
-float AutomationClip::valueAt( timeMap::const_iterator v, int offset ) const
+float AutomationClip::valueAt(timeMap::const_iterator v, int offset) const
 {
 	QMutexLocker m(&m_clipMutex);
 
