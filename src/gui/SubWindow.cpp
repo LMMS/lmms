@@ -114,26 +114,6 @@ SubWindow::SubWindow(QWidget *parent, Qt::WindowFlags windowFlags) :
 
 
 /**
- * @brief SubWindow::setWidget
- *
- *  This is a wrapper to initialize everything that depends on a child widget.
- *  Though technically not an override, this is the only way
- *  to set the child widget, and the best way to track that.
- */
-void SubWindow::setWidget(QWidget* w)
-{
-	QMdiSubWindow::setWidget(w);
-
-	if (widget())
-	{
-		m_childGeom = widget()->geometry();
-	}
-}
-
-
-
-
-/**
  * @brief SubWindow::paintEvent
  * 
  *  This draws our new title bar with custom colors
@@ -345,6 +325,7 @@ void SubWindow::detach()
 
 	hide();
 	widget()->setWindowFlags(flags);
+	m_childGeom = widget()->geometry(); // reset/init tracked detached geometry since it's only needed there
 
 	if (shown) { widget()->show(); }
 
@@ -639,11 +620,11 @@ bool SubWindow::eventFilter(QObject* obj, QEvent* event)
 			return QMdiSubWindow::eventFilter(obj, event);
 
 		case QEvent::Move:
-			m_childGeom.moveTo(static_cast<QMoveEvent*>(event)->pos());
+			if (isDetached()) { m_childGeom.moveTo(static_cast<QMoveEvent*>(event)->pos()); }
 			return QMdiSubWindow::eventFilter(obj, event);
 
 		case QEvent::Resize:
-			m_childGeom.setSize(static_cast<QResizeEvent*>(event)->size());
+			if (isDetached()) { m_childGeom.setSize(static_cast<QResizeEvent*>(event)->size()); }
 			return QMdiSubWindow::eventFilter(obj, event);
 
 		default:

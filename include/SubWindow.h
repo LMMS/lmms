@@ -69,7 +69,6 @@ public:
 	void setBorderColor( const QColor &c );
 	int titleBarHeight() const;
 	int frameWidth() const;
-	void setWidget(QWidget* widget);  // Hook for QMdiSubWindow::setWidget
 	bool isDetached() const;
 	void setDetached(bool on);
 
