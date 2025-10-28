@@ -162,7 +162,7 @@ namespace lmms::PathUtil
 		QFileInfo vstInfo(vstPath);
 		if (vstInfo.exists()) { assumedBase = Base::UserVST; }
 
-		// Assume we've found the correct base location, return the full path.
+		// Assume we've found the correct base location, return the full path
 		return basePrefix(assumedBase) + path;
 	}
 
