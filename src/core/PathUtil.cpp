@@ -157,7 +157,7 @@ namespace lmms::PathUtil
 		QFileInfo factoryInfo(factoryPath);
 		if (factoryInfo.exists()) { assumedBase = Base::FactorySample; }
 
-		//Check if it's a VST.
+		//Check if it's a VST
 		QString vstPath = baseLocation(Base::UserVST) + path;
 		QFileInfo vstInfo(vstPath);
 		if (vstInfo.exists()) { assumedBase = Base::UserVST; }
