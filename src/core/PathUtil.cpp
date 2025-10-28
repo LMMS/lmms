@@ -56,7 +56,7 @@ namespace lmms::PathUtil
 					loc = QFileInfo(projectPath).path();
 				}
 				// We resolved it properly if we had an open Song and the project
-				// filename wasn't empty.
+				// filename wasn't empty
 				if (error) { *error = (!s || projectPath.isEmpty()); }
 				break;
 			}
@@ -219,7 +219,7 @@ namespace lmms::PathUtil
 		for (auto base: relativeBases)
 		{
 			// Skip local paths when searching for the shortest relative if those
-			// are not allowed for that resource.
+			// are not allowed for that resource
 			if (base == Base::LocalDir && !allowLocal) { continue; }
 
 			QString otherPath = relativeOrAbsolute(absolutePath, base);
