@@ -121,9 +121,9 @@ struct SoundFontPluginData
 
 
 
-SoundFontInstrument::SoundFontInstrument( InstrumentTrack * _instrument_track ) :
-	Instrument(_instrument_track, &soundfontplayer_plugin_descriptor, nullptr, Flag::IsSingleStreamed),
-	m_srcState( nullptr ),
+SoundFontInstrument::SoundFontInstrument(InstrumentTrack* instrument_track) :
+	Instrument(instrument_track, &soundfontplayer_plugin_descriptor, nullptr, Flag::IsSingleStreamed),
+	m_resampler(AudioResampler::Mode::Linear),
 	m_synth(nullptr),
 	m_font( nullptr ),
 	m_fontId( 0 ),
@@ -235,11 +235,6 @@ SoundFontInstrument::~SoundFontInstrument()
 	freeFont();
 	delete_fluid_synth( m_synth );
 	delete_fluid_settings( m_settings );
-	if( m_srcState != nullptr )
-	{
-		src_delete( m_srcState );
-	}
-
 }
 
 
@@ -590,7 +585,9 @@ void SoundFontInstrument::reloadSynth()
 	// Set & get, returns the true sample rate
 	fluid_settings_setnum( m_settings, (char *) "synth.sample-rate", Engine::audioEngine()->outputSampleRate() );
 	fluid_settings_getnum( m_settings, (char *) "synth.sample-rate", &tempRate );
+
 	m_internalSampleRate = static_cast<int>( tempRate );
+	m_resampler.setRatio(m_internalSampleRate, Engine::audioEngine()->outputSampleRate());
 
 	if( m_font )
 	{
@@ -620,31 +617,19 @@ void SoundFontInstrument::reloadSynth()
 	}
 
 	m_synthMutex.lock();
-	if( Engine::audioEngine()->currentQualitySettings().interpolation >=
-			AudioEngine::qualitySettings::Interpolation::SincFastest )
+
+	if (m_internalSampleRate != Engine::audioEngine()->outputSampleRate())
 	{
-		fluid_synth_set_interp_method( m_synth, -1, FLUID_INTERP_7THORDER );
+		// LMMS supports a sample rate of 192 kHZ, while FluidSynth only supports up to 96 kHZ.
+		// Because of this, the instrument is resampled using libsamplerate when necessary.
+		// This uses linear interpolation, so the instrument's interpolation is set to FLUID_INTERP_LINEAR
+		// to match. A better option might be to make the interpolation option modifiable by the user, as well as only
+		// supporting only up to 96 kHZ (though that may be a problem if theres a strong need for 192 kHZ).
+		fluid_synth_set_interp_method(m_synth, -1, FLUID_INTERP_LINEAR);
 	}
-	else
-	{
-		fluid_synth_set_interp_method( m_synth, -1, FLUID_INTERP_DEFAULT );
-	}
+
 	m_synthMutex.unlock();
-	if( m_internalSampleRate < Engine::audioEngine()->outputSampleRate() )
-	{
-		m_synthMutex.lock();
-		if( m_srcState != nullptr )
-		{
-			src_delete( m_srcState );
-		}
-		int error;
-		m_srcState = src_new( Engine::audioEngine()->currentQualitySettings().libsrcInterpolation(), DEFAULT_CHANNELS, &error );
-		if( m_srcState == nullptr || error )
-		{
-			qCritical("error while creating libsamplerate data structure in SoundFontInstrument::reloadSynth()");
-		}
-		m_synthMutex.unlock();
-	}
+
 	updateReverb();
 	updateChorus();
 	updateReverbOn();
@@ -884,44 +869,38 @@ void SoundFontInstrument::play( SampleFrame* _working_buffer )
 
 void SoundFontInstrument::renderFrames( f_cnt_t frames, SampleFrame* buf )
 {
-	m_synthMutex.lock();
-	fluid_synth_get_gain(m_synth); // This flushes voice updates as a side effect
-	if( m_internalSampleRate < Engine::audioEngine()->outputSampleRate() &&
-							m_srcState != nullptr )
-	{
-		const fpp_t f = frames * m_internalSampleRate / Engine::audioEngine()->outputSampleRate();
-#ifdef __GNUC__
-		SampleFrame tmp[f];
-#else
-		SampleFrame* tmp = new SampleFrame[f];
-#endif
-		fluid_synth_write_float( m_synth, f, tmp, 0, 2, tmp, 1, 2 );
+	const auto guard = std::lock_guard{m_synthMutex};
 
-		SRC_DATA src_data;
-		src_data.data_in = (float *)tmp;
-		src_data.data_out = (float *)buf;
-		src_data.input_frames = f;
-		src_data.output_frames = frames;
-		src_data.src_ratio = (double) frames / f;
-		src_data.end_of_input = 0;
-		int error = src_process( m_srcState, &src_data );
-#ifndef __GNUC__
-		delete[] tmp;
-#endif
-		if( error )
-		{
-			qCritical( "SoundFontInstrument: error while resampling: %s", src_strerror( error ) );
-		}
-		if (static_cast<f_cnt_t>(src_data.output_frames_gen) < frames)
-		{
-			qCritical("SoundFontInstrument: not enough frames: %ld / %zu", src_data.output_frames_gen, frames);
-		}
+	fluid_synth_get_gain(m_synth); // This flushes voice updates as a side effect
+
+	if (m_internalSampleRate == Engine::audioEngine()->outputSampleRate()) {
+		fluid_synth_write_float(m_synth, frames, buf, 0, 2, buf, 1, 2);
+		return;
 	}
-	else
+
+	// TODO: These kind of playback pipelines/graphs are repeated within other parts of the codebase that work with
+	// audio samples. We should find a way to unify this but the right abstraction is not so clear yet.
+	while (frames > 0)
 	{
-		fluid_synth_write_float( m_synth, frames, buf, 0, 2, buf, 1, 2 );
+		if (m_bufferView.empty())
+		{
+			fluid_synth_write_float(m_synth, m_buffer.size(), m_buffer.data(), 0, 2, m_buffer.data(), 1, 2);
+			m_bufferView = m_buffer;
+		}
+
+		const auto [inputFramesUsed, outputFramesGenerated]
+			= m_resampler.process({&m_bufferView.data()[0][0], 2, m_bufferView.size()}, {&buf[0][0], 2, frames});
+
+		if (inputFramesUsed == 0 && outputFramesGenerated == 0)
+		{
+			std::fill_n(buf, frames, SampleFrame{});
+			break;
+		}
+
+		m_bufferView = m_bufferView.subspan(inputFramesUsed);
+		buf += outputFramesGenerated;
+		frames -= outputFramesGenerated;
 	}
-	m_synthMutex.unlock();
 }
 
 
@@ -984,7 +963,7 @@ SoundFontInstrumentView::SoundFontInstrumentView( Instrument * _instrument, QWid
 
 	// File Button
 	m_fileDialogButton = new PixmapButton(this);
-	m_fileDialogButton->setCursor(QCursor(Qt::PointingHandCursor));
+	m_fileDialogButton->setCursor(Qt::PointingHandCursor);
 	m_fileDialogButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("fileselect_on"));
 	m_fileDialogButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("fileselect_off"));
 	m_fileDialogButton->move(217, 107);
@@ -995,7 +974,7 @@ SoundFontInstrumentView::SoundFontInstrumentView( Instrument * _instrument, QWid
 
 	// Patch Button
 	m_patchDialogButton = new PixmapButton(this);
-	m_patchDialogButton->setCursor(QCursor(Qt::PointingHandCursor));
+	m_patchDialogButton->setCursor(Qt::PointingHandCursor);
 	m_patchDialogButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("patches_on"));
 	m_patchDialogButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("patches_off"));
 	m_patchDialogButton->setEnabled(false);

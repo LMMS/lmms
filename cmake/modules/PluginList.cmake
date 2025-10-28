@@ -61,6 +61,7 @@ SET(LMMS_PLUGIN_LIST
 	SoundFontPlayer
 	Sfxr
 	Sid
+	SlewDistortion
 	SlicerT
 	SpectrumAnalyzer
 	StereoEnhancer

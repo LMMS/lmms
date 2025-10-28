@@ -297,14 +297,14 @@ class InterleavedBufferView : public detail::BufferViewData<T, channelCount>
 public:
 	using Base::Base;
 
-	//! Contruct const from mutable (static channel count)
+	//! Construct const from mutable (static channel count)
 	template<typename U = T> requires (std::is_const_v<U> && channelCount != DynamicChannelCount)
 	constexpr InterleavedBufferView(InterleavedBufferView<std::remove_const_t<U>, channelCount> other) noexcept
 		: Base{other.data(), other.frames()}
 	{
 	}
 
-	//! Contruct const from mutable (dynamic channel count)
+	//! Construct const from mutable (dynamic channel count)
 	template<typename U = T> requires (std::is_const_v<U> && channelCount == DynamicChannelCount)
 	constexpr InterleavedBufferView(InterleavedBufferView<std::remove_const_t<U>, channelCount> other) noexcept
 		: Base{other.data(), other.channels(), other.frames()}
@@ -474,14 +474,14 @@ class PlanarBufferView : public detail::BufferViewData<T* const, channelCount>
 public:
 	using Base::Base;
 
-	//! Contruct const from mutable (static channel count)
+	//! Construct const from mutable (static channel count)
 	template<typename U = T> requires (std::is_const_v<U> && channelCount != DynamicChannelCount)
 	constexpr PlanarBufferView(PlanarBufferView<std::remove_const_t<U>, channelCount> other) noexcept
 		: Base{other.data(), other.frames()}
 	{
 	}
 
-	//! Contruct const from mutable (dynamic channel count)
+	//! Construct const from mutable (dynamic channel count)
 	template<typename U = T> requires (std::is_const_v<U> && channelCount == DynamicChannelCount)
 	constexpr PlanarBufferView(PlanarBufferView<std::remove_const_t<U>, channelCount> other) noexcept
 		: Base{other.data(), other.channels(), other.frames()}
