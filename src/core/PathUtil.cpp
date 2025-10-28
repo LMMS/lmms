@@ -147,22 +147,22 @@ namespace lmms::PathUtil
 
 		QString path = serializePath(input);
 
-		// Check if it's a user sample.
+		//Check if it's a user sample.
 		QString userPath = baseLocation(Base::UserSample) + path;
 		QFileInfo userInfo(userPath);
 		if (userInfo.exists()) { assumedBase = Base::UserSample; }
 
-		// Check if it's a factory sample
+		//Check if it's a factory sample
 		QString factoryPath = baseLocation(Base::FactorySample) + path;
 		QFileInfo factoryInfo(factoryPath);
 		if (factoryInfo.exists()) { assumedBase = Base::FactorySample; }
 
-		// Check if it's a VST.
+		//Check if it's a VST.
 		QString vstPath = baseLocation(Base::UserVST) + path;
 		QFileInfo vstInfo(vstPath);
 		if (vstInfo.exists()) { assumedBase = Base::UserVST; }
 
-		// Assume we've found the correct base location, return the full path
+		//Assume we've found the correct base location, return the full path
 		return basePrefix(assumedBase) + path;
 	}
 
@@ -175,7 +175,7 @@ namespace lmms::PathUtil
 
 		QString path = serializePath(input);
 
-		// First, do no harm to absolute paths.
+		//First, do no harm to absolute paths.
 		// Note: Paths starting with a colon (:) are always considered absolute, as they denote a QResource.
 		QFileInfo inputFileInfo = QFileInfo(path);
 		if (inputFileInfo.isAbsolute())
@@ -183,7 +183,7 @@ namespace lmms::PathUtil
 			if (error) { *error = false; }
 			return path;
 		}
-		// Next, handle old relative paths with no prefix
+		//Next, handle old relative paths with no prefix
 		QString upgraded = path.contains(":") ? path : oldRelativeUpgrade(path);
 
 		Base base = baseLookup(upgraded);
