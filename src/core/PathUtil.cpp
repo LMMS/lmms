@@ -15,7 +15,7 @@ namespace lmms::PathUtil
 
 	QString baseLocation(const Base base, bool* error /* = nullptr*/)
 	{
-		// error is false unless something goes wrong.
+		// error is false unless something goes wrong
 		if (error) { *error = false; }
 
 		QString loc = "";
