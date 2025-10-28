@@ -183,7 +183,7 @@ namespace lmms::PathUtil
 			if (error) { *error = false; }
 			return path;
 		}
-		// Next, handle old relative paths with no prefix.
+		// Next, handle old relative paths with no prefix
 		QString upgraded = path.contains(":") ? path : oldRelativeUpgrade(path);
 
 		Base base = baseLookup(upgraded);
@@ -199,7 +199,7 @@ namespace lmms::PathUtil
 		bool error;
 		QString relativePath = baseQDir(base, &error).relativeFilePath(absolutePath);
 		// Return the relative path if it didn't result in a path starting with ..
-		// and the baseQDir was resolved properly.
+		// and the baseQDir was resolved properly
 		return (relativePath.startsWith("..") || error)
 			? absolutePath
 			: relativePath;
