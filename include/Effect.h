@@ -26,10 +26,12 @@
 #ifndef LMMS_EFFECT_H
 #define LMMS_EFFECT_H
 
-#include "Plugin.h"
-#include "Engine.h"
+#include <span>
+
 #include "AudioEngine.h"
 #include "AutomatableModel.h"
+#include "Engine.h"
+#include "Plugin.h"
 #include "TempoSyncKnobModel.h"
 
 namespace lmms
@@ -53,7 +55,6 @@ public:
 	Effect( const Plugin::Descriptor * _desc,
 			Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key );
-	~Effect() override;
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 	void loadSettings( const QDomElement & _this ) override;
@@ -65,16 +66,6 @@ public:
 
 	//! Returns true if audio was processed and should continue being processed
 	bool processAudioBuffer(SampleFrame* buf, const fpp_t frames);
-
-	inline ch_cnt_t processorCount() const
-	{
-		return m_processors;
-	}
-
-	inline void setProcessorCount( ch_cnt_t _processors )
-	{
-		m_processors = _processors;
-	}
 
 	inline bool isOkay() const
 	{
@@ -92,14 +83,15 @@ public:
 		return m_running;
 	}
 
-	inline void startRunning() 
-	{ 
-		m_bufferCount = 0;
-		m_running = true; 
+	void startRunning()
+	{
+		m_quietBufferCount = 0;
+		m_running = true;
 	}
 
-	inline void stopRunning()
+	void stopRunning()
 	{
+		m_quietBufferCount = 0;
 		m_running = false;
 	}
 
@@ -124,27 +116,6 @@ public:
 		return 1.0f - m_wetDryModel.value();
 	}
 
-	inline float gate() const
-	{
-		const float level = m_gateModel.value();
-		return level*level * m_processors;
-	}
-
-	inline f_cnt_t bufferCount() const
-	{
-		return m_bufferCount;
-	}
-
-	inline void resetBufferCount()
-	{
-		m_bufferCount = 0;
-	}
-
-	inline void incrementBufferCount()
-	{
-		++m_bufferCount;
-	}
-
 	inline bool dontRun() const
 	{
 		return m_noRun;
@@ -158,6 +129,11 @@ public:
 	inline TempoSyncKnobModel* autoQuitModel()
 	{
 		return &m_autoQuitModel;
+	}
+
+	bool autoQuitEnabled() const
+	{
+		return m_autoQuitEnabled;
 	}
 
 	EffectChain * effectChain() const
@@ -199,64 +175,32 @@ protected:
 
 	gui::PluginView* instantiateView( QWidget * ) override;
 
-	// some effects might not be capable of higher sample-rates so they can
-	// sample it down before processing and back after processing
-	inline void sampleDown( const SampleFrame* _src_buf,
-							SampleFrame* _dst_buf,
-							sample_rate_t _dst_sr )
-	{
-		resample( 0, _src_buf,
-				Engine::audioEngine()->outputSampleRate(),
-					_dst_buf, _dst_sr,
-					Engine::audioEngine()->framesPerPeriod() );
-	}
-
-	inline void sampleBack( const SampleFrame* _src_buf,
-							SampleFrame* _dst_buf,
-							sample_rate_t _src_sr )
-	{
-		resample( 1, _src_buf, _src_sr, _dst_buf,
-				Engine::audioEngine()->outputSampleRate(),
-			Engine::audioEngine()->framesPerPeriod() * _src_sr /
-				Engine::audioEngine()->outputSampleRate() );
-	}
-	void reinitSRC();
-
 	virtual void onEnabledChanged() {}
 
 
 private:
 	/**
-		If the setting "Keep effects running even without input" is disabled,
-		after "decay" ms of a signal below "gate", the effect is turned off
-		and won't be processed again until it receives new audio input
-	*/
-	void checkGate(double outSum);
+	 * If auto-quit is enabled ("Keep effects running even without input" setting is disabled),
+	 * after "decay" ms of the output buffer remaining below the silence threshold, the effect is
+	 * turned off and won't be processed again until it receives new audio input.
+	 */
+	void handleAutoQuit(std::span<const SampleFrame> output);
 
 
 	EffectChain * m_parent;
-	void resample( int _i, const SampleFrame* _src_buf,
-					sample_rate_t _src_sr,
-					SampleFrame* _dst_buf, sample_rate_t _dst_sr,
-					const f_cnt_t _frames );
-
-	ch_cnt_t m_processors;
 
 	bool m_okay;
 	bool m_noRun;
 	bool m_running;
-	f_cnt_t m_bufferCount;
+
+	//! The number of consecutive periods where output buffers remain below the silence threshold
+	f_cnt_t m_quietBufferCount = 0;
 
 	BoolModel m_enabledModel;
 	FloatModel m_wetDryModel;
-	FloatModel m_gateModel;
 	TempoSyncKnobModel m_autoQuitModel;
-	
-	bool m_autoQuitDisabled;
 
-	SRC_DATA m_srcData[2];
-	SRC_STATE * m_srcState[2];
-
+	bool m_autoQuitEnabled = false;
 
 	friend class gui::EffectView;
 	friend class EffectChain;

@@ -22,7 +22,6 @@
  *
  */
 
-#include <QDomElement>
 
 #include "GranularPitchShifterControls.h"
 #include "GranularPitchShifterEffect.h"

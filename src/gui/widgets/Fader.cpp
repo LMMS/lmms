@@ -49,10 +49,9 @@
 #include <QInputDialog>
 #include <QMouseEvent>
 #include <QPainter>
-#include <QPainterPath>
+#include <QPainterPath>  // IWYU pragma: keep
 
 #include "lmms_math.h"
-#include "embed.h"
 #include "CaptionMenu.h"
 #include "ConfigManager.h"
 #include "KeyboardShortcuts.h"
@@ -73,6 +72,7 @@ SimpleTextFloat* Fader::s_textFloat = nullptr;
 Fader::Fader(FloatModel* model, const QString& name, QWidget* parent, bool modelIsLinear) :
 	QWidget(parent),
 	FloatModelView(model, this),
+	m_knobSize(embed::logicalSize(m_knob)),
 	m_modelIsLinear(modelIsLinear)
 {
 	if (s_textFloat == nullptr)
@@ -121,7 +121,7 @@ void Fader::adjustByDecibelDelta(float value)
 	adjustModelByDBDelta(value);
 
 	updateTextFloat();
-	s_textFloat->setVisibilityTimeOut(1000);
+	s_textFloat->showWithTimeout(1000);
 }
 
 void Fader::adjustByDialog()
@@ -198,7 +198,7 @@ void Fader::mousePressEvent(QMouseEvent* mouseEvent)
 
 		const int localY = mouseEvent->y();
 		const auto knobLowerPosY = calculateKnobPosYFromModel();
-		const auto knobUpperPosY = knobLowerPosY - m_knob.height();
+		const auto knobUpperPosY = knobLowerPosY - m_knobSize.height();
 
 		const auto clickedOnKnob = localY >= knobUpperPosY && localY <= knobLowerPosY;
 
@@ -207,7 +207,7 @@ void Fader::mousePressEvent(QMouseEvent* mouseEvent)
 			// If the users clicked on the knob we want to compensate for the offset to the center line
 			// of the knob when dealing with mouse move events.
 			// This will make it feel like the users have grabbed the knob where they clicked.
-			const auto knobCenterPos = knobLowerPosY - (m_knob.height() / 2);
+			const auto knobCenterPos = knobLowerPosY - (m_knobSize.height() / 2);
 			m_knobCenterOffset = localY - knobCenterPos;
 
 			// In this case we also will not call setVolumeByLocalPixelValue, i.e. we do not make any immediate
@@ -361,9 +361,9 @@ int Fader::calculateKnobPosYFromModel() const
 			const auto scaledRatio = computeScaledRatio(actualDb);
 
 			// This returns results between:
-			// * m_knob.height()  for a ratio of 1
+			// * m_knobSize.height()  for a ratio of 1
 			// * height()         for a ratio of 0
-			return height() - (height() - m_knob.height()) * scaledRatio;
+			return height() - (height() - m_knobSize.height()) * scaledRatio;
 		}
 	}
 	else
@@ -375,9 +375,9 @@ int Fader::calculateKnobPosYFromModel() const
 		auto const ratio = (clampedValue - minV) / (maxV - minV);
 
 		// This returns results between:
-		// * m_knob.height()  for a ratio of 1
+		// * m_knobSize.height()  for a ratio of 1
 		// * height()         for a ratio of 0
-		return height() - (height() - m_knob.height()) * ratio;
+		return height() - (height() - m_knobSize.height()) * ratio;
 	}
 }
 
@@ -391,11 +391,11 @@ void Fader::setVolumeByLocalPixelValue(int y)
 
 	// The y parameter gives us where the mouse click went.
 	// Assume that the middle of the fader should go there.
-	int const lowerFaderKnob = y + (m_knob.height() / 2);
+	int const lowerFaderKnob = y + (m_knobSize.height() / 2);
 
 	// In some cases we need the clamped lower position of the fader knob so we can ensure
 	// that we only set allowed values in the model range.
-	int const clampedLowerFaderKnob = std::clamp(lowerFaderKnob, m_knob.height(), height());
+	int const clampedLowerFaderKnob = std::clamp(lowerFaderKnob, m_knobSize.height(), height());
 
 	if (modelIsLinear())
 	{
@@ -411,7 +411,7 @@ void Fader::setVolumeByLocalPixelValue(int y)
 
 			// First map the lower knob position to [0, 1] so that we can apply some curve mapping, e.g.
 			// square, cube, etc.
-			LinearMap<float> knobMap(float(m_knob.height()), 1., float(height()), 0.);
+			LinearMap<float> knobMap(float(m_knobSize.height()), 1., float(height()), 0.);
 
 			// Apply the inverse of what is done in calculateKnobPosYFromModel
 			auto const knobPos = std::pow(knobMap.map(clampedLowerFaderKnob), 1./c_dBScalingExponent);
@@ -433,7 +433,7 @@ void Fader::setVolumeByLocalPixelValue(int y)
 	}
 	else
 	{
-		LinearMap<float> valueMap(float(m_knob.height()), model()->maxValue(), float(height()), model()->minValue());
+		LinearMap<float> valueMap(float(m_knobSize.height()), model()->maxValue(), float(height()), model()->minValue());
 
 		model()->setValue(valueMap.map(clampedLowerFaderKnob));
 	}
@@ -512,9 +512,16 @@ void Fader::modelValueChanged()
 
 QString Fader::getModelValueAsDbString() const
 {
-	const auto value = model()->value();
-
 	QString label(tr("Volume: %1 dB"));
+	// Check that the pointer isn't dangling, which can happen if the
+	// model was dropped in order to load a new project from an existing one.
+	auto* newModel = model();
+	if (!newModel)
+	{
+		// model() was a dangling pointer, so return a sane default value.
+		return label.arg(tr("-inf"));
+	}
+	const auto value = newModel->value();
 
 	if (modelIsLinear())
 	{
@@ -546,7 +553,7 @@ void Fader::paintEvent(QPaintEvent* ev)
 	}
 
 	// Draw the knob
-	painter.drawPixmap((width() - m_knob.width()) / 2, calculateKnobPosYFromModel() - m_knob.height(), m_knob);
+	painter.drawPixmap((width() - m_knobSize.width()) / 2, calculateKnobPosYFromModel() - m_knobSize.height(), m_knob);
 }
 
 void Fader::paintLevels(QPaintEvent* ev, QPainter& painter, bool linear)
@@ -720,7 +727,7 @@ void Fader::paintFaderTicks(QPainter& painter)
 	for (float i = startValue; i >= c_faderMinDb; i-= stepSize)
 	{
 		const auto scaledRatio = computeScaledRatio(i);
-		const auto maxHeight = height() - (height() - m_knob.height()) * scaledRatio - (m_knob.height() / 2);
+		const auto maxHeight = height() - (height() - m_knobSize.height()) * scaledRatio - (m_knobSize.height() / 2);
 
 		if (approximatelyEqual(i, 0.))
 		{

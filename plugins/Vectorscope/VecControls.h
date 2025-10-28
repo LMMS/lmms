@@ -25,7 +25,6 @@
 #ifndef VECCONTROLS_H
 #define VECCONTROLS_H
 
-#include <QColor>
 
 #include "EffectControls.h"
 
@@ -38,7 +37,6 @@ class Vectorscope;
 namespace gui
 {
 class VecControlsDialog;
-class VectorView;
 }
 
 // Holds all the configuration values

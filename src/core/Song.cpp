@@ -54,7 +54,6 @@
 #include "ProjectNotes.h"
 #include "Scale.h"
 #include "SongEditor.h"
-#include "TimeLineWidget.h"
 #include "PeakController.h"
 
 
@@ -290,7 +289,7 @@ void Song::processNextBuffer()
 			}
 			else if (m_playMode == PlayMode::MidiClip && m_loopMidiClip && !loopEnabled)
 			{
-				enforceLoop(TimePos{0}, m_midiClipToPlay->length());
+				enforceLoop(-m_midiClipToPlay->startTimeOffset(), m_midiClipToPlay->length() - m_midiClipToPlay->startTimeOffset());
 			}
 
 			// Handle loop points, and inform VST plugins of the loop status
@@ -366,7 +365,7 @@ void Song::processAutomations(const TrackList &tracklist, TimePos timeStart, fpp
 		break;
 	case PlayMode::Pattern:
 	{
-		Q_ASSERT(tracklist.size() == 1);
+		if (tracklist.empty()) { return; }
 		Q_ASSERT(tracklist.at(0)->type() == Track::Type::Pattern);
 		auto patternTrack = dynamic_cast<PatternTrack*>(tracklist.at(0));
 		container = Engine::patternStore();
@@ -396,7 +395,14 @@ void Song::processAutomations(const TrackList &tracklist, TimePos timeStart, fpp
 		if (p->isRecording() && relTime >= 0 && relTime < p->length())
 		{
 			const AutomatableModel* recordedModel = p->firstObject();
-			p->recordValue(relTime, recordedModel->value<float>());
+			// The automation system really needs to be reworked.
+			// For whatever reason, the values in an automation clip are stored in un-un-scaled format, so if you
+			// are automating a log knob, when you draw an curve, the values being stored are not the actual values the
+			// knob will take, but instead the unscaled version of the unscaled numbers. The tooltip shows the number you expect, but if you double-click,
+			// you can see that the true values are stored by their inverse scaled value....which is wrong, since they weren't scaled in the first place...?
+			// Anyhow, in the meantime before we redo the automation system, when recording automations, we have to get the inverseScaledValue
+			// and store that so that when playing it back, it scales the value correctly.
+			p->recordValue(relTime, recordedModel->inverseScaledValue(recordedModel->value<float>()));
 
 			recordedModels << recordedModel;
 		}
@@ -660,7 +666,14 @@ void Song::stop()
 	switch (timeline.stopBehaviour())
 	{
 		case Timeline::StopBehaviour::BackToZero:
-			getPlayPos().setTicks(0);
+			if (m_playMode == PlayMode::MidiClip)
+			{
+				getPlayPos().setTicks(std::max(0, -m_midiClipToPlay->startTimeOffset()));
+			}
+			else
+			{
+				getPlayPos().setTicks(0);
+			}
 			m_elapsedMilliSeconds[static_cast<std::size_t>(m_playMode)] = 0;
 			break;
 

@@ -33,6 +33,7 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
+#include "AutomatableButton.h"
 #include "ComboBox.h"
 #include "ConfigManager.h"
 #include "DataFile.h"
@@ -59,6 +60,7 @@
 #include "MainWindow.h"
 #include "PianoView.h"
 #include "PluginFactory.h"
+#include "PluginView.h"
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "SubWindow.h"
@@ -128,7 +130,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 #if QT_VERSION < 0x50C00
 	// Workaround for a bug in Qt versions below 5.12,
 	// where argument-dependent-lookup fails for QFlags operators
-	// declared inside a namepsace.
+	// declared inside a namespace.
 	// This affects the Q_DECLARE_OPERATORS_FOR_FLAGS macro in Instrument.h
 	// See also: https://codereview.qt-project.org/c/qt/qtbase/+/225348
 
@@ -144,19 +146,17 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	soloMuteLayout->setContentsMargins(0, 0, 2, 0);
 	soloMuteLayout->setSpacing(2);
 
-	m_muteBtn = new PixmapButton(this, tr("Mute"));
+	m_muteBtn = new AutomatableButton(this, tr("Mute"));
 	m_muteBtn->setModel(&m_track->m_mutedModel);
-	m_muteBtn->setActiveGraphic(embed::getIconPixmap("mute_active"));
-	m_muteBtn->setInactiveGraphic(embed::getIconPixmap("mute_inactive"));
 	m_muteBtn->setCheckable(true);
+	m_muteBtn->setObjectName("btn-mute");
 	m_muteBtn->setToolTip(tr("Mute this instrument"));
 	soloMuteLayout->addWidget(m_muteBtn, 0, widgetAlignment);
 
-	m_soloBtn = new PixmapButton(this, tr("Solo"));
+	m_soloBtn = new AutomatableButton(this, tr("Solo"));
 	m_soloBtn->setModel(&m_track->m_soloModel);
-	m_soloBtn->setActiveGraphic(embed::getIconPixmap("solo_active"));
-	m_soloBtn->setInactiveGraphic(embed::getIconPixmap("solo_inactive"));
 	m_soloBtn->setCheckable(true);
+	m_soloBtn->setObjectName("btn-solo");
 	m_soloBtn->setToolTip(tr("Solo this instrument"));
 	soloMuteLayout->addWidget(m_soloBtn, 0, widgetAlignment);
 
@@ -296,9 +296,9 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	vlayout->addWidget( m_pianoView );
 	setModel( _itv->model() );
 
-	updateInstrumentView();
-
 	QMdiSubWindow* subWin = getGUI()->mainWindow()->addWindowedWidget( this );
+
+	updateInstrumentView();
 
 	// The previous call should have given us a sub window parent. Therefore
 	// we can reuse this method.
@@ -541,8 +541,8 @@ void InstrumentTrackWindow::closeEvent( QCloseEvent* event )
 		hide();
 	}
 
-	m_itv->m_tlb->setFocus();
-	m_itv->m_tlb->setChecked( false );
+	m_itv->setFocus();
+	m_itv->m_tlb->setChecked(false);
 }
 
 

@@ -36,7 +36,6 @@ namespace lmms
 {
 
 class Track;
-class TrackContainer;
 
 namespace gui
 {
@@ -94,18 +93,25 @@ public:
 		return m_length;
 	}
 
-	/*! \brief Specify whether or not a TCO automatically resizes.
+
+	bool hasTrackContainer() const;
+
+	bool isInPattern() const;
+
+	bool manuallyResizable() const;
+
+	/*! \brief Set whether a clip has been resized yet by the user or the knife tool.
 	 *
-	 *  If a TCO does automatically resize, it cannot be manually
-	 *  resized by clicking and dragging its edge.
+	 *  If a clip has been resized previously, it will not automatically 
+	 *  resize when editing it.
 	 *
 	 */
-	inline void setAutoResize( const bool r )
+	void setAutoResize(const bool r)
 	{
 		m_autoResize = r;
 	}
 
-	inline const bool getAutoResize() const
+	bool getAutoResize() const
 	{
 		return m_autoResize;
 	}
@@ -115,6 +121,7 @@ public:
 
 	virtual void movePosition( const TimePos & pos );
 	virtual void changeLength( const TimePos & length );
+	virtual void updateLength() {};
 
 	virtual gui::ClipView * createView( gui::TrackView * tv ) = 0;
 
@@ -137,6 +144,12 @@ public:
 	// Will copy the state of a clip to another clip
 	static void copyStateTo( Clip *src, Clip *dst );
 
+	/**
+	* Creates a copy of this clip
+	* @return pointer to the new clip object
+	*/
+	virtual Clip* clone() = 0;
+
 public slots:
 	void toggleMute();
 
@@ -147,6 +160,8 @@ signals:
 	void destroyedClip();
 	void colorChanged();
 
+protected:
+	Clip(const Clip& other);
 
 private:
 	Track * m_track;
@@ -158,7 +173,7 @@ private:
 
 	BoolModel m_mutedModel;
 	BoolModel m_soloModel;
-	bool m_autoResize;
+	bool m_autoResize = true;
 
 	bool m_selectViewOnCreate;
 

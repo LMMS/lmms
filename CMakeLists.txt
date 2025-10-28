@@ -1,4 +1,5 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.13)
+SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Set the given policy to NEW. If it does not exist, it will not be set. If it
 # is already set to NEW (most likely due to predating the minimum required CMake
@@ -596,6 +597,9 @@ if(WANT_VST)
 	else()
 		set(STATUS_VST "No hosts selected and available")
 	endif()
+	if(WINE_ASLR_ENABLED)
+		set(STATUS_VST_64 "${STATUS_VST_64}\n\tWARNING: You are using wine ${WINE_VERSION} which cannot disable ASLR, please consider upgrading to wine 10.14 or higher.  ASLR may cause crashes with older VSTs.")
+	endif()
 endif()
 
 IF(WANT_DEBUG_FPE)
@@ -645,11 +649,20 @@ ENDIF()
 SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DLMMS_DEBUG")
 SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DLMMS_DEBUG")
 
+if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_compile_definitions(NDEBUG)
+	SET(STATUS_ASSERTIONS "Disabled")
+else()
+    remove_definitions(-DNDEBUG)
+	SET(STATUS_ASSERTIONS "Enabled")
+endif()
+
 if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.16")
 	set(NOOP_COMMAND "${CMAKE_COMMAND}" "-E" "true")
 else()
 	set(NOOP_COMMAND "${CMAKE_COMMAND}" "-E" "echo")
 endif()
+
 if(STRIP)
 	# TODO CMake 3.19: Now that CONFIG generator expressions support testing for
 	# multiple configurations, combine the OR into a single CONFIG expression.
@@ -876,6 +889,7 @@ MESSAGE(
 "* Debug using UBSanitizer           : ${STATUS_DEBUG_UBSAN}\n"
 "* Debug packaging commands          : ${STATUS_DEBUG_CPACK}\n"
 "* Profile using GNU profiler        : ${STATUS_GPROF}\n"
+"* Debug assertions                  : ${STATUS_ASSERTIONS}\n"
 "* Dynamic alpha/nighty branding     : ${STATUS_DYNAMIC_BRANDING}\n"
 )
 

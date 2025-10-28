@@ -28,7 +28,6 @@
 #include <QWidget>
 
 #include "ModelView.h"
-#include "PixmapButton.h"
 #include "SampleTrack.h"
 #include "SerializingObject.h"
 
@@ -37,6 +36,7 @@ class QLineEdit;
 namespace lmms::gui
 {
 
+class AutomatableButton;
 class EffectRackView;
 class Knob;
 class MixerChannelLcdSpinBox;
@@ -91,8 +91,8 @@ private:
 	QLineEdit * m_nameLineEdit;
 	Knob * m_volumeKnob;
 	Knob * m_panningKnob;
-	PixmapButton *m_muteBtn;
-	PixmapButton *m_soloBtn;
+	AutomatableButton* m_muteBtn;
+	AutomatableButton* m_soloBtn;
 	MixerChannelLcdSpinBox * m_mixerChannelNumber;
 
 	EffectRackView * m_effectRack;
