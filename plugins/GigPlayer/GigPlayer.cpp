@@ -914,7 +914,7 @@ GigInstrumentView::GigInstrumentView( Instrument * _instrument, QWidget * _paren
 
 	// File Button
 	m_fileDialogButton = new PixmapButton( this );
-	m_fileDialogButton->setCursor( QCursor( Qt::PointingHandCursor ) );
+	m_fileDialogButton->setCursor(Qt::PointingHandCursor);
 	m_fileDialogButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "fileselect_on" ) );
 	m_fileDialogButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "fileselect_off" ) );
 	m_fileDialogButton->move( 223, 68 );
@@ -925,7 +925,7 @@ GigInstrumentView::GigInstrumentView( Instrument * _instrument, QWidget * _paren
 
 	// Patch Button
 	m_patchDialogButton = new PixmapButton( this );
-	m_patchDialogButton->setCursor( QCursor( Qt::PointingHandCursor ) );
+	m_patchDialogButton->setCursor(Qt::PointingHandCursor);
 	m_patchDialogButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "patches_on" ) );
 	m_patchDialogButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "patches_off" ) );
 	m_patchDialogButton->setEnabled( false );
