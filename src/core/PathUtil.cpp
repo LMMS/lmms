@@ -175,7 +175,7 @@ namespace lmms::PathUtil
 
 		QString path = serializePath(input);
 
-		//First, do no harm to absolute paths.
+		//First, do no harm to absolute paths
 		// Note: Paths starting with a colon (:) are always considered absolute, as they denote a QResource.
 		QFileInfo inputFileInfo = QFileInfo(path);
 		if (inputFileInfo.isAbsolute())
