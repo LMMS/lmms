@@ -354,15 +354,14 @@ void SubWindow::attach()
 	frame += decorationMargins();
 
 	// arbitrary values, require window to touch `mdiArea - margin`
-	// min(max(a, b), c) ensures that a <= b <= c
 	// TODO make this live configurble maybe?
 	const auto margin = QMargins(40, 40, 40, 40);
-	frame.moveTo(std::min(std::max(margin.left() - frame.width(),
-	                               frame.left()),
-	                               mdiArea()->rect().width() - margin.right()),
-	             std::min(std::max(margin.top() - frame.height(),
-	                               frame.top()),
-	                               mdiArea()->rect().height() - margin.bottom()));
+	frame.moveTo(std::clamp(frame.left(),
+	                        margin.left() - frame.width(),
+	                        mdiArea()->rect().width() - margin.right()),
+	             std::clamp(frame.top(),
+	                        margin.top() - frame.height(),
+	                        mdiArea()->rect().height() - margin.bottom()));
 
 	auto flags = windowFlags();
 	flags &= ~Qt::Window;
