@@ -152,7 +152,7 @@ namespace lmms::PathUtil
 		QFileInfo userInfo(userPath);
 		if (userInfo.exists()) { assumedBase = Base::UserSample; }
 
-		// Check if it's a factory sample.
+		// Check if it's a factory sample
 		QString factoryPath = baseLocation(Base::FactorySample) + path;
 		QFileInfo factoryInfo(factoryPath);
 		if (factoryInfo.exists()) { assumedBase = Base::FactorySample; }
