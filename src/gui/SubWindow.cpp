@@ -348,7 +348,7 @@ void SubWindow::attach()
 
 	const bool shown = widget()->isVisible();
 
-	auto frame = widget()->windowHandle()->geometry();
+	auto frame = widget()->geometry();
 	frame.moveTo(mdiArea()->mapFromGlobal(frame.topLeft()));
 	frame += decorationMargins();
 
