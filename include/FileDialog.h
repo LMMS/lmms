@@ -37,9 +37,15 @@ class LMMS_EXPORT FileDialog : public QFileDialog
 {
 	Q_OBJECT
 public:
+	QList<QUrl> m_urls;
+	QList<QUrl> m_beforeUrls;
+	QList<QUrl> m_addedSidebarUrls;
+
 	explicit FileDialog( QWidget *parent = 0, const QString &caption = QString(),
 						const QString &directory = QString(),
 						const QString &filter = QString() );
+
+	~FileDialog();
 
 	static QString getExistingDirectory(QWidget *parent,
 										const QString &caption,
