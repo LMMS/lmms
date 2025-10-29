@@ -185,7 +185,6 @@ void SubWindow::showEvent(QShowEvent* e)
 	widget()->show();
 	if (isDetached())
 	{
-		widget()->setGeometry(m_childGeom);
 		widget()->setWindowState((widget()->windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
 	}
 }
@@ -326,7 +325,6 @@ void SubWindow::detach()
 
 	hide();
 	widget()->setWindowFlags(flags);
-	m_childGeom = widget()->geometry(); // reset/init tracked detached geometry since it's only needed there
 
 	if (shown) { widget()->show(); }
 
@@ -635,16 +633,7 @@ bool SubWindow::eventFilter(QObject* obj, QEvent* event)
 			else
 			{
 				hide();
-				event->ignore();
 			}
-			return QMdiSubWindow::eventFilter(obj, event);
-
-		case QEvent::Move:
-			if (isDetached()) { m_childGeom.moveTo(static_cast<QMoveEvent*>(event)->pos()); }
-			return QMdiSubWindow::eventFilter(obj, event);
-
-		case QEvent::Resize:
-			if (isDetached()) { m_childGeom.setSize(static_cast<QResizeEvent*>(event)->size()); }
 			return QMdiSubWindow::eventFilter(obj, event);
 
 		default:
