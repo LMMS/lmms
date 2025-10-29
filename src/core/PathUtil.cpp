@@ -184,9 +184,7 @@ namespace lmms::PathUtil
 			return path;
 		}
 		//Next, handle old relative paths with no prefix
-		QString upgraded = path.contains(":") ? path : oldRelativeUpgrade(path);
-
-		Base base = baseLookup(upgraded);
+		Base base = baseLookup(oldRelativeUpgrade(path));
 		return baseLocation(base, error) + upgraded.remove(0, basePrefix(base).length());
 	}
 
