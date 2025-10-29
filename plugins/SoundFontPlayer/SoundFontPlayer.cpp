@@ -221,7 +221,7 @@ SoundFontInstrument::SoundFontInstrument(InstrumentTrack* instrument_track) :
 	connect(instrumentTrack()->microtuner()->keyRangeImportModel(), &Model::dataChanged, this, &SoundFontInstrument::updateTuning, Qt::DirectConnection);
 	connect(instrumentTrack()->baseNoteModel(), &Model::dataChanged, this, &SoundFontInstrument::updateTuning, Qt::DirectConnection);
 
-	auto iph = new InstrumentPlayHandle(this, _instrument_track);
+	auto iph = new InstrumentPlayHandle(this, instrument_track);
 	Engine::audioEngine()->addPlayHandle( iph );
 }
 
