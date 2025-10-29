@@ -42,6 +42,7 @@
 #include <QStyleOptionTitleBar>
 #include <QWindow>
 
+#include "ConfigManager.h"
 #include "embed.h"
 
 // Only needed for error display for missing detach feature
@@ -608,8 +609,15 @@ bool SubWindow::eventFilter(QObject* obj, QEvent* event)
 			if (isDetached())
 			{
 				attach();
-				hide();
 				event->ignore();
+				if (ConfigManager::inst()->value("ui", "hideondetachedclosed", "0").toInt())
+				{
+					hide();
+				}
+				else
+				{
+					return true;
+				}
 			}
 			else
 			{

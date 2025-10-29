@@ -112,6 +112,8 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 			"ui", "trackdeletionwarning", "1").toInt()),
 	m_mixerChannelDeletionWarning(ConfigManager::inst()->value(
 			"ui", "mixerchanneldeletionwarning", "1").toInt()),
+	m_hideOnDetachedClosed(ConfigManager::inst()->value(
+			"ui", "hideondetachedclosed", "0").toInt()),
 	m_MMPZ(!ConfigManager::inst()->value(
 			"app", "nommpz").toInt()),
 	m_disableBackup(!ConfigManager::inst()->value(
@@ -254,6 +256,8 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 		m_trackDeletionWarning, SLOT(toggleTrackDeletionWarning(bool)), false);
 	addCheckBox(tr("Show warning when deleting a mixer channel that is in use"), guiGroupBox, guiGroupLayout,
 		m_mixerChannelDeletionWarning,	SLOT(toggleMixerChannelDeletionWarning(bool)), false);
+	addCheckBox(tr("Hide subwindows when attaching them"), guiGroupBox, guiGroupLayout,
+		m_hideOnDetachedClosed, SLOT(toggleHideOnDetachedClosed(bool)), false);
 
 	m_loopMarkerComboBox = new QComboBox{guiGroupBox};
 
@@ -975,6 +979,8 @@ void SetupDialog::accept()
 					QString::number(m_trackDeletionWarning));
 	ConfigManager::inst()->setValue("ui", "mixerchanneldeletionwarning",
 					QString::number(m_mixerChannelDeletionWarning));
+	ConfigManager::inst()->setValue("ui", "hideondetachedclosed",
+					QString::number(m_hideOnDetachedClosed));
 	ConfigManager::inst()->setValue("app", "nommpz",
 					QString::number(!m_MMPZ));
 	ConfigManager::inst()->setValue("app", "disablebackup",
@@ -1099,6 +1105,12 @@ void SetupDialog::toggleTrackDeletionWarning(bool enabled)
 void SetupDialog::toggleMixerChannelDeletionWarning(bool enabled)
 {
 	m_mixerChannelDeletionWarning = enabled;
+}
+
+
+void SetupDialog::toggleHideOnDetachedClosed(bool enabled)
+{
+	m_hideOnDetachedClosed = enabled;
 }
 
 
