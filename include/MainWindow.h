@@ -22,24 +22,29 @@
  *
  */
 
-#ifndef MAIN_WINDOW_H
-#define MAIN_WINDOW_H
+#ifndef LMMS_GUI_MAIN_WINDOW_H
+#define LMMS_GUI_MAIN_WINDOW_H
 
-#include <QtCore/QBasicTimer>
-#include <QtCore/QTimer>
-#include <QtCore/QList>
+#include <QBasicTimer>
+#include <QTimer>
+#include <QList>
 #include <QMainWindow>
+#include <QMdiArea>
 
 #include "ConfigManager.h"
-#include "SubWindow.h"
 
 class QAction;
 class QDomElement;
 class QGridLayout;
-class QMdiArea;
 
-class ConfigManager;
+namespace lmms
+{
+
+namespace gui
+{
+
 class PluginView;
+class SubWindow;
 class ToolButton;
 
 
@@ -49,7 +54,7 @@ class MainWindow : public QMainWindow
 public:
 	QMdiArea* workspace()
 	{
-		return m_workspace;
+		return static_cast<QMdiArea*>(m_workspace);
 	}
 
 	QWidget* toolBar()
@@ -63,6 +68,8 @@ public:
 	// wrap the widget with a window decoration and add it to the workspace
 	LMMS_EXPORT SubWindow* addWindowedWidget(QWidget *w, Qt::WindowFlags windowFlags = QFlag(0));
 
+
+	void refocus();
 
 	///
 	/// \brief	Asks whether changes made to the project are to be saved.
@@ -105,7 +112,7 @@ public:
 		return m_autoSaveTimer.interval();
 	}
 
-	enum SessionState
+	enum class SessionState
 	{
 		Normal,
 		Recover
@@ -135,6 +142,8 @@ public:
 	static void saveWidgetState( QWidget * _w, QDomElement & _de );
 	static void restoreWidgetState( QWidget * _w, const QDomElement & _de );
 
+	bool eventFilter(QObject* watched, QEvent* event) override;
+
 public slots:
 	void resetWindowTitle();
 
@@ -149,7 +158,7 @@ public slots:
 	void aboutLMMS();
 	void help();
 	void toggleAutomationEditorWin();
-	void toggleBBEditorWin( bool forceShow = false );
+	void togglePatternEditorWin(bool forceShow = false);
 	void toggleSongEditorWin();
 	void toggleProjectNotesWin();
 	void toggleMicrotunerWin();
@@ -180,19 +189,33 @@ protected:
 private:
 	MainWindow();
 	MainWindow( const MainWindow & );
-	virtual ~MainWindow();
+	~MainWindow() override;
 
 	void finalize();
 
 	void toggleWindow( QWidget *window, bool forceShow = false );
-	void refocus();
 
 	void exportProject(bool multiExport = false);
 	void handleSaveResult(QString const & filename, bool songSavedSuccessfully);
 	bool guiSaveProject();
 	bool guiSaveProjectAs( const QString & filename );
 
-	QMdiArea * m_workspace;
+	class MovableQMdiArea : public QMdiArea
+	{
+	public:
+		MovableQMdiArea(QWidget* parent = nullptr);
+		~MovableQMdiArea() {}
+	protected:
+		void mousePressEvent(QMouseEvent* event) override;
+		void mouseMoveEvent(QMouseEvent* event) override;
+		void mouseReleaseEvent(QMouseEvent* event) override;
+	private:
+		bool m_isBeingMoved;
+		int m_lastX;
+		int m_lastY;
+	};
+
+	MovableQMdiArea * m_workspace;
 
 	QWidget * m_toolBar;
 	QGridLayout * m_toolBarLayout;
@@ -232,13 +255,12 @@ private:
 private slots:
 	void browseHelp();
 	void showTool( QAction * _idx );
-	void updateViewMenu( void );
+	void updateViewMenu();
 	void updateConfig( QAction * _who );
 	void onToggleMetronome();
 	void onExportProject();
 	void onExportProjectTracks();
 	void onImportProject();
-	void onSongStopped();
 	void onSongModified();
 	void onProjectFileNameChanged();
 
@@ -248,4 +270,8 @@ signals:
 
 } ;
 
-#endif
+} // namespace gui
+
+} // namespace lmms
+
+#endif // LMMS_GUI_MAIN_WINDOW_H

@@ -22,16 +22,18 @@
  *
  */
 
-#ifndef SCALE_H
-#define SCALE_H
+#ifndef LMMS_SCALE_H
+#define LMMS_SCALE_H
 
-#include <cmath>
 #include <cstdint>
 #include <vector>
 #include <QObject>
 #include <QString>
 
 #include "SerializingObject.h"
+
+namespace lmms
+{
 
 class Interval : public SerializingObject
 {
@@ -45,7 +47,7 @@ public:
 	QString getString() const
 	{
 		if (m_denominator) {return QString::number(m_numerator) + "/" + QString::number(m_denominator);}
-		else {return QString().sprintf("%.4f", m_cents);}
+		else {return QString("%1").arg(m_cents, 0, 'f', 4);}
 	}
 
 	void saveSettings(QDomDocument &doc, QDomElement &element) override;
@@ -84,4 +86,7 @@ private:
 
 };
 
-#endif
+
+} // namespace lmms
+
+#endif // LMMS_SCALE_H

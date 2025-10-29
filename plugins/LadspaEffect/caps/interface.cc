@@ -29,7 +29,7 @@
 	(2541 - 2580 donated to artemio@kdemail.net)
 */
 
-#include <sys/time.h>
+// #include <sys/time.h>
 
 #include "basics.h"
 
@@ -69,7 +69,6 @@ seed()
 
 extern "C" {
 
-__attribute__ ((constructor)) 
 void caps_so_init()
 {
 	DescriptorStub ** d = descriptors;
@@ -125,7 +124,6 @@ void caps_so_init()
 	//seed();
 }
 
-__attribute__ ((destructor)) 
 void caps_so_fini()
 {
 	for (ulong i = 0; i < N; ++i)
@@ -141,5 +139,12 @@ ladspa_descriptor (unsigned long i)
 		return descriptors[i];
 	return 0;
 }
+
+struct CapsSoInit
+{
+	CapsSoInit() { caps_so_init(); } 
+	~CapsSoInit() { caps_so_fini(); } 
+};
+static CapsSoInit capsSoInit;
 
 }; /* extern "C" */

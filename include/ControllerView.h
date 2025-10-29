@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef CONTROLLER_VIEW_H
-#define CONTROLLER_VIEW_H
+#ifndef LMMS_GUI_CONTROLLER_VIEW_H
+#define LMMS_GUI_CONTROLLER_VIEW_H
 
 #include <QFrame>
 
@@ -36,6 +36,10 @@ class QLabel;
 class QPushButton;
 class QMdiSubWindow;
 
+namespace lmms::gui
+{
+
+
 class LedCheckBox;
 
 
@@ -44,7 +48,7 @@ class ControllerView : public QFrame, public ModelView
 	Q_OBJECT
 public:
 	ControllerView( Controller * _controller, QWidget * _parent );
-	virtual ~ControllerView();
+	~ControllerView() override;
 
 	inline Controller * getController()
 	{
@@ -59,12 +63,16 @@ public:
 
 public slots:
 	void editControls();
-	void deleteController();
+	void removeController();
 	void closeControls();
 	void renameController();
+	void moveUp();
+	void moveDown();
 
 signals:
-	void deleteController( ControllerView * _view );
+	void movedUp(ControllerView* view);
+	void movedDown(ControllerView* view);
+	void removedController(ControllerView* view);
 
 
 protected:
@@ -81,4 +89,7 @@ private:
 
 } ;
 
-#endif
+
+} // namespace lmms::gui
+
+#endif // LMMS_GUI_CONTROLLER_VIEW_H

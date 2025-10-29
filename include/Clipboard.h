@@ -22,16 +22,19 @@
  *
  */
 
-#ifndef CLIPBOARD_H
-#define CLIPBOARD_H
+#ifndef LMMS_CLIPBOARD_H
+#define LMMS_CLIPBOARD_H
 
-#include <QtCore/QMap>
 #include <QDomElement>
+#include <QMap>
+
+#include "lmms_export.h"
 
 class QMimeData;
 
-namespace Clipboard
+namespace lmms::Clipboard
 {
+
 	enum class MimeType
 	{
 		StringPair,
@@ -43,7 +46,7 @@ namespace Clipboard
 	bool hasFormat( MimeType mT );
 
 	// Helper methods for String data
-	void copyString( const QString & str, MimeType mT );
+	void LMMS_EXPORT copyString(const QString& str, MimeType mT);
 	QString getString( MimeType mT );
 
 	// Helper methods for String Pair data
@@ -64,6 +67,7 @@ namespace Clipboard
 				break;
 		}
 	}
-} ;
 
-#endif
+} // namespace lmms::Clipboard
+
+#endif // LMMS_CLIPBOARD_H

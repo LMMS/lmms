@@ -22,17 +22,36 @@
  *
  */
 
-#ifndef AUDIO_PORTAUDIO_H
-#define AUDIO_PORTAUDIO_H
+#ifndef LMMS_AUDIO_PORTAUDIO_H
+#define LMMS_AUDIO_PORTAUDIO_H
 
-#include <QtCore/QObject>
+#include <QObject>
 
 #include "lmmsconfig.h"
 #include "ComboBoxModel.h"
 
+#ifdef LMMS_HAVE_PORTAUDIO
+
+#   include <portaudio.h>
+
+#   include "AudioDevice.h"
+#   include "AudioDeviceSetupWidget.h"
+
+#   if defined paNeverDropInput || defined paNonInterleaved
+#	    define PORTAUDIO_V19
+#   else
+#	    define PORTAUDIO_V18
+#   endif
+
+#endif
+
+
+namespace lmms
+{
+
 class AudioPortAudioSetupUtil : public QObject
 {
-	Q_OBJECT
+Q_OBJECT
 public slots:
 	void updateBackends();
 	void updateDevices();
@@ -41,66 +60,50 @@ public slots:
 public:
 	ComboBoxModel m_backendModel;
 	ComboBoxModel m_deviceModel;
-} ;
+};
 
 
 #ifdef LMMS_HAVE_PORTAUDIO
 
-#include <portaudio.h>
 
-#include <QtCore/QSemaphore>
-
-#include "AudioDevice.h"
-#include "AudioDeviceSetupWidget.h"
-
-#if defined paNeverDropInput || defined paNonInterleaved
-#	define PORTAUDIO_V19
-#else
-#	define PORTAUDIO_V18
-#endif
-
-
+namespace gui
+{
 class ComboBox;
-class LcdSpinBox;
+}
 
 
 class AudioPortAudio : public AudioDevice
 {
 public:
 	AudioPortAudio( bool & _success_ful, AudioEngine* audioEngine );
-	virtual ~AudioPortAudio();
+	~AudioPortAudio() override;
 
 	inline static QString name()
 	{
 		return QT_TRANSLATE_NOOP( "AudioDeviceSetupWidget", "PortAudio" );
 	}
 
+	int process_callback(const float* _inputBuffer, float* _outputBuffer, f_cnt_t _framesPerBuffer);
 
-	int process_callback( const float *_inputBuffer,
-		float * _outputBuffer,
-		unsigned long _framesPerBuffer );
-
-
-	class setupWidget : public AudioDeviceSetupWidget
+	class setupWidget : public gui::AudioDeviceSetupWidget
 	{
 	public:
 		setupWidget( QWidget * _parent );
-		virtual ~setupWidget();
+		~setupWidget() override;
 
-		virtual void saveSettings();
-		virtual void show();
+		void saveSettings() override;
+		void show() override;
 
 	private:
-		ComboBox * m_backend;
-		ComboBox * m_device;
+		gui::ComboBox * m_backend;
+		gui::ComboBox * m_device;
 		AudioPortAudioSetupUtil m_setupUtil;
 
 	} ;
 
 private:
-	virtual void startProcessing();
-	virtual void stopProcessing();
-	virtual void applyQualitySettings();
+	void startProcessing() override;
+	void stopProcessing() override;
 
 #ifdef PORTAUDIO_V19
 	static int _process_callback( const void *_inputBuffer, void * _outputBuffer,
@@ -122,10 +125,10 @@ private:
 		unsigned long _framesPerBuffer, PaTimestamp _outTime, void * _arg );
 
 
-	typedef double PaTime;
-	typedef PaDeviceID PaDeviceIndex;
+	using PaTime = double;
+	using PaDeviceIndex = PaDeviceID;
 
-	typedef struct PaStreamParameters
+	using PaStreamParameters = struct
 	{
 		PaDeviceIndex device;
 		int channelCount;
@@ -134,7 +137,7 @@ private:
 		void *hostApiSpecificStreamInfo;
 
 	} PaStreamParameters;
-#endif
+#endif // PORTAUDIO_V19
 
 	PaStream * m_paStream;
 	PaStreamParameters m_outputParameters;
@@ -142,14 +145,16 @@ private:
 
 	bool m_wasPAInitError;
 
-	surroundSampleFrame * m_outBuf;
-	int m_outBufPos;
-	int m_outBufSize;
+	SampleFrame* m_outBuf;
+	std::size_t m_outBufPos;
+	fpp_t m_outBufSize;
 
 	bool m_stopped;
 
 } ;
 
-#endif
+#endif // LMMS_HAVE_PORTAUDIO
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_AUDIO_PORTAUDIO_H

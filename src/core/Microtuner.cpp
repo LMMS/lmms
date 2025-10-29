@@ -27,11 +27,14 @@
 #include <vector>
 #include <cmath>
 
-#include "ConfigManager.h"
 #include "Engine.h"
 #include "Keymap.h"
+#include "Note.h"
 #include "Scale.h"
 #include "Song.h"
+
+namespace lmms
+{
 
 
 Microtuner::Microtuner() :
@@ -99,12 +102,23 @@ float Microtuner::keyToFreq(int key, int userBaseNote) const
 
 	// Compute frequency of the middle note and return the final frequency
 	const double octaveRatio = intervals[octaveDegree].getRatio();
-	const float middleFreq = (keymap->getBaseFreq() / pow(octaveRatio, (baseScaleOctave + baseKeymapOctave)))
-								/ intervals[baseScaleDegree].getRatio();
+	const float middleFreq = (keymap->getBaseFreq() / std::pow(octaveRatio, baseScaleOctave + baseKeymapOctave))
+		/ intervals[baseScaleDegree].getRatio();
 
-	return middleFreq * intervals[scaleDegree].getRatio() * pow(octaveRatio, keymapOctave + scaleOctave);
+	return middleFreq * intervals[scaleDegree].getRatio() * std::pow(octaveRatio, keymapOctave + scaleOctave);
 }
 
+int Microtuner::octaveSize() const
+{
+	const int keymapSize = Engine::getSong()->getKeymap(currentKeymap())->getSize();
+	if (keymapSize > 0)
+	{
+		return keymapSize;
+	}
+
+	// Determine octave size from the scale if the keymap isn't in use.
+	return Engine::getSong()->getScale(currentScale())->getIntervals().size() - 1;
+}
 
 /**
  * \brief Update scale name displayed in the microtuner scale list.
@@ -112,14 +126,14 @@ float Microtuner::keyToFreq(int key, int userBaseNote) const
  */
 void Microtuner::updateScaleList(int index)
 {
-	if (index >= 0 && index < MaxScaleCount)
+	if (index >= 0 && static_cast<std::size_t>(index) < MaxScaleCount)
 	{
 		m_scaleModel.replaceItem(index,
 			QString::number(index) + ": " + Engine::getSong()->getScale(index)->getDescription());
 	}
 	else
 	{
-		for (int i = 0; i < MaxScaleCount; i++)
+		for (auto i = std::size_t{0}; i < MaxScaleCount; i++)
 		{
 			m_scaleModel.replaceItem(i,
 				QString::number(i) + ": " + Engine::getSong()->getScale(i)->getDescription());
@@ -133,14 +147,14 @@ void Microtuner::updateScaleList(int index)
  */
 void Microtuner::updateKeymapList(int index)
 {
-	if (index >= 0 && index < MaxKeymapCount)
+	if (index >= 0 && static_cast<std::size_t>(index) < MaxKeymapCount)
 	{
 		m_keymapModel.replaceItem(index,
 			QString::number(index) + ": " + Engine::getSong()->getKeymap(index)->getDescription());
 	}
 	else
 	{
-		for (int i = 0; i < MaxKeymapCount; i++)
+		for (auto i = std::size_t{0}; i < MaxKeymapCount; i++)
 		{
 			m_keymapModel.replaceItem(i,
 				QString::number(i) + ": " + Engine::getSong()->getKeymap(i)->getDescription());
@@ -165,3 +179,6 @@ void Microtuner::loadSettings(const QDomElement &element)
 	m_keymapModel.loadSettings(element, "keymap");
 	m_keyRangeImportModel.loadSettings(element, "range_import");
 }
+
+
+} // namespace lmms

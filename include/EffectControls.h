@@ -22,15 +22,23 @@
  *
  */
 
-#ifndef EFFECT_CONTROLS_H
-#define EFFECT_CONTROLS_H
+#ifndef LMMS_EFFECT_CONTROLS_H
+#define LMMS_EFFECT_CONTROLS_H
 
 #include "Model.h"
 #include "JournallingObject.h"
 #include "Effect.h"
 
+namespace lmms
+{
+
+
+namespace gui
+{
+
 class EffectControlDialog;
 
+} // namespace gui
 
 class EffectControls : public JournallingObject, public Model
 {
@@ -43,12 +51,10 @@ public:
 	{
 	}
 
-	virtual ~EffectControls()
-	{
-	}
+	~EffectControls() override = default;
 
 	virtual int controlCount() = 0;
-	virtual EffectControlDialog * createView() = 0;
+	virtual gui::EffectControlDialog * createView() = 0;
 
 
 	void setViewVisible( bool _visible )
@@ -73,4 +79,7 @@ private:
 
 } ;
 
-#endif
+
+} // namespace lmms
+
+#endif // LMMS_EFFECT_CONTROLS_H

@@ -27,12 +27,21 @@
 
 #include "ComboBoxModel.h"
 #include "EffectControls.h"
-#include "lmms_constants.h"
 
 //#define SA_DEBUG 1	// define SA_DEBUG to enable performance measurements
 
+namespace lmms
+{
+
 
 class Analyzer;
+
+namespace gui
+{
+class SaControlsDialog;
+class SaSpectrumView;
+class SaWaterfallView;
+}
 
 // Holds all the configuration values
 class SaControls : public EffectControls
@@ -40,9 +49,9 @@ class SaControls : public EffectControls
 	Q_OBJECT
 public:
 	explicit SaControls(Analyzer* effect);
-	virtual ~SaControls() {}
+	~SaControls() override = default;
 
-	EffectControlDialog* createView() override;
+	gui::EffectControlDialog* createView() override;
 
 	void saveSettings (QDomDocument& doc, QDomElement& parent) override;
 	void loadSettings (const QDomElement &_this) override;
@@ -89,9 +98,13 @@ private:
 	QColor m_colorGrid;		//!< color of grid lines
 	QColor m_colorLabels;	//!< color of axis labels
 
-	friend class SaControlsDialog;
-	friend class SaSpectrumView;
-	friend class SaWaterfallView;
+	friend class gui::SaControlsDialog;
+	friend class gui::SaSpectrumView;
+	friend class gui::SaWaterfallView;
 	friend class SaProcessor;
 };
+
+
+} // namespace lmms
+
 #endif // SACONTROLS_H

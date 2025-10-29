@@ -22,21 +22,21 @@
  *
  */
 
-#ifndef MIDI_DUMMY_H
-#define MIDI_DUMMY_H
+#ifndef LMMS_MIDI_DUMMY_H
+#define LMMS_MIDI_DUMMY_H
 
 #include "MidiClient.h"
+
+
+namespace lmms
+{
 
 
 class MidiDummy : public MidiClientRaw
 {
 public:
-	MidiDummy()
-	{
-	}
-	virtual ~MidiDummy()
-	{
-	}
+	MidiDummy() = default;
+	~MidiDummy() override = default;
 
 	inline static QString name()
 	{
@@ -63,4 +63,6 @@ protected:
 } ;
 
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_MIDI_DUMMY_H

@@ -21,21 +21,31 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
+
 #include "SampleTrackWindow.h"
 
 #include <QCloseEvent>
+#include <QGridLayout>
+#include <QLabel>
+#include <QLineEdit>
 #include <QMenu>
+#include <QVBoxLayout>
 
+#include "AutomatableButton.h"
+#include "EffectRackView.h"
 #include "embed.h"
-#include "gui_templates.h"
 #include "GuiApplication.h"
 #include "Knob.h"
 #include "MainWindow.h"
+#include "MixerChannelLcdSpinBox.h"
+#include "SampleTrackView.h"
 #include "Song.h"
-#include "TabWidget.h"
+#include "SubWindow.h"
 #include "TrackLabelButton.h"
- 
+
+namespace lmms::gui
+{
+
 
 SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
 	QWidget(),
@@ -43,29 +53,34 @@ SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
 	m_track(tv->model()),
 	m_stv(tv)
 {
+#if QT_VERSION < 0x50C00
+	// Workaround for a bug in Qt versions below 5.12,
+	// where argument-dependent-lookup fails for QFlags operators
+	// declared inside a namespace.
+	// This affects the Q_DECLARE_OPERATORS_FOR_FLAGS macro in Instrument.h
+	// See also: https://codereview.qt-project.org/c/qt/qtbase/+/225348
+
+	using ::operator|;
+#endif
+
 	// init own layout + widgets
 	setFocusPolicy(Qt::StrongFocus);
-	QVBoxLayout * vlayout = new QVBoxLayout(this);
-	vlayout->setMargin(0);
+	auto vlayout = new QVBoxLayout(this);
+	vlayout->setContentsMargins(0, 0, 0, 0);
 	vlayout->setSpacing(0);
 
-	TabWidget* generalSettingsWidget = new TabWidget(tr("GENERAL SETTINGS"), this);
+	auto generalSettingsWidget = new QWidget(this);
+	auto generalSettingsLayout = new QVBoxLayout(generalSettingsWidget);
 
-	QVBoxLayout* generalSettingsLayout = new QVBoxLayout(generalSettingsWidget);
-
-	generalSettingsLayout->setContentsMargins(8, 18, 8, 8);
-	generalSettingsLayout->setSpacing(6);
-
-	QWidget* nameWidget = new QWidget(generalSettingsWidget);
-	QHBoxLayout* nameLayout = new QHBoxLayout(nameWidget);
+	auto nameWidget = new QWidget(generalSettingsWidget);
+	auto nameLayout = new QHBoxLayout(nameWidget);
 	nameLayout->setContentsMargins(0, 0, 0, 0);
 	nameLayout->setSpacing(2);
 
 	// setup line edit for changing sample track name
 	m_nameLineEdit = new QLineEdit;
-	m_nameLineEdit->setFont(pointSize<9>(m_nameLineEdit->font()));
-	connect(m_nameLineEdit, SIGNAL(textChanged(const QString &)),
-				this, SLOT(textChanged(const QString &)));
+	connect(m_nameLineEdit, SIGNAL(textChanged(const QString&)),
+				this, SLOT(textChanged(const QString&)));
 
 	m_nameLineEdit->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
 	nameLayout->addWidget(m_nameLineEdit);
@@ -73,60 +88,77 @@ SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
 
 	generalSettingsLayout->addWidget(nameWidget);
 
-
-	QGridLayout* basicControlsLayout = new QGridLayout;
+	auto basicControlsLayout = new QGridLayout;
 	basicControlsLayout->setHorizontalSpacing(3);
 	basicControlsLayout->setVerticalSpacing(0);
 	basicControlsLayout->setContentsMargins(0, 0, 0, 0);
 
-	QString labelStyleSheet = "font-size: 6pt;";
+	QString labelStyleSheet = "font-size: 10px;";
 	Qt::Alignment labelAlignment = Qt::AlignHCenter | Qt::AlignTop;
 	Qt::Alignment widgetAlignment = Qt::AlignHCenter | Qt::AlignCenter;
+	
+	auto soloMuteLayout = new QVBoxLayout();
+	soloMuteLayout->setContentsMargins(0, 0, 2, 0);
+	soloMuteLayout->setSpacing(2);
+
+	m_muteBtn = new AutomatableButton(this, tr("Mute"));
+	m_muteBtn->setModel(&m_track->m_mutedModel);
+	m_muteBtn->setObjectName("btn-mute");
+	m_muteBtn->setCheckable(true);
+	m_muteBtn->setToolTip(tr("Mute this sample track"));
+	soloMuteLayout->addWidget(m_muteBtn, 0, widgetAlignment);
+
+	m_soloBtn = new AutomatableButton(this, tr("Solo"));
+	m_soloBtn->setModel(&m_track->m_soloModel);
+	m_soloBtn->setObjectName("btn-solo");
+	m_soloBtn->setCheckable(true);
+	m_soloBtn->setToolTip(tr("Solo this sample track"));
+	soloMuteLayout->addWidget(m_soloBtn, 0, widgetAlignment);
+
+	basicControlsLayout->addLayout(soloMuteLayout, 0, 0, 2, 1, widgetAlignment);
 
 	// set up volume knob
-	m_volumeKnob = new Knob(knobBright_26, nullptr, tr("Sample volume"));
+	m_volumeKnob = new Knob(KnobType::Bright26, nullptr, tr("Sample volume"));
 	m_volumeKnob->setVolumeKnob(true);
 	m_volumeKnob->setHintText(tr("Volume:"), "%");
 
-	basicControlsLayout->addWidget(m_volumeKnob, 0, 0);
+	basicControlsLayout->addWidget(m_volumeKnob, 0, 1);
 	basicControlsLayout->setAlignment(m_volumeKnob, widgetAlignment);
 
-	QLabel *label = new QLabel(tr("VOL"), this);
-	label->setStyleSheet(labelStyleSheet);
-	basicControlsLayout->addWidget(label, 1, 0);
-	basicControlsLayout->setAlignment(label, labelAlignment);
-
-
-	// set up panning knob
-	m_panningKnob = new Knob(knobBright_26, nullptr, tr("Panning"));
-	m_panningKnob->setHintText(tr("Panning:"), "");
-
-	basicControlsLayout->addWidget(m_panningKnob, 0, 1);
-	basicControlsLayout->setAlignment(m_panningKnob, widgetAlignment);
-
-	label = new QLabel(tr("PAN"),this);
+	auto label = new QLabel(tr("VOL"), this);
 	label->setStyleSheet(labelStyleSheet);
 	basicControlsLayout->addWidget(label, 1, 1);
 	basicControlsLayout->setAlignment(label, labelAlignment);
 
+	// set up panning knob
+	m_panningKnob = new Knob(KnobType::Bright26, nullptr, tr("Panning"));
+	m_panningKnob->setHintText(tr("Panning:"), "");
 
-	basicControlsLayout->setColumnStretch(2, 1);
+	basicControlsLayout->addWidget(m_panningKnob, 0, 2);
+	basicControlsLayout->setAlignment(m_panningKnob, widgetAlignment);
+
+	label = new QLabel(tr("PAN"),this);
+	label->setStyleSheet(labelStyleSheet);
+	basicControlsLayout->addWidget(label, 1, 2);
+	basicControlsLayout->setAlignment(label, labelAlignment);
+
+	basicControlsLayout->setColumnStretch(3, 1);
 
 
 	// setup spinbox for selecting Mixer-channel
-	m_mixerChannelNumber = new MixerLineLcdSpinBox(2, nullptr, tr("Mixer channel"), m_stv);
+	m_mixerChannelNumber = new MixerChannelLcdSpinBox(2, nullptr, tr("Mixer channel"), m_stv);
 
-	basicControlsLayout->addWidget(m_mixerChannelNumber, 0, 3);
+	basicControlsLayout->addWidget(m_mixerChannelNumber, 0, 4);
 	basicControlsLayout->setAlignment(m_mixerChannelNumber, widgetAlignment);
 
-	label = new QLabel(tr("CHANNEL"), this);
+	label = new QLabel(tr("CHAN"), this);
 	label->setStyleSheet(labelStyleSheet);
-	basicControlsLayout->addWidget(label, 1, 3);
+	basicControlsLayout->addWidget(label, 1, 4);
 	basicControlsLayout->setAlignment(label, labelAlignment);
 
 	generalSettingsLayout->addLayout(basicControlsLayout);
 
-	m_effectRack = new EffectRackView(tv->model()->audioPort()->effects());
+	m_effectRack = new EffectRackView(tv->model()->audioBusHandle()->effects());
 	m_effectRack->setFixedSize(EffectRackView::DEFAULT_WIDTH, 242);
 
 	vlayout->addWidget(generalSettingsWidget);
@@ -151,11 +183,6 @@ SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
 	subWin->setFixedSize(subWin->size());
 	subWin->hide();
 }
-
-SampleTrackWindow::~SampleTrackWindow()
-{
-}
-
 
 
 void SampleTrackWindow::setSampleTrackView(SampleTrackView* tv)
@@ -241,7 +268,7 @@ void SampleTrackWindow::closeEvent(QCloseEvent* ce)
 		hide();
 	}
 
-	m_stv->m_tlb->setFocus();
+	m_stv->setFocus();
 	m_stv->m_tlb->setChecked(false);
 }
 
@@ -263,3 +290,6 @@ void SampleTrackWindow::loadSettings(const QDomElement& element)
 		m_stv->m_tlb->setChecked(true);
 	}
 }
+
+
+} // namespace lmms::gui

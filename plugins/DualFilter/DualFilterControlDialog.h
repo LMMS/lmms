@@ -28,8 +28,14 @@
 
 #include "EffectControlDialog.h"
 
+namespace lmms
+{
+
 
 class DualFilterControls;
+
+namespace gui
+{
 
 
 class DualFilterControlDialog : public EffectControlDialog
@@ -37,10 +43,13 @@ class DualFilterControlDialog : public EffectControlDialog
 	Q_OBJECT
 public:
 	DualFilterControlDialog( DualFilterControls* controls );
-	virtual ~DualFilterControlDialog()
-	{
-	}
+	~DualFilterControlDialog() override = default;
 
 } ;
+
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

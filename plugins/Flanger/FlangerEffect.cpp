@@ -23,22 +23,32 @@
  */
 
 #include "FlangerEffect.h"
+
+#include <numbers>
+
 #include "Engine.h"
+#include "MonoDelay.h"
+#include "QuadratureLfo.h"
 
 #include "embed.h"
+#include "lmms_math.h"
 #include "plugin_export.h"
+
+namespace lmms
+{
+
 
 extern "C"
 {
 
 Plugin::Descriptor PLUGIN_EXPORT flanger_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"Flanger",
 	QT_TRANSLATE_NOOP( "PluginBrowser", "A native flanger plugin" ),
 	"Dave French <contact/dot/dave/dot/french3/at/googlemail/dot/com>",
 	0x0100,
-	Plugin::Effect,
+	Plugin::Type::Effect,
 	new PluginPixmapLoader("logo"),
 	nullptr,
 	nullptr,
@@ -51,10 +61,9 @@ FlangerEffect::FlangerEffect( Model *parent, const Plugin::Descriptor::SubPlugin
 	Effect( &flanger_plugin_descriptor, parent, key ),
 	m_flangerControls( this )
 {
-	m_lfo = new QuadratureLfo( Engine::audioEngine()->processingSampleRate() );
-	m_lDelay = new MonoDelay( 1, Engine::audioEngine()->processingSampleRate() );
-	m_rDelay = new MonoDelay( 1, Engine::audioEngine()->processingSampleRate() );
-	m_noise = new Noise;
+	m_lfo = new QuadratureLfo( Engine::audioEngine()->outputSampleRate() );
+	m_lDelay = new MonoDelay( 1, Engine::audioEngine()->outputSampleRate() );
+	m_rDelay = new MonoDelay( 1, Engine::audioEngine()->outputSampleRate() );
 }
 
 
@@ -74,39 +83,31 @@ FlangerEffect::~FlangerEffect()
 	{
 		delete m_lfo;
 	}
-	if(m_noise)
-	{
-		delete m_noise;
-	}
 }
 
 
 
 
-bool FlangerEffect::processAudioBuffer( sampleFrame *buf, const fpp_t frames )
+Effect::ProcessStatus FlangerEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 {
-	if( !isEnabled() || !isRunning () )
-	{
-		return( false );
-	}
-	double outSum = 0.0;
 	const float d = dryLevel();
 	const float w = wetLevel();
-	const float length = m_flangerControls.m_delayTimeModel.value() * Engine::audioEngine()->processingSampleRate();
+	const float length = m_flangerControls.m_delayTimeModel.value() * Engine::audioEngine()->outputSampleRate();
 	const float noise = m_flangerControls.m_whiteNoiseAmountModel.value();
-	float amplitude = m_flangerControls.m_lfoAmountModel.value() * Engine::audioEngine()->processingSampleRate();
+	float amplitude = m_flangerControls.m_lfoAmountModel.value() * Engine::audioEngine()->outputSampleRate();
 	bool invertFeedback = m_flangerControls.m_invertFeedbackModel.value();
 	m_lfo->setFrequency(  1.0/m_flangerControls.m_lfoFrequencyModel.value() );
-	m_lfo->setOffset( m_flangerControls.m_lfoPhaseModel.value() / 180 * D_PI );
+	m_lfo->setOffset(m_flangerControls.m_lfoPhaseModel.value() / 180 * std::numbers::pi);
 	m_lDelay->setFeedback( m_flangerControls.m_feedbackModel.value() );
 	m_rDelay->setFeedback( m_flangerControls.m_feedbackModel.value() );
-	sample_t dryS[2];
-	float leftLfo;
-	float rightLfo;
+	auto dryS = std::array<sample_t, 2>{};
 	for( fpp_t f = 0; f < frames; ++f )
 	{
-		buf[f][0] += m_noise->tick() * noise;
-		buf[f][1] += m_noise->tick() * noise;
+		float leftLfo;
+		float rightLfo;
+
+		buf[f][0] += fastRand(-1.f, +1.f) * noise;
+		buf[f][1] += fastRand(-1.f, +1.f) * noise;
 		dryS[0] = buf[f][0];
 		dryS[1] = buf[f][1];
 		m_lfo->tick(&leftLfo, &rightLfo);
@@ -124,10 +125,9 @@ bool FlangerEffect::processAudioBuffer( sampleFrame *buf, const fpp_t frames )
 
 		buf[f][0] = ( d * dryS[0] ) + ( w * buf[f][0] );
 		buf[f][1] = ( d * dryS[1] ) + ( w * buf[f][1] );
-		outSum += buf[f][0]*buf[f][0] + buf[f][1]*buf[f][1];
 	}
-	checkGate( outSum / frames );
-	return isRunning();
+
+	return ProcessStatus::ContinueIfNotQuiet;
 }
 
 
@@ -135,9 +135,9 @@ bool FlangerEffect::processAudioBuffer( sampleFrame *buf, const fpp_t frames )
 
 void FlangerEffect::changeSampleRate()
 {
-	m_lfo->setSampleRate( Engine::audioEngine()->processingSampleRate() );
-	m_lDelay->setSampleRate( Engine::audioEngine()->processingSampleRate() );
-	m_rDelay->setSampleRate( Engine::audioEngine()->processingSampleRate() );
+	m_lfo->setSampleRate( Engine::audioEngine()->outputSampleRate() );
+	m_lDelay->setSampleRate( Engine::audioEngine()->outputSampleRate() );
+	m_rDelay->setSampleRate( Engine::audioEngine()->outputSampleRate() );
 }
 
 
@@ -161,3 +161,6 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model* parent, void* data )
 }
 
 }}
+
+
+} // namespace lmms

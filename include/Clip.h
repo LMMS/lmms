@@ -22,30 +22,38 @@
  *
  */
 
-#ifndef TRACK_CONTENT_OBJECT_H
-#define TRACK_CONTENT_OBJECT_H
+#ifndef LMMS_CLIP_H
+#define LMMS_CLIP_H
+
+#include <optional>
 
 #include <QColor>
 
 #include "AutomatableModel.h"
-#include "lmms_basics.h"
 
+
+namespace lmms
+{
 
 class Track;
+
+namespace gui
+{
+
 class ClipView;
-class TrackContainer;
 class TrackView;
+
+} // namespace gui
 
 
 class LMMS_EXPORT Clip : public Model, public JournallingObject
 {
 	Q_OBJECT
-	MM_OPERATORS
 	mapPropertyFromModel(bool,isMuted,setMuted,m_mutedModel);
 	mapPropertyFromModel(bool,isSolo,setSolo,m_soloModel);
 public:
 	Clip( Track * track );
-	virtual ~Clip();
+	~Clip() override;
 
 	inline Track * getTrack() const
 	{
@@ -85,39 +93,37 @@ public:
 		return m_length;
 	}
 
-	inline void setAutoResize( const bool r )
+
+	bool hasTrackContainer() const;
+
+	bool isInPattern() const;
+
+	bool manuallyResizable() const;
+
+	/*! \brief Set whether a clip has been resized yet by the user or the knife tool.
+	 *
+	 *  If a clip has been resized previously, it will not automatically 
+	 *  resize when editing it.
+	 *
+	 */
+	void setAutoResize(const bool r)
 	{
 		m_autoResize = r;
 	}
 
-	inline const bool getAutoResize() const
+	bool getAutoResize() const
 	{
 		return m_autoResize;
 	}
 
-	QColor color() const
-	{
-		return m_color;
-	}
-
-	void setColor( const QColor & c )
-	{
-		m_color = c;
-	}
-
-	bool hasColor();
-
-	void useCustomClipColor( bool b );
-
-	bool usesCustomClipColor()
-	{
-		return m_useCustomClipColor;
-	}
+	auto color() const -> const std::optional<QColor>& { return m_color; }
+	void setColor(const std::optional<QColor>& color);
 
 	virtual void movePosition( const TimePos & pos );
 	virtual void changeLength( const TimePos & length );
+	virtual void updateLength() {};
 
-	virtual ClipView * createView( TrackView * tv ) = 0;
+	virtual gui::ClipView * createView( gui::TrackView * tv ) = 0;
 
 	inline void selectViewOnCreate( bool select )
 	{
@@ -138,6 +144,12 @@ public:
 	// Will copy the state of a clip to another clip
 	static void copyStateTo( Clip *src, Clip *dst );
 
+	/**
+	* Creates a copy of this clip
+	* @return pointer to the new clip object
+	*/
+	virtual Clip* clone() = 0;
+
 public slots:
 	void toggleMute();
 
@@ -148,15 +160,10 @@ signals:
 	void destroyedClip();
 	void colorChanged();
 
+protected:
+	Clip(const Clip& other);
 
 private:
-	enum Actions
-	{
-		NoAction,
-		Move,
-		Resize
-	} ;
-
 	Track * m_track;
 	QString m_name;
 
@@ -166,16 +173,17 @@ private:
 
 	BoolModel m_mutedModel;
 	BoolModel m_soloModel;
-	bool m_autoResize;
+	bool m_autoResize = true;
 
 	bool m_selectViewOnCreate;
 
-	QColor m_color;
-	bool m_useCustomClipColor;
+	std::optional<QColor> m_color;
 
 	friend class ClipView;
 
 } ;
 
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_CLIP_H

@@ -26,8 +26,10 @@
 #include <QMouseEvent>
 
 #include "NStateButton.h"
-#include "ToolTip.h"
 
+
+namespace lmms::gui
+{
 
 
 NStateButton::NStateButton( QWidget * _parent ) :
@@ -65,31 +67,27 @@ void NStateButton::addState( const QPixmap & _pm, const QString & _tooltip )
 
 
 
-void NStateButton::changeState( int _n )
+void NStateButton::changeState(int state)
 {
-	if( _n >= 0 && _n < (int) m_states.size() )
+	if (state >= 0 && state < m_states.size() && state != m_curState)
 	{
-		m_curState = _n;
+		m_curState = state;
 
-		const QString & _tooltip =
-			( m_states[m_curState].second != "" ) ?
-				m_states[m_curState].second :
-					m_generalToolTip;
-		ToolTip::add( this, _tooltip );
+		const auto& [icon, tooltip] = m_states[m_curState];
+		setToolTip(tooltip.isEmpty() ? m_generalToolTip : tooltip);
+		setIcon(icon);
 
-		setIcon( m_states[m_curState].first );
-
-		emit changedState( m_curState );
+		emit changedState(m_curState);
 	}
 }
 
-
-
-void NStateButton::mousePressEvent( QMouseEvent * _me )
+void NStateButton::mousePressEvent(QMouseEvent* me)
 {
-	if( _me->button() == Qt::LeftButton && m_states.size() )
+	if (me->button() == Qt::LeftButton && !m_states.empty())
 	{
-		changeState( ( ++m_curState ) % m_states.size() );
+		changeState((m_curState + 1) % m_states.size());
 	}
-	ToolButton::mousePressEvent( _me );
+	ToolButton::mousePressEvent(me);
 }
+
+} // namespace lmms::gui

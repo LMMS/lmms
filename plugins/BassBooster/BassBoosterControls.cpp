@@ -23,11 +23,12 @@
  */
 
 
-#include <QDomElement>
 
 #include "BassBoosterControls.h"
 #include "BassBooster.h"
 
+namespace lmms
+{
 
 
 BassBoosterControls::BassBoosterControls( BassBoosterEffect* effect ) :
@@ -66,6 +67,4 @@ void BassBoosterControls::saveSettings( QDomDocument& doc, QDomElement& _this )
 }
 
 
-
-
-
+} // namespace lmms

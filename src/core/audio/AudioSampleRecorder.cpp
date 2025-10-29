@@ -26,8 +26,10 @@
 
 #include "AudioSampleRecorder.h"
 #include "SampleBuffer.h"
-#include "debug.h"
 
+
+namespace lmms
+{
 
 
 AudioSampleRecorder::AudioSampleRecorder( const ch_cnt_t _channels,
@@ -57,49 +59,34 @@ AudioSampleRecorder::~AudioSampleRecorder()
 f_cnt_t AudioSampleRecorder::framesRecorded() const
 {
 	f_cnt_t frames = 0;
-	for( BufferList::ConstIterator it = m_buffers.begin();
-						it != m_buffers.end(); ++it )
+	for (const auto& buffer : m_buffers)
 	{
-		frames += ( *it ).second;
+		frames += buffer.second;
 	}
 	return frames;
 }
 
-
-
-
-void AudioSampleRecorder::createSampleBuffer( SampleBuffer** sampleBuf )
+std::shared_ptr<const SampleBuffer> AudioSampleRecorder::createSampleBuffer()
 {
 	const f_cnt_t frames = framesRecorded();
 	// create buffer to store all recorded buffers in
-	sampleFrame * data = new sampleFrame[frames];
-	// make sure buffer is cleaned up properly at the end...
-	sampleFrame * data_ptr = data;
-
-
-	assert( data != nullptr );
+	auto bigBuffer = std::vector<SampleFrame>(frames);
 
 	// now copy all buffers into big buffer
-	for( BufferList::ConstIterator it = m_buffers.begin();
-						it != m_buffers.end(); ++it )
+	auto framesCopied = 0;
+	for (const auto& [buf, numFrames] : m_buffers)
 	{
-		memcpy( data_ptr, ( *it ).first, ( *it ).second *
-							sizeof( sampleFrame ) );
-		data_ptr += ( *it ).second;
+		std::copy_n(buf, numFrames, bigBuffer.begin() + framesCopied);
+		framesCopied += numFrames;
 	}
+
 	// create according sample-buffer out of big buffer
-	*sampleBuf = new SampleBuffer( data, frames );
-	( *sampleBuf )->setSampleRate( sampleRate() );
-	delete[] data;
+	return std::make_shared<const SampleBuffer>(std::move(bigBuffer), sampleRate());
 }
 
-
-
-
-void AudioSampleRecorder::writeBuffer( const surroundSampleFrame * _ab,
-					const fpp_t _frames, const float )
+void AudioSampleRecorder::writeBuffer(const SampleFrame* _ab, const fpp_t _frames)
 {
-	sampleFrame * buf = new sampleFrame[_frames];
+	auto buf = new SampleFrame[_frames];
 	for( fpp_t frame = 0; frame < _frames; ++frame )
 	{
 		for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
@@ -111,4 +98,4 @@ void AudioSampleRecorder::writeBuffer( const surroundSampleFrame * _ab,
 }
 
 
-
+} // namespace lmms

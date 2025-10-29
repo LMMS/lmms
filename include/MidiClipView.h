@@ -21,23 +21,30 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
-#ifndef MIDI_CLIP_VIEW_H
-#define MIDI_CLIP_VIEW_H
- 
-#include "MidiClip.h"
+
+#ifndef LMMS_GUI_MIDI_CLIP_VIEW_H
+#define LMMS_GUI_MIDI_CLIP_VIEW_H
+
+#include <QStaticText>
 #include "ClipView.h"
+#include "embed.h"
+
+namespace lmms
+{
 
 class MidiClip;
- 
- 
+
+namespace gui
+{
+
+
 class MidiClipView : public ClipView
 {
 	Q_OBJECT
 
 public:
 	MidiClipView( MidiClip* clip, TrackView* parent );
- 	virtual ~MidiClipView() = default;
+	~MidiClipView() override = default;
 
 	Q_PROPERTY(QColor noteFillColor READ getNoteFillColor WRITE setNoteFillColor)
 	Q_PROPERTY(QColor noteBorderColor READ getNoteBorderColor WRITE setNoteBorderColor)
@@ -56,17 +63,25 @@ public:
 	QColor const & getMutedNoteBorderColor() const { return m_mutedNoteBorderColor; }
 	void setMutedNoteBorderColor(QColor const & color) { m_mutedNoteBorderColor = color; }
 
+	// Returns true if selection can be merged and false if not
+	static bool canMergeSelection(QVector<ClipView*> clipvs);
+	static void mergeClips(QVector<ClipView*> clipvs);
+	static void bulkClearNotesOutOfBounds(QVector<ClipView*> clipvs);
+
 public slots:
-	MidiClip* getMidiClip();
+	lmms::MidiClip* getMidiClip();
 	void update() override;
 
 
 protected slots:
 	void openInPianoRoll();
 	void setGhostInPianoRoll();
+	void setGhostInAutomationEditor();
 
 	void resetName();
 	void changeName();
+	void transposeSelection();
+	void clearNotesOutOfBounds();
 
 
 protected:
@@ -78,10 +93,11 @@ protected:
 
 
 private:
-	static QPixmap * s_stepBtnOn0;
-	static QPixmap * s_stepBtnOn200;
-	static QPixmap * s_stepBtnOff;
-	static QPixmap * s_stepBtnOffLight;
+	QPixmap m_stepBtnOn0 = embed::getIconPixmap("step_btn_on_0");
+	QPixmap m_stepBtnOn200 = embed::getIconPixmap("step_btn_on_200");
+	QPixmap m_stepBtnOff = embed::getIconPixmap("step_btn_off");
+	QPixmap m_stepBtnOffLight = embed::getIconPixmap("step_btn_off_light");
+	QPixmap m_stepBtnHighlight = embed::getIconPixmap("step_btn_highlight");
 
 	MidiClip* m_clip;
 	QPixmap m_paintPixmap;
@@ -92,10 +108,17 @@ private:
 	QColor m_mutedNoteBorderColor;
 
 	QStaticText m_staticTextName;
+
+	bool m_legacySEPattern;
+
+	bool isResizableBeforeStart() override { return false; }
 	
-	bool m_legacySEBB;
+	bool destructiveSplitClip(const TimePos pos) override;
 } ;
- 
- 
- 
- #endif
+
+
+} // namespace gui
+
+} // namespace lmms
+
+#endif // LMMS_GUI_MIDI_CLIP_VIEW_H

@@ -22,33 +22,37 @@
  *
  */
 
-#include <QMessageBox>
 
 #include "VstEffect.h"
 
 #include "GuiApplication.h"
 #include "Song.h"
 #include "TextFloat.h"
+#include "VstPlugin.h"
 #include "VstSubPluginFeatures.h"
 
 #include "embed.h"
 #include "plugin_export.h"
+
+namespace lmms
+{
+
 
 extern "C"
 {
 
 Plugin::Descriptor PLUGIN_EXPORT vsteffect_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"VST",
 	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"plugin for using arbitrary VST effects inside LMMS." ),
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0200,
-	Plugin::Effect,
+	Plugin::Type::Effect,
 	new PluginPixmapLoader("logo"),
 	nullptr,
-	new VstSubPluginFeatures( Plugin::Effect )
+	new VstSubPluginFeatures( Plugin::Type::Effect )
 } ;
 
 }
@@ -61,93 +65,71 @@ VstEffect::VstEffect( Model * _parent,
 	m_key( *_key ),
 	m_vstControls( this )
 {
+	bool loaded = false;
 	if( !m_key.attributes["file"].isEmpty() )
 	{
-		openPlugin( m_key.attributes["file"] );
+		loaded = openPlugin(m_key.attributes["file"]);
 	}
 	setDisplayName( m_key.attributes["file"].section( ".dll", 0, 0 ).isEmpty()
 		? m_key.name : m_key.attributes["file"].section( ".dll", 0, 0 ) );
+
+	setDontRun(!loaded);
 }
 
 
 
 
-VstEffect::~VstEffect()
+Effect::ProcessStatus VstEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 {
-}
+	assert(m_plugin != nullptr);
+	static thread_local auto tempBuf = std::array<SampleFrame, MAXIMUM_BUFFER_SIZE>();
 
-
-
-
-bool VstEffect::processAudioBuffer( sampleFrame * _buf, const fpp_t _frames )
-{
-	if( !isEnabled() || !isRunning () )
+	std::memcpy(tempBuf.data(), buf, sizeof(SampleFrame) * frames);
+	if (m_pluginMutex.tryLock(Engine::getSong()->isExporting() ? -1 : 0))
 	{
-		return false;
+		m_plugin->process(tempBuf.data(), tempBuf.data());
+		m_pluginMutex.unlock();
 	}
 
-	if( m_plugin )
+	const float w = wetLevel();
+	const float d = dryLevel();
+	for (fpp_t f = 0; f < frames; ++f)
 	{
-		const float d = dryLevel();
-#ifdef __GNUC__
-		sampleFrame buf[_frames];
-#else
-		sampleFrame * buf = new sampleFrame[_frames];
-#endif
-		memcpy( buf, _buf, sizeof( sampleFrame ) * _frames );
-		if (m_pluginMutex.tryLock(Engine::getSong()->isExporting() ? -1 : 0))
-		{
-			m_plugin->process( buf, buf );
-			m_pluginMutex.unlock();
-		}
-
-		double out_sum = 0.0;
-		const float w = wetLevel();
-		for( fpp_t f = 0; f < _frames; ++f )
-		{
-			_buf[f][0] = w*buf[f][0] + d*_buf[f][0];
-			_buf[f][1] = w*buf[f][1] + d*_buf[f][1];
-		}
-		for( fpp_t f = 0; f < _frames; ++f )
-		{
-			out_sum += _buf[f][0]*_buf[f][0] + _buf[f][1]*_buf[f][1];
-		}
-#ifndef __GNUC__
-		delete[] buf;
-#endif
-
-		checkGate( out_sum / _frames );
+		buf[f][0] = w * tempBuf[f][0] + d * buf[f][0];
+		buf[f][1] = w * tempBuf[f][1] + d * buf[f][1];
 	}
-	return isRunning();
+
+	return ProcessStatus::ContinueIfNotQuiet;
 }
 
 
 
 
-void VstEffect::openPlugin( const QString & _plugin )
+bool VstEffect::openPlugin(const QString& plugin)
 {
-	TextFloat * tf = nullptr;
-	if( getGUI() != nullptr )
+	gui::TextFloat* tf = nullptr;
+	if( gui::getGUI() != nullptr )
 	{
-		tf = TextFloat::displayMessage(
+		tf = gui::TextFloat::displayMessage(
 			VstPlugin::tr( "Loading plugin" ),
 			VstPlugin::tr( "Please wait while loading VST plugin..." ),
 				PLUGIN_NAME::getIconPixmap( "logo", 24, 24 ), 0 );
 	}
 
 	QMutexLocker ml( &m_pluginMutex ); Q_UNUSED( ml );
-	m_plugin = QSharedPointer<VstPlugin>(new VstPlugin( _plugin ));
+	m_plugin = QSharedPointer<VstPlugin>(new VstPlugin(plugin));
 	if( m_plugin->failed() )
 	{
 		m_plugin.clear();
 		delete tf;
-		collectErrorForUI( VstPlugin::tr( "The VST plugin %1 could not be loaded." ).arg( _plugin ) );
-		return;
+		collectErrorForUI(VstPlugin::tr("The VST plugin %1 could not be loaded.").arg(plugin));
+		return false;
 	}
 
 	delete tf;
 
-	m_key.attributes["file"] = _plugin;
+	m_key.attributes["file"] = plugin;
+	return true;
 }
 
 
@@ -166,3 +148,5 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model * _parent, void * _data )
 
 }
 
+
+} // namespace lmms

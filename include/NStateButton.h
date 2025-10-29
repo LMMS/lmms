@@ -22,15 +22,17 @@
  *
  */
 
-
-#ifndef NSTATE_BUTTON_H
-#define NSTATE_BUTTON_H
+#ifndef LMMS_GUI_NSTATE_BUTTON_H
+#define LMMS_GUI_NSTATE_BUTTON_H
 
 #include <QPixmap>
-#include <QtCore/QVector>
-#include <QtCore/QPair>
+#include <QVector>
+#include <QPair>
 
 #include "ToolButton.h"
+
+namespace lmms::gui
+{
 
 
 class NStateButton : public ToolButton
@@ -38,7 +40,7 @@ class NStateButton : public ToolButton
 	Q_OBJECT
 public:
 	NStateButton( QWidget * _parent );
-	virtual ~NStateButton();
+	~NStateButton() override;
 	void addState( const QPixmap & _pixmap, const QString & _tooltip = "" );
 
 	inline void setGeneralToolTip( const QString & _tooltip )
@@ -53,23 +55,21 @@ public:
 
 
 public slots:
-	void changeState( int _n );
-
+	void changeState(int state);
 
 signals:
-	void changedState( int _n );
-
+	void changedState(int state);
 
 protected:
-	void mousePressEvent( QMouseEvent * _me ) override;
-
+	void mousePressEvent(QMouseEvent* me) override;
 
 private:
-	QVector<QPair<QPixmap, QString> > m_states;
+	QVector<QPair<QPixmap, QString>> m_states;
 	QString m_generalToolTip;
 
 	int m_curState;
+};
 
-} ;
+} // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_NSTATE_BUTTON_H

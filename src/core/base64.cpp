@@ -28,7 +28,7 @@
 #include <QBuffer>
 #include <QDataStream>
 
-namespace base64
+namespace lmms::base64
 {
 
 
@@ -54,5 +54,4 @@ QVariant decode( const QString & _b64, QVariant::Type _force_type )
 }
 
 
-} ;
-
+} // namespace lmms::base64

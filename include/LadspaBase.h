@@ -23,45 +23,41 @@
  *
  */
 
-#ifndef LADSPA_BASE_H
-#define LADSPA_BASE_H
+#ifndef LMMS_LADSPA_BASE_H
+#define LMMS_LADSPA_BASE_H
+
+#include <QRegularExpression>
 
 #include "LadspaManager.h"
 #include "Plugin.h"
 
+namespace lmms
+{
+
+
 class LadspaControl;
 
+enum class BufferRate {
+	ChannelIn,
+	ChannelOut,
+	AudioRateInput,
+	AudioRateOutput,
+	ControlRateInput,
+	ControlRateOutput
+};
 
-typedef enum BufferRates
-{
-	CHANNEL_IN,
-	CHANNEL_OUT,
-	AUDIO_RATE_INPUT,
-	AUDIO_RATE_OUTPUT,
-	CONTROL_RATE_INPUT,
-	CONTROL_RATE_OUTPUT
-} buffer_rate_t;
-
-typedef enum BufferData
-{
-	TOGGLED,
-	ENUM,
-	INTEGER,
-	FLOATING,
-	TIME,
-	NONE
-} buffer_data_t;
+enum class BufferDataType { Toggled, Enum, Integer, Floating, Time, None };
 
 //! This struct is used to hold port descriptions internally
 //! which where received from the ladspa plugin
-typedef struct PortDescription
+struct port_desc_t
 {
 	QString name;
 	ch_cnt_t proc;
 	uint16_t port_id;
 	uint16_t control_id;
-	buffer_rate_t rate;
-	buffer_data_t data_type;
+	BufferRate rate;
+	BufferDataType data_type;
 	float scale;
 	LADSPA_Data max;
 	LADSPA_Data min;
@@ -70,10 +66,9 @@ typedef struct PortDescription
 	//! This is true iff ladspa suggests logscale
 	//! Note however that the model can still decide to use a linear scale
 	bool suggests_logscale;
-	LADSPA_Data * buffer;
-	LadspaControl * control;
-} port_desc_t;
-
+	LADSPA_Data* buffer;
+	LadspaControl* control;
+};
 
 inline Plugin::Descriptor::SubPluginFeatures::Key ladspaKeyToSubPluginKey(
 						const Plugin::Descriptor * _desc,
@@ -82,10 +77,12 @@ inline Plugin::Descriptor::SubPluginFeatures::Key ladspaKeyToSubPluginKey(
 {
 	Plugin::Descriptor::SubPluginFeatures::Key::AttributeMap m;
 	QString file = _key.first;
-	m["file"] = file.remove( QRegExp( "\\.so$" ) ).remove( QRegExp( "\\.dll$" ) );
+	m["file"] = file.remove(QRegularExpression("\\.so$")).remove(QRegularExpression("\\.dll$"));
 	m["plugin"] = _key.second;
 	return Plugin::Descriptor::SubPluginFeatures::Key( _desc, _name, m );
 }
 
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_LADSPA_BASE_H

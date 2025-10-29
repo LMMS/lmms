@@ -23,20 +23,29 @@
  *
  */
 
-#ifndef PANNING_H
-#define PANNING_H
+#ifndef LMMS_PANNING_H
+#define LMMS_PANNING_H
 
-#include "lmms_basics.h"
-#include "panning_constants.h"
+#include "LmmsTypes.h"
 #include "Midi.h"
 #include "volume.h"
 
-inline stereoVolumeVector panningToVolumeVector( panning_t _p,
+#include <cmath>
+
+namespace lmms
+{
+
+inline constexpr panning_t PanningRight = 100;
+inline constexpr panning_t PanningLeft = -PanningRight;
+inline constexpr panning_t PanningCenter = 0;
+inline constexpr panning_t DefaultPanning = PanningCenter;
+
+inline StereoVolumeVector panningToVolumeVector( panning_t _p,
 							float _scale = 1.0f )
 {
-	stereoVolumeVector v = { { _scale, _scale } };
+	StereoVolumeVector v = { { _scale, _scale } };
 	const float pf = _p / 100.0f;
-	v.vol[_p >= PanningCenter ? 0 : 1] *= 1.0f - qAbs<float>( pf );
+	v.vol[_p >= PanningCenter ? 0 : 1] *= 1.0f - std::abs(pf);
 	return v;
 }
 
@@ -49,4 +58,7 @@ inline int panningToMidi( panning_t _p )
 			  ( (float)( MidiMaxPanning - MidiMinPanning ) ) );
 }
 
-#endif
+
+} // namespace lmms
+
+#endif // LMMS_PANNING_H

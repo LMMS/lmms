@@ -1,0 +1,3 @@
+INCLUDE(BuildPlugin)
+
+BUILD_PLUGIN(lb302 Lb302.cpp Lb302.h MOCFILES Lb302.h EMBEDDED_RESOURCES artwork.png logo.png)

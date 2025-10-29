@@ -22,30 +22,35 @@
  *
  */
 
-#ifndef INSTRUMENT_FUNCTION_VIEWS_H
-#define INSTRUMENT_FUNCTION_VIEWS_H
+#ifndef LMMS_INSTRUMENT_FUNCTION_VIEWS_H
+#define LMMS_INSTRUMENT_FUNCTION_VIEWS_H
 
 #include "ModelView.h"
 
 #include <QWidget>
 
 class QLabel;
-class ComboBox;
-class GroupBox;
-class Knob;
-class TempoSyncKnob;
+
+namespace lmms
+{
 
 class InstrumentFunctionArpeggio;
 class InstrumentFunctionNoteStacking;
 
+namespace gui
+{
 
+class ComboBox;
+class GroupBox;
+class Knob;
+class TempoSyncKnob;
 
 class InstrumentFunctionNoteStackingView : public QWidget, public ModelView
 {
 	Q_OBJECT
 public:
 	InstrumentFunctionNoteStackingView( InstrumentFunctionNoteStacking* cc, QWidget* parent = nullptr );
-	virtual ~InstrumentFunctionNoteStackingView();
+	~InstrumentFunctionNoteStackingView() override;
 
 
 private:
@@ -68,7 +73,7 @@ class InstrumentFunctionArpeggioView : public QWidget, public ModelView
 	Q_OBJECT
 public:
 	InstrumentFunctionArpeggioView( InstrumentFunctionArpeggio* arp, QWidget* parent = nullptr );
-	virtual ~InstrumentFunctionArpeggioView();
+	~InstrumentFunctionArpeggioView() override;
 
 
 private:
@@ -90,5 +95,8 @@ private:
 
 } ;
 
+} // namespace gui
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_INSTRUMENT_FUNCTION_VIEWS_H

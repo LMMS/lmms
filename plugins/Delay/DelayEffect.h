@@ -27,17 +27,22 @@
 
 #include "Effect.h"
 #include "DelayControls.h"
-#include "Lfo.h"
-#include "StereoDelay.h"
-#include "ValueBuffer.h"
+
+namespace lmms
+{
+
+class Lfo;
+class StereoDelay;
 
 class DelayEffect : public Effect
 {
 public:
 	DelayEffect(Model* parent , const Descriptor::SubPluginFeatures::Key* key );
-	virtual ~DelayEffect();
-	virtual bool processAudioBuffer( sampleFrame* buf, const fpp_t frames );
-	virtual EffectControls* controls()
+	~DelayEffect() override;
+
+	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
+
+	EffectControls* controls() override
 	{
 		return &m_delayControls;
 	}
@@ -50,5 +55,8 @@ private:
 	float m_outGain;
 	float m_currentLength;
 };
+
+
+} // namespace lmms
 
 #endif // DELAYEFFECT_H

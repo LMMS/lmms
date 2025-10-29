@@ -1,7 +1,7 @@
 /*
  * Lv2Proc.cpp - Lv2 processor class
  *
- * Copyright (c) 2019-2020 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
+ * Copyright (c) 2019-2024 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -27,23 +27,29 @@
 #ifdef LMMS_HAVE_LV2
 
 #include <cmath>
-#include <lv2/lv2plug.in/ns/ext/midi/midi.h>
-#include <lv2/lv2plug.in/ns/ext/atom/atom.h>
-#include <lv2/lv2plug.in/ns/ext/resize-port/resize-port.h>
+#include <lv2/midi/midi.h>
+#include <lv2/atom/atom.h>
+#include <lv2/resize-port/resize-port.h>
+#include <lv2/worker/worker.h>
 #include <QDebug>
 #include <QtGlobal>
 
 #include "AudioEngine.h"
 #include "AutomatableModel.h"
 #include "ComboBoxModel.h"
+#include "ConfigManager.h"
 #include "Engine.h"
 #include "Lv2Features.h"
 #include "Lv2Manager.h"
 #include "Lv2Ports.h"
 #include "Lv2Evbuf.h"
+#include "MidiEvent.h"
 #include "MidiEventToByteSeq.h"
+#include "NoCopyNoMove.h"
 
 
+namespace lmms
+{
 
 
 // container for everything required to store MIDI events going to the plugin
@@ -57,25 +63,33 @@ struct MidiInputEvent
 
 
 
-Plugin::PluginTypes Lv2Proc::check(const LilvPlugin *plugin,
+Plugin::Type Lv2Proc::check(const LilvPlugin *plugin,
 	std::vector<PluginIssue>& issues)
 {
 	unsigned maxPorts = lilv_plugin_get_num_ports(plugin);
 	enum { inCount, outCount, maxCount };
-	unsigned audioChannels[maxCount] = { 0, 0 }; // audio input and output count
-	unsigned midiChannels[maxCount] = { 0, 0 }; // MIDI input and output count
+	auto audioChannels = std::array<unsigned, maxCount>{}; // audio input and output count
+	auto midiChannels = std::array<unsigned, maxCount>{}; // MIDI input and output count
 
 	const char* pluginUri = lilv_node_as_uri(lilv_plugin_get_uri(plugin));
 	//qDebug() << "Checking plugin" << pluginUri << "...";
 
-	// TODO: manage a global blacklist outside of the code
+	// TODO: manage a global list of blocked plugins outside of the code
 	//       for now, this will help
 	//       this is only a fix for the meantime
-	const auto& pluginBlacklist = Lv2Manager::getPluginBlacklist();
-	if (!Engine::ignorePluginBlacklist() &&
-		pluginBlacklist.find(pluginUri) != pluginBlacklist.end())
+	if (!ConfigManager::enableBlockedPlugins())
 	{
-		issues.emplace_back(blacklisted);
+		if( // plugin unstable?
+			Lv2Manager::pluginIsUnstable(pluginUri) ||
+			// plugins only useful with UI?
+			(!Lv2Manager::wantUi() &&
+			Lv2Manager::pluginIsOnlyUsefulWithUi(pluginUri)) ||
+			// plugin unstable with 32 or less fpp?
+			(Engine::audioEngine()->framesPerPeriod() <= 32 &&
+			Lv2Manager::pluginIsUnstableWithBuffersizeLessEqual32(pluginUri)) )
+		{
+			issues.emplace_back(PluginIssueType::Blocked);
+		}
 	}
 
 	for (unsigned portNum = 0; portNum < maxPorts; ++portNum)
@@ -102,19 +116,19 @@ Plugin::PluginTypes Lv2Proc::check(const LilvPlugin *plugin,
 	}
 
 	if (audioChannels[inCount] > 2)
-		issues.emplace_back(tooManyInputChannels,
+		issues.emplace_back(PluginIssueType::TooManyInputChannels,
 			std::to_string(audioChannels[inCount]));
 	if (audioChannels[outCount] == 0)
-		issues.emplace_back(noOutputChannel);
+		issues.emplace_back(PluginIssueType::NoOutputChannel);
 	else if (audioChannels[outCount] > 2)
-		issues.emplace_back(tooManyOutputChannels,
+		issues.emplace_back(PluginIssueType::TooManyOutputChannels,
 			std::to_string(audioChannels[outCount]));
 
 	if (midiChannels[inCount] > 1)
-		issues.emplace_back(tooManyMidiInputChannels,
+		issues.emplace_back(PluginIssueType::TooManyMidiInputChannels,
 			std::to_string(midiChannels[inCount]));
 	if (midiChannels[outCount] > 1)
-		issues.emplace_back(tooManyMidiOutputChannels,
+		issues.emplace_back(PluginIssueType::TooManyMidiOutputChannels,
 			std::to_string(midiChannels[outCount]));
 
 	AutoLilvNodes reqFeats(lilv_plugin_get_required_features(plugin));
@@ -124,7 +138,7 @@ Plugin::PluginTypes Lv2Proc::check(const LilvPlugin *plugin,
 								lilv_nodes_get(reqFeats.get(), itr));
 		if(!Lv2Features::isFeatureSupported(reqFeatName))
 		{
-			issues.emplace_back(featureNotSupported, reqFeatName);
+			issues.emplace_back(PluginIssueType::FeatureNotSupported, reqFeatName);
 		}
 	}
 
@@ -140,17 +154,38 @@ Plugin::PluginTypes Lv2Proc::check(const LilvPlugin *plugin,
 			{
 				// yes, this is not a Lv2 feature,
 				// but it's a feature in abstract sense
-				issues.emplace_back(featureNotSupported, ro);
+				issues.emplace_back(PluginIssueType::FeatureNotSupported, ro);
 			}
 		}
 	}
 
 	return (audioChannels[inCount] > 2 || audioChannels[outCount] > 2)
-		? Plugin::Undefined
+		? Plugin::Type::Undefined
 		: (audioChannels[inCount] > 0)
-			? Plugin::Effect
-			: Plugin::Instrument;
+			? Plugin::Type::Effect
+			: Plugin::Type::Instrument;
 }
+
+
+
+
+class Lv2ProcSuspender : NoCopyNoMove
+{
+public:
+	Lv2ProcSuspender(Lv2Proc* proc)
+		: m_proc(proc)
+		, m_wasActive(proc->m_instance)
+	{
+		if (m_wasActive) { m_proc->shutdownPlugin(); }
+	}
+	~Lv2ProcSuspender()
+	{
+		if (m_wasActive) { m_proc->initPlugin(); }
+	}
+private:
+	Lv2Proc* const m_proc;
+	const bool m_wasActive;
+};
 
 
 
@@ -158,9 +193,11 @@ Plugin::PluginTypes Lv2Proc::check(const LilvPlugin *plugin,
 Lv2Proc::Lv2Proc(const LilvPlugin *plugin, Model* parent) :
 	LinkedModelGroup(parent),
 	m_plugin(plugin),
+	m_workLock(1),
 	m_midiInputBuf(m_maxMidiInputEvents),
 	m_midiInputReader(m_midiInputBuf)
 {
+	createPorts();
 	initPlugin();
 }
 
@@ -168,6 +205,11 @@ Lv2Proc::Lv2Proc(const LilvPlugin *plugin, Model* parent) :
 
 
 Lv2Proc::~Lv2Proc() { shutdownPlugin(); }
+
+
+
+
+void Lv2Proc::reload() { Lv2ProcSuspender(this); }
 
 
 
@@ -244,11 +286,11 @@ void Lv2Proc::copyModelsFromCore()
 				ev.time.frames(Engine::framesPerTick()) + ev.offset;
 			uint32_t type = Engine::getLv2Manager()->
 				uridCache()[Lv2UridCache::Id::midi_MidiEvent];
-			uint8_t buf[4];
-			std::size_t bufsize = writeToByteSeq(ev.ev, buf, sizeof(buf));
+			auto buf = std::array<uint8_t, 4>{};
+			std::size_t bufsize = writeToByteSeq(ev.ev, buf.data(), buf.size());
 			if(bufsize)
 			{
-				lv2_evbuf_write(&iter, atomStamp, type, bufsize, buf);
+				lv2_evbuf_write(&iter, atomStamp, type, bufsize, buf.data());
 			}
 		}
 	}
@@ -282,7 +324,7 @@ void Lv2Proc::copyModelsToCore()
 
 
 
-void Lv2Proc::copyBuffersFromCore(const sampleFrame *buf,
+void Lv2Proc::copyBuffersFromCore(const SampleFrame* buf,
 									unsigned firstChan, unsigned num,
 									fpp_t frames)
 {
@@ -307,7 +349,7 @@ void Lv2Proc::copyBuffersFromCore(const sampleFrame *buf,
 
 
 
-void Lv2Proc::copyBuffersToCore(sampleFrame* buf,
+void Lv2Proc::copyBuffersToCore(SampleFrame* buf,
 								unsigned firstChan, unsigned num,
 								fpp_t frames) const
 {
@@ -328,7 +370,19 @@ void Lv2Proc::copyBuffersToCore(sampleFrame* buf,
 
 void Lv2Proc::run(fpp_t frames)
 {
+	if (m_worker)
+	{
+		// Process any worker replies
+		m_worker->emitResponses();
+	}
+
 	lilv_instance_run(m_instance, static_cast<uint32_t>(frames));
+
+	if (m_worker)
+	{
+		// Notify the plugin the run() cycle is finished
+		m_worker->notifyPluginThatRunFinished();
+	}
 }
 
 
@@ -362,7 +416,7 @@ void Lv2Proc::handleMidiInputEvent(const MidiEvent &event, const TimePos &time, 
 	else
 	{
 		qWarning() << "Warning: Caught MIDI event for an Lv2 instrument"
-					<< "that can not hande MIDI... Ignoring";
+					<< "that can not handle MIDI... Ignoring";
 	}
 }
 
@@ -371,12 +425,8 @@ void Lv2Proc::handleMidiInputEvent(const MidiEvent &event, const TimePos &time, 
 
 AutomatableModel *Lv2Proc::modelAtPort(const QString &uri)
 {
-	// unused currently
-	AutomatableModel *mod;
-	auto itr = m_connectedModels.find(uri.toUtf8().data());
-	if (itr != m_connectedModels.end()) { mod = itr->second; }
-	else { mod = nullptr; }
-	return mod;
+	const auto itr = m_connectedModels.find(uri.toUtf8().data());
+	return itr != m_connectedModels.end() ? itr->second : nullptr;
 }
 
 
@@ -388,16 +438,23 @@ void Lv2Proc::initPlugin()
 	initPluginSpecificFeatures();
 	m_features.createFeatureVectors();
 
-	createPorts();
-
 	m_instance = lilv_plugin_instantiate(m_plugin,
-		Engine::audioEngine()->processingSampleRate(),
+		Engine::audioEngine()->outputSampleRate(),
 		m_features.featurePointers());
 
 	if (m_instance)
 	{
+		const auto iface = static_cast<const LV2_Worker_Interface*>(
+			lilv_instance_get_extension_data(m_instance, LV2_WORKER__interface));
+		if (iface)
+		{
+			m_worker->setHandle(lilv_instance_get_handle(m_instance));
+			m_worker->setInterface(iface);
+		}
 		for (std::size_t portNum = 0; portNum < m_ports.size(); ++portNum)
+		{
 			connectPort(portNum);
+		}
 		lilv_instance_activate(m_instance);
 	}
 	else
@@ -407,7 +464,7 @@ void Lv2Proc::initPlugin()
 			<< "(URI:"
 			<< lilv_node_as_uri(lilv_plugin_get_uri(m_plugin))
 			<< ")";
-		m_valid = false;
+		throw std::runtime_error("Failed to create Lv2 processor");
 	}
 }
 
@@ -416,12 +473,12 @@ void Lv2Proc::initPlugin()
 
 void Lv2Proc::shutdownPlugin()
 {
-	if (m_valid)
-	{
-		lilv_instance_deactivate(m_instance);
-		lilv_instance_free(m_instance);
-		m_instance = nullptr;
-	}
+	lilv_instance_deactivate(m_instance);
+	lilv_instance_free(m_instance);
+	m_instance = nullptr;
+
+	m_features.clear();
+	m_options.clear();
 }
 
 
@@ -451,7 +508,7 @@ void Lv2Proc::initMOptions()
 		re-initialize, and this code section will be
 		executed again, creating a new option vector.
 	*/
-	float sampleRate = Engine::audioEngine()->processingSampleRate();
+	float sampleRate = Engine::audioEngine()->outputSampleRate();
 	int32_t blockLength = Engine::audioEngine()->framesPerPeriod();
 	int32_t sequenceSize = defaultEvbufSize();
 
@@ -469,8 +526,19 @@ void Lv2Proc::initMOptions()
 
 void Lv2Proc::initPluginSpecificFeatures()
 {
+	// options
 	initMOptions();
 	m_features[LV2_OPTIONS__options] = const_cast<LV2_Options_Option*>(m_options.feature());
+
+	// worker (if plugin has worker extension)
+	Lv2Manager* mgr = Engine::getLv2Manager();
+	if (lilv_plugin_has_extension_data(m_plugin, mgr->uri(LV2_WORKER__interface).get()))
+	{
+		bool threaded = !Engine::audioEngine()->renderOnly();
+		m_worker.emplace(&m_workLock, threaded);
+		m_features[LV2_WORKER__schedule] = m_worker->feature();
+		// note: the worker interface can not be instantiated yet - it requires m_instance. see initPlugin()
+	}
 }
 
 
@@ -497,12 +565,12 @@ void Lv2Proc::createPort(std::size_t portNum)
 	{
 		case Lv2Ports::Type::Control:
 		{
-			Lv2Ports::Control* ctrl = new Lv2Ports::Control;
+			auto ctrl = new Lv2Ports::Control;
 			if (meta.m_flow == Lv2Ports::Flow::Input)
 			{
 				AutoLilvNode node(lilv_port_get_name(m_plugin, lilvPort));
 				QString dispName = lilv_node_as_string(node.get());
-				sample_rate_t sr = Engine::audioEngine()->processingSampleRate();
+				sample_rate_t sr = Engine::audioEngine()->outputSampleRate();
 				if(meta.def() < meta.min(sr) || meta.def() > meta.max(sr))
 				{
 					qWarning()	<< "Warning: Plugin"
@@ -522,7 +590,7 @@ void Lv2Proc::createPort(std::size_t portNum)
 
 						// make multiples of 0.01 (or 0.1 for larger values)
 						float minStep = (stepSize >= 1.0f) ? 0.1f : 0.01f;
-						stepSize -= fmodf(stepSize, minStep);
+						stepSize -= std::fmod(stepSize, minStep);
 						stepSize = std::max(stepSize, minStep);
 
 						ctrl->m_connectedModel.reset(
@@ -539,23 +607,35 @@ void Lv2Proc::createPort(std::size_t portNum)
 						break;
 					case Lv2Ports::Vis::Enumeration:
 					{
-						ComboBoxModel* comboModel
-							= new ComboBoxModel(
-								nullptr, dispName);
-						LilvScalePoints* sps =
-							lilv_port_get_scale_points(m_plugin, lilvPort);
-						LILV_FOREACH(scale_points, i, sps)
+						ComboBoxModel* comboModel = new ComboBoxModel(nullptr, dispName);
+
 						{
-							const LilvScalePoint* sp = lilv_scale_points_get(sps, i);
-							ctrl->m_scalePointMap.push_back(lilv_node_as_float(
-											lilv_scale_point_get_value(sp)));
-							comboModel->addItem(
-								lilv_node_as_string(
-									lilv_scale_point_get_label(sp)));
+							AutoLilvScalePoints sps (static_cast<LilvScalePoints*>(lilv_port_get_scale_points(m_plugin, lilvPort)));
+							// temporary map, since lilv may return scale points in random order
+							std::map<float, const char*> scalePointMap;
+							LILV_FOREACH(scale_points, i, sps.get())
+							{
+								const LilvScalePoint* sp = lilv_scale_points_get(sps.get(), i);
+								const float f = lilv_node_as_float(lilv_scale_point_get_value(sp));
+								const char* s = lilv_node_as_string(lilv_scale_point_get_label(sp));
+								scalePointMap[f] = s;
+							}
+							for (const auto& [f,s] : scalePointMap)
+							{
+								ctrl->m_scalePointMap.push_back(f);
+								comboModel->addItem(s);
+							}
 						}
-						lilv_scale_points_free(sps);
+						for(std::size_t i = 0; i < ctrl->m_scalePointMap.size(); ++i)
+						{
+							if(meta.def() == ctrl->m_scalePointMap[i])
+							{
+								comboModel->setValue(i);
+								comboModel->setInitValue(i);
+								break;
+							}
+						}
 						ctrl->m_connectedModel.reset(comboModel);
-						// TODO: use default value on comboModel, too?
 						break;
 					}
 					case Lv2Ports::Vis::Toggled:
@@ -575,18 +655,14 @@ void Lv2Proc::createPort(std::size_t portNum)
 		}
 		case Lv2Ports::Type::Audio:
 		{
-			Lv2Ports::Audio* audio =
-				new Lv2Ports::Audio(
-						static_cast<std::size_t>(
-							Engine::audioEngine()->framesPerPeriod()),
-						portIsSideChain(m_plugin, lilvPort)
-					);
+			auto audio = new Lv2Ports::Audio(static_cast<std::size_t>(Engine::audioEngine()->framesPerPeriod()),
+				portIsSideChain(m_plugin, lilvPort));
 			port = audio;
 			break;
 		}
 		case Lv2Ports::Type::AtomSeq:
 		{
-			Lv2Ports::AtomSeq* atomPort = new Lv2Ports::AtomSeq;
+			auto atomPort = new Lv2Ports::AtomSeq;
 
 			{
 				AutoLilvNode uriAtomSupports(Engine::getLv2Manager()->uri(LV2_ATOM__supports));
@@ -611,7 +687,8 @@ void Lv2Proc::createPort(std::size_t portNum)
 				AutoLilvNode rszMinimumSize = mgr->uri(LV2_RESIZE_PORT__minimumSize);
 				AutoLilvNodes minSizeV(lilv_port_get_value(m_plugin, lilvPort, rszMinimumSize.get()));
 				LilvNode* minSize = minSizeV ? lilv_nodes_get_first(minSizeV.get()) : nullptr;
-				if (minSize && lilv_node_is_int(minSize)) {
+				if (minSize && lilv_node_is_int(minSize))
+				{
 					minimumSize = std::max(minimumSize, lilv_node_as_int(minSize));
 				}
 			}
@@ -753,10 +830,8 @@ struct ConnectPortVisitor : public Lv2Ports::Visitor
 		connectPort((audio.mustBeUsed()) ? audio.m_buffer.data() : nullptr);
 	}
 	void visit(Lv2Ports::Unknown&) override { connectPort(nullptr); }
-	~ConnectPortVisitor() override;
+	~ConnectPortVisitor() override = default;
 };
-
-ConnectPortVisitor::~ConnectPortVisitor() {}
 
 // !This function must be realtime safe!
 // use createPort to create any port before connecting
@@ -775,7 +850,8 @@ void Lv2Proc::dumpPort(std::size_t num)
 {
 	struct DumpPortDetail : public Lv2Ports::ConstVisitor
 	{
-		void visit(const Lv2Ports::Control& ctrl) override {
+		void visit(const Lv2Ports::Control& ctrl) override
+		{
 			qDebug() << "  control port";
 			// output ports may be uninitialized yet, only print inputs
 			if (ctrl.m_flow == Lv2Ports::Flow::Input)
@@ -783,7 +859,8 @@ void Lv2Proc::dumpPort(std::size_t num)
 				qDebug() << "    value:" << ctrl.m_val;
 			}
 		}
-		void visit(const Lv2Ports::Audio& audio) override {
+		void visit(const Lv2Ports::Audio& audio) override
+		{
 			qDebug() << (audio.isSideChain()	? "  audio port (sidechain)"
 												: "  audio port");
 			qDebug() << "    buffer size:" << audio.bufferSize();
@@ -799,7 +876,7 @@ void Lv2Proc::dumpPort(std::size_t num)
 	qDebug() << "  visualization: " << Lv2Ports::toStr(port.m_vis);
 	if (port.m_type == Lv2Ports::Type::Control || port.m_type == Lv2Ports::Type::Cv)
 	{
-		sample_rate_t sr = Engine::audioEngine()->processingSampleRate();
+		sample_rate_t sr = Engine::audioEngine()->outputSampleRate();
 		qDebug() << "  default:" << port.def();
 		qDebug() << "  min:" << port.min(sr);
 		qDebug() << "  max:" << port.max(sr);
@@ -837,5 +914,7 @@ AutoLilvNode Lv2Proc::uri(const char *uriStr)
 	return Engine::getLv2Manager()->uri(uriStr);
 }
 
+
+} // namespace lmms
 
 #endif // LMMS_HAVE_LV2

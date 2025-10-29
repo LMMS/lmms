@@ -22,12 +22,15 @@
  *
  */
 
-
-#ifndef INSTRUMENT_VIEW_H
-#define INSTRUMENT_VIEW_H
+#ifndef LMMS_GUI_INSTRUMENT_VIEW_H
+#define LMMS_GUI_INSTRUMENT_VIEW_H
 
 #include "Instrument.h"
 #include "PluginView.h"
+
+
+namespace lmms::gui
+{
 
 class InstrumentTrackWindow;
 
@@ -66,8 +69,10 @@ class LMMS_EXPORT InstrumentViewFixedSize : public InstrumentView
 
 public:
 	using InstrumentView::InstrumentView;
-	~InstrumentViewFixedSize() override;
+	~InstrumentViewFixedSize() override = default;
 } ;
 
 
-#endif
+} // namespace lmms::gui
+
+#endif // LMMS_GUI_INSTRUMENT_VIEW_H

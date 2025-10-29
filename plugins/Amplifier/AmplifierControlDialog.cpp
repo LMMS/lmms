@@ -23,47 +23,40 @@
  *
  */
 
-#include <QLayout>
-
 #include "AmplifierControlDialog.h"
 #include "AmplifierControls.h"
 #include "embed.h"
+#include "Knob.h"
+
+#include <QGridLayout>
 
 
-
-AmplifierControlDialog::AmplifierControlDialog( AmplifierControls* controls ) :
-	EffectControlDialog( controls )
+namespace lmms::gui
 {
-	setAutoFillBackground( true );
+
+AmplifierControlDialog::AmplifierControlDialog(AmplifierControls* controls) :
+	EffectControlDialog(controls)
+{
+	setAutoFillBackground(true);
 	QPalette pal;
-	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap( "artwork" ) );
-	setPalette( pal );
-	setFixedSize( 100, 110 );
+	pal.setBrush(backgroundRole(), PLUGIN_NAME::getIconPixmap("artwork"));
+	setPalette(pal);
 
-	Knob * volumeKnob = new Knob( knobBright_26, this);
-	volumeKnob -> move( 16, 10 );
-	volumeKnob -> setVolumeKnob( true );
-	volumeKnob->setModel( &controls->m_volumeModel );
-	volumeKnob->setLabel( tr( "VOL" ) );
-	volumeKnob->setHintText( tr( "Volume:" ) , "%" );
+	QGridLayout* gridLayout = new QGridLayout(this);
+	
+	auto makeKnob = [this](const QString& label, const QString& hintText, const QString& unit, FloatModel* model, bool isVolume)
+	{
+		Knob* newKnob = new Knob(KnobType::Bright26, label, this);
+		newKnob->setModel(model);
+		newKnob->setHintText(hintText, unit);
+		newKnob->setVolumeKnob(isVolume);
+		return newKnob;
+	};
 
-	Knob * panKnob = new Knob( knobBright_26, this);
-	panKnob -> move( 57, 10 );
-	panKnob->setModel( &controls->m_panModel );
-	panKnob->setLabel( tr( "PAN" ) );
-	panKnob->setHintText( tr( "Panning:" ) , "" );
-
-	Knob * leftKnob = new Knob( knobBright_26, this);
-	leftKnob -> move( 16, 65 );
-	leftKnob -> setVolumeKnob( true );
-	leftKnob->setModel( &controls->m_leftModel );
-	leftKnob->setLabel( tr( "LEFT" ) );
-	leftKnob->setHintText( tr( "Left gain:" ) , "%" );
-
-	Knob * rightKnob = new Knob( knobBright_26, this);
-	rightKnob -> move( 57, 65 );
-	rightKnob -> setVolumeKnob( true );
-	rightKnob->setModel( &controls->m_rightModel );
-	rightKnob->setLabel( tr( "RIGHT" ) );
-	rightKnob->setHintText( tr( "Right gain:" ) , "%" );
+	gridLayout->addWidget(makeKnob(tr("VOL"), tr("Volume:"), "%", &controls->m_volumeModel, true), 0, 0, Qt::AlignHCenter);
+	gridLayout->addWidget(makeKnob(tr("PAN"), tr("Panning:"), "%", &controls->m_panModel, false), 0, 1, Qt::AlignHCenter);
+	gridLayout->addWidget(makeKnob(tr("LEFT"), tr("Left gain:"), "%", &controls->m_leftModel, true), 1, 0, Qt::AlignHCenter);
+	gridLayout->addWidget(makeKnob(tr("RIGHT"), tr("Right gain:"), "%", &controls->m_rightModel, true), 1, 1, Qt::AlignHCenter);
 }
+
+} // namespace lmms::gui

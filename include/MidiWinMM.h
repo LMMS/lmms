@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef MIDI_WINMM_H
-#define MIDI_WINMM_H
+#ifndef LMMS_MIDI_WINMM_H
+#define LMMS_MIDI_WINMM_H
 
 #include "lmmsconfig.h"
 
@@ -36,6 +36,10 @@
 
 
 class QLineEdit;
+
+
+namespace lmms
+{
 
 
 class MidiWinMM : public QObject, public MidiClient
@@ -130,7 +134,7 @@ private:
 	QMap<HMIDIOUT, QString> m_outputDevices;
 
 	// subscriptions
-	typedef QMap<QString, MidiPortList> SubMap;
+	using SubMap = QMap<QString, MidiPortList>;
 	SubMap m_inputSubs;
 	SubMap m_outputSubs;
 
@@ -141,7 +145,9 @@ signals:
 
 } ;
 
-#endif
 
-#endif
+} // namespace lmms
 
+#endif // LMMS_BUILD_WIN32
+
+#endif // LMMS_MIDI_WINMM_H

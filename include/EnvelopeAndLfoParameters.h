@@ -22,17 +22,26 @@
  *
  */
 
-#ifndef ENVELOPE_AND_LFO_PARAMETERS_H
-#define ENVELOPE_AND_LFO_PARAMETERS_H
+#ifndef LMMS_ENVELOPE_AND_LFO_PARAMETERS_H
+#define LMMS_ENVELOPE_AND_LFO_PARAMETERS_H
 
-#include <QtCore/QVector>
+#include <memory>
 
 #include "JournallingObject.h"
 #include "AutomatableModel.h"
 #include "SampleBuffer.h"
 #include "TempoSyncKnobModel.h"
-#include "lmms_basics.h"
+#include "LmmsTypes.h"
 
+namespace lmms
+{
+
+namespace gui
+{
+
+class EnvelopeAndLfoView;
+
+}
 
 class LMMS_EXPORT EnvelopeAndLfoParameters : public Model, public JournallingObject
 {
@@ -41,13 +50,9 @@ public:
 	class LfoInstances
 	{
 	public:
-		LfoInstances()
-		{
-		}
+		LfoInstances() = default;
 
-		~LfoInstances()
-		{
-		}
+		~LfoInstances() = default;
 
 		inline bool isEmpty() const
 		{
@@ -62,14 +67,25 @@ public:
 
 	private:
 		QMutex m_lfoListMutex;
-		typedef QList<EnvelopeAndLfoParameters *> LfoList;
+		using LfoList = QList<EnvelopeAndLfoParameters*>;
 		LfoList m_lfos;
 
-	} ;
+	};
+
+	enum class LfoShape
+	{
+		SineWave,
+		TriangleWave,
+		SawWave,
+		SquareWave,
+		UserDefinedWave,
+		RandomWave,
+		Count
+	};
 
 	EnvelopeAndLfoParameters( float _value_for_zero_amount,
 							Model * _parent );
-	virtual ~EnvelopeAndLfoParameters();
+	~EnvelopeAndLfoParameters() override;
 
 	static inline float expKnobVal( float _val )
 	{
@@ -108,6 +124,28 @@ public:
 		return m_rFrames;
 	}
 
+	// Envelope
+	const FloatModel& getPredelayModel() const { return m_predelayModel; }
+	const FloatModel& getAttackModel() const { return m_attackModel; }
+	const FloatModel& getHoldModel() const { return m_holdModel; }
+	const FloatModel& getDecayModel() const { return m_decayModel; }
+	const FloatModel& getSustainModel() const { return m_sustainModel; }
+	const FloatModel& getReleaseModel() const { return m_releaseModel; }
+	const FloatModel& getAmountModel() const { return m_amountModel; }
+	FloatModel& getAmountModel() { return m_amountModel; }
+
+
+	// LFO
+	inline f_cnt_t getLfoPredelayFrames() const { return m_lfoPredelayFrames; }
+	inline f_cnt_t getLfoAttackFrames() const { return m_lfoAttackFrames; }
+	inline f_cnt_t getLfoOscillationFrames() const { return m_lfoOscillationFrames; }
+
+	const FloatModel& getLfoAmountModel() const { return m_lfoAmountModel; }
+	FloatModel& getLfoAmountModel() { return m_lfoAmountModel; }
+	const TempoSyncKnobModel& getLfoSpeedModel() const { return m_lfoSpeedModel; }
+	const BoolModel& getX100Model() const { return m_x100Model; }
+	const IntModel& getLfoWaveModel() const { return m_lfoWaveModel; }
+	std::shared_ptr<const SampleBuffer> getLfoUserWave() const { return m_userWave; }
 
 public slots:
 	void updateSampleVars();
@@ -162,25 +200,18 @@ private:
 	sample_t * m_lfoShapeData;
 	sample_t m_random;
 	bool m_bad_lfoShapeData;
-	SampleBuffer m_userWave;
+	std::shared_ptr<const SampleBuffer> m_userWave = SampleBuffer::emptyBuffer();
 
-	enum LfoShapes
-	{
-		SineWave,
-		TriangleWave,
-		SawWave,
-		SquareWave,
-		UserDefinedWave,
-		RandomWave,
-		NumLfoShapes
-	} ;
+	constexpr static auto NumLfoShapes = static_cast<std::size_t>(LfoShape::Count);
 
 	sample_t lfoShapeSample( fpp_t _frame_offset );
 	void updateLfoShapeData();
 
 
-	friend class EnvelopeAndLfoView;
+	friend class gui::EnvelopeAndLfoView;
 
 } ;
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_ENVELOPE_AND_LFO_PARAMETERS_H

@@ -23,11 +23,14 @@
  *
  */
 
+#ifndef LMMS_GUI_LMMS_PALETTE_H
+#define LMMS_GUI_LMMS_PALETTE_H
+
 #include <QWidget>
 #include "lmms_export.h"
 
-#ifndef LMMSPALETTE_H
-#define LMMSPALETTE_H
+namespace lmms::gui
+{
 
 
 class LMMS_EXPORT LmmsPalette : public QWidget
@@ -46,7 +49,7 @@ class LMMS_EXPORT LmmsPalette : public QWidget
 
 public:
 	LmmsPalette( QWidget * parent, QStyle * stylearg  ); 
-	virtual ~LmmsPalette();
+	~LmmsPalette() override = default;
 
 #define ACCESSMET( read, write ) \
 	QColor read () const; \
@@ -82,6 +85,6 @@ private:
 };
 
 
+} // namespace lmms::gui
 
-
-#endif
+#endif // LMMS_GUI_LMMS_PALETTE_H

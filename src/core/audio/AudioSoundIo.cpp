@@ -26,21 +26,22 @@
 
 #ifdef LMMS_HAVE_SOUNDIO
 
-#include <QLabel>
+#include <QFormLayout>
 #include <QLineEdit>
 
 #include "Engine.h"
-#include "debug.h"
 #include "ConfigManager.h"
-#include "gui_templates.h"
 #include "ComboBox.h"
 #include "AudioEngine.h"
 
+namespace lmms
+{
+
 AudioSoundIo::AudioSoundIo( bool & outSuccessful, AudioEngine * _audioEngine ) :
-	AudioDevice( qBound<ch_cnt_t>(
+	AudioDevice(std::clamp<ch_cnt_t>(
+		ConfigManager::inst()->value("audiosoundio", "channels").toInt(),
 		DEFAULT_CHANNELS,
-		ConfigManager::inst()->value( "audiosoundio", "channels" ).toInt(),
-		SURROUND_CHANNELS ), _audioEngine )
+		DEFAULT_CHANNELS), _audioEngine)
 {
 	outSuccessful = false;
 	m_soundio = nullptr;
@@ -67,7 +68,6 @@ AudioSoundIo::AudioSoundIo( bool & outSuccessful, AudioEngine * _audioEngine ) :
 	const QString& configDeviceId = ConfigManager::inst()->value( "audiosoundio", "out_device_id" );
 	const QString& configDeviceRaw = ConfigManager::inst()->value( "audiosoundio", "out_device_raw" );
 
-	int err;
 	int outDeviceCount = 0;
 	int backendCount = soundio_backend_count(m_soundio);
 	for (int i = 0; i < backendCount; i += 1)
@@ -75,11 +75,7 @@ AudioSoundIo::AudioSoundIo( bool & outSuccessful, AudioEngine * _audioEngine ) :
 		SoundIoBackend backend = soundio_get_backend(m_soundio, i);
 		if (configBackend == soundio_backend_name(backend))
 		{
-			if ((err = soundio_connect_backend(m_soundio, backend)))
-			{
-				// error occurred, leave outDeviceCount 0
-			}
-			else
+			if (!soundio_connect_backend(m_soundio, backend))
 			{
 				soundio_flush_events(m_soundio);
 				if (m_disconnectErr)
@@ -96,7 +92,7 @@ AudioSoundIo::AudioSoundIo( bool & outSuccessful, AudioEngine * _audioEngine ) :
 	if (outDeviceCount <= 0)
 	{
 		// try connecting to the default backend
-		if ((err = soundio_connect(m_soundio)))
+		if (int err = soundio_connect(m_soundio))
 		{
 			fprintf(stderr, "Unable to initialize soundio: %s\n", soundio_strerror(err));
 			return;
@@ -155,7 +151,7 @@ AudioSoundIo::AudioSoundIo( bool & outSuccessful, AudioEngine * _audioEngine ) :
 			break;
 		}
 		if (closestSupportedSampleRate == -1 ||
-			abs(range->max - currentSampleRate) < abs(closestSupportedSampleRate - currentSampleRate))
+			std::abs(range->max - currentSampleRate) < std::abs(closestSupportedSampleRate - currentSampleRate))
 		{
 			closestSupportedSampleRate = range->max;
 		}
@@ -177,7 +173,7 @@ AudioSoundIo::AudioSoundIo( bool & outSuccessful, AudioEngine * _audioEngine ) :
 	m_outstream->layout = *soundio_channel_layout_get_default(channels());
 	m_outstream->format = SoundIoFormatFloat32NE;
 
-	if ((err = soundio_outstream_open(m_outstream)))
+	if (int err = soundio_outstream_open(m_outstream))
 	{
 		fprintf(stderr, "Unable to initialize soundio: %s\n", soundio_strerror(err));
 		return;
@@ -212,17 +208,15 @@ AudioSoundIo::~AudioSoundIo()
 
 void AudioSoundIo::startProcessing()
 {
-	int err;
-	
 	m_outBufFrameIndex = 0;
 	m_outBufFramesTotal = 0;
 	m_outBufSize = audioEngine()->framesPerPeriod();
 
-	m_outBuf = new surroundSampleFrame[m_outBufSize];
+	m_outBuf = new SampleFrame[m_outBufSize];
 
 	if (! m_outstreamStarted)
 	{
-		if ((err = soundio_outstream_start(m_outstream)))
+		if (int err = soundio_outstream_start(m_outstream))
 		{
 			fprintf(stderr, 
 				"AudioSoundIo::startProcessing() :: soundio unable to start stream: %s\n", 
@@ -234,7 +228,7 @@ void AudioSoundIo::startProcessing()
 
 	m_stopped = false;
 
-	if ((err = soundio_outstream_pause(m_outstream, false)))
+	if (int err = soundio_outstream_pause(m_outstream, false))
 	{
 		m_stopped = true;
 		fprintf(stderr, 
@@ -245,12 +239,10 @@ void AudioSoundIo::startProcessing()
 
 void AudioSoundIo::stopProcessing()
 {
-	int err;
-	
 	m_stopped = true;
 	if (m_outstream)
 	{
-		if ((err = soundio_outstream_pause(m_outstream, true)))
+		if (int err = soundio_outstream_pause(m_outstream, true))
 		{
 			fprintf(stderr, 
 				"AudioSoundIo::stopProcessing() :: pausing result error: %s\n",
@@ -279,18 +271,14 @@ void AudioSoundIo::writeCallback(int frameCountMin, int frameCountMax)
 {
 	if (m_stopped) {return;}
 	const struct SoundIoChannelLayout *layout = &m_outstream->layout;
-	SoundIoChannelArea *areas;
+	SoundIoChannelArea* areas;
 	int bytesPerSample = m_outstream->bytes_per_sample;
-	int err;
-
-	const float gain = audioEngine()->masterGain();
-
 	int framesLeft = frameCountMax;
 
 	while (framesLeft > 0)
 	{
 		int frameCount = framesLeft;
-		if ((err = soundio_outstream_begin_write(m_outstream, &areas, &frameCount)))
+		if (int err = soundio_outstream_begin_write(m_outstream, &areas, &frameCount))
 		{
 			errorCallback(err);
 			return;
@@ -325,14 +313,14 @@ void AudioSoundIo::writeCallback(int frameCountMin, int frameCountMax)
 
 			for (int channel = 0; channel < layout->channel_count; channel += 1)
 			{
-				float sample = gain * m_outBuf[m_outBufFrameIndex][channel];
+				float sample = m_outBuf[m_outBufFrameIndex][channel];
 				memcpy(areas[channel].ptr, &sample, bytesPerSample);
 				areas[channel].ptr += areas[channel].step;
 			}
 			m_outBufFrameIndex += 1;
 		}
 
-		if ((err = soundio_outstream_end_write(m_outstream)))
+		if (int err = soundio_outstream_end_write(m_outstream))
 		{
 			errorCallback(err);
 			return;
@@ -340,10 +328,6 @@ void AudioSoundIo::writeCallback(int frameCountMin, int frameCountMax)
 
 		framesLeft -= frameCount;
 	}
-}
-
-AudioSoundIoSetupUtil::~AudioSoundIoSetupUtil()
-{
 }
 
 void AudioSoundIoSetupUtil::reconnectSoundIo()
@@ -376,11 +360,10 @@ void AudioSoundIo::setupWidget::reconnectSoundIo()
 
 	soundio_disconnect(m_soundio);
 
-	int err;
 	int backend_index = m_backendModel.findText(configBackend);
 	if (backend_index < 0)
 	{
-		if ((err = soundio_connect(m_soundio)))
+		if (int err = soundio_connect(m_soundio))
 		{
 			fprintf(stderr, "soundio: unable to connect backend: %s\n", soundio_strerror(err));
 			return;
@@ -391,11 +374,11 @@ void AudioSoundIo::setupWidget::reconnectSoundIo()
 	else
 	{
 		SoundIoBackend backend = soundio_get_backend(m_soundio, backend_index);
-		if ((err = soundio_connect_backend(m_soundio, backend)))
+		if (int err = soundio_connect_backend(m_soundio, backend))
 		{
 			fprintf(stderr, "soundio: unable to connect %s backend: %s\n",
 					soundio_backend_name(backend), soundio_strerror(err));
-			if ((err = soundio_connect(m_soundio)))
+			if (int err = soundio_connect(m_soundio))
 			{
 				fprintf(stderr, "soundio: unable to connect backend: %s\n", soundio_strerror(err));
 				return;
@@ -452,19 +435,13 @@ AudioSoundIo::setupWidget::setupWidget( QWidget * _parent ) :
 {
 	m_setupUtil.m_setupWidget = this;
 
-	m_backend = new ComboBox( this, "BACKEND" );
-	m_backend->setGeometry( 64, 15, 260, 20 );
+	QFormLayout * form = new QFormLayout(this);
 
-	QLabel * backend_lbl = new QLabel( tr( "Backend" ), this );
-	backend_lbl->setFont( pointSize<7>( backend_lbl->font() ) );
-	backend_lbl->move( 8, 18 );
+	m_backend = new gui::ComboBox( this, "BACKEND" );
+	form->addRow(tr("Backend"), m_backend);
 
-	m_device = new ComboBox( this, "DEVICE" );
-	m_device->setGeometry( 64, 35, 260, 20 );
-
-	QLabel * dev_lbl = new QLabel( tr( "Device" ), this );
-	dev_lbl->setFont( pointSize<7>( dev_lbl->font() ) );
-	dev_lbl->move( 8, 38 );
+	m_device = new gui::ComboBox( this, "DEVICE" );
+	form->addRow(tr("Device"), m_device);
 
 	// Setup models
 	m_soundio = soundio_create();
@@ -489,7 +466,8 @@ AudioSoundIo::setupWidget::setupWidget( QWidget * _parent ) :
 
 	reconnectSoundIo();
 
-	bool ok = connect( &m_backendModel, SIGNAL( dataChanged() ), &m_setupUtil, SLOT( reconnectSoundIo() ) );
+	[[maybe_unused]] bool ok = connect(&m_backendModel, &ComboBoxModel::dataChanged,
+		&m_setupUtil, &AudioSoundIoSetupUtil::reconnectSoundIo);
 	assert(ok);
 
 	m_backend->setModel( &m_backendModel );
@@ -498,7 +476,8 @@ AudioSoundIo::setupWidget::setupWidget( QWidget * _parent ) :
 
 AudioSoundIo::setupWidget::~setupWidget()
 {
-	bool ok = disconnect( &m_backendModel, SIGNAL( dataChanged() ), &m_setupUtil, SLOT( reconnectSoundIo() ) );
+	[[maybe_unused]] bool ok = disconnect(&m_backendModel, &ComboBoxModel::dataChanged,
+		&m_setupUtil, &AudioSoundIoSetupUtil::reconnectSoundIo);
 	assert(ok);
 	if (m_soundio)
 	{
@@ -519,4 +498,7 @@ void AudioSoundIo::setupWidget::saveSettings()
 	ConfigManager::inst()->setValue( "audiosoundio", "out_device_raw", configDeviceRaw);
 }
 
-#endif
+
+} // namespace lmms
+
+#endif // LMMS_HAVE_SOUNDIO

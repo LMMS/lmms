@@ -28,18 +28,23 @@
 
 #include "Effect.h"
 #include "FlangerControls.h"
-#include "QuadratureLfo.h"
-#include "MonoDelay.h"
-#include "Noise.h"
+
+namespace lmms
+{
+
+class MonoDelay;
+class QuadratureLfo;
 
 
 class FlangerEffect : public Effect
 {
 public:
 	FlangerEffect( Model* parent , const Descriptor::SubPluginFeatures::Key* key );
-	virtual ~FlangerEffect();
-	virtual bool processAudioBuffer( sampleFrame *buf, const fpp_t frames );
-	virtual EffectControls* controls()
+	~FlangerEffect() override;
+
+	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
+
+	EffectControls* controls() override
 	{
 		return &m_flangerControls;
 	}
@@ -51,8 +56,9 @@ private:
 	MonoDelay* m_lDelay;
 	MonoDelay* m_rDelay;
 	QuadratureLfo* m_lfo;
-	Noise* m_noise;
-
 };
+
+
+} // namespace lmms
 
 #endif // FLANGEREFFECT_H

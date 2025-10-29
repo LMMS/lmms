@@ -24,16 +24,26 @@
 
 #include "PluginFactory.h"
 
-#include <QtCore/QCoreApplication>
-#include <QtCore/QDebug>
-#include <QtCore/QDir>
-#include <QtCore/QLibrary>
+#include <QCoreApplication>
+#include <QDebug>
+#include <QDir>
+#include <QLibrary>
+#include <QRegularExpression>
 #include <memory>
 #include "lmmsconfig.h"
 
 #include "ConfigManager.h"
 #include "Plugin.h"
-#include "embed.h"
+
+// QT qHash specialization, needs to be in global namespace
+qint64 qHash(const QFileInfo& fi)
+{
+	return qHash(fi.absoluteFilePath());
+}
+
+namespace lmms
+{
+
 
 #ifdef LMMS_BUILD_WIN32
 	QStringList nameFilters("*.dll");
@@ -41,21 +51,12 @@
 	QStringList nameFilters("lib*.so");
 #endif
 
-qint64 qHash(const QFileInfo& fi)
-{
-	return qHash(fi.absoluteFilePath());
-}
-
 std::unique_ptr<PluginFactory> PluginFactory::s_instance;
 
 PluginFactory::PluginFactory()
 {
 	setupSearchPaths();
 	discoverPlugins();
-}
-
-PluginFactory::~PluginFactory()
-{
 }
 
 void PluginFactory::setupSearchPaths()
@@ -85,8 +86,7 @@ void PluginFactory::setupSearchPaths()
 	addRelativeIfExists(PLUGIN_DIR);
 #endif
 	// Or via an environment variable:
-	QString env_path;
-	if (!(env_path = qgetenv("LMMS_PLUGIN_DIR")).isEmpty())
+	if (const char* env_path = std::getenv("LMMS_PLUGIN_DIR"))
 		QDir::addSearchPath("plugins", env_path);
 
 	QDir::addSearchPath("plugins", ConfigManager::inst()->workingDir() + "plugins");
@@ -105,12 +105,12 @@ PluginFactory* getPluginFactory()
 	return PluginFactory::instance();
 }
 
-const Plugin::DescriptorList PluginFactory::descriptors() const
+Plugin::DescriptorList PluginFactory::descriptors() const
 {
 	return m_descriptors.values();
 }
 
-const Plugin::DescriptorList PluginFactory::descriptors(Plugin::PluginTypes type) const
+Plugin::DescriptorList PluginFactory::descriptors(Plugin::Type type) const
 {
 	return m_descriptors.values(type);
 }
@@ -120,12 +120,12 @@ const PluginFactory::PluginInfoList& PluginFactory::pluginInfos() const
 	return m_pluginInfos;
 }
 
-const PluginFactory::PluginInfoAndKey PluginFactory::pluginSupportingExtension(const QString& ext)
+PluginFactory::PluginInfoAndKey PluginFactory::pluginSupportingExtension(const QString& ext)
 {
 	return m_pluginByExt.value(ext, PluginInfoAndKey());
 }
 
-const PluginFactory::PluginInfo PluginFactory::pluginInfo(const char* name) const
+PluginFactory::PluginInfo PluginFactory::pluginInfo(const char* name) const
 {
 	for (const PluginInfo& info : m_pluginInfos)
 	{
@@ -157,6 +157,9 @@ void PluginFactory::discoverPlugins()
 		files.unite(QDir(searchPath).entryInfoList(nameFilters).toSet());
 #endif
 	}
+
+	// Apply any plugin filters from environment LMMS_EXCLUDE_PLUGINS
+	filterPlugins(files);
 
 	// Cheap dependency handling: zynaddsubfx needs ZynAddSubFxCore. By loading
 	// all libraries twice we ensure that libZynAddSubFxCore is found.
@@ -246,9 +249,64 @@ void PluginFactory::discoverPlugins()
 	m_descriptors = descriptors;
 }
 
+// Builds QList<QRegularExpression> based on environment variable envVar
+QList<QRegularExpression> PluginFactory::getExcludePatterns(const char* envVar) {
+	QList<QRegularExpression> excludePatterns;
+	QString excludePatternString = std::getenv(envVar);
 
+	if (!excludePatternString.isEmpty()) {
+		QStringList patterns = excludePatternString.split(',');
+		for (const QString& pattern : patterns) {
+			if (pattern.trimmed().isEmpty()) {
+				continue;
+			}
+			QRegularExpression regex(pattern.trimmed());
+			if (regex.isValid()) {
+				excludePatterns << regex;
+			} else {
+				qWarning() << "Invalid regular expression:" << pattern;
+			}
+		}
+	}
+	return excludePatterns;
+}
 
-const QString PluginFactory::PluginInfo::name() const
+// Filter plugins based on environment variable, e.g. export LMMS_EXCLUDE_PLUGINS="libcarla"
+void PluginFactory::filterPlugins(QSet<QFileInfo>& files) {
+	// Get filter
+	QList<QRegularExpression> excludePatterns = getExcludePatterns("LMMS_EXCLUDE_PLUGINS");
+	if (excludePatterns.isEmpty()) {
+		return;
+	}
+
+  	// Get files to remove
+	QSet<QFileInfo> filesToRemove;
+	for (const QFileInfo& fileInfo : files) {
+		bool exclude = false;
+		QString filePath = fileInfo.filePath();
+
+		for (const QRegularExpression& pattern : excludePatterns) {
+			if (pattern.match(filePath).hasMatch()) {
+				exclude = true;
+				break;
+			}
+		}
+
+		if (exclude) {
+			filesToRemove.insert(fileInfo);
+		}
+	}
+
+	// Remove them
+	for (const QFileInfo& fileInfo : filesToRemove) {
+		files.remove(fileInfo);
+	}
+}
+
+QString PluginFactory::PluginInfo::name() const
 {
 	return descriptor ? descriptor->name : QString();
 }
+
+
+} // namespace lmms

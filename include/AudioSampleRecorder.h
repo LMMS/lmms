@@ -23,13 +23,17 @@
  *
  */
 
-#ifndef AUDIO_SAMPLE_RECORDER_H
-#define AUDIO_SAMPLE_RECORDER_H
+#ifndef LMMS_AUDIO_SAMPLE_RECORDER_H
+#define LMMS_AUDIO_SAMPLE_RECORDER_H
 
-#include <QtCore/QList>
-#include <QtCore/QPair>
+#include <QList>
+#include <QPair>
+#include <memory>
 
 #include "AudioDevice.h"
+
+namespace lmms
+{
 
 class SampleBuffer;
 
@@ -38,21 +42,19 @@ class AudioSampleRecorder : public AudioDevice
 {
 public:
 	AudioSampleRecorder( const ch_cnt_t _channels, bool & _success_ful, AudioEngine* audioEngine );
-	virtual ~AudioSampleRecorder();
+	~AudioSampleRecorder() override;
 
 	f_cnt_t framesRecorded() const;
-	void createSampleBuffer( SampleBuffer** sampleBuffer );
-
+	std::shared_ptr<const SampleBuffer> createSampleBuffer();
 
 private:
-	virtual void writeBuffer( const surroundSampleFrame * _ab,
-						const fpp_t _frames,
-						const float _master_gain ) override;
+	void writeBuffer(const SampleFrame* _ab, const fpp_t _frames) override;
 
-	typedef QList<QPair<sampleFrame *, fpp_t> > BufferList;
+	using BufferList = QList<QPair<SampleFrame*, fpp_t>>;
 	BufferList m_buffers;
 
 } ;
 
+} // namespace lmms
 
-#endif
+#endif // LMMS_AUDIO_SAMPLE_RECORDER_H

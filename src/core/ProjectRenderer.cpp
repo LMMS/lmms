@@ -34,22 +34,23 @@
 #include "AudioFileMP3.h"
 #include "AudioFileFlac.h"
 
-#ifdef LMMS_HAVE_SCHED_H
-#include "sched.h"
-#endif
 
-const ProjectRenderer::FileEncodeDevice ProjectRenderer::fileEncodeDevices[] =
+namespace lmms
 {
 
-	{ ProjectRenderer::WaveFile,
+
+const std::array<ProjectRenderer::FileEncodeDevice, 5> ProjectRenderer::fileEncodeDevices
+{
+
+	FileEncodeDevice{ ProjectRenderer::ExportFileFormat::Wave,
 		QT_TRANSLATE_NOOP( "ProjectRenderer", "WAV (*.wav)" ),
 					".wav", &AudioFileWave::getInst },
-	{ ProjectRenderer::FlacFile,
+	FileEncodeDevice{ ProjectRenderer::ExportFileFormat::Flac,
 		QT_TRANSLATE_NOOP("ProjectRenderer", "FLAC (*.flac)"),
 		".flac",
 		&AudioFileFlac::getInst
 	},
-	{ ProjectRenderer::OggFile,
+	FileEncodeDevice{ ProjectRenderer::ExportFileFormat::Ogg,
 		QT_TRANSLATE_NOOP( "ProjectRenderer", "OGG (*.ogg)" ),
 					".ogg",
 #ifdef LMMS_HAVE_OGGVORBIS
@@ -58,7 +59,7 @@ const ProjectRenderer::FileEncodeDevice ProjectRenderer::fileEncodeDevices[] =
 					nullptr
 #endif
 									},
-	{ ProjectRenderer::MP3File,
+	FileEncodeDevice{ ProjectRenderer::ExportFileFormat::MP3,
 		QT_TRANSLATE_NOOP( "ProjectRenderer", "MP3 (*.mp3)" ),
 					".mp3",
 #ifdef LMMS_HAVE_MP3LAME
@@ -70,24 +71,18 @@ const ProjectRenderer::FileEncodeDevice ProjectRenderer::fileEncodeDevices[] =
 	// Insert your own file-encoder infos here.
 	// Maybe one day the user can add own encoders inside the program.
 
-	{ ProjectRenderer::NumFileFormats, nullptr, nullptr, nullptr }
+	FileEncodeDevice{ ProjectRenderer::ExportFileFormat::Count, nullptr, nullptr, nullptr }
 
 } ;
 
-
-
-
-ProjectRenderer::ProjectRenderer( const AudioEngine::qualitySettings & qualitySettings,
-					const OutputSettings & outputSettings,
-					ExportFileFormats exportFileFormat,
-					const QString & outputFilename ) :
-	QThread( Engine::audioEngine() ),
-	m_fileDev( nullptr ),
-	m_qualitySettings( qualitySettings ),
-	m_progress( 0 ),
-	m_abort( false )
+ProjectRenderer::ProjectRenderer(
+	const OutputSettings& outputSettings, ExportFileFormat exportFileFormat, const QString& outputFilename)
+	: QThread(Engine::audioEngine())
+	, m_fileDev(nullptr)
+	, m_progress(0)
+	, m_abort(false)
 {
-	AudioFileDeviceInstantiaton audioEncoderFactory = fileEncodeDevices[exportFileFormat].m_getDevInst;
+	AudioFileDeviceInstantiaton audioEncoderFactory = fileEncodeDevices[static_cast<std::size_t>(exportFileFormat)].m_getDevInst;
 
 	if (audioEncoderFactory)
 	{
@@ -107,20 +102,13 @@ ProjectRenderer::ProjectRenderer( const AudioEngine::qualitySettings & qualitySe
 
 
 
-ProjectRenderer::~ProjectRenderer()
-{
-}
-
-
-
-
 // Little help function for getting file format from a file extension
 // (only for registered file-encoders).
-ProjectRenderer::ExportFileFormats ProjectRenderer::getFileFormatFromExtension(
+ProjectRenderer::ExportFileFormat ProjectRenderer::getFileFormatFromExtension(
 							const QString & _ext )
 {
 	int idx = 0;
-	while( fileEncodeDevices[idx].m_fileFormat != NumFileFormats )
+	while( fileEncodeDevices[idx].m_fileFormat != ExportFileFormat::Count )
 	{
 		if( QString( fileEncodeDevices[idx].m_extension ) == _ext )
 		{
@@ -129,16 +117,16 @@ ProjectRenderer::ExportFileFormats ProjectRenderer::getFileFormatFromExtension(
 		++idx;
 	}
 
-	return( WaveFile ); // Default.
+	return( ExportFileFormat::Wave ); // Default.
 }
 
 
 
 
 QString ProjectRenderer::getFileExtensionFromFormat(
-		ExportFileFormats fmt )
+		ExportFileFormat fmt )
 {
-	return fileEncodeDevices[fmt].m_extension;
+	return fileEncodeDevices[static_cast<std::size_t>(fmt)].m_extension;
 }
 
 
@@ -151,7 +139,7 @@ void ProjectRenderer::startProcessing()
 	{
 		// Have to do audio engine stuff with GUI-thread affinity in order to
 		// make slots connected to sampleRateChanged()-signals being called immediately.
-		Engine::audioEngine()->setAudioDevice( m_fileDev, m_qualitySettings, false, false );
+		Engine::audioEngine()->setAudioDevice(m_fileDev, false, false);
 
 		start(
 #ifndef LMMS_BUILD_WIN32
@@ -165,18 +153,6 @@ void ProjectRenderer::startProcessing()
 
 void ProjectRenderer::run()
 {
-	MemoryManager::ThreadGuard mmThreadGuard; Q_UNUSED(mmThreadGuard);
-#if 0
-#if defined(LMMS_BUILD_LINUX) || defined(LMMS_BUILD_FREEBSD)
-#ifdef LMMS_HAVE_SCHED_H
-	cpu_set_t mask;
-	CPU_ZERO( &mask );
-	CPU_SET( 0, &mask );
-	sched_setaffinity( 0, sizeof( mask ), &mask );
-#endif
-#endif
-#endif
-
 	PerfLogTimer perfLog("Project Render");
 
 	Engine::getSong()->startExport();
@@ -228,10 +204,10 @@ void ProjectRenderer::abortProcessing()
 
 void ProjectRenderer::updateConsoleProgress()
 {
-	const int cols = 50;
+	constexpr int cols = 50;
 	static int rot = 0;
-	char buf[80];
-	char prog[cols+1];
+	auto buf = std::array<char, 80>{};
+	auto prog = std::array<char, cols + 1>{};
 
 	for( int i = 0; i < cols; ++i )
 	{
@@ -239,14 +215,15 @@ void ProjectRenderer::updateConsoleProgress()
 	}
 	prog[cols] = 0;
 
-	const char * activity = (const char *) "|/-\\";
-	memset( buf, 0, sizeof( buf ) );
-	sprintf( buf, "\r|%s|    %3d%%   %c  ", prog, m_progress,
+	const auto activity = "|/-\\";
+	std::fill(buf.begin(), buf.end(), 0);
+	std::snprintf(buf.data(), buf.size(), "\r|%s|    %3d%%   %c  ", prog.data(), m_progress,
 							activity[rot] );
 	rot = ( rot+1 ) % 4;
 
-	fprintf( stderr, "%s", buf );
+	fprintf( stderr, "%s", buf.data() );
 	fflush( stderr );
 }
 
 
+} // namespace lmms

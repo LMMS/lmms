@@ -1,0 +1,231 @@
+#!/usr/bin/python3
+
+import subprocess
+from pathlib import Path
+import tempfile
+import os
+import sys
+
+
+def set_git_config():
+	"""Set local git identity, but only in local repo (to not overwrite user settings)"""
+	"""Also, fix git issue: fatal: transport 'file' not allowed"""
+	subprocess.run(['git', 'config', 'user.name', 'James Bond'])
+	subprocess.run(['git', 'config', 'user.email', '007@sis.gov.uk'])
+	subprocess.run(['git', 'config', '--global', 'protocol.file.allow', 'always'])
+
+
+def create_file(filename: str, file_content: str):
+	"""Create a file in the current directory and adds it to git"""
+	Path(filename).parent.mkdir(parents=True, exist_ok=True)
+	with open(filename, "w", encoding='utf-8') as textfile:
+		print(file_content, file=textfile)
+	subprocess.run(['git', 'add', filename], check=True)
+
+
+class ScriptTest():
+	def __init__(self, scriptpath: Path):
+		self.scriptpath = Path(scriptpath)
+
+	def __enter__(self):
+		"""Create temporary, minimal test environment, and change to it"""
+		self.lmms_tmpdir = tempfile.TemporaryDirectory(dir='.')
+		os.chdir(self.lmms_tmpdir.name)
+		# prerequirements
+		Path('data/themes').mkdir(parents=True)
+		subprocess.run(['git', 'init', '-b', 'main'], check=True)
+		set_git_config()
+		subprocess.run(['git', 'submodule', 'add', '../../carla', 'plugins/CarlaBase/carla'], check=True)
+		create_file('src/core/classes.cpp', 'namespace lmms {\nclass TestClass\n}')
+		create_file('data/locale/de.ts',
+					'<?xml version="1.0" ?><!DOCTYPE TS><TS language="de" version="2.1">\n'
+					'    <context>\n'
+					'    <name>TestClass</name>\n'
+					'     <message>\n'
+					'        <location filename="../../src/core/classes.cpp" line="20"/>\n'
+					'        <source>About LMMS</source>\n'
+					'        <translation>Über LMMS</translation>\n'
+					'    </message>\n'
+					'</context>\n'
+					'</TS>\n')
+		subprocess.run(['git', 'commit', '-m', 'Initial commit'], check=True)
+		return self
+
+	def __exit__(self, type, value, traceback):
+		"""Leave and destroy temporary test environment"""
+		os.chdir('..')
+		self.lmms_tmpdir.cleanup()
+
+	def expect(self, expectation: str):
+		"""Check if "expectation" is in the output"""
+		if expectation not in self.result.stdout:
+			raise RuntimeError(f'Expected "{expectation}" in script output')
+
+	def run(self, expected_returncode: int = 1):  # default: something goes wrong ("to the safe side")
+		"""Run the script, check the exit code and store the result"""
+		command = [str(self.scriptpath)]
+		if os.name == 'nt':
+			command.insert(0, sys.executable)
+		self.result = subprocess.run(command, capture_output=True, text=True)
+		print('--->8--- Script output BEGIN --->8---')
+		print(self.result.stdout)
+		print('--->8--- Script output END   --->8---')
+		if self.result.stderr:
+			print('--->8--- Script error output BEGIN --->8---')
+			print(self.result.stderr)
+			print('--->8--- Script error output END   --->8---')
+		# make sure script returned "error" (because we test for errors) and that the output is as expected
+		if self.result.returncode != expected_returncode:
+			raise RuntimeError(f"Script \"check-strings\" returned {self.result.returncode}, "
+							   f"but {expected_returncode} expected")
+
+
+lmms_main_path = Path(__file__).resolve().parent.parent.parent
+
+with tempfile.TemporaryDirectory() as tmpdir:
+	os.chdir(tmpdir)
+	check_strings = lmms_main_path / 'tests' / 'scripted' / 'check-strings'
+	check_namespace = lmms_main_path / 'tests' / 'scripted' / 'check-namespace'
+
+	# create dummy carla repo
+	Path('carla').mkdir()
+	os.chdir('carla')
+	subprocess.run(['git', 'init', '-b', 'main'], check=True)
+	set_git_config()
+	create_file('README.md', 'hello world')
+	subprocess.run(['git', 'commit', '-m', 'Initial commit'], check=True)
+	os.chdir('..')
+
+	Path('lmms').mkdir()
+	os.chdir('lmms')
+
+	# minimal working example
+	with ScriptTest(check_strings) as test:
+		test.run(0)  # exitcode 0 - no errors expected
+		test.expect('0 errors')
+
+	with ScriptTest(check_strings) as test:
+		create_file('data/locale/fr.ts',
+					'<?xml version="1.0" ?><!DOCTYPE TS><TS language="de" version="2.1">\n'
+					'    <context>\n'
+					'    <name>NonExistentClass</name>\n'
+					'     <message>\n'
+					'        <location filename="../../src/core/classes.cpp" line="20"/>\n'
+					'        <source>About LMMS</source>\n'
+					'        <translation>À propos de LMMS</translation>\n'
+					'    </message>\n'
+					'</context>\n'
+					'</TS>\n')
+		test.run()
+		test.expect('Error: data/locale: Class does not exist in source code: NonExistentClass')
+		test.expect('1 errors')
+
+	with ScriptTest(check_strings) as test:
+		create_file('data/themes/classic/style.css',
+					'lmms--gui--NonExistentClass {'
+					'\tcolor: #d1d8e4;\n'
+					'}')
+		test.run()
+		test.expect('Error: data/themes/classic/style.css: Class does not exist in source code: NonExistentClass')
+		test.expect('1 errors')
+
+	with ScriptTest(check_namespace) as test:
+		# minimal working example
+		test.run(0)  # exitcode 0 - no errors expected
+		test.expect('0 errors')
+
+		create_file('01_OddBraceWithinMacro.cpp', '''
+					#if HAS_EVEN_BRACES
+						namespace lmms {}
+					#endif
+					namespace lmms {
+					#if HAS_ODD_BRACE
+					}
+					#endif
+					''')
+		create_file('02_IncludeInCodeBlock.cpp', '''
+					#include <good>
+					extern "C" {
+						#include "alright.c"
+					}
+					namespace lmms {
+						#include <bad>
+					}
+					''')
+		create_file('03_MacroComments.h', '''
+					#ifndef HEADER_GUARD_NEEDS_NO_COMMENT
+					#define HEADER_GUARD_NEEDS_NO_COMMENT
+						#ifdef HAS_NESTED_NEEDS_COMMENT
+							#ifdef SHORT_NO_NESTED_NEEDS_NO_COMMENT
+								namespace lmms {}
+							#endif
+						#endif
+						#ifdef HAS_COMMENT
+							#ifdef SHORT_NO_NESTED_NEEDS_NO_COMMENT
+							#else
+							#endif
+						#endif // HAS_COMMENT
+					#endif
+					''')
+		create_file('04_NamespaceComments.cpp', '''
+					namespace lmms {
+						namespace ShortNamespace {
+							class WithDeclarationsOnly;
+						}
+						namespace LongNamespace {
+							class WithDefinition {
+								int x;
+							};
+						}
+					} // namespace lmms
+					''')
+		create_file('05_NoHeaderGuard.h', '''
+					#include <cstdio>
+					namespace lmms {}
+					''')
+		create_file('06_PragmaButNoLmms.h', '''
+					// should not cause header guard warning
+					#pragma once
+					namespace not_lmms {}
+					''')
+		create_file('07_MismatchingEndifName.h', '''
+					#ifndef ABC_H
+					namespace lmms {
+					\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n
+					}
+					#endif // XYZ_H
+					''')
+		create_file('08_MismatchingNamespaceEndName.h', '''
+					#ifndef ABC_H
+					namespace lmms {
+					{}
+					} // namespace smml
+					#endif // ABC_H
+					''')
+		create_file('09_NoEndifAfterElseIsOk.cpp', '''
+					#ifdef XYZ
+					namespace lmms {
+					\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n
+					}
+					#else
+					namespace lmms {
+					\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n
+					}
+					#endif
+					''')
+		test.run()
+		test.expect('8 errors')
+		test.expect('''
+Error: 01_OddBraceWithinMacro.cpp:7: Expected #endif before }
+Error: 02_IncludeInCodeBlock.cpp:7: #include inside a code block
+Error: 03_MacroComments.h:8: Missing comment // HAS_NESTED_NEEDS_COMMENT
+Error: 04_NamespaceComments.cpp:10: Missing comment // namespace LongNamespace
+Error: 05_NoHeaderGuard.h: First statement should be header guard
+Error: 06_PragmaButNoLmms.h: File has no namespace lmms
+Error: 07_MismatchingEndifName.h:36: Missing comment // ABC_H
+Error: 08_MismatchingNamespaceEndName.h:5: Missing comment // namespace lmms
+''')
+
+
+# if we made it until here without an exception, all tests have been passed
+print("SUCCESS")

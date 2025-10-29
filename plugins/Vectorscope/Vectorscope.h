@@ -28,25 +28,32 @@
 #include "LocklessRingBuffer.h"
 #include "VecControls.h"
 
+namespace lmms
+{
+
 
 //! Top level class; handles LMMS interface and accumulates data for processing.
 class Vectorscope : public Effect
 {
 public:
 	Vectorscope(Model *parent, const Descriptor::SubPluginFeatures::Key *key);
-	virtual ~Vectorscope() {};
+	~Vectorscope() override = default;
 
-	bool processAudioBuffer(sampleFrame *buffer, const fpp_t frame_count) override;
+	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
+
 	EffectControls *controls() override {return &m_controls;}
-	LocklessRingBuffer<sampleFrame> *getBuffer() {return &m_inputBuffer;}
+	LocklessRingBuffer<SampleFrame> *getBuffer() {return &m_inputBuffer;}
 
 private:
 	VecControls m_controls;
 
 	// Maximum LMMS buffer size (hard coded, the actual constant is hard to get)
 	const unsigned int m_maxBufferSize = 4096;
-	LocklessRingBuffer<sampleFrame> m_inputBuffer;
+	LocklessRingBuffer<SampleFrame> m_inputBuffer;
 };
+
+
+} // namespace lmms
 
 #endif // VECTORSCOPE_H
 

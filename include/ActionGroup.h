@@ -22,11 +22,13 @@
  *
  */
 
-
-#ifndef ACTION_GROUP_H
-#define ACTION_GROUP_H
+#ifndef LMMS_GUI_ACTION_GROUP_H
+#define LMMS_GUI_ACTION_GROUP_H
 
 #include <QActionGroup>
+
+namespace lmms::gui
+{
 
 /// \brief Convenience subclass of QActionGroup
 ///
@@ -54,4 +56,6 @@ private:
 	QList<QAction*> m_actions;
 };
 
-#endif
+} // namespace lmms::gui
+
+#endif // LMMS_GUI_ACTION_GROUP_H

@@ -31,18 +31,25 @@
 #include "DualFilterControls.h"
 #include "BasicFilters.h"
 
+namespace lmms
+{
+
+
 class DualFilterEffect : public Effect
 {
 public:
 	DualFilterEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key );
-	virtual ~DualFilterEffect();
-	virtual bool processAudioBuffer( sampleFrame* buf, const fpp_t frames );
+	~DualFilterEffect() override;
 
-	virtual EffectControls* controls()
+	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
+
+	EffectControls* controls() override
 	{
 		return &m_dfControls;
 	}
 
+protected:
+	void onEnabledChanged() override;
 
 private:
 	DualFilterControls m_dfControls;
@@ -61,5 +68,8 @@ private:
 	friend class DualFilterControls;
 
 } ;
+
+
+} // namespace lmms
 
 #endif

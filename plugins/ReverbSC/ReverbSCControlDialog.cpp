@@ -22,11 +22,18 @@
  *
  */
 
-#include <QLayout>
 
 #include "ReverbSCControlDialog.h"
-#include "ReverbSCControls.h"
+
 #include "embed.h"
+#include "Knob.h"
+#include "ReverbSCControls.h"
+
+#include <QHBoxLayout>
+
+namespace lmms::gui
+{
+
 
 ReverbSCControlDialog::ReverbSCControlDialog( ReverbSCControls* controls ) :
 	EffectControlDialog( controls )
@@ -35,29 +42,30 @@ ReverbSCControlDialog::ReverbSCControlDialog( ReverbSCControls* controls ) :
 	QPalette pal;
 	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap( "artwork" ) );
 	setPalette( pal );
-	setFixedSize( 185, 55 );
-	
-	Knob * inputGainKnob = new Knob( knobBright_26, this);
-	inputGainKnob -> move( 16, 10 );
+
+	auto knobLayout = new QHBoxLayout(this);
+
+	auto inputGainKnob = new Knob(KnobType::Bright26, tr("Input"), this);
 	inputGainKnob->setModel( &controls->m_inputGainModel );
-	inputGainKnob->setLabel( tr( "Input" ) );
 	inputGainKnob->setHintText( tr( "Input gain:" ) , "dB" );
 
-	Knob * sizeKnob = new Knob( knobBright_26, this);
-	sizeKnob -> move( 57, 10 );
+	auto sizeKnob = new Knob(KnobType::Bright26, tr("Size"), this);
 	sizeKnob->setModel( &controls->m_sizeModel );
-	sizeKnob->setLabel( tr( "Size" ) );
 	sizeKnob->setHintText( tr( "Size:" ) , "" );
 
-	Knob * colorKnob = new Knob( knobBright_26, this);
-	colorKnob -> move( 98, 10 );
+	auto colorKnob = new Knob(KnobType::Bright26, tr("Color"), this);
 	colorKnob->setModel( &controls->m_colorModel );
-	colorKnob->setLabel( tr( "Color" ) );
 	colorKnob->setHintText( tr( "Color:" ) , "" );
 
-	Knob * outputGainKnob = new Knob( knobBright_26, this);
-	outputGainKnob -> move( 139, 10 );
+	auto outputGainKnob = new Knob(KnobType::Bright26, tr("Output"), this);
 	outputGainKnob->setModel( &controls->m_outputGainModel );
-	outputGainKnob->setLabel( tr( "Output" ) );
 	outputGainKnob->setHintText( tr( "Output gain:" ) , "dB" );
+
+	knobLayout->addWidget(inputGainKnob);
+	knobLayout->addWidget(sizeKnob);
+	knobLayout->addWidget(colorKnob);
+	knobLayout->addWidget(outputGainKnob);
 }
+
+
+} // namespace lmms::gui

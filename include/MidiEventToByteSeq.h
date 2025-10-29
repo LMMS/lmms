@@ -22,13 +22,17 @@
  *
  */
 
-#ifndef MIDIEVENTTOBYTESEQ_H
-#define MIDIEVENTTOBYTESEQ_H
+#ifndef LMMS_MIDIEVENTTOBYTESEQ_H
+#define LMMS_MIDIEVENTTOBYTESEQ_H
 
 #include <cstddef>
 #include <cstdint>
 
 #include "lmms_export.h"
+
+
+namespace lmms
+{
 
 /**
 	Write MIDI event into byte sequence.
@@ -44,4 +48,7 @@
 std::size_t LMMS_EXPORT writeToByteSeq( const class MidiEvent& ev,
 										uint8_t* data, std::size_t bufsize );
 
-#endif // MIDIEVENTTOBYTESEQ_H
+
+} // namespace lmms
+
+#endif // LMMS_MIDIEVENTTOBYTESEQ_H

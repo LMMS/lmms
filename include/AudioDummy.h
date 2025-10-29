@@ -22,14 +22,16 @@
  *
  */
 
-#ifndef AUDIO_DUMMY_H
-#define AUDIO_DUMMY_H
+#ifndef LMMS_AUDIO_DUMMY_H
+#define LMMS_AUDIO_DUMMY_H
 
 #include "AudioDevice.h"
 #include "AudioDeviceSetupWidget.h"
 #include "AudioEngine.h"
 #include "MicroTimer.h"
 
+namespace lmms
+{
 
 class AudioDummy : public QThread, public AudioDevice
 {
@@ -41,7 +43,7 @@ public:
 		_success_ful = true;
 	}
 
-	virtual ~AudioDummy()
+	~AudioDummy() override
 	{
 		stopProcessing();
 	}
@@ -52,17 +54,15 @@ public:
 	}
 
 
-	class setupWidget : public AudioDeviceSetupWidget
+	class setupWidget : public gui::AudioDeviceSetupWidget
 	{
 	public:
 		setupWidget( QWidget * _parent ) :
-			AudioDeviceSetupWidget( AudioDummy::name(), _parent )
+			gui::AudioDeviceSetupWidget( AudioDummy::name(), _parent )
 		{
 		}
 
-		virtual ~setupWidget()
-		{
-		}
+		~setupWidget() override = default;
 
 		void saveSettings() override
 		{
@@ -94,7 +94,7 @@ private:
 		while( true )
 		{
 			timer.reset();
-			const surroundSampleFrame* b = audioEngine()->nextBuffer();
+			const SampleFrame* b = audioEngine()->nextBuffer();
 			if( !b )
 			{
 				break;
@@ -104,7 +104,7 @@ private:
 				delete[] b;
 			}
 
-			const int microseconds = static_cast<int>( audioEngine()->framesPerPeriod() * 1000000.0f / audioEngine()->processingSampleRate() - timer.elapsed() );
+			const int microseconds = static_cast<int>( audioEngine()->framesPerPeriod() * 1000000.0f / audioEngine()->outputSampleRate() - timer.elapsed() );
 			if( microseconds > 0 )
 			{
 				usleep( microseconds );
@@ -114,5 +114,6 @@ private:
 
 } ;
 
+} // namespace lmms
 
-#endif
+#endif // LMMS_AUDIO_DUMMY_H

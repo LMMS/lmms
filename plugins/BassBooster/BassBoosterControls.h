@@ -27,8 +27,9 @@
 
 #include "EffectControls.h"
 #include "BassBoosterControlDialog.h"
-#include "Knob.h"
 
+namespace lmms
+{
 
 class BassBoosterEffect;
 
@@ -38,25 +39,23 @@ class BassBoosterControls : public EffectControls
 	Q_OBJECT
 public:
 	BassBoosterControls( BassBoosterEffect* effect );
-	virtual ~BassBoosterControls()
-	{
-	}
+	~BassBoosterControls() override = default;
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
-	inline virtual QString nodeName() const
+	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
+	void loadSettings( const QDomElement & _this ) override;
+	inline QString nodeName() const override
 	{
 		return "bassboostercontrols";
 	}
 
-	virtual int controlCount()
+	int controlCount() override
 	{
 		return 3;
 	}
 
-	virtual EffectControlDialog* createView()
+	gui::EffectControlDialog* createView() override
 	{
-		return new BassBoosterControlDialog( this );
+		return new gui::BassBoosterControlDialog( this );
 	}
 
 
@@ -69,8 +68,11 @@ private:
 	FloatModel m_gainModel;
 	FloatModel m_ratioModel;
 
-	friend class BassBoosterControlDialog;
+	friend class gui::BassBoosterControlDialog;
 	friend class BassBoosterEffect;
 } ;
+
+
+} // namespace lmms
 
 #endif

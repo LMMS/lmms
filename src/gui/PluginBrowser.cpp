@@ -27,6 +27,7 @@
 #include <QHeaderView>
 #include <QLabel>
 #include <QLineEdit>
+#include <QMenu>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QStyleOption>
@@ -34,9 +35,14 @@
 
 #include "embed.h"
 #include "Engine.h"
-#include "gui_templates.h"
+#include "InstrumentTrack.h"
+#include "Song.h"
 #include "StringPairDrag.h"
+#include "TrackContainerView.h"
 #include "PluginFactory.h"
+
+namespace lmms::gui
+{
 
 
 PluginBrowser::PluginBrowser( QWidget * _parent ) :
@@ -49,22 +55,23 @@ PluginBrowser::PluginBrowser( QWidget * _parent ) :
 
 	addContentWidget( m_view );
 
-	QVBoxLayout * view_layout = new QVBoxLayout( m_view );
-	view_layout->setMargin( 5 );
+	auto view_layout = new QVBoxLayout(m_view);
+	view_layout->setContentsMargins(5, 5, 5, 5);
 	view_layout->setSpacing( 5 );
 
 
 	auto hint = new QLabel( tr( "Drag an instrument "
-					"into either the Song-Editor, the "
-					"Beat+Bassline Editor or into an "
+					"into either the Song Editor, the "
+					"Pattern Editor or an "
 					"existing instrument track." ),
 								m_view );
 	hint->setWordWrap( true );
 
-	QLineEdit * searchBar = new QLineEdit( m_view );
-	searchBar->setPlaceholderText( "Search" );
-	searchBar->setMaxLength( 64 );
-	searchBar->setClearButtonEnabled( true );
+	auto searchBar = new QLineEdit(m_view);
+	searchBar->setPlaceholderText(tr("Search"));
+	searchBar->setMaxLength(64);
+	searchBar->setClearButtonEnabled(true);
+	searchBar->addAction(embed::getIconPixmap("zoom"), QLineEdit::LeadingPosition);
 
 	m_descTree = new QTreeWidget( m_view );
 	m_descTree->setColumnCount( 1 );
@@ -72,8 +79,8 @@ PluginBrowser::PluginBrowser( QWidget * _parent ) :
 	m_descTree->setIndentation( 10 );
 	m_descTree->setSelectionMode( QAbstractItemView::NoSelection );
 
-	connect( searchBar, SIGNAL( textEdited( const QString & ) ),
-			this, SLOT( onFilterChanged( const QString & ) ) );
+	connect( searchBar, SIGNAL( textEdited( const QString& ) ),
+			this, SLOT( onFilterChanged( const QString& ) ) );
 
 	view_layout->addWidget( hint );
 	view_layout->addWidget( searchBar );
@@ -118,8 +125,7 @@ void PluginBrowser::onFilterChanged( const QString & filter )
 		for (int itemIndex = 0; itemIndex < itemCount; ++itemIndex)
 		{
 			QTreeWidgetItem * item = root->child( itemIndex );
-			PluginDescWidget * descWidget = static_cast<PluginDescWidget *>
-							(m_descTree->itemWidget( item, 0));
+			auto descWidget = static_cast<PluginDescWidget*>(m_descTree->itemWidget(item, 0));
 			if (descWidget->name().contains(filter, Qt::CaseInsensitive))
 			{
 				item->setHidden( false );
@@ -156,7 +162,7 @@ void PluginBrowser::addPlugins()
 	m_descTree->clear();
 
 	// Fetch and sort all instrument plugin descriptors
-	auto descs = getPluginFactory()->descriptors(Plugin::Instrument);
+	auto descs = getPluginFactory()->descriptors(Plugin::Type::Instrument);
 	std::sort(descs.begin(), descs.end(),
 		[](auto d1, auto d2)
 		{
@@ -276,9 +282,9 @@ void PluginDescWidget::leaveEvent( QEvent * _e )
 
 void PluginDescWidget::mousePressEvent( QMouseEvent * _me )
 {
+	Engine::setDndPluginKey(&m_pluginKey);
 	if ( _me->button() == Qt::LeftButton )
 	{
-		Engine::setDndPluginKey(&m_pluginKey);
 		new StringPairDrag("instrument",
 			QString::fromUtf8(m_pluginKey.desc->name), m_logo, this);
 		leaveEvent( _me );
@@ -286,9 +292,24 @@ void PluginDescWidget::mousePressEvent( QMouseEvent * _me )
 }
 
 
+void PluginDescWidget::contextMenuEvent(QContextMenuEvent* e)
+{
+	QMenu contextMenu(this);
+	contextMenu.addAction(
+		tr("Send to new instrument track"),
+		[=, this]{ openInNewInstrumentTrack(m_pluginKey.desc->name); }
+	);
+	contextMenu.exec(e->globalPos());
+}
 
 
+void PluginDescWidget::openInNewInstrumentTrack(QString value)
+{
+	TrackContainer* tc = Engine::getSong();
+	auto it = dynamic_cast<InstrumentTrack*>(Track::create(Track::Type::Instrument, tc));
+	auto ilt = new InstrumentLoaderThread(this, it, value);
+	ilt->start();
+}
 
 
-
-
+} // namespace lmms::gui

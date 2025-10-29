@@ -22,13 +22,14 @@
  *
  */
 
-
-#ifndef LCD_SPINBOX_H
-#define LCD_SPINBOX_H
+#ifndef LMMS_GUI_LCD_SPINBOX_H
+#define LMMS_GUI_LCD_SPINBOX_H
 
 #include "LcdWidget.h"
 #include "AutomatableModelView.h"
 
+namespace lmms::gui
+{
 
 class LMMS_EXPORT LcdSpinBox : public LcdWidget, public IntModelView
 {
@@ -38,7 +39,7 @@ public:
 
 	LcdSpinBox( int numDigits, const QString& style, QWidget* parent, const QString& name = QString() );
 
-	virtual ~LcdSpinBox() = default;
+	~LcdSpinBox() override = default;
 
 	void modelChanged() override
 	{
@@ -84,6 +85,8 @@ signals:
 
 } ;
 
-typedef IntModel LcdSpinBoxModel;
+using LcdSpinBoxModel = IntModel;
 
-#endif
+} // namespace lmms::gui
+
+#endif // LMMS_GUI_LCD_SPINBOX_H

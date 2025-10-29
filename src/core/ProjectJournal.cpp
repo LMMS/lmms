@@ -23,11 +23,16 @@
  */
 
 #include <cstdlib>
+#include <QDomElement>
 
 #include "ProjectJournal.h"
 #include "Engine.h"
 #include "JournallingObject.h"
 #include "Song.h"
+#include "AutomationClip.h"
+
+namespace lmms
+{
 
 //! Avoid clashes between loaded IDs (have the bit cleared)
 //! and newly created IDs (have the bit set)
@@ -46,13 +51,6 @@ ProjectJournal::ProjectJournal() :
 
 
 
-ProjectJournal::~ProjectJournal()
-{
-}
-
-
-
-
 void ProjectJournal::undo()
 {
 	while( !m_undoCheckPoints.isEmpty() )
@@ -62,7 +60,7 @@ void ProjectJournal::undo()
 
 		if( jo )
 		{
-			DataFile curState( DataFile::JournalData );
+			DataFile curState( DataFile::Type::JournalData );
 			jo->saveState( curState, curState.content() );
 			m_redoCheckPoints.push( CheckPoint( c.joID, curState ) );
 
@@ -71,6 +69,12 @@ void ProjectJournal::undo()
 			jo->restoreState( c.data.content().firstChildElement() );
 			setJournalling( prev );
 			Engine::getSong()->setModified();
+
+			// loading AutomationClip connections correctly
+			if (!c.data.content().elementsByTagName("automationclip").isEmpty())
+			{
+				AutomationClip::resolveAllIDs();
+			}
 			break;
 		}
 	}
@@ -87,7 +91,7 @@ void ProjectJournal::redo()
 
 		if( jo )
 		{
-			DataFile curState( DataFile::JournalData );
+			DataFile curState( DataFile::Type::JournalData );
 			jo->saveState( curState, curState.content() );
 			m_undoCheckPoints.push( CheckPoint( c.joID, curState ) );
 
@@ -119,7 +123,7 @@ void ProjectJournal::addJournalCheckPoint( JournallingObject *jo )
 	{
 		m_redoCheckPoints.clear();
 
-		DataFile dataFile( DataFile::JournalData );
+		DataFile dataFile( DataFile::Type::JournalData );
 		jo->saveState( dataFile, dataFile.content() );
 
 		m_undoCheckPoints.push( CheckPoint( jo->id(), dataFile ) );
@@ -206,3 +210,4 @@ void ProjectJournal::stopAllJournalling()
 
 
 
+} // namespace lmms

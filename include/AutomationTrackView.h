@@ -23,22 +23,33 @@
  *
  */
 
-#ifndef AUTOMATION_TRACK_VIEW_H
-#define AUTOMATION_TRACK_VIEW_H
+#ifndef LMMS_GUI_AUTOMATION_TRACK_VIEW_H
+#define LMMS_GUI_AUTOMATION_TRACK_VIEW_H
 
-#include "AutomationTrack.h"
 #include "TrackView.h"
+
+namespace lmms
+{
+
+class AutomationTrack;
+
+namespace gui
+{
 
 
 class AutomationTrackView : public TrackView
 {
 public:
 	AutomationTrackView( AutomationTrack* at, TrackContainerView* tcv );
-	virtual ~AutomationTrackView() = default;
+	~AutomationTrackView() override = default;
 
 	void dragEnterEvent( QDragEnterEvent * _dee ) override;
 	void dropEvent( QDropEvent * _de ) override;
 } ;
 
 
-#endif
+} // namespace gui
+
+} // namespace lmms
+
+#endif // LMMS_GUI_AUTOMATION_TRACK_VIEW_H

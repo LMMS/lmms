@@ -21,65 +21,85 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
-#ifndef SAMPLE_CLIP_H
-#define SAMPLE_CLIP_H
 
-#include "SampleBuffer.h"
-#include "SampleTrack.h"
+#ifndef LMMS_SAMPLE_CLIP_H
+#define LMMS_SAMPLE_CLIP_H
+
+#include <memory>
 #include "Clip.h"
- 
+#include "Sample.h"
+
+namespace lmms
+{
+
+class SampleBuffer;
+
+namespace gui
+{
+
+class SampleClipView;
+
+} // namespace gui
+
 
 class SampleClip : public Clip
 {
 	Q_OBJECT
 	mapPropertyFromModel(bool,isRecord,setRecord,m_recordModel);
 public:
-	SampleClip( Track * _track );
-	SampleClip( const SampleClip& orig );
-	virtual ~SampleClip();
+	SampleClip(Track* track, Sample sample, bool isPlaying);
+	SampleClip(Track* track);
+	~SampleClip() override;
 
 	SampleClip& operator=( const SampleClip& that ) = delete;
 
 	void changeLength( const TimePos & _length ) override;
-	const QString & sampleFile() const;
+	const QString& sampleFile() const;
+	bool hasSampleFileLoaded(const QString & filename) const;
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 	void loadSettings( const QDomElement & _this ) override;
 	inline QString nodeName() const override
 	{
-		return "sampletco";
+		return "sampleclip";
 	}
 
-	SampleBuffer* sampleBuffer()
+	Sample& sample()
 	{
-		return m_sampleBuffer;
+		return m_sample;
 	}
 
 	TimePos sampleLength() const;
 	void setSampleStartFrame( f_cnt_t startFrame );
 	void setSamplePlayLength( f_cnt_t length );
-	ClipView * createView( TrackView * _tv ) override;
+	gui::ClipView * createView( gui::TrackView * _tv ) override;
 
 
 	bool isPlaying() const;
 	void setIsPlaying(bool isPlaying);
+	void setSampleBuffer(std::shared_ptr<const SampleBuffer> sb);
+
+	SampleClip* clone() override
+	{
+		return new SampleClip(*this);
+	}
 
 public slots:
-	void setSampleBuffer( SampleBuffer* sb );
-	void setSampleFile( const QString & _sf );
+	void setSampleFile(const QString& sf);
 	void updateLength();
 	void toggleRecord();
 	void playbackPositionChanged();
 	void updateTrackClips();
 
+protected:
+	SampleClip( const SampleClip& orig );
 
 private:
-	SampleBuffer* m_sampleBuffer;
+	Sample m_sample;
 	BoolModel m_recordModel;
 	bool m_isPlaying;
 
-	friend class SampleClipView;
+	friend class gui::SampleClipView;
 
 
 signals:
@@ -88,5 +108,6 @@ signals:
 } ;
 
 
+} // namespace lmms
 
-#endif
+#endif // LMMS_SAMPLE_CLIP_H

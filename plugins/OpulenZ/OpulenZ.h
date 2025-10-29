@@ -25,13 +25,25 @@
 #ifndef OPULENZ_H
 #define OPULENZ_H
 
+
+#include "AutomatableModel.h"
 #include "Instrument.h"
 #include "InstrumentView.h"
-#include "opl.h"
 
-#include "LcdSpinBox.h"
-#include "Knob.h"
-#include "PixmapButton.h"
+class Copl;
+
+
+namespace lmms
+{
+
+namespace gui
+{
+class Knob;
+class LcdSpinBox;
+class PixmapButton;
+class AutomatableButtonGroup;
+}
+
 
 // This one is a flag, MIDI notes take 7 low bits
 #define OPL2_VOICE_FREE 128
@@ -46,24 +58,19 @@ class OpulenzInstrument : public Instrument
 	Q_OBJECT
 public:
 	OpulenzInstrument( InstrumentTrack * _instrument_track );
-	virtual ~OpulenzInstrument();
+	~OpulenzInstrument() override;
 
-	virtual QString nodeName() const;
-	virtual PluginView * instantiateView( QWidget * _parent );
+	QString nodeName() const override;
+	gui::PluginView* instantiateView( QWidget * _parent ) override;
 
-	virtual Flags flags() const
-	{
-		return IsSingleStreamed | IsMidiBased;
-	}
+	bool handleMidiEvent( const MidiEvent& event, const TimePos& time, f_cnt_t offset = 0 ) override;
+	void play( SampleFrame* _working_buffer ) override;
 
-	virtual bool handleMidiEvent( const MidiEvent& event, const TimePos& time, f_cnt_t offset = 0 );
-	virtual void play( sampleFrame * _working_buffer );
-
-	void saveSettings( QDomDocument & _doc, QDomElement & _this );
-	void loadSettings( const QDomElement & _this );
+	void saveSettings( QDomDocument & _doc, QDomElement & _this ) override;
+	void loadSettings( const QDomElement & _this ) override;
 	void loadPatch(const unsigned char inst[14]);
 	void tuneEqual(int center, float Hz);
-	virtual void loadFile( const QString& file );
+	void loadFile( const QString& file ) override;
 
 	IntModel m_patchModel;
 
@@ -141,15 +148,18 @@ private:
 };
 
 
+namespace gui
+{
+
 
 class OpulenzInstrumentView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:
 	OpulenzInstrumentView( Instrument * _instrument, QWidget * _parent );
-	virtual ~OpulenzInstrumentView();
+	~OpulenzInstrumentView() override;
 	LcdSpinBox *m_patch;
-	void modelChanged();
+	void modelChanged() override;
 
 	Knob *op1_a_kn;
 	Knob *op1_d_kn;
@@ -167,7 +177,7 @@ public:
 	PixmapButton *op1_w1_btn;
 	PixmapButton *op1_w2_btn;
 	PixmapButton *op1_w3_btn;
-	automatableButtonGroup *op1_waveform;
+	AutomatableButtonGroup *op1_waveform;
 
 
 	Knob *op2_a_kn;
@@ -185,7 +195,7 @@ public:
 	PixmapButton *op2_w1_btn;
 	PixmapButton *op2_w2_btn;
 	PixmapButton *op2_w3_btn;
-	automatableButtonGroup *op2_waveform;
+	AutomatableButtonGroup *op2_waveform;
 
 
 	PixmapButton *fm_btn;
@@ -199,5 +209,10 @@ public:
 	QString knobHintHelper(float n);
 
 };
+
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

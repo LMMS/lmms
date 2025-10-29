@@ -24,16 +24,21 @@
  *
  */
 
-#ifndef TOOL_PLUGIN_H
-#define TOOL_PLUGIN_H
+#ifndef LMMS_TOOL_PLUGIN_H
+#define LMMS_TOOL_PLUGIN_H
 
 #include "Plugin.h"
+
+
+namespace lmms
+{
+
 
 class LMMS_EXPORT ToolPlugin : public Plugin
 {
 public:
 	ToolPlugin( const Descriptor * _descriptor, Model * _parent );
-	virtual ~ToolPlugin();
+	~ToolPlugin() override = default;
 
 	// instantiate tool-plugin with given name or return NULL
 	// on failure
@@ -42,4 +47,7 @@ public:
 
 } ;
 
-#endif
+
+} // namespace lmms
+
+#endif // LMMS_TOOL_PLUGIN_H

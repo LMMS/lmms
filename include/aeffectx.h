@@ -22,7 +22,6 @@
  *
  */
 
-
 #ifndef AEFFECTX_H
 #define AEFFECTX_H
 
@@ -30,7 +29,12 @@
 #include <type_traits>
 
 // Calling convention
+#ifdef _WIN32
 #define VST_CALL_CONV __cdecl
+#else
+#define VST_CALL_CONV 
+#endif
+
 
 template<typename T>
 constexpr int32_t CCONST(T a, T b, T c, T d)
@@ -103,6 +107,7 @@ constexpr int effOpen = 0;
 constexpr int effClose = 1; // currently unused
 constexpr int effSetProgram = 2; // currently unused
 constexpr int effGetProgram = 3; // currently unused
+constexpr int effSetProgramName = 4;
 constexpr int effGetProgramName = 5; // currently unused
 constexpr int effGetParamLabel = 6;
 constexpr int effGetParamDisplay = 7;
@@ -115,8 +120,10 @@ constexpr int effEditOpen = 14;
 constexpr int effEditClose = 15;
 constexpr int effEditIdle = 19;
 constexpr int effEditTop = 20;
+constexpr int effGetChunk = 23;
 constexpr int effSetChunk = 24;
 constexpr int effProcessEvents = 25;
+constexpr int effGetProgramNameIndexed = 29;
 constexpr int effGetEffectName = 45;
 constexpr int effGetVendorString = 47;
 constexpr int effGetProductString = 48;
@@ -291,9 +298,6 @@ public:
 
 } ;
 
+using audioMasterCallback = intptr_t (VST_CALL_CONV*)(AEffect*, int32_t, int32_t, intptr_t, void*, float);
 
-
-typedef intptr_t (VST_CALL_CONV * audioMasterCallback)( AEffect * , int32_t, int32_t, intptr_t, void * , float );
-
-
-#endif
+#endif // AEFFECTX_H

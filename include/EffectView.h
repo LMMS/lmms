@@ -23,17 +23,21 @@
  *
  */
 
-#ifndef EFFECT_VIEW_H
-#define EFFECT_VIEW_H
+#ifndef LMMS_GUI_EFFECT_VIEW_H
+#define LMMS_GUI_EFFECT_VIEW_H
 
 #include "AutomatableModel.h"
 #include "PluginView.h"
 #include "Effect.h"
 
+class QGraphicsOpacityEffect;
 class QGroupBox;
 class QLabel;
 class QPushButton;
 class QMdiSubWindow;
+
+namespace lmms::gui
+{
 
 class EffectControlDialog;
 class Knob;
@@ -46,7 +50,7 @@ class EffectView : public PluginView
 	Q_OBJECT
 public:
 	EffectView( Effect * _model, QWidget * _parent );
-	virtual ~EffectView();
+	~EffectView() override;
 
 	inline Effect * effect()
 	{
@@ -58,6 +62,11 @@ public:
 	}
 
 	static constexpr int DEFAULT_WIDTH = 215;
+	static constexpr int DEFAULT_HEIGHT = 60;
+	
+	void mouseMoveEvent(QMouseEvent* event) override;
+	void mousePressEvent(QMouseEvent* event) override;
+	void mouseReleaseEvent(QMouseEvent* event) override;
 
 public slots:
 	void editControls();
@@ -68,10 +77,9 @@ public slots:
 
 
 signals:
-	void moveUp( EffectView * _plugin );
-	void moveDown( EffectView * _plugin );
-	void deletePlugin( EffectView * _plugin );
-
+	void movedUp(EffectView* view);
+	void movedDown(EffectView* view);
+	void deletedPlugin(EffectView* view);
 
 protected:
 	void contextMenuEvent( QContextMenuEvent * _me ) override;
@@ -84,10 +92,15 @@ private:
 	LedCheckBox * m_bypass;
 	Knob * m_wetDry;
 	TempoSyncKnob * m_autoQuit;
-	Knob * m_gate;
 	QMdiSubWindow * m_subWindow;
 	EffectControlDialog * m_controlView;
+	
+	bool m_dragging;
+	QGraphicsOpacityEffect* m_opacityEffect;
 
 } ;
 
-#endif
+
+} // namespace lmms::gui
+
+#endif // LMMS_GUI_EFFECT_VIEW_H

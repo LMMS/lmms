@@ -23,8 +23,12 @@
  *
  */
 
-#ifndef VST_SYNC_DATA_H
-#define VST_SYNC_DATA_H
+#ifndef LMMS_VST_SYNC_DATA_H
+#define LMMS_VST_SYNC_DATA_H
+
+namespace lmms
+{
+
 
 // VST sync frequency (in ms), how often will be VST plugin synced
 // keep it power of two if possible (not used by now)
@@ -32,10 +36,6 @@
 
 // When defined, latency should be subtracted from song PPQ position
 //#define VST_SNC_LATENCY
-
-// define file for ftok as shared memory shmget key
-constexpr const char* VST_SNC_SHM_KEY_FILE = "/dev/null";
-//constexpr int64_t VST_SNC_SHM_RND_KEY = 3561653564469;
 
 
 
@@ -46,17 +46,19 @@ struct VstSyncData
 	int timeSigDenom;
 	bool isPlaying;
 	bool isCycle;
-	bool hasSHM;
 	float cycleStart;
 	float cycleEnd;
-	bool m_playbackJumped;
-	int m_bufferSize;
-	int m_sampleRate;
-	int m_bpm;
+	bool playbackJumped;
+	int bufferSize;
+	int sampleRate;
+	int bpm;
 
 #ifdef VST_SNC_LATENCY
-	float m_latency;
+	float latency;
 #endif
 } ;
 
-#endif
+
+} // namespace lmms
+
+#endif // LMMS_VST_SYNC_DATA_H

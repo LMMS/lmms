@@ -1,16 +1,16 @@
 set(LMMS_SRCS
 	${LMMS_SRCS}
 
+	core/AudioBusHandle.cpp
 	core/AudioEngine.cpp
 	core/AudioEngineProfiler.cpp
 	core/AudioEngineWorkerThread.cpp
+	core/AudioResampler.cpp
 	core/AutomatableModel.cpp
 	core/AutomationClip.cpp
 	core/AutomationNode.cpp
 	core/BandLimitedWave.cpp
 	core/base64.cpp
-	core/BBClip.cpp
-	core/BBTrackContainer.cpp
 	core/BufferManager.cpp
 	core/Clipboard.cpp
 	core/ComboBoxModel.cpp
@@ -39,9 +39,8 @@ set(LMMS_SRCS
 	core/LfoController.cpp
 	core/LinkedModelGroups.cpp
 	core/LocklessAllocator.cpp
-	core/MemoryHelper.cpp
-	core/MemoryManager.cpp
 	core/MeterModel.cpp
+	core/Metronome.cpp
 	core/MicroTimer.cpp
 	core/Microtuner.cpp
 	core/MixHelpers.cpp
@@ -51,6 +50,8 @@ set(LMMS_SRCS
 	core/NotePlayHandle.cpp
 	core/Oscillator.cpp
 	core/PathUtil.cpp
+	core/PatternClip.cpp
+	core/PatternStore.cpp
 	core/PeakController.cpp
 	core/PerfLog.cpp
 	core/Piano.cpp
@@ -65,18 +66,25 @@ set(LMMS_SRCS
 	core/RemotePlugin.cpp
 	core/RenderManager.cpp
 	core/RingBuffer.cpp
+	core/Sample.cpp
 	core/SampleBuffer.cpp
 	core/SampleClip.cpp
+	core/SampleDecoder.cpp
 	core/SamplePlayHandle.cpp
 	core/SampleRecordHandle.cpp
 	core/Scale.cpp
+	core/LmmsSemaphore.cpp
 	core/SerializingObject.cpp
 	core/Song.cpp
 	core/TempoSyncKnobModel.cpp
+	core/ThreadPool.cpp
+	core/Timeline.cpp
 	core/TimePos.cpp
 	core/ToolPlugin.cpp
 	core/Track.cpp
 	core/TrackContainer.cpp
+	core/UpgradeExtendedNoteRange.h
+	core/UpgradeExtendedNoteRange.cpp
 	core/Clip.cpp
 	core/ValueBuffer.cpp
 	core/VstSyncController.cpp
@@ -92,7 +100,6 @@ set(LMMS_SRCS
 	core/audio/AudioJack.cpp
 	core/audio/AudioOss.cpp
 	core/audio/AudioSndio.cpp
-	core/audio/AudioPort.cpp
 	core/audio/AudioPortAudio.cpp
 	core/audio/AudioSoundIo.cpp
 	core/audio/AudioPulseAudio.cpp
@@ -110,6 +117,7 @@ set(LMMS_SRCS
 	core/lv2/Lv2SubPluginFeatures.cpp
 	core/lv2/Lv2UridCache.cpp
 	core/lv2/Lv2UridMap.cpp
+	core/lv2/Lv2Worker.cpp
 
 	core/midi/MidiAlsaRaw.cpp
 	core/midi/MidiAlsaSeq.cpp

@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef AUDIO_FILE_MP3_H
-#define AUDIO_FILE_MP3_H
+#ifndef LMMS_AUDIO_FILE_MP3_H
+#define LMMS_AUDIO_FILE_MP3_H
 
 #include "lmmsconfig.h"
 
@@ -34,6 +34,8 @@
 
 #include "lame/lame.h"
 
+namespace lmms
+{
 
 class AudioFileMP3 : public AudioFileDevice
 {
@@ -43,7 +45,7 @@ public:
 			bool & successful,
 			const QString & _file,
 			AudioEngine* audioEngine );
-	virtual ~AudioFileMP3();
+	~AudioFileMP3() override;
 
 	static AudioFileDevice * getInst( const QString & outputFilename,
 					  OutputSettings const & outputSettings,
@@ -56,9 +58,7 @@ public:
 	}
 
 protected:
-	virtual void writeBuffer( const surroundSampleFrame * /* _buf*/,
-				  const fpp_t /*_frames*/,
-				  const float /*_master_gain*/ ) override;
+	void writeBuffer(const SampleFrame* /* _buf*/, const fpp_t /*_frames*/) override;
 
 private:
 	void flushRemainingBuffers();
@@ -69,6 +69,8 @@ private:
 	lame_t m_lame;
 };
 
-#endif
+} // namespace lmms
 
-#endif
+#endif // LMMS_HAVE_MP3LAME
+
+#endif // LMMS_AUDIO_FILE_MP3_H

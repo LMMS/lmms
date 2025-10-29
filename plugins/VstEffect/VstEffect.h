@@ -25,38 +25,37 @@
 #ifndef _VST_EFFECT_H
 #define _VST_EFFECT_H
 
-#include <QtCore/QMutex>
-#include <QtCore/QSharedPointer>
+#include <QMutex>
+#include <QSharedPointer>
 
 #include "Effect.h"
-#include "VstEffectControlDialog.h"
 #include "VstEffectControls.h"
 
+namespace lmms
+{
+
+
 class VstPlugin;
+
 
 class VstEffect : public Effect
 {
 public:
 	VstEffect( Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key );
-	virtual ~VstEffect();
+	~VstEffect() override = default;
 
-	virtual bool processAudioBuffer( sampleFrame * _buf,
-							const fpp_t _frames );
+	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
 
-	virtual EffectControls * controls()
+	EffectControls * controls() override
 	{
 		return &m_vstControls;
 	}
 
-	virtual inline QString publicName() const
-	{
-		return m_plugin->name();
-	}
-
 
 private:
-	void openPlugin( const QString & _plugin );
+	//! Returns true if plugin was loaded (m_plugin != nullptr)
+	bool openPlugin(const QString& plugin);
 	void closePlugin();
 
 	QSharedPointer<VstPlugin> m_plugin;
@@ -67,11 +66,12 @@ private:
 
 
 	friend class VstEffectControls;
-	friend class VstEffectControlDialog;
-	friend class manageVSTEffectView;
+	friend class gui::VstEffectControlDialog;
+	friend class gui::ManageVSTEffectView;
 
 } ;
 
 
+} // namespace lmms
 
 #endif

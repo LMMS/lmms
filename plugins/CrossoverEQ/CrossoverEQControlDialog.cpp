@@ -24,92 +24,90 @@
  *
  */
  
-#include <QLayout>
-#include <QLabel>
 
+#include "AutomatableButton.h"
 #include "CrossoverEQControlDialog.h"
 #include "CrossoverEQControls.h"
 #include "embed.h"
-#include "ToolTip.h"
-#include "LedCheckbox.h"
+#include "FontHelper.h"
 #include "Knob.h"
 #include "Fader.h"
 
-CrossoverEQControlDialog::CrossoverEQControlDialog( CrossoverEQControls * controls ) :
-	EffectControlDialog( controls )
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+
+
+namespace lmms::gui
 {
-	setAutoFillBackground( true );
+
+
+CrossoverEQControlDialog::CrossoverEQControlDialog(CrossoverEQControls *controls) :
+	EffectControlDialog(controls)
+{
+	setAutoFillBackground(true);
 	QPalette pal;
-	pal.setBrush( backgroundRole(),	PLUGIN_NAME::getIconPixmap( "artwork" ) );
-	setPalette( pal );
-	setFixedSize( 167, 178 );
+	pal.setBrush(backgroundRole(), PLUGIN_NAME::getIconPixmap("artwork"));
+	setPalette(pal);
+	setFixedSize(167, 218);
+	auto layout = new QVBoxLayout(this);
+
+	auto knobsLayout = new QHBoxLayout();
+	layout->addLayout(knobsLayout);
+
+	const auto makeKnob = [this, knobsLayout](
+		FloatModel* model,
+		const QString& label,
+		const QString& txt_before
+	) {
+		auto k = new Knob(KnobType::Bright26, label, SMALL_FONT_SIZE, this);
+		k->setModel(model);
+		k->setHintText(txt_before, "Hz");
+		knobsLayout->addWidget(k, 0, Qt::AlignHCenter);
+	};
+
+	makeKnob(&controls->m_xover12, "1/2", tr("Band 1/2 crossover"));
+	makeKnob(&controls->m_xover23, "2/3", tr("Band 2/3 crossover"));
+	makeKnob(&controls->m_xover34, "3/4", tr("Band 3/4 crossover"));
 	
-	// knobs
-	Knob * xover12 = new Knob( knobBright_26, this );
-	xover12->move( 29, 11 );
-	xover12->setModel( & controls->m_xover12 );
-	xover12->setLabel( "1/2" );
-	xover12->setHintText( tr( "Band 1/2 crossover:" ), " Hz" );
-	
-	Knob * xover23 = new Knob( knobBright_26, this );
-	xover23->move( 69, 11 );
-	xover23->setModel( & controls->m_xover23 );
-	xover23->setLabel( "2/3" );
-	xover23->setHintText( tr( "Band 2/3 crossover:" ), " Hz" );
-	
-	Knob * xover34 = new Knob( knobBright_26, this );
-	xover34->move( 109, 11 );
-	xover34->setModel( & controls->m_xover34 );
-	xover34->setLabel( "3/4" );
-	xover34->setHintText( tr( "Band 3/4 crossover:" ), " Hz" );
-	
-	m_fader_bg = QPixmap( PLUGIN_NAME::getIconPixmap( "fader_bg" ) );
-	m_fader_empty = QPixmap( PLUGIN_NAME::getIconPixmap( "fader_empty" ) );
-	m_fader_knob = QPixmap( PLUGIN_NAME::getIconPixmap( "fader_knob2" ) );
-	
-	// faders
-	Fader * gain1 = new Fader( &controls->m_gain1, tr( "Band 1 gain" ), this,
-		&m_fader_bg, &m_fader_empty, &m_fader_knob );
-	gain1->move( 7, 56 );
-	gain1->setDisplayConversion( false );
-	gain1->setHintText( tr( "Band 1 gain:" ), " dBFS" );
-	
-	Fader * gain2 = new Fader( &controls->m_gain2, tr( "Band 2 gain" ), this,
-		&m_fader_bg, &m_fader_empty, &m_fader_knob );
-	gain2->move( 47, 56 );
-	gain2->setDisplayConversion( false );
-	gain2->setHintText( tr( "Band 2 gain:" ), " dBFS" );
-	
-	Fader * gain3 = new Fader( &controls->m_gain3, tr( "Band 3 gain" ), this,
-		&m_fader_bg, &m_fader_empty, &m_fader_knob );
-	gain3->move( 87, 56 );
-	gain3->setDisplayConversion( false );
-	gain3->setHintText( tr( "Band 3 gain:" ), " dBFS" );
-	
-	Fader * gain4 = new Fader( &controls->m_gain4, tr( "Band 4 gain" ), this,
-		&m_fader_bg, &m_fader_empty, &m_fader_knob );
-	gain4->move( 127, 56 );
-	gain4->setDisplayConversion( false );
-	gain4->setHintText( tr( "Band 4 gain:" ), " dBFS" );
-	
-	// leds
-	LedCheckBox * mute1 = new LedCheckBox( "", this, tr( "Band 1 mute" ), LedCheckBox::Green );
-	mute1->move( 15, 154 );
-	mute1->setModel( & controls->m_mute1 );
-	ToolTip::add( mute1, tr( "Mute band 1" ) );
-	
-	LedCheckBox * mute2 = new LedCheckBox( "", this, tr( "Band 2 mute" ), LedCheckBox::Green );
-	mute2->move( 55, 154 );
-	mute2->setModel( & controls->m_mute2 );
-	ToolTip::add( mute2, tr( "Mute band 2" ) );
-	
-	LedCheckBox * mute3 = new LedCheckBox( "", this, tr( "Band 3 mute" ), LedCheckBox::Green );
-	mute3->move( 95, 154 );
-	mute3->setModel( & controls->m_mute3 );
-	ToolTip::add( mute3, tr( "Mute band 3" ) );
-	
-	LedCheckBox * mute4 = new LedCheckBox( "", this, tr( "Band 4 mute" ), LedCheckBox::Green );
-	mute4->move( 135, 154 );
-	mute4->setModel( & controls->m_mute4 );
-	ToolTip::add( mute4, tr( "Mute band 4" ) );
+	auto bandsLayout = new QGridLayout();
+	bandsLayout->setContentsMargins(4, 10, 4, 5);
+	layout->addLayout(bandsLayout);
+
+	const auto makeFader = [this, bandsLayout](
+		FloatModel* model,
+		const QString& label,
+		int column
+	) {
+		auto f = new Fader(model, label, this, false);
+		f->setHintText(label, "dBFS");
+		f->setDisplayConversion(false);
+		f->setRenderUnityLine(false);
+		bandsLayout->addWidget(f, 0, column, Qt::AlignHCenter);
+	};
+
+	makeFader(&controls->m_gain1, tr("Band 1 gain"), 0);
+	makeFader(&controls->m_gain2, tr("Band 2 gain"), 1);
+	makeFader(&controls->m_gain3, tr("Band 3 gain"), 2);
+	makeFader(&controls->m_gain4, tr("Band 4 gain"), 3);
+
+	const auto makeMuteBtn = [this, bandsLayout](
+		BoolModel* model,
+		const QString& label,
+		int column
+	) {
+		auto b = new AutomatableButton(this, label);
+		b->setCheckable(true);
+		b->setModel(model);
+		b->setToolTip(label);
+		b->setObjectName("btn-mute-inv");
+		bandsLayout->addWidget(b, 1, column, Qt::AlignCenter);
+	};
+
+	makeMuteBtn(&controls->m_mute1, tr("Mute band 1"), 0);
+	makeMuteBtn(&controls->m_mute2, tr("Mute band 2"), 1);
+	makeMuteBtn(&controls->m_mute3, tr("Mute band 3"), 2);
+	makeMuteBtn(&controls->m_mute4, tr("Mute band 4"), 3);
 }
+
+
+} // namespace lmms::gui

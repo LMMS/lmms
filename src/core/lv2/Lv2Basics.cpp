@@ -26,6 +26,9 @@
 
 #ifdef LMMS_HAVE_LV2
 
+namespace lmms
+{
+
 QString qStringFromPluginNode(const LilvPlugin* plug,
 	LilvNode* (*getFunc)(const LilvPlugin*))
 {
@@ -44,6 +47,8 @@ std::string stdStringFromPortName(const LilvPlugin* plug, const LilvPort* port)
 	return std::string(
 			lilv_node_as_string(AutoLilvNode(lilv_port_get_name(plug, port)).get()));
 }
+
+} // namespace lmms
 
 #endif // LMMS_HAVE_LV2
 

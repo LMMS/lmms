@@ -28,9 +28,10 @@
 #include <QPainter>
 
 #include "PixmapButton.h"
-#include "MainWindow.h"
 #include "embed.h"
 
+namespace lmms::gui
+{
 
 
 PixmapButton::PixmapButton( QWidget * _parent, const QString & _name ) :
@@ -46,27 +47,18 @@ PixmapButton::PixmapButton( QWidget * _parent, const QString & _name ) :
 
 
 
-PixmapButton::~PixmapButton()
+
+
+
+void PixmapButton::paintEvent(QPaintEvent*)
 {
-}
+	QPainter p(this);
 
+	QPixmap* pixmapToDraw = isActive() ? &m_activePixmap : &m_inactivePixmap;
 
-
-
-void PixmapButton::paintEvent( QPaintEvent * )
-{
-	QPainter p( this );
-
-	if( ( model() != nullptr && model()->value() ) || m_pressed )
+	if (!pixmapToDraw->isNull())
 	{
-		if( !m_activePixmap.isNull() )
-		{
-			p.drawPixmap( 0, 0, m_activePixmap );
-		}
-	}
-	else if( !m_inactivePixmap.isNull() )
-	{
-		p.drawPixmap( 0, 0, m_inactivePixmap );
+		p.drawPixmap(0, 0, *pixmapToDraw);
 	}
 }
 
@@ -110,15 +102,11 @@ void PixmapButton::mouseDoubleClickEvent( QMouseEvent * _me )
 }
 
 
-
-
-void PixmapButton::setActiveGraphic( const QPixmap & _pm )
+void PixmapButton::setActiveGraphic(const QPixmap &pm)
 {
-	m_activePixmap = _pm;
-	resize( m_activePixmap.width(), m_activePixmap.height() );
+	m_activePixmap = pm;
+	resize(embed::logicalSize(m_activePixmap));
 }
-
-
 
 
 void PixmapButton::setInactiveGraphic( const QPixmap & _pm, bool _update )
@@ -132,17 +120,18 @@ void PixmapButton::setInactiveGraphic( const QPixmap & _pm, bool _update )
 
 QSize PixmapButton::sizeHint() const
 {
-	if( ( model() != nullptr && model()->value() ) || m_pressed )
-	{
-		return m_activePixmap.size() / devicePixelRatio();
-	}
-	else 
-	{
-		return m_inactivePixmap.size() / devicePixelRatio();
-	}
+	return minimumSizeHint();
 }
 
+QSize PixmapButton::minimumSizeHint() const
+{
+	return embed::logicalSize(m_activePixmap)
+		.expandedTo(embed::logicalSize(m_inactivePixmap));
+}
 
+bool PixmapButton::isActive() const
+{
+	return (model() != nullptr && model()->value()) || m_pressed;
+}
 
-
-
+} // namespace lmms::gui

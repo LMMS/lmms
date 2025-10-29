@@ -24,10 +24,8 @@
 
 #include "Plugin.h"
 
-#include <QtGlobal>
-#include <QtCore/QDebug>
-#include <QtCore/QDir>
-#include <QtCore/QLibrary>
+#include <QDomElement>
+#include <QLibrary>
 #include <QMessageBox>
 
 #include "embed.h"
@@ -36,6 +34,10 @@
 #include "DummyPlugin.h"
 #include "AutomatableModel.h"
 #include "Song.h"
+#include "PluginFactory.h"
+
+namespace lmms
+{
 
 
 static PixmapLoader dummyLoader;
@@ -47,7 +49,7 @@ static Plugin::Descriptor dummyPluginDescriptor =
 	QT_TRANSLATE_NOOP( "PluginBrowser", "no description" ),
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0100,
-	Plugin::Undefined,
+	Plugin::Type::Undefined,
 	&dummyLoader,
 	nullptr
 } ;
@@ -66,13 +68,6 @@ Plugin::Plugin(const Descriptor * descriptor, Model * parent, const
 	{
 		m_descriptor = &dummyPluginDescriptor;
 	}
-}
-
-
-
-
-Plugin::~Plugin()
-{
 }
 
 
@@ -184,7 +179,6 @@ AutomatableModel * Plugin::childModel( const QString & )
 
 
 
-#include "PluginFactory.h"
 Plugin * Plugin::instantiateWithKey(const QString& pluginName, Model * parent,
 				const Descriptor::SubPluginFeatures::Key *key,
 				bool keyFromDnd)
@@ -219,7 +213,7 @@ Plugin * Plugin::instantiate(const QString& pluginName, Model * parent,
 	Plugin* inst;
 	if( pi.isNull() )
 	{
-		if( getGUI() != nullptr )
+		if (gui::getGUI() != nullptr)
 		{
 			QMessageBox::information( nullptr,
 				tr( "Plugin not found" ),
@@ -231,8 +225,8 @@ Plugin * Plugin::instantiate(const QString& pluginName, Model * parent,
 	}
 	else
 	{
-		InstantiationHook instantiationHook;
-		if ((instantiationHook = ( InstantiationHook ) pi.library->resolve( "lmms_plugin_main" )))
+		auto instantiationHook = reinterpret_cast<InstantiationHook>(pi.library->resolve("lmms_plugin_main"));
+		if (instantiationHook)
 		{
 			inst = instantiationHook(parent, data);
 			if(!inst) {
@@ -241,7 +235,7 @@ Plugin * Plugin::instantiate(const QString& pluginName, Model * parent,
 		}
 		else
 		{
-			if( getGUI() != nullptr )
+			if (gui::getGUI() != nullptr)
 			{
 				QMessageBox::information( nullptr,
 					tr( "Error while loading plugin" ),
@@ -266,9 +260,9 @@ void Plugin::collectErrorForUI( QString errMsg )
 
 
 
-PluginView * Plugin::createView( QWidget * parent )
+gui::PluginView * Plugin::createView( QWidget * parent )
 {
-	PluginView * pv = instantiateView( parent );
+	gui::PluginView * pv = instantiateView( parent );
 	if( pv != nullptr )
 	{
 		pv->setModel( this );
@@ -313,3 +307,4 @@ QDomElement Plugin::Descriptor::SubPluginFeatures::Key::saveXML(
 
 
 
+} // namespace lmms

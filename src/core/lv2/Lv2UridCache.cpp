@@ -26,10 +26,10 @@
 
 #ifdef LMMS_HAVE_LV2
 
-#include <lv2/lv2plug.in/ns/ext/atom/atom.h>
-#include <lv2/lv2plug.in/ns/ext/buf-size/buf-size.h>
-#include <lv2/lv2plug.in/ns/ext/midi/midi.h>
-#include <lv2/lv2plug.in/ns/ext/parameters/parameters.h>
+#include <lv2/atom/atom.h>
+#include <lv2/buf-size/buf-size.h>
+#include <lv2/midi/midi.h>
+#include <lv2/parameters/parameters.h>
 #include <QtGlobal>
 
 #include "Lv2UridMap.h"
@@ -38,6 +38,10 @@
 #ifndef LV2_BUF_SIZE__nominalBlockLength
 #define LV2_BUF_SIZE__nominalBlockLength LV2_BUF_SIZE_PREFIX "nominalBlockLength"
 #endif
+
+namespace lmms
+{
+
 
 uint32_t Lv2UridCache::operator[](Lv2UridCache::Id id) const
 {
@@ -66,6 +70,9 @@ Lv2UridCache::Lv2UridCache(UridMap &mapper)
 
 	for(uint32_t urid : m_cache) { Q_ASSERT(urid != noIdYet); }
 }
+
+
+} // namespace lmms
 
 #endif // LMMS_HAVE_LV2
 

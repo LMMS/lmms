@@ -31,7 +31,12 @@
 #include "Engine.h"
 #include "GuiApplication.h"
 #include "Song.h"
+#include "Track.h"
+#include "TrackContainer.h"
 
+
+namespace lmms
+{
 
 /*! \brief Create a new Clip
  *
@@ -45,9 +50,7 @@ Clip::Clip( Track * track ) :
 	m_startPosition(),
 	m_length(),
 	m_mutedModel( false, this, tr( "Mute" ) ),
-	m_selectViewOnCreate( false ),
-	m_color( 128, 128, 128 ),
-	m_useCustomClipColor( false )
+	m_selectViewOnCreate{false}
 {
 	if( getTrack() )
 	{
@@ -60,7 +63,29 @@ Clip::Clip( Track * track ) :
 }
 
 
-
+/*! \brief Copy a Clip
+ *
+ *  Creates a duplicate clip of the one provided.
+ *
+ * \param other The clip object which will be copied.
+ */
+Clip::Clip(const Clip& other):
+	Model(other.m_track),
+	m_track(other.m_track),
+	m_name(other.m_name),
+	m_startPosition(other.m_startPosition),
+	m_length(other.m_length),
+	m_startTimeOffset(other.m_startTimeOffset),
+	m_mutedModel(other.m_mutedModel.value(), this, tr( "Mute" )),
+	m_autoResize(other.m_autoResize),
+	m_selectViewOnCreate{other.m_selectViewOnCreate},
+	m_color(other.m_color)
+{
+	if (getTrack())
+	{
+		getTrack()->addClip(this);
+	}
+}
 
 /*! \brief Destroy a Clip
  *
@@ -89,7 +114,7 @@ Clip::~Clip()
  */
 void Clip::movePosition( const TimePos & pos )
 {
-	TimePos newPos = qMax(0, pos.getTicks());
+	TimePos newPos = std::max(0, pos.getTicks());
 	if (m_startPosition != newPos)
 	{
 		Engine::audioEngine()->requestChangeInModel();
@@ -145,10 +170,25 @@ void Clip::copyStateTo( Clip *src, Clip *dst )
 		dst->movePosition( pos );
 
 		AutomationClip::resolveAllIDs();
-		GuiApplication::instance()->automationEditor()->m_editor->updateAfterClipChange();
+		gui::getGUI()->automationEditor()->m_editor->updateAfterClipChange();
 	}
 }
 
+bool Clip::hasTrackContainer() const
+{
+	return getTrack() != nullptr && getTrack()->trackContainer() != nullptr;
+}
+
+bool Clip::isInPattern() const
+{
+	return hasTrackContainer()
+		&& getTrack()->trackContainer()->type() == TrackContainer::Type::Pattern;
+}
+
+bool Clip::manuallyResizable() const
+{
+	return !isInPattern();
+}
 
 
 
@@ -182,18 +222,10 @@ void Clip::setStartTimeOffset( const TimePos &startTimeOffset )
 	m_startTimeOffset = startTimeOffset;
 }
 
-
-
-void Clip::useCustomClipColor( bool b )
+void Clip::setColor(const std::optional<QColor>& color)
 {
-	if (b == m_useCustomClipColor) { return; }
-	m_useCustomClipColor = b;
+	m_color = color;
 	emit colorChanged();
 }
 
-
-bool Clip::hasColor()
-{
-	return usesCustomClipColor() || getTrack()->useColor();
-}
-
+} // namespace lmms

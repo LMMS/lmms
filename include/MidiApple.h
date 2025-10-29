@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef MIDI_APPLE_H
-#define MIDI_APPLE_H
+#ifndef LMMS_MIDI_APPLE_H
+#define LMMS_MIDI_APPLE_H
 
 #include "lmmsconfig.h"
 
@@ -36,6 +36,10 @@
 
 
 class QLineEdit;
+
+
+namespace lmms
+{
 
 
 class MidiApple : public QObject, public MidiClient
@@ -136,7 +140,7 @@ private:
 	QMap<MIDIEndpointRef, MIDIPortRef> m_sourcePortRef;
 
 	// subscriptions
-	typedef QMap<QString, MidiPortList> SubMap;
+	using SubMap = QMap<QString, MidiPortList>;
 	SubMap m_inputSubs;
 	SubMap m_outputSubs;
 
@@ -146,7 +150,9 @@ signals:
 
 } ;
 
-#endif
 
+} // namespace lmms
 
-#endif
+#endif // LMMS_BUILD_APPLE
+
+#endif // LMMS_MIDI_APPLE_H

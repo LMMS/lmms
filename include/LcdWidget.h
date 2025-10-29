@@ -22,14 +22,16 @@
  *
  */
 
+#ifndef LMMS_GUI_LCD_WIDGET_H
+#define LMMS_GUI_LCD_WIDGET_H
 
-#ifndef LCD_WIDGET_H
-#define LCD_WIDGET_H
-
-#include <QtCore/QMap>
+#include <QMap>
 #include <QWidget>
 
 #include "lmms_export.h"
+
+namespace lmms::gui
+{
 
 class LMMS_EXPORT LcdWidget : public QWidget
 {
@@ -45,10 +47,9 @@ public:
 	LcdWidget(int numDigits, const QString& style, QWidget* parent, const QString& name = QString(),
 		bool leadingZero = false);
 
-	virtual ~LcdWidget();
-
-	void setValue( int value );
-	void setLabel( const QString& label );
+	void setValue(int value);
+	void setValue(float value);
+	void setLabel(const QString& label);
 
 	void addTextForValue( int value, const QString& text )
 	{
@@ -95,7 +96,7 @@ private:
 	QString m_display;
 
 	QString m_label;
-	QPixmap* m_lcdPixmap;
+	QPixmap m_lcdPixmap;
 
 	QColor m_textColor;
 	QColor m_textShadowColor;
@@ -112,4 +113,6 @@ private:
 
 };
 
-#endif
+} // namespace lmms::gui
+
+#endif // LMMS_GUI_LCD_WIDGET_H

@@ -24,27 +24,54 @@
 
 #include "Model.h"
 
+namespace lmms
+{
+
+Model::Model(Model* parent, QString displayName, bool defaultConstructed) :
+	QObject(parent),
+	m_displayName(displayName),
+	m_defaultConstructed(defaultConstructed)
+{
+}
+
+bool Model::isDefaultConstructed() const
+{
+	return m_defaultConstructed;
+}
+
+Model* Model::parentModel() const
+{
+	return dynamic_cast<Model*>(parent());
+}
+
+QString Model::displayName() const
+{
+	return m_displayName;
+}
+
+void Model::setDisplayName(const QString& displayName)
+{
+	m_displayName = displayName;
+}
 
 QString Model::fullDisplayName() const
 {
-	const QString & n = displayName();
-	if( parentModel() ) 
+	const QString n = displayName();
+
+	if (parentModel())
 	{
 		const QString p = parentModel()->fullDisplayName();
-		if( n.isEmpty() && p.isEmpty() )
+
+		if (!p.isEmpty())
 		{
-			return QString();
+			return p + ">" + n;
 		}
-		else if( p.isEmpty() )
-		{
-			return n;
-		}
-		return p + ">" + n;
 	}
+
 	return n;
 }
 
 
 
-
+} // namespace lmms
 

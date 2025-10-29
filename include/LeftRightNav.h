@@ -22,12 +22,14 @@
  *
  */
 
-#ifndef LEFT_RIGHT_NAV_H
-#define LEFT_RIGHT_NAV_H
+#ifndef LMMS_GUI_LEFT_RIGHT_NAV_H
+#define LMMS_GUI_LEFT_RIGHT_NAV_H
 
 #include "PixmapButton.h"
 
-#include <QLayout>
+
+namespace lmms::gui
+{
 
 class LeftRightNav : public QWidget
 {
@@ -46,4 +48,7 @@ private:
 	PixmapButton m_rightBtn;
 };
 
-#endif
+
+} // namespace lmms::gui
+
+#endif // LMMS_GUI_LEFT_RIGHT_NAV_H

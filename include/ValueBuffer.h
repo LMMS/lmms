@@ -23,19 +23,21 @@
  *
  */
 
-#ifndef VALUE_BUFFER_H
-#define VALUE_BUFFER_H
+#ifndef LMMS_VALUE_BUFFER_H
+#define LMMS_VALUE_BUFFER_H
 
 #include <vector>
 
-#include "MemoryManager.h"
 #include "lmms_export.h"
+
+namespace lmms
+{
+
 
 class LMMS_EXPORT ValueBuffer : public std::vector<float>
 {
-	MM_OPERATORS
 public:
-	ValueBuffer();
+	ValueBuffer() = default;
 	ValueBuffer(int length);
 
 	void fill(float value);
@@ -50,4 +52,7 @@ public:
 	void interpolate(float start, float end);
 };
 
-#endif
+
+} // namespace lmms
+
+#endif // LMMS_VALUE_BUFFER_H

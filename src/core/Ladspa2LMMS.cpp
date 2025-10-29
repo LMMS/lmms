@@ -27,22 +27,25 @@
 #include "Ladspa2LMMS.h"
 
 
+namespace lmms
+{
+
+
 Ladspa2LMMS::Ladspa2LMMS()
 {
 	l_sortable_plugin_t plugins = getSortedPlugins();
 	
-	for( l_sortable_plugin_t::iterator it = plugins.begin();
-			it != plugins.end(); ++it )
+	for (const auto& plugin : plugins)
 	{
-		ladspa_key_t key = (*it).second;
-		ladspaManagerDescription * desc = getDescription( key );
+		ladspa_key_t key = plugin.second;
+		LadspaManagerDescription * desc = getDescription( key );
 		
-		if( desc->type == SOURCE )
+		if( desc->type == LadspaPluginType::Source )
 		{
 			m_instruments.append( qMakePair( getName( key ), 
 								key ) );
 		}
-		else if( desc->type == TRANSFER &&
+		else if( desc->type == LadspaPluginType::Transfer &&
 			( desc->inputChannels == desc->outputChannels &&
 			( desc->inputChannels == 1 ||
 			desc->inputChannels == 2 ||
@@ -52,7 +55,7 @@ Ladspa2LMMS::Ladspa2LMMS()
 			m_validEffects.append( qMakePair( getName( key ),
 								key ) );
 		}
-		else if( desc->type == TRANSFER &&
+		else if( desc->type == LadspaPluginType::Transfer &&
 			( desc->inputChannels != desc->outputChannels ||
 			( desc->inputChannels != 1 &&
 			desc->inputChannels != 2 &&
@@ -62,12 +65,12 @@ Ladspa2LMMS::Ladspa2LMMS()
 			m_invalidEffects.append( qMakePair( getName( key ), 
 								key ) );
 		}
-		else if( desc->type == SINK )
+		else if( desc->type == LadspaPluginType::Sink )
 		{
 			m_analysisTools.append( qMakePair( getName( key ),
 								key ) );
 		}
-		else if( desc->type == OTHER )
+		else if( desc->type == LadspaPluginType::Other )
 		{
 			m_otherPlugins.append( qMakePair( getName( key ), 
 								key ) );
@@ -78,12 +81,6 @@ Ladspa2LMMS::Ladspa2LMMS()
  
  
  
-Ladspa2LMMS::~Ladspa2LMMS()
-{
-}
-
-
-
 QString Ladspa2LMMS::getShortName( const ladspa_key_t & _key )
 {
 	QString name = getName( _key );
@@ -126,3 +123,6 @@ QString Ladspa2LMMS::getShortName( const ladspa_key_t & _key )
 	return name;
 }
 
+
+
+} // namespace lmms

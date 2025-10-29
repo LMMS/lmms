@@ -35,6 +35,9 @@
 
 #include <atomic>
 
+namespace lmms
+{
+
 // invisible track-container which is needed as parent for preview-channels
 class PreviewTrackContainer : public TrackContainer
 {
@@ -45,14 +48,12 @@ public:
 		m_dataMutex()
 	{
 		setJournalling( false );
-		m_previewInstrumentTrack = dynamic_cast<InstrumentTrack *>( Track::create( Track::InstrumentTrack, this ) );
+		m_previewInstrumentTrack = dynamic_cast<InstrumentTrack *>( Track::create( Track::Type::Instrument, this ) );
 		m_previewInstrumentTrack->setJournalling( false );
 		m_previewInstrumentTrack->setPreviewMode( true );
 	}
 
-	virtual ~PreviewTrackContainer()
-	{
-	}
+	~PreviewTrackContainer() override = default;
 
 	QString nodeName() const override
 	{
@@ -115,7 +116,7 @@ PreviewTrackContainer * PresetPreviewPlayHandle::s_previewTC;
 
 
 PresetPreviewPlayHandle::PresetPreviewPlayHandle( const QString & _preset_file, bool _load_by_plugin, DataFile *dataFile ) :
-	PlayHandle( TypePresetPreviewHandle ),
+	PlayHandle( Type::PresetPreviewHandle ),
 	m_previewNote(nullptr)
 {
 	setUsesBuffer( false );
@@ -168,16 +169,16 @@ PresetPreviewPlayHandle::PresetPreviewPlayHandle( const QString & _preset_file, 
 	// make sure, our preset-preview-track does not appear in any MIDI-
 	// devices list, so just disable receiving/sending MIDI-events at all
 	s_previewTC->previewInstrumentTrack()->
-				midiPort()->setMode( MidiPort::Disabled );
+				midiPort()->setMode( MidiPort::Mode::Disabled );
 
 	Engine::audioEngine()->requestChangeInModel();
 	// create note-play-handle for it
 	m_previewNote = NotePlayHandleManager::acquire(
 			s_previewTC->previewInstrumentTrack(), 0,
-			typeInfo<f_cnt_t>::max() / 2,
+			std::numeric_limits<f_cnt_t>::max() / 2,
 				Note( 0, 0, DefaultKey, 100 ) );
 
-	setAudioPort( s_previewTC->previewInstrumentTrack()->audioPort() );
+	setAudioBusHandle(s_previewTC->previewInstrumentTrack()->audioBusHandle());
 
 	s_previewTC->setPreviewNote( m_previewNote );
 
@@ -205,7 +206,7 @@ PresetPreviewPlayHandle::~PresetPreviewPlayHandle()
 
 
 
-void PresetPreviewPlayHandle::play( sampleFrame * _working_buffer )
+void PresetPreviewPlayHandle::play( SampleFrame* _working_buffer )
 {
 	// Do nothing; the preview instrument is played by m_previewNote, which
 	// has been added to the audio engine
@@ -274,4 +275,4 @@ bool PresetPreviewPlayHandle::isPreviewing()
 }
 
 
-
+} // namespace lmms

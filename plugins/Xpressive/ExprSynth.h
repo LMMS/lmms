@@ -28,18 +28,22 @@
 #include <cmath>
 #include <cstddef>
 #include <limits>
-#include "AutomatableModel.h"
 #include "Graph.h"
-#include "Instrument.h"
-#include "MemoryManager.h"
+
+namespace lmms
+{
 
 
 class ExprFrontData;
+class FloatModel;
+class NotePlayHandle;
+class SampleFrame;
+
 
 class ExprFront
 {
 public:
-	typedef float (*ff1data_functor)(void*, float);
+	using ff1data_functor = float (*)(void*, float);
 	ExprFront(const char* expr, int last_func_samples);
 	~ExprFront();
 	bool compile();
@@ -90,13 +94,12 @@ public:
 
 class ExprSynth
 {
-	MM_OPERATORS
 public:
 	ExprSynth(const WaveSample* gW1, const WaveSample* gW2, const WaveSample* gW3, ExprFront* exprO1, ExprFront* exprO2, NotePlayHandle* nph,
 			const sample_rate_t sample_rate, const FloatModel* pan1, const FloatModel* pan2, float rel_trans);
 	virtual ~ExprSynth();
 
-	void renderOutput(fpp_t frames, sampleFrame* buf );
+	void renderOutput(fpp_t frames, SampleFrame* buf );
 
 
 private:
@@ -141,5 +144,6 @@ inline void clearArray(T* arr,unsigned int size)
 }
 
 
+} // namespace lmms
 
 #endif

@@ -22,12 +22,18 @@
  *
  */
 
-#include <QLayout>
+
+#include <QHBoxLayout>
+#include <QVBoxLayout>
 
 #include "BassBoosterControlDialog.h"
 #include "BassBoosterControls.h"
 #include "embed.h"
+#include "Knob.h"
 
+
+namespace lmms::gui
+{
 
 
 BassBoosterControlDialog::BassBoosterControlDialog( BassBoosterControls* controls ) :
@@ -37,26 +43,22 @@ BassBoosterControlDialog::BassBoosterControlDialog( BassBoosterControls* control
 	QPalette pal;
 	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap( "artwork" ) );
 	setPalette( pal );
-	setFixedSize( 120, 60 );
 
-	QVBoxLayout * tl = new QVBoxLayout( this );
+	auto tl = new QVBoxLayout(this);
 	tl->addSpacing( 4 );
 
-	QHBoxLayout * l = new QHBoxLayout;
+	auto l = new QHBoxLayout;
 
-	Knob * freqKnob = new Knob( knobBright_26, this);
+	auto freqKnob = new Knob(KnobType::Bright26, tr("FREQ"), this);
 	freqKnob->setModel( &controls->m_freqModel );
-	freqKnob->setLabel( tr( "FREQ" ) );
 	freqKnob->setHintText( tr( "Frequency:" ) , "Hz" );
 
-	Knob * gainKnob = new Knob( knobBright_26, this );
+	auto gainKnob = new Knob(KnobType::Bright26, tr("GAIN"), this);
 	gainKnob->setModel( &controls->m_gainModel );
-	gainKnob->setLabel( tr( "GAIN" ) );
 	gainKnob->setHintText( tr( "Gain:" ) , "" );
 
-	Knob * ratioKnob = new Knob( knobBright_26, this );
+	auto ratioKnob = new Knob(KnobType::Bright26, tr("RATIO"), this);
 	ratioKnob->setModel( &controls->m_ratioModel );
-	ratioKnob->setLabel( tr( "RATIO" ) );
 	ratioKnob->setHintText( tr( "Ratio:" ) , "" );
 
 	l->addWidget( freqKnob );
@@ -66,3 +68,6 @@ BassBoosterControlDialog::BassBoosterControlDialog( BassBoosterControls* control
 	tl->addLayout( l );
 	setLayout( tl );
 }
+
+
+} // namespace lmms::gui

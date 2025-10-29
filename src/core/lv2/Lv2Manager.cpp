@@ -1,7 +1,7 @@
 /*
  * Lv2Manager.cpp - Implementation of Lv2Manager class
  *
- * Copyright (c) 2018-2020 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
+ * Copyright (c) 2018-2024 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -28,28 +28,27 @@
 
 #include <algorithm>
 #include <cstdlib>
-#include <cstring>
 #include <lilv/lilv.h>
-#include <lv2.h>
-#include <lv2/lv2plug.in/ns/ext/buf-size/buf-size.h>
-#include <lv2/lv2plug.in/ns/ext/options/options.h>
+#include <lv2/buf-size/buf-size.h>
+#include <lv2/options/options.h>
+#include <lv2/worker/worker.h>
 #include <QDebug>
-#include <QDir>
-#include <QLibrary>
 #include <QElapsedTimer>
 
+#include "AudioEngine.h"
 #include "ConfigManager.h"
 #include "Engine.h"
 #include "Plugin.h"
-#include "PluginFactory.h"
 #include "Lv2ControlBase.h"
 #include "Lv2Options.h"
 #include "PluginIssue.h"
 
 
+namespace lmms
+{
 
 
-const std::set<const char*, Lv2Manager::CmpStr> Lv2Manager::pluginBlacklist =
+const std::set<std::string_view> Lv2Manager::unstablePlugins =
 {
 	// github.com/calf-studio-gear/calf, #278
 	"http://calf.sourceforge.net/plugins/Analyzer",
@@ -61,7 +60,106 @@ const std::set<const char*, Lv2Manager::CmpStr> Lv2Manager::pluginBlacklist =
 	"http://calf.sourceforge.net/plugins/StereoTools",
 	"http://calf.sourceforge.net/plugins/TapeSimulator",
 	"http://calf.sourceforge.net/plugins/TransientDesigner",
-	"http://calf.sourceforge.net/plugins/Vinyl"
+	"http://calf.sourceforge.net/plugins/Vinyl",
+
+	// https://gitlab.com/drobilla/blop-lv2/-/issues/3
+	"http://drobilla.net/plugins/blop/pulse",
+	"http://drobilla.net/plugins/blop/sawtooth",
+	"http://drobilla.net/plugins/blop/square",
+	"http://drobilla.net/plugins/blop/triangle",
+
+	// unstable
+	"urn:juced:DrumSynth"
+};
+
+const std::set<std::string_view> Lv2Manager::pluginsOnlyUsefulWithUi =
+{
+	// Visualization, meters, and scopes etc., won't work if UI is disabled
+	"http://distrho.sf.net/plugins/ProM",
+	"http://distrho.sf.net/plugins/glBars",
+	"http://gareus.org/oss/lv2/meters#spectr30mono",
+	"http://gareus.org/oss/lv2/meters#spectr30stereo",
+	"http://gareus.org/oss/lv2/meters#bitmeter",
+	"http://gareus.org/oss/lv2/meters#BBCM6",
+	"http://gareus.org/oss/lv2/meters#BBCmono",
+	"http://gareus.org/oss/lv2/meters#BBCstereo",
+	"http://gareus.org/oss/lv2/meters#DINmono",
+	"http://gareus.org/oss/lv2/meters#DINstereo",
+	"http://gareus.org/oss/lv2/meters#EBUmono",
+	"http://gareus.org/oss/lv2/meters#EBUstereo",
+	"http://gareus.org/oss/lv2/meters#EBUr128",
+	"http://gareus.org/oss/lv2/meters#BBCM6",
+	"http://gareus.org/oss/lv2/meters#dr14mono",
+	"http://gareus.org/oss/lv2/meters#dr14stereo",
+	"http://gareus.org/oss/lv2/meters#K12mono",
+	"http://gareus.org/oss/lv2/meters#K12stereo",
+	"http://gareus.org/oss/lv2/meters#K14mono",
+	"http://gareus.org/oss/lv2/meters#K14stereo",
+	"http://gareus.org/oss/lv2/meters#K20mono",
+	"http://gareus.org/oss/lv2/meters#K20stereo",
+	"http://gareus.org/oss/lv2/meters#NORmono",
+	"http://gareus.org/oss/lv2/meters#NORstereo",
+	"http://gareus.org/oss/lv2/meters#COR",
+	"http://gareus.org/oss/lv2/meters#dBTPmono",
+	"http://gareus.org/oss/lv2/meters#dBTPstereo",
+	"http://gareus.org/oss/lv2/meters#TPnRMSmono",
+	"http://gareus.org/oss/lv2/meters#TPnRMSstereo",
+	"http://gareus.org/oss/lv2/meters#VUmono",
+	"http://gareus.org/oss/lv2/meters#VUstereo",
+	"http://gareus.org/oss/lv2/meters#goniometer",
+	"http://gareus.org/oss/lv2/meters#stereoscope",
+	"http://gareus.org/oss/lv2/meters#SigDistHist",
+	"http://gareus.org/oss/lv2/tuna#one",
+	"http://gareus.org/oss/lv2/tuna#two",
+	"http://gareus.org/oss/lv2/sisco#Mono",
+	"http://gareus.org/oss/lv2/sisco#Stereo",
+	"http://gareus.org/oss/lv2/spectra#Mono",
+	"http://gareus.org/oss/lv2/convoLV2#Mono",
+	"http://gareus.org/oss/lv2/convoLV2#MonoToStereo",
+	"http://gareus.org/oss/lv2/convoLV2#Stereo",
+	"http://gareus.org/oss/lv2/zeroconvolv#CfgMono",
+	"http://gareus.org/oss/lv2/zeroconvolv#CfgMonoToStereo",
+	"http://gareus.org/oss/lv2/zeroconvolv#CfgStereo",
+	"http://gareus.org/oss/lv2/zeroconvolv#Mono",
+	"http://gareus.org/oss/lv2/zeroconvolv#MonoToStereo",
+	"http://gareus.org/oss/lv2/zeroconvolv#Stereo",
+	"http://lsp-plug.in/plugins/lv2/latency_meter",
+	"http://lsp-plug.in/plugins/lv2/spectrum_analyzer_x1",
+	"http://lsp-plug.in/plugins/lv2/spectrum_analyzer_x2",
+	"http://lsp-plug.in/plugins/lv2/phase_detector",
+	"http://lsp-plug.in/plugins/lv2/profiler_mono",
+	"http://lsp-plug.in/plugins/lv2/profiler_stereo",
+	"http://invadarecords.com/plugins/lv2/meter",
+	"http://guitarix.sourceforge.net/plugins/gxtuner#tuner",
+	"https://github.com/jpcima/ADLplug",
+	"https://github.com/HiFi-LoFi/KlangFalter",
+	"https://github.com/klangfreund/SpectrumAnalyser",
+	"https://github.com/klangfreund/lufsmeter",
+	"https://github.com/laixinyuan/StereoSourceSepartion",
+	"urn:juce:TalFilter2",
+	"urn:juce:Vex",
+	"http://zynaddsubfx.sourceforge.net",
+	"http://geontime.com/geonkick/single"
+};
+
+const std::set<std::string_view> Lv2Manager::unstablePluginsBuffersizeLessEqual32 =
+{
+	"http://moddevices.com/plugins/mod-devel/2Voices",
+	"http://moddevices.com/plugins/mod-devel/Capo",
+	"http://moddevices.com/plugins/mod-devel/Drop",
+	"http://moddevices.com/plugins/mod-devel/Harmonizer",
+	"http://moddevices.com/plugins/mod-devel/Harmonizer2",
+	"http://moddevices.com/plugins/mod-devel/HarmonizerCS",
+	"http://moddevices.com/plugins/mod-devel/SuperCapo",
+	"http://moddevices.com/plugins/mod-devel/SuperWhammy",
+	"http://moddevices.com/plugins/mod-devel/Gx2Voices",
+	"http://moddevices.com/plugins/mod-devel/GxCapo",
+	"http://moddevices.com/plugins/mod-devel/GxDrop",
+	"http://moddevices.com/plugins/mod-devel/GxHarmonizer",
+	"http://moddevices.com/plugins/mod-devel/GxHarmonizer2",
+	"http://moddevices.com/plugins/mod-devel/GxHarmonizerCS",
+	"http://moddevices.com/plugins/mod-devel/GxSuperCapo",
+	"http://moddevices.com/plugins/mod-devel/GxSuperWhammy"
 };
 
 
@@ -79,10 +177,15 @@ Lv2Manager::Lv2Manager() :
 	m_supportedFeatureURIs.insert(LV2_URID__map);
 	m_supportedFeatureURIs.insert(LV2_URID__unmap);
 	m_supportedFeatureURIs.insert(LV2_OPTIONS__options);
+	m_supportedFeatureURIs.insert(LV2_WORKER__schedule);
 	// min/max is always passed in the options
 	m_supportedFeatureURIs.insert(LV2_BUF_SIZE__boundedBlockLength);
 	// block length is only changed initially in AudioEngine CTOR
 	m_supportedFeatureURIs.insert(LV2_BUF_SIZE__fixedBlockLength);
+	if (const auto fpp = Engine::audioEngine()->framesPerPeriod(); (fpp & (fpp - 1)) == 0)  // <=> ffp is power of 2 (for ffp > 0)
+	{
+		m_supportedFeatureURIs.insert(LV2_BUF_SIZE__powerOf2BlockLength);
+	}
 
 	auto supportOpt = [this](Lv2UridCache::Id id)
 	{
@@ -138,13 +241,13 @@ void Lv2Manager::initPlugins()
 	QElapsedTimer timer;
 	timer.start();
 
-	unsigned blacklisted = 0;
+	unsigned blocked = 0;
 	LILV_FOREACH(plugins, itr, plugins)
 	{
 		const LilvPlugin* curPlug = lilv_plugins_get(plugins, itr);
 
 		std::vector<PluginIssue> issues;
-		Plugin::PluginTypes type = Lv2ControlBase::check(curPlug, issues);
+		Plugin::Type type = Lv2ControlBase::check(curPlug, issues);
 		std::sort(issues.begin(), issues.end());
 		auto last = std::unique(issues.begin(), issues.end());
 		issues.erase(last, issues.end());
@@ -167,9 +270,9 @@ void Lv2Manager::initPlugins()
 		{
 			if(std::any_of(issues.begin(), issues.end(),
 				[](const PluginIssue& iss) {
-				return iss.type() == PluginIssueType::blacklisted; }))
+				return iss.type() == PluginIssueType::Blocked; }))
 			{
-				++blacklisted;
+				++blocked;
 			}
 		}
 		++pluginCount;
@@ -196,28 +299,20 @@ void Lv2Manager::initPlugins()
 	}
 
 	// TODO: might be better in the LMMS core
-	if(Engine::ignorePluginBlacklist())
+	if(ConfigManager::enableBlockedPlugins())
 	{
 		qWarning() <<
-			"WARNING! Plugin blacklist disabled! If you want to use the blacklist,\n"
-			"  please set environment variable \"LMMS_IGNORE_BLACKLIST\" to empty or\n"
+			"WARNING! Blocked plugins enabled! If you want to disable them,\n"
+			"  please set environment variable \"LMMS_ENABLE_BLOCKED_PLUGINS\" to empty or\n"
 			"  do not set it.";
 	}
-	else if(blacklisted > 0)
+	else if(blocked > 0)
 	{
 		qDebug() <<
-			"Lv2 Plugins blacklisted:" << blacklisted << "of" << pluginCount << "\n"
-			"  If you want to ignore the blacklist (dangerous!), please set\n"
-			"  environment variable \"LMMS_IGNORE_BLACKLIST\" to nonempty.";
+			"Blocked Lv2 Plugins:" << blocked << "of" << pluginCount << "\n"
+			"  If you want to enable them (dangerous!), please set\n"
+			"  environment variable \"LMMS_ENABLE_BLOCKED_PLUGINS\" to nonempty.";
 	}
-}
-
-
-
-
-bool Lv2Manager::CmpStr::operator()(const char *a, const char *b) const
-{
-	return std::strcmp(a, b) < 0;
 }
 
 
@@ -235,6 +330,14 @@ AutoLilvNodes Lv2Manager::findNodes(const LilvNode *subject,
 	const LilvNode *predicate, const LilvNode *object)
 {
 	return AutoLilvNodes(lilv_world_find_nodes (m_world, subject, predicate, object));
+}
+
+
+
+
+bool Lv2Manager::wantUi()
+{
+	return false;
 }
 
 
@@ -265,6 +368,6 @@ bool Lv2Manager::isSubclassOf(const LilvPluginClass* clvss, const char* uriStr)
 }
 
 
-
+} // namespace lmms
 
 #endif // LMMS_HAVE_LV2

@@ -21,25 +21,34 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
- 
-#ifndef SAMPLE_TRACK_WINDOW_H
-#define SAMPLE_TRACK_WINDOW_H
 
-#include "MixerLineLcdSpinBox.h"
+#ifndef LMMS_GUI_SAMPLE_TRACK_WINDOW_H
+#define LMMS_GUI_SAMPLE_TRACK_WINDOW_H
 
-#include <QLineEdit>
+#include <QWidget>
 
-#include "EffectRackView.h"
+#include "ModelView.h"
 #include "SampleTrack.h"
- 
+#include "SerializingObject.h"
+
+class QLineEdit;
+
+namespace lmms::gui
+{
+
+class AutomatableButton;
+class EffectRackView;
+class Knob;
+class MixerChannelLcdSpinBox;
+class SampleTrackView;
+
 
 class SampleTrackWindow : public QWidget, public ModelView, public SerializingObjectHook
 {
 	Q_OBJECT
 public:
 	SampleTrackWindow(SampleTrackView * tv);
-	virtual ~SampleTrackWindow();
+	~SampleTrackWindow() override = default;
 
 	SampleTrack * model()
 	{
@@ -82,11 +91,15 @@ private:
 	QLineEdit * m_nameLineEdit;
 	Knob * m_volumeKnob;
 	Knob * m_panningKnob;
-	MixerLineLcdSpinBox * m_mixerChannelNumber;
+	AutomatableButton* m_muteBtn;
+	AutomatableButton* m_soloBtn;
+	MixerChannelLcdSpinBox * m_mixerChannelNumber;
 
 	EffectRackView * m_effectRack;
 } ;
 
 
 
-#endif
+} // namespace lmms::gui
+
+#endif // LMMS_GUI_SAMPLE_TRACK_WINDOW_H

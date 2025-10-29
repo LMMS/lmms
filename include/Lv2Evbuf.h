@@ -1,5 +1,5 @@
 /*
- * lv2_evbuf.h - Lv2 event buffer definitions
+ * Lv2Evbuf.h - Lv2 event buffer definitions
  *
  * Copyright (c) 2019-2020 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
@@ -30,8 +30,8 @@
  * match the LMMS coding conventions.
  */
 
-#ifndef LV2_EVBUF_H
-#define LV2_EVBUF_H
+#ifndef LMMS_LV2_EVBUF_H
+#define LMMS_LV2_EVBUF_H
 
 #include "lmmsconfig.h"
 
@@ -39,18 +39,24 @@
 
 #include <cstdint>
 
+
+namespace lmms
+{
+
+
 /**
    An abstract/opaque LV2 event buffer.
 */
-typedef struct LV2_Evbuf_Impl LV2_Evbuf;
+using LV2_Evbuf = struct LV2_Evbuf_Impl;
 
 /**
    An iterator over an LV2_Evbuf.
 */
-typedef struct {
+struct LV2_Evbuf_Iterator
+{
 	LV2_Evbuf* evbuf;
 	uint32_t offset;
-} LV2_Evbuf_Iterator;
+};
 
 /**
    Allocate a new, empty event buffer.
@@ -144,6 +150,9 @@ lv2_evbuf_write(	LV2_Evbuf_Iterator* iter,
 					uint32_t size,
 					const uint8_t* data);
 
+
+} // namespace lmms
+
 #endif // LMMS_HAVE_LV2
 
-#endif // LV2_EVBUF_H
+#endif // LMMS_LV2_EVBUF_H

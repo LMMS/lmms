@@ -27,31 +27,39 @@
 #ifndef _SID_H
 #define _SID_H
 
-#include <QObject>
+#include "AutomatableModel.h"
 #include "Instrument.h"
 #include "InstrumentView.h"
-#include "Knob.h"
+
+namespace lmms
+{
 
 
+class NotePlayHandle;  // IWYU pragma: keep
+
+namespace gui
+{
+class Knob;
+class AutomatableButtonGroup;
 class SidInstrumentView;
-class NotePlayHandle;
-class automatableButtonGroup;
 class PixmapButton;
+}
 
-class voiceObject : public Model
+class VoiceObject : public Model
 {
 	Q_OBJECT
-	MM_OPERATORS
 public:
-	enum WaveForm {
-		SquareWave = 0,
-		TriangleWave,
-		SawWave,
-		NoiseWave,
-		NumWaveShapes
+	enum class WaveForm {
+		Square = 0,
+		Triangle,
+		Saw,
+		Noise,
+		Count
 	};
-	voiceObject( Model * _parent, int _idx );
-	virtual ~voiceObject();
+	constexpr static auto NumWaveShapes = static_cast<std::size_t>(WaveForm::Count);
+
+	VoiceObject( Model * _parent, int _idx );
+	~VoiceObject() override = default;
 
 
 private:
@@ -68,43 +76,44 @@ private:
 	BoolModel m_testModel;
 
 	friend class SidInstrument;
-	friend class SidInstrumentView;
+	friend class gui::SidInstrumentView;
 } ;
 
 class SidInstrument : public Instrument
 {
 	Q_OBJECT
 public:
-	enum FilerType {
+	enum class FilterType {
 		HighPass = 0,
 		BandPass,
 		LowPass,
-		NumFilterTypes
+		Count
 	};
+	constexpr static auto NumFilterTypes = static_cast<std::size_t>(FilterType::Count);
 	
-	enum ChipModel {
-		sidMOS6581 = 0,
-		sidMOS8580,
-		NumChipModels
+	enum class ChipModel {
+		MOS6581 = 0,
+		MOS8580,
+		Count
 	};
-
+	constexpr static auto NumChipModels = static_cast<std::size_t>(ChipModel::Count);
 
 	SidInstrument( InstrumentTrack * _instrument_track );
-	virtual ~SidInstrument();
+	~SidInstrument() override = default;
 
-	virtual void playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer );
-	virtual void deleteNotePluginData( NotePlayHandle * _n );
+	void playNote( NotePlayHandle * _n,
+						SampleFrame* _working_buffer ) override;
+	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
+	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
+	void loadSettings( const QDomElement & _this ) override;
 
-	virtual QString nodeName() const;
+	QString nodeName() const override;
 
-	virtual f_cnt_t desiredReleaseFrames() const;
+	float desiredReleaseTimeMs() const override;
 
-	virtual PluginView * instantiateView( QWidget * _parent );
+	gui::PluginView* instantiateView( QWidget * _parent ) override;
 
 
 /*public slots:
@@ -113,7 +122,7 @@ public:
 
 private:
 	// voices
-	voiceObject * m_voice[3];
+	VoiceObject * m_voice[3];
 
 	// filter	
 	FloatModel m_filterFCModel;
@@ -126,10 +135,13 @@ private:
 
 	IntModel m_chipModel;
 
-	friend class SidInstrumentView;
+	friend class gui::SidInstrumentView;
 
 } ;
 
+
+namespace gui
+{
 
 
 class SidInstrumentView : public InstrumentViewFixedSize
@@ -137,13 +149,13 @@ class SidInstrumentView : public InstrumentViewFixedSize
 	Q_OBJECT
 public:
 	SidInstrumentView( Instrument * _instrument, QWidget * _parent );
-	virtual ~SidInstrumentView();
+	~SidInstrumentView() override = default;
 
 private:
-	virtual void modelChanged();
+	void modelChanged() override;
 	
-	automatableButtonGroup * m_passBtnGrp;
-	automatableButtonGroup * m_sidTypeBtnGrp;
+	AutomatableButtonGroup * m_passBtnGrp;
+	AutomatableButtonGroup * m_sidTypeBtnGrp;
 
 	struct voiceKnobs
 	{
@@ -153,7 +165,7 @@ private:
 					Knob * r,
 					Knob * pw,
 					Knob * crs,
-					automatableButtonGroup * wfbg,
+					AutomatableButtonGroup * wfbg,
 					PixmapButton * syncb,
 					PixmapButton * ringb,
 					PixmapButton * filterb,
@@ -171,16 +183,14 @@ private:
 			m_testButton( testb )
 		{
 		}
-		voiceKnobs()
-		{
-		}
+		voiceKnobs() = default;
 		Knob * m_attKnob;
 		Knob * m_decKnob;
 		Knob * m_sustKnob;
 		Knob * m_relKnob;
 		Knob * m_pwKnob;
 		Knob * m_crsKnob;
-		automatableButtonGroup * m_waveFormBtnGrp;
+		AutomatableButtonGroup * m_waveFormBtnGrp;
 		PixmapButton * m_syncButton;
 		PixmapButton * m_ringModButton;
 		PixmapButton * m_filterButton;
@@ -199,5 +209,9 @@ protected slots:
 	void updateKnobToolTip();
 } ;
 
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

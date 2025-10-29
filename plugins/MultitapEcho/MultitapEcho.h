@@ -28,30 +28,33 @@
 
 #include "Effect.h"
 #include "MultitapEchoControls.h"
-#include "ValueBuffer.h"
 #include "RingBuffer.h"
-#include "lmms_math.h"
 #include "BasicFilters.h"
+
+namespace lmms
+{
+
 
 class MultitapEchoEffect : public Effect
 {
 public:
 	MultitapEchoEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key );
-	virtual ~MultitapEchoEffect();
-	virtual bool processAudioBuffer( sampleFrame* buf, const fpp_t frames );
+	~MultitapEchoEffect() override;
 
-	virtual EffectControls* controls()
+	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
+
+	EffectControls* controls() override
 	{
 		return &m_controls;
 	}
 
 private:
 	void updateFilters( int begin, int end );
-	void runFilter( sampleFrame * dst, sampleFrame * src, StereoOnePole & filter, const fpp_t frames );
+	void runFilter( SampleFrame* dst, SampleFrame* src, StereoOnePole & filter, const fpp_t frames );
 
 	inline void setFilterFreq( float fc, StereoOnePole & f )
 	{
-		const float b1 = expf( -2.0f * F_PI * fc );
+		const float b1 = std::exp(-2 * std::numbers::pi_v<float> * fc);
 		f.setCoeffs( 1.0f - b1, b1 );
 	}
 
@@ -68,11 +71,13 @@ private:
 	float m_sampleRate;
 	float m_sampleRatio;
 	
-	sampleFrame * m_work;
+	SampleFrame* m_work;
 
 	friend class MultitapEchoControls;
 
 };
 
+
+} // namespace lmms
 
 #endif

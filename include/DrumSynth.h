@@ -23,32 +23,39 @@
  *
  */
 
+#ifndef LMMS_DRUM_SYNTH_H
+#define LMMS_DRUM_SYNTH_H
 
-#ifndef _DRUMSYNTH_H__
-#define _DRUMSYNTH_H__
+#include <cstddef>
+#include <cstdint>
 
-#include <stdint.h>
-#include "lmms_basics.h"
+#include "LmmsTypes.h"
 
 class QString;
 
-class DrumSynth {
-    public:
-        DrumSynth() {};
-        int GetDSFileSamples(QString dsfile, int16_t *&wave, int channels, sample_rate_t Fs);
+namespace lmms {
 
-    private:
-        float LoudestEnv(void);
-        int   LongestEnv(void);
-        void  UpdateEnv(int e, long t);
-        void  GetEnv(int env, const char *sec, const char *key, QString ini);
+class DrumSynth
+{
+public:
+	DrumSynth() = default;
+	int GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sample_rate_t Fs);
 
-        float waveform(float ph, int form);
+private:
+	float LoudestEnv();
+	int LongestEnv();
+	void UpdateEnv(int e, long t);
+	void GetEnv(int env, const char* sec, const char* key, QString ini);
 
-        int GetPrivateProfileString(const char *sec, const char *key, const char *def, char *buffer, int size, QString file);
-        int GetPrivateProfileInt(const char *sec, const char *key, int def, QString file);
-        float GetPrivateProfileFloat(const char *sec, const char *key, float def, QString file);
+	float waveform(float ph, int form);
 
+	std::size_t GetPrivateProfileString(const char* sec,
+		const char* key, const char* def, char* buffer,
+		std::size_t size, QString file);
+	int GetPrivateProfileInt(const char* sec, const char* key, int def, QString file);
+	float GetPrivateProfileFloat(const char* sec, const char* key, float def, QString file);
 };
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_DRUM_SYNTH_H

@@ -1,6 +1,5 @@
 #include "PathUtil.h"
 
-#include <QDebug>
 #include <QDir>
 #include <QFileInfo>
 
@@ -8,10 +7,10 @@
 #include "Engine.h"
 #include "Song.h"
 
-namespace PathUtil
+namespace lmms::PathUtil
 {
-	Base relativeBases[] = { Base::ProjectDir, Base::FactorySample, Base::UserSample, Base::UserVST, Base::Preset,
-		Base::UserLADSPA, Base::DefaultLADSPA, Base::UserSoundfont, Base::DefaultSoundfont, Base::UserGIG, Base::DefaultGIG,
+	auto relativeBases = std::array{ Base::ProjectDir, Base::FactoryProjects, Base::FactorySample, Base::UserSample, Base::UserVST, Base::Preset,
+		Base::FactoryPresets, Base::UserLADSPA, Base::DefaultLADSPA, Base::UserSoundfont, Base::DefaultSoundfont, Base::UserGIG, Base::DefaultGIG,
 		Base::LocalDir };
 
 	QString baseLocation(const Base base, bool* error /* = nullptr*/)
@@ -23,6 +22,11 @@ namespace PathUtil
 		switch (base)
 		{
 			case Base::ProjectDir       : loc = ConfigManager::inst()->userProjectsDir(); break;
+			case Base::FactoryProjects :
+			{
+				QDir fpd = QDir(ConfigManager::inst()->factoryProjectsDir());
+				loc = fpd.absolutePath(); break;
+			}
 			case Base::FactorySample    :
 			{
 				QDir fsd = QDir(ConfigManager::inst()->factorySamplesDir());
@@ -31,6 +35,11 @@ namespace PathUtil
 			case Base::UserSample       : loc = ConfigManager::inst()->userSamplesDir(); break;
 			case Base::UserVST          : loc = ConfigManager::inst()->userVstDir(); break;
 			case Base::Preset           : loc = ConfigManager::inst()->userPresetsDir(); break;
+			case Base::FactoryPresets    :
+			{
+				QDir fpd = QDir(ConfigManager::inst()->factoryPresetsDir());
+				loc = fpd.absolutePath(); break;
+			}
 			case Base::UserLADSPA       : loc = ConfigManager::inst()->ladspaDir(); break;
 			case Base::DefaultLADSPA    : loc = ConfigManager::inst()->userLadspaDir(); break;
 			case Base::UserSoundfont    : loc = ConfigManager::inst()->sf2Dir(); break;
@@ -71,10 +80,12 @@ namespace PathUtil
 		switch (base)
 		{
 			case Base::ProjectDir       : return QStringLiteral("userprojects:");
+			case Base::FactoryProjects  : return QStringLiteral("factoryprojects:");
 			case Base::FactorySample    : return QStringLiteral("factorysample:");
 			case Base::UserSample       : return QStringLiteral("usersample:");
 			case Base::UserVST          : return QStringLiteral("uservst:");
 			case Base::Preset           : return QStringLiteral("preset:");
+			case Base::FactoryPresets   : return QStringLiteral("factorypreset:");
 			case Base::UserLADSPA       : return QStringLiteral("userladspa:");
 			case Base::DefaultLADSPA    : return QStringLiteral("defaultladspa:");
 			case Base::UserSoundfont    : return QStringLiteral("usersoundfont:");
@@ -104,9 +115,9 @@ namespace PathUtil
 		return path.mid( basePrefix(baseLookup(path)).length() );
 	}
 
-	QString cleanName(const QString & path)
+	QString cleanName(const QString& path)
 	{
-		return stripPrefix(QFileInfo(path).baseName());
+		return stripPrefix(QFileInfo(path).completeBaseName());
 	}
 
 
@@ -122,7 +133,7 @@ namespace PathUtil
 		//Check if it's a factory sample
 		QString factoryPath = baseLocation(Base::FactorySample) + input;
 		QFileInfo factoryInfo(factoryPath);
-		if (factoryInfo.exists()) { assumedBase = Base::FactorySample; }	
+		if (factoryInfo.exists()) { assumedBase = Base::FactorySample; }
 
 		//Check if it's a VST
 		QString vstPath = baseLocation(Base::UserVST) + input;
@@ -188,4 +199,5 @@ namespace PathUtil
 		}
 		return basePrefix(shortestBase) + relativeOrAbsolute(absolutePath, shortestBase);
 	}
-}
+
+} // namespace lmms::PathUtil

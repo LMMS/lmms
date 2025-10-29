@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef AUDIO_JACK_H
-#define AUDIO_JACK_H
+#ifndef LMMS_AUDIO_JACK_H
+#define LMMS_AUDIO_JACK_H
 
 #include "lmmsconfig.h"
 
@@ -31,19 +31,28 @@
 #ifndef LMMS_HAVE_WEAKJACK
 #include <jack/jack.h>
 #else
-#include "weak_libjack.h"
+#include <weak_libjack.h>
 #endif
 
 #include <atomic>
-#include <QtCore/QVector>
-#include <QtCore/QList>
-#include <QtCore/QMap>
+#include <vector>
+#ifdef AUDIO_BUS_HANDLE_SUPPORT
+#include <QMap>
+#endif
 
 #include "AudioDevice.h"
 #include "AudioDeviceSetupWidget.h"
+#ifdef AUDIO_BUS_HANDLE_SUPPORT
+#include "AudioBusHandle.h"
+#endif
 
 class QLineEdit;
-class LcdSpinBox;
+class QMenu;
+class QToolButton;
+
+namespace lmms
+{
+
 class MidiJack;
 
 
@@ -51,89 +60,96 @@ class AudioJack : public QObject, public AudioDevice
 {
 	Q_OBJECT
 public:
-	AudioJack( bool & _success_ful, AudioEngine* audioEngine );
-	virtual ~AudioJack();
+	AudioJack(bool& successful, AudioEngine* audioEngine);
+	~AudioJack() override;
 
 	// this is to allow the jack midi connection to use the same jack client connection
 	// the jack callback is handled here, we call the midi client so that it can read
 	// it's midi data during the callback
-	AudioJack * addMidiClient(MidiJack *midiClient);
-	void removeMidiClient(void) { m_midiClient = nullptr; }
-	jack_client_t * jackClient() {return m_client;};
+	AudioJack* addMidiClient(MidiJack* midiClient);
+	void removeMidiClient() { m_midiClient = nullptr; }
+	jack_client_t* jackClient() { return m_client; };
 
 	inline static QString name()
 	{
-		return QT_TRANSLATE_NOOP( "AudioDeviceSetupWidget",
-			"JACK (JACK Audio Connection Kit)" );
+		return QT_TRANSLATE_NOOP("AudioDeviceSetupWidget", "JACK (JACK Audio Connection Kit)");
 	}
 
-
-	class setupWidget : public AudioDeviceSetupWidget
+	class setupWidget : public gui::AudioDeviceSetupWidget
 	{
 	public:
-		setupWidget( QWidget * _parent );
-		virtual ~setupWidget();
-
-		virtual void saveSettings();
+		setupWidget(QWidget* parent);
+		void saveSettings() override;
 
 	private:
-		QLineEdit * m_clientName;
-		LcdSpinBox * m_channels;
+		std::vector<std::string> getAudioPortNames(JackPortFlags portFlags) const;
+		std::vector<std::string> getAudioInputNames() const;
+		std::vector<std::string> getAudioOutputNames() const;
+		static QMenu* buildMenu(QToolButton* toolButton, const std::vector<std::string>& names, const QString& filteredLMMSClientName);
 
-	} ;
+	private:
+		QLineEdit* m_clientName;
+		// Because we do not have access to a JackAudio driver instance we have to be our own client to display inputs and outputs...
+		jack_client_t* m_client;
 
+		std::vector<QToolButton*> m_outputDevices;
+		std::vector<QToolButton*> m_inputDevices;
+	};
 
 private slots:
 	void restartAfterZombified();
 
-
 private:
 	bool initJackClient();
+	void resizeInputBuffer(jack_nframes_t nframes);
 
-	virtual void startProcessing();
-	virtual void stopProcessing();
-	virtual void applyQualitySettings();
+	void attemptToConnect(size_t index, const char *lmms_port_type, const char *source_port, const char *destination_port);
+	void attemptToReconnectOutput(size_t outputIndex, const QString& targetPort);
+	void attemptToReconnectInput(size_t inputIndex, const QString& sourcePort);
 
-	virtual void registerPort( AudioPort * _port );
-	virtual void unregisterPort( AudioPort * _port );
-	virtual void renamePort( AudioPort * _port );
+	void startProcessing() override;
+	void stopProcessing() override;
 
-	int processCallback( jack_nframes_t _nframes, void * _udata );
+	void registerPort(AudioBusHandle* port) override;
+	void unregisterPort(AudioBusHandle* port) override;
+	void renamePort(AudioBusHandle* port) override;
 
-	static int staticProcessCallback( jack_nframes_t _nframes,
-							void * _udata );
-	static void shutdownCallback( void * _udata );
+	int processCallback(jack_nframes_t nframes);
 
+	static int staticProcessCallback(jack_nframes_t nframes, void* udata);
+	static void shutdownCallback(void* _udata);
 
-	jack_client_t * m_client;
+	jack_client_t* m_client;
 
 	bool m_active;
 	std::atomic<bool> m_stopped;
 
-	std::atomic<MidiJack *> m_midiClient;
-	QVector<jack_port_t *> m_outputPorts;
-	jack_default_audio_sample_t * * m_tempOutBufs;
-	surroundSampleFrame * m_outBuf;
+	std::atomic<MidiJack*> m_midiClient;
+	std::vector<jack_port_t*> m_outputPorts;
+	std::vector<jack_port_t*> m_inputPorts;
+	jack_default_audio_sample_t** m_tempOutBufs;
+	std::vector<SampleFrame> m_inputFrameBuffer;
+	SampleFrame* m_outBuf;
 
 	f_cnt_t m_framesDoneInCurBuf;
 	f_cnt_t m_framesToDoInCurBuf;
 
-
-#ifdef AUDIO_PORT_SUPPORT
+#ifdef AUDIO_BUS_HANDLE_SUPPORT
 	struct StereoPort
 	{
-		jack_port_t * ports[2];
-	} ;
+		jack_port_t* ports[2];
+	};
 
-	typedef QMap<AudioPort *, StereoPort> JackPortMap;
+	using JackPortMap = QMap<AudioBusHandle*, StereoPort>;
 	JackPortMap m_portMap;
 #endif
 
 signals:
 	void zombified();
+};
 
-} ;
+} // namespace lmms
 
-#endif
+#endif // LMMS_HAVE_JACK
 
-#endif
+#endif // LMMS_AUDIO_JACK_H

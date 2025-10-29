@@ -22,19 +22,22 @@
  *
  */
 
-#ifndef EDITOR_COMMON_H
-#define EDITOR_COMMON_H
+#ifndef LMMS_GUI_EDITOR_H
+#define LMMS_GUI_EDITOR_H
 
 #include <QMainWindow>
 #include <QToolBar>
+
+class QAction;
+
+namespace lmms::gui
+{
 
 static const int Quantizations[] = {
 	1, 2, 4, 8, 16, 32, 64,
 	3, 6, 12, 24, 48, 96, 192
 };
 
-
-class QAction;
 
 class DropToolBar;
 
@@ -48,12 +51,20 @@ class Editor : public QMainWindow
 public:
 	void setPauseIcon(bool displayPauseIcon=true);
 	QAction *playAction() const;
+	static Editor* lastPlayedEditor() { return s_lastPlayedEditor; }
 protected:
 	DropToolBar * addDropToolBarToTop(QString const & windowTitle);
 	DropToolBar * addDropToolBar(Qt::ToolBarArea whereToAdd, QString const & windowTitle);
 	DropToolBar * addDropToolBar(QWidget * parent, Qt::ToolBarArea whereToAdd, QString const & windowTitle);
 
-	void closeEvent( QCloseEvent * _ce ) override;
+	void closeEvent(QCloseEvent * event) override;
+	void keyPressEvent(QKeyEvent *ke) override;
+public slots:
+	//! Called by pressing the space key. Plays or stops.
+	void togglePlayStop();
+	//! Called by pressing shift+space. Toggles pause state.
+	void togglePause();
+
 protected slots:
 	virtual void play() {}
 	virtual void record() {}
@@ -62,13 +73,9 @@ protected slots:
 	virtual void stop() {}
 
 private slots:
-	/// Called by pressing the space key. Plays or stops.
-	void togglePlayStop();
-	
-	/// Called by pressing shift+space. Toggles pause state.
-	void togglePause();
-
 	void toggleMaximize();
+private:
+	inline static Editor* s_lastPlayedEditor = nullptr;
 
 signals:
 
@@ -78,7 +85,7 @@ protected:
 	/// \param	record	If set true, the editor's toolbar will contain record
 	///					buttons in addition to the play and stop buttons.
 	Editor(bool record = false, bool record_step = false);
-	virtual ~Editor();
+	~Editor() override = default;
 
 
 	DropToolBar* m_toolBar;
@@ -108,4 +115,6 @@ protected:
 };
 
 
-#endif
+} // namespace lmms::gui
+
+#endif // LMMS_GUI_EDITOR_H

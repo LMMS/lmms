@@ -113,24 +113,6 @@
         </bbtrack>
       </track>
     </trackcontainer>
-    <track type="6" muted="0" name="Automation track" solo="0">
-      <automationtrack/>
-      <automationpattern prog="0" mute="0" name="Numerator" pos="0" tens="1" len="192"/>
-      <automationpattern prog="0" mute="0" name="Denominator" pos="0" tens="1" len="192"/>
-      <automationpattern prog="0" mute="0" name="Tempo" pos="0" tens="1" len="192"/>
-      <automationpattern prog="0" mute="0" name="Master volume" pos="0" tens="1" len="192"/>
-      <automationpattern prog="0" mute="0" name="Master pitch" pos="0" tens="1" len="192"/>
-      <automationpattern prog="0" mute="0" name="Numerator" pos="0" tens="1" len="192"/>
-      <automationpattern prog="0" mute="0" name="Denominator" pos="0" tens="1" len="192"/>
-      <automationpattern prog="0" mute="0" name="Tempo" pos="0" tens="1" len="192"/>
-      <automationpattern prog="0" mute="0" name="Master volume" pos="0" tens="1" len="192"/>
-      <automationpattern prog="0" mute="0" name="Master pitch" pos="0" tens="1" len="192"/>
-      <automationpattern prog="0" mute="0" name="Numerator" pos="0" tens="1" len="192"/>
-      <automationpattern prog="0" mute="0" name="Denominator" pos="0" tens="1" len="192"/>
-      <automationpattern prog="0" mute="0" name="Tempo" pos="0" tens="1" len="192"/>
-      <automationpattern prog="0" mute="0" name="Master volume" pos="0" tens="1" len="192"/>
-      <automationpattern prog="0" mute="0" name="Master pitch" pos="0" tens="1" len="192"/>
-    </track>
     <mixer visible="1" width="561" height="332" x="10" y="314" maximized="0" minimized="0">
       <mixerchannel num="0" muted="0" volume="1" name="Master" soloed="0">
         <fxchain numofeffects="0" enabled="0"/>

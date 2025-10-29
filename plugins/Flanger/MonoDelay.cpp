@@ -23,16 +23,18 @@
  */
 
 #include "MonoDelay.h"
-#include "interpolation.h"
-#include "lmms_math.h"
 #include "string.h"
+
+namespace lmms
+{
+
 
 MonoDelay::MonoDelay( int maxTime , int sampleRate )
 {
 	m_buffer = 0;
-	m_maxTime = maxTime;
+	m_maxTime = static_cast<float>(maxTime);
 	m_maxLength = maxTime * sampleRate;
-	m_length = m_maxLength;
+	m_length = static_cast<float>(m_maxLength);
 
 	m_writeIndex = 0;
 	m_feedback = 0.0f;
@@ -55,7 +57,7 @@ MonoDelay::~MonoDelay()
 void MonoDelay::tick( sample_t* sample )
 {
 	m_writeIndex = ( m_writeIndex + 1 ) % ( int )m_maxLength;
-	int readIndex = m_writeIndex - m_length;
+	int readIndex = m_writeIndex - static_cast<int>(m_length);
 	if (readIndex < 0 ) { readIndex += m_maxLength; }
 	float out = m_buffer[ readIndex ];
 	m_buffer[ m_writeIndex ] = *sample + ( out * m_feedback );
@@ -76,3 +78,6 @@ void MonoDelay::setSampleRate( int sampleRate )
 	m_buffer = new sample_t[( int )( sampleRate * m_maxTime ) ];
 	memset( m_buffer, 0, sizeof(float) * ( int )( sampleRate * m_maxTime ) );
 }
+
+
+} // namespace lmms

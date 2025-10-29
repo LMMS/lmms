@@ -29,16 +29,26 @@
 
 #include "EffectControlDialog.h"
 
+namespace lmms
+{
+
 class BitcrushControls;
+
+
+namespace gui
+{
 
 class BitcrushControlDialog : public EffectControlDialog
 {
 	Q_OBJECT
 public:
 	BitcrushControlDialog( BitcrushControls * controls );
-	virtual ~BitcrushControlDialog()
-	{
-	}
+	~BitcrushControlDialog() override = default;
 };
+
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

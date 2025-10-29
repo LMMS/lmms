@@ -1,20 +1,16 @@
-INCLUDE(BuildPlugin)
+include(BuildPlugin)
 
-# Avoid unused warnings for mididata.h
-IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-variable")
-ENDIF()
+add_library(adplug STATIC
+	adplug/src/fmopl.c
+	adplug/src/temuopl.cpp
+)
+target_include_directories(adplug PUBLIC adplug/src)
+set_target_properties(adplug PROPERTIES SYSTEM TRUE)
 
-INCLUDE_DIRECTORIES(adplug/src)
-
-BUILD_PLUGIN(opulenz
+build_plugin(opulenz
 	OpulenZ.cpp
 	OpulenZ.h
-	adplug/src/opl.h
-	adplug/src/fmopl.c
-	adplug/src/fmopl.h
-	adplug/src/temuopl.cpp
-	adplug/src/temuopl.h
 	MOCFILES OpulenZ.h
 	EMBEDDED_RESOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.png"
 )
+target_link_libraries(opulenz adplug)

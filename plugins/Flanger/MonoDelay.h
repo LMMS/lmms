@@ -25,7 +25,11 @@
 #ifndef MONODELAY_H
 #define MONODELAY_H
 
-#include "lmms_basics.h"
+#include "LmmsTypes.h"
+
+namespace lmms
+{
+
 
 class MonoDelay
 {
@@ -56,5 +60,8 @@ private:
 	float m_feedback;
 	float m_maxTime;
 };
+
+
+} // namespace lmms
 
 #endif // MONODELAY_H

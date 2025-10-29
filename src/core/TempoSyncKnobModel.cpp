@@ -31,26 +31,23 @@
 #include "Song.h"
 
 
+namespace lmms
+{
+
+
 TempoSyncKnobModel::TempoSyncKnobModel( const float _val, const float _min,
 				const float _max, const float _step,
 				const float _scale, Model * _parent,
 				const QString & _display_name ) :
 	FloatModel( _val, _min, _max, _step, _parent, _display_name ),
-	m_tempoSyncMode( SyncNone ),
-	m_tempoLastSyncMode( SyncNone ),
+	m_tempoSyncMode( SyncMode::None ),
+	m_tempoLastSyncMode( SyncMode::None ),
 	m_scale( _scale ),
 	m_custom( _parent )
 {
-	connect( Engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ),
-			this, SLOT( calculateTempoSyncTime( bpm_t ) ),
+	connect( Engine::getSong(), SIGNAL(tempoChanged(lmms::bpm_t)),
+			this, SLOT(calculateTempoSyncTime(lmms::bpm_t)),
 			Qt::DirectConnection );
-}
-
-
-
-
-TempoSyncKnobModel::~TempoSyncKnobModel()
-{
 }
 
 
@@ -58,15 +55,15 @@ TempoSyncKnobModel::~TempoSyncKnobModel()
 
 void TempoSyncKnobModel::setTempoSync( QAction * _item )
 {
-	setTempoSync( _item->data().toInt() );
+	setTempoSync( static_cast<SyncMode>(_item->data().toInt()) );
 }
 
 
 
 
-void TempoSyncKnobModel::setTempoSync( int _note_type )
+void TempoSyncKnobModel::setTempoSync( SyncMode _note_type )
 {
-	setSyncMode( ( TempoSyncMode ) _note_type );
+	setSyncMode( _note_type );
 	Engine::getSong()->setModified();
 }
 
@@ -77,34 +74,34 @@ void TempoSyncKnobModel::calculateTempoSyncTime( bpm_t _bpm )
 {
 	float conversionFactor = 1.0;
 	
-	if( m_tempoSyncMode )
+	if( m_tempoSyncMode != SyncMode::None )
 	{
 		switch( m_tempoSyncMode )
 		{
-			case SyncCustom:
+			case SyncMode::Custom:
 				conversionFactor = 
 			static_cast<float>( m_custom.getDenominator() ) /
 			static_cast<float>( m_custom.getNumerator() );
 				break;
-			case SyncDoubleWholeNote:
+			case SyncMode::DoubleWholeNote:
 				conversionFactor = 0.125;
 				break;
-			case SyncWholeNote:
+			case SyncMode::WholeNote:
 				conversionFactor = 0.25;
 				break;
-			case SyncHalfNote:
+			case SyncMode::HalfNote:
 				conversionFactor = 0.5;
 				break;
-			case SyncQuarterNote:
+			case SyncMode::QuarterNote:
 				conversionFactor = 1.0;
 				break;
-			case SyncEighthNote:
+			case SyncMode::EighthNote:
 				conversionFactor = 2.0;
 				break;
-			case SyncSixteenthNote:
+			case SyncMode::SixteenthNote:
 				conversionFactor = 4.0;
 				break;
-			case SyncThirtysecondNote:
+			case SyncMode::ThirtysecondNote:
 				conversionFactor = 8.0;
 				break;
 			default: ;
@@ -119,6 +116,10 @@ void TempoSyncKnobModel::calculateTempoSyncTime( bpm_t _bpm )
 	{
 		emit syncModeChanged( m_tempoSyncMode );
 		m_tempoLastSyncMode = m_tempoSyncMode;
+	}
+	else if (m_tempoSyncMode == SyncMode::Custom)
+	{
+		emit syncModeChanged(m_tempoSyncMode);
 	}
 }
 
@@ -141,21 +142,21 @@ void TempoSyncKnobModel::loadSettings( const QDomElement & _this,
 {
 	FloatModel::loadSettings( _this, _name );
 	m_custom.loadSettings( _this, _name );
-	setSyncMode( ( TempoSyncMode ) _this.attribute( _name + "_syncmode" ).toInt() );
+	setSyncMode( ( SyncMode ) _this.attribute( _name + "_syncmode" ).toInt() );
 }
 
 
 
 
-void TempoSyncKnobModel::setSyncMode( TempoSyncMode _new_mode )
+void TempoSyncKnobModel::setSyncMode( SyncMode _new_mode )
 {
 	if( m_tempoSyncMode != _new_mode )
 	{
 		m_tempoSyncMode = _new_mode;
-		if( _new_mode == SyncCustom )
+		if( _new_mode == SyncMode::Custom )
 		{
-			connect( &m_custom, SIGNAL( dataChanged() ),
-					this, SLOT( updateCustom() ),
+			connect( &m_custom, SIGNAL(dataChanged()),
+					this, SLOT(updateCustom()),
 					Qt::DirectConnection );
 		}
 	}
@@ -177,12 +178,8 @@ void TempoSyncKnobModel::setScale( float _new_scale )
 
 void TempoSyncKnobModel::updateCustom()
 {
-	setSyncMode( SyncCustom );
+	setSyncMode( SyncMode::Custom );
 }
 
 
-
-
-
-
-
+} // namespace lmms

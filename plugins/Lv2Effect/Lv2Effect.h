@@ -1,7 +1,7 @@
 /*
  * Lv2Effect.h - implementation of LV2 effect
  *
- * Copyright (c) 2018-2020 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
+ * Copyright (c) 2018-2023 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -28,6 +28,10 @@
 #include "Effect.h"
 #include "Lv2FxControls.h"
 
+namespace lmms
+{
+
+
 class Lv2Effect : public Effect
 {
 	Q_OBJECT
@@ -37,10 +41,9 @@ public:
 		initialization
 	*/
 	Lv2Effect(Model* parent, const Descriptor::SubPluginFeatures::Key* _key);
-	//! Must be checked after ctor or reload
-	bool isValid() const { return m_controls.isValid(); }
 
-	bool processAudioBuffer( sampleFrame* buf, const fpp_t frames ) override;
+	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
+
 	EffectControls* controls() override { return &m_controls; }
 
 	Lv2FxControls* lv2Controls() { return &m_controls; }
@@ -48,7 +51,10 @@ public:
 
 private:
 	Lv2FxControls m_controls;
-	std::vector<sampleFrame> m_tmpOutputSmps;
+	std::vector<SampleFrame> m_tmpOutputSmps;
 };
 
-#endif // LMMS_HAVE_LV2
+
+} // namespace lmms
+
+#endif

@@ -24,19 +24,16 @@
  */
 
 #include <cmath>
-#include <QApplication>
-#include <QLabel>
 #include <QMouseEvent>
-#include <QPainter>
-#include <QStyleOptionFrameV2>
 #include <QInputDialog>
 
 #include "LcdSpinBox.h"
+#include "KeyboardShortcuts.h"
 #include "CaptionMenu.h"
-#include "GuiApplication.h"
-#include "MainWindow.h"
 
 
+namespace lmms::gui
+{
 
 LcdSpinBox::LcdSpinBox( int numDigits, QWidget* parent, const QString& name ) :
 	LcdWidget( numDigits, parent, name ),
@@ -83,7 +80,7 @@ void LcdSpinBox::contextMenuEvent(QContextMenuEvent* event)
 void LcdSpinBox::mousePressEvent( QMouseEvent* event )
 {
 	if( event->button() == Qt::LeftButton &&
-		! ( event->modifiers() & Qt::ControlModifier ) &&
+		! (event->modifiers() & KBD_COPY_MODIFIER) &&
 						event->y() < cellHeight() + 2  )
 	{
 		m_mouseMoving = true;
@@ -112,7 +109,7 @@ void LcdSpinBox::mouseMoveEvent( QMouseEvent* event )
 		int dy = event->globalY() - m_lastMousePos.y();
 		if( dy )
 		{
-			float fdy = static_cast<float>(dy);
+			auto fdy = static_cast<float>(dy);
 			if( event->modifiers() & Qt::ShiftModifier ) {
 				fdy = qBound( -4.f, fdy/4.f, 4.f );
 			}
@@ -145,7 +142,9 @@ void LcdSpinBox::mouseReleaseEvent(QMouseEvent*)
 void LcdSpinBox::wheelEvent(QWheelEvent * we)
 {
 	we->accept();
-	model()->setValue(model()->value() + ((we->angleDelta().y() > 0) ? 1 : -1) * model()->step<int>());
+	const int direction = (we->angleDelta().y() > 0 ? 1 : -1) * (we->inverted() ? -1 : 1);
+
+	model()->setValue(model()->value() + direction * model()->step<int>());
 	emit manualChange();
 }
 
@@ -175,3 +174,4 @@ void LcdSpinBox::enterValue()
 	}
 }
 
+} // namespace lmms::gui

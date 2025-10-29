@@ -26,20 +26,26 @@
 
 #include "SaSpectrumView.h"
 
-#include <algorithm>
 #include <cmath>
 #include <QMouseEvent>
 #include <QMutexLocker>
 #include <QPainter>
+#include <QPainterPath>
 #include <QString>
 
+#include "fft_helpers.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
+#include "SaControls.h"
 #include "SaProcessor.h"
+#include "lmms_math.h"
 
 #ifdef SA_DEBUG
 	#include <chrono>
 #endif
+
+namespace lmms::gui
+{
 
 
 SaSpectrumView::SaSpectrumView(SaControls *controls, SaProcessor *processor, QWidget *_parent) :
@@ -297,7 +303,7 @@ void SaSpectrumView::refreshPaths()
 // part new, part old. At reasonable frame rate, such difference is invisible..
 void SaSpectrumView::updateBuffers(const float *spectrum, float *displayBuffer, float *peakBuffer)
 {
-	for (int n = 0; n < m_processor->binCount(); n++)
+	for (auto n = std::size_t{0}; n < m_processor->binCount(); n++)
 	{
 		// Update the exponential average if enabled, or simply copy the value.
 		if (!m_controls->m_pauseModel.value())
@@ -642,14 +648,13 @@ float SaSpectrumView::ampToYPixel(float amplitude, unsigned int height)
 std::vector<std::pair<int, std::string>> SaSpectrumView::makeLogFreqTics(int low, int high)
 {
 	std::vector<std::pair<int, std::string>> result;
-	int i, j;
-	int a[] = {10, 20, 50};		// sparse series multipliers
-	int b[] = {14, 30, 70};		// additional (denser) series
+	auto a = std::array{10, 20, 50};		// sparse series multipliers
+	auto b = std::array{14, 30, 70};		// additional (denser) series
 
 	// generate main steps (powers of 10); use the series to specify smaller steps
-	for (i = 1; i <= high; i *= 10)
+	for (int i = 1; i <= high; i *= 10)
 	{
-		for (j = 0; j < 3; j++)
+		for (int j = 0; j < 3; j++)
 		{
 			// insert a label from sparse series if it falls within bounds
 			if (i * a[j] >= low && i * a[j] <= high)
@@ -664,7 +669,7 @@ std::vector<std::pair<int, std::string>> SaSpectrumView::makeLogFreqTics(int low
 				}
 			}
 			// also insert denser series if high and low values are close
-			if ((log10(high) - log10(low) < 2) && (i * b[j] >= low && i * b[j] <= high))
+			if ((std::log10(high) - std::log10(low) < 2) && (i * b[j] >= low && i * b[j] <= high))
 			{
 				if (i * b[j] < 1500)
 				{
@@ -686,7 +691,7 @@ std::vector<std::pair<int, std::string>> SaSpectrumView::makeLogFreqTics(int low
 std::vector<std::pair<int, std::string>> SaSpectrumView::makeLinearFreqTics(int low, int high)
 {
 	std::vector<std::pair<int, std::string>> result;
-	int i, increment;
+	int increment;
 
 	// select a suitable increment based on zoom level
 	if (high - low < 500) {increment = 50;}
@@ -695,7 +700,7 @@ std::vector<std::pair<int, std::string>> SaSpectrumView::makeLinearFreqTics(int 
 	else {increment = 2000;}
 
 	// generate steps based on increment, starting at 0
-	for (i = 0; i <= high; i += increment)
+	for (int i = 0; i <= high; i += increment)
 	{
 		if (i >= low)
 		{
@@ -719,18 +724,17 @@ std::vector<std::pair<int, std::string>> SaSpectrumView::makeLinearFreqTics(int 
 std::vector<std::pair<float, std::string>> SaSpectrumView::makeLogAmpTics(int low, int high)
 {
 	std::vector<std::pair<float, std::string>> result;
-	float i;
 	double increment;
 
 	// Base zoom level on selected range and how close is the current height
 	// to the sizeHint() (denser scale for bigger window).
 	if ((high - low) < 20 * ((float)height() / sizeHint().height()))
 	{
-		increment = pow(10, 0.3);	// 3 dB steps when really zoomed in
+		increment = fastPow10f(0.3f); // 3 dB steps when really zoomed in
 	}
 	else if (high - low < 45 * ((float)height() / sizeHint().height()))
 	{
-		increment = pow(10, 0.6);	// 6 dB steps when sufficiently zoomed in
+		increment = fastPow10f(0.6f); // 6 dB steps when sufficiently zoomed in
 	}
 	else
 	{
@@ -739,11 +743,11 @@ std::vector<std::pair<float, std::string>> SaSpectrumView::makeLogAmpTics(int lo
 
 	// Generate n dB increments, start checking at -90 dB. Limits are tweaked
 	// just a little bit to make sure float comparisons do not miss edges.
-	for (i = 0.000000001; 10 * log10(i) <= (high + 0.001); i *= increment)
+	for (float i = 0.000000001f; 10 * std::log10(i) <= (high + 0.001); i *= increment)
 	{
-		if (10 * log10(i) >= (low - 0.001))
+		if (10 * std::log10(i) >= (low - 0.001))
 		{
-			result.emplace_back(i, std::to_string((int)std::round(10 * log10(i))));
+			result.emplace_back(i, std::to_string((int)std::round(10 * std::log10(i))));
 		}
 	}
 	return result;
@@ -759,41 +763,39 @@ std::vector<std::pair<float, std::string>> SaSpectrumView::makeLogAmpTics(int lo
 std::vector<std::pair<float, std::string>> SaSpectrumView::makeLinearAmpTics(int low, int high)
 {
 	std::vector<std::pair<float, std::string>> result;
-	double i, nearest;
-
 	// make about 5 labels when window is small, 10 if it is big
 	float split = (float)height() / sizeHint().height() >= 1.5 ? 10.0 : 5.0;
 
 	// convert limits to linear scale
-	float lin_low = pow(10, low / 10.0);
-	float lin_high = pow(10, high / 10.0);
+	float lin_low = fastPow10f(low / 10.0);
+	float lin_high = fastPow10f(high / 10.0);
 
 	// Linear scale will vary widely, so instead of trying to craft extra nice
 	// multiples, just generate a few evenly spaced increments across the range,
 	// paying attention only to the decimal places to keep labels short.
 	// Limits are shifted a bit so that float comparisons do not miss edges.
-	for (i = 0; i <= (lin_high + 0.0001); i += (lin_high - lin_low) / split)
+	for (double i = 0; i <= (lin_high + 0.0001); i += (lin_high - lin_low) / split)
 	{
 		if (i >= (lin_low - 0.0001))
 		{
 			if (i >= 9.99 && i < 99.9)
 			{
-				nearest = std::round(i);
+				double nearest = std::round(i);
 				result.emplace_back(nearest, std::to_string(nearest).substr(0, 2));
 			}
 			else if (i >= 0.099)
 			{	// also covers numbers above 100
-				nearest = std::round(i * 10) / 10;
+				double nearest = std::round(i * 10) / 10;
 				result.emplace_back(nearest, std::to_string(nearest).substr(0, 3));
 			}
 			else if (i >= 0.0099)
 			{
-				nearest = std::round(i * 1000) / 1000;
+				double nearest = std::round(i * 1000) / 1000;
 				result.emplace_back(nearest, std::to_string(nearest).substr(0, 4));
 			}
 			else if	(i >= 0.00099)
 			{
-				nearest = std::round(i * 10000) / 10000;
+				double nearest = std::round(i * 10000) / 10000;
 				result.emplace_back(nearest, std::to_string(nearest).substr(1, 4));
 			}
 			else if (i > -0.01 && i < 0.01)
@@ -841,3 +843,5 @@ void SaSpectrumView::resizeEvent(QResizeEvent *event)
 	m_linearAmpTics = makeLinearAmpTics(m_processor->getAmpRangeMin(), m_processor->getAmpRangeMax());
 }
 
+
+} // namespace lmms::gui

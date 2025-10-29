@@ -29,6 +29,8 @@
 #include "ProjectJournal.h"
 #include "Engine.h"
 
+namespace lmms
+{
 
 
 JournallingObject::JournallingObject() :
@@ -140,3 +142,4 @@ void JournallingObject::changeID( jo_id_t _id )
 }
 
 
+} // namespace lmms

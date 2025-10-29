@@ -29,22 +29,26 @@
 
 #include "Effect.h"
 #include "BitcrushControls.h"
-#include "ValueBuffer.h"
-#include "lmms_math.h"
 #include "BasicFilters.h"
+
+
+namespace lmms
+{
+
 
 class BitcrushEffect : public Effect
 {
 public:
 	BitcrushEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key );
-	virtual ~BitcrushEffect();
-	virtual bool processAudioBuffer( sampleFrame* buf, const fpp_t frames );
+	~BitcrushEffect() override;
 
-	virtual EffectControls* controls()
+	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
+
+	EffectControls* controls() override
 	{
 		return &m_controls;
 	}
-	
+
 private:
 	void sampleRateChanged();
 	float depthCrush( float in );
@@ -52,7 +56,7 @@ private:
 
 	BitcrushControls m_controls;
 	
-	sampleFrame * m_buffer;
+	SampleFrame* m_buffer;
 	float m_sampleRate;
 	StereoLinkwitzRiley m_filter;
 	
@@ -79,5 +83,8 @@ private:
 
 	friend class BitcrushControls;
 };
+
+
+} // namespace lmms
 
 #endif
