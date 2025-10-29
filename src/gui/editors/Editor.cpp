@@ -139,14 +139,6 @@ QAction *Editor::playAction() const
 	return m_playAction;
 }
 
-// Workaround: for some reason editor windows minimize their height when close is unhandled
-void Editor::closeEvent(QCloseEvent* ce)
-{
-	if (!parentWidget()) { hide(); }
-	getGUI()->mainWindow()->refocus();
-	ce->ignore();
-}
-
 void Editor::keyPressEvent(QKeyEvent* ke)
 {
 	if (ke->key() == Qt::Key_Space)

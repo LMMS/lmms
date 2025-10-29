@@ -173,8 +173,8 @@ void SubWindow::changeEvent( QEvent *event )
 
 void SubWindow::setVisible(bool visible)
 {
-	if (isDetached()) { widget()->setVisible(visible); }
-	else { QMdiSubWindow::setVisible(visible); }
+	widget()->setVisible(visible);
+	if (!isDetached()) { QMdiSubWindow::setVisible(visible); }
 }
 
 
