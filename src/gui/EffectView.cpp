@@ -90,6 +90,18 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 		if( m_controlView )
 		{
 			m_subWindow = getGUI()->mainWindow()->addWindowedWidget( m_controlView );
+			if (!m_controlView->isResizable())
+			{
+				if (m_controlView->layout())
+				{
+					m_controlView->layout()->setSizeConstraint(QLayout::SetFixedSize);
+				}
+				else
+				{
+					m_controlView->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+				}
+			}
+			m_subWindow->setWindowFlag(Qt::WindowMaximizeButtonHint, false);
 			m_subWindow->hide();
 		}
 	}
