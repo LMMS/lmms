@@ -593,6 +593,18 @@ void SubWindow::resizeEvent( QResizeEvent * event )
 	}
 }
 
+
+
+
+/**
+ * @brief SubWindow::eventFilter
+ *
+ * Override of QMdiSubWindow's event filter.
+ * This is not how regular eventFilters work, it is never installed explicitly.
+ * Instead, it is installed by Qt and conveniently installs itself
+ * onto the child widget. Despite relying on internal implementation details,
+ * as of writing this it seems to be the best way to do so as soon as the widget is set.
+ */
 bool SubWindow::eventFilter(QObject* obj, QEvent* event)
 {
 	if (obj != static_cast<QObject*>(widget()))
