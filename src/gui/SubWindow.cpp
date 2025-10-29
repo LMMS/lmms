@@ -521,6 +521,7 @@ void SubWindow::adjustTitleBar()
 
 	m_detachBtn->move(buttonPos);
 	m_detachBtn->show();
+	buttonBarWidth = buttonBarWidth + m_buttonSize.width() + buttonGap;
 
 	if( widget() )
 	{
