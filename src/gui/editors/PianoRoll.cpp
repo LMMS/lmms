@@ -5379,39 +5379,61 @@ bool PianoRollWindow::hasFocus() const
 
 
 
-void PianoRollWindow::showEvent(QShowEvent *se)
+void PianoRollWindow::showEvent(QShowEvent*)
 {
-	// Create an initial clip when opening Piano Roll in an empty project
+	// Don't allow piano roll to be opened if there's no clip to display.
+	// To help new users who don't know how to open a clip:
+	// - if there are no clips, create one in the first track and open it
+	// - if there are multiple empty clips, open the first one
+	// - if there's only one clip with notes, open that
+	// - if there are no tracks, or multiple clips, show a help text
 	if (!m_editor->hasValidMidiClip())
 	{
-		Track* firstTrack = nullptr;
-		for (Track* track: Engine::getSong()->tracks())
-		{
-			if (track->type() == Track::InstrumentTrack)
-			{
-				if (!firstTrack) { firstTrack = track; }
+		InstrumentTrack* firstTrack = nullptr;
+		MidiClip* firstEmptyClip = nullptr;
+		MidiClip* firstMelodyClip = nullptr;
 
-				// Don't create a new clip if the track has clips
-				if (track->numOfClips() != 0)
+		for (auto track: Engine::getSong()->tracks())
+		{
+			if (track->type() != Track::Type::Instrument) { continue; }
+			auto instrumentTrack = static_cast<InstrumentTrack*>(track);
+
+			if (!firstTrack) { firstTrack = instrumentTrack; }
+
+			for (auto clip: instrumentTrack->getClips())
+			{
+				auto midiClip = static_cast<MidiClip*>(clip);
+
+				if (midiClip->notes().empty())
 				{
-					TextFloat::displayMessage(tr("No active clip"),
-						tr("Please open a clip by double clicking on it in the Song Editor."),
+					if (!firstEmptyClip) { firstEmptyClip = midiClip; }
+				}
+				else if (!firstMelodyClip)
+				{
+					firstMelodyClip = midiClip;
+				}
+				else
+				{
+					TextFloat::displayMessage(tr("No clip selected"),
+						tr("Double click a melody clip in the Song Editor to open it."),
 						embed::getIconPixmap("error"), 5000);
 					parentWidget()->hide();
 					return;
 				}
 			}
 		}
-
-		if (firstTrack)
+		if (firstMelodyClip || firstEmptyClip)
 		{
-			MidiClip* midiClip = new MidiClip(dynamic_cast<InstrumentTrack*>(firstTrack));
-			m_editor->setCurrentMidiClip(midiClip);
+			m_editor->setCurrentMidiClip(firstMelodyClip ? firstMelodyClip : firstEmptyClip);
+		}
+		else if (firstTrack)
+		{
+			m_editor->setCurrentMidiClip(new MidiClip(firstTrack));
 		}
 		else
 		{
-			TextFloat::displayMessage(tr("No instruments"),
-				tr("Please add an instrument by dragging it from the sidebar to the Song Editor."),
+			TextFloat::displayMessage(tr("No instrument tracks"),
+				tr("Drag an instrument plugin or preset from the sidebar to the Song Editor."),
 				embed::getIconPixmap("error"), 5000);
 			parentWidget()->hide();
 		}
@@ -5421,12 +5443,14 @@ void PianoRollWindow::showEvent(QShowEvent *se)
 
 void PianoRollWindow::updateAfterMidiClipChange()
 {
-	clipRenamed();
-	updateStepRecordingIcon(); //MIDI clip change turn step recording OFF - update icon accordingly
 	if (!m_editor->hasValidMidiClip())
 	{
 		parentWidget()->hide();
+		return;
 	}
+
+	clipRenamed();
+	updateStepRecordingIcon(); //MIDI clip change turn step recording OFF - update icon accordingly
 }
 
 void PianoRollWindow::clipRenamed()

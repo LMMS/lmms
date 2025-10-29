@@ -146,6 +146,7 @@ public:
 		return m_midiClip;
 	}
 
+	// TODO remove this since PianoRoll should no longer be visible without a valid midi clip
 	bool hasValidMidiClip() const
 	{
 		return m_midiClip != nullptr;
