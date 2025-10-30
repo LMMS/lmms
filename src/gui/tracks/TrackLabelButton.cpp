@@ -47,7 +47,7 @@ TrackLabelButton::TrackLabelButton( TrackView * _tv, QWidget * _parent ) :
 {
 	setAcceptDrops( true );
 	setFocusPolicy(Qt::NoFocus);
-	setCursor( QCursor( embed::getIconPixmap( "hand" ), 3, 3 ) );
+	setCursor(Qt::PointingHandCursor);
 	setToolButtonStyle( Qt::ToolButtonTextBesideIcon );
 
 	m_renameLineEdit = new TrackRenameLineEdit( this );
