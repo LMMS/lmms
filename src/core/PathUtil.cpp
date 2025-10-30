@@ -22,7 +22,7 @@ namespace lmms::PathUtil
 		switch (base)
 		{
 			case Base::ProjectDir       : loc = ConfigManager::inst()->userProjectsDir(); break;
-			case Base::FactoryProjects :
+			case Base::FactoryProjects  :
 			{
 				QDir fpd = QDir(ConfigManager::inst()->factoryProjectsDir());
 				loc = fpd.absolutePath(); break;
@@ -60,7 +60,7 @@ namespace lmms::PathUtil
 				if (error) { *error = (!s || projectPath.isEmpty()); }
 				break;
 			}
-			default                   : return QString("");
+			default                     : return QString("");
 		}
 		return QDir::cleanPath(loc) + "/";
 	}
@@ -97,7 +97,7 @@ namespace lmms::PathUtil
 		}
 	}
 
-	Base baseLookup(const QString & input)
+	Base baseLookup(const QString& input)
 	{
 		if (input.isEmpty()) { return Base::Absolute; };
 
@@ -110,36 +110,36 @@ namespace lmms::PathUtil
 	}
 
 
+
+
 	// Enforce forward slashes for cross-platform compatibility, see #8107.
-	QString serializePath(const QString & input)
+	QString serializePath(const QString& input)
 	{
 		if (input.isEmpty()) { return input; }
 
 		return QString(input).replace("\\", "/");
 	}
 
-	QString stripPrefix(const QString & input)
+	QString stripPrefix(const QString& input)
 	{
 		if (input.isEmpty()) { return input; }
 
 		QString path = serializePath(input);
-
 		return path.mid(basePrefix(baseLookup(path)).length());
 	}
 
-	QString cleanName(const QString & input)
+	QString cleanName(const QString& input)
 	{
 		if (input.isEmpty()) { return input; }
 
 		QString path = serializePath(input);
-
 		return stripPrefix(QFileInfo(path).completeBaseName());
 	}
 
 
 
 
-	QString oldRelativeUpgrade(const QString & input)
+	QString oldRelativeUpgrade(const QString& input)
 	{
 		Base assumedBase = Base::Absolute;
 
@@ -166,15 +166,11 @@ namespace lmms::PathUtil
 		return basePrefix(assumedBase) + path;
 	}
 
-
-
-
-	QString toAbsolute(const QString & input, bool* error /* = nullptr*/)
+	QString toAbsolute(const QString& input, bool* error /* = nullptr*/)
 	{
 		if (input.isEmpty()) { return input; }
 
 		QString path = serializePath(input);
-
 		//First, do no harm to absolute paths
 		// Note: Paths starting with a colon (:) are always considered absolute, as they denote a QResource.
 		QFileInfo inputFileInfo = QFileInfo(path);
@@ -189,7 +185,7 @@ namespace lmms::PathUtil
 		return baseLocation(base, error) + upgraded.remove(0, basePrefix(base).length());
 	}
 
-	QString relativeOrAbsolute(const QString & input, const Base base)
+	QString relativeOrAbsolute(const QString& input, const Base base)
 	{
 		if (input.isEmpty()) { return input; }
 
@@ -204,12 +200,11 @@ namespace lmms::PathUtil
 			: relativePath;
 	}
 
-	QString toShortestRelative(const QString & input, bool allowLocal /* = false*/)
+	QString toShortestRelative(const QString& input, bool allowLocal /* = false*/)
 	{
 		if (input.isEmpty()) { return basePrefix(Base::Absolute); }
 
 		QString path = serializePath(input);
-
 		QFileInfo inputFileInfo = QFileInfo(path);
 		QString absolutePath = inputFileInfo.isAbsolute() ? path : toAbsolute(path);
 
