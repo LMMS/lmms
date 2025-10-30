@@ -442,7 +442,7 @@ PatmanView::PatmanView( Instrument * _instrument, QWidget * _parent ) :
 
 	m_openFileButton = new PixmapButton( this, nullptr );
 	m_openFileButton->setObjectName( "openFileButton" );
-	m_openFileButton->setCursor( QCursor( Qt::PointingHandCursor ) );
+	m_openFileButton->setCursor(Qt::PointingHandCursor);
 	m_openFileButton->move( 227, 86 );
 	m_openFileButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"select_file_on" ) );

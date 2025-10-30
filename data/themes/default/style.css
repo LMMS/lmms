@@ -799,10 +799,6 @@ lmms--gui--TimeLineWidget {
 
 	qproperty-barLineColor: rgb( 192, 192, 192 );
 	qproperty-barNumberColor: rgb( 192, 192, 192 );
-
-	/* Cursor hotspots for loop marker adjustment */
-	qproperty-mouseHotspotSelLeft: 0px 16px;
-	qproperty-mouseHotspotSelRight: 32px 16px;
 }
 
 lmms--gui--TrackContainerView QLabel
@@ -823,10 +819,6 @@ lmms--gui--ClipView   {
 	qproperty-textShadowColor: rgba(0,0,0,200);
 	qproperty-gradient: false; /* boolean property, set true to have a gradient */
 	qproperty-markerColor: rgb(0, 0, 0);
-	/* finger tip offset of cursor */
-	qproperty-mouseHotspotHand: 7px 2px;
-	qproperty-mouseHotspotKnife: 0px 0px;
-
 	font-size: 11px;
 }
 
