@@ -82,10 +82,10 @@ private slots:
 	void toggleSoloLegacyBehavior(bool enabled);
 	void toggleTrackDeletionWarning(bool enabled);
 	void toggleMixerChannelDeletionWarning(bool enabled);
-	void toggleHideOnDetachedClosed(bool enabled);
 	void toggleMMPZ(bool enabled);
 	void toggleDisableBackup(bool enabled);
 	void toggleOpenLastProject(bool enabled);
+	void detachBehaviorChanged();
 	void loopMarkerModeChanged();
 	void setLanguage(int lang);
 
@@ -145,10 +145,11 @@ private:
 	bool m_soloLegacyBehavior;
 	bool m_trackDeletionWarning;
 	bool m_mixerChannelDeletionWarning;
-	bool m_hideOnDetachedClosed;
 	bool m_MMPZ;
 	bool m_disableBackup;
 	bool m_openLastProject;
+	QString m_detachBehavior;
+	QComboBox* m_detachBehaviorComboBox;
 	QString m_loopMarkerMode;
 	QComboBox* m_loopMarkerComboBox;
 	QString m_lang;

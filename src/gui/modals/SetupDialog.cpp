@@ -112,14 +112,13 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 			"ui", "trackdeletionwarning", "1").toInt()),
 	m_mixerChannelDeletionWarning(ConfigManager::inst()->value(
 			"ui", "mixerchanneldeletionwarning", "1").toInt()),
-	m_hideOnDetachedClosed(ConfigManager::inst()->value(
-			"ui", "hideondetachedclosed", "0").toInt()),
 	m_MMPZ(!ConfigManager::inst()->value(
 			"app", "nommpz").toInt()),
 	m_disableBackup(!ConfigManager::inst()->value(
 			"app", "disablebackup").toInt()),
 	m_openLastProject(ConfigManager::inst()->value(
 			"app", "openlastproject").toInt()),
+	m_detachBehavior{ConfigManager::inst()->value("ui", "detachBehavior", "show")},
 	m_loopMarkerMode{ConfigManager::inst()->value("app", "loopmarkermode", "dual")},
 	m_lang(ConfigManager::inst()->value(
 			"app", "language")),
@@ -256,8 +255,19 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 		m_trackDeletionWarning, SLOT(toggleTrackDeletionWarning(bool)), false);
 	addCheckBox(tr("Show warning when deleting a mixer channel that is in use"), guiGroupBox, guiGroupLayout,
 		m_mixerChannelDeletionWarning,	SLOT(toggleMixerChannelDeletionWarning(bool)), false);
-	addCheckBox(tr("Hide subwindows when attaching them"), guiGroupBox, guiGroupLayout,
-		m_hideOnDetachedClosed, SLOT(toggleHideOnDetachedClosed(bool)), false);
+
+	m_detachBehaviorComboBox = new QComboBox{guiGroupBox};
+
+	m_detachBehaviorComboBox->addItem(tr("Show when attaching"), "show");
+	m_detachBehaviorComboBox->addItem(tr("Hide when attaching"), "hide");
+	m_detachBehaviorComboBox->addItem(tr("Always detached"), "detached");
+
+	m_detachBehaviorComboBox->setCurrentIndex(m_detachBehaviorComboBox->findData(m_detachBehavior));
+	connect(m_detachBehaviorComboBox, qOverload<int>(&QComboBox::currentIndexChanged),
+		this, &SetupDialog::detachBehaviorChanged);
+
+	guiGroupLayout->addWidget(new QLabel{tr("Detaching behavior"), guiGroupBox});
+	guiGroupLayout->addWidget(m_detachBehaviorComboBox);
 
 	m_loopMarkerComboBox = new QComboBox{guiGroupBox};
 
@@ -979,14 +989,13 @@ void SetupDialog::accept()
 					QString::number(m_trackDeletionWarning));
 	ConfigManager::inst()->setValue("ui", "mixerchanneldeletionwarning",
 					QString::number(m_mixerChannelDeletionWarning));
-	ConfigManager::inst()->setValue("ui", "hideondetachedclosed",
-					QString::number(m_hideOnDetachedClosed));
 	ConfigManager::inst()->setValue("app", "nommpz",
 					QString::number(!m_MMPZ));
 	ConfigManager::inst()->setValue("app", "disablebackup",
 					QString::number(!m_disableBackup));
 	ConfigManager::inst()->setValue("app", "openlastproject",
 					QString::number(m_openLastProject));
+	ConfigManager::inst()->setValue("ui", "detachbehavior", m_detachBehavior);
 	ConfigManager::inst()->setValue("app", "loopmarkermode", m_loopMarkerMode);
 	ConfigManager::inst()->setValue("app", "language", m_lang);
 	ConfigManager::inst()->setValue("ui", "saveinterval",
@@ -1108,12 +1117,6 @@ void SetupDialog::toggleMixerChannelDeletionWarning(bool enabled)
 }
 
 
-void SetupDialog::toggleHideOnDetachedClosed(bool enabled)
-{
-	m_hideOnDetachedClosed = enabled;
-}
-
-
 void SetupDialog::toggleMMPZ(bool enabled)
 {
 	m_MMPZ = enabled;
@@ -1129,6 +1132,12 @@ void SetupDialog::toggleDisableBackup(bool enabled)
 void SetupDialog::toggleOpenLastProject(bool enabled)
 {
 	m_openLastProject = enabled;
+}
+
+
+void SetupDialog::detachBehaviorChanged()
+{
+	m_detachBehavior = m_detachBehaviorComboBox->currentData().toString();
 }
 
 

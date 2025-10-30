@@ -129,15 +129,15 @@ void EffectView::editControls()
 {
 	if( m_subWindow )
 	{
-		if( !m_subWindow->isVisible() )
+		if( !m_controlView->isVisible() )
 		{
-			m_subWindow->show();
-			m_subWindow->raise();
+			m_controlView->show();
+			m_controlView->raise();
 			effect()->controls()->setViewVisible( true );
 		}
 		else
 		{
-			m_subWindow->hide();
+			m_controlView->hide();
 			effect()->controls()->setViewVisible( false );
 		}
 	}
