@@ -620,24 +620,24 @@ bool SubWindow::eventFilter(QObject* obj, QEvent* event)
 		case QEvent::Close:
 			if (isDetached())
 			{
-				//attach();
-				event->ignore();
 				QString detachBehavior = ConfigManager::inst()->value("ui", "detachbehavior", "show");
 				if (detachBehavior == "show")
 				{
 					attach();
+					event->ignore();
 					return true;
 				}
 				else if (detachBehavior == "hide")
 				{
 					attach();
 					hide();
+					event->ignore();
 					return QMdiSubWindow::eventFilter(obj, event);
 				}
 				else if (detachBehavior == "detached")
 				{
-					widget()->hide();
-					return true;
+					event->accept();
+					return QMdiSubWindow::eventFilter(obj, event);
 				}
 			}
 			else
