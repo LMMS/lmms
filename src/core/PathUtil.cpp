@@ -60,7 +60,7 @@ namespace lmms::PathUtil
 				if (error) { *error = (!s || projectPath.isEmpty()); }
 				break;
 			}
-			default                     : return QString("");
+			default                   : return QString("");
 		}
 		return QDir::cleanPath(loc) + "/";
 	}
