@@ -105,8 +105,18 @@ inline T fastRand(T range) noexcept
 template<typename T> requires std::is_integral_v<T>
 inline T fastRand(T range) noexcept
 {
+	// The integer specialization of this function is kind of weird, but
+	// it is necessary to prevent massive bias away from the maximum
+	// value. FAST_RAND_RATIO here is 1 greater than normal, so it will
+	// actually result in an open-end range.
 	constexpr float FAST_RAND_RATIO = 1.f / 32768;
-	return static_cast<T>(std::floor(fastRand() * (1 + range) * FAST_RAND_RATIO));
+	// Since it's open-end using the above ratio, increase the magnitude
+	// by 1. All values greater than range get, rounded to range, and
+	// the bias is removed.
+	const float frange = static_cast<float>(range); // Even on -O3 it casts twice without this for some reason??
+	const float r = frange + std::copysign(1.f, frange);
+	// Always round towards 0 (implicit truncation occurs during static_cast).
+	return static_cast<T>(fastRand() * r * FAST_RAND_RATIO);
 }
 
 

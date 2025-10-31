@@ -768,10 +768,10 @@ void SfxrInstrumentView::genLaser()
 	{
 		s->m_startFreqModel.setValue(fastRand(0.3f, 0.9f));
 		s->m_minFreqModel.setValue(fastRand(0.1f));
-		s->m_slideModel.setValue(fastRand(-0.35f,-0.65f));
+		s->m_slideModel.setValue(fastRand(-0.65f,-0.35f));
 	}
 
-	if (oneIn(3))
+	if (oneIn(2))
 	{
 		s->m_sqrDutyModel.setValue(fastRand(0.5f));
 		s->m_sqrSweepModel.setValue(0.2f);
@@ -972,7 +972,7 @@ void SfxrInstrumentView::randomize()
 	s->m_attModel.setValue(pow_hack<3>(fastRand(-1.f, 1.f)));
 	s->m_holdModel.setValue(pow_hack<2>(fastRand(-1.f, 1.f)));
 	s->m_decModel.setValue(fastRand(-1.f, 1.f));
-	s->m_susModel.setValue(pow_hack<2>(fastRand(-1.f, 1.f)));
+	s->m_susModel.setValue(pow_hack<2>(fastRand(0.8f)));
 	if (s->m_attModel.value() + s->m_holdModel.value() + s->m_decModel.value() < 0.2f)
 	{
 		s->m_holdModel.setValue(s->m_holdModel.value() + fastRand(0.2f, 0.5f));
