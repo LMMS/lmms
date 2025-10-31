@@ -353,15 +353,16 @@ void SubWindow::attach()
 	frame.moveTo(mdiArea()->mapFromGlobal(frame.topLeft()));
 	frame += decorationMargins();
 
-	// arbitrary values, require window to touch `mdiArea - margin`
-	// TODO make this live configurble maybe?
-	const auto margin = QMargins(40, 40, 40, 40);
+	// Make sure the window fully fits on screen
+	frame.setSize({std::min(frame.width(), mdiArea()->width()),
+	               std::min(frame.height(), mdiArea()->height())});
+
 	frame.moveTo(std::clamp(frame.left(),
-	                        margin.left() - frame.width(),
-	                        mdiArea()->rect().width() - margin.right()),
+	                        0,
+	                        mdiArea()->rect().width() - frame.width()),
 	             std::clamp(frame.top(),
-	                        margin.top() - frame.height(),
-	                        mdiArea()->rect().height() - margin.bottom()));
+	                        0,
+	                        mdiArea()->rect().height() - frame.height()));
 
 	auto flags = windowFlags();
 	flags &= ~Qt::Window;
