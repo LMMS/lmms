@@ -22,7 +22,7 @@ namespace lmms::PathUtil
 		switch (base)
 		{
 			case Base::ProjectDir       : loc = ConfigManager::inst()->userProjectsDir(); break;
-			case Base::FactoryProjects  :
+			case Base::FactoryProjects :
 			{
 				QDir fpd = QDir(ConfigManager::inst()->factoryProjectsDir());
 				loc = fpd.absolutePath(); break;
