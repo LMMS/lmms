@@ -557,7 +557,7 @@ void AutomationClip::applyDragValue()
 
 
 
-float AutomationClip::valueAt(const TimePos& _time, bool wantInValue) const
+float AutomationClip::valueAt(const TimePos& _time, bool wantInValue /*= false*/) const
 {
 	QMutexLocker m(&m_clipMutex);
 
