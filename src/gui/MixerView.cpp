@@ -56,9 +56,9 @@ namespace lmms::gui
 
 
 MixerView::MixerView(Mixer* mixer) :
-	QWidget(),
-	ModelView(nullptr, this),
-	SerializingObjectHook(),
+	DetachableWidget{},
+	ModelView{nullptr, this},
+	SerializingObjectHook{},
 	m_mixer(mixer)
 {
 #if QT_VERSION < 0x50C00
@@ -172,10 +172,14 @@ MixerView::MixerView(Mixer* mixer) :
 	// timer for updating faders
 	connect(mainWindow, &MainWindow::periodicUpdate, this, &MixerView::updateFaders);
 
-	// add ourself to workspace
-	QMdiSubWindow* subWin = mainWindow->addWindowedWidget(this);
+	// adjust window size
+	layout()->invalidate();
+	resize(sizeHint());
+	setFixedHeight(height());
 	layout()->setSizeConstraint(QLayout::SetMinimumSize);
-	subWin->layout()->setSizeConstraint(QLayout::SetMinAndMaxSize);
+
+	// add ourself to workspace
+	[[maybe_unused]] SubWindow* subWin = mainWindow->addWindowedWidget(this);
 
 	parentWidget()->setAttribute(Qt::WA_DeleteOnClose, false);
 	parentWidget()->move(5, 310);
@@ -548,21 +552,6 @@ void MixerView::keyPressEvent(QKeyEvent * e)
 			break;
 	}
 }
-
-
-
-void MixerView::closeEvent(QCloseEvent * ce)
- {
-	if (parentWidget())
-	{
-		parentWidget()->hide();
-	}
-	else
-	{
-		hide();
-	}
-	ce->ignore();
- }
 
 
 
