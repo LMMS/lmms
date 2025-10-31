@@ -112,7 +112,7 @@ namespace lmms::PathUtil
 
 
 
-	// Enforce forward slashes for cross-platform compatibility, see #8107.
+	// Enforce forward slashes for cross-platform compatibility due to limitations of QDir::fromNativeSeparators, see #8107.
 	QString serializePath(const QString& input)
 	{
 		if (input.isEmpty()) { return input; }
