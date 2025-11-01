@@ -165,12 +165,6 @@ AudioFileWriter::Impl::Impl(std::filesystem::path path, AudioFileFormat format, 
 	}
 }
 
-auto AudioFileWriter::read(InterleavedBufferView<float> dst) -> std::size_t
-{
-	assert(dst.channels() == m_impl->m_info.channels && "invalid channel count");
-	return sf_readf_float(m_impl->m_sndfile, dst.data(), dst.frames());
-}
-
 auto AudioFileWriter::write(InterleavedBufferView<const float> src) -> std::size_t
 {
 	assert(src.channels() == m_impl->m_info.channels && "invalid channel count");
