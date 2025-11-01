@@ -60,14 +60,6 @@ public:
 	~AudioFileWriter();
 
     /**
-     * @brief Read from the audio file using the given @a dst buffer
-     * 
-     * @param dst The buffer to read the data into.
-     * @returns The number of frames written into @a dst.
-     */
-	auto read(InterleavedBufferView<float> dst) -> std::size_t;
-
-    /**
      * @brief Write audio to the audio file using the given @a src buffer.
      * 
      * @param src The audio data to write into the audio file.
