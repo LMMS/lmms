@@ -222,7 +222,7 @@ void TrackContentWidget::update()
 
 
 
-// resposible for moving track-content-widgets to appropriate position after
+// responsible for moving track-content-widgets to appropriate position after
 // change of visible viewport
 /*! \brief Move the trackContentWidget to a new place in time
  *
@@ -643,7 +643,7 @@ void TrackContentWidget::paintEvent( QPaintEvent * pe )
  */
 void TrackContentWidget::resizeEvent( QResizeEvent * resizeEvent )
 {
-	// Update backgroud
+	// Update background
 	updateBackground();
 	// Force redraw
 	QWidget::resizeEvent( resizeEvent );

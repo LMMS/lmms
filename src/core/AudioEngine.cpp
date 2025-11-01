@@ -81,7 +81,6 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 	m_workers(),
 	m_numWorkers( QThread::idealThreadCount()-1 ),
 	m_newPlayHandles( PlayHandle::MaxNumber ),
-	m_qualitySettings(qualitySettings::Interpolation::Linear),
 	m_masterGain( 1.0f ),
 	m_audioDev( nullptr ),
 	m_audioDevStartFailed( false ),
@@ -127,7 +126,7 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 		}
 	}
 
-	// allocte the FIFO from the determined size
+	// allocate the FIFO from the determined size
 	m_fifo = new Fifo( fifoSize );
 
 	// now that framesPerPeriod is fixed initialize global BufferManager

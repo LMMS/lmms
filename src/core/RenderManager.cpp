@@ -34,11 +34,8 @@
 namespace lmms
 {
 
-RenderManager::RenderManager(const AudioEngine::qualitySettings& qualitySettings, const OutputSettings& outputSettings,
-	AudioFileFormat fmt, QString outputPath)
-	: m_qualitySettings(qualitySettings)
-	, m_oldQualitySettings(Engine::audioEngine()->currentQualitySettings())
-	, m_outputSettings(outputSettings)
+RenderManager::RenderManager(const OutputSettings& outputSettings, AudioFileFormat fmt, QString outputPath)
+	: m_outputSettings(outputSettings)
 	, m_format(fmt)
 	, m_outputPath(outputPath)
 {
@@ -136,11 +133,7 @@ void RenderManager::renderProject()
 
 void RenderManager::render(QString outputPath)
 {
-	m_activeRenderer = std::make_unique<ProjectRenderer>(
-			m_qualitySettings,
-			m_outputSettings,
-			m_format,
-			outputPath);
+	m_activeRenderer = std::make_unique<ProjectRenderer>(m_outputSettings, m_format, outputPath);
 
 	// pass progress signals through
 	connect( m_activeRenderer.get(), SIGNAL(progressChanged(int)),

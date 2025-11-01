@@ -33,11 +33,10 @@
 namespace lmms
 {
 
-ProjectRenderer::ProjectRenderer(const AudioEngine::qualitySettings& qualitySettings,
+ProjectRenderer::ProjectRenderer(
 	const OutputSettings& outputSettings, AudioFileFormat audioFileFormat, const QString& outputFilename)
 	: QThread(Engine::audioEngine())
 	, m_audioFileWriter(PathUtil::fsConvert(outputFilename), audioFileFormat, outputSettings)
-	, m_qualitySettings(qualitySettings)
 	, m_progress(0)
 	, m_abort(false)
 {

@@ -40,8 +40,7 @@ class LMMS_EXPORT ProjectRenderer : public QThread
 {
 	Q_OBJECT
 public:
-	ProjectRenderer(const AudioEngine::qualitySettings& _qs, const OutputSettings& _os, AudioFileFormat _file_format,
-		const QString& _out_file);
+	ProjectRenderer(const OutputSettings& _os, AudioFileFormat _file_format, const QString& _out_file);
 	~ProjectRenderer() override = default;
 
 public slots:
@@ -56,15 +55,10 @@ signals:
 
 private:
 	void run() override;
-
 	AudioFileWriter m_audioFileWriter;
-	AudioEngine::qualitySettings m_qualitySettings;
-
 	volatile int m_progress;
 	volatile bool m_abort;
-
-} ;
-
+};
 
 } // namespace lmms
 
