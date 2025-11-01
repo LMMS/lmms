@@ -505,10 +505,7 @@ void MainWindow::finalize()
 			getGUI()->songEditor()
 	})
 	{
-		QMdiSubWindow* window = addWindowedWidget(widget);
-		window->setWindowIcon(widget->windowIcon());
-		window->setAttribute(Qt::WA_DeleteOnClose, false);
-		window->resize(widget->sizeHint());
+		addWindowedWidget(widget);
 	}
 
 	getGUI()->automationEditor()->parentWidget()->hide();
