@@ -25,7 +25,7 @@
 #ifndef LMMS_PROJECT_RENDERER_H
 #define LMMS_PROJECT_RENDERER_H
 
-#include "AudioFile.h"
+#include "AudioFileWriter.h"
 #include "AudioEngine.h"
 #include "AudioFileFormats.h"
 #include "OutputSettings.h"
@@ -57,7 +57,7 @@ signals:
 private:
 	void run() override;
 
-	AudioFile m_audioFile;
+	AudioFileWriter m_audioFileWriter;
 	AudioEngine::qualitySettings m_qualitySettings;
 
 	volatile int m_progress;

@@ -22,7 +22,7 @@
  *
  */
 
-#include "AudioFile.h"
+#include "AudioFileWriter.h"
 
 #include <sndfile.h>
 
@@ -92,7 +92,7 @@ SF_INFO sfInfoFromOutputSettings(AudioFileFormat format, OutputSettings settings
 } // namespace
 
 namespace lmms {
-struct AudioFile::Impl
+struct AudioFileWriter::Impl
 {
 	Impl(std::filesystem::path path);
 	Impl(std::filesystem::path path, AudioFileFormat format, OutputSettings settings);
@@ -101,28 +101,22 @@ struct AudioFile::Impl
 	std::filesystem::path m_path;
 };
 
-AudioFile::AudioFile(std::filesystem::path path)
-	: m_impl(std::make_unique<Impl>(std::move(path)))
-{
-	if (!m_impl->m_sndfile) { throw std::runtime_error{sf_strerror(m_impl->m_sndfile)}; }
-}
-
-AudioFile::AudioFile(std::filesystem::path path, AudioFileFormat format, OutputSettings settings)
+AudioFileWriter::AudioFileWriter(std::filesystem::path path, AudioFileFormat format, OutputSettings settings)
 	: m_impl(std::make_unique<Impl>(std::move(path), format, settings))
 {
 	if (!m_impl->m_sndfile) { throw std::runtime_error{sf_strerror(m_impl->m_sndfile)}; }
 }
 
-AudioFile::~AudioFile() = default;
+AudioFileWriter::~AudioFileWriter() = default;
 
-AudioFile::Impl::Impl(std::filesystem::path path)
+AudioFileWriter::Impl::Impl(std::filesystem::path path)
 	: m_info()
 	, m_sndfile(openAudioFile(path, SFM_READ, &m_info))
 	, m_path(std::move(path))
 {
 }
 
-AudioFile::Impl::Impl(std::filesystem::path path, AudioFileFormat format, OutputSettings settings)
+AudioFileWriter::Impl::Impl(std::filesystem::path path, AudioFileFormat format, OutputSettings settings)
 	: m_info(sfInfoFromOutputSettings(format, settings))
 	, m_sndfile(openAudioFile(path, SFM_WRITE, &m_info))
 	, m_path(std::move(path))
@@ -179,34 +173,34 @@ AudioFile::Impl::Impl(std::filesystem::path path, AudioFileFormat format, Output
 	}
 }
 
-auto AudioFile::read(InterleavedBufferView<float> dst) -> std::size_t
+auto AudioFileWriter::read(InterleavedBufferView<float> dst) -> std::size_t
 {
 	assert(dst.channels() == m_impl->m_info.channels && "invalid channel count");
 	return sf_readf_float(m_impl->m_sndfile, dst.data(), dst.frames());
 }
 
-auto AudioFile::write(InterleavedBufferView<const float> src) -> std::size_t
+auto AudioFileWriter::write(InterleavedBufferView<const float> src) -> std::size_t
 {
 	assert(src.channels() == m_impl->m_info.channels && "invalid channel count");
 	return sf_writef_float(m_impl->m_sndfile, src.data(), src.frames());
 }
 
-auto AudioFile::frames() const -> f_cnt_t
+auto AudioFileWriter::frames() const -> f_cnt_t
 {
 	return m_impl->m_info.frames;
 }
 
-auto AudioFile::channels() const -> ch_cnt_t
+auto AudioFileWriter::channels() const -> ch_cnt_t
 {
 	return m_impl->m_info.channels;
 }
 
-auto AudioFile::sampleRate() const -> sample_rate_t
+auto AudioFileWriter::sampleRate() const -> sample_rate_t
 {
 	return m_impl->m_info.samplerate;
 }
 
-auto AudioFile::path() const -> const std::filesystem::path&
+auto AudioFileWriter::path() const -> const std::filesystem::path&
 {
 	return m_impl->m_path;
 }

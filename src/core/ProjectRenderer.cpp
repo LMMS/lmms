@@ -36,7 +36,7 @@ namespace lmms
 ProjectRenderer::ProjectRenderer(const AudioEngine::qualitySettings& qualitySettings,
 	const OutputSettings& outputSettings, AudioFileFormat audioFileFormat, const QString& outputFilename)
 	: QThread(Engine::audioEngine())
-	, m_audioFile(PathUtil::fsConvert(outputFilename), audioFileFormat, outputSettings)
+	, m_audioFileWriter(PathUtil::fsConvert(outputFilename), audioFileFormat, outputSettings)
 	, m_qualitySettings(qualitySettings)
 	, m_progress(0)
 	, m_abort(false)
@@ -81,7 +81,7 @@ void ProjectRenderer::run()
 	perfLog.end();
 
 	// If the user aborted export-process, the file has to be deleted.
-	if (m_abort) { std::filesystem::remove(m_audioFile.path()); }
+	if (m_abort) { std::filesystem::remove(m_audioFileWriter.path()); }
 }
 
 void ProjectRenderer::processNextBuffer()
@@ -89,17 +89,17 @@ void ProjectRenderer::processNextBuffer()
 	assert(m_audioFile.channels() == 1 || m_audioFile.channels()  == 2 && "invalid channel count");
 	const auto framesPerPeriod = Engine::audioEngine()->framesPerPeriod();
 
-	if (m_audioFile.channels() == 1)
+	if (m_audioFileWriter.channels() == 1)
 	{
 		const auto src = Engine::audioEngine()->renderNextBuffer();
 		auto dst = std::vector<float>(framesPerPeriod);
 		std::transform(src, src + framesPerPeriod, dst.begin(), [](auto& frame) { return frame.average(); });
-		m_audioFile.write({dst.data(), 2, framesPerPeriod});
+		m_audioFileWriter.write({dst.data(), 2, framesPerPeriod});
 	}
-	else if (m_audioFile.channels() == 2)
+	else if (m_audioFileWriter.channels() == 2)
 	{
 		const auto src = Engine::audioEngine()->renderNextBuffer();
-		m_audioFile.write({&src[0][0], 2, framesPerPeriod});
+		m_audioFileWriter.write({&src[0][0], 2, framesPerPeriod});
 	}
 }
 

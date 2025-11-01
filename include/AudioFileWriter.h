@@ -1,5 +1,5 @@
 /*
- * AudioFile.h
+ * AudioFileWriter.h
  *
  * Copyright (c) 2025 Sotonye Atemie <sakertooth@gmail.com>
  *
@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef LMMS_AUDIO_FILE_H
-#define LMMS_AUDIO_FILE_H
+#ifndef LMMS_AUDIO_FILE_WRITER_H
+#define LMMS_AUDIO_FILE_WRITER_H
 
 #include <filesystem>
 
@@ -33,19 +33,12 @@
 
 namespace lmms {
 /**
- * @brief An abstraction for a handle to an audio file on disk.
+ * @brief A class that can be used to write to audio files on disk.
  *
  */
-class AudioFile
+class AudioFileWriter
 {
 public:
-	/**
-	 * @brief Construct a new audio file object for reading using the given @a path.
-	 *
-	 * @param path The path to the audio file to read from.
-	 */
-	explicit AudioFile(std::filesystem::path path);
-
 	/**
 	 * @brief Construct a new Audio File object for writing to the given @a path.
 	 *
@@ -53,25 +46,25 @@ public:
 	 * @param format The audio file format to use
 	 * @param settings The various output settings for the write (e.g., bit rate, sample rate, bit depth, etc).
 	 */
-	AudioFile(std::filesystem::path path, AudioFileFormat format, OutputSettings settings);
+	AudioFileWriter(std::filesystem::path path, AudioFileFormat format, OutputSettings settings);
 
 	/**
 	 * @brief Destroy the audio file object, closing the internal handle if necessary.
 	 *
 	 */
-	~AudioFile();
+	~AudioFileWriter();
 
     //! Deleted copy constructor.
-	AudioFile(const AudioFile&) = delete;
+	AudioFileWriter(const AudioFileWriter&) = delete;
 
     //! Deleted move constructor.
-	AudioFile(AudioFile&&) = default;
+	AudioFileWriter(AudioFileWriter&&) = default;
 
     //! Deleted copy assignment operator.
-	AudioFile& operator=(const AudioFile&) = delete;
+	AudioFileWriter& operator=(const AudioFileWriter&) = delete;
 
     //! Deleted move assignment operator.
-	AudioFile& operator=(AudioFile&&) = default;
+	AudioFileWriter& operator=(AudioFileWriter&&) = default;
 
     /**
      * @brief Read from the audio file using the given @a dst buffer
@@ -107,4 +100,4 @@ private:
 };
 } // namespace lmms
 
-#endif // LMMS_AUDIO_FILE_H
+#endif // LMMS_AUDIO_FILE_WRITER_H
