@@ -94,7 +94,6 @@ SF_INFO sfInfoFromOutputSettings(AudioFileFormat format, OutputSettings settings
 namespace lmms {
 struct AudioFileWriter::Impl
 {
-	Impl(std::filesystem::path path);
 	Impl(std::filesystem::path path, AudioFileFormat format, OutputSettings settings);
 	SF_INFO m_info;
 	SNDFILE* m_sndfile;
@@ -108,13 +107,6 @@ AudioFileWriter::AudioFileWriter(std::filesystem::path path, AudioFileFormat for
 }
 
 AudioFileWriter::~AudioFileWriter() = default;
-
-AudioFileWriter::Impl::Impl(std::filesystem::path path)
-	: m_info()
-	, m_sndfile(openAudioFile(path, SFM_READ, &m_info))
-	, m_path(std::move(path))
-{
-}
 
 AudioFileWriter::Impl::Impl(std::filesystem::path path, AudioFileFormat format, OutputSettings settings)
 	: m_info(sfInfoFromOutputSettings(format, settings))
