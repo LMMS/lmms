@@ -39,6 +39,11 @@ namespace lmms {
 class AudioFileWriter
 {
 public:
+	AudioFileWriter(const AudioFileWriter&) = delete;
+	AudioFileWriter(AudioFileWriter&&) = delete;
+	AudioFileWriter& operator=(const AudioFileWriter&) = delete;
+	AudioFileWriter& operator=(AudioFileWriter&&) = delete;
+
 	/**
 	 * @brief Construct a new Audio File object for writing to the given @a path.
 	 *
@@ -53,18 +58,6 @@ public:
 	 *
 	 */
 	~AudioFileWriter();
-
-    //! Deleted copy constructor.
-	AudioFileWriter(const AudioFileWriter&) = delete;
-
-    //! Deleted move constructor.
-	AudioFileWriter(AudioFileWriter&&) = default;
-
-    //! Deleted copy assignment operator.
-	AudioFileWriter& operator=(const AudioFileWriter&) = delete;
-
-    //! Deleted move assignment operator.
-	AudioFileWriter& operator=(AudioFileWriter&&) = default;
 
     /**
      * @brief Read from the audio file using the given @a dst buffer
