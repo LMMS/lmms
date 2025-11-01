@@ -44,14 +44,14 @@ namespace lmms::gui
 {
 
 
-ControllerView::ControllerView (Controller * model, QWidget * parent)
+ControllerView::ControllerView(Controller * model, QWidget * parent)
 	: QFrame{parent}
 	, ModelView{model, this}
 	, m_subWindow{nullptr}
 	, m_controllerDlg{nullptr}
 {
-	this->setFrameStyle( QFrame::StyledPanel );
-	this->setFrameShadow( QFrame::Raised );
+	this->setFrameStyle(QFrame::StyledPanel);
+	this->setFrameShadow(QFrame::Raised);
 	setFocusPolicy(Qt::StrongFocus);
 
 	auto vBoxLayout = new QVBoxLayout(this);
@@ -77,7 +77,7 @@ ControllerView::ControllerView (Controller * model, QWidget * parent)
 
 	m_controllerDlg = getController()->createDialog(getGUI()->mainWindow()->workspace());
 
-	m_subWindow = getGUI()->mainWindow()->addWindowedWidget( m_controllerDlg );
+	m_subWindow = getGUI()->mainWindow()->addWindowedWidget(m_controllerDlg);
 	m_subWindow->setWindowFlag(Qt::WindowMaximizeButtonHint, false);
 	m_subWindow->hide();
 
