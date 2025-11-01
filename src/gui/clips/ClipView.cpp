@@ -96,11 +96,6 @@ ClipView::ClipView( Clip * clip,
 	m_patternClipBackground( 0, 0, 0 ),
 	m_gradient( true ),
 	m_markerColor(0, 0, 0),
-	m_mouseHotspotHand( 0, 0 ),
-	m_mouseHotspotKnife( 0, 0 ),
-	m_cursorHand( QCursor( embed::getIconPixmap( "hand" ) ) ),
-	m_cursorKnife( QCursor( embed::getIconPixmap( "cursor_knife" ) ) ),
-	m_cursorSetYet( false ),
 	m_needsUpdate( true )
 {
 	if( s_textFloat == nullptr )
@@ -111,7 +106,7 @@ ClipView::ClipView( Clip * clip,
 
 	setAttribute( Qt::WA_DeleteOnClose, true );
 	setFocusPolicy( Qt::StrongFocus );
-	setCursor( m_cursorHand );
+	setCursor(Qt::PointingHandCursor);
 	move( 0, 0 );
 	show();
 
@@ -167,14 +162,6 @@ ClipView::~ClipView()
  */
 void ClipView::update()
 {
-	if( !m_cursorSetYet )
-	{
-		m_cursorHand = QCursor( embed::getIconPixmap( "hand" ), m_mouseHotspotHand.width(), m_mouseHotspotHand.height() );
-		m_cursorKnife = QCursor( embed::getIconPixmap( "cursor_knife" ), m_mouseHotspotKnife.width(), m_mouseHotspotKnife.height() );
-		setCursor( m_cursorHand );
-		m_cursorSetYet = true;
-	}
-
 	if( fixedClips() )
 	{
 		updateLength();
@@ -330,7 +317,7 @@ void ClipView::updateLength()
 	else
 	{
 		// this std::max function is needed for clips that do not start or end on the beat, otherwise, they "disappear" when zooming to min 
-		// 3 is the minimun width needed to make a clip visible
+		// 3 is the minimum width needed to make a clip visible
 		setFixedWidth(std::max(static_cast<int>(m_clip->length() * pixelsPerBar() / TimePos::ticksPerBar() + 1), 3));
 	}
 	m_trackView->trackContainerView()->update();
@@ -504,10 +491,10 @@ void ClipView::updateCursor(QMouseEvent * me)
 	// If we are in the middle on knife mode, use the knife cursor
 	else if (m_trackView->trackContainerView()->knifeMode() && !isSelected())
 	{
-		setCursor(m_cursorKnife);
+		setCursor(Qt::SplitHCursor);
 	}
 	// If we are in the middle in any other mode, use the hand cursor
-	else { setCursor(m_cursorHand); }
+	else { setCursor(Qt::PointingHandCursor); }
 }
 
 
@@ -681,7 +668,7 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 				else if (knifeMode)
 				{
 					m_action = Action::Split;
-					setCursor( m_cursorKnife );
+					setCursor(Qt::SplitHCursor);
 					setMarkerPos( knifeMarkerPos( me ) );
 					setMarkerEnabled( true );
 					update();
@@ -996,7 +983,7 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 	}
 	else if( m_action == Action::Split )
 	{
-		setCursor(m_cursorKnife);
+		setCursor(Qt::SplitHCursor);
 		setMarkerPos(knifeMarkerPos(me));
 		update();
 	}

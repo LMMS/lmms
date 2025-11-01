@@ -156,7 +156,7 @@ void Oscillator::generateSquareWaveTable(int bands, sample_t* table, int firstBa
 {
 	using namespace std::numbers;
 	// square waves only contain odd harmonics,
-	// at diffrent levels when compared to triangle waves
+	// at different levels when compared to triangle waves
 	// https://en.wikipedia.org/wiki/Square_wave
 	for (int i = 0; i < OscillatorConstants::WAVETABLE_LENGTH; i++)
 	{

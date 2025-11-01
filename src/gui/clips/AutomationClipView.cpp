@@ -385,7 +385,7 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 	p.setPen( current? c.lighter( 130 ) : c.darker( 300 ) );
 	p.drawRect( 0, 0, rect().right(), rect().bottom() );
 
-	// draw the 'muted' pixmap only if the clip was manualy muted
+	// draw the 'muted' pixmap only if the clip was manually muted
 	if( m_clip->isMuted() )
 	{
 		const int spacing = BORDER_WIDTH;
