@@ -304,7 +304,6 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	// we can reuse this method.
 	updateSubWindow();
 
-	setWindowIcon(embed::getIconPixmap("instrument_track"));
 	subWin->hide();
 }
 
