@@ -304,6 +304,9 @@ public:
 	static bool isAudioDevNameValid(QString name);
 	static bool isMidiDevNameValid(QString name);
 
+	void startProcessing(bool needsFifo = true);
+	void stopProcessing();
+
 
 signals:
 	void sampleRateChanged();
@@ -334,10 +337,6 @@ private:
 
 	AudioEngine( bool renderOnly );
 	~AudioEngine() override;
-
-	void startProcessing(bool needsFifo = true);
-	void stopProcessing();
-
 
 	AudioDevice * tryAudioDevices();
 	MidiClient * tryMidiClients();
@@ -405,7 +404,6 @@ private:
 	friend class Engine;
 	friend class AudioEngineWorkerThread;
 	friend class ProjectRenderer;
-	friend class RenderManager;
 } ;
 
 } // namespace lmms
