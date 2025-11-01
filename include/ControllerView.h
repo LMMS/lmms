@@ -64,7 +64,6 @@ public:
 public slots:
 	void editControls();
 	void removeController();
-	void closeControls();
 	void renameController();
 	void moveUp();
 	void moveDown();
@@ -85,7 +84,6 @@ private:
 	QMdiSubWindow * m_subWindow;
 	ControllerDialog * m_controllerDlg;
 	QLabel * m_nameLabel;
-	bool m_show;
 
 } ;
 
