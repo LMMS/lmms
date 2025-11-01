@@ -44,7 +44,7 @@ namespace lmms::gui
 {
 
 
-ControllerView::ControllerView(Controller * model, QWidget * parent)
+ControllerView::ControllerView(Controller* model, QWidget* parent)
 	: QFrame{parent}
 	, ModelView{model, this}
 	, m_subWindow{nullptr}
