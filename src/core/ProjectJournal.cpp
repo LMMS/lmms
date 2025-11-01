@@ -133,7 +133,6 @@ void ProjectJournal::addJournalCheckPoint( JournallingObject *jo )
 		}
 
 		Engine::getSong()->setModified();
-		
 	}
 }
 
