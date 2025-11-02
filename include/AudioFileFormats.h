@@ -40,7 +40,9 @@ enum class AudioFileFormat
 	WAV,
 	FLAC,
 	OGG,
+#ifdef LMMS_HAVE_MP3LAME
 	MP3
+#endif
 };
 
 /**
@@ -61,7 +63,10 @@ struct AudioFileFormatDescriptor
 static constexpr auto AudioFileFormats = std::array{AudioFileFormatDescriptor{AudioFileFormat::WAV, "WAV", ".wav"},
 	AudioFileFormatDescriptor{AudioFileFormat::FLAC, "FLAC", ".flac"},
 	AudioFileFormatDescriptor{AudioFileFormat::OGG, "OGG", ".ogg"},
-	AudioFileFormatDescriptor{AudioFileFormat::MP3, "MP3", ".mp3"}};
+#ifdef LMMS_HAVE_MP3LAME
+	AudioFileFormatDescriptor{AudioFileFormat::MP3, "MP3", ".mp3"}
+#endif
+};
 
 } // namespace lmms
 

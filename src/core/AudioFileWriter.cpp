@@ -25,9 +25,12 @@
 #include "AudioFileWriter.h"
 
 #include <fstream>
-#include <lame/lame.h>
 #include <sndfile.h>
 #include <vector>
+
+#ifdef LMMS_HAVE_MP3LAME
+#include <lame/lame.h>
+#endif
 
 namespace lmms {
 
@@ -157,6 +160,7 @@ private:
 	SF_INFO m_info{};
 };
 
+#ifdef LMMS_HAVE_MP3LAME
 class LameBackend : public Backend
 {
 public:
@@ -187,11 +191,11 @@ public:
 
 	auto write(InterleavedBufferView<const float> src) -> std::size_t override
 	{
-		assert(src.channels() == 1 || src.channels()  == 2 && "unsupported channel count");
+		assert(src.channels() == 1 || src.channels() == 2 && "unsupported channel count");
 
 		m_encodeBuffer.resize(1.25 * src.frames() + 7200);
 
-		if (src.channels()  == 2)
+		if (src.channels() == 2)
 		{
 			lame_encode_buffer_interleaved_ieee_float(
 				m_lame, src.data(), src.frames(), m_encodeBuffer.data(), m_encodeBuffer.size());
@@ -206,20 +210,11 @@ public:
 		return src.frames();
 	}
 
-	auto frames() const -> f_cnt_t override
-	{
-		return lame_get_frameNum(m_lame);
-	}
+	auto frames() const -> f_cnt_t override { return lame_get_frameNum(m_lame); }
 
-	auto channels() const -> ch_cnt_t override
-	{
-		return lame_get_num_channels(m_lame);
-	}
+	auto channels() const -> ch_cnt_t override { return lame_get_num_channels(m_lame); }
 
-	auto sampleRate() const -> sample_rate_t override
-	{
-		return lame_get_in_samplerate(m_lame);
-	}
+	auto sampleRate() const -> sample_rate_t override { return lame_get_in_samplerate(m_lame); }
 
 private:
 	auto modeFromSettings(OutputSettings::StereoMode stereoMode) -> MPEG_mode
@@ -242,8 +237,8 @@ private:
 	std::vector<unsigned char> m_encodeBuffer;
 	std::vector<unsigned char> m_flushBuffer;
 };
-
-}
+#endif
+} // namespace
 
 struct AudioFileWriter::Impl
 {
@@ -256,12 +251,14 @@ struct AudioFileWriter::Impl
 		case AudioFileFormat::OGG:
 			m_backend = std::make_unique<SndfileBackend>(path, format, settings);
 			break;
+#ifdef LMMS_HAVE_MP3LAME
 		case AudioFileFormat::MP3:
 			// Note: Sndfile supports MP3 in version 1.1.0 and greater but is still missing some features, such as adding
 			// comments to the files and an option for joint stereo (which might be removed in the future if there is little
 			// need for it.). We also are still using 1.0.29 in our CI builds.
 			m_backend = std::make_unique<LameBackend>(path, format, settings);
 			break;
+#endif
 		}
 	}
 
