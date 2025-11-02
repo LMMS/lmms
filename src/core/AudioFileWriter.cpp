@@ -54,40 +54,9 @@ class SndfileBackend : public Backend
 public:
 	SndfileBackend(const std::filesystem::path& path, AudioFileFormat format, OutputSettings settings)
 	{
-		auto sfBitDepth = 0;
-		auto sfFormat = 0;
-
-		switch (settings.getBitDepth())
-		{
-		case OutputSettings::BitDepth::Depth16Bit:
-			sfBitDepth = SF_FORMAT_PCM_16;
-			break;
-		case OutputSettings::BitDepth::Depth24Bit:
-			sfBitDepth = SF_FORMAT_PCM_24;
-			break;
-		case OutputSettings::BitDepth::Depth32Bit:
-			sfBitDepth = SF_FORMAT_PCM_32;
-			break;
-		}
-
-		switch (format)
-		{
-		case AudioFileFormat::WAV:
-			sfFormat = SF_FORMAT_WAV | sfBitDepth;
-			break;
-		case AudioFileFormat::FLAC:
-			sfFormat = SF_FORMAT_FLAC | sfBitDepth;
-			break;
-		case AudioFileFormat::OGG:
-			sfFormat = SF_FORMAT_OGG | SF_FORMAT_VORBIS;
-			break;
-		default:
-			break;
-		}
-
 		m_info.samplerate = settings.getSampleRate();
 		m_info.channels = settings.getStereoMode() == OutputSettings::StereoMode::Mono ? 1 : 2;
-		m_info.format = sfFormat;
+		m_info.format = formatFromSettings(format, settings.getBitDepth());
 
 #ifdef LMMS_BUILD_WIN32
 		m_sndfile = sf_wchar_open(path.c_str(), SFM_WRITE, &m_info);
@@ -153,6 +122,37 @@ public:
 	}
 
 private:
+	auto bitDepthFromSettings(OutputSettings::BitDepth bitDepth) -> int
+	{
+		switch (bitDepth)
+		{
+		case OutputSettings::BitDepth::Depth16Bit:
+			return SF_FORMAT_PCM_16;
+		case OutputSettings::BitDepth::Depth24Bit:
+			return SF_FORMAT_PCM_24;
+		case OutputSettings::BitDepth::Depth32Bit:
+			return SF_FORMAT_PCM_32;
+		default:
+			return 0;
+		}
+	}
+
+	auto formatFromSettings(AudioFileFormat format, OutputSettings::BitDepth bitDepth) -> int
+	{
+		auto sfBitDepth = bitDepthFromSettings(bitDepth);
+		switch (format)
+		{
+		case AudioFileFormat::WAV:
+			return SF_FORMAT_WAV | sfBitDepth;
+		case AudioFileFormat::FLAC:
+			return SF_FORMAT_FLAC | sfBitDepth;
+		case AudioFileFormat::OGG:
+			return SF_FORMAT_OGG | SF_FORMAT_VORBIS;
+		default:
+			return 0;
+		}
+	}
+
 	SNDFILE* m_sndfile;
 	SF_INFO m_info{};
 };
