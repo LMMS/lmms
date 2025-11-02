@@ -96,10 +96,7 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 				{
 					m_controlView->layout()->setSizeConstraint(QLayout::SetFixedSize);
 				}
-				else
-				{
-					m_controlView->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-				}
+				// else hope it already manages its size
 			}
 			m_subWindow->setWindowFlag(Qt::WindowMaximizeButtonHint, false);
 			m_subWindow->hide();
