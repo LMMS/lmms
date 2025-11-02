@@ -29,12 +29,12 @@
 namespace {
 using namespace lmms;
 
-SNDFILE* openAudioFile(const std::filesystem::path& path, int mode, SF_INFO* sfinfo)
+SNDFILE* openAudioFile(const std::filesystem::path& path, SF_INFO* sfinfo)
 {
 #ifdef LMMS_BUILD_WIN32
-	return sf_wchar_open(path.c_str(), mode, sfinfo);
+	return sf_wchar_open(path.c_str(), SFM_WRITE, sfinfo);
 #else
-	return sf_open(path.c_str(), mode, sfinfo);
+	return sf_open(path.c_str(), SFM_WRITE, sfinfo);
 #endif
 }
 
@@ -110,7 +110,7 @@ AudioFileWriter::~AudioFileWriter() = default;
 
 AudioFileWriter::Impl::Impl(std::filesystem::path path, AudioFileFormat format, OutputSettings settings)
 	: m_info(sfInfoFromOutputSettings(format, settings))
-	, m_sndfile(openAudioFile(path, SFM_WRITE, &m_info))
+	, m_sndfile(openAudioFile(path, &m_info))
 	, m_path(std::move(path))
 {
 	// This only works for a select number of formats.
