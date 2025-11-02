@@ -24,7 +24,10 @@
 
 #include "AudioFileWriter.h"
 
+#include <fstream>
+#include <lame/lame.h>
 #include <sndfile.h>
+#include <vector>
 
 namespace lmms {
 
@@ -157,50 +160,118 @@ private:
 class LameBackend : public Backend
 {
 public:
+	LameBackend(const LameBackend&) = delete;
+	LameBackend(LameBackend&&) = delete;
+	LameBackend& operator=(const LameBackend&) = delete;
+	LameBackend& operator=(LameBackend&&) = delete;
+
 	LameBackend(const std::filesystem::path& path, AudioFileFormat format, OutputSettings settings)
+		: m_lame(lame_init())
+		, m_flushBuffer(7200)
 	{
+		lame_set_num_channels(m_lame, settings.getStereoMode() == OutputSettings::StereoMode::Mono ? 1 : 2);
+		lame_set_in_samplerate(m_lame, settings.getSampleRate());
+		lame_set_brate(m_lame, settings.bitrate());
+		lame_set_mode(m_lame, modeFromSettings(settings.getStereoMode()));
+
+		id3tag_init(m_lame);
+		id3tag_set_comment(m_lame, "Created with LMMS");
+	}
+
+	~LameBackend()
+	{
+		lame_encode_flush(m_lame, m_flushBuffer.data(), m_flushBuffer.size());
+		m_file.write(reinterpret_cast<const char*>(m_flushBuffer.data()), m_flushBuffer.size());
+		lame_close(m_lame);
 	}
 
 	auto write(InterleavedBufferView<const float> src) -> std::size_t override
 	{
+		assert(src.channels() == 1 || src.channels()  == 2 && "unsupported channel count");
+
+		m_encodeBuffer.resize(1.25 * src.frames() + 7200);
+
+		if (src.channels()  == 2)
+		{
+			lame_encode_buffer_interleaved_ieee_float(
+				m_lame, src.data(), src.frames(), m_encodeBuffer.data(), m_encodeBuffer.size());
+		}
+		else if (src.channels() == 1)
+		{
+			lame_encode_buffer_float(
+				m_lame, src.data(), src.data(), src.frames(), m_encodeBuffer.data(), m_encodeBuffer.size());
+		}
+
+		m_file.write(reinterpret_cast<const char*>(m_encodeBuffer.data()), m_encodeBuffer.size());
+		return src.frames();
 	}
 
 	auto frames() const -> f_cnt_t override
 	{
+		return lame_get_frameNum(m_lame);
 	}
 
 	auto channels() const -> ch_cnt_t override
 	{
+		return lame_get_num_channels(m_lame);
 	}
 
 	auto sampleRate() const -> sample_rate_t override
 	{
+		return lame_get_in_samplerate(m_lame);
 	}
+
+private:
+	auto modeFromSettings(OutputSettings::StereoMode stereoMode) -> MPEG_mode
+	{
+		switch (stereoMode)
+		{
+		case OutputSettings::StereoMode::Stereo:
+			return STEREO;
+		case OutputSettings::StereoMode::JointStereo:
+			return JOINT_STEREO;
+		case OutputSettings::StereoMode::Mono:
+			return MONO;
+		default:
+			return NOT_SET;
+		}
+	}
+
+	lame_global_flags* m_lame;
+	std::ofstream m_file;
+	std::vector<unsigned char> m_encodeBuffer;
+	std::vector<unsigned char> m_flushBuffer;
 };
 
 }
 
 struct AudioFileWriter::Impl
 {
+	Impl(std::filesystem::path path, AudioFileFormat format, OutputSettings settings)
+	{
+		switch(format)
+		{
+		case AudioFileFormat::WAV:
+		case AudioFileFormat::FLAC:
+		case AudioFileFormat::OGG:
+			m_backend = std::make_unique<SndfileBackend>(path, format, settings);
+			break;
+		case AudioFileFormat::MP3:
+			// Note: Sndfile supports MP3 in version 1.1.0 and greater but is still missing some features, such as adding
+			// comments to the files and an option for joint stereo (which might be removed in the future if there is little
+			// need for it.). We also are still using 1.0.29 in our CI builds.
+			m_backend = std::make_unique<LameBackend>(path, format, settings);
+			break;
+		}
+	}
+
 	std::unique_ptr<Backend> m_backend;
 };
 
 AudioFileWriter::AudioFileWriter(std::filesystem::path path, AudioFileFormat format, OutputSettings settings)
-	: m_path(path)
+	: m_impl(std::make_unique<Impl>(path, format, settings))
+	, m_path(path)
 {
-	m_impl = std::make_unique<Impl>();
-
-	if (format == AudioFileFormat::MP3)
-	{
-		// Note: Sndfile supports MP3 in version 1.1.0 and greater but is still missing some features, such as adding
-		// comments to the files and an option for joint stereo (which might be removed in the future if there is little
-		// need for it.). We also are still using 1.0.29 in our CI builds.
-		m_impl->m_backend = std::make_unique<LameBackend>(path, format, settings);
-	}
-	else
-	{
-		m_impl->m_backend = std::make_unique<SndfileBackend>(path, format, settings);
-	}
 }
 
 AudioFileWriter::~AudioFileWriter() = default;
