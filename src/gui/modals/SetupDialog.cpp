@@ -258,15 +258,15 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 
 	m_detachBehaviorComboBox = new QComboBox{guiGroupBox};
 
-	m_detachBehaviorComboBox->addItem(tr("Show when attaching"), "show");
-	m_detachBehaviorComboBox->addItem(tr("Hide when attaching"), "hide");
+	m_detachBehaviorComboBox->addItem(tr("Attach and show when closed"), "show");
+	m_detachBehaviorComboBox->addItem(tr("Attach and hide when closed"), "hide");
 	m_detachBehaviorComboBox->addItem(tr("Always detached"), "detached");
 
 	m_detachBehaviorComboBox->setCurrentIndex(m_detachBehaviorComboBox->findData(m_detachBehavior));
 	connect(m_detachBehaviorComboBox, qOverload<int>(&QComboBox::currentIndexChanged),
 		this, &SetupDialog::detachBehaviorChanged);
 
-	guiGroupLayout->addWidget(new QLabel{tr("Detaching behavior"), guiGroupBox});
+	guiGroupLayout->addWidget(new QLabel{tr("Detached window behavior"), guiGroupBox});
 	guiGroupLayout->addWidget(m_detachBehaviorComboBox);
 
 	m_loopMarkerComboBox = new QComboBox{guiGroupBox};
