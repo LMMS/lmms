@@ -82,6 +82,7 @@ public:
 private:
 	struct Impl;
 	std::unique_ptr<Impl> m_impl;
+	std::filesystem::path m_path;
 };
 } // namespace lmms
 

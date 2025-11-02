@@ -29,167 +29,205 @@
 namespace lmms {
 
 namespace {
-using namespace lmms;
 
-SNDFILE* openAudioFile(const std::filesystem::path& path, SF_INFO* sfinfo)
+class Backend
 {
+public:
+	Backend() = default;
+	Backend(const Backend&) = default;
+	Backend(Backend&&) = delete;
+	Backend& operator=(const Backend&) = default;
+	Backend& operator=(Backend&&) = delete;
+
+	virtual ~Backend() = default;
+	virtual auto write(InterleavedBufferView<const float> src) -> std::size_t = 0;
+	virtual auto frames() const -> f_cnt_t = 0;
+	virtual auto channels() const -> ch_cnt_t = 0;
+	virtual auto sampleRate() const -> sample_rate_t = 0;
+};
+
+class SndfileBackend : public Backend
+{
+public:
+	SndfileBackend(const std::filesystem::path& path, AudioFileFormat format, OutputSettings settings)
+	{
+		auto sfBitDepth = 0;
+		auto sfFormat = 0;
+
+		switch (settings.getBitDepth())
+		{
+		case OutputSettings::BitDepth::Depth16Bit:
+			sfBitDepth = SF_FORMAT_PCM_16;
+			break;
+		case OutputSettings::BitDepth::Depth24Bit:
+			sfBitDepth = SF_FORMAT_PCM_24;
+			break;
+		case OutputSettings::BitDepth::Depth32Bit:
+			sfBitDepth = SF_FORMAT_PCM_32;
+			break;
+		}
+
+		switch (format)
+		{
+		case AudioFileFormat::WAV:
+			sfFormat = SF_FORMAT_WAV | sfBitDepth;
+			break;
+		case AudioFileFormat::FLAC:
+			sfFormat = SF_FORMAT_FLAC | sfBitDepth;
+			break;
+		case AudioFileFormat::OGG:
+			sfFormat = SF_FORMAT_OGG | SF_FORMAT_VORBIS;
+			break;
+		default:
+			break;
+		}
+
+		m_info.samplerate = settings.getSampleRate();
+		m_info.channels = settings.getStereoMode() == OutputSettings::StereoMode::Mono ? 1 : 2;
+		m_info.format = sfFormat;
+
 #ifdef LMMS_BUILD_WIN32
-	return sf_wchar_open(path.c_str(), SFM_WRITE, sfinfo);
+		m_sndfile = sf_wchar_open(path.c_str(), SFM_WRITE, &m_info);
 #else
-	return sf_open(path.c_str(), SFM_WRITE, sfinfo);
+		m_sndfile = sf_open(path.c_str(), SFM_WRITE, &m_info);
 #endif
-}
 
-SF_INFO sfInfoFromOutputSettings(AudioFileFormat format, OutputSettings settings)
+		if (!m_sndfile) { throw std::runtime_error{"failed to load file using sndfile"}; }
+
+		if (format == AudioFileFormat::FLAC)
+		{
+			auto compressionLevel = settings.getCompressionLevel();
+			sf_command(m_sndfile, SFC_SET_COMPRESSION_LEVEL, &compressionLevel, sizeof(int));
+		}
+		else if (format == AudioFileFormat::OGG)
+		{
+			assert(m_info.channels == 1 || m_info.channels == 2 && "invalid channel count");
+
+			constexpr auto monoBitrateTargets = std::array<double, 12>{
+				32000., 48000., 60000., 70000., 80000., 86000., 96000., 110000., 120000., 140000., 160000., 240001.};
+
+			constexpr auto stereoBitrateTargets = std::array<double, 12>{22500. * 2, 32000. * 2, 40000. * 2, 48000. * 2,
+				56000. * 2, 64000. * 2, 80000. * 2, 96000. * 2, 112000. * 2, 128000. * 2, 160000. * 2, 250001. * 2};
+
+			const auto& bitrateTargets = m_info.channels == 1 ? monoBitrateTargets : stereoBitrateTargets;
+			const auto bitrateTargetIt
+				= std::lower_bound(bitrateTargets.begin(), bitrateTargets.end(), settings.bitrate() * 1000);
+			assert(bitrateTargetIt != bitrateTargets.end() && "invalid bitrate");
+
+			const auto upperIndex = std::distance(bitrateTargets.begin(), bitrateTargetIt);
+			const auto lowerIndex = upperIndex == 0 ? 0 : upperIndex - 1;
+
+			const auto bitrateLow = bitrateTargets[lowerIndex];
+			const auto bitrateHigh = bitrateTargets[upperIndex];
+			const auto bitrateFractionalIndex = (settings.bitrate() * 1000 - bitrateLow) / (bitrateHigh - bitrateLow);
+			const auto bitrateIndex = lowerIndex + bitrateFractionalIndex;
+
+			const auto qualityLevel = 1.1 / static_cast<double>(bitrateTargets.size() - 1) * bitrateIndex - .1;
+			auto compressionLevel = std::clamp(1 - qualityLevel, 0., 1.);
+			sf_command(m_sndfile, SFC_SET_COMPRESSION_LEVEL, &compressionLevel, sizeof(double));
+		}
+	}
+
+	auto write(InterleavedBufferView<const float> src) -> std::size_t override
+	{
+		assert(m_info.channels() == src.channels());
+		return sf_writef_float(m_sndfile, src.data(), src.frames());
+	}
+
+	auto frames() const -> f_cnt_t override
+	{
+		return m_info.frames;
+	}
+
+	auto channels() const -> ch_cnt_t override
+	{
+		return m_info.channels;
+	}
+
+	auto sampleRate() const -> sample_rate_t override
+	{
+		return m_info.samplerate;
+	}
+
+private:
+	SNDFILE* m_sndfile;
+	SF_INFO m_info{};
+};
+
+class LameBackend : public Backend
 {
-	auto sfFormat = 0;
-	auto sfBitDepth = 0;
-	auto sfChannels = 0;
-
-	switch (settings.getBitDepth())
+public:
+	LameBackend(const std::filesystem::path& path, AudioFileFormat format, OutputSettings settings)
 	{
-	case OutputSettings::BitDepth::Depth16Bit:
-		sfBitDepth = SF_FORMAT_PCM_16;
-		break;
-	case OutputSettings::BitDepth::Depth24Bit:
-		sfBitDepth = SF_FORMAT_PCM_24;
-		break;
-	case OutputSettings::BitDepth::Depth32Bit:
-		sfBitDepth = SF_FORMAT_FLOAT;
-		break;
 	}
 
-	switch (format)
+	auto write(InterleavedBufferView<const float> src) -> std::size_t override
 	{
-	case AudioFileFormat::WAV:
-		sfFormat = SF_FORMAT_WAV | sfBitDepth;
-		break;
-	case AudioFileFormat::FLAC:
-		sfFormat = SF_FORMAT_FLAC | sfBitDepth;
-		break;
-	case AudioFileFormat::OGG:
-		sfFormat = SF_FORMAT_OGG | SF_FORMAT_VORBIS;
-		break;
-	case AudioFileFormat::MP3:
-		sfFormat = SF_FORMAT_MPEG | SF_FORMAT_MPEG_LAYER_III;
-		break;
-	default:
-		break;
 	}
 
-	switch (settings.getStereoMode())
+	auto frames() const -> f_cnt_t override
 	{
-	case OutputSettings::StereoMode::Stereo:
-	case OutputSettings::StereoMode::JointStereo:
-		sfChannels = 2;
-		break;
-	case OutputSettings::StereoMode::Mono:
-		sfChannels = 1;
-		break;
 	}
 
-	return {.samplerate = static_cast<int>(settings.getSampleRate()), .channels = sfChannels, .format = sfFormat};
-}
+	auto channels() const -> ch_cnt_t override
+	{
+	}
+
+	auto sampleRate() const -> sample_rate_t override
+	{
+	}
+};
 
 }
 
 struct AudioFileWriter::Impl
 {
-	Impl(std::filesystem::path path, AudioFileFormat format, OutputSettings settings);
-	SF_INFO m_info;
-	SNDFILE* m_sndfile;
-	std::filesystem::path m_path;
+	std::unique_ptr<Backend> m_backend;
 };
 
 AudioFileWriter::AudioFileWriter(std::filesystem::path path, AudioFileFormat format, OutputSettings settings)
-	: m_impl(std::make_unique<Impl>(std::move(path), format, settings))
+	: m_path(path)
 {
-	if (!m_impl->m_sndfile) { throw std::runtime_error{sf_strerror(m_impl->m_sndfile)}; }
+	m_impl = std::make_unique<Impl>();
+
+	if (format == AudioFileFormat::MP3)
+	{
+		// Note: Sndfile supports MP3 in version 1.1.0 and greater but is still missing some features, such as adding
+		// comments to the files and an option for joint stereo (which might be removed in the future if there is little
+		// need for it.). We also are still using 1.0.29 in our CI builds.
+		m_impl->m_backend = std::make_unique<LameBackend>(path, format, settings);
+	}
+	else
+	{
+		m_impl->m_backend = std::make_unique<SndfileBackend>(path, format, settings);
+	}
 }
 
 AudioFileWriter::~AudioFileWriter() = default;
 
-AudioFileWriter::Impl::Impl(std::filesystem::path path, AudioFileFormat format, OutputSettings settings)
-	: m_info(sfInfoFromOutputSettings(format, settings))
-	, m_sndfile(openAudioFile(path, &m_info))
-	, m_path(std::move(path))
-{
-	// This only works for a select number of formats.
-	// Formats like MP3 silently fail/do nothing (according to local testing).
-	// one option could be to introduce TagLib and use that instead for metadata,
-	// or we transition to using FFmpeg which can handle metadata.
-	sf_set_string(m_sndfile, SF_STR_COMMENT, "Created with LMMS");
-
-	if (format == AudioFileFormat::FLAC)
-	{
-		auto compressionLevel = settings.getCompressionLevel();
-		sf_command(m_sndfile, SFC_SET_COMPRESSION_LEVEL, &compressionLevel, sizeof(int));
-	}
-	else if (format == AudioFileFormat::MP3)
-	{
-		constexpr auto minBitRate = 32;
-		constexpr auto maxBitRate = 320;
-		const auto targetBitRate = settings.bitrate();
-
-		auto mode = SF_BITRATE_MODE_CONSTANT;
-		sf_command(m_sndfile, SFC_SET_BITRATE_MODE, &mode, sizeof(int));
-
-		auto compressionLevel = (maxBitRate - targetBitRate) / static_cast<double>(maxBitRate - minBitRate);
-		sf_command(m_sndfile, SFC_SET_COMPRESSION_LEVEL, &compressionLevel, sizeof(double));
-	}
-	else if (format == AudioFileFormat::OGG)
-	{
-		assert(m_info.channels == 1 || m_info.channels == 2 && "invalid channel count");
-
-		constexpr auto monoBitrateTargets = std::array<double, 12>{
-			32000., 48000., 60000., 70000., 80000., 86000., 96000., 110000., 120000., 140000., 160000., 240001.};
-
-		constexpr auto stereoBitrateTargets = std::array<double, 12>{22500. * 2, 32000. * 2, 40000. * 2, 48000. * 2,
-			56000. * 2, 64000. * 2, 80000. * 2, 96000. * 2, 112000. * 2, 128000. * 2, 160000. * 2, 250001. * 2};
-
-		const auto& bitrateTargets = m_info.channels == 1 ? monoBitrateTargets : stereoBitrateTargets;
-		const auto bitrateTargetIt
-			= std::lower_bound(bitrateTargets.begin(), bitrateTargets.end(), settings.bitrate() * 1000);
-		assert(bitrateTargetIt != bitrateTargets.end() && "invalid bitrate");
-
-		const auto upperIndex = std::distance(bitrateTargets.begin(), bitrateTargetIt);
-		const auto lowerIndex = upperIndex == 0 ? 0 : upperIndex - 1;
-
-		const auto bitrateLow = bitrateTargets[lowerIndex];
-		const auto bitrateHigh = bitrateTargets[upperIndex];
-		const auto bitrateFractionalIndex = (settings.bitrate() * 1000 - bitrateLow) / (bitrateHigh - bitrateLow);
-		const auto bitrateIndex = lowerIndex + bitrateFractionalIndex;
-
-		const auto qualityLevel = 1.1 / static_cast<double>(bitrateTargets.size() - 1) * bitrateIndex - .1;
-		auto compressionLevel = std::clamp(1 - qualityLevel, 0., 1.);
-		sf_command(m_sndfile, SFC_SET_COMPRESSION_LEVEL, &compressionLevel, sizeof(double));
-	}
-}
-
 auto AudioFileWriter::write(InterleavedBufferView<const float> src) -> std::size_t
 {
-	assert(src.channels() == m_impl->m_info.channels && "invalid channel count");
-	return sf_writef_float(m_impl->m_sndfile, src.data(), src.frames());
+	return m_impl->m_backend->write(src);
 }
 
 auto AudioFileWriter::frames() const -> f_cnt_t
 {
-	return m_impl->m_info.frames;
+	return m_impl->m_backend->frames();
 }
 
 auto AudioFileWriter::channels() const -> ch_cnt_t
 {
-	return m_impl->m_info.channels;
+	return m_impl->m_backend->channels();
 }
 
 auto AudioFileWriter::sampleRate() const -> sample_rate_t
 {
-	return m_impl->m_info.samplerate;
+	return m_impl->m_backend->sampleRate();
 }
 
 auto AudioFileWriter::path() const -> const std::filesystem::path&
 {
-	return m_impl->m_path;
+	return m_path;
 }
 
 } // namespace lmms
