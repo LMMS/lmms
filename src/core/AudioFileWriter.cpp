@@ -26,6 +26,8 @@
 
 #include <sndfile.h>
 
+namespace lmms {
+
 namespace {
 using namespace lmms;
 
@@ -89,9 +91,8 @@ SF_INFO sfInfoFromOutputSettings(AudioFileFormat format, OutputSettings settings
 	return {.samplerate = static_cast<int>(settings.getSampleRate()), .channels = sfChannels, .format = sfFormat};
 }
 
-} // namespace
+}
 
-namespace lmms {
 struct AudioFileWriter::Impl
 {
 	Impl(std::filesystem::path path, AudioFileFormat format, OutputSettings settings);
