@@ -33,6 +33,7 @@
 
 #include "CaptionMenu.h"
 #include "FontHelper.h"
+#include "DeprecationHelper.h"
 
 #define QT_SUPPORTS_WIDGET_SCREEN (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
 #if !QT_SUPPORTS_WIDGET_SCREEN
@@ -105,9 +106,11 @@ void ComboBox::mousePressEvent( QMouseEvent* event )
 		return;
 	}
 
+	const auto pos = position(event);
+
 	if( event->button() == Qt::LeftButton && ! ( event->modifiers() & Qt::ControlModifier ) )
 	{
-		if( event->x() > width() - CB_ARROW_BTN_WIDTH )
+		if (pos.x() > width() - CB_ARROW_BTN_WIDTH)
 		{
 			m_pressed = true;
 			update();
