@@ -575,13 +575,6 @@ float AutomationClip::valueAt(const TimePos& _time, bool wantInValue /*= false*/
 	}
 
 	// If we have a node at that time, just return its value
-	if (m_timeMap.contains(_time))
-	{
-		// When the time is exactly the node's time, we want the inValue
-		return m_timeMap[_time].getInValue();
-	}
-
-	// If we have a node at that time, just return its value
 	if (v.key() == _time)
 	{
 		// When the time is exactly the node's time, we want the outValue
