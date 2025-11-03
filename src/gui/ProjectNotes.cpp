@@ -147,12 +147,15 @@ void ProjectNotes::setupActions()
 	m_comboFont->setEditable( true );
 	QFontDatabase db;
 	m_comboFont->addItems( db.families() );
-#if (QT_VERSION < QT_VERSION_CHECK(5,14,0))
-	connect(m_comboFont, SIGNAL(activated(const QString&)), m_edit,
+
+	connect(m_comboFont,
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
+		QOverload<const QString&>::of(&QComboBox::activated),
 #else
-	connect(m_comboFont, SIGNAL(textActivated(const QString&)), m_edit,
+		&QComboBox::textActivated,
 #endif
-			SLOT(setFontFamily(const QString&)));
+		m_edit, &QTextEdit::setFontFamily);
+
 	m_comboFont->lineEdit()->setText( QApplication::font().family() );
 
 	m_comboSize = new QComboBox( tb );
@@ -163,12 +166,15 @@ void ProjectNotes::setupActions()
 	{
 		m_comboSize->addItem( QString::number( *it ) );
 	}
-#if (QT_VERSION < QT_VERSION_CHECK(5,14,0))
-	connect(m_comboSize, SIGNAL(activated(const QString&)), this, 
+
+	connect(m_comboSize,
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
+		QOverload<const QString&>::of(&QComboBox::activated),
 #else
-	connect(m_comboSize, SIGNAL(textActivated(const QString&)), this, 
+		&QComboBox::textActivated,
 #endif
-		    SLOT( textSize( const QString& ) ) );
+		this, &ProjectNotes::textSize);
+
 	m_comboSize->lineEdit()->setText( QString::number(
 					QApplication::font().pointSize() ) );
 

@@ -550,12 +550,13 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 		setCurrentIndex(m_audioInterfaces->findText(audioDevName));
 	m_audioIfaceSetupWidgets[audioDevName]->show();
 
-#if (QT_VERSION < QT_VERSION_CHECK(5,14,0))
-	connect(m_audioInterfaces, SIGNAL(activated(const QString&)),
+	connect(m_audioInterfaces,
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
+		QOverload<const QString&>::of(&QComboBox::activated),
 #else
-	connect(m_audioInterfaces, SIGNAL(textActivated(const QString&)),
+		&QComboBox::textActivated,
 #endif
-			this, SLOT(audioInterfaceChanged(const QString&)));
+		this, &SetupDialog::audioInterfaceChanged);
 
 	// Advanced setting, hidden for now
 	// // TODO Handle or remove.
@@ -729,13 +730,13 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	m_midiInterfaces->setCurrentIndex(m_midiInterfaces->findText(midiDevName));
 	m_midiIfaceSetupWidgets[midiDevName]->show();
 
-#if (QT_VERSION < QT_VERSION_CHECK(5,14,0))
-	connect(m_midiInterfaces, SIGNAL(activated(const QString&)),
+	connect(m_midiInterfaces,
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
+		QOverload<const QString&>::of(&QComboBox::activated),
 #else
-	connect(m_midiInterfaces, SIGNAL(textActivated(const QString&)),
+		&QComboBox::textActivated,
 #endif
-			this, SLOT(midiInterfaceChanged(const QString&)));
-
+		this, &SetupDialog::midiInterfaceChanged);
 
 	// MIDI autoassign group
 	QGroupBox * midiAutoAssignBox = new QGroupBox(tr("Automatically assign MIDI controller to selected track"), midi_w);
