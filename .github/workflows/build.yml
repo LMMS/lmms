@@ -241,6 +241,7 @@ jobs:
           cmake -S . \
                 -B build \
                 -DCMAKE_OSX_ARCHITECTURES=${{ matrix.arch }} \
+                -DWANT_QT6=ON \
                 $CMAKE_OPTS \
                 -DUSE_WERROR=OFF
       - name: Build
