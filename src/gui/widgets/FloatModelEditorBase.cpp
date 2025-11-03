@@ -30,6 +30,7 @@
 #include <QPainter>
 
 #include "lmms_math.h"
+#include "DeprecationHelper.h"
 #include "CaptionMenu.h"
 #include "ControllerConnection.h"
 #include "GuiApplication.h"
@@ -166,8 +167,7 @@ void FloatModelEditorBase::mousePressEvent(QMouseEvent * me)
 			thisModel->saveJournallingState(false);
 		}
 
-		const QPoint & p = me->pos();
-		m_lastMousePos = p;
+		m_lastMousePos = position(me);
 		m_leftOver = 0.0f;
 
 		emit sliderPressed();
@@ -196,13 +196,15 @@ void FloatModelEditorBase::mousePressEvent(QMouseEvent * me)
 
 void FloatModelEditorBase::mouseMoveEvent(QMouseEvent * me)
 {
-	if (m_buttonPressed && me->pos() != m_lastMousePos)
+	const auto pos = position(me);
+
+	if (m_buttonPressed && pos != m_lastMousePos)
 	{
 		// knob position is changed depending on last mouse position
-		setPosition(me->pos() - m_lastMousePos);
+		setPosition(pos - m_lastMousePos);
 		emit sliderMoved(model()->value());
 		// original position for next time is current position
-		m_lastMousePos = me->pos();
+		m_lastMousePos = pos;
 	}
 	s_textFloat->setText(displayValue());
 	s_textFloat->show();
@@ -229,8 +231,11 @@ void FloatModelEditorBase::mouseReleaseEvent(QMouseEvent* event)
 	s_textFloat->hide();
 }
 
-
-void FloatModelEditorBase::enterEvent(QEvent *event)
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+void FloatModelEditorBase::enterEvent(QEnterEvent*)
+#else
+void FloatModelEditorBase::enterEvent(QEvent*)
+#endif
 {
 	showTextFloat(700, 2000);
 }
