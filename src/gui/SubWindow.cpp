@@ -81,7 +81,7 @@ SubWindow::SubWindow(QWidget *parent, Qt::WindowFlags windowFlags) :
 	// Disable the minimize button and make sure that the custom window hint is set
 	setWindowFlags((this->windowFlags() & ~Qt::WindowMinimizeButtonHint) | Qt::CustomizeWindowHint);
 
-	connect( mdiArea(), SIGNAL(subWindowActivated(QMdiSubWindow*)), this, SLOT(focusChanged(QMdiSubWindow*)));
+	connect(mdiArea(), &QMdiArea::subWindowActivated, this, &SubWindow::focusChanged);
 }
 
 
