@@ -288,21 +288,6 @@ void TrackView::mousePressEvent( QMouseEvent * me )
 			QCursor::setPos(mapToGlobal(QPoint(pos.x(), height())));
 			QApplication::setOverrideCursor(Qt::SizeVerCursor);
 		}
-		else
-		{
-			if (pos.x() > 10) // 10 = The width of the grip + 2 pixels to the left and right.
-			{
-				QWidget::mousePressEvent(me);
-				return;
-			}
-
-			m_action = Action::Move;
-			QApplication::setOverrideCursor(Qt::SizeVerCursor);
-
-			// update because in move-mode, all elements in
-			// track-op-widgets are hidden as a visual feedback
-			m_trackOperationsWidget.update();
-		}
 
 		me->accept();
 	}
