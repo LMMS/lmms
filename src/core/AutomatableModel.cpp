@@ -429,24 +429,35 @@ void AutomatableModel::setStep( const float step )
 }
 
 
-float AutomatableModel::fittedValue(float value) const
+
+
+float AutomatableModel::fittedValue( float value ) const
 {
 	value = std::clamp(value, m_minValue, m_maxValue);
 
-	if (m_step != 0 && m_hasStrictStepSize)
+	if( m_step != 0 && m_hasStrictStepSize )
 	{
-		value = std::nearbyintf(value / m_step) * m_step;
+		value = nearbyintf( value / m_step ) * m_step;
 	}
 
-	roundAt(value, m_maxValue);
-	roundAt(value, m_minValue);
-	roundAt(value, 0.0f);
+	roundAt( value, m_maxValue );
+	roundAt( value, m_minValue );
+	roundAt( value, 0.0f );
 
-	// Necessary in the case where m_maxValue = x.5, m_step >= 1, which
-	// will cause nearbyintf() to round upwards past m_maxValue in a
-	// way that roundAt(value, m_maxValue) cannot fix.
-	return std::clamp(value, m_minValue, m_maxValue);
+	if( value < m_minValue )
+	{
+		return m_minValue;
+	}
+	else if( value > m_maxValue )
+	{
+		return m_maxValue;
+	}
+
+	return value;
 }
+
+
+
 
 
 void AutomatableModel::linkModel( AutomatableModel* model )
