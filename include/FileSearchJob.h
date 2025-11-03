@@ -52,6 +52,11 @@ public:
 	//! Stop processing and destroys the object.
 	~FileSearchJob();
 
+	FileSearchJob(const FileSearchJob&) = delete;
+	FileSearchJob(FileSearchJob&&) = delete;
+	FileSearchJob& operator=(const FileSearchJob&) = delete;
+	FileSearchJob& operator=(FileSearchJob&&) = delete;
+
 	//! Commit to searching with the given @p task.
 	//! Cancels any previous search.
 	//! Callers can connect to the provided signals to interact with the search and its progress.
@@ -68,7 +73,6 @@ signals:
 	void finished();
 
 private:
-	Q_DISABLE_MOVE(FileSearchJob)
 	void runSearch(Task task);
 	std::future<void> m_task;
 	std::atomic_flag m_stop = ATOMIC_FLAG_INIT;
