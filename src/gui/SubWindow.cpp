@@ -150,10 +150,10 @@ void SubWindow::changeEvent( QEvent *event )
  * 
  *  Stores the given text into the given label.
  *  Shorts the text if it's too big for the labels width
- *  ans adds three dots (...)
+ *  and adds three dots (...)
  * 
  * @param label - holds a pointer to the QLabel
- * @param text  - the text which will be stored (and if needed breaked down) into the QLabel.
+ * @param text  - the text which will be stored (and if needed broken down) into the QLabel.
  */
 void SubWindow::elideText( QLabel *label, QString text )
 {
@@ -255,9 +255,9 @@ void SubWindow::updateTitleBar()
 /**
  * @brief SubWindow::moveEvent
  * 
- *  overides the QMdiSubWindow::moveEvent() for saving the position
+ *  overrides the QMdiSubWindow::moveEvent() for saving the position
  *  of the subwindow into m_trackedNormalGeom. This position
- *  will be saved with the project because of an Qt bug wich doesn't
+ *  will be saved with the project because of an Qt bug which doesn't
  *  save the right position. look at: https://bugreports.qt.io/browse/QTBUG-256
  * @param event
  */
@@ -391,7 +391,7 @@ void SubWindow::focusChanged( QMdiSubWindow *subWindow )
  *  On every resize event we have to adjust our title label.
  * 
  *  At last we store the current size into m_trackedNormalGeom. This size
- *  will be saved with the project because of an Qt bug wich doesn't
+ *  will be saved with the project because of an Qt bug which doesn't
  *  save the right size. look at: https://bugreports.qt.io/browse/QTBUG-256
  * 
  * @param event

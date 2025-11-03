@@ -10,7 +10,7 @@ foreach (_define_var ${_define_vars})
     endif()
 endforeach()
 
-# Format for readibility
+# Format for readability
 string(REPLACE ";" " " LMMS_BUILD_OPTIONS "${LMMS_BUILD_OPTIONS}")
 
 CONFIGURE_FILE("lmmsversion.h.in"       "${CMAKE_BINARY_DIR}/lmmsversion.h")

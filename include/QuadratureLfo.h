@@ -1,5 +1,5 @@
 /*
- * quadraturelfo.h - defination of QuadratureLfo class.
+ * quadraturelfo.h - definition of QuadratureLfo class.
  *
  * Copyright (c) 2014 David French <dave/dot/french3/at/googlemail/dot/com>
  *
