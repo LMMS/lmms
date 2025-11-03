@@ -158,11 +158,10 @@ OutputSettings::StereoMode mapToStereoMode(int index)
 
 void ExportProjectDialog::startExport()
 {
-	const auto bitrates = std::array{64, 128, 160, 192, 256, 320};
-
-	OutputSettings os = OutputSettings(samplerateCB->currentData().toInt(), bitrates[bitrateCB->currentIndex()],
-		static_cast<OutputSettings::BitDepth>(depthCB->currentIndex()),
-		mapToStereoMode(stereoModeComboBox->currentIndex()));
+	OutputSettings os
+		= OutputSettings(samplerateCB->currentData().toInt(), SUPPORTED_OGG_BITRATES[bitrateCB->currentIndex()],
+			static_cast<OutputSettings::BitDepth>(depthCB->currentIndex()),
+			mapToStereoMode(stereoModeComboBox->currentIndex()));
 
 	if (compressionWidget->isVisible())
 	{

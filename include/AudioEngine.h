@@ -59,7 +59,8 @@ constexpr int BYTES_PER_FRAME = sizeof(SampleFrame);
 
 constexpr float OUTPUT_SAMPLE_MULTIPLIER = 32767.0f;
 
-constexpr auto SUPPORTED_SAMPLERATES = std::array{44100, 48000, 88200, 96000, 192000}; 
+constexpr auto SUPPORTED_SAMPLERATES = std::array{44100, 48000, 88200, 96000, 192000};
+constexpr auto SUPPORTED_OGG_BITRATES = std::array{64, 128, 160, 192, 256, 320};
 
 class LMMS_EXPORT AudioEngine : public QObject
 {

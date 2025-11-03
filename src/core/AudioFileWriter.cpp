@@ -24,9 +24,11 @@
 
 #include "AudioFileWriter.h"
 
+#include <array>
 #include <fstream>
 #include <sndfile.h>
 #include <vector>
+#include "AudioEngine.h"
 
 #ifdef LMMS_HAVE_MP3LAME
 #include <lame/lame.h>
@@ -69,37 +71,16 @@ public:
 
 		if (!m_sndfile) { throw std::runtime_error{"failed to load file using sndfile"}; }
 
-		if (format == AudioFileFormat::FLAC)
+		switch (format)
 		{
-			auto compressionLevel = settings.getCompressionLevel();
-			sf_command(m_sndfile, SFC_SET_COMPRESSION_LEVEL, &compressionLevel, sizeof(int));
-		}
-		else if (format == AudioFileFormat::OGG)
-		{
-			assert(m_info.channels == 1 || m_info.channels == 2 && "invalid channel count");
-
-			constexpr auto monoBitrateTargets = std::array<double, 12>{
-				32000., 48000., 60000., 70000., 80000., 86000., 96000., 110000., 120000., 140000., 160000., 240001.};
-
-			constexpr auto stereoBitrateTargets = std::array<double, 12>{22500. * 2, 32000. * 2, 40000. * 2, 48000. * 2,
-				56000. * 2, 64000. * 2, 80000. * 2, 96000. * 2, 112000. * 2, 128000. * 2, 160000. * 2, 250001. * 2};
-
-			const auto& bitrateTargets = m_info.channels == 1 ? monoBitrateTargets : stereoBitrateTargets;
-			const auto bitrateTargetIt
-				= std::lower_bound(bitrateTargets.begin(), bitrateTargets.end(), settings.bitrate() * 1000);
-			assert(bitrateTargetIt != bitrateTargets.end() && "invalid bitrate");
-
-			const auto upperIndex = std::distance(bitrateTargets.begin(), bitrateTargetIt);
-			const auto lowerIndex = upperIndex == 0 ? 0 : upperIndex - 1;
-
-			const auto bitrateLow = bitrateTargets[lowerIndex];
-			const auto bitrateHigh = bitrateTargets[upperIndex];
-			const auto bitrateFractionalIndex = (settings.bitrate() * 1000 - bitrateLow) / (bitrateHigh - bitrateLow);
-			const auto bitrateIndex = lowerIndex + bitrateFractionalIndex;
-
-			const auto qualityLevel = 1.1 / static_cast<double>(bitrateTargets.size() - 1) * bitrateIndex - .1;
-			auto compressionLevel = std::clamp(1 - qualityLevel, 0., 1.);
-			sf_command(m_sndfile, SFC_SET_COMPRESSION_LEVEL, &compressionLevel, sizeof(double));
+		case AudioFileFormat::FLAC:
+			applyFlacSettings(settings);
+			return;
+		case AudioFileFormat::OGG:
+			applyOggSettings(settings);
+			return;
+		default:
+			break;
 		}
 	}
 
@@ -154,6 +135,20 @@ private:
 		default:
 			return 0;
 		}
+	}
+
+	void applyFlacSettings(OutputSettings settings)
+	{
+		auto compressionLevel = settings.getCompressionLevel();
+		sf_command(m_sndfile, SFC_SET_COMPRESSION_LEVEL, &compressionLevel, sizeof(int));
+	}
+
+	void applyOggSettings(OutputSettings settings)
+	{
+		constexpr auto minNominalBitrate = SUPPORTED_OGG_BITRATES.front();
+		constexpr auto maxNominalBitrate = SUPPORTED_OGG_BITRATES.back();
+		auto compressionLevel = std::lerp(1, 0, (settings.bitrate() - minNominalBitrate) / (maxNominalBitrate - minNominalBitrate));
+		sf_command(m_sndfile, SFC_SET_COMPRESSION_LEVEL, &compressionLevel, sizeof(double));
 	}
 
 	SNDFILE* m_sndfile;
