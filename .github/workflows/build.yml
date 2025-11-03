@@ -67,9 +67,9 @@ jobs:
       - name: Configure
         run: |
           ccache --zero-stats
-          source /opt/qt5*/bin/qt5*-env.sh || true
           cmake -S . \
                 -B build \
+                -DWANT_QT6=ON \
                 $CMAKE_OPTS
       - name: Build
         run: cmake --build build
@@ -150,6 +150,7 @@ jobs:
           ccache --zero-stats
           cmake -S . \
                 -B build \
+                -DWANT_QT6=ON \
                 $CMAKE_OPTS
       - name: Build
         run: cmake --build build
