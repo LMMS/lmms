@@ -566,37 +566,38 @@ float AutomationClip::valueAt(const TimePos& _time, bool wantInValue /*= false*/
 		return 0;
 	}
 
-	const auto it = m_timeMap.lowerBound(_time);
-	if (it == m_timeMap.end())
+	timeMap::const_iterator v = m_timeMap.lowerBound(_time);
+	const auto pv = std::prev(v);
+	if (v == m_timeMap.end())
 	{
 		// When the time is after the last node, we want the outValue of it
-		return OUTVAL(it - 1);
+		return pv->getOutValue();
 	}
 
 	// If we have a node at that time, just return its value
-	if (it.key() == _time)
+	if (v.key() == _time)
 	{
 		// When the time is exactly the node's time, we want the outValue
 		// to ensure that discrete jumps are handled correctly while playing.
 		// UI functions may want the inValue instead.
 		if (wantInValue)
 		{
-			return it->getInValue();
+			return v->getInValue();
 		}
 		else
 		{
-			return it->getOutValue();
+			return v->getOutValue();
 		}
 	}
 
-	if (it == m_timeMap.begin())
+	if (v == m_timeMap.begin())
 	{
 		return 0;
 	}
 
 	// The returned node has a greater key than _time. Therefore we take the
 	// previous element to calculate the current value.
-	return valueAt(it - 1, _time - POS(it - 1));
+	return valueAt(pv, _time - POS(pv));
 }
 
 
