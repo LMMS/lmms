@@ -123,10 +123,10 @@ void TabWidget::setActiveTab(int idx)
 
 
 // Return the index of the tab at position "pos"
-int TabWidget::findTabAtPos(const QPoint* pos)
+int TabWidget::findTabAtPos(const QPoint& pos)
 {
 
-	if (pos->y() > 1 && pos->y() < m_tabbarHeight - 1)
+	if (pos.y() > 1 && pos.y() < m_tabbarHeight - 1)
 	{
 		int cx = ((m_caption == "") ? 4 : 14) + horizontalAdvance(fontMetrics(), m_caption);
 
@@ -134,7 +134,7 @@ int TabWidget::findTabAtPos(const QPoint* pos)
 		{
 			int const currentWidgetWidth = it->nwidth;
 
-			if (pos->x() >= cx && pos->x() <= cx + currentWidgetWidth)
+			if (pos.x() >= cx && pos.x() <= cx + currentWidgetWidth)
 			{
 				return(it.key());
 			}
@@ -155,7 +155,7 @@ bool TabWidget::event(QEvent* event)
 	{
 		auto helpEvent = static_cast<QHelpEvent*>(event);
 
-		int idx = findTabAtPos(& helpEvent->pos());
+		int idx = findTabAtPos(helpEvent->pos());
 
 		if (idx != -1)
 		{
@@ -180,10 +180,8 @@ bool TabWidget::event(QEvent* event)
 // Activate tab when clicked
 void TabWidget::mousePressEvent(QMouseEvent* me)
 {
-
 	// Find index of tab that has been clicked
-	QPoint pos = me->pos();
-	int idx = findTabAtPos(&pos);
+	const int idx = findTabAtPos(position(me));
 
 	// When found, activate tab that has been clicked
 	if (idx != -1)
