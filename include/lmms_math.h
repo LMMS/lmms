@@ -213,7 +213,8 @@ inline float linearToLogScale(float min, float max, float value)
 template<typename T> requires std::is_arithmetic_v<T>
 inline auto fastPow10f(T x)
 {
-	return std::exp(std::numbers::ln10_v<std::conditional_t<std::is_floating_point_v<T>, T, float>> * x);
+	using F_T = std::conditional_t<std::is_floating_point_v<T>, T, float>;
+	return std::exp(std::numbers::ln10_v<F_T> * x);
 }
 
 
@@ -221,7 +222,8 @@ inline auto fastPow10f(T x)
 template<typename T> requires std::is_arithmetic_v<T>
 inline auto fastLog10f(T x)
 {
-	constexpr auto inv_ln10 = static_cast<std::conditional_t<std::is_floating_point_v<T>, T, float>>(1.0 / std::numbers::ln10);
+	using F_T = std::conditional_t<std::is_floating_point_v<T>, T, float>;
+	constexpr auto inv_ln10 = static_cast<F_T>(1.0 / std::numbers::ln10);
 	return std::log(x) * inv_ln10;
 }
 
