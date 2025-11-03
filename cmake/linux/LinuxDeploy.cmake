@@ -151,6 +151,8 @@ file(COPY "${APP}/usr/share/icons/hicolor/256x256/apps/${lmms}.png" DESTINATION 
 # Inform linuxdeploy-plugin-qt about wayland plugin
 set(ENV{EXTRA_PLATFORM_PLUGINS} "libqwayland-generic.so")
 set(ENV{EXTRA_QT_MODULES} "waylandcompositor")
+# Toggle experimental platform theming support
+set(ENV{DEPLOY_PLATFORM_THEMES} 1)
 
 # Call linuxdeploy
 message(STATUS "Calling ${LINUXDEPLOY_BIN} --appdir \"${APP}\" ... [... libraries].")

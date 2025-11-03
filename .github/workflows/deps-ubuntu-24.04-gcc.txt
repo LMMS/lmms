@@ -39,8 +39,11 @@ lsb-release
 lv2-dev
 make
 perl
+plasma-integration
 portaudio19-dev
+qt5-gtk-platformtheme
 qt5-qmake
+qt5-xdgdesktopportal-platformtheme
 qtbase5-dev
 qtbase5-dev-tools
 qtbase5-private-dev
