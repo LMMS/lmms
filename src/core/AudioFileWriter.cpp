@@ -86,7 +86,7 @@ public:
 
 	auto write(InterleavedBufferView<const float> src) -> std::size_t override
 	{
-		assert(m_info.channels() == src.channels());
+		assert(m_info.channels == src.channels());
 		return sf_writef_float(m_sndfile, src.data(), src.frames());
 	}
 
@@ -166,6 +166,7 @@ public:
 
 	LameBackend(const std::filesystem::path& path, AudioFileFormat format, OutputSettings settings)
 		: m_lame(lame_init())
+		, m_file(path)
 		, m_flushBuffer(7200)
 	{
 		lame_set_num_channels(m_lame, settings.getStereoMode() == OutputSettings::StereoMode::Mono ? 1 : 2);
