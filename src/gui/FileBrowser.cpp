@@ -43,6 +43,7 @@
 #include "AudioEngine.h"
 #include "ConfigManager.h"
 #include "DataFile.h"
+#include "DeprecationHelper.h"
 #include "Engine.h"
 #include "FileBrowser.h"
 #include "FileRevealer.h"
@@ -177,7 +178,13 @@ void FileBrowser::addContentCheckBox()
 	auto configCheckBox = [this](QBoxLayout* boxLayout, QCheckBox* box, Qt::CheckState checkState)
 	{
 		box->setCheckState(checkState);
-		connect(box, SIGNAL(stateChanged(int)), this, SLOT(reloadTree()));
+
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
+		connect(box, &QCheckBox::checkStateChanged, this, &FileBrowser::reloadTree);
+#else
+		connect(box, &QCheckBox::stateChanged, this, &FileBrowser::reloadTree);
+#endif
+
 		boxLayout->addWidget(box);
 	};
 
@@ -721,8 +728,10 @@ QList<QAction*> FileBrowserTreeWidget::getContextActions(FileItem* file, bool so
 
 void FileBrowserTreeWidget::mousePressEvent(QMouseEvent * me )
 {
+	const auto pos = position(me);
+
 	// Forward the event
-	QTreeWidgetItem * i = itemAt(me->pos());
+	QTreeWidgetItem* i = itemAt(pos);
 	QTreeWidget::mousePressEvent(me);
 	// QTreeWidget handles right clicks for us, so we only care about left clicks
 	if(me->button() != Qt::LeftButton) { return; }
@@ -730,13 +739,13 @@ void FileBrowserTreeWidget::mousePressEvent(QMouseEvent * me )
 	if (i)
 	{
 		// TODO: Restrict to visible selection
-//		if ( _me->x() > header()->cellPos( header()->mapToActual( 0 ) )
+//		if ( pos.x() > header()->cellPos( header()->mapToActual( 0 ) )
 //			+ treeStepSize() * ( i->depth() + ( rootIsDecorated() ?
 //						1 : 0 ) ) + itemMargin() ||
-//				_me->x() < header()->cellPos(
+//				pos.x() < header()->cellPos(
 //						header()->mapToActual( 0 ) ) )
 //		{
-			m_pressPos = me->pos();
+			m_pressPos = pos;
 			m_mousePressed = true;
 //		}
 	}
@@ -830,9 +839,7 @@ void FileBrowserTreeWidget::stopPreview()
 
 void FileBrowserTreeWidget::mouseMoveEvent( QMouseEvent * me )
 {
-	if( m_mousePressed == true &&
-		( m_pressPos - me->pos() ).manhattanLength() >
-					QApplication::startDragDistance() )
+	if (m_mousePressed && (m_pressPos - position(me)).manhattanLength() > QApplication::startDragDistance())
 	{
 		// make sure any playback is stopped
 		mouseReleaseEvent( nullptr );
