@@ -141,7 +141,6 @@ jo_id_t ProjectJournal::allocID(JournallingObject* obj)
 	jo_id_t id;
 	for (jo_id_t tid = fastRand(); m_joIDs.contains(id = tid % EO_ID_MSB | EO_ID_MSB); tid++) {}
 	m_joIDs[id] = obj;
-	//printf("new id: %d\n", id);
 	return id;
 }
 
