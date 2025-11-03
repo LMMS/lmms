@@ -23,8 +23,13 @@ if(NOT MSVC AND (LMMS_HOST_X86 OR LMMS_HOST_X86_64))
 	ADD_DEFINITIONS(-DASM_F2I_YES)
 endif()
 
-# build ZynAddSubFX with full optimizations
-if(NOT MSVC)
+if(MSVC)
+	# enable updated C++ language standards, disable certain permissive behavior
+	set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} /Zc:__cplusplus /permissive-")
+	# workaround _WIN32 vs WIN32 differences
+	add_compile_definitions(WIN32)
+else()
+	# build ZynAddSubFX with full optimizations, treat nonconformant code as warnings
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -fpermissive")
 endif()
 
@@ -126,8 +131,8 @@ target_static_libraries(ZynAddSubFxCore PUBLIC
 target_link_libraries(ZynAddSubFxCore INTERFACE
 	${FFTW3F_LIBRARIES}
 	${QT_LIBRARIES}
-	Qt5::Widgets
-	Qt5::Xml
+	Qt${QT_VERSION_MAJOR}::Widgets
+	Qt${QT_VERSION_MAJOR}::Xml
 	Threads::Threads
 	ZLIB::ZLIB
 )
@@ -192,7 +197,7 @@ if(LMMS_HAVE_LIBRT)
 endif()
 
 # Support qt_version_tag in Qt 5.6
-TARGET_LINK_LIBRARIES(RemoteZynAddSubFx Qt5::Core)
+TARGET_LINK_LIBRARIES(RemoteZynAddSubFx Qt${QT_VERSION_MAJOR}::Core)
 
 # link Qt libraries when on win32
 IF(LMMS_BUILD_WIN32)
