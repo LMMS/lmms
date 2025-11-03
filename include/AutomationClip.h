@@ -166,7 +166,7 @@ public:
 		return supportsTangentEditing(m_progressionType);
 	}
 
-	float valueAt(const TimePos & _time, bool wantInValue = 0) const;
+	float valueAt(const TimePos& _time, bool wantInValue = false) const;
 	float *valuesAfter( const TimePos & _time ) const;
 
 	QString name() const;
