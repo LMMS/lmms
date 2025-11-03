@@ -470,7 +470,7 @@ jobs:
       - name: Configure
         run: |
           /clang64/bin/ccache.exe --zero-stats
-          cmake -B build $CMAKE_OPTS
+          cmake -B build -DWANT_QT6=ON $CMAKE_OPTS
       - name: Build
         run: cmake --build build
       - name: Package
