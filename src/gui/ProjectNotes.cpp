@@ -26,6 +26,7 @@
 #include "ProjectNotes.h"
 
 #include <QAction>
+#include <QActionGroup>
 #include <QApplication>
 #include <QCloseEvent>
 #include <QColorDialog>
@@ -146,8 +147,15 @@ void ProjectNotes::setupActions()
 	m_comboFont->setEditable( true );
 	QFontDatabase db;
 	m_comboFont->addItems( db.families() );
-	connect( m_comboFont, SIGNAL( activated( const QString& ) ),
-			m_edit, SLOT( setFontFamily( const QString& ) ) );
+
+	connect(m_comboFont,
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
+		QOverload<const QString&>::of(&QComboBox::activated),
+#else
+		&QComboBox::textActivated,
+#endif
+		m_edit, &QTextEdit::setFontFamily);
+
 	m_comboFont->lineEdit()->setText( QApplication::font().family() );
 
 	m_comboSize = new QComboBox( tb );
@@ -158,8 +166,15 @@ void ProjectNotes::setupActions()
 	{
 		m_comboSize->addItem( QString::number( *it ) );
 	}
-	connect( m_comboSize, SIGNAL( activated( const QString& ) ),
-		     this, SLOT( textSize( const QString& ) ) );
+
+	connect(m_comboSize,
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
+		QOverload<const QString&>::of(&QComboBox::activated),
+#else
+		&QComboBox::textActivated,
+#endif
+		this, &ProjectNotes::textSize);
+
 	m_comboSize->lineEdit()->setText( QString::number(
 					QApplication::font().pointSize() ) );
 

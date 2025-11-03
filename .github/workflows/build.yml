@@ -372,10 +372,10 @@ jobs:
       - name: Install tools
         run: choco install ccache
       - name: Install Qt
-        uses: jurplel/install-qt-action@b3ea5275e37b734d027040e2c7fe7a10ea2ef946
+        uses: jurplel/install-qt-action@d325aaf2a8baeeda41ad0b5d39f84a6af9bcf005
         with:
-          version: '5.15.2'
-          arch: "win64_msvc2019_64"
+          version: '6.8.*'
+          arch: "win64_msvc2022_64"
           archives: qtbase qtsvg qttools
           cache: true
       - name: Set up build environment
@@ -392,6 +392,7 @@ jobs:
             --toolchain C:/vcpkg/scripts/buildsystems/vcpkg.cmake `
             -Werror=dev `
             -DCMAKE_BUILD_TYPE=RelWithDebInfo `
+            -DWANT_QT6=ON `
             -DUSE_COMPILE_CACHE=ON `
             -DUSE_WERROR=ON `
             -DVCPKG_TARGET_TRIPLET="x64-windows" `
