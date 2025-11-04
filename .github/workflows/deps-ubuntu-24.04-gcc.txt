@@ -19,6 +19,8 @@ liblilv-dev
 liblist-moreutils-perl
 libmp3lame-dev
 libogg-dev
+libqt5widgets5
+libqt5x11extras5
 libqt6svg6-dev
 libsamplerate0-dev
 libsdl2-dev
