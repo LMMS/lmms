@@ -184,9 +184,11 @@ jobs:
           - arch: x86_64
             os: macos-15-intel
             xcode: "16.4"
+            macosx_deployment_target: 10.15
           - arch: arm64
             os: macos-15
             xcode: "16.4"
+            macosx_deployment_target: 11.0
     name: macos-${{ matrix.arch }}
     runs-on: ${{ matrix.os }}
     env:
@@ -236,11 +238,11 @@ jobs:
       - name: Configure
         run: |
           ccache --zero-stats
-          source .github/workflows/macos-env.sh brew qt 6
           mkdir build
           cmake -S . \
                 -B build \
                 -DCMAKE_OSX_ARCHITECTURES=${{ matrix.arch }} \
+                -DCMAKE_OSX_DEPLOYMENT_TARGET=${{ matrix.macosx_deployment_target }} \
                 -DWANT_QT6=ON \
                 $CMAKE_OPTS \
                 -DUSE_WERROR=OFF
