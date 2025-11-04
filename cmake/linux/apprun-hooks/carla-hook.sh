@@ -1,5 +1,4 @@
 #!/bin/sh
-ME="$(basename "$0")"
 
 # Workaround nuances with carla being an optional-yet-hard-linked plugin
 CARLA_LIB_NAME="libcarla_native-plugin.so"
@@ -17,12 +16,12 @@ if command -v carla > /dev/null 2>&1; then
 			# Add directory to LD_LIBRARY_PATH so libcarlabase.so can find it
 			CARLA_LIB_FILE="$CARLA_PREFIX/$lib/carla/$CARLA_LIB_NAME"
 			export LD_LIBRARY_PATH="$CARLA_PREFIX/$lib/carla/:$LD_LIBRARY_PATH"
-			echo "[$ME] Carla appears to be installed on this system at $CARLA_PREFIX/$lib/carla so we'll use it." >&2
+			echo "[${0##*/}] Carla appears to be installed on this system at $CARLA_PREFIX/$lib/carla so we'll use it." >&2
 			break
 		fi
 	done
 else
-	echo "[$ME] Carla does not appear to be installed, we'll remove it from the plugin listing." >&2
+	echo "[${0##*/}] Carla does not appear to be installed, we'll remove it from the plugin listing." >&2
 	export "LMMS_EXCLUDE_PLUGINS=libcarla,${LMMS_EXCLUDE_PLUGINS}"
 fi
 
@@ -36,7 +35,7 @@ if [ -n "$CARLA_LIB_FILE" ]; then
 			conflict_sys="$(ldd "$CARLA_LIB_FILE" | grep "$conflict" | awk '{print $3}')"
 			if [ -e "$conflict_sys" ]; then
 				# Add library to LD_PRELOAD so lmms can find it over its bundled version
-				echo "[$ME] Preferring the system's \"$conflict\" over the version bundled." >&2
+				echo "[${0##*/}] Preferring the system's \"$conflict\" over the version bundled." >&2
 				export LD_PRELOAD="$conflict_sys:$LD_PRELOAD"
 			fi
 		fi
