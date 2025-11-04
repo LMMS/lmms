@@ -394,9 +394,7 @@ void AudioEngine::renderStageMix()
 	AutomatableModel::incrementPeriodCounter();
 }
 
-
-
-const SampleFrame* AudioEngine::renderNextBuffer()
+const SampleFrame* AudioEngine::renderNextBuffer() noexcept LMMS_NONBLOCKING
 {
 	const auto lock = std::lock_guard{m_changeMutex};
 
