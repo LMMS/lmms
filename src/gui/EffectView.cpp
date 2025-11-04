@@ -87,17 +87,9 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 					this, SLOT(editControls()));
 
 		m_controlView = effect()->controls()->createView();
-		if( m_controlView )
+		if (m_controlView)
 		{
-			m_subWindow = getGUI()->mainWindow()->addWindowedWidget( m_controlView );
-			if (!m_controlView->isResizable())
-			{
-				if (m_controlView->layout())
-				{
-					m_controlView->layout()->setSizeConstraint(QLayout::SetFixedSize);
-				}
-				// else hope it already manages its size
-			}
+			m_subWindow = getGUI()->mainWindow()->addWindowedWidget(m_controlView);
 			m_subWindow->setWindowFlag(Qt::WindowMaximizeButtonHint, false);
 			m_subWindow->hide();
 		}

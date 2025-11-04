@@ -45,8 +45,6 @@ public:
 	EffectControlDialog(EffectControls* controls);
 	~EffectControlDialog() override = default;
 
-	virtual bool isResizable() const { return false; }
-
 protected:
 	EffectControls* m_effectControls;
 };
