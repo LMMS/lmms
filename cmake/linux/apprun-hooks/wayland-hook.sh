@@ -1,8 +1,7 @@
-#!/usr/bin/env bash
+#!/bin/sh
+ME="$(basename "$0")"
 
-# Configure QPlatform Abstraction (qpa) to prefer X-Protocol C-Bindings (xcb) over Wayland 
-ME="$( basename "${BASH_SOURCE[0]}")"
-
+# Configure QPlatform Abstraction (qpa) to prefer X-Protocol C-Bindings (xcb) over Wayland
 if [ -n "$QT_QPA_PLATFORM" ]; then
 	echo "[$ME] QT_QPA_PLATFORM=\"$QT_QPA_PLATFORM\" was provided, using." >&2
 else
