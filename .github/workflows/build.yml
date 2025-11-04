@@ -236,7 +236,7 @@ jobs:
       - name: Configure
         run: |
           ccache --zero-stats
-          source .github/workflows/macos-env.sh
+          source .github/workflows/macos-env.sh brew qt 6
           mkdir build
           cmake -S . \
                 -B build \
