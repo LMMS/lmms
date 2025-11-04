@@ -182,7 +182,6 @@ void SubWindow::setVisible(bool visible)
 
 void SubWindow::showEvent(QShowEvent* e)
 {
-	widget()->show();
 	if (ConfigManager::inst()->value("ui", "detachbehavior", "show") == "detached") { detach(); }
 	if (isDetached())
 	{
