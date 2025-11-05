@@ -48,6 +48,7 @@ public:
 private:
 	void closeEvent(QCloseEvent*) override;
 	void update();
+	void reset();
 	QPushButton* m_tapButton;
 	QPushButton* m_resetButton;
 	QPushButton* m_syncButton;

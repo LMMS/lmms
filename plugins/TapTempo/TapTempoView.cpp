@@ -51,9 +51,8 @@ TapTempoView::TapTempoView(TapTempo* plugin)
 
 	auto font = QFont();
 
-	m_tapButton->setFixedSize(250, 250);
-	m_tapButton->setFont(adjustedToPixelSize(font, 32));
-	m_tapButton->setText(tr("Click to begin"));
+	m_tapButton->setFixedSize(200, 200);
+	m_tapButton->setFont(adjustedToPixelSize(font, 24));
 
 	m_precisionCheckBox->setFocusPolicy(Qt::NoFocus);
 	m_precisionCheckBox->setToolTip(tr("Display in high precision"));
@@ -65,11 +64,9 @@ TapTempoView::TapTempoView(TapTempo* plugin)
 
 	m_msLabel->setFocusPolicy(Qt::NoFocus);
 	m_msLabel->setToolTip(tr("BPM in milliseconds"));
-	m_msLabel->setText(tr("0 ms"));
 
 	m_hzLabel->setFocusPolicy(Qt::NoFocus);
 	m_hzLabel->setToolTip(tr("Frequency of BPM"));
-	m_hzLabel->setText(tr("0.0000 hz"));
 
 	m_resetButton->setFocusPolicy(Qt::NoFocus);
 	m_resetButton->setToolTip(tr("Reset counter and sidebar information"));
@@ -113,7 +110,9 @@ TapTempoView::TapTempoView(TapTempo* plugin)
 	connect(m_precisionCheckBox, &QCheckBox::toggled, this, &TapTempoView::update);
 	connect(m_syncButton, &QPushButton::clicked, m_plugin, &TapTempo::sync);
 
+	reset();
 	hide();
+
 	if (parentWidget())
 	{
 		parentWidget()->hide();
@@ -137,10 +136,17 @@ void TapTempoView::update()
 	m_hzLabel->setText(tr("%1 hz").arg(hz, 0, 'f', 4));
 }
 
+void TapTempoView::reset()
+{
+	m_tapButton->setText(tr("Click to begin"));
+	m_msLabel->setText(tr("0 ms"));
+	m_hzLabel->setText(tr("0.0000 hz"));
+}
+
 void TapTempoView::closeEvent(QCloseEvent*)
 {
 	m_plugin->reset();
-	update();
+	reset();
 }
 
 } // namespace lmms::gui
