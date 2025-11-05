@@ -24,7 +24,6 @@
 
 #include "TapTempo.h"
 
-#include <iostream>
 #include <string>
 
 #include "SamplePlayHandle.h"
