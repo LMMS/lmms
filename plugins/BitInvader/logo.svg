@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48">
+	<metadata>
+		<rdf:RDF>
+			<cc:Work>
+			<dc:title>BitInvader icon</dc:title>
+				<dc:creator>
+					<cc:Agent><dc:title>Fawn Sannar</dc:title></cc:Agent>
+				</dc:creator>
+			</cc:Work>
+			<cc:License rdf:about="http://creativecommons.org/publicdomain/zero/1.0/">
+				<cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction" />
+				<cc:permits rdf:resource="http://creativecommons.org/ns#Distribution" />
+				<cc:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks" />
+			</cc:License>
+		</rdf:RDF>
+	</metadata>
+	<path fill="#000" d="M6 6v9h4v6H6v3H2v12h8v3h4v3h20v-3h4v-3h8V24h-4v-3h-4v-6h4V6H30v3h-4v3h-4V9h-4V6H6z"/>
+	<path fill="#e0fa15" d="M10 9v3h4V9zm4 3v3h4v-3zm4 3v3h-4v6h-4v3h4v3h4v3h12v-3h4v-3h4v-3h-4v-6h-4v-3zm12 0h4v-3h-4zm4-3h4V9h-4zm4 15v6h4v-6zm-8 6v3h4v-3zm0 3h-4v3h4zm-12-3h-4v3h4zm0 3v3h4v-3zm-8-9H6v6h4zm8-6h4v6h-4zm8 0h4v6h-4z"/>
+</svg>
