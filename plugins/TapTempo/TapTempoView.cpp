@@ -51,9 +51,9 @@ TapTempoView::TapTempoView(TapTempo* plugin)
 
 	auto font = QFont();
 
-	m_tapButton->setFixedSize(200, 200);
+	m_tapButton->setFixedSize(250, 250);
 	m_tapButton->setFont(adjustedToPixelSize(font, 32));
-	m_tapButton->setText(tr("0"));
+	m_tapButton->setText(tr("Click to begin"));
 
 	m_precisionCheckBox->setFocusPolicy(Qt::NoFocus);
 	m_precisionCheckBox->setToolTip(tr("Display in high precision"));
