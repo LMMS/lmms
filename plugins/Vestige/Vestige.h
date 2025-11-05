@@ -174,9 +174,9 @@ private:
 
 	PixmapButton * m_openPluginButton;
 	PixmapButton * m_openPresetButton;
-	PixmapButton * m_rolLPresetButton;
-	PixmapButton * m_rolRPresetButton;
-	QPushButton * m_selPresetButton;
+	QPushButton* m_rolLPresetButton;
+	QPushButton* m_rolRPresetButton;
+	QPushButton* m_selPresetButton;
 	QPushButton * m_toggleGUIButton;
 	PixmapButton * m_managePluginButton;
 	PixmapButton * m_savePresetButton;

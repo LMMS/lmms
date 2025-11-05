@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10">
+	<metadata>
+		<rdf:RDF>
+			<cc:Work>
+				<dc:title>Downward-facing arrow</dc:title>
+				<dc:creator><cc:Agent><dc:title>Fawn Sannar</dc:title></cc:Agent></dc:creator>
+			</cc:Work>
+			<cc:License rdf:about="http://creativecommons.org/publicdomain/zero/1.0/">
+				<cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction" />
+				<cc:permits rdf:resource="http://creativecommons.org/ns#Distribution" />
+				<cc:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks" />
+			</cc:License>
+		</rdf:RDF>
+	</metadata>
+	<path d="m8.8 3.6-3 4a1 1 0 0 1-1.6 0l-3-4a1 1 0 0 1 0.8-1.6h6a1 1 0 0 1 0.8 1.6z" fill="#fff"/>
+</svg>

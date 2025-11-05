@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10">
+	<metadata>
+		<rdf:RDF>
+			<cc:Work>
+				<dc:title>Left-facing arrow</dc:title>
+				<dc:creator><cc:Agent><dc:title>Fawn Sannar</dc:title></cc:Agent></dc:creator>
+			</cc:Work>
+			<cc:License rdf:about="http://creativecommons.org/publicdomain/zero/1.0/">
+				<cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction" />
+				<cc:permits rdf:resource="http://creativecommons.org/ns#Distribution" />
+				<cc:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks" />
+			</cc:License>
+		</rdf:RDF>
+	</metadata>
+	<path fill="#fff" d="m6.4 1.2-4 3a1 1 0 0 0 0 1.6l4 3A1 1 0 0 0 8 8V2a1 1 0 0 0-1.6-.8z"/>
+</svg>
