@@ -24,6 +24,7 @@
 
 #include "TapTempo.h"
 
+#include <iostream>
 #include <string>
 
 #include "SamplePlayHandle.h"
@@ -74,7 +75,22 @@ void TapTempo::tap(bool play)
 
 		const auto total = std::accumulate(m_intervals.begin(), m_intervals.end(), 0.0);
 		const auto avg = total / m_intervals.size();
-		constexpr auto alpha = 0.1; // a smoothing factor to minimize jitter in the BPM calculation
+
+		const auto variance = std::accumulate(m_intervals.begin(), m_intervals.end(), 0.0, [&](auto acc, auto x) {
+			return acc + std::pow(x - avg, 2);
+		}) / m_intervals.size();
+
+		const auto stdDev = std::sqrt(variance);
+		constexpr auto maxStdDev = 100ms;
+
+		// A mesure of how stable the user is tapping at
+		const auto stability = std::clamp(1.0 - (stdDev / maxStdDev.count()), 0.0, 1.0);
+
+		// A smoothing factor to minimize jitter in the BPM calculation
+		constexpr auto minAlpha = 0.1;
+		constexpr auto maxAlpha = 1.0;
+		const auto alpha = std::lerp(minAlpha, maxAlpha, 1.0 - stability);
+
 		m_bpm = alpha * (60000. / avg) + (1.0 - alpha) * m_bpm;
 	}
 
