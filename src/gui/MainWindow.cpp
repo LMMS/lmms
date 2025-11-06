@@ -303,8 +303,8 @@ void MainWindow::finalize()
 
 	project_menu->addSeparator();
 
-	project_menu->addAction(embed::getIconPixmap("project_import"), tr("Import..."),
-		keySequence(Qt::CTRL, Qt::Key_I), this, &MainWindow::onImportProject);
+	addAction(project_menu, embed::getIconPixmap("project_import"), tr("Import..."),
+		keySequence(Qt::CTRL, Qt::Key_I), &MainWindow::onImportProject);
 
 	addAction(project_menu, "project_export", tr("E&xport..."),
 		keySequence(Qt::CTRL, Qt::Key_E), &MainWindow::onExportProject);
