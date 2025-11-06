@@ -865,7 +865,7 @@ XpressiveHelpView::XpressiveHelpView():QTextEdit(s_helpText)
 #if QT_VERSION < 0x50C00
 	// Workaround for a bug in Qt versions below 5.12,
 	// where argument-dependent-lookup fails for QFlags operators
-	// declared inside a namepsace.
+	// declared inside a namespace.
 	// This affects the Q_DECLARE_OPERATORS_FOR_FLAGS macro in Instrument.h
 	// See also: https://codereview.qt-project.org/c/qt/qtbase/+/225348
 
