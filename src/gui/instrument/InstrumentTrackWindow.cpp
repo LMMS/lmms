@@ -601,6 +601,7 @@ void InstrumentTrackWindow::dropEvent( QDropEvent* event )
 		event->accept();
 		setFocus();
 	}
+	updateSubWindow();
 }
 
 
