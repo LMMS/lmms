@@ -128,6 +128,10 @@ set(ENV{PATH} "${QTBIN}:$ENV{PATH}")
 # Promote finding our own libraries first
 set(ENV{LD_LIBRARY_PATH} "${APP}/usr/lib/${lmms}/:${APP}/usr/lib/${lmms}/optional:$ENV{LD_LIBRARY_PATH}")
 
+# Workaround for finding libs from online installer
+# https://github.com/linuxdeploy/linuxdeploy-plugin-qt/issues/193
+set(ENV{LD_LIBRARY_PATH} "${QTBIN}/../lib:$ENV{LD_LIBRARY_PATH}")
+
 # Skip slow searching of copyright files https://github.com/linuxdeploy/linuxdeploy/issues/278
 set(ENV{DISABLE_COPYRIGHT_FILES_DEPLOYMENT} 1)
 

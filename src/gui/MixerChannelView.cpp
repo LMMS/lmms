@@ -343,10 +343,16 @@ bool MixerChannelView::confirmRemoval(int index)
 	QString messageTitleRemoveTrack = tr("Confirm removal");
 	QString askAgainText = tr("Don't ask again");
 	auto askAgainCheckBox = new QCheckBox(askAgainText, nullptr);
-	connect(askAgainCheckBox, &QCheckBox::stateChanged, [](int state) {
+	auto onCheckedStateChanged = [](auto state) {
 		// Invert button state, if it's checked we *shouldn't* ask again
-		ConfigManager::inst()->setValue("ui", "mixerchanneldeletionwarning", state ? "0" : "1");
-	});
+		ConfigManager::inst()->setValue("ui", "mixerchanneldeletionwarning", state != Qt::Unchecked ? "0" : "1");
+	};
+
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
+	connect(askAgainCheckBox, &QCheckBox::checkStateChanged, onCheckedStateChanged);
+#else
+	connect(askAgainCheckBox, &QCheckBox::stateChanged, onCheckedStateChanged);
+#endif
 
 	QMessageBox mb;
 	mb.setText(messageRemoveTrack);

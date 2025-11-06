@@ -361,7 +361,12 @@ int main( int argc, char * * argv )
 		return EXIT_FAILURE;
 	}
 #endif
+
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
+	// High-DPI scaling is always enabled in Qt >= 6.0
 	QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+#endif
+
 	QCoreApplication * app = coreOnly ?
 			new QCoreApplication( argc, argv ) :
 					new gui::MainApplication(argc, argv);
@@ -824,7 +829,7 @@ int main( int argc, char * * argv )
 			discard->setIcon( embed::getIconPixmap( "discard" ) );
 			
 			// add shortcut to discard
-			discard->setShortcut(combine(Qt::CTRL, Qt::Key_D));
+			discard->setShortcut(keySequence(Qt::CTRL, Qt::Key_D));
 
 			mb.setDefaultButton( recover );
 			mb.setEscapeButton( exit );
