@@ -375,9 +375,11 @@ lmms--gui--TrackContentWidget {
 
 /* 20px = 1px border + 2px padding + 14px icon + 2px padding + 1px border */
 QPushButton#btn-mute,
+QPushButton#btn-mute-inv,
 QPushButton#btn-mute-inv:checked,
 QPushButton#btn-solo,
 lmms--gui--TrackOperationsWidget QPushButton {
+	padding: 2;
 	min-height: 14;
 	max-height: 14;
 	min-width: 14;
@@ -388,6 +390,7 @@ lmms--gui--TrackOperationsWidget QPushButton {
 QPushButton#btn-stepper-down,
 QPushButton#btn-stepper-left,
 QPushButton#btn-stepper-right {
+	padding: 2;
 	min-height: 10;
 	max-height: 10;
 	min-width: 10;
@@ -401,7 +404,6 @@ QPushButton#btn-mute,
 QPushButton#btn-mute-inv:checked,
 QPushButton#btn-solo,
 lmms--gui--TrackOperationsWidget QPushButton {
-	padding: 2;
 	border: 1 solid #12161d;
 	border-top: 1 solid #191d24;
 	border-bottom: 1 solid #0c1016;
