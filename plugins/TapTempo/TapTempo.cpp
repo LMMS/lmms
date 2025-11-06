@@ -106,7 +106,6 @@ void TapTempo::sync()
 void TapTempo::reset()
 {
 	m_bpm = 0;
-	m_beat = 0;
 	m_intervals.clear();
 	m_lastTap = std::chrono::time_point<clock>{};
 }
