@@ -69,16 +69,10 @@ void TapTempo::tap(bool play)
 			return;
 		}
 
-		m_intervals.emplace_back(delta.count());
-		if (m_intervals.size() > MaxIntervals) { m_intervals.pop_front(); }
-
-		const auto total = std::accumulate(m_intervals.begin(), m_intervals.end(), 0.0);
-		const auto avg = total / m_intervals.size();
-
 		// A smoothing factor to reduce jitter in the BPM calculation
 		constexpr auto alpha = 0.2;
 
-		m_bpm = alpha * (60000. / avg) + (1.0 - alpha) * m_bpm;
+		m_bpm = alpha * (60000. / delta.count()) + (1.0 - alpha) * m_bpm;
 	}
 
 	const auto timeSigNumerator = Engine::getSong()->getTimeSigModel().getNumerator();
@@ -94,7 +88,6 @@ void TapTempo::sync()
 void TapTempo::reset()
 {
 	m_bpm = 0;
-	m_intervals.clear();
 	m_lastTap = std::chrono::time_point<clock>{};
 }
 

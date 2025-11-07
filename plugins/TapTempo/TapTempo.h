@@ -52,7 +52,6 @@ public:
 private:
 	static constexpr auto MaxIntervals = 5;
 	using clock = std::chrono::steady_clock;
-	std::deque<long> m_intervals{};
 	std::chrono::time_point<clock> m_lastTap;
 	int m_beat = 0;
 	double m_bpm = 0;
