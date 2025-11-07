@@ -36,6 +36,7 @@ namespace lmms
 
 namespace
 {
+
 /*
  * In the past, the RMS was calculated then compared with a threshold of 10^(-10).
  * Now we use a different algorithm to determine whether a buffer is non-quiet, so
@@ -65,7 +66,7 @@ AudioBus::AudioBus(SampleFrame* const* bus, track_ch_t channelPairs, f_cnt_t fra
 	: m_bus{bus}
 	, m_channelPairs{channelPairs}
 	, m_frames{frames}
-	, m_autoQuitEnabled{ConfigManager::inst()->value("ui", "disableautoquit", "1").toInt() == 0}
+	, m_silenceTrackingEnabled{ConfigManager::inst()->value("ui", "disableautoquit", "1").toInt() == 0}
 {
 	m_quietChannels.set();
 }
@@ -77,12 +78,20 @@ void AudioBus::mixQuietChannels(const AudioBus& other)
 
 auto AudioBus::hasInputNoise(const std::bitset<MaxTrackChannels>& usedChannels) const -> bool
 {
-	// Assume non-quiet when auto-quit is disabled
-	if (!m_autoQuitEnabled) { return usedChannels.any(); }
+	// Assume non-quiet when silence tracking is disabled
+	if (!m_silenceTrackingEnabled) { return m_channelPairs != 0 && usedChannels.any(); }
 
 	auto nonQuiet = ~m_quietChannels;
 	nonQuiet &= usedChannels;
 	return nonQuiet.any();
+}
+
+auto AudioBus::hasAnyInputNoise() const -> bool
+{
+	// Assume non-quiet when silence tracking is disabled
+	if (!m_silenceTrackingEnabled) { return m_channelPairs != 0; }
+
+	return !m_quietChannels.all();
 }
 
 void AudioBus::sanitize(const std::bitset<MaxTrackChannels>& channels, track_ch_t upperBound)

@@ -59,7 +59,7 @@ private:
 		}
 
 		auto ab = AudioBus{m_trackChannels.data(), channelPairs, frames};
-		ab.setAutoQuitEnabled(true);
+		ab.enableSilenceTracking(true);
 
 		return ab;
 	}

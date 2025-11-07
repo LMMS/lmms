@@ -92,8 +92,8 @@ public:
 	auto quietChannels() -> std::bitset<MaxTrackChannels>& { return m_quietChannels; }
 #endif
 
-	auto autoQuitEnabled() const -> bool { return m_autoQuitEnabled; }
-	void setAutoQuitEnabled(bool enabled) { m_autoQuitEnabled = enabled; }
+	auto silenceTrackingEnabled() const -> bool { return m_silenceTrackingEnabled; }
+	void enableSilenceTracking(bool enabled) { m_silenceTrackingEnabled = enabled; }
 
 	//! Mixes the silence status of the other `AudioBus` with this `AudioBus`
 	void mixQuietChannels(const AudioBus& other);
@@ -107,9 +107,12 @@ public:
 	 *   1 = track channel is routed to at least one processor input
 	 *
 	 * If the processor is sleeping and has input noise, it should wake up.
-	 * If auto-quit is disabled, all channels are assumed to have input noise.
+	 * If silence tracking is disabled, all channels are assumed to have input noise.
 	 */
 	auto hasInputNoise(const std::bitset<MaxTrackChannels>& usedChannels) const -> bool;
+
+	//! Determines whether there is input noise on any channel. @see hasInputNoise
+	auto hasAnyInputNoise() const -> bool;
 
 	/**
 	 * @brief Sanitizes specified track channels of any Inf/NaN values if "nanhandler" setting is enabled
@@ -119,7 +122,7 @@ public:
 	 */
 	void sanitize(const std::bitset<MaxTrackChannels>& channels, track_ch_t upperBound = MaxTrackChannels);
 
-	//! @see sanitize
+	//! Sanitizes all channels. @see sanitize
 	void sanitizeAll();
 
 	/**
@@ -131,7 +134,7 @@ public:
 	 */
 	auto update(const std::bitset<MaxTrackChannels>& channels, track_ch_t upperBound = MaxTrackChannels) -> bool;
 
-	//! @see update
+	//! Updates the silence status of all channels. @see update
 	auto updateAll() -> bool;
 
 	/**
@@ -142,7 +145,7 @@ public:
 	 */
 	void silenceChannels(const std::bitset<MaxTrackChannels>& channels, track_ch_t upperBound = MaxTrackChannels);
 
-	//! @see silenceChannels
+	//! Silences (zeroes) all channels. @see silenceChannels
 	void silenceAllChannels();
 
 private:
@@ -152,7 +155,7 @@ private:
 
 	std::bitset<MaxTrackChannels> m_quietChannels;
 
-	bool m_autoQuitEnabled = false;
+	bool m_silenceTrackingEnabled = false;
 };
 
 } // namespace lmms
