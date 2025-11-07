@@ -25,7 +25,7 @@
 #include "MixHelpers.h"
 
 #ifdef LMMS_DEBUG
-#include <cstdio>
+#include <iostream>
 #endif
 
 #include <cmath>
@@ -117,8 +117,7 @@ bool sanitizeHelper(SampleFrame* src, int frames)
 		if (badData)
 		{
 #ifdef LMMS_DEBUG
-			// TODO: don't use std::cout here?
-			std::cout << "Bad data, clearing buffer. frame: " << f
+			std::cerr << "Bad data, clearing buffer. frame: " << f
 				<< ": value " << currentFrame.left() << ", " << currentFrame.right() << "\n";
 #endif
 
