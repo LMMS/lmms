@@ -50,8 +50,6 @@ class MixerChannel : public ThreadableJob
 
 		EffectChain m_fxChain;
 
-		// set to true when input fed from mixToChannel or child channel
-		bool m_hasInput;
 		// set to true if any effect in the channel is enabled and running
 		bool m_stillRunning;
 

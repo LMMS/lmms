@@ -59,7 +59,6 @@ void MixerRoute::updateName()
 
 MixerChannel::MixerChannel( int idx, Model * _parent ) :
 	m_fxChain( nullptr ),
-	m_hasInput( false ),
 	m_stillRunning( false ),
 	m_peakLeft( 0.0f ),
 	m_peakRight( 0.0f ),
@@ -173,7 +172,7 @@ void MixerChannel::doProcessing()
 			FloatModel * sendModel = senderRoute->amount();
 			if( ! sendModel ) qFatal( "Error: no send model found from %d to %d", senderRoute->senderIndex(), m_channelIndex );
 
-			if( sender->m_hasInput || sender->m_stillRunning )
+			if (sender->m_bus.hasAnyInputNoise() || sender->m_stillRunning)
 			{
 				// figure out if we're getting sample-exact input
 				ValueBuffer * sendBuf = sendModel->valueBuffer();
@@ -203,7 +202,6 @@ void MixerChannel::doProcessing()
 					MixHelpers::addSanitizedMultipliedByBuffer( m_buffer, ch_buf, v, sendBuf, fpp );
 				}
 				m_bus.mixQuietChannels(sender->m_bus);
-				m_hasInput = true;
 			}
 		}
 
@@ -646,7 +644,6 @@ void Mixer::mixToChannel(const AudioBus& bus, mix_ch_t channel)
 
 		MixHelpers::add(mixerChannel->m_bus.bus()[0], bus.bus()[0], bus.frames());
 		mixerChannel->m_bus.mixQuietChannels(bus);
-		mixerChannel->m_hasInput = true;
 
 		mixerChannel->m_lock.unlock();
 	}
@@ -732,8 +729,6 @@ void Mixer::masterMix( SampleFrame* _buf )
 		m_mixerChannels[i]->m_bus.silenceAllChannels();
 		m_mixerChannels[i]->reset();
 		m_mixerChannels[i]->m_queued = false;
-		// also reset hasInput
-		m_mixerChannels[i]->m_hasInput = false;
 		m_mixerChannels[i]->m_dependenciesMet = 0;
 	}
 }
