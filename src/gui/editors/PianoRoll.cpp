@@ -5387,56 +5387,55 @@ void PianoRollWindow::showEvent(QShowEvent*)
 	// - if there are multiple empty clips, open the first one
 	// - if there's only one clip with notes, open that
 	// - if there are no tracks, or multiple clips, show a help text
-	if (!m_editor->hasValidMidiClip())
+	if (m_editor->hasValidMidiClip()) { return; }
+
+	InstrumentTrack* firstTrack = nullptr;
+	MidiClip* firstEmptyClip = nullptr;
+	MidiClip* firstMelodyClip = nullptr;
+
+	for (auto track: Engine::getSong()->tracks())
 	{
-		InstrumentTrack* firstTrack = nullptr;
-		MidiClip* firstEmptyClip = nullptr;
-		MidiClip* firstMelodyClip = nullptr;
+		if (track->type() != Track::Type::Instrument) { continue; }
+		auto instrumentTrack = static_cast<InstrumentTrack*>(track);
 
-		for (auto track: Engine::getSong()->tracks())
+		if (!firstTrack) { firstTrack = instrumentTrack; }
+
+		for (auto clip: instrumentTrack->getClips())
 		{
-			if (track->type() != Track::Type::Instrument) { continue; }
-			auto instrumentTrack = static_cast<InstrumentTrack*>(track);
+			auto midiClip = static_cast<MidiClip*>(clip);
 
-			if (!firstTrack) { firstTrack = instrumentTrack; }
-
-			for (auto clip: instrumentTrack->getClips())
+			if (midiClip->notes().empty())
 			{
-				auto midiClip = static_cast<MidiClip*>(clip);
-
-				if (midiClip->notes().empty())
-				{
-					if (!firstEmptyClip) { firstEmptyClip = midiClip; }
-				}
-				else if (!firstMelodyClip)
-				{
-					firstMelodyClip = midiClip;
-				}
-				else
-				{
-					TextFloat::displayMessage(tr("No clip selected"),
-						tr("Double click a melody clip in the Song Editor to open it."),
-						embed::getIconPixmap("error"), 5000);
-					parentWidget()->hide();
-					return;
-				}
+				if (!firstEmptyClip) { firstEmptyClip = midiClip; }
+			}
+			else if (!firstMelodyClip)
+			{
+				firstMelodyClip = midiClip;
+			}
+			else
+			{
+				TextFloat::displayMessage(tr("No clip selected"),
+					tr("Double click a melody clip in the Song Editor to open it."),
+					embed::getIconPixmap("error"), 5000);
+				parentWidget()->hide();
+				return;
 			}
 		}
-		if (firstMelodyClip || firstEmptyClip)
-		{
-			m_editor->setCurrentMidiClip(firstMelodyClip ? firstMelodyClip : firstEmptyClip);
-		}
-		else if (firstTrack)
-		{
-			m_editor->setCurrentMidiClip(new MidiClip(firstTrack));
-		}
-		else
-		{
-			TextFloat::displayMessage(tr("No instrument tracks"),
-				tr("Drag an instrument plugin or preset from the sidebar to the Song Editor."),
-				embed::getIconPixmap("error"), 5000);
-			parentWidget()->hide();
-		}
+	}
+	if (firstMelodyClip || firstEmptyClip)
+	{
+		m_editor->setCurrentMidiClip(firstMelodyClip ? firstMelodyClip : firstEmptyClip);
+	}
+	else if (firstTrack)
+	{
+		m_editor->setCurrentMidiClip(new MidiClip(firstTrack));
+	}
+	else
+	{
+		TextFloat::displayMessage(tr("No instrument tracks"),
+			tr("Drag an instrument plugin or preset from the sidebar to the Song Editor."),
+			embed::getIconPixmap("error"), 5000);
+		parentWidget()->hide();
 	}
 }
 
