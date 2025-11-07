@@ -39,12 +39,15 @@ public:
 	{
 	}
 
-	InlineAutomation(const InlineAutomation& _copy) :
-		FloatModel(_copy.value(), _copy.minValue(), _copy.maxValue(), _copy.step<float>()),
-		m_autoClip(_copy.m_autoClip->clone())
+	InlineAutomation(const InlineAutomation& _copy)
+		: FloatModel(_copy.value(), _copy.minValue(), _copy.maxValue(), _copy.step<float>())
 	{
-		m_autoClip->clearObjects();
-		m_autoClip->addObject(this);
+		if (_copy.m_autoClip)
+		{
+			m_autoClip = _copy.m_autoClip->clone();
+			m_autoClip->clearObjects();
+			m_autoClip->addObject(this);
+		}
 	}
 
 	~InlineAutomation() override
