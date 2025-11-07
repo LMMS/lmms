@@ -49,7 +49,7 @@ public:
 
 	~InlineAutomation() override
 	{
-		m_autoClip->deleteLater();
+		if (m_autoClip) { m_autoClip->deleteLater(); }
 	}
 
 	virtual float defaultValue() const = 0;
