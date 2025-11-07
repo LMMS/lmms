@@ -746,8 +746,6 @@ void InstrumentTrackWindow::updateSubWindow()
 	auto subWindow = findSubWindowInParents();
 	if (subWindow && m_instrumentView)
 	{
-		Qt::WindowFlags flags = subWindow->windowFlags();
-
 		const auto instrumentViewResizable = m_instrumentView->isResizable();
 
 		if (instrumentViewResizable)
@@ -757,15 +755,9 @@ void InstrumentTrackWindow::updateSubWindow()
 			const auto extraSpace = QSize(12, 208);
 			setMaximumSize(m_instrumentView->maximumSize() + extraSpace);
 			setMinimumSize(m_instrumentView->minimumSize() + extraSpace);
-
-			flags &= ~Qt::MSWindowsFixedSizeDialogHint;
-			flags |= Qt::WindowMaximizeButtonHint;
 		}
 		else
 		{
-			flags |= Qt::MSWindowsFixedSizeDialogHint;
-			flags &= ~Qt::WindowMaximizeButtonHint;
-
 			setFixedSize(sizeHint());
 
 			// The sub window might be reused from an instrument that was maximized. Show the sub window
@@ -776,7 +768,7 @@ void InstrumentTrackWindow::updateSubWindow()
 			}
 		}
 
-		subWindow->setWindowFlags(flags);
+		subWindow->setWindowFlag(Qt::WindowMaximizeButtonHint, instrumentViewResizable);
 
 		// TODO This is only needed if the sub window is implemented with LMMS' own SubWindow class.
 		// If an QMdiSubWindow is used everything works automatically. It seems that SubWindow is
