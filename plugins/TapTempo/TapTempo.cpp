@@ -74,24 +74,7 @@ void TapTempo::tap(bool play)
 
 		const auto total = std::accumulate(m_intervals.begin(), m_intervals.end(), 0.0);
 		const auto avg = total / m_intervals.size();
-
-		// The mean absolute deviation of the tap intervals
-		const auto deviation = std::accumulate(m_intervals.begin(), m_intervals.end(), 0.0, [&](auto acc, auto x) {
-			return acc + std::abs(x - avg);
-		}) / m_intervals.size();
-
-		// The threshold for least stability
-		// Testing shows consistent tapping has a deviation of around [-50, 50] ms, so 100ms is a safe maximum 
-		constexpr auto maxDeviation = 100ms;
-
-		const auto stability = std::clamp(1.0 - (deviation / maxDeviation.count()), 0.0, 1.0);
-
-		// A smoothing factor to control jitter in the BPM calculation
-		// We want to allow more jitter when the deviation is high, and more stability when the deviation is low,
-		// allowing for quicker BPM updates when changing tempos, and stability when trying to tap consistently.
-		constexpr auto minAlpha = 0.1;
-		constexpr auto maxAlpha = 0.9;
-		const auto alpha = std::lerp(minAlpha, maxAlpha, 1.0 - stability);
+		constexpr auto alpha = 0.2;
 
 		m_bpm = alpha * (60000. / avg) + (1.0 - alpha) * m_bpm;
 	}
