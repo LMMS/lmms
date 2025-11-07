@@ -45,9 +45,9 @@ except ImportError:
 # CONSTANTS
 #
 
-LUPDATE_COMMAND = 'lupdate-qt5'
-LRELEASE_COMMAND = 'lrelease-qt5'
-TRANSIFEX_COMMAND = 'tx-cli'
+LUPDATE_EXECUTABLES = 'lupdate', 'lupdate-qt5'
+LRELEASE_EXECUTABLES = 'lrelease', 'lrelease-qt5'
+TRANSIFEX_CLIENT = 'tx-cli'
 
 # Files to look for strings in (copied from lupdate --help)
 LUPDATE_EXTENSIONS = 'java,jui,ui,c,c++,cc,cpp,cxx,ch,h,h++,hh,hpp,hxx,js,qs,qml,qrc'.split(',')
@@ -109,6 +109,15 @@ def run(command: list[str], exit_on_error=True, **kwargs) -> bool:
 		error(f'Failed with code {proc.returncode}')
 	print('----------------------------------------------')
 	return proc.returncode == 0
+
+
+def find_executable(executables: tuple[str, ...]) -> str:
+	"""Return first existing executable"""
+
+	for ex in executables:
+		if shutil.which(ex) is not None:
+			return ex
+	raise OSError(f'Commands not found: {executables}')
 
 
 # TODO Python 3.12: use tempfile.NamedTempFile(delete=True, delete_on_close=False) instead
@@ -274,15 +283,15 @@ def check_requirements():
 		error("The translations have uncommited changes",
 			  "Please git commit or git restore them")
 
-	if shutil.which(TRANSIFEX_COMMAND) is None:
-		error(f"You don't seem to have {TRANSIFEX_COMMAND} installed",
+	if shutil.which(TRANSIFEX_CLIENT) is None:
+		error(f"You don't seem to have {TRANSIFEX_CLIENT} installed",
 			  "Get the latest release here: https://github.com/transifex/cli")
 
-	for qt_command in (LUPDATE_COMMAND, LRELEASE_COMMAND):
-		if shutil.which(qt_command) is None:
-			error(f"You don't seem to have {qt_command} installed",
-				  "Usually this comes with your Qt installation, or you need to install",
-				  "extra packages like `qt5-tools`, `qttools5-dev-tools` or similar")
+	for commands in (LUPDATE_EXECUTABLES, LRELEASE_EXECUTABLES):
+		if all(shutil.which(cmd) is None for cmd in commands):
+			error(f"You don't seem to have {commands[0]} installed",
+				  "Usually this comes with your Qt installation, or you need to install some",
+				  "package like `qt5-tools`, `qttools5-dev-tools`, `qt6-l10n-tools` or similar")
 
 
 def backup_translations():
@@ -297,7 +306,7 @@ def pull_translations_from_tx():
 	info('Pulling down translations from Transifex')
 
 	command = [
-		TRANSIFEX_COMMAND,
+		TRANSIFEX_CLIENT,
 		'pull',  # this will overwrite files in data/locale [1]
 		'--mode', 'translator',  # both translated and untranslated strings [2]
 		'--force',  # even if the local file is newer than the online resource
@@ -339,7 +348,7 @@ def find_new_strings_in_codebase():
 
 		# Usage: lupdate [options] @lst-file -ts ts-files ... [2]
 		run([
-			LUPDATE_COMMAND,
+			find_executable(LUPDATE_EXECUTABLES),
 			'-no-obsolete',  # drop obsolete and vanished strings
 			'-I', 'include/',  # location to look for include files
 			f'@{list_file}',  # read file names (one per line) from this file
@@ -424,7 +433,7 @@ def validate_translation_files():
 
 	for file in iter_ts_files(include_english=True):
 		with NamedTempFile('.qm') as temp_qm:
-			if not run([LRELEASE_COMMAND, str(file), '-qm', temp_qm]):
+			if not run([find_executable(LRELEASE_EXECUTABLES), str(file), '-qm', temp_qm]):
 				found_errors = True
 	if found_errors:
 		exit(1)
@@ -452,10 +461,10 @@ def push_translations_to_tx():
 	# [4] https://help.transifex.com/en/articles/6223301-qt-linguist
 
 	# Push the updated English strings
-	run([TRANSIFEX_COMMAND, 'push', '--source'])
+	run([TRANSIFEX_CLIENT, 'push', '--source'])
 
 	# Push the updated translations
-	run([TRANSIFEX_COMMAND, 'push', '--translation', '--languages', ','.join(LANGUAGES)])
+	run([TRANSIFEX_CLIENT, 'push', '--translation', '--languages', ','.join(LANGUAGES)])
 
 	info('Translations uploaded!')
 
