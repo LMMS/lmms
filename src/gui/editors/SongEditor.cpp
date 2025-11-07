@@ -1097,6 +1097,8 @@ void SongEditorWindow::play()
 void SongEditorWindow::record()
 {
 	m_editor->m_song->record();
+	m_editor->m_timeLine->setRecording(true);
+	m_editor->m_positionLine->setRecording(true);
 }
 
 
@@ -1105,6 +1107,8 @@ void SongEditorWindow::record()
 void SongEditorWindow::recordAccompany()
 {
 	m_editor->m_song->playAndRecord();
+	m_editor->m_timeLine->setRecording(true);
+	m_editor->m_positionLine->setRecording(true);
 }
 
 
@@ -1114,6 +1118,8 @@ void SongEditorWindow::stop()
 {
 	m_editor->m_song->stop();
 	getGUI()->pianoRoll()->stopRecording();
+	m_editor->m_timeLine->setRecording(false);
+	m_editor->m_positionLine->setRecording(false);
 }
 
 
