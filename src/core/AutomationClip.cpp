@@ -570,7 +570,7 @@ float AutomationClip::valueAt(const TimePos& _time, bool wantInValue /*= false*/
 	if (v == m_timeMap.end())
 	{
 		// When the time is after the last node, we want the outValue of it
-		return pv->getOutValue();
+		return std::prev(v)->getOutValue();
 	}
 
 	// If we have a node at that time, just return its value
