@@ -566,8 +566,7 @@ float AutomationClip::valueAt(const TimePos& _time, bool wantInValue /*= false*/
 		return 0;
 	}
 
-	timeMap::const_iterator v = m_timeMap.lowerBound(_time);
-	const auto pv = std::prev(v);
+	const auto v = m_timeMap.lowerBound(_time);
 	if (v == m_timeMap.end())
 	{
 		// When the time is after the last node, we want the outValue of it
