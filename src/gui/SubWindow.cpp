@@ -320,7 +320,7 @@ void SubWindow::detach()
 
 	auto flags = windowFlags();
 	flags |= Qt::Window;
-	flags &= ~Qt::Widget;
+	flags &= ~Qt::SubWindow;
 	flags |= Qt::WindowMinimizeButtonHint;
 
 	hide();
@@ -365,7 +365,7 @@ void SubWindow::attach()
 
 	auto flags = windowFlags();
 	flags &= ~Qt::Window;
-	flags |= Qt::Widget;
+	flags |= Qt::SubWindow;
 	flags &= ~Qt::WindowMinimizeButtonHint;
 	widget()->setWindowFlags(flags);
 
