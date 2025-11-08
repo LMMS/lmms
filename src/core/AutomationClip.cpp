@@ -596,6 +596,7 @@ float AutomationClip::valueAt(const TimePos& _time, bool wantInValue /*= false*/
 
 	// The returned node has a greater key than _time. Therefore we take the
 	// previous element to calculate the current value.
+	const auto pv = std::prev(v);
 	return valueAt(pv, _time - POS(pv));
 }
 
