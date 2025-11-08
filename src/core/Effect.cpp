@@ -116,11 +116,7 @@ bool Effect::processAudioBuffer(AudioBus& inOut)
 {
 	if (!isAwake())
 	{
-		if (inOut.hasInputNoise(0b11))
-		{
-			startRunning();
-		}
-		else
+		if (!inOut.hasInputNoise(0b11))
 		{
 			// Sleeping plugins need to zero any track channels their output is routed to in order to
 			// prevent sudden track channel passthrough behavior when the plugin is put to sleep.
@@ -130,6 +126,8 @@ bool Effect::processAudioBuffer(AudioBus& inOut)
 
 			return false;
 		}
+
+		startRunning();
 	}
 
 	if (!isRunning())

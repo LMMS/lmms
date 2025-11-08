@@ -93,7 +93,7 @@ public:
 #endif
 
 	auto silenceTrackingEnabled() const -> bool { return m_silenceTrackingEnabled; }
-	void enableSilenceTracking(bool enabled) { m_silenceTrackingEnabled = enabled; }
+	void enableSilenceTracking(bool enabled);
 
 	//! Mixes the silence status of the other `AudioBus` with this `AudioBus`
 	void mixQuietChannels(const AudioBus& other);
@@ -153,6 +153,13 @@ private:
 	const track_ch_t m_channelPairs = 0;
 	const f_cnt_t m_frames = 0;
 
+	/**
+	 * Stores which channels are known to be quiet.
+	 *
+	 * It must always be kept in sync with the buffer data when enabled - at minimum
+	 * avoiding any false positives where a channel is marked as "quiet" when it isn't.
+	 * Any channel bits at or above `channels()` must always be marked quiet.
+	 */
 	std::bitset<MaxTrackChannels> m_quietChannels;
 
 	bool m_silenceTrackingEnabled = false;

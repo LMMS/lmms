@@ -22,6 +22,8 @@
  *
  */
 
+// TODO: Add tests for when silence tracking is disabled
+
 #include "AudioBus.h"
 
 #include <QObject>
