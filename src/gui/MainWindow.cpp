@@ -329,23 +329,16 @@ void MainWindow::finalize()
 
 	auto edit_menu = new QMenu(this);
 	menuBar()->addMenu( edit_menu )->setText( tr( "&Edit" ) );
-	m_undoAction = edit_menu->addAction( embed::getIconPixmap( "edit_undo" ),
-					tr( "Undo" ),
+	m_undoAction = edit_menu->addAction(embed::getIconPixmap("edit_undo"),
+					tr("Undo"),
 					this, SLOT(undo()),
-					QKeySequence::Undo );
-	m_redoAction = edit_menu->addAction( embed::getIconPixmap( "edit_redo" ),
-					tr( "Redo" ),
+					QKeySequence::Undo);
+	m_redoAction = edit_menu->addAction(embed::getIconPixmap("edit_redo"),
+					tr("Redo"),
 					this, SLOT(redo()),
-					QKeySequence::Redo );
-	// Ensure that both (Ctrl+Y) and (Ctrl+Shift+Z) activate redo shortcut regardless of OS defaults
-	if (QKeySequence(QKeySequence::Redo) != QKeySequence(combine(Qt::CTRL, Qt::Key_Y)))
-	{
-		new QShortcut(QKeySequence(combine(Qt::CTRL, Qt::Key_Y)), this, SLOT(redo()));
-	}
-	if (QKeySequence(QKeySequence::Redo) != QKeySequence(combine(Qt::CTRL, Qt::SHIFT, Qt::Key_Z)))
-	{
-		new QShortcut(QKeySequence(combine(Qt::CTRL, Qt::SHIFT, Qt::Key_Z)), this, SLOT(redo()));
-	}
+					QKeySequence::Redo);
+	m_undoAction->setShortcutContext(Qt::ApplicationShortcut);
+	m_redoAction->setShortcutContext(Qt::ApplicationShortcut);
 
 	edit_menu->addSeparator();
 	edit_menu->addAction(embed::getIconPixmap("microtuner"), tr("Scales and keymaps"),
