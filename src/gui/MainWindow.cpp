@@ -650,74 +650,56 @@ void MainWindow::clearKeyModifiers()
 
 
 
-void MainWindow::saveWidgetState( QWidget * _w, QDomElement & _de )
+void MainWindow::saveWidgetState(QWidget* w, QDomElement& de)
 {
-	// If our widget is the main content of a window (e.g. piano roll, Mixer, etc),
-	// we really care about the position of the *window* - not the position of the widget within its window
-	if( _w->parentWidget() != nullptr &&
-			_w->parentWidget()->inherits( "QMdiSubWindow" ) )
-	{
-		_w = _w->parentWidget();
-	}
+	// TODO only use one of these
+	SubWindow* win = qobject_cast<SubWindow*>(w); // nullptr if not
+	if (!win && w->parentWidget()) { win = qobject_cast<SubWindow*>(w->parentWidget()); } // try parent instead
+	if (!win) { return; } // finally, soft-fail if neither can find the window
 
-	// If the widget is a SubWindow, then we can make use of the getTrueNormalGeometry() method that
-	// performs the same as normalGeometry, but isn't broken on X11 ( see https://bugreports.qt.io/browse/QTBUG-256 )
-	auto asSubWindow = qobject_cast<SubWindow*>(_w);
-	QRect normalGeom = asSubWindow != nullptr ? asSubWindow->getTrueNormalGeometry() : _w->normalGeometry();
+	de.setAttribute("visible", bool{win->widget() && win->widget()->isVisible()});
+	de.setAttribute("maximized", win->isMaximized());
 
-	bool visible = _w->isVisible();
-	_de.setAttribute( "visible", visible );
-	_de.setAttribute( "minimized", _w->isMinimized() );
-	_de.setAttribute( "maximized", _w->isMaximized() );
-
-	_de.setAttribute( "x", normalGeom.x() );
-	_de.setAttribute( "y", normalGeom.y() );
-
-	QSize sizeToStore = normalGeom.size();
-	_de.setAttribute( "width", sizeToStore.width() );
-	_de.setAttribute( "height", sizeToStore.height() );
+	QRect normalGeometry = win->getTrueNormalGeometry();
+	de.setAttribute("x", normalGeometry.x());
+	de.setAttribute("y", normalGeometry.y() );
+	de.setAttribute("width", normalGeometry.width());
+	de.setAttribute("height", normalGeometry.height());
 }
 
 
 
 
-void MainWindow::restoreWidgetState( QWidget * _w, const QDomElement & _de )
+void MainWindow::restoreWidgetState(QWidget* w, const QDomElement& de)
 {
-	QRect r( qMax( 1, _de.attribute( "x" ).toInt() ),
-			qMax( 1, _de.attribute( "y" ).toInt() ),
-			qMax( _w->sizeHint().width(), _de.attribute( "width" ).toInt() ),
-			qMax( _w->minimumHeight(), _de.attribute( "height" ).toInt() ) );
-	if( _de.hasAttribute( "visible" ) && !r.isNull() )
-	{
-		// If our widget is the main content of a window (e.g. piano roll, Mixer, etc),
-		// we really care about the position of the *window* - not the position of the widget within its window
-		if ( _w->parentWidget() != nullptr &&
-			_w->parentWidget()->inherits( "QMdiSubWindow" ) )
-		{
-			_w = _w->parentWidget();
-		}
-		// first restore the window, as attempting to resize a maximized window causes graphics glitching
-		_w->setWindowState( _w->windowState() & ~(Qt::WindowMaximized | Qt::WindowMinimized) );
+	// TODO only use one of these
+	SubWindow* win = qobject_cast<SubWindow*>(w); // nullptr if not
+	if (!win && w->parentWidget()) { win = qobject_cast<SubWindow*>(w->parentWidget()); } // try parent instead
+	if (!win) { return; } // finally, soft-fail if neither can find the window
 
-		// Check isEmpty() to work around corrupt project files with empty size
-		if ( ! r.size().isEmpty() ) {
-			_w->resize( r.size() );
-		}
-		_w->move( r.topLeft() );
+	QRect normalGeometry(de.attribute("x").toInt(),
+	                     de.attribute("y").toInt(),
+	                     de.attribute("width").toInt(),
+	                     de.attribute("height").toInt());
+
+	if (normalGeometry.isValid())
+	{
+		// first restore the window, as attempting to resize a maximized window causes graphics glitching
+		win->setWindowState(win->windowState() & ~(Qt::WindowMaximized | Qt::WindowMinimized));
+
+		win->setGeometry(normalGeometry);
 
 		// set the window to its correct minimized/maximized/restored state
-		Qt::WindowStates flags = _w->windowState();
-		flags = _de.attribute( "minimized" ).toInt() ?
-				( flags | Qt::WindowMinimized ) :
-				( flags & ~Qt::WindowMinimized );
-		flags = _de.attribute( "maximized" ).toInt() ?
-				( flags | Qt::WindowMaximized ) :
-				( flags & ~Qt::WindowMaximized );
-		_w->setWindowState( flags );
-
-		_w->setVisible( _de.attribute( "visible" ).toInt() );
+		Qt::WindowStates winState = win->windowState();
+		winState = de.attribute("maximized").toInt()
+					? (winState | Qt::WindowMaximized)
+					: (winState & ~Qt::WindowMaximized);
+		win->setWindowState(winState);
 	}
+
+	if (de.hasAttribute("visible")) { win->setVisible(de.attribute("visible").toInt()); }
 }
+
 
 
 
