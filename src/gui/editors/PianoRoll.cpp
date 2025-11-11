@@ -3882,13 +3882,14 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 {
 	we->accept();
 	// handle wheel events for note edit area - for editing note vol/pan with mousewheel
-	if(position(we).x() > noteEditLeft() && position(we).x() < noteEditRight()
-	&& position(we).y() > noteEditTop() && position(we).y() < noteEditBottom())
+	const auto pos = we->position().toPoint();
+	if (pos.x() > noteEditLeft() && pos.x() < noteEditRight()
+		&& pos.y() > noteEditTop() && pos.y() < noteEditBottom())
 	{
 		if (!hasValidMidiClip()) {return;}
 		// get values for going through notes
 		int pixel_range = 8;
-		int x = position(we).x() - m_whiteKeyWidth;
+		int x = pos.x() - m_whiteKeyWidth;
 		int ticks_start = ( x - pixel_range / 2 ) *
 					TimePos::ticksPerBar() / m_ppb + m_currentPosition;
 		int ticks_end = ( x + pixel_range / 2 ) *
@@ -3925,7 +3926,7 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 				{
 					// show the volume hover-text only if all notes have the
 					// same volume
-					showVolTextFloat(nv[0]->getVolume(), position(we), 1000);
+					showVolTextFloat(nv[0]->getVolume(), pos, 1000);
 				}
 			}
 			else if( m_noteEditMode == NoteEditMode::Panning )
@@ -3944,7 +3945,7 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 				{
 					// show the pan hover-text only if all notes have the same
 					// panning
-					showPanTextFloat( nv[0]->getPanning(), position( we ), 1000 );
+					showPanTextFloat(nv[0]->getPanning(), pos, 1000);
 				}
 			}
 			update();
@@ -3994,7 +3995,7 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 		}
 		z = qBound( 0, z, m_zoomingModel.size() - 1 );
 
-		int x = (position(we).x() - m_whiteKeyWidth) * TimePos::ticksPerBar();
+		int x = (pos.x() - m_whiteKeyWidth) * TimePos::ticksPerBar();
 		// ticks based on the mouse x-position where the scroll wheel was used
 		int ticks = x / m_ppb;
 		// what would be the ticks in the new zoom level on the very same mouse x
