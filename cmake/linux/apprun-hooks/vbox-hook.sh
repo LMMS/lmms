@@ -1,5 +1,4 @@
 #!/bin/sh
-ME="$(basename "$0")"
 
 # Workaround crash in VirtualBox when hardware rendering is enabled
 if lsmod |grep vboxguest > /dev/null 2>&1; then
