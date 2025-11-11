@@ -211,7 +211,7 @@ Sf2Instrument::Sf2Instrument( InstrumentTrack * _instrument_track ) :
 	connect( &m_chorusLevel, SIGNAL( dataChanged() ), this, SLOT( updateChorus() ) );
 	connect( &m_chorusSpeed, SIGNAL( dataChanged() ), this, SLOT( updateChorus() ) );
 	connect( &m_chorusDepth, SIGNAL( dataChanged() ), this, SLOT( updateChorus() ) );
-	
+
 	// Microtuning
 	connect(Engine::getSong(), &Song::scaleListChanged, this, &Sf2Instrument::updateTuning);
 	connect(Engine::getSong(), &Song::keymapListChanged, this, &Sf2Instrument::updateTuning);
@@ -1179,7 +1179,7 @@ void Sf2InstrumentView::showFileDialog()
 {
 	auto k = castModel<Sf2Instrument>();
 
-	FileDialog ofd( nullptr, tr( "Open SoundFont file" ) );
+	FileDialog ofd( nullptr, tr( "Open SoundFont file" ), FileDialog::DirType::Soundfont );
 	ofd.setFileMode( FileDialog::ExistingFiles );
 
 	QStringList types;
