@@ -250,6 +250,7 @@ void EffectSelectDialog::rowChanged(const QModelIndex& idx, const QModelIndex&)
 		}
 
 		auto textualInfoWidget = new QWidget(m_descriptionWidget);
+		textualInfoWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 		hbox->addWidget(textualInfoWidget);
 
 		auto textWidgetLayout = new QVBoxLayout(textualInfoWidget);
