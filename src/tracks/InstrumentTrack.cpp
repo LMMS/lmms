@@ -70,7 +70,8 @@ InstrumentTrack::InstrumentTrack(TrackContainer* tc) :
 	m_arpeggio(this),
 	m_noteStacking(this),
 	m_piano(this),
-	m_microtuner()
+	m_microtuner(),
+	m_midiCCEnable(false, nullptr, tr("Enable/Disable MIDI CC"))
 {
 	m_pitchModel.setCenterValue( 0 );
 	m_pitchModel.setStrictStepSize(true);
@@ -86,11 +87,6 @@ InstrumentTrack::InstrumentTrack(TrackContainer* tc) :
 		m_notes[i] = nullptr;
 		m_runningMidiNotes[i] = 0;
 	}
-
-
-	// Initialize the m_midiCCEnabled variable, but it's actually going to be connected
-	// to a LedButton
-	m_midiCCEnable = std::make_unique<BoolModel>(false, nullptr, tr("Enable/Disable MIDI CC"));
 
 	// Initialize the MIDI CC controller models and connect them to the method that processes
 	// the midi cc events
@@ -305,7 +301,7 @@ MidiEvent InstrumentTrack::applyMasterKey( const MidiEvent& event )
 void InstrumentTrack::processCCEvent(int controller)
 {
 	// Does nothing if the LED is disabled
-	if (!m_midiCCEnable->value()) { return; }
+	if (!m_midiCCEnable.value()) { return; }
 
 	auto channel = static_cast<uint8_t>(midiPort()->realOutputChannel());
 	auto cc = static_cast<uint16_t>(controller);
@@ -845,7 +841,7 @@ void InstrumentTrack::saveTrackSpecificSettings(QDomDocument& doc, QDomElement& 
 	m_microtuner.saveSettings(doc, thisElement);
 
 	// Save MIDI CC stuff
-	m_midiCCEnable->saveSettings(doc, thisElement, "enablecc");
+	m_midiCCEnable.saveSettings(doc, thisElement, "enablecc");
 	QDomElement midiCC = doc.createElement("midicontrollers");
 	thisElement.appendChild(midiCC);
 	for (int i = 0; i < MidiControllerCount; ++i)
@@ -922,7 +918,7 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 
 	// We set MIDI CC enable to false so the knobs don't trigger MIDI CC events while
 	// they are being loaded. After all knobs are loaded we load the right value of m_midiCCEnable.
-	m_midiCCEnable->setValue(false);
+	m_midiCCEnable.setValue(false);
 
 	QDomNode node = thisElement.firstChild();
 	while( !node.isNull() )
@@ -997,7 +993,7 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 	}
 
 	// Load the right value of m_midiCCEnable
-	m_midiCCEnable->loadSettings(thisElement, "enablecc");
+	m_midiCCEnable.loadSettings(thisElement, "enablecc");
 
 	updatePitchRange();
 	unlock();
