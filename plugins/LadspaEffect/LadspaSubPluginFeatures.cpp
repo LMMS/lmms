@@ -88,7 +88,7 @@ void LadspaSubPluginFeatures::fillDescriptionWidget( QWidget * _parent,
 	maker_content->setText(makerString);
 	maker_content->setWordWrap( true );
 	l->addWidget( maker_label );
-	l->addWidget( maker_content);
+	l->addWidget(maker_content);
 	
 
 	auto copyright = new QWidget(_parent);
