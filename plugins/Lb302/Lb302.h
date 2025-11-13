@@ -124,6 +124,7 @@ class Lb302Filter3Pole : public Lb302Filter
 	sample_t process(const sample_t& samp) override;
 
 	protected:
+	static constexpr float VOL_ADJUST = 3.f;
 	float kfcn,
 	      kp,
 	      kp1,
@@ -171,6 +172,7 @@ private:
 	void initSlide();
 
 private:
+	static constexpr float DIST_RATIO = 4.f;
 	static constexpr fpp_t ENVINC = 64; //* Envelope Recalculation period
 
 	FloatModel vcf_cut_knob;

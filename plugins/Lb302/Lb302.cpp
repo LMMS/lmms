@@ -48,23 +48,9 @@
 #include "embed.h"
 #include "plugin_export.h"
 
-//
-// New config
-//
 #define LB_24_IGNORE_ENVELOPE
-#define LB_FILTERED
-//#define LB_DECAY
 //#define LB_24_RES_TRICK
 
-#define LB_DIST_RATIO    4.0
-#define LB_24_VOL_ADJUST 3.0
-//#define LB_DECAY_NOTES
-
-#define LB_DEBUG
-
-//
-// Old config
-//
 
 namespace lmms
 {
@@ -228,7 +214,7 @@ sample_t Lb302Filter3Pole::process(const sample_t& samp)
 	ay2     = kp1h * (ay1 + ay11) - kp*ay2;
 	aout    = kp1h * (ay2 + ay31) - kp*aout;
 
-	return std::tanh(aout * value) * LB_24_VOL_ADJUST / (1.0 + fs->dist);
+	return std::tanh(aout * value) * VOL_ADJUST / (1.0 + fs->dist);
 }
 
 
@@ -319,7 +305,7 @@ void Lb302Synth::filterChanged()
 	fs.cutoff = vcf_cut_knob.value();
 	fs.reso   = vcf_res_knob.value();
 	fs.envmod = vcf_mod_knob.value();
-	fs.dist   = LB_DIST_RATIO*dist_knob.value();
+	fs.dist   = dist_knob.value() * DIST_RATIO;
 
 	float d = 0.2 + (2.3*vcf_dec_knob.value());
 
@@ -514,27 +500,15 @@ int Lb302Synth::process(SampleFrame* outbuf, const std::size_t size)
 
 		//vca_a = 0.5;
 		// Write out samples.
-#ifdef LB_FILTERED
 		//samp = vcf->process(vco_k)*2.0*vca_a;
 		//samp = vcf->process(vco_k)*2.0;
 		sample_t samp = filter.process(vco_k) * vca_a;
-		//printf("%f %d\n", vco_c, sample_cnt);
-
 
 		//samp = vco_k * vca_a;
+		// if (sample_cnt <= 4) { vca_a = 0; }
 
-		if( sample_cnt <= 4 )
-		{
-	//			vca_a = 0;
-		}
-
-#else
-		//samp = vco_k*vca_a;
-#endif
-		/*
-		float releaseFrames = desiredReleaseFrames();
-		samp *= (releaseFrames - catch_decay)/releaseFrames;
-		*/
+		// float releaseFrames = desiredReleaseFrames();
+		// samp *= (releaseFrames - catch_decay)/releaseFrames;
 		//LB302 samp *= (float)(decay_frames - catch_decay)/(float)decay_frames;
 
 		for( int c = 0; c < DEFAULT_CHANNELS; c++ ) 
