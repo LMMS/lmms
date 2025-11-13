@@ -223,12 +223,12 @@ float Lb302Filter3Pole::process(const float& samp)
 	float ax1  = lastin;
 	float ay11 = ay1;
 	float ay31 = ay2;
-	lastin  = (samp) - tanh(kres*aout);
+	lastin  = samp - std::tanh(kres * aout);
 	ay1     = kp1h * (lastin+ax1) - kp*ay1;
 	ay2     = kp1h * (ay1 + ay11) - kp*ay2;
 	aout    = kp1h * (ay2 + ay31) - kp*aout;
 
-	return tanh(aout*value)*LB_24_VOL_ADJUST/(1.0+fs->dist);
+	return std::tanh(aout * value) * LB_24_VOL_ADJUST / (1.0 + fs->dist);
 }
 
 
