@@ -120,15 +120,15 @@ void Lb302Filter::playNote()
 
 Lb302FilterIIR2::Lb302FilterIIR2(Lb302FilterKnobState* p_fs)
 	: Lb302Filter(p_fs)
-	, m_dist{std::make_unique<DspEffectLibrary::Distortion>(1.0, 1.f)}
+	, m_dist{std::make_unique<DspEffectLibrary::Distortion>(1.f, 1.f)}
 {};
 
 
 void Lb302FilterIIR2::recalc()
 {
 	Lb302Filter::recalc();
-	//m_dist->setThreshold(0.5+(fs->dist*2.0));
-	m_dist->setThreshold(fs->dist*75.0);
+	//m_dist->setThreshold(0.5f + (fs->dist * 2.f));
+	m_dist->setThreshold(fs->dist * 75.f);
 };
 
 
@@ -139,9 +139,9 @@ void Lb302FilterIIR2::envRecalc()
 	float w = vcf_e0 + vcf_c0;          // e0 is adjusted for Hz and doesn't need ENVINC
 	float k = std::exp(-w / vcf_rescoeff); // Does this mean c0 is inheritantly?
 
-	vcf_a = 2.0 * std::cos(2.0 * w) * k;
+	vcf_a = 2.f * std::cos(2.f * w) * k;
 	vcf_b = -k*k;
-	vcf_c = 1.0 - vcf_a - vcf_b;
+	vcf_c = 1.f - vcf_a - vcf_b;
 }
 
 
@@ -180,7 +180,7 @@ void Lb302Filter3Pole::envRecalc()
 
 	// e0 is adjusted for Hz and doesn't need ENVINC
 	float w = vcf_e0 + vcf_c0;
-	float k = (fs->cutoff > 0.975)?0.975:fs->cutoff;
+	float k = std::min(fs->cutoff, 0.975f);
 	// sampleRateCutoff should not be changed to anything dynamic that is outside the
 	// scope of LB302 (like e.g. the audio engine's sample rate) as this changes the filter's cutoff
 	// behavior without any modification to its controls.
@@ -193,20 +193,20 @@ void Lb302Filter3Pole::envRecalc()
 
 #ifdef LB_24_IGNORE_ENVELOPE
 	// kfcn = fs->cutoff;
-	kfcn = 2.0 * kfco / Engine::audioEngine()->outputSampleRate();
+	kfcn = 2.f * kfco / Engine::audioEngine()->outputSampleRate();
 #else
 	kfcn = w;
 #endif
-	kp   = ((-2.7528*kfcn + 3.0429)*kfcn + 1.718)*kfcn - 0.9984;
-	kp1  = kp+1.0;
-	kp1h = 0.5*kp1;
+	kp   = ((-2.7528f * kfcn + 3.0429f) * kfcn + 1.718f) * kfcn - 0.9984f;
+	kp1  = kp + 1.f;
+	kp1h = 0.5f * kp1;
 #ifdef LB_24_RES_TRICK
 	k = std::exp(-w / vcf_rescoeff);
-	kres = (((k))) * (((-2.7079*kp1 + 10.963)*kp1 - 14.934)*kp1 + 8.4974);
+	kres = k * (((-2.7079f * kp1 + 10.963f) * kp1 - 14.934f) * kp1 + 8.4974f);
 #else
-	kres = (((fs->reso))) * (((-2.7079*kp1 + 10.963)*kp1 - 14.934)*kp1 + 8.4974);
+	kres = fs->reso * (((-2.7079f * kp1 + 10.963f) * kp1 - 14.934f) * kp1 + 8.4974f);
 #endif
-	value = 1.0+( (fs->dist) *(1.5 + 2.0*kres*(1.0-kfcn))); // ENVMOD was DIST
+	value = 1.f + (fs->dist * (1.5f + 2.f * kres * (1.f - kfcn))); // ENVMOD was DIST
 }
 
 
@@ -220,7 +220,7 @@ sample_t Lb302Filter3Pole::process(const sample_t& samp)
 	ay2     = kp1h * (ay1 + ay11) - kp*ay2;
 	aout    = kp1h * (ay2 + ay31) - kp*aout;
 
-	return std::tanh(aout * value) * VOL_ADJUST / (1.0 + fs->dist);
+	return std::tanh(aout * value) * VOL_ADJUST / (1.f + fs->dist);
 }
 
 
@@ -303,7 +303,7 @@ void Lb302Synth::filterChanged()
 	fs.envmod = vcf_mod_knob.value();
 	fs.dist   = dist_knob.value() * DIST_RATIO;
 
-	float d = 0.2 + (2.3*vcf_dec_knob.value());
+	float d = 0.2f + (2.3f*vcf_dec_knob.value());
 
 	d *= Engine::audioEngine()->outputSampleRate(); // d *= smpl rate
 	fs.envdecay = std::pow(0.1f, 1.0f / d * ENVINC); // decay is 0.1 to the 1/d * ENVINC
@@ -330,12 +330,12 @@ void Lb302Synth::recalcFilter()
 	// THIS IS OLD 3pole/24dB code, I may reintegrate it.  Don't need it
 	// right now.   Should be toggled by LB_24_RES_TRICK at the moment.
 
-	/*kfcn = 2.0 * (((vcf_cutoff*3000))) / engine::audioEngine()->outputSampleRate();
-	kp   = ((-2.7528*kfcn + 3.0429)*kfcn + 1.718)*kfcn - 0.9984;
-	kp1  = kp+1.0;
-	kp1h = 0.5*kp1;
-	kres = (((vcf_reso))) * (((-2.7079*kp1 + 10.963)*kp1 - 14.934)*kp1 + 8.4974);
-	value = 1.0+( (((0))) *(1.5 + 2.0*kres*(1.0-kfcn))); // ENVMOD was DIST*/
+	/*kfcn = 2.f * (vcf_cutoff * 3000) / engine::audioEngine()->outputSampleRate();
+	kp   = ((-2.7528f * kfcn + 3.0429f) * kfcn + 1.718f) * kfcn - 0.9984f;
+	kp1  = kp + 1.f;
+	kp1h = 0.5f * kp1;
+	kres = vcf_reso * (((-2.7079f * kp1 + 10.963f) * kp1 - 14.934f) * kp1 + 8.4974f);
+	value = 1.f + (0.f * (1.5f + 2.f * kres * (1.f - kfcn))); // ENVMOD was DIST*/
 
 	vcf_envpos = ENVINC; // Trigger filter update in process()
 }
@@ -369,7 +369,7 @@ void Lb302Synth::process(SampleFrame* outbuf, const fpp_t size)
 
 		// This computes the factor that's needed to make a signal with a value of 1 decay to the
 		// targeted attenuation over the time in number of samples.
-		return std::pow(targetedAttenuation, 1. / samplesNeededForDecay);
+		return std::pow(targetedAttenuation, 1.f / samplesNeededForDecay);
 	};
 	constexpr auto gateThreshold = 1.f / 65536.f; // Signal below this value is silenced
 	const auto decay = computeDecayFactor(0.245260770975f, gateThreshold);
@@ -401,7 +401,7 @@ void Lb302Synth::process(SampleFrame* outbuf, const fpp_t size)
 
 		// update vco
 		vco_c += vco_inc;
-		if (vco_c > 0.5) { vco_c -= 1.0; }
+		if (vco_c > 0.5f) { vco_c -= 1.0; }
 		vco_shape = static_cast<VcoShape>(wave_shape.value());
 
 		// add vco_shape_param the changes the shape of each curve.
@@ -412,7 +412,8 @@ void Lb302Synth::process(SampleFrame* outbuf, const fpp_t size)
 			// Is this sawtooth backwards?
 			case VcoShape::Sawtooth: vco_k = vco_c; break;
 
-			// p0: duty rev.saw<->triangle<->saw p1: curviness
+			// p0: duty rev.saw<->triangle<->saw
+			// p1: curviness
 			case VcoShape::Triangle:
 				vco_k = vco_c * 2.f + 0.5f;
 				if (vco_k > 0.5f) { vco_k = 1.f - vco_k; }
@@ -462,14 +463,14 @@ void Lb302Synth::process(SampleFrame* outbuf, const fpp_t size)
 				break;
 
 			case VcoShape::BLMoog:
-				vco_k = vco_inc == 0. ? 0. : BandLimitedWave::oscillate(vco_c + 0.5f, BandLimitedWave::pdToLen(vco_inc), BandLimitedWave::Waveform::BLMoog);
+				vco_k = vco_inc == 0.f ? 0.f : BandLimitedWave::oscillate(vco_c + 0.5f, BandLimitedWave::pdToLen(vco_inc), BandLimitedWave::Waveform::BLMoog);
 				break;
 		}
 
 		//vca_a = 0.5;
 		// Write out samples.
-		//samp = vcf->process(vco_k)*2.0*vca_a;
-		//samp = vcf->process(vco_k)*2.0;
+		//samp = vcf->process(vco_k) * 2.f * vca_a;
+		//samp = vcf->process(vco_k) * 2.f;
 		sample_t samp = filter.process(vco_k) * vca_a;
 
 		//samp = vco_k * vca_a;
@@ -487,7 +488,7 @@ void Lb302Synth::process(SampleFrame* outbuf, const fpp_t size)
 		// Handle Envelope
 		if(vca_mode==VcaMode::Attack) {
 			vca_a+=(vca_a0-vca_a)*vca_attack;
-			if(sample_cnt>=0.5*Engine::audioEngine()->outputSampleRate())
+			if(sample_cnt >= 0.5f * Engine::audioEngine()->outputSampleRate())
 				vca_mode = VcaMode::Idle;
 		}
 		else if(vca_mode == VcaMode::Decay) {
