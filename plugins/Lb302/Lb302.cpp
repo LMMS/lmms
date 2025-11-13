@@ -261,28 +261,15 @@ Lb302Synth::Lb302Synth(InstrumentTrack* instrumentTrack)
 	, db24Toggle(false, this, tr("24dB/oct Filter"))
 	, vcfs{std::make_unique<Lb302FilterIIR2>(&fs), std::make_unique<Lb302Filter3Pole>(&fs)}
 {
-	connect( Engine::audioEngine(), SIGNAL( sampleRateChanged() ),
-	         this, SLOT ( filterChanged() ) );
+	connect(Engine::audioEngine(), &AudioEngine::sampleRateChanged, this, &Lb302Synth::filterChanged);
+	connect(&vcf_cut_knob, &FloatModel::dataChanged, this, &Lb302Synth::filterChanged);
+	connect(&vcf_res_knob, &FloatModel::dataChanged, this, &Lb302Synth::filterChanged);
+	connect(&vcf_mod_knob, &FloatModel::dataChanged, this, &Lb302Synth::filterChanged);
+	connect(&vcf_dec_knob, &FloatModel::dataChanged, this, &Lb302Synth::filterChanged);
+	connect(&db24Toggle, &BoolModel::dataChanged, this, &Lb302Synth::db24Toggled);
+	connect(&dist_knob, &FloatModel::dataChanged, this, &Lb302Synth::filterChanged);
 
-	connect( &vcf_cut_knob, SIGNAL( dataChanged() ),
-	         this, SLOT ( filterChanged() ) );
-
-	connect( &vcf_res_knob, SIGNAL( dataChanged() ),
-	         this, SLOT ( filterChanged() ) );
-
-	connect( &vcf_mod_knob, SIGNAL( dataChanged() ),
-	         this, SLOT ( filterChanged() ) );
-
-	connect( &vcf_dec_knob, SIGNAL( dataChanged() ),
-	         this, SLOT ( filterChanged() ) );
-
-	connect( &db24Toggle, SIGNAL( dataChanged() ),
-	         this, SLOT ( db24Toggled() ) );
-
-	connect( &dist_knob, SIGNAL( dataChanged() ),
-	         this, SLOT ( filterChanged()));
-
-	db24Toggled();
+	// db24Toggled(); // TODO: Remove? This just calls recalcFilter(), which also happens during filterChanged()
 	filterChanged();
 
 	Engine::audioEngine()->addPlayHandle(new InstrumentPlayHandle(this, instrumentTrack));
