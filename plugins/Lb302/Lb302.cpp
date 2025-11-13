@@ -513,7 +513,7 @@ void Lb302Synth::process(SampleFrame* outbuf, const fpp_t size)
 
 void Lb302Synth::initNote(float noteVcoInc, bool noteIsDead)
 {
-	catch_decay = 0;
+	// catch_decay = 0;
 	vco_inc = noteVcoInc;
 
 	// Always reset vca on non-dead notes, and

@@ -143,29 +143,33 @@ class Lb302Filter3Pole : public Lb302Filter
 class Lb302Synth : public Instrument
 {
 	Q_OBJECT
+	friend class gui::Lb302SynthView;
+
 public:
-	Lb302Synth( InstrumentTrack * _instrument_track );
-
-	void play( SampleFrame* _working_buffer ) override;
-	void playNote( NotePlayHandle * _n,
-						SampleFrame* _working_buffer ) override;
-	void deleteNotePluginData( NotePlayHandle * _n ) override;
-
-
-	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
-	void loadSettings( const QDomElement & _this ) override;
-
+	Lb302Synth(InstrumentTrack*);
+	void play(SampleFrame* working_buffer) override;
+	void playNote(NotePlayHandle* nph, SampleFrame* working_buffer) override;
+	void deleteNotePluginData(NotePlayHandle* nph) override;
+	void saveSettings(QDomDocument& doc, QDomElement& el) override;
+	void loadSettings(const QDomElement& el) override;
 	QString nodeName() const override;
+	gui::PluginView* instantiateView(QWidget* parent) override;
 
-	gui::PluginView* instantiateView( QWidget * _parent ) override;
+public slots:
+	void filterChanged();
+	void db24Toggled();
 
 private:
-	void processNote( NotePlayHandle * n );
-
+	void processNote(NotePlayHandle* nph);
+	void process(SampleFrame* outbuf, const fpp_t size);
 	void initNote(float noteVcoInc, bool noteIsDead);
 	void initSlide();
+	void recalcFilter();
 
-private:
+	enum class VcoShape { Sawtooth, Square, Triangle, Moog, RoundSquare, Sine, Exponential, WhiteNoise,
+		BLSawtooth, BLSquare, BLTriangle, BLMoog };
+	enum class VcaMode { Attack, Decay, Idle, NeverPlayed };
+
 	static constexpr float DIST_RATIO = 4.f;
 	static constexpr fpp_t ENVINC = 64; //* Envelope Recalculation period
 
@@ -185,12 +189,6 @@ private:
 	BoolModel deadToggle;
 	BoolModel db24Toggle;
 
-
-public slots:
-	void filterChanged();
-	void db24Toggled();
-
-private:
 	// Oscillator
 	float vco_inc = 0.f; // Sample increment for the frequency. Creates Sawtooth.
 	float vco_k = 0.f;   // Raw oscillator sample [-0.5,0.5]
@@ -200,8 +198,6 @@ private:
 	float vco_slideinc = 0.f;  //* Slide base to use in next node. Nonzero=slide next note
 	float vco_slidebase = 0.f; //* The base vco_inc while sliding.
 
-	enum class VcoShape { Sawtooth, Square, Triangle, Moog, RoundSquare, Sine, Exponential, WhiteNoise,
-							BLSawtooth, BLSquare, BLTriangle, BLMoog };
 	VcoShape vco_shape = VcoShape::BLSawtooth;
 
 	// User settings
@@ -221,32 +217,19 @@ private:
 	float vca_a      = 0.f;               // Amplifier coefficient.
 
 	// Envelope State
-	enum class VcaMode
-	{
-		Attack = 0,
-		Decay = 1,
-		Idle = 2,
-		NeverPlayed = 3
-	};
 	VcaMode vca_mode = VcaMode::NeverPlayed;
 
 	// My hacks
 	f_cnt_t sample_cnt = 0;
-	f_cnt_t catch_decay = 0;
+	// f_cnt_t catch_decay = 0;
 
 	bool new_freq = false;
 	float true_freq;
 
-	void recalcFilter();
-
-	void process(SampleFrame* outbuf, const fpp_t size);
-
-	friend class gui::Lb302SynthView;
-
-	NotePlayHandle * m_playingNote;
+	NotePlayHandle* m_playingNote;
 	NotePlayHandleList m_notes;
 	QMutex m_notesMutex;
-} ;
+};
 
 
 namespace gui
