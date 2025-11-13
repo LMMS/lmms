@@ -74,19 +74,23 @@ extern "C"
 
 Plugin::Descriptor PLUGIN_EXPORT lb302_plugin_descriptor =
 {
-	LMMS_STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY(PLUGIN_NAME),
 	"LB302",
-	QT_TRANSLATE_NOOP( "PluginBrowser",
-			"Incomplete monophonic imitation TB-303" ),
+	QT_TRANSLATE_NOOP("PluginBrowser", "Incomplete monophonic imitation TB-303"),
 	"Paul Giblock <pgib/at/users.sf.net>",
 	0x0100,
 	Plugin::Type::Instrument,
-	new PluginPixmapLoader( "logo" ),
+	new PluginPixmapLoader("logo"),
 	nullptr,
 	nullptr,
 };
 
+PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* m, void*)
+{
+	return new Lb302Synth(static_cast<InstrumentTrack*>(m));
 }
+
+} // extern "C"
 
 //
 // Lb302Filter
@@ -931,21 +935,5 @@ void Lb302SynthView::modelChanged()
 
 
 } // namespace gui
-
-
-extern "C"
-{
-
-// necessary for getting instance out of shared lib
-PLUGIN_EXPORT Plugin * lmms_plugin_main( Model * m, void * )
-{
-
-	return( new Lb302Synth(
-		static_cast<InstrumentTrack *>( m ) ) );
-}
-
-
-}
-
 
 } // namespace lmms
