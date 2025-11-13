@@ -51,6 +51,12 @@
 #define LB_24_IGNORE_ENVELOPE
 //#define LB_24_RES_TRICK
 
+namespace
+{
+// Helper to get the phase increment per sample, given a note's frequency and the current sample rate
+static inline float phaseInc(float freq) { return freq / lmms::Engine::audioEngine()->outputSampleRate(); }
+}
+
 
 namespace lmms
 {
@@ -222,16 +228,6 @@ sample_t Lb302Filter3Pole::process(const sample_t& samp)
 // LBSynth
 //
 
-static float computeDecayFactor(float decayTimeInSeconds, float targetedAttenuation)
-{
-	// This is the number of samples that correspond to the decay time in seconds
-	auto samplesNeededForDecay = decayTimeInSeconds * Engine::audioEngine()->outputSampleRate();
-
-	// This computes the factor that's needed to make a signal with a value of 1 decay to the
-	// targeted attenuation over the time in number of samples.
-	return std::pow(targetedAttenuation, 1. / samplesNeededForDecay);
-}
-
 Lb302Synth::Lb302Synth(InstrumentTrack* instrumentTrack)
 	: Instrument(instrumentTrack, &lb302_plugin_descriptor, nullptr, Flag::IsSingleStreamed)
 	, vcf_cut_knob(0.75f, 0.0f, 1.5f, 0.005f, this, tr("VCF Cutoff Frequency"))
@@ -344,34 +340,18 @@ void Lb302Synth::recalcFilter()
 	vcf_envpos = ENVINC; // Trigger filter update in process()
 }
 
-inline float GET_INC(float freq) {
-	return freq/Engine::audioEngine()->outputSampleRate();  // TODO: Use actual sampling rate.
-}
 
-int Lb302Synth::process(SampleFrame* outbuf, const std::size_t size)
+void Lb302Synth::process(SampleFrame* outbuf, const fpp_t size)
 {
 	const float sampleRatio = 44100.f / Engine::audioEngine()->outputSampleRate();
+	Lb302Filter& filter = vcf(); // Hold on to the current VCF, and use it throughout this period
 
-	// Hold on to the current VCF, and use it throughout this period
-	Lb302Filter& filter = vcf();
-
-	if( release_frame == 0 || ! m_playingNote ) 
+	if (release_frame == 0 || !m_playingNote) { vca_mode = VcaMode::Decay; }
+	if (new_freq)
 	{
-		vca_mode = VcaMode::Decay;
-	}
-
-	if( new_freq ) 
-	{
-		//printf("  playing new note..\n");
-		Lb302Note note;
-		note.vco_inc = GET_INC( true_freq );
-		note.dead = deadToggle.value();
-		initNote(&note);
-
+		initNote(phaseInc(true_freq), deadToggle.value());
 		new_freq = false;
 	}
-
-
 
 	// TODO: NORMAL RELEASE
 	// vca_mode = 1;
@@ -382,7 +362,17 @@ int Lb302Synth::process(SampleFrame* outbuf, const std::size_t size)
 	//
 	// At 44.1 kHz this will compute something very close to the previously
 	// hard coded value of 0.99897516.
-	auto decay = computeDecayFactor(0.245260770975f, 1.f / 65536.f);
+	constexpr auto computeDecayFactor = [](float decayTimeInSeconds, float targetedAttenuation) -> float
+	{
+		// This is the number of samples that correspond to the decay time in seconds
+		auto samplesNeededForDecay = decayTimeInSeconds * Engine::audioEngine()->outputSampleRate();
+
+		// This computes the factor that's needed to make a signal with a value of 1 decay to the
+		// targeted attenuation over the time in number of samples.
+		return std::pow(targetedAttenuation, 1. / samplesNeededForDecay);
+	};
+	constexpr auto gateThreshold = 1.f / 65536.f; // Signal below this value is silenced
+	const auto decay = computeDecayFactor(0.245260770975f, gateThreshold);
 
 	for (auto i = std::size_t{0}; i < size; i++)
 	{
@@ -390,19 +380,19 @@ int Lb302Synth::process(SampleFrame* outbuf, const std::size_t size)
 		if (i >= release_frame) { vca_mode = VcaMode::Decay; }
 
 		// update vcf
-		if(vcf_envpos >= ENVINC) {
+		if (vcf_envpos >= ENVINC)
+		{
 			filter.envRecalc();
-
 			vcf_envpos = 0;
 
-			if (vco_slide) {
-					vco_inc = vco_slidebase - vco_slide;
-					// Calculate coeff from dec_knob on knob change.
-					vco_slide -= vco_slide * ( 0.1f - slide_dec_knob.value() * 0.0999f ) * sampleRatio; // TODO: Adjust for ENVINC
-
+			if (vco_slide)
+			{
+				vco_inc = vco_slidebase - vco_slide;
+				// Calculate coeff from dec_knob on knob change.
+				// TODO: Adjust for ENVINC
+				vco_slide -= vco_slide * (0.1f - slide_dec_knob.value() * 0.0999f) * sampleRatio;
 			}
 		}
-
 
 		sample_cnt++;
 		vcf_envpos++;
@@ -411,86 +401,64 @@ int Lb302Synth::process(SampleFrame* outbuf, const std::size_t size)
 
 		// update vco
 		vco_c += vco_inc;
-		
-		if(vco_c > 0.5)
-			vco_c -= 1.0;
-
-		switch(int(rint(wave_shape.value()))) {
-			case 0: vco_shape = VcoShape::Sawtooth; break;
-			case 1: vco_shape = VcoShape::Triangle; break;
-			case 2: vco_shape = VcoShape::Square; break;
-			case 3: vco_shape = VcoShape::RoundSquare; break;
-			case 4: vco_shape = VcoShape::Moog; break;
-			case 5: vco_shape = VcoShape::Sine; break;
-			case 6: vco_shape = VcoShape::Exponential; break;
-			case 7: vco_shape = VcoShape::WhiteNoise; break;
-			case 8: vco_shape = VcoShape::BLSawtooth; break;
-			case 9: vco_shape = VcoShape::BLSquare; break;
-			case 10: vco_shape = VcoShape::BLTriangle; break;
-			case 11: vco_shape = VcoShape::BLMoog; break;
-			default:  vco_shape = VcoShape::Sawtooth; break;
-		}
+		if (vco_c > 0.5) { vco_c -= 1.0; }
+		vco_shape = static_cast<VcoShape>(wave_shape.value());
 
 		// add vco_shape_param the changes the shape of each curve.
 		// merge sawtooths with triangle and square with round square?
-		switch (vco_shape) {
-			case VcoShape::Sawtooth: // p0: curviness of line
-				vco_k = vco_c;  // Is this sawtooth backwards?
+		switch (vco_shape)
+		{
+			// p0: curviness of line
+			// Is this sawtooth backwards?
+			case VcoShape::Sawtooth: vco_k = vco_c; break;
+
+			// p0: duty rev.saw<->triangle<->saw p1: curviness
+			case VcoShape::Triangle:
+				vco_k = vco_c * 2.f + 0.5f;
+				if (vco_k > 0.5f) { vco_k = 1.f - vco_k; }
 				break;
 
-			case VcoShape::Triangle:  // p0: duty rev.saw<->triangle<->saw p1: curviness
-				vco_k = (vco_c*2.0)+0.5;
-				if (vco_k>0.5)
-					vco_k = 1.0- vco_k;
+			// p0: slope of top
+			case VcoShape::Square:
+				vco_k = vco_c < 0.f ? 0.5f : -0.5f;
 				break;
 
-			case VcoShape::Square: // p0: slope of top
-				vco_k = (vco_c<0)?0.5:-0.5;
+			// p0: width of round
+			case VcoShape::RoundSquare:
+				vco_k = vco_c < 0.f ? std::sqrt(1.f - (vco_c * vco_c * 4.f)) - 0.5f : -0.5f;
 				break;
 
-			case VcoShape::RoundSquare: // p0: width of round
-				vco_k = (vco_c < 0.f) ? (std::sqrt(1.f - (vco_c * vco_c * 4.f)) - 0.5f) : -0.5f;
-				break;
-
-			case VcoShape::Moog: // Maybe the fall should be exponential/sinsoidal instead of quadric.
-				// [-0.5, 0]: Rise, [0,0.25]: Slope down, [0.25,0.5]: Low
-				vco_k = (vco_c*2.0)+0.5;
-				if (vco_k>1.0) {
-					vco_k = -0.5 ;
+			// Maybe the fall should be exponential/sinsoidal instead of quadric.
+			// [-0.5, 0]: Rise, [0,0.25]: Slope down, [0.25,0.5]: Low
+			case VcoShape::Moog:
+				vco_k = vco_c * 2.f + 0.5f;
+				if (vco_k > 1.f) { vco_k = -0.5f; }
+				else if (vco_k > 0.5f)
+				{
+					float w = 2.f * (vco_k - 0.5f) - 1.f;
+					vco_k = 0.5f - std::sqrt(1.f - (w * w));
 				}
-				else if (vco_k>0.5) {
-					float w = 2.0 * (vco_k - 0.5) - 1.0;
-					vco_k = 0.5 - std::sqrt(1.0 - (w * w));
-				}
-				vco_k *= 2.0;  // MOOG wave gets filtered away
+				vco_k *= 2.f; // MOOG wave gets filtered away
 				break;
 
-			case VcoShape::Sine:
-				// [-0.5, 0.5]  : [-pi, pi]
-				vco_k = 0.5f * Oscillator::sinSample( vco_c );
-				break;
-
-			case VcoShape::Exponential:
-				vco_k = 0.5 * Oscillator::expSample( vco_c );
-				break;
-
-			case VcoShape::WhiteNoise:
-				vco_k = 0.5 * Oscillator::noiseSample( vco_c );
-				break;
+			// [-0.5, 0.5] : [-pi, pi]
+			case VcoShape::Sine: vco_k = 0.5f * Oscillator::sinSample(vco_c); break;
+			case VcoShape::Exponential: vco_k = 0.5f * Oscillator::expSample(vco_c); break;
+			case VcoShape::WhiteNoise: vco_k = 0.5f * Oscillator::noiseSample(vco_c); break;
 
 			// The next cases all use the BandLimitedWave class which uses the oscillator increment `vco_inc` to compute samples.
 			// If that oscillator increment is 0 we return a 0 sample because calling BandLimitedWave::pdToLen(0) leads to a
 			// division by 0 which in turn leads to floating point exceptions.
 			case VcoShape::BLSawtooth:
-				vco_k = vco_inc == 0. ? 0. : BandLimitedWave::oscillate(vco_c + 0.5f, BandLimitedWave::pdToLen(vco_inc), BandLimitedWave::Waveform::BLSaw) * 0.5f;
+				vco_k = vco_inc == 0.f ? 0.f : BandLimitedWave::oscillate(vco_c + 0.5f, BandLimitedWave::pdToLen(vco_inc), BandLimitedWave::Waveform::BLSaw) * 0.5f;
 				break;
 
 			case VcoShape::BLSquare:
-				vco_k = vco_inc == 0. ? 0. : BandLimitedWave::oscillate(vco_c + 0.5f, BandLimitedWave::pdToLen(vco_inc), BandLimitedWave::Waveform::BLSquare) * 0.5f;
+				vco_k = vco_inc == 0.f ? 0.f : BandLimitedWave::oscillate(vco_c + 0.5f, BandLimitedWave::pdToLen(vco_inc), BandLimitedWave::Waveform::BLSquare) * 0.5f;
 				break;
 
 			case VcoShape::BLTriangle:
-				vco_k = vco_inc == 0. ? 0. : BandLimitedWave::oscillate(vco_c + 0.5f, BandLimitedWave::pdToLen(vco_inc), BandLimitedWave::Waveform::BLTriangle) * 0.5f;
+				vco_k = vco_inc == 0.f ? 0.f : BandLimitedWave::oscillate(vco_c + 0.5f, BandLimitedWave::pdToLen(vco_inc), BandLimitedWave::Waveform::BLTriangle) * 0.5f;
 				break;
 
 			case VcoShape::BLMoog:
@@ -526,14 +494,14 @@ int Lb302Synth::process(SampleFrame* outbuf, const std::size_t size)
 			vca_a *= decay;
 
 			// the following line actually speeds up processing
-			if(vca_a < (1/65536.0)) {
+			if (vca_a < gateThreshold)
+			{
 				vca_a = 0;
 				vca_mode = VcaMode::NeverPlayed;
 			}
 		}
 
 	}
-	return 1;
 }
 
 
@@ -542,41 +510,36 @@ int Lb302Synth::process(SampleFrame* outbuf, const std::size_t size)
  *  to be called from process() when a prior edge-to-edge note is done releasing.
  */
 
-void Lb302Synth::initNote( Lb302Note *n)
+void Lb302Synth::initNote(float noteVcoInc, bool noteIsDead)
 {
 	catch_decay = 0;
-
-	vco_inc = n->vco_inc;
+	vco_inc = noteVcoInc;
 
 	// Always reset vca on non-dead notes, and
 	// Only reset vca on decaying(decayed) and never-played
-	if(n->dead == 0 || (vca_mode == VcaMode::Decay || vca_mode == VcaMode::NeverPlayed)) {
-		//printf("    good\n");
+	if (!noteIsDead || (vca_mode == VcaMode::Decay || vca_mode == VcaMode::NeverPlayed))
+	{
 		sample_cnt = 0;
 		vca_mode = VcaMode::Attack;
 		// LB303:
 		//vca_a = 0;
 	}
-	else {
-		vca_mode = VcaMode::Idle;
-	}
+	else { vca_mode = VcaMode::Idle; }
 
 	initSlide();
 
 	// Slide-from note, save inc for next note
-	if (slideToggle.value()) {
-		vco_slideinc = vco_inc; // May need to equal vco_slidebase+vco_slide if last note slid
-	}
-
+	// May need to equal vco_slidebase + vco_slide if last note slid
+	if (slideToggle.value()) { vco_slideinc = vco_inc; }
 
 	recalcFilter();
 
-	if(n->dead ==0){
+	if (!noteIsDead)
+	{
 		// Swap next two blocks??
 		vcf().playNote();
 
-		// Ensure envelope is recalculated
-		vcf_envpos = ENVINC;
+		vcf_envpos = ENVINC; // Ensure envelope is recalculated
 
 		// Double Check
 		//vca_mode = 0;
@@ -637,23 +600,15 @@ void Lb302Synth::processNote( NotePlayHandle * _n )
 		if( ! m_playingNote && ! _n->isReleased() && release_frame > 0 )
 		{
 			m_playingNote = _n;
-			if ( slideToggle.value() ) 
-			{
-				vco_slideinc = GET_INC( _n->frequency() );
-			}
+			if (slideToggle.value()) { vco_slideinc = phaseInc(_n->frequency()); }
 		}
 
 		// Check for slide
-		if( m_playingNote == _n ) 
+		if (m_playingNote == _n)
 		{
 			true_freq = _n->frequency();
-
-			if( slideToggle.value() ) {
-				vco_slidebase = GET_INC( true_freq );			// The REAL frequency
-			}
-			else {
-				vco_inc = GET_INC( true_freq );
-			}
+			const auto true_inc = phaseInc(true_freq);
+			if (slideToggle.value()) { vco_slidebase = true_inc; } else { vco_inc = true_inc; }
 		}
 }
 

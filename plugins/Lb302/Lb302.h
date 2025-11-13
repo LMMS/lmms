@@ -139,12 +139,6 @@ class Lb302Filter3Pole : public Lb302Filter
 
 
 
-struct Lb302Note
-{
-	float vco_inc;
-	bool dead;
-};
-
 
 class Lb302Synth : public Instrument
 {
@@ -168,7 +162,7 @@ public:
 private:
 	void processNote( NotePlayHandle * n );
 
-	void initNote(Lb302Note *Note);
+	void initNote(float noteVcoInc, bool noteIsDead);
 	void initSlide();
 
 private:
@@ -245,7 +239,7 @@ private:
 
 	void recalcFilter();
 
-	int process(SampleFrame* outbuf, const std::size_t size);
+	void process(SampleFrame* outbuf, const fpp_t size);
 
 	friend class gui::Lb302SynthView;
 
