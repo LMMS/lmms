@@ -64,49 +64,44 @@ void LadspaSubPluginFeatures::fillDescriptionWidget( QWidget * _parent,
 	Ladspa2LMMS * lm = Engine::getLADSPAManager();
 	const auto ldesc = lm->getDescription(lkey);
 
-	QString labelText =
-		"<p><b>" + QWidget::tr("Name") + ":</b> " + lm->getName(lkey) + "</p>"
-		"<p><b>" + QWidget::tr("File") + ":</b> <code>" + lkey.first + "</code></p>"
-		"<p><b>" + QWidget::tr("Author") + ":</b> "
-			+ lm->getMaker(lkey)
-				.replace(" at ", "@")
-				.replace(" dot ", ".")
-				.toHtmlEscaped()
-			+ "</p>"
-		"<p><b>" + QWidget::tr("Copyright") + ":</b> " + lm->getCopyright(lkey) + "</p>"
-		"<p><b>" + QWidget::tr("Channels") + ":</b> "
-			+ QString::number(ldesc->inputChannels) + " " + QWidget::tr("in") + ", "
-			+ QString::number(ldesc->outputChannels) + " " + QWidget::tr("out")
-			+ "</p>";
+	auto labelText = QString{
+		"<p><b>%1</b>%2</p>" // Name
+		"<p><b>%3</b><code>%4</code></p>" // File
+		"<p><b>%5</b>%6</p>" // Author
+		"<p><b>%7</b>%8</p>" // Copyright
+		"<p><b>%9</b>%10</p>" // Channels
+	}.arg(
+		QWidget::tr("Name: "), lm->getName(lkey),
+		QWidget::tr("File: "), lkey.first,
+		QWidget::tr("Author: "), lm->getMaker(lkey).replace(" at ", "@").replace(" dot ", ".").toHtmlEscaped(),
+		QWidget::tr("Copyright: "), lm->getCopyright(lkey),
+		QWidget::tr("Channels: "), QWidget::tr("%1 in, %2 out").arg(ldesc->inputChannels).arg(ldesc->outputChannels)
+	);
 
 	if (lm->hasRealTimeDependency(lkey))
 	{
-		labelText += "<p><b>" + QWidget::tr("Real-time Dependency")
-			+ ":</b> " + QWidget::tr(
-				"This plugin has a real-time dependency (e.g. listens "
-				"to a MIDI device) so its output must not be cached or "
-				"subject to significant latency."
-			) + "</p>";
+		labelText += QString{"<p><b>%1</b>%2</p>"}.arg(
+			QWidget::tr("Real-time Dependency: "),
+			QWidget::tr("This plugin has a real-time dependency (e.g. listens to a MIDI device) so its output must "
+				"not be cached or subject to significant latency.")
+		);
 	}
 
-	if (lm->isRealTimeCapable(lkey))
+	if (!lm->isRealTimeCapable(lkey))
 	{
-		labelText += "<p><b>" + QWidget::tr("Real-time Capable")
-			+ ":</b> " + QWidget::tr(
-				"This plugin is capable of running in a &lsquo;hard "
-				"real-time&rsquo; environment."
-			) + "</p>";
+		labelText += QString{"<p><b>%1</b>%2</p>"}.arg(
+			QWidget::tr("Not Real-time Capable: "),
+			QWidget::tr("This plugin is not suitable for use in a &lsquo;hard real-time&rsquo; environment.")
+		);
 	}
 
 	if (lm->isInplaceBroken(lkey))
 	{
-		labelText += "<p><b>" + QWidget::tr("In-place Broken")
-			+ ":</b> " + QWidget::tr(
-				"This plugin cannot process audio &lsquo;in "
-				"place&rsquo; and may cease to work correctly if the "
-				"host elects to use the same data location for both "
-				"input and output."
-			) + "</p>";
+		labelText += QString{"<p><b>%1</b>%2</p>"}.arg(
+			QWidget::tr("In-place Broken: "),
+			QWidget::tr("This plugin cannot process audio &lsquo;in place&rsquo; and may cease to work correctly if "
+				"the host elects to use the same data location for both input and output.")
+		);
 	}
 
 	auto label = new QLabel(labelText, _parent);
