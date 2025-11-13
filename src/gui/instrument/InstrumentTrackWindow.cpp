@@ -469,6 +469,25 @@ void InstrumentTrackWindow::updateInstrumentView()
 		m_tabWidget->addTab( m_instrumentView, tr( "Plugin" ), "plugin_tab", 0 );
 		m_tabWidget->setActiveTab( 0 );
 
+		// If instrument is resizable, unset size constraints on tabs.
+		// Otherwise, prevent other tabs from exceeding the size of the
+		// instrument tab
+		const auto maxSize = m_instrumentView->isResizable()
+			? QSize{QWIDGETSIZE_MAX, QWIDGETSIZE_MAX}
+			: QSize{
+				std::max(INSTRUMENT_WIDTH, m_instrumentView->width()),
+				std::max(INSTRUMENT_HEIGHT, m_instrumentView->maximumHeight()),
+			};
+		m_tabWidget->setMaximumSize(maxSize);
+		// Individual tabs must also have their maximum widths set,
+		// otherwise they will remain wide, and their overflowing contents
+		// will get clipped.
+		m_ssView->setMaximumSize(maxSize);
+		m_instrumentFunctionsView->setMaximumSize(maxSize);
+		m_effectView->setMaximumSize(maxSize);
+		m_midiView->setMaximumSize(maxSize);
+		m_tuningView->setMaximumSize(maxSize);
+
 		m_ssView->setFunctionsHidden(m_track->m_instrument->isSingleStreamed());
 
 		modelChanged(); 		// Get the instrument window to refresh
