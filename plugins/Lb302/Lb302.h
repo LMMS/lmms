@@ -77,7 +77,7 @@ class Lb302Filter
 
 	virtual void recalc();
 	virtual void envRecalc();
-	virtual float process(const float& samp)=0;
+	virtual sample_t process(const sample_t& samp) = 0;
 	virtual void playNote();
 
 	protected:
@@ -97,7 +97,7 @@ class Lb302FilterIIR2 : public Lb302Filter
 
 	void recalc() override;
 	void envRecalc() override;
-	float process(const float& samp) override;
+	sample_t process(const sample_t& samp) override;
 
 	protected:
 	float vcf_d1 = 0.f;     //   d1 and d2 are added back into the sample with
@@ -121,7 +121,7 @@ class Lb302Filter3Pole : public Lb302Filter
 	//virtual void recalc();
 	void envRecalc() override;
 	void recalc() override;
-	float process(const float& samp) override;
+	sample_t process(const sample_t& samp) override;
 
 	protected:
 	float kfcn,

@@ -153,9 +153,9 @@ void Lb302FilterIIR2::envRecalc()
 }
 
 
-float Lb302FilterIIR2::process(const float& samp)
+sample_t Lb302FilterIIR2::process(const sample_t& samp)
 {
-	float ret = vcf_a*vcf_d1 + vcf_b*vcf_d2 + vcf_c*samp;
+	sample_t ret = vcf_a * vcf_d1 + vcf_b * vcf_d2 + vcf_c * samp;
 	// Delayed samples for filter
 	vcf_d2 = vcf_d1;
 	vcf_d1 = ret;
@@ -218,7 +218,7 @@ void Lb302Filter3Pole::envRecalc()
 }
 
 
-float Lb302Filter3Pole::process(const float& samp)
+sample_t Lb302Filter3Pole::process(const sample_t& samp)
 {
 	float ax1  = lastin;
 	float ay11 = ay1;
@@ -530,7 +530,7 @@ int Lb302Synth::process(SampleFrame* outbuf, const std::size_t size)
 #ifdef LB_FILTERED
 		//samp = vcf->process(vco_k)*2.0*vca_a;
 		//samp = vcf->process(vco_k)*2.0;
-		float samp = filter.process(vco_k) * vca_a;
+		sample_t samp = filter.process(vco_k) * vca_a;
 		//printf("%f %d\n", vco_c, sample_cnt);
 
 
