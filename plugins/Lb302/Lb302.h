@@ -32,16 +32,17 @@
 #ifndef LB302_H
 #define LB302_H
 
+#include <array>
+#include <memory>
+
+#include <QMutex>
+
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "NotePlayHandle.h"
-#include <QMutex>
 
 namespace lmms
 {
-
-
-static const int NUM_FILTERS = 2;
 
 
 namespace DspEffectLibrary
@@ -58,9 +59,8 @@ class LedCheckBox;
 }
 
 
-class Lb302FilterKnobState
+struct Lb302FilterKnobState
 {
-	public:
 	float cutoff;
 	float reso;
 	float envmod;
@@ -72,7 +72,7 @@ class Lb302FilterKnobState
 class Lb302Filter
 {
 	public:
-	Lb302Filter(Lb302FilterKnobState* p_fs);
+	Lb302Filter(Lb302FilterKnobState* p_fs) : fs{p_fs} {};
 	virtual ~Lb302Filter() = default;
 
 	virtual void recalc();
@@ -84,9 +84,9 @@ class Lb302Filter
 	Lb302FilterKnobState *fs;
 
 	// Filter Decay
-	float vcf_c0;           // c0=e1 on retrigger; c0*=ed every sample; cutoff=e0+c0
-	float vcf_e0,           // e0 and e1 for interpolation
-	      vcf_e1;
+	float vcf_c0 = 0.f; // c0=e1 on retrigger; c0*=ed every sample; cutoff=e0+c0
+	float vcf_e0 = 0.f; // e0 and e1 for interpolation
+	float vcf_e1 = 0.f;
 	float vcf_rescoeff;     // Resonance coefficient [0.30,9.54]
 };
 
@@ -94,30 +94,29 @@ class Lb302FilterIIR2 : public Lb302Filter
 {
 	public:
 	Lb302FilterIIR2(Lb302FilterKnobState* p_fs);
-	~Lb302FilterIIR2() override;
 
 	void recalc() override;
 	void envRecalc() override;
 	float process(const float& samp) override;
 
 	protected:
-	float vcf_d1,           //   d1 and d2 are added back into the sample with
-	      vcf_d2;           //   vcf_a and b as coefficients. IIR2 resonance
+	float vcf_d1 = 0.f;     //   d1 and d2 are added back into the sample with
+	float vcf_d2 = 0.f;     //   vcf_a and b as coefficients. IIR2 resonance
 	                        //   loop.
 
 	                        // IIR2 Coefficients for mixing dry and delay.
-	float vcf_a,            //   Mixing coefficients for the final sound.
-	      vcf_b,            //
-	      vcf_c;
+	float vcf_a = 0.f;      //   Mixing coefficients for the final sound.
+	float vcf_b = 0.f;      //
+	float vcf_c = 1.f;
 
-	DspEffectLibrary::Distortion * m_dist;
+	std::unique_ptr<DspEffectLibrary::Distortion> m_dist;
 };
 
 
 class Lb302Filter3Pole : public Lb302Filter
 {
 	public:
-	Lb302Filter3Pole(Lb302FilterKnobState* p_fs);
+	Lb302Filter3Pole(Lb302FilterKnobState* p_fs) : Lb302Filter(p_fs) {};
 
 	//virtual void recalc();
 	void envRecalc() override;
@@ -130,18 +129,17 @@ class Lb302Filter3Pole : public Lb302Filter
 	      kp1,
 	      kp1h,
 	      kres;
-	float ay1,
-	      ay2,
-	      aout,
-	      lastin,
-	      value;
+	float ay1 = 0.f;
+	float ay2 = 0.f;
+	float aout = 0.f;
+	float lastin = 0.f;
+	float value;
 };
 
 
 
-class Lb302Note
+struct Lb302Note
 {
-public:
 	float vco_inc;
 	bool dead;
 };
@@ -152,7 +150,6 @@ class Lb302Synth : public Instrument
 	Q_OBJECT
 public:
 	Lb302Synth( InstrumentTrack * _instrument_track );
-	~Lb302Synth() override;
 
 	void play( SampleFrame* _working_buffer ) override;
 	void playNote( NotePlayHandle * _n,
@@ -174,6 +171,8 @@ private:
 	void initSlide();
 
 private:
+	static constexpr fpp_t ENVINC = 64; //* Envelope Recalculation period
+
 	FloatModel vcf_cut_knob;
 	FloatModel vcf_res_knob;
 	FloatModel vcf_mod_knob;
@@ -197,33 +196,33 @@ public slots:
 
 private:
 	// Oscillator
-	float vco_inc,          // Sample increment for the frequency. Creates Sawtooth.
-	      vco_k,            // Raw oscillator sample [-0.5,0.5]
-	      vco_c;            // Raw oscillator sample [-0.5,0.5]
+	float vco_inc = 0.f; // Sample increment for the frequency. Creates Sawtooth.
+	float vco_k = 0.f;   // Raw oscillator sample [-0.5,0.5]
+	float vco_c = 0.f;   // Raw oscillator sample [-0.5,0.5]
 
-	float vco_slide,        //* Current value of slide exponential curve. Nonzero=sliding
-	      vco_slideinc,     //* Slide base to use in next node. Nonzero=slide next note
-	      vco_slidebase;    //* The base vco_inc while sliding.
+	float vco_slide = 0.f;     //* Current value of slide exponential curve. Nonzero=sliding
+	float vco_slideinc = 0.f;  //* Slide base to use in next node. Nonzero=slide next note
+	float vco_slidebase = 0.f; //* The base vco_inc while sliding.
 
 	enum class VcoShape { Sawtooth, Square, Triangle, Moog, RoundSquare, Sine, Exponential, WhiteNoise,
 							BLSawtooth, BLSquare, BLTriangle, BLMoog };
-	VcoShape vco_shape;
-
-	// Filters (just keep both loaded and switch)
-	Lb302Filter* vcfs[NUM_FILTERS];
+	VcoShape vco_shape = VcoShape::BLSawtooth;
 
 	// User settings
-	Lb302FilterKnobState fs;
-	QAtomicPointer<Lb302Filter> vcf;
+	Lb302FilterKnobState fs = {};
 
-	size_t release_frame;
+	// Filters (just keep both loaded and switch)
+	std::array<std::unique_ptr<Lb302Filter>, 2> vcfs;
+	inline Lb302Filter& vcf() { return *vcfs[db24Toggle.value()]; } // Helper to get current vcf
+
+	f_cnt_t release_frame;
 
 	// More States
-	int   vcf_envpos;       // Update counter. Updates when >= ENVINC
+	f_cnt_t vcf_envpos = ENVINC; // Update counter. Updates when >= ENVINC
 
-	float vca_attack,       // Amp attack
-	      vca_a0,           // Initial amplifier coefficient
-	      vca_a;            // Amplifier coefficient.
+	float vca_attack = 1.f - 0.96406088f; // Amp attack
+	float vca_a0     = 0.5f;              // Initial amplifier coefficient
+	float vca_a      = 0.f;               // Amplifier coefficient.
 
 	// Envelope State
 	enum class VcaMode
@@ -233,17 +232,13 @@ private:
 		Idle = 2,
 		NeverPlayed = 3
 	};
-	VcaMode vca_mode;
+	VcaMode vca_mode = VcaMode::NeverPlayed;
 
 	// My hacks
-	int   sample_cnt;
+	f_cnt_t sample_cnt = 0;
+	f_cnt_t catch_decay = 0;
 
-	int   last_offset;
-
-	int catch_frame;
-	int catch_decay;
-
-	bool new_freq;
+	bool new_freq = false;
 	float true_freq;
 
 	void recalcFilter();

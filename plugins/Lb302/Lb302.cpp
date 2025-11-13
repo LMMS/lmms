@@ -28,11 +28,11 @@
  *
  */
 
-// Need to include this first to ensure we get M_PI in MinGW with C++11
-#define _USE_MATH_DEFINES
-#include <cmath>
-
 #include "Lb302.h"
+
+#include <cmath>
+#include <numbers>
+
 #include "AutomatableButton.h"
 #include "DspEffectLibrary.h"
 #include "Engine.h"
@@ -47,9 +47,6 @@
 
 #include "embed.h"
 #include "plugin_export.h"
-
-// Envelope Recalculation period
-#define ENVINC 64
 
 //
 // New config
@@ -71,10 +68,6 @@
 
 namespace lmms
 {
-
-
-//#define engine::audioEngine()->outputSampleRate() 44100.0f
-const float sampleRateCutoff = 44100.0f;
 
 extern "C"
 {
@@ -99,21 +92,13 @@ Plugin::Descriptor PLUGIN_EXPORT lb302_plugin_descriptor =
 // Lb302Filter
 //
 
-Lb302Filter::Lb302Filter(Lb302FilterKnobState* p_fs) :
-	fs(p_fs),
-	vcf_c0(0),
-	vcf_e0(0),
-	vcf_e1(0)
-{
-};
-
-
 void Lb302Filter::recalc()
 {
 	vcf_e1 = std::exp(6.109f + 1.5876f * fs->envmod + 2.1553f * fs->cutoff - 1.2f * (1.0f - fs->reso));
 	vcf_e0 = std::exp(5.613f - 0.8f * fs->envmod + 2.1553f * fs->cutoff - 0.7696f * (1.0f - fs->reso));
-	vcf_e0*=M_PI/Engine::audioEngine()->outputSampleRate();
-	vcf_e1*=M_PI/Engine::audioEngine()->outputSampleRate();
+	const float pi_sr = std::numbers::pi_v<float> / Engine::audioEngine()->outputSampleRate();
+	vcf_e0 *= pi_sr;
+	vcf_e1 *= pi_sr;
 	vcf_e1 -= vcf_e0;
 
 	vcf_rescoeff = std::exp(-1.20f + 3.455f * fs->reso);
@@ -137,24 +122,10 @@ void Lb302Filter::playNote()
 // Lb302FilterIIR2
 //
 
-Lb302FilterIIR2::Lb302FilterIIR2(Lb302FilterKnobState* p_fs) :
-	Lb302Filter(p_fs),
-	vcf_d1(0),
-	vcf_d2(0),
-	vcf_a(0),
-	vcf_b(0),
-	vcf_c(1)
-{
-
-	m_dist = new DspEffectLibrary::Distortion( 1.0, 1.0f);
-
-};
-
-
-Lb302FilterIIR2::~Lb302FilterIIR2()
-{
-	delete m_dist;
-}
+Lb302FilterIIR2::Lb302FilterIIR2(Lb302FilterKnobState* p_fs)
+	: Lb302Filter(p_fs)
+	, m_dist{std::make_unique<DspEffectLibrary::Distortion>(1.0, 1.f)}
+{};
 
 
 void Lb302FilterIIR2::recalc()
@@ -197,15 +168,6 @@ float Lb302FilterIIR2::process(const float& samp)
 // Lb302Filter3Pole
 //
 
-Lb302Filter3Pole::Lb302Filter3Pole(Lb302FilterKnobState *p_fs) :
-	Lb302Filter(p_fs),
-	ay1(0),
-	ay2(0),
-	aout(0),
-	lastin(0)
-{
-};
-
 
 void Lb302Filter3Pole::recalc()
 {
@@ -223,9 +185,10 @@ void Lb302Filter3Pole::envRecalc()
 	// e0 is adjusted for Hz and doesn't need ENVINC
 	float w = vcf_e0 + vcf_c0;
 	float k = (fs->cutoff > 0.975)?0.975:fs->cutoff;
-    // sampleRateCutoff should not be changed to anything dynamic that is outside the
-    // scope of LB302 (like e.g. the audio engine's sample rate) as this changes the filter's cutoff
-    // behavior without any modification to its controls.
+	// sampleRateCutoff should not be changed to anything dynamic that is outside the
+	// scope of LB302 (like e.g. the audio engine's sample rate) as this changes the filter's cutoff
+	// behavior without any modification to its controls.
+	constexpr float sampleRateCutoff = 44100.0f;
 	float kfco = 50.f + (k)*((2300.f-1600.f*(fs->envmod))+(w) *
 	                   (700.f+1500.f*(k)+(1500.f+(k)*(sampleRateCutoff/2.f-6000.f)) *
 	                   (fs->envmod)) );
@@ -279,25 +242,21 @@ static float computeDecayFactor(float decayTimeInSeconds, float targetedAttenuat
 	return std::pow(targetedAttenuation, 1. / samplesNeededForDecay);
 }
 
-Lb302Synth::Lb302Synth( InstrumentTrack * _instrumentTrack ) :
-	Instrument(_instrumentTrack, &lb302_plugin_descriptor, nullptr, Flag::IsSingleStreamed),
-	vcf_cut_knob( 0.75f, 0.0f, 1.5f, 0.005f, this, tr( "VCF Cutoff Frequency" ) ),
-	vcf_res_knob( 0.75f, 0.0f, 1.25f, 0.005f, this, tr( "VCF Resonance" ) ),
-	vcf_mod_knob( 0.1f, 0.0f, 1.0f, 0.005f, this, tr( "VCF Envelope Mod" ) ),
-	vcf_dec_knob( 0.1f, 0.0f, 1.0f, 0.005f, this, tr( "VCF Envelope Decay" ) ),
-	dist_knob( 0.0f, 0.0f, 1.0f, 0.01f, this, tr( "Distortion" ) ),
-	wave_shape( 8.0f, 0.0f, 11.0f, this, tr( "Waveform" ) ),
-	slide_dec_knob( 0.6f, 0.0f, 1.0f, 0.005f, this, tr( "Slide Decay" ) ),
-	slideToggle( false, this, tr( "Slide" ) ),
-	accentToggle( false, this, tr( "Accent" ) ),
-	deadToggle( false, this, tr( "Dead" ) ),
-	db24Toggle( false, this, tr( "24dB/oct Filter" ) ),
-	vca_attack(1.f - 0.96406088f),
-	vca_a0(0.5),
-	vca_a(0.),
-	vca_mode(VcaMode::NeverPlayed)
+Lb302Synth::Lb302Synth(InstrumentTrack* instrumentTrack)
+	: Instrument(instrumentTrack, &lb302_plugin_descriptor, nullptr, Flag::IsSingleStreamed)
+	, vcf_cut_knob(0.75f, 0.0f, 1.5f, 0.005f, this, tr("VCF Cutoff Frequency"))
+	, vcf_res_knob(0.75f, 0.0f, 1.25f, 0.005f, this, tr("VCF Resonance"))
+	, vcf_mod_knob(0.1f, 0.0f, 1.0f, 0.005f, this, tr("VCF Envelope Mod"))
+	, vcf_dec_knob(0.1f, 0.0f, 1.0f, 0.005f, this, tr("VCF Envelope Decay"))
+	, dist_knob(0.0f, 0.0f, 1.0f, 0.01f, this, tr("Distortion"))
+	, wave_shape(8.0f, 0.0f, 11.0f, this, tr("Waveform"))
+	, slide_dec_knob(0.6f, 0.0f, 1.0f, 0.005f, this, tr("Slide Decay"))
+	, slideToggle(false, this, tr("Slide"))
+	, accentToggle(false, this, tr("Accent"))
+	, deadToggle(false, this, tr("Dead"))
+	, db24Toggle(false, this, tr("24dB/oct Filter"))
+	, vcfs{std::make_unique<Lb302FilterIIR2>(&fs), std::make_unique<Lb302Filter3Pole>(&fs)}
 {
-
 	connect( Engine::audioEngine(), SIGNAL( sampleRateChanged() ),
 	         this, SLOT ( filterChanged() ) );
 
@@ -319,52 +278,10 @@ Lb302Synth::Lb302Synth( InstrumentTrack * _instrumentTrack ) :
 	connect( &dist_knob, SIGNAL( dataChanged() ),
 	         this, SLOT ( filterChanged()));
 
-
-	// SYNTH
-
-	vco_inc = 0.0;
-	vco_c = 0;
-	vco_k = 0;
-
-	vco_slide = 0; vco_slideinc = 0;
-	vco_slidebase = 0;
-
-	fs.cutoff = 0;
-	fs.envmod = 0;
-	fs.reso = 0;
-	fs.envdecay = 0;
-	fs.dist = 0;
-
-	vcf_envpos = ENVINC;
-
-	vco_shape = VcoShape::BLSawtooth;
-
-	vcfs[0] = new Lb302FilterIIR2(&fs);
-	vcfs[1] = new Lb302Filter3Pole(&fs);
 	db24Toggled();
-
-	sample_cnt = 0;
-	release_frame = 0;
-	catch_frame = 0;
-	catch_decay = 0;
-
-	last_offset = 0;
-
-	new_freq = false;
-
 	filterChanged();
 
-	auto iph = new InstrumentPlayHandle(this, _instrumentTrack);
-	Engine::audioEngine()->addPlayHandle( iph );
-}
-
-
-Lb302Synth::~Lb302Synth()
-{
-	for (const auto& vcf : vcfs) 
-	{
-		delete vcf;
-	}
+	Engine::audioEngine()->addPlayHandle(new InstrumentPlayHandle(this, instrumentTrack));
 }
 
 
@@ -423,13 +340,7 @@ void Lb302Synth::filterChanged()
 }
 
 
-void Lb302Synth::db24Toggled()
-{
-	vcf = vcfs[db24Toggle.value()];
-	// These recalcFilter calls might suck
-	recalcFilter();
-}
-
+void Lb302Synth::db24Toggled() { recalcFilter(); } // These recalcFilter calls might suck
 
 
 QString Lb302Synth::nodeName() const
@@ -441,7 +352,7 @@ QString Lb302Synth::nodeName() const
 // OBSOLETE. Break apart once we get Q_OBJECT to work. >:[
 void Lb302Synth::recalcFilter()
 {
-	vcf.loadRelaxed()->recalc();
+	vcf().recalc();
 
 	// THIS IS OLD 3pole/24dB code, I may reintegrate it.  Don't need it
 	// right now.   Should be toggled by LB_24_RES_TRICK at the moment.
@@ -465,7 +376,7 @@ int Lb302Synth::process(SampleFrame* outbuf, const std::size_t size)
 	const float sampleRatio = 44100.f / Engine::audioEngine()->outputSampleRate();
 
 	// Hold on to the current VCF, and use it throughout this period
-	Lb302Filter *filter = vcf.loadAcquire();
+	Lb302Filter& filter = vcf();
 
 	if( release_frame == 0 || ! m_playingNote ) 
 	{
@@ -503,7 +414,7 @@ int Lb302Synth::process(SampleFrame* outbuf, const std::size_t size)
 
 		// update vcf
 		if(vcf_envpos >= ENVINC) {
-			filter->envRecalc();
+			filter.envRecalc();
 
 			vcf_envpos = 0;
 
@@ -615,7 +526,7 @@ int Lb302Synth::process(SampleFrame* outbuf, const std::size_t size)
 #ifdef LB_FILTERED
 		//samp = vcf->process(vco_k)*2.0*vca_a;
 		//samp = vcf->process(vco_k)*2.0;
-		float samp = filter->process(vco_k) * vca_a;
+		float samp = filter.process(vco_k) * vca_a;
 		//printf("%f %d\n", vco_c, sample_cnt);
 
 
@@ -697,7 +608,7 @@ void Lb302Synth::initNote( Lb302Note *n)
 
 	if(n->dead ==0){
 		// Swap next two blocks??
-		vcf.loadRelaxed()->playNote();
+		vcf().playNote();
 
 		// Ensure envelope is recalculated
 		vcf_envpos = ENVINC;
