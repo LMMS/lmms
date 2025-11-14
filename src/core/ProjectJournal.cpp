@@ -44,6 +44,7 @@ ProjectJournal::ProjectJournal() :
 	m_joIDs(),
 	m_undoCheckPoints(),
 	m_redoCheckPoints(),
+	m_commandStack(),
 	m_journalling( false )
 {
 }
