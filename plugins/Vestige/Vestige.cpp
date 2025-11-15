@@ -103,8 +103,9 @@ public:
 	vstSubWin( QWidget * _parent ) :
 		SubWindow( _parent )
 	{
-		setAttribute( Qt::WA_DeleteOnClose, false );
-		setWindowFlags( Qt::WindowCloseButtonHint );
+		setAttribute(Qt::WA_DeleteOnClose, false);
+		setWindowFlag(Qt::WindowMaximizeButtonHint, false);
+		setDetachable(false);
 	}
 
 	~vstSubWin() override = default;
