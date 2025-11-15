@@ -69,6 +69,8 @@ public:
 	void setBorderColor( const QColor &c );
 	int titleBarHeight() const;
 	int frameWidth() const;
+	bool isDetachable() const;
+	void setDetachable(bool on);
 	bool isDetached() const;
 	void setDetached(bool on);
 
@@ -108,6 +110,7 @@ private:
 	QLabel * m_windowTitle;
 	QGraphicsDropShadowEffect * m_shadow;
 	bool m_hasFocus;
+	bool m_isDetachable;
 
 	static void elideText( QLabel *label, QString text );
 	void adjustTitleBar();

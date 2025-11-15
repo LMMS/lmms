@@ -29,6 +29,7 @@
 #include "SubWindow.h"
 
 #include <algorithm>
+
 #include <QGraphicsDropShadowEffect>
 #include <QGuiApplication>
 #include <QLabel>
@@ -49,11 +50,12 @@ namespace lmms::gui
 {
 
 
-SubWindow::SubWindow(QWidget *parent, Qt::WindowFlags windowFlags) :
-	QMdiSubWindow(parent, windowFlags),
-	m_buttonSize(17, 17),
-	m_titleBarHeight(titleBarHeight()),
-	m_hasFocus(false)
+SubWindow::SubWindow(QWidget *parent, Qt::WindowFlags windowFlags)
+	: QMdiSubWindow{parent, windowFlags}
+	, m_buttonSize{17, 17}
+	, m_titleBarHeight{titleBarHeight()}
+	, m_hasFocus{false}
+	, m_isDetachable{true}
 {
 	// initialize the tracked geometry to whatever Qt thinks the normal geometry currently is.
 	// this should always work, since QMdiSubWindows will not start as maximized
@@ -186,6 +188,23 @@ void SubWindow::showEvent(QShowEvent* e)
 
 
 
+bool SubWindow::isDetachable() const
+{
+	return m_isDetachable;
+}
+
+
+
+
+void SubWindow::setDetachable(bool on)
+{
+	m_isDetachable = on;
+
+}
+
+
+
+
 bool SubWindow::isDetached() const
 {
 	return widget()->windowFlags().testFlag(Qt::Window);
@@ -288,7 +307,7 @@ void SubWindow::setBorderColor( const QColor &c )
 
 void SubWindow::detach()
 {
-	if (isDetached()) { return; }
+	if (!isDetachable() || isDetached()) { return; }
 
 	const auto pos = mapToGlobal(widget()->pos());
 	const bool shown = isVisible();
@@ -442,6 +461,7 @@ void SubWindow::adjustTitleBar()
 	// button adjustments
 	m_maximizeBtn->hide();
 	m_restoreBtn->hide();
+	m_detachBtn->hide();
 	m_closeBtn->show();
 
 	const int rightSpace = 3;
@@ -482,9 +502,12 @@ void SubWindow::adjustTitleBar()
 		buttonPos -= buttonStep;
 	}
 
-	m_detachBtn->move(buttonPos);
-	m_detachBtn->show();
-	buttonBarWidth = buttonBarWidth + m_buttonSize.width() + buttonGap;
+	if (isDetachable())
+	{
+		m_detachBtn->move(buttonPos);
+		m_detachBtn->show();
+		buttonBarWidth = buttonBarWidth + m_buttonSize.width() + buttonGap;
+	}
 
 	if( widget() )
 	{
