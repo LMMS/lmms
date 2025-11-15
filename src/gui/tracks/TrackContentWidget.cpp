@@ -602,7 +602,7 @@ void TrackContentWidget::mousePressEvent( QMouseEvent * me )
 		{
 			so.at( i )->setSelected( false);
 		}
-		getTrack()->addJournalCheckPoint();
+		getTrack()->addJournalCheckPoint(tr("Add clip to %1").arg(getTrack()->name()));
 		const float snapSize = getGUI()->songEditor()->m_editor->getSnapSize();
 		const TimePos timePos = TimePos(getPosition(pos.x())).quantize(snapSize, true);
 		getTrack()->createClip(timePos);

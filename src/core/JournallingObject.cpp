@@ -55,11 +55,11 @@ JournallingObject::~JournallingObject()
 
 
 
-void JournallingObject::addJournalCheckPoint()
+void JournallingObject::addJournalCheckPoint(QString reason)
 {
 	if( isJournalling() )
 	{
-		Engine::projectJournal()->addJournalCheckPoint( this );
+		Engine::projectJournal()->addJournalCheckPoint(this, std::move(reason));
 	}
 }
 
@@ -73,7 +73,7 @@ QDomElement JournallingObject::saveState( QDomDocument & _doc,
 	{
 		QDomElement _this = SerializingObject::saveState( _doc, _parent );
 
-		QDomElement journalNode = _doc.createElement( "journallingObject" );
+		QDomElement journalNode = _doc.createElement(NodeName);
 		journalNode.setAttribute( "id", id() );
 		journalNode.setAttribute( "metadata", true );
 		_this.appendChild( journalNode );
@@ -97,7 +97,7 @@ void JournallingObject::restoreState( const QDomElement & _this )
 	QDomNode node = _this.firstChild();
 	while( !node.isNull() )
 	{
-		if( node.isElement() && node.nodeName() == "journal" )
+		if(node.isElement() && node.nodeName() == NodeName)
 		{
 			const jo_id_t new_id = node.toElement().attribute( "id" ).toInt();
 			if( new_id )

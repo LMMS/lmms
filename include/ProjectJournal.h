@@ -27,6 +27,7 @@
 
 #include <QHash>
 #include <QStack>
+#include <QObject>
 
 #include "LmmsTypes.h"
 #include "DataFile.h"
@@ -40,8 +41,9 @@ class JournallingObject;
 
 
 //! @warning many parts of this class may be rewritten soon
-class ProjectJournal
+class ProjectJournal : public QObject
 {
+	Q_OBJECT
 public:
 	static const int MAX_UNDO_STATES;
 
@@ -54,7 +56,7 @@ public:
 	bool canUndo() const;
 	bool canRedo() const;
 
-	void addJournalCheckPoint( JournallingObject *jo );
+	void addJournalCheckPoint(JournallingObject* jo, QString reason);
 
 	bool isJournalling() const
 	{
@@ -98,21 +100,30 @@ public:
 		return nullptr;
 	}
 
-
-private:
-	using JoIdMap = QHash<jo_id_t, JournallingObject*>;
-
 	struct CheckPoint
 	{
-		CheckPoint( jo_id_t initID = 0, const DataFile& initData = DataFile( DataFile::Type::JournalData ) ) :
-			joID( initID ),
-			data( initData )
+		CheckPoint(jo_id_t initID = 0, const DataFile& initData = DataFile(DataFile::Type::JournalData), QString description = "") :
+			joID(initID),
+			data(initData),
+			description(std::move(description))
 		{
 		}
 		jo_id_t joID;
 		DataFile data;
+		QString description;
 	} ;
 	using CheckPointStack = QStack<CheckPoint>;
+
+	CheckPointStack& undoCheckPoints() { return m_undoCheckPoints; }
+	CheckPointStack& redoCheckPoints() { return m_redoCheckPoints; }
+
+signals:
+	void undoTriggered();
+	void redoTriggered();
+	void checkPointAdded();
+
+private:
+	using JoIdMap = QHash<jo_id_t, JournallingObject*>;
 
 	JoIdMap m_joIDs;
 

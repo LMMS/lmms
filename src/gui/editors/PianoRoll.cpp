@@ -1778,18 +1778,20 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 				if (it == notes.rend())
 				{
 					is_new_note = true;
-					m_midiClip->addJournalCheckPoint();
-
-					// then set new note
-
-					// clear selection and select this new note
-					clearSelectedNotes();
 
 					// +32 to quanitize the note correctly when placing notes with
 					// the mouse.  We do this here instead of in note.quantized
 					// because live notes should still be quantized at the half.
 					TimePos note_pos( pos_ticks - ( quantization() / 2 ) );
 					TimePos note_len( newNoteLen() );
+
+					m_midiClip->addJournalCheckPoint(tr("Add note"));
+
+					// then set new note
+
+					// clear selection and select this new note
+					clearSelectedNotes();
+
 
 					Note new_note( note_len, note_pos, key_num );
 					new_note.setSelected( true );
@@ -1872,7 +1874,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 						m_currentNote->endPos() * m_ppb / TimePos::ticksPerBar() - RESIZE_AREA_WIDTH
 					&& m_currentNote->length() > 0 )
 				{
-					m_midiClip->addJournalCheckPoint();
+					m_midiClip->addJournalCheckPoint(tr("Resize note"));
 					// then resize the note
 					m_action = Action::ResizeNote;
 

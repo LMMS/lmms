@@ -70,6 +70,7 @@
 #include "TextFloat.h"
 #include "ToolButton.h"
 #include "ToolPlugin.h"
+#include "UndoRedoMenu.h"
 #include "VersionedSaveDialog.h"
 
 #include "lmmsversion.h"
@@ -154,6 +155,9 @@ MainWindow::MainWindow() :
 
 	sideBar->appendTab(new FileBrowser(FileBrowser::Type::Normal, root_paths.join("*"), FileItem::defaultFilters(), title,
 		embed::getIconPixmap("computer").transformed(QTransform().rotate(90)), splitter, dirs_as_items));
+
+	emit initProgress(tr("Preparing undo/redo menu"));
+	sideBar->appendTab(new UndoRedoMenu(splitter));
 
 	m_workspace = new MovableQMdiArea(splitter);
 
