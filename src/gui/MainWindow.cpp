@@ -354,6 +354,7 @@ void MainWindow::finalize()
 		 this, SLOT(updateViewMenu()));
 	connect( m_viewMenu, SIGNAL(triggered(QAction*)), this,
 		SLOT(updateConfig(QAction*)));
+	updateViewMenu();
 
 
 	m_toolsMenu = new QMenu( this );
@@ -547,6 +548,7 @@ SubWindow* MainWindow::addWindowedWidget(QWidget *w, Qt::WindowFlags windowFlags
 {
 	// wrap the widget in our own *custom* window that patches some errors in QMdiSubWindow
 	auto win = new SubWindow(m_workspace->viewport(), windowFlags);
+	connect(this, &MainWindow::detachAllSubWindows, win, &SubWindow::setDetached);
 	win->setWidget(w);
 	if (w) { connect(w, &QWidget::destroyed, win, &SubWindow::deleteLater); } // TODO somehow make this work on any setWidget
 	if (w && w->sizeHint().isValid()) {
@@ -557,6 +559,13 @@ SubWindow* MainWindow::addWindowedWidget(QWidget *w, Qt::WindowFlags windowFlags
 	}
 	m_workspace->addSubWindow(win);
 	return win;
+}
+
+
+
+void MainWindow::setAllSubWindowsDetached(bool detachState)
+{
+	emit detachAllSubWindows(detachState);
 }
 
 
@@ -1053,6 +1062,22 @@ void MainWindow::updateViewMenu()
 				tr( "Fullscreen" ) + "\tF11",
 				this, SLOT(toggleFullscreen())
 		);
+
+	m_viewMenu->addSeparator();
+
+	auto detachAllAction = m_viewMenu->addAction(embed::getIconPixmap("detach"),
+				tr("Detach all subwindows"),
+				this, [this](){setAllSubWindowsDetached(true);},
+				QKeySequence {Qt::CTRL | Qt::SHIFT | Qt::Key_D}
+		);
+	auto attachAllAction = m_viewMenu->addAction(embed::getIconPixmap("detach"),
+				tr("Attach all subwindows"),
+				this, [this](){setAllSubWindowsDetached(false);},
+				QKeySequence {Qt::CTRL | Qt::ALT | Qt::SHIFT | Qt::Key_D}
+		);
+
+	detachAllAction->setShortcutContext(Qt::ApplicationShortcut);
+	attachAllAction->setShortcutContext(Qt::ApplicationShortcut);
 
 	m_viewMenu->addSeparator();
 
