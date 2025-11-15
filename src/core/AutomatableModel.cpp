@@ -303,9 +303,6 @@ void AutomatableModel::setValue( const float value )
 	m_value = fittedValue( value );
 	if( old_val != m_value )
 	{
-		// add changes to history so user can undo it
-		addJournalCheckPoint();
-
 		// notify linked models
 		for (const auto& linkedModel : m_linkedModels)
 		{
