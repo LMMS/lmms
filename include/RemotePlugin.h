@@ -27,7 +27,9 @@
 
 #include <QThread>
 #include <QProcess>
-#include <QRecursiveMutex>
+#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
+#include <QRecursiveMutex>  // IWYU pragma: keep
+#endif
 
 #include "RemotePluginBase.h"
 #include "SharedMemory.h"
@@ -164,7 +166,11 @@ private:
 	QString m_exec;
 	QStringList m_args;
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
 	QRecursiveMutex m_commMutex;
+#else
+	QMutex m_commMutex;
+#endif
 	bool m_splitChannels;
 
 	SharedMemory<float[]> m_audioBuffer;

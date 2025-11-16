@@ -1,6 +1,6 @@
 # AppRun Hooks
 
-Scripts placed in this directory will automatically be bundled into linuxdeploy AppImages
+Scripts placed in this directory will automatically be bundled into AppImages
 (e.g. `LMMS.AppDir/apprun-hooks`) and executed immediately before lmms.
 
 Quoting:

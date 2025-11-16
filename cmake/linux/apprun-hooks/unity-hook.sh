@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 # Workaround Unity desktop menubar integration
 # - Unity's menubar relocation breaks Qt's MDI window handling in Linux

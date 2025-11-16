@@ -1057,7 +1057,11 @@ void Song::loadProject( const QString & fileName )
 			{
 				QTextStream(stderr) << tr("Can't load project: "
 					"Project file contains local paths to plugins.")
+#if (QT_VERSION >= QT_VERSION_CHECK(5,15,0))
 					<< Qt::endl;
+#else
+					<< endl;
+#endif
 			}
 		}
 	}
@@ -1212,7 +1216,11 @@ void Song::loadProject( const QString & fileName )
 		}
 		else
 		{
+#if (QT_VERSION >= QT_VERSION_CHECK(5,15,0))
 			QTextStream(stderr) << Engine::getSong()->errorSummary() << Qt::endl;
+#else
+			QTextStream(stderr) << Engine::getSong()->errorSummary() << endl;
+#endif
 		}
 	}
 

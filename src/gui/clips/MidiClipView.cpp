@@ -495,14 +495,13 @@ void MidiClipView::mouseDoubleClickEvent(QMouseEvent *_me)
 
 void MidiClipView::wheelEvent(QWheelEvent * we)
 {
-	const auto pos = we->position().toPoint();
 	if(m_clip->m_clipType == MidiClip::Type::BeatClip &&
 				(fixedClips() || pixelsPerBar() >= 96) &&
-				pos.y() > height() - m_stepBtnOff.height())
+				position(we).y() > height() - m_stepBtnOff.height())
 	{
 //	get the step number that was wheeled on and
 //	do calculations in floats to prevent rounding errors...
-		float tmp = ((float(pos.x()) - BORDER_WIDTH) *
+		float tmp = ((float(position(we).x()) - BORDER_WIDTH) *
 				float(m_clip -> m_steps)) / float(width() - BORDER_WIDTH*2);
 
 		int step = int( tmp );
