@@ -278,11 +278,16 @@ SongEditor::SongEditor( Song * song ) :
 void SongEditor::saveSettings( QDomDocument& doc, QDomElement& element )
 {
 	MainWindow::saveWidgetState( parentWidget(), element );
+	element.setAttribute("timelinezoom", m_zoomingModel->value());
 }
 
 void SongEditor::loadSettings( const QDomElement& element )
 {
 	MainWindow::restoreWidgetState(parentWidget(), element);
+	if (element.hasAttribute("timelinezoom"))
+	{
+		m_zoomingModel->setValue(element.attribute("timelinezoom").toFloat());
+	}
 }
 
 
