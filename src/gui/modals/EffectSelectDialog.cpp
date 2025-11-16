@@ -131,13 +131,8 @@ EffectSelectDialog::EffectSelectDialog(QWidget* parent) :
 	mainLayout->addLayout(leftSectionLayout);
 
 	m_filterEdit = new QLineEdit(this);
-	connect(m_filterEdit, &QLineEdit::textChanged, this, [this](const QString &text) {
-// TODO: Cleanup when we don't support Qt5 anymore
-#if (QT_VERSION >= QT_VERSION_CHECK(5,12,0))
+	connect(m_filterEdit, &QLineEdit::textChanged, this, [this](const QString& text) {
 		m_model.setFilterRegularExpression(QRegularExpression(text, QRegularExpression::CaseInsensitiveOption));
-#else
-		m_model.setFilterRegExp(QRegExp(text, Qt::CaseInsensitive));
-#endif
 	});
 	connect(m_filterEdit, &QLineEdit::textChanged, this, &EffectSelectDialog::updateSelection);
 	m_filterEdit->setFocus();

@@ -66,28 +66,26 @@ using LocklessListElement = LocklessList<PlayHandle*>::Element;
 
 static thread_local bool s_renderingThread = false;
 
-AudioEngine::AudioEngine(bool renderOnly)
-	: m_renderOnly(renderOnly)
-	, m_framesPerAudioBuffer(ConfigManager::inst()
-			  ->value("audioengine", "framesperaudiobuffer", QString::number(DEFAULT_BUFFER_SIZE))
-			  .toULong())
-	, m_framesPerPeriod(std::min(m_framesPerAudioBuffer, DEFAULT_BUFFER_SIZE))
-	, m_baseSampleRate(
-		  ConfigManager::inst()->value("audioengine", "samplerate", QString::number(DEFAULT_SAMPLE_RATE)).toULong())
-	, m_inputBufferRead(0)
-	, m_inputBufferWrite(1)
-	, m_outputBufferRead(nullptr)
-	, m_outputBufferWrite(nullptr)
-	, m_workers()
-	, m_numWorkers(QThread::idealThreadCount() - 1)
-	, m_newPlayHandles(PlayHandle::MaxNumber)
-	, m_qualitySettings(qualitySettings::Interpolation::Linear)
-	, m_masterGain(1.0f)
-	, m_audioDev(nullptr)
-	, m_oldAudioDev(nullptr)
-	, m_audioDevStartFailed(false)
-	, m_profiler()
-	, m_clearSignal(false)
+
+
+
+AudioEngine::AudioEngine( bool renderOnly ) :
+	m_renderOnly( renderOnly ),
+	m_framesPerPeriod( DEFAULT_BUFFER_SIZE ),
+	m_baseSampleRate(std::max(ConfigManager::inst()->value("audioengine", "samplerate").toInt(), SUPPORTED_SAMPLERATES.front())),
+	m_inputBufferRead( 0 ),
+	m_inputBufferWrite( 1 ),
+	m_outputBufferRead(nullptr),
+	m_outputBufferWrite(nullptr),
+	m_workers(),
+	m_numWorkers( QThread::idealThreadCount()-1 ),
+	m_newPlayHandles( PlayHandle::MaxNumber ),
+	m_masterGain( 1.0f ),
+	m_audioDev( nullptr ),
+	m_oldAudioDev( nullptr ),
+	m_audioDevStartFailed( false ),
+	m_profiler(),
+	m_clearSignal(false)
 {
 	for( int i = 0; i < 2; ++i )
 	{
@@ -382,25 +380,6 @@ void AudioEngine::clearInternal()
 	}
 }
 
-
-
-
-void AudioEngine::changeQuality(const struct qualitySettings & qs)
-{
-	// don't delete the audio-device
-	stopProcessing();
-
-	m_qualitySettings = qs;
-
-	emit sampleRateChanged();
-	emit qualitySettingsChanged();
-
-	startProcessing();
-}
-
-
-
-
 void AudioEngine::doSetAudioDevice( AudioDevice * _dev )
 {
 	// TODO: Use shared_ptr here in the future.
@@ -421,11 +400,9 @@ void AudioEngine::doSetAudioDevice( AudioDevice * _dev )
 	}
 }
 
-void AudioEngine::setAudioDevice(AudioDevice* _dev, const struct qualitySettings& _qs, bool startNow)
+void AudioEngine::setAudioDevice(AudioDevice* _dev, bool startNow)
 {
 	stopProcessing();
-
-	m_qualitySettings = _qs;
 
 	doSetAudioDevice( _dev );
 
