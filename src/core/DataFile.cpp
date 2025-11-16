@@ -139,6 +139,7 @@ DataFile::DataFile( Type type ) :
 	root.setAttribute( "creator", "LMMS" );
 	root.setAttribute( "creatorversion", LMMS_VERSION );
 	root.setAttribute( "creatorplatform", QSysInfo::kernelType() );
+	root.setAttribute( "creatorplatformtype", QSysInfo::productType() );
 	appendChild( root );
 
 	m_head = createElement( "head" );
@@ -2103,6 +2104,7 @@ void DataFile::upgrade()
 	documentElement().setAttribute( "creator", "LMMS" );
 	documentElement().setAttribute( "creatorversion", LMMS_VERSION );
 	documentElement().setAttribute( "creatorplatform", QSysInfo::kernelType() );
+	documentElement().setAttribute( "creatorplatformtype", QSysInfo::productType() );
 
 	if( type() == Type::SongProject || type() == Type::SongProjectTemplate )
 	{
