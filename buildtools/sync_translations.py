@@ -47,7 +47,7 @@ except ImportError:
 
 LUPDATE_EXECUTABLES = 'lupdate', 'lupdate-qt5'
 LRELEASE_EXECUTABLES = 'lrelease', 'lrelease-qt5'
-TRANSIFEX_CLIENT = 'tx-cli'
+TRANSIFEX_EXECUTABLES = 'tx', 'tx-cli' # (arch linux)
 
 # Files to look for strings in (copied from lupdate --help)
 LUPDATE_EXTENSIONS = 'java,jui,ui,c,c++,cc,cpp,cxx,ch,h,h++,hh,hpp,hxx,js,qs,qml,qrc'.split(',')
@@ -58,10 +58,6 @@ TRANSLATION_DIR = Path('./data/locale')
 # Names for temporary .ts file backups
 BACKUP_PREFIX = time.strftime('%y%m%d_%H%M%S_')
 BACKUP_SUFFIX = '.bak'
-
-# Percentage that needs to be translated before a language is pulled in
-# TODO should we have this limit, or just include all languages?
-LANGUAGE_THRESHOLD: str = '20'
 
 #
 # ARGUMENTS
@@ -96,8 +92,8 @@ def choice(prompt: str, choices: str):
 	 """
 	while True:
 		reply = input(f'[?] {prompt} [{"/".join(choices)}]\n>>> ')
-		if len(reply) == 1 and reply.lower() in choices.lower():
-			return reply.lower()
+		if len(reply) == 1 and reply.upper() in choices.upper():
+			return reply.upper()
 
 
 def run(command: list[str], exit_on_error=True, **kwargs) -> bool:
@@ -117,7 +113,7 @@ def find_executable(executables: tuple[str, ...]) -> str:
 	for ex in executables:
 		if shutil.which(ex) is not None:
 			return ex
-	raise OSError(f'Commands not found: {executables}')
+	raise OSError(f'None of these commands were found: {executables}')
 
 
 # TODO Python 3.12: use tempfile.NamedTempFile(delete=True, delete_on_close=False) instead
@@ -283,13 +279,14 @@ def check_requirements():
 		error("The translations have uncommited changes",
 			  "Please git commit or git restore them")
 
-	if shutil.which(TRANSIFEX_CLIENT) is None:
-		error(f"You don't seem to have {TRANSIFEX_CLIENT} installed",
-			  "Get the latest release here: https://github.com/transifex/cli")
+	if all(shutil.which(cmd) is None for cmd in TRANSIFEX_EXECUTABLES):
+		error(f"You don't seem to have the Transifex client `{TRANSIFEX_EXECUTABLES[0]}` installed",
+			  "Get the latest release here: https://github.com/transifex/cli"
+			  "or install some package like `transifex-cli`")
 
 	for commands in (LUPDATE_EXECUTABLES, LRELEASE_EXECUTABLES):
 		if all(shutil.which(cmd) is None for cmd in commands):
-			error(f"You don't seem to have {commands[0]} installed",
+			error(f"You don't seem to have `{commands[0]}` installed",
 				  "Usually this comes with your Qt installation, or you need to install some",
 				  "package like `qt5-tools`, `qttools5-dev-tools`, `qt6-l10n-tools` or similar")
 
@@ -306,7 +303,7 @@ def pull_translations_from_tx():
 	info('Pulling down translations from Transifex')
 
 	command = [
-		TRANSIFEX_CLIENT,
+		find_executable(TRANSIFEX_EXECUTABLES),
 		'pull',  # this will overwrite files in data/locale [1]
 		'--mode', 'translator',  # both translated and untranslated strings [2]
 		'--force',  # even if the local file is newer than the online resource
@@ -315,8 +312,8 @@ def pull_translations_from_tx():
 	if LANGUAGES:
 		command += ['--languages', ','.join(LANGUAGES)]
 	else:
-		# Pull down all languages that are complete enough
-		command += ['--all', '--minimum-perc', LANGUAGE_THRESHOLD]
+		command += ['--all']
+	# command += ['--minimum-perc', '50']
 
 	run(command)
 
@@ -418,7 +415,9 @@ def fill_in_known_translations():
 				del untranslated.translation.attrib['type']
 
 		# Write the updated XML to disk
-		new_tree.write(new_ts, encoding="utf8", xml_declaration=True)
+		# For some reason pushing doesn't support utf8, even if the files returned by pull are utf8
+		# It results in: `Your file doesn't seem to contain valid xml: not well-formed (invalid token)`
+		new_tree.write(new_ts, encoding="ascii", xml_declaration=True)
 
 
 def validate_translation_files():
@@ -454,19 +453,36 @@ def push_translations_to_tx():
 	#
 	# I don't think we want the first, and I don't think the latter can happen, since in the case of TS files
 	# the string key and the source string are the same [4].
-	#
+
+	tx = find_executable(TRANSIFEX_EXECUTABLES)
+
+	# Push the updated English strings
+	run([
+		tx,
+		'push',
+		'--source',
+		'--force',
+	])
+
+	# Push the updated translations
+	command = [
+		tx,
+		'push',
+		'--translation',
+		'--force',  # push even if the online resource was edited while this script was running [5]
+	]
+	if LANGUAGES:
+		command += ['--languages', ','.join(LANGUAGES)]
+	run(command)
+
+	info('Translations uploaded!')
+
 	# [1] https://github.com/transifex/cli/pull/195
 	# [2] https://help.transifex.com/en/articles/6236820-edit-source-strings-online
 	# [3] https://help.transifex.com/en/articles/6649327-how-string-hashes-are-calculated
 	# [4] https://help.transifex.com/en/articles/6223301-qt-linguist
-
-	# Push the updated English strings
-	run([TRANSIFEX_CLIENT, 'push', '--source'])
-
-	# Push the updated translations
-	run([TRANSIFEX_CLIENT, 'push', '--translation', '--languages', ','.join(LANGUAGES)])
-
-	info('Translations uploaded!')
+	# [5] https://github.com/transifex/cli?tab=readme-ov-file#pushing-files-to-transifex
+	...
 
 
 def delete_backups():

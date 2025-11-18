@@ -1,10 +1,12 @@
 [main]
 host = https://app.transifex.com
-minimum_perc = 51
-#Need to finish at least 51% before merging back
-# This doesn't appear to affect `tx-cli pull`, though it should
+# Need to finish at least 51% before merging back
+# Even if uncommented, this doesn't appear to affect `tx-cli pull`
+# minimum_perc = 51
 
-# [o:Organization p:Project r:Resource]
+# Name of the resource, like o:organization_slug p:project_slug r:resource_slug
+# This resource will be labeled `lmms.ts` in web interface
+# To specify this resource in the CLI you write `lmms.lmms` (project.resource)
 [o:lmms:p:lmms:r:lmms]
 file_filter = data/locale/<lang>.ts
 source_file = data/locale/en.ts
