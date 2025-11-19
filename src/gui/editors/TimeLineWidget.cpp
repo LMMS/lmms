@@ -340,14 +340,17 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 	{
 		case Action::MovePositionMarker:
 			m_pos.setTicks(timeAtCursor.getTicks());
-			Engine::getSong()->setToTime(timeAtCursor, m_mode);
-			if (!( Engine::getSong()->isPlaying()))
+			//We have to explicitly specify both of these cases, otherwise the timer does not get updated.
+			if (!Engine::getSong()->isPlaying())
 			{
-				//Song::PlayMode::None is used when nothing is being played.
-				Engine::getSong()->setToTime(timeAtCursor, Song::PlayMode::None);
+				Engine::getSong()->setPlayPos(timeAtCursor.getTicks(), Song::PlayMode::None);
 			}
-			m_pos.setCurrentFrame( 0 );
-			m_pos.setJumped( true );
+			else
+			{
+				Engine::getSong()->setPlayPos(timeAtCursor.getTicks(), m_mode);
+			}
+			m_pos.setCurrentFrame(0);
+			m_pos.setJumped(true);
 			updatePosition();
 			break;
 
