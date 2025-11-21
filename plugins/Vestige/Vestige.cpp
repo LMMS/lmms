@@ -532,14 +532,10 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	m_openPresetButton->setToolTip(tr("Open VST plugin preset"));
 
 
-	m_rolLPresetButton = new PixmapButton( this, "" );
-	m_rolLPresetButton->setCheckable( false );
-	m_rolLPresetButton->setCursor( Qt::PointingHandCursor );
+	m_rolLPresetButton = new QPushButton(this);
+	m_rolLPresetButton->setObjectName("btn-stepper-left");
+	m_rolLPresetButton->setCursor(Qt::PointingHandCursor);
 	m_rolLPresetButton->move( 190, 201 );
-	m_rolLPresetButton->setActiveGraphic( embed::getIconPixmap(
-							"stepper-left-press" ) );
-	m_rolLPresetButton->setInactiveGraphic( embed::getIconPixmap(
-							"stepper-left" ) );
 	connect( m_rolLPresetButton, SIGNAL( clicked() ), this,
 						SLOT( previousProgram() ) );
 	m_rolLPresetButton->setToolTip(tr("Previous (-)"));
@@ -560,14 +556,10 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	m_savePresetButton->setToolTip(tr("Save preset"));
 
 
-	m_rolRPresetButton = new PixmapButton( this, "" );
-	m_rolRPresetButton->setCheckable( false );
-	m_rolRPresetButton->setCursor( Qt::PointingHandCursor );
+	m_rolRPresetButton = new QPushButton(this);
+	m_rolRPresetButton->setObjectName("btn-stepper-right");
+	m_rolRPresetButton->setCursor(Qt::PointingHandCursor);
 	m_rolRPresetButton->move( 209, 201 );
-	m_rolRPresetButton->setActiveGraphic( embed::getIconPixmap(
-							"stepper-right-press" ) );
-	m_rolRPresetButton->setInactiveGraphic( embed::getIconPixmap(
-							"stepper-right" ) );
 	connect( m_rolRPresetButton, SIGNAL( clicked() ), this,
 						SLOT( nextProgram() ) );
 	m_rolRPresetButton->setToolTip(tr("Next (+)"));
@@ -575,15 +567,14 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	m_rolRPresetButton->setShortcut( Qt::Key_Plus );
 
 
-	m_selPresetButton = new QPushButton( tr( "" ), this );
-	m_selPresetButton->setGeometry( 228, 201, 16, 16 );
+	m_selPresetButton = new QPushButton(this);
+	m_selPresetButton->setObjectName("btn-stepper-down");
+	m_selPresetButton->setCursor(Qt::PointingHandCursor);
+	m_selPresetButton->move(228, 201);
 
 	auto menu = new QMenu;
 
 	connect( menu, SIGNAL( aboutToShow() ), this, SLOT( updateMenu() ) );
-
-
-	m_selPresetButton->setIcon( embed::getIconPixmap( "stepper-down" ) );
 
 	m_selPresetButton->setMenu(menu);
 
