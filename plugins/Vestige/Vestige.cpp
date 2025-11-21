@@ -103,8 +103,9 @@ public:
 	vstSubWin( QWidget * _parent ) :
 		SubWindow( _parent )
 	{
-		setAttribute( Qt::WA_DeleteOnClose, false );
-		setWindowFlags( Qt::WindowCloseButtonHint );
+		setAttribute(Qt::WA_DeleteOnClose, false);
+		setWindowFlag(Qt::WindowMaximizeButtonHint, false);
+		setDetachable(false);
 	}
 
 	~vstSubWin() override = default;
@@ -113,15 +114,8 @@ public:
 	{
 		// ignore close-events - for some reason otherwise the VST GUI
 		// remains hidden when re-opening
-		if (windowFlags().testFlag(Qt::Window))
-		{
-			e->accept();
-		}
-		else
-		{
-			hide();
-			e->ignore();
-		}
+		hide();
+		e->ignore();
 	}
 };
 

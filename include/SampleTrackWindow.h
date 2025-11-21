@@ -25,7 +25,8 @@
 #ifndef LMMS_GUI_SAMPLE_TRACK_WINDOW_H
 #define LMMS_GUI_SAMPLE_TRACK_WINDOW_H
 
-#include "DetachableWidget.h"
+#include <QWidget>
+
 #include "ModelView.h"
 #include "SampleTrack.h"
 #include "SerializingObject.h"
@@ -42,7 +43,7 @@ class MixerChannelLcdSpinBox;
 class SampleTrackView;
 
 
-class SampleTrackWindow : public DetachableWidget, public ModelView, public SerializingObjectHook
+class SampleTrackWindow : public QWidget, public ModelView, public SerializingObjectHook
 {
 	Q_OBJECT
 public:

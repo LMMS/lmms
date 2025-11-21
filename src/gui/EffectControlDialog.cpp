@@ -31,7 +31,7 @@ namespace lmms::gui
 {
 
 EffectControlDialog::EffectControlDialog(EffectControls* controls)
-	: DetachableWidget{nullptr}
+	: QWidget{nullptr}
 	, ModelView{controls, this}
 	, m_effectControls{controls}
 {

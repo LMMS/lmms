@@ -304,7 +304,6 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	// we can reuse this method.
 	updateSubWindow();
 
-	subWin->setWindowIcon(embed::getIconPixmap("instrument_track"));
 	subWin->hide();
 }
 
@@ -531,22 +530,6 @@ void InstrumentTrackWindow::toggleVisibility( bool on )
 
 void InstrumentTrackWindow::closeEvent( QCloseEvent* event )
 {
-	// TODO: When is this event used?
-	if (windowFlags().testFlag(Qt::Window))
-	{
-		event->accept();
-	}
-	else if (getGUI()->mainWindow()->workspace())
-	{
-		parentWidget()->hide();
-		event->ignore();
-	}
-	else
-	{
-		hide();
-		event->ignore();
-	}
-
 	m_itv->setFocus();
 	m_itv->m_tlb->setChecked(false);
 }
@@ -618,6 +601,7 @@ void InstrumentTrackWindow::dropEvent( QDropEvent* event )
 		event->accept();
 		setFocus();
 	}
+	updateSubWindow();
 }
 
 
@@ -677,13 +661,34 @@ void InstrumentTrackWindow::viewInstrumentInDirection(int d)
 	// avoid reloading the window if there is only one instrument, as that will just change the active tab
 	if (idxOfNext != idxOfMe)
 	{
+		SubWindow* source_subwin = static_cast<SubWindow*>(parentWidget());
+		SubWindow* target_subwin = static_cast<SubWindow*>(newView->getInstrumentTrackWindow()->parentWidget());
+		QWidget* source_widget;
+		QWidget* target_widget;
+
+		// set widgets we move and get our position from
+		if (source_subwin->isDetached())
+		{
+			source_widget = this;
+			target_widget = newView->getInstrumentTrackWindow();
+		}
+		else
+		{
+			source_widget = parentWidget();
+			target_widget = newView->getInstrumentTrackWindow()->parentWidget();
+		}
+
 		// save current window pos and then hide the window by unchecking its button in the track list
-		QPoint curPos = parentWidget()->pos();
+		QPoint curPos = source_widget->pos();
 		m_itv->m_tlb->setChecked(false);
 
 		// enable the new window by checking its track list button & moving it to where our window just was
 		newView->m_tlb->setChecked(true);
-		newView->getInstrumentTrackWindow()->parentWidget()->move(curPos); // TODO
+
+		// sync detached state with current widget like we do with position
+		target_subwin->setDetached(source_subwin->isDetached());
+
+		target_widget->move(curPos);
 
 		// scroll the SongEditor/PatternEditor to make sure the new trackview label is visible
 		bringToFront->trackContainerView()->scrollToTrackView(bringToFront);
@@ -741,25 +746,18 @@ void InstrumentTrackWindow::updateSubWindow()
 	auto subWindow = findSubWindowInParents();
 	if (subWindow && m_instrumentView)
 	{
-		Qt::WindowFlags flags = subWindow->windowFlags();
-
 		const auto instrumentViewResizable = m_instrumentView->isResizable();
 
 		if (instrumentViewResizable)
 		{
 			// TODO As of writing SlicerT is the only resizable instrument. Is this code specific to SlicerT?
+			// TODO Expand extraSpace in terms of specific widget sizes or replace with QLayout::setSizeConstraint.
 			const auto extraSpace = QSize(12, 208);
 			setMaximumSize(m_instrumentView->maximumSize() + extraSpace);
 			setMinimumSize(m_instrumentView->minimumSize() + extraSpace);
-
-			flags &= ~Qt::MSWindowsFixedSizeDialogHint;
-			flags |= Qt::WindowMaximizeButtonHint;
 		}
 		else
 		{
-			flags |= Qt::MSWindowsFixedSizeDialogHint;
-			flags &= ~Qt::WindowMaximizeButtonHint;
-
 			setFixedSize(sizeHint());
 
 			// The sub window might be reused from an instrument that was maximized. Show the sub window
@@ -770,7 +768,7 @@ void InstrumentTrackWindow::updateSubWindow()
 			}
 		}
 
-		subWindow->setWindowFlags(flags);
+		subWindow->setWindowFlag(Qt::WindowMaximizeButtonHint, instrumentViewResizable);
 
 		// TODO This is only needed if the sub window is implemented with LMMS' own SubWindow class.
 		// If an QMdiSubWindow is used everything works automatically. It seems that SubWindow is
@@ -779,14 +777,6 @@ void InstrumentTrackWindow::updateSubWindow()
 		if (subWin)
 		{
 			subWin->updateTitleBar();
-		}
-		else
-		{
-			// TODO: Can this be removed?
-			// Show or hide the Size and Maximize options from the system menu depending on whether the view is resizable or not
-			QMenu* systemMenu = subWindow->systemMenu();
-			systemMenu->actions().at(2)->setVisible(instrumentViewResizable); // Size
-			systemMenu->actions().at(4)->setVisible(instrumentViewResizable); // Maximize
 		}
 	}
 }

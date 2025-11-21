@@ -26,8 +26,10 @@
 #ifndef LMMS_GUI_CONTROLLER_DIALOG_H
 #define LMMS_GUI_CONTROLLER_DIALOG_H
 
-#include "DetachableWidget.h"
+#include <QWidget>
+
 #include "ModelView.h"
+
 
 namespace lmms
 {
@@ -37,7 +39,7 @@ class Controller;
 namespace gui
 {
 
-class ControllerDialog : public DetachableWidget, public ModelView
+class ControllerDialog : public QWidget, public ModelView
 {
 public:
 	ControllerDialog(Controller* controller, QWidget* parent);

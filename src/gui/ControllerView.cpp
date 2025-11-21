@@ -44,15 +44,14 @@ namespace lmms::gui
 {
 
 
-ControllerView::ControllerView( Controller * _model, QWidget * _parent ) :
-	QFrame( _parent ),
-	ModelView( _model, this ),
-	m_subWindow( nullptr ),
-	m_controllerDlg( nullptr ),
-	m_show( true )
+ControllerView::ControllerView(Controller* model, QWidget* parent)
+	: QFrame{parent}
+	, ModelView{model, this}
+	, m_subWindow{nullptr}
+	, m_controllerDlg{nullptr}
 {
-	this->setFrameStyle( QFrame::StyledPanel );
-	this->setFrameShadow( QFrame::Raised );
+	this->setFrameStyle(QFrame::StyledPanel);
+	this->setFrameShadow(QFrame::Raised);
 	setFocusPolicy(Qt::StrongFocus);
 
 	auto vBoxLayout = new QVBoxLayout(this);
@@ -60,7 +59,7 @@ ControllerView::ControllerView( Controller * _model, QWidget * _parent ) :
 	auto hBox = new QHBoxLayout();
 	vBoxLayout->addLayout(hBox);
 
-	auto label = new QLabel("<b>" + _model->displayName() + "</b>", this);
+	auto label = new QLabel("<b>" + model->displayName() + "</b>", this);
 	QSizePolicy sizePolicy = label->sizePolicy();
 	sizePolicy.setHorizontalStretch(1);
 	label->setSizePolicy(sizePolicy);
@@ -72,27 +71,17 @@ ControllerView::ControllerView( Controller * _model, QWidget * _parent ) :
 
 	hBox->addWidget(controlsButton);
 
-	m_nameLabel = new QLabel(_model->name(), this);
+	m_nameLabel = new QLabel(model->name(), this);
 	vBoxLayout->addWidget(m_nameLabel);
 
 
-	m_controllerDlg = getController()->createDialog( getGUI()->mainWindow()->workspace() );
+	m_controllerDlg = getController()->createDialog(getGUI()->mainWindow()->workspace());
 
-	m_subWindow = getGUI()->mainWindow()->addWindowedWidget( m_controllerDlg );
-	
-	Qt::WindowFlags flags = m_subWindow->windowFlags();
-	flags &= ~Qt::WindowMaximizeButtonHint;
-	m_subWindow->setWindowFlags( flags );
-	m_subWindow->setFixedSize( m_subWindow->size() );
-
-	m_subWindow->setWindowIcon( m_controllerDlg->windowIcon() );
-
-	connect( m_controllerDlg, SIGNAL(closed()),
-		this, SLOT(closeControls()));
-
+	m_subWindow = getGUI()->mainWindow()->addWindowedWidget(m_controllerDlg);
+	m_subWindow->setWindowFlag(Qt::WindowMaximizeButtonHint, false);
 	m_subWindow->hide();
 
-	setModel( _model );
+	setModel(model);
 }
 
 
@@ -111,27 +100,19 @@ ControllerView::~ControllerView()
 
 void ControllerView::editControls()
 {
-	if( m_show )
+	if (!m_controllerDlg->isVisible())
 	{
 		m_subWindow->show();
 		m_subWindow->raise();
-		m_show = false;
 	}
 	else
 	{
 		m_subWindow->hide();
-		m_show = true;
 	}
 }
 
 
 
-
-void ControllerView::closeControls()
-{
-	m_subWindow->hide();
-	m_show = true;
-}
 
 void ControllerView::moveUp() { emit movedUp(this); }
 

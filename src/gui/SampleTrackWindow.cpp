@@ -48,7 +48,7 @@ namespace lmms::gui
 
 
 SampleTrackWindow::SampleTrackWindow(SampleTrackView* stv)
-	: DetachableWidget{}
+	: QWidget{}
 	, ModelView{nullptr, this}
 	, m_track{stv->model()}
 	, m_stv{stv}
@@ -169,27 +169,14 @@ SampleTrackWindow::SampleTrackWindow(SampleTrackView* stv)
 
 	QMdiSubWindow * subWin = getGUI()->mainWindow()->addWindowedWidget(this);
 	Qt::WindowFlags flags = subWin->windowFlags();
-	flags |= Qt::MSWindowsFixedSizeDialogHint;
+	flags |= Qt::MSWindowsFixedSizeDialogHint;  // resizing is disabled regardless, this makes SubWindow hide related actions
 	flags &= ~Qt::WindowMaximizeButtonHint;
 	subWin->setWindowFlags(flags);
 
-	// adjust window size
-	layout()->invalidate();
-	resize(sizeHint());
-	if (parentWidget())
-	{
-		parentWidget()->resize(parentWidget()->sizeHint());
-	}
-	setFixedSize(size());
+	// better than `setFixedSize` because it still responds to layout changes
+	layout()->setSizeConstraint(QLayout::SetFixedSize);
 
-	// Hide the Size and Maximize options from the system menu
-	// since the dialog size is fixed.
-	QMenu * systemMenu = subWin->systemMenu();
-	systemMenu->actions().at(2)->setVisible(false); // Size
-	systemMenu->actions().at(4)->setVisible(false); // Maximize
-
-	subWin->setWindowIcon(embed::getIconPixmap("sample_track"));
-	subWin->setFixedSize(subWin->size());
+	setWindowIcon(embed::getIconPixmap("sample_track"));
 	subWin->hide();
 }
 
@@ -266,8 +253,6 @@ void SampleTrackWindow::toggleVisibility(bool on)
 
 void SampleTrackWindow::closeEvent(QCloseEvent* ce)
 {
-	DetachableWidget::closeEvent(ce);
-
 	m_stv->setFocus();
 	m_stv->m_tlb->setChecked(false);
 }

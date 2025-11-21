@@ -28,6 +28,8 @@
 
 #include "SubWindow.h"
 
+#include <algorithm>
+
 #include <QGraphicsDropShadowEffect>
 #include <QGuiApplication>
 #include <QLabel>
@@ -41,17 +43,19 @@
 #include <QStyleOptionTitleBar>
 #include <QWindow>
 
+#include "ConfigManager.h"
 #include "embed.h"
 
 namespace lmms::gui
 {
 
 
-SubWindow::SubWindow(QWidget *parent, Qt::WindowFlags windowFlags) :
-	QMdiSubWindow(parent, windowFlags),
-	m_buttonSize(17, 17),
-	m_titleBarHeight(titleBarHeight()),
-	m_hasFocus(false)
+SubWindow::SubWindow(QWidget *parent, Qt::WindowFlags windowFlags)
+	: QMdiSubWindow{parent, windowFlags}
+	, m_buttonSize{17, 17}
+	, m_titleBarHeight{titleBarHeight()}
+	, m_hasFocus{false}
+	, m_isDetachable{true}
 {
 	// initialize the tracked geometry to whatever Qt thinks the normal geometry currently is.
 	// this should always work, since QMdiSubWindows will not start as maximized
@@ -81,7 +85,7 @@ SubWindow::SubWindow(QWidget *parent, Qt::WindowFlags windowFlags) :
 	m_restoreBtn = createButton("restore", tr("Restore"));
 	connect(m_restoreBtn, &QPushButton::clicked, this, &QWidget::showNormal);
 
-	m_detachBtn = createButton("window", tr("Detach"));
+	m_detachBtn = createButton("detach", tr("Detach"));
 	connect(m_detachBtn, &QPushButton::clicked, this, &SubWindow::detach);
 
 	// QLabel for the window title and the shadow effect
@@ -158,24 +162,61 @@ void SubWindow::changeEvent( QEvent *event )
 	{
 		adjustTitleBar();
 	}
-
 }
+
+
+
 
 void SubWindow::setVisible(bool visible)
 {
-	if (isDetached() && visible)  // avoid showing titlebar here
-	{
-		widget()->show();
-		// raise the detached window in case it was minimized
-		widget()->setWindowState((widget()->windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
-		return;
-	}
-	QMdiSubWindow::setVisible(visible);
+	if (isDetached() || visible) { widget()->setVisible(visible); }
+	if (!isDetached()) { QMdiSubWindow::setVisible(visible); }
 }
+
+
+
+
+void SubWindow::showEvent(QShowEvent* e)
+{
+	if (ConfigManager::inst()->value("ui", "detachbehavior", "show") == "detached") { detach(); }
+	if (isDetached())
+	{
+		widget()->setWindowState((widget()->windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
+	}
+}
+
+
+
+
+bool SubWindow::isDetachable() const
+{
+	return m_isDetachable;
+}
+
+
+
+
+void SubWindow::setDetachable(bool on)
+{
+	m_isDetachable = on;
+
+}
+
+
+
 
 bool SubWindow::isDetached() const
 {
 	return widget()->windowFlags().testFlag(Qt::Window);
+}
+
+
+
+
+void SubWindow::setDetached(bool on)
+{
+	if (on) { detach(); }
+	else { attach(); }
 }
 
 
@@ -261,65 +302,70 @@ void SubWindow::setBorderColor( const QColor &c )
 	m_borderColor = c;
 }
 
+
+
+
 void SubWindow::detach()
 {
-#if QT_VERSION < 0x50C00
-	// Workaround for a bug in Qt versions below 5.12,
-	// where argument-dependent-lookup fails for QFlags operators
-	// declared inside a namepsace.
-	// This affects the Q_DECLARE_OPERATORS_FOR_FLAGS macro in Instrument.h
-	// See also: https://codereview.qt-project.org/c/qt/qtbase/+/225348
-
-	using ::operator|;
-#endif
-
-	if (isDetached()) { return; }
+	if (!isDetachable() || isDetached()) { return; }
 
 	const auto pos = mapToGlobal(widget()->pos());
+	const bool shown = isVisible();
 
 	auto flags = windowFlags();
 	flags |= Qt::Window;
-	flags &= ~Qt::Widget;
-	widget()->setWindowFlags(flags);
-	widget()->show();
-	hide();
+	flags &= ~Qt::SubWindow;
+	flags |= Qt::WindowMinimizeButtonHint;
 
-	widget()->windowHandle()->setPosition(pos);
+	hide();
+	widget()->setWindowFlags(flags);
+
+	if (shown) { widget()->show(); }
+
+	widget()->move(pos);
 }
 
 void SubWindow::attach()
 {
-#if QT_VERSION < 0x50C00
-	// Workaround for a bug in Qt versions below 5.12,
-	// where argument-dependent-lookup fails for QFlags operators
-	// declared inside a namepsace.
-	// This affects the Q_DECLARE_OPERATORS_FOR_FLAGS macro in Instrument.h
-	// See also: https://codereview.qt-project.org/c/qt/qtbase/+/225348
-
-	using ::operator|;
-#endif
-
 	if (!isDetached()) { return; }
 
-	auto frame = widget()->windowHandle()->frameGeometry();
+	const bool shown = widget()->isVisible();
+
+	auto frame = widget()->geometry();
+	frame.moveTo(mdiArea()->mapFromGlobal(frame.topLeft()));
+	frame += decorationMargins();
+
+	// Make sure the window fully fits on screen
+	frame.setSize({std::min(frame.width(), mdiArea()->width()),
+	               std::min(frame.height(), mdiArea()->height())});
+
+	frame.moveTo(std::clamp(frame.left(),
+	                        0,
+	                        mdiArea()->rect().width() - frame.width()),
+	             std::clamp(frame.top(),
+	                        0,
+	                        mdiArea()->rect().height() - frame.height()));
 
 	auto flags = windowFlags();
 	flags &= ~Qt::Window;
-	flags |= Qt::Widget;
+	flags |= Qt::SubWindow;
+	flags &= ~Qt::WindowMinimizeButtonHint;
 	widget()->setWindowFlags(flags);
-	widget()->show();
-	show();
 
-	// Delay moving & resizing using event queue. Ensures that this widget is
-	// visible first, so that resizing works.
-	QObject obj;
-	connect(&obj, &QObject::destroyed, this, [this, frame]() {
-		if (QGuiApplication::platformName() != "wayland")
-		{  // Workaround for wayland reporting on-screen pos as 0-0. If ever solved on wayland side, this check is safe to remove.
-			move(mdiArea()->mapFromGlobal(frame.topLeft()));
-		}
-		resize(frame.size());
-	}, Qt::QueuedConnection);
+	if (shown)
+	{
+		widget()->show();
+		show();
+	}
+
+	if (QGuiApplication::platformName() == "wayland")
+	{
+		resize(frame.size());  // Workaround for wayland reporting position as 0-0, see https://doc.qt.io/qt-6.9/application-windows.html#wayland-peculiarities
+	}
+	else
+	{
+		setGeometry(frame);
+	}
 }
 
 
@@ -340,6 +386,19 @@ int SubWindow::frameWidth() const
 	QStyleOptionFrame so;
 	return style()->pixelMetric(QStyle::PM_MdiSubWindowFrameWidth, &so, this);
 }
+
+
+
+
+QMargins SubWindow::decorationMargins() const
+{
+	return QMargins(frameWidth(),     // left
+	                titleBarHeight(), // top
+	                frameWidth(),     // right
+	                frameWidth());    // bottom
+}
+
+
 
 
 void SubWindow::updateTitleBar()
@@ -402,6 +461,7 @@ void SubWindow::adjustTitleBar()
 	// button adjustments
 	m_maximizeBtn->hide();
 	m_restoreBtn->hide();
+	m_detachBtn->hide();
 	m_closeBtn->show();
 
 	const int rightSpace = 3;
@@ -442,8 +502,12 @@ void SubWindow::adjustTitleBar()
 		buttonPos -= buttonStep;
 	}
 
-	m_detachBtn->move(buttonPos);
-	m_detachBtn->show();
+	if (isDetachable())
+	{
+		m_detachBtn->move(buttonPos);
+		m_detachBtn->show();
+		buttonBarWidth = buttonBarWidth + m_buttonSize.width() + buttonGap;
+	}
 
 	if( widget() )
 	{
@@ -515,6 +579,18 @@ void SubWindow::resizeEvent( QResizeEvent * event )
 	}
 }
 
+
+
+
+/**
+ * @brief SubWindow::eventFilter
+ *
+ * Override of QMdiSubWindow's event filter.
+ * This is not how regular eventFilters work, it is never installed explicitly.
+ * Instead, it is installed by Qt and conveniently installs itself
+ * onto the child widget. Despite relying on internal implementation details,
+ * as of writing this it seems to be the best way to do so as soon as the widget is set.
+ */
 bool SubWindow::eventFilter(QObject* obj, QEvent* event)
 {
 	if (obj != static_cast<QObject*>(widget()))
@@ -524,11 +600,41 @@ bool SubWindow::eventFilter(QObject* obj, QEvent* event)
 
 	switch (event->type())
 	{
-	case QEvent::WindowStateChange:
-		event->accept();
-		return true;
-	default:
-		return QMdiSubWindow::eventFilter(obj, event);
+		case QEvent::WindowStateChange:
+			event->accept();
+			return true;
+
+		case QEvent::Close:
+			if (isDetached())
+			{
+				QString detachBehavior = ConfigManager::inst()->value("ui", "detachbehavior", "show");
+				if (detachBehavior == "show")
+				{
+					attach();
+					event->ignore();
+					return true;
+				}
+				else if (detachBehavior == "hide")
+				{
+					attach();
+					hide();
+					event->ignore();
+					return QMdiSubWindow::eventFilter(obj, event);
+				}
+				else if (detachBehavior == "detached")
+				{
+					event->accept();
+					return QMdiSubWindow::eventFilter(obj, event);
+				}
+			}
+			else
+			{
+				hide();
+			}
+			return QMdiSubWindow::eventFilter(obj, event);
+
+		default:
+			return QMdiSubWindow::eventFilter(obj, event);
 	}
 }
 

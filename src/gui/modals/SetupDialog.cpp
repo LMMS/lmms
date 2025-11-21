@@ -118,6 +118,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 			"app", "disablebackup").toInt()),
 	m_openLastProject(ConfigManager::inst()->value(
 			"app", "openlastproject").toInt()),
+	m_detachBehavior{ConfigManager::inst()->value("ui", "detachbehavior", "show")},
 	m_loopMarkerMode{ConfigManager::inst()->value("app", "loopmarkermode", "dual")},
 	m_lang(ConfigManager::inst()->value(
 			"app", "language")),
@@ -254,6 +255,19 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 		m_trackDeletionWarning, SLOT(toggleTrackDeletionWarning(bool)), false);
 	addCheckBox(tr("Show warning when deleting a mixer channel that is in use"), guiGroupBox, guiGroupLayout,
 		m_mixerChannelDeletionWarning,	SLOT(toggleMixerChannelDeletionWarning(bool)), false);
+
+	m_detachBehaviorComboBox = new QComboBox{guiGroupBox};
+
+	m_detachBehaviorComboBox->addItem(tr("Attach and show when closed"), "show");
+	m_detachBehaviorComboBox->addItem(tr("Attach and hide when closed"), "hide");
+	m_detachBehaviorComboBox->addItem(tr("Always detached"), "detached");
+
+	m_detachBehaviorComboBox->setCurrentIndex(m_detachBehaviorComboBox->findData(m_detachBehavior));
+	connect(m_detachBehaviorComboBox, qOverload<int>(&QComboBox::currentIndexChanged),
+		this, &SetupDialog::detachBehaviorChanged);
+
+	guiGroupLayout->addWidget(new QLabel{tr("Detached window behavior"), guiGroupBox});
+	guiGroupLayout->addWidget(m_detachBehaviorComboBox);
 
 	m_loopMarkerComboBox = new QComboBox{guiGroupBox};
 
@@ -981,6 +995,7 @@ void SetupDialog::accept()
 					QString::number(!m_disableBackup));
 	ConfigManager::inst()->setValue("app", "openlastproject",
 					QString::number(m_openLastProject));
+	ConfigManager::inst()->setValue("ui", "detachbehavior", m_detachBehavior);
 	ConfigManager::inst()->setValue("app", "loopmarkermode", m_loopMarkerMode);
 	ConfigManager::inst()->setValue("app", "language", m_lang);
 	ConfigManager::inst()->setValue("ui", "saveinterval",
@@ -1117,6 +1132,12 @@ void SetupDialog::toggleDisableBackup(bool enabled)
 void SetupDialog::toggleOpenLastProject(bool enabled)
 {
 	m_openLastProject = enabled;
+}
+
+
+void SetupDialog::detachBehaviorChanged()
+{
+	m_detachBehavior = m_detachBehaviorComboBox->currentData().toString();
 }
 
 

@@ -205,20 +205,16 @@ void InstrumentTrackView::toggleMidiCCRack()
 
 
 
-InstrumentTrackWindow * InstrumentTrackView::topLevelInstrumentTrackWindow()
+InstrumentTrackWindow* InstrumentTrackView::topLevelInstrumentTrackWindow()
 {
-	InstrumentTrackWindow * w = nullptr;
-	for( const QMdiSubWindow * sw :
-				getGUI()->mainWindow()->workspace()->subWindowList(
-											QMdiArea::ActivationHistoryOrder ) )
-	{
-		if( sw->isVisible() && sw->widget()->inherits( "lmms::gui::InstrumentTrackWindow" ) )
-		{
-			w = qobject_cast<InstrumentTrackWindow *>( sw->widget() );
-		}
-	}
-
-	return w;
+	auto subWindowList = getGUI()->mainWindow()->workspace()->subWindowList(QMdiArea::ActivationHistoryOrder);
+	auto winIt = std::find_if(subWindowList.rbegin(), subWindowList.rend(),
+			[](QMdiSubWindow* sw){return sw->widget()
+				&& sw->widget()->isVisible()
+				&& sw->widget()->inherits("lmms::gui::InstrumentTrackWindow");});
+	return winIt != subWindowList.rend() && (**winIt).widget()
+		? qobject_cast<InstrumentTrackWindow*>((**winIt).widget())
+		: nullptr;
 }
 
 

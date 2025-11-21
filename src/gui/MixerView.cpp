@@ -56,7 +56,7 @@ namespace lmms::gui
 
 
 MixerView::MixerView(Mixer* mixer) :
-	DetachableWidget{},
+	QWidget{},
 	ModelView{nullptr, this},
 	SerializingObjectHook{},
 	m_mixer(mixer)
@@ -172,10 +172,6 @@ MixerView::MixerView(Mixer* mixer) :
 	// timer for updating faders
 	connect(mainWindow, &MainWindow::periodicUpdate, this, &MixerView::updateFaders);
 
-	// adjust window size
-	layout()->invalidate();
-	resize(sizeHint());
-	setFixedHeight(height());
 	layout()->setSizeConstraint(QLayout::SetMinimumSize);
 
 	// add ourself to workspace
