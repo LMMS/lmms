@@ -1,7 +1,7 @@
 /*
  * Lv2ViewBase.h - base class for Lv2 plugin views
  *
- * Copyright (c) 2018-2023 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
+ * Copyright (c) 2018-2024 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -25,12 +25,18 @@
 #ifndef LMMS_GUI_LV2_VIEW_BASE_H
 #define LMMS_GUI_LV2_VIEW_BASE_H
 
+#include "Lv2Proc.h"
 #include "lmmsconfig.h"
 
 #ifdef LMMS_HAVE_LV2
 
 
-#include "LinkedModelGroupViews.h"
+#include <QWidget>
+namespace lmms::gui {
+class Control;
+}
+
+#include "ModelGroupView.h"
 #include "lmms_export.h"
 #include "Lv2Basics.h"
 
@@ -49,42 +55,28 @@ namespace gui
 {
 
 
-//! View for one processor, Lv2ViewBase contains 2 of those for mono plugins
-class Lv2ViewProc : public LinkedModelGroupView
-{
-public:
-	//! @param colNum numbers of columns for the controls
-	Lv2ViewProc(QWidget *parent, Lv2Proc *proc, int colNum);
-	~Lv2ViewProc() override = default;
-
-private:
-	static AutoLilvNode uri(const char *uriStr);
-};
-
-
-
 
 class HelpWindowEventFilter : public QObject
 {
 	Q_OBJECT
-	class Lv2ViewBase* const m_viewBase;
+	class Lv2ProcView* const m_procView;
 protected:
 	bool eventFilter(QObject* obj, QEvent* event) override;
 public:
-	HelpWindowEventFilter(class Lv2ViewBase* viewBase);
+	HelpWindowEventFilter(class Lv2ProcView* viewBase);
 };
 
 
 
 
 //! Base class for view for one Lv2 plugin
-class LMMS_EXPORT Lv2ViewBase : public LinkedModelGroupsView
+class LMMS_EXPORT Lv2ProcView : public ModelGroupView
 {
 	friend class HelpWindowEventFilter;
 protected:
 	//! @param pluginWidget A child class which inherits QWidget
-	Lv2ViewBase(class QWidget *pluginWidget, Lv2ControlBase *ctrlBase);
-	~Lv2ViewBase();
+	Lv2ProcView(class QWidget *pluginWidget, Lv2Proc *proc);
+	~Lv2ProcView();
 
 	// these widgets must be connected by child widgets
 	QPushButton* m_reloadPluginButton = nullptr;
@@ -97,7 +89,7 @@ protected:
 
 	// to be called by child virtuals
 	//! Reconnect models if model changed
-	void modelChanged(Lv2ControlBase* ctrlBase);
+	void modelChanged(Lv2Proc *proc);
 
 private:
 	enum Rows
@@ -108,10 +100,7 @@ private:
 	};
 
 	static AutoLilvNode uri(const char *uriStr);
-	LinkedModelGroupView* getGroupView() override { return m_procView; }
 	void onHelpWindowClosed();
-
-	Lv2ViewProc* m_procView;
 
 	//! Numbers of controls per row; must be multiple of 2 for mono effects
 	const int m_colNum = 6;
