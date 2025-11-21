@@ -67,8 +67,6 @@ LeftRightNav::LeftRightNav(QWidget *parent)
 	m_layout.addWidget(&m_rightBtn);
 }
 
-QPushButton* LeftRightNav::getLeftBtn() { return &m_leftBtn; }
-QPushButton* LeftRightNav::getRightBtn() { return &m_rightBtn; }
 
 void LeftRightNav::setShortcuts(const QKeySequence &leftShortcut, const QKeySequence &rightShortcut)
 {

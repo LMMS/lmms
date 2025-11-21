@@ -36,8 +36,6 @@ class LeftRightNav : public QWidget
 	Q_OBJECT
 public:
 	LeftRightNav(QWidget *parent=nullptr);
-	QPushButton* getLeftBtn();
-	QPushButton* getRightBtn();
 	void setShortcuts(const QKeySequence &leftShortcut=Qt::Key_Minus, const QKeySequence &rightShortcut=Qt::Key_Plus);
 signals:
 	void onNavLeft();
