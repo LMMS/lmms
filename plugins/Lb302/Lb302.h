@@ -172,6 +172,8 @@ private:
 
 	static constexpr float DIST_RATIO = 4.f;
 	static constexpr fpp_t ENVINC = 64; //* Envelope Recalculation period
+	static constexpr float vca_attack = 1.f - 0.96406088f; // Amp attack
+	static constexpr float vca_a0 = 0.5f; // Initial amplifier coefficient
 
 	FloatModel vcf_cut_knob;
 	FloatModel vcf_res_knob;
@@ -206,17 +208,11 @@ private:
 	// Filters (just keep both loaded and switch)
 	std::array<std::unique_ptr<Lb302Filter>, 2> vcfs;
 	inline Lb302Filter& vcf() { return *vcfs[db24Toggle.value()]; } // Helper to get current vcf
-
+	f_cnt_t vcf_envpos = ENVINC; // Update counter. Updates when >= ENVINC
 	f_cnt_t release_frame;
 
-	// More States
-	f_cnt_t vcf_envpos = ENVINC; // Update counter. Updates when >= ENVINC
-
-	float vca_attack = 1.f - 0.96406088f; // Amp attack
-	float vca_a0     = 0.5f;              // Initial amplifier coefficient
-	float vca_a      = 0.f;               // Amplifier coefficient.
-
 	// Envelope State
+	float vca_a = 0.f; // Amplifier coefficient.
 	VcaMode vca_mode = VcaMode::NeverPlayed;
 
 	// My hacks
