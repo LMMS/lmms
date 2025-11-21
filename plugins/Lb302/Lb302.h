@@ -28,7 +28,6 @@
  *
  */
 
-
 #ifndef LB302_H
 #define LB302_H
 
@@ -71,7 +70,7 @@ struct Lb302FilterKnobState
 
 class Lb302Filter
 {
-	public:
+public:
 	Lb302Filter(Lb302FilterKnobState* p_fs) : fs{p_fs} {};
 	virtual ~Lb302Filter() = default;
 
@@ -80,33 +79,35 @@ class Lb302Filter
 	virtual sample_t process(const sample_t& samp) = 0;
 	virtual void playNote();
 
-	protected:
+protected:
 	Lb302FilterKnobState *fs;
 
 	// Filter Decay
 	float vcf_c0 = 0.f; // c0=e1 on retrigger; c0*=ed every sample; cutoff=e0+c0
 	float vcf_e0 = 0.f; // e0 and e1 for interpolation
 	float vcf_e1 = 0.f;
-	float vcf_rescoeff;     // Resonance coefficient [0.30,9.54]
+	float vcf_rescoeff; // Resonance coefficient [0.30,9.54]
 };
 
 class Lb302FilterIIR2 : public Lb302Filter
 {
-	public:
+public:
 	Lb302FilterIIR2(Lb302FilterKnobState* p_fs);
 
 	void recalc() override;
 	void envRecalc() override;
 	sample_t process(const sample_t& samp) override;
 
-	protected:
-	float vcf_d1 = 0.f;     //   d1 and d2 are added back into the sample with
-	float vcf_d2 = 0.f;     //   vcf_a and b as coefficients. IIR2 resonance
-	                        //   loop.
+protected:
+	// d1 and d2 are added back into the sample with vcf_a and b as
+	// coefficients. IIR2 resonance loop.
+	float vcf_d1 = 0.f;
+	float vcf_d2 = 0.f;
 
-	                        // IIR2 Coefficients for mixing dry and delay.
-	float vcf_a = 0.f;      //   Mixing coefficients for the final sound.
-	float vcf_b = 0.f;      //
+	// IIR2 Coefficients for mixing dry and delay.
+	// Mixing coefficients for the final sound.
+	float vcf_a = 0.f;
+	float vcf_b = 0.f;
 	float vcf_c = 1.f;
 
 	std::unique_ptr<DspEffectLibrary::Distortion> m_dist;
@@ -115,7 +116,7 @@ class Lb302FilterIIR2 : public Lb302Filter
 
 class Lb302Filter3Pole : public Lb302Filter
 {
-	public:
+public:
 	Lb302Filter3Pole(Lb302FilterKnobState* p_fs) : Lb302Filter(p_fs) {};
 
 	//virtual void recalc();
@@ -123,13 +124,13 @@ class Lb302Filter3Pole : public Lb302Filter
 	void recalc() override;
 	sample_t process(const sample_t& samp) override;
 
-	protected:
+protected:
 	static constexpr float VOL_ADJUST = 3.f;
-	float kfcn,
-	      kp,
-	      kp1,
-	      kp1h,
-	      kres;
+	float kfcn;
+	float kp;
+	float kp1;
+	float kp1h;
+	float kres;
 	float ay1 = 0.f;
 	float ay2 = 0.f;
 	float aout = 0.f;
@@ -235,29 +236,28 @@ namespace gui
 class Lb302SynthView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
+
 public:
-	Lb302SynthView( Instrument * _instrument,
-	                QWidget * _parent );
+	Lb302SynthView(Instrument* instrument, QWidget* parent);
 	~Lb302SynthView() override = default;
 
 private:
 	void modelChanged() override;
 
-	Knob * m_vcfCutKnob;
-	Knob * m_vcfResKnob;
-	Knob * m_vcfDecKnob;
-	Knob * m_vcfModKnob;
+	Knob* m_vcfCutKnob;
+	Knob* m_vcfResKnob;
+	Knob* m_vcfDecKnob;
+	Knob* m_vcfModKnob;
 
-	Knob * m_distKnob;
-	Knob * m_slideDecKnob;
-	AutomatableButtonGroup * m_waveBtnGrp;
+	Knob* m_distKnob;
+	Knob* m_slideDecKnob;
+	AutomatableButtonGroup* m_waveBtnGrp;
 
-	LedCheckBox * m_slideToggle;
-	/*LedCheckBox * m_accentToggle;*/ // removed pending accent implementation
-	LedCheckBox * m_deadToggle;
-	LedCheckBox * m_db24Toggle;
-
-} ;
+	LedCheckBox* m_slideToggle;
+	// LedCheckBox* m_accentToggle; // TODO: implement accent notes
+	LedCheckBox* m_deadToggle;
+	LedCheckBox* m_db24Toggle;
+};
 
 
 } // namespace gui

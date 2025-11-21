@@ -34,8 +34,10 @@
 #include <numbers>
 
 #include "AutomatableButton.h"
+#include "BandLimitedWave.h"
 #include "DspEffectLibrary.h"
 #include "Engine.h"
+#include "embed.h"
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
 #include "Knob.h"
@@ -43,9 +45,6 @@
 #include "NotePlayHandle.h"
 #include "Oscillator.h"
 #include "PixmapButton.h"
-#include "BandLimitedWave.h"
-
-#include "embed.h"
 #include "plugin_export.h"
 
 #define LB_24_IGNORE_ENVELOPE
