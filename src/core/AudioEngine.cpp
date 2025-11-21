@@ -66,27 +66,29 @@ using LocklessListElement = LocklessList<PlayHandle*>::Element;
 
 static thread_local bool s_renderingThread = false;
 
-
-
-
-AudioEngine::AudioEngine( bool renderOnly ) :
-	m_renderOnly( renderOnly ),
-	m_framesPerPeriod( DEFAULT_BUFFER_SIZE ),
-	m_baseSampleRate(std::max(ConfigManager::inst()->value("audioengine", "samplerate").toInt(), SUPPORTED_SAMPLERATES.front())),
-	m_inputBufferRead( 0 ),
-	m_inputBufferWrite( 1 ),
-	m_outputBufferRead(nullptr),
-	m_outputBufferWrite(nullptr),
-	m_workers(),
-	m_numWorkers( QThread::idealThreadCount()-1 ),
-	m_newPlayHandles( PlayHandle::MaxNumber ),
-	m_masterGain( 1.0f ),
-	m_audioDev( nullptr ),
-	m_oldAudioDev( nullptr ),
-	m_audioDevStartFailed( false ),
-	m_profiler(),
-	m_clearSignal(false)
+AudioEngine::AudioEngine(bool renderOnly)
+	: m_renderOnly(renderOnly)
+	, m_framesPerAudioBuffer(std::clamp(ConfigManager::inst()->value("audioengine", "framesperaudiobuffer").toULong(),
+		  MINIMUM_BUFFER_SIZE, MAXIMUM_BUFFER_SIZE))
+	, m_framesPerPeriod(std::min(m_framesPerAudioBuffer, DEFAULT_BUFFER_SIZE))
+	, m_baseSampleRate(
+		  std::max(ConfigManager::inst()->value("audioengine", "samplerate").toInt(), SUPPORTED_SAMPLERATES.front()))
+	, m_inputBufferRead(0)
+	, m_inputBufferWrite(1)
+	, m_outputBufferRead(nullptr)
+	, m_outputBufferWrite(nullptr)
+	, m_workers()
+	, m_numWorkers(QThread::idealThreadCount() - 1)
+	, m_newPlayHandles(PlayHandle::MaxNumber)
+	, m_masterGain(1.0f)
+	, m_audioDev(nullptr)
+	, m_oldAudioDev(nullptr)
+	, m_audioDevStartFailed(false)
+	, m_profiler()
+	, m_clearSignal(false)
 {
+	assert(m_framesPerAudioBuffer % m_framesPerPeriod == 0 && "Frames per period is not a multiple of buffer size");
+
 	for( int i = 0; i < 2; ++i )
 	{
 		m_inputBufferFrames[i] = 0;
