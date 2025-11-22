@@ -37,7 +37,6 @@
 #include "LmmsTypes.h"
 #include "SampleFrame.h"
 #include "LocklessList.h"
-#include "FifoBuffer.h"
 #include "AudioEngineProfiler.h"
 #include "PlayHandle.h"
 
@@ -58,6 +57,8 @@ constexpr int BYTES_PER_INT_SAMPLE = sizeof(int_sample_t);
 constexpr int BYTES_PER_FRAME = sizeof(SampleFrame);
 
 constexpr float OUTPUT_SAMPLE_MULTIPLIER = 32767.0f;
+
+constexpr sample_rate_t DEFAULT_SAMPLE_RATE = 44100;
 
 constexpr auto SUPPORTED_SAMPLERATES = std::array{44100, 48000, 88200, 96000, 192000}; 
 
@@ -126,7 +127,7 @@ public:
 
 	//! Set new audio device. Old device will be deleted,
 	//! unless it's stored using storeAudioDevice
-	void setAudioDevice(AudioDevice* _dev, bool _needs_fifo, bool startNow);
+	void setAudioDevice(AudioDevice* _dev, bool startNow);
 	void storeAudioDevice();
 	void restoreAudioDevice();
 	inline AudioDevice * audioDev()
@@ -170,13 +171,19 @@ public:
 
 	void removePlayHandlesOfTypes(Track * track, PlayHandle::Types types);
 
-
-	// methods providing information for other classes
-	inline fpp_t framesPerPeriod() const
+	//! @return the number of frames rendered per period
+	//! @note this represents the size of the buffer for each call to @ref renderNextBuffer
+	fpp_t framesPerPeriod() const
 	{
 		return m_framesPerPeriod;
 	}
 
+	//! @returns the number of audio frames per audio buffer
+	//! @note this represents the size of the underlying device buffer
+	fpp_t framesPerAudioBuffer() const
+	{
+		return m_framesPerAudioBuffer;
+	}
 
 	AudioEngineProfiler& profiler()
 	{
@@ -235,11 +242,6 @@ public:
 
 	bool criticalXRuns() const;
 
-	inline bool hasFifoWriter() const
-	{
-		return m_fifoWriter != nullptr;
-	}
-
 	void pushInputFrames( SampleFrame* _ab, const f_cnt_t _frames );
 
 	inline const SampleFrame* inputBuffer()
@@ -252,10 +254,16 @@ public:
 		return m_inputBufferFrames[ m_inputBufferRead ];
 	}
 
-	inline const SampleFrame* nextBuffer()
-	{
-		return hasFifoWriter() ? m_fifo->read() : renderNextBuffer();
-	}
+	//! Renders the next period of the audio buffer
+	//! The audio buffer can contain many periods, depending on the chosen buffer size
+	//! @returns The next audio period
+	const SampleFrame* renderNextPeriod();
+
+	//! Renders the stereo, interleaved audio buffer into @a dst
+	//! @note @a dst is expected to have a frame count of `framesPerAudioBuffer()`
+	//! @note if @a dst is mono, the buffer is converted to mono
+	//! @note if @a dst is non stereo, the other channels are zero-filled
+	void renderNextBuffer(AudioBufferView<float> auto dst);
 
 	//! Block until a change in model can be done (i.e. wait for audio thread)
 	void requestChangeInModel();
@@ -277,32 +285,11 @@ signals:
 
 
 private:
-	using Fifo = FifoBuffer<SampleFrame*>;
-
-	class fifoWriter : public QThread
-	{
-	public:
-		fifoWriter( AudioEngine * audioEngine, Fifo * fifo );
-
-		void finish();
-
-
-	private:
-		AudioEngine * m_audioEngine;
-		Fifo * m_fifo;
-		volatile bool m_writing;
-
-		void run() override;
-
-		void write(SampleFrame* buffer);
-	} ;
-
-
 	AudioEngine( bool renderOnly );
 	~AudioEngine() override;
 
-	void startProcessing(bool needsFifo = true);
-	void stopProcessing();
+	void startProcessing() { m_audioDev->startProcessing(); }
+	void stopProcessing() { m_audioDev->stopProcessing(); }
 
 
 	AudioDevice * tryAudioDevices();
@@ -313,7 +300,6 @@ private:
 	void renderStageEffects();
 	void renderStageMix();
 
-	const SampleFrame* renderNextBuffer();
 
 	void swapBuffers();
 
@@ -323,12 +309,13 @@ private:
 
 	std::vector<AudioBusHandle*> m_audioBusHandles;
 
+	fpp_t m_framesPerAudioBuffer;
 	fpp_t m_framesPerPeriod;
+	sample_rate_t m_baseSampleRate;
 
 	SampleFrame* m_inputBuffer[2];
 	f_cnt_t m_inputBufferFrames[2];
 	f_cnt_t m_inputBufferSize[2];
-	sample_rate_t m_baseSampleRate;
 	int m_inputBufferRead;
 	int m_inputBufferWrite;
 
@@ -357,10 +344,6 @@ private:
 	// MIDI device stuff
 	MidiClient * m_midiClient;
 	QString m_midiClientName;
-
-	// FIFO stuff
-	Fifo * m_fifo;
-	fifoWriter * m_fifoWriter;
 
 	AudioEngineProfiler m_profiler;
 

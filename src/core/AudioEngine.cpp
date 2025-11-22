@@ -25,7 +25,6 @@
 #include "AudioEngine.h"
 
 #include "MixHelpers.h"
-#include "denormals.h"
 
 #include "lmmsconfig.h"
 
@@ -67,27 +66,32 @@ using LocklessListElement = LocklessList<PlayHandle*>::Element;
 
 static thread_local bool s_renderingThread = false;
 
-
-
-
-AudioEngine::AudioEngine( bool renderOnly ) :
-	m_renderOnly( renderOnly ),
-	m_framesPerPeriod( DEFAULT_BUFFER_SIZE ),
-	m_baseSampleRate(std::max(ConfigManager::inst()->value("audioengine", "samplerate").toInt(), SUPPORTED_SAMPLERATES.front())),
-	m_inputBufferRead( 0 ),
-	m_inputBufferWrite( 1 ),
-	m_outputBufferRead(nullptr),
-	m_outputBufferWrite(nullptr),
-	m_workers(),
-	m_numWorkers( QThread::idealThreadCount()-1 ),
-	m_newPlayHandles( PlayHandle::MaxNumber ),
-	m_masterGain( 1.0f ),
-	m_audioDev( nullptr ),
-	m_oldAudioDev( nullptr ),
-	m_audioDevStartFailed( false ),
-	m_profiler(),
-	m_clearSignal(false)
+AudioEngine::AudioEngine(bool renderOnly)
+	: m_renderOnly(renderOnly)
+	, m_framesPerAudioBuffer(std::clamp(ConfigManager::inst()->value("audioengine", "framesperaudiobuffer").toULong(),
+		  MINIMUM_BUFFER_SIZE, MAXIMUM_BUFFER_SIZE))
+	, m_framesPerPeriod(std::min(m_framesPerAudioBuffer, DEFAULT_BUFFER_SIZE))
+	, m_baseSampleRate(
+		  std::max(ConfigManager::inst()->value("audioengine", "samplerate").toInt(), SUPPORTED_SAMPLERATES.front()))
+	, m_inputBufferRead(0)
+	, m_inputBufferWrite(1)
+	, m_outputBufferRead(nullptr)
+	, m_outputBufferWrite(nullptr)
+	, m_workers()
+	, m_numWorkers(QThread::idealThreadCount() - 1)
+	, m_newPlayHandles(PlayHandle::MaxNumber)
+	, m_masterGain(1.0f)
+	, m_audioDev(nullptr)
+	, m_oldAudioDev(nullptr)
+	, m_audioDevStartFailed(false)
+	, m_profiler()
+	, m_clearSignal(false)
 {
+	if (m_framesPerAudioBuffer % m_framesPerPeriod != 0)
+	{
+		throw std::invalid_argument{"Frames per period is not a multiple of buffer size"};
+	}
+
 	for( int i = 0; i < 2; ++i )
 	{
 		m_inputBufferFrames[i] = 0;
@@ -96,43 +100,7 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 		zeroSampleFrames(m_inputBuffer[i], m_inputBufferSize[i]);
 	}
 
-	// determine FIFO size and number of frames per period
-	int fifoSize = 1;
-
-	// if not only rendering (that is, using the GUI), load the buffer
-	// size from user configuration
-	if( renderOnly == false )
-	{
-		m_framesPerPeriod = 
-			( fpp_t ) ConfigManager::inst()->value( "audioengine", "framesperaudiobuffer" ).toInt();
-
-		// if the value read from user configuration is not set or
-		// lower than the minimum allowed, use the default value and
-		// save it to the configuration
-		if( m_framesPerPeriod < MINIMUM_BUFFER_SIZE )
-		{
-			ConfigManager::inst()->setValue( "audioengine",
-						"framesperaudiobuffer",
-						QString::number( DEFAULT_BUFFER_SIZE ) );
-
-			m_framesPerPeriod = DEFAULT_BUFFER_SIZE;
-		}
-		// lmms works with chunks of size DEFAULT_BUFFER_SIZE (256) and only the final mix will use the actual
-		// buffer size. Plugins don't see a larger buffer size than 256. If m_framesPerPeriod is larger than
-		// DEFAULT_BUFFER_SIZE, it's set to DEFAULT_BUFFER_SIZE and the rest is handled by an increased fifoSize.
-		else if( m_framesPerPeriod > DEFAULT_BUFFER_SIZE )
-		{
-			fifoSize = m_framesPerPeriod / DEFAULT_BUFFER_SIZE;
-			m_framesPerPeriod = DEFAULT_BUFFER_SIZE;
-		}
-	}
-
-	// allocate the FIFO from the determined size
-	m_fifo = new Fifo( fifoSize );
-
-	// now that framesPerPeriod is fixed initialize global BufferManager
 	BufferManager::init( m_framesPerPeriod );
-
 	m_outputBufferRead = std::make_unique<SampleFrame[]>(m_framesPerPeriod);
 	m_outputBufferWrite = std::make_unique<SampleFrame[]>(m_framesPerPeriod);
 
@@ -165,12 +133,6 @@ AudioEngine::~AudioEngine()
 		m_workers[w]->wait( 500 );
 	}
 
-	while( m_fifo->available() )
-	{
-		delete[] m_fifo->read();
-	}
-	delete m_fifo;
-
 	delete m_midiClient;
 	delete m_audioDev;
 
@@ -199,46 +161,6 @@ void AudioEngine::initDevices()
 	// Loading audio device may have changed the sample rate
 	emit sampleRateChanged();
 }
-
-
-
-
-void AudioEngine::startProcessing(bool needsFifo)
-{
-	if (needsFifo)
-	{
-		m_fifoWriter = new fifoWriter( this, m_fifo );
-		m_fifoWriter->start( QThread::HighPriority );
-	}
-	else
-	{
-		m_fifoWriter = nullptr;
-	}
-
-	m_audioDev->startProcessing();
-}
-
-
-
-
-void AudioEngine::stopProcessing()
-{
-	if( m_fifoWriter != nullptr )
-	{
-		m_fifoWriter->finish();
-		m_fifoWriter->wait();
-		m_audioDev->stopProcessing();
-		delete m_fifoWriter;
-		m_fifoWriter = nullptr;
-	}
-	else
-	{
-		m_audioDev->stopProcessing();
-	}
-}
-
-
-
 
 bool AudioEngine::criticalXRuns() const
 {
@@ -396,7 +318,7 @@ void AudioEngine::renderStageMix()
 
 
 
-const SampleFrame* AudioEngine::renderNextBuffer()
+const SampleFrame* AudioEngine::renderNextPeriod()
 {
 	const auto lock = std::lock_guard{m_changeMutex};
 
@@ -410,8 +332,40 @@ const SampleFrame* AudioEngine::renderNextBuffer()
 
 	s_renderingThread = false;
 	m_profiler.finishPeriod(outputSampleRate(), m_framesPerPeriod);
-
 	return m_outputBufferRead.get();
+}
+
+template void AudioEngine::renderNextBuffer<InterleavedBufferView<float>>(InterleavedBufferView<float> dst);
+template void AudioEngine::renderNextBuffer<PlanarBufferView<float>>(PlanarBufferView<float> dst);
+void AudioEngine::renderNextBuffer(AudioBufferView<float> auto dst)
+{
+	for (auto frame = f_cnt_t{0}; frame < dst.frames(); ++frame)
+	{
+		const auto index = frame % m_framesPerPeriod;
+		if (index == 0) { renderNextPeriod(); }
+
+		switch (dst.channels())
+		{
+		case 0:
+			assert(false);
+			break;
+		case 1:
+			dst.sample(0, frame) = m_outputBufferRead[index].average();
+			break;
+		case 2:
+			dst.sample(0, frame) = m_outputBufferRead[index][0];
+			dst.sample(1, frame) = m_outputBufferRead[index][1];
+			break;
+		default:
+			dst.sample(0, frame) = m_outputBufferRead[index][0];
+			dst.sample(1, frame) = m_outputBufferRead[index][1];
+			for (auto channel = 2; channel < dst.channels(); ++channel)
+			{
+				dst.sample(channel, frame) = 0.f;
+			}
+			break;
+		}
+	}
 }
 
 
@@ -483,7 +437,7 @@ void AudioEngine::doSetAudioDevice( AudioDevice * _dev )
 	}
 }
 
-void AudioEngine::setAudioDevice(AudioDevice* _dev, bool _needs_fifo, bool startNow)
+void AudioEngine::setAudioDevice(AudioDevice* _dev, bool startNow)
 {
 	stopProcessing();
 
@@ -492,7 +446,7 @@ void AudioEngine::setAudioDevice(AudioDevice* _dev, bool _needs_fifo, bool start
 	emit qualitySettingsChanged();
 	emit sampleRateChanged();
 
-	if (startNow) {startProcessing( _needs_fifo );}
+	if (startNow) { startProcessing(); }
 }
 
 
@@ -1042,51 +996,6 @@ MidiClient * AudioEngine::tryMidiClients()
 	m_midiClientName = MidiDummy::name();
 
 	return new MidiDummy;
-}
-
-
-
-
-
-
-
-
-
-AudioEngine::fifoWriter::fifoWriter( AudioEngine* audioEngine, Fifo * fifo ) :
-	m_audioEngine( audioEngine ),
-	m_fifo( fifo ),
-	m_writing( true )
-{
-	setObjectName("AudioEngine::fifoWriter");
-}
-
-
-
-
-void AudioEngine::fifoWriter::finish()
-{
-	m_writing = false;
-}
-
-
-
-
-void AudioEngine::fifoWriter::run()
-{
-	disable_denormals();
-
-	const fpp_t frames = m_audioEngine->framesPerPeriod();
-	while( m_writing )
-	{
-		auto buffer = new SampleFrame[frames];
-		const SampleFrame* b = m_audioEngine->renderNextBuffer();
-		memcpy(buffer, b, frames * sizeof(SampleFrame));
-		m_fifo->write(buffer);
-	}
-
-	// Let audio backend stop processing
-	m_fifo->write(nullptr);
-	m_fifo->waitUntilRead();
 }
 
 } // namespace lmms
