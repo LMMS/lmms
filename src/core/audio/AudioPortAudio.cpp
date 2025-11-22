@@ -234,7 +234,8 @@ int AudioPortAudio::process_callback(const float* _inputBuffer, float* _outputBu
 		return paComplete;
 	}
 
-	nextBuffer(InterleavedBufferView<float>{_outputBuffer, channels(), _framesPerBuffer});
+	const auto bufferView = InterleavedBufferView<float>{_outputBuffer, channels(), _framesPerBuffer};
+	audioEngine()->renderNextBuffer(bufferView);
 	return paContinue;
 }
 

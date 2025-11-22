@@ -94,7 +94,7 @@ private:
 		while (AudioDevice::isRunning())
 		{
 			timer.reset();
-			audioEngine()->renderNextBuffer();
+			audioEngine()->renderNextPeriod();
 
 			const int microseconds = static_cast<int>( audioEngine()->framesPerPeriod() * 1000000.0f / audioEngine()->outputSampleRate() - timer.elapsed() );
 			if( microseconds > 0 )

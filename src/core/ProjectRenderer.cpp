@@ -157,7 +157,7 @@ void ProjectRenderer::run()
 
 	Engine::getSong()->startExport();
 	// Skip first empty buffer.
-	Engine::audioEngine()->renderNextBuffer();
+	Engine::audioEngine()->renderNextPeriod();
 
 	m_progress = 0;
 
@@ -167,7 +167,9 @@ void ProjectRenderer::run()
 	// Continually track and emit progress percentage to listeners.
 	while (!Engine::getSong()->isExportDone() && !m_abort)
 	{
-		m_fileDev->writeBuffer(Engine::audioEngine()->renderNextBuffer(), Engine::audioEngine()->framesPerPeriod());
+		const auto buffer = Engine::audioEngine()->renderNextPeriod();
+		m_fileDev->writeBuffer(buffer, Engine::audioEngine()->framesPerPeriod());
+
 		const int nprog = Engine::getSong()->getExportProgress();
 		if (m_progress != nprog)
 		{

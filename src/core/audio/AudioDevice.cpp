@@ -59,39 +59,6 @@ void AudioDevice::stopProcessing()
 	stopProcessingImpl();
 }
 
-void AudioDevice::nextBuffer(AudioBufferView<float> auto dst)
-{
-	for (auto frame = f_cnt_t{0}; frame < dst.frames(); ++frame)
-	{
-		if (m_audioEngineBufferIndex == 0) { m_audioEngineBuffer = m_audioEngine->renderNextBuffer(); }
-		const auto audioEngineFrame = m_audioEngineBuffer[m_audioEngineBufferIndex];
-
-		switch (dst.channels())
-		{
-		case 0:
-			assert(false);
-			break;
-		case 1:
-			dst.sample(0, frame) = audioEngineFrame.average();
-			break;
-		case 2:
-			dst.sample(0, frame) = audioEngineFrame[0];
-			dst.sample(1, frame) = audioEngineFrame[1];
-			break;
-		default:
-			dst.sample(0, frame) = audioEngineFrame[0];
-			dst.sample(1, frame) = audioEngineFrame[1];
-			for (auto channel = 2; channel < dst.channels(); ++channel)
-			{
-				dst.sample(channel, frame) = 0.f;
-			}
-			break;
-		}
-
-		m_audioEngineBufferIndex = (m_audioEngineBufferIndex + 1) % m_audioEngine->framesPerPeriod();
-	}
-}
-
 void AudioDevice::stopProcessingThread( QThread * thread )
 {
 	if( !thread->wait( 30000 ) )
@@ -169,8 +136,5 @@ void AudioDevice::clearS16Buffer( int_sample_t * _outbuf, const fpp_t _frames )
 
 	memset( _outbuf, 0,  _frames * channels() * BYTES_PER_INT_SAMPLE );
 }
-
-template void AudioDevice::nextBuffer<InterleavedBufferView<float>>(InterleavedBufferView<float> dst);
-template void AudioDevice::nextBuffer<PlanarBufferView<float>>(PlanarBufferView<float> dst);
 
 } // namespace lmms

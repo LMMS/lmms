@@ -129,11 +129,13 @@ void AudioSndio::stopProcessingImpl()
 
 void AudioSndio::run()
 {
-	auto buf = std::vector<float>(audioEngine()->framesPerAudioBuffer() * channels());
+	const auto framesPerAudioBuffer = audioEngine()->framesPerAudioBuffer();
+	auto buf = std::vector<float>(framesPerAudioBuffer * channels());
 
 	while (AudioDevice::isRunning())
 	{
-		nextBuffer(InterleavedBufferView<float>{buf.data(), channels(), audioEngine()->framesPerAudioBuffer()});
+		const auto bufferView = InterleavedBufferView<float>{buf.data(), channels(), framesPerAudioBuffer};
+		audioEngine()->renderNextBuffer(bufferView);
 		sio_write(m_hdl, buf.data(), buf.size() * sizeof(float));
 	}
 }

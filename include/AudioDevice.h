@@ -83,10 +83,6 @@ public:
 	bool isRunning() const { return m_running.test(std::memory_order_acquire); }
 
 protected:
-	//! Render the next audio playback buffer into @p dst.
-	//! @return `true` if playback was rendered into @p dst.
-	void nextBuffer(AudioBufferView<float> auto dst);
-
 	// convert a given audio-buffer to a buffer in signed 16-bit samples
 	// returns num of bytes in outbuf
 	int convertToS16(
@@ -113,8 +109,6 @@ private:
 	ch_cnt_t m_channels;
 
 	AudioEngine* m_audioEngine = nullptr;
-	const SampleFrame* m_audioEngineBuffer = nullptr;
-	std::size_t m_audioEngineBufferIndex = 0;
 
 	QMutex m_devMutex;
 

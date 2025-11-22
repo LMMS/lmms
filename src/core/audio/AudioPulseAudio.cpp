@@ -204,7 +204,7 @@ void AudioPulseAudio::run()
 	{
 		while (AudioDevice::isRunning())
 		{
-			audioEngine()->renderNextBuffer();
+			audioEngine()->renderNextPeriod();
 		}
 	}
 
@@ -229,7 +229,11 @@ void AudioPulseAudio::streamWriteCallback(pa_stream*, size_t)
 	{
 		std::fill_n(static_cast<float*>(buf), numSamples, 0.f);
 	}
-	else { nextBuffer(InterleavedBufferView<float>{reinterpret_cast<float*>(buf), channels(), numFrames}); }
+	else
+	{
+		const auto bufferView = InterleavedBufferView<float>{reinterpret_cast<float*>(buf), channels(), numFrames};
+		audioEngine()->renderNextBuffer(bufferView);
+	}
 
 	pa_stream_write(m_s, buf, maxBufSizeInBytes, nullptr, 0, PA_SEEK_RELATIVE);
 }

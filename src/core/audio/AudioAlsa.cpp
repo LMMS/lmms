@@ -236,12 +236,14 @@ void AudioAlsa::stopProcessingImpl()
 
 void AudioAlsa::run()
 {
-	auto buf = std::vector<float>(audioEngine()->framesPerAudioBuffer() * channels());
+	const auto framesPerAudioBuffer = audioEngine()->framesPerAudioBuffer();
+	auto buf = std::vector<float>(framesPerAudioBuffer * channels());
 	while (AudioDevice::isRunning())
 	{
-		nextBuffer(InterleavedBufferView<float>{buf.data(), channels(), audioEngine()->framesPerAudioBuffer()});
+		const auto bufferView = InterleavedBufferView<float>{buf.data(), channels(), framesPerAudioBuffer};
+		audioEngine()->renderNextBuffer(bufferView);
 
-		if (const auto framesWritten = snd_pcm_writei(m_handle, buf.data(), audioEngine()->framesPerAudioBuffer()); framesWritten < 0)
+		if (const auto framesWritten = snd_pcm_writei(m_handle, buf.data(), framesPerAudioBuffer); framesWritten < 0)
 		{
 			handleError(framesWritten);
 			continue;

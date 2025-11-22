@@ -87,7 +87,10 @@ AudioEngine::AudioEngine(bool renderOnly)
 	, m_profiler()
 	, m_clearSignal(false)
 {
-	assert(m_framesPerAudioBuffer % m_framesPerPeriod == 0 && "Frames per period is not a multiple of buffer size");
+	if (m_framesPerAudioBuffer % m_framesPerPeriod != 0)
+	{
+		throw std::invalid_argument{"Frames per period is not a multiple of buffer size"};
+	}
 
 	for( int i = 0; i < 2; ++i )
 	{
@@ -315,7 +318,7 @@ void AudioEngine::renderStageMix()
 
 
 
-const SampleFrame* AudioEngine::renderNextBuffer()
+const SampleFrame* AudioEngine::renderNextPeriod()
 {
 	const auto lock = std::lock_guard{m_changeMutex};
 
@@ -329,8 +332,40 @@ const SampleFrame* AudioEngine::renderNextBuffer()
 
 	s_renderingThread = false;
 	m_profiler.finishPeriod(outputSampleRate(), m_framesPerPeriod);
-
 	return m_outputBufferRead.get();
+}
+
+template void AudioEngine::renderNextBuffer<InterleavedBufferView<float>>(InterleavedBufferView<float> dst);
+template void AudioEngine::renderNextBuffer<PlanarBufferView<float>>(PlanarBufferView<float> dst);
+void AudioEngine::renderNextBuffer(AudioBufferView<float> auto dst)
+{
+	for (auto frame = f_cnt_t{0}; frame < dst.frames(); ++frame)
+	{
+		const auto index = frame % m_framesPerPeriod;
+		if (index == 0) { renderNextPeriod(); }
+
+		switch (dst.channels())
+		{
+		case 0:
+			assert(false);
+			break;
+		case 1:
+			dst.sample(0, frame) = m_outputBufferRead[index].average();
+			break;
+		case 2:
+			dst.sample(0, frame) = m_outputBufferRead[index][0];
+			dst.sample(1, frame) = m_outputBufferRead[index][1];
+			break;
+		default:
+			dst.sample(0, frame) = m_outputBufferRead[index][0];
+			dst.sample(1, frame) = m_outputBufferRead[index][1];
+			for (auto channel = 2; channel < dst.channels(); ++channel)
+			{
+				dst.sample(channel, frame) = 0.f;
+			}
+			break;
+		}
+	}
 }
 
 
