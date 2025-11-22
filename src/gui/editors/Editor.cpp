@@ -147,8 +147,8 @@ Editor::Editor(bool record, bool recordAccompany, bool recordStep) :
 		addButton(m_toggleStepRecordingAction, "stepRecordButton");
 	}
 
-    // Stop action setup
-    createButton(m_stopAction, "stop", tr("Stop (Space)"), SLOT(stop()), "stopButton");
+	// Stop action setup
+	createButton(m_stopAction, "stop", tr("Stop (Space)"), SLOT(stop()), "stopButton");
 
 	// Setup shortcuts for actions
 	new QShortcut(QKeySequence(combine(Qt::SHIFT, Qt::Key_Space)), this, SLOT(togglePause()));
