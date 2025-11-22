@@ -89,6 +89,7 @@ protected:
 	float vcf_rescoeff; // Resonance coefficient [0.30,9.54]
 };
 
+
 class Lb302FilterIIR2 : public Lb302Filter
 {
 public:
@@ -137,8 +138,6 @@ protected:
 	float lastin = 0.f;
 	float value;
 };
-
-
 
 
 class Lb302Synth : public Instrument
