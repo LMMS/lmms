@@ -123,30 +123,6 @@ Editor::Editor(bool record, bool recordAccompany, bool recordStep) :
 	createButton(m_recordAccompanyAction, "record_accompany", tr("Record while playing"), SLOT(recordAccompany()), "recordAccompanyButton", recordAccompany);
 	createButton(m_toggleStepRecordingAction, "record_step_off", tr("Toggle Step Recording"), SLOT(toggleStepRecording()), "stepRecordButton", recordStep);
 
-	// Record action setup
-	if (record)
-	{
-		m_recordAction = new QAction(embed::getIconPixmap("record"), tr("Record"), this);
-		connect(m_recordAction, SIGNAL(triggered()), this, SLOT(record()));
-		addButton(m_recordAction, "recordButton");
-	}
-
-	// RecordAccompany action setup
-	if (recordAccompany)
-	{
-		m_recordAccompanyAction = new QAction(embed::getIconPixmap("record_accompany"), tr("Record while playing"), this);
-		connect(m_recordAccompanyAction, SIGNAL(triggered()), this, SLOT(recordAccompany()));
-		addButton(m_recordAccompanyAction, "recordAccompanyButton");
-	}
-
-	// RecordStep action setup
-	if (recordStep)
-	{
-		m_toggleStepRecordingAction = new QAction(embed::getIconPixmap("record_step_off"), tr("Toggle Step Recording"), this);
-		connect(m_toggleStepRecordingAction, SIGNAL(triggered()), this, SLOT(toggleStepRecording()));
-		addButton(m_toggleStepRecordingAction, "stepRecordButton");
-	}
-
 	// Stop action setup
 	createButton(m_stopAction, "stop", tr("Stop (Space)"), SLOT(stop()), "stopButton");
 
