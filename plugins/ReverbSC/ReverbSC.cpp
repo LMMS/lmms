@@ -41,7 +41,7 @@ Plugin::Descriptor PLUGIN_EXPORT reverbsc_plugin_descriptor =
 	"Paul Batchelor",
 	0x0123,
 	Plugin::Type::Effect,
-	new PluginPixmapLoader( "logo" ),
+	new PixmapLoader("lmms-plugin-logo"),
 	nullptr,
 	nullptr,
 } ;
