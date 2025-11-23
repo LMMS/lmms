@@ -1,7 +1,7 @@
 /*
  * CommandStack.h - provides undo and redo for commands
  *
- * Copyright (c) 2025 szeli1 <TODO/at/gmail/dot/com>
+ * Copyright (c) 2025 szeli1
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -43,7 +43,7 @@ public:
 	CommandStack();
 	~CommandStack();
 
-	void pushBack(const CommandBase& command, CommandDataBase* commandData);
+	void pushBack(const CommandBase& command, std::unique_ptr<CommandDataBase> commandData);
 	void undo();
 	void redo();
 
@@ -52,7 +52,7 @@ private:
 	void popBack();
 	size_t m_undoSize;
 	//! stores the used commands (not nullptr) among with the changed data (that could be nullptr)
-	std::vector<std::pair<const CommandBase*, std::unique_ptr<CommandDataBase*>>> m_stack;
+	std::vector<std::pair<const CommandBase*, std::unique_ptr<CommandDataBase>>> m_stack;
 };
 
 } // namespace lmms

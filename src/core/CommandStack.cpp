@@ -42,16 +42,14 @@ CommandStack::~CommandStack()
 	}
 }
 
-void CommandStack::pushBack(const CommandBase& command, CommandDataBase* commandData)
+void CommandStack::pushBack(const CommandBase& command, std::unique_ptr<CommandDataBase> commandData)
 {
 	size_t diff{m_stack.size() - m_undoSize};
 	for (size_t i{0}; i < diff; ++i)
 	{
 		popBack();
 	}
-	auto test = std::unique_ptr(new int(2));
-
-	m_stack.push_back(std::make_pair(&command, std::unique_ptr<CommandDataBase*>(new CommandDataBase(*commandData))));
+	m_stack.emplace_back(&command, std::move(commandData));
 	redo();
 }
 
