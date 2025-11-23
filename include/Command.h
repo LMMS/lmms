@@ -1,7 +1,7 @@
 /*
  * Command.h - implements Commands, a layer between the core and gui
  *
- * Copyright (c) 2025 szeli1 <TODO/at/gmail/dot/com>
+ * Copyright (c) 2025 szeli1
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -193,7 +193,7 @@ public:
 	ParamCommand(CommandStack& container)
 		: CommandBase{container} {}
 	//! pushes the command onto the stack and executes it
-	void push(T data) const { m_container->pushBack(*this, new CommandData<T>{data}); }
+	void push(T data) const { m_container->pushBack(*this, std::make_unique<CommandData<T>>(CommandData<T>{data})); }
 	void operator()(T data) const { push(data); }
 };
 
