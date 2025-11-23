@@ -1,6 +1,6 @@
 set_directory_properties(PROPERTIES SYSTEM TRUE)
 
-if(LMMS_BUILD_LINUX AND LMMS_HAVE_VST)
+if(LMMS_BUILD_LINUX AND LMMS_HAVE_VST AND NOT WANT_QT6)
 	set(BUILD_SHARED_LIBS OFF)
 	add_subdirectory(qt5-x11embed)
 ENDIF()
@@ -15,7 +15,7 @@ ADD_SUBDIRECTORY(weakjack)
 add_library(ringbuffer OBJECT
 	ringbuffer/src/lib/ringbuffer.cpp
 )
-target_compile_features(ringbuffer PUBLIC cxx_std_17)
+target_compile_features(ringbuffer PUBLIC cxx_std_20)
 target_include_directories(ringbuffer PUBLIC
 	ringbuffer/include
 	"${CMAKE_CURRENT_BINARY_DIR}"

@@ -24,7 +24,6 @@
 
 #include "Plugin.h"
 
-#include <QtGlobal>
 #include <QDomElement>
 #include <QLibrary>
 #include <QMessageBox>

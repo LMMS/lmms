@@ -98,6 +98,14 @@ ExportProjectDialog::ExportProjectDialog( const QString & _file_name,
 	compressionWidget->setVisible(false);
 #endif
 
+	for (const auto sampleRate : SUPPORTED_SAMPLERATES)
+	{
+		samplerateCB->addItem(tr("%1 Hz").arg(sampleRate), sampleRate);
+	}
+
+	const auto currentIndex = std::max(0, samplerateCB->findData(Engine::audioEngine()->outputSampleRate()));
+	samplerateCB->setCurrentIndex(currentIndex);
+
 	connect( startButton, SIGNAL(clicked()),
 			this, SLOT(startBtnClicked()));
 }
@@ -154,19 +162,11 @@ OutputSettings::StereoMode mapToStereoMode(int index)
 
 void ExportProjectDialog::startExport()
 {
-	auto qs = AudioEngine::qualitySettings(
-		static_cast<AudioEngine::qualitySettings::Interpolation>(interpolationCB->currentIndex()));
-	const auto samplerates = std::array{44100, 48000, 88200, 96000, 192000};
 	const auto bitrates = std::array{64, 128, 160, 192, 256, 320};
 
-	bool useVariableBitRate = checkBoxVariableBitRate->isChecked();
-
-	OutputSettings::BitRateSettings bitRateSettings(bitrates[ bitrateCB->currentIndex() ], useVariableBitRate);
-	OutputSettings os = OutputSettings(
-			samplerates[ samplerateCB->currentIndex() ],
-			bitRateSettings,
-			static_cast<OutputSettings::BitDepth>( depthCB->currentIndex() ),
-			mapToStereoMode(stereoModeComboBox->currentIndex()) );
+	OutputSettings os = OutputSettings(samplerateCB->currentData().toInt(), bitrates[bitrateCB->currentIndex()],
+		static_cast<OutputSettings::BitDepth>(depthCB->currentIndex()),
+		mapToStereoMode(stereoModeComboBox->currentIndex()));
 
 	if (compressionWidget->isVisible())
 	{
@@ -181,7 +181,8 @@ void ExportProjectDialog::startExport()
 	{
 		output_name+=m_fileExtension;
 	}
-	m_renderManager.reset(new RenderManager( qs, os, m_ft, output_name ));
+
+	m_renderManager.reset(new RenderManager(os, m_ft, output_name));
 
 	Engine::getSong()->setExportLoop( exportLoopCB->isChecked() );
 	Engine::getSong()->setRenderBetweenMarkers( renderMarkersCB->isChecked() );
@@ -230,8 +231,6 @@ void ExportProjectDialog::onFileFormatChanged(int index)
 			(exportFormat == ProjectRenderer::ExportFileFormat::Wave ||
 			 exportFormat == ProjectRenderer::ExportFileFormat::Flac);
 
-	bool variableBitrateVisible = !(exportFormat == ProjectRenderer::ExportFileFormat::MP3 || exportFormat == ProjectRenderer::ExportFileFormat::Flac);
-
 #ifdef LMMS_HAVE_SF_COMPLEVEL
 	bool compressionLevelVisible = (exportFormat == ProjectRenderer::ExportFileFormat::Flac);
 	compressionWidget->setVisible(compressionLevelVisible);
@@ -241,7 +240,6 @@ void ExportProjectDialog::onFileFormatChanged(int index)
 	sampleRateWidget->setVisible(sampleRateControlsVisible);
 
 	bitrateWidget->setVisible(bitRateControlsEnabled);
-	checkBoxVariableBitRate->setVisible(variableBitrateVisible);
 
 	depthWidget->setVisible(bitDepthControlEnabled);
 }

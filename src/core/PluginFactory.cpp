@@ -28,6 +28,7 @@
 #include <QDebug>
 #include <QDir>
 #include <QLibrary>
+#include <QRegularExpression>
 #include <memory>
 #include "lmmsconfig.h"
 
@@ -149,13 +150,12 @@ void PluginFactory::discoverPlugins()
 	QSet<QFileInfo> files;
 	for (const QString& searchPath : QDir::searchPaths("plugins"))
 	{
-#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
 		auto discoveredPluginList = QDir(searchPath).entryInfoList(nameFilters);
 		files.unite(QSet<QFileInfo>(discoveredPluginList.begin(), discoveredPluginList.end()));
-#else
-		files.unite(QDir(searchPath).entryInfoList(nameFilters).toSet());
-#endif
 	}
+
+	// Apply any plugin filters from environment LMMS_EXCLUDE_PLUGINS
+	filterPlugins(files);
 
 	// Cheap dependency handling: zynaddsubfx needs ZynAddSubFxCore. By loading
 	// all libraries twice we ensure that libZynAddSubFxCore is found.
@@ -245,7 +245,59 @@ void PluginFactory::discoverPlugins()
 	m_descriptors = descriptors;
 }
 
+// Builds QList<QRegularExpression> based on environment variable envVar
+QList<QRegularExpression> PluginFactory::getExcludePatterns(const char* envVar) {
+	QList<QRegularExpression> excludePatterns;
+	QString excludePatternString = std::getenv(envVar);
 
+	if (!excludePatternString.isEmpty()) {
+		QStringList patterns = excludePatternString.split(',');
+		for (const QString& pattern : patterns) {
+			if (pattern.trimmed().isEmpty()) {
+				continue;
+			}
+			QRegularExpression regex(pattern.trimmed());
+			if (regex.isValid()) {
+				excludePatterns << regex;
+			} else {
+				qWarning() << "Invalid regular expression:" << pattern;
+			}
+		}
+	}
+	return excludePatterns;
+}
+
+// Filter plugins based on environment variable, e.g. export LMMS_EXCLUDE_PLUGINS="libcarla"
+void PluginFactory::filterPlugins(QSet<QFileInfo>& files) {
+	// Get filter
+	QList<QRegularExpression> excludePatterns = getExcludePatterns("LMMS_EXCLUDE_PLUGINS");
+	if (excludePatterns.isEmpty()) {
+		return;
+	}
+
+  	// Get files to remove
+	QSet<QFileInfo> filesToRemove;
+	for (const QFileInfo& fileInfo : files) {
+		bool exclude = false;
+		QString filePath = fileInfo.filePath();
+
+		for (const QRegularExpression& pattern : excludePatterns) {
+			if (pattern.match(filePath).hasMatch()) {
+				exclude = true;
+				break;
+			}
+		}
+
+		if (exclude) {
+			filesToRemove.insert(fileInfo);
+		}
+	}
+
+	// Remove them
+	for (const QFileInfo& fileInfo : filesToRemove) {
+		files.remove(fileInfo);
+	}
+}
 
 QString PluginFactory::PluginInfo::name() const
 {

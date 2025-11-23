@@ -22,29 +22,34 @@
  *
  */
 
+#include "MixerView.h"
 
+#include <QHBoxLayout>
 #include <QLayout>
+#include <QLineEdit>
 #include <QPushButton>
 #include <QScrollArea>
 #include <QStyle>
 #include <QKeyEvent>
+#include <QStackedLayout>
+#include <QStackedWidget>
 
-#include "lmms_math.h"
-
-#include "MixerChannelView.h"
-#include "MixerView.h"
-#include "Knob.h"
-#include "Mixer.h"
+#include "EffectRackView.h"
+#include "Engine.h"
+#include "Fader.h"
 #include "GuiApplication.h"
-#include "MainWindow.h"
-#include "AudioEngine.h"
+#include "Knob.h"
 #include "InstrumentTrack.h"
+#include "MainWindow.h"
+#include "Mixer.h"
+#include "MixerChannelView.h"
 #include "PatternStore.h"
 #include "SampleTrack.h"
 #include "SendButtonIndicator.h"
 #include "Song.h"
 #include "SubWindow.h"
 #include "TrackContainer.h" // For TrackContainer::TrackList typedef
+#include "embed.h"
 
 namespace lmms::gui
 {
@@ -56,16 +61,6 @@ MixerView::MixerView(Mixer* mixer) :
 	SerializingObjectHook(),
 	m_mixer(mixer)
 {
-#if QT_VERSION < 0x50C00
-	// Workaround for a bug in Qt versions below 5.12,
-	// where argument-dependent-lookup fails for QFlags operators
-	// declared inside a namepsace.
-	// This affects the Q_DECLARE_OPERATORS_FOR_FLAGS macro in Instrument.h
-	// See also: https://codereview.qt-project.org/c/qt/qtbase/+/225348
-
-	using ::operator|;
-#endif
-
 	mixer->setHook(this);
 
 	//QPalette pal = palette();
@@ -150,6 +145,7 @@ MixerView::MixerView(Mixer* mixer) :
 	newChannelBtn->setObjectName("newChannelBtn");
 	newChannelBtn->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Expanding);
 	newChannelBtn->setFixedWidth(mixerChannelSize.width());
+	newChannelBtn->setFocusPolicy(Qt::NoFocus);
 	connect(newChannelBtn, SIGNAL(clicked()), this, SLOT(addNewChannel()));
 	ml->addWidget(newChannelBtn, 0);
 
@@ -375,6 +371,7 @@ void MixerView::updateMixerChannel(int index)
 	}
 
 	thisLine->m_sendButton->updateLightStatus();
+	thisLine->m_renameLineEdit->setText(thisLine->elideName(thisLine->mixerChannel()->m_name));
 	thisLine->update();
 }
 
@@ -480,6 +477,16 @@ void MixerView::renameChannel(int index)
 
 void MixerView::keyPressEvent(QKeyEvent * e)
 {
+	auto adjustCurrentFader = [this](const Qt::KeyboardModifiers& modifiers, Fader::AdjustmentDirection direction)
+	{
+		auto* mixerChannel = currentMixerChannel();
+
+		if (mixerChannel)
+		{
+			mixerChannel->fader()->adjust(modifiers, direction);
+		}
+	};
+
 	switch(e->key())
 	{
 		case Qt::Key_Delete:
@@ -507,6 +514,14 @@ void MixerView::keyPressEvent(QKeyEvent * e)
 				setCurrentMixerChannel(m_currentMixerChannel->channelIndex() + 1);
 			}
 			break;
+		case Qt::Key_Up:
+		case Qt::Key_Plus:
+			adjustCurrentFader(e->modifiers(), Fader::AdjustmentDirection::Up);
+			break;
+		case Qt::Key_Down:
+		case Qt::Key_Minus:
+			adjustCurrentFader(e->modifiers(), Fader::AdjustmentDirection::Down);
+			break;
 		case Qt::Key_Insert:
 			if (e->modifiers() & Qt::ShiftModifier)
 			{
@@ -517,6 +532,9 @@ void MixerView::keyPressEvent(QKeyEvent * e)
 		case Qt::Key_Return:
 		case Qt::Key_F2:
 			renameChannel(m_currentMixerChannel->channelIndex());
+			break;
+		default:
+			e->ignore();
 			break;
 	}
 }

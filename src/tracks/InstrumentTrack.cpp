@@ -46,30 +46,29 @@ namespace lmms
 {
 
 
-InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
-	Track( Track::Type::Instrument, tc ),
+InstrumentTrack::InstrumentTrack(TrackContainer* tc) :
+	Track(Track::Type::Instrument, tc),
 	MidiEventProcessor(),
-	m_midiPort( tr( "unnamed_track" ), Engine::audioEngine()->midiClient(),
-								this, this ),
+	m_midiPort(tr("unnamed_track"), Engine::audioEngine()->midiClient(), this, this),
 	m_notes(),
-	m_sustainPedalPressed( false ),
-	m_silentBuffersProcessed( false ),
-	m_previewMode( false ),
+	m_sustainPedalPressed(false),
+	m_silentBuffersProcessed(false),
+	m_previewMode(false),
 	m_baseNoteModel(0, 0, NumKeys - 1, this, tr("Base note")),
 	m_firstKeyModel(0, 0, NumKeys - 1, this, tr("First note")),
 	m_lastKeyModel(0, 0, NumKeys - 1, this, tr("Last note")),
-	m_hasAutoMidiDev( false ),
-	m_volumeModel( DefaultVolume, MinVolume, MaxVolume, 0.1f, this, tr( "Volume" ) ),
-	m_panningModel( DefaultPanning, PanningLeft, PanningRight, 0.1f, this, tr( "Panning" ) ),
-	m_audioPort( tr( "unnamed_track" ), true, &m_volumeModel, &m_panningModel, &m_mutedModel ),
-	m_pitchModel( 0, MinPitchDefault, MaxPitchDefault, 1, this, tr( "Pitch" ) ),
-	m_pitchRangeModel( 1, 1, 60, this, tr( "Pitch range" ) ),
-	m_mixerChannelModel( 0, 0, 0, this, tr( "Mixer channel" ) ),
-	m_useMasterPitchModel( true, this, tr( "Master pitch") ),
-	m_instrument( nullptr ),
-	m_soundShaping( this ),
-	m_arpeggio( this ),
-	m_noteStacking( this ),
+	m_hasAutoMidiDev(false),
+	m_volumeModel(DefaultVolume, MinVolume, MaxVolume, 0.1f, this, tr("Volume")),
+	m_panningModel(DefaultPanning, PanningLeft, PanningRight, 0.1f, this, tr("Panning")),
+	m_audioBusHandle(tr("unnamed_track"), true, &m_volumeModel, &m_panningModel, &m_mutedModel),
+	m_pitchModel(0, MinPitchDefault, MaxPitchDefault, 1, this, tr("Pitch")),
+	m_pitchRangeModel(1, 1, 60, this, tr("Pitch range")),
+	m_mixerChannelModel(0, 0, 0, this, tr("Mixer channel")),
+	m_useMasterPitchModel(true, this, tr("Master pitch")),
+	m_instrument(nullptr),
+	m_soundShaping(this),
+	m_arpeggio(this),
+	m_noteStacking(this),
 	m_piano(this),
 	m_microtuner()
 {
@@ -110,6 +109,8 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	connect(&m_pitchModel, SIGNAL(dataChanged()), this, SLOT(updatePitch()), Qt::DirectConnection);
 	connect(&m_pitchRangeModel, SIGNAL(dataChanged()), this, SLOT(updatePitchRange()), Qt::DirectConnection);
 	connect(&m_mixerChannelModel, SIGNAL(dataChanged()), this, SLOT(updateMixerChannel()), Qt::DirectConnection);
+
+	autoAssignMidiDevice(true);
 }
 
 
@@ -250,7 +251,7 @@ void InstrumentTrack::processAudioBuffer( SampleFrame* buf, const fpp_t frames, 
 
 	// if effects "went to sleep" because there was no input, wake them up
 	// now
-	m_audioPort.effects()->startRunning();
+	m_audioBusHandle.effects()->startRunning();
 
 	// get volume knob data
 	static const float DefaultVolumeRatio = 1.0f / DefaultVolume;
@@ -518,7 +519,7 @@ void InstrumentTrack::processOutEvent( const MidiEvent& event, const TimePos& ti
 			break;
 	}
 
-	// if appropriate, midi-port does futher routing
+	// if appropriate, midi-port does further routing
 	m_midiPort.processOutEvent( event, time );
 }
 
@@ -623,11 +624,9 @@ void InstrumentTrack::deleteNotePluginData( NotePlayHandle* n )
 void InstrumentTrack::setName(const QString& newName, bool shouldCreateUnique)
 {
 	Track::setName(newName, shouldCreateUnique);
-	m_midiPort.setName( name() );
-	m_audioPort.setName( name() );
+	m_midiPort.setName(name());
+	m_audioBusHandle.setName(name());
 }
-
-
 
 
 
@@ -672,7 +671,7 @@ void InstrumentTrack::updatePitchRange()
 
 void InstrumentTrack::updateMixerChannel()
 {
-	m_audioPort.setNextMixerChannel( m_mixerChannelModel.value() );
+	m_audioBusHandle.setNextMixerChannel(m_mixerChannelModel.value());
 }
 
 
@@ -750,7 +749,7 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 		TimePos cur_start = _start;
 		if( _clip_num < 0 )
 		{
-			cur_start -= c->startPosition();
+			cur_start -= c->startPosition() + c->startTimeOffset();
 		}
 
 		// get all notes from the given clip...
@@ -761,25 +760,33 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 		// very effective algorithm for playing notes that are
 		// posated within the current sample-frame
 
-
 		if( cur_start > 0 )
 		{
-			// skip notes which are posated before start-bar
-			while( nit != notes.end() && ( *nit )->pos() < cur_start )
+			// skip notes which end before start-bar
+			while( nit != notes.end() && ( *nit )->endPos() < cur_start )
 			{
 				++nit;
 			}
 		}
 
-		while (nit != notes.end() && (*nit)->pos() == cur_start)
+		while (nit != notes.end() && (*nit)->pos() < c->length() - c->startTimeOffset())
 		{
 			const auto currentNote = *nit;
+			// Skip any notes note at the current time pos or not overlapping with the start.
+			if (!(currentNote->pos() == cur_start
+				|| (cur_start == -c->startTimeOffset() && (*nit)->pos() < cur_start && (*nit)->endPos() > cur_start)))
+			{
+				++nit;
+				continue;
+			}
 
+			// Calculate the overlap of the note over the clip end.
+			const auto noteOverlap = std::max(0, currentNote->endPos() - (c->length() - c->startTimeOffset()));
 			// If the note is a Step Note, frames will be 0 so the NotePlayHandle
 			// plays for the whole length of the sample
 			const auto noteFrames = currentNote->type() == Note::Type::Step
 				? 0
-				: currentNote->length().frames(frames_per_tick);
+				: (currentNote->endPos() - cur_start - noteOverlap) * frames_per_tick;
 
 			NotePlayHandle* notePlayHandle = NotePlayHandleManager::acquire(this, _offset, noteFrames, *currentNote);
 			notePlayHandle->setPatternTrack(pattern_track);
@@ -788,7 +795,7 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 			{
 				// then set song-global offset of clip in order to
 				// properly perform the note detuning
-				notePlayHandle->setSongGlobalParentOffset( c->startPosition() );
+				notePlayHandle->setSongGlobalParentOffset( c->startPosition() + c->startTimeOffset());
 			}
 
 			Engine::audioEngine()->addPlayHandle( notePlayHandle );
@@ -877,7 +884,7 @@ void InstrumentTrack::saveTrackSpecificSettings(QDomDocument& doc, QDomElement& 
 		autoAssignMidiDevice(hasAuto);
 	}
 
-	m_audioPort.effects()->saveState( doc, thisElement );
+	m_audioBusHandle.effects()->saveState(doc, thisElement);
 }
 
 
@@ -909,7 +916,7 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 	m_microtuner.loadSettings(thisElement);
 
 	// clear effect-chain just in case we load an old preset without FX-data
-	m_audioPort.effects()->clear();
+	m_audioBusHandle.effects()->clear();
 
 	// We set MIDI CC enable to false so the knobs don't trigger MIDI CC events while
 	// they are being loaded. After all knobs are loaded we load the right value of m_midiCCEnable.
@@ -936,9 +943,9 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 			{
 				m_midiPort.restoreState( node.toElement() );
 			}
-			else if( m_audioPort.effects()->nodeName() == node.nodeName() )
+			else if (m_audioBusHandle.effects()->nodeName() == node.nodeName())
 			{
-				m_audioPort.effects()->restoreState( node.toElement() );
+				m_audioBusHandle.effects()->restoreState(node.toElement());
 			}
 			else if(node.nodeName() == "instrument")
 			{

@@ -1,4 +1,5 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.13)
+SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Set the given policy to NEW. If it does not exist, it will not be set. If it
 # is already set to NEW (most likely due to predating the minimum required CMake
@@ -46,7 +47,7 @@ include(StaticDependencies)
 
 STRING(TOUPPER          "${CMAKE_PROJECT_NAME}" PROJECT_NAME_UCASE)
 
-SET(PROJECT_YEAR 2024)
+SET(PROJECT_YEAR 2025)
 
 SET(PROJECT_AUTHOR      "LMMS Developers")
 SET(PROJECT_URL         "https://lmms.io")
@@ -102,7 +103,11 @@ option(WANT_DEBUG_ASAN	"Enable AddressSanitizer" OFF)
 option(WANT_DEBUG_TSAN	"Enable ThreadSanitizer" OFF)
 option(WANT_DEBUG_MSAN	"Enable MemorySanitizer" OFF)
 option(WANT_DEBUG_UBSAN	"Enable UndefinedBehaviorSanitizer" OFF)
+option(WANT_DEBUG_GPROF	"Enable gprof profiler" OFF)
 OPTION(BUNDLE_QT_TRANSLATIONS	"Install Qt translation files for LMMS" OFF)
+option(WANT_DEBUG_CPACK "Show detailed logs for packaging commands" OFF)
+option(WANT_CPACK_TARBALL "Request CPack to create a tarball instead of an installer" OFF)
+option(WANT_QT6 "Build with experimental Qt6 support" OFF)
 
 
 IF(LMMS_BUILD_APPLE)
@@ -170,30 +175,45 @@ check_library_exists(rt shm_open "" LMMS_HAVE_LIBRT)
 
 LIST(APPEND CMAKE_PREFIX_PATH "${CMAKE_INSTALL_PREFIX}")
 
-FIND_PACKAGE(Qt5 5.9.0 COMPONENTS Core Gui Widgets Xml REQUIRED)
-FIND_PACKAGE(Qt5 COMPONENTS LinguistTools QUIET)
+if(WANT_QT6)
+	set(QT_VERSION_MAJOR 6)
+	if(MSVC)
+		set(LMMS_QT_MIN_VERSION 6.8.0)
+	else()
+		set(LMMS_QT_MIN_VERSION 6.0.0)
+	endif()
+	set(STATUS_QT6 "Enabled")
+else()
+	set(QT_VERSION_MAJOR 5)
+	set(LMMS_QT_MIN_VERSION 5.15.0)
+	set(STATUS_QT6 "Disabled")
+endif()
+
+find_package(Qt${QT_VERSION_MAJOR} ${LMMS_QT_MIN_VERSION} COMPONENTS Core Gui Widgets Xml Svg REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS LinguistTools QUIET)
 
 include_directories(SYSTEM
-	${Qt5Core_INCLUDE_DIRS}
-	${Qt5Gui_INCLUDE_DIRS}
-	${Qt5Widgets_INCLUDE_DIRS}
-	${Qt5Xml_INCLUDE_DIRS}
+	${Qt${QT_VERSION_MAJOR}Core_INCLUDE_DIRS}
+	${Qt${QT_VERSION_MAJOR}Gui_INCLUDE_DIRS}
+	${Qt${QT_VERSION_MAJOR}Widgets_INCLUDE_DIRS}
+	${Qt${QT_VERSION_MAJOR}Xml_INCLUDE_DIRS}
 )
 
-SET(QT_LIBRARIES
-	Qt5::Core
-	Qt5::Gui
-	Qt5::Widgets
-	Qt5::Xml
+set(QT_LIBRARIES
+	Qt${QT_VERSION_MAJOR}::Core
+	Qt${QT_VERSION_MAJOR}::Gui
+	Qt${QT_VERSION_MAJOR}::Widgets
+	Qt${QT_VERSION_MAJOR}::Xml
+	Qt${QT_VERSION_MAJOR}::Svg
 )
 
-IF(LMMS_BUILD_LINUX AND WANT_VST)
+IF(LMMS_BUILD_LINUX AND WANT_VST AND NOT WANT_QT6)
     FIND_PACKAGE(Qt5 COMPONENTS X11Extras REQUIRED)
     LIST(APPEND QT_LIBRARIES Qt5::X11Extras)
 ENDIF()
 
-# Resolve Qt5::qmake to full path for use in packaging scripts
-GET_TARGET_PROPERTY(QT_QMAKE_EXECUTABLE "${Qt5Core_QMAKE_EXECUTABLE}" IMPORTED_LOCATION)
+# Resolve qmake to full path for use in packaging scripts
+get_target_property(QT_QMAKE_EXECUTABLE Qt${QT_VERSION_MAJOR}::qmake IMPORTED_LOCATION)
 
 # Find the location of Qt translation files
 execute_process(COMMAND ${QT_QMAKE_EXECUTABLE} -query QT_INSTALL_TRANSLATIONS
@@ -206,8 +226,8 @@ IF(EXISTS "${QT_TRANSLATIONS_DIR}")
 	ADD_DEFINITIONS("-DQT_TRANSLATIONS_DIR=\"${QT_TRANSLATIONS_DIR}\"")
 ENDIF()
 
-FIND_PACKAGE(Qt5Test)
-SET(QT_QTTEST_LIBRARY Qt5::Test)
+FIND_PACKAGE(Qt${QT_VERSION_MAJOR}Test)
+SET(QT_QTTEST_LIBRARY Qt${QT_VERSION_MAJOR}::Test)
 
 # check for libsndfile
 FIND_PACKAGE(SndFile REQUIRED)
@@ -236,29 +256,28 @@ if(LMMS_BUILD_APPLE)
 endif()
 find_package(Perl)
 
-IF(WANT_LV2)
-	IF(PKG_CONFIG_FOUND)
-		PKG_CHECK_MODULES(LV2 lv2)
-		PKG_CHECK_MODULES(LILV lilv-0)
-	ENDIF()
-	IF(NOT LV2_FOUND AND NOT LILV_FOUND)
-		UNSET(LV2_FOUND CACHE)
-		UNSET(LILV_FOUND CACHE)
-		FIND_PACKAGE(LV2 CONFIG)
-		FIND_PACKAGE(LILV CONFIG)
-		IF(LILV_FOUND)
-			SET(LILV_LIBRARIES "lilv::lilv")
-		ENDIF()
-	ENDIF()
-	IF(LV2_FOUND AND LILV_FOUND)
-		SET(LMMS_HAVE_LV2 TRUE)
-		SET(STATUS_LV2 "OK")
-	ELSE()
-		SET(STATUS_LV2 "not found, install it or set PKG_CONFIG_PATH appropriately")
-	ENDIF()
-ELSE(WANT_LV2)
-	SET(STATUS_LV2 "not built as requested")
-ENDIF(WANT_LV2)
+if(WANT_LV2)
+	if(PKG_CONFIG_FOUND)
+		pkg_check_modules(LV2 lv2)
+	endif()
+
+	find_package(Lilv)
+	if(Lilv_FOUND)
+		set(LILV_LIBRARIES Lilv::lilv)
+	endif()
+
+	# Ensure both dependencies are found
+	if(NOT LV2_FOUND)
+		set(STATUS_LV2 "not found, install lv2 or set PKG_CONFIG_PATH appropriately")
+	elseif(NOT Lilv_FOUND)
+		set(STATUS_LV2 "not found, install lilv or set PKG_CONFIG_PATH appropriately")
+	else()
+		set(LMMS_HAVE_LV2 TRUE)
+		set(STATUS_LV2 "OK")
+	endif()
+else()
+	set(STATUS_LV2 "not built as requested")
+endif()
 
 IF(WANT_SUIL)
 	IF(PKG_CONFIG_FOUND)
@@ -266,6 +285,7 @@ IF(WANT_SUIL)
 		IF(SUIL_FOUND)
 			SET(LMMS_HAVE_SUIL TRUE)
 			SET(STATUS_SUIL "OK")
+			find_package(SuilModules)
 		ELSE()
 			SET(STATUS_SUIL "not found, install it or set PKG_CONFIG_PATH appropriately")
 		ENDIF()
@@ -591,6 +611,9 @@ if(WANT_VST)
 	else()
 		set(STATUS_VST "No hosts selected and available")
 	endif()
+	if(WINE_ASLR_ENABLED)
+		set(STATUS_VST_64 "${STATUS_VST_64}\n\tWARNING: You are using wine ${WINE_VERSION} which cannot disable ASLR, please consider upgrading to wine 10.14 or higher.  ASLR may cause crashes with older VSTs.")
+	endif()
 endif()
 
 IF(WANT_DEBUG_FPE)
@@ -603,6 +626,17 @@ IF(WANT_DEBUG_FPE)
 ELSE()
 	SET (STATUS_DEBUG_FPE "Disabled")
 ENDIF(WANT_DEBUG_FPE)
+
+if(WANT_DEBUG_CPACK)
+	if((LMMS_BUILD_WIN32 AND CMAKE_VERSION VERSION_LESS "3.19") OR WANT_CPACK_TARBALL)
+		set(STATUS_DEBUG_CPACK "Wanted but disabled due to unsupported configuration")
+	else()
+		set(CPACK_DEBUG TRUE)
+		set(STATUS_DEBUG_CPACK "Enabled")
+	endif()
+else()
+	set(STATUS_DEBUG_CPACK "Disabled")
+endif()
 
 # check for libsamplerate
 FIND_PACKAGE(Samplerate 0.1.8 MODULE REQUIRED)
@@ -618,11 +652,20 @@ ENDIF()
 SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DLMMS_DEBUG")
 SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DLMMS_DEBUG")
 
+if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_compile_definitions(NDEBUG)
+	SET(STATUS_ASSERTIONS "Disabled")
+else()
+    remove_definitions(-DNDEBUG)
+	SET(STATUS_ASSERTIONS "Enabled")
+endif()
+
 if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.16")
 	set(NOOP_COMMAND "${CMAKE_COMMAND}" "-E" "true")
 else()
 	set(NOOP_COMMAND "${CMAKE_COMMAND}" "-E" "echo")
 endif()
+
 if(STRIP)
 	# TODO CMake 3.19: Now that CONFIG generator expressions support testing for
 	# multiple configurations, combine the OR into a single CONFIG expression.
@@ -663,6 +706,22 @@ elseif(MSVC)
 	# Use UTF-8 as the source and execution character set
 	add_compile_options("/utf-8")
 ENDIF()
+
+# gcc builds support gprof for profiling
+# clang too seems to support gprof, but i couldn't get it working.
+# if needed, change the if condition to "GNU|CLANG"
+if(NOT CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+	set(STATUS_GPROF ", NOT SUPPORTED BY THIS COMPILER")
+	set(WANT_DEBUG_GPROF OFF)
+endif()
+
+if(WANT_DEBUG_GPROF)
+	add_compile_options(-pg)
+	add_link_options(-pg)
+	set(STATUS_GPROF "OK")
+else()
+	set(STATUS_GPROF "Disabled ${STATUS_GPROF}")
+endif()
 
 # add enabled sanitizers
 function(add_sanitizer sanitizer supported_compilers want_flag status_flag)
@@ -727,7 +786,7 @@ IF(LMMS_BUILD_LINUX)
 		"${CMAKE_BINARY_DIR}/lmmsconfig.h"
 		"${CMAKE_BINARY_DIR}/lmmsversion.h"
 		"${CMAKE_SOURCE_DIR}/src/gui/embed.cpp"
-		DESTINATION "${CMAKE_INSTALL_PREFIX}/include/lmms/")
+		DESTINATION "include/lmms/")
 ENDIF(LMMS_BUILD_LINUX)
 
 #
@@ -831,6 +890,10 @@ MESSAGE(
 "* Debug using ThreadSanitizer       : ${STATUS_DEBUG_TSAN}\n"
 "* Debug using MemorySanitizer       : ${STATUS_DEBUG_MSAN}\n"
 "* Debug using UBSanitizer           : ${STATUS_DEBUG_UBSAN}\n"
+"* Debug packaging commands          : ${STATUS_DEBUG_CPACK}\n"
+"* Profile using GNU profiler        : ${STATUS_GPROF}\n"
+"* Debug assertions                  : ${STATUS_ASSERTIONS}\n"
+"* Experimental Qt6 support          : ${STATUS_QT6}\n"
 )
 
 MESSAGE(

@@ -1,7 +1,7 @@
 /*
- * MixerChannelView.h - the mixer channel view
+ * MixerChannelView.h
  *
- * Copyright (c) 2022 saker <sakertooth@gmail.com>
+ * Copyright (c) 2024 saker
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -22,32 +22,30 @@
  *
  */
 
-#ifndef MIXER_CHANNEL_VIEW_H
-#define MIXER_CHANNEL_VIEW_H
+#ifndef LMMS_GUI_MIXER_CHANNEL_VIEW_H
+#define LMMS_GUI_MIXER_CHANNEL_VIEW_H
 
-#include <QGraphicsView>
-#include <QLabel>
-#include <QLineEdit>
-#include <QPixmap>
-#include <QStackedWidget>
 #include <QWidget>
 
-#include "EffectRackView.h"
-#include "Fader.h"
-#include "Knob.h"
-#include "LcdWidget.h"
-#include "PixmapButton.h"
-#include "SendButtonIndicator.h"
+class QGraphicsView;
+class QLabel;
+class QLineEdit;
+class QStackedWidget;
 
 namespace lmms {
 class MixerChannel;
 }
 
 namespace lmms::gui {
+class AutomatableButton;
+class EffectRackView;
+class Fader;
+class Knob;
+class LcdWidget;
+class MixerView;
 class PeakIndicator;
+class SendButtonIndicator;
 
-constexpr int MIXER_CHANNEL_INNER_BORDER_SIZE = 3;
-constexpr int MIXER_CHANNEL_OUTER_BORDER_SIZE = 1;
 
 class MixerChannelView : public QWidget
 {
@@ -63,27 +61,28 @@ public:
 	void contextMenuEvent(QContextMenuEvent*) override;
 	void mousePressEvent(QMouseEvent*) override;
 	void mouseDoubleClickEvent(QMouseEvent*) override;
-	bool eventFilter(QObject* dist, QEvent* event) override;
-
-	int channelIndex() const;
-	void setChannelIndex(int index);
-
-	QBrush backgroundActive() const;
-	void setBackgroundActive(const QBrush& c);
-
-	QColor strokeOuterActive() const;
-	void setStrokeOuterActive(const QColor& c);
-
-	QColor strokeOuterInactive() const;
-	void setStrokeOuterInactive(const QColor& c);
-
-	QColor strokeInnerActive() const;
-	void setStrokeInnerActive(const QColor& c);
-
-	QColor strokeInnerInactive() const;
-	void setStrokeInnerInactive(const QColor& c);
+	void keyPressEvent(QKeyEvent* ke) override;
 
 	void reset();
+	int channelIndex() const { return m_channelIndex; }
+	void setChannelIndex(int index);
+
+	QBrush backgroundActive() const { return m_backgroundActive; }
+	void setBackgroundActive(const QBrush& c) { m_backgroundActive = c; }
+
+	QColor strokeOuterActive() const { return m_strokeOuterActive; }
+	void setStrokeOuterActive(const QColor& c) { m_strokeOuterActive = c; }
+
+	QColor strokeOuterInactive() const { return m_strokeOuterInactive; }
+	void setStrokeOuterInactive(const QColor& c) { m_strokeOuterInactive = c; }
+
+	QColor strokeInnerActive() const { return m_strokeInnerActive; }
+	void setStrokeInnerActive(const QColor& c) { m_strokeInnerActive = c; }
+
+	QColor strokeInnerInactive() const { return m_strokeInnerInactive; }
+	void setStrokeInnerInactive(const QColor& c) { m_strokeInnerInactive = c; }
+
+	Fader* fader() const { return m_fader; }
 
 public slots:
 	void renameChannel();
@@ -116,8 +115,8 @@ private:
 	QLineEdit* m_renameLineEdit;
 	QGraphicsView* m_renameLineEditView;
 	QLabel* m_sendArrow;
-	PixmapButton* m_muteButton;
-	PixmapButton* m_soloButton;
+	AutomatableButton* m_muteButton;
+	AutomatableButton* m_soloButton;
 	PeakIndicator* m_peakIndicator = nullptr;
 	Fader* m_fader;
 	EffectRackView* m_effectRackView;
@@ -135,4 +134,4 @@ private:
 };
 } // namespace lmms::gui
 
-#endif // MIXER_CHANNEL_VIEW_H
+#endif // LMMS_GUI_MIXER_CHANNEL_VIEW_H

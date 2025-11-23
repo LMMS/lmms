@@ -64,16 +64,6 @@ MicrotunerConfig::MicrotunerConfig() :
 	m_baseKeyModel(DefaultBaseKey, 0, NumKeys - 1, nullptr, tr("Base key")),
 	m_baseFreqModel(DefaultBaseFreq, 0.1f, 9999.999f, 0.001f, nullptr, tr("Base note frequency"))
 {
-#if QT_VERSION < 0x50C00
-	// Workaround for a bug in Qt versions below 5.12,
-	// where argument-dependent-lookup fails for QFlags operators
-	// declared inside a namepsace.
-	// This affects the Q_DECLARE_OPERATORS_FOR_FLAGS macro in Instrument.h
-	// See also: https://codereview.qt-project.org/c/qt/qtbase/+/225348
-
-	using ::operator|;
-#endif
-
 	setWindowIcon(embed::getIconPixmap("microtuner"));
 	setWindowTitle(tr("Microtuner Configuration"));
 
@@ -94,7 +84,7 @@ MicrotunerConfig::MicrotunerConfig() :
 	auto scaleCombo = new ComboBox();
 	scaleCombo->setModel(&m_scaleComboModel);
 	microtunerLayout->addWidget(scaleCombo, 1, 0, 1, 2);
-	connect(&m_scaleComboModel, &ComboBoxModel::dataChanged, [=] {updateScaleForm();});
+	connect(&m_scaleComboModel, &ComboBoxModel::dataChanged, this, &MicrotunerConfig::updateScaleForm);
 
 	m_scaleNameEdit = new QLineEdit("12-TET");
 	m_scaleNameEdit->setToolTip(tr("Scale description. Cannot start with \"!\" and cannot contain a newline character."));
@@ -106,8 +96,8 @@ MicrotunerConfig::MicrotunerConfig() :
 	saveScaleButton->setToolTip(tr("Save scale definition to a file."));
 	microtunerLayout->addWidget(loadScaleButton, 3, 0, 1, 1);
 	microtunerLayout->addWidget(saveScaleButton, 3, 1, 1, 1);
-	connect(loadScaleButton, &QPushButton::clicked, [=] {loadScaleFromFile();});
-	connect(saveScaleButton, &QPushButton::clicked, [=] {saveScaleToFile();});
+	connect(loadScaleButton, &QPushButton::clicked, this, &MicrotunerConfig::loadScaleFromFile);
+	connect(saveScaleButton, &QPushButton::clicked, this, &MicrotunerConfig::saveScaleToFile);
 
 	m_scaleTextEdit = new QPlainTextEdit();
 	m_scaleTextEdit->setPlainText("100.0\n200.0\n300.0\n400.0\n500.0\n600.0\n700.0\n800.0\n900.0\n1000.0\n1100.0\n1200.0");
@@ -117,7 +107,7 @@ MicrotunerConfig::MicrotunerConfig() :
 	auto applyScaleButton = new QPushButton(tr("Apply scale changes"));
 	applyScaleButton->setToolTip(tr("Verify and apply changes made to the selected scale. To use the scale, select it in the settings of a supported instrument."));
 	microtunerLayout->addWidget(applyScaleButton, 6, 0, 1, 2);
-	connect(applyScaleButton, &QPushButton::clicked, [=] {applyScale();});
+	connect(applyScaleButton, &QPushButton::clicked, this, &MicrotunerConfig::applyScale);
 
 	// ----------------------------------
 	// Mapping sub-column
@@ -132,7 +122,7 @@ MicrotunerConfig::MicrotunerConfig() :
 	auto keymapCombo = new ComboBox();
 	keymapCombo->setModel(&m_keymapComboModel);
 	microtunerLayout->addWidget(keymapCombo, 1, 2, 1, 2);
-	connect(&m_keymapComboModel, &ComboBoxModel::dataChanged, [=] {updateKeymapForm();});
+	connect(&m_keymapComboModel, &ComboBoxModel::dataChanged, this, &MicrotunerConfig::updateKeymapForm);
 
 	m_keymapNameEdit = new QLineEdit("default");
 	m_keymapNameEdit->setToolTip(tr("Keymap description. Cannot start with \"!\" and cannot contain a newline character."));
@@ -144,8 +134,8 @@ MicrotunerConfig::MicrotunerConfig() :
 	saveKeymapButton->setToolTip(tr("Save key mapping definition to a file."));
 	microtunerLayout->addWidget(loadKeymapButton, 3, 2, 1, 1);
 	microtunerLayout->addWidget(saveKeymapButton, 3, 3, 1, 1);
-	connect(loadKeymapButton, &QPushButton::clicked, [=] {loadKeymapFromFile();});
-	connect(saveKeymapButton, &QPushButton::clicked, [=] {saveKeymapToFile();});
+	connect(loadKeymapButton, &QPushButton::clicked, this, &MicrotunerConfig::loadKeymapFromFile);
+	connect(saveKeymapButton, &QPushButton::clicked, this, &MicrotunerConfig::saveKeymapToFile);
 
 	m_keymapTextEdit = new QPlainTextEdit();
 	m_keymapTextEdit->setPlainText("0\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11");
@@ -189,7 +179,7 @@ MicrotunerConfig::MicrotunerConfig() :
 	auto applyKeymapButton = new QPushButton(tr("Apply keymap changes"));
 	applyKeymapButton->setToolTip(tr("Verify and apply changes made to the selected key mapping. To use the mapping, select it in the settings of a supported instrument."));
 	microtunerLayout->addWidget(applyKeymapButton, 6, 2, 1, 2);
-	connect(applyKeymapButton, &QPushButton::clicked, [=] {applyKeymap();});
+	connect(applyKeymapButton, &QPushButton::clicked, this, &MicrotunerConfig::applyKeymap);
 
 	updateScaleForm();
 	updateKeymapForm();
@@ -325,7 +315,7 @@ void MicrotunerConfig::updateKeymapForm()
  */
 bool MicrotunerConfig::validateScaleForm()
 {
-	auto fail = [=](QString message) {QMessageBox::critical(this, tr("Scale parsing error"), message);};
+	auto fail = [this](const QString& message){ QMessageBox::critical(this, tr("Scale parsing error"), message); };
 
 	// check name
 	QString name = m_scaleNameEdit->text();
@@ -333,11 +323,7 @@ bool MicrotunerConfig::validateScaleForm()
 	if (name.contains('\n')) {fail(tr("Scale name cannot contain a new-line character")); return false;}
 
 	// check intervals
-	#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
-		QStringList input = m_scaleTextEdit->toPlainText().split('\n', Qt::SkipEmptyParts);
-	#else
-		QStringList input = m_scaleTextEdit->toPlainText().split('\n', QString::SkipEmptyParts);
-	#endif
+	QStringList input = m_scaleTextEdit->toPlainText().split('\n', Qt::SkipEmptyParts);
 	for (auto &line: input)
 	{
 		if (line.isEmpty()) {continue;}
@@ -373,7 +359,7 @@ bool MicrotunerConfig::validateScaleForm()
  */
 bool MicrotunerConfig::validateKeymapForm()
 {
-	auto fail = [=](QString message) {QMessageBox::critical(this, tr("Keymap parsing error"), message);};
+	auto fail = [this](const QString& message){ QMessageBox::critical(this, tr("Keymap parsing error"), message); };
 
 	// check name
 	QString name = m_keymapNameEdit->text();
@@ -381,11 +367,7 @@ bool MicrotunerConfig::validateKeymapForm()
 	if (name.contains('\n')) {fail(tr("Keymap name cannot contain a new-line character")); return false;}
 
 	// check key mappings
-	#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
-		QStringList input = m_keymapTextEdit->toPlainText().split('\n', Qt::SkipEmptyParts);
-	#else
-		QStringList input = m_keymapTextEdit->toPlainText().split('\n', QString::SkipEmptyParts);
-	#endif
+	QStringList input = m_keymapTextEdit->toPlainText().split('\n', Qt::SkipEmptyParts);
 	for (auto &line: input)
 	{
 		if (line.isEmpty()) {continue;}
@@ -415,11 +397,7 @@ bool MicrotunerConfig::applyScale()
 	std::vector<Interval> newIntervals;
 	newIntervals.emplace_back(1, 1);
 
-#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
 	QStringList input = m_scaleTextEdit->toPlainText().split('\n', Qt::SkipEmptyParts);
-#else
-	QStringList input = m_scaleTextEdit->toPlainText().split('\n', QString::SkipEmptyParts);
-#endif
 	for (auto &line: input)
 	{
 		if (line.isEmpty()) {continue;}
@@ -461,11 +439,7 @@ bool MicrotunerConfig::applyKeymap()
 
 	std::vector<int> newMap;
 
-#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
 	QStringList input = m_keymapTextEdit->toPlainText().split('\n', Qt::SkipEmptyParts);
-#else
-	QStringList input = m_keymapTextEdit->toPlainText().split('\n', QString::SkipEmptyParts);
-#endif
 	for (auto &line: input)
 	{
 		if (line.isEmpty()) {continue;}
@@ -560,7 +534,7 @@ bool MicrotunerConfig::loadKeymapFromFile()
 		QString line = stream.readLine();
 		if (line != "" && line[0] == '!')
 		{
-			if (line.length() > 1 && line[1] == '!' && i == -7)		// LMMS extension: double "!" occuring before any
+			if (line.length() > 1 && line[1] == '!' && i == -7)		// LMMS extension: double "!" occurring before any
 			{														// value is loaded marks a description field.
 				m_keymapNameEdit->setText(line.mid(2));
 			}

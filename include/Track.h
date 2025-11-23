@@ -31,7 +31,7 @@
 
 #include "AutomatableModel.h"
 #include "JournallingObject.h"
-#include "lmms_basics.h"
+#include "LmmsTypes.h"
 #include <optional>
 
 
@@ -224,9 +224,9 @@ private:
 
 protected:
 	BoolModel m_mutedModel;
+	BoolModel m_soloModel;
 
 private:
-	BoolModel m_soloModel;
 	bool m_mutedBeforeSolo;
 
 	clipVector m_clips;

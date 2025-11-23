@@ -32,18 +32,15 @@
 #include <QKeyEvent>
 #include <QLabel>
 #include <QPainter>
-#include <QPainterPath>
+#include <QPainterPath>  // IWYU pragma: keep
+#include <QPushButton>
 #include <QScrollBar>
 #include <QStyleOption>
 #include <QToolTip>
 #include <cmath>
 
 #include "SampleClip.h"
-#include "SampleWaveform.h"
-
-#ifndef __USE_XOPEN
-#define __USE_XOPEN
-#endif
+#include "SampleThumbnail.h"
 
 #include "ActionGroup.h"
 #include "AutomationNode.h"
@@ -58,11 +55,9 @@
 #include "PatternStore.h"
 #include "PianoRoll.h"
 #include "ProjectJournal.h"
-#include "SampleBuffer.h"
 #include "StringPairDrag.h"
 #include "TextFloat.h"
 #include "TimeLineWidget.h"
-#include "debug.h"
 #include "embed.h"
 #include "FontHelper.h"
 
@@ -107,7 +102,8 @@ AutomationEditor::AutomationEditor() :
 	m_scaleColor(Qt::SolidPattern),
 	m_crossColor(0, 0, 0),
 	m_backgroundShade(0, 0, 0),
-	m_ghostNoteColor(0, 0, 0)
+	m_ghostNoteColor(0, 0, 0),
+	m_outOfBoundsShade(0, 0, 0, 128)
 {
 	connect( this, SIGNAL(currentClipChanged()),
 				this, SLOT(updateAfterClipChange()),
@@ -115,15 +111,16 @@ AutomationEditor::AutomationEditor() :
 	connect( Engine::getSong(), SIGNAL(timeSignatureChanged(int,int)),
 						this, SLOT(update()));
 
-	setAttribute( Qt::WA_OpaquePaintEvent, true );
-
 	//keeps the direction of the widget, undepended on the locale
 	setLayoutDirection( Qt::LeftToRight );
 
+	// Set up tension model
 	m_tensionModel = new FloatModel(1.f, 0.f, 1.f, 0.01f);
+	m_tensionModel->setJournalling(false);
 	connect( m_tensionModel, SIGNAL(dataChanged()),
 				this, SLOT(setTension()));
 
+	// Set up quantization model
 	for (auto q : Quantizations) {
 		m_quantizeModel.addItem(QString("1/%1").arg(q));
 	}
@@ -189,6 +186,7 @@ void AutomationEditor::setCurrentClip(AutomationClip * new_clip )
 	if (m_clip != nullptr)
 	{
 		connect(m_clip, SIGNAL(dataChanged()), this, SLOT(update()));
+		connect(m_clip, &AutomationClip::lengthChanged, this, qOverload<>(&QWidget::update));
 	}
 
 	emit currentClipChanged();
@@ -294,6 +292,7 @@ void AutomationEditor::keyPressEvent(QKeyEvent * ke )
 			break;
 
 		default:
+			ke->ignore();
 			break;
 	}
 }
@@ -429,13 +428,15 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 		}
 	};
 
+	const auto pos = position(mouseEvent);
+
 	// If we clicked inside the AutomationEditor viewport (where the nodes are represented)
-	if (mouseEvent->y() > TOP_MARGIN && mouseEvent->x() >= VALUES_WIDTH)
+	if (pos.y() > TOP_MARGIN && pos.x() >= VALUES_WIDTH)
 	{
-		float level = getLevel( mouseEvent->y() );
+		float level = getLevel(pos.y());
 
 		// Get the viewport X
-		int x = mouseEvent->x() - VALUES_WIDTH;
+		int x = pos.x() - VALUES_WIDTH;
 
 		// Get tick in which the user clicked
 		int posTicks = (x * TimePos::ticksPerBar() / m_ppb) + m_currentPosition;
@@ -454,7 +455,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 			|| (m_editMode == EditMode::Erase && m_mouseDownRight)
 		);
 
-		timeMap::iterator clickedNode = getNodeAt(mouseEvent->x(), mouseEvent->y(), editingOutValue);
+		timeMap::iterator clickedNode = getNodeAt(pos.x(), pos.y(), editingOutValue);
 
 		switch (m_editMode)
 		{
@@ -480,7 +481,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 					}
 					else // No shift, we are just creating/moving nodes
 					{
-						// Starts actually moving/draging the node
+						// Starts actually moving/dragging the node
 						TimePos newTime = m_clip->setDragValue(
 							// The TimePos of either the clicked node or a new one
 							TimePos(
@@ -623,7 +624,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 				m_clip->addJournalCheckPoint();
 
 				// Gets the closest node to the mouse click
-				timeMap::iterator node = getClosestNode(mouseEvent->x());
+				timeMap::iterator node = getClosestNode(pos.x());
 
 				// Starts dragging a tangent
 				if (m_mouseDownLeft && node != tm.end())
@@ -664,14 +665,16 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 
 void AutomationEditor::mouseDoubleClickEvent(QMouseEvent * mouseEvent)
 {
+	const auto pos = position(mouseEvent);
+
 	if (!validClip()) { return; }
 
 	// If we double clicked outside the AutomationEditor viewport return
-	if (mouseEvent->y() <= TOP_MARGIN || mouseEvent->x() < VALUES_WIDTH) { return; }
+	if (pos.y() <= TOP_MARGIN || pos.x() < VALUES_WIDTH) { return; }
 
 	// Are we fine tuning the inValue or outValue?
 	const bool isOutVal = (m_editMode == EditMode::DrawOutValues);
-	timeMap::iterator clickedNode = getNodeAt(mouseEvent->x(), mouseEvent->y(), isOutVal);
+	timeMap::iterator clickedNode = getNodeAt(pos.x(), pos.y(), isOutVal);
 
 	switch (m_editMode)
 	{
@@ -729,12 +732,14 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 		return;
 	}
 
+	const auto pos = position(mouseEvent);
+
 	// If the mouse y position is inside the Automation Editor viewport
-	if (mouseEvent->y() > TOP_MARGIN)
+	if (pos.y() > TOP_MARGIN)
 	{
-		float level = getLevel(mouseEvent->y());
+		float level = getLevel(pos.y());
 		// Get the viewport X position where the mouse is at
-		int x = mouseEvent->x() - VALUES_WIDTH;
+		int x = pos.x() - VALUES_WIDTH;
 
 		// Get the X position in ticks
 		int posTicks = (x * TimePos::ticksPerBar() / m_ppb) + m_currentPosition;
@@ -815,7 +820,7 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 				{
 					if (m_action == Action::ResetOutValues)
 					{
-						// Reseting outValues
+						// Resetting outValues
 
 						// Resets all values from the last clicked tick up to the current position tick
 						m_clip->resetNodes(m_drawLastTick, posTicks);
@@ -851,7 +856,7 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 				{
 					if (m_action == Action::ResetOutValues)
 					{
-						// Reseting outValues
+						// Resetting outValues
 
 						// Resets all values from the last clicked tick up to the current position tick
 						m_clip->resetNodes(m_drawLastTick, posTicks);
@@ -883,8 +888,8 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 						? yCoordOfLevel(OUTVAL(it))
 						: yCoordOfLevel(INVAL(it));
 					float dy = m_draggedOutTangent
-						? y - mouseEvent->y()
-						: mouseEvent->y() - y;
+						? y - pos.y()
+						: pos.y() - y;
 					float dx = std::abs(posTicks - POS(it));
 					float newTangent = dy / std::max(dx, 1.0f);
 
@@ -1025,6 +1030,7 @@ void AutomationEditor::setGhostSample(SampleClip* newGhostSample)
 	// Expects a pointer to a Sample buffer or nullptr.
 	m_ghostSample = newGhostSample;
 	m_renderSample = true;
+	m_sampleThumbnail = SampleThumbnail{newGhostSample->sample()};
 }
 
 void AutomationEditor::paintEvent(QPaintEvent * pe )
@@ -1217,12 +1223,19 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 			int yOffset = (editorHeight - sampleHeight) / 2.0f + TOP_MARGIN;
 
 			p.setPen(m_ghostSampleColor);
-			
+
 			const auto& sample = m_ghostSample->sample();
-			const auto waveform = SampleWaveform::Parameters{
-				sample.data(), sample.sampleSize(), sample.amplification(), sample.reversed()};
-			const auto rect = QRect(startPos, yOffset, sampleWidth, sampleHeight);
-			SampleWaveform::visualize(waveform, p, rect);
+
+			const auto param = SampleThumbnail::VisualizeParameters{
+				.sampleRect = QRect(startPos, yOffset, sampleWidth, sampleHeight),
+				.viewportRect = rect(),
+				.amplification = sample.amplification(),
+				.sampleStart = static_cast<float>(sample.startFrame()) / sample.sampleSize(),
+				.sampleEnd = static_cast<float>(sample.endFrame()) / sample.sampleSize(),
+				.reversed = sample.reversed()
+			};
+
+			m_sampleThumbnail.visualize(param, p);
 		}
 
 		// draw ghost notes
@@ -1307,11 +1320,13 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 		if( time_map.size() > 0 )
 		{
 			timeMap::iterator it = time_map.begin();
-			while( it+1 != time_map.end() )
+			while (std::next(it) != time_map.end())
 			{
 				// skip this section if it occurs completely before the
 				// visible area
-				int next_x = xCoordOfTick(POS(it+1));
+				const auto nit = std::next(it);
+
+				int next_x = xCoordOfTick(POS(nit));
 				if( next_x < 0 )
 				{
 					++it;
@@ -1334,17 +1349,17 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 				// the next node.
 				float nextValue = m_clip->progressionType() == AutomationClip::ProgressionType::Discrete
 					? OUTVAL(it)
-					: INVAL(it + 1);
+					: INVAL(nit);
 
 				p.setRenderHints( QPainter::Antialiasing, true );
 				QPainterPath path;
 				path.moveTo(QPointF(xCoordOfTick(POS(it)), yCoordOfLevel(0)));
-				for (int i = 0; i < POS(it + 1) - POS(it); i++)
+				for (int i = 0; i < POS(nit) - POS(it); ++i)
 				{
 					path.lineTo(QPointF(xCoordOfTick(POS(it) + i), yCoordOfLevel(values[i])));
 				}
-				path.lineTo(QPointF(xCoordOfTick(POS(it + 1)), yCoordOfLevel(nextValue)));
-				path.lineTo(QPointF(xCoordOfTick(POS(it + 1)), yCoordOfLevel(0)));
+				path.lineTo(QPointF(xCoordOfTick(POS(nit)), yCoordOfLevel(nextValue)));
+				path.lineTo(QPointF(xCoordOfTick(POS(nit)), yCoordOfLevel(0)));
 				path.lineTo(QPointF(xCoordOfTick(POS(it)), yCoordOfLevel(0)));
 				p.fillPath(path, m_graphColor);
 				p.setRenderHints( QPainter::Antialiasing, false );
@@ -1379,6 +1394,22 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 				drawAutomationTangents(p, it);
 			}
 		}
+
+		// draw clip bounds overlay
+		p.fillRect(
+			xCoordOfTick(m_clip->length() - m_clip->startTimeOffset()),
+			TOP_MARGIN,
+			width() - 10,
+			grid_bottom,
+			m_outOfBoundsShade
+		);
+		p.fillRect(
+			0,
+			TOP_MARGIN,
+			xCoordOfTick(-m_clip->startTimeOffset()),
+			grid_bottom,
+			m_outOfBoundsShade
+		);
 	}
 	else
 	{
@@ -1395,7 +1426,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 	}
 
 	// TODO: Get this out of paint event
-	int l = validClip() ? (int) m_clip->length() : 0;
+	int l = validClip() ? (int) m_clip->length() - m_clip->startTimeOffset() : 0;
 
 	// reset scroll-range
 	if( m_leftRightScroll->maximum() != l )
@@ -1613,7 +1644,7 @@ void AutomationEditor::wheelEvent(QWheelEvent * we )
 		}
 		x = qBound( 0, x, m_zoomingXModel.size() - 1 );
 
-		int mouseX = (position( we ).x() - VALUES_WIDTH)* TimePos::ticksPerBar();
+		int mouseX = (we->position().toPoint().x() - VALUES_WIDTH) * TimePos::ticksPerBar();
 		// ticks based on the mouse x-position where the scroll wheel was used
 		int ticks = mouseX / m_ppb;
 		// what would be the ticks in the new zoom level on the very same mouse x
@@ -1627,7 +1658,7 @@ void AutomationEditor::wheelEvent(QWheelEvent * we )
 	}
 
 	// FIXME: Reconsider if determining orientation is necessary in Qt6.
-	else if(abs(we->angleDelta().x()) > abs(we->angleDelta().y())) // scrolling is horizontal
+	else if (std::abs(we->angleDelta().x()) > std::abs(we->angleDelta().y())) // scrolling is horizontal
 	{
 		adjustLeftRightScoll(we->angleDelta().x());
 	}
@@ -2037,17 +2068,18 @@ AutomationEditorWindow::AutomationEditorWindow() :
 
 	auto editModeGroup = new ActionGroup(this);
 	m_drawAction = editModeGroup->addAction(embed::getIconPixmap("edit_draw"), tr("Draw mode (Shift+D)"));
-	m_drawAction->setShortcut(Qt::SHIFT | Qt::Key_D);
+
+	m_drawAction->setShortcut(keySequence(Qt::SHIFT, Qt::Key_D));
 	m_drawAction->setChecked(true);
 
 	m_eraseAction = editModeGroup->addAction(embed::getIconPixmap("edit_erase"), tr("Erase mode (Shift+E)"));
-	m_eraseAction->setShortcut(Qt::SHIFT | Qt::Key_E);
+	m_eraseAction->setShortcut(keySequence(Qt::SHIFT, Qt::Key_E));
 
 	m_drawOutAction = editModeGroup->addAction(embed::getIconPixmap("edit_draw_outvalue"), tr("Draw outValues mode (Shift+C)"));
-	m_drawOutAction->setShortcut(Qt::SHIFT | Qt::Key_C);
+	m_drawOutAction->setShortcut(keySequence(Qt::SHIFT, Qt::Key_C));
 
 	m_editTanAction = editModeGroup->addAction(embed::getIconPixmap("edit_tangent"), tr("Edit tangents mode (Shift+T)"));
-	m_editTanAction->setShortcut(Qt::SHIFT | Qt::Key_T);
+	m_editTanAction->setShortcut(keySequence(Qt::SHIFT, Qt::Key_T));
 	m_editTanAction->setEnabled(false);
 
 	m_flipYAction = new QAction(embed::getIconPixmap("flip_y"), tr("Flip vertically"), this);

@@ -31,6 +31,7 @@
 #include <QDropEvent>
 #include <QGridLayout>
 #include <QPushButton>
+#include <QRegularExpression>
 
 #include "ZynAddSubFx.h"
 #include "ConfigManager.h"
@@ -109,7 +110,7 @@ ZynAddSubFxInstrument::ZynAddSubFxInstrument(
 	m_plugin( nullptr ),
 	m_remotePlugin( nullptr ),
 	m_portamentoModel( 0, 0, 127, 1, this, tr( "Portamento" ) ),
-	m_filterFreqModel( 127, 0, 127, 1, this, tr( "Filter frequency" ) ),
+	m_filterFreqModel( 64, 0, 127, 1, this, tr( "Filter frequency" ) ),
 	m_filterQModel( 64, 0, 127, 1, this, tr( "Filter resonance" ) ),
 	m_bandwidthModel( 64, 0, 127, 1, this, tr( "Bandwidth" ) ),
 	m_fmGainModel( 127, 0, 127, 1, this, tr( "FM gain" ) ),
@@ -143,11 +144,6 @@ ZynAddSubFxInstrument::ZynAddSubFxInstrument(
 
 	connect( instrumentTrack()->pitchRangeModel(), SIGNAL( dataChanged() ),
 			this, SLOT( updatePitchRange() ), Qt::DirectConnection );
-
-	// ZynAddSubFX's internal value that LMMS's FREQ knob controls
-	// isn't set properly when the instrument is first loaded in,
-	// and doesn't update until the FREQ knob is moved
-	updateFilterFreq();
 }
 
 
@@ -512,33 +508,26 @@ ZynAddSubFxView::ZynAddSubFxView( Instrument * _instrument, QWidget * _parent ) 
 	l->setVerticalSpacing( 16 );
 	l->setHorizontalSpacing( 10 );
 
-	m_portamento = new Knob( KnobType::Bright26, this );
+	m_portamento = new Knob(KnobType::Bright26, tr("PORT"), SMALL_FONT_SIZE, this);
 	m_portamento->setHintText( tr( "Portamento:" ), "" );
-	m_portamento->setLabel( tr( "PORT" ) );
 
-	m_filterFreq = new Knob( KnobType::Bright26, this );
+	m_filterFreq = new Knob(KnobType::Bright26, tr("FREQ"), SMALL_FONT_SIZE, this);
 	m_filterFreq->setHintText( tr( "Filter frequency:" ), "" );
-	m_filterFreq->setLabel( tr( "FREQ" ) );
 
-	m_filterQ = new Knob( KnobType::Bright26, this );
+	m_filterQ = new Knob(KnobType::Bright26, tr("RES"), SMALL_FONT_SIZE, this);
 	m_filterQ->setHintText( tr( "Filter resonance:" ), "" );
-	m_filterQ->setLabel( tr( "RES" ) );
 
-	m_bandwidth = new Knob( KnobType::Bright26, this );
+	m_bandwidth = new Knob(KnobType::Bright26, tr("BW"), SMALL_FONT_SIZE, this);
 	m_bandwidth->setHintText( tr( "Bandwidth:" ), "" );
-	m_bandwidth->setLabel( tr( "BW" ) );
 
-	m_fmGain = new Knob( KnobType::Bright26, this );
+	m_fmGain = new Knob(KnobType::Bright26, tr("FM GAIN"), SMALL_FONT_SIZE, this);
 	m_fmGain->setHintText( tr( "FM gain:" ), "" );
-	m_fmGain->setLabel( tr( "FM GAIN" ) );
 
-	m_resCenterFreq = new Knob( KnobType::Bright26, this );
+	m_resCenterFreq = new Knob(KnobType::Bright26, tr("RES CF"), SMALL_FONT_SIZE, this);
 	m_resCenterFreq->setHintText( tr( "Resonance center frequency:" ), "" );
-	m_resCenterFreq->setLabel( tr( "RES CF" ) );
 
-	m_resBandwidth = new Knob( KnobType::Bright26, this );
+	m_resBandwidth = new Knob(KnobType::Bright26, tr("RES BW"), SMALL_FONT_SIZE, this);
 	m_resBandwidth->setHintText( tr( "Resonance bandwidth:" ), "" );
-	m_resBandwidth->setLabel( tr( "RES BW" ) );
 
 	m_forwardMidiCC = new LedCheckBox( tr( "Forward MIDI control changes" ), this );
 

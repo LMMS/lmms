@@ -16,6 +16,7 @@
 [submodule "plugins/Xpressive/exprtk"]
 	path = plugins/Xpressive/exprtk
 	url = https://github.com/ArashPartow/exprtk
+	branch = release
 [submodule "plugins/LadspaEffect/swh/ladspa"]
 	path = plugins/LadspaEffect/swh/ladspa
 	url = https://github.com/swh/ladspa
@@ -46,3 +47,6 @@
 [submodule "src/3rdparty/hiir/hiir"]
 	path = src/3rdparty/hiir/hiir
 	url = https://github.com/LostRobotMusic/hiir
+[submodule "plugins/MidiImport/portsmf"]
+	path = plugins/MidiImport/portsmf
+	url = https://github.com/portsmf/portsmf

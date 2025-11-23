@@ -26,6 +26,7 @@
 #include "CompressorControlDialog.h"
 #include "CompressorControls.h"
 
+#include <cmath>
 #include <QLabel>
 #include <QPainter>
 #include <QWheelEvent>
@@ -34,7 +35,6 @@
 #include "embed.h"
 #include "../Eq/EqFader.h"
 #include "GuiApplication.h"
-#include "interpolation.h"
 #include "Knob.h"
 #include "MainWindow.h"
 #include "PixmapButton.h"
@@ -48,7 +48,6 @@ CompressorControlDialog::CompressorControlDialog(CompressorControls* controls) :
 	m_controls(controls)
 {
 	setAutoFillBackground(false);
-	setAttribute(Qt::WA_OpaquePaintEvent, true);
 	setAttribute(Qt::WA_NoSystemBackground, true);
 	
 	setMinimumSize(MIN_COMP_SCREEN_X, MIN_COMP_SCREEN_Y);
@@ -196,7 +195,7 @@ CompressorControlDialog::CompressorControlDialog(CompressorControls* controls) :
 	peakButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("peak_unsel"));
 	peakButton->setToolTip(tr("Use absolute value of the input"));
 
-	rmsPeakGroup = new automatableButtonGroup(this);
+	rmsPeakGroup = new AutomatableButtonGroup(this);
 	rmsPeakGroup->addButton(rmsButton);
 	rmsPeakGroup->addButton(peakButton);
 	rmsPeakGroup->setModel(&controls->m_peakmodeModel);
@@ -211,7 +210,7 @@ CompressorControlDialog::CompressorControlDialog(CompressorControls* controls) :
 	midSideButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("midside_unsel"));
 	midSideButton->setToolTip(tr("Compress mid and side audio"));
 
-	leftRightMidSideGroup = new automatableButtonGroup(this);
+	leftRightMidSideGroup = new AutomatableButtonGroup(this);
 	leftRightMidSideGroup->addButton(leftRightButton);
 	leftRightMidSideGroup->addButton(midSideButton);
 	leftRightMidSideGroup->setModel(&controls->m_midsideModel);
@@ -226,7 +225,7 @@ CompressorControlDialog::CompressorControlDialog(CompressorControls* controls) :
 	limitButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("limiter_unsel"));
 	limitButton->setToolTip(tr("Set Ratio to infinity (is not guaranteed to limit audio volume)"));
 
-	compressLimitGroup = new automatableButtonGroup(this);
+	compressLimitGroup = new AutomatableButtonGroup(this);
 	compressLimitGroup->addButton(compressButton);
 	compressLimitGroup->addButton(limitButton);
 	compressLimitGroup->setModel(&controls->m_limiterModel);
@@ -256,7 +255,7 @@ CompressorControlDialog::CompressorControlDialog(CompressorControls* controls) :
 	blendButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("blend_unsel"));
 	blendButton->setToolTip(tr("Blend between stereo linking modes"));
 
-	stereoLinkGroup = new automatableButtonGroup(this);
+	stereoLinkGroup = new AutomatableButtonGroup(this);
 	stereoLinkGroup->addButton(unlinkedButton);
 	stereoLinkGroup->addButton(maximumButton);
 	stereoLinkGroup->addButton(averageButton);
@@ -437,7 +436,11 @@ void CompressorControlDialog::drawVisPixmap()
 	m_p.setPen(QPen(m_inVolAreaColor, 1));
 	for (int i = 0; i < m_compPixelMovement; ++i)
 	{
-		const int temp = linearInterpolate(m_lastPoint, m_yPoint, float(i) / float(m_compPixelMovement));
+		const int temp = std::lerp(
+			m_lastPoint,
+			m_yPoint,
+			static_cast<float>(i) / static_cast<float>(m_compPixelMovement)
+		);
 		m_p.drawLine(m_windowSizeX-m_compPixelMovement+i, temp, m_windowSizeX-m_compPixelMovement+i, m_windowSizeY);
 	}
 
@@ -449,7 +452,11 @@ void CompressorControlDialog::drawVisPixmap()
 	m_p.setPen(QPen(m_outVolAreaColor, 1));
 	for (int i = 0; i < m_compPixelMovement; ++i)
 	{
-		const int temp = linearInterpolate(m_lastPoint+m_lastGainPoint, m_yPoint+m_yGainPoint, float(i) / float(m_compPixelMovement));
+		const int temp = std::lerp(
+			m_lastPoint + m_lastGainPoint,
+			m_yPoint + m_yGainPoint,
+			static_cast<float>(i) / static_cast<float>(m_compPixelMovement)
+		);
 		m_p.drawLine(m_windowSizeX-m_compPixelMovement+i, temp, m_windowSizeX-m_compPixelMovement+i, m_windowSizeY);
 	}
 
@@ -512,7 +519,7 @@ void CompressorControlDialog::redrawKnee()
 		// Draw knee curve using many straight lines.
 		for (int i = 0; i < COMP_KNEE_LINES; ++i)
 		{
-			newPoint[0] = linearInterpolate(kneePoint1, kneePoint2X, (i + 1) / (float)COMP_KNEE_LINES);
+			newPoint[0] = std::lerp(kneePoint1, kneePoint2X, (i + 1) / static_cast<float>(COMP_KNEE_LINES));
 
 			const float temp = newPoint[0] - thresholdVal + kneeVal;
 			newPoint[1] = (newPoint[0] + (actualRatio - 1) * temp * temp / (4 * kneeVal));

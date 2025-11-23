@@ -40,6 +40,7 @@
 
 #include "base64.h"
 #include "ConfigManager.h"
+#include "DeprecationHelper.h"
 #include "Effect.h"
 #include "embed.h"
 #include "GuiApplication.h"
@@ -85,7 +86,8 @@ const std::vector<DataFile::UpgradeMethod> DataFile::UPGRADE_METHODS = {
 	&DataFile::upgrade_sampleAndHold    ,   &DataFile::upgrade_midiCCIndexing,
 	&DataFile::upgrade_loopsRename      ,   &DataFile::upgrade_noteTypes,
 	&DataFile::upgrade_fixCMTDelays     ,   &DataFile::upgrade_fixBassLoopsTypo,
-	&DataFile::findProblematicLadspaPlugins
+	&DataFile::findProblematicLadspaPlugins,
+	&DataFile::upgrade_noHiddenAutomationTracks
 };
 
 // Vector of all versions that have upgrade routines.
@@ -353,7 +355,7 @@ bool DataFile::writeFile(const QString& filename, bool withResources)
 		if (QDir(bundleDir).exists())
 		{
 			showError(SongEditor::tr("Operation denied"),
-				SongEditor::tr("A bundle folder with that name already eists on the "
+				SongEditor::tr("A bundle folder with that name already exists on the "
 				"selected path. Can't overwrite a project bundle. Please select a different "
 				"name."));
 
@@ -602,6 +604,11 @@ DataFile::Type DataFile::type( const QString& typeName )
 	if( typeName == "channelsettings" )
 	{
 		return Type::InstrumentTrackSettings;
+	}
+
+	if (typeName == "pattern")
+	{
+		return Type::MidiClip;
 	}
 
 	return Type::Unknown;
@@ -1021,19 +1028,19 @@ void DataFile::upgrade_0_4_0_beta1()
 		if( !k.isEmpty() )
 		{
 			const QList<QVariant> l =
-				base64::decode( k, QVariant::List ).toList();
+				base64::decode(k, QMetaType::QVariantList).toList();
 			if( !l.isEmpty() )
 			{
 				QString name = l[0].toString();
 				QVariant u = l[1];
 				EffectKey::AttributeMap m;
 				// VST-effect?
-				if( u.type() == QVariant::String )
+				if (typeId(u) == QMetaType::QString)
 				{
 					m["file"] = u.toString();
 				}
 				// LADSPA-effect?
-				else if( u.type() == QVariant::StringList )
+				else if (typeId(u) == QMetaType::QStringList)
 				{
 					const QStringList sl = u.toStringList();
 					m["plugin"] = sl.value( 0 );
@@ -1638,6 +1645,51 @@ void DataFile::upgrade_1_3_0()
 	}
 }
 
+void DataFile::upgrade_noHiddenAutomationTracks()
+{
+	// convert global automation tracks to non-hidden
+	QDomElement song = firstChildElement("lmms-project")
+		.firstChildElement("song");
+	QDomElement trackContainer = song.firstChildElement("trackcontainer");
+	QDomElement globalAutomationTrack = song.firstChildElement("track");
+	if (!globalAutomationTrack.isNull()
+		&& globalAutomationTrack.attribute("type").toInt() == static_cast<int>(Track::Type::HiddenAutomation))
+	{
+		// global automation clips
+		QDomNodeList automationClips = globalAutomationTrack.elementsByTagName("automationclip");
+		QList<QDomNode> tracksToInsert;
+		for (int i = 0; i < automationClips.length(); ++i)
+		{
+			QDomElement automationClip = automationClips.item(i).toElement();
+			// If automationClip has time nodes, move it to trackcontainer
+			// There are times when an <object> node is present without an
+			// object with the same ID in the file, so we ignore that node
+			if (automationClip.elementsByTagName("time").length() > 1)
+			{
+				QDomElement automationTrackForClip = createElement("track");
+				automationTrackForClip.setAttribute("muted", QString::number(false));
+				automationTrackForClip.setAttribute("solo", QString::number(false));
+				automationTrackForClip.setAttribute("type",
+					QString::number(static_cast<int>(Track::Type::Automation)));
+				automationTrackForClip.setAttribute("name",
+					automationClip.attribute("name", "Automation Track"));
+				QDomElement at = createElement("automationtrack");
+				automationTrackForClip.appendChild(at);
+				automationTrackForClip.appendChild(automationClips.item(i).cloneNode());
+				tracksToInsert.prepend(automationTrackForClip); // To preserve orders
+			}
+		}
+
+		// Insert the tracks at the beginning of trackContainer, preserving their order
+		for (const auto& track : tracksToInsert) {
+			trackContainer.insertBefore(track, trackContainer.firstChild());
+		}
+
+		// Remove the track object just in case
+		globalAutomationTrack.parentNode().removeChild(globalAutomationTrack);
+	}
+}
+
 void DataFile::upgrade_noHiddenClipNames()
 {
 	QDomNodeList tracks = elementsByTagName("track");
@@ -2073,13 +2125,13 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 {
 	QString errorMsg;
 	int line = -1, col = -1;
-	if( !setContent( _data, &errorMsg, &line, &col ) )
+	if (!lmms::setContent(*this, _data, &errorMsg, &line, &col))
 	{
 		// parsing failed? then try to uncompress data
 		QByteArray uncompressed = qUncompress( _data );
 		if( !uncompressed.isEmpty() )
 		{
-			if( setContent( uncompressed, &errorMsg, &line, &col ) )
+			if (lmms::setContent(*this, uncompressed, &errorMsg, &line, &col))
 			{
 				line = col = -1;
 			}

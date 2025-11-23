@@ -29,14 +29,12 @@
 #include <QInputDialog>
 #include <QPainter>
 
-#ifndef __USE_XOPEN
-#define __USE_XOPEN
-#endif
-
 #include "lmms_math.h"
+#include "DeprecationHelper.h"
 #include "CaptionMenu.h"
 #include "ControllerConnection.h"
 #include "GuiApplication.h"
+#include "KeyboardShortcuts.h"
 #include "LocaleHelper.h"
 #include "MainWindow.h"
 #include "ProjectJournal.h"
@@ -159,7 +157,7 @@ void FloatModelEditorBase::dropEvent(QDropEvent * de)
 void FloatModelEditorBase::mousePressEvent(QMouseEvent * me)
 {
 	if (me->button() == Qt::LeftButton &&
-			! (me->modifiers() & Qt::ControlModifier) &&
+			! (me->modifiers() & KBD_COPY_MODIFIER) &&
 			! (me->modifiers() & Qt::ShiftModifier))
 	{
 		AutomatableModel *thisModel = model();
@@ -169,8 +167,7 @@ void FloatModelEditorBase::mousePressEvent(QMouseEvent * me)
 			thisModel->saveJournallingState(false);
 		}
 
-		const QPoint & p = me->pos();
-		m_lastMousePos = p;
+		m_lastMousePos = position(me);
 		m_leftOver = 0.0f;
 
 		emit sliderPressed();
@@ -199,13 +196,15 @@ void FloatModelEditorBase::mousePressEvent(QMouseEvent * me)
 
 void FloatModelEditorBase::mouseMoveEvent(QMouseEvent * me)
 {
-	if (m_buttonPressed && me->pos() != m_lastMousePos)
+	const auto pos = position(me);
+
+	if (m_buttonPressed && pos != m_lastMousePos)
 	{
 		// knob position is changed depending on last mouse position
-		setPosition(me->pos() - m_lastMousePos);
+		setPosition(pos - m_lastMousePos);
 		emit sliderMoved(model()->value());
 		// original position for next time is current position
-		m_lastMousePos = me->pos();
+		m_lastMousePos = pos;
 	}
 	s_textFloat->setText(displayValue());
 	s_textFloat->show();
@@ -232,8 +231,11 @@ void FloatModelEditorBase::mouseReleaseEvent(QMouseEvent* event)
 	s_textFloat->hide();
 }
 
-
-void FloatModelEditorBase::enterEvent(QEvent *event)
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+void FloatModelEditorBase::enterEvent(QEnterEvent*)
+#else
+void FloatModelEditorBase::enterEvent(QEvent*)
+#endif
 {
 	showTextFloat(700, 2000);
 }
@@ -332,13 +334,16 @@ void FloatModelEditorBase::wheelEvent(QWheelEvent * we)
 	}
 
 	// Compute the number of steps but make sure that we always do at least one step
-	const float stepMult = std::max(range / numberOfStepsForFullSweep / step, 1.f);
+	const float currentValue = model()->value();
+	const float valueOffset = range / numberOfStepsForFullSweep;
+	const float scaledValueOffset = model()->scaledValue(model()->inverseScaledValue(currentValue) + valueOffset) - currentValue;
+	const float stepMult = std::max(scaledValueOffset / step, 1.f);
 	const int inc = direction * stepMult;
 	model()->incValue(inc);
 
 	s_textFloat->setText(displayValue());
 	s_textFloat->moveGlobal(this, QPoint(width() + 2, 0));
-	s_textFloat->setVisibilityTimeOut(1000);
+	s_textFloat->showWithTimeout(1000);
 
 	emit sliderMoved(model()->value());
 }
@@ -346,40 +351,26 @@ void FloatModelEditorBase::wheelEvent(QWheelEvent * we)
 
 void FloatModelEditorBase::setPosition(const QPoint & p)
 {
-	const float value = getValue(p) + m_leftOver;
+	const float valueOffset = getValue(p) + m_leftOver;
+	const float currentValue = model()->value();
+	const float scaledValueOffset = currentValue - model()->scaledValue(model()->inverseScaledValue(currentValue) - valueOffset);
 	const auto step = model()->step<float>();
-	const float oldValue = model()->value();
+	const float roundedValue = std::round((currentValue - scaledValueOffset) / step) * step;
 
-	if (model()->isScaleLogarithmic()) // logarithmic code
+	if (!approximatelyEqual(roundedValue, currentValue))
 	{
-		const float pos = model()->minValue() < 0
-			? oldValue / qMax(qAbs(model()->maxValue()), qAbs(model()->minValue()))
-			: (oldValue - model()->minValue()) / model()->range();
-		const float ratio = 0.1f + qAbs(pos) * 15.f;
-		float newValue = value * ratio;
-		if (qAbs(newValue) >= step)
-		{
-			float roundedValue = qRound((oldValue - value) / step) * step;
-			model()->setValue(roundedValue);
-			m_leftOver = 0.0f;
-		}
-		else
-		{
-			m_leftOver = value;
-		}
+		model()->setValue(roundedValue);
+		m_leftOver = 0.0f;
 	}
-
-	else // linear code
+	else
 	{
-		if (qAbs(value) >= step)
+		if (valueOffset > 0 && approximatelyEqual(currentValue, model()->minValue()))
 		{
-			float roundedValue = qRound((oldValue - value) / step) * step;
-			model()->setValue(roundedValue);
 			m_leftOver = 0.0f;
 		}
 		else
 		{
-			m_leftOver = value;
+			m_leftOver = valueOffset;
 		}
 	}
 }
@@ -390,8 +381,7 @@ void FloatModelEditorBase::enterValue()
 	bool ok;
 	float new_val;
 
-	if (isVolumeKnob() &&
-		ConfigManager::inst()->value("app", "displaydbfs").toInt())
+	if (isVolumeKnob())
 	{
 		auto const initalValue = model()->getRoundedValue() / 100.0;
 		auto const initialDbValue = initalValue > 0. ? ampToDbfs(initalValue) : -96;
@@ -444,8 +434,7 @@ void FloatModelEditorBase::friendlyUpdate()
 
 QString FloatModelEditorBase::displayValue() const
 {
-	if (isVolumeKnob() &&
-		ConfigManager::inst()->value("app", "displaydbfs").toInt())
+	if (isVolumeKnob())
 	{
 		auto const valueToVolumeRatio = model()->getRoundedValue() / volumeRatio();
 		return m_description.trimmed() + (
