@@ -504,7 +504,7 @@ private:
 	bar_t m_elapsedBars;
 
 	VstSyncController m_vstSyncController;
-	
+
 	int m_loopRenderCount;
 	int m_loopRenderRemaining;
 	TimePos m_exportSongBegin;
