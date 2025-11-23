@@ -64,6 +64,7 @@ protected:
 
 
 private:
+	void exportClip();
 	SampleClip * m_clip;
 	SampleThumbnail m_sampleThumbnail;
 	QPixmap m_paintPixmap;

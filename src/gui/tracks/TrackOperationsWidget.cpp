@@ -38,6 +38,11 @@
 #include "ColorChooser.h"
 #include "ConfigManager.h"
 #include "DataFile.h"
+#include "ExportProjectDialog.h"
+#include "FileDialog.h"
+#include "ProjectRenderer.h"
+#include "SampleClip.h"
+#include "TimePos.h"
 #include "embed.h"
 #include "Engine.h"
 #include "InstrumentTrackView.h"
@@ -234,6 +239,22 @@ void TrackOperationsWidget::clearTrack()
 	t->unlock();
 }
 
+/*! \brief Export this track to an audio file and add it to the project */
+void TrackOperationsWidget::exportTrack()
+{
+	// TODO: FileDialog would not be needed here if we had a dedicated place to put these files in
+	auto dialog = FileDialog{};
+	dialog.setFileMode(FileDialog::Directory);
+	dialog.setAcceptMode(FileDialog::AcceptSave);
+	dialog.setDirectory(ConfigManager::inst()->userProjectsDir());
+	dialog.setWindowTitle(tr("Select directory for writing the exported track..."));
+
+	if (dialog.exec() == QDialog::Accepted)
+	{
+		auto exportDialog = ExportProjectDialog::exportTrack(dialog.selectedFiles()[0], m_trackView->getTrack());
+		exportDialog.exec();
+	}
+}
 
 /*! \brief Remove this track from the track list
  *
@@ -312,6 +333,12 @@ void TrackOperationsWidget::updateMenu()
 	{
 		toMenu->addAction( tr( "Clear this track" ), this, SLOT(clearTrack()));
 	}
+
+	if (!dynamic_cast<AutomationTrackView*>(m_trackView))
+	{
+		toMenu->addAction(tr("Export this track"), this, &TrackOperationsWidget::exportTrack);
+	}
+
 	if (QMenu *mixerMenu = m_trackView->createMixerMenu(tr("Channel %1: %2"), tr("Assign to new Mixer Channel")))
 	{
 		toMenu->addMenu(mixerMenu);

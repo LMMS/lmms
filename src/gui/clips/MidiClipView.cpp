@@ -25,17 +25,18 @@
 
 #include "MidiClipView.h"
 
-
-#include <algorithm>
 #include <QApplication>
 #include <QInputDialog>
 #include <QMenu>
 #include <QPainter>
+#include <algorithm>
 #include <set>
 
 #include "AutomationEditor.h"
 #include "ConfigManager.h"
 #include "DeprecationHelper.h"
+#include "ExportProjectDialog.h"
+#include "FileDialog.h"
 #include "GuiApplication.h"
 #include "InstrumentTrackView.h"
 #include "MidiClip.h"
@@ -233,6 +234,9 @@ void MidiClipView::constructContextMenu( QMenu * _cm )
 	{
 		_cm->addAction(embed::getIconPixmap("scale"), tr("Transpose"), this, &MidiClipView::transposeSelection);
 	}
+
+	_cm->addAction(embed::getIconPixmap("sample_track"), tr("Export clip"), this, &MidiClipView::exportClip);
+
 	_cm->addSeparator();
 
 	_cm->addAction( embed::getIconPixmap( "reload" ), tr( "Reset name" ),
@@ -938,5 +942,20 @@ bool MidiClipView::destructiveSplitClip(const TimePos pos)
 	return true;
 }
 
+void MidiClipView::exportClip()
+{
+	// TODO: FileDialog would not be needed here if we had a dedicated place to put these files in
+	auto dialog = FileDialog{};
+	dialog.setFileMode(FileDialog::Directory);
+	dialog.setAcceptMode(FileDialog::AcceptSave);
+	dialog.setDirectory(ConfigManager::inst()->userProjectsDir());
+	dialog.setWindowTitle(tr("Select directory for writing the exported track..."));
+
+	if (dialog.exec() == QDialog::Accepted)
+	{
+		auto exportDialog = ExportProjectDialog::exportClip(dialog.selectedFiles()[0], m_clip);
+		exportDialog.exec();
+	}
+}
 
 } // namespace lmms::gui
