@@ -39,7 +39,7 @@ SimpleTextFloat::SimpleTextFloat() :
 	QWidget(getGUI()->mainWindow(), Qt::ToolTip)
 {
 	QHBoxLayout * layout = new QHBoxLayout(this);
-	layout->setMargin(3);
+	layout->setContentsMargins(3, 3, 3, 3);
 	setLayout(layout);
 
 	m_textLabel = new QLabel(this);

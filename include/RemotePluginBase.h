@@ -248,20 +248,6 @@ public:
 
 
 private:
-	static inline void fastMemCpy( void * _dest, const void * _src,
-							const int _len )
-	{
-		// calling memcpy() for just an integer is obsolete overhead
-		if( _len == 4 )
-		{
-			*( (int32_t *) _dest ) = *( (int32_t *) _src );
-		}
-		else
-		{
-			memcpy( _dest, _src, _len );
-		}
-	}
-
 	void read( void * _buf, int _len )
 	{
 		if( isInvalid() )
@@ -279,7 +265,7 @@ private:
 #endif
 			lock();
 		}
-		fastMemCpy( _buf, m_data->data + m_data->startPtr, _len );
+		std::memcpy(_buf, m_data->data + m_data->startPtr, _len);
 		m_data->startPtr += _len;
 		// nothing left?
 		if( m_data->startPtr == m_data->endPtr )
@@ -315,7 +301,7 @@ private:
 #endif
 			lock();
 		}
-		fastMemCpy( m_data->data + m_data->endPtr, _buf, _len );
+		std::memcpy(m_data->data + m_data->endPtr, _buf, _len);
 		m_data->endPtr += _len;
 		unlock();
 	}

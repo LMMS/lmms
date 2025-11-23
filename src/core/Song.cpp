@@ -499,7 +499,6 @@ void Song::playSong()
 	}
 
 	m_playMode = PlayMode::Song;
-	m_lastPlayMode = m_playMode;
 	m_playing = true;
 	m_paused = false;
 
@@ -539,7 +538,6 @@ void Song::playPattern()
 	}
 
 	m_playMode = PlayMode::Pattern;
-	m_lastPlayMode = m_playMode;
 	m_playing = true;
 	m_paused = false;
 
@@ -566,7 +564,6 @@ void Song::playMidiClip( const MidiClip* midiClipToPlay, bool loop )
 	if( m_midiClipToPlay != nullptr )
 	{
 		m_playMode = PlayMode::MidiClip;
-		m_lastPlayMode = m_playMode;
 		m_playing = true;
 		m_paused = false;
 	}
@@ -1060,11 +1057,7 @@ void Song::loadProject( const QString & fileName )
 			{
 				QTextStream(stderr) << tr("Can't load project: "
 					"Project file contains local paths to plugins.")
-#if (QT_VERSION >= QT_VERSION_CHECK(5,15,0))
 					<< Qt::endl;
-#else
-					<< endl;
-#endif
 			}
 		}
 	}
@@ -1219,11 +1212,7 @@ void Song::loadProject( const QString & fileName )
 		}
 		else
 		{
-#if (QT_VERSION >= QT_VERSION_CHECK(5,15,0))
 			QTextStream(stderr) << Engine::getSong()->errorSummary() << Qt::endl;
-#else
-			QTextStream(stderr) << Engine::getSong()->errorSummary() << endl;
-#endif
 		}
 	}
 

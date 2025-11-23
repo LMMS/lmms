@@ -26,6 +26,7 @@
 #ifndef WATSYN_H
 #define WATSYN_H
 
+#include "AudioResampler.h"
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "Graph.h"
@@ -187,28 +188,23 @@ private:
 	}
 
 	// memcpy utilizing libsamplerate (src) for sinc interpolation
-	inline void srccpy( float * _dst, float * _src )
+	inline void srccpy(float* _dst, float* _src)
 	{
-		int err;
-		const int margin = 64;
-		
-		// copy to temp array
-		float tmps [ GRAPHLEN + margin ]; // temp array in stack
-		float * tmp = &tmps[0];
+		auto srcIndex = f_cnt_t{0};
+		auto dstIndex = f_cnt_t{0};
 
-		memcpy( tmp, _src, sizeof( float ) * GRAPHLEN );
-		memcpy( tmp + GRAPHLEN, _src, sizeof( float ) * margin );
-		SRC_STATE * src_state = src_new( SRC_SINC_FASTEST, 1, &err );
-		SRC_DATA src_data;
-		src_data.data_in = tmp;
-		src_data.input_frames = GRAPHLEN + margin;
-		src_data.data_out = _dst;
-		src_data.output_frames = WAVELEN;
-		src_data.src_ratio = static_cast<double>( WAVERATIO );
-		src_data.end_of_input = 0;
-		err = src_process( src_state, &src_data ); 
-		if( err ) { qDebug( "Watsyn SRC error: %s", src_strerror( err ) ); }
-		src_delete( src_state );
+		m_resampler.reset();
+		m_resampler.setRatio(WAVERATIO);
+
+		while (dstIndex < WAVELEN)
+		{
+			const auto input = InterleavedBufferView<const float, 1>{_src + srcIndex, GRAPHLEN - srcIndex};
+			const auto output = InterleavedBufferView<float, 1>{_dst + dstIndex, WAVELEN - dstIndex};
+			const auto result = m_resampler.process(input, output);
+
+			srcIndex = (srcIndex + result.inputFramesUsed) % GRAPHLEN;
+			dstIndex += result.outputFramesGenerated;
+		}
 	}
 
 	// memcpy utilizing cubic interpolation
@@ -242,6 +238,7 @@ private:
 		}
 	}*/
 
+	AudioResampler m_resampler = AudioResampler{AudioResampler::Mode::SincFastest, 1};
 
 	FloatModel a1_vol;
 	FloatModel a2_vol;

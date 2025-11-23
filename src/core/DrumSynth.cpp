@@ -26,6 +26,7 @@
 #include "DrumSynth.h"
 
 #include <QFile>
+#include <array>
 #include <cmath>
 #include <cstring>
 #include <sstream>
@@ -48,7 +49,7 @@ const int PNT = 2;
 const int dENV = 3;
 const int NEXTT = 4;
 
-// Bah, I'll move these into the class once I sepearate DrumsynthFile from DrumSynth
+// Bah, I'll move these into the class once I separate DrumsynthFile from DrumSynth
 // llama
 float envpts[8][3][32];	 // envelope/time-level/point
 float envData[8][6];	 // envelope running status
@@ -185,14 +186,14 @@ float DrumSynth::waveform(float ph, int form)
 	return (saw01 < 0.5f) ? 1.f : -1.f;
 }
 
-int DrumSynth::GetPrivateProfileString(
-	const char* sec, const char* key, const char* def, char* buffer, int size, QString file)
+std::size_t DrumSynth::GetPrivateProfileString(const char* sec,
+	const char* key, const char* def, char* buffer, std::size_t size,
+	QString file)
 {
+	const auto maxlen = std::max(std::size_t{1}, size) - 1; // TODO C++26: Use std::sub_sat(size, 1)
 	stringstream is;
 	bool inSection = false;
-	int len = 0;
-
-	char* line = static_cast<char*>(malloc(200));
+	std::array<char, 200> line = {};
 
 	// Use QFile to handle unicode file name on Windows
 	// Previously we used ifstream directly
@@ -201,68 +202,47 @@ int DrumSynth::GetPrivateProfileString(
 	QByteArray dat = f.readAll().constData();
 	is.str(string(dat.constData(), dat.size()));
 
+	// If buffer[0] isn't overwritten after reading file, default value
+	// `def` will be used.
+	std::memset(buffer, '\0', size);
+
 	while (is.good())
 	{
 		if (!inSection)
 		{
 			is.ignore(numeric_limits<streamsize>::max(), '[');
-
 			if (!is.eof())
 			{
-				is.getline(line, 200, ']');
-				if (strcasecmp(line, sec) == 0)
-				{
-					inSection = true;
-				}
+				is.getline(line.data(), line.size(), ']');
+				if (!strcasecmp(line.data(), sec)) { inSection = true; }
 			}
 		}
 		else if (!is.eof())
 		{
-			is.getline(line, 200);
-			if (line[0] == '[')
+			is.getline(line.data(), line.size());
+			if (line[0] == '[') { break; }
+
+			char* k = std::strtok(line.data(), " \t=");
+			char* b = std::strtok(nullptr, "\n\r\0");
+			if (k && !strcasecmp(k, key))
 			{
-				break;
-			}
-
-			char* k = strtok(line, " \t=");
-			char* b = strtok(nullptr, "\n\r\0");
-
-			if (k != 0 && strcasecmp(k, key) == 0)
-			{
-				if (b == 0)
+				if (b)
 				{
-					len = 0;
-					buffer[0] = 0;
-				}
-				else
-				{
-					k = static_cast<char*>(b + strlen(b) - 1);
-					while ((k >= b) && (*k == ' ' || *k == '\t'))
-					{
-						--k;
-					}
-					*(k + 1) = '\0';
-
-					len = strlen(b);
-					if (len > size - 1)
-					{
-						len = size - 1;
-					}
-					strncpy(buffer, b, len + 1);
+					// Trim trailing whitespace
+					k = &b[std::strlen(b)];
+					while (k >= b && (*k == ' ' || *k == '\t')) { --k; }
+					k[1] = '\0'; // k == b - 1 when string is empty or all whitespace
+					std::strncpy(buffer, b, maxlen);
 				}
 				break;
 			}
 		}
 	}
 
-	if (len == 0)
-	{
-		len = strlen(def);
-		strncpy(buffer, def, size);
-	}
-
-	free(line);
-
+	// Use default value `def` if value is missing
+	if (!buffer[0]) { std::strncpy(buffer, def, maxlen); }
+	// Since nothing ever copies past `maxlen`, buffer must be null-terminated
+	const auto len = std::strlen(buffer);
 	return len;
 }
 
@@ -345,7 +325,7 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sa
 	}
 
 	// try to read version from input file
-	strcpy(sec, "General");
+	std::strcpy(sec, "General");
 	GetPrivateProfileString(sec, "Version", "", ver, sizeof(ver), dsfile);
 	ver[9] = 0;
 	if ((strcasecmp(ver, "DrumSynth") != 0) // input fail
@@ -398,7 +378,7 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sa
 	GetEnv(7, sec, "FilterEnv", dsfile);
 
 	// read noise parameters
-	strcpy(sec, "Noise");
+	std::strcpy(sec, "Noise");
 	chkOn[1] = GetPrivateProfileInt(sec, "On", 0, dsfile);
 	sliLev[1] = GetPrivateProfileInt(sec, "Level", 0, dsfile);
 	NT = GetPrivateProfileInt(sec, "Slope", 0, dsfile);
@@ -423,7 +403,7 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sa
 	// srand(1); //fixed random sequence
 
 	// read tone parameters
-	strcpy(sec, "Tone");
+	std::strcpy(sec, "Tone");
 	chkOn[0] = GetPrivateProfileInt(sec, "On", 0, dsfile);
 	TON = chkOn[0];
 	sliLev[0] = GetPrivateProfileInt(sec, "Level", 128, dsfile);
@@ -452,7 +432,7 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sa
 	Tphi = GetPrivateProfileFloat(sec, "Phase", 90.f, dsfile) / 57.29578f; // degrees>radians
 
 	// read overtone parameters
-	strcpy(sec, "Overtones");
+	std::strcpy(sec, "Overtones");
 	chkOn[2] = GetPrivateProfileInt(sec, "On", 0, dsfile);
 	OON = chkOn[2];
 	sliLev[2] = GetPrivateProfileInt(sec, "Level", 128, dsfile);
@@ -497,7 +477,7 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sa
 	}
 
 	// read noise band parameters
-	strcpy(sec, "NoiseBand");
+	std::strcpy(sec, "NoiseBand");
 	chkOn[3] = GetPrivateProfileInt(sec, "On", 0, dsfile);
 	BON = chkOn[3];
 	sliLev[3] = GetPrivateProfileInt(sec, "Level", 128, dsfile);
@@ -510,7 +490,7 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sa
 	BQ = BQ * BQ / (10000.f - 6600.f * (std::sqrt(BF) - 0.19f));
 	BFStep = 1 + static_cast<int>((40.f - (BFStep / 2.5f)) / (BQ + 1.f + (1.f * BF)));
 
-	strcpy(sec, "NoiseBand2");
+	std::strcpy(sec, "NoiseBand2");
 	chkOn[4] = GetPrivateProfileInt(sec, "On", 0, dsfile);
 	BON2 = chkOn[4];
 	sliLev[4] = GetPrivateProfileInt(sec, "Level", 128, dsfile);
@@ -524,7 +504,7 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sa
 	BFStep2 = 1 + static_cast<int>((40 - (BFStep2 / 2.5)) / (BQ2 + 1 + (1 * BF2)));
 
 	// read distortion parameters
-	strcpy(sec, "Distortion");
+	std::strcpy(sec, "Distortion");
 	chkOn[5] = GetPrivateProfileInt(sec, "On", 0, dsfile);
 	DiON = chkOn[5];
 	DStep = 1 + GetPrivateProfileInt(sec, "Rate", 0, dsfile);

@@ -89,7 +89,6 @@ void SlicerT::playNote(NotePlayHandle* handle, SampleFrame* workingBuffer)
 	float speedRatio = static_cast<float>(m_originalBPM.value()) / bpm;
 	if (!m_enableSync.value()) { speedRatio = 1; }
 	speedRatio *= pitchRatio;
-	speedRatio *= Engine::audioEngine()->outputSampleRate() / static_cast<float>(m_originalSample.sampleRate());
 
 	float sliceStart, sliceEnd;
 	if (noteIndex == 0) // full sample at base note
@@ -109,35 +108,21 @@ void SlicerT::playNote(NotePlayHandle* handle, SampleFrame* workingBuffer)
 		return;
 	}
 
-	if (!handle->m_pluginData) { handle->m_pluginData = new PlaybackState(sliceStart); }
-	auto playbackState = static_cast<PlaybackState*>(handle->m_pluginData);
+	const auto startFrame = static_cast<int>(sliceStart * m_originalSample.sampleSize());
+	if (!handle->m_pluginData) { handle->m_pluginData = new Sample::PlaybackState(AudioResampler::Mode::Linear, startFrame); }
 
-	float noteDone = playbackState->noteDone();
-	float noteLeft = sliceEnd - noteDone;
+	auto playbackState = static_cast<Sample::PlaybackState*>(handle->m_pluginData);
+	const auto endFrame = sliceEnd * m_originalSample.sampleSize();
+	const auto framesLeft = endFrame - playbackState->frameIndex();
 
-	if (noteLeft > 0)
+	if (framesLeft > 0
+		&& m_originalSample.play(workingBuffer + offset, playbackState, frames, Sample::Loop::Off, speedRatio))
 	{
-		int noteFrame = noteDone * m_originalSample.sampleSize();
-
-		SRC_STATE* resampleState = playbackState->resamplingState();
-		SRC_DATA resampleData;
-		resampleData.data_in = (m_originalSample.data() + noteFrame)->data();
-		resampleData.data_out = (workingBuffer + offset)->data();
-		resampleData.input_frames = noteLeft * m_originalSample.sampleSize();
-		resampleData.output_frames = frames;
-		resampleData.src_ratio = speedRatio;
-
-		src_process(resampleState, &resampleData);
-
-		float nextNoteDone = noteDone + frames * (1.0f / speedRatio) / m_originalSample.sampleSize();
-		playbackState->setNoteDone(nextNoteDone);
-
 		// exponential fade out, applyRelease() not used since it extends the note length
 		int fadeOutFrames = m_fadeOutFrames.value() / 1000.0f * Engine::audioEngine()->outputSampleRate();
-		int noteFramesLeft = noteLeft * m_originalSample.sampleSize() * speedRatio;
 		for (auto i = std::size_t{0}; i < frames; i++)
 		{
-			float fadeValue = static_cast<float>(noteFramesLeft - static_cast<int>(i)) / fadeOutFrames;
+			float fadeValue = static_cast<float>(framesLeft * speedRatio - static_cast<int>(i)) / fadeOutFrames;
 			fadeValue = std::clamp(fadeValue, 0.0f, 1.0f);
 			fadeValue = cosinusInterpolate(0, 1, fadeValue);
 
@@ -145,14 +130,15 @@ void SlicerT::playNote(NotePlayHandle* handle, SampleFrame* workingBuffer)
 			workingBuffer[i + offset][1] *= fadeValue;
 		}
 
-		emit isPlaying(noteDone, sliceStart, sliceEnd);
+		const auto currentNote = static_cast<float>(playbackState->frameIndex()) / m_originalSample.sampleSize();
+		emit isPlaying(currentNote, sliceStart, sliceEnd);
 	}
 	else { emit isPlaying(-1, 0, 0); }
 }
 
 void SlicerT::deleteNotePluginData(NotePlayHandle* handle)
 {
-	delete static_cast<PlaybackState*>(handle->m_pluginData);
+	delete static_cast<Sample::PlaybackState*>(handle->m_pluginData);
 	emit isPlaying(-1, 0, 0);
 }
 
@@ -327,6 +313,11 @@ void SlicerT::updateFile(QString file)
 	findSlices();
 
 	emit dataChanged();
+}
+
+void SlicerT::loadFile(const QString& file)
+{
+	updateFile(file);
 }
 
 void SlicerT::updateSlices()

@@ -71,6 +71,15 @@ if(MSVC)
 	target_link_options(${EXE_NAME} PRIVATE "/entry:mainCRTStartup")
 endif()
 
+# If we're building a Windows executable, add linker flags to disable ASLR
+# This is needed because several old VST dlls crash when high entropy ASLR is in use
+# /HIGHENTROPYVA:YES relies on /DYNAMICBASE:YES so this ensures maximum VST compatiblity
+if(MSVC)
+	target_link_options(${EXE_NAME} PRIVATE "/DYNAMICBASE:NO")
+elseif(IS_MINGW)
+	target_link_options(${EXE_NAME} PRIVATE "-Wl,--disable-dynamicbase")
+endif()
+
 if(IS_MINGW)
 	SET(CMAKE_REQUIRED_FLAGS "-std=c++20")
 endif()

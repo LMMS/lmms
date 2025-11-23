@@ -331,62 +331,6 @@
        </layout>
       </widget>
      </item>
-     <item>
-      <widget class="QGroupBox" name="qualityGroupBox">
-       <property name="title">
-        <string>Quality settings</string>
-       </property>
-       <layout class="QVBoxLayout">
-        <item>
-         <widget class="QLabel" name="label_2">
-          <property name="text">
-           <string>Interpolation:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QComboBox" name="interpolationCB">
-          <property name="currentIndex">
-           <number>2</number>
-          </property>
-          <item>
-           <property name="text">
-            <string>Zero order hold</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Sinc worst (fastest)</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Sinc medium (recommended)</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Sinc best (slowest)</string>
-           </property>
-          </item>
-         </widget>
-        </item>
-        <item>
-         <spacer>
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>0</width>
-            <height>0</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-       </layout>
-      </widget>
-     </item>
     </layout>
    </item>
    <item>

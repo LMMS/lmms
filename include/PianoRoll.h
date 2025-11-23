@@ -146,6 +146,7 @@ public:
 		return m_midiClip;
 	}
 
+	// TODO remove this since PianoRoll should no longer be visible without a valid midi clip
 	bool hasValidMidiClip() const
 	{
 		return m_midiClip != nullptr;
@@ -188,7 +189,6 @@ protected:
 	void focusOutEvent( QFocusEvent * ) override;
 	void focusInEvent( QFocusEvent * ) override;
 
-	int getKey( int y ) const;
 	void drawNoteRect( QPainter & p, int x, int y,
 					int  width, const Note * n, const QColor & noteCol, const QColor & noteTextColor,
 					const QColor & selCol, const int noteOpc, const bool borderless, bool drawNoteName );
@@ -339,6 +339,9 @@ private:
 	int keyAreaTop() const;
 	int noteEditRight() const;
 	int noteEditLeft() const;
+
+	int getKey(int y) const;
+	int yCoordOfKey(int key) const;
 
 	void dragNotes(int x, int y, bool alt, bool shift, bool ctrl);
 
@@ -587,6 +590,8 @@ private slots:
 private:
 	void clipRenamed();
 	void focusInEvent(QFocusEvent * event) override;
+	void showEvent(QShowEvent* se) override;
+
 	void stopStepRecording();
 	void updateStepRecordingIcon();
 

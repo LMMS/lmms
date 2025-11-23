@@ -40,6 +40,8 @@
 #include "MainWindow.h"
 #include "MidiJack.h"
 
+#include <cstdio>
+
 
 namespace
 {
@@ -55,6 +57,21 @@ QString getOutputKeyByChannel(size_t channel)
 QString getInputKeyByChannel(size_t channel)
 {
 	return "input" + QString::number(channel + 1);
+}
+
+void printJackStatus(jack_status_t status)
+{
+	std::fprintf(stderr, "Status: 0x%2.0x\n", static_cast<unsigned int>(status));
+
+	if (status & JackFailure)
+	{
+		std::fprintf(stderr, "Overall operation failed. JACK dependencies might need to be installed.\n");
+	}
+
+	if (status & JackServerFailed)
+	{
+		std::fprintf(stderr, "Could not connect to JACK server.\n");
+	}
 }
 
 }
@@ -172,15 +189,16 @@ bool AudioJack::initJackClient()
 	m_client = jack_client_open(clientName.toLatin1().constData(), JackNullOption, &status, serverName);
 	if (m_client == nullptr)
 	{
-		printf("jack_client_open() failed, status 0x%2.0x\n", status);
-		if (status & JackServerFailed) { printf("Could not connect to JACK server.\n"); }
+		std::fprintf(stderr, "jack_client_open() failed, ");
+		printJackStatus(status);
+
 		return false;
 	}
 	if (status & JackNameNotUnique)
 	{
-		printf(	"there's already a client with name '%s', so unique "
-				"name '%s' was assigned\n",
-				clientName.toLatin1().constData(), jack_get_client_name(m_client));
+		std::printf("there's already a client with name '%s', so unique "
+					"name '%s' was assigned\n",
+					clientName.toLatin1().constData(), jack_get_client_name(m_client));
 	}
 
 	resizeInputBuffer(jack_get_buffer_size(m_client));
@@ -212,7 +230,7 @@ bool AudioJack::initJackClient()
 
 		if (m_outputPorts.back() == nullptr)
 		{
-			printf("no more JACK-ports available!\n");
+			std::fprintf(stderr, "no more JACK-ports available!\n");
 			return false;
 		}
 	}
@@ -230,47 +248,47 @@ void AudioJack::resizeInputBuffer(jack_nframes_t nframes)
 
 void AudioJack::attemptToConnect(size_t index, const char *lmms_port_type, const char *source_port, const char *destination_port)
 {
-	printf("Attempting to reconnect %s port %u: %s -> %s", lmms_port_type, static_cast<unsigned int>(index), source_port, destination_port);
+	std::printf("Attempting to reconnect %s port %u: %s -> %s", lmms_port_type, static_cast<unsigned int>(index), source_port, destination_port);
 	if (!jack_connect(m_client, source_port, destination_port))
 	{
-		printf(" - Success!\n");
+		std::printf(" - Success!\n");
 	}
 	else
 	{
-		printf(" - Failure\n");
+		std::printf(" - Failure\n");
 	}
 }
 
 void AudioJack::attemptToReconnectOutput(size_t outputIndex, const QString& targetPort)
 {
-	if (outputIndex > m_outputPorts.size()) return;
+	if (outputIndex >= m_outputPorts.size()) { return; }
 
 	if (targetPort == disconnectedRepresentation)
 	{
-		printf("Output port %u is not connected.\n", static_cast<unsigned int>(outputIndex));
+		std::fprintf(stderr, "Output port %u is not connected.\n", static_cast<unsigned int>(outputIndex));
 		return;
 	}
 
 	auto outputName = jack_port_name(m_outputPorts[outputIndex]);
-	auto targetName = targetPort.toLatin1().constData();
+	auto targetName = targetPort.toLatin1();
 
-	attemptToConnect(outputIndex, "output", outputName, targetName);
+	attemptToConnect(outputIndex, "output", outputName, targetName.constData());
 }
 
 void AudioJack::attemptToReconnectInput(size_t inputIndex, const QString& sourcePort)
 {
-	if (inputIndex > m_inputPorts.size()) return;
+	if (inputIndex >= m_inputPorts.size()) { return; }
 
 	if (sourcePort == disconnectedRepresentation)
 	{
-		printf("Input port %u is not connected.\n", static_cast<unsigned int>(inputIndex));
+		std::fprintf(stderr, "Input port %u is not connected.\n", static_cast<unsigned int>(inputIndex));
 		return;
 	}
 
 	auto inputName = jack_port_name(m_inputPorts[inputIndex]);
-	auto sourceName = sourcePort.toLatin1().constData();
+	auto sourceName = sourcePort.toLatin1();
 
-	attemptToConnect(inputIndex, "input", sourceName, inputName);
+	attemptToConnect(inputIndex, "input", sourceName.constData(), inputName);
 }
 
 
@@ -284,7 +302,7 @@ void AudioJack::startProcessing()
 
 	if (jack_activate(m_client))
 	{
-		printf("cannot activate client\n");
+		std::fprintf(stderr, "cannot activate client\n");
 		return;
 	}
 
@@ -483,6 +501,11 @@ AudioJack::setupWidget::setupWidget(QWidget* parent)
 	const char* serverName = nullptr;
 	jack_status_t status;
 	m_client = jack_client_open("LMMS-Setup Dialog", JackNullOption, &status, serverName);
+	if (!m_client)
+	{
+		std::fprintf(stderr, "jack_client_open() failed, ");
+		printJackStatus(status);
+	}
 
 	QFormLayout * form = new QFormLayout(this);
 
@@ -561,6 +584,14 @@ void AudioJack::setupWidget::saveSettings()
 std::vector<std::string> AudioJack::setupWidget::getAudioPortNames(JackPortFlags portFlags) const
 {
 	std::vector<std::string> audioPorts;
+
+	// We are using weak_libjack. If JACK is not installed this will result in the client being nullptr.
+	// Because jack_get_ports in weak_libjack does not check for nullptr we have to do this here and fail gracefully,
+	// i.e. with an empty list of audio ports.
+	if (!m_client)
+	{
+		return audioPorts;
+	}
 
 	const char **inputAudioPorts = jack_get_ports(m_client, nullptr, JACK_DEFAULT_AUDIO_TYPE, portFlags);
 	if (inputAudioPorts)

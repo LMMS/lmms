@@ -81,17 +81,14 @@ protected:
 	void paintEvent(QPaintEvent * me) override;
 	void wheelEvent(QWheelEvent * me) override;
 
-	void enterEvent(QEvent *event) override;
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+	void enterEvent(QEnterEvent*) override;
+#else
+	void enterEvent(QEvent*) override;
+#endif
 	void leaveEvent(QEvent *event) override;
 
 	virtual float getValue(const QPoint & p);
-
-private slots:
-	virtual void enterValue();
-	void friendlyUpdate();
-	void toggleScale();
-
-private:
 	virtual QString displayValue() const;
 
 	void doConnections() override;
@@ -114,6 +111,11 @@ private:
 	bool m_buttonPressed;
 
 	DirectionOfManipulation m_directionOfManipulation;
+
+private slots:
+	virtual void enterValue();
+	void friendlyUpdate();
+	void toggleScale();
 };
 
 } // namespace lmms::gui

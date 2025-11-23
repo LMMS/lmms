@@ -46,7 +46,7 @@ namespace lmms::gui
  * 
  *  Because of a bug in the QMdiSubWindow class to save the right position and size
  *  of a subwindow in a project and because of the inability
- *  for cusomizing the title bar appearance, lmms implements its own subwindow
+ *  for customizing the title bar appearance, lmms implements its own subwindow
  *  class.
  */
 class LMMS_EXPORT SubWindow : public QMdiSubWindow

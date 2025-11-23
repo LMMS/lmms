@@ -226,11 +226,7 @@ private:
 
 	// Mutex to make methods involving automation clips thread safe
 	// Mutable so we can lock it from const objects
-#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
 	mutable QRecursiveMutex m_clipMutex;
-#else
-	mutable QMutex m_clipMutex;
-#endif
 
 	AutomationTrack * m_autoTrack;
 	std::vector<jo_id_t> m_idsToResolve;

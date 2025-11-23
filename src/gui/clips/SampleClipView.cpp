@@ -316,7 +316,7 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	p.setPen( c.darker( 200 ) );
 	p.drawRect(-m_paintPixmapXPosition, 0, rect().right(), rect().bottom());
 
-	// draw the 'muted' pixmap only if the clip was manualy muted
+	// draw the 'muted' pixmap only if the clip was manually muted
 	if( m_clip->isMuted() )
 	{
 		const int spacing = BORDER_WIDTH;

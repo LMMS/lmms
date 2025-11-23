@@ -51,7 +51,7 @@ AudioFileProcessorView::AudioFileProcessorView(Instrument* instrument,
 	InstrumentViewFixedSize(instrument, parent)
 {
 	m_openAudioFileButton = new PixmapButton(this);
-	m_openAudioFileButton->setCursor(QCursor(Qt::PointingHandCursor));
+	m_openAudioFileButton->setCursor(Qt::PointingHandCursor);
 	m_openAudioFileButton->move(227, 72);
 	m_openAudioFileButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap(
 							"select_file"));

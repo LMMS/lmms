@@ -150,7 +150,7 @@ void PatternClipView::paintEvent(QPaintEvent*)
 	p.setPen( c.darker( 300 ) );
 	p.drawRect( 0, 0, rect().right(), rect().bottom() );
 	
-	// draw the 'muted' pixmap only if the clip was manualy muted
+	// draw the 'muted' pixmap only if the clip was manually muted
 	if (m_patternClip->isMuted())
 	{
 		const int spacing = BORDER_WIDTH;
