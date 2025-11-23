@@ -128,9 +128,9 @@ void MidiClip::updateLength()
 	// If the clip hasn't already been manually resized, automatically resize it.
 	if (getAutoResize())
 	{
-		if( m_clipType == Type::BeatClip )
+		if (m_clipType == Type::BeatClip)
 		{
-			changeLength( beatClipLength() );
+			changeLength(beatClipLength());
 			updatePatternTrack();
 			return;
 		}
