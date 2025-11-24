@@ -30,7 +30,6 @@
 
 #include "ModelView.h"
 
-
 namespace lmms
 {
 

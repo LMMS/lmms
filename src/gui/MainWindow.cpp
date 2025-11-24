@@ -484,15 +484,10 @@ void MainWindow::finalize()
 	}
 
 	// Add editor subwindows
-	for (QWidget* widget :  std::list<QWidget*>{
-			getGUI()->automationEditor(),
-			getGUI()->patternEditor(),
-			getGUI()->pianoRoll(),
-			getGUI()->songEditor()
-	})
-	{
-		addWindowedWidget(widget);
-	}
+	addWindowedWidget(getGUI()->automationEditor());
+	addWindowedWidget(getGUI()->patternEditor());
+	addWindowedWidget(getGUI()->pianoRoll());
+	addWindowedWidget(getGUI()->songEditor());
 
 	getGUI()->automationEditor()->parentWidget()->hide();
 	getGUI()->patternEditor()->parentWidget()->move(610, 5);
@@ -542,22 +537,30 @@ SubWindow* MainWindow::addWindowedWidget(QWidget *w, Qt::WindowFlags windowFlags
 	auto win = new SubWindow(m_workspace->viewport(), windowFlags);
 	connect(this, &MainWindow::detachAllSubWindows, win, &SubWindow::setDetached);
 	win->setWidget(w);
-	if (w) { connect(w, &QWidget::destroyed, win, &SubWindow::deleteLater); } // TODO somehow make this work on any setWidget
-	if (w && w->sizeHint().isValid()) {
-		auto titleBarHeight = win->titleBarHeight();
-		auto frameWidth = win->frameWidth();
-		QSize delta(2* frameWidth, titleBarHeight + frameWidth);
-		win->resize(delta + w->sizeHint());
+
+	if (w)
+	{
+		// TODO: somehow make this work on any setWidget
+		connect(w, &QWidget::destroyed, win, &SubWindow::deleteLater);
+
+		if (w->sizeHint().isValid())
+		{
+			auto titleBarHeight = win->titleBarHeight();
+			auto frameWidth = win->frameWidth();
+			QSize delta(2* frameWidth, titleBarHeight + frameWidth);
+			win->resize(delta + w->sizeHint());
+		}
 	}
+
 	m_workspace->addSubWindow(win);
 	return win;
 }
 
 
 
-void MainWindow::setAllSubWindowsDetached(bool detachState)
+void MainWindow::setAllSubWindowsDetached(bool detached)
 {
-	emit detachAllSubWindows(detachState);
+	emit detachAllSubWindows(detached);
 }
 
 
@@ -657,10 +660,18 @@ void MainWindow::clearKeyModifiers()
 
 void MainWindow::saveWidgetState(QWidget* w, QDomElement& de)
 {
-	// TODO only use one of these
-	SubWindow* win = qobject_cast<SubWindow*>(w); // nullptr if not
-	if (!win && w->parentWidget()) { win = qobject_cast<SubWindow*>(w->parentWidget()); } // try parent instead
-	if (!win) { return; } // finally, soft-fail if neither can find the window
+	// TODO: Only use one of these
+	auto win = qobject_cast<SubWindow*>(w);
+	if (!win)
+	{
+		// Fall back on parent
+		win = qobject_cast<SubWindow*>(w->parentWidget());
+		if (!win)
+		{
+			// Still could not find the window - soft fail
+			return;
+		}
+	}
 
 	de.setAttribute("visible", bool{win->widget() && win->widget()->isVisible()});
 	de.setAttribute("maximized", win->isMaximized());
@@ -677,15 +688,25 @@ void MainWindow::saveWidgetState(QWidget* w, QDomElement& de)
 
 void MainWindow::restoreWidgetState(QWidget* w, const QDomElement& de)
 {
-	// TODO only use one of these
-	SubWindow* win = qobject_cast<SubWindow*>(w); // nullptr if not
-	if (!win && w->parentWidget()) { win = qobject_cast<SubWindow*>(w->parentWidget()); } // try parent instead
-	if (!win) { return; } // finally, soft-fail if neither can find the window
+	// TODO: Only use one of these
+	auto win = qobject_cast<SubWindow*>(w);
+	if (!win)
+	{
+		// Fall back on parent
+		win = qobject_cast<SubWindow*>(w->parentWidget());
+		if (!win)
+		{
+			// Still could not find the window - soft fail
+			return;
+		}
+	}
 
-	QRect normalGeometry(de.attribute("x").toInt(),
-	                     de.attribute("y").toInt(),
-	                     de.attribute("width").toInt(),
-	                     de.attribute("height").toInt());
+	const auto normalGeometry = QRect {
+		de.attribute("x").toInt(),
+		de.attribute("y").toInt(),
+		de.attribute("width").toInt(),
+		de.attribute("height").toInt()
+	};
 
 	if (normalGeometry.isValid())
 	{
@@ -697,12 +718,15 @@ void MainWindow::restoreWidgetState(QWidget* w, const QDomElement& de)
 		// set the window to its correct minimized/maximized/restored state
 		Qt::WindowStates winState = win->windowState();
 		winState = de.attribute("maximized").toInt()
-					? (winState | Qt::WindowMaximized)
-					: (winState & ~Qt::WindowMaximized);
+			? (winState | Qt::WindowMaximized)
+			: (winState & ~Qt::WindowMaximized);
 		win->setWindowState(winState);
 	}
 
-	if (de.hasAttribute("visible")) { win->setVisible(de.attribute("visible").toInt()); }
+	if (const auto visible = de.attribute("visible"); !visible.isEmpty())
+	{
+		win->setVisible(visible.toInt());
+	}
 }
 
 
@@ -1062,15 +1086,15 @@ void MainWindow::updateViewMenu()
 	m_viewMenu->addSeparator();
 
 	auto detachAllAction = m_viewMenu->addAction(embed::getIconPixmap("detach"),
-				tr("Detach all subwindows"),
-				this, [this](){setAllSubWindowsDetached(true);},
-				QKeySequence {Qt::CTRL | Qt::SHIFT | Qt::Key_D}
-		);
+		tr("Detach all subwindows"),
+		this, [this](){ setAllSubWindowsDetached(true); },
+		QKeySequence{Qt::CTRL | Qt::SHIFT | Qt::Key_D}
+	);
 	auto attachAllAction = m_viewMenu->addAction(embed::getIconPixmap("detach"),
-				tr("Attach all subwindows"),
-				this, [this](){setAllSubWindowsDetached(false);},
-				QKeySequence {Qt::CTRL | Qt::ALT | Qt::SHIFT | Qt::Key_D}
-		);
+		tr("Attach all subwindows"),
+		this, [this](){ setAllSubWindowsDetached(false); },
+		QKeySequence{Qt::CTRL | Qt::ALT | Qt::SHIFT | Qt::Key_D}
+	);
 
 	detachAllAction->setShortcutContext(Qt::ApplicationShortcut);
 	attachAllAction->setShortcutContext(Qt::ApplicationShortcut);

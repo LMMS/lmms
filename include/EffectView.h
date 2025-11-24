@@ -74,7 +74,6 @@ public slots:
 	void moveDown();
 	void deletePlugin();
 
-
 signals:
 	void movedUp(EffectView* view);
 	void movedDown(EffectView* view);

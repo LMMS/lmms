@@ -84,8 +84,7 @@ private:
 	QMdiSubWindow * m_subWindow;
 	ControllerDialog * m_controllerDlg;
 	QLabel * m_nameLabel;
-
-} ;
+};
 
 
 } // namespace lmms::gui

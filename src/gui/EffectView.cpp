@@ -118,11 +118,11 @@ void EffectView::editControls()
 {
 	if( m_subWindow )
 	{
-		if( !m_controlView->isVisible() )
+		if (!m_controlView->isVisible())
 		{
 			m_subWindow->show();
 			m_subWindow->raise();
-			effect()->controls()->setViewVisible( true ); // TODO is this even needed?
+			effect()->controls()->setViewVisible(true); // TODO is this even needed?
 		}
 		else
 		{

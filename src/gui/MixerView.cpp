@@ -56,9 +56,9 @@ namespace lmms::gui
 
 
 MixerView::MixerView(Mixer* mixer) :
-	QWidget{},
-	ModelView{nullptr, this},
-	SerializingObjectHook{},
+	QWidget(),
+	ModelView(nullptr, this),
+	SerializingObjectHook(),
 	m_mixer(mixer)
 {
 	mixer->setHook(this);
@@ -165,7 +165,7 @@ MixerView::MixerView(Mixer* mixer) :
 	layout()->setSizeConstraint(QLayout::SetMinimumSize);
 
 	// add ourself to workspace
-	[[maybe_unused]] SubWindow* subWin = mainWindow->addWindowedWidget(this);
+	mainWindow->addWindowedWidget(this);
 
 	parentWidget()->setAttribute(Qt::WA_DeleteOnClose, false);
 	parentWidget()->move(5, 310);

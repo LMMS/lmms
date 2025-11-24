@@ -40,7 +40,6 @@
 #include "MainWindow.h"
 #include "Song.h"
 #include "SubWindow.h"
-#include "embed.h"
 
 namespace lmms::gui
 {

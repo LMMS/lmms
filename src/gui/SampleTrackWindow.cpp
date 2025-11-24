@@ -249,7 +249,7 @@ void SampleTrackWindow::closeEvent(QCloseEvent* ce)
 
 
 
-void SampleTrackWindow::saveSettings([[maybe_unused]] QDomDocument& doc, QDomElement& element)
+void SampleTrackWindow::saveSettings(QDomDocument& doc, QDomElement& element)
 {
 	MainWindow::saveWidgetState(this, element);
 }

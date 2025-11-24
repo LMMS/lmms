@@ -50,7 +50,7 @@ namespace lmms::gui
 {
 
 
-SubWindow::SubWindow(QWidget *parent, Qt::WindowFlags windowFlags)
+SubWindow::SubWindow(QWidget* parent, Qt::WindowFlags windowFlags)
 	: QMdiSubWindow{parent, windowFlags}
 	, m_buttonSize{17, 17}
 	, m_titleBarHeight{titleBarHeight()}
@@ -67,7 +67,7 @@ SubWindow::SubWindow(QWidget *parent, Qt::WindowFlags windowFlags)
 	m_borderColor = Qt::black;
 
 	// close, maximize, restore, and detach buttons
-	auto createButton = [this](const std::string& iconName, const QString& tooltip) -> QPushButton* {
+	auto createButton = [this](std::string_view iconName, const QString& tooltip) -> QPushButton* {
 		auto button = new QPushButton{embed::getIconPixmap(iconName), QString{}, this};
 		button->resize(m_buttonSize);
 		button->setFocusPolicy(Qt::NoFocus);
@@ -199,7 +199,6 @@ bool SubWindow::isDetachable() const
 void SubWindow::setDetachable(bool on)
 {
 	m_isDetachable = on;
-
 }
 
 
@@ -336,15 +335,15 @@ void SubWindow::attach()
 	frame += decorationMargins();
 
 	// Make sure the window fully fits on screen
-	frame.setSize({std::min(frame.width(), mdiArea()->width()),
-	               std::min(frame.height(), mdiArea()->height())});
+	frame.setSize({
+		std::min(frame.width(), mdiArea()->width()),
+		std::min(frame.height(), mdiArea()->height())
+	});
 
-	frame.moveTo(std::clamp(frame.left(),
-	                        0,
-	                        mdiArea()->rect().width() - frame.width()),
-	             std::clamp(frame.top(),
-	                        0,
-	                        mdiArea()->rect().height() - frame.height()));
+	frame.moveTo(
+		std::clamp(frame.left(), 0, mdiArea()->rect().width() - frame.width()),
+		std::clamp(frame.top(), 0, mdiArea()->rect().height() - frame.height())
+	);
 
 	auto flags = windowFlags();
 	flags &= ~Qt::Window;
@@ -360,7 +359,9 @@ void SubWindow::attach()
 
 	if (QGuiApplication::platformName() == "wayland")
 	{
-		resize(frame.size());  // Workaround for wayland reporting position as 0-0, see https://doc.qt.io/qt-6.9/application-windows.html#wayland-peculiarities
+		// Workaround for wayland reporting position as 0-0
+		// See https://doc.qt.io/qt-6.9/application-windows.html#wayland-peculiarities
+		resize(frame.size());
 	}
 	else
 	{
@@ -392,10 +393,12 @@ int SubWindow::frameWidth() const
 
 QMargins SubWindow::decorationMargins() const
 {
-	return QMargins(frameWidth(),     // left
-	                titleBarHeight(), // top
-	                frameWidth(),     // right
-	                frameWidth());    // bottom
+	return {
+		frameWidth(),     // left
+		titleBarHeight(), // top
+		frameWidth(),     // right
+		frameWidth()      // bottom
+	};
 }
 
 
@@ -468,8 +471,8 @@ void SubWindow::adjustTitleBar()
 	const int buttonGap = 1;
 	const int menuButtonSpace = 24;
 
-	QPoint buttonPos(width() - rightSpace - m_buttonSize.width(), 3);
-	const QPoint buttonStep( m_buttonSize.width() + buttonGap, 0 );
+	auto buttonPos = QPoint{width() - rightSpace - m_buttonSize.width(), 3};
+	const auto buttonStep = QPoint{m_buttonSize.width() + buttonGap, 0};
 
 	// the buttonBarWidth depends on the number of buttons.
 	// we need it to calculate the width of window title label
