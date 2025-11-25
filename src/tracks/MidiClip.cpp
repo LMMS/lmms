@@ -305,6 +305,32 @@ void MidiClip::setStep( int step, bool enabled )
 }
 
 
+void MidiClip::flipNotes(const NoteVector& notes)
+{
+    if (notes.empty()) { return; }
+
+    addJournalCheckPoint();
+
+    int min = notes.at(0)->key();
+    int max = notes.at(0)->key();
+
+    for (auto note : notes)
+    {
+        int key = note->key();
+        if (key > max) { max = key; }
+        if (key < min) { min = key; }
+    }
+
+    int sum = min + max;
+
+    for (auto note : notes)
+    {
+        note->setKey(sum - note->key());
+    }
+
+    rearrangeAllNotes();
+    emit dataChanged();
+}
 
 void MidiClip::reverseNotes(const NoteVector& notes)
 {

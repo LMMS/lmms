@@ -778,6 +778,20 @@ void PianoRoll::constrainNoteLengths(bool constrainMax)
 	Engine::getSong()->setModified();
 }
 
+void PianoRoll::flipNotes()
+{
+	if (!hasValidMidiClip()) { return; }
+
+	const NoteVector selectedNotes = getSelectedNotes();
+	const auto& notes = selectedNotes.empty() ? m_midiClip->notes() : selectedNotes;
+
+	m_midiClip->flipNotes(notes);
+
+	update();
+	getGUI()->songEditor()->update();
+	Engine::getSong()->setModified();
+}
+
 void PianoRoll::reverseNotes()
 {
 	if (!hasValidMidiClip()) { return; }
@@ -791,7 +805,6 @@ void PianoRoll::reverseNotes()
 	getGUI()->songEditor()->update();
 	Engine::getSong()->setModified();
 }
-
 
 void PianoRoll::loadMarkedSemiTones(const QDomElement & de)
 {
@@ -5023,7 +5036,11 @@ PianoRollWindow::PianoRollWindow() :
 
 	auto reverseAction = new QAction(embed::getIconPixmap("flip_x"), tr("Reverse Notes"), noteToolsButton);
 	connect(reverseAction, &QAction::triggered, [this](){ m_editor->reverseNotes(); });
-	reverseAction->setShortcut(keySequence(Qt::SHIFT, Qt::Key_R));
+	reverseAction->setShortcut(keySequence(Qt::SHIFT, Qt::Key_H));
+
+	auto flipAction = new QAction(embed::getIconPixmap("flip_y"), tr("Flip Notes"), noteToolsButton);
+	connect(flipAction, &QAction::triggered, [this](){ m_editor->flipNotes(); });
+	flipAction->setShortcut(keySequence(Qt::SHIFT, Qt::Key_V));
 
 	noteToolsButton->addAction(glueAction);
 	noteToolsButton->addAction(knifeAction);
@@ -5033,6 +5050,7 @@ PianoRollWindow::PianoRollWindow() :
 	noteToolsButton->addAction(minLengthAction);
 	noteToolsButton->addAction(maxLengthAction);
 	noteToolsButton->addAction(reverseAction);
+	noteToolsButton->addAction(flipAction);
 
 	notesActionsToolBar->addWidget(noteToolsButton);
 
