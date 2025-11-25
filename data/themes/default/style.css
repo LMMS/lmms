@@ -918,6 +918,18 @@ lmms--gui--SubWindow > QPushButton:hover{
 	border-radius: 2px;
 }
 
+QPushButton#btn-window-detach {
+	image: url("resources:detach.svg");
+}
+
+QPushButton#btn-window-maximize {
+	image: url("resources:maximize.png");
+}
+
+QPushButton#btn-window-close {
+	image: url("resources:close.png");
+}
+
 /* Instrument */
 
 /* Envelope graph */
