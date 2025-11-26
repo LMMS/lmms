@@ -270,7 +270,7 @@ Effect::ProcessStatus FrequencyShifterEffect::processImpl(SampleFrame* buf, cons
 				m_phase[ch] = ph;
 
 				const float sideVal = shiftedR;
-				const float ringVal = shiftedI * cosP;
+				const float ringVal = shiftedR + shiftedI;
 				out[ch] = sideVal * invRing + ringVal * ring;
 			}
 
