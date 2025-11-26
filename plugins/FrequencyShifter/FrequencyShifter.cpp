@@ -39,7 +39,7 @@ extern "C"
 Plugin::Descriptor PLUGIN_EXPORT frequencyshifter_plugin_descriptor =
 {
 	LMMS_STRINGIFY(PLUGIN_NAME),
-	"FrequencyShifter",
+	"Frequency Shifter",
 	QT_TRANSLATE_NOOP("PluginBrowser", "A frequency shifter (not a pitch shifter) and barberpole phaser plugin"),
 	"Lost Robot <r94231/at/gmail/dot/com>",
 	0x0100,
