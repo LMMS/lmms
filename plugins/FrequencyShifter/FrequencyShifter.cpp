@@ -216,14 +216,10 @@ Effect::ProcessStatus FrequencyShifterEffect::processImpl(SampleFrame* buf, cons
 			for (int ch = 0; ch < 2; ++ch)
 			{
 				const float phaseValue = m_phase[ch] + m_truePhase;
-				float s;
-				float c;
-#if defined(__clang__) || defined(__GNUC__)
-				__builtin_sincosf(phaseValue, &s, &c);
-#else
-				s = std::sin(phaseValue);
-				c = std::cos(phaseValue);
-#endif
+				
+				const float s = std::sin(phaseValue);
+				const float c = std::cos(phaseValue);
+				
 				float cosP = c;
 				float sinP = s;
 
