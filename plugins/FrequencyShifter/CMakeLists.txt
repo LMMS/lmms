@@ -1,0 +1,3 @@
+INCLUDE(BuildPlugin)
+
+BUILD_PLUGIN(frequencyshifter FrequencyShifter.cpp FrequencyShifterControls.cpp FrequencyShifterControlDialog.cpp MOCFILES FrequencyShifter.h FrequencyShifterControls.h FrequencyShifterControlDialog.h EMBEDDED_RESOURCES *.png)

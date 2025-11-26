@@ -1159,6 +1159,17 @@ lmms--gui--CompressorControlDialog lmms--gui--Knob {
 	qproperty-lineWidth: 2;
 }
 
+lmms--gui--FrequencyShifterControlDialog lmms--gui--Knob {
+	color: #ffffff;
+	qproperty-outerColor: #ffffff;
+	qproperty-lineWidth: 3;
+}
+lmms--gui--FrequencyShifterControlDialog lmms--gui--Knob#fs_glide,
+lmms--gui--FrequencyShifterControlDialog lmms--gui--Knob#fs_dglide,
+lmms--gui--FrequencyShifterControlDialog lmms--gui--Knob#fs_phase {
+    qproperty-lineWidth: 2;
+}
+
 lmms--gui--VectorView {
 	qproperty-colorTrace: rgba(60, 255, 130, 255);
 	qproperty-colorGrid: rgba(76, 80, 84, 128);

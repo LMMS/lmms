@@ -38,6 +38,7 @@ SET(LMMS_PLUGIN_LIST
 	DynamicsProcessor
 	Eq
 	Flanger
+	FrequencyShifter
 	GranularPitchShifter
 	HydrogenImport
 	LadspaBrowser
