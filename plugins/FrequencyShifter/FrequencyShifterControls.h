@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef FREQUENCYSHIFTERCONTROLS_H
-#define FREQUENCYSHIFTERCONTROLS_H
+#ifndef LMMS_FREQUENCY_SHIFTER_CONTROLS_H
+#define LMMS_FREQUENCY_SHIFTER_CONTROLS_H
 
 #include "EffectControls.h"
 #include "FrequencyShifterControlDialog.h"
@@ -84,5 +84,4 @@ public:
 
 } // namespace lmms
 
-#endif
-
+#endif // LMMS_FREQUENCY_SHIFTER_CONTROLS_H

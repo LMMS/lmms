@@ -29,12 +29,16 @@
  * -------------------------------------------------------------------------
  */
 
-#pragma once
+#ifndef LMMS_HILBERT_TRANSFORM_H
+#define LMMS_HILBERT_TRANSFORM_H
 #include <cmath>
 
 #ifdef __SSE2__
 	#include <emmintrin.h>
 #endif
+
+namespace lmms
+{
 
 template<int Channels>
 struct HilbertIIRFloat {
@@ -201,3 +205,6 @@ struct HilbertIIRFloat {
 	}
 };
 
+} // namespace lmms
+
+#endif // LMMS_HILBERT_TRANSFORM_H
