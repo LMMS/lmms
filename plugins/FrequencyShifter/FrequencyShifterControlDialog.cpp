@@ -95,7 +95,7 @@ FrequencyShifterControlDialog::FrequencyShifterControlDialog(FrequencyShifterCon
 	shiftSpin->setSeamless(true, true);
 
 	mk(18, 30, "Mix", &c->m_mix, "", "fs_mix", K60);
-	mk(235, 24, "Spread", &c->m_spreadShift,"", "fs_spread", K24);
+	mk(235, 24, "Spread", &c->m_spreadShift,"Hz", "fs_spread", K24);
 	mk(235, 72, "Phase",&c->m_phase, "", "fs_phase", K24);
 	mk(24, 115, "Ring", &c->m_ring, "", "fs_ring", K36);
 	mk(72, 115, "Harmonics", &c->m_harmonics, "", "fs_harm", K36);
@@ -115,7 +115,7 @@ FrequencyShifterControlDialog::FrequencyShifterControlDialog(FrequencyShifterCon
 	PixmapButton* antireflectButton = new PixmapButton(this, "Antireflect");
 	antireflectButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("antireflect_on"));
 	antireflectButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("antireflect_off"));
-	antireflectButton->setToolTip("Antireflect");
+	antireflectButton->setToolTip("Anti-reflect");
 	antireflectButton->move(188, 122);
 	antireflectButton->setCheckable(true);
 	antireflectButton->setModel(&c->m_antireflect);
@@ -150,7 +150,7 @@ FrequencyShifterControlDialog::FrequencyShifterControlDialog(FrequencyShifterCon
 	PixmapButton* resetShifterBtn = new PixmapButton(this, tr("Reset Shifter"));
 	resetShifterBtn->setActiveGraphic(PLUGIN_NAME::getIconPixmap("reset_shifter_on"));
 	resetShifterBtn->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("reset_shifter_off"));
-	resetShifterBtn->setToolTip(tr("Reset frequency shifter phases"));
+	resetShifterBtn->setToolTip(tr("Reset frequency shifter phase"));
 	resetShifterBtn->setCheckable(false);
 	resetShifterBtn->move(77, 5);
 	resetShifterBtn->setModel(&c->m_resetShifter);
