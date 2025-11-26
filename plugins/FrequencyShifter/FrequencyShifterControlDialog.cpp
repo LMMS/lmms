@@ -12,7 +12,7 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * General Public License for more details.
  *
  * You should have received a copy of the GNU General Public
@@ -51,7 +51,6 @@ static inline void setupKnobGeometry(Knob* k, int w, int h)
 	int outer = std::max(1, cx - 3);
 	int inner = std::max(1, outer - ((w >= 40) ? 16 : (w >= 24) ? 10 : 6));
 
-	// very small knobs: keep inner small for a visible tick/arc
 	if (w <= 16)
 	{
 		outer = cx - 2;
@@ -72,9 +71,9 @@ FrequencyShifterControlDialog::FrequencyShifterControlDialog(FrequencyShifterCon
 	setFixedSize(288, 360);
 
 	auto mk = [this](int x, int y,
-		             const QString& lbl, FloatModel* m, const QString& unit,
-		             const char* objName,
-		             QSize sz)
+		const QString& lbl, FloatModel* m, const QString& unit,
+		const char* objName,
+		QSize sz)
 	{
 		Knob* k = new Knob(KnobType::Styled, this);
 		k->setObjectName(objName);
@@ -85,7 +84,6 @@ FrequencyShifterControlDialog::FrequencyShifterControlDialog(FrequencyShifterCon
 		return k;
 	};
 
-	// ====== Knob size presets (scaled ×1.2) ======
 	const QSize K60(60, 60);
 	const QSize K36(36, 36);
 	const QSize K24(24, 24);
@@ -96,32 +94,23 @@ FrequencyShifterControlDialog::FrequencyShifterControlDialog(FrequencyShifterCon
 	shiftSpin->setModel(&c->m_freqShift);
 	shiftSpin->setSeamless(true, true);
 
-	// ====== Top row (Shifter) ======
-	mk(18, 30, "MIX",   &c->m_mix,        "",   "fs_mix",    K60);
-	mk(235, 24, "SPRD", &c->m_spreadShift,"",   "fs_spread", K24);
-	mk(235, 72, "PHASE",&c->m_phase,      "",   "fs_phase",  K24);
+	mk(18, 30, "Mix", &c->m_mix, "", "fs_mix", K60);
+	mk(235, 24, "Spread", &c->m_spreadShift,"", "fs_spread", K24);
+	mk(235, 72, "Phase",&c->m_phase, "", "fs_phase", K24);
+	mk(24, 115, "Ring", &c->m_ring, "", "fs_ring", K36);
+	mk(72, 115, "Harmonics", &c->m_harmonics, "", "fs_harm", K36);
+	mk(120, 115, "Tone",&c->m_tone, "Hz", "fs_tone", K36);
+	mk(200, 147, "Glide", &c->m_glide, "", "fs_glide", K19);
 
-	// ====== Small row under Shifter label ======
-	mk(24, 115, "RING", &c->m_ring,       "",   "fs_ring",   K36);
-	mk(72, 115, "HARM", &c->m_harmonics,  "",   "fs_harm",   K36);
-	mk(120, 115, "TONE",&c->m_tone,       "Hz", "fs_tone",   K36);
+	mk(18, 200, "LFO", &c->m_lfoAmount, "Hz", "fs_lfo", K36);
+	mk(66, 200, "LFO Rate", &c->m_lfoRate, "Hz", "fs_lforate", K36);
+	mk(114, 200, "LFO Stereo Phase", &c->m_lfoStereoPhase, "", "fs_lfost", K36);
 
-	// ====== LFO row ======
-	mk(18, 200,  "LFO",    &c->m_lfoAmount,      "Hz", "fs_lfo",     K36);
-	mk(66, 200,  "LFO R",  &c->m_lfoRate,        "Hz", "fs_lforate", K36);
-	mk(114, 200, "LFO ST", &c->m_lfoStereoPhase, "",   "fs_lfost",   K36);
-
-	// ====== Delay section ======
-	mk(18, 282,  "DELAY",      &c->m_delayLengthLong,  "ms", "fs_delay",    K36);
-	mk(114, 282, "FB",         &c->m_feedback,         "",   "fs_feedback", K36);
-
-	mk(24, 324,  "FINE DELAY", &c->m_delayLengthShort, "ms", "fs_finedelay", K24);
-	mk(120, 324, "DELAY DAMP", &c->m_delayDamp,        "Hz", "fs_damp",      K24);
-
-	mk(245, 315, "DELAY GLIDE", &c->m_delayGlide, "", "fs_dglide", K19);
-
-	// ====== Misc ======
-	mk(200, 147, "GLIDE", &c->m_glide, "", "fs_glide", K19);
+	mk(18, 282, "Delay Length", &c->m_delayLengthLong, "ms", "fs_delay", K36);
+	mk(114, 282, "Feedback", &c->m_feedback, "", "fs_feedback", K36);
+	mk(24, 324, "Delay Length (fine)", &c->m_delayLengthShort, "ms", "fs_finedelay", K24);
+	mk(120, 324, "Delay Damping", &c->m_delayDamp, "Hz", "fs_damp", K24);
+	mk(245, 315, "Delay Glide", &c->m_delayGlide, "", "fs_dglide", K19);
 
 	PixmapButton* antireflectButton = new PixmapButton(this, "Antireflect");
 	antireflectButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("antireflect_on"));
