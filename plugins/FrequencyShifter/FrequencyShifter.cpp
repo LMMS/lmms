@@ -261,14 +261,7 @@ Effect::ProcessStatus FrequencyShifterEffect::processImpl(SampleFrame* buf, cons
 					shiftedI = modI;
 				}
 
-				float ph = m_phase[ch] + dPh[ch];
-				ph = std::fmod(ph, twoPi);
-				if (ph < 0.f)
-				{
-					ph += twoPi;
-				}
-				m_phase[ch] = ph;
-
+				m_phase[ch] += dPh[ch];
 				out[ch] = shiftedR + ring * shiftedI;
 			}
 
