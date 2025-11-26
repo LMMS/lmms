@@ -114,13 +114,14 @@ Effect::ProcessStatus FrequencyShifterEffect::processImpl(SampleFrame* buf, cons
 	const float delayGlideCoeff = delayGlide ? std::exp(-1.f / (delayGlide * m_sampleRate)) : 0.f;
 	const float glideCoeff = glide ? std::exp(-1.f / (glide * m_sampleRate)) : 0.f;
 
-	const int wantSize = static_cast<int>(delayLen) + 4;
+	const int wantSize = static_cast<int>(delayLen) + 4;// +4 provides space for interpolation
 	if (wantSize > m_ringBufSize)
 	{
 		m_ringBufSize = wantSize;
 		m_ringBuf.resize(wantSize);
 	}
 
+	// we only bother with wrapping phases once per buffer
 	for (int ch = 0; ch < 2; ++ch)
 	{
 		m_lfoPhase[ch] = std::fmod(m_lfoPhase[ch], twoPi);
@@ -179,6 +180,7 @@ Effect::ProcessStatus FrequencyShifterEffect::processImpl(SampleFrame* buf, cons
 		const float fxInL = parallelFB ? (dlyL * feedback) : (inL + dlyL * feedback);
 		const float fxInR = parallelFB ? (dlyR * feedback) : (inR + dlyR * feedback);
 
+		// bring stereo phases back in-sync slowly if spread is set to 0
 		if (m_phase[0] != m_phase[1] && spread == 0.f)
 		{
 			for (int ch = 0; ch < 2; ++ch)
@@ -202,6 +204,7 @@ Effect::ProcessStatus FrequencyShifterEffect::processImpl(SampleFrame* buf, cons
 			}
 		}
 
+		// delta phase
 		const float dPh0 = (m_trueShift[0] + lfo0) * twoPiOverSr;
 		const float dPh1 = (m_trueShift[1] + lfo1) * twoPiOverSr;
 
@@ -225,6 +228,7 @@ Effect::ProcessStatus FrequencyShifterEffect::processImpl(SampleFrame* buf, cons
 
 				if (doHarm)
 				{
+					// arbitrary distortion function, crossfaded with original signal
 					const float xc = std::clamp(harmFactor * cosP, -3.f, 3.f);
 					const float xs = std::clamp(harmFactor * sinP, -3.f, 3.f);
 					const float xc2 = xc * xc;
@@ -272,14 +276,18 @@ Effect::ProcessStatus FrequencyShifterEffect::processImpl(SampleFrame* buf, cons
 		float delayInL = outL + (parallelFB ? inL : 0.f);
 		float delayInR = outR + (parallelFB ? inR : 0.f);
 
-		delayInL = (16.f * delayInL) / (16.f + std::fabs(delayInL));
-		delayInR = (16.f * delayInR) / (16.f + std::fabs(delayInR));
+		// saturate feedback loop to ensure it doesn't explode
+		constexpr float FbSaturation = 16.f;
+		delayInL = (FbSaturation * delayInL) / (FbSaturation + std::fabs(delayInL));
+		delayInR = (FbSaturation * delayInR) / (FbSaturation + std::fabs(delayInR));
 
+		// 1-pole lowpass in feedback loop
 		m_dampState[0] = (1.f - dampCoeff) * delayInL + dampCoeff * m_dampState[0];
 		m_dampState[1] = (1.f - dampCoeff) * delayInR + dampCoeff * m_dampState[1];
 		m_ringBuf[m_writeIndex][0] = m_dampState[0];
 		m_ringBuf[m_writeIndex][1] = m_dampState[1];
 
+		// 1-pole lowpass on entire signal
 		m_toneState[0] = (1.f - toneCoeff) * outL + toneCoeff * m_toneState[0];
 		m_toneState[1] = (1.f - toneCoeff) * outR + toneCoeff * m_toneState[1];
 		outL = m_toneState[0];

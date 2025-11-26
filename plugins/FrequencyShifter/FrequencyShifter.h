@@ -75,39 +75,6 @@ private:
 	float m_hp[2] = {0.f, 0.f};
 	float m_lfoPhase[2] = {0.f, 0.f};
 
-	struct PrefilterLP
-	{
-		float v0z = 0.f;
-		float v1 = 0.f;
-		float v2 = 0.f;
-		float g1 = 0.f;
-		float g2 = 0.f;
-		float g3 = 0.f;
-		float g4 = 0.f;
-
-		void setCoefs(float sr, float cutoff)
-		{
-			const float g = std::tan(std::numbers::pi_v<float> * cutoff / sr);
-			const float ginv = g / (1 + g * (g + std::numbers::sqrt2_v<float>));
-			g1 = ginv;
-			g2 = 2 * (g + std::numbers::sqrt2_v<float>) * ginv;
-			g3 = g * ginv;
-			g4 = 2 * ginv;
-		}
-
-		float process(float in)
-		{
-			const float v1z = v1;
-			const float v3 = in + v0z - 2 * v2;
-			v1 += g1 * v3 - g2 * v1z;
-			v2 += g3 * v3 + g4 * v1z;
-			v0z = in;
-			return v2;
-		}
-	};
-
-	std::array<PrefilterLP, 2> m_prefilterLP;
-
 	std::array<float, 2> m_dampState = {0.f, 0.f};
 	std::array<float, 2> m_toneState = {0.f, 0.f};
 
