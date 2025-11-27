@@ -220,6 +220,7 @@ protected slots:
 	void copySelectedNotes();
 	void cutSelectedNotes();
 	void pasteNotes();
+	void duplicateNotes();
 	bool deleteSelectedNotes();
 
 	void updatePosition(const lmms::TimePos & t );
@@ -246,6 +247,7 @@ protected slots:
 	void glueNotes();
 	void fitNoteLengths(bool fill);
 	void reverseNotes();
+	void flipNotes();
 	void constrainNoteLengths(bool constrainMax);
 
 	void changeSnapMode();

@@ -81,6 +81,9 @@ public:
 	//! Horizontally flip the positions of the given notes.
 	void reverseNotes(const NoteVector& notes);
 
+	//! Vertically flip the positions of the given notes.
+	void flipNotes(const NoteVector& notes);
+
 	// Split the list of notes on the given position
 	void splitNotes(const NoteVector& notes, TimePos pos);
 
