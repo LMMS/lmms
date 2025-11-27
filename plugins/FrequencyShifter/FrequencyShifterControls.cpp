@@ -22,7 +22,7 @@
  *
  */
 
-#include "FrequencyShifter.h"
+#include "FrequencyShifterEffect.h"
 #include "FrequencyShifterControls.h"
 
 #include <QDomElement>

@@ -22,7 +22,7 @@
  *
  */
 
-#include "FrequencyShifter.h"
+#include "FrequencyShifterEffect.h"
 
 #include "embed.h"
 #include "plugin_export.h"
@@ -153,32 +153,24 @@ Effect::ProcessStatus FrequencyShifterEffect::processImpl(SampleFrame* buf, cons
 		m_trueDelay = std::max((1.f - delayGlideCoeff) * delayLen + delayGlideCoeff * m_trueDelay, 1.f);
 		m_truePhase = (1.f - glideCoeff) * phase + glideCoeff * m_truePhase;
 
-		float intPartF;
-		const float fracDelay = std::modf(m_trueDelay, &intPartF);
-		const float frac = 1.f - fracDelay;
-		const int intPart = static_cast<int>(intPartF);
+		float readIndex = static_cast<float>(m_writeIndex) - m_trueDelay;
+		if (readIndex < 0.f) { readIndex += static_cast<float>(m_ringBufSize); }
 
-		int readIndex = m_writeIndex - intPart;
-		const int ri1 = (readIndex >= 0) ? (readIndex) : (readIndex + m_ringBufSize);
-		int ri2 = ri1 + 1;
-		if (ri2 == m_ringBufSize)
-		{
-			ri2 = 0;
-		}
+		const int indexFloor = static_cast<int>(readIndex);
+		const float frac = readIndex - static_cast<float>(indexFloor);
 
+		const std::array<float, 2> dly = getHermiteSample(indexFloor, frac);
+
+		const float inL = buf[i][0];
+		const float inR = buf[i][1];
+		const float fxInL = parallelFB ? (dly[0] * feedback) : (inL + dly[0] * feedback);
+		const float fxInR = parallelFB ? (dly[1] * feedback) : (inR + dly[1] * feedback);
+		
 		++m_writeIndex;
 		if (m_writeIndex == m_ringBufSize)
 		{
 			m_writeIndex = 0;
 		}
-
-		const float dlyL = std::lerp(m_ringBuf[ri1][0], m_ringBuf[ri2][0], frac);
-		const float dlyR = std::lerp(m_ringBuf[ri1][1], m_ringBuf[ri2][1], frac);
-
-		const float inL = buf[i][0];
-		const float inR = buf[i][1];
-		const float fxInL = parallelFB ? (dlyL * feedback) : (inL + dlyL * feedback);
-		const float fxInR = parallelFB ? (dlyR * feedback) : (inR + dlyR * feedback);
 
 		// bring stereo phases back in-sync slowly if spread is set to 0
 		if (m_phase[0] != m_phase[1] && spread == 0.f)

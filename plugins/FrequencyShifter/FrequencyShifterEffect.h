@@ -22,13 +22,14 @@
  *
  */
 
-#ifndef LMMS_FREQUENCY_SHIFTER_H
-#define LMMS_FREQUENCY_SHIFTER_H
+#ifndef LMMS_FREQUENCY_SHIFTER_EFFECT_H
+#define LMMS_FREQUENCY_SHIFTER_EFFECT_H
 
 #include "Effect.h"
 #include "FrequencyShifterControls.h"
 
 #include "HilbertTransform.h"
+#include "interpolation.h"
 #include "lmms_math.h"
 
 #include <array>
@@ -59,6 +60,33 @@ private slots:
 	void updateSampleRate();
 
 private:
+	std::array<float, 2> getHermiteSample(int indexFloor, float fraction)
+	{
+		const int size = m_ringBufSize;
+
+		const int i0 = (indexFloor == 0) ? (size - 1) : (indexFloor - 1);
+		const int i1 = indexFloor;
+
+		int i2 = indexFloor + 1;
+		int i3 = indexFloor + 2;
+		if (i2 >= size) i2 -= size;
+		if (i3 >= size) i3 -= size;
+
+		std::array<float, 2> out;
+
+		for (int ch = 0; ch < 2; ++ch)
+		{
+			const float v0 = m_ringBuf[i0][ch];
+			const float v1 = m_ringBuf[i1][ch];
+			const float v2 = m_ringBuf[i2][ch];
+			const float v3 = m_ringBuf[i3][ch];
+
+			out[ch] = hermiteInterpolate(v0, v1, v2, v3, fraction);
+		}
+
+		return out;
+	}
+
 	FrequencyShifterControls m_controls;
 	float m_fs[2] = {0.f, 0.f};
 	float m_phase[2] = {0.f, 0.f};
@@ -91,5 +119,5 @@ private:
 
 } // namespace lmms
 
-#endif // LMMS_FREQUENCY_SHIFTER_H
+#endif // LMMS_FREQUENCY_SHIFTER_EFFECT_H
 
