@@ -4601,8 +4601,11 @@ void PianoRoll::pasteNotes()
 	}
 }
 
-
-
+void PianoRoll::duplicateNotes()
+{
+	copySelectedNotes();
+	pasteNotes();
+}
 
 //Return false if no notes are deleted
 bool PianoRoll::deleteSelectedNotes()
@@ -4987,18 +4990,22 @@ PianoRollWindow::PianoRollWindow() :
 
 	auto pasteAction = new QAction(embed::getIconPixmap("edit_paste"), tr("Paste (%1+V)").arg(UI_CTRL_KEY), this);
 
+	auto duplicateAction = new QAction(embed::getIconPixmap("square_square"), tr("Duplicate (%1+D)").arg(UI_CTRL_KEY), this);
+
 	cutAction->setShortcut(keySequence(Qt::CTRL, Qt::Key_X));
 	copyAction->setShortcut(keySequence(Qt::CTRL, Qt::Key_C));
 	pasteAction->setShortcut(keySequence(Qt::CTRL, Qt::Key_V));
+	duplicateAction->setShortcut(keySequence(Qt::CTRL, Qt::Key_D));
 
 	connect( cutAction, SIGNAL(triggered()), m_editor, SLOT(cutSelectedNotes()));
 	connect( copyAction, SIGNAL(triggered()), m_editor, SLOT(copySelectedNotes()));
 	connect( pasteAction, SIGNAL(triggered()), m_editor, SLOT(pasteNotes()));
+	connect( duplicateAction, SIGNAL(triggered()), m_editor, SLOT(duplicateNotes()));
 
 	copyPasteActionsToolBar->addAction( cutAction );
 	copyPasteActionsToolBar->addAction( copyAction );
 	copyPasteActionsToolBar->addAction( pasteAction );
-
+	copyPasteActionsToolBar->addAction( duplicateAction);
 
 	DropToolBar *timeLineToolBar = addDropToolBarToTop( tr( "Timeline controls" ) );
 	m_editor->m_timeLine->addToolButtons( timeLineToolBar );
