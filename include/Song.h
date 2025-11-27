@@ -202,8 +202,6 @@ public:
 		return m_playMode;
 	}
 
-	PlayMode lastPlayMode() const { return m_lastPlayMode; }
-
 	const TimePos& getPlayPos(PlayMode pm) const
 	{
 		return getTimeline(pm).getPlayPos();
@@ -430,8 +428,6 @@ private:
 	std::array<Timeline, PlayModeCount> m_timelines;
 
 	PlayMode m_playMode;
-	PlayMode m_lastPlayMode;
-
 	bar_t m_length;
 
 	const MidiClip* m_midiClipToPlay;

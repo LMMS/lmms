@@ -550,8 +550,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 		setCurrentIndex(m_audioInterfaces->findText(audioDevName));
 	m_audioIfaceSetupWidgets[audioDevName]->show();
 
-	connect(m_audioInterfaces, SIGNAL(activated(const QString&)),
-			this, SLOT(audioInterfaceChanged(const QString&)));
+	connect(m_audioInterfaces, &QComboBox::textActivated, this, &SetupDialog::audioInterfaceChanged);
 
 	// Advanced setting, hidden for now
 	// // TODO Handle or remove.
@@ -725,9 +724,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	m_midiInterfaces->setCurrentIndex(m_midiInterfaces->findText(midiDevName));
 	m_midiIfaceSetupWidgets[midiDevName]->show();
 
-	connect(m_midiInterfaces, SIGNAL(activated(const QString&)),
-			this, SLOT(midiInterfaceChanged(const QString&)));
-
+	connect(m_midiInterfaces, &QComboBox::textActivated, this, &SetupDialog::midiInterfaceChanged);
 
 	// MIDI autoassign group
 	QGroupBox * midiAutoAssignBox = new QGroupBox(tr("Automatically assign MIDI controller to selected track"), midi_w);
