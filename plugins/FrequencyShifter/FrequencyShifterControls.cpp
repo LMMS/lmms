@@ -48,7 +48,7 @@ FrequencyShifterControls::FrequencyShifterControls(FrequencyShifterEffect* e) :
 	m_glide(0.05f, 0.f, 1.f, 0.0001f, this, "Glide"),
 	m_tone(22000.f, 100.f, 22000.f, 0.1f, this, "Tone"),
 	m_phase(0.f, -2.f, 2.f, 0.00001f, this, "Phase"),
-	m_antireflect(true, this, "Antireflect"),
+	m_antireflect(false, this, "Antireflect"),
 	m_routeMode(0, 0, 2, this, "Route Mode"),
 	m_harmonics(0.f, 0.f, 1.f, 0.0001f, this, "Harmonics"),
 	m_resetShifter(false, this, "Reset Shifter"),

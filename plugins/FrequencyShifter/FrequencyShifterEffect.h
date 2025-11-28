@@ -101,7 +101,7 @@ private:
 
 	float m_lp[2] = {0.f, 0.f};
 	float m_hp[2] = {0.f, 0.f};
-	float m_lfoPhase[2] = {0.f, 0.f};
+	float m_lfoPhase = 0.f;
 
 	std::array<float, 2> m_dampState = {0.f, 0.f};
 	std::array<float, 2> m_toneState = {0.f, 0.f};

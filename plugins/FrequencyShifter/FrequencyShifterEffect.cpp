@@ -93,8 +93,7 @@ Effect::ProcessStatus FrequencyShifterEffect::processImpl(SampleFrame* buf, cons
 	}
 	if (!m_prevResetLfo && resetLfoBtn)
 	{
-		m_lfoPhase[0] = 0.f;
-		m_lfoPhase[1] = 0.f;
+		m_lfoPhase = 0.f;
 	}
 	m_prevResetShifter = resetShifterBtn;
 	m_prevResetLfo = resetLfoBtn;
@@ -103,7 +102,6 @@ Effect::ProcessStatus FrequencyShifterEffect::processImpl(SampleFrame* buf, cons
 	const float invRing = 1.f - ring;
 	const bool parallelFB = (routeMode >= 1);
 	const bool routeAdd = (routeMode == 1);
-	const float syncConstant = 100.f / m_sampleRate;
 
 	const bool doHarm = (harmonics > 0.f);
 	const float harmFactor = harmonics * 20.f + 1.f;
@@ -122,9 +120,9 @@ Effect::ProcessStatus FrequencyShifterEffect::processImpl(SampleFrame* buf, cons
 	}
 
 	// we only bother with wrapping phases once per buffer
+	m_lfoPhase = std::fmod(m_lfoPhase, twoPi);
 	for (int ch = 0; ch < 2; ++ch)
 	{
-		m_lfoPhase[ch] = std::fmod(m_lfoPhase[ch], twoPi);
 		m_phase[ch] = std::fmod(m_phase[ch], twoPi);
 	}
 
@@ -134,16 +132,15 @@ Effect::ProcessStatus FrequencyShifterEffect::processImpl(SampleFrame* buf, cons
 		float lfo1;
 		if (lfoAmt > 0.f)
 		{
-			lfo0 = std::sin(m_lfoPhase[0]) * lfoAmt;
-			lfo1 = std::sin(m_lfoPhase[1] + lfoSt) * lfoAmt;
+			lfo0 = std::sin(m_lfoPhase) * lfoAmt;
+			lfo1 = std::sin(m_lfoPhase + lfoSt) * lfoAmt;
 		}
 		else
 		{
 			lfo0 = 0.f;
 			lfo1 = 0.f;
 		}
-		m_lfoPhase[0] += lfoRate;
-		m_lfoPhase[1] += lfoRate;
+		m_lfoPhase += lfoRate;
 
 		const float base0 = fs - spread;
 		const float base1 = fs + spread;
@@ -170,30 +167,6 @@ Effect::ProcessStatus FrequencyShifterEffect::processImpl(SampleFrame* buf, cons
 		if (m_writeIndex == m_ringBufSize)
 		{
 			m_writeIndex = 0;
-		}
-
-		// bring stereo phases back in-sync slowly if spread is set to 0
-		if (m_phase[0] != m_phase[1] && spread == 0.f)
-		{
-			for (int ch = 0; ch < 2; ++ch)
-			{
-				if (m_phase[ch] >= twoPi)
-				{
-					m_phase[ch] -= twoPi;
-				}
-				else if (m_phase[ch] < 0.f)
-				{
-					m_phase[ch] += twoPi;
-				}
-			}
-			if (std::abs(m_phase[0] - m_phase[1]) <= syncConstant)
-			{
-				m_phase[1] = m_phase[0];
-			}
-			else
-			{
-				m_phase[1] += syncConstant;
-			}
 		}
 
 		// delta phase
