@@ -1427,6 +1427,24 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 				break;
 			}
 
+		case Qt::Key_Minus:
+			if (ke->modifiers() & Qt::ControlModifier)
+			{
+				// ctrl - will zoom out 
+				int value = m_zoomingModel.value();
+				m_zoomingModel.setValue(value - 1);
+			}
+			break;
+
+		case Qt::Key_Equal:
+			if (ke->modifiers() & Qt::ControlModifier)
+			{
+				// ctrl = will zoom in
+				int value = m_zoomingModel.value();
+				m_zoomingModel.setValue(value + 1);
+			}
+			break;
+
 		case Qt::Key_A:
 			if (ke->modifiers() & Qt::ControlModifier && m_editMode != EditMode::Strum && m_editMode != EditMode::Knife)
 			{
@@ -4603,8 +4621,21 @@ void PianoRoll::pasteNotes()
 
 void PianoRoll::duplicateNotes()
 {
-	copySelectedNotes();
-	pasteNotes();
+
+	NoteVector selected_notes = getSelectedNotes();
+	clearSelectedNotes();
+
+	if( ! selected_notes.empty() )
+	{
+		for( const Note *note : selected_notes)
+		{
+			Note new_note( *note );
+			new_note.setPos( note->pos() );
+			new_note.setSelected( true );
+
+			m_midiClip->addNote( new_note, false );
+		}
+	}
 }
 
 //Return false if no notes are deleted

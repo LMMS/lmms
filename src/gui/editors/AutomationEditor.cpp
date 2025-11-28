@@ -291,6 +291,24 @@ void AutomationEditor::keyPressEvent(QKeyEvent * ke )
 			ke->accept();
 			break;
 
+		case Qt::Key_Minus:
+			if (ke->modifiers() & Qt::ControlModifier)
+			{
+				// ctrl - will zoom out 
+				int value = m_zoomingXModel.value();
+				m_zoomingXModel.setValue(value - 1);
+			}
+			break;
+
+		case Qt::Key_Equal:
+			if (ke->modifiers() & Qt::ControlModifier)
+			{
+				// ctrl = will zoom in
+				int value = m_zoomingXModel.value();
+				m_zoomingXModel.setValue(value + 1);
+			}
+			break;
+
 		default:
 			ke->ignore();
 			break;
