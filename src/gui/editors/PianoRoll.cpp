@@ -1434,14 +1434,26 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 				int value = m_zoomingXModel.value();
 				m_zoomingXModel.setValue(value - 1);
 			}
+			if (ke->modifiers() & Qt::AltModifier)
+			{
+				// alt = will zoom y out
+				int value = m_zoomingYModel.value();
+				m_zoomingYModel.setValue(value - 1);
+			}
 			break;
 
 		case Qt::Key_Equal:
 			if (ke->modifiers() & Qt::ControlModifier)
 			{
-				// ctrl = will zoom in
+				// ctrl = will zoom x in
 				int value = m_zoomingXModel.value();
 				m_zoomingXModel.setValue(value + 1);
+			}
+			if (ke->modifiers() & Qt::AltModifier)
+			{
+				// alt = will zoom y in
+				int value = m_zoomingYModel.value();
+				m_zoomingYModel.setValue(value + 1);
 			}
 			break;
 
@@ -1493,6 +1505,15 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 			break;
 
 		case Qt::Key_0:
+			if (ke->modifiers() & Qt::ControlModifier)
+			{
+				m_zoomingXModel.setValue(3);	
+			}
+
+			if (ke->modifiers() & Qt::AltModifier)
+			{
+				m_zoomingYModel.setValue(2);	
+			}
 		case Qt::Key_1:
 		case Qt::Key_2:
 		case Qt::Key_3:
