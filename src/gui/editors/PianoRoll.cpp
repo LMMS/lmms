@@ -5074,7 +5074,7 @@ PianoRollWindow::PianoRollWindow() :
 
 	auto reverseAction = new QAction(embed::getIconPixmap("flip_x"), tr("Reverse Notes"), noteToolsButton);
 	connect(reverseAction, &QAction::triggered, [this](){ m_editor->reverseNotes(); });
-	reverseAction->setShortcut(keySequence(Qt::SHIFT, Qt::Key_H));
+	reverseAction->setShortcut(keySequence(Qt::SHIFT, Qt::Key_R));
 
 	auto flipAction = new QAction(embed::getIconPixmap("flip_y"), tr("Flip Notes"), noteToolsButton);
 	connect(flipAction, &QAction::triggered, [this](){ m_editor->flipNotes(); });
