@@ -361,7 +361,7 @@ private:
 
 	static SimpleTextFloat * s_textFloat;
 
-	ComboBoxModel m_zoomingModel;
+	ComboBoxModel m_zoomingXModel;
 	ComboBoxModel m_zoomingYModel;
 	ComboBoxModel m_quantizeModel;
 	ComboBoxModel m_noteLenModel;
