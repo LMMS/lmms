@@ -4621,7 +4621,6 @@ void PianoRoll::pasteNotes()
 
 void PianoRoll::duplicateNotes()
 {
-
 	NoteVector selected_notes = getSelectedNotes();
 	clearSelectedNotes();
 
