@@ -46,7 +46,7 @@ public:
 
 	//! Ring buffer size for the data being transfered from the audio thread to the gui thread
 	//! The actual size of the history buffer is defined in OscilloscopeGraph.h
-	static constexpr int InputBufferSize = 4096 * 4; // Using same queue buffer size as Spectrum Analyzer
+	static constexpr int InputBufferSize = 4096 * 16; // This number seems to be large enough to work with 192000 Hz sample rate
 
 	LocklessRingBuffer<SampleFrame>& inputBuffer() { return m_inputBuffer; }
 
