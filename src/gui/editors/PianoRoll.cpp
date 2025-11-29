@@ -1504,16 +1504,6 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 			ke->accept();
 			break;
 
-		case Qt::Key_0:
-			if (ke->modifiers() & Qt::ControlModifier)
-			{
-				m_zoomingXModel.setValue(3);	
-			}
-
-			if (ke->modifiers() & Qt::AltModifier)
-			{
-				m_zoomingYModel.setValue(2);	
-			}
 		case Qt::Key_1:
 		case Qt::Key_2:
 		case Qt::Key_3:
