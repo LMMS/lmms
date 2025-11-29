@@ -68,6 +68,7 @@ OscilloscopeControlDialog::OscilloscopeControlDialog(OscilloscopeControls* contr
 
 	Knob* lengthKnob = new Knob(KnobType::Bright26, tr("Window Size"), this);
 	lengthKnob->setModel(&controls->m_lengthModel);
+	lengthKnob->setUnit(" ms");
 	controlsLayout->addWidget(lengthKnob);
 
 	Knob* phaseKnob = new Knob(KnobType::Bright26, tr("Offset"), this);

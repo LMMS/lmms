@@ -58,15 +58,19 @@ public:
 	void mousePressEvent(QMouseEvent* me) override;
 	void mouseMoveEvent(QMouseEvent* me) override;
 
-	//! Length of the oscilloscope history; the buffer which is actually drawn on the screen, not the ring buffer used for communication between threads
-	static constexpr int BufferSize = 44100 * 3;
+	//! Length of the oscilloscope history in seconds
+	static constexpr float MaxBufferLengthSeconds = 5.0f;
+
+private slots:
+	void changeSampleRate();
 
 private:
 	OscilloscopeControls* m_controls;
 
 	LocklessRingBufferReader<SampleFrame> m_inputBufferReader;
 
-	std::array<SampleFrame, BufferSize> m_ringBuffer = {};
+	// Buffer which is actually drawn on the screen, not the ring buffer used for communication between threads
+	std::vector<SampleFrame> m_ringBuffer = {};
 	int m_ringBufferIndex = 0;
 
 	int m_mousePos;

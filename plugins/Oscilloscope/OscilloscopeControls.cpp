@@ -34,7 +34,7 @@ namespace lmms
 OscilloscopeControls::OscilloscopeControls(Oscilloscope* effect) :
 	EffectControls(effect),
 	m_ampModel(100.0f, 0.0f, 1000.0f, 0.00001f, this, tr("Amplitude")),
-	m_lengthModel(10000.0f, 10.0f, gui::OscilloscopeGraph::BufferSize, 1.0f, this, tr("Length")),
+	m_lengthModel(500.0f, 1.0f, gui::OscilloscopeGraph::MaxBufferLengthSeconds * 1000, 0.001f, this, tr("Length")),
 	m_phaseModel(1.0f, 0.0f, 1.0f, 0.00001f, this, tr("Phase")),
 	m_pauseModel(false, this, tr("Pause")),
 	m_stereoModel(false, this, tr("Stereo")),
