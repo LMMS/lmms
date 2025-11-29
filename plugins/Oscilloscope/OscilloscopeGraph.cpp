@@ -40,7 +40,8 @@ namespace lmms::gui
 
 OscilloscopeGraph::OscilloscopeGraph(QWidget* parent, OscilloscopeControls* controls):
 	QWidget(parent),
-	m_controls(controls)
+	m_controls(controls),
+	m_inputBufferReader(static_cast<Oscilloscope*>(m_controls->effect())->inputBuffer())
 {
 	setAutoFillBackground(true);
 	connect(getGUI()->mainWindow(), SIGNAL(periodicUpdate()), this, SLOT(update()));
@@ -50,23 +51,25 @@ OscilloscopeGraph::OscilloscopeGraph(QWidget* parent, OscilloscopeControls* cont
 
 void OscilloscopeGraph::paintEvent(QPaintEvent* pe)
 {
-	if (!isVisible()) { return; }
+	Oscilloscope* effect = static_cast<Oscilloscope*>(m_controls->effect());
+
+	// Update the ring buffer with any new data from the audio thread
+	auto incomingBuffer = m_inputBufferReader.read_max(effect->inputBuffer().capacity() / 4);
+	for (f_cnt_t f = 0; f < incomingBuffer.size(); ++f)
+	{
+		m_ringBuffer[m_ringBufferIndex] = incomingBuffer[f];
+		m_ringBufferIndex = (m_ringBufferIndex + 1) % BufferSize;
+    }
 
 	QPainter p(this);
 	p.fillRect(0, 0, width(), height(), m_backgroundColor);
-
-	Oscilloscope* effect = static_cast<Oscilloscope*>(m_controls->effect());
 
 	float amp = m_controls->m_ampModel.value() * 0.01f;
 	float phase = m_controls->m_phaseModel.value();
 	int windowSize = m_controls->m_lengthModel.value();
 	int framesPerPixel = std::max(1, windowSize / width());
 
-
-	auto buffer = effect->buffer();
-	int bufferSize = Oscilloscope::BufferSize;
-	int bufferIndex = effect->bufferIndex();
-	int windowStartIndex = bufferIndex + (bufferSize - windowSize) + (phase) * bufferSize;
+	int windowStartIndex = m_ringBufferIndex + (BufferSize - windowSize) + (phase) * BufferSize;
 	// Quantize start index to prevent flickering
 	windowStartIndex -= windowStartIndex % framesPerPixel;
 
@@ -89,16 +92,16 @@ void OscilloscopeGraph::paintEvent(QPaintEvent* pe)
 		p.setPen(color);
 		for (int f = 0; f < windowSize - framesPerPixel; f += framesPerPixel)
 		{
-			const int currentIndex = (windowStartIndex + f) % bufferSize;
-			const int nextIndex = (windowStartIndex + f + framesPerPixel) % bufferSize;
+			const int currentIndex = (windowStartIndex + f) % BufferSize;
+			const int nextIndex = (windowStartIndex + f + framesPerPixel) % BufferSize;
 
-			float maxValue = getChannel(buffer[hq ? currentIndex : nextIndex]);
-			float minValue = getChannel(buffer[currentIndex]);
+			float maxValue = getChannel(m_ringBuffer[hq ? currentIndex : nextIndex]);
+			float minValue = getChannel(m_ringBuffer[currentIndex]);
 
 			for (int i = currentIndex + 1; hq && i <= nextIndex; ++i)
 			{
-				maxValue = std::max(maxValue, getChannel(buffer[i]));
-				minValue = std::min(minValue, getChannel(buffer[i]));
+				maxValue = std::max(maxValue, getChannel(m_ringBuffer[i]));
+				minValue = std::min(minValue, getChannel(m_ringBuffer[i]));
 			}
 
 			p.drawLine(
@@ -125,10 +128,10 @@ void OscilloscopeGraph::wheelEvent(QWheelEvent* we)
 {
 	int windowSize = m_controls->m_lengthModel.value();
 	float phase = m_controls->m_phaseModel.value();
-	float mouseOffset = (1.0f - we->position().x() / width()) * windowSize / Oscilloscope::BufferSize;
+	float mouseOffset = (1.0f - we->position().x() / width()) * windowSize / BufferSize;
 	float zoomAmount = std::clamp(std::exp2(-we->angleDelta().y() / 240.0f), m_controls->m_lengthModel.minValue() / windowSize, m_controls->m_lengthModel.maxValue() / windowSize);
 
-	if ((zoomAmount > 1.0f && windowSize >= Oscilloscope::BufferSize) || (zoomAmount < 1.0f && windowSize <= 10)) { return; }
+	if ((zoomAmount > 1.0f && windowSize >= BufferSize) || (zoomAmount < 1.0f && windowSize <= 10)) { return; }
 
 	int newWindowSize = windowSize * zoomAmount;
 	float newPhase = phase - mouseOffset * (1.0f - zoomAmount);
@@ -146,7 +149,7 @@ void OscilloscopeGraph::mouseMoveEvent(QMouseEvent* me)
 {
 	float phase = m_controls->m_phaseModel.value();
 	int windowSize = m_controls->m_lengthModel.value();
-	float newPhase = phase + 1.0f * (m_mousePos - me->x()) / width() * windowSize / Oscilloscope::BufferSize;
+	float newPhase = phase + 1.0f * (m_mousePos - me->x()) / width() * windowSize / BufferSize;
 	m_controls->m_phaseModel.setValue(newPhase - std::floor(newPhase));
 	m_mousePos = me->x();
 }

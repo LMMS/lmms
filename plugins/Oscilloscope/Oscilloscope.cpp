@@ -49,7 +49,8 @@ Plugin::Descriptor PLUGIN_EXPORT oscilloscope_plugin_descriptor =
 
 Oscilloscope::Oscilloscope(Model* parent, const Descriptor::SubPluginFeatures::Key* key) :
 	Effect(&oscilloscope_plugin_descriptor, parent, key),
-	m_controls(this)
+	m_controls(this),
+	m_inputBuffer(InputBufferSize)
 {
 }
 
@@ -58,11 +59,8 @@ Effect::ProcessStatus Oscilloscope::processImpl(SampleFrame* buffer, const fpp_t
 {
 	if (!m_controls.m_pauseModel.value())
 	{
-		for (f_cnt_t f = 0; f < frames; ++f)
-		{
-			m_ringBuffer[m_ringBufferIndex] = buffer[f];
-			m_ringBufferIndex = (m_ringBufferIndex + 1) % BufferSize;
-		}
+		// Send the samples from the audio thread over to the gui via a ring buffer; the gui will do all of the processing.
+		m_inputBuffer.write(buffer, frames);
 	}
 	return ProcessStatus::Continue;
 }

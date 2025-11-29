@@ -26,6 +26,7 @@
 #define LMMS_GUI_OSCILLOSCOPE_GRAPH_H
 
 #include "OscilloscopeControls.h"
+#include "LocklessRingBuffer.h"
 #include <QWidget>
 
 namespace lmms
@@ -56,8 +57,18 @@ public:
 	void wheelEvent(QWheelEvent* we) override;
 	void mousePressEvent(QMouseEvent* me) override;
 	void mouseMoveEvent(QMouseEvent* me) override;
+
+	//! Length of the oscilloscope history; the buffer which is actually drawn on the screen, not the ring buffer used for communication between threads
+	static constexpr int BufferSize = 44100 * 3;
+
 private:
 	OscilloscopeControls* m_controls;
+
+	LocklessRingBufferReader<SampleFrame> m_inputBufferReader;
+
+	std::array<SampleFrame, BufferSize> m_ringBuffer = {};
+	int m_ringBufferIndex = 0;
+
 	int m_mousePos;
 
 	QColor m_monoColor = QColor(255, 255, 255);

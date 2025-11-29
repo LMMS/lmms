@@ -27,6 +27,7 @@
 
 #include "Effect.h"
 #include "OscilloscopeControls.h"
+#include "LocklessRingBuffer.h"
 
 namespace lmms
 {
@@ -43,16 +44,16 @@ public:
 		return &m_controls;
 	}
 
-	static constexpr int BufferSize = 44100 * 3;
+	//! Ring buffer size for the data being transfered from the audio thread to the gui thread
+	//! The actual size of the history buffer is defined in OscilloscopeGraph.h
+	static constexpr int InputBufferSize = 4096 * 4; // Using same queue buffer size as Spectrum Analyzer
 
-	std::span<const SampleFrame, BufferSize> buffer() const { return m_ringBuffer; }
-	int bufferIndex() const { return m_ringBufferIndex; }
+	LocklessRingBuffer<SampleFrame>& inputBuffer() { return m_inputBuffer; }
 
 private:
 	OscilloscopeControls m_controls;
 
-	std::array<SampleFrame, BufferSize> m_ringBuffer = {};
-	int m_ringBufferIndex = 0;
+	LocklessRingBuffer<SampleFrame> m_inputBuffer;
 
 	friend class OscilloscopeControls;
 };
