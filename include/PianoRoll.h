@@ -222,8 +222,8 @@ protected slots:
 	void pasteNotes();
 	bool deleteSelectedNotes();
 
-	void updatePosition(const lmms::TimePos & t );
-	void updatePositionAccompany(const lmms::TimePos & t );
+	void updatePosition();
+	void updatePositionAccompany();
 	void updatePositionStepRecording(const lmms::TimePos & t );
 
 	void zoomingChanged();
@@ -328,6 +328,7 @@ private:
 	void cancelStrumAction();
 
 	void updateScrollbars();
+	void updatePositionLinePos();
 	void updatePositionLineHeight();
 
 	QList<int> getAllOctavesForKey( int keyToMirror ) const;
@@ -531,9 +532,6 @@ private:
 	QBrush m_blackKeyActiveBackground;
 	QBrush m_blackKeyInactiveBackground;
 	QBrush m_blackKeyDisabledBackground;
-
-signals:
-	void positionChanged( const lmms::TimePos & );
 } ;
 
 
