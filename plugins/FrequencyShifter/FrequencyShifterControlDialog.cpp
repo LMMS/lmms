@@ -250,7 +250,6 @@ FrequencyShifterHelpView::FrequencyShifterHelpView() :
 	setTextInteractionFlags(Qt::TextSelectableByKeyboard | Qt::TextSelectableByMouse);
 	getGUI()->mainWindow()->addWindowedWidget(this);
 	parentWidget()->setAttribute(Qt::WA_DeleteOnClose, false);
-	parentWidget()->setWindowIcon(PLUGIN_NAME::getIconPixmap("logo"));
 
 	// No maximize button
 	Qt::WindowFlags flags = parentWidget()->windowFlags();

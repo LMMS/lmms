@@ -44,11 +44,15 @@ Plugin::Descriptor PLUGIN_EXPORT frequencyshifter_plugin_descriptor =
 	"Lost Robot <r94231/at/gmail/dot/com>",
 	0x0100,
 	Plugin::Type::Effect,
-	new PluginPixmapLoader("logo"),
+	new PixmapLoader("lmms-plugin-logo"),
 	nullptr,
 	nullptr,
 };
+PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* parent, void* data)
+{
+	return new FrequencyShifterEffect(parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key*>(data));
 }
+}// extern "C"
 
 FrequencyShifterEffect::FrequencyShifterEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key) :
 	Effect(&frequencyshifter_plugin_descriptor, parent, key),
@@ -63,7 +67,7 @@ FrequencyShifterEffect::FrequencyShifterEffect(Model* parent, const Descriptor::
 
 Effect::ProcessStatus FrequencyShifterEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 {
-	const float twoPi = std::numbers::pi_v<float> * 2.0f;
+	constexpr float twoPi = std::numbers::pi_v<float> * 2.0f;
 
 	const float mix = m_controls.m_mix.value() * wetLevel();
 	const float fs = m_controls.m_freqShift.value();
@@ -91,14 +95,10 @@ Effect::ProcessStatus FrequencyShifterEffect::processImpl(SampleFrame* buf, cons
 		m_phase[0] = 0.f;
 		m_phase[1] = 0.f;
 	}
-	if (!m_prevResetLfo && resetLfoBtn)
-	{
-		m_lfoPhase = 0.f;
-	}
+	if (!m_prevResetLfo && resetLfoBtn) { m_lfoPhase = 0.f; }
 	m_prevResetShifter = resetShifterBtn;
 	m_prevResetLfo = resetLfoBtn;
 
-	const float twoPiOverSr = twoPi / m_sampleRate;
 	const float invRing = 1.f - ring;
 	const bool parallelFB = (routeMode >= 1);
 	const bool routeAdd = (routeMode == 1);
@@ -107,17 +107,10 @@ Effect::ProcessStatus FrequencyShifterEffect::processImpl(SampleFrame* buf, cons
 	const float harmFactor = harmonics * 20.f + 1.f;
 	const float harmDiv = 1.f / (harmonics * 0.3f + 1.f);
 
-	const float dampCoeff = std::exp(-2.f * std::numbers::pi_v<float> * delayDamp / m_sampleRate);
-	const float toneCoeff = std::exp(-2.f * std::numbers::pi_v<float> * tone / m_sampleRate);
+	const float dampCoeff = std::exp(-m_twoPiOverSr * delayDamp);
+	const float toneCoeff = std::exp(-m_twoPiOverSr * tone);
 	const float delayGlideCoeff = delayGlide ? std::exp(-1.f / (delayGlide * m_sampleRate)) : 0.f;
 	const float glideCoeff = glide ? std::exp(-1.f / (glide * m_sampleRate)) : 0.f;
-
-	const int wantSize = static_cast<int>(delayLen) + 4;// +4 provides space for interpolation
-	if (wantSize > m_ringBufSize)
-	{
-		m_ringBufSize = wantSize;
-		m_ringBuf.resize(wantSize);
-	}
 
 	// we only bother with wrapping phases once per buffer
 	m_lfoPhase = std::fmod(m_lfoPhase, twoPi);
@@ -126,7 +119,7 @@ Effect::ProcessStatus FrequencyShifterEffect::processImpl(SampleFrame* buf, cons
 		m_phase[ch] = std::fmod(m_phase[ch], twoPi);
 	}
 
-	for (fpp_t i = 0; i < frames; ++i)
+	for (size_t i = 0; i < frames; ++i)
 	{
 		float lfo0;
 		float lfo1;
@@ -164,14 +157,11 @@ Effect::ProcessStatus FrequencyShifterEffect::processImpl(SampleFrame* buf, cons
 		const float fxInR = parallelFB ? (dly[1] * feedback) : (inR + dly[1] * feedback);
 		
 		++m_writeIndex;
-		if (m_writeIndex == m_ringBufSize)
-		{
-			m_writeIndex = 0;
-		}
+		if (m_writeIndex == m_ringBufSize) { m_writeIndex = 0; }
 
 		// delta phase
-		const float dPh0 = (m_trueShift[0] + lfo0) * twoPiOverSr;
-		const float dPh1 = (m_trueShift[1] + lfo1) * twoPiOverSr;
+		const float dPh0 = (m_trueShift[0] + lfo0) * m_twoPiOverSr;
+		const float dPh1 = (m_trueShift[1] + lfo1) * m_twoPiOverSr;
 
 		float outL;
 		float outR;
@@ -277,17 +267,16 @@ Effect::ProcessStatus FrequencyShifterEffect::processImpl(SampleFrame* buf, cons
 void FrequencyShifterEffect::updateSampleRate()
 {
 	m_sampleRate = Engine::audioEngine()->outputSampleRate();
+	
+	constexpr float twoPi = std::numbers::pi_v<float> * 2.0f;
+	m_twoPiOverSr = twoPi / m_sampleRate;
 
 	m_hilbert1 = HilbertIIRFloat<2>(m_sampleRate, 2.0f);
 	m_hilbert2 = HilbertIIRFloat<2>(m_sampleRate, 2.0f);
-}
-
-extern "C"
-{
-PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* parent, void* data)
-{
-	return new FrequencyShifterEffect(parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key*>(data));
-}
+	
+	// +6 provides space for interpolation
+	m_ringBufSize = (m_controls.m_delayLengthLong.maxValue() + m_controls.m_delayLengthShort.maxValue()) * 0.001f * m_sampleRate + 6.f;
+	m_ringBuf.resize(m_ringBufSize);
 }
 
 } // namespace lmms

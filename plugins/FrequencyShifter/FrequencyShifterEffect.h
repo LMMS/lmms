@@ -90,7 +90,8 @@ private:
 	FrequencyShifterControls m_controls;
 	float m_fs[2] = {0.f, 0.f};
 	float m_phase[2] = {0.f, 0.f};
-	float m_sampleRate = 44100.f;
+	float m_sampleRate = 0.f;
+	float m_twoPiOverSr = 0.f;
 
 	int m_ringBufSize = 0;
 	std::vector<std::array<float, 2>> m_ringBuf;
