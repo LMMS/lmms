@@ -328,6 +328,7 @@ void AutomationEditor::keyPressEvent(QKeyEvent * ke )
 				m_zoomingYModel.setValue(0);	
 				m_zoomingXModel.setValue(3);	
 			}
+			break;
 		default:
 			ke->ignore();
 			break;
