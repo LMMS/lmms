@@ -80,8 +80,11 @@ void OscilloscopeGraph::paintEvent(QPaintEvent* pe)
 	int framesPerPixel = std::max(1, windowSizeFrames / width());
 
 	int windowStartIndex = m_ringBufferIndex + (m_ringBuffer.size() - windowSizeFrames) + (phase) * m_ringBuffer.size();
-	// Quantize start index to prevent flickering
-	windowStartIndex -= windowStartIndex % framesPerPixel;
+	// Quantize start index to prevent flickering (round up to prevent going below the current ring buffer index)
+	int frameOffsetWithinPixel = windowStartIndex % framesPerPixel;
+	windowStartIndex += framesPerPixel - frameOffsetWithinPixel;
+	// And subtract that amount from the window size to prevent going past off the right
+	windowSizeFrames -= framesPerPixel - frameOffsetWithinPixel;
 
 	p.setPen(m_minorLineColor);
 	p.drawLine(0, height() / 2, width(), height() / 2);
