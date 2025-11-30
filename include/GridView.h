@@ -1,5 +1,5 @@
 /*
- * Command.h - implements Commands, a layer between the core and gui
+ * GridView.h - a grid display and editor widget
  *
  * Copyright (c) 2025 szeli1
  *
@@ -25,84 +25,7 @@
 #ifndef LMMS_GRID_VIEW_H
 #define LMMS_GRID_VIEW_H
 
-
-
-class LMMS_EXPORT Graph : public QWidget, public ModelView
-{
-	Q_OBJECT
-public:
-	enum class Style
-	{
-		Nearest, //!< draw as stairs
-		Linear, //!< connect each 2 samples with a line, with wrapping
-		LinearNonCyclic, //!< Linear without wrapping
-		Bar, //!< draw thick bars
-	};
-
-	/**
-	 * @brief Constructor
-	 * @param _width Pixel width of widget
-	 * @param _height Pixel height of widget
-	 */
-	Graph( QWidget * _parent, Style _style = Style::Linear,
-		int _width = 132,
-		int _height = 104
-	);
-	~Graph() override = default;
-
-	void setForeground( const QPixmap & _pixmap );
-
-
-	void setGraphColor( const QColor );
-
-	inline graphModel * model()
-	{
-		return castModel<graphModel>();
-	}
-
-	inline Style getGraphStyle()
-	{
-		return m_graphStyle;
-	}
-
-
-	inline void setGraphStyle( Style _s )
-	{
-		m_graphStyle = _s;
-		update();
-	}
-
-signals:
-	void drawn();
-protected:
-	void paintEvent( QPaintEvent * _pe ) override;
-	void dropEvent( QDropEvent * _de ) override;
-	void dragEnterEvent( QDragEnterEvent * _dee ) override;
-	void mousePressEvent( QMouseEvent * _me ) override;
-	void mouseMoveEvent( QMouseEvent * _me ) override;
-	void mouseReleaseEvent( QMouseEvent * _me ) override;
-
-protected slots:
-	void updateGraph( int _startPos, int _endPos );
-	void updateGraph();
-
-private:
-	void modelChanged() override;
-
-	void changeSampleAt( int _x, int _y );
-	void drawLineAt( int _x, int _y, int _lastx );
-
-
-	QPixmap m_foreground;
-	QColor m_graphColor;
-
-	Style m_graphStyle;
-
-	bool m_mouseDown;
-	int m_lastCursorX;
-
-} ;
-
+#include <QPointF>
 
 namespace lmms::gui
 {
@@ -117,6 +40,20 @@ public:
 	{
 		return castModel<GridModel>();
 	}
+	enum MoveDir
+	{
+		right,
+		left,
+		up,
+		down
+	};
+
+	void moveToWhole(unsigned int x, unsigned int y);
+	void moveToNearest(MoveDir dir);
+
+	//! selects everything between `start` and `end`
+	//! uses `getCenter` for bounds checking
+	void select(QPointF start, QPointF end);
 
 protected:
 	void paintEvent(QPaintEvent* pe) override;
@@ -125,13 +62,30 @@ protected:
 	void mousePressEvent(QMouseEvent* me) override;
 	void mouseMoveEvent(QMouseEvent* me) override;
 	void mouseReleaseEvent(QMouseEvent* me) override;
-private:
+	
+	void drawGrid();
+
+	//! should return the start coords and the end coords of an object / note / point
+	virtual std::pair<QPointF, QPointF> getBoundingBox(size_t index) = 0;
+	//! should to apply selection based on `m_selectStart` and `m_selectEnd`
+	//! use `select()` to apply selection automatically
+	virtual void updateSelection();
+	std::set<size_t> m_selecion;
+
 	void modelChanged() override;
 
-	float selectStartX;
-	float selectStartY;
-	float selectEndX;
-	float selectEndY;
+	//! if shift is pressed
+	bool m_isSelectionPressed;
+	//! if control is sperssed
+	bool m_isNearestPressed;
+
+	QPointF m_selectStartOld;
+	QPointF m_selectEndOld;
+	QPointF m_selectStart;
+	QPointF m_selectEnd;
+
+	unsigned int m_cubeWidth;
+	unsigned int m_cubeHeight;
 };
 
 } // namespace lmms::gui

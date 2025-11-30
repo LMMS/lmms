@@ -44,6 +44,11 @@ public:
 		float x;
 		float y;
 	};
+	struct Item
+	{
+		ItemInfo info;
+		std::shared_ptr<void> object;
+	};
 
 	//! @return index if found inside radius, else -1
 	//! (the first index is returned where `xPos` is found)
@@ -56,23 +61,20 @@ public:
 	//! @return new / final index (if x changed)
 	size_t setInfo(size_t index, const ItemInfo& info);
 	size_t setInfo(size_t index, const ItemInfo& info, unsigned int horizontalSteps, unsigned int verticalSteps);
-	const ItemInfo& getInfo(size_t index);
+	const Item& getItem(size_t index);
 
+	//! @return item count
+	size_t getCount();
 	void resizeGrid(size_t length, size_t height);
 	virtual ~GridModel();
 protected:
 	GridModel(size_t length, size_t height, unsigned int horizontalSteps, unsigned int verticalSteps,
 		Model* parent, QString displayName, bool defaultConstructed);
 
-	struct Item
-	{
-		ItemInfo info;
-		std::shared_ptr<void> object;
-	};
-
 	//! @return index if found, -1 if not
 	int findObject(void* object);
-	//! @return index if found, index after xPos if not found
+	//! @return the index where [index - 1].x < xPos and xPos <= [index].x
+	//! so return the first index where xPos <= x
 	size_t findIndex(float xPos);
 
 	//! @return index where added
@@ -83,19 +85,18 @@ protected:
 	size_t setX(size_t index, float newX);
 	void setY(size_t index, float newY);
 
-	float fitPos(float position, size_t max, unsigned int steps);
+	float fitPos(float position, unsigned int max, unsigned int steps);
 
 private:
-	size_t m_length;
-	size_t m_height;
+	unsigned int m_length;
+	unsigned int m_height;
 	unsigned int m_horizontalSteps;
 	unsigned int m_verticalSteps;
 
 	//! items are sorted by x position ascending
 	std::vector<Item> m_items;
-	std::set<size_t> m_selecion;
 
-	friend class gui::GridView;
+	friend class lmms::gui::GridView;
 };
 
 template<typename T>

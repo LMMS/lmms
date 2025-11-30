@@ -184,17 +184,22 @@ size_t GridModel::setInfo(size_t index, const GridModel::ItemInfo& info, unsigne
 	if (newY != m_items[index].info.y) { setY(index, newY); }
 	return finalIndex;
 }
-const GridModel::ItemInfo& GridModel::getInfo(size_t index)
+const GridModel::Item& GridModel::getItem(size_t index)
 {
-	return m_items[index].info;
+	return m_items[index];
 }
-float GridModel::fitPos(float position, size_t max, unsigned int steps)
+float GridModel::fitPos(float position, unsigned int max, unsigned int steps)
 {
 	if (steps >= GRID_MAX_STEPS)
 	{
 		return std::clamp(position, 0.0f, static_cast<float>(max));
 	}
 	return std::clamp(std::round(position * steps) / steps, 0.0f, static_cast<float>(max));
+}
+
+size_t GridModel::getCount()
+{
+	return m_items.size();
 }
 
 void GridModel::resizeGrid(size_t length, size_t height)
