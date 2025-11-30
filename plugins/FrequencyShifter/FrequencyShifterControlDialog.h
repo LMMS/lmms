@@ -55,8 +55,8 @@ class FrequencyShifterHelpView : public QTextEdit
 public:
 	static FrequencyShifterHelpView* getInstance()
 	{
-		static FrequencyShifterHelpView instance;
-		return &instance;
+		static FrequencyShifterHelpView* instance = new FrequencyShifterHelpView;
+		return instance;
 	}
 
 private:
