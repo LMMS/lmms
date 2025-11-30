@@ -54,7 +54,6 @@ FrequencyShifterControls::FrequencyShifterControls(FrequencyShifterEffect* e) :
 	m_resetShifter(false, this, "Reset Shifter"),
 	m_resetLfo(false, this, "Reset LFO")
 {
-	m_freqShift.setScaleLogarithmic(true);
 	m_spreadShift.setScaleLogarithmic(true);
 	m_delayLengthLong.setScaleLogarithmic(true);
 	m_delayLengthShort.setScaleLogarithmic(true);
