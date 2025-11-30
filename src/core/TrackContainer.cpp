@@ -299,7 +299,7 @@ AutomatedValueMap TrackContainer::automatedValuesFromTracks(const TrackList &tra
 				continue;
 			}
 			TimePos relTime = time - p->startPosition() - p->startTimeOffset();
-			if (p->getResizable()) {
+			if (!p->isInPattern()) {
 				relTime = std::min(static_cast<int>(relTime), p->length() - p->startTimeOffset());
 			}
 			float value = p->valueAt(relTime);

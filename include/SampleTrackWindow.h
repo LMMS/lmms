@@ -30,13 +30,13 @@
 #include "ModelView.h"
 #include "SampleTrack.h"
 #include "SerializingObject.h"
-#include "AutomatableButton.h"
 
 class QLineEdit;
 
 namespace lmms::gui
 {
 
+class AutomatableButton;
 class EffectRackView;
 class Knob;
 class MixerChannelLcdSpinBox;

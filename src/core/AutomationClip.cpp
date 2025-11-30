@@ -36,7 +36,6 @@
 #include "ProjectJournal.h"
 #include "Song.h"
 
-#include <cmath>
 
 namespace lmms
 {
@@ -48,9 +47,6 @@ const float AutomationClip::DEFAULT_MAX_VALUE = 1;
 
 AutomationClip::AutomationClip( AutomationTrack * _auto_track ) :
 	Clip( _auto_track ),
-#if (QT_VERSION < QT_VERSION_CHECK(5,14,0))
-	m_clipMutex(QMutex::Recursive),
-#endif
 	m_autoTrack( _auto_track ),
 	m_objects(),
 	m_tension( 1.0 ),
@@ -60,21 +56,6 @@ AutomationClip::AutomationClip( AutomationTrack * _auto_track ) :
 	m_lastRecordedValue( 0 )
 {
 	changeLength( TimePos( 1, 0 ) );
-	if( getTrack() )
-	{
-		switch( getTrack()->trackContainer()->type() )
-		{
-			case TrackContainer::Type::Pattern:
-				setResizable(false);
-				break;
-
-			case TrackContainer::Type::Song:
-				// move down
-			default:
-				setResizable(true);
-				break;
-		}
-	}
 }
 
 
@@ -82,9 +63,6 @@ AutomationClip::AutomationClip( AutomationTrack * _auto_track ) :
 
 AutomationClip::AutomationClip( const AutomationClip & _clip_to_copy ) :
 	Clip(_clip_to_copy),
-#if (QT_VERSION < QT_VERSION_CHECK(5,14,0))
-	m_clipMutex(QMutex::Recursive),
-#endif
 	m_autoTrack( _clip_to_copy.m_autoTrack ),
 	m_objects( _clip_to_copy.m_objects ),
 	m_tension( _clip_to_copy.m_tension ),
@@ -104,19 +82,6 @@ AutomationClip::AutomationClip( const AutomationClip & _clip_to_copy ) :
 		m_timeMap[POS(it)] = it.value();
 		// Sets the node's clip to this one
 		m_timeMap[POS(it)].setClip(this);
-	}
-	if (!getTrack()){ return; }
-	switch( getTrack()->trackContainer()->type() )
-	{
-		case TrackContainer::Type::Pattern:
-			setResizable(false);
-			break;
-
-		case TrackContainer::Type::Song:
-			// move down
-		default:
-			setResizable(true);
-			break;
 	}
 }
 
@@ -215,7 +180,7 @@ TimePos AutomationClip::timeMapLength() const
 	if (m_timeMap.isEmpty()) { return one_bar; }
 
 	timeMap::const_iterator it = m_timeMap.end();
-	auto last_tick = static_cast<tick_t>(POS(it - 1));
+	auto last_tick = static_cast<tick_t>(POS(std::prev(it)));
 	// if last_tick is 0 (single item at tick 0)
 	// return length as a whole bar to prevent disappearing Clip
 	if (last_tick == 0) { return one_bar; }
@@ -611,13 +576,16 @@ float AutomationClip::valueAt( const TimePos & _time ) const
 	{
 		return 0;
 	}
+
+	const auto pv = std::prev(v);
+
 	if( v == m_timeMap.end() )
 	{
 		// When the time is after the last node, we want the outValue of it
-		return OUTVAL(v - 1);
+		return OUTVAL(pv);
 	}
 
-	return valueAt(v - 1, _time - POS(v - 1));
+	return valueAt(pv, _time - POS(pv));
 }
 
 
@@ -639,9 +607,10 @@ float AutomationClip::valueAt( timeMap::const_iterator v, int offset ) const
 	}
 	else if( m_progressionType == ProgressionType::Linear )
 	{
+		auto const nv = std::next(v);
 		float slope =
-			(INVAL(v + 1) - OUTVAL(v))
-			/ (POS(v + 1) - POS(v));
+			(INVAL(nv) - OUTVAL(v))
+			/ (POS(nv) - POS(v));
 
 		return OUTVAL(v) + offset * slope;
 	}
@@ -655,15 +624,17 @@ float AutomationClip::valueAt( timeMap::const_iterator v, int offset ) const
 		// value: y.  To make this work we map the values of x that this
 		// segment spans to values of t for t = 0.0 -> 1.0 and scale the
 		// tangents _m1 and _m2
-		int numValues = (POS(v + 1) - POS(v));
+		auto const nv = std::next(v);
+
+		int numValues = (POS(nv) - POS(v));
 		float t = (float) offset / (float) numValues;
 		float m1 = OUTTAN(v) * numValues * m_tension;
-		float m2 = INTAN(v + 1) * numValues * m_tension;
+		float m2 = INTAN(nv) * numValues * m_tension;
 
 		auto t2 = t * t, t3 = t2 * t;
 		return (2 * t3 - 3 * t2 + 1) * OUTVAL(v)
 			+ (t3 - 2 * t2 + t) * m1
-			+ (-2 * t3 + 3 * t2) * INVAL(v + 1)
+			+ (-2 * t3 + 3 * t2) * INVAL(nv)
 			+ (t3 - t2) * m2;
 	}
 }
@@ -676,12 +647,14 @@ float *AutomationClip::valuesAfter( const TimePos & _time ) const
 	QMutexLocker m(&m_clipMutex);
 
 	timeMap::const_iterator v = m_timeMap.lowerBound(_time);
-	if( v == m_timeMap.end() || (v+1) == m_timeMap.end() )
+	auto const nv = std::next(v);
+
+	if (v == m_timeMap.end() || nv == m_timeMap.end())
 	{
 		return nullptr;
 	}
 
-	int numValues = POS(v + 1) - POS(v);
+	int numValues = POS(nv) - POS(v);
 	auto ret = new float[numValues];
 
 	for( int i = 0; i < numValues; i++ )
@@ -1185,7 +1158,9 @@ void AutomationClip::generateTangents(timeMap::iterator it, int numToGenerate)
 			continue;
 		}
 
-		if (it + 1 == m_timeMap.end())
+		auto const nit = std::next(it);
+
+		if (nit == m_timeMap.end())
 		{
 			// Previously, the last value's tangent was always set to 0. That logic was kept for both tangents
 			// of the last node
@@ -1196,7 +1171,7 @@ void AutomationClip::generateTangents(timeMap::iterator it, int numToGenerate)
 		{
 			// On the first node there's no curve behind it, so we will only calculate the outTangent
 			// and inTangent will be set to 0.
-			float tangent = (INVAL(it + 1) - OUTVAL(it)) / (POS(it + 1) - POS(it));
+			float tangent = (INVAL(nit) - OUTVAL(it)) / (POS(nit) - POS(it));
 			it.value().setInTangent(0);
 			it.value().setOutTangent(tangent);
 		}
@@ -1209,9 +1184,12 @@ void AutomationClip::generateTangents(timeMap::iterator it, int numToGenerate)
 			// TODO: This behavior means that a very small difference between the inValue and outValue can
 			// result in a big change in the curve. In the future, allowing the user to manually adjust
 			// the tangents would be better.
+
+			auto const pit = std::prev(it);
+
 			if (OFFSET(it) == 0)
 			{
-				float inTangent = (INVAL(it + 1) - OUTVAL(it - 1)) / (POS(it + 1) - POS(it - 1));
+				float inTangent = (INVAL(nit) - OUTVAL(pit)) / (POS(nit) - POS(pit));
 				it.value().setInTangent(inTangent);
 				// inTangent == outTangent in this case
 				it.value().setOutTangent(inTangent);
@@ -1219,9 +1197,9 @@ void AutomationClip::generateTangents(timeMap::iterator it, int numToGenerate)
 			else
 			{
 				// Calculate the left side of the curve
-				float inTangent = (INVAL(it) - OUTVAL(it - 1)) / (POS(it) - POS(it - 1));
+				float inTangent = (INVAL(it) - OUTVAL(pit)) / (POS(it) - POS(pit));
 				// Calculate the right side of the curve
-				float outTangent = (INVAL(it + 1) - OUTVAL(it)) / (POS(it + 1) - POS(it));
+				float outTangent = (INVAL(nit) - OUTVAL(it)) / (POS(nit) - POS(it));
 				it.value().setInTangent(inTangent);
 				it.value().setOutTangent(outTangent);
 			}

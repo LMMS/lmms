@@ -28,7 +28,6 @@
 #include "AutomatableButton.h"
 
 
-class QPixmap;
 
 
 namespace lmms::gui
