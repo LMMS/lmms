@@ -150,7 +150,7 @@ FrequencyShifterControlDialog::FrequencyShifterControlDialog(FrequencyShifterCon
 	PixmapButton* resetShifterBtn = new PixmapButton(this, tr("Reset Shifter"));
 	resetShifterBtn->setActiveGraphic(PLUGIN_NAME::getIconPixmap("reset_shifter_on"));
 	resetShifterBtn->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("reset_shifter_off"));
-	resetShifterBtn->setToolTip(tr("Reset frequency shifter phase"));
+	resetShifterBtn->setToolTip(tr("Reset the shifter's oscillator phases to 0 (automatable)"));
 	resetShifterBtn->setCheckable(false);
 	resetShifterBtn->move(77, 5);
 	resetShifterBtn->setModel(&c->m_resetShifter);
@@ -158,7 +158,7 @@ FrequencyShifterControlDialog::FrequencyShifterControlDialog(FrequencyShifterCon
 	PixmapButton* resetLfoBtn = new PixmapButton(this, tr("Reset LFO"));
 	resetLfoBtn->setActiveGraphic(PLUGIN_NAME::getIconPixmap("reset_lfo_on"));
 	resetLfoBtn->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("reset_lfo_off"));
-	resetLfoBtn->setToolTip(tr("Reset LFO phase"));
+	resetLfoBtn->setToolTip(tr("Reset the LFO phase to 0 (automatable)"));
 	resetLfoBtn->setCheckable(false);
 	resetLfoBtn->move(60, 179);
 	resetLfoBtn->setModel(&c->m_resetLfo);
@@ -185,7 +185,7 @@ QString FrequencyShifterHelpView::s_helpText = tr(
 "</div>"
 "<h3>Overview:</h3>"
 "Frequency Shifter is <b>not</b> a pitch shifter.<br><br>"
-"While &quot;frequency&quot; refers to Hz, &quot;pitch&quot; refers to octaves, semitones, cents, etc.. <br>"
+"While &quot;frequency&quot; refers to Hz, &quot;pitch&quot; refers to octaves, semitones, cents, etc. <br>"
 "So, pitch shifting impacts all partials in the audio multiplicatively, while frequency shifting impacts it additively.<br>"
 "For example: If you have frequencies 100, 200, and 300 Hz, a pitch shift upward by 1.2x would result in 120, 240, and 360 Hz. "
 "Meanwhile, a frequency shift upward by 20 Hz would result in 120, 220, and 320 Hz.<br>"

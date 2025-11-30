@@ -37,9 +37,6 @@
 #include <numbers>
 #include <vector>
 
-constexpr int FREQUENCY_SHIFTER_PREFILTER_STAGES = 4;
-constexpr float PrefilterBandwidth = 0.96f; // 96% of nyquist
-
 namespace lmms
 {
 
