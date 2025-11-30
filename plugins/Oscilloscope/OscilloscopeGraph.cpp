@@ -64,7 +64,7 @@ void OscilloscopeGraph::paintEvent(QPaintEvent* pe)
 	Oscilloscope* effect = static_cast<Oscilloscope*>(m_controls->effect());
 
 	// Update the ring buffer with any new data from the audio thread
-	auto incomingBuffer = m_inputBufferReader.read_max(effect->inputBuffer().capacity() / 4);
+	auto incomingBuffer = m_inputBufferReader.read_max(effect->inputBuffer().capacity());
 	for (f_cnt_t f = 0; f < incomingBuffer.size(); ++f)
 	{
 		m_ringBuffer[m_ringBufferIndex] = incomingBuffer[f];
