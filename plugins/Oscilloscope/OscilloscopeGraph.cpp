@@ -47,8 +47,8 @@ OscilloscopeGraph::OscilloscopeGraph(QWidget* parent, OscilloscopeControls* cont
 	setMinimumSize(400, 200);
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-	connect(getGUI()->mainWindow(), SIGNAL(periodicUpdate()), this, SLOT(update()));
-	connect(Engine::audioEngine(), SIGNAL(sampleRateChanged()), this, SLOT(changeSampleRate()));
+	connect(getGUI()->mainWindow(), &MainWindow::periodicUpdate, this, static_cast<void (QWidget::*)()>(&QWidget::update));
+	connect(Engine::audioEngine(), &AudioEngine::sampleRateChanged, this, &OscilloscopeGraph::changeSampleRate);
 	changeSampleRate();
 }
 
