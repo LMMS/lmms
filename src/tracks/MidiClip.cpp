@@ -311,17 +311,8 @@ void MidiClip::flipNotes(const NoteVector& notes)
 
     addJournalCheckPoint();
 
-    int min = notes.at(0)->key();
-    int max = notes.at(0)->key();
-
-    for (auto note : notes)
-    {
-        int key = note->key();
-        if (key > max) { max = key; }
-        if (key < min) { min = key; }
-    }
-
-    int sum = min + max;
+	auto bounds = boundsForNotes(notes);
+    int sum = bounds->lowest + bounds->highest;
 
     for (auto note : notes)
     {
