@@ -98,7 +98,6 @@ void OscilloscopeGraph::paintEvent(QPaintEvent* pe)
 	const float xscale = 1.f / (windowSizeFrames - framesPerPixel);
 	const bool stereo = m_controls->m_stereoModel.value();
 
-
 	auto drawWaveform = [&](QColor& color, auto&& getChannel)
 	{
 		p.setCompositionMode(QPainter::CompositionMode_Plus);
