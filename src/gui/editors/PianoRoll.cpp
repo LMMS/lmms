@@ -787,9 +787,6 @@ void PianoRoll::flipNotes()
 
 	m_midiClip->flipNotes(notes);
 
-	update();
-	getGUI()->songEditor()->update();
-	Engine::getSong()->setModified();
 }
 
 void PianoRoll::reverseNotes()
