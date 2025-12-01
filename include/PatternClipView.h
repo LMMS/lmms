@@ -71,11 +71,11 @@ private:
 	
 	QStaticText m_staticTextName;
 
-	float m_emptyTrackHeightRatio;
-	float m_verticalPadding;
-	float m_noteVerticalSpacing;
-	float m_noteHorizontalSpacing;
-	QColor m_noteColor;
+	float m_emptyTrackHeightRatio {0.5f};
+	float m_verticalPadding {0.15f};
+	float m_noteVerticalSpacing {0.2f};
+	float m_noteHorizontalSpacing {0.2f};
+	QColor m_noteColor {255, 255, 255};
 } ;
 
 

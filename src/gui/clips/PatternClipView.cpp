@@ -48,12 +48,7 @@ namespace lmms::gui
 PatternClipView::PatternClipView(Clip* _clip, TrackView* _tv) :
 	ClipView( _clip, _tv ),
 	m_patternClip(dynamic_cast<PatternClip*>(_clip)),
-	m_paintPixmap(),
-	m_emptyTrackHeightRatio(0.5f),
-	m_verticalPadding(0.15f),
-	m_noteVerticalSpacing(0.2f),
-	m_noteHorizontalSpacing(0.2f),
-	m_noteColor(255, 255, 255)
+	m_paintPixmap()
 {
 	connect( _clip->getTrack(), SIGNAL(dataChanged()), 
 			this, SLOT(update()));
@@ -121,7 +116,7 @@ void PatternClipView::paintEvent(QPaintEvent*)
 	// paint a black rectangle under the clip to prevent glitches with transparent backgrounds
 	p.fillRect( rect(), QColor( 0, 0, 0 ) );
 
-	int pixelsPerPattern = Engine::patternStore()->lengthOfPattern(m_patternClip->patternIndex()) * pixelsPerBar();
+	const int pixelsPerPattern = Engine::patternStore()->lengthOfPattern(m_patternClip->patternIndex()) * pixelsPerBar();
 	int offset = static_cast<int>(m_patternClip->startTimeOffset() * (pixelsPerBar() / TimePos::ticksPerBar()))
 			% pixelsPerPattern;
 	if (offset < 2) {
@@ -139,42 +134,39 @@ void PatternClipView::paintEvent(QPaintEvent*)
 
 	// Draw notes
 
-	int patternIndex = static_cast<PatternTrack*>(m_patternClip->getTrack())->patternIndex();
+	const int patternIndex = static_cast<PatternTrack*>(m_patternClip->getTrack())->patternIndex();
 	// Count the number of non-empty instrument tracks.
 	// Only used midi tracks will be drawn, but empty tracks will still give a bit of empty space for padding.
 	int numberInstrumentTracksUsed = 0;
 	for (const auto& track : Engine::patternStore()->tracks())
 	{
-		Clip* clip = track->getClip(patternIndex);
-		MidiClip* mClip = dynamic_cast<MidiClip*>(clip);
+		const MidiClip* const mClip = dynamic_cast<MidiClip*>(track->getClip(patternIndex));
 		if (mClip && mClip->notes().size() > 0)
 		{
 			numberInstrumentTracksUsed++;
 		}
 	}
-	int totalTracks = Engine::patternStore()->tracks().size();
-	int numberEmptyTracks = totalTracks - numberInstrumentTracksUsed;
+	const auto totalTracks = Engine::patternStore()->tracks().size();
+	const auto numberEmptyTracks = totalTracks - numberInstrumentTracksUsed;
 
-	float totalHeight = height() * (1.0f - 2 * m_verticalPadding);
-	float totalHeightForEmptyTracks = totalHeight * numberEmptyTracks / totalTracks * m_emptyTrackHeightRatio;
-	float totalHeightForTracks = totalHeight - totalHeightForEmptyTracks;
+	const float totalHeight = height() * (1.0f - 2 * m_verticalPadding);
+	const float totalHeightForEmptyTracks = totalHeight * numberEmptyTracks / totalTracks * m_emptyTrackHeightRatio;
+	const float totalHeightForTracks = totalHeight - totalHeightForEmptyTracks;
 
-	float trackHeight = numberInstrumentTracksUsed > 0
+	const float trackHeight = numberInstrumentTracksUsed > 0
 		? totalHeightForTracks / numberInstrumentTracksUsed
-		: 0;
-	float emptyTrackHeight = numberEmptyTracks > 0
+		: 0.f;
+	const float emptyTrackHeight = numberEmptyTracks > 0
 		? totalHeightForEmptyTracks / numberEmptyTracks
-		: 0;
+		: 0.f;
 
-	int verticalNoteSpacing = trackHeight * m_noteVerticalSpacing;
-	int horizontalNoteSpacing = pixelsPerBar() / TimePos::stepsPerBar() * m_noteHorizontalSpacing;
+	const int verticalNoteSpacing = trackHeight * m_noteVerticalSpacing;
+	const int horizontalNoteSpacing = pixelsPerBar() / TimePos::stepsPerBar() * m_noteHorizontalSpacing;
 
 	float lastY = height() * m_verticalPadding;
 	for (const auto& track : Engine::patternStore()->tracks())
 	{
-		Clip* clip = track->getClip(patternIndex);
-		MidiClip* mClip = dynamic_cast<MidiClip*>(clip);
-
+		const MidiClip* const mClip = dynamic_cast<MidiClip*>(track->getClip(patternIndex));
 		if (!mClip || mClip->notes().size() == 0)
 		{
 			lastY += emptyTrackHeight;
@@ -182,7 +174,7 @@ void PatternClipView::paintEvent(QPaintEvent*)
 		}
 
 		// Compare how long the clip view is compared to the underlying pattern. First +1 for ceiling, second +1 for possible previous bar.
-		int maxPossibleRepetions = getClip()->length() / mClip->length() + 1 + 1;
+		const int maxPossibleRepetions = getClip()->length() / mClip->length() + 1 + 1;
 		for (const Note* note : mClip->notes())
 		{
 			QRect noteRect = QRect(
@@ -192,7 +184,7 @@ void PatternClipView::paintEvent(QPaintEvent*)
 				trackHeight - verticalNoteSpacing
 			);
 			// Loop through all the possible bars this pattern could affect. Starting at -1 for the possibility of start offset
-			QColor noteColor = QColor(m_noteColor.red(), m_noteColor.green(), m_noteColor.blue(), std::clamp(note->getVolume() * 255 / 100, 50, 255));
+			const auto noteColor = QColor(m_noteColor.red(), m_noteColor.green(), m_noteColor.blue(), std::clamp(note->getVolume() * 255 / 100, 50, 255));
 			for (int i = -1; i < maxPossibleRepetions - 1; i++)
 			{
 				noteRect.moveLeft(note->pos() * pixelsPerBar() / TimePos::ticksPerBar() + offset + i * pixelsPerPattern + horizontalNoteSpacing / 2);
