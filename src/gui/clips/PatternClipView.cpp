@@ -28,7 +28,6 @@
 #include <QMenu>
 #include <QPainter>
 
-#include "AutomationClip.h"
 #include "Engine.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
@@ -37,7 +36,6 @@
 #include "PatternStore.h"
 #include "PatternTrack.h"
 #include "RenameDialog.h"
-#include "SampleClip.h"
 #include "TrackContainerView.h"
 #include "TrackView.h"
 
@@ -180,8 +178,8 @@ void PatternClipView::paintEvent(QPaintEvent*)
 			QRect noteRect = QRect(
 				note->pos() * pixelsPerBar() / TimePos::ticksPerBar() + offset + horizontalNoteSpacing / 2,
 				lastY + verticalNoteSpacing / 2,
-				pixelsPerBar() / TimePos::stepsPerBar() - horizontalNoteSpacing,
-				trackHeight - verticalNoteSpacing
+				std::max(1.0f, pixelsPerBar() / TimePos::stepsPerBar() - horizontalNoteSpacing),
+				std::max(1.0f, trackHeight - verticalNoteSpacing)
 			);
 			// Loop through all the possible bars this pattern could affect. Starting at -1 for the possibility of start offset
 			const auto noteColor = QColor(m_noteColor.red(), m_noteColor.green(), m_noteColor.blue(), std::clamp(note->getVolume() * 255 / 100, 50, 255));
