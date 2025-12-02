@@ -18,4 +18,4 @@ This plugin is designed as an experiment and a new DSP tool that gives LMMS user
 
 Stereo processing is not yet implemented the plugin currently operates in mono.
 
-All files required are within the Plugins/TransferFunction folder excluding the PluginList.cmake file which was also required to be edited before compilation.
+All files created / modified are stored within the Plugins/TransferFunction folder excluding the PluginList.cmake file (within cmake/modules) which was also required to be edited before compilation.
