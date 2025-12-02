@@ -94,9 +94,7 @@ SongEditor::SongEditor( Song * song ) :
 					 : DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH),
 	m_selectRegion(false)
 {
-	m_zoomingModel->setParent(this);
-	m_snappingModel->setParent(this);
-
+	// Set up timeline
 	m_timeLine = new TimeLineWidget(m_trackHeadWidth, 32, pixelsPerBar(),
 		m_song->getPlayPos(Song::PlayMode::Song),
 		m_song->getTimeline(Song::PlayMode::Song),
@@ -113,7 +111,7 @@ SongEditor::SongEditor( Song * song ) :
 	// when tracks realign, adjust height of position line
 	connect(this, &TrackContainerView::tracksRealigned, this, &SongEditor::updatePositionLine);
 
-	m_positionLine = new PositionLine(this);
+	m_positionLine = new PositionLine(this, Song::PlayMode::Song);
 	static_cast<QVBoxLayout *>( layout() )->insertWidget( 1, m_timeLine );
 
 	connect( m_song, SIGNAL(playbackStateChanged()),
@@ -244,10 +242,15 @@ SongEditor::SongEditor( Song * song ) :
 	connect(contentWidget()->verticalScrollBar(), SIGNAL(valueChanged(int)),this, SLOT(updateRubberband()));
 	connect(m_timeLine, SIGNAL(selectionFinished()), this, SLOT(stopSelectRegion()));
 
-	//zoom connects
+
+	// Set up zooming model
+	m_zoomingModel->setParent(this);
+	m_zoomingModel->setJournalling(false);
 	connect(m_zoomingModel, SIGNAL(dataChanged()), this, SLOT(zoomingChanged()));
 
+
 	// Set up snapping model
+	m_snappingModel->setParent(this);
 	for (float bars : SNAP_SIZES)
 	{
 		if (bars > 1.0f)
@@ -525,9 +528,10 @@ void SongEditor::adjustLeftRightScoll(int value)
 
 void SongEditor::wheelEvent( QWheelEvent * we )
 {
-	if ((we->modifiers() & Qt::ControlModifier) && (position(we).x() > m_trackHeadWidth))
+	const auto posX = we->position().toPoint().x();
+	if ((we->modifiers() & Qt::ControlModifier) && (posX > m_trackHeadWidth))
 	{
-		int x = position(we).x() - m_trackHeadWidth;
+		int x = posX - m_trackHeadWidth;
 		// tick based on the mouse x-position where the scroll wheel was used
 		int tick = x / pixelsPerBar() * TimePos::ticksPerBar();
 
@@ -584,11 +588,13 @@ void SongEditor::closeEvent( QCloseEvent * ce )
 
 void SongEditor::mousePressEvent(QMouseEvent *me)
 {
+	const auto pos = position(me);
+	
 	if (allowRubberband())
 	{
 		//we save the position of scrollbars, mouse position and zooming level
 		m_scrollPos = QPoint(m_leftRightScroll->value(), contentWidget()->verticalScrollBar()->value());
-		m_origin = contentWidget()->mapFromParent(QPoint(me->pos().x(), me->pos().y()));
+		m_origin = contentWidget()->mapFromParent(pos);
 		m_rubberbandPixelsPerBar = pixelsPerBar();
 
 		//paint the rubberband
@@ -597,8 +603,8 @@ void SongEditor::mousePressEvent(QMouseEvent *me)
 		rubberBand()->show();
 
 		//the trackView(index) and the time position where the mouse was clicked
-		m_rubberBandStartTrackview = trackIndexFromSelectionPoint(me->y());
-		m_rubberbandStartTimePos = TimePos((me->x() - m_trackHeadWidth)
+		m_rubberBandStartTrackview = trackIndexFromSelectionPoint(pos.y());
+		m_rubberbandStartTimePos = TimePos((pos.x() - m_trackHeadWidth)
 											/ pixelsPerBar() * TimePos::ticksPerBar())
 											+ m_currentPosition;
 	}
@@ -610,7 +616,7 @@ void SongEditor::mousePressEvent(QMouseEvent *me)
 
 void SongEditor::mouseMoveEvent(QMouseEvent *me)
 {
-	m_mousePos = me->pos();
+	m_mousePos = position(me);
 	updateRubberband();
 	QWidget::mouseMoveEvent(me);
 }
@@ -959,7 +965,7 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 
 	m_editModeGroup = new ActionGroup(this);
 	m_drawModeAction = m_editModeGroup->addAction(embed::getIconPixmap("edit_draw"), tr("Draw mode"));
-	m_knifeModeAction = m_editModeGroup->addAction(embed::getIconPixmap("edit_knife"), tr("Knife mode (split sample clips)"));
+	m_knifeModeAction = m_editModeGroup->addAction(embed::getIconPixmap("edit_knife"), tr("Knife mode (split clips)"));
 	m_selectModeAction = m_editModeGroup->addAction(embed::getIconPixmap("edit_select"), tr("Edit mode (select and move)"));
 	m_drawModeAction->setChecked(true);
 
@@ -1130,7 +1136,7 @@ void SongEditorWindow::adjustUiAfterProjectLoad()
 {
 	// make sure to bring us to front as the song editor is the central
 	// widget in a song and when just opening a song in order to listen to
-	// it, it's very annyoing to manually bring up the song editor each time
+	// it, it's very annoying to manually bring up the song editor each time
 	getGUI()->mainWindow()->workspace()->setActiveSubWindow(
 			qobject_cast<QMdiSubWindow *>( parentWidget() ) );
 	connect( qobject_cast<SubWindow *>( parentWidget() ), SIGNAL(focusLost()), this, SLOT(lostFocus()));

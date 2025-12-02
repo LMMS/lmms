@@ -25,15 +25,14 @@
  */
  
 
+#include "AutomatableButton.h"
 #include "CrossoverEQControlDialog.h"
 #include "CrossoverEQControls.h"
 #include "embed.h"
-#include "LedCheckBox.h"
+#include "FontHelper.h"
 #include "Knob.h"
 #include "Fader.h"
-#include "PixmapButton.h"
 
-#include <QPixmap>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 
@@ -60,9 +59,8 @@ CrossoverEQControlDialog::CrossoverEQControlDialog(CrossoverEQControls *controls
 		const QString& label,
 		const QString& txt_before
 	) {
-		auto k = new Knob(KnobType::Bright26, this);
+		auto k = new Knob(KnobType::Bright26, label, SMALL_FONT_SIZE, this);
 		k->setModel(model);
-		k->setLabel(label);
 		k->setHintText(txt_before, "Hz");
 		knobsLayout->addWidget(k, 0, Qt::AlignHCenter);
 	};

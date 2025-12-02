@@ -34,7 +34,7 @@
 #include <QLocale>
 #include <QTemporaryFile>
 
-#ifdef LMMS_BUILD_LINUX
+#if defined(LMMS_BUILD_LINUX) && (QT_VERSION < QT_VERSION_CHECK(6,0,0))
 #	include <QX11Info>
 #	include <X11EmbedContainer.h>
 #endif
@@ -49,12 +49,12 @@
 
 #include "AudioEngine.h"
 #include "ConfigManager.h"
+#include "FileDialog.h"
 #include "GuiApplication.h"
 #include "LocaleHelper.h"
 #include "MainWindow.h"
 #include "PathUtil.h"
 #include "Song.h"
-#include "FileDialog.h"
 
 #ifdef LMMS_BUILD_LINUX
 #	include <X11/Xlib.h>
@@ -404,9 +404,8 @@ bool VstPlugin::processMessage( const message & _m )
 	{
 	case IdVstPluginWindowID:
 		m_pluginWindowID = _m.getInt();
-		if( m_embedMethod == "none"
-			&& ConfigManager::inst()->value(
-				"ui", "vstalwaysontop" ).toInt() )
+		if (m_embedMethod == "none" && !gui::GuiApplication::isWayland()
+			&& ConfigManager::inst()->value("ui", "vstalwaysontop").toInt())
 		{
 #ifdef LMMS_BUILD_WIN32
 			// We're changing the owner, not the parent,
@@ -416,7 +415,7 @@ bool VstPlugin::processMessage( const message & _m )
 					(LONG_PTR) gui::getGUI()->mainWindow()->winId() );
 #endif
 
-#ifdef LMMS_BUILD_LINUX
+#if defined(LMMS_BUILD_LINUX) && (QT_VERSION < QT_VERSION_CHECK(6,0,0))
 			XSetTransientForHint( QX11Info::display(),
 					m_pluginWindowID,
 					gui::getGUI()->mainWindow()->winId() );
@@ -773,7 +772,7 @@ void VstPlugin::createUI( QWidget * parent )
 	} else
 #endif
 
-#ifdef LMMS_BUILD_LINUX
+#if defined(LMMS_BUILD_LINUX) && (QT_VERSION < QT_VERSION_CHECK(6,0,0))
 	if (m_embedMethod == "xembed" )
 	{
 		if (parent)

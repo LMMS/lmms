@@ -30,7 +30,6 @@
 #include "endian_handling.h"
 #include "AudioEngine.h"
 #include "ConfigManager.h"
-#include "Engine.h"
 
 namespace lmms
 {

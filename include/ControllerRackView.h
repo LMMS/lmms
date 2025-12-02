@@ -26,7 +26,6 @@
 #define LMMS_GUI_CONTROLLER_RACK_VIEW_H
 
 #include <QWidget>
-#include <QCloseEvent>
 
 #include "SerializingObject.h"
 

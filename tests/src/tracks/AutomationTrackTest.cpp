@@ -22,9 +22,8 @@
  *
  */
 
-#include <QtTest/QtTest>
+#include <QtTest>
 
-#include "QCoreApplication"
 
 #include "AutomationClip.h"
 #include "AutomationTrack.h"
@@ -34,7 +33,6 @@
 #include "PatternClip.h"
 #include "PatternTrack.h"
 #include "PatternStore.h"
-#include "TrackContainer.h"
 
 #include "Engine.h"
 #include "Song.h"
@@ -163,8 +161,7 @@ private slots:
 		Note* note = midiClip.addNote(Note(TimePos(4, 0)), false);
 		note->createDetuning();
 
-		DetuningHelper* dh = note->detuning();
-		auto clip = dh->automationClip();
+		auto clip = note->detuning()->automationClip();
 		clip->setProgressionType( AutomationClip::ProgressionType::Linear );
 		clip->putValue(TimePos(0, 0), 0.0);
 		clip->putValue(TimePos(4, 0), 1.0);

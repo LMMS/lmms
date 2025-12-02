@@ -27,17 +27,16 @@
 #define _VESTIGE_H
 
 
-#include <QMdiSubWindow>
 #include <QMutex>
 
 #include "Instrument.h"
 #include "InstrumentView.h"
 
 
-class QPixmap;
+class QGridLayout;
+class QMdiSubWindow;
 class QPushButton;
 class QScrollArea;
-class QGridLayout;
 
 namespace lmms
 {
@@ -175,8 +174,8 @@ private:
 
 	PixmapButton * m_openPluginButton;
 	PixmapButton * m_openPresetButton;
-	PixmapButton * m_rolLPresetButton;
-	PixmapButton * m_rolRPresetButton;
+	QPushButton* m_rolLPresetButton;
+	QPushButton* m_rolRPresetButton;
 	QPushButton * m_selPresetButton;
 	QPushButton * m_toggleGUIButton;
 	PixmapButton * m_managePluginButton;
