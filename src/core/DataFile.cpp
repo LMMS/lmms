@@ -138,8 +138,8 @@ DataFile::DataFile( Type type ) :
 	root.setAttribute( "type", typeName( type ) );
 	root.setAttribute( "creator", "LMMS" );
 	root.setAttribute( "creatorversion", LMMS_VERSION );
-	root.setAttribute( "creatorplatform", QSysInfo::kernelType() );
-	root.setAttribute( "creatorplatformtype", QSysInfo::productType() );
+	root.setAttribute("creatorplatform", QSysInfo::kernelType());
+	root.setAttribute("creatorplatformtype", QSysInfo::productType());
 	appendChild( root );
 
 	m_head = createElement( "head" );
