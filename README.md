@@ -17,3 +17,5 @@ This opens the door to creative processing that is impossible with normal filter
 This plugin is designed as an experiment and a new DSP tool that gives LMMS users a level of spectral control normally found only in high end academic software. I don't believe that there is another plugin or VST which does this.
 
 Stereo processing is not yet implemented the plugin currently operates in mono.
+
+All files required are within the Plugins/TransferFunction folder excluding the PluginList.cmake file which was also required to be edited before compilation.
