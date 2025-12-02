@@ -1,4 +1,4 @@
-This repository is a fork of the LMMS DAW with a work in progress frequency-domain **Transfer Function** plugin.  
+This repository is a fork of the LMMS DAW with a work in progress frequency domain **transfer function** plugin.  
 
 So far, the STFT engine and user interface are implemented, and I am currently working on the transfer function parser.
 
