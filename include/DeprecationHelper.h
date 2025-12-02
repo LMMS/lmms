@@ -39,37 +39,6 @@ namespace lmms
 {
 
 /**
- * @brief horizontalAdvance is a backwards-compatible adapter for
- * QFontMetrics::horizontalAdvance and width functions.
- * @param metrics
- * @param text
- * @return text's horizontal advance based on metrics.
- */
-inline int horizontalAdvance(const QFontMetrics& metrics, const QString& text)
-{
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 11, 0))
-	return metrics.horizontalAdvance(text);
-#else
-	return metrics.width(text);
-#endif
-}
-
-/**
- * @brief position is a backwards-compatible adapter for
- * QWheelEvent::position and pos functions.
- * @param wheelEvent
- * @return the position of wheelEvent
- */
-inline QPoint position(const QWheelEvent* wheelEvent)
-{
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
-	return wheelEvent->position().toPoint();
-#else
-	return wheelEvent->pos();
-#endif
-}
-
-/**
  * @brief position is a backwards-compatible adapter for
  * QDropEvent::position and pos functions.
  * @param me

@@ -48,16 +48,6 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 	m_plugin( nullptr ),
 	tbLabel( nullptr )
 {
-#if QT_VERSION < 0x50C00
-	// Workaround for a bug in Qt versions below 5.12,
-	// where argument-dependent-lookup fails for QFlags operators
-	// declared inside a namespace.
-	// This affects the Q_DECLARE_OPERATORS_FOR_FLAGS macro in Instrument.h
-	// See also: https://codereview.qt-project.org/c/qt/qtbase/+/225348
-
-	using ::operator|;
-#endif
-
 	auto l = new QGridLayout(this);
 	l->setContentsMargins( 10, 10, 10, 10 );
 	l->setVerticalSpacing( 2 );
@@ -133,13 +123,9 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 		m_openPresetButton->setMinimumHeight( 16 );
 		m_openPresetButton->setMaximumHeight( 16 );
 
-		m_rolLPresetButton = new PixmapButton( this, "" );
-		m_rolLPresetButton->setCheckable( false );
-		m_rolLPresetButton->setCursor( Qt::PointingHandCursor );
-		m_rolLPresetButton->setActiveGraphic( embed::getIconPixmap(
-							"stepper-left-press" ) );
-		m_rolLPresetButton->setInactiveGraphic( embed::getIconPixmap(
-							"stepper-left" ) );
+		m_rolLPresetButton = new QPushButton(this);
+		m_rolLPresetButton->setObjectName("btn-stepper-left");
+		m_rolLPresetButton->setCursor(Qt::PointingHandCursor);
 		connect( m_rolLPresetButton, SIGNAL( clicked() ), _ctl,
 						SLOT( rolrPreset() ) );
 
@@ -150,18 +136,10 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 
 		m_rolLPresetButton->setShortcut( Qt::Key_Minus );
 
-		m_rolLPresetButton->setMinimumWidth( 16 );
-		m_rolLPresetButton->setMaximumWidth( 16 );
-		m_rolLPresetButton->setMinimumHeight( 16 );
-		m_rolLPresetButton->setMaximumHeight( 16 );
 
-		m_rolRPresetButton = new PixmapButton( this, "" );
-		m_rolRPresetButton->setCheckable( false );
-		m_rolRPresetButton->setCursor( Qt::PointingHandCursor );
-		m_rolRPresetButton->setActiveGraphic( embed::getIconPixmap(
-							"stepper-right-press" ) );
-		m_rolRPresetButton->setInactiveGraphic( embed::getIconPixmap(
-							"stepper-right" ) );
+		m_rolRPresetButton = new QPushButton(this);
+		m_rolRPresetButton->setObjectName("btn-stepper-right");
+		m_rolRPresetButton->setCursor(Qt::PointingHandCursor);
 		connect( m_rolRPresetButton, SIGNAL( clicked() ), _ctl,
 						SLOT( rollPreset() ) );
 
@@ -172,16 +150,10 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 
 		m_rolRPresetButton->setShortcut( Qt::Key_Plus );
 
-		m_rolRPresetButton->setMinimumWidth( 16 );
-		m_rolRPresetButton->setMaximumWidth( 16 );
-		m_rolRPresetButton->setMinimumHeight( 16 );
-		m_rolRPresetButton->setMaximumHeight( 16 );
 
- 		_ctl->m_selPresetButton = new QPushButton( tr( "" ), this );
-
-		_ctl->m_selPresetButton->setCheckable( false );
-		_ctl->m_selPresetButton->setCursor( Qt::PointingHandCursor );
-		_ctl->m_selPresetButton->setIcon( embed::getIconPixmap( "stepper-down" ) );
+		_ctl->m_selPresetButton = new QPushButton(this);
+		_ctl->m_selPresetButton->setObjectName("btn-stepper-down");
+		_ctl->m_selPresetButton->setCursor(Qt::PointingHandCursor);
 
 		auto menu = new QMenu;
 		connect( menu, SIGNAL( aboutToShow() ), _ctl, SLOT( updateMenu() ) );
