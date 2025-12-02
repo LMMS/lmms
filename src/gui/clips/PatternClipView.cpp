@@ -54,6 +54,8 @@ PatternClipView::PatternClipView(Clip* _clip, TrackView* _tv) :
 			this, &PatternClipView::update);
 	connect(Engine::patternStore(), &TrackContainer::trackRemoved,
 			this, &PatternClipView::update);
+	connect(Engine::patternStore(), &TrackContainer::trackMoved,
+			this, &PatternClipView::update);
 
 	setStyle( QApplication::style() );
 }
