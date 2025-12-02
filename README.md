@@ -6,7 +6,7 @@ So far, the STFT engine and user interface are implemented, and I am currently w
 
 The goal is to allow users to define arbitrary H(ω) curves for creative spectral processing inside LMMS.
 
-Native Plugins must be compiled within LMMS. The aim is to create a cross platform plugin.
+Native Plugins must be compiled within LMMS. The aim is to create a cross platform plugin (to run within LMMS on any platform which LMMS exists on).
 
 LMMS has many powerful effects, but almost all of them work in the **time domain**.
 
