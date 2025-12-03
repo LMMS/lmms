@@ -131,6 +131,8 @@ void ProjectJournal::addJournalCheckPoint( JournallingObject *jo )
 		{
 			m_undoCheckPoints.remove( 0, m_undoCheckPoints.size() - MAX_UNDO_STATES );
 		}
+
+		Engine::getSong()->setModified();
 	}
 }
 
