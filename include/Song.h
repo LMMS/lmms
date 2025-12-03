@@ -147,28 +147,6 @@ public:
 		return m_elapsedMilliSeconds[static_cast<std::size_t>(playMode)];
 	}
 
-	inline void setToTime(TimePos const & pos)
-	{
-		setToTime(pos, m_playMode);
-	}
-
-	inline void setToTime(TimePos const & pos, PlayMode playMode)
-	{
-		m_elapsedMilliSeconds[static_cast<std::size_t>(playMode)] = pos.getTimeInMilliseconds(getTempo());
-		getPlayPos(playMode).setTicks(pos.getTicks());
-	}
-
-	inline void setToTimeByTicks(tick_t ticks)
-	{
-		setToTimeByTicks(ticks, m_playMode);
-	}
-
-	inline void setToTimeByTicks(tick_t ticks, PlayMode playMode)
-	{
-		m_elapsedMilliSeconds[static_cast<std::size_t>(playMode)] = TimePos::ticksToMilliseconds(ticks, getTempo());
-		getPlayPos(playMode).setTicks(ticks);
-	}
-
 	inline int getBars() const
 	{
 		return currentBar();
@@ -375,6 +353,9 @@ public:
 
 	Metronome& metronome() { return m_metronome; }
 
+	void setPlayPos(tick_t ticks, PlayMode playMode);
+
+
 public slots:
 	void playSong();
 	void record();
@@ -411,7 +392,6 @@ private slots:
 	void updateFramesPerTick();
 
 
-
 private:
 	Song();
 	Song( const Song & );
@@ -434,7 +414,6 @@ private:
 			getPlayPos(m_playMode).currentFrame();
 	}
 
-	void setPlayPos( tick_t ticks, PlayMode playMode );
 
 	void saveControllerStates( QDomDocument & doc, QDomElement & element );
 	void restoreControllerStates( const QDomElement & element );
