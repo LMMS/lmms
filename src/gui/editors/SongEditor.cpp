@@ -511,6 +511,19 @@ void SongEditor::keyPressEvent( QKeyEvent * ke )
 	{
 		m_zoomingModel->reset();
 	}
+	else if( ke->key() == Qt::Key_Minus && ke->modifiers() & Qt::ControlModifier )
+	{
+		// ctrl - will zoom out 
+		int value = m_zoomingModel->value();
+		m_zoomingModel->setValue(value - 10);
+	}
+
+	else if ( ke->key() == Qt::Key_Equal && ke->modifiers() & Qt::ControlModifier)
+	{
+		// ctrl = will zoom in
+		int value = m_zoomingModel->value();
+		m_zoomingModel->setValue(value + 10);
+	}
 	else
 	{
 		QWidget::keyPressEvent(ke);
