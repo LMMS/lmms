@@ -43,6 +43,7 @@
 namespace lmms
 {
 
+
 // TODO C++23: Make constexpr since std::abs() will be constexpr
 inline bool approximatelyEqual(float x, float y) noexcept
 {
@@ -81,25 +82,52 @@ inline auto absFraction(std::floating_point auto x) noexcept
 	return x - std::floor(x);
 }
 
-inline auto fastRand() noexcept
+
+//! @brief Returns a psuedorandom integer between 0 and 32767, inclusive.
+inline int fastRand() noexcept
 {
-	static unsigned long next = 1;
-	next = next * 1103515245 + 12345;
-	return next / 65536 % 32768;
+	thread_local unsigned long s_next = 1;
+	s_next = s_next * 1103515245 + 12345;
+	return s_next / 65536 % 32768;
 }
 
-template<std::floating_point T>
-inline auto fastRand(T range) noexcept
+
+//! @brief Returns a psuedorandom number between 0 and @p range, inclusive.
+template<typename T> requires std::is_floating_point_v<T>
+inline T fastRand(T range) noexcept
 {
-	constexpr T FAST_RAND_RATIO = static_cast<T>(1.0 / 32767);
+	constexpr auto FAST_RAND_RATIO = static_cast<T>(1.0 / 32767);
 	return fastRand() * range * FAST_RAND_RATIO;
 }
 
-template<std::floating_point T>
-inline auto fastRand(T from, T to) noexcept
+
+//! @brief Returns a psuedorandom integer between 0 and @p range, inclusive.
+template<typename T> requires std::is_integral_v<T>
+inline T fastRand(T range) noexcept
 {
-	return from + fastRand(to - from);
+	// The integer specialization of this function is kind of weird, but
+	// it is necessary to prevent massive bias away from the maximum
+	// value. FAST_RAND_RATIO here is 1 greater than normal, so it will
+	// actually result in an open-end range.
+	constexpr float FAST_RAND_RATIO = 1.f / 32768;
+	// Since it's open-end using the above ratio, increase the magnitude
+	// by 1. All values greater than range get, rounded to range, and
+	// the bias is removed.
+	const float frange = static_cast<float>(range); // Even on -O3 it casts twice without this for some reason??
+	const float r = frange + std::copysign(1.f, frange);
+	// Always round towards 0 (implicit truncation occurs during static_cast).
+	return static_cast<T>(fastRand() * r * FAST_RAND_RATIO);
 }
+
+
+//! @brief Returns a psuedorandom number between @p from and @p to, inclusive.
+template<typename T> requires std::is_arithmetic_v<T>
+inline auto fastRand(T from, T to) noexcept { return from + fastRand(to - from); }
+
+
+//! @brief Returns true one in @p chance times at random.
+inline bool oneIn(unsigned chance) noexcept { return 0 == (fastRand() % chance); }
+
 
 //! Round `value` to `where` depending on step size
 template<class T>
@@ -180,25 +208,25 @@ inline float linearToLogScale(float min, float max, float value)
 	return std::isnan(result) ? 0 : result;
 }
 
+
 // TODO C++26: Make constexpr since std::exp() will be constexpr
-template<std::floating_point T>
+template<typename T> requires std::is_arithmetic_v<T>
 inline auto fastPow10f(T x)
 {
-	return std::exp(std::numbers::ln10_v<T> * x);
+	using F_T = std::conditional_t<std::is_floating_point_v<T>, T, float>;
+	return std::exp(std::numbers::ln10_v<F_T> * x);
 }
 
-// TODO C++26: Make constexpr since std::exp() will be constexpr
-inline auto fastPow10f(std::integral auto x)
-{
-	return std::exp(std::numbers::ln10_v<float> * x);
-}
 
 // TODO C++26: Make constexpr since std::log() will be constexpr
-inline auto fastLog10f(float x)
+template<typename T> requires std::is_arithmetic_v<T>
+inline auto fastLog10f(T x)
 {
-	constexpr auto inv_ln10 = static_cast<float>(1.0 / std::numbers::ln10);
+	using F_T = std::conditional_t<std::is_floating_point_v<T>, T, float>;
+	constexpr auto inv_ln10 = static_cast<F_T>(1.0 / std::numbers::ln10);
 	return std::log(x) * inv_ln10;
 }
+
 
 //! @brief Converts linear amplitude (>0-1.0) to dBFS scale. 
 //! @param amp Linear amplitude, where 1.0 = 0dBFS. ** Must be larger than zero! **
