@@ -86,13 +86,14 @@ TransferFunctionControlDialog::TransferFunctionControlDialog(TransferFunctionCon
 
 	// Text Box at (Row 1, Col 0)
 
-	// MADE BIGGER: Font size 14px, Padding 5px
+	
 
 	QLineEdit* formulaBox = new QLineEdit(this);
+	formulaBox->setMinimumWidth(600);
 
 	formulaBox->setPlaceholderText("e.g. 1 / sqrt(1 + (freq/800)^2)");
 
-	formulaBox->setStyleSheet("background-color: #222; color: #0F0; border: 1px solid #555; font-family: Monospace; font-size: 14px; padding: 6px; margin-top: 15px;");
+	formulaBox->setStyleSheet("background-color: #222; color: #0F0; border: 1px solid #555; font-family: Monospace; font-size: 8px; padding: 2px; margin-top: 15px;");
 
 	formulaBox->setText(controls->getFormula());
 
