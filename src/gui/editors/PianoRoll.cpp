@@ -3143,9 +3143,9 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 
 	if (!hasValidMidiClip())
 	{
-		auto icon = embed::getIconPixmap("pr_no_clip");
-		const int x = (width()-icon.width())/2;
-		const int y = (height()-icon.height())/2;
+		const auto icon = embed::getIconPixmap("pr_no_clip");
+		const int x = (width() - icon.width()) / 2;
+		const int y = (height() - icon.height()) / 2;
 		p.drawPixmap(x, y, icon);
 
 		p.setPen(QApplication::palette().color(QPalette::Active, QPalette::Text));
