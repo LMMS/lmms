@@ -4486,7 +4486,6 @@ void PianoRoll::enterValue( NoteVector* nv )
 			}
 			m_lastNotePanning = new_val;
 		}
-
 	}
 }
 
