@@ -141,6 +141,7 @@ lmms--gui--FileBrowser QCheckBox
 lmms--gui--PositionLine {
 	qproperty-tailGradient: false;
 	qproperty-lineColor: rgb(255, 255, 255);
+	qproperty-recordingColor: rgb(255, 71, 87);
 }
 
 lmms--gui--PianoRoll {
