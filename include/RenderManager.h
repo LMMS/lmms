@@ -28,6 +28,7 @@
 
 #include <memory>
 
+#include "Clip.h"
 #include "ProjectRenderer.h"
 #include "OutputSettings.h"
 
@@ -47,6 +48,12 @@ public:
 	/// Export all unmuted tracks into a single file
 	void renderProject();
 
+	//! Export `track` to an audio file.
+	void renderTrack(Track* track);
+
+	//! Export `clip` to an audio file.
+	void renderClip(Clip* clip);
+
 	/// Export all unmuted tracks into individual file
 	void renderTracks();
 
@@ -63,8 +70,8 @@ private slots:
 private:
 	QString pathForTrack( const Track *track, int num );
 	void restoreMutedState();
-
 	void render( QString outputPath );
+	void populateUnmutedTracks();
 
 	const OutputSettings m_outputSettings;
 	ProjectRenderer::ExportFileFormat m_format;

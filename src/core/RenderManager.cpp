@@ -22,14 +22,15 @@
  *
  */
 
-#include <QDir>
-#include <QRegularExpression>
-
 #include "RenderManager.h"
 
+#include <QDir>
+#include <QRegularExpression>
+#include <ranges>
+
+#include "AutomationTrack.h"
 #include "PatternStore.h"
 #include "Song.h"
-
 
 namespace lmms
 {
@@ -84,40 +85,40 @@ void RenderManager::renderNextTrack()
 		// for multi-render, prefix each output file with a different number
 		int trackNum = m_tracksToRender.size() + 1;
 
-		render( pathForTrack(renderTrack, trackNum) );
+		render(pathForTrack(renderTrack, trackNum));
 	}
+}
+
+void RenderManager::populateUnmutedTracks()
+{
+	m_unmuted.clear();
+
+	const auto tracks = {Engine::getSong()->tracks(), Engine::patternStore()->tracks()};
+
+	for (const auto& other : tracks | std::views::join)
+	{
+		if (!other->isMuted() && !dynamic_cast<AutomationTrack*>(other)) { m_unmuted.emplace_back(other); }
+	}
+}
+
+void RenderManager::renderTrack(Track* track)
+{
+	populateUnmutedTracks();
+	m_tracksToRender = {track};
+	renderNextTrack();
+}
+
+void RenderManager::renderClip(Clip* clip)
+{
+	populateUnmutedTracks();
+	m_tracksToRender = {clip->getTrack()};
+	renderNextTrack();
 }
 
 // Render the song into individual tracks
 void RenderManager::renderTracks()
 {
-	const TrackContainer::TrackList& tl = Engine::getSong()->tracks();
-
-	// find all currently unnmuted tracks -- we want to render these.
-	for (const auto& tk : tl)
-	{
-		Track::Type type = tk->type();
-
-		// Don't render automation tracks
-		if ( tk->isMuted() == false &&
-				( type == Track::Type::Instrument || type == Track::Type::Sample ) )
-		{
-			m_unmuted.push_back(tk);
-		}
-	}
-
-	const TrackContainer::TrackList& t2 = Engine::patternStore()->tracks();
-	for (const auto& tk : t2)
-	{
-		Track::Type type = tk->type();
-
-		// Don't render automation tracks
-		if ( tk->isMuted() == false &&
-				( type == Track::Type::Instrument || type == Track::Type::Sample ) )
-		{
-			m_unmuted.push_back(tk);
-		}
-	}
+	populateUnmutedTracks();
 
 	// copy the list of unmuted tracks into our rendering queue.
 	// we need to remember which tracks were unmuted to restore state at the end.
@@ -156,7 +157,7 @@ void RenderManager::render(QString outputPath)
 	}
 }
 
-// Unmute all tracks that were muted while rendering tracks
+// Unmute all tracks and clips that were muted while rendering
 void RenderManager::restoreMutedState()
 {
 	while (!m_unmuted.empty())

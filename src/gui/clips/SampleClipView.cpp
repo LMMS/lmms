@@ -21,16 +21,18 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
+
 #include "SampleClipView.h"
 
 #include <QApplication>
 #include <QMenu>
 #include <QPainter>
 
-#include "GuiApplication.h"
 #include "AutomationEditor.h"
-#include "embed.h"
+#include "ConfigManager.h"
+#include "ExportProjectDialog.h"
+#include "FileDialog.h"
+#include "GuiApplication.h"
 #include "PathUtil.h"
 #include "SampleClip.h"
 #include "SampleLoader.h"
@@ -39,6 +41,7 @@
 #include "StringPairDrag.h"
 #include "TrackContainerView.h"
 #include "TrackView.h"
+#include "embed.h"
 
 namespace lmms::gui
 {
@@ -101,6 +104,7 @@ void SampleClipView::constructContextMenu(QMenu* cm)
 		SLOT(setAutomationGhost())
 	);
 
+	cm->addAction(embed::getIconPixmap("sample_track"), tr("Export clip"), this, &SampleClipView::exportClip);
 }
 
 
@@ -370,6 +374,24 @@ void SampleClipView::setAutomationGhost()
 	aEditor->parentWidget()->show();
 	aEditor->show();
 	aEditor->setFocus();
+}
+
+
+void SampleClipView::exportClip()
+{
+	// TODO: FileDialog would not be needed here if we had a dedicated place to put these files in
+	auto dialog = FileDialog{};
+	dialog.setFileMode(FileDialog::Directory);
+	dialog.setAcceptMode(FileDialog::AcceptSave);
+	dialog.setDirectory(ConfigManager::inst()->userProjectsDir());
+	dialog.setWindowTitle(tr("Select directory for writing the exported track..."));
+
+
+	if (dialog.exec() == QDialog::Accepted)
+	{
+		auto exportDialog = ExportProjectDialog::exportClip(dialog.selectedFiles()[0], m_clip);
+		exportDialog.exec();
+	}
 }
 
 } // namespace lmms::gui
