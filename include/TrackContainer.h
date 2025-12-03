@@ -68,7 +68,7 @@ public:
 
 	void addTrack( Track * _track );
 	void removeTrack( Track * _track );
-	void moveTrack(Track * track, int indexTo);
+	void moveTrack(Track* track, int indexTo);
 
 	virtual void updateAfterTrackAdd();
 

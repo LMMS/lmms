@@ -214,10 +214,9 @@ void TrackContainer::removeTrack( Track * _track )
 	}
 }
 
-void TrackContainer::moveTrack(Track * track, int indexTo)
+void TrackContainer::moveTrack(Track* track, int indexTo)
 {
-	auto it = std::find(m_tracks.begin(), m_tracks.end(), track);
-	m_tracks.erase(it);
+	m_tracks.erase(std::find(m_tracks.begin(), m_tracks.end(), track));
 	m_tracks.insert(m_tracks.begin() + indexTo, track);
 
 	emit trackMoved();
