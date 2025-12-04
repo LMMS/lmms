@@ -27,8 +27,6 @@
 #include "embed.h"
 #include "plugin_export.h"
 
-#include <QDebug>
-
 namespace lmms
 {
 
@@ -67,11 +65,7 @@ Effect::ProcessStatus Oscilloscope::processImpl(SampleFrame* buffer, const fpp_t
 	if (!m_controls.m_pauseModel.value())
 	{
 		// Send the samples from the audio thread over to the gui via a ring buffer; the gui will do all of the processing.
-		const f_cnt_t framesWritten = m_inputBuffer.write(buffer, frames);
-		if (framesWritten < frames)
-		{
-			qWarning() << "[Oscilloscope] Frames dropped from audio-gui ringbuffer! Had" << frames << "but only wrote" << framesWritten;
-		}
+		m_inputBuffer.write(buffer, frames);
 	}
 	return ProcessStatus::Continue;
 }
