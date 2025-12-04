@@ -27,7 +27,7 @@ At this point in time:
 - Aliasing fixed
 - User interface implemented
 - Bode plot for preset 1 is calculated
-- Bode plots for presets 2 to 17 are drawn based on secondary copies of the equations stored within TransferFunctionControls.cpp . This means that if TransferFunction.cpp's presets change, these will not match. I know this not the best way
+- Bode plots for presets 2 to 17 are drawn based on secondary copies of the equations stored within TransferFunctionControls.cpp . This means that if TransferFunction.cpp's presets change, these will not match.  I know this not the best way yet as it does not follow single source of truth
 
 To fix: I’ve had some problems with high-pass filtering using common transfer functions. To remove the low end I basically required a brickwall response or an increase in the filter order (exponent in the equation). The high end works fine even with low orders.
 
