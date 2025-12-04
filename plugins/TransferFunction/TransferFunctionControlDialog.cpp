@@ -14,13 +14,17 @@
 
 #include "Knob.h"
 
-
+#include "Graph.h"
 
 #include <QGridLayout>
 
-#include <QLineEdit> 
+#include <QHBoxLayout> // Added for side labels
 
-#include <QLabel> 
+#include <QLineEdit>
+
+#include <QLabel>
+
+#include <QPalette>
 
 
 
@@ -32,146 +36,241 @@ namespace lmms::gui
 
 TransferFunctionControlDialog::TransferFunctionControlDialog(TransferFunctionControls* controls) :
 
-	EffectControlDialog(controls)
+    EffectControlDialog(controls)
 
 {
 
-	setAutoFillBackground(true);
+    setAutoFillBackground(true);
 
-	QPalette pal;
+    QPalette pal;
 
-	pal.setBrush(backgroundRole(), PLUGIN_NAME::getIconPixmap("artwork"));
+    pal.setBrush(backgroundRole(), PLUGIN_NAME::getIconPixmap("artwork"));
 
-	setPalette(pal);
+    setPalette(pal);
 
 
 
-	// 1. MAKE IT WIDER AND TALLER
+    // WINDOW SIZE
 
-	setMinimumWidth(700);
+    setMinimumWidth(700);
 
-	setMinimumHeight(300);
+    setMinimumHeight(500);
 
 
 
-	QGridLayout* gridLayout = new QGridLayout(this);
+    QGridLayout* gridLayout = new QGridLayout(this);
 
-	
 
-	// --- LEFT COLUMN: CONTROLS ---
 
+    // ============================================================
 
+    // LEFT COLUMN: PRESET KNOB + FORMULA BOX
 
-	auto makeKnob = [this](const QString& label, const QString& hintText, const QString& unit, FloatModel* model, bool isVolume)
+    // ============================================================
 
-	{
+    auto makeKnob = [this](const QString& label, const QString& hintText,
 
-		Knob* newKnob = new Knob(KnobType::Bright26, label, this);
+                            const QString& unit, FloatModel* model, bool isVolume)
 
-		newKnob->setModel(model);
+    {
 
-		newKnob->setHintText(hintText, unit);
+        Knob* newKnob = new Knob(KnobType::Bright26, label, this);
 
-		return newKnob;
+        newKnob->setModel(model);
 
-	};
+        newKnob->setHintText(hintText, unit);
 
+        return newKnob;
 
+    };
 
-	// Knob at (Row 0, Col 0)
 
-	gridLayout->addWidget(makeKnob(tr("PRESET"), tr("Preset ID"), "#", &controls->m_volumeModel, false), 0, 0, Qt::AlignHCenter);
 
+    // PRESET knob
 
+    gridLayout->addWidget(
 
-	// Text Box at (Row 1, Col 0)
+        makeKnob(tr("PRESET"), tr("Preset ID"), "#", &controls->m_volumeModel, false),
 
-	
+        0, 0, Qt::AlignHCenter
 
-	QLineEdit* formulaBox = new QLineEdit(this);
-	formulaBox->setMinimumWidth(600);
+    );
 
-	formulaBox->setPlaceholderText("e.g. 1 / sqrt(1 + (freq/800)^2)");
 
-	formulaBox->setStyleSheet("background-color: #222; color: #0F0; border: 1px solid #555; font-family: Monospace; font-size: 8px; padding: 2px; margin-top: 15px;");
 
-	formulaBox->setText(controls->getFormula());
+    // FORMULA TEXTBOX
 
-	connect(formulaBox, &QLineEdit::textChanged, controls, &TransferFunctionControls::setFormula);
+    QLineEdit* formulaBox = new QLineEdit(this);
 
-	
+    formulaBox->setMinimumWidth(600);
 
-	gridLayout->addWidget(formulaBox, 1, 0, Qt::AlignHCenter);
+    formulaBox->setPlaceholderText("e.g. 1 / sqrt(1 + (freq/800)^2)");
 
+    formulaBox->setStyleSheet(
 
+        "background-color: #222;"
 
+        "color: #0F0;"
 
+        "border: 1px solid #555;"
 
-	// --- RIGHT COLUMN: INFO TEXT ---
+        "font-family: Monospace;"
 
+        "font-size: 10px;"
 
+        "padding: 2px;"
 
-	QLabel* infoLabel = new QLabel(this);
+        "margin-top: 15px;"
 
-	
+    );
 
-	// CSS Styling for the text
+    formulaBox->setText(controls->getFormula());
 
-	infoLabel->setStyleSheet("color: #ccc; font-size: 11px; font-family: Monospace; background-color: rgba(0,0,0,100); padding: 10px; border-radius: 5px;");
+    connect(formulaBox, &QLineEdit::textChanged, controls, &TransferFunctionControls::setFormula);
 
-	
+    gridLayout->addWidget(formulaBox, 1, 0, Qt::AlignHCenter);
 
-	// UPDATED TEXT WITH NEW SYNTAX
 
-	infoLabel->setText(
 
-		"<b>PRESETS:</b><br>"
 
-		"1:  CUSTOM (Use Box Below) &nbsp;&nbsp; 10: Comb Notch<br>"
 
-		"2:  Lowpass &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 11: Allpass<br>"
+    // ============================================================
 
-		"3:  Highpass &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 12: Bitcrusher<br>"
+    // RIGHT COLUMN: TEXT INFO PANEL
 
-		"4:  Low Shelf &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 13: Spectral Decay<br>"
+    // ============================================================
 
-		"5:  High Shelf &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 14: Gate Sweep<br>"
+    QLabel* infoLabel = new QLabel(this);
 
-		"6:  Telephone &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 15: Formants<br>"
+    infoLabel->setStyleSheet(
 
-		"7:  Notch &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 16: Odd Booster<br>"
+        "color: #ccc;"
 
-		"8:  Resonator &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 17: Phase Tilt<br>"
+        "font-size: 10px;"
 
-		"9:  Comb<br>"
+        "font-family: Monospace;"
 
-		"<br>"
+        "background-color: rgba(0,0,0,100);"
 
-		"<b>CUSTOM SYNTAX (Preset 1):</b><br>"
+        "padding: 10px;"
 
-		"Vars:  <i>freq</i> (Hz), <i>j</i> (Imaginary), <i>pi</i><br>"
+        "border-radius: 5px;"
 
-		"Math:  +, -, *, /, ^ (Power), ( )<br>"
+    );
 
-		"Funcs: sqrt, exp, sin, cos, abs, log<br>"
+    infoLabel->setText(
 
-		"Ex:    <code>1 / sqrt(1 + (freq/800)^2)</code>"
+        "<b>PRESETS:</b><br>"
 
-	);
+        "1: CUSTOM (Use Box Below) &nbsp;&nbsp; 10: Comb Notch<br>"
 
+        "2: Lowpass &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 11: Allpass<br>"        "3: Highpass &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 12: Bitcrusher<br>"
 
+        "4: Low Shelf &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 13: Spectral Decay<br>"
 
-	// Add Label at (Row 0, Col 1), Spanning 2 Rows
+        "5: High Shelf &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 14: Gate Sweep<br>"
 
-	gridLayout->addWidget(infoLabel, 0, 1, 2, 1, Qt::AlignLeft);
+        "6: Telephone &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 15: Formants<br>"
 
-	
+        "7: Notch &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 16: Odd Booster<br>"
 
-	// Adjust columns so the text area takes up more space
+        "8: Resonator &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 17: Phase Tilt<br>"
 
-	gridLayout->setColumnStretch(0, 4); // Controls slightly wider
+        "9: Comb<br>"
 
-	gridLayout->setColumnStretch(1, 5); // Text area
+        "<br>"
+
+        "<b>CUSTOM SYNTAX (Preset 1):</b><br>"
+
+        "Vars: <i>freq</i> (Hz), <i>j</i> (Imag), <i>pi</i><br>"
+
+        "Math: +, -, *, /, ^ , ( )<br>"
+
+        "Funcs: sqrt, exp, sin, cos, abs, log<br>"
+
+        "Ex: <code>1 / sqrt(1 + (freq/800)^2)</code>"
+
+    );
+
+    gridLayout->addWidget(infoLabel, 0, 1, 2, 1, Qt::AlignLeft);
+
+
+
+    gridLayout->setColumnStretch(0, 4);
+
+    gridLayout->setColumnStretch(1, 5);
+
+
+
+
+
+    // ============================================================
+
+    // BODE PLOTS (With Side Labels)
+
+    // ============================================================
+
+
+
+    // HELPER to create [Label] -> [Graph] row
+
+    auto addLabeledGraph = [this, gridLayout](int row, QString text, graphModel* model, QColor color) {
+
+        QWidget* container = new QWidget(this);
+
+        QHBoxLayout* layout = new QHBoxLayout(container);
+
+        layout->setContentsMargins(0,0,0,0);
+
+        
+
+        // Label
+
+        QLabel* lbl = new QLabel(text, this);
+
+        lbl->setFixedWidth(60); 
+
+        lbl->setStyleSheet("color: #BBB; font-size: 9px; font-weight: bold;");
+
+        lbl->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+
+        
+
+        // Graph
+
+        auto graph = new Graph(this, Graph::Style::LinearNonCyclic, 300, 100);
+
+        graph->setModel(model);
+
+        graph->setGraphColor(color);
+
+
+
+        layout->addWidget(lbl);
+
+        layout->addWidget(graph);
+
+
+
+        // Add to main grid (span 2 columns)
+
+        gridLayout->addWidget(container, row, 0, 1, 2);
+
+    };
+
+
+
+    // Add Magnitude Row
+
+    addLabeledGraph(2, "MAG\n(dB)", &controls->m_bodeMagModel, QColor(0, 255, 0));
+
+
+
+    // Add Phase Row
+
+    addLabeledGraph(3, "PHASE\n(rad)", &controls->m_bodePhaseModel, QColor(255, 200, 0));
+
+
 
 }
 
