@@ -14,6 +14,8 @@
 
 #include <cctype>
 
+#include <algorithm> // Required for std::copy
+
 
 
 namespace lmms
@@ -22,7 +24,7 @@ namespace lmms
 
 
 
-// 1. DEFINE COMPLEX (Missing in your original file)
+// 1. DEFINE COMPLEX
 
 using Complex = std::complex<float>;
 
@@ -30,17 +32,33 @@ const float PI = 3.14159265358979f;
 
 
 
+// --- CONSTANTS FOR HIGH RESOLUTION ---
+
+// N = 2048 gives ~21 Hz resolution at 44.1kHz
+
+// This is critical for getting the bass filters to work.
+
+const int FIXED_FFT_SIZE = 2048;
+
+
+
 // --- FFT IMPLEMENTATION ---
 
-void distinct_fft(std::vector<Complex>& x, bool inverse) {
+void distinct_fft(std::vector<Complex>& x, bool inverse)
+
+{
 
     const size_t N = x.size();
 
     if (N <= 1) return;
 
+
+
     std::vector<Complex> even(N / 2);
 
     std::vector<Complex> odd(N / 2);
+
+
 
     for (size_t i = 0; i < N / 2; ++i) {
 
@@ -50,15 +68,21 @@ void distinct_fft(std::vector<Complex>& x, bool inverse) {
 
     }
 
+
+
     distinct_fft(even, inverse);
 
     distinct_fft(odd, inverse);
+
+
 
     float angle = (inverse ? -2.0f : 2.0f) * PI / N;
 
     Complex w(1.0f, 0.0f);
 
     Complex wn(std::cos(angle), std::sin(angle));
+
+
 
     for (size_t i = 0; i < N / 2; ++i) {
 
@@ -128,17 +152,17 @@ class SimpleParser {
 
         if (c == '(') {
 
-            get(); 
+            get();
 
             Complex val = parseExpression();
 
-            if (peek() == ')') get(); 
+            if (peek() == ')') get();
 
             return val;
 
         }
 
-        
+
 
         // Numbers
 
@@ -150,15 +174,13 @@ class SimpleParser {
 
             float val = std::stof(str.substr(start, pos - start));
 
-            // Support "5j" syntax
-
             if (peek() == 'j') { get(); return Complex(0.0f, val); }
 
             return Complex(val, 0.0f);
 
         }
 
-        
+
 
         // Variables and Functions
 
@@ -168,23 +190,19 @@ class SimpleParser {
 
             while (pos < str.length() && std::isalpha(str[pos])) token += str[pos++];
 
-            
 
-            // VARIABLES (Added s and w for better Transfer Functions)
 
             if (token == "freq") return Complex(currentFreq, 0.0f);
 
-            if (token == "w")    return Complex(2.0f * PI * currentFreq, 0.0f); // Omega
+            if (token == "w")    return Complex(2.0f * PI * currentFreq, 0.0f);
 
-            if (token == "s")    return Complex(0.0f, 2.0f * PI * currentFreq); // s = j*w
+            if (token == "s")    return Complex(0.0f, 2.0f * PI * currentFreq);
 
             if (token == "j")    return Complex(0.0f, 1.0f);
 
             if (token == "pi")   return Complex(PI, 0.0f);
 
 
-
-            // FUNCTIONS
 
             if (peek() == '(') {
 
@@ -198,7 +216,7 @@ class SimpleParser {
 
                 if (token == "cos")  return std::cos(arg);
 
-                if (token == "tan")  return std::tan(arg); // Added tan
+                if (token == "tan")  return std::tan(arg);
 
                 if (token == "abs")  return Complex(std::abs(arg), 0.0f);
 
@@ -222,7 +240,7 @@ class SimpleParser {
 
         while (true) {
 
-            if (peek() == '^') { get(); Complex rhs = parsePrimary(); lhs = std::pow(lhs, rhs); } 
+            if (peek() == '^') { get(); Complex rhs = parsePrimary(); lhs = std::pow(lhs, rhs); }
 
             else break;
 
@@ -242,19 +260,19 @@ class SimpleParser {
 
             char op = peek();
 
-            if (op == '*') { get(); lhs *= parsePower(); } 
+            if (op == '*') { get(); lhs *= parsePower(); }
 
-            else if (op == '/') { 
+            else if (op == '/') {
 
-                get(); 
+                get();
 
-                Complex rhs = parsePower(); 
+                Complex rhs = parsePower();
 
-                if(std::abs(rhs) < 1e-9f) rhs = Complex(1e-9f, 0.0f); 
+                if(std::abs(rhs) < 1e-9f) rhs = Complex(1e-9f, 0.0f);
 
-                lhs /= rhs; 
+                lhs /= rhs;
 
-            } 
+            }
 
             else break;
 
@@ -274,9 +292,9 @@ class SimpleParser {
 
             char op = peek();
 
-            if (op == '+') { get(); lhs += parseTerm(); } 
+            if (op == '+') { get(); lhs += parseTerm(); }
 
-            else if (op == '-') { get(); lhs -= parseTerm(); } 
+            else if (op == '-') { get(); lhs -= parseTerm(); }
 
             else break;
 
@@ -340,35 +358,39 @@ TransferFunctionEffect::TransferFunctionEffect(Model* parent, const Descriptor::
 
     : Effect(&TransferFunction_plugin_descriptor, parent, key),
 
-      m_ampControls(this) {}
+      m_ampControls(this)
+
+{
+
+}
 
 
 
-// --- Main STFT Processing ---
+// --- High Resolution STFT Processing ---
 
-Effect::ProcessStatus TransferFunctionEffect::processImpl(SampleFrame* buf, const fpp_t frames) {
+Effect::ProcessStatus TransferFunctionEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 
-    
+{
 
-    // 1. SETUP BUFFERS (STFT Architecture)
+    // 1. ONE-TIME INITIALIZATION
 
-    int hop = (int)frames;
+    // We force vectors to size 2048 regardless of 'frames' (usually 256).
 
-    int N = 1;
+    if (m_window.size() != FIXED_FFT_SIZE) {
 
-    while (N < 2*hop) N <<= 1;
+        m_window.assign(FIXED_FFT_SIZE, 0.0f);
 
-    int halfN = N / 2;
+        m_history.assign(FIXED_FFT_SIZE, 0.0f);    // Input Ring Buffer
+
+        m_overlapAdd.assign(FIXED_FFT_SIZE, 0.0f); // Output Accumulator
 
 
 
-    if (m_window.size() != (size_t)N) {
+        // Create Hanning Window
 
-        m_window.assign(N, 0.0f);
+        for (int i = 0; i < FIXED_FFT_SIZE; ++i) {
 
-        for (int i = 0; i < N; ++i) {
-
-            m_window[i] = 0.5f * (1.0f - std::cos(2.0f * PI * i / (N - 1)));
+            m_window[i] = 0.5f * (1.0f - std::cos(2.0f * PI * i / (FIXED_FFT_SIZE - 1)));
 
         }
 
@@ -376,37 +398,55 @@ Effect::ProcessStatus TransferFunctionEffect::processImpl(SampleFrame* buf, cons
 
 
 
-    if (m_overlapAdd.size() != (size_t)halfN)
+    // 2. INPUT BUFFERING (Sliding Window)
 
-        m_overlapAdd.assign(halfN, 0.0f);
+    // We have a 2048 sample history. We discard the oldest 'frames' samples,
 
-    if (m_history.size() != (size_t)halfN)
+    // shift everything back, and append the new 'frames' samples.
 
-        m_history.assign(halfN, 0.0f);
+    int hop = (int)frames;
+
+    if (hop > FIXED_FFT_SIZE) hop = FIXED_FFT_SIZE; // Safety
 
 
 
-    // 2. FILL INPUT BUFFER
+    // Shift history left
 
-    std::vector<Complex> buffer(N, Complex(0.0f, 0.0f));
+    std::copy(m_history.begin() + hop, m_history.end(), m_history.begin());
 
-    for (int i = 0; i < N; ++i) {
 
-        float val = (i < halfN) ? m_history[i] : (i - halfN < hop ? buf[i - halfN][0] : 0.0f);
 
-        buffer[i] = Complex(val * m_window[i], 0.0f);
+    // Copy new audio to the end of history
+
+    for (int i = 0; i < hop; ++i) {
+
+        m_history[FIXED_FFT_SIZE - hop + i] = buf[i][0]; // Mono processing
 
     }
 
 
 
-    // 3. FORWARD FFT
+    // 3. PREPARE FFT
+
+    // Copy history to temp buffer and apply window
+
+    std::vector<Complex> buffer(FIXED_FFT_SIZE);
+
+    for (int i = 0; i < FIXED_FFT_SIZE; ++i) {
+
+        buffer[i] = Complex(m_history[i] * m_window[i], 0.0f);
+
+    }
+
+
+
+    // 4. FORWARD FFT
 
     distinct_fft(buffer, false);
 
 
 
-    // 4. PREPARE CONTROL VALUES
+    // 5. FILTERING
 
     int presetIdx = (int)m_ampControls.m_volumeModel.value();
 
@@ -414,25 +454,23 @@ Effect::ProcessStatus TransferFunctionEffect::processImpl(SampleFrame* buf, cons
 
     if (presetIdx > 17) presetIdx = 17;
 
-    
+
 
     std::string customFormula = m_ampControls.getFormula().toStdString();
 
-    float fs = 44100.0f; // Static sample rate
+    float fs = 44100.0f;
 
-    float binWidth = fs / float(N);
+    float binWidth = fs / (float)FIXED_FFT_SIZE; // ~21.5 Hz per bin
 
 
-
-    // Declare Parser (static to avoid reallocation)
 
     static SimpleParser parser;
 
 
 
-    // 5. FREQUENCY DOMAIN PROCESSING LOOP
+    // Iterate half spectrum
 
-    for (int i = 0; i <= N/2; ++i) {
+    for (int i = 0; i <= FIXED_FFT_SIZE / 2; ++i) {
 
         float freq = i * binWidth;
 
@@ -442,13 +480,11 @@ Effect::ProcessStatus TransferFunctionEffect::processImpl(SampleFrame* buf, cons
 
         Complex H(1.0f, 0.0f);
 
-        float fc, bw, delay; // Temp vars
+        float fc, bw, delay; 
 
 
 
         if (presetIdx == 1) {
-
-            // MODE 1: Custom Text Parser
 
             H = parser.eval(customFormula, freq);
 
@@ -456,35 +492,25 @@ Effect::ProcessStatus TransferFunctionEffect::processImpl(SampleFrame* buf, cons
 
         else {
 
-            // MODE 2-17: Hardcoded Presets
+            // Presets
 
             switch(presetIdx) {
 
-                case 2: // Lowpass
+                case 2: H = 1.0f / std::sqrt(1.0f + std::pow(freq / 800.0f, 2.0f)); break;
 
-                    H = 1.0f / std::sqrt(1.0f + std::pow(freq / 800.0f, 2.0f)); break;
+                case 3: H = std::sqrt(1.0f + std::pow(freq / 500.0f, 2.0f)); break;
 
-                case 3: // Highpass
+                case 4: H = (freq / 500.0f) / std::sqrt(1.0f + std::pow(freq / 500.0f, 2.0f)); break;
 
-                    H = std::sqrt(1.0f + std::pow(freq / 500.0f, 2.0f)); break;
-
-                case 4: // Low Shelf
-
-                    H = (freq / 500.0f) / std::sqrt(1.0f + std::pow(freq / 500.0f, 2.0f)); break;
-
-                case 5: // High Shelf
-
-                    H = 1.0f + (1.0f) / (1.0f + std::pow(2000.0f / (freq+1.0f), 2.0f)); break;
+                case 5: H = 1.0f + (1.0f) / (1.0f + std::pow(2000.0f / (freq+1.0f), 2.0f)); break;
 
                 case 6: // Telephone
 
                     if (freq > 300.0f && freq < 3000.0f) H = Complex(1.0f, 0.0f);
 
-                    else H = Complex(0.0f, 0.0f);
+                    else H = Complex(0.0f, 0.0f); break;
 
-                    break;
-
-                case 7: // Notch Hole
+                case 7: // Notch
 
                     fc = 600.0f; bw = 40.0f;
 
@@ -518,17 +544,13 @@ Effect::ProcessStatus TransferFunctionEffect::processImpl(SampleFrame* buf, cons
 
                     H = (std::fmod(freq, 500.0f) < 250.0f) ? 1.0f : -1.0f; break;
 
-                case 13: // Spectral Decay
+                case 13: H = std::exp(-0.0004f * freq); break;
 
-                    H = std::exp(-0.0004f * freq); break;
-
-                case 14: // Spectral Gate Sweep
+                case 14: // Gate Sweep
 
                     if (freq > 500.0f) H = std::exp(-0.0008f * (freq - 500.0f)) * std::sin(freq * 0.005f);
 
-                    else H = 0.0f; 
-
-                    break;
+                    else H = 0.0f; break;
 
                 case 15: // Formants
 
@@ -538,17 +560,11 @@ Effect::ProcessStatus TransferFunctionEffect::processImpl(SampleFrame* buf, cons
 
                         std::exp(-std::pow(freq-2500.0f, 2.0f)/(2.0f*40000.0f)); break;
 
-                case 16: // Odd Harmonic Booster
+                case 16: H = 1.0f + 0.8f * std::sin(PI * freq / 200.0f); break;
 
-                    H = 1.0f + 0.8f * std::sin(PI * freq / 200.0f); break;
+                case 17: H = std::exp(Complex(0, 1) * 0.0005f * freq); break;
 
-                case 17: // Phase Tilt
-
-                    H = std::exp(Complex(0, 1) * 0.0005f * freq); break;
-
-                default: 
-
-                    H = Complex(1.0f, 0.0f); break;
+                default: H = Complex(1.0f, 0.0f); break;
 
             }
 
@@ -558,15 +574,15 @@ Effect::ProcessStatus TransferFunctionEffect::processImpl(SampleFrame* buf, cons
 
         // Apply Transfer Function
 
-        if (i == 0 || i == N/2) H = Complex(H.real(), 0.0f);
+        if (i == 0 || i == FIXED_FFT_SIZE/2) H = Complex(H.real(), 0.0f);
 
         buffer[i] *= H;
 
 
 
-        // Conjugate Symmetry (Mirror for Real Audio)
+        // Conjugate Symmetry
 
-        if (i > 0 && i < N/2) buffer[N-i] = std::conj(buffer[i]);
+        if (i > 0 && i < FIXED_FFT_SIZE/2) buffer[FIXED_FFT_SIZE-i] = std::conj(buffer[i]);
 
     }
 
@@ -578,21 +594,49 @@ Effect::ProcessStatus TransferFunctionEffect::processImpl(SampleFrame* buf, cons
 
 
 
-    // 7. OVERLAP-ADD OUTPUT
+    // 7. OVERLAP-ADD TO OUTPUT ACCUMULATOR
 
-    for (int i = 0; i < halfN; ++i) {
+    // Scaling Factor: With 8x overlap (2048/256), the Hanning windows sum up to ~4.0.
 
-        float outVal = m_overlapAdd[i] + buffer[i].real();
+    // We normalize by dividing by (FIXED_N / 2 / hop).
 
-        m_history[i] = buf[i][0];
+    // Factor = 2 * hop / FIXED_N.
 
-        m_overlapAdd[i] = buffer[i + halfN].real();
+    float outputScale = 2.0f * (float)hop / (float)FIXED_FFT_SIZE;
 
-        buf[i][0] = outVal;
 
-        buf[i][1] = outVal;
+
+    for (int i = 0; i < FIXED_FFT_SIZE; ++i) {
+
+        m_overlapAdd[i] += buffer[i].real() * outputScale;
 
     }
+
+
+
+    // 8. WRITE TO LMMS BUFFER & SHIFT ACCUMULATOR
+
+    // Extract valid 'hop' samples from the front
+
+    for (int i = 0; i < hop; ++i) {
+
+        float val = m_overlapAdd[i];
+
+        buf[i][0] = val;
+
+        buf[i][1] = val; // Stereo copy
+
+    }
+
+
+
+    // Shift accumulator left
+
+    std::copy(m_overlapAdd.begin() + hop, m_overlapAdd.end(), m_overlapAdd.begin());
+
+    // Zero out the newly exposed tail
+
+    std::fill(m_overlapAdd.end() - hop, m_overlapAdd.end(), 0.0f);
 
 
 
