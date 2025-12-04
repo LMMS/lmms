@@ -97,10 +97,7 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 {
 	for( int i = 0; i < 2; ++i )
 	{
-		m_inputBufferFrames[i] = 0;
-		m_inputBufferSize[i] = FIXED_INPUT_BUFFER_CAPACITY;
-		m_inputBuffer[i] = new SampleFrame[FIXED_INPUT_BUFFER_CAPACITY];
-		zeroSampleFrames(m_inputBuffer[i], FIXED_INPUT_BUFFER_CAPACITY);
+		m_inputBuffer[i].reserve(FIXED_INPUT_BUFFER_CAPACITY);
 	}
 
 	// determine FIFO size and number of frames per period
@@ -157,7 +154,6 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 
 	m_inputAudioRingBuffer = std::make_unique<LocklessRingBuffer<SampleFrame>>(FIXED_INPUT_BUFFER_CAPACITY);
 	m_inputAudioRingBufferReader = std::make_unique<LocklessRingBufferReader<SampleFrame>>(*m_inputAudioRingBuffer);
-	m_tempInputProcessingBuffer.reserve(m_inputAudioRingBuffer->capacity());
 }
 
 
@@ -215,8 +211,10 @@ AudioEngine::~AudioEngine()
 		m_fifo = nullptr;
 	}
 
-	delete m_midiClient; m_midiClient = nullptr;
-	delete m_audioDev; m_audioDev = nullptr;
+	delete m_midiClient;
+	m_midiClient = nullptr;
+	delete m_audioDev;
+	m_audioDev = nullptr;
 
 	if (m_oldAudioDev)
 	{
@@ -224,11 +222,7 @@ AudioEngine::~AudioEngine()
 	}
 	m_oldAudioDev = nullptr;
 
-	for (int i = 0; i < 2; ++i)
-	{
-		delete[] m_inputBuffer[i];
-		m_inputBuffer[i] = nullptr;
-	}
+	// Input buffers are std::vectors and clean up automatically
 }
 
 
@@ -347,9 +341,9 @@ void AudioEngine::processBufferedInputFrames()
 
 	requestChangeInModel();
 
-	SampleFrame* currentWriteBufPtr = m_inputBuffer[m_inputBufferWrite];
-	f_cnt_t currentWriteBufCapacity = m_inputBufferSize[m_inputBufferWrite];
-	f_cnt_t currentFramesInWriteBuf = m_inputBufferFrames[m_inputBufferWrite];
+	auto& currentWriteBuf = m_inputBuffer[m_inputBufferWrite];
+	f_cnt_t currentWriteBufCapacity = currentWriteBuf.capacity();
+	f_cnt_t currentFramesInWriteBuf = currentWriteBuf.size();
 
 	f_cnt_t totalFramesSuccessfullyCopiedToMain = 0;
 
@@ -370,7 +364,8 @@ void AudioEngine::processBufferedInputFrames()
 		framesWeCanActuallyCopy - totalFramesSuccessfullyCopiedToMain);
 		if (framesToCopyFromPart1 > 0)
 		{
-			memcpy(&currentWriteBufPtr[currentFramesInWriteBuf + totalFramesSuccessfullyCopiedToMain],
+			currentWriteBuf.resize(currentFramesInWriteBuf + totalFramesSuccessfullyCopiedToMain + framesToCopyFromPart1);
+			memcpy(&currentWriteBuf[currentFramesInWriteBuf + totalFramesSuccessfullyCopiedToMain],
 				sequence.first_half_ptr(), framesToCopyFromPart1 * sizeof(SampleFrame));
 			totalFramesSuccessfullyCopiedToMain += framesToCopyFromPart1;
 		}
@@ -382,13 +377,13 @@ void AudioEngine::processBufferedInputFrames()
 		framesWeCanActuallyCopy - totalFramesSuccessfullyCopiedToMain);
 		if (framesToCopyFromPart2 > 0)
 		{
-			memcpy(&currentWriteBufPtr[currentFramesInWriteBuf + totalFramesSuccessfullyCopiedToMain],
+			currentWriteBuf.resize(currentFramesInWriteBuf + totalFramesSuccessfullyCopiedToMain + framesToCopyFromPart2);
+			memcpy(&currentWriteBuf[currentFramesInWriteBuf + totalFramesSuccessfullyCopiedToMain],
 				sequence.second_half_ptr(), framesToCopyFromPart2 * sizeof(SampleFrame));
 			totalFramesSuccessfullyCopiedToMain += framesToCopyFromPart2;
 		}
 	}
 	
-	m_inputBufferFrames[m_inputBufferWrite] += totalFramesSuccessfullyCopiedToMain;
 	
 	doneChangeInModel();
 }
@@ -551,7 +546,7 @@ void AudioEngine::swapBuffers()
 {
 	m_inputBufferWrite = (m_inputBufferWrite + 1) % 2;
 	m_inputBufferRead = (m_inputBufferRead + 1) % 2;
-	m_inputBufferFrames[m_inputBufferWrite] = 0;
+	m_inputBuffer[m_inputBufferWrite].clear();
 
 	std::swap(m_outputBufferRead, m_outputBufferWrite);
 	zeroSampleFrames(m_outputBufferWrite.get(), m_framesPerPeriod);

@@ -292,12 +292,12 @@ public:
 
 	inline const SampleFrame* inputBuffer()
 	{
-		return m_inputBuffer[m_inputBufferRead];
+		return m_inputBuffer[m_inputBufferRead].data();
 	}
 
 	inline f_cnt_t inputBufferFrames() const
 	{
-		return m_inputBufferFrames[ m_inputBufferRead ];
+		return m_inputBuffer[m_inputBufferRead].size();
 	}
 
 	inline const SampleFrame* nextBuffer()
@@ -375,9 +375,7 @@ private:
 
 	fpp_t m_framesPerPeriod;
 
-	SampleFrame* m_inputBuffer[2];
-	f_cnt_t m_inputBufferFrames[2];
-	f_cnt_t m_inputBufferSize[2];
+	std::array<std::vector<SampleFrame>, 2> m_inputBuffer;
 	sample_rate_t m_baseSampleRate;
 	int m_inputBufferRead;
 	int m_inputBufferWrite;
@@ -426,7 +424,6 @@ private:
 
 	std::unique_ptr<LocklessRingBuffer<SampleFrame>> m_inputAudioRingBuffer;
 	std::unique_ptr<LocklessRingBufferReader<SampleFrame>> m_inputAudioRingBufferReader;
-	std::vector<SampleFrame> m_tempInputProcessingBuffer;
 } ;
 
 } // namespace lmms
