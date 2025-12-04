@@ -99,7 +99,6 @@ void OscilloscopeGraph::paintEvent(QPaintEvent* pe)
 	const bool hq = framesPerPixel > 1;
 	const int xoffset = !hq * framesPerPixel;
 	const float xscale = 1.f / (windowSizeFrames - framesPerPixel);
-	const bool stereo = m_controls->m_stereoModel.value();
 
 	auto drawWaveform = [&](QColor& color, auto&& getChannel)
 	{
@@ -128,7 +127,7 @@ void OscilloscopeGraph::paintEvent(QPaintEvent* pe)
 		}
 	};
 
-	if (!stereo)
+	if (!m_controls->m_stereoModel.value())
 	{
 		drawWaveform(m_monoColor, [](const SampleFrame& f){ return f.average(); });
 	}
