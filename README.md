@@ -21,7 +21,8 @@ At this point in time:
 - Parsing for H(s) and H(f) implemented
 - Bode plot added
 - Stereo added
-- Presets / examples added to dial - focus on filters, but should be able to do delays, echos etc- Dial option one to manually enter a transfer function added
+- Presets / examples added to dial - focus on filters, but should be able to do delays, echos etc
+- Dial option one to manually enter a transfer function added
 - Tested, hasn't crashed so far
 - Aliasing fixed
 - User interface implemented
