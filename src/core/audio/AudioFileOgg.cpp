@@ -79,7 +79,30 @@ AudioFileOgg::AudioFileOgg(OutputSettings const& outputSettings, const ch_cnt_t 
 
 AudioFileOgg::~AudioFileOgg()
 {
+	// Signal end of stream - no more audio data will be written
 	vorbis_analysis_wrote(&m_vds, 0);
+
+	// Flush all remaining encoded data from the encoder's internal buffers
+	// This is critical to prevent truncation at the end of the file
+	while (vorbis_analysis_blockout(&m_vds, &m_vb) == 1)
+	{
+		vorbis_analysis(&m_vb, nullptr);
+		vorbis_bitrate_addblock(&m_vb);
+
+		while (vorbis_bitrate_flushpacket(&m_vds, &m_packet))
+		{
+			ogg_stream_packetin(&m_oss, &m_packet);
+
+			// Use ogg_stream_flush instead of pageout to ensure all pages are written
+			while (ogg_stream_flush(&m_oss, &m_page))
+			{
+				writeData(m_page.header, m_page.header_len);
+				writeData(m_page.body, m_page.body_len);
+			}
+		}
+	}
+
+	// Clean up encoder resources
 	ogg_stream_clear(&m_oss);
 	vorbis_block_clear(&m_vb);
 	vorbis_dsp_clear(&m_vds);
