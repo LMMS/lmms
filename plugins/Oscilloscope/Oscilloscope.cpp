@@ -67,7 +67,7 @@ Effect::ProcessStatus Oscilloscope::processImpl(SampleFrame* buffer, const fpp_t
 	if (!m_controls.m_pauseModel.value())
 	{
 		// Send the samples from the audio thread over to the gui via a ring buffer; the gui will do all of the processing.
-		f_cnt_t framesWritten = m_inputBuffer.write(buffer, frames);
+		const f_cnt_t framesWritten = m_inputBuffer.write(buffer, frames);
 		if (framesWritten < frames)
 		{
 			qWarning() << "[Oscilloscope] Frames dropped from audio-gui ringbuffer! Had" << frames << "but only wrote" << framesWritten;

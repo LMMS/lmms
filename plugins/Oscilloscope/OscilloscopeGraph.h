@@ -58,7 +58,7 @@ public:
 	void mousePressEvent(QMouseEvent* me) override;
 	void mouseMoveEvent(QMouseEvent* me) override;
 
-	//! Length of the oscilloscope history in seconds
+	//! Maximum length of the oscilloscope history in seconds
 	static constexpr float MaxBufferLengthSeconds = 5.0f;
 
 private slots:

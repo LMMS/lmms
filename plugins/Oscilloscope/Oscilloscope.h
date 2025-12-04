@@ -39,10 +39,7 @@ public:
 
 	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
 
-	EffectControls* controls() override
-	{
-		return &m_controls;
-	}
+	EffectControls* controls() override { return &m_controls; }
 
 	//! Ring buffer size for the data being transfered from the audio thread to the gui thread
 	//! This is not the history length! The actual size of the history buffer is defined in OscilloscopeGraph.h
