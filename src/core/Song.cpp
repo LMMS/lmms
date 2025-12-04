@@ -625,6 +625,12 @@ void Song::setPlayPos( tick_t ticks, PlayMode playMode )
 
 void Song::togglePause()
 {
+	// Pause/unpause only works when something is actually playing
+	if( m_playMode == PlayMode::None )
+	{
+		return;
+	}
+
 	if( m_paused == true )
 	{
 		m_playing = true;
