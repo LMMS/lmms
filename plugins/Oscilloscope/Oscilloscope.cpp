@@ -46,6 +46,11 @@ Plugin::Descriptor PLUGIN_EXPORT oscilloscope_plugin_descriptor =
 	nullptr,
 	nullptr,
 };
+
+PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* parent, void* data)
+{
+	return new Oscilloscope(parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key*>(data));
+}
 }
 
 
@@ -72,13 +77,5 @@ Effect::ProcessStatus Oscilloscope::processImpl(SampleFrame* buffer, const fpp_t
 }
 
 
-extern "C"
-{
-// necessary for getting instance out of shared lib
-PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* parent, void* data)
-{
-	return new Oscilloscope(parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key*>(data));
-}
-}
 
 } // namespace lmms
