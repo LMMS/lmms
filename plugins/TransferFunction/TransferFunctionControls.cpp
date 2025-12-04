@@ -609,9 +609,11 @@ void TransferFunctionControls::updateBodePlot()
 					H = 1.0f / std::sqrt(1.0f + std::pow(freq / 800.0f, 2.0f)); break;
 
 				case 3: // Highpass
-
-					H = std::sqrt(1.0f + std::pow(freq / 500.0f, 2.0f)); break;
-
+					// Highpass (Brick Wall - Same style as Case 6)
+                    // If frequency is below 500Hz, silence it completely.
+                    if (freq < 500.0f) H = Complex(0.0f, 0.0f);
+                    else H = Complex(1.0f, 0.0f); 
+                    break;
 				case 4: // Low Shelf
 
 					H = (freq / 500.0f) / std::sqrt(1.0f + std::pow(freq / 500.0f, 2.0f)); break;
@@ -769,3 +771,4 @@ void TransferFunctionControls::setFormula(const QString& text)
 
 
 } // namespace lmms
+
