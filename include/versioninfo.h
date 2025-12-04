@@ -3,10 +3,10 @@
 
 #include "LmmsCommonMacros.h"
 
-#if defined(__GNUC__)
-constexpr const char* LMMS_BUILDCONF_COMPILER_VERSION = "GCC " __VERSION__;
-#elif defined(__clang__)
+#if defined(__clang__)
 constexpr const char* LMMS_BUILDCONF_COMPILER_VERSION = "Clang " __clang_version__;
+#elif defined(__GNUC__)
+constexpr const char* LMMS_BUILDCONF_COMPILER_VERSION = "GCC " __VERSION__;
 #elif defined(_MSC_VER)
 constexpr const char* LMMS_BUILDCONF_COMPILER_VERSION = "MSVC " LMMS_STRINGIFY(_MSC_FULL_VER);
 #else
