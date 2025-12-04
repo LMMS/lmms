@@ -93,8 +93,10 @@ void OscilloscopeGraph::paintEvent(QPaintEvent* pe)
 	p.drawLine(0, height() / 2, width(), height() / 2);
 
 	p.setPen(m_clippingLineColor);
-	p.drawLine(0, height() / 2 * (1 - amp), width(), height() / 2 * (1 - amp));
-	p.drawLine(0, height() / 2 * (1 + amp), width(), height() / 2 * (1 + amp));
+	// Subtracting/adding 1 pixel from the clipping line vertical positions to ensure they "round up" and
+	// don't appear when at the default zoom/scale.
+	p.drawLine(0, height() / 2 * (1 - amp) - 1, width(), height() / 2 * (1 - amp) - 1);
+	p.drawLine(0, height() / 2 * (1 + amp) + 1, width(), height() / 2 * (1 + amp) + 1);
 
 	const bool hq = framesPerPixel > 1;
 	const int xoffset = !hq * framesPerPixel;
