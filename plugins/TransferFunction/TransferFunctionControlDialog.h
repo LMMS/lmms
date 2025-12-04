@@ -26,4 +26,3 @@ public:
 } // namespace lmms
 
 #endif // LMMS_GUI_TransferFunction_CONTROL_DIALOG_H
-
