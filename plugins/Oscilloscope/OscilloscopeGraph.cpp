@@ -163,7 +163,7 @@ void OscilloscopeGraph::mousePressEvent(QMouseEvent* me) { m_mousePos = me->x();
 
 void OscilloscopeGraph::mouseMoveEvent(QMouseEvent* me)
 {
-	float newPhase = m_controls->m_phaseModel.value() + (m_mousePos - me->x()) / width() * (m_controls->m_lengthModel.value() / m_controls->m_lengthModel.maxValue());
+	float newPhase = m_controls->m_phaseModel.value() + static_cast<float>(m_mousePos - me->x()) / width() * (m_controls->m_lengthModel.value() / m_controls->m_lengthModel.maxValue());
 	m_controls->m_phaseModel.setValue(newPhase - std::floor(newPhase));
 	m_mousePos = me->x();
 }
