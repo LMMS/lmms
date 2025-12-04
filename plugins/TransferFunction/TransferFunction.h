@@ -18,7 +18,9 @@
 
 
 
-namespace lmms {
+namespace lmms
+
+{
 
 
 
@@ -26,7 +28,9 @@ typedef std::complex<float> Complex;
 
 
 
-class TransferFunctionEffect : public Effect {
+class TransferFunctionEffect : public Effect
+
+{
 
 public:
 
@@ -50,15 +54,25 @@ private:
 
 
 
-    std::vector<float> m_history;
+    // STEREO BUFFERS
+
+    std::vector<float> m_historyL;
+
+    std::vector<float> m_historyR;
+
+    
+
+    std::vector<float> m_overlapAddL;
+
+    std::vector<float> m_overlapAddR;
+
+
+
+    // Shared Window (Window shape is the same for both)
 
     std::vector<float> m_window;
 
-    std::vector<float> m_overlapAdd;
 
-
-
-    Complex evalFormula(const std::string& expr, float freq);
 
     friend class TransferFunctionControls;
 
