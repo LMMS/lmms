@@ -1101,10 +1101,10 @@ lmms--gui--CompressorControlDialog lmms--gui--Knob {
 
 lmms--gui--OscilloscopeGraph {
 	qproperty-monoColor: rgb(255, 255, 255);
-	qproperty-leftColor: rgba(126, 146, 255, 0.5);
-	qproperty-rightColor: rgba(255, 128, 128, 0.5);
+	qproperty-leftColor: #289fff;
+	qproperty-rightColor: #ee043b;
 	qproperty-minorLineColor: rgb(100, 100, 100);
-	qproperty-clippingLineColor: rgb(100, 0, 0);
+	qproperty-clippingLineColor: #ffc976;
 	qproperty-backgroundColor: rgb(0, 0, 0);
 }
 
