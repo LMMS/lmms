@@ -29,6 +29,6 @@ At this point in time:
 - Bode plot for preset 1 is calculated
 - Bode plots for presets 2 to 17 are drawn within TransferFunctionControls.cpp . This means that if TransferFunction.cpp's presets change, these will not match. I know this not the best way.
 
-To fix: I’ve had some problems with high-pass filtering using common transfer functions. To remove the low end I basically need a brick-wall response unless I increase the filter order (exponent in the equation). The high end works fine even with low orders.
+To fix: I’ve had some problems with high-pass filtering using common transfer functions. To remove the low end I basically required a brickwall response or an increase in the filter order (exponent in the equation). The high end works fine even with low orders.
 
 All files created / modified are stored within the Plugins/TransferFunction folder excluding the PluginList.cmake file (within cmake/modules) which was also required to be edited before compilation.
