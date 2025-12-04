@@ -49,7 +49,6 @@ void OscilloscopeControls::loadSettings(const QDomElement& parent)
 	m_ampModel.loadSettings(parent, "amp");
 	m_lengthModel.loadSettings(parent, "length");
 	m_phaseModel.loadSettings(parent, "phase");
-	m_pauseModel.loadSettings(parent, "pause");
 	m_stereoModel.loadSettings(parent, "stereo");
 }
 
@@ -59,7 +58,6 @@ void OscilloscopeControls::saveSettings(QDomDocument& doc, QDomElement& parent)
 	m_ampModel.saveSettings(doc, parent, "amp");
 	m_lengthModel.saveSettings(doc, parent, "length");
 	m_phaseModel.saveSettings(doc, parent, "phase");
-	m_pauseModel.saveSettings(doc, parent, "pause");
 	m_stereoModel.saveSettings(doc, parent, "stereo");
 }
 
