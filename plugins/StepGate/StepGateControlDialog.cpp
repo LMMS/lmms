@@ -1,7 +1,7 @@
 #include "StepGateControlDialog.h"
 
 #include "StepGateControls.h"
-h
+
 #include "Knob.h"
 
 
