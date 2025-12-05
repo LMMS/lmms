@@ -42,4 +42,4 @@ All files created / modified are stored within the Plugins/TransferFunction fold
 - Stereo
 - Built in tempo synced delay with on / off, feedback and step size
 
-- Do wer require internal filters in StepGate?
+- Do we require internal filters in StepGate?
