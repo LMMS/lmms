@@ -1,5 +1,5 @@
 #include "StepGateControls.h"
-v
+
 #include "StepGateControlDialog.h"
 
 #include "StepGate.h"
