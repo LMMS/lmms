@@ -2,7 +2,7 @@
 
 #define LMMS_GUI_STEPGATE_CONTROL_DIALOG_H
 
-d
+
 
 #include "EffectControlDialog.h"
 
