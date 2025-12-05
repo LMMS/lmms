@@ -1,5 +1,5 @@
 /*
- * Sf2Player.h - a soundfont2 player using fluidSynth
+ * SoundFontPlayer.h - a soundfont player using fluidSynth
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail/dot/com>
  * Copyright (c) 2009-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
@@ -24,8 +24,8 @@
  */
 
 
-#ifndef SF2_PLAYER_H
-#define SF2_PLAYER_H
+#ifndef SOUNDFONT_PLAYER_H
+#define SOUNDFONT_PLAYER_H
 
 #include <array>
 #include <fluidsynth/types.h>
@@ -45,27 +45,27 @@ namespace lmms
 {
 
 
-struct Sf2PluginData;
+struct SoundFontPluginData;
 class NotePlayHandle;
 
 namespace gui
 {
 class Knob;
 class PixmapButton;
-class Sf2InstrumentView;
+class SoundFontInstrumentView;
 class PatchesDialog;
 } // namespace gui
 
 
-class Sf2Instrument : public Instrument
+class SoundFontInstrument : public Instrument
 {
 	Q_OBJECT
 	mapPropertyFromModel(int,getBank,setBank,m_bankNum);
 	mapPropertyFromModel(int,getPatch,setPatch,m_patchNum);
 
 public:
-	Sf2Instrument( InstrumentTrack * _instrument_track );
-	~Sf2Instrument() override;
+	SoundFontInstrument( InstrumentTrack * _instrument_track );
+	~SoundFontInstrument() override;
 
 	void play( SampleFrame* _working_buffer ) override;
 
@@ -92,7 +92,7 @@ public:
 
 
 public slots:
-	void openFile( const QString & _sf2File, bool updateTrackName = true );
+	void openFile( const QString & _soundFontFile, bool updateTrackName = true );
 	void updatePatch();
 	void reloadSynth();
 	
@@ -153,11 +153,11 @@ private:
 
 private:
 	void freeFont();
-	void noteOn( Sf2PluginData * n );
-	void noteOff( Sf2PluginData * n );
+	void noteOn( SoundFontPluginData * n );
+	void noteOff( SoundFontPluginData * n );
 	void renderFrames( f_cnt_t frames, SampleFrame* buf );
 
-	friend class gui::Sf2InstrumentView;
+	friend class gui::SoundFontInstrumentView;
 
 signals:
 	void fileLoading();
@@ -171,13 +171,13 @@ namespace gui
 {
 
 
-class Sf2InstrumentView : public InstrumentViewFixedSize
+class SoundFontInstrumentView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:
-	Sf2InstrumentView( Instrument * _instrument,
+	SoundFontInstrumentView( Instrument * _instrument,
 					QWidget * _parent );
-	~Sf2InstrumentView() override = default;
+	~SoundFontInstrumentView() override = default;
 
 private:
 	void modelChanged() override;
