@@ -1,5 +1,5 @@
 #ifndef LMMS_STEPGATE_H
-d
+
 #define LMMS_STEPGATE_H
 
 
