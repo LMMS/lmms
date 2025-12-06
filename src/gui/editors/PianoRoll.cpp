@@ -618,7 +618,7 @@ void PianoRoll::setGhostNotes(const NoteVector& notes)
 	}
 	if (auto bounds = boundsForNotes(m_ghostNotes))
 	{
-		m_ghostBounds = bounds.value();
+		m_ghostBounds = *bounds;
 	}
 	m_ghostVisible.setValue(!m_ghostNotes.empty());
 	m_pasteGhostAction->setEnabled(!m_ghostNotes.empty());
