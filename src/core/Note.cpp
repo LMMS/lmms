@@ -272,13 +272,10 @@ std::optional<NoteBounds> boundsForNotes(const NoteVector& notes)
 
 	for (const Note* note: notes)
 	{
-		// Treat beat notes as 1 tick long
-		// TODO should this be done in Note::endPos instead?
-		TimePos noteEnd = note->length() < 0 ? TimePos(note->pos() + 1) : note->endPos();
 		// TODO should we assume that NoteVector is always sorted correctly,
 		// so first() always has the lowest time position?
 		start = std::min(start, note->pos());
-		end = std::max(end, noteEnd);
+		end = std::max(end, note->endPos());
 		lower = std::min(lower, note->key());
 		upper = std::max(upper, note->key());
 	}
