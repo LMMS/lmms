@@ -478,7 +478,7 @@ SlewDistortionHelpView::SlewDistortionHelpView() : QTextEdit(s_helpText)
 	setTextInteractionFlags(Qt::TextSelectableByKeyboard | Qt::TextSelectableByMouse);
 	getGUI()->mainWindow()->addWindowedWidget(this);
 	parentWidget()->setAttribute(Qt::WA_DeleteOnClose, false);
-	parentWidget()->setWindowIcon(PLUGIN_NAME::getIconPixmap("logo"));
+	parentWidget()->setWindowIcon(QIcon(PixmapLoader("lmms-plugin-logo").pixmap()));
 	
 	// No maximize button
 	Qt::WindowFlags flags = parentWidget()->windowFlags();
