@@ -35,6 +35,7 @@
 #include "ValueBuffer.h"
 #include "ModelVisitor.h"
 
+class QAction;
 
 namespace lmms
 {
@@ -500,6 +501,11 @@ public:
 	{
 	}
 	QString displayValue( const float val ) const override;
+
+	//! \brief Convenience method to create and connect a QAction to this model
+	//! When the model changes value, the action is checked or unchecked, and vice versa.
+	QAction* createAction(const QString& text);
+
 } ;
 
 using AutomatedValueMap = QMap<AutomatableModel*, float>;

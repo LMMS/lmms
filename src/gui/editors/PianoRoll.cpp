@@ -5124,17 +5124,15 @@ PianoRollWindow::PianoRollWindow() :
 	// Ghost note button and menu
 	auto ghostButton = new QToolButton(m_toolBar);
 	auto ghostMenu = new QMenu(ghostButton);
-
-	auto ghostVisibleAction = qActionFromModel(m_editor->m_ghostVisible, tr("Show ghost notes"), this);
-	ghostVisibleAction->setIcon(embed::getIconPixmap("ghost_note"));
-
+	auto ghostVisibleAction = m_editor->m_ghostVisible.createAction(tr("Show ghost notes"));
 	auto setGhostAction = new QAction(tr("Use selection as ghost"), this);
+	auto ghostRepeatAction = m_editor->m_ghostRepeated.createAction(tr("Repeat horizontally"));
+	auto ghostStackAction = m_editor->m_ghostStacked.createAction(tr("Stack vertically"));
 	connect(setGhostAction, &QAction::triggered, m_editor, &PianoRoll::setGhostNotesFromSelection);
 
-	auto ghostRepeatAction = qActionFromModel(m_editor->m_ghostRepeated, tr("Repeat ghost"), this);
 
-	auto ghostStackAction = qActionFromModel(m_editor->m_ghostStacked, tr("Stack ghost"), this);
 
+	ghostVisibleAction->setIcon(embed::getIconPixmap("ghost_note"));
 	ghostButton->setDefaultAction(ghostVisibleAction);
 	ghostButton->setPopupMode(QToolButton::MenuButtonPopup);
 	ghostButton->setMenu(ghostMenu);
