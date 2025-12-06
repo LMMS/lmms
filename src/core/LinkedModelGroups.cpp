@@ -46,7 +46,7 @@ void LinkedModelGroup::linkControls(LinkedModelGroup *other)
 	{
 		auto itr2 = other->m_models.find(id);
 		Q_ASSERT(itr2 != other->m_models.end());
-		itr->second.m_model->linkToModel(inf2.m_model);
+		inf->second.m_model->linkToModel(itr2.m_model);
 	});
 }
 
