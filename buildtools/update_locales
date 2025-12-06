@@ -86,7 +86,7 @@ test_source_strings()
 
 	# lrelease - "compile" a TS file into a binary QM format
 	# This happens during the LMMS build process, so we want to make sure it works
-	run "$LRELEASE" "$SOURCE_FILE" -qm "$qm_file" || error "Validation failed!"
+	run "$LRELEASE" -silent "$SOURCE_FILE" -qm "$qm_file" || error "Validation failed!"
 }
 
 push_source_strings()
@@ -133,7 +133,7 @@ test_translations()
 
 	declare -i errors=0
 	for translation in "$TRANSLATION_DIR"/*.ts; do
-		run "$LRELEASE" "$translation" -qm "$qm_file" || errors+=1
+		run "$LRELEASE" -silent "$translation" -qm "$qm_file" || errors+=1
 	done
 
 	if ((errors))
