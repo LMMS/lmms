@@ -1,87 +1,174 @@
 #!/bin/bash
 
-# Where generated source strings are saved
-OUTPUT_TS="data/locale/en.ts"
+TRANSLATION_DIR='data/locale'
+SOURCE_FILE="$TRANSLATION_DIR/en.ts"
 
-# From lupdate --help
-EXTENSIONS='\.(java|jui|ui|c|c[+][+]|cc|cpp|cxx|ch|h|h[+][+]|hh|hpp|hxx|js|qs|qml|qrc)$'
+# Copied from lupdate --help
+EXTENSIONS='java,jui,ui,c,c++,cc,cpp,cxx,ch,h,h++,hh,hpp,hxx,js,qs,qml,qrc'
 
-# Temporary files
-LIST_FILE="$(mktemp -u lupdate_XXXXX.txt)"
-QM_TEST_FILE="$(mktemp -u lconvert_XXXXX.qm)"
+#
+# Helper functions
+#
 
-aberr(){ printf "[\e[31mERROR\e[0m]: \e[1m%s\e[0m\n" "$*" >&2; }
-abinfo(){ printf "[\e[96mINFO\e[0m]: \e[1m%s\e[0m\n" "$*" >&2; }
+info() { printf "[\e[96mINFO\e[0m] \e[1m%s\e[0m\n" "$@"; }
+error() { printf "[\e[31mERROR\e[0m] \e[1m%s\e[0m\n" "$@" >&2; exit 1; }
+run() {	printf "[\e[32mDEBUG\e[0m]"; printf ' %q' "$@"; printf '\n'; "$@"; }
 
-function upload_to_tx() {
-  if ! which tx > /dev/null; then
-    aberr "You don't have Transifex client installed. \n Run \`pip install transifex-client\` to install it."
-    exit 1
-  fi
-  abinfo "Uploading to transifex..."
-  if ! tx push -s; then
-    aberr "Problems occurred when uploading strings to Transifex."
-    printf "\t Either there are syntax errors in source file or you don't have permission to update the source file."
-    exit 1
-  fi
-  exit 0
+question()
+{
+	while true; do
+		printf '[\e[1;33m?\e[0m] \e[1m%s [y/n] \e[0m' "$*"
+		read -r || exit 1
+		[[ $REPLY =~ Y|y ]] && return 0
+		[[ $REPLY =~ N|n ]] && return 1
+	done
 }
 
-function validate() {
-  ERR_LANG=""
-  ERR_BUF=""
-  for i in data/locale/*.ts; do
-    if ! ERR_BUF=$(lconvert-qt5 -i "${i}" -o "$QM_TEST_FILE" -of qm 2>&1); then
-      ERR_LANG+="\e[96m$(basename "${i}")\e[0m: \e[93m${ERR_BUF}\e[0m "
-      printf "\e[31mx\e[0m"
-      continue
-    fi
-    printf "\e[32m.\e[0m"
-  done
-  echo ""
-  if [[ "x${ERR_LANG}" != "x" ]]; then
-    aberr "The following files failed the validation: "
-    echo -e "${ERR_LANG}"
-  fi
+assert_lupdate()
+{
+	[[ $LUPDATE ]] || LUPDATE="$(type -p lupdate || type -p lupdate-qt5)" || error \
+		"You don't seem to have 'lupdate' installed!" \
+		"Usually this comes with your Qt installation, or you need to install some package like qt5-tools, qttools5-dev-tools, qt6-l10n-tools or similar"
 }
 
-# disable "code unreachable" warning for this function
-# shellcheck disable=SC2317
-function cleanup() {
-  [[ -f $LIST_FILE ]] && rm "$LIST_FILE"
-  [[ -f $QM_TEST_FILE ]] && rm "$QM_TEST_FILE"
+assert_lrelease()
+{
+	[[ $LRELEASE ]] || LRELEASE="$(type -p lrelease || type -p lrelease-qt5)" || error \
+		"You don't seem to have 'lrelease' installed!" \
+		"Usually this comes with your Qt installation, or you need to install some package like qt5-tools, qttools5-dev-tools, qt6-l10n-tools or similar"
 }
 
-trap cleanup EXIT
+assert_transifex()
+{
+	[[ $TRANSIFEX ]] || TRANSIFEX="$(type -p tx || type -p tx-cli)" || error \
+		"You don't seem to have the Transifex client 'tx' installed!" \
+		"Install some package like 'transifex-cli' or get the latest release here: https://github.com/transifex/cli"
+}
 
-abinfo "Checking for your environment..."
-if ! which lupdate-qt5 > /dev/null; then
-  aberr "You don't seem to have Qt i18n tools installed."
-  printf "\tUsually this comes with your Qt installation, or you need to\n"
-  printf "\tinstall extra packages like \`qt5-tools\` or similar.\n"
-  exit 1;
+#
+# Main functions
+#
+
+check_that_all_is_committed()
+{
+	[[ -d $TRANSLATION_DIR ]] || error "Can't find $TRANSLATION_DIR"
+	type -p git >/dev/null || error "You don't seem to have 'git' installed"
+	git diff --quiet -- "$TRANSLATION_DIR/*.ts" \
+		|| question "The translations have uncommited changes. Do you want to overwrite them?" \
+		|| exit
+}
+
+collect_source_strings()
+{
+	info "Adding new strings from the codebase"
+	assert_lupdate
+
+	list_file="$(mktemp XXXX.txt)"
+	temporary_files+=("$list_file")
+	git ls-files | grep -E "[.](${EXTENSIONS//,/|})$" > "$list_file"
+
+	# lupdate - scan source code and generate (or update) a TS file with English strings
+	#   -no-obsolete	remove vanished strings
+	#   -I PATH			location of include files
+	#   @FILE			read a list of filenames from this file
+	#   -ts FILE		output file, must be the last argument
+	# https://doc.qt.io/qt-6/linguist-lupdate.html
+	run "$LUPDATE" -no-obsolete -I include/ \@"$list_file" -ts "$SOURCE_FILE"
+}
+
+test_source_strings()
+{
+	info "Trying to compile English source strings into binary format"
+	assert_lrelease
+
+	qm_file="$(mktemp XXXX.qm)"
+	temporary_files+=("$qm_file")
+
+	# lrelease - "compile" a TS file into a binary QM format
+	# This happens during the LMMS build process, so we want to make sure it works
+	run "$LRELEASE" "$SOURCE_FILE" -qm "$qm_file" || error "Validation failed!"
+}
+
+push_source_strings()
+{
+	assert_transifex
+
+	# tx push - upload source strings to Transifex [1]
+	#   --force		Push even if the online resource was edited while this script was running
+	# [1] https://github.com/transifex/cli?tab=readme-ov-file#pushing-files-to-transifex
+	run "$TRANSIFEX" push --source --force
+
+	# If you wonder about these other badly documented options, this is what I could find about them [1]
+	#   --replace-edited-strings	Overwrite source strings that have been edited online [2].
+	# 								We don't do this so we don't need this option.
+	#   --keep-translations			Re-use translations when a source string has changed but its string key
+	# 								remains the same [3]. I don't think this can happen for TS files since
+	#								the string key *is* the source string plus some context [4].
+	# [1] https://github.com/transifex/cli/pull/195
+	# [2] https://help.transifex.com/en/articles/6236820-edit-source-strings-online
+	# [3] https://help.transifex.com/en/articles/6649327-how-string-hashes-are-calculated
+	# [4] https://help.transifex.com/en/articles/6223301-qt-linguist
+}
+
+pull_translations()
+{
+	assert_transifex
+
+	# tx pull - overwrite translations in data/locale with new ones from Transifex [1]
+	#   --all					add languages that exist online but not locally
+	#   --mode=translator		include both translated and untranslated strings [2]
+	#   --force					overwrite the local file even if the online resource is older
+	#   --minimum-perc N		minimum completeness needed to include a translation
+	# [1] https://github.com/transifex/cli?tab=readme-ov-file#pulling-files-from-transifex
+	# [2] https://help.transifex.com/en/articles/6223301-qt-linguist
+	run "$TRANSIFEX" pull --all --mode translator --force --minimum-perc 1
+}
+
+test_translations()
+{
+	info "Trying to compile translation files into binary format"
+
+	qm_file="$(mktemp XXXX.qm)"
+	temporary_files+=("$qm_file")
+
+	declare -i errors=0
+	for translation in "$TRANSLATION_DIR"/*.ts; do
+		run "$LRELEASE" "$translation" -qm "$qm_file" || errors+=1
+	done
+
+	if ((errors))
+	then error "$errors language(s) failed to compile!"
+	else info 'Translations compiled successfully!'
+	fi
+}
+
+#
+# Main
+#
+
+[[ $1 ]] && exec cat <<EOF >&2
+Usage: update_locales
+Push new English strings to Transifex and pull down the latest translations
+
+Environment variables:
+  LRELEASE
+  LUPDATE
+  TRANSIFEX
+EOF
+
+temporary_files=()
+trap '[[ $temporary_files ]] && rm "${temporary_files[@]}"' EXIT
+
+check_that_all_is_committed
+if question "Scan the source code for new strings?"; then
+	collect_source_strings
+	test_source_strings
+	if question "Push new English strings to Transifex?"; then
+		push_source_strings
+	fi
 fi
-
-abinfo "Scanning directories..."
-
-git ls-files | grep -E "$EXTENSIONS" > "$LIST_FILE"
-if ! lupdate -no-obsolete -I include/ "@$LIST_FILE" -ts "$OUTPUT_TS"; then
-  aberr "There are some problems when collecting the strings."
-  exit 1
+if question "Pull translations from Transifex?"; then
+	pull_translations
+	test_translations
 fi
-
-abinfo "Validating translations..."
-validate
-
-abinfo "Translations successfully updated."
-printf "Do you want to upload translations to Transifex? [y/N]: "
-read -n 1 -r TX
-echo ""
-
-if [[ "$TX" == "y" || "$TX" == "Y" ]]; then
-  upload_to_tx
-fi
-
-abinfo "No upload as required."
-
-exit 0
+info "See you later, translator!"
