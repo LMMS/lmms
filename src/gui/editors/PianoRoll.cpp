@@ -301,12 +301,13 @@ PianoRoll::PianoRoll() :
 
 	removeSelection();
 
-	m_pasteGhostAction = new QAction(tr("Paste ghost notes"), this);
+	m_pasteGhostAction = new QAction(tr("Paste ghost"), this);
 	m_pasteGhostAction->setDisabled(true);
 	connect(m_pasteGhostAction, &QAction::triggered, this, &PianoRoll::pasteGhostNotes);
-	connect(&m_ghostVisible, SIGNAL(dataChanged()), this, SLOT(update()));
-	connect(&m_ghostRepeated, SIGNAL(dataChanged()), this, SLOT(update()));
-	connect(&m_ghostStacked, SIGNAL(dataChanged()), this, SLOT(update()));
+	connect(&m_ghostVisible, &Model::dataChanged, this, qOverload<>(&QWidget::update));
+	connect(&m_ghostRepeated, &Model::dataChanged, this, qOverload<>(&QWidget::update));
+	connect(&m_ghostStacked, &Model::dataChanged, this, qOverload<>(&QWidget::update));
+	connect(&m_ghostStackedDense, &Model::dataChanged, this, qOverload<>(&QWidget::update));
 
 	// init scrollbars
 	m_leftRightScroll = new QScrollBar( Qt::Horizontal, this );
@@ -453,7 +454,6 @@ void PianoRoll::reset()
 	m_lastNoteVolume = DefaultVolume;
 	m_lastNotePanning = DefaultPanning;
 	m_ghostNotes.clear();
-	m_ghostVisible.setValue(false);
 }
 
 void PianoRoll::showTextFloat(const QString &text, const QPoint &pos, int timeout)
@@ -606,18 +606,15 @@ void PianoRoll::markSemiTone(SemiToneMarkerAction i, bool fromMenu)
 
 
 
-/*! \brief Copy notes to the ghost note vector
- *
- *  This is a private method. It will also update GUI components related to ghost notes.
- */
 void PianoRoll::setGhostNotes(const NoteVector& notes)
 {
 	// TODO undo ghost note changes
 
 	m_ghostNotes.clear();
-	for (auto& note: notes)
+	for (const auto& note: notes)
 	{
-		m_ghostNotes.push_back(new Note(note->length(), note->pos(), note->key()));
+			auto new_note = new Note(note->length(), note->pos(), note->key());
+			m_ghostNotes.push_back( new_note );
 	}
 	if (auto bounds = boundsForNotes(m_ghostNotes))
 	{
@@ -630,41 +627,23 @@ void PianoRoll::setGhostNotes(const NoteVector& notes)
 
 
 
-/*! \brief Use selected notes as ghost notes
- *
- *  Use all notes in the current clip if there's no selection.
- *  Ghost notes will be cleared if there are no notes in the current clip.
- */
+
 void PianoRoll::setGhostNotesFromSelection()
 {
-	if (!hasValidMidiClip()) { return; }
-
+	if (!hasValidMidiClip() || m_midiClip->notes().empty()) { return; }
 	auto selection = getSelectedNotes();
 	setGhostNotes(selection.empty() ? m_midiClip->notes() : selection);
 }
 
 
 
-/*! \brief Use notes from the given MidiClip as ghost notes */
-void PianoRoll::setGhostMidiClip( MidiClip* newMidiClip )
-{
-	// Expects a pointer to a MIDI clip or nullptr.
-	if( newMidiClip != nullptr )
-	{
-		setGhostNotes(newMidiClip->notes());
-	}
-}
 
-
-
-
-/*! \brief Paste the ghost notes as regular notes */
 void PianoRoll::pasteGhostNotes()
 {
 	if (!hasValidMidiClip()) { return; }
 
 	clearSelectedNotes();
-	for (auto& note : m_ghostNotes)
+	for (const auto& note : m_ghostNotes)
 	{
 		auto newNote = m_midiClip->addNote(*note, false);
 		newNote->setSelected(true);
@@ -674,22 +653,18 @@ void PianoRoll::pasteGhostNotes()
 
 
 
-/*! \brief Load ghost notes and related settings from a DOM element */
 void PianoRoll::loadGhostNotes( const QDomElement & de )
 {
-	m_ghostNotes.clear();
-
+	NoteVector notes;
 	for (QDomNode node = de.firstChild(); !node.isNull(); node = node.nextSibling())
 	{
 			auto n = new Note;
 			n->restoreState( node.toElement() );
 			n->setVolume(DefaultVolume);
-			m_ghostNotes.push_back( n );
+			notes.push_back( n );
 	}
-	if (auto bounds = boundsForNotes(m_ghostNotes))
-	{
-		m_ghostBounds = bounds.value();
-	}
+	setGhostNotes(notes);
+
 	if (de.hasAttribute("repeat"))
 	{
 		m_ghostRepeated.setValue(de.attribute("repeat").toInt());
@@ -698,15 +673,14 @@ void PianoRoll::loadGhostNotes( const QDomElement & de )
 	{
 		m_ghostStacked.setValue(de.attribute("stack").toInt());
 	}
+	if (de.hasAttribute("dense"))
+	{
+		m_ghostStackedDense.setValue(de.attribute("dense").toInt());
+	}
 	if (de.hasAttribute("visible"))
 	{
 		m_ghostVisible.setValue(de.attribute("visible").toInt());
 	}
-	else
-	{
-		m_ghostVisible.setValue(!m_ghostNotes.empty());
-	}
-	m_pasteGhostAction->setEnabled(!m_ghostNotes.empty());
 }
 
 
@@ -3618,9 +3592,10 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			const int posEnd = loop ? rightmostTick : m_ghostBounds.end.getTicks();
 
 			// Vertical repeat
-			const bool stack = m_ghostStacked.value();
-			// Round to whole octaves
-			const int ghostRange = roundUp((m_ghostBounds.highest - m_ghostBounds.lowest + 1), KeysPerOctave);
+			const bool stack = m_ghostStacked.value() || m_ghostStackedDense.value();
+			const bool everyOctave = m_ghostStackedDense.value();
+			// Round to next octave
+			const int ghostRange = everyOctave ? KeysPerOctave : roundUp((m_ghostBounds.highest - m_ghostBounds.lowest + 1), KeysPerOctave);
 			// Offset of the bottommost visible repetition, relative to the original ghost notes
 			const int keyOffBegin = stack ? roundDown(m_startKey - m_ghostBounds.lowest, ghostRange) : 0;
 			// Where to stop drawing
@@ -3628,10 +3603,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 
 			for (const Note* note : m_ghostNotes)
 			{
-				if (note->length() == 0) { continue; }
-				const int noteLen = (note->length() > 0) ? note->length().getTicks() : 4;
-				const int noteWidth = noteLen * m_ppb / TimePos::ticksPerBar();
-
+				const int noteWidth = note->length() * m_ppb / TimePos::ticksPerBar();
 				for (int posOff = posOffBegin; m_ghostBounds.start + posOff < posEnd; posOff += ghostLength)
 				{
 					for (int keyOff = keyOffBegin; m_ghostBounds.lowest + keyOff < keyEnd; keyOff += ghostRange)
@@ -3639,8 +3611,8 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 						const int pos = note->pos() + posOff;
 						const int key = note->key() + keyOff;
 
-						// skip notes outside visible area
-						if (pos + noteLen <= m_currentPosition || pos >= rightmostTick
+							   // skip notes outside visible area
+						if (pos + note->length() <= m_currentPosition || pos >= rightmostTick
 							|| key < m_startKey || key > topKey) { continue; }
 
 						drawNoteRect(
@@ -5128,9 +5100,19 @@ PianoRollWindow::PianoRollWindow() :
 	auto setGhostAction = new QAction(tr("Use selection as ghost"), this);
 	auto ghostRepeatAction = m_editor->m_ghostRepeated.createAction(tr("Repeat horizontally"));
 	auto ghostStackAction = m_editor->m_ghostStacked.createAction(tr("Stack vertically"));
+	auto ghostStackDenseAction = m_editor->m_ghostStackedDense.createAction(tr("Stack on every octave"));
+
 	connect(setGhostAction, &QAction::triggered, m_editor, &PianoRoll::setGhostNotesFromSelection);
 
-
+	// Connect it so stacking is implicitly checked when octave stacking is checked
+	connect(ghostStackDenseAction, &QAction::triggered, ghostStackAction, [ghostStackAction](bool checked)
+	{
+		if (checked) { ghostStackAction->setChecked(true); }
+	});
+	connect(ghostStackAction, &QAction::triggered, ghostStackDenseAction, [ghostStackDenseAction](bool checked)
+	{
+		if (!checked) { ghostStackDenseAction->setChecked(false); }
+	});
 
 	ghostVisibleAction->setIcon(embed::getIconPixmap("ghost_note"));
 	ghostButton->setDefaultAction(ghostVisibleAction);
@@ -5141,6 +5123,7 @@ PianoRollWindow::PianoRollWindow() :
 	ghostMenu->addSeparator();
 	ghostMenu->addAction(ghostRepeatAction);
 	ghostMenu->addAction(ghostStackAction);
+	ghostMenu->addAction(ghostStackDenseAction);
 	miscToolBar->addWidget(ghostButton);
 
 	addToolBarBreak();
@@ -5304,7 +5287,8 @@ const MidiClip* PianoRollWindow::currentMidiClip() const
 
 void PianoRollWindow::setGhostMidiClip( MidiClip* clip )
 {
-	m_editor->setGhostMidiClip( clip );
+	if (clip == nullptr) { return; }
+	m_editor->setGhostNotes(clip->notes());
 }
 
 
@@ -5428,6 +5412,7 @@ void PianoRollWindow::saveSettings( QDomDocument & doc, QDomElement & de )
 		ghostNotesRoot.setAttribute("visible", m_editor->m_ghostVisible.value());
 		ghostNotesRoot.setAttribute("repeat", m_editor->m_ghostRepeated.value());
 		ghostNotesRoot.setAttribute("stack", m_editor->m_ghostStacked.value());
+		ghostNotesRoot.setAttribute("dense", m_editor->m_ghostStackedDense.value());
 		de.appendChild( ghostNotesRoot );
 	}
 

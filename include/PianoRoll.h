@@ -122,12 +122,8 @@ public:
 	void showPanTextFloat(panning_t pan, const QPoint &pos, int timeout=-1);
 
 	void setCurrentMidiClip( MidiClip* newMidiClip );
+	void loadGhostNotes( const QDomElement & de );
 	void loadMarkedSemiTones(const QDomElement & de);
-
-	void loadGhostNotes(const QDomElement& de);
-	void setGhostMidiClip(MidiClip* newMidiClip);
-	void setGhostNotesFromSelection();
-	void pasteGhostNotes();
 
 	inline void stopRecording()
 	{
@@ -379,6 +375,7 @@ private:
 	BoolModel m_ghostVisible;
 	BoolModel m_ghostRepeated;
 	BoolModel m_ghostStacked;
+	BoolModel m_ghostStackedDense;
 	QAction* m_pasteGhostAction;
 
 	inline const NoteVector & ghostNotes() const
@@ -386,6 +383,8 @@ private:
 		return m_ghostNotes;
 	}
 	void setGhostNotes(const NoteVector& notes);
+	void setGhostNotesFromSelection();
+	void pasteGhostNotes();
 
 	QScrollBar * m_leftRightScroll;
 	QScrollBar * m_topBottomScroll;
