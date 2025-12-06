@@ -29,20 +29,23 @@
 #define CARLA_MIN_PARAM_VERSION 0x020090
 #define CARLA_VERSION_HEX_3 0x30000
 
+#include <vector>
+
 // qt
 #include <QCloseEvent>
 #include <QDomElement>
 #include <QMutex>
+#include <QRegularExpression>
 
 // carla/source/includes
 #include "carlabase_export.h"
-#include "CarlaDefines.h"
+#include <CarlaDefines.h>
 #if CARLA_VERSION_HEX >= 0x010911
-    #include "CarlaNativePlugin.h"
+    #include <CarlaNativePlugin.h>  // IWYU pragma: keep
 #else
-    #include "CarlaBackend.h"
-    #include "CarlaNative.h"
-    #include "CarlaUtils.h"
+    #include <CarlaBackend.h>
+    #include <CarlaNative.h>
+    #include <CarlaUtils.h>
     CARLA_EXPORT
     const NativePluginDescriptor* carla_get_native_patchbay_plugin();
 
@@ -62,7 +65,7 @@ class QCompleter;
 class QGridLayout;
 class QHBoxLayout;
 class QLineEdit;
-class QStringListModel;
+class QStringListModel;  // IWYU pragma: keep
 class QScrollArea;
 
 
@@ -80,7 +83,7 @@ class CarlaParamFloatModel : public FloatModel
 {
 public:
 	CarlaParamFloatModel(Model * parent):
-		FloatModel(0.0, 0.0, 1.0, 0.001, parent, "Unused"),
+		FloatModel(0.f, 0.f, 1.f, 0.001f, parent, "Unused"),
 		m_isOutput(false),
 		m_isEnabled(false)
 	{
@@ -89,8 +92,8 @@ public:
 	// From AutomatableModel.h, it's private there.
 	inline static bool mustQuoteName(const QString &name)
 	{
-		QRegExp reg("^[A-Za-z0-9._-]+$");
-		return !reg.exactMatch(name);
+		QRegularExpression reg("^[A-Za-z0-9._-]+$");
+		return !reg.match(name).hasMatch();
 	}
 
 	inline void loadSettings(const QDomElement& element, const QString& name = QString("value")) override
@@ -189,11 +192,10 @@ public:
     intptr_t handleDispatcher(const NativeHostDispatcherOpcode opcode, const int32_t index, const intptr_t value, void* const ptr, const float opt);
 
     // LMMS functions
-    Flags flags() const override;
     QString nodeName() const override;
     void saveSettings(QDomDocument& doc, QDomElement& parent) override;
     void loadSettings(const QDomElement& elem) override;
-    void play(sampleFrame* workingBuffer) override;
+    void play(SampleFrame* workingBuffer) override;
     bool handleMidiEvent(const MidiEvent& event, const TimePos& time, f_cnt_t offset) override;
     gui::PluginView* instantiateView(QWidget* parent) override;
 
@@ -223,7 +225,7 @@ private:
     QMutex fMutex;
 
     uint8_t m_paramGroupCount;
-    QList<CarlaParamFloatModel*> m_paramModels;
+    std::vector<CarlaParamFloatModel*> m_paramModels;
     QDomElement m_settingsElem;
 
     QCompleter* m_paramsCompleter;
@@ -351,7 +353,7 @@ private:
 
 	CarlaInstrument* const m_carlaInstrument;
 	CarlaInstrumentView* const m_carlaInstrumentView;
-	QList<Knob*> m_knobs;
+	std::vector<Knob*> m_knobs;
 
 	// Keep track of the biggest knob width per group
 	QList<uint16_t> m_maxKnobWidthPerGroup;

@@ -23,12 +23,15 @@
  *
  */
 
+#include "EffectRackView.h"
+
 #include <QApplication>
+#include <QAction>
 #include <QPushButton>
 #include <QScrollArea>
 #include <QVBoxLayout>
 
-#include "EffectRackView.h"
+#include "DeprecationHelper.h"
 #include "EffectSelectDialog.h"
 #include "EffectView.h"
 #include "GroupBox.h"
@@ -42,7 +45,7 @@ EffectRackView::EffectRackView( EffectChain* model, QWidget* parent ) :
 	ModelView( nullptr, this )
 {
 	auto mainLayout = new QVBoxLayout(this);
-	mainLayout->setMargin( 5 );
+	mainLayout->setContentsMargins(5, 5, 5, 5);
 
 	m_effectsGroupBox = new GroupBox( tr( "EFFECTS CHAIN" ) );
 	mainLayout->addWidget( m_effectsGroupBox );
@@ -62,6 +65,7 @@ EffectRackView::EffectRackView( EffectChain* model, QWidget* parent ) :
 
 	auto addButton = new QPushButton;
 	addButton->setText( tr( "Add effect" ) );
+	addButton->setFocusPolicy(Qt::NoFocus);
 
 	effectsLayout->addWidget( addButton );
 
@@ -165,17 +169,27 @@ void EffectRackView::update()
 				view_map[i] = true;
 				break;
 			}
+			++i;
 		}
 		if( i >= m_effectViews.size() )
 		{
 			auto view = new EffectView(effect, w);
-			connect( view, SIGNAL(moveUp(lmms::gui::EffectView*)),
-					this, SLOT(moveUp(lmms::gui::EffectView*)));
-			connect( view, SIGNAL(moveDown(lmms::gui::EffectView*)),
-				this, SLOT(moveDown(lmms::gui::EffectView*)));
-			connect( view, SIGNAL(deletePlugin(lmms::gui::EffectView*)),
-				this, SLOT(deletePlugin(lmms::gui::EffectView*)),
-							Qt::QueuedConnection );
+			connect(view, &EffectView::movedUp, this, &EffectRackView::moveUp);
+			connect(view, &EffectView::movedDown, this, &EffectRackView::moveDown);
+			connect(view, &EffectView::deletedPlugin, this, &EffectRackView::deletePlugin, Qt::QueuedConnection);
+
+			QAction* moveUpAction = new QAction(view);
+			moveUpAction->setShortcut(keySequence(Qt::Key_Up, Qt::AltModifier));
+			moveUpAction->setShortcutContext(Qt::WidgetShortcut);
+			connect(moveUpAction, &QAction::triggered, view, &EffectView::moveUp);
+			view->addAction(moveUpAction);
+
+			QAction* moveDownAction = new QAction(view);
+			moveDownAction->setShortcut(keySequence(Qt::Key_Down, Qt::AltModifier));
+			moveDownAction->setShortcutContext(Qt::WidgetShortcut);
+			connect(moveDownAction, &QAction::triggered, view, &EffectView::moveDown);
+			view->addAction(moveDownAction);
+
 			view->show();
 			m_effectViews.append( view );
 			if( i < view_map.size() )
@@ -212,7 +226,7 @@ void EffectRackView::update()
 		}
 	}
 
-	w->setFixedSize( EffectView::DEFAULT_WIDTH + 2*EffectViewMargin, m_lastY);
+	w->setFixedSize(EffectView::DEFAULT_WIDTH + 2 * EffectViewMargin, m_lastY);
 
 	QWidget::update();
 }
@@ -257,6 +271,15 @@ void EffectRackView::modelChanged()
 	m_effectsGroupBox->setModel( &fxChain()->m_enabledModel );
 	connect( fxChain(), SIGNAL(aboutToClear()), this, SLOT(clearViews()));
 	update();
+}
+
+
+
+
+QSize EffectRackView::sizeHint() const
+{
+	// Use the formula from InstrumentTrackWindow.cpp
+	return QSize{EffectRackView::DEFAULT_WIDTH, 254 /* INSTRUMENT_HEIGHT */ - 4 - 1};
 }
 
 

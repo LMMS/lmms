@@ -25,8 +25,8 @@
 #ifndef LFO_H
 #define LFO_H
 
-#include "lmms_constants.h"
-
+#include <cmath>
+#include <numbers>
 
 namespace lmms
 {
@@ -50,10 +50,7 @@ public:
 		m_frequency = frequency;
 		m_increment = m_frequency * m_twoPiOverSr;
 
-		if( m_phase >= F_2PI )
-		{
-			m_phase -= F_2PI;
-		}
+		m_phase = std::fmod(m_phase, 2 * std::numbers::pi_v<float>);
 	}
 
 
@@ -62,7 +59,7 @@ public:
 	inline void setSampleRate ( int samplerate )
 	{
 		m_samplerate = samplerate;
-		m_twoPiOverSr = F_2PI / samplerate;
+		m_twoPiOverSr = 2 * std::numbers::pi_v<float> / samplerate;
 		m_increment = m_frequency * m_twoPiOverSr;
 	}
 

@@ -31,6 +31,7 @@
 #include "ControllerConnection.h"
 #include "embed.h"
 #include "GuiApplication.h"
+#include "KeyboardShortcuts.h"
 #include "MainWindow.h"
 #include "StringPairDrag.h"
 #include "Clipboard.h"
@@ -48,7 +49,7 @@ AutomatableModelView::AutomatableModelView( Model* model, QWidget* _this ) :
 	m_conversionFactor( 1.0 )
 {
 	widget()->setAcceptDrops( true );
-	widget()->setCursor( QCursor( embed::getIconPixmap( "hand" ), 3, 3 ) );
+	widget()->setCursor(Qt::PointingHandCursor);
 }
 
 void AutomatableModelView::addDefaultActions( QMenu* menu )
@@ -171,12 +172,12 @@ void AutomatableModelView::unsetModel()
 
 void AutomatableModelView::mousePressEvent( QMouseEvent* event )
 {
-	if( event->button() == Qt::LeftButton && event->modifiers() & Qt::ControlModifier )
+	if (event->button() == Qt::LeftButton && event->modifiers() & KBD_COPY_MODIFIER)
 	{
 		new gui::StringPairDrag( "automatable_model", QString::number( modelUntyped()->id() ), QPixmap(), widget() );
 		event->accept();
 	}
-	else if( event->button() == Qt::MidButton )
+	else if( event->button() == Qt::MiddleButton )
 	{
 		modelUntyped()->reset();
 	}

@@ -43,8 +43,8 @@ Plugin::Descriptor PLUGIN_EXPORT stereomatrix_plugin_descriptor =
 				"Plugin for freely manipulating stereo output" ),
 	"Paul Giblock <drfaygo/at/gmail.com>",
 	0x0100,
-	Plugin::Effect,
-	new PluginPixmapLoader("logo"),
+	Plugin::Type::Effect,
+	new PixmapLoader("lmms-plugin-logo"),
 	nullptr,
 	nullptr,
 } ;
@@ -64,44 +64,29 @@ StereoMatrixEffect::StereoMatrixEffect(
 
 
 
-bool StereoMatrixEffect::processAudioBuffer( sampleFrame * _buf,
-							const fpp_t _frames )
+Effect::ProcessStatus StereoMatrixEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 {
-	
-	// This appears to be used for determining whether or not to continue processing
-	// audio with this effect	
-	if( !isEnabled() || !isRunning() )
-	{
-		return( false );
-	}
-
-	double out_sum = 0.0;
-
-	for( fpp_t f = 0; f < _frames; ++f )
+	for (fpp_t f = 0; f < frames; ++f)
 	{	
 		const float d = dryLevel();
 		const float w = wetLevel();
 		
-		sample_t l = _buf[f][0];
-		sample_t r = _buf[f][1];
+		sample_t l = buf[f][0];
+		sample_t r = buf[f][1];
 
 		// Init with dry-mix
-		_buf[f][0] = l * d;
-		_buf[f][1] = r * d;
+		buf[f][0] = l * d;
+		buf[f][1] = r * d;
 
 		// Add it wet
-		_buf[f][0] += ( m_smControls.m_llModel.value( f ) * l  +
+		buf[f][0] += ( m_smControls.m_llModel.value( f ) * l  +
 					m_smControls.m_rlModel.value( f ) * r ) * w;
 
-		_buf[f][1] += ( m_smControls.m_lrModel.value( f ) * l  +
+		buf[f][1] += ( m_smControls.m_lrModel.value( f ) * l  +
 					m_smControls.m_rrModel.value( f ) * r ) * w;
-		out_sum += _buf[f][0]*_buf[f][0] + _buf[f][1]*_buf[f][1];
-
 	}
 
-	checkGate( out_sum / _frames );
-
-	return( isRunning() );
+	return ProcessStatus::ContinueIfNotQuiet;
 }
 
 

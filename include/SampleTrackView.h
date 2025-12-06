@@ -22,22 +22,21 @@
  *
  */
 
-#ifndef SAMPLE_TRACK_VIEW_H
-#define SAMPLE_TRACK_VIEW_H
+#ifndef LMMS_GUI_SAMPLE_TRACK_VIEW_H
+#define LMMS_GUI_SAMPLE_TRACK_VIEW_H
 
 
+#include "SampleTrack.h"
 #include "TrackView.h"
 
 namespace lmms
 {
 
-class SampleTrack;
-
-
 namespace gui
 {
 
 class Knob;
+class MixerChannelLcdSpinBox;
 class SampleTrackWindow;
 class TrackLabelButton;
 
@@ -90,6 +89,7 @@ private slots:
 
 private:
 	SampleTrackWindow * m_window;
+	MixerChannelLcdSpinBox* m_mixerChannelNumber;
 	Knob * m_volumeKnob;
 	Knob * m_panningKnob;
 	FadeButton * m_activityIndicator;
@@ -109,4 +109,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_SAMPLE_TRACK_VIEW_H

@@ -45,7 +45,6 @@ PatternClip::PatternClip(Track* track) :
 		changeLength( TimePos( t, 0 ) );
 		restoreJournallingState();
 	}
-	setAutoResize( false );
 }
 
 void PatternClip::saveSettings(QDomDocument& doc, QDomElement& element)
@@ -60,10 +59,12 @@ void PatternClip::saveSettings(QDomDocument& doc, QDomElement& element)
 		element.setAttribute( "pos", startPosition() );
 	}
 	element.setAttribute( "len", length() );
+	element.setAttribute("off", startTimeOffset());
 	element.setAttribute( "muted", isMuted() );
-	if( usesCustomClipColor() )
+	element.setAttribute("autoresize", QString::number(getAutoResize()));
+	if (const auto& c = color())
 	{
-		element.setAttribute( "color", color().name() );
+		element.setAttribute("color", c->name());
 	}
 }
 
@@ -78,28 +79,25 @@ void PatternClip::loadSettings(const QDomElement& element)
 		movePosition( element.attribute( "pos" ).toInt() );
 	}
 	changeLength( element.attribute( "len" ).toInt() );
-	if( element.attribute( "muted" ).toInt() != isMuted() )
+	setAutoResize(element.attribute("autoresize", "1").toInt());
+	setStartTimeOffset(element.attribute("off").toInt());
+	if (static_cast<bool>(element.attribute("muted").toInt()) != isMuted())
 	{
 		toggleMute();
 	}
 	
-	// for colors saved in 1.3-onwards
-	if( element.hasAttribute( "color" ) && !element.hasAttribute( "usestyle" ) )
+	if (element.hasAttribute("color"))
 	{
-		useCustomClipColor( true );
-		setColor( element.attribute( "color" ) );
-	}
-	
-	// for colors saved before 1.3
-	else if(element.hasAttribute("color"))
-	{
-		setColor(QColor(element.attribute("color").toUInt()));
-		
-		// usestyle attribute is no longer used
-	}
-	else
-	{
-		useCustomClipColor(false);
+		if (!element.hasAttribute("usestyle"))
+		{
+			// for colors saved in 1.3-onwards
+			setColor(QColor{element.attribute("color")});
+		}
+		else if (element.attribute("usestyle").toUInt() == 0)
+		{
+			// for colors saved before 1.3
+			setColor(QColor{element.attribute("color").toUInt()});
+		}
 	}
 }
 

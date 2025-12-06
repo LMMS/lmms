@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef METER_MODEL_H
-#define METER_MODEL_H
+#ifndef LMMS_METER_MODEL_H
+#define LMMS_METER_MODEL_H
 
 #include "AutomatableModel.h"
 
@@ -46,7 +46,7 @@ public:
 
 	void reset();
 
-	// Must have the sub-models exposed to programatically connect
+	// Must have the sub-models exposed to programmatically connect
 	// to automation or controllers
 	IntModel & numeratorModel()
 	{
@@ -68,4 +68,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_METER_MODEL_H

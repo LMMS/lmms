@@ -40,12 +40,12 @@ Ladspa2LMMS::Ladspa2LMMS()
 		ladspa_key_t key = plugin.second;
 		LadspaManagerDescription * desc = getDescription( key );
 		
-		if( desc->type == SOURCE )
+		if( desc->type == LadspaPluginType::Source )
 		{
 			m_instruments.append( qMakePair( getName( key ), 
 								key ) );
 		}
-		else if( desc->type == TRANSFER &&
+		else if( desc->type == LadspaPluginType::Transfer &&
 			( desc->inputChannels == desc->outputChannels &&
 			( desc->inputChannels == 1 ||
 			desc->inputChannels == 2 ||
@@ -55,7 +55,7 @@ Ladspa2LMMS::Ladspa2LMMS()
 			m_validEffects.append( qMakePair( getName( key ),
 								key ) );
 		}
-		else if( desc->type == TRANSFER &&
+		else if( desc->type == LadspaPluginType::Transfer &&
 			( desc->inputChannels != desc->outputChannels ||
 			( desc->inputChannels != 1 &&
 			desc->inputChannels != 2 &&
@@ -65,12 +65,12 @@ Ladspa2LMMS::Ladspa2LMMS()
 			m_invalidEffects.append( qMakePair( getName( key ), 
 								key ) );
 		}
-		else if( desc->type == SINK )
+		else if( desc->type == LadspaPluginType::Sink )
 		{
 			m_analysisTools.append( qMakePair( getName( key ),
 								key ) );
 		}
-		else if( desc->type == OTHER )
+		else if( desc->type == LadspaPluginType::Other )
 		{
 			m_otherPlugins.append( qMakePair( getName( key ), 
 								key ) );

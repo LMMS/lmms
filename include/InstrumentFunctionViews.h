@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef INSTRUMENT_FUNCTION_VIEWS_H
-#define INSTRUMENT_FUNCTION_VIEWS_H
+#ifndef LMMS_INSTRUMENT_FUNCTION_VIEWS_H
+#define LMMS_INSTRUMENT_FUNCTION_VIEWS_H
 
 #include "ModelView.h"
 
@@ -99,4 +99,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_INSTRUMENT_FUNCTION_VIEWS_H

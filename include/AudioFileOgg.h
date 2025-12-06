@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef AUDIO_FILE_OGG_H
-#define AUDIO_FILE_OGG_H
+#ifndef LMMS_AUDIO_FILE_OGG_H
+#define LMMS_AUDIO_FILE_OGG_H
 
 #include "lmmsconfig.h"
 
@@ -56,61 +56,19 @@ public:
 		return new AudioFileOgg( outputSettings, channels, successful, outputFilename, audioEngine );
 	}
 
-
 private:
-	void writeBuffer( const surroundSampleFrame * _ab,
-						const fpp_t _frames,
-						const float _master_gain ) override;
-
-	bool startEncoding();
-	void finishEncoding();
-	inline int writePage();
-
-	inline bitrate_t nominalBitrate() const
-	{
-		return getOutputSettings().getBitRateSettings().getBitRate();
-	}
-
-	inline bitrate_t minBitrate() const
-	{
-		if (nominalBitrate() > 64)
-		{
-			return nominalBitrate() - 64;
-		}
-		else
-		{
-			return 64;
-		}
-	}
-
-	inline bitrate_t maxBitrate() const
-	{
-		return nominalBitrate() + 64;
-	}
-
-private:
-	bool m_ok;
-	ch_cnt_t m_channels;
-	sample_rate_t m_rate;
-
-	uint32_t m_serialNo;
-
-	vorbis_comment * m_comments;
-
-	// encoding setup - init by init_ogg_encoding
-	ogg_stream_state	m_os;
-	ogg_page 	 	m_og;
-	ogg_packet	 	m_op;
-
-	vorbis_dsp_state 	m_vd;
-	vorbis_block     	m_vb;
-	vorbis_info      	m_vi;
-
-} ;
-
+	void writeBuffer(const SampleFrame* _ab, const fpp_t _frames) override;
+	vorbis_info m_vi;
+	vorbis_dsp_state m_vds;
+	vorbis_comment m_vc;
+	vorbis_block m_vb;
+	ogg_stream_state m_oss;
+	ogg_packet m_packet;
+	ogg_page m_page;
+};
 
 } // namespace lmms
 
 #endif // LMMS_HAVE_OGGVORBIS
 
-#endif
+#endif // LMMS_AUDIO_FILE_OGG_H

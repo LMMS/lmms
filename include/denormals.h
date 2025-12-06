@@ -1,8 +1,8 @@
-// Denormals stripping. 
+// Denormals stripping.
 // These snippets should be common enough to be considered public domain.
 
-#ifndef DENORMALS_H
-#define DENORMALS_H
+#ifndef LMMS_DENORMALS_H
+#define LMMS_DENORMALS_H
 
 #ifdef __SSE__
 #include <immintrin.h>
@@ -35,7 +35,7 @@ int inline can_we_daz()
 
 #endif // __SSE__
 
-// Set denormal protection for this thread. 
+// Set denormal protection for this thread.
 void inline disable_denormals()
 {
 #ifdef __SSE__
@@ -50,5 +50,4 @@ void inline disable_denormals()
 
 } // namespace lmms
 
-#endif // DENORMALS_H
-
+#endif // LMMS_DENORMALS_H

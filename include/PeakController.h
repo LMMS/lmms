@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef PEAK_CONTROLLER_H
-#define PEAK_CONTROLLER_H
+#ifndef LMMS_PEAK_CONTROLLER_H
+#define LMMS_PEAK_CONTROLLER_H
 
 #include "Controller.h"
 #include "ControllerDialog.h"
@@ -36,7 +36,7 @@ namespace lmms
 
 class PeakControllerEffect;
 
-using PeakControllerEffectVector = QVector<PeakControllerEffect*>;
+using PeakControllerEffectVector = std::vector<PeakControllerEffect*>;
 
 class LMMS_EXPORT PeakController : public Controller
 {
@@ -107,4 +107,4 @@ protected:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_PEAK_CONTROLLER_H

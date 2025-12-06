@@ -24,6 +24,7 @@
  */
 
 
+#include "LmmsCommonMacros.h"
 #include "Plugin.h"
 #include "vstbase_export.h"
 
@@ -41,7 +42,7 @@ Plugin::Descriptor VSTBASE_EXPORT vstbase_plugin_descriptor =
 	"library for all LMMS plugins dealing with VST-plugins",
 	"Tobias Doerffel <tobydox/at/users/dot/sf/dot/net>",
 	0x0100,
-	Plugin::Library,
+	Plugin::Type::Library,
 	nullptr,
 	nullptr,
 } ;

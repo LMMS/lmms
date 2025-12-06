@@ -22,10 +22,8 @@
  *
  */
 
-
-#ifndef PATTERN_EDITOR_H
-#define PATTERN_EDITOR_H
-
+#ifndef LMMS_GUI_PATTERN_EDITOR_H
+#define LMMS_GUI_PATTERN_EDITOR_H
 
 #include "Editor.h"
 #include "TrackContainerView.h"
@@ -39,6 +37,7 @@ namespace gui
 {
 
 class ComboBox;
+class TimeLineWidget;
 
 
 class PatternEditor : public TrackContainerView
@@ -64,13 +63,19 @@ public slots:
 	void addSampleTrack();
 	void addAutomationTrack();
 	void cloneClip();
+	void updateMaxSteps();
 
 protected slots:
 	void dropEvent(QDropEvent * de ) override;
+	void resizeEvent(QResizeEvent* de) override;
 	void updatePosition();
+	void updatePixelsPerBar();
 
 private:
 	PatternStore* m_ps;
+	TimeLineWidget* m_timeLine;
+	int m_trackHeadWidth;
+	tick_t m_maxClipLength;
 	void makeSteps( bool clone );
 };
 
@@ -99,4 +104,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_PATTERN_EDITOR_H

@@ -43,7 +43,7 @@ Plugin::Descriptor PLUGIN_EXPORT carlarack_plugin_descriptor =
                        "Carla Rack Instrument" ),
     "falkTX <falktx/at/falktx.com>",
     CARLA_VERSION_HEX,
-    Plugin::Instrument,
+    Plugin::Type::Instrument,
     new PluginPixmapLoader( "logo" ),
     nullptr,
     nullptr,

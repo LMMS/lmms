@@ -28,6 +28,7 @@
 #include "WaveShaperControlDialog.h"
 #include "WaveShaperControls.h"
 #include "embed.h"
+#include "FontHelper.h"
 #include "Graph.h"
 #include "Knob.h"
 #include "PixmapButton.h"
@@ -48,7 +49,7 @@ WaveShaperControlDialog::WaveShaperControlDialog(
 	setPalette( pal );
 	setFixedSize( 224, 274 );
 
-	auto waveGraph = new Graph(this, Graph::LinearNonCyclicStyle, 204, 205);
+	auto waveGraph = new Graph(this, Graph::Style::LinearNonCyclic, 204, 205);
 	waveGraph -> move( 10, 6 );
 	waveGraph -> setModel( &_controls -> m_wavegraphModel );
 	waveGraph -> setAutoFillBackground( true );
@@ -59,20 +60,18 @@ WaveShaperControlDialog::WaveShaperControlDialog(
 	waveGraph->setGraphColor( QColor( 85, 204, 145 ) );
 	waveGraph -> setMaximumSize( 204, 205 );
 
-	auto inputKnob = new Knob(knobBright_26, this);
+	auto inputKnob = new Knob(KnobType::Bright26, tr("INPUT"), SMALL_FONT_SIZE, this);
 	inputKnob -> setVolumeKnob( true );
 	inputKnob -> setVolumeRatio( 1.0 );
 	inputKnob -> move( 26, 225 );
 	inputKnob->setModel( &_controls->m_inputModel );
-	inputKnob->setLabel( tr( "INPUT" ) );
 	inputKnob->setHintText( tr( "Input gain:" ) , "" );
 
-	auto outputKnob = new Knob(knobBright_26, this);
+	auto outputKnob = new Knob(KnobType::Bright26, tr("OUTPUT"), SMALL_FONT_SIZE, this);
 	outputKnob -> setVolumeKnob( true );
 	outputKnob -> setVolumeRatio( 1.0 );
 	outputKnob -> move( 76, 225 );
 	outputKnob->setModel( &_controls->m_outputModel );
-	outputKnob->setLabel( tr( "OUTPUT" ) );
 	outputKnob->setHintText( tr( "Output gain:" ), "" );
 
 	auto resetButton = new PixmapButton(this, tr("Reset wavegraph"));
@@ -103,7 +102,7 @@ WaveShaperControlDialog::WaveShaperControlDialog(
 	subOneButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "sub1_inactive" ) );
 	subOneButton->setToolTip(tr("Decrease wavegraph amplitude by 1 dB"));
 
-	auto clipInputToggle = new LedCheckBox("Clip input", this, tr("Clip input"), LedCheckBox::Green);
+	auto clipInputToggle = new LedCheckBox("Clip input", this, tr("Clip input"), LedCheckBox::LedColor::Green);
 	clipInputToggle -> move( 131, 252 );
 	clipInputToggle -> setModel( &_controls -> m_clipModel );
 	clipInputToggle->setToolTip(tr("Clip input signal to 0 dB"));

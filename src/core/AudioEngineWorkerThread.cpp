@@ -30,7 +30,6 @@
 
 #include "denormals.h"
 #include "AudioEngine.h"
-#include "MemoryManager.h"
 #include "ThreadableJob.h"
 
 #if __SSE__
@@ -80,7 +79,7 @@ void AudioEngineWorkerThread::JobQueue::run()
 	while (processedJob && m_itemsDone < m_writeIndex)
 	{
 		processedJob = false;
-		for( int i = 0; i < m_writeIndex && i < JOB_QUEUE_SIZE; ++i )
+		for (auto i = std::size_t{0}; i < m_writeIndex && i < JOB_QUEUE_SIZE; ++i)
 		{
 			ThreadableJob * job = m_items[i].exchange(nullptr);
 			if( job )
@@ -91,7 +90,7 @@ void AudioEngineWorkerThread::JobQueue::run()
 			}
 		}
 		// always exit loop if we're not in dynamic mode
-		processedJob = processedJob && ( m_opMode == Dynamic );
+		processedJob = processedJob && ( m_opMode == OperationMode::Dynamic );
 	}
 }
 
@@ -167,7 +166,6 @@ void AudioEngineWorkerThread::startAndWaitForJobs()
 
 void AudioEngineWorkerThread::run()
 {
-	MemoryManager::ThreadGuard mmThreadGuard; Q_UNUSED(mmThreadGuard);
 	disable_denormals();
 
 	QMutex m;

@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef RECENTPROJECTSMENU_H
-#define RECENTPROJECTSMENU_H
+#ifndef LMMS_GUI_RECENT_PROJECTS_MENU_H
+#define LMMS_GUI_RECENT_PROJECTS_MENU_H
 
 #include <QMenu>
 
@@ -45,4 +45,4 @@ private slots:
 
 } // namespace lmms::gui
 
-#endif // RECENTPROJECTSMENU_H
+#endif // LMMS_GUI_RECENT_PROJECTS_MENU_H

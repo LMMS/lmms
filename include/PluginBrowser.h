@@ -22,15 +22,14 @@
  *
  */
 
-#ifndef PLUGIN_BROWSER_H
-#define PLUGIN_BROWSER_H
+#ifndef LMMS_GUI_PLUGIN_BROWSER_H
+#define LMMS_GUI_PLUGIN_BROWSER_H
 
 #include <QPixmap>
 
 #include "SideBarWidget.h"
 #include "Plugin.h"
 
-class QLineEdit;
 class QTreeWidget;
 
 namespace lmms::gui
@@ -56,8 +55,6 @@ private:
 };
 
 
-
-
 class PluginDescWidget : public QWidget
 {
 	Q_OBJECT
@@ -65,13 +62,18 @@ public:
 	using PluginKey = Plugin::Descriptor::SubPluginFeatures::Key;
 	PluginDescWidget( const PluginKey & _pk, QWidget * _parent );
 	QString name() const;
-
+	void openInNewInstrumentTrack(QString value);
 
 protected:
-	void enterEvent( QEvent * _e ) override;
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+	void enterEvent(QEnterEvent* event) override;
+#else
+	void enterEvent(QEvent* event) override;
+#endif
 	void leaveEvent( QEvent * _e ) override;
 	void mousePressEvent( QMouseEvent * _me ) override;
 	void paintEvent( QPaintEvent * _pe ) override;
+	void contextMenuEvent(QContextMenuEvent* e) override;
 
 private:
 	constexpr static int DEFAULT_HEIGHT{24};
@@ -85,4 +87,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_PLUGIN_BROWSER_H

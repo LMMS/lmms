@@ -62,11 +62,11 @@ class Eq
 {
 	public:
 		/* recursion coefficients, 3 per band */
-		eq_sample __attribute__ ((aligned)) a[Bands], b[Bands], c[Bands];
+		eq_sample a[Bands], b[Bands], c[Bands];
 		/* past outputs, 2 per band */
-		eq_sample __attribute__ ((aligned)) y[2][Bands];
+		eq_sample y[2][Bands];
 		/* current gain and recursion factor, each 1 per band = 2 */
-		eq_sample __attribute__ ((aligned)) gain[Bands], gf[Bands];
+		eq_sample gain[Bands], gf[Bands];
 		/* input history */
 		eq_sample x[2];
 		/* history index */

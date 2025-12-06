@@ -1,7 +1,7 @@
 /*
  * Lv2ControlBase.cpp - Lv2 control base class
  *
- * Copyright (c) 2018-2020 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
+ * Copyright (c) 2018-2023 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -31,6 +31,7 @@
 #include <QtGlobal>
 
 #include "Engine.h"
+#include "lmms_constants.h"
 #include "Lv2Manager.h"
 #include "Lv2Proc.h"
 
@@ -39,7 +40,7 @@ namespace lmms
 {
 
 
-Plugin::PluginTypes Lv2ControlBase::check(const LilvPlugin *plugin,
+Plugin::Type Lv2ControlBase::check(const LilvPlugin *plugin,
 	std::vector<PluginIssue> &issues)
 {
 	// for some reason, all checks can be done by one processor...
@@ -54,35 +55,12 @@ Lv2ControlBase::Lv2ControlBase(Model* that, const QString &uri) :
 {
 	if (m_plugin)
 	{
-		int channelsLeft = DEFAULT_CHANNELS; // LMMS plugins are stereo
-		while (channelsLeft > 0)
-		{
-			std::unique_ptr<Lv2Proc> newOne = std::make_unique<Lv2Proc>(m_plugin, that);
-			if (newOne->isValid())
-			{
-				channelsLeft -= std::max(
-					1 + static_cast<bool>(newOne->inPorts().m_right),
-					1 + static_cast<bool>(newOne->outPorts().m_right));
-				Q_ASSERT(channelsLeft >= 0);
-				m_procs.push_back(std::move(newOne));
-			}
-			else
-			{
-				qCritical() << "Failed instantiating LV2 processor";
-				m_valid = false;
-				channelsLeft = 0;
-			}
-		}
-		if (m_valid)
-		{
-			m_channelsPerProc = DEFAULT_CHANNELS / m_procs.size();
-			linkAllModels();
-		}
+		init(that);
 	}
 	else
 	{
 		qCritical() << "No Lv2 plugin found for URI" << uri;
-		m_valid = false;
+		throw std::runtime_error("No Lv2 plugin found for given URI");
 	}
 }
 
@@ -90,6 +68,41 @@ Lv2ControlBase::Lv2ControlBase(Model* that, const QString &uri) :
 
 
 Lv2ControlBase::~Lv2ControlBase() = default;
+
+
+
+
+void Lv2ControlBase::init(Model* meAsModel)
+{
+	int channelsLeft = DEFAULT_CHANNELS; // LMMS plugins are stereo
+	while (channelsLeft > 0)
+	{
+		std::unique_ptr<Lv2Proc> newOne = std::make_unique<Lv2Proc>(m_plugin, meAsModel);
+		channelsLeft -= std::max(
+			1 + static_cast<bool>(newOne->inPorts().m_right),
+			1 + static_cast<bool>(newOne->outPorts().m_right));
+		Q_ASSERT(channelsLeft >= 0);
+		m_procs.push_back(std::move(newOne));
+	}
+	m_channelsPerProc = DEFAULT_CHANNELS / m_procs.size();
+	linkAllModels();
+}
+
+
+
+
+void Lv2ControlBase::shutdown()
+{
+	// currently nothing to do here
+}
+
+
+
+
+void Lv2ControlBase::reload()
+{
+	for (const auto& c : m_procs) { c->reload(); }
+}
 
 
 
@@ -125,7 +138,7 @@ void Lv2ControlBase::copyModelsToLmms() const
 
 
 
-void Lv2ControlBase::copyBuffersFromLmms(const sampleFrame *buf, fpp_t frames) {
+void Lv2ControlBase::copyBuffersFromLmms(const SampleFrame* buf, fpp_t frames) {
 	unsigned firstChan = 0; // tell the procs which channels they shall read from
 	for (const auto& c : m_procs) 
 	{
@@ -137,7 +150,7 @@ void Lv2ControlBase::copyBuffersFromLmms(const sampleFrame *buf, fpp_t frames) {
 
 
 
-void Lv2ControlBase::copyBuffersToLmms(sampleFrame *buf, fpp_t frames) const {
+void Lv2ControlBase::copyBuffersToLmms(SampleFrame* buf, fpp_t frames) const {
 	unsigned firstChan = 0; // tell the procs which channels they shall write to
 	for (const auto& c : m_procs) {
 		c->copyBuffersToCore(buf, firstChan, m_channelsPerProc, frames);
@@ -178,14 +191,6 @@ void Lv2ControlBase::loadSettings(const QDomElement &that)
 void Lv2ControlBase::loadFile(const QString &file)
 {
 	(void)file;
-}
-
-
-
-
-void Lv2ControlBase::reloadPlugin()
-{
-	// TODO
 }
 
 

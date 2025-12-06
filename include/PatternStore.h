@@ -22,9 +22,8 @@
  *
  */
 
-
-#ifndef PATTERN_STORE_H
-#define PATTERN_STORE_H
+#ifndef LMMS_PATTERN_STORE_H
+#define LMMS_PATTERN_STORE_H
 
 #include "TrackContainer.h"
 #include "ComboBoxModel.h"
@@ -99,8 +98,9 @@ public slots:
 	void play();
 	void stop();
 	void updateComboBox();
-	void currentPatternChanged();
 
+signals:
+	void trackUpdated();
 
 private:
 	ComboBoxModel m_patternComboBoxModel;
@@ -114,4 +114,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_PATTERN_STORE_H

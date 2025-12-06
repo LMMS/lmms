@@ -25,7 +25,6 @@
 #ifndef OPULENZ_H
 #define OPULENZ_H
 
-#include <QMutex>
 
 #include "AutomatableModel.h"
 #include "Instrument.h"
@@ -42,7 +41,7 @@ namespace gui
 class Knob;
 class LcdSpinBox;
 class PixmapButton;
-class automatableButtonGroup;
+class AutomatableButtonGroup;
 }
 
 
@@ -64,13 +63,8 @@ public:
 	QString nodeName() const override;
 	gui::PluginView* instantiateView( QWidget * _parent ) override;
 
-	Flags flags() const override
-	{
-		return IsSingleStreamed | IsMidiBased;
-	}
-
 	bool handleMidiEvent( const MidiEvent& event, const TimePos& time, f_cnt_t offset = 0 ) override;
-	void play( sampleFrame * _working_buffer ) override;
+	void play( SampleFrame* _working_buffer ) override;
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _this ) override;
 	void loadSettings( const QDomElement & _this ) override;
@@ -183,7 +177,7 @@ public:
 	PixmapButton *op1_w1_btn;
 	PixmapButton *op1_w2_btn;
 	PixmapButton *op1_w3_btn;
-	automatableButtonGroup *op1_waveform;
+	AutomatableButtonGroup *op1_waveform;
 
 
 	Knob *op2_a_kn;
@@ -201,7 +195,7 @@ public:
 	PixmapButton *op2_w1_btn;
 	PixmapButton *op2_w2_btn;
 	PixmapButton *op2_w3_btn;
-	automatableButtonGroup *op2_waveform;
+	AutomatableButtonGroup *op2_waveform;
 
 
 	PixmapButton *fm_btn;

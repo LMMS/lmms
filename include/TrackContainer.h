@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef TRACK_CONTAINER_H
-#define TRACK_CONTAINER_H
+#ifndef LMMS_TRACK_CONTAINER_H
+#define LMMS_TRACK_CONTAINER_H
 
 #include <QReadWriteLock>
 
@@ -49,11 +49,11 @@ class LMMS_EXPORT TrackContainer : public Model, public JournallingObject
 {
 	Q_OBJECT
 public:
-	using TrackList = QVector<Track*>;
-	enum TrackContainerTypes
+	using TrackList = std::vector<Track*>;
+	enum class Type
 	{
-		PatternContainer,
-		SongContainer
+		Pattern,
+		Song
 	} ;
 
 	TrackContainer();
@@ -63,17 +63,12 @@ public:
 
 	void loadSettings( const QDomElement & _this ) override;
 
-
-	virtual AutomationClip * tempoAutomationClip()
-	{
-		return nullptr;
-	}
-
-	int countTracks( Track::TrackTypes _tt = Track::NumTrackTypes ) const;
+	int countTracks( Track::Type _tt = Track::Type::Count ) const;
 
 
 	void addTrack( Track * _track );
 	void removeTrack( Track * _track );
+	void moveTrack(Track* track, int indexTo);
 
 	virtual void updateAfterTrackAdd();
 
@@ -91,12 +86,12 @@ public:
 		return "trackcontainer";
 	}
 
-	inline void setType( TrackContainerTypes newType )
+	inline void setType( Type newType )
 	{
 		m_TrackContainerType = newType;
 	}
 
-	inline TrackContainerTypes type() const
+	inline Type type() const
 	{
 		return m_TrackContainerType;
 	}
@@ -105,6 +100,8 @@ public:
 
 signals:
 	void trackAdded( lmms::Track * _track );
+	void trackRemoved();
+	void trackMoved();
 
 protected:
 	static AutomatedValueMap automatedValuesFromTracks(const TrackList &tracks, TimePos timeStart, int clipNum = -1);
@@ -114,7 +111,7 @@ protected:
 private:
 	TrackList m_tracks;
 
-	TrackContainerTypes m_TrackContainerType;
+	Type m_TrackContainerType;
 
 
 	friend class gui::TrackContainerView;
@@ -124,4 +121,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_TRACK_CONTAINER_H

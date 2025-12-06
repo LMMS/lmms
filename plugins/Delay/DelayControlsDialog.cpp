@@ -25,6 +25,7 @@
 #include "AutomatableModel.h"
 #include "DelayControlsDialog.h"
 #include "DelayControls.h"
+#include "DeprecationHelper.h"
 #include "embed.h"
 #include "TempoSyncKnob.h"
 #include "../Eq/EqFader.h"
@@ -44,32 +45,28 @@ DelayControlsDialog::DelayControlsDialog( DelayControls *controls ) :
 	setPalette( pal );
 	setFixedSize( 300, 208 );
 
-	auto sampleDelayKnob = new TempoSyncKnob(knobBright_26, this);
+	auto sampleDelayKnob = new TempoSyncKnob(KnobType::Bright26, tr("DELAY"), this, Knob::LabelRendering::LegacyFixedFontSize);
 	sampleDelayKnob->move( 10,14 );
 	sampleDelayKnob->setVolumeKnob( false );
 	sampleDelayKnob->setModel( &controls->m_delayTimeModel );
-	sampleDelayKnob->setLabel( tr( "DELAY" ) );
 	sampleDelayKnob->setHintText( tr( "Delay time" ) + " ", " s" );
 
-	auto feedbackKnob = new Knob(knobBright_26, this);
+	auto feedbackKnob = new Knob(KnobType::Bright26, tr("FDBK"), this, Knob::LabelRendering::LegacyFixedFontSize);
 	feedbackKnob->move( 11, 58 );
 	feedbackKnob->setVolumeKnob( true) ;
 	feedbackKnob->setModel( &controls->m_feedbackModel);
-	feedbackKnob->setLabel( tr( "FDBK" ) );
 	feedbackKnob->setHintText( tr ( "Feedback amount" ) + " " , "" );
 
-	auto lfoFreqKnob = new TempoSyncKnob(knobBright_26, this);
+	auto lfoFreqKnob = new TempoSyncKnob(KnobType::Bright26, tr("RATE"), this, Knob::LabelRendering::LegacyFixedFontSize);
 	lfoFreqKnob->move( 11, 119 );
 	lfoFreqKnob->setVolumeKnob( false );
 	lfoFreqKnob->setModel( &controls->m_lfoTimeModel );
-	lfoFreqKnob->setLabel( tr( "RATE" ) );
 	lfoFreqKnob->setHintText( tr ( "LFO frequency") + " ", " s" );
 
-	auto lfoAmtKnob = new TempoSyncKnob(knobBright_26, this);
+	auto lfoAmtKnob = new TempoSyncKnob(KnobType::Bright26, tr("AMNT"), this, Knob::LabelRendering::LegacyFixedFontSize);
 	lfoAmtKnob->move( 11, 159 );
 	lfoAmtKnob->setVolumeKnob( false );
 	lfoAmtKnob->setModel( &controls->m_lfoAmountModel );
-	lfoAmtKnob->setLabel( tr( "AMNT" ) );
 	lfoAmtKnob->setHintText( tr ( "LFO amount" ) + " " , " s" );
 
 	auto outFader
@@ -139,18 +136,20 @@ void XyPad::mouseReleaseEvent(QMouseEvent *event)
 
 void XyPad::mouseMoveEvent(QMouseEvent *event)
 {
-	if( m_acceptInput && (event->x() >= 0) && ( event->x() < width() )
-			&& ( event->y() >= 0) && ( event->y() < height() ) )
+	const auto pos = position(event);
+
+	if (m_acceptInput && (pos.x() >= 0) && (pos.x() < width())
+		&& (pos.y() >= 0) && (pos.y() < height()))
 	{
 		//set xmodel
 		float xRange = m_xModel->maxValue() - m_xModel->minValue();
 		float xInc = xRange / width();
-		m_xModel->setValue( m_xModel->minValue() + ( event->x() * xInc ) );
+		m_xModel->setValue(m_xModel->minValue() + (pos.x() * xInc));
 
 		//set ymodel
 		float yRange = m_yModel->maxValue() - m_yModel->minValue();
 		float yInc = yRange / height();
-		m_yModel->setValue( m_yModel->minValue() + ( event->y() * yInc ) );
+		m_yModel->setValue(m_yModel->minValue() + (pos.y() * yInc));
 	}
 }
 

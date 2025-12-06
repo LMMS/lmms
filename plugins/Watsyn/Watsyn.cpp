@@ -32,7 +32,6 @@
 #include "PixmapButton.h"
 #include "Song.h"
 #include "lmms_math.h"
-#include "interpolation.h"
 
 #include "embed.h"
 #include "plugin_export.h"
@@ -52,7 +51,7 @@ Plugin::Descriptor PLUGIN_EXPORT watsyn_plugin_descriptor =
 				"4-oscillator modulatable wavetable synth" ),
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
 	0x0100,
-	Plugin::Instrument,
+	Plugin::Type::Instrument,
 	new PluginPixmapLoader( "logo" ),
 	nullptr,
 	nullptr,
@@ -74,8 +73,8 @@ WatsynObject::WatsynObject( float * _A1wave, float * _A2wave,
 				m_fpp( _frames ),
 				m_parent( _w )
 {
-	m_abuf = new sampleFrame[_frames];
-	m_bbuf = new sampleFrame[_frames];
+	m_abuf = new SampleFrame[_frames];
+	m_bbuf = new SampleFrame[_frames];
 
 	m_lphase[A1_OSC] = 0.0f;
 	m_lphase[A2_OSC] = 0.0f;
@@ -107,9 +106,9 @@ WatsynObject::~WatsynObject()
 void WatsynObject::renderOutput( fpp_t _frames )
 {
 	if( m_abuf == nullptr )
-		m_abuf = new sampleFrame[m_fpp];
+		m_abuf = new SampleFrame[m_fpp];
 	if( m_bbuf == nullptr )
-		m_bbuf = new sampleFrame[m_fpp];
+		m_bbuf = new SampleFrame[m_fpp];
 
 	for( fpp_t frame = 0; frame < _frames; frame++ )
 	{
@@ -122,38 +121,50 @@ void WatsynObject::renderOutput( fpp_t _frames )
 		/////////////   A-series   /////////////////
 
 		// A2
-		sample_t A2_L = linearInterpolate( m_A2wave[ static_cast<int>( m_lphase[A2_OSC] ) ],
-							m_A2wave[ static_cast<int>( m_lphase[A2_OSC] + 1 ) % WAVELEN ],
-							fraction( m_lphase[A2_OSC] ) ) * m_parent->m_lvol[A2_OSC];
-		sample_t A2_R = linearInterpolate( m_A2wave[ static_cast<int>( m_rphase[A2_OSC] ) ],
-							m_A2wave[ static_cast<int>( m_rphase[A2_OSC] + 1 ) % WAVELEN ],
-							fraction( m_rphase[A2_OSC] ) ) * m_parent->m_rvol[A2_OSC];
+		sample_t A2_L = m_parent->m_lvol[A2_OSC] * std::lerp(
+			m_A2wave[static_cast<int>(m_lphase[A2_OSC])],
+			m_A2wave[static_cast<int>(m_lphase[A2_OSC] + 1) % WAVELEN],
+			fraction(m_lphase[A2_OSC])
+		);
+		sample_t A2_R = m_parent->m_rvol[A2_OSC] * std::lerp(
+			m_A2wave[static_cast<int>(m_rphase[A2_OSC])],
+			m_A2wave[static_cast<int>(m_rphase[A2_OSC] + 1) % WAVELEN],
+			fraction(m_rphase[A2_OSC])
+		);
 
 		// if phase mod, add to phases
 		if( m_amod == MOD_PM )
 		{
-			A1_lphase = fmodf( A1_lphase + A2_L * PMOD_AMT, WAVELEN );
+			A1_lphase = std::fmod(A1_lphase + A2_L * PMOD_AMT, WAVELEN);
 			if( A1_lphase < 0 ) A1_lphase += WAVELEN;
-			A1_rphase = fmodf( A1_rphase + A2_R * PMOD_AMT, WAVELEN );
+			A1_rphase = std::fmod(A1_rphase + A2_R * PMOD_AMT, WAVELEN);
 			if( A1_rphase < 0 ) A1_rphase += WAVELEN;
 		}
 		// A1
-		sample_t A1_L = linearInterpolate( m_A1wave[ static_cast<int>( A1_lphase ) ],
-							m_A1wave[ static_cast<int>( A1_lphase + 1 ) % WAVELEN ],
-							fraction( A1_lphase ) ) * m_parent->m_lvol[A1_OSC];
-		sample_t A1_R = linearInterpolate( m_A1wave[ static_cast<int>( A1_rphase ) ],
-							m_A1wave[ static_cast<int>( A1_rphase + 1 ) % WAVELEN ],
-							fraction( A1_rphase ) ) * m_parent->m_rvol[A1_OSC];
+		sample_t A1_L = m_parent->m_lvol[A1_OSC] * std::lerp(
+			m_A1wave[static_cast<int>(A1_lphase)],
+			m_A1wave[static_cast<int>(A1_lphase + 1) % WAVELEN],
+			fraction(A1_lphase)
+		);
+		sample_t A1_R = m_parent->m_rvol[A1_OSC] * std::lerp(
+			m_A1wave[static_cast<int>(A1_rphase)],
+			m_A1wave[static_cast<int>(A1_rphase + 1) % WAVELEN],
+			fraction(A1_rphase)
+		);
 
 		/////////////   B-series   /////////////////
 
 		// B2
-		sample_t B2_L = linearInterpolate( m_B2wave[ static_cast<int>( m_lphase[B2_OSC] ) ],
-							m_B2wave[ static_cast<int>( m_lphase[B2_OSC] + 1 ) % WAVELEN ],
-							fraction( m_lphase[B2_OSC] ) ) * m_parent->m_lvol[B2_OSC];
-		sample_t B2_R = linearInterpolate( m_B2wave[ static_cast<int>( m_rphase[B2_OSC] ) ],
-							m_B2wave[ static_cast<int>( m_rphase[B2_OSC] + 1 ) % WAVELEN ],
-							fraction( m_rphase[B2_OSC] ) ) * m_parent->m_rvol[B2_OSC];
+		sample_t B2_L = m_parent->m_lvol[B2_OSC] * std::lerp(
+			m_B2wave[static_cast<int>(m_lphase[B2_OSC])],
+			m_B2wave[static_cast<int>(m_lphase[B2_OSC] + 1) % WAVELEN],
+			fraction(m_lphase[B2_OSC])
+		);
+		sample_t B2_R = m_parent->m_rvol[B2_OSC] * std::lerp(
+			m_B2wave[static_cast<int>(m_rphase[B2_OSC])],
+			m_B2wave[static_cast<int>(m_rphase[B2_OSC] + 1) % WAVELEN],
+			fraction(m_rphase[B2_OSC])
+		);
 
 		// if crosstalk active, add a1
 		const float xt = m_parent->m_xtalk.value();
@@ -166,18 +177,22 @@ void WatsynObject::renderOutput( fpp_t _frames )
 		// if phase mod, add to phases
 		if( m_bmod == MOD_PM )
 		{
-			B1_lphase = fmodf( B1_lphase + B2_L * PMOD_AMT, WAVELEN );
+			B1_lphase = std::fmod(B1_lphase + B2_L * PMOD_AMT, WAVELEN);
 			if( B1_lphase < 0 ) B1_lphase += WAVELEN;
-			B1_rphase = fmodf( B1_rphase + B2_R * PMOD_AMT, WAVELEN );
+			B1_rphase = std::fmod(B1_rphase + B2_R * PMOD_AMT, WAVELEN);
 			if( B1_rphase < 0 ) B1_rphase += WAVELEN;
 		}
 		// B1
-		sample_t B1_L = linearInterpolate( m_B1wave[ static_cast<int>( B1_lphase ) % WAVELEN ],
-							m_B1wave[ static_cast<int>( B1_lphase + 1 ) % WAVELEN ],
-							fraction( B1_lphase ) ) * m_parent->m_lvol[B1_OSC];
-		sample_t B1_R = linearInterpolate( m_B1wave[ static_cast<int>( B1_rphase ) % WAVELEN ],
-							m_B1wave[ static_cast<int>( B1_rphase + 1 ) % WAVELEN ],
-							fraction( B1_rphase ) ) * m_parent->m_rvol[B1_OSC];
+		sample_t B1_L = m_parent->m_lvol[B1_OSC] * std::lerp(
+			m_B1wave[static_cast<int>(B1_lphase) % WAVELEN],
+			m_B1wave[static_cast<int>(B1_lphase + 1) % WAVELEN],
+			fraction(B1_lphase)
+		);
+		sample_t B1_R = m_parent->m_rvol[B1_OSC] * std::lerp(
+			m_B1wave[static_cast<int>(B1_rphase) % WAVELEN],
+			m_B1wave[static_cast<int>(B1_rphase + 1) % WAVELEN],
+			fraction(B1_rphase)
+		);
 
 
 		// A-series modulation)
@@ -222,9 +237,9 @@ void WatsynObject::renderOutput( fpp_t _frames )
 		for( int i = 0; i < NUM_OSCS; i++ )
 		{
 			m_lphase[i] += ( static_cast<float>( WAVELEN ) / ( m_samplerate / ( m_nph->frequency() * m_parent->m_lfreq[i] ) ) );
-			m_lphase[i] = fmodf( m_lphase[i], WAVELEN );
+			m_lphase[i] = std::fmod(m_lphase[i], WAVELEN);
 			m_rphase[i] += ( static_cast<float>( WAVELEN ) / ( m_samplerate / ( m_nph->frequency() * m_parent->m_rfreq[i] ) ) );
-			m_rphase[i] = fmodf( m_rphase[i], WAVELEN );
+			m_rphase[i] = std::fmod(m_rphase[i], WAVELEN);
 		}
 	}
 
@@ -327,24 +342,24 @@ WatsynInstrument::WatsynInstrument( InstrumentTrack * _instrument_track ) :
 
 
 void WatsynInstrument::playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer )
+						SampleFrame* _working_buffer )
 {
-	if ( _n->totalFramesPlayed() == 0 || _n->m_pluginData == nullptr )
+	if (!_n->m_pluginData)
 	{
 		auto w = new WatsynObject(&A1_wave[0], &A2_wave[0], &B1_wave[0], &B2_wave[0], m_amod.value(), m_bmod.value(),
-			Engine::audioEngine()->processingSampleRate(), _n, Engine::audioEngine()->framesPerPeriod(), this);
+			Engine::audioEngine()->outputSampleRate(), _n, Engine::audioEngine()->framesPerPeriod(), this);
 
 		_n->m_pluginData = w;
 	}
 
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();
-	sampleFrame * buffer = _working_buffer + offset;
+	SampleFrame* buffer = _working_buffer + offset;
 
 	auto w = static_cast<WatsynObject*>(_n->m_pluginData);
 
-	sampleFrame * abuf = w->abuf();
-	sampleFrame * bbuf = w->bbuf();
+	SampleFrame* abuf = w->abuf();
+	SampleFrame* bbuf = w->bbuf();
 
 	w-> renderOutput( frames );
 
@@ -445,8 +460,6 @@ void WatsynInstrument::playNote( NotePlayHandle * _n,
 	}
 
 	applyRelease( _working_buffer, _n );
-
-	instrumentTrack()->processAudioBuffer( _working_buffer, frames + offset, _n );
 }
 
 
@@ -598,32 +611,32 @@ void WatsynInstrument::updateVolumes()
 void WatsynInstrument::updateFreqA1()
 {
 	// calculate frequencies
-	m_lfreq[A1_OSC] = ( a1_mult.value() / 8 ) * powf( 2, a1_ltune.value() / 1200 );
-	m_rfreq[A1_OSC] = ( a1_mult.value() / 8 ) * powf( 2, a1_rtune.value() / 1200 );
+	m_lfreq[A1_OSC] = (a1_mult.value() / 8) * std::exp2(a1_ltune.value() / 1200);
+	m_rfreq[A1_OSC] = (a1_mult.value() / 8) * std::exp2(a1_rtune.value() / 1200);
 }
 
 
 void WatsynInstrument::updateFreqA2()
 {
 	// calculate frequencies
-	m_lfreq[A2_OSC] = ( a2_mult.value() / 8 ) * powf( 2, a2_ltune.value() / 1200 );
-	m_rfreq[A2_OSC] = ( a2_mult.value() / 8 ) * powf( 2, a2_rtune.value() / 1200 );
+	m_lfreq[A2_OSC] = (a2_mult.value() / 8) * std::exp2(a2_ltune.value() / 1200);
+	m_rfreq[A2_OSC] = (a2_mult.value() / 8) * std::exp2(a2_rtune.value() / 1200);
 }
 
 
 void WatsynInstrument::updateFreqB1()
 {
 	// calculate frequencies
-	m_lfreq[B1_OSC] = ( b1_mult.value() / 8 ) * powf( 2, b1_ltune.value() / 1200 );
-	m_rfreq[B1_OSC] = ( b1_mult.value() / 8 ) * powf( 2, b1_rtune.value() / 1200 );
+	m_lfreq[B1_OSC] = (b1_mult.value() / 8) * std::exp2(b1_ltune.value() / 1200);
+	m_rfreq[B1_OSC] = (b1_mult.value() / 8) * std::exp2(b1_rtune.value() / 1200);
 }
 
 
 void WatsynInstrument::updateFreqB2()
 {
 	// calculate frequencies
-	m_lfreq[B2_OSC] = ( b2_mult.value() / 8 ) * powf( 2, b2_ltune.value() / 1200 );
-	m_rfreq[B2_OSC] = ( b2_mult.value() / 8 ) * powf( 2, b2_rtune.value() / 1200 );	
+	m_lfreq[B2_OSC] = (b2_mult.value() / 8) * std::exp2(b2_ltune.value() / 1200);
+	m_rfreq[B2_OSC] = (b2_mult.value() / 8) * std::exp2(b2_rtune.value() / 1200);	
 }
 
 
@@ -741,7 +754,7 @@ WatsynView::WatsynView( Instrument * _instrument,
 	b2_selectButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "b2_inactive" ) );
 	b2_selectButton->setToolTip(tr("Select oscillator B2"));
 
-	m_selectedGraphGroup = new automatableButtonGroup( this );
+	m_selectedGraphGroup = new AutomatableButtonGroup( this );
 	m_selectedGraphGroup -> addButton( a1_selectButton );
 	m_selectedGraphGroup -> addButton( a2_selectButton );
 	m_selectedGraphGroup -> addButton( b1_selectButton );
@@ -774,7 +787,7 @@ WatsynView::WatsynView( Instrument * _instrument,
 	amod_pmButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "apm_inactive" ) );
 	amod_pmButton->setToolTip(tr("Modulate phase of A1 by output of A2"));
 
-	m_aModGroup = new automatableButtonGroup( this );
+	m_aModGroup = new AutomatableButtonGroup( this );
 	m_aModGroup -> addButton( amod_mixButton );
 	m_aModGroup -> addButton( amod_amButton );
 	m_aModGroup -> addButton( amod_rmButton );
@@ -805,7 +818,7 @@ WatsynView::WatsynView( Instrument * _instrument,
 	bmod_pmButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "bpm_inactive" ) );
 	bmod_pmButton->setToolTip(tr("Modulate phase of B1 by output of B2"));
 
-	m_bModGroup = new automatableButtonGroup( this );
+	m_bModGroup = new AutomatableButtonGroup( this );
 	m_bModGroup -> addButton( bmod_mixButton );
 	m_bModGroup -> addButton( bmod_amButton );
 	m_bModGroup -> addButton( bmod_rmButton );
@@ -816,7 +829,7 @@ WatsynView::WatsynView( Instrument * _instrument,
 	pal = QPalette();
 	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap("wavegraph") );
 // a1 graph
-	a1_graph = new Graph( this, Graph::LinearStyle, 224, 105 );
+	a1_graph = new Graph( this, Graph::Style::Linear, 224, 105 );
 	a1_graph->move( 4, 141 );
 	a1_graph->setAutoFillBackground( true );
 	a1_graph->setGraphColor( QColor( 0x43, 0xb2, 0xff ) );
@@ -824,7 +837,7 @@ WatsynView::WatsynView( Instrument * _instrument,
 	a1_graph->setPalette( pal );
 
 // a2 graph
-	a2_graph = new Graph( this, Graph::LinearStyle, 224, 105 );
+	a2_graph = new Graph( this, Graph::Style::Linear, 224, 105 );
 	a2_graph->move( 4, 141 );
 	a2_graph->setAutoFillBackground( true );
 	a2_graph->setGraphColor( QColor( 0x43, 0xb2, 0xff ) );
@@ -832,7 +845,7 @@ WatsynView::WatsynView( Instrument * _instrument,
 	a2_graph->setPalette( pal );
 
 // b1 graph
-	b1_graph = new Graph( this, Graph::LinearStyle, 224, 105 );
+	b1_graph = new Graph( this, Graph::Style::Linear, 224, 105 );
 	b1_graph->move( 4, 141 );
 	b1_graph->setAutoFillBackground( true );
 	b1_graph->setGraphColor( QColor( 0xfc, 0x54, 0x31 ) );
@@ -840,7 +853,7 @@ WatsynView::WatsynView( Instrument * _instrument,
 	b1_graph->setPalette( pal );
 
 // b2 graph
-	b2_graph = new Graph( this, Graph::LinearStyle, 224, 105 );
+	b2_graph = new Graph( this, Graph::Style::Linear, 224, 105 );
 	b2_graph->move( 4, 141 );
 	b2_graph->setAutoFillBackground( true );
 	b2_graph->setGraphColor( QColor( 0xfc, 0x54, 0x31 ) );

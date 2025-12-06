@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef MIDIEVENTTOBYTESEQ_H
-#define MIDIEVENTTOBYTESEQ_H
+#ifndef LMMS_MIDIEVENTTOBYTESEQ_H
+#define LMMS_MIDIEVENTTOBYTESEQ_H
 
 #include <cstddef>
 #include <cstdint>
@@ -51,4 +51,4 @@ std::size_t LMMS_EXPORT writeToByteSeq( const class MidiEvent& ev,
 
 } // namespace lmms
 
-#endif // MIDIEVENTTOBYTESEQ_H
+#endif // LMMS_MIDIEVENTTOBYTESEQ_H

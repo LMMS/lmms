@@ -26,10 +26,10 @@
 
 #ifdef LMMS_HAVE_LV2
 
-#include <lv2/lv2plug.in/ns/ext/atom/atom.h>
-#include <lv2/lv2plug.in/ns/ext/buf-size/buf-size.h>
-#include <lv2/lv2plug.in/ns/ext/midi/midi.h>
-#include <lv2/lv2plug.in/ns/ext/parameters/parameters.h>
+#include <lv2/atom/atom.h>
+#include <lv2/buf-size/buf-size.h>
+#include <lv2/midi/midi.h>
+#include <lv2/parameters/parameters.h>
 #include <QtGlobal>
 
 #include "Lv2UridMap.h"

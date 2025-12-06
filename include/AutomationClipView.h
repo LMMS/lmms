@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef AUTOMATION_CLIP_VIEW_H
-#define AUTOMATION_CLIP_VIEW_H
+#ifndef LMMS_GUI_AUTOMATION_CLIP_VIEW_H
+#define LMMS_GUI_AUTOMATION_CLIP_VIEW_H
 
 #include <QStaticText>
 
@@ -74,10 +74,9 @@ private:
 	QPixmap m_paintPixmap;
 	
 	QStaticText m_staticTextName;
-	
-	static QPixmap * s_clip_rec;
-
 	void scaleTimemapToFit( float oldMin, float oldMax );
+	
+	bool isResizableBeforeStart() override { return false; }
 } ;
 
 
@@ -85,4 +84,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_AUTOMATION_CLIP_VIEW_H

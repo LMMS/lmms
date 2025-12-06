@@ -22,9 +22,8 @@
  *
  */
 
-
-#ifndef FILEDIALOG_H
-#define FILEDIALOG_H
+#ifndef LMMS_GUI_FILE_DIALOG_H
+#define LMMS_GUI_FILE_DIALOG_H
 
 #include <QFileDialog>
 
@@ -57,4 +56,4 @@ public:
 
 } // namespace lmms::gui
 
-#endif // FILEDIALOG_H
+#endif // LMMS_GUI_FILE_DIALOG_H

@@ -26,16 +26,16 @@
  *
  */
 
-
-#ifndef CONTROLLER_CONNECTION_H
-#define CONTROLLER_CONNECTION_H
+#ifndef LMMS_CONTROLLER_CONNECTION_H
+#define LMMS_CONTROLLER_CONNECTION_H
 
 #include <QObject>
-#include <QVector>
 
 #include "Controller.h"
 #include "JournallingObject.h"
 #include "ValueBuffer.h"
+
+#include <vector>
 
 namespace lmms
 {
@@ -47,7 +47,7 @@ namespace gui
 class ControllerConnectionDialog;
 }
 
-using ControllerConnectionVector = QVector<ControllerConnection*>;
+using ControllerConnectionVector = std::vector<ControllerConnection*>;
 
 class LMMS_EXPORT ControllerConnection : public QObject, public JournallingObject
 {
@@ -128,5 +128,4 @@ signals:
 
 } // namespace lmms
 
-#endif
-
+#endif // LMMS_CONTROLLER_CONNECTION_H

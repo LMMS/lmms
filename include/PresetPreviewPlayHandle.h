@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef PRESET_PREVIEW_PLAY_HANDLE_H
-#define PRESET_PREVIEW_PLAY_HANDLE_H
+#ifndef LMMS_PRESET_PREVIEW_PLAY_HANDLE_H
+#define LMMS_PRESET_PREVIEW_PLAY_HANDLE_H
 
 #include "NotePlayHandle.h"
 
@@ -47,7 +47,7 @@ public:
 		return true;
 	}
 
-	void play( sampleFrame* buffer ) override;
+	void play( SampleFrame* buffer ) override;
 	bool isFinished() const override;
 
 	bool isFromTrack( const Track * _track ) const override;
@@ -69,4 +69,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_PRESET_PREVIEW_PLAY_HANDLE_H

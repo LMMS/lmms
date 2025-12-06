@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef AUTOMATION_TRACK_VIEW_H
-#define AUTOMATION_TRACK_VIEW_H
+#ifndef LMMS_GUI_AUTOMATION_TRACK_VIEW_H
+#define LMMS_GUI_AUTOMATION_TRACK_VIEW_H
 
 #include "TrackView.h"
 
@@ -52,4 +52,4 @@ public:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_AUTOMATION_TRACK_VIEW_H

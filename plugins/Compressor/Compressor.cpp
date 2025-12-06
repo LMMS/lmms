@@ -24,8 +24,10 @@
 
 #include "Compressor.h"
 
+#include <cmath>
+#include <numbers>
+
 #include "embed.h"
-#include "interpolation.h"
 #include "lmms_math.h"
 #include "plugin_export.h"
 
@@ -43,8 +45,8 @@ Plugin::Descriptor PLUGIN_EXPORT compressor_plugin_descriptor =
 	QT_TRANSLATE_NOOP("PluginBrowser", "A dynamic range compressor."),
 	"Lost Robot <r94231@gmail.com>",
 	0x0100,
-	Plugin::Effect,
-	new PluginPixmapLoader("logo"),
+	Plugin::Type::Effect,
+	new PixmapLoader("lmms-plugin-logo"),
 	nullptr,
 	nullptr,
 } ;
@@ -56,15 +58,12 @@ CompressorEffect::CompressorEffect(Model* parent, const Descriptor::SubPluginFea
 	Effect(&compressor_plugin_descriptor, parent, key),
 	m_compressorControls(this)
 {
-	m_sampleRate = Engine::audioEngine()->processingSampleRate();
+	m_sampleRate = Engine::audioEngine()->outputSampleRate();
 
 	m_yL[0] = m_yL[1] = COMP_NOISE_FLOOR;
 
-	m_maxLookaheadVal[0] = 0;
-	m_maxLookaheadVal[1] = 0;
-
 	// 200 ms
-	m_crestTimeConst = exp(-1.f / (0.2f * m_sampleRate));
+	m_crestTimeConst = std::exp(-1.f / (0.2f * m_sampleRate));
 
 	connect(&m_compressorControls.m_attackModel, SIGNAL(dataChanged()), this, SLOT(calcAttack()), Qt::DirectConnection);
 	connect(&m_compressorControls.m_releaseModel, SIGNAL(dataChanged()), this, SLOT(calcRelease()), Qt::DirectConnection);
@@ -100,7 +99,7 @@ CompressorEffect::CompressorEffect(Model* parent, const Descriptor::SubPluginFea
 float CompressorEffect::msToCoeff(float ms)
 {
 	// Convert time in milliseconds to applicable lowpass coefficient
-	return exp(m_coeffPrecalc / ms);
+	return std::exp(m_coeffPrecalc / ms);
 }
 
 
@@ -177,14 +176,13 @@ void CompressorEffect::calcRange()
 
 void CompressorEffect::resizeRMS()
 {
-	m_rmsTimeConst = exp(-1.f / (m_compressorControls.m_rmsModel.value() * 0.001f * m_sampleRate));
+	const float rmsValue = m_compressorControls.m_rmsModel.value();
+	m_rmsTimeConst = (rmsValue > 0) ? std::exp(-1.f / (rmsValue * 0.001f * m_sampleRate)) : 0;
 }
 
 void CompressorEffect::calcLookaheadLength()
 {
-	m_lookaheadLength = qMax(m_compressorControls.m_lookaheadLengthModel.value() * 0.001f * m_sampleRate, 1.f);
-
-	m_preLookaheadLength = ceil(m_lookaheadDelayLength - m_lookaheadLength);
+	m_lookaheadLength = std::ceil((m_compressorControls.m_lookaheadLengthModel.value() / 1000.f) * m_sampleRate);
 }
 
 void CompressorEffect::calcThreshold()
@@ -213,18 +211,19 @@ void CompressorEffect::redrawKnee()
 
 void CompressorEffect::calcTiltCoeffs()
 {
+	using namespace std::numbers;
 	m_tiltVal = m_compressorControls.m_tiltModel.value();
 
-	const float amp = 6 / log(2);
+	constexpr float amp = 6.f / ln2_v<float>;
 
-	const float gfactor = 5;
+	constexpr float gfactor = 5;
 	const float g1 = m_tiltVal > 0 ? -gfactor * m_tiltVal : -m_tiltVal;
 	const float g2 = m_tiltVal > 0 ? m_tiltVal : gfactor * m_tiltVal;
 
-	m_lgain = exp(g1 / amp) - 1;
-	m_hgain = exp(g2 / amp) - 1;
+	m_lgain = std::exp(g1 / amp) - 1;
+	m_hgain = std::exp(g2 / amp) - 1;
 
-	const float omega = 2 * F_PI * m_compressorControls.m_tiltFreqModel.value();
+	const float omega = 2 * pi_v<float> * m_compressorControls.m_tiltFreqModel.value();
 	const float n = 1 / (m_sampleRate * 3 + omega);
 	m_a0 = 2 * omega * n;
 	m_b1 = (m_sampleRate * 3 - omega) * n;
@@ -237,38 +236,10 @@ void CompressorEffect::calcMix()
 
 
 
-bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
+Effect::ProcessStatus CompressorEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 {
-	if (!isEnabled() || !isRunning())
-	{
-		// Clear lookahead buffers and other values when needed
-		if (!m_cleanedBuffers)
-		{
-			m_yL[0] = m_yL[1] = COMP_NOISE_FLOOR;
-			m_gainResult[0] = m_gainResult[1] = 1;
-			m_displayPeak[0] = m_displayPeak[1] = COMP_NOISE_FLOOR;
-			m_displayGain[0] = m_displayGain[1] = COMP_NOISE_FLOOR;
-			std::fill(std::begin(m_lookaheadBuf[0]), std::end(m_lookaheadBuf[0]), 0);
-			std::fill(std::begin(m_lookaheadBuf[1]), std::end(m_lookaheadBuf[1]), 0);
-			m_lookaheadBufLoc[0] = 0;
-			m_lookaheadBufLoc[1] = 0;
-			std::fill(std::begin(m_preLookaheadBuf[0]), std::end(m_preLookaheadBuf[0]), 0);
-			std::fill(std::begin(m_preLookaheadBuf[1]), std::end(m_preLookaheadBuf[1]), 0);
-			m_preLookaheadBufLoc[0] = 0;
-			m_preLookaheadBufLoc[1] = 0;
-			std::fill(std::begin(m_inputBuf[0]), std::end(m_inputBuf[0]), 0);
-			std::fill(std::begin(m_inputBuf[1]), std::end(m_inputBuf[1]), 0);
-			m_inputBufLoc = 0;
-			m_cleanedBuffers = true;
-		}
-		return false;
-	}
-	else
-	{
-		m_cleanedBuffers = false;
-	}
+	m_cleanedBuffers = false;
 
-	float outSum = 0.0;
 	const float d = dryLevel();
 	const float w = wetLevel();
 
@@ -276,7 +247,7 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	float rOutPeak = 0.0;
 	float lInPeak = 0.0;
 	float rInPeak = 0.0;
-	
+
 	const bool midside = m_compressorControls.m_midsideModel.value();
 	const bool peakmode = m_compressorControls.m_peakmodeModel.value();
 	const float inBalance = m_compressorControls.m_inBalanceModel.value();
@@ -292,8 +263,8 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 
 	for(fpp_t f = 0; f < frames; ++f)
 	{
-		sample_t drySignal[2] = {buf[f][0], buf[f][1]};
-		sample_t s[2] = {drySignal[0] * m_inGainVal, drySignal[1] * m_inGainVal};
+		auto drySignal = std::array{buf[f][0], buf[f][1]};
+		auto s = std::array{drySignal[0] * m_inGainVal, drySignal[1] * m_inGainVal};
 
 		// Calculate tilt filters, to bias the sidechain to the low or high frequencies
 		if (m_tiltVal)
@@ -317,64 +288,17 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 
 		for (int i = 0; i < 2; i++)
 		{
-			float inputValue = feedback ? m_prevOut[i] : s[i];
+			float inputValue = (feedback && !lookahead) ? m_prevOut[i] : s[i];
 
 			// Calculate the crest factor of the audio by diving the peak by the RMS
-			m_crestPeakVal[i] = qMax(inputValue * inputValue, m_crestTimeConst * m_crestPeakVal[i] + (1 - m_crestTimeConst) * (inputValue * inputValue));
-			m_crestRmsVal[i] = m_crestTimeConst * m_crestRmsVal[i] + ((1 - m_crestTimeConst) * (inputValue * inputValue));
+			m_crestPeakVal[i] = qMax(qMax(COMP_NOISE_FLOOR, inputValue * inputValue), m_crestTimeConst * m_crestPeakVal[i] + (1 - m_crestTimeConst) * (inputValue * inputValue));
+			m_crestRmsVal[i] = qMax(COMP_NOISE_FLOOR, m_crestTimeConst * m_crestRmsVal[i] + ((1 - m_crestTimeConst) * (inputValue * inputValue)));
 			m_crestFactorVal[i] = m_crestPeakVal[i] / m_crestRmsVal[i];
 
 			m_rmsVal[i] = m_rmsTimeConst * m_rmsVal[i] + ((1 - m_rmsTimeConst) * (inputValue * inputValue));
 
 			// Grab the peak or RMS value
 			inputValue = qMax(COMP_NOISE_FLOOR, peakmode ? std::abs(inputValue) : std::sqrt(m_rmsVal[i]));
-
-			// The following code uses math magic to semi-efficiently
-			// find the largest value in the lookahead buffer.
-			// This can probably be improved.
-			if (lookahead)
-			{
-				// Pre-lookahead delay, so the total delay always matches 20 ms
-				++m_preLookaheadBufLoc[i];
-				if (m_preLookaheadBufLoc[i] >= m_preLookaheadLength)
-				{
-					m_preLookaheadBufLoc[i] = 0;
-				}
-				const float tempInputValue = inputValue;
-				inputValue = m_preLookaheadBuf[i][m_preLookaheadBufLoc[i]];
-				m_preLookaheadBuf[i][m_preLookaheadBufLoc[i]] = tempInputValue;
-
-
-				// Increment ring buffer location
-				++m_lookaheadBufLoc[i];
-				if (m_lookaheadBufLoc[i] >= m_lookaheadLength)
-				{
-					m_lookaheadBufLoc[i] = 0;
-				}
-
-				m_lookaheadBuf[i][m_lookaheadBufLoc[i]] = inputValue;
-
-				// If the new input value is larger than the stored maximum,
-				// store that as the maximum
-				if (inputValue >= m_maxLookaheadVal[i])
-				{
-					m_maxLookaheadVal[i] = inputValue;
-					m_maxLookaheadTimer[i] = m_lookaheadLength;
-				}
-
-				// Decrement timer.  When the timer reaches 0, that means the
-				// stored maximum value has left the buffer and a new
-				// maximum value must be found.
-				if (--m_maxLookaheadTimer[i] <= 0)
-				{
-					m_maxLookaheadTimer[i] = std::distance(std::begin(m_lookaheadBuf[i]),
-						std::max_element(std::begin(m_lookaheadBuf[i]), std::begin(m_lookaheadBuf[i]) + m_lookaheadLength));
-					m_maxLookaheadVal[i] = m_lookaheadBuf[i][m_maxLookaheadTimer[i]];
-					m_maxLookaheadTimer[i] = realmod(m_maxLookaheadTimer[i] - m_lookaheadBufLoc[i], m_lookaheadLength);
-				}
-
-				inputValue = m_maxLookaheadVal[i];
-			}
 
 			float t = inputValue;
 
@@ -414,11 +338,22 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 
 			// Keep it above the noise floor
 			m_yL[i] = qMax(COMP_NOISE_FLOOR, m_yL[i]);
+			
+			float scVal = m_yL[i];
+			
+			if (lookahead)
+			{
+				const float temp = scVal;
+				// Lookahead is calculated by picking the largest value between
+				// the current sidechain signal and the delayed sidechain signal.
+				scVal = std::max(m_scLookBuf[i][m_lookWrite], m_scLookBuf[i][(m_lookWrite + m_lookBufLength - m_lookaheadLength) % m_lookBufLength]);
+				m_scLookBuf[i][m_lookWrite] = temp;
+			}
 
 			// For the visualizer
-			m_displayPeak[i] = qMax(m_yL[i], m_displayPeak[i]);
+			m_displayPeak[i] = qMax(scVal, m_displayPeak[i]);
 
-			const float currentPeakDbfs = ampToDbfs(m_yL[i]);
+			const float currentPeakDbfs = ampToDbfs(scVal);
 
 			// Now find the gain change that should be applied,
 			// depending on the measured input value.
@@ -438,53 +373,53 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 					: m_thresholdVal + (currentPeakDbfs - m_thresholdVal) * m_ratioVal;
 			}
 
-			m_gainResult[i] = dbfsToAmp(m_gainResult[i]) / m_yL[i];
+			m_gainResult[i] = dbfsToAmp(m_gainResult[i]) / scVal;
 			m_gainResult[i] = qMax(m_rangeVal, m_gainResult[i]);
 		}
 
-		switch (stereoLink)
+		switch (static_cast<StereoLinkMode>(stereoLink))
 		{
-			case Unlinked:
+			case StereoLinkMode::Unlinked:
 			{
 				break;
 			}
-			case Maximum:
+			case StereoLinkMode::Maximum:
 			{
 				m_gainResult[0] = m_gainResult[1] = qMin(m_gainResult[0], m_gainResult[1]);
 				break;
 			}
-			case Average:
+			case StereoLinkMode::Average:
 			{
 				m_gainResult[0] = m_gainResult[1] = (m_gainResult[0] + m_gainResult[1]) * 0.5f;
 				break;
 			}
-			case Minimum:
+			case StereoLinkMode::Minimum:
 			{
 				m_gainResult[0] = m_gainResult[1] = qMax(m_gainResult[0], m_gainResult[1]);
 				break;
 			}
-			case Blend:
+			case StereoLinkMode::Blend:
 			{
 				if (blend > 0)// 0 is unlinked
 				{
 					if (blend <= 1)// Blend to minimum volume
 					{
 						const float temp1 = qMin(m_gainResult[0], m_gainResult[1]);
-						m_gainResult[0] = linearInterpolate(m_gainResult[0], temp1, blend);
-						m_gainResult[1] = linearInterpolate(m_gainResult[1], temp1, blend);
+						m_gainResult[0] = std::lerp(m_gainResult[0], temp1, blend);
+						m_gainResult[1] = std::lerp(m_gainResult[1], temp1, blend);
 					}
 					else if (blend <= 2)// Blend to average volume
 					{
 						const float temp1 = qMin(m_gainResult[0], m_gainResult[1]);
 						const float temp2 = (m_gainResult[0] + m_gainResult[1]) * 0.5f;
-						m_gainResult[0] = linearInterpolate(temp1, temp2, blend - 1);
+						m_gainResult[0] = std::lerp(temp1, temp2, blend - 1);
 						m_gainResult[1] = m_gainResult[0];
 					}
 					else// Blend to maximum volume
 					{
 						const float temp1 = (m_gainResult[0] + m_gainResult[1]) * 0.5f;
 						const float temp2 = qMax(m_gainResult[0], m_gainResult[1]);
-						m_gainResult[0] = linearInterpolate(temp1, temp2, blend - 2);
+						m_gainResult[0] = std::lerp(temp1, temp2, blend - 2);
 						m_gainResult[1] = m_gainResult[0];
 					}
 				}
@@ -506,18 +441,10 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 		// Delay the signal by 20 ms via ring buffer if lookahead is enabled
 		if (lookahead)
 		{
-			++m_inputBufLoc;
-			if (m_inputBufLoc >= m_lookaheadDelayLength)
-			{
-				m_inputBufLoc = 0;
-			}
-
-			const float temp[2] = {drySignal[0], drySignal[1]};
-			s[0] = m_inputBuf[0][m_inputBufLoc];
-			s[1] = m_inputBuf[1][m_inputBufLoc];
-
-			m_inputBuf[0][m_inputBufLoc] = temp[0];
-			m_inputBuf[1][m_inputBufLoc] = temp[1];
+			s[0] = m_inLookBuf[0][m_lookWrite];
+			s[1] = m_inLookBuf[1][m_lookWrite];
+			m_inLookBuf[0][m_lookWrite] = drySignal[0];
+			m_inLookBuf[1][m_lookWrite] = drySignal[1];
 		}
 		else
 		{
@@ -525,8 +452,8 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 			s[1] = drySignal[1];
 		}
 
-		float delayedDrySignal[2] = {s[0], s[1]};
-		
+		auto delayedDrySignal = std::array{s[0], s[1]};
+
 		if (midside)// Convert left/right to mid/side
 		{
 			const float temp = s[0];
@@ -571,7 +498,7 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 		buf[f][0] = (1 - m_mixVal) * temp1 + m_mixVal * buf[f][0];
 		buf[f][1] = (1 - m_mixVal) * temp2 + m_mixVal * buf[f][1];
 
-		outSum += buf[f][0] * buf[f][0] + buf[f][1] * buf[f][1];
+		if (--m_lookWrite < 0) { m_lookWrite = m_lookBufLength - 1; }
 
 		lInPeak = drySignal[0] > lInPeak ? drySignal[0] : lInPeak;
 		rInPeak = drySignal[1] > rInPeak ? drySignal[1] : rInPeak;
@@ -579,29 +506,30 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 		rOutPeak = s[1] > rOutPeak ? s[1] : rOutPeak;
 	}
 
-	checkGate(outSum / frames);
 	m_compressorControls.m_outPeakL = lOutPeak;
 	m_compressorControls.m_outPeakR = rOutPeak;
 	m_compressorControls.m_inPeakL = lInPeak;
 	m_compressorControls.m_inPeakR = rInPeak;
 
-	return isRunning();
+	return ProcessStatus::ContinueIfNotQuiet;
 }
 
-
-// Regular modulo doesn't handle negative numbers correctly.  This does.
-inline int CompressorEffect::realmod(int k, int n)
+void CompressorEffect::processBypassedImpl()
 {
-	return (k %= n) < 0 ? k+n : k;
+	// Clear lookahead buffers and other values when needed
+	if (!m_cleanedBuffers)
+	{
+		m_yL[0] = m_yL[1] = COMP_NOISE_FLOOR;
+		m_gainResult[0] = m_gainResult[1] = 1;
+		m_displayPeak[0] = m_displayPeak[1] = COMP_NOISE_FLOOR;
+		m_displayGain[0] = m_displayGain[1] = COMP_NOISE_FLOOR;
+		std::fill(std::begin(m_scLookBuf[0]), std::end(m_scLookBuf[0]), COMP_NOISE_FLOOR);
+		std::fill(std::begin(m_scLookBuf[1]), std::end(m_scLookBuf[1]), COMP_NOISE_FLOOR);
+		std::fill(std::begin(m_inLookBuf[0]), std::end(m_inLookBuf[0]), 0);
+		std::fill(std::begin(m_inLookBuf[1]), std::end(m_inLookBuf[1]), 0);
+		m_cleanedBuffers = true;
+	}
 }
-
-// Regular fmod doesn't handle negative numbers correctly.  This does.
-inline float CompressorEffect::realfmod(float k, float n)
-{
-	return (k = fmod(k, n)) < 0 ? k+n : k;
-}
-
-
 
 inline void CompressorEffect::calcTiltFilter(sample_t inputSample, sample_t &outputSample, int filtNum)
 {
@@ -613,23 +541,20 @@ inline void CompressorEffect::calcTiltFilter(sample_t inputSample, sample_t &out
 
 void CompressorEffect::changeSampleRate()
 {
-	m_sampleRate = Engine::audioEngine()->processingSampleRate();
+	m_sampleRate = Engine::audioEngine()->outputSampleRate();
 
 	m_coeffPrecalc = COMP_LOG / (m_sampleRate * 0.001f);
 
 	// 200 ms
-	m_crestTimeConst = exp(-1.f / (0.2f * m_sampleRate));
+	m_crestTimeConst = std::exp(-1.f / (0.2f * m_sampleRate));
 
-	// 20 ms
-	m_lookaheadDelayLength = 0.02 * m_sampleRate;
-	m_inputBuf[0].resize(m_lookaheadDelayLength);
-	m_inputBuf[1].resize(m_lookaheadDelayLength);
-
-	m_lookaheadBuf[0].resize(m_lookaheadDelayLength);
-	m_lookaheadBuf[1].resize(m_lookaheadDelayLength);
-
-	m_preLookaheadBuf[0].resize(m_lookaheadDelayLength);
-	m_preLookaheadBuf[1].resize(m_lookaheadDelayLength);
+	m_lookBufLength = std::ceil((20.f / 1000.f) * m_sampleRate) + 2;
+	for (int i = 0; i < 2; ++i)
+	{
+		m_inLookBuf[i].resize(m_lookBufLength);
+		m_scLookBuf[i].resize(m_lookBufLength, COMP_NOISE_FLOOR);
+	}
+	m_lookWrite = 0;
 
 	calcThreshold();
 	calcKnee();
@@ -646,6 +571,9 @@ void CompressorEffect::changeSampleRate()
 	calcInGain();
 	calcTiltCoeffs();
 	calcMix();
+
+	calcAutoAttack();
+	calcAutoRelease();
 }
 
 

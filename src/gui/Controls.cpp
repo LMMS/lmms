@@ -38,7 +38,10 @@ namespace lmms::gui
 {
 
 
-void KnobControl::setText(const QString &text) { m_knob->setLabel(text); }
+void KnobControl::setText(const QString& text)
+{
+	m_knob->setLabel(text);
+}
 
 QWidget *KnobControl::topWidget() { return m_knob; }
 
@@ -51,8 +54,8 @@ FloatModel *KnobControl::model() { return m_knob->model(); }
 
 AutomatableModelView* KnobControl::modelView() { return m_knob; }
 
-KnobControl::KnobControl(QWidget *parent) :
-	m_knob(new Knob(parent)) {}
+KnobControl::KnobControl(const QString& text, QWidget *parent) :
+	m_knob(new Knob(KnobType::Bright26, text, parent)) {}
 
 
 void ComboControl::setText(const QString &text) { m_label->setText(text); }
@@ -95,7 +98,7 @@ AutomatableModelView* CheckControl::modelView() { return m_checkBox; }
 
 CheckControl::CheckControl(QWidget *parent) :
 	m_widget(new QWidget(parent)),
-	m_checkBox(new LedCheckBox(nullptr, QString(), LedCheckBox::Green)),
+	m_checkBox(new LedCheckBox(nullptr, QString(), LedCheckBox::LedColor::Green)),
 	m_label(new QLabel(m_widget))
 {
 	auto vbox = new QVBoxLayout(m_widget);

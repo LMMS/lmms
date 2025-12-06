@@ -23,10 +23,10 @@
  *
  */
 
-#ifndef VOLUME_H
-#define VOLUME_H
+#ifndef LMMS_VOLUME_H
+#define LMMS_VOLUME_H
 
-#include "lmms_basics.h"
+#include "LmmsTypes.h"
 
 namespace lmms
 {
@@ -43,4 +43,4 @@ struct StereoVolumeVector
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_VOLUME_H

@@ -23,12 +23,10 @@
  *
  */
 
-
-#ifndef RENAME_DIALOG_H
-#define RENAME_DIALOG_H
+#ifndef LMMS_GUI_RENAME_DIALOG_H
+#define LMMS_GUI_RENAME_DIALOG_H
 
 #include <QDialog>
-
 
 class QLineEdit;
 
@@ -62,4 +60,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_RENAME_DIALOG_H

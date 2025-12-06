@@ -91,24 +91,21 @@ void MidiSndio::sendByte( const unsigned char c )
 void MidiSndio::run()
 {
 	struct pollfd pfd;
-	nfds_t nfds;
-	char buf[0x100], *p;
-	size_t n;
-	int ret;
+	char buf[0x100];
 	while( m_quit == false && m_hdl )
 	{
-		nfds = mio_pollfd( m_hdl, &pfd, POLLIN );
-		ret = poll( &pfd, nfds, 100 );
+		nfds_t nfds = mio_pollfd(m_hdl, &pfd, POLLIN);
+		int ret = poll(&pfd, nfds, 100);
 		if ( ret < 0 )
 			break;
 		if ( !ret || !( mio_revents( m_hdl, &pfd ) & POLLIN ) )
 			continue;
-		n = mio_read( m_hdl, buf, sizeof(buf) );
+		size_t n = mio_read(m_hdl, buf, sizeof(buf));
 		if ( !n )
 		{
 			break;
 		}
-		for (p = buf; n > 0; n--, p++)
+		for (char* p = buf; n > 0; n--, p++)
 		{
 			parseData( *p );
 		}

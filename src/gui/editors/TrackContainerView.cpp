@@ -89,18 +89,23 @@ TrackContainerView::TrackContainerView( TrackContainer * _tc ) :
 	m_tc->setHook( this );
 	//keeps the direction of the widget, undepended on the locale
 	setLayoutDirection( Qt::LeftToRight );
+
+	// The main layout - by default it only contains the scroll area,
+	// but SongEditor uses the layout to add a TimeLineWidget on top
 	auto layout = new QVBoxLayout(this);
-	layout->setMargin( 0 );
+	layout->setContentsMargins(0, 0, 0, 0);
 	layout->setSpacing( 0 );
 	layout->addWidget( m_scrollArea );
 
+	// The widget that will contain all TrackViews
 	auto scrollContent = new QWidget;
 	m_scrollLayout = new QVBoxLayout( scrollContent );
-	m_scrollLayout->setMargin( 0 );
+	m_scrollLayout->setContentsMargins(0, 0, 0, 0);
 	m_scrollLayout->setSpacing( 0 );
 	m_scrollLayout->setSizeConstraint( QLayout::SetMinAndMaxSize );
 
 	m_scrollArea->setWidget( scrollContent );
+	m_scrollArea->setWidgetResizable(true);
 
 	m_scrollArea->show();
 	m_rubberBand->hide();
@@ -194,13 +199,11 @@ void TrackContainerView::moveTrackView( TrackView * trackView, int indexTo )
 	PatternTrack::swapPatternTracks( trackView->getTrack(),
 			m_trackViews[indexTo]->getTrack() );
 
+	m_tc->moveTrack(trackView->getTrack(), indexTo);
+
 	m_scrollLayout->removeWidget( trackView );
 	m_scrollLayout->insertWidget( indexTo, trackView );
 
-	Track * track = m_tc->m_tracks[indexFrom];
-
-	m_tc->m_tracks.remove( indexFrom );
-	m_tc->m_tracks.insert( indexTo, track );
 	m_trackViews.move( indexFrom, indexTo );
 
 	realignTracks();
@@ -254,15 +257,13 @@ void TrackContainerView::scrollToTrackView( TrackView * _tv )
 
 void TrackContainerView::realignTracks()
 {
-	m_scrollArea->widget()->setFixedWidth(width());
-	m_scrollArea->widget()->setFixedHeight(
-				m_scrollArea->widget()->minimumSizeHint().height());
-
 	for (const auto& trackView : m_trackViews)
 	{
 		trackView->show();
 		trackView->update();
 	}
+
+	emit tracksRealigned();
 }
 
 
@@ -370,8 +371,8 @@ void TrackContainerView::dragEnterEvent( QDragEnterEvent * _dee )
 		QString( "presetfile,pluginpresetfile,samplefile,instrument,"
 				"importedproject,soundfontfile,patchfile,vstpluginfile,projectfile,"
 				"track_%1,track_%2" ).
-						arg( Track::InstrumentTrack ).
-						arg( Track::SampleTrack ) );
+						arg( static_cast<int>(Track::Type::Instrument) ).
+						arg( static_cast<int>(Track::Type::Sample) ) );
 }
 
 
@@ -392,7 +393,7 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 	QString value = StringPairDrag::decodeValue( _de );
 	if( type == "instrument" )
 	{
-		auto it = dynamic_cast<InstrumentTrack*>(Track::create(Track::InstrumentTrack, m_tc));
+		auto it = dynamic_cast<InstrumentTrack*>(Track::create(Track::Type::Instrument, m_tc));
 		auto ilt = new InstrumentLoaderThread(this, it, value);
 		ilt->start();
 		//it->toggledInstrumentTrackButton( true );
@@ -402,7 +403,7 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 		|| type == "soundfontfile" || type == "vstpluginfile"
 		|| type == "patchfile" )
 	{
-		auto it = dynamic_cast<InstrumentTrack*>(Track::create(Track::InstrumentTrack, m_tc));
+		auto it = dynamic_cast<InstrumentTrack*>(Track::create(Track::Type::Instrument, m_tc));
 		PluginFactory::PluginInfoAndKey piakn =
 			getPluginFactory()->pluginSupportingExtension(FileItem::extension(value));
 		Instrument * i = it->loadInstrument(piakn.info.name(), &piakn.key);
@@ -413,9 +414,9 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 	else if( type == "presetfile" )
 	{
 		DataFile dataFile( value );
-		auto it = dynamic_cast<InstrumentTrack*>(Track::create(Track::InstrumentTrack, m_tc));
-		it->setSimpleSerializing();
-		it->loadSettings( dataFile.content().toElement() );
+		auto it = dynamic_cast<InstrumentTrack*>(Track::create(Track::Type::Instrument, m_tc));
+		it->loadPreset(dataFile.content().toElement());
+
 		//it->toggledInstrumentTrackButton( true );
 		_de->accept();
 	}
@@ -440,15 +441,6 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 		Track::create( dataFile.content().firstChild().toElement(), m_tc );
 		_de->accept();
 	}
-}
-
-
-
-
-void TrackContainerView::resizeEvent( QResizeEvent * _re )
-{
-	realignTracks();
-	QWidget::resizeEvent( _re );
 }
 
 
@@ -486,6 +478,18 @@ void TrackContainerView::scrollArea::wheelEvent( QWheelEvent * _we )
 	}
 }
 
+
+
+
+unsigned int TrackContainerView::totalHeightOfTracks() const
+{
+	unsigned int heightSum = 0;
+	for (auto & trackView : m_trackViews)
+	{
+		heightSum += trackView->getTrack()->getHeight();
+	}
+	return heightSum;
+}
 
 } // namespace gui
 

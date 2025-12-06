@@ -22,11 +22,13 @@
  *
  */
 
-#ifndef PIANO_H
-#define PIANO_H
+#ifndef LMMS_PIANO_H
+#define LMMS_PIANO_H
 
-#include "Note.h"
+#include <array>
+
 #include "Model.h"
+#include "Note.h"
 
 namespace lmms
 {
@@ -38,23 +40,23 @@ class MidiEventProcessor;
 class Piano final : public Model
 {
 public:
-	enum KeyTypes
+	enum class KeyType
 	{
-		WhiteKey,
-		BlackKey
+		White,
+		Black
 	} ;
 
-	Piano( InstrumentTrack* track );
+	Piano(InstrumentTrack* track);
 
-	void setKeyState( int key, bool state );
+	void setKeyState(int key, bool state);
 
-	bool isKeyPressed( int key ) const
+	bool isKeyPressed(int key) const
 	{
 		return m_pressedKeys[key];
 	}
 
-	void handleKeyPress( int key, int midiVelocity = -1 );
-	void handleKeyRelease( int key );
+	void handleKeyPress(int key, int midiVelocity = -1);
+	void handleKeyRelease(int key);
 
 	InstrumentTrack* instrumentTrack() const
 	{
@@ -75,7 +77,7 @@ public:
 	static const unsigned int NumBlackKeys = 53;
 
 private:
-	static bool isValidKey( int key )
+	static bool isValidKey(int key)
 	{
 		return key >= 0 && key < NumKeys;
 	}
@@ -89,5 +91,4 @@ private:
 
 } // namespace lmms
 
-#endif
-
+#endif // LMMS_PIANO_H

@@ -62,7 +62,7 @@ void Engine::init( bool renderOnly )
 	emit engine->initProgress(tr("Generating wavetables"));
 	// generate (load from file) bandlimited wavetables
 	BandLimitedWave::generateWaves();
-	//initilize oscillators
+	//initialize oscillators
 	Oscillator::waveTableInit();
 
 	emit engine->initProgress(tr("Initializing data structures"));
@@ -126,15 +126,6 @@ void Engine::destroy()
 
 
 
-bool Engine::ignorePluginBlacklist()
-{
-	const char* envVar = getenv("LMMS_IGNORE_BLACKLIST");
-	return (envVar && *envVar);
-}
-
-
-
-
 float Engine::framesPerTick(sample_rate_t sampleRate)
 {
 	return sampleRate * 60.0f * 4 /
@@ -146,7 +137,7 @@ float Engine::framesPerTick(sample_rate_t sampleRate)
 
 void Engine::updateFramesPerTick()
 {
-	s_framesPerTick = s_audioEngine->processingSampleRate() * 60.0f * 4 / DefaultTicksPerBar / s_song->getTempo();
+	s_framesPerTick = s_audioEngine->outputSampleRate() * 60.0f * 4 / DefaultTicksPerBar / s_song->getTempo();
 }
 
 

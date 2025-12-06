@@ -5,29 +5,49 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 jobs:
-  linux:
-    name: linux
-    runs-on: ubuntu-latest
-    container: lmmsci/linux.gcc:18.04
+  linux-x86_64:
+    name: linux-x86_64
+    runs-on: ubuntu-22.04
     env:
       CMAKE_OPTS: >-
         -DUSE_WERROR=ON
         -DCMAKE_BUILD_TYPE=RelWithDebInfo
         -DUSE_COMPILE_CACHE=ON
-      CCACHE_MAXSIZE: 500M
+        -DWANT_DEBUG_CPACK=ON
+      CCACHE_MAXSIZE: 0
+      CCACHE_NOCOMPRESS: 1
       MAKEFLAGS: -j2
     steps:
-      - name: Update and configure Git
-        run: |
-          add-apt-repository ppa:git-core/ppa
-          apt-get update
-          apt-get --yes install git
-          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: Configure git
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Check out
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
           submodules: recursive
+      - name: Clone fltk
+        uses: actions/checkout@v4
+        with:
+          repository: fltk/fltk
+          path: fltk
+          ref: 27d991f046bdebb12bfd58f7c05a19f135979c29
+          fetch-depth: 1
+      - name: Configure winehq
+        run: |
+          sudo dpkg --add-architecture i386
+          sudo mkdir -pm755 /etc/apt/keyrings
+          wget -O - https://dl.winehq.org/wine-builds/winehq.key | \
+          sudo gpg --dearmor -o /etc/apt/keyrings/winehq-archive.key -
+          sudo wget -NP /etc/apt/sources.list.d/ \
+          https://dl.winehq.org/wine-builds/ubuntu/dists/$(lsb_release -cs)/winehq-$(lsb_release -cs).sources
+      - name: Install packages
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y --no-install-recommends \
+            $(xargs < .github/workflows/deps-ubuntu-24.04-gcc.txt)
+          sudo apt-get install -y --install-recommends g++-multilib gcc-multilib winehq-devel wine-devel-dev
+          sudo apt-get install -y --install-recommends \
+            $(xargs < .github/workflows/deps-ubuntu-24.04-fltk.txt)
       - name: Cache ccache data
         uses: actions/cache@v3
         with:
@@ -36,50 +56,79 @@ jobs:
             ccache-${{ github.job }}-${{ github.ref }}-
             ccache-${{ github.job }}-
           path: ~/.ccache
+      - name: Configure fltk
+        run: |
+          cmake -S fltk -B fltk/build -DFLTK_BUILD_SHARED_LIBS=ON -DFLTK_BACKEND_WAYLAND=ON \
+            -DFLTK_USE_LIBDECOR_GTK=OFF -DFLTK_BUILD_TEST=OFF -DFLTK_BUILD_GL=OFF
+      - name: Install fltk
+        run: |
+          cmake --build fltk/build
+          sudo cmake --install fltk/build --prefix /usr
       - name: Configure
         run: |
+          ccache --zero-stats
           source /opt/qt5*/bin/qt5*-env.sh || true
-          mkdir build && cd build
-          cmake .. $CMAKE_OPTS -DCMAKE_INSTALL_PREFIX=./install
+          cmake -S . \
+                -B build \
+                $CMAKE_OPTS
       - name: Build
         run: cmake --build build
-      - name: Build tests
-        run: cmake --build build --target tests
       - name: Run tests
-        run: build/tests/tests
+        run: |
+          cd build/tests
+          ctest --output-on-failure -j2
       - name: Package
         run: |
-          cmake --build build --target install
-          cmake --build build --target appimage \
-            || (cat build/appimage.log && false)
+          cmake --build build --target package
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: linux
           path: build/lmms-*.AppImage
-      - name: Print ccache statistics
+      - name: Trim ccache and print statistics
         run: |
+          ccache --cleanup
           echo "[ccache config]"
-          ccache -p
+          ccache --show-config
           echo "[ccache stats]"
-          ccache -s
-  macos:
-    name: macos
-    runs-on: macos-11
+          ccache --show-stats
+        env:
+          CCACHE_MAXSIZE: 500M
+  linux-arm64:
+    name: linux-arm64
+    runs-on: ubuntu-24.04-arm
     env:
       CMAKE_OPTS: >-
         -DUSE_WERROR=ON
         -DCMAKE_BUILD_TYPE=RelWithDebInfo
         -DUSE_COMPILE_CACHE=ON
-      CCACHE_MAXSIZE: 500M
-      MAKEFLAGS: -j3
-      DEVELOPER_DIR: /Applications/Xcode_11.7.app/Contents/Developer
+        -DWANT_DEBUG_CPACK=ON
+      CCACHE_MAXSIZE: 0
+      CCACHE_NOCOMPRESS: 1
+      MAKEFLAGS: -j2
+      DEBIAN_FRONTEND: noninteractive
     steps:
+      - name: Configure git
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Check out
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
           submodules: recursive
+      - name: Clone fltk
+        uses: actions/checkout@v4
+        with:
+          repository: fltk/fltk
+          path: fltk
+          ref: 27d991f046bdebb12bfd58f7c05a19f135979c29
+          fetch-depth: 1
+      - name: Install system packages
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y --no-install-recommends \
+            $(xargs < .github/workflows/deps-ubuntu-24.04-gcc.txt)
+          sudo apt-get install -y --install-recommends \
+            $(xargs < .github/workflows/deps-ubuntu-24.04-fltk.txt)
       - name: Cache ccache data
         uses: actions/cache@v3
         with:
@@ -87,70 +136,84 @@ jobs:
           restore-keys: |
             ccache-${{ github.job }}-${{ github.ref }}-
             ccache-${{ github.job }}-
-          path: ~/Library/Caches/ccache
-      - name: Install dependencies
+          path: ~/.ccache
+      - name: Configure fltk
         run: |
-          brew install ccache fftw pkg-config libogg libvorbis lame libsndfile \
-                       libsamplerate jack sdl libgig libsoundio lilv lv2 stk \
-                       fluid-synth portaudio fltk qt@5 carla
-          npm install --location=global appdmg
+          cmake -S fltk -B fltk/build -DFLTK_BUILD_SHARED_LIBS=ON -DFLTK_BACKEND_WAYLAND=ON \
+            -DFLTK_USE_LIBDECOR_GTK=OFF -DFLTK_BUILD_TEST=OFF -DFLTK_BUILD_GL=OFF
+      - name: Install fltk
+        run: |
+          cmake --build fltk/build
+          sudo cmake --install fltk/build --prefix /usr
       - name: Configure
         run: |
-          mkdir build
+          ccache --zero-stats
           cmake -S . \
                 -B build \
-                -DCMAKE_INSTALL_PREFIX="../target" \
-                -DCMAKE_PREFIX_PATH="$(brew --prefix qt5)" \
-                $CMAKE_OPTS \
-                -DUSE_WERROR=OFF
+                $CMAKE_OPTS
       - name: Build
         run: cmake --build build
-      - name: Build tests
-        run: cmake --build build --target tests
       - name: Run tests
-        run: build/tests/tests
+        run: |
+          cd build/tests
+          ctest --output-on-failure -j2
       - name: Package
         run: |
-          cmake --build build --target install
-          cmake --build build --target dmg
+          cmake --build build --target package
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: macos
-          path: build/lmms-*.dmg
-      - name: Print ccache statistics
+          name: linux-arm64
+          path: build/lmms-*.AppImage
+      - name: Trim ccache and print statistics
         run: |
+          ccache --cleanup
           echo "[ccache config]"
-          ccache -p
+          ccache --show-config
           echo "[ccache stats]"
-          ccache -s
-  mingw:
+          ccache --show-stats
+        env:
+          CCACHE_MAXSIZE: 500M
+  macos:
     strategy:
       fail-fast: false
       matrix:
-        arch: ['32', '64']
-    name: mingw${{ matrix.arch }}
-    runs-on: ubuntu-latest
-    container: lmmsci/linux.mingw${{ matrix.arch }}:18.04
+        arch: [ x86_64, arm64 ]
+        include:
+          - arch: x86_64
+            os: macos-15-intel
+            xcode: "16.4"
+          - arch: arm64
+            os: macos-15
+            xcode: "16.4"
+    name: macos-${{ matrix.arch }}
+    runs-on: ${{ matrix.os }}
     env:
       CMAKE_OPTS: >-
+        -Werror=dev
         -DUSE_WERROR=ON
         -DCMAKE_BUILD_TYPE=RelWithDebInfo
         -DUSE_COMPILE_CACHE=ON
-      CCACHE_MAXSIZE: 500M
-      MAKEFLAGS: -j2
+      CCACHE_MAXSIZE: 0
+      CCACHE_NOCOMPRESS: 1
+      MAKEFLAGS: -j3
+      DEVELOPER_DIR: /Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer
     steps:
-      - name: Update and configure Git
-        run: |
-          add-apt-repository ppa:git-core/ppa
-          apt-get update
-          apt-get --yes install git
-          git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Check out
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
           submodules: recursive
+      - name: Clean up Homebrew download cache
+        run: rm -rf ~/Library/Caches/Homebrew/downloads
+      - name: Restore Homebrew download cache
+        id: cache-homebrew
+        uses: actions/cache/restore@v3
+        with:
+          key: n/a - only restore from restore-keys
+          restore-keys: |
+            homebrew-${{ matrix.arch }}-
+          path: ~/Library/Caches/Homebrew/downloads
       - name: Cache ccache data
         uses: actions/cache@v3
         with:
@@ -159,37 +222,128 @@ jobs:
           restore-keys: |
             ccache-${{ github.job }}-${{ matrix.arch }}-${{ github.ref }}-
             ccache-${{ github.job }}-${{ matrix.arch }}-
-          path: ~/.ccache
+          path: ~/Library/Caches/ccache
+      - name: Install dependencies
+        run: |
+          brew bundle install --verbose
+          npm update -g npm
+          npm install --location=global appdmg
+        env:
+          HOMEBREW_NO_AUTO_UPDATE: 1
+          HOMEBREW_NO_INSTALL_UPGRADE: 1
+          HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: 1
       - name: Configure
         run: |
-          mkdir build && cd build
-          ../cmake/build_win${{ matrix.arch }}.sh
+          ccache --zero-stats
+          source .github/workflows/macos-env.sh
+          mkdir build
+          cmake -S . \
+                -B build \
+                -DCMAKE_OSX_ARCHITECTURES=${{ matrix.arch }} \
+                $CMAKE_OPTS \
+                -DUSE_WERROR=OFF
       - name: Build
         run: cmake --build build
-      - name: Build tests
-        run: cmake --build build --target tests
+      - name: Run tests
+        run: |
+          cd build/tests
+          ctest --output-on-failure -j3
+      - name: Package
+        run: |
+          cmake --build build --target package
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-${{ matrix.arch }}
+          path: build/lmms-*.dmg
+      - name: Trim ccache and print statistics
+        run: |
+          ccache --cleanup
+          echo "[ccache config]"
+          ccache --show-config
+          echo "[ccache stats]"
+          ccache --show-stats --verbose
+        env:
+          CCACHE_MAXSIZE: 500MB
+      - name: Save Homebrew download cache
+        if: ${{ steps.cache-homebrew.outputs.cache-matched-key != env.key }}
+        uses: actions/cache/save@v3
+        with:
+          key: ${{ env.key }} 
+          path: ~/Library/Caches/Homebrew/downloads
+        env:
+          key: "homebrew-${{ matrix.arch }}\
+            -${{ hashFiles('Brewfile.lock.json') }}"
+  mingw:
+    name: mingw64
+    runs-on: ubuntu-latest
+    env:
+      CMAKE_OPTS: >-
+        -Werror=dev
+        -DUSE_WERROR=ON
+        -DCMAKE_BUILD_TYPE=RelWithDebInfo
+        -DUSE_COMPILE_CACHE=ON
+      CCACHE_MAXSIZE: 0
+      CCACHE_NOCOMPRESS: 1
+      MAKEFLAGS: -j2
+    steps:
+      - name: Configure apt
+        run: |
+          sudo sh -c 'echo "deb http://ppa.launchpad.net/tobydox/mingw-w64/ubuntu focal main" > \
+          /etc/apt/sources.list.d/tobydox-mingw-w64.list'
+          sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 72931B477E22FEFD47F8DECE02FE5F12ADDE29B2
+          sudo apt-get update -y
+      - name: Configure git
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: Check out
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          submodules: recursive
+      - name: Cache ccache data
+        uses: actions/cache@v3
+        with:
+          key: "ccache-${{ github.job }}-64-${{ github.ref }}\
+            -${{ github.run_id }}"
+          restore-keys: |
+            ccache-${{ github.job }}-64-${{ github.ref }}-
+            ccache-${{ github.job }}-64-
+          path: ~/.ccache
+      - name: Install dependencies
+        run: |
+          sudo apt-get install -y --no-install-recommends \
+          $(xargs < .github/workflows/deps-ubuntu-24.04-mingw.txt)
+      - name: Configure
+        run: |
+          ccache --zero-stats
+          cmake -S . \
+                -B build \
+                -DCMAKE_TOOLCHAIN_FILE="./cmake/toolchains/MinGW-W64-64.cmake" \
+                $CMAKE_OPTS
+      - name: Build
+        run: cmake --build build
       - name: Package
         run: cmake --build build --target package
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: mingw${{ matrix.arch }}
+          name: mingw64
           path: build/lmms-*.exe
-      - name: Print ccache statistics
+      - name: Trim ccache and print statistics
         run: |
+          ccache --cleanup
           echo "[ccache config]"
-          ccache -p
+          ccache --show-config
           echo "[ccache stats]"
-          ccache -s
+          ccache --show-stats
+        env:
+          CCACHE_MAXSIZE: 500M
   msvc:
-    strategy:
-      fail-fast: false
-      matrix:
-        arch: ['x86', 'x64']
-    name: msvc-${{ matrix.arch }}
-    runs-on: windows-2019
+    name: msvc-x64
+    runs-on: windows-2022
     env:
-      qt-version: '5.15.2'
+      CCACHE_MAXSIZE: 0
+      CCACHE_NOCOMPRESS: 1
     steps:
       - name: Check out
         uses: actions/checkout@v3
@@ -197,57 +351,140 @@ jobs:
           fetch-depth: 0
           submodules: recursive
       - name: Cache vcpkg dependencies
+        id: cache-deps
         uses: actions/cache@v3
         with:
-          key: vcpkg-${{ matrix.arch }}-${{ github.ref }}-${{ github.run_id }}
+          key: vcpkg-msvc-x86_64-${{ hashFiles('vcpkg.json') }}
           restore-keys: |
-            vcpkg-${{ matrix.arch }}-${{ github.ref }}-
-            vcpkg-${{ matrix.arch }}-
-          path: C:\vcpkg\installed
-      - name: Install 64-bit Qt
-        if: matrix.arch == 'x64'
-        uses: jurplel/install-qt-action@64bdb64f2c14311d23733a8463e5fcbc65e8775e
+            vcpkg-msvc-x86_64-
+          path: build\vcpkg_installed
+      - name: Cache ccache data
+        uses: actions/cache@v3
         with:
-          version: ${{ env.qt-version }}
-          arch: win64_msvc2019_64
+          # yamllint disable rule:line-length
+          key: "ccache-${{ github.job }}-x64-${{ github.ref }}\
+            -${{ github.run_id }}"
+          restore-keys: |
+            ccache-${{ github.job }}-x64-${{ github.ref }}-
+            ccache-${{ github.job }}-x64-
+          path: ~\AppData\Local\ccache
+          # yamllint enable rule:line-length
+      - name: Install tools
+        run: choco install ccache
+      - name: Install Qt
+        uses: jurplel/install-qt-action@d325aaf2a8baeeda41ad0b5d39f84a6af9bcf005
+        with:
+          version: '6.8.*'
+          arch: "win64_msvc2022_64"
           archives: qtbase qtsvg qttools
           cache: true
-      - name: Install 32-bit Qt
-        uses: jurplel/install-qt-action@64bdb64f2c14311d23733a8463e5fcbc65e8775e
-        with:
-          version: ${{ env.qt-version }}
-          arch: win32_msvc2019
-          archives: qtbase qtsvg qttools
-          cache: true
-          set-env: ${{ matrix.arch == 'x86' }}
-      - name: Install dependencies
-        run: |
-          vcpkg install `
-            --triplet=${{ matrix.arch }}-windows `
-            --host-triplet=${{ matrix.arch }}-windows `
-            --recurse `
-            fftw3 fluidsynth[sndfile] libsamplerate libsndfile libstk lilv lv2 `
-            portaudio sdl2
       - name: Set up build environment
-        uses: ilammy/msvc-dev-cmd@d8610e2b41c6d0f0c3b4c46dad8df0fd826c68e1
+        uses: ilammy/msvc-dev-cmd@cec98b9d092141f74527d0afa6feb2af698cfe89
         with:
-          arch: ${{ matrix.arch }}
+          arch: x64
       - name: Configure
         run: |
-          mkdir build
+          ccache --zero-stats
+          mkdir build -Force
           cmake -S . `
             -B build `
             -G Ninja `
             --toolchain C:/vcpkg/scripts/buildsystems/vcpkg.cmake `
-            -DCMAKE_BUILD_TYPE=RelWithDebInfo
+            -Werror=dev `
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo `
+            -DWANT_QT6=ON `
+            -DUSE_COMPILE_CACHE=ON `
+            -DUSE_WERROR=ON `
+            -DVCPKG_TARGET_TRIPLET="x64-windows" `
+            -DVCPKG_HOST_TRIPLET="x64-windows" `
+            -DVCPKG_MANIFEST_INSTALL="${{ env.should_install_manifest }}"
+        env:
+          should_install_manifest:
+            ${{ steps.cache-deps.outputs.cache-hit == 'true' && 'NO' || 'YES' }}
       - name: Build
         run: cmake --build build
-      - name: Build tests
-        run: cmake --build build --target tests
+      - name: Run tests
+        run: |
+          cd build/tests
+          ctest --output-on-failure -j2
       - name: Package
         run: cmake --build build --target package
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: msvc-${{ matrix.arch }}
+          name: msvc-x64
           path: build\lmms-*.exe
+      - name: Trim ccache and print statistics
+        run: |
+          ccache --cleanup
+          echo "[ccache config]"
+          ccache --show-config
+          echo "[ccache stats]"
+          ccache --show-stats --verbose
+        env:
+          CCACHE_MAXSIZE: 500MB
+  msys2:
+    name: windows-arm64
+    runs-on: windows-11-arm
+    defaults:
+      run:
+        shell: msys2 {0}
+    env:
+      CMAKE_OPTS: >-
+        -DCMAKE_BUILD_TYPE=RelWithDebInfo
+        -DUSE_COMPILE_CACHE=ON
+        -DCPACK_NSIS_EXECUTABLE=/clang64/bin/makensis.exe
+      CCACHE_MAXSIZE: 0
+      CCACHE_NOCOMPRESS: 1
+      MAKEFLAGS: -j2
+    steps:
+      - name: Check out
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          submodules: recursive
+      - name: Cache msys2 dependencies
+        id: cache-deps
+        uses: actions/cache@v3
+        with:
+          key: windows-arm64-${{ hashFiles('.github/workflows/deps-msys2-clangarm64.txt') }}
+          restore-keys: |
+            windows-arm64-
+          path: \msys64\var\cache\pacman\pkg
+      - name: Install msys2
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: CLANGARM64
+          update: true
+      - name: Install dependencies
+        run: pacman --needed --noconfirm -S - < .github/workflows/deps-msys2-clangarm64.txt
+      - name: Cache ccache data
+        uses: actions/cache@v3
+        with:
+          key: ccache-${{ github.job }}-${{ github.ref }}-${{ github.run_id }}
+          restore-keys: |
+            ccache-${{ github.job }}-${{ github.ref }}-
+            ccache-${{ github.job }}-
+          path: ~\AppData\Local\ccache
+      - name: Configure
+        run: |
+          /clang64/bin/ccache.exe --zero-stats
+          cmake -B build $CMAKE_OPTS
+      - name: Build
+        run: cmake --build build
+      - name: Package
+        run: cmake --build build --target package
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-arm64
+          path: build\lmms-*.exe
+      - name: Trim ccache and print statistics
+        run: |
+          /clang64/bin/ccache.exe --cleanup
+          echo "[ccache config]"
+          /clang64/bin/ccache.exe --show-config
+          echo "[ccache stats]"
+          /clang64/bin/ccache.exe --show-stats --verbose
+        env:
+          CCACHE_MAXSIZE: 500MB

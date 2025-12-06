@@ -22,10 +22,8 @@
  *
  */
 
-
-#ifndef PATTERN_TRACK_H
-#define PATTERN_TRACK_H
-
+#ifndef LMMS_PATTERN_TRACK_H
+#define LMMS_PATTERN_TRACK_H
 
 #include <QMap>
 
@@ -39,7 +37,6 @@ class TrackContainer;
 namespace gui
 {
 
-class TrackLabelButton;
 class PatternTrackView;
 
 } // namespace gui
@@ -59,8 +56,7 @@ public:
 	gui::TrackView * createView( gui::TrackContainerView* tcv ) override;
 	Clip* createClip(const TimePos & pos) override;
 
-	void saveTrackSpecificSettings( QDomDocument & _doc,
-							QDomElement & _parent ) override;
+	void saveTrackSpecificSettings(QDomDocument& doc, QDomElement& parent, bool presetMode) override;
 	void loadTrackSpecificSettings( const QDomElement & _this ) override;
 
 	static PatternTrack* findPatternTrack(int pattern_num);
@@ -104,4 +100,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_PATTERN_TRACK_H
