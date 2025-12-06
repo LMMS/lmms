@@ -33,6 +33,7 @@
 
 #include "CaptionMenu.h"
 #include "FontHelper.h"
+#include "DeprecationHelper.h"
 #include "Scroll.h"
 
 namespace lmms::gui

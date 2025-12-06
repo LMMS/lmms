@@ -30,6 +30,7 @@
 #include "LcdSpinBox.h"
 #include "KeyboardShortcuts.h"
 #include "CaptionMenu.h"
+#include "DeprecationHelper.h"
 #include "Scroll.h"
 
 
