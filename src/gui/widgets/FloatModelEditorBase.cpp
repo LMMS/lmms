@@ -423,7 +423,7 @@ void FloatModelEditorBase::friendlyUpdate()
 	if (model()->useControllerValue()
 		&& model()->controllerConnection()
 		&& model()->controllerConnection()->getController()->frequentUpdates()
-		&& Controller::runningFrames() % (256*4) != 0)
+		&& Controller::runningFrames() % (256 * 4) != 0)
 	{ return; }
 
 	update();
