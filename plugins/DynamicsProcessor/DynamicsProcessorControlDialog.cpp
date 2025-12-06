@@ -135,7 +135,7 @@ DynProcControlDialog::DynProcControlDialog(
 	smUnlButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "unl_inactive" ) );
 	smUnlButton->setToolTip(tr("Process each stereo channel independently"));
 
-	auto smGroup = new automatableButtonGroup(this);
+	auto smGroup = new AutomatableButtonGroup(this);
 	smGroup -> addButton( smMaxButton );
 	smGroup -> addButton( smAvgButton );
 	smGroup -> addButton( smUnlButton );

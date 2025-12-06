@@ -80,7 +80,7 @@ void TabWidget::addTab(QWidget* w, const QString& name, const char* pixmap, int 
 	}
 
 	// Tab's width when it is a text tab. This isn't correct for artwork tabs, but it's fixed later during the PaintEvent
-	int tab_width = horizontalAdvance(fontMetrics(), name) + 10;
+	int tab_width = fontMetrics().horizontalAdvance(name) + 10;
 
 	// Register new tab
 	widgetDesc d = {w, pixmap, name, tab_width};
@@ -124,18 +124,18 @@ void TabWidget::setActiveTab(int idx)
 
 
 // Return the index of the tab at position "pos"
-int TabWidget::findTabAtPos(const QPoint* pos)
+int TabWidget::findTabAtPos(const QPoint& pos)
 {
 
-	if (pos->y() > 1 && pos->y() < m_tabbarHeight - 1)
+	if (pos.y() > 1 && pos.y() < m_tabbarHeight - 1)
 	{
-		int cx = ((m_caption == "") ? 4 : 14) + horizontalAdvance(fontMetrics(), m_caption);
+		int cx = ((m_caption == "") ? 4 : 14) + fontMetrics().horizontalAdvance(m_caption);
 
 		for (widgetStack::iterator it = m_widgets.begin(); it != m_widgets.end(); ++it)
 		{
 			int const currentWidgetWidth = it->nwidth;
 
-			if (pos->x() >= cx && pos->x() <= cx + currentWidgetWidth)
+			if (pos.x() >= cx && pos.x() <= cx + currentWidgetWidth)
 			{
 				return(it.key());
 			}
@@ -156,7 +156,7 @@ bool TabWidget::event(QEvent* event)
 	{
 		auto helpEvent = static_cast<QHelpEvent*>(event);
 
-		int idx = findTabAtPos(& helpEvent->pos());
+		int idx = findTabAtPos(helpEvent->pos());
 
 		if (idx != -1)
 		{
@@ -181,10 +181,8 @@ bool TabWidget::event(QEvent* event)
 // Activate tab when clicked
 void TabWidget::mousePressEvent(QMouseEvent* me)
 {
-
 	// Find index of tab that has been clicked
-	QPoint pos = me->pos();
-	int idx = findTabAtPos(&pos);
+	const int idx = findTabAtPos(position(me));
 
 	// When found, activate tab that has been clicked
 	if (idx != -1)
@@ -236,7 +234,7 @@ void TabWidget::paintEvent(QPaintEvent* pe)
 	}
 
 	// Calculate the tabs' x (tabs are painted next to the caption)
-	int tab_x_offset = m_caption.isEmpty() ? 4 : 14 + horizontalAdvance(fontMetrics(), m_caption);
+	int tab_x_offset = m_caption.isEmpty() ? 4 : 14 + fontMetrics().horizontalAdvance(m_caption);
 
 	// Compute tabs' width depending on the number of tabs (only applicable for artwork tabs)
 	widgetStack::iterator first = m_widgets.begin();
@@ -301,7 +299,7 @@ void TabWidget::wheelEvent(QWheelEvent* we)
 {
 	auto scroll = Scroll(we);
 
-	if (position(we).y() > m_tabheight)
+	if (we->position().toPoint().y() > m_tabheight)
 	{
 		return;
 	}

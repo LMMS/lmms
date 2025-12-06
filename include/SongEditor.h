@@ -26,7 +26,6 @@
 #ifndef LMMS_GUI_SONG_EDITOR_H
 #define LMMS_GUI_SONG_EDITOR_H
 
-#include "AutomatableModel.h"
 #include "Editor.h"
 #include "TrackContainerView.h"
 
@@ -36,6 +35,7 @@ class QScrollBar;
 namespace lmms
 {
 
+class IntModel;
 class Song;
 class ComboBoxModel;
 

@@ -36,21 +36,16 @@
 class QAction;
 class QDomElement;
 class QGridLayout;
-class QMdiArea;
 
 namespace lmms
 {
 
-class ConfigManager;
-
 namespace gui
 {
 
-class FileBrowser;
 class PluginView;
 class SubWindow;
 class ToolButton;
-class GuiApplication;
 
 
 class MainWindow : public QMainWindow

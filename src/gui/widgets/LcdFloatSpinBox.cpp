@@ -137,15 +137,17 @@ void LcdFloatSpinBox::contextMenuEvent(QContextMenuEvent* event)
 
 void LcdFloatSpinBox::mousePressEvent(QMouseEvent* event)
 {
+	const auto pos = position(event);
+
 	// switch between integer and fractional step based on cursor position
-	m_intStep = event->x() < m_wholeDisplay.width();
+	m_intStep = pos.x() < m_wholeDisplay.width();
 
 	if (event->button() == Qt::LeftButton &&
 		!(event->modifiers() & KBD_COPY_MODIFIER) &&
-		event->y() < m_wholeDisplay.cellHeight() + 2)
+		pos.y() < m_wholeDisplay.cellHeight() + 2)
 	{
 		m_mouseMoving = true;
-		m_origMousePos = event->globalPos();
+		m_origMousePos = globalPosition(event);
 
 		AutomatableModel *thisModel = model();
 		if (thisModel)
@@ -165,13 +167,14 @@ void LcdFloatSpinBox::mouseMoveEvent(QMouseEvent* event)
 {
 	if (m_mouseMoving)
 	{
-		int dy = event->globalY() - m_origMousePos.y();
+		const auto globalPos = globalPosition(event);
+		int dy = globalPos.y() - m_origMousePos.y();
 		if (getGUI()->mainWindow()->isShiftPressed()) { dy = qBound(-4, dy/4, 4); }
 		if (dy > 1 || dy < -1)
 		{
 			model()->setValue(model()->value() - dy / 2 * getStep());
 			emit manualChange();
-			m_origMousePos = event->globalPos();
+			m_origMousePos = globalPos;
 		}
 	}
 }
@@ -193,7 +196,7 @@ void LcdFloatSpinBox::wheelEvent(QWheelEvent *event)
 	event->accept();
 
 	// switch between integer and fractional step based on cursor position
-	if (position(event).x() < m_wholeDisplay.width()) { m_intStep = true; }
+	if (event->position().toPoint().x() < m_wholeDisplay.width()) { m_intStep = true; }
 	else { m_intStep = false; }
 
 	const int steps = scroll.getSteps(Scroll::Flag::DisableNaturalScrolling);

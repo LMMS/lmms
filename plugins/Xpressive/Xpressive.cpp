@@ -370,7 +370,7 @@ XpressiveView::XpressiveView(Instrument * _instrument, QWidget * _parent) :
 	m_helpBtn->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("help_inactive"));
 	m_helpBtn->setToolTip(tr("Open help window"));
 
-	m_selectedGraphGroup = new automatableButtonGroup(this);
+	m_selectedGraphGroup = new AutomatableButtonGroup(this);
 	m_selectedGraphGroup->addButton(m_w1Btn);
 	m_selectedGraphGroup->addButton(m_w2Btn);
 	m_selectedGraphGroup->addButton(m_w3Btn);
@@ -861,18 +861,6 @@ QString XpressiveHelpView::s_helpText=
 
 XpressiveHelpView::XpressiveHelpView():QTextEdit(s_helpText)
 {
-
-#if QT_VERSION < 0x50C00
-	// Workaround for a bug in Qt versions below 5.12,
-	// where argument-dependent-lookup fails for QFlags operators
-	// declared inside a namepsace.
-	// This affects the Q_DECLARE_OPERATORS_FOR_FLAGS macro in Instrument.h
-	// See also: https://codereview.qt-project.org/c/qt/qtbase/+/225348
-
-	using ::operator|;
-
-#endif
-
 	setWindowTitle ( "Xpressive Help" );
 	setTextInteractionFlags ( Qt::TextSelectableByKeyboard | Qt::TextSelectableByMouse );
 	getGUI()->mainWindow()->addWindowedWidget( this );

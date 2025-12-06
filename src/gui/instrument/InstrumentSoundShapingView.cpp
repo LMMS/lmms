@@ -24,14 +24,16 @@
 
 #include "InstrumentSoundShapingView.h"
 
+#include <QHBoxLayout>
 #include <QLabel>
-#include <QBoxLayout>
+#include <QVBoxLayout>
 
 #include "EnvelopeAndLfoParameters.h"
 #include "EnvelopeAndLfoView.h"
 #include "ComboBox.h"
 #include "GroupBox.h"
 #include "FontHelper.h"
+#include "InstrumentSoundShaping.h"
 #include "Knob.h"
 #include "TabWidget.h"
 
@@ -83,7 +85,6 @@ InstrumentSoundShapingView::InstrumentSoundShapingView(QWidget* parent) :
 	m_singleStreamInfoLabel->setWordWrap(true);
 	// TODO Could also be rendered in system font size...
 	m_singleStreamInfoLabel->setFont(adjustedToPixelSize(m_singleStreamInfoLabel->font(), DEFAULT_FONT_SIZE));
-	m_singleStreamInfoLabel->setFixedWidth(242);
 
 	mainLayout->addWidget(m_singleStreamInfoLabel, 0, Qt::AlignTop);
 }
