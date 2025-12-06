@@ -32,16 +32,22 @@ namespace lmms {
 
 void Timeline::setLoopBegin(TimePos begin)
 {
+	if (begin < 0 || begin == m_loopEnd) { return; }
+
 	std::tie(m_loopBegin, m_loopEnd) = std::minmax(begin, TimePos{m_loopEnd});
 }
 
 void Timeline::setLoopEnd(TimePos end)
 {
+	if (end < 0 || end == m_loopBegin) { return; }
+
 	std::tie(m_loopBegin, m_loopEnd) = std::minmax(TimePos{m_loopBegin}, end);
 }
 
 void Timeline::setLoopPoints(TimePos begin, TimePos end)
 {
+	if (begin < 0 || end < 0 || begin == end) { return; }
+
 	std::tie(m_loopBegin, m_loopEnd) = std::minmax(begin, end);
 }
 

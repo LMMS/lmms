@@ -767,8 +767,8 @@ lmms--gui--TimeLineWidget {
 	qproperty-activeLoopInnerColor: rgba( 74, 155, 100, 255 );
 	qproperty-activeLoopHandleColor: rgba( 192, 192, 192, 200 );
 
-	/* Width of loop marker handles (when handle mode is active) */
-	qproperty-loopHandleWidth: 8;
+	/* Width of loop move handle (when grab closest mode is active) */
+	qproperty-loopHandleWidth: 30;
 
 	qproperty-barLineColor: rgb( 192, 192, 192 );
 	qproperty-barNumberColor: rgb( 192, 192, 192 );

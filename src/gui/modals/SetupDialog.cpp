@@ -261,7 +261,6 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 
 	m_loopMarkerComboBox->addItem(tr("Dual-button"), "dual");
 	m_loopMarkerComboBox->addItem(tr("Grab closest"), "closest");
-	m_loopMarkerComboBox->addItem(tr("Handles"), "handles");
 
 	m_loopMarkerComboBox->setCurrentIndex(m_loopMarkerComboBox->findData(m_loopMarkerMode));
 	connect(m_loopMarkerComboBox, qOverload<int>(&QComboBox::currentIndexChanged),
