@@ -43,7 +43,7 @@ All files created / modified are stored within the Plugins/TransferFunction fold
 - Built in tempo synced delay with on / off, feedback and step size
 - Do we require internal filters in StepGate?
 
-**Plugin #3: Spectral Gate **
+**Plugin #3: Spectral Gate**
 - Combines the rhythmic step sequencing of StepGate with the FFT frequency domain processing of the Transfer Function plugin
 - Spectral Morphing: Instead of simple volume gating, the effect morphs between two distinct spectral states ("Open" and "Closed")
 - Independent controls for the Open and Closed states including selectable presets and custom formulas
