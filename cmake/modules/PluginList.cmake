@@ -78,6 +78,7 @@ SET(LMMS_PLUGIN_LIST
 	WaveShaper
 	Vectorscope
 	Vibed
+	Visualiser
 	Xpressive
 	ZynAddSubFx
 )
