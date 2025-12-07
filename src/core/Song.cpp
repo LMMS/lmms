@@ -247,7 +247,7 @@ void Song::processNextBuffer()
 	{
 		if (getPlayPos() < begin || getPlayPos() >= end)
 		{
-			timeline.setTicks(begin.getTicks());
+			getTimeline().setTicks(begin.getTicks());
 			return true;
 		}
 		return false;
