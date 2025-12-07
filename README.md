@@ -51,3 +51,17 @@ All files created / modified are stored within the Plugins/TransferFunction fold
 - Math Parser featuring the H(f) text entry system from Plugin #1
 - 17 Spectral Presets
 - Future idea, FFT size selector
+
+ **Plugin #4: Visualiser**
+- Introduces visual analysis and artistic rendering to LMMS. Unlike standard spectrum analyzers, this plugin combines scientific audio metering with a "Demoscene" aesthetic
+- 32 Selectable Modes ranging from standard Waveforms and Spectrum Analyzers to "Amiga" style Copper Bars, Starfields, and Retro Sunsets
+- Stereo FFT Analysis: Uses Fast Fourier Transform to drive frequency-based visuals
+- Kraftwerk &  Amiga demo tributes
+- Text Customisation with classic Amiga style Sine-Wave Scroller
+- Random Cycle Mode. Mode #31 automatically cycles through a random visualisation every 3 seconds
+- Scientific Tools including Phase Scope, Complex Plane, Data Stats and Oscilloscope
+- State Saving as current mode, text and wiggle settings are saved within the song file.
+- All rendering is done via QPainter for maximum compatibility across platforms. tested and stable.
+- All files created are stored within the Plugins/Visualiser folder.
+
+
