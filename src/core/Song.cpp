@@ -238,6 +238,8 @@ void Song::processNextBuffer()
 			return;
 	}
 
+	auto& timeline = getTimeline();
+
 	// If the playback position is outside of the range [begin, end), move it to
 	// begin and inform interested parties.
 	// Returns true if the playback position was moved, else false.
@@ -245,13 +247,12 @@ void Song::processNextBuffer()
 	{
 		if (getPlayPos() < begin || getPlayPos() >= end)
 		{
-			getTimeline().setTicks(begin.getTicks());
+			timeline.setTicks(begin.getTicks());
 			return true;
 		}
 		return false;
 	};
 
-	const auto& timeline = getTimeline();
 	const auto loopEnabled = !m_exporting && timeline.loopEnabled();
 
 	// Ensure playback begins within the loop if it is enabled
@@ -273,8 +274,8 @@ void Song::processNextBuffer()
 			const auto elapsedTicks = static_cast<int>(frameOffsetInTick / framesPerTick);
 			frameOffsetInTick -= elapsedTicks * framesPerTick;
 			// Passing false as the second argument prevents the timeline from sending `positionJumped` signals and resetting the frame offset.
-			getTimeline().setTicks(getPlayPos().getTicks() + elapsedTicks, false);
-			getTimeline().setFrameOffset(frameOffsetInTick);
+			timeline.setTicks(getPlayPos().getTicks() + elapsedTicks, false);
+			timeline.setFrameOffset(frameOffsetInTick);
 
 			// If we are playing a pattern track, or a MIDI clip with no loop enabled,
 			// loop back to the beginning when we reach the end
@@ -337,7 +338,7 @@ void Song::processNextBuffer()
 		// Update frame counters
 		frameOffsetInPeriod += framesToPlay;
 		frameOffsetInTick += framesToPlay;
-		getTimeline().setFrameOffset(frameOffsetInTick);
+		timeline.setFrameOffset(frameOffsetInTick);
 	}
 
 	// Reset the jumped state after processing this buffer, since presumably it has now been handled.
@@ -643,18 +644,18 @@ void Song::stop()
 		case Timeline::StopBehaviour::BackToZero:
 			if (m_playMode == PlayMode::MidiClip)
 			{
-				getTimeline().setTicks(std::max(0, -m_midiClipToPlay->startTimeOffset()));
+				timeline.setTicks(std::max(0, -m_midiClipToPlay->startTimeOffset()));
 			}
 			else
 			{
-				getTimeline().setTicks(0);
+				timeline.setTicks(0);
 			}
 			break;
 
 		case Timeline::StopBehaviour::BackToStart:
 			if (timeline.playStartPosition() >= 0)
 			{
-				getTimeline().setTicks(timeline.playStartPosition().getTicks());
+				timeline.setTicks(timeline.playStartPosition().getTicks());
 
 				timeline.setPlayStartPosition(-1);
 			}
@@ -702,14 +703,14 @@ void Song::startExport()
 	m_exporting = true;
 	updateLength();
 
-	const auto& timeline = getTimeline(PlayMode::Song);
+	auto& timeline = getTimeline(PlayMode::Song);
 
 	if (m_renderBetweenMarkers)
 	{
 		m_exportSongBegin = m_exportLoopBegin = timeline.loopBegin();
 		m_exportSongEnd = m_exportLoopEnd = timeline.loopEnd();
 
-		getTimeline(PlayMode::Song).setTicks(timeline.loopBegin().getTicks());
+		timeline.setTicks(timeline.loopBegin().getTicks());
 	}
 	else
 	{
