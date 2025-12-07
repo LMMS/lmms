@@ -79,7 +79,9 @@ AudioFileOgg::AudioFileOgg(OutputSettings const& outputSettings, const ch_cnt_t 
 
 AudioFileOgg::~AudioFileOgg()
 {
-	vorbis_analysis_wrote(&m_vds, 0);
+	// writing 0 frames is how we flush any remaining data to the file
+	writeBuffer(nullptr, 0);
+
 	ogg_stream_clear(&m_oss);
 	vorbis_block_clear(&m_vb);
 	vorbis_dsp_clear(&m_vds);
@@ -89,21 +91,30 @@ AudioFileOgg::~AudioFileOgg()
 
 void AudioFileOgg::writeBuffer(const SampleFrame* _ab, const fpp_t _frames)
 {
-	const auto vab = vorbis_analysis_buffer(&m_vds, _frames);
-
-	for (auto c = 0; c < channels(); ++c)
+	if (_frames == 0)
 	{
-		if (c < DEFAULT_CHANNELS)
+		vorbis_analysis_wrote(&m_vds, 0);
+	}
+	else
+	{
+		const auto vab = vorbis_analysis_buffer(&m_vds, _frames);
+		for (auto c = 0; c < channels(); ++c)
 		{
-			for (auto i = std::size_t{0}; i < _frames; ++i)
+			if (c < DEFAULT_CHANNELS)
 			{
-				vab[c][i] = _ab[i][c];
+				for (auto i = std::size_t{0}; i < _frames; ++i)
+				{
+					vab[c][i] = _ab[i][c];
+				}
+			}
+			else
+			{
+				std::fill_n(vab[c], _frames, 0.0f);
 			}
 		}
-		else { std::fill_n(vab[c], _frames, 0.0f); }
-	}
 
-	vorbis_analysis_wrote(&m_vds, _frames);
+		vorbis_analysis_wrote(&m_vds, _frames);
+	}
 
 	while (vorbis_analysis_blockout(&m_vds, &m_vb) == 1)
 	{
@@ -114,14 +125,13 @@ void AudioFileOgg::writeBuffer(const SampleFrame* _ab, const fpp_t _frames)
 		{
 			ogg_stream_packetin(&m_oss, &m_packet);
 
-			while (ogg_stream_pageout(&m_oss, &m_page))
+			do
 			{
+				if (ogg_stream_pageout(&m_oss, &m_page) == 0) { break; }
 				writeData(m_page.header, m_page.header_len);
 				writeData(m_page.body, m_page.body_len);
-			}
+			} while (!ogg_page_eos(&m_page));
 		}
-
-		if (ogg_page_eos(&m_page)) { break; }
 	}
 }
 

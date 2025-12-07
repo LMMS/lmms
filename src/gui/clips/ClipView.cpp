@@ -583,7 +583,7 @@ void ClipView::paintTextLabel(QString const & text, QPainter & painter)
 		elidedClipName = text.trimmed();
 	}
 
-	painter.fillRect(QRect(0, 0, width(), fontMetrics.height() + 2 * textTop), textBackgroundColor());
+	painter.fillRect(QRect(0, 0, fontMetrics.horizontalAdvance(elidedClipName) + 8, fontMetrics.height() + 2 * textTop), textBackgroundColor());
 
 	int const finalTextTop = textTop + fontMetrics.ascent();
 	painter.setPen(textShadowColor());
