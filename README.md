@@ -64,5 +64,6 @@ All files created / modified are stored within the Plugins/TransferFunction fold
 - All rendering is done via QPainter for maximum compatibility across platforms. tested and stable
 - All files created are stored within the Plugins/Visualiser folder
 - Audio passthrough, use as an effect on channel, instrument or master
+- Exports video output as a series of pictures to /home/username/Pictures/LMMS_Visuals/ at selected resolution and between tick being ticked and unticked for persons who wish to render later
 
 
