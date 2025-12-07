@@ -53,9 +53,9 @@ All files created / modified are stored within the Plugins/TransferFunction fold
 - Future idea, FFT size selector
 
  **Plugin #4: Visualiser**
-- Introduces visual analysis and artistic rendering to LMMS. Unlike standard spectrum analyzers, this plugin combines scientific audio metering with a "Demoscene" aesthetic
-- 32 Selectable Modes ranging from standard Waveforms and Spectrum Analyzers to "Amiga" style Copper Bars, Starfields, and Retro Sunsets
-- Stereo FFT Analysis. Uses Fast Fourier Transform to drive frequency-based visuals
+- Introduces visual analysis and artistic rendering to LMMS. Unlike standard spectrum analysers, this plugin combines scientific audio metering with a "Demoscene" aesthetic
+- 32 Selectable modes ranging from standard Waveforms and Spectrum Analyzers to "Amiga" style Copper Bars, Starfields, and Retro Sunsets
+- Stereo FFT Analysis. Uses Fast Fourier Transform to drive frequency based visuals
 - Kraftwerk &  Amiga demo tributes
 - Text Customisation with classic Amiga style Sine-Wave Scroller
 - Random Cycle Mode. Mode #31 automatically cycles through a random visualisation every 3 seconds
