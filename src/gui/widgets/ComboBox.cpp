@@ -35,12 +35,6 @@
 #include "FontHelper.h"
 #include "DeprecationHelper.h"
 
-#define QT_SUPPORTS_WIDGET_SCREEN (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
-#if !QT_SUPPORTS_WIDGET_SCREEN
-#include <QApplication>
-#include <QDesktopWidget>
-#endif
-
 namespace lmms::gui
 {
 const int CB_ARROW_BTN_WIDTH = 18;
@@ -125,12 +119,7 @@ void ComboBox::mousePressEvent( QMouseEvent* event )
 
 			QPoint gpos = mapToGlobal(QPoint(0, height()));
 
-			#if (QT_SUPPORTS_WIDGET_SCREEN)
 			bool const menuCanBeFullyShown = screen()->geometry().contains(QRect(gpos, m_menu.sizeHint()));
-			#else
-			bool const menuCanBeFullyShown = gpos.y() + m_menu.sizeHint().height() < qApp->desktop()->height();
-			#endif
-
 			if (menuCanBeFullyShown)
 			{
 				m_menu.exec(gpos);

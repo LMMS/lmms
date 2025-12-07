@@ -150,12 +150,8 @@ void PluginFactory::discoverPlugins()
 	QSet<QFileInfo> files;
 	for (const QString& searchPath : QDir::searchPaths("plugins"))
 	{
-#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
 		auto discoveredPluginList = QDir(searchPath).entryInfoList(nameFilters);
 		files.unite(QSet<QFileInfo>(discoveredPluginList.begin(), discoveredPluginList.end()));
-#else
-		files.unite(QDir(searchPath).entryInfoList(nameFilters).toSet());
-#endif
 	}
 
 	// Apply any plugin filters from environment LMMS_EXCLUDE_PLUGINS

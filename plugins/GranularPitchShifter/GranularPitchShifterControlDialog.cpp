@@ -139,10 +139,6 @@ QString GranularPitchShifterHelpView::s_helpText=
 
 GranularPitchShifterHelpView::GranularPitchShifterHelpView():QTextEdit(s_helpText)
 {
-#if (QT_VERSION < QT_VERSION_CHECK(5,12,0))
-	// Bug workaround: https://codereview.qt-project.org/c/qt/qtbase/+/225348
-	using ::operator|;
-#endif
 	setWindowTitle("Granular Pitch Shifter Help");
 	setTextInteractionFlags(Qt::TextSelectableByKeyboard | Qt::TextSelectableByMouse);
 	getGUI()->mainWindow()->addWindowedWidget(this);

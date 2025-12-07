@@ -528,9 +528,10 @@ void SongEditor::adjustLeftRightScoll(int value)
 
 void SongEditor::wheelEvent( QWheelEvent * we )
 {
-	if ((we->modifiers() & Qt::ControlModifier) && (position(we).x() > m_trackHeadWidth))
+	const auto posX = we->position().toPoint().x();
+	if ((we->modifiers() & Qt::ControlModifier) && (posX > m_trackHeadWidth))
 	{
-		int x = position(we).x() - m_trackHeadWidth;
+		int x = posX - m_trackHeadWidth;
 		// tick based on the mouse x-position where the scroll wheel was used
 		int tick = x / pixelsPerBar() * TimePos::ticksPerBar();
 

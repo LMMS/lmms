@@ -125,16 +125,15 @@ void MidiClip::init()
 
 void MidiClip::updateLength()
 {
-	if( m_clipType == Type::BeatClip )
-	{
-		changeLength( beatClipLength() );
-		updatePatternTrack();
-		return;
-	}
-
 	// If the clip hasn't already been manually resized, automatically resize it.
 	if (getAutoResize())
 	{
+		if (m_clipType == Type::BeatClip)
+		{
+			changeLength(beatClipLength());
+			updatePatternTrack();
+			return;
+		}
 		tick_t max_length = TimePos::ticksPerBar();
 
 		for (const auto& note : m_notes)
