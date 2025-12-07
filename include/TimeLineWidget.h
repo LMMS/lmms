@@ -152,7 +152,7 @@ public:
 					m_ppb / TimePos::ticksPerBar() );
 	}
 
-  Timeline* model()
+	Timeline* model()
 	{
 		return m_timeline;
 	}
