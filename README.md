@@ -45,7 +45,7 @@ All files created / modified are stored within the Plugins/TransferFunction fold
 
 **Plugin #3: Spectral Gate**
 - Combines the rhythmic step sequencing of StepGate with the FFT frequency domain processing of the Transfer Function plugin
-- Spectral Morphing: Instead of simple volume gating, the effect morphs between two distinct spectral states ("Open" and "Closed")
+- Spectral Morphing. Instead of simple volume gating, the effect morphs between two distinct spectral states ("Open" and "Closed")
 - Independent controls for the Open and Closed states including selectable presets and custom formulas
 - Dual 3-Band EQ
 - Math Parser featuring the H(f) text entry system from Plugin #1
@@ -55,7 +55,7 @@ All files created / modified are stored within the Plugins/TransferFunction fold
  **Plugin #4: Visualiser**
 - Introduces visual analysis and artistic rendering to LMMS. Unlike standard spectrum analyzers, this plugin combines scientific audio metering with a "Demoscene" aesthetic
 - 32 Selectable Modes ranging from standard Waveforms and Spectrum Analyzers to "Amiga" style Copper Bars, Starfields, and Retro Sunsets
-- Stereo FFT Analysis: Uses Fast Fourier Transform to drive frequency-based visuals
+- Stereo FFT Analysis. Uses Fast Fourier Transform to drive frequency-based visuals
 - Kraftwerk &  Amiga demo tributes
 - Text Customisation with classic Amiga style Sine-Wave Scroller
 - Random Cycle Mode. Mode #31 automatically cycles through a random visualisation every 3 seconds
