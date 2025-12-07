@@ -112,9 +112,11 @@ public:
 		return getMilliseconds(m_playMode);
 	}
 
+	//! Returns the elapsed milliseconds since the start of the song
+	//! This function attempts to give the correct value even despite mid-song tempo changes
 	inline int getMilliseconds(PlayMode playMode) const
 	{
-		return 1000 * getFrames() / Engine::audioEngine()->outputSampleRate();
+		return 1000 * getTimeline(playMode).getElapsedSeconds();
 	}
 
 	inline int getBars() const
@@ -209,6 +211,15 @@ public:
 	const TimePos& getPlayPos() const
 	{
 		return getPlayPos(m_playMode);
+	}
+
+	void setPlayPos(tick_t ticks, PlayMode playMode)
+	{
+		getTimeline(playMode).setPlayPos(ticks);
+	}
+	void setPlayPos(tick_t ticks)
+	{
+		setPlayPos(ticks, m_playMode);
 	}
 
 	auto getTimeline(PlayMode mode) -> Timeline& { return m_timelines[static_cast<std::size_t>(mode)]; }
@@ -373,8 +384,6 @@ private:
 		return getTimeline(m_playMode).getTicks() * Engine::framesPerTick() + getTimeline(m_playMode).getFrameOffset();
 	}
 
-	void setPlayPos( tick_t ticks, PlayMode playMode );
-
 	void saveControllerStates( QDomDocument & doc, QDomElement & element );
 	void restoreControllerStates( const QDomElement & element );
 
@@ -457,13 +466,12 @@ private:
 signals:
 	void projectLoaded();
 	void playbackStateChanged();
-	void playbackPositionChanged();
+	void playbackPositionJumped();
 	void lengthChanged( int bars );
 	void tempoChanged( lmms::bpm_t newBPM );
 	void timeSignatureChanged( int oldTicksPerBar, int ticksPerBar );
 	void controllerAdded( lmms::Controller * );
 	void controllerRemoved( lmms::Controller * );
-	void updateSampleTracks();
 	void stopped();
 	void modified();
 	void projectFileNameChanged();

@@ -26,6 +26,8 @@
 
 #include <QObject>
 
+#include "AudioEngine.h"
+#include "Engine.h"
 #include "JournallingObject.h"
 #include "TimePos.h"
 
@@ -48,22 +50,36 @@ public:
 	void setPlayPos(TimePos pos)
 	{
 		m_pos = pos;
+		// Calling `setPlayPos` is treated as a jump, so the frame offset is reset
+		m_frameOffset = 0;
 		emit positionChanged();
+		emit positionJumped();
 	}
 
 	auto getTicks() const -> tick_t { return m_pos.getTicks(); }
 
-	void setTicks(tick_t ticks)
+	// By default, calling `setTicks` will emit `positionJumped` signals to update everything accordingly
+	// However, passing `jumped = false` will instead treat the change in ticks as a continuous increment
+	void setTicks(tick_t ticks, bool jumped = true)
 	{
+		if (jumped)
+		{
+			m_frameOffset = 0;
+			// If the playhead has jumped, reset the elapsed time based on the global offset, ignoring any potnetial tempo automations.
+			m_elapsedSeconds = ticks * Engine::framesPerTick() / Engine::audioEngine()->outputSampleRate();
+			emit positionJumped();
+		}
+		else
+		{
+			// Update the elapsed time based on the delta ticks, to preserve the current total in case there was a tempo change mid-song
+			m_elapsedSeconds += (ticks - m_pos.getTicks()) * Engine::framesPerTick() / Engine::audioEngine()->outputSampleRate();
+		}
 		m_pos.setTicks(ticks);
 		emit positionChanged();
 	}
 
 	auto getFrameOffset() const -> f_cnt_t { return m_frameOffset; }
 	void setFrameOffset(const f_cnt_t frame) { m_frameOffset = frame; }
-
-	auto getJumped() const -> bool { return m_jumped; }
-	void setJumped(const bool jumped) { m_jumped = jumped; }
 
 	auto loopBegin() const -> TimePos { return m_loopBegin; }
 	auto loopEnd() const -> TimePos { return m_loopEnd; }
@@ -80,12 +96,15 @@ public:
 	void setPlayStartPosition(TimePos position) { m_playStartPosition = position; }
 	void setStopBehaviour(StopBehaviour behaviour);
 
+	auto getElapsedSeconds() const -> double { return m_elapsedSeconds + getFrameOffset() / Engine::audioEngine()->outputSampleRate(); }
+
 	auto nodeName() const -> QString override { return "timeline"; }
 
 signals:
 	void loopEnabledChanged(bool enabled);
 	void stopBehaviourChanged(lmms::Timeline::StopBehaviour behaviour);
 	void positionChanged();
+	void positionJumped();
 
 protected:
 	void saveSettings(QDomDocument& doc, QDomElement& element) override;
@@ -98,7 +117,8 @@ private:
 	TimePos m_pos = TimePos{0};
 
 	f_cnt_t m_frameOffset = 0;
-	bool m_jumped = false;
+
+	double m_elapsedSeconds = 0;
 
 	StopBehaviour m_stopBehaviour = StopBehaviour::BackToStart;
 	TimePos m_playStartPosition = TimePos{-1};

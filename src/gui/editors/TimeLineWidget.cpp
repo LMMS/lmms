@@ -336,8 +336,6 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 				//Song::PlayMode::None is used when nothing is being played.
 				Engine::getSong()->getTimeline(Song::PlayMode::None).setTicks(timeAtCursor.getTicks());
 			}
-			m_timeline->setFrameOffset(0);
-			m_timeline->setJumped(true);
 			update();
 			break;
 

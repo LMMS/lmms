@@ -56,7 +56,7 @@ SampleClip::SampleClip(Track* _track, Sample sample, bool isPlaying)
 	connect( Engine::getSong(), SIGNAL(playbackStateChanged()),
 			this, SLOT(playbackPositionChanged()), Qt::DirectConnection );
 	//care about loops and jumps
-	connect( Engine::getSong(), SIGNAL(updateSampleTracks()),
+	connect( Engine::getSong(), SIGNAL(playbackPositionJumped()),
 			this, SLOT(playbackPositionChanged()), Qt::DirectConnection );
 	//care about mute Clips
 	connect( this, SIGNAL(dataChanged()), this, SLOT(playbackPositionChanged()));
@@ -94,7 +94,7 @@ SampleClip::SampleClip(const SampleClip& orig) :
 	connect( Engine::getSong(), SIGNAL(playbackStateChanged()),
 			this, SLOT(playbackPositionChanged()), Qt::DirectConnection );
 	//care about loops and jumps
-	connect( Engine::getSong(), SIGNAL(updateSampleTracks()),
+	connect( Engine::getSong(), SIGNAL(playbackPositionJumped()),
 			this, SLOT(playbackPositionChanged()), Qt::DirectConnection );
 	//care about mute Clips
 	connect( this, SIGNAL(dataChanged()), this, SLOT(playbackPositionChanged()));

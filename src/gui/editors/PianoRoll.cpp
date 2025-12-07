@@ -881,8 +881,8 @@ void PianoRoll::setCurrentMidiClip( MidiClip* newMidiClip )
 	}
 
 	// Make sure the playhead position isn't out of the clip bounds.
-	Engine::getSong()->getTimeline(Song::PlayMode::MidiClip).setTicks(std::clamp(
-		Engine::getSong()->getPlayPos(Song::PlayMode::MidiClip).getTicks(),
+	m_timeLine->model()->setTicks(std::clamp(
+		m_timeLine->model()->getTicks(),
 		std::max(0, -m_midiClip->startTimeOffset()),
 		m_midiClip->length() - m_midiClip->startTimeOffset()
 	));
@@ -4692,7 +4692,7 @@ void PianoRoll::updatePositionAccompany()
 		}
 		if( (int) pos > 0 )
 		{
-			s->getTimeline(Song::PlayMode::MidiClip).setTicks(pos);
+			m_timeLine->model()->setTicks(pos);
 			autoScroll( pos );
 		}
 	}

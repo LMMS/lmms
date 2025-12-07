@@ -117,6 +117,15 @@ Song::Song() :
 
 	for (auto& scale : m_scales) {scale = std::make_shared<Scale>();}
 	for (auto& keymap : m_keymaps) {keymap = std::make_shared<Keymap>();}
+
+	// Aggregate the `positionJumped` signals from all the timelines into a single `playbackPositionJumped` signal for other objects to use.
+	for (auto& timeline : m_timelines)
+	{
+		connect(&timeline, &Timeline::positionJumped, this, &Song::playbackPositionJumped);
+	}
+
+	// Inform VST plugins and sample tracks if the user moved the play head
+	connect(this, &Song::playbackPositionJumped, [this](){ m_vstSyncController.setPlaybackJumped(true); });
 }
 
 
@@ -190,8 +199,6 @@ void Song::savePlayStartPosition()
 
 void Song::processNextBuffer()
 {
-	m_vstSyncController.setPlaybackJumped(false);
-
 	// If nothing is playing, there is nothing to do
 	if (!m_playing) { return; }
 
@@ -239,8 +246,6 @@ void Song::processNextBuffer()
 		if (getPlayPos() < begin || getPlayPos() >= end)
 		{
 			getTimeline().setTicks(begin.getTicks());
-			m_vstSyncController.setPlaybackJumped(true);
-			emit updateSampleTracks();
 			return true;
 		}
 		return false;
@@ -251,14 +256,6 @@ void Song::processNextBuffer()
 
 	// Ensure playback begins within the loop if it is enabled
 	if (loopEnabled) { enforceLoop(timeline.loopBegin(), timeline.loopEnd()); }
-
-	// Inform VST plugins and sample tracks if the user moved the play head
-	if (timeline.getJumped())
-	{
-		m_vstSyncController.setPlaybackJumped(true);
-		emit updateSampleTracks();
-		getTimeline().setJumped(false);
-	}
 
 	const auto framesPerTick = Engine::framesPerTick();
 	const auto framesPerPeriod = Engine::audioEngine()->framesPerPeriod();
@@ -274,8 +271,9 @@ void Song::processNextBuffer()
 		{
 			// Transfer any whole ticks from the frame count to the tick count
 			const auto elapsedTicks = static_cast<int>(frameOffsetInTick / framesPerTick);
-			getTimeline().setTicks(getPlayPos().getTicks() + elapsedTicks);
 			frameOffsetInTick -= elapsedTicks * framesPerTick;
+			// Passing false as the second argument prevents the timeline from sending `positionJumped` signals and resetting the frame offset.
+			getTimeline().setTicks(getPlayPos().getTicks() + elapsedTicks, false);
 			getTimeline().setFrameOffset(frameOffsetInTick);
 
 			// If we are playing a pattern track, or a MIDI clip with no loop enabled,
@@ -341,6 +339,9 @@ void Song::processNextBuffer()
 		frameOffsetInTick += framesToPlay;
 		getTimeline().setFrameOffset(frameOffsetInTick);
 	}
+
+	// Reset the jumped state after processing this buffer, since presumably it has now been handled.
+	m_vstSyncController.setPlaybackJumped(false);
 }
 
 
@@ -597,23 +598,6 @@ void Song::updateLength()
 
 
 
-void Song::setPlayPos( tick_t ticks, PlayMode playMode )
-{
-	getTimeline(playMode).setTicks(ticks);
-	getTimeline(playMode).setFrameOffset(0.0f);
-	getTimeline(playMode).setJumped(true);
-
-	// send a signal if playposition changes during playback
-	if( isPlaying() )
-	{
-		emit playbackPositionChanged();
-		emit updateSampleTracks();
-	}
-}
-
-
-
-
 void Song::togglePause()
 {
 	if( m_paused == true )
@@ -681,8 +665,6 @@ void Song::stop()
 	}
 
 	getTimeline(PlayMode::None).setTicks(getPlayPos().getTicks());
-
-	getTimeline().setFrameOffset(0);
 
 	m_vstSyncController.setPlaybackState( m_exporting );
 	m_vstSyncController.setAbsolutePosition(
