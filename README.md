@@ -1,4 +1,4 @@
-This repository is a fork of the LMMS DAW with a work in progress frequency domain (H(s) and H(f)) transfer function plugin.
+This repository is a fork of the LMMS DAW with additional Plugins. It was named H(s) as the original extra plugin was for the transfer function.
 
 To make it clear, LMMS was not created by myself, I have just created the fork with / for the plugins. The main fork of LMMS can be found at https://github.com/LMMS/lmms .
 
