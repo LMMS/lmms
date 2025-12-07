@@ -60,8 +60,9 @@ All files created / modified are stored within the Plugins/TransferFunction fold
 - Text Customisation with classic Amiga style Sine-Wave Scroller
 - Random Cycle Mode. Mode #31 automatically cycles through a random visualisation every 3 seconds
 - Scientific Tools including Phase Scope, Complex Plane, Data Stats and Oscilloscope
-- State Saving as current mode, text and wiggle settings are saved within the song file.
-- All rendering is done via QPainter for maximum compatibility across platforms. tested and stable.
-- All files created are stored within the Plugins/Visualiser folder.
+- State Saving as current mode, text and wiggle settings are saved within the song file
+- All rendering is done via QPainter for maximum compatibility across platforms. tested and stable
+- All files created are stored within the Plugins/Visualiser folder
+- Audio passthrough, use as an effect on channel, instrument or master
 
 
