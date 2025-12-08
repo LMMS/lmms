@@ -96,7 +96,7 @@ SongEditor::SongEditor( Song * song ) :
 {
 	// Set up timeline
 	m_timeLine = new TimeLineWidget(m_trackHeadWidth, 32, pixelsPerBar(),
-		&m_song->getTimeline(Song::PlayMode::Song),
+		m_song->getTimeline(Song::PlayMode::Song),
 		m_currentPosition, this
 	);
 	connect(this, &TrackContainerView::positionChanged, m_timeLine, qOverload<>(&QWidget::update));

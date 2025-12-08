@@ -80,7 +80,7 @@ public:
 		Disabled
 	};
 
-	TimeLineWidget(int xoff, int yoff, float ppb, Timeline* timeline,
+	TimeLineWidget(int xoff, int yoff, float ppb, Timeline& timeline,
 				const TimePos& begin, QWidget* parent);
 	~TimeLineWidget() override;
 
