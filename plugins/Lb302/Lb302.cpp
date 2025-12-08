@@ -32,6 +32,7 @@
 
 #include <cmath>
 #include <numbers>
+
 #include <QDebug>
 
 #include "AutomatableButton.h"
@@ -55,22 +56,12 @@
 	#include <immintrin.h>
 	#define busy_wait_hint() _mm_pause()
 #elif defined(__aarch64__) // arm64
-	#ifndef __ARM_ACLE
-		#warning __aarch64__ is defined, but __ARM_ACLE is not! Busy-wait hints will not work as intended.
-		#define busy_wait_hint()
-	#else
-		#include <arm_acle.h>
-		// See https://github.com/rust-lang/rust/commit/c064b6560b7ce0adeb9bbf5d7dcf12b1acb0c807
-		#define busy_wait_hint() __isb(15)
-	#endif
+	#include <arm_acle.h>
+	// See https://github.com/rust-lang/rust/commit/c064b6560b7ce0adeb9bbf5d7dcf12b1acb0c807
+	#define busy_wait_hint() __isb(15)
 #elif defined(__arm__) // arm32
-	#ifndef __ARM_ACLE
-		#warning __arm__ is defined, but __ARM_ACLE is not! Busy-wait hints will not work as intended.
-		#define busy_wait_hint()
-	#else
-		#include <arm_acle.h>
-		#define busy_wait_hint() __yield()
-	#endif
+	#include <arm_acle.h>
+	#define busy_wait_hint() __yield()
 #elif defined(_M_ARM64) // arm64 msvc
 	#include <intrin.h>
 	// See https://github.com/rust-lang/rust/commit/c064b6560b7ce0adeb9bbf5d7dcf12b1acb0c807

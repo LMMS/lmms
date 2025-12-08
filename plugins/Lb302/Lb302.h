@@ -32,7 +32,9 @@
 #define LB302_H
 
 #include <array>
+#include <atomic>
 #include <memory>
+#include <new>
 
 #include <QMutex>
 
