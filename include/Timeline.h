@@ -45,7 +45,7 @@ public:
 		KeepPosition
 	};
 
-	auto getPlayPos() const -> const TimePos& { return m_pos; }
+	auto pos() const -> const TimePos& { return m_pos; }
 
 	void setPlayPos(TimePos pos)
 	{
@@ -56,7 +56,7 @@ public:
 		emit positionJumped();
 	}
 
-	auto getTicks() const -> tick_t { return m_pos.getTicks(); }
+	auto ticks() const -> tick_t { return m_pos.getTicks(); }
 
 	// By default, calling `setTicks` will emit `positionJumped` signals to update everything accordingly
 	// However, passing `jumped = false` will instead treat the change in ticks as a continuous increment
@@ -78,7 +78,7 @@ public:
 		emit positionChanged();
 	}
 
-	auto getFrameOffset() const -> f_cnt_t { return m_frameOffset; }
+	auto frameOffset() const -> f_cnt_t { return m_frameOffset; }
 	void setFrameOffset(const f_cnt_t frame) { m_frameOffset = frame; }
 
 	auto loopBegin() const -> TimePos { return m_loopBegin; }
@@ -96,7 +96,7 @@ public:
 	void setPlayStartPosition(TimePos position) { m_playStartPosition = position; }
 	void setStopBehaviour(StopBehaviour behaviour);
 
-	auto getElapsedSeconds() const -> double { return m_elapsedSeconds + getFrameOffset() / Engine::audioEngine()->outputSampleRate(); }
+	auto getElapsedSeconds() const -> double { return m_elapsedSeconds + frameOffset() / Engine::audioEngine()->outputSampleRate(); }
 
 	auto nodeName() const -> QString override { return "timeline"; }
 

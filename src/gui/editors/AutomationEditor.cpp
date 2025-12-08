@@ -268,12 +268,12 @@ void AutomationEditor::keyPressEvent(QKeyEvent * ke )
 			break;
 
 		case Qt::Key_Left:
-			m_timeLine->model()->setTicks(std::max(0, m_timeLine->model()->getTicks() - 16));
+			m_timeLine->model()->setTicks(std::max(0, m_timeLine->model()->ticks() - 16));
 			ke->accept();
 			break;
 
 		case Qt::Key_Right:
-			m_timeLine->model()->setTicks(m_timeLine->model()->getTicks() + 16);
+			m_timeLine->model()->setTicks(m_timeLine->model()->ticks() + 16);
 			ke->accept();
 			break;
 
@@ -1829,7 +1829,7 @@ void AutomationEditor::setTension()
 
 void AutomationEditor::updatePosition()
 {
-	const TimePos& t = m_timeLine->model()->getPlayPos();
+	const TimePos& t = m_timeLine->model()->pos();
 	if( ( Engine::getSong()->isPlaying() &&
 			Engine::getSong()->playMode() ==
 					Song::PlayMode::AutomationClip ) ||

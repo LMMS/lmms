@@ -265,7 +265,7 @@ void Song::processNextBuffer()
 
 	while (frameOffsetInPeriod < framesPerPeriod)
 	{
-		auto frameOffsetInTick = timeline.getFrameOffset();
+		auto frameOffsetInTick = timeline.frameOffset();
 
 		// If a whole tick has elapsed, update the frame and tick count, and check any loops
 		if (frameOffsetInTick >= framesPerTick)
@@ -319,7 +319,7 @@ void Song::processNextBuffer()
 			// This must be done after we've corrected the frame/tick count,
 			// but before actually playing any frames.
 			m_vstSyncController.setAbsolutePosition(getPlayPos().getTicks()
-				+ timeline.getFrameOffset() / static_cast<double>(framesPerTick));
+				+ timeline.frameOffset() / static_cast<double>(framesPerTick));
 			m_vstSyncController.update();
 		}
 
@@ -670,7 +670,7 @@ void Song::stop()
 	m_vstSyncController.setPlaybackState( m_exporting );
 	m_vstSyncController.setAbsolutePosition(
 		getPlayPos().getTicks()
-		+ timeline.getFrameOffset()
+		+ timeline.frameOffset()
 		/ (double) Engine::framesPerTick() );
 
 	// remove all note-play-handles that are active

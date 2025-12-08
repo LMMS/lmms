@@ -69,21 +69,21 @@ private slots:
 		// By default, setting the ticks is treated as a forceful jump
 		resetReceived();
 		timeline.setTicks(10);
-		QCOMPARE(timeline.getTicks(), 10);
+		QCOMPARE(timeline.ticks(), 10);
 		QVERIFY(positionChangedReceived);
 		QVERIFY(positionJumpedReceived);
 
 		// And likewise using setPlayPos
 		resetReceived();
 		timeline.setPlayPos(TimePos(10));
-		QCOMPARE(timeline.getTicks(), 10);
+		QCOMPARE(timeline.ticks(), 10);
 		QVERIFY(positionChangedReceived);
 		QVERIFY(positionJumpedReceived);
 
 		// However, passing false will be treated as a simple delta to the current tick value, and will not emit positionJumped.
 		resetReceived();
 		timeline.setTicks(10, false);
-		QCOMPARE(timeline.getTicks(), 10);
+		QCOMPARE(timeline.ticks(), 10);
 		QVERIFY(positionChangedReceived);
 		QVERIFY(!positionJumpedReceived);
 	}

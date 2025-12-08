@@ -206,7 +206,7 @@ public:
 
 	const TimePos& getPlayPos(PlayMode pm) const
 	{
-		return getTimeline(pm).getPlayPos();
+		return getTimeline(pm).pos();
 	}
 	const TimePos& getPlayPos() const
 	{
@@ -381,7 +381,7 @@ private:
 
 	inline f_cnt_t currentFrame() const
 	{
-		return getTimeline(m_playMode).getTicks() * Engine::framesPerTick() + getTimeline(m_playMode).getFrameOffset();
+		return getTimeline(m_playMode).ticks() * Engine::framesPerTick() + getTimeline(m_playMode).frameOffset();
 	}
 
 	void saveControllerStates( QDomDocument & doc, QDomElement & element );
