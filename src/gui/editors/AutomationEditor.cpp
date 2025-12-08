@@ -1644,7 +1644,7 @@ void AutomationEditor::wheelEvent(QWheelEvent * we )
 		}
 		x = qBound( 0, x, m_zoomingXModel.size() - 1 );
 
-		int mouseX = (position( we ).x() - VALUES_WIDTH)* TimePos::ticksPerBar();
+		int mouseX = (we->position().toPoint().x() - VALUES_WIDTH) * TimePos::ticksPerBar();
 		// ticks based on the mouse x-position where the scroll wheel was used
 		int ticks = mouseX / m_ppb;
 		// what would be the ticks in the new zoom level on the very same mouse x

@@ -150,6 +150,8 @@ private:
 	bool m_openLastProject;
 	QString m_loopMarkerMode;
 	QComboBox* m_loopMarkerComboBox;
+	QString m_autoScroll;
+	QComboBox* m_autoScrollComboBox;
 	QString m_lang;
 	QStringList m_languages;
 

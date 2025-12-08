@@ -148,13 +148,7 @@ void ProjectNotes::setupActions()
 	QFontDatabase db;
 	m_comboFont->addItems( db.families() );
 
-	connect(m_comboFont,
-#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
-		QOverload<const QString&>::of(&QComboBox::activated),
-#else
-		&QComboBox::textActivated,
-#endif
-		m_edit, &QTextEdit::setFontFamily);
+	connect(m_comboFont, &QComboBox::textActivated, m_edit, &QTextEdit::setFontFamily);
 
 	m_comboFont->lineEdit()->setText( QApplication::font().family() );
 
@@ -167,13 +161,7 @@ void ProjectNotes::setupActions()
 		m_comboSize->addItem( QString::number( *it ) );
 	}
 
-	connect(m_comboSize,
-#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
-		QOverload<const QString&>::of(&QComboBox::activated),
-#else
-		&QComboBox::textActivated,
-#endif
-		this, &ProjectNotes::textSize);
+	connect(m_comboSize, &QComboBox::textActivated, this, &ProjectNotes::textSize);
 
 	m_comboSize->lineEdit()->setText( QString::number(
 					QApplication::font().pointSize() ) );

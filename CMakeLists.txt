@@ -185,7 +185,7 @@ if(WANT_QT6)
 	set(STATUS_QT6 "Enabled")
 else()
 	set(QT_VERSION_MAJOR 5)
-	set(LMMS_QT_MIN_VERSION 5.9.0)
+	set(LMMS_QT_MIN_VERSION 5.15.0)
 	set(STATUS_QT6 "Disabled")
 endif()
 
