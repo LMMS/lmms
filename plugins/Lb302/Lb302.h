@@ -34,9 +34,9 @@
 #include <array>
 #include <atomic>
 #include <memory>
-#include <new>
 
 #include <QMutex>
+#include <new>
 
 #include "Instrument.h"
 #include "InstrumentView.h"
@@ -45,6 +45,15 @@
 namespace lmms
 {
 
+// TODO: Use std::hardware_destructive_interference_size directly once our compilers are updated enough
+// GCC 12.1+, Clang 19+, MSVC 2017 15.3
+#if __cpp_lib_hardware_interference_size >= 201703L
+inline constexpr std::size_t CACHELINE = std::hardware_destructive_interference_size;
+#elif defined(__aarch64__) || defined(_M_ARM64) // 64-bit ARM
+inline constexpr std::size_t CACHELINE = 256;
+#else // x86_64
+inline constexpr std::size_t CACHELINE = 64;
+#endif
 
 namespace DspEffectLibrary
 {
@@ -242,13 +251,13 @@ private:
 	std::array<NotePlayHandle*, MaxPendingNotes> m_notes {};
 
 	// TODO: Documentation
-	alignas(std::hardware_destructive_interference_size) std::atomic_size_t m_notesReadIdx {0};
+	alignas(CACHELINE) std::atomic_size_t m_notesReadIdx {0};
 
 	// TODO: Documentation
-	alignas(std::hardware_destructive_interference_size) std::atomic_size_t m_notesWriteCommitted {0};
+	alignas(CACHELINE) std::atomic_size_t m_notesWriteCommitted {0};
 
 	// TODO: Documentation
-	alignas(std::hardware_destructive_interference_size) std::atomic_size_t m_notesWriteClaimed {0};
+	alignas(CACHELINE) std::atomic_size_t m_notesWriteClaimed {0};
 };
 
 
