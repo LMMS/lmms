@@ -72,6 +72,8 @@ struct Star {
 
 // ================================================================
 
+
+
 class VisualiserEffectControls : public lmms::EffectControls
 
 {
@@ -182,6 +184,8 @@ private:
 
 // ================================================================
 
+
+
 class VisualiserControlDialog : public lmms::gui::EffectControlDialog
 
 {
@@ -208,7 +212,7 @@ private slots:
 
     void onResChanged(int index); 
 
-    void onBandChanged(int index); // NEW SLOT
+    void onBandChanged(int index);
 
     void onTextChanged(const QString &text);
 
@@ -230,8 +234,9 @@ private:
 
     QComboBox                *m_resCombo;
 
-    QComboBox                *m_bandCombo; // NEW DROPDOWN
+    QComboBox                *m_bandCombo;
 
     QLineEdit                *m_textBox;
 
 };
+
