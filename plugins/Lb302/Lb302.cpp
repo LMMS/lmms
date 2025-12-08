@@ -577,11 +577,6 @@ void Lb302Synth::playNote(NotePlayHandle* nph, SampleFrame*)
 {
 	if (nph->isMasterNote() || (nph->hasParent() && nph->isReleased())) { return; }
 
-	// // sort notes: new notes to the end
-	// m_notesMutex.lock();
-	// if (nph->totalFramesPlayed() == 0) { m_notes.append(nph); } else { m_notes.prepend(nph); }
-	// m_notesMutex.unlock();
-
 	// Send note through atomic ring buffer
 	constexpr auto MaxTries = MaxPendingNotes * 4; // Give up and drop the note if performance is already catastrophic
 	auto tries = MaxTries;
@@ -647,13 +642,22 @@ void Lb302Synth::processNote(NotePlayHandle* nph)
 void Lb302Synth::play(SampleFrame* working_buffer)
 {
 	// Process all pending notes in the ringbuffer
-	const auto readIdx = m_notesReadIdx.load(std::memory_order_relaxed);
-	const auto notesCount = m_notesWriteCommitted.load(std::memory_order_acquire) - readIdx;
-	// TODO: This does not preserve the old behavior of processing notes with totalFramesPlayed() == 0 first.
-	// Some sort of in-place sort would be preferable to avoid a memcpy, but there may be two separate contiguous
-	// parts of the ringbuffer ready for reading if it wraps around the end of the ringbuffer.
-	for (size_t i = 0; i < notesCount; ++i) { processNote(m_notes[(readIdx + i) & NotesBufMask]); }
-	m_notesReadIdx.fetch_add(notesCount, std::memory_order_release);
+	for (;;)
+	{
+		const auto readIdx = m_notesReadIdx.load(std::memory_order_relaxed);
+		const auto writeCommitted = m_notesWriteCommitted.load(std::memory_order_acquire);
+		const auto notesCount = writeCommitted - readIdx;
+		if (!notesCount)
+		{
+			const auto writeClaimed = m_notesWriteClaimed.load(std::memory_order_relaxed);
+			if (writeClaimed == writeCommitted) { break; } // No in-progress notes
+		}
+		// TODO: This does not preserve the old behavior of processing notes with totalFramesPlayed() == 0 last.
+		// Some sort of in-place sort would be preferable to avoid a memcpy, but there may be two separate contiguous
+		// parts of the ringbuffer ready for reading if it wraps around the end of the ringbuffer.
+		for (size_t i = 0; i < notesCount; ++i) { processNote(m_notes[(readIdx + i) & NotesBufMask]); }
+		m_notesReadIdx.fetch_add(notesCount, std::memory_order_release);
+	}
 
 	process(working_buffer, Engine::audioEngine()->framesPerPeriod());
 }
