@@ -209,7 +209,7 @@ private:
 	std::array<std::unique_ptr<Lb302Filter>, 2> vcfs;
 	inline Lb302Filter& vcf() { return *vcfs[db24Toggle.value()]; } // Helper to get current vcf
 	f_cnt_t vcf_envpos = ENVINC; // Update counter. Updates when >= ENVINC
-	f_cnt_t release_frame;
+	std::atomic<f_cnt_t> release_frame;
 
 	// Envelope State
 	float vca_a = 0.f; // Amplifier coefficient.
@@ -223,8 +223,30 @@ private:
 	float true_freq;
 
 	NotePlayHandle* m_playingNote;
-	NotePlayHandleList m_notes;
-	QMutex m_notesMutex;
+
+	//! @brief The maximum number of note events Lb302 can process per audio buffer.
+	//! This value was arbitrarily chosen based off of stress tests with LMMS's
+	//! buffer size set to its maximum value (4096 samples). It may be adjusted
+	//! as needed, but it must always be a power of 2.
+	static constexpr size_t MaxPendingNotes = 128;
+	static_assert(std::has_single_bit(MaxPendingNotes)); // MaxPendingNotes MUST be a power of 2
+
+	//! @brief Bitmask used to wrap arbitrary indicies within the bounds of the pending notes ring buffer.
+	static constexpr size_t NotesBufMask = MaxPendingNotes - 1;
+
+	//! @brief Multiple-producer single-consumer realtime-safe ring buffer for note events.
+	//! This is used to implement monophony, since multiple LMMS threads
+	//! can independently send an instance of Lb302 note events.
+	std::array<NotePlayHandle*, MaxPendingNotes> m_notes {};
+
+	// TODO: Documentation
+	alignas(std::hardware_destructive_interference_size) std::atomic_size_t m_notesReadIdx {0};
+
+	// TODO: Documentation
+	alignas(std::hardware_destructive_interference_size) std::atomic_size_t m_notesWriteCommitted {0};
+
+	// TODO: Documentation
+	alignas(std::hardware_destructive_interference_size) std::atomic_size_t m_notesWriteClaimed {0};
 };
 
 
