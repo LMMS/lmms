@@ -32,6 +32,7 @@
 
 #include <cmath>
 #include <numbers>
+#include <QDebug>
 
 #include "AutomatableButton.h"
 #include "BandLimitedWave.h"
@@ -49,6 +50,40 @@
 
 #define LB_24_IGNORE_ENVELOPE
 //#define LB_24_RES_TRICK
+
+#if defined(__x86_64__) || defined(_M_AMD64) || defined(__i386__) || defined(_M_IX86)
+	#include <immintrin.h>
+	#define busy_wait_hint() _mm_pause()
+#elif defined(__aarch64__) // arm64
+	#ifndef __ARM_ACLE
+		#warning __aarch64__ is defined, but __ARM_ACLE is not! Busy-wait hints will not work as intended.
+		#define busy_wait_hint()
+	#else
+		#include <arm_acle.h>
+		// See https://github.com/rust-lang/rust/commit/c064b6560b7ce0adeb9bbf5d7dcf12b1acb0c807
+		#define busy_wait_hint() __isb(15)
+	#endif
+#elif defined(__arm__) // arm32
+	#ifndef __ARM_ACLE
+		#warning __arm__ is defined, but __ARM_ACLE is not! Busy-wait hints will not work as intended.
+		#define busy_wait_hint()
+	#else
+		#include <arm_acle.h>
+		#define busy_wait_hint() __yield()
+	#endif
+#elif defined(_M_ARM64) // arm64 msvc
+	#include <intrin.h>
+	// See https://github.com/rust-lang/rust/commit/c064b6560b7ce0adeb9bbf5d7dcf12b1acb0c807
+	#define busy_wait_hint() __isb(15)
+#elif defined(_M_ARM) // arm32 msvc
+	#include <intrin.h>
+	#define busy_wait_hint() __yield()
+#else
+	// GCC for ARM lacks these intrinsics at the moment.
+	// See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=105416
+	#error No busy-wait architecture intrinsic available!
+	// TODO: Add riscv32, riscv64
+#endif
 
 namespace
 {
@@ -333,7 +368,7 @@ void Lb302Synth::process(SampleFrame* outbuf, const fpp_t size)
 	const float sampleRatio = 44100.f / Engine::audioEngine()->outputSampleRate();
 	Lb302Filter& filter = vcf(); // Hold on to the current VCF, and use it throughout this period
 
-	if (release_frame == 0 || !m_playingNote) { vca_mode = VcaMode::Decay; }
+	if (release_frame.load(std::memory_order_relaxed) == 0 || !m_playingNote) { vca_mode = VcaMode::Decay; }
 	if (new_freq)
 	{
 		initNote(phaseInc(true_freq), deadToggle.value());
@@ -364,7 +399,7 @@ void Lb302Synth::process(SampleFrame* outbuf, const fpp_t size)
 	for (f_cnt_t i = 0; i < size; ++i)
 	{
 		// start decay if we're past release
-		if (i >= release_frame) { vca_mode = VcaMode::Decay; }
+		if (i >= release_frame.load(std::memory_order_relaxed)) { vca_mode = VcaMode::Decay; }
 
 		// update vcf
 		if (vcf_envpos >= ENVINC)
@@ -552,12 +587,42 @@ void Lb302Synth::playNote(NotePlayHandle* nph, SampleFrame*)
 {
 	if (nph->isMasterNote() || (nph->hasParent() && nph->isReleased())) { return; }
 
-	// sort notes: new notes to the end
-	m_notesMutex.lock();
-	if (nph->totalFramesPlayed() == 0) { m_notes.append(nph); } else { m_notes.prepend(nph); }
-	m_notesMutex.unlock();
+	// // sort notes: new notes to the end
+	// m_notesMutex.lock();
+	// if (nph->totalFramesPlayed() == 0) { m_notes.append(nph); } else { m_notes.prepend(nph); }
+	// m_notesMutex.unlock();
 
-	release_frame = std::max(release_frame, nph->framesLeft() + nph->offset());
+	// Send note through atomic ring buffer
+	constexpr auto MaxTries = MaxPendingNotes * 4; // Give up and drop the note if performance is already catastrophic
+	auto tries = MaxTries;
+	size_t index, next_index;
+	size_t write_claimed_expected = m_notesWriteClaimed.load(std::memory_order_relaxed);
+	do
+	{
+		if (!tries--)
+		{
+			qDebug() << "Lb302: Unable to enqueue note after " << MaxTries << " attempts!";
+			return;
+		}
+		const ptrdiff_t occupied = write_claimed_expected - m_notesReadIdx.load(std::memory_order_acquire);
+		assert(occupied >= 0);
+		if (static_cast<size_t>(occupied) >= MaxPendingNotes) { return; } // No space remaining
+		index = write_claimed_expected; next_index = write_claimed_expected + 1;
+	}
+	while (!m_notesWriteClaimed.compare_exchange_strong(write_claimed_expected, next_index, std::memory_order_acquire));
+
+	m_notes[index & NotesBufMask] = nph;
+	release_frame.store(
+		std::max(release_frame.load(std::memory_order_acquire), nph->framesLeft() + nph->offset()),
+		std::memory_order_release
+	);
+
+	size_t write_committed_expected = index;
+	while (!m_notesWriteCommitted.compare_exchange_strong(write_committed_expected, next_index, std::memory_order_release))
+	{
+		write_committed_expected = index; // Reset this as the CAS will have changed it
+		busy_wait_hint();
+	}
 }
 
 
@@ -572,7 +637,7 @@ void Lb302Synth::processNote(NotePlayHandle* nph)
 		nph->m_pluginData = this;
 	}
 	
-	if (!m_playingNote && !nph->isReleased() && release_frame > 0)
+	if (!m_playingNote && !nph->isReleased() && release_frame.load(std::memory_order_relaxed) > 0)
 	{
 		m_playingNote = nph;
 		if (slideToggle.value()) { vco_slideinc = phaseInc(nph->frequency()); }
@@ -591,9 +656,14 @@ void Lb302Synth::processNote(NotePlayHandle* nph)
 
 void Lb302Synth::play(SampleFrame* working_buffer)
 {
-	m_notesMutex.lock();
-	while (!m_notes.isEmpty()) { processNote(m_notes.takeFirst()); };
-	m_notesMutex.unlock();
+	// Process all pending notes in the ringbuffer
+	const auto readIdx = m_notesReadIdx.load(std::memory_order_relaxed);
+	const auto notesCount = m_notesWriteCommitted.load(std::memory_order_acquire) - readIdx;
+	// TODO: This does not preserve the old behavior of processing notes with totalFramesPlayed() == 0 first.
+	// Some sort of in-place sort would be preferable to avoid a memcpy, but there may be two separate contiguous
+	// parts of the ringbuffer ready for reading if it wraps around the end of the ringbuffer.
+	for (size_t i = 0; i < notesCount; ++i) { processNote(m_notes[(readIdx + i) & NotesBufMask]); }
+	m_notesReadIdx.fetch_add(notesCount, std::memory_order_release);
 
 	process(working_buffer, Engine::audioEngine()->framesPerPeriod());
 }
