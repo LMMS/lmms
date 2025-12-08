@@ -284,7 +284,7 @@ PianoRoll::PianoRoll() :
 	// white position line follows timeline marker
 	m_positionLine = new PositionLine(this, Song::PlayMode::MidiClip);
 
-	connect(Engine::getSong(), SIGNAL(playbackStateChanged()), m_positionLine, SLOT(update()));
+	connect(Engine::getSong(), &Song::playbackStateChanged, m_positionLine, qOverload<>(&QWidget::update));
 
 	//update timeline when in step-recording mode
 	connect( &m_stepRecorderWidget, SIGNAL( positionChanged( const lmms::TimePos& ) ),
