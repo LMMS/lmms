@@ -34,7 +34,9 @@
 #include <array>
 #include <atomic>
 #include <memory>
+#if __cpp_lib_hardware_interference_size >= 201703L
 #include <new>
+#endif
 
 #include "Instrument.h"
 #include "InstrumentView.h"
@@ -248,13 +250,13 @@ private:
 	//! can independently send an instance of Lb302 note events.
 	std::array<NotePlayHandle*, MaxPendingNotes> m_notes {};
 
-	// TODO: Documentation
+	// TODO: Documentation (index incremented as notes are dequeued)
 	alignas(CACHELINE) std::atomic_size_t m_notesReadIdx {0};
 
-	// TODO: Documentation
+	// TODO: Documentation (index incremented as notes finish getting enqueued)
 	alignas(CACHELINE) std::atomic_size_t m_notesWriteCommitted {0};
 
-	// TODO: Documentation
+	// TODO: Documentation (index incremented as notes begin getting enqueued)
 	alignas(CACHELINE) std::atomic_size_t m_notesWriteClaimed {0};
 };
 

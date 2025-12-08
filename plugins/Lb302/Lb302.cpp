@@ -64,6 +64,7 @@
 	#elif defined(__GNUG__)
 		// GCC for ARM lacks these intrinsics at the moment.
 		// See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=105416
+		// TODO: Remove inline asm once GCC properly provides __ARM_ACLE
 		#define busy_wait_hint() asm volatile ("isb 15" ::: "memory")
 	#endif
 #elif defined(_M_ARM64) // arm64 msvc
@@ -577,21 +578,29 @@ void Lb302Synth::playNote(NotePlayHandle* nph, SampleFrame*)
 {
 	if (nph->isMasterNote() || (nph->hasParent() && nph->isReleased())) { return; }
 
-	// Send note through atomic ring buffer
-	constexpr auto MaxTries = MaxPendingNotes * 4; // Give up and drop the note if performance is already catastrophic
+	constexpr auto MaxTries = MaxPendingNotes; // Give up and drop the note if performance is already catastrophic
 	auto tries = MaxTries;
+	auto write_claimed_expected = m_notesWriteClaimed.load(std::memory_order_relaxed);
 	size_t index, next_index;
-	size_t write_claimed_expected = m_notesWriteClaimed.load(std::memory_order_relaxed);
 	do
 	{
+		retry_send_note:
 		if (!tries--)
 		{
-			qDebug() << "Lb302: Unable to enqueue note after " << MaxTries << " attempts!";
+			qDebug() << "Lb302: Unable to enqueue note after" << MaxTries << "attempts! Note dropped.";
 			return;
 		}
 		const ptrdiff_t occupied = write_claimed_expected - m_notesReadIdx.load(std::memory_order_acquire);
 		assert(occupied >= 0);
-		if (static_cast<size_t>(occupied) >= MaxPendingNotes) { return; } // No space remaining
+		// If full, wait for room
+		if (static_cast<size_t>(occupied) >= MaxPendingNotes)
+		{
+			busy_wait_hint();
+			// goto rather than continue since we do not want to evaluate the compare_exchange_strong().
+			// However, the CAS is what normally updates write_claimed_expected, so load it manually
+			write_claimed_expected = m_notesWriteClaimed.load(std::memory_order_relaxed);
+			goto retry_send_note;
+		}
 		index = write_claimed_expected; next_index = write_claimed_expected + 1;
 	}
 	while (!m_notesWriteClaimed.compare_exchange_strong(write_claimed_expected, next_index, std::memory_order_acquire));
@@ -641,23 +650,23 @@ void Lb302Synth::processNote(NotePlayHandle* nph)
 
 void Lb302Synth::play(SampleFrame* working_buffer)
 {
-	// Process all pending notes in the ringbuffer
-	for (;;)
+	const auto readIdx = m_notesReadIdx.load(std::memory_order_relaxed);
+	const auto writeCommitted = m_notesWriteCommitted.load(std::memory_order_acquire);
+	// Process notes, but process new notes last
+	for (size_t i = readIdx; i < writeCommitted; ++i)
 	{
-		const auto readIdx = m_notesReadIdx.load(std::memory_order_relaxed);
-		const auto writeCommitted = m_notesWriteCommitted.load(std::memory_order_acquire);
-		const auto notesCount = writeCommitted - readIdx;
-		if (!notesCount)
-		{
-			const auto writeClaimed = m_notesWriteClaimed.load(std::memory_order_relaxed);
-			if (writeClaimed == writeCommitted) { break; } // No in-progress notes
-		}
-		// TODO: This does not preserve the old behavior of processing notes with totalFramesPlayed() == 0 last.
-		// Some sort of in-place sort would be preferable to avoid a memcpy, but there may be two separate contiguous
-		// parts of the ringbuffer ready for reading if it wraps around the end of the ringbuffer.
-		for (size_t i = 0; i < notesCount; ++i) { processNote(m_notes[(readIdx + i) & NotesBufMask]); }
-		m_notesReadIdx.fetch_add(notesCount, std::memory_order_release);
+		const auto& nph = m_notes[i & NotesBufMask];
+		if (nph->totalFramesPlayed() == 0) { continue; }
+		processNote(nph);
 	}
+	for (size_t i = readIdx; i < writeCommitted; ++i)
+	{
+		const auto& nph = m_notes[i & NotesBufMask];
+		if (nph->totalFramesPlayed() != 0) { continue; }
+		processNote(nph);
+	}
+	// Mark the processed notes as having been read so that playNote() calls can overwrite them
+	m_notesReadIdx.fetch_add(writeCommitted - readIdx, std::memory_order_release);
 
 	process(working_buffer, Engine::audioEngine()->framesPerPeriod());
 }
