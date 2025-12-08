@@ -268,14 +268,7 @@ void AutomationEditor::keyPressEvent(QKeyEvent * ke )
 			break;
 
 		case Qt::Key_Left:
-			if(m_timeLine->model()->getTicks() - 16 > 0)
-			{
-				m_timeLine->model()->setTicks(m_timeLine->model()->getTicks() - 16);
-			}
-			else
-			{
-				m_timeLine->model()->setTicks(0);
-			}
+			m_timeLine->model()->setTicks(std::max(0, m_timeLine->model()->getTicks() - 16));
 			ke->accept();
 			break;
 
