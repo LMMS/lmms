@@ -664,10 +664,6 @@ public:
 
         case 43: drawEuroGalaxyTunnel(p, w, h);  break;
 
-        
-
-        // SEVERED HEADS TRIBUTE MODES (RENAMED)
-
         case 44: drawAnalogVideoFeedback(p, w, h);   break;
 
         case 45: drawRetroCheckerboard(p, w, h);     break;
@@ -3052,13 +3048,6 @@ private:
 
     }
 
-
-
-    // ============================================================
-
-    // NEW: SEVERED HEADS TRIBUTE MODES
-
-    // ============================================================
 
 
 
