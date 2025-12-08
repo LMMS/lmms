@@ -578,8 +578,7 @@ void Lb302Synth::playNote(NotePlayHandle* nph, SampleFrame*)
 {
 	if (nph->isMasterNote() || (nph->hasParent() && nph->isReleased())) { return; }
 
-	constexpr auto MaxTries = MaxPendingNotes; // Give up and drop the note if performance is already catastrophic
-	auto tries = MaxTries;
+	auto tries = MaxNoteEnqueueRetries;
 	auto write_claimed_expected = m_notesWriteClaimed.load(std::memory_order_relaxed);
 	size_t index, next_index;
 	do
@@ -587,10 +586,10 @@ void Lb302Synth::playNote(NotePlayHandle* nph, SampleFrame*)
 		retry_send_note:
 		if (!tries--)
 		{
-			qDebug() << "Lb302: Unable to enqueue note after" << MaxTries << "attempts! Note dropped.";
+			qDebug() << "Lb302: Note dropped due to catastrophically poor performance! This should never happen!";
 			return;
 		}
-		const ptrdiff_t occupied = write_claimed_expected - m_notesReadIdx.load(std::memory_order_acquire);
+		const ptrdiff_t occupied = write_claimed_expected - m_notesReadSeq.load(std::memory_order_acquire);
 		assert(occupied >= 0);
 		// If full, wait for room
 		if (static_cast<size_t>(occupied) >= MaxPendingNotes)
@@ -650,7 +649,7 @@ void Lb302Synth::processNote(NotePlayHandle* nph)
 
 void Lb302Synth::play(SampleFrame* working_buffer)
 {
-	const auto readIdx = m_notesReadIdx.load(std::memory_order_relaxed);
+	const auto readIdx = m_notesReadSeq.load(std::memory_order_relaxed);
 	const auto writeCommitted = m_notesWriteCommitted.load(std::memory_order_acquire);
 	// Process notes, but process new notes last
 	for (size_t i = readIdx; i < writeCommitted; ++i)
@@ -666,7 +665,7 @@ void Lb302Synth::play(SampleFrame* working_buffer)
 		processNote(nph);
 	}
 	// Mark the processed notes as having been read so that playNote() calls can overwrite them
-	m_notesReadIdx.fetch_add(writeCommitted - readIdx, std::memory_order_release);
+	m_notesReadSeq.fetch_add(writeCommitted - readIdx, std::memory_order_release);
 
 	process(working_buffer, Engine::audioEngine()->framesPerPeriod());
 }

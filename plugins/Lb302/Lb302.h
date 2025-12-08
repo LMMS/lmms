@@ -45,6 +45,8 @@
 namespace lmms
 {
 
+//! @brief Platform-dependent minimum amount of padding between objects to prevent false cache sharing.
+// TODO: Should this live somewhere else? Pretty sure it's visible to the entire lmms namespace...
 // TODO: Use std::hardware_destructive_interference_size directly once our compilers are updated enough
 // GCC 12.1+, Clang 19+, MSVC 2017 15.3
 #if __cpp_lib_hardware_interference_size >= 201703L
@@ -97,7 +99,7 @@ protected:
 	float vcf_c0 = 0.f; // c0=e1 on retrigger; c0*=ed every sample; cutoff=e0+c0
 	float vcf_e0 = 0.f; // e0 and e1 for interpolation
 	float vcf_e1 = 0.f;
-	float vcf_rescoeff; // Resonance coefficient [0.30,9.54]
+	float vcf_rescoeff; //!< Resonance coefficient [0.30, 9.54]
 };
 
 
@@ -182,9 +184,9 @@ private:
 	enum class VcaMode { Attack, Decay, Idle, NeverPlayed };
 
 	static constexpr float DIST_RATIO = 4.f;
-	static constexpr fpp_t ENVINC = 64; //* Envelope Recalculation period
-	static constexpr float vca_attack = 1.f - 0.96406088f; // Amp attack
-	static constexpr float vca_a0 = 0.5f; // Initial amplifier coefficient
+	static constexpr fpp_t ENVINC = 64; //!< Envelope Recalculation period
+	static constexpr float vca_attack = 1.f - 0.96406088f; //!< Amp attack
+	static constexpr float vca_a0 = 0.5f; //!< Initial amplifier coefficient
 
 	FloatModel vcf_cut_knob;
 	FloatModel vcf_res_knob;
@@ -203,27 +205,31 @@ private:
 	BoolModel db24Toggle;
 
 	// Oscillator
-	float vco_inc = 0.f; // Sample increment for the frequency. Creates Sawtooth.
-	float vco_k = 0.f;   // Raw oscillator sample [-0.5,0.5]
-	float vco_c = 0.f;   // Raw oscillator sample [-0.5,0.5]
+	float vco_inc = 0.f; //!< Sample increment for the frequency. Creates Sawtooth.
+	float vco_k = 0.f;   //!< Raw oscillator sample [-0.5, 0.5]
+	float vco_c = 0.f;   //!< Raw oscillator sample [-0.5, 0.5]
 
-	float vco_slide = 0.f;     //* Current value of slide exponential curve. Nonzero=sliding
-	float vco_slideinc = 0.f;  //* Slide base to use in next node. Nonzero=slide next note
-	float vco_slidebase = 0.f; //* The base vco_inc while sliding.
+	float vco_slide = 0.f;     //!< Current value of slide exponential curve. Nonzero=sliding
+	float vco_slideinc = 0.f;  //!< Slide base to use in next node. Nonzero=slide next note
+	float vco_slidebase = 0.f; //!< The base @ref vco_inc while sliding.
 
 	VcoShape vco_shape = VcoShape::BLSawtooth;
 
 	// User settings
 	Lb302FilterKnobState fs = {};
 
-	// Filters (just keep both loaded and switch)
-	std::array<std::unique_ptr<Lb302Filter>, 2> vcfs;
-	inline Lb302Filter& vcf() { return *vcfs[db24Toggle.value()]; } // Helper to get current vcf
-	f_cnt_t vcf_envpos = ENVINC; // Update counter. Updates when >= ENVINC
+	std::array<std::unique_ptr<Lb302Filter>, 2> vcfs; //!< Filters (just keep both loaded and switch)
+
+	//! @brief Helper to get current vcf
+	//! @see vcfs
+	//! @see db24Toggle
+	inline Lb302Filter& vcf() { return *vcfs[db24Toggle.value()]; }
+
+	f_cnt_t vcf_envpos = ENVINC; //!< Update counter. Updates when >= @ref ENVINC
 	std::atomic<f_cnt_t> release_frame;
 
 	// Envelope State
-	float vca_a = 0.f; // Amplifier coefficient.
+	float vca_a = 0.f; //!< Amplifier coefficient.
 	VcaMode vca_mode = VcaMode::NeverPlayed;
 
 	// My hacks
@@ -236,27 +242,88 @@ private:
 	NotePlayHandle* m_playingNote;
 
 	//! @brief The maximum number of note events Lb302 can process per audio buffer.
+	//!
 	//! This value was arbitrarily chosen based off of stress tests with LMMS's
-	//! buffer size set to its maximum value (4096 samples). It may be adjusted
-	//! as needed, but it must always be a power of 2.
+	//! buffer size set to its maximum value (4096 samples) to maximize the
+	//! ratio of enqueue operations to dequeue operations per buffer. It may be
+	//! adjusted as needed, but it must always be a power of 2.
+	//!
+	//! @see m_notes
 	static constexpr size_t MaxPendingNotes = 128;
 	static_assert(std::has_single_bit(MaxPendingNotes)); // MaxPendingNotes MUST be a power of 2
 
-	//! @brief Bitmask used to wrap arbitrary indicies within the bounds of the pending notes ring buffer.
+	//! @brief The maximum number of retries permitted per enqueue operation before a note is dropped.
+	//!
+	//! Enqueue operations may fail during high contention as multiple threads
+	//! attempt to reserve the next spot in the ringbuffer using atomic CAS
+	//! operations, or when there are already @ref MaxPendingNotes enqueued
+	//! notes in the ringbuffer. This constant determines the maximum number of
+	//! times an enqueue operation is allowed to retry under either of these
+	//! circumstances before it gives up and drops the note.
+	//!
+	//! This limit should never be met under normal operation and is a failsafe
+	//! for catastrophic performance situations to prevent hanging in
+	//! spinlocks.
+	//!
+	//! @see playNote
+	static constexpr size_t MaxNoteEnqueueRetries = MaxPendingNotes;
+
+	//! @brief Bitmask used to wrap arbitrary indicies within the bounds of @ref m_notes.
+	//!
+	//! @see m_notesReadSeq
+	//! @see m_notesWriteCommitted
+	//! @see m_notesWriteClaimed
 	static constexpr size_t NotesBufMask = MaxPendingNotes - 1;
 
-	//! @brief Multiple-producer single-consumer realtime-safe ring buffer for note events.
-	//! This is used to implement monophony, since multiple LMMS threads
-	//! can independently send an instance of Lb302 note events.
+	//! @brief Backing array for the multiple-producer single-consumer realtime-safe ring buffer queue for note events.
+	//!
+	//! This is used to implement monophony, since multiple LMMS threads can
+	//! independently send note events to an instance of Lb302.
+	//!
+	//! @see MaxPendingNotes
+	//! @see m_notesReadSeq
+	//! @see m_notesWriteCommitted
+	//! @see m_notesWriteClaimed
 	std::array<NotePlayHandle*, MaxPendingNotes> m_notes {};
 
-	// TODO: Documentation (index incremented as notes are dequeued)
-	alignas(CACHELINE) std::atomic_size_t m_notesReadIdx {0};
+	//! @brief Sequence number indicating complete dequeue operations.
+	//!
+	//! As notes are dequeued, this sequence number is incremented. It can be
+	//! used as an index into @ref m_notes if bitwise-AND'd with
+	//! @ref NotesBufMask.
+	//! 
+	//! The difference between this sequence number and @ref m_notesReadSeq
+	//! is the number of currently vacant indicies in @ref m_notes that are
+	//! available to be written to, and can never exceed @ref MaxPendingNotes.
+	//!
+	//! @see play
+	alignas(CACHELINE) std::atomic_size_t m_notesReadSeq {0};
 
-	// TODO: Documentation (index incremented as notes finish getting enqueued)
+	//! @brief Sequence number indicating complete enqueue operations.
+	//!
+	//! As note enqueue operations complete, this sequence number is
+	//! incremented. It can be used as an index into @ref m_notes if
+	//! bitwise-AND'd with @ref NotesBufMask.
+	//!
+	//! The difference between this sequence number and @ref m_notesReadSeq
+	//! is the number of currently enqueued notes ready to be dequeued, and can
+	//! never exceed @ref MaxPendingNotes. It should always be less than or
+	//! equal to @ref m_notesWriteClaimed.
+	//!
+	//! @see playNote
 	alignas(CACHELINE) std::atomic_size_t m_notesWriteCommitted {0};
 
-	// TODO: Documentation (index incremented as notes begin getting enqueued)
+	//! @brief Sequence number indicating in-progress enqueue operations.
+	//!
+	//! As note enqueue operations begin, this sequence number is incremented.
+	//! It can be used as an index into @ref m_notes if bitwise-AND'd with
+	//! @ref NotesBufMask.
+	//!
+	//! The difference between this sequence number and @ref m_notesReadSeq
+	//! is the number of currently occupied indicies in @ref m_notes (even
+	//! those not yet written to), and can never exceed @ref MaxPendingNotes.
+	//!
+	//! @see playNote
 	alignas(CACHELINE) std::atomic_size_t m_notesWriteClaimed {0};
 };
 
