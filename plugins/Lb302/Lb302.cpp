@@ -56,24 +56,23 @@
 	#include <immintrin.h>
 	#define busy_wait_hint() _mm_pause()
 #elif defined(__aarch64__) // arm64
-	#include <arm_acle.h>
+	// isb 15 used instead of yield on arm64
 	// See https://github.com/rust-lang/rust/commit/c064b6560b7ce0adeb9bbf5d7dcf12b1acb0c807
-	#define busy_wait_hint() __isb(15)
-#elif defined(__arm__) // arm32
-	#include <arm_acle.h>
-	#define busy_wait_hint() __yield()
+	#if defined(__ARM_ACLE)
+		#include <arm_acle.h>
+		#define busy_wait_hint() __isb(15)
+	#elif defined(__GNUG__)
+		// GCC for ARM lacks these intrinsics at the moment.
+		// See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=105416
+		#define busy_wait_hint() asm volatile ("isb 15" ::: "memory")
+	#endif
 #elif defined(_M_ARM64) // arm64 msvc
 	#include <intrin.h>
 	// See https://github.com/rust-lang/rust/commit/c064b6560b7ce0adeb9bbf5d7dcf12b1acb0c807
 	#define busy_wait_hint() __isb(15)
-#elif defined(_M_ARM) // arm32 msvc
-	#include <intrin.h>
-	#define busy_wait_hint() __yield()
 #else
-	// GCC for ARM lacks these intrinsics at the moment.
-	// See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=105416
-	#error No busy-wait architecture intrinsic available!
-	// TODO: Add riscv32, riscv64
+	// TODO: Add other platforms as needed (LMMS only supports 64-bit x86 and ARM so far)
+	#error No busy-wait architecture intrinsic available for this platform!
 #endif
 
 namespace
