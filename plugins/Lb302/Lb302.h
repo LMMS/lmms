@@ -34,8 +34,6 @@
 #include <array>
 #include <atomic>
 #include <memory>
-
-#include <QMutex>
 #include <new>
 
 #include "Instrument.h"
