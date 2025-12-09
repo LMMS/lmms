@@ -26,6 +26,7 @@ This opens the door to creative processing that is impossible with normal filter
 - Bode plots for presets 2 to 17 are drawn based on secondary copies of the equations stored within TransferFunctionControls.cpp . This means that if TransferFunction.cpp's presets change, these will not match.  I know this not the best way yet as it does not follow single source of truth
 
 To fix: I’ve had some problems with high-pass filtering using common transfer functions. To remove the low end I basically required a brickwall response or an increase in the filter order (exponent in the equation). The high end works fine even with low orders.
+Still using fixed sample rate. The others have been updated not to use fixed sample rate.
 
 All files created / modified are stored within the Plugins/TransferFunction folder excluding the PluginList.cmake file (within cmake/modules) which was also required to be edited before compilation.
 
@@ -67,4 +68,12 @@ All files created / modified are stored within the Plugins/TransferFunction fold
 - Exports video output as a series of pictures to /home/username/Pictures/LMMS_Visuals/ at selected resolution and between tick being ticked and unticked for persons who wish to render later
 - Switch to select whether all frequencies, bass, mid, or treble control effect on certain visualisations
 
+**Plugin #5: Delay2**
+- Not tested properly
+
+**Plugin #6: DelayChorusCombo**
+- Not tested properly
+
+**Plugin #7: PitchShifter**
+- Im not sure if this is required anymore as there are LADSPA equivelents
 
