@@ -1379,7 +1379,7 @@ void MainWindow::autoSave()
 			ConfigManager::inst()->value( "ui", "enableversionedautosave" ).toInt())
 		{
 			QString currentProjectName = Engine::getSong()->projectFileName();
-			QString autoSaveTimestamp = QDateTime::currentDateTime().toString("dd-MM-yyyy-hh-mm-ss");
+			QString autoSaveTimestamp = QDateTime::currentDateTime().toString("yyyy-MM-dd_hh-mm-ss");
 			QString autoSaveVersionedName = currentProjectName.section('.', 0, 0).append(".autosave.")	//filename.autosave.
 											.append(autoSaveTimestamp).append(".")						//timestamp.
 											.append(currentProjectName.section('.', -1));				//extension
