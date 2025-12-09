@@ -41,9 +41,8 @@ constexpr auto SectionSDL = "audiosdl";
 constexpr auto PlaybackDeviceSDL = "device";
 constexpr auto InputDeviceSDL = "inputdevice";
 
-AudioSdl::AudioSdl( bool & _success_ful, AudioEngine*  _audioEngine ) :
-	AudioDevice( DEFAULT_CHANNELS, _audioEngine ),
-	m_outBuf(new SampleFrame[audioEngine()->framesPerPeriod()])
+AudioSdl::AudioSdl(bool& _success_ful, AudioEngine* _audioEngine)
+	: AudioDevice(DEFAULT_CHANNELS, _audioEngine)
 {
 	_success_ful = false;
 
@@ -62,7 +61,7 @@ AudioSdl::AudioSdl( bool & _success_ful, AudioEngine*  _audioEngine ) :
 						// to convert the buffers
 
 	m_audioHandle.channels = channels();
-	m_audioHandle.samples = std::max(f_cnt_t{1024}, audioEngine()->framesPerPeriod() * 2);
+	m_audioHandle.samples = _audioEngine->framesPerAudioBuffer();
 
 	m_audioHandle.callback = sdlAudioCallback;
 	m_audioHandle.userdata = this;
@@ -121,25 +120,19 @@ AudioSdl::AudioSdl( bool & _success_ful, AudioEngine*  _audioEngine ) :
 
 AudioSdl::~AudioSdl()
 {
-	stopProcessing();
-
 	if (m_inputDevice != 0)
 		SDL_CloseAudioDevice(m_inputDevice);
 	if (m_outputDevice != 0)
 		SDL_CloseAudioDevice(m_outputDevice);
 
 	SDL_Quit();
-
-	delete[] m_outBuf;
 }
 
 
 
 
-void AudioSdl::startProcessing()
+void AudioSdl::startProcessingImpl()
 {
-	m_stopped = false;
-
 	SDL_PauseAudioDevice (m_outputDevice, 0);
 	SDL_PauseAudioDevice (m_inputDevice, 0);
 }
@@ -147,14 +140,12 @@ void AudioSdl::startProcessing()
 
 
 
-void AudioSdl::stopProcessing()
+void AudioSdl::stopProcessingImpl()
 {
 	if( SDL_GetAudioDeviceStatus(m_outputDevice) == SDL_AUDIO_PLAYING )
 	{
 		SDL_LockAudioDevice (m_inputDevice);
 		SDL_LockAudioDevice (m_outputDevice);
-
-		m_stopped = true;
 
 		SDL_PauseAudioDevice (m_inputDevice,	1);
 		SDL_PauseAudioDevice (m_outputDevice,	1);
@@ -176,38 +167,16 @@ void AudioSdl::sdlAudioCallback( void * _udata, Uint8 * _buf, int _len )
 
 void AudioSdl::sdlAudioCallback( Uint8 * _buf, int _len )
 {
-	if( m_stopped )
+	const auto frameCount = _len / sizeof(float) / channels();
+
+	if (!isRunning())
 	{
 		memset( _buf, 0, _len );
 		return;
 	}
 
-	// SDL2: process float samples
-	while( _len )
-	{
-		if( m_currentBufferFramePos == 0 )
-		{
-			// frames depend on the sample rate
-			const fpp_t frames = getNextBuffer( m_outBuf );
-			if( !frames )
-			{
-				memset( _buf, 0, _len );
-				return;
-			}
-			m_currentBufferFramesCount = frames;
-
-		}
-		const uint min_frames_count = std::min(_len/sizeof(SampleFrame),
-										  m_currentBufferFramesCount
-										- m_currentBufferFramePos);
-
-		memcpy( _buf, m_outBuf + m_currentBufferFramePos, min_frames_count*sizeof(SampleFrame) );
-		_buf += min_frames_count*sizeof(SampleFrame);
-		_len -= min_frames_count*sizeof(SampleFrame);
-		m_currentBufferFramePos += min_frames_count;
-
-		m_currentBufferFramePos %= m_currentBufferFramesCount;
-	}
+	const auto bufferView = InterleavedBufferView<float>{reinterpret_cast<float*>(_buf), channels(), frameCount};
+	audioEngine()->renderNextBuffer(bufferView);
 }
 
 void AudioSdl::sdlInputAudioCallback(void *_udata, Uint8 *_buf, int _len) {
