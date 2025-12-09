@@ -24,6 +24,7 @@
 
 #include "AutomatableModel.h"
 
+#include <QAction>
 #include <QRegularExpression>
 
 #include "lmms_math.h"
@@ -817,5 +818,25 @@ QString BoolModel::displayValue( const float val ) const
 	return QString::number( castValue<bool>( scaledValue( val ) ) );
 }
 
+QAction* BoolModel::createAction(const QString& text)
+{
+	auto action = new QAction(text, this);
+	action->setCheckable(true);
+
+	action->connect(this, &Model::dataChanged, action, [this, action] {
+		if (value() != action->isChecked())
+		{
+			action->setChecked(value());
+		}
+	});
+	action->connect(action, &QAction::toggled, this, [this, action] {
+		if (value() != action->isChecked())
+		{
+			setValue(action->isChecked());
+		}
+	});
+
+	return action;
+}
 
 } // namespace lmms
