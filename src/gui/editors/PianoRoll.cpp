@@ -3882,13 +3882,14 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 {
 	we->accept();
 	// handle wheel events for note edit area - for editing note vol/pan with mousewheel
-	if(position(we).x() > noteEditLeft() && position(we).x() < noteEditRight()
-	&& position(we).y() > noteEditTop() && position(we).y() < noteEditBottom())
+	const auto pos = we->position().toPoint();
+	if (pos.x() > noteEditLeft() && pos.x() < noteEditRight()
+		&& pos.y() > noteEditTop() && pos.y() < noteEditBottom())
 	{
 		if (!hasValidMidiClip()) {return;}
 		// get values for going through notes
 		int pixel_range = 8;
-		int x = position(we).x() - m_whiteKeyWidth;
+		int x = pos.x() - m_whiteKeyWidth;
 		int ticks_start = ( x - pixel_range / 2 ) *
 					TimePos::ticksPerBar() / m_ppb + m_currentPosition;
 		int ticks_end = ( x + pixel_range / 2 ) *
@@ -3925,7 +3926,7 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 				{
 					// show the volume hover-text only if all notes have the
 					// same volume
-					showVolTextFloat(nv[0]->getVolume(), position(we), 1000);
+					showVolTextFloat(nv[0]->getVolume(), pos, 1000);
 				}
 			}
 			else if( m_noteEditMode == NoteEditMode::Panning )
@@ -3944,7 +3945,7 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 				{
 					// show the pan hover-text only if all notes have the same
 					// panning
-					showPanTextFloat( nv[0]->getPanning(), position( we ), 1000 );
+					showPanTextFloat(nv[0]->getPanning(), pos, 1000);
 				}
 			}
 			update();
@@ -3994,7 +3995,7 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 		}
 		z = qBound( 0, z, m_zoomingModel.size() - 1 );
 
-		int x = (position(we).x() - m_whiteKeyWidth) * TimePos::ticksPerBar();
+		int x = (pos.x() - m_whiteKeyWidth) * TimePos::ticksPerBar();
 		// ticks based on the mouse x-position where the scroll wheel was used
 		int ticks = x / m_ppb;
 		// what would be the ticks in the new zoom level on the very same mouse x
@@ -5403,8 +5404,82 @@ bool PianoRollWindow::hasFocus() const
 
 
 
+void PianoRollWindow::showEvent(QShowEvent*)
+{
+	// PianoRoll can ONLY be shown if hasValidMidiClip is true
+	// TODO remove hasValidMidiClip checks throughout the code
+	if (m_editor->hasValidMidiClip()) { return; }
+
+	// A new user might try to open PianoRoll in an empty project unaware that they first need to create a clip.
+	// To make life easier for them we create and/or open the first clip in an empty project.
+	// If there are multiple non-empty clips, we tell the user to double click one of them instead.
+
+	InstrumentTrack* firstTrack = nullptr;
+	MidiClip* firstEmptyClip = nullptr;
+	MidiClip* firstMelodyClip = nullptr;
+
+	// Iterate through all instrument tracks in the Song
+	for (auto track: Engine::getSong()->tracks())
+	{
+		if (track->type() != Track::Type::Instrument) { continue; }
+		auto instrumentTrack = static_cast<InstrumentTrack*>(track);
+		if (!firstTrack) { firstTrack = instrumentTrack; }
+
+		// Iterate through all midi clips in each track
+		for (auto clip: instrumentTrack->getClips())
+		{
+			auto midiClip = static_cast<MidiClip*>(clip);
+
+			// Remember the first empty clip in the Song (ignore subsequent empty clips)
+			if (midiClip->notes().empty())
+			{
+				if (!firstEmptyClip) { firstEmptyClip = midiClip; }
+			}
+			// Remember the first non-empty clip in the Song
+			else if (!firstMelodyClip)
+			{
+				firstMelodyClip = midiClip;
+			}
+			// If there are multiple non-empty clips in the Song, show a hint
+			else
+			{
+				TextFloat::displayMessage(tr("No clip selected"),
+					tr("Double click a melody clip in the Song Editor to open it."),
+					embed::getIconPixmap("error"), 5000);
+				parentWidget()->hide();
+				return;
+			}
+		}
+	}
+	// If we found a clip, open it
+	if (firstMelodyClip || firstEmptyClip)
+	{
+		m_editor->setCurrentMidiClip(firstMelodyClip ? firstMelodyClip : firstEmptyClip);
+	}
+	// If we found a track with no clips, create a clip and open it
+	else if (firstTrack)
+	{
+		m_editor->setCurrentMidiClip(new MidiClip(firstTrack));
+	}
+	// If we found no instrument tracks, show a hint
+	else
+	{
+		TextFloat::displayMessage(tr("No instrument tracks"),
+			tr("Drag an instrument plugin or preset from the sidebar to the Song Editor."),
+			embed::getIconPixmap("error"), 5000);
+		parentWidget()->hide();
+	}
+}
+
+
 void PianoRollWindow::updateAfterMidiClipChange()
 {
+	if (!m_editor->hasValidMidiClip())
+	{
+		parentWidget()->hide();
+		return;
+	}
+
 	clipRenamed();
 	updateStepRecordingIcon(); //MIDI clip change turn step recording OFF - update icon accordingly
 }
