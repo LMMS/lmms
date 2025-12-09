@@ -33,6 +33,8 @@ SET(LMMS_PLUGIN_LIST
 	Compressor
 	CrossoverEQ
 	Delay
+	Delay2
+	DelayChorusCombo
 	Dispersion
 	DualFilter
 	DynamicsProcessor
@@ -56,6 +58,7 @@ SET(LMMS_PLUGIN_LIST
 	FreeBoy
 	Patman
 	PeakControllerEffect
+	PitchShifter
 	GigPlayer
 	ReverbSC
 	Sf2Player
