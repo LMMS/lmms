@@ -353,9 +353,8 @@ void AudioEngine::processBufferedInputFrames()
 	f_cnt_t spaceLeftInMainBuffer{(currentFramesInWriteBuf >= currentWriteBufCapacity)
 	? 0 : currentWriteBufCapacity - currentFramesInWriteBuf};
 
-	f_cnt_t framesWeCanActuallyCopy = static_cast<f_cnt_t>(framesInSequence);
-	framesWeCanActuallyCopy = framesWeCanActuallyCopy > spaceLeftInMainBuffer ?
-		spaceLeftInMainBuffer : framesWeCanActuallyCopy;
+	f_cnt_t framesWeCanActuallyCopy{static_cast<f_cnt_t>(framesInSequence) > spaceLeftInMainBuffer ?
+		spaceLeftInMainBuffer : static_cast<f_cnt_t>(framesInSequence)};
 
 	if (len1 > 0 && totalFramesSuccessfullyCopiedToMain < framesWeCanActuallyCopy)
 	{
