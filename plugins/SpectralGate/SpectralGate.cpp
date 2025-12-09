@@ -746,7 +746,7 @@ SpectralGateEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 
 
 
-    float fs = 44100.f;
+    float fs = rate;
 
     float binWidth = fs / FIXED_FFT_SIZE;
 
