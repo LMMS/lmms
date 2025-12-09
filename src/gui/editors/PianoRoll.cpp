@@ -4211,13 +4211,7 @@ bool PianoRoll::toggleStepRecording()
 		}
 	}
 
-	bool isRecording = m_stepRecorder.isRecording();
-
-	// hide playhead when step recording
-	m_timeLine->setPlayheadVisible(!isRecording);
-	m_positionLine->setVisible(!isRecording);
-
-	return isRecording;
+	return m_stepRecorder.isRecording();
 }
 
 
