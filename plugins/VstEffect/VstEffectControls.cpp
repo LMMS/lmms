@@ -27,6 +27,7 @@
 #include <QGridLayout>
 #include <QMenu>
 #include <QPushButton>
+#include <QLineEdit>
 #include <QScrollArea>
 
 #include "embed.h"
@@ -343,7 +344,7 @@ ManageVSTEffectView::ManageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 	m_displayAutomatedOnly = new QPushButton( tr( "Automated" ), widget );
 	connect( m_displayAutomatedOnly, SIGNAL( clicked() ), this,
 							SLOT( displayAutomatedOnly() ) );
-
+	m_isAuto = false;
 	l->addWidget( m_displayAutomatedOnly, 0, 1, 1, 2, Qt::AlignLeft );
 
 
@@ -353,6 +354,15 @@ ManageVSTEffectView::ManageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 
 	l->addWidget( m_closeButton, 0, 2, 1, 7, Qt::AlignLeft );
 
+	auto m_searchBar = new QLineEdit(widget);
+	m_searchBar->setPlaceholderText(tr("Search"));
+	m_searchBar->setMaxLength(35);
+	m_searchBar->setClearButtonEnabled(true);
+	m_searchBar->addAction(embed::getIconPixmap("zoom"), QLineEdit::LeadingPosition);
+	l->addWidget( m_searchBar, 0, 3, 1, 2, Qt::AlignLeft );
+
+	connect( m_searchBar, SIGNAL( textEdited( const QString& ) ),
+		 this, SLOT( onFilterChanged( const QString& ) ) );
 
 	for( int i = 0; i < 10; i++ )
 	{
@@ -463,27 +473,41 @@ void ManageVSTEffectView::syncPlugin()
 }
 
 
-
-void ManageVSTEffectView::displayAutomatedOnly()
+void ManageVSTEffectView::onFilterChanged( const QString & filter )
 {
-	bool isAuto = QString::compare( m_displayAutomatedOnly->text(), tr( "Automated" ) ) == 0;
+	m_filter = filter;
+	displayFilteredKnobs();
+}
 
-	for( int i = 0; i< m_vi2->paramCount; i++ )
+void ManageVSTEffectView::displayAutomatedOnly( void )
+{
+	m_isAuto = !m_isAuto;
+	displayFilteredKnobs();
+}
+
+void ManageVSTEffectView::displayFilteredKnobs( void )
+{
+	if (m_isAuto) {
+		m_displayAutomatedOnly->setText( "All" );
+	} else {
+		m_displayAutomatedOnly->setText( "Automated" );
+	}
+
+	const QMap<QString, QString> & dump = m_effect->m_plugin->parameterDump();
+	auto paramStr = std::array<char, 35>{};
+	QStringList s_dumpValues;
+	for( int i = 0; i < m_vi2->paramCount; i++ )
 	{
-
-		if( !( m_vi2->knobFModel[ i ]->isAutomated() ||
-					m_vi2->knobFModel[ i ]->controllerConnection() ) )
+		sprintf(paramStr.data(), "param%d", i);
+		s_dumpValues = dump[paramStr.data()].split(":");
+		if( !s_dumpValues.at(1).contains(m_filter, Qt::CaseInsensitive)
+			|| (m_isAuto && !( m_vi2->knobFModel[ i ]->isAutomated() || m_vi2->knobFModel[ i ]->controllerConnection())))
 		{
-			if( vstKnobs[ i ]->isVisible() == true  && isAuto )
-			{
-				vstKnobs[ i ]->hide();
-				m_displayAutomatedOnly->setText( "All" );
-			} else {
-				vstKnobs[ i ]->show();
-				m_displayAutomatedOnly->setText( "Automated" );
-			}
+			vstKnobs[ i ]->hide();
+		}  else {
+			vstKnobs[ i ]->show();
 		}
- 	}
+	}
 }
 
 
