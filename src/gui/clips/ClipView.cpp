@@ -1127,14 +1127,6 @@ void ClipView::contextMenuEvent( QContextMenuEvent * cme )
 		this, &ClipView::toggleSelectedAutoResize
 	);
 
-	// TODO: Allow for exporting clips inside patterns
-	if (!dynamic_cast<AutomationClipView*>(this)
-		&& !dynamic_cast<PatternStore*>(m_trackView->getTrack()->trackContainer()))
-	{
-		// TODO: Consider allowing exporting a selection of clips
-		contextMenu.addAction(tr("Export clip"));
-	}
-
 	constructContextMenu( &contextMenu );
 
 	contextMenu.exec( QCursor::pos() );
