@@ -25,12 +25,12 @@
 #include "SfzSampler.h"
 
 #include <QDomElement>
-#include <cmath>
-#include <fftw3.h>
+#include <QDebug>
 
 #include "Engine.h"
 #include "InstrumentTrack.h"
 #include "PathUtil.h"
+#include "ConfigManager.h"
 #include "SampleLoader.h"
 #include "SfzSamplerView.h"
 #include "Song.h"
@@ -61,22 +61,50 @@ PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* m, void*)
 
 SfzSampler::SfzSampler(InstrumentTrack* instrumentTrack)
 	: Instrument(instrumentTrack, &sfzsampler_plugin_descriptor)
-	, m_originalSample()
+	, m_originalSample1()
+	, m_originalSample2()
 	, m_parentTrack(instrumentTrack)
 {
+	QString path = ConfigManager::inst()->userSamplesDir() + "sfz/jlearman.jRhodes3c-master/jRhodes3c-looped-flac-sfz/";
+	if (auto buffer = gui::SampleLoader::createBufferFromFile(path + "As_029__F1_279-stereo.flac"))
+	{
+		m_originalSample1 = Sample(std::move(buffer));
+	}
+	if (auto buffer = gui::SampleLoader::createBufferFromFile(path + "As_035__B1_281-stereo.flac"))
+	{
+		m_originalSample2 = Sample(std::move(buffer));
+	}
+
+	emit dataChanged();
 }
 
 void SfzSampler::playNote(NotePlayHandle* handle, SampleFrame* workingBuffer)
 {
-	if (m_originalSample.sampleSize() <= 1) { return; }
+	//if (m_originalSample.sampleSize() <= 1) { return; }
 
-	int noteIndex = handle->key() - m_parentTrack->baseNote();
+	int noteIndex = handle->key();
 	const fpp_t frames = handle->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = handle->noteOffset();
+
+	const f_cnt_t startFrame = 0;
+
+	if (!handle->m_pluginData) { handle->m_pluginData = new Sample::PlaybackState(AudioResampler::Mode::Linear, startFrame); }
+
+	auto playbackState = static_cast<Sample::PlaybackState*>(handle->m_pluginData);
+
+	if (noteIndex % 2 == 0)
+	{
+		m_originalSample1.play(workingBuffer + offset, playbackState, frames, Sample::Loop::Off);
+	}
+	else
+	{
+		m_originalSample2.play(workingBuffer + offset, playbackState, frames, Sample::Loop::Off);
+	}
 }
 
 void SfzSampler::deleteNotePluginData(NotePlayHandle* handle)
 {
+	delete static_cast<Sample::PlaybackState*>(handle->m_pluginData);
 }
 
 

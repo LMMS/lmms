@@ -54,7 +54,8 @@ public:
 
 private:
 
-	Sample m_originalSample;
+	Sample m_originalSample1;
+	Sample m_originalSample2;
 
 	InstrumentTrack* m_parentTrack;
 
