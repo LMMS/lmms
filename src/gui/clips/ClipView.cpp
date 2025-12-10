@@ -32,6 +32,7 @@
 #include <QPainter>
 
 #include "AutomationClip.h"
+#include "AutomationClipView.h"
 #include "Clipboard.h"
 #include "ColorChooser.h"
 #include "DataFile.h"
@@ -1125,6 +1126,14 @@ void ClipView::contextMenuEvent( QContextMenuEvent * cme )
 		m_clip->getAutoResize() ? tr("Disable auto-resize") : tr("Enable auto-resize"),
 		this, &ClipView::toggleSelectedAutoResize
 	);
+
+	// TODO: Allow for exporting clips inside patterns
+	if (!dynamic_cast<AutomationClipView*>(this)
+		&& !dynamic_cast<PatternStore*>(m_trackView->getTrack()->trackContainer()))
+	{
+		// TODO: Consider allowing exporting a selection of clips
+		contextMenu.addAction(tr("Export clip"));
+	}
 
 	constructContextMenu( &contextMenu );
 

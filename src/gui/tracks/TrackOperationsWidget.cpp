@@ -38,6 +38,7 @@
 #include "ColorChooser.h"
 #include "ConfigManager.h"
 #include "DataFile.h"
+#include "PatternStore.h"
 #include "embed.h"
 #include "Engine.h"
 #include "InstrumentTrackView.h"
@@ -312,6 +313,14 @@ void TrackOperationsWidget::updateMenu()
 	{
 		toMenu->addAction( tr( "Clear this track" ), this, SLOT(clearTrack()));
 	}
+
+	// TODO: Allow for exporting tracks inside patterns
+	if (!dynamic_cast<AutomationTrackView*>(this)
+		&& !dynamic_cast<PatternStore*>(m_trackView->getTrack()->trackContainer()))
+	{
+		toMenu->addAction(tr("Export this track"));
+	}
+
 	if (QMenu *mixerMenu = m_trackView->createMixerMenu(tr("Channel %1: %2"), tr("Assign to new Mixer Channel")))
 	{
 		toMenu->addMenu(mixerMenu);
