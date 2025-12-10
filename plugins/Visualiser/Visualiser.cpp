@@ -2606,48 +2606,38 @@ private:
 
 
 
-    void drawEuroHyperColor(QPainter &p, int w, int h)
-
+void drawEuroHyperColor(QPainter &p, int w, int h)
     {
-
         float t = m_hue * 0.03f;
-
         float bass = getReactionLevel();
-
-
-
+        
         for (int y = 0; y < h; ++y)
-
         {
-
             float ny = (float)y / h;
-
             for (int x = 0; x < w; x += 4)
-
             {
-
                 float nx = (float)x / w;
-
+                
+                // v ranges roughly from -3.0 to +3.0
                 float v = std::sin(nx*10 + t) + std::sin(ny*10 - t*1.5f);
-
                 v += std::sin((nx+ny)*8 + t*2.0f);
 
-                int hue = (int)((v * 40.0f) + m_hue + bass*100.0f) % 360;
+                // Calculate Hue
+                int rawHue = (int)((v * 40.0f) + m_hue + bass*100.0f);
+                
+                // FIX: Ensure positive modulo result
+                int hue = rawHue % 360;
+                if (hue < 0) hue += 360; 
 
                 int sat = 200 + (int)(bass*55.0f);
-
                 int val = 180 + (int)(bass*70.0f);
 
+                // qBound protects Sat and Val, but we fixed Hue manually above
                 p.setPen(QColor::fromHsv(hue, qBound(0,sat,255), qBound(0,val,255)));
-
                 p.drawLine(x, y, x+3, y);
-
             }
-
         }
-
     }
-
 
 
     void drawEuroRasterBarsXL(QPainter &p, int w, int h)
