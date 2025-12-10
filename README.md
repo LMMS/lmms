@@ -68,12 +68,22 @@ All files created / modified are stored within the Plugins/TransferFunction fold
 - Exports video output as a series of pictures to /home/username/Pictures/LMMS_Visuals/ at selected resolution and between tick being ticked and unticked for persons who wish to render later
 - Switch to select whether all frequencies, bass, mid, or treble control effect on certain visualisations
 
-**Plugin #5: Delay2**
+**Plugin #5: Reverb1**
+- Stereo
+- Adjutstable Pre Delay
+- 15 Selectable room presets
+- Damping
+- Schroeder/Freeverb algorithm
+
+**Plugin #6: Delay2**
+- Compiled successfully
 - Not tested properly
 
-**Plugin #6: DelayChorusCombo**
+**Plugin #7: DelayChorusCombo**
+- Compiled successfully
 - Not tested properly
 
-**Plugin #7: PitchShifter**
+**Plugin #8: PitchShifter**
+- Compiled successfully
 - Im not sure if this is required anymore as there are LADSPA equivelents
 
