@@ -60,6 +60,7 @@ SET(LMMS_PLUGIN_LIST
 	PeakControllerEffect
 	PitchShifter
 	GigPlayer
+	Reverb1
 	ReverbSC
 	Sf2Player
 	Sfxr
