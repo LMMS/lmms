@@ -70,7 +70,7 @@ private:
 	LocklessRingBufferReader<SampleFrame> m_inputBufferReader;
 
 	// Buffer which is actually drawn on the screen, not the ring buffer used for communication between threads
-	std::vector<SampleFrame> m_ringBuffer = {};
+	std::vector<SampleFrame> m_ringBuffer;
 	int m_ringBufferIndex = 0;
 
 	int m_mousePos;
