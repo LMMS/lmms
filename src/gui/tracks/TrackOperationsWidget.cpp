@@ -263,15 +263,17 @@ void TrackOperationsWidget::exportTrack()
 
 	dialog.setFileMode(FileDialog::AnyFile);
 	dialog.setNameFilters(types);
+	dialog.setAcceptMode(FileDialog::AcceptSave);
+	dialog.setDefaultSuffix(ProjectRenderer::fileEncodeDevices[0].m_extension);
 
 	const auto projectFileName = Engine::getSong()->projectFileName();
 	const auto exportName = (projectFileName.isEmpty() ? tr("untitled") : QFileInfo{projectFileName}.baseName()) + "_"
-		+ m_trackView->getTrack()->name();
+		+ m_trackView->getTrack()->name() + ProjectRenderer::fileEncodeDevices[0].m_extension;
 	dialog.selectFile(exportName);
 
 	if (dialog.exec() != QDialog::Accepted) { return; }
 
-	auto exportDialog = ExportProjectDialog{dialog.selectedFiles()[0], nullptr, false};
+	auto exportDialog = ExportProjectDialog{dialog.selectedFiles()[0], RenderManager::Mode::ExportTrack, nullptr};
 	exportDialog.exec();
 }
 

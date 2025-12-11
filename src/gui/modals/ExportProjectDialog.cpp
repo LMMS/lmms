@@ -34,49 +34,36 @@
 namespace lmms::gui
 {
 
-ExportProjectDialog::ExportProjectDialog( const QString & _file_name,
-							QWidget * _parent, bool multi_export=false ) :
-	QDialog( _parent ),
-	Ui::ExportProjectDialog(),
-	m_fileName( _file_name ),
-	m_fileExtension(),
-	m_multiExport( multi_export ),
-	m_renderManager( nullptr )
+ExportProjectDialog::ExportProjectDialog(const QString& path, RenderManager::Mode mode, QWidget* parent)
+	: QDialog(parent)
+	, Ui::ExportProjectDialog()
+	, m_path(path)
+	, m_mode(mode)
+	, m_renderManager(nullptr)
 {
 	setupUi( this );
-	setWindowTitle( tr( "Export project to %1" ).arg(
-					QFileInfo( _file_name ).fileName() ) );
+	setWindowTitle(tr("Export project to %1").arg(QFileInfo(path).fileName()));
 
-	// Get the extension of the chosen file.
-	QStringList parts = _file_name.split( '.' );
-	QString fileExt;
-	if( parts.size() > 0 )
+	for (const auto& fileEncodeDevice : ProjectRenderer::fileEncodeDevices)
 	{
-		fileExt = "." + parts[parts.size()-1];
+		if (!fileEncodeDevice.isAvailable()) { continue; }
+		fileFormatCB->addItem(
+			fileEncodeDevice.m_description, QVariant(static_cast<int>(fileEncodeDevice.m_fileFormat)));
 	}
 
-	int cbIndex = 0;
-	for (auto i = std::size_t{0}; i < ProjectRenderer::NumFileFormats; ++i)
+	// When exporting either the project or a single track, a file name with an extension is expected, so we can fetch
+	// it to update the file format box automatically
+	if (mode == RenderManager::Mode::ExportProject || mode == RenderManager::Mode::ExportTrack)
 	{
-		if( ProjectRenderer::fileEncodeDevices[i].isAvailable() )
+		auto extension = QFileInfo{path}.completeSuffix();
+		if (extension.isEmpty()) { extension = ProjectRenderer::fileEncodeDevices[0].m_extension; }
+
+		for (auto i = 0; i < fileFormatCB->count(); ++i)
 		{
-			// Get the extension of this format.
-			QString renderExt = ProjectRenderer::fileEncodeDevices[i].m_extension;
-
-			// Add to combo box.
-			fileFormatCB->addItem( ProjectRenderer::tr(
-				ProjectRenderer::fileEncodeDevices[i].m_description ),
-				QVariant( static_cast<int>(ProjectRenderer::fileEncodeDevices[i].m_fileFormat) ) // Format tag; later used for identification.
-			);
-
-			// If this is our extension, select it.
-			if( QString::compare( renderExt, fileExt,
-									Qt::CaseInsensitive ) == 0 )
-			{
-				fileFormatCB->setCurrentIndex( cbIndex );
-			}
-
-			cbIndex++;
+			const auto comboBoxExtension = ProjectRenderer::getFileExtensionFromFormat(
+				static_cast<ProjectRenderer::ExportFileFormat>(fileFormatCB->itemData(i).toInt())).remove(0, 1);
+			if (QString::compare(extension, comboBoxExtension) != 0) { continue; }
+			fileFormatCB->setCurrentIndex(i);
 		}
 	}
 
@@ -174,15 +161,7 @@ void ExportProjectDialog::startExport()
 		os.setCompressionLevel(level);
 	}
 
-	// Make sure we have the the correct file extension
-	// so there's no confusion about the codec in use.
-	auto output_name = m_fileName;
-	if (!(m_multiExport || output_name.endsWith(m_fileExtension,Qt::CaseInsensitive)))
-	{
-		output_name+=m_fileExtension;
-	}
-
-	m_renderManager.reset(new RenderManager(os, m_ft, output_name));
+	m_renderManager.reset(new RenderManager(os, m_ft, m_path));
 
 	Engine::getSong()->setExportLoop( exportLoopCB->isChecked() );
 	Engine::getSong()->setRenderBetweenMarkers( renderMarkersCB->isChecked() );
@@ -197,13 +176,17 @@ void ExportProjectDialog::startExport()
 	connect( m_renderManager.get(), SIGNAL(finished()),
 			getGUI()->mainWindow(), SLOT(resetWindowTitle()));
 
-	if ( m_multiExport )
+	switch (m_mode)
 	{
-		m_renderManager->renderTracks();
-	}
-	else
-	{
+	case RenderManager::Mode::ExportProject:
 		m_renderManager->renderProject();
+		break;
+	case RenderManager::Mode::ExportTracks:
+		m_renderManager->renderTracks();
+		break;
+	case RenderManager::Mode::ExportTrack:
+		// TODO: Implement
+		break;
 	}
 }
 
@@ -263,16 +246,6 @@ void ExportProjectDialog::startBtnClicked()
 									  "format." ) );
 		reject();
 		return;
-	}
-
-	// Find proper file extension.
-	for (auto i = std::size_t{0}; i < ProjectRenderer::NumFileFormats; ++i)
-	{
-		if (m_ft == ProjectRenderer::fileEncodeDevices[i].m_fileFormat)
-		{
-			m_fileExtension = QString( QLatin1String( ProjectRenderer::fileEncodeDevices[i].m_extension ) );
-			break;
-		}
 	}
 
 	startButton->setEnabled( false );
