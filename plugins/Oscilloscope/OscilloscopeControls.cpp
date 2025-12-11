@@ -26,6 +26,7 @@
 
 #include "Oscilloscope.h"
 #include "OscilloscopeControls.h"
+#include "OscilloscopeControlDialog.h"
 #include "OscilloscopeGraph.h"
 
 namespace lmms
@@ -59,6 +60,12 @@ void OscilloscopeControls::saveSettings(QDomDocument& doc, QDomElement& parent)
 	m_lengthModel.saveSettings(doc, parent, "length");
 	m_phaseModel.saveSettings(doc, parent, "phase");
 	m_stereoModel.saveSettings(doc, parent, "stereo");
+}
+
+
+gui::EffectControlDialog* OscilloscopeControls::createView()
+{
+	return new gui::OscilloscopeControlDialog(this);
 }
 
 

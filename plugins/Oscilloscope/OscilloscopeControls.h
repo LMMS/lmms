@@ -26,7 +26,6 @@
 #define LMMS_OSCILLOSCOPE_CONTROLS_H
 
 #include "EffectControls.h"
-#include "OscilloscopeControlDialog.h"
 
 namespace lmms
 {
@@ -49,7 +48,7 @@ public:
 	void saveSettings(QDomDocument& doc, QDomElement& parent) override;
 	void loadSettings(const QDomElement& parent) override;
 	QString nodeName() const override { return "OscilloscopeControls"; }
-	gui::EffectControlDialog* createView() override { return new gui::OscilloscopeControlDialog(this); }
+	gui::EffectControlDialog* createView() override;
 	int controlCount() override { return 5; }
 
 private:
