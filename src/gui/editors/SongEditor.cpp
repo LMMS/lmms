@@ -100,7 +100,7 @@ SongEditor::SongEditor( Song * song ) :
 		m_currentPosition, this
 	);
 	connect(this, &TrackContainerView::positionChanged, m_timeLine, qOverload<>(&QWidget::update));
-	connect(m_timeLine->model(), &Timeline::positionChanged, this, &SongEditor::updatePosition, Qt::QueuedConnection);
+	connect(m_timeLine->timeline(), &Timeline::positionChanged, this, &SongEditor::updatePosition, Qt::QueuedConnection);
 	connect( m_timeLine, SIGNAL(regionSelectedFromPixels(int,int)),
 			this, SLOT(selectRegionFromPixels(int,int)));
 	connect( m_timeLine, SIGNAL(selectionFinished()),
@@ -764,7 +764,7 @@ static inline void animateScroll( QScrollBar *scrollBar, int newVal, bool smooth
 
 void SongEditor::updatePosition()
 {
-	const TimePos& t = m_timeLine->model()->pos();
+	const TimePos& t = m_timeLine->timeline()->pos();
 	const bool compactTrackButtons = ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt();
 	const auto widgetWidth = compactTrackButtons ? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT : DEFAULT_SETTINGS_WIDGET_WIDTH;
 	const auto trackOpWidth = compactTrackButtons ? TRACK_OP_WIDTH_COMPACT : TRACK_OP_WIDTH;
@@ -803,7 +803,7 @@ void SongEditor::updatePositionLine()
 	const bool compactTrackButtons = ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt();
 	const auto widgetWidth = compactTrackButtons ? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT : DEFAULT_SETTINGS_WIDGET_WIDTH;
 	const auto trackOpWidth = compactTrackButtons ? TRACK_OP_WIDTH_COMPACT : TRACK_OP_WIDTH;
-	const int x = m_timeLine->markerX(m_timeLine->model()->pos());
+	const int x = m_timeLine->markerX(m_timeLine->timeline()->pos());
 	if( x >= trackOpWidth + widgetWidth -1 )
 	{
 		m_positionLine->show();

@@ -60,7 +60,7 @@ PatternEditor::PatternEditor(PatternStore* ps) :
 		Engine::getSong()->getTimeline(Song::PlayMode::Pattern),
 		m_currentPosition, this
 	);
-	connect(m_timeLine->model(), &Timeline::positionChanged, this, &PatternEditor::updatePosition, Qt::QueuedConnection);
+	connect(m_timeLine->timeline(), &Timeline::positionChanged, this, &PatternEditor::updatePosition, Qt::QueuedConnection);
 	static_cast<QVBoxLayout*>(layout())->insertWidget(0, m_timeLine);
 
 	connect(m_ps, &PatternStore::trackUpdated,

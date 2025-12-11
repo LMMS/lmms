@@ -279,7 +279,7 @@ PianoRoll::PianoRoll() :
 		Engine::getSong()->getTimeline(Song::PlayMode::MidiClip),
 		m_currentPosition, this
 	);
-	connect(m_timeLine->model(), &Timeline::positionChanged, this, &PianoRoll::updatePosition, Qt::QueuedConnection);
+	connect(m_timeLine->timeline(), &Timeline::positionChanged, this, &PianoRoll::updatePosition, Qt::QueuedConnection);
 
 	// white position line follows timeline marker
 	m_positionLine = new PositionLine(this, Song::PlayMode::MidiClip);
@@ -881,8 +881,8 @@ void PianoRoll::setCurrentMidiClip( MidiClip* newMidiClip )
 	}
 
 	// Make sure the playhead position isn't out of the clip bounds.
-	m_timeLine->model()->setTicks(std::clamp(
-		m_timeLine->model()->ticks(),
+	m_timeLine->timeline()->setTicks(std::clamp(
+		m_timeLine->timeline()->ticks(),
 		std::max(0, -m_midiClip->startTimeOffset()),
 		m_midiClip->length() - m_midiClip->startTimeOffset()
 	));
@@ -1455,7 +1455,7 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 			break;
 
 		case Qt::Key_Home:
-			m_timeLine->model()->setTicks(0);
+			m_timeLine->timeline()->setTicks(0);
 			ke->accept();
 			break;
 
@@ -4570,7 +4570,7 @@ void PianoRoll::pasteNotes()
 			// create the note
 			Note cur_note;
 			cur_note.restoreState( list.item( i ).toElement() );
-			cur_note.setPos(cur_note.pos() + Note::quantized(m_timeLine->model()->pos(), quantization()));
+			cur_note.setPos(cur_note.pos() + Note::quantized(m_timeLine->timeline()->pos(), quantization()));
 
 			// select it
 			cur_note.setSelected( true );
@@ -4638,7 +4638,7 @@ void PianoRoll::autoScroll( const TimePos & t )
 
 void PianoRoll::updatePosition()
 {
-	const TimePos& t = m_timeLine->model()->pos();
+	const TimePos& t = m_timeLine->timeline()->pos();
 	if ((Engine::getSong()->isPlaying()
 			&& Engine::getSong()->playMode() == Song::PlayMode::MidiClip
 			&& m_timeLine->autoScroll() != TimeLineWidget::AutoScrollState::Disabled
@@ -4654,7 +4654,7 @@ void PianoRoll::updatePositionLinePos()
 	// ticks relative to m_currentPosition
 	// < 0 = outside viewport left
 	// > width = outside viewport right
-	const int pos = (static_cast<int>(m_timeLine->model()->pos()) - m_currentPosition) * m_ppb / TimePos::ticksPerBar();
+	const int pos = (static_cast<int>(m_timeLine->timeline()->pos()) - m_currentPosition) * m_ppb / TimePos::ticksPerBar();
 	// if pos is within visible range, show it
 	if (pos >= 0 && pos <= width() - m_whiteKeyWidth)
 	{
@@ -4692,7 +4692,7 @@ void PianoRoll::updatePositionAccompany()
 		}
 		if( (int) pos > 0 )
 		{
-			m_timeLine->model()->setTicks(pos);
+			m_timeLine->timeline()->setTicks(pos);
 			autoScroll( pos );
 		}
 	}

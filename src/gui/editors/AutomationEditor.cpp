@@ -134,7 +134,7 @@ AutomationEditor::AutomationEditor() :
 		Engine::getSong()->getTimeline(Song::PlayMode::AutomationClip),
 		m_currentPosition, this
 	);
-	connect(m_timeLine->model(), &Timeline::positionChanged, this, &AutomationEditor::updatePosition, Qt::QueuedConnection);
+	connect(m_timeLine->timeline(), &Timeline::positionChanged, this, &AutomationEditor::updatePosition, Qt::QueuedConnection);
 
 	// init scrollbars
 	m_leftRightScroll = new QScrollBar( Qt::Horizontal, this );
@@ -268,17 +268,17 @@ void AutomationEditor::keyPressEvent(QKeyEvent * ke )
 			break;
 
 		case Qt::Key_Left:
-			m_timeLine->model()->setTicks(std::max(0, m_timeLine->model()->ticks() - 16));
+			m_timeLine->timeline()->setTicks(std::max(0, m_timeLine->timeline()->ticks() - 16));
 			ke->accept();
 			break;
 
 		case Qt::Key_Right:
-			m_timeLine->model()->setTicks(m_timeLine->model()->ticks() + 16);
+			m_timeLine->timeline()->setTicks(m_timeLine->timeline()->ticks() + 16);
 			ke->accept();
 			break;
 
 		case Qt::Key_Home:
-			m_timeLine->model()->setTicks(0);
+			m_timeLine->timeline()->setTicks(0);
 			ke->accept();
 			break;
 
@@ -1829,7 +1829,7 @@ void AutomationEditor::setTension()
 
 void AutomationEditor::updatePosition()
 {
-	const TimePos& t = m_timeLine->model()->pos();
+	const TimePos& t = m_timeLine->timeline()->pos();
 	if( ( Engine::getSong()->isPlaying() &&
 			Engine::getSong()->playMode() ==
 					Song::PlayMode::AutomationClip ) ||
