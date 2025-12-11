@@ -95,7 +95,7 @@ inline int fastRand() noexcept
 
 //! @brief Returns a pseudorandom number within [0, @p upper].
 //! @returns A pseudorandom number greater than or equal to 0 and less than or equal to @p upper.
-template<typename T> requires std::is_floating_point_v<T>
+template<std::floating_point T>
 inline T fastRand(T upper) noexcept
 {
 	constexpr auto FAST_RAND_RATIO = static_cast<T>(1.0 / 32767);
@@ -105,7 +105,7 @@ inline T fastRand(T upper) noexcept
 
 //! @brief Returns a pseudorandom integer within [0, @p upper].
 //! @returns A pseudorandom integer greater than or equal to 0 and less than or equal to @p upper.
-template<typename T> requires std::is_integral_v<T>
+template<std::integral T>
 inline T fastRand(T upper) noexcept
 {
 	// The integer specialization of this function is kind of weird, but it is
