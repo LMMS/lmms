@@ -51,6 +51,7 @@
 #include "Oscilloscope.h"
 #include "PianoRoll.h"
 #include "PositionLine.h"
+#include "Scroll.h"
 #include "SubWindow.h"
 #include "TextFloat.h"
 #include "TimeDisplayWidget.h"
@@ -66,6 +67,7 @@ namespace
 constexpr int MIN_PIXELS_PER_BAR = 4;
 constexpr int MAX_PIXELS_PER_BAR = 400;
 constexpr int ZOOM_STEPS = 200;
+constexpr int PIXELS_PER_SCROLL = 60;
 
 constexpr std::array SNAP_SIZES{8.f, 4.f, 2.f, 1.f, 1/2.f, 1/4.f, 1/8.f, 1/16.f};
 constexpr std::array PROPORTIONAL_SNAP_SIZES{64.f, 32.f, 16.f, 8.f, 4.f, 2.f, 1.f, 1/2.f, 1/4.f, 1/8.f, 1/16.f, 1/32.f, 1/64.f};
@@ -519,15 +521,11 @@ void SongEditor::keyPressEvent( QKeyEvent * ke )
 
 
 
-void SongEditor::adjustLeftRightScoll(int value)
-{
-	m_leftRightScroll->setValue(m_leftRightScroll->value()
-						- value * DEFAULT_PIXELS_PER_BAR / pixelsPerBar());
-}
-
-
 void SongEditor::wheelEvent( QWheelEvent * we )
 {
+	auto scroll = Scroll(we);
+	we->accept();
+
 	const auto posX = we->position().toPoint().x();
 	if ((we->modifiers() & Qt::ControlModifier) && (posX > m_trackHeadWidth))
 	{
@@ -535,11 +533,10 @@ void SongEditor::wheelEvent( QWheelEvent * we )
 		// tick based on the mouse x-position where the scroll wheel was used
 		int tick = x / pixelsPerBar() * TimePos::ticksPerBar();
 
-		// move zoom slider (pixelsPerBar will change automatically)
-		int step = we->modifiers() & Qt::ShiftModifier ? 1 : 5;
-		// when Alt is pressed, wheelEvent returns delta for x coordinate (mimics horizontal mouse wheel)
-		int direction = (we->angleDelta().y() + we->angleDelta().x()) > 0 ? 1 : -1;
-		m_zoomingModel->incValue(step * direction);
+		// Holding shift will zoom 5x slower
+		float scrollSpeed = we->modifiers() & Qt::ShiftModifier ? 1 : 5;
+
+		m_zoomingModel->incValue(scroll.getSteps(scrollSpeed));
 
 		// scroll to zooming around cursor's tick
 		int newTick = static_cast<int>(x / pixelsPerBar() * TimePos::ticksPerBar());
@@ -550,22 +547,33 @@ void SongEditor::wheelEvent( QWheelEvent * we )
 		// and make sure, all Clip's are resized and relocated
 		realignTracks();
 	}
-
-	// FIXME: Reconsider if determining orientation is necessary in Qt6.
-	else if (std::abs(we->angleDelta().x()) > std::abs(we->angleDelta().y())) // scrolling is horizontal
-	{
-		adjustLeftRightScoll(we->angleDelta().x());
-	}
-	else if (we->modifiers() & Qt::ShiftModifier)
-	{
-		adjustLeftRightScoll(we->angleDelta().y());
-	}
 	else
 	{
-		we->ignore();
-		return;
+		// Calculate number of TimePos-ticks to move the horizontal scroll bar
+		const float ticksPerPixel = TimePos::ticksPerBar() / pixelsPerBar();
+		const float ticksPerScroll = PIXELS_PER_SCROLL * ticksPerPixel;
+		const int ticks = scroll.getSteps(ticksPerScroll, Scroll::Flag::SwapWithShiftOrAlt|Scroll::Flag::Horizontal);
+
+		m_leftRightScroll->setValue(m_leftRightScroll->value() - ticks);
+
+		/* ┌─────────────── SongEditor ───────────────┐
+		 * │ Timeline                                 │
+		 * │ ┌─── TrackContainerView::scrollArea ───┐ │
+		 * │ │ TrackView                   Vertical │ │
+		 * │ │ TrackView                     scroll │ │
+		 * │ │ TrackView                        bar │ │
+		 * │ └──────────────────────────────────────┘ │
+		 * │ Horizontal scroll bar                    │
+		 * └──────────────────────────────────────────┘
+		 *
+		 * When scrolling in the Song Editor the QWheelEvent is first passed to the scrollArea. It will call this
+		 * function to see if we will use the event for zooming. If we ignore() the event, the scrollArea can
+		 * use it to scroll up/down. If we changed the orientation here we must accept() the event, because the scrollArea
+		 * wouldn't know that, and it would scroll the other direction.
+		 */
+		const bool changedOrientation = we->modifiers() & (Qt::ShiftModifier|Qt::AltModifier);
+		if (!changedOrientation) { we->ignore(); }
 	}
-	we->accept();
 }
 
 

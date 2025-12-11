@@ -41,6 +41,7 @@
 #include "MidiClip.h"
 #include "PianoRoll.h"
 #include "RenameDialog.h"
+#include "Scroll.h"
 #include "SongEditor.h"
 #include "TrackContainerView.h"
 #include "TrackView.h"
@@ -495,10 +496,12 @@ void MidiClipView::mouseDoubleClickEvent(QMouseEvent *_me)
 
 void MidiClipView::wheelEvent(QWheelEvent * we)
 {
+	auto scroll = Scroll(we);
 	const auto pos = we->position().toPoint();
 	if(m_clip->m_clipType == MidiClip::Type::BeatClip &&
 				(fixedClips() || pixelsPerBar() >= 96) &&
-				pos.y() > height() - m_stepBtnOff.height())
+				pos.y() > height() - m_stepBtnOff.height() &&
+				scroll.isVertical())
 	{
 //	get the step number that was wheeled on and
 //	do calculations in floats to prevent rounding errors...
@@ -513,8 +516,11 @@ void MidiClipView::wheelEvent(QWheelEvent * we)
 		}
 
 		Note * n = m_clip->noteAtStep( step );
-		const int direction = (we->angleDelta().y() > 0 ? 1 : -1) * (we->inverted() ? -1 : 1);
-		if(!n && direction > 0)
+
+		// Increment the volume by 5 for every scroll wheel tick
+		int volumeIncrement = scroll.getSteps(5, Scroll::Flag::DisableNaturalScrolling);
+
+		if (!n && volumeIncrement > 0)
 		{
 			n = m_clip->addStepNote( step );
 			n->setVolume( 0 );
@@ -522,19 +528,16 @@ void MidiClipView::wheelEvent(QWheelEvent * we)
 		if( n != nullptr )
 		{
 			int vol = n->getVolume();
-			if(direction > 0)
-			{
-				n->setVolume( qMin( 100, vol + 5 ) );
-			}
-			else
-			{
-				n->setVolume( qMax( 0, vol - 5 ) );
-			}
+
+			// Don't pass negative volume as it would fold over
+			n->setVolume(static_cast<volume_t>(std::max(0, vol + volumeIncrement)));
 
 			Engine::getSong()->setModified();
 			update();
 			m_clip->updatePatternTrack();
 		}
+
+		// Accept the event so it doesn't get passed on to the editor window
 		we->accept();
 	}
 	else

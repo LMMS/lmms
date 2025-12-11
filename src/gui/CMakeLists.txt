@@ -38,6 +38,7 @@ SET(LMMS_SRCS
 	gui/SampleLoader.cpp
 	gui/SampleTrackWindow.cpp
 	gui/SampleThumbnail.cpp
+	gui/Scroll.cpp
 	gui/SendButtonIndicator.cpp
 	gui/SideBar.cpp
 	gui/SideBarWidget.cpp
