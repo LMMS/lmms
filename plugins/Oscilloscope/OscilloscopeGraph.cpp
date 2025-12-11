@@ -54,7 +54,7 @@ OscilloscopeGraph::OscilloscopeGraph(QWidget* parent, OscilloscopeControls* cont
 
 void OscilloscopeGraph::changeSampleRate()
 {
-		const auto newBufferSize = static_cast<std::size_t>(Engine::audioEngine()->outputSampleRate() * MaxBufferLengthSeconds);
+	const auto newBufferSize = static_cast<std::size_t>(Engine::audioEngine()->outputSampleRate() * MaxBufferLengthSeconds);
 	m_ringBuffer.resize(newBufferSize);
 	m_ringBufferIndex = m_ringBufferIndex % newBufferSize;
 }
