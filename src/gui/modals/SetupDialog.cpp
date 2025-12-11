@@ -153,9 +153,9 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	m_vstDir(QDir::toNativeSeparators(ConfigManager::inst()->vstDir())),
 	m_ladspaDir(QDir::toNativeSeparators(ConfigManager::inst()->ladspaDir())),
 	m_gigDir(QDir::toNativeSeparators(ConfigManager::inst()->gigDir())),
-	m_sf2Dir(QDir::toNativeSeparators(ConfigManager::inst()->sf2Dir())),
+	m_soundFontDir(QDir::toNativeSeparators(ConfigManager::inst()->soundFontDir())),
 #ifdef LMMS_HAVE_FLUIDSYNTH
-	m_sf2File(QDir::toNativeSeparators(ConfigManager::inst()->sf2File())),
+	m_soundFontFile(QDir::toNativeSeparators(ConfigManager::inst()->soundFontFile())),
 #endif
 	m_themeDir(QDir::toNativeSeparators(ConfigManager::inst()->themeDir())),
 	m_backgroundPicFile(QDir::toNativeSeparators(ConfigManager::inst()->backgroundPicFile()))
@@ -836,15 +836,15 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 		SLOT(setLADSPADir(const QString&)),
 		SLOT(openLADSPADir()),
 		m_ladspaDirLineEdit, "add_folder");
-	addPathEntry(tr("SF2 directory"), m_sf2Dir,
-		SLOT(setSF2Dir(const QString&)),
-		SLOT(openSF2Dir()),
-		m_sf2DirLineEdit);
+	addPathEntry(tr("SoundFont directory"), m_soundFontDir,
+		SLOT(setSoundFontDir(const QString&)),
+		SLOT(openSoundFontDir()),
+		m_soundFontDirLineEdit);
 #ifdef LMMS_HAVE_FLUIDSYNTH
-	addPathEntry(tr("Default SF2"), m_sf2File,
-		SLOT(setSF2File(const QString&)),
-		SLOT(openSF2File()),
-		m_sf2FileLineEdit);
+	addPathEntry(tr("Default SoundFont"), m_soundFontFile,
+		SLOT(setSoundFontFile(const QString&)),
+		SLOT(openSoundFontFile()),
+		m_soundFontFileLineEdit);
 #endif
 	addPathEntry(tr("GIG directory"), m_gigDir,
 		SLOT(setGIGDir(const QString&)),
@@ -1028,9 +1028,9 @@ void SetupDialog::accept()
 	ConfigManager::inst()->setWorkingDir(QDir::fromNativeSeparators(m_workingDir));
 	ConfigManager::inst()->setVSTDir(QDir::fromNativeSeparators(m_vstDir));
 	ConfigManager::inst()->setLADSPADir(QDir::fromNativeSeparators(m_ladspaDir));
-	ConfigManager::inst()->setSF2Dir(QDir::fromNativeSeparators(m_sf2Dir));
+	ConfigManager::inst()->setSoundFontDir(QDir::fromNativeSeparators(m_soundFontDir));
 #ifdef LMMS_HAVE_FLUIDSYNTH
-	ConfigManager::inst()->setSF2File(m_sf2File);
+	ConfigManager::inst()->setSoundFontFile(m_soundFontFile);
 #endif
 	ConfigManager::inst()->setGIGDir(QDir::fromNativeSeparators(m_gigDir));
 	ConfigManager::inst()->setThemeDir(QDir::fromNativeSeparators(m_themeDir));
@@ -1365,41 +1365,41 @@ void SetupDialog::setLADSPADir(const QString & ladspaDir)
 }
 
 
-void SetupDialog::openSF2Dir()
+void SetupDialog::openSoundFontDir()
 {
 	QString new_dir = FileDialog::getExistingDirectory(this,
-		tr("Choose your SF2 directory"), m_sf2Dir);
+		tr("Choose your SoundFont directory"), m_soundFontDir);
 	if (!new_dir.isEmpty())
 	{
-		m_sf2DirLineEdit->setText(new_dir);
+		m_soundFontDirLineEdit->setText(new_dir);
 	}
 }
 
 
-void SetupDialog::setSF2Dir(const QString & sf2Dir)
+void SetupDialog::setSoundFontDir(const QString & soundFontDir)
 {
-	m_sf2Dir = sf2Dir;
+	m_soundFontDir = soundFontDir;
 }
 
 
-void SetupDialog::openSF2File()
+void SetupDialog::openSoundFontFile()
 {
 #ifdef LMMS_HAVE_FLUIDSYNTH
 	QString new_file = FileDialog::getOpenFileName(this,
-		tr("Choose your default SF2"), m_sf2File, "SoundFont 2 files (*.sf2)");
+		tr("Choose your default SoundFont"), m_soundFontFile, "SoundFont 2 files (*.soundFont)");
 
 	if (!new_file.isEmpty())
 	{
-		m_sf2FileLineEdit->setText(new_file);
+		m_soundFontFileLineEdit->setText(new_file);
 	}
 #endif
 }
 
 
-void SetupDialog::setSF2File(const QString & sf2File)
+void SetupDialog::setSoundFontFile(const QString & soundFontFile)
 {
 #ifdef LMMS_HAVE_FLUIDSYNTH
-	m_sf2File = sf2File;
+	m_soundFontFile = soundFontFile;
 #endif
 }
 

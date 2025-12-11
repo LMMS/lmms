@@ -7611,7 +7611,7 @@ Reason: &quot;%2&quot;</source>
     </message>
     <message>
         <location filename="src/gui/modals/SetupDialog.cpp" line="545"/>
-        <source>SF2 directory</source>
+        <source>SoundFont directory</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -7725,7 +7725,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <location filename="src/gui/modals/SetupDialog.cpp" line="1298"/>
-        <source>Choose your SF2 directory</source>
+        <source>Choose your SoundFont directory</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -11260,42 +11260,42 @@ Double clicking any of the plugins will bring up information on the ports.</sour
 <context>
     <name>PatchesDialog</name>
     <message>
-        <location filename="plugins/Sf2Player/PatchesDialog.ui" line="39"/>
+        <location filename="plugins/SoundFontPlayer/PatchesDialog.ui" line="39"/>
         <source>Qsynth: Channel Preset</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="plugins/Sf2Player/PatchesDialog.ui" line="70"/>
+        <location filename="plugins/SoundFontPlayer/PatchesDialog.ui" line="70"/>
         <source>Bank selector</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="plugins/Sf2Player/PatchesDialog.ui" line="95"/>
+        <location filename="plugins/SoundFontPlayer/PatchesDialog.ui" line="95"/>
         <source>Bank</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="plugins/Sf2Player/PatchesDialog.ui" line="101"/>
+        <location filename="plugins/SoundFontPlayer/PatchesDialog.ui" line="101"/>
         <source>Program selector</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="plugins/Sf2Player/PatchesDialog.ui" line="126"/>
+        <location filename="plugins/SoundFontPlayer/PatchesDialog.ui" line="126"/>
         <source>Patch</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="plugins/Sf2Player/PatchesDialog.ui" line="131"/>
+        <location filename="plugins/SoundFontPlayer/PatchesDialog.ui" line="131"/>
         <source>Name</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="plugins/Sf2Player/PatchesDialog.ui" line="176"/>
+        <location filename="plugins/SoundFontPlayer/PatchesDialog.ui" line="176"/>
         <source>OK</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="plugins/Sf2Player/PatchesDialog.ui" line="195"/>
+        <location filename="plugins/SoundFontPlayer/PatchesDialog.ui" line="195"/>
         <source>Cancel</source>
         <translation type="unfinished"/>
     </message>
@@ -11448,7 +11448,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="plugins/Sf2Player/Sf2Player.cpp" line="54"/>
+        <location filename="plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="54"/>
         <source>Player for SoundFont files</source>
         <translation type="unfinished"/>
     </message>
@@ -11525,167 +11525,167 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
 </context>
 <context>
-    <name>Sf2Instrument</name>
+    <name>SoundFontInstrument</name>
     <message>
-        <location filename="plugins/Sf2Player/Sf2Player.cpp" line="94"/>
+        <location filename="plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="94"/>
         <source>Bank</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="plugins/Sf2Player/Sf2Player.cpp" line="95"/>
+        <location filename="plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="95"/>
         <source>Patch</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="plugins/Sf2Player/Sf2Player.cpp" line="96"/>
+        <location filename="plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="96"/>
         <source>Gain</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="plugins/Sf2Player/Sf2Player.cpp" line="97"/>
+        <location filename="plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="97"/>
         <source>Reverb</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="plugins/Sf2Player/Sf2Player.cpp" line="98"/>
+        <location filename="plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="98"/>
         <source>Reverb Roomsize</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="plugins/Sf2Player/Sf2Player.cpp" line="99"/>
+        <location filename="plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="99"/>
         <source>Reverb Damping</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="plugins/Sf2Player/Sf2Player.cpp" line="100"/>
+        <location filename="plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="100"/>
         <source>Reverb Width</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="plugins/Sf2Player/Sf2Player.cpp" line="101"/>
+        <location filename="plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="101"/>
         <source>Reverb Level</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="plugins/Sf2Player/Sf2Player.cpp" line="102"/>
+        <location filename="plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="102"/>
         <source>Chorus</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="plugins/Sf2Player/Sf2Player.cpp" line="103"/>
+        <location filename="plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="103"/>
         <source>Chorus Lines</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="plugins/Sf2Player/Sf2Player.cpp" line="104"/>
+        <location filename="plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="104"/>
         <source>Chorus Level</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="plugins/Sf2Player/Sf2Player.cpp" line="105"/>
+        <location filename="plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="105"/>
         <source>Chorus Speed</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="plugins/Sf2Player/Sf2Player.cpp" line="106"/>
+        <location filename="plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="106"/>
         <source>Chorus Depth</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="plugins/Sf2Player/Sf2Player.cpp" line="339"/>
+        <location filename="plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="339"/>
         <source>A soundfont %1 could not be loaded.</source>
         <translation type="unfinished"/>
     </message>
 </context>
 <context>
-    <name>Sf2InstrumentView</name>
+    <name>SoundFontInstrumentView</name>
     <message>
-        <location filename="plugins/Sf2Player/Sf2Player.cpp" line="845"/>
+        <location filename="plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="845"/>
         <source>Open other SoundFont file</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="plugins/Sf2Player/Sf2Player.cpp" line="847"/>
-        <source>Click here to open another SF2 file</source>
+        <location filename="plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="847"/>
+        <source>Click here to open another SoundFont file</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="plugins/Sf2Player/Sf2Player.cpp" line="859"/>
+        <location filename="plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="859"/>
         <source>Choose the patch</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="plugins/Sf2Player/Sf2Player.cpp" line="894"/>
+        <location filename="plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="894"/>
         <source>Gain</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="plugins/Sf2Player/Sf2Player.cpp" line="907"/>
+        <location filename="plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="907"/>
         <source>Apply reverb (if supported)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="plugins/Sf2Player/Sf2Player.cpp" line="909"/>
+        <location filename="plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="909"/>
         <source>This button enables the reverb effect. This is useful for cool effects, but only works on files that support it.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="plugins/Sf2Player/Sf2Player.cpp" line="915"/>
+        <location filename="plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="915"/>
         <source>Reverb Roomsize:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="plugins/Sf2Player/Sf2Player.cpp" line="919"/>
+        <location filename="plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="919"/>
         <source>Reverb Damping:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="plugins/Sf2Player/Sf2Player.cpp" line="923"/>
+        <location filename="plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="923"/>
         <source>Reverb Width:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="plugins/Sf2Player/Sf2Player.cpp" line="927"/>
+        <location filename="plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="927"/>
         <source>Reverb Level:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="plugins/Sf2Player/Sf2Player.cpp" line="947"/>
+        <location filename="plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="947"/>
         <source>Apply chorus (if supported)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="plugins/Sf2Player/Sf2Player.cpp" line="949"/>
+        <location filename="plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="949"/>
         <source>This button enables the chorus effect. This is useful for cool echo effects, but only works on files that support it.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="plugins/Sf2Player/Sf2Player.cpp" line="954"/>
+        <location filename="plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="954"/>
         <source>Chorus Lines:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="plugins/Sf2Player/Sf2Player.cpp" line="958"/>
+        <location filename="plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="958"/>
         <source>Chorus Level:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="plugins/Sf2Player/Sf2Player.cpp" line="962"/>
+        <location filename="plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="962"/>
         <source>Chorus Speed:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="plugins/Sf2Player/Sf2Player.cpp" line="966"/>
+        <location filename="plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="966"/>
         <source>Chorus Depth:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="plugins/Sf2Player/Sf2Player.cpp" line="1074"/>
+        <location filename="plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="1074"/>
         <source>Open SoundFont file</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="plugins/Sf2Player/Sf2Player.cpp" line="1078"/>
+        <location filename="plugins/SoundFontPlayer/SoundFontPlayer.cpp" line="1078"/>
         <source>SoundFont2 Files (*.sf2)</source>
         <translation type="unfinished"/>
     </message>
