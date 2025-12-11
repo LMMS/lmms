@@ -125,7 +125,7 @@ Song::Song() :
 	}
 
 	// Inform VST plugins and sample tracks if the user moved the play head
-	connect(this, &Song::playbackPositionJumped, [this](){ m_vstSyncController.setPlaybackJumped(true); }, Qt::DirectConnection);
+	connect(this, &Song::playbackPositionJumped, [this](){ m_vstSyncController.setPlaybackJumped(true); });
 }
 
 
