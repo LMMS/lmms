@@ -307,26 +307,26 @@ void MalletsInstrument::playNote( NotePlayHandle * _n,
 
 		if (p < 9)
 		{
-			hardness += random * fastRand(-64.f, 64.f);
+			hardness += random * fastRandInc(-64.f, 64.f);
 			hardness = std::clamp(hardness, 0.0f, 128.0f);
 
-			position += random * fastRand(-32.f, 32.f);
+			position += random * fastRandInc(-32.f, 32.f);
 			position = std::clamp(position, 0.0f, 64.0f);
 		}
 		else if (p == 9)
 		{
-			modulator += random * fastRand(-64.f, 64.f);
+			modulator += random * fastRandInc(-64.f, 64.f);
 			modulator = std::clamp(modulator, 0.0f, 128.0f);
 
-			crossfade += random * fastRand(-64.f, 64.f);
+			crossfade += random * fastRandInc(-64.f, 64.f);
 			crossfade = std::clamp(crossfade, 0.0f, 128.0f);
 		}
 		else
 		{
-			pressure += random * fastRand(-64.f, 64.f);
+			pressure += random * fastRandInc(-64.f, 64.f);
 			pressure = std::clamp(pressure, 0.0f, 128.0f);
 
-			speed += random * fastRand(-64.f, 64.f);
+			speed += random * fastRandInc(-64.f, 64.f);
 			speed = std::clamp(speed, 0.0f, 128.0f);
 		}
 

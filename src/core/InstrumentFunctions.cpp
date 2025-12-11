@@ -415,7 +415,7 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 		frames_processed += remaining_frames_for_cur_arp;
 
 		// Skip notes randomly
-		if (m_arpSkipModel.value() && fastRand(100.f) <= m_arpSkipModel.value())
+		if (m_arpSkipModel.value() && fastRandInc(100.f) <= m_arpSkipModel.value())
 		{
 			frames_processed += arp_frames;
 			cur_frame += arp_frames;
@@ -426,7 +426,7 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 
 		// Miss notes randomly. We intercept int dir and abuse it
 		// after need.  :)
-		if (m_arpMissModel.value() && fastRand(100.f) <= m_arpMissModel.value())
+		if (m_arpMissModel.value() && fastRandInc(100.f) <= m_arpMissModel.value())
 		{
 			dir = ArpDirection::Random;
 		}
@@ -454,7 +454,7 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 		else if( dir == ArpDirection::Random )
 		{
 			// just pick a random chord-index
-			cur_arp_idx = fastRand(range);
+			cur_arp_idx = fastRandInc(range);
 		}
 
 		// Divide cur_arp_idx with wanted repeats. The repeat feature will not affect random notes.

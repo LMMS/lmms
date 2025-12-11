@@ -271,7 +271,7 @@ void TrackOperationsWidget::resetTrackColor()
 
 void TrackOperationsWidget::randomizeTrackColor()
 {
-	QColor buffer = ColorChooser::getPalette(ColorChooser::Palette::Track)[fastRand(47)];
+	QColor buffer = ColorChooser::getPalette(ColorChooser::Palette::Track)[fastRand(48)];
 	auto track = m_trackView->getTrack();
 	track->addJournalCheckPoint();
 	track->setColor(buffer);

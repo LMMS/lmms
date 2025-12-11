@@ -109,11 +109,11 @@ private:
 		{
 			for (int i = 0; i < pick; ++i)
 			{
-				dl->data[i] = scale * values[dl->length - i - 1] + fastRand(randAmt);
+				dl->data[i] = scale * values[dl->length - i - 1] + fastRandInc(randAmt);
 			}
 			for (int i = pick; i < dl->length; ++i)
 			{
-				dl->data[i] = scale * values[i - pick] + fastRand(randAmt);
+				dl->data[i] = scale * values[i - pick] + fastRandInc(randAmt);
 			}
 		}
 		else
@@ -122,14 +122,14 @@ private:
 			{
 				for (int i = pick; i < dl->length; ++i)
 				{
-					dl->data[i] = scale * values[i - pick] + fastRand(randAmt);
+					dl->data[i] = scale * values[i - pick] + fastRandInc(randAmt);
 				}
 			}
 			else
 			{
 				for (int i = 0; i < len; ++i)
 				{
-					dl->data[i+pick] = scale * values[i] + fastRand(randAmt);
+					dl->data[i+pick] = scale * values[i] + fastRandInc(randAmt);
 				}
 			}
 		}

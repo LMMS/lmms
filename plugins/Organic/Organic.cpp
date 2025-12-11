@@ -236,11 +236,8 @@ void OrganicInstrument::playNote( NotePlayHandle * _n,
 
 		for (int i = m_numOscillators - 1; i >= 0; --i)
 		{
-			// Oscillator phases are wrapped within the range [0, 1), so 0 == 1
-			// TODO C++23: Use std::nextafter(1.f, 0.f) since it will be constexpr
-			constexpr float MAX_RANDOM_PHASE = 0.999999940395355224609375f;
-			newOsc->phaseOffsetLeft[i] = fastRand(MAX_RANDOM_PHASE);
-			newOsc->phaseOffsetRight[i] = fastRand(MAX_RANDOM_PHASE);
+			newOsc->phaseOffsetLeft[i] = fastRand(1.f);
+			newOsc->phaseOffsetRight[i] = fastRand(1.f);
 
 			// initialise ocillators
 			if (i == m_numOscillators - 1)
@@ -345,10 +342,10 @@ void OrganicInstrument::randomiseSettings()
 {
 	for (auto i = 0; i < m_numOscillators; ++i)
 	{
-		m_osc[i]->m_volModel.setValue(fastRand(100));
-		m_osc[i]->m_detuneModel.setValue(fastRand(-5, 5));
+		m_osc[i]->m_volModel.setValue(fastRandInc(100));
+		m_osc[i]->m_detuneModel.setValue(fastRandInc(-5, 5));
 		m_osc[i]->m_panModel.setValue(0);
-		m_osc[i]->m_oscModel.setValue(fastRand(5));
+		m_osc[i]->m_oscModel.setValue(fastRandInc(5));
 	}
 }
 

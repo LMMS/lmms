@@ -162,7 +162,7 @@ public:
 
 	static inline sample_t noiseSample( const float )
 	{
-		return fastRand(-1.f, 1.f);
+		return fastRandInc(-1.f, 1.f);
 	}
 
 	static sample_t userWaveSample(const SampleBuffer* buffer, const float sample)

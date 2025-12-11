@@ -93,20 +93,47 @@ inline int fastRand() noexcept
 }
 
 
-//! @brief Returns a pseudorandom number within [0, @p upper].
-//! @returns A pseudorandom number greater than or equal to 0 and less than or equal to @p upper.
+//! @brief Returns a pseudorandom number within [0, @p upper) (exclusive upper bound).
+//! @returns A pseudorandom number greater than or equal to 0 and less @p upper.
 template<std::floating_point T>
 inline T fastRand(T upper) noexcept
+{
+	constexpr auto FAST_RAND_RATIO = static_cast<T>(1.0 / 32768);
+	return fastRand() * upper * FAST_RAND_RATIO;
+}
+
+
+//! @brief Returns a pseudorandom integer within [0, @p upper) (exclusive upper bound).
+//! @p upper may be negative, in which case the output range is (@p upper, 0].
+//! @returns A pseudorandom integer greater than or equal to 0 and less than @p upper.
+template<std::integral T>
+inline T fastRand(T upper) noexcept
+{
+	constexpr float FAST_RAND_RATIO = 1.f / 32768;
+	return static_cast<T>(fastRand() * static_cast<float>(upper) * FAST_RAND_RATIO);
+}
+
+
+//! @brief Returns a pseudorandom integer within [@p from, @p to) (exclusive upper bound).
+//! @returns A pseudorandom integer greater than or equal to @p from and less than @p to.
+template<typename T> requires std::is_arithmetic_v<T>
+inline auto fastRand(T from, T to) noexcept { return from + fastRand(to - from); }
+
+
+//! @brief Returns a pseudorandom number within [0, @p upper] (inclusive upper bound).
+//! @returns A pseudorandom number greater than or equal to 0 and less than or equal to @p upper.
+template<std::floating_point T>
+inline T fastRandInc(T upper) noexcept
 {
 	constexpr auto FAST_RAND_RATIO = static_cast<T>(1.0 / 32767);
 	return fastRand() * upper * FAST_RAND_RATIO;
 }
 
 
-//! @brief Returns a pseudorandom integer within [0, @p upper].
+//! @brief Returns a pseudorandom integer within [0, @p upper] (inclusive upper bound).
 //! @returns A pseudorandom integer greater than or equal to 0 and less than or equal to @p upper.
-template<std::integral T>
-inline T fastRand(T upper) noexcept
+template<std::unsigned_integral T>
+inline T fastRandInc(T upper) noexcept
 {
 	// The integer specialization of this function is kind of weird, but it is
 	// necessary to prevent massive bias away from the maximum value.
@@ -115,24 +142,46 @@ inline T fastRand(T upper) noexcept
 	// [0, @p upper].
 	constexpr float FAST_RAND_RATIO = 1.f / 32768;
 	// Since the random float will be in a range that does not include @upper
-	// due to the above ratio, increase the magnitude of the random float by 1.
-	// All values greater than @p upper get rounded down to @p range, making the
+	// due to the above ratio, increase the upper bound by 1.
+	// All values greater than @p upper get rounded down to @p upper, making the
+	// chance of returning a value of @p upper the same as any other of the
+	// possible values.
+	// No need to copysign() unlike the signed_integral overload, since it will always be positive
+	return static_cast<T>(fastRand() * (upper + 1.f) * FAST_RAND_RATIO);
+}
+
+
+//! @brief Returns a pseudorandom integer within [0, @p upper] (inclusive upper bound).
+//! @p upper may be negative, in which case the output range is [@p upper, 0].
+//! @returns A pseudorandom integer greater than or equal to 0 and less than or equal to @p upper.
+template<std::signed_integral T>
+inline T fastRandInc(T upper) noexcept
+{
+	// The integer specialization of this function is kind of weird, but it is
+	// necessary to prevent massive bias away from the maximum value.
+	// FAST_RAND_RATIO here is 1 greater than normal, so when multiplied by, it
+	// will result in a random float within [0, @p upper) instead of the usual
+	// [0, @p upper].
+	constexpr float FAST_RAND_RATIO = 1.f / 32768;
+	// Since the random float will be in a range that does not include @upper
+	// due to the above ratio, increase the magnitude of the upper bound by 1.
+	// All values greater than @p upper get rounded down to @p upper, making the
 	// chance of returning a value of @p upper the same as any other of the
 	// possible values.
 	// HACK: Even on -O3, without this static_cast, it will convert @p upper to float twice for some reason
-	const float fupper = static_cast<float>(upper);
+	const auto fupper = static_cast<float>(upper);
 	const float r = fupper + std::copysign(1.f, fupper);
 	// Always round towards 0 (implicit truncation occurs during static_cast).
 	return static_cast<T>(fastRand() * r * FAST_RAND_RATIO);
 }
 
 
-//! @brief Returns a pseudorandom integer within [@p from, @p to].
+//! @brief Returns a pseudorandom integer within [@p from, @p to] (inclusive upper bound).
 //! This function does not require the parameters to be in the proper order.
 //! fastRand(a, b) behaves identically to fastRand(b, a).
 //! @returns A pseudorandom integer greater than or equal to @p from and less than or equal to @p to.
 template<typename T> requires std::is_arithmetic_v<T>
-inline auto fastRand(T from, T to) noexcept { return from + fastRand(to - from); }
+inline auto fastRandInc(T from, T to) noexcept { return from + fastRandInc(to - from); }
 
 
 //! @brief Returns true one in @p chance times at random.
