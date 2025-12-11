@@ -260,7 +260,8 @@ static int sid_fillbuffer(unsigned char* sidreg, reSID::SID *sid, int tdelta, sh
 		// Possible random badline delay once per writing
 		if (badline == c && residdelay)
 		{
-			const int result = sid->clock(residdelay, ptr, samples);
+			auto dt = residdelay;
+			const int result = sid->clock(dt, ptr, samples);
 			total += result;
 			ptr += result;
 			samples -= result;
