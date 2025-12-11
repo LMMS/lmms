@@ -38,7 +38,10 @@
 #include "ColorChooser.h"
 #include "ConfigManager.h"
 #include "DataFile.h"
+#include "ExportProjectDialog.h"
+#include "FileDialog.h"
 #include "PatternStore.h"
+#include "ProjectRenderer.h"
 #include "embed.h"
 #include "Engine.h"
 #include "InstrumentTrackView.h"
@@ -247,6 +250,31 @@ void TrackOperationsWidget::removeTrack()
 	}
 }
 
+void TrackOperationsWidget::exportTrack()
+{
+	auto dialog = FileDialog{nullptr, tr("Select audio file")};
+	auto types = QStringList{};
+
+	for (const auto& fileEncodeDevice : ProjectRenderer::fileEncodeDevices)
+	{
+		if (!fileEncodeDevice.isAvailable()) { continue; }
+		types << tr(fileEncodeDevice.m_description);
+	}
+
+	dialog.setFileMode(FileDialog::AnyFile);
+	dialog.setNameFilters(types);
+
+	const auto projectFileName = Engine::getSong()->projectFileName();
+	const auto exportName = (projectFileName.isEmpty() ? tr("untitled") : QFileInfo{projectFileName}.baseName()) + "_"
+		+ m_trackView->getTrack()->name();
+	dialog.selectFile(exportName);
+
+	if (dialog.exec() != QDialog::Accepted) { return; }
+
+	auto exportDialog = ExportProjectDialog{dialog.selectedFiles()[0], nullptr, false};
+	exportDialog.exec();
+}
+
 void TrackOperationsWidget::selectTrackColor()
 {
 	const auto newColor = ColorChooser{this}
@@ -318,7 +346,7 @@ void TrackOperationsWidget::updateMenu()
 	if (!dynamic_cast<AutomationTrackView*>(this)
 		&& !dynamic_cast<PatternStore*>(m_trackView->getTrack()->trackContainer()))
 	{
-		toMenu->addAction(tr("Export this track"));
+		toMenu->addAction(tr("Export this track"), this, &TrackOperationsWidget::exportTrack);
 	}
 
 	if (QMenu *mixerMenu = m_trackView->createMixerMenu(tr("Channel %1: %2"), tr("Assign to new Mixer Channel")))
