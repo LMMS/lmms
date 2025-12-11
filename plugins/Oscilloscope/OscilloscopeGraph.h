@@ -72,6 +72,8 @@ private:
 	// Buffer which is actually drawn on the screen, not the ring buffer used for communication between threads
 	std::vector<SampleFrame> m_ringBuffer;
 	int m_ringBufferIndex = 0;
+	// Mutex to prevent race condition when resizing the buffer when the sample rate changes
+	std::mutex m_bufferMutex;
 
 	int m_mousePos;
 

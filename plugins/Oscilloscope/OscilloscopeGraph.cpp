@@ -54,6 +54,8 @@ OscilloscopeGraph::OscilloscopeGraph(QWidget* parent, OscilloscopeControls* cont
 
 void OscilloscopeGraph::changeSampleRate()
 {
+	// Lock the mutex to prevent paintEvent from accidentally accessing out-of-bounds data when resizing the buffer
+	std::lock_guard<std::mutex> lockGuard(m_bufferMutex);
 	const auto newBufferSize = static_cast<std::size_t>(Engine::audioEngine()->outputSampleRate() * MaxBufferLengthSeconds);
 	m_ringBuffer.resize(newBufferSize);
 	m_ringBufferIndex = m_ringBufferIndex % newBufferSize;
@@ -65,6 +67,8 @@ void OscilloscopeGraph::paintEvent(QPaintEvent* pe)
 
 	// Update the ring buffer with any new data from the audio thread
 	auto incomingBuffer = m_inputBufferReader.read_max(effect->inputBuffer().capacity());
+	// Make sure the buffer is not currently being resized by changeSampleRate
+	std::lock_guard<std::mutex> lockGuard(m_bufferMutex);
 	for (f_cnt_t f = 0; f < incomingBuffer.size(); ++f)
 	{
 		m_ringBuffer[m_ringBufferIndex] = incomingBuffer[f];
