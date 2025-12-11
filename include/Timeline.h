@@ -58,23 +58,22 @@ public:
 
 	auto ticks() const -> tick_t { return m_pos.getTicks(); }
 
-	// By default, calling `setTicks` will emit `positionJumped` signals to update everything accordingly
-	// However, passing `jumped = false` will instead treat the change in ticks as a continuous increment
-	void setTicks(tick_t ticks, bool jumped = true)
+	//! Forcefully sets the current ticks, resets the frame offset, and sets the elapsed seconds based on the global position (ignoring potential mid-song tempo changes)
+	//! This function will emit the `positionJumped` signal to allow other widgets to update accordingly
+	void setTicks(tick_t ticks)
 	{
-		if (jumped)
-		{
-			m_frameOffset = 0;
-			// If the playhead has jumped, reset the elapsed time based on the global offset, ignoring any potnetial tempo automations.
-			m_elapsedSeconds = ticks * Engine::framesPerTick() / Engine::audioEngine()->outputSampleRate();
-			emit positionJumped();
-		}
-		else
-		{
-			// Update the elapsed time based on the delta ticks, to preserve the current total in case there was a tempo change mid-song
-			m_elapsedSeconds += (ticks - m_pos.getTicks()) * Engine::framesPerTick() / Engine::audioEngine()->outputSampleRate();
-		}
 		m_pos.setTicks(ticks);
+		m_frameOffset = 0;
+		m_elapsedSeconds = ticks * Engine::framesPerTick() / Engine::audioEngine()->outputSampleRate();
+		emit positionJumped();
+		emit positionChanged();
+	}
+
+	//! Advances the current timeline position by a certain number of ticks, in addition to updating the elapsed time based on the current tempo.
+	void incrementTicks(tick_t increment)
+	{
+		m_pos.setTicks(ticks() + increment);
+		m_elapsedSeconds += increment * Engine::framesPerTick() / Engine::audioEngine()->outputSampleRate();
 		emit positionChanged();
 	}
 

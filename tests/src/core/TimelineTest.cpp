@@ -75,15 +75,15 @@ private slots:
 
 		// And likewise using setPlayPos
 		resetReceived();
-		timeline.setPlayPos(TimePos(10));
-		QCOMPARE(timeline.ticks(), 10);
+		timeline.setPlayPos(TimePos(15));
+		QCOMPARE(timeline.ticks(), 15);
 		QVERIFY(positionChangedReceived);
 		QVERIFY(positionJumpedReceived);
 
-		// However, passing false will be treated as a simple delta to the current tick value, and will not emit positionJumped.
+		// However, using incrementTicks will not emit positionJumped.
 		resetReceived();
-		timeline.setTicks(10, false);
-		QCOMPARE(timeline.ticks(), 10);
+		timeline.incrementTicks(10);
+		QCOMPARE(timeline.ticks(), 25);
 		QVERIFY(positionChangedReceived);
 		QVERIFY(!positionJumpedReceived);
 	}
@@ -110,7 +110,7 @@ private slots:
 		// Changing the tempo and then non-forcefully incrementing the ticks will increase the elapsed time based on the new tempo
 		Engine::getSong()->setTempo(60);
 		secondsPerTick = 60.0f / Engine::getSong()->getTempo() * 4 / DefaultTicksPerBar;
-		timeline.setTicks(15, false);
+		timeline.incrementTicks(5);
 		QCOMPARE(static_cast<int>(timeline.getElapsedSeconds() * 1000), static_cast<int>((initialElapsedSeconds + 5 * secondsPerTick) * 1000));
 
 		// Forcefully setting the ticks (such as dragging the playhead with the mouse) will reset the elapsed time based on the global position and current tempo

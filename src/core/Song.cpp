@@ -273,8 +273,7 @@ void Song::processNextBuffer()
 			// Transfer any whole ticks from the frame count to the tick count
 			const auto elapsedTicks = static_cast<int>(frameOffsetInTick / framesPerTick);
 			frameOffsetInTick -= elapsedTicks * framesPerTick;
-			// Passing false as the second argument prevents the timeline from sending `positionJumped` signals and resetting the frame offset.
-			timeline.setTicks(getPlayPos().getTicks() + elapsedTicks, false);
+			timeline.incrementTicks(elapsedTicks);
 			timeline.setFrameOffset(frameOffsetInTick);
 
 			// If we are playing a pattern track, or a MIDI clip with no loop enabled,
