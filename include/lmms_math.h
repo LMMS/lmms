@@ -83,7 +83,8 @@ inline auto absFraction(std::floating_point auto x) noexcept
 }
 
 
-//! @brief Returns a psuedorandom integer between 0 and 32767, inclusive.
+//! @brief Returns a pseudorandom integer within [0, 32768).
+//! @returns A pseudorandom integer greater than or equal to 0 and less than 32767.
 inline int fastRand() noexcept
 {
 	thread_local unsigned long s_next = 1;
@@ -92,35 +93,44 @@ inline int fastRand() noexcept
 }
 
 
-//! @brief Returns a psuedorandom number between 0 and @p range, inclusive.
+//! @brief Returns a pseudorandom number within [0, @p upper].
+//! @returns A pseudorandom number greater than or equal to 0 and less than or equal to @p upper.
 template<typename T> requires std::is_floating_point_v<T>
-inline T fastRand(T range) noexcept
+inline T fastRand(T upper) noexcept
 {
 	constexpr auto FAST_RAND_RATIO = static_cast<T>(1.0 / 32767);
-	return fastRand() * range * FAST_RAND_RATIO;
+	return fastRand() * upper * FAST_RAND_RATIO;
 }
 
 
-//! @brief Returns a psuedorandom integer between 0 and @p range, inclusive.
+//! @brief Returns a pseudorandom integer within [0, @p upper].
+//! @returns A pseudorandom integer greater than or equal to 0 and less than or equal to @p upper.
 template<typename T> requires std::is_integral_v<T>
-inline T fastRand(T range) noexcept
+inline T fastRand(T upper) noexcept
 {
-	// The integer specialization of this function is kind of weird, but
-	// it is necessary to prevent massive bias away from the maximum
-	// value. FAST_RAND_RATIO here is 1 greater than normal, so it will
-	// actually result in an open-end range.
+	// The integer specialization of this function is kind of weird, but it is
+	// necessary to prevent massive bias away from the maximum value.
+	// FAST_RAND_RATIO here is 1 greater than normal, so when multiplied by, it
+	// will result in a random float within [0, @p upper) instead of the usual
+	// [0, @p upper].
 	constexpr float FAST_RAND_RATIO = 1.f / 32768;
-	// Since it's open-end using the above ratio, increase the magnitude
-	// by 1. All values greater than range get, rounded to range, and
-	// the bias is removed.
-	const float frange = static_cast<float>(range); // Even on -O3 it casts twice without this for some reason??
-	const float r = frange + std::copysign(1.f, frange);
+	// Since the random float will be in a range that does not include @upper
+	// due to the above ratio, increase the magnitude of the random float by 1.
+	// All values greater than @p upper get rounded down to @p range, making the
+	// chance of returning a value of @p upper the same as any other of the
+	// possible values.
+	// HACK: Even on -O3, without this static_cast, it will convert @p upper to float twice for some reason
+	const float fupper = static_cast<float>(upper);
+	const float r = fupper + std::copysign(1.f, fupper);
 	// Always round towards 0 (implicit truncation occurs during static_cast).
 	return static_cast<T>(fastRand() * r * FAST_RAND_RATIO);
 }
 
 
-//! @brief Returns a psuedorandom number between @p from and @p to, inclusive.
+//! @brief Returns a pseudorandom integer within [@p from, @p to].
+//! This function does not require the parameters to be in the proper order.
+//! fastRand(a, b) behaves identically to fastRand(b, a).
+//! @returns A pseudorandom integer greater than or equal to @p from and less than or equal to @p to.
 template<typename T> requires std::is_arithmetic_v<T>
 inline auto fastRand(T from, T to) noexcept { return from + fastRand(to - from); }
 
