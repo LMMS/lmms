@@ -60,7 +60,6 @@ PatternEditor::PatternEditor(PatternStore* ps) :
 		Engine::getSong()->getTimeline(Song::PlayMode::Pattern),
 		m_currentPosition, this
 	);
-	connect(this, &PatternEditor::positionChanged, m_timeLine, qOverload<>(&QWidget::update));
 	connect(m_timeLine->model(), &Timeline::positionChanged, this, &PatternEditor::updatePosition, Qt::QueuedConnection);
 	static_cast<QVBoxLayout*>(layout())->insertWidget(0, m_timeLine);
 
@@ -199,7 +198,6 @@ void PatternEditor::updatePosition()
 	{
 		trackView->update();
 	}
-	emit positionChanged( m_currentPosition );
 }
 
 void PatternEditor::updatePixelsPerBar()
