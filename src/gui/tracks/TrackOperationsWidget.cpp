@@ -273,7 +273,7 @@ void TrackOperationsWidget::exportTrack()
 
 	if (dialog.exec() != QDialog::Accepted) { return; }
 
-	auto exportDialog = ExportProjectDialog{dialog.selectedFiles()[0], RenderManager::Mode::ExportTrack, nullptr};
+	auto exportDialog = ExportProjectDialog{dialog.selectedFiles()[0], RenderManager::Mode::ExportTrack, m_trackView->getTrack()};
 	exportDialog.exec();
 }
 

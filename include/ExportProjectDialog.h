@@ -41,7 +41,8 @@ class ExportProjectDialog : public QDialog, public Ui::ExportProjectDialog
 {
 	Q_OBJECT
 public:
-	ExportProjectDialog(const QString& path, RenderManager::Mode mode, QWidget* parent = nullptr);
+	ExportProjectDialog(
+		const QString& path, RenderManager::Mode mode, Track* track = nullptr, QWidget* parent = nullptr);
 
 protected:
 	void reject() override;
@@ -60,6 +61,7 @@ private:
 	QString m_path;
 	RenderManager::Mode m_mode;
 	ProjectRenderer::ExportFileFormat m_ft;
+	Track* m_track;
 	std::unique_ptr<RenderManager> m_renderManager;
 } ;
 

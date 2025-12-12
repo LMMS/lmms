@@ -59,6 +59,9 @@ public:
 	/// Export all unmuted tracks into individual file
 	void renderTracks();
 
+	/// Export a a track into a single file
+	void renderTrack(Track* track);
+
 	void abortProcessing();
 
 signals:
@@ -83,6 +86,8 @@ private:
 
 	std::vector<Track*> m_tracksToRender;
 	std::vector<Track*> m_unmuted;
+
+	Mode m_mode;
 } ;
 
 

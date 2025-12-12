@@ -34,11 +34,12 @@
 namespace lmms::gui
 {
 
-ExportProjectDialog::ExportProjectDialog(const QString& path, RenderManager::Mode mode, QWidget* parent)
+ExportProjectDialog::ExportProjectDialog(const QString& path, RenderManager::Mode mode, Track* track, QWidget* parent)
 	: QDialog(parent)
 	, Ui::ExportProjectDialog()
 	, m_path(path)
 	, m_mode(mode)
+	, m_track(track)
 	, m_renderManager(nullptr)
 {
 	setupUi( this );
@@ -185,7 +186,7 @@ void ExportProjectDialog::startExport()
 		m_renderManager->renderTracks();
 		break;
 	case RenderManager::Mode::ExportTrack:
-		// TODO: Implement
+		m_renderManager->renderTrack(m_track);
 		break;
 	}
 }

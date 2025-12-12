@@ -22,15 +22,15 @@
  *
  */
 
-#include <QDir>
-#include <QRegularExpression>
-
 #include "RenderManager.h"
 
+#include <QDir>
+#include <QRegularExpression>
+#include <ranges>
+
+#include "AutomationTrack.h"
 #include "PatternStore.h"
 #include "Song.h"
-
-
 namespace lmms
 {
 
@@ -68,23 +68,29 @@ void RenderManager::renderNextTrack()
 		// nothing left to render
 		restoreMutedState();
 		emit finished();
+		return;
 	}
-	else
+
+	// pop the next track from our rendering queue
+	Track* renderTrack = m_tracksToRender.back();
+	m_tracksToRender.pop_back();
+
+	// mute everything but the track we are about to render
+	for (auto track : m_unmuted)
 	{
-		// pop the next track from our rendering queue
-		Track* renderTrack = m_tracksToRender.back();
-		m_tracksToRender.pop_back();
+		track->setMuted(track != renderTrack);
+	}
 
-		// mute everything but the track we are about to render
-		for (auto track : m_unmuted)
-		{
-			track->setMuted(track != renderTrack);
-		}
-
+	if (m_mode == Mode::ExportTracks)
+	{
 		// for multi-render, prefix each output file with a different number
 		int trackNum = m_tracksToRender.size() + 1;
 
 		render( pathForTrack(renderTrack, trackNum) );
+	}
+	else
+	{
+		render(m_outputPath);
 	}
 }
 
@@ -123,13 +129,31 @@ void RenderManager::renderTracks()
 	// we need to remember which tracks were unmuted to restore state at the end.
 	m_tracksToRender = m_unmuted;
 
+	m_mode = Mode::ExportTracks;
 	renderNextTrack();
 }
 
 // Render the song into a single track
 void RenderManager::renderProject()
 {
+	m_mode = Mode::ExportProject;
 	render( m_outputPath );
+}
+
+void RenderManager::renderTrack(Track* track)
+{
+	const auto containers = {Engine::getSong()->tracks(), Engine::patternStore()->tracks()};
+
+	for (auto& otherTrack : containers | std::views::join)
+	{
+		if (otherTrack == track || otherTrack->isMuted() || dynamic_cast<AutomationTrack*>(otherTrack)) { continue; }
+		m_unmuted.push_back(otherTrack);
+	}
+
+	m_tracksToRender = {track};
+
+	m_mode = Mode::ExportTrack;
+	renderNextTrack();
 }
 
 void RenderManager::render(QString outputPath)
