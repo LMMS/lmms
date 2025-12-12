@@ -15,14 +15,18 @@
 #include <complex>
 #include <vector>
 #include <cstdlib>
-#include <cstring>  // for ::memset
-#include <functional> 
+#include <cstring>
+#include <functional>
+#include <random> // Added for thread-safe random generation
+
 using namespace lmms;
 extern "C" LMMS_EXPORT Plugin::Descriptor Visualiser_plugin_descriptor;
+
 #define BUFFER_SIZE 512
 static float g_bufferL[BUFFER_SIZE];
 static float g_bufferR[BUFFER_SIZE];
 #define SAMPLE_RATE 44100.0f
+
 // ================================================================
 // SIMPLE FFT
 // ================================================================
@@ -43,6 +47,7 @@ std::vector<std::complex<float>> computeComplexFFT(float* data)
     }
     return output;
 }
+
 // ================================================================
 // FREQ -> NOTE
 // ================================================================
@@ -59,6 +64,7 @@ QString freqToNote(float freq)
     if (noteIndex < 0) noteIndex = 0;
     return QString("%1%2").arg(notes[noteIndex]).arg(octave);
 }
+
 // ================================================================
 // SIMPLE 2D MAP FOR WOLFENSTEIN-STYLE DUNGEON
 // ================================================================
@@ -82,6 +88,7 @@ static const int g_wolfMap[MAP_H][MAP_W] ={
     {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
     {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
 };
+
 // ================================================================
 // SCREEN WIDGET
 // ================================================================
@@ -108,16 +115,22 @@ public:
         , m_planeX(0.0f)
         , m_planeY(0.66f)
     {
+        // Initialize Random Number Generator securely
+        std::random_device rd;
+        m_rng.seed(rd());
+
         setMinimumSize(300, 250);
         setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        
         for (int i = 0; i < 100; ++i)
         {
             m_stars.push_back({
-                (float)(rand() % 2000 - 1000),
-                (float)(rand() % 2000 - 1000),
-                (float)(rand() % 1000 + 1)
+                (float)(randomRange(-1000, 999)),
+                (float)(randomRange(-1000, 999)),
+                (float)(randomRange(1, 1000))
             });
         }
+        
         // zero fire buffer safely
         ::memset(m_fire, 0, sizeof(m_fire));
         QTimer *t = new QTimer(this);
@@ -128,6 +141,7 @@ public:
             update();
         });
         t->start(30);
+        
         // --- Init New Members ---
         m_prevFrameValid = false;
         m_voxelZ = 0.0f;
@@ -135,6 +149,14 @@ public:
         m_lastEnergy = 0.0f;
         m_framesSinceChange = 0;
     }
+
+    // Helper for thread-safe random integers (inclusive)
+    int randomRange(int min, int max)
+    {
+        std::uniform_int_distribution<int> dist(min, max);
+        return dist(m_rng);
+    }
+
     float getReactionLevel()
     {
         if (m_reactionBand == 0)
@@ -149,6 +171,7 @@ public:
             sum += std::abs(bins[i]);
         return sum * 3.0f;
     }
+
     void updateLogic()
     {
         m_hue = (m_hue + 2) % 360;
@@ -159,7 +182,7 @@ public:
             if (m_cycleCounter > 100)
             {
                 m_cycleCounter = 0;
-                m_randomModeIndex = rand() % 31; // 0..30
+                m_randomModeIndex = randomRange(0, 30);
             }
         }
         // particles (mode 15)
@@ -171,10 +194,10 @@ public:
                 for (int k = 0; k < 3; k++)
                 {
                     Particle p;
-                    p.x = rand() % width();
-                    p.y = height()/2 + (rand()%100 - 50);
-                    p.vx = (rand()%10 - 5) * 0.1f;
-                    p.vy = (rand()%5 + 1);
+                    p.x = randomRange(0, width() - 1);
+                    p.y = height()/2 + (randomRange(-50, 49));
+                    p.vx = (randomRange(-5, 4)) * 0.1f;
+                    p.vy = (randomRange(1, 5));
                     p.life = 50;
                     p.color = QColor::fromHsv(m_hue, 200, 255);
                     m_particles.push_back(p);
@@ -234,13 +257,14 @@ public:
                 // Pick any scene 0..46, avoiding cycle modes (31 and 47)
                 int newScene;
                 do {
-                    newScene = rand() % 47; 
+                    newScene = randomRange(0, 46); 
                 } while (newScene == 31 || newScene == 47);
                 m_fftCycleScene = newScene;
                 m_framesSinceChange = 0;
             }
         }
     }
+
     void setMode(int m)          { m_mode = m; update(); }
     void setShowText(bool show)  { m_showText = show; update(); }
     void setWiggleText(bool wig) { m_wiggleText = wig; update(); }
@@ -248,6 +272,7 @@ public:
     void setRecResolution(int r) { m_recResolution = r; }
     void setReactionBand(int b)  { m_reactionBand = b; }
     void setText(const QString &t) { m_text = t; update(); }
+
     void renderScene(QPainter &p, int w, int h)
     {
         // Compute active mode
@@ -258,6 +283,7 @@ public:
             activeMode = m_fftCycleScene;     // FFT-based random scene
         else
             activeMode = m_mode;
+            
         switch (activeMode)
         {
         case 0:  drawWaveform(p, w, h);          break;
@@ -490,7 +516,7 @@ private:
         float ignition = getReactionLevel();
         for (int x = 0; x < fw; ++x)
         {
-            if ((rand()%100) < (ignition * 200.0f))
+            if (randomRange(0, 99) < (ignition * 200.0f))
                 m_fire[x][fh-1] = 255;
             else
                 m_fire[x][fh-1] = 0;
@@ -537,8 +563,8 @@ private:
             if (s.z <= 0)
             {
                 s.z = 1000;
-                s.x = (rand()%2000)-1000;
-                s.y = (rand()%2000)-1000;
+                s.x = randomRange(-1000, 999);
+                s.y = randomRange(-1000, 999);
             }
             float k = 250.0f / s.z;
             int sz = (int)(2.0f * k);
@@ -619,7 +645,7 @@ private:
             int idx = (i * BUFFER_SIZE) / cols;
             if (std::abs(g_bufferL[idx]) > 0.05f)
             {
-                QString bin = (rand()%2 == 0) ? "0" : "1";
+                QString bin = (randomRange(0, 1) == 0) ? "0" : "1";
                 int y = (m_hue * 5 + i * 20) % h;
                 p.drawText(i * 15, y, bin);
             }
@@ -630,10 +656,10 @@ private:
         drawWaveform(p, w, h);
         for (int i = 0; i < 10; ++i)
         {
-            if ((rand()%10) > 7)
+            if (randomRange(0, 9) > 7)
             {
-                int y = rand() % h;
-                int shift = (rand() % 40) - 20;
+                int y = randomRange(0, h - 1);
+                int shift = randomRange(-20, 19);
                 p.setPen(Qt::red);
                 p.drawLine(0, y, w, y+shift);
             }
@@ -735,9 +761,9 @@ private:
         {
             for (int x = 0; x < cols; ++x)
             {
-                if ((rand()%100) > 90)
+                if (randomRange(0, 99) > 90)
                     p.drawText(x*(w/cols), y*(h/rows),
-                               QString::number(rand()%9));
+                               QString::number(randomRange(0, 8)));
             }
         }
     }
@@ -970,7 +996,7 @@ private:
         static std::vector<int> radius;
         if (std::abs(g_bufferL[0]) > 0.5f)
         {
-            drops.push_back(QPoint(rand()%w, rand()%h));
+            drops.push_back(QPoint(randomRange(0, w - 1), randomRange(0, h - 1)));
             radius.push_back(1);
         }
         p.setPen(Qt::blue);
@@ -1120,8 +1146,8 @@ private:
         for (int y = 0; y < h; ++y)
         {
             int offset = (int)(std::sin(y * 0.1f + m_hue * 0.05f) * jitterAmount);
-            if ((rand() % 100) < 2)
-                offset += (rand() % 15) - 7;
+            if (randomRange(0, 99) < 2)
+                offset += randomRange(-7, 7);
             int srcY = y;
             if (srcY < 0) srcY = 0;
             if (srcY >= h) srcY = h-1;
@@ -1133,7 +1159,7 @@ private:
                 if (sx >= w) sx = w-1;
                 QRgb col = line[sx];
                 // add a bit of random noise
-                int noise = (rand() % 15) - 7;
+                int noise = randomRange(-7, 7);
                 int r = qBound(0, qRed(col)   + noise, 255);
                 int g = qBound(0, qGreen(col) + noise, 255);
                 int b = qBound(0, qBlue(col)  + noise, 255);
@@ -1287,9 +1313,9 @@ void drawEuroHyperColor(QPainter &p, int w, int h)
         int lines = 5 + (int)(energy * 30.0f);
         for (int i = 0; i < lines; ++i)
         {
-            int y = rand() % h;
-            int height = 1 + rand()%4;
-            int shift = (rand()%80) - 40;
+            int y = randomRange(0, h - 1);
+            int height = 1 + randomRange(0, 3);
+            int shift = randomRange(-40, 39);
             p.fillRect(0, y, w, height, QColor(0,0,0,160));
             p.fillRect(shift, y, w, height, QColor(255,255,255,40));
         }
@@ -1485,15 +1511,15 @@ void drawEuroHyperColor(QPainter &p, int w, int h)
         // Jittery black waveform
         p.setPen(QPen(Qt::black, 3));
         int mid = h/2;
-        float jitter = (rand() % 10) - 5;
+        float jitter = (randomRange(-5, 4));
         
         for (int i = 0; i < BUFFER_SIZE-1; i += 2)
         {
             int x1 = (i*w)/BUFFER_SIZE;
             int x2 = ((i+1)*w)/BUFFER_SIZE;
             // Add noise to the wave
-            float s1 = g_bufferL[i] + (rand()%100 * 0.002f);
-            float s2 = g_bufferL[i+1] + (rand()%100 * 0.002f);
+            float s1 = g_bufferL[i] + (randomRange(0, 99) * 0.002f);
+            float s2 = g_bufferL[i+1] + (randomRange(0, 99) * 0.002f);
             
             p.drawLine(x1, mid + s1*h*0.6f + jitter, 
                        x2, mid + s2*h*0.6f + jitter);
@@ -1502,7 +1528,7 @@ void drawEuroHyperColor(QPainter &p, int w, int h)
         for (int i = 0; i < 100; ++i)
         {
             p.setPen(Qt::black);
-            p.drawPoint(rand()%w, rand()%h);
+            p.drawPoint(randomRange(0, w - 1), randomRange(0, h - 1));
         }
     }
     // ============================================================
@@ -1533,6 +1559,9 @@ void drawEuroHyperColor(QPainter &p, int w, int h)
     int    m_fftCycleScene = 0;      // current scene for FFT-cycle mode
     float  m_lastEnergy    = 0.0f;
     int    m_framesSinceChange = 0;
+
+    // --- NEW: Random Number Generator ---
+    std::mt19937 m_rng;
 };
 // ================================================================
 // EFFECT CONTROLS
@@ -1632,7 +1661,7 @@ VisualiserControlDialog::VisualiserControlDialog(EffectControls *controls)
     m_modeCombo->addItem("45. Retro Checkerboard");
     m_modeCombo->addItem("46. Industrial Scope");
     
-    m_modeCombo->addItem("47. Cycle  FFT Energy");
+    m_modeCombo->addItem("47. Cycle   FFT Energy");
     ml->addWidget(new QLabel("Mode:", this));
     ml->addWidget(m_modeCombo);
     main->addLayout(ml);
