@@ -138,7 +138,7 @@ public:
 		return( m_pos );
 	}
 
-  static AutoScrollState defaultAutoScrollState();
+	static AutoScrollState defaultAutoScrollState();
 	AutoScrollState autoScroll() const { return m_autoScroll; }
 	void setAutoScroll(AutoScrollState state) { m_autoScroll = state; }
 
