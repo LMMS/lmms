@@ -68,6 +68,7 @@ SET(LMMS_PLUGIN_LIST
 	StereoMatrix
 	Stk
 	TapTempo
+	Transfer Function
 	VstBase
 	Vestige
 	VstEffect
@@ -75,6 +76,7 @@ SET(LMMS_PLUGIN_LIST
 	WaveShaper
 	Vectorscope
 	Vibed
+	Visualiser
 	Xpressive
 	ZynAddSubFx
 )
