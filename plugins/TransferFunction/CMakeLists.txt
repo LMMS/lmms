@@ -1,0 +1,3 @@
+INCLUDE(BuildPlugin)
+
+BUILD_PLUGIN(TransferFunction TransferFunction.cpp TransferFunctionControls.cpp TransferFunctionControlDialog.cpp MOCFILES TransferFunctionControls.h TransferFunctionControlDialog.h EMBEDDED_RESOURCES artwork.svg)
