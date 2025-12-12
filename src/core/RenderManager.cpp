@@ -31,6 +31,7 @@
 #include "AutomationTrack.h"
 #include "PatternStore.h"
 #include "Song.h"
+
 namespace lmms
 {
 
