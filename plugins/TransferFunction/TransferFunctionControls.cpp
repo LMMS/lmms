@@ -1,16 +1,36 @@
-#ifndef TRANSFER_FUNCTION_LOGIC_H
+/*
 
-#define TRANSFER_FUNCTION_LOGIC_H
+ * TransferFunctionControls.cpp - controls for TransferFunction effect
+
+ */
 
 
 
-#include <complex>
+#include "TransferFunctionControls.h"
 
-#include <string>
+#include "TransferFunction.h"
+
+#include "TransferFunctionLogic.h"
+
+
+
+// NEW INCLUDES FOR SAMPLE RATE
+
+#include "Engine.h"
+
+#include "AudioEngine.h"
+
+
+
+#include <QDomElement>
+
+#include <QDomDocument>
+
+#include <vector>
 
 #include <cmath>
 
-#include <vector>
+#include <string>
 
 #include <cctype>
 
@@ -24,103 +44,151 @@ namespace lmms
 
 
 
-using Complex = std::complex<float>;
+// =======================
 
-static const float PI_LOGIC = 3.14159265358979f;
+//   CONSTRUCTOR
 
-
-
-// =============================================================
-
-// NEW: DRAWING DATA STRUCTURES
-
-// =============================================================
-
-struct DrawPoint {
-
-    float freq; 
-
-    float mag;  
-
-    bool operator<(const DrawPoint& other) const { return freq < other.freq; }
-
-};
+// =======================
 
 
 
-inline float getDrawnMagnitude(float freq, const std::vector<DrawPoint>& points) {
+TransferFunctionControls::TransferFunctionControls(TransferFunctionEffect* effect) :
 
-    if (points.empty()) return 1.0f; 
+	EffectControls(effect),
 
-    if (freq <= points.front().freq) return points.front().mag;
+	m_effect(effect),
 
-    if (freq >= points.back().freq) return points.back().mag;
+	m_volumeModel(1.0f, 1.0f, 18.0f, 1.0f, this, tr("Preset")),
 
+	m_formulaString("1.0 / (1.0 + 1j * (freq / 800.0))"), 
 
+	m_bodeMagModel(0.0f, 1.0f, 512, this),
 
-    auto it = std::upper_bound(points.begin(), points.end(), DrawPoint{freq, 0.0f});
+	m_bodePhaseModel(0.0f, 1.0f, 512, this)
 
-    const DrawPoint& p2 = *it;
+{
 
-    const DrawPoint& p1 = *(--it);
+    // Init with flat line
 
+    m_drawPoints.push_back({0.0f, 0.5f});
 
+    m_drawPoints.push_back({22050.0f, 0.5f});
 
-    float t = (freq - p1.freq) / (p2.freq - p1.freq);
+    
 
-    return p1.mag + t * (p2.mag - p1.mag);
+	connect(&m_volumeModel, SIGNAL(dataChanged()), this, SLOT(updateBodePlot()));
+
+	updateBodePlot();
 
 }
 
 
 
-// =============================================================
+// =======================
 
-// FORMULA STRING HELPER (MISSING FUNCTION ADDED HERE)
+//   LOAD / SAVE
 
-// =============================================================
+// =======================
 
-inline std::string getPresetFormulaString(int presetIdx) {
 
-    switch(presetIdx) {
 
-        case 1: return "Custom (See Entry Box)";
+void TransferFunctionControls::loadSettings(const QDomElement& parent)
 
-        case 2: return "Lowpass 4th Order: 1 / sqrt(1 + (freq/800)^8)";
+{
 
-        case 3: return "Highpass 4th Order: 1 / sqrt(1 + (500/freq)^8)";
+	m_volumeModel.loadSettings(parent, "volume");
 
-        case 4: return "Low Shelf: 1 + 1 / (1 + (freq/500)^2)";
 
-        case 5: return "High Shelf: 1 + 1 / (1 + (2000/(freq+1))^2)";
 
-        case 6: return "Telephone: Bandpass 300Hz - 3000Hz";
+	if (parent.hasAttribute("formula"))
 
-        case 7: return "Notch: 1 - exp(-(freq-600)^2 / (2*40^2))";
+	{
 
-        case 8: return "Resonator: 1 + 8 * exp(-(20*(freq-900)/900)^2)";
+		m_formulaString = parent.attribute("formula");
 
-        case 9: return "Comb: 1 + exp(-j * 2*pi*freq * 0.002)";
+	}
 
-        case 10: return "Comb Notch: 1 - exp(-j * 2*pi*freq * 0.003)";
+    
 
-        case 11: return "Allpass: (1 - j*(freq/1200)) / (1 + j*(freq/1200))";
+    QDomNode node = parent.firstChild();
 
-        case 12: return "Bitcrusher: Square Wave (Freq % 500 < 250)";
+    m_drawPoints.clear();
 
-        case 13: return "Spectral Decay: exp(-0.0004 * freq)";
+    bool foundPoints = false;
 
-        case 14: return "Gate Sweep: exp(-0.0008*(freq-500)) * sin(...)";
+    
 
-        case 15: return "Formants: Sum of 3 Gaussian peaks";
+    while (!node.isNull())
 
-        case 16: return "Odd Booster: 1 + 0.8 * sin(pi*freq/200)";
+    {
 
-        case 17: return "Phase Tilt: exp(j * 0.0005 * freq)";
+        QDomElement el = node.toElement();
 
-        case 18: return "Custom Draw: Linear Interpolated Curve";
+        if (!el.isNull() && el.tagName() == "point")
 
-        default: return "Unknown";
+        {
+
+            foundPoints = true;
+
+            float f = el.attribute("f").toFloat();
+
+            float m = el.attribute("m").toFloat();
+
+            m_drawPoints.push_back({f, m});
+
+        }
+
+        node = node.nextSibling();
+
+    }
+
+    
+
+    if(foundPoints) {
+
+        std::sort(m_drawPoints.begin(), m_drawPoints.end());
+
+    } else {
+
+        m_drawPoints.push_back({0.0f, 0.5f});
+
+        m_drawPoints.push_back({22050.0f, 0.5f});
+
+    }
+
+
+
+	updateBodePlot();
+
+}
+
+
+
+
+
+void TransferFunctionControls::saveSettings(QDomDocument& doc, QDomElement& parent)
+
+{
+
+	m_volumeModel.saveSettings(doc, parent, "volume");
+
+	parent.setAttribute("formula", m_formulaString);
+
+    
+
+    if (!m_drawPoints.empty()) {
+
+        for(const auto& p : m_drawPoints) {
+
+            QDomElement pt = doc.createElement("point");
+
+            pt.setAttribute("f", p.freq);
+
+            pt.setAttribute("m", p.mag);
+
+            parent.appendChild(pt);
+
+        }
 
     }
 
@@ -128,404 +196,174 @@ inline std::string getPresetFormulaString(int presetIdx) {
 
 
 
-// =============================================================
+// =======================
 
-// SHARED PARSER CLASS
+//   DATA HANDLING
 
-// =============================================================
+// =======================
 
-class SimpleParser
+void TransferFunctionControls::setDrawPoint(float freq, float mag)
 
 {
 
-    std::string str;
+    m_drawPoints.push_back({freq, mag});
 
-    size_t pos;
+    std::sort(m_drawPoints.begin(), m_drawPoints.end());
 
-    float currentFreq;
+    updateBodePlot();
 
+}
 
 
-    char peek() {
 
-        while (pos < str.length() && std::isspace(static_cast<unsigned char>(str[pos]))) pos++;
+// NEW: Clear Logic
 
-        if (pos >= str.length()) return 0;
-
-        return str[pos];
-
-    }
-
-
-
-    char get() {
-
-        char c = peek();
-
-        if (pos < str.length()) pos++;
-
-        return c;
-
-    }
-
-
-
-    Complex parsePrimary() {
-
-        char c = peek();
-
-        if (c == '(') {
-
-            get();
-
-            Complex val = parseExpression();
-
-            if (peek() == ')') get();
-
-            return val;
-
-        }
-
-        if (std::isdigit(static_cast<unsigned char>(c)) || c == '.') {
-
-            size_t start = pos;
-
-            while (pos < str.length() && (std::isdigit(static_cast<unsigned char>(str[pos])) || str[pos] == '.')) pos++;
-
-            float val = std::stof(str.substr(start, pos - start));
-
-            if (peek() == 'j') { get(); return Complex(0.0f, val); }
-
-            return Complex(val, 0.0f);
-
-        }
-
-        if (std::isalpha(static_cast<unsigned char>(c))) {
-
-            std::string token;
-
-            while (pos < str.length() && std::isalpha(static_cast<unsigned char>(str[pos]))) token += str[pos++];
-
-
-
-            if (token == "freq") return Complex(currentFreq, 0.0f);
-
-            if (token == "w")    return Complex(2.0f * PI_LOGIC * currentFreq, 0.0f);
-
-            if (token == "s")    return Complex(0.0f, 2.0f * PI_LOGIC * currentFreq);
-
-            if (token == "j")    return Complex(0.0f, 1.0f);
-
-            if (token == "pi")   return Complex(PI_LOGIC, 0.0f);
-
-
-
-            if (peek() == '(') {
-
-                get();
-
-                Complex arg = parseExpression();
-
-                if (peek() == ')') get();
-
-
-
-                if (token == "sqrt") return std::sqrt(arg);
-
-                if (token == "exp")  return std::exp(arg);
-
-                if (token == "sin")  return std::sin(arg);
-
-                if (token == "cos")  return std::cos(arg);
-
-                if (token == "tan")  return std::tan(arg);
-
-                if (token == "abs")  return Complex(std::abs(arg), 0.0f);
-
-                if (token == "log")  return std::log(arg);
-
-            }
-
-            return Complex(1.0f, 0.0f);
-
-        }
-
-        return Complex(0.0f, 0.0f);
-
-    }
-
-
-
-    Complex parsePower() {
-
-        Complex lhs = parsePrimary();
-
-        while (true) {
-
-            if (peek() == '^') { get(); Complex rhs = parsePrimary(); lhs = std::pow(lhs, rhs); }
-
-            else break;
-
-        }
-
-        return lhs;
-
-    }
-
-
-
-    Complex parseTerm() {
-
-        Complex lhs = parsePower();
-
-        while (true) {
-
-            char op = peek();
-
-            if (op == '*') { get(); lhs *= parsePower(); }
-
-            else if (op == '/') { get(); Complex rhs = parsePower(); if(std::abs(rhs)<1e-9f) rhs=Complex(1e-9f,0.0f); lhs/=rhs; }
-
-            else break;
-
-        }
-
-        return lhs;
-
-    }
-
-
-
-    Complex parseExpression() {
-
-        Complex lhs = parseTerm();
-
-        while (true) {
-
-            char op = peek();
-
-            if (op == '+') { get(); lhs += parseTerm(); }
-
-            else if (op == '-') { get(); lhs -= parseTerm(); }
-
-            else break;
-
-        }
-
-        return lhs;
-
-    }
-
-
-
-public:
-
-    Complex eval(const std::string& expression, float f) {
-
-        str = expression; pos = 0; currentFreq = f;
-
-        if (str.empty()) return Complex(1.0f, 0.0f);
-
-        return parseExpression();
-
-    }
-
-};
-
-
-
-// =============================================================
-
-// SHARED EVALUATION FUNCTION (SSOT)
-
-// =============================================================
-
-inline Complex calculateTransferFunction(int presetIdx, float freq, 
-
-                                         const std::string& customFormula, 
-
-                                         SimpleParser& parser,
-
-                                         const std::vector<DrawPoint>* drawPoints = nullptr)
+void TransferFunctionControls::clearDrawing()
 
 {
 
-    Complex H(1.0f, 0.0f);
+    m_drawPoints.clear();
 
-    float fc, bw, delay; 
+    // Reset to flat line (Unity Gain)
+
+    m_drawPoints.push_back({0.0f, 0.5f});
+
+    m_drawPoints.push_back({22050.0f, 0.5f});
+
+    updateBodePlot();
+
+}
 
 
 
-    if (presetIdx == 1)
+// =======================
 
-    {
+//   BODE PLOT GENERATION
 
-        H = parser.eval(customFormula, freq);
+// =======================
+
+
+
+void TransferFunctionControls::updateBodePlot()
+
+{
+
+	const int N = 512;
+
+    
+
+    float fs = 44100.0f;
+
+    if (Engine::audioEngine()) {
+
+        fs = Engine::audioEngine()->baseSampleRate();
 
     }
 
-    else if (presetIdx == 18) 
+    
 
-    {
+	const float minFreq = 20.0f;        
 
-        if (drawPoints && !drawPoints->empty()) {
+	const float maxFreq = fs * 0.5f;    
 
-            float normMag = getDrawnMagnitude(freq, *drawPoints);
 
-            float db = normMag * 80.0f - 40.0f;
 
-            float linear = std::pow(10.0f, db / 20.0f);
+	int presetIdx = static_cast<int>(m_volumeModel.value());
 
-            H = Complex(linear, 0.0f); 
+	if (presetIdx < 1) presetIdx = 1;
 
-        } else {
+	if (presetIdx > 18) presetIdx = 18;
 
-            H = Complex(1.0f, 0.0f);
 
-        }
 
-    }
+	std::vector<float> mag(N);
 
-    else
+	std::vector<float> phase(N);
 
-    {
 
-        switch(presetIdx) {
 
-            case 2: // Lowpass 4th Order
+	SimpleParser parser;
 
-                H = 1.0f / std::sqrt(1.0f + std::pow(freq / 800.0f, 8.0f)); 
+	const float PI = 3.14159265358979f; 
 
-                break;
 
-            case 3: // Highpass 4th Order
 
-                if (freq < 1.0f) freq = 1.0f;
+	for (int i = 0; i < N; ++i)
 
-                H = 1.0f / std::sqrt(1.0f + std::pow(500.0f / freq, 8.0f)); 
+	{
 
-                break;
+		float percent = static_cast<float>(i) / static_cast<float>(N - 1);
 
-            case 4: // Low Shelf
+		float freq = minFreq * std::pow(maxFreq / minFreq, percent);
 
-                H = 1.0f + 1.0f / (1.0f + std::pow(freq / 500.0f, 2.0f)); 
 
-                break;
 
-            case 5: // High Shelf
+		Complex H = calculateTransferFunction(presetIdx, freq, m_formulaString.toStdString(), parser, &m_drawPoints);
 
-                H = 1.0f + 1.0f / (1.0f + std::pow(2000.0f / (freq + 1.0f), 2.0f)); 
 
-                break;
 
-            case 6: // Telephone
+		float m = std::abs(H);
 
-                if (freq > 300.0f && freq < 3000.0f) { H = Complex(1.0f, 0.0f); } 
+		float p = std::arg(H);
 
-                else { H = Complex(0.0f, 0.0f); }
 
-                break;
 
-            case 7: // Notch
+		float db = 20.0f * std::log10(m + 1e-12f);
 
-                fc = 600.0f; bw = 40.0f;
+		float magNorm = (db + 40.0f) / 80.0f;
 
-                H = 1.0f - std::exp(-std::pow(freq - fc, 2.0f) / (2.0f * bw * bw)); 
+		if (magNorm < 0.0f) magNorm = 0.0f;
 
-                break;
+		if (magNorm > 1.0f) magNorm = 1.0f;
 
-            case 8: // Resonator
+		mag[i] = magNorm;
 
-                fc = 900.0f; 
 
-                H = 1.0f + 8.0f * std::exp(-std::pow(20.0f * (freq - fc) / fc, 2.0f)); 
 
-                break;
+		float phaseNorm = (p + PI) / (2.0f * PI);
 
-            case 9: // Comb
+		if (phaseNorm < 0.0f) phaseNorm = 0.0f;
 
-                delay = 0.002f;
+		if (phaseNorm > 1.0f) phaseNorm = 1.0f;
 
-                H = 1.0f + std::exp(Complex(0, -1) * 2.0f * PI_LOGIC * freq * delay); 
+		phase[i] = phaseNorm;
 
-                break;
+	}
 
-            case 10: // Comb Notch
 
-                delay = 0.003f;
 
-                H = 1.0f - std::exp(Complex(0, -1) * 2.0f * PI_LOGIC * freq * delay); 
+	m_bodeMagModel.setSamples(mag.data());
 
-                break;
+	m_bodePhaseModel.setSamples(phase.data());
 
-            case 11: // Allpass
+}
 
-                fc = 1200.0f;
 
-                H = (1.0f - Complex(0,1) * (freq/fc)) / (1.0f + Complex(0,1) * (freq/fc)); 
 
-                break;
+// =======================
 
-            case 12: // Bitcrusher
+//   SLOTS
 
-                H = (std::fmod(freq, 500.0f) < 250.0f) ? 1.0f : -1.0f; 
+// =======================
 
-                break;
 
-            case 13: // Spectral Decay
 
-                H = std::exp(-0.0004f * freq); 
+void TransferFunctionControls::setFormula(const QString& text)
 
-                break;
+{
 
-            case 14: // Spectral Gate Sweep
+	if (m_formulaString != text)
 
-                if (freq > 500.0f) { H = std::exp(-0.0008f * (freq - 500.0f)) * std::sin(freq * 0.005f); } 
+	{
 
-                else { H = 0.0f; }
+		m_formulaString = text;
 
-                break;
+		updateBodePlot();
 
-            case 15: // Formants
-
-                H = std::exp(-std::pow(freq-800.0f, 2.0f)/(2.0f*6400.0f)) +
-
-                    std::exp(-std::pow(freq-1500.0f, 2.0f)/(2.0f*22500.0f)) +
-
-                    std::exp(-std::pow(freq-2500.0f, 2.0f)/(2.0f*40000.0f)); 
-
-                break;
-
-            case 16: // Odd Harmonic Booster
-
-                H = 1.0f + 0.8f * std::sin(PI_LOGIC * freq / 200.0f); 
-
-                break;
-
-            case 17: // Phase Tilt
-
-                H = std::exp(Complex(0, 1) * 0.0005f * freq); 
-
-                break;
-
-            default: 
-
-                H = Complex(1.0f, 0.0f); 
-
-                break;
-
-        }
-
-    }
-
-    return H;
+	}
 
 }
 
 
 
 } // namespace lmms
-
-
-
-#endif // TRANSFER_FUNCTION_LOGIC_H
