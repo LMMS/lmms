@@ -24,7 +24,6 @@
 
 #include "TimeLineWidget.h"
 
-
 #include <QGuiApplication>
 #include <QMenu>
 #include <QMouseEvent>
@@ -221,14 +220,16 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 		p.fillRect(rightHandle, color);
 	}
 
+	const QPixmap& marker = !m_isRecording ? m_posMarkerPixmap : m_recordingPosMarkerPixmap;
+
 	// Only draw the position marker if the position line is in view
-	if (markerX(m_pos) >= m_xOffset && markerX(m_pos) < width() - m_posMarkerPixmap.width() / 2)
+	if (m_isPlayheadVisible && markerX(m_pos) >= m_xOffset && markerX(m_pos) < width() - marker.width() / 2)
 	{
 		// Let the position marker extrude to the left
 		p.setClipping(false);
 		p.setOpacity(0.6);
-		p.drawPixmap(markerX(m_pos) - (m_posMarkerPixmap.width() / 2),
-			height() - m_posMarkerPixmap.height(), m_posMarkerPixmap);
+		p.drawPixmap(markerX(m_pos) - (marker.width() / 2),
+			height() - marker.height(), marker);
 	}
 }
 

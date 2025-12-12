@@ -138,6 +138,7 @@ public:
 		return( m_pos );
 	}
 
+	static AutoScrollState defaultAutoScrollState();
 	AutoScrollState autoScroll() const { return m_autoScroll; }
 	void setAutoScroll(AutoScrollState state) { m_autoScroll = state; }
 
@@ -157,7 +158,11 @@ public:
 					m_ppb / TimePos::ticksPerBar() );
 	}
 
-	static AutoScrollState defaultAutoScrollState();
+	bool isRecording() const { return m_isRecording; }
+	void setRecording(bool recording) { m_isRecording = recording; }
+
+	bool isPlayheadVisible() const { return m_isPlayheadVisible; }
+	void setPlayheadVisible(bool visible) { m_isPlayheadVisible = visible; }
 
 signals:
 	void positionChanged(const lmms::TimePos& postion);
@@ -195,6 +200,7 @@ private:
 	auto actionCursor(Action action) const -> QCursor;
 
 	QPixmap m_posMarkerPixmap = embed::getIconPixmap("playpos_marker");
+	QPixmap m_recordingPosMarkerPixmap = embed::getIconPixmap("recording_playpos_marker");
 
 	QColor m_inactiveLoopColor = QColor{52, 63, 53, 64};
 	QBrush m_inactiveLoopBrush = QColor{255, 255, 255, 32};
@@ -231,6 +237,9 @@ private:
 	// position allows for unquantized drag but fails when toggling quantization.
 	std::array<TimePos, 2> m_oldLoopPos;
 	TimePos m_dragStartPos;
+
+	bool m_isRecording = false;
+	bool m_isPlayheadVisible = true;
 
 	TextFloat* m_hint = nullptr;
 	int m_initalXSelect;

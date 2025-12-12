@@ -4149,6 +4149,9 @@ void PianoRoll::record()
 	m_recording = true;
 
 	Engine::getSong()->playMidiClip( m_midiClip, false );
+
+	m_timeLine->setRecording(true);
+	m_positionLine->setRecording(true);
 }
 
 
@@ -4176,6 +4179,11 @@ void PianoRoll::recordAccompany()
 	{
 		Engine::getSong()->playPattern();
 	}
+
+	auto* songEditor = GuiApplication::instance()->songEditor()->m_editor;
+
+	songEditor->timeLine()->setRecording(true);
+	songEditor->positionLine()->setRecording(true);
 }
 
 
@@ -4204,7 +4212,7 @@ bool PianoRoll::toggleStepRecording()
 		}
 	}
 
-	return m_stepRecorder.isRecording();;
+	return m_stepRecorder.isRecording();
 }
 
 
@@ -4215,6 +4223,13 @@ void PianoRoll::stop()
 	Engine::getSong()->stop();
 	m_recording = false;
 	m_scrollBack = m_timeLine->autoScroll() != TimeLineWidget::AutoScrollState::Disabled;
+
+	auto* songEditor = GuiApplication::instance()->songEditor()->m_editor;
+
+	songEditor->timeLine()->setRecording(false);
+	songEditor->positionLine()->setRecording(false);
+	m_timeLine->setRecording(false);
+	m_positionLine->setRecording(false);
 }
 
 
