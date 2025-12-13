@@ -89,7 +89,7 @@ public slots:
 	void setEditModeSelect();
 	void toggleProportionalSnap();
 
-	void updatePosition( const lmms::TimePos & t );
+	void updatePosition();
 	void updatePositionLine();
 	void selectAllClips( bool select );
 
