@@ -118,13 +118,17 @@ Song::Song() :
 	for (auto& scale : m_scales) {scale = std::make_shared<Scale>();}
 	for (auto& keymap : m_keymaps) {keymap = std::make_shared<Keymap>();}
 
-	// Aggregate the `positionJumped` signals from all the timelines into a single `playbackPositionJumped` signal for other objects to use.
+	// Aggregate the `positionJumped` signals from all the timelines into a single `playbackPositionJumped` signal for other objects (sample tracks, LFOs, etc) to use.
 	for (auto& timeline : m_timelines)
 	{
-		connect(&timeline, &Timeline::positionJumped, this, &Song::playbackPositionJumped, Qt::DirectConnection);
+		connect(&timeline, &Timeline::positionJumped, [this](){
+			// Only emit the signal when the song is actually playing
+			// This prevents LFOs from changing phase when the user drags the timeline while paused
+			if (isPlaying()) { emit playbackPositionJumped(); }
+		});
 	}
 
-	// Inform VST plugins and sample tracks if the user moved the play head
+	// Inform VST plugins if the user moved the play head
 	connect(this, &Song::playbackPositionJumped, [this](){ m_vstSyncController.setPlaybackJumped(true); });
 }
 
