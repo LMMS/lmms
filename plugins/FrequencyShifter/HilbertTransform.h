@@ -40,7 +40,8 @@ namespace lmms
 {
 
 template<int Channels>
-struct HilbertIIRFloat {
+struct HilbertIIRFloat
+{
 	static constexpr int order = 12;
 
 	alignas(16) static constexpr float baseCoeffsR[order] = {
@@ -77,11 +78,13 @@ struct HilbertIIRFloat {
 	alignas(16) float stateR[Channels][order];
 	alignas(16) float stateI[Channels][order];
 
-	HilbertIIRFloat(float sampleRate = 48000.0f, float passbandGain = 2.0f) {
+	HilbertIIRFloat(float sampleRate = 48000.0f, float passbandGain = 2.0f)
+	{
 		const float freqFactor = std::fmin(0.46f, 20000.0f / sampleRate);
 		const float coeffScale = freqFactor * passbandGain;
 		direct = baseDirect * 2.0f * passbandGain * freqFactor;
-		for (int i = 0; i < order; ++i) {
+		for (int i = 0; i < order; ++i)
+		{
 			coeffsR[i] = baseCoeffsR[i] * coeffScale;
 			coeffsI[i] = baseCoeffsI[i] * coeffScale;
 			const float a = basePolesR[i] * freqFactor;
@@ -93,18 +96,25 @@ struct HilbertIIRFloat {
 		reset();
 	}
 
-	inline void reset() {
+	inline void reset()
+	{
 		for (int ch = 0; ch < Channels; ++ch)
+		{
 			for (int i = 0; i < order; ++i)
+			{
 				stateR[ch][i] = stateI[ch][i] = 0.0f;
+			}
+		}
 	}
 
-	inline void processReal(float x, int channel, float *out) {
+	inline void processReal(float x, int channel, float *out)
+	{
 		float *sR = stateR[channel], *sI = stateI[channel];
 #ifdef __SSE2__
 		const __m128 vx = _mm_set1_ps(x);
 		__m128 sumR = _mm_setzero_ps(), sumI = _mm_setzero_ps();
-		for (int i = 0; i < order; i += 4) {
+		for (int i = 0; i < order; i += 4)
+		{
 			__m128 vr  = _mm_load_ps(&sR[i]);
 			__m128 vi  = _mm_load_ps(&sI[i]);
 			__m128 vpr = _mm_load_ps(&polesR[i]);
@@ -135,7 +145,8 @@ struct HilbertIIRFloat {
 		out[1] =              (tmpI[0] + tmpI[1] + tmpI[2] + tmpI[3]);
 #else
 		float sumR = 0.0f, sumI = 0.0f;
-		for (int i = 0; i < order; ++i) {
+		for (int i = 0; i < order; ++i)
+		{
 			const float r = sR[i], im = sI[i], pr = polesR[i], pi = polesI[i];
 			const float nr = r * pr - im * pi + x * coeffsR[i];
 			const float ni = r * pi + im * pr + x * coeffsI[i];
@@ -147,13 +158,15 @@ struct HilbertIIRFloat {
 #endif
 	}
 
-	inline void processComplex(const float *x, int channel, float *out) {
+	inline void processComplex(const float *x, int channel, float *out)
+	{
 		const float xr = x[0], xi = x[1];
 		float *sR = stateR[channel], *sI = stateI[channel];
 #ifdef __SSE2__
 		const __m128 vxr = _mm_set1_ps(xr), vxi = _mm_set1_ps(xi);
 		__m128 sumR = _mm_setzero_ps(), sumI = _mm_setzero_ps();
-		for (int i = 0; i < order; i += 4) {
+		for (int i = 0; i < order; i += 4)
+		{
 			__m128 vr  = _mm_load_ps(&sR[i]);
 			__m128 vi  = _mm_load_ps(&sI[i]);
 			__m128 vpr = _mm_load_ps(&polesR[i]);
@@ -189,7 +202,8 @@ struct HilbertIIRFloat {
 		out[1] = xi * direct + si;
 #else
 		float sumR = 0.0f, sumI = 0.0f;
-		for (int i = 0; i < order; ++i) {
+		for (int i = 0; i < order; ++i)
+		{
 			const float r = sR[i], im = sI[i];
 			const float pr = polesR[i], pi = polesI[i], cr = coeffsR[i], ci = coeffsI[i];
 			const float xrcr = xr * cr, xici = xi * ci, xrci = xr * ci, xicr = xi * cr;
