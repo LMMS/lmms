@@ -215,7 +215,7 @@ public:
 
 	void setPlayPos(tick_t ticks, PlayMode playMode)
 	{
-		getTimeline(playMode).setPlayPos(ticks);
+		getTimeline(playMode).setTicks(ticks);
 	}
 	void setPlayPos(tick_t ticks)
 	{

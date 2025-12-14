@@ -73,17 +73,10 @@ private slots:
 		QVERIFY(positionChangedReceived);
 		QVERIFY(positionJumpedReceived);
 
-		// And likewise using setPlayPos
-		resetReceived();
-		timeline.setPlayPos(TimePos(15));
-		QCOMPARE(timeline.ticks(), 15);
-		QVERIFY(positionChangedReceived);
-		QVERIFY(positionJumpedReceived);
-
 		// However, using incrementTicks will not emit positionJumped.
 		resetReceived();
 		timeline.incrementTicks(10);
-		QCOMPARE(timeline.ticks(), 25);
+		QCOMPARE(timeline.ticks(), 20);
 		QVERIFY(positionChangedReceived);
 		QVERIFY(!positionJumpedReceived);
 	}

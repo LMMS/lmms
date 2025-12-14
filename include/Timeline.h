@@ -47,15 +47,6 @@ public:
 
 	auto pos() const -> const TimePos& { return m_pos; }
 
-	void setPlayPos(TimePos pos)
-	{
-		m_pos = pos;
-		// Calling `setPlayPos` is treated as a jump, so the frame offset is reset
-		m_frameOffset = 0;
-		emit positionChanged();
-		emit positionJumped();
-	}
-
 	auto ticks() const -> tick_t { return m_pos.getTicks(); }
 
 	//! Forcefully sets the current ticks, resets the frame offset, and sets the elapsed seconds based on the global position (ignoring potential mid-song tempo changes)
