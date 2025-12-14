@@ -1308,104 +1308,104 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 
 
 	// following code draws all visible values
-		//NEEDS Change in CSS
-		//int len_ticks = 4;
-		timeMap & time_map = m_clip->getTimeMap();
+	//NEEDS Change in CSS
+	//int len_ticks = 4;
+	timeMap & time_map = m_clip->getTimeMap();
 
-		//Don't bother doing/rendering anything if there is no automation points
-		if( time_map.size() > 0 )
+	//Don't bother doing/rendering anything if there is no automation points
+	if( time_map.size() > 0 )
+	{
+		timeMap::iterator it = time_map.begin();
+		while (std::next(it) != time_map.end())
 		{
-			timeMap::iterator it = time_map.begin();
-			while (std::next(it) != time_map.end())
+			// skip this section if it occurs completely before the
+			// visible area
+			const auto nit = std::next(it);
+
+			int next_x = xCoordOfTick(POS(nit));
+			if( next_x < 0 )
 			{
-				// skip this section if it occurs completely before the
-				// visible area
-				const auto nit = std::next(it);
-
-				int next_x = xCoordOfTick(POS(nit));
-				if( next_x < 0 )
-				{
-					++it;
-					continue;
-				}
-
-				int x = xCoordOfTick(POS(it));
-				if( x > width() )
-				{
-					break;
-				}
-
-				float *values = m_clip->valuesAfter(POS(it));
-
-				// We are creating a path to draw a polygon representing the values between two
-				// nodes. When we have two nodes with discrete progression, we will basically have
-				// a rectangle with the outValue of the first node (that's why nextValue will match
-				// the outValue of the current node). When we have nodes with linear or cubic progression
-				// the value of the end of the shape between the two nodes will be the inValue of
-				// the next node.
-				float nextValue = m_clip->progressionType() == AutomationClip::ProgressionType::Discrete
-					? OUTVAL(it)
-					: INVAL(nit);
-
-				p.setRenderHints( QPainter::Antialiasing, true );
-				QPainterPath path;
-				path.moveTo(QPointF(xCoordOfTick(POS(it)), yCoordOfLevel(0)));
-				for (int i = 0; i < POS(nit) - POS(it); ++i)
-				{
-					path.lineTo(QPointF(xCoordOfTick(POS(it) + i), yCoordOfLevel(values[i])));
-				}
-				path.lineTo(QPointF(xCoordOfTick(POS(nit)), yCoordOfLevel(nextValue)));
-				path.lineTo(QPointF(xCoordOfTick(POS(nit)), yCoordOfLevel(0)));
-				path.lineTo(QPointF(xCoordOfTick(POS(it)), yCoordOfLevel(0)));
-				p.fillPath(path, m_graphColor);
-				p.setRenderHints( QPainter::Antialiasing, false );
-				delete [] values;
-
-				// Draw circle
-				drawAutomationPoint(p, it);
-				// Draw tangents if necessary (only for manually edited tangents)
-				if (m_clip->canEditTangents() && LOCKEDTAN(it))
-				{
-					drawAutomationTangents(p, it);
-				}
-
 				++it;
+				continue;
 			}
 
-			for (
-				int i = POS(it), x = xCoordOfTick(i);
-				x <= width();
-				i++, x = xCoordOfTick(i)
-			)
+			int x = xCoordOfTick(POS(it));
+			if( x > width() )
 			{
-				// Draws the rectangle representing the value after the last node (for
-				// that reason we use outValue).
-				drawLevelTick(p, i, OUTVAL(it));
+				break;
 			}
-			// Draw circle(the last one)
+
+			float *values = m_clip->valuesAfter(POS(it));
+
+			// We are creating a path to draw a polygon representing the values between two
+			// nodes. When we have two nodes with discrete progression, we will basically have
+			// a rectangle with the outValue of the first node (that's why nextValue will match
+			// the outValue of the current node). When we have nodes with linear or cubic progression
+			// the value of the end of the shape between the two nodes will be the inValue of
+			// the next node.
+			float nextValue = m_clip->progressionType() == AutomationClip::ProgressionType::Discrete
+				? OUTVAL(it)
+				: INVAL(nit);
+
+			p.setRenderHints( QPainter::Antialiasing, true );
+			QPainterPath path;
+			path.moveTo(QPointF(xCoordOfTick(POS(it)), yCoordOfLevel(0)));
+			for (int i = 0; i < POS(nit) - POS(it); ++i)
+			{
+				path.lineTo(QPointF(xCoordOfTick(POS(it) + i), yCoordOfLevel(values[i])));
+			}
+			path.lineTo(QPointF(xCoordOfTick(POS(nit)), yCoordOfLevel(nextValue)));
+			path.lineTo(QPointF(xCoordOfTick(POS(nit)), yCoordOfLevel(0)));
+			path.lineTo(QPointF(xCoordOfTick(POS(it)), yCoordOfLevel(0)));
+			p.fillPath(path, m_graphColor);
+			p.setRenderHints( QPainter::Antialiasing, false );
+			delete [] values;
+
+			// Draw circle
 			drawAutomationPoint(p, it);
 			// Draw tangents if necessary (only for manually edited tangents)
 			if (m_clip->canEditTangents() && LOCKEDTAN(it))
 			{
 				drawAutomationTangents(p, it);
 			}
+
+			++it;
 		}
 
-		// draw clip bounds overlay
-		p.fillRect(
-			xCoordOfTick(m_clip->length() - m_clip->startTimeOffset()),
-			TOP_MARGIN,
-			width() - 10,
-			grid_bottom,
-			m_outOfBoundsShade
-		);
-		p.fillRect(
-			0,
-			TOP_MARGIN,
-			xCoordOfTick(-m_clip->startTimeOffset()),
-			grid_bottom,
-			m_outOfBoundsShade
-		);
+		for (
+			int i = POS(it), x = xCoordOfTick(i);
+			x <= width();
+			i++, x = xCoordOfTick(i)
+		)
+		{
+			// Draws the rectangle representing the value after the last node (for
+			// that reason we use outValue).
+			drawLevelTick(p, i, OUTVAL(it));
+		}
+		// Draw circle(the last one)
+		drawAutomationPoint(p, it);
+		// Draw tangents if necessary (only for manually edited tangents)
+		if (m_clip->canEditTangents() && LOCKEDTAN(it))
+		{
+			drawAutomationTangents(p, it);
+		}
+	}
+
+	// draw clip bounds overlay
+	p.fillRect(
+		xCoordOfTick(m_clip->length() - m_clip->startTimeOffset()),
+		TOP_MARGIN,
+		width() - 10,
+		grid_bottom,
+		m_outOfBoundsShade
+	);
+	p.fillRect(
+		0,
+		TOP_MARGIN,
+		xCoordOfTick(-m_clip->startTimeOffset()),
+		grid_bottom,
+		m_outOfBoundsShade
+	);
 
 
 	// TODO: Get this out of paint event
