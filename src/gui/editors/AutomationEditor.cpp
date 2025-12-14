@@ -32,15 +32,13 @@
 #include <QKeyEvent>
 #include <QLabel>
 #include <QPainter>
-#include <QPainterPath>  // IWYU pragma: keep
+#include <QPainterPath> // IWYU pragma: keep
 #include <QPushButton>
 #include <QScrollBar>
 #include <QStyleOption>
 #include <QToolTip>
+#include <SongEditor.h>
 #include <cmath>
-
-#include "SampleClip.h"
-#include "SampleThumbnail.h"
 
 #include "ActionGroup.h"
 #include "AutomationNode.h"
@@ -48,6 +46,7 @@
 #include "DeprecationHelper.h"
 #include "DetuningHelper.h"
 #include "Engine.h"
+#include "FontHelper.h"
 #include "GuiApplication.h"
 #include "Knob.h"
 #include "MainWindow.h"
@@ -55,12 +54,12 @@
 #include "PatternStore.h"
 #include "PianoRoll.h"
 #include "ProjectJournal.h"
+#include "SampleClip.h"
+#include "SampleThumbnail.h"
 #include "StringPairDrag.h"
 #include "TextFloat.h"
 #include "TimeLineWidget.h"
 #include "embed.h"
-#include "FontHelper.h"
-
 
 namespace lmms::gui
 {
@@ -215,7 +214,10 @@ void AutomationEditor::updateAfterClipChange()
 {
 	m_currentPosition = 0;
 
-	if( !validClip() )
+	setEnabled(validClip());
+	m_timeLine->setVisible(validClip());
+
+	if ( !validClip() )
 	{
 		m_minLevel = m_maxLevel = m_scrollLevel = 0;
 		m_step = 1;
@@ -1055,58 +1057,55 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 
 	p.fillRect(0, TOP_MARGIN, VALUES_WIDTH, height() - TOP_MARGIN, m_scaleColor);
 
+	if (!validClip())
+	{
+		const auto icon = embed::getIconPixmap("pr_no_clip");
+		const int x = (width() - icon.width()) / 2;
+		const int y = (height() - icon.height()) / 2;
+		p.drawPixmap(x, y, icon);
+
+		p.setPen(QApplication::palette().color(QPalette::Active, QPalette::Text));
+		QRect textRect(0, y + icon.height() + 5, width(), 30);
+		p.drawText(textRect, Qt::AlignHCenter | Qt::AlignTop,
+			tr("Double-click on an automation clip in Song Editor to open it here"));
+		return;
+	}
+
 	// print value numbers
 	int font_height = p.fontMetrics().height();
 	auto text_flags = (Qt::Alignment)(Qt::AlignRight | Qt::AlignVCenter);
 
-	if( validClip() )
+	if (m_y_auto)
 	{
-		if( m_y_auto )
+		auto y = std::array{grid_bottom, TOP_MARGIN + font_height / 2};
+		auto level = std::array{m_minLevel, m_maxLevel};
+		for (int i = 0; i < 2; ++i)
 		{
-			auto y = std::array{grid_bottom, TOP_MARGIN + font_height / 2};
-			auto level = std::array{m_minLevel, m_maxLevel};
-			for( int i = 0; i < 2; ++i )
-			{
-				const QString & label = m_clip->firstObject()
-						->displayValue( level[i] );
-				p.setPen( QApplication::palette().color( QPalette::Active,
-							QPalette::Shadow ) );
-				p.drawText( 1, y[i] - font_height + 1,
-					VALUES_WIDTH - 10, 2 * font_height,
-					text_flags, label );
-				p.setPen( fgColor );
-				p.drawText( 0, y[i] - font_height,
-					VALUES_WIDTH - 10, 2 * font_height,
-					text_flags, label );
-			}
+			const QString& label = m_clip->firstObject()->displayValue(level[i]);
+			p.setPen(QApplication::palette().color(QPalette::Active, QPalette::Shadow));
+			p.drawText(1, y[i] - font_height + 1, VALUES_WIDTH - 10, 2 * font_height, text_flags, label);
+			p.setPen(fgColor);
+			p.drawText(0, y[i] - font_height, VALUES_WIDTH - 10, 2 * font_height, text_flags, label);
 		}
-		else
+	}
+	else
+	{
+		int level = (int)m_bottomLevel;
+		int printable = qMax(1, 5 * DEFAULT_Y_DELTA / m_y_delta);
+		int module = level % printable;
+		if (module)
 		{
-			int level = (int) m_bottomLevel;
-			int printable = qMax( 1, 5 * DEFAULT_Y_DELTA
-								/ m_y_delta );
-			int module = level % printable;
-			if( module )
-			{
-				int inv_module = ( printable - module )
-								% printable;
-				level += inv_module;
-			}
-			for( ; level <= m_topLevel; level += printable )
-			{
-				const QString & label = m_clip->firstObject()
-							->displayValue( level );
-				int y = yCoordOfLevel(level);
-				p.setPen( QApplication::palette().color( QPalette::Active,
-							QPalette::Shadow ) );
-				p.drawText( 1, y - font_height + 1,
-					VALUES_WIDTH - 10, 2 * font_height,
-					text_flags, label );
-				p.setPen( fgColor );
-				p.drawText( 0, y - font_height,
-					VALUES_WIDTH - 10, 2 * font_height,
-					text_flags, label );
-			}
+			int inv_module = (printable - module) % printable;
+			level += inv_module;
+		}
+		for (; level <= m_topLevel; level += printable)
+		{
+			const QString& label = m_clip->firstObject()->displayValue(level);
+			int y = yCoordOfLevel(level);
+			p.setPen(QApplication::palette().color(QPalette::Active, QPalette::Shadow));
+			p.drawText(1, y - font_height + 1, VALUES_WIDTH - 10, 2 * font_height, text_flags, label);
+			p.setPen(fgColor);
+			p.drawText(0, y - font_height, VALUES_WIDTH - 10, 2 * font_height, text_flags, label);
 		}
 	}
 
@@ -1309,9 +1308,6 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 
 
 	// following code draws all visible values
-
-	if( validClip() )
-	{
 		//NEEDS Change in CSS
 		//int len_ticks = 4;
 		timeMap & time_map = m_clip->getTimeMap();
@@ -1410,20 +1406,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 			grid_bottom,
 			m_outOfBoundsShade
 		);
-	}
-	else
-	{
-		QFont f = font();
-		f.setBold( true );
-		p.setFont(f);
-		p.setPen( QApplication::palette().color( QPalette::Active,
-							QPalette::BrightText ) );
-		p.drawText( VALUES_WIDTH + 20, TOP_MARGIN + 40,
-				width() - VALUES_WIDTH - 20 - SCROLLBAR_SIZE,
-				grid_height - 40, Qt::TextWordWrap,
-				tr( "Please open an automation clip by "
-					"double-clicking on it!" ) );
-	}
+
 
 	// TODO: Get this out of paint event
 	int l = validClip() ? (int) m_clip->length() - m_clip->startTimeOffset() : 0;
