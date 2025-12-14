@@ -1308,12 +1308,12 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 
 
 	// following code draws all visible values
-	//NEEDS Change in CSS
-	//int len_ticks = 4;
-	timeMap & time_map = m_clip->getTimeMap();
+	// NEEDS Change in CSS
+	// int len_ticks = 4;
+	timeMap& time_map = m_clip->getTimeMap();
 
-	//Don't bother doing/rendering anything if there is no automation points
-	if( time_map.size() > 0 )
+	// Don't bother doing/rendering anything if there is no automation points
+	if (time_map.size() > 0)
 	{
 		timeMap::iterator it = time_map.begin();
 		while (std::next(it) != time_map.end())
@@ -1323,19 +1323,16 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 			const auto nit = std::next(it);
 
 			int next_x = xCoordOfTick(POS(nit));
-			if( next_x < 0 )
+			if (next_x < 0)
 			{
 				++it;
 				continue;
 			}
 
 			int x = xCoordOfTick(POS(it));
-			if( x > width() )
-			{
-				break;
-			}
+			if (x > width()) { break; }
 
-			float *values = m_clip->valuesAfter(POS(it));
+			float* values = m_clip->valuesAfter(POS(it));
 
 			// We are creating a path to draw a polygon representing the values between two
 			// nodes. When we have two nodes with discrete progression, we will basically have
@@ -1343,11 +1340,10 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 			// the outValue of the current node). When we have nodes with linear or cubic progression
 			// the value of the end of the shape between the two nodes will be the inValue of
 			// the next node.
-			float nextValue = m_clip->progressionType() == AutomationClip::ProgressionType::Discrete
-				? OUTVAL(it)
-				: INVAL(nit);
+			float nextValue
+				= m_clip->progressionType() == AutomationClip::ProgressionType::Discrete ? OUTVAL(it) : INVAL(nit);
 
-			p.setRenderHints( QPainter::Antialiasing, true );
+			p.setRenderHints(QPainter::Antialiasing, true);
 			QPainterPath path;
 			path.moveTo(QPointF(xCoordOfTick(POS(it)), yCoordOfLevel(0)));
 			for (int i = 0; i < POS(nit) - POS(it); ++i)
@@ -1358,25 +1354,18 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 			path.lineTo(QPointF(xCoordOfTick(POS(nit)), yCoordOfLevel(0)));
 			path.lineTo(QPointF(xCoordOfTick(POS(it)), yCoordOfLevel(0)));
 			p.fillPath(path, m_graphColor);
-			p.setRenderHints( QPainter::Antialiasing, false );
-			delete [] values;
+			p.setRenderHints(QPainter::Antialiasing, false);
+			delete[] values;
 
 			// Draw circle
 			drawAutomationPoint(p, it);
 			// Draw tangents if necessary (only for manually edited tangents)
-			if (m_clip->canEditTangents() && LOCKEDTAN(it))
-			{
-				drawAutomationTangents(p, it);
-			}
+			if (m_clip->canEditTangents() && LOCKEDTAN(it)) { drawAutomationTangents(p, it); }
 
 			++it;
 		}
 
-		for (
-			int i = POS(it), x = xCoordOfTick(i);
-			x <= width();
-			i++, x = xCoordOfTick(i)
-		)
+		for (int i = POS(it), x = xCoordOfTick(i); x <= width(); i++, x = xCoordOfTick(i))
 		{
 			// Draws the rectangle representing the value after the last node (for
 			// that reason we use outValue).
@@ -1385,77 +1374,61 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 		// Draw circle(the last one)
 		drawAutomationPoint(p, it);
 		// Draw tangents if necessary (only for manually edited tangents)
-		if (m_clip->canEditTangents() && LOCKEDTAN(it))
-		{
-			drawAutomationTangents(p, it);
-		}
+		if (m_clip->canEditTangents() && LOCKEDTAN(it)) { drawAutomationTangents(p, it); }
 	}
 
 	// draw clip bounds overlay
-	p.fillRect(
-		xCoordOfTick(m_clip->length() - m_clip->startTimeOffset()),
-		TOP_MARGIN,
-		width() - 10,
-		grid_bottom,
-		m_outOfBoundsShade
-	);
-	p.fillRect(
-		0,
-		TOP_MARGIN,
-		xCoordOfTick(-m_clip->startTimeOffset()),
-		grid_bottom,
-		m_outOfBoundsShade
-	);
-
+	p.fillRect(xCoordOfTick(m_clip->length() - m_clip->startTimeOffset()), TOP_MARGIN, width() - 10, grid_bottom,
+		m_outOfBoundsShade);
+	p.fillRect(0, TOP_MARGIN, xCoordOfTick(-m_clip->startTimeOffset()), grid_bottom, m_outOfBoundsShade);
 
 	// TODO: Get this out of paint event
-	int l = validClip() ? (int) m_clip->length() - m_clip->startTimeOffset() : 0;
+	int l = validClip() ? (int)m_clip->length() - m_clip->startTimeOffset() : 0;
 
 	// reset scroll-range
-	if( m_leftRightScroll->maximum() != l )
+	if (m_leftRightScroll->maximum() != l)
 	{
-		m_leftRightScroll->setRange( 0, l );
-		m_leftRightScroll->setPageStep( l );
+		m_leftRightScroll->setRange(0, l);
+		m_leftRightScroll->setPageStep(l);
 	}
 
-	if(validClip() && GuiApplication::instance()->automationEditor()->m_editor->hasFocus())
-	{
-		drawCross( p );
-	}
+	if (validClip() && GuiApplication::instance()->automationEditor()->m_editor->hasFocus()) { drawCross(p); }
 
-	const QPixmap * cursor = nullptr;
+	const QPixmap* cursor = nullptr;
 	// draw current edit-mode-icon below the cursor
-	switch( m_editMode )
+	switch (m_editMode)
 	{
-		case EditMode::Draw:
+	case EditMode::Draw: {
+		if (m_action == Action::EraseValues) { cursor = &m_toolErase; }
+		else if (m_action == Action::MoveValue) { cursor = &m_toolMove; }
+		else
 		{
-			if (m_action == Action::EraseValues) { cursor = &m_toolErase; }
-			else if (m_action == Action::MoveValue) { cursor = &m_toolMove; }
-			else { cursor = &m_toolDraw; }
-			break;
+			cursor = &m_toolDraw;
 		}
-		case EditMode::Erase:
-		{
-			cursor = &m_toolErase;
-			break;
-		}
-		case EditMode::DrawOutValues:
-		{
-			if (m_action == Action::ResetOutValues) { cursor = &m_toolErase; }
-			else if (m_action == Action::MoveOutValue) { cursor = &m_toolMove; }
-			else { cursor = &m_toolDrawOut; }
-			break;
-		}
-		case EditMode::EditTangents:
-		{
-			cursor = m_action == Action::MoveTangent ? &m_toolMove : &m_toolEditTangents;
-			break;
-		}
+		break;
 	}
-	QPoint mousePosition = mapFromGlobal( QCursor::pos() );
+	case EditMode::Erase: {
+		cursor = &m_toolErase;
+		break;
+	}
+	case EditMode::DrawOutValues: {
+		if (m_action == Action::ResetOutValues) { cursor = &m_toolErase; }
+		else if (m_action == Action::MoveOutValue) { cursor = &m_toolMove; }
+		else
+		{
+			cursor = &m_toolDrawOut;
+		}
+		break;
+	}
+	case EditMode::EditTangents: {
+		cursor = m_action == Action::MoveTangent ? &m_toolMove : &m_toolEditTangents;
+		break;
+	}
+	}
+	QPoint mousePosition = mapFromGlobal(QCursor::pos());
 	if (cursor != nullptr && mousePosition.y() > TOP_MARGIN + SCROLLBAR_SIZE)
 	{
-		p.drawPixmap( mousePosition + QPoint( 8, 8 ), *cursor );
+		p.drawPixmap(mousePosition + QPoint(8, 8), *cursor);
 	}
 }
 
