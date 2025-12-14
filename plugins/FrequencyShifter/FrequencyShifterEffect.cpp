@@ -58,8 +58,6 @@ FrequencyShifterEffect::FrequencyShifterEffect(Model* parent, const Descriptor::
 	Effect(&frequencyshifter_plugin_descriptor, parent, key),
 	m_controls(this)
 {
-	m_ringBuf.resize(1, {0.f, 0.f});
-
 	connect(Engine::audioEngine(), &AudioEngine::sampleRateChanged,
 		this, &FrequencyShifterEffect::updateSampleRate);
 	updateSampleRate();

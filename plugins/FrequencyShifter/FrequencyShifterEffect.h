@@ -85,7 +85,6 @@ private:
 	}
 
 	FrequencyShifterControls m_controls;
-	float m_fs[2] = {0.f, 0.f};
 	float m_phase[2] = {0.f, 0.f};
 	float m_sampleRate = 0.f;
 	float m_twoPiOverSr = 0.f;
@@ -97,15 +96,10 @@ private:
 	HilbertIIRFloat<2> m_hilbert1;
 	HilbertIIRFloat<2> m_hilbert2;
 
-	float m_lp[2] = {0.f, 0.f};
-	float m_hp[2] = {0.f, 0.f};
 	float m_lfoPhase = 0.f;
 
 	std::array<float, 2> m_dampState = {0.f, 0.f};
 	std::array<float, 2> m_toneState = {0.f, 0.f};
-
-	float m_shiftPrePhase[2] = {0.f, 0.f};
-	float m_shiftPostPhase[2] = {0.f, 0.f};
 
 	float m_trueShift[2] = {0.f, 0.f};
 	float m_truePhase = 0.f;

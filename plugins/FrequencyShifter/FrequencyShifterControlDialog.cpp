@@ -25,7 +25,6 @@
 #include "FrequencyShifterControlDialog.h"
 #include "FrequencyShifterControls.h"
 
-#include <QCheckBox>
 #include <QTextEdit>
 
 #include "AutomatableButton.h"
