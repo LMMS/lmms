@@ -133,30 +133,28 @@ Effect::ProcessStatus FrequencyShifterEffect::processImpl(SampleFrame* buf, cons
 		}
 		m_lfoPhase += lfoRate;
 
+		// parameter interpolation (glide)
 		const float base0 = fs - spread;
 		const float base1 = fs + spread;
 		m_trueShift[0] = (1.f - glideCoeff) * base0 + glideCoeff * m_trueShift[0];
 		m_trueShift[1] = (1.f - glideCoeff) * base1 + glideCoeff * m_trueShift[1];
-
 		m_trueDelay = std::max((1.f - delayGlideCoeff) * delayLen + delayGlideCoeff * m_trueDelay, 1.f);
 		m_truePhase = (1.f - glideCoeff) * phase + glideCoeff * m_truePhase;
 
+		// delay line with 4-point hermite interpolation
 		float readIndex = static_cast<float>(m_writeIndex) - m_trueDelay;
 		if (readIndex < 0.f) { readIndex += static_cast<float>(m_ringBufSize); }
-
 		const int indexFloor = static_cast<int>(readIndex);
 		const float frac = readIndex - static_cast<float>(indexFloor);
-
 		const std::array<float, 2> dly = getHermiteSample(indexFloor, frac);
+		if (++m_writeIndex == m_ringBufSize) { m_writeIndex = 0; }
 
+		// routing stuff
 		const float inL = buf[i][0];
 		const float inR = buf[i][1];
 		const float fxInL = parallelFB ? (dly[0] * feedback) : (inL + dly[0] * feedback);
 		const float fxInR = parallelFB ? (dly[1] * feedback) : (inR + dly[1] * feedback);
 		
-		++m_writeIndex;
-		if (m_writeIndex == m_ringBufSize) { m_writeIndex = 0; }
-
 		// delta phase
 		const float dPh0 = (m_trueShift[0] + lfo0) * m_twoPiOverSr;
 		const float dPh1 = (m_trueShift[1] + lfo1) * m_twoPiOverSr;
@@ -195,6 +193,9 @@ Effect::ProcessStatus FrequencyShifterEffect::processImpl(SampleFrame* buf, cons
 				float analytic1[2];
 				m_hilbert1.processReal(fxIn[ch], ch, analytic1);
 
+				// ring modulation frequency shifts both downward and upward simultaneously
+				// oscI alongside the hilbert-transformed signal cancels out one of those two sidebands
+				// so fading it out will bring us closer to ring modulation
 				const float oscR = cosP;
 				const float oscI = sinP * invRing;
 
@@ -202,24 +203,24 @@ Effect::ProcessStatus FrequencyShifterEffect::processImpl(SampleFrame* buf, cons
 				const float modI = analytic1[0] * oscI + analytic1[1] * oscR;
 
 				float shiftedR;
-				float shiftedI;
 
 				if (antireflect)
 				{
+					// use a second hilbert transform on the complex signal
+					// in order to remove negative frequencies to
+					// prevent aliasing through 0 Hz and Nyquist
 					float mod[2] = {modR, modI};
 					float analytic2[2];
 					m_hilbert2.processComplex(mod, ch, analytic2);
 					shiftedR = analytic2[0] * 0.5f;
-					shiftedI = analytic2[1] * 0.5f;
 				}
 				else
 				{
 					shiftedR = modR;
-					shiftedI = modI;
 				}
 
 				m_phase[ch] += dPh[ch];
-				out[ch] = shiftedR + ring * shiftedI;
+				out[ch] = shiftedR;
 			}
 
 			outL = out[0];
