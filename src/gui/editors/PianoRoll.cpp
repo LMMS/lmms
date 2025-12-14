@@ -3141,6 +3141,20 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	// fill with bg color
 	p.fillRect( 0, 0, width(), height(), bgColor );
 
+	if (!hasValidMidiClip())
+	{
+		const auto icon = embed::getIconPixmap("pr_no_clip");
+		const int x = (width() - icon.width()) / 2;
+		const int y = (height() - icon.height()) / 2;
+		p.drawPixmap(x, y, icon);
+
+		p.setPen(QApplication::palette().color(QPalette::Active, QPalette::Text));
+		QRect textRect(0, y + icon.height() + 5, width(), 30);
+		p.drawText(textRect, Qt::AlignHCenter | Qt::AlignTop,
+			tr("Double-click on an instrument clip in Song Editor to open it here"));
+		return;
+	}
+
 	// set font-size to 80% of key line height
 	QFont f = p.font();
 	int keyFontSize = m_keyLineHeight * 0.8;
@@ -3724,17 +3738,6 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 		p.setPen(QPen(m_noteColor, NOTE_EDIT_LINE_WIDTH + 2));
 		p.drawPoints( editHandles );
 
-	}
-	else
-	{
-		QFont f = font();
-		f.setBold(true);
-		p.setFont(f);
-		p.setPen( QApplication::palette().color( QPalette::Active,
-							QPalette::BrightText ) );
-		p.drawText(m_whiteKeyWidth + 20, PR_TOP_MARGIN + 40,
-				tr( "Please open a clip by double-clicking "
-								"on it!" ) );
 	}
 
 	p.setClipRect(
@@ -4666,7 +4669,7 @@ void PianoRoll::updatePosition(const TimePos & t)
 	// > width = outside viewport right
 	const int pos = (static_cast<int>(m_timeLine->pos()) - m_currentPosition) * m_ppb / TimePos::ticksPerBar();
 	// if pos is within visible range, show it
-	if (pos >= 0 && pos <= width() - m_whiteKeyWidth)
+	if (hasValidMidiClip() && pos >= 0 && pos <= width() - m_whiteKeyWidth)
 	{
 		m_positionLine->show();
 		// adjust pos for piano keys width and self line width (align to rightmost of line)
@@ -5406,13 +5409,11 @@ bool PianoRollWindow::hasFocus() const
 
 void PianoRollWindow::showEvent(QShowEvent*)
 {
-	// PianoRoll can ONLY be shown if hasValidMidiClip is true
-	// TODO remove hasValidMidiClip checks throughout the code
-	if (m_editor->hasValidMidiClip()) { return; }
-
 	// A new user might try to open PianoRoll in an empty project unaware that they first need to create a clip.
 	// To make life easier for them we create and/or open the first clip in an empty project.
-	// If there are multiple non-empty clips, we tell the user to double click one of them instead.
+
+	// Has a clip already, do nothing
+	if (m_editor->hasValidMidiClip()) { return; }
 
 	InstrumentTrack* firstTrack = nullptr;
 	MidiClip* firstEmptyClip = nullptr;
@@ -5440,13 +5441,9 @@ void PianoRollWindow::showEvent(QShowEvent*)
 			{
 				firstMelodyClip = midiClip;
 			}
-			// If there are multiple non-empty clips in the Song, show a hint
+			// If there are multiple clips with notes, do nothing
 			else
 			{
-				TextFloat::displayMessage(tr("No clip selected"),
-					tr("Double click a melody clip in the Song Editor to open it."),
-					embed::getIconPixmap("error"), 5000);
-				parentWidget()->hide();
 				return;
 			}
 		}
@@ -5461,24 +5458,13 @@ void PianoRollWindow::showEvent(QShowEvent*)
 	{
 		m_editor->setCurrentMidiClip(new MidiClip(firstTrack));
 	}
-	// If we found no instrument tracks, show a hint
-	else
-	{
-		TextFloat::displayMessage(tr("No instrument tracks"),
-			tr("Drag an instrument plugin or preset from the sidebar to the Song Editor."),
-			embed::getIconPixmap("error"), 5000);
-		parentWidget()->hide();
-	}
 }
 
 
 void PianoRollWindow::updateAfterMidiClipChange()
 {
-	if (!m_editor->hasValidMidiClip())
-	{
-		parentWidget()->hide();
-		return;
-	}
+	setEnabled(m_editor->hasValidMidiClip());
+	m_editor->m_timeLine->setVisible(m_editor->hasValidMidiClip());
 
 	clipRenamed();
 	updateStepRecordingIcon(); //MIDI clip change turn step recording OFF - update icon accordingly
