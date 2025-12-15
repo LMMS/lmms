@@ -60,7 +60,7 @@ TimeLineWidget::TimeLineWidget(const int xoff, const int yoff, const float ppb, 
 
 	connect( Engine::getSong(), SIGNAL(timeSignatureChanged(int,int)),
 					this, SLOT(update()));
-	connect(m_timeline, &Timeline::positionChanged, this, qOverload<>(&QWidget::update), Qt::QueuedConnection);
+	connect(m_timeline, &Timeline::positionChanged, this, qOverload<>(&QWidget::update));
 }
 
 

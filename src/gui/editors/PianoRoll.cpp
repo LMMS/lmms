@@ -279,7 +279,7 @@ PianoRoll::PianoRoll() :
 		Engine::getSong()->getTimeline(Song::PlayMode::MidiClip),
 		m_currentPosition, this
 	);
-	connect(m_timeLine->timeline(), &Timeline::positionChanged, this, &PianoRoll::updatePosition, Qt::QueuedConnection);
+	connect(m_timeLine->timeline(), &Timeline::positionChanged, this, &PianoRoll::updatePosition);
 
 	// white position line follows timeline marker
 	m_positionLine = new PositionLine(this, Song::PlayMode::MidiClip);
@@ -291,7 +291,7 @@ PianoRoll::PianoRoll() :
 			this, SLOT( updatePositionStepRecording( const lmms::TimePos& ) ) );
 
 	// update timeline when in record-accompany mode
-	connect(&Engine::getSong()->getTimeline(Song::PlayMode::Song), &Timeline::positionChanged, this, &PianoRoll::updatePositionAccompany, Qt::QueuedConnection);
+	connect(&Engine::getSong()->getTimeline(Song::PlayMode::Song), &Timeline::positionChanged, this, &PianoRoll::updatePositionAccompany);
 	// TODO
 /*	connect( engine::getSong()->getPlayPos( Song::PlayMode::Pattern ).m_timeLine,
 				SIGNAL( positionChanged( const lmms::TimePos& ) ),

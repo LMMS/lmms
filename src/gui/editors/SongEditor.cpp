@@ -100,7 +100,7 @@ SongEditor::SongEditor( Song * song ) :
 		m_currentPosition, this
 	);
 	connect(this, &TrackContainerView::positionChanged, m_timeLine, qOverload<>(&QWidget::update));
-	connect(m_timeLine->timeline(), &Timeline::positionChanged, this, &SongEditor::updatePosition, Qt::QueuedConnection);
+	connect(m_timeLine->timeline(), &Timeline::positionChanged, this, &SongEditor::updatePosition);
 	connect( m_timeLine, SIGNAL(regionSelectedFromPixels(int,int)),
 			this, SLOT(selectRegionFromPixels(int,int)));
 	connect( m_timeLine, SIGNAL(selectionFinished()),
