@@ -121,15 +121,15 @@ Song::Song() :
 	// Aggregate the `positionJumped` signals from all the timelines into a single `playbackPositionJumped` signal for other objects (sample tracks, LFOs, etc) to use.
 	for (auto& timeline : m_timelines)
 	{
-		connect(&timeline, &Timeline::positionJumped, [this](){
+		connect(&timeline, &Timeline::positionJumped, this, [this](){
 			// Only emit the signal when the song is actually playing
 			// This prevents LFOs from changing phase when the user drags the timeline while paused
 			if (isPlaying()) { emit playbackPositionJumped(); }
-		});
+		}, Qt::DirectConnection);
 	}
 
 	// Inform VST plugins if the user moved the play head
-	connect(this, &Song::playbackPositionJumped, [this](){ m_vstSyncController.setPlaybackJumped(true); });
+	connect(this, &Song::playbackPositionJumped, this, [this](){ m_vstSyncController.setPlaybackJumped(true); }, Qt::DirectConnection);
 }
 
 
