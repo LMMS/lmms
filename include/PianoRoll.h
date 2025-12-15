@@ -564,8 +564,8 @@ public:
 
 	using SerializingObject::saveState;
 	using SerializingObject::restoreState;
-	void saveSettings(QDomDocument & doc, QDomElement & de ) override;
-	void loadSettings( const QDomElement & de ) override;
+	void saveSettings(QDomDocument & doc, QDomElement & de );
+	void loadSettings( const QDomElement & de );
 
 	inline QString nodeName() const override
 	{
