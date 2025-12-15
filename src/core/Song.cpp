@@ -241,7 +241,7 @@ void Song::processNextBuffer()
 	{
 		if (getPlayPos() < begin || getPlayPos() >= end)
 		{
-			setToTime(begin);
+			setPlayPos(begin.getTicks(), Engine::getSong()->playMode());
 			m_vstSyncController.setPlaybackJumped(true);
 			emit updateSampleTracks();
 			return true;
@@ -605,9 +605,8 @@ void Song::updateLength()
 
 void Song::setPlayPos( tick_t ticks, PlayMode playMode )
 {
-	tick_t ticksFromPlayMode = getPlayPos(playMode).getTicks();
-	m_elapsedTicks += ticksFromPlayMode - ticks;
-	m_elapsedMilliSeconds[static_cast<std::size_t>(playMode)] += TimePos::ticksToMilliseconds( ticks - ticksFromPlayMode, getTempo() );
+	m_elapsedTicks = ticks;
+	m_elapsedMilliSeconds[static_cast<std::size_t>(playMode)] = TimePos::ticksToMilliseconds( ticks , getTempo() );
 	getPlayPos(playMode).setTicks( ticks );
 	getPlayPos(playMode).setCurrentFrame( 0.0f );
 	getPlayPos(playMode).setJumped( true );
@@ -681,7 +680,7 @@ void Song::stop()
 			if (timeline.playStartPosition() >= 0)
 			{
 				getPlayPos().setTicks(timeline.playStartPosition().getTicks());
-				setToTime(timeline.playStartPosition());
+				setPlayPos(timeline.playStartPosition().getTicks(), Engine::getSong()->playMode());
 
 				timeline.setPlayStartPosition(-1);
 			}
