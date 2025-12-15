@@ -66,8 +66,7 @@ namespace
 constexpr int MIN_PIXELS_PER_BAR = 4;
 constexpr int MAX_PIXELS_PER_BAR = 400;
 constexpr int ZOOM_STEPS = 200;
-constexpr int SNAP_SIZES_SMALL = 5;
-constexpr int SNAP_SIZES_LARGE = 4;
+constexpr int SNAP_SIZE_MAX_BARS = 8;
 
 }
 
@@ -251,7 +250,9 @@ SongEditor::SongEditor( Song * song ) :
 	m_snappingModel->setParent(this);
 	connect(m_song, &Song::timeSignatureChanged, this, &SongEditor::updateSnapSizes);
 	updateSnapSizes();
-	m_snappingModel->setInitValue(SNAP_SIZES_LARGE + 2); // +2 Defaults to 1/4 when using 4/4 time sig
+	// Find 1/numerator snap size
+	auto defaultSnapIndex = std::find(m_snapSizes.begin(), m_snapSizes.end(), 1.0f / m_song->getTimeSigModel().getNumerator());
+	m_snappingModel->setInitValue(defaultSnapIndex != m_snapSizes.end() ? std::distance(m_snapSizes.begin(), defaultSnapIndex) : 0);
 
 	setFocusPolicy( Qt::StrongFocus );
 	setFocus();
@@ -265,31 +266,30 @@ void SongEditor::updateSnapSizes()
 	int numerator = m_song->getTimeSigModel().getNumerator();
 	int denominator = m_song->getTimeSigModel().getDenominator();
 	// Add the snap sizes larger than 1 bar
-	for (int i = SNAP_SIZES_LARGE; i >= 0; i--)
+	for (int snapSize = SNAP_SIZE_MAX_BARS; snapSize >= 1; snapSize /= 2)
 	{
-		float snapSize = std::exp2(i);
 		m_snapSizes.push_back(snapSize);
-		m_snappingModel->addItem(QString("%1 Bar").arg(std::exp2(i)));
+		m_snappingModel->addItem(QString("%1 Bar").arg(snapSize));
 	}
 	// Add the 1 / numerator snap size
 	// Additionally, for large numerators, the divisors of the numerator are also added as snap sizes (so using 12/8 timesig would allow 1/12, but also 1/2, 1/3, 1/4 and 1/6)
 	// Find divisors of numerator (this will also include the numerator itself due to the <= bound) (starting at 2 because 1 divides all numbers)
 	for (int i = 2; i <= numerator; ++i)
 	{
-		if (numerator % i == 0)
+		// Don't add snap sizes which are not clean divisors of the ticks per bar
+		if (numerator % i == 0 && (DefaultTicksPerBar * numerator / denominator) % i == 0)
 		{
 			float snapSize = 1.0f / i;
 			m_snapSizes.push_back(snapSize);
 			m_snappingModel->addItem(QString("1/%1 Bar").arg(i));
 		}
 	}
-	// Add the snap sizes smaller than 1 / numerator of a bar
-	for (int i = -1; i >= -SNAP_SIZES_SMALL; i--)
+	// Add the snap sizes smaller than 1 / numerator of a bar, until the snap size no longer evenly divides the ticks per bar
+	for (int invSnapSize = 2 * numerator; (DefaultTicksPerBar * numerator / denominator) % invSnapSize == 0; invSnapSize *= 2)
 	{
-		float snapSize = std::exp2(i) / numerator;
-		if (snapSize * DefaultTicksPerBar * numerator / denominator < 1) { break; } // Don't add sub-tick snap sizes
+		float snapSize = 1.0f / invSnapSize;
 		m_snapSizes.push_back(snapSize);
-		m_snappingModel->addItem(QString("1/%1 Bar").arg(std::exp2(-i) * numerator));
+		m_snappingModel->addItem(QString("1/%1 Bar").arg(invSnapSize));
 	}
 	m_snappingModel->setValue(oldIndex);
 }
