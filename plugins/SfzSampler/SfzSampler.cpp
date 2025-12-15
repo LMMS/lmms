@@ -190,9 +190,13 @@ void SfzSampler::play(SampleFrame* workingBuffer)
 	{
 		//m_noteStates[key].playbackState
 		f_cnt_t offsetFrames = 0;
-		if (m_noteStates[key].frameCounter < 0 && frames - m_noteStates[key].frameCounter > 0)
+		if (m_noteStates[key].frameCounter < 0 && m_noteStates[key].frameCounter + frames > 0)
 		{
-			offsetFrames = frames - m_noteStates[key].frameCounter;
+			offsetFrames = m_noteStates[key].frameCounter + frames;
+		}
+		else if (m_noteStates[key].frameCounter && m_noteStates[key].frameCounter + frames < 0)
+		{
+			continue;
 		}
 		if (m_noteStates[key].sampleIndex != -1)
 		{
