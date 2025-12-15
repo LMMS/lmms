@@ -42,6 +42,7 @@
 #include "SetupDialog.h"
 #include "TabBar.h"
 #include "TabButton.h"
+#include "TimeLineWidget.h"
 
 
 // Platform-specific audio-interface classes.
@@ -119,6 +120,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	m_openLastProject(ConfigManager::inst()->value(
 			"app", "openlastproject").toInt()),
 	m_loopMarkerMode{ConfigManager::inst()->value("app", "loopmarkermode", "dual")},
+	m_autoScroll(ConfigManager::inst()->value("ui", "autoscroll", "stepped")),
 	m_lang(ConfigManager::inst()->value(
 			"app", "language")),
 	m_saveInterval(	ConfigManager::inst()->value(
@@ -267,6 +269,17 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 
 	guiGroupLayout->addWidget(new QLabel{tr("Loop edit mode"), guiGroupBox});
 	guiGroupLayout->addWidget(m_loopMarkerComboBox);
+
+	m_autoScrollComboBox = new QComboBox{guiGroupBox};
+	m_autoScrollComboBox->addItem(tr("Disabled"), TimeLineWidget::AutoScrollDisabledString);
+	m_autoScrollComboBox->addItem(tr("Stepped (Scroll once the playhead goes out of view)"), TimeLineWidget::AutoScrollSteppedString);
+	m_autoScrollComboBox->addItem(tr("Continuous (Scroll constantly to keep the playhead in the center)"), TimeLineWidget::AutoScrollContinuousString);
+	m_autoScrollComboBox->setCurrentIndex(m_autoScrollComboBox->findData(m_autoScroll));
+	connect(m_autoScrollComboBox, qOverload<int>(&QComboBox::currentIndexChanged),
+		this, [this](){ m_autoScroll = m_autoScrollComboBox->currentData().toString(); });
+
+	guiGroupLayout->addWidget(new QLabel{tr("Default Autoscroll Mode"), guiGroupBox});
+	guiGroupLayout->addWidget(m_autoScrollComboBox);
 
 	generalControlsLayout->addWidget(guiGroupBox);
 
@@ -550,8 +563,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 		setCurrentIndex(m_audioInterfaces->findText(audioDevName));
 	m_audioIfaceSetupWidgets[audioDevName]->show();
 
-	connect(m_audioInterfaces, SIGNAL(activated(const QString&)),
-			this, SLOT(audioInterfaceChanged(const QString&)));
+	connect(m_audioInterfaces, &QComboBox::textActivated, this, &SetupDialog::audioInterfaceChanged);
 
 	// Advanced setting, hidden for now
 	// // TODO Handle or remove.
@@ -725,9 +737,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	m_midiInterfaces->setCurrentIndex(m_midiInterfaces->findText(midiDevName));
 	m_midiIfaceSetupWidgets[midiDevName]->show();
 
-	connect(m_midiInterfaces, SIGNAL(activated(const QString&)),
-			this, SLOT(midiInterfaceChanged(const QString&)));
-
+	connect(m_midiInterfaces, &QComboBox::textActivated, this, &SetupDialog::midiInterfaceChanged);
 
 	// MIDI autoassign group
 	QGroupBox * midiAutoAssignBox = new QGroupBox(tr("Automatically assign MIDI controller to selected track"), midi_w);
@@ -983,6 +993,7 @@ void SetupDialog::accept()
 					QString::number(m_openLastProject));
 	ConfigManager::inst()->setValue("app", "loopmarkermode", m_loopMarkerMode);
 	ConfigManager::inst()->setValue("app", "language", m_lang);
+	ConfigManager::inst()->setValue("ui", "autoscroll", m_autoScroll);
 	ConfigManager::inst()->setValue("ui", "saveinterval",
 					QString::number(m_saveInterval));
 	ConfigManager::inst()->setValue("ui", "enableautosave",

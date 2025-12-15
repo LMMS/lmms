@@ -26,7 +26,6 @@
 #ifndef LMMS_GUI_SONG_EDITOR_H
 #define LMMS_GUI_SONG_EDITOR_H
 
-#include "AutomatableModel.h"
 #include "Editor.h"
 #include "TrackContainerView.h"
 
@@ -36,6 +35,7 @@ class QScrollBar;
 namespace lmms
 {
 
+class IntModel;
 class Song;
 class ComboBoxModel;
 
@@ -70,9 +70,12 @@ public:
 	void saveSettings( QDomDocument& doc, QDomElement& element ) override;
 	void loadSettings( const QDomElement& element ) override;
 
-	ComboBoxModel *snappingModel() const;
+	ComboBoxModel* snappingModel() const;
 	float getSnapSize() const;
 	QString getSnapSizeString() const;
+
+	TimeLineWidget* timeLine() const { return m_timeLine; }
+	PositionLine* positionLine() const { return m_positionLine; }
 
 public slots:
 	void scrolled( int new_pos );
@@ -133,7 +136,8 @@ private:
 
 	LcdSpinBox * m_tempoSpinBox;
 
-	TimeLineWidget * m_timeLine;
+	TimeLineWidget* m_timeLine;
+	PositionLine* m_positionLine;
 
 	MeterDialog * m_timeSigDisplay;
 	AutomatableSlider * m_masterVolumeSlider;
@@ -142,7 +146,6 @@ private:
 	TextFloat * m_mvsStatus;
 	TextFloat * m_mpsStatus;
 
-	PositionLine * m_positionLine;
 
 	IntModel* m_zoomingModel;
 	ComboBoxModel* m_snappingModel;

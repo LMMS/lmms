@@ -25,16 +25,14 @@
  */
  
 
+#include "AutomatableButton.h"
 #include "CrossoverEQControlDialog.h"
 #include "CrossoverEQControls.h"
 #include "embed.h"
 #include "FontHelper.h"
-#include "LedCheckBox.h"
 #include "Knob.h"
 #include "Fader.h"
-#include "PixmapButton.h"
 
-#include <QPixmap>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 

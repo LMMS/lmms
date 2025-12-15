@@ -22,7 +22,6 @@
  *
  */
 
-#include <QDomElement>
 
 #include "Nes.h"
 
@@ -767,7 +766,7 @@ NesInstrumentView::NesInstrumentView( Instrument * instrument,	QWidget * parent 
 	dcx += 13;
 	makedcled( ch1_dc4, dcx, 42, tr( "75% Duty cycle" ), "nesdc4_on" )
 		
-	m_ch1DutyCycleGrp = new automatableButtonGroup( this );
+	m_ch1DutyCycleGrp = new AutomatableButtonGroup( this );
 	m_ch1DutyCycleGrp -> addButton( ch1_dc1 );
 	m_ch1DutyCycleGrp -> addButton( ch1_dc2 );
 	m_ch1DutyCycleGrp -> addButton( ch1_dc3 );
@@ -798,7 +797,7 @@ NesInstrumentView::NesInstrumentView( Instrument * instrument,	QWidget * parent 
 	dcx += 13;
 	makedcled( ch2_dc4, dcx, 99, tr( "75% Duty cycle" ), "nesdc4_on" )
 		
-	m_ch2DutyCycleGrp = new automatableButtonGroup( this );
+	m_ch2DutyCycleGrp = new AutomatableButtonGroup( this );
 	m_ch2DutyCycleGrp -> addButton( ch2_dc1 );
 	m_ch2DutyCycleGrp -> addButton( ch2_dc2 );
 	m_ch2DutyCycleGrp -> addButton( ch2_dc3 );

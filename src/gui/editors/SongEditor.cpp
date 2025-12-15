@@ -537,9 +537,10 @@ void SongEditor::adjustLeftRightScoll(int value)
 
 void SongEditor::wheelEvent( QWheelEvent * we )
 {
-	if ((we->modifiers() & Qt::ControlModifier) && (position(we).x() > m_trackHeadWidth))
+	const auto posX = we->position().toPoint().x();
+	if ((we->modifiers() & Qt::ControlModifier) && (posX > m_trackHeadWidth))
 	{
-		int x = position(we).x() - m_trackHeadWidth;
+		int x = posX - m_trackHeadWidth;
 		// tick based on the mouse x-position where the scroll wheel was used
 		int tick = x / pixelsPerBar() * TimePos::ticksPerBar();
 
@@ -596,11 +597,13 @@ void SongEditor::closeEvent( QCloseEvent * ce )
 
 void SongEditor::mousePressEvent(QMouseEvent *me)
 {
+	const auto pos = position(me);
+	
 	if (allowRubberband())
 	{
 		//we save the position of scrollbars, mouse position and zooming level
 		m_scrollPos = QPoint(m_leftRightScroll->value(), contentWidget()->verticalScrollBar()->value());
-		m_origin = contentWidget()->mapFromParent(QPoint(me->pos().x(), me->pos().y()));
+		m_origin = contentWidget()->mapFromParent(pos);
 		m_rubberbandPixelsPerBar = pixelsPerBar();
 
 		//paint the rubberband
@@ -609,8 +612,8 @@ void SongEditor::mousePressEvent(QMouseEvent *me)
 		rubberBand()->show();
 
 		//the trackView(index) and the time position where the mouse was clicked
-		m_rubberBandStartTrackview = trackIndexFromSelectionPoint(me->y());
-		m_rubberbandStartTimePos = TimePos((me->x() - m_trackHeadWidth)
+		m_rubberBandStartTrackview = trackIndexFromSelectionPoint(pos.y());
+		m_rubberbandStartTimePos = TimePos((pos.x() - m_trackHeadWidth)
 											/ pixelsPerBar() * TimePos::ticksPerBar())
 											+ m_currentPosition;
 	}
@@ -622,7 +625,7 @@ void SongEditor::mousePressEvent(QMouseEvent *me)
 
 void SongEditor::mouseMoveEvent(QMouseEvent *me)
 {
-	m_mousePos = me->pos();
+	m_mousePos = position(me);
 	updateRubberband();
 	QWidget::mouseMoveEvent(me);
 }
@@ -1104,6 +1107,8 @@ void SongEditorWindow::play()
 void SongEditorWindow::record()
 {
 	m_editor->m_song->record();
+	m_editor->m_timeLine->setRecording(true);
+	m_editor->m_positionLine->setRecording(true);
 }
 
 
@@ -1112,6 +1117,8 @@ void SongEditorWindow::record()
 void SongEditorWindow::recordAccompany()
 {
 	m_editor->m_song->playAndRecord();
+	m_editor->m_timeLine->setRecording(true);
+	m_editor->m_positionLine->setRecording(true);
 }
 
 
@@ -1121,6 +1128,8 @@ void SongEditorWindow::stop()
 {
 	m_editor->m_song->stop();
 	getGUI()->pianoRoll()->stopRecording();
+	m_editor->m_timeLine->setRecording(false);
+	m_editor->m_positionLine->setRecording(false);
 }
 
 
@@ -1142,7 +1151,7 @@ void SongEditorWindow::adjustUiAfterProjectLoad()
 {
 	// make sure to bring us to front as the song editor is the central
 	// widget in a song and when just opening a song in order to listen to
-	// it, it's very annyoing to manually bring up the song editor each time
+	// it, it's very annoying to manually bring up the song editor each time
 	getGUI()->mainWindow()->workspace()->setActiveSubWindow(
 			qobject_cast<QMdiSubWindow *>( parentWidget() ) );
 	connect( qobject_cast<SubWindow *>( parentWidget() ), SIGNAL(focusLost()), this, SLOT(lostFocus()));
