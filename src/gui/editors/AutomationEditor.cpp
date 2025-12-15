@@ -216,6 +216,7 @@ void AutomationEditor::updateAfterClipChange()
 
 	setEnabled(validClip());
 	m_timeLine->setVisible(validClip());
+	m_interpolationActionsToolBar->setVisible(validClip());
 
 	if ( !validClip() )
 	{
@@ -2051,7 +2052,7 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	editActionsToolBar->addAction(m_flipYAction);
 
 	// Interpolation actions
-	DropToolBar *interpolationActionsToolBar = addDropToolBarToTop(tr("Interpolation controls"));
+	m_editor->m_interpolationActionsToolBar = addDropToolBarToTop(tr("Interpolation controls"));
 
 	auto progression_type_group = new ActionGroup(this);
 
@@ -2073,13 +2074,13 @@ AutomationEditorWindow::AutomationEditorWindow() :
 
 	connect(m_cubicHermiteAction, SIGNAL(toggled(bool)), m_tensionKnob, SLOT(setEnabled(bool)));
 
-	interpolationActionsToolBar->addSeparator();
-	interpolationActionsToolBar->addAction(m_discreteAction);
-	interpolationActionsToolBar->addAction(m_linearAction);
-	interpolationActionsToolBar->addAction(m_cubicHermiteAction);
-	interpolationActionsToolBar->addSeparator();
-	interpolationActionsToolBar->addWidget( new QLabel( tr("Tension: "), interpolationActionsToolBar ));
-	interpolationActionsToolBar->addWidget( m_tensionKnob );
+	m_editor->m_interpolationActionsToolBar->addSeparator();
+	m_editor->m_interpolationActionsToolBar->addAction(m_discreteAction);
+	m_editor->m_interpolationActionsToolBar->addAction(m_linearAction);
+	m_editor->m_interpolationActionsToolBar->addAction(m_cubicHermiteAction);
+	m_editor->m_interpolationActionsToolBar->addSeparator();
+	m_editor->m_interpolationActionsToolBar->addWidget( new QLabel( tr("Tension: "), m_editor->m_interpolationActionsToolBar ));
+	m_editor->m_interpolationActionsToolBar->addWidget( m_tensionKnob );
 
 
 

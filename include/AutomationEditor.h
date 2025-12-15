@@ -206,6 +206,8 @@ private:
 	AutomationEditor( const AutomationEditor & );
 	~AutomationEditor() override;
 
+	DropToolBar* m_interpolationActionsToolBar;
+
 	QPixmap m_toolDraw = embed::getIconPixmap("edit_draw");
 	QPixmap m_toolErase = embed::getIconPixmap("edit_erase");
 	QPixmap m_toolDrawOut = embed::getIconPixmap("edit_draw_outvalue");
