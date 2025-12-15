@@ -101,132 +101,8 @@ SfzSampler::SfzSampler(InstrumentTrack* instrumentTrack)
 	, m_parentTrack(instrumentTrack)
 {
 	QString path = ConfigManager::inst()->userSamplesDir() + "sfz/jlearman.jRhodes3c-master/jRhodes3c-looped-flac-sfz/";
-	if (auto buffer = gui::SampleLoader::createBufferFromFile(path + "As_029__F1_279-stereo.flac"))
-	{
-		m_originalSample1 = Sample(std::move(buffer));
-	}
-	if (auto buffer = gui::SampleLoader::createBufferFromFile(path + "As_035__B1_281-stereo.flac"))
-	{
-		m_originalSample2 = Sample(std::move(buffer));
-	}
 
-	QFile file(path + "_jRhodes-stereo-looped.sfz");
-
-	if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) { return; }
-
-	bool inGlobal = false;
-	bool inGroup = false;
-	bool inRegion = false;
-
-	while (!file.atEnd())
-	{
-		QString line = file.readLine();
-		// Trim comments off end
-		line = line.split("//")[0];
-		line = line.trimmed();
-		qDebug() << line;
-		// Split by "=" TODO make better
-		QStringList segments = line.split("=");
-		if (segments.length() == 0) { continue; }
-		if (segments.length() == 1)
-		{
-			if (line == "<global>")
-			{
-				qDebug() << "Global!";
-				inGlobal = true;
-				inGroup = false;
-				inRegion = false;
-			}
-			if (line == "<group>")
-			{
-				qDebug() << "New Group!";
-				inGlobal = false;
-				inGroup = true;
-				inRegion = false;
-				m_sfz.m_groups.push_back(SfzGroup());
-			}
-			if (line == "<region>")
-			{
-				qDebug() << "New Region!";
-				inGlobal = false;
-				inGroup = false;
-				inRegion = true;
-				m_sfz.m_groups.back().m_regions.push_back(SfzRegion());
-			}
-		}
-		if (segments.length() == 2)
-		{
-			QString opcode = segments[0];
-			QString value = segments[1];
-			SfzSettingState& currentSettingsState = inGlobal
-				? m_sfz.m_globalSettings
-				: inGroup
-					? m_sfz.m_groups.back().m_globalSettings
-					: m_sfz.m_groups.back().m_regions.back().m_settings;
-			if (opcode == "sample")
-			{
-				currentSettingsState.sampleFile = value;
-				qDebug() << "LOADING SAMPLE!!!" << value;
-				if (auto buffer = gui::SampleLoader::createBufferFromFile(path + value))
-				{
-					m_samples.push_back(Sample(std::move(buffer)));
-					currentSettingsState.sampleIndex = m_samples.size() - 1;
-				}
-			}
-			else if (opcode == "lokey")
-			{
-				currentSettingsState.lokey = keyStringToInt(value);
-			}
-			else if (opcode == "hikey")
-			{
-				currentSettingsState.hikey = keyStringToInt(value);
-			}
-			else if (opcode == "pitch_keycenter")
-			{
-				currentSettingsState.pitch_keycenter = keyStringToInt(value);
-			}
-			else if (opcode == "lovel")
-			{
-				currentSettingsState.lovel = value.toInt();
-			}
-			else if (opcode == "hivel")
-			{
-				currentSettingsState.hivel = value.toInt();
-			}
-			else if (opcode == "loop_mode")
-			{
-				if (value == "loop_continuous") { currentSettingsState.loop_mode = LoopMode::LoopContinuous; }
-				else { qDebug() << "Oops loop val"; }
-			}
-			else if (opcode == "ampeg_hold")
-			{
-				currentSettingsState.ampeg_hold = value.toFloat();
-			}
-			else if (opcode == "ampeg_sustain")
-			{
-				currentSettingsState.ampeg_sustain = value.toFloat();
-			}
-			else if (opcode == "ampeg_decay")
-			{
-				currentSettingsState.ampeg_decay = value.toFloat();
-			}
-			else if (opcode == "ampeg_release")
-			{
-				currentSettingsState.ampeg_release = value.toFloat();
-			}
-			else
-			{
-				qDebug() << "AAAAAAAA uknown opcode" << opcode << value;
-			}
-		}
-
-	}
-
-	qDebug() << "Yay!" << m_sfz.m_groups.size();
-	for (auto& group : m_sfz.m_groups)
-	{
-		qDebug() << "wooo" << group.m_regions.size();
-	}
+	//loadFile(path + "_jRhodes-stereo-looped.sfz");
 
 	auto iph = new InstrumentPlayHandle(this, instrumentTrack);
 	Engine::audioEngine()->addPlayHandle( iph );
@@ -259,7 +135,7 @@ bool SfzSampler::handleMidiEvent(const MidiEvent& event, const TimePos& time, f_
 		int key = event.key();
 		int velocity = event.velocity();
 		m_noteStates[key].pressed = false;
-		m_noteStates[key].velocity = velocity;
+		//m_noteStates[key].velocity = velocity;
 		m_noteStates[key].frameReleased = m_noteStates[key].frameCounter;
 		qDebug() << "Note off!" << key << velocity;
 	}
@@ -328,27 +204,28 @@ void SfzSampler::play(SampleFrame* workingBuffer)
 			for (f_cnt_t f = 0; f < frames; ++f)
 			{
 				float ampeg_multiplier = 1.0f;
+				ampeg_multiplier *= (m_noteStates[key].velocity / 127.0f);
 				if (m_noteStates[key].pressed)
 				{
 					if (m_noteStates[key].frameCounter > 0 && m_noteStates[key].frameCounter < 0) // TODO attack
 					{
-						ampeg_multiplier = 1.0f; // TODO
+						ampeg_multiplier *= 1.0f; // TODO
 						//qDebug() << "Attack" << m_noteStates[key].frameCounter << m_noteStates[key].attackFrames << m_noteStates[key].holdFrames << m_noteStates[key].decayFrames << m_noteStates[key].sustainLevel << m_noteStates[key].releaseFrames;
 					}
 					else if (m_noteStates[key].frameCounter < m_noteStates[key].holdFrames)
 					{
-						ampeg_multiplier = 1.0f;
+						ampeg_multiplier *= 1.0f;
 						//qDebug() << "Hold" << m_noteStates[key].frameCounter << m_noteStates[key].attackFrames << m_noteStates[key].holdFrames << m_noteStates[key].decayFrames << m_noteStates[key].sustainLevel << m_noteStates[key].releaseFrames;
 					}
 					else if (m_noteStates[key].frameCounter < m_noteStates[key].holdFrames + m_noteStates[key].decayFrames)
 					{
-						ampeg_multiplier = 1.0f - (1.0f - m_noteStates[key].sustainLevel) * 1.0f * (m_noteStates[key].frameCounter - m_noteStates[key].holdFrames) / m_noteStates[key].decayFrames;
+						ampeg_multiplier *= 1.0f - (1.0f - m_noteStates[key].sustainLevel) * 1.0f * (m_noteStates[key].frameCounter - m_noteStates[key].holdFrames) / m_noteStates[key].decayFrames;
 						//qDebug() << 1.0f * (m_noteStates[key].frameCounter - m_noteStates[key].holdFrames) / m_noteStates[key].decayFrames << ampeg_multiplier;
 						//qDebug() << "Decay" << m_noteStates[key].frameCounter << m_noteStates[key].attackFrames << m_noteStates[key].holdFrames << m_noteStates[key].decayFrames << m_noteStates[key].sustainLevel << m_noteStates[key].releaseFrames;
 					}
 					else
 					{
-						ampeg_multiplier = m_noteStates[key].sustainLevel;
+						ampeg_multiplier *= m_noteStates[key].sustainLevel;
 						//qDebug() << "Sustain" << m_noteStates[key].frameCounter << m_noteStates[key].attackFrames << m_noteStates[key].holdFrames << m_noteStates[key].decayFrames << m_noteStates[key].sustainLevel << m_noteStates[key].releaseFrames;
 					}
 				}
@@ -356,12 +233,12 @@ void SfzSampler::play(SampleFrame* workingBuffer)
 				{
 					if (m_noteStates[key].frameCounter - m_noteStates[key].frameReleased < m_noteStates[key].releaseFrames)
 					{
-						ampeg_multiplier = 1.0f - 1.0f * (m_noteStates[key].frameCounter - m_noteStates[key].frameReleased) / m_noteStates[key].releaseFrames;
+						ampeg_multiplier *= 1.0f - 1.0f * (m_noteStates[key].frameCounter - m_noteStates[key].frameReleased) / m_noteStates[key].releaseFrames;
 						//qDebug() << "Release" << m_noteStates[key].frameCounter << m_noteStates[key].attackFrames << m_noteStates[key].holdFrames << m_noteStates[key].decayFrames << m_noteStates[key].sustainLevel << m_noteStates[key].releaseFrames;
 					}
 					else
 					{
-						ampeg_multiplier = 0.0f;
+						ampeg_multiplier *= 0.0f;
 					}
 				}
 				workingBuffer[f] += m_tempBuffer[f] * ampeg_multiplier;
@@ -404,8 +281,131 @@ void SfzSampler::deleteNotePluginData(NotePlayHandle* handle)
 }*/
 
 
-void SfzSampler::loadFile(const QString& file)
+void SfzSampler::loadFile(const QString& filepath)
 {
+
+	m_samples.clear();
+
+	QString parentDirectory = QFileInfo(filepath).absoluteDir().path() + "/";
+	qDebug() << "File!" << filepath;
+	qDebug() << "Dir!" << parentDirectory;
+	QFile file(filepath);
+
+	if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) { qDebug() << "Could not read!!"; return; }
+
+	bool inGlobal = false;
+	bool inGroup = false;
+	bool inRegion = false;
+
+	while (!file.atEnd())
+	{
+		QString line = file.readLine();
+		// Trim comments off end
+		line = line.split("//")[0];
+		line = line.trimmed();
+		qDebug() << line;
+		// Split by "=" TODO make better
+		QStringList segments = line.split("=");
+		if (segments.length() == 0) { continue; }
+		if (segments.length() == 1)
+		{
+			if (line == "<global>")
+			{
+				qDebug() << "Global!";
+				inGlobal = true;
+				inGroup = false;
+				inRegion = false;
+			}
+			if (line == "<group>")
+			{
+				qDebug() << "New Group!";
+				inGlobal = false;
+				inGroup = true;
+				inRegion = false;
+				m_sfz.m_groups.push_back(SfzGroup());
+			}
+			if (line == "<region>")
+			{
+				qDebug() << "New Region!";
+				inGlobal = false;
+				inGroup = false;
+				inRegion = true;
+				m_sfz.m_groups.back().m_regions.push_back(SfzRegion());
+			}
+		}
+		if (segments.length() == 2)
+		{
+			QString opcode = segments[0];
+			QString value = segments[1];
+			SfzSettingState& currentSettingsState = inGlobal
+				? m_sfz.m_globalSettings
+				: inGroup
+					? m_sfz.m_groups.back().m_globalSettings
+					: m_sfz.m_groups.back().m_regions.back().m_settings;
+			if (opcode == "sample")
+			{
+				currentSettingsState.sampleFile = value;
+				qDebug() << "LOADING SAMPLE!!!" << value;
+				if (auto buffer = gui::SampleLoader::createBufferFromFile(parentDirectory + value))
+				{
+					m_samples.push_back(Sample(std::move(buffer)));
+					currentSettingsState.sampleIndex = m_samples.size() - 1;
+				}
+			}
+			else if (opcode == "lokey")
+			{
+				currentSettingsState.lokey = keyStringToInt(value);
+			}
+			else if (opcode == "hikey")
+			{
+				currentSettingsState.hikey = keyStringToInt(value);
+			}
+			else if (opcode == "pitch_keycenter")
+			{
+				currentSettingsState.pitch_keycenter = keyStringToInt(value);
+			}
+			else if (opcode == "lovel")
+			{
+				currentSettingsState.lovel = value.toInt();
+			}
+			else if (opcode == "hivel")
+			{
+				currentSettingsState.hivel = value.toInt();
+			}
+			else if (opcode == "loop_mode")
+			{
+				if (value == "loop_continuous") { currentSettingsState.loop_mode = LoopMode::LoopContinuous; }
+				else { qDebug() << "Oops loop val"; }
+			}
+			else if (opcode == "ampeg_hold")
+			{
+				currentSettingsState.ampeg_hold = value.toFloat();
+			}
+			else if (opcode == "ampeg_sustain")
+			{
+				currentSettingsState.ampeg_sustain = value.toFloat();
+			}
+			else if (opcode == "ampeg_decay")
+			{
+				currentSettingsState.ampeg_decay = value.toFloat();
+			}
+			else if (opcode == "ampeg_release")
+			{
+				currentSettingsState.ampeg_release = value.toFloat();
+			}
+			else
+			{
+				qDebug() << "AAAAAAAA uknown opcode" << opcode << value;
+			}
+		}
+
+	}
+
+	qDebug() << "Yay!" << m_sfz.m_groups.size();
+	for (auto& group : m_sfz.m_groups)
+	{
+		qDebug() << "wooo" << group.m_regions.size();
+	}
 }
 
 void SfzSampler::saveSettings(QDomDocument& document, QDomElement& element)

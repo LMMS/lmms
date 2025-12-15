@@ -40,6 +40,10 @@
 #include "StringPairDrag.h"
 #include "Track.h"
 #include "embed.h"
+#include "ConfigManager.h"
+#include "FileDialog.h"
+#include "PathUtil.h"
+#include "embed.h"
 
 namespace lmms {
 
@@ -55,6 +59,20 @@ SfzSamplerView::SfzSamplerView(SfzSampler* instrument, QWidget* parent)
 
 	setMaximumSize(QSize(10000, 10000));
 	setMinimumSize(QSize(516, 400));
+
+	auto openfilebutton = new QPushButton("Open SFZ File", this);
+	openfilebutton->setIcon(embed::getIconPixmap("folder"));
+	openfilebutton->setToolTip(tr("Open SFZ File"));
+	connect(openfilebutton, &PixmapButton::clicked, [this](){
+		auto openFileDialog = FileDialog(nullptr, QObject::tr("Open SFZ File"));
+		auto dir = ConfigManager::inst()->userSamplesDir();
+		openFileDialog.setDirectory(dir);
+		if (openFileDialog.exec() == QDialog::Accepted)
+		{
+			if (openFileDialog.selectedFiles().isEmpty()) { return; }
+			m_instrument->loadFile(openFileDialog.selectedFiles()[0]);
+		}
+	});
 
 	update();
 }
