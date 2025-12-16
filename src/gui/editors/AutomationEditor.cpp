@@ -214,7 +214,6 @@ void AutomationEditor::updateAfterClipChange()
 {
 	m_currentPosition = 0;
 
-	setEnabled(validClip());
 	m_timeLine->setVisible(validClip());
 	m_interpolationActionsToolBar->setVisible(validClip());
 
