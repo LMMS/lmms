@@ -17,7 +17,6 @@ const float PI = 3.14159265358979f;
 const int FIXED_FFT_SIZE = 2048;
 
 void distinct_fft(std::vector<Complex>& x, bool inverse) {
-
     const size_t N = x.size(); if (N <= 1) return;
     std::vector<Complex> even(N/2), odd(N/2);
     for (size_t i=0; i<N/2; ++i) { even[i]=x[i*2]; odd[i]=x[i*2+1]; }
