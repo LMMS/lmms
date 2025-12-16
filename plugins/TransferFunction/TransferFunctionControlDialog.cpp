@@ -98,18 +98,14 @@ TransferFunctionControlDialog::TransferFunctionControlDialog(TransferFunctionCon
 
     m_bodeContainer = new QWidget(this); QVBoxLayout* bodeLayout = new QVBoxLayout(m_bodeContainer); bodeLayout->setContentsMargins(0,0,0,0);
     auto addGraph = [this, controls, bodeLayout](QString title, graphModel* model, QColor col, bool interact) {
-
         QWidget* wrap = new QWidget(this); QHBoxLayout* hl = new QHBoxLayout(wrap); hl->setContentsMargins(0,0,0,0);
         QLabel* lb = new QLabel(title, this); lb->setFixedWidth(50); lb->setStyleSheet("color:#BBB; font-weight:bold;"); hl->addWidget(lb);
         if (interact) { m_clearButton = new QPushButton("Clear", this); m_clearButton->setFixedWidth(50); connect(m_clearButton, &QPushButton::clicked, controls, &TransferFunctionControls::clearDrawing); hl->addWidget(m_clearButton); } 
         else { QWidget* sp = new QWidget(this); sp->setFixedWidth(50); hl->addWidget(sp); }
         auto g = new Graph(this, Graph::Style::LinearNonCyclic, 300, 100); g->setModel(model); g->setGraphColor(col); if(interact) { g->installEventFilter(this); g->setObjectName("MagGraph"); } hl->addWidget(g); bodeLayout->addWidget(wrap);
-
     };
-
     addGraph("MAG", &controls->m_bodeMagModel, QColor(0, 255, 0), true); addGraph("PHASE", &controls->m_bodePhaseModel, QColor(255, 200, 0), false);
     LogScaleWidget* sc = new LogScaleWidget(this); bodeLayout->addWidget(sc); gridLayout->addWidget(m_bodeContainer, 3, 0, 2, 2);
-
     m_poleZeroGraph = new PoleZeroGraph(this, controls); m_poleZeroGraph->setVisible(false); gridLayout->addWidget(m_poleZeroGraph, 3, 0, 2, 2);
     connect(&controls->m_volumeModel, SIGNAL(dataChanged()), this, SLOT(updateUIState())); updateUIState();
 }
