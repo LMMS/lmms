@@ -595,7 +595,6 @@ private:
 
 	PianoRoll* m_editor;
 
-	QToolButton* m_fileToolsButton;
 	ComboBox * m_zoomingComboBox;
 	ComboBox * m_zoomingYComboBox;
 	ComboBox * m_quantizeComboBox;

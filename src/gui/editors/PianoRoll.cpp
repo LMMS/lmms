@@ -4966,18 +4966,18 @@ PianoRollWindow::PianoRollWindow() :
 	DropToolBar* fileActionsToolBar = addDropToolBarToTop(tr("File actions"));
 
 	// -- File ToolButton
-	m_fileToolsButton = new QToolButton(m_toolBar);
-	m_fileToolsButton->setIcon(embed::getIconPixmap("file"));
-	m_fileToolsButton->setPopupMode(QToolButton::InstantPopup);
+	auto fileToolsButton = new QToolButton(m_toolBar);
+	fileToolsButton->setIcon(embed::getIconPixmap("file"));
+	fileToolsButton->setPopupMode(QToolButton::InstantPopup);
 
 	// Import / export
-	auto importAction = new QAction(embed::getIconPixmap("project_import"), tr("Import clip"), m_fileToolsButton);
+	auto importAction = new QAction(embed::getIconPixmap("project_import"), tr("Import clip"), fileToolsButton);
 
-	auto exportAction = new QAction(embed::getIconPixmap("project_export"), tr("Export clip"), m_fileToolsButton);
+	auto exportAction = new QAction(embed::getIconPixmap("project_export"), tr("Export clip"), fileToolsButton);
 
-	m_fileToolsButton->addAction(importAction);
-	m_fileToolsButton->addAction(exportAction);
-	fileActionsToolBar->addWidget(m_fileToolsButton);
+	fileToolsButton->addAction(importAction);
+	fileToolsButton->addAction(exportAction);
+	fileActionsToolBar->addWidget(fileToolsButton);
 
 	connect(importAction, SIGNAL(triggered()), this, SLOT(importMidiClip()));
 	connect(exportAction, SIGNAL(triggered()), this, SLOT(exportMidiClip()));
@@ -5206,11 +5206,12 @@ PianoRollWindow::PianoRollWindow() :
 	setFocusPolicy( Qt::StrongFocus );
 	setFocus();
 	setWindowIcon( embed::getIconPixmap( "piano" ) );
-	setCurrentMidiClip( nullptr );
 
 	// Connections
 	connect( m_editor, SIGNAL(currentMidiClipChanged()), this, SIGNAL(currentMidiClipChanged()));
 	connect( m_editor, SIGNAL(currentMidiClipChanged()), this, SLOT(updateAfterMidiClipChange()));
+	// Initial setup of window title etc
+	setCurrentMidiClip(nullptr);
 }
 
 
@@ -5238,15 +5239,8 @@ void PianoRollWindow::setCurrentMidiClip( MidiClip* clip )
 
 	if ( clip )
 	{
-		setWindowTitle( tr( "Piano-Roll - %1" ).arg( clip->name() ) );
-		m_fileToolsButton->setEnabled(true);
 		connect( clip->instrumentTrack(), SIGNAL(nameChanged()), this, SLOT(updateAfterMidiClipChange()));
 		connect( clip, SIGNAL(dataChanged()), this, SLOT(updateAfterMidiClipChange()));
-	}
-	else
-	{
-		setWindowTitle( tr( "Piano-Roll - no clip" ) );
-		m_fileToolsButton->setEnabled(false);
 	}
 }
 
@@ -5475,12 +5469,10 @@ void PianoRollWindow::clipRenamed()
 	if ( currentMidiClip() )
 	{
 		setWindowTitle( tr( "Piano-Roll - %1" ).arg( currentMidiClip()->name() ) );
-		m_fileToolsButton->setEnabled(true);
 	}
 	else
 	{
 		setWindowTitle( tr( "Piano-Roll - no clip" ) );
-		m_fileToolsButton->setEnabled(false);
 	}
 }
 
