@@ -260,6 +260,19 @@ SongEditor::SongEditor( Song * song ) :
 
 void SongEditor::updateSnapSizes()
 {
+	// Helper function for displaying note fractions
+	auto simplifyFraction = [](int& num, int& den)
+	{
+		for (int i = 2; i <= num; ++i)
+		{
+			while (num % i == 0 and den % i == 0)
+			{
+				num /= i;
+				den /= i;
+			}
+		}
+	};
+
 	int oldIndex = m_snappingModel->value();
 	m_snappingModel->clear();
 	m_snapSizes.clear();
@@ -281,7 +294,12 @@ void SongEditor::updateSnapSizes()
 		{
 			float snapSize = 1.0f / i;
 			m_snapSizes.push_back(snapSize);
-			m_snappingModel->addItem(QString("1/%1 Bar").arg(i));
+			// Find the numerator and denominator of the snap size in terms of note lengths. For example, 1/3 of a bar in 3/4 time is a quarter note.
+			// This can get tricky since larger time signatures might end up with unsimplified fractions, such as: 1/2 of a bar in 12/8 time = 12/16 note, but that equals 3/4 note.
+			int noteNumerator = numerator;
+			int noteDenominator = denominator * i;
+			simplifyFraction(noteNumerator, noteDenominator);
+			m_snappingModel->addItem(QString("1/%1 Bar (%2/%3 Note)").arg(i).arg(noteNumerator).arg(noteDenominator));
 		}
 	}
 	// Add the snap sizes smaller than 1 / numerator of a bar, until the snap size no longer evenly divides the ticks per bar
@@ -289,7 +307,10 @@ void SongEditor::updateSnapSizes()
 	{
 		float snapSize = 1.0f / invSnapSize;
 		m_snapSizes.push_back(snapSize);
-		m_snappingModel->addItem(QString("1/%1 Bar").arg(invSnapSize));
+		int noteNumerator = numerator;
+		int noteDenominator = denominator * invSnapSize;
+		simplifyFraction(noteNumerator, noteDenominator);
+		m_snappingModel->addItem(QString("1/%1 Bar (%2/%3 Note)").arg(invSnapSize).arg(noteNumerator).arg(noteDenominator));
 	}
 	m_snappingModel->setValue(oldIndex);
 }
