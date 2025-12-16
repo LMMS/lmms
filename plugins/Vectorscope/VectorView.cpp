@@ -33,6 +33,7 @@
 #include "GuiApplication.h"
 #include "FontHelper.h"
 #include "MainWindow.h"
+#include "Scroll.h"
 #include "VecControls.h"
 
 namespace lmms::gui
@@ -240,12 +241,18 @@ void VectorView::mouseDoubleClickEvent(QMouseEvent *event)
 // Change zoom level using the mouse wheel
 void VectorView::wheelEvent(QWheelEvent *event)
 {
-	// Go through integers to avoid accumulating errors
-	const unsigned short old_zoom = round(100 * m_zoom);
-	// Min-max bounds are 20 and 1000 %, step for 15°-increment mouse wheel is 20 %
-	const unsigned short new_zoom = qBound(20, old_zoom + event->angleDelta().y() / 6, 1000);
-	m_zoom = new_zoom / 100.f;
+	auto scroll = Scroll(event);
 	event->accept();
+
+	// Increment 20% per mouse wheel step
+	const int increment = scroll.getSteps(20);
+
+	// Round zoom percentage to integers to avoid accumulating errors
+	const unsigned short old_zoom = round(100 * m_zoom);
+	// Min-max bounds are 20 and 1000 %
+	const unsigned short new_zoom = std::clamp(old_zoom + increment, 20, 1000);
+
+	m_zoom = new_zoom / 100.f;
 	m_zoomTimestamp = std::chrono::duration_cast<std::chrono::milliseconds>
 	(
 		std::chrono::high_resolution_clock::now().time_since_epoch()

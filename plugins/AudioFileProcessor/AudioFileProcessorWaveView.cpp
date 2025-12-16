@@ -29,6 +29,7 @@
 #include "DeprecationHelper.h"
 #include "SampleThumbnail.h"
 #include "FontHelper.h"
+#include "Scroll.h"
 
 
 #include <QPainter>
@@ -198,7 +199,14 @@ void AudioFileProcessorWaveView::mouseMoveEvent(QMouseEvent * me)
 
 void AudioFileProcessorWaveView::wheelEvent(QWheelEvent * we)
 {
-	zoom(we->angleDelta().y() > 0);
+	auto scroll = Scroll(we);
+	we->accept();
+
+	int scrolledSteps = scroll.getSteps();
+	if (scrolledSteps == 0) { return; }
+
+	bool zoomOut = scrolledSteps < 0;
+	zoom(zoomOut);
 	update();
 }
 

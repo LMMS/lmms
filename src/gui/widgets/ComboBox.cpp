@@ -34,6 +34,7 @@
 #include "CaptionMenu.h"
 #include "FontHelper.h"
 #include "DeprecationHelper.h"
+#include "Scroll.h"
 
 namespace lmms::gui
 {
@@ -210,12 +211,13 @@ void ComboBox::paintEvent( QPaintEvent * _pe )
 
 void ComboBox::wheelEvent( QWheelEvent* event )
 {
+	auto scroll = Scroll(event);
+	event->accept();
+
 	if( model() )
 	{
-		const int direction = (event->angleDelta().y() < 0 ? 1 : -1) * (event->inverted() ? -1 : 1);
-		model()->setValue(model()->value() + direction);
+		model()->setValue(model()->value() - scroll.getSteps());
 		update();
-		event->accept();
 	}
 }
 
