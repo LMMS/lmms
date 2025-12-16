@@ -5466,7 +5466,6 @@ void PianoRollWindow::showEvent(QShowEvent*)
 
 void PianoRollWindow::updateAfterMidiClipChange()
 {
-	setEnabled(m_editor->hasValidMidiClip());
 	m_editor->m_timeLine->setVisible(m_editor->hasValidMidiClip());
 
 	clipRenamed();
