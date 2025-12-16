@@ -2312,6 +2312,8 @@ void AutomationEditorWindow::setProgressionType(int progType)
 
 void AutomationEditorWindow::updateEditTanButton()
 {
+	if (!m_editor->validClip()) { return; }
+
 	auto progType = currentClip()->progressionType();
 	m_editTanAction->setEnabled(AutomationClip::supportsTangentEditing(progType));
 	if (!m_editTanAction->isEnabled() && m_editTanAction->isChecked()) { m_drawAction->trigger(); }
