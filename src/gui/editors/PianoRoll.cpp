@@ -4913,6 +4913,9 @@ PianoRollWindow::PianoRollWindow() :
 {
 	setCentralWidget( m_editor );
 
+	// disable all controls when no clip is selected
+	connect(m_editor, &PianoRoll::currentMidiClipChanged, this, [this]{ setEnabled(m_editor->hasValidMidiClip()); });
+
 	m_playAction->setToolTip(tr( "Play/pause current clip (Space)" ) );
 	m_recordAction->setToolTip(tr( "Record notes from MIDI-device/channel-piano" ) );
 	m_recordAccompanyAction->setToolTip( tr( "Record notes from MIDI-device/channel-piano while playing song or pattern track" ) );
