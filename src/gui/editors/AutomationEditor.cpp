@@ -30,7 +30,7 @@
 #include <QInputDialog>
 #include <QLabel>
 #include <QPainter>
-#include <QPainterPath>
+#include <QPainterPath> // IWYU pragma: keep
 #include <QPushButton>
 #include <QScrollBar>
 #include <QStyleOption>
