@@ -43,7 +43,6 @@ inline Complex calculatePoleZeroResponse(float freq, float fs,
                                          const std::vector<Complex>& poles, 
                                          const std::vector<Complex>& zeros)
 {
-
     float omega = 2.0f * PI_LOGIC * freq / fs;
     Complex z = std::exp(Complex(0.0f, omega));
     Complex numerator(1.0f, 0.0f);
@@ -177,6 +176,7 @@ class SimpleParser{
         }
         return lhs;
     }
+
 public:
     Complex eval(const std::string& expression, float f) {
         str = expression; pos = 0; currentFreq = f;
