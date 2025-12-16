@@ -1055,8 +1055,6 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 	// start drawing at the bottom
 	int grid_bottom = height() - SCROLLBAR_SIZE - 1;
 
-	p.fillRect(0, TOP_MARGIN, VALUES_WIDTH, height() - TOP_MARGIN, m_scaleColor);
-
 	if (!validClip())
 	{
 		const auto icon = embed::getIconPixmap("pr_no_clip");
@@ -1070,6 +1068,8 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 			tr("Double-click on an automation clip in Song Editor to open it here"));
 		return;
 	}
+
+	p.fillRect(0, TOP_MARGIN, VALUES_WIDTH, height() - TOP_MARGIN, m_scaleColor);
 
 	// print value numbers
 	int font_height = p.fontMetrics().height();
