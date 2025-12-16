@@ -27,18 +27,14 @@
 
 #include "AutomationEditor.h"
 
-#include <QApplication>
-#include <QDebug>
 #include <QInputDialog>
-#include <QKeyEvent>
 #include <QLabel>
 #include <QPainter>
-#include <QPainterPath> // IWYU pragma: keep
+#include <QPainterPath>
 #include <QPushButton>
 #include <QScrollBar>
 #include <QStyleOption>
 #include <QToolTip>
-#include <SongEditor.h>
 #include <cmath>
 
 #include "ActionGroup.h"
