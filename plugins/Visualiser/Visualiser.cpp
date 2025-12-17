@@ -19,7 +19,8 @@
 #include <functional>
 #include <random> // Added for thread-safe random generation
 
-using namespace lmms;
+namespace lmms
+{
 extern "C" LMMS_EXPORT Plugin::Descriptor Visualiser_plugin_descriptor;
 
 #define BUFFER_SIZE 512
@@ -1810,3 +1811,4 @@ extern "C"
         return new VisualiserEffect(parent, QDomElement());
     }
 }
+} // namespace lmms
