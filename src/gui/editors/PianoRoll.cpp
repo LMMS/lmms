@@ -276,23 +276,22 @@ PianoRoll::PianoRoll() :
 
 	// add time-line
 	m_timeLine = new TimeLineWidget(m_whiteKeyWidth, 0, m_ppb,
-		Engine::getSong()->getPlayPos(Song::PlayMode::MidiClip),
 		Engine::getSong()->getTimeline(Song::PlayMode::MidiClip),
-		m_currentPosition, Song::PlayMode::MidiClip, this
+		m_currentPosition, this
 	);
-	connect(this, &PianoRoll::positionChanged, m_timeLine, &TimeLineWidget::updatePosition);
-	connect( m_timeLine, SIGNAL( positionChanged( const lmms::TimePos& ) ),
-			this, SLOT( updatePosition( const lmms::TimePos& ) ) );
+	connect(m_timeLine->timeline(), &Timeline::positionChanged, this, &PianoRoll::updatePosition);
 
 	// white position line follows timeline marker
 	m_positionLine = new PositionLine(this, Song::PlayMode::MidiClip);
+
+	connect(Engine::getSong(), &Song::playbackStateChanged, m_positionLine, qOverload<>(&QWidget::update));
 
 	//update timeline when in step-recording mode
 	connect( &m_stepRecorderWidget, SIGNAL( positionChanged( const lmms::TimePos& ) ),
 			this, SLOT( updatePositionStepRecording( const lmms::TimePos& ) ) );
 
 	// update timeline when in record-accompany mode
-	connect(m_timeLine, &TimeLineWidget::positionChanged, this, &PianoRoll::updatePositionAccompany);
+	connect(&Engine::getSong()->getTimeline(Song::PlayMode::Song), &Timeline::positionChanged, this, &PianoRoll::updatePositionAccompany);
 	// TODO
 /*	connect( engine::getSong()->getPlayPos( Song::PlayMode::Pattern ).m_timeLine,
 				SIGNAL( positionChanged( const lmms::TimePos& ) ),
@@ -882,8 +881,8 @@ void PianoRoll::setCurrentMidiClip( MidiClip* newMidiClip )
 	}
 
 	// Make sure the playhead position isn't out of the clip bounds.
-	Engine::getSong()->getPlayPos(Song::PlayMode::MidiClip).setTicks(std::clamp(
-		Engine::getSong()->getPlayPos(Song::PlayMode::MidiClip).getTicks(),
+	m_timeLine->timeline()->setTicks(std::clamp(
+		m_timeLine->timeline()->ticks(),
 		std::max(0, -m_midiClip->startTimeOffset()),
 		m_midiClip->length() - m_midiClip->startTimeOffset()
 	));
@@ -1456,8 +1455,7 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 			break;
 
 		case Qt::Key_Home:
-			m_timeLine->pos().setTicks( 0 );
-			m_timeLine->updatePosition();
+			m_timeLine->timeline()->setTicks(0);
 			ke->accept();
 			break;
 
@@ -4316,7 +4314,8 @@ void PianoRoll::horScrolled(int new_pos )
 {
 	m_currentPosition = new_pos;
 	m_stepRecorderWidget.setCurrentPosition(m_currentPosition);
-	emit positionChanged( m_currentPosition );
+	m_timeLine->update();
+	updatePositionLinePos();
 	update();
 }
 
@@ -4589,7 +4588,7 @@ void PianoRoll::pasteNotes()
 			// create the note
 			Note cur_note;
 			cur_note.restoreState( list.item( i ).toElement() );
-			cur_note.setPos( cur_note.pos() + Note::quantized( m_timeLine->pos(), quantization() ) );
+			cur_note.setPos(cur_note.pos() + Note::quantized(m_timeLine->timeline()->pos(), quantization()));
 
 			// select it
 			cur_note.setSelected( true );
@@ -4655,8 +4654,9 @@ void PianoRoll::autoScroll( const TimePos & t )
 
 
 
-void PianoRoll::updatePosition(const TimePos & t)
+void PianoRoll::updatePosition()
 {
+	const TimePos& t = m_timeLine->timeline()->pos();
 	if ((Engine::getSong()->isPlaying()
 			&& Engine::getSong()->playMode() == Song::PlayMode::MidiClip
 			&& m_timeLine->autoScroll() != TimeLineWidget::AutoScrollState::Disabled
@@ -4664,10 +4664,15 @@ void PianoRoll::updatePosition(const TimePos & t)
 	{
 		autoScroll(t);
 	}
+	updatePositionLinePos();
+}
+
+void PianoRoll::updatePositionLinePos()
+{
 	// ticks relative to m_currentPosition
 	// < 0 = outside viewport left
 	// > width = outside viewport right
-	const int pos = (static_cast<int>(m_timeLine->pos()) - m_currentPosition) * m_ppb / TimePos::ticksPerBar();
+	const int pos = (static_cast<int>(m_timeLine->timeline()->pos()) - m_currentPosition) * m_ppb / TimePos::ticksPerBar();
 	// if pos is within visible range, show it
 	if (hasValidMidiClip() && pos >= 0 && pos <= width() - m_whiteKeyWidth)
 	{
@@ -4690,8 +4695,9 @@ void PianoRoll::updatePositionLineHeight()
 
 
 
-void PianoRoll::updatePositionAccompany( const TimePos & t )
+void PianoRoll::updatePositionAccompany()
 {
+	const TimePos& t = Engine::getSong()->getPlayPos(Song::PlayMode::Song);
 	Song * s = Engine::getSong();
 
 	if( m_recording && hasValidMidiClip() &&
@@ -4700,11 +4706,11 @@ void PianoRoll::updatePositionAccompany( const TimePos & t )
 		TimePos pos = t;
 		if (s->playMode() != Song::PlayMode::Pattern)
 		{
-			pos -= m_midiClip->startPosition();
+			pos -= m_midiClip->startPosition() + m_midiClip->startTimeOffset();
 		}
 		if( (int) pos > 0 )
 		{
-			s->getPlayPos( Song::PlayMode::MidiClip ).setTicks( pos );
+			m_timeLine->timeline()->setTicks(pos);
 			autoScroll( pos );
 		}
 	}
@@ -4729,6 +4735,7 @@ void PianoRoll::zoomingChanged()
 	m_timeLine->setPixelsPerBar( m_ppb );
 	m_stepRecorderWidget.setPixelsPerBar( m_ppb );
 	m_positionLine->zoomChange(m_zoomLevels[m_zoomingModel.value()]);
+	updatePositionLinePos();
 
 	update();
 }
