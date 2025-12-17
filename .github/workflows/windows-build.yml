@@ -28,6 +28,8 @@ jobs:
             mingw-w64-x86_64-libsndfile
             mingw-w64-x86_64-pkg-config
             mingw-w64-x86_64-qt5-base
+            mingw-w64-x86_64-qt5-svg
+            mingw-w64-x86_64-qt5-tools
             mingw-w64-x86_64-fftw
             mingw-w64-x86_64-fluidsynth
             mingw-w64-x86_64-libsamplerate
