@@ -124,7 +124,8 @@ void TransferFunctionControlDialog::updateUIState() {
 
 bool TransferFunctionControlDialog::eventFilter(QObject* obj, QEvent* event) {
     if (obj->objectName() == "MagGraph") {
-        if (!m_pluginControls) return false; int preset = static_cast<int>(m_pluginControls->m_volumeModel.value());
+        if (!m_pluginControls) return false;
+			int preset = static_cast<int>(m_pluginControls->m_volumeModel.value());
         if (preset == 18 && (event->type() == QEvent::MouseButtonPress || event->type() == QEvent::MouseMove)) {
             QMouseEvent* me = static_cast<QMouseEvent*>(event); if (me->buttons() & Qt::LeftButton) {
                 QWidget* w = static_cast<QWidget*>(obj); float xPct = (float)me->x() / w->width(); if(xPct<0)xPct=0; if(xPct>1)xPct=1;
