@@ -198,6 +198,7 @@ void PatternEditor::updatePosition()
 	{
 		trackView->update();
 	}
+	emit positionChanged(m_currentPosition);
 }
 
 void PatternEditor::updatePixelsPerBar()
