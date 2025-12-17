@@ -99,7 +99,7 @@ Effect::ProcessStatus TransferFunctionEffect::processImpl(SampleFrame* buf, cons
     std::copy(m_overlapAddR.begin() + hop, m_overlapAddR.end(), m_overlapAddR.begin());
     std::fill(m_overlapAddL.end() - hop, m_overlapAddL.end(), 0.0f); std::fill(m_overlapAddR.end() - hop, m_overlapAddR.end(), 0.0f);
     return Effect::ProcessStatus::Continue;
-}
+}  // namespace lmms
 
 extern "C" { PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* parent, void* data) { return new TransferFunctionEffect(parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key*>(data)); } }
 }
