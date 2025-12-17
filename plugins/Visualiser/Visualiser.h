@@ -1,7 +1,7 @@
 #pragma once
-#include <lmms/Effect.h>
-#include <lmms/EffectControls.h>
-#include <lmms/EffectControlDialog.h>
+#include <Effect.h>
+#include <EffectControls.h>
+#include <EffectControlDialog.h>
 #include <QComboBox>
 #include <QLineEdit>
 #include <QCheckBox>
