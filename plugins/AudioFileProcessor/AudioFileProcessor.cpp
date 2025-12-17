@@ -295,8 +295,6 @@ auto AudioFileProcessor::beatLen(NotePlayHandle* note) const -> f_cnt_t
 		: m_nextPlayStartPoint;
 	const auto duration = m_sample.endFrame() - startFrame;
 
-	qDebug() << baseFreq << freqFactor << note->frequency() << Engine::audioEngine()->outputSampleRate() << Engine::audioEngine()->baseSampleRate();
-
 	return static_cast<f_cnt_t>(std::floor(duration * freqFactor * sampleRateRatio));
 }
 
