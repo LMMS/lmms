@@ -4,12 +4,6 @@ name: Windows Build LMMS
 on:
   push:
   workflow_dispatch:
-name: Windows Build LMMS
-
-# Run on every push to your fork or manually
-on:
-  push:
-  workflow_dispatch:
 
 jobs:
   build-windows:
