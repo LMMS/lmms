@@ -1,6 +1,6 @@
 #include "Visualiser.h"
-#include <Plugin.h>
-#include <SampleFrame.h>
+#include <lmms/Plugin.h>
+#include <lmms/SampleFrame.h>
 #include <QWidget>
 #include <QPainter>
 #include <QTimer>
@@ -17,11 +17,13 @@
 #include <cstdlib>
 #include <cstring>
 #include <functional>
-#include <random> // Added for thread-safe random generation
+#include <random> 
 
 namespace lmms
 {
-extern "C" LMMS_EXPORT Plugin::Descriptor Visualiser_plugin_descriptor;
+
+// REMOVED: extern "C" LMMS_EXPORT Plugin::Descriptor Visualiser_plugin_descriptor; 
+// (We define it at the bottom with PLUGIN_EXPORT instead)
 
 #define BUFFER_SIZE 512
 static float g_bufferL[BUFFER_SIZE];
@@ -1793,7 +1795,8 @@ private:
 };
 extern "C"
 {
-    LMMS_EXPORT Plugin::Descriptor Visualiser_plugin_descriptor =
+    // CHANGED: LMMS_EXPORT -> PLUGIN_EXPORT
+    PLUGIN_EXPORT Plugin::Descriptor Visualiser_plugin_descriptor =
     {
         "Visualiser",
         "Visualiser",
@@ -1805,7 +1808,8 @@ extern "C"
         nullptr,
         nullptr
     };
-    LMMS_EXPORT Plugin *lmms_plugin_main(lmms::Model *parent, void *data)
+    // CHANGED: LMMS_EXPORT -> PLUGIN_EXPORT
+    PLUGIN_EXPORT Plugin *lmms_plugin_main(lmms::Model *parent, void *data)
     {
         Q_UNUSED(data);
         return new VisualiserEffect(parent, QDomElement());
