@@ -15,7 +15,7 @@ jobs:
         with:
           submodules: recursive
 
-      # 2. Install dependencies using MSYS2 (Required for LMMS)
+      # 2. Install dependencies using MSYS2
       - name: Setup MSYS2
         uses: msys2/setup-msys2@v2
         with:
@@ -25,8 +25,8 @@ jobs:
             mingw-w64-x86_64-toolchain
             mingw-w64-x86_64-cmake
             mingw-w64-x86_64-ninja
-            mingw-w64-x86_64-libsndfile
             mingw-w64-x86_64-pkg-config
+            mingw-w64-x86_64-libsndfile
             mingw-w64-x86_64-qt5-base
             mingw-w64-x86_64-qt5-svg
             mingw-w64-x86_64-qt5-tools
@@ -36,6 +36,10 @@ jobs:
             mingw-w64-x86_64-lame
             mingw-w64-x86_64-libvorbis
             mingw-w64-x86_64-libogg
+            mingw-w64-x86_64-SDL2
+            mingw-w64-x86_64-fltk
+            mingw-w64-x86_64-stk
+            mingw-w64-x86_64-libgig
 
       # 3. Configure and Build (Must run inside MSYS2 shell)
       - name: Build LMMS
