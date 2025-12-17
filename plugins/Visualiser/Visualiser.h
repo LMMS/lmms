@@ -11,6 +11,9 @@
 #include <complex>
 #include <vector>
 #include <deque>
+
+namespace lmms
+{
 // Forward declaration
 class VisualiserScreen;
 // --- DATA STRUCTURES ---
@@ -95,3 +98,4 @@ private:
     QComboBox                *m_bandCombo;
     QLineEdit                *m_textBox;
 };
+} // namespace lmms
