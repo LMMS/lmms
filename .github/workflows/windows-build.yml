@@ -1,0 +1,35 @@
+name: Windows Build
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout source
+      uses: actions/checkout@v4
+
+    - name: Setup MSVC
+      uses: ilammy/msvc-dev-cmd@v1
+
+    - name: Install dependencies
+      run: |
+        choco install -y cmake ninja python
+        choco install -y qt6-base-dev
+
+    - name: Configure
+      run: |
+        cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+
+    - name: Build
+      run: |
+        cmake --build build --config Release
+
+    - name: Upload build
+      uses: actions/upload-artifact@v4
+      with:
+        name: lmms-windows-build
+        path: build
