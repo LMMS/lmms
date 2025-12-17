@@ -9,7 +9,7 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      # 1. Checkout your fork
+      # 1. Checkout fork
       - name: Checkout source
         uses: actions/checkout@v4
         with:
@@ -40,17 +40,4 @@ jobs:
             mingw-w64-x86_64-fltk
             mingw-w64-x86_64-stk
             mingw-w64-x86_64-libgig
-
-      # 3. Configure and Build (Must run inside MSYS2 shell)
-      - name: Build LMMS
-        shell: msys2 {0}
-        run: |
-          cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
-          cmake --build build
-
-      # 4. Upload the build artifacts
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: lmms-windows-build
-          path: build/*.exe
+            perl-List-MoreUtils
