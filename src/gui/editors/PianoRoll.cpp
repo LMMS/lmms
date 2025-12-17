@@ -151,7 +151,7 @@ const std::vector<float> PianoRoll::m_zoomYLevels =
 PianoRoll::PianoRoll() :
 	m_noteEditMenu( nullptr ),
 	m_semiToneMarkerMenu( nullptr ),
-	m_zoomingModel(),
+	m_zoomingXModel(),
 	m_zoomingYModel(),
 	m_quantizeModel(),
 	m_noteLenModel(),
@@ -316,10 +316,10 @@ PianoRoll::PianoRoll() :
 	// setup zooming-stuff
 	for( float const & zoomLevel : m_zoomLevels )
 	{
-		m_zoomingModel.addItem(QString("%1%").arg(zoomLevel * 100));
+		m_zoomingXModel.addItem(QString("%1%").arg(zoomLevel * 100));
 	}
-	m_zoomingModel.setValue( m_zoomingModel.findText( "100%" ) );
-	connect( &m_zoomingModel, SIGNAL(dataChanged()),
+	m_zoomingXModel.setValue( m_zoomingXModel.findText( "100%" ) );
+	connect( &m_zoomingXModel, SIGNAL(dataChanged()),
 					this, SLOT(zoomingChanged()));
 
 	// zoom y
@@ -778,6 +778,17 @@ void PianoRoll::constrainNoteLengths(bool constrainMax)
 	Engine::getSong()->setModified();
 }
 
+void PianoRoll::flipNotes()
+{
+	if (!hasValidMidiClip()) { return; }
+
+	const NoteVector selectedNotes = getSelectedNotes();
+	const auto& notes = selectedNotes.empty() ? m_midiClip->notes() : selectedNotes;
+
+	m_midiClip->flipNotes(notes);
+
+}
+
 void PianoRoll::reverseNotes()
 {
 	if (!hasValidMidiClip()) { return; }
@@ -791,7 +802,6 @@ void PianoRoll::reverseNotes()
 	getGUI()->songEditor()->update();
 	Engine::getSong()->setModified();
 }
-
 
 void PianoRoll::loadMarkedSemiTones(const QDomElement & de)
 {
@@ -1414,6 +1424,36 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 				break;
 			}
 
+		case Qt::Key_Minus:
+			if (ke->modifiers() & Qt::ControlModifier)
+			{
+				// ctrl - will zoom out 
+				int value = m_zoomingXModel.value();
+				m_zoomingXModel.setValue(value - 1);
+			}
+			if (ke->modifiers() & Qt::AltModifier)
+			{
+				// alt = will zoom y out
+				int value = m_zoomingYModel.value();
+				m_zoomingYModel.setValue(value - 1);
+			}
+			break;
+
+		case Qt::Key_Equal:
+			if (ke->modifiers() & Qt::ControlModifier)
+			{
+				// ctrl = will zoom x in
+				int value = m_zoomingXModel.value();
+				m_zoomingXModel.setValue(value + 1);
+			}
+			if (ke->modifiers() & Qt::AltModifier)
+			{
+				// alt = will zoom y in
+				int value = m_zoomingYModel.value();
+				m_zoomingYModel.setValue(value + 1);
+			}
+			break;
+
 		case Qt::Key_A:
 			if (ke->modifiers() & Qt::ControlModifier && m_editMode != EditMode::Strum && m_editMode != EditMode::Knife)
 			{
@@ -1461,7 +1501,6 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 			ke->accept();
 			break;
 
-		case Qt::Key_0:
 		case Qt::Key_1:
 		case Qt::Key_2:
 		case Qt::Key_3:
@@ -3235,7 +3274,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 
 		// draw vertical quantization lines
 		// If we're over 100% zoom, we allow all quantization level grids
-		if (m_zoomingModel.value() <= 3)
+		if (m_zoomingXModel.value() <= 3)
 		{
 			// we're under 100% zoom
 			// allow quantization grid up to 1/24 for triplets
@@ -3422,7 +3461,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 		float timeSignature =
 			static_cast<float>(Engine::getSong()->getTimeSigModel().getNumerator()) /
 			static_cast<float>(Engine::getSong()->getTimeSigModel().getDenominator());
-		float zoomFactor = m_zoomLevels[m_zoomingModel.value()];
+		float zoomFactor = m_zoomLevels[m_zoomingXModel.value()];
 		//the bars which disappears at the left side by scrolling
 		int leftBars = m_currentPosition * zoomFactor / TimePos::ticksPerBar();
 		//iterates the visible bars and draw the shading on uneven bars
@@ -3876,7 +3915,7 @@ void PianoRoll::resizeEvent(QResizeEvent* re)
 void PianoRoll::adjustLeftRightScoll(int value)
 {
 	m_leftRightScroll->setValue(m_leftRightScroll->value() -
-							value * 0.3f / m_zoomLevels[m_zoomingModel.value()]);
+							value * 0.3f / m_zoomLevels[m_zoomingXModel.value()]);
 }
 
 
@@ -3987,7 +4026,7 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 	}
 	else if( we->modifiers() & Qt::ControlModifier )
 	{
-		int z = m_zoomingModel.value();
+		int z = m_zoomingXModel.value();
 		if(we->angleDelta().y() > 0)
 		{
 			z++;
@@ -3996,7 +4035,7 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 		{
 			z--;
 		}
-		z = qBound( 0, z, m_zoomingModel.size() - 1 );
+		z = qBound( 0, z, m_zoomingXModel.size() - 1 );
 
 		int x = (pos.x() - m_whiteKeyWidth) * TimePos::ticksPerBar();
 		// ticks based on the mouse x-position where the scroll wheel was used
@@ -4006,7 +4045,7 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 		// scroll so the tick "selected" by the mouse x doesn't move on the screen
 		m_leftRightScroll->setValue(m_leftRightScroll->value() + ticks - newTicks);
 		// update combobox with zooming-factor
-		m_zoomingModel.setValue( z );
+		m_zoomingXModel.setValue( z );
 	}
 
 	// FIXME: Reconsider if determining orientation is necessary in Qt6.
@@ -4465,7 +4504,6 @@ void PianoRoll::enterValue( NoteVector* nv )
 			}
 			m_lastNotePanning = new_val;
 		}
-
 	}
 }
 
@@ -4606,8 +4644,23 @@ void PianoRoll::pasteNotes()
 	}
 }
 
+void PianoRoll::duplicateNotes()
+{
+	NoteVector selected_notes = getSelectedNotes();
+	clearSelectedNotes();
 
+	if( ! selected_notes.empty() )
+	{
+		for( const Note *note : selected_notes)
+		{
+			Note new_note( *note );
+			new_note.setPos( note->pos() );
+			new_note.setSelected( true );
 
+			m_midiClip->addNote( new_note, false );
+		}
+	}
+}
 
 //Return false if no notes are deleted
 bool PianoRoll::deleteSelectedNotes()
@@ -4722,13 +4775,13 @@ void PianoRoll::updatePositionStepRecording( const TimePos & t )
 
 void PianoRoll::zoomingChanged()
 {
-	m_ppb = m_zoomLevels[m_zoomingModel.value()] * DEFAULT_PR_PPB;
+	m_ppb = m_zoomLevels[m_zoomingXModel.value()] * DEFAULT_PR_PPB;
 
 	assert( m_ppb > 0 );
 
 	m_timeLine->setPixelsPerBar( m_ppb );
 	m_stepRecorderWidget.setPixelsPerBar( m_ppb );
-	m_positionLine->zoomChange(m_zoomLevels[m_zoomingModel.value()]);
+	m_positionLine->zoomChange(m_zoomLevels[m_zoomingXModel.value()]);
 
 	update();
 }
@@ -4992,18 +5045,22 @@ PianoRollWindow::PianoRollWindow() :
 
 	auto pasteAction = new QAction(embed::getIconPixmap("edit_paste"), tr("Paste (%1+V)").arg(UI_CTRL_KEY), this);
 
+	auto duplicateAction = new QAction(embed::getIconPixmap("square_square"), tr("Duplicate (%1+D)").arg(UI_CTRL_KEY), this);
+
 	cutAction->setShortcut(keySequence(Qt::CTRL, Qt::Key_X));
 	copyAction->setShortcut(keySequence(Qt::CTRL, Qt::Key_C));
 	pasteAction->setShortcut(keySequence(Qt::CTRL, Qt::Key_V));
+	duplicateAction->setShortcut(keySequence(Qt::CTRL, Qt::Key_D));
 
 	connect( cutAction, SIGNAL(triggered()), m_editor, SLOT(cutSelectedNotes()));
 	connect( copyAction, SIGNAL(triggered()), m_editor, SLOT(copySelectedNotes()));
 	connect( pasteAction, SIGNAL(triggered()), m_editor, SLOT(pasteNotes()));
+	connect( duplicateAction, SIGNAL(triggered()), m_editor, SLOT(duplicateNotes()));
 
 	copyPasteActionsToolBar->addAction( cutAction );
 	copyPasteActionsToolBar->addAction( copyAction );
 	copyPasteActionsToolBar->addAction( pasteAction );
-
+	copyPasteActionsToolBar->addAction( duplicateAction);
 
 	DropToolBar *timeLineToolBar = addDropToolBarToTop( tr( "Timeline controls" ) );
 	m_editor->m_timeLine->addToolButtons( timeLineToolBar );
@@ -5043,6 +5100,10 @@ PianoRollWindow::PianoRollWindow() :
 	connect(reverseAction, &QAction::triggered, [this](){ m_editor->reverseNotes(); });
 	reverseAction->setShortcut(keySequence(Qt::SHIFT, Qt::Key_R));
 
+	auto flipAction = new QAction(embed::getIconPixmap("flip_y"), tr("Flip Notes"), noteToolsButton);
+	connect(flipAction, &QAction::triggered, [this](){ m_editor->flipNotes(); });
+	flipAction->setShortcut(keySequence(Qt::SHIFT, Qt::Key_V));
+
 	noteToolsButton->addAction(glueAction);
 	noteToolsButton->addAction(knifeAction);
 	noteToolsButton->addAction(strumAction);
@@ -5051,6 +5112,7 @@ PianoRollWindow::PianoRollWindow() :
 	noteToolsButton->addAction(minLengthAction);
 	noteToolsButton->addAction(maxLengthAction);
 	noteToolsButton->addAction(reverseAction);
+	noteToolsButton->addAction(flipAction);
 
 	notesActionsToolBar->addWidget(noteToolsButton);
 
@@ -5063,7 +5125,7 @@ PianoRollWindow::PianoRollWindow() :
 	zoom_lbl->setPixmap( embed::getIconPixmap( "zoom_x" ) );
 
 	m_zoomingComboBox = new ComboBox( m_toolBar );
-	m_zoomingComboBox->setModel( &m_editor->m_zoomingModel );
+	m_zoomingComboBox->setModel( &m_editor->m_zoomingXModel );
 	m_zoomingComboBox->setFixedSize( 64, ComboBox::DEFAULT_HEIGHT );
 	m_zoomingComboBox->setToolTip( tr( "Horizontal zooming") );
 

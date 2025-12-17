@@ -219,6 +219,7 @@ protected slots:
 	void copySelectedNotes();
 	void cutSelectedNotes();
 	void pasteNotes();
+	void duplicateNotes();
 	bool deleteSelectedNotes();
 
 	void updatePosition(const lmms::TimePos & t );
@@ -245,6 +246,7 @@ protected slots:
 	void glueNotes();
 	void fitNoteLengths(bool fill);
 	void reverseNotes();
+	void flipNotes();
 	void constrainNoteLengths(bool constrainMax);
 
 	void changeSnapMode();
@@ -358,7 +360,7 @@ private:
 
 	static SimpleTextFloat * s_textFloat;
 
-	ComboBoxModel m_zoomingModel;
+	ComboBoxModel m_zoomingXModel;
 	ComboBoxModel m_zoomingYModel;
 	ComboBoxModel m_quantizeModel;
 	ComboBoxModel m_noteLenModel;
