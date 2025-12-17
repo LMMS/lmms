@@ -1809,4 +1809,4 @@ extern "C"
         Q_UNUSED(data);
         return new VisualiserEffect(parent, QDomElement());
     }
-}
+} // namespace lmms
