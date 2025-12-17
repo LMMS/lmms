@@ -1,6 +1,5 @@
 name: Windows Build LMMS
 
-# Run on every push to your fork or manually
 on:
   push:
   workflow_dispatch:
@@ -10,38 +9,42 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      # 1️⃣ Checkout your fork
+      # 1. Checkout your fork
       - name: Checkout source
         uses: actions/checkout@v4
         with:
-          submodules: recursive  # ensures LMMS submodules are cloned
+          submodules: recursive
 
-      # 2️⃣ Install dependencies
-      - name: Install dependencies
-        run: |
-          choco install -y cmake ninja python git
-          choco install -y qt5-default  # LMMS requires Qt5
+      # 2. Install dependencies using MSYS2 (Required for LMMS)
+      - name: Setup MSYS2
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
           install: >-
+            mingw-w64-x86_64-toolchain
+            mingw-w64-x86_64-cmake
+            mingw-w64-x86_64-ninja
             mingw-w64-x86_64-libsndfile
             mingw-w64-x86_64-pkg-config
             mingw-w64-x86_64-qt5-base
             mingw-w64-x86_64-fftw
-            mingw-w64-x86_64-ninja
-          refreshenv  # refresh environment variables so Qt5 is detected
+            mingw-w64-x86_64-fluidsynth
+            mingw-w64-x86_64-libsamplerate
+            mingw-w64-x86_64-lame
+            mingw-w64-x86_64-libvorbis
+            mingw-w64-x86_64-libogg
 
-      # 3️⃣ Configure the build with CMake
-      - name: Configure build
+      # 3. Configure and Build (Must run inside MSYS2 shell)
+      - name: Build LMMS
+        shell: msys2 {0}
         run: |
           cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+          cmake --build build
 
-      # 4️⃣ Build LMMS
-      - name: Build LMMS
-        run: |
-          cmake --build build --config Release
-
-      # 5️⃣ Upload the build artifacts for download
+      # 4. Upload the build artifacts
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: lmms-windows-build
-          path: build
+          path: build/*.exe
