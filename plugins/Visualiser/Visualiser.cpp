@@ -1,6 +1,6 @@
 #include "Visualiser.h"
-#include <lmms/Plugin.h>
-#include <lmms/SampleFrame.h>
+#include <Plugin.h>
+#include <SampleFrame.h>
 #include <QWidget>
 #include <QPainter>
 #include <QTimer>
