@@ -87,7 +87,6 @@ AutomationEditor::AutomationEditor() :
 	m_editMode( EditMode::Draw ),
 	m_mouseDownLeft(false),
 	m_mouseDownRight( false ),
-	m_scrollBack( false ),
 	m_barLineColor(0, 0, 0),
 	m_beatLineColor(0, 0, 0),
 	m_lineColor(0, 0, 0),
@@ -131,6 +130,11 @@ AutomationEditor::AutomationEditor() :
 		m_currentPosition, this
 	);
 	connect(m_timeLine->timeline(), &Timeline::positionChanged, this, &AutomationEditor::updatePosition);
+
+	// Update timeline position when parent editors are playing
+	connect(&Engine::getSong()->getTimeline(Song::PlayMode::Song), &Timeline::positionChanged, this, &AutomationEditor::updatePositionAccompany);
+	connect(&Engine::getSong()->getTimeline(Song::PlayMode::Pattern), &Timeline::positionChanged, this, &AutomationEditor::updatePositionAccompany);
+	connect(&Engine::getSong()->getTimeline(Song::PlayMode::MidiClip), &Timeline::positionChanged, this, &AutomationEditor::updatePositionAccompany);
 
 	// init scrollbars
 	m_leftRightScroll = new QScrollBar( Qt::Horizontal, this );
@@ -1230,7 +1234,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 			const NoteVector& notes = m_ghostNotes->notes();
 			int minKey = 128;
 			int maxKey = 0;
-			int detuningOffset = 0;
+			m_detuningNoteOffset = 0;
 			const Note* detuningNote = nullptr;
 
 			for (const Note* note : notes)
@@ -1238,7 +1242,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 				int noteKey = note->key();
 
 				if (note->detuning()->automationClip() == m_clip) {
-					detuningOffset = note->pos();
+					m_detuningNoteOffset = note->pos();
 					detuningNote = note;
 				}
 
@@ -1252,8 +1256,8 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 				int notePos = note->pos();
 
 				// offset note if detuning
-				if (notePos+lenTicks < detuningOffset) { continue; }
-				notePos -= detuningOffset;
+				if (notePos+lenTicks < m_detuningNoteOffset) { continue; }
+				notePos -= m_detuningNoteOffset;
 
 				// remove/change after #5902
 				if (lenTicks == 0) { continue; }
@@ -1646,36 +1650,40 @@ inline bool AutomationEditor::inPatternEditor()
 
 void AutomationEditor::play()
 {
-	if( !validClip() )
+	if (!validClip())
 	{
 		return;
 	}
 
-	if( !m_clip->getTrack() )
+	if (!m_clip->getTrack())
 	{
 		if( Engine::getSong()->playMode() != Song::PlayMode::MidiClip )
 		{
 			Engine::getSong()->stop();
-			Engine::getSong()->playMidiClip( getGUI()->pianoRoll()->currentMidiClip() );
+			Engine::getSong()->playMidiClip(getGUI()->pianoRoll()->currentMidiClip());
+			Engine::getSong()->getTimeline(Song::PlayMode::MidiClip).setTicks(m_detuningNoteOffset);
 		}
-		else if( Engine::getSong()->isStopped() == false )
+		else if (Engine::getSong()->isStopped() == false)
 		{
 			Engine::getSong()->togglePause();
 		}
 		else
 		{
-			Engine::getSong()->playMidiClip( getGUI()->pianoRoll()->currentMidiClip() );
+			Engine::getSong()->playMidiClip(getGUI()->pianoRoll()->currentMidiClip());
+			Engine::getSong()->getTimeline(Song::PlayMode::MidiClip).setTicks(m_detuningNoteOffset);
 		}
 	}
 	else if (inPatternEditor())
 	{
+		Engine::getSong()->getTimeline(Song::PlayMode::Pattern).setTicks(m_timeLine->timeline()->pos());
 		Engine::patternStore()->play();
 	}
 	else
 	{
-		if( Engine::getSong()->isStopped() == true )
+		if (Engine::getSong()->isStopped() == true)
 		{
 			Engine::getSong()->playSong();
+			Engine::getSong()->getTimeline(Song::PlayMode::Song).setTicks(m_clip->startPosition() - m_clip->startTimeOffset() + m_timeLine->timeline()->pos());
 		}
 		else
 		{
@@ -1701,7 +1709,8 @@ void AutomationEditor::stop()
 	{
 		Engine::getSong()->stop();
 	}
-	m_scrollBack = true;
+	// Scroll back to the start if autoscroll is enabled
+	autoScroll(m_timeLine->timeline()->pos());
 }
 
 
@@ -1778,29 +1787,75 @@ void AutomationEditor::setTension()
 
 
 
+void AutomationEditor::autoScroll( const TimePos & t )
+{
+	const int w = width() - VALUES_WIDTH;
+	if (m_timeLine->autoScroll() == TimeLineWidget::AutoScrollState::Disabled)
+	{
+		return;
+	}
+	else if (m_timeLine->autoScroll() == TimeLineWidget::AutoScrollState::Stepped)
+	{
+		if (t < m_currentPosition || t > m_currentPosition + w * TimePos::ticksPerBar() / m_ppb)
+		{
+			m_leftRightScroll->setValue(t.getTicks());
+		}
+	}
+	else if (m_timeLine->autoScroll() == TimeLineWidget::AutoScrollState::Continuous)
+	{
+		m_leftRightScroll->setValue(std::max(t.getTicks() - w * TimePos::ticksPerBar() / m_ppb / 2, 0));
+	}
+}
+
+
 
 void AutomationEditor::updatePosition()
 {
-	const TimePos& t = m_timeLine->timeline()->pos();
-	if( ( Engine::getSong()->isPlaying() &&
-			Engine::getSong()->playMode() ==
-					Song::PlayMode::AutomationClip ) ||
-							m_scrollBack == true )
+	if (Engine::getSong()->isPlaying())
 	{
-		const int w = width() - VALUES_WIDTH;
-		if( t > m_currentPosition + w * TimePos::ticksPerBar() / m_ppb )
+		autoScroll(m_timeLine->timeline()->pos());
+	}
+}
+
+
+
+void AutomationEditor::updatePositionAccompany()
+{
+	if (!validClip()) { return; }
+	Song * s = Engine::getSong();
+
+	if (!m_clip->getTrack())
+	{
+		if (s->playMode() == Song::PlayMode::MidiClip)
 		{
-			m_leftRightScroll->setValue( t.getBar() *
-							TimePos::ticksPerBar() );
+			TimePos newTimelinePos = s->getPlayPos(Song::PlayMode::MidiClip) - m_detuningNoteOffset;
+			// Don't update the timeline if the playhead isn't within the clip bounds
+			if (newTimelinePos >= m_clip->startTimeOffset() && newTimelinePos < m_clip->length() - m_clip->startTimeOffset())
+			{
+				m_timeLine->timeline()->setTicks(newTimelinePos);
+			}
 		}
-		else if( t < m_currentPosition )
+	}
+	else if (m_clip->getTrack()->trackContainer() == Engine::patternStore())
+	{
+		if (s->playMode() == Song::PlayMode::Pattern)
 		{
-			TimePos t_ = qMax( t - w * TimePos::ticksPerBar() *
-					TimePos::ticksPerBar() / m_ppb, 0 );
-			m_leftRightScroll->setValue( t_.getBar() *
-							TimePos::ticksPerBar() );
+			// Don't offset the timeline position by the clip start position when in the pattern editor, since
+			// the internal position of each clip depends on which pattern they are part of, and isn't visible to the user.
+			TimePos newTimelinePos = s->getPlayPos(Song::PlayMode::Pattern);
+			if (newTimelinePos >= m_clip->startTimeOffset() && newTimelinePos < m_clip->length() - m_clip->startTimeOffset())
+			{
+				m_timeLine->timeline()->setTicks(newTimelinePos);
+			}
 		}
-		m_scrollBack = false;
+	}
+	else if (s->playMode() == Song::PlayMode::Song)
+	{
+		TimePos newTimelinePos = s->getPlayPos(Song::PlayMode::Song) - m_clip->startPosition() - m_clip->startTimeOffset();
+		if (newTimelinePos >= m_clip->startTimeOffset() && newTimelinePos < m_clip->length() - m_clip->startTimeOffset())
+		{
+			m_timeLine->timeline()->setTicks(newTimelinePos);
+		}
 	}
 }
 
@@ -2008,6 +2063,11 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	m_playAction->setToolTip(tr( "Play/pause current clip (Space)" ));
 
 	m_stopAction->setToolTip(tr("Stop playing of current clip (Space)"));
+
+	// Autoscroll mode button
+	DropToolBar* timeLineToolBar = addDropToolBarToTop(tr("Timeline controls"));
+	m_editor->m_timeLine->addToolButtons(timeLineToolBar, true, false, false);
+
 
 	// Edit mode buttons
 	DropToolBar *editActionsToolBar = addDropToolBarToTop(tr("Edit actions"));

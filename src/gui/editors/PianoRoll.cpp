@@ -188,7 +188,6 @@ PianoRoll::PianoRoll() :
 	m_editMode( EditMode::Draw ),
 	m_ctrlMode( EditMode::Draw ),
 	m_mouseDownRight( false ),
-	m_scrollBack( false ),
 	m_stepRecorderWidget(this, DEFAULT_PR_PPB, PR_TOP_MARGIN, PR_BOTTOM_MARGIN + m_notesEditHeight, WHITE_KEY_WIDTH, 0),
 	m_stepRecorder(*this, m_stepRecorderWidget),
 	m_barLineColor( 0, 0, 0 ),
@@ -290,13 +289,10 @@ PianoRoll::PianoRoll() :
 	connect( &m_stepRecorderWidget, SIGNAL( positionChanged( const lmms::TimePos& ) ),
 			this, SLOT( updatePositionStepRecording( const lmms::TimePos& ) ) );
 
-	// update timeline when in record-accompany mode
+	// Update timeline position when parent editors are playing
 	connect(&Engine::getSong()->getTimeline(Song::PlayMode::Song), &Timeline::positionChanged, this, &PianoRoll::updatePositionAccompany);
-	// TODO
-/*	connect( engine::getSong()->getPlayPos( Song::PlayMode::Pattern ).m_timeLine,
-				SIGNAL( positionChanged( const lmms::TimePos& ) ),
-			this,
-			SLOT( updatePositionAccompany( const lmms::TimePos& ) ) );*/
+	connect(&Engine::getSong()->getTimeline(Song::PlayMode::Pattern), &Timeline::positionChanged, this, &PianoRoll::updatePositionAccompany);
+
 
 	removeSelection();
 
@@ -849,6 +845,9 @@ void PianoRoll::setCurrentMidiClip( MidiClip* newMidiClip )
 	m_startKey = INITIAL_START_KEY;
 
 	m_stepRecorder.setCurrentMidiClip(newMidiClip);
+
+	// Update visibility of position line so that it hides itself if the clip is deleted
+	updatePositionLinePos();
 
 	if( ! hasValidMidiClip() )
 	{
@@ -4223,7 +4222,8 @@ void PianoRoll::stop()
 {
 	Engine::getSong()->stop();
 	m_recording = false;
-	m_scrollBack = m_timeLine->autoScroll() != TimeLineWidget::AutoScrollState::Disabled;
+	// Scroll back to the start if autoscroll is enabled
+	autoScroll(m_timeLine->timeline()->pos());
 
 	auto* songEditor = GuiApplication::instance()->songEditor()->m_editor;
 
@@ -4629,40 +4629,33 @@ bool PianoRoll::deleteSelectedNotes()
 
 
 
-void PianoRoll::autoScroll( const TimePos & t )
+void PianoRoll::autoScroll(const TimePos & t)
 {
 	const int w = width() - m_whiteKeyWidth;
-	if (m_timeLine->autoScroll() == TimeLineWidget::AutoScrollState::Stepped) 
+	if (m_timeLine->autoScroll() == TimeLineWidget::AutoScrollState::Disabled)
 	{
-		if (t > m_currentPosition + w * TimePos::ticksPerBar() / m_ppb)
+		return;
+	}
+	else if (m_timeLine->autoScroll() == TimeLineWidget::AutoScrollState::Stepped)
+	{
+		if (t < m_currentPosition || t > m_currentPosition + w * TimePos::ticksPerBar() / m_ppb)
 		{
-			m_leftRightScroll->setValue(t.getBar() * TimePos::ticksPerBar());
-		}
-		else if (t < m_currentPosition)
-		{
-			TimePos t2 = std::max(t - w * TimePos::ticksPerBar() *
-						TimePos::ticksPerBar() / m_ppb, static_cast<tick_t>(0));
-			m_leftRightScroll->setValue(t2.getBar() * TimePos::ticksPerBar());
+			m_leftRightScroll->setValue(t.getTicks());
 		}
 	}
 	else if (m_timeLine->autoScroll() == TimeLineWidget::AutoScrollState::Continuous)
 	{
 		m_leftRightScroll->setValue(std::max(t.getTicks() - w * TimePos::ticksPerBar() / m_ppb / 2, 0));
 	}
-	m_scrollBack = false;
 }
 
 
 
 void PianoRoll::updatePosition()
 {
-	const TimePos& t = m_timeLine->timeline()->pos();
-	if ((Engine::getSong()->isPlaying()
-			&& Engine::getSong()->playMode() == Song::PlayMode::MidiClip
-			&& m_timeLine->autoScroll() != TimeLineWidget::AutoScrollState::Disabled
-		) || m_scrollBack)
+	if (Engine::getSong()->isPlaying())
 	{
-		autoScroll(t);
+		autoScroll(m_timeLine->timeline()->pos());
 	}
 	updatePositionLinePos();
 }
@@ -4697,21 +4690,29 @@ void PianoRoll::updatePositionLineHeight()
 
 void PianoRoll::updatePositionAccompany()
 {
-	const TimePos& t = Engine::getSong()->getPlayPos(Song::PlayMode::Song);
+	if (!hasValidMidiClip()) { return; }
 	Song * s = Engine::getSong();
 
-	if( m_recording && hasValidMidiClip() &&
-					s->playMode() != Song::PlayMode::MidiClip )
+	if (m_midiClip->getTrack()->trackContainer() ==	Engine::patternStore())
 	{
-		TimePos pos = t;
-		if (s->playMode() != Song::PlayMode::Pattern)
+		if (s->playMode() == Song::PlayMode::Pattern)
 		{
-			pos -= m_midiClip->startPosition() + m_midiClip->startTimeOffset();
+			// Don't offset the timeline position by the clip start position when in the pattern editor, since
+			// the internal position of each clip depends on which pattern they are part of, and isn't visible to the user.
+			TimePos newTimelinePos = s->getPlayPos(Song::PlayMode::Pattern);
+			// Don't update the timeline if the playhead isn't within the clip bounds
+			if (newTimelinePos >= m_midiClip->startTimeOffset() && newTimelinePos < m_midiClip->length() - m_midiClip->startTimeOffset())
+			{
+				m_timeLine->timeline()->setTicks(newTimelinePos);
+			}
 		}
-		if( (int) pos > 0 )
+	}
+	else if (s->playMode() == Song::PlayMode::Song)
+	{
+		TimePos newTimelinePos = s->getPlayPos(Song::PlayMode::Song) - m_midiClip->startPosition() - m_midiClip->startTimeOffset();
+		if (newTimelinePos >= m_midiClip->startTimeOffset() && newTimelinePos < m_midiClip->length() - m_midiClip->startTimeOffset())
 		{
-			m_timeLine->timeline()->setTicks(pos);
-			autoScroll( pos );
+			m_timeLine->timeline()->setTicks(newTimelinePos);
 		}
 	}
 }
