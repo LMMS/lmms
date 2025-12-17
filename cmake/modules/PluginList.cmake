@@ -68,7 +68,7 @@ SET(LMMS_PLUGIN_LIST
 	StereoMatrix
 	Stk
 	TapTempo
-	Transfer Function
+	TransferFunction
 	VstBase
 	Vestige
 	VstEffect
