@@ -1,5 +1,12 @@
-name: Windows Build
+name: Windows Build LMMS
 
+# Run on every push to your fork or manually
+on:
+  push:
+  workflow_dispatch:
+name: Windows Build LMMS
+
+# Run on every push to your fork or manually
 on:
   push:
   workflow_dispatch:
@@ -9,27 +16,32 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - name: Checkout source
-      uses: actions/checkout@v4
+      # 1️⃣ Checkout your fork
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive  # ensures LMMS submodules are cloned
 
-    - name: Setup MSVC
-      uses: ilammy/msvc-dev-cmd@v1
+      # 2️⃣ Install dependencies
+      - name: Install dependencies
+        run: |
+          choco install -y cmake ninja python git
+          choco install -y qt5-default  # LMMS requires Qt5
+          refreshenv  # refresh environment variables so Qt5 is detected
 
-    - name: Install dependencies
-      run: |
-        choco install -y cmake ninja python
-        choco install -y qt6-base-dev
+      # 3️⃣ Configure the build with CMake
+      - name: Configure build
+        run: |
+          cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
 
-    - name: Configure
-      run: |
-        cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+      # 4️⃣ Build LMMS
+      - name: Build LMMS
+        run: |
+          cmake --build build --config Release
 
-    - name: Build
-      run: |
-        cmake --build build --config Release
-
-    - name: Upload build
-      uses: actions/upload-artifact@v4
-      with:
-        name: lmms-windows-build
-        path: build
+      # 5️⃣ Upload the build artifacts for download
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: lmms-windows-build
+          path: build
