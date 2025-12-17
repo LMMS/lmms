@@ -21,6 +21,12 @@ jobs:
         run: |
           choco install -y cmake ninja python git
           choco install -y qt5-default  # LMMS requires Qt5
+          install: >-
+            mingw-w64-x86_64-libsndfile
+            mingw-w64-x86_64-pkg-config
+            mingw-w64-x86_64-qt5-base
+            mingw-w64-x86_64-fftw
+            mingw-w64-x86_64-ninja
           refreshenv  # refresh environment variables so Qt5 is detected
 
       # 3️⃣ Configure the build with CMake
