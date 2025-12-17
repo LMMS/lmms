@@ -1,6 +1,6 @@
 #include "Visualiser.h"
-#include <lmms/Plugin.h>
-#include <lmms/SampleFrame.h>
+#include <Plugin.h>
+#include <SampleFrame.h>
 #include <QWidget>
 #include <QPainter>
 #include <QTimer>
@@ -23,7 +23,7 @@ namespace lmms
 {
 
 // REMOVED: extern "C" LMMS_EXPORT Plugin::Descriptor Visualiser_plugin_descriptor; 
-// (We define it at the bottom with PLUGIN_EXPORT instead)
+// (Define it at the bottom with PLUGIN_EXPORT instead)
 
 #define BUFFER_SIZE 512
 static float g_bufferL[BUFFER_SIZE];
