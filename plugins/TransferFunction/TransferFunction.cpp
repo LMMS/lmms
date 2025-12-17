@@ -63,7 +63,8 @@ Effect::ProcessStatus TransferFunctionEffect::processImpl(SampleFrame* buf, cons
 
     // --- CALCULATE FILTER RESPONSE ---
     int presetIdx = (int)m_ampControls.m_volumeModel.value();
-    if (presetIdx < 1) presetIdx = 1; if (presetIdx > 20) presetIdx = 20; // Cap at 20
+    if (presetIdx < 1) presetIdx = 1;
+    if (presetIdx > 20) presetIdx = 20; // Cap at 20
   
     std::string customFormula = m_ampControls.getFormula().toStdString();
     float fs = Engine::audioEngine()->baseSampleRate(); if (fs < 1.0f) fs = 44100.0f;
@@ -102,4 +103,4 @@ Effect::ProcessStatus TransferFunctionEffect::processImpl(SampleFrame* buf, cons
 }
 
 extern "C" { PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* parent, void* data) { return new TransferFunctionEffect(parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key*>(data)); } }
-}// namespace lmms
+} // namespace lmms
