@@ -27,20 +27,15 @@
 
 #include "AutomationEditor.h"
 
-#include <QApplication>
 #include <QInputDialog>
-#include <QKeyEvent>
 #include <QLabel>
 #include <QPainter>
-#include <QPainterPath>  // IWYU pragma: keep
+#include <QPainterPath> // IWYU pragma: keep
 #include <QPushButton>
 #include <QScrollBar>
 #include <QStyleOption>
 #include <QToolTip>
 #include <cmath>
-
-#include "SampleClip.h"
-#include "SampleThumbnail.h"
 
 #include "ActionGroup.h"
 #include "AutomationNode.h"
@@ -48,6 +43,7 @@
 #include "DeprecationHelper.h"
 #include "DetuningHelper.h"
 #include "Engine.h"
+#include "FontHelper.h"
 #include "GuiApplication.h"
 #include "Knob.h"
 #include "MainWindow.h"
@@ -55,12 +51,12 @@
 #include "PatternStore.h"
 #include "PianoRoll.h"
 #include "ProjectJournal.h"
+#include "SampleClip.h"
+#include "SampleThumbnail.h"
 #include "StringPairDrag.h"
 #include "TextFloat.h"
 #include "TimeLineWidget.h"
 #include "embed.h"
-#include "FontHelper.h"
-
 
 namespace lmms::gui
 {
@@ -215,7 +211,9 @@ void AutomationEditor::updateAfterClipChange()
 {
 	m_currentPosition = 0;
 
-	if( !validClip() )
+	m_timeLine->setVisible(validClip());
+
+	if ( !validClip() )
 	{
 		m_minLevel = m_maxLevel = m_scrollLevel = 0;
 		m_step = 1;
@@ -1053,60 +1051,57 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 	// start drawing at the bottom
 	int grid_bottom = height() - SCROLLBAR_SIZE - 1;
 
+	if (!validClip())
+	{
+		const auto icon = embed::getIconPixmap("pr_no_clip");
+		const int x = (width() - icon.width()) / 2;
+		const int y = (height() - icon.height()) / 2;
+		p.drawPixmap(x, y, icon);
+
+		p.setPen(QApplication::palette().color(QPalette::Active, QPalette::Text));
+		QRect textRect(0, y + icon.height() + 5, width(), 30);
+		p.drawText(textRect, Qt::AlignHCenter | Qt::AlignTop,
+			tr("Double-click on an automation clip in Song Editor to open it here"));
+		return;
+	}
+
 	p.fillRect(0, TOP_MARGIN, VALUES_WIDTH, height() - TOP_MARGIN, m_scaleColor);
 
 	// print value numbers
 	int font_height = p.fontMetrics().height();
 	auto text_flags = (Qt::Alignment)(Qt::AlignRight | Qt::AlignVCenter);
 
-	if( validClip() )
+	if (m_y_auto)
 	{
-		if( m_y_auto )
+		auto y = std::array{grid_bottom, TOP_MARGIN + font_height / 2};
+		auto level = std::array{m_minLevel, m_maxLevel};
+		for (int i = 0; i < 2; ++i)
 		{
-			auto y = std::array{grid_bottom, TOP_MARGIN + font_height / 2};
-			auto level = std::array{m_minLevel, m_maxLevel};
-			for( int i = 0; i < 2; ++i )
-			{
-				const QString & label = m_clip->firstObject()
-						->displayValue( level[i] );
-				p.setPen( QApplication::palette().color( QPalette::Active,
-							QPalette::Shadow ) );
-				p.drawText( 1, y[i] - font_height + 1,
-					VALUES_WIDTH - 10, 2 * font_height,
-					text_flags, label );
-				p.setPen( fgColor );
-				p.drawText( 0, y[i] - font_height,
-					VALUES_WIDTH - 10, 2 * font_height,
-					text_flags, label );
-			}
+			const QString& label = m_clip->firstObject()->displayValue(level[i]);
+			p.setPen(QApplication::palette().color(QPalette::Active, QPalette::Shadow));
+			p.drawText(1, y[i] - font_height + 1, VALUES_WIDTH - 10, 2 * font_height, text_flags, label);
+			p.setPen(fgColor);
+			p.drawText(0, y[i] - font_height, VALUES_WIDTH - 10, 2 * font_height, text_flags, label);
 		}
-		else
+	}
+	else
+	{
+		int level = (int)m_bottomLevel;
+		int printable = qMax(1, 5 * DEFAULT_Y_DELTA / m_y_delta);
+		int module = level % printable;
+		if (module)
 		{
-			int level = (int) m_bottomLevel;
-			int printable = qMax( 1, 5 * DEFAULT_Y_DELTA
-								/ m_y_delta );
-			int module = level % printable;
-			if( module )
-			{
-				int inv_module = ( printable - module )
-								% printable;
-				level += inv_module;
-			}
-			for( ; level <= m_topLevel; level += printable )
-			{
-				const QString & label = m_clip->firstObject()
-							->displayValue( level );
-				int y = yCoordOfLevel(level);
-				p.setPen( QApplication::palette().color( QPalette::Active,
-							QPalette::Shadow ) );
-				p.drawText( 1, y - font_height + 1,
-					VALUES_WIDTH - 10, 2 * font_height,
-					text_flags, label );
-				p.setPen( fgColor );
-				p.drawText( 0, y - font_height,
-					VALUES_WIDTH - 10, 2 * font_height,
-					text_flags, label );
-			}
+			int inv_module = (printable - module) % printable;
+			level += inv_module;
+		}
+		for (; level <= m_topLevel; level += printable)
+		{
+			const QString& label = m_clip->firstObject()->displayValue(level);
+			int y = yCoordOfLevel(level);
+			p.setPen(QApplication::palette().color(QPalette::Active, QPalette::Shadow));
+			p.drawText(1, y - font_height + 1, VALUES_WIDTH - 10, 2 * font_height, text_flags, label);
+			p.setPen(fgColor);
+			p.drawText(0, y - font_height, VALUES_WIDTH - 10, 2 * font_height, text_flags, label);
 		}
 	}
 
@@ -1309,170 +1304,127 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 
 
 	// following code draws all visible values
+	// NEEDS Change in CSS
+	// int len_ticks = 4;
+	timeMap& time_map = m_clip->getTimeMap();
 
-	if( validClip() )
+	// Don't bother doing/rendering anything if there is no automation points
+	if (time_map.size() > 0)
 	{
-		//NEEDS Change in CSS
-		//int len_ticks = 4;
-		timeMap & time_map = m_clip->getTimeMap();
-
-		//Don't bother doing/rendering anything if there is no automation points
-		if( time_map.size() > 0 )
+		timeMap::iterator it = time_map.begin();
+		while (std::next(it) != time_map.end())
 		{
-			timeMap::iterator it = time_map.begin();
-			while (std::next(it) != time_map.end())
+			// skip this section if it occurs completely before the
+			// visible area
+			const auto nit = std::next(it);
+
+			int next_x = xCoordOfTick(POS(nit));
+			if (next_x < 0)
 			{
-				// skip this section if it occurs completely before the
-				// visible area
-				const auto nit = std::next(it);
-
-				int next_x = xCoordOfTick(POS(nit));
-				if( next_x < 0 )
-				{
-					++it;
-					continue;
-				}
-
-				int x = xCoordOfTick(POS(it));
-				if( x > width() )
-				{
-					break;
-				}
-
-				float *values = m_clip->valuesAfter(POS(it));
-
-				// We are creating a path to draw a polygon representing the values between two
-				// nodes. When we have two nodes with discrete progression, we will basically have
-				// a rectangle with the outValue of the first node (that's why nextValue will match
-				// the outValue of the current node). When we have nodes with linear or cubic progression
-				// the value of the end of the shape between the two nodes will be the inValue of
-				// the next node.
-				float nextValue = m_clip->progressionType() == AutomationClip::ProgressionType::Discrete
-					? OUTVAL(it)
-					: INVAL(nit);
-
-				p.setRenderHints( QPainter::Antialiasing, true );
-				QPainterPath path;
-				path.moveTo(QPointF(xCoordOfTick(POS(it)), yCoordOfLevel(0)));
-				for (int i = 0; i < POS(nit) - POS(it); ++i)
-				{
-					path.lineTo(QPointF(xCoordOfTick(POS(it) + i), yCoordOfLevel(values[i])));
-				}
-				path.lineTo(QPointF(xCoordOfTick(POS(nit)), yCoordOfLevel(nextValue)));
-				path.lineTo(QPointF(xCoordOfTick(POS(nit)), yCoordOfLevel(0)));
-				path.lineTo(QPointF(xCoordOfTick(POS(it)), yCoordOfLevel(0)));
-				p.fillPath(path, m_graphColor);
-				p.setRenderHints( QPainter::Antialiasing, false );
-				delete [] values;
-
-				// Draw circle
-				drawAutomationPoint(p, it);
-				// Draw tangents if necessary (only for manually edited tangents)
-				if (m_clip->canEditTangents() && LOCKEDTAN(it))
-				{
-					drawAutomationTangents(p, it);
-				}
-
 				++it;
+				continue;
 			}
 
-			for (
-				int i = POS(it), x = xCoordOfTick(i);
-				x <= width();
-				i++, x = xCoordOfTick(i)
-			)
+			int x = xCoordOfTick(POS(it));
+			if (x > width()) { break; }
+
+			float* values = m_clip->valuesAfter(POS(it));
+
+			// We are creating a path to draw a polygon representing the values between two
+			// nodes. When we have two nodes with discrete progression, we will basically have
+			// a rectangle with the outValue of the first node (that's why nextValue will match
+			// the outValue of the current node). When we have nodes with linear or cubic progression
+			// the value of the end of the shape between the two nodes will be the inValue of
+			// the next node.
+			float nextValue
+				= m_clip->progressionType() == AutomationClip::ProgressionType::Discrete ? OUTVAL(it) : INVAL(nit);
+
+			p.setRenderHints(QPainter::Antialiasing, true);
+			QPainterPath path;
+			path.moveTo(QPointF(xCoordOfTick(POS(it)), yCoordOfLevel(0)));
+			for (int i = 0; i < POS(nit) - POS(it); ++i)
 			{
-				// Draws the rectangle representing the value after the last node (for
-				// that reason we use outValue).
-				drawLevelTick(p, i, OUTVAL(it));
+				path.lineTo(QPointF(xCoordOfTick(POS(it) + i), yCoordOfLevel(values[i])));
 			}
-			// Draw circle(the last one)
+			path.lineTo(QPointF(xCoordOfTick(POS(nit)), yCoordOfLevel(nextValue)));
+			path.lineTo(QPointF(xCoordOfTick(POS(nit)), yCoordOfLevel(0)));
+			path.lineTo(QPointF(xCoordOfTick(POS(it)), yCoordOfLevel(0)));
+			p.fillPath(path, m_graphColor);
+			p.setRenderHints(QPainter::Antialiasing, false);
+			delete[] values;
+
+			// Draw circle
 			drawAutomationPoint(p, it);
 			// Draw tangents if necessary (only for manually edited tangents)
-			if (m_clip->canEditTangents() && LOCKEDTAN(it))
-			{
-				drawAutomationTangents(p, it);
-			}
+			if (m_clip->canEditTangents() && LOCKEDTAN(it)) { drawAutomationTangents(p, it); }
+
+			++it;
 		}
 
-		// draw clip bounds overlay
-		p.fillRect(
-			xCoordOfTick(m_clip->length() - m_clip->startTimeOffset()),
-			TOP_MARGIN,
-			width() - 10,
-			grid_bottom,
-			m_outOfBoundsShade
-		);
-		p.fillRect(
-			0,
-			TOP_MARGIN,
-			xCoordOfTick(-m_clip->startTimeOffset()),
-			grid_bottom,
-			m_outOfBoundsShade
-		);
+		for (int i = POS(it), x = xCoordOfTick(i); x <= width(); i++, x = xCoordOfTick(i))
+		{
+			// Draws the rectangle representing the value after the last node (for
+			// that reason we use outValue).
+			drawLevelTick(p, i, OUTVAL(it));
+		}
+		// Draw circle(the last one)
+		drawAutomationPoint(p, it);
+		// Draw tangents if necessary (only for manually edited tangents)
+		if (m_clip->canEditTangents() && LOCKEDTAN(it)) { drawAutomationTangents(p, it); }
 	}
-	else
-	{
-		QFont f = font();
-		f.setBold( true );
-		p.setFont(f);
-		p.setPen( QApplication::palette().color( QPalette::Active,
-							QPalette::BrightText ) );
-		p.drawText( VALUES_WIDTH + 20, TOP_MARGIN + 40,
-				width() - VALUES_WIDTH - 20 - SCROLLBAR_SIZE,
-				grid_height - 40, Qt::TextWordWrap,
-				tr( "Please open an automation clip by "
-					"double-clicking on it!" ) );
-	}
+
+	// draw clip bounds overlay
+	p.fillRect(xCoordOfTick(m_clip->length() - m_clip->startTimeOffset()), TOP_MARGIN, width() - 10, grid_bottom,
+		m_outOfBoundsShade);
+	p.fillRect(0, TOP_MARGIN, xCoordOfTick(-m_clip->startTimeOffset()), grid_bottom, m_outOfBoundsShade);
 
 	// TODO: Get this out of paint event
-	int l = validClip() ? (int) m_clip->length() - m_clip->startTimeOffset() : 0;
+	int l = validClip() ? (int)m_clip->length() - m_clip->startTimeOffset() : 0;
 
 	// reset scroll-range
-	if( m_leftRightScroll->maximum() != l )
+	if (m_leftRightScroll->maximum() != l)
 	{
-		m_leftRightScroll->setRange( 0, l );
-		m_leftRightScroll->setPageStep( l );
+		m_leftRightScroll->setRange(0, l);
+		m_leftRightScroll->setPageStep(l);
 	}
 
-	if(validClip() && GuiApplication::instance()->automationEditor()->m_editor->hasFocus())
-	{
-		drawCross( p );
-	}
+	if (validClip() && GuiApplication::instance()->automationEditor()->m_editor->hasFocus()) { drawCross(p); }
 
-	const QPixmap * cursor = nullptr;
+	const QPixmap* cursor = nullptr;
 	// draw current edit-mode-icon below the cursor
-	switch( m_editMode )
+	switch (m_editMode)
 	{
-		case EditMode::Draw:
+	case EditMode::Draw: {
+		if (m_action == Action::EraseValues) { cursor = &m_toolErase; }
+		else if (m_action == Action::MoveValue) { cursor = &m_toolMove; }
+		else
 		{
-			if (m_action == Action::EraseValues) { cursor = &m_toolErase; }
-			else if (m_action == Action::MoveValue) { cursor = &m_toolMove; }
-			else { cursor = &m_toolDraw; }
-			break;
+			cursor = &m_toolDraw;
 		}
-		case EditMode::Erase:
-		{
-			cursor = &m_toolErase;
-			break;
-		}
-		case EditMode::DrawOutValues:
-		{
-			if (m_action == Action::ResetOutValues) { cursor = &m_toolErase; }
-			else if (m_action == Action::MoveOutValue) { cursor = &m_toolMove; }
-			else { cursor = &m_toolDrawOut; }
-			break;
-		}
-		case EditMode::EditTangents:
-		{
-			cursor = m_action == Action::MoveTangent ? &m_toolMove : &m_toolEditTangents;
-			break;
-		}
+		break;
 	}
-	QPoint mousePosition = mapFromGlobal( QCursor::pos() );
+	case EditMode::Erase: {
+		cursor = &m_toolErase;
+		break;
+	}
+	case EditMode::DrawOutValues: {
+		if (m_action == Action::ResetOutValues) { cursor = &m_toolErase; }
+		else if (m_action == Action::MoveOutValue) { cursor = &m_toolMove; }
+		else
+		{
+			cursor = &m_toolDrawOut;
+		}
+		break;
+	}
+	case EditMode::EditTangents: {
+		cursor = m_action == Action::MoveTangent ? &m_toolMove : &m_toolEditTangents;
+		break;
+	}
+	}
+	QPoint mousePosition = mapFromGlobal(QCursor::pos());
 	if (cursor != nullptr && mousePosition.y() > TOP_MARGIN + SCROLLBAR_SIZE)
 	{
-		p.drawPixmap( mousePosition + QPoint( 8, 8 ), *cursor );
+		p.drawPixmap(mousePosition + QPoint(8, 8), *cursor);
 	}
 }
 
@@ -2056,7 +2008,9 @@ AutomationEditorWindow::AutomationEditorWindow() :
 {
 	setCentralWidget(m_editor);
 
-
+	// disable all controls when no clip is selected
+	setEnabled(m_editor->validClip());
+	connect(m_editor, &AutomationEditor::currentClipChanged, this, [this] { setEnabled(m_editor->validClip()); });
 
 	// Play/stop buttons
 	m_playAction->setToolTip(tr( "Play/pause current clip (Space)" ));
@@ -2355,6 +2309,8 @@ void AutomationEditorWindow::setProgressionType(int progType)
 
 void AutomationEditorWindow::updateEditTanButton()
 {
+	if (!m_editor->validClip()) { return; }
+
 	auto progType = currentClip()->progressionType();
 	m_editTanAction->setEnabled(AutomationClip::supportsTangentEditing(progType));
 	if (!m_editTanAction->isEnabled() && m_editTanAction->isChecked()) { m_drawAction->trigger(); }
