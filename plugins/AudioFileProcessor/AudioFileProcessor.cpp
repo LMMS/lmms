@@ -22,8 +22,6 @@
  *
  */
 
-
-#include <QDebug>
 #include "AudioFileProcessor.h"
 #include "AudioFileProcessorView.h"
 
