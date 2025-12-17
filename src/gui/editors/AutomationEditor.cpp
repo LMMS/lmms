@@ -2009,6 +2009,7 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	setCentralWidget(m_editor);
 
 	// disable all controls when no clip is selected
+	setEnabled(m_editor->validClip());
 	connect(m_editor, &AutomationEditor::currentClipChanged, this, [this] { setEnabled(m_editor->validClip()); });
 
 	// Play/stop buttons
