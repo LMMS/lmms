@@ -1,6 +1,7 @@
 #include "Visualiser.h"
-#include <Plugin.h>
-#include <SampleFrame.h>
+#include <lmms/Plugin.h>
+#include <lmms/SampleFrame.h>
+#include "plugin_export.h" // <--- CRITICAL FIX: Defines PLUGIN_EXPORT
 #include <QWidget>
 #include <QPainter>
 #include <QTimer>
@@ -22,8 +23,9 @@
 namespace lmms
 {
 
-// REMOVED: extern "C" LMMS_EXPORT Plugin::Descriptor Visualiser_plugin_descriptor; 
-// (Define it at the bottom with PLUGIN_EXPORT instead)
+extern "C" {
+    extern Plugin::Descriptor Visualiser_plugin_descriptor;
+}
 
 #define BUFFER_SIZE 512
 static float g_bufferL[BUFFER_SIZE];
@@ -1795,21 +1797,22 @@ private:
 };
 extern "C"
 {
-    // CHANGED: LMMS_EXPORT -> PLUGIN_EXPORT
-    PLUGIN_EXPORT Plugin::Descriptor Visualiser_plugin_descriptor =
+    // DEFINITION
+    Plugin::Descriptor PLUGIN_EXPORT Visualiser_plugin_descriptor =
     {
         "Visualiser",
         "Visualiser",
         QT_TRANSLATE_NOOP("PluginBrowser","Visualiser Plugin"),
-        "Your Name",
+        "Ewan Pettigrew",
         0x0100,
         Plugin::Type::Effect,
         nullptr,
         nullptr,
         nullptr
     };
-    // CHANGED: LMMS_EXPORT -> PLUGIN_EXPORT
-    PLUGIN_EXPORT Plugin *lmms_plugin_main(lmms::Model *parent, void *data)
+    
+    // DEFINITION
+    Plugin PLUGIN_EXPORT *lmms_plugin_main(lmms::Model *parent, void *data)
     {
         Q_UNUSED(data);
         return new VisualiserEffect(parent, QDomElement());
