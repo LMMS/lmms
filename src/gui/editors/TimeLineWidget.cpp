@@ -24,7 +24,6 @@
 
 #include "TimeLineWidget.h"
 
-
 #include <QGuiApplication>
 #include <QMenu>
 #include <QMouseEvent>
@@ -47,25 +46,21 @@ namespace
 	constexpr int MIN_BAR_LABEL_DISTANCE = 35;
 }
 
-TimeLineWidget::TimeLineWidget(const int xoff, const int yoff, const float ppb, Song::PlayPos& pos, Timeline& timeline,
-		const TimePos& begin, Song::PlayMode mode, QWidget* parent) :
+TimeLineWidget::TimeLineWidget(const int xoff, const int yoff, const float ppb, Timeline& timeline,
+		const TimePos& begin, QWidget* parent) :
 	QWidget{parent},
 	m_xOffset{xoff},
 	m_ppb{ppb},
-	m_pos{pos},
 	m_timeline{&timeline},
-	m_begin{begin},
-	m_mode{mode}
+	m_begin{begin}
 {
 	move( 0, yoff );
 
 	setMouseTracking(true);
 
-	auto updateTimer = new QTimer(this);
-	connect(updateTimer, &QTimer::timeout, this, &TimeLineWidget::updatePosition);
-	updateTimer->start( 1000 / 60 );  // 60 fps
 	connect( Engine::getSong(), SIGNAL(timeSignatureChanged(int,int)),
 					this, SLOT(update()));
+	connect(m_timeline, &Timeline::positionChanged, this, qOverload<>(&QWidget::update));
 }
 
 
@@ -128,12 +123,6 @@ void TimeLineWidget::addToolButtons( QToolBar * _tool_bar )
 	_tool_bar->addWidget( autoScroll );
 	_tool_bar->addWidget( loopPoints );
 	_tool_bar->addWidget( behaviourAtStop );
-}
-
-void TimeLineWidget::updatePosition()
-{
-	emit positionChanged(m_pos);
-	update();
 }
 
 void TimeLineWidget::toggleAutoScroll( int _n )
@@ -221,14 +210,16 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 		p.fillRect(rightHandle, color);
 	}
 
+	const QPixmap& marker = !m_isRecording ? m_posMarkerPixmap : m_recordingPosMarkerPixmap;
+
 	// Only draw the position marker if the position line is in view
-	if (markerX(m_pos) >= m_xOffset && markerX(m_pos) < width() - m_posMarkerPixmap.width() / 2)
+	if (m_isPlayheadVisible && markerX(m_timeline->pos()) >= m_xOffset && markerX(m_timeline->pos()) < width() - marker.width() / 2)
 	{
 		// Let the position marker extrude to the left
 		p.setClipping(false);
 		p.setOpacity(0.6);
-		p.drawPixmap(markerX(m_pos) - (m_posMarkerPixmap.width() / 2),
-			height() - m_posMarkerPixmap.height(), m_posMarkerPixmap);
+		p.drawPixmap(markerX(m_timeline->pos()) - (marker.width() / 2),
+			height() - marker.height(), marker);
 	}
 }
 
@@ -340,16 +331,13 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 	switch( m_action )
 	{
 		case Action::MovePositionMarker:
-			m_pos.setTicks(timeAtCursor.getTicks());
-			Engine::getSong()->setToTime(timeAtCursor, m_mode);
+			m_timeline->setTicks(timeAtCursor.getTicks());
 			if (!( Engine::getSong()->isPlaying()))
 			{
 				//Song::PlayMode::None is used when nothing is being played.
-				Engine::getSong()->setToTime(timeAtCursor, Song::PlayMode::None);
+				Engine::getSong()->getTimeline(Song::PlayMode::None).setTicks(timeAtCursor.getTicks());
 			}
-			m_pos.setCurrentFrame( 0 );
-			m_pos.setJumped( true );
-			updatePosition();
+			update();
 			break;
 
 		case Action::MoveLoopBegin:

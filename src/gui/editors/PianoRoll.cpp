@@ -276,23 +276,22 @@ PianoRoll::PianoRoll() :
 
 	// add time-line
 	m_timeLine = new TimeLineWidget(m_whiteKeyWidth, 0, m_ppb,
-		Engine::getSong()->getPlayPos(Song::PlayMode::MidiClip),
 		Engine::getSong()->getTimeline(Song::PlayMode::MidiClip),
-		m_currentPosition, Song::PlayMode::MidiClip, this
+		m_currentPosition, this
 	);
-	connect(this, &PianoRoll::positionChanged, m_timeLine, &TimeLineWidget::updatePosition);
-	connect( m_timeLine, SIGNAL( positionChanged( const lmms::TimePos& ) ),
-			this, SLOT( updatePosition( const lmms::TimePos& ) ) );
+	connect(m_timeLine->timeline(), &Timeline::positionChanged, this, &PianoRoll::updatePosition);
 
 	// white position line follows timeline marker
 	m_positionLine = new PositionLine(this, Song::PlayMode::MidiClip);
+
+	connect(Engine::getSong(), &Song::playbackStateChanged, m_positionLine, qOverload<>(&QWidget::update));
 
 	//update timeline when in step-recording mode
 	connect( &m_stepRecorderWidget, SIGNAL( positionChanged( const lmms::TimePos& ) ),
 			this, SLOT( updatePositionStepRecording( const lmms::TimePos& ) ) );
 
 	// update timeline when in record-accompany mode
-	connect(m_timeLine, &TimeLineWidget::positionChanged, this, &PianoRoll::updatePositionAccompany);
+	connect(&Engine::getSong()->getTimeline(Song::PlayMode::Song), &Timeline::positionChanged, this, &PianoRoll::updatePositionAccompany);
 	// TODO
 /*	connect( engine::getSong()->getPlayPos( Song::PlayMode::Pattern ).m_timeLine,
 				SIGNAL( positionChanged( const lmms::TimePos& ) ),
@@ -882,8 +881,8 @@ void PianoRoll::setCurrentMidiClip( MidiClip* newMidiClip )
 	}
 
 	// Make sure the playhead position isn't out of the clip bounds.
-	Engine::getSong()->getPlayPos(Song::PlayMode::MidiClip).setTicks(std::clamp(
-		Engine::getSong()->getPlayPos(Song::PlayMode::MidiClip).getTicks(),
+	m_timeLine->timeline()->setTicks(std::clamp(
+		m_timeLine->timeline()->ticks(),
 		std::max(0, -m_midiClip->startTimeOffset()),
 		m_midiClip->length() - m_midiClip->startTimeOffset()
 	));
@@ -1456,8 +1455,7 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 			break;
 
 		case Qt::Key_Home:
-			m_timeLine->pos().setTicks( 0 );
-			m_timeLine->updatePosition();
+			m_timeLine->timeline()->setTicks(0);
 			ke->accept();
 			break;
 
@@ -3141,6 +3139,20 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	// fill with bg color
 	p.fillRect( 0, 0, width(), height(), bgColor );
 
+	if (!hasValidMidiClip())
+	{
+		const auto icon = embed::getIconPixmap("pr_no_clip");
+		const int x = (width() - icon.width()) / 2;
+		const int y = (height() - icon.height()) / 2;
+		p.drawPixmap(x, y, icon);
+
+		p.setPen(QApplication::palette().color(QPalette::Active, QPalette::Text));
+		QRect textRect(0, y + icon.height() + 5, width(), 30);
+		p.drawText(textRect, Qt::AlignHCenter | Qt::AlignTop,
+			tr("Double-click on an instrument clip in Song Editor to open it here"));
+		return;
+	}
+
 	// set font-size to 80% of key line height
 	QFont f = p.font();
 	int keyFontSize = m_keyLineHeight * 0.8;
@@ -3725,17 +3737,6 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 		p.drawPoints( editHandles );
 
 	}
-	else
-	{
-		QFont f = font();
-		f.setBold(true);
-		p.setFont(f);
-		p.setPen( QApplication::palette().color( QPalette::Active,
-							QPalette::BrightText ) );
-		p.drawText(m_whiteKeyWidth + 20, PR_TOP_MARGIN + 40,
-				tr( "Please open a clip by double-clicking "
-								"on it!" ) );
-	}
 
 	p.setClipRect(
 		m_whiteKeyWidth,
@@ -4149,6 +4150,9 @@ void PianoRoll::record()
 	m_recording = true;
 
 	Engine::getSong()->playMidiClip( m_midiClip, false );
+
+	m_timeLine->setRecording(true);
+	m_positionLine->setRecording(true);
 }
 
 
@@ -4176,6 +4180,11 @@ void PianoRoll::recordAccompany()
 	{
 		Engine::getSong()->playPattern();
 	}
+
+	auto* songEditor = GuiApplication::instance()->songEditor()->m_editor;
+
+	songEditor->timeLine()->setRecording(true);
+	songEditor->positionLine()->setRecording(true);
 }
 
 
@@ -4204,7 +4213,7 @@ bool PianoRoll::toggleStepRecording()
 		}
 	}
 
-	return m_stepRecorder.isRecording();;
+	return m_stepRecorder.isRecording();
 }
 
 
@@ -4215,6 +4224,13 @@ void PianoRoll::stop()
 	Engine::getSong()->stop();
 	m_recording = false;
 	m_scrollBack = m_timeLine->autoScroll() != TimeLineWidget::AutoScrollState::Disabled;
+
+	auto* songEditor = GuiApplication::instance()->songEditor()->m_editor;
+
+	songEditor->timeLine()->setRecording(false);
+	songEditor->positionLine()->setRecording(false);
+	m_timeLine->setRecording(false);
+	m_positionLine->setRecording(false);
 }
 
 
@@ -4298,7 +4314,8 @@ void PianoRoll::horScrolled(int new_pos )
 {
 	m_currentPosition = new_pos;
 	m_stepRecorderWidget.setCurrentPosition(m_currentPosition);
-	emit positionChanged( m_currentPosition );
+	m_timeLine->update();
+	updatePositionLinePos();
 	update();
 }
 
@@ -4571,7 +4588,7 @@ void PianoRoll::pasteNotes()
 			// create the note
 			Note cur_note;
 			cur_note.restoreState( list.item( i ).toElement() );
-			cur_note.setPos( cur_note.pos() + Note::quantized( m_timeLine->pos(), quantization() ) );
+			cur_note.setPos(cur_note.pos() + Note::quantized(m_timeLine->timeline()->pos(), quantization()));
 
 			// select it
 			cur_note.setSelected( true );
@@ -4637,8 +4654,9 @@ void PianoRoll::autoScroll( const TimePos & t )
 
 
 
-void PianoRoll::updatePosition(const TimePos & t)
+void PianoRoll::updatePosition()
 {
+	const TimePos& t = m_timeLine->timeline()->pos();
 	if ((Engine::getSong()->isPlaying()
 			&& Engine::getSong()->playMode() == Song::PlayMode::MidiClip
 			&& m_timeLine->autoScroll() != TimeLineWidget::AutoScrollState::Disabled
@@ -4646,12 +4664,17 @@ void PianoRoll::updatePosition(const TimePos & t)
 	{
 		autoScroll(t);
 	}
+	updatePositionLinePos();
+}
+
+void PianoRoll::updatePositionLinePos()
+{
 	// ticks relative to m_currentPosition
 	// < 0 = outside viewport left
 	// > width = outside viewport right
-	const int pos = (static_cast<int>(m_timeLine->pos()) - m_currentPosition) * m_ppb / TimePos::ticksPerBar();
+	const int pos = (static_cast<int>(m_timeLine->timeline()->pos()) - m_currentPosition) * m_ppb / TimePos::ticksPerBar();
 	// if pos is within visible range, show it
-	if (pos >= 0 && pos <= width() - m_whiteKeyWidth)
+	if (hasValidMidiClip() && pos >= 0 && pos <= width() - m_whiteKeyWidth)
 	{
 		m_positionLine->show();
 		// adjust pos for piano keys width and self line width (align to rightmost of line)
@@ -4672,8 +4695,9 @@ void PianoRoll::updatePositionLineHeight()
 
 
 
-void PianoRoll::updatePositionAccompany( const TimePos & t )
+void PianoRoll::updatePositionAccompany()
 {
+	const TimePos& t = Engine::getSong()->getPlayPos(Song::PlayMode::Song);
 	Song * s = Engine::getSong();
 
 	if( m_recording && hasValidMidiClip() &&
@@ -4682,11 +4706,11 @@ void PianoRoll::updatePositionAccompany( const TimePos & t )
 		TimePos pos = t;
 		if (s->playMode() != Song::PlayMode::Pattern)
 		{
-			pos -= m_midiClip->startPosition();
+			pos -= m_midiClip->startPosition() + m_midiClip->startTimeOffset();
 		}
 		if( (int) pos > 0 )
 		{
-			s->getPlayPos( Song::PlayMode::MidiClip ).setTicks( pos );
+			m_timeLine->timeline()->setTicks(pos);
 			autoScroll( pos );
 		}
 	}
@@ -4711,6 +4735,7 @@ void PianoRoll::zoomingChanged()
 	m_timeLine->setPixelsPerBar( m_ppb );
 	m_stepRecorderWidget.setPixelsPerBar( m_ppb );
 	m_positionLine->zoomChange(m_zoomLevels[m_zoomingModel.value()]);
+	updatePositionLinePos();
 
 	update();
 }
@@ -5391,13 +5416,11 @@ bool PianoRollWindow::hasFocus() const
 
 void PianoRollWindow::showEvent(QShowEvent*)
 {
-	// PianoRoll can ONLY be shown if hasValidMidiClip is true
-	// TODO remove hasValidMidiClip checks throughout the code
-	if (m_editor->hasValidMidiClip()) { return; }
-
 	// A new user might try to open PianoRoll in an empty project unaware that they first need to create a clip.
 	// To make life easier for them we create and/or open the first clip in an empty project.
-	// If there are multiple non-empty clips, we tell the user to double click one of them instead.
+
+	// Has a clip already, do nothing
+	if (m_editor->hasValidMidiClip()) { return; }
 
 	InstrumentTrack* firstTrack = nullptr;
 	MidiClip* firstEmptyClip = nullptr;
@@ -5425,13 +5448,9 @@ void PianoRollWindow::showEvent(QShowEvent*)
 			{
 				firstMelodyClip = midiClip;
 			}
-			// If there are multiple non-empty clips in the Song, show a hint
+			// If there are multiple clips with notes, do nothing
 			else
 			{
-				TextFloat::displayMessage(tr("No clip selected"),
-					tr("Double click a melody clip in the Song Editor to open it."),
-					embed::getIconPixmap("error"), 5000);
-				parentWidget()->hide();
 				return;
 			}
 		}
@@ -5446,24 +5465,13 @@ void PianoRollWindow::showEvent(QShowEvent*)
 	{
 		m_editor->setCurrentMidiClip(new MidiClip(firstTrack));
 	}
-	// If we found no instrument tracks, show a hint
-	else
-	{
-		TextFloat::displayMessage(tr("No instrument tracks"),
-			tr("Drag an instrument plugin or preset from the sidebar to the Song Editor."),
-			embed::getIconPixmap("error"), 5000);
-		parentWidget()->hide();
-	}
 }
 
 
 void PianoRollWindow::updateAfterMidiClipChange()
 {
-	if (!m_editor->hasValidMidiClip())
-	{
-		parentWidget()->hide();
-		return;
-	}
+	setEnabled(m_editor->hasValidMidiClip());
+	m_editor->m_timeLine->setVisible(m_editor->hasValidMidiClip());
 
 	clipRenamed();
 	updateStepRecordingIcon(); //MIDI clip change turn step recording OFF - update icon accordingly

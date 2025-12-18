@@ -919,7 +919,9 @@ void MainWindow::help()
 
 void MainWindow::toggleWindow( QWidget *window, bool forceShow )
 {
-	QWidget *parent = window->parentWidget();
+	// All "windows" should be inside a SubWindow, because the use of activeSubWindow() depends on it
+	auto parent = dynamic_cast<QMdiSubWindow*>(window->parentWidget());
+	if (parent == nullptr) { return; }
 
 	if( forceShow ||
 		m_workspace->activeSubWindow() != parent ||
@@ -927,7 +929,8 @@ void MainWindow::toggleWindow( QWidget *window, bool forceShow )
 	{
 		parent->show();
 		window->show();
-		window->setFocus();
+		if (window->isEnabled()) { window->setFocus(); }
+		else { m_workspace->setActiveSubWindow(parent); }
 	}
 	else
 	{
