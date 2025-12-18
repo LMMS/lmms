@@ -23,6 +23,7 @@
  */
 
 #include "SfzSampler.h"
+#include "SfzParser.h"
 
 #include <QDomElement>
 #include <QDebug>
@@ -61,43 +62,8 @@ PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* m, void*)
 } // end extern
 
 
-
-
-int keyStringToInt(QString keyString)
-{
-	bool ok;
-	int asInt = keyString.toInt(&ok);
-	if (ok) { return asInt; }
-	qDebug() << "yyayyyy";
-	QString octaveString = keyString.right(1);
-	QString keyName = keyString.chopped(1).toLower();
-	qDebug() << octaveString << keyName;
-	bool ok2;
-	int octave = octaveString.toInt(&ok2);
-	if (!ok2) { qDebug() << "AAAA bad octave"; return 0; }
-	int keyOffset = 0;
-	if (keyName == "a") { keyOffset = 0; }
-	else if (keyName == "a#" || keyName == "bb") { keyOffset = 1; }
-	else if (keyName == "b") { keyOffset = 2; }
-	else if (keyName == "c") { keyOffset = 3; }
-	else if (keyName == "c#" || keyName == "db") { keyOffset = 4; }
-	else if (keyName == "d") { keyOffset = 5; }
-	else if (keyName == "d#" || keyName == "eb") { keyOffset = 6; }
-	else if (keyName == "e") { keyOffset = 7; }
-	else if (keyName == "f") { keyOffset = 8; }
-	else if (keyName == "f#" || keyName == "gb") { keyOffset = 9; }
-	else if (keyName == "g") { keyOffset = 10; }
-	else if (keyName == "g#" || keyName == "ab") { keyOffset = 11; }
-	else { qDebug() << "AAAA bad key";  return 0; }
-	qDebug() << "returning" << 21 + octave * 12 + keyOffset;
-	return 21 + octave * 12 + keyOffset;
-}
-
-
 SfzSampler::SfzSampler(InstrumentTrack* instrumentTrack)
 	: Instrument(instrumentTrack, &sfzsampler_plugin_descriptor, nullptr, Flag::IsSingleStreamed)
-	, m_originalSample1()
-	, m_originalSample2()
 	, m_tempBuffer(new SampleFrame[Engine::audioEngine()->framesPerPeriod()])
 	, m_parentTrack(instrumentTrack)
 {
@@ -127,6 +93,7 @@ bool SfzSampler::handleMidiEvent(const MidiEvent& event, const TimePos& time, f_
 		int velocity = event.velocity();
 		qDebug() << "Note on!" << key << velocity;
 	}
+	return true;
 }
 
 
@@ -145,7 +112,26 @@ void SfzSampler::playNote(NotePlayHandle* handle, SampleFrame* workingBuffer)
 
 	if (!handle->m_pluginData) 
 	{
-		handle->m_pluginData = ;
+		qDebug() << "Note play handle no plugin data!";
+		// Find an empty active note array
+		for (int i = 0; i < MAX_ACTIVE_NOTES; ++i)
+		{
+			if (m_activeNoteArrays[i] == std::nullopt)
+			{
+				handle->m_pluginData = &m_activeNoteArrays[i];
+			}
+		}
+		// Did we find an open array?
+		if (!handle->m_pluginData) { qDebug() << "[SFZ Player] Could not find vacant note array in buffer!"; return; }
+		
+		auto* activeNoteArray = static_cast<std::optional<std::array<SfzRegionPlayState, MAX_SOUNDS_PER_NOTE_PRESS>>*>(handle->m_pluginData);
+
+		// Now loop through the regions are check which ones meet the conditions to spawn a new note
+
+		for (auto region : m_sfzRegions)
+		{
+			// TODO
+		}
 	}
 }
 
@@ -157,17 +143,14 @@ void SfzSampler::deleteNotePluginData(NotePlayHandle* handle)
 
 void SfzSampler::loadFile(const QString& filepath)
 {
-	QString parentDirectory = QFileInfo(filepath).absoluteDir().path() + "/";
-	qDebug() << "File!" << filepath;
-	qDebug() << "Dir!" << parentDirectory;
-	QFile file(filepath);
-
-	if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) { qDebug() << "Could not read!!"; return; }
-
-	while (!file.atEnd())
-	{
-		QString line = file.readLine();
-	}
+	bool successful = SfzParser::parseSfzFile(filepath, m_sfzRegions);
+	qDebug() << "was okay?" << successful;
+	qDebug() << "num regions" << m_sfzRegions.size();
+	qDebug() << "first region sample" << m_sfzRegions[0].m_sample.value_or("aaaa");
+	qDebug() << "first region lokey" << m_sfzRegions[0].m_lokey.value_or(-1);
+	qDebug() << "first region hikey" << m_sfzRegions[0].m_hikey.value_or(-1);
+	qDebug() << "first region lovel" << m_sfzRegions[0].m_lovel.value_or(-1);
+	qDebug() << "first region hivel" << m_sfzRegions[0].m_hivel.value_or(-1);
 }
 
 void SfzSampler::saveSettings(QDomDocument& document, QDomElement& element)

@@ -1,18 +1,27 @@
 
 
 #include "SfzParser.h"
-//#include <QDir>
+#include "SfzOpcodeState.h"
+#include <QDir>
+//#include <QFile>
+#include <QStringList>
+#include <QRegularExpression>
+#include <QDebug>
 
 namespace lmms
 {
 
 
-static bool SfzParser::parseSfzFile(const QString& filePath, std::vector<SfzRegion>& outputRegions)
+bool SfzParser::parseSfzFile(const QString& filePath, std::vector<SfzRegion>& outputRegions)
 {
 	QDir parentDirectory = QFileInfo(filePath).absoluteDir();
 	QFile file(filePath);
 
-	if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) { qDebug() << "Could not read!!"; return; }
+	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+	{
+		qDebug() << "[SFZ Parser] Could not read file:" << filePath;
+		return false;
+	}
 
 	std::vector<QString> parsedSegments;
 
@@ -26,7 +35,7 @@ static bool SfzParser::parseSfzFile(const QString& filePath, std::vector<SfzRegi
 		// of accidentally splitting the opcode name from the value.
 		for (QString segment : line.split(QRegularExpression("\\s+"), Qt::SkipEmptyParts))
 		{
-			parsedSegments.push_back(parsedSegments);
+			parsedSegments.push_back(segment);
 		}
 	}
 
@@ -37,27 +46,29 @@ static bool SfzParser::parseSfzFile(const QString& filePath, std::vector<SfzRegi
 	// Create a base opcode state list to keep track of which defaults are global
 	SfzOpcodeState globalState;
 
-	bool withinGlobal = false
+	bool withinGlobal = false;
 	for (QString segment : parsedSegments)
 	{
 		// Track whether we are entering a <global> header region
-		if (segment == "<global>")
+		if (segment.front() == "<" && segment.back() == ">")
 		{
-			withinGlobal = true;
+			if (segment == "<global>")
+			{
+				withinGlobal = true;
+			}
+			else
+			{
+				withinGlobal = false;
+			}
 			continue;
 		}
-		else if (segment == "<group>" || segment == "<region>")
-		{
-			withinGlobal = false;
-			continue;
-		}
-		// TODO handle more header types
 
 		// If we are in <global>, update the global opcode state
 		if (withinGlobal)
 		{
 			// Opcodes are stored in name=value format, with no spaces, so splitting on the "=" always works
-			auto opcodeNameAndValue = segment.split("="); // TODO add debug message if error
+			auto opcodeNameAndValue = segment.split("=");
+			if (opcodeNameAndValue.size() != 2) { qDebug() << "[SFZ Parser] Syntax error, could not parse opcode assignment:" << segment; return false; }
 			globalState.setOpcodeByStrings(opcodeNameAndValue[0], opcodeNameAndValue[1]);
 		}
 	}
@@ -74,56 +85,67 @@ static bool SfzParser::parseSfzFile(const QString& filePath, std::vector<SfzRegi
 	withinGlobal = false;
 	bool withinGroup = false;
 	bool withinRegion = false;
-	for (segment : parsedSegments)
+	for (QString segment : parsedSegments)
 	{
-		// Track whether we are entering a <global> header region
-		if (segment == "<global>")
+		// Track whether we are entering a new header region
+		if (segment.front() == "<" && segment.back() == ">")
 		{
-			// If we were previously in a <region>, then wrap it up and add it to the output vector
-			if (withinRegion) { outputRegions.push_back(currentRegionState); }
-			withinGlobal = true;
-			withinGroup = false;
-			withinRegion = false;
-			// Don't do anything special; we handled the globals above
+			if (segment == "<global>")
+			{
+				// If we were previously in a <region>, then wrap it up and add it to the output vector
+				if (withinRegion) { outputRegions.push_back(SfzRegion(currentRegionState)); }
+				withinGlobal = true;
+				withinGroup = false;
+				withinRegion = false;
+				// Don't do anything special; we already handled the globals above
+			}
+			else if (segment == "<group>")
+			{
+				if (withinRegion) { outputRegions.push_back(SfzRegion(currentRegionState)); }
+				withinGlobal = false;
+				withinGroup = true;
+				withinRegion = false;
+				// Reset the current group settings to the global defaults
+				currentGroupState = globalState;
+			}
+			else if (segment == "<region>")
+			{
+				if (withinRegion) { outputRegions.push_back(SfzRegion(currentRegionState)); }
+				withinGlobal = false;
+				withinGroup = false;
+				withinRegion = true;
+				// Reset the current region settings to the group defaults
+				currentRegionState = currentGroupState;
+			}
+			else
+			{
+				qDebug() << "[SFZ Parser] Unknown header type:" << segment;
+				return false;
+			}
 			continue;
+			// TODO handle more header types
 		}
-		else if (segment == "<group>")
-		{
-			if (withinRegion) { outputRegions.push_back(currentRegionState); }
-			withinGlobal = false;
-			withinGroup = true;
-			withinRegion = false;
-			// Reset the current group settings to the global defaults
-			currentGroupState = globalState;
-			continue;
-		}
-		else if (segment == "<region>")
-		{
-			if (withinRegion) { outputRegions.push_back(currentRegionState); }
-			withinGlobal = false;
-			withinGroup = false;
-			withinRegion = true;
-			// Reset the current region settings to the group defaults
-			currentRegionState = currentGroupState;
-			continue;
-		}
-		// TODO handle more header types
 
 		// If we are in a group, update the opcodes of the current group state
 		if (withinGroup)
 		{
-			auto opcodeNameAndValue = segment.split("="); // TODO add debug message if error
+			auto opcodeNameAndValue = segment.split("=");
+			if (opcodeNameAndValue.size() != 2) { qDebug() << "[SFZ Parser] Syntax error, could not parse opcode assignment:" << segment; return false; }
 			currentGroupState.setOpcodeByStrings(opcodeNameAndValue[0], opcodeNameAndValue[1]);
 		}
 		// If we are within a region, update the opcodes of the current region state
 		if (withinRegion)
 		{
-			auto opcodeNameAndValue = segment.split("="); // TODO add debug message if error
+			auto opcodeNameAndValue = segment.split("=");
+			if (opcodeNameAndValue.size() != 2) { qDebug() << "[SFZ Parser] Syntax error, could not parse opcode assignment:" << segment; return false; }
 			currentRegionState.setOpcodeByStrings(opcodeNameAndValue[0], opcodeNameAndValue[1]);
 		}
 	}
+	// Check one last time in case the file ended with a region and didn't get added
+	if (withinRegion) { outputRegions.push_back(SfzRegion(currentRegionState)); }
 
 	// Now that all the opcodes have been parsed into regions and added to the output vector, we are done!
+	return true;
 }
 
 

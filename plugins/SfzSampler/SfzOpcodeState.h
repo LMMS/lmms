@@ -2,9 +2,9 @@
 #ifndef LMMS_SFZ_OPCODE_STATE_H
 #define LMMS_SFZ_OPCODE_STATE_H
 
-#include "SfzOpcodes.h"
+//#include "SfzOpcodes.h"
 #include <QString>
-//#include <optional>
+#include <optional>
 
 namespace lmms
 {
@@ -12,9 +12,9 @@ namespace lmms
 class SfzOpcodeState
 {
 public:
-	void setOpcodeByStrings(const QString& name, const QString& value);
+	bool setOpcodeByStrings(const QString& name, const QString& value);
 
-private:
+//private:
 	std::optional<QString> m_sample = std::nullopt;
 
 	std::optional<int> m_key = std::nullopt;
@@ -34,7 +34,7 @@ private:
 	std::optional<float> m_ampeg_release = 0.001;
 
 	friend class SfzRegion;
-}
+};
 
 
 } // namespace lmms

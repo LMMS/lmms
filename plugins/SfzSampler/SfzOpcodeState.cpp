@@ -3,6 +3,7 @@
 
 
 #include "SfzOpcodeState.h"
+#include <QDebug>
 
 namespace lmms
 {
@@ -67,6 +68,11 @@ bool SfzOpcodeState::setOpcodeByStrings(const QString& name, const QString& valu
 	else if (name == "ampeg_release")
 	{
 		m_ampeg_release = value.toFloat(&successful);
+	}
+	else
+	{
+		qDebug() << "[SFZ Parser] Unknown opcode:" << name;
+		return false;
 	}
 
 	return successful;

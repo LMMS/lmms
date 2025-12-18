@@ -3,6 +3,7 @@
 #define LMMS_SFZ_OPCODES_H
 
 #include <QString>
+#include <map>
 
 namespace lmms
 {
@@ -26,7 +27,7 @@ enum class SfzOpcodes
 	AmpEGSustain,
 	AmpEGDecay,
 	AmpEGRelease,
-}
+};
 
 
 std::map<SfzOpcodes, QString> SfzOpcodeNames = {
@@ -40,7 +41,7 @@ std::map<SfzOpcodes, QString> SfzOpcodeNames = {
 	{SfzOpcodes::HiVel, "hivel"},
 
 	{SfzOpcodes::PitchKeyCenter, "pitch_keycenter"},
-}
+};
 
 
 } // namespace lmms

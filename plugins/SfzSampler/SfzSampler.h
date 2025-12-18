@@ -31,7 +31,9 @@
 #include "Note.h"
 #include "Sample.h"
 #include "SfzSamplerView.h"
-#include "SfzFormat.h"
+#include "SfzParser.h"
+#include "SfzRegion.h"
+#include "SfzRegionPlayState.h"
 
 namespace lmms {
 
@@ -61,6 +63,17 @@ private:
 	SampleFrame* m_tempBuffer;
 
 	InstrumentTrack* m_parentTrack;
+
+	std::vector<SfzRegion> m_sfzRegions;
+	
+
+	// We need to keep track of which notes are active. Because a single NotePlayHandle can create multiple sounds,
+	// their m_pluginData need to point to an array of SfzRegionPlayStates. We don't want to perform any allocations at runtime,
+	// so we define a buffer to hold a bunch of them at once and give out pointers to the NotePlayHandles as they are created.
+	static constexpr int MAX_SOUNDS_PER_NOTE_PRESS = 16;
+	static constexpr int MAX_ACTIVE_NOTES = 128;
+	
+	std::array<std::optional<std::array<SfzRegionPlayState, MAX_SOUNDS_PER_NOTE_PRESS>>, MAX_ACTIVE_NOTES> m_activeNoteArrays;
 
 	friend class gui::SfzSamplerView;
 };

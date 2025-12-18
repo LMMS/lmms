@@ -4,6 +4,7 @@
 
 #include "SfzRegion.h"
 #include <QString>
+#include <vector>
 
 namespace lmms
 {
@@ -12,8 +13,7 @@ class SfzParser
 {
 public:
 	static bool parseSfzFile(const QString& filePath, std::vector<SfzRegion>& outputRegions);
-
-}
+};
 
 
 
