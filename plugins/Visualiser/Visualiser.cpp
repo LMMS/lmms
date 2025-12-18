@@ -1,6 +1,6 @@
 #include "Visualiser.h"
-#include <lmms/Plugin.h>
-#include <lmms/SampleFrame.h>
+#include <Plugin.h>
+#include <SampleFrame.h>
 #include "plugin_export.h" // <--- CRITICAL FIX: Defines PLUGIN_EXPORT
 #include <QWidget>
 #include <QPainter>
