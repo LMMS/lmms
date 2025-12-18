@@ -39,7 +39,8 @@
 #include "interpolation.h"
 #include "plugin_export.h"
 
-namespace lmms {
+namespace lmms
+{
 
 extern "C" {
 Plugin::Descriptor PLUGIN_EXPORT sfzsampler_plugin_descriptor = {
