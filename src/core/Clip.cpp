@@ -85,7 +85,6 @@ Clip::Clip(const Clip& other):
 	if (getTrack())
 	{
 		getTrack()->addClip(this);
-		connect(getTrack(), &Track::nameChanged, this, &Clip::nameChanged);
 	}
 }
 

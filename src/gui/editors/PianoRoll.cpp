@@ -907,6 +907,7 @@ void PianoRoll::setCurrentMidiClip( MidiClip* newMidiClip )
 		this, SLOT(update()));
 	connect(m_midiClip, &MidiClip::lengthChanged, this, qOverload<>(&QWidget::update));
 	connect(m_midiClip, &MidiClip::nameChanged, this, &PianoRoll::currentMidiClipRenamed);
+	connect(m_midiClip->getTrack(), &Track::nameChanged, this, &PianoRoll::currentMidiClipRenamed);
 
 	update();
 	emit currentMidiClipChanged();
@@ -5464,7 +5465,10 @@ void PianoRollWindow::updateWindowTitle()
 {
 	if ( currentMidiClip() )
 	{
-		setWindowTitle( tr( "Piano-Roll - %1" ).arg( currentMidiClip()->name() ) );
+		const auto& name = currentMidiClip()->name().isEmpty()
+			? currentMidiClip()->getTrack()->name()
+			: currentMidiClip()->name();
+		setWindowTitle(tr("Piano-Roll - %1").arg(name));
 	}
 	else
 	{
