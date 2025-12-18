@@ -55,6 +55,7 @@ Clip::Clip( Track * track ) :
 	if( getTrack() )
 	{
 		getTrack()->addClip( this );
+		connect(track, &Track::nameChanged, this, &Clip::nameChanged);
 	}
 	setJournalling( false );
 	movePosition( 0 );
@@ -84,6 +85,7 @@ Clip::Clip(const Clip& other):
 	if (getTrack())
 	{
 		getTrack()->addClip(this);
+		connect(getTrack(), &Track::nameChanged, this, &Clip::nameChanged);
 	}
 }
 

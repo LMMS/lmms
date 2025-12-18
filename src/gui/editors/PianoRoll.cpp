@@ -906,6 +906,7 @@ void PianoRoll::setCurrentMidiClip( MidiClip* newMidiClip )
 	connect(m_midiClip->instrumentTrack()->microtuner()->keyRangeImportModel(), SIGNAL(dataChanged()),
 		this, SLOT(update()));
 	connect(m_midiClip, &MidiClip::lengthChanged, this, qOverload<>(&QWidget::update));
+	connect(m_midiClip, &MidiClip::nameChanged, this, &PianoRoll::currentMidiClipRenamed);
 
 	update();
 	emit currentMidiClipChanged();
@@ -5210,7 +5211,8 @@ PianoRollWindow::PianoRollWindow() :
 	// Connections
 	connect( m_editor, SIGNAL(currentMidiClipChanged()), this, SIGNAL(currentMidiClipChanged()));
 	connect( m_editor, SIGNAL(currentMidiClipChanged()), this, SLOT(updateAfterMidiClipChange()));
-	// Initial setup of window title etc
+	connect(m_editor, &PianoRoll::currentMidiClipRenamed, this, &PianoRollWindow::updateWindowTitle);
+	// Trigger initial setup of window title etc
 	setCurrentMidiClip(nullptr);
 }
 
@@ -5236,12 +5238,6 @@ void PianoRollWindow::setGhostMidiClip( MidiClip* clip )
 void PianoRollWindow::setCurrentMidiClip( MidiClip* clip )
 {
 	m_editor->setCurrentMidiClip( clip );
-
-	if ( clip )
-	{
-		connect( clip->instrumentTrack(), SIGNAL(nameChanged()), this, SLOT(updateAfterMidiClipChange()));
-		connect( clip, SIGNAL(dataChanged()), this, SLOT(updateAfterMidiClipChange()));
-	}
 }
 
 
@@ -5460,11 +5456,11 @@ void PianoRollWindow::updateAfterMidiClipChange()
 	setEnabled(m_editor->hasValidMidiClip());
 	m_editor->m_timeLine->setVisible(m_editor->hasValidMidiClip());
 
-	clipRenamed();
+	updateWindowTitle();
 	updateStepRecordingIcon(); //MIDI clip change turn step recording OFF - update icon accordingly
 }
 
-void PianoRollWindow::clipRenamed()
+void PianoRollWindow::updateWindowTitle()
 {
 	if ( currentMidiClip() )
 	{

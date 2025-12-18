@@ -252,6 +252,7 @@ protected slots:
 
 signals:
 	void currentMidiClipChanged();
+	void currentMidiClipRenamed();
 	void ghostClipSet(bool);
 	void semiToneMarkerMenuScaleSetEnabled(bool);
 	void semiToneMarkerMenuChordSetEnabled(bool);
@@ -584,9 +585,9 @@ private slots:
 	void ghostClipSet( bool state );
 	void exportMidiClip();
 	void importMidiClip();
+	void updateWindowTitle();
 
 private:
-	void clipRenamed();
 	void focusInEvent(QFocusEvent * event) override;
 	void showEvent(QShowEvent* se) override;
 
