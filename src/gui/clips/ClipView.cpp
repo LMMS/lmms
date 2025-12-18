@@ -117,7 +117,7 @@ ClipView::ClipView( Clip * clip,
 
 	connect( m_clip, SIGNAL(lengthChanged()),
 			this, SLOT(updateLength()));
-	connect(m_clip, &Clip::nameChanged, this, qOverload<>(&QWidget::update));
+	connect(m_clip, &Clip::nameChanged, this, qOverload<>(&ClipView::update));
 	connect(getGUI()->songEditor()->m_editor, &SongEditor::pixelsPerBarChanged, this, &ClipView::updateLength);
 	connect( m_clip, SIGNAL(positionChanged()),
 			this, SLOT(updatePosition()));
