@@ -1,7 +1,7 @@
 #include "Visualiser.h"
-#include <Plugin.h>
-#include <SampleFrame.h>
-#include "plugin_export.h" // <--- CRITICAL FIX: Defines PLUGIN_EXPORT
+#include <lmms/Plugin.h>
+#include <lmms/SampleFrame.h>
+#include "plugin_export.h" 
 #include <QWidget>
 #include <QPainter>
 #include <QTimer>
@@ -23,8 +23,9 @@
 namespace lmms
 {
 
+// --- FIX: Added PLUGIN_EXPORT here to match the definition at the bottom ---
 extern "C" {
-    extern Plugin::Descriptor Visualiser_plugin_descriptor;
+    extern Plugin::Descriptor PLUGIN_EXPORT Visualiser_plugin_descriptor;
 }
 
 #define BUFFER_SIZE 512
@@ -1803,7 +1804,7 @@ extern "C"
         "Visualiser",
         "Visualiser",
         QT_TRANSLATE_NOOP("PluginBrowser","Visualiser Plugin"),
-        "Ewan Pettigrew",
+        "Your Name",
         0x0100,
         Plugin::Type::Effect,
         nullptr,
