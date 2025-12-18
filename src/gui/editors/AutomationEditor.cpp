@@ -2251,7 +2251,7 @@ void AutomationEditorWindow::setCurrentClip(AutomationClip* clip)
 	if (clip)
 	{
 		connect(clip, SIGNAL(dataChanged()), this, SLOT(update()));
-		connect( clip, SIGNAL(dataChanged()), this, SLOT(updateWindowTitle()));
+		connect(clip, &Clip::nameChanged, this, &AutomationEditorWindow::updateWindowTitle);
 		connect(clip, SIGNAL(destroyed()), this, SLOT(clearCurrentClip()));
 
 		connect(m_flipXAction, SIGNAL(triggered()), clip, SLOT(flipX()));
