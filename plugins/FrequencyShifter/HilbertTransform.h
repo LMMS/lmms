@@ -76,9 +76,9 @@ struct HilbertIIRFloat
 	alignas(16) float coeffsI[order];
 	alignas(16) float polesR[order];
 	alignas(16) float polesI[order];
-	float direct;
 	alignas(16) float stateR[Channels][order];
 	alignas(16) float stateI[Channels][order];
+	float direct;
 
 	HilbertIIRFloat(float sampleRate = 48000.0f, float passbandGain = 2.0f)
 	{

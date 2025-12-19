@@ -83,30 +83,31 @@ private:
 
 		return out;
 	}
-
-	FrequencyShifterControls m_controls;
-	float m_phase[2] = {0.f, 0.f};
-	float m_sampleRate = 0.f;
-	float m_twoPiOverSr = 0.f;
-
-	int m_ringBufSize = 0;
-	std::vector<std::array<float, 2>> m_ringBuf;
-	int m_writeIndex = 0;
-
+	
 	HilbertIIRFloat<2> m_hilbert1;
 	HilbertIIRFloat<2> m_hilbert2;
+	
+	std::vector<std::array<float, 2>> m_ringBuf;
+	
+	std::array<float, 2> m_phase{};
+	std::array<float, 2> m_trueShift{};
+	std::array<float, 2> m_dampState{};
+	std::array<float, 2> m_toneState{};
+	
+	float m_lfoPhase{};
+	float m_truePhase{};
+	float m_trueDelay{1.f};
+	
+	float m_twoPiOverSr{};
+	float m_sampleRate{};
+	
+	int m_ringBufSize{};
+	int m_writeIndex{};
+	
+	bool m_prevResetShifter{};
+	bool m_prevResetLfo{};
 
-	float m_lfoPhase = 0.f;
-
-	std::array<float, 2> m_dampState = {0.f, 0.f};
-	std::array<float, 2> m_toneState = {0.f, 0.f};
-
-	float m_trueShift[2] = {0.f, 0.f};
-	float m_truePhase = 0.f;
-	float m_trueDelay = 1.f;
-
-	bool m_prevResetShifter = false;
-	bool m_prevResetLfo = false;
+	FrequencyShifterControls m_controls;
 };
 
 } // namespace lmms
