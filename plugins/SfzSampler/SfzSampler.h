@@ -61,7 +61,7 @@ public:
 	gui::PluginView* instantiateView(QWidget* parent) override;
 
 private:
-	void processTrigger(const SfzTrigger&);
+	void processTrigger(const SfzTrigger& trigger);
 
 	SampleFrame* m_tempBuffer;
 
@@ -71,9 +71,6 @@ private:
 	SfzGlobalState m_sfzGlobalState;
 
 	std::vector<SfzRegion> m_sfzRegions;
-
-	static constexpr int MAX_ACTIVE_NOTES = 128;
-	std::array<SfzRegionPlayState, MAX_ACTIVE_NOTES> m_activeNotes;
 
 	friend class gui::SfzSamplerView;
 };

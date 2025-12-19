@@ -4,23 +4,25 @@
 
 #include "SampleFrame.h"
 #include "SfzTrigger.h"
-#include "SfzRegion.h"
+#include "SfzOpcodeState.h"
 
 namespace lmms
 {
+
+class SfzRegion;
 
 
 class SfzRegionPlayState
 {
 public:
-	SfzRegionPlayState(const SfzRegion& region, const SfzTrigger& trigger);
+	SfzRegionPlayState(const SfzRegion* region, const SfzTrigger& trigger);
 	SfzRegionPlayState() = default; // Needed to initialize array
 
 	//! Generates the next buffer of audio from this sound. If m_active is false, this function does nothing.
-	void play(SampleFrame* buffer, fpp_t frames);
+	void play(SampleFrame* buffer, const fpp_t frames);
 
 	//! Handle incoming event to decide whether to deactivate/release
-	void processTrigger(const& SfzTrigger);
+	void processTrigger(const SfzTrigger& trigger);
 
 	bool active() const { return m_active; }
 

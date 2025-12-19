@@ -117,37 +117,11 @@ void SfzSampler::processTrigger(const SfzTrigger& trigger)
 {
 	// Notify the global state to update which keys are active
 	m_sfzGlobalState.processTrigger(trigger);
+
 	// Loop through all the regions to check if a new note should be played
-	for (int regionIndex = 0; regionIndex < m_sfzRegions.size(); ++regionIndex)
+	for (auto& region : m_sfzRegions)
 	{
-		auto& region = m_sfzRegions.at(regionIndex);
-		if (region.triggerConditionsMet(m_sfzGlobalState, trigger))
-		{
-			// Loop through array to find open position
-			bool foundOpenPosition = false;
-			for (int i = 0; i < MAX_ACTIVE_NOTES; ++i)
-			{
-				if (!m_activeNotes[i].active())
-				{
-					m_activeNotes[i] = SfzRegionPlayState(region, trigger);
-					// Notify the global state to update the count of active notes in the region
-					m_sfzGlobalState.regionTriggered(regionIndex);
-					foundOpenPosition = true;
-					break;
-				}
-			}
-			if (!foundOpenPosition) { qDebug() << "[SFZ Player] Could not find vacant position in note state buffer!"; }
-		}
-	}
-	// Loop through all the active notes to check if any need to be deactivated/released by the trigger
-	for (auto regionPlayState : m_activeNotes)
-	{
-		if (regionPlayState.active())
-		{
-			regionPlayState.processTrigger(trigger);
-			// If the trigger deactivated the sound, notify the global state to update the number of active notes in that region
-			if (!regionPlayState.active()) { m_sfzGlobalState.regionEnded(regionPlayState); }
-		}
+		region.processTrigger(m_sfzGlobalState, trigger);
 	}
 }
 
@@ -159,10 +133,11 @@ void SfzSampler::play(SampleFrame* workingBuffer)
 {
 	const fpp_t frames = Engine::audioEngine()->framesPerPeriod();
 
-	for (auto regionPlayState : m_activeNotes)
+	for (auto& region : m_sfzRegions)
 	{
-		// Render audio from each of the active notes
-		regionPlayState.play(m_tempBuffer, frames);
+		// Render audio from each of the regions
+		// This amounts to the regions themselves rendering the audio from each of their active SfzRegionPlayStates
+		region.play(m_tempBuffer, frames);
 		for (f_cnt_t f = 0; f < frames; ++f)
 		{
 			workingBuffer[f] += m_tempBuffer[f];

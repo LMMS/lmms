@@ -5,21 +5,13 @@
 namespace lmms
 {
 
-SfzGlobalState::SfzGlobalState(const int numRegions)
-{
-	m_regionNoteCounts.resize(numRegions);
-}
-
 void SfzGlobalState::processTrigger(const SfzTrigger& trigger)
 {
 }
 
-void SfzGlobalState::regionTriggered(const SfzRegion& region)
+int SfzGlobalState::lastKeyPressedInRange(const int lowKey, const int highKey)
 {
-}
-
-void SfzGlobalState::regionEnded(const SfzRegion& region)
-{
+	return 0;
 }
 
 

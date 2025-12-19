@@ -5,14 +5,14 @@
 namespace lmms
 {
 
-SfzRegionPlayState::SfzRegionPlayState(const SfzRegion& region, const SfzTrigger& trigger)
+SfzRegionPlayState::SfzRegionPlayState(const SfzRegion* region, const SfzTrigger& trigger)
 	: m_trigger(trigger)
-	, m_region(&region)
+	, m_region(region)
 {
 }
 
 
-void SfzRegionPlayState::play(SampleFrame* buffer, fpp_t frames)
+void SfzRegionPlayState::play(SampleFrame* buffer, const fpp_t frames)
 {
 }
 
