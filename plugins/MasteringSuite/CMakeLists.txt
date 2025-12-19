@@ -6,7 +6,7 @@ BUILD_PLUGIN(MasteringSuite
     MasteringSuiteControls.h
     MasteringSuiteDialog.h
     MasteringScope.h
-    TinyFFT.h      # <--- ADD THIS LINE
+    TinyFFT.h
     MOCFILES
     MasteringSuiteControls.h
     MasteringSuiteDialog.h
