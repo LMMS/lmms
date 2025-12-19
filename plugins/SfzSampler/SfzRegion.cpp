@@ -15,5 +15,9 @@ SfzRegion::SfzRegion(SfzOpcodeState opcodeState)
 {
 }
 
+bool SfzRegion::triggerConditionsMet(const SfzGlobalState& globalState, const SfzTrigger& trigger)
+{
+	return false;
+}
 
 } // namespace lmms

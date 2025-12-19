@@ -3,7 +3,6 @@
 #include "SfzParser.h"
 #include "SfzOpcodeState.h"
 #include <QDir>
-//#include <QFile>
 #include <QStringList>
 #include <QRegularExpression>
 #include <QDebug>
@@ -14,6 +13,10 @@ namespace lmms
 
 bool SfzParser::parseSfzFile(const QString& filePath, std::vector<SfzRegion>& outputRegions)
 {
+	// Clear the vector of regions just in case anything is inside it from before
+	outputRegions.clear();
+
+	// Open the .sfz file
 	QDir parentDirectory = QFileInfo(filePath).absoluteDir();
 	QFile file(filePath);
 
@@ -145,6 +148,7 @@ bool SfzParser::parseSfzFile(const QString& filePath, std::vector<SfzRegion>& ou
 	if (withinRegion) { outputRegions.push_back(SfzRegion(currentRegionState)); }
 
 	// Now that all the opcodes have been parsed into regions and added to the output vector, we are done!
+	// The samples themselves still need to be loaded, but that's a job for later
 	return true;
 }
 

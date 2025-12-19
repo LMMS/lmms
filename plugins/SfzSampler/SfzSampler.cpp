@@ -89,50 +89,22 @@ bool SfzSampler::handleMidiEvent(const MidiEvent& event, const TimePos& time, f_
 {
 	if (event.type() == MidiNoteOn)
 	{
-		int key = event.key();
-		int velocity = event.velocity();
-		qDebug() << "Note on!" << key << velocity;
+		processTrigger(SfzTrigger::noteOnEvent(event.key(), event.velocity()));
+		return true;
 	}
-	return true;
+	else if (event.type() == MidiNoteOff)
+	{
+		processTrigger(SfzTrigger::noteOffEvent(event.key(), event.velocity()));
+		return true;
+	}
+	return false;
 }
-
-
-void SfzSampler::play(SampleFrame* workingBuffer)
-{
-	const fpp_t frames = Engine::audioEngine()->framesPerPeriod();
-}
-
-
 
 void SfzSampler::playNote(NotePlayHandle* handle, SampleFrame* workingBuffer)
 {
 	int noteIndex = handle->key();
 	const fpp_t frames = handle->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = handle->noteOffset();
-
-	if (!handle->m_pluginData) 
-	{
-		qDebug() << "Note play handle no plugin data!";
-		// Find an empty active note array
-		for (int i = 0; i < MAX_ACTIVE_NOTES; ++i)
-		{
-			if (m_activeNoteArrays[i] == std::nullopt)
-			{
-				handle->m_pluginData = &m_activeNoteArrays[i];
-			}
-		}
-		// Did we find an open array?
-		if (!handle->m_pluginData) { qDebug() << "[SFZ Player] Could not find vacant note array in buffer!"; return; }
-		
-		auto* activeNoteArray = static_cast<std::optional<std::array<SfzRegionPlayState, MAX_SOUNDS_PER_NOTE_PRESS>>*>(handle->m_pluginData);
-
-		// Now loop through the regions are check which ones meet the conditions to spawn a new note
-
-		for (auto region : m_sfzRegions)
-		{
-			// TODO
-		}
-	}
 }
 
 void SfzSampler::deleteNotePluginData(NotePlayHandle* handle)
@@ -141,9 +113,71 @@ void SfzSampler::deleteNotePluginData(NotePlayHandle* handle)
 }
 
 
+void SfzSampler::processTrigger(const SfzTrigger& trigger)
+{
+	// Notify the global state to update which keys are active
+	m_sfzGlobalState.processTrigger(trigger);
+	// Loop through all the regions to check if a new note should be played
+	for (int regionIndex = 0; regionIndex < m_sfzRegions.size(); ++regionIndex)
+	{
+		auto& region = m_sfzRegions.at(regionIndex);
+		if (region.triggerConditionsMet(m_sfzGlobalState, trigger))
+		{
+			// Loop through array to find open position
+			bool foundOpenPosition = false;
+			for (int i = 0; i < MAX_ACTIVE_NOTES; ++i)
+			{
+				if (!m_activeNotes[i].active())
+				{
+					m_activeNotes[i] = SfzRegionPlayState(region, trigger);
+					// Notify the global state to update the count of active notes in the region
+					m_sfzGlobalState.regionTriggered(regionIndex);
+					foundOpenPosition = true;
+					break;
+				}
+			}
+			if (!foundOpenPosition) { qDebug() << "[SFZ Player] Could not find vacant position in note state buffer!"; }
+		}
+	}
+	// Loop through all the active notes to check if any need to be deactivated/released by the trigger
+	for (auto regionPlayState : m_activeNotes)
+	{
+		if (regionPlayState.active())
+		{
+			regionPlayState.processTrigger(trigger);
+			// If the trigger deactivated the sound, notify the global state to update the number of active notes in that region
+			if (!regionPlayState.active()) { m_sfzGlobalState.regionEnded(regionPlayState); }
+		}
+	}
+}
+
+
+
+
+
+void SfzSampler::play(SampleFrame* workingBuffer)
+{
+	const fpp_t frames = Engine::audioEngine()->framesPerPeriod();
+
+	for (auto regionPlayState : m_activeNotes)
+	{
+		// Render audio from each of the active notes
+		regionPlayState.play(m_tempBuffer, frames);
+		for (f_cnt_t f = 0; f < frames; ++f)
+		{
+			workingBuffer[f] += m_tempBuffer[f];
+		}
+	}
+}
+
+
+
+
 void SfzSampler::loadFile(const QString& filepath)
 {
+	// Parse all the <region> headers of the .sfz (accounting for <global> and <group> defaults) and populate m_sfzRegions with the new SfzRegion
 	bool successful = SfzParser::parseSfzFile(filepath, m_sfzRegions);
+	//
 	qDebug() << "was okay?" << successful;
 	qDebug() << "num regions" << m_sfzRegions.size();
 	qDebug() << "first region sample" << m_sfzRegions[0].m_sample.value_or("aaaa");

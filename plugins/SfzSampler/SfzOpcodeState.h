@@ -13,6 +13,7 @@ class SfzOpcodeState
 {
 public:
 	bool setOpcodeByStrings(const QString& name, const QString& value);
+	static int keyNumFromString(QString keyString, bool* successful);
 
 //private:
 	std::optional<QString> m_sample = std::nullopt;
