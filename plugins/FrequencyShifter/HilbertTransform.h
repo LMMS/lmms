@@ -25,6 +25,8 @@
  *
  *   Copyright (c) 2024 Geraint Luff / Signalsmith Audio Ltd.
  *   Released under the 0BSD (Zero-Clause BSD) License.
+ *
+ *   https://github.com/Signalsmith-Audio/hilbert-iir/blob/main/hilbert.h
  * -------------------------------------------------------------------------
  */
 
