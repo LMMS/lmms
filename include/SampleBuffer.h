@@ -38,16 +38,6 @@ namespace lmms {
 class LMMS_EXPORT SampleBuffer
 {
 public:
-	using value_type = SampleFrame;
-	using reference = SampleFrame&;
-	using const_reference = const SampleFrame&;
-	using iterator = std::vector<SampleFrame>::iterator;
-	using const_iterator = std::vector<SampleFrame>::const_iterator;
-	using difference_type = std::vector<SampleFrame>::difference_type;
-	using size_type = std::vector<SampleFrame>::size_type;
-	using reverse_iterator = std::vector<SampleFrame>::reverse_iterator;
-	using const_reverse_iterator = std::vector<SampleFrame>::const_reverse_iterator;
-
 	SampleBuffer() = default;
 	explicit SampleBuffer(const QString& audioFile);
 	SampleBuffer(const QString& base64, int sampleRate);
@@ -55,32 +45,13 @@ public:
 	SampleBuffer(
 		const SampleFrame* data, size_t numFrames, int sampleRate = Engine::audioEngine()->outputSampleRate());
 
-	friend void swap(SampleBuffer& first, SampleBuffer& second) noexcept;
 	auto toBase64() const -> QString;
 
 	auto audioFile() const -> const QString& { return m_audioFile; }
 	auto sampleRate() const -> sample_rate_t { return m_sampleRate; }
 
-	auto begin() -> iterator;
-	auto end() -> iterator;
-
-	auto begin() const -> const_iterator { return m_data->begin(); }
-	auto end() const -> const_iterator { return m_data->end(); }
-
-	auto cbegin() const -> const_iterator { return m_data->cbegin(); }
-	auto cend() const -> const_iterator { return m_data->cend(); }
-
-	auto rbegin() -> reverse_iterator { return m_data->rbegin(); }
-	auto rend() -> reverse_iterator { return m_data->rend(); }
-
-	auto rbegin() const -> const_reverse_iterator { return m_data->rbegin(); }
-	auto rend() const -> const_reverse_iterator { return m_data->rend(); }
-
-	auto crbegin() const -> const_reverse_iterator { return m_data->crbegin(); }
-	auto crend() const -> const_reverse_iterator { return m_data->crend(); }
-
 	auto data() const -> const SampleFrame* { return m_data->data(); }
-	auto size() const -> size_type { return m_data->size(); }
+	auto size() const -> std::size_t { return m_data->size(); }
 	auto empty() const -> bool { return m_data->empty(); }
 
 private:

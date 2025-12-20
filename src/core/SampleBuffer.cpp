@@ -69,14 +69,6 @@ SampleBuffer::SampleBuffer(std::vector<SampleFrame> data, int sampleRate)
 {
 }
 
-void swap(SampleBuffer& first, SampleBuffer& second) noexcept
-{
-	using std::swap;
-	swap(first.m_data, second.m_data);
-	swap(first.m_audioFile, second.m_audioFile);
-	swap(first.m_sampleRate, second.m_sampleRate);
-}
-
 QString SampleBuffer::toBase64() const
 {
 	// TODO: Replace with non-Qt equivalent
