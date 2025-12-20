@@ -58,6 +58,9 @@ public:
 	//! Constructs a buffer with size of @a numFrames and a sample rate of @a sampleRate from the raw @a data.
 	SampleBuffer(const SampleFrame* data, f_cnt_t numFrames, sample_rate_t sampleRate);
 
+	//! Constructs a silent buffer with a size of @a numFrames and a sample Rate of @a sampleRate.
+	SampleBuffer(f_cnt_t numFrames, sample_rate_t sampleRate);
+
 	//! @returns a mutable reference the audio frame at the given @a index.
 	auto operator[](f_cnt_t index) -> SampleFrame&;
 

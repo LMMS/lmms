@@ -64,6 +64,12 @@ SampleBuffer::SampleBuffer(const SampleFrame* data, f_cnt_t numFrames, sample_ra
 {
 }
 
+SampleBuffer::SampleBuffer(f_cnt_t numFrames, sample_rate_t sampleRate)
+	: m_data(std::make_shared<std::vector<SampleFrame>>(numFrames))
+	, m_sampleRate(sampleRate)
+{
+}
+
 auto SampleBuffer::operator[](f_cnt_t index) -> SampleFrame&
 {
 	assert(index < m_data->size());
