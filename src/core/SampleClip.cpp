@@ -322,7 +322,7 @@ void SampleClip::loadSettings( const QDomElement & _this )
 			Engine::audioEngine()->outputSampleRate();
 
 		const auto buffer = gui::SampleLoader::createBufferFromBase64(_this.attribute("data"), sampleRate);
-		m_sample = Sample{buffer};
+		m_sample = Sample{std::move(buffer)};
 	}
 	changeLength( _this.attribute( "len" ).toInt() );
 	setMuted( _this.attribute( "muted" ).toInt() );
