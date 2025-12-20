@@ -44,7 +44,6 @@ class SfzSampler : public Instrument
 
 public:
 	SfzSampler(InstrumentTrack* instrumentTrack);
-	~SfzSampler();
 
 	void playNote(NotePlayHandle* handle, SampleFrame* workingBuffer) override;
 	void deleteNotePluginData(NotePlayHandle* handle) override;
@@ -63,7 +62,7 @@ public:
 private:
 	void processTrigger(const SfzTrigger& trigger);
 
-	SampleFrame* m_tempBuffer;
+	std::unique_ptr<SampleFrame[]> m_tempBuffer;
 
 	InstrumentTrack* m_parentTrack;
 

@@ -17,13 +17,7 @@ namespace lmms
 
 SfzRegion::SfzRegion(SfzOpcodeState opcodeState)
 	: SfzOpcodeState(opcodeState)
-	, m_tempBuffer(new SampleFrame[Engine::audioEngine()->framesPerPeriod()])
 {
-}
-
-SfzRegion::~SfzRegion()
-{
-	delete[] m_tempBuffer;
 }
 
 bool SfzRegion::triggerConditionsMet(const SfzGlobalState& globalState, const SfzTrigger& trigger)
@@ -61,16 +55,18 @@ void SfzRegion::processTrigger(const SfzGlobalState& globalState, const SfzTrigg
 }
 
 
-void SfzRegion::play(SampleFrame* workingBuffer, const fpp_t frames)
+bool SfzRegion::play(SampleFrame* workingBuffer, SampleFrame* temporaryBuffer, const fpp_t frames)
 {
+	bool anythingPlayed = false;
 	for (auto& regionPlayState : m_activeSounds)
 	{
-		regionPlayState.play(m_tempBuffer, frames);
-		for (f_cnt_t f = 0; f < frames; ++f)
+		anythingPlayed = anythingPlayed || regionPlayState.play(temporaryBuffer, frames);
+		if (anythingPlayed)
 		{
-			workingBuffer[f] += m_tempBuffer[f];
+			for (f_cnt_t f = 0; f < frames; ++f) { workingBuffer[f] += temporaryBuffer[f]; }
 		}
 	}
+	return anythingPlayed;
 }
 
 

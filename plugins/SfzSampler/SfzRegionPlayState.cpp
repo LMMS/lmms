@@ -12,8 +12,9 @@ SfzRegionPlayState::SfzRegionPlayState(const SfzRegion* region, const SfzTrigger
 }
 
 
-void SfzRegionPlayState::play(SampleFrame* buffer, const fpp_t frames)
+bool SfzRegionPlayState::play(SampleFrame* buffer, const fpp_t frames)
 {
+	return false;
 }
 
 

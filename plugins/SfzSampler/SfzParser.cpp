@@ -96,7 +96,7 @@ bool SfzParser::parseSfzFile(const QString& filePath, std::vector<SfzRegion>& ou
 			if (segment == "<global>")
 			{
 				// If we were previously in a <region>, then wrap it up and add it to the output vector
-				if (withinRegion) { outputRegions.push_back(SfzRegion(currentRegionState)); }
+				if (withinRegion) { outputRegions.emplace_back(currentRegionState); }
 				withinGlobal = true;
 				withinGroup = false;
 				withinRegion = false;
@@ -104,7 +104,7 @@ bool SfzParser::parseSfzFile(const QString& filePath, std::vector<SfzRegion>& ou
 			}
 			else if (segment == "<group>")
 			{
-				if (withinRegion) { outputRegions.push_back(SfzRegion(currentRegionState)); }
+				if (withinRegion) { outputRegions.emplace_back(currentRegionState); }
 				withinGlobal = false;
 				withinGroup = true;
 				withinRegion = false;
@@ -113,7 +113,7 @@ bool SfzParser::parseSfzFile(const QString& filePath, std::vector<SfzRegion>& ou
 			}
 			else if (segment == "<region>")
 			{
-				if (withinRegion) { outputRegions.push_back(SfzRegion(currentRegionState)); }
+				if (withinRegion) { outputRegions.emplace_back(currentRegionState); }
 				withinGlobal = false;
 				withinGroup = false;
 				withinRegion = true;
@@ -145,7 +145,7 @@ bool SfzParser::parseSfzFile(const QString& filePath, std::vector<SfzRegion>& ou
 		}
 	}
 	// Check one last time in case the file ended with a region and didn't get added
-	if (withinRegion) { outputRegions.push_back(SfzRegion(currentRegionState)); }
+	if (withinRegion) { outputRegions.emplace_back(currentRegionState); }
 
 	// Now that all the opcodes have been parsed into regions and added to the output vector, we are done!
 	// The samples themselves still need to be loaded, but that's a job for later
