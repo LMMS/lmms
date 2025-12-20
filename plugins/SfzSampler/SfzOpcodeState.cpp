@@ -15,7 +15,7 @@ bool SfzOpcodeState::setOpcodeByStrings(const QString& name, const QString& valu
 
 	if (name == "sample")
 	{
-		m_sample = value;
+		m_sampleFile = value;
 	}
 
 	else if (name == "key")

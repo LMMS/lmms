@@ -8,6 +8,7 @@
 
 #include "Engine.h"
 #include "AudioEngine.h"
+#include "SampleLoader.h"
 
 #include <QDebug>
 
@@ -67,6 +68,25 @@ bool SfzRegion::play(SampleFrame* workingBuffer, SampleFrame* temporaryBuffer, c
 		}
 	}
 	return anythingPlayed;
+}
+
+
+
+bool SfzRegion::initializeSample(const QDir& parentDirectory)
+{
+	if (m_sampleFile == std::nullopt)
+	{
+		// It's weird for a region not to have a sample defined. That's literally all regions do, play samples, right?
+		qDebug() << "[SFZ Player] Warning: `sample` opcode not assigned";
+		return false;
+	}
+
+	if (auto buffer = gui::SampleLoader::createBufferFromFile(parentDirectory.absoluteFilePath(m_sampleFile.value_or(""))))
+	{
+		m_sample = Sample(std::move(buffer));
+		return true;
+	}
+	return false;
 }
 
 

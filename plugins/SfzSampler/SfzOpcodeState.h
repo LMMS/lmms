@@ -16,7 +16,7 @@ public:
 	static int keyNumFromString(QString keyString, bool* successful);
 
 //private:
-	std::optional<QString> m_sample = std::nullopt;
+	std::optional<QString> m_sampleFile = std::nullopt;
 
 	std::optional<int> m_key = std::nullopt;
 	std::optional<int> m_lokey = 0;

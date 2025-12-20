@@ -7,6 +7,10 @@
 #include "SfzTrigger.h"
 #include "SfzRegionPlayState.h"
 
+#include "Sample.h"
+
+#include <QDir>
+
 namespace lmms
 {
 
@@ -29,10 +33,19 @@ public:
 	//! Returns true if any sound was actually generated
 	bool play(SampleFrame* workingBuffer, SampleFrame* temporaryBuffer, const fpp_t frames);
 
+
+	//! Load the sample file given by the `sample` opcode into m_sample.
+	//! The sample path is treated as relative to the path to the sfz file, so the parent directory is also needed
+	//! Returns true if successful
+	bool initializeSample(const QDir& parentDirectory);
+
 private:
 	static constexpr int MAX_ACTIVE_SOUNDS = 128;
 	//! Array to store all active (and inactive) sound play states for this region
 	std::array<SfzRegionPlayState, MAX_ACTIVE_SOUNDS> m_activeSounds;
+
+	//! Sample object to be played. The sample file path is defined in the `sample` opcode, but the data needs to be loaded first
+	Sample m_sample;
 };
 
 

@@ -54,7 +54,7 @@ public:
 	void saveSettings(QDomDocument& document, QDomElement& element) override;
 	void loadSettings(const QDomElement& element) override;
 
-	void loadFile(const QString& file) override;
+	void loadFile(const QString& filePath) override;
 
 	QString nodeName() const override;
 	gui::PluginView* instantiateView(QWidget* parent) override;

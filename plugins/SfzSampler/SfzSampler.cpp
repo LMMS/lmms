@@ -144,18 +144,28 @@ void SfzSampler::play(SampleFrame* workingBuffer)
 
 
 
-void SfzSampler::loadFile(const QString& filepath)
+void SfzSampler::loadFile(const QString& filePath)
 {
 	// Parse all the <region> headers of the .sfz (accounting for <global> and <group> defaults) and populate m_sfzRegions with the new SfzRegion
-	bool successful = SfzParser::parseSfzFile(filepath, m_sfzRegions);
-	//
-	qDebug() << "was okay?" << successful;
+	bool successfulParseFile = SfzParser::parseSfzFile(filePath, m_sfzRegions);
+
+	qDebug() << "was okay?" << successfulParseFile;
 	qDebug() << "num regions" << m_sfzRegions.size();
-	qDebug() << "first region sample" << m_sfzRegions[0].m_sample.value_or("aaaa");
+	qDebug() << "first region sample" << m_sfzRegions[0].m_sampleFile.value_or("aaaa");
 	qDebug() << "first region lokey" << m_sfzRegions[0].m_lokey.value_or(-1);
 	qDebug() << "first region hikey" << m_sfzRegions[0].m_hikey.value_or(-1);
 	qDebug() << "first region lovel" << m_sfzRegions[0].m_lovel.value_or(-1);
 	qDebug() << "first region hivel" << m_sfzRegions[0].m_hivel.value_or(-1);
+
+	// The SfzParser generates all the SfzRegion objects, but it doesn't load any of the samples
+	// The sample filenames are stored in the regions as from the `sample` opcode, so we just need to load the files into memory to use them
+	// The samples are stored with relative paths with respect to the sfz file, so first find the parent directory:
+	QDir parentDirectory = QFileInfo(filePath).absoluteDir();
+	for (auto& region : m_sfzRegions)
+	{
+		bool successfulLoadSample = region.initializeSample(parentDirectory);
+		qDebug() << "sample was load okay?" << successfulLoadSample;
+	}
 }
 
 void SfzSampler::saveSettings(QDomDocument& document, QDomElement& element)
