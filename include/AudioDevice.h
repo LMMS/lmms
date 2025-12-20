@@ -57,7 +57,7 @@ public:
 	}
 
 
-	// if audio-driver supports ports, classes inherting AudioBusHandle
+	// if audio-driver supports ports, classes inheriting AudioBusHandle
 	// (e.g. channel-tracks) can register themselves for making
 	// audio-driver able to collect their individual output and provide
 	// them at a specific port - currently only supported by JACK

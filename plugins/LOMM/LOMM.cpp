@@ -41,7 +41,7 @@ extern "C"
 		"Lost Robot <r94231/at/gmail/dot/com>",
 		0x0100,
 		Plugin::Type::Effect,
-		new PluginPixmapLoader("logo"),
+		new PixmapLoader("lmms-plugin-logo"),
 		nullptr,
 		nullptr
 	};

@@ -500,7 +500,7 @@ void InstrumentTrack::processOutEvent(const MidiEvent& event, const TimePos& tim
 	// Now for real, pass the event to the instrument
 	m_instrument->handleMidiEvent(event, time, offset);
 
-	// If appropriate, midi-port can do futher routing
+	// If appropriate, midi-port can do further routing
 	m_midiPort.processOutEvent(event, time);
 
 	// And send the event to the piano widget to update the pressed keys
