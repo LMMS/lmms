@@ -24,41 +24,43 @@
 
 #include "Sample.h"
 
+#include "Engine.h"
+
 namespace lmms {
 
 Sample::Sample(const QString& audioFile)
 	: m_buffer(audioFile)
 	, m_startFrame(0)
-	, m_endFrame(m_buffer.size())
+	, m_endFrame(m_buffer.numFrames())
 	, m_loopStartFrame(0)
-	, m_loopEndFrame(m_buffer.size())
+	, m_loopEndFrame(m_buffer.numFrames())
 {
 }
 
-Sample::Sample(const QByteArray& base64, int sampleRate)
+Sample::Sample(const QString& base64, sample_rate_t sampleRate)
 	: m_buffer(base64, sampleRate)
 	, m_startFrame(0)
-	, m_endFrame(m_buffer.size())
+	, m_endFrame(m_buffer.numFrames())
 	, m_loopStartFrame(0)
-	, m_loopEndFrame(m_buffer.size())
+	, m_loopEndFrame(m_buffer.numFrames())
 {
 }
 
-Sample::Sample(const SampleFrame* data, size_t numFrames, int sampleRate)
+Sample::Sample(const SampleFrame* data, f_cnt_t numFrames, sample_rate_t sampleRate)
 	: m_buffer(data, numFrames, sampleRate)
 	, m_startFrame(0)
-	, m_endFrame(m_buffer.size())
+	, m_endFrame(m_buffer.numFrames())
 	, m_loopStartFrame(0)
-	, m_loopEndFrame(m_buffer.size())
+	, m_loopEndFrame(m_buffer.numFrames())
 {
 }
 
 Sample::Sample(const SampleBuffer& buffer)
 	: m_buffer(buffer)
 	, m_startFrame(0)
-	, m_endFrame(m_buffer.size())
+	, m_endFrame(m_buffer.numFrames())
 	, m_loopStartFrame(0)
-	, m_loopEndFrame(m_buffer.size())
+	, m_loopEndFrame(m_buffer.numFrames())
 {
 }
 
@@ -182,7 +184,7 @@ f_cnt_t Sample::render(SampleFrame* dst, f_cnt_t size, PlaybackState* state, Loo
 		}
 
 		const auto value
-			= m_buffer.data()[m_reversed ? m_buffer.size() - state->m_frameIndex - 1 : state->m_frameIndex]
+			= m_buffer.data()[m_reversed ? m_buffer.numFrames() - state->m_frameIndex - 1 : state->m_frameIndex]
 			* m_amplification;
 		dst[frame] = value;
 		state->m_backwards ? --state->m_frameIndex : ++state->m_frameIndex;

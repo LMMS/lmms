@@ -37,8 +37,7 @@ public:
 	static QString openAudioFile(const QString& previousFile = "");
 	static QString openWaveformFile(const QString& previousFile = "");
 	static SampleBuffer createBufferFromFile(const QString& filePath);
-	static SampleBuffer createBufferFromBase64(
-		const QString& base64, int sampleRate = Engine::audioEngine()->outputSampleRate());
+	static SampleBuffer createBufferFromBase64(const QString& base64, sample_rate_t sampleRate);
 
 private:
 	static void displayError(const QString& message);

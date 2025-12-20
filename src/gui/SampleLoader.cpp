@@ -99,7 +99,7 @@ SampleBuffer SampleLoader::createBufferFromFile(const QString& filePath)
 	}
 }
 
-SampleBuffer SampleLoader::createBufferFromBase64(const QString& base64, int sampleRate)
+SampleBuffer SampleLoader::createBufferFromBase64(const QString& base64, sample_rate_t sampleRate)
 {
 	try
 	{

@@ -120,7 +120,7 @@ SampleBuffer SampleRecordHandle::createSampleBuffer()
 	}
 
 	// create according sample-buffer out of big buffer
-	return SampleBuffer{std::move(bigBuffer), static_cast<int>(Engine::audioEngine()->inputSampleRate())};
+	return SampleBuffer{bigBuffer.data(), bigBuffer.size(), Engine::audioEngine()->inputSampleRate()};
 }
 
 

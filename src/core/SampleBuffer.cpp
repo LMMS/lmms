@@ -30,12 +30,6 @@
 
 namespace lmms {
 
-SampleBuffer::SampleBuffer(const SampleFrame* data, size_t numFrames, int sampleRate)
-	: m_data(std::make_shared<std::vector<SampleFrame>>(data, data + numFrames))
-	, m_sampleRate(sampleRate)
-{
-}
-
 SampleBuffer::SampleBuffer(const QString& audioFile)
 {
 	if (audioFile.isEmpty()) { throw std::runtime_error{"Failure loading audio file: Audio file path is empty."}; }
@@ -46,7 +40,7 @@ SampleBuffer::SampleBuffer(const QString& audioFile)
 		auto& [data, sampleRate] = *decodedResult;
 		m_data = std::make_shared<std::vector<SampleFrame>>(std::move(data));
 		m_sampleRate = sampleRate;
-		m_audioFile = PathUtil::toShortestRelative(audioFile);
+		m_source = PathUtil::toShortestRelative(audioFile);
 		return;
 	}
 
@@ -54,8 +48,9 @@ SampleBuffer::SampleBuffer(const QString& audioFile)
 		"Failed to decode audio file: Either the audio codec is unsupported, or the file is corrupted."};
 }
 
-SampleBuffer::SampleBuffer(const QString& base64, int sampleRate)
-	: m_sampleRate(sampleRate)
+SampleBuffer::SampleBuffer(const QString& base64, sample_rate_t sampleRate)
+	: m_source(base64)
+	, m_sampleRate(sampleRate)
 {
 	// TODO: Replace with non-Qt equivalent
 	const auto bytes = QByteArray::fromBase64(base64.toUtf8());
@@ -63,13 +58,35 @@ SampleBuffer::SampleBuffer(const QString& base64, int sampleRate)
 	std::memcpy(reinterpret_cast<char*>(m_data->data()), bytes, m_data->size() * sizeof(SampleFrame));
 }
 
-SampleBuffer::SampleBuffer(std::vector<SampleFrame> data, int sampleRate)
-	: m_data(std::make_shared<std::vector<SampleFrame>>(std::move(data)))
+SampleBuffer::SampleBuffer(const SampleFrame* data, f_cnt_t numFrames, sample_rate_t sampleRate)
+	: m_data(std::make_shared<std::vector<SampleFrame>>(data, data + numFrames))
 	, m_sampleRate(sampleRate)
 {
 }
 
-QString SampleBuffer::toBase64() const
+auto SampleBuffer::operator[](f_cnt_t index) -> SampleFrame&
+{
+	assert(index < m_data->size());
+
+	if (!m_data.unique())
+	{
+		m_data = std::make_shared<std::vector<SampleFrame>>(*m_data);
+	}
+
+	return (*m_data)[index];
+}
+
+auto SampleBuffer::data() -> SampleFrame*
+{
+	if (!m_data.unique())
+	{
+		m_data = std::make_shared<std::vector<SampleFrame>>(*m_data);
+	}
+
+	return m_data->data();
+}
+
+auto SampleBuffer::toBase64() const -> QString
 {
 	// TODO: Replace with non-Qt equivalent
 	const auto data = reinterpret_cast<const char*>(m_data->data());

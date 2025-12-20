@@ -81,7 +81,7 @@ SampleBuffer AudioSampleRecorder::createSampleBuffer()
 	}
 
 	// create according sample-buffer out of big buffer
-	return SampleBuffer{std::move(bigBuffer), static_cast<int>(sampleRate())};
+	return SampleBuffer{bigBuffer.data(), bigBuffer.size(), sampleRate()};
 }
 
 void AudioSampleRecorder::writeBuffer(const SampleFrame* _ab, const fpp_t _frames)
