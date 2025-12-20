@@ -189,17 +189,9 @@ void SampleClipView::mouseDoubleClickEvent( QMouseEvent * )
 	if (m_trackView->trackContainerView()->knifeMode()) { return; }
 
 	const QString selectedAudioFile = SampleLoader::openAudioFile();
-
 	if (selectedAudioFile.isEmpty()) { return; }
-	
-	if (!m_clip->hasSampleFileLoaded(selectedAudioFile))
-	{
-		auto sampleBuffer = SampleLoader::createBufferFromFile(selectedAudioFile);
-		if (sampleBuffer != SampleBuffer::emptyBuffer())
-		{
-			m_clip->setSampleBuffer(sampleBuffer);
-		}
-	}
+
+	m_clip->setSampleFile(selectedAudioFile);
 	m_clip->updateLength();
 }
 

@@ -31,7 +31,7 @@
 namespace lmms {
 
 SampleBuffer::SampleBuffer(const SampleFrame* data, size_t numFrames, int sampleRate)
-	: m_data(data, data + numFrames)
+	: m_data(std::make_shared<std::vector<SampleFrame>>(data, data + numFrames))
 	, m_sampleRate(sampleRate)
 {
 }
@@ -44,7 +44,7 @@ SampleBuffer::SampleBuffer(const QString& audioFile)
 	if (auto decodedResult = SampleDecoder::decode(absolutePath))
 	{
 		auto& [data, sampleRate] = *decodedResult;
-		m_data = std::move(data);
+		m_data = std::make_shared<std::vector<SampleFrame>>(std::move(data));
 		m_sampleRate = sampleRate;
 		m_audioFile = PathUtil::toShortestRelative(audioFile);
 		return;
@@ -59,12 +59,12 @@ SampleBuffer::SampleBuffer(const QString& base64, int sampleRate)
 {
 	// TODO: Replace with non-Qt equivalent
 	const auto bytes = QByteArray::fromBase64(base64.toUtf8());
-	m_data.resize(bytes.size() / sizeof(SampleFrame));
-	std::memcpy(reinterpret_cast<char*>(m_data.data()), bytes, m_data.size() * sizeof(SampleFrame));
+	m_data->resize(bytes.size() / sizeof(SampleFrame));
+	std::memcpy(reinterpret_cast<char*>(m_data->data()), bytes, m_data->size() * sizeof(SampleFrame));
 }
 
 SampleBuffer::SampleBuffer(std::vector<SampleFrame> data, int sampleRate)
-	: m_data(std::move(data))
+	: m_data(std::make_shared<std::vector<SampleFrame>>(std::move(data)))
 	, m_sampleRate(sampleRate)
 {
 }
@@ -80,15 +80,15 @@ void swap(SampleBuffer& first, SampleBuffer& second) noexcept
 QString SampleBuffer::toBase64() const
 {
 	// TODO: Replace with non-Qt equivalent
-	const auto data = reinterpret_cast<const char*>(m_data.data());
-	const auto size = static_cast<int>(m_data.size() * sizeof(SampleFrame));
+	const auto data = reinterpret_cast<const char*>(m_data->data());
+	const auto size = static_cast<int>(m_data->size() * sizeof(SampleFrame));
 	const auto byteArray = QByteArray{data, size};
 	return byteArray.toBase64();
 }
 
-auto SampleBuffer::emptyBuffer() -> std::shared_ptr<const SampleBuffer>
+auto SampleBuffer::emptyData() -> std::shared_ptr<std::vector<SampleFrame>>
 {
-	static auto s_buffer = std::make_shared<const SampleBuffer>();
+	static auto s_buffer = std::make_shared<std::vector<SampleFrame>>();
 	return s_buffer;
 }
 

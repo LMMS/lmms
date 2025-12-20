@@ -91,14 +91,14 @@ public:
 
 	static void waveTableInit();
 	static void destroyFFTPlans();
-	static std::unique_ptr<OscillatorConstants::waveform_t> generateAntiAliasUserWaveTable(const SampleBuffer* sampleBuffer);
+	static std::unique_ptr<OscillatorConstants::waveform_t> generateAntiAliasUserWaveTable(const SampleBuffer& sampleBuffer);
 
 	inline void setUseWaveTable(bool n)
 	{
 		m_useWaveTable = n;
 	}
 
-	void setUserWave(std::shared_ptr<const SampleBuffer> _wave)
+	void setUserWave(const SampleBuffer& _wave)
 	{
 		m_userWave = _wave;
 	}
@@ -165,14 +165,14 @@ public:
 		return 1.0f - rand() * 2.0f / static_cast<float>(RAND_MAX);
 	}
 
-	static sample_t userWaveSample(const SampleBuffer* buffer, const float sample)
+	static sample_t userWaveSample(const SampleBuffer& buffer, const float sample)
 	{
-		if (buffer == nullptr || buffer->size() == 0) { return 0; }
-		const auto frames = buffer->size();
+		if (buffer.empty()) { return 0; }
+		const auto frames = buffer.size();
 		const auto frame = absFraction(sample) * frames;
 		const auto f1 = static_cast<f_cnt_t>(frame);
 
-		return std::lerp(buffer->data()[f1][0], buffer->data()[(f1 + 1) % frames][0], fraction(frame));
+		return std::lerp(buffer.data()[f1][0], buffer.data()[(f1 + 1) % frames][0], fraction(frame));
 	}
 
 	struct wtSampleControl {
@@ -250,7 +250,7 @@ private:
 	Oscillator * m_subOsc;
 	float m_phaseOffset;
 	float m_phase;
-	std::shared_ptr<const SampleBuffer> m_userWave = SampleBuffer::emptyBuffer();
+	SampleBuffer m_userWave;
 	std::shared_ptr<const OscillatorConstants::waveform_t> m_userAntiAliasWaveTable;
 	bool m_useWaveTable;
 	// There are many update*() variants; the modulator flag is stored as a member variable to avoid

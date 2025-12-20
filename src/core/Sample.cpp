@@ -27,38 +27,38 @@
 namespace lmms {
 
 Sample::Sample(const QString& audioFile)
-	: m_buffer(std::make_shared<SampleBuffer>(audioFile))
+	: m_buffer(audioFile)
 	, m_startFrame(0)
-	, m_endFrame(m_buffer->size())
+	, m_endFrame(m_buffer.size())
 	, m_loopStartFrame(0)
-	, m_loopEndFrame(m_buffer->size())
+	, m_loopEndFrame(m_buffer.size())
 {
 }
 
 Sample::Sample(const QByteArray& base64, int sampleRate)
-	: m_buffer(std::make_shared<SampleBuffer>(base64, sampleRate))
+	: m_buffer(base64, sampleRate)
 	, m_startFrame(0)
-	, m_endFrame(m_buffer->size())
+	, m_endFrame(m_buffer.size())
 	, m_loopStartFrame(0)
-	, m_loopEndFrame(m_buffer->size())
+	, m_loopEndFrame(m_buffer.size())
 {
 }
 
 Sample::Sample(const SampleFrame* data, size_t numFrames, int sampleRate)
-	: m_buffer(std::make_shared<SampleBuffer>(data, numFrames, sampleRate))
+	: m_buffer(data, numFrames, sampleRate)
 	, m_startFrame(0)
-	, m_endFrame(m_buffer->size())
+	, m_endFrame(m_buffer.size())
 	, m_loopStartFrame(0)
-	, m_loopEndFrame(m_buffer->size())
+	, m_loopEndFrame(m_buffer.size())
 {
 }
 
-Sample::Sample(std::shared_ptr<const SampleBuffer> buffer)
+Sample::Sample(const SampleBuffer& buffer)
 	: m_buffer(buffer)
 	, m_startFrame(0)
-	, m_endFrame(m_buffer->size())
+	, m_endFrame(m_buffer.size())
 	, m_loopStartFrame(0)
-	, m_loopEndFrame(m_buffer->size())
+	, m_loopEndFrame(m_buffer.size())
 {
 }
 
@@ -118,7 +118,7 @@ bool Sample::play(SampleFrame* dst, PlaybackState* state, size_t numFrames, Loop
 {
 	state->m_frameIndex = std::max<int>(m_startFrame, state->m_frameIndex);
 
-	const auto sampleRateRatio = static_cast<double>(Engine::audioEngine()->outputSampleRate()) / m_buffer->sampleRate();
+	const auto sampleRateRatio = static_cast<double>(Engine::audioEngine()->outputSampleRate()) / m_buffer.sampleRate();
 	const auto freqRatio = frequency() / DefaultBaseFreq;
 	state->m_resampler.setRatio(sampleRateRatio * freqRatio * ratio);
 
@@ -182,7 +182,7 @@ f_cnt_t Sample::render(SampleFrame* dst, f_cnt_t size, PlaybackState* state, Loo
 		}
 
 		const auto value
-			= m_buffer->data()[m_reversed ? m_buffer->size() - state->m_frameIndex - 1 : state->m_frameIndex]
+			= m_buffer.data()[m_reversed ? m_buffer.size() - state->m_frameIndex - 1 : state->m_frameIndex]
 			* m_amplification;
 		dst[frame] = value;
 		state->m_backwards ? --state->m_frameIndex : ++state->m_frameIndex;
@@ -194,7 +194,7 @@ f_cnt_t Sample::render(SampleFrame* dst, f_cnt_t size, PlaybackState* state, Loo
 auto Sample::sampleDuration() const -> std::chrono::milliseconds
 {
 	const auto numFrames = endFrame() - startFrame();
-	const auto duration = numFrames / static_cast<float>(m_buffer->sampleRate()) * 1000;
+	const auto duration = numFrames / static_cast<float>(m_buffer.sampleRate()) * 1000;
 	return std::chrono::milliseconds{static_cast<int>(duration)};
 }
 

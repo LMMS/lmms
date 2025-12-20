@@ -591,7 +591,7 @@ QString graphModel::setWaveToUser()
 		auto sampleBuffer = gui::SampleLoader::createBufferFromFile(fileName);
 		for( int i = 0; i < length(); i++ )
 		{
-			m_samples[i] = Oscillator::userWaveSample(sampleBuffer.get(), i / static_cast<float>(length()));
+			m_samples[i] = Oscillator::userWaveSample(sampleBuffer, i / static_cast<float>(length()));
 		}
 	}
 

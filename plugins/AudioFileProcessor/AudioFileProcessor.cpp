@@ -225,7 +225,7 @@ void AudioFileProcessor::loadSettings(const QDomElement& elem)
 	}
 	else if (auto sampleData = elem.attribute("sampledata"); !sampleData.isEmpty())
 	{
-		m_sample = Sample(gui::SampleLoader::createBufferFromBase64(sampleData));
+		m_sample = Sample{gui::SampleLoader::createBufferFromBase64(sampleData)};
 	}
 
 	m_loopModel.loadSettings(elem, "looped");

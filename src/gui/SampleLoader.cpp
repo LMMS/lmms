@@ -26,7 +26,6 @@
 
 #include <QFileInfo>
 #include <QMessageBox>
-#include <memory>
 
 #include "ConfigManager.h"
 #include "FileDialog.h"
@@ -87,33 +86,29 @@ QString SampleLoader::openWaveformFile(const QString& previousFile)
 		previousFile.isEmpty() ? ConfigManager::inst()->factorySamplesDir() + "waveforms/10saw.flac" : previousFile);
 }
 
-std::shared_ptr<const SampleBuffer> SampleLoader::createBufferFromFile(const QString& filePath)
+SampleBuffer SampleLoader::createBufferFromFile(const QString& filePath)
 {
-	if (filePath.isEmpty()) { return SampleBuffer::emptyBuffer(); }
-
 	try
 	{
-		return std::make_shared<SampleBuffer>(filePath);
+		return SampleBuffer{filePath};
 	}
 	catch (const std::runtime_error& error)
 	{
 		if (getGUI()) { displayError(QString::fromStdString(error.what())); }
-		return SampleBuffer::emptyBuffer();
+		return SampleBuffer{};
 	}
 }
 
-std::shared_ptr<const SampleBuffer> SampleLoader::createBufferFromBase64(const QString& base64, int sampleRate)
+SampleBuffer SampleLoader::createBufferFromBase64(const QString& base64, int sampleRate)
 {
-	if (base64.isEmpty()) { return SampleBuffer::emptyBuffer(); }
-
 	try
 	{
-		return std::make_shared<SampleBuffer>(base64, sampleRate);
+		return SampleBuffer{base64, sampleRate};
 	}
 	catch (const std::runtime_error& error)
 	{
 		if (getGUI()) { displayError(QString::fromStdString(error.what())); }
-		return SampleBuffer::emptyBuffer();
+		return SampleBuffer{};
 	}
 }
 

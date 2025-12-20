@@ -92,8 +92,6 @@ OscillatorObject::OscillatorObject( Model * _parent, int _idx ) :
 				Oscillator::NumModulationAlgos-1, this,
 				tr( "Modulation type %1" ).arg( _idx+1 ) ),
 	m_useWaveTableModel(true),
-
-	m_sampleBuffer( new SampleBuffer ),
 	m_volumeLeft( 0.0f ),
 	m_volumeRight( 0.0f ),
 	m_detuningLeft( 0.0f ),
@@ -140,7 +138,7 @@ void OscillatorObject::oscUserDefWaveDblClick()
 	if( af != "" )
 	{
 		m_sampleBuffer = gui::SampleLoader::createBufferFromFile(af);
-		m_userAntiAliasWaveTable = Oscillator::generateAntiAliasUserWaveTable(m_sampleBuffer.get());
+		m_userAntiAliasWaveTable = Oscillator::generateAntiAliasUserWaveTable(m_sampleBuffer);
 		// TODO:
 		//m_usrWaveBtn->setToolTip(m_sampleBuffer->audioFile());
 	}
@@ -251,8 +249,7 @@ void TripleOscillator::saveSettings( QDomDocument & _doc, QDomElement & _this )
 					"modalgo" + QString::number( i+1 ) );
 		m_osc[i]->m_useWaveTableModel.saveSettings( _doc, _this,
 					"useWaveTable" + QString::number (i+1 ) );
-		_this.setAttribute( "userwavefile" + is,
-					m_osc[i]->m_sampleBuffer->audioFile() );
+		_this.setAttribute("userwavefile" + is, m_osc[i]->m_sampleBuffer.audioFile());
 	}
 }
 
@@ -285,7 +282,7 @@ void TripleOscillator::loadSettings( const QDomElement & _this )
 			if (QFileInfo(PathUtil::toAbsolute(userWaveFile)).exists())
 			{
 				m_osc[i]->m_sampleBuffer = gui::SampleLoader::createBufferFromFile(userWaveFile);
-				m_osc[i]->m_userAntiAliasWaveTable = Oscillator::generateAntiAliasUserWaveTable(m_osc[i]->m_sampleBuffer.get());
+				m_osc[i]->m_userAntiAliasWaveTable = Oscillator::generateAntiAliasUserWaveTable(m_osc[i]->m_sampleBuffer);
 			}
 			else { Engine::getSong()->collectError(QString("%1: %2").arg(tr("Sample not found"), userWaveFile)); }
 		}

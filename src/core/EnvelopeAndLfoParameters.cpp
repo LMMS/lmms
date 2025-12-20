@@ -225,7 +225,7 @@ inline sample_t EnvelopeAndLfoParameters::lfoShapeSample( fpp_t _frame_offset )
 			shape_sample = Oscillator::sawSample( phase );
 			break;
 		case LfoShape::UserDefinedWave:
-			shape_sample = Oscillator::userWaveSample(m_userWave.get(), phase);
+			shape_sample = Oscillator::userWaveSample(m_userWave, phase);
 			break;
 		case LfoShape::RandomWave:
 			if( frame == 0 )
@@ -353,7 +353,7 @@ void EnvelopeAndLfoParameters::saveSettings( QDomDocument & _doc,
 	m_lfoAmountModel.saveSettings( _doc, _parent, "lamt" );
 	m_x100Model.saveSettings( _doc, _parent, "x100" );
 	m_controlEnvAmountModel.saveSettings( _doc, _parent, "ctlenvamt" );
-	_parent.setAttribute("userwavefile", m_userWave->audioFile());
+	_parent.setAttribute("userwavefile", m_userWave.audioFile());
 }
 
 

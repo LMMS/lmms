@@ -61,32 +61,31 @@ public:
 	auto audioFile() const -> const QString& { return m_audioFile; }
 	auto sampleRate() const -> sample_rate_t { return m_sampleRate; }
 
-	auto begin() -> iterator { return m_data.begin(); }
-	auto end() -> iterator { return m_data.end(); }
+	auto begin() -> iterator;
+	auto end() -> iterator;
 
-	auto begin() const -> const_iterator { return m_data.begin(); }
-	auto end() const -> const_iterator { return m_data.end(); }
+	auto begin() const -> const_iterator { return m_data->begin(); }
+	auto end() const -> const_iterator { return m_data->end(); }
 
-	auto cbegin() const -> const_iterator { return m_data.cbegin(); }
-	auto cend() const -> const_iterator { return m_data.cend(); }
+	auto cbegin() const -> const_iterator { return m_data->cbegin(); }
+	auto cend() const -> const_iterator { return m_data->cend(); }
 
-	auto rbegin() -> reverse_iterator { return m_data.rbegin(); }
-	auto rend() -> reverse_iterator { return m_data.rend(); }
+	auto rbegin() -> reverse_iterator { return m_data->rbegin(); }
+	auto rend() -> reverse_iterator { return m_data->rend(); }
 
-	auto rbegin() const -> const_reverse_iterator { return m_data.rbegin(); }
-	auto rend() const -> const_reverse_iterator { return m_data.rend(); }
+	auto rbegin() const -> const_reverse_iterator { return m_data->rbegin(); }
+	auto rend() const -> const_reverse_iterator { return m_data->rend(); }
 
-	auto crbegin() const -> const_reverse_iterator { return m_data.crbegin(); }
-	auto crend() const -> const_reverse_iterator { return m_data.crend(); }
+	auto crbegin() const -> const_reverse_iterator { return m_data->crbegin(); }
+	auto crend() const -> const_reverse_iterator { return m_data->crend(); }
 
-	auto data() const -> const SampleFrame* { return m_data.data(); }
-	auto size() const -> size_type { return m_data.size(); }
-	auto empty() const -> bool { return m_data.empty(); }
-
-	static auto emptyBuffer() -> std::shared_ptr<const SampleBuffer>;
+	auto data() const -> const SampleFrame* { return m_data->data(); }
+	auto size() const -> size_type { return m_data->size(); }
+	auto empty() const -> bool { return m_data->empty(); }
 
 private:
-	std::vector<SampleFrame> m_data;
+	static auto emptyData() -> std::shared_ptr<std::vector<SampleFrame>>;
+	std::shared_ptr<std::vector<SampleFrame>> m_data = emptyData();
 	QString m_audioFile;
 	sample_rate_t m_sampleRate = Engine::audioEngine()->outputSampleRate();
 };
