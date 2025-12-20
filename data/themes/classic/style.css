@@ -591,7 +591,12 @@ QToolButton#stopButton {
 
 /* all tool buttons */
 
-QToolButton, QToolButton::menu-button {
+lmms--gui--TransportButton {
+	width: 27px;
+	height: 27px;
+}
+
+lmms--gui--TransportButton, QToolButton, QToolButton::menu-button {
 	padding: 1px 1px 1px 1px;
 	border-radius: 5px;
 	border: 1px solid rgba(63, 63, 63, 128);
@@ -600,12 +605,12 @@ QToolButton, QToolButton::menu-button {
 	color: black;
 }
 
-QToolButton:hover {
+lmms--gui--TransportButton:hover, QToolButton:hover {
 	background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #c0cdd3, stop:1 #71797d);
 	color: white;
 }
 
-QToolButton:pressed {
+lmms--gui--TransportButton:pressed, QToolButton:pressed {
 	background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #969696, stop:0.5 #c9c9c9, stop:1 #969696 );
 	padding: 2px 1px 0px 1px;
 	color: white;

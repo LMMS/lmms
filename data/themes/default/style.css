@@ -624,7 +624,12 @@ QToolBar::separator {
 
 /* all tool buttons */
 
-QToolButton, QToolButton::menu-button {
+lmms--gui--TransportButton {
+	width: 27px;
+	height: 27px;
+}
+
+lmms--gui--TransportButton, QToolButton, QToolButton::menu-button {
 	margin: 1px;
 	padding: 2px 2px 2px 2px;
 	border-top: 1px solid #778394;
@@ -635,7 +640,7 @@ QToolButton, QToolButton::menu-button {
 	color: #fff;
 }
 
-QToolButton:hover {
+lmms--gui--TransportButton:hover, QToolButton:hover {
 	border-top: 1px solid #909eb3;
 	border-bottom: 1px solid #1e2226;
 	border-radius: 2px;
@@ -648,7 +653,7 @@ QToolButton:hover:checked {
 	background: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1, stop:0 #292d33, stop:1 #22262c)
 }
 
-QToolButton:pressed {
+lmms--gui--TransportButton:pressed, QToolButton:pressed {
 	border-top: 1px solid #778394;
 	border-bottom: 1px solid #1e2226;
 	border-radius: 2px;
