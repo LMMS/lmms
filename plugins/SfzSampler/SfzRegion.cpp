@@ -25,19 +25,19 @@ bool SfzRegion::triggerConditionsMet(const SfzGlobalState& globalState, const Sf
 {
 	if (trigger.type() == SfzTrigger::Type::NoteOn)
 	{
-		int triggerKey = trigger.key().value_or(-1);
-		int triggerVelocity = trigger.velocity().value_or(-1);
+		int triggerKey = trigger.key().value();
+		int triggerVelocity = trigger.velocity().value();
 
 		// `key` opcode
 		if (m_key != std::nullopt)
 		{
-			if (triggerKey != m_key.value_or(-1)) { return false; }
+			if (triggerKey != m_key.value()) { return false; }
 		}
 		// `lokey` and `hikey` opcodes
-		if (triggerKey > m_hikey.value_or(-1) || triggerKey < m_lokey.value_or(-1)) { return false; }
+		if (triggerKey > m_hikey.value() || triggerKey < m_lokey.value()) { return false; }
 
 		// `lovel` and `hivel` opcodes
-		if (triggerVelocity > m_hivel.value_or(-1) || triggerVelocity < m_lovel.value_or(-1)) { return false; }
+		if (triggerVelocity > m_hivel.value() || triggerVelocity < m_lovel.value()) { return false; }
 
 		// If all the contitions passed, return true and spawn a sound
 		return true;
@@ -125,7 +125,7 @@ bool SfzRegion::initializeSample(const QDir& parentDirectory)
 		return false;
 	}
 
-	if (auto buffer = gui::SampleLoader::createBufferFromFile(parentDirectory.absoluteFilePath(m_sampleFile.value_or(""))))
+	if (auto buffer = gui::SampleLoader::createBufferFromFile(parentDirectory.absoluteFilePath(m_sampleFile.value())))
 	{
 		m_sample = Sample(std::move(buffer));
 		return true;

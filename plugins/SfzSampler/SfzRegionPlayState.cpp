@@ -66,8 +66,8 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const fpp_t frames)
 	const f_cnt_t framesToPlay = frames - startFrameOffset;
 
 	// Calculate pitch difference relative to original sample
-	const int semitoneDifference = m_trigger.key().value_or(-1) - m_region->m_pitch_keycenter.value_or(-1);
-	const float freqRatio = std::exp2(-semitoneDifference * m_region->m_pitch_keytrack.value_or(-1) / 1200.0f);
+	const int semitoneDifference = m_trigger.key().value() - m_region->m_pitch_keycenter.value();
+	const float freqRatio = std::exp2(-semitoneDifference * m_region->m_pitch_keytrack.value() / 1200.0f);
 	
 	// Initially render the sample into the buffer
 	// TODO what about if other stuff is left in buffer?
@@ -78,19 +78,19 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const fpp_t frames)
 	for (f_cnt_t f = 0; f < frames; ++f)
 	{
 		float ampeg = envelopeGenerator(
-			m_region->m_ampeg_delay.value_or(0) * sampleRate,
-			m_region->m_ampeg_attack.value_or(0) * sampleRate,
-			m_region->m_ampeg_hold.value_or(0) * sampleRate,
-			m_region->m_ampeg_decay.value_or(0) * sampleRate,
-			m_region->m_ampeg_sustain.value_or(0) / 100.0f, // Sustain is stored in percent, so divide by 100 to get ratio
-			m_region->m_ampeg_release.value_or(0) * sampleRate
+			m_region->m_ampeg_delay.value() * sampleRate,
+			m_region->m_ampeg_attack.value() * sampleRate,
+			m_region->m_ampeg_hold.value() * sampleRate,
+			m_region->m_ampeg_decay.value() * sampleRate,
+			m_region->m_ampeg_sustain.value() / 100.0f, // Sustain is stored in percent, so divide by 100 to get ratio
+			m_region->m_ampeg_release.value() * sampleRate
 		);
 		buffer[f] *= ampeg;
 		m_frameCount++;
 	}
 
 	// Deactive the voice if it has been released and the release has finished
-	if (m_released && m_frameCount - m_releaseFrame > m_region->m_ampeg_release.value_or(0) * sampleRate)
+	if (m_released && m_frameCount - m_releaseFrame > m_region->m_ampeg_release.value() * sampleRate)
 	{
 		m_active = false;
 	}
