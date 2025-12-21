@@ -25,7 +25,7 @@
 #ifndef LMMS_MIX_HELPERS_H
 #define LMMS_MIX_HELPERS_H
 
-#include "LmmsTypes.h"
+#include "AudioBufferView.h"
 
 namespace lmms
 {
@@ -42,12 +42,21 @@ bool useNaNHandler();
 
 void setNaNHandler( bool use );
 
-bool sanitize(SampleFrame* src, int frames);
-bool sanitizeL(SampleFrame* src, int frames);
-bool sanitizeR(SampleFrame* src, int frames);
+/**
+ * @brief Sanitizes a buffer of infs/NaNs, zeroing the entire buffer if
+ *        any is detected.
+ *
+ * Only performs sanitization when the NaN handler is active.
+ *
+ * @returns true if inf or NaN was detected
+ */
+bool sanitize(std::span<sample_t> buffer);
 
 /*! \brief Add samples from src to dst */
 void add( SampleFrame* dst, const SampleFrame* src, int frames );
+
+/*! \brief Add samples from src to dst */
+void add(PlanarBufferView<sample_t> dst, PlanarBufferView<const sample_t> src);
 
 /*! \brief Multiply samples from `dst` by `coeff` */
 void multiply(SampleFrame* dst, float coeff, int frames);
@@ -81,6 +90,50 @@ void multiplyAndAddMultiplied( SampleFrame* dst, const SampleFrame* src, float c
 
 /*! \brief Multiply dst by coeffDst and add samples from srcLeft/srcRight multiplied by coeffSrc */
 void multiplyAndAddMultipliedJoined( SampleFrame* dst, const sample_t* srcLeft, const sample_t* srcRight, float coeffDst, float coeffSrc, int frames );
+
+//! Copies planar buffers to interleaved buffers
+template<class T, proc_ch_t inputs, proc_ch_t outputs>
+constexpr void copy(InterleavedBufferView<std::remove_const_t<T>, outputs> dst,
+	PlanarBufferView<T, inputs> src)
+{
+	assert(src.frames() == dst.frames());
+	if constexpr (inputs == DynamicChannelCount || outputs == DynamicChannelCount)
+	{
+		assert(src.channels() == dst.channels());
+	}
+	else { static_assert(inputs == outputs); }
+
+	for (f_cnt_t frame = 0; frame < dst.frames(); ++frame)
+	{
+		auto* framePtr = dst.framePtr(frame);
+		for (proc_ch_t channel = 0; channel < dst.channels(); ++channel)
+		{
+			framePtr[channel] = src.bufferPtr(channel)[frame];
+		}
+	}
+}
+
+//! Copies interleaved buffers to planar buffers
+template<class T, proc_ch_t inputs, proc_ch_t outputs>
+constexpr void copy(PlanarBufferView<std::remove_const_t<T>, outputs> dst,
+	InterleavedBufferView<T, inputs> src)
+{
+	assert(src.frames() == dst.frames());
+	if constexpr (inputs == DynamicChannelCount || outputs == DynamicChannelCount)
+	{
+		assert(src.channels() == dst.channels());
+	}
+	else { static_assert(inputs == outputs); }
+
+	for (proc_ch_t channel = 0; channel < dst.channels(); ++channel)
+	{
+		auto* channelPtr = dst.bufferPtr(channel);
+		for (f_cnt_t frame = 0; frame < dst.frames(); ++frame)
+		{
+			channelPtr[frame] = src.framePtr(frame)[channel];
+		}
+	}
+}
 
 } // namespace MixHelpers
 

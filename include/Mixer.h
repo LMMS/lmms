@@ -55,8 +55,7 @@ class MixerChannel : public ThreadableJob
 
 		float m_peakLeft;
 		float m_peakRight;
-		SampleFrame* m_buffer;
-		AudioBus m_bus;
+		AudioBus m_busses;
 		bool m_muteBeforeSolo;
 		BoolModel m_muteModel;
 		BoolModel m_soloModel;
@@ -143,7 +142,7 @@ public:
 	Mixer();
 	~Mixer() override;
 
-	void mixToChannel(const AudioBus& bus, mix_ch_t channel);
+	void mixToChannel(const AudioBus& busses, mix_ch_t channel);
 
 	void prepareMasterMix();
 	void masterMix( SampleFrame* _buf );

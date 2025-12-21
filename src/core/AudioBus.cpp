@@ -62,7 +62,7 @@ constexpr auto SilenceThreshold = 0.0001431f;
 
 //! @returns Bitset with all bits at or above `pos` set to `value` and the rest set to `!value`
 template<bool value>
-auto createMask(track_ch_t pos) -> std::bitset<MaxTrackChannels>
+auto createMask(track_ch_t pos) noexcept -> std::bitset<MaxTrackChannels>
 {
 	assert(pos <= MaxTrackChannels);
 
@@ -83,13 +83,69 @@ auto createMask(track_ch_t pos) -> std::bitset<MaxTrackChannels>
 
 } // namespace
 
-AudioBus::AudioBus(SampleFrame* const* bus, track_ch_t channelPairs, f_cnt_t frames)
-	: m_bus{bus}
-	, m_channelPairs{channelPairs}
-	, m_frames{frames}
+AudioBus::BusData::BusData(ch_cnt_t channels, f_cnt_t frames, track_ch_t startingChannel)
+	: m_sourceBuffer{std::make_unique<float[]>(channels * frames)}
+	, m_channelBuffers{std::make_unique_for_overwrite<float*[]>(channels)}
+	, m_interleavedBuffer{std::make_unique<float[]>(2 * frames)}
+	, m_channels{channels}
+	, m_startingChannel{startingChannel}
+{
+	float* ptr = m_sourceBuffer.get();
+	track_ch_t channel = 0;
+	while (channel < channels)
+	{
+		m_channelBuffers[channel] = ptr;
+
+		ptr += frames;
+		++channel;
+	}
+}
+
+AudioBus::AudioBus(f_cnt_t frames)
+	: m_frames{frames}
 	, m_silenceTrackingEnabled{ConfigManager::inst()->value("ui", "disableautoquit", "1").toInt() == 0}
 {
-	m_quietChannels.set();
+	if (!addBus(DEFAULT_CHANNELS))
+	{
+		throw std::runtime_error{"failed to add bus"};
+	}
+
+	m_silenceFlags.set();
+}
+
+auto AudioBus::addBus(ch_cnt_t channels) -> BusData*
+{
+	if (m_busses.size() >= m_busses.capacity())
+	{
+		// Maximum busses reached
+		return nullptr;
+	}
+
+	if (channels > MaxChannelsPerBus || channels == 0)
+	{
+		// Invalid channel count for a bus
+		return nullptr;
+	}
+
+	if (m_totalChannels + channels > MaxTrackChannels)
+	{
+		// Not enough room for requested track channels
+		return nullptr;
+	}
+
+	const auto startingChannel = m_busses.empty()
+		? track_ch_t{0}
+		: static_cast<track_ch_t>(m_busses.back().startingChannel() + m_busses.back().channels());
+
+	auto& data = m_busses.emplace_back(channels, m_frames, startingChannel);
+
+	// Ensure the new track channels (and all the higher, unused
+	// track channels) are set to "silent"
+	m_silenceFlags |= createMask<true>(m_totalChannels);
+
+	m_totalChannels += channels;
+
+	return &data;
 }
 
 void AudioBus::enableSilenceTracking(bool enabled)
@@ -104,60 +160,56 @@ void AudioBus::enableSilenceTracking(bool enabled)
 
 void AudioBus::mixQuietChannels(const AudioBus& other)
 {
-	m_quietChannels &= other.quietChannels();
+	m_silenceFlags &= other.silenceFlags();
 }
 
 auto AudioBus::hasInputNoise(const std::bitset<MaxTrackChannels>& usedChannels) const -> bool
 {
-	auto nonQuiet = ~m_quietChannels;
-	nonQuiet &= usedChannels;
-	return nonQuiet.any();
+	auto nonSilent = ~m_silenceFlags;
+	nonSilent &= usedChannels;
+	return nonSilent.any();
 }
 
 auto AudioBus::hasAnyInputNoise() const -> bool
 {
-	return !m_quietChannels.all();
+	return !m_silenceFlags.all();
 }
 
 void AudioBus::sanitize(const std::bitset<MaxTrackChannels>& channels, track_ch_t upperBound)
 {
 	if (!MixHelpers::useNaNHandler()) { return; }
 
-	const auto numTrackChannels = std::min(upperBound, this->channels());
+	auto trackChannelsLeft = std::min(upperBound, totalChannels());
 
-	for (track_ch_t tc = 0; tc < numTrackChannels; tc += 2)
+	auto trackChannel = track_ch_t{0};
+	for (BusData& bus : m_busses)
 	{
-		switch ((channels[tc] << 1) | std::uint8_t{channels[tc + 1]})
+		const auto busChannels = std::min<track_ch_t>(trackChannelsLeft, bus.channels());
+		assert(busChannels <= MaxChannelsPerBus);
+
+		for (ch_cnt_t ch = 0; ch < static_cast<ch_cnt_t>(busChannels); ++ch)
 		{
-			case 0b11:
-				if (MixHelpers::sanitize(m_bus[tc / 2], m_frames))
+			if (channels[trackChannel])
+			{
+				// This channel needs to be sanitized
+				if (MixHelpers::sanitize(std::span{bus.channelBuffer(ch), m_frames}))
 				{
 					// Inf/NaN detected and buffer cleared
-					m_quietChannels[tc] = true;
-					m_quietChannels[tc + 1] = true;
+					m_silenceFlags[trackChannel] = true;
 				}
-				break;
-			case 0b10:
-				if (MixHelpers::sanitizeL(m_bus[tc / 2], m_frames))
-				{
-					// Inf/NaN detected and buffer cleared
-					m_quietChannels[tc] = true;
-				}
-				break;
-			case 0b01:
-			if (MixHelpers::sanitizeR(m_bus[tc / 2], m_frames))
-				{
-					// Inf/NaN detected and buffer cleared
-					m_quietChannels[tc + 1] = true;
-				}
-				break;
-			case 0b00:
-				// Neither track channel needs to be sanitized
-				break;
-			default:
-				unreachable();
-				break;
+			}
+
+			++trackChannel;
 		}
+
+		trackChannelsLeft -= busChannels;
+		if (trackChannelsLeft == 0) { break; }
+	}
+
+	if (channels[0] || channels[1])
+	{
+		// Keep the temporary interleaved buffer in sync
+		MixHelpers::copy(interleavedBuffer(0), buffers(0));
 	}
 }
 
@@ -165,111 +217,70 @@ void AudioBus::sanitizeAll()
 {
 	if (!MixHelpers::useNaNHandler()) { return; }
 
-	for (track_ch_t tc = 0; tc < channelPairs(); ++tc)
+	auto trackChannel = track_ch_t{0};
+	for (BusData& bus : m_busses)
 	{
-		if (MixHelpers::sanitize(m_bus[tc], m_frames))
+		for (ch_cnt_t ch = 0; ch < bus.channels(); ++ch)
 		{
-			// Inf/NaN detected and buffer cleared
-			m_quietChannels[tc * 2] = true;
-			m_quietChannels[tc * 2 + 1] = true;
+			if (MixHelpers::sanitize(std::span{bus.channelBuffer(ch), m_frames}))
+			{
+				// Inf/NaN detected and buffer cleared
+				m_silenceFlags[trackChannel] = true;
+			}
+
+			++trackChannel;
 		}
 	}
+
+	// Keep the temporary interleaved buffer in sync
+	MixHelpers::copy(interleavedBuffer(0), buffers(0));
 }
 
 auto AudioBus::update(const std::bitset<MaxTrackChannels>& channels, track_ch_t upperBound) -> bool
 {
 	assert(upperBound <= MaxTrackChannels);
-	assert(upperBound % 2 == 0);
 
-	// Invariant: Any channel bits at or above `channels()` must be marked quiet
-	assert((~m_quietChannels & createMask<true>(this->channels())).none());
+	// Invariant: Any channel bits at or above `totalChannels()` must be marked silent
+	assert((~m_silenceFlags & createMask<true>(totalChannels())).none());
 
-	const auto numTrackChannels = std::min(upperBound, this->channels());
+	auto trackChannelsLeft = std::min(upperBound, totalChannels());
 
 	if (!m_silenceTrackingEnabled)
 	{
-		// Mark specified channels (up to the upper bound) as non-quiet
+		// Mark specified channels (up to the upper bound) as non-silent
 		auto temp = ~channels;
-		temp |= createMask<true>(numTrackChannels);
-		m_quietChannels &= temp;
+		temp |= createMask<true>(trackChannelsLeft);
+		m_silenceFlags &= temp;
 		return false;
 	}
 
 	bool allQuiet = true;
 
-	for (track_ch_t tc = 0; tc < numTrackChannels; tc += 2)
+	auto trackChannel = track_ch_t{0};
+	for (BusData& bus : m_busses)
 	{
-		switch ((channels[tc] << 1) | std::uint8_t{channels[tc + 1]})
-		{
-			case 0b11:
-			{
-				const float* tcPair = (*this)[tc / 2];
-				const auto samples = frames() * 2;
+		const auto busChannels = std::min<track_ch_t>(trackChannelsLeft, bus.channels());
+		assert(busChannels <= MaxChannelsPerBus);
 
-				bool quietL = true;
-				bool quietR = true;
-				for (std::size_t idx = 0; idx < samples; idx += 2)
-				{
-					if (std::abs(tcPair[idx]) > SilenceThreshold)
-					{
-						quietL = false;
-						++idx;
-						for (; idx < samples; idx += 2)
-						{
-							if (std::abs(tcPair[idx]) > SilenceThreshold)
-							{
-								quietR = false;
-								break;
-							}
-						}
-						break;
-					}
-					if (std::abs(tcPair[idx + 1]) > SilenceThreshold)
-					{
-						quietR = false;
-						for (; idx < samples; idx += 2)
-						{
-							if (std::abs(tcPair[idx]) > SilenceThreshold)
-							{
-								quietL = false;
-								break;
-							}
-						}
-						break;
-					}
-				}
-				m_quietChannels[tc] = quietL;
-				m_quietChannels[tc + 1] = quietR;
-				allQuiet = allQuiet && quietL && quietR;
-				break;
-			}
-			case 0b10:
+		for (ch_cnt_t ch = 0; ch < static_cast<ch_cnt_t>(busChannels); ++ch)
+		{
+			if (channels[trackChannel])
 			{
-				const auto tcPair = trackChannelPair(tc / 2);
-				const auto quiet = std::ranges::all_of(tcPair.framesView(), [](const float* frame) {
-					return std::abs(frame[0]) < SilenceThreshold;
+				// This channel needs to be updated
+				const auto buffer = std::span{bus.channelBuffer(ch), m_frames};
+				const auto quiet = std::ranges::all_of(buffer, [](const float sample) {
+					return std::abs(sample) < SilenceThreshold;
 				});
-				m_quietChannels[tc] = quiet;
+
+				m_silenceFlags[trackChannel] = quiet;
 				allQuiet = allQuiet && quiet;
-				break;
 			}
-			case 0b01:
-			{
-				const auto tcPair = trackChannelPair(tc / 2);
-				const auto quiet = std::ranges::all_of(tcPair.framesView(), [](const float* frame) {
-					return std::abs(frame[1]) < SilenceThreshold;
-				});
-				m_quietChannels[tc + 1] = quiet;
-				allQuiet = allQuiet && quiet;
-				break;
-			}
-			case 0b00:
-				// Neither track channel needs to be updated
-				break;
-			default:
-				unreachable();
-				break;
+
+			++trackChannel;
 		}
+
+		trackChannelsLeft -= busChannels;
+		if (trackChannelsLeft == 0) { break; }
 	}
 
 	return allQuiet;
@@ -277,70 +288,102 @@ auto AudioBus::update(const std::bitset<MaxTrackChannels>& channels, track_ch_t 
 
 auto AudioBus::updateAll() -> bool
 {
+	// Invariant: Any channel bits at or above `totalChannels()` must be marked silent
+	assert((~m_silenceFlags & createMask<true>(totalChannels())).none());
+
 	if (!m_silenceTrackingEnabled)
 	{
-		// Mark all channels below `channels()` as non-quiet
-		m_quietChannels &= createMask<true>(channels());
+		// Mark all channels below `channels()` as non-silent
+		m_silenceFlags &= createMask<true>(totalChannels());
 		return false;
 	}
 
-	return update(std::bitset<MaxTrackChannels>{}.set(), channels());
+	bool allQuiet = true;
+
+	auto trackChannel = track_ch_t{0};
+	for (BusData& bus : m_busses)
+	{
+		for (ch_cnt_t ch = 0; ch < bus.channels(); ++ch)
+		{
+			const auto buffer = std::span{bus.channelBuffer(ch), m_frames};
+			const auto quiet = std::ranges::all_of(buffer, [](const float sample) {
+				return std::abs(sample) < SilenceThreshold;
+			});
+
+			m_silenceFlags[trackChannel] = quiet;
+			allQuiet = allQuiet && quiet;
+
+			++trackChannel;
+		}
+	}
+
+	return allQuiet;
 }
 
 void AudioBus::silenceChannels(const std::bitset<MaxTrackChannels>& channels, track_ch_t upperBound)
 {
-	auto needSilenced = ~m_quietChannels;
+	auto needSilenced = ~m_silenceFlags;
 	needSilenced &= channels;
 
-	const auto numTrackChannels = std::min(upperBound, this->channels());
-	for (track_ch_t tc = 0; tc < numTrackChannels; tc += 2)
+	auto trackChannelsLeft = std::min(upperBound, totalChannels());
+
+	auto trackChannel = track_ch_t{0};
+	for (BusData& bus : m_busses)
 	{
-		switch ((needSilenced[tc] << 1) | std::uint8_t{needSilenced[tc + 1]})
+		const auto busChannels = std::min<track_ch_t>(trackChannelsLeft, bus.channels());
+		assert(busChannels <= MaxChannelsPerBus);
+
+		for (ch_cnt_t ch = 0; ch < static_cast<ch_cnt_t>(busChannels); ++ch)
 		{
-			case 0b11:
-				// Zero both track channels
-				std::ranges::fill(trackChannelPair(tc / 2).dataView(), 0.f);
-				break;
-			case 0b10:
+			if (needSilenced[trackChannel])
 			{
-				// Zero left track channel
-				auto tcPair = trackChannelPair(tc / 2);
-				for (float* frame : tcPair.framesView())
-				{
-					frame[0] = 0.f;
-				}
-				break;
+				std::ranges::fill(std::span{bus.channelBuffer(ch), m_frames}, 0);
 			}
-			case 0b01:
-			{
-				// Zero right track channel
-				auto tcPair = trackChannelPair(tc / 2);
-				for (float* frame : tcPair.framesView())
-				{
-					frame[1] = 0.f;
-				}
-				break;
-			}
-			case 0b00:
-				// Neither track channel is used
-				break;
-			default:
-				unreachable();
-				break;
+
+			++trackChannel;
 		}
+
+		trackChannelsLeft -= busChannels;
+		if (trackChannelsLeft == 0) { break; }
 	}
 
-	m_quietChannels |= channels;
+	if (needSilenced[0] || needSilenced[1])
+	{
+		// Keep the temporary interleaved buffer in sync
+		MixHelpers::copy(interleavedBuffer(0), buffers(0));
+	}
+
+	m_silenceFlags |= channels;
 }
 
 void AudioBus::silenceAllChannels()
 {
-	for (track_ch_t tc = 0; tc < m_channelPairs; tc += 2)
+	for (BusData& bus : m_busses)
 	{
-		std::fill_n(m_bus[tc], m_frames, SampleFrame{});
+		std::fill_n(bus.sourceBuffer(), bus.channels() * m_frames, 0);
+		std::fill_n(bus.interleavedBuffer(), 2 * m_frames, 0);
 	}
 
-	m_quietChannels.set();
+	m_silenceFlags.set();
+}
+
+auto AudioBus::absPeakValue(bus_cnt_t busIndex, ch_cnt_t busChannel) const -> float
+{
+	if (m_silenceFlags[m_busses[busIndex].startingChannel() + busChannel])
+	{
+		// Skip calculation if channel is already known to be silent
+		return 0;
+	}
+
+	const float* buffer = m_busses[busIndex].channelBuffer(busChannel);
+
+	float max = 0;
+	for (f_cnt_t frame = 0; frame < m_frames; ++frame)
+	{
+		max = std::max(std::abs(buffer[frame]), max);
+	}
+
+	return max;
 }
 
 } // namespace lmms

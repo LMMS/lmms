@@ -45,24 +45,10 @@ private:
 	std::vector<lmms::SampleFrame*> m_trackChannels;
 
 	// Creates new AudioBus with quiet buffers
-	auto createBus(lmms::track_ch_t channels, lmms::f_cnt_t frames) -> AudioBus
+	auto createAudioBus(lmms::f_cnt_t frames) -> AudioBus
 	{
-		assert(channels % 2 == 0);
-		const auto channelPairs = static_cast<lmms::track_ch_t>(channels / 2);
-
-		m_trackChannels.resize(channelPairs);
-
-		m_buffers.resize(channelPairs * frames);
-		std::ranges::fill(m_buffers, lmms::SampleFrame{});
-
-		for (lmms::track_ch_t channelPair = 0; channelPair < channelPairs; ++channelPair)
-		{
-			m_trackChannels[channelPair] = &m_buffers[channelPair * frames];
-		}
-
-		auto ab = AudioBus{m_trackChannels.data(), channelPairs, frames};
+		auto ab = AudioBus{frames};
 		ab.enableSilenceTracking(true);
-
 		return ab;
 	}
 
@@ -71,132 +57,226 @@ private slots:
 	void DefaultConstructor()
 	{
 		auto ab = AudioBus{};
-		QCOMPARE(ab.bus(), nullptr);
-		QCOMPARE(ab.channels(), 0);
+		QCOMPARE(ab.busCount(), 0);
+		QCOMPARE(ab.totalChannels(), 0);
 		QCOMPARE(ab.frames(), 0);
-		QCOMPARE(ab.quietChannels().none(), true);
+		QCOMPARE(ab.silenceFlags().none(), true);
 	}
 
 	//! Verifies correct construction
 	void Constructor()
 	{
-		auto ab = createBus(2, 10);
-		QCOMPARE(ab.bus() == nullptr, false);
-		QCOMPARE(ab.channels(), 2);
+		auto ab = createAudioBus(10);
+		QCOMPARE(ab.busCount(), 1);
+		QCOMPARE(ab.totalChannels(), 2);
 		QCOMPARE(ab.frames(), 10);
-		QCOMPARE(ab.quietChannels().all(), true);
+		QCOMPARE(ab.silenceFlags().all(), true);
+	}
+
+	//! Verifies that the `addBus` method works as intended
+	void AddBus()
+	{
+		// A bus with 2 channels (the main bus) is added by default
+		auto ab = createAudioBus(10);
+		QCOMPARE(ab.busCount(), 1);
+		QCOMPARE(ab.totalChannels(), 2);
+
+		// Add a bus with 5 channels
+		auto bus2 = ab.addBus(5);
+		QVERIFY(bus2 != nullptr);
+		QCOMPARE(bus2->channels(), 5);
+		QCOMPARE(bus2->startingChannel(), 2);
+		QCOMPARE(ab.busCount(), 2);
+		QCOMPARE(ab.totalChannels(), 7);
+
+		// Add a bus with 1 channel
+		auto bus3 = ab.addBus(1);
+		QVERIFY(bus3 != nullptr);
+		QCOMPARE(bus3->channels(), 1);
+		QCOMPARE(bus3->startingChannel(), 2 + 5);
+		QCOMPARE(ab.busCount(), 3);
+		QCOMPARE(ab.totalChannels(), 8);
+
+		// Add a bus with as many channels as possible
+		auto bus4 = ab.addBus(lmms::MaxChannelsPerBus);
+		QVERIFY(bus4 != nullptr);
+		QCOMPARE(bus4->channels(), lmms::MaxChannelsPerBus);
+		QCOMPARE(bus4->startingChannel(), 2 + 5 + 1);
+		QCOMPARE(ab.busCount(), 4);
+		QCOMPARE(ab.totalChannels(), 8 + lmms::MaxChannelsPerBus);
+
+		// Now, try with too many channels
+		auto bus5 = ab.addBus(lmms::MaxChannelsPerBus + 1);
+		QCOMPARE(bus5, nullptr);
+		QCOMPARE(ab.busCount(), 4);
+		QCOMPARE(ab.totalChannels(), 8 + lmms::MaxChannelsPerBus);
+
+		// And again with too few channels
+		auto bus6 = ab.addBus(0);
+		QCOMPARE(bus6, nullptr);
+		QCOMPARE(ab.busCount(), 4);
+		QCOMPARE(ab.totalChannels(), 8 + lmms::MaxChannelsPerBus);
+
+		// Add more busses until no more can be added
+		auto bussesLeft = static_cast<int>(lmms::MaxBussesPerTrack - ab.busCount());
+		QVERIFY(bussesLeft >= 0);
+		while (bussesLeft > 0)
+		{
+			auto temp = ab.addBus(1);
+			QVERIFY(temp != nullptr);
+			--bussesLeft;
+		}
+		QCOMPARE(bussesLeft, 0);
+
+		// Cannot add more busses
+		auto bus7 = ab.addBus(1);
+		QCOMPARE(bus7, nullptr);
+
+		// Create new AudioBus
+		auto ab2 = createAudioBus(10);
+		auto channelsLeft = lmms::MaxTrackChannels - ab2.totalChannels();
+		constexpr auto channelsPerBus = static_cast<int>(lmms::MaxChannelsPerBus - 1);
+
+		while (channelsLeft - channelsPerBus > 0)
+		{
+			auto bus = ab2.addBus(channelsPerBus);
+			QVERIFY(bus != nullptr);
+			channelsLeft -= channelsPerBus;
+		}
+		QVERIFY(channelsLeft > 0);
+		QVERIFY(ab2.busCount() < lmms::MaxBussesPerTrack);
+
+		auto bus8 = ab2.addBus(channelsLeft);
+		QVERIFY(bus8 != nullptr);
+		QVERIFY(ab2.busCount() < lmms::MaxBussesPerTrack);
+		QCOMPARE(ab2.totalChannels(), lmms::MaxTrackChannels);
+
+		// Verify that more busses cannot be added when the maximum track channels
+		// has been reached
+		auto bus9 = ab2.addBus(1);
+		QCOMPARE(bus9, nullptr);
+		QCOMPARE(ab2.totalChannels(), lmms::MaxTrackChannels);
 	}
 
 	//! Verifies that the `update` method works as intended
 	void Update()
 	{
-		auto ab = createBus(4, 10);
+		auto ab = createAudioBus(10);
+
+		// Add a 2nd stereo bus
+		QVERIFY(ab.addBus(2) != nullptr);
 
 		// Both channels should be silent
 		QCOMPARE(ab.update(0b1111), true);
-		QCOMPARE(ab.quietChannels().all(), true);
+		QCOMPARE(ab.silenceFlags().all(), true);
 
 		// Now introduce a non-zero sample to the right channel of 2nd track channel bus
 		// but update all channels except that one
-		ab.trackChannelPair(1).frame(5)[1] = 1.f;
+		ab.buffers(1).buffer(1)[5] = 1.f;
 		QCOMPARE(ab.update(0b0111), true);
-		QCOMPARE(ab.quietChannels().all(), true);
+		QCOMPARE(ab.silenceFlags().all(), true);
 
 		// Now update that channel
 		QCOMPARE(ab.update(0b1000), false);
-		QCOMPARE(ab.quietChannels()[0], true);
-		QCOMPARE(ab.quietChannels()[1], true);
-		QCOMPARE(ab.quietChannels()[2], true);
-		QCOMPARE(ab.quietChannels()[3], false);
+		QCOMPARE(ab.silenceFlags()[0], true);
+		QCOMPARE(ab.silenceFlags()[1], true);
+		QCOMPARE(ab.silenceFlags()[2], true);
+		QCOMPARE(ab.silenceFlags()[3], false);
 
 		// Should return true if no channels are selected for update
 		QCOMPARE(ab.update(0), true);
 
 		// Make the left channel of the 1st track channel bus non-zero too
-		ab.trackChannelPair(0).frame(5)[0] = 1.f;
+		ab.buffers(0).buffer(0)[5] = 1.f;
 
 		// Update the left channel of the 1st track channel bus
 		QCOMPARE(ab.update(0b0001), false);
-		QCOMPARE(ab.quietChannels()[0], false);
-		QCOMPARE(ab.quietChannels()[1], true);
-		QCOMPARE(ab.quietChannels()[2], true);
-		QCOMPARE(ab.quietChannels()[3], false);
+		QCOMPARE(ab.silenceFlags()[0], false);
+		QCOMPARE(ab.silenceFlags()[1], true);
+		QCOMPARE(ab.silenceFlags()[2], true);
+		QCOMPARE(ab.silenceFlags()[3], false);
 
 		// Make the left channel of the 2nd track channel bus non-zero,
 		// and set the left channel of 1st track channel bus back to zero
-		ab.trackChannelPair(1).frame(5)[0] = 1.f;
-		ab.trackChannelPair(0).frame(5)[0] = 0.f;
+		ab.buffers(1).buffer(0)[5] = 1.f;
+		ab.buffers(0).buffer(0)[5] = 0.f;
 
 		// Update only the 2nd track channel bus
 		QCOMPARE(ab.update(0b1100), false);
-		QCOMPARE(ab.quietChannels()[0], false);
-		QCOMPARE(ab.quietChannels()[1], true);
-		QCOMPARE(ab.quietChannels()[2], false);
-		QCOMPARE(ab.quietChannels()[3], false);
+		QCOMPARE(ab.silenceFlags()[0], false);
+		QCOMPARE(ab.silenceFlags()[1], true);
+		QCOMPARE(ab.silenceFlags()[2], false);
+		QCOMPARE(ab.silenceFlags()[3], false);
 
 		// Now update the 1st track channel bus
 		QCOMPARE(ab.update(0b0011), true);
-		QCOMPARE(ab.quietChannels()[0], true);
-		QCOMPARE(ab.quietChannels()[1], true);
-		QCOMPARE(ab.quietChannels()[2], false);
-		QCOMPARE(ab.quietChannels()[3], false);
+		QCOMPARE(ab.silenceFlags()[0], true);
+		QCOMPARE(ab.silenceFlags()[1], true);
+		QCOMPARE(ab.silenceFlags()[2], false);
+		QCOMPARE(ab.silenceFlags()[3], false);
 
 		// Zero out all channels again
-		ab.trackChannelPair(1).frame(5)[0] = 0.f;
-		ab.trackChannelPair(1).frame(5)[1] = 0.f;
+		ab.buffers(1).buffer(0)[5] = 0.f;
+		ab.buffers(1).buffer(1)[5] = 0.f;
 		QCOMPARE(ab.update(0b0000), true);
-		QCOMPARE(ab.quietChannels().all(), false);
+		QCOMPARE(ab.silenceFlags().all(), false);
 		QCOMPARE(ab.update(0b1111), true);
-		QCOMPARE(ab.quietChannels().all(), true);
+		QCOMPARE(ab.silenceFlags().all(), true);
 	}
 
 	//! Verifies that the `updateAll` method works as intended
 	void UpdateAll()
 	{
-		auto ab = createBus(4, 10);
+		auto ab = createAudioBus(10);
+
+		// Add a 2nd stereo bus
+		QVERIFY(ab.addBus(2) != nullptr);
 
 		// Both channels should be silent
 		QCOMPARE(ab.updateAll(), true);
-		QCOMPARE(ab.quietChannels().all(), true);
+		QCOMPARE(ab.silenceFlags().all(), true);
 
 		// Now introduce a non-zero sample to the right channel of 2nd track channel bus
-		ab.trackChannelPair(1).frame(5)[1] = 1.f;
+		ab.buffers(1).buffer(1)[5] = 1.f;
 		QCOMPARE(ab.updateAll(), false);
-		QCOMPARE(ab.quietChannels().all(), false);
-		QCOMPARE(ab.quietChannels()[0], true);
-		QCOMPARE(ab.quietChannels()[1], true);
-		QCOMPARE(ab.quietChannels()[2], true);
-		QCOMPARE(ab.quietChannels()[3], false);
+		QCOMPARE(ab.silenceFlags().all(), false);
+		QCOMPARE(ab.silenceFlags()[0], true);
+		QCOMPARE(ab.silenceFlags()[1], true);
+		QCOMPARE(ab.silenceFlags()[2], true);
+		QCOMPARE(ab.silenceFlags()[3], false);
 
 		// Make the left channel of the 1st track channel bus non-zero too
-		ab.trackChannelPair(0).frame(5)[0] = 1.f;
+		ab.buffers(0).buffer(0)[5] = 1.f;
 		QCOMPARE(ab.updateAll(), false);
-		QCOMPARE(ab.quietChannels().all(), false);
-		QCOMPARE(ab.quietChannels()[0], false);
-		QCOMPARE(ab.quietChannels()[1], true);
-		QCOMPARE(ab.quietChannels()[2], true);
-		QCOMPARE(ab.quietChannels()[3], false);
+		QCOMPARE(ab.silenceFlags().all(), false);
+		QCOMPARE(ab.silenceFlags()[0], false);
+		QCOMPARE(ab.silenceFlags()[1], true);
+		QCOMPARE(ab.silenceFlags()[2], true);
+		QCOMPARE(ab.silenceFlags()[3], false);
 
 		// Zero out all channels again
-		ab.trackChannelPair(0).frame(5)[0] = 0.f;
-		ab.trackChannelPair(1).frame(5)[1] = 0.f;
+		ab.buffers(0).buffer(0)[5] = 0.f;
+		ab.buffers(1).buffer(1)[5] = 0.f;
 		QCOMPARE(ab.updateAll(), true);
-		QCOMPARE(ab.quietChannels().all(), true);
+		QCOMPARE(ab.silenceFlags().all(), true);
 	}
 
 	//! Verifies that the `hasInputNoise` method works as intended
 	void HasInputNoise()
 	{
-		auto ab = createBus(4, 10);
+		auto ab = createAudioBus(10);
+
+		// Add a 2nd stereo bus
+		QVERIFY(ab.addBus(2) != nullptr);
 
 		// No input noise since all track channels are silent
 		QCOMPARE(ab.hasInputNoise(0b1111), false);
 
 		// Make the left channels in both busses non-zero and manually update the silence status
-		ab.trackChannelPair(0).frame(5)[0] = 1.f;
-		ab.trackChannelPair(1).frame(5)[0] = 1.f;
-		ab.quietChannels()[0] = false;
-		ab.quietChannels()[2] = false;
+		ab.buffers(0).buffer(0)[5] = 1.f;
+		ab.buffers(1).buffer(0)[5] = 1.f;
+		ab.silenceFlags()[0] = false;
+		ab.silenceFlags()[2] = false;
 
 		// Check if any channels are non-zero
 		QCOMPARE(ab.hasInputNoise(0b1111), true);
@@ -216,95 +296,100 @@ private slots:
 	{
 		lmms::MixHelpers::setNaNHandler(true);
 
-		auto ab = createBus(4, 10);
+		auto ab = createAudioBus(10);
+
+		// Add a 2nd stereo bus
+		QVERIFY(ab.addBus(2) != nullptr);
 
 		// Should have no effect when all buffers are zeroed
-		QCOMPARE(ab.quietChannels().all(), true);
+		QCOMPARE(ab.silenceFlags().all(), true);
 		ab.sanitize(0b1111);
-		QCOMPARE(ab.quietChannels().all(), true);
+		QCOMPARE(ab.silenceFlags().all(), true);
 
 		// Make left channel of 1st track channel bus contain an Inf, and force the channel to non-quiet
-		ab.trackChannelPair(0).frame(5)[0] = std::numeric_limits<float>::infinity();
-		ab.quietChannels()[0] = false;
+		ab.buffers(0).buffer(0)[5] = std::numeric_limits<float>::infinity();
+		ab.silenceFlags()[0] = false;
 
 		// Make right channel of 1st track channel bus non-zero too, but using a valid value
-		ab.trackChannelPair(0).frame(5)[1] = 1.f;
-		ab.quietChannels()[1] = false;
+		ab.buffers(0).buffer(1)[5] = 1.f;
+		ab.silenceFlags()[1] = false;
 
 		// Sanitize only the left channel
 		ab.sanitize(0b0001);
 
 		// The left channel's buffer should be zeroed, while the right channel should be unaffected
-		QCOMPARE(ab.trackChannelPair(0).frame(5)[0], 0.f);
-		QCOMPARE(ab.trackChannelPair(0).frame(5)[1], 1.f);
-		QCOMPARE(ab.quietChannels()[0], true);
-		QCOMPARE(ab.quietChannels()[1], false);
+		QCOMPARE(ab.buffers(0).buffer(0)[5], 0.f);
+		QCOMPARE(ab.buffers(0).buffer(1)[5], 1.f);
+		QCOMPARE(ab.silenceFlags()[0], true);
+		QCOMPARE(ab.silenceFlags()[1], false);
 
 		// Try again
-		ab.trackChannelPair(0).frame(5)[0] = std::numeric_limits<float>::infinity();
-		ab.quietChannels()[0] = false;
+		ab.buffers(0).buffer(0)[5] = std::numeric_limits<float>::infinity();
+		ab.silenceFlags()[0] = false;
 
 		// This time, sanitize both channels of the 1st track channel bus
 		ab.sanitize(0b0011);
 
-		// When the left/right channels are both sanitized, it is allowed to zero both buffers if
-		// an Inf/NaN is detected in either channel
-		QCOMPARE(ab.trackChannelPair(0).frame(5)[0], 0.f);
-		QCOMPARE(ab.trackChannelPair(0).frame(5)[1], 0.f);
-		QCOMPARE(ab.quietChannels()[0], true);
-		QCOMPARE(ab.quietChannels()[1], true);
+		// Again, the left channel's buffer should be zeroed, while the right channel should be unaffected
+		QCOMPARE(ab.buffers(0).buffer(0)[5], 0.f);
+		QCOMPARE(ab.buffers(0).buffer(1)[5], 1.f);
+		QCOMPARE(ab.silenceFlags()[0], true);
+		QCOMPARE(ab.silenceFlags()[1], false);
 	}
 
 	//! Verifies that the `silenceChannels` method works as intended
 	void SilenceChannels()
 	{
-		auto ab = createBus(4, 10);
+		auto ab = createAudioBus(10);
+
+		// Add a 2nd stereo bus
+		QVERIFY(ab.addBus(2) != nullptr);
 
 		// Should have no effect when all buffers are zeroed
-		QCOMPARE(ab.quietChannels().all(), true);
+		QCOMPARE(ab.silenceFlags().all(), true);
 		ab.silenceChannels(0b1111);
-		QCOMPARE(ab.quietChannels().all(), true);
+		QCOMPARE(ab.silenceFlags().all(), true);
 
 		// Make left channel of 2nd track channel bus contain a non-zero value, and force the channel to non-quiet
-		ab.trackChannelPair(1).frame(5)[0] = 1.f;
-		ab.quietChannels()[2] = false;
+		ab.buffers(1).buffer(0)[5] = 1.f;
+		ab.silenceFlags()[2] = false;
 
 		// Silence only the left channel
 		ab.silenceChannels(0b0100);
 
-		QCOMPARE(ab.quietChannels()[0], true);
-		QCOMPARE(ab.quietChannels()[1], true);
-		QCOMPARE(ab.quietChannels()[2], true);
-		QCOMPARE(ab.quietChannels()[3], true);
+		QCOMPARE(ab.silenceFlags()[0], true);
+		QCOMPARE(ab.silenceFlags()[1], true);
+		QCOMPARE(ab.silenceFlags()[2], true);
+		QCOMPARE(ab.silenceFlags()[3], true);
 
 		// Make right channel of 2nd track channel bus contain a non-zero value, and force the channel to non-quiet
-		ab.trackChannelPair(1).frame(5)[1] = 1.f;
-		ab.quietChannels()[3] = false;
+		ab.buffers(1).buffer(1)[5] = 1.f;
+		ab.silenceFlags()[3] = false;
 
 		// Silence only the right channel
 		ab.silenceChannels(0b1000);
 
-		QCOMPARE(ab.quietChannels()[0], true);
-		QCOMPARE(ab.quietChannels()[1], true);
-		QCOMPARE(ab.quietChannels()[2], true);
-		QCOMPARE(ab.quietChannels()[3], true);
+		QCOMPARE(ab.silenceFlags()[0], true);
+		QCOMPARE(ab.silenceFlags()[1], true);
+		QCOMPARE(ab.silenceFlags()[2], true);
+		QCOMPARE(ab.silenceFlags()[3], true);
 
 		// Make right channel of 1st track channel bus and both channels of 2nd track channel bus contain
 		// a non-zero value, and force those channels to non-quiet
-		ab.trackChannelPair(1).frame(5)[1] = 1.f;
-		ab.quietChannels()[1] = false;
-		ab.trackChannelPair(1).frame(5)[0] = 1.f;
-		ab.quietChannels()[2] = false;
-		ab.trackChannelPair(1).frame(5)[1] = 1.f;
-		ab.quietChannels()[3] = false;
+		ab.buffers(1).buffer(1)[5] = 1.f;
+		ab.silenceFlags()[1] = false;
+		ab.buffers(1).buffer(0)[5] = 1.f;
+		ab.silenceFlags()[2] = false;
+		ab.buffers(1).buffer(1)[5] = 1.f;
+		ab.silenceFlags()[3] = false;
 
 		// Silence both channels of the 2nd track channel bus, plus the already-quiet left channel of the 1st bus
 		ab.silenceChannels(0b1101);
 
-		QCOMPARE(ab.quietChannels()[0], true);
-		QCOMPARE(ab.quietChannels()[1], false);
-		QCOMPARE(ab.quietChannels()[2], true);
-		QCOMPARE(ab.quietChannels()[3], true);
+		QCOMPARE(ab.silenceFlags()[0], true);
+		QCOMPARE(ab.silenceFlags()[1], false);
+		QCOMPARE(ab.silenceFlags()[2], true);
+		QCOMPARE(ab.silenceFlags()[3], true);
 	}
 };
 

@@ -30,6 +30,7 @@
 #include "EffectChain.h"
 #include "EffectControls.h"
 #include "EffectView.h"
+#include "MixHelpers.h"
 
 #include "ConfigManager.h"
 #include "SampleFrame.h"
@@ -137,7 +138,10 @@ bool Effect::processAudioBuffer(AudioBus& inOut)
 		return false;
 	}
 
-	const auto status = processImpl(inOut.bus()[0], inOut.frames());
+	const auto status = processImpl(inOut.interleavedBuffer(0).asSampleFrames().data(), inOut.frames());
+
+	// Copy interleaved plugin output to planar
+	MixHelpers::copy(inOut.buffers(0), inOut.interleavedBuffer(0));
 
 	inOut.sanitize(0b11);
 

@@ -28,68 +28,145 @@
 #include <bitset>
 
 #include "AudioBufferView.h"
+#include "ArrayVector.h"
 #include "LmmsTypes.h"
 #include "lmms_constants.h"
 #include "lmms_export.h"
-#include "SampleFrame.h"
 
 namespace lmms
 {
 
 /**
- * A non-owning span of the track channels for an instrument or effect chain
+ * A collection of busses for an instrument or effect chain
  * which keeps track of signal flow.
  */
 class LMMS_EXPORT AudioBus
 {
 public:
+	class LMMS_EXPORT BusData
+	{
+	public:
+		BusData(ch_cnt_t channels, f_cnt_t frames, track_ch_t startingChannel);
+
+		//! Large buffer that all channel buffers are sourced from
+		auto sourceBuffer() const -> const float* { return m_sourceBuffer.get(); }
+
+		//! Large buffer that all channel buffers are sourced from
+		auto sourceBuffer() -> float* { return m_sourceBuffer.get(); }
+
+		auto channelBuffers() const -> const float* const* { return m_channelBuffers.get(); }
+		auto channelBuffers() -> float** { return m_channelBuffers.get(); }
+
+		auto channelBuffer(ch_cnt_t channel) const -> const float*
+		{
+			assert(channel < m_channels);
+			return m_channelBuffers[channel];
+		}
+
+		auto channelBuffer(ch_cnt_t channel) -> float*
+		{
+			assert(channel < m_channels);
+			return m_channelBuffers[channel];
+		}
+
+		auto interleavedBuffer() const -> const float* { return m_interleavedBuffer.get(); }
+		auto interleavedBuffer() -> float* { return m_interleavedBuffer.get(); }
+
+		auto channels() const -> ch_cnt_t { return m_channels; }
+
+		auto startingChannel() const -> track_ch_t { return m_startingChannel; }
+		void setStartingChannel(track_ch_t channel) { m_startingChannel = channel; }
+
+	private:
+		std::unique_ptr<float[]>       m_sourceBuffer;
+		std::unique_ptr<float*[]>      m_channelBuffers;
+
+		//! Interleaved scratch buffer for conversions between interleaved and planar TODO: Remove once using planar only
+		std::unique_ptr<float[]>       m_interleavedBuffer;
+
+		//! Number of channels in `m_channelBuffers` (`MaxChannelsPerBus` maximum) - currently only 2 is used
+		ch_cnt_t                       m_channels = 0;
+
+		//! Maps channel #0 of this bus to its track channel # within AudioBus (for performance)
+		track_ch_t                     m_startingChannel = 0;
+	};
+
 	AudioBus() = default;
-	AudioBus(const AudioBus&) = default;
 
-	//! `bus` is assumed to be silent
-	AudioBus(SampleFrame* const* bus, track_ch_t channelPairs, f_cnt_t frames);
+	//! Single stereo bus with `frames` frames
+	explicit AudioBus(f_cnt_t frames);
 
-	auto trackChannelPair(track_ch_t pairIndex) const -> InterleavedBufferView<const float, 2>
+	auto busCount() const -> bus_cnt_t { return static_cast<bus_cnt_t>(m_busses.size()); }
+
+	//! @returns the buffers of the given bus
+	auto buffers(bus_cnt_t busIndex) const -> PlanarBufferView<const float>
 	{
-		return {m_bus[pairIndex], m_frames};
+		assert(busIndex < busCount());
+		const BusData& b = m_busses[busIndex];
+		return {b.channelBuffers(), b.channels(), m_frames};
 	}
 
-	auto trackChannelPair(track_ch_t pairIndex) -> InterleavedBufferView<float, 2>
+	//! @returns the buffers of the given bus
+	auto buffers(bus_cnt_t busIndex) -> PlanarBufferView<float>
 	{
-		return {m_bus[pairIndex], m_frames};
+		assert(busIndex < busCount());
+		BusData& b = m_busses[busIndex];
+		return {b.channelBuffers(), b.channels(), m_frames};
 	}
 
-	//! @returns 2-channel interleaved buffer for the given track channel pair
-	auto operator[](track_ch_t pairIndex) const -> const float*
+	//! @returns planar channel buffers for the given bus
+	auto operator[](bus_cnt_t busIndex) const -> const float* const*
 	{
-		return reinterpret_cast<const float*>(m_bus[pairIndex]);
+		return m_busses[busIndex].channelBuffers();
 	}
 
-	//! @returns 2-channel interleaved buffer for the given track channel pair
-	auto operator[](track_ch_t pairIndex) -> float*
+	//! @returns planar channel buffers for the given bus
+	auto operator[](bus_cnt_t busIndex) -> float**
 	{
-		return reinterpret_cast<float*>(m_bus[pairIndex]);
+		return m_busses[busIndex].channelBuffers();
 	}
 
-	//! @returns 2D array that can be accessed like: bus()[channel pair index][sample index]
-	auto bus() const -> const SampleFrame* const* { return m_bus; }
+	//! @returns array of busses
+	auto busses() const -> const ArrayVector<BusData, MaxBussesPerTrack>& { return m_busses; }
 
-	//! @returns 2D array that can be accessed like: bus()[channel pair index][sample index]
-	auto bus() -> SampleFrame* const* { return m_bus; }
+	//! @returns array of busses
+	auto busses() -> ArrayVector<BusData, MaxBussesPerTrack>& { return m_busses; }
 
-	auto channels() const -> track_ch_t { return m_channelPairs * 2; }
-	auto channelPairs() const -> track_ch_t { return m_channelPairs; }
+	//! @returns sum of all bus channel counts
+	auto totalChannels() const -> track_ch_t { return m_totalChannels; }
+
+	//! @returns the frame count for each channel buffer
 	auto frames() const -> f_cnt_t { return m_frames; }
+
+	//! @returns scratch buffer for conversions between interleaved and planar TODO: Remove once using planar only
+	auto interleavedBuffer(bus_cnt_t busIndex) const -> InterleavedBufferView<const float, 2>
+	{
+		assert(m_busses[busIndex].channels() == 2);
+		return {m_busses[busIndex].interleavedBuffer(), m_frames};
+	}
+
+	//! @returns scratch buffer for conversions between interleaved and planar TODO: Remove once using planar only
+	auto interleavedBuffer(bus_cnt_t busIndex) -> InterleavedBufferView<float, 2>
+	{
+		assert(m_busses[busIndex].channels() == 2);
+		return {m_busses[busIndex].interleavedBuffer(), m_frames};
+	}
+
+	/**
+	 * @brief Adds a new bus at the end of the list
+	 * @returns the newly created bus, or nullptr upon failure
+	 */
+	auto addBus(ch_cnt_t channels) -> BusData*;
 
 	/**
 	 * Track channels which are known to be quiet, AKA the silence status.
-	 * 1 = track channel is quiet
-	 * 0 = track channel is assumed to carry a signal (non-quiet)
+	 * 1 = track channel is known to be silent
+	 * 0 = track channel is assumed to be non-silent
 	 */
-	auto quietChannels() const -> const std::bitset<MaxTrackChannels>& { return m_quietChannels; }
+	auto silenceFlags() const -> const std::bitset<MaxTrackChannels>& { return m_silenceFlags; }
 
 #ifdef LMMS_TESTING
-	auto quietChannels() -> std::bitset<MaxTrackChannels>& { return m_quietChannels; }
+	auto silenceFlags() -> std::bitset<MaxTrackChannels>& { return m_silenceFlags; }
 #endif
 
 	auto silenceTrackingEnabled() const -> bool { return m_silenceTrackingEnabled; }
@@ -148,19 +225,28 @@ public:
 	//! Silences (zeroes) all channels. @see silenceChannels
 	void silenceAllChannels();
 
+	//! @returns absolute peak sample value for the given channel
+	auto absPeakValue(bus_cnt_t busIndex, ch_cnt_t busChannel) const -> float;
+
 private:
-	SampleFrame* const* m_bus = nullptr; //!< [channel pair index][sample index]
-	const track_ch_t m_channelPairs = 0;
+	ArrayVector<BusData, MaxBussesPerTrack> m_busses;
+
+	//! Caches the sum of `m_busses[idx].channels()` - must never exceed MaxTrackChannels
+	track_ch_t m_totalChannels = 0;
+
 	const f_cnt_t m_frames = 0;
 
 	/**
-	 * Stores which channels are known to be quiet.
+	 * Stores which track channels are known to be quiet, AKA the silence status.
 	 *
-	 * It must always be kept in sync with the buffer data when enabled - at minimum
-	 * avoiding any false positives where a channel is marked as "quiet" when it isn't.
-	 * Any channel bits at or above `channels()` must always be marked quiet.
+	 * This must always be kept in sync with the buffer data when enabled - at minimum
+	 * avoiding any false positives where a channel is marked as "silent" when it isn't.
+	 * Any channel bits at or above `m_totalChannels` must always be marked silent.
+	 *
+	 * 1 = track channel is known to be silent
+	 * 0 = track channel is assumed to be non-silent
 	 */
-	std::bitset<MaxTrackChannels> m_quietChannels;
+	std::bitset<MaxTrackChannels> m_silenceFlags;
 
 	bool m_silenceTrackingEnabled = false;
 };

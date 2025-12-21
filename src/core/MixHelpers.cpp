@@ -28,6 +28,7 @@
 #include <iostream>
 #endif
 
+#include <algorithm>
 #include <cmath>
 
 #include "ValueBuffer.h"
@@ -89,95 +90,31 @@ void setNaNHandler( bool use )
 	s_NaNHandler = use;
 }
 
-namespace {
-
-template<std::uint8_t channels>
-bool sanitizeHelper(SampleFrame* src, int frames)
+bool sanitize(std::span<sample_t> buffer)
 {
 	if (!useNaNHandler()) { return false; }
 
-	for (int f = 0; f < frames; ++f)
+	for (std::size_t f = 0; f < buffer.size(); ++f)
 	{
-		auto& currentFrame = src[f];
-
-		bool badData;
-		if constexpr (channels == 0b10)
-		{
-			badData = std::isinf(currentFrame.left()) || std::isnan(currentFrame.left());
-		}
-		else if constexpr (channels == 0b01)
-		{
-			badData = std::isinf(currentFrame.right()) || std::isnan(currentFrame.right());
-		}
-		else
-		{
-			badData = currentFrame.containsInf() || currentFrame.containsNaN();
-		}
-
-		if (badData)
+		sample_t& sample = buffer[f];
+		if (std::isinf(sample) || std::isnan(sample))
 		{
 #ifdef LMMS_DEBUG
-			std::cerr << "Bad data, clearing buffer. frame: " << f
-				<< ": value " << currentFrame.left() << ", " << currentFrame.right() << "\n";
+			std::cerr << "Bad data, clearing buffer. frame: "
+				<< f << ": value " << sample << "\n";
 #endif
 
-			// Clear the channel(s) if a problem is found
-			if constexpr (channels != 0b11)
-			{
-				for (int frame = 0; frame < frames; ++frame)
-				{
-					if constexpr (channels == 0b10)
-					{
-						src[frame].setLeft(0.f);
-					}
-					else if constexpr (channels == 0b01)
-					{
-						src[frame].setRight(0.f);
-					}
-				}
-			}
-			else
-			{
-				std::ranges::fill_n(src, frames, SampleFrame{});
-			}
+			// Clear the channel if a problem is found
+			std::ranges::fill(buffer, 0);
 
 			return true;
 		}
 		else
 		{
-			if constexpr (channels == 0b10)
-			{
-				currentFrame.left() = std::clamp(currentFrame.left(), sample_t(-1000.0), sample_t(1000.0));
-			}
-			else if constexpr (channels == 0b01)
-			{
-				currentFrame.right() = std::clamp(currentFrame.right(), sample_t(-1000.0), sample_t(1000.0));
-			}
-			else
-			{
-				currentFrame.clamp(sample_t(-1000.0), sample_t(1000.0));
-			}
+			sample = std::clamp(sample, sample_t(-1000.0), sample_t(1000.0));
 		}
 	}
 	return false;
-};
-
-} // namespace
-
-/*! \brief Function for sanitizing a buffer of infs/nans - returns true if those are found */
-bool sanitize(SampleFrame* src, int frames)
-{
-	return sanitizeHelper<0b11>(src, frames);
-}
-
-bool sanitizeL(SampleFrame* src, int frames)
-{
-	return sanitizeHelper<0b10>(src, frames);
-}
-
-bool sanitizeR(SampleFrame* src, int frames)
-{
-	return sanitizeHelper<0b01>(src, frames);
 }
 
 struct AddOp
@@ -193,6 +130,24 @@ void add( SampleFrame* dst, const SampleFrame* src, int frames )
 	run<>( dst, src, frames, AddOp() );
 }
 
+
+void add(PlanarBufferView<sample_t> dst, PlanarBufferView<const sample_t> src)
+{
+	assert(dst.channels() == src.channels());
+	assert(dst.frames() == src.frames());
+
+	const auto channels = dst.channels();
+	const auto frames = dst.frames();
+	for (proc_ch_t channel = 0; channel < channels; ++channel)
+	{
+		auto* dstPtr = dst.bufferPtr(channel);
+		const auto* srcPtr = src.bufferPtr(channel);
+		for (f_cnt_t frame = 0; frame < frames; ++frame)
+		{
+			dstPtr[frame] += srcPtr[frame];
+		}
+	}
+}
 
 
 struct AddMultipliedOp
