@@ -38,9 +38,8 @@ SampleBuffer::SampleBuffer(const QString& audioFile)
 	if (auto decodedResult = SampleDecoder::decode(absolutePath))
 	{
 		auto& [data, sampleRate] = *decodedResult;
-		m_data = std::make_shared<std::vector<SampleFrame>>(std::move(data));
-		m_sampleRate = sampleRate;
-		m_source = PathUtil::toShortestRelative(audioFile);
+		m_data = std::make_shared<const SampleBufferData>(
+			std::move(data), PathUtil::toShortestRelative(audioFile), sampleRate);
 		return;
 	}
 
@@ -49,39 +48,36 @@ SampleBuffer::SampleBuffer(const QString& audioFile)
 }
 
 SampleBuffer::SampleBuffer(const QString& base64, sample_rate_t sampleRate)
-	: m_source(base64)
-	, m_sampleRate(sampleRate)
 {
 	// TODO: Replace with non-Qt equivalent
 	const auto bytes = QByteArray::fromBase64(base64.toUtf8());
-	m_data->resize(bytes.size() / sizeof(SampleFrame));
-	std::memcpy(reinterpret_cast<char*>(m_data->data()), bytes, m_data->size() * sizeof(SampleFrame));
+	auto data = std::vector<SampleFrame>(bytes.size() / sizeof(SampleFrame)); 
+	std::memcpy(reinterpret_cast<char*>(data.data()), bytes, m_data->data.size() * sizeof(SampleFrame));
+	m_data = std::make_shared<const SampleBufferData>(std::move(data), std::nullopt, sampleRate);
 }
 
 SampleBuffer::SampleBuffer(const SampleFrame* data, f_cnt_t numFrames, sample_rate_t sampleRate)
-	: m_data(std::make_shared<std::vector<SampleFrame>>(data, data + numFrames))
-	, m_sampleRate(sampleRate)
+	: m_data(std::make_shared<const SampleBufferData>(std::vector<SampleFrame>(data, data + numFrames), std::nullopt, sampleRate))
 {
 }
 
 SampleBuffer::SampleBuffer(f_cnt_t numFrames, sample_rate_t sampleRate)
-	: m_data(std::make_shared<std::vector<SampleFrame>>(numFrames))
-	, m_sampleRate(sampleRate)
+	: m_data(std::make_shared<const SampleBufferData>(std::vector<SampleFrame>(numFrames), std::nullopt, sampleRate))
 {
 }
 
 auto SampleBuffer::toBase64() const -> QString
 {
 	// TODO: Replace with non-Qt equivalent
-	const auto data = reinterpret_cast<const char*>(m_data->data());
-	const auto size = static_cast<int>(m_data->size() * sizeof(SampleFrame));
+	const auto data = reinterpret_cast<const char*>(m_data->data.data());
+	const auto size = static_cast<int>(m_data->data.size() * sizeof(SampleFrame));
 	const auto byteArray = QByteArray{data, size};
 	return byteArray.toBase64();
 }
 
-auto SampleBuffer::emptyData() -> std::shared_ptr<std::vector<SampleFrame>>
+auto SampleBuffer::emptyData() -> std::shared_ptr<const SampleBufferData>
 {
-	static auto s_buffer = std::make_shared<std::vector<SampleFrame>>();
+	static auto s_buffer = std::make_shared<const SampleBufferData>();
 	return s_buffer;
 }
 

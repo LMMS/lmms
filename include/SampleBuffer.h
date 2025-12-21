@@ -27,6 +27,7 @@
 
 #include <QString>
 #include <memory>
+#include <optional>
 #include <vector>
 
 #include "LmmsTypes.h"
@@ -34,6 +35,14 @@
 #include "lmms_export.h"
 
 namespace lmms {
+
+struct SampleBufferData
+{
+	std::vector<SampleFrame> data;
+	std::optional<QString> audioFilePath = std::nullopt; // TODO: Use std::filesystem::path
+	sample_rate_t sampleRate = 0;
+};
+
 //! @class SampleBuffer
 //! @brief Represents an immutable, stereo interleaved audio buffer.
 class LMMS_EXPORT SampleBuffer
@@ -59,27 +68,24 @@ public:
 	//! Converts the buffer to a Base64 string representation.
 	auto toBase64() const -> QString;
 
-	//! @returns the source of the buffer. If was from an audio file, returns the path to the audio file. If instead it
-	//! was from a Base64 string, that Base64 string is returned. Otherwise, an empty string is returned.
-	auto source() const -> const QString& { return m_source; }
+	//! @returns the path to the audio file if the buffer was loaded from one (otherwise, an empty string is returned).
+	auto audioFilePath() const -> QString { return m_data->audioFilePath.value_or(QString{}); }
 
 	//! @returns an immutable raw pointer to the audio data.
-	auto data() const -> const SampleFrame* { return m_data->data(); }
+	auto data() const -> const SampleFrame* { return m_data->data.data(); }
 
 	//! @returns true if the buffer has no audio frames, false otherwise.
-	auto empty() const -> bool { return m_data->empty(); }
+	auto empty() const -> bool { return m_data->data.size() == 0; }
 
 	//! @returns the associated sample rate with this buffer.
-	auto sampleRate() const -> sample_rate_t { return m_sampleRate; }
+	auto sampleRate() const -> sample_rate_t { return m_data->sampleRate; }
 
 	//! @returns the number of audio frames within the buffer.
-	auto numFrames() const -> f_cnt_t { return m_data->size(); }
+	auto numFrames() const -> f_cnt_t { return m_data->data.size(); }
 
 private:
-	static auto emptyData() -> std::shared_ptr<std::vector<SampleFrame>>;
-	std::shared_ptr<std::vector<SampleFrame>> m_data = emptyData();
-	QString m_source;
-	sample_rate_t m_sampleRate = 0;
+	static auto emptyData() -> std::shared_ptr<const SampleBufferData>;
+	std::shared_ptr<const SampleBufferData> m_data = emptyData();
 };
 
 } // namespace lmms

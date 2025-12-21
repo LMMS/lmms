@@ -70,7 +70,7 @@ SampleBuffer AudioSampleRecorder::createSampleBuffer()
 {
 	const f_cnt_t frames = framesRecorded();
 	// create buffer to store all recorded buffers in
-	auto bigBuffer = SampleBuffer{frames, sampleRate()};
+	auto bigBuffer = std::vector<SampleFrame>(frames);
 
 	// now copy all buffers into big buffer
 	auto framesCopied = 0;
@@ -81,7 +81,7 @@ SampleBuffer AudioSampleRecorder::createSampleBuffer()
 	}
 
 	// create according sample-buffer out of big buffer
-	return bigBuffer;
+	return SampleBuffer{bigBuffer.data(), bigBuffer.size(), sampleRate()};
 }
 
 void AudioSampleRecorder::writeBuffer(const SampleFrame* _ab, const fpp_t _frames)
