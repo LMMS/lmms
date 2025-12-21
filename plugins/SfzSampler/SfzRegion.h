@@ -33,11 +33,12 @@ public:
 	//! Returns true if any sound was actually generated
 	bool play(SampleFrame* workingBuffer, SampleFrame* temporaryBuffer, const fpp_t frames);
 
-
 	//! Load the sample file given by the `sample` opcode into m_sample.
 	//! The sample path is treated as relative to the path to the sfz file, so the parent directory is also needed
 	//! Returns true if successful
 	bool initializeSample(const QDir& parentDirectory);
+
+	const Sample& sample() const { return m_sample; }
 
 private:
 	static constexpr int MAX_ACTIVE_SOUNDS = 128;

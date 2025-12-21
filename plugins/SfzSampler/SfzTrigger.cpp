@@ -5,21 +5,21 @@
 namespace lmms
 {
 
-const SfzTrigger SfzTrigger::noteOnEvent(const int key, const int vel)
+const SfzTrigger SfzTrigger::noteOnEvent(const int key, const int velocity)
 {
 	SfzTrigger trigger = SfzTrigger();
 	trigger.m_type = Type::NoteOn;
 	trigger.m_key = key;
-	trigger.m_vel = vel;
+	trigger.m_velocity = velocity;
 	return trigger;
 }
 
-const SfzTrigger SfzTrigger::noteOffEvent(const int key, const int vel)
+const SfzTrigger SfzTrigger::noteOffEvent(const int key, const int velocity)
 {
 	SfzTrigger trigger = SfzTrigger();
 	trigger.m_type = Type::NoteOff;
 	trigger.m_key = key;
-	trigger.m_vel = vel;
+	trigger.m_velocity = velocity;
 	return trigger;
 }
 

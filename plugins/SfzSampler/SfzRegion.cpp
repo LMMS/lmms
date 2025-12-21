@@ -23,6 +23,25 @@ SfzRegion::SfzRegion(SfzOpcodeState opcodeState)
 
 bool SfzRegion::triggerConditionsMet(const SfzGlobalState& globalState, const SfzTrigger& trigger)
 {
+	if (trigger.type() == SfzTrigger::Type::NoteOn)
+	{
+		int triggerKey = trigger.key().value_or(-1);
+		int triggerVelocity = trigger.velocity().value_or(-1);
+
+		// `key` opcode
+		if (m_key != std::nullopt)
+		{
+			if (triggerKey != m_key.value_or(-1)) { return false; }
+		}
+		// `lokey` and `hikey` opcodes
+		if (triggerKey > m_hikey.value_or(-1) || triggerKey < m_lokey.value_or(-1)) { return false; }
+
+		// `lovel` and `hivel` opcodes
+		if (triggerVelocity > m_hivel.value_or(-1) || triggerVelocity < m_lovel.value_or(-1)) { return false; }
+
+		// If all the contitions passed, return true and spawn a sound
+		return true;
+	}
 	return false;
 }
 
