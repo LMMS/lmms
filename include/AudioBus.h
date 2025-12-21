@@ -48,6 +48,11 @@ public:
 	public:
 		BusData(ch_cnt_t channels, f_cnt_t frames, track_ch_t startingChannel);
 
+		BusData(const BusData&) = delete;
+		BusData(BusData&&) noexcept = default;
+		auto operator=(const BusData&) -> BusData& = delete;
+		auto operator=(BusData&&) noexcept -> BusData& = default;
+
 		//! Large buffer that all channel buffers are sourced from
 		auto sourceBuffer() const -> const float* { return m_sourceBuffer.get(); }
 
