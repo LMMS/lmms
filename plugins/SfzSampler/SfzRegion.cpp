@@ -52,7 +52,7 @@ void SfzRegion::processTrigger(const SfzGlobalState& globalState, const SfzTrigg
 	{
 		// Loop through array to find open position
 		bool foundOpenPosition = false;
-		for (size_t i = 0; i < m_activeSounds.size(); ++i)
+		for (size_t i = 0; i <= m_activeSounds.size(); ++i)
 		{
 			auto& regionPlayState = m_activeSounds[i];
 			if (!regionPlayState.active())
@@ -68,7 +68,7 @@ void SfzRegion::processTrigger(const SfzGlobalState& globalState, const SfzTrigg
 	}
 
 	// Loop through all the active sounds to check if any need to be deactivated/released by the trigger
-	for (size_t i = 0; i < m_maxActiveIndex; ++i)
+	for (size_t i = 0; i <= m_maxActiveIndex; ++i)
 	{
 		auto& regionPlayState = m_activeSounds[i];
 
@@ -85,7 +85,7 @@ void SfzRegion::processTrigger(const SfzGlobalState& globalState, const SfzTrigg
 bool SfzRegion::play(SampleFrame* workingBuffer, SampleFrame* temporaryBuffer, const fpp_t frames)
 {
 	bool anythingPlayed = false;
-	for (size_t i = 0; i < m_maxActiveIndex; ++i)
+	for (size_t i = 0; i <= m_maxActiveIndex; ++i)
 	{
 		auto& regionPlayState = m_activeSounds[i];
 

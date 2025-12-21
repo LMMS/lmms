@@ -99,10 +99,7 @@ int SfzOpcodeState::keyNumFromString(QString keyString, bool* successful)
 	QString key = keyString.chopped(1);
 	int keyOffset = 0;
 	
-	if (key == "a") { keyOffset = -3; }
-	else if (key == "a#" || key == "bb") { keyOffset = -2; }
-	else if (key == "b") { keyOffset = -1; }
-	else if (key == "c") { keyOffset = 0; } // C is 0 since that's where the octaves change
+	if (key == "c") { keyOffset = 0; } // C is 0 since that's where the octaves change
 	else if (key == "c#" || key == "db") { keyOffset = 1; }
 	else if (key == "d") { keyOffset = 2; }
 	else if (key == "d#" || key == "eb") { keyOffset = 3; }
@@ -111,6 +108,9 @@ int SfzOpcodeState::keyNumFromString(QString keyString, bool* successful)
 	else if (key == "f#" || key == "gb") { keyOffset = 6; }
 	else if (key == "g") { keyOffset = 7; }
 	else if (key == "g#" || key == "ab") { keyOffset = 8; }
+	else if (key == "a") { keyOffset = 9; }
+	else if (key == "a#" || key == "bb") { keyOffset = 10; }
+	else if (key == "b") { keyOffset = 11; }
 	else
 	{
 		*successful = false;
@@ -118,7 +118,7 @@ int SfzOpcodeState::keyNumFromString(QString keyString, bool* successful)
 		return -1;
 	}
 	*successful = true;
-	// For some reason, C1 is midi key 21, so eveything is offset by 24
+	// For some reason, C1 is midi key 24, so eveything is offset by 24
 	return 24 + keyOffset + 12 * (octave - 1);
 }
 

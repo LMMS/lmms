@@ -151,11 +151,15 @@ void SfzSampler::loadFile(const QString& filePath)
 
 	qDebug() << "was okay?" << successfulParseFile;
 	qDebug() << "num regions" << m_sfzRegions.size();
-	qDebug() << "first region sample" << m_sfzRegions[0].m_sampleFile.value_or("aaaa");
-	qDebug() << "first region lokey" << m_sfzRegions[0].m_lokey.value_or(-1);
-	qDebug() << "first region hikey" << m_sfzRegions[0].m_hikey.value_or(-1);
-	qDebug() << "first region lovel" << m_sfzRegions[0].m_lovel.value_or(-1);
-	qDebug() << "first region hivel" << m_sfzRegions[0].m_hivel.value_or(-1);
+	for (auto& region : m_sfzRegions)
+	{
+		qDebug() << "------";
+		qDebug() << "region sample" << region.m_sampleFile.value_or("aaaa");
+		qDebug() << "region lokey" << region.m_lokey.value_or(-1);
+		qDebug() << "region hikey" << region.m_hikey.value_or(-1);
+		qDebug() << "region lovel" << region.m_lovel.value_or(-1);
+		qDebug() << "region hivel" << region.m_hivel.value_or(-1);
+	}
 
 	// The SfzParser generates all the SfzRegion objects, but it doesn't load any of the samples
 	// The sample filenames are stored in the regions as from the `sample` opcode, so we just need to load the files into memory to use them
