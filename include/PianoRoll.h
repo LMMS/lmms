@@ -220,7 +220,6 @@ protected slots:
 	void copySelectedNotes();
 	void cutSelectedNotes();
 	void pasteNotes();
-	void duplicateNotes();
 	bool deleteSelectedNotes();
 
 	void updatePosition(const lmms::TimePos & t );
