@@ -26,6 +26,7 @@ public:
 	std::optional<int> m_hivel = 127;
 
 	std::optional<int> m_pitch_keycenter = 60;
+	std::optional<int> m_pitch_keytrack = 100;
 
 	std::optional<float> m_ampeg_delay = 0;
 	std::optional<float> m_ampeg_attack = 0;

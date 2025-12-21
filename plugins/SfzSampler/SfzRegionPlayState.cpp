@@ -24,10 +24,14 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const fpp_t frames)
 	// If the start is within this buffer, get the number of frames until it starts
 	const f_cnt_t startFrameOffset = std::max(0, -m_frameCount);
 	const f_cnt_t framesToPlay = frames - startFrameOffset;
+
+	// Calculate pitch difference relative to original sample
+	const int semitoneDifference = m_trigger.key().value_or(-1) - m_region->m_pitch_keycenter.value_or(-1);
+	const float freqRatio = std::exp2(-semitoneDifference * m_region->m_pitch_keytrack.value_or(-1) / 1200.0f);
 	
 	// Initially render the sample into the buffer
 	// TODO what about if other stuff is left in buffer?
-	m_region->sample().play(buffer + startFrameOffset, &m_samplePlaybackState, framesToPlay);
+	m_region->sample().play(buffer + startFrameOffset, &m_samplePlaybackState, framesToPlay, Sample::Loop::Off, freqRatio);
 
 	for (f_cnt_t f = 0; f < frames; ++f)
 	{

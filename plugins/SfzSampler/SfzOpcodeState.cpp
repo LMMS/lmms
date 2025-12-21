@@ -48,6 +48,11 @@ bool SfzOpcodeState::setOpcodeByStrings(const QString& name, const QString& valu
 		m_pitch_keycenter = value.toInt(&successful);
 		if (!successful) { m_pitch_keycenter = keyNumFromString(value, &successful); }
 	}
+	else if (name == "pitch_keytrack")
+	{
+		m_pitch_keytrack = value.toInt(&successful);
+		if (!successful) { m_pitch_keytrack = keyNumFromString(value, &successful); }
+	}
 
 	else if (name == "ampeg_delay")
 	{
