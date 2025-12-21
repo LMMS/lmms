@@ -437,13 +437,13 @@ public:
 		return reinterpret_cast<const SampleFrame*>(this->m_data)[index];
 	}
 
-	auto toSampleFrames() noexcept -> std::span<SampleFrame>
+	auto asSampleFrames() noexcept -> std::span<SampleFrame>
 		requires (std::is_same_v<T, float> && channelCount == 2)
 	{
 		return {reinterpret_cast<SampleFrame*>(this->m_data), this->m_frames};
 	}
 
-	auto toSampleFrames() const noexcept -> std::span<const SampleFrame>
+	auto asSampleFrames() const noexcept -> std::span<const SampleFrame>
 		requires (std::is_same_v<T, const float> && channelCount == 2)
 	{
 		return {reinterpret_cast<const SampleFrame*>(this->m_data), this->m_frames};
@@ -456,6 +456,10 @@ public:
 // Check that the std::span-like space optimization works
 static_assert(sizeof(InterleavedBufferView<float>) > sizeof(InterleavedBufferView<float, 2>));
 static_assert(sizeof(InterleavedBufferView<float, 2>) == sizeof(void*) + sizeof(f_cnt_t));
+
+// Deduction guides
+InterleavedBufferView(const SampleFrame*, f_cnt_t) -> InterleavedBufferView<const float, 2>;
+InterleavedBufferView(SampleFrame*, f_cnt_t) -> InterleavedBufferView<float, 2>;
 
 
 /**
