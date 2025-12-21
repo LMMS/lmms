@@ -468,15 +468,14 @@ void AutomatableModel::linkToModel(AutomatableModel* other)
 {
 	if (isLinkedToModel(other)) { return; }
 
-	// copy data from other to this
-	setValue(other->m_value);
 	if (valueBuffer() && other->valueBuffer())
 	{
 		std::copy_n(other->valueBuffer()->data(),
 			valueBuffer()->length(),
 			valueBuffer()->data());
-		emit dataChanged();
 	}
+	// copy data from other to this
+	setValue(other->m_value);
 	// link the models
 	AutomatableModel* thisEnd = getLastLinkedModel();
 	AutomatableModel* otherEnd = other->getLastLinkedModel();
