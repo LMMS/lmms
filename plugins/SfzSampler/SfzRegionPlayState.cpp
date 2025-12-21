@@ -26,7 +26,7 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const fpp_t frames)
 	const f_cnt_t framesToPlay = frames - startFrameOffset;
 	
 	// Initially render the sample into the buffer
-	// Sample::play returns whether the sample completed playback or not
+	// TODO what about if other stuff is left in buffer?
 	m_region->sample().play(buffer + startFrameOffset, &m_samplePlaybackState, framesToPlay);
 
 	for (f_cnt_t f = 0; f < frames; ++f)
@@ -40,7 +40,7 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const fpp_t frames)
 
 void SfzRegionPlayState::processTrigger(const SfzTrigger& trigger)
 {
-	if (trigger.type() == SfzTrigger::Type::NoteOff)
+	if (trigger.key() == m_trigger.key() && trigger.type() == SfzTrigger::Type::NoteOff)
 	{
 		m_active = false; // testing
 	}

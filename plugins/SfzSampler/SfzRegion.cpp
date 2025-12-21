@@ -52,11 +52,14 @@ void SfzRegion::processTrigger(const SfzGlobalState& globalState, const SfzTrigg
 	{
 		// Loop through array to find open position
 		bool foundOpenPosition = false;
-		for (auto& regionPlayState : m_activeSounds)
+		for (size_t i = 0; i < m_activeSounds.size(); ++i)
 		{
+			auto& regionPlayState = m_activeSounds[i];
 			if (!regionPlayState.active())
 			{
 				regionPlayState = SfzRegionPlayState(this, trigger);
+				// If this new index is above the current max active index, update it
+				m_maxActiveIndex = std::max(m_maxActiveIndex, i);
 				foundOpenPosition = true;
 				break;
 			}
@@ -65,11 +68,15 @@ void SfzRegion::processTrigger(const SfzGlobalState& globalState, const SfzTrigg
 	}
 
 	// Loop through all the active sounds to check if any need to be deactivated/released by the trigger
-	for (auto& regionPlayState : m_activeSounds)
+	for (size_t i = 0; i < m_maxActiveIndex; ++i)
 	{
+		auto& regionPlayState = m_activeSounds[i];
+
 		if (regionPlayState.active())
 		{
 			regionPlayState.processTrigger(trigger);
+			// If this was the max active index and the trigger caused it to deactivate, figure out what the next active index is
+			if (!regionPlayState.active() && i == m_maxActiveIndex) { recalculateMaxActiveIndex(); }
 		}
 	}
 }
@@ -78,17 +85,35 @@ void SfzRegion::processTrigger(const SfzGlobalState& globalState, const SfzTrigg
 bool SfzRegion::play(SampleFrame* workingBuffer, SampleFrame* temporaryBuffer, const fpp_t frames)
 {
 	bool anythingPlayed = false;
-	for (auto& regionPlayState : m_activeSounds)
+	for (size_t i = 0; i < m_maxActiveIndex; ++i)
 	{
-		anythingPlayed = anythingPlayed || regionPlayState.play(temporaryBuffer, frames);
-		if (anythingPlayed)
+		auto& regionPlayState = m_activeSounds[i];
+
+		if (!regionPlayState.active()) { continue; }
+
+		bool regionPlayStateProducedSound = regionPlayState.play(temporaryBuffer, frames);
+		// If the play state deactivated during playback, and this was the max active index, figure out what the new max active index is
+		if (!regionPlayState.active() && i == m_maxActiveIndex) { recalculateMaxActiveIndex(); }
+
+		if (regionPlayStateProducedSound)
 		{
-			for (f_cnt_t f = 0; f < frames; ++f) { workingBuffer[f] += temporaryBuffer[f]; }
+			for (f_cnt_t f = 0; f < frames; ++f) { workingBuffer[f] += temporaryBuffer[f]; } // TODO don't use temp buffer
 		}
+		anythingPlayed = anythingPlayed || regionPlayStateProducedSound;
 	}
 	return anythingPlayed;
 }
 
+
+void SfzRegion::recalculateMaxActiveIndex()
+{
+	// Loop backward from the old max active index to find the next play state which is active
+	while (m_maxActiveIndex > 0)
+	{
+		if (m_activeSounds[m_maxActiveIndex].active()) { return; }
+		else { m_maxActiveIndex--; }
+	}
+}
 
 
 bool SfzRegion::initializeSample(const QDir& parentDirectory)

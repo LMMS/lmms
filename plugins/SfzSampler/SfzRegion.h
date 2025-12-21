@@ -47,6 +47,14 @@ private:
 
 	//! Sample object to be played. The sample file path is defined in the `sample` opcode, but the data needs to be loaded first
 	Sample m_sample;
+
+	//! Maximum active index in the play state array
+	//! By always spawning new sounds at the lowest open index and keeping track of the maximum index which contains an actice sound,
+	//! you only need to loop through the first n elements and ignore the rest since you know they are inactive (Thanks to Lost Robot for the idea)
+	size_t m_maxActiveIndex = 0;
+	
+	//! Helper function to figure out what the maximum active index is, in the event the maximum index deacticated
+	void recalculateMaxActiveIndex();
 };
 
 
