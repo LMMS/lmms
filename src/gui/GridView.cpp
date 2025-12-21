@@ -64,6 +64,14 @@ void moveToWhole(unsigned int x, unsigned int y)
 }
 void moveToNearest(MoveDir dir)
 {
+	switch (dir)
+	{
+		case right:
+			
+			break;
+		case left:
+			break;
+	}
 }
 
 void paintEvent(QPaintEvent* pe) override
@@ -79,7 +87,7 @@ void select(QPointF start, QPointF end)
 		QPointF curEnd{}
 		{curStart, curEnd} = getBoundingBox(i);
 		QPointF curCenter{(curStart.x() + curEnd.x()) / 2.0f, (curStart.y() + curEnd.y()) / 2.0f};
-		if (curCenter.x() > end.x()) { break; }
+		if (curStart.x() > end.x()) { break; }
 		if (curCenter.x() > start.x() && start.y() < curCenter.y() && curCenter.y() > end.y())
 		{
 			m_selecion.insert(i);

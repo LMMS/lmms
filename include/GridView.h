@@ -52,7 +52,7 @@ public:
 	void moveToNearest(MoveDir dir);
 
 	//! selects everything between `start` and `end`
-	//! uses `getCenter` for bounds checking
+	//! uses getBoundingBox's center for bounds checking
 	void select(QPointF start, QPointF end);
 
 protected:
@@ -67,9 +67,8 @@ protected:
 
 	//! should return the start coords and the end coords of an object / note / point
 	virtual std::pair<QPointF, QPointF> getBoundingBox(size_t index) = 0;
-	//! should to apply selection based on `m_selectStart` and `m_selectEnd`
 	//! use `select()` to apply selection automatically
-	virtual void updateSelection();
+	virtual void updateSelection(QPointF start, QPointF, end);
 	std::set<size_t> m_selecion;
 
 	void modelChanged() override;
