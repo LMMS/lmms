@@ -67,6 +67,9 @@ public:
 
 	//! Converts the buffer to a Base64 string representation.
 	auto toBase64() const -> QString;
+	
+	//! @returns a reference to the audio frame at the given @a index.
+	auto operator[](f_cnt_t index) const -> const SampleFrame& { return m_data->data[index]; }
 
 	//! @returns the path to the audio file if the buffer was loaded from one (otherwise, an empty string is returned).
 	auto audioFilePath() const -> QString { return m_data->audioFilePath.value_or(QString{}); }
