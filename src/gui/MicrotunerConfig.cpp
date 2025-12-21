@@ -67,7 +67,7 @@ MicrotunerConfig::MicrotunerConfig() :
 #if QT_VERSION < 0x50C00
 	// Workaround for a bug in Qt versions below 5.12,
 	// where argument-dependent-lookup fails for QFlags operators
-	// declared inside a namepsace.
+	// declared inside a namespace.
 	// This affects the Q_DECLARE_OPERATORS_FOR_FLAGS macro in Instrument.h
 	// See also: https://codereview.qt-project.org/c/qt/qtbase/+/225348
 
@@ -560,7 +560,7 @@ bool MicrotunerConfig::loadKeymapFromFile()
 		QString line = stream.readLine();
 		if (line != "" && line[0] == '!')
 		{
-			if (line.length() > 1 && line[1] == '!' && i == -7)		// LMMS extension: double "!" occuring before any
+			if (line.length() > 1 && line[1] == '!' && i == -7)		// LMMS extension: double "!" occurring before any
 			{														// value is loaded marks a description field.
 				m_keymapNameEdit->setText(line.mid(2));
 			}

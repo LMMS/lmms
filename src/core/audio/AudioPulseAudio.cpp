@@ -154,7 +154,7 @@ static void context_state_callback(pa_context *c, void *userdata)
 
 			buffer_attr.maxlength = (uint32_t)(-1);
 
-			// play silence in case of buffer underun instead of using default rewind
+			// play silence in case of buffer underrun instead of using default rewind
 			buffer_attr.prebuf = 0;
 
 			buffer_attr.minreq = (uint32_t)(-1);

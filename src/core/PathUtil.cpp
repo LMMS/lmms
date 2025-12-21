@@ -97,12 +97,14 @@ namespace lmms::PathUtil
 		}
 	}
 
-	Base baseLookup(const QString & path)
+	Base baseLookup(const QString& input)
 	{
+		if (input.isEmpty()) { return Base::Absolute; };
+
 		for (auto base: relativeBases)
 		{
 			QString prefix = basePrefix(base);
-			if ( path.startsWith(prefix) ) { return base; }
+			if (input.startsWith(prefix)) { return base; }
 		}
 		return Base::Absolute;
 	}
@@ -110,63 +112,84 @@ namespace lmms::PathUtil
 
 
 
-	QString stripPrefix(const QString & path)
+	// Enforce forward slashes for cross-platform compatibility due to limitations of QDir::fromNativeSeparators, see #8107.
+	QString serializePath(const QString& input)
 	{
-		return path.mid( basePrefix(baseLookup(path)).length() );
+		if (input.isEmpty()) { return input; }
+
+		return QString(input).replace("\\", "/");
 	}
 
-	QString cleanName(const QString& path)
+	QString stripPrefix(const QString& input)
 	{
+		if (input.isEmpty()) { return input; }
+
+		QString path = serializePath(input);
+		return path.mid(basePrefix(baseLookup(path)).length());
+	}
+
+	QString cleanName(const QString& input)
+	{
+		if (input.isEmpty()) { return input; }
+
+		QString path = serializePath(input);
 		return stripPrefix(QFileInfo(path).completeBaseName());
 	}
 
 
 
 
-	QString oldRelativeUpgrade(const QString & input)
+	QString oldRelativeUpgrade(const QString& input)
 	{
-		if (input.isEmpty()) { return input; }
+		Base assumedBase = Base::Absolute;
 
-		//Start by assuming that the file is a user sample
-		Base assumedBase = Base::UserSample;
+		if (input.isEmpty()) { return basePrefix(assumedBase); }
+
+		QString path = serializePath(input);
+
+		//Check if it's a user sample.
+		QString userPath = baseLocation(Base::UserSample) + path;
+		QFileInfo userInfo(userPath);
+		if (userInfo.exists()) { assumedBase = Base::UserSample; }
 
 		//Check if it's a factory sample
-		QString factoryPath = baseLocation(Base::FactorySample) + input;
+		QString factoryPath = baseLocation(Base::FactorySample) + path;
 		QFileInfo factoryInfo(factoryPath);
 		if (factoryInfo.exists()) { assumedBase = Base::FactorySample; }
 
 		//Check if it's a VST
-		QString vstPath = baseLocation(Base::UserVST) + input;
+		QString vstPath = baseLocation(Base::UserVST) + path;
 		QFileInfo vstInfo(vstPath);
 		if (vstInfo.exists()) { assumedBase = Base::UserVST; }
 
 		//Assume we've found the correct base location, return the full path
-		return basePrefix(assumedBase) + input;
+		return basePrefix(assumedBase) + path;
 	}
 
-
-
-
-	QString toAbsolute(const QString & input, bool* error /* = nullptr*/)
+	QString toAbsolute(const QString& input, bool* error /* = nullptr*/)
 	{
+		if (input.isEmpty()) { return input; }
+
+		QString path = serializePath(input);
 		//First, do no harm to absolute paths
-		QFileInfo inputFileInfo = QFileInfo(input);
+		// Note: Paths starting with a colon (:) are always considered absolute, as they denote a QResource.
+		QFileInfo inputFileInfo = QFileInfo(path);
 		if (inputFileInfo.isAbsolute())
 		{
 			if (error) { *error = false; }
-			return input;
+			return path;
 		}
 		//Next, handle old relative paths with no prefix
-		QString upgraded = input.contains(":") ? input : oldRelativeUpgrade(input);
-
+		QString upgraded = oldRelativeUpgrade(path);
 		Base base = baseLookup(upgraded);
 		return baseLocation(base, error) + upgraded.remove(0, basePrefix(base).length());
 	}
 
-	QString relativeOrAbsolute(const QString & input, const Base base)
+	QString relativeOrAbsolute(const QString& input, const Base base)
 	{
 		if (input.isEmpty()) { return input; }
-		QString absolutePath = toAbsolute(input);
+
+		QString absolutePath = toAbsolute(serializePath(input));
 		if (base == Base::Absolute) { return absolutePath; }
 		bool error;
 		QString relativePath = baseQDir(base, &error).relativeFilePath(absolutePath);
@@ -177,10 +200,13 @@ namespace lmms::PathUtil
 			: relativePath;
 	}
 
-	QString toShortestRelative(const QString & input, bool allowLocal /* = false*/)
+	QString toShortestRelative(const QString& input, bool allowLocal /* = false*/)
 	{
-		QFileInfo inputFileInfo = QFileInfo(input);
-		QString absolutePath = inputFileInfo.isAbsolute() ? input : toAbsolute(input);
+		if (input.isEmpty()) { return basePrefix(Base::Absolute); }
+
+		QString path = serializePath(input);
+		QFileInfo inputFileInfo = QFileInfo(path);
+		QString absolutePath = inputFileInfo.isAbsolute() ? path : toAbsolute(path);
 
 		Base shortestBase = Base::Absolute;
 		QString shortestPath = relativeOrAbsolute(absolutePath, shortestBase);
