@@ -70,28 +70,6 @@ SampleBuffer::SampleBuffer(f_cnt_t numFrames, sample_rate_t sampleRate)
 {
 }
 
-auto SampleBuffer::operator[](f_cnt_t index) -> SampleFrame&
-{
-	assert(index < m_data->size());
-
-	if (!m_data.unique())
-	{
-		m_data = std::make_shared<std::vector<SampleFrame>>(*m_data);
-	}
-
-	return (*m_data)[index];
-}
-
-auto SampleBuffer::data() -> SampleFrame*
-{
-	if (!m_data.unique())
-	{
-		m_data = std::make_shared<std::vector<SampleFrame>>(*m_data);
-	}
-
-	return m_data->data();
-}
-
 auto SampleBuffer::toBase64() const -> QString
 {
 	// TODO: Replace with non-Qt equivalent

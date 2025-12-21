@@ -61,9 +61,6 @@ public:
 	//! Constructs a silent buffer with a size of @a numFrames and a sample Rate of @a sampleRate.
 	SampleBuffer(f_cnt_t numFrames, sample_rate_t sampleRate);
 
-	//! @returns a mutable reference the audio frame at the given @a index.
-	auto operator[](f_cnt_t index) -> SampleFrame&;
-
 	//! Converts the buffer to a Base64 string representation.
 	auto toBase64() const -> QString;
 
@@ -73,9 +70,6 @@ public:
 
 	//! @returns an immutable raw pointer to the audio data.
 	auto data() const -> const SampleFrame* { return m_data->data(); }
-
-	//! @returns a mutable raw pointer to the audio data.
-	auto data() -> SampleFrame*;
 
 	//! @returns true if the buffer has no audio frames, false otherwise.
 	auto empty() const -> bool { return m_data->empty(); }
