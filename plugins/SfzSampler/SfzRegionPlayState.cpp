@@ -4,6 +4,8 @@
 
 #include "SfzRegion.h"
 
+#include "lmms_math.h"
+
 namespace lmms
 {
 
@@ -13,6 +15,44 @@ SfzRegionPlayState::SfzRegionPlayState(const SfzRegion* region, const SfzTrigger
 	, m_region(region)
 {
 }
+
+
+
+float SfzRegionPlayState::envelopeGenerator(const f_cnt_t delay, const f_cnt_t attack, const f_cnt_t hold, const f_cnt_t decay, const float sustain, const f_cnt_t release) const
+{
+	// If the note hasn't started yet, don't do anything
+	if (m_frameCount < 0) { return 0.0f; }
+	// If the note has already been released, return the release amplitude
+	if (m_released && static_cast<f_cnt_t>(m_frameCount) > m_releaseFrame)
+	{
+		// According to https://sfzformat.com/tutorials/envelope_generators/, release and decay follow exponential curves (linear in dB) which go from 0 to -90 dB
+		return dbfsToAmp(-90 * static_cast<float>(m_frameCount - m_releaseFrame) / release);
+	}
+	// If it hasn't been released yet, do the normal envelope shape
+	else if (static_cast<f_cnt_t>(m_frameCount) < delay)
+	{
+		return 0.f;
+	}
+	else if (static_cast<f_cnt_t>(m_frameCount) < delay + attack)
+	{
+		return static_cast<float>(m_frameCount - delay) / attack;
+	}
+	else if (static_cast<f_cnt_t>(m_frameCount) < delay + attack + hold)
+	{
+		return 1.0f;
+	}
+	else if (static_cast<f_cnt_t>(m_frameCount) < delay + attack + hold + decay)
+	{
+		// Follow an exponential curve from 0 to -90 dB, but stop at the sustain value
+		return std::max(sustain, dbfsToAmp(-90 * static_cast<float>(m_frameCount - (delay + attack + hold)) / decay));
+	}
+	else
+	{
+		return sustain;
+	}
+}
+
+
 
 
 bool SfzRegionPlayState::play(SampleFrame* buffer, const fpp_t frames)
@@ -33,9 +73,26 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const fpp_t frames)
 	// TODO what about if other stuff is left in buffer?
 	m_region->sample().play(buffer + startFrameOffset, &m_samplePlaybackState, framesToPlay, Sample::Loop::Off, freqRatio);
 
+	// Apply amplitude envelope
+	const float sampleRate = Engine::audioEngine()->outputSampleRate();
 	for (f_cnt_t f = 0; f < frames; ++f)
 	{
+		float ampeg = envelopeGenerator(
+			m_region->m_ampeg_delay.value_or(0) * sampleRate,
+			m_region->m_ampeg_attack.value_or(0) * sampleRate,
+			m_region->m_ampeg_hold.value_or(0) * sampleRate,
+			m_region->m_ampeg_decay.value_or(0) * sampleRate,
+			m_region->m_ampeg_sustain.value_or(0) / 100.0f, // Sustain is stored in percent, so divide by 100 to get ratio
+			m_region->m_ampeg_release.value_or(0) * sampleRate
+		);
+		buffer[f] *= ampeg;
 		m_frameCount++;
+	}
+
+	// Deactive the voice if it has been released and the release has finished
+	if (m_released && m_frameCount - m_releaseFrame > m_region->m_ampeg_release.value_or(0) * sampleRate)
+	{
+		m_active = false;
 	}
 
 	return true;
@@ -46,7 +103,8 @@ void SfzRegionPlayState::processTrigger(const SfzTrigger& trigger)
 {
 	if (trigger.key() == m_trigger.key() && trigger.type() == SfzTrigger::Type::NoteOff)
 	{
-		m_active = false; // testing
+		m_released = true;
+		m_releaseFrame = m_frameCount; // testing
 	}
 }
 

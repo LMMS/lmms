@@ -29,6 +29,9 @@ public:
 
 	bool active() const { return m_active; }
 
+	//! Helper function for calculating the envelope value at the current frame
+	float envelopeGenerator(const f_cnt_t delay, const f_cnt_t attack, const f_cnt_t hold, const f_cnt_t decay, const float sustain, const f_cnt_t release) const;
+
 private:
 	//! Stores whether this object still represents a sound which exists.
 	//! This will be true when the sound is active, but will become false once the release has ended or it has been forcefully deactivated.
