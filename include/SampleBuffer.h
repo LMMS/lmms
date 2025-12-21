@@ -35,12 +35,7 @@
 
 namespace lmms {
 //! @class SampleBuffer
-//! @brief Represents a stereo, interleaved audio buffer.
-//! SampleBuffer can be loaded from an audio file on disk, a Base64 string, or raw audio frame data.
-//! @note This class implements the CoW (copy-on-write) technique. It stores a shared pointer to the raw audio data, so
-//! if copies are made, the data is shared automatically. When modifications to this buffer are made, a deep copy of the
-//! data happens if being shared.
-//! @todo This class should support any number of channels, rather than being fixed at stereo.
+//! @brief Represents an immutable, stereo interleaved audio buffer.
 class LMMS_EXPORT SampleBuffer
 {
 public:
