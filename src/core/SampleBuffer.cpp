@@ -32,7 +32,7 @@ namespace lmms {
 
 SampleBuffer::SampleBuffer(const QString& audioFile)
 {
-	if (audioFile.isEmpty()) { throw std::runtime_error{"Failure loading audio file: Audio file path is empty."}; }
+	assert(!audioFile.isEmpty());
 	const auto absolutePath = PathUtil::toAbsolute(audioFile);
 
 	if (auto decodedResult = SampleDecoder::decode(absolutePath))
