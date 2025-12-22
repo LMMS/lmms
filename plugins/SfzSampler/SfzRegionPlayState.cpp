@@ -6,6 +6,9 @@
 
 #include "lmms_math.h"
 
+#include "MicroTimer.h"
+#include <QDebug>
+
 namespace lmms
 {
 
@@ -23,7 +26,7 @@ float SfzRegionPlayState::envelopeGenerator(const f_cnt_t delay, const f_cnt_t a
 	// If the note hasn't started yet, don't do anything
 	if (m_frameCount < 0) { return 0.0f; }
 	// If the note has already been released, return the release amplitude
-	if (m_released && static_cast<f_cnt_t>(m_frameCount) > m_releaseFrame)
+	if (m_released && m_frameCount > m_releaseFrame)
 	{
 		// According to https://sfzformat.com/tutorials/envelope_generators/, release and decay follow exponential curves (linear in dB) which go from 0 to -90 dB
 		return dbfsToAmp(-90 * static_cast<float>(m_frameCount - m_releaseFrame) / release);
@@ -59,6 +62,14 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const fpp_t frames)
 {
 	// If the sound is not active (note was released, off_by triggered, etc) then don't render any audio
 	if (!m_active) { return false; }
+
+	static int totalMicroseconds = 0;
+	static int totalSquaredMicroseconds = 0;
+	static int totalCalls = 0;
+	static int minElapsed = 10000000;
+	static int maxElapsed = 0;
+	MicroTimer profiler;
+
 	// If the initial m_frameCount is negative, that means the note hasn't started yet
 	if (m_frameCount < -static_cast<int>(frames)) { m_frameCount += frames; return false; } // If the note doesn't start in this buffer, don't play anything
 	// If the start is within this buffer, get the number of frames until it starts
@@ -73,27 +84,39 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const fpp_t frames)
 	// TODO what about if other stuff is left in buffer?
 	m_region->sample().play(buffer + startFrameOffset, &m_samplePlaybackState, framesToPlay, Sample::Loop::Off, freqRatio);
 
-	// Apply amplitude envelope
 	const float sampleRate = Engine::audioEngine()->outputSampleRate();
+
+	// Amplitude envelope
+	const f_cnt_t ampegDelayFrames = m_region->m_ampeg_delay.value() * sampleRate;
+	const f_cnt_t ampegAttackFrames = m_region->m_ampeg_attack.value() * sampleRate;
+	const f_cnt_t ampegHoldFrames = m_region->m_ampeg_hold.value() * sampleRate;
+	const f_cnt_t ampegDecayFrames = m_region->m_ampeg_decay.value() * sampleRate;
+	const float ampegSustain = m_region->m_ampeg_sustain.value() / 100.0f; // Sustain is stored in percent, so divide by 100 to get ratio
+	const f_cnt_t ampegReleaseFrames = m_region->m_ampeg_release.value() * sampleRate;
+
 	for (f_cnt_t f = 0; f < frames; ++f)
 	{
 		float ampeg = envelopeGenerator(
-			m_region->m_ampeg_delay.value() * sampleRate,
-			m_region->m_ampeg_attack.value() * sampleRate,
-			m_region->m_ampeg_hold.value() * sampleRate,
-			m_region->m_ampeg_decay.value() * sampleRate,
-			m_region->m_ampeg_sustain.value() / 100.0f, // Sustain is stored in percent, so divide by 100 to get ratio
-			m_region->m_ampeg_release.value() * sampleRate
+			ampegDelayFrames,
+			ampegAttackFrames,
+			ampegHoldFrames,
+			ampegDecayFrames,
+			ampegSustain,
+			ampegReleaseFrames
 		);
 		buffer[f] *= ampeg;
 		m_frameCount++;
 	}
 
 	// Deactive the voice if it has been released and the release has finished
-	if (m_released && m_frameCount - m_releaseFrame > m_region->m_ampeg_release.value() * sampleRate)
+	if (m_released && static_cast<f_cnt_t>(m_frameCount - m_releaseFrame) > ampegReleaseFrames)
 	{
 		m_active = false;
 	}
+
+	int elapsed = profiler.elapsed(); totalMicroseconds += elapsed; totalSquaredMicroseconds += elapsed * elapsed; totalCalls++; minElapsed = std::min(minElapsed, elapsed); maxElapsed = std::max(maxElapsed, elapsed);
+	float mean = 1.0f * totalMicroseconds / totalCalls, variance = (1.0f * totalSquaredMicroseconds - 1.0f * totalMicroseconds * totalMicroseconds / totalCalls / totalCalls) / totalCalls;
+	qDebug() << "SfzRegionPlayState::play profiler:" << elapsed << "Min:" << minElapsed << "Max:" << maxElapsed << "Total calls" << totalCalls << "Mean:" << mean << "Stdev:" << std::sqrt(variance) << "Stdev of mean:" << sqrt(variance / totalCalls);
 
 	return true;
 }
