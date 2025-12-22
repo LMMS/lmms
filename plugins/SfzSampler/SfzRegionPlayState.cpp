@@ -78,13 +78,14 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const fpp_t frames)
 
 	// Calculate pitch difference relative to original sample
 	const int semitoneDifference = m_trigger.key().value() - m_region->m_pitch_keycenter.value();
-	const float freqRatio = std::exp2(-semitoneDifference * m_region->m_pitch_keytrack.value() / 1200.0f);
-	
-	// Initially render the sample into the buffer
-	// TODO what about if other stuff is left in buffer?
-	m_region->sample().play(buffer + startFrameOffset, &m_samplePlaybackState, framesToPlay, Sample::Loop::Off, freqRatio);
+	const float freqRatio = std::exp2(semitoneDifference * m_region->m_pitch_keytrack.value() / 1200.0f);
 
+	// Sample rate of sample
+	const float sampleSampleRate = m_region->sample().sampleRate();
+	// Sample rate of LMMS
 	const float sampleRate = Engine::audioEngine()->outputSampleRate();
+	// Play the sample faster/slower to match the correct sample rate
+	freqRatio *= sampleSampleRate / sampleRate;
 
 	// Amplitude envelope
 	const f_cnt_t ampegDelayFrames = m_region->m_ampeg_delay.value() * sampleRate;
@@ -96,7 +97,7 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const fpp_t frames)
 
 	for (f_cnt_t f = 0; f < frames; ++f)
 	{
-		float ampeg = envelopeGenerator(
+		const float ampeg = envelopeGenerator(
 			ampegDelayFrames,
 			ampegAttackFrames,
 			ampegHoldFrames,
@@ -104,7 +105,9 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const fpp_t frames)
 			ampegSustain,
 			ampegReleaseFrames
 		);
-		buffer[f] *= ampeg;
+		buffer[f][0] += m_region->sample().at(m_sampleFrame, 0) * ampeg;
+		buffer[f][1] += m_region->sample().at(m_sampleFrame, 1) * ampeg;
+		m_sampleFrame = std::min(static_cast<float>(m_region->sample().size()), m_sampleFrame + freqRatio);
 		m_frameCount++;
 	}
 

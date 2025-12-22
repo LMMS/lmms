@@ -62,8 +62,6 @@ public:
 private:
 	void processTrigger(const SfzTrigger& trigger);
 
-	std::unique_ptr<SampleFrame[]> m_tempBuffer;
-
 	InstrumentTrack* m_parentTrack;
 
 	//! Holds information about the total number of notes active, last switch keys pressed, etc

@@ -64,7 +64,6 @@ PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* m, void*)
 
 SfzSampler::SfzSampler(InstrumentTrack* instrumentTrack)
 	: Instrument(instrumentTrack, &sfzsampler_plugin_descriptor, nullptr, Flag::IsSingleStreamed)
-	, m_tempBuffer(std::make_unique<SampleFrame[]>(Engine::audioEngine()->framesPerPeriod()))
 	, m_parentTrack(instrumentTrack)
 {
 	QString path = ConfigManager::inst()->userSamplesDir() + "sfz/jlearman.jRhodes3c-master/jRhodes3c-looped-flac-sfz/";
@@ -132,12 +131,7 @@ void SfzSampler::play(SampleFrame* workingBuffer)
 		// Render audio from each of the regions
 		// This amounts to the regions themselves rendering the audio from each of their active SfzRegionPlayStates
 		// We pass a temporary buffer which can be used for rendering samples and later summing it to the working buffer.
-		bool anythingPlayed = region.play(workingBuffer, m_tempBuffer.get(), frames);
-		// The buffer cleared and reused for each region so that the regions don't have to worry about allocating it.
-		if (anythingPlayed)
-		{
-			for (f_cnt_t f = 0; f < frames; ++f) { m_tempBuffer[f] = SampleFrame{0.0f}; } // TODO can we avoid this?
-		}
+		bool anythingPlayed = region.play(workingBuffer, frames);
 	}
 }
 

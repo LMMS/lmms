@@ -44,8 +44,8 @@ private:
 	//! The frame at which the note was released, relative to the start of the note
 	int m_releaseFrame = 0;
 
-	//! In order to play a Sample, we have to keep a persistance Sample::PlaybackState object which holds things likethe current frame position in the sample, etc
-	Sample::PlaybackState m_samplePlaybackState;
+	//! Stores the current frame index being played in the region's sample. This is a float, since interpolation is done to change pitch/sample rate
+	float m_sampleFrame = 0;
 
 	//! The trigger event which caused this sound
 	SfzTrigger m_trigger;

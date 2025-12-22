@@ -18,6 +18,8 @@ build_plugin(sfzsampler
 	SfzGlobalState.h
 	SfzTrigger.cpp
 	SfzTrigger.h
+	SfzSampleBuffer.cpp
+	SfzSampleBuffer.h
 	MOCFILES
 	SfzSampler.h
 	SfzSamplerView.h
@@ -28,5 +30,6 @@ build_plugin(sfzsampler
 	SfzRegionPlayState.h
 	SfzGlobalState.h
 	SfzTrigger.h
+	SfzSampleBuffer.h
 	EMBEDDED_RESOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.png"
 )

@@ -82,24 +82,17 @@ void SfzRegion::processTrigger(const SfzGlobalState& globalState, const SfzTrigg
 }
 
 
-bool SfzRegion::play(SampleFrame* workingBuffer, SampleFrame* temporaryBuffer, const fpp_t frames)
+bool SfzRegion::play(SampleFrame* workingBuffer, const fpp_t frames)
 {
 	bool anythingPlayed = false;
 	for (size_t i = 0; i <= m_maxActiveIndex; ++i)
 	{
 		auto& regionPlayState = m_activeSounds[i];
-
 		if (!regionPlayState.active()) { continue; }
 
-		bool regionPlayStateProducedSound = regionPlayState.play(temporaryBuffer, frames);
+		anythingPlayed = regionPlayState.play(workingBuffer, frames) || anythingPlayed;
 		// If the play state deactivated during playback, and this was the max active index, figure out what the new max active index is
 		if (!regionPlayState.active() && i == m_maxActiveIndex) { recalculateMaxActiveIndex(); }
-
-		if (regionPlayStateProducedSound)
-		{
-			for (f_cnt_t f = 0; f < frames; ++f) { workingBuffer[f] += temporaryBuffer[f]; } // TODO don't use temp buffer
-		}
-		anythingPlayed = anythingPlayed || regionPlayStateProducedSound;
 	}
 	return anythingPlayed;
 }
@@ -127,7 +120,7 @@ bool SfzRegion::initializeSample(const QDir& parentDirectory)
 
 	if (auto buffer = gui::SampleLoader::createBufferFromFile(parentDirectory.absoluteFilePath(m_sampleFile.value())))
 	{
-		m_sample = Sample(std::move(buffer));
+		m_sample = SfzSampleBuffer(buffer->data(), buffer->size(), buffer->sampleRate());
 		return true;
 	}
 	return false;
