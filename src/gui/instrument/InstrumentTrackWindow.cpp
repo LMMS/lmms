@@ -135,14 +135,14 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	soloMuteLayout->setContentsMargins(0, 0, 2, 0);
 	soloMuteLayout->setSpacing(2);
 
-	m_muteBtn = new AutomatableButton(this, tr("Mute"));
+	m_muteBtn = new AutomatableButton(this);
 	m_muteBtn->setModel(&m_track->m_mutedModel);
 	m_muteBtn->setCheckable(true);
 	m_muteBtn->setObjectName("btn-mute");
 	m_muteBtn->setToolTip(tr("Mute this instrument"));
 	soloMuteLayout->addWidget(m_muteBtn, 0, widgetAlignment);
 
-	m_soloBtn = new AutomatableButton(this, tr("Solo"));
+	m_soloBtn = new AutomatableButton(this);
 	m_soloBtn->setModel(&m_track->m_soloModel);
 	m_soloBtn->setCheckable(true);
 	m_soloBtn->setObjectName("btn-solo");

@@ -116,13 +116,13 @@ MixerChannelView::MixerChannelView(QWidget* parent, MixerView* mixerView, int ch
 	renameLineEditProxy->setRotation(-90);
 	m_renameLineEditView->setFixedSize(m_renameLineEdit->height() + 5, m_renameLineEdit->width() + 5);
 
-	m_muteButton = new AutomatableButton(this, tr("Mute"));
+	m_muteButton = new AutomatableButton(this);
 	m_muteButton->setObjectName("btn-mute");
 	m_muteButton->setToolTip(tr("Mute this channel"));
 	m_muteButton->setCheckable(true);
 	m_muteButton->setModel(&mixerChannel->m_muteModel);
 
-	m_soloButton = new AutomatableButton(this, tr("Solo"));
+	m_soloButton = new AutomatableButton(this);
 	m_soloButton->setObjectName("btn-solo");
 	m_soloButton->setToolTip(tr("Solo this channel"));
 	m_soloButton->setCheckable(true);

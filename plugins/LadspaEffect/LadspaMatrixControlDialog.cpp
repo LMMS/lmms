@@ -66,7 +66,7 @@ LadspaMatrixControlDialog::LadspaMatrixControlDialog(LadspaControls * ladspaCont
 	{
 		mainLayout->addSpacing(3);
 
-		m_stereoLink = new LedCheckBox(tr("Link Channels"), this, QString(), LedCheckBox::LedColor::Green, false);
+		m_stereoLink = new LedCheckBox(tr("Link Channels"), this, LedCheckBox::LedColor::Green, false);
 		m_stereoLink->setModel(&ladspaControls->m_stereoLinkModel);
 		mainLayout->addWidget(m_stereoLink, 0, Qt::AlignCenter);
 	}
@@ -150,7 +150,7 @@ void LadspaMatrixControlDialog::arrangeControls(QWidget * parent, QGridLayout* g
 			// Only use the first channel to determine if we need to add link controls
 			if (i == 0 && ladspaControl->m_link)
 			{
-				LedCheckBox * linkCheckBox = new LedCheckBox("", parent, "", LedCheckBox::LedColor::Green);
+				LedCheckBox* linkCheckBox = new LedCheckBox(parent, LedCheckBox::LedColor::Green);
 				linkCheckBox->setModel(&ladspaControl->m_linkEnabledModel);
 				linkCheckBox->setToolTip(tr("Link channels"));
 				gridLayout->addWidget(linkCheckBox, currentRow, linkColumn, Qt::AlignHCenter);

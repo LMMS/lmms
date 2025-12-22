@@ -40,7 +40,7 @@ GroupBox::GroupBox( const QString & _caption, QWidget * _parent ) :
 	m_caption( _caption ),
 	m_titleBarHeight( 11 )
 {
-	m_led = new PixmapButton( this, _caption );
+	m_led = new PixmapButton(this);
 	m_led->setCheckable( true );
 	m_led->move( 3, 0 );
 	m_led->setActiveGraphic( embed::getIconPixmap( "led_green" ) );
