@@ -33,6 +33,8 @@
 #include <vector>
 #include <algorithm>
 
+#include <QCoreApplication>
+
 namespace lmms
 {
 
@@ -148,7 +150,7 @@ std::array<InstrumentFunctionNoteStacking::ChordTable::Init, InstrumentFunctionN
 
 
 InstrumentFunctionNoteStacking::Chord::Chord( const char * n, const ChordSemiTones & semi_tones ) :
-	m_name( InstrumentFunctionNoteStacking::tr( n ) )
+	m_name(QCoreApplication::translate("InstrumentFunctionNoteStacking", n))
 {
 	for( m_size = 0; m_size < MAX_CHORD_POLYPHONY; m_size++ )
 	{
