@@ -146,7 +146,6 @@ public:
 		return m_midiClip;
 	}
 
-	// TODO remove this since PianoRoll should no longer be visible without a valid midi clip
 	bool hasValidMidiClip() const
 	{
 		return m_midiClip != nullptr;
@@ -222,8 +221,8 @@ protected slots:
 	void pasteNotes();
 	bool deleteSelectedNotes();
 
-	void updatePosition(const lmms::TimePos & t );
-	void updatePositionAccompany(const lmms::TimePos & t );
+	void updatePosition();
+	void updatePositionAccompany();
 	void updatePositionStepRecording(const lmms::TimePos & t );
 
 	void zoomingChanged();
@@ -328,6 +327,7 @@ private:
 	void cancelStrumAction();
 
 	void updateScrollbars();
+	void updatePositionLinePos();
 	void updatePositionLineHeight();
 
 	QList<int> getAllOctavesForKey( int keyToMirror ) const;
@@ -531,9 +531,6 @@ private:
 	QBrush m_blackKeyActiveBackground;
 	QBrush m_blackKeyInactiveBackground;
 	QBrush m_blackKeyDisabledBackground;
-
-signals:
-	void positionChanged( const lmms::TimePos & );
 } ;
 
 

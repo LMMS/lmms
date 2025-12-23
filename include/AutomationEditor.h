@@ -157,7 +157,7 @@ protected slots:
 	void setProgressionType(int type);
 	void setTension();
 
-	void updatePosition( const lmms::TimePos & t );
+	void updatePosition();
 
 	void zoomingXChanged();
 	void zoomingYChanged();
@@ -298,7 +298,6 @@ private:
 
 signals:
 	void currentClipChanged();
-	void positionChanged( const lmms::TimePos & );
 } ;
 
 

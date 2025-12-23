@@ -320,6 +320,7 @@ void AudioFileProcessor::setAudioFile(const QString& _audio_file, bool _rename)
 
 	m_sample = Sample(gui::SampleLoader::createBufferFromFile(_audio_file));
 	loopPointChanged();
+	reverseModelChanged();
 	emit sampleUpdated();
 }
 
