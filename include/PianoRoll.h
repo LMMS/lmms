@@ -372,6 +372,9 @@ private:
 	static const std::vector<float> m_zoomYLevels;
 
 	MidiClip* m_midiClip;
+	//! Vector of notes which have their detuning/other parameter being edited.
+	//! TODO: This is the same as the selected notes, except that these are cached. Refactor getSelectedNotes() to be more efficient so that it can be used instead.
+	NoteVector m_selectedParameterEditNotes;
 	NoteVector m_ghostNotes;
 
 	inline const NoteVector & ghostNotes() const
@@ -456,6 +459,8 @@ private:
 	void drawDetuningInfo( QPainter & _p, const Note * _n, int _x, int _y ) const;
 	bool mouseOverNote();
 	Note * noteUnderMouse();
+	//! Calculates the closest note to the mouse given their parameter automation curve
+	Note* parameterEditNoteUnderMouse(Note::ParameterType paramType);
 
 	// turn a selection rectangle into selected notes
 	void computeSelectedNotes( bool shift );
@@ -473,6 +478,22 @@ private:
 
 	void updateKnifePos(QMouseEvent* me, bool initial);
 
+	//! Varaibles which hold which mouse buttons are being held while editing the detuning/parameter of notes.
+	bool m_parameterEditDownLeft = false;
+	bool m_parameterEditDownRight = false;
+	//! Stores the last edited position for the note detuning/parameter curves.
+	//! When erasing nodes when dragging the mouse, all nodes in the range of the last mouse pos to the current mouse pos are removed. Without this, when dragging the mouse super fast, some nodes could get missed; this ensures all nodes from the previous mouse position to the current one will get deleted.
+	int m_lastParameterEditTick = -1;
+	//! The current note whose detuning/parameter curve is being edited.
+	Note* m_parameterEditClickedNote;
+
+	//! Updates the currently dragged node position in the detuning/parameter curve of the selected notes.
+	void updateParameterEditPos(QMouseEvent* me, Note::ParameterType paramType);
+	//! Applies the dragging of the current node of the detuning/parameter curves
+	void applyParameterEditPos(QMouseEvent* me, Note::ParameterType paramType);
+	//! Initializes the currently selected notes for detuning. If any notes are selected, it uses those. If none are selected but there is a note under the mouse, it will select that note.
+	bool setupParameterEditNotes(Note::ParameterType paramType);
+  
 	//! Stores the chords for the strum tool
 	std::vector<NoteVector> m_selectedChords;
 	//! Computes which notes belong to which chords from the selection
