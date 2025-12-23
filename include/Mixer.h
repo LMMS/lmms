@@ -25,6 +25,7 @@
 #ifndef LMMS_MIXER_H
 #define LMMS_MIXER_H
 
+#include "AudioBus.h"
 #include "Model.h"
 #include "EffectChain.h"
 #include "JournallingObject.h"
@@ -49,14 +50,12 @@ class MixerChannel : public ThreadableJob
 
 		EffectChain m_fxChain;
 
-		// set to true when input fed from mixToChannel or child channel
-		bool m_hasInput;
 		// set to true if any effect in the channel is enabled and running
 		bool m_stillRunning;
 
 		float m_peakLeft;
 		float m_peakRight;
-		SampleFrame* m_buffer;
+		AudioBus m_busses;
 		bool m_muteBeforeSolo;
 		BoolModel m_muteModel;
 		BoolModel m_soloModel;
@@ -143,7 +142,7 @@ public:
 	Mixer();
 	~Mixer() override;
 
-	void mixToChannel( const SampleFrame* _buf, mix_ch_t _ch );
+	void mixToChannel(const AudioBus& busses, mix_ch_t channel);
 
 	void prepareMasterMix();
 	void masterMix( SampleFrame* _buf );
