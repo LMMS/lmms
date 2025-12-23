@@ -66,8 +66,8 @@ LfoController::LfoController( Model * _parent ) :
 
 	connect( Engine::getSong(), SIGNAL(playbackStateChanged()),
 			this, SLOT(updatePhase()));
-	connect( Engine::getSong(), SIGNAL(playbackPositionChanged()),
-			this, SLOT(updatePhase()));
+	connect(Engine::getSong(), &Song::playbackPositionJumped,
+			this, &LfoController::updatePhase);
 
 	updateDuration();
 }
