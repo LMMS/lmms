@@ -46,10 +46,7 @@ AudioSoundIo::AudioSoundIo( bool & outSuccessful, AudioEngine * _audioEngine ) :
 	outSuccessful = false;
 	m_soundio = nullptr;
 	m_outstream = nullptr;
-	m_outBuf = nullptr;
 	m_disconnectErr = 0;
-	m_outBufFrameIndex = 0;
-	m_outBufFramesTotal = 0;
 	m_stopped = true;
 	m_outstreamStarted = false;
 
@@ -164,7 +161,7 @@ AudioSoundIo::AudioSoundIo( bool & outSuccessful, AudioEngine * _audioEngine ) :
 	}
 
 	m_outstream->name = "LMMS";
-	m_outstream->software_latency = (double)audioEngine()->framesPerPeriod() / (double)currentSampleRate;
+	m_outstream->software_latency = static_cast<double>(audioEngine()->framesPerAudioBuffer()) / currentSampleRate;
 	m_outstream->userdata = this;
 	m_outstream->write_callback = staticWriteCallback;
 	m_outstream->error_callback = staticErrorCallback;
@@ -192,8 +189,6 @@ void AudioSoundIo::onBackendDisconnect(int err)
 
 AudioSoundIo::~AudioSoundIo()
 {
-	stopProcessing();
-	
 	if (m_outstream)
 	{
 		soundio_outstream_destroy(m_outstream);
@@ -206,14 +201,8 @@ AudioSoundIo::~AudioSoundIo()
 	}
 }
 
-void AudioSoundIo::startProcessing()
+void AudioSoundIo::startProcessingImpl()
 {
-	m_outBufFrameIndex = 0;
-	m_outBufFramesTotal = 0;
-	m_outBufSize = audioEngine()->framesPerPeriod();
-
-	m_outBuf = new SampleFrame[m_outBufSize];
-
 	if (! m_outstreamStarted)
 	{
 		if (int err = soundio_outstream_start(m_outstream))
@@ -237,7 +226,7 @@ void AudioSoundIo::startProcessing()
 	}
 }
 
-void AudioSoundIo::stopProcessing()
+void AudioSoundIo::stopProcessingImpl()
 {
 	m_stopped = true;
 	if (m_outstream)
@@ -248,12 +237,6 @@ void AudioSoundIo::stopProcessing()
 				"AudioSoundIo::stopProcessing() :: pausing result error: %s\n",
 				soundio_strerror(err));
 		}
-	}
-
-	if (m_outBuf)
-	{
-		delete[] m_outBuf;
-		m_outBuf = nullptr;
 	}
 }
 
@@ -269,55 +252,43 @@ void AudioSoundIo::underflowCallback()
 
 void AudioSoundIo::writeCallback(int frameCountMin, int frameCountMax)
 {
-	if (m_stopped) {return;}
-	const struct SoundIoChannelLayout *layout = &m_outstream->layout;
-	SoundIoChannelArea* areas;
-	int bytesPerSample = m_outstream->bytes_per_sample;
-	int framesLeft = frameCountMax;
+	const auto layout = static_cast<SoundIoChannelLayout*>(&m_outstream->layout);
+	auto areas = static_cast<SoundIoChannelArea*>(nullptr);
+	auto framesLeft = frameCountMax;
 
 	while (framesLeft > 0)
 	{
-		int frameCount = framesLeft;
-		if (int err = soundio_outstream_begin_write(m_outstream, &areas, &frameCount))
+		auto frameCount = framesLeft;
+		if (int error = soundio_outstream_begin_write(m_outstream, &areas, &frameCount))
 		{
-			errorCallback(err);
+			errorCallback(error);
 			return;
 		}
 
-		if (!frameCount)
-			break;
+		if (!frameCount) { break; }
 
-		
-		if (m_stopped)
+		auto buffers = std::array<float*, SOUNDIO_MAX_CHANNELS>{};
+		buffers.fill(nullptr);
+
+		for (auto i = 0; i < layout->channel_count; ++i)
 		{
-			for (int channel = 0; channel < layout->channel_count; ++channel)
-			{
-				memset(areas[channel].ptr, 0, bytesPerSample * frameCount);
-				areas[channel].ptr += areas[channel].step * frameCount;
-			}
-			continue;
+			buffers[i] = reinterpret_cast<float*>(areas[i].ptr);
 		}
 
-		for (int frame = 0; frame < frameCount; frame += 1)
+		if (!isRunning())
 		{
-			if (m_outBufFrameIndex >= m_outBufFramesTotal)
+			for (auto i = 0; i < layout->channel_count; ++i)
 			{
-				m_outBufFramesTotal = getNextBuffer(m_outBuf);
-				if (m_outBufFramesTotal == 0)
-				{
-					m_stopped = true;
-					break;
-				}
-				m_outBufFrameIndex = 0;
+				std::fill_n(buffers[i], frameCount * layout->channel_count, 0.f);
 			}
 
-			for (int channel = 0; channel < layout->channel_count; channel += 1)
-			{
-				float sample = m_outBuf[m_outBufFrameIndex][channel];
-				memcpy(areas[channel].ptr, &sample, bytesPerSample);
-				areas[channel].ptr += areas[channel].step;
-			}
-			m_outBufFrameIndex += 1;
+			break;
+		}
+		else
+		{
+			const auto bufferView = PlanarBufferView<float>{
+				buffers.data(), static_cast<proc_ch_t>(layout->channel_count), static_cast<f_cnt_t>(frameCount)};
+			audioEngine()->renderNextBuffer(bufferView);
 		}
 
 		if (int err = soundio_outstream_end_write(m_outstream))
