@@ -78,7 +78,7 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const fpp_t frames)
 
 	// Calculate pitch difference relative to original sample
 	const int semitoneDifference = m_trigger.key().value() - m_region->m_pitch_keycenter.value();
-	const float freqRatio = std::exp2(semitoneDifference * m_region->m_pitch_keytrack.value() / 1200.0f);
+	float freqRatio = std::exp2(semitoneDifference * m_region->m_pitch_keytrack.value() / 1200.0f);
 
 	// Sample rate of sample
 	const float sampleSampleRate = m_region->sample().sampleRate();

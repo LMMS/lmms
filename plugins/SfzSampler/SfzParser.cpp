@@ -2,7 +2,6 @@
 
 #include "SfzParser.h"
 #include "SfzOpcodeState.h"
-#include <QDir>
 #include <QStringList>
 #include <QRegularExpression>
 #include <QDebug>
@@ -26,13 +25,21 @@ bool SfzParser::parseSfzFile(const QString& filePath, std::vector<SfzRegion>& ou
 		return false;
 	}
 
+	QString fileContents = file.readAll();
+
+	// Before parsing the headers and opcodes, we need to hande #include and #define statements
+	// This amounts to recursively loading and copy/pasting the contents of the other files where the #include is, and find/replacing the #define words with their values
+	fileContents = recursiveHandleIncludeAndDefineStatements(parentDirectory, fileContents);
+
+	qDebug().noquote() << "TESTING: Loaded SFZ:\n" << fileContents; // testing
+
+	// Now that all the includes/defines are handled, loop
 	std::vector<QString> parsedSegments;
 
-	while (!file.atEnd())
+	for (QString line : fileContents.split("\n"))
 	{
-		QString line = file.readLine();
 		// Remove comments from end of line
-		line = line.split("\\")[0];
+		line = line.split("//")[0];
 		// Split the line on whitespace to extract header and opcodes keywords
 		// Fortunately, the SFZ format specifically states that opcode assignments cannot contain spaces, so there is no risk
 		// of accidentally splitting the opcode name from the value.
@@ -151,6 +158,82 @@ bool SfzParser::parseSfzFile(const QString& filePath, std::vector<SfzRegion>& ou
 	// The samples themselves still need to be loaded, but that's a job for later
 	return true;
 }
+
+
+
+
+
+QString SfzParser::recursiveHandleIncludeAndDefineStatements(const QDir& parentDirectory, QString fileContents, std::map<QString, QString> defineMap)
+{
+	// Reconstruct the file line by line as we parse the defines and includes
+	QStringList reconstructedSegments;
+	// We have to handle the defines in two loops (one before and one after the includes), since 
+	// some people use defined $keywords in their include paths, but we also want the defines to affect the text from the included files
+	for (QString line : fileContents.split("\n"))
+	{
+		if (line.startsWith("#define"))
+		{
+			// Split on whitespace
+			const auto segments = line.split(QRegularExpression("\\s+"), Qt::SkipEmptyParts);
+			// A define statement should have 3 parts, the #define, the $keyword, and the value
+			if (segments.size() != 3)
+			{
+				qDebug() << "[SFZ Parser] Ill-formed define statment:" << line;
+				continue;
+			}
+			const QString keyword = segments[1];
+			const QString replacement = segments[2];
+			defineMap[keyword] = replacement;
+			// A define keyword should probably start with a $. I couldn't find a requirement for this, but let's warn the user anyway
+			if (keyword.front() != "$") { qDebug() << "[SFZ Parser] Warning: Define keyword does not start with $:" << line; }
+		}
+		else if (line.startsWith("#include"))
+		{
+			// Replace any of the defined keywords before parsing the include path, since some SFZ files use $keywords in them
+			for (const auto& [keyword, replacement] : defineMap)
+			{
+				line.replace(keyword, replacement);
+			}
+
+			const auto segments = line.split(QRegularExpression("\\s+"), Qt::SkipEmptyParts);
+			// An include statement should have two parts, the #include and the path
+			if (segments.size() != 2)
+			{
+				qDebug() << "[SFZ Parser] Ill-formed include statment:" << line;
+				continue;
+			}
+
+			QString relativePath = segments[1];
+			relativePath.replace("\"", ""); // Remove " " from start and end
+			const QString absolutePath = parentDirectory.absoluteFilePath(relativePath);
+			
+			QFile file(absolutePath);
+			if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+			{
+				qDebug() << "[SFZ Parser] Could not read included file:" << absolutePath << "from include statement:" << line;
+				continue;
+			}
+			
+			QString includedFileContents = file.readAll();
+
+			// Resolve any includes and defines in this new file too before pasting it in
+			includedFileContents = recursiveHandleIncludeAndDefineStatements(parentDirectory, includedFileContents, defineMap);
+			reconstructedSegments.push_back(includedFileContents);
+		}
+		else
+		{
+			// Replace any of the defined keywords before adding the line to the reconstructed file
+			for (const auto& [keyword, replacement] : defineMap)
+			{
+				line.replace(keyword, replacement);
+			}
+			reconstructedSegments.push_back(line);
+		}
+	}
+
+	return reconstructedSegments.join("\n");
+}
+
 
 
 } // namespace lmms
