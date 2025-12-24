@@ -17,6 +17,8 @@ public:
 
 //private:
 	std::optional<QString> m_sampleFile = std::nullopt;
+	std::optional<QString> m_default_path = std::nullopt;
+
 
 	std::optional<int> m_key = std::nullopt;
 	std::optional<int> m_lokey = 0;

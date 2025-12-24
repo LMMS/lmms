@@ -17,6 +17,10 @@ bool SfzOpcodeState::setOpcodeByStrings(const QString& name, const QString& valu
 	{
 		m_sampleFile = value;
 	}
+	else if (name == "default_path")
+	{
+		m_default_path = value;
+	}
 
 	else if (name == "key")
 	{

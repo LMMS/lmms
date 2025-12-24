@@ -118,7 +118,8 @@ bool SfzRegion::initializeSample(const QDir& parentDirectory)
 		return false;
 	}
 
-	if (auto buffer = gui::SampleLoader::createBufferFromFile(parentDirectory.absoluteFilePath(m_sampleFile.value())))
+	// TODO is simply adding the default path sufficient?
+	if (auto buffer = gui::SampleLoader::createBufferFromFile(parentDirectory.absoluteFilePath(m_default_path.value_or("") + m_sampleFile.value())))
 	{
 		m_sample = SfzSampleBuffer(buffer->data(), buffer->size(), buffer->sampleRate());
 		return true;

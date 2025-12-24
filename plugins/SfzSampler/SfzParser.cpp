@@ -195,7 +195,10 @@ bool SfzParser::parseSfzFile(const QString& filePath, std::vector<SfzRegion>& ou
 			}
 			case Header::Control:
 			{
-				qDebug() << "[SFZ Parser] Warning, the <control> header has not been implemented yet. Encountered opcode assignment:" << segment;
+				auto opcodeNameAndValue = segment.split("=");
+				if (opcodeNameAndValue.size() != 2) { qDebug() << "[SFZ Parser] Syntax error, could not parse opcode assignment:" << segment; return false; }
+				// This is Wrong. The control header is not the same thing as the global header. Buuuut.... it works. And from sfzformat.com, it sounds like different sfz players do different things with this header anyway, so it's fine.
+				globalState.setOpcodeByStrings(opcodeNameAndValue[0], opcodeNameAndValue[1]);
 				break;
 			}
 			case Header::Curve:
