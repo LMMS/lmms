@@ -1,5 +1,5 @@
 /*
- * Sf2Player.cpp - a soundfont2 player using fluidSynth
+ * SoundFontPlayer.cpp - a soundfont player using fluidSynth
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail/dot/com>
  * Copyright (c) 2009-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
@@ -23,7 +23,7 @@
  *
  */
 
-#include "Sf2Player.h"
+#include "SoundFontPlayer.h"
 
 #include <fluidsynth.h>
 #include <QDebug>
@@ -57,10 +57,10 @@ namespace lmms
 extern "C"
 {
 
-Plugin::Descriptor PLUGIN_EXPORT sf2player_plugin_descriptor =
+Plugin::Descriptor PLUGIN_EXPORT soundfontplayer_plugin_descriptor =
 {
 	LMMS_STRINGIFY( PLUGIN_NAME ),
-	"Sf2 Player",
+	"SoundFont Player",
 	QT_TRANSLATE_NOOP( "PluginBrowser", "Player for SoundFont files" ),
 	"Paul Giblock <drfaygo/at/gmail/dot/com>",
 	0x0100,
@@ -104,7 +104,7 @@ private:
 	float m_coarseTune;
 };
 
-struct Sf2PluginData
+struct SoundFontPluginData
 {
 	int midiNote;
 	int lastPanning;
@@ -121,8 +121,8 @@ struct Sf2PluginData
 
 
 
-Sf2Instrument::Sf2Instrument( InstrumentTrack * _instrument_track ) :
-	Instrument(_instrument_track, &sf2player_plugin_descriptor, nullptr, Flag::IsSingleStreamed),
+SoundFontInstrument::SoundFontInstrument(InstrumentTrack* instrument_track) :
+	Instrument(instrument_track, &soundfontplayer_plugin_descriptor, nullptr, Flag::IsSingleStreamed),
 	m_resampler(AudioResampler::Mode::Linear),
 	m_synth(nullptr),
 	m_font( nullptr ),
@@ -187,7 +187,7 @@ Sf2Instrument::Sf2Instrument( InstrumentTrack * _instrument_track ) :
 	// but we don't need that when loading a project/preset/preview
 	if (!Engine::getSong()->isLoadingProject() && !instrumentTrack()->isPreviewMode())
 	{
-		loadFile(ConfigManager::inst()->sf2File());
+		loadFile(ConfigManager::inst()->soundFontFile());
 	}
 
 	connect( &m_bankNum, SIGNAL( dataChanged() ), this, SLOT( updatePatch() ) );
@@ -213,21 +213,21 @@ Sf2Instrument::Sf2Instrument( InstrumentTrack * _instrument_track ) :
 	connect( &m_chorusDepth, SIGNAL( dataChanged() ), this, SLOT( updateChorus() ) );
 	
 	// Microtuning
-	connect(Engine::getSong(), &Song::scaleListChanged, this, &Sf2Instrument::updateTuning);
-	connect(Engine::getSong(), &Song::keymapListChanged, this, &Sf2Instrument::updateTuning);
-	connect(instrumentTrack()->microtuner()->enabledModel(), &Model::dataChanged, this, &Sf2Instrument::updateTuning, Qt::DirectConnection);
-	connect(instrumentTrack()->microtuner()->scaleModel(), &Model::dataChanged, this, &Sf2Instrument::updateTuning, Qt::DirectConnection);
-	connect(instrumentTrack()->microtuner()->keymapModel(), &Model::dataChanged, this, &Sf2Instrument::updateTuning, Qt::DirectConnection);
-	connect(instrumentTrack()->microtuner()->keyRangeImportModel(), &Model::dataChanged, this, &Sf2Instrument::updateTuning, Qt::DirectConnection);
-	connect(instrumentTrack()->baseNoteModel(), &Model::dataChanged, this, &Sf2Instrument::updateTuning, Qt::DirectConnection);
+	connect(Engine::getSong(), &Song::scaleListChanged, this, &SoundFontInstrument::updateTuning);
+	connect(Engine::getSong(), &Song::keymapListChanged, this, &SoundFontInstrument::updateTuning);
+	connect(instrumentTrack()->microtuner()->enabledModel(), &Model::dataChanged, this, &SoundFontInstrument::updateTuning, Qt::DirectConnection);
+	connect(instrumentTrack()->microtuner()->scaleModel(), &Model::dataChanged, this, &SoundFontInstrument::updateTuning, Qt::DirectConnection);
+	connect(instrumentTrack()->microtuner()->keymapModel(), &Model::dataChanged, this, &SoundFontInstrument::updateTuning, Qt::DirectConnection);
+	connect(instrumentTrack()->microtuner()->keyRangeImportModel(), &Model::dataChanged, this, &SoundFontInstrument::updateTuning, Qt::DirectConnection);
+	connect(instrumentTrack()->baseNoteModel(), &Model::dataChanged, this, &SoundFontInstrument::updateTuning, Qt::DirectConnection);
 
-	auto iph = new InstrumentPlayHandle(this, _instrument_track);
+	auto iph = new InstrumentPlayHandle(this, instrument_track);
 	Engine::audioEngine()->addPlayHandle( iph );
 }
 
 
 
-Sf2Instrument::~Sf2Instrument()
+SoundFontInstrument::~SoundFontInstrument()
 {
 	Engine::audioEngine()->removePlayHandlesOfTypes( instrumentTrack(),
 				PlayHandle::Type::NotePlayHandle
@@ -239,7 +239,7 @@ Sf2Instrument::~Sf2Instrument()
 
 
 
-void Sf2Instrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
+void SoundFontInstrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	_this.setAttribute( "src", m_filename );
 	m_patchNum.saveSettings( _doc, _this, "patch" );
@@ -263,7 +263,7 @@ void Sf2Instrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 
 
-void Sf2Instrument::loadSettings( const QDomElement & _this )
+void SoundFontInstrument::loadSettings( const QDomElement & _this )
 {
 	openFile( _this.attribute( "src" ), false );
 	m_patchNum.loadSettings( _this, "patch" );
@@ -288,7 +288,7 @@ void Sf2Instrument::loadSettings( const QDomElement & _this )
 
 
 
-void Sf2Instrument::loadFile( const QString & _file )
+void SoundFontInstrument::loadFile( const QString & _file )
 {
 	if( !_file.isEmpty() && QFileInfo( _file ).exists() )
 	{
@@ -336,7 +336,7 @@ void Sf2Instrument::loadFile( const QString & _file )
 
 
 
-AutomatableModel * Sf2Instrument::childModel( const QString & _modelName )
+AutomatableModel * SoundFontInstrument::childModel( const QString & _modelName )
 {
 	if( _modelName == "bank" )
 	{
@@ -352,15 +352,15 @@ AutomatableModel * Sf2Instrument::childModel( const QString & _modelName )
 
 
 
-QString Sf2Instrument::nodeName() const
+QString SoundFontInstrument::nodeName() const
 {
-	return sf2player_plugin_descriptor.name;
+	return soundfontplayer_plugin_descriptor.name;
 }
 
 
 
 
-void Sf2Instrument::freeFont()
+void SoundFontInstrument::freeFont()
 {
 	m_synthMutex.lock();
 
@@ -375,13 +375,13 @@ void Sf2Instrument::freeFont()
 
 
 
-void Sf2Instrument::openFile( const QString & _sf2File, bool updateTrackName )
+void SoundFontInstrument::openFile( const QString & _soundFontFile, bool updateTrackName )
 {
 	emit fileLoading();
 
 	// Used for loading file
-	char * sf2Ascii = qstrdup( qPrintable( PathUtil::toAbsolute( _sf2File ) ) );
-	QString relativePath = PathUtil::toShortestRelative( _sf2File );
+	char * soundFontAscii = qstrdup( qPrintable( PathUtil::toAbsolute( _soundFontFile ) ) );
+	QString relativePath = PathUtil::toShortestRelative( _soundFontFile );
 
 	// free the soundfont if one is selected
 	freeFont();
@@ -389,9 +389,9 @@ void Sf2Instrument::openFile( const QString & _sf2File, bool updateTrackName )
 	m_synthMutex.lock();
 
 	bool loaded = false;
-	if (fluid_is_soundfont(sf2Ascii))
+	if (fluid_is_soundfont(soundFontAscii))
 	{
-		m_fontId = fluid_synth_sfload(m_synth, sf2Ascii, true);
+		m_fontId = fluid_synth_sfload(m_synth, soundFontAscii, true);
 
 		if (fluid_synth_sfcount(m_synth) > 0)
 		{
@@ -403,7 +403,7 @@ void Sf2Instrument::openFile( const QString & _sf2File, bool updateTrackName )
 
 	if (!loaded)
 	{
-		collectErrorForUI(Sf2Instrument::tr("A soundfont %1 could not be loaded.").arg(QFileInfo(_sf2File).baseName()));
+		collectErrorForUI(SoundFontInstrument::tr("A soundfont %1 could not be loaded.").arg(QFileInfo(_soundFontFile).baseName()));
 	}
 
 	m_synthMutex.unlock();
@@ -419,11 +419,11 @@ void Sf2Instrument::openFile( const QString & _sf2File, bool updateTrackName )
 		emit fileChanged();
 	}
 
-	delete[] sf2Ascii;
+	delete[] soundFontAscii;
 
 	if( updateTrackName || instrumentTrack()->displayName() == displayName() )
 	{
-		instrumentTrack()->setName( PathUtil::cleanName( _sf2File ) );
+		instrumentTrack()->setName( PathUtil::cleanName( _soundFontFile ) );
 	}
 
 	updatePatch();
@@ -432,7 +432,7 @@ void Sf2Instrument::openFile( const QString & _sf2File, bool updateTrackName )
 
 
 
-void Sf2Instrument::updatePatch()
+void SoundFontInstrument::updatePatch()
 {
 	if( m_bankNum.value() >= 0 && m_patchNum.value() >= 0 )
 	{
@@ -444,7 +444,7 @@ void Sf2Instrument::updatePatch()
 
 
 
-QString Sf2Instrument::getCurrentPatchName()
+QString SoundFontInstrument::getCurrentPatchName()
 {
 	int iBankSelected = m_bankNum.value();
 	int iProgSelected = m_patchNum.value();
@@ -489,7 +489,7 @@ QString Sf2Instrument::getCurrentPatchName()
 
 
 
-void Sf2Instrument::updateGain()
+void SoundFontInstrument::updateGain()
 {
 	fluid_synth_set_gain( m_synth, m_gain.value() );
 }
@@ -499,7 +499,7 @@ void Sf2Instrument::updateGain()
 	| FLUIDSYNTH_VERSION_MICRO)
 #define USE_NEW_EFFECT_API (FLUIDSYNTH_VERSION_HEX >= 0x020200)
 
-void Sf2Instrument::updateReverbOn()
+void SoundFontInstrument::updateReverbOn()
 {
 #if USE_NEW_EFFECT_API
 	fluid_synth_reverb_on(m_synth, -1, m_reverbOn.value() ? 1 : 0);
@@ -508,7 +508,7 @@ void Sf2Instrument::updateReverbOn()
 #endif
 }
 
-void Sf2Instrument::updateReverb()
+void SoundFontInstrument::updateReverb()
 {
 #if USE_NEW_EFFECT_API
 	fluid_synth_set_reverb_group_roomsize(m_synth, -1, m_reverbRoomSize.value());
@@ -522,7 +522,7 @@ void Sf2Instrument::updateReverb()
 #endif
 }
 
-void Sf2Instrument::updateChorusOn()
+void SoundFontInstrument::updateChorusOn()
 {
 #if USE_NEW_EFFECT_API
 	fluid_synth_chorus_on(m_synth, -1, m_chorusOn.value() ? 1 : 0);
@@ -531,7 +531,7 @@ void Sf2Instrument::updateChorusOn()
 #endif
 }
 
-void Sf2Instrument::updateChorus()
+void SoundFontInstrument::updateChorus()
 {
 #if USE_NEW_EFFECT_API
 	fluid_synth_set_chorus_group_nr(m_synth, -1, static_cast<int>(m_chorusNum.value()));
@@ -546,7 +546,7 @@ void Sf2Instrument::updateChorus()
 #endif
 }
 
-void Sf2Instrument::updateTuning()
+void SoundFontInstrument::updateTuning()
 {
 	if (instrumentTrack()->microtuner()->enabledModel()->value())
 	{
@@ -578,7 +578,7 @@ void Sf2Instrument::updateTuning()
 
 
 
-void Sf2Instrument::reloadSynth()
+void SoundFontInstrument::reloadSynth()
 {
 	double tempRate;
 
@@ -646,7 +646,7 @@ void Sf2Instrument::reloadSynth()
 
 
 
-void Sf2Instrument::playNote( NotePlayHandle * _n, SampleFrame* )
+void SoundFontInstrument::playNote( NotePlayHandle * _n, SampleFrame* )
 {
 	if( _n->isMasterNote() || ( _n->hasParent() && _n->isReleased() ) )
 	{
@@ -667,7 +667,7 @@ void Sf2Instrument::playNote( NotePlayHandle * _n, SampleFrame* )
 	{
 		const int baseVelocity = instrumentTrack()->midiPort()->baseVelocity();
 
-		auto pluginData = new Sf2PluginData;
+		auto pluginData = new SoundFontPluginData;
 		pluginData->midiNote = midiNote;
 		pluginData->lastPanning = 0;
 		pluginData->lastVelocity = _n->midiVelocity( baseVelocity );
@@ -685,7 +685,7 @@ void Sf2Instrument::playNote( NotePlayHandle * _n, SampleFrame* )
 	}
 	else if( _n->isReleased() && ! _n->instrumentTrack()->isSustainPedalPressed() ) // note is released during this period
 	{
-		auto pluginData = static_cast<Sf2PluginData*>(_n->m_pluginData);
+		auto pluginData = static_cast<SoundFontPluginData*>(_n->m_pluginData);
 		pluginData->offset = _n->framesBeforeRelease();
 		pluginData->isNew = false;
 
@@ -695,7 +695,7 @@ void Sf2Instrument::playNote( NotePlayHandle * _n, SampleFrame* )
 	}
 
 	// Update the pitch of all the voices
-	if (const auto data = static_cast<Sf2PluginData*>(_n->m_pluginData)) {
+	if (const auto data = static_cast<SoundFontPluginData*>(_n->m_pluginData)) {
 		const auto detuning = _n->currentDetuning();
 		for (const auto& voice : data->fluidVoices) {
 			if (voice.isValid()) {
@@ -707,7 +707,7 @@ void Sf2Instrument::playNote( NotePlayHandle * _n, SampleFrame* )
 }
 
 
-void Sf2Instrument::noteOn( Sf2PluginData * n )
+void SoundFontInstrument::noteOn( SoundFontPluginData * n )
 {
 	m_synthMutex.lock();
 
@@ -765,7 +765,7 @@ void Sf2Instrument::noteOn( Sf2PluginData * n )
 }
 
 
-void Sf2Instrument::noteOff( Sf2PluginData * n )
+void SoundFontInstrument::noteOff( SoundFontPluginData * n )
 {
 	n->noteOffSent = true;
 	m_notesRunningMutex.lock();
@@ -781,7 +781,7 @@ void Sf2Instrument::noteOff( Sf2PluginData * n )
 }
 
 
-void Sf2Instrument::play( SampleFrame* _working_buffer )
+void SoundFontInstrument::play( SampleFrame* _working_buffer )
 {
 	const fpp_t frames = Engine::audioEngine()->framesPerPeriod();
 
@@ -820,8 +820,8 @@ void Sf2Instrument::play( SampleFrame* _working_buffer )
 		NotePlayHandle * currentNote = m_playingNotes[0];
 		for( int i = 1; i < m_playingNotes.size(); ++i )
 		{
-			auto currentData = static_cast<Sf2PluginData*>(currentNote->m_pluginData);
-			auto iData = static_cast<Sf2PluginData*>(m_playingNotes[i]->m_pluginData);
+			auto currentData = static_cast<SoundFontPluginData*>(currentNote->m_pluginData);
+			auto iData = static_cast<SoundFontPluginData*>(m_playingNotes[i]->m_pluginData);
 			if( currentData->offset > iData->offset )
 			{
 				currentNote = m_playingNotes[i];
@@ -830,7 +830,7 @@ void Sf2Instrument::play( SampleFrame* _working_buffer )
 
 		// process the current note:
 		// first see if we're synced in frame count
-		auto currentData = static_cast<Sf2PluginData*>(currentNote->m_pluginData);
+		auto currentData = static_cast<SoundFontPluginData*>(currentNote->m_pluginData);
 		if( currentData->offset > currentFrame )
 		{
 			renderFrames( currentData->offset - currentFrame, _working_buffer + currentFrame );
@@ -867,7 +867,7 @@ void Sf2Instrument::play( SampleFrame* _working_buffer )
 }
 
 
-void Sf2Instrument::renderFrames( f_cnt_t frames, SampleFrame* buf )
+void SoundFontInstrument::renderFrames( f_cnt_t frames, SampleFrame* buf )
 {
 	const auto guard = std::lock_guard{m_synthMutex};
 
@@ -906,9 +906,9 @@ void Sf2Instrument::renderFrames( f_cnt_t frames, SampleFrame* buf )
 
 
 
-void Sf2Instrument::deleteNotePluginData( NotePlayHandle * _n )
+void SoundFontInstrument::deleteNotePluginData( NotePlayHandle * _n )
 {
-	auto pluginData = static_cast<Sf2PluginData*>(_n->m_pluginData);
+	auto pluginData = static_cast<SoundFontPluginData*>(_n->m_pluginData);
 	if( ! pluginData->noteOffSent ) // if we for some reason haven't noteoffed the note before it gets deleted,
 									// do it here
 	{
@@ -926,9 +926,9 @@ void Sf2Instrument::deleteNotePluginData( NotePlayHandle * _n )
 
 
 
-gui::PluginView * Sf2Instrument::instantiateView( QWidget * _parent )
+gui::PluginView * SoundFontInstrument::instantiateView( QWidget * _parent )
 {
-	return new gui::Sf2InstrumentView( this, _parent );
+	return new gui::SoundFontInstrumentView( this, _parent );
 }
 
 
@@ -938,10 +938,10 @@ namespace gui
 {
 
 
-class Sf2Knob : public Knob
+class SoundFontKnob : public Knob
 {
 public:
-	Sf2Knob( QWidget * _parent ) :
+	SoundFontKnob( QWidget * _parent ) :
 			Knob( KnobType::Styled, _parent )
 	{
 		setFixedSize( 31, 38 );
@@ -950,13 +950,13 @@ public:
 
 
 
-Sf2InstrumentView::Sf2InstrumentView( Instrument * _instrument, QWidget * _parent ) :
+SoundFontInstrumentView::SoundFontInstrumentView( Instrument * _instrument, QWidget * _parent ) :
 	InstrumentViewFixedSize( _instrument, _parent )
 {
 //	QVBoxLayout * vl = new QVBoxLayout( this );
 //	QHBoxLayout * hl = new QHBoxLayout();
 
-	auto k = castModel<Sf2Instrument>();
+	auto k = castModel<SoundFontInstrument>();
 
 	connect(&k->m_bankNum, SIGNAL(dataChanged()), this, SLOT(updatePatchName()));
 	connect(&k->m_patchNum, SIGNAL(dataChanged()), this, SLOT(updatePatchName()));
@@ -1015,7 +1015,7 @@ Sf2InstrumentView::Sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 //	vl->addLayout( hl );
 
 	// Gain
-	m_gainKnob = new Sf2Knob( this );
+	m_gainKnob = new SoundFontKnob( this );
 	m_gainKnob->setHintText( tr("Gain:"), "" );
 	m_gainKnob->move( 86, 55 );
 //	vl->addWidget( m_gainKnob );
@@ -1032,19 +1032,19 @@ Sf2InstrumentView::Sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 	m_reverbButton->setToolTip(tr("Apply reverb (if supported)"));
 
 
-	m_reverbRoomSizeKnob = new Sf2Knob( this );
+	m_reverbRoomSizeKnob = new SoundFontKnob( this );
 	m_reverbRoomSizeKnob->setHintText( tr("Room size:"), "" );
 	m_reverbRoomSizeKnob->move( 93, 160 );
 
-	m_reverbDampingKnob = new Sf2Knob( this );
+	m_reverbDampingKnob = new SoundFontKnob( this );
 	m_reverbDampingKnob->setHintText( tr("Damping:"), "" );
 	m_reverbDampingKnob->move( 130, 160 );
 
-	m_reverbWidthKnob = new Sf2Knob( this );
+	m_reverbWidthKnob = new SoundFontKnob( this );
 	m_reverbWidthKnob->setHintText( tr("Width:"), "" );
 	m_reverbWidthKnob->move( 167, 160 );
 
-	m_reverbLevelKnob = new Sf2Knob( this );
+	m_reverbLevelKnob = new SoundFontKnob( this );
 	m_reverbLevelKnob->setHintText( tr("Level:"), "" );
 	m_reverbLevelKnob->move( 204, 160 );
 
@@ -1067,19 +1067,19 @@ Sf2InstrumentView::Sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 	m_chorusButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "chorus_off" ) );
 	m_chorusButton->setToolTip(tr("Apply chorus (if supported)"));
 
-	m_chorusNumKnob = new Sf2Knob( this );
+	m_chorusNumKnob = new SoundFontKnob( this );
 	m_chorusNumKnob->setHintText( tr("Voices:"), "" );
 	m_chorusNumKnob->move( 93, 206 );
 
-	m_chorusLevelKnob = new Sf2Knob( this );
+	m_chorusLevelKnob = new SoundFontKnob( this );
 	m_chorusLevelKnob->setHintText( tr("Level:"), "" );
 	m_chorusLevelKnob->move( 130 , 206 );
 
-	m_chorusSpeedKnob = new Sf2Knob( this );
+	m_chorusSpeedKnob = new SoundFontKnob( this );
 	m_chorusSpeedKnob->setHintText( tr("Speed:"), "" );
 	m_chorusSpeedKnob->move( 167 , 206 );
 
-	m_chorusDepthKnob = new Sf2Knob( this );
+	m_chorusDepthKnob = new SoundFontKnob( this );
 	m_chorusDepthKnob->setHintText( tr("Depth:"), "" );
 	m_chorusDepthKnob->move( 204 , 206 );
 /*
@@ -1102,9 +1102,9 @@ Sf2InstrumentView::Sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 
 
 
-void Sf2InstrumentView::modelChanged()
+void SoundFontInstrumentView::modelChanged()
 {
-	auto k = castModel<Sf2Instrument>();
+	auto k = castModel<SoundFontInstrument>();
 	m_bankNumLcd->setModel( &k->m_bankNum );
 	m_patchNumLcd->setModel( &k->m_patchNum );
 
@@ -1133,9 +1133,9 @@ void Sf2InstrumentView::modelChanged()
 
 
 
-void Sf2InstrumentView::updateFilename()
+void SoundFontInstrumentView::updateFilename()
 {
-	auto i = castModel<Sf2Instrument>();
+	auto i = castModel<SoundFontInstrument>();
 	QFontMetrics fm( m_filenameLabel->font() );
 	QString file = i->m_filename.endsWith( ".sf2", Qt::CaseInsensitive ) ?
 			i->m_filename.left( i->m_filename.length() - 4 ) :
@@ -1153,9 +1153,9 @@ void Sf2InstrumentView::updateFilename()
 
 
 
-void Sf2InstrumentView::updatePatchName()
+void SoundFontInstrumentView::updatePatchName()
 {
-	auto i = castModel<Sf2Instrument>();
+	auto i = castModel<SoundFontInstrument>();
 	QFontMetrics fm( font() );
 	QString patch = i->getCurrentPatchName();
 	m_patchLabel->setText( fm.elidedText( patch, Qt::ElideLeft, m_patchLabel->width() ) );
@@ -1167,7 +1167,7 @@ void Sf2InstrumentView::updatePatchName()
 
 
 
-void Sf2InstrumentView::invalidateFile()
+void SoundFontInstrumentView::invalidateFile()
 {
 	m_patchDialogButton->setEnabled( false );
 }
@@ -1175,9 +1175,9 @@ void Sf2InstrumentView::invalidateFile()
 
 
 
-void Sf2InstrumentView::showFileDialog()
+void SoundFontInstrumentView::showFileDialog()
 {
-	auto k = castModel<Sf2Instrument>();
+	auto k = castModel<SoundFontInstrument>();
 
 	FileDialog ofd( nullptr, tr( "Open SoundFont file" ) );
 	ofd.setFileMode( FileDialog::ExistingFiles );
@@ -1194,7 +1194,7 @@ void Sf2InstrumentView::showFileDialog()
 	}
 	else
 	{
-		ofd.setDirectory( ConfigManager::inst()->sf2Dir() );
+		ofd.setDirectory( ConfigManager::inst()->soundFontDir() );
 	}
 
 	m_fileDialogButton->setEnabled( false );
@@ -1215,9 +1215,9 @@ void Sf2InstrumentView::showFileDialog()
 
 
 
-void Sf2InstrumentView::showPatchDialog()
+void SoundFontInstrumentView::showPatchDialog()
 {
-	auto k = castModel<Sf2Instrument>();
+	auto k = castModel<SoundFontInstrument>();
 
 	PatchesDialog pd( this );
 
@@ -1235,7 +1235,7 @@ extern "C"
 // necessary for getting instance out of shared lib
 PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 {
-	return new Sf2Instrument( static_cast<InstrumentTrack *>( m ) );
+	return new SoundFontInstrument( static_cast<InstrumentTrack *>( m ) );
 }
 }
 

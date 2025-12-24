@@ -116,10 +116,10 @@ private slots:
 	void setVSTDir(const QString & vstDir);
 	void openLADSPADir();
 	void setLADSPADir(const QString & ladspaDir);
-	void openSF2Dir();
-	void setSF2Dir(const QString & sf2Dir);
-	void openSF2File();
-	void setSF2File(const QString & sf2File);
+	void openSoundFontDir();
+	void setSoundFontDir(const QString & SoundFontDir);
+	void openSoundFontFile();
+	void setSoundFontFile(const QString & soundFontFile);
 	void openGIGDir();
 	void setGIGDir(const QString & gigDir);
 	void openThemeDir();
@@ -199,9 +199,9 @@ private:
 	QString m_vstDir;
 	QString m_ladspaDir;
 	QString m_gigDir;
-	QString m_sf2Dir;
+	QString m_soundFontDir;
 #ifdef LMMS_HAVE_FLUIDSYNTH
-	QString m_sf2File;
+	QString m_soundFontFile;
 #endif
 	QString m_themeDir;
 	QString m_backgroundPicFile;
@@ -211,9 +211,9 @@ private:
 	QLineEdit * m_themeDirLineEdit;
 	QLineEdit * m_ladspaDirLineEdit;
 	QLineEdit * m_gigDirLineEdit;
-	QLineEdit * m_sf2DirLineEdit;
+	QLineEdit * m_soundFontDirLineEdit;
 #ifdef LMMS_HAVE_FLUIDSYNTH
-	QLineEdit * m_sf2FileLineEdit;
+	QLineEdit * m_soundFontFileLineEdit;
 #endif
 	QLineEdit * m_backgroundPicFileLineEdit;
 

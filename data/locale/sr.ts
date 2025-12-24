@@ -6117,7 +6117,7 @@ Latency: %2 ms</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>SF2 directory</source>
+        <source>SoundFont directory</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -6133,7 +6133,7 @@ Latency: %2 ms</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Choose your SF2 directory</source>
+        <source>Choose your SoundFont directory</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -9136,7 +9136,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
 </context>
 <context>
-    <name>Sf2Instrument</name>
+    <name>SoundFontInstrument</name>
     <message>
         <source>Bank</source>
         <translation type="unfinished"/>
@@ -9195,13 +9195,13 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
 </context>
 <context>
-    <name>Sf2InstrumentView</name>
+    <name>SoundFontInstrumentView</name>
     <message>
         <source>Open other SoundFont file</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Click here to open another SF2 file</source>
+        <source>Click here to open another SoundFont file</source>
         <translation type="unfinished"/>
     </message>
     <message>

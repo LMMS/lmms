@@ -92,7 +92,7 @@ bool MidiImport::tryImport(TrackContainer* tc)
 	if (!openFile()) { return false; }
 
 #ifdef LMMS_HAVE_FLUIDSYNTH
-	if (gui::getGUI() != nullptr && ConfigManager::inst()->sf2File().isEmpty())
+	if (gui::getGUI() != nullptr && ConfigManager::inst()->soundFontFile().isEmpty())
 	{
 		QMessageBox::information(gui::getGUI()->mainWindow(),
 			tr("Setup incomplete"),
@@ -191,7 +191,7 @@ public:
 	InstrumentTrack* it = nullptr;
 	MidiClip* p = nullptr;
 	Instrument* it_inst = nullptr;
-	bool isSF2 = false;
+	bool isSoundFont = false;
 	bool hasNotes = false;
 	QString trackName;
 
@@ -203,12 +203,12 @@ public:
 			it = dynamic_cast<InstrumentTrack*>(Track::create(Track::Type::Instrument, tc));
 
 #ifdef LMMS_HAVE_FLUIDSYNTH
-			it_inst = it->loadInstrument("sf2player");
+			it_inst = it->loadInstrument("soundFontplayer");
 
 			if (it_inst)
 			{
-				isSF2 = true;
-				it_inst->loadFile(ConfigManager::inst()->sf2File());
+				isSoundFont = true;
+				it_inst->loadFile(ConfigManager::inst()->soundFontFile());
 				it_inst->childModel("bank")->setValue(0);
 				it_inst->childModel("patch")->setValue(0);
 			}
@@ -427,7 +427,7 @@ bool MidiImport::readSMF(TrackContainer* tc)
 				if (update == "programi")
 				{
 					const auto prog = evt->get_integer_value();
-					if (ch->isSF2)
+					if (ch->isSoundFont)
 					{
 						auto& pc = pcs[evt->chan];
 						AutomatableModel* objModel = ch->it_inst->childModel("patch");
@@ -462,7 +462,7 @@ bool MidiImport::readSMF(TrackContainer* tc)
 						switch (ccid)
 						{
 							case 0:
-								if (ch->isSF2 && ch->it_inst)
+								if (ch->isSoundFont && ch->it_inst)
 								{
 									objModel = ch->it_inst->childModel("bank");
 									printf("BANK SELECT %f %d\n", cc, static_cast<int>(cc * 127));
@@ -535,7 +535,7 @@ bool MidiImport::readSMF(TrackContainer* tc)
 		}
 		// Set channel 10 to drums as per General MIDI's orders
 		if (c.first % 16l == 9 /* channel 10 */
-			&& c.second.hasNotes && c.second.it_inst && c.second.isSF2)
+			&& c.second.hasNotes && c.second.it_inst && c.second.isSoundFont)
 		{
 			c.second.it_inst->childModel("bank")->setValue(128);
 			c.second.it_inst->childModel("patch")->setValue(0);
