@@ -4,6 +4,7 @@
 
 #include "SfzOpcodeState.h"
 #include <QDebug>
+#include <QRegularExpression>
 
 namespace lmms
 {
@@ -82,6 +83,24 @@ bool SfzOpcodeState::setOpcodeByStrings(const QString& name, const QString& valu
 	{
 		m_ampeg_release = value.toFloat(&successful);
 	}
+
+	else if (name.startsWith("ampeg_release_oncc") || name.startsWith("ampeg_releasecc"))
+	{
+		int ccNumber = ccNumberFromOpcode(name);
+		m_ampeg_release_oncc.at(ccNumber) = value.toFloat(&successful);
+	}
+
+	else if (name.startsWith("set_cc"))
+	{
+		int ccNumber = ccNumberFromOpcode(name);
+		m_set_cc.at(ccNumber) = value.toInt(&successful);
+	}
+	else if (name.startsWith("set_hdcc"))
+	{
+		int ccNumber = ccNumberFromOpcode(name);
+		m_set_cc.at(ccNumber) = value.toFloat(&successful) * 128;
+	}
+
 	else
 	{
 		qDebug() << "[SFZ Parser] Unknown opcode:" << name;
@@ -96,6 +115,19 @@ bool SfzOpcodeState::setOpcodeByStrings(const QString& name, const QString& valu
 	return true;
 }
 
+
+
+int SfzOpcodeState::ccNumberFromOpcode(const QString& opcode)
+{
+	// Match for numbers
+	QRegularExpression re("\\d+");
+	QRegularExpressionMatch match = re.match(opcode);
+	if (!match.hasMatch()) { qDebug() << "[SFZ Parser] Unable to find CC number in opcode:" << opcode; return 0; }
+	bool successfulToInt = false;
+	int ccNumber = match.captured(0).toInt(&successfulToInt);
+	if (!successfulToInt) { qDebug() << "[SFZ Parser] Unable to convert CC number to int:" << opcode; return 0; }
+	return ccNumber;
+}
 
 
 int SfzOpcodeState::keyNumFromString(QString keyString, bool* successful)

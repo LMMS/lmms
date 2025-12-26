@@ -19,6 +19,7 @@ namespace lmms
 SfzRegion::SfzRegion(SfzOpcodeState opcodeState)
 	: SfzOpcodeState(opcodeState)
 {
+	recalculateTotalCCModulation(SfzGlobalState()); // The region objects don't currently have direct access to the global state, so pass in a blank object just to reset the CC modulations to their defaults.
 }
 
 bool SfzRegion::triggerConditionsMet(const SfzGlobalState& globalState, const SfzTrigger& trigger)
@@ -47,6 +48,12 @@ bool SfzRegion::triggerConditionsMet(const SfzGlobalState& globalState, const Sf
 
 void SfzRegion::processTrigger(const SfzGlobalState& globalState, const SfzTrigger& trigger)
 {
+	// Before spawning an sounds, real quick do some pre-calculation of the midi CC modulation amounts so that we don't have to do it every buffer
+	if (trigger.type() == SfzTrigger::Type::ControlChange)
+	{
+		recalculateTotalCCModulation(globalState);
+	}
+
 	// If the trigger conditions are met, spawn a new sound
 	if (triggerConditionsMet(globalState, trigger))
 	{
@@ -107,6 +114,25 @@ void SfzRegion::recalculateMaxActiveIndex()
 		else { m_maxActiveIndex--; }
 	}
 }
+
+
+
+float SfzRegion::totalCCModulation(const std::array<float, 128>& ccModulationAmounts, const SfzGlobalState& globalState) const
+{
+	float total = 0.0f;
+	for (int i = 0; i < 128; ++i)
+	{
+		total += ccModulationAmounts[i] * globalState.midiCCValue(i, m_set_cc[i]) / 128.0f; // m_set_cc stores the default CC values for each of the midi controllers
+	}
+	return total;
+}
+
+void SfzRegion::recalculateTotalCCModulation(const SfzGlobalState& globalState)
+{
+	m_ampeg_release_totalCC = totalCCModulation(m_ampeg_release_oncc, globalState);
+	// TODO more
+}
+
 
 
 bool SfzRegion::initializeSample(const QDir& parentDirectory)

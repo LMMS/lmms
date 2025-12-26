@@ -25,34 +25,38 @@ float SfzRegionPlayState::envelopeGenerator(const f_cnt_t delay, const f_cnt_t a
 {
 	// If the note hasn't started yet, don't do anything
 	if (m_frameCount < 0) { return 0.0f; }
-	// If the note has already been released, return the release amplitude
-	if (m_released && m_frameCount > m_releaseFrame)
+	// There is the possibility that the note may have released during attack, decay, etc, so we may need to multiply the release and the normal env values together to get a smooth output
+	float normalValue = 1.0f;
+	float releaseValue = 1.0f;
+	// Calculate the normal envelope value
+	if (static_cast<f_cnt_t>(m_frameCount) < delay)
 	{
-		// According to https://sfzformat.com/tutorials/envelope_generators/, release and decay follow exponential curves (linear in dB) which go from 0 to -90 dB
-		return dbfsToAmp(-90 * static_cast<float>(m_frameCount - m_releaseFrame) / release);
-	}
-	// If it hasn't been released yet, do the normal envelope shape
-	else if (static_cast<f_cnt_t>(m_frameCount) < delay)
-	{
-		return 0.f;
+		normalValue = 0.f;
 	}
 	else if (static_cast<f_cnt_t>(m_frameCount) < delay + attack)
 	{
-		return static_cast<float>(m_frameCount - delay) / attack;
+		normalValue = static_cast<float>(m_frameCount - delay) / attack;
 	}
 	else if (static_cast<f_cnt_t>(m_frameCount) < delay + attack + hold)
 	{
-		return 1.0f;
+		normalValue = 1.0f;
 	}
 	else if (static_cast<f_cnt_t>(m_frameCount) < delay + attack + hold + decay)
 	{
 		// Follow an exponential curve from 0 to -90 dB, but stop at the sustain value
-		return std::max(sustain, dbfsToAmp(-90 * static_cast<float>(m_frameCount - (delay + attack + hold)) / decay));
+		normalValue = std::max(sustain, dbfsToAmp(-90 * static_cast<float>(m_frameCount - (delay + attack + hold)) / decay));
 	}
 	else
 	{
-		return sustain;
+		normalValue = sustain;
 	}
+	// If the note has already been released, find the release amplitude
+	if (m_released && m_frameCount > m_releaseFrame)
+	{
+		// According to https://sfzformat.com/tutorials/envelope_generators/, release and decay follow exponential curves (linear in dB) which go from 0 to -90 dB
+		releaseValue = dbfsToAmp(-90 * static_cast<float>(m_frameCount - m_releaseFrame) / release);
+	}
+	return releaseValue * normalValue;
 }
 
 
@@ -88,12 +92,12 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const fpp_t frames)
 	freqRatio *= sampleSampleRate / sampleRate;
 
 	// Amplitude envelope
-	const f_cnt_t ampegDelayFrames = m_region->m_ampeg_delay.value() * sampleRate;
-	const f_cnt_t ampegAttackFrames = m_region->m_ampeg_attack.value() * sampleRate;
-	const f_cnt_t ampegHoldFrames = m_region->m_ampeg_hold.value() * sampleRate;
-	const f_cnt_t ampegDecayFrames = m_region->m_ampeg_decay.value() * sampleRate;
-	const float ampegSustain = m_region->m_ampeg_sustain.value() / 100.0f; // Sustain is stored in percent, so divide by 100 to get ratio
-	const f_cnt_t ampegReleaseFrames = m_region->m_ampeg_release.value() * sampleRate;
+	const f_cnt_t ampegDelayFrames = (m_region->m_ampeg_delay.value()) * sampleRate;
+	const f_cnt_t ampegAttackFrames = (m_region->m_ampeg_attack.value()) * sampleRate;
+	const f_cnt_t ampegHoldFrames = (m_region->m_ampeg_hold.value()) * sampleRate;
+	const f_cnt_t ampegDecayFrames = (m_region->m_ampeg_decay.value()) * sampleRate;
+	const float ampegSustain = (m_region->m_ampeg_sustain.value()) / 100.0f; // Sustain is stored in percent, so divide by 100 to get ratio
+	const f_cnt_t ampegReleaseFrames = (m_region->m_ampeg_release.value() + m_region->m_ampeg_release_totalCC) * sampleRate;
 
 	for (f_cnt_t f = 0; f < frames; ++f)
 	{
@@ -119,15 +123,14 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const fpp_t frames)
 
 	int elapsed = profiler.elapsed(); totalMicroseconds += elapsed; totalSquaredMicroseconds += elapsed * elapsed; totalCalls++; minElapsed = std::min(minElapsed, elapsed); maxElapsed = std::max(maxElapsed, elapsed);
 	float mean = 1.0f * totalMicroseconds / totalCalls, variance = (1.0f * totalSquaredMicroseconds - 1.0f * totalMicroseconds * totalMicroseconds / totalCalls / totalCalls) / totalCalls;
-	qDebug() << "SfzRegionPlayState::play profiler:" << elapsed << "Min:" << minElapsed << "Max:" << maxElapsed << "Total calls" << totalCalls << "Mean:" << mean << "Stdev:" << std::sqrt(variance) << "Stdev of mean:" << sqrt(variance / totalCalls);
-
+	//qDebug() << "SfzRegionPlayState::play profiler:" << elapsed << "Min:" << minElapsed << "Max:" << maxElapsed << "Total calls" << totalCalls << "Mean:" << mean << "Stdev:" << std::sqrt(variance) << "Stdev of mean:" << sqrt(variance / totalCalls);
 	return true;
 }
 
 
 void SfzRegionPlayState::processTrigger(const SfzTrigger& trigger)
 {
-	if (trigger.key() == m_trigger.key() && trigger.type() == SfzTrigger::Type::NoteOff)
+	if (trigger.key() == m_trigger.key() && trigger.type() == SfzTrigger::Type::NoteOff && !m_released)
 	{
 		m_released = true;
 		m_releaseFrame = m_frameCount; // testing

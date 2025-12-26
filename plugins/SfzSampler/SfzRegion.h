@@ -56,6 +56,16 @@ private:
 	
 	//! Helper function to figure out what the maximum active index is, in the event the maximum index deacticated
 	void recalculateMaxActiveIndex();
+
+	//! Store the current total midi CC modulation amounts for the different targets, just so that we don't
+	// have to recalculate them every buffer, instead only when a trigger occurs.
+	float m_ampeg_release_totalCC = 0.0f;
+
+	//! Helper function to calculate the total modulation of all midi CC controllers on a parameter. Essentially it just multiplies the modulation amounts by the current CC values and adds it all up.
+	float totalCCModulation(const std::array<float, 128>& ccModulationAmounts, const SfzGlobalState& globalState) const;
+	void recalculateTotalCCModulation(const SfzGlobalState& globalState);
+
+	friend class SfzRegionPlayState; // TODO this was just to make it easy but...?
 };
 
 

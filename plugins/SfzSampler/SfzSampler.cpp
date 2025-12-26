@@ -91,6 +91,11 @@ bool SfzSampler::handleMidiEvent(const MidiEvent& event, const TimePos& time, f_
 		processTrigger(SfzTrigger::noteOffEvent(event.key(), event.velocity()));
 		return true;
 	}
+	else if (event.type() == MidiControlChange)
+	{
+		processTrigger(SfzTrigger::controlChangeEvent(event.controllerNumber(), event.controllerValue()));
+		return true;
+	}
 	return false;
 }
 
@@ -109,7 +114,7 @@ void SfzSampler::deleteNotePluginData(NotePlayHandle* handle)
 
 void SfzSampler::processTrigger(const SfzTrigger& trigger)
 {
-	// Notify the global state to update which keys are active
+	// Notify the global state to update which keys are active, update midi CC values, etc
 	m_sfzGlobalState.processTrigger(trigger);
 
 	// Loop through all the regions to check if a new note should be played
