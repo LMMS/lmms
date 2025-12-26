@@ -56,7 +56,11 @@ bool SfzOpcodeState::setOpcodeByStrings(const QString& name, const QString& valu
 	else if (name == "pitch_keytrack")
 	{
 		m_pitch_keytrack = value.toInt(&successful);
-		if (!successful) { m_pitch_keytrack = keyNumFromString(value, &successful); }
+	}
+
+	else if (name == "amp_veltrack")
+	{
+		m_amp_veltrack = value.toFloat(&successful);
 	}
 
 	else if (name == "ampeg_delay")

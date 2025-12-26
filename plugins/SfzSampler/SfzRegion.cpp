@@ -35,10 +35,10 @@ bool SfzRegion::triggerConditionsMet(const SfzGlobalState& globalState, const Sf
 			if (triggerKey != m_key.value()) { return false; }
 		}
 		// `lokey` and `hikey` opcodes
-		if (triggerKey > m_hikey.value() || triggerKey < m_lokey.value()) { return false; }
+		if (triggerKey > m_hikey || triggerKey < m_lokey) { return false; }
 
 		// `lovel` and `hivel` opcodes
-		if (triggerVelocity > m_hivel.value() || triggerVelocity < m_lovel.value()) { return false; }
+		if (triggerVelocity > m_hivel || triggerVelocity < m_lovel) { return false; }
 
 		// If all the contitions passed, return true and spawn a sound
 		return true;

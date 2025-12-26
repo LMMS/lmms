@@ -21,23 +21,24 @@ public:
 	std::optional<QString> m_sampleFile = std::nullopt;
 	std::optional<QString> m_default_path = std::nullopt;
 
-	// TODO maybe these don't all have to be optionals
 	std::optional<int> m_key = std::nullopt;
-	std::optional<int> m_lokey = 0;
-	std::optional<int> m_hikey = 127;
+	int m_lokey = 0;
+	int m_hikey = 127;
 
-	std::optional<int> m_lovel = 0;
-	std::optional<int> m_hivel = 127;
+	int m_lovel = 0;
+	int m_hivel = 127;
 
-	std::optional<int> m_pitch_keycenter = 60;
-	std::optional<int> m_pitch_keytrack = 100;
+	int m_pitch_keycenter = 60;
+	int m_pitch_keytrack = 100;
 
-	std::optional<float> m_ampeg_delay = 0;
-	std::optional<float> m_ampeg_attack = 0;
-	std::optional<float> m_ampeg_hold = 0;
-	std::optional<float> m_ampeg_decay = 0;
-	std::optional<float> m_ampeg_sustain = 100;
-	std::optional<float> m_ampeg_release = 0.001;
+	float m_amp_veltrack = 100;
+
+	float m_ampeg_delay = 0;
+	float m_ampeg_attack = 0;
+	float m_ampeg_hold = 0;
+	float m_ampeg_decay = 0;
+	float m_ampeg_sustain = 100;
+	float m_ampeg_release = 0.001;
 	std::array<float, 128> m_ampeg_release_oncc = {};
 
 	//! Default midi CC values

@@ -81,8 +81,8 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const fpp_t frames)
 	const f_cnt_t framesToPlay = frames - startFrameOffset;
 
 	// Calculate pitch difference relative to original sample
-	const int semitoneDifference = m_trigger.key().value() - m_region->m_pitch_keycenter.value();
-	float freqRatio = std::exp2(semitoneDifference * m_region->m_pitch_keytrack.value() / 1200.0f);
+	const int semitoneDifference = m_trigger.key().value() - m_region->m_pitch_keycenter;
+	float freqRatio = std::exp2(semitoneDifference * m_region->m_pitch_keytrack / 1200.0f);
 
 	// Sample rate of sample
 	const float sampleSampleRate = m_region->sample().sampleRate();
@@ -92,12 +92,17 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const fpp_t frames)
 	freqRatio *= sampleSampleRate / sampleRate;
 
 	// Amplitude envelope
-	const f_cnt_t ampegDelayFrames = (m_region->m_ampeg_delay.value()) * sampleRate;
-	const f_cnt_t ampegAttackFrames = (m_region->m_ampeg_attack.value()) * sampleRate;
-	const f_cnt_t ampegHoldFrames = (m_region->m_ampeg_hold.value()) * sampleRate;
-	const f_cnt_t ampegDecayFrames = (m_region->m_ampeg_decay.value()) * sampleRate;
-	const float ampegSustain = (m_region->m_ampeg_sustain.value()) / 100.0f; // Sustain is stored in percent, so divide by 100 to get ratio
-	const f_cnt_t ampegReleaseFrames = (m_region->m_ampeg_release.value() + m_region->m_ampeg_release_totalCC) * sampleRate;
+	const f_cnt_t ampegDelayFrames = (m_region->m_ampeg_delay) * sampleRate;
+	const f_cnt_t ampegAttackFrames = (m_region->m_ampeg_attack) * sampleRate;
+	const f_cnt_t ampegHoldFrames = (m_region->m_ampeg_hold) * sampleRate;
+	const f_cnt_t ampegDecayFrames = (m_region->m_ampeg_decay) * sampleRate;
+	const float ampegSustain = (m_region->m_ampeg_sustain) / 100.0f; // Sustain is stored in percent, so divide by 100 to get ratio
+	const f_cnt_t ampegReleaseFrames = (m_region->m_ampeg_release + m_region->m_ampeg_release_totalCC) * sampleRate;
+
+	// Amplitude due to velocity
+	// If amp_keytrack is 100, then 0 velocity = 0 amp, and 127 velocity = 1.0f amp (as expected)
+	// If amp_keytrack is -100, it's the reverse. If amp_keytrack is 0, the volume is not affected by the velocity.
+	const float ampVelocity = 2 * ((m_trigger.velocity().value() / 127.0f - 0.5f) * (m_region->m_amp_veltrack / 100) * 0.5f + 0.5f);
 
 	for (f_cnt_t f = 0; f < frames; ++f)
 	{
@@ -109,8 +114,8 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const fpp_t frames)
 			ampegSustain,
 			ampegReleaseFrames
 		);
-		buffer[f][0] += m_region->sample().at(m_sampleFrame, 0) * ampeg;
-		buffer[f][1] += m_region->sample().at(m_sampleFrame, 1) * ampeg;
+		buffer[f][0] += m_region->sample().at(m_sampleFrame, 0) * ampeg * ampVelocity;
+		buffer[f][1] += m_region->sample().at(m_sampleFrame, 1) * ampeg * ampVelocity;
 		m_sampleFrame = std::min(static_cast<float>(m_region->sample().size()), m_sampleFrame + freqRatio);
 		m_frameCount++;
 	}
