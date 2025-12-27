@@ -1079,7 +1079,7 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../plugins/Xpressive/Xpressive.cpp" line="56"/>
         <source>Mathematical expression parser</source>
-        <translation type="unfinished"/>
+        <translation>数学表达式解析器</translation>
     </message>
     <message>
         <location filename="../../plugins/ZynAddSubFx/ZynAddSubFx.cpp" line="66"/>
@@ -1187,12 +1187,12 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../src/core/DataFile.cpp" line="2061"/>
         <source>LADSPA plugins</source>
-        <translation type="unfinished"/>
+        <translation>LADSPA插件</translation>
     </message>
     <message>
         <location filename="../../src/core/DataFile.cpp" line="2062"/>
         <source>The project contains %1 LADSPA plugin(s) which might have not been restored correctly! Please check the project.</source>
-        <translation type="unfinished"/>
+        <translation>该项目包含的 %1 LADSPA插件可能未正确还原！请检查项目。</translation>
     </message>
     <message>
         <location filename="../../src/core/lv2/Lv2SubPluginFeatures.cpp" line="159"/>
@@ -3743,7 +3743,7 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../plugins/MidiImport/MidiImport.cpp" line="99"/>
         <source>You have not set up a default soundfont in the settings dialog (Edit-&gt;Settings). Therefore no sound will be played back after importing this MIDI file. You should download a General MIDI soundfont, specify it in settings dialog and try again.</source>
-        <translation type="unfinished"/>
+        <translation>您尚未在设置对话框（编辑-&gt;设置）中设置默认声音字体（soundfont）。因此，导入MIDI文件后将不会播放任何声音。您应该下载一个通用MIDI声音字体（soundfont）文件。在设置对话框中指定该音色字体，然后重试。</translation>
     </message>
     <message>
         <location filename="../../plugins/MidiImport/MidiImport.cpp" line="111"/>
@@ -6790,7 +6790,7 @@ Please make sure you have read-permission to the file and the directory containi
     <message>
         <location filename="../../plugins/CarlaBase/Carla.cpp" line="758"/>
         <source>Search..</source>
-        <translation type="unfinished"/>
+        <translation>搜索......</translation>
     </message>
     <message>
         <location filename="../../plugins/CarlaBase/Carla.cpp" line="764"/>
@@ -9128,7 +9128,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/instrument/InstrumentSoundShapingView.cpp" line="84"/>
         <source>Envelopes, LFOs and filters are not supported by the current instrument.</source>
-        <translation>包络和低频振荡 (LFO) 不被当前乐器支持。</translation>
+        <translation>包络、低频振荡 (LFO)和滤波器 不被当前乐器支持。</translation>
     </message>
 </context>
 <context>
@@ -9199,7 +9199,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="153"/>
         <source>Mute this instrument</source>
-        <translation type="unfinished"/>
+        <translation>静音此乐器</translation>
     </message>
     <message>
         <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="156"/>
@@ -9209,7 +9209,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="160"/>
         <source>Solo this instrument</source>
-        <translation type="unfinished"/>
+        <translation>独奏此乐器</translation>
     </message>
     <message>
         <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="166"/>
@@ -9342,7 +9342,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/instrument/InstrumentTuningView.cpp" line="61"/>
         <source>Enables the use of global transposition</source>
-        <translation type="unfinished"/>
+        <translation>启用使用全局移调</translation>
     </message>
     <message>
         <location filename="../../src/gui/instrument/InstrumentTuningView.cpp" line="67"/>
@@ -10871,7 +10871,7 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="1081"/>
         <source>Fullscreen</source>
-        <translation type="unfinished"/>
+        <translation>全屏</translation>
     </message>
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="1090"/>
@@ -12873,7 +12873,7 @@ Warning: This operation can not be undone.</source>
     <message>
         <location filename="../../src/gui/PluginBrowser.cpp" line="63"/>
         <source>Drag an instrument into either the Song Editor, the Pattern Editor or an existing instrument track.</source>
-        <translation type="unfinished"/>
+        <translation>将乐器插件拖入歌曲编辑器, 样式编辑器, 或者现有的乐器轨道。</translation>
     </message>
     <message>
         <location filename="../../src/gui/PluginBrowser.cpp" line="71"/>
@@ -13486,7 +13486,7 @@ Warning: This operation can not be undone.</source>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="197"/>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="872"/>
         <source>General</source>
-        <translation type="unfinished"/>
+        <translation>常规</translation>
     </message>
     <message>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="232"/>
@@ -13501,7 +13501,7 @@ Warning: This operation can not be undone.</source>
     <message>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="237"/>
         <source>Enable master oscilloscope by default</source>
-        <translation type="unfinished"/>
+        <translation>默认启用主示波器</translation>
     </message>
     <message>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="239"/>
@@ -13521,7 +13521,7 @@ Warning: This operation can not be undone.</source>
     <message>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="245"/>
         <source>Enable one instrument-track-window mode</source>
-        <translation type="unfinished"/>
+        <translation>启用一个乐器轨道窗口模式</translation>
     </message>
     <message>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="247"/>
@@ -14540,7 +14540,7 @@ Latency: %2 ms</source>
     <message>
         <location filename="../../src/gui/editors/SongEditor.cpp" line="965"/>
         <source>Knife mode (split clips)</source>
-        <translation type="unfinished"/>
+        <translation>分割模式（分割片段）</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/SongEditor.cpp" line="966"/>
@@ -15123,7 +15123,7 @@ Latency: %2 ms</source>
     <message>
         <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="171"/>
         <source>After removing a track, it can not be recovered. Are you sure you want to remove track &quot;%1&quot;?</source>
-        <translation type="unfinished"/>
+        <translation>在你移除该轨道之后，该轨道无法再通过撤销而恢复。你确定想要移除&quot;%1&quot;轨道吗？</translation>
     </message>
     <message>
         <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="174"/>

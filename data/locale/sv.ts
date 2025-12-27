@@ -74,47 +74,47 @@ Om du är intresserad av att översätta LMMS till ett annat språk eller vill f
     <message>
         <location filename="../../include/AudioAlsa.h" line="76"/>
         <source>ALSA (Advanced Linux Sound Architecture)</source>
-        <translation type="unfinished"/>
+        <translation>ALSA (Advanced Linux Sound Architecture)</translation>
     </message>
     <message>
         <location filename="../../include/AudioDummy.h" line="53"/>
         <source>Dummy (no sound output)</source>
-        <translation type="unfinished"/>
+        <translation>Dummy (inget ljud ut)</translation>
     </message>
     <message>
         <location filename="../../include/AudioJack.h" line="75"/>
         <source>JACK (JACK Audio Connection Kit)</source>
-        <translation type="unfinished"/>
+        <translation>JACK (JACK Audio Connection Kit)</translation>
     </message>
     <message>
         <location filename="../../include/AudioOss.h" line="58"/>
         <source>OSS (Open Sound System)</source>
-        <translation type="unfinished"/>
+        <translation>OSS (Open Sound System)</translation>
     </message>
     <message>
         <location filename="../../include/AudioPortAudio.h" line="83"/>
         <source>PortAudio</source>
-        <translation type="unfinished"/>
+        <translation>PortAudio</translation>
     </message>
     <message>
         <location filename="../../include/AudioPulseAudio.h" line="59"/>
         <source>PulseAudio</source>
-        <translation type="unfinished"/>
+        <translation>PulseAudio</translation>
     </message>
     <message>
         <location filename="../../include/AudioSdl.h" line="50"/>
         <source>SDL (Simple DirectMedia Layer)</source>
-        <translation type="unfinished"/>
+        <translation>SDL (Simple DirectMedia Layer)</translation>
     </message>
     <message>
         <location filename="../../include/AudioSndio.h" line="59"/>
         <source>sndio</source>
-        <translation type="unfinished"/>
+        <translation>sndio</translation>
     </message>
     <message>
         <location filename="../../include/AudioSoundIo.h" line="69"/>
         <source>soundio</source>
-        <translation type="unfinished"/>
+        <translation>soundio</translation>
     </message>
     <message>
         <location filename="../../src/core/audio/AudioSdl.cpp" line="226"/>
@@ -734,42 +734,42 @@ Om du är intresserad av att översätta LMMS till ett annat språk eller vill f
     <message>
         <location filename="../../include/MidiAlsaRaw.h" line="57"/>
         <source>ALSA Raw-MIDI (Advanced Linux Sound Architecture)</source>
-        <translation type="unfinished"/>
+        <translation>ALSA Rå-MIDI (Advanced Linux Sound Architecture)</translation>
     </message>
     <message>
         <location filename="../../include/MidiAlsaSeq.h" line="60"/>
         <source>ALSA-Sequencer (Advanced Linux Sound Architecture)</source>
-        <translation type="unfinished"/>
+        <translation>ALSA-Sequencer (Advanced Linux Sound Architecture)</translation>
     </message>
     <message>
         <location filename="../../include/MidiApple.h" line="59"/>
         <source>Apple MIDI</source>
-        <translation type="unfinished"/>
+        <translation>Apple MIDI</translation>
     </message>
     <message>
         <location filename="../../include/MidiDummy.h" line="43"/>
         <source>Dummy (no MIDI support)</source>
-        <translation type="unfinished"/>
+        <translation>Dummy (inget MIDI-stöd)</translation>
     </message>
     <message>
         <location filename="../../include/MidiJack.h" line="63"/>
         <source>Jack-MIDI</source>
-        <translation type="unfinished"/>
+        <translation>Jack-MIDI</translation>
     </message>
     <message>
         <location filename="../../include/MidiOss.h" line="54"/>
         <source>OSS Raw-MIDI (Open Sound System)</source>
-        <translation type="unfinished"/>
+        <translation>OSS Rå-MIDI (Open Sound System)</translation>
     </message>
     <message>
         <location filename="../../include/MidiSndio.h" line="55"/>
         <source>sndio MIDI</source>
-        <translation type="unfinished"/>
+        <translation>sndio MIDI</translation>
     </message>
     <message>
         <location filename="../../include/MidiWinMM.h" line="60"/>
         <source>WinMM MIDI</source>
-        <translation type="unfinished"/>
+        <translation>WinMM MIDI</translation>
     </message>
 </context>
 <context>
@@ -833,7 +833,7 @@ Om du är intresserad av att översätta LMMS till ett annat språk eller vill f
     <message>
         <location filename="../../plugins/Amplifier/Amplifier.cpp" line="41"/>
         <source>A native amplifier plugin</source>
-        <translation>En inbyggd förstärkare-tillägg</translation>
+        <translation>Ett inbyggt förstärkartillägg</translation>
     </message>
     <message>
         <location filename="../../plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="49"/>
@@ -868,7 +868,7 @@ Om du är intresserad av att översätta LMMS till ett annat språk eller vill f
     <message>
         <location filename="../../plugins/Compressor/Compressor.cpp" line="45"/>
         <source>A dynamic range compressor.</source>
-        <translation type="unfinished"/>
+        <translation>En kompressor med dynamiskt omfång.</translation>
     </message>
     <message>
         <location filename="../../plugins/CrossoverEQ/CrossoverEQ.cpp" line="43"/>
@@ -888,7 +888,7 @@ Om du är intresserad av att översätta LMMS till ett annat språk eller vill f
     <message>
         <location filename="../../plugins/DynamicsProcessor/DynamicsProcessor.cpp" line="48"/>
         <source>plugin for processing dynamics in a flexible way</source>
-        <translation>tillägg för dynamisk bearbetning på ett flexibelt sätt</translation>
+        <translation>tillägg för flexibel bearbetning av dynamik</translation>
     </message>
     <message>
         <location filename="../../plugins/Eq/EqEffect.cpp" line="44"/>
@@ -1080,32 +1080,32 @@ Detta chip användes i datorn Commodore 64.</translation>
     <message>
         <location filename="../../plugins/Dispersion/Dispersion.cpp" line="42"/>
         <source>An all-pass filter allowing for extremely high orders.</source>
-        <translation type="unfinished"/>
+        <translation>Ett all-pass filter som tillåter extremt höga ordningar.</translation>
     </message>
     <message>
         <location filename="../../plugins/GranularPitchShifter/GranularPitchShifterEffect.cpp" line="42"/>
         <source>Granular pitch shifter</source>
-        <translation type="unfinished"/>
+        <translation>Finkornig tonhöjdsändrare</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMM.cpp" line="40"/>
         <source>Upwards/downwards multiband compression plugin powered by the eldritch elder god LOMMUS.</source>
-        <translation type="unfinished"/>
+        <translation>Uppåt-/nedåtgående multiband-kompressor driven av den fasansfulla urguden LOMMUS.</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortion.cpp" line="39"/>
         <source>A 2-band distortion and slew rate limiter plugin.</source>
-        <translation type="unfinished"/>
+        <translation>2-bands distortion och slew rate begränsare.</translation>
     </message>
     <message>
         <location filename="../../plugins/SlicerT/SlicerT.cpp" line="47"/>
         <source>Basic Slicer</source>
-        <translation type="unfinished"/>
+        <translation>Enkel slicer</translation>
     </message>
     <message>
         <location filename="../../plugins/TapTempo/TapTempo.cpp" line="38"/>
         <source>Tap to the beat</source>
-        <translation type="unfinished"/>
+        <translation>Knacka takten</translation>
     </message>
 </context>
 <context>
@@ -1178,12 +1178,12 @@ Detta chip användes i datorn Commodore 64.</translation>
     <message>
         <location filename="../../src/core/DataFile.cpp" line="2061"/>
         <source>LADSPA plugins</source>
-        <translation type="unfinished"/>
+        <translation>LADSPA-tillägg</translation>
     </message>
     <message>
         <location filename="../../src/core/DataFile.cpp" line="2062"/>
         <source>The project contains %1 LADSPA plugin(s) which might have not been restored correctly! Please check the project.</source>
-        <translation type="unfinished"/>
+        <translation>Projektet innehåller %1 LADSPA-tillägg som eventuellt inte återställdes rätt! Vänligen kontrollera projektet.</translation>
     </message>
     <message>
         <location filename="../../src/core/lv2/Lv2SubPluginFeatures.cpp" line="159"/>
@@ -1218,7 +1218,7 @@ Detta chip användes i datorn Commodore 64.</translation>
     <message>
         <location filename="../../src/core/lv2/Lv2SubPluginFeatures.cpp" line="233"/>
         <source>failed to load description</source>
-        <translation type="unfinished"/>
+        <translation>misslyckades att läsa in beskrivning</translation>
     </message>
     <message>
         <location filename="../../src/gui/SampleLoader.cpp" line="40"/>
@@ -1228,7 +1228,7 @@ Detta chip användes i datorn Commodore 64.</translation>
     <message>
         <location filename="../../src/gui/SampleLoader.cpp" line="122"/>
         <source>Error loading sample</source>
-        <translation type="unfinished"/>
+        <translation>Misslyckades att ladda ljudfil</translation>
     </message>
 </context>
 <context>
@@ -1401,7 +1401,7 @@ Detta chip användes i datorn Commodore 64.</translation>
     <message>
         <location filename="../../plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="224"/>
         <source>Sample not found</source>
-        <translation type="unfinished"/>
+        <translation>Ljudfil hittades inte</translation>
     </message>
 </context>
 <context>
@@ -1481,7 +1481,7 @@ Detta chip användes i datorn Commodore 64.</translation>
     <message>
         <location filename="../../src/core/audio/AudioSdl.cpp" line="244"/>
         <source>Input device</source>
-        <translation type="unfinished"/>
+        <translation>Ingångsenhet</translation>
     </message>
 </context>
 <context>
@@ -1707,7 +1707,7 @@ Detta chip användes i datorn Commodore 64.</translation>
     <message>
         <location filename="../../plugins/Compressor/CompressorControls.cpp" line="41"/>
         <source>Knee</source>
-        <translation type="unfinished"/>
+        <translation>Knä</translation>
     </message>
     <message>
         <location filename="../../plugins/Compressor/CompressorControls.cpp" line="42"/>
@@ -1727,17 +1727,17 @@ Detta chip användes i datorn Commodore 64.</translation>
     <message>
         <location filename="../../plugins/Compressor/CompressorControls.cpp" line="45"/>
         <source>Mid/Side</source>
-        <translation type="unfinished"/>
+        <translation>Mitt/Sidor</translation>
     </message>
     <message>
         <location filename="../../plugins/Compressor/CompressorControls.cpp" line="46"/>
         <source>Peak Mode</source>
-        <translation type="unfinished"/>
+        <translation>Toppläge</translation>
     </message>
     <message>
         <location filename="../../plugins/Compressor/CompressorControls.cpp" line="47"/>
         <source>Lookahead Length</source>
-        <translation type="unfinished"/>
+        <translation>Lookahead-längd</translation>
     </message>
     <message>
         <location filename="../../plugins/Compressor/CompressorControls.cpp" line="48"/>
@@ -1767,7 +1767,7 @@ Detta chip användes i datorn Commodore 64.</translation>
     <message>
         <location filename="../../plugins/Compressor/CompressorControls.cpp" line="53"/>
         <source>Blend</source>
-        <translation type="unfinished"/>
+        <translation>Blandning</translation>
     </message>
     <message>
         <location filename="../../plugins/Compressor/CompressorControls.cpp" line="54"/>
@@ -1777,12 +1777,12 @@ Detta chip användes i datorn Commodore 64.</translation>
     <message>
         <location filename="../../plugins/Compressor/CompressorControls.cpp" line="55"/>
         <source>Auto Makeup Gain</source>
-        <translation type="unfinished"/>
+        <translation>Auto nivåkompensering</translation>
     </message>
     <message>
         <location filename="../../plugins/Compressor/CompressorControls.cpp" line="56"/>
         <source>Audition</source>
-        <translation type="unfinished"/>
+        <translation>Provspelning</translation>
     </message>
     <message>
         <location filename="../../plugins/Compressor/CompressorControls.cpp" line="57"/>
@@ -1792,27 +1792,27 @@ Detta chip användes i datorn Commodore 64.</translation>
     <message>
         <location filename="../../plugins/Compressor/CompressorControls.cpp" line="58"/>
         <source>Auto Attack</source>
-        <translation type="unfinished"/>
+        <translation>Auto Attack</translation>
     </message>
     <message>
         <location filename="../../plugins/Compressor/CompressorControls.cpp" line="59"/>
         <source>Auto Release</source>
-        <translation type="unfinished"/>
+        <translation>Auto Release</translation>
     </message>
     <message>
         <location filename="../../plugins/Compressor/CompressorControls.cpp" line="60"/>
         <source>Lookahead</source>
-        <translation type="unfinished"/>
+        <translation>Lookahead</translation>
     </message>
     <message>
         <location filename="../../plugins/Compressor/CompressorControls.cpp" line="61"/>
         <source>Tilt</source>
-        <translation type="unfinished"/>
+        <translation>Tilt</translation>
     </message>
     <message>
         <location filename="../../plugins/Compressor/CompressorControls.cpp" line="62"/>
         <source>Tilt Frequency</source>
-        <translation type="unfinished"/>
+        <translation>Tiltfrekvens</translation>
     </message>
     <message>
         <location filename="../../plugins/Compressor/CompressorControls.cpp" line="63"/>
@@ -1866,7 +1866,7 @@ Detta chip användes i datorn Commodore 64.</translation>
     <message>
         <location filename="../../include/DetuningHelper.h" line="56"/>
         <source>Note detuning</source>
-        <translation type="unfinished"/>
+        <translation>Notstämning</translation>
     </message>
 </context>
 <context>
@@ -1874,7 +1874,7 @@ Detta chip användes i datorn Commodore 64.</translation>
     <message>
         <location filename="../../plugins/Dispersion/DispersionControls.cpp" line="36"/>
         <source>Amount</source>
-        <translation type="unfinished"/>
+        <translation>Mängd</translation>
     </message>
     <message>
         <location filename="../../plugins/Dispersion/DispersionControls.cpp" line="37"/>
@@ -1894,7 +1894,7 @@ Detta chip användes i datorn Commodore 64.</translation>
     <message>
         <location filename="../../plugins/Dispersion/DispersionControls.cpp" line="40"/>
         <source>DC Offset Removal</source>
-        <translation type="unfinished"/>
+        <translation>DC-kompensering</translation>
     </message>
 </context>
 <context>
@@ -2092,7 +2092,7 @@ Detta chip användes i datorn Commodore 64.</translation>
     <message>
         <location filename="../../include/DummyEffect.h" line="139"/>
         <source>NOT FOUND</source>
-        <translation type="unfinished"/>
+        <translation>HITTADES INTE</translation>
     </message>
 </context>
 <context>
@@ -2169,7 +2169,7 @@ Detta chip användes i datorn Commodore 64.</translation>
     <message>
         <location filename="../../src/core/Engine.cpp" line="88"/>
         <source>Launching audio engine threads</source>
-        <translation type="unfinished"/>
+        <translation>Startar trådar för ljudmotor</translation>
     </message>
 </context>
 <context>
@@ -2247,7 +2247,7 @@ Detta chip användes i datorn Commodore 64.</translation>
     <message>
         <location filename="../../src/core/EnvelopeAndLfoParameters.cpp" line="394"/>
         <source>Sample not found</source>
-        <translation type="unfinished"/>
+        <translation>Ljudfil hittades inte</translation>
     </message>
 </context>
 <context>
@@ -2478,7 +2478,7 @@ Detta chip användes i datorn Commodore 64.</translation>
     <message>
         <location filename="../../plugins/Flanger/FlangerControls.cpp" line="40"/>
         <source>Amount</source>
-        <translation type="unfinished"/>
+        <translation>Mängd</translation>
     </message>
     <message>
         <location filename="../../plugins/Flanger/FlangerControls.cpp" line="41"/>
@@ -2652,42 +2652,42 @@ Detta chip användes i datorn Commodore 64.</translation>
     <message>
         <location filename="../../plugins/GranularPitchShifter/GranularPitchShifterControls.cpp" line="36"/>
         <source>Grain Size</source>
-        <translation type="unfinished"/>
+        <translation>Kornstorlek</translation>
     </message>
     <message>
         <location filename="../../plugins/GranularPitchShifter/GranularPitchShifterControls.cpp" line="37"/>
         <source>Spray</source>
-        <translation type="unfinished"/>
+        <translation>Spridning</translation>
     </message>
     <message>
         <location filename="../../plugins/GranularPitchShifter/GranularPitchShifterControls.cpp" line="38"/>
         <source>Jitter</source>
-        <translation type="unfinished"/>
+        <translation>Darr</translation>
     </message>
     <message>
         <location filename="../../plugins/GranularPitchShifter/GranularPitchShifterControls.cpp" line="39"/>
         <source>Twitch</source>
-        <translation type="unfinished"/>
+        <translation>Ryck</translation>
     </message>
     <message>
         <location filename="../../plugins/GranularPitchShifter/GranularPitchShifterControls.cpp" line="40"/>
         <source>Pitch Stereo Spread</source>
-        <translation type="unfinished"/>
+        <translation>Tonhöjdsskillnad stereo</translation>
     </message>
     <message>
         <location filename="../../plugins/GranularPitchShifter/GranularPitchShifterControls.cpp" line="41"/>
         <source>Spray Stereo</source>
-        <translation type="unfinished"/>
+        <translation>Spridning i stereo</translation>
     </message>
     <message>
         <location filename="../../plugins/GranularPitchShifter/GranularPitchShifterControls.cpp" line="42"/>
         <source>Shape</source>
-        <translation type="unfinished"/>
+        <translation>Form</translation>
     </message>
     <message>
         <location filename="../../plugins/GranularPitchShifter/GranularPitchShifterControls.cpp" line="43"/>
         <source>Fade Length</source>
-        <translation type="unfinished"/>
+        <translation>Toningslängd</translation>
     </message>
     <message>
         <location filename="../../plugins/GranularPitchShifter/GranularPitchShifterControls.cpp" line="44"/>
@@ -2697,52 +2697,52 @@ Detta chip användes i datorn Commodore 64.</translation>
     <message>
         <location filename="../../plugins/GranularPitchShifter/GranularPitchShifterControls.cpp" line="45"/>
         <source>Minimum Allowed Latency</source>
-        <translation type="unfinished"/>
+        <translation>Minsta tillåtna latens</translation>
     </message>
     <message>
         <location filename="../../plugins/GranularPitchShifter/GranularPitchShifterControls.cpp" line="46"/>
         <source>Prefilter</source>
-        <translation type="unfinished"/>
+        <translation>Förfilter</translation>
     </message>
     <message>
         <location filename="../../plugins/GranularPitchShifter/GranularPitchShifterControls.cpp" line="47"/>
         <source>Density</source>
-        <translation type="unfinished"/>
+        <translation>Densitet</translation>
     </message>
     <message>
         <location filename="../../plugins/GranularPitchShifter/GranularPitchShifterControls.cpp" line="48"/>
         <source>Glide</source>
-        <translation type="unfinished"/>
+        <translation>Glid</translation>
     </message>
     <message>
         <location filename="../../plugins/GranularPitchShifter/GranularPitchShifterControls.cpp" line="49"/>
         <source>Ring Buffer Length</source>
-        <translation type="unfinished"/>
+        <translation>Ringbuffertlängd</translation>
     </message>
     <message>
         <location filename="../../plugins/GranularPitchShifter/GranularPitchShifterControls.cpp" line="58"/>
         <source>5 Seconds</source>
-        <translation type="unfinished"/>
+        <translation>5 sekunder</translation>
     </message>
     <message>
         <location filename="../../plugins/GranularPitchShifter/GranularPitchShifterControls.cpp" line="59"/>
         <source>10 Seconds (Size)</source>
-        <translation type="unfinished"/>
+        <translation>10 sekunder (Storlek)</translation>
     </message>
     <message>
         <location filename="../../plugins/GranularPitchShifter/GranularPitchShifterControls.cpp" line="60"/>
         <source>40 Seconds (Size and Pitch)</source>
-        <translation type="unfinished"/>
+        <translation>40 sekunder (Storlek och Tonhöjd)</translation>
     </message>
     <message>
         <location filename="../../plugins/GranularPitchShifter/GranularPitchShifterControls.cpp" line="61"/>
         <source>40 Seconds (Size and Spray and Jitter)</source>
-        <translation type="unfinished"/>
+        <translation>40 sekunder (Storlek, Tonhöjd och Jitter)</translation>
     </message>
     <message>
         <location filename="../../plugins/GranularPitchShifter/GranularPitchShifterControls.cpp" line="62"/>
         <source>120 Seconds (All of the above)</source>
-        <translation type="unfinished"/>
+        <translation>120 sekunder (alla ovanstående)</translation>
     </message>
 </context>
 <context>
@@ -2765,7 +2765,7 @@ Detta chip användes i datorn Commodore 64.</translation>
     <message>
         <location filename="../../src/core/InstrumentFunctions.cpp" line="306"/>
         <source>Note repeats</source>
-        <translation type="unfinished"/>
+        <translation>Upprepningar av not</translation>
     </message>
     <message>
         <location filename="../../src/core/InstrumentFunctions.cpp" line="307"/>
@@ -3027,12 +3027,12 @@ Detta chip användes i datorn Commodore 64.</translation>
     <message>
         <location filename="../../src/tracks/InstrumentTrack.cpp" line="58"/>
         <source>First note</source>
-        <translation type="unfinished"/>
+        <translation>Första noten</translation>
     </message>
     <message>
         <location filename="../../src/tracks/InstrumentTrack.cpp" line="59"/>
         <source>Last note</source>
-        <translation>Senaste noten</translation>
+        <translation>Sista noten</translation>
     </message>
     <message>
         <location filename="../../src/tracks/InstrumentTrack.cpp" line="61"/>
@@ -3118,7 +3118,7 @@ Detta chip användes i datorn Commodore 64.</translation>
     <message>
         <location filename="../../plugins/Kicker/Kicker.cpp" line="74"/>
         <source>Envelope slope</source>
-        <translation>Konturkurva</translation>
+        <translation>Sluttning kontur</translation>
     </message>
     <message>
         <location filename="../../plugins/Kicker/Kicker.cpp" line="75"/>
@@ -3133,7 +3133,7 @@ Detta chip användes i datorn Commodore 64.</translation>
     <message>
         <location filename="../../plugins/Kicker/Kicker.cpp" line="77"/>
         <source>Frequency slope</source>
-        <translation>Frekvenslutning</translation>
+        <translation>Sluttning frekvens</translation>
     </message>
     <message>
         <location filename="../../plugins/Kicker/Kicker.cpp" line="78"/>
@@ -3171,177 +3171,177 @@ Detta chip användes i datorn Commodore 64.</translation>
     <message>
         <location filename="../../plugins/LOMM/LOMMControls.cpp" line="41"/>
         <source>Upward Depth</source>
-        <translation type="unfinished"/>
+        <translation>Djup uppåt</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControls.cpp" line="42"/>
         <source>Downward Depth</source>
-        <translation type="unfinished"/>
+        <translation>Djup nedåt</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControls.cpp" line="43"/>
         <source>High/Mid Split</source>
-        <translation type="unfinished"/>
+        <translation>Hög/mellan delning</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControls.cpp" line="44"/>
         <source>Mid/Low Split</source>
-        <translation type="unfinished"/>
+        <translation>Mellan/låg delning</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControls.cpp" line="45"/>
         <source>Enable High/Mid Split</source>
-        <translation type="unfinished"/>
+        <translation>Aktivera delning av hög/mellan</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControls.cpp" line="46"/>
         <source>Enable Mid/Low Split</source>
-        <translation type="unfinished"/>
+        <translation>Aktivera delning av mellan/låg</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControls.cpp" line="47"/>
         <source>Enable High Band</source>
-        <translation type="unfinished"/>
+        <translation>Aktivera höga bandet</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControls.cpp" line="48"/>
         <source>Enable Mid Band</source>
-        <translation type="unfinished"/>
+        <translation>Aktivera mellersta bandet</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControls.cpp" line="49"/>
         <source>Enable Low Band</source>
-        <translation type="unfinished"/>
+        <translation>Aktivera låga bandet</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControls.cpp" line="50"/>
         <source>High Input Volume</source>
-        <translation type="unfinished"/>
+        <translation>Hög ingångsvolym</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControls.cpp" line="51"/>
         <source>Mid Input Volume</source>
-        <translation type="unfinished"/>
+        <translation>Mellan ingångsvolym</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControls.cpp" line="52"/>
         <source>Low Input Volume</source>
-        <translation type="unfinished"/>
+        <translation>Låg ingångsvolym</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControls.cpp" line="53"/>
         <source>High Output Volume</source>
-        <translation type="unfinished"/>
+        <translation>Hög utgångsvolym</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControls.cpp" line="54"/>
         <source>Mid Output Volume</source>
-        <translation type="unfinished"/>
+        <translation>Mellan utgångsvolym</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControls.cpp" line="55"/>
         <source>Low Output Volume</source>
-        <translation type="unfinished"/>
+        <translation>Låg utgångsvolym</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControls.cpp" line="56"/>
         <source>Above Threshold High</source>
-        <translation type="unfinished"/>
+        <translation>Övre tröskelvärde hög</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControls.cpp" line="57"/>
         <source>Above Threshold Mid</source>
-        <translation type="unfinished"/>
+        <translation>Övre tröskelvärde mellan</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControls.cpp" line="58"/>
         <source>Above Threshold Low</source>
-        <translation type="unfinished"/>
+        <translation>Övre tröskelvärde låg</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControls.cpp" line="59"/>
         <source>Above Ratio High</source>
-        <translation type="unfinished"/>
+        <translation>Övre förhållande hög</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControls.cpp" line="60"/>
         <source>Above Ratio Mid</source>
-        <translation type="unfinished"/>
+        <translation>Övre förhållande mellan</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControls.cpp" line="61"/>
         <source>Above Ratio Low</source>
-        <translation type="unfinished"/>
+        <translation>Övre förhållande låg</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControls.cpp" line="62"/>
         <source>Below Threshold High</source>
-        <translation type="unfinished"/>
+        <translation>Undre tröskelvärde hög</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControls.cpp" line="63"/>
         <source>Below Threshold Mid</source>
-        <translation type="unfinished"/>
+        <translation>Undre tröskelvärde mellan</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControls.cpp" line="64"/>
         <source>Below Threshold Low</source>
-        <translation type="unfinished"/>
+        <translation>Undre tröskelvärde låg</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControls.cpp" line="65"/>
         <source>Below Ratio High</source>
-        <translation type="unfinished"/>
+        <translation>Undre förhållande hög</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControls.cpp" line="66"/>
         <source>Below Ratio Mid</source>
-        <translation type="unfinished"/>
+        <translation>Undre förhållande mellan</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControls.cpp" line="67"/>
         <source>Below Ratio Low</source>
-        <translation type="unfinished"/>
+        <translation>Undre förhållande låg</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControls.cpp" line="68"/>
         <source>Attack High</source>
-        <translation type="unfinished"/>
+        <translation>Attack hög</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControls.cpp" line="69"/>
         <source>Attack Mid</source>
-        <translation type="unfinished"/>
+        <translation>Attack mellan</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControls.cpp" line="70"/>
         <source>Attack Low</source>
-        <translation type="unfinished"/>
+        <translation>Attack låg</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControls.cpp" line="71"/>
         <source>Release High</source>
-        <translation type="unfinished"/>
+        <translation>Release hög</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControls.cpp" line="72"/>
         <source>Release Mid</source>
-        <translation type="unfinished"/>
+        <translation>Release mellan</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControls.cpp" line="73"/>
         <source>Release Low</source>
-        <translation type="unfinished"/>
+        <translation>Release låg</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControls.cpp" line="74"/>
         <source>RMS Time</source>
-        <translation type="unfinished"/>
+        <translation>RMS-tid</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControls.cpp" line="75"/>
         <source>Knee</source>
-        <translation type="unfinished"/>
+        <translation>Knä</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControls.cpp" line="76"/>
@@ -3351,12 +3351,12 @@ Detta chip användes i datorn Commodore 64.</translation>
     <message>
         <location filename="../../plugins/LOMM/LOMMControls.cpp" line="77"/>
         <source>Balance</source>
-        <translation type="unfinished"/>
+        <translation>Balans</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControls.cpp" line="78"/>
         <source>Scale output volume with Depth</source>
-        <translation type="unfinished"/>
+        <translation>Reglera utgångsvolym efter Djup</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControls.cpp" line="79"/>
@@ -3366,7 +3366,7 @@ Detta chip användes i datorn Commodore 64.</translation>
     <message>
         <location filename="../../plugins/LOMM/LOMMControls.cpp" line="80"/>
         <source>Auto Time</source>
-        <translation type="unfinished"/>
+        <translation>Autotid</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControls.cpp" line="81"/>
@@ -3381,22 +3381,22 @@ Detta chip användes i datorn Commodore 64.</translation>
     <message>
         <location filename="../../plugins/LOMM/LOMMControls.cpp" line="83"/>
         <source>Mid/Side</source>
-        <translation type="unfinished"/>
+        <translation>Mitt/Sidor</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControls.cpp" line="84"/>
         <source>Lookahead</source>
-        <translation type="unfinished"/>
+        <translation>Lookahead</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControls.cpp" line="85"/>
         <source>Lookahead Length</source>
-        <translation type="unfinished"/>
+        <translation>Lookahead-längd</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControls.cpp" line="86"/>
         <source>Suppress upward compression for side band</source>
-        <translation type="unfinished"/>
+        <translation>Inaktivera uppåtkomprimering av sidobandet</translation>
     </message>
 </context>
 <context>
@@ -3513,7 +3513,7 @@ Detta chip användes i datorn Commodore 64.</translation>
     <message>
         <location filename="../../src/core/LfoController.cpp" line="249"/>
         <source>Sample not found</source>
-        <translation type="unfinished"/>
+        <translation>Ljudfil hittades inte</translation>
     </message>
 </context>
 <context>
@@ -3601,7 +3601,7 @@ Detta chip användes i datorn Commodore 64.</translation>
     <message>
         <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="91"/>
         <source>Randomness</source>
-        <translation type="unfinished"/>
+        <translation>Slumpmässighet</translation>
     </message>
     <message>
         <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="98"/>
@@ -3692,17 +3692,17 @@ Detta chip användes i datorn Commodore 64.</translation>
     <message>
         <location filename="../../src/core/Microtuner.cpp" line="41"/>
         <source>Microtuner</source>
-        <translation type="unfinished"/>
+        <translation>Mikrostämmare</translation>
     </message>
     <message>
         <location filename="../../src/core/Microtuner.cpp" line="42"/>
         <source>Microtuner on / off</source>
-        <translation type="unfinished"/>
+        <translation>Mikrostämmare på / av</translation>
     </message>
     <message>
         <location filename="../../src/core/Microtuner.cpp" line="43"/>
         <source>Selected scale</source>
-        <translation type="unfinished"/>
+        <translation>Vald skala</translation>
     </message>
     <message>
         <location filename="../../src/core/Microtuner.cpp" line="44"/>
@@ -3785,7 +3785,7 @@ Detta chip användes i datorn Commodore 64.</translation>
         <location filename="../../src/core/midi/MidiJack.cpp" line="60"/>
         <source>The JACK server seems to be shut down.</source>
         <extracomment>When JACK(JACK Audio Connection Kit) disconnects, it will show the following message (dialog message)</extracomment>
-        <translation type="unfinished"/>
+        <translation>JACK-servern verkar vara avstängd.</translation>
     </message>
 </context>
 <context>
@@ -4095,7 +4095,7 @@ Detta chip användes i datorn Commodore 64.</translation>
     <message>
         <location filename="../../plugins/Monstro/Monstro.cpp" line="911"/>
         <source>Env 1 slope</source>
-        <translation>Knt 1 kurva</translation>
+        <translation>Knt 1 sluttning</translation>
     </message>
     <message>
         <location filename="../../plugins/Monstro/Monstro.cpp" line="913"/>
@@ -4130,7 +4130,7 @@ Detta chip användes i datorn Commodore 64.</translation>
     <message>
         <location filename="../../plugins/Monstro/Monstro.cpp" line="919"/>
         <source>Env 2 slope</source>
-        <translation>Knt 2 kurva</translation>
+        <translation>Knt 2 sluttning</translation>
     </message>
     <message>
         <location filename="../../plugins/Monstro/Monstro.cpp" line="921"/>
@@ -4486,7 +4486,7 @@ Detta chip användes i datorn Commodore 64.</translation>
     <message>
         <location filename="../../plugins/Nes/Nes.cpp" line="484"/>
         <source>Channel 1 enable</source>
-        <translation type="unfinished"/>
+        <translation>Kanal 1 aktiv</translation>
     </message>
     <message>
         <location filename="../../plugins/Nes/Nes.cpp" line="485"/>
@@ -4501,12 +4501,12 @@ Detta chip användes i datorn Commodore 64.</translation>
     <message>
         <location filename="../../plugins/Nes/Nes.cpp" line="488"/>
         <source>Channel 1 envelope enable</source>
-        <translation type="unfinished"/>
+        <translation>Kanal 1 kontur aktiv</translation>
     </message>
     <message>
         <location filename="../../plugins/Nes/Nes.cpp" line="489"/>
         <source>Channel 1 envelope loop</source>
-        <translation type="unfinished"/>
+        <translation>Kanal 1 kontur slinga</translation>
     </message>
     <message>
         <location filename="../../plugins/Nes/Nes.cpp" line="490"/>
@@ -4521,7 +4521,7 @@ Detta chip användes i datorn Commodore 64.</translation>
     <message>
         <location filename="../../plugins/Nes/Nes.cpp" line="494"/>
         <source>Channel 1 sweep enable</source>
-        <translation type="unfinished"/>
+        <translation>Kanal 1 svep aktiv</translation>
     </message>
     <message>
         <location filename="../../plugins/Nes/Nes.cpp" line="495"/>
@@ -4536,12 +4536,12 @@ Detta chip användes i datorn Commodore 64.</translation>
     <message>
         <location filename="../../plugins/Nes/Nes.cpp" line="498"/>
         <source>Channel 2 enable</source>
-        <translation type="unfinished"/>
+        <translation>Kanal 2 aktiv</translation>
     </message>
     <message>
         <location filename="../../plugins/Nes/Nes.cpp" line="499"/>
         <source>Channel 2 coarse detune</source>
-        <translation type="unfinished"/>
+        <translation>Kanal 2 grov urstämning</translation>
     </message>
     <message>
         <location filename="../../plugins/Nes/Nes.cpp" line="500"/>
@@ -4551,12 +4551,12 @@ Detta chip användes i datorn Commodore 64.</translation>
     <message>
         <location filename="../../plugins/Nes/Nes.cpp" line="502"/>
         <source>Channel 2 envelope enable</source>
-        <translation type="unfinished"/>
+        <translation>Kanal 2 kontur aktiv</translation>
     </message>
     <message>
         <location filename="../../plugins/Nes/Nes.cpp" line="503"/>
         <source>Channel 2 envelope loop</source>
-        <translation type="unfinished"/>
+        <translation>Kanal 2 kontur slinga</translation>
     </message>
     <message>
         <location filename="../../plugins/Nes/Nes.cpp" line="504"/>
@@ -4571,7 +4571,7 @@ Detta chip användes i datorn Commodore 64.</translation>
     <message>
         <location filename="../../plugins/Nes/Nes.cpp" line="508"/>
         <source>Channel 2 sweep enable</source>
-        <translation type="unfinished"/>
+        <translation>Kanal 2 svep aktiv</translation>
     </message>
     <message>
         <location filename="../../plugins/Nes/Nes.cpp" line="509"/>
@@ -4586,12 +4586,12 @@ Detta chip användes i datorn Commodore 64.</translation>
     <message>
         <location filename="../../plugins/Nes/Nes.cpp" line="513"/>
         <source>Channel 3 enable</source>
-        <translation type="unfinished"/>
+        <translation>Kanal 3 aktiv</translation>
     </message>
     <message>
         <location filename="../../plugins/Nes/Nes.cpp" line="514"/>
         <source>Channel 3 coarse detune</source>
-        <translation>Kanal 3 grovurstämning</translation>
+        <translation>Kanal 3 grov urstämning</translation>
     </message>
     <message>
         <location filename="../../plugins/Nes/Nes.cpp" line="515"/>
@@ -4601,7 +4601,7 @@ Detta chip användes i datorn Commodore 64.</translation>
     <message>
         <location filename="../../plugins/Nes/Nes.cpp" line="518"/>
         <source>Channel 4 enable</source>
-        <translation type="unfinished"/>
+        <translation>Kanal 4 aktiv</translation>
     </message>
     <message>
         <location filename="../../plugins/Nes/Nes.cpp" line="519"/>
@@ -4611,12 +4611,12 @@ Detta chip användes i datorn Commodore 64.</translation>
     <message>
         <location filename="../../plugins/Nes/Nes.cpp" line="521"/>
         <source>Channel 4 envelope enable</source>
-        <translation type="unfinished"/>
+        <translation>Kanal 4 kontur aktiv</translation>
     </message>
     <message>
         <location filename="../../plugins/Nes/Nes.cpp" line="522"/>
         <source>Channel 4 envelope loop</source>
-        <translation type="unfinished"/>
+        <translation>Kanal 4 kontur slinga</translation>
     </message>
     <message>
         <location filename="../../plugins/Nes/Nes.cpp" line="523"/>
@@ -4626,12 +4626,12 @@ Detta chip användes i datorn Commodore 64.</translation>
     <message>
         <location filename="../../plugins/Nes/Nes.cpp" line="525"/>
         <source>Channel 4 noise mode</source>
-        <translation type="unfinished"/>
+        <translation>Kanal 4 brusläge</translation>
     </message>
     <message>
         <location filename="../../plugins/Nes/Nes.cpp" line="526"/>
         <source>Channel 4 frequency mode</source>
-        <translation type="unfinished"/>
+        <translation>Kanal 4 frekvensläge</translation>
     </message>
     <message>
         <location filename="../../plugins/Nes/Nes.cpp" line="527"/>
@@ -4646,7 +4646,7 @@ Detta chip användes i datorn Commodore 64.</translation>
     <message>
         <location filename="../../plugins/Nes/Nes.cpp" line="530"/>
         <source>Channel 4 quantize</source>
-        <translation type="unfinished"/>
+        <translation>Kanal 4 kvantisering</translation>
     </message>
     <message>
         <location filename="../../plugins/Nes/Nes.cpp" line="533"/>
@@ -4890,7 +4890,7 @@ Detta chip användes i datorn Commodore 64.</translation>
     <message>
         <location filename="../../src/tracks/PatternTrack.cpp" line="49"/>
         <source>Pattern %1</source>
-        <translation type="unfinished"/>
+        <translation>Mönster %1</translation>
     </message>
     <message>
         <location filename="../../src/tracks/PatternTrack.cpp" line="197"/>
@@ -5189,7 +5189,7 @@ Orsak: &quot;%2&quot;</translation>
     <message>
         <location filename="../../src/core/SampleClip.cpp" line="316"/>
         <source>Sample not found</source>
-        <translation type="unfinished"/>
+        <translation>Ljudfil hittades inte</translation>
     </message>
 </context>
 <context>
@@ -5343,222 +5343,222 @@ Orsak: &quot;%2&quot;</translation>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControls.cpp" line="37"/>
         <source>Type 1</source>
-        <translation type="unfinished"/>
+        <translation>Typ 1</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControls.cpp" line="38"/>
         <source>Type 2</source>
-        <translation type="unfinished"/>
+        <translation>Typ 2</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControls.cpp" line="39"/>
         <source>Drive 1</source>
-        <translation type="unfinished"/>
+        <translation>Drive 1</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControls.cpp" line="40"/>
         <source>Drive 2</source>
-        <translation type="unfinished"/>
+        <translation>Drive 2</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControls.cpp" line="41"/>
         <source>Slew Up 1</source>
-        <translation type="unfinished"/>
+        <translation>Slew upp 1</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControls.cpp" line="42"/>
         <source>Slew Up 2</source>
-        <translation type="unfinished"/>
+        <translation>Slew upp 2</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControls.cpp" line="43"/>
         <source>Slew Down 1</source>
-        <translation type="unfinished"/>
+        <translation>Slew ned 1</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControls.cpp" line="44"/>
         <source>Slew Down 2</source>
-        <translation type="unfinished"/>
+        <translation>Slew ned 2</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControls.cpp" line="45"/>
         <source>Bias 1</source>
-        <translation type="unfinished"/>
+        <translation>Bias 1</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControls.cpp" line="46"/>
         <source>Bias 2</source>
-        <translation type="unfinished"/>
+        <translation>Bias 2</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControls.cpp" line="47"/>
         <source>Warp 1</source>
-        <translation type="unfinished"/>
+        <translation>Warp 1</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControls.cpp" line="48"/>
         <source>Warp 2</source>
-        <translation type="unfinished"/>
+        <translation>Warp 2</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControls.cpp" line="49"/>
         <source>Crush 1</source>
-        <translation type="unfinished"/>
+        <translation>Krossa 1</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControls.cpp" line="50"/>
         <source>Crush 2</source>
-        <translation type="unfinished"/>
+        <translation>Krossa 2</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControls.cpp" line="51"/>
         <source>Out Vol 1</source>
-        <translation type="unfinished"/>
+        <translation>Volym ut 1</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControls.cpp" line="52"/>
         <source>Out Vol 2</source>
-        <translation type="unfinished"/>
+        <translation>Volym ut 2</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControls.cpp" line="53"/>
         <source>Attack 1</source>
-        <translation type="unfinished"/>
+        <translation>Attack 1</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControls.cpp" line="54"/>
         <source>Attack 2</source>
-        <translation type="unfinished"/>
+        <translation>Attack 2</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControls.cpp" line="55"/>
         <source>Release 1</source>
-        <translation type="unfinished"/>
+        <translation>Release 1</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControls.cpp" line="56"/>
         <source>Release 2</source>
-        <translation type="unfinished"/>
+        <translation>Release 2</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControls.cpp" line="57"/>
         <source>Dynamics 1</source>
-        <translation type="unfinished"/>
+        <translation>Dynamik 1</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControls.cpp" line="58"/>
         <source>Dynamics 2</source>
-        <translation type="unfinished"/>
+        <translation>Dynamik 2</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControls.cpp" line="59"/>
         <source>Dynamic Slew 1</source>
-        <translation type="unfinished"/>
+        <translation>Dynamisk slew 1</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControls.cpp" line="60"/>
         <source>Dynamic Slew 2</source>
-        <translation type="unfinished"/>
+        <translation>Dynamisk slew 2</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControls.cpp" line="61"/>
         <source>DC Offset Remover</source>
-        <translation type="unfinished"/>
+        <translation>Ta bort DC-förskjutning</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControls.cpp" line="62"/>
         <source>Multiband</source>
-        <translation type="unfinished"/>
+        <translation>Flerband</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControls.cpp" line="63"/>
         <source>Oversample</source>
-        <translation type="unfinished"/>
+        <translation>Översampla</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControls.cpp" line="64"/>
         <source>Split</source>
-        <translation type="unfinished"/>
+        <translation>Dela</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControls.cpp" line="65"/>
         <source>Mix 1</source>
-        <translation type="unfinished"/>
+        <translation>Mix 1</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControls.cpp" line="66"/>
         <source>Mix 2</source>
-        <translation type="unfinished"/>
+        <translation>Mix 2</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControls.cpp" line="67"/>
         <source>Slew Link 1</source>
-        <translation type="unfinished"/>
+        <translation>Länka slew 1</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControls.cpp" line="68"/>
         <source>Slew Link 2</source>
-        <translation type="unfinished"/>
+        <translation>Länka slew 2</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControls.cpp" line="84"/>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControls.cpp" line="95"/>
         <source>Hard Clip</source>
-        <translation type="unfinished"/>
+        <translation>Hård klippning</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControls.cpp" line="85"/>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControls.cpp" line="96"/>
         <source>Tanh</source>
-        <translation type="unfinished"/>
+        <translation>Tanh</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControls.cpp" line="86"/>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControls.cpp" line="97"/>
         <source>Fast Soft Clip 1</source>
-        <translation type="unfinished"/>
+        <translation>Snabb mjuk klippning 1</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControls.cpp" line="87"/>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControls.cpp" line="98"/>
         <source>Fast Soft Clip 2</source>
-        <translation type="unfinished"/>
+        <translation>Snabb mjuk klippning 2</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControls.cpp" line="88"/>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControls.cpp" line="99"/>
         <source>Sinusoidal</source>
-        <translation type="unfinished"/>
+        <translation>Sinusformad</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControls.cpp" line="89"/>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControls.cpp" line="100"/>
         <source>Foldback</source>
-        <translation type="unfinished"/>
+        <translation>Vikning</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControls.cpp" line="90"/>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControls.cpp" line="101"/>
         <source>Full Rectify</source>
-        <translation type="unfinished"/>
+        <translation>Helvågslikriktad</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControls.cpp" line="91"/>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControls.cpp" line="102"/>
         <source>Half Rectify</source>
-        <translation type="unfinished"/>
+        <translation>Halvvågslikriktad</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControls.cpp" line="92"/>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControls.cpp" line="103"/>
         <source>Smooth Rectify</source>
-        <translation type="unfinished"/>
+        <translation>Mjuk likriktning</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControls.cpp" line="93"/>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControls.cpp" line="104"/>
         <source>Bitcrush</source>
-        <translation type="unfinished"/>
+        <translation>Bitcrush</translation>
     </message>
 </context>
 <context>
@@ -5566,33 +5566,33 @@ Orsak: &quot;%2&quot;</translation>
     <message>
         <location filename="../../plugins/SlicerT/SlicerT.cpp" line="61"/>
         <source>Note threshold</source>
-        <translation type="unfinished"/>
+        <translation>Tröskelvärde not</translation>
     </message>
     <message>
         <location filename="../../plugins/SlicerT/SlicerT.cpp" line="62"/>
         <source>FadeOut</source>
-        <translation type="unfinished"/>
+        <translation>Tona ut</translation>
     </message>
     <message>
         <location filename="../../plugins/SlicerT/SlicerT.cpp" line="63"/>
         <source>Original bpm</source>
-        <translation type="unfinished"/>
+        <translation>Ursprunglig BPM</translation>
     </message>
     <message>
         <location filename="../../plugins/SlicerT/SlicerT.cpp" line="64"/>
         <source>Slice snap</source>
-        <translation type="unfinished"/>
+        <translation>Snäppstorlek</translation>
     </message>
     <message>
         <location filename="../../plugins/SlicerT/SlicerT.cpp" line="65"/>
         <source>BPM sync</source>
-        <translation type="unfinished"/>
+        <translation>BPM-synkronisering</translation>
     </message>
     <message>
         <location filename="../../plugins/SlicerT/SlicerT.cpp" line="340"/>
         <location filename="../../plugins/SlicerT/SlicerT.cpp" line="376"/>
         <source>slice_%1</source>
-        <translation type="unfinished"/>
+        <translation>slice_%1</translation>
     </message>
     <message>
         <location filename="../../plugins/SlicerT/SlicerT.cpp" line="360"/>
@@ -5620,7 +5620,7 @@ Orsak: &quot;%2&quot;</translation>
     <message>
         <location filename="../../src/core/Song.cpp" line="1052"/>
         <source>Aborting project load</source>
-        <translation type="unfinished"/>
+        <translation>Avbryter inläsning av projekt</translation>
     </message>
     <message>
         <location filename="../../src/core/Song.cpp" line="1053"/>
@@ -5761,7 +5761,7 @@ Se till att du har läsrättigheter för filen och mappen som innehåller filen 
     <message>
         <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="290"/>
         <source>Sample not found</source>
-        <translation type="unfinished"/>
+        <translation>Ljudfil hittades inte</translation>
     </message>
 </context>
 <context>
@@ -5774,7 +5774,7 @@ Se till att du har läsrättigheter för filen och mappen som innehåller filen 
     <message>
         <location filename="../../plugins/Vectorscope/VecControls.cpp" line="41"/>
         <source>Lines rendering</source>
-        <translation type="unfinished"/>
+        <translation>Renderar linjer</translation>
     </message>
 </context>
 <context>
@@ -5912,7 +5912,7 @@ Se till att du har läsrättigheter för filen och mappen som innehåller filen 
         <location filename="../../plugins/VstBase/VstPlugin.cpp" line="506"/>
         <location filename="../../plugins/VstBase/VstPlugin.cpp" line="582"/>
         <source>VST Plugin Preset (*.fxp *.fxb)</source>
-        <translation type="unfinished"/>
+        <translation>VST-tilläggsförinställning (*.fxp *.fxb)</translation>
     </message>
     <message>
         <location filename="../../plugins/VstBase/VstPlugin.cpp" line="578"/>
@@ -6400,7 +6400,7 @@ Se till att du har läsrättigheter för filen och mappen som innehåller filen 
     <message>
         <location filename="../../src/gui/editors/AutomationEditor.cpp" line="1416"/>
         <source>Please open an automation clip by double-clicking on it!</source>
-        <translation type="unfinished"/>
+        <translation>Vänligen öppna ett automatiseringsklipp genom att dubbelklicka på det!</translation>
     </message>
 </context>
 <context>
@@ -6433,12 +6433,12 @@ Se till att du har läsrättigheter för filen och mappen som innehåller filen 
     <message>
         <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2069"/>
         <source>Draw outValues mode (Shift+C)</source>
-        <translation type="unfinished"/>
+        <translation>Ritläge för ut-värden (Shift+C)</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2072"/>
         <source>Edit tangents mode (Shift+T)</source>
-        <translation type="unfinished"/>
+        <translation>Redigeringsläge för tangenter (Shift+T)</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2076"/>
@@ -6730,12 +6730,12 @@ Se till att du har läsrättigheter för filen och mappen som innehåller filen 
     <message>
         <location filename="../../src/gui/widgets/CPULoadWidget.cpp" line="102"/>
         <source>DSP total: %1%</source>
-        <translation type="unfinished"/>
+        <translation>Total DSP-användning: %1%</translation>
     </message>
     <message>
         <location filename="../../src/gui/widgets/CPULoadWidget.cpp" line="103"/>
         <source> - Notes and setup: %1%</source>
-        <translation type="unfinished"/>
+        <translation>- Noter och förberedelser: %1%</translation>
     </message>
     <message>
         <location filename="../../src/gui/widgets/CPULoadWidget.cpp" line="104"/>
@@ -6750,7 +6750,7 @@ Se till att du har läsrättigheter för filen och mappen som innehåller filen 
     <message>
         <location filename="../../src/gui/widgets/CPULoadWidget.cpp" line="106"/>
         <source> - Mixing: %1%</source>
-        <translation type="unfinished"/>
+        <translation>- Mixning: %1%</translation>
     </message>
 </context>
 <context>
@@ -6768,7 +6768,7 @@ Se till att du har läsrättigheter för filen och mappen som innehåller filen 
     <message>
         <location filename="../../plugins/CarlaBase/Carla.cpp" line="637"/>
         <source>Params</source>
-        <translation type="unfinished"/>
+        <translation>Parametrar</translation>
     </message>
     <message>
         <location filename="../../plugins/CarlaBase/Carla.cpp" line="643"/>
@@ -6826,17 +6826,17 @@ Se till att du har läsrättigheter för filen och mappen som innehåller filen 
         <location filename="../../src/gui/clips/ClipView.cpp" line="732"/>
         <source>Press &lt;%1&gt; or &lt;Alt&gt; for unquantized splitting.
 Press &lt;Shift&gt; for destructive splitting.</source>
-        <translation type="unfinished"/>
+        <translation>Håll ned &lt;%1&gt; eller &lt;Alt&gt; för okvantiserad delning.Håll ned &lt;Shift&gt; för destruktiv delning.</translation>
     </message>
     <message>
         <location filename="../../src/gui/clips/ClipView.cpp" line="733"/>
         <source>Press &lt;%1&gt; or &lt;Alt&gt; for unquantized splitting.</source>
-        <translation type="unfinished"/>
+        <translation>Håll ned &lt;%1&gt; eller &lt;Alt&gt; för okvantiserad delning.</translation>
     </message>
     <message>
         <location filename="../../src/gui/clips/ClipView.cpp" line="737"/>
         <source>Press &lt;%1&gt; or &lt;Alt&gt; for unquantized resizing.</source>
-        <translation type="unfinished"/>
+        <translation>Håll ned &lt;%1&gt; eller &lt;Alt&gt; för okvantiserad ändring av storlek.</translation>
     </message>
     <message>
         <location filename="../../src/gui/clips/ClipView.cpp" line="739"/>
@@ -6891,7 +6891,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../src/gui/clips/ClipView.cpp" line="1123"/>
         <source>Clip color</source>
-        <translation type="unfinished"/>
+        <translation>Klippfärg</translation>
     </message>
     <message>
         <location filename="../../src/gui/clips/ClipView.cpp" line="1125"/>
@@ -6906,17 +6906,17 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../src/gui/clips/ClipView.cpp" line="1127"/>
         <source>Pick random</source>
-        <translation type="unfinished"/>
+        <translation>Välj slumpmässig</translation>
     </message>
     <message>
         <location filename="../../src/gui/clips/ClipView.cpp" line="1132"/>
         <source>Disable auto-resize</source>
-        <translation type="unfinished"/>
+        <translation>Fast längd</translation>
     </message>
     <message>
         <location filename="../../src/gui/clips/ClipView.cpp" line="1132"/>
         <source>Enable auto-resize</source>
-        <translation type="unfinished"/>
+        <translation>Automatisk längd</translation>
     </message>
 </context>
 <context>
@@ -6964,12 +6964,12 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="107"/>
         <source>Knee:</source>
-        <translation type="unfinished"/>
+        <translation>Knä:</translation>
     </message>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="109"/>
         <source>Smooth out the gain reduction curve around the threshold</source>
-        <translation type="unfinished"/>
+        <translation>Jämna ut kurvan kring tröskelvärdet</translation>
     </message>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="112"/>
@@ -6979,17 +6979,17 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="114"/>
         <source>Maximum gain reduction</source>
-        <translation type="unfinished"/>
+        <translation>Maximal reduktion av förstärkning</translation>
     </message>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="117"/>
         <source>Lookahead Length:</source>
-        <translation type="unfinished"/>
+        <translation>Lookahead-längd:</translation>
     </message>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="119"/>
         <source>How long the compressor has to react to the sidechain signal ahead of time</source>
-        <translation>Hur länge kompressorn måste reagera på sidokedjesignalen i förväg</translation>
+        <translation>Hur långt i förväg kompressorn måste reagera på sidokedjesignalen</translation>
     </message>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="122"/>
@@ -6999,7 +6999,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="124"/>
         <source>Delay between attack and release stages</source>
-        <translation type="unfinished"/>
+        <translation>Fördröjning mellan attack- och release-stadier</translation>
     </message>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="127"/>
@@ -7019,7 +7019,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="134"/>
         <source>Bias the input audio to the left/right or mid/side</source>
-        <translation type="unfinished"/>
+        <translation>Justera ingångsljudets balans åt vänster/höger eller mitt/sida</translation>
     </message>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="137"/>
@@ -7029,7 +7029,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="139"/>
         <source>Bias the output audio to the left/right or mid/side</source>
-        <translation type="unfinished"/>
+        <translation>Justera utgångsljudets balans åt vänster/höger eller mitt/sida</translation>
     </message>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="142"/>
@@ -7039,42 +7039,42 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="144"/>
         <source>Bias the sidechain signal to the left/right or mid/side</source>
-        <translation type="unfinished"/>
+        <translation>Justera balansen på sidokedjans signal åt vänster/höger eller mitt/sida</translation>
     </message>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="147"/>
         <source>Stereo Link Blend:</source>
-        <translation type="unfinished"/>
+        <translation>Blandning av stereolänk:</translation>
     </message>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="149"/>
         <source>Blend between unlinked/maximum/average/minimum stereo linking modes</source>
-        <translation type="unfinished"/>
+        <translation>Tona mellan stereolänkslägena: frikopplad/max/medel/min</translation>
     </message>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="152"/>
         <source>Tilt Gain:</source>
-        <translation type="unfinished"/>
+        <translation>Tilt-förstärkning:</translation>
     </message>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="154"/>
         <source>Bias the sidechain signal to the low or high frequencies.  -6 db is lowpass, 6 db is highpass.</source>
-        <translation type="unfinished"/>
+        <translation>Justera balansen mellan bas och diskant i sidokedjan. -6 db är lågpass, 6 db är högpass.</translation>
     </message>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="157"/>
         <source>Tilt Frequency:</source>
-        <translation type="unfinished"/>
+        <translation>Tilt-frekvens:</translation>
     </message>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="159"/>
         <source>Center frequency of sidechain tilt filter</source>
-        <translation type="unfinished"/>
+        <translation>Mittfrekvens för sidokejdans tilt-filter</translation>
     </message>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="162"/>
         <source>Mix:</source>
-        <translation type="unfinished"/>
+        <translation>Mix:</translation>
     </message>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="164"/>
@@ -7084,22 +7084,22 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="167"/>
         <source>Auto Attack:</source>
-        <translation type="unfinished"/>
+        <translation>Automatisk attack:</translation>
     </message>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="169"/>
         <source>Automatically control attack value depending on crest factor</source>
-        <translation type="unfinished"/>
+        <translation>Justera attackvärdet beroende på hur höga vågtopparna är i förhållande till RMS</translation>
     </message>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="172"/>
         <source>Auto Release:</source>
-        <translation type="unfinished"/>
+        <translation>Automatisk release:</translation>
     </message>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="174"/>
         <source>Automatically control release value depending on crest factor</source>
-        <translation type="unfinished"/>
+        <translation>Justera releasevärdet beroende på hur höga vågtopparna är i förhållande till RMS</translation>
     </message>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="176"/>
@@ -7130,7 +7130,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="188"/>
         <source>Root Mean Square</source>
-        <translation type="unfinished"/>
+        <translation>Effektivvärde</translation>
     </message>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="191"/>
@@ -7140,7 +7140,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="193"/>
         <source>Peak</source>
-        <translation type="unfinished"/>
+        <translation>Topp</translation>
     </message>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="196"/>
@@ -7160,7 +7160,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="208"/>
         <source>Mid/Side</source>
-        <translation type="unfinished"/>
+        <translation>Mitt/Sidor</translation>
     </message>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="211"/>
@@ -7190,7 +7190,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="233"/>
         <source>Unlinked</source>
-        <translation>Olänkad</translation>
+        <translation>Frikopplad</translation>
     </message>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="236"/>
@@ -7215,7 +7215,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="246"/>
         <source>Compress based on the averaged channel volume</source>
-        <translation type="unfinished"/>
+        <translation>Komprimera baserat på medelvärdet av kanalernas volym</translation>
     </message>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="248"/>
@@ -7230,28 +7230,28 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="253"/>
         <source>Blend</source>
-        <translation type="unfinished"/>
+        <translation>Blandning</translation>
     </message>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="256"/>
         <source>Blend between stereo linking modes</source>
-        <translation type="unfinished"/>
+        <translation>Tona mellan stereolänk-lägen</translation>
     </message>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="266"/>
         <source>Auto Makeup Gain</source>
-        <translation type="unfinished"/>
+        <translation>Auto nivåkompensering</translation>
     </message>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="269"/>
         <source>Automatically change makeup gain depending on threshold, knee, and ratio settings</source>
-        <translation type="unfinished"/>
+        <translation>Justera automatiskt nivåkompenseringen beroende tröskelvärde, knä och förhållande</translation>
     </message>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="273"/>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="280"/>
         <source>Soft Clip</source>
-        <translation type="unfinished"/>
+        <translation>Mjuk klippning</translation>
     </message>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="276"/>
@@ -7266,12 +7266,12 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="287"/>
         <source>Lookahead Enabled</source>
-        <translation type="unfinished"/>
+        <translation>Lookahead aktiverat</translation>
     </message>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="290"/>
         <source>Enable Lookahead, which introduces 20 milliseconds of latency</source>
-        <translation type="unfinished"/>
+        <translation>Aktivera Lookahead, vilket lägger till 20 millisekunder fördröjning</translation>
     </message>
 </context>
 <context>
@@ -7419,17 +7419,17 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../plugins/CrossoverEQ/CrossoverEQControlDialog.cpp" line="68"/>
         <source>Band 1/2 crossover</source>
-        <translation type="unfinished"/>
+        <translation>Band 1/2 övergångspunkt</translation>
     </message>
     <message>
         <location filename="../../plugins/CrossoverEQ/CrossoverEQControlDialog.cpp" line="69"/>
         <source>Band 2/3 crossover</source>
-        <translation type="unfinished"/>
+        <translation>Band 2/3 övergångspunkt</translation>
     </message>
     <message>
         <location filename="../../plugins/CrossoverEQ/CrossoverEQControlDialog.cpp" line="70"/>
         <source>Band 3/4 crossover</source>
-        <translation type="unfinished"/>
+        <translation>Band 3/4 övergångspunkt</translation>
     </message>
     <message>
         <location filename="../../plugins/CrossoverEQ/CrossoverEQControlDialog.cpp" line="88"/>
@@ -7535,7 +7535,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../plugins/Dispersion/DispersionControlDialog.cpp" line="50"/>
         <source>Number of all-pass filters</source>
-        <translation type="unfinished"/>
+        <translation>Antal allpass-filter</translation>
     </message>
     <message>
         <location filename="../../plugins/Dispersion/DispersionControlDialog.cpp" line="53"/>
@@ -7565,7 +7565,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../plugins/Dispersion/DispersionControlDialog.cpp" line="60"/>
         <source>octaves</source>
-        <translation type="unfinished"/>
+        <translation>oktaver</translation>
     </message>
     <message>
         <location filename="../../plugins/Dispersion/DispersionControlDialog.cpp" line="63"/>
@@ -7575,22 +7575,22 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../plugins/Dispersion/DispersionControlDialog.cpp" line="65"/>
         <source>Feedback:</source>
-        <translation type="unfinished"/>
+        <translation>Återkoppling:</translation>
     </message>
     <message>
         <location filename="../../plugins/Dispersion/DispersionControlDialog.cpp" line="68"/>
         <source>DC Offset Removal</source>
-        <translation type="unfinished"/>
+        <translation>DC-kompensering</translation>
     </message>
     <message>
         <location filename="../../plugins/Dispersion/DispersionControlDialog.cpp" line="70"/>
         <source>DC</source>
-        <translation type="unfinished"/>
+        <translation>DC</translation>
     </message>
     <message>
         <location filename="../../plugins/Dispersion/DispersionControlDialog.cpp" line="72"/>
         <source>Remove DC Offset</source>
-        <translation type="unfinished"/>
+        <translation>Ta bort DC-förskjutning</translation>
     </message>
 </context>
 <context>
@@ -7993,7 +7993,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="186"/>
         <source>MOD ENV AMOUNT</source>
-        <translation type="unfinished"/>
+        <translation>MOD KONT. MÄNGD</translation>
     </message>
     <message>
         <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="187"/>
@@ -8231,7 +8231,7 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
         <location filename="../../src/gui/widgets/Fader.cpp" line="522"/>
         <location filename="../../src/gui/widgets/Fader.cpp" line="530"/>
         <source>-inf</source>
-        <translation type="unfinished"/>
+        <translation>-inf</translation>
     </message>
 </context>
 <context>
@@ -8298,12 +8298,12 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     <message>
         <location filename="../../src/gui/FileBrowser.cpp" line="626"/>
         <source>Remove favorite file</source>
-        <translation type="unfinished"/>
+        <translation>Ta bort från favoriter</translation>
     </message>
     <message>
         <location filename="../../src/gui/FileBrowser.cpp" line="631"/>
         <source>Add favorite file</source>
-        <translation type="unfinished"/>
+        <translation>Lägg till i favoriter</translation>
     </message>
     <message>
         <location filename="../../src/gui/FileBrowser.cpp" line="640"/>
@@ -8313,7 +8313,7 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     <message>
         <location filename="../../src/gui/FileBrowser.cpp" line="645"/>
         <source>Pattern Editor</source>
-        <translation type="unfinished"/>
+        <translation>Mönsterredigerare</translation>
     </message>
     <message>
         <location filename="../../src/gui/FileBrowser.cpp" line="655"/>
@@ -8323,12 +8323,12 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     <message>
         <location filename="../../src/gui/FileBrowser.cpp" line="661"/>
         <source>Remove favorite folder</source>
-        <translation type="unfinished"/>
+        <translation>Ta bort favoritmapp</translation>
     </message>
     <message>
         <location filename="../../src/gui/FileBrowser.cpp" line="665"/>
         <source>Add favorite folder</source>
-        <translation type="unfinished"/>
+        <translation>Lägg till favoritmapp</translation>
     </message>
     <message>
         <location filename="../../src/gui/FileBrowser.cpp" line="691"/>
@@ -8718,57 +8718,57 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     <message>
         <location filename="../../plugins/GranularPitchShifter/GranularPitchShifterControlDialog.cpp" line="57"/>
         <source>Grain Size:</source>
-        <translation type="unfinished"/>
+        <translation>Kornstorlek:</translation>
     </message>
     <message>
         <location filename="../../plugins/GranularPitchShifter/GranularPitchShifterControlDialog.cpp" line="58"/>
         <source>Spray:</source>
-        <translation type="unfinished"/>
+        <translation>Spridning:</translation>
     </message>
     <message>
         <location filename="../../plugins/GranularPitchShifter/GranularPitchShifterControlDialog.cpp" line="59"/>
         <source>Jitter:</source>
-        <translation type="unfinished"/>
+        <translation>Darr:</translation>
     </message>
     <message>
         <location filename="../../plugins/GranularPitchShifter/GranularPitchShifterControlDialog.cpp" line="60"/>
         <source>Twitch:</source>
-        <translation type="unfinished"/>
+        <translation>Ryck:</translation>
     </message>
     <message>
         <location filename="../../plugins/GranularPitchShifter/GranularPitchShifterControlDialog.cpp" line="61"/>
         <source>Spray Stereo Spread:</source>
-        <translation type="unfinished"/>
+        <translation>Spridning i stereo:</translation>
     </message>
     <message>
         <location filename="../../plugins/GranularPitchShifter/GranularPitchShifterControlDialog.cpp" line="62"/>
         <source>Grain Shape:</source>
-        <translation type="unfinished"/>
+        <translation>Kornform:</translation>
     </message>
     <message>
         <location filename="../../plugins/GranularPitchShifter/GranularPitchShifterControlDialog.cpp" line="63"/>
         <source>Fade Length:</source>
-        <translation type="unfinished"/>
+        <translation>Toningslängd:</translation>
     </message>
     <message>
         <location filename="../../plugins/GranularPitchShifter/GranularPitchShifterControlDialog.cpp" line="64"/>
         <source>Feedback:</source>
-        <translation type="unfinished"/>
+        <translation>Återkoppling:</translation>
     </message>
     <message>
         <location filename="../../plugins/GranularPitchShifter/GranularPitchShifterControlDialog.cpp" line="65"/>
         <source>Minimum Allowed Latency:</source>
-        <translation type="unfinished"/>
+        <translation>Minsta tillåtna latens:</translation>
     </message>
     <message>
         <location filename="../../plugins/GranularPitchShifter/GranularPitchShifterControlDialog.cpp" line="66"/>
         <source>Density:</source>
-        <translation type="unfinished"/>
+        <translation>Densitet:</translation>
     </message>
     <message>
         <location filename="../../plugins/GranularPitchShifter/GranularPitchShifterControlDialog.cpp" line="67"/>
         <source>Glide:</source>
-        <translation type="unfinished"/>
+        <translation>Glid:</translation>
     </message>
     <message>
         <location filename="../../plugins/GranularPitchShifter/GranularPitchShifterControlDialog.cpp" line="69"/>
@@ -8780,7 +8780,7 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
         <location filename="../../plugins/GranularPitchShifter/GranularPitchShifterControlDialog.cpp" line="75"/>
         <location filename="../../plugins/GranularPitchShifter/GranularPitchShifterControlDialog.cpp" line="78"/>
         <source>Pitch Stereo Spread</source>
-        <translation type="unfinished"/>
+        <translation>Tonhöjdsskillnad stereo</translation>
     </message>
     <message>
         <location filename="../../plugins/GranularPitchShifter/GranularPitchShifterControlDialog.cpp" line="88"/>
@@ -8791,7 +8791,7 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
         <location filename="../../plugins/GranularPitchShifter/GranularPitchShifterControlDialog.cpp" line="91"/>
         <location filename="../../plugins/GranularPitchShifter/GranularPitchShifterControlDialog.cpp" line="97"/>
         <source>Prefilter</source>
-        <translation type="unfinished"/>
+        <translation>Förfilter</translation>
     </message>
 </context>
 <context>
@@ -8834,12 +8834,12 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     <message>
         <location filename="../../src/gui/GuiApplication.cpp" line="179"/>
         <source>Preparing microtuner</source>
-        <translation type="unfinished"/>
+        <translation>Förbereder mikrostämmare</translation>
     </message>
     <message>
         <location filename="../../src/gui/GuiApplication.cpp" line="183"/>
         <source>Preparing pattern editor</source>
-        <translation type="unfinished"/>
+        <translation>Förbereder mönsterredigeraren</translation>
     </message>
     <message>
         <location filename="../../src/gui/GuiApplication.cpp" line="187"/>
@@ -8867,7 +8867,7 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     <message>
         <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="101"/>
         <source>REP</source>
-        <translation type="unfinished"/>
+        <translation>REP</translation>
     </message>
     <message>
         <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="102"/>
@@ -8907,7 +8907,7 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     <message>
         <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="121"/>
         <source>Note repeats:</source>
-        <translation type="unfinished"/>
+        <translation>Repetitioner av not:</translation>
     </message>
     <message>
         <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="121"/>
@@ -9051,17 +9051,17 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     <message>
         <location filename="../../src/gui/instrument/InstrumentMidiIOView.cpp" line="145"/>
         <source>VELOCITY MAPPING</source>
-        <translation type="unfinished"/>
+        <translation>VELOCITETSMAPPNING</translation>
     </message>
     <message>
         <location filename="../../src/gui/instrument/InstrumentMidiIOView.cpp" line="154"/>
         <source>MIDI VELOCITY</source>
-        <translation type="unfinished"/>
+        <translation>MIDI-VELOCITET</translation>
     </message>
     <message>
         <location filename="../../src/gui/instrument/InstrumentMidiIOView.cpp" line="155"/>
         <source>MIDI notes at this velocity correspond to 100% note velocity.</source>
-        <translation type="unfinished"/>
+        <translation>MIDI-noter med denna velocitet motsvarar 100% not-velocitet.</translation>
     </message>
 </context>
 <context>
@@ -9200,7 +9200,7 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     <message>
         <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="160"/>
         <source>Solo this instrument</source>
-        <translation type="unfinished"/>
+        <translation>Spela detta instrument solo</translation>
     </message>
     <message>
         <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="166"/>
@@ -9305,7 +9305,7 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     <message>
         <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="280"/>
         <source>Tuning and transposition</source>
-        <translation type="unfinished"/>
+        <translation>Stämning och transponering</translation>
     </message>
     <message>
         <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="420"/>
@@ -9328,22 +9328,22 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     <message>
         <location filename="../../src/gui/instrument/InstrumentTuningView.cpp" line="54"/>
         <source>GLOBAL TRANSPOSITION</source>
-        <translation type="unfinished"/>
+        <translation>GLOBAL TRANSPONERING</translation>
     </message>
     <message>
         <location filename="../../src/gui/instrument/InstrumentTuningView.cpp" line="61"/>
         <source>Enables the use of global transposition</source>
-        <translation type="unfinished"/>
+        <translation>Aktiverar användning av global transponering</translation>
     </message>
     <message>
         <location filename="../../src/gui/instrument/InstrumentTuningView.cpp" line="67"/>
         <source>Microtuner is not available for MIDI-based instruments.</source>
-        <translation type="unfinished"/>
+        <translation>Mikrostämmare är inte tillgänglig för MIDI-baserade instrument.</translation>
     </message>
     <message>
         <location filename="../../src/gui/instrument/InstrumentTuningView.cpp" line="72"/>
         <source>MICROTUNER</source>
-        <translation type="unfinished"/>
+        <translation>MIKROSTÄMMARE</translation>
     </message>
     <message>
         <location filename="../../src/gui/instrument/InstrumentTuningView.cpp" line="83"/>
@@ -9354,22 +9354,22 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
         <location filename="../../src/gui/instrument/InstrumentTuningView.cpp" line="87"/>
         <location filename="../../src/gui/instrument/InstrumentTuningView.cpp" line="88"/>
         <source>Edit scales and keymaps</source>
-        <translation type="unfinished"/>
+        <translation>Redigera skalor och tangentbindningar</translation>
     </message>
     <message>
         <location filename="../../src/gui/instrument/InstrumentTuningView.cpp" line="100"/>
         <source>Active keymap:</source>
-        <translation>Aktiv karläggningskarta:</translation>
+        <translation>Aktiv tangentbindning:</translation>
     </message>
     <message>
         <location filename="../../src/gui/instrument/InstrumentTuningView.cpp" line="107"/>
         <source>Import note ranges from keymap</source>
-        <translation type="unfinished"/>
+        <translation>Importera notomfång från tangentbindning</translation>
     </message>
     <message>
         <location filename="../../src/gui/instrument/InstrumentTuningView.cpp" line="109"/>
         <source>When enabled, the first, last and base notes of this instrument will be overwritten with values specified by the selected keymap.</source>
-        <translation type="unfinished"/>
+        <translation>Ställ in instrumentets högsta och lägsta not, samt basnoten, utifrån värdena i vald tangentbindning.</translation>
     </message>
 </context>
 <context>
@@ -9387,7 +9387,7 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     <message>
         <location filename="../../plugins/Kicker/Kicker.cpp" line="294"/>
         <source>Frequency slope:</source>
-        <translation>Frekvenslutning:</translation>
+        <translation>Sluttning frekvens</translation>
     </message>
     <message>
         <location filename="../../plugins/Kicker/Kicker.cpp" line="298"/>
@@ -9402,7 +9402,7 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     <message>
         <location filename="../../plugins/Kicker/Kicker.cpp" line="306"/>
         <source>Envelope slope:</source>
-        <translation>Konturkurva:</translation>
+        <translation>Sluttning kontur</translation>
     </message>
     <message>
         <location filename="../../plugins/Kicker/Kicker.cpp" line="310"/>
@@ -9510,17 +9510,17 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     <message>
         <location filename="../../plugins/LOMM/LOMMControlDialog.cpp" line="63"/>
         <source>Enable High Band</source>
-        <translation type="unfinished"/>
+        <translation>Aktivera höga bandet</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControlDialog.cpp" line="64"/>
         <source>Enable Mid Band</source>
-        <translation type="unfinished"/>
+        <translation>Aktivera mellersta bandet</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControlDialog.cpp" line="65"/>
         <source>Enable Low Band</source>
-        <translation type="unfinished"/>
+        <translation>Aktivera låga bandet</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControlDialog.cpp" line="67"/>
@@ -9585,7 +9585,7 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     <message>
         <location filename="../../plugins/LOMM/LOMMControlDialog.cpp" line="74"/>
         <source>Above Threshold High</source>
-        <translation type="unfinished"/>
+        <translation>Över tröskel hög</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControlDialog.cpp" line="74"/>
@@ -9595,7 +9595,7 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     <message>
         <location filename="../../plugins/LOMM/LOMMControlDialog.cpp" line="75"/>
         <source>Above Threshold Mid</source>
-        <translation type="unfinished"/>
+        <translation>Över tröskelvärde mellan</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControlDialog.cpp" line="75"/>
@@ -9605,7 +9605,7 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     <message>
         <location filename="../../plugins/LOMM/LOMMControlDialog.cpp" line="76"/>
         <source>Above Threshold Low</source>
-        <translation type="unfinished"/>
+        <translation>Över tröskelvärde låg</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControlDialog.cpp" line="76"/>
@@ -9615,7 +9615,7 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     <message>
         <location filename="../../plugins/LOMM/LOMMControlDialog.cpp" line="77"/>
         <source>Above Ratio High</source>
-        <translation type="unfinished"/>
+        <translation>Övre förhållande hög</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControlDialog.cpp" line="77"/>
@@ -9625,7 +9625,7 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     <message>
         <location filename="../../plugins/LOMM/LOMMControlDialog.cpp" line="78"/>
         <source>Above Ratio Mid</source>
-        <translation type="unfinished"/>
+        <translation>Övre förhållande mellan</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControlDialog.cpp" line="78"/>
@@ -9635,7 +9635,7 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     <message>
         <location filename="../../plugins/LOMM/LOMMControlDialog.cpp" line="79"/>
         <source>Above Ratio Low</source>
-        <translation type="unfinished"/>
+        <translation>Övre förhållande låg</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControlDialog.cpp" line="79"/>
@@ -9645,7 +9645,7 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     <message>
         <location filename="../../plugins/LOMM/LOMMControlDialog.cpp" line="81"/>
         <source>Below Threshold High</source>
-        <translation type="unfinished"/>
+        <translation>Undre tröskelvärde hög</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControlDialog.cpp" line="81"/>
@@ -9655,7 +9655,7 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     <message>
         <location filename="../../plugins/LOMM/LOMMControlDialog.cpp" line="82"/>
         <source>Below Threshold Mid</source>
-        <translation type="unfinished"/>
+        <translation>Undre tröskelvärde mellan</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControlDialog.cpp" line="82"/>
@@ -9665,7 +9665,7 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     <message>
         <location filename="../../plugins/LOMM/LOMMControlDialog.cpp" line="83"/>
         <source>Below Threshold Low</source>
-        <translation type="unfinished"/>
+        <translation>Undre tröskelvärde låg</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControlDialog.cpp" line="83"/>
@@ -9675,7 +9675,7 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     <message>
         <location filename="../../plugins/LOMM/LOMMControlDialog.cpp" line="84"/>
         <source>Below Ratio High</source>
-        <translation type="unfinished"/>
+        <translation>Undre förhållande hög</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControlDialog.cpp" line="84"/>
@@ -9685,7 +9685,7 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     <message>
         <location filename="../../plugins/LOMM/LOMMControlDialog.cpp" line="85"/>
         <source>Below Ratio Mid</source>
-        <translation type="unfinished"/>
+        <translation>Undre förhållande mellan</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControlDialog.cpp" line="85"/>
@@ -9695,7 +9695,7 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     <message>
         <location filename="../../plugins/LOMM/LOMMControlDialog.cpp" line="86"/>
         <source>Below Ratio Low</source>
-        <translation type="unfinished"/>
+        <translation>Undre förhållande låg</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControlDialog.cpp" line="86"/>
@@ -9775,7 +9775,7 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     <message>
         <location filename="../../plugins/LOMM/LOMMControlDialog.cpp" line="96"/>
         <source>Knee:</source>
-        <translation type="unfinished"/>
+        <translation>Knä:</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControlDialog.cpp" line="96"/>
@@ -9805,7 +9805,7 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     <message>
         <location filename="../../plugins/LOMM/LOMMControlDialog.cpp" line="100"/>
         <source>Scale output volume with Depth</source>
-        <translation type="unfinished"/>
+        <translation>Reglera utgångsvolym efter Djup</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControlDialog.cpp" line="101"/>
@@ -9835,7 +9835,7 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     <message>
         <location filename="../../plugins/LOMM/LOMMControlDialog.cpp" line="106"/>
         <source>Mix:</source>
-        <translation type="unfinished"/>
+        <translation>Mix:</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControlDialog.cpp" line="106"/>
@@ -9855,7 +9855,7 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     <message>
         <location filename="../../plugins/LOMM/LOMMControlDialog.cpp" line="110"/>
         <source>Mid/Side</source>
-        <translation type="unfinished"/>
+        <translation>Mitt/Sidor</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControlDialog.cpp" line="110"/>
@@ -9866,13 +9866,13 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
         <location filename="../../plugins/LOMM/LOMMControlDialog.cpp" line="111"/>
         <location filename="../../plugins/LOMM/LOMMControlDialog.cpp" line="112"/>
         <source>Suppress upward compression for side band</source>
-        <translation type="unfinished"/>
+        <translation>Inaktivera uppåtkomprimering av sidobandet</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControlDialog.cpp" line="113"/>
         <location filename="../../plugins/LOMM/LOMMControlDialog.cpp" line="115"/>
         <source>Lookahead</source>
-        <translation type="unfinished"/>
+        <translation>Lookahead</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMMControlDialog.cpp" line="115"/>
@@ -10650,7 +10650,7 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="351"/>
         <source>Scales and keymaps</source>
-        <translation type="unfinished"/>
+        <translation>Skalor och tangentbindningar</translation>
     </message>
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="353"/>
@@ -10732,7 +10732,7 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
         <location filename="../../src/gui/MainWindow.cpp" line="449"/>
         <location filename="../../src/gui/MainWindow.cpp" line="1053"/>
         <source>Pattern Editor</source>
-        <translation type="unfinished"/>
+        <translation>Mönsterredigerare</translation>
     </message>
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="453"/>
@@ -11189,7 +11189,7 @@ Besök https://lmms.io/documentation/ för dokumentation (Engelska).</translatio
     <message>
         <location filename="../../src/gui/MicrotunerConfig.cpp" line="60"/>
         <source>Selected keymap slot</source>
-        <translation type="unfinished"/>
+        <translation>Vald tangentbindning</translation>
     </message>
     <message>
         <location filename="../../src/gui/MicrotunerConfig.cpp" line="61"/>
@@ -11279,12 +11279,12 @@ Unity (0.0 cents or ratio 1/1) is always present as a hidden first value; do not
     <message>
         <location filename="../../src/gui/MicrotunerConfig.cpp" line="125"/>
         <source>Keymap slot to edit:</source>
-        <translation type="unfinished"/>
+        <translation>Tangentbindningar att redigera:</translation>
     </message>
     <message>
         <location filename="../../src/gui/MicrotunerConfig.cpp" line="138"/>
         <source>Keymap description. Cannot start with &quot;!&quot; and cannot contain a newline character.</source>
-        <translation type="unfinished"/>
+        <translation>Beskrivning av tangentbindning. Får inte börja med &quot;!&quot; och får inte innehålla radbrytning.</translation>
     </message>
     <message>
         <location filename="../../src/gui/MicrotunerConfig.cpp" line="143"/>
@@ -11303,7 +11303,7 @@ starting with the middle key and continuing in sequence.
 The pattern repeats for keys outside of the explicit keymap range.
 Multiple keys can be mapped to the same scale degree.
 Enter &apos;x&apos; if you wish to leave the key disabled / not mapped.</source>
-        <translation type="unfinished"/>
+        <translation>Varje rad representerar en MIDI-tangent, med början från basnoten och uppåt. På raden anges vilken ton i skalan som ska knytas till den tangenten. Mönstret upprepas för de tangenter som ligger utanför det angivna omfånget. Flera tangenter kan knytas till samma ton i skalan. Skriv &apos;x&apos; om du vill hoppa över / inaktivera en tangent.</translation>
     </message>
     <message>
         <location filename="../../src/gui/MicrotunerConfig.cpp" line="160"/>
@@ -11333,7 +11333,7 @@ Enter &apos;x&apos; if you wish to leave the key disabled / not mapped.</source>
     <message>
         <location filename="../../src/gui/MicrotunerConfig.cpp" line="173"/>
         <source>First line in the keymap refers to this MIDI key</source>
-        <translation type="unfinished"/>
+        <translation>Första raden i tangentbindningen avser denna MIDI-tangent</translation>
     </message>
     <message>
         <location filename="../../src/gui/MicrotunerConfig.cpp" line="178"/>
@@ -11353,7 +11353,7 @@ Enter &apos;x&apos; if you wish to leave the key disabled / not mapped.</source>
     <message>
         <location filename="../../src/gui/MicrotunerConfig.cpp" line="189"/>
         <source>Apply keymap changes</source>
-        <translation type="unfinished"/>
+        <translation>Verkställ tangentbindningar</translation>
     </message>
     <message>
         <location filename="../../src/gui/MicrotunerConfig.cpp" line="190"/>
@@ -11398,17 +11398,17 @@ Enter &apos;x&apos; if you wish to leave the key disabled / not mapped.</source>
     <message>
         <location filename="../../src/gui/MicrotunerConfig.cpp" line="376"/>
         <source>Keymap parsing error</source>
-        <translation>Tolkningsfel för tangentkartläggning</translation>
+        <translation>Tolkningsfel av tangentbindningar</translation>
     </message>
     <message>
         <location filename="../../src/gui/MicrotunerConfig.cpp" line="380"/>
         <source>Keymap name cannot start with an exclamation mark</source>
-        <translation type="unfinished"/>
+        <translation>Tangentbindningens namn får inte börja med ett utropstecken</translation>
     </message>
     <message>
         <location filename="../../src/gui/MicrotunerConfig.cpp" line="381"/>
         <source>Keymap name cannot contain a new-line character</source>
-        <translation>Kartläggningsnamn kan inte innehålla ett nyradstecken</translation>
+        <translation>Tangentbindningens namn får inte innehålla radbrytningar</translation>
     </message>
     <message>
         <location filename="../../src/gui/MicrotunerConfig.cpp" line="399"/>
@@ -11423,7 +11423,7 @@ Enter &apos;x&apos; if you wish to leave the key disabled / not mapped.</source>
     <message>
         <location filename="../../src/gui/MicrotunerConfig.cpp" line="497"/>
         <source>Invalid keymap</source>
-        <translation type="unfinished"/>
+        <translation>Ogiltig tangentbindning</translation>
     </message>
     <message>
         <location filename="../../src/gui/MicrotunerConfig.cpp" line="497"/>
@@ -11455,18 +11455,18 @@ Enter &apos;x&apos; if you wish to leave the key disabled / not mapped.</source>
     <message>
         <location filename="../../src/gui/MicrotunerConfig.cpp" line="544"/>
         <source>Open keymap</source>
-        <translation type="unfinished"/>
+        <translation>Öppna tangentbindningar</translation>
     </message>
     <message>
         <location filename="../../src/gui/MicrotunerConfig.cpp" line="544"/>
         <location filename="../../src/gui/MicrotunerConfig.cpp" line="629"/>
         <source>Scala keymap definition (*.kbm)</source>
-        <translation>Skalkeyboardsdefinition (*.kbm)</translation>
+        <translation>Scala tangentbindningar (*.kbm)</translation>
     </message>
     <message>
         <location filename="../../src/gui/MicrotunerConfig.cpp" line="549"/>
         <source>Keymap load failure</source>
-        <translation type="unfinished"/>
+        <translation>Misslyckades att läsa in tangentbindningar</translation>
     </message>
     <message>
         <location filename="../../src/gui/MicrotunerConfig.cpp" line="593"/>
@@ -11487,12 +11487,12 @@ Enter &apos;x&apos; if you wish to leave the key disabled / not mapped.</source>
     <message>
         <location filename="../../src/gui/MicrotunerConfig.cpp" line="629"/>
         <source>Save keymap</source>
-        <translation>Spara tangentkartläggning</translation>
+        <translation>Spara tangentbindningar</translation>
     </message>
     <message>
         <location filename="../../src/gui/MicrotunerConfig.cpp" line="635"/>
         <source>Keymap save failure</source>
-        <translation type="unfinished"/>
+        <translation>Misslyckades att spara tangentbindningar</translation>
     </message>
 </context>
 <context>
@@ -11689,7 +11689,7 @@ Enter &apos;x&apos; if you wish to leave the key disabled / not mapped.</source>
     <message>
         <location filename="../../src/gui/MixerChannelView.cpp" line="191"/>
         <source>Pick random</source>
-        <translation type="unfinished"/>
+        <translation>Välj slumpmässig</translation>
     </message>
     <message>
         <location filename="../../src/gui/MixerChannelView.cpp" line="339"/>
@@ -11888,7 +11888,7 @@ Warning: This operation can not be undone.</source>
         <location filename="../../plugins/Monstro/Monstro.cpp" line="1734"/>
         <location filename="../../plugins/Monstro/Monstro.cpp" line="1742"/>
         <source>Slope</source>
-        <translation>Lutning</translation>
+        <translation>Sluttning</translation>
     </message>
     <message>
         <location filename="../../plugins/Monstro/Monstro.cpp" line="1749"/>
@@ -12295,7 +12295,7 @@ Warning: This operation can not be undone.</source>
     <message>
         <location filename="../../src/gui/clips/PatternClipView.cpp" line="57"/>
         <source>Open in Pattern Editor</source>
-        <translation type="unfinished"/>
+        <translation>Öppna i Mönsterredigeraren</translation>
     </message>
     <message>
         <location filename="../../src/gui/clips/PatternClipView.cpp" line="63"/>
@@ -12313,7 +12313,7 @@ Warning: This operation can not be undone.</source>
     <message>
         <location filename="../../src/gui/editors/PatternEditor.cpp" line="282"/>
         <source>Pattern Editor</source>
-        <translation type="unfinished"/>
+        <translation>Mönsterredigerare</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/PatternEditor.cpp" line="300"/>
@@ -12323,12 +12323,12 @@ Warning: This operation can not be undone.</source>
     <message>
         <location filename="../../src/gui/editors/PatternEditor.cpp" line="301"/>
         <source>Stop playback of current pattern (Space)</source>
-        <translation type="unfinished"/>
+        <translation>Stoppa uppspelning av aktuellt mönster (Blanksteg)</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/PatternEditor.cpp" line="305"/>
         <source>Pattern selector</source>
-        <translation type="unfinished"/>
+        <translation>Mönsterväljare</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/PatternEditor.cpp" line="315"/>
@@ -12338,12 +12338,12 @@ Warning: This operation can not be undone.</source>
     <message>
         <location filename="../../src/gui/editors/PatternEditor.cpp" line="318"/>
         <source>New pattern</source>
-        <translation type="unfinished"/>
+        <translation>Nytt mönster</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/PatternEditor.cpp" line="320"/>
         <source>Clone pattern</source>
-        <translation type="unfinished"/>
+        <translation>Klona mönster</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/PatternEditor.cpp" line="322"/>
@@ -12462,7 +12462,7 @@ Warning: This operation can not be undone.</source>
     <message>
         <location filename="../../src/gui/widgets/PeakIndicator.cpp" line="74"/>
         <source>-inf</source>
-        <translation type="unfinished"/>
+        <translation>-inf</translation>
     </message>
 </context>
 <context>
@@ -12470,12 +12470,12 @@ Warning: This operation can not be undone.</source>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="221"/>
         <source>Note Velocity</source>
-        <translation>Not-velocitet</translation>
+        <translation>Velocitet</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="222"/>
         <source>Note Panning</source>
-        <translation>Not-panorering</translation>
+        <translation>Panorering</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="235"/>
@@ -12535,7 +12535,7 @@ Warning: This operation can not be undone.</source>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="429"/>
         <source>Nudge</source>
-        <translation type="unfinished"/>
+        <translation>Putta</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="430"/>
@@ -12685,12 +12685,12 @@ Warning: This operation can not be undone.</source>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="4988"/>
         <source>Glue</source>
-        <translation type="unfinished"/>
+        <translation>Limma</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="4992"/>
         <source>Knife</source>
-        <translation type="unfinished"/>
+        <translation>Kniv</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="4996"/>
@@ -12841,7 +12841,7 @@ Warning: This operation can not be undone.</source>
     <message>
         <location filename="../../src/gui/instrument/PianoView.cpp" line="785"/>
         <source>First note</source>
-        <translation type="unfinished"/>
+        <translation>Första noten</translation>
     </message>
     <message>
         <location filename="../../src/gui/instrument/PianoView.cpp" line="790"/>
@@ -13463,7 +13463,7 @@ Warning: This operation can not be undone.</source>
     <message>
         <location filename="../../src/gui/modals/VersionedSaveDialog.cpp" line="189"/>
         <source>Save As Project Bundle (with resources)</source>
-        <translation>Spara som projektpaket (med resurser)</translation>
+        <translation>Spara som projektmapp (med resurser)</translation>
     </message>
 </context>
 <context>
@@ -13542,17 +13542,17 @@ Warning: This operation can not be undone.</source>
     <message>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="260"/>
         <source>Dual-button</source>
-        <translation type="unfinished"/>
+        <translation>Båda musknappar</translation>
     </message>
     <message>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="261"/>
         <source>Grab closest</source>
-        <translation type="unfinished"/>
+        <translation>Greppa närmaste</translation>
     </message>
     <message>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="262"/>
         <source>Handles</source>
-        <translation type="unfinished"/>
+        <translation>Handtag</translation>
     </message>
     <message>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="268"/>
@@ -14151,67 +14151,67 @@ Latens: %2 ms</translation>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControlDialog.cpp" line="142"/>
         <source>Slew Link 1</source>
-        <translation type="unfinished"/>
+        <translation>Länka slew 1</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControlDialog.cpp" line="154"/>
         <source>Slew Link 2</source>
-        <translation type="unfinished"/>
+        <translation>Länka slew 2</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControlDialog.cpp" line="167"/>
         <source>DC Offset Removal</source>
-        <translation type="unfinished"/>
+        <translation>DC-kompensering</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControlDialog.cpp" line="168"/>
         <source>Multiband</source>
-        <translation type="unfinished"/>
+        <translation>Flerband</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControlDialog.cpp" line="170"/>
         <source>Split:</source>
-        <translation type="unfinished"/>
+        <translation>Delning:</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControlDialog.cpp" line="171"/>
         <source>Mix 1:</source>
-        <translation type="unfinished"/>
+        <translation>Mix 1:</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControlDialog.cpp" line="172"/>
         <source>Mix 2:</source>
-        <translation type="unfinished"/>
+        <translation>Mix 2:</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControlDialog.cpp" line="174"/>
         <source>Disable Oversampling</source>
-        <translation type="unfinished"/>
+        <translation>Inaktivera översampling</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControlDialog.cpp" line="175"/>
         <source>2x Oversampling</source>
-        <translation type="unfinished"/>
+        <translation>2x översampling</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControlDialog.cpp" line="176"/>
         <source>4x Oversampling</source>
-        <translation type="unfinished"/>
+        <translation>4x översampling</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControlDialog.cpp" line="177"/>
         <source>8x Oversampling</source>
-        <translation type="unfinished"/>
+        <translation>8x översampling</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControlDialog.cpp" line="178"/>
         <source>16x Oversampling</source>
-        <translation type="unfinished"/>
+        <translation>16x översampling</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControlDialog.cpp" line="179"/>
         <source>32x Oversampling</source>
-        <translation type="unfinished"/>
+        <translation>32x översampling</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControlDialog.cpp" line="194"/>
@@ -14224,7 +14224,7 @@ Latens: %2 ms</translation>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControlDialog.cpp" line="399"/>
         <source>&lt;div style=&apos;text-align: center;&apos;&gt;&lt;b&gt;Slew Distortion&lt;/b&gt;&lt;br&gt;&lt;br&gt;Plugin by Lost Robot&lt;br&gt;GUI by thismoon&lt;br&gt;&lt;/div&gt;&lt;h3&gt;Overview:&lt;/h3&gt;Slew Distortion is a multiband slew rate limiter and distortion effect.&lt;br&gt;&lt;br&gt;Slew rate limiting is something I accidentally invented while trying to make a lowpass filter for the first time.&lt;br&gt;In short, a slew rate limiter limits how quickly the waveform can move from one point to the next.&lt;br&gt;You&apos;ll hear that it has a similar quality to a lowpass filter, in that it does quieten the high frequencies by quite a bit.&lt;br&gt;However, the intensity of this effect depends heavily on the input signal, and with it comes a rather unique distortion of that signal.&lt;br&gt;&lt;br&gt;In this plugin, the slew rate limiting is followed by waveshaping distortion.&lt;br&gt;Every distortion type is a pure waveshaping function with no filters or delays of any kind involved.&lt;br&gt;These distortions will generate new harmonics at exact frequency multiples of the incoming audio.&lt;br&gt;&lt;br&gt;Because the plugin is multiband, you can apply these effects to different frequency ranges independently.&lt;br&gt;&lt;br&gt;&lt;h3&gt;Distortion Types:&lt;/h3&gt;&lt;b&gt;Hard Clip&lt;/b&gt; - Aggressively clamps the audio signal to 0 dBFS.&lt;br&gt;This leaves the signal entirely untouched until it passes the clamping threshold, beyond which all content is clipped out entirely.&lt;br&gt;&lt;b&gt;Tanh&lt;/b&gt; - A very gentle sigmoid distortion.&lt;br&gt;This waveshape is mathematically smooth and continuous at all derivatives.&lt;br&gt;It can be pushed significantly harder than most other distortion shapes before it starts generating harsh high frequencies.&lt;br&gt;&lt;b&gt;Fast Soft Clip 1&lt;/b&gt; - A CPU-efficient soft clipping function.&lt;br&gt;&lt;b&gt;Fast Soft Clip 2&lt;/b&gt; - A CPU-efficient cubic soft clipping function.&lt;br&gt;&lt;b&gt;Sinusoidal&lt;/b&gt; - Incredibly smooth wavewrapping distortion.&lt;br&gt;Unlike all the previous distortion types, loud audio information is not entirely lost or clipped away, and is instead wrapped back down to lower values.&lt;br&gt;&lt;b&gt;Foldover&lt;/b&gt; - A non-smooth wavewrapping alternative.&lt;br&gt;This leaves the audio values untouched relative to neighboring values,&lt;br&gt;except at the borders where the waveshape sharply changes directions, generating harsh distortion.&lt;br&gt;&lt;b&gt;Full-wave Rectify&lt;/b&gt; - Flips the bottom half of the waveform to the top half.&lt;br&gt;The timbre of this commonly sounds similar to shifting the audio upward by one octave.&lt;br&gt;Unlike all the previous distortion types, this one is asymmetrical by default, meaning it will generate even-multiple harmonics.&lt;br&gt;&lt;b&gt;Smooth Rectify&lt;/b&gt; - An alternative to Full-wave Rectify which has a smooth corner.&lt;br&gt;&lt;b&gt;Half-wave Rectify&lt;/b&gt; - An alternative to Full-wave Rectify which clips all negative audio samples instead of reflecting them upward.&lt;br&gt;&lt;b&gt;Bitcrush&lt;/b&gt; - Bit depth reduction. This distortion type is special-cased to have the Drive change its shape instead of its input amplitude.&lt;br&gt;&lt;br&gt;&lt;h3&gt;Slew:&lt;/h3&gt;This section controls the slew rate limit, the speed at which the incoming waveform&apos;s values can change.&lt;br&gt;&lt;b&gt;Up&lt;/b&gt; and &lt;b&gt;Down&lt;/b&gt; control the slew rate limit for upward and downward movement, respectively.&lt;br&gt;The &lt;b&gt;Slew Link&lt;/b&gt; button locks the Slew Up and Slew Down parameters to the same value, for convenience.&lt;br&gt;&lt;br&gt;&lt;h3&gt;Dynamics:&lt;/h3&gt;This section uses an envelope follower to track the volume of the incoming audio signal.&lt;br&gt;&lt;b&gt;Amount&lt;/b&gt; - Restores the dynamic range lost from the distortion and slew rate limiting by matching the output volume to the input volume.&lt;br&gt;&lt;b&gt;Slew&lt;/b&gt; - Dynamically changes the slew rate, depending on the input volume.&lt;br&gt;&lt;b&gt;Attack&lt;/b&gt; - How quickly the envelope follower responds to increases in volume (e.g. transients).&lt;br&gt;&lt;b&gt;Release&lt;/b&gt; - How quickly the envelope follower responds to decreases in volume.&lt;br&gt;&lt;br&gt;&lt;h3&gt;Shape:&lt;/h3&gt;This section allows further sculpting of the distortion shape beyond what the distortion types can achieve on their own.&lt;br&gt;&lt;b&gt;Warp&lt;/b&gt; - Causes input values smaller than this value to be unimpacted by the waveshaping.&lt;br&gt;The distortion shape is properly scaled and shifted to ensure it remains perfectly clean and continuous.&lt;br&gt;&lt;b&gt;Crush&lt;/b&gt; - Increases the volume of audio below the Warp value.&lt;br&gt;This adds a sharp corner to the waveshaping function, resulting in much more aggressive distortion.&lt;br&gt;&lt;br&gt;&lt;h3&gt;Miscellaneous:&lt;/h3&gt;&lt;b&gt;Mix&lt;/b&gt; - Blends between the wet and dry signals for the current band.&lt;br&gt;Since both the wet and dry signal are after the crossover filter and have oversampling applied,&lt;br&gt;this parameter is entirely immune to phase issues caused by blending signals.&lt;br&gt;&lt;b&gt;Bias&lt;/b&gt; - Adds DC offset to the input signal before the distortion, causing the waveshaping to be asymmetrical.&lt;br&gt;This allows every distortion type to generate even-multiple harmonics, including the symmetrical types which usually only generate odd-multiple harmonics.&lt;br&gt;&lt;b&gt;DC Remover&lt;/b&gt; - Removes DC offset (0 Hz audio) from the output signal. You&apos;ll almost always want to leave this enabled.&lt;br&gt;&lt;b&gt;Multiband&lt;/b&gt; - Splits the signal into two frequency bands. If disabled, the top band&apos;s parameters are applied to the entire audio signal.&lt;br&gt;&lt;b&gt;Split&lt;/b&gt; - The crossover frequency at which the Multiband mode splits the signal into two bands.&lt;br&gt;&lt;br&gt;&lt;h3&gt;Oversampling:&lt;/h3&gt;An audio signal is only capable of storing frequencies below Nyquist, which is half of the sample rate.&lt;br&gt;If any form of distortion generates new frequencies that are above this Nyquist frequency, they will be reflected (aliased) back downward.&lt;br&gt;For example, if the distortion generates a harmonic that is 5000 Hz above Nyquist, that frequency will be aliased down to 5000 Hz below Nyquist.&lt;br&gt;This aliasing is inharmonic, oftentimes sounds unpleasant, and can even contribute to auditory masking within the song.&lt;br&gt;&lt;br&gt;Oversampling helps to resolve this issue by temporarily increasing the sample rate of the signal,&lt;br&gt;so significantly higher frequencies can be supported before they start aliasing back into the audible range.&lt;br&gt;Those higher frequencies are then filtered out before decreasing the sample rate back to its original value so they don&apos;t alias.&lt;br&gt;&lt;br&gt;This plugin supports up to five stages of oversampling.&lt;br&gt;Each stage provides an extra 2 octaves of headroom before frequencies alias far enough to become audible.&lt;br&gt;The number on the button is how much the sample rate is increased by. THE PLUGIN&apos;S CPU USAGE WILL BE INCREASED BY APPROXIMATELY THE SAME AMOUNT.&lt;br&gt;Even just 2x oversampling can make a massive difference and is oftentimes all you need, but up to 32x oversampling is supported.&lt;br&gt;</source>
-        <translation type="unfinished"/>
+        <translation>&lt;div style=&apos;text-align: center;&apos;&gt;&lt;b&gt;Slew Distortion&lt;/b&gt;&lt;br&gt;&lt;br&gt;Tillägg av Lost Robot&lt;br&gt;GUI av thismoon&lt;br&gt;&lt;/div&gt;&lt;h3&gt;Översikt:&lt;/h3&gt;Slew Distortion är en slew rate-begränsare och distorsionseffekt med flera band.&lt;br&gt;&lt;br&gt;Begränsning av slew rate är något jag uppfann av en händelse då jag försökte skapa ett lågpassfilter för första gången.&lt;br&gt;Kort sagt så begränsar det hur snabbt en vågform kan röra sig från en punkt till en annan.&lt;br&gt;Du kommer höra att det påminner om hur ett lågpassfilter tystar ned de höga frekvenserna rätt rejält.&lt;br&gt;Hur tydlig effekten blir beror till stor del på ingångssignalen. Dessutom får signalen en ganska unik sorts distorsion.&lt;br&gt;&lt;br&gt;I det här tillägget följs slew rate begränsningen av en waveshaper.&lt;br&gt;Varje typ av distorsion är en ren vågformarfunktion utan några som helst filter eller fördröjning.&lt;br&gt;De olika distorsionerna kommer att skapa övertoner på frekvenser som är multiplar av av det inkommande ljudet.&lt;br&gt;&lt;br&gt;Eftersom tillägget har flera band så kan du tillämpa effekterna på de två frekvensomfången, var för sig.&lt;br&gt;&lt;br&gt;&lt;h3&gt;Typer av distorsion:&lt;/h3&gt;&lt;b&gt;Hård klippning&lt;/b&gt; - Begränsar aggressivt ljudsignalen till 0 dBFS.&lt;br&gt;Ljudsignalen förblir orörd ända tills den passerar tröskelvärdet, där den klipps av helt och hållet.&lt;br&gt;&lt;b&gt;Tanh&lt;/b&gt; - En väldigt mild sigmoid distorsion.&lt;br&gt;Denna vågformare är matematiskt mjuk och kontinuerlig för alla derivator.&lt;br&gt;Den kan pressas betydligt hårdare än de flesta andra distorsionstyper innan den börjar generera skarpa, höga frekvenser.&lt;br&gt;&lt;b&gt;Snabb mjuk klippning 1&lt;/b&gt; - En processorvänlig, mjuk klippningsfunktion.&lt;br&gt;&lt;b&gt;Snabb mjuk klippning 2&lt;/b&gt; - En processorvänlig, kubisk, mjuk klippningsfunktion.&lt;br&gt;&lt;b&gt;Sinusformad&lt;/b&gt; - Extremt mjuk distorsion med vågvikning.&lt;br&gt;Till skillnad från de föregående distorsionstyperna så bevaras här informationen i de höga ljudsignalerna. Istället för att vågtopparna klipps bort så viks de ned till lägre nivåer.&lt;br&gt;&lt;b&gt;Vikning&lt;/b&gt; - Alternativ med hård vågvikning.&lt;br&gt;Ljudet lämnas orört i förhållande till närliggande värden, &lt;br&gt;utom vid kanterna där vågformen omedelbart byter riktning, vilket skapar skarp distorsion.&lt;br&gt;&lt;b&gt;Helvågslikriktning&lt;/b&gt; - Viker upp den nedre delen av vågformen.&lt;br&gt;Klangfärgen påminner om när man spelar ett ljud en oktav högre.&lt;br&gt;Till skillnad från de föregående distorsionstyperna så är denna asymmetrisk som standard, vilket innebär att den även genererar övertoner för jämna multiplar.&lt;br&gt;&lt;b&gt;Mjuk likriktning&lt;/b&gt; - Ett alternativ till helvågslikriktning med ett mjukt hörn.&lt;br&gt;&lt;b&gt;Halvvågslikriktning&lt;/b&gt; - Ett alternativ till helvågslikriktning som klipper alla negativa värden istället för att spegelvända dem till positiva.&lt;br&gt;&lt;b&gt;Bitcrush&lt;/b&gt; - Reducerar bit-djup. Denna distorsion är ett undantagsfall då Drive ändrar vågformen istället för ingångsvolymen.&lt;br&gt;&lt;br&gt;&lt;h3&gt;Slew:&lt;/h3&gt;Den här delen styr slew rate, dvs. hastigheten med vilken det inkommande ljudets vågform kan ändras.&lt;br&gt;&lt;b&gt;Upp&lt;/b&gt; och &lt;b&gt;Ned&lt;/b&gt; begränsar slew-hastigheten för uppåt- och nedåtgående förändring. &lt;br&gt;Knappen &lt;b&gt;Slew-länk&lt;/b&gt; binder samman Slew Upp och Slew Ned så de alltid har samma värde.&lt;br&gt;&lt;br&gt;&lt;h3&gt;Dynamik:&lt;/h3&gt;De här delen använder en konturföljare för att registrera volymen på den inkommande ljudsignalen.&lt;br&gt;&lt;b&gt;Mängd&lt;/b&gt; - Återställer dynamiskt omfång som gått förlorat pga. distorsion och slew rate begränsning genom att matcha utgångsvolym med ingångsvolym.&lt;br&gt;&lt;b&gt;Slew&lt;/b&gt; - Ändrar slew rate dynamiskt beroende på ingångsvolym.&lt;br&gt;&lt;b&gt;Attack&lt;/b&gt; - Hur snabbt konturföljaren reagerar på ökad volym (t.ex. transienter).&lt;br&gt;&lt;b&gt;Release&lt;/b&gt; - Hur snabbt konturföljaren reagerar på minskad volym.&lt;br&gt;&lt;br&gt;&lt;h3&gt;Form:&lt;/h3&gt;Den här delen delen låter dig ändra formen på distorsionen ytterligare.&lt;br&gt;&lt;b&gt;Warp&lt;/b&gt; - Ingångsvärden mindre än detta värde kommer förbli orörda av vågformaren.&lt;br&gt;Formen på distorsionen justeras och kompenseras för att förbli ren och oavbruten.&lt;br&gt;&lt;b&gt;Krossa&lt;/b&gt; - Ökar ljudvolymen under Warp-värdet.&lt;br&gt;Detta skapar ett skarpt hörn i vågformarfunktionen, vilket ger en mycket aggressiv distorsion.&lt;br&gt;&lt;br&gt;&lt;h3&gt;Övrigt:&lt;/h3&gt;&lt;b&gt;Mix&lt;/b&gt; - Blandar våt och torr signal i det nuvarande bandet.&lt;br&gt;Eftersom både den våta och torra signalen ligger efter crossover-filtret, samt har översamplats,&lt;br&gt;är denna parameter helt immun mot problem med fasskillnader som uppstår när signaler blandas.&lt;br&gt;&lt;b&gt;Bias&lt;/b&gt; - Lägger till en DC-förskjutning på ingångssignalen innan distorsionen sker, vilket gör vågformaren asymmetrisk.&lt;br&gt;Detta gör att även symmetriska distorsionstyper kan skapa övertoner för jämna multiplar, inte bara udda.&lt;br&gt;&lt;b&gt;DC-borttagning&lt;/b&gt; - Tar bort DC-förskjutning (0 Hz ljud) från utsignalen. Du vill nog alltid ha detta aktiverat.&lt;br&gt;&lt;b&gt;Flerband&lt;/b&gt; - Delar signalen i två frekvensband. Om detta är avstängt gäller det övre bandets parametrar för hela ljudsignalen.&lt;br&gt;&lt;b&gt;Delning&lt;/b&gt; - Frekvensen som delar det övre och lägre frekvensbandet i flerbandsläget.&lt;br&gt;&lt;br&gt;&lt;h3&gt;Översampling:&lt;/h3&gt;En ljudsignal kan endast återge frekvenser under Nyquist, vilket är halva samplingsfrekvensen.&lt;br&gt;Om någon form av distorsion skapar frekvenser ovanför Nyquistfrekvensen kommer de att vikas ner (aliasing).&lt;br&gt;Om distorsionen t.ex. skapar en överton som är 5000 Hz över Nyquist så kommer den vikas ner till 5000 Hz under Nyquist.&lt;br&gt;Den här sortens vikningsdistorsion är oharmonisk, den låter ofta otrevlig, och den kan till och med dränka ut andra ljud i sången.&lt;br&gt;&lt;br&gt;Översampling avhjälper problemet genom att tillfälligt öka signalens samplingsfrekvens&lt;br&gt;så betydligt högre frekvenser kan användas innan de börjar vikas ned i det hörbara omfånget.&lt;br&gt;De höga frekvenserna filtreras sedan ut innan samplingsfrekvensen återställs till sitt ursprungliga värde så att ingen vikningsdistorsion sker.&lt;br&gt;&lt;br&gt;Detta tillägg stödjer upp till fem steg av översampling.&lt;br&gt;Varje steg ger 2 extra oktaver utrymme innan frekvenserna börjar vikas ned tillräckligt mycket för att bli hörbara.&lt;br&gt;Siffran på knappen visar hur mycket samplingsfrekvensen ökar. TILLÄGGETS PROCESSORANVÄNDNING KOMMER ÖKA MED UNGEFÄR SAMMA FÖRHÅLLANDE.&lt;br&gt;En 2x översampling kan göra en enorm skillnad och är ofta allt du behöver, men upp till 32x översampling är tillgänglig.&lt;br&gt;</translation>
     </message>
 </context>
 <context>
@@ -14242,12 +14242,12 @@ Latens: %2 ms</translation>
     <message>
         <location filename="../../plugins/SlicerT/SlicerTView.cpp" line="70"/>
         <source>Sync sample</source>
-        <translation type="unfinished"/>
+        <translation>Synka ljudfil</translation>
     </message>
     <message>
         <location filename="../../plugins/SlicerT/SlicerTView.cpp" line="74"/>
         <source>Enable BPM sync</source>
-        <translation type="unfinished"/>
+        <translation>Aktivera BPM synk</translation>
     </message>
     <message>
         <location filename="../../plugins/SlicerT/SlicerTView.cpp" line="77"/>
@@ -14346,7 +14346,7 @@ Latens: %2 ms</translation>
     <message>
         <location filename="../../src/core/DataFile.cpp" line="357"/>
         <source>A bundle folder with that name already exists on the selected path. Can&apos;t overwrite a project bundle. Please select a different name.</source>
-        <translation type="unfinished"/>
+        <translation>En projektmapp med det namnet existerar redan. Kan inte skriva över en projektmapp. Vänligen ange ett annat namn.</translation>
     </message>
     <message>
         <location filename="../../src/core/DataFile.cpp" line="367"/>
@@ -14358,7 +14358,7 @@ Latens: %2 ms</translation>
     <message>
         <location filename="../../src/core/DataFile.cpp" line="368"/>
         <source>Couldn&apos;t create bundle folder.</source>
-        <translation type="unfinished"/>
+        <translation>Misslyckades att skapa projektmapp.</translation>
     </message>
     <message>
         <location filename="../../src/core/DataFile.cpp" line="376"/>
@@ -14448,17 +14448,17 @@ Latens: %2 ms</translation>
         <location filename="../../src/gui/editors/SongEditor.cpp" line="196"/>
         <location filename="../../src/gui/editors/SongEditor.cpp" line="207"/>
         <source>Global transposition</source>
-        <translation type="unfinished"/>
+        <translation>Global transponering</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/SongEditor.cpp" line="316"/>
         <source>1/%1 Bar</source>
-        <translation type="unfinished"/>
+        <translation>1/%1 Takt</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/SongEditor.cpp" line="320"/>
         <source>%1 Bars</source>
-        <translation type="unfinished"/>
+        <translation>%1 Takter</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/SongEditor.cpp" line="664"/>
@@ -14468,7 +14468,7 @@ Latens: %2 ms</translation>
     <message>
         <location filename="../../src/gui/editors/SongEditor.cpp" line="706"/>
         <source>Value: %1 keys</source>
-        <translation type="unfinished"/>
+        <translation>Värde: %1 tonsteg</translation>
     </message>
 </context>
 <context>
@@ -14491,7 +14491,7 @@ Latens: %2 ms</translation>
     <message>
         <location filename="../../src/gui/editors/SongEditor.cpp" line="935"/>
         <source>Record samples from Audio-device while playing song or pattern track</source>
-        <translation type="unfinished"/>
+        <translation>Spela in ljud från ljudenhet, medan sång eller mönster spelas upp</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/SongEditor.cpp" line="936"/>
@@ -14506,7 +14506,7 @@ Latens: %2 ms</translation>
     <message>
         <location filename="../../src/gui/editors/SongEditor.cpp" line="943"/>
         <source>Add pattern-track</source>
-        <translation type="unfinished"/>
+        <translation>Lägg till mönster-spår</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/SongEditor.cpp" line="946"/>
@@ -14531,7 +14531,7 @@ Latens: %2 ms</translation>
     <message>
         <location filename="../../src/gui/editors/SongEditor.cpp" line="965"/>
         <source>Knife mode (split clips)</source>
-        <translation type="unfinished"/>
+        <translation>Knivläge (dela klipp)</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/SongEditor.cpp" line="966"/>
@@ -14601,7 +14601,7 @@ Latens: %2 ms</translation>
     <message>
         <location filename="../../src/gui/editors/StepRecorderWidget.cpp" line="97"/>
         <source>Move recording cursor using &lt;Left/Right&gt; arrows</source>
-        <translation type="unfinished"/>
+        <translation>Flytta inspelningsmarkör med vänster eller höger piltangent</translation>
     </message>
 </context>
 <context>
@@ -14674,7 +14674,7 @@ Latens: %2 ms</translation>
     <message>
         <location filename="../../plugins/TapTempo/TapTempoView.cpp" line="58"/>
         <source>Display in high precision</source>
-        <translation type="unfinished"/>
+        <translation>Visa med högre precision</translation>
     </message>
     <message>
         <location filename="../../plugins/TapTempo/TapTempoView.cpp" line="61"/>
@@ -14684,7 +14684,7 @@ Latens: %2 ms</translation>
     <message>
         <location filename="../../plugins/TapTempo/TapTempoView.cpp" line="63"/>
         <source>Mute metronome</source>
-        <translation type="unfinished"/>
+        <translation>Tysta metronom</translation>
     </message>
     <message>
         <location filename="../../plugins/TapTempo/TapTempoView.cpp" line="64"/>
@@ -14704,7 +14704,7 @@ Latens: %2 ms</translation>
     <message>
         <location filename="../../plugins/TapTempo/TapTempoView.cpp" line="73"/>
         <source>Frequency of BPM</source>
-        <translation type="unfinished"/>
+        <translation>BPM frekvens</translation>
     </message>
     <message>
         <location filename="../../plugins/TapTempo/TapTempoView.cpp" line="74"/>
@@ -14719,7 +14719,7 @@ Latens: %2 ms</translation>
     <message>
         <location filename="../../plugins/TapTempo/TapTempoView.cpp" line="78"/>
         <source>Reset counter and sidebar information</source>
-        <translation type="unfinished"/>
+        <translation>Återställ räkneverk och värden</translation>
     </message>
     <message>
         <location filename="../../plugins/TapTempo/TapTempoView.cpp" line="80"/>
@@ -14729,7 +14729,7 @@ Latens: %2 ms</translation>
     <message>
         <location filename="../../plugins/TapTempo/TapTempoView.cpp" line="82"/>
         <source>Sync with project tempo</source>
-        <translation type="unfinished"/>
+        <translation>Synkronisera med projektets tempo</translation>
     </message>
     <message>
         <location filename="../../plugins/TapTempo/TapTempoView.cpp" line="150"/>
@@ -15006,17 +15006,17 @@ Latens: %2 ms</translation>
     <message>
         <location filename="../../src/gui/editors/TimeLineWidget.cpp" line="89"/>
         <source>Stepped auto scrolling</source>
-        <translation type="unfinished"/>
+        <translation>Stegad automatisk rullning</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/TimeLineWidget.cpp" line="90"/>
         <source>Continuous auto scrolling</source>
-        <translation type="unfinished"/>
+        <translation>Mjuk automatisk rullning</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/TimeLineWidget.cpp" line="91"/>
         <source>Auto scrolling disabled</source>
-        <translation type="unfinished"/>
+        <translation>Ingen automatisk rullning</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/TimeLineWidget.cpp" line="96"/>
@@ -15051,32 +15051,32 @@ Latens: %2 ms</translation>
     <message>
         <location filename="../../src/gui/editors/TimeLineWidget.cpp" line="420"/>
         <source>Set loop begin here</source>
-        <translation type="unfinished"/>
+        <translation>Börja slinga här</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/TimeLineWidget.cpp" line="428"/>
         <source>Set loop end here</source>
-        <translation type="unfinished"/>
+        <translation>Avsluta slinga här</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/TimeLineWidget.cpp" line="439"/>
         <source>Loop edit mode (hold shift)</source>
-        <translation type="unfinished"/>
+        <translation>Redigering av slinga (håll in shift)</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/TimeLineWidget.cpp" line="448"/>
         <source>Dual-button</source>
-        <translation type="unfinished"/>
+        <translation>Båda musknappar</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/TimeLineWidget.cpp" line="449"/>
         <source>Grab closest</source>
-        <translation type="unfinished"/>
+        <translation>Greppa närmaste</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/TimeLineWidget.cpp" line="450"/>
         <source>Handles</source>
-        <translation type="unfinished"/>
+        <translation>Handtag</translation>
     </message>
 </context>
 <context>
@@ -15149,7 +15149,7 @@ Latens: %2 ms</translation>
     <message>
         <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="308"/>
         <source>Assign to new Mixer Channel</source>
-        <translation type="unfinished"/>
+        <translation>Tilldela ny mixerkanal</translation>
     </message>
     <message>
         <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="320"/>
@@ -15164,7 +15164,7 @@ Latens: %2 ms</translation>
     <message>
         <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="326"/>
         <source>Track color</source>
-        <translation type="unfinished"/>
+        <translation>Spårfärg</translation>
     </message>
     <message>
         <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="328"/>
@@ -15179,12 +15179,12 @@ Latens: %2 ms</translation>
     <message>
         <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="330"/>
         <source>Pick random</source>
-        <translation type="unfinished"/>
+        <translation>Välj slumpmässig</translation>
     </message>
     <message>
         <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="332"/>
         <source>Reset clip colors</source>
-        <translation type="unfinished"/>
+        <translation>Återställ klippfärger</translation>
     </message>
 </context>
 <context>
@@ -15334,7 +15334,7 @@ Latens: %2 ms</translation>
     <message>
         <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="680"/>
         <source>Use alias-free wavetable oscillators.</source>
-        <translation type="unfinished"/>
+        <translation>Wavetable oscillatorer utan vikningsdistorsion.</translation>
     </message>
 </context>
 <context>
@@ -15352,12 +15352,12 @@ Latens: %2 ms</translation>
     <message>
         <location filename="../../plugins/Vectorscope/VecControlsDialog.cpp" line="66"/>
         <source>Lines</source>
-        <translation type="unfinished"/>
+        <translation>Linjer</translation>
     </message>
     <message>
         <location filename="../../plugins/Vectorscope/VecControlsDialog.cpp" line="67"/>
         <source>Render with lines.</source>
-        <translation type="unfinished"/>
+        <translation>Rendera med linjer.</translation>
     </message>
 </context>
 <context>

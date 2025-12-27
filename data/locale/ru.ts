@@ -29,7 +29,7 @@
     <message>
         <location filename="../../src/gui/modals/about_dialog.ui" line="126"/>
         <source>Copyright © %1.</source>
-        <translation>Все права защищены © %1.</translation>
+        <translation>Авторское право © %1.</translation>
     </message>
     <message>
         <location filename="../../src/gui/modals/about_dialog.ui" line="152"/>
@@ -69,7 +69,7 @@ https://matrix.to/#/#lmms.ru.team:matrix.org
 Symbiants / OeAi (2014)
 Василий Павлов (2019)
 Алексей &quot;Lexeii&quot; Бобылёв (2020)  
-Андрей Степанов (2018) 
+Андрей Степанов (2018-2025) 
 Andrew344 (2016)
 Кирилл Рагузин (2018)
 Simple88 (2016)</translation>
@@ -95,12 +95,12 @@ Simple88 (2016)</translation>
     <message>
         <location filename="../../include/AudioJack.h" line="75"/>
         <source>JACK (JACK Audio Connection Kit)</source>
-        <translation type="unfinished"/>
+        <translation>JACK (JACK Audio Connection Kit)</translation>
     </message>
     <message>
         <location filename="../../include/AudioOss.h" line="58"/>
         <source>OSS (Open Sound System)</source>
-        <translation type="unfinished"/>
+        <translation>OSS (Open Sound System)</translation>
     </message>
     <message>
         <location filename="../../include/AudioPortAudio.h" line="83"/>
@@ -115,7 +115,7 @@ Simple88 (2016)</translation>
     <message>
         <location filename="../../include/AudioSdl.h" line="50"/>
         <source>SDL (Simple DirectMedia Layer)</source>
-        <translation type="unfinished"/>
+        <translation>SDL (Simple DirectMedia Layer)</translation>
     </message>
     <message>
         <location filename="../../include/AudioSndio.h" line="59"/>
@@ -153,7 +153,7 @@ Simple88 (2016)</translation>
     <message>
         <location filename="../../src/gui/modals/export_project.ui" line="61"/>
         <source>Render Looped Section:</source>
-        <translation>Рендерить закольцованную секцию</translation>
+        <translation>Рендерить закольцованную секцию:</translation>
     </message>
     <message>
         <location filename="../../src/gui/modals/export_project.ui" line="68"/>
@@ -642,7 +642,7 @@ Simple88 (2016)</translation>
     <message>
         <location filename="../../src/core/InstrumentFunctions.cpp" line="124"/>
         <source>Major bebop</source>
-        <translation>Мажор бибоп</translation>
+        <translation>Мажорный бибоп</translation>
     </message>
     <message>
         <location filename="../../src/core/InstrumentFunctions.cpp" line="125"/>
@@ -745,17 +745,17 @@ Simple88 (2016)</translation>
     <message>
         <location filename="../../include/MidiAlsaRaw.h" line="57"/>
         <source>ALSA Raw-MIDI (Advanced Linux Sound Architecture)</source>
-        <translation type="unfinished"/>
+        <translation>ALSA Raw-MIDI (Advanced Linux Sound Architecture)</translation>
     </message>
     <message>
         <location filename="../../include/MidiAlsaSeq.h" line="60"/>
         <source>ALSA-Sequencer (Advanced Linux Sound Architecture)</source>
-        <translation type="unfinished"/>
+        <translation>ALSA-Sequencer (Advanced Linux Sound Architecture)</translation>
     </message>
     <message>
         <location filename="../../include/MidiApple.h" line="59"/>
         <source>Apple MIDI</source>
-        <translation type="unfinished"/>
+        <translation>Apple MIDI</translation>
     </message>
     <message>
         <location filename="../../include/MidiDummy.h" line="43"/>
@@ -765,12 +765,12 @@ Simple88 (2016)</translation>
     <message>
         <location filename="../../include/MidiJack.h" line="63"/>
         <source>Jack-MIDI</source>
-        <translation type="unfinished"/>
+        <translation>Jack-MIDI</translation>
     </message>
     <message>
         <location filename="../../include/MidiOss.h" line="54"/>
         <source>OSS Raw-MIDI (Open Sound System)</source>
-        <translation type="unfinished"/>
+        <translation>OSS Raw-MIDI (Open Sound System)</translation>
     </message>
     <message>
         <location filename="../../include/MidiSndio.h" line="55"/>
@@ -780,7 +780,7 @@ Simple88 (2016)</translation>
     <message>
         <location filename="../../include/MidiWinMM.h" line="60"/>
         <source>WinMM MIDI</source>
-        <translation type="unfinished"/>
+        <translation>WinMM MIDI</translation>
     </message>
 </context>
 <context>
@@ -825,7 +825,7 @@ Simple88 (2016)</translation>
         <location filename="../../plugins/GigPlayer/PatchesDialog.ui" line="173"/>
         <location filename="../../plugins/Sf2Player/PatchesDialog.ui" line="173"/>
         <source>OK</source>
-        <translation>ОК</translation>
+        <translation>Хорошо</translation>
     </message>
     <message>
         <location filename="../../plugins/GigPlayer/PatchesDialog.ui" line="192"/>
@@ -879,7 +879,7 @@ Simple88 (2016)</translation>
     <message>
         <location filename="../../plugins/Compressor/Compressor.cpp" line="45"/>
         <source>A dynamic range compressor.</source>
-        <translation type="unfinished"/>
+        <translation>Компрессор динамического диапазона.</translation>
     </message>
     <message>
         <location filename="../../plugins/CrossoverEQ/CrossoverEQ.cpp" line="43"/>
@@ -989,7 +989,7 @@ Simple88 (2016)</translation>
     <message>
         <location filename="../../plugins/Organic/Organic.cpp" line="51"/>
         <source>Additive Synthesizer for organ-like sounds</source>
-        <translation>Синтезатор звуков вроде органа</translation>
+        <translation>Аддитивный синтезатор оргáно-подобных звуков</translation>
     </message>
     <message>
         <location filename="../../plugins/Patman/Patman.cpp" line="60"/>
@@ -1051,7 +1051,7 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../plugins/Vectorscope/Vectorscope.cpp" line="39"/>
         <source>A stereo field visualizer.</source>
-        <translation type="unfinished"/>
+        <translation>Визуализатор стереополя.</translation>
     </message>
     <message>
         <location filename="../../plugins/Vestige/Vestige.cpp" line="76"/>
@@ -1096,7 +1096,7 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../plugins/GranularPitchShifter/GranularPitchShifterEffect.cpp" line="42"/>
         <source>Granular pitch shifter</source>
-        <translation type="unfinished"/>
+        <translation>Гранулярный сдвиг высоты тона</translation>
     </message>
     <message>
         <location filename="../../plugins/LOMM/LOMM.cpp" line="40"/>
@@ -1194,7 +1194,7 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../src/core/DataFile.cpp" line="2062"/>
         <source>The project contains %1 LADSPA plugin(s) which might have not been restored correctly! Please check the project.</source>
-        <translation type="unfinished"/>
+        <translation>Проект содержит %1 плагинов LADSPA, которые, возможно, не были восстановлены правильно! Пожалуйста, проверьте проект.</translation>
     </message>
     <message>
         <location filename="../../src/core/lv2/Lv2SubPluginFeatures.cpp" line="159"/>
@@ -1209,7 +1209,7 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../src/core/lv2/Lv2SubPluginFeatures.cpp" line="162"/>
         <source>Maker: </source>
-        <translation>Автор:</translation>
+        <translation>Создатель:</translation>
     </message>
     <message>
         <location filename="../../src/core/lv2/Lv2SubPluginFeatures.cpp" line="170"/>
@@ -1253,7 +1253,7 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../plugins/LadspaEffect/LadspaSubPluginFeatures.cpp" line="78"/>
         <source>Maker: </source>
-        <translation>Автор:</translation>
+        <translation>Создатель:</translation>
     </message>
     <message>
         <location filename="../../plugins/LadspaEffect/LadspaSubPluginFeatures.cpp" line="93"/>
@@ -1263,7 +1263,7 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../plugins/LadspaEffect/LadspaSubPluginFeatures.cpp" line="103"/>
         <source>Requires Real Time: </source>
-        <translation>Требует работать в реальном времени:</translation>
+        <translation>Требует работы в реальном времени:</translation>
     </message>
     <message>
         <location filename="../../plugins/LadspaEffect/LadspaSubPluginFeatures.cpp" line="105"/>
@@ -1321,7 +1321,7 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../plugins/VstEffect/VstEffect.cpp" line="114"/>
         <source>Loading plugin</source>
-        <translation>Загрузка модуля</translation>
+        <translation>Загружается плагин</translation>
     </message>
     <message>
         <location filename="../../plugins/VstEffect/VstEffect.cpp" line="115"/>
@@ -1407,7 +1407,7 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="99"/>
         <source>Sinc</source>
-        <translation>Приёмник</translation>
+        <translation>Sinc</translation>
     </message>
     <message>
         <location filename="../../plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="224"/>
@@ -1425,7 +1425,8 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../src/core/audio/AudioJack.cpp" line="153"/>
         <source>LMMS was kicked by JACK for some reason. Therefore the JACK backend of LMMS has been restarted. You will have to make manual connections again.</source>
-        <translation>LMMS не был подключен к JACK по какой-то причине, поэтому подключение LMMS к JACK было перезапущено. Вам придётся заново вручную создать соединения.</translation>
+        <translation>LMMS был отключён от JACK по какой-то причине. Поэтому бэкенд JACK в LMMS был перезапущен. Вам придётся восстановить соединения вручную.
+</translation>
     </message>
     <message>
         <location filename="../../src/core/audio/AudioJack.cpp" line="160"/>
@@ -1461,7 +1462,7 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../src/core/audio/AudioPortAudio.cpp" line="379"/>
         <source>Backend</source>
-        <translation>Интерфейс</translation>
+        <translation>Бэкенд</translation>
     </message>
     <message>
         <location filename="../../src/core/audio/AudioPortAudio.cpp" line="382"/>
@@ -1513,7 +1514,7 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../src/core/audio/AudioSoundIo.cpp" line="441"/>
         <source>Backend</source>
-        <translation>Интерфейс</translation>
+        <translation>Бэкенд</translation>
     </message>
     <message>
         <location filename="../../src/core/audio/AudioSoundIo.cpp" line="444"/>
@@ -1913,7 +1914,7 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../plugins/DualFilter/DualFilterControls.cpp" line="42"/>
         <source>Filter 1 enabled</source>
-        <translation>Фильтр 1 включен</translation>
+        <translation>Фильтр 1 включён</translation>
     </message>
     <message>
         <location filename="../../plugins/DualFilter/DualFilterControls.cpp" line="43"/>
@@ -1943,7 +1944,7 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../plugins/DualFilter/DualFilterControls.cpp" line="50"/>
         <source>Filter 2 enabled</source>
-        <translation>Фильтр 2 включен</translation>
+        <translation>Фильтр 2 включён</translation>
     </message>
     <message>
         <location filename="../../plugins/DualFilter/DualFilterControls.cpp" line="51"/>
@@ -2180,7 +2181,7 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../src/core/Engine.cpp" line="88"/>
         <source>Launching audio engine threads</source>
-        <translation>Запускаем потоки микшера</translation>
+        <translation>Запускаются потоки звукового движка</translation>
     </message>
 </context>
 <context>
@@ -2708,7 +2709,7 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../plugins/GranularPitchShifter/GranularPitchShifterControls.cpp" line="45"/>
         <source>Minimum Allowed Latency</source>
-        <translation type="unfinished"/>
+        <translation>Минимально допустимая задержка</translation>
     </message>
     <message>
         <location filename="../../plugins/GranularPitchShifter/GranularPitchShifterControls.cpp" line="46"/>
@@ -4901,7 +4902,7 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../src/tracks/PatternTrack.cpp" line="49"/>
         <source>Pattern %1</source>
-        <translation type="unfinished"/>
+        <translation>Шаблон %1</translation>
     </message>
     <message>
         <location filename="../../src/tracks/PatternTrack.cpp" line="197"/>
@@ -5354,12 +5355,12 @@ Reason: &quot;%2&quot;</source>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControls.cpp" line="37"/>
         <source>Type 1</source>
-        <translation type="unfinished"/>
+        <translation>Тип 1</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControls.cpp" line="38"/>
         <source>Type 2</source>
-        <translation type="unfinished"/>
+        <translation>Тип 2</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControls.cpp" line="39"/>
@@ -5484,7 +5485,7 @@ Reason: &quot;%2&quot;</source>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControls.cpp" line="63"/>
         <source>Oversample</source>
-        <translation type="unfinished"/>
+        <translation>Передискретизация</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControls.cpp" line="64"/>
@@ -5494,12 +5495,12 @@ Reason: &quot;%2&quot;</source>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControls.cpp" line="65"/>
         <source>Mix 1</source>
-        <translation type="unfinished"/>
+        <translation>Микс 1</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControls.cpp" line="66"/>
         <source>Mix 2</source>
-        <translation type="unfinished"/>
+        <translation>Миск 2</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControls.cpp" line="67"/>
@@ -5539,7 +5540,7 @@ Reason: &quot;%2&quot;</source>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControls.cpp" line="88"/>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControls.cpp" line="99"/>
         <source>Sinusoidal</source>
-        <translation type="unfinished"/>
+        <translation>Синусоидальный</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControls.cpp" line="89"/>
@@ -5651,7 +5652,7 @@ Reason: &quot;%2&quot;</source>
     <message>
         <location filename="../../src/core/Song.cpp" line="1511"/>
         <source> (repeated %1 times)</source>
-        <translation type="unfinished"/>
+        <translation> (повторено %1 раз(-а))</translation>
     </message>
     <message>
         <location filename="../../src/core/Song.cpp" line="1518"/>
@@ -5744,7 +5745,7 @@ You should convert this file into a format supported by LMMS using another softw
         <source>Couldn't open file %1 for reading.
 Please make sure you have read-permission to the file and the directory containing the file and try again!</source>
         <translation>Не удалось открыть файл %1 для записи.
-Проверьте, обладаете ли вы правами на чтение файла и содержащий его каталог и попробуйте снова!</translation>
+Проверьте, обладаете ли вы правами на чтение файла и содержащего его каталога, и попробуйте снова!</translation>
     </message>
     <message>
         <location filename="../../src/core/TrackContainer.cpp" line="98"/>
@@ -5836,7 +5837,7 @@ Please make sure you have read-permission to the file and the directory containi
     <message>
         <location filename="../../plugins/Vibed/Vibed.cpp" line="117"/>
         <source>String %1 fuzziness</source>
-        <translation>Плавание струны:</translation>
+        <translation>Дребезжание струны:</translation>
     </message>
     <message>
         <location filename="../../plugins/Vibed/Vibed.cpp" line="119"/>
@@ -6802,7 +6803,7 @@ Please make sure you have read-permission to the file and the directory containi
     <message>
         <location filename="../../plugins/CarlaBase/Carla.cpp" line="772"/>
         <source>Only show knobs with a connection.</source>
-        <translation type="unfinished"/>
+        <translation>Показывать только присоединённые ручки.</translation>
     </message>
     <message>
         <location filename="../../plugins/CarlaBase/Carla.cpp" line="870"/>
@@ -6922,12 +6923,12 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../src/gui/clips/ClipView.cpp" line="1132"/>
         <source>Disable auto-resize</source>
-        <translation type="unfinished"/>
+        <translation>Отключить автоподгонку</translation>
     </message>
     <message>
         <location filename="../../src/gui/clips/ClipView.cpp" line="1132"/>
         <source>Enable auto-resize</source>
-        <translation type="unfinished"/>
+        <translation>Включить автоподгонку</translation>
     </message>
 </context>
 <context>
@@ -6940,7 +6941,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="89"/>
         <source>Volume at which the compression begins to take place</source>
-        <translation type="unfinished"/>
+        <translation>Громкость, при которой начинает работать компрессия</translation>
     </message>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="92"/>
@@ -7090,12 +7091,12 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="164"/>
         <source>Balance between wet and dry signals</source>
-        <translation type="unfinished"/>
+        <translation>Баланс исходного и обработанного сигнала</translation>
     </message>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="167"/>
         <source>Auto Attack:</source>
-        <translation type="unfinished"/>
+        <translation>Автоматическая атака:</translation>
     </message>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="169"/>
@@ -7105,7 +7106,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="172"/>
         <source>Auto Release:</source>
-        <translation type="unfinished"/>
+        <translation>Автоматическое восстановление:</translation>
     </message>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="174"/>
@@ -7141,7 +7142,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="188"/>
         <source>Root Mean Square</source>
-        <translation type="unfinished"/>
+        <translation>Среднеквадратичное</translation>
     </message>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="191"/>
@@ -7201,12 +7202,12 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="233"/>
         <source>Unlinked</source>
-        <translation type="unfinished"/>
+        <translation>Несвязанно</translation>
     </message>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="236"/>
         <source>Compress each channel separately</source>
-        <translation type="unfinished"/>
+        <translation>Сжимать каждый канал отдельно</translation>
     </message>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="238"/>
@@ -7216,7 +7217,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="241"/>
         <source>Compress based on the loudest channel</source>
-        <translation type="unfinished"/>
+        <translation>Сжимать на основе самого громкого канала</translation>
     </message>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="243"/>
@@ -7226,7 +7227,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="246"/>
         <source>Compress based on the averaged channel volume</source>
-        <translation type="unfinished"/>
+        <translation>Сжимать на основе усреднённой громкости канала</translation>
     </message>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="248"/>
@@ -7236,7 +7237,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="251"/>
         <source>Compress based on the quietest channel</source>
-        <translation type="unfinished"/>
+        <translation>Сжимать на основе самого тихого канала</translation>
     </message>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="253"/>
@@ -7272,7 +7273,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="283"/>
         <source>Use the compressor&apos;s output as the sidechain input</source>
-        <translation type="unfinished"/>
+        <translation>Использовать выход компрессора в качестве входа боковой цепи</translation>
     </message>
     <message>
         <location filename="../../plugins/Compressor/CompressorControlDialog.cpp" line="287"/>
@@ -7430,37 +7431,37 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../plugins/CrossoverEQ/CrossoverEQControlDialog.cpp" line="68"/>
         <source>Band 1/2 crossover</source>
-        <translation type="unfinished"/>
+        <translation>Граница полос 1 и 2</translation>
     </message>
     <message>
         <location filename="../../plugins/CrossoverEQ/CrossoverEQControlDialog.cpp" line="69"/>
         <source>Band 2/3 crossover</source>
-        <translation type="unfinished"/>
+        <translation>Граница полос 2 и 3</translation>
     </message>
     <message>
         <location filename="../../plugins/CrossoverEQ/CrossoverEQControlDialog.cpp" line="70"/>
         <source>Band 3/4 crossover</source>
-        <translation type="unfinished"/>
+        <translation>Граница полос 3 и 4</translation>
     </message>
     <message>
         <location filename="../../plugins/CrossoverEQ/CrossoverEQControlDialog.cpp" line="88"/>
         <source>Band 1 gain</source>
-        <translation>Полоса 1 усиление</translation>
+        <translation>Усиление полосы 1</translation>
     </message>
     <message>
         <location filename="../../plugins/CrossoverEQ/CrossoverEQControlDialog.cpp" line="89"/>
         <source>Band 2 gain</source>
-        <translation>Полоса 2 усиление</translation>
+        <translation>Усиление полосы 2</translation>
     </message>
     <message>
         <location filename="../../plugins/CrossoverEQ/CrossoverEQControlDialog.cpp" line="90"/>
         <source>Band 3 gain</source>
-        <translation>Полоса 3 усиление</translation>
+        <translation>Усиление полосы 3</translation>
     </message>
     <message>
         <location filename="../../plugins/CrossoverEQ/CrossoverEQControlDialog.cpp" line="91"/>
         <source>Band 4 gain</source>
-        <translation>Полоса 4 усиление</translation>
+        <translation>Усиление полосы 4</translation>
     </message>
     <message>
         <location filename="../../plugins/CrossoverEQ/CrossoverEQControlDialog.cpp" line="106"/>
@@ -7576,7 +7577,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../plugins/Dispersion/DispersionControlDialog.cpp" line="60"/>
         <source>octaves</source>
-        <translation type="unfinished"/>
+        <translation>октавы</translation>
     </message>
     <message>
         <location filename="../../plugins/Dispersion/DispersionControlDialog.cpp" line="63"/>
@@ -7655,12 +7656,12 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../plugins/DualFilter/DualFilterControlDialog.cpp" line="66"/>
         <source>Filter 1 enabled</source>
-        <translation>Фильтр 1 включен</translation>
+        <translation>Фильтр 1 включён</translation>
     </message>
     <message>
         <location filename="../../plugins/DualFilter/DualFilterControlDialog.cpp" line="67"/>
         <source>Filter 2 enabled</source>
-        <translation>Фильтр 2 включен</translation>
+        <translation>Фильтр 2 включён</translation>
     </message>
     <message>
         <location filename="../../plugins/DualFilter/DualFilterControlDialog.cpp" line="71"/>
@@ -8027,7 +8028,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../src/gui/instrument/EnvelopeGraph.cpp" line="68"/>
         <source>Scaling</source>
-        <translation type="unfinished"/>
+        <translation>Масштаб</translation>
     </message>
     <message>
         <location filename="../../src/gui/instrument/EnvelopeGraph.cpp" line="89"/>
@@ -8241,7 +8242,7 @@ Please make sure you have write permission to the file and the directory contain
         <location filename="../../src/gui/widgets/Fader.cpp" line="522"/>
         <location filename="../../src/gui/widgets/Fader.cpp" line="530"/>
         <source>-inf</source>
-        <translation type="unfinished"/>
+        <translation>-беск.</translation>
     </message>
 </context>
 <context>
@@ -8282,7 +8283,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/FileBrowser.cpp" line="585"/>
         <source>Finder</source>
-        <translation type="unfinished"/>
+        <translation>Поисковик</translation>
     </message>
     <message>
         <location filename="../../src/gui/FileBrowser.cpp" line="587"/>
@@ -8292,12 +8293,12 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/FileBrowser.cpp" line="589"/>
         <source>file manager</source>
-        <translation type="unfinished"/>
+        <translation>файловый менеджер</translation>
     </message>
     <message>
         <location filename="../../src/gui/FileBrowser.cpp" line="612"/>
         <source>Show in %1</source>
-        <translation type="unfinished"/>
+        <translation>Показать в %1</translation>
     </message>
     <message>
         <location filename="../../src/gui/FileBrowser.cpp" line="618"/>
@@ -8308,12 +8309,12 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/FileBrowser.cpp" line="626"/>
         <source>Remove favorite file</source>
-        <translation type="unfinished"/>
+        <translation>Убрать избранный файл</translation>
     </message>
     <message>
         <location filename="../../src/gui/FileBrowser.cpp" line="631"/>
         <source>Add favorite file</source>
-        <translation type="unfinished"/>
+        <translation>Добавить избранный файл</translation>
     </message>
     <message>
         <location filename="../../src/gui/FileBrowser.cpp" line="640"/>
@@ -8328,17 +8329,17 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/FileBrowser.cpp" line="655"/>
         <source>Open in %1</source>
-        <translation type="unfinished"/>
+        <translation>Открыть в %1</translation>
     </message>
     <message>
         <location filename="../../src/gui/FileBrowser.cpp" line="661"/>
         <source>Remove favorite folder</source>
-        <translation type="unfinished"/>
+        <translation>Убрать избранную папку</translation>
     </message>
     <message>
         <location filename="../../src/gui/FileBrowser.cpp" line="665"/>
         <source>Add favorite folder</source>
-        <translation type="unfinished"/>
+        <translation>Добавить избранную папку</translation>
     </message>
     <message>
         <location filename="../../src/gui/FileBrowser.cpp" line="691"/>
@@ -8358,7 +8359,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/FileBrowser.cpp" line="702"/>
         <source>Send to new sample track (Shift + Enter)</source>
-        <translation type="unfinished"/>
+        <translation>Послать на новую дорожку сэмплов (Shift + Enter)</translation>
     </message>
     <message>
         <location filename="../../src/gui/FileBrowser.cpp" line="710"/>
@@ -8401,7 +8402,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/SampleLoader.cpp" line="62"/>
         <source>All audio files</source>
-        <translation type="unfinished"/>
+        <translation>Все файлы аудио</translation>
     </message>
     <message>
         <location filename="../../src/gui/SampleLoader.cpp" line="64"/>
@@ -8758,7 +8759,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../plugins/GranularPitchShifter/GranularPitchShifterControlDialog.cpp" line="63"/>
         <source>Fade Length:</source>
-        <translation type="unfinished"/>
+        <translation>Время затухания</translation>
     </message>
     <message>
         <location filename="../../plugins/GranularPitchShifter/GranularPitchShifterControlDialog.cpp" line="64"/>
@@ -9348,7 +9349,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/instrument/InstrumentTuningView.cpp" line="67"/>
         <source>Microtuner is not available for MIDI-based instruments.</source>
-        <translation type="unfinished"/>
+        <translation>Микротональный настройщик недоступен для MIDI-инструментов.</translation>
     </message>
     <message>
         <location filename="../../src/gui/instrument/InstrumentTuningView.cpp" line="72"/>
@@ -10437,12 +10438,12 @@ Double click to pick a file.</source>
     <message>
         <location filename="../../src/gui/LfoControllerDialog.cpp" line="171"/>
         <source>Multiply modulation frequency by 1</source>
-        <translation type="unfinished"/>
+        <translation>Умножить частоту модуляции на 1</translation>
     </message>
     <message>
         <location filename="../../src/gui/LfoControllerDialog.cpp" line="177"/>
         <source>Multiply modulation frequency by 100</source>
-        <translation type="unfinished"/>
+        <translation>Умножить частоту модуляции на 100</translation>
     </message>
     <message>
         <location filename="../../src/gui/LfoControllerDialog.cpp" line="183"/>
@@ -10560,7 +10561,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="133"/>
         <source>My Home</source>
-        <translation>Моя домашняя папка</translation>
+        <translation>Мой домашний каталог</translation>
     </message>
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="136"/>
@@ -10675,7 +10676,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="375"/>
         <source>&amp;Tools</source>
-        <translation>&amp;Инструменты</translation>
+        <translation>С&amp;ервис</translation>
     </message>
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="383"/>
@@ -10760,7 +10761,7 @@ Please make sure you have write permission to the file and the directory contain
         <location filename="../../src/gui/MainWindow.cpp" line="461"/>
         <location filename="../../src/gui/MainWindow.cpp" line="1066"/>
         <source>Mixer</source>
-        <translation>Микшер Эффектов</translation>
+        <translation>Микшер</translation>
     </message>
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="465"/>
@@ -11280,7 +11281,7 @@ Unity (0.0 cents or ratio 1/1) is always present as a hidden first value; do not
     <message>
         <location filename="../../src/gui/MicrotunerConfig.cpp" line="117"/>
         <source>Apply scale changes</source>
-        <translation type="unfinished"/>
+        <translation>Применить изменения масштаба</translation>
     </message>
     <message>
         <location filename="../../src/gui/MicrotunerConfig.cpp" line="118"/>
@@ -11708,7 +11709,10 @@ Enter &apos;x&apos; if you wish to leave the key disabled / not mapped.</source>
 Are you sure you want to remove this channel?
 
 Warning: This operation can not be undone.</source>
-        <translation type="unfinished"/>
+        <translation>Этот канал микшера занят.
+Уверены, что хотите его убрать?
+
+Предупреждение: Это действие необратимо.</translation>
     </message>
     <message>
         <location filename="../../src/gui/MixerChannelView.cpp" line="343"/>
@@ -12473,7 +12477,7 @@ Warning: This operation can not be undone.</source>
     <message>
         <location filename="../../src/gui/widgets/PeakIndicator.cpp" line="74"/>
         <source>-inf</source>
-        <translation type="unfinished"/>
+        <translation>-беск.</translation>
     </message>
 </context>
 <context>
@@ -12551,7 +12555,7 @@ Warning: This operation can not be undone.</source>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="430"/>
         <source>Snap</source>
-        <translation type="unfinished"/>
+        <translation>Привязка</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="464"/>
@@ -12776,7 +12780,7 @@ Warning: This operation can not be undone.</source>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="5099"/>
         <source>Snap mode</source>
-        <translation type="unfinished"/>
+        <translation>Режим привязки</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="5104"/>
@@ -12921,7 +12925,7 @@ Warning: This operation can not be undone.</source>
     <message>
         <location filename="../../src/gui/ProjectNotes.cpp" line="118"/>
         <source>&amp;Redo</source>
-        <translation>Ве&amp;рнуть</translation>
+        <translation>&amp;Вернуть</translation>
     </message>
     <message>
         <location filename="../../src/gui/ProjectNotes.cpp" line="120"/>
@@ -13543,7 +13547,7 @@ Warning: This operation can not be undone.</source>
     <message>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="253"/>
         <source>Show warning when deleting tracks</source>
-        <translation type="unfinished"/>
+        <translation>Показывать предупреждение при удалении дорожек</translation>
     </message>
     <message>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="255"/>
@@ -13680,7 +13684,7 @@ Warning: This operation can not be undone.</source>
     <message>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="470"/>
         <source>Audio interface</source>
-        <translation>Аудио-интерфейс</translation>
+        <translation>Интерфейс аудио</translation>
     </message>
     <message>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="562"/>
@@ -13726,12 +13730,12 @@ Warning: This operation can not be undone.</source>
     <message>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="757"/>
         <source>Auto-quantize notes in Piano Roll</source>
-        <translation type="unfinished"/>
+        <translation>Квантизация нот в пианоролле</translation>
     </message>
     <message>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="761"/>
         <source>If enabled, notes will be automatically quantized when recording them from a MIDI controller. If disabled, they are always recorded at the highest possible resolution.</source>
-        <translation type="unfinished"/>
+        <translation>Если включена, то ноты будут автоматически квантованы при записи с MIDI-контроллера. В противном случае ноты будут записаны с максимально возможной дискретизацией.</translation>
     </message>
     <message>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="780"/>
@@ -13757,7 +13761,7 @@ Warning: This operation can not be undone.</source>
     <message>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="829"/>
         <source>SF2 directory</source>
-        <translation>Папка SF2</translation>
+        <translation>Каталог SF2</translation>
     </message>
     <message>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="834"/>
@@ -13767,12 +13771,12 @@ Warning: This operation can not be undone.</source>
     <message>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="839"/>
         <source>GIG directory</source>
-        <translation>Папка GIG</translation>
+        <translation>Каталог GIG</translation>
     </message>
     <message>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="843"/>
         <source>Theme directory</source>
-        <translation>Папка для тем</translation>
+        <translation>Каталог тем</translation>
     </message>
     <message>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="847"/>
@@ -14122,22 +14126,22 @@ Latency: %2 ms</source>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControlDialog.cpp" line="124"/>
         <source>Attack 1:</source>
-        <translation type="unfinished"/>
+        <translation>Атака 1:</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControlDialog.cpp" line="125"/>
         <source>Attack 2:</source>
-        <translation type="unfinished"/>
+        <translation>Атака 2:</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControlDialog.cpp" line="126"/>
         <source>Release 1:</source>
-        <translation type="unfinished"/>
+        <translation>Восстановление 1:</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControlDialog.cpp" line="127"/>
         <source>Release 2:</source>
-        <translation type="unfinished"/>
+        <translation>Восстановление 2:</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControlDialog.cpp" line="128"/>
@@ -14187,42 +14191,42 @@ Latency: %2 ms</source>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControlDialog.cpp" line="171"/>
         <source>Mix 1:</source>
-        <translation type="unfinished"/>
+        <translation>Микс 1:</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControlDialog.cpp" line="172"/>
         <source>Mix 2:</source>
-        <translation type="unfinished"/>
+        <translation>Микс 2:</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControlDialog.cpp" line="174"/>
         <source>Disable Oversampling</source>
-        <translation type="unfinished"/>
+        <translation>Отключить передискретизацию</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControlDialog.cpp" line="175"/>
         <source>2x Oversampling</source>
-        <translation type="unfinished"/>
+        <translation>Передискретизация 2x</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControlDialog.cpp" line="176"/>
         <source>4x Oversampling</source>
-        <translation type="unfinished"/>
+        <translation>Передискретизация 4x</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControlDialog.cpp" line="177"/>
         <source>8x Oversampling</source>
-        <translation type="unfinished"/>
+        <translation>Передискретизация 8x</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControlDialog.cpp" line="178"/>
         <source>16x Oversampling</source>
-        <translation type="unfinished"/>
+        <translation>Передискретизация 16x</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControlDialog.cpp" line="179"/>
         <source>32x Oversampling</source>
-        <translation type="unfinished"/>
+        <translation>Передискретизация 32x</translation>
     </message>
     <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortionControlDialog.cpp" line="194"/>
@@ -14324,7 +14328,7 @@ Latency: %2 ms</source>
     <message>
         <location filename="../../plugins/SlicerT/SlicerTView.cpp" line="245"/>
         <source>Snap</source>
-        <translation type="unfinished"/>
+        <translation>Привязка</translation>
     </message>
 </context>
 <context>
@@ -14347,7 +14351,7 @@ Latency: %2 ms</source>
         <source>Could not open file %1. You probably have no permissions to read this file.
  Please make sure to have at least read permissions to the file and try again.</source>
         <translation>Не удалось открыть файл %1. Вероятно, у вас нет прав на его чтение.
-Проверьте, есть ли у вас права на чтение этого файла и попробуйте снова.</translation>
+Проверьте, есть ли у вас права на чтение этого файла, и попробуйте снова.</translation>
     </message>
     <message>
         <location filename="../../src/core/DataFile.cpp" line="356"/>
@@ -14395,7 +14399,7 @@ Latency: %2 ms</source>
     <message>
         <location filename="../../src/core/DataFile.cpp" line="418"/>
         <source>An unknown error has occurred and the file could not be saved.</source>
-        <translation type="unfinished"/>
+        <translation>Произошла неизвестная ошибка, и файл не удалось сохранить.</translation>
     </message>
     <message>
         <location filename="../../src/core/DataFile.cpp" line="2146"/>

@@ -1069,7 +1069,7 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <location filename="../../plugins/Xpressive/Xpressive.cpp" line="56"/>
         <source>Mathematical expression parser</source>
-        <translation type="unfinished"/>
+        <translation>數學表達式解析器</translation>
     </message>
     <message>
         <location filename="../../plugins/ZynAddSubFx/ZynAddSubFx.cpp" line="66"/>
@@ -7405,7 +7405,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../src/gui/ControllerView.cpp" line="183"/>
         <source>&amp;Remove this controller</source>
-        <translation type="unfinished"/>
+        <translation>刪除此控制器(&amp;R)</translation>
     </message>
     <message>
         <location filename="../../src/gui/ControllerView.cpp" line="184"/>
@@ -9118,7 +9118,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/instrument/InstrumentSoundShapingView.cpp" line="84"/>
         <source>Envelopes, LFOs and filters are not supported by the current instrument.</source>
-        <translation>包絡和低頻振盪 (LFO) 不被當前樂器支持。</translation>
+        <translation>包絡、低頻振盪(LFO)和濾波器不被目前樂器支持。</translation>
     </message>
 </context>
 <context>
@@ -10860,7 +10860,7 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="1081"/>
         <source>Fullscreen</source>
-        <translation type="unfinished"/>
+        <translation>全螢幕</translation>
     </message>
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="1090"/>

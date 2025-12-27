@@ -74,47 +74,47 @@ Se você estiver interessado em traduzir LMMS para outro idioma ou quer melhorar
     <message>
         <location filename="../../include/AudioAlsa.h" line="76"/>
         <source>ALSA (Advanced Linux Sound Architecture)</source>
-        <translation type="unfinished"/>
+        <translation>ALSA (Advanced Linux Sound Architecture)</translation>
     </message>
     <message>
         <location filename="../../include/AudioDummy.h" line="53"/>
         <source>Dummy (no sound output)</source>
-        <translation type="unfinished"/>
+        <translation>Dummy (sem saída de som)</translation>
     </message>
     <message>
         <location filename="../../include/AudioJack.h" line="75"/>
         <source>JACK (JACK Audio Connection Kit)</source>
-        <translation type="unfinished"/>
+        <translation>JACK (JACK Audio Connection Kit)</translation>
     </message>
     <message>
         <location filename="../../include/AudioOss.h" line="58"/>
         <source>OSS (Open Sound System)</source>
-        <translation type="unfinished"/>
+        <translation>OSS (Open Sound System)</translation>
     </message>
     <message>
         <location filename="../../include/AudioPortAudio.h" line="83"/>
         <source>PortAudio</source>
-        <translation type="unfinished"/>
+        <translation>PortAudio</translation>
     </message>
     <message>
         <location filename="../../include/AudioPulseAudio.h" line="59"/>
         <source>PulseAudio</source>
-        <translation type="unfinished"/>
+        <translation>PulseAudio</translation>
     </message>
     <message>
         <location filename="../../include/AudioSdl.h" line="50"/>
         <source>SDL (Simple DirectMedia Layer)</source>
-        <translation type="unfinished"/>
+        <translation>SDL (Simple DirectMedia Layer)</translation>
     </message>
     <message>
         <location filename="../../include/AudioSndio.h" line="59"/>
         <source>sndio</source>
-        <translation type="unfinished"/>
+        <translation>sndio</translation>
     </message>
     <message>
         <location filename="../../include/AudioSoundIo.h" line="69"/>
         <source>soundio</source>
-        <translation type="unfinished"/>
+        <translation>soundio</translation>
     </message>
     <message>
         <location filename="../../src/core/audio/AudioSdl.cpp" line="226"/>
@@ -734,42 +734,42 @@ Se você estiver interessado em traduzir LMMS para outro idioma ou quer melhorar
     <message>
         <location filename="../../include/MidiAlsaRaw.h" line="57"/>
         <source>ALSA Raw-MIDI (Advanced Linux Sound Architecture)</source>
-        <translation type="unfinished"/>
+        <translation>ALSA Raw-MIDI (Advanced Linux Sound Architecture)</translation>
     </message>
     <message>
         <location filename="../../include/MidiAlsaSeq.h" line="60"/>
         <source>ALSA-Sequencer (Advanced Linux Sound Architecture)</source>
-        <translation type="unfinished"/>
+        <translation>ALSA-Sequencer (Advanced Linux Sound Architecture)</translation>
     </message>
     <message>
         <location filename="../../include/MidiApple.h" line="59"/>
         <source>Apple MIDI</source>
-        <translation type="unfinished"/>
+        <translation>Apple MIDI</translation>
     </message>
     <message>
         <location filename="../../include/MidiDummy.h" line="43"/>
         <source>Dummy (no MIDI support)</source>
-        <translation type="unfinished"/>
+        <translation>Dummy (sem suporte MIDI)</translation>
     </message>
     <message>
         <location filename="../../include/MidiJack.h" line="63"/>
         <source>Jack-MIDI</source>
-        <translation type="unfinished"/>
+        <translation>Jack-MIDI</translation>
     </message>
     <message>
         <location filename="../../include/MidiOss.h" line="54"/>
         <source>OSS Raw-MIDI (Open Sound System)</source>
-        <translation type="unfinished"/>
+        <translation>OSS Raw-MIDI (Open Sound System)</translation>
     </message>
     <message>
         <location filename="../../include/MidiSndio.h" line="55"/>
         <source>sndio MIDI</source>
-        <translation type="unfinished"/>
+        <translation>sndio MIDI</translation>
     </message>
     <message>
         <location filename="../../include/MidiWinMM.h" line="60"/>
         <source>WinMM MIDI</source>
-        <translation type="unfinished"/>
+        <translation>WinMM MIDI</translation>
     </message>
 </context>
 <context>
@@ -2092,7 +2092,7 @@ Este chip foi utilizado no computador Commodore 64.</translation>
     <message>
         <location filename="../../include/DummyEffect.h" line="139"/>
         <source>NOT FOUND</source>
-        <translation type="unfinished"/>
+        <translation>NÃO ENCONTRADO</translation>
     </message>
 </context>
 <context>
@@ -5840,7 +5840,7 @@ Por favor certifique-se que você tem permissões de leitura para o arquivo e pa
     <message>
         <location filename="../../plugins/Vibed/Vibed.cpp" line="122"/>
         <source>String %1</source>
-        <translation type="unfinished"/>
+        <translation>Corda %1</translation>
     </message>
 </context>
 <context>
@@ -6377,7 +6377,7 @@ Por favor certifique-se que você tem permissões de leitura para o arquivo e pa
     <message>
         <location filename="../../src/gui/clips/AutomationClipView.cpp" line="436"/>
         <source>Model is already connected to this clip.</source>
-        <translation type="unfinished"/>
+        <translation>O modelo já está conectado a este clipe.</translation>
     </message>
 </context>
 <context>
@@ -6390,17 +6390,17 @@ Por favor certifique-se que você tem permissões de leitura para o arquivo e pa
     <message>
         <location filename="../../src/gui/editors/AutomationEditor.cpp" line="358"/>
         <source>New outValue</source>
-        <translation type="unfinished"/>
+        <translation>Novo valor de saída</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/AutomationEditor.cpp" line="359"/>
         <source>New inValue</source>
-        <translation type="unfinished"/>
+        <translation>Novo valor de entrada</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/AutomationEditor.cpp" line="1416"/>
         <source>Please open an automation clip by double-clicking on it!</source>
-        <translation type="unfinished"/>
+        <translation>Por favor abra um clipe de automação por dar um clique duplo nele!</translation>
     </message>
 </context>
 <context>
@@ -6408,12 +6408,12 @@ Por favor certifique-se que você tem permissões de leitura para o arquivo e pa
     <message>
         <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2054"/>
         <source>Play/pause current clip (Space)</source>
-        <translation type="unfinished"/>
+        <translation>Tocar/pausar o clipe atual (Espaço)</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2056"/>
         <source>Stop playing of current clip (Space)</source>
-        <translation type="unfinished"/>
+        <translation>Parar de tocar o clipe atual (Espaço)</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2059"/>
@@ -6433,12 +6433,12 @@ Por favor certifique-se que você tem permissões de leitura para o arquivo e pa
     <message>
         <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2069"/>
         <source>Draw outValues mode (Shift+C)</source>
-        <translation type="unfinished"/>
+        <translation>Modo desenhar valores de saída (Shift+C)</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2072"/>
         <source>Edit tangents mode (Shift+T)</source>
-        <translation type="unfinished"/>
+        <translation>Modo editor de tangentes (Shift+T)</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2076"/>
@@ -6508,13 +6508,13 @@ Por favor certifique-se que você tem permissões de leitura para o arquivo e pa
     <message>
         <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2186"/>
         <source>Clear ghost notes</source>
-        <translation type="unfinished"/>
+        <translation>Limpar notas fantasmas</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2218"/>
         <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2334"/>
         <source>Automation Editor - no clip</source>
-        <translation type="unfinished"/>
+        <translation>Editor de Automação - sem clipe</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2222"/>
@@ -6525,7 +6525,7 @@ Por favor certifique-se que você tem permissões de leitura para o arquivo e pa
     <message>
         <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2275"/>
         <source>Model is already connected to this clip.</source>
-        <translation type="unfinished"/>
+        <translation>O modelo já está conectado a este clipe.</translation>
     </message>
 </context>
 <context>
@@ -6730,27 +6730,27 @@ Por favor certifique-se que você tem permissões de leitura para o arquivo e pa
     <message>
         <location filename="../../src/gui/widgets/CPULoadWidget.cpp" line="102"/>
         <source>DSP total: %1%</source>
-        <translation type="unfinished"/>
+        <translation>DSP total: %1%</translation>
     </message>
     <message>
         <location filename="../../src/gui/widgets/CPULoadWidget.cpp" line="103"/>
         <source> - Notes and setup: %1%</source>
-        <translation type="unfinished"/>
+        <translation> - Notas and setup: %1%</translation>
     </message>
     <message>
         <location filename="../../src/gui/widgets/CPULoadWidget.cpp" line="104"/>
         <source> - Instruments: %1%</source>
-        <translation type="unfinished"/>
+        <translation> - Instrumentos: %1%</translation>
     </message>
     <message>
         <location filename="../../src/gui/widgets/CPULoadWidget.cpp" line="105"/>
         <source> - Effects: %1%</source>
-        <translation type="unfinished"/>
+        <translation> - Efeitos: %1%</translation>
     </message>
     <message>
         <location filename="../../src/gui/widgets/CPULoadWidget.cpp" line="106"/>
         <source> - Mixing: %1%</source>
-        <translation type="unfinished"/>
+        <translation> - Mixagem: %1%</translation>
     </message>
 </context>
 <context>
@@ -6809,7 +6809,7 @@ Por favor certifique-se que você tem permissões de leitura para o arquivo e pa
     <message>
         <location filename="../../src/gui/clips/ClipView.cpp" line="705"/>
         <source>Current length</source>
-        <translation type="unfinished"/>
+        <translation>Tamanho atual</translation>
     </message>
     <message>
         <location filename="../../src/gui/clips/ClipView.cpp" line="706"/>
@@ -6820,23 +6820,24 @@ Por favor certifique-se que você tem permissões de leitura para o arquivo e pa
     <message>
         <location filename="../../src/gui/clips/ClipView.cpp" line="727"/>
         <source>Press &lt;%1&gt; and drag to make a copy.</source>
-        <translation type="unfinished"/>
+        <translation>Pressione &lt;%1&gt; e arraste para fazer uma cópia.</translation>
     </message>
     <message>
         <location filename="../../src/gui/clips/ClipView.cpp" line="732"/>
         <source>Press &lt;%1&gt; or &lt;Alt&gt; for unquantized splitting.
 Press &lt;Shift&gt; for destructive splitting.</source>
-        <translation type="unfinished"/>
+        <translation>Pressione &lt;%1&gt; ou &lt;Alt&gt; para divisão não quantizada
+Pressione &lt;Shift&gt; para divisão destrutiva.</translation>
     </message>
     <message>
         <location filename="../../src/gui/clips/ClipView.cpp" line="733"/>
         <source>Press &lt;%1&gt; or &lt;Alt&gt; for unquantized splitting.</source>
-        <translation type="unfinished"/>
+        <translation>Pressione &lt;%1&gt; ou &lt;Alt&gt; para divisão não quantizada.</translation>
     </message>
     <message>
         <location filename="../../src/gui/clips/ClipView.cpp" line="737"/>
         <source>Press &lt;%1&gt; or &lt;Alt&gt; for unquantized resizing.</source>
-        <translation type="unfinished"/>
+        <translation>Pressione &lt;%1&gt; ou &lt;Alt&gt; para redimensionamento não quantizado</translation>
     </message>
     <message>
         <location filename="../../src/gui/clips/ClipView.cpp" line="739"/>
@@ -6851,7 +6852,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../src/gui/clips/ClipView.cpp" line="1087"/>
         <source>Delete selection (middle mousebutton)</source>
-        <translation type="unfinished"/>
+        <translation>Apagar seleção (botão do meio do mouse)</translation>
     </message>
     <message>
         <location filename="../../src/gui/clips/ClipView.cpp" line="1095"/>
@@ -6861,7 +6862,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../src/gui/clips/ClipView.cpp" line="1096"/>
         <source>Cut selection</source>
-        <translation type="unfinished"/>
+        <translation>Cortar seleção</translation>
     </message>
     <message>
         <location filename="../../src/gui/clips/ClipView.cpp" line="1103"/>
@@ -6871,7 +6872,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../src/gui/clips/ClipView.cpp" line="1104"/>
         <source>Copy selection</source>
-        <translation type="unfinished"/>
+        <translation>Copiar seleção</translation>
     </message>
     <message>
         <location filename="../../src/gui/clips/ClipView.cpp" line="1109"/>
@@ -6891,7 +6892,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../src/gui/clips/ClipView.cpp" line="1123"/>
         <source>Clip color</source>
-        <translation type="unfinished"/>
+        <translation>Cor do clipe</translation>
     </message>
     <message>
         <location filename="../../src/gui/clips/ClipView.cpp" line="1125"/>
@@ -6906,17 +6907,17 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../src/gui/clips/ClipView.cpp" line="1127"/>
         <source>Pick random</source>
-        <translation type="unfinished"/>
+        <translation>Seleção aleatória</translation>
     </message>
     <message>
         <location filename="../../src/gui/clips/ClipView.cpp" line="1132"/>
         <source>Disable auto-resize</source>
-        <translation type="unfinished"/>
+        <translation>Desativar tamanho automático</translation>
     </message>
     <message>
         <location filename="../../src/gui/clips/ClipView.cpp" line="1132"/>
         <source>Enable auto-resize</source>
-        <translation type="unfinished"/>
+        <translation>Ativar tamanho automático</translation>
     </message>
 </context>
 <context>
@@ -7826,12 +7827,12 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../src/gui/modals/EffectSelectDialog.cpp" line="111"/>
         <source>All</source>
-        <translation type="unfinished"/>
+        <translation>Todos</translation>
     </message>
     <message>
         <location filename="../../src/gui/modals/EffectSelectDialog.cpp" line="145"/>
         <source>Search</source>
-        <translation type="unfinished"/>
+        <translation>Procurar</translation>
     </message>
     <message>
         <location filename="../../src/gui/modals/EffectSelectDialog.cpp" line="287"/>
@@ -8008,7 +8009,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="276"/>
         <source>Drag and drop a sample into this window.</source>
-        <translation type="unfinished"/>
+        <translation>Arraste e solte uma amostra nesta janela</translation>
     </message>
 </context>
 <context>
@@ -8016,12 +8017,12 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../src/gui/instrument/EnvelopeGraph.cpp" line="68"/>
         <source>Scaling</source>
-        <translation type="unfinished"/>
+        <translation>Escala</translation>
     </message>
     <message>
         <location filename="../../src/gui/instrument/EnvelopeGraph.cpp" line="89"/>
         <source>Dynamic</source>
-        <translation type="unfinished"/>
+        <translation>Dinâmica</translation>
     </message>
     <message>
         <location filename="../../src/gui/instrument/EnvelopeGraph.cpp" line="90"/>
@@ -8031,7 +8032,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../src/gui/instrument/EnvelopeGraph.cpp" line="93"/>
         <source>Absolute</source>
-        <translation type="unfinished"/>
+        <translation>Absoluta</translation>
     </message>
     <message>
         <location filename="../../src/gui/instrument/EnvelopeGraph.cpp" line="94"/>
@@ -8041,7 +8042,7 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     <message>
         <location filename="../../src/gui/instrument/EnvelopeGraph.cpp" line="97"/>
         <source>Relative</source>
-        <translation type="unfinished"/>
+        <translation>Relativa</translation>
     </message>
     <message>
         <location filename="../../src/gui/instrument/EnvelopeGraph.cpp" line="98"/>
@@ -8169,7 +8170,8 @@ Press &lt;Shift&gt; for destructive splitting.</source>
         <location filename="../../src/core/audio/AudioFileDevice.cpp" line="51"/>
         <source>Could not open file %1 for writing.
 Please make sure you have write permission to the file and the directory containing the file and try again!</source>
-        <translation type="unfinished"/>
+        <translation>Não pôde abrir o arquivo %1 para escrita.
+Por favor certifique que você tem permissão para gravar o aquivo e o diretório contendo o arquivo e tente novamente!</translation>
     </message>
     <message>
         <location filename="../../src/gui/modals/ExportProjectDialog.cpp" line="47"/>
@@ -8179,17 +8181,17 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/modals/ExportProjectDialog.cpp" line="87"/>
         <source>( Fastest - biggest )</source>
-        <translation type="unfinished"/>
+        <translation>( Mais rápido - maior )</translation>
     </message>
     <message>
         <location filename="../../src/gui/modals/ExportProjectDialog.cpp" line="88"/>
         <source>( Slowest - smallest )</source>
-        <translation type="unfinished"/>
+        <translation>( Mais lento - menor )</translation>
     </message>
     <message>
         <location filename="../../src/gui/modals/ExportProjectDialog.cpp" line="103"/>
         <source>%1 Hz</source>
-        <translation type="unfinished"/>
+        <translation>%1 Hz</translation>
     </message>
     <message>
         <location filename="../../src/gui/modals/ExportProjectDialog.cpp" line="260"/>
@@ -8213,7 +8215,7 @@ Please make sure you have write permission to the file and the directory contain
         <location filename="../../src/gui/widgets/Fader.cpp" line="136"/>
         <location filename="../../src/gui/widgets/Fader.cpp" line="151"/>
         <source>Set value</source>
-        <translation type="unfinished"/>
+        <translation>Alterar valor</translation>
     </message>
     <message>
         <location filename="../../src/gui/widgets/Fader.cpp" line="137"/>
@@ -8224,13 +8226,13 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/widgets/Fader.cpp" line="515"/>
         <source>Volume: %1 dB</source>
-        <translation type="unfinished"/>
+        <translation>Volume: %1 dB</translation>
     </message>
     <message>
         <location filename="../../src/gui/widgets/Fader.cpp" line="522"/>
         <location filename="../../src/gui/widgets/Fader.cpp" line="530"/>
         <source>-inf</source>
-        <translation type="unfinished"/>
+        <translation>-inf</translation>
     </message>
 </context>
 <context>
@@ -8243,27 +8245,27 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/FileBrowser.cpp" line="104"/>
         <source>Search</source>
-        <translation type="unfinished"/>
+        <translation>Procurar</translation>
     </message>
     <message>
         <location filename="../../src/gui/FileBrowser.cpp" line="114"/>
         <source>Refresh list</source>
-        <translation type="unfinished"/>
+        <translation>Atualizar lista</translation>
     </message>
     <message>
         <location filename="../../src/gui/FileBrowser.cpp" line="185"/>
         <source>User content</source>
-        <translation type="unfinished"/>
+        <translation>Conteúdo do usuário</translation>
     </message>
     <message>
         <location filename="../../src/gui/FileBrowser.cpp" line="190"/>
         <source>Factory content</source>
-        <translation type="unfinished"/>
+        <translation>Conteúdo de fábrica</translation>
     </message>
     <message>
         <location filename="../../src/gui/FileBrowser.cpp" line="194"/>
         <source>Hidden content</source>
-        <translation type="unfinished"/>
+        <translation>Conteúdo oculto</translation>
     </message>
 </context>
 <context>
@@ -8271,22 +8273,22 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/FileBrowser.cpp" line="585"/>
         <source>Finder</source>
-        <translation type="unfinished"/>
+        <translation>Encontrar</translation>
     </message>
     <message>
         <location filename="../../src/gui/FileBrowser.cpp" line="587"/>
         <source>Explorer</source>
-        <translation type="unfinished"/>
+        <translation>Explorador</translation>
     </message>
     <message>
         <location filename="../../src/gui/FileBrowser.cpp" line="589"/>
         <source>file manager</source>
-        <translation type="unfinished"/>
+        <translation>gerenciador de arquivos</translation>
     </message>
     <message>
         <location filename="../../src/gui/FileBrowser.cpp" line="612"/>
         <source>Show in %1</source>
-        <translation type="unfinished"/>
+        <translation>Mostrar em %1</translation>
     </message>
     <message>
         <location filename="../../src/gui/FileBrowser.cpp" line="618"/>
@@ -8297,12 +8299,12 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/FileBrowser.cpp" line="626"/>
         <source>Remove favorite file</source>
-        <translation type="unfinished"/>
+        <translation>Remover arquivo favorito</translation>
     </message>
     <message>
         <location filename="../../src/gui/FileBrowser.cpp" line="631"/>
         <source>Add favorite file</source>
-        <translation type="unfinished"/>
+        <translation>Adicionar arquivo favorito</translation>
     </message>
     <message>
         <location filename="../../src/gui/FileBrowser.cpp" line="640"/>
@@ -8312,27 +8314,27 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/FileBrowser.cpp" line="645"/>
         <source>Pattern Editor</source>
-        <translation type="unfinished"/>
+        <translation>Editor de Sequências</translation>
     </message>
     <message>
         <location filename="../../src/gui/FileBrowser.cpp" line="655"/>
         <source>Open in %1</source>
-        <translation type="unfinished"/>
+        <translation>Abrir em %1</translation>
     </message>
     <message>
         <location filename="../../src/gui/FileBrowser.cpp" line="661"/>
         <source>Remove favorite folder</source>
-        <translation type="unfinished"/>
+        <translation>Remover pasta favorita</translation>
     </message>
     <message>
         <location filename="../../src/gui/FileBrowser.cpp" line="665"/>
         <source>Add favorite folder</source>
-        <translation type="unfinished"/>
+        <translation>Adicionar pasta favorita</translation>
     </message>
     <message>
         <location filename="../../src/gui/FileBrowser.cpp" line="691"/>
         <source>Send to new AudioFileProcessor instance</source>
-        <translation type="unfinished"/>
+        <translation>Enviar para uma nova instância de AudioFileProcessor</translation>
     </message>
     <message>
         <location filename="../../src/gui/FileBrowser.cpp" line="692"/>
@@ -8342,17 +8344,17 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/FileBrowser.cpp" line="695"/>
         <source> (%2Enter)</source>
-        <translation type="unfinished"/>
+        <translation> (%2Enter)</translation>
     </message>
     <message>
         <location filename="../../src/gui/FileBrowser.cpp" line="702"/>
         <source>Send to new sample track (Shift + Enter)</source>
-        <translation type="unfinished"/>
+        <translation>Enviar para uma nova trilha de áudio (Shift + Enter)</translation>
     </message>
     <message>
         <location filename="../../src/gui/FileBrowser.cpp" line="710"/>
         <source>Send to new SlicerT instance</source>
-        <translation type="unfinished"/>
+        <translation>Enviar para uma nova instância de SlicerT</translation>
     </message>
     <message>
         <location filename="../../src/gui/FileBrowser.cpp" line="767"/>
@@ -8372,7 +8374,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/FileBrowser.cpp" line="799"/>
         <source>%1 does not appear to be a valid %2 file</source>
-        <translation type="unfinished"/>
+        <translation>%1 não parece ser um arquivo %2 válido</translation>
     </message>
     <message>
         <location filename="../../src/gui/FileBrowser.cpp" line="1091"/>
@@ -8390,7 +8392,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/SampleLoader.cpp" line="62"/>
         <source>All audio files</source>
-        <translation type="unfinished"/>
+        <translation>Todos os arquivos de áudio</translation>
     </message>
     <message>
         <location filename="../../src/gui/SampleLoader.cpp" line="64"/>
@@ -8482,12 +8484,12 @@ Please make sure you have write permission to the file and the directory contain
         <location filename="../../src/gui/widgets/FloatModelEditorBase.cpp" line="385"/>
         <location filename="../../src/gui/widgets/FloatModelEditorBase.cpp" line="402"/>
         <source>Set value</source>
-        <translation type="unfinished"/>
+        <translation>Alterar valor</translation>
     </message>
     <message>
         <location filename="../../src/gui/widgets/FloatModelEditorBase.cpp" line="386"/>
         <source>Please enter a new value between -96.0 dBFS and 6.0 dBFS:</source>
-        <translation type="unfinished"/>
+        <translation>Por favor insira um novo valor entre -96.0 dBFS e 6.0 dBFS:</translation>
     </message>
     <message>
         <location filename="../../src/gui/widgets/FloatModelEditorBase.cpp" line="403"/>
@@ -8699,7 +8701,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../plugins/GigPlayer/GigPlayer.cpp" line="936"/>
         <source>Choose patch</source>
-        <translation type="unfinished"/>
+        <translation>Escolher programa</translation>
     </message>
     <message>
         <location filename="../../plugins/GigPlayer/GigPlayer.cpp" line="953"/>
@@ -8866,22 +8868,22 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="101"/>
         <source>REP</source>
-        <translation type="unfinished"/>
+        <translation>REP</translation>
     </message>
     <message>
         <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="102"/>
         <source>CYCLE</source>
-        <translation type="unfinished"/>
+        <translation>CICLO</translation>
     </message>
     <message>
         <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="103"/>
         <source>SKIP</source>
-        <translation type="unfinished"/>
+        <translation>SALTAR</translation>
     </message>
     <message>
         <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="104"/>
         <source>MISS</source>
-        <translation type="unfinished"/>
+        <translation>FALTAR</translation>
     </message>
     <message>
         <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="105"/>
@@ -8906,17 +8908,17 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="121"/>
         <source>Note repeats:</source>
-        <translation type="unfinished"/>
+        <translation>Repetição de notas:</translation>
     </message>
     <message>
         <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="121"/>
         <source>time(s)</source>
-        <translation type="unfinished"/>
+        <translation>vez(es)</translation>
     </message>
     <message>
         <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="122"/>
         <source>Cycle notes:</source>
-        <translation type="unfinished"/>
+        <translation>Ciclo de notas:</translation>
     </message>
     <message>
         <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="122"/>
@@ -8926,7 +8928,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="123"/>
         <source>Skip rate:</source>
-        <translation type="unfinished"/>
+        <translation>Taxa de saltos:</translation>
     </message>
     <message>
         <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="123"/>
@@ -8938,7 +8940,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="124"/>
         <source>Miss rate:</source>
-        <translation type="unfinished"/>
+        <translation>Taxa de faltas:</translation>
     </message>
     <message>
         <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="125"/>
@@ -9011,14 +9013,14 @@ Please make sure you have write permission to the file and the directory contain
         <location filename="../../src/gui/instrument/InstrumentMidiIOView.cpp" line="92"/>
         <source>CHAN</source>
         <extracomment>This string must be be short, its width must be less than * width of LCD spin-box of two digits</extracomment>
-        <translation type="unfinished"/>
+        <translation>CNL</translation>
     </message>
     <message>
         <location filename="../../src/gui/instrument/InstrumentMidiIOView.cpp" line="69"/>
         <location filename="../../src/gui/instrument/InstrumentMidiIOView.cpp" line="99"/>
         <source>VELOC</source>
         <extracomment>This string must be be short, its width must be less than * width of LCD spin-box of three digits</extracomment>
-        <translation type="unfinished"/>
+        <translation>VELOC</translation>
     </message>
     <message>
         <location filename="../../src/gui/instrument/InstrumentMidiIOView.cpp" line="81"/>
@@ -9029,7 +9031,7 @@ Please make sure you have write permission to the file and the directory contain
         <location filename="../../src/gui/instrument/InstrumentMidiIOView.cpp" line="106"/>
         <source>PROG</source>
         <extracomment>This string must be be short, its width must be less than the * width of LCD spin-box of three digits</extracomment>
-        <translation type="unfinished"/>
+        <translation>PROG</translation>
     </message>
     <message>
         <location filename="../../src/gui/instrument/InstrumentMidiIOView.cpp" line="114"/>
@@ -9050,17 +9052,17 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/instrument/InstrumentMidiIOView.cpp" line="145"/>
         <source>VELOCITY MAPPING</source>
-        <translation type="unfinished"/>
+        <translation>MAPEAMENTO DE VELOCIDADE</translation>
     </message>
     <message>
         <location filename="../../src/gui/instrument/InstrumentMidiIOView.cpp" line="154"/>
         <source>MIDI VELOCITY</source>
-        <translation type="unfinished"/>
+        <translation>VELOCIDADE MIDI</translation>
     </message>
     <message>
         <location filename="../../src/gui/instrument/InstrumentMidiIOView.cpp" line="155"/>
         <source>MIDI notes at this velocity correspond to 100% note velocity.</source>
-        <translation type="unfinished"/>
+        <translation>Notas MIDI nesta velocidade corresponde a 100% de velocidade</translation>
     </message>
 </context>
 <context>
@@ -9176,7 +9178,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/tracks/InstrumentTrackView.cpp" line="389"/>
         <source>%1: %2</source>
-        <translation type="unfinished"/>
+        <translation>%1: %2</translation>
     </message>
 </context>
 <context>
@@ -9189,7 +9191,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="153"/>
         <source>Mute this instrument</source>
-        <translation type="unfinished"/>
+        <translation>Mutar este instrumento</translation>
     </message>
     <message>
         <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="156"/>
@@ -9199,7 +9201,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="160"/>
         <source>Solo this instrument</source>
-        <translation type="unfinished"/>
+        <translation>Solar este instrumento</translation>
     </message>
     <message>
         <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="166"/>
@@ -9269,7 +9271,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="223"/>
         <source>CHAN</source>
-        <translation type="unfinished"/>
+        <translation>CNL</translation>
     </message>
     <message>
         <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="233"/>
@@ -9319,7 +9321,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="480"/>
         <source>Plugin</source>
-        <translation type="unfinished"/>
+        <translation>Plugin</translation>
     </message>
 </context>
 <context>
@@ -10025,7 +10027,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../plugins/LadspaEffect/LadspaMatrixControlDialog.cpp" line="111"/>
         <source>Link</source>
-        <translation type="unfinished"/>
+        <translation>Conectar</translation>
     </message>
     <message>
         <location filename="../../plugins/LadspaEffect/LadspaMatrixControlDialog.cpp" line="135"/>
@@ -10281,7 +10283,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/widgets/LcdFloatSpinBox.cpp" line="213"/>
         <source>Set value</source>
-        <translation type="unfinished"/>
+        <translation>Alterar valor</translation>
     </message>
     <message>
         <location filename="../../src/gui/widgets/LcdFloatSpinBox.cpp" line="214"/>
@@ -10294,7 +10296,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/widgets/LcdSpinBox.cpp" line="162"/>
         <source>Set value</source>
-        <translation type="unfinished"/>
+        <translation>Alterar valor</translation>
     </message>
     <message>
         <location filename="../../src/gui/widgets/LcdSpinBox.cpp" line="163"/>
@@ -10443,7 +10445,7 @@ Double click to pick a file.</source>
     <message>
         <location filename="../../src/gui/instrument/LfoGraph.cpp" line="165"/>
         <source>%1 Hz</source>
-        <translation type="unfinished"/>
+        <translation>%1 Hz</translation>
     </message>
 </context>
 <context>
@@ -10480,7 +10482,8 @@ Double click to pick a file.</source>
         <location filename="../../src/core/ConfigManager.cpp" line="680"/>
         <source>Could not open file %1 for writing.
 Please make sure you have write permission to the file and the directory containing the file and try again!</source>
-        <translation type="unfinished"/>
+        <translation>Não pôde abrir o arquivo %1 para escrita.
+Por favor certifique que você tem permissão para gravar o aquivo e o diretório contendo o arquivo e tente novamente!</translation>
     </message>
     <message>
         <location filename="../../src/core/main.cpp" line="780"/>
@@ -10552,7 +10555,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="136"/>
         <source>Root Directory</source>
-        <translation type="unfinished"/>
+        <translation>Diretório Raiz</translation>
     </message>
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="140"/>
@@ -10567,7 +10570,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="161"/>
         <source>Loading background picture</source>
-        <translation type="unfinished"/>
+        <translation>Carregando plano de fundo</translation>
     </message>
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="270"/>
@@ -10612,12 +10615,12 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="309"/>
         <source>E&amp;xport...</source>
-        <translation>&amp;Renderizar...</translation>
+        <translation>E&amp;xportar...</translation>
     </message>
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="314"/>
         <source>Export &amp;Tracks...</source>
-        <translation type="unfinished"/>
+        <translation>Exportar &amp;Trilhas</translation>
     </message>
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="320"/>
@@ -10647,7 +10650,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="351"/>
         <source>Scales and keymaps</source>
-        <translation type="unfinished"/>
+        <translation>Escalas e mapeamento de teclas</translation>
     </message>
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="353"/>
@@ -10662,7 +10665,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="375"/>
         <source>&amp;Tools</source>
-        <translation>&amp;Ferramentas</translation>
+        <translation>Ferramen&amp;tas</translation>
     </message>
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="383"/>
@@ -10723,19 +10726,19 @@ Please make sure you have write permission to the file and the directory contain
         <location filename="../../src/gui/MainWindow.cpp" line="444"/>
         <location filename="../../src/gui/MainWindow.cpp" line="1049"/>
         <source>Song Editor</source>
-        <translation>Mostrar/esconder Editor de Arranjo</translation>
+        <translation>Editor de Arranjo</translation>
     </message>
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="449"/>
         <location filename="../../src/gui/MainWindow.cpp" line="1053"/>
         <source>Pattern Editor</source>
-        <translation type="unfinished"/>
+        <translation>Editor de Sequências</translation>
     </message>
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="453"/>
         <location filename="../../src/gui/MainWindow.cpp" line="1057"/>
         <source>Piano Roll</source>
-        <translation>Mostrar/esconder Editor de Notas MIDI</translation>
+        <translation>Piano Roll</translation>
     </message>
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="457"/>
@@ -10747,12 +10750,12 @@ Please make sure you have write permission to the file and the directory contain
         <location filename="../../src/gui/MainWindow.cpp" line="461"/>
         <location filename="../../src/gui/MainWindow.cpp" line="1066"/>
         <source>Mixer</source>
-        <translation type="unfinished"/>
+        <translation>Mixer</translation>
     </message>
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="465"/>
         <source>Show/hide controller rack</source>
-        <translation type="unfinished"/>
+        <translation>Mostrar/ocultar rack de controladores</translation>
     </message>
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="469"/>
@@ -10767,7 +10770,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="590"/>
         <source>Recover session. Please save your work!</source>
-        <translation type="unfinished"/>
+        <translation>Sessão de recuperação. Por favor salve seu trabalho!</translation>
     </message>
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="593"/>
@@ -10777,12 +10780,12 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="612"/>
         <source>Recovered project not saved</source>
-        <translation type="unfinished"/>
+        <translation>Projeto recuperado não salvo</translation>
     </message>
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="613"/>
         <source>This project was recovered from the previous session. It is currently unsaved and will be lost if you don&apos;t save it. Do you want to save it now?</source>
-        <translation type="unfinished"/>
+        <translation>Este projeto foi recuperado de uma sessão anterior. Atualmente não está salvo e vai ser perdido se você não salvá-lo. Deseja salvar agora?</translation>
     </message>
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="618"/>
@@ -10827,12 +10830,12 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="878"/>
         <source>Overwrite default template?</source>
-        <translation type="unfinished"/>
+        <translation>Sobrescrever o modelo padrão?</translation>
     </message>
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="879"/>
         <source>This will overwrite your current default template.</source>
-        <translation type="unfinished"/>
+        <translation>Isso vai sobrescrever seu modelo padrão.</translation>
     </message>
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="912"/>
@@ -10859,7 +10862,7 @@ Por favor visite http://lmms.sf.net/wiki para ter acesso a mais infromações so
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="1081"/>
         <source>Fullscreen</source>
-        <translation type="unfinished"/>
+        <translation>Tela cheia</translation>
     </message>
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="1090"/>
@@ -10869,7 +10872,7 @@ Por favor visite http://lmms.sf.net/wiki para ter acesso a mais infromações so
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="1104"/>
         <source>Enable note labels in piano roll</source>
-        <translation type="unfinished"/>
+        <translation>Ativar nome de notas no piano roll</translation>
     </message>
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="1398"/>
@@ -10886,12 +10889,12 @@ Por favor visite http://lmms.sf.net/wiki para ter acesso a mais infromações so
         <location filename="../../src/gui/MainWindow.cpp" line="1414"/>
         <location filename="../../src/gui/MainWindow.cpp" line="1470"/>
         <source>Select file for project-export...</source>
-        <translation type="unfinished"/>
+        <translation>Selecione o arquivo para exportar o projeto...</translation>
     </message>
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="1439"/>
         <source>Select directory for writing exported tracks...</source>
-        <translation type="unfinished"/>
+        <translation>Selecione o diretório para gravar as trilhas exportadas...</translation>
     </message>
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="1501"/>
@@ -11107,7 +11110,7 @@ Por favor visite http://lmms.sf.net/wiki para ter acesso a mais infromações so
     <message>
         <location filename="../../plugins/VstEffect/VstEffectControls.cpp" line="347"/>
         <source>VST sync</source>
-        <translation type="unfinished"/>
+        <translation>sincronização VST</translation>
     </message>
     <message>
         <location filename="../../plugins/VstEffect/VstEffectControls.cpp" line="353"/>
@@ -11168,7 +11171,7 @@ Por favor visite http://lmms.sf.net/wiki para ter acesso a mais infromações so
     <message>
         <location filename="../../src/gui/widgets/MeterDialog.cpp" line="73"/>
         <source>Meter denominator</source>
-        <translation type="unfinished"/>
+        <translation>Denominador</translation>
     </message>
     <message>
         <location filename="../../src/gui/widgets/MeterDialog.cpp" line="76"/>
@@ -11192,25 +11195,25 @@ Por favor visite http://lmms.sf.net/wiki para ter acesso a mais infromações so
         <location filename="../../src/gui/MicrotunerConfig.cpp" line="61"/>
         <location filename="../../src/gui/MicrotunerConfig.cpp" line="159"/>
         <source>First key</source>
-        <translation type="unfinished"/>
+        <translation>Primeira tecla</translation>
     </message>
     <message>
         <location filename="../../src/gui/MicrotunerConfig.cpp" line="62"/>
         <location filename="../../src/gui/MicrotunerConfig.cpp" line="165"/>
         <source>Last key</source>
-        <translation type="unfinished"/>
+        <translation>Última tecla</translation>
     </message>
     <message>
         <location filename="../../src/gui/MicrotunerConfig.cpp" line="63"/>
         <location filename="../../src/gui/MicrotunerConfig.cpp" line="171"/>
         <source>Middle key</source>
-        <translation type="unfinished"/>
+        <translation>Tecla do meio</translation>
     </message>
     <message>
         <location filename="../../src/gui/MicrotunerConfig.cpp" line="64"/>
         <location filename="../../src/gui/MicrotunerConfig.cpp" line="177"/>
         <source>Base key</source>
-        <translation type="unfinished"/>
+        <translation>Tecla base</translation>
     </message>
     <message>
         <location filename="../../src/gui/MicrotunerConfig.cpp" line="65"/>
@@ -11238,13 +11241,13 @@ Por favor visite http://lmms.sf.net/wiki para ter acesso a mais infromações so
         <location filename="../../src/gui/MicrotunerConfig.cpp" line="103"/>
         <location filename="../../src/gui/MicrotunerConfig.cpp" line="141"/>
         <source>Load</source>
-        <translation type="unfinished"/>
+        <translation>Carregar</translation>
     </message>
     <message>
         <location filename="../../src/gui/MicrotunerConfig.cpp" line="104"/>
         <location filename="../../src/gui/MicrotunerConfig.cpp" line="142"/>
         <source>Save</source>
-        <translation type="unfinished"/>
+        <translation>Salvar</translation>
     </message>
     <message>
         <location filename="../../src/gui/MicrotunerConfig.cpp" line="105"/>
@@ -11498,17 +11501,17 @@ Enter &apos;x&apos; if you wish to leave the key disabled / not mapped.</source>
         <location filename="../../src/gui/MidiCCRackView.cpp" line="50"/>
         <location filename="../../src/gui/MidiCCRackView.cpp" line="124"/>
         <source>MIDI CC Rack - %1</source>
-        <translation type="unfinished"/>
+        <translation>Rack MIDI CC - %1</translation>
     </message>
     <message>
         <location filename="../../src/gui/MidiCCRackView.cpp" line="70"/>
         <source>MIDI CC Knobs:</source>
-        <translation type="unfinished"/>
+        <translation>Controles MIDI</translation>
     </message>
     <message>
         <location filename="../../src/gui/MidiCCRackView.cpp" line="93"/>
         <source>CC %1</source>
-        <translation type="unfinished"/>
+        <translation>CC %1</translation>
     </message>
 </context>
 <context>
@@ -11517,12 +11520,12 @@ Enter &apos;x&apos; if you wish to leave the key disabled / not mapped.</source>
         <location filename="../../src/gui/clips/MidiClipView.cpp" line="158"/>
         <location filename="../../src/gui/clips/MidiClipView.cpp" line="234"/>
         <source>Transpose</source>
-        <translation type="unfinished"/>
+        <translation>Transposição</translation>
     </message>
     <message>
         <location filename="../../src/gui/clips/MidiClipView.cpp" line="158"/>
         <source>Semitones to transpose by:</source>
-        <translation type="unfinished"/>
+        <translation>Semitons para transposição:</translation>
     </message>
     <message>
         <location filename="../../src/gui/clips/MidiClipView.cpp" line="199"/>
@@ -11532,7 +11535,7 @@ Enter &apos;x&apos; if you wish to leave the key disabled / not mapped.</source>
     <message>
         <location filename="../../src/gui/clips/MidiClipView.cpp" line="204"/>
         <source>Set as ghost in piano-roll</source>
-        <translation type="unfinished"/>
+        <translation>Definir como fantasma no piano-roll</translation>
     </message>
     <message>
         <location filename="../../src/gui/clips/MidiClipView.cpp" line="210"/>
@@ -11608,7 +11611,7 @@ Enter &apos;x&apos; if you wish to leave the key disabled / not mapped.</source>
     <message>
         <location filename="../../src/gui/widgets/MixerChannelLcdSpinBox.cpp" line="91"/>
         <source>Set value</source>
-        <translation type="unfinished"/>
+        <translation>Alterar valor</translation>
     </message>
 </context>
 <context>
@@ -11686,7 +11689,7 @@ Enter &apos;x&apos; if you wish to leave the key disabled / not mapped.</source>
     <message>
         <location filename="../../src/gui/MixerChannelView.cpp" line="191"/>
         <source>Pick random</source>
-        <translation type="unfinished"/>
+        <translation>Seleção aleatória</translation>
     </message>
     <message>
         <location filename="../../src/gui/MixerChannelView.cpp" line="339"/>
@@ -11715,7 +11718,7 @@ Aviso: Esta operação não pode ser desfeita.</translation>
     <message>
         <location filename="../../src/gui/MixerView.cpp" line="82"/>
         <source>Mixer</source>
-        <translation type="unfinished"/>
+        <translation>Mixer</translation>
     </message>
 </context>
 <context>
@@ -12239,7 +12242,7 @@ Aviso: Esta operação não pode ser desfeita.</translation>
     <message>
         <location filename="../../src/gui/widgets/Oscilloscope.cpp" line="61"/>
         <source>Oscilloscope</source>
-        <translation type="unfinished"/>
+        <translation>Osciloscópio</translation>
     </message>
     <message>
         <location filename="../../src/gui/widgets/Oscilloscope.cpp" line="205"/>
@@ -12313,7 +12316,7 @@ Aviso: Esta operação não pode ser desfeita.</translation>
     <message>
         <location filename="../../src/gui/editors/PatternEditor.cpp" line="282"/>
         <source>Pattern Editor</source>
-        <translation type="unfinished"/>
+        <translation>Editor de Sequências</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/PatternEditor.cpp" line="300"/>
@@ -12323,12 +12326,12 @@ Aviso: Esta operação não pode ser desfeita.</translation>
     <message>
         <location filename="../../src/gui/editors/PatternEditor.cpp" line="301"/>
         <source>Stop playback of current pattern (Space)</source>
-        <translation type="unfinished"/>
+        <translation>Parar a sequência atual (Espaço)</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/PatternEditor.cpp" line="305"/>
         <source>Pattern selector</source>
-        <translation type="unfinished"/>
+        <translation>Seletor de sequência</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/PatternEditor.cpp" line="315"/>
@@ -12338,12 +12341,12 @@ Aviso: Esta operação não pode ser desfeita.</translation>
     <message>
         <location filename="../../src/gui/editors/PatternEditor.cpp" line="318"/>
         <source>New pattern</source>
-        <translation type="unfinished"/>
+        <translation>Nova sequência</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/PatternEditor.cpp" line="320"/>
         <source>Clone pattern</source>
-        <translation type="unfinished"/>
+        <translation>Clonar sequência</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/PatternEditor.cpp" line="322"/>
@@ -12462,7 +12465,7 @@ Aviso: Esta operação não pode ser desfeita.</translation>
     <message>
         <location filename="../../src/gui/widgets/PeakIndicator.cpp" line="74"/>
         <source>-inf</source>
-        <translation type="unfinished"/>
+        <translation>-inf</translation>
     </message>
 </context>
 <context>
@@ -12579,7 +12582,7 @@ Aviso: Esta operação não pode ser desfeita.</translation>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="4888"/>
         <source>Play/pause current clip (Space)</source>
-        <translation type="unfinished"/>
+        <translation>Tocar/pausar o clipe atual (Espaço)</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="4889"/>
@@ -12599,7 +12602,7 @@ Aviso: Esta operação não pode ser desfeita.</translation>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="4892"/>
         <source>Stop playing of current clip (Space)</source>
-        <translation type="unfinished"/>
+        <translation>Parar de tocar o clipe atual (Espaço)</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="4894"/>
@@ -12634,12 +12637,12 @@ Aviso: Esta operação não pode ser desfeita.</translation>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="4917"/>
         <source>Quantize positions</source>
-        <translation type="unfinished"/>
+        <translation>Quantizar posições</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="4918"/>
         <source>Quantize lengths</source>
-        <translation type="unfinished"/>
+        <translation>Quantizar tamanhos</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="4938"/>
@@ -12649,13 +12652,13 @@ Aviso: Esta operação não pode ser desfeita.</translation>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="4946"/>
         <source>Import clip</source>
-        <translation type="unfinished"/>
+        <translation>Importar clipe</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="4948"/>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="5415"/>
         <source>Export clip</source>
-        <translation type="unfinished"/>
+        <translation>Exportar clipe</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="4959"/>
@@ -12665,17 +12668,17 @@ Aviso: Esta operação não pode ser desfeita.</translation>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="4961"/>
         <source>Cut (%1+X)</source>
-        <translation type="unfinished"/>
+        <translation>Cortar (%1+X)</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="4963"/>
         <source>Copy (%1+C)</source>
-        <translation type="unfinished"/>
+        <translation>Copiar (%1+C)</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="4965"/>
         <source>Paste (%1+V)</source>
-        <translation type="unfinished"/>
+        <translation>Colar (%1+V)</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="4980"/>
@@ -12685,7 +12688,7 @@ Aviso: Esta operação não pode ser desfeita.</translation>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="4988"/>
         <source>Glue</source>
-        <translation type="unfinished"/>
+        <translation>Unir</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="4992"/>
@@ -12695,17 +12698,17 @@ Aviso: Esta operação não pode ser desfeita.</translation>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="4996"/>
         <source>Strum</source>
-        <translation type="unfinished"/>
+        <translation>Deslocar</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="5000"/>
         <source>Fill</source>
-        <translation type="unfinished"/>
+        <translation>Preencher</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="5004"/>
         <source>Cut overlaps</source>
-        <translation type="unfinished"/>
+        <translation>Remover sobreposição</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="5008"/>
@@ -12745,12 +12748,12 @@ Aviso: Esta operação não pode ser desfeita.</translation>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="5066"/>
         <source>Note length</source>
-        <translation type="unfinished"/>
+        <translation>Tamanho da nota</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="5072"/>
         <source>Key</source>
-        <translation type="unfinished"/>
+        <translation>Tecla</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="5081"/>
@@ -12765,30 +12768,30 @@ Aviso: Esta operação não pode ser desfeita.</translation>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="5099"/>
         <source>Snap mode</source>
-        <translation type="unfinished"/>
+        <translation>Modo de posição</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="5104"/>
         <source>Clear ghost notes</source>
-        <translation type="unfinished"/>
+        <translation>Limpar notas fantasmas</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="5213"/>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="5392"/>
         <source>Piano-Roll - %1</source>
-        <translation type="unfinished"/>
+        <translation>Piano-Roll - %1</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="5220"/>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="5397"/>
         <source>Piano-Roll - no clip</source>
-        <translation type="unfinished"/>
+        <translation>Piano-Roll - sem clipe</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="5416"/>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="5477"/>
         <source>XML clip file (*.xpt *.xptz)</source>
-        <translation type="unfinished"/>
+        <translation>Arquivo de clipe XML (*.xpt *.xptz)</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="5422"/>
@@ -12864,12 +12867,12 @@ Aviso: Esta operação não pode ser desfeita.</translation>
     <message>
         <location filename="../../src/gui/PluginBrowser.cpp" line="63"/>
         <source>Drag an instrument into either the Song Editor, the Pattern Editor or an existing instrument track.</source>
-        <translation type="unfinished"/>
+        <translation>Arraste um instrumento dentro do Editor de Arranjo, do Editor de Sequência ou de uma trilha de instrumento.</translation>
     </message>
     <message>
         <location filename="../../src/gui/PluginBrowser.cpp" line="71"/>
         <source>Search</source>
-        <translation type="unfinished"/>
+        <translation>Procurar</translation>
     </message>
 </context>
 <context>
@@ -13387,7 +13390,7 @@ Aviso: Esta operação não pode ser desfeita.</translation>
     <message>
         <location filename="../../src/gui/tracks/SampleTrackView.cpp" line="159"/>
         <source>%1: %2</source>
-        <translation type="unfinished"/>
+        <translation>%1: %2</translation>
     </message>
 </context>
 <context>
@@ -13450,7 +13453,7 @@ Aviso: Esta operação não pode ser desfeita.</translation>
     <message>
         <location filename="../../src/gui/SampleTrackWindow.cpp" line="154"/>
         <source>CHAN</source>
-        <translation type="unfinished"/>
+        <translation>CNL</translation>
     </message>
 </context>
 <context>
@@ -13502,7 +13505,7 @@ Aviso: Esta operação não pode ser desfeita.</translation>
     <message>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="241"/>
         <source>Show fader ticks</source>
-        <translation type="unfinished"/>
+        <translation>Mostrar marcação no Fader</translation>
     </message>
     <message>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="243"/>
@@ -13715,12 +13718,12 @@ Aviso: Esta operação não pode ser desfeita.</translation>
     <message>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="757"/>
         <source>Auto-quantize notes in Piano Roll</source>
-        <translation type="unfinished"/>
+        <translation>Autoquantizar notas no Piano Roll</translation>
     </message>
     <message>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="761"/>
         <source>If enabled, notes will be automatically quantized when recording them from a MIDI controller. If disabled, they are always recorded at the highest possible resolution.</source>
-        <translation type="unfinished"/>
+        <translation>Se ativado, notas vão ser automaticamente quantizadas quando gravadas de um controlador MIDI. Se desativado, vão ser gravadas na resolução mais alta possível.</translation>
     </message>
     <message>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="780"/>
@@ -13822,17 +13825,17 @@ Latency: %2 ms</source>
     <message>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="1301"/>
         <source>Choose the LMMS working directory</source>
-        <translation type="unfinished"/>
+        <translation>Escolha o diretório de trabalho do LMMS</translation>
     </message>
     <message>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="1318"/>
         <source>Choose your VST plugins directory</source>
-        <translation type="unfinished"/>
+        <translation>Escolha o diretório com seus plugins VST</translation>
     </message>
     <message>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="1335"/>
         <source>Choose your LADSPA plugins directory</source>
-        <translation type="unfinished"/>
+        <translation>Escolha o diretório com seus plugins LADSPA</translation>
     </message>
     <message>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="1360"/>
@@ -13852,12 +13855,12 @@ Latency: %2 ms</source>
     <message>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="1416"/>
         <source>Choose your theme directory</source>
-        <translation type="unfinished"/>
+        <translation>Escolha seu diretório de temas</translation>
     </message>
     <message>
         <location filename="../../src/gui/modals/SetupDialog.cpp" line="1450"/>
         <source>Choose your background picture</source>
-        <translation type="unfinished"/>
+        <translation>Escolha um plano de fundo</translation>
     </message>
 </context>
 <context>
@@ -13871,7 +13874,7 @@ Latency: %2 ms</source>
     <message>
         <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="985"/>
         <source>Choose patch</source>
-        <translation type="unfinished"/>
+        <translation>Escolher programa</translation>
     </message>
     <message>
         <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1019"/>
@@ -14362,12 +14365,12 @@ Latency: %2 ms</source>
     <message>
         <location filename="../../src/core/DataFile.cpp" line="376"/>
         <source>Couldn&apos;t create resources folder.</source>
-        <translation type="unfinished"/>
+        <translation>Não pode criar pasta de recursos.</translation>
     </message>
     <message>
         <location filename="../../src/core/DataFile.cpp" line="384"/>
         <source>Failed to copy resources.</source>
-        <translation type="unfinished"/>
+        <translation>Falha ao copiar recursos.</translation>
     </message>
     <message>
         <location filename="../../src/core/DataFile.cpp" line="393"/>
@@ -14383,7 +14386,7 @@ Latency: %2 ms</source>
     <message>
         <location filename="../../src/core/DataFile.cpp" line="418"/>
         <source>An unknown error has occurred and the file could not be saved.</source>
-        <translation type="unfinished"/>
+        <translation>Um erro desconhecido ocorreu e o arquivo não pôde ser salvo.</translation>
     </message>
     <message>
         <location filename="../../src/core/DataFile.cpp" line="2146"/>
@@ -14408,7 +14411,7 @@ Latency: %2 ms</source>
     <message>
         <location filename="../../src/core/DataFile.cpp" line="2190"/>
         <source>Version difference</source>
-        <translation type="unfinished"/>
+        <translation>Diferença de versão</translation>
     </message>
     <message>
         <location filename="../../src/core/DataFile.cpp" line="2191"/>
@@ -14447,7 +14450,7 @@ Latency: %2 ms</source>
         <location filename="../../src/gui/editors/SongEditor.cpp" line="196"/>
         <location filename="../../src/gui/editors/SongEditor.cpp" line="207"/>
         <source>Global transposition</source>
-        <translation type="unfinished"/>
+        <translation>Transposição global</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/SongEditor.cpp" line="316"/>
@@ -14467,7 +14470,7 @@ Latency: %2 ms</source>
     <message>
         <location filename="../../src/gui/editors/SongEditor.cpp" line="706"/>
         <source>Value: %1 keys</source>
-        <translation type="unfinished"/>
+        <translation>Valor: %1 teclas</translation>
     </message>
 </context>
 <context>
@@ -14505,7 +14508,7 @@ Latency: %2 ms</source>
     <message>
         <location filename="../../src/gui/editors/SongEditor.cpp" line="943"/>
         <source>Add pattern-track</source>
-        <translation type="unfinished"/>
+        <translation>Adicionar trilha de sequência</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/SongEditor.cpp" line="946"/>
@@ -15005,17 +15008,17 @@ Latency: %2 ms</source>
     <message>
         <location filename="../../src/gui/editors/TimeLineWidget.cpp" line="89"/>
         <source>Stepped auto scrolling</source>
-        <translation type="unfinished"/>
+        <translation>Auto-rolagem compassada</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/TimeLineWidget.cpp" line="90"/>
         <source>Continuous auto scrolling</source>
-        <translation type="unfinished"/>
+        <translation>Auto-rolagem contínua</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/TimeLineWidget.cpp" line="91"/>
         <source>Auto scrolling disabled</source>
-        <translation type="unfinished"/>
+        <translation>Auto-rolagem desativada</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/TimeLineWidget.cpp" line="96"/>
@@ -15178,7 +15181,7 @@ Latency: %2 ms</source>
     <message>
         <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="330"/>
         <source>Pick random</source>
-        <translation type="unfinished"/>
+        <translation>Seleção aleatória</translation>
     </message>
     <message>
         <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="332"/>
