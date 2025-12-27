@@ -252,6 +252,7 @@ protected slots:
 
 signals:
 	void currentMidiClipChanged();
+	void currentMidiClipRenamed();
 	void ghostClipSet(bool);
 	void semiToneMarkerMenuScaleSetEnabled(bool);
 	void semiToneMarkerMenuChordSetEnabled(bool);
@@ -582,9 +583,9 @@ private slots:
 	void ghostClipSet( bool state );
 	void exportMidiClip();
 	void importMidiClip();
+	void updateWindowTitle();
 
 private:
-	void clipRenamed();
 	void focusInEvent(QFocusEvent * event) override;
 	void showEvent(QShowEvent* se) override;
 
@@ -593,7 +594,6 @@ private:
 
 	PianoRoll* m_editor;
 
-	QToolButton* m_fileToolsButton;
 	ComboBox * m_zoomingComboBox;
 	ComboBox * m_zoomingYComboBox;
 	ComboBox * m_quantizeComboBox;
