@@ -48,6 +48,11 @@ bool SfzOpcodeState::setOpcodeByStrings(const QString& name, const QString& valu
 		m_hivel = value.toInt(&successful);
 	}
 
+	else if (name == "offset")
+	{
+		m_offset = value.toInt(&successful);
+	}
+
 	else if (name == "pitch_keycenter")
 	{
 		m_pitch_keycenter = value.toInt(&successful);
@@ -56,6 +61,20 @@ bool SfzOpcodeState::setOpcodeByStrings(const QString& name, const QString& valu
 	else if (name == "pitch_keytrack")
 	{
 		m_pitch_keytrack = value.toInt(&successful);
+	}
+
+	else if (name == "tune")
+	{
+		m_tune = value.toFloat(&successful);
+	}
+
+	else if (name == "volume" || name == "group_volume")
+	{
+		m_volume = value.toFloat(&successful);
+	}
+	else if (name == "pan")
+	{
+		m_pan = value.toFloat(&successful);
 	}
 
 	else if (name == "amp_veltrack")

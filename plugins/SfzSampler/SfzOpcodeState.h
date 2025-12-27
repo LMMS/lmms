@@ -28,8 +28,15 @@ public:
 	int m_lovel = 0;
 	int m_hivel = 127;
 
+	int m_offset = 0; // sample play offset in frames
+
 	int m_pitch_keycenter = 60;
 	int m_pitch_keytrack = 100;
+	
+	float m_tune = 0.0f; // in cents
+
+	float m_volume = 0.0f; // In decibals
+	float m_pan = 0.0f;
 
 	float m_amp_veltrack = 100;
 

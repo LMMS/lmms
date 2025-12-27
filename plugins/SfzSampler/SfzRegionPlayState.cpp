@@ -17,6 +17,8 @@ SfzRegionPlayState::SfzRegionPlayState(const SfzRegion* region, const SfzTrigger
 	, m_trigger(trigger)
 	, m_region(region)
 {
+	// Set initial sample start frame offset
+	m_sampleFrame += m_region->m_offset;
 }
 
 
@@ -81,7 +83,7 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const fpp_t frames)
 	const f_cnt_t framesToPlay = frames - startFrameOffset;
 
 	// Calculate pitch difference relative to original sample
-	const int semitoneDifference = m_trigger.key().value() - m_region->m_pitch_keycenter;
+	const int semitoneDifference = m_trigger.key().value() - m_region->m_pitch_keycenter + m_region->m_tune / 100;
 	float freqRatio = std::exp2(semitoneDifference * m_region->m_pitch_keytrack / 1200.0f);
 
 	// Sample rate of sample
@@ -104,6 +106,14 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const fpp_t frames)
 	// If amp_keytrack is -100, it's the reverse. If amp_keytrack is 0, the volume is not affected by the velocity.
 	const float ampVelocity = 2 * ((m_trigger.velocity().value() / 127.0f - 0.5f) * (m_region->m_amp_veltrack / 100) * 0.5f + 0.5f);
 
+	// Amplitude due to volume/gain
+	const float ampVolume = dbfsToAmp(m_region->m_volume);
+
+	// Panning
+	const float pan = m_region->m_pan / 100;
+	const float rightPanAmp = std::min(1.0f, 1.0f + pan);
+	const float leftPanAmp = std::min(1.0f, 1.0f - pan);
+
 	for (f_cnt_t f = 0; f < frames; ++f)
 	{
 		const float ampeg = envelopeGenerator(
@@ -114,8 +124,8 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const fpp_t frames)
 			ampegSustain,
 			ampegReleaseFrames
 		);
-		buffer[f][0] += m_region->sample().at(m_sampleFrame, 0) * ampeg * ampVelocity;
-		buffer[f][1] += m_region->sample().at(m_sampleFrame, 1) * ampeg * ampVelocity;
+		buffer[f][0] += m_region->sample().at(m_sampleFrame, 0) * ampeg * ampVelocity * ampVolume * rightPanAmp;
+		buffer[f][1] += m_region->sample().at(m_sampleFrame, 1) * ampeg * ampVelocity * ampVolume * leftPanAmp;
 		m_sampleFrame = std::min(static_cast<float>(m_region->sample().size()), m_sampleFrame + freqRatio);
 		m_frameCount++;
 	}
