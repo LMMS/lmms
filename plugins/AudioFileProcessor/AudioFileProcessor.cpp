@@ -288,13 +288,14 @@ auto AudioFileProcessor::beatLen(NotePlayHandle* note) const -> f_cnt_t
 	const auto freqFactor = baseFreq / note->frequency()
 		* Engine::audioEngine()->outputSampleRate()
 		/ Engine::audioEngine()->baseSampleRate();
+	const auto sampleRateRatio = static_cast<double>(Engine::audioEngine()->outputSampleRate()) / m_sample.sampleRate();
 
 	const auto startFrame = m_nextPlayStartPoint >= static_cast<std::size_t>(m_sample.endFrame())
 		? m_sample.startFrame()
 		: m_nextPlayStartPoint;
 	const auto duration = m_sample.endFrame() - startFrame;
 
-	return static_cast<f_cnt_t>(std::floor(duration * freqFactor));
+	return static_cast<f_cnt_t>(std::floor(duration * freqFactor * sampleRateRatio));
 }
 
 
