@@ -1,4 +1,4 @@
-/*
+﻿/*
  * SampleTrack.cpp - implementation of class SampleTrack, a track which
  *                   provides arrangement of samples
  *
@@ -22,7 +22,7 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
+
 #include "SampleTrack.h"
 
 #include <QDomElement>
@@ -106,7 +106,8 @@ bool SampleTrack::play( const TimePos & _start, const fpp_t _frames,
 
 			if( _start >= sClip->startPosition() && _start < sClip->endPosition() )
 			{
-				if( sClip->isPlaying() == false && _start >= (sClip->startPosition() + sClip->startTimeOffset()) )
+				if (!sClip->isPlaying() && (_start >= (sClip->startPosition() + sClip->startTimeOffset())
+											|| sClip->isRecord()))
 				{
 					auto bufferFramesPerTick = Engine::framesPerTick(sClip->sample().sampleRate());
 					f_cnt_t sampleStart = bufferFramesPerTick * ( _start - sClip->startPosition() - sClip->startTimeOffset() );
@@ -115,8 +116,16 @@ bool SampleTrack::play( const TimePos & _start, const fpp_t _frames,
 					//if the Clip smaller than the sample length we play only until Clip end
 					//else we play the sample to the end but nothing more
 					f_cnt_t samplePlayLength = clipFrameLength > sampleBufferLength ? sampleBufferLength : clipFrameLength;
+
+					// In case we are recoding, "play" the whole TCO.
+					if (sClip->isRecord())
+					{
+						samplePlayLength = clipFrameLength;
+					}
+
 					//we only play within the sampleBuffer limits
-					if( sampleStart < sampleBufferLength )
+					//Ignore that in case of recoding.
+					if (sampleStart < sampleBufferLength || sClip->isRecord())
 					{
 						sClip->setSampleStartFrame( sampleStart );
 						sClip->setSamplePlayLength( samplePlayLength );
@@ -147,7 +156,7 @@ bool SampleTrack::play( const TimePos & _start, const fpp_t _frames,
 				{
 					return played_a_note;
 				}
-				auto smpHandle = new SampleRecordHandle(st);
+				auto smpHandle = new SampleRecordHandle(st, _start - st->startPosition());
 				handle = smpHandle;
 			}
 			else
