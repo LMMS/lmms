@@ -29,6 +29,7 @@
 #include <QApplication>
 #include <QCheckBox>
 #include <QHBoxLayout>
+#include <QHeaderView>
 #include <QLineEdit>
 #include <QMdiArea>
 #include <QMdiSubWindow>
@@ -462,6 +463,11 @@ FileBrowserTreeWidget::FileBrowserTreeWidget(QWidget * parent ) :
 	m_pressPos(),
 	m_previewPlayHandle( nullptr )
 {
+	setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+	setHorizontalScrollMode(ScrollPerPixel);
+	header()->setStretchLastSection(false);
+	header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+
 	setColumnCount( 1 );
 	headerItem()->setHidden( true );
 	setSortingEnabled( false );
