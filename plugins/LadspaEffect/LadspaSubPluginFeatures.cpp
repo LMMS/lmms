@@ -29,11 +29,11 @@
 #include <QLabel>
 
 #include "LadspaSubPluginFeatures.h"
-#include "AudioDevice.h"
-#include "AudioEngine.h"
+
 #include "Engine.h"
 #include "Ladspa2LMMS.h"
 #include "LadspaBase.h"
+#include "lmms_constants.h"
 
 namespace lmms
 {
@@ -157,7 +157,7 @@ void LadspaSubPluginFeatures::listSubPluginKeys(
 	for( l_sortable_plugin_t::const_iterator it = plugins.begin();
 						it != plugins.end(); ++it )
 	{
-		if( lm->getDescription( ( *it ).second )->inputChannels <= Engine::audioEngine()->audioDev()->channels() )
+		if (lm->getDescription((*it).second)->inputChannels <= DEFAULT_CHANNELS)
 		{
 			_kl.push_back( ladspaKeyToSubPluginKey( _desc, ( *it ).first, ( *it ).second ) );
 		}

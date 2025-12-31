@@ -25,33 +25,33 @@
 
 #include "FileBrowser.h"
 
+#include <PathUtil.h>
 #include <QApplication>
-#include <QDesktopServices>
-#include <QDirIterator>
+#include <QCheckBox>
 #include <QHBoxLayout>
-#include <QKeyEvent>
 #include <QLineEdit>
 #include <QMdiArea>
 #include <QMdiSubWindow>
 #include <QMenu>
 #include <QMessageBox>
+#include <QProgressBar>
 #include <QPushButton>
 #include <QShortcut>
 #include <QStringList>
 #include <cassert>
-#include <queue>
 
 #include "AudioEngine.h"
 #include "ConfigManager.h"
 #include "DataFile.h"
 #include "Engine.h"
-#include "FileBrowser.h"
+#include "FileRevealer.h"
 #include "FileSearch.h"
 #include "GuiApplication.h"
 #include "ImportFilter.h"
 #include "Instrument.h"
 #include "InstrumentTrack.h"
 #include "InstrumentTrackWindow.h"
+#include "KeyboardShortcuts.h"
 #include "MainWindow.h"
 #include "PatternStore.h"
 #include "PluginFactory.h"
@@ -77,18 +77,15 @@ enum TreeWidgetItemTypes
 	TypeDirectoryItem
 } ;
 
-
-FileBrowser::FileBrowser(const QString & directories, const QString & filter,
-			const QString & title, const QPixmap & pm,
-			QWidget * parent, bool dirs_as_items,
-			const QString& userDir,
-			const QString& factoryDir):
-	SideBarWidget( title, pm, parent ),
-	m_directories( directories ),
-	m_filter( filter ),
-	m_dirsAsItems( dirs_as_items ),
-	m_userDir(userDir),
-	m_factoryDir(factoryDir)
+FileBrowser::FileBrowser(Type type, const QString& directories, const QString& filter, const QString& title, const QPixmap& pm,
+	QWidget* parent, bool dirs_as_items, const QString& userDir, const QString& factoryDir)
+	: SideBarWidget(title, pm, parent)
+	, m_type(type)
+	, m_directories(directories)
+	, m_filter(filter)
+	, m_dirsAsItems(dirs_as_items)
+	, m_userDir(userDir)
+	, m_factoryDir(factoryDir)
 {
 	setWindowTitle( tr( "Browser" ) );
 
@@ -135,6 +132,14 @@ FileBrowser::FileBrowser(const QString & directories, const QString & filter,
 	filterFocusShortcut->setContext(Qt::WidgetWithChildrenShortcut);
 
 	m_previousFilterValue = "";
+
+	if (m_type == Type::Favorites)
+	{
+		connect(ConfigManager::inst(), &ConfigManager::favoritesChanged, [this] {
+			m_directories = ConfigManager::inst()->favoriteItems().join("*");
+			reloadTree();
+		});
+	}
 
 	reloadTree();
 	show();
@@ -329,7 +334,7 @@ void FileBrowser::reloadTree()
 
 	m_fileBrowserTreeWidget->clear();
 
-	QStringList paths = m_directories.split('*');
+	auto paths = m_directories.isEmpty() ? QStringList{} : m_directories.split('*');
 
 	if (m_showUserContent && !m_showUserContent->isChecked())
 	{
@@ -341,12 +346,37 @@ void FileBrowser::reloadTree()
 		paths.removeAll(m_factoryDir);
 	}
 
-	if (!paths.isEmpty())
+	switch (m_type)
 	{
+	case Type::Favorites:
+		for (auto& path : paths)
+		{
+			while (path.endsWith('/') || path.endsWith('\\') || path.endsWith("."))
+			{
+				path.chop(1);
+			}
+
+			auto info = QFileInfo{PathUtil::toAbsolute(path)};
+
+			if (info.isDir())
+			{
+				auto dir = new Directory(info.fileName(), info.absolutePath(), m_filter);
+				dir->update();
+				m_fileBrowserTreeWidget->addTopLevelItem(dir);
+			}
+			else if (info.isFile())
+			{
+				auto file = new FileItem(info.fileName(), info.path());
+				m_fileBrowserTreeWidget->addTopLevelItem(file);
+			}
+		}
+		break;
+	case Type::Normal:
 		for (const auto& path : paths)
 		{
 			addItems(path);
 		}
+		break;
 	}
 
 	if (m_filterEdit->text().isEmpty())
@@ -623,28 +653,47 @@ void FileBrowserTreeWidget::focusOutEvent(QFocusEvent* fe)
 	QTreeWidget::focusOutEvent(fe);
 }
 
-
-
-
-void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent * e )
+void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 {
-	auto file = dynamic_cast<FileItem*>(itemAt(e->pos()));
-	if( file != nullptr && file->isTrack() )
+#ifdef LMMS_BUILD_APPLE
+	QString fileManager = tr("Finder");
+#elif defined(LMMS_BUILD_WIN32)
+	QString fileManager = tr("Explorer");
+#else
+	QString fileManager = tr("file manager");
+#endif
+
+	QTreeWidgetItem* item = itemAt(e->pos());
+	if (item == nullptr) { return; } // program hangs when right-clicking on empty space otherwise
+
+	QMenu contextMenu(this);
+
+	switch (item->type())
 	{
-		QMenu contextMenu( this );
+	case TypeFileItem: {
+		auto file = dynamic_cast<FileItem*>(item);
+		const auto path = QFileInfo{file->fullName()}.absoluteFilePath();
 
-		contextMenu.addAction(
-			tr( "Send to active instrument-track" ),
-			[=]{ sendToActiveInstrumentTrack(file); }
-		);
+		contextMenu.addAction(QIcon(embed::getIconPixmap("folder")), tr("Show in %1").arg(fileManager),
+			[=] { FileRevealer::reveal(file->fullName()); });
 
-		contextMenu.addSeparator();
+		if (ConfigManager::inst()->isFavoriteItem(file->fullName()))
+		{
+			contextMenu.addAction(
+				QIcon(embed::getIconPixmap("star")), tr("Remove favorite file"), [path] { ConfigManager::inst()->removeFavoriteItem(path); });
+		}
+		else
+		{
+			contextMenu.addAction(
+				QIcon(embed::getIconPixmap("star")), tr("Add favorite file"), [path] { ConfigManager::inst()->addFavoriteItem(path); });
+		}
 
-		contextMenu.addAction(
-			QIcon(embed::getIconPixmap("folder")),
-			tr("Open containing folder"),
-			[=]{ openContainingFolder(file); }
-		);
+		if (file->isTrack())
+		{
+			contextMenu.addSeparator();
+			contextMenu.addAction(
+				tr("Send to active instrument-track"), [=, this] { sendToActiveInstrumentTrack(file); });
+		}
 
 		auto songEditorHeader = new QAction(tr("Song Editor"), nullptr);
 		songEditorHeader->setDisabled(true);
@@ -655,14 +704,31 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent * e )
 		patternEditorHeader->setDisabled(true);
 		contextMenu.addAction(patternEditorHeader);
 		contextMenu.addActions( getContextActions(file, false) );
-
-		// We should only show the menu if it contains items
-		if (!contextMenu.isEmpty()) { contextMenu.exec( e->globalPos() ); }
+		break;
 	}
+	case TypeDirectoryItem: {
+		auto dir = dynamic_cast<Directory*>(item);
+		const auto path = QFileInfo{dir->fullName()}.absoluteFilePath();
+
+		contextMenu.addAction(QIcon(embed::getIconPixmap("folder")), tr("Open in %1").arg(fileManager), [=] {
+			FileRevealer::openDir(dir->fullName());
+		});
+
+		if (ConfigManager::inst()->isFavoriteItem(dir->fullName()))
+		{
+			contextMenu.addAction(QIcon(embed::getIconPixmap("star")), tr("Remove favorite folder"), [path] { ConfigManager::inst()->removeFavoriteItem(path); });
+		}
+		else
+		{
+			contextMenu.addAction(QIcon(embed::getIconPixmap("star")), tr("Add favorite folder"), [path] { ConfigManager::inst()->addFavoriteItem(path); });
+		}
+		break;
+	}
+	}
+
+	// Only show the menu if it contains items
+	if (!contextMenu.isEmpty()) { contextMenu.exec(e->globalPos()); }
 }
-
-
-
 
 QList<QAction*> FileBrowserTreeWidget::getContextActions(FileItem* file, bool songEditor)
 {
@@ -676,14 +742,14 @@ QList<QAction*> FileBrowserTreeWidget::getContextActions(FileItem* file, bool so
 
 	auto toInstrument = new QAction(instrumentAction + tr(" (%2Enter)").arg(shortcutMod), nullptr);
 	connect(toInstrument, &QAction::triggered,
-		[=]{ openInNewInstrumentTrack(file, songEditor); });
+		[=, this]{ openInNewInstrumentTrack(file, songEditor); });
 	result.append(toInstrument);
 
 	if (songEditor && fileIsSample)
 	{
 		auto toSampleTrack = new QAction(tr("Send to new sample track (Shift + Enter)"), nullptr);
 		connect(toSampleTrack, &QAction::triggered,
-			[=]{ openInNewSampleTrack(file); });
+			[=, this]{ openInNewSampleTrack(file); });
 		result.append(toSampleTrack);
 	}
 
@@ -990,22 +1056,6 @@ bool FileBrowserTreeWidget::openInNewSampleTrack(FileItem* item)
 
 
 
-
-void FileBrowserTreeWidget::openContainingFolder(FileItem* item)
-{
-	// Delegate to QDesktopServices::openUrl with the directory of the selected file. Please note that
-	// this will only open the directory but not select the file as this is much more complicated due
-	// to different implementations that are needed for different platforms (Linux/Windows/MacOS).
-
-	// Using QDesktopServices::openUrl seems to be the most simple cross platform way which uses
-	// functionality that's already available in Qt.
-	QFileInfo fileInfo(item->fullName());
-	QDesktopServices::openUrl(QUrl::fromLocalFile(fileInfo.dir().path()));
-}
-
-
-
-
 void FileBrowserTreeWidget::sendToActiveInstrumentTrack( FileItem* item )
 {
 	// get all windows opened in the workspace
@@ -1225,15 +1275,21 @@ void FileItem::determineFileType()
 		m_type = FileType::Midi;
 		m_handling = FileHandling::ImportAsProject;
 	}
-	else if( ext == "dll"
-#ifdef LMMS_BUILD_LINUX
-		|| ext == "so" 
-#endif
+#ifdef LMMS_HAVE_VST
+	else if (
+#	if defined(LMMS_BUILD_LINUX)
+		ext == "so" ||
+#	endif
+#	if defined(LMMS_HAVE_VST_32) || defined(LMMS_HAVE_VST_64)
+		ext == "dll" ||
+#	endif
+		false
 	)
 	{
 		m_type = FileType::VstPlugin;
 		m_handling = FileHandling::LoadByPlugin;
 	}
+#endif
 	else if ( ext == "lv2" )
 	{
 		m_type = FileType::Preset;

@@ -25,16 +25,19 @@
 #include "SlicerTView.h"
 
 #include <QDropEvent>
-#include <qpixmap.h>
-#include <qpushbutton.h>
+#include <QPainter>
+#include <QPushButton>
 
 #include "Clipboard.h"
+#include "ComboBox.h"
 #include "DataFile.h"
-#include "InstrumentTrack.h"
 #include "InstrumentView.h"
+#include "Knob.h"
+#include "LcdSpinBox.h"
 #include "PixmapButton.h"
 #include "SampleLoader.h"
 #include "SlicerT.h"
+#include "SlicerTWaveform.h"
 #include "StringPairDrag.h"
 #include "Track.h"
 #include "embed.h"
@@ -55,7 +58,6 @@ SlicerTView::SlicerTView(SlicerT* instrument, QWidget* parent)
 
 	setMaximumSize(QSize(10000, 10000));
 	setMinimumSize(QSize(516, 400));
-	setResizable(true);
 
 	m_wf = new SlicerTWaveform(248, 128, instrument, this);
 	m_wf->move(0, s_topBarHeight);
@@ -71,6 +73,12 @@ SlicerTView::SlicerTView(SlicerT* instrument, QWidget* parent)
 	m_syncToggle->setCheckable(true);
 	m_syncToggle->setToolTip(tr("Enable BPM sync"));
 	m_syncToggle->setModel(&m_slicerTParent->m_enableSync);
+
+	m_clearButton = new PixmapButton(this, tr("Clear all slices"));
+	m_clearButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("clear_slices_active"));
+	m_clearButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("clear_slices_inactive"));
+	m_clearButton->setToolTip(tr("Clear all slices"));
+	connect(m_clearButton, &PixmapButton::clicked, this, &SlicerTView::clearSlices);
 
 	m_bpmBox = new LcdSpinBox(3, "19purple", this);
 	m_bpmBox->setToolTip(tr("Original sample BPM"));
@@ -110,6 +118,19 @@ Knob* SlicerTView::createStyledKnob()
 	newKnob->setCenterPointX(24.0);
 	newKnob->setCenterPointY(15.0);
 	return newKnob;
+}
+
+// Clear all notes
+void SlicerTView::clearSlices()
+{
+	m_slicerTParent->m_slicePoints.clear();
+
+	// Points are added to the start (0) and end (1) of the sample,
+	// so the whole sample can still be copied using MIDI.
+	m_slicerTParent->m_slicePoints.emplace_back(0);
+	m_slicerTParent->m_slicePoints.emplace_back(1);
+
+	emit m_slicerTParent->dataChanged();
 }
 
 // copied from piano roll
@@ -262,7 +283,7 @@ void SlicerTView::resizeEvent(QResizeEvent* re)
 {
 	m_y1 = height() - s_bottomBoxOffset;
 
-	// left box
+	// Left box
 	m_noteThresholdKnob->move(s_x1 - 25, m_y1);
 	m_fadeOutKnob->move(s_x2 - 25, m_y1);
 
@@ -272,8 +293,10 @@ void SlicerTView::resizeEvent(QResizeEvent* re)
 	m_bpmBox->move(s_x5 - 13, m_y1 + 4);
 	m_snapSetting->move(s_x6 - 8, m_y1 + 3);
 
-	// right box
-	m_syncToggle->move((width() - 100), m_y1 + 5);
+	// Right box
+	// For explanation on the choice of constants, look at #7850
+	m_syncToggle->move((width() - 100), m_y1 - 7);
+	m_clearButton->move((width() - 100), m_y1 + 17);
 
 	m_folderButton->move(width() - 20, height() - s_bottomBoxHeight - s_sampleBoxHeight + 1);
 

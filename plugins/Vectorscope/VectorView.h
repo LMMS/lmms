@@ -1,6 +1,7 @@
 /* VectorView.h - declaration of VectorView class.
  *
  * Copyright (c) 2019 Martin Pavelek <he29/dot/HS/at/gmail/dot/com>
+ * Copyright (c) 2025- Michael Gregorius
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -44,10 +45,14 @@ class VectorView : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit VectorView(VecControls *controls, LocklessRingBuffer<SampleFrame> *inputBuffer, unsigned short displaySize, QWidget *parent = 0);
+	VectorView(VecControls* controls, LocklessRingBuffer<SampleFrame>* inputBuffer, QWidget* parent = nullptr);
 	~VectorView() override = default;
 
 	QSize sizeHint() const override {return QSize(300, 300);}
+
+	Q_PROPERTY(QColor colorTrace MEMBER m_colorTrace)
+	Q_PROPERTY(QColor colorGrid MEMBER m_colorGrid)
+	Q_PROPERTY(QColor colorLabels MEMBER m_colorLabels)
 
 protected:
 	void paintEvent(QPaintEvent *event) override;
@@ -58,24 +63,24 @@ private slots:
 	void periodicUpdate();
 
 private:
+	void drawZoomInfo();
+
+private:
 	VecControls *m_controls;
 
 	LocklessRingBuffer<SampleFrame> *m_inputBuffer;
 	LocklessRingBufferReader<SampleFrame> m_bufferReader;
 
-	std::vector<uchar> m_displayBuffer;
-	const unsigned short m_displaySize;
-
-	bool m_visible;
-
 	float m_zoom;
 
 	// State variables for comparison with previous repaint
-	unsigned int m_persistTimestamp;
 	unsigned int m_zoomTimestamp;
-	bool m_oldHQ;
-	int m_oldX;
-	int m_oldY;
+
+	QPointF m_lastPoint = QPoint();
+
+	QColor m_colorTrace = QColor(60, 255, 130, 255);	// ~LMMS green
+	QColor m_colorGrid = QColor(76, 80, 84, 128);		// ~60 % gray (slightly cold / blue), 50 % transparent
+	QColor m_colorLabels = QColor(76, 80, 84, 255);		// ~60 % gray (slightly cold / blue)
 
 #ifdef VEC_DEBUG
 	float m_executionAvg = 0;

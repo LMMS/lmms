@@ -30,10 +30,9 @@
 #include <QScrollArea>
 #include <QVBoxLayout>
 
-#include "AudioDevice.h"
-#include "AudioEngine.h"
 #include "Engine.h"
 #include "Ladspa2LMMS.h"
+#include "lmms_constants.h"
 
 
 namespace lmms::gui
@@ -74,8 +73,7 @@ LadspaDescription::LadspaDescription( QWidget * _parent,
 	QList<QString> pluginNames;
 	for (const auto& plugin : plugins)
 	{
-		ch_cnt_t audioDeviceChannels = Engine::audioEngine()->audioDev()->channels();
-		if (_type != LadspaPluginType::Valid || manager->getDescription(plugin.second)->inputChannels <= audioDeviceChannels)
+		if (_type != LadspaPluginType::Valid || manager->getDescription(plugin.second)->inputChannels <= DEFAULT_CHANNELS)
 		{
 			pluginNames.push_back(plugin.first);
 			m_pluginKeys.push_back(plugin.second);

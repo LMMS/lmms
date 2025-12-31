@@ -34,7 +34,7 @@
 #include <QMoveEvent>
 #include <QPainter>
 #include <QPushButton>
-#include <QStyleOption>
+#include <QStyleOptionTitleBar>
 
 #include "embed.h"
 
@@ -246,6 +246,10 @@ int SubWindow::frameWidth() const
 }
 
 
+void SubWindow::updateTitleBar()
+{
+	adjustTitleBar();
+}
 
 
 /**

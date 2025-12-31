@@ -30,17 +30,17 @@
 #include <QMouseEvent>
 #include <QPainter>
 #include <QStyleOption>
-#include <QtGlobal>
 
 
 #include "AudioEngine.h"
+#include "AutomatableButton.h"
 #include "ConfigManager.h"
 #include "DataFile.h"
 #include "Engine.h"
 #include "FadeButton.h"
-#include "PixmapButton.h"
 #include "StringPairDrag.h"
 #include "Track.h"
+#include "TrackGrip.h"
 #include "TrackContainerView.h"
 #include "ClipView.h"
 
@@ -102,6 +102,10 @@ TrackView::TrackView( Track * track, TrackContainerView * tcv ) :
 
 	connect( &m_track->m_soloModel, SIGNAL(dataChanged()),
 			m_track, SLOT(toggleSolo()), Qt::DirectConnection );
+	
+	auto trackGrip = m_trackOperationsWidget.getTrackGrip();
+	connect(trackGrip, &TrackGrip::grabbed, this, &TrackView::onTrackGripGrabbed);
+	connect(trackGrip, &TrackGrip::released, this, &TrackView::onTrackGripReleased);
 
 	// create views for already existing clips
 	for (const auto& clip : m_track->m_clips)
@@ -284,22 +288,6 @@ void TrackView::mousePressEvent( QMouseEvent * me )
 			QCursor c( Qt::SizeVerCursor);
 			QApplication::setOverrideCursor( c );
 		}
-		else
-		{
-			if( me->x()>10 ) // 10 = The width of the grip + 2 pixels to the left and right.
-			{
-				QWidget::mousePressEvent( me );
-				return;
-			}
-
-			m_action = Action::Move;
-
-			QCursor c( Qt::SizeVerCursor );
-			QApplication::setOverrideCursor( c );
-			// update because in move-mode, all elements in
-			// track-op-widgets are hidden as a visual feedback
-			m_trackOperationsWidget.update();
-		}
 
 		me->accept();
 	}
@@ -450,6 +438,16 @@ void TrackView::muteChanged()
 	if (indicator) { setIndicatorMute(indicator, m_track->m_mutedModel.value()); }
 }
 
+
+void TrackView::onTrackGripGrabbed()
+{
+	m_action = Action::Move;
+}
+
+void TrackView::onTrackGripReleased()
+{
+	m_action = Action::None;
+}
 
 
 

@@ -24,6 +24,8 @@
 
 #include "AutomatableModel.h"
 
+#include <QRegularExpression>
+
 #include "lmms_math.h"
 
 #include "AudioEngine.h"
@@ -754,7 +756,7 @@ float AutomatableModel::globalAutomationValueAt( const TimePos& time )
 		if( latestClip )
 		{
 			// scale/fit the value appropriately and return it
-			const float value = latestClip->valueAt( time - latestClip->startPosition() );
+			const float value = latestClip->valueAt(time - latestClip->startPosition() + latestClip->startTimeOffset());
 			const float scaled_value = scaledValue( value );
 			return fittedValue( scaled_value );
 		}

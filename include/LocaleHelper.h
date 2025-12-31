@@ -25,6 +25,9 @@
  *
  */
 
+// NOTE: The LMMS/zynaddsubfx repo contains a copy of this header.
+//       If you modify this file, consider modifying it there as well.
+
 #ifndef LMMS_LOCALEHELPER_H
 #define LMMS_LOCALEHELPER_H
 
@@ -36,7 +39,7 @@
 namespace lmms::LocaleHelper
 {
 
-inline double toDouble(QString str, bool* ok = nullptr)
+inline double toDouble(const QString& str, bool* ok = nullptr)
 {
 	bool isOkay;
 	QLocale c(QLocale::C);
@@ -48,16 +51,16 @@ inline double toDouble(QString str, bool* ok = nullptr)
 		german.setNumberOptions(QLocale::RejectGroupSeparator);
 		value = german.toDouble(str, &isOkay);
 	}
-	if (ok != nullptr) {*ok = isOkay;}
+	if (ok != nullptr) { *ok = isOkay; }
 	return value;
 }
 
-inline float toFloat(QString str, bool* ok = nullptr)
+inline float toFloat(const QString& str, bool* ok = nullptr)
 {
 	double d = toDouble(str, ok);
 	if (!std::isinf(d) && std::fabs(d) > std::numeric_limits<float>::max())
 	{
-		if (ok != nullptr) {*ok = false;}
+		if (ok != nullptr) { *ok = false; }
 		return 0.0f;
 	}
 	return static_cast<float>(d);
