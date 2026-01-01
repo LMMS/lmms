@@ -28,7 +28,6 @@ public:
 	//
 	// Key Trigger
 	//
-	std::optional<int> m_key = std::nullopt;
 	int m_lokey = 0;
 	int m_hikey = 127;
 

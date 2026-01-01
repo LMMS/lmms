@@ -29,11 +29,6 @@ bool SfzRegion::triggerConditionsMet(const SfzGlobalState& globalState, const Sf
 		int triggerKey = trigger.key().value();
 		int triggerVelocity = trigger.velocity().value();
 
-		// `key` opcode
-		if (m_key != std::nullopt)
-		{
-			if (triggerKey != m_key.value()) { return false; }
-		}
 		// `lokey` and `hikey` opcodes
 		if (triggerKey > m_hikey || triggerKey < m_lokey) { return false; }
 

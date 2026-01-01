@@ -30,11 +30,6 @@ bool SfzOpcodeState::setOpcodeByStrings(const QString& name, const QString& valu
 	//
 	// Key Trigger
 	//
-	else if (name == "key")
-	{
-		m_key = value.toInt(&successful);
-		if (!successful) { m_key = keyNumFromString(value, &successful); }
-	}
 	else if (name == "lokey")
 	{
 		m_lokey = value.toInt(&successful);
@@ -44,6 +39,12 @@ bool SfzOpcodeState::setOpcodeByStrings(const QString& name, const QString& valu
 	{
 		m_hikey = value.toInt(&successful);
 		if (!successful) { m_hikey = keyNumFromString(value, &successful); }
+	}
+	else if (name == "key")
+	{
+		// Setting "key" on its own is equivalent to setting lokey, hikey, and pitch_keycenter all to the same value
+		m_lokey = m_hikey = m_pitch_keycenter = value.toInt(&successful);
+		if (!successful) { m_lokey = m_hikey = m_pitch_keycenter = keyNumFromString(value, &successful); }
 	}
 
 
