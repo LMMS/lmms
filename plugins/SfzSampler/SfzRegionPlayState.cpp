@@ -127,11 +127,11 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const fpp_t frames)
 	freqRatio *= sampleSampleRate / sampleRate;
 
 	// Amplitude envelope
-	const f_cnt_t ampegDelayFrames = (m_region->m_ampeg_delay) * sampleRate;
-	const f_cnt_t ampegAttackFrames = (m_region->m_ampeg_attack) * sampleRate;
-	const f_cnt_t ampegHoldFrames = (m_region->m_ampeg_hold) * sampleRate;
-	const f_cnt_t ampegDecayFrames = (m_region->m_ampeg_decay) * sampleRate;
-	const float ampegSustain = (m_region->m_ampeg_sustain) / 100.0f; // Sustain is stored in percent, so divide by 100 to get ratio
+	const f_cnt_t ampegDelayFrames = (m_region->m_ampeg_delay + m_region->m_ampeg_delay_totalCC) * sampleRate;
+	const f_cnt_t ampegAttackFrames = (m_region->m_ampeg_attack + m_region->m_ampeg_attack_totalCC) * sampleRate;
+	const f_cnt_t ampegHoldFrames = (m_region->m_ampeg_hold + m_region->m_ampeg_hold_totalCC) * sampleRate;
+	const f_cnt_t ampegDecayFrames = (m_region->m_ampeg_decay + m_region->m_ampeg_decay_totalCC) * sampleRate;
+	const float ampegSustain = (m_region->m_ampeg_sustain + m_region->m_ampeg_sustain_totalCC) / 100.0f; // Sustain is stored in percent, so divide by 100 to get ratio
 	const f_cnt_t ampegReleaseFrames = (m_region->m_ampeg_release + m_region->m_ampeg_release_totalCC) * sampleRate;
 
 	// Amplitude due to velocity

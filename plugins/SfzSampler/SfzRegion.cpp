@@ -112,10 +112,10 @@ void SfzRegion::recalculateMaxActiveIndex()
 
 
 
-float SfzRegion::totalCCModulation(const std::array<float, 128>& ccModulationAmounts, const SfzGlobalState& globalState) const
+float SfzRegion::totalCCModulation(const std::array<float, SfzOpcodeState::NumMidiCCs>& ccModulationAmounts, const SfzGlobalState& globalState) const
 {
 	float total = 0.0f;
-	for (int i = 0; i < 128; ++i)
+	for (int i = 0; i < SfzOpcodeState::NumMidiCCs; ++i)
 	{
 		total += ccModulationAmounts[i] * globalState.midiCCValue(i, m_set_cc[i]) / 128.0f; // m_set_cc stores the default CC values for each of the midi controllers
 	}
@@ -124,6 +124,11 @@ float SfzRegion::totalCCModulation(const std::array<float, 128>& ccModulationAmo
 
 void SfzRegion::recalculateTotalCCModulation(const SfzGlobalState& globalState)
 {
+	m_ampeg_delay_totalCC = totalCCModulation(m_ampeg_delay_oncc, globalState);
+	m_ampeg_attack_totalCC = totalCCModulation(m_ampeg_attack_oncc, globalState);
+	m_ampeg_hold_totalCC = totalCCModulation(m_ampeg_hold_oncc, globalState);
+	m_ampeg_decay_totalCC = totalCCModulation(m_ampeg_decay_oncc, globalState);
+	m_ampeg_sustain_totalCC = totalCCModulation(m_ampeg_sustain_oncc, globalState);
 	m_ampeg_release_totalCC = totalCCModulation(m_ampeg_release_oncc, globalState);
 	// TODO more
 }

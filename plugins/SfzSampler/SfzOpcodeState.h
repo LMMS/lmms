@@ -17,6 +17,8 @@ public:
 	static int keyNumFromString(QString keyString, bool* successful);
 	static int ccNumberFromOpcode(const QString& opcode);
 
+	// Normal MIDI CC's range from 0 to 127. More advanced SFZ's go beyond that, but for now we cap it at 128. This should be extended in the future.
+	static constexpr const int NumMidiCCs = 128;
 
 	//
 	// File Paths
@@ -104,12 +106,12 @@ public:
 	float m_ampeg_vel2sustain = 0.0f;
 	float m_ampeg_vel2release = 0.0f;
 	// Midi CC modulation amounts
-	std::array<float, 128> m_ampeg_delay_oncc = {};
-	std::array<float, 128> m_ampeg_attack_oncc = {};
-	std::array<float, 128> m_ampeg_hold_oncc = {};
-	std::array<float, 128> m_ampeg_decay_oncc = {};
-	std::array<float, 128> m_ampeg_sustain_oncc = {};
-	std::array<float, 128> m_ampeg_release_oncc = {};
+	std::array<float, NumMidiCCs> m_ampeg_delay_oncc = {};
+	std::array<float, NumMidiCCs> m_ampeg_attack_oncc = {};
+	std::array<float, NumMidiCCs> m_ampeg_hold_oncc = {};
+	std::array<float, NumMidiCCs> m_ampeg_decay_oncc = {};
+	std::array<float, NumMidiCCs> m_ampeg_sustain_oncc = {};
+	std::array<float, NumMidiCCs> m_ampeg_release_oncc = {};
 
 
 	//
@@ -123,7 +125,7 @@ public:
 	// Midi CC
 	//
 	//! Default midi CC values
-	std::array<int, 128> m_set_cc = {};
+	std::array<int, NumMidiCCs> m_set_cc = {};
 
 	friend class SfzRegion;
 };

@@ -33,54 +33,69 @@ bool SfzParser::parseSfzFile(const QString& filePath, std::vector<SfzRegion>& ou
 
 	qDebug().noquote() << "TESTING: Loaded SFZ:\n" << fileContents; // testing
 
-	// Now that all the includes/defines are handled, loop
+	// Now that all the includes/defines are handled, loop through the whole contents and split it up into segments so that it can be parsed
+	// For example, if you have a sfz file like:
+	/*
+		<region>
+		sample=test.wav
+		key=70
+	*/
+	// Then the parsed segments would be "<region>", "sample=test.wav", and "key=70"
+	// In this example they were all on separate lines, but they don't have to be:
+	/*
+		<region> ampeg_release=0.3 lokey=45 hikey=49
+	*/
+	// This would still be parsed into segments as "<region>", "ampeg_release=0.3", "lokey=45", and "hikey=49"
+	// According to the SFZ format website, there must never be a space on either side of the = for an opcode assignment. That makes things simpler
+	// However, there can be spaces in the value assigned to the opcode. For example, if your sample file name has spaces:
+	/*
+		<region> sample=Grand Piano G4 MP.wav key=49
+	*/
+	// This would be parsed as "<region>", "sample=Grand Piano G4 MP.wav", and "key=49"
+	// Essentially, we need a way to be able to split up the file on whitespace, while leaving intact any opcode assignments which have spaces in their right hand side.
 	std::vector<QString> parsedSegments;
 
+	// We start by splitting on newline
 	for (QString line : fileContents.split("\n"))
 	{
 		// Remove comments from end of line
 		line = line.split("//")[0];
-		// Split the line on whitespace to extract header and opcodes keywords
-		// Fortunately, the SFZ format specifically states that opcode assignments cannot contain spaces around the =, so there is no risk
-		// of accidentally splitting the opcode name from the value.
-		line.replace(">", "> "); // Real quick, make sure there is whitespace between header keywords and anything else after them. One .sfz file I found did `<curve>curve_index=11` in it,, with no space between, which makes parsing complicated, so to fix it we just insert an extra space.
-		for (QString segment : line.split(QRegularExpression("\\s+"), Qt::SkipEmptyParts))
+		
+		line.replace(">", "> "); // Real quick, make sure there is whitespace between header keywords and anything else after them. One .sfz file I found did `<curve>curve_index=11` in it, with no space between, which makes parsing complicated, so to fix it we just insert an extra space.
+		
+		// We can start by splitting on whitespace, but then we will have to go back and group together any chunks which belong to the same opcode assignment, if for example the sample file included spaces
+		// For example, if we had the line:
+		//     <region> sample=My Favorite Sample.flac key=99
+		// Then it would initially by split into "<region>", "sample=My", "Favorite", "Sample.flac", and "key=99"
+		// However, we notice that "Favorite" and "Sample.flac" are not valid opcode assignments since they don't have an "=", and they're not headers, since you don't have those <brackets>
+		// So they must belong to the previous opcode assignment, "sample=My"
+		// If we connect them together, we get "<region>", "sample=My Favorite Sample.flac", and "key=99", just as we wanted!
+		std::vector<QString> lineSegments;
+		for (QString segment : line.split(QRegularExpression("\\s"), Qt::SkipEmptyParts)) // Note: Technically by skipping empty parts, double-spaces within names will be lost. Is this okay? I'm not sure.
 		{
-			parsedSegments.push_back(segment);
-		}
-	}
-	
-	// Okay so ummm... there's a problem I didn't mention haha :sweat_smile:
-	// Unfortunately, sample opcode assignments *can* contain spaces and special characters except for "=". This means that the sample opcode lines could have gotten split up by what we juts did :|
-	// But that's okay. We can just loop through all of the segments, check if they have the sample opcode, and if so, check the next few segments too to see if they might be part of the file name (i.e., don't have = and aren't a header with < > aaround it)
-	for (size_t i = 0; i < parsedSegments.size(); ++i)
-	{
-		if (parsedSegments.at(i).startsWith("sample="))
-		{
-			QStringList samplePathSegments;
-			// Add the initial part of the sample file, before any spaces
-			if (parsedSegments.at(i).split("=").size() != 2)
+			if (segment.contains("=") || (segment.front() == "<" && segment.back() == ">"))
 			{
-				qDebug() << "[SFZ Parser] Warning, sample file path starts with a space? That's kind of weird:" << parsedSegments;
-				samplePathSegments.push_back("");
+				// If this is an opcode assignment or a <header>, go ahead and add it to the list as it is
+				lineSegments.push_back(segment);
 			}
 			else
 			{
-				samplePathSegments.push_back(parsedSegments.at(i).split("=")[1]);
+				// If it's not, then it must belong to the previous segment, so let's concatinate it (with a space, to account for the space taken from the split)
+				if (lineSegments.size() > 0)
+				{
+					lineSegments.back() += " " + segment;
+				}
+				else
+				{
+					qDebug() << "[SFZ Parser] Warning: Encountered non-header, non-opcode assignment at start of line:" << line;
+				}
 			}
-			// Look at the next few segments to see if they might be continuations of the sample file path
-			for (size_t j = i + 1; j < parsedSegments.size();)
-			{
-				QString nextSegment = parsedSegments.at(j);
-				if (nextSegment.contains("=")) { break; } // If there's an equals sign, it's an opcode assignment, not part of the sample file
-				if (nextSegment.front() == "<" && nextSegment.back() == ">") { break; } // If it has < > around it, it's a header, so not part of the sample file
-				samplePathSegments.push_back(nextSegment);
-				parsedSegments.erase(parsedSegments.begin() + j); // Get rid of that segment, since it's part of the file path. Don't increment the index, since everything will shift back.
-			}
-			// Now replace the sample opcode segment with the complete filename
-			parsedSegments.at(i) = "sample=" + samplePathSegments.join(" "); // Technically this doesn't account for samples with double spaces or tabs in the filename
 		}
+		// Add the segments from the current line to the overall list
+		parsedSegments.insert(parsedSegments.end(), lineSegments.begin(), lineSegments.end());
 	}
+
+
 
 	// Now that all the segments are collected, we can go through them all and construct the SfzRegions
 	// First, the <global> header(s) must be found. The SFZ format website does not guarantee that <global> will
@@ -203,12 +218,12 @@ bool SfzParser::parseSfzFile(const QString& filePath, std::vector<SfzRegion>& ou
 			}
 			case Header::Curve:
 			{
-				qDebug() << "[SFZ Parser] Warning, the <curve> header has not been implemented yet. Encountered opcode assignment:" << segment;
+				qDebug() << "[SFZ Parser] Warning: The <curve> header has not been implemented yet. Encountered opcode assignment:" << segment;
 				break;
 			}
 			default:
 			{
-				qDebug() << "[SFZ Parser] Error, encountered line within invalid header" << segment;
+				qDebug() << "[SFZ Parser] Error: Encountered line within invalid header" << segment;
 				return false;
 			}
 		}

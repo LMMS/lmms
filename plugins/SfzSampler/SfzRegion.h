@@ -59,10 +59,15 @@ private:
 
 	//! Store the current total midi CC modulation amounts for the different targets, just so that we don't
 	// have to recalculate them every buffer, instead only when a trigger occurs.
+	float m_ampeg_delay_totalCC = 0.0f;
+	float m_ampeg_attack_totalCC = 0.0f;
+	float m_ampeg_hold_totalCC = 0.0f;
+	float m_ampeg_decay_totalCC = 0.0f;
+	float m_ampeg_sustain_totalCC = 0.0f;
 	float m_ampeg_release_totalCC = 0.0f;
 
 	//! Helper function to calculate the total modulation of all midi CC controllers on a parameter. Essentially it just multiplies the modulation amounts by the current CC values and adds it all up.
-	float totalCCModulation(const std::array<float, 128>& ccModulationAmounts, const SfzGlobalState& globalState) const;
+	float totalCCModulation(const std::array<float, SfzOpcodeState::NumMidiCCs>& ccModulationAmounts, const SfzGlobalState& globalState) const;
 	void recalculateTotalCCModulation(const SfzGlobalState& globalState);
 
 	friend class SfzRegionPlayState; // TODO this was just to make it easy but...?

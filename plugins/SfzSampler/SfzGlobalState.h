@@ -5,6 +5,7 @@
 #include <array>
 #include <optional>
 
+#include "SfzOpcodeState.h"
 #include "SfzTrigger.h"
 
 namespace lmms
@@ -35,7 +36,7 @@ private:
 	//! Stores the current value of all the midi CC knobs/controllers
 	//! Technically, floats should probably be used to allow for HDCC (high definition CC's) as used in ARIA, but for now dividing by 128 to get a float between 0 and 1 works fine.
 	//! std::optional is used so that sfz file can specify default cc values
-	std::array<std::optional<int>, 128> m_ccValues = {};
+	std::array<std::optional<int>, SfzOpcodeState::NumMidiCCs> m_ccValues = {};
 };
 
 

@@ -238,6 +238,8 @@ int SfzOpcodeState::ccNumberFromOpcode(const QString& opcode)
 	bool successfulToInt = false;
 	int ccNumber = match.captured(0).toInt(&successfulToInt);
 	if (!successfulToInt) { qDebug() << "[SFZ Parser] Unable to convert CC number to int:" << opcode; return 0; }
+	// Normal midi lets you choose between 0-127 for the CC number. According to the SFZ format website, ARIA and SFZ 2 allow for extended CC numbers. Most have not been implemented here, so to keep things safe, we cap it and give a warning.
+	if (ccNumber < 0 || ccNumber > NumMidiCCs) { qDebug() << "[SFZ Parser] Midi CC number" << ccNumber << "is out of range 0-127. This is not yet implmented."; return 0;}
 	return ccNumber;
 }
 
