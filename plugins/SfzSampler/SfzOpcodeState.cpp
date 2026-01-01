@@ -14,6 +14,9 @@ bool SfzOpcodeState::setOpcodeByStrings(const QString& name, const QString& valu
 {
 	bool successful = true;
 
+	//
+	// File paths
+	//
 	if (name == "sample")
 	{
 		m_sampleFile = value;
@@ -23,6 +26,10 @@ bool SfzOpcodeState::setOpcodeByStrings(const QString& name, const QString& valu
 		m_default_path = value;
 	}
 
+
+	//
+	// Key Trigger
+	//
 	else if (name == "key")
 	{
 		m_key = value.toInt(&successful);
@@ -39,6 +46,10 @@ bool SfzOpcodeState::setOpcodeByStrings(const QString& name, const QString& valu
 		if (!successful) { m_hikey = keyNumFromString(value, &successful); }
 	}
 
+
+	//
+	// Velocity Trigger
+	//
 	else if (name == "lovel")
 	{
 		m_lovel = value.toInt(&successful);
@@ -48,11 +59,35 @@ bool SfzOpcodeState::setOpcodeByStrings(const QString& name, const QString& valu
 		m_hivel = value.toInt(&successful);
 	}
 
+
+	//
+	// Sample playback options
+	//
 	else if (name == "offset")
 	{
 		m_offset = value.toInt(&successful);
 	}
+	else if (name == "loop_mode")
+	{
+		if (value == "no_loop") { m_loop_mode = LoopMode::NoLoop; }
+		else if (value == "one_shot") { m_loop_mode = LoopMode::OneShot; }
+		//else if (value == "loop_continuous") { m_loop_mode = LoopMode::LoopContinuous; } // Not implemented yet, since we don't currently have a way to get loop point data from sample files
+		//else if (value == "loop_sustain") { m_loop_mode = LoopMode::LoopSustain; }
+		else
+		{
+			qDebug() << "[SFZ Parser] Unknown loop_mode:" << value;
+			return false;
+		}
+	}
 
+
+	//
+	// Pitch
+	//
+	else if (name == "tune")
+	{
+		m_tune = value.toInt(&successful);
+	}
 	else if (name == "pitch_keycenter")
 	{
 		m_pitch_keycenter = value.toInt(&successful);
@@ -67,33 +102,10 @@ bool SfzOpcodeState::setOpcodeByStrings(const QString& name, const QString& valu
 		m_pitch_veltrack = value.toInt(&successful);
 	}
 
-	else if (name == "tune")
-	{
-		m_tune = value.toFloat(&successful);
-	}
 
-	else if (name == "volume" || name == "group_volume")
-	{
-		m_volume = value.toFloat(&successful);
-	}
-	else if (name == "pan")
-	{
-		m_pan = value.toFloat(&successful);
-	}
-
-	else if (name == "loop_mode")
-	{
-		if (value == "no_loop") { m_loop_mode = LoopMode::NoLoop; }
-		else if (value == "one_shot") { m_loop_mode = LoopMode::OneShot; }
-		//else if (value == "loop_continuous") { m_loop_mode = LoopMode::LoopContinuous; } // Not implemented yet, since we don't currently have a way to get loop point data from sample files
-		//else if (value == "loop_sustain") { m_loop_mode = LoopMode::LoopSustain; }
-		else
-		{
-			qDebug() << "[SFZ Parser] Unknown loop_mode:" << value;
-			return false;
-		}
-	}
-
+	//
+	// Filter
+	//
 	else if (name == "fil_type")
 	{
 		if (value == "lpf_1p") { m_fil_type = FilterType::Lowpass1Pole; }
@@ -121,42 +133,73 @@ bool SfzOpcodeState::setOpcodeByStrings(const QString& name, const QString& valu
 		m_fil_veltrack = value.toInt(&successful);
 	}
 
+	//
+	// Amplitude
+	//
 	else if (name == "amp_veltrack")
 	{
 		m_amp_veltrack = value.toFloat(&successful);
 	}
 
-	else if (name == "ampeg_delay")
+	//
+	// Amplitude Envelope Generator (ampeg)
+	//
+	else if (name == "ampeg_delay") { m_ampeg_delay = value.toFloat(&successful); }
+	else if (name == "ampeg_attack") { m_ampeg_attack = value.toFloat(&successful); }
+	else if (name == "ampeg_hold") { m_ampeg_hold = value.toFloat(&successful); }
+	else if (name == "ampeg_decay") { m_ampeg_decay = value.toFloat(&successful); }
+	else if (name == "ampeg_sustain") { m_ampeg_sustain = value.toFloat(&successful); }
+	else if (name == "ampeg_release") { m_ampeg_release = value.toFloat(&successful); }
+	// Velocity modulation amounts
+	else if (name == "ampeg_vel2delay") { m_ampeg_vel2delay = value.toFloat(&successful); }
+	else if (name == "ampeg_vel2attack") { m_ampeg_vel2attack = value.toFloat(&successful); }
+	else if (name == "ampeg_vel2hold") { m_ampeg_vel2hold = value.toFloat(&successful); }
+	else if (name == "ampeg_vel2decay") { m_ampeg_vel2decay = value.toFloat(&successful); }
+	else if (name == "ampeg_vel2sustain") { m_ampeg_vel2sustain = value.toFloat(&successful); }
+	else if (name == "ampeg_vel2release") { m_ampeg_vel2release = value.toFloat(&successful); }
+	// Midi CC modulation amounts
+	else if (name.startsWith("ampeg_delay_oncc") || name.startsWith("ampeg_delaycc"))
 	{
-		m_ampeg_delay = value.toFloat(&successful);
+		m_ampeg_delay_oncc.at(ccNumberFromOpcode(name)) = value.toFloat(&successful);
 	}
-	else if (name == "ampeg_attack")
+	else if (name.startsWith("ampeg_attack_oncc") || name.startsWith("ampeg_attackcc"))
 	{
-		m_ampeg_attack = value.toFloat(&successful);
+		m_ampeg_attack_oncc.at(ccNumberFromOpcode(name)) = value.toFloat(&successful);
 	}
-	else if (name == "ampeg_hold")
+	else if (name.startsWith("ampeg_hold_oncc") || name.startsWith("ampeg_holdcc"))
 	{
-		m_ampeg_hold = value.toFloat(&successful);
+		m_ampeg_hold_oncc.at(ccNumberFromOpcode(name)) = value.toFloat(&successful);
 	}
-	else if (name == "ampeg_decay")
+	else if (name.startsWith("ampeg_decay_oncc") || name.startsWith("ampeg_decaycc"))
 	{
-		m_ampeg_decay = value.toFloat(&successful);
+		m_ampeg_decay_oncc.at(ccNumberFromOpcode(name)) = value.toFloat(&successful);
 	}
-	else if (name == "ampeg_sustain")
+	else if (name.startsWith("ampeg_sustain_oncc") || name.startsWith("ampeg_sustaincc"))
 	{
-		m_ampeg_sustain = value.toFloat(&successful);
+		m_ampeg_sustain_oncc.at(ccNumberFromOpcode(name)) = value.toFloat(&successful);
 	}
-	else if (name == "ampeg_release")
-	{
-		m_ampeg_release = value.toFloat(&successful);
-	}
-
 	else if (name.startsWith("ampeg_release_oncc") || name.startsWith("ampeg_releasecc"))
 	{
-		int ccNumber = ccNumberFromOpcode(name);
-		m_ampeg_release_oncc.at(ccNumber) = value.toFloat(&successful);
+		m_ampeg_release_oncc.at(ccNumberFromOpcode(name)) = value.toFloat(&successful);
 	}
 
+
+	//
+	// Misc Volume
+	//
+	else if (name == "volume" || name == "group_volume")
+	{
+		m_volume = value.toFloat(&successful);
+	}
+	else if (name == "pan")
+	{
+		m_pan = value.toFloat(&successful);
+	}
+
+
+	//
+	// Midi CC
+	//
 	else if (name.startsWith("set_cc"))
 	{
 		int ccNumber = ccNumberFromOpcode(name);
@@ -173,6 +216,7 @@ bool SfzOpcodeState::setOpcodeByStrings(const QString& name, const QString& valu
 		qDebug() << "[SFZ Parser] Unknown opcode:" << name;
 		return false;
 	}
+
 
 	if (!successful)
 	{
