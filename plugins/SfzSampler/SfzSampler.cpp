@@ -69,7 +69,7 @@ SfzSampler::SfzSampler(InstrumentTrack* instrumentTrack)
 	//QString path = ConfigManager::inst()->userSamplesDir() + "sfz/jlearman.jRhodes3c-master/jRhodes3c-looped-flac-sfz/";
 	//loadFile(path + "_jRhodes-stereo-looped.sfz");
 
-	loadFile(ConfigManager::inst()->userSamplesDir() + "sfz/SplendidGrandPiano-master/Splendid\ Grand\ Piano.sfz");
+	//loadFile(ConfigManager::inst()->userSamplesDir() + "sfz/SplendidGrandPiano-master/Splendid\ Grand\ Piano.sfz");
 
 	auto iph = new InstrumentPlayHandle(this, instrumentTrack);
 	Engine::audioEngine()->addPlayHandle(iph);

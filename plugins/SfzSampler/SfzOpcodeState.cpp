@@ -77,6 +77,18 @@ bool SfzOpcodeState::setOpcodeByStrings(const QString& name, const QString& valu
 		m_pan = value.toFloat(&successful);
 	}
 
+	else if (name == "loop_mode")
+	{
+		if (value == "no_loop") { m_loop_mode = LoopMode::NoLoop; }
+		else if (value == "one_shot") { m_loop_mode = LoopMode::OneShot; }
+		//else if (value == "loop_continuous") { m_loop_mode = LoopMode::LoopContinuous; } // Not implemented yet, since we don't currently have a way to get loop point data from sample files
+		//else if (value == "loop_sustain") { m_loop_mode = LoopMode::LoopSustain; }
+		else
+		{
+			qDebug() << "[SFZ Parser] Unknown loop_mode:" << value;
+		}
+	}
+
 	else if (name == "amp_veltrack")
 	{
 		m_amp_veltrack = value.toFloat(&successful);

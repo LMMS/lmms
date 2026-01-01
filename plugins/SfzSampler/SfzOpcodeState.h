@@ -38,6 +38,15 @@ public:
 	float m_volume = 0.0f; // In decibals
 	float m_pan = 0.0f;
 
+	enum class LoopMode
+	{
+		NoLoop,
+		OneShot,
+		//LoopContinuous,
+		//LoopSustain
+	};
+	LoopMode m_loop_mode = LoopMode::NoLoop;
+
 	float m_amp_veltrack = 100;
 
 	float m_ampeg_delay = 0;

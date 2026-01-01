@@ -136,6 +136,12 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const fpp_t frames)
 		m_active = false;
 	}
 
+	// If loop_mode is one_shot, no noteOff signal will ever come to release it, so we need to manually deactivate when we reach the end of the sample
+	if (m_region->m_loop_mode == SfzOpcodeState::LoopMode::OneShot && m_sampleFrame >= m_region->sample().size())
+	{
+		m_active = false; // TODO should this forcefully decative or just release?
+	}
+
 	int elapsed = profiler.elapsed(); totalMicroseconds += elapsed; totalSquaredMicroseconds += elapsed * elapsed; totalCalls++; minElapsed = std::min(minElapsed, elapsed); maxElapsed = std::max(maxElapsed, elapsed);
 	float mean = 1.0f * totalMicroseconds / totalCalls, variance = (1.0f * totalSquaredMicroseconds - 1.0f * totalMicroseconds * totalMicroseconds / totalCalls / totalCalls) / totalCalls;
 	//qDebug() << "SfzRegionPlayState::play profiler:" << elapsed << "Min:" << minElapsed << "Max:" << maxElapsed << "Total calls" << totalCalls << "Mean:" << mean << "Stdev:" << std::sqrt(variance) << "Stdev of mean:" << sqrt(variance / totalCalls);
@@ -145,10 +151,17 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const fpp_t frames)
 
 void SfzRegionPlayState::processTrigger(const SfzTrigger& trigger)
 {
-	if (trigger.key() == m_trigger.key() && trigger.type() == SfzTrigger::Type::NoteOff && !m_released)
+	if (m_released) { return; } // If we already released, don't do anything
+
+	if (trigger.type() == SfzTrigger::Type::NoteOff)
 	{
-		m_released = true;
-		m_releaseFrame = m_frameCount; // testing
+		if (m_region->m_loop_mode == SfzOpcodeState::LoopMode::OneShot) { return; } // If one_shot looping is enabled, the whole sample will play regardless of if the note is released
+
+		if (trigger.key() == m_trigger.key())
+		{
+			m_released = true;
+			m_releaseFrame = m_frameCount; // testing
+		}
 	}
 }
 
