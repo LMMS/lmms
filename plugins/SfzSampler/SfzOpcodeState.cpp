@@ -62,6 +62,10 @@ bool SfzOpcodeState::setOpcodeByStrings(const QString& name, const QString& valu
 	{
 		m_pitch_keytrack = value.toInt(&successful);
 	}
+	else if (name == "pitch_veltrack")
+	{
+		m_pitch_veltrack = value.toInt(&successful);
+	}
 
 	else if (name == "tune")
 	{
@@ -92,12 +96,12 @@ bool SfzOpcodeState::setOpcodeByStrings(const QString& name, const QString& valu
 
 	else if (name == "fil_type")
 	{
-		if (value == "lpf1p") { m_fil_type = FilterType::Lowpass1Pole; }
-		else if (value == "lpf2p") { m_fil_type = FilterType::Lowpass2Pole; }
-		else if (value == "hpf1p") { m_fil_type = FilterType::Highpass1Pole; }
-		else if (value == "hpf2p") { m_fil_type = FilterType::Highpass2Pole; }
-		else if (value == "bpf2p") { m_fil_type = FilterType::Bandpass2Pole; }
-		else if (value == "brf2p") { m_fil_type = FilterType::Bandstop2Pole; }
+		if (value == "lpf_1p") { m_fil_type = FilterType::Lowpass1Pole; }
+		else if (value == "lpf_2p") { m_fil_type = FilterType::Lowpass2Pole; }
+		else if (value == "hpf_1p") { m_fil_type = FilterType::Highpass1Pole; }
+		else if (value == "hpf_2p") { m_fil_type = FilterType::Highpass2Pole; }
+		else if (value == "bpf_2p") { m_fil_type = FilterType::Bandpass2Pole; }
+		else if (value == "brf_2p") { m_fil_type = FilterType::Bandstop2Pole; }
 		else
 		{
 			qDebug() << "[SFZ Parser] Unknown filter type:" << value;
@@ -111,6 +115,10 @@ bool SfzOpcodeState::setOpcodeByStrings(const QString& name, const QString& valu
 	else if (name == "resonance")
 	{
 		m_resonance = value.toFloat(&successful);
+	}
+	else if (name == "fil_veltrack")
+	{
+		m_fil_veltrack = value.toInt(&successful);
 	}
 
 	else if (name == "amp_veltrack")

@@ -59,7 +59,8 @@ public:
 	// Pitch
 	//
 	int m_pitch_keycenter = 60;
-	int m_pitch_keytrack = 100;
+	int m_pitch_keytrack = 100; // in cents
+	int m_pitch_veltrack = 0; // in cents
 
 	float m_tune = 0.0f; // in cents
 
@@ -78,6 +79,7 @@ public:
 	FilterType m_fil_type = FilterType::Lowpass2Pole;
 	std::optional<float> m_cutoff = std::nullopt;
 	float m_resonance = 0.0f;
+	int m_fil_veltrack = 0; // in cents
 
 
 	//

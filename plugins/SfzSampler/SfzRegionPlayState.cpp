@@ -108,9 +108,16 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const fpp_t frames)
 	const f_cnt_t startFrameOffset = std::max(0, -m_frameCount);
 	const f_cnt_t framesToPlay = frames - startFrameOffset;
 
+	// Helper variable
+	const float normalizedVelocity = m_trigger.velocity().value() / 127.0f;
+
 	// Calculate pitch difference relative to original sample
-	const int semitoneDifference = m_trigger.key().value() - m_region->m_pitch_keycenter + m_region->m_tune / 100;
-	float freqRatio = std::exp2(semitoneDifference * m_region->m_pitch_keytrack / 1200.0f);
+	const float semitoneDifference = m_trigger.key().value() - m_region->m_pitch_keycenter;
+	// The total pitch depends on 1. the key offset 2. the fine `tune` adjustment 3. the velocity, if pitch_veltrack is nonzero
+	const float pitch = semitoneDifference * m_region->m_pitch_keytrack / 100.0f
+		+ m_region->m_tune / 100.0f
+		+ normalizedVelocity * m_region->m_pitch_veltrack / 100.0f;
+	float freqRatio = std::exp2(pitch / 12.0f);
 
 	// Sample rate of sample
 	const float sampleSampleRate = m_region->sample().sampleRate();
@@ -132,8 +139,8 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const fpp_t frames)
 	// If amp_keytrack is -100, it's the reverse. If amp_keytrack is 0, the volume is not affected by the velocity.
 	// Essentially this means lerping between y = x, y = 1, and y = 1 - x, if you think of y being the amp and x being vel/127
 	const float ampVelocity = m_region->m_amp_veltrack > 0
-		? (m_trigger.velocity().value() / 127.0f) * (m_region->m_amp_veltrack / 100) + 1.0f * (1.0f - m_region->m_amp_veltrack / 100)
-		: (1.0f - m_trigger.velocity().value() / 127.0f) * (m_region->m_amp_veltrack / -100) + 1.0f * (1.0f - m_region->m_amp_veltrack / -100);
+		? (normalizedVelocity) * (m_region->m_amp_veltrack / 100) + 1.0f * (1.0f - m_region->m_amp_veltrack / 100)
+		: (1.0f - normalizedVelocity) * (m_region->m_amp_veltrack / -100) + 1.0f * (1.0f - m_region->m_amp_veltrack / -100);
 
 	// Amplitude due to volume/gain
 	const float ampVolume = dbfsToAmp(m_region->m_volume);
@@ -148,9 +155,12 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const fpp_t frames)
 	// For performance, only update the cutoff frequency/resonance once per buffer
 	if (filterEnabled)
 	{
+		// The cutoff frequency is in hertz, but things like fil_veltrack are defined in cents, so we have to convert them
+		const float filterCutoffPitchOffset = normalizedVelocity * m_region->m_fil_veltrack / 100.0f;
+		const float filterCutoff = m_region->m_cutoff.value() + std::exp2(filterCutoffPitchOffset / 12.0f);
 		// SFZ has the resonance given in decibals, which is not the same as the resonance passed to the filter, so we have to convert it
 		const float q = std::sqrt(2.0f) * dbfsToAmp(m_region->m_resonance); // TODO is this equation correct? I'm sort of basing it off https://www.musicdsp.org/en/latest/Filters/180-cool-sounding-lowpass-with-decibel-measured-resonance.html but I'm not sure.
-		m_filter.calcFilterCoeffs(m_region->m_cutoff.value(), q);
+		m_filter.calcFilterCoeffs(filterCutoff, q);
 	}
 
 	for (f_cnt_t f = 0; f < frames; ++f)
