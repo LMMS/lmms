@@ -86,7 +86,31 @@ bool SfzOpcodeState::setOpcodeByStrings(const QString& name, const QString& valu
 		else
 		{
 			qDebug() << "[SFZ Parser] Unknown loop_mode:" << value;
+			return false;
 		}
+	}
+
+	else if (name == "fil_type")
+	{
+		if (value == "lpf1p") { m_fil_type = FilterType::Lowpass1Pole; }
+		else if (value == "lpf2p") { m_fil_type = FilterType::Lowpass2Pole; }
+		else if (value == "hpf1p") { m_fil_type = FilterType::Highpass1Pole; }
+		else if (value == "hpf2p") { m_fil_type = FilterType::Highpass2Pole; }
+		else if (value == "bpf2p") { m_fil_type = FilterType::Bandpass2Pole; }
+		else if (value == "brf2p") { m_fil_type = FilterType::Bandstop2Pole; }
+		else
+		{
+			qDebug() << "[SFZ Parser] Unknown filter type:" << value;
+			return false;
+		}
+	}
+	else if (name == "cutoff")
+	{
+		m_cutoff = value.toFloat(&successful);
+	}
+	else if (name == "resonance")
+	{
+		m_resonance = value.toFloat(&successful);
 	}
 
 	else if (name == "amp_veltrack")

@@ -6,7 +6,7 @@
 #include "SfzTrigger.h"
 #include "SfzOpcodeState.h"
 
-#include "Sample.h"
+#include "BasicFilters.h"
 
 namespace lmms
 {
@@ -46,6 +46,10 @@ private:
 
 	//! Stores the current frame index being played in the region's sample. This is a float, since interpolation is done to change pitch/sample rate
 	float m_sampleFrame = 0;
+
+	//! Some SFZ's utilize filters (e.g, a lowpass which changes cutoff depending on velocity), so each voice needs to have a filter object
+	// TODO this assumes 2 channels--is that okay?
+	BasicFilters<2> m_filter = {44100}; // This just initializes it to something so this class can be default-initialized in an array, but this will be reinitialized later.
 
 	//! The trigger event which caused this sound
 	SfzTrigger m_trigger;

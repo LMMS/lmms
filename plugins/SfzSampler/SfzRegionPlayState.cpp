@@ -14,11 +14,37 @@ namespace lmms
 
 SfzRegionPlayState::SfzRegionPlayState(const SfzRegion* region, const SfzTrigger& trigger)
 	: m_active(true)
+	, m_filter(Engine::audioEngine()->outputSampleRate())
 	, m_trigger(trigger)
 	, m_region(region)
 {
 	// Set initial sample start frame offset
 	m_sampleFrame += m_region->m_offset;
+
+	// Setup the filter
+	switch (m_region->m_fil_type)
+	{
+	// This is not correct! I'm using the default filters from BasicFilters, but I don't believe they necessarily match the 1 pole vs 2 pole specifications for sfz.
+	// For example, the default lowpass is a biquad, which I believe has 2 poles. For now I'm using it for both lowpass types, but it should probably be changed in the future.
+	case SfzOpcodeState::FilterType::Lowpass1Pole:
+		m_filter.setFilterType(BasicFilters<2>::FilterType::LowPass);
+		break;
+	case SfzOpcodeState::FilterType::Lowpass2Pole:
+		m_filter.setFilterType(BasicFilters<2>::FilterType::LowPass);
+		break;
+	case SfzOpcodeState::FilterType::Highpass1Pole:
+		m_filter.setFilterType(BasicFilters<2>::FilterType::HiPass);
+		break;
+	case SfzOpcodeState::FilterType::Highpass2Pole:
+		m_filter.setFilterType(BasicFilters<2>::FilterType::HiPass);
+		break;
+	case SfzOpcodeState::FilterType::Bandpass2Pole:
+		m_filter.setFilterType(BasicFilters<2>::FilterType::BandPass_CSG); // I am not well versed in the difference between BandPass_CSG and BandPass_CZPG. It seems to be something about how it uses Q/resonance? I'm not sure.
+		break;
+	case SfzOpcodeState::FilterType::Bandstop2Pole:
+		m_filter.setFilterType(BasicFilters<2>::FilterType::Notch);
+		break;
+	}
 }
 
 
@@ -104,7 +130,10 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const fpp_t frames)
 	// Amplitude due to velocity
 	// If amp_keytrack is 100, then 0 velocity = 0 amp, and 127 velocity = 1.0f amp (as expected)
 	// If amp_keytrack is -100, it's the reverse. If amp_keytrack is 0, the volume is not affected by the velocity.
-	const float ampVelocity = 2 * ((m_trigger.velocity().value() / 127.0f - 0.5f) * (m_region->m_amp_veltrack / 100) * 0.5f + 0.5f);
+	// Essentially this means lerping between y = x, y = 1, and y = 1 - x, if you think of y being the amp and x being vel/127
+	const float ampVelocity = m_region->m_amp_veltrack > 0
+		? (m_trigger.velocity().value() / 127.0f) * (m_region->m_amp_veltrack / 100) + 1.0f * (1.0f - m_region->m_amp_veltrack / 100)
+		: (1.0f - m_trigger.velocity().value() / 127.0f) * (m_region->m_amp_veltrack / -100) + 1.0f * (1.0f - m_region->m_amp_veltrack / -100);
 
 	// Amplitude due to volume/gain
 	const float ampVolume = dbfsToAmp(m_region->m_volume);
@@ -114,8 +143,19 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const fpp_t frames)
 	const float rightPanAmp = std::min(1.0f, 1.0f + pan);
 	const float leftPanAmp = std::min(1.0f, 1.0f - pan);
 
+	// Filter
+	const bool filterEnabled = m_region->m_cutoff != std::nullopt;
+	// For performance, only update the cutoff frequency/resonance once per buffer
+	if (filterEnabled)
+	{
+		// SFZ has the resonance given in decibals, which is not the same as the resonance passed to the filter, so we have to convert it
+		const float q = std::sqrt(2.0f) * dbfsToAmp(m_region->m_resonance); // TODO is this equation correct? I'm sort of basing it off https://www.musicdsp.org/en/latest/Filters/180-cool-sounding-lowpass-with-decibel-measured-resonance.html but I'm not sure.
+		m_filter.calcFilterCoeffs(m_region->m_cutoff.value(), q);
+	}
+
 	for (f_cnt_t f = 0; f < frames; ++f)
 	{
+		// The amplitude envelope is computed every frame, since doing it once per buffer could result in discontinuities/clicks
 		const float ampeg = envelopeGenerator(
 			ampegDelayFrames,
 			ampegAttackFrames,
@@ -124,11 +164,20 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const fpp_t frames)
 			ampegSustain,
 			ampegReleaseFrames
 		);
-		buffer[f][0] += m_region->sample().at(m_sampleFrame, 0) * ampeg * ampVelocity * ampVolume * rightPanAmp;
-		buffer[f][1] += m_region->sample().at(m_sampleFrame, 1) * ampeg * ampVelocity * ampVolume * leftPanAmp;
+		if (filterEnabled) // TODO does this if statement make it faster?
+		{
+			buffer[f][0] += m_filter.update(m_region->sample().at(m_sampleFrame, 0) * ampeg * ampVelocity * ampVolume * rightPanAmp, 0);
+			buffer[f][1] += m_filter.update(m_region->sample().at(m_sampleFrame, 1) * ampeg * ampVelocity * ampVolume * leftPanAmp, 1);
+		}
+		else
+		{
+			buffer[f][0] += m_region->sample().at(m_sampleFrame, 0) * ampeg * ampVelocity * ampVolume * rightPanAmp;
+			buffer[f][1] += m_region->sample().at(m_sampleFrame, 1) * ampeg * ampVelocity * ampVolume * leftPanAmp;
+		}
 		m_sampleFrame = std::min(static_cast<float>(m_region->sample().size()), m_sampleFrame + freqRatio);
 		m_frameCount++;
 	}
+
 
 	// Deactive the voice if it has been released and the release has finished
 	if (m_released && static_cast<f_cnt_t>(m_frameCount - m_releaseFrame) > ampegReleaseFrames)
