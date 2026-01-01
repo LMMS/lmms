@@ -62,6 +62,19 @@ bool SfzOpcodeState::setOpcodeByStrings(const QString& name, const QString& valu
 
 
 	//
+	// Round Robin Trigger
+	//
+	else if (name == "seq_length")
+	{
+		m_seq_length = value.toInt(&successful);
+	}
+	else if (name == "seq_position")
+	{
+		m_seq_position = value.toInt(&successful);
+	}
+
+
+	//
 	// Sample playback options
 	//
 	else if (name == "offset")

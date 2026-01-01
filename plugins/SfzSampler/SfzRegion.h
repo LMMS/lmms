@@ -57,6 +57,9 @@ private:
 	//! Helper function to figure out what the maximum active index is, in the event the maximum index deacticated
 	void recalculateMaxActiveIndex();
 
+	//! In order to do round robin, the region needs to keep track of how many notes it has played in its lifetime. Or rather, the number of notes it *would* have played if it weren't restricted to only play a note when the round-robin counter hit the right numbers.
+	size_t m_roundRobinCount = 0;
+
 	//! Store the current total midi CC modulation amounts for the different targets, just so that we don't
 	// have to recalculate them every buffer, instead only when a trigger occurs.
 	float m_ampeg_delay_totalCC = 0.0f;

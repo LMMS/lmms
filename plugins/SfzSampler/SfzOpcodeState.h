@@ -40,6 +40,12 @@ public:
 	int m_lovel = 0;
 	int m_hivel = 127;
 
+	//
+	// Round Robin Trigger
+	//
+	int m_seq_length = 1;
+	int m_seq_position = 1;
+
 
 	//
 	// Sample playback

@@ -35,6 +35,10 @@ bool SfzRegion::triggerConditionsMet(const SfzGlobalState& globalState, const Sf
 		// `lovel` and `hivel` opcodes
 		if (triggerVelocity > m_hivel || triggerVelocity < m_lovel) { return false; }
 
+		// If all conditions up until now have passed, that means we're ready to play sound. However, if round-robin is set up, we only do it if it's our turn.
+		m_roundRobinCount++;
+		if (m_roundRobinCount % m_seq_length != m_seq_position - 1 /*Minus 1 because the opcode is 1-indexed*/) { return false; } // Not our turn
+
 		// If all the contitions passed, return true and spawn a sound
 		return true;
 	}
