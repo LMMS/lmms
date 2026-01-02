@@ -26,6 +26,8 @@
 
 #include <QObject>
 
+#include "AudioEngine.h"
+#include "Engine.h"
 #include "JournallingObject.h"
 #include "TimePos.h"
 
@@ -43,6 +45,32 @@ public:
 		KeepPosition
 	};
 
+	auto pos() const -> const TimePos& { return m_pos; }
+
+	auto ticks() const -> tick_t { return m_pos.getTicks(); }
+
+	//! Forcefully sets the current ticks, resets the frame offset, and sets the elapsed seconds based on the global position (ignoring potential mid-song tempo changes)
+	//! This function will emit the `positionJumped` signal to allow other widgets to update accordingly
+	void setTicks(tick_t ticks)
+	{
+		m_pos.setTicks(ticks);
+		m_frameOffset = 0;
+		m_elapsedSeconds = ticks * Engine::framesPerTick() / Engine::audioEngine()->outputSampleRate();
+		emit positionJumped();
+		emit positionChanged();
+	}
+
+	//! Advances the current timeline position by a certain number of ticks, in addition to updating the elapsed time based on the current tempo.
+	void incrementTicks(tick_t increment)
+	{
+		m_pos.setTicks(ticks() + increment);
+		m_elapsedSeconds += increment * Engine::framesPerTick() / Engine::audioEngine()->outputSampleRate();
+		emit positionChanged();
+	}
+
+	auto frameOffset() const -> f_cnt_t { return m_frameOffset; }
+	void setFrameOffset(const f_cnt_t frame) { m_frameOffset = frame; }
+
 	auto loopBegin() const -> TimePos { return m_loopBegin; }
 	auto loopEnd() const -> TimePos { return m_loopEnd; }
 	auto loopEnabled() const -> bool { return m_loopEnabled; }
@@ -58,11 +86,15 @@ public:
 	void setPlayStartPosition(TimePos position) { m_playStartPosition = position; }
 	void setStopBehaviour(StopBehaviour behaviour);
 
+	auto getElapsedSeconds() const -> double { return m_elapsedSeconds + frameOffset() / Engine::audioEngine()->outputSampleRate(); }
+
 	auto nodeName() const -> QString override { return "timeline"; }
 
 signals:
 	void loopEnabledChanged(bool enabled);
 	void stopBehaviourChanged(lmms::Timeline::StopBehaviour behaviour);
+	void positionChanged();
+	void positionJumped();
 
 protected:
 	void saveSettings(QDomDocument& doc, QDomElement& element) override;
@@ -72,6 +104,11 @@ private:
 	TimePos m_loopBegin = TimePos{0};
 	TimePos m_loopEnd = TimePos{DefaultTicksPerBar};
 	bool m_loopEnabled = false;
+	TimePos m_pos = TimePos{0};
+
+	f_cnt_t m_frameOffset = 0;
+
+	double m_elapsedSeconds = 0;
 
 	StopBehaviour m_stopBehaviour = StopBehaviour::BackToStart;
 	TimePos m_playStartPosition = TimePos{-1};

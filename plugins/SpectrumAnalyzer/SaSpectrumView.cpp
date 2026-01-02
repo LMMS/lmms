@@ -33,6 +33,7 @@
 #include <QPainterPath>
 #include <QString>
 
+#include "DeprecationHelper.h"
 #include "fft_helpers.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
@@ -819,18 +820,14 @@ void SaSpectrumView::periodicUpdate()
 
 
 // Handle mouse input: set new cursor position.
-// For some reason (a bug?), localPos() only returns integers. As a workaround
-// the fractional part is taken from windowPos() (which works correctly).
-void SaSpectrumView::mouseMoveEvent(QMouseEvent *event)
+void SaSpectrumView::mouseMoveEvent(QMouseEvent* event)
 {
-	m_cursor = QPointF(	event->localPos().x() - (event->windowPos().x() - (long)event->windowPos().x()),
-						event->localPos().y() - (event->windowPos().y() - (long)event->windowPos().y()));
+	m_cursor = positionF(event);
 }
 
-void SaSpectrumView::mousePressEvent(QMouseEvent *event)
+void SaSpectrumView::mousePressEvent(QMouseEvent* event)
 {
-	m_cursor = QPointF(	event->localPos().x() - (event->windowPos().x() - (long)event->windowPos().x()),
-						event->localPos().y() - (event->windowPos().y() - (long)event->windowPos().y()));
+	m_cursor = positionF(event);
 }
 
 

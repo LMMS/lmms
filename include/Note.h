@@ -1,5 +1,5 @@
 /*
- * Note.h - declaration of class note which contains all informations about a
+ * Note.h - declaration of class note which contains all information about a
  *          note + definitions of several constants and enums
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
@@ -156,7 +156,7 @@ public:
 
 	static inline bool lessThan( const Note * lhs, const Note * rhs )
 	{
-		// function to compare two notes - must be called explictly when
+		// function to compare two notes - must be called explicitly when
 		// using qSort
 		if( (int)( *lhs ).pos() < (int)( *rhs ).pos() )
 		{

@@ -262,7 +262,7 @@ std::vector<PluginIssue> Meta::get(const LilvPlugin *plugin,
 	if (hasProperty(LV2_PORT_PROPS__logarithmic))
 	{
 		// check min/max available
-		// we requre them anyways, but this will detect plugins that will
+		// we require them anyways, but this will detect plugins that will
 		// be non-Lv2-conforming
 		if(m_min == std::numeric_limits<decltype(m_min)>::lowest())
 		{

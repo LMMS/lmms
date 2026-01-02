@@ -131,20 +131,21 @@ void AudioFileProcessor::playNote( NotePlayHandle * _n,
 			m_nextPlayBackwards = false;
 		}
 		// set interpolation mode for libsamplerate
-		int srcmode = SRC_LINEAR;
+		auto interpolationMode = AudioResampler::Mode::Linear;
 		switch( m_interpolationModel.value() )
 		{
 			case 0:
-				srcmode = SRC_ZERO_ORDER_HOLD;
+				interpolationMode = AudioResampler::Mode::ZOH;
 				break;
 			case 1:
-				srcmode = SRC_LINEAR;
+				interpolationMode = AudioResampler::Mode::Linear;
 				break;
 			case 2:
-				srcmode = SRC_SINC_MEDIUM_QUALITY;
+				interpolationMode = AudioResampler::Mode::SincMedium;
 				break;
 		}
-		_n->m_pluginData = new Sample::PlaybackState(_n->hasDetuningInfo(), srcmode);
+
+		_n->m_pluginData = new Sample::PlaybackState(interpolationMode);
 		static_cast<Sample::PlaybackState*>(_n->m_pluginData)->setFrameIndex(m_nextPlayStartPoint);
 		static_cast<Sample::PlaybackState*>(_n->m_pluginData)->setBackwards(m_nextPlayBackwards);
 
@@ -158,8 +159,8 @@ void AudioFileProcessor::playNote( NotePlayHandle * _n,
 	{
 		if (m_sample.play(_working_buffer + offset,
 						static_cast<Sample::PlaybackState*>(_n->m_pluginData),
-						frames, _n->frequency(),
-						static_cast<Sample::Loop>(m_loopModel.value())))
+						frames, static_cast<Sample::Loop>(m_loopModel.value()),
+						DefaultBaseFreq / _n->frequency()))
 		{
 			applyRelease( _working_buffer, _n );
 			emit isPlaying(static_cast<Sample::PlaybackState*>(_n->m_pluginData)->frameIndex());
@@ -287,13 +288,14 @@ auto AudioFileProcessor::beatLen(NotePlayHandle* note) const -> f_cnt_t
 	const auto freqFactor = baseFreq / note->frequency()
 		* Engine::audioEngine()->outputSampleRate()
 		/ Engine::audioEngine()->baseSampleRate();
+	const auto sampleRateRatio = static_cast<double>(Engine::audioEngine()->outputSampleRate()) / m_sample.sampleRate();
 
 	const auto startFrame = m_nextPlayStartPoint >= static_cast<std::size_t>(m_sample.endFrame())
 		? m_sample.startFrame()
 		: m_nextPlayStartPoint;
 	const auto duration = m_sample.endFrame() - startFrame;
 
-	return static_cast<f_cnt_t>(std::floor(duration * freqFactor));
+	return static_cast<f_cnt_t>(std::floor(duration * freqFactor * sampleRateRatio));
 }
 
 
@@ -319,6 +321,7 @@ void AudioFileProcessor::setAudioFile(const QString& _audio_file, bool _rename)
 
 	m_sample = Sample(gui::SampleLoader::createBufferFromFile(_audio_file));
 	loopPointChanged();
+	reverseModelChanged();
 	emit sampleUpdated();
 }
 
