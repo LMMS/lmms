@@ -487,10 +487,10 @@ private:
 	//! The current note whose detuning/parameter curve is being edited.
 	Note* m_parameterEditClickedNote;
 
-	//! Updates the currently dragged node position in the detuning/parameter curve of the selected notes.
+	//! Updates the currently dragged node position in the detuning/parameter curves of the selected notes.
 	void updateParameterEditPos(QMouseEvent* me, Note::ParameterType paramType);
-	//! Applies the dragging of the current node of the detuning/parameter curves
-	void applyParameterEditPos(QMouseEvent* me, Note::ParameterType paramType);
+	//! Finishes the dragging of the current node of the detuning/parameter curves
+	void applyParameterEditPos(Note::ParameterType paramType);
 	//! Initializes the currently selected notes for detuning. If any notes are selected, it uses those. If none are selected but there is a note under the mouse, it will select that note.
 	bool setupParameterEditNotes(Note::ParameterType paramType);
   

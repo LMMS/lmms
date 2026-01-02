@@ -2397,9 +2397,9 @@ void PianoRoll::mouseReleaseEvent( QMouseEvent * me )
 		}
 	}
 
-	if (m_editMode == EditMode::Detuning)
+	if (m_editMode == EditMode::Detuning || m_ctrlMode == EditMode::Detuning)
 	{
-		applyParameterEditPos(me, Note::ParameterType::Detuning);
+		applyParameterEditPos(Note::ParameterType::Detuning);
 	}
 
 	if( me->button() & Qt::RightButton )
@@ -2876,7 +2876,7 @@ void PianoRoll::updateParameterEditPos(QMouseEvent* me, Note::ParameterType para
 	m_lastParameterEditTick = posTicks;
 }
 
-void PianoRoll::applyParameterEditPos(QMouseEvent* me, Note::ParameterType paramType)
+void PianoRoll::applyParameterEditPos(Note::ParameterType paramType)
 {
 	// If the left button was just released, apply the drag on all of the notes' automation clips.
 	if (m_parameterEditDownLeft)
