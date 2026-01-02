@@ -372,9 +372,6 @@ private:
 	static const std::vector<float> m_zoomYLevels;
 
 	MidiClip* m_midiClip;
-	//! Vector of notes which have their detuning/other parameter being edited.
-	//! TODO: This is the same as the selected notes, except that these are cached. Refactor getSelectedNotes() to be more efficient so that it can be used instead.
-	NoteVector m_selectedParameterEditNotes;
 	NoteVector m_ghostNotes;
 
 	inline const NoteVector & ghostNotes() const
@@ -491,8 +488,6 @@ private:
 	void updateParameterEditPos(QMouseEvent* me, Note::ParameterType paramType);
 	//! Finishes the dragging of the current node of the detuning/parameter curves
 	void applyParameterEditPos(Note::ParameterType paramType);
-	//! Initializes the currently selected notes for detuning. If any notes are selected, it uses those. If none are selected but there is a note under the mouse, it will select that note.
-	bool setupParameterEditNotes(Note::ParameterType paramType);
   
 	//! Stores the chords for the strum tool
 	std::vector<NoteVector> m_selectedChords;

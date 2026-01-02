@@ -1679,26 +1679,31 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 	if (m_editMode == EditMode::Detuning)
 	{
 		// Let users access automation editor with shift-click, if they want the old functionality
-		if (noteUnderMouse() && me->modifiers() & Qt::ShiftModifier)
+		Note* clickedNote = noteUnderMouse();
+		if (clickedNote && me->modifiers() & Qt::ShiftModifier)
 		{
-			Note* n = noteUnderMouse();
-			if (n->detuning() == nullptr)
+			if (clickedNote->detuning() == nullptr)
 			{
-				n->createDetuning();
-				AutomationClip* detuningClip = n->detuning()->automationClip();
+				clickedNote->createDetuning();
+				AutomationClip* detuningClip = clickedNote->detuning()->automationClip();
 				connect(detuningClip, SIGNAL(dataChanged()), this, SLOT(update()));
 			}
 			getGUI()->automationEditor()->setGhostMidiClip(m_midiClip);
-			getGUI()->automationEditor()->open(n->detuning()->automationClip());
+			getGUI()->automationEditor()->open(clickedNote->detuning()->automationClip());
 			return;
 		}
 
-		// Setup the currently selected notes/note under mouse
-		bool notesFound = setupParameterEditNotes(Note::ParameterType::Detuning);
-		if (!notesFound) { return; }
+		// Only the currently selected notes are used for detuning
+		// If the user is clicking on a note, make the note selected so that it will be counted
+		if (clickedNote && !clickedNote->selected())
+		{
+			clickedNote->setSelected(true);
+			// If there are already automation nodes in the detuning curve, don't immediately place a new when the user clicks on the note to select it
+			if (clickedNote->detuning() && clickedNote->detuning()->hasAutomation()) { return; }
+		}
 
 		// Create detuning curves for each note if they don't have them already
-		for (Note* note: m_selectedParameterEditNotes)
+		for (Note* note: getSelectedNotes())
 		{
 			if (note->detuning() == nullptr)
 			{
@@ -2835,7 +2840,7 @@ void PianoRoll::updateParameterEditPos(QMouseEvent* me, Note::ParameterType para
 	AutomationClip::setQuantization(quantization());
 
 	// Loop through all of the selected notes and update the drag position in each.
-	for (Note* note: m_selectedParameterEditNotes)
+	for (Note* note: getSelectedNotes())
 	{
 		AutomationClip* aClip = note->parameterCurve(paramType);
 		if (aClip == nullptr) { continue; }
@@ -2881,7 +2886,7 @@ void PianoRoll::applyParameterEditPos(Note::ParameterType paramType)
 	// If the left button was just released, apply the drag on all of the notes' automation clips.
 	if (m_parameterEditDownLeft)
 	{
-		for (Note* note: m_selectedParameterEditNotes)
+		for (Note* note: getSelectedNotes())
 		{
 			AutomationClip* aClip = note->parameterCurve(paramType);
 			if (aClip == nullptr) { continue; }
@@ -2894,30 +2899,6 @@ void PianoRoll::applyParameterEditPos(Note::ParameterType paramType)
 	m_parameterEditClickedNote = nullptr;
 }
 
-bool PianoRoll::setupParameterEditNotes(Note::ParameterType paramType)
-{
-	// If the user has selected notes, use those for the detuning/parameter editing
-	// Else, if the user is clicking on a note, select that note and use it.
-	if (!getSelectedNotes().empty())
-	{
-		m_selectedParameterEditNotes = getSelectedNotes();
-		return true;
-	}
-	else if (noteUnderMouse())
-	{
-		Note* n = noteUnderMouse();
-		m_selectedParameterEditNotes.assign(1, n);
-		// The note is also set to be selected so that it can be tracked even when the user drags automation nodes above/below the note.
-		if (!n->selected())
-		{
-			n->setSelected(true);
-			// If there are already automation nodes in the detuning curve, don't immediately place a new when the user clicks on the note to select it
-			if (n->detuning() && n->detuning()->hasAutomation()) { return false; }
-		}
-		return true;
-	}
-	return false;
-}
 
 
 void PianoRoll::updateKnifePos(QMouseEvent* me, bool initial)
@@ -5098,7 +5079,7 @@ Note * PianoRoll::parameterEditNoteUnderMouse(Note::ParameterType paramType)
 	// Loop through all notes having their detuning/parameter being edited, and find the one whose automation curve is closest to the mouse.
 	int minScore = -1;
 	Note* closestNote = nullptr;
-	for (Note* note : m_selectedParameterEditNotes)
+	for (Note* note : getSelectedNotes())
 	{
 		// Skip note if the mouse is outside of its start time
 		if (posTicks < note->pos()) { continue; }
