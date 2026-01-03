@@ -80,8 +80,8 @@ public:
 		Disabled
 	};
 
-	TimeLineWidget(int xoff, int yoff, float ppb, Song::PlayPos& pos, Timeline& timeline,
-				const TimePos& begin, Song::PlayMode mode, QWidget* parent);
+	TimeLineWidget(int xoff, int yoff, float ppb, Timeline& timeline,
+				const TimePos& begin, QWidget* parent);
 	~TimeLineWidget() override;
 
 	inline QColor const & getBarLineColor() const { return m_barLineColor; }
@@ -133,11 +133,6 @@ public:
 		m_cursorSelectRight = QCursor{m_cursorSelectRight.pixmap(), s.width(), s.height()};
 	}
 
-	inline Song::PlayPos & pos()
-	{
-		return( m_pos );
-	}
-
 	static AutoScrollState defaultAutoScrollState();
 	AutoScrollState autoScroll() const { return m_autoScroll; }
 	void setAutoScroll(AutoScrollState state) { m_autoScroll = state; }
@@ -158,6 +153,11 @@ public:
 					m_ppb / TimePos::ticksPerBar() );
 	}
 
+	Timeline* timeline()
+	{
+		return m_timeline;
+	}
+
 	bool isRecording() const { return m_isRecording; }
 	void setRecording(bool recording) { m_isRecording = recording; }
 
@@ -165,12 +165,10 @@ public:
 	void setPlayheadVisible(bool visible) { m_isPlayheadVisible = visible; }
 
 signals:
-	void positionChanged(const lmms::TimePos& postion);
 	void regionSelectedFromPixels( int, int );
 	void selectionFinished();
 
 public slots:
-	void updatePosition();
 	void setSnapSize( const float snapSize )
 	{
 		m_snapSize = snapSize;
@@ -225,11 +223,9 @@ private:
 	int m_xOffset;
 	float m_ppb;
 	float m_snapSize = 1.f;
-	Song::PlayPos & m_pos;
 	Timeline* m_timeline;
 	// Leftmost position visible in parent editor
 	const TimePos & m_begin;
-	const Song::PlayMode m_mode;
 
 	AutoScrollState m_autoScroll = defaultAutoScrollState();
 
