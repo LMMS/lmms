@@ -300,7 +300,7 @@ void SongEditor::updateSnapSizes()
 			int noteNumerator = numerator;
 			int noteDenominator = denominator * i;
 			simplifyFraction(noteNumerator, noteDenominator);
-			m_snappingModel->addItem(QString("1/%1 Bar (%2/%3 Note)").arg(i).arg(noteNumerator).arg(noteDenominator));
+			m_snappingModel->addItem(QString("%1/%2").arg(noteNumerator).arg(noteDenominator));
 		}
 	}
 	// Add the snap sizes smaller than 1 / numerator of a bar, until the snap size no longer evenly divides the ticks per bar
@@ -311,7 +311,7 @@ void SongEditor::updateSnapSizes()
 		int noteNumerator = numerator;
 		int noteDenominator = denominator * invSnapSize;
 		simplifyFraction(noteNumerator, noteDenominator);
-		m_snappingModel->addItem(QString("1/%1 Bar (%2/%3 Note)").arg(invSnapSize).arg(noteNumerator).arg(noteDenominator));
+		m_snappingModel->addItem(QString("%1/%2").arg(noteNumerator).arg(noteDenominator));
 	}
 	m_snappingModel->setValue(oldIndex);
 }
