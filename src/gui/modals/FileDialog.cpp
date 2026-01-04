@@ -168,7 +168,7 @@ QString FileDialog::openAudioFile(const QString& previousFile)
 		allFileTypes.append(displayExtension);
 	}
 
-	nameFilters.append(QString{"%1 (%2)"}.arg(FileDialog::tr("All audio files"), allFileTypes.join(" ")));
+	nameFilters.append(QString{"%1 (%2)"}.arg(tr("All audio files"), allFileTypes.join(" ")));
 	nameFilters.append(fileTypes);
 	nameFilters.append(QString("%1 (*)").arg(FileDialog::tr("Other files")));
 
