@@ -5106,7 +5106,7 @@ Note * PianoRoll::parameterEditNoteUnderMouse(Note::ParameterType paramType)
 
 		int lastNodeTime = !aClip->getTimeMap().isEmpty() ? aClip->getTimeMap().lastKey() : 0;
 		int horizontalPixelOffset = (posTicks > note->endPos() && relativePos > lastNodeTime) ? (relativePos - lastNodeTime) * m_ppb / TimePos::ticksPerBar() : 0;
-		
+
 		int distanceScore = verticalPixelOffset * verticalPixelOffset + horizontalPixelOffset * horizontalPixelOffset;
 
 		if (distanceScore < minScore || minScore == -1)
