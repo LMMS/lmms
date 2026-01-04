@@ -151,7 +151,7 @@ QString FileDialog::openAudioFile(const QString& previousFile)
 
 	// change dir to position of previously opened file
 	openFileDialog.setDirectory(dir);
-	openFileDialog.setFileMode(FileDialog::ExistingFiles);
+	openFileDialog.setFileMode(QFileDialog::ExistingFiles);
 
 	// set filters
 	auto fileTypes = QStringList{};
