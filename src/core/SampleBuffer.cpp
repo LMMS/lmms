@@ -77,7 +77,7 @@ std::shared_ptr<const SampleBuffer> SampleBuffer::fromFile(const QString& filePa
 	const auto absolutePath = PathUtil::toAbsolute(filePath);
 	const auto storedPath = PathUtil::toShortestRelative(filePath);
 
-	auto result = SampleDecoder::decode(filePath);
+	auto result = SampleDecoder::decode(absolutePath);
 
 	if (!result)
 	{
