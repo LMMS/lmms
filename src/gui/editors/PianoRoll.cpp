@@ -2820,7 +2820,7 @@ void PianoRoll::updateParameterEditPos(QMouseEvent* me, Note::ParameterType para
 		m_parameterEditDownLeft = m_parameterEditDownLeft || me->button() & Qt::LeftButton;
 		// Do not allow right click mode if left click is already held.
 		m_parameterEditDownRight = (m_parameterEditDownRight || me->button() & Qt::RightButton) && m_parameterEditDownLeft == false;
-		m_lastParameterEditTick = -1;
+		m_lastParameterEditTick = std::nullopt;
 		// Get the note with the closest automation curve to the mouse cursor
 		m_parameterEditClickedNote = parameterEditNoteUnderMouse(paramType);
 	}
@@ -2849,13 +2849,13 @@ void PianoRoll::updateParameterEditPos(QMouseEvent* me, Note::ParameterType para
 		if (m_parameterEditDownLeft)
 		{
 			// Don't allow the user to drag the first node from the start of the note. They can drag it up and down, but if they try to move it from the first tick, apply the previous drag and start a new one to preserve the node
-			if (Note::quantized(m_lastParameterEditTick - m_parameterEditClickedNote->pos(), quantization()) == 0 && Note::quantized(relativePos, quantization()) != 0)
+			if (m_lastParameterEditTick != std::nullopt && Note::quantized(m_lastParameterEditTick.value() - m_parameterEditClickedNote->pos(), quantization()) == 0 && Note::quantized(relativePos, quantization()) != 0)
 			{
 				updateLastEditTick = false;
 				aClip->setDragValue(0, relativeKey);
 			}
 			// Also, don't let the user drag another node onto the first node, since that creates issues with the first node changing height without the user intending it to
-			else if (Note::quantized(m_lastParameterEditTick - m_parameterEditClickedNote->pos(), quantization()) > 0 && Note::quantized(relativePos, quantization()) <= 0)
+			else if (m_lastParameterEditTick != std::nullopt && Note::quantized(m_lastParameterEditTick.value() - m_parameterEditClickedNote->pos(), quantization()) > 0 && Note::quantized(relativePos, quantization()) <= 0)
 			{
 				updateLastEditTick = false;
 				aClip->setDragValue(quantization(), relativeKey);
@@ -2868,14 +2868,14 @@ void PianoRoll::updateParameterEditPos(QMouseEvent* me, Note::ParameterType para
 		// If right-clicking, remove nodes.
 		else if (m_parameterEditDownRight)
 		{
-			// If the last position of the mouse is not -1, remove all nodes which the mouse has dragged over since the last mouse event.
-			// -1 means there is no previous mouse position, meaning that the drag just started.
-			if (m_lastParameterEditTick != -1)
+			// If the last position of the mouse exists, remove all nodes which the mouse has dragged over since the last mouse event.
+			// std::nullopt means there is no previous mouse position, meaning that the drag just started.
+			if (m_lastParameterEditTick != std::nullopt)
 			{
 				// Don't allow the user to accidentally remove the default node at the very start of the note, by making sure the tick range is >= 1
-				if (!(m_lastParameterEditTick - m_parameterEditClickedNote->pos() == 0 && relativePos == 0))
+				if (!(m_lastParameterEditTick.value() - m_parameterEditClickedNote->pos() == 0 && relativePos == 0))
 				{
-					aClip->removeNodes(std::max(1, m_lastParameterEditTick - m_parameterEditClickedNote->pos()), std::max(TimePos{1}, relativePos));
+					aClip->removeNodes(std::max(1, m_lastParameterEditTick.value() - m_parameterEditClickedNote->pos()), std::max(TimePos{1}, relativePos));
 				}
 			}
 			else

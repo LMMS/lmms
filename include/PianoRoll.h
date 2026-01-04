@@ -480,7 +480,7 @@ private:
 	bool m_parameterEditDownRight = false;
 	//! Stores the last edited position for the note detuning/parameter curves.
 	//! When erasing nodes when dragging the mouse, all nodes in the range of the last mouse pos to the current mouse pos are removed. Without this, when dragging the mouse super fast, some nodes could get missed; this ensures all nodes from the previous mouse position to the current one will get deleted.
-	int m_lastParameterEditTick = -1;
+	std::optional<int> m_lastParameterEditTick = std::nullopt;
 	//! The current note whose detuning/parameter curve is being edited.
 	Note* m_parameterEditClickedNote;
 
