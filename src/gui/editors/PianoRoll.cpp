@@ -2441,7 +2441,7 @@ void PianoRoll::mouseReleaseEvent( QMouseEvent * me )
 
 	if (m_editMode == EditMode::Detuning || m_ctrlMode == EditMode::Detuning)
 	{
-		applyParameterEditPos(Note::ParameterType::Detuning);
+		applyParameterEditPos(me, Note::ParameterType::Detuning);
 	}
 
 	if( me->button() & Qt::RightButton )
@@ -2879,7 +2879,6 @@ void PianoRoll::updateParameterEditPos(QMouseEvent* me, Note::ParameterType para
 	AutomationClip::setQuantization(quantization());
 
 	// Loop through all of the selected notes and update the drag position in each.
-	bool updateLastEditTick = true; // Only update m_lastParameterEditTick if the user isn't trying to drag the first node left/right, or any other node onto the first node.
 	for (Note* note: getSelectedNotes())
 	{
 		AutomationClip* aClip = note->parameterCurve(paramType);
@@ -2889,20 +2888,8 @@ void PianoRoll::updateParameterEditPos(QMouseEvent* me, Note::ParameterType para
 		{
 			// Don't allow the user to drag the first node from the start of the note. They can drag it up and down, but if they try to move it from the first tick, apply the previous drag and start a new one to preserve the node
 			if (m_lastParameterEditTick != std::nullopt && Note::quantized(m_lastParameterEditTick.value() - m_parameterEditClickedNote->pos(), quantization()) == 0 && Note::quantized(relativePos, quantization()) != 0 && !(me->modifiers() & Qt::AltModifier))
-
 			{
-				updateLastEditTick = false;
-				aClip->setDragValue(0, relativeKey);
-			}
-			// Also, don't let the user drag another node onto the first node, since that creates issues with the first node changing height without the user intending it to
-			else if (m_lastParameterEditTick != std::nullopt && Note::quantized(m_lastParameterEditTick.value() - m_parameterEditClickedNote->pos(), quantization()) > 0 && Note::quantized(relativePos, quantization()) <= 0)
-			{
-				updateLastEditTick = false;
-				aClip->setDragValue(quantization(), relativeKey);
-			}
-			else
-			{
-				aClip->setDragValue(relativePos, relativeKey);
+				aClip->applyDragValue();
 			}
 
 			if ((Note::quantized(relativePos, quantization()) != 0) && (me->modifiers() & Qt::AltModifier))
@@ -2940,6 +2927,7 @@ void PianoRoll::updateParameterEditPos(QMouseEvent* me, Note::ParameterType para
 				{
 					aClip->removeNodes(std::max(1, m_lastParameterEditTick.value() - m_parameterEditClickedNote->pos()), std::max(TimePos{1}, relativePos));
 				}
+				// If is the default node, reset it to the default tuning.
 				else
 				{
 					aClip->putValue(0, 0.0f);
@@ -2955,15 +2943,15 @@ void PianoRoll::updateParameterEditPos(QMouseEvent* me, Note::ParameterType para
 				}
 				else
 				{
-					aClip->putValue(relativePos, 0.0f);
+					aClip->putValue(0, 0.0f);
 				}
 			}
 		}
 	}
-	if (updateLastEditTick) { m_lastParameterEditTick = posTicks; }
+	m_lastParameterEditTick = posTicks;
 }
 
-void PianoRoll::applyParameterEditPos(Note::ParameterType paramType)
+void PianoRoll::applyParameterEditPos(QMouseEvent* me, Note::ParameterType paramType)
 {
 	// If the left button was just released, apply the drag on all of the notes' automation clips.
 	if (m_parameterEditDownLeft)
