@@ -164,7 +164,7 @@ QString FileDialog::openAudioFile(const QString& previousFile)
 		const auto name = QString::fromStdString(audioType.name);
 		const auto extension = QString::fromStdString(audioType.extension);
 		const auto displayExtension = QString{"*.%1"}.arg(extension);
-		fileTypes.append(QString{"%1 (%2)"}.arg(FileDialog::tr("%1 files").arg(name), displayExtension));
+		fileTypes.append(QString{"%1 (%2)"}.arg(tr("%1 files").arg(name), displayExtension));
 		allFileTypes.append(displayExtension);
 	}
 
