@@ -1694,8 +1694,8 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 		}
 
 		// Only the currently selected notes are used for detuning
-		// If the user is clicking on a note, make the note selected so that it will be counted
-		if (clickedNote && !clickedNote->selected())
+		// If the user is clicking on a note without any others selected, make that note selected so that it will be counted
+		if (clickedNote && !clickedNote->selected() && getSelectedNotes().empty())
 		{
 			clickedNote->setSelected(true);
 			// If there are already automation nodes in the detuning curve, don't immediately place a new when the user clicks on the note to select it
