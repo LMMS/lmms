@@ -27,6 +27,7 @@
 
 #include "Graph.h"
 #include "DeprecationHelper.h"
+#include "FileDialog.h"
 #include "SampleLoader.h"
 #include "StringPairDrag.h"
 #include "Oscillator.h"
@@ -585,7 +586,7 @@ void graphModel::setWaveToNoise()
 
 QString graphModel::setWaveToUser()
 {
-	QString fileName = gui::SampleLoader::openWaveformFile();
+	QString fileName = gui::FileDialog::openWaveformFile();
 	if( fileName.isEmpty() == false )
 	{
 		auto sampleBuffer = gui::SampleLoader::createBufferFromFile(fileName);

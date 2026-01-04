@@ -24,6 +24,7 @@
  */
 
 
+#include "FileDialog.h"
 #include "embed.h"
 
 
@@ -208,7 +209,7 @@ LfoControllerDialog::~LfoControllerDialog()
 
 void LfoControllerDialog::askUserDefWave()
 {
-	const auto fileName = SampleLoader::openWaveformFile();
+	const auto fileName = FileDialog::openWaveformFile();
 	if (fileName.isEmpty()) { return; }
 
 	auto lfoModel = dynamic_cast<LfoController*>(model());

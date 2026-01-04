@@ -30,6 +30,7 @@
 #include "AudioEngine.h"
 #include "AutomatableButton.h"
 #include "Engine.h"
+#include "FileDialog.h"
 #include "InstrumentTrack.h"
 #include "Knob.h"
 #include "NotePlayHandle.h"
@@ -136,7 +137,7 @@ OscillatorObject::OscillatorObject( Model * _parent, int _idx ) :
 
 void OscillatorObject::oscUserDefWaveDblClick()
 {
-	auto af = gui::SampleLoader::openWaveformFile();
+	auto af = gui::FileDialog::openWaveformFile();
 	if( af != "" )
 	{
 		m_sampleBuffer = gui::SampleLoader::createBufferFromFile(af);
