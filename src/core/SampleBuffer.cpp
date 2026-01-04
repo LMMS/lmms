@@ -121,8 +121,9 @@ std::shared_ptr<const SampleBuffer> SampleBuffer::fromBase64(const QString& base
 {
 	if (base64.isEmpty()) { return SampleBuffer::emptyBuffer(); }
 
-	// TODO: Instead of showing a error via a message box (and interrupting the user each time), we can log a message to
-	// console and work towards implementing a status bar to show non-fatal errors instead.
+	// TODO: Instead of showing a error via a message box (interrupting the user each time as well as coupling GUI code
+	// to Core code), we can log a message to console and work towards implementing a status bar to show non-fatal
+	// errors instead.
 	try
 	{
 		return std::make_shared<SampleBuffer>(base64, sampleRate);
