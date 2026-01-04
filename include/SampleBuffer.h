@@ -85,6 +85,10 @@ public:
 
 	static auto emptyBuffer() -> std::shared_ptr<const SampleBuffer>;
 
+	static std::shared_ptr<const SampleBuffer> fromFile(const QString& filePath);
+	static std::shared_ptr<const SampleBuffer> fromBase64(
+		const QString& base64, int sampleRate = Engine::audioEngine()->outputSampleRate());
+
 private:
 	std::vector<SampleFrame> m_data;
 	QString m_audioFile;

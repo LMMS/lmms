@@ -23,8 +23,11 @@
  */
 
 #include "SampleBuffer.h"
+
+#include <QMessageBox>
 #include <cstring>
 
+#include "GuiApplication.h"
 #include "PathUtil.h"
 #include "SampleDecoder.h"
 
@@ -90,6 +93,49 @@ auto SampleBuffer::emptyBuffer() -> std::shared_ptr<const SampleBuffer>
 {
 	static auto s_buffer = std::make_shared<const SampleBuffer>();
 	return s_buffer;
+}
+
+std::shared_ptr<const SampleBuffer> SampleBuffer::fromFile(const QString& filePath)
+{
+	if (filePath.isEmpty()) { return SampleBuffer::emptyBuffer(); }
+
+	// TODO: Instead of showing a error via a message box (interrupting the user each time as well as coupling GUI code
+	// to Core code), we can log a message to console and work towards implementing a status bar to show non-fatal
+	// errors instead.
+	try
+	{
+		return std::make_shared<SampleBuffer>(filePath);
+	}
+	catch (const std::runtime_error& error)
+	{
+		if (gui::getGUI())
+		{
+			QMessageBox::critical(nullptr, QObject::tr("Error loading sample"), QString::fromStdString(error.what()));
+		}
+
+		return SampleBuffer::emptyBuffer();
+	}
+}
+
+std::shared_ptr<const SampleBuffer> SampleBuffer::fromBase64(const QString& base64, int sampleRate)
+{
+	if (base64.isEmpty()) { return SampleBuffer::emptyBuffer(); }
+
+	// TODO: Instead of showing a error via a message box (and interrupting the user each time), we can log a message to
+	// console and work towards implementing a status bar to show non-fatal errors instead.
+	try
+	{
+		return std::make_shared<SampleBuffer>(base64, sampleRate);
+	}
+	catch (const std::runtime_error& error)
+	{
+		if (gui::getGUI())
+		{
+			QMessageBox::critical(nullptr, QObject::tr("Error loading sample"), QString::fromStdString(error.what()));
+		}
+
+		return SampleBuffer::emptyBuffer();
+	}
 }
 
 } // namespace lmms

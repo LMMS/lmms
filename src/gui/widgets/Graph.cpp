@@ -28,7 +28,6 @@
 #include "Graph.h"
 #include "DeprecationHelper.h"
 #include "FileDialog.h"
-#include "SampleLoader.h"
 #include "StringPairDrag.h"
 #include "Oscillator.h"
 
@@ -589,7 +588,7 @@ QString graphModel::setWaveToUser()
 	QString fileName = gui::FileDialog::openWaveformFile();
 	if( fileName.isEmpty() == false )
 	{
-		auto sampleBuffer = gui::SampleLoader::createBufferFromFile(fileName);
+		auto sampleBuffer = SampleBuffer::fromFile(fileName);
 		for( int i = 0; i < length(); i++ )
 		{
 			m_samples[i] = Oscillator::userWaveSample(sampleBuffer.get(), i / static_cast<float>(length()));

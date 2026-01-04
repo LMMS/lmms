@@ -36,7 +36,6 @@
 #include "Knob.h"
 #include "LcdSpinBox.h"
 #include "PixmapButton.h"
-#include "SampleLoader.h"
 #include "SlicerT.h"
 #include "SlicerTWaveform.h"
 #include "StringPairDrag.h"

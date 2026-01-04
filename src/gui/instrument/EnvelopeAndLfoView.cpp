@@ -33,7 +33,6 @@
 #include "EnvelopeGraph.h"
 #include "LfoGraph.h"
 #include "EnvelopeAndLfoParameters.h"
-#include "SampleLoader.h"
 #include "Knob.h"
 #include "LedCheckBox.h"
 #include "DataFile.h"
@@ -242,7 +241,7 @@ void EnvelopeAndLfoView::dropEvent( QDropEvent * _de )
 	QString value = StringPairDrag::decodeValue( _de );
 	if( type == "samplefile" )
 	{
-		m_params->m_userWave = SampleLoader::createBufferFromFile(value);
+		m_params->m_userWave = SampleBuffer::fromFile(value);
 		m_userLfoBtn->model()->setValue( true );
 		m_params->m_lfoWaveModel.setValue(static_cast<int>(EnvelopeAndLfoParameters::LfoShape::UserDefinedWave));
 		_de->accept();
@@ -254,7 +253,7 @@ void EnvelopeAndLfoView::dropEvent( QDropEvent * _de )
 		auto file = dataFile.content().
 					firstChildElement().firstChildElement().
 					firstChildElement().attribute("src");
-		m_params->m_userWave = SampleLoader::createBufferFromFile(file);
+		m_params->m_userWave = SampleBuffer::fromFile(file);
 		m_userLfoBtn->model()->setValue( true );
 		m_params->m_lfoWaveModel.setValue(static_cast<int>(EnvelopeAndLfoParameters::LfoShape::UserDefinedWave));
 		_de->accept();
