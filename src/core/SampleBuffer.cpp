@@ -90,8 +90,9 @@ std::shared_ptr<const SampleBuffer> SampleBuffer::fromFile(const QString& filePa
 		}
 		else
 		{
-			qWarning() << "Failed to load sample at path " << absolutePath
-					<< ", the file may not exist, be corrupted, or is unsupported.";
+			qWarning() << QObject::tr(
+				"Failed to load sample at path %1, the file may not exist, be corrupted, or is unsupported.")
+							  .arg(absolutePath);
 		}
 
 		return SampleBuffer::emptyBuffer();
@@ -113,12 +114,12 @@ std::shared_ptr<const SampleBuffer> SampleBuffer::fromBase64(const QString& str,
 		// when loading the project), and this function also shouldn't be concerned with handling the error.
 		if (gui::getGUI())
 		{
-			QMessageBox::warning(nullptr, QObject::tr("Failed to load sample"),
-				QObject::tr("The sample may be corrupted or unsupported."));
+			QMessageBox::warning(
+				nullptr, QObject::tr("Failed to load sample"), QObject::tr("The sample size is invalid."));
 		}
 		else
 		{
-			qWarning() << "Failed to load Base64 sample, invalid size";
+			qWarning() << QObject::tr("Failed to load Base64 sample, invalid size");
 		}
 
 		return SampleBuffer::emptyBuffer();
