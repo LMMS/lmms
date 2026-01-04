@@ -2840,6 +2840,7 @@ void PianoRoll::updateParameterEditPos(QMouseEvent* me, Note::ParameterType para
 	AutomationClip::setQuantization(quantization());
 
 	// Loop through all of the selected notes and update the drag position in each.
+	bool updateLastEditTick = true; // Only update m_lastParameterEditTick if the user isn't trying to drag the first node left/right, or any other node onto the first node.
 	for (Note* note: getSelectedNotes())
 	{
 		AutomationClip* aClip = note->parameterCurve(paramType);
@@ -2850,9 +2851,19 @@ void PianoRoll::updateParameterEditPos(QMouseEvent* me, Note::ParameterType para
 			// Don't allow the user to drag the first node from the start of the note. They can drag it up and down, but if they try to move it from the first tick, apply the previous drag and start a new one to preserve the node
 			if (Note::quantized(m_lastParameterEditTick - m_parameterEditClickedNote->pos(), quantization()) == 0 && Note::quantized(relativePos, quantization()) != 0)
 			{
-				aClip->applyDragValue();
+				updateLastEditTick = false;
+				aClip->setDragValue(0, relativeKey);
 			}
-			aClip->setDragValue(relativePos, relativeKey);
+			// Also, don't let the user drag another node onto the first node, since that creates issues with the first node changing height without the user intending it to
+			else if (Note::quantized(m_lastParameterEditTick - m_parameterEditClickedNote->pos(), quantization()) > 0 && Note::quantized(relativePos, quantization()) <= 0)
+			{
+				updateLastEditTick = false;
+				aClip->setDragValue(quantization(), relativeKey);
+			}
+			else
+			{
+				aClip->setDragValue(relativePos, relativeKey);
+			}
 		}
 		// If right-clicking, remove nodes.
 		else if (m_parameterEditDownRight)
@@ -2878,7 +2889,7 @@ void PianoRoll::updateParameterEditPos(QMouseEvent* me, Note::ParameterType para
 			}
 		}
 	}
-	m_lastParameterEditTick = posTicks;
+	if (updateLastEditTick) { m_lastParameterEditTick = posTicks; }
 }
 
 void PianoRoll::applyParameterEditPos(Note::ParameterType paramType)
