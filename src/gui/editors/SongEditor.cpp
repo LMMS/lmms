@@ -66,7 +66,7 @@ namespace
 constexpr int MIN_PIXELS_PER_BAR = 4;
 constexpr int MAX_PIXELS_PER_BAR = 400;
 constexpr int ZOOM_STEPS = 200;
-constexpr int SNAP_SIZE_MAX_BARS = 8;
+constexpr int SNAP_SIZE_MAX_BARS = 8; //< This should be a power of 2 due to how SongEditor::updateSnapSizes() works.
 
 }
 
@@ -290,18 +290,18 @@ void SongEditor::updateSnapSizes()
 	// Find divisors of numerator (this will also include the numerator itself due to the <= bound) (starting at 2 because 1 divides all numbers)
 	for (int i = 2; i <= numerator; ++i)
 	{
+		if (numerator % i != 0) { continue; }
 		// Don't add snap sizes which are not clean divisors of the ticks per bar
-		if (numerator % i == 0 && (DefaultTicksPerBar * numerator / denominator) % i == 0)
-		{
-			float snapSize = 1.0f / i;
-			m_snapSizes.push_back(snapSize);
-			// Find the numerator and denominator of the snap size in terms of note lengths. For example, 1/3 of a bar in 3/4 time is a quarter note.
-			// This can get tricky since larger time signatures might end up with unsimplified fractions, such as: 1/2 of a bar in 12/8 time = 12/16 note, but that equals 3/4 note.
-			int noteNumerator = numerator;
-			int noteDenominator = denominator * i;
-			simplifyFraction(noteNumerator, noteDenominator);
-			m_snappingModel->addItem(QString("%1/%2").arg(noteNumerator).arg(noteDenominator));
-		}
+		if ((DefaultTicksPerBar * numerator / denominator) % i != 0) { continue; }
+
+		float snapSize = 1.0f / i;
+		m_snapSizes.push_back(snapSize);
+		// Find the numerator and denominator of the snap size in terms of note lengths. For example, 1/3 of a bar in 3/4 time is a quarter note.
+		// This can get tricky since larger time signatures might end up with unsimplified fractions, such as: 1/2 of a bar in 12/8 time = 12/16 note, but that equals 3/4 note.
+		int noteNumerator = numerator;
+		int noteDenominator = denominator * i;
+		simplifyFraction(noteNumerator, noteDenominator);
+		m_snappingModel->addItem(QString("%1/%2").arg(noteNumerator).arg(noteDenominator));
 	}
 	// Add the snap sizes smaller than 1 / numerator of a bar, until the snap size no longer evenly divides the ticks per bar
 	for (int invSnapSize = 2 * numerator; (DefaultTicksPerBar * numerator / denominator) % invSnapSize == 0; invSnapSize *= 2)
