@@ -66,7 +66,7 @@ namespace
 constexpr int MIN_PIXELS_PER_BAR = 4;
 constexpr int MAX_PIXELS_PER_BAR = 400;
 constexpr int ZOOM_STEPS = 200;
-constexpr int SNAP_SIZE_MAX_BARS = 8; //< This should be a power of 2 due to how SongEditor::updateSnapSizes() works.
+constexpr int SNAP_SIZE_MAX_BARS = 8;
 
 }
 
