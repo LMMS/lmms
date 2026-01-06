@@ -308,7 +308,7 @@ private:
 
 	Microtuner m_microtuner;
 
-	std::unique_ptr<BoolModel> m_midiCCEnable;
+	BoolModel m_midiCCEnable;
 	std::unique_ptr<FloatModel> m_midiCCModel[MidiControllerCount];
 
 	friend class gui::InstrumentTrackView;
