@@ -456,6 +456,8 @@ private:
 	void drawDetuningInfo( QPainter & _p, const Note * _n, int _x, int _y ) const;
 	bool mouseOverNote();
 	Note * noteUnderMouse();
+	//! Calculates the closest note to the mouse given their parameter automation curve
+	Note* parameterEditNoteUnderMouse(Note::ParameterType paramType);
 
 	// turn a selection rectangle into selected notes
 	void computeSelectedNotes( bool shift );
@@ -472,6 +474,20 @@ private:
 	bool m_knifeDown;
 
 	void updateKnifePos(QMouseEvent* me, bool initial);
+
+	//! Varaibles which hold which mouse buttons are being held while editing the detuning/parameter of notes.
+	bool m_parameterEditDownLeft = false;
+	bool m_parameterEditDownRight = false;
+	//! Stores the last edited position for the note detuning/parameter curves.
+	//! When erasing nodes when dragging the mouse, all nodes in the range of the last mouse pos to the current mouse pos are removed. Without this, when dragging the mouse super fast, some nodes could get missed; this ensures all nodes from the previous mouse position to the current one will get deleted.
+	std::optional<int> m_lastParameterEditTick = std::nullopt;
+	//! The current note whose detuning/parameter curve is being edited.
+	Note* m_parameterEditClickedNote;
+
+	//! Updates the currently dragged node position in the detuning/parameter curves of the selected notes.
+	void updateParameterEditPos(QMouseEvent* me, Note::ParameterType paramType);
+	//! Finishes the dragging of the current node of the detuning/parameter curves
+	void applyParameterEditPos(Note::ParameterType paramType);
 
 	//! Stores the chords for the strum tool
 	std::vector<NoteVector> m_selectedChords;

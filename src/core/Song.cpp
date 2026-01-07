@@ -124,7 +124,7 @@ Song::Song() :
 		connect(&timeline, &Timeline::positionJumped, this, [this](){
 			// Only emit the signal when the song is actually playing
 			// This prevents LFOs from changing phase when the user drags the timeline while paused
-			if (isPlaying()) { emit playbackPositionJumped(); }
+			if (m_playing) { emit playbackPositionJumped(); }
 		}, Qt::DirectConnection);
 	}
 

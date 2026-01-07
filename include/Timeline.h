@@ -68,8 +68,8 @@ public:
 		emit positionChanged();
 	}
 
-	auto frameOffset() const -> f_cnt_t { return m_frameOffset; }
-	void setFrameOffset(const f_cnt_t frame) { m_frameOffset = frame; }
+	auto frameOffset() const -> float { return m_frameOffset; }
+	void setFrameOffset(const float frame) { m_frameOffset = frame; }
 
 	auto loopBegin() const -> TimePos { return m_loopBegin; }
 	auto loopEnd() const -> TimePos { return m_loopEnd; }
@@ -106,7 +106,7 @@ private:
 	bool m_loopEnabled = false;
 	TimePos m_pos = TimePos{0};
 
-	f_cnt_t m_frameOffset = 0;
+	float m_frameOffset = 0;
 
 	double m_elapsedSeconds = 0;
 
