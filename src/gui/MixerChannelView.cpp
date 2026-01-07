@@ -28,19 +28,28 @@
 #include <QFont>
 #include <QGraphicsProxyWidget>
 #include <QGraphicsScene>
+#include <QGraphicsView>
+#include <QLineEdit>
 #include <QMenu>
 #include <QMessageBox>
 #include <QPainter>
-#include <cassert>
+#include <QStackedWidget>
+#include <QVBoxLayout>
 
+#include "AutomatableButton.h"
 #include "CaptionMenu.h"
 #include "ColorChooser.h"
 #include "ConfigManager.h"
+#include "EffectRackView.h"
+#include "Fader.h"
 #include "FontHelper.h"
 #include "GuiApplication.h"
+#include "Knob.h"
+#include "LcdWidget.h"
 #include "Mixer.h"
 #include "MixerView.h"
 #include "PeakIndicator.h"
+#include "SendButtonIndicator.h"
 #include "Song.h"
 
 namespace lmms::gui {
@@ -108,16 +117,16 @@ MixerChannelView::MixerChannelView(QWidget* parent, MixerView* mixerView, int ch
 	m_renameLineEditView->setFixedSize(m_renameLineEdit->height() + 5, m_renameLineEdit->width() + 5);
 
 	m_muteButton = new AutomatableButton(this, tr("Mute"));
-	m_muteButton->setModel(&mixerChannel->m_muteModel);
-	m_muteButton->setCheckable(true);
 	m_muteButton->setObjectName("btn-mute");
 	m_muteButton->setToolTip(tr("Mute this channel"));
+	m_muteButton->setCheckable(true);
+	m_muteButton->setModel(&mixerChannel->m_muteModel);
 
 	m_soloButton = new AutomatableButton(this, tr("Solo"));
-	m_soloButton->setModel(&mixerChannel->m_soloModel);
-	m_soloButton->setCheckable(true);
 	m_soloButton->setObjectName("btn-solo");
 	m_soloButton->setToolTip(tr("Solo this channel"));
+	m_soloButton->setCheckable(true);
+	m_soloButton->setModel(&mixerChannel->m_soloModel);
 
 	auto soloMuteLayout = new QVBoxLayout();
 	soloMuteLayout->setContentsMargins(0, 2, 0, 2);
@@ -231,10 +240,6 @@ void MixerChannelView::keyPressEvent(QKeyEvent* ke)
 			renameFinished();
 		}
 	}
-	else if (ke->key() == Qt::Key_Space)
-	{
-		m_fader->adjustByDialog();
-	}
 	else
 	{
 		ke->ignore();
@@ -338,10 +343,16 @@ bool MixerChannelView::confirmRemoval(int index)
 	QString messageTitleRemoveTrack = tr("Confirm removal");
 	QString askAgainText = tr("Don't ask again");
 	auto askAgainCheckBox = new QCheckBox(askAgainText, nullptr);
-	connect(askAgainCheckBox, &QCheckBox::stateChanged, [](int state) {
+	auto onCheckedStateChanged = [](auto state) {
 		// Invert button state, if it's checked we *shouldn't* ask again
-		ConfigManager::inst()->setValue("ui", "mixerchanneldeletionwarning", state ? "0" : "1");
-	});
+		ConfigManager::inst()->setValue("ui", "mixerchanneldeletionwarning", state != Qt::Unchecked ? "0" : "1");
+	};
+
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
+	connect(askAgainCheckBox, &QCheckBox::checkStateChanged, onCheckedStateChanged);
+#else
+	connect(askAgainCheckBox, &QCheckBox::stateChanged, onCheckedStateChanged);
+#endif
 
 	QMessageBox mb;
 	mb.setText(messageRemoveTrack);

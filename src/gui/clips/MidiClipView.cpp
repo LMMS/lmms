@@ -27,12 +27,10 @@
 
 
 #include <algorithm>
-#include <cmath>
 #include <QApplication>
 #include <QInputDialog>
 #include <QMenu>
 #include <QPainter>
-#include <cmath>
 #include <set>
 
 #include "AutomationEditor.h"
@@ -142,7 +140,7 @@ void MidiClipView::transposeSelection()
 {
 	const auto selection = getClickedClips();
 
-	// Calculate the key boundries for all clips
+	// Calculate the key boundaries for all clips
 	int highest = 0;
 	int lowest = NumKeys - 1;
 	for (ClipView* clipview: selection)
@@ -423,17 +421,19 @@ void MidiClipView::bulkClearNotesOutOfBounds(QVector<ClipView*> clipvs)
 
 void MidiClipView::mousePressEvent( QMouseEvent * _me )
 {
+	const auto pos = position(_me);
+
 	bool displayPattern = fixedClips() || (pixelsPerBar() >= 96 && m_legacySEPattern);
 	if (_me->button() == Qt::LeftButton && m_clip->m_clipType == MidiClip::Type::BeatClip && displayPattern
-		&& _me->y() > BeatStepButtonOffset && _me->y() < BeatStepButtonOffset + m_stepBtnOff.height())
+		&& pos.y() > BeatStepButtonOffset && pos.y() < BeatStepButtonOffset + m_stepBtnOff.height())
 
 	// when mouse button is pressed in pattern mode
 
 	{
 //	get the step number that was clicked on and
 //	do calculations in floats to prevent rounding errors...
-		float tmp = ( ( float(_me->x()) - BORDER_WIDTH ) *
-				float( m_clip -> m_steps ) ) / float(width() - BORDER_WIDTH*2);
+		float tmp = ((static_cast<float>(pos.x()) - BORDER_WIDTH)
+			* static_cast<float>(m_clip->m_steps)) / static_cast<float>(width() - BORDER_WIDTH * 2);
 
 		int step = int( tmp );
 
@@ -495,13 +495,14 @@ void MidiClipView::mouseDoubleClickEvent(QMouseEvent *_me)
 
 void MidiClipView::wheelEvent(QWheelEvent * we)
 {
+	const auto pos = we->position().toPoint();
 	if(m_clip->m_clipType == MidiClip::Type::BeatClip &&
 				(fixedClips() || pixelsPerBar() >= 96) &&
-				position(we).y() > height() - m_stepBtnOff.height())
+				pos.y() > height() - m_stepBtnOff.height())
 	{
 //	get the step number that was wheeled on and
 //	do calculations in floats to prevent rounding errors...
-		float tmp = ((float(position(we).x()) - BORDER_WIDTH) *
+		float tmp = ((float(pos.x()) - BORDER_WIDTH) *
 				float(m_clip -> m_steps)) / float(width() - BORDER_WIDTH*2);
 
 		int step = int( tmp );
@@ -532,10 +533,7 @@ void MidiClipView::wheelEvent(QWheelEvent * we)
 
 			Engine::getSong()->setModified();
 			update();
-			if( getGUI()->pianoRoll()->currentMidiClip() == m_clip )
-			{
-				getGUI()->pianoRoll()->update();
-			}
+			m_clip->updatePatternTrack();
 		}
 		we->accept();
 	}
@@ -761,7 +759,7 @@ void MidiClipView::paintEvent( QPaintEvent * )
 
 		int const notesBorder = 4; // Border for the notes towards the top and bottom in pixels
 
-		// The relavant painting code starts here
+		// The relevant painting code starts here
 		p.save();
 
 		p.translate(0., distanceToTop + notesBorder);

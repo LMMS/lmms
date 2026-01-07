@@ -26,18 +26,14 @@
 #define LMMS_GUI_KNOB_H
 
 #include <memory>
-#include <QTextDocument>
 
 #include "FloatModelEditorBase.h"
 
 
-class QPixmap;
 
 namespace lmms::gui
 {
 
-
-class SimpleTextFloat;
 
 enum class KnobType
 {
@@ -136,8 +132,8 @@ public:
 	
 	Knob( const Knob& other ) = delete;
 
+	const QString& getLabel() const;
 	void setLabel(const QString& txt);
-	void setHtmlLabel( const QString &htmltxt );
 
 	void setTotalAngle( float angle );
 
@@ -215,8 +211,6 @@ private:
 
 	QString m_label;
 	bool m_fixedFontSizeLabelRendering = false;
-	bool m_isHtmlLabel;
-	QTextDocument* m_tdRenderer;
 
 	std::unique_ptr<QPixmap> m_knobPixmap;
 

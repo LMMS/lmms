@@ -40,11 +40,8 @@
 #include "StepRecorder.h"
 #include "StepRecorderWidget.h"
 
-class QPainter;
-class QPixmap;
 class QPushButton;
 class QScrollBar;
-class QString;
 class QMenu;
 class QToolButton;
 
@@ -52,7 +49,6 @@ namespace lmms
 {
 
 
-class NotePlayHandle;
 class MidiClip;
 
 
@@ -192,7 +188,6 @@ protected:
 	void focusOutEvent( QFocusEvent * ) override;
 	void focusInEvent( QFocusEvent * ) override;
 
-	int getKey( int y ) const;
 	void drawNoteRect( QPainter & p, int x, int y,
 					int  width, const Note * n, const QColor & noteCol, const QColor & noteTextColor,
 					const QColor & selCol, const int noteOpc, const bool borderless, bool drawNoteName );
@@ -226,8 +221,8 @@ protected slots:
 	void pasteNotes();
 	bool deleteSelectedNotes();
 
-	void updatePosition(const lmms::TimePos & t );
-	void updatePositionAccompany(const lmms::TimePos & t );
+	void updatePosition();
+	void updatePositionAccompany();
 	void updatePositionStepRecording(const lmms::TimePos & t );
 
 	void zoomingChanged();
@@ -332,6 +327,7 @@ private:
 	void cancelStrumAction();
 
 	void updateScrollbars();
+	void updatePositionLinePos();
 	void updatePositionLineHeight();
 
 	QList<int> getAllOctavesForKey( int keyToMirror ) const;
@@ -342,6 +338,9 @@ private:
 	int keyAreaTop() const;
 	int noteEditRight() const;
 	int noteEditLeft() const;
+
+	int getKey(int y) const;
+	int yCoordOfKey(int key) const;
 
 	void dragNotes(int x, int y, bool alt, bool shift, bool ctrl);
 
@@ -532,9 +531,6 @@ private:
 	QBrush m_blackKeyActiveBackground;
 	QBrush m_blackKeyInactiveBackground;
 	QBrush m_blackKeyDisabledBackground;
-
-signals:
-	void positionChanged( const lmms::TimePos & );
 } ;
 
 
@@ -590,6 +586,8 @@ private slots:
 private:
 	void clipRenamed();
 	void focusInEvent(QFocusEvent * event) override;
+	void showEvent(QShowEvent* se) override;
+
 	void stopStepRecording();
 	void updateStepRecordingIcon();
 

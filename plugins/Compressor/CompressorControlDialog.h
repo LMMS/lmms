@@ -59,7 +59,7 @@ constexpr int COMP_BOX_Y = 280;
 constexpr float COMP_GRID_SPACING = 3.f;// 3 db per grid line
 constexpr float COMP_GRID_MAX = 96.f;// Can't zoom out past 96 db
 
-class automatableButtonGroup;
+class AutomatableButtonGroup;
 class Knob;
 class PixmapButton;
 class EqFader;
@@ -196,22 +196,22 @@ private:
 
 	PixmapButton * rmsButton;
 	PixmapButton * peakButton;
-	automatableButtonGroup * rmsPeakGroup;
+	AutomatableButtonGroup * rmsPeakGroup;
 
 	PixmapButton * leftRightButton;
 	PixmapButton * midSideButton;
-	automatableButtonGroup * leftRightMidSideGroup;
+	AutomatableButtonGroup * leftRightMidSideGroup;
 
 	PixmapButton * compressButton;
 	PixmapButton * limitButton;
-	automatableButtonGroup * compressLimitGroup;
+	AutomatableButtonGroup * compressLimitGroup;
 
 	PixmapButton * unlinkedButton;
 	PixmapButton * maximumButton;
 	PixmapButton * averageButton;
 	PixmapButton * minimumButton;
 	PixmapButton * blendButton;
-	automatableButtonGroup * stereoLinkGroup;
+	AutomatableButtonGroup * stereoLinkGroup;
 
 	PixmapButton * autoMakeupButton;
 	PixmapButton * auditionButton;

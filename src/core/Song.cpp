@@ -55,7 +55,6 @@
 #include "ProjectNotes.h"
 #include "Scale.h"
 #include "SongEditor.h"
-#include "TimeLineWidget.h"
 #include "PeakController.h"
 
 
@@ -94,13 +93,10 @@ Song::Song() :
 	m_length( 0 ),
 	m_midiClipToPlay( nullptr ),
 	m_loopMidiClip( false ),
-	m_elapsedTicks( 0 ),
-	m_elapsedBars( 0 ),
 	m_loopRenderCount(1),
 	m_loopRenderRemaining(1),
 	m_oldAutomatedValues()
 {
-	for (double& millisecondsElapsed : m_elapsedMilliSeconds) { millisecondsElapsed = 0; }
 	connect( &m_tempoModel, SIGNAL(dataChanged()),
 			this, SLOT(setTempo()), Qt::DirectConnection );
 	connect( &m_tempoModel, SIGNAL(dataUnchanged()),
@@ -122,6 +118,19 @@ Song::Song() :
 
 	for (auto& scale : m_scales) {scale = std::make_shared<Scale>();}
 	for (auto& keymap : m_keymaps) {keymap = std::make_shared<Keymap>();}
+
+	// Aggregate the `positionJumped` signals from all the timelines into a single `playbackPositionJumped` signal for other objects (sample tracks, LFOs, etc) to use.
+	for (auto& timeline : m_timelines)
+	{
+		connect(&timeline, &Timeline::positionJumped, this, [this](){
+			// Only emit the signal when the song is actually playing
+			// This prevents LFOs from changing phase when the user drags the timeline while paused
+			if (isPlaying()) { emit playbackPositionJumped(); }
+		}, Qt::DirectConnection);
+	}
+
+	// Inform VST plugins if the user moved the play head
+	connect(this, &Song::playbackPositionJumped, this, [this](){ m_vstSyncController.setPlaybackJumped(true); }, Qt::DirectConnection);
 }
 
 
@@ -203,8 +212,6 @@ void Song::savePlayStartPosition()
 
 void Song::processNextBuffer()
 {
-	m_vstSyncController.setPlaybackJumped(false);
-
 	// If nothing is playing, there is nothing to do
 	if (!m_playing) { return; }
 
@@ -244,6 +251,8 @@ void Song::processNextBuffer()
 			return;
 	}
 
+	auto& timeline = getTimeline();
+
 	// If the playback position is outside of the range [begin, end), move it to
 	// begin and inform interested parties.
 	// Returns true if the playback position was moved, else false.
@@ -251,20 +260,16 @@ void Song::processNextBuffer()
 	{
 		if (getPlayPos() < begin || getPlayPos() >= end)
 		{
-			setToTime(begin);
-			m_vstSyncController.setPlaybackJumped(true);
-			emit updateSampleTracks();
+			getTimeline().setTicks(begin.getTicks());
 			return true;
 		}
 		return false;
 	};
 
-	const auto& timeline = getTimeline();
 	const auto loopEnabled = !m_exporting && timeline.loopEnabled();
 
 	// Ensure playback begins within the loop if it is enabled
 	if (loopEnabled) { enforceLoop(timeline.loopBegin(), timeline.loopEnd()); }
-
 
 #ifdef LMMS_HAVE_CLAP
 	// If looping is enabled, or we're playing a pattern track or a MIDI clip
@@ -275,14 +280,6 @@ void Song::processNextBuffer()
 		);
 #endif
 
-	// Inform VST plugins if the user moved the play head
-	if (getPlayPos().jumped())
-	{
-		m_vstSyncController.setPlaybackJumped(true);
-		emit updateSampleTracks();
-		getPlayPos().setJumped(false);
-	}
-
 	const auto framesPerTick = Engine::framesPerTick();
 	const auto framesPerPeriod = Engine::audioEngine()->framesPerPeriod();
 
@@ -290,16 +287,16 @@ void Song::processNextBuffer()
 
 	while (frameOffsetInPeriod < framesPerPeriod)
 	{
-		auto frameOffsetInTick = getPlayPos().currentFrame();
+		auto frameOffsetInTick = timeline.frameOffset();
 
 		// If a whole tick has elapsed, update the frame and tick count, and check any loops
 		if (frameOffsetInTick >= framesPerTick)
 		{
 			// Transfer any whole ticks from the frame count to the tick count
 			const auto elapsedTicks = static_cast<int>(frameOffsetInTick / framesPerTick);
-			getPlayPos().setTicks(getPlayPos().getTicks() + elapsedTicks);
 			frameOffsetInTick -= elapsedTicks * framesPerTick;
-			getPlayPos().setCurrentFrame(frameOffsetInTick);
+			timeline.incrementTicks(elapsedTicks);
+			timeline.setFrameOffset(frameOffsetInTick);
 
 			// If we are playing a pattern track, or a MIDI clip with no loop enabled,
 			// loop back to the beginning when we reach the end
@@ -343,7 +340,7 @@ void Song::processNextBuffer()
 			// This must be done after we've corrected the frame/tick count,
 			// but before actually playing any frames.
 			m_vstSyncController.setAbsolutePosition(getPlayPos().getTicks()
-				+ getPlayPos().currentFrame() / static_cast<double>(framesPerTick));
+				+ timeline.frameOffset() / static_cast<double>(framesPerTick));
 			m_vstSyncController.update();
 
 #ifdef LMMS_HAVE_CLAP
@@ -367,11 +364,11 @@ void Song::processNextBuffer()
 		// Update frame counters
 		frameOffsetInPeriod += framesToPlay;
 		frameOffsetInTick += framesToPlay;
-		getPlayPos().setCurrentFrame(frameOffsetInTick);
-		m_elapsedMilliSeconds[static_cast<std::size_t>(m_playMode)] += TimePos::ticksToMilliseconds(framesToPlay / framesPerTick, getTempo());
-		m_elapsedBars = getPlayPos(PlayMode::Song).getBar();
-		m_elapsedTicks = (getPlayPos(PlayMode::Song).getTicks() % ticksPerBar()) / 48;
+		timeline.setFrameOffset(frameOffsetInTick);
 	}
+
+	// Reset the jumped state after processing this buffer, since presumably it has now been handled.
+	m_vstSyncController.setPlaybackJumped(false);
 }
 
 
@@ -438,7 +435,7 @@ void Song::processAutomations(const TrackList &tracklist, TimePos timeStart, fpp
 	for (auto it = m_oldAutomatedValues.begin(); it != m_oldAutomatedValues.end(); it++)
 	{
 		AutomatableModel * am = it.key();
-		if (am->controllerConnection() && !values.contains(am))
+		if (!values.contains(am))
 		{
 			am->setUseControllerValue(true);
 		}
@@ -448,13 +445,18 @@ void Song::processAutomations(const TrackList &tracklist, TimePos timeStart, fpp
 	// Apply values
 	for (auto it = values.begin(); it != values.end(); it++)
 	{
-		if (! recordedModels.contains(it.key()))
+		AutomatableModel* model = it.key();
+		bool isRecording = recordedModels.contains(model);
+		model->setUseControllerValue(isRecording);
+
+		if (!isRecording)
 		{
-			it.key()->setAutomatedValue(it.value());
-		}
-		else if (!it.key()->useControllerValue())
-		{
-			it.key()->setUseControllerValue(true);
+			/* TODO
+			 * Remove scaleValue() from here when automation editor's
+			 * Y axis can be set to logarithmic, and automation clips store
+			 * the actual values, and not the invertedScaledValue.
+			 */
+			model->setValue(model->scaledValue(it.value()), true);
 		}
 	}
 }
@@ -524,7 +526,6 @@ void Song::playSong()
 	}
 
 	m_playMode = PlayMode::Song;
-	m_lastPlayMode = m_playMode;
 	m_playing = true;
 	m_paused = false;
 
@@ -568,7 +569,6 @@ void Song::playPattern()
 	}
 
 	m_playMode = PlayMode::Pattern;
-	m_lastPlayMode = m_playMode;
 	m_playing = true;
 	m_paused = false;
 
@@ -599,7 +599,6 @@ void Song::playMidiClip( const MidiClip* midiClipToPlay, bool loop )
 	if( m_midiClipToPlay != nullptr )
 	{
 		m_playMode = PlayMode::MidiClip;
-		m_lastPlayMode = m_playMode;
 		m_playing = true;
 		m_paused = false;
 	}
@@ -639,28 +638,14 @@ void Song::updateLength()
 
 
 
-void Song::setPlayPos( tick_t ticks, PlayMode playMode )
-{
-	tick_t ticksFromPlayMode = getPlayPos(playMode).getTicks();
-	m_elapsedTicks += ticksFromPlayMode - ticks;
-	m_elapsedMilliSeconds[static_cast<std::size_t>(playMode)] += TimePos::ticksToMilliseconds( ticks - ticksFromPlayMode, getTempo() );
-	getPlayPos(playMode).setTicks( ticks );
-	getPlayPos(playMode).setCurrentFrame( 0.0f );
-	getPlayPos(playMode).setJumped( true );
-
-// send a signal if playposition changes during playback
-	if( isPlaying() )
-	{
-		emit playbackPositionChanged();
-		emit updateSampleTracks();
-	}
-}
-
-
-
-
 void Song::togglePause()
 {
+	// Pause/unpause only works when something is actually playing
+	if (m_playMode == PlayMode::None)
+	{
+		return;
+	}
+
 	if( m_paused == true )
 	{
 		m_playing = true;
@@ -708,20 +693,18 @@ void Song::stop()
 		case Timeline::StopBehaviour::BackToZero:
 			if (m_playMode == PlayMode::MidiClip)
 			{
-				getPlayPos().setTicks(std::max(0, -m_midiClipToPlay->startTimeOffset()));
+				timeline.setTicks(std::max(0, -m_midiClipToPlay->startTimeOffset()));
 			}
 			else
 			{
-				getPlayPos().setTicks(0);
+				timeline.setTicks(0);
 			}
-			m_elapsedMilliSeconds[static_cast<std::size_t>(m_playMode)] = 0;
 			break;
 
 		case Timeline::StopBehaviour::BackToStart:
 			if (timeline.playStartPosition() >= 0)
 			{
-				getPlayPos().setTicks(timeline.playStartPosition().getTicks());
-				setToTime(timeline.playStartPosition());
+				timeline.setTicks(timeline.playStartPosition().getTicks());
 
 				timeline.setPlayStartPosition(-1);
 			}
@@ -731,15 +714,12 @@ void Song::stop()
 			break;
 	}
 
-	m_elapsedMilliSeconds[static_cast<std::size_t>(PlayMode::None)] = m_elapsedMilliSeconds[static_cast<std::size_t>(m_playMode)];
-	getPlayPos(PlayMode::None).setTicks(getPlayPos().getTicks());
-
-	getPlayPos().setCurrentFrame( 0 );
+	getTimeline(PlayMode::None).setTicks(getPlayPos().getTicks());
 
 	m_vstSyncController.setPlaybackState( m_exporting );
 	m_vstSyncController.setAbsolutePosition(
 		getPlayPos().getTicks()
-		+ getPlayPos().currentFrame()
+		+ timeline.frameOffset()
 		/ (double) Engine::framesPerTick() );
 
 #ifdef LMMS_HAVE_CLAP
@@ -778,14 +758,14 @@ void Song::startExport()
 	m_exporting = true;
 	updateLength();
 
-	const auto& timeline = getTimeline(PlayMode::Song);
+	auto& timeline = getTimeline(PlayMode::Song);
 
 	if (m_renderBetweenMarkers)
 	{
 		m_exportSongBegin = m_exportLoopBegin = timeline.loopBegin();
 		m_exportSongEnd = m_exportLoopEnd = timeline.loopEnd();
 
-		getPlayPos(PlayMode::Song).setTicks(timeline.loopBegin().getTicks());
+		timeline.setTicks(timeline.loopBegin().getTicks());
 	}
 	else
 	{
@@ -808,7 +788,7 @@ void Song::startExport()
 			? timeline.loopEnd()
 			: TimePos{0};
 
-		getPlayPos(PlayMode::Song).setTicks( 0 );
+		getTimeline(PlayMode::Song).setTicks(0);
 	}
 
 	m_exportEffectiveLength = (m_exportLoopBegin - m_exportSongBegin) + (m_exportLoopEnd - m_exportLoopBegin) 
@@ -1107,11 +1087,7 @@ void Song::loadProject( const QString & fileName )
 			{
 				QTextStream(stderr) << tr("Can't load project: "
 					"Project file contains local paths to plugins.")
-#if (QT_VERSION >= QT_VERSION_CHECK(5,15,0))
 					<< Qt::endl;
-#else
-					<< endl;
-#endif
 			}
 		}
 	}
@@ -1266,11 +1242,7 @@ void Song::loadProject( const QString & fileName )
 		}
 		else
 		{
-#if (QT_VERSION >= QT_VERSION_CHECK(5,15,0))
 			QTextStream(stderr) << Engine::getSong()->errorSummary() << Qt::endl;
-#else
-			QTextStream(stderr) << Engine::getSong()->errorSummary() << endl;
-#endif
 		}
 	}
 

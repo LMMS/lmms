@@ -34,6 +34,7 @@
 
 #include "Lb302.h"
 #include "AutomatableButton.h"
+#include "DspEffectLibrary.h"
 #include "Engine.h"
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
@@ -440,11 +441,8 @@ QString Lb302Synth::nodeName() const
 // OBSOLETE. Break apart once we get Q_OBJECT to work. >:[
 void Lb302Synth::recalcFilter()
 {
-#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
 	vcf.loadRelaxed()->recalc();
-#else
-	vcf.load()->recalc();
-#endif
+
 	// THIS IS OLD 3pole/24dB code, I may reintegrate it.  Don't need it
 	// right now.   Should be toggled by LB_24_RES_TRICK at the moment.
 
@@ -699,11 +697,8 @@ void Lb302Synth::initNote( Lb302Note *n)
 
 	if(n->dead ==0){
 		// Swap next two blocks??
-#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
 		vcf.loadRelaxed()->playNote();
-#else
-		vcf.load()->playNote();
-#endif
+
 		// Ensure envelope is recalculated
 		vcf_envpos = ENVINC;
 
@@ -982,7 +977,7 @@ Lb302SynthView::Lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
 			tr( "Click here for bandlimited moog saw wave." ) );
 
 
-	m_waveBtnGrp = new automatableButtonGroup( this );
+	m_waveBtnGrp = new AutomatableButtonGroup( this );
 	m_waveBtnGrp->addButton( sawWaveBtn );
 	m_waveBtnGrp->addButton( triangleWaveBtn );
 	m_waveBtnGrp->addButton( sqrWaveBtn );

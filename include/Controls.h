@@ -36,8 +36,6 @@ class QLabel;
 namespace lmms
 {
 
-class AutomatableModel;
-
 namespace gui
 {
 

@@ -29,11 +29,11 @@
 #include <QLabel>
 
 #include "LadspaSubPluginFeatures.h"
-#include "AudioDevice.h"
-#include "AudioEngine.h"
+
 #include "Engine.h"
 #include "Ladspa2LMMS.h"
 #include "LadspaBase.h"
+#include "lmms_constants.h"
 
 namespace lmms
 {

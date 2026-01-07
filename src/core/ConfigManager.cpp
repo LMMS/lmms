@@ -24,7 +24,6 @@
 
 #include "ConfigManager.h"
 
-#include <PathUtil.h>
 #include <QApplication>
 #include <QDir>
 #include <QDomElement>
@@ -32,8 +31,10 @@
 #include <QStandardPaths>
 #include <QTextStream>
 
+#include "DeprecationHelper.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
+#include "PathUtil.h"
 #include "ProjectVersion.h"
 #include "lmmsversion.h"
 
@@ -420,7 +421,7 @@ void ConfigManager::loadConfigFile(const QString & configFile)
 	{
 		QString errorString;
 		int errorLine, errorCol;
-		if(dom_tree.setContent(&cfg_file, false, &errorString, &errorLine, &errorCol))
+		if (lmms::setContent(dom_tree, &cfg_file, false, &errorString, &errorLine, &errorCol))
 		{
 			// get the head information from the DOM
 			QDomElement root = dom_tree.documentElement();

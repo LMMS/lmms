@@ -47,6 +47,9 @@
 [submodule "src/3rdparty/hiir/hiir"]
 	path = src/3rdparty/hiir/hiir
 	url = https://github.com/LostRobotMusic/hiir
+[submodule "plugins/MidiImport/portsmf"]
+	path = plugins/MidiImport/portsmf
+	url = https://github.com/portsmf/portsmf
 [submodule "src/3rdparty/clap/clap"]
 	path = src/3rdparty/clap/clap
 	url = https://github.com/free-audio/clap.git
