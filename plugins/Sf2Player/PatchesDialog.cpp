@@ -359,11 +359,11 @@ void PatchesDialog::bankChanged ()
 	// Clear up the program list to refill
 	m_progListView->setSortingEnabled(false);
 	m_progListSourceModel.setRowCount(0);
-	QTreeWidgetItem *pProgItem = nullptr;
 
 	// For all soundfonts (in reversed stack order) fill the available programs...
+	bool stop = false; // replaces the `pProgItem` check that used to exist here
 	int cSoundFonts = ::fluid_synth_sfcount(m_pSynth);
-	for (int i = 0; i < cSoundFonts && !pProgItem; i++) {
+	for (int i = 0; i < cSoundFonts && !stop; i++) {
 		fluid_sfont_t *pSoundFont = ::fluid_synth_get_sfont(m_pSynth, i);
 		if (pSoundFont) {
 #ifdef CONFIG_FLUID_BANK_OFFSET
@@ -388,6 +388,8 @@ void PatchesDialog::bankChanged ()
 					patchNumItem->setData(iProg, Qt::DisplayRole);
 
 					auto patchNameItem = new QStandardItem(fluid_preset_get_name(pCurPreset));
+
+					stop = true;
 
 					m_progListSourceModel.appendRow({patchNumItem, patchNameItem});
 					// Old columns:
