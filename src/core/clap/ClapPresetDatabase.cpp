@@ -187,7 +187,7 @@ auto ClapPresetDatabase::discoverPresets(const Location& location, std::set<Pres
 	const auto preferredIndexer = getIndexerFor(location);
 
 	// Handle PLUGIN presets (internal presets)
-	if (PathUtil::baseLookup(location.location) == PathUtil::Base::Internal)
+	if (PathUtil::hasBase(location.location, PathUtil::Base::Internal))
 	{
 		if (!preferredIndexer)
 		{

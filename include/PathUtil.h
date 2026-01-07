@@ -78,10 +78,10 @@ namespace lmms::PathUtil
 	QString LMMS_EXPORT stripPrefix(const QString& input);
 
 	//! Remove the prefix from a path, iff there is one
-	std::string_view LMMS_EXPORT stripPrefix(std::string_view input);
+	std::string LMMS_EXPORT stripPrefix(std::string_view input);
 
 	//! Return the results of baseLookup() and stripPrefix()
-	std::pair<Base, std::string_view> LMMS_EXPORT parsePath(std::string_view path);
+	std::pair<Base, std::string> LMMS_EXPORT parsePath(std::string_view path);
 
 	//! Get the filename for a path, handling prefixed paths correctly
 	QString LMMS_EXPORT cleanName(const QString& input);

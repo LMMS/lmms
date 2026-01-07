@@ -152,7 +152,7 @@ namespace lmms::PathUtil
 
 	Base baseLookup(std::string_view input)
 	{
-		if (input.isEmpty()) { return Base::Absolute; };
+		if (input.empty()) { return Base::Absolute; };
 
 		for (auto base : relativeBases)
 		{
@@ -170,34 +170,50 @@ namespace lmms::PathUtil
 		return QString(input).replace("\\", "/");
 	}
 
-	static std::string_view serializePath(std::string_view input)
+	static std::string serializePath(std::string_view input)
 	{
-		for (char& c : input)
+		std::string serialized;
+		serialized.reserve(input.size());
+		for (char c : input)
 		{
 			if (c == '\\') { c = '/'; }
+			serialized.push_back(c);
 		}
 
-		return input;
+		return serialized;
 	}
 
 	QString stripPrefix(const QString& input)
 	{
 		if (input.isEmpty()) { return input; }
 
+		const auto base = baseLookup(input);
+		if (base == Base::Internal)
+		{
+			// Don't serialize internal paths
+			return input.mid(basePrefix(base).length());
+		}
+
 		QString path = serializePath(input);
-		return path.mid(basePrefix(baseLookup(path)).length());
+		return path.mid(basePrefix(base).length());
 	}
 
-	std::string_view stripPrefix(std::string_view input)
+	std::string stripPrefix(std::string_view input)
 	{
-		if (input.empty()) { return input; }
+		if (input.empty()) { return std::string{input}; }
 
-		std::string_view path = serializePath(input);
-		path.remove_prefix(basePrefix(baseLookup(path)).length());
-		return path;
+		const auto base = baseLookup(input);
+		if (base == Base::Internal)
+		{
+			// Don't serialize internal paths
+			return std::string{input.substr(basePrefix(base).length())};
+		}
+
+		std::string path = serializePath(input);
+		return path.substr(basePrefix(base).length());
 	}
 
-	std::pair<Base, std::string_view> parsePath(std::string_view path)
+	std::pair<Base, std::string> parsePath(std::string_view path)
 	{
 		for (auto base : relativeBases)
 		{
@@ -205,25 +221,38 @@ namespace lmms::PathUtil
 			if (path.rfind(prefix, 0) == 0)
 			{
 				path.remove_prefix(prefix.length());
-				return { base, path };
+				if (base == Base::Internal)
+				{
+					// Don't serialize internal paths
+					return { base, std::string{path} };
+				}
+				return { base, serializePath(path) };
 			}
 		}
-		return { Base::Absolute, path };
+		return { Base::Absolute, serializePath(path) };
 	}
 
 	QString cleanName(const QString& input)
 	{
 		if (input.isEmpty()) { return input; }
 
-		QString path = serializePath(input);
-		return stripPrefix(QFileInfo(path).completeBaseName());
+		auto [base, path] = parsePath(input.toStdString());
+		if (base == Base::Internal)
+		{
+			// Internal paths should be returned as-is
+			return QString::fromStdString(path);
+		}
+
+		QString serialized = serializePath(input);
+		// TODO: Are all prefixed paths supported by QFileInfo?
+		return stripPrefix(QFileInfo(serialized).completeBaseName());
 	}
 
 	QString oldRelativeUpgrade(const QString& input)
 	{
 		Base assumedBase = Base::Absolute;
 
-		if (input.isEmpty()) { return basePrefix(assumedBase); }
+		if (input.isEmpty()) { return basePrefixQString(assumedBase); }
 
 		QString path = serializePath(input);
 
@@ -294,7 +323,7 @@ namespace lmms::PathUtil
 
 	QString toShortestRelative(const QString& input, bool allowLocal /* = false*/)
 	{
-		if (input.isEmpty()) { return basePrefixQString(Base::Absolute); }
+		if (input.isEmpty()) { return input; }
 		if (hasBase(input, Base::Internal)) { return input; }
 
 		QString path = serializePath(input);
@@ -321,11 +350,11 @@ namespace lmms::PathUtil
 
 	std::string toShortestRelative(std::string_view input, bool allowLocal)
 	{
-		if (input.empty()) { return basePrefix(Base::Absolute); }
+		if (input.empty()) { return {}; }
 		if (hasBase(input, Base::Internal)) { return std::string{input}; }
 
 		const auto path = serializePath(QString::fromUtf8(input.data(), input.size()));
-		QFileInfo inputFileInfo = QFileInfo(apth);
+		QFileInfo inputFileInfo = QFileInfo(path);
 		QString absolutePath = inputFileInfo.isAbsolute() ? path : toAbsolute(path);
 
 		Base shortestBase = Base::Absolute;
