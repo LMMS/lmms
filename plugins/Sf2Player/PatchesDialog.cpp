@@ -30,7 +30,6 @@
 //#include <QFileInfo>
 #include <QLabel>
 #include <QKeyEvent>
-#include <QDebug> // TODO: remove
 #include <QSortFilterProxyModel>
 #include <QStandardItemModel>
 #include <QStandardItem>
@@ -81,6 +80,15 @@ PatchesDialog::PatchesDialog( QWidget *pParent, Qt::WindowFlags wflags )
 	m_iBank  = 0;
 	m_iProg  = 0;
 
+	// Configure bank list view
+	auto bankHeader = m_bankListView->header();
+	bankHeader->setSectionResizeMode(0, QHeaderView::Stretch);
+	bankHeader->setStretchLastSection(true);
+	bankHeader->resizeSection(0, 30);
+
+	m_splitter->setStretchFactor(0, 2);
+	m_splitter->setStretchFactor(1, 6);
+
 	// Configure program list models
 	m_progListSourceModel.setHorizontalHeaderLabels({tr("Patch"), tr("Name")});
 	m_progListProxyModel.setSourceModel(&m_progListSourceModel);
@@ -95,15 +103,22 @@ PatchesDialog::PatchesDialog( QWidget *pParent, Qt::WindowFlags wflags )
 	m_progListView->setSelectionMode(QAbstractItemView::SingleSelection);
 	m_progListView->setSortingEnabled(true);
 	m_progListView->sortByColumn(0, Qt::AscendingOrder); // Initial sort by column 0 (Name)
-	m_progListView->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-	m_progListView->verticalHeader()->hide();
 
-	auto pHeader = m_progListView->horizontalHeader();
-	pHeader->setDefaultAlignment(Qt::AlignLeft);
-	pHeader->setSectionResizeMode(0, QHeaderView::ResizeToContents);
-	pHeader->setSectionResizeMode(1, QHeaderView::Stretch);
-	pHeader->setSectionsMovable(false);
-	pHeader->setStretchLastSection(true);
+	constexpr int rowHeight = 14;
+	auto progVHeader = m_progListView->verticalHeader();
+	// progVHeader->setSectionResizeMode(QHeaderView::ResizeToContents);
+	progVHeader->setSectionResizeMode(QHeaderView::Fixed);
+	progVHeader->setMinimumSectionSize(rowHeight);
+	progVHeader->setMaximumSectionSize(rowHeight);
+	progVHeader->setDefaultSectionSize(rowHeight);
+	progVHeader->hide();
+
+	auto progHeader = m_progListView->horizontalHeader();
+	progHeader->setDefaultAlignment(Qt::AlignLeft);
+	progHeader->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+	progHeader->setSectionResizeMode(1, QHeaderView::Stretch);
+	progHeader->setSectionsMovable(false);
+	progHeader->setStretchLastSection(true);
 
 	// Initial sort order...
 	m_bankListView->sortItems(0, Qt::AscendingOrder);
