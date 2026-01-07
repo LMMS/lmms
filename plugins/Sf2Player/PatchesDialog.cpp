@@ -220,16 +220,20 @@ void PatchesDialog::setup ( fluid_synth_t * pSynth, int iChan,
 	if (pPreset)
 		m_iProg = fluid_preset_get_num(pPreset);
 
-	// TODO: make this work.....
-	QStandardItem *progItem = findProgItem(m_iProg);
-	if (progItem != nullptr)
+	if (auto progItem = findProgItem(m_iProg); progItem != nullptr)
 	{
-		QModelIndex idx = progItem->index();
-		m_progListView->selectionModel()->select(idx, QItemSelectionModel::Rows);
-		m_progListView->scrollTo(idx);
+		auto sourceIdx = progItem->index();
+		auto proxyIdx = m_progListProxyModel.mapFromSource(sourceIdx);
+		if (proxyIdx.isValid())
+		{
+			int row = proxyIdx.row();
+			auto idx = m_progListView->model()->index(row, 0);
+
+			m_progListView->selectionModel()->setCurrentIndex(idx,
+				QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
+			m_progListView->scrollTo(idx);
+		}
 	}
-	// m_progListModel->setCurrentItem(pProgItem); // TODO: ACCOUNT
-	// m_progListView->scrollToItem(pProgItem); // TODO: ACCOUNT
 
 	// Done with setup...
 	//m_iDirtySetup--;
@@ -312,7 +316,6 @@ QTreeWidgetItem *PatchesDialog::findBankItem ( int iBank )
 }
 
 
-// Find the program item of given program number id.
 QStandardItem *PatchesDialog::findProgItem(int iProg)
 {
 	QList<QStandardItem*> progs = m_progListSourceModel.findItems(
