@@ -69,21 +69,9 @@ public:
 	}
 };
 
-class NumericItem : public QStandardItem {
-public:
-	NumericItem(QString x) : QStandardItem(x) {}
-
-	bool operator<(const QStandardItem &other) const
-	{
-		return text().toInt() < other.text().toInt();
-	}
-};
-
-// TODO: sorting via the column button is messed up!! it doesn't take into account the NumericItem class, for some reason
-
 // Constructor.
 PatchesDialog::PatchesDialog( QWidget *pParent, Qt::WindowFlags wflags )
-	: QDialog( pParent, wflags ), m_progListSourceModel{}, m_progListProxyModel{}
+	: QDialog(pParent, wflags)
 {
 	// Setup UI struct...
 	setupUi( this );
@@ -130,7 +118,6 @@ PatchesDialog::PatchesDialog( QWidget *pParent, Qt::WindowFlags wflags )
 
 	// Initial sort order...
 	m_bankListView->sortItems(0, Qt::AscendingOrder);
-	// m_progListView->sortItems(0, Qt::AscendingOrder); // TODO: how to do this
 
 	m_filterEdit->setPlaceholderText(tr("Search"));
 	m_filterEdit->setClearButtonEnabled(true);
@@ -151,12 +138,6 @@ PatchesDialog::PatchesDialog( QWidget *pParent, Qt::WindowFlags wflags )
 	QObject::connect(m_progListView->selectionModel(),
 		&QItemSelectionModel::currentRowChanged, this,
 		[this](auto& cur, auto& prev) { progChanged(cur, prev); });
-	// QObject::connect(m_progListView,
-	// 	SIGNAL(currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)),
-	// 	SLOT(progChanged(QTreeWidgetItem*,QTreeWidgetItem*)));
-	// QObject::connect(m_progListView,
-	// 	SIGNAL(itemActivated(QTreeWidgetItem*,int)),
-	// 	SLOT(accept()));
 	QObject::connect(m_okButton,
 		SIGNAL(clicked()),
 		SLOT(accept()));
@@ -166,7 +147,7 @@ PatchesDialog::PatchesDialog( QWidget *pParent, Qt::WindowFlags wflags )
 	QObject::connect(m_filterEdit, &QLineEdit::textChanged, this, [this](const QString& text) {
 		m_progListProxyModel.setFilterRegularExpression(
 			QRegularExpression(text, QRegularExpression::CaseInsensitiveOption));
-		diffSelectRow(0); // just check if everything is fine
+		diffSelectRow(0); // just fix the selection if it has been invalidated
 	});
 
 	installEventFilter(this);
@@ -180,7 +161,6 @@ void PatchesDialog::setup ( fluid_synth_t * pSynth, int iChan,
 						LcdSpinBoxModel * _progModel,
 							QLabel * _patchLabel )
 {
-
 	// We'll going to changes the whole thing...
 	m_dirty = 0;
 	m_bankModel = _bankModel;
@@ -344,7 +324,7 @@ QTreeWidgetItem *PatchesDialog::findBankItem ( int iBank )
 
 
 // Find the program item of given program number id.
-QStandardItem *PatchesDialog::findProgItem ( int iProg )
+QStandardItem *PatchesDialog::findProgItem(int iProg)
 {
 	QList<QStandardItem *> progs = m_progListSourceModel.findItems(
 		QString::number(iProg), Qt::MatchExactly, 0);
@@ -388,7 +368,6 @@ void PatchesDialog::bankChanged ()
 #else
 			fluid_preset_t *pCurPreset = nullptr;
 #endif
-			int row = 0;
 			while ((pCurPreset = fluid_sfont_iteration_next_wrapper(pSoundFont, pCurPreset))) {
 				int iBank = fluid_preset_get_banknum(pCurPreset);
 #ifdef CONFIG_FLUID_BANK_OFFSET
@@ -396,13 +375,14 @@ void PatchesDialog::bankChanged ()
 #endif
 				int iProg = fluid_preset_get_num(pCurPreset);
 				if (iBank == iBankSelected && !findProgItem(iProg)) {
-					// FIXME: use PatchItem here? It makes sense, but I'm not fully sure how to use it here
+					// Setting a numeric value here allows for numerical sorting
+					auto patchNumItem = new QStandardItem();
+					patchNumItem->setData(iProg, Qt::DisplayRole);
 
-					m_progListSourceModel.setItem(row, 0, new NumericItem(QString::number(iProg)));
-					m_progListSourceModel.setItem(row, 1, new QStandardItem(fluid_preset_get_name(pCurPreset)));
-					row++;
+					auto patchNameItem = new QStandardItem(fluid_preset_get_name(pCurPreset));
 
-					// pProgItem = new PatchItem(&m_progListSourceModel, pProgItem);
+					m_progListSourceModel.appendRow({patchNumItem, patchNameItem});
+
 					// if (pProgItem) {
 						//pProgItem->setText(2, QString::number(fluid_sfont_get_id(pSoundFont)));
 						//pProgItem->setText(3, QFileInfo(
@@ -413,7 +393,7 @@ void PatchesDialog::bankChanged ()
 		}
 	}
 	m_progListView->setSortingEnabled(true);
-	m_progListSourceModel.sort(0); // sort by patch column
+	m_progListSourceModel.sort(0, Qt::AscendingOrder); // sort by patch column
 
 	// Stabilize the form.
 	stabilizeForm();
