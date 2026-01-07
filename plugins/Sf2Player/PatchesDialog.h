@@ -27,6 +27,8 @@
 #define _PATCHES_DIALOG_H
 
 #include <fluidsynth/types.h>
+#include <QSortFilterProxyModel>
+#include <QStandardItemModel>
 
 #include "ui_PatchesDialog.h"
 #include "LcdSpinBox.h"
@@ -60,21 +62,33 @@ public slots:
 
 	void stabilizeForm();
 	void bankChanged();
-	void progChanged( QTreeWidgetItem * _curr, QTreeWidgetItem * _prev );
+	void progChanged(const QModelIndex& cur, const QModelIndex& prev);
 
 protected slots:
 
 	void accept() override;
 	void reject() override;
+	bool eventFilter(QObject *obj, QEvent *event) override;
 
 protected:
 
 	void setBankProg(int iBank, int iProg);
 
 	QTreeWidgetItem *findBankItem(int iBank);
-	QTreeWidgetItem *findProgItem(int iProg);
+	QStandardItem *findProgItem(int iProg);
 
 	bool validateForm();
+
+	// Figure out which patch has been set and set it
+	//
+	// `updateUi` argument
+	void updatePatch(bool updateUi);
+
+	// Select a row via an offset form the currently selected row. Sanitizes
+	// input.
+	//
+	// `diff=0` can be used for guaranteeing something is selected.
+	void diffSelectRow(int offset);
 
 private:
 
@@ -89,9 +103,14 @@ private:
 	//int m_iDirtyCount;
 	int m_dirty;
 
+	int m_selProg;
+	QString m_selProgName;
+
 	LcdSpinBoxModel * m_bankModel;
 	LcdSpinBoxModel * m_progModel;
 	QLabel *m_patchLabel;
+	QStandardItemModel m_progListSourceModel;
+	QSortFilterProxyModel m_progListProxyModel;
 };
 
 

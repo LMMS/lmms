@@ -40,6 +40,10 @@
   </property>
   <layout class="QVBoxLayout" >
    <item>
+    <widget class="QLineEdit" name="m_filterEdit" >
+    </widget>
+   </item>
+   <item>
     <widget class="QSplitter" name="m_splitter" >
      <property name="sizePolicy" >
       <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
@@ -93,31 +97,31 @@
        </property>
       </column>
      </widget>
-     <widget class="QTreeWidget" name="m_progListView" >
+     <widget class="QTableView" name="m_progListView" >
       <property name="toolTip" >
        <string>Program selector</string>
       </property>
-      <property name="alternatingRowColors" >
-       <bool>true</bool>
-      </property>
-      <property name="indentation" >
-       <number>4</number>
-      </property>
-      <property name="rootIsDecorated" >
-       <bool>false</bool>
-      </property>
-      <property name="uniformRowHeights" >
-       <bool>true</bool>
-      </property>
-      <property name="itemsExpandable" >
-       <bool>false</bool>
-      </property>
+      <!-- <property name="alternatingRowColors" > -->
+      <!--  <bool>true</bool> -->
+      <!-- </property> -->
+      <!-- <property name="indentation" > -->
+      <!--  <number>4</number> -->
+      <!-- </property> -->
+      <!-- <property name="rootIsDecorated" > -->
+      <!--  <bool>false</bool> -->
+      <!-- </property> -->
+      <!-- <property name="uniformRowHeights" > -->
+      <!--  <bool>true</bool> -->
+      <!-- </property> -->
+      <!-- <property name="itemsExpandable" > -->
+      <!--  <bool>false</bool> -->
+      <!-- </property> -->
       <property name="sortingEnabled" >
        <bool>true</bool>
       </property>
-      <property name="allColumnsShowFocus" >
-       <bool>true</bool>
-      </property>
+      <!-- <property name="allColumnsShowFocus" > -->
+      <!--  <bool>true</bool> -->
+      <!-- </property> -->
       <column>
        <property name="text" >
         <string>Patch</string>
