@@ -79,16 +79,17 @@ protected:
 
 	bool validateForm();
 
-	// Figure out which patch has been set and set it
-	//
-	// `updateUi` argument
+	/**
+		Updates the current patch, and updates the UI controls if `updateUi` is
+		true.
+	*/
 	void updatePatch(bool updateUi);
 
-	// Select a row via an offset form the currently selected row. Sanitizes
-	// input.
-	//
-	// `diff=0` can be used for guaranteeing something is selected.
-	void diffSelectRow(int offset);
+	/**
+		Selects a row in the program selector based off a signed offset from the
+		currently selected row. Also clamps the selection.
+	*/
+	void diffSelectProgRow(int offset);
 
 private:
 
@@ -109,8 +110,8 @@ private:
 	LcdSpinBoxModel * m_bankModel;
 	LcdSpinBoxModel * m_progModel;
 	QLabel *m_patchLabel;
-	QStandardItemModel m_progListSourceModel;
-	QSortFilterProxyModel m_progListProxyModel;
+	QStandardItemModel m_progListSourceModel; //!< Programs on the selected bank
+	QSortFilterProxyModel m_progListProxyModel; //!< Model to allow searching
 };
 
 
