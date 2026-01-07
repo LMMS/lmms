@@ -49,7 +49,6 @@ SET(LMMS_PLUGIN_LIST
 	MidiImport
 	MidiExport
 	MultitapEcho
-	ModularOne
 	Monstro
 	Nes
 	OpulenZ
