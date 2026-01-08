@@ -156,7 +156,7 @@ Effect::ProcessStatus GranularPitchShifterEffect::processImpl(SampleFrame* buf, 
 		if (++m_timeSinceLastGrain >= m_nextWaitRandomization * waitMult)
 		{
 			m_timeSinceLastGrain = 0;
-			auto randThing = fastRand<double>(-1.0, +1.0);
+			auto randThing = fastRandInc<double>(-1.0, +1.0);
 			m_nextWaitRandomization = std::exp2(randThing * twitch);
 			double grainSpeed = 1. / std::exp2(randThing * jitter);
 
