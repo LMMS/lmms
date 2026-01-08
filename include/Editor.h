@@ -27,6 +27,7 @@
 
 #include <QMainWindow>
 #include <QToolBar>
+#include <QWidgetAction>
 
 class QAction;
 
@@ -90,11 +91,11 @@ protected:
 
 	DropToolBar* m_toolBar;
 
-	QAction* m_playAction;
-	QAction* m_recordAction;
-	QAction* m_recordAccompanyAction;
+	QWidgetAction* m_playAction;
+	QWidgetAction* m_recordAction;
+	QWidgetAction* m_recordAccompanyAction;
 	QAction* m_toggleStepRecordingAction;
-	QAction* m_stopAction;
+	QWidgetAction* m_stopAction;
 };
 
 
