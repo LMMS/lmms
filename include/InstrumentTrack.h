@@ -70,8 +70,6 @@ public:
 	void processAudioBuffer( SampleFrame* _buf, const fpp_t _frames,
 							NotePlayHandle * _n );
 
-	MidiEvent applyMasterKey( const MidiEvent& event );
-
 	void processInEvent( const MidiEvent& event, const TimePos& time = TimePos(), f_cnt_t offset = 0 ) override;
 	void processOutEvent( const MidiEvent& event, const TimePos& time = TimePos(), f_cnt_t offset = 0 ) override;
 	// silence all running notes played by this track
@@ -100,19 +98,26 @@ public:
 		return m_instrument;
 	}
 
+	//! Forcefully set the current instrument
+	//! Currently only used for unit testing
+	void setInstrument(Instrument* instrument)
+	{
+		m_instrument = instrument;
+	}
+
 	void deleteNotePluginData( NotePlayHandle * _n );
 
 	// name-stuff
 	void setName( const QString & _new_name ) override;
 
-	// translate given key of a note-event to absolute key (i.e.
-	// add global master-pitch and base-note of this instrument track)
-	int masterKey( int _midi_key ) const;
+	//! Get the midi transpose amount based on the offset from the base note from the default base note, plus the global transposition
+	int transposeAmount() const;
 
-	// translate pitch to midi-pitch [0,16383]
+	//! Convert the pitch knob amount into the range 0 to 2^14, since MIDI pitch bends are sent as 14 bit unsigned integers
+	//! 2^14 = 16384, and the zero point is in the middle at 2^13 = 8192.
 	int midiPitch() const
 	{
-		return static_cast<int>( ( ( m_pitchModel.value() + m_pitchModel.range()/2 ) * MidiMaxPitchBend ) / m_pitchModel.range() );
+		return std::clamp(static_cast<int>(std::round(2 * 8192 * m_pitchModel.value() / m_pitchModel.range()) + 8192), 0, 16383);
 	}
 
 	/*! \brief Returns current range for pitch bend in semitones */
@@ -174,7 +179,7 @@ public:
 	}
 
 	bool keyRangeImport() const;
-	bool isKeyMapped(int key) const;
+	bool isKeyMapped(int physicalKey) const;
 	int firstKey() const;
 	int lastKey() const;
 	int baseNote() const;
@@ -245,6 +250,7 @@ signals:
 	void midiNoteOff( const lmms::Note& );
 	void newNote();
 	void endNote();
+	void transposeChanged();
 
 protected:
 	QString nodeName() const override
@@ -268,11 +274,17 @@ private:
 
 	MidiPort m_midiPort;
 
+	//! Stores a list of active NotePlayHandles for this instrument track
+	//! NOTE: The indicies refer to the index of the physical piano key used to generate the NotePlayHandle, not the output (potentially transposed) key.
 	NotePlayHandle* m_notes[NumKeys];
 	NotePlayHandleList m_sustainedNotes;
 
-	int m_runningMidiNotes[NumKeys];
-	QMutex m_midiNotesMutex;
+	//! Stores a count of the number of active midi notes on every output midi key on every channel.
+	//! NOTE: The indicies refer to the output (transposed) key stored in the midi event, not the physical piano key used to generate the note.
+	std::array<std::array<int, NumKeys>, 16> m_runningMidiNotes;
+	//! Locks to ensure the checks for whether a note is already active and the actual sending of the MIDI events are not interleved betweeh threads. Otherwise, NoteOff and NoteOn events could theoretically get out of order.
+	//! TODO: Replace the mutex system with a lockless buffer, where NotePlayHandles add their midi events to the buffer, and a separate thread loops over it and handles the events in order.
+	std::mutex m_midiOutputMutex;
 
 	bool m_sustainPedalPressed;
 
