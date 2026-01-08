@@ -35,7 +35,6 @@
 #include "Knob.h"
 #include "LcdSpinBox.h"
 #include "PixmapButton.h"
-#include "SampleLoader.h"
 #include "SfzSampler.h"
 #include "StringPairDrag.h"
 #include "Track.h"

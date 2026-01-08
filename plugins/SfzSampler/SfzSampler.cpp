@@ -33,7 +33,6 @@
 #include "InstrumentTrack.h"
 #include "PathUtil.h"
 #include "ConfigManager.h"
-#include "SampleLoader.h"
 #include "SfzSamplerView.h"
 #include "Song.h"
 #include "embed.h"
