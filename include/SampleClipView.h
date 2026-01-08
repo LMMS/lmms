@@ -50,7 +50,7 @@ public slots:
 	void updateSample();
 	void reverseSample();
 	void setAutomationGhost();
-
+	void exportStoredSample();
 
 
 protected:

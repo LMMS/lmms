@@ -71,7 +71,7 @@ public:
 public slots:
 	lmms::MidiClip* getMidiClip();
 	void update() override;
-
+	QString exportClipAudio();
 
 protected slots:
 	void openInPianoRoll();
