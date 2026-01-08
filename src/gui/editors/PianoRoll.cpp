@@ -4087,6 +4087,8 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 					// same volume
 					showVolTextFloat(nv[0]->getVolume(), pos, 1000);
 				}
+				// Emit MIDI clip has changed
+				m_midiClip->dataChanged();
 			}
 			else if( m_noteEditMode == NoteEditMode::Panning )
 			{
