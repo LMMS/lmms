@@ -1598,8 +1598,7 @@ void MainWindow::onProjectFileNameChanged()
 }
 
 
-MainWindow::MovableQMdiArea::MovableQMdiArea(QWidget* parent,
-	keyModifiers* keyMods) :
+MainWindow::MovableQMdiArea::MovableQMdiArea(QWidget* parent, keyModifiers* keyMods) :
 	QMdiArea(parent),
 	m_isBeingMoved(false),
 	m_lastX(0),
