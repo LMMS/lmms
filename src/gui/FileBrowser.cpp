@@ -29,12 +29,14 @@
 #include <QApplication>
 #include <QCheckBox>
 #include <QHBoxLayout>
+#include <QHeaderView>
 #include <QLineEdit>
 #include <QMdiArea>
 #include <QMdiSubWindow>
 #include <QMenu>
 #include <QMessageBox>
 #include <QProgressBar>
+#include <QScrollBar>
 #include <QPushButton>
 #include <QShortcut>
 #include <QStringList>
@@ -461,6 +463,11 @@ FileBrowserTreeWidget::FileBrowserTreeWidget(QWidget * parent ) :
 	m_pressPos(),
 	m_previewPlayHandle( nullptr )
 {
+	setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+	setHorizontalScrollMode(ScrollPerPixel);
+	header()->setStretchLastSection(false);
+	header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+
 	setColumnCount( 1 );
 	headerItem()->setHidden( true );
 	setSortingEnabled( false );
@@ -500,6 +507,13 @@ QList<QString> FileBrowserTreeWidget::expandedDirs( QTreeWidgetItem * item ) con
 	return dirs;
 }
 
+void FileBrowserTreeWidget::scrollTo(const QModelIndex &index, ScrollHint hint)
+{
+	// Overide scrollTo to ensure the horizontal scrollbar stay in place
+	int barPos = horizontalScrollBar()->value();
+	QTreeWidget::scrollTo(index, hint);
+	horizontalScrollBar()->setValue(barPos);
+}
 
 void FileBrowserTreeWidget::keyPressEvent(QKeyEvent * ke )
 {
