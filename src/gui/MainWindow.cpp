@@ -26,6 +26,7 @@
 
 #include <QApplication>
 #include <QCloseEvent>
+#include <QDebug> // TODO: remove
 #include <QDesktopServices>
 #include <QDomElement>
 #include <QFileInfo>
@@ -155,7 +156,7 @@ MainWindow::MainWindow() :
 	sideBar->appendTab(new FileBrowser(FileBrowser::Type::Normal, root_paths.join("*"), FileItem::defaultFilters(), title,
 		embed::getIconPixmap("computer").transformed(QTransform().rotate(90)), splitter, dirs_as_items));
 
-	m_workspace = new MovableQMdiArea(splitter);
+	m_workspace = new MovableQMdiArea(splitter, &m_keyMods);
 
 	// Load background
 	emit initProgress(tr("Loading background picture"));
@@ -1597,12 +1598,16 @@ void MainWindow::onProjectFileNameChanged()
 }
 
 
-MainWindow::MovableQMdiArea::MovableQMdiArea(QWidget* parent) :
+MainWindow::MovableQMdiArea::MovableQMdiArea(QWidget* parent,
+	keyModifiers* keyMods) :
 	QMdiArea(parent),
 	m_isBeingMoved(false),
 	m_lastX(0),
 	m_lastY(0)
-{}
+	, m_keyMods(keyMods)
+{
+	parent->installEventFilter(this);
+}
 
 void MainWindow::MovableQMdiArea::mousePressEvent(QMouseEvent* event)
 {
@@ -1666,6 +1671,40 @@ void MainWindow::MovableQMdiArea::mouseReleaseEvent(QMouseEvent* event)
 {
 	setCursor(Qt::ArrowCursor);
 	m_isBeingMoved = false;
+}
+
+bool MainWindow::MovableQMdiArea::eventFilter(QObject* watched, QEvent* event)
+{
+	// This event filter attempts to steal mouse events related to drag-scroll
+	// in specific scenarios.
+
+	if (event->type() == QEvent::MouseButtonPress
+		&& m_keyMods->m_ctrl && m_keyMods->m_alt)
+	{
+		QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
+
+		if (mouseEvent->button() == Qt::LeftButton)
+		{
+			mousePressEvent(mouseEvent);
+			return true;
+		}
+	}
+
+	if (event->type() == QEvent::MouseMove && m_isBeingMoved)
+	{
+		QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
+		mouseMoveEvent(mouseEvent);
+		return true;
+	}
+
+	if (event->type() == QEvent::MouseButtonRelease && m_isBeingMoved)
+	{
+		QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
+		mouseReleaseEvent(mouseEvent);
+		return true;
+	}
+
+	return QObject::eventFilter(watched, event);
 }
 
 } // namespace lmms::gui
