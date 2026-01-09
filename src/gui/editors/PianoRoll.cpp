@@ -4055,15 +4055,31 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 
 		// When alt is pressed we only edit the note under the cursor
 		bool altPressed = we->modifiers() & Qt::AltModifier;
+
 		// go through notes to figure out which one we want to change
 		NoteVector nv;
+		bool isSelection = false;
 		for ( Note * i : m_midiClip->notes() )
 		{
-			if( i->withinRange( ticks_start, ticks_end ) || ( i->selected() && !altPressed ) )
+			if (i->selected() && !altPressed) // found a selected note
+			{
+				if (!isSelection)
+				{
+					// drop other notes if we are realizing this is a selection now
+					isSelection = true;
+					nv.clear();
+				}
+
+				nv.push_back(i);
+			}
+
+			// not on selection - just push back the note if it is within range
+			if (!isSelection && i->withinRange(ticks_start, ticks_end))
 			{
 				nv.push_back(i);
 			}
 		}
+
 		if( nv.size() > 0 )
 		{
 			const int step = (we->angleDelta().y() > 0 ? 1 : -1) * (we->inverted() ? -1 : 1);
