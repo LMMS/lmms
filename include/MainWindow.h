@@ -206,6 +206,8 @@ private:
 	public:
 		MovableQMdiArea(QWidget* parent, keyModifiers* keyMods);
 		~MovableQMdiArea() {}
+
+		bool panAnywhere;
 	protected:
 		void mousePressEvent(QMouseEvent* event) override;
 		void mouseMoveEvent(QMouseEvent* event) override;

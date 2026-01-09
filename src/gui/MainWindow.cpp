@@ -1598,12 +1598,13 @@ void MainWindow::onProjectFileNameChanged()
 }
 
 
-MainWindow::MovableQMdiArea::MovableQMdiArea(QWidget* parent, keyModifiers* keyMods) :
-	QMdiArea(parent),
-	m_isBeingMoved(false),
-	m_lastX(0),
-	m_lastY(0)
-	, m_keyMods(keyMods)
+MainWindow::MovableQMdiArea::MovableQMdiArea(QWidget* parent, keyModifiers* keyMods)
+	: QMdiArea(parent)
+	, panAnywhere{false}
+	, m_keyMods{keyMods}
+	, m_isBeingMoved{false}
+	, m_lastX{0}
+	, m_lastY{0}
 {
 	parent->installEventFilter(this);
 }
@@ -1674,11 +1675,10 @@ void MainWindow::MovableQMdiArea::mouseReleaseEvent(QMouseEvent* event)
 
 bool MainWindow::MovableQMdiArea::eventFilter(QObject* watched, QEvent* event)
 {
-	// This event filter attempts to steal mouse events related to drag-scroll
-	// in specific scenarios.
+	// This event filter attempts to steal mouse events related to panning
+	// without needing to click over a region without any widgets.
 
-	if (event->type() == QEvent::MouseButtonPress
-		&& m_keyMods->m_ctrl && m_keyMods->m_alt)
+	if (event->type() == QEvent::MouseButtonPress && panAnywhere)
 	{
 		QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
 
@@ -1701,6 +1701,39 @@ bool MainWindow::MovableQMdiArea::eventFilter(QObject* watched, QEvent* event)
 		QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
 		mouseReleaseEvent(mouseEvent);
 		return true;
+	}
+
+	if (panAnywhere)
+	{
+		if (event->type() == QEvent::KeyPress)
+		{
+			// Ignore keypresses while pan-anywhere is enabled
+			return true;
+		}
+
+		if (event->type() == QEvent::KeyRelease && panAnywhere)
+		{
+			// Disable pan-anywhere if S has been released
+			QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
+			if (keyEvent->key() == Qt::Key_S)
+			{
+				panAnywhere = false;
+				return true;
+			}
+		}
+	}
+	else
+	{
+		// Enable pan-anywhere upon pressing Alt+S
+		if (event->type() == QEvent::KeyPress && m_keyMods->m_alt)
+		{
+			QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
+			if (keyEvent->key() == Qt::Key_S)
+			{
+				panAnywhere = true;
+				return true;
+			}
+		}
 	}
 
 	return QObject::eventFilter(watched, event);
