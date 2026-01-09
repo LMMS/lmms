@@ -451,10 +451,24 @@ void Song::processMetronome(size_t bufferOffset)
 
 void Song::setModified(bool value)
 {
+	//Split in two for performance reasons?
 	if( !m_loadingProject && m_modified != value)
 	{
 		m_modified = value;
+		m_modifiedautosave = value;
 		emit modified();
+	}
+	else if ( !m_loadingProject && m_modified == value)
+	{
+		m_modifiedautosave = value;
+	}
+}
+
+void Song::setModifiedAutosave(bool value)
+{
+	if( !m_loadingProject && m_modifiedautosave != value)
+	{
+		m_modifiedautosave = value;
 	}
 }
 
