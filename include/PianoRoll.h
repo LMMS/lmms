@@ -487,7 +487,7 @@ private:
 	//! Updates the currently dragged node position in the detuning/parameter curves of the selected notes.
 	void updateParameterEditPos(QMouseEvent* me, Note::ParameterType paramType);
 	//! Finishes the dragging of the current node of the detuning/parameter curves
-	void applyParameterEditPos(Note::ParameterType paramType);
+	void applyParameterEditPos(QMouseEvent* me, Note::ParameterType paramType);
 
 	//! Stores the chords for the strum tool
 	std::vector<NoteVector> m_selectedChords;
