@@ -40,6 +40,15 @@ class RenderManager : public QObject
 {
 	Q_OBJECT
 public:
+	//! @enum Mode
+	//! Specifies the kind of export that should be done
+	enum class Mode
+	{
+		ExportProject, //! Exporting the entire project
+		ExportTracks,  //! Exporting individual tracks
+		ExportTrack	   //! Exporting a single track
+	};
+
 	RenderManager(const OutputSettings& outputSettings, ProjectRenderer::ExportFileFormat fmt, QString outputPath);
 
 	~RenderManager() override;
@@ -49,6 +58,9 @@ public:
 
 	/// Export all unmuted tracks into individual file
 	void renderTracks();
+
+	/// Export a a track into a single file
+	void renderTrack(Track* track);
 
 	void abortProcessing();
 
@@ -74,6 +86,8 @@ private:
 
 	std::vector<Track*> m_tracksToRender;
 	std::vector<Track*> m_unmuted;
+
+	Mode m_mode;
 } ;
 
 
