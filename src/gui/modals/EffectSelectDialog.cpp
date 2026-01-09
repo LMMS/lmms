@@ -24,10 +24,6 @@
  */
 
 #include "EffectSelectDialog.h"
-#include "DummyEffect.h"
-#include "EffectChain.h"
-#include "embed.h"
-#include "PluginFactory.h"
 
 #include <QApplication>
 #include <QDialogButtonBox>
@@ -43,6 +39,11 @@
 #include <QTableView>
 #include <QVBoxLayout>
 
+#include "DummyEffect.h"
+#include "EffectChain.h"
+#include "embed.h"
+#include "lmmsconfig.h"
+#include "PluginFactory.h"
 
 namespace lmms::gui
 {
@@ -108,8 +109,20 @@ EffectSelectDialog::EffectSelectDialog(QWidget* parent) :
 
 	QVBoxLayout* leftSectionLayout = new QVBoxLayout();
 
-	QStringList buttonLabels = { tr("All"), "LMMS", "LADSPA", "LV2", "VST" };
-	QStringList buttonSearchString = { "", "LMMS", "LADSPA", "LV2", "VST" };
+	const auto buttonStringsCommon = QStringList {
+		"LMMS",
+#ifdef LMMS_HAVE_CLAP
+		"CLAP",
+#endif
+		"LADSPA",
+#ifdef LMMS_HAVE_LV2
+		"LV2",
+#endif
+		"VST"
+	};
+
+	QStringList buttonLabels = QStringList{ tr("All") } + buttonStringsCommon;
+	QStringList buttonSearchString = QStringList{ "" } + buttonStringsCommon;
 
 	for (int i = 0; i < buttonLabels.size(); ++i)
 	{
@@ -246,7 +259,7 @@ void EffectSelectDialog::rowChanged(const QModelIndex& idx, const QModelIndex&)
 			logoLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 			logoLabel->setMaximumSize(64, 64);
 
-			hbox->addWidget(logoLabel);
+			hbox->addWidget(logoLabel, 0, Qt::AlignTop);
 		}
 
 		auto textualInfoWidget = new QWidget(m_descriptionWidget);
