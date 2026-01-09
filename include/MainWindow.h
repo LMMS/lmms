@@ -204,9 +204,11 @@ private:
 	class MovableQMdiArea : public QMdiArea
 	{
 	public:
-		MovableQMdiArea(QWidget* parent, keyModifiers* keyMods);
+		MovableQMdiArea(QWidget* parent, keyModifiers* keyMods, std::function<bool()> hasMaximizedWindows);
 		~MovableQMdiArea() {}
 
+		//! Indicates that a panning action can be initiated through a
+		// left-button mouse drag.
 		bool panAnywhere;
 	protected:
 		void mousePressEvent(QMouseEvent* event) override;
@@ -218,6 +220,7 @@ private:
 		bool m_isBeingMoved;
 		int m_lastX;
 		int m_lastY;
+		std::function<bool()> m_hasMaximizedWindows;
 	};
 	MovableQMdiArea * m_workspace;
 
