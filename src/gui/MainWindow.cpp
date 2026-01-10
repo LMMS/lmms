@@ -158,11 +158,10 @@ MainWindow::MainWindow() :
 
 	const auto hasMaximizedWindows = [this]()
 	{
-		for (const auto* subWindow : workspace()->subWindowList())
+		for (const auto* sw : workspace()->subWindowList())
 		{
-			if (subWindow->isMaximized())
+			if (sw->isVisible() && sw->isMaximized())
 			{
-
 				return true;
 			}
 		}
