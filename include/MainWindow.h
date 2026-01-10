@@ -205,7 +205,7 @@ private:
 	{
 	public:
 		/**
-			\param hasActiveMaxWindow Function that should return whether there
+			@param hasActiveMaxWindow Function that should return whether there
 			are any active maximized windows, in order to avoid initiating a pan
 			in that case.
 		*/
