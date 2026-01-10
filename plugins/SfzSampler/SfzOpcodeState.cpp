@@ -150,6 +150,16 @@ bool SfzOpcodeState::setOpcodeByStrings(const QString& name, const QString& valu
 	//
 	// Amplitude
 	//
+	else if (name == "amplitude")
+	{
+		m_amplitude = value.toFloat(&successful);
+	}
+	else if (name.startsWith("amplitude_oncc") || name.startsWith("amplitude_cc"))
+	{
+		m_amplitude_oncc.at(ccNumberFromOpcode(name)) = value.toFloat(&successful);
+	}
+
+
 	else if (name == "amp_veltrack")
 	{
 		m_amp_veltrack = value.toFloat(&successful);

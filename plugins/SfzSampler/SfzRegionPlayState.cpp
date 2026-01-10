@@ -126,6 +126,9 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const fpp_t frames)
 	// Play the sample faster/slower to match the correct sample rate
 	freqRatio *= sampleSampleRate / sampleRate;
 
+	// Amplitude
+	const float amplitude = (m_region->m_amplitude + m_region->m_amplitude_totalCC) / 100.0f; // Amplitude is stored as a percent
+
 	// Amplitude envelope
 	const f_cnt_t ampegDelayFrames = (m_region->m_ampeg_delay + m_region->m_ampeg_delay_totalCC) * sampleRate;
 	const f_cnt_t ampegAttackFrames = (m_region->m_ampeg_attack + m_region->m_ampeg_attack_totalCC) * sampleRate;
@@ -176,13 +179,13 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const fpp_t frames)
 		);
 		if (filterEnabled) // TODO does this if statement make it faster?
 		{
-			buffer[f][0] += m_filter.update(m_region->sample().at(m_sampleFrame, 0) * ampeg * ampVelocity * ampVolume * rightPanAmp, 0);
-			buffer[f][1] += m_filter.update(m_region->sample().at(m_sampleFrame, 1) * ampeg * ampVelocity * ampVolume * leftPanAmp, 1);
+			buffer[f][0] += m_filter.update(m_region->sample().at(m_sampleFrame, 0) * amplitude * ampeg * ampVelocity * ampVolume * rightPanAmp, 0);
+			buffer[f][1] += m_filter.update(m_region->sample().at(m_sampleFrame, 1) * amplitude * ampeg * ampVelocity * ampVolume * leftPanAmp, 1);
 		}
 		else
 		{
-			buffer[f][0] += m_region->sample().at(m_sampleFrame, 0) * ampeg * ampVelocity * ampVolume * rightPanAmp;
-			buffer[f][1] += m_region->sample().at(m_sampleFrame, 1) * ampeg * ampVelocity * ampVolume * leftPanAmp;
+			buffer[f][0] += m_region->sample().at(m_sampleFrame, 0) * amplitude * ampeg * ampVelocity * ampVolume * rightPanAmp;
+			buffer[f][1] += m_region->sample().at(m_sampleFrame, 1) * amplitude * ampeg * ampVelocity * ampVolume * leftPanAmp;
 		}
 		m_sampleFrame = std::min(static_cast<float>(m_region->sample().size()), m_sampleFrame + freqRatio);
 		m_frameCount++;

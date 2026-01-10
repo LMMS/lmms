@@ -128,6 +128,8 @@ float SfzRegion::totalCCModulation(const std::array<float, SfzOpcodeState::NumMi
 
 void SfzRegion::recalculateTotalCCModulation(const SfzGlobalState& globalState)
 {
+	m_amplitude_totalCC = totalCCModulation(m_amplitude_oncc, globalState);
+
 	m_ampeg_delay_totalCC = totalCCModulation(m_ampeg_delay_oncc, globalState);
 	m_ampeg_attack_totalCC = totalCCModulation(m_ampeg_attack_oncc, globalState);
 	m_ampeg_hold_totalCC = totalCCModulation(m_ampeg_hold_oncc, globalState);

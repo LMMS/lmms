@@ -91,6 +91,9 @@ public:
 	//
 	// Amplitude
 	//
+	float m_amplitude = 100.0f; // In percent
+	std::array<float, NumMidiCCs> m_amplitude_oncc = {};
+
 	// Overall amplitute velocity modulation
 	float m_amp_veltrack = 100;
 

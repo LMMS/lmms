@@ -62,6 +62,8 @@ private:
 
 	//! Store the current total midi CC modulation amounts for the different targets, just so that we don't
 	// have to recalculate them every buffer, instead only when a trigger occurs.
+	float m_amplitude_totalCC = 0.0f;
+
 	float m_ampeg_delay_totalCC = 0.0f;
 	float m_ampeg_attack_totalCC = 0.0f;
 	float m_ampeg_hold_totalCC = 0.0f;
