@@ -386,7 +386,7 @@ void VestigeInstrument::loadFile( const QString & _file )
 
 	if( set_ch_name )
 	{
-		instrumentTrack()->setName( m_plugin->name() );
+		instrumentTrack()->setName(m_plugin->name(), true);
 	}
 
 	m_pluginMutex.unlock();
