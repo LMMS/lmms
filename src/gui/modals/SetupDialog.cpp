@@ -750,14 +750,27 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	{
 		m_assignableMidiDevices->addItems(Engine::audioEngine()->midiClient()->readablePorts());
 	}
-	else
+	else { m_assignableMidiDevices->addItem("all"); }
 	{
-		m_assignableMidiDevices->addItem("all");
+		int current = m_assignableMidiDevices->findText(ConfigManager::inst()->value("midi", "midiautoassign"));
+		if (current >= 0) { m_assignableMidiDevices->setCurrentIndex(current); }
 	}
-	int current = m_assignableMidiDevices->findText(ConfigManager::inst()->value("midi", "midiautoassign"));
-	if (current >= 0)
+
+	// MIDI daw mode
+	QGroupBox* midiMCUBox = new QGroupBox(tr("Use surface control (MCU protocol)"), midi_w);
+	QVBoxLayout* midiMCULayout = new QVBoxLayout(midiMCUBox);
+
+	m_MCUDawMidiDevices = new QComboBox(midiMCUBox);
+	midiMCULayout->addWidget(m_MCUDawMidiDevices);
+	m_MCUDawMidiDevices->addItem("none");
+	if (!Engine::audioEngine()->midiClient()->isRaw())
 	{
-		m_assignableMidiDevices->setCurrentIndex(current);
+		m_MCUDawMidiDevices->addItems(Engine::audioEngine()->midiClient()->readablePorts());
+	}
+	else {}
+	{
+		int current = m_MCUDawMidiDevices->findText(ConfigManager::inst()->value("midi", "midimcudaw"));
+		if (current >= 0) { m_MCUDawMidiDevices->setCurrentIndex(current); }
 	}
 
 	// MIDI Recording tab
@@ -775,6 +788,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	midi_layout->addWidget(midiInterfaceBox);
 	midi_layout->addWidget(ms_w);
 	midi_layout->addWidget(midiAutoAssignBox);
+	midi_layout->addWidget(midiMCUBox);
 	midi_layout->addWidget(midiRecordingTab);
 	midi_layout->addStretch();
 
@@ -1022,6 +1036,8 @@ void SetupDialog::accept()
 					m_midiIfaceNames[m_midiInterfaces->currentText()]);
 	ConfigManager::inst()->setValue("midi", "midiautoassign",
 					m_assignableMidiDevices->currentText());
+	ConfigManager::inst()->setValue("midi", "midimcudaw",
+					m_MCUDawMidiDevices->currentText());
 	ConfigManager::inst()->setValue("midi", "autoquantize", QString::number(m_midiAutoQuantize));
 
 
