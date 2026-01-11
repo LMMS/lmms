@@ -10,6 +10,14 @@ namespace lmms
 {
 
 
+SfzOpcodeState::SfzOpcodeState()
+{
+	// Certain arrays need to be initialized here in the constructor, since doing it in the header file is difficult
+	m_hicc.fill(127);
+}
+
+
+
 bool SfzOpcodeState::setOpcodeByStrings(const QString& name, const QString& value)
 {
 	bool successful = true;
@@ -249,6 +257,16 @@ bool SfzOpcodeState::setOpcodeByStrings(const QString& name, const QString& valu
 	//
 	// Midi CC
 	//
+	else if (name.startsWith("locc"))
+	{
+		int ccNumber = ccNumberFromOpcode(name);
+		m_locc.at(ccNumber) = value.toInt(&successful);
+	}
+	else if (name.startsWith("hicc"))
+	{
+		int ccNumber = ccNumberFromOpcode(name);
+		m_hicc.at(ccNumber) = value.toInt(&successful);
+	}
 	else if (name.startsWith("set_cc"))
 	{
 		int ccNumber = ccNumberFromOpcode(name);

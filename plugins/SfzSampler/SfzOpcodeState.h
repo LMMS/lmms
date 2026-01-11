@@ -13,6 +13,8 @@ namespace lmms
 class SfzOpcodeState
 {
 public:
+	SfzOpcodeState(); // We need a constructor to initialize things like m_hicc
+
 	bool setOpcodeByStrings(const QString& name, const QString& value);
 	static int keyNumFromString(QString keyString, bool* successful);
 	static int ccNumberFromOpcode(const QString& opcode);
@@ -140,6 +142,8 @@ public:
 	//
 	// Midi CC
 	//
+	std::array<int, NumMidiCCs> m_locc = {};
+	std::array<int, NumMidiCCs> m_hicc = {}; // NOTE this needs to be initialized to contain all 127 in the constructor, since it's hard to fill an array directly within a header file
 	//! Default midi CC values
 	std::array<int, NumMidiCCs> m_set_cc = {};
 

@@ -5,7 +5,6 @@ build_plugin(sfzsampler
 	SfzSampler.h
 	SfzSamplerView.cpp
 	SfzSamplerView.h
-	SfzOpcodes.h
 	SfzOpcodeState.cpp
 	SfzOpcodeState.h
 	SfzRegion.cpp
@@ -23,7 +22,6 @@ build_plugin(sfzsampler
 	MOCFILES
 	SfzSampler.h
 	SfzSamplerView.h
-	SfzOpcodes.h
 	SfzOpcodeState.h
 	SfzRegion.h
 	SfzParser.h
