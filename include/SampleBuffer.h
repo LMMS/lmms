@@ -59,6 +59,9 @@ public:
 	 */
 	SampleBuffer(std::vector<SampleFrame> data, sample_rate_t sampleRate, const QString& path = "");
 
+	/** @returns a const reference to the audio frame at the given frame index. */
+	auto operator[](f_cnt_t index) const -> const SampleFrame& { return m_data[index]; }
+
 	/** @brief Serializes the raw PCM data into a Base64 string for project saving.
 		@todo This function should be removed once Base64 is migrated to audio files on disk.
 	 */

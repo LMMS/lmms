@@ -155,10 +155,8 @@ f_cnt_t Sample::render(SampleFrame* dst, f_cnt_t size, PlaybackState* state, Loo
 			break;
 		}
 
-		const auto value
-			= m_buffer.data()[m_reversed ? m_buffer.frames() - state->m_frameIndex - 1 : state->m_frameIndex]
-			* m_amplification;
-		dst[frame] = value;
+		const auto index = m_reversed ? m_buffer.frames() - state->m_frameIndex - 1 : state->m_frameIndex;
+		dst[frame] = m_buffer[index] * m_amplification;
 		state->m_backwards ? --state->m_frameIndex : ++state->m_frameIndex;
 	}
 
