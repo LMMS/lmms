@@ -263,7 +263,7 @@ QString SfzParser::recursiveHandleIncludeAndDefineStatements(const QDir& parentD
 			// A define variable should probably start with a $
 			if (variableName.front() != "$") { qDebug() << "[SFZ Parser] Warning: #define variable name does not start with $:" << line; }
 		}
-		else if (line.startsWith("#include"))
+		else if (line.startsWith("#include "))
 		{
 			// Replace any of the defined variables before parsing the include path, since some SFZ files use $variables in them
 			for (const auto& [variableName, variableValue] : defineMap)
@@ -273,13 +273,13 @@ QString SfzParser::recursiveHandleIncludeAndDefineStatements(const QDir& parentD
 
 			const auto segments = line.split(QRegularExpression("\\s+"), Qt::SkipEmptyParts);
 			// An include statement should have two parts, the #include and the path
-			if (segments.size() != 2)
+			if (line.split("#include ").size() != 2)
 			{
 				qDebug() << "[SFZ Parser] Ill-formed include statment:" << line;
 				continue;
 			}
 
-			QString relativePath = segments[1];
+			QString relativePath = line.split("#include ")[1];
 			relativePath.replace("\"", ""); // Remove " " from start and end
 			const QString absolutePath = parentDirectory.absoluteFilePath(relativePath);
 			
