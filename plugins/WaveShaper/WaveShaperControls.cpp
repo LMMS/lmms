@@ -46,6 +46,7 @@ WaveShaperControls::WaveShaperControls( WaveShaperEffect * _eff ) :
 	m_outputModel( 1.0f, 0.0f, 5.0f, 0.01f, this, tr( "Output gain" ) ),
 	m_wavegraphModel( 0.0f, 1.0f, 200, this ),
 	m_clipModel( false, this )
+	, m_graphModel(20, 20, GRID_MAX_STEPS, GRID_MAX_STEPS, this, tr("waveshape"))
 {
 	connect( &m_wavegraphModel, SIGNAL( samplesChanged( int, int ) ),
 			this, SLOT( samplesChanged( int, int ) ) );

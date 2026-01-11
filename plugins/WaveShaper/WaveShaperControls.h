@@ -29,6 +29,7 @@
 #include "EffectControls.h"
 #include "WaveShaperControlDialog.h"
 #include "Graph.h"
+#include "GridModel.h"
 
 namespace lmms
 {
@@ -79,6 +80,7 @@ private:
 	FloatModel m_outputModel;
 	graphModel m_wavegraphModel;
 	BoolModel  m_clipModel;
+	VectorGraphModel m_graphModel;
 
 	friend class gui::WaveShaperControlDialog;
 	friend class WaveShaperEffect;

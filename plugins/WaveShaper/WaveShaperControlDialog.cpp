@@ -30,6 +30,7 @@
 #include "embed.h"
 #include "FontHelper.h"
 #include "Graph.h"
+#include "GridView.h"
 #include "Knob.h"
 #include "PixmapButton.h"
 #include "LedCheckBox.h"
@@ -47,7 +48,7 @@ WaveShaperControlDialog::WaveShaperControlDialog(
 	pal.setBrush( backgroundRole(),
 				PLUGIN_NAME::getIconPixmap( "artwork" ) );
 	setPalette( pal );
-	setFixedSize( 224, 274 );
+	setFixedSize( 700, 700 );
 
 	auto waveGraph = new Graph(this, Graph::Style::LinearNonCyclic, 204, 205);
 	waveGraph -> move( 10, 6 );
@@ -59,6 +60,11 @@ WaveShaperControlDialog::WaveShaperControlDialog(
 	waveGraph->setPalette( pal );
 	waveGraph->setGraphColor( QColor( 85, 204, 145 ) );
 	waveGraph -> setMaximumSize( 204, 205 );
+
+	auto vectorGraph = new VectorGraphView(this, 10, 10);
+	vectorGraph->move(10, 300);
+	vectorGraph->setModel(&_controls->m_graphModel);
+	vectorGraph->setAutoFillBackground(true);
 
 	auto inputKnob = new Knob(KnobType::Bright26, tr("INPUT"), SMALL_FONT_SIZE, this);
 	inputKnob -> setVolumeKnob( true );
