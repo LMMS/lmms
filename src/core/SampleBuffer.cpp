@@ -34,18 +34,21 @@
 
 namespace lmms {
 
+// Use aliasing constructor for std::shared_ptr to share ownership of a newly allocated vector without double
+// indirection when accessing samples (in the case of a vector in a shared pointer)
 SampleBuffer::SampleBuffer(std::vector<SampleFrame> data, sample_rate_t sampleRate, const QString& path)
-	: m_data(std::move(data))
-	, m_path(path)
+	: m_frames(data.size())
 	, m_sampleRate(sampleRate)
+	, m_path(path)
+	, m_data(std::shared_ptr<SampleFrame[]>(data.data(), [v = std::move(data)](auto) {}))
 {
 }
 
 QString SampleBuffer::toBase64() const
 {
 	// TODO: Replace with non-Qt equivalent
-	const auto data = reinterpret_cast<const char*>(m_data.data());
-	const auto size = static_cast<int>(m_data.size() * sizeof(SampleFrame));
+	const auto data = reinterpret_cast<const char*>(m_data.get());
+	const auto size = static_cast<int>(m_frames * sizeof(SampleFrame));
 	const auto byteArray = QByteArray::fromRawData(data, size);
 	return byteArray.toBase64();
 }

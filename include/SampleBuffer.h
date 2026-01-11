@@ -26,6 +26,7 @@
 #define LMMS_SAMPLE_BUFFER_H
 
 #include <QString>
+#include <memory>
 #include <optional>
 #include <vector>
 
@@ -68,16 +69,16 @@ public:
 	auto toBase64() const -> QString;
 
 	/** @returns true if the buffer contains no audio data. */
-	auto empty() const -> bool { return m_data.empty(); }
+	auto empty() const -> bool { return m_frames == 0; }
 
 	/** @returns direct access to the raw audio data. */
-	auto data() const -> const SampleFrame* { return m_data.data(); }
+	auto data() const -> const SampleFrame* { return m_data.get(); }
 
 	/** @returns the file path associated with this buffer, if any. */
 	auto path() const -> const QString& { return m_path; }
 
 	/** @returns the total number of audio frames. */
-	auto frames() const -> f_cnt_t { return m_data.size(); }
+	auto frames() const -> f_cnt_t { return m_frames; }
 
 	/** @returns the original sample rate of the data. */
 	auto sampleRate() const -> sample_rate_t { return m_sampleRate; }
@@ -99,9 +100,11 @@ public:
 	static std::optional<SampleBuffer> fromBase64(const QString& str, sample_rate_t sampleRate);
 
 private:
-	std::vector<SampleFrame> m_data;
-	QString m_path;
+	f_cnt_t m_frames = 0;
 	sample_rate_t m_sampleRate = 0;
+	QString m_path;
+	inline static const auto emptyBuffer = std::make_shared<SampleFrame[]>(0);
+	std::shared_ptr<SampleFrame[]> m_data = emptyBuffer;
 };
 
 } // namespace lmms
