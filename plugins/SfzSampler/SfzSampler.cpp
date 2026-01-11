@@ -160,14 +160,22 @@ void SfzSampler::loadFile(const QString& filePath)
 		bool successfulLoadSample = region.initializeSample(parentDirectory);
 		qDebug() << "sample was load okay?" << successfulLoadSample;
 	}
+
+	m_sfzFilePath = filePath;
 }
 
 void SfzSampler::saveSettings(QDomDocument& document, QDomElement& element)
 {
+	element.setAttribute("sfzfile", m_sfzFilePath);
 }
 
 void SfzSampler::loadSettings(const QDomElement& element)
 {
+	m_sfzFilePath = element.attribute("sfzfile");
+	if (!m_sfzFilePath.isEmpty())
+	{
+		loadFile(m_sfzFilePath);
+	}
 }
 
 QString SfzSampler::nodeName() const

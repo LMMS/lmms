@@ -64,6 +64,8 @@ private:
 
 	InstrumentTrack* m_parentTrack;
 
+	QString m_sfzFilePath = "";
+
 	//! Holds information about the total number of notes active, last switch keys pressed, etc
 	SfzGlobalState m_sfzGlobalState;
 
