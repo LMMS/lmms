@@ -31,7 +31,7 @@
 namespace lmms
 {
 
-GridModel::GridModel(size_t length, size_t height, unsigned int horizontalSteps, unsigned int verticalSteps,
+GridModel::GridModel(unsigned int length, unsigned int height, unsigned int horizontalSteps, unsigned int verticalSteps,
 	Model* parent, QString displayName, bool defaultConstructed)
 	: Model(parent, displayName, defaultConstructed)
 	, m_length{length}
@@ -43,32 +43,18 @@ GridModel::GridModel(size_t length, size_t height, unsigned int horizontalSteps,
 GridModel::~GridModel()
 {}
 
-int GridModel::findObject(void* object)
+int GridModel::findObject(void* object) const
 {
 	for (size_t i{0}; i < m_items.size(); ++i)
 	{
-		if (m_items[i].object.get() == object)
+		if (m_items[i].object == object)
 		{
 			return i;
 		}
 	}
 	return -1;
 }
-int GridModel::findObject(float x, void* object)
-{
-	size_t index = findIndex(x);
-	if (m_items[index].x != x) { return -1; }
-	for (size_t i{findIndex(x)}; i < item.size(); ++i)
-	{
-		if (m_items[i].y == y)
-		{
-			return i;
-		}
-	}
-	return -1;
-}
-
-int GridModel::findIndexFromPos(float xPos, float radius)
+int GridModel::findIndexFromPos(float xPos, float radius) const
 {
 	size_t output = findIndex(xPos);
 	if (output < m_items.size() && std::abs(m_items[output].info.x - xPos) < radius)
@@ -82,7 +68,7 @@ int GridModel::findIndexFromPos(float xPos, float radius)
 	return -1;
 }
 
-size_t GridModel::findIndex(float xPos)
+size_t GridModel::findIndex(float xPos) const
 {
 	// binary search
 	int low = 0;
@@ -109,10 +95,10 @@ size_t GridModel::findIndex(float xPos)
 		}
     }
 
-	assert(mid + 1 < m_items.size());
+	assert(static_cast<size_t>(mid) + 1 < m_items.size());
 	assert(m_items[mid].info.x < xPos);
 	assert(m_items[mid + 1].info.x > xPos);
-	assert(m_items[m_items.size() - 1].info.x < xPos && mid + 1 == m_items.size());
+	assert(m_items[m_items.size() - 1].info.x < xPos && static_cast<size_t>(mid + 1) == m_items.size());
   	
   	return mid + 1;
 }
@@ -125,11 +111,13 @@ size_t GridModel::addItem(GridModel::Item itemIn)
 	{
 		for (size_t i{m_items.size() - 2}; --i > foundIndex;)
 		{
-			printf("adding: swap: [%ld + 1] = [%d] index = %ld\n", i, foundIndex);
+			printf("adding: swap: [%ld + 1] = [%ld] found index = %ld\n", i, i, foundIndex);
 			m_items[i + 1] = m_items[i];
 		}
 		m_items[foundIndex] = itemIn;
 	}
+	emit dataChangedAt(foundIndex);
+	emit dataChanged();
 	return foundIndex;
 }
 
@@ -139,7 +127,15 @@ void GridModel::removeItem(size_t index)
 	{
 		m_items[i] = m_items[i + 1];
 	}
+	emit dataChangedAt(index);
+	emit dataChanged();
 	m_items.pop_back();
+}
+
+void** GridModel::getAndSetObject(size_t index)
+{
+	assert(index < m_items.size());
+	return &m_items[index].object;
 }
 
 size_t GridModel::setX(size_t index, float newX)
@@ -164,11 +160,16 @@ size_t GridModel::setX(size_t index, float newX)
 		m_items[i] = m_items[i + 1];
 		m_items[i + 1] = swap;
 	}
+	emit dataChangedAt(index);
+	emit dataChangedAt(foundIndex);
+	emit dataChanged();
 	return foundIndex;
 }
 void GridModel::setY(size_t index, float newY)
 {
 	m_items[index].info.y = newY;
+	emit dataChangedAt(index);
+	emit dataChanged();
 }
 size_t GridModel::setInfo(size_t index, const GridModel::ItemInfo& info)
 {
@@ -176,19 +177,20 @@ size_t GridModel::setInfo(size_t index, const GridModel::ItemInfo& info)
 }
 size_t GridModel::setInfo(size_t index, const GridModel::ItemInfo& info, unsigned int horizontalSteps, unsigned int verticalSteps)
 {
+	float newY = fitPos(info.y, m_height, verticalSteps);
+	if (newY != m_items[index].info.y) { setY(index, newY); }
+
 	size_t finalIndex{index};
 	float newX = fitPos(info.y, m_length, horizontalSteps);
 	if (newX != m_items[index].info.x) { finalIndex = setX(index, newX); }
-
-	float newY = fitPos(info.y, m_height, verticalSteps);
-	if (newY != m_items[index].info.y) { setY(index, newY); }
 	return finalIndex;
 }
-const GridModel::Item& GridModel::getItem(size_t index)
+const GridModel::Item& GridModel::getItem(size_t index) const
 {
+	assert(index < m_items.size());
 	return m_items[index];
 }
-float GridModel::fitPos(float position, unsigned int max, unsigned int steps)
+float GridModel::fitPos(float position, unsigned int max, unsigned int steps) const
 {
 	if (steps >= GRID_MAX_STEPS)
 	{
@@ -197,9 +199,17 @@ float GridModel::fitPos(float position, unsigned int max, unsigned int steps)
 	return std::clamp(std::round(position * steps) / steps, 0.0f, static_cast<float>(max));
 }
 
-size_t GridModel::getCount()
+size_t GridModel::getCount() const
 {
 	return m_items.size();
+}
+unsigned int GridModel::getLength() const
+{
+	return m_length;
+}
+unsigned int GridModel::getHeight() const
+{
+	return m_height;
 }
 
 void GridModel::resizeGrid(size_t length, size_t height)
@@ -216,6 +226,39 @@ void GridModel::resizeGrid(size_t length, size_t height)
 			setInfo(i, m_items[i].info);
 		}
 	}
+	emit propertiesChanged();
+}
+
+void GridModel::setSteps(unsigned int horizontalSteps, unsigned int verticalSteps)
+{
+	m_horizontalSteps = horizontalSteps;
+	m_verticalSteps = verticalSteps;
+	emit propertiesChanged();
+}
+
+VectorGraphModel::VectorGraphModel(unsigned int length, unsigned int height, unsigned int horizontalSteps, unsigned int verticalSteps,
+	Model* parent, QString displayName, bool defaultConstructed)
+	: GridModelTyped{length, height, horizontalSteps, verticalSteps, parent, displayName, defaultConstructed}
+{
+}
+
+void VectorGraphModel::setPoint(size_t index, float x, float y, bool isBezierHandle)
+{
+}
+
+void VectorGraphModel::renderPoints(size_t resolution, size_t start, size_t end)
+{
+}
+void VectorGraphModel::renderAfter(size_t index)
+{
+}
+const std::vector<float>& VectorGraphModel::getBuffer() const
+{
+	return m_buffer;
+}
+std::vector<float>& VectorGraphModel::getBufferRef()
+{
+	return m_buffer;
 }
 
 } // namespace lmms

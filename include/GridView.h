@@ -1,7 +1,7 @@
 /*
  * GridView.h - a grid display and editor widget
  *
- * Copyright (c) 2025 szeli1
+ * Copyright (c) 2025 - 2026 szeli1
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -25,15 +25,26 @@
 #ifndef LMMS_GRID_VIEW_H
 #define LMMS_GRID_VIEW_H
 
+#include <QWidget>
 #include <QPointF>
+
+#include "GridModel.h"
+#include "ModelView.h"
+
+/* This class implements
+	1. selection
+*/
+
+class QPainter;
 
 namespace lmms::gui
 {
 
-class GridView : public QWidget, public ModelView
+class LMMS_EXPORT GridView : public QWidget, public ModelView
 {
+Q_OBJECT
 public:
-	GridView(QWidget* parent);
+	GridView(QWidget* parent, GridModel* model, size_t cubeWidth, size_t cubeHeight);
 	~GridView() override = default;	
 
 	GridModel* model()
@@ -42,36 +53,52 @@ public:
 	}
 	enum MoveDir
 	{
-		right,
+		right, // positive x direction
 		left,
-		up,
+		up, // positive y direction
 		down
 	};
 
 	void moveToWhole(unsigned int x, unsigned int y);
+
+	//! extends `m_selectStart`, `m_selectEnd` to contain `start` and `end`
+	//! start's x and y must be SMALLER than end's
+	void containSelection(QPointF start, QPointF end);
+
 	void moveToNearest(MoveDir dir);
 
-	//! selects everything between `start` and `end`
-	//! uses getBoundingBox's center for bounds checking
-	void select(QPointF start, QPointF end);
-
+	void updateSelection();
+public slots:
+	void updateGrid();
 protected:
 	void paintEvent(QPaintEvent* pe) override;
-	void dropEvent(QDropEvent* de) override;
-	void dragEnterEvent(QDragEnterEvent* dee) override;
-	void mousePressEvent(QMouseEvent* me) override;
-	void mouseMoveEvent(QMouseEvent* me) override;
-	void mouseReleaseEvent(QMouseEvent* me) override;
+	//void dropEvent(QDropEvent* de) override;
+	//void dragEnterEvent(QDragEnterEvent* dee) override;
+	//void mousePressEvent(QMouseEvent* me) override;
+	//void mouseMoveEvent(QMouseEvent* me) override;
+	//void mouseReleaseEvent(QMouseEvent* me) override;
 	
-	void drawGrid();
+	void drawGrid(QPainter& painter);
+	//! transforms a given y coord with the cubeWidth / cubeHeight ratio
+	float transformYToScreen(float yCoord); // TODO
 
+	//*** selection logic ***
+	//! selects everything between `start` and `end`
+	//! uses getBoundingBox's center for bounds checking
+	//! @param offset: how before start.x should we start searching
+	std::set<size_t>&& select(QPointF start, QPointF end, float offset);
+	QPointF getBoundingBoxCenter(size_t index) const;
+	QPointF getBoundingBoxCenter(QPointF start, QPointF end) const;
 	//! should return the start coords and the end coords of an object / note / point
-	virtual std::pair<QPointF, QPointF> getBoundingBox(size_t index) = 0;
+	virtual std::pair<QPointF, QPointF> getBoundingBox(size_t index) const = 0;
 	//! use `select()` to apply selection automatically
-	virtual void updateSelection(QPointF start, QPointF, end);
-	std::set<size_t> m_selecion;
+	//! if your widget doesn't work with points, then you can offset `start` or `end` and use `select()` on that
+	virtual std::set<size_t>&& getSelection(QPointF start, QPointF end) { return select(start, end, 0.0); }
+	//! @return model->getCount() if failed else closest index
+	size_t getClosest(const std::set<size_t>& selection, QPointF point);
+	std::set<size_t> m_selection;
 
-	void modelChanged() override;
+	void modelChanged() override; // TODO
 
 	//! if shift is pressed
 	bool m_isSelectionPressed;
@@ -82,9 +109,25 @@ protected:
 	QPointF m_selectEndOld;
 	QPointF m_selectStart;
 	QPointF m_selectEnd;
+	QPointF m_cursorStart; // TODO maybe remove?
+	QPointF m_cursorEnd;
 
-	unsigned int m_cubeWidth;
-	unsigned int m_cubeHeight;
+	size_t m_cubeWidth;
+	size_t m_cubeHeight;
+	//! if false, automatically resizes `m_cubeWidth` and height
+	bool m_isSizeStatic;
+	//! highlights every nth line on the grid
+	size_t m_gridHighlightMod;
+};
+
+class LMMS_EXPORT VectorGraphView : public GridView
+{
+public:
+	VectorGraphView(QWidget* parent, size_t cubeWidth, size_t cubeHeight);
+protected:
+	void paintEvent(QPaintEvent* pe) override;
+	std::pair<QPointF, QPointF> getBoundingBox(size_t index) const override;
+	std::set<size_t>&& getSelection(QPointF start, QPointF end) override;
 };
 
 } // namespace lmms::gui
