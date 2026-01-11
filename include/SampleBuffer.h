@@ -38,8 +38,9 @@ namespace lmms {
  * @class SampleBuffer
  *
  * @brief A dedicated container for immutable PCM audio data.
- * SampleBuffer is used to store and transport audio frames loaded from external
- * sources (mainly from audio files and Base64 audio strings).
+ * SampleBuffer is used to store and transport audio data loaded from external
+ * sources (mainly from audio files and Base64 audio strings). Do not use this class when a buffer of audio is
+ * needed for audio processing without additional sample rate and path metadata.
  *
  * @note This class is primarily populated via static factory methods:
  * fromFile() and fromBase64().
@@ -66,7 +67,7 @@ public:
 	/** @returns true if the buffer contains no audio data. */
 	auto empty() const -> bool { return m_data.empty(); }
 
-	/** @returns direct access to the raw frame array. */
+	/** @returns direct access to the raw audio data. */
 	auto data() const -> const SampleFrame* { return m_data.data(); }
 
 	/** @returns the file path associated with this buffer, if any. */
