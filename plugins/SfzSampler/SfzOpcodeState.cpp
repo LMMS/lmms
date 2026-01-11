@@ -49,6 +49,31 @@ bool SfzOpcodeState::setOpcodeByStrings(const QString& name, const QString& valu
 
 
 	//
+	// Key Switches
+	//
+	else if (name == "sw_lokey")
+	{
+		m_sw_lokey = value.toInt(&successful);
+		if (!successful) { m_sw_lokey = keyNumFromString(value, &successful); }
+	}
+	else if (name == "sw_hikey")
+	{
+		m_sw_hikey = value.toInt(&successful);
+		if (!successful) { m_sw_hikey = keyNumFromString(value, &successful); }
+	}
+	else if (name == "sw_last")
+	{
+		m_sw_last = value.toInt(&successful);
+		if (!successful) { m_sw_last = keyNumFromString(value, &successful); }
+	}
+	else if (name == "sw_default")
+	{
+		m_sw_default = value.toInt(&successful);
+		if (!successful) { m_sw_default = keyNumFromString(value, &successful); }
+	}
+
+
+	//
 	// Velocity Trigger
 	//
 	else if (name == "lovel")

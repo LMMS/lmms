@@ -33,6 +33,13 @@ public:
 	int m_lokey = 0;
 	int m_hikey = 127;
 
+	//
+	// Key Switches
+	//
+	int m_sw_lokey = 0;
+	int m_sw_hikey = 127;
+	std::optional<int> m_sw_last = std::nullopt; // The SFZ opcode spec says this should default to 0, but I don't think that's right?
+	std::optional<int> m_sw_default = std::nullopt;
 
 	//
 	// Velocity Trigger

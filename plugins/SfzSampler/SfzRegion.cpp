@@ -29,11 +29,15 @@ bool SfzRegion::triggerConditionsMet(const SfzGlobalState& globalState, const Sf
 		int triggerKey = trigger.key().value();
 		int triggerVelocity = trigger.velocity().value();
 
-		// `lokey` and `hikey` opcodes
+		// Ensure the key was pressed between the `lokey` and `hikey` opcodes
 		if (triggerKey > m_hikey || triggerKey < m_lokey) { return false; }
 
-		// `lovel` and `hivel` opcodes
+		// And had velocity between `lovel` and `hivel` opcodes
 		if (triggerVelocity > m_hivel || triggerVelocity < m_lovel) { return false; }
+
+		// If a keyswitch range was defined, ensure the last pressed key in that range matches the specified keyswitch for this region
+		// TODO add unit tests
+		if (m_sw_last != std::nullopt && globalState.lastKeyPressedInRange(m_sw_lokey, m_sw_hikey, m_sw_default) != m_sw_last) { return false; }
 
 		// If all conditions up until now have passed, that means we're ready to play sound. However, if round-robin is set up, we only do it if it's our turn.
 		m_roundRobinCount++;
