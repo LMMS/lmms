@@ -105,7 +105,7 @@ bool sanitize(std::span<sample_t> buffer)
 #endif
 
 			// Clear the channel if a problem is found
-			std::ranges::fill(buffer, 0);
+			std::ranges::fill(buffer, 0.f);
 
 			return true;
 		}
