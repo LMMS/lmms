@@ -44,8 +44,6 @@ public:
 
 	bool isDefaultConstructed() const;
 
-	Model* parentModel() const;
-
 	virtual QString displayName() const;
 
 	virtual void setDisplayName(const QString& displayName);

@@ -39,16 +39,20 @@ public:
 	{
 	}
 
-	InlineAutomation(const InlineAutomation& _copy) :
-		FloatModel(_copy.value(), _copy.minValue(), _copy.maxValue(), _copy.step<float>()),
-		m_autoClip(_copy.m_autoClip->clone())
+	InlineAutomation(const InlineAutomation& _copy)
+		: FloatModel(_copy.value(), _copy.minValue(), _copy.maxValue(), _copy.step<float>())
 	{
-		m_autoClip->clearObjects();
-		m_autoClip->addObject(this);
+		if (_copy.m_autoClip)
+		{
+			m_autoClip = _copy.m_autoClip->clone();
+			m_autoClip->clearObjects();
+			m_autoClip->addObject(this);
+		}
 	}
 
 	~InlineAutomation() override
 	{
+		if (m_autoClip) { m_autoClip->deleteLater(); }
 	}
 
 	virtual float defaultValue() const = 0;
@@ -82,10 +86,10 @@ public:
 	{
 		if( m_autoClip == nullptr )
 		{
-			m_autoClip = std::make_unique<AutomationClip>(nullptr);
+			m_autoClip = new AutomationClip(nullptr);
 			m_autoClip->addObject( this );
 		}
-		return m_autoClip.get();
+		return m_autoClip;
 	}
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
@@ -93,7 +97,7 @@ public:
 
 
 private:
-	std::unique_ptr<AutomationClip> m_autoClip;
+	AutomationClip* m_autoClip = nullptr;
 
 } ;
 
