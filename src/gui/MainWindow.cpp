@@ -35,8 +35,6 @@
 #include <QShortcut>
 #include <QSplitter>
 
-#include <QDebug> // TODO: remove
-
 #include "AboutDialog.h"
 #include "AutomationEditor.h"
 #include "ControllerRackView.h"
