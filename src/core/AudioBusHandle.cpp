@@ -232,7 +232,7 @@ void AudioBusHandle::doProcessing()
 		m_busses.sanitizeAll();
 
 		// Update silence status of track channels for instrument output
-		m_busses.updateAll();
+		m_busses.updateAllSilenceFlags();
 	}
 	// as of now there's no situation where we only have panning model but no volume model
 	// if we have neither, we don't have to do anything here - just pass the audio as is

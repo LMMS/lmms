@@ -62,11 +62,11 @@ constexpr auto SilenceThreshold = 0.0001431f;
 
 //! @returns Bitset with all bits at or above `pos` set to `value` and the rest set to `!value`
 template<bool value>
-auto createMask(track_ch_t pos) noexcept -> std::bitset<MaxTrackChannels>
+auto createMask(track_ch_t pos) noexcept -> AudioBus::ChannelFlags
 {
 	assert(pos <= MaxTrackChannels);
 
-	std::bitset<MaxTrackChannels> mask;
+	AudioBus::ChannelFlags mask;
 	mask.set();
 
 	if constexpr (value)
@@ -171,7 +171,7 @@ void AudioBus::enableSilenceTracking(bool enabled)
 	m_silenceTrackingEnabled = enabled;
 	if (!oldValue && enabled)
 	{
-		updateAll();
+		updateAllSilenceFlags();
 	}
 }
 
@@ -180,7 +180,7 @@ void AudioBus::mixQuietChannels(const AudioBus& other)
 	m_silenceFlags &= other.silenceFlags();
 }
 
-auto AudioBus::hasInputNoise(const std::bitset<MaxTrackChannels>& usedChannels) const -> bool
+auto AudioBus::hasInputNoise(const ChannelFlags& usedChannels) const -> bool
 {
 	auto nonSilent = ~m_silenceFlags;
 	nonSilent &= usedChannels;
@@ -192,7 +192,7 @@ auto AudioBus::hasAnyInputNoise() const -> bool
 	return !m_silenceFlags.all();
 }
 
-void AudioBus::sanitize(const std::bitset<MaxTrackChannels>& channels, track_ch_t upperBound)
+void AudioBus::sanitize(const ChannelFlags& channels, track_ch_t upperBound)
 {
 	if (!MixHelpers::useNaNHandler()) { return; }
 
@@ -253,7 +253,7 @@ void AudioBus::sanitizeAll()
 	MixHelpers::copy(interleavedBuffer(0), buffers(0));
 }
 
-auto AudioBus::update(const std::bitset<MaxTrackChannels>& channels, track_ch_t upperBound) -> bool
+auto AudioBus::updateSilenceFlags(const ChannelFlags& channels, track_ch_t upperBound) -> bool
 {
 	assert(upperBound <= MaxTrackChannels);
 
@@ -303,7 +303,7 @@ auto AudioBus::update(const std::bitset<MaxTrackChannels>& channels, track_ch_t 
 	return allQuiet;
 }
 
-auto AudioBus::updateAll() -> bool
+auto AudioBus::updateAllSilenceFlags() -> bool
 {
 	// Invariant: Any channel bits at or above `totalChannels()` must be marked silent
 	assert((~m_silenceFlags & createMask<true>(totalChannels())).none());
@@ -337,7 +337,7 @@ auto AudioBus::updateAll() -> bool
 	return allQuiet;
 }
 
-void AudioBus::silenceChannels(const std::bitset<MaxTrackChannels>& channels, track_ch_t upperBound)
+void AudioBus::silenceChannels(const ChannelFlags& channels, track_ch_t upperBound)
 {
 	auto needSilenced = ~m_silenceFlags;
 	needSilenced &= channels;

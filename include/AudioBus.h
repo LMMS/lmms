@@ -44,6 +44,8 @@ namespace lmms
 class LMMS_EXPORT AudioBus
 {
 public:
+	using ChannelFlags = std::bitset<MaxTrackChannels>;
+
 	class LMMS_EXPORT BusData
 	{
 	public:
@@ -138,12 +140,6 @@ public:
 		return m_busses[busIndex].channelBuffers();
 	}
 
-	//! @returns array of busses
-	auto busses() const -> const ArrayVector<BusData, MaxBussesPerTrack>& { return m_busses; }
-
-	//! @returns array of busses
-	auto busses() -> ArrayVector<BusData, MaxBussesPerTrack>& { return m_busses; }
-
 	//! @returns sum of all bus channel counts
 	auto totalChannels() const -> track_ch_t { return m_totalChannels; }
 
@@ -173,16 +169,32 @@ public:
 	/**
 	 * Track channels which are known to be quiet, AKA the silence status.
 	 * 1 = track channel is known to be silent
-	 * 0 = track channel is assumed to be non-silent
+	 * 0 = track channel is assumed to be non-silent (or, when silence tracking
+	 *     is enabled, known to be non-silent)
+	 *
+	 * NOTE: If any track channel buffers are used and their data modified outside of this class,
+	 *       their silence flags will be invalidated until `updateSilenceFlags()` is called.
+	 *       Therefore, calling code must be careful to always keep the silence flags up-to-date.
 	 */
-	auto silenceFlags() const -> const std::bitset<MaxTrackChannels>& { return m_silenceFlags; }
+	auto silenceFlags() const -> const ChannelFlags& { return m_silenceFlags; }
 
 #ifdef LMMS_TESTING
-	auto silenceFlags() -> std::bitset<MaxTrackChannels>& { return m_silenceFlags; }
+	auto silenceFlags() -> ChannelFlags& { return m_silenceFlags; }
 #endif
 
-	auto silenceTrackingEnabled() const -> bool { return m_silenceTrackingEnabled; }
+	/**
+	 * When silence tracking is enabled, track channels will be checked for silence whenever their data may
+	 * have changed, so it'll always be known whether they are silent or non-silent. There is a performance cost
+	 * to this, but it is likely worth it since this information allows many effects to be put to sleep
+	 * when their inputs are silent ("auto-quit"). When a track channel is known to be silent, it also
+	 * enables optimizations in buffer sanitization, buffer zeroing, and finding the absolute peak sample value.
+	 *
+	 * When silence tracking is disabled, track channels are not checked for silence, so a silence flag may be
+	 * unset despite the channel being silent. Non-silence must be assumed whenever the silence status is not
+	 * known, so the optimizations which silent buffers allow will not be possible as often.
+	 */
 	void enableSilenceTracking(bool enabled);
+	auto silenceTrackingEnabled() const -> bool { return m_silenceTrackingEnabled; }
 
 	//! Mixes the silence status of the other `AudioBus` with this `AudioBus`
 	void mixQuietChannels(const AudioBus& other);
@@ -198,7 +210,7 @@ public:
 	 * If the processor is sleeping and has input noise, it should wake up.
 	 * If silence tracking is disabled, all channels are assumed to have input noise.
 	 */
-	auto hasInputNoise(const std::bitset<MaxTrackChannels>& usedChannels) const -> bool;
+	auto hasInputNoise(const ChannelFlags& usedChannels) const -> bool;
 
 	//! Determines whether there is input noise on any channel. @see hasInputNoise
 	auto hasAnyInputNoise() const -> bool;
@@ -209,7 +221,7 @@ public:
 	 * @param channels track channels to sanitize; 1 = selected, 0 = skip
 	 * @param upperBound any track channel indexes at or above this are skipped
 	 */
-	void sanitize(const std::bitset<MaxTrackChannels>& channels, track_ch_t upperBound = MaxTrackChannels);
+	void sanitize(const ChannelFlags& channels, track_ch_t upperBound = MaxTrackChannels);
 
 	//! Sanitizes all channels. @see sanitize
 	void sanitizeAll();
@@ -221,10 +233,10 @@ public:
 	 * @param upperBound any track channel indexes at or above this are skipped
 	 * @returns true if all updated channels were silent
 	 */
-	auto update(const std::bitset<MaxTrackChannels>& channels, track_ch_t upperBound = MaxTrackChannels) -> bool;
+	auto updateSilenceFlags(const ChannelFlags& channels, track_ch_t upperBound = MaxTrackChannels) -> bool;
 
-	//! Updates the silence status of all channels. @see update
-	auto updateAll() -> bool;
+	//! Updates the silence status of all channels. @see updateSilenceFlags
+	auto updateAllSilenceFlags() -> bool;
 
 	/**
 	 * @brief Silences (zeroes) the given channels
@@ -232,7 +244,7 @@ public:
 	 * @param channels track channels to silence; 1 = selected, 0 = skip
 	 * @param upperBound any track channel indexes at or above this are skipped
 	 */
-	void silenceChannels(const std::bitset<MaxTrackChannels>& channels, track_ch_t upperBound = MaxTrackChannels);
+	void silenceChannels(const ChannelFlags& channels, track_ch_t upperBound = MaxTrackChannels);
 
 	//! Silences (zeroes) all channels. @see silenceChannels
 	void silenceAllChannels();
@@ -259,9 +271,10 @@ private:
 	 * Any channel bits at or above `m_totalChannels` must always be marked silent.
 	 *
 	 * 1 = track channel is known to be silent
-	 * 0 = track channel is assumed to be non-silent
+	 * 0 = track channel is assumed to be non-silent (or, when silence tracking
+	 *     is enabled, known to be non-silent)
 	 */
-	std::bitset<MaxTrackChannels> m_silenceFlags;
+	ChannelFlags m_silenceFlags;
 
 	bool m_silenceTrackingEnabled = false;
 };

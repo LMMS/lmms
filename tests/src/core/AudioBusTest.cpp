@@ -158,8 +158,8 @@ private slots:
 		QCOMPARE(ab2.totalChannels(), lmms::MaxTrackChannels);
 	}
 
-	//! Verifies that the `update` method works as intended
-	void Update()
+	//! Verifies that the `updateSilenceFlags` method works as intended
+	void UpdateSilenceFlags()
 	{
 		auto ab = createAudioBus(10);
 
@@ -167,30 +167,30 @@ private slots:
 		QVERIFY(ab.addBus(2) != nullptr);
 
 		// Both channels should be silent
-		QCOMPARE(ab.update(0b1111), true);
+		QCOMPARE(ab.updateSilenceFlags(0b1111), true);
 		QCOMPARE(ab.silenceFlags().all(), true);
 
 		// Now introduce a non-zero sample to the right channel of 2nd track channel bus
 		// but update all channels except that one
 		ab.buffers(1).buffer(1)[5] = 1.f;
-		QCOMPARE(ab.update(0b0111), true);
+		QCOMPARE(ab.updateSilenceFlags(0b0111), true);
 		QCOMPARE(ab.silenceFlags().all(), true);
 
 		// Now update that channel
-		QCOMPARE(ab.update(0b1000), false);
+		QCOMPARE(ab.updateSilenceFlags(0b1000), false);
 		QCOMPARE(ab.silenceFlags()[0], true);
 		QCOMPARE(ab.silenceFlags()[1], true);
 		QCOMPARE(ab.silenceFlags()[2], true);
 		QCOMPARE(ab.silenceFlags()[3], false);
 
 		// Should return true if no channels are selected for update
-		QCOMPARE(ab.update(0), true);
+		QCOMPARE(ab.updateSilenceFlags(0), true);
 
 		// Make the left channel of the 1st track channel bus non-zero too
 		ab.buffers(0).buffer(0)[5] = 1.f;
 
 		// Update the left channel of the 1st track channel bus
-		QCOMPARE(ab.update(0b0001), false);
+		QCOMPARE(ab.updateSilenceFlags(0b0001), false);
 		QCOMPARE(ab.silenceFlags()[0], false);
 		QCOMPARE(ab.silenceFlags()[1], true);
 		QCOMPARE(ab.silenceFlags()[2], true);
@@ -202,14 +202,14 @@ private slots:
 		ab.buffers(0).buffer(0)[5] = 0.f;
 
 		// Update only the 2nd track channel bus
-		QCOMPARE(ab.update(0b1100), false);
+		QCOMPARE(ab.updateSilenceFlags(0b1100), false);
 		QCOMPARE(ab.silenceFlags()[0], false);
 		QCOMPARE(ab.silenceFlags()[1], true);
 		QCOMPARE(ab.silenceFlags()[2], false);
 		QCOMPARE(ab.silenceFlags()[3], false);
 
 		// Now update the 1st track channel bus
-		QCOMPARE(ab.update(0b0011), true);
+		QCOMPARE(ab.updateSilenceFlags(0b0011), true);
 		QCOMPARE(ab.silenceFlags()[0], true);
 		QCOMPARE(ab.silenceFlags()[1], true);
 		QCOMPARE(ab.silenceFlags()[2], false);
@@ -218,14 +218,14 @@ private slots:
 		// Zero out all channels again
 		ab.buffers(1).buffer(0)[5] = 0.f;
 		ab.buffers(1).buffer(1)[5] = 0.f;
-		QCOMPARE(ab.update(0b0000), true);
+		QCOMPARE(ab.updateSilenceFlags(0b0000), true);
 		QCOMPARE(ab.silenceFlags().all(), false);
-		QCOMPARE(ab.update(0b1111), true);
+		QCOMPARE(ab.updateSilenceFlags(0b1111), true);
 		QCOMPARE(ab.silenceFlags().all(), true);
 	}
 
-	//! Verifies that the `updateAll` method works as intended
-	void UpdateAll()
+	//! Verifies that the `updateAllSilenceFlags` method works as intended
+	void UpdateAllSilenceFlags()
 	{
 		auto ab = createAudioBus(10);
 
@@ -233,12 +233,12 @@ private slots:
 		QVERIFY(ab.addBus(2) != nullptr);
 
 		// Both channels should be silent
-		QCOMPARE(ab.updateAll(), true);
+		QCOMPARE(ab.updateAllSilenceFlags(), true);
 		QCOMPARE(ab.silenceFlags().all(), true);
 
 		// Now introduce a non-zero sample to the right channel of 2nd track channel bus
 		ab.buffers(1).buffer(1)[5] = 1.f;
-		QCOMPARE(ab.updateAll(), false);
+		QCOMPARE(ab.updateAllSilenceFlags(), false);
 		QCOMPARE(ab.silenceFlags().all(), false);
 		QCOMPARE(ab.silenceFlags()[0], true);
 		QCOMPARE(ab.silenceFlags()[1], true);
@@ -247,7 +247,7 @@ private slots:
 
 		// Make the left channel of the 1st track channel bus non-zero too
 		ab.buffers(0).buffer(0)[5] = 1.f;
-		QCOMPARE(ab.updateAll(), false);
+		QCOMPARE(ab.updateAllSilenceFlags(), false);
 		QCOMPARE(ab.silenceFlags().all(), false);
 		QCOMPARE(ab.silenceFlags()[0], false);
 		QCOMPARE(ab.silenceFlags()[1], true);
@@ -257,7 +257,7 @@ private slots:
 		// Zero out all channels again
 		ab.buffers(0).buffer(0)[5] = 0.f;
 		ab.buffers(1).buffer(1)[5] = 0.f;
-		QCOMPARE(ab.updateAll(), true);
+		QCOMPARE(ab.updateAllSilenceFlags(), true);
 		QCOMPARE(ab.silenceFlags().all(), true);
 	}
 

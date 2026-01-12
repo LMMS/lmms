@@ -126,7 +126,7 @@ bool Effect::processAudioBuffer(AudioBus& inOut)
 	inOut.sanitize(0b11);
 
 	// Update silence status for track channels the processor wrote to
-	const bool silentOutput = inOut.update(0b11);
+	const bool silentOutput = inOut.updateSilenceFlags(0b11);
 
 	switch (status)
 	{
