@@ -107,12 +107,12 @@ AudioBus::BusData::BusData(std::pmr::polymorphic_allocator<>& alloc,
 	}
 }
 
-AudioBus::AudioBus(f_cnt_t frames, std::pmr::memory_resource* bufferResource)
+AudioBus::AudioBus(f_cnt_t frames, ch_cnt_t channels, std::pmr::memory_resource* bufferResource)
 	: m_frames{frames}
 	, m_alloc{bufferResource}
 	, m_silenceTrackingEnabled{ConfigManager::inst()->value("ui", "disableautoquit", "1").toInt() == 0}
 {
-	if (!addBus(DEFAULT_CHANNELS))
+	if (!addBus(channels))
 	{
 		throw std::runtime_error{"failed to add bus"};
 	}

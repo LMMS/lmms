@@ -104,8 +104,9 @@ public:
 	auto operator=(const AudioBus&) -> AudioBus& = delete;
 	auto operator=(AudioBus&&) noexcept -> AudioBus& = default;
 
-	//! Single stereo bus with `frames` frames
-	explicit AudioBus(f_cnt_t frames, std::pmr::memory_resource* bufferResource = std::pmr::get_default_resource());
+	//! Single bus with `frames` frames, `channels` channels, and all buffers allocated with `bufferResource`
+	explicit AudioBus(f_cnt_t frames, ch_cnt_t channels = DEFAULT_CHANNELS,
+		std::pmr::memory_resource* bufferResource = std::pmr::get_default_resource());
 
 	auto busCount() const -> bus_cnt_t { return static_cast<bus_cnt_t>(m_busses.size()); }
 
