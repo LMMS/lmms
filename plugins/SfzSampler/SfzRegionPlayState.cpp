@@ -18,6 +18,8 @@ SfzRegionPlayState::SfzRegionPlayState(const SfzRegion* region, const SfzTrigger
 	, m_trigger(trigger)
 	, m_region(region)
 {
+	// Delay the start of the playback by the trigger offset
+	m_frameCount -= trigger.frameOffset();
 	// Set initial sample start frame offset
 	m_sampleFrame += m_region->m_offset;
 

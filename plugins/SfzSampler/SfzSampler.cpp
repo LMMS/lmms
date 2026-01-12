@@ -82,17 +82,17 @@ bool SfzSampler::handleMidiEvent(const MidiEvent& event, const TimePos& time, f_
 {
 	if (event.type() == MidiNoteOn)
 	{
-		processTrigger(SfzTrigger::noteOnEvent(event.key(), event.velocity()));
+		processTrigger(SfzTrigger::noteOnEvent(offset, event.key(), event.velocity()));
 		return true;
 	}
 	else if (event.type() == MidiNoteOff)
 	{
-		processTrigger(SfzTrigger::noteOffEvent(event.key(), event.velocity()));
+		processTrigger(SfzTrigger::noteOffEvent(offset, event.key(), event.velocity()));
 		return true;
 	}
 	else if (event.type() == MidiControlChange)
 	{
-		processTrigger(SfzTrigger::controlChangeEvent(event.controllerNumber(), event.controllerValue()));
+		processTrigger(SfzTrigger::controlChangeEvent(offset, event.controllerNumber(), event.controllerValue()));
 		return true;
 	}
 	return false;

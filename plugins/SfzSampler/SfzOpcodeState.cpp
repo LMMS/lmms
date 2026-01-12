@@ -275,7 +275,7 @@ bool SfzOpcodeState::setOpcodeByStrings(const QString& name, const QString& valu
 	else if (name.startsWith("set_hdcc"))
 	{
 		int ccNumber = ccNumberFromOpcode(name);
-		m_set_cc.at(ccNumber) = value.toFloat(&successful) * 128;
+		m_set_cc.at(ccNumber) = value.toFloat(&successful) * 127;
 	}
 
 	else
