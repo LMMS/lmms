@@ -58,7 +58,12 @@ public:
 
 	// Returns true if file name was changed, returns false if it wasn't
 	static bool changeFileNameVersion( QString &fileName, bool increment );
-	static bool fileExistsQuery( QString FileName, QString WindowTitle );
+
+	/**
+		Checks if the file can be written to. If the file exists, shows a
+		confirmation dialog and returns whether the file can be overwritten.
+	*/
+	static bool checkOverwrite(QString fileName, QString windowTitle);
 
 public slots:
 	void incrementVersion();

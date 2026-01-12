@@ -35,6 +35,8 @@
 #include <QShortcut>
 #include <QSplitter>
 
+#include <QDebug> // TODO: remove
+
 #include "AboutDialog.h"
 #include "AutomationEditor.h"
 #include "ControllerRackView.h"
@@ -74,10 +76,11 @@
 
 #include "lmmsversion.h"
 
-
 namespace lmms::gui
 {
 
+static QString removeDefaultSuffix(const QString& selectedNameFilter,
+	const QString& rawFileName, const QString& defaultSuffix);
 
 MainWindow::MainWindow() :
 	m_workspace( nullptr ),
@@ -806,30 +809,25 @@ bool MainWindow::saveProjectAs()
 	}
 
 	// Don't write over file with suffix if no suffix is provided.
-	QString suffix = ConfigManager::inst()->value( "app",
-							"nommpz" ).toInt() == 0
-						? "mmpz"
-						: "mmp" ;
-	sfd.setDefaultSuffix( suffix );
+	const QString defaultSuffix = ConfigManager::inst()->value("app", "nommpz").toInt() == 0
+		? ".mmpz" : ".mmp";
+	sfd.setDefaultSuffix(defaultSuffix);
 
 	if( sfd.exec () == FileDialog::Accepted &&
 		!sfd.selectedFiles().isEmpty() && sfd.selectedFiles()[0] != "" )
 	{
-		QString fname = sfd.selectedFiles()[0] ;
-		if( sfd.selectedNameFilter().contains( "(*.mpt)" ) )
+		QString rawFileName = sfd.selectedFiles()[0] ;
+		QString fileName = removeDefaultSuffix(sfd.selectedNameFilter(), rawFileName, defaultSuffix);
+
+		const auto windowTitle = fileName.endsWith(".mpt")
+			? tr("Save project template")
+			: tr("Save project");
+		if (!VersionedSaveDialog::checkOverwrite(fileName, windowTitle))
 		{
-			// Remove the default suffix
-			fname.remove( "." + suffix );
-			if( !sfd.selectedFiles()[0].endsWith( ".mpt" ) )
-			{
-				if( VersionedSaveDialog::fileExistsQuery( fname + ".mpt",
-						tr( "Save project template" ) ) )
-				{
-					fname += ".mpt";
-				}
-			}
+			return false;
 		}
-		if( this->guiSaveProjectAs( fname ) )
+
+		if (this->guiSaveProjectAs(fileName))
 		{
 			if( getSession() == SessionState::Recover )
 			{
@@ -1469,40 +1467,24 @@ void MainWindow::exportProject(bool multiExport)
 		efd.setWindowTitle( tr( "Select file for project-export..." ) );
 	}
 
-	QString suffix = "wav";
-	efd.setDefaultSuffix( suffix );
+	const QString defaultSuffix = ".wav";
+	efd.setDefaultSuffix(defaultSuffix); // the leading dot is removed here, but that's alright.
+
 	efd.setAcceptMode( FileDialog::AcceptSave );
 
 	if( efd.exec() == QDialog::Accepted && !efd.selectedFiles().isEmpty() &&
 					 !efd.selectedFiles()[0].isEmpty() )
 	{
+		const QString rawFileName = efd.selectedFiles()[0];
 
-		QString exportFileName = efd.selectedFiles()[0];
-		if ( !multiExport )
+		QString exportFileName = multiExport
+			? rawFileName
+			: removeDefaultSuffix(efd.selectedNameFilter(), rawFileName, defaultSuffix);
+
+		// Check for overwrite risk
+		if (!multiExport && !VersionedSaveDialog::checkOverwrite(exportFileName, tr("Save project")))
 		{
-			int stx = efd.selectedNameFilter().indexOf( "(*." );
-			int etx = efd.selectedNameFilter().indexOf( ")" );
-
-			if ( stx > 0 && etx > stx )
-			{
-				// Get first extension from selected dropdown.
-				// i.e. ".wav" from "WAV-File (*.wav), Dummy-File (*.dum)"
-				suffix = efd.selectedNameFilter().mid( stx + 2, etx - stx - 2 ).split( " " )[0].trimmed();
-
-				Qt::CaseSensitivity cs = Qt::CaseSensitive;
-#if defined(LMMS_BUILD_APPLE) || defined(LMMS_BUILD_WIN32)
-				cs = Qt::CaseInsensitive;
-#endif
-				exportFileName.remove( "." + suffix, cs );
-				if ( efd.selectedFiles()[0].endsWith( suffix ) )
-				{
-					if( VersionedSaveDialog::fileExistsQuery( exportFileName + suffix,
-							tr( "Save project" ) ) )
-					{
-						exportFileName += suffix;
-					}
-				}
-			}
+			return;
 		}
 
 		ExportProjectDialog epd( exportFileName, getGUI()->mainWindow(), multiExport );
@@ -1666,6 +1648,36 @@ void MainWindow::MovableQMdiArea::mouseReleaseEvent(QMouseEvent* event)
 {
 	setCursor(Qt::ArrowCursor);
 	m_isBeingMoved = false;
+}
+
+static QString removeDefaultSuffix(const QString& selectedNameFilter,
+	const QString& rawFileName, const QString& defaultSuffix)
+{
+	int stx = selectedNameFilter.indexOf("(*.");
+	int etx = selectedNameFilter.indexOf(")");
+
+	QString ret = rawFileName;
+
+	if (stx > 0 && etx > stx)
+	{
+		// Get first extension from selected dropdown.
+		// i.e. ".wav" from "WAV-File (*.wav), Dummy-File (*.dum)"
+		QString selectedSuffix = selectedNameFilter.mid(stx + 2, etx - stx - 2)
+			.split(" ")[0].trimmed();
+
+		Qt::CaseSensitivity cs = Qt::CaseSensitive;
+#if defined(LMMS_BUILD_APPLE) || defined(LMMS_BUILD_WIN32)
+		cs = Qt::CaseInsensitive;
+#endif
+
+		if (ret.endsWith(defaultSuffix) && selectedSuffix != defaultSuffix)
+		{
+			ret.remove(defaultSuffix, cs);
+			ret += selectedSuffix;
+		}
+	}
+
+	return ret;
 }
 
 } // namespace lmms::gui
