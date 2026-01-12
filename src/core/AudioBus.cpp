@@ -83,14 +83,20 @@ auto createMask(track_ch_t pos) noexcept -> std::bitset<MaxTrackChannels>
 
 } // namespace
 
-AudioBus::BusData::BusData(ch_cnt_t channels, f_cnt_t frames, track_ch_t startingChannel)
-	: m_sourceBuffer{std::make_unique<float[]>(channels * frames)}
-	, m_channelBuffers{std::make_unique_for_overwrite<float*[]>(channels)}
-	, m_interleavedBuffer{std::make_unique<float[]>(2 * frames)}
+AudioBus::BusData::BusData(std::pmr::polymorphic_allocator<>& alloc,
+	ch_cnt_t channels, f_cnt_t frames, track_ch_t startingChannel)
+	: m_sourceBuffer{alloc.allocate_object<float>(channels * frames)}
+	, m_channelBuffers{alloc.allocate_object<float*>(channels)}
+	, m_interleavedBuffer{alloc.allocate_object<float>(2 * frames)}
 	, m_channels{channels}
 	, m_startingChannel{startingChannel}
 {
-	float* ptr = m_sourceBuffer.get();
+	// Set uninitialized buffers to zero (silent)
+	std::fill_n(m_sourceBuffer, channels * frames, 0.f);
+	std::fill_n(m_interleavedBuffer, 2 * frames, 0.f);
+
+	// Initialize channel buffers
+	float* ptr = m_sourceBuffer;
 	track_ch_t channel = 0;
 	while (channel < channels)
 	{
@@ -101,8 +107,9 @@ AudioBus::BusData::BusData(ch_cnt_t channels, f_cnt_t frames, track_ch_t startin
 	}
 }
 
-AudioBus::AudioBus(f_cnt_t frames)
+AudioBus::AudioBus(f_cnt_t frames, std::pmr::memory_resource* bufferResource)
 	: m_frames{frames}
+	, m_alloc{bufferResource}
 	, m_silenceTrackingEnabled{ConfigManager::inst()->value("ui", "disableautoquit", "1").toInt() == 0}
 {
 	if (!addBus(DEFAULT_CHANNELS))
@@ -111,6 +118,16 @@ AudioBus::AudioBus(f_cnt_t frames)
 	}
 
 	m_silenceFlags.set();
+}
+
+AudioBus::~AudioBus()
+{
+	for (BusData& bus : m_busses)
+	{
+		m_alloc.deallocate_object(bus.m_sourceBuffer, bus.channels() * m_frames);
+		m_alloc.deallocate_object(bus.channelBuffers(), bus.channels());
+		m_alloc.deallocate_object(bus.m_interleavedBuffer, 2 * m_frames);
+	}
 }
 
 auto AudioBus::addBus(ch_cnt_t channels) -> BusData*
@@ -137,7 +154,7 @@ auto AudioBus::addBus(ch_cnt_t channels) -> BusData*
 		? track_ch_t{0}
 		: static_cast<track_ch_t>(m_busses.back().startingChannel() + m_busses.back().channels());
 
-	auto& data = m_busses.emplace_back(channels, m_frames, startingChannel);
+	auto& data = m_busses.emplace_back(m_alloc, channels, m_frames, startingChannel);
 
 	// Ensure the new track channels (and all the higher, unused
 	// track channels) are set to "silent"
@@ -360,7 +377,7 @@ void AudioBus::silenceAllChannels()
 {
 	for (BusData& bus : m_busses)
 	{
-		std::fill_n(bus.sourceBuffer(), bus.channels() * m_frames, 0);
+		std::fill_n(bus.m_sourceBuffer, bus.channels() * m_frames, 0);
 		std::fill_n(bus.interleavedBuffer(), 2 * m_frames, 0);
 	}
 

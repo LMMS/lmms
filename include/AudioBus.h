@@ -26,6 +26,7 @@
 #define LMMS_AUDIO_BUS_H
 
 #include <bitset>
+#include <memory_resource>
 
 #include "AudioBufferView.h"
 #include "ArrayVector.h"
@@ -37,7 +38,7 @@ namespace lmms
 {
 
 /**
- * A collection of busses for an instrument or effect chain
+ * A collection of track channels for an instrument or effect chain
  * which keeps track of signal flow.
  */
 class LMMS_EXPORT AudioBus
@@ -46,21 +47,16 @@ public:
 	class LMMS_EXPORT BusData
 	{
 	public:
-		BusData(ch_cnt_t channels, f_cnt_t frames, track_ch_t startingChannel);
+		BusData(std::pmr::polymorphic_allocator<>& alloc,
+			ch_cnt_t channels, f_cnt_t frames, track_ch_t startingChannel);
 
 		BusData(const BusData&) = delete;
 		BusData(BusData&&) noexcept = default;
 		auto operator=(const BusData&) -> BusData& = delete;
 		auto operator=(BusData&&) noexcept -> BusData& = default;
 
-		//! Large buffer that all channel buffers are sourced from
-		auto sourceBuffer() const -> const float* { return m_sourceBuffer.get(); }
-
-		//! Large buffer that all channel buffers are sourced from
-		auto sourceBuffer() -> float* { return m_sourceBuffer.get(); }
-
-		auto channelBuffers() const -> const float* const* { return m_channelBuffers.get(); }
-		auto channelBuffers() -> float** { return m_channelBuffers.get(); }
+		auto channelBuffers() const -> const float* const* { return m_channelBuffers; }
+		auto channelBuffers() -> float** { return m_channelBuffers; }
 
 		auto channelBuffer(ch_cnt_t channel) const -> const float*
 		{
@@ -74,32 +70,42 @@ public:
 			return m_channelBuffers[channel];
 		}
 
-		auto interleavedBuffer() const -> const float* { return m_interleavedBuffer.get(); }
-		auto interleavedBuffer() -> float* { return m_interleavedBuffer.get(); }
+		auto interleavedBuffer() const -> const float* { return m_interleavedBuffer; }
+		auto interleavedBuffer() -> float* { return m_interleavedBuffer; }
 
 		auto channels() const -> ch_cnt_t { return m_channels; }
 
 		auto startingChannel() const -> track_ch_t { return m_startingChannel; }
-		void setStartingChannel(track_ch_t channel) { m_startingChannel = channel; }
+
+		friend class AudioBus;
 
 	private:
-		std::unique_ptr<float[]>       m_sourceBuffer;
-		std::unique_ptr<float*[]>      m_channelBuffers;
+		//! Large buffer that all channel buffers are sourced from
+		float*     m_sourceBuffer = nullptr;
+
+		//! Provides access to individual channel buffers within the source buffer
+		float**    m_channelBuffers = nullptr;
 
 		//! Interleaved scratch buffer for conversions between interleaved and planar TODO: Remove once using planar only
-		std::unique_ptr<float[]>       m_interleavedBuffer;
+		float*     m_interleavedBuffer = nullptr;
 
 		//! Number of channels in `m_channelBuffers` (`MaxChannelsPerBus` maximum) - currently only 2 is used
-		ch_cnt_t                       m_channels = 0;
+		ch_cnt_t   m_channels = 0;
 
 		//! Maps channel #0 of this bus to its track channel # within AudioBus (for performance)
-		track_ch_t                     m_startingChannel = 0;
+		track_ch_t m_startingChannel = 0;
 	};
 
 	AudioBus() = default;
+	~AudioBus();
+
+	AudioBus(const AudioBus&) = delete;
+	AudioBus(AudioBus&&) noexcept = default;
+	auto operator=(const AudioBus&) -> AudioBus& = delete;
+	auto operator=(AudioBus&&) noexcept -> AudioBus& = default;
 
 	//! Single stereo bus with `frames` frames
-	explicit AudioBus(f_cnt_t frames);
+	explicit AudioBus(f_cnt_t frames, std::pmr::memory_resource* bufferResource = std::pmr::get_default_resource());
 
 	auto busCount() const -> bus_cnt_t { return static_cast<bus_cnt_t>(m_busses.size()); }
 
@@ -240,6 +246,9 @@ private:
 	track_ch_t m_totalChannels = 0;
 
 	const f_cnt_t m_frames = 0;
+
+	//! Allocator used by all buffers
+	std::pmr::polymorphic_allocator<> m_alloc;
 
 	/**
 	 * Stores which track channels are known to be quiet, AKA the silence status.
