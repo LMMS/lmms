@@ -60,8 +60,8 @@ public:
 	static bool changeFileNameVersion( QString &fileName, bool increment );
 
 	/**
-		Checks if the file can be written to. If the file exists, shows a
-		confirmation dialog and returns whether the file can be overwritten.
+		Checks if the file can be written to. If the file exists, shows a confirmation dialog and returns whether the
+		file can be overwritten.
 	*/
 	static bool checkOverwrite(QString fileName, QString windowTitle);
 

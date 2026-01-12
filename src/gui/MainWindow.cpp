@@ -77,8 +77,8 @@
 namespace lmms::gui
 {
 
-static QString removeDefaultSuffix(const QString& selectedNameFilter,
-	const QString& rawFileName, const QString& defaultSuffix);
+static QString removeDefaultSuffix(const QString& selectedNameFilter, const QString& rawFileName,
+	const QString& defaultSuffix);
 
 MainWindow::MainWindow() :
 	m_workspace( nullptr ),
@@ -807,8 +807,7 @@ bool MainWindow::saveProjectAs()
 	}
 
 	// Don't write over file with suffix if no suffix is provided.
-	const QString defaultSuffix = ConfigManager::inst()->value("app", "nommpz").toInt() == 0
-		? ".mmpz" : ".mmp";
+	const QString defaultSuffix = ConfigManager::inst()->value("app", "nommpz").toInt() == 0 ? ".mmpz" : ".mmp";
 	sfd.setDefaultSuffix(defaultSuffix);
 
 	if( sfd.exec () == FileDialog::Accepted &&
@@ -817,9 +816,7 @@ bool MainWindow::saveProjectAs()
 		QString rawFileName = sfd.selectedFiles()[0] ;
 		QString fileName = removeDefaultSuffix(sfd.selectedNameFilter(), rawFileName, defaultSuffix);
 
-		const auto windowTitle = fileName.endsWith(".mpt")
-			? tr("Save project template")
-			: tr("Save project");
+		const auto windowTitle = fileName.endsWith(".mpt") ? tr("Save project template") : tr("Save project");
 		if (!VersionedSaveDialog::checkOverwrite(fileName, windowTitle))
 		{
 			return false;
@@ -1648,8 +1645,8 @@ void MainWindow::MovableQMdiArea::mouseReleaseEvent(QMouseEvent* event)
 	m_isBeingMoved = false;
 }
 
-static QString removeDefaultSuffix(const QString& selectedNameFilter,
-	const QString& rawFileName, const QString& defaultSuffix)
+static QString removeDefaultSuffix(const QString& selectedNameFilter, const QString& rawFileName,
+	const QString& defaultSuffix)
 {
 	int stx = selectedNameFilter.indexOf("(*.");
 	int etx = selectedNameFilter.indexOf(")");
@@ -1660,8 +1657,7 @@ static QString removeDefaultSuffix(const QString& selectedNameFilter,
 	{
 		// Get first extension from selected dropdown.
 		// i.e. ".wav" from "WAV-File (*.wav), Dummy-File (*.dum)"
-		QString selectedSuffix = selectedNameFilter.mid(stx + 2, etx - stx - 2)
-			.split(" ")[0].trimmed();
+		QString selectedSuffix = selectedNameFilter.mid(stx + 2, etx - stx - 2).split(" ")[0].trimmed();
 
 		Qt::CaseSensitivity cs = Qt::CaseSensitive;
 #if defined(LMMS_BUILD_APPLE) || defined(LMMS_BUILD_WIN32)
