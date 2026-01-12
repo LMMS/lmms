@@ -18,8 +18,14 @@ SfzRegionPlayState::SfzRegionPlayState(const SfzRegion* region, const SfzTrigger
 	, m_trigger(trigger)
 	, m_region(region)
 {
+	const float sampleRate = Engine::audioEngine()->outputSampleRate();
 	// Delay the start of the playback by the trigger offset
 	m_frameCount -= trigger.frameOffset();
+	// And by the delay opcode in seconds
+	m_frameCount -= region->m_delay * sampleRate;
+	// And any random delay amount
+	m_frameCount -= fastRand(1.0f) * region->m_delay_random * sampleRate;
+
 	// Set initial sample start frame offset
 	m_sampleFrame += m_region->m_offset;
 

@@ -39,7 +39,7 @@ private:
 	//! Stores whether the note has been released yet
 	bool m_released = false;
 
-	//! The number of frames since the start of the sound. This may be negative if a note starts partway through a buffer.
+	//! The number of frames since the start of the sound. This may be negative if the region has delay or the note starts partway through a buffer.
 	int m_frameCount = 0;
 	//! The frame at which the note was released, relative to the start of the note
 	int m_releaseFrame = 0;

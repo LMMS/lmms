@@ -70,6 +70,12 @@ public:
 	};
 	LoopMode m_loop_mode = LoopMode::NoLoop;
 
+	//
+	// Delay
+	//
+	float m_delay = 0; // In seconds
+	float m_delay_random = 0;
+
 
 	//
 	// Pitch

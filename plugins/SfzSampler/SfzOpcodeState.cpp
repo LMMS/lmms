@@ -129,6 +129,19 @@ bool SfzOpcodeState::setOpcodeByStrings(const QString& name, const QString& valu
 
 
 	//
+	// Delay
+	//
+	else if (name == "delay")
+	{
+		m_delay = value.toFloat(&successful);
+	}
+	else if (name == "delay_random")
+	{
+		m_delay_random = value.toFloat(&successful);
+	}
+
+
+	//
 	// Pitch
 	//
 	else if (name == "tune")

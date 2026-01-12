@@ -31,7 +31,7 @@ const SfzTrigger SfzTrigger::controlChangeEvent(const int frameOffset, const int
 	trigger.m_type = Type::ControlChange;
 	trigger.m_controlChangeNumber = controlNumber;
 	trigger.m_controlChangeValue = value;
-	trigger.m_frameOffset = frameOffset; // Frame offset is ignored for CC events, since making them sample-exact would be inconvenient
+	trigger.m_frameOffset = frameOffset; // Frame offset is not currently for CC events, since making them sample-exact would be inconvenient
 	return trigger;
 }
 
