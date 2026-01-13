@@ -25,6 +25,8 @@
 #ifndef LMMS_GRID_VIEW_H
 #define LMMS_GRID_VIEW_H
 
+#include <set>
+
 #include <QWidget>
 #include <QPointF>
 
@@ -81,19 +83,22 @@ protected:
 	void drawGrid(QPainter& painter);
 	//! transforms a given y coord with the cubeWidth / cubeHeight ratio
 	float transformYToScreen(float yCoord); // TODO
+	QPointF toModelCoords(QPoint viewPos) const;
+	QPointF toModelCoords(QPointF viewPos) const;
+	QPoint toViewCoords(QPointF modelPos) const;
 
 	//*** selection logic ***
 	//! selects everything between `start` and `end`
 	//! uses getBoundingBox's center for bounds checking
 	//! @param offset: how before start.x should we start searching
-	std::set<size_t>&& select(QPointF start, QPointF end, float offset);
+	std::set<size_t> select(QPointF start, QPointF end, float offset);
 	QPointF getBoundingBoxCenter(size_t index) const;
 	QPointF getBoundingBoxCenter(QPointF start, QPointF end) const;
 	//! should return the start coords and the end coords of an object / note / point
 	virtual std::pair<QPointF, QPointF> getBoundingBox(size_t index) const = 0;
 	//! use `select()` to apply selection automatically
 	//! if your widget doesn't work with points, then you can offset `start` or `end` and use `select()` on that
-	virtual std::set<size_t>&& getSelection(QPointF start, QPointF end) { return select(start, end, 0.0); }
+	virtual std::set<size_t> getSelection(QPointF start, QPointF end) { return select(start, end, 0.0); }
 	//! @return model->getCount() if failed else closest index
 	size_t getClosest(const std::set<size_t>& selection, QPointF point);
 	std::set<size_t> m_selection;
@@ -126,8 +131,9 @@ public:
 	VectorGraphView(QWidget* parent, size_t cubeWidth, size_t cubeHeight);
 protected:
 	void paintEvent(QPaintEvent* pe) override;
+	void mousePressEvent(QMouseEvent* me) override;
 	std::pair<QPointF, QPointF> getBoundingBox(size_t index) const override;
-	std::set<size_t>&& getSelection(QPointF start, QPointF end) override;
+	std::set<size_t> getSelection(QPointF start, QPointF end) override;
 };
 
 } // namespace lmms::gui

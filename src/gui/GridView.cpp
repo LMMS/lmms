@@ -28,6 +28,7 @@
 #include "stdio.h" // TODO remove
 #include <QDebug> // TODO remove
 
+#include <QMouseEvent>
 #include <QPainter>
 
 namespace lmms::gui
@@ -191,6 +192,21 @@ void GridView::drawGrid(QPainter& painter)
 			painter.drawLine(i * cubeWidth, borderWidth, i * cubeWidth, height() - 1 - borderWidth);
 	}
 }
+QPointF GridView::toModelCoords(QPoint viewPos) const
+{
+	constexpr int borderWidth{1};
+	return QPointF(static_cast<float>(viewPos.x() - borderWidth) / m_cubeWidth, static_cast<float>(viewPos.y() - borderWidth) / m_cubeHeight);
+}
+QPointF GridView::toModelCoords(QPointF viewPos) const
+{
+	constexpr int borderWidth{1};
+	return QPointF(static_cast<float>(viewPos.x() - borderWidth) / m_cubeWidth, static_cast<float>(viewPos.y() - borderWidth) / m_cubeHeight);
+}
+QPoint GridView::toViewCoords(QPointF modelPos) const
+{
+	constexpr int borderWidth{1};
+	return QPoint(static_cast<int>(modelPos.x() * m_cubeWidth) + borderWidth, static_cast<int>(modelPos.y() * m_cubeHeight) + borderWidth);
+}
 
 QPointF GridView::getBoundingBoxCenter(size_t index) const
 {
@@ -203,7 +219,7 @@ QPointF GridView::getBoundingBoxCenter(QPointF start, QPointF end) const
 	return QPointF{(start.x() + end.x()) / 2.0f, (start.y() + end.y()) / 2.0f};
 }
 
-std::set<size_t>&& GridView::select(QPointF start, QPointF end, float offset)
+std::set<size_t> GridView::select(QPointF start, QPointF end, float offset)
 {
 	std::set<size_t> output{};
 	size_t startIndex = model()->findIndex(start.x() - offset);
@@ -218,7 +234,7 @@ std::set<size_t>&& GridView::select(QPointF start, QPointF end, float offset)
 			output.insert(i);
 		}
 	}
-	return std::move(output);
+	return output;
 }
 void GridView::updateSelection()
 {
@@ -271,12 +287,12 @@ VectorGraphView::VectorGraphView(QWidget* parent, size_t cubeWidth, size_t cubeH
 
 std::pair<QPointF, QPointF> VectorGraphView::getBoundingBox(size_t index) const
 {
-	float radius{castModel<VectorGraphModel>()->getObject(index).isBezierHandle ? 0.5 : 0.5};
+	float radius{castModel<VectorGraphModel>()->getObject(index).isBezierHandle ? 0.5f : 0.5f};
 	GridModel::ItemInfo coords{castModel<VectorGraphModel>()->getItem(index).info};
 	return std::make_pair(QPointF{coords.x - radius, coords.y - radius}, QPointF{coords.x + radius, coords.y + radius});
 }
 
-std::set<size_t>&& VectorGraphView::getSelection(QPointF start, QPointF end)
+std::set<size_t> VectorGraphView::getSelection(QPointF start, QPointF end)
 {
 	return GridView::select(start, end, 0.5);
 }
@@ -285,6 +301,37 @@ void VectorGraphView::paintEvent(QPaintEvent* pe)
 {
 	QPainter painter(this);
 	drawGrid(painter);
+
+	QColor pointC{60, 223, 110};
+	painter.setPen(pointC);
+
+	for (size_t i = 0; i < model()->getCount(); i = model()->getNextItem(i))
+	{
+		auto curXY{toViewCoords(QPointF{model()->getItem(i).info.x, model()->getItem(i).info.y})};
+		painter.drawEllipse(curXY, 5, 5);
+	}
+}
+
+void VectorGraphView::mousePressEvent(QMouseEvent* me)
+{
+	const auto mousePos{me->pos()};
+	//QPointF mousePos{position(me)};
+	QPointF modelPos(toModelCoords(mousePos));
+
+	auto graphModel{castModel<VectorGraphModel>()};
+
+	if (me->button() == Qt::LeftButton)
+	{
+		graphModel->addItem(VGPoint{0.0f, 0.0f, false}, GridModel::ItemInfo(modelPos.x(), modelPos.y()));
+	}
+	else
+	{
+		int index{graphModel->findIndexFromPos(modelPos.x(), 0.5)};
+		if (index >= 0)
+		{
+			graphModel->removeItem(index);
+		}
+	}
 }
 
 } // namespace lmms::gui
