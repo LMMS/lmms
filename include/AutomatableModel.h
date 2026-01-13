@@ -220,6 +220,11 @@ public:
 		setValue( m_value + steps * m_step );
 	}
 
+	void addValue(float amount)
+	{
+		setValue(m_value + amount);
+	}
+
 	float range() const
 	{
 		return m_range;
