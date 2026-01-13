@@ -516,6 +516,21 @@ void FileBrowserTreeWidget::scrollTo(const QModelIndex &index, ScrollHint hint)
 	horizontalScrollBar()->setValue(barPos);
 }
 
+void FileBrowserTreeWidget::wheelEvent(QWheelEvent * event)
+{
+	// When shift is pressed, scroll horizontally instead of vertically
+	if (event->modifiers() & Qt::ShiftModifier)
+	{
+		horizontalScrollBar()->setValue(
+			horizontalScrollBar()->value() - event->angleDelta().y());
+		event->accept();
+	}
+	else
+	{
+		QTreeWidget::wheelEvent(event);
+	}
+}
+
 void FileBrowserTreeWidget::keyPressEvent(QKeyEvent * ke )
 {
 	// Shorter names for some commonly used properties of the event
