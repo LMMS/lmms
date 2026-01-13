@@ -25,9 +25,10 @@
 #ifndef LMMS_GRID_MODEl_H
 #define LMMS_GRID_MODEl_H
 
-#include <set>
 #include <memory> // shared_ptr
 #include <vector>
+
+#include "stdio.h" // TODO remove
 
 #include "Model.h"
 
@@ -53,7 +54,7 @@ public:
 	struct Item
 	{
 		ItemInfo info;
-		void* object;
+		size_t objectIndex;
 	};
 
 	//*** util ***
@@ -88,20 +89,21 @@ protected:
 	//! @return index if found, -1 if not
 	int findObject(void* object) const;
 	//! @return the index where [index - 1].x < xPos and xPos <= [index].x
-	//! so return the first index where xPos <= x
+	//! so return the first index where xPos <= x (this index can be the size)
 	size_t findIndex(float xPos) const;
 
 	//! @return index where added
 	size_t addItem(Item itemIn);
 	void removeItem(size_t index);
 	//! DOESN'T EMIT
-	void** getAndSetObject(size_t index);
+	size_t& getAndSetObjectIndex(size_t index);
 private:
 	//! only call these with fitted values (`fitPos`)
 	//! @return new / final index (if x changed)
 	size_t setX(size_t index, float newX);
 	void setY(size_t index, float newY);
 	float fitPos(float position, unsigned int max, unsigned int steps) const;
+	void move(size_t startIndex, size_t finalIndex);
 
 	unsigned int m_length;
 	unsigned int m_height;
@@ -125,35 +127,32 @@ public:
 		: GridModel{length, height, horizontalSteps, verticalSteps, parent, displayName, defaultConstructed} {}
 	~GridModelTyped() = default;
 
-	//! @return index if found, -1 if not
-	int findObject(T* object) const { return GridModel::findObject(object); }
-	const T& getObject(size_t index) const { return *static_cast<const T*>(GridModel::getItem(index).object); }
+
+	const T& getObject(size_t index) const { return m_TInstances[GridModel::getItem(index).objectIndex]; }
 
 	//! @return index where added
 	size_t addItem(T object, ItemInfo info)
 	{
 		m_TInstances.push_back(object);
-		return GridModel::addItem(Item{info, &m_TInstances[m_TInstances.size() - 1]});
+		return GridModel::addItem(Item{info, m_TInstances.size() - 1});
 	}
 	void removeItem(size_t index)
 	{
-		T* instance{static_cast<T*>(*GridModel::getAndSetObject(index))};
-		// removing the Item (object* + coords pair)
-		GridModel::removeItem(index);
-		// removing the instance
-		const T* back{&m_TInstances.back()};
-		for (T* it = instance; it != back; ++it)
-		{
-			*it = *(it + 1);
-		}
-		// now everything needs to be offset
+		size_t instanceIndex{GridModel::getItem(index).objectIndex};
+		// the stored indexes need to be offset after removing (doing it before because of signals)
 		for (size_t i = 0; i < getCount(); ++i)
 		{
-			T** curPtr{static_cast<T**>(GridModel::getAndSetObject(i))};
-			if (*curPtr > instance) { --(*curPtr); }
+			size_t& storedIndex{GridModel::getAndSetObjectIndex(i)};
+			if (storedIndex > instanceIndex) { --storedIndex; }
 		}
-		// actually removing the instance
+		// removing the instance
+		for (size_t i = instanceIndex; i < m_TInstances.size(); ++i)
+		{
+			m_TInstances[i] = m_TInstances[i + 1];
+		}
 		m_TInstances.pop_back();
+		// removing the Item (object* + coords pair)
+		GridModel::removeItem(index);
 	}
 };
 

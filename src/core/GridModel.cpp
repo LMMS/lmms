@@ -43,17 +43,6 @@ GridModel::GridModel(unsigned int length, unsigned int height, unsigned int hori
 GridModel::~GridModel()
 {}
 
-int GridModel::findObject(void* object) const
-{
-	for (size_t i{0}; i < m_items.size(); ++i)
-	{
-		if (m_items[i].object == object)
-		{
-			return i;
-		}
-	}
-	return -1;
-}
 int GridModel::findIndexFromPos(float xPos, float radius) const
 {
 	size_t output = findIndex(xPos);
@@ -72,7 +61,7 @@ size_t GridModel::findIndex(float xPos) const
 {
 	// binary search
 	int low = 0;
-	int high = m_items.size() - 2;
+	int high = m_items.size();
 	int mid = 0;
 	// if the target is smaller
 	bool isSmaller = false;
@@ -80,9 +69,11 @@ size_t GridModel::findIndex(float xPos) const
 	{
         mid = ((high - low) / 2) + low;
 
-        if (m_items[mid].info.x < xPos && xPos <= m_items[mid + 1].info.x)
+        // DO NOT CHANGE
+        if (static_cast<size_t>(mid) >= m_items.size()
+			|| (xPos <= m_items[mid].info.x && (mid == 0 || m_items[mid - 1].info.x < xPos)))
 		{
-			return mid;
+			break;
 		}
 		isSmaller = xPos <= m_items[mid].info.x;
         if (isSmaller)
@@ -94,27 +85,44 @@ size_t GridModel::findIndex(float xPos) const
             low = mid + 1;
 		}
     }
-
-	assert(static_cast<size_t>(mid) + 1 < m_items.size());
-	assert(m_items[mid].info.x < xPos);
-	assert(m_items[mid + 1].info.x > xPos);
-	assert(m_items[m_items.size() - 1].info.x < xPos && static_cast<size_t>(mid + 1) == m_items.size());
-  	
-  	return mid + 1;
+#ifdef NDEBUG
+	// asserts:
+	printf("findIndex: pos: %f, mid: %d, low: %d, high: %d\n", xPos, mid, low, high);
+	if (mid >= m_items.size())
+	{
+		if (m_items.size() > 0)
+		{
+			assert(xPos > m_items[m_items.size() - 1].info.x);
+		}
+	}
+	else
+	{
+		printf("assert(m_items[%d].info.x = %f >= xPos %f)\n", mid, m_items[mid].info.x, xPos);
+		assert(m_items[mid].info.x >= xPos);
+		if (mid > 0)
+		{
+			assert(m_items[mid - 1].info.x < xPos);
+		}
+	}
+#endif
+  	return mid;
 }
 
 size_t GridModel::addItem(GridModel::Item itemIn)
 {
+	//printf("addItem at %f %ld\n", itemIn.info.x, itemIn.objectIndex);
+	/*
+	for (size_t i = 0; i < m_items.size(); ++i)
+	{
+		printf("item[%ld] = %f\n", i, m_items[i].info.x);
+	}
+	*/
+
 	size_t foundIndex{findIndex(itemIn.info.x)};
 	m_items.push_back(itemIn);
-	if (foundIndex < m_items.size())
+	if (foundIndex + 1 < m_items.size())
 	{
-		for (size_t i{m_items.size() - 2}; --i > foundIndex;)
-		{
-			printf("adding: swap: [%ld + 1] = [%ld] found index = %ld\n", i, i, foundIndex);
-			m_items[i + 1] = m_items[i];
-		}
-		m_items[foundIndex] = itemIn;
+		move(m_items.size() - 1, foundIndex);
 	}
 	emit dataChangedAt(foundIndex);
 	emit dataChanged();
@@ -123,43 +131,48 @@ size_t GridModel::addItem(GridModel::Item itemIn)
 
 void GridModel::removeItem(size_t index)
 {
-	for (size_t i{index}; i + 1 < m_items.size(); ++i)
-	{
-		m_items[i] = m_items[i + 1];
-	}
+	//printf("removeItem: %d\n", index);
+	move(index, m_items.size() - 1);
+	m_items.pop_back();
 	emit dataChangedAt(index);
 	emit dataChanged();
-	m_items.pop_back();
 }
 
-void** GridModel::getAndSetObject(size_t index)
+void GridModel::move(size_t startIndex, size_t finalIndex)
+{
+	auto itemData{m_items[startIndex]};
+	if (startIndex > finalIndex)
+	{
+		for (size_t i = startIndex; i > finalIndex; --i)
+		{
+			m_items[i] = m_items[i - 1];
+		}
+	}
+	else
+	{
+		for (size_t i = startIndex; i < finalIndex; ++i)
+		{
+			m_items[i] = m_items[i + 1];
+		}
+	}
+	m_items[finalIndex] = itemData;
+}
+
+size_t& GridModel::getAndSetObjectIndex(size_t index)
 {
 	assert(index < m_items.size());
-	return &m_items[index].object;
+	return m_items[index].objectIndex;
 }
 
 size_t GridModel::setX(size_t index, float newX)
 {
 	size_t foundIndex{findIndex(newX)};
 	m_items[index].info.x = newX;
-	size_t minIndex{0};
-	size_t maxIndex{0};
-	if (foundIndex < index)
+	if (foundIndex > index)
 	{
-		minIndex = foundIndex;
-		maxIndex = index;
+		foundIndex -= 1;
 	}
-	else
-	{
-		minIndex = index;
-		maxIndex = foundIndex;
-	}
-	for (size_t i{minIndex}; i < maxIndex; ++i)
-	{
-		Item swap = m_items[i];
-		m_items[i] = m_items[i + 1];
-		m_items[i + 1] = swap;
-	}
+	move(index, foundIndex);
 	emit dataChangedAt(index);
 	emit dataChangedAt(foundIndex);
 	emit dataChanged();
