@@ -154,11 +154,13 @@ void SfzSamplerView::paintEvent(QPaintEvent* pe)
 	brush.fillRect(rect(), QColor(19, 19, 20));
 }
 
+
 void SfzSidebarWidget::paintEvent(QPaintEvent* pe)
 {
 	QPainter brush(this);
 	brush.fillRect(rect(), QColor(19, 19, 20));
 }
+
 
 void SfzControlsWidget::paintEvent(QPaintEvent* pe)
 {
@@ -166,11 +168,31 @@ void SfzControlsWidget::paintEvent(QPaintEvent* pe)
 	brush.fillRect(rect(), QColor(19, 19, 20));
 }
 
+
 void SfzPianoWidget::paintEvent(QPaintEvent* pe)
 {
 	QPainter brush(this);
 	brush.fillRect(rect(), QColor(72, 72, 75));
+
+	brush.setPen(QPen(QColor(47, 54, 94), 1));
+	for (int key = 0; key < 128; ++key)
+	{
+		bool isBlack = false;
+		if (key % 12 == 1 || key % 12 == 3 || key % 12 == 6 || key % 12 == 8 || key % 12 == 10) { isBlack = true; }
+		if (isBlack)
+		{
+			QRect noteRect(key * width() / 128.0f, 0, width() / 128.0f, height() / 2);
+			brush.drawRect(noteRect);
+			brush.fillRect(noteRect, QColor(22, 22, 25));
+			brush.drawLine((key + 0.5f) * width() / 128.0f, height() / 2, (key + 0.5f) * width() / 128.0f, height());
+		}
+		if (key % 12 == 0 || key % 12 == 5)
+		{
+			brush.drawLine(key * width() / 128.0f, 0, key * width() / 128.0f, height());
+		}
+	}
 }
+
 
 SfzSidebarGroupBox::SfzSidebarGroupBox(QWidget* parent)
 	: QFrame(parent)
