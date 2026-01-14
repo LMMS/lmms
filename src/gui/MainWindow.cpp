@@ -1434,6 +1434,7 @@ void MainWindow::exportProject(bool multiExport)
 	if (multiExport)
 	{
 		efd.setFileMode(FileDialog::Directory);
+		efd.setAcceptMode(FileDialog::AcceptSave);
 		efd.setWindowTitle(tr("Select directory for writing exported tracks..."));
 		if (!projectFileName.isEmpty()) { efd.setDirectory(QFileInfo{projectFileName}.absolutePath()); }
 
