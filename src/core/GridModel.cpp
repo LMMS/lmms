@@ -85,10 +85,9 @@ size_t GridModel::findIndex(float xPos) const
             low = mid + 1;
 		}
     }
-#ifdef NDEBUG
+#ifdef LMMS_DEBUG
 	// asserts:
-	printf("findIndex: pos: %f, mid: %d, low: %d, high: %d\n", xPos, mid, low, high);
-	if (mid >= m_items.size())
+	if (static_cast<size_t>(mid) >= m_items.size())
 	{
 		if (m_items.size() > 0)
 		{
@@ -97,7 +96,6 @@ size_t GridModel::findIndex(float xPos) const
 	}
 	else
 	{
-		printf("assert(m_items[%d].info.x = %f >= xPos %f)\n", mid, m_items[mid].info.x, xPos);
 		assert(m_items[mid].info.x >= xPos);
 		if (mid > 0)
 		{
@@ -194,7 +192,7 @@ size_t GridModel::setInfo(size_t index, const GridModel::ItemInfo& info, unsigne
 	if (newY != m_items[index].info.y) { setY(index, newY); }
 
 	size_t finalIndex{index};
-	float newX = fitPos(info.y, m_length, horizontalSteps);
+	float newX = fitPos(info.x, m_length, horizontalSteps);
 	if (newX != m_items[index].info.x) { finalIndex = setX(index, newX); }
 	return finalIndex;
 }
