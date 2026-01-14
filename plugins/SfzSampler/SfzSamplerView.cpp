@@ -84,6 +84,7 @@ SfzSamplerView::SfzSamplerView(SfzSampler* instrument, QWidget* parent)
 	m_sidebarWidget->setMinimumWidth(s_sidebarMinWidth);
 	m_pianoWidget->setMinimumHeight(s_keyboardAreaMinHeight);
 
+	// Logo at top of sidebar
 	auto logoFrame = new SfzSidebarGroupBox(m_sidebarWidget);
 	auto logoLabel = new QLabel(logoFrame);
 	logoLabel->setPixmap(m_logo);
@@ -92,19 +93,20 @@ SfzSamplerView::SfzSamplerView(SfzSampler* instrument, QWidget* parent)
 	logoFrame->layout()->setContentsMargins(0, 0, 0, 0);
 	logoFrame->layout()->addWidget(logoLabel);
 
-	auto frame1 = new SfzSidebarGroupBox(m_sidebarWidget);
-	auto label1 = new QLabel("Testing1", frame1);
-	frame1->layout()->addWidget(label1);
-
-	auto frame2 = new SfzSidebarGroupBox(m_sidebarWidget);
-	auto label2 = new QLabel("Testing2\nvery long\nwow", frame2);
-	auto label3 = new QLabel("another thing!", frame2);
-	frame2->layout()->addWidget(label2);
-	frame2->layout()->addWidget(label3);
-
-	
 	m_sidebarLayout->addWidget(logoFrame);
 	m_sidebarLayout->addWidget(new SfzDividerLine(this, 2, 8));
+
+	// Setup info labels
+	auto frame1 = new SfzSidebarGroupBox(m_sidebarWidget);
+	m_sfzPathLabel = new QLabel(frame1);
+	frame1->layout()->addWidget(m_sfzPathLabel);
+	m_sampleCountLabel = new QLabel(frame1);
+	frame1->layout()->addWidget(m_sampleCountLabel);
+
+	auto frame2 = new SfzSidebarGroupBox(m_sidebarWidget);
+	m_activeVoiceCountLabel = new QLabel(frame2);
+	frame2->layout()->addWidget(m_activeVoiceCountLabel);
+	
 	m_sidebarLayout->addWidget(frame1);
 	m_sidebarLayout->addWidget(new SfzDividerLine(this, 2, 8));
 	m_sidebarLayout->addWidget(frame2);
@@ -112,36 +114,49 @@ SfzSamplerView::SfzSamplerView(SfzSampler* instrument, QWidget* parent)
 	m_sidebarLayout->addStretch();
 
 
-	m_emptyFileLabel = new QLabel("Drag and drop or click to load SFZ file", m_controlsWidget);
+	m_emptyFileLabel = new QLabel(tr("Drag and drop or click to load SFZ file"), m_controlsWidget);
 	m_emptyFileLabel->setAlignment(Qt::AlignCenter);
 	m_emptyFileLabel->move(s_controlsAreaWidth / 2, s_controlsAreaHeight / 2);
 	m_controlsLayout->addWidget(m_emptyFileLabel, 0, Qt::AlignCenter);
-
-
-	auto openfilebutton = new QPushButton("Open SFZ File", m_pianoWidget);
-	openfilebutton->setIcon(embed::getIconPixmap("folder"));
-	openfilebutton->setToolTip(tr("Open SFZ File"));
-	connect(openfilebutton, &PixmapButton::clicked, [this](){
-		auto openFileDialog = FileDialog(nullptr, QObject::tr("Open SFZ File"));
-		auto dir = ConfigManager::inst()->userSamplesDir();
-		openFileDialog.setDirectory(dir);
-		if (openFileDialog.exec() == QDialog::Accepted)
-		{
-			if (openFileDialog.selectedFiles().isEmpty()) { return; }
-			m_instrument->loadFile(openFileDialog.selectedFiles()[0]);
-		}
-	});
 
 	update();
 }
 
 
+void SfzSamplerView::openFile()
+{
+	auto openFileDialog = FileDialog(nullptr, QObject::tr("Open SFZ File"));
+	auto dir = ConfigManager::inst()->userSamplesDir();
+	openFileDialog.setDirectory(dir);
+	if (openFileDialog.exec() == QDialog::Accepted)
+	{
+		if (openFileDialog.selectedFiles().isEmpty()) { return; }
+		m_instrument->loadFile(openFileDialog.selectedFiles()[0]);
+	}
+}
+
+
 void SfzSamplerView::dragEnterEvent(QDragEnterEvent* dee)
 {
+	QString value = StringPairDrag::decodeValue(dee);
+	if (value.endsWith(".sfz")) 
+	{
+		dee->accept();
+		m_instrument->loadFile(value);
+	}
+	dee->ignore();
 }
 
 void SfzSamplerView::dropEvent(QDropEvent* de)
 {
+	QString value = StringPairDrag::decodeValue(de);
+	if (value.endsWith(".sfz")) 
+	{
+		de->accept();
+		m_instrument->loadFile(value);
+		return;
+	}
+	de->ignore();
 }
 
 void SfzSamplerView::resizeEvent(QResizeEvent* re)
@@ -152,6 +167,13 @@ void SfzSamplerView::paintEvent(QPaintEvent* pe)
 {
 	QPainter brush(this);
 	brush.fillRect(rect(), QColor(19, 19, 20));
+
+	// Update info labels
+	m_sfzPathLabel->setText(tr("Loaded File: %1").arg("todo"));
+
+	m_sampleCountLabel->setText(tr("Sample Count: %1").arg("123"));
+
+	m_activeVoiceCountLabel->setText(tr("Active Voices: %1").arg("3"));
 }
 
 
@@ -161,6 +183,11 @@ void SfzSidebarWidget::paintEvent(QPaintEvent* pe)
 	brush.fillRect(rect(), QColor(19, 19, 20));
 }
 
+
+void SfzControlsWidget::mousePressEvent(QMouseEvent* pe)
+{
+	static_cast<SfzSamplerView*>(parent())->openFile();
+}
 
 void SfzControlsWidget::paintEvent(QPaintEvent* pe)
 {

@@ -1028,6 +1028,10 @@ lmms--gui--SlicerTView lmms--gui--Knob {
 	qproperty-lineWidth: 3;
 }
 
+lmms--gui--SfzSamplerView QLabel {
+	font: 10pt;
+}
+
 lmms--gui--WatsynView lmms--gui--Knob {
 	qproperty-innerRadius: 1;
 	qproperty-outerRadius: 7;

@@ -50,6 +50,7 @@ class SfzControlsWidget : public QWidget
 public:
 	using QWidget::QWidget;
 protected:
+	void mousePressEvent(QMouseEvent* pe) override;
 	void paintEvent(QPaintEvent* pe) override;
 };
 
@@ -104,6 +105,9 @@ public:
 
 	static constexpr int s_keyboardAreaMinHeight = 50;
 
+public slots:
+	void openFile();
+
 protected:
 	void dragEnterEvent(QDragEnterEvent* dee) override;
 	void dropEvent(QDropEvent* de) override;
@@ -127,6 +131,12 @@ private:
 	QBoxLayout* m_controlsLayout;
 
 	QVBoxLayout* m_sidebarLayout;
+
+	QLabel* m_sfzPathLabel;
+	QLabel* m_sampleCountLabel;
+
+	QLabel* m_activeVoiceCountLabel;
+
 
 	QLabel* m_emptyFileLabel;
 };
