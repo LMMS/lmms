@@ -39,18 +39,19 @@ GridView::GridView(QWidget* parent, GridModel* model, size_t cubeWidth, size_t c
 	, ModelView{model, this}
 	, m_selection{}
 	, m_isSelectionPressed{false}
-	, m_isNearestPressed{false}
+	, m_mouseAction{}
 	, m_selectStartOld{}
 	, m_selectEndOld{}
 	, m_selectStart{}
 	, m_selectEnd{}
-	, m_cursorStart{}
-	, m_cursorEnd{}
+	, m_cursorPos{}
 	, m_cubeWidth{cubeWidth}
 	, m_cubeHeight{cubeHeight}
 	, m_isSizeStatic{true}
 	, m_gridHighlightMod{5}
 {
+	// if the widget is clicked, gain keyboard focus
+	setFocusPolicy(Qt::ClickFocus);
 	//QT's resize
 	if (model != nullptr)
 	{
@@ -68,8 +69,7 @@ void GridView::moveToWhole(unsigned int x, unsigned int y)
 }
 void GridView::containSelection(QPointF start, QPointF end)
 {
-	m_cursorStart = start;
-	m_cursorEnd = end;
+	m_cursorPos = getBoundingBoxCenter(start, end);
 	if (m_isSelectionPressed)
 	{
 		m_selectStart.setX(std::min(start.x(), m_selectStartOld.x()));
@@ -85,46 +85,61 @@ void GridView::containSelection(QPointF start, QPointF end)
 		m_selectStart = m_selectStartOld;
 		m_selectEnd = m_selectEndOld;
 	}
+	// the selection changed, so reset the current selection
+	m_selection.clear();
 }
 void GridView::moveToNearest(MoveDir dir)
 {
 	QPointF start{};
 	QPointF end{};
-	QPointF target{};
 	// at first we will get a bounding box where we will search for the closest thing
 	switch (dir)
 	{
-		case right:
-			start = QPointF(m_selectEnd.x(), m_selectStart.y());
-			end = QPointF(std::ceil(m_selectEnd.x()) + 1.0f, m_selectEnd.y());
-			target = QPointF(m_selectEnd.x(), (m_selectStart.y() + m_selectEnd.y()) / 2.0f);
+		case right: // positive dir
+			start = QPointF(m_cursorPos.x(), std::floor(m_cursorPos.y()));
+			end = QPointF(m_cursorPos.x() + 1.0f, std::floor(m_cursorPos.y()) + 1.0f);
 			break;
 		case left:
-			start = QPointF(std::floor(m_selectStart.x() - 1.0f), m_selectStart.y());
-			end = QPointF(m_selectStart.x(), m_selectEnd.y());
-			target = QPointF(m_selectStart.x(), (m_selectStart.y() + m_selectEnd.y()) / 2.0f);
+			start = QPointF(m_cursorPos.x() - 1.0f, std::floor(m_cursorPos.y()));
+			end = QPointF(m_cursorPos.x(), std::floor(m_cursorPos.y()) + 1.0f);
 			break;
-		case up:
-			start = QPointF(m_selectStart.x(), std::ceil(m_selectEnd.y()) + 1.0f);
-			end = QPointF(m_selectEnd.x(), m_selectStart.y());
-			target = QPointF((m_selectStart.x() + m_selectEnd.x()) / 2.0f, m_selectEnd.y());
+		case up: // positive dir
+			start = QPointF(std::floor(m_cursorPos.x()), m_cursorPos.y());
+			end = QPointF(std::floor(m_cursorPos.x()) + 1.0f, m_cursorPos.y() + 1.0f);
 			break;
 		case down:
-			start = QPointF(m_selectStart.x(), m_selectEnd.y());
-			end = QPointF(m_selectEnd.x(), std::floor(m_selectStart.x()) - 1.0f);
-			target = QPointF(m_selectEnd.x(), (m_selectStart.y() + m_selectEnd.y()) / 2.0f);
-			target = QPointF((m_selectStart.x() + m_selectEnd.x()) / 2.0f, m_selectStart.y());
+			start = QPointF(std::floor(m_cursorPos.x()), m_cursorPos.y() - 1.0f);
+			end = QPointF(std::floor(m_cursorPos.x()) + 1.0f, m_cursorPos.y());
 			break;
 	}
+	assert(start.x() < end.x());
+	assert(start.y() < end.y());
 	// this is inefficient for left and right, in those cases our data is sorted so we could break
 	// this is done to ensure compatibility with the classes that inherit this:
 	// in the case of notes we can't estimate the first X coord
 	std::set<size_t> searchBuffer{getSelection(start, end)};
 	// this is slightly inefficient because we can compare less bytes of data knowing `dir`
-	size_t closestIndex{getClosest(searchBuffer, target)};
+	size_t closestIndex{getClosest(searchBuffer, m_cursorPos)};
 	if (closestIndex >= model()->getCount())
 	{
-		containSelection(start, end);
+		unsigned int moveX{static_cast<unsigned int>(m_cursorPos.x())};
+		unsigned int moveY{static_cast<unsigned int>(m_cursorPos.y())};
+		switch (dir)
+		{
+			case right:
+				moveX += moveX + 1 < model()->getLength() ? 1 : 0;
+				break;
+			case left:
+				moveX -= moveX > 0 ? 1 : 0;
+				break;
+			case up:
+				moveY += moveY + 1 < model()->getHeight() ? 1 : 0;
+				break;
+			case down:
+				moveY -= moveY > 0 ? 1 : 0;
+				break;
+		}
+		moveToWhole(moveX, moveY);
 	}
 	else
 	{
@@ -137,6 +152,38 @@ void GridView::paintEvent(QPaintEvent* pe)
 {
 	QPainter painter(this);
 	drawGrid(painter);
+	drawSelection(painter);
+}
+void GridView::keyPressEvent(QKeyEvent* ke)
+{
+	m_isSelectionPressed = ke->modifiers() & Qt::ShiftModifier;
+	switch (ke->key())
+	{
+		case Qt::Key_Home:
+		case Qt::Key_Up:
+			moveToNearest(GridView::MoveDir::up);
+			ke->accept();
+			break;
+		case Qt::Key_Delete:
+		case Qt::Key_Down:
+			moveToNearest(GridView::MoveDir::down);
+			ke->accept();
+			break;
+		case Qt::Key_End:
+		case Qt::Key_Left:
+			moveToNearest(GridView::MoveDir::left);
+			ke->accept();
+			break;
+		case Qt::Key_PageDown:
+		case Qt::Key_Right:
+			moveToNearest(GridView::MoveDir::right);
+			ke->accept();
+			break;
+		default:
+			ke->ignore();
+			break;
+	}
+	update();
 }
 
 void GridView::drawGrid(QPainter& painter)
@@ -192,20 +239,36 @@ void GridView::drawGrid(QPainter& painter)
 			painter.drawLine(i * cubeWidth, borderWidth, i * cubeWidth, height() - 1 - borderWidth);
 	}
 }
+void GridView::drawSelection(QPainter& painter)
+{
+	QColor selectionBorderC{40, 255, 70};
+
+	if (m_selectStart != m_selectEnd)
+	{
+		QPoint selectStart{toViewCoords(m_selectStart)};
+		QPoint selectEnd{toViewCoords(m_selectEnd)};
+		QPoint cursorPos{toViewCoords(m_cursorPos)};
+
+		painter.setPen(selectionBorderC);
+		painter.drawRect(selectStart.x(), selectStart.y(), selectEnd.x() - selectStart.x(), selectEnd.y() - selectStart.y());
+		painter.drawLine(cursorPos.x() - 1, cursorPos.y(), cursorPos.x() + 1, cursorPos.y());
+		painter.drawLine(cursorPos.x(), cursorPos.y() - 1, cursorPos.x(), cursorPos.y() + 1);
+	}
+}
 QPointF GridView::toModelCoords(QPoint viewPos) const
 {
 	constexpr int borderWidth{1};
-	return QPointF(static_cast<float>(viewPos.x() - borderWidth) / m_cubeWidth, static_cast<float>(viewPos.y() - borderWidth) / m_cubeHeight);
+	return QPointF(static_cast<float>(viewPos.x() - borderWidth) / m_cubeWidth, -static_cast<float>(viewPos.y() - borderWidth) / m_cubeHeight + model()->getHeight());
 }
 QPointF GridView::toModelCoords(QPointF viewPos) const
 {
 	constexpr int borderWidth{1};
-	return QPointF(static_cast<float>(viewPos.x() - borderWidth) / m_cubeWidth, static_cast<float>(viewPos.y() - borderWidth) / m_cubeHeight);
+	return QPointF(static_cast<float>(viewPos.x() - borderWidth) / m_cubeWidth, -static_cast<float>(viewPos.y() - borderWidth) / m_cubeHeight + model()->getHeight());
 }
 QPoint GridView::toViewCoords(QPointF modelPos) const
 {
 	constexpr int borderWidth{1};
-	return QPoint(static_cast<int>(modelPos.x() * m_cubeWidth) + borderWidth, static_cast<int>(modelPos.y() * m_cubeHeight) + borderWidth);
+	return QPoint(static_cast<int>(modelPos.x() * m_cubeWidth) + borderWidth, static_cast<int>(-(modelPos.y() - model()->getHeight()) * m_cubeHeight) + borderWidth);
 }
 
 QPointF GridView::getBoundingBoxCenter(size_t index) const
@@ -223,13 +286,13 @@ std::set<size_t> GridView::select(QPointF start, QPointF end, float offset)
 {
 	std::set<size_t> output{};
 	size_t startIndex = model()->findIndex(start.x() - offset);
-	for (size_t i = startIndex; i < model()->getCount(); i = model()->getNextItem(i))
+	for (size_t i = startIndex; i < model()->getCount(); ++i)
 	{
 		auto bb{getBoundingBox(i)};
 		QPointF curCenter{getBoundingBoxCenter(bb.first, bb.second)};
-		// if the current start.x > end.x
-		if (bb.first.x() > end.x()) { break; }
-		if (curCenter.x() > start.x() && start.y() < curCenter.y() && curCenter.y() > end.y())
+		// if curStart.x > end.x (assumption: bb.first.x is smaller than center.x)
+		if (end.x() <= bb.first.x()) { break; }
+		if (start.x() < curCenter.x() && curCenter.x() < end.x() && start.y() < curCenter.y() && curCenter.y() < end.y())
 		{
 			output.insert(i);
 		}
@@ -238,7 +301,41 @@ std::set<size_t> GridView::select(QPointF start, QPointF end, float offset)
 }
 void GridView::updateSelection()
 {
-	m_selection = getSelection(m_selectStart, m_selectEnd);
+	if (m_selectStart != m_selectEnd)
+	{
+		if (m_selection.empty()) { m_selection = getSelection(m_selectStart, m_selectEnd); }
+	}
+	else
+	{
+		m_selection.clear();
+	}
+}
+void GridView::selectionMoveAction(QPointF offset)
+{
+	updateSelection();
+	if (m_selection.empty()) { return; }
+	if (offset.x() > 0)
+	{
+		for (auto it = m_selection.rbegin(); it != m_selection.rend(); ++it)
+		{
+			GridModel::ItemInfo curInfo{model()->getItem(*it).info};
+			size_t newIndex{model()->setInfo(*it, GridModel::ItemInfo{
+				curInfo.x + static_cast<float>(offset.x()),
+				curInfo.y + static_cast<float>(offset.y())})};
+			if (newIndex != *it) { m_selection.erase(*it); m_selection.insert(newIndex); }
+		}
+	}
+	else
+	{
+		for (auto it = m_selection.begin(); it != m_selection.end(); ++it)
+		{
+			GridModel::ItemInfo curInfo{model()->getItem(*it).info};
+			size_t newIndex{model()->setInfo(*it, GridModel::ItemInfo{
+				curInfo.x + static_cast<float>(offset.x()),
+				curInfo.y + static_cast<float>(offset.y())})};
+			if (newIndex != *it) { m_selection.erase(*it); m_selection.insert(newIndex); }
+		}
+	}
 }
 size_t GridView::getClosest(const std::set<size_t>& selection, QPointF point)
 {
@@ -294,7 +391,7 @@ std::pair<QPointF, QPointF> VectorGraphView::getBoundingBox(size_t index) const
 
 std::set<size_t> VectorGraphView::getSelection(QPointF start, QPointF end)
 {
-	return GridView::select(start, end, 0.5);
+	return GridView::select(start, end, 0.0f);
 }
 
 void VectorGraphView::paintEvent(QPaintEvent* pe)
@@ -305,32 +402,119 @@ void VectorGraphView::paintEvent(QPaintEvent* pe)
 	QColor pointC{60, 223, 110};
 	painter.setPen(pointC);
 
-	for (size_t i = 0; i < model()->getCount(); i = model()->getNextItem(i))
+	for (size_t i = 0; i < model()->getCount(); ++i)
 	{
 		auto curXY{toViewCoords(QPointF{model()->getItem(i).info.x, model()->getItem(i).info.y})};
 		painter.drawEllipse(curXY, 5, 5);
 	}
+
+	drawSelection(painter);
 }
 
 void VectorGraphView::mousePressEvent(QMouseEvent* me)
 {
 	const auto mousePos{me->pos()};
-	//QPointF mousePos{position(me)};
 	QPointF modelPos(toModelCoords(mousePos));
 
 	auto graphModel{castModel<VectorGraphModel>()};
 
+	m_isSelectionPressed = false;
 	if (me->button() == Qt::LeftButton)
 	{
-		graphModel->addItem(VGPoint{0.0f, 0.0f, false}, GridModel::ItemInfo(modelPos.x(), modelPos.y()));
+		if (me->modifiers() & Qt::ControlModifier)
+		{
+			// select
+			m_mouseAction = GridView::MouseAction::selectAction;
+			GridView::containSelection(modelPos, modelPos);
+			m_isSelectionPressed = true;
+		}
+		else
+		{
+			// place
+			m_mouseAction = GridView::MouseAction::placeAction;
+			size_t index{graphModel->addItem(VGPoint{0.0f, 0.0f, false}, GridModel::ItemInfo(modelPos.x(), modelPos.y()))};
+			auto bb{getBoundingBox(index)};
+			GridView::containSelection(bb.first, bb.second);
+		}
+		me->accept();
 	}
-	else
+	else if (me->button() == Qt::RightButton)
 	{
+		// delete
+		m_mouseAction = GridView::MouseAction::removeAction;
 		int index{graphModel->findIndexFromPos(modelPos.x(), 0.5)};
 		if (index >= 0)
 		{
 			graphModel->removeItem(index);
 		}
+		me->accept();
+	}
+}
+void VectorGraphView::keyPressEvent(QKeyEvent* ke)
+{
+	m_isSelectionPressed = ke->modifiers() & Qt::ShiftModifier;
+	if (ke->modifiers() & Qt::ControlModifier)
+	{
+		switch (ke->key())
+		{
+			case Qt::Key_Up:
+				selectionMoveAction(QPointF{0.0f, 0.1f});
+				ke->accept();
+				break;
+			case Qt::Key_Down:
+				selectionMoveAction(QPointF{0.0f, -0.1f});
+				ke->accept();
+				break;
+			case Qt::Key_Left:
+				selectionMoveAction(QPointF{-0.1f, 0.0f});
+				ke->accept();
+				break;
+			case Qt::Key_Right:
+				selectionMoveAction(QPointF{0.1f, 0.0f});
+				ke->accept();
+				break;
+			case Qt::Key_Delete:
+				ke->accept();
+				break;
+		}
+	}
+	else
+	{
+		GridView::keyPressEvent(ke);
+	}
+}
+void VectorGraphView::mouseMoveEvent(QMouseEvent* me)
+{
+	const auto mousePos{me->pos()};
+	QPointF modelPos(toModelCoords(mousePos));
+
+	//auto graphModel{castModel<VectorGraphModel>()};
+
+	switch (m_mouseAction)
+	{
+		case GridView::MouseAction::selectAction:
+			m_isSelectionPressed = true;
+			// moving the cursor
+			GridView::containSelection(modelPos, modelPos);
+			printf("containSelection\n");
+			update();
+			me->accept();
+			break;
+		case GridView::MouseAction::placeAction:
+			// preparing cursorPos for move action
+			m_cursorPos = modelPos;
+			m_mouseAction = GridView::MouseAction::moveAction;
+			break;
+		case GridView::MouseAction::moveAction:
+			printf("moved\n");
+			selectionMoveAction(modelPos - m_cursorPos);
+			// moving the cursor
+			m_cursorPos = modelPos;
+			me->accept();
+			break;
+		case GridView::MouseAction::removeAction:
+			me->accept();
+			break;
 	}
 }
 

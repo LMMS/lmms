@@ -33,8 +33,14 @@
 #include "GridModel.h"
 #include "ModelView.h"
 
-/* This class implements
-	1. selection
+/* This class handles
+	1. rendering the grid
+	2. movement / selection with keyboard
+	3. rendering the selection
+	4. moving selected items
+	This class doesn't handle
+	1. adding items in any way
+	2. removing items in any way
 */
 
 class QPainter;
@@ -49,16 +55,21 @@ public:
 	GridView(QWidget* parent, GridModel* model, size_t cubeWidth, size_t cubeHeight);
 	~GridView() override = default;	
 
-	GridModel* model()
-	{
-		return castModel<GridModel>();
-	}
+	GridModel* model() { return castModel<GridModel>(); }
+	const GridModel* model() const { return castModel<GridModel>(); }
 	enum MoveDir
 	{
 		right, // positive x direction
 		left,
 		up, // positive y direction
 		down
+	};
+	enum MouseAction
+	{
+		selectAction,
+		placeAction,
+		moveAction,
+		removeAction
 	};
 
 	void moveToWhole(unsigned int x, unsigned int y);
@@ -70,10 +81,12 @@ public:
 	void moveToNearest(MoveDir dir);
 
 	void updateSelection();
+	void selectionMoveAction(QPointF offset);
 public slots:
 	void updateGrid();
 protected:
 	void paintEvent(QPaintEvent* pe) override;
+	void keyPressEvent(QKeyEvent* ke);
 	//void dropEvent(QDropEvent* de) override;
 	//void dragEnterEvent(QDragEnterEvent* dee) override;
 	//void mousePressEvent(QMouseEvent* me) override;
@@ -81,6 +94,7 @@ protected:
 	//void mouseReleaseEvent(QMouseEvent* me) override;
 	
 	void drawGrid(QPainter& painter);
+	void drawSelection(QPainter& painter);
 	//! transforms a given y coord with the cubeWidth / cubeHeight ratio
 	float transformYToScreen(float yCoord); // TODO
 	QPointF toModelCoords(QPoint viewPos) const;
@@ -107,15 +121,13 @@ protected:
 
 	//! if shift is pressed
 	bool m_isSelectionPressed;
-	//! if control is sperssed
-	bool m_isNearestPressed;
+	MouseAction m_mouseAction;
 
 	QPointF m_selectStartOld;
 	QPointF m_selectEndOld;
 	QPointF m_selectStart;
 	QPointF m_selectEnd;
-	QPointF m_cursorStart; // TODO maybe remove?
-	QPointF m_cursorEnd;
+	QPointF m_cursorPos;
 
 	size_t m_cubeWidth;
 	size_t m_cubeHeight;
@@ -132,6 +144,8 @@ public:
 protected:
 	void paintEvent(QPaintEvent* pe) override;
 	void mousePressEvent(QMouseEvent* me) override;
+	void mouseMoveEvent(QMouseEvent* me) override;
+	void keyPressEvent(QKeyEvent* ke);
 	std::pair<QPointF, QPointF> getBoundingBox(size_t index) const override;
 	std::set<size_t> getSelection(QPointF start, QPointF end) override;
 };
