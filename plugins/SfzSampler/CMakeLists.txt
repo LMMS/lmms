@@ -29,5 +29,5 @@ build_plugin(sfzsampler
 	SfzGlobalState.h
 	SfzTrigger.h
 	SfzSampleBuffer.h
-	EMBEDDED_RESOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.png"
+	EMBEDDED_RESOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.svg"
 )
