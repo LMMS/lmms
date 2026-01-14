@@ -1428,85 +1428,74 @@ void MainWindow::onExportProjectMidi()
 
 void MainWindow::exportProject(bool multiExport)
 {
-	QString const & projectFileName = Engine::getSong()->projectFileName();
+	const auto projectFileName = Engine::getSong()->projectFileName();
+	auto efd = FileDialog{getGUI()->mainWindow()};
 
-	FileDialog efd( getGUI()->mainWindow() );
-
-	if ( multiExport )
+	if (multiExport)
 	{
-		efd.setFileMode( FileDialog::Directory);
-		efd.setWindowTitle( tr( "Select directory for writing exported tracks..." ) );
-		if( !projectFileName.isEmpty() )
+		efd.setFileMode(FileDialog::Directory);
+		efd.setWindowTitle(tr("Select directory for writing exported tracks..."));
+		if (!projectFileName.isEmpty()) { efd.setDirectory(QFileInfo{projectFileName}.absolutePath()); }
+
+		if (efd.exec() == QDialog::Accepted)
 		{
-			efd.setDirectory( QFileInfo( projectFileName ).absolutePath() );
+			auto epd = ExportProjectDialog{efd.selectedFiles()[0], getGUI()->mainWindow(), multiExport};
+			epd.exec();
 		}
 	}
 	else
 	{
-		efd.setFileMode( FileDialog::AnyFile );
-		int idx = 0;
-		QStringList types;
-		while( ProjectRenderer::fileEncodeDevices[idx].m_fileFormat != ProjectRenderer::ExportFileFormat::Count)
+		if (projectFileName.isEmpty())
 		{
-			if(ProjectRenderer::fileEncodeDevices[idx].isAvailable()) {
-				types << tr(ProjectRenderer::fileEncodeDevices[idx].m_description);
-			}
-			++idx;
-		}
-		efd.setNameFilters( types );
-		QString baseFilename;
-		if( !projectFileName.isEmpty() )
-		{
-			efd.setDirectory( QFileInfo( projectFileName ).absolutePath() );
-			baseFilename = QFileInfo( projectFileName ).completeBaseName();
+			efd.setDirectory(ConfigManager::inst()->userProjectsDir());
+			efd.selectFile(QString{"%1%2"}.arg(tr("untitled"), ProjectRenderer::fileEncodeDevices[0].m_extension));
 		}
 		else
 		{
-			efd.setDirectory( ConfigManager::inst()->userProjectsDir() );
-			baseFilename = tr( "untitled" );
+			efd.setDirectory(QFileInfo{projectFileName}.absolutePath());
+			efd.selectFile(QString{"%1%2"}.arg(
+				QFileInfo{projectFileName}.completeBaseName(), ProjectRenderer::fileEncodeDevices[0].m_extension));
 		}
-		efd.selectFile( baseFilename + ProjectRenderer::fileEncodeDevices[0].m_extension );
-		efd.setWindowTitle( tr( "Select file for project-export..." ) );
-	}
 
-	QString suffix = "wav";
-	efd.setDefaultSuffix( suffix );
-	efd.setAcceptMode( FileDialog::AcceptSave );
-
-	if( efd.exec() == QDialog::Accepted && !efd.selectedFiles().isEmpty() &&
-					 !efd.selectedFiles()[0].isEmpty() )
-	{
-
-		QString exportFileName = efd.selectedFiles()[0];
-		if ( !multiExport )
+		auto types = QStringList{};
+		for (const auto& device : ProjectRenderer::fileEncodeDevices)
 		{
-			int stx = efd.selectedNameFilter().indexOf( "(*." );
-			int etx = efd.selectedNameFilter().indexOf( ")" );
+			if (!device.isAvailable()) { continue; }
+			types << tr(device.m_description);
+		}
 
-			if ( stx > 0 && etx > stx )
+		efd.setFileMode(FileDialog::AnyFile);
+		efd.setAcceptMode(FileDialog::AcceptSave);
+		efd.setNameFilters(types);
+		efd.setWindowTitle(tr("Select file for project-export..."));
+
+		if (efd.exec() == QDialog::Accepted)
+		{
+			auto exportFileName = efd.selectedFiles()[0];
+
+			// If the file name has no extension, we use the extension from the selected name filter
+			if (QFileInfo{exportFileName}.suffix().isEmpty())
 			{
-				// Get first extension from selected dropdown.
-				// i.e. ".wav" from "WAV-File (*.wav), Dummy-File (*.dum)"
-				suffix = efd.selectedNameFilter().mid( stx + 2, etx - stx - 2 ).split( " " )[0].trimmed();
-
-				Qt::CaseSensitivity cs = Qt::CaseSensitive;
-#if defined(LMMS_BUILD_APPLE) || defined(LMMS_BUILD_WIN32)
-				cs = Qt::CaseInsensitive;
-#endif
-				exportFileName.remove( "." + suffix, cs );
-				if ( efd.selectedFiles()[0].endsWith( suffix ) )
+				const auto selectedNameFilter = efd.selectedNameFilter();
+				for (const auto& device : ProjectRenderer::fileEncodeDevices)
 				{
-					if( VersionedSaveDialog::fileExistsQuery( exportFileName + suffix,
-							tr( "Save project" ) ) )
-					{
-						exportFileName += suffix;
-					}
+					if (QString::compare(tr(device.m_description), selectedNameFilter) != 0) { continue; }
+					exportFileName += device.m_extension;
+					break;
+				}
+
+				// The file with the extension from the name filter might exist, so ask the user if they want to replace
+				// it and back out if they do not
+				if (QFile::exists(exportFileName)
+					&& !VersionedSaveDialog::fileExistsQuery(exportFileName, tr("Save project")))
+				{
+					return;
 				}
 			}
-		}
 
-		ExportProjectDialog epd( exportFileName, getGUI()->mainWindow(), multiExport );
-		epd.exec();
+			auto epd = ExportProjectDialog{exportFileName, getGUI()->mainWindow(), multiExport};
+			epd.exec();
+		}
 	}
 }
 
