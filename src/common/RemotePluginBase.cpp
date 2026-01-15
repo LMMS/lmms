@@ -26,6 +26,7 @@
 
 #ifndef BUILD_REMOTE_PLUGIN_CLIENT
 #include <QCoreApplication>
+#include <QThread>
 #endif
 
 

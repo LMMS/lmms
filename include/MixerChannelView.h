@@ -25,26 +25,26 @@
 #ifndef LMMS_GUI_MIXER_CHANNEL_VIEW_H
 #define LMMS_GUI_MIXER_CHANNEL_VIEW_H
 
-#include <QGraphicsView>
-#include <QLabel>
-#include <QLineEdit>
-#include <QPixmap>
-#include <QStackedWidget>
 #include <QWidget>
 
-#include "EffectRackView.h"
-#include "Fader.h"
-#include "Knob.h"
-#include "LcdWidget.h"
-#include "PixmapButton.h"
-#include "SendButtonIndicator.h"
+class QGraphicsView;
+class QLabel;
+class QLineEdit;
+class QStackedWidget;
 
 namespace lmms {
 class MixerChannel;
 }
 
 namespace lmms::gui {
+class AutomatableButton;
+class EffectRackView;
+class Fader;
+class Knob;
+class LcdWidget;
+class MixerView;
 class PeakIndicator;
+class SendButtonIndicator;
 
 
 class MixerChannelView : public QWidget
@@ -61,7 +61,7 @@ public:
 	void contextMenuEvent(QContextMenuEvent*) override;
 	void mousePressEvent(QMouseEvent*) override;
 	void mouseDoubleClickEvent(QMouseEvent*) override;
-	bool eventFilter(QObject* dist, QEvent* event) override;
+	void keyPressEvent(QKeyEvent* ke) override;
 
 	void reset();
 	int channelIndex() const { return m_channelIndex; }
@@ -115,8 +115,8 @@ private:
 	QLineEdit* m_renameLineEdit;
 	QGraphicsView* m_renameLineEditView;
 	QLabel* m_sendArrow;
-	PixmapButton* m_muteButton;
-	PixmapButton* m_soloButton;
+	AutomatableButton* m_muteButton;
+	AutomatableButton* m_soloButton;
 	PeakIndicator* m_peakIndicator = nullptr;
 	Fader* m_fader;
 	EffectRackView* m_effectRackView;

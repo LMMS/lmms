@@ -33,7 +33,7 @@
 #endif
 
 #include "embed.h"
-#include "lmms_basics.h"
+#include "LmmsTypes.h"
 #include "plugin_export.h"
 
 namespace lmms
@@ -49,7 +49,7 @@ extern "C" {
 		"Martin Pavelek <he29/dot/HS/at/gmail/dot/com>",
 		0x0112,
 		Plugin::Type::Effect,
-		new PluginPixmapLoader("logo"),
+		new PixmapLoader("lmms-plugin-logo"),
 		nullptr,
 		nullptr,
 	};

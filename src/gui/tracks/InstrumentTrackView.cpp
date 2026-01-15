@@ -27,24 +27,28 @@
 #include <QAction>
 #include <QApplication>
 #include <QDragEnterEvent>
+#include <QHBoxLayout>
 #include <QMdiArea>
 #include <QMdiSubWindow>
 #include <QMenu>
+#include <QSpacerItem>
+#include <QVBoxLayout>
 
 #include "AudioEngine.h"
 #include "ConfigManager.h"
 #include "Engine.h"
 #include "FadeButton.h"
-#include "Knob.h"
-#include "MidiCCRackView.h"
-#include "Mixer.h"
-#include "MixerView.h"
 #include "GuiApplication.h"
 #include "Instrument.h"
 #include "InstrumentTrackWindow.h"
+#include "Knob.h"
 #include "MainWindow.h"
 #include "MidiClient.h"
+#include "MidiCCRackView.h"
 #include "MidiPortMenu.h"
+#include "Mixer.h"
+#include "MixerChannelLcdSpinBox.h"
+#include "MixerView.h"
 #include "TrackLabelButton.h"
 
 
@@ -77,19 +81,15 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 	m_mixerChannelNumber = new MixerChannelLcdSpinBox(2, getTrackSettingsWidget(), tr("Mixer channel"), this);
 	m_mixerChannelNumber->show();
 
-	m_volumeKnob = new Knob( KnobType::Small17, getTrackSettingsWidget(),
-							tr( "Volume" ) );
+	m_volumeKnob = new Knob(KnobType::Small17, tr("VOL"), getTrackSettingsWidget(), Knob::LabelRendering::LegacyFixedFontSize, tr("VOL"));
 	m_volumeKnob->setVolumeKnob( true );
 	m_volumeKnob->setModel( &_it->m_volumeModel );
 	m_volumeKnob->setHintText( tr( "Volume:" ), "%" );
-	m_volumeKnob->setLabel( tr( "VOL" ) );
 	m_volumeKnob->show();
 
-	m_panningKnob = new Knob( KnobType::Small17, getTrackSettingsWidget(),
-							tr( "Panning" ) );
+	m_panningKnob = new Knob(KnobType::Small17, tr("PAN"), getTrackSettingsWidget(), Knob::LabelRendering::LegacyFixedFontSize, tr("Panning"));
 	m_panningKnob->setModel( &_it->m_panningModel );
 	m_panningKnob->setHintText(tr("Panning:"), "%");
-	m_panningKnob->setLabel( tr( "PAN" ) );
 	m_panningKnob->show();
 
 	m_midiMenu = new QMenu( tr( "MIDI" ), this );

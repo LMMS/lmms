@@ -40,8 +40,6 @@ namespace lmms
 {
 
 
-class Engine;
-
 const QString PROJECTS_PATH = "projects/";
 const QString TEMPLATE_PATH = "templates/";
 const QString PRESETS_PATH = "presets/";
@@ -214,6 +212,8 @@ public:
 		return m_recentlyOpenedProjects;
 	}
 
+	const QStringList& favoriteItems() { return m_favoriteItems; }
+
 	QString localeDir() const
 	{
 		return m_dataDir + LOCALE_PATH;
@@ -240,6 +240,10 @@ public:
 
 	void addRecentlyOpenedProject(const QString & _file);
 
+	void addFavoriteItem(const QString& item);
+	void removeFavoriteItem(const QString& item);
+	bool isFavoriteItem(const QString& item);
+
 	QString value(const QString& cls, const QString& attribute, const QString& defaultVal = "") const;
 
 	void setValue(const QString & cls, const QString & attribute,
@@ -265,6 +269,7 @@ public:
 
 signals:
 	void valueChanged( QString cls, QString attribute, QString value );
+	void favoritesChanged();
 
 private:
 	static ConfigManager * s_instanceOfMe;
@@ -299,6 +304,7 @@ private:
 	QString m_version;
 	unsigned int m_configVersion;
 	QStringList m_recentlyOpenedProjects;
+	QStringList m_favoriteItems;
 
 	using stringPairVector = std::vector<QPair<QString, QString>>;
 	using settingsMap = QMap<QString, stringPairVector>;

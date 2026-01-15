@@ -25,15 +25,14 @@
 #ifndef LMMS_REMOTE_PLUGIN_BASE_H
 #define LMMS_REMOTE_PLUGIN_BASE_H
 
-#include "MidiEvent.h"
-
-#include <atomic>
+#include <atomic>  // IWYU pragma: keep
 #include <vector>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <string>
-#include <cassert>
+
+#include "lmmsconfig.h"
 
 #if !(defined(LMMS_HAVE_SYS_IPC_H) && defined(LMMS_HAVE_SEMAPHORE_H))
 #define SYNC_WITH_SHM_FIFO
@@ -48,7 +47,7 @@
 #endif // !(LMMS_HAVE_SYS_IPC_H && LMMS_HAVE_SEMAPHORE_H)
 
 #ifdef LMMS_HAVE_LOCALE_H
-#include <clocale>
+#include <clocale>  // IWYU pragma: keep
 #endif
 
 #ifdef LMMS_HAVE_PTHREAD_H
@@ -67,14 +66,11 @@
 
 #else // BUILD_REMOTE_PLUGIN_CLIENT
 #include "lmms_export.h"
-#include <QMutex>
-#include <QProcess>
-#include <QThread>
 #include <QString>
 
 #ifndef SYNC_WITH_SHM_FIFO
 #include <poll.h>
-#include <unistd.h>
+#include <unistd.h>  // IWYU pragma: keep
 #endif // SYNC_WITH_SHM_FIFO
 
 #endif // BUILD_REMOTE_PLUGIN_CLIENT
@@ -252,20 +248,6 @@ public:
 
 
 private:
-	static inline void fastMemCpy( void * _dest, const void * _src,
-							const int _len )
-	{
-		// calling memcpy() for just an integer is obsolete overhead
-		if( _len == 4 )
-		{
-			*( (int32_t *) _dest ) = *( (int32_t *) _src );
-		}
-		else
-		{
-			memcpy( _dest, _src, _len );
-		}
-	}
-
 	void read( void * _buf, int _len )
 	{
 		if( isInvalid() )
@@ -283,7 +265,7 @@ private:
 #endif
 			lock();
 		}
-		fastMemCpy( _buf, m_data->data + m_data->startPtr, _len );
+		std::memcpy(_buf, m_data->data + m_data->startPtr, _len);
 		m_data->startPtr += _len;
 		// nothing left?
 		if( m_data->startPtr == m_data->endPtr )
@@ -319,7 +301,7 @@ private:
 #endif
 			lock();
 		}
-		fastMemCpy( m_data->data + m_data->endPtr, _buf, _len );
+		std::memcpy(m_data->data + m_data->endPtr, _buf, _len);
 		m_data->endPtr += _len;
 		unlock();
 	}

@@ -34,6 +34,7 @@
 
 #include "Lb302.h"
 #include "AutomatableButton.h"
+#include "DspEffectLibrary.h"
 #include "Engine.h"
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
@@ -440,11 +441,8 @@ QString Lb302Synth::nodeName() const
 // OBSOLETE. Break apart once we get Q_OBJECT to work. >:[
 void Lb302Synth::recalcFilter()
 {
-#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
 	vcf.loadRelaxed()->recalc();
-#else
-	vcf.load()->recalc();
-#endif
+
 	// THIS IS OLD 3pole/24dB code, I may reintegrate it.  Don't need it
 	// right now.   Should be toggled by LB_24_RES_TRICK at the moment.
 
@@ -699,11 +697,8 @@ void Lb302Synth::initNote( Lb302Note *n)
 
 	if(n->dead ==0){
 		// Swap next two blocks??
-#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
 		vcf.loadRelaxed()->playNote();
-#else
-		vcf.load()->playNote();
-#endif
+
 		// Ensure envelope is recalculated
 		vcf_envpos = ENVINC;
 
@@ -831,22 +826,18 @@ Lb302SynthView::Lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
 	m_vcfCutKnob = new Knob( KnobType::Bright26, this );
 	m_vcfCutKnob->move( 75, 130 );
 	m_vcfCutKnob->setHintText( tr( "Cutoff Freq:" ), "" );
-	m_vcfCutKnob->setLabel( "" );
 
 	m_vcfResKnob = new Knob( KnobType::Bright26, this );
 	m_vcfResKnob->move( 120, 130 );
 	m_vcfResKnob->setHintText( tr( "Resonance:" ), "" );
-	m_vcfResKnob->setLabel( "" );
 
 	m_vcfModKnob = new Knob( KnobType::Bright26, this );
 	m_vcfModKnob->move( 165, 130 );
 	m_vcfModKnob->setHintText( tr( "Env Mod:" ), "" );
-	m_vcfModKnob->setLabel( "" );
 
 	m_vcfDecKnob = new Knob( KnobType::Bright26, this );
 	m_vcfDecKnob->move( 210, 130 );
 	m_vcfDecKnob->setHintText( tr( "Decay:" ), "" );
-	m_vcfDecKnob->setLabel( "" );
 
 	m_slideToggle = new LedCheckBox( "", this );
 	m_slideToggle->move( 10, 180 );
@@ -867,12 +858,10 @@ Lb302SynthView::Lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
 	m_slideDecKnob = new Knob( KnobType::Bright26, this );
 	m_slideDecKnob->move( 210, 75 );
 	m_slideDecKnob->setHintText( tr( "Slide Decay:" ), "" );
-	m_slideDecKnob->setLabel( "");
 
 	m_distKnob = new Knob( KnobType::Bright26, this );
 	m_distKnob->move( 210, 190 );
 	m_distKnob->setHintText( tr( "DIST:" ), "" );
-	m_distKnob->setLabel( tr( ""));
 
 
 	// Shapes
@@ -988,7 +977,7 @@ Lb302SynthView::Lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
 			tr( "Click here for bandlimited moog saw wave." ) );
 
 
-	m_waveBtnGrp = new automatableButtonGroup( this );
+	m_waveBtnGrp = new AutomatableButtonGroup( this );
 	m_waveBtnGrp->addButton( sawWaveBtn );
 	m_waveBtnGrp->addButton( triangleWaveBtn );
 	m_waveBtnGrp->addButton( sqrWaveBtn );

@@ -31,9 +31,9 @@
 
 #include "ComboBox.h"
 #include "DataFile.h"
+#include "FileDialog.h"
 #include "FontHelper.h"
 #include "PixmapButton.h"
-#include "SampleLoader.h"
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "Track.h"
@@ -51,7 +51,7 @@ AudioFileProcessorView::AudioFileProcessorView(Instrument* instrument,
 	InstrumentViewFixedSize(instrument, parent)
 {
 	m_openAudioFileButton = new PixmapButton(this);
-	m_openAudioFileButton->setCursor(QCursor(Qt::PointingHandCursor));
+	m_openAudioFileButton->setCursor(Qt::PointingHandCursor);
 	m_openAudioFileButton->move(227, 72);
 	m_openAudioFileButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap(
 							"select_file"));
@@ -99,7 +99,7 @@ AudioFileProcessorView::AudioFileProcessorView(Instrument* instrument,
 							"loop_pingpong_off"));
 	m_loopPingPongButton->setToolTip(tr("Enable ping-pong loop"));
 
-	m_loopGroup = new automatableButtonGroup(this);
+	m_loopGroup = new AutomatableButtonGroup(this);
 	m_loopGroup->addButton(m_loopOffButton);
 	m_loopGroup->addButton(m_loopOnButton);
 	m_loopGroup->addButton(m_loopPingPongButton);
@@ -120,15 +120,15 @@ AudioFileProcessorView::AudioFileProcessorView(Instrument* instrument,
 	m_ampKnob->setHintText(tr("Amplify:"), "%");
 
 	m_startKnob = new AudioFileProcessorWaveView::knob(this);
-	m_startKnob->move(45, 108);
+	m_startKnob->move(50, 108);
 	m_startKnob->setHintText(tr("Start point:"), "");
 
 	m_endKnob = new AudioFileProcessorWaveView::knob(this);
-	m_endKnob->move(125, 108);
+	m_endKnob->move(130, 108);
 	m_endKnob->setHintText(tr("End point:"), "");
 
 	m_loopKnob = new AudioFileProcessorWaveView::knob(this);
-	m_loopKnob->move(85, 108);
+	m_loopKnob->move(90, 108);
 	m_loopKnob->setHintText(tr("Loopback point:"), "");
 
 // interpolation selector
@@ -257,7 +257,7 @@ void AudioFileProcessorView::sampleUpdated()
 
 void AudioFileProcessorView::openAudioFile()
 {
-	QString af = SampleLoader::openAudioFile();
+	QString af = FileDialog::openAudioFile();
 	if (af.isEmpty()) { return; }
 
 	castModel<AudioFileProcessor>()->setAudioFile(af);

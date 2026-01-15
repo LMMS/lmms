@@ -30,7 +30,6 @@
 
 #include "AudioDevice.h"
 #include "AudioDeviceSetupWidget.h"
-#include "lmmsconfig.h"
 #include "MidiClient.h"
 #include "MidiSetupWidget.h"
 
@@ -150,6 +149,8 @@ private:
 	bool m_openLastProject;
 	QString m_loopMarkerMode;
 	QComboBox* m_loopMarkerComboBox;
+	QString m_autoScroll;
+	QComboBox* m_autoScrollComboBox;
 	QString m_lang;
 	QStringList m_languages;
 
@@ -183,6 +184,8 @@ private:
 	QSlider * m_bufferSizeSlider;
 	QLabel * m_bufferSizeLbl;
 	QLabel * m_bufferSizeWarnLbl;
+	int m_sampleRate;
+	QSlider* m_sampleRateSlider;
 
 	// MIDI settings widgets.
 	QComboBox * m_midiInterfaces;

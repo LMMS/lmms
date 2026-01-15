@@ -24,14 +24,15 @@
 
 #include "TrackOperationsWidget.h"
 
-#include <QBoxLayout>
+#include <QCheckBox>
+#include <QHBoxLayout>
 #include <QMenu>
 #include <QMessageBox>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QPushButton>
-#include <QCheckBox>
 
+#include "AutomatableButton.h"
 #include "AutomationClip.h"
 #include "AutomationTrackView.h"
 #include "ColorChooser.h"
@@ -41,7 +42,6 @@
 #include "Engine.h"
 #include "InstrumentTrackView.h"
 #include "KeyboardShortcuts.h"
-#include "PixmapButton.h"
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "Track.h"
@@ -83,52 +83,27 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 	// buttons in a layout.
 	auto operationsWidget = new QWidget(this);
 	auto operationsLayout = new QHBoxLayout(operationsWidget);
-	operationsLayout->setContentsMargins(0, 3, 0, 0);
+	operationsLayout->setContentsMargins(2, 6, 0, 6);
 	operationsLayout->setSpacing(2);
 
 	m_trackOps = new QPushButton(operationsWidget);
 	m_trackOps->setFocusPolicy( Qt::NoFocus );
 	m_trackOps->setMenu( toMenu );
 	m_trackOps->setToolTip(tr("Actions"));
+	m_trackOps->setCursor(Qt::PointingHandCursor);
 
-	// This helper lambda wraps a PixmapButton in a QWidget. This is necessary due to some strange effect where the
-	// PixmapButtons are resized to a size that's larger than their minimum/fixed size when the method "show" is called
-	// in "TrackContainerView::realignTracks". Specifically, with the default theme the buttons are resized from
-	// (16, 14) to (26, 26). This then makes them behave not as expected in layouts.
-	// The resizing is not done for QWidgets. Therefore we wrap the PixmapButton in a QWidget which is set to a
-	// fixed size that will be able to show the active and inactive pixmap. We can then use the QWidget in layouts
-	// without any disturbances.
-	//
-	// The resizing only seems to affect the track view hierarchy and is triggered by Qt's internal mechanisms.
-	// For example the buttons in the mixer view do not seem to be affected.
-	// If you want to debug this simply override "PixmapButton::resizeEvent" and trigger a break point in there.
-	auto buildPixmapButtonWrappedInWidget = [](QWidget* parent, const QString& toolTip,
-		std::string_view activeGraphic, std::string_view inactiveGraphic, PixmapButton*& pixmapButton)
-	{
-		const auto activePixmap = embed::getIconPixmap(activeGraphic);
-		const auto inactivePixmap = embed::getIconPixmap(inactiveGraphic);
-
-		auto wrapperWidget = new QWidget(parent);
-
-		auto button = new PixmapButton(wrapperWidget, toolTip);
-		button->setCheckable(true);
-		button->setActiveGraphic(activePixmap);
-		button->setInactiveGraphic(inactivePixmap);
-		button->setToolTip(toolTip);
-
-		wrapperWidget->setFixedSize(button->minimumSizeHint());
-
-		pixmapButton = button;
-
-		return wrapperWidget;
-	};
-
-	auto muteWidget = buildPixmapButtonWrappedInWidget(operationsWidget, tr("Mute"), "mute_active", "mute_inactive", m_muteBtn);
-	auto soloWidget = buildPixmapButtonWrappedInWidget(operationsWidget, tr("Solo"), "solo_active", "solo_inactive", m_soloBtn);
+	m_muteBtn = new AutomatableButton(operationsWidget, tr("Mute"));
+	m_muteBtn->setCheckable(true);
+	m_muteBtn->setToolTip(tr("Mute"));
+	m_muteBtn->setObjectName("btn-mute");
+	m_soloBtn = new AutomatableButton(operationsWidget, tr("Solo"));
+	m_soloBtn->setCheckable(true);
+	m_soloBtn->setToolTip(tr("Solo"));
+	m_soloBtn->setObjectName("btn-solo");
 
 	operationsLayout->addWidget(m_trackOps);
-	operationsLayout->addWidget(muteWidget);
-	operationsLayout->addWidget(soloWidget);
+	operationsLayout->addWidget(m_muteBtn);
+	operationsLayout->addWidget(m_soloBtn);
 
 	layout->addWidget(operationsWidget, 0, Qt::AlignTop | Qt::AlignLeading);
 
@@ -200,10 +175,16 @@ bool TrackOperationsWidget::confirmRemoval()
 	QString messageTitleRemoveTrack = tr("Confirm removal");
 	QString askAgainText = tr("Don't ask again");
 	auto askAgainCheckBox = new QCheckBox(askAgainText, nullptr);
-	connect(askAgainCheckBox, &QCheckBox::stateChanged, [](int state){
+	auto onCheckedStateChanged = [](auto state){
 		// Invert button state, if it's checked we *shouldn't* ask again
-		ConfigManager::inst()->setValue("ui", "trackdeletionwarning", state ? "0" : "1");
-	});
+		ConfigManager::inst()->setValue("ui", "trackdeletionwarning", state != Qt::Unchecked ? "0" : "1");
+	};
+
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
+	connect(askAgainCheckBox, &QCheckBox::checkStateChanged, onCheckedStateChanged);
+#else
+	connect(askAgainCheckBox, &QCheckBox::stateChanged, onCheckedStateChanged);
+#endif
 
 	QMessageBox mb;
 	mb.setText(messageRemoveTrack);

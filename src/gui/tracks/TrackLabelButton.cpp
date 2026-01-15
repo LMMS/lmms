@@ -29,8 +29,8 @@
 #include <QMouseEvent>
 
 #include "ConfigManager.h"
+#include "DeprecationHelper.h"
 #include "embed.h"
-#include "InstrumentTrackView.h"
 #include "Instrument.h"
 #include "InstrumentTrack.h"
 #include "RenameDialog.h"
@@ -47,7 +47,8 @@ TrackLabelButton::TrackLabelButton( TrackView * _tv, QWidget * _parent ) :
 	m_iconName()
 {
 	setAcceptDrops( true );
-	setCursor( QCursor( embed::getIconPixmap( "hand" ), 3, 3 ) );
+	setFocusPolicy(Qt::NoFocus);
+	setCursor(Qt::PointingHandCursor);
 	setToolButtonStyle( Qt::ToolButtonTextBesideIcon );
 
 	m_renameLineEdit = new TrackRenameLineEdit( this );
@@ -181,7 +182,8 @@ void TrackLabelButton::mouseDoubleClickEvent( QMouseEvent * _me )
 
 void TrackLabelButton::mouseReleaseEvent( QMouseEvent *_me )
 {
-	if( m_buttonRect.contains( _me->globalPos(), true ) && m_renameLineEdit->isHidden() )
+	const auto globalPos = globalPosition(_me);
+	if (m_buttonRect.contains(globalPos, true) && m_renameLineEdit->isHidden())
 	{
 		QToolButton::mousePressEvent( _me );
 	}

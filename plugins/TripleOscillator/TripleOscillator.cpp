@@ -29,8 +29,8 @@
 #include "TripleOscillator.h"
 #include "AudioEngine.h"
 #include "AutomatableButton.h"
-#include "debug.h"
 #include "Engine.h"
+#include "FileDialog.h"
 #include "InstrumentTrack.h"
 #include "Knob.h"
 #include "NotePlayHandle.h"
@@ -38,7 +38,6 @@
 #include "PathUtil.h"
 #include "PixmapButton.h"
 #include "SampleBuffer.h"
-#include "SampleLoader.h"
 #include "Song.h"
 #include "embed.h"
 #include "plugin_export.h"
@@ -137,10 +136,10 @@ OscillatorObject::OscillatorObject( Model * _parent, int _idx ) :
 
 void OscillatorObject::oscUserDefWaveDblClick()
 {
-	auto af = gui::SampleLoader::openWaveformFile();
+	auto af = gui::FileDialog::openWaveformFile();
 	if( af != "" )
 	{
-		m_sampleBuffer = gui::SampleLoader::createBufferFromFile(af);
+		m_sampleBuffer = SampleBuffer::fromFile(af);
 		m_userAntiAliasWaveTable = Oscillator::generateAntiAliasUserWaveTable(m_sampleBuffer.get());
 		// TODO:
 		//m_usrWaveBtn->setToolTip(m_sampleBuffer->audioFile());
@@ -285,7 +284,7 @@ void TripleOscillator::loadSettings( const QDomElement & _this )
 		{
 			if (QFileInfo(PathUtil::toAbsolute(userWaveFile)).exists())
 			{
-				m_osc[i]->m_sampleBuffer = gui::SampleLoader::createBufferFromFile(userWaveFile);
+				m_osc[i]->m_sampleBuffer = SampleBuffer::fromFile(userWaveFile);
 				m_osc[i]->m_userAntiAliasWaveTable = Oscillator::generateAntiAliasUserWaveTable(m_osc[i]->m_sampleBuffer.get());
 			}
 			else { Engine::getSong()->collectError(QString("%1: %2").arg(tr("Sample not found"), userWaveFile)); }
@@ -491,7 +490,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 							"fm_inactive" ) );
 	fm_osc1_btn->setToolTip(tr("Modulate frequency of oscillator 1 by oscillator 2"));
 
-	m_mod1BtnGrp = new automatableButtonGroup( this );
+	m_mod1BtnGrp = new AutomatableButtonGroup( this );
 	m_mod1BtnGrp->addButton( pm_osc1_btn );
 	m_mod1BtnGrp->addButton( am_osc1_btn );
 	m_mod1BtnGrp->addButton( mix_osc1_btn );
@@ -538,7 +537,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 							"fm_inactive" ) );
 	fm_osc2_btn->setToolTip(tr("Modulate frequency of oscillator 2 by oscillator 3"));
 
-	m_mod2BtnGrp = new automatableButtonGroup( this );
+	m_mod2BtnGrp = new AutomatableButtonGroup( this );
 
 	m_mod2BtnGrp->addButton( pm_osc2_btn );
 	m_mod2BtnGrp->addButton( am_osc2_btn );
@@ -680,7 +679,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 		uwt->setCheckable(true);
 		uwt->setToolTip(tr("Use alias-free wavetable oscillators."));
 
-		auto wsbg = new automatableButtonGroup(this);
+		auto wsbg = new AutomatableButtonGroup(this);
 
 		wsbg->addButton( sin_wave_btn );
 		wsbg->addButton( triangle_wave_btn );

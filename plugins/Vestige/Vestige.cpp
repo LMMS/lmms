@@ -79,10 +79,14 @@ Plugin::Descriptor Q_DECL_EXPORT  vestige_plugin_descriptor =
 	0x0100,
 	Plugin::Type::Instrument,
 	new PluginPixmapLoader( "logo" ),
-#ifdef LMMS_BUILD_LINUX
-	"dll,so",
-#else
+#if defined(LMMS_BUILD_WIN32)
 	"dll",
+#elif defined(LMMS_BUILD_LINUX)
+#	if defined(LMMS_HAVE_VST_32) || defined(LMMS_HAVE_VST_64)
+		"dll,so",
+#	else
+		"so",
+#	endif
 #endif
 	nullptr,
 } ;
@@ -528,14 +532,10 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	m_openPresetButton->setToolTip(tr("Open VST plugin preset"));
 
 
-	m_rolLPresetButton = new PixmapButton( this, "" );
-	m_rolLPresetButton->setCheckable( false );
-	m_rolLPresetButton->setCursor( Qt::PointingHandCursor );
+	m_rolLPresetButton = new QPushButton(this);
+	m_rolLPresetButton->setObjectName("btn-stepper-left");
+	m_rolLPresetButton->setCursor(Qt::PointingHandCursor);
 	m_rolLPresetButton->move( 190, 201 );
-	m_rolLPresetButton->setActiveGraphic( embed::getIconPixmap(
-							"stepper-left-press" ) );
-	m_rolLPresetButton->setInactiveGraphic( embed::getIconPixmap(
-							"stepper-left" ) );
 	connect( m_rolLPresetButton, SIGNAL( clicked() ), this,
 						SLOT( previousProgram() ) );
 	m_rolLPresetButton->setToolTip(tr("Previous (-)"));
@@ -556,14 +556,10 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	m_savePresetButton->setToolTip(tr("Save preset"));
 
 
-	m_rolRPresetButton = new PixmapButton( this, "" );
-	m_rolRPresetButton->setCheckable( false );
-	m_rolRPresetButton->setCursor( Qt::PointingHandCursor );
+	m_rolRPresetButton = new QPushButton(this);
+	m_rolRPresetButton->setObjectName("btn-stepper-right");
+	m_rolRPresetButton->setCursor(Qt::PointingHandCursor);
 	m_rolRPresetButton->move( 209, 201 );
-	m_rolRPresetButton->setActiveGraphic( embed::getIconPixmap(
-							"stepper-right-press" ) );
-	m_rolRPresetButton->setInactiveGraphic( embed::getIconPixmap(
-							"stepper-right" ) );
 	connect( m_rolRPresetButton, SIGNAL( clicked() ), this,
 						SLOT( nextProgram() ) );
 	m_rolRPresetButton->setToolTip(tr("Next (+)"));
@@ -571,15 +567,14 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	m_rolRPresetButton->setShortcut( Qt::Key_Plus );
 
 
-	m_selPresetButton = new QPushButton( tr( "" ), this );
-	m_selPresetButton->setGeometry( 228, 201, 16, 16 );
+	m_selPresetButton = new QPushButton(this);
+	m_selPresetButton->setObjectName("btn-stepper-down");
+	m_selPresetButton->setCursor(Qt::PointingHandCursor);
+	m_selPresetButton->move(228, 201);
 
 	auto menu = new QMenu;
 
 	connect( menu, SIGNAL( aboutToShow() ), this, SLOT( updateMenu() ) );
-
-
-	m_selPresetButton->setIcon( embed::getIconPixmap( "stepper-down" ) );
 
 	m_selPresetButton->setMenu(menu);
 
@@ -669,13 +664,17 @@ void VestigeInstrumentView::openPlugin()
 
 	// set filters
 	QStringList types;
-	types << tr( "DLL-files (*.dll)" )
-		<< tr( "EXE-files (*.exe)" )
-#ifdef LMMS_BUILD_LINUX
-		<< tr( "SO-files (*.so)" )
+#if defined(LMMS_BUILD_WIN32)
+	types << tr("VST2 files (*.dll)");
+#elif defined(LMMS_BUILD_LINUX)
+#	if defined(LMMS_HAVE_VST_32) || defined(LMMS_HAVE_VST_64)
+		types << tr("All VST files (*.dll *.so)")
+			<< tr("Windows VST2 files (*.dll)");
+#	endif
+	types << tr("LinuxVST files (*.so)");
 #endif
-		;
-	ofd.setNameFilters( types );
+
+	ofd.setNameFilters(types);
 
 	if( m_vi->m_pluginDLL != "" )
 	{
@@ -914,17 +913,6 @@ ManageVestigeInstrumentView::ManageVestigeInstrumentView( Instrument * _instrume
 							QWidget * _parent, VestigeInstrument * m_vi2 ) :
 	InstrumentViewFixedSize( _instrument, _parent )
 {
-#if QT_VERSION < 0x50C00
-	// Workaround for a bug in Qt versions below 5.12,
-	// where argument-dependent-lookup fails for QFlags operators
-	// declared inside a namepsace.
-	// This affects the Q_DECLARE_OPERATORS_FOR_FLAGS macro in Instrument.h
-	// See also: https://codereview.qt-project.org/c/qt/qtbase/+/225348
-
-	using ::operator|;
-
-#endif
-
 	m_vi = m_vi2;
 	m_vi->m_scrollArea = new QScrollArea( this );
 	widget = new QWidget(this);
@@ -990,9 +978,11 @@ ManageVestigeInstrumentView::ManageVestigeInstrumentView( Instrument * _instrume
 		std::snprintf(paramStr.data(), paramStr.size(), "param%d", i);
 		s_dumpValues = dump[paramStr.data()].split(":");
 
-		vstKnobs[ i ] = new CustomTextKnob( KnobType::Bright26, this, s_dumpValues.at( 1 ) );
-		vstKnobs[ i ]->setDescription( s_dumpValues.at( 1 ) + ":" );
-		vstKnobs[ i ]->setLabel( s_dumpValues.at( 1 ).left( 15 ) );
+		const auto & description = s_dumpValues.at(1);
+
+		auto knob = new CustomTextKnob(KnobType::Bright26, description.left(15), this, description);
+		knob->setDescription(description + ":");
+		vstKnobs[i] = knob;
 
 		if( !hasKnobModel )
 		{
@@ -1062,8 +1052,8 @@ void ManageVestigeInstrumentView::syncPlugin( void )
 			std::snprintf(paramStr.data(), paramStr.size(), "param%d", i);
 			s_dumpValues = dump[paramStr.data()].split(":");
 			float f_value = LocaleHelper::toFloat(s_dumpValues.at(2));
-			m_vi->knobFModel[ i ]->setAutomatedValue( f_value );
-			m_vi->knobFModel[ i ]->setInitValue( f_value );
+			m_vi->knobFModel[i]->setValue(f_value, true);
+			m_vi->knobFModel[i]->setInitValue(f_value);
 		}
 	}
 	syncParameterText();

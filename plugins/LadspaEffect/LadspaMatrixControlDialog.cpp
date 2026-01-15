@@ -24,21 +24,17 @@
  */
 
 
-#include <QGroupBox>
-#include <QLayout>
 #include <QLabel>
 #include <QScrollArea>
 #include <QScrollBar>
 #include <QSpacerItem>
-#include <QMdiArea>
+#include <QVBoxLayout>
 
 
-#include "LadspaBase.h"
 #include "LadspaControl.h"
-#include "LadspaEffect.h"
+#include "LadspaControls.h"
 #include "LadspaMatrixControlDialog.h"
 #include "LadspaWidgetFactory.h"
-#include "LadspaControlView.h"
 #include "LedCheckBox.h"
 
 
@@ -182,7 +178,7 @@ QWidget * LadspaMatrixControlDialog::createMatrixWidget()
 {
 	QWidget *widget = new QWidget(this);
 	QGridLayout *gridLayout = new QGridLayout(widget);
-	gridLayout->setMargin(0);
+	gridLayout->setContentsMargins(0, 0, 0, 0);
 	widget->setLayout(gridLayout);
 
 	arrangeControls(widget, gridLayout);

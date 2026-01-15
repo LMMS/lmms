@@ -33,6 +33,7 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
+#include "AutomatableButton.h"
 #include "ComboBox.h"
 #include "ConfigManager.h"
 #include "DataFile.h"
@@ -59,6 +60,7 @@
 #include "MainWindow.h"
 #include "PianoView.h"
 #include "PluginFactory.h"
+#include "PluginView.h"
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "SubWindow.h"
@@ -125,17 +127,6 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	basicControlsLayout->setVerticalSpacing(0);
 	basicControlsLayout->setContentsMargins(0, 0, 0, 0);
 
-#if QT_VERSION < 0x50C00
-	// Workaround for a bug in Qt versions below 5.12,
-	// where argument-dependent-lookup fails for QFlags operators
-	// declared inside a namepsace.
-	// This affects the Q_DECLARE_OPERATORS_FOR_FLAGS macro in Instrument.h
-	// See also: https://codereview.qt-project.org/c/qt/qtbase/+/225348
-
-	using ::operator|;
-
-#endif
-
 	QString labelStyleSheet = "font-size: 10px;";
 	Qt::Alignment labelAlignment = Qt::AlignHCenter | Qt::AlignTop;
 	Qt::Alignment widgetAlignment = Qt::AlignHCenter | Qt::AlignCenter;
@@ -144,19 +135,17 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	soloMuteLayout->setContentsMargins(0, 0, 2, 0);
 	soloMuteLayout->setSpacing(2);
 
-	m_muteBtn = new PixmapButton(this, tr("Mute"));
+	m_muteBtn = new AutomatableButton(this, tr("Mute"));
 	m_muteBtn->setModel(&m_track->m_mutedModel);
-	m_muteBtn->setActiveGraphic(embed::getIconPixmap("mute_active"));
-	m_muteBtn->setInactiveGraphic(embed::getIconPixmap("mute_inactive"));
 	m_muteBtn->setCheckable(true);
+	m_muteBtn->setObjectName("btn-mute");
 	m_muteBtn->setToolTip(tr("Mute this instrument"));
 	soloMuteLayout->addWidget(m_muteBtn, 0, widgetAlignment);
 
-	m_soloBtn = new PixmapButton(this, tr("Solo"));
+	m_soloBtn = new AutomatableButton(this, tr("Solo"));
 	m_soloBtn->setModel(&m_track->m_soloModel);
-	m_soloBtn->setActiveGraphic(embed::getIconPixmap("solo_active"));
-	m_soloBtn->setInactiveGraphic(embed::getIconPixmap("solo_inactive"));
 	m_soloBtn->setCheckable(true);
+	m_soloBtn->setObjectName("btn-solo");
 	m_soloBtn->setToolTip(tr("Solo this instrument"));
 	soloMuteLayout->addWidget(m_soloBtn, 0, widgetAlignment);
 
@@ -296,9 +285,9 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	vlayout->addWidget( m_pianoView );
 	setModel( _itv->model() );
 
-	updateInstrumentView();
-
 	QMdiSubWindow* subWin = getGUI()->mainWindow()->addWindowedWidget( this );
+
+	updateInstrumentView();
 
 	// The previous call should have given us a sub window parent. Therefore
 	// we can reuse this method.
@@ -480,6 +469,25 @@ void InstrumentTrackWindow::updateInstrumentView()
 		m_tabWidget->addTab( m_instrumentView, tr( "Plugin" ), "plugin_tab", 0 );
 		m_tabWidget->setActiveTab( 0 );
 
+		// If instrument is resizable, unset size constraints on tabs.
+		// Otherwise, prevent other tabs from exceeding the size of the
+		// instrument tab
+		const auto maxSize = m_instrumentView->isResizable()
+			? QSize{QWIDGETSIZE_MAX, QWIDGETSIZE_MAX}
+			: QSize{
+				std::max(INSTRUMENT_WIDTH, m_instrumentView->width()),
+				std::max(INSTRUMENT_HEIGHT, m_instrumentView->maximumHeight()),
+			};
+		m_tabWidget->setMaximumSize(maxSize);
+		// Individual tabs must also have their maximum widths set,
+		// otherwise they will remain wide, and their overflowing contents
+		// will get clipped.
+		m_ssView->setMaximumSize(maxSize);
+		m_instrumentFunctionsView->setMaximumSize(maxSize);
+		m_effectView->setMaximumSize(maxSize);
+		m_midiView->setMaximumSize(maxSize);
+		m_tuningView->setMaximumSize(maxSize);
+
 		m_ssView->setFunctionsHidden(m_track->m_instrument->isSingleStreamed());
 
 		modelChanged(); 		// Get the instrument window to refresh
@@ -541,8 +549,8 @@ void InstrumentTrackWindow::closeEvent( QCloseEvent* event )
 		hide();
 	}
 
-	m_itv->m_tlb->setFocus();
-	m_itv->m_tlb->setChecked( false );
+	m_itv->setFocus();
+	m_itv->m_tlb->setChecked(false);
 }
 
 

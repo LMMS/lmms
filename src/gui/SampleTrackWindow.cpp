@@ -31,8 +31,8 @@
 #include <QMenu>
 #include <QVBoxLayout>
 
+#include "AutomatableButton.h"
 #include "EffectRackView.h"
-#include "PixmapButton.h"
 #include "embed.h"
 #include "GuiApplication.h"
 #include "Knob.h"
@@ -53,16 +53,6 @@ SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
 	m_track(tv->model()),
 	m_stv(tv)
 {
-#if QT_VERSION < 0x50C00
-	// Workaround for a bug in Qt versions below 5.12,
-	// where argument-dependent-lookup fails for QFlags operators
-	// declared inside a namepsace.
-	// This affects the Q_DECLARE_OPERATORS_FOR_FLAGS macro in Instrument.h
-	// See also: https://codereview.qt-project.org/c/qt/qtbase/+/225348
-
-	using ::operator|;
-#endif
-
 	// init own layout + widgets
 	setFocusPolicy(Qt::StrongFocus);
 	auto vlayout = new QVBoxLayout(this);
@@ -101,18 +91,16 @@ SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
 	soloMuteLayout->setContentsMargins(0, 0, 2, 0);
 	soloMuteLayout->setSpacing(2);
 
-	m_muteBtn = new PixmapButton(this, tr("Mute"));
+	m_muteBtn = new AutomatableButton(this, tr("Mute"));
 	m_muteBtn->setModel(&m_track->m_mutedModel);
-	m_muteBtn->setActiveGraphic(embed::getIconPixmap("mute_active"));
-	m_muteBtn->setInactiveGraphic(embed::getIconPixmap("mute_inactive"));
+	m_muteBtn->setObjectName("btn-mute");
 	m_muteBtn->setCheckable(true);
 	m_muteBtn->setToolTip(tr("Mute this sample track"));
 	soloMuteLayout->addWidget(m_muteBtn, 0, widgetAlignment);
 
-	m_soloBtn = new PixmapButton(this, tr("Solo"));
+	m_soloBtn = new AutomatableButton(this, tr("Solo"));
 	m_soloBtn->setModel(&m_track->m_soloModel);
-	m_soloBtn->setActiveGraphic(embed::getIconPixmap("solo_active"));
-	m_soloBtn->setInactiveGraphic(embed::getIconPixmap("solo_inactive"));
+	m_soloBtn->setObjectName("btn-solo");
 	m_soloBtn->setCheckable(true);
 	m_soloBtn->setToolTip(tr("Solo this sample track"));
 	soloMuteLayout->addWidget(m_soloBtn, 0, widgetAlignment);
@@ -270,7 +258,7 @@ void SampleTrackWindow::closeEvent(QCloseEvent* ce)
 		hide();
 	}
 
-	m_stv->m_tlb->setFocus();
+	m_stv->setFocus();
 	m_stv->m_tlb->setChecked(false);
 }
 

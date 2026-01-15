@@ -25,7 +25,7 @@
 
 #include "MultitapEcho.h"
 #include "embed.h"
-#include "lmms_basics.h"
+#include "LmmsTypes.h"
 #include "lmms_math.h"
 #include "plugin_export.h"
 
@@ -44,7 +44,7 @@ Plugin::Descriptor PLUGIN_EXPORT multitapecho_plugin_descriptor =
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
 	0x0100,
 	Plugin::Type::Effect,
-	new PluginPixmapLoader( "logo" ),
+	new PixmapLoader("lmms-plugin-logo"),
 	nullptr,
 	nullptr,
 } ;

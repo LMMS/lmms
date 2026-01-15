@@ -22,29 +22,34 @@
  *
  */
 
+#include "MixerView.h"
 
+#include <QHBoxLayout>
 #include <QLayout>
+#include <QLineEdit>
 #include <QPushButton>
 #include <QScrollArea>
 #include <QStyle>
 #include <QKeyEvent>
+#include <QStackedLayout>
+#include <QStackedWidget>
 
-#include "lmms_math.h"
-
-#include "MixerChannelView.h"
-#include "MixerView.h"
-#include "Knob.h"
-#include "Mixer.h"
+#include "EffectRackView.h"
+#include "Engine.h"
+#include "Fader.h"
 #include "GuiApplication.h"
-#include "MainWindow.h"
-#include "AudioEngine.h"
+#include "Knob.h"
 #include "InstrumentTrack.h"
+#include "MainWindow.h"
+#include "Mixer.h"
+#include "MixerChannelView.h"
 #include "PatternStore.h"
 #include "SampleTrack.h"
 #include "SendButtonIndicator.h"
 #include "Song.h"
 #include "SubWindow.h"
 #include "TrackContainer.h" // For TrackContainer::TrackList typedef
+#include "embed.h"
 
 namespace lmms::gui
 {
@@ -56,16 +61,6 @@ MixerView::MixerView(Mixer* mixer) :
 	SerializingObjectHook(),
 	m_mixer(mixer)
 {
-#if QT_VERSION < 0x50C00
-	// Workaround for a bug in Qt versions below 5.12,
-	// where argument-dependent-lookup fails for QFlags operators
-	// declared inside a namepsace.
-	// This affects the Q_DECLARE_OPERATORS_FOR_FLAGS macro in Instrument.h
-	// See also: https://codereview.qt-project.org/c/qt/qtbase/+/225348
-
-	using ::operator|;
-#endif
-
 	mixer->setHook(this);
 
 	//QPalette pal = palette();
@@ -376,6 +371,7 @@ void MixerView::updateMixerChannel(int index)
 	}
 
 	thisLine->m_sendButton->updateLightStatus();
+	thisLine->m_renameLineEdit->setText(thisLine->elideName(thisLine->mixerChannel()->m_name));
 	thisLine->update();
 }
 
@@ -537,15 +533,8 @@ void MixerView::keyPressEvent(QKeyEvent * e)
 		case Qt::Key_F2:
 			renameChannel(m_currentMixerChannel->channelIndex());
 			break;
-		case Qt::Key_Space:
-			{
-				auto* mixerChannel = currentMixerChannel();
-
-				if (mixerChannel)
-				{
-					mixerChannel->fader()->adjustByDialog();
-				}
-			}
+		default:
+			e->ignore();
 			break;
 	}
 }

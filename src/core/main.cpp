@@ -55,7 +55,7 @@
 #include <sys/prctl.h>
 #endif
 
-#include <csignal>
+#include <csignal>  // To register the signal handler
 
 #include "MainApplication.h"
 #include "ConfigManager.h"
@@ -76,12 +76,12 @@
 #include <fenv.h> // For feenableexcept
 #include <execinfo.h> // For backtrace and backtrace_symbols_fd
 #include <unistd.h> // For STDERR_FILENO
-#include <csignal> // To register the signal handler
 #endif
 
 
 #ifdef LMMS_DEBUG_FPE
-void signalHandler( int signum ) {
+void sigfpeHandler(int signum)
+{
 
 	// Get a back trace
 	void *array[10];
@@ -140,15 +140,16 @@ inline void loadTranslation( const QString & tname,
 
 void printVersion( char *executableName )
 {
-	printf( "LMMS %s\n(%s %s, Qt %s, %s)\n\n"
+	printf("LMMS %s\n(%s %s, Qt %s, %s)\n\n"
+		"Build options:\n%s\n\n"
 		"Copyright (c) %s\n\n"
 		"This program is free software; you can redistribute it and/or\n"
 		"modify it under the terms of the GNU General Public\n"
 		"License as published by the Free Software Foundation; either\n"
 		"version 2 of the License, or (at your option) any later version.\n\n"
 		"Try \"%s --help\" for more information.\n\n", LMMS_VERSION,
-		LMMS_BUILDCONF_PLATFORM, LMMS_BUILDCONF_MACHINE, QT_VERSION_STR, LMMS_BUILDCONF_COMPILER_VERSION,
-		LMMS_PROJECT_COPYRIGHT, executableName );
+		LMMS_BUILDCONF_PLATFORM, LMMS_BUILDCONF_MACHINE, QT_VERSION_STR, LMMS_BUILDCONF_COMPILER_VERSION, LMMS_BUILD_OPTIONS,
+		LMMS_PROJECT_COPYRIGHT, executableName);
 }
 
 
@@ -189,12 +190,6 @@ void printHelp()
 		"          Default: 160.\n"
 		"  -f, --format <format>         Specify format of render-output where\n"
 		"          Format is either 'wav', 'flac', 'ogg' or 'mp3'.\n"
-		"  -i, --interpolation <method>   Specify interpolation method\n"
-		"          Possible values:\n"
-		"            - linear\n"
-		"            - sincfastest (default)\n"
-		"            - sincmedium\n"
-		"            - sincbest\n"
 		"  -l, --loop                     Render as a loop\n"
 		"  -m, --mode                     Stereo mode used for MP3 export\n"
 		"          Possible values: s, j, m\n"
@@ -291,11 +286,7 @@ int main( int argc, char * * argv )
 		}
 		else if (arg == "--geometry" || arg == "-geometry")
 		{
-			if (arg == "--geometry")
-			{
-				// Delete the first "-" so Qt recognize the option
-				strcpy(argv[i], "-geometry");
-			}
+			if (arg == "--geometry") { argv[i]++; } // Delete the first "-" so Qt recognize the option
 			// option -geometry is filtered by Qt later,
 			// so we need to check its presence now to
 			// determine, if the application should run in
@@ -314,8 +305,9 @@ int main( int argc, char * * argv )
 
 	// Install the trap handler
 	// register signal SIGFPE and signal handler
-	signal(SIGFPE, signalHandler);
+	signal(SIGFPE, sigfpeHandler);
 #endif
+	signal(SIGINT, gui::GuiApplication::sigintHandler);
 
 #ifdef LMMS_BUILD_WIN32
 	// Don't touch redirected streams here
@@ -356,7 +348,7 @@ int main( int argc, char * * argv )
 	// initialize memory managers
 	NotePlayHandleManager::init();
 
-	// intialize RNG
+	// initialize RNG
 	srand( getpid() + time( 0 ) );
 
 	disable_denormals();
@@ -368,12 +360,16 @@ int main( int argc, char * * argv )
 		return EXIT_FAILURE;
 	}
 #endif
+
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
+	// High-DPI scaling is always enabled in Qt >= 6.0
 	QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+#endif
+
 	QCoreApplication * app = coreOnly ?
 			new QCoreApplication( argc, argv ) :
 					new gui::MainApplication(argc, argv);
 
-	AudioEngine::qualitySettings qs(AudioEngine::qualitySettings::Interpolation::Linear);
 	OutputSettings os(44100, 160, OutputSettings::BitDepth::Depth16Bit, OutputSettings::StereoMode::JointStereo);
 	ProjectRenderer::ExportFileFormat eff = ProjectRenderer::ExportFileFormat::Wave;
 
@@ -613,39 +609,6 @@ int main( int argc, char * * argv )
 		{
 			os.setBitDepth(OutputSettings::BitDepth::Depth32Bit);
 		}
-		else if( arg == "--interpolation" || arg == "-i" )
-		{
-			++i;
-
-			if( i == argc )
-			{
-				return usageError( "No interpolation method specified" );
-			}
-
-
-			const QString ip = QString( argv[i] );
-
-			if( ip == "linear" )
-			{
-		qs.interpolation = AudioEngine::qualitySettings::Interpolation::Linear;
-			}
-			else if( ip == "sincfastest" )
-			{
-		qs.interpolation = AudioEngine::qualitySettings::Interpolation::SincFastest;
-			}
-			else if( ip == "sincmedium" )
-			{
-		qs.interpolation = AudioEngine::qualitySettings::Interpolation::SincMedium;
-			}
-			else if( ip == "sincbest" )
-			{
-		qs.interpolation = AudioEngine::qualitySettings::Interpolation::SincBest;
-			}
-			else
-			{
-				return usageError( QString( "Invalid interpolation method %1" ).arg( argv[i] ) );
-			}
-		}
 		else if( arg == "--import" )
 		{
 			++i;
@@ -774,7 +737,7 @@ int main( int argc, char * * argv )
 		}
 
 		// create renderer
-		auto r = new RenderManager(qs, os, eff, renderOut);
+		auto r = new RenderManager(os, eff, renderOut);
 		QCoreApplication::instance()->connect( r,
 				SIGNAL(finished()), SLOT(quit()));
 
