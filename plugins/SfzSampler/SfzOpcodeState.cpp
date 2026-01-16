@@ -290,6 +290,11 @@ bool SfzOpcodeState::setOpcodeByStrings(const QString& name, const QString& valu
 		int ccNumber = ccNumberFromOpcode(name);
 		m_set_cc.at(ccNumber) = value.toFloat(&successful) * 127;
 	}
+	else if (name.startsWith("label_cc"))
+	{
+		int ccNumber = ccNumberFromOpcode(name);
+		m_label_cc.at(ccNumber) = value;
+	}
 
 	else
 	{

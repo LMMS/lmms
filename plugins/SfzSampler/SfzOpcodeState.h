@@ -152,6 +152,8 @@ public:
 	std::array<int, NumMidiCCs> m_hicc = {}; // NOTE this needs to be initialized to contain all 127 in the constructor, since it's hard to fill an array directly within a header file
 	//! Default midi CC values
 	std::array<int, NumMidiCCs> m_set_cc = {};
+	//! Human readable names for the controls
+	std::array<std::optional<QString>, NumMidiCCs> m_label_cc = {};
 
 	friend class SfzRegion;
 };

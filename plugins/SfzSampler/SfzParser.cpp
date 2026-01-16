@@ -190,6 +190,7 @@ bool SfzParser::parseSfzFile(const QString& filePath, std::vector<SfzRegion>& ou
 			case Header::Global:
 			{
 				// Do nothing. The global headers were already handled above
+				// TODO this is wrong, some sfz's treat global headers as local, expecting that one after another will overwrite the last
 				break;
 			}
 			case Header::Group:
