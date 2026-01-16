@@ -34,7 +34,11 @@
 #include <QSpinBox>
 #include <QVBoxLayout>
 
+#include "Engine.h"
+#include "GuiApplication.h"
+#include "MainWindow.h"
 #include "ProjectRenderer.h"
+#include "Song.h"
 
 namespace lmms::gui {
 
@@ -43,7 +47,7 @@ constexpr auto maxCompressionLevel = 8;
 constexpr auto maxLoopRepeat = 64;
 } // namespace
 
-ExportProjectDialog::ExportProjectDialog(const QString& path, QWidget* parent, bool multiExport)
+ExportProjectDialog::ExportProjectDialog(const QString& path, Mode mode, QWidget* parent)
 	: QDialog(parent)
 	, m_fileFormatSetting(new FileFormatSetting(tr("File format:")))
 	, m_sampleRateSetting(new FileFormatSetting(tr("Sampling rate:")))
@@ -58,6 +62,8 @@ ExportProjectDialog::ExportProjectDialog(const QString& path, QWidget* parent, b
 	, m_startButton(new QPushButton(tr("Start")))
 	, m_cancelButton(new QPushButton(tr("Cancel")))
 	, m_progressBar(new QProgressBar())
+	, m_path(path)
+	, m_mode(mode)
 {
 	setWindowTitle(tr("Export project"));
 
@@ -95,7 +101,7 @@ ExportProjectDialog::ExportProjectDialog(const QString& path, QWidget* parent, b
 
 	connect(m_fileFormatSetting->comboBox(), qOverload<int>(&QComboBox::currentIndexChanged), this,
 		&ExportProjectDialog::onFileFormatChanged);
-
+	connect(m_startButton, &QPushButton::clicked, this, &ExportProjectDialog::onStartButtonClicked);
 	connect(m_cancelButton, &QPushButton::clicked, this, &ExportProjectDialog::reject);
 
 	auto index = 0;
@@ -148,14 +154,14 @@ ExportProjectDialog::ExportProjectDialog(const QString& path, QWidget* parent, b
 	{
 		switch (static_cast<OutputSettings::StereoMode>(i))
 		{
+		case OutputSettings::StereoMode::Mono:
+			m_stereoModeSetting->comboBox()->addItem(tr("Mono"), i);
+			break;
 		case OutputSettings::StereoMode::Stereo:
 			m_stereoModeSetting->comboBox()->addItem(tr("Stereo"), i);
 			break;
 		case OutputSettings::StereoMode::JointStereo:
 			m_stereoModeSetting->comboBox()->addItem(tr("Joint stereo"), i);
-			break;
-		case OutputSettings::StereoMode::Mono:
-			m_stereoModeSetting->comboBox()->addItem(tr("Mono"), i);
 			break;
 		default:
 			assert(false && "invalid or unsupported stereo mode");
@@ -218,6 +224,58 @@ void ExportProjectDialog::onFileFormatChanged(int index)
 	}
 }
 
+void ExportProjectDialog::onStartButtonClicked()
+{
+	const auto sampleRate = static_cast<sample_rate_t>(m_sampleRateSetting->comboBox()->currentData().toInt());
+	const auto bitRate = static_cast<bitrate_t>(m_bitRateSetting->comboBox()->currentData().toInt());
+	const auto bitDepth = static_cast<OutputSettings::BitDepth>(m_bitDepthSetting->comboBox()->currentData().toInt());
+	const auto stereoMode
+		= static_cast<OutputSettings::StereoMode>(m_stereoModeSetting->comboBox()->currentData().toInt());
+	auto outputSettings = OutputSettings{sampleRate, bitRate, bitDepth, stereoMode};
+
+	const auto compressionLevel = m_compressionLevelSetting->comboBox()->currentData().toDouble();
+	outputSettings.setCompressionLevel(compressionLevel);
+
+	const auto format
+		= static_cast<ProjectRenderer::ExportFileFormat>(m_fileFormatSetting->comboBox()->currentData().toInt());
+	m_renderManager = std::make_unique<RenderManager>(outputSettings, format, m_path);
+	m_startButton->setEnabled(false);
+
+	Engine::getSong()->setExportLoop(m_exportAsLoopBox->isChecked());
+	Engine::getSong()->setRenderBetweenMarkers(m_exportBetweenLoopMarkersBox->isChecked());
+	Engine::getSong()->setLoopRenderCount(m_loopRepeatBox->value());
+
+	connect(m_renderManager.get(), &RenderManager::progressChanged, m_progressBar, &QProgressBar::setValue);
+	connect(m_renderManager.get(), &RenderManager::progressChanged, this, &ExportProjectDialog::updateTitleBar);
+	connect(m_renderManager.get(), &RenderManager::finished, this, &QDialog::accept);
+	connect(m_renderManager.get(), &RenderManager::finished, getGUI()->mainWindow(), &MainWindow::resetWindowTitle);
+
+	switch (m_mode)
+	{
+	case Mode::ExportProject:
+		m_renderManager->renderProject();
+		break;
+	case Mode::ExportTracks:
+		m_renderManager->renderTracks();
+		break;
+	}
+}
+
+void ExportProjectDialog::accept()
+{
+	m_renderManager.reset(nullptr);
+	QDialog::accept();
+	getGUI()->mainWindow()->resetWindowTitle();
+
+}
+
+void ExportProjectDialog::reject()
+{
+	if (m_renderManager) { m_renderManager->abortProcessing(); }
+	m_renderManager.reset(nullptr);
+	QDialog::reject();
+}
+
 ExportProjectDialog::FileFormatSetting::FileFormatSetting(const QString& header)
 	: m_label(new QLabel(header))
 	, m_comboBox(new QComboBox())
@@ -229,6 +287,11 @@ ExportProjectDialog::FileFormatSetting::FileFormatSetting(const QString& header)
 	layout->addWidget(m_comboBox);
 	layout->setContentsMargins(0, 0, 0, 0);
 	layout->setSpacing(2);
+}
+
+void ExportProjectDialog::updateTitleBar(int prog)
+{
+	getGUI()->mainWindow()->setWindowTitle(tr("Rendering: %1%").arg(prog));
 }
 
 } // namespace lmms::gui

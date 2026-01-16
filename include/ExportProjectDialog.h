@@ -27,6 +27,7 @@
 #define LMMS_GUI_EXPORT_PROJECT_DIALOG_H
 
 #include <QDialog>
+#include "RenderManager.h"
 
 class QString;
 class QLabel;
@@ -41,7 +42,13 @@ namespace lmms::gui
 class ExportProjectDialog : public QDialog
 {
 public:
-	ExportProjectDialog(const QString& path, QWidget* parent, bool multiExport = false);
+	enum class Mode
+	{
+		ExportProject,
+		ExportTracks,
+	};
+
+	ExportProjectDialog(const QString& path, Mode mode, QWidget* parent = nullptr);
 
 private:
 	class FileFormatSetting : public QWidget
@@ -54,7 +61,11 @@ private:
 		QComboBox* m_comboBox = nullptr;
 	};
 
+	void accept() override;
+	void reject() override;
 	void onFileFormatChanged(int index);
+	void onStartButtonClicked();
+	void updateTitleBar(int prog);
 
 	FileFormatSetting* m_fileFormatSetting = nullptr;
 	FileFormatSetting* m_sampleRateSetting = nullptr;
@@ -69,6 +80,9 @@ private:
 	QPushButton* m_startButton = nullptr;
 	QPushButton* m_cancelButton = nullptr;
 	QProgressBar* m_progressBar = nullptr;
+	QString m_path;
+	Mode m_mode;
+	std::unique_ptr<RenderManager> m_renderManager;
 };
 
 } // namespace lmms::gui
