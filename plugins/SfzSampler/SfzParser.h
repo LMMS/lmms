@@ -3,6 +3,7 @@
 #define LMMS_SFZ_PARSER_H
 
 #include "SfzRegion.h"
+#include "SfzControlsConfig.h"
 #include <QString>
 #include <QDir>
 #include <vector>
@@ -13,7 +14,7 @@ namespace lmms
 class SfzParser
 {
 public:
-	static bool parseSfzFile(const QString& filePath, std::vector<SfzRegion>& outputRegions, SfzOpcodeState& controlsConfig);
+	static bool parseSfzFile(const QString& filePath, std::vector<SfzRegion>& outputRegions, SfzControlsConfig& controlsConfig);
 
 private:
 	//! Helper function to parse any #include or #define statements from a string, recursively so that the included files have their includes and defines handled too

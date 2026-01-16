@@ -145,6 +145,11 @@ void SfzSampler::play(SampleFrame* workingBuffer)
 
 void SfzSampler::loadFile(const QString& filePath)
 {
+	// Reset the note counts, midi cc values, etc
+	m_sfzGlobalState = SfzGlobalState();
+	// And any info about control labels, default values, etc
+	m_controlsConfig = SfzControlsConfig();
+
 	// Parse all the <region> headers of the .sfz (accounting for <global> and <group> defaults) and populate m_sfzRegions with the new SfzRegion
 	// The <control> header is also parsed into a separate object for easy access by the gui
 	bool successfulParseFile = SfzParser::parseSfzFile(filePath, m_sfzRegions, m_controlsConfig);
@@ -162,8 +167,6 @@ void SfzSampler::loadFile(const QString& filePath)
 		qDebug() << "sample was load okay?" << successfulLoadSample;
 	}
 
-	// Reset the note counts, midi cc values, etc
-	m_sfzGlobalState = SfzGlobalState();
 	// Set the initial cc values based on any `set_ccN` opcodes in the <control> header
 	m_sfzGlobalState.initializeMidiCCValues(m_controlsConfig);
 

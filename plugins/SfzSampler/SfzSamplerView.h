@@ -27,6 +27,8 @@
 
 #include "InstrumentView.h"
 
+#include <QGridLayout>
+
 namespace lmms {
 
 class SfzSampler;
@@ -41,6 +43,7 @@ public:
 	SfzSamplerView(SfzSampler* instrument, QWidget* parent);
 
 public slots:
+	void updateKnobs();
 	void openFile();
 
 protected:
@@ -54,6 +57,9 @@ private:
 	bool isResizable() const override { return true; }
 
 	SfzSampler* m_instrument;
+
+	QWidget* m_controlsWidget;
+	QGridLayout* m_knobLayout;
 };
 
 } // namespace gui

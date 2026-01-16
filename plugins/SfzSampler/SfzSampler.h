@@ -35,6 +35,7 @@
 #include "SfzRegion.h"
 #include "SfzRegionPlayState.h"
 #include "SfzGlobalState.h"
+#include "SfzControlsConfig.h"
 
 namespace lmms {
 
@@ -72,8 +73,8 @@ private:
 	//! Holds information about the total number of notes active, last switch keys pressed, etc
 	SfzGlobalState m_sfzGlobalState;
 
-	//! Holds information about midi CC default values, control labels, etc
-	SfzOpcodeState m_controlsConfig;
+	//! Holds information about midi CC default values, labels, which CC's are actually used, etc
+	SfzControlsConfig m_controlsConfig;
 
 	std::vector<SfzRegion> m_sfzRegions;
 

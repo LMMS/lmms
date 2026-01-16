@@ -10,7 +10,7 @@ namespace lmms
 {
 
 
-bool SfzParser::parseSfzFile(const QString& filePath, std::vector<SfzRegion>& outputRegions, SfzOpcodeState& controlsConfig)
+bool SfzParser::parseSfzFile(const QString& filePath, std::vector<SfzRegion>& outputRegions, SfzControlsConfig& controlsConfig)
 {
 	// Clear the vector of regions just in case anything is inside it from before
 	outputRegions.clear();
@@ -184,6 +184,8 @@ bool SfzParser::parseSfzFile(const QString& filePath, std::vector<SfzRegion>& ou
 		}
 
 		// If this line/segment isn't a new header, it must be an opcode assignment
+		auto opcodeNameAndValue = segment.split("=");
+		if (opcodeNameAndValue.size() != 2) { qDebug() << "[SFZ Parser] Syntax error, could not parse opcode assignment:" << segment; return false; }
 		// Depending on the current header/zone, opcode assignments are handled differently:
 		switch (currentHeader)
 		{
@@ -196,23 +198,17 @@ bool SfzParser::parseSfzFile(const QString& filePath, std::vector<SfzRegion>& ou
 			case Header::Group:
 			{
 				// If we are in a group, update the opcodes of the current group state
-				auto opcodeNameAndValue = segment.split("=");
-				if (opcodeNameAndValue.size() != 2) { qDebug() << "[SFZ Parser] Syntax error, could not parse opcode assignment:" << segment; return false; }
 				currentGroupState.setOpcodeByStrings(opcodeNameAndValue[0], opcodeNameAndValue[1]);
 				break;
 			}
 			case Header::Region:
 			{
 				// If we are within a region, update the opcodes of the current region state
-				auto opcodeNameAndValue = segment.split("=");
-				if (opcodeNameAndValue.size() != 2) { qDebug() << "[SFZ Parser] Syntax error, could not parse opcode assignment:" << segment; return false; }
 				currentRegionState.setOpcodeByStrings(opcodeNameAndValue[0], opcodeNameAndValue[1]);
 				break;
 			}
 			case Header::Control:
 			{
-				auto opcodeNameAndValue = segment.split("=");
-				if (opcodeNameAndValue.size() != 2) { qDebug() << "[SFZ Parser] Syntax error, could not parse opcode assignment:" << segment; return false; }
 				controlsConfig.setOpcodeByStrings(opcodeNameAndValue[0], opcodeNameAndValue[1]);
 				// Also set the opcode for the global state, that way it will get propagated down to all other regions (this is needed for things like `default_path` to work for all regions)
 				// Technically it could be reworked so that the regions fetch any needed info from the controls state, but for now this way is simpler.
@@ -229,6 +225,14 @@ bool SfzParser::parseSfzFile(const QString& filePath, std::vector<SfzRegion>& ou
 				qDebug() << "[SFZ Parser] Error: Encountered line within invalid header" << segment;
 				return false;
 			}
+		}
+		// For the GUI, it's nice to keep track of which midi CC's are being used, and only display those (not all 128)
+		// This is a bit hacky, but just checking if the opcode has "ccN" inside it and parsing that number works fine
+		QRegularExpression re("cc\\d+");
+		QRegularExpressionMatch match = re.match(opcodeNameAndValue[0]);
+		if (match.hasMatch())
+		{
+			controlsConfig.m_activeMidiCCs.at(match.captured(0).split("cc")[1].toInt()) = true;
 		}
 	}
 	// Check one last time in case the file ended with a region and didn't get added

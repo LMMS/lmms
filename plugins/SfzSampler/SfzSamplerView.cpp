@@ -54,12 +54,14 @@ namespace gui {
 SfzSamplerView::SfzSamplerView(SfzSampler* instrument, QWidget* parent)
 	: InstrumentView(instrument, parent)
 	, m_instrument(instrument)
+	, m_controlsWidget(new QWidget(this))
+	, m_knobLayout(new QGridLayout(m_controlsWidget))
 {
 	setAcceptDrops(true);
 	setAutoFillBackground(true);
 
 	setMaximumSize(QSize(10000, 10000));
-	setMinimumSize(QSize(500, 500));
+	setMinimumSize(QSize(500, 250));
 
 	auto layout1 = new QVBoxLayout(this);
 
@@ -67,32 +69,44 @@ SfzSamplerView::SfzSamplerView(SfzSampler* instrument, QWidget* parent)
 	connect(openFileButton, &PixmapButton::clicked, this, &SfzSamplerView::openFile);
 	layout1->addWidget(openFileButton);
 
-	auto layout2 = new QGridLayout();
-	layout1->addLayout(layout2);
-
-	// Initialize Midi CC knobs
-	for (int i = 0; i < SfzOpcodeState::NumMidiCCs; ++i)
-	{
-		m_instrument->m_ccModels.at(i).setRange(0, 127, 1);
-		m_instrument->m_ccModels.at(i).setValue(m_instrument->m_sfzGlobalState.midiCCValue(i), true);
-		const QString& controlLabel = m_instrument->m_controlsConfig.m_label_cc.at(i).value_or(tr("CC %1").arg(i));
-		auto ccKnob = new Knob(KnobType::Bright26, controlLabel, this);
-		ccKnob->setModel(&m_instrument->m_ccModels.at(i));
-		layout2->addWidget(ccKnob, i / 12, i % 12);
-		connect(&m_instrument->m_ccModels.at(i), &AutomatableModel::dataChanged, this, [i, this](){
-			m_instrument->handleMidiEvent(MidiEvent(MidiControlChange, 0, i, m_instrument->m_ccModels.at(i).value()));
-		});
-	}
+	layout1->addWidget(m_controlsWidget);
 
 	// Whenever a new SFZ file is loaded, set the default CC values
-	connect(m_instrument, &SfzSampler::fileLoaded, [this](){
-		for (int i = 0; i < SfzOpcodeState::NumMidiCCs; ++i)
-		{
-			m_instrument->m_ccModels.at(i).setValue(m_instrument->m_sfzGlobalState.midiCCValue(i), true);
-		}
-	});
+	connect(m_instrument, &SfzSampler::fileLoaded, [this](){ updateKnobs(); }); // this lambda is so bad, but it doesn't work as a slot for some reason
+
+	updateKnobs();
 
 	update();
+}
+
+
+void SfzSamplerView::updateKnobs()
+{
+	// Remove any old knobs
+	delete m_controlsWidget;
+	m_controlsWidget = new QWidget(this);
+	m_knobLayout = new QGridLayout(m_controlsWidget);
+	layout()->addWidget(m_controlsWidget);
+
+	// Initialize new knobs
+	int activeControlCount = 0;
+	for (int i = 0; i < SfzOpcodeState::NumMidiCCs; ++i)
+	{
+		// Only add a knob if the control is actually used
+		if (m_instrument->m_controlsConfig.m_activeMidiCCs.at(i))
+		{
+			m_instrument->m_ccModels.at(i).setRange(0, 127, 1);
+			m_instrument->m_ccModels.at(i).setValue(m_instrument->m_sfzGlobalState.midiCCValue(i), true);
+			const QString& controlLabel = m_instrument->m_controlsConfig.m_label_cc.at(i).value_or(tr("CC %1").arg(i));
+			auto ccKnob = new Knob(KnobType::Bright26, controlLabel, m_controlsWidget);
+			ccKnob->setModel(&m_instrument->m_ccModels.at(i));
+			m_knobLayout->addWidget(ccKnob, activeControlCount / 8, activeControlCount % 8);
+			connect(&m_instrument->m_ccModels.at(i), &AutomatableModel::dataChanged, this, [i, this](){
+				m_instrument->handleMidiEvent(MidiEvent(MidiControlChange, 0, i, m_instrument->m_ccModels.at(i).value()));
+			});
+			activeControlCount++;
+		}
+	}
 }
 
 

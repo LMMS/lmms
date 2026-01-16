@@ -15,6 +15,7 @@ build_plugin(sfzsampler
 	SfzRegionPlayState.h
 	SfzGlobalState.cpp
 	SfzGlobalState.h
+	SfzControlsConfig.h
 	SfzTrigger.cpp
 	SfzTrigger.h
 	SfzSampleBuffer.cpp
@@ -27,6 +28,7 @@ build_plugin(sfzsampler
 	SfzParser.h
 	SfzRegionPlayState.h
 	SfzGlobalState.h
+	SfzControlsConfig.h
 	SfzTrigger.h
 	SfzSampleBuffer.h
 	EMBEDDED_RESOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.svg"
