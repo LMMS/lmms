@@ -266,7 +266,7 @@ void InstrumentFunctionNoteStacking::processNote( NotePlayHandle * _n )
 				// different
 				Engine::audioEngine()->addPlayHandle(
 						NotePlayHandleManager::acquire( _n->instrumentTrack(), _n->offset(), _n->frames(), note_copy,
-									_n, -1, NotePlayHandle::Origin::NoteStacking )
+									_n, 0, NotePlayHandle::Origin::NoteStacking )
 						);
 			}
 		}
@@ -510,7 +510,7 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 							gated_frames,
 							Note( TimePos( 0 ), TimePos( 0 ), sub_note_key, _n->getVolume(),
 									_n->getPanning(), _n->detuning() ),
-							_n, -1, NotePlayHandle::Origin::Arpeggio )
+							_n, 0, NotePlayHandle::Origin::Arpeggio )
 				);
 
 		// update counters

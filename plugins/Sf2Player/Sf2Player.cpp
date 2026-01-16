@@ -653,9 +653,7 @@ void Sf2Instrument::playNote( NotePlayHandle * _n, SampleFrame* )
 		return;
 	}
 
-	int masterPitch = instrumentTrack()->useMasterPitchModel()->value() ? Engine::getSong()->masterPitch() : 0;
-	int baseNote = instrumentTrack()->baseNoteModel()->value();
-	int midiNote = _n->midiKey() - baseNote + DefaultBaseKey + masterPitch;
+	int midiNote = _n->key();
 
 	// out of range?
 	if (midiNote < 0 || midiNote >= 128)
