@@ -181,6 +181,7 @@ ExportProjectDialog::ExportProjectDialog(const QString& path, Mode mode, QWidget
 	fileFormatSettingsLayout->addRow(m_bitDepthLabel, m_bitDepthComboBox);
 	fileFormatSettingsLayout->addRow(m_stereoModeLabel, m_stereoModeComboBox);
 	fileFormatSettingsLayout->addRow(m_compressionLevelLabel, m_compressionLevelComboBox);
+	fileFormatSettingsLayout->setVerticalSpacing(4);
 
 	auto startCancelButtonsLayout = new QHBoxLayout{};
 	startCancelButtonsLayout->addStretch();
