@@ -46,6 +46,9 @@ namespace lmms::gui {
 namespace {
 constexpr auto maxCompressionLevel = 8;
 constexpr auto defaultCompressionLevel = 5;
+constexpr auto defaultBitRate = 160;
+constexpr auto defaultBitDepth = OutputSettings::BitDepth::Depth24Bit;
+constexpr auto defaultStereoMode = OutputSettings::StereoMode::Stereo;
 constexpr auto maxLoopRepeat = 64;
 } // namespace
 
@@ -162,6 +165,10 @@ ExportProjectDialog::ExportProjectDialog(const QString& path, Mode mode, QWidget
 		}
 	}
 
+	m_bitRateComboBox->setCurrentIndex(std::max(0, m_bitRateComboBox->findData(defaultBitRate)));
+	m_bitDepthComboBox->setCurrentIndex(std::max(0, m_bitDepthComboBox->findData(static_cast<int>(defaultBitDepth))));
+	m_stereoModeComboBox->setCurrentIndex(
+		std::max(0, m_stereoModeComboBox->findData(static_cast<int>(defaultStereoMode))));
 	m_compressionLevelComboBox->setCurrentIndex(defaultCompressionLevel);
 
 	auto mainLayout = new QVBoxLayout(this);
