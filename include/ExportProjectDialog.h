@@ -27,6 +27,9 @@
 #define LMMS_GUI_EXPORT_PROJECT_DIALOG_H
 
 #include <QDialog>
+#include <QComboBox>
+#include <QLabel>
+#include <QProgressBar>
 
 namespace lmms::gui
 {
@@ -35,6 +38,23 @@ class ExportProjectDialog : public QDialog
 {
 public:
 	ExportProjectDialog(const QString& path, QWidget* parent, bool multiExport = false);
+
+private:
+	QLabel* m_fileFormatLabel = nullptr;
+	QComboBox* m_fileFormatComboBox = nullptr;
+	QLabel* m_sampleRateLabel = nullptr;
+	QComboBox* m_sampleRateComboBox = nullptr;
+	QLabel* m_bitRateLabel = nullptr;
+	QComboBox* m_bitRateComboBox = nullptr;
+	QLabel* m_bitDepthLabel = nullptr;
+	QComboBox* m_bitDepthComboBox = nullptr;
+	QLabel* m_stereoModeLabel = nullptr;
+	QComboBox* m_stereoModeComboBox = nullptr;
+	QLabel* m_compressionLevelLabel = nullptr;
+	QComboBox* m_compressionLevelComboBox = nullptr;
+	QPushButton* m_startButton = nullptr;
+	QPushButton* m_cancelButton = nullptr;
+	QProgressBar* m_progressBar = nullptr;
 };
 
 } // namespace lmms::gui
