@@ -39,14 +39,16 @@ public:
 	{
 		Depth16Bit,
 		Depth24Bit,
-		Depth32Bit
+		Depth32Bit,
+		Count
 	};
 
 	enum class StereoMode
 	{
 		Stereo,
 		JointStereo,
-		Mono
+		Mono,
+		Count
 	};
 
 public:

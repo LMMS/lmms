@@ -28,8 +28,11 @@
 #include <QFileInfo>
 #include <QGroupBox>
 #include <QLabel>
+#include <QProgressBar>
 #include <QPushButton>
 #include <QVBoxLayout>
+
+#include "ProjectRenderer.h"
 
 namespace lmms::gui {
 
@@ -65,6 +68,9 @@ ExportProjectDialog::ExportProjectDialog(const QString& path, QWidget* parent, b
 	auto startButton = new QPushButton(tr("Start"));
 	auto cancelButton = new QPushButton(tr("Cancel"));
 
+	auto progressBar = new QProgressBar{};
+	progressBar->setValue(0);
+
 	fileFormatSettingsLayout->addWidget(fileFormatLabel);
 	fileFormatSettingsLayout->addWidget(fileFormatComboBox);
 
@@ -89,6 +95,81 @@ ExportProjectDialog::ExportProjectDialog(const QString& path, QWidget* parent, b
 
 	mainLayout->addWidget(fileFormatSettingsGroupBox);
 	mainLayout->addLayout(startCancelButtonsLayout);
+	mainLayout->addWidget(progressBar);
+
+	for (const auto& device : ProjectRenderer::fileEncodeDevices)
+	{
+		if (!device.isAvailable()) { continue; }	
+		fileFormatComboBox->addItem(tr(device.m_description), static_cast<int>(device.m_fileFormat));
+	}
+
+	for (const auto& sampleRate : SUPPORTED_SAMPLERATES)
+	{
+		const auto str = tr("%1 %2").arg(QString::number(sampleRate), "Hz");
+		sampleRateComboBox->addItem(str, sampleRate);
+	}
+
+	for (const auto& bitRate : SUPPORTED_BITRATES)
+	{
+		const auto str = tr("%1 %2").arg(QString::number(bitRate), "KBit/s");
+		bitRateComboBox->addItem(str, bitRate);
+	}
+
+	for (auto i = 0; i < static_cast<int>(OutputSettings::BitDepth::Count); ++i)
+	{
+		switch (static_cast<OutputSettings::BitDepth>(i))
+		{
+		case OutputSettings::BitDepth::Depth16Bit:
+			bitDepthComboBox->addItem(tr("16 Bit integer"), i);
+			break;
+		case OutputSettings::BitDepth::Depth24Bit:
+			bitDepthComboBox->addItem(tr("24 Bit integer"), i);
+			break;
+		case OutputSettings::BitDepth::Depth32Bit:
+			bitDepthComboBox->addItem(tr("32 Bit float"), i);
+			break;
+		default:
+			assert(false && "invalid or unsupported bit depth");
+			break;
+		}
+	}
+
+	for (auto i = 0; i < static_cast<int>(OutputSettings::StereoMode::Count); ++i)
+	{
+		switch (static_cast<OutputSettings::StereoMode>(i))
+		{
+		case OutputSettings::StereoMode::Stereo:
+			stereoModeComboBox->addItem(tr("Stereo"), i);
+			break;
+		case OutputSettings::StereoMode::JointStereo:
+			stereoModeComboBox->addItem(tr("Joint stereo"), i);
+			break;
+		case OutputSettings::StereoMode::Mono:
+			stereoModeComboBox->addItem(tr("Mono"), i);
+			break;
+		default:
+			assert(false && "invalid or unsupported stereo mode");
+			break;
+		}
+	}
+
+	constexpr auto maxCompressionLevel = 8;
+	for (auto i = 0; i <= maxCompressionLevel; ++i)
+	{
+		const auto compressionValue = static_cast<float>(i) / maxCompressionLevel;
+		switch (i)
+		{
+		case 0:
+			compressionLevelComboBox->addItem(tr("%1 (Fastest, biggest)").arg(i), compressionValue);
+			break;
+		case maxCompressionLevel:
+			compressionLevelComboBox->addItem(tr("%1 (Slowest, smallest)").arg(i), compressionValue);
+			break;
+		default:
+			compressionLevelComboBox->addItem(QString::number(i), compressionValue);
+			break;
+		}
+	}
 }
 
 } // namespace lmms::gui
