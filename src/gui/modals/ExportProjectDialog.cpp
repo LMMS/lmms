@@ -33,6 +33,11 @@
 
 namespace lmms::gui {
 
+namespace {
+	constexpr auto maxCompressionLevel = 8;
+	constexpr auto maxLoopRepeat = 64;
+}
+
 ExportProjectDialog::ExportProjectDialog(const QString& path, QWidget* parent, bool multiExport)
 	: QDialog(parent)
 	, m_fileFormatSetting(new FileFormatSetting(tr("File format:")))
@@ -41,6 +46,10 @@ ExportProjectDialog::ExportProjectDialog(const QString& path, QWidget* parent, b
 	, m_bitDepthSetting(new FileFormatSetting(tr("Bit depth:")))
 	, m_stereoModeSetting(new FileFormatSetting(("Stereo mode:")))
 	, m_compressionLevelSetting(new FileFormatSetting(tr("Compression level:")))
+	, m_exportAsLoopBox(new QCheckBox(tr("Export as loop (remove extra bar)")))
+	, m_exportBetweenLoopMarkersBox(new QCheckBox(tr("Export between loop markers")))
+	, m_loopRepeatLabel(new QLabel(tr("Render looped section:")))
+	, m_loopRepeatBox(new QSpinBox())
 	, m_startButton(new QPushButton(tr("Start")))
 	, m_cancelButton(new QPushButton(tr("Cancel")))
 	, m_progressBar(new QProgressBar())
@@ -48,11 +57,19 @@ ExportProjectDialog::ExportProjectDialog(const QString& path, QWidget* parent, b
 	setWindowTitle(tr("Export project to %1").arg(QFileInfo(path).fileName()));
 
 	auto mainLayout = new QVBoxLayout(this);
-	auto startCancelButtonsLayout = new QHBoxLayout{};
+
+	auto loopRepeatLayout = new QHBoxLayout{};
+	loopRepeatLayout->addWidget(m_loopRepeatLabel);
+	loopRepeatLayout->addWidget(m_loopRepeatBox);
+
+	auto exportSettingsGroupBox = new QGroupBox(tr("Export settings"));
+	auto exportSettingsLayout = new QVBoxLayout{exportSettingsGroupBox};
+	exportSettingsLayout->addWidget(m_exportAsLoopBox);
+	exportSettingsLayout->addWidget(m_exportBetweenLoopMarkersBox);
+	exportSettingsLayout->addLayout(loopRepeatLayout);
 
 	auto fileFormatSettingsGroupBox = new QGroupBox(tr("File format settings"));
 	auto fileFormatSettingsLayout = new QVBoxLayout(fileFormatSettingsGroupBox);
-
 	fileFormatSettingsLayout->addWidget(m_fileFormatSetting);
 	fileFormatSettingsLayout->addWidget(m_sampleRateSetting);
 	fileFormatSettingsLayout->addWidget(m_bitRateSetting);
@@ -60,10 +77,12 @@ ExportProjectDialog::ExportProjectDialog(const QString& path, QWidget* parent, b
 	fileFormatSettingsLayout->addWidget(m_stereoModeSetting);
 	fileFormatSettingsLayout->addWidget(m_compressionLevelSetting);
 
+	auto startCancelButtonsLayout = new QHBoxLayout{};
 	startCancelButtonsLayout->addStretch();
 	startCancelButtonsLayout->addWidget(m_startButton);
 	startCancelButtonsLayout->addWidget(m_cancelButton);
 
+	mainLayout->addWidget(exportSettingsGroupBox);
 	mainLayout->addWidget(fileFormatSettingsGroupBox);
 	mainLayout->addStretch();
 	mainLayout->addLayout(startCancelButtonsLayout);
@@ -139,7 +158,6 @@ ExportProjectDialog::ExportProjectDialog(const QString& path, QWidget* parent, b
 		}
 	}
 
-	constexpr auto maxCompressionLevel = 8;
 	for (auto i = 0; i <= maxCompressionLevel; ++i)
 	{
 		const auto compressionValue = static_cast<float>(i) / maxCompressionLevel;
@@ -158,6 +176,10 @@ ExportProjectDialog::ExportProjectDialog(const QString& path, QWidget* parent, b
 	}
 
 	m_progressBar->setValue(0);
+	m_loopRepeatBox->setMinimum(1);
+	m_loopRepeatBox->setMaximum(maxLoopRepeat);;
+	m_loopRepeatBox->setValue(1);
+	m_loopRepeatBox->setSuffix(tr(" time(s)"));
 }
 
 void ExportProjectDialog::onFileFormatChanged(int index)

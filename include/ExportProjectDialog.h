@@ -30,6 +30,8 @@
 #include <QComboBox>
 #include <QLabel>
 #include <QProgressBar>
+#include <QCheckBox>
+#include <QSpinBox>
 
 namespace lmms::gui
 {
@@ -58,6 +60,10 @@ private:
 	FileFormatSetting* m_bitDepthSetting = nullptr;
 	FileFormatSetting* m_stereoModeSetting = nullptr;
 	FileFormatSetting* m_compressionLevelSetting = nullptr;
+	QCheckBox* m_exportAsLoopBox = nullptr;
+	QCheckBox* m_exportBetweenLoopMarkersBox = nullptr;
+	QLabel* m_loopRepeatLabel = nullptr;
+	QSpinBox* m_loopRepeatBox = nullptr;
 	QPushButton* m_startButton = nullptr;
 	QPushButton* m_cancelButton = nullptr;
 	QProgressBar* m_progressBar = nullptr;
