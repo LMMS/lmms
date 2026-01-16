@@ -51,28 +51,30 @@ public:
 	ExportProjectDialog(const QString& path, Mode mode, QWidget* parent = nullptr);
 
 private:
-	class FileFormatSetting : public QWidget
-	{
-	public:
-		FileFormatSetting(const QString& header);
-		auto comboBox() -> QComboBox* { return m_comboBox; }
-	private:
-		QLabel* m_label = nullptr;
-		QComboBox* m_comboBox = nullptr;
-	};
-
 	void accept() override;
 	void reject() override;
 	void onFileFormatChanged(int index);
 	void onStartButtonClicked();
 	void updateTitleBar(int prog);
 
-	FileFormatSetting* m_fileFormatSetting = nullptr;
-	FileFormatSetting* m_sampleRateSetting = nullptr;
-	FileFormatSetting* m_bitRateSetting = nullptr;
-	FileFormatSetting* m_bitDepthSetting = nullptr;
-	FileFormatSetting* m_stereoModeSetting = nullptr;
-	FileFormatSetting* m_compressionLevelSetting = nullptr;
+	QLabel* m_fileFormatLabel = nullptr;
+	QComboBox* m_fileFormatComboBox = nullptr;
+
+	QLabel* m_sampleRateLabel = nullptr;
+	QComboBox* m_sampleRateComboBox = nullptr;
+
+	QLabel* m_bitRateLabel = nullptr;
+	QComboBox* m_bitRateComboBox = nullptr;
+
+	QLabel* m_bitDepthLabel = nullptr;
+	QComboBox* m_bitDepthComboBox = nullptr;
+
+	QLabel* m_stereoModeLabel = nullptr;
+	QComboBox* m_stereoModeComboBox = nullptr;
+
+	QLabel* m_compressionLevelLabel = nullptr;
+	QComboBox* m_compressionLevelComboBox = nullptr;
+
 	QCheckBox* m_exportAsLoopBox = nullptr;
 	QCheckBox* m_exportBetweenLoopMarkersBox = nullptr;
 	QLabel* m_loopRepeatLabel = nullptr;
