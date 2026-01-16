@@ -8,11 +8,8 @@ ccache
 cmake
 dirmngr
 file
-g++-mingw-w64-i686
-g++-mingw-w64-x86-64
-gcc-mingw-w64
-gcc-mingw-w64-i686
-gcc-mingw-w64-x86-64
+g++-mingw-w64-x86-64-posix
+gcc-mingw-w64-x86-64-posix
 git
 gnupg
 gpg
@@ -31,9 +28,9 @@ make
 mingw-w64-tools
 nsis
 perl
-qt5-qmake
 qt5base-mingw-w64
 qt5svg-mingw-w64
+qttools5-dev-tools
 software-properties-common
 ssh-client
 sudo
