@@ -45,6 +45,7 @@ namespace lmms::gui {
 
 namespace {
 constexpr auto maxCompressionLevel = 8;
+constexpr auto defaultCompressionLevel = 5;
 constexpr auto maxLoopRepeat = 64;
 } // namespace
 
@@ -160,6 +161,8 @@ ExportProjectDialog::ExportProjectDialog(const QString& path, Mode mode, QWidget
 			break;
 		}
 	}
+
+	m_compressionLevelComboBox->setCurrentIndex(defaultCompressionLevel);
 
 	auto mainLayout = new QVBoxLayout(this);
 
