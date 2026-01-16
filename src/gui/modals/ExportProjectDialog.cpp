@@ -59,7 +59,7 @@ ExportProjectDialog::ExportProjectDialog(const QString& path, QWidget* parent, b
 	, m_cancelButton(new QPushButton(tr("Cancel")))
 	, m_progressBar(new QProgressBar())
 {
-	setWindowTitle(tr("Export project to %1").arg(QFileInfo(path).fileName()));
+	setWindowTitle(tr("Export project"));
 
 	auto mainLayout = new QVBoxLayout(this);
 
