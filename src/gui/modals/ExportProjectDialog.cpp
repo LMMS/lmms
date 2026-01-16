@@ -24,9 +24,14 @@
 
 #include "ExportProjectDialog.h"
 
+#include <QCheckBox>
+#include <QComboBox>
 #include <QFileInfo>
 #include <QGroupBox>
+#include <QLabel>
+#include <QProgressBar>
 #include <QPushButton>
+#include <QSpinBox>
 #include <QVBoxLayout>
 
 #include "ProjectRenderer.h"
@@ -34,9 +39,9 @@
 namespace lmms::gui {
 
 namespace {
-	constexpr auto maxCompressionLevel = 8;
-	constexpr auto maxLoopRepeat = 64;
-}
+constexpr auto maxCompressionLevel = 8;
+constexpr auto maxLoopRepeat = 64;
+} // namespace
 
 ExportProjectDialog::ExportProjectDialog(const QString& path, QWidget* parent, bool multiExport)
 	: QDialog(parent)
@@ -177,7 +182,7 @@ ExportProjectDialog::ExportProjectDialog(const QString& path, QWidget* parent, b
 
 	m_progressBar->setValue(0);
 	m_loopRepeatBox->setMinimum(1);
-	m_loopRepeatBox->setMaximum(maxLoopRepeat);;
+	m_loopRepeatBox->setMaximum(maxLoopRepeat);
 	m_loopRepeatBox->setValue(1);
 	m_loopRepeatBox->setSuffix(tr(" time(s)"));
 }

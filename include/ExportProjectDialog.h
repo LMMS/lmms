@@ -27,11 +27,13 @@
 #define LMMS_GUI_EXPORT_PROJECT_DIALOG_H
 
 #include <QDialog>
-#include <QComboBox>
-#include <QLabel>
-#include <QProgressBar>
-#include <QCheckBox>
-#include <QSpinBox>
+
+class QString;
+class QLabel;
+class QProgressBar;
+class QCheckBox;
+class QComboBox;
+class QSpinBox;
 
 namespace lmms::gui
 {
