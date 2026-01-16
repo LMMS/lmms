@@ -387,9 +387,8 @@ void FloatModelEditorBase::enterValue()
 
 		new_val = QInputDialog::getDouble(
 			this, tr("Set value"),
-			tr("Please enter a new value between "
-					"-96.0 dBFS and 6.0 dBFS:"),
-				initialDbValue, -96.0, 6.0, model()->getDigitCount(), &ok);
+			tr("Please enter a new value between -96.0 dBFS and %1 dBFS:").arg(ampToDbfs(model()->maxValue() / 100.0f)),
+				initialDbValue, -96.0, ampToDbfs(model()->maxValue() / 100.0f), model()->getDigitCount(), &ok);
 
 		if (new_val <= -96.0)
 		{
