@@ -28,16 +28,13 @@
 
 #include <QDialog>
 
-
 namespace lmms::gui
 {
-
 
 class ExportProjectDialog : public QDialog
 {
 public:
 	ExportProjectDialog(const QString& path, QWidget* parent, bool multiExport = false);
-
 };
 
 } // namespace lmms::gui

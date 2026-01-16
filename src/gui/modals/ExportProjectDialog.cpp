@@ -22,20 +22,73 @@
  *
  */
 
-#include <QFileInfo>
-#include <QMessageBox>
-
 #include "ExportProjectDialog.h"
 
-namespace lmms::gui
-{
+#include <QComboBox>
+#include <QFileInfo>
+#include <QGroupBox>
+#include <QLabel>
+#include <QPushButton>
+#include <QVBoxLayout>
+
+namespace lmms::gui {
 
 ExportProjectDialog::ExportProjectDialog(const QString& path, QWidget* parent, bool multiExport)
-	: QDialog{parent}
+	: QDialog(parent)
 {
-	setWindowTitle(tr("Export project to %1").arg(QFileInfo{path}.fileName()));
+	setWindowTitle(tr("Export project to %1").arg(QFileInfo(path).fileName()));
+
+	auto mainLayout = new QVBoxLayout(this);
+
+	auto fileFormatSettingsGroupBox = new QGroupBox(tr("File format settings"));
+	auto fileFormatSettingsLayout = new QVBoxLayout(fileFormatSettingsGroupBox);
+
+	auto fileFormatLabel = new QLabel(tr("File format:"));
+	auto fileFormatComboBox = new QComboBox();
+
+	auto sampleRateLabel = new QLabel(tr("Sampling rate:"));
+	auto sampleRateComboBox = new QComboBox();
+
+	auto bitRateLabel = new QLabel(tr("Bit rate:"));
+	auto bitRateComboBox = new QComboBox();
+
+	auto bitDepthLabel = new QLabel(tr("Bit depth:"));
+	auto bitDepthComboBox = new QComboBox();
+
+	auto stereoModeLabel = new QLabel(tr("Stereo mode:"));
+	auto stereoModeComboBox = new QComboBox();
+
+	auto compressionLevelLabel = new QLabel(tr("Compression level:"));
+	auto compressionLevelComboBox = new QComboBox();
+
+	auto startCancelButtonsLayout = new QHBoxLayout{};
+	auto startButton = new QPushButton(tr("Start"));
+	auto cancelButton = new QPushButton(tr("Cancel"));
+
+	fileFormatSettingsLayout->addWidget(fileFormatLabel);
+	fileFormatSettingsLayout->addWidget(fileFormatComboBox);
+
+	fileFormatSettingsLayout->addWidget(sampleRateLabel);
+	fileFormatSettingsLayout->addWidget(sampleRateComboBox);
+
+	fileFormatSettingsLayout->addWidget(bitRateLabel);
+	fileFormatSettingsLayout->addWidget(bitRateComboBox);
+
+	fileFormatSettingsLayout->addWidget(bitDepthLabel);
+	fileFormatSettingsLayout->addWidget(bitDepthComboBox);
+
+	fileFormatSettingsLayout->addWidget(stereoModeLabel);
+	fileFormatSettingsLayout->addWidget(stereoModeComboBox);
+
+	fileFormatSettingsLayout->addWidget(compressionLevelLabel);
+	fileFormatSettingsLayout->addWidget(compressionLevelComboBox);
+
+	startCancelButtonsLayout->addStretch();
+	startCancelButtonsLayout->addWidget(startButton);
+	startCancelButtonsLayout->addWidget(cancelButton);
+
+	mainLayout->addWidget(fileFormatSettingsGroupBox);
+	mainLayout->addLayout(startCancelButtonsLayout);
 }
-
-
 
 } // namespace lmms::gui
