@@ -185,12 +185,12 @@ CompressorControlDialog::CompressorControlDialog(CompressorControls* controls) :
 	m_inFader->setHintText(tr("Gain"), "dBFS");
 	m_inFader->setToolTip(tr("Input volume"));
 
-	rmsButton = new PixmapButton(this, tr("Root Mean Square"));
+	rmsButton = new PixmapButton(this);
 	rmsButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("rms_sel"));
 	rmsButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("rms_unsel"));
 	rmsButton->setToolTip(tr("Use RMS of the input"));
 
-	peakButton = new PixmapButton(this, tr("Peak"));
+	peakButton = new PixmapButton(this);
 	peakButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("peak_sel"));
 	peakButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("peak_unsel"));
 	peakButton->setToolTip(tr("Use absolute value of the input"));
@@ -200,12 +200,12 @@ CompressorControlDialog::CompressorControlDialog(CompressorControls* controls) :
 	rmsPeakGroup->addButton(peakButton);
 	rmsPeakGroup->setModel(&controls->m_peakmodeModel);
 
-	leftRightButton = new PixmapButton(this, tr("Left/Right"));
+	leftRightButton = new PixmapButton(this);
 	leftRightButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("leftright_sel"));
 	leftRightButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("leftright_unsel"));
 	leftRightButton->setToolTip(tr("Compress left and right audio"));
 
-	midSideButton = new PixmapButton(this, tr("Mid/Side"));
+	midSideButton = new PixmapButton(this);
 	midSideButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("midside_sel"));
 	midSideButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("midside_unsel"));
 	midSideButton->setToolTip(tr("Compress mid and side audio"));
@@ -215,12 +215,12 @@ CompressorControlDialog::CompressorControlDialog(CompressorControls* controls) :
 	leftRightMidSideGroup->addButton(midSideButton);
 	leftRightMidSideGroup->setModel(&controls->m_midsideModel);
 
-	compressButton = new PixmapButton(this, tr("Compressor"));
+	compressButton = new PixmapButton(this);
 	compressButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("compressor_sel"));
 	compressButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("compressor_unsel"));
 	compressButton->setToolTip(tr("Compress the audio"));
 
-	limitButton = new PixmapButton(this, tr("Limiter"));
+	limitButton = new PixmapButton(this);
 	limitButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("limiter_sel"));
 	limitButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("limiter_unsel"));
 	limitButton->setToolTip(tr("Set Ratio to infinity (is not guaranteed to limit audio volume)"));
@@ -230,27 +230,27 @@ CompressorControlDialog::CompressorControlDialog(CompressorControls* controls) :
 	compressLimitGroup->addButton(limitButton);
 	compressLimitGroup->setModel(&controls->m_limiterModel);
 
-	unlinkedButton = new PixmapButton(this, tr("Unlinked"));
+	unlinkedButton = new PixmapButton(this);
 	unlinkedButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("unlinked_sel"));
 	unlinkedButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("unlinked_unsel"));
 	unlinkedButton->setToolTip(tr("Compress each channel separately"));
 
-	maximumButton = new PixmapButton(this, tr("Maximum"));
+	maximumButton = new PixmapButton(this);
 	maximumButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("maximum_sel"));
 	maximumButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("maximum_unsel"));
 	maximumButton->setToolTip(tr("Compress based on the loudest channel"));
 
-	averageButton = new PixmapButton(this, tr("Average"));
+	averageButton = new PixmapButton(this);
 	averageButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("average_sel"));
 	averageButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("average_unsel"));
 	averageButton->setToolTip(tr("Compress based on the averaged channel volume"));
 
-	minimumButton = new PixmapButton(this, tr("Minimum"));
+	minimumButton = new PixmapButton(this);
 	minimumButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("minimum_sel"));
 	minimumButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("minimum_unsel"));
 	minimumButton->setToolTip(tr("Compress based on the quietest channel"));
 
-	blendButton = new PixmapButton(this, tr("Blend"));
+	blendButton = new PixmapButton(this);
 	blendButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("blend_sel"));
 	blendButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("blend_unsel"));
 	blendButton->setToolTip(tr("Blend between stereo linking modes"));
@@ -263,28 +263,28 @@ CompressorControlDialog::CompressorControlDialog(CompressorControls* controls) :
 	stereoLinkGroup->addButton(blendButton);
 	stereoLinkGroup->setModel(&controls->m_stereoLinkModel);
 
-	autoMakeupButton = new PixmapButton(this, tr("Auto Makeup Gain"));
+	autoMakeupButton = new PixmapButton(this);
 	autoMakeupButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("autogain_sel"));
 	autoMakeupButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("autogain_unsel"));
 	autoMakeupButton->setToolTip(tr("Automatically change makeup gain depending on threshold, knee, and ratio settings"));
 	autoMakeupButton->setCheckable(true);
 	autoMakeupButton->setModel(&controls->m_autoMakeupModel);
 
-	auditionButton = new PixmapButton(this, tr("Soft Clip"));
+	auditionButton = new PixmapButton(this);
 	auditionButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("audition_sel"));
 	auditionButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("audition_unsel"));
 	auditionButton->setToolTip(tr("Play the delta signal"));
 	auditionButton->setCheckable(true);
 	auditionButton->setModel(&controls->m_auditionModel);
 
-	feedbackButton = new PixmapButton(this, tr("Soft Clip"));
+	feedbackButton = new PixmapButton(this);
 	feedbackButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("feedback_sel"));
 	feedbackButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("feedback_unsel"));
 	feedbackButton->setToolTip(tr("Use the compressor's output as the sidechain input"));
 	feedbackButton->setCheckable(true);
 	feedbackButton->setModel(&controls->m_feedbackModel);
 
-	lookaheadButton = new PixmapButton(this, tr("Lookahead Enabled"));
+	lookaheadButton = new PixmapButton(this);
 	lookaheadButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("lookahead_sel"));
 	lookaheadButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("lookahead_unsel"));
 	lookaheadButton->setToolTip(tr("Enable Lookahead, which introduces 20 milliseconds of latency"));
