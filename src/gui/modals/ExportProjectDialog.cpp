@@ -74,44 +74,6 @@ ExportProjectDialog::ExportProjectDialog(const QString& path, Mode mode, QWidget
 {
 	setWindowTitle(tr("Export project"));
 
-	auto mainLayout = new QVBoxLayout(this);
-
-	auto loopRepeatLayout = new QHBoxLayout{};
-	loopRepeatLayout->addWidget(m_loopRepeatLabel);
-	loopRepeatLayout->addWidget(m_loopRepeatBox);
-
-	auto exportSettingsGroupBox = new QGroupBox(tr("Export settings"));
-	auto exportSettingsLayout = new QVBoxLayout{exportSettingsGroupBox};
-	exportSettingsLayout->addWidget(m_exportAsLoopBox);
-	exportSettingsLayout->addWidget(m_exportBetweenLoopMarkersBox);
-	exportSettingsLayout->addLayout(loopRepeatLayout);
-
-	auto fileFormatSettingsGroupBox = new QGroupBox(tr("File format settings"));
-	auto fileFormatSettingsLayout = new QFormLayout(fileFormatSettingsGroupBox);
-	fileFormatSettingsLayout->addRow(m_fileFormatLabel, m_fileFormatComboBox);
-	fileFormatSettingsLayout->addRow(m_sampleRateLabel, m_sampleRateComboBox);
-	fileFormatSettingsLayout->addRow(m_bitRateLabel, m_bitRateComboBox);
-	fileFormatSettingsLayout->addRow(m_bitDepthLabel, m_bitDepthComboBox);
-	fileFormatSettingsLayout->addRow(m_stereoModeLabel, m_stereoModeComboBox);
-	fileFormatSettingsLayout->addRow(m_compressionLevelLabel, m_compressionLevelComboBox);
-
-	auto startCancelButtonsLayout = new QHBoxLayout{};
-	startCancelButtonsLayout->addStretch();
-	startCancelButtonsLayout->addWidget(m_startButton);
-	startCancelButtonsLayout->addWidget(m_cancelButton);
-
-	mainLayout->addWidget(exportSettingsGroupBox);
-	mainLayout->addWidget(fileFormatSettingsGroupBox);
-	mainLayout->addStretch();
-	mainLayout->addLayout(startCancelButtonsLayout);
-	mainLayout->addWidget(m_progressBar);
-
-	// This is so that the dialog doesn't resize when switching to the Flac format (it has an extra
-	// compression level box, so we want the dialog to have a fixed size as if Flac was selected)
-	onFileFormatChanged(static_cast<int>(ProjectRenderer::ExportFileFormat::Flac));
-	adjustSize();
-	setFixedSize(size());
-
 	connect(m_fileFormatComboBox, qOverload<int>(&QComboBox::currentIndexChanged), this,
 		&ExportProjectDialog::onFileFormatChanged);
 	connect(m_startButton, &QPushButton::clicked, this, &ExportProjectDialog::onStartButtonClicked);
@@ -198,6 +160,38 @@ ExportProjectDialog::ExportProjectDialog(const QString& path, Mode mode, QWidget
 			break;
 		}
 	}
+
+	auto mainLayout = new QVBoxLayout(this);
+
+	auto loopRepeatLayout = new QHBoxLayout{};
+	loopRepeatLayout->addWidget(m_loopRepeatLabel);
+	loopRepeatLayout->addWidget(m_loopRepeatBox);
+
+	auto exportSettingsGroupBox = new QGroupBox(tr("Export settings"));
+	auto exportSettingsLayout = new QVBoxLayout{exportSettingsGroupBox};
+	exportSettingsLayout->addWidget(m_exportAsLoopBox);
+	exportSettingsLayout->addWidget(m_exportBetweenLoopMarkersBox);
+	exportSettingsLayout->addLayout(loopRepeatLayout);
+
+	auto fileFormatSettingsGroupBox = new QGroupBox(tr("File format settings"));
+	auto fileFormatSettingsLayout = new QFormLayout(fileFormatSettingsGroupBox);
+	fileFormatSettingsLayout->addRow(m_fileFormatLabel, m_fileFormatComboBox);
+	fileFormatSettingsLayout->addRow(m_sampleRateLabel, m_sampleRateComboBox);
+	fileFormatSettingsLayout->addRow(m_bitRateLabel, m_bitRateComboBox);
+	fileFormatSettingsLayout->addRow(m_bitDepthLabel, m_bitDepthComboBox);
+	fileFormatSettingsLayout->addRow(m_stereoModeLabel, m_stereoModeComboBox);
+	fileFormatSettingsLayout->addRow(m_compressionLevelLabel, m_compressionLevelComboBox);
+
+	auto startCancelButtonsLayout = new QHBoxLayout{};
+	startCancelButtonsLayout->addStretch();
+	startCancelButtonsLayout->addWidget(m_startButton);
+	startCancelButtonsLayout->addWidget(m_cancelButton);
+
+	mainLayout->addWidget(exportSettingsGroupBox);
+	mainLayout->addWidget(fileFormatSettingsGroupBox);
+	mainLayout->addStretch();
+	mainLayout->addLayout(startCancelButtonsLayout);
+	mainLayout->addWidget(m_progressBar);
 
 	m_progressBar->setValue(0);
 	m_loopRepeatBox->setMinimum(1);
