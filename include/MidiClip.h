@@ -52,6 +52,8 @@ public:
 		MelodyClip
 	} ;
 
+	static const int MAX_LENGTH_IN_BARS = 500;
+
 	MidiClip( InstrumentTrack* instrumentTrack );
 	~MidiClip() override;
 
@@ -144,6 +146,8 @@ private:
 
 	void setType( Type _new_clip_type );
 	void checkType();
+	bool canIncreaseLength() const;
+	void displayLengthError() const;
 
 	void resizeToFirstTrack();
 
