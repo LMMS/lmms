@@ -13,7 +13,7 @@ namespace lmms
 class SfzParser
 {
 public:
-	static bool parseSfzFile(const QString& filePath, std::vector<SfzRegion>& outputRegions);
+	static bool parseSfzFile(const QString& filePath, std::vector<SfzRegion>& outputRegions, SfzOpcodeState& controlsConfig);
 
 private:
 	//! Helper function to parse any #include or #define statements from a string, recursively so that the included files have their includes and defines handled too

@@ -59,6 +59,9 @@ public:
 	QString nodeName() const override;
 	gui::PluginView* instantiateView(QWidget* parent) override;
 
+signals:
+	void fileLoaded();
+
 private:
 	void processTrigger(const SfzTrigger& trigger);
 
@@ -69,7 +72,14 @@ private:
 	//! Holds information about the total number of notes active, last switch keys pressed, etc
 	SfzGlobalState m_sfzGlobalState;
 
+	//! Holds information about midi CC default values, control labels, etc
+	SfzOpcodeState m_controlsConfig;
+
 	std::vector<SfzRegion> m_sfzRegions;
+
+	// The GUI needs models to connect to midi CC knobs, so a bunch of dummy models are defined here.
+	// Ideally it would be better to reuse the midi CC models for the instrument track
+	std::array<FloatModel, SfzOpcodeState::NumMidiCCs> m_ccModels;
 
 	friend class gui::SfzSamplerView;
 };

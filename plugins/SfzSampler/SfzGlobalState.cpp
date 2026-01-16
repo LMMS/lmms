@@ -44,4 +44,13 @@ std::optional<int> SfzGlobalState::lastKeyPressedInRange(const int lowKey, const
 }
 
 
+void SfzGlobalState::initializeMidiCCValues(const SfzOpcodeState& controlsConfig)
+{
+	for (int i = 0; i < SfzOpcodeState::NumMidiCCs; ++i)
+	{
+		m_ccValues.at(i) = controlsConfig.m_set_cc.at(i);
+	}
+}
+
+
 } // namespace lmms

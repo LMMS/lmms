@@ -25,7 +25,10 @@ public:
 	std::optional<int> lastKeyPressedInRange(const int lowKey, const int highKey, const std::optional<int> defaultKey) const;
 
 	//! Returns the current value of the given midi CC knob/controller, or the default value if we haven't recieved any midi CC signals for it yet.
-	int midiCCValue(const int index, const int defaultValue) const { return m_ccValues.at(index).value_or(defaultValue); }
+	int midiCCValue(const int index) const { return m_ccValues.at(index); }
+
+	// Sets initial values for the controls, based on any `set_ccN` opcodes in the <control> header
+	void initializeMidiCCValues(const SfzOpcodeState& controlsConfig);
 
 private:
 	//! Stores a number for every key, tracking which order the keys were played in
@@ -39,9 +42,9 @@ private:
 	std::array<bool, 128> m_activeKeys = {};
 
 	//! Stores the current value of all the midi CC knobs/controllers
-	//! Technically, floats should probably be used to allow for HDCC (high definition CC's) as used in ARIA, but for now dividing by 128 to get a float between 0 and 1 works fine.
+	//! Technically, floats should probably be used to allow for HDCC (high definition CC's) as used in ARIA, but for now dividing by 127 to get a float between 0 and 1 works fine.
 	//! std::optional is used so that sfz file can specify default cc values
-	std::array<std::optional<int>, SfzOpcodeState::NumMidiCCs> m_ccValues = {};
+	std::array<int, SfzOpcodeState::NumMidiCCs> m_ccValues = {};
 };
 
 

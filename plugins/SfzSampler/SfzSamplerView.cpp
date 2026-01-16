@@ -27,6 +27,8 @@
 #include <QDropEvent>
 #include <QPainter>
 #include <QPushButton>
+#include <QVBoxLayout>
+#include <QDebug>
 
 #include "Clipboard.h"
 #include "ComboBox.h"
@@ -43,6 +45,7 @@
 #include "FileDialog.h"
 #include "PathUtil.h"
 #include "embed.h"
+#include "MidiEvent.h"
 
 namespace lmms {
 
@@ -52,12 +55,38 @@ SfzSamplerView::SfzSamplerView(SfzSampler* instrument, QWidget* parent)
 	: InstrumentView(instrument, parent)
 	, m_instrument(instrument)
 {
-	// window settings
 	setAcceptDrops(true);
 	setAutoFillBackground(true);
 
 	setMaximumSize(QSize(10000, 10000));
 	setMinimumSize(QSize(250, 250));
+
+	auto layout1 = new QVBoxLayout(this);
+
+	auto openFileButton = new QPushButton(embed::getIconPixmap("folder"), tr("Open SFZ File"), this);
+	connect(openFileButton, &PixmapButton::clicked, this, &SfzSamplerView::openFile);
+	layout1->addWidget(openFileButton);
+
+	// Initialize Midi CC knobs
+	for (int i = 0; i < SfzOpcodeState::NumMidiCCs; ++i)
+	{
+		m_instrument->m_ccModels.at(i).setRange(0, 127, 1);
+		m_instrument->m_ccModels.at(i).setValue(m_instrument->m_sfzGlobalState.midiCCValue(i), true);
+		auto ccKnob = new Knob(KnobType::Bright26, tr("CC %1").arg(i), this);
+		ccKnob->setModel(&m_instrument->m_ccModels.at(i));
+		layout1->addWidget(ccKnob);
+		connect(&m_instrument->m_ccModels.at(i), &AutomatableModel::dataChanged, this, [i, this](){
+			m_instrument->handleMidiEvent(MidiEvent(MidiControlChange, 0, i, m_instrument->m_ccModels.at(i).value()));
+		});
+	}
+
+	// Whenever a new SFZ file is loaded, set the default CC values
+	connect(m_instrument, &SfzSampler::fileLoaded, [this](){
+		for (int i = 0; i < SfzOpcodeState::NumMidiCCs; ++i)
+		{
+			m_instrument->m_ccModels.at(i).setValue(m_instrument->m_sfzGlobalState.midiCCValue(i), true);
+		}
+	});
 
 	update();
 }

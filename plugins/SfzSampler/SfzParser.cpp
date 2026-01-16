@@ -10,7 +10,7 @@ namespace lmms
 {
 
 
-bool SfzParser::parseSfzFile(const QString& filePath, std::vector<SfzRegion>& outputRegions)
+bool SfzParser::parseSfzFile(const QString& filePath, std::vector<SfzRegion>& outputRegions, SfzOpcodeState& controlsConfig)
 {
 	// Clear the vector of regions just in case anything is inside it from before
 	outputRegions.clear();
@@ -212,7 +212,9 @@ bool SfzParser::parseSfzFile(const QString& filePath, std::vector<SfzRegion>& ou
 			{
 				auto opcodeNameAndValue = segment.split("=");
 				if (opcodeNameAndValue.size() != 2) { qDebug() << "[SFZ Parser] Syntax error, could not parse opcode assignment:" << segment; return false; }
-				// This is Wrong. The control header is not the same thing as the global header. Buuuut.... it works. And from sfzformat.com, it sounds like different sfz players do different things with this header anyway, so it's fine.
+				controlsConfig.setOpcodeByStrings(opcodeNameAndValue[0], opcodeNameAndValue[1]);
+				// Also set the opcode for the global state, that way it will get propagated down to all other regions (this is needed for things like `default_path` to work for all regions)
+				// Technically it could be reworked so that the regions fetch any needed info from the controls state, but for now this way is simpler.
 				globalState.setOpcodeByStrings(opcodeNameAndValue[0], opcodeNameAndValue[1]);
 				break;
 			}

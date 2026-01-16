@@ -42,7 +42,7 @@ bool SfzRegion::triggerConditionsMet(const SfzGlobalState& globalState, const Sf
 		// If midi CC ranges are defined, make sure the current CC values are within range
 		for (int i = 0; i < SfzOpcodeState::NumMidiCCs; ++i)
 		{
-			const int ccValue = globalState.midiCCValue(i, m_set_cc.at(i));
+			const int ccValue = globalState.midiCCValue(i);
 			if (ccValue > m_hicc.at(i) || ccValue < m_locc.at(i)) { return false; }
 		}
 
@@ -132,7 +132,7 @@ float SfzRegion::totalCCModulation(const std::array<float, SfzOpcodeState::NumMi
 	float total = 0.0f;
 	for (int i = 0; i < SfzOpcodeState::NumMidiCCs; ++i)
 	{
-		total += ccModulationAmounts.at(i) * globalState.midiCCValue(i, m_set_cc.at(i)) / 128.0f; // m_set_cc stores the default CC values for each of the midi controllers
+		total += ccModulationAmounts.at(i) * globalState.midiCCValue(i) / 128.0f; // m_set_cc stores the default CC values for each of the midi controllers
 	}
 	return total;
 }
