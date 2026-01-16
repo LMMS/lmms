@@ -99,6 +99,12 @@ ExportProjectDialog::ExportProjectDialog(const QString& path, Mode mode, QWidget
 	mainLayout->addLayout(startCancelButtonsLayout);
 	mainLayout->addWidget(m_progressBar);
 
+	// This is so that the dialog doesn't resize when switching to the Flac format (it has an extra
+	// compression level box, so we want the dialog to have a fixed size as if Flac was selected)
+	onFileFormatChanged(static_cast<int>(ProjectRenderer::ExportFileFormat::Flac));
+	adjustSize();
+	setFixedSize(size());
+
 	connect(m_fileFormatSetting->comboBox(), qOverload<int>(&QComboBox::currentIndexChanged), this,
 		&ExportProjectDialog::onFileFormatChanged);
 	connect(m_startButton, &QPushButton::clicked, this, &ExportProjectDialog::onStartButtonClicked);
