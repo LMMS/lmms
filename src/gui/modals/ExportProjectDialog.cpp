@@ -69,22 +69,34 @@ ExportProjectDialog::ExportProjectDialog(const QString& path, QWidget* parent, b
 	mainLayout->addLayout(startCancelButtonsLayout);
 	mainLayout->addWidget(m_progressBar);
 
+	connect(m_fileFormatSetting->comboBox(), qOverload<int>(&QComboBox::currentIndexChanged), this,
+		&ExportProjectDialog::onFileFormatChanged);
+
+	auto index = 0;
 	for (const auto& device : ProjectRenderer::fileEncodeDevices)
 	{
 		if (!device.isAvailable()) { continue; }
-		m_fileFormatSetting->addItem(tr(device.m_description), static_cast<int>(device.m_fileFormat));
+
+		m_fileFormatSetting->comboBox()->addItem(tr(device.m_description), static_cast<int>(device.m_fileFormat));
+
+		if (QString::compare(QFileInfo{path}.suffix(), &device.m_extension[1], Qt::CaseInsensitive) == 0)
+		{
+			m_fileFormatSetting->comboBox()->setCurrentIndex(index);
+		}
+
+		++index;
 	}
 
 	for (const auto& sampleRate : SUPPORTED_SAMPLERATES)
 	{
 		const auto str = tr("%1 %2").arg(QString::number(sampleRate), "Hz");
-		m_sampleRateSetting->addItem(str, sampleRate);
+		m_sampleRateSetting->comboBox()->addItem(str, sampleRate);
 	}
 
 	for (const auto& bitRate : SUPPORTED_BITRATES)
 	{
 		const auto str = tr("%1 %2").arg(QString::number(bitRate), "KBit/s");
-		m_bitRateSetting->addItem(str, bitRate);
+		m_bitRateSetting->comboBox()->addItem(str, bitRate);
 	}
 
 	for (auto i = 0; i < static_cast<int>(OutputSettings::BitDepth::Count); ++i)
@@ -92,13 +104,13 @@ ExportProjectDialog::ExportProjectDialog(const QString& path, QWidget* parent, b
 		switch (static_cast<OutputSettings::BitDepth>(i))
 		{
 		case OutputSettings::BitDepth::Depth16Bit:
-			m_bitDepthSetting->addItem(tr("16 Bit integer"), i);
+			m_bitDepthSetting->comboBox()->addItem(tr("16 Bit integer"), i);
 			break;
 		case OutputSettings::BitDepth::Depth24Bit:
-			m_bitDepthSetting->addItem(tr("24 Bit integer"), i);
+			m_bitDepthSetting->comboBox()->addItem(tr("24 Bit integer"), i);
 			break;
 		case OutputSettings::BitDepth::Depth32Bit:
-			m_bitDepthSetting->addItem(tr("32 Bit float"), i);
+			m_bitDepthSetting->comboBox()->addItem(tr("32 Bit float"), i);
 			break;
 		default:
 			assert(false && "invalid or unsupported bit depth");
@@ -111,13 +123,13 @@ ExportProjectDialog::ExportProjectDialog(const QString& path, QWidget* parent, b
 		switch (static_cast<OutputSettings::StereoMode>(i))
 		{
 		case OutputSettings::StereoMode::Stereo:
-			m_stereoModeSetting->addItem(tr("Stereo"), i);
+			m_stereoModeSetting->comboBox()->addItem(tr("Stereo"), i);
 			break;
 		case OutputSettings::StereoMode::JointStereo:
-			m_stereoModeSetting->addItem(tr("Joint stereo"), i);
+			m_stereoModeSetting->comboBox()->addItem(tr("Joint stereo"), i);
 			break;
 		case OutputSettings::StereoMode::Mono:
-			m_stereoModeSetting->addItem(tr("Mono"), i);
+			m_stereoModeSetting->comboBox()->addItem(tr("Mono"), i);
 			break;
 		default:
 			assert(false && "invalid or unsupported stereo mode");
@@ -132,20 +144,18 @@ ExportProjectDialog::ExportProjectDialog(const QString& path, QWidget* parent, b
 		switch (i)
 		{
 		case 0:
-			m_compressionLevelSetting->addItem(tr("%1 (Fastest, biggest)").arg(i), compressionValue);
+			m_compressionLevelSetting->comboBox()->addItem(tr("%1 (Fastest, biggest)").arg(i), compressionValue);
 			break;
 		case maxCompressionLevel:
-			m_compressionLevelSetting->addItem(tr("%1 (Slowest, smallest)").arg(i), compressionValue);
+			m_compressionLevelSetting->comboBox()->addItem(tr("%1 (Slowest, smallest)").arg(i), compressionValue);
 			break;
 		default:
-			m_compressionLevelSetting->addItem(QString::number(i), compressionValue);
+			m_compressionLevelSetting->comboBox()->addItem(QString::number(i), compressionValue);
 			break;
 		}
 	}
 
 	m_progressBar->setValue(0);
-	connect(m_fileFormatSetting->comboBox(), qOverload<int>(&QComboBox::activated), this,
-		&ExportProjectDialog::onFileFormatChanged);
 }
 
 void ExportProjectDialog::onFileFormatChanged(int index)
@@ -190,11 +200,6 @@ ExportProjectDialog::FileFormatSetting::FileFormatSetting(const QString& header)
 	layout->addWidget(m_comboBox);
 	layout->setContentsMargins(0, 0, 0, 0);
 	layout->setSpacing(2);
-}
-
-void ExportProjectDialog::FileFormatSetting::addItem(const QString& text, const QVariant& userData)
-{
-	m_comboBox->addItem(text, userData);
 }
 
 } // namespace lmms::gui
