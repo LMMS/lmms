@@ -302,11 +302,6 @@ jobs:
           sudo ./vcpkg/bootstrap-vcpkg.sh
           echo "VCPKG_INSTALLATION_ROOT=$(pwd)/vcpkg" >> "$GITHUB_ENV"
           export VCPKG_INSTALLATION_ROOT="$(pwd)/vcpkg"
-      - name: Install system dependencies
-        run: |
-          sudo .github/workflows/setup-mingw-packages.sh
-          sudo apt-get install -y --no-install-recommends \
-            $(xargs < .github/workflows/deps-ubuntu-24.04-mingw.txt)
       - name: Cache vcpkg dependencies
         if: ${{ !env.ACT }} # skip during local actions testing
         id: cache-deps
@@ -326,16 +321,18 @@ jobs:
             ccache-${{ github.job }}-64-${{ github.ref }}-
             ccache-${{ github.job }}-64-
           path: ~/.ccache
-      - name: Install dependencies
+      - name: Install system dependencies
         run: |
+          sudo .github/workflows/setup-mingw-packages.sh
+          #sudo .github/workflows/install-powershell.sh
           sudo apt-get install -y --no-install-recommends \
-          $(xargs < .github/workflows/deps-ubuntu-24.04-mingw.txt)
+            $(xargs < .github/workflows/deps-ubuntu-24.04-mingw.txt)
       - name: Configure
         run: |
           ccache --zero-stats
           cmake -S . \
                 -B build \
-                -DCMAKE_TOOLCHAIN_FILE="./cmake/toolchains/MinGW-W64-64.cmake" \
+                -DCMAKE_TOOLCHAIN_FILE="${VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake" \
                 -DVCPKG_TARGET_TRIPLET="x64-mingw-static" \
                 -DVCPKG_HOST_TRIPLET="x64-linux" \
                 -DVCPKG_MANIFEST_INSTALL="${{ env.should_install_manifest }}" \
