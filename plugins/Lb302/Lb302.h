@@ -34,28 +34,14 @@
 #include <array>
 #include <atomic>
 #include <memory>
-#if __cpp_lib_hardware_interference_size >= 201703L
-#include <new>
-#endif
 
+#include "Hardware.h"
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "NotePlayHandle.h"
 
 namespace lmms
 {
-
-//! @brief Platform-dependent minimum amount of padding between objects to prevent false cache sharing.
-// TODO: Should this live somewhere else? Pretty sure it's visible to the entire lmms namespace...
-// TODO: Use std::hardware_destructive_interference_size directly once our compilers are updated enough
-// GCC 12.1+, Clang 19+, MSVC 2017 15.3
-#if __cpp_lib_hardware_interference_size >= 201703L
-inline constexpr std::size_t CACHELINE = std::hardware_destructive_interference_size;
-#elif defined(__aarch64__) || defined(_M_ARM64) // 64-bit ARM
-inline constexpr std::size_t CACHELINE = 256;
-#else // x86_64
-inline constexpr std::size_t CACHELINE = 64;
-#endif
 
 namespace DspEffectLibrary
 {
@@ -297,7 +283,7 @@ private:
 	//! available to be written to, and can never exceed @ref MaxPendingNotes.
 	//!
 	//! @see play
-	alignas(CACHELINE) std::atomic_size_t m_notesReadSeq {0};
+	alignas(hardware_destructive_interference_size) std::atomic_size_t m_notesReadSeq {0};
 
 	//! @brief Sequence number indicating complete enqueue operations.
 	//!
@@ -311,7 +297,7 @@ private:
 	//! equal to @ref m_notesWriteClaimed.
 	//!
 	//! @see playNote
-	alignas(CACHELINE) std::atomic_size_t m_notesWriteCommitted {0};
+	alignas(hardware_destructive_interference_size) std::atomic_size_t m_notesWriteCommitted {0};
 
 	//! @brief Sequence number indicating in-progress enqueue operations.
 	//!
@@ -324,7 +310,7 @@ private:
 	//! those not yet written to), and can never exceed @ref MaxPendingNotes.
 	//!
 	//! @see playNote
-	alignas(CACHELINE) std::atomic_size_t m_notesWriteClaimed {0};
+	alignas(hardware_destructive_interference_size) std::atomic_size_t m_notesWriteClaimed {0};
 };
 
 
