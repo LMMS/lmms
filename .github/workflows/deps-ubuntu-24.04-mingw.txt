@@ -1,3 +1,6 @@
+autoconf
+autoconf-archive
+automake
 binutils
 binutils-mingw-w64
 ca-certificates
@@ -15,6 +18,7 @@ libglx-dev
 liblist-moreutils-perl
 libmpc3
 libopengl-dev
+libtool
 libxml-perl
 libxml2-utils
 lsb-release
