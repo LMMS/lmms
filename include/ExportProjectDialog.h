@@ -40,18 +40,22 @@ public:
 	ExportProjectDialog(const QString& path, QWidget* parent, bool multiExport = false);
 
 private:
-	QLabel* m_fileFormatLabel = nullptr;
-	QComboBox* m_fileFormatComboBox = nullptr;
-	QLabel* m_sampleRateLabel = nullptr;
-	QComboBox* m_sampleRateComboBox = nullptr;
-	QLabel* m_bitRateLabel = nullptr;
-	QComboBox* m_bitRateComboBox = nullptr;
-	QLabel* m_bitDepthLabel = nullptr;
-	QComboBox* m_bitDepthComboBox = nullptr;
-	QLabel* m_stereoModeLabel = nullptr;
-	QComboBox* m_stereoModeComboBox = nullptr;
-	QLabel* m_compressionLevelLabel = nullptr;
-	QComboBox* m_compressionLevelComboBox = nullptr;
+	class FileFormatSetting : public QWidget
+	{
+	public:
+		FileFormatSetting(const QString& header);
+		void addItem(const QString& text, const QVariant& userData);
+	private:
+		QLabel* m_label = nullptr;
+		QComboBox* m_comboBox = nullptr;
+	};
+
+	FileFormatSetting* m_fileFormatSetting = nullptr;
+	FileFormatSetting* m_sampleRateSetting = nullptr;
+	FileFormatSetting* m_bitRateSetting = nullptr;
+	FileFormatSetting* m_bitDepthSetting = nullptr;
+	FileFormatSetting* m_stereoModeSetting = nullptr;
+	FileFormatSetting* m_compressionLevelSetting = nullptr;
 	QPushButton* m_startButton = nullptr;
 	QPushButton* m_cancelButton = nullptr;
 	QProgressBar* m_progressBar = nullptr;
