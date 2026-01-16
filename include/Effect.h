@@ -55,7 +55,6 @@ public:
 	Effect( const Plugin::Descriptor * _desc,
 			Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key );
-	~Effect() override;
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 	void loadSettings( const QDomElement & _this ) override;
@@ -176,29 +175,6 @@ protected:
 
 	gui::PluginView* instantiateView( QWidget * ) override;
 
-	// some effects might not be capable of higher sample-rates so they can
-	// sample it down before processing and back after processing
-	inline void sampleDown( const SampleFrame* _src_buf,
-							SampleFrame* _dst_buf,
-							sample_rate_t _dst_sr )
-	{
-		resample( 0, _src_buf,
-				Engine::audioEngine()->outputSampleRate(),
-					_dst_buf, _dst_sr,
-					Engine::audioEngine()->framesPerPeriod() );
-	}
-
-	inline void sampleBack( const SampleFrame* _src_buf,
-							SampleFrame* _dst_buf,
-							sample_rate_t _src_sr )
-	{
-		resample( 1, _src_buf, _src_sr, _dst_buf,
-				Engine::audioEngine()->outputSampleRate(),
-			Engine::audioEngine()->framesPerPeriod() * _src_sr /
-				Engine::audioEngine()->outputSampleRate() );
-	}
-	void reinitSRC();
-
 	virtual void onEnabledChanged() {}
 
 
@@ -212,10 +188,6 @@ private:
 
 
 	EffectChain * m_parent;
-	void resample( int _i, const SampleFrame* _src_buf,
-					sample_rate_t _src_sr,
-					SampleFrame* _dst_buf, sample_rate_t _dst_sr,
-					const f_cnt_t _frames );
 
 	bool m_okay;
 	bool m_noRun;
@@ -229,10 +201,6 @@ private:
 	TempoSyncKnobModel m_autoQuitModel;
 
 	bool m_autoQuitEnabled = false;
-
-	SRC_DATA m_srcData[2];
-	SRC_STATE * m_srcState[2];
-
 
 	friend class gui::EffectView;
 	friend class EffectChain;

@@ -35,10 +35,12 @@
 #include "Clipboard.h"
 #include "ColorChooser.h"
 #include "DataFile.h"
+#include "DeprecationHelper.h"
 #include "Engine.h"
 #include "embed.h"
 #include "GuiApplication.h"
 #include "KeyboardShortcuts.h"
+#include "lmms_math.h"
 #include "MidiClipView.h"
 #include "PatternClip.h"
 #include "PatternStore.h"
@@ -96,11 +98,6 @@ ClipView::ClipView( Clip * clip,
 	m_patternClipBackground( 0, 0, 0 ),
 	m_gradient( true ),
 	m_markerColor(0, 0, 0),
-	m_mouseHotspotHand( 0, 0 ),
-	m_mouseHotspotKnife( 0, 0 ),
-	m_cursorHand( QCursor( embed::getIconPixmap( "hand" ) ) ),
-	m_cursorKnife( QCursor( embed::getIconPixmap( "cursor_knife" ) ) ),
-	m_cursorSetYet( false ),
 	m_needsUpdate( true )
 {
 	if( s_textFloat == nullptr )
@@ -111,7 +108,7 @@ ClipView::ClipView( Clip * clip,
 
 	setAttribute( Qt::WA_DeleteOnClose, true );
 	setFocusPolicy( Qt::StrongFocus );
-	setCursor( m_cursorHand );
+	setCursor(Qt::PointingHandCursor);
 	move( 0, 0 );
 	show();
 
@@ -167,14 +164,6 @@ ClipView::~ClipView()
  */
 void ClipView::update()
 {
-	if( !m_cursorSetYet )
-	{
-		m_cursorHand = QCursor( embed::getIconPixmap( "hand" ), m_mouseHotspotHand.width(), m_mouseHotspotHand.height() );
-		m_cursorKnife = QCursor( embed::getIconPixmap( "cursor_knife" ), m_mouseHotspotKnife.width(), m_mouseHotspotKnife.height() );
-		setCursor( m_cursorHand );
-		m_cursorSetYet = true;
-	}
-
 	if( fixedClips() )
 	{
 		updateLength();
@@ -330,7 +319,7 @@ void ClipView::updateLength()
 	else
 	{
 		// this std::max function is needed for clips that do not start or end on the beat, otherwise, they "disappear" when zooming to min 
-		// 3 is the minimun width needed to make a clip visible
+		// 3 is the minimum width needed to make a clip visible
 		setFixedWidth(std::max(static_cast<int>(m_clip->length() * pixelsPerBar() / TimePos::ticksPerBar() + 1), 3));
 	}
 	m_trackView->trackContainerView()->update();
@@ -365,7 +354,7 @@ void ClipView::selectColor()
 
 void ClipView::randomizeColor()
 {
-	setColor(ColorChooser::getPalette(ColorChooser::Palette::Mixer)[std::rand() % 48]);
+	setColor(ColorChooser::getPalette(ColorChooser::Palette::Mixer)[fastRand(48)]);
 }
 
 void ClipView::resetColor()
@@ -495,19 +484,21 @@ void ClipView::dropEvent( QDropEvent * de )
  */
 void ClipView::updateCursor(QMouseEvent * me)
 {
+	const auto posX = position(me).x();
+
 	// If we are at the edges, use the resize cursor
 	if (!me->buttons() && m_clip->manuallyResizable() && !isSelected()
-		&& ((me->x() > width() - RESIZE_GRIP_WIDTH) || (me->x() < RESIZE_GRIP_WIDTH)))
+		&& ((posX > width() - RESIZE_GRIP_WIDTH) || (posX < RESIZE_GRIP_WIDTH)))
 	{
 		setCursor(Qt::SizeHorCursor);
 	}
 	// If we are in the middle on knife mode, use the knife cursor
 	else if (m_trackView->trackContainerView()->knifeMode() && !isSelected())
 	{
-		setCursor(m_cursorKnife);
+		setCursor(Qt::SplitHCursor);
 	}
 	// If we are in the middle in any other mode, use the hand cursor
-	else { setCursor(m_cursorHand); }
+	else { setCursor(Qt::PointingHandCursor); }
 }
 
 
@@ -593,7 +584,7 @@ void ClipView::paintTextLabel(QString const & text, QPainter & painter)
 		elidedClipName = text.trimmed();
 	}
 
-	painter.fillRect(QRect(0, 0, width(), fontMetrics.height() + 2 * textTop), textBackgroundColor());
+	painter.fillRect(QRect(0, 0, fontMetrics.horizontalAdvance(elidedClipName) + 8, fontMetrics.height() + 2 * textTop), textBackgroundColor());
 
 	int const finalTextTop = textTop + fontMetrics.ascent();
 	painter.setPen(textShadowColor());
@@ -619,13 +610,15 @@ void ClipView::paintTextLabel(QString const & text, QPainter & painter)
  */
 void ClipView::mousePressEvent( QMouseEvent * me )
 {
+	const auto pos = position(me);
+
 	// Right now, active is only used on right/mid clicks actions, so we use a ternary operator
 	// to avoid the overhead of calling getClickedClips when it's not used
 	auto active = me->button() == Qt::LeftButton
 		? QVector<ClipView *>()
 		: getClickedClips();
 
-	setInitialPos( me->pos() );
+	setInitialPos(pos);
 	setInitialOffsets();
 	if( !fixedClips() && me->button() == Qt::LeftButton )
 	{
@@ -660,7 +653,7 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 					m_clip->setJournalling(false);
 				}
 
-				setInitialPos( me->pos() );
+				setInitialPos(pos);
 				setInitialOffsets();
 
 				if (!m_clip->manuallyResizable() && !knifeMode)
@@ -668,12 +661,12 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 					m_action = Action::Move;
 					setCursor( Qt::SizeAllCursor );
 				}
-				else if( me->x() >= width() - RESIZE_GRIP_WIDTH )
+				else if (pos.x() >= width() - RESIZE_GRIP_WIDTH)
 				{
 					m_action = Action::Resize;
 					setCursor( Qt::SizeHorCursor );
 				}
-				else if (me->x() < RESIZE_GRIP_WIDTH)
+				else if (pos.x() < RESIZE_GRIP_WIDTH)
 				{
 					m_action = Action::ResizeLeft;
 					setCursor( Qt::SizeHorCursor );
@@ -681,7 +674,7 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 				else if (knifeMode)
 				{
 					m_action = Action::Split;
-					setCursor( m_cursorKnife );
+					setCursor(Qt::SplitHCursor);
 					setMarkerPos( knifeMarkerPos( me ) );
 					setMarkerEnabled( true );
 					update();
@@ -836,6 +829,7 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 		m_hint = nullptr;
 	}
 
+	const auto pos = position(me);
 	const float ppb = m_trackView->trackContainerView()->pixelsPerBar();
 	if( m_action == Action::Move )
 	{
@@ -888,7 +882,7 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 		if( m_action == Action::Resize )
 		{
 			// The clip's new length
-			TimePos l = static_cast<int>( me->x() * TimePos::ticksPerBar() / ppb );
+			TimePos l = static_cast<int>(pos.x() * TimePos::ticksPerBar() / ppb);
 
 			// If the user is holding alt, or pressed ctrl after beginning the drag, don't quantize
 			if ( unquantizedModHeld(me) )
@@ -923,7 +917,7 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 		{
 			auto pClip = dynamic_cast<PatternClip*>(m_clip);
 
-			const int x = mapToParent( me->pos() ).x() - m_initialMousePos.x();
+			const int x = mapToParent(pos).x() - m_initialMousePos.x();
 
 			TimePos t = qMax( 0, (int)
 								m_trackView->trackContainerView()->currentPosition() +
@@ -996,7 +990,7 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 	}
 	else if( m_action == Action::Split )
 	{
-		setCursor(m_cursorKnife);
+		setCursor(Qt::SplitHCursor);
 		setMarkerPos(knifeMarkerPos(me));
 		update();
 	}
@@ -1033,7 +1027,7 @@ void ClipView::mouseReleaseEvent( QMouseEvent * me )
 	else if( m_action == Action::Split )
 	{
 		const float ppb = m_trackView->trackContainerView()->pixelsPerBar();
-		const TimePos relPos = me->pos().x() * TimePos::ticksPerBar() / ppb;
+		const TimePos relPos = position(me).x() * TimePos::ticksPerBar() / ppb;
 		if (me->modifiers() & Qt::ShiftModifier)
 		{
 			destructiveSplitClip(unquantizedModHeld(me) ? relPos : quantizeSplitPos(relPos));
@@ -1295,7 +1289,7 @@ void ClipView::setInitialOffsets()
  */
 bool ClipView::mouseMovedDistance( QMouseEvent * me, int distance )
 {
-	QPoint dPos = mapToGlobal( me->pos() ) - m_initialMouseGlobalPos;
+	QPoint dPos = mapToGlobal(position(me)) - m_initialMouseGlobalPos;
 	const int pixelsMoved = dPos.manhattanLength();
 	return ( pixelsMoved > distance || pixelsMoved < -distance );
 }
@@ -1321,7 +1315,7 @@ TimePos ClipView::draggedClipPos( QMouseEvent * me )
 	//Pixels per bar
 	const float ppb = m_trackView->trackContainerView()->pixelsPerBar();
 	// The pixel distance that the mouse has moved
-	const int mouseOff = mapToGlobal(me->pos()).x() - m_initialMouseGlobalPos.x();
+	const int mouseOff = mapToGlobal(position(me)).x() - m_initialMouseGlobalPos.x();
 	TimePos newPos = m_initialClipPos + mouseOff * TimePos::ticksPerBar() / ppb;
 	TimePos offset = newPos - m_initialClipPos;
 	// If the user is holding alt, or pressed ctrl after beginning the drag, don't quantize
@@ -1353,7 +1347,7 @@ TimePos ClipView::draggedClipPos( QMouseEvent * me )
 int ClipView::knifeMarkerPos( QMouseEvent * me )
 {
 	//Position relative to start of clip
-	const int markerPos = me->pos().x();
+	const int markerPos = position(me).x();
 
 	//In unquantized mode, we don't have to mess with the position at all
 	if ( unquantizedModHeld(me) ) { return markerPos; }

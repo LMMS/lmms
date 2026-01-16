@@ -519,7 +519,7 @@ void InstrumentTrack::processOutEvent( const MidiEvent& event, const TimePos& ti
 			break;
 	}
 
-	// if appropriate, midi-port does futher routing
+	// if appropriate, midi-port does further routing
 	m_midiPort.processOutEvent( event, time );
 }
 
