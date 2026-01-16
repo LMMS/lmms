@@ -52,29 +52,6 @@
 #define LB_24_IGNORE_ENVELOPE
 //#define LB_24_RES_TRICK
 
-#if defined(__x86_64__) || defined(_M_AMD64) || defined(__i386__) || defined(_M_IX86)
-	#include <immintrin.h>
-	#define busy_wait_hint() _mm_pause()
-#elif defined(__aarch64__) // arm64
-	// isb 15 used instead of yield on arm64
-	// See https://github.com/rust-lang/rust/commit/c064b6560b7ce0adeb9bbf5d7dcf12b1acb0c807
-	#if defined(__ARM_ACLE)
-		#include <arm_acle.h>
-		#define busy_wait_hint() __isb(15)
-	#elif defined(__GNUG__)
-		// GCC for ARM lacks these intrinsics at the moment.
-		// See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=105416
-		// TODO: Remove inline asm once GCC properly provides __ARM_ACLE
-		#define busy_wait_hint() asm volatile ("isb 15" ::: "memory")
-	#endif
-#elif defined(_M_ARM64) // arm64 msvc
-	#include <intrin.h>
-	// See https://github.com/rust-lang/rust/commit/c064b6560b7ce0adeb9bbf5d7dcf12b1acb0c807
-	#define busy_wait_hint() __isb(15)
-#else
-	// TODO: Add other platforms as needed (LMMS only supports 64-bit x86 and ARM so far)
-	#error No busy-wait architecture intrinsic available for this platform!
-#endif
 
 namespace
 {
