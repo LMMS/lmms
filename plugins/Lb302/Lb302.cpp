@@ -339,8 +339,38 @@ void Lb302Synth::process(SampleFrame* outbuf, const fpp_t size)
 	if (release_frame.load(std::memory_order_relaxed) == 0 || !m_playingNote) { vca_mode = VcaMode::Decay; }
 	if (new_freq)
 	{
-		initNote(phaseInc(true_freq), deadToggle.value());
 		new_freq = false;
+		const bool noteIsDead = deadToggle.value();
+		// catch_decay = 0;
+		vco_inc = phaseInc(true_freq);
+
+		// Always reset vca on non-dead notes, and only reset vca on decaying (decayed) and never-played
+		if (!noteIsDead || (vca_mode == VcaMode::Decay || vca_mode == VcaMode::NeverPlayed))
+		{
+			sample_cnt = 0;
+			vca_mode = VcaMode::Attack;
+		}
+		else { vca_mode = VcaMode::Idle; }
+
+		if (vco_slideinc != 0.f)
+		{
+			// Initiate Slide
+			vco_slide = vco_inc - vco_slideinc; // Slide amount
+			vco_slidebase = vco_inc; // The REAL frequency
+		}
+		else { vco_slide = 0.f; }
+
+		// Slide-from note, save inc for next note
+		// May need to equal vco_slidebase + vco_slide if last note slid
+		if (slideToggle.value()) { vco_slideinc = vco_inc; }
+
+		recalcFilter();
+		if (!noteIsDead)
+		{
+			// Swap next two blocks??
+			vcf().playNote();
+			vcf_envpos = ENVINC; // Ensure envelope is recalculated
+		}
 	}
 
 	// TODO: NORMAL RELEASE
@@ -490,48 +520,6 @@ void Lb302Synth::process(SampleFrame* outbuf, const fpp_t size)
 				vca_mode = VcaMode::NeverPlayed;
 			}
 		}
-	}
-}
-
-
-/*  Prepares the active LB302 note.  I separated this into a function because it
- *  needs to be called onplayNote() when a new note is started.  It also needs
- *  to be called from process() when a prior edge-to-edge note is done releasing.
- */
-
-void Lb302Synth::initNote(float noteVcoInc, bool noteIsDead)
-{
-	// catch_decay = 0;
-	vco_inc = noteVcoInc;
-
-	// Always reset vca on non-dead notes, and only reset vca on decaying (decayed) and never-played
-	if (!noteIsDead || (vca_mode == VcaMode::Decay || vca_mode == VcaMode::NeverPlayed))
-	{
-		sample_cnt = 0;
-		vca_mode = VcaMode::Attack;
-		// LB303:
-		//vca_a = 0;
-	}
-	else { vca_mode = VcaMode::Idle; }
-
-	initSlide();
-
-	// Slide-from note, save inc for next note
-	// May need to equal vco_slidebase + vco_slide if last note slid
-	if (slideToggle.value()) { vco_slideinc = vco_inc; }
-
-	recalcFilter();
-
-	if (!noteIsDead)
-	{
-		// Swap next two blocks??
-		vcf().playNote();
-
-		vcf_envpos = ENVINC; // Ensure envelope is recalculated
-
-		// Double Check
-		//vca_mode = VcaMode::Attack;
-		//vca_a = 0.f;
 	}
 }
 
