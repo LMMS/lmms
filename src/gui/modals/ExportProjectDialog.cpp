@@ -72,6 +72,8 @@ ExportProjectDialog::ExportProjectDialog(const QString& path, QWidget* parent, b
 	connect(m_fileFormatSetting->comboBox(), qOverload<int>(&QComboBox::currentIndexChanged), this,
 		&ExportProjectDialog::onFileFormatChanged);
 
+	connect(m_cancelButton, &QPushButton::clicked, this, &ExportProjectDialog::reject);
+
 	auto index = 0;
 	for (const auto& device : ProjectRenderer::fileEncodeDevices)
 	{
