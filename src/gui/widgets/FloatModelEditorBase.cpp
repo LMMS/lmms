@@ -59,6 +59,12 @@ FloatModelEditorBase::FloatModelEditorBase(DirectionOfManipulation directionOfMa
 }
 
 
+bool FloatModelEditorBase::isVolumeKnob() const
+{
+	return (bool) m_volumeKnob.value();
+}	
+
+
 void FloatModelEditorBase::initUi(const QString & name)
 {
 	if (s_textFloat == nullptr)
@@ -374,6 +380,11 @@ void FloatModelEditorBase::setPosition(const QPoint & p)
 	}
 }
 
+void FloatModelEditorBase::setVolumeKnob( const bool val )
+{
+	// By setting parameter "isAutomated = true", we prevent the creation of an undo checkpoint
+	m_volumeKnob.setValue( (float) val, true );
+}
 
 void FloatModelEditorBase::enterValue()
 {

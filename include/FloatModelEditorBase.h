@@ -41,7 +41,6 @@ class LMMS_EXPORT FloatModelEditorBase : public QWidget, public FloatModelView
 {
 	Q_OBJECT
 
-	mapPropertyFromModel(bool, isVolumeKnob, setVolumeKnob, m_volumeKnob);
 	mapPropertyFromModel(float, volumeRatio, setVolumeRatio, m_volumeRatio);
 
 	void initUi(const QString & name); //!< to be called by ctors
@@ -62,6 +61,8 @@ public:
 		setDescription(txt_before);
 		setUnit(txt_after);
 	}
+
+	bool isVolumeKnob() const;
 
 signals:
 	void sliderPressed();
@@ -111,6 +112,9 @@ protected:
 	bool m_buttonPressed;
 
 	DirectionOfManipulation m_directionOfManipulation;
+
+public slots:
+	void setVolumeKnob( const bool val );
 
 private slots:
 	virtual void enterValue();
