@@ -65,6 +65,7 @@ ExportProjectDialog::ExportProjectDialog(const QString& path, QWidget* parent, b
 	startCancelButtonsLayout->addWidget(m_cancelButton);
 
 	mainLayout->addWidget(fileFormatSettingsGroupBox);
+	mainLayout->addStretch();
 	mainLayout->addLayout(startCancelButtonsLayout);
 	mainLayout->addWidget(m_progressBar);
 
@@ -143,6 +144,39 @@ ExportProjectDialog::ExportProjectDialog(const QString& path, QWidget* parent, b
 	}
 
 	m_progressBar->setValue(0);
+	connect(m_fileFormatSetting->comboBox(), qOverload<int>(&QComboBox::activated), this,
+		&ExportProjectDialog::onFileFormatChanged);
+}
+
+void ExportProjectDialog::onFileFormatChanged(int index)
+{
+	m_sampleRateSetting->setVisible(false);
+	m_bitDepthSetting->setVisible(false);
+	m_bitRateSetting->setVisible(false);
+	m_stereoModeSetting->setVisible(false);
+	m_compressionLevelSetting->setVisible(false);
+
+	switch (static_cast<ProjectRenderer::ExportFileFormat>(index))
+	{
+	case ProjectRenderer::ExportFileFormat::Wave:
+		m_sampleRateSetting->setVisible(true);
+		m_bitDepthSetting->setVisible(true);
+		break;
+	case ProjectRenderer::ExportFileFormat::Flac:
+		m_sampleRateSetting->setVisible(true);
+		m_bitDepthSetting->setVisible(true);
+		m_compressionLevelSetting->setVisible(true);
+		break;
+	case ProjectRenderer::ExportFileFormat::Ogg:
+		m_sampleRateSetting->setVisible(true);
+		m_bitRateSetting->setVisible(true);
+		break;
+	case ProjectRenderer::ExportFileFormat::MP3:
+		m_stereoModeSetting->setVisible(true);
+		m_bitRateSetting->setVisible(true);
+	default:
+		break;
+	}
 }
 
 ExportProjectDialog::FileFormatSetting::FileFormatSetting(const QString& header)

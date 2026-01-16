@@ -45,10 +45,13 @@ private:
 	public:
 		FileFormatSetting(const QString& header);
 		void addItem(const QString& text, const QVariant& userData);
+		auto comboBox() -> QComboBox* { return m_comboBox; }
 	private:
 		QLabel* m_label = nullptr;
 		QComboBox* m_comboBox = nullptr;
 	};
+
+	void onFileFormatChanged(int index);
 
 	FileFormatSetting* m_fileFormatSetting = nullptr;
 	FileFormatSetting* m_sampleRateSetting = nullptr;
