@@ -27,6 +27,7 @@
 #define LMMS_GUI_EXPORT_PROJECT_DIALOG_H
 
 #include <QDialog>
+
 #include "RenderManager.h"
 
 class QString;
@@ -36,8 +37,7 @@ class QCheckBox;
 class QComboBox;
 class QSpinBox;
 
-namespace lmms::gui
-{
+namespace lmms::gui {
 
 class ExportProjectDialog : public QDialog
 {

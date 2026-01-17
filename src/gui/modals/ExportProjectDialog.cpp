@@ -26,15 +26,15 @@
 
 #include <QCheckBox>
 #include <QComboBox>
+#include <QDir>
 #include <QFileInfo>
+#include <QFormLayout>
 #include <QGroupBox>
 #include <QLabel>
 #include <QProgressBar>
 #include <QPushButton>
 #include <QSpinBox>
 #include <QVBoxLayout>
-#include <QFormLayout>
-#include <QDir>
 
 #include "Engine.h"
 #include "GuiApplication.h"
@@ -195,7 +195,8 @@ ExportProjectDialog::ExportProjectDialog(const QString& path, Mode mode, QWidget
 	{
 		const auto pathExtension = QFileInfo{path}.completeSuffix().prepend(".");
 		const auto pathFormat = ProjectRenderer::getFileFormatFromExtension(pathExtension);
-		m_fileFormatComboBox->setCurrentIndex(std::max(0, m_fileFormatComboBox->findData(static_cast<int>(pathFormat))));
+		m_fileFormatComboBox->setCurrentIndex(
+			std::max(0, m_fileFormatComboBox->findData(static_cast<int>(pathFormat))));
 	}
 
 	m_bitRateComboBox->setCurrentIndex(std::max(0, m_bitRateComboBox->findData(defaultBitRate)));
@@ -265,15 +266,13 @@ void ExportProjectDialog::onStartButtonClicked()
 	const auto sampleRate = static_cast<sample_rate_t>(m_sampleRateComboBox->currentData().toInt());
 	const auto bitRate = static_cast<bitrate_t>(m_bitRateComboBox->currentData().toInt());
 	const auto bitDepth = static_cast<OutputSettings::BitDepth>(m_bitDepthComboBox->currentData().toInt());
-	const auto stereoMode
-		= static_cast<OutputSettings::StereoMode>(m_stereoModeComboBox->currentData().toInt());
+	const auto stereoMode = static_cast<OutputSettings::StereoMode>(m_stereoModeComboBox->currentData().toInt());
 	auto outputSettings = OutputSettings{sampleRate, bitRate, bitDepth, stereoMode};
 
 	const auto compressionLevel = m_compressionLevelComboBox->currentData().toDouble();
 	outputSettings.setCompressionLevel(compressionLevel);
 
-	const auto format
-		= static_cast<ProjectRenderer::ExportFileFormat>(m_fileFormatComboBox->currentData().toInt());
+	const auto format = static_cast<ProjectRenderer::ExportFileFormat>(m_fileFormatComboBox->currentData().toInt());
 	m_renderManager = std::make_unique<RenderManager>(outputSettings, format, m_path);
 	m_startButton->setEnabled(false);
 
@@ -302,7 +301,6 @@ void ExportProjectDialog::accept()
 	m_renderManager.reset(nullptr);
 	QDialog::accept();
 	getGUI()->mainWindow()->resetWindowTitle();
-
 }
 
 void ExportProjectDialog::reject()
