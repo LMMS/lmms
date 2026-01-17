@@ -37,8 +37,6 @@
 #include <QVBoxLayout>
 
 #include "Engine.h"
-#include "GuiApplication.h"
-#include "MainWindow.h"
 #include "ProjectRenderer.h"
 #include "Song.h"
 
@@ -283,7 +281,6 @@ void ExportProjectDialog::onStartButtonClicked()
 	connect(m_renderManager.get(), &RenderManager::progressChanged, m_progressBar, &QProgressBar::setValue);
 	connect(m_renderManager.get(), &RenderManager::progressChanged, this, &ExportProjectDialog::updateTitleBar);
 	connect(m_renderManager.get(), &RenderManager::finished, this, &QDialog::accept);
-	connect(m_renderManager.get(), &RenderManager::finished, getGUI()->mainWindow(), &MainWindow::resetWindowTitle);
 
 	switch (m_mode)
 	{
@@ -300,7 +297,6 @@ void ExportProjectDialog::accept()
 {
 	m_renderManager.reset(nullptr);
 	QDialog::accept();
-	getGUI()->mainWindow()->resetWindowTitle();
 }
 
 void ExportProjectDialog::reject()
@@ -312,7 +308,7 @@ void ExportProjectDialog::reject()
 
 void ExportProjectDialog::updateTitleBar(int prog)
 {
-	getGUI()->mainWindow()->setWindowTitle(tr("Rendering: %1%").arg(prog));
+	setWindowTitle(tr("Rendering: %1%").arg(prog));
 }
 
 } // namespace lmms::gui
