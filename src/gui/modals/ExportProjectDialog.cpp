@@ -33,7 +33,8 @@
 #include <QPushButton>
 #include <QSpinBox>
 #include <QVBoxLayout>
-#include <qformlayout.h>
+#include <QFormLayout>
+#include <QDir>
 
 #include "Engine.h"
 #include "GuiApplication.h"
@@ -217,6 +218,14 @@ ExportProjectDialog::ExportProjectDialog(const QString& path, Mode mode, QWidget
 
 void ExportProjectDialog::onFileFormatChanged(int index)
 {
+	if (m_mode == Mode::ExportProject)
+	{
+		const auto fileInfo = QFileInfo{m_path};
+		const auto extension
+			= ProjectRenderer::getFileExtensionFromFormat(static_cast<ProjectRenderer::ExportFileFormat>(index));
+		m_path = fileInfo.path() + QDir::separator() + fileInfo.completeBaseName() + extension;
+	}
+
 	auto setVisible = [](QLabel* label, QComboBox* comboBox, bool visible) {
 		label->setVisible(visible);
 		comboBox->setVisible(visible);
