@@ -33,7 +33,7 @@
 #include "NotePlayHandle.h"
 #include "Oscillator.h"
 #include "PixmapButton.h"
-
+#include "lmms_math.h"
 #include "embed.h"
 #include "plugin_export.h"
 
@@ -231,71 +231,63 @@ void OrganicInstrument::playNote( NotePlayHandle * _n,
 		auto oscs_l = std::array<Oscillator*, NUM_OSCILLATORS>{};
 		auto oscs_r = std::array<Oscillator*, NUM_OSCILLATORS>{};
 
-		_n->m_pluginData = new oscPtr;
+		auto newOsc = new oscPtr;
+		_n->m_pluginData = newOsc;
 
-		for( int i = m_numOscillators - 1; i >= 0; --i )
+		for (int i = m_numOscillators - 1; i >= 0; --i)
 		{
-			static_cast<oscPtr *>( _n->m_pluginData )->phaseOffsetLeft[i]
-				= rand() / (static_cast<float>(RAND_MAX) + 1.0f);
-			static_cast<oscPtr *>( _n->m_pluginData )->phaseOffsetRight[i]
-				= rand() / (static_cast<float>(RAND_MAX) + 1.0f);
+			newOsc->phaseOffsetLeft[i] = fastRand(1.f);
+			newOsc->phaseOffsetRight[i] = fastRand(1.f);
 
 			// initialise ocillators
-
-			if( i == m_numOscillators - 1 )
+			if (i == m_numOscillators - 1)
 			{
 				// create left oscillator
 				oscs_l[i] = new Oscillator(
-						&m_osc[i]->m_waveShape,
-						&m_modulationAlgo,
-						_n->frequency(),
-						m_osc[i]->m_detuningLeft,
-						static_cast<oscPtr *>( _n->m_pluginData )->phaseOffsetLeft[i],
-						m_osc[i]->m_volumeLeft );
+					&m_osc[i]->m_waveShape,
+					&m_modulationAlgo,
+					_n->frequency(),
+					m_osc[i]->m_detuningLeft,
+					newOsc->phaseOffsetLeft[i],
+					m_osc[i]->m_volumeLeft);
 				// create right oscillator
 				oscs_r[i] = new Oscillator(
-						&m_osc[i]->m_waveShape,
-						&m_modulationAlgo,
-						_n->frequency(),
-						m_osc[i]->m_detuningRight,
-						static_cast<oscPtr *>( _n->m_pluginData )->phaseOffsetRight[i],
-						m_osc[i]->m_volumeRight );
+					&m_osc[i]->m_waveShape,
+					&m_modulationAlgo,
+					_n->frequency(),
+					m_osc[i]->m_detuningRight,
+					newOsc->phaseOffsetRight[i],
+					m_osc[i]->m_volumeRight);
 			}
 			else
 			{
 				// create left oscillator
 				oscs_l[i] = new Oscillator(
-						&m_osc[i]->m_waveShape,
-						&m_modulationAlgo,
-						_n->frequency(),
-						m_osc[i]->m_detuningLeft,
-						static_cast<oscPtr *>( _n->m_pluginData )->phaseOffsetLeft[i],
-						m_osc[i]->m_volumeLeft,
-						oscs_l[i + 1] );
+					&m_osc[i]->m_waveShape,
+					&m_modulationAlgo,
+					_n->frequency(),
+					m_osc[i]->m_detuningLeft,
+					newOsc->phaseOffsetLeft[i],
+					m_osc[i]->m_volumeLeft,
+					oscs_l[i + 1]);
 				// create right oscillator
 				oscs_r[i] = new Oscillator(
-						&m_osc[i]->m_waveShape,
-						&m_modulationAlgo,
-						_n->frequency(),
-						m_osc[i]->m_detuningRight,
-						static_cast<oscPtr *>( _n->m_pluginData )->phaseOffsetRight[i],
-						m_osc[i]->m_volumeRight,
-						oscs_r[i + 1] );
+					&m_osc[i]->m_waveShape,
+					&m_modulationAlgo,
+					_n->frequency(),
+					m_osc[i]->m_detuningRight,
+					newOsc->phaseOffsetRight[i],
+					m_osc[i]->m_volumeRight,
+					oscs_r[i + 1]);
 			}
-
-
 		}
-
-		static_cast<oscPtr *>( _n->m_pluginData )->oscLeft = oscs_l[0];
-		static_cast<oscPtr *>( _n->m_pluginData )->oscRight = oscs_r[0];
+		newOsc->oscLeft = oscs_l[0];
+		newOsc->oscRight = oscs_r[0];
 	}
 
-	Oscillator * osc_l = static_cast<oscPtr *>( _n->m_pluginData )->oscLeft;
-	Oscillator * osc_r = static_cast<oscPtr *>( _n->m_pluginData)->oscRight;
-
-	osc_l->update( _working_buffer + offset, frames, 0 );
-	osc_r->update( _working_buffer + offset, frames, 1 );
-
+	auto osc = static_cast<oscPtr*>(_n->m_pluginData);
+	osc->oscLeft->update(_working_buffer + offset, frames, 0);
+	osc->oscRight->update(_working_buffer + offset, frames, 1);
 
 	// -- fx section --
 
@@ -346,25 +338,16 @@ float inline OrganicInstrument::waveshape(float in, float amount)
 }
 
 
-
-
 void OrganicInstrument::randomiseSettings()
 {
-
-	for( int i = 0; i < m_numOscillators; i++ )
+	for (auto i = 0; i < m_numOscillators; ++i)
 	{
-		m_osc[i]->m_volModel.setValue( intRand( 0, 100 ) );
-
-		m_osc[i]->m_detuneModel.setValue( intRand( -5, 5 ) );
-
-		m_osc[i]->m_panModel.setValue( 0 );
-
-		m_osc[i]->m_oscModel.setValue( intRand( 0, 5 ) );
+		m_osc[i]->m_volModel.setValue(fastRandInc(100));
+		m_osc[i]->m_detuneModel.setValue(fastRandInc(-5, 5));
+		m_osc[i]->m_panModel.setValue(0);
+		m_osc[i]->m_oscModel.setValue(fastRandInc(5));
 	}
-
 }
-
-
 
 
 void OrganicInstrument::updateAllDetuning()
@@ -373,17 +356,6 @@ void OrganicInstrument::updateAllDetuning()
 	{
 		m_osc[i]->updateDetuning();
 	}
-}
-
-
-
-
-int OrganicInstrument::intRand( int min, int max )
-{
-//	int randn = min+int((max-min)*rand()/(RAND_MAX + 1.0));
-//	cout << randn << endl;
-	int randn = ( rand() % (max - min) ) + min;
-	return( randn );
 }
 
 

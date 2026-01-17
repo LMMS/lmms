@@ -23,12 +23,11 @@
  *
  */
 
+#include <sid.h>
 
 
 #include <cmath>
 #include <cstdio>
-
-#include <sid.h>
 
 #include "SidInstrument.h"
 #include "AudioEngine.h"
@@ -37,19 +36,20 @@
 #include "Knob.h"
 #include "NotePlayHandle.h"
 #include "PixmapButton.h"
-
+#include "lmms_math.h"
 #include "embed.h"
 #include "plugin_export.h"
 
+namespace
+{
+inline constexpr auto C64_PAL_CYCLES_PER_SEC = 985248;
+inline constexpr auto NUMSIDREGS = 0x19;
+inline constexpr auto SIDWRITEDELAY = 9; // lda $xxxx,x 4 cycles, sta $d400,x 5 cycles
+inline constexpr auto SIDWAVEDELAY = 4; // and $xxxx,x 4 cycles extra
+}
+
 namespace lmms
 {
-
-
-#define C64_PAL_CYCLES_PER_SEC  985248
-
-#define NUMSIDREGS 0x19
-#define SIDWRITEDELAY 9 // lda $xxxx,x 4 cycles, sta $d400,x 5 cycles
-#define SIDWAVEDELAY 4 // and $xxxx,x 4 cycles extra
 
 auto sidorder = std::array<unsigned char, 25>
   {0x15,0x16,0x18,0x17,
@@ -238,54 +238,47 @@ float SidInstrument::desiredReleaseTimeMs() const
 
 static int sid_fillbuffer(unsigned char* sidreg, reSID::SID *sid, int tdelta, short *ptr, int samples)
 {
-  int total = 0;
-//  customly added
-  int residdelay = 0;
+	int total = 0;
+	int badline = fastRand(NUMSIDREGS);
+	int residdelay = 0; // customly added
 
-  int badline = rand() % NUMSIDREGS;
+	for (int c = 0; c < NUMSIDREGS; ++c)
+	{
+		unsigned char o = sidorder[c];
 
-  for (int c = 0; c < NUMSIDREGS; c++)
-  {
-    unsigned char o = sidorder[c];
+		// Extra delay for loading the waveform (and mt_chngate,x)
+		if (o == 4 || o == 11 || o == 18)
+		{
+			auto dt = SIDWAVEDELAY;
+			const int result = sid->clock(dt, ptr, samples);
+			total += result;
+			ptr += result;
+			samples -= result;
+			tdelta -= SIDWAVEDELAY;
+		}
 
-  	// Extra delay for loading the waveform (and mt_chngate,x)
-  	if ((o == 4) || (o == 11) || (o == 18))
-  	{
-  	  int tdelta2 = SIDWAVEDELAY;
-      int result = sid->clock(tdelta2, ptr, samples);
-      total += result;
-      ptr += result;
-      samples -= result;
-      tdelta -= SIDWAVEDELAY;
-    }
+		// Possible random badline delay once per writing
+		if (badline == c && residdelay)
+		{
+			auto dt = residdelay;
+			const int result = sid->clock(dt, ptr, samples);
+			total += result;
+			ptr += result;
+			samples -= result;
+			tdelta -= residdelay;
+		}
 
-    // Possible random badline delay once per writing
-    if ((badline == c) && (residdelay))
-  	{
-      int tdelta2 = residdelay;
-      int result = sid->clock(tdelta2, ptr, samples);
-      total += result;
-      ptr += result;
-      samples -= result;
-      tdelta -= residdelay;
-    }
+		sid->write(o, sidreg[o]);
 
-    sid->write(o, sidreg[o]);
-
-    int tdelta2 = SIDWRITEDELAY;
-    int result = sid->clock(tdelta2, ptr, samples);
-    total += result;
-    ptr += result;
-    samples -= result;
-    tdelta -= SIDWRITEDELAY;
-  }
-  int result = sid->clock(tdelta, ptr, samples);
-  total += result;
-
-  return total;
+		auto dt = SIDWRITEDELAY;
+		const int result = sid->clock(dt, ptr, samples);
+		total += result;
+		ptr += result;
+		samples -= result;
+		tdelta -= SIDWRITEDELAY;
+	}
+	return total + sid->clock(tdelta, ptr, samples);
 }
-
-
 
 
 void SidInstrument::playNote( NotePlayHandle * _n,

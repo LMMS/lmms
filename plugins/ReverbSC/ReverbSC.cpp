@@ -90,10 +90,10 @@ Effect::ProcessStatus ReverbSCEffect::processImpl(SampleFrame* buf, const fpp_t 
 	{
 		auto s = std::array{buf[f][0], buf[f][1]};
 
-		const auto inGain = static_cast<SPFLOAT>(fastPow10f(
-			(inGainBuf ? inGainBuf->values()[f] : m_reverbSCControls.m_inputGainModel.value()) / 20.f));
-		const auto outGain = static_cast<SPFLOAT>(fastPow10f(
-			(outGainBuf ? outGainBuf->values()[f] : m_reverbSCControls.m_outputGainModel.value()) / 20.f));
+		const auto inGain = fastPow10f<SPFLOAT>(
+			(inGainBuf ? inGainBuf->values()[f] : m_reverbSCControls.m_inputGainModel.value()) / 20.f);
+		const auto outGain = fastPow10f<SPFLOAT>(
+			(outGainBuf ? outGainBuf->values()[f] : m_reverbSCControls.m_outputGainModel.value()) / 20.f);
 
 		s[0] *= inGain;
 		s[1] *= inGain;
