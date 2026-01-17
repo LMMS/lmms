@@ -184,8 +184,7 @@ ExportProjectDialog::ExportProjectDialog(const QString& path, Mode mode, QWidget
 	mainLayout->addWidget(m_progressBar);
 
 	m_progressBar->setValue(0);
-	m_loopRepeatBox->setMinimum(1);
-	m_loopRepeatBox->setMaximum(maxLoopRepeat);
+	m_loopRepeatBox->setRange(1, maxLoopRepeat);
 	m_loopRepeatBox->setValue(1);
 	m_loopRepeatBox->setSuffix(tr(" time(s)"));
 
