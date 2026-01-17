@@ -147,6 +147,12 @@ void GridView::moveToNearest(MoveDir dir)
 		containSelection(bb.first, bb.second);
 	}
 }
+size_t GridView::getClickedItem(QPointF pos)
+{
+	auto searchBox{getOnClickSearchArea(pos)};
+	std::set<size_t> searchBuffer{getSelection(searchBox.first, searchBox.second)};
+	return getClosest(searchBuffer, pos);
+}
 
 void GridView::paintEvent(QPaintEvent* pe)
 {
@@ -388,6 +394,11 @@ std::pair<QPointF, QPointF> VectorGraphView::getBoundingBox(size_t index) const
 	GridModel::ItemInfo coords{castModel<VectorGraphModel>()->getItem(index).info};
 	return std::make_pair(QPointF{coords.x - radius, coords.y - radius}, QPointF{coords.x + radius, coords.y + radius});
 }
+std::pair<QPointF, QPointF> VectorGraphView::getOnClickSearchArea(QPointF clickedPos) const
+{
+	float radius{0.5f};
+	return std::make_pair(QPointF{clickedPos.x() - radius, clickedPos.y() - radius}, QPointF{clickedPos.x() + radius, clickedPos.y() + radius});
+}
 
 std::set<size_t> VectorGraphView::getSelection(QPointF start, QPointF end)
 {
@@ -430,10 +441,15 @@ void VectorGraphView::mousePressEvent(QMouseEvent* me)
 		}
 		else
 		{
-			// place
 			m_mouseAction = GridView::MouseAction::placeAction;
-			size_t index{graphModel->addItem(VGPoint{0.0f, 0.0f, false}, GridModel::ItemInfo(modelPos.x(), modelPos.y()))};
-			auto bb{getBoundingBox(index)};
+			size_t foundIndex(GridView::getClickedItem(modelPos));
+			if (foundIndex >= model()->getCount())
+			{
+				// place if not found
+				foundIndex = graphModel->addItem(VGPoint{0.0f, 0.0f, false}, GridModel::ItemInfo(modelPos.x(), modelPos.y()));
+			}
+			// select clicked point
+			auto bb{getBoundingBox(foundIndex)};
 			GridView::containSelection(bb.first, bb.second);
 		}
 		me->accept();
@@ -442,10 +458,10 @@ void VectorGraphView::mousePressEvent(QMouseEvent* me)
 	{
 		// delete
 		m_mouseAction = GridView::MouseAction::removeAction;
-		int index{graphModel->findIndexFromPos(modelPos.x(), 0.5)};
-		if (index >= 0)
+		size_t foundIndex(GridView::getClickedItem(modelPos));
+		if (foundIndex < model()->getCount())
 		{
-			graphModel->removeItem(index);
+			graphModel->removeItem(foundIndex);
 		}
 		me->accept();
 	}
@@ -458,22 +474,38 @@ void VectorGraphView::keyPressEvent(QKeyEvent* ke)
 		switch (ke->key())
 		{
 			case Qt::Key_Up:
-				selectionMoveAction(QPointF{0.0f, 0.1f});
+				selectionMoveAction(QPointF{0.0f, 0.2f});
 				ke->accept();
 				break;
 			case Qt::Key_Down:
-				selectionMoveAction(QPointF{0.0f, -0.1f});
+				selectionMoveAction(QPointF{0.0f, -0.2f});
 				ke->accept();
 				break;
 			case Qt::Key_Left:
-				selectionMoveAction(QPointF{-0.1f, 0.0f});
+				selectionMoveAction(QPointF{-0.2f, 0.0f});
 				ke->accept();
 				break;
 			case Qt::Key_Right:
-				selectionMoveAction(QPointF{0.1f, 0.0f});
+				selectionMoveAction(QPointF{0.2f, 0.0f});
 				ke->accept();
 				break;
 			case Qt::Key_Delete:
+				selectionDeleteAction();
+				ke->accept();
+				break;
+			case Qt::Key_C:
+				ke->accept();
+				break;
+			case Qt::Key_V:
+				ke->accept();
+				break;
+			case Qt::Key_X:
+				ke->accept();
+				break;
+			case Qt::Key_A:
+				GridView::containSelection(QPointF{0.0f, 0.0f},
+					QPointF(model()->getLength(), model()->getHeight()));
+				update();
 				ke->accept();
 				break;
 		}
@@ -488,7 +520,7 @@ void VectorGraphView::mouseMoveEvent(QMouseEvent* me)
 	const auto mousePos{me->pos()};
 	QPointF modelPos(toModelCoords(mousePos));
 
-	//auto graphModel{castModel<VectorGraphModel>()};
+	auto graphModel{castModel<VectorGraphModel>()};
 
 	switch (m_mouseAction)
 	{
@@ -496,7 +528,6 @@ void VectorGraphView::mouseMoveEvent(QMouseEvent* me)
 			m_isSelectionPressed = true;
 			// moving the cursor
 			GridView::containSelection(modelPos, modelPos);
-			printf("containSelection\n");
 			update();
 			me->accept();
 			break;
@@ -506,16 +537,40 @@ void VectorGraphView::mouseMoveEvent(QMouseEvent* me)
 			m_mouseAction = GridView::MouseAction::moveAction;
 			break;
 		case GridView::MouseAction::moveAction:
-			printf("moved\n");
 			selectionMoveAction(modelPos - m_cursorPos);
 			// moving the cursor
 			m_cursorPos = modelPos;
 			me->accept();
 			break;
 		case GridView::MouseAction::removeAction:
+			// this is expensive, but it is used to ensure
+			// this part of the code works when `getOnClickSearchArea` changes
+			size_t foundIndex(GridView::getClickedItem(modelPos));
+			if (foundIndex < model()->getCount())
+			{
+				graphModel->removeItem(foundIndex);
+			}
 			me->accept();
 			break;
 	}
+}
+void VectorGraphView::selectionDeleteAction()
+{
+	auto graphModel{castModel<VectorGraphModel>()};
+
+	GridView::updateSelection();
+	for (auto it = m_selection.rbegin(); it != m_selection.rend(); it = m_selection.rbegin())
+	{
+		printf("delete item: %d\n", *it);
+		graphModel->removeItem(*it);
+		m_selection.erase(*it);
+	}
+}
+void VectorGraphView::selectionCopyAction()
+{
+}
+void VectorGraphView::selectionPasteAction()
+{
 }
 
 } // namespace lmms::gui

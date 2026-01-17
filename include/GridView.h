@@ -73,12 +73,13 @@ public:
 	};
 
 	void moveToWhole(unsigned int x, unsigned int y);
-
 	//! extends `m_selectStart`, `m_selectEnd` to contain `start` and `end`
 	//! start's x and y must be SMALLER than end's
 	void containSelection(QPointF start, QPointF end);
-
 	void moveToNearest(MoveDir dir);
+
+	//! @return `getCount()` if not found, else index
+	size_t getClickedItem(QPointF pos);
 
 	void updateSelection();
 	void selectionMoveAction(QPointF offset);
@@ -110,6 +111,8 @@ protected:
 	QPointF getBoundingBoxCenter(QPointF start, QPointF end) const;
 	//! should return the start coords and the end coords of an object / note / point
 	virtual std::pair<QPointF, QPointF> getBoundingBox(size_t index) const = 0;
+	//! should return an area where `getSelection()` could run
+	virtual std::pair<QPointF, QPointF> getOnClickSearchArea(QPointF clickedPos) const = 0;
 	//! use `select()` to apply selection automatically
 	//! if your widget doesn't work with points, then you can offset `start` or `end` and use `select()` on that
 	virtual std::set<size_t> getSelection(QPointF start, QPointF end) { return select(start, end, 0.0); }
@@ -145,9 +148,16 @@ protected:
 	void paintEvent(QPaintEvent* pe) override;
 	void mousePressEvent(QMouseEvent* me) override;
 	void mouseMoveEvent(QMouseEvent* me) override;
-	void keyPressEvent(QKeyEvent* ke);
+	void keyPressEvent(QKeyEvent* ke) override;
 	std::pair<QPointF, QPointF> getBoundingBox(size_t index) const override;
+	std::pair<QPointF, QPointF> getOnClickSearchArea(QPointF clickedPos) const override;
 	std::set<size_t> getSelection(QPointF start, QPointF end) override;
+	//! returns getCount() if not found, else index
+	size_t selectOnClick(QPointF pos);
+
+	void selectionDeleteAction();
+	void selectionCopyAction();
+	void selectionPasteAction();
 };
 
 } // namespace lmms::gui
