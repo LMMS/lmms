@@ -154,9 +154,10 @@ void VersionedSaveDialog::decrementVersion()
 	selectFile( file );
 }
 
-
-
-
+// TODO: This function is confusing. When it returns true, it means that the file exists *and* the user wanted to
+// replace it. Since it seems like this function is meant for confirming if you can overwrite an existing file (if
+// there is one) using it for that purpose is incorrect, since overwrites should be allowed when the file does not
+// exist. That being said, if this function isn't for overwrite confirmation somehow, then I have no idea what its for.
 bool VersionedSaveDialog::fileExistsQuery( QString FileName, QString WindowTitle )
 {
 	bool fileExists = false;
