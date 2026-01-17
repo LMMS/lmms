@@ -28,6 +28,8 @@
 #include <QPainter>
 #include <QPushButton>
 #include <QVBoxLayout>
+#include <QGridLayout>
+#include <QLabel>
 #include <QDebug>
 
 #include "Clipboard.h"
@@ -54,6 +56,7 @@ namespace gui {
 SfzSamplerView::SfzSamplerView(SfzSampler* instrument, QWidget* parent)
 	: InstrumentView(instrument, parent)
 	, m_instrument(instrument)
+	, m_switchKeysLabel(new QLabel(this))
 	, m_controlsWidget(new QWidget(this))
 	, m_knobLayout(new QGridLayout(m_controlsWidget))
 {
@@ -69,18 +72,21 @@ SfzSamplerView::SfzSamplerView(SfzSampler* instrument, QWidget* parent)
 	connect(openFileButton, &PixmapButton::clicked, this, &SfzSamplerView::openFile);
 	layout1->addWidget(openFileButton);
 
+	layout1->addWidget(m_switchKeysLabel);
+
 	layout1->addWidget(m_controlsWidget);
 
-	// Whenever a new SFZ file is loaded, set the default CC values
-	connect(m_instrument, &SfzSampler::fileLoaded, [this](){ updateKnobs(); }); // this lambda is so bad, but it doesn't work as a slot for some reason
 
-	updateKnobs();
+	// Whenever a new SFZ file is loaded, set the default CC values
+	connect(m_instrument, &SfzSampler::fileLoaded, [this](){ onFileLoaded(); }); // this lambda is so bad, but it doesn't work as a slot for some reason
+
+	onFileLoaded();
 
 	update();
 }
 
 
-void SfzSamplerView::updateKnobs()
+void SfzSamplerView::onFileLoaded()
 {
 	// Remove any old knobs
 	delete m_controlsWidget;
@@ -106,6 +112,21 @@ void SfzSamplerView::updateKnobs()
 			});
 			activeControlCount++;
 		}
+	}
+
+	// Update the switch key list
+	QStringList switchKeyLabels;
+	for (const auto& [key, label] : m_instrument->m_controlsConfig.m_switchKeyLabels)
+	{
+		switchKeyLabels.push_back(QString("- %1 %2").arg(SfzOpcodeState::keyNumToString(key)).arg(label));
+	}
+	if (switchKeyLabels.size() > 0)
+	{
+		m_switchKeysLabel->setText(tr("Switch Keys:\n") + switchKeyLabels.join("\n"));
+	}
+	else
+	{
+		m_switchKeysLabel->setText("");
 	}
 }
 

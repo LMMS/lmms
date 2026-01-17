@@ -16,7 +16,8 @@ public:
 	SfzOpcodeState(); // We need a constructor to initialize things like m_hicc
 
 	bool setOpcodeByStrings(const QString& name, const QString& value);
-	static int keyNumFromString(QString keyString, bool* successful);
+	static int stringToKeyNum(QString keyString, bool* successful);
+	static QString keyNumToString(int keyNum);
 	static int ccNumberFromOpcode(const QString& opcode);
 
 	// Normal MIDI CC's range from 0 to 127. More advanced SFZ's go beyond that, but for now we cap it at 128. This should be extended in the future.
@@ -42,6 +43,7 @@ public:
 	int m_sw_hikey = 127;
 	std::optional<int> m_sw_last = std::nullopt; // The SFZ opcode spec says this should default to 0, but I don't think that's right?
 	std::optional<int> m_sw_default = std::nullopt;
+	std::optional<QString> m_sw_label = std::nullopt;
 
 	//
 	// Velocity Trigger

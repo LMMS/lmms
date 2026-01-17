@@ -232,11 +232,23 @@ bool SfzParser::parseSfzFile(const QString& filePath, std::vector<SfzRegion>& ou
 		QRegularExpressionMatch match = re.match(opcodeNameAndValue[0]);
 		if (match.hasMatch())
 		{
-			controlsConfig.m_activeMidiCCs.at(match.captured(0).split("cc")[1].toInt()) = true;
+			int ccNumber = match.captured(0).split("cc")[1].toInt();
+			if (ccNumber >= 0 && ccNumber <= SfzOpcodeState::NumMidiCCs) { controlsConfig.m_activeMidiCCs.at(ccNumber) = true; }
 		}
 	}
 	// Check one last time in case the file ended with a region and didn't get added
 	if (currentHeader == Header::Region) { outputRegions.emplace_back(currentRegionState); }
+
+
+	// Just so that the GUI doesn't have to loop over all the regions to find the switch keys, let's also
+	// make a list of them in the controlsConfig object for easy access
+	for (const auto& region : outputRegions)
+	{
+		if (region.m_sw_last != std::nullopt)
+		{
+			controlsConfig.m_switchKeyLabels.insert({region.m_sw_last.value(), region.m_sw_label.value_or("")});
+		}
+	}
 
 	// Now that all the opcodes have been parsed into regions and added to the output vector, we are done!
 	// The samples themselves still need to be loaded, but that's a job for later

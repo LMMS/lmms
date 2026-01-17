@@ -41,18 +41,18 @@ bool SfzOpcodeState::setOpcodeByStrings(const QString& name, const QString& valu
 	else if (name == "lokey")
 	{
 		m_lokey = value.toInt(&successful);
-		if (!successful) { m_lokey = keyNumFromString(value, &successful); }
+		if (!successful) { m_lokey = stringToKeyNum(value, &successful); }
 	}
 	else if (name == "hikey")
 	{
 		m_hikey = value.toInt(&successful);
-		if (!successful) { m_hikey = keyNumFromString(value, &successful); }
+		if (!successful) { m_hikey = stringToKeyNum(value, &successful); }
 	}
 	else if (name == "key")
 	{
 		// Setting "key" on its own is equivalent to setting lokey, hikey, and pitch_keycenter all to the same value
 		m_lokey = m_hikey = m_pitch_keycenter = value.toInt(&successful);
-		if (!successful) { m_lokey = m_hikey = m_pitch_keycenter = keyNumFromString(value, &successful); }
+		if (!successful) { m_lokey = m_hikey = m_pitch_keycenter = stringToKeyNum(value, &successful); }
 	}
 
 
@@ -62,22 +62,26 @@ bool SfzOpcodeState::setOpcodeByStrings(const QString& name, const QString& valu
 	else if (name == "sw_lokey")
 	{
 		m_sw_lokey = value.toInt(&successful);
-		if (!successful) { m_sw_lokey = keyNumFromString(value, &successful); }
+		if (!successful) { m_sw_lokey = stringToKeyNum(value, &successful); }
 	}
 	else if (name == "sw_hikey")
 	{
 		m_sw_hikey = value.toInt(&successful);
-		if (!successful) { m_sw_hikey = keyNumFromString(value, &successful); }
+		if (!successful) { m_sw_hikey = stringToKeyNum(value, &successful); }
 	}
 	else if (name == "sw_last")
 	{
 		m_sw_last = value.toInt(&successful);
-		if (!successful) { m_sw_last = keyNumFromString(value, &successful); }
+		if (!successful) { m_sw_last = stringToKeyNum(value, &successful); }
 	}
 	else if (name == "sw_default")
 	{
 		m_sw_default = value.toInt(&successful);
-		if (!successful) { m_sw_default = keyNumFromString(value, &successful); }
+		if (!successful) { m_sw_default = stringToKeyNum(value, &successful); }
+	}
+	else if (name == "sw_label")
+	{
+		m_sw_label = value;
 	}
 
 
@@ -151,7 +155,7 @@ bool SfzOpcodeState::setOpcodeByStrings(const QString& name, const QString& valu
 	else if (name == "pitch_keycenter")
 	{
 		m_pitch_keycenter = value.toInt(&successful);
-		if (!successful) { m_pitch_keycenter = keyNumFromString(value, &successful); }
+		if (!successful) { m_pitch_keycenter = stringToKeyNum(value, &successful); }
 	}
 	else if (name == "pitch_keytrack")
 	{
@@ -330,7 +334,7 @@ int SfzOpcodeState::ccNumberFromOpcode(const QString& opcode)
 }
 
 
-int SfzOpcodeState::keyNumFromString(QString keyString, bool* successful)
+int SfzOpcodeState::stringToKeyNum(QString keyString, bool* successful)
 {
 	keyString = keyString.toLower();
 	// The last character is the octave number
@@ -363,6 +367,52 @@ int SfzOpcodeState::keyNumFromString(QString keyString, bool* successful)
 	return 24 + keyOffset + 12 * (octave - 1);
 }
 
+
+QString SfzOpcodeState::keyNumToString(int keyNum)
+{
+	QString octave = QString::number((keyNum - 24) / 12 + 1);
+	QString key = "";
+	switch (keyNum % 12)
+	{
+	case 0:
+		key = "C";
+		break;
+	case 1:
+		key = "C#";
+		break;
+	case 2:
+		key = "D";
+		break;
+	case 3:
+		key = "D#";
+		break;
+	case 4:
+		key = "E";
+		break;
+	case 5:
+		key = "F";
+		break;
+	case 6:
+		key = "F#";
+		break;
+	case 7:
+		key = "G";
+		break;
+	case 8:
+		key = "G#";
+		break;
+	case 9:
+		key = "A";
+		break;
+	case 10:
+		key = "A#";
+		break;
+	case 11:
+		key = "B";
+		break;
+	}
+	return key + octave;
+}
 
 
 } // namespace lmms

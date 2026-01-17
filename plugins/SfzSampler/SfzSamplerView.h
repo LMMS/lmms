@@ -27,7 +27,8 @@
 
 #include "InstrumentView.h"
 
-#include <QGridLayout>
+class QGridLayout;
+class QLabel;
 
 namespace lmms {
 
@@ -43,7 +44,7 @@ public:
 	SfzSamplerView(SfzSampler* instrument, QWidget* parent);
 
 public slots:
-	void updateKnobs();
+	void onFileLoaded();
 	void openFile();
 
 protected:
@@ -58,6 +59,7 @@ private:
 
 	SfzSampler* m_instrument;
 
+	QLabel* m_switchKeysLabel;
 	QWidget* m_controlsWidget;
 	QGridLayout* m_knobLayout;
 };
