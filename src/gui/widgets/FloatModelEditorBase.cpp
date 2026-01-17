@@ -59,7 +59,6 @@ FloatModelEditorBase::FloatModelEditorBase(DirectionOfManipulation directionOfMa
 }
 
 
-
 void FloatModelEditorBase::initUi(const QString & name)
 {
 	if (s_textFloat == nullptr)
@@ -374,6 +373,7 @@ void FloatModelEditorBase::setPosition(const QPoint & p)
 		}
 	}
 }
+
 
 void FloatModelEditorBase::enterValue()
 {

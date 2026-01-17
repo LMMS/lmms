@@ -67,16 +67,16 @@ public:
 		return m_volumeKnob;
 	}	
 
+	inline void setVolumeKnob( const bool val )
+	{
+		m_volumeKnob = val;
+	}
+
 signals:
 	void sliderPressed();
 	void sliderReleased();
 	void sliderMoved(float value);
 
-public slots:
-	inline void setVolumeKnob( const bool val )
-	{
-		m_volumeKnob = val;
-	}
 
 protected:
 	void contextMenuEvent(QContextMenuEvent * me) override;
@@ -120,7 +120,6 @@ protected:
 	bool m_buttonPressed;
 
 	DirectionOfManipulation m_directionOfManipulation;
-
 
 private slots:
 	virtual void enterValue();
