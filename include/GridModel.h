@@ -26,6 +26,7 @@
 #define LMMS_GRID_MODEl_H
 
 #include <memory> // shared_ptr
+#include <set>
 #include <vector>
 
 #include "stdio.h" // TODO remove
@@ -90,11 +91,10 @@ public:
 	void setSteps(unsigned int horizontalSteps, unsigned int verticalSteps);
 
 	virtual ~GridModel();
-signals:
-	void dataChangedAt(size_t index);
 protected:
 	GridModel(unsigned int length, unsigned int height, unsigned int horizontalSteps, unsigned int verticalSteps,
 		Model* parent, QString displayName, bool defaultConstructed);
+	virtual void dataChangedAt(size_t index);
 
 	//! @return index where added
 	size_t addItem(Item itemIn);
@@ -164,14 +164,24 @@ public:
 		GridModel::removeItem(index);
 	}
 	// TODO implement getting the save buffer
-	//std::span
+	// toBase64(selection)
+	// addItems(std::string base64String)
+	// clear()
 };
 
 struct VGPoint
 {
-	float bezierL;
-	float bezierR;
-	bool isBezierHandle;
+	enum Type
+	{
+		bezier, //!< the normal point
+		attribute, //!< used to adjust other's attributes
+		sine, //!< makes a sine shaped line
+		peak, //!< makes a peak filter shaped line
+		steps, //!< makes a staircase
+		random,
+		count
+	};
+	Type type;
 };
 
 class LMMS_EXPORT VectorGraphModel : public GridModelTyped<VGPoint>
@@ -184,12 +194,29 @@ public:
 	void setPoint(size_t index, float x, float y, bool isBezierHandle);
 
 	void renderPoints(size_t resolution, size_t start, size_t end);
-	void renderAfter(size_t index);
+	void renderAfter(size_t index, std::vector<float>& buffer);
 	const std::vector<float>& getBuffer() const;
 	std::vector<float>& getBufferRef();
 
+protected:
+	void dataChangedAt(size_t index) override;
 private:
+	void processLineTypeBezier(std::vector<float>& samplesOut, size_t startLoc, size_t endLoc,
+		float yBefore, float yAfter, float yMid);
+	void processLineTypeSine(std::vector<float>& samplesOut, size_t startLoc, size_t endLoc,
+		float sineAmp, float sineFreq, float sinePhase, float fadeInStartVal);
+	void processLineTypePeak(std::vector<float>& samplesOut, size_t startLoc, size_t endLoc,
+		float peakAmp, float peakX, float peakWidth, float fadeInStartVal);
+	void processLineTypeSteps(std::vector<float>& samplesOut, size_t startLoc, size_t endLoc,
+		std::vector<float>* yArray, float stepCount, float stepCurve, float fadeInStartVal);
+	void processLineTypeRandom(std::vector<float>& samplesOut, size_t startLoc, size_t endLoc,
+		float randomAmp, float randomCount, float randomSeed, float fadeInStartVal);
+
+
+	size_t m_renderSize;
 	std::vector<float> m_buffer;
+	bool m_allChanged;
+	std::set<size_t> m_changedData;
 };
 
 } // namespace lmms
