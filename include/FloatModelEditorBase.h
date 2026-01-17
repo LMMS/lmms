@@ -62,13 +62,21 @@ public:
 		setUnit(txt_after);
 	}
 
-	bool isVolumeKnob() const;
+	inline bool isVolumeKnob() const
+	{
+		return m_volumeKnob;
+	}	
 
 signals:
 	void sliderPressed();
 	void sliderReleased();
 	void sliderMoved(float value);
 
+public slots:
+	inline void setVolumeKnob( const bool val )
+	{
+		m_volumeKnob = val;
+	}
 
 protected:
 	void contextMenuEvent(QContextMenuEvent * me) override;
@@ -104,7 +112,7 @@ protected:
 
 	static SimpleTextFloat * s_textFloat;
 
-	BoolModel m_volumeKnob;
+	bool m_volumeKnob;
 	FloatModel m_volumeRatio;
 
 	QPoint m_lastMousePos; //!< mouse position in last mouseMoveEvent
@@ -113,8 +121,6 @@ protected:
 
 	DirectionOfManipulation m_directionOfManipulation;
 
-public slots:
-	void setVolumeKnob( const bool val );
 
 private slots:
 	virtual void enterValue();
