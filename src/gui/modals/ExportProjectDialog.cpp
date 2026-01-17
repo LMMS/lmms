@@ -47,7 +47,7 @@ namespace lmms::gui {
 namespace {
 constexpr auto maxCompressionLevel = 8;
 constexpr auto defaultCompressionLevel = 5;
-constexpr auto defaultBitRate = 160;
+constexpr auto defaultBitRate = SUPPORTED_BITRATES[2];
 constexpr auto defaultBitDepth = OutputSettings::BitDepth::Depth24Bit;
 constexpr auto defaultStereoMode = OutputSettings::StereoMode::Stereo;
 constexpr auto maxLoopRepeat = std::numeric_limits<int>::max();
