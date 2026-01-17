@@ -78,24 +78,10 @@ ExportProjectDialog::ExportProjectDialog(const QString& path, Mode mode, QWidget
 {
 	setWindowTitle(tr("Export project"));
 
-	connect(m_fileFormatComboBox, qOverload<int>(&QComboBox::currentIndexChanged), this,
-		&ExportProjectDialog::onFileFormatChanged);
-	connect(m_startButton, &QPushButton::clicked, this, &ExportProjectDialog::onStartButtonClicked);
-	connect(m_cancelButton, &QPushButton::clicked, this, &ExportProjectDialog::reject);
-
-	auto index = 0;
 	for (const auto& device : ProjectRenderer::fileEncodeDevices)
 	{
 		if (!device.isAvailable()) { continue; }
-
 		m_fileFormatComboBox->addItem(tr(device.m_description), static_cast<int>(device.m_fileFormat));
-
-		if (QString::compare(QFileInfo{path}.suffix(), &device.m_extension[1], Qt::CaseInsensitive) == 0)
-		{
-			m_fileFormatComboBox->setCurrentIndex(index);
-		}
-
-		++index;
 	}
 
 	for (const auto& sampleRate : SUPPORTED_SAMPLERATES)
@@ -204,6 +190,10 @@ ExportProjectDialog::ExportProjectDialog(const QString& path, Mode mode, QWidget
 	m_loopRepeatBox->setValue(1);
 	m_loopRepeatBox->setSuffix(tr(" time(s)"));
 
+	const auto pathExtension = QFileInfo{path}.suffix();
+	const auto pathFormat = ProjectRenderer::getFileFormatFromExtension(pathExtension);
+	m_fileFormatComboBox->setCurrentIndex(std::max(0, m_fileFormatComboBox->findData(static_cast<int>(pathFormat))));
+
 	m_bitRateComboBox->setCurrentIndex(std::max(0, m_bitRateComboBox->findData(defaultBitRate)));
 	m_bitDepthComboBox->setCurrentIndex(std::max(0, m_bitDepthComboBox->findData(static_cast<int>(defaultBitDepth))));
 	m_stereoModeComboBox->setCurrentIndex(
@@ -215,6 +205,11 @@ ExportProjectDialog::ExportProjectDialog(const QString& path, Mode mode, QWidget
 	onFileFormatChanged(static_cast<int>(ProjectRenderer::ExportFileFormat::Flac));
 	adjustSize();
 	onFileFormatChanged(currentFileFormat);
+
+	connect(m_fileFormatComboBox, qOverload<int>(&QComboBox::currentIndexChanged), this,
+		&ExportProjectDialog::onFileFormatChanged);
+	connect(m_startButton, &QPushButton::clicked, this, &ExportProjectDialog::onStartButtonClicked);
+	connect(m_cancelButton, &QPushButton::clicked, this, &ExportProjectDialog::reject);
 }
 
 void ExportProjectDialog::onFileFormatChanged(int index)
