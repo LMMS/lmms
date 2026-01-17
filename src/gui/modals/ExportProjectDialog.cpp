@@ -50,7 +50,7 @@ constexpr auto defaultCompressionLevel = 5;
 constexpr auto defaultBitRate = 160;
 constexpr auto defaultBitDepth = OutputSettings::BitDepth::Depth24Bit;
 constexpr auto defaultStereoMode = OutputSettings::StereoMode::Stereo;
-constexpr auto maxLoopRepeat = 64;
+constexpr auto maxLoopRepeat = std::numeric_limits<int>::max();
 } // namespace
 
 ExportProjectDialog::ExportProjectDialog(const QString& path, Mode mode, QWidget* parent)
