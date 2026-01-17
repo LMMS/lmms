@@ -165,12 +165,6 @@ ExportProjectDialog::ExportProjectDialog(const QString& path, Mode mode, QWidget
 		}
 	}
 
-	m_bitRateComboBox->setCurrentIndex(std::max(0, m_bitRateComboBox->findData(defaultBitRate)));
-	m_bitDepthComboBox->setCurrentIndex(std::max(0, m_bitDepthComboBox->findData(static_cast<int>(defaultBitDepth))));
-	m_stereoModeComboBox->setCurrentIndex(
-		std::max(0, m_stereoModeComboBox->findData(static_cast<int>(defaultStereoMode))));
-	m_compressionLevelComboBox->setCurrentIndex(defaultCompressionLevel);
-
 	auto mainLayout = new QVBoxLayout(this);
 
 	auto loopRepeatLayout = new QHBoxLayout{};
@@ -209,6 +203,18 @@ ExportProjectDialog::ExportProjectDialog(const QString& path, Mode mode, QWidget
 	m_loopRepeatBox->setMaximum(maxLoopRepeat);
 	m_loopRepeatBox->setValue(1);
 	m_loopRepeatBox->setSuffix(tr(" time(s)"));
+
+	m_bitRateComboBox->setCurrentIndex(std::max(0, m_bitRateComboBox->findData(defaultBitRate)));
+	m_bitDepthComboBox->setCurrentIndex(std::max(0, m_bitDepthComboBox->findData(static_cast<int>(defaultBitDepth))));
+	m_stereoModeComboBox->setCurrentIndex(
+		std::max(0, m_stereoModeComboBox->findData(static_cast<int>(defaultStereoMode))));
+	m_compressionLevelComboBox->setCurrentIndex(defaultCompressionLevel);
+
+	// To prevent resizing of dialog when selecting the FLAC format (which has 3 settings, not 2 like the others)
+	const auto currentFileFormat = m_fileFormatComboBox->currentData().toInt();
+	onFileFormatChanged(static_cast<int>(ProjectRenderer::ExportFileFormat::Flac));
+	adjustSize();
+	onFileFormatChanged(currentFileFormat);
 }
 
 void ExportProjectDialog::onFileFormatChanged(int index)
