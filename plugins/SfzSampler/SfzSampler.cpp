@@ -145,6 +145,8 @@ void SfzSampler::play(SampleFrame* workingBuffer)
 
 void SfzSampler::loadFile(const QString& filePath)
 {
+	// Prevent the audio thread from accidentally looping through the region vector while it's being edited
+	const auto guard = Engine::audioEngine()->requestChangesGuard();
 	// Reset the note counts, midi cc values, etc
 	m_sfzGlobalState = SfzGlobalState();
 	// And any info about control labels, default values, etc
@@ -154,17 +156,19 @@ void SfzSampler::loadFile(const QString& filePath)
 	// The <control> header is also parsed into a separate object for easy access by the gui
 	bool successfulParseFile = SfzParser::parseSfzFile(filePath, m_sfzRegions, m_controlsConfig);
 
-	qDebug() << "was okay?" << successfulParseFile;
-	qDebug() << "num regions" << m_sfzRegions.size();
+	if (!successfulParseFile) { qDebug() << "[SFZ Player] An error occurred when parsing the SFZ file."; return; }
 
 	// The SfzParser generates all the SfzRegion objects, but it doesn't load any of the samples
 	// The sample filenames are stored in the regions as from the `sample` opcode, so we just need to load the files into memory to use them
 	// The samples are stored with relative paths with respect to the sfz file, so first find the parent directory:
 	QDir parentDirectory = QFileInfo(filePath).absoluteDir();
+	int i = 0;
 	for (auto& region : m_sfzRegions)
 	{
+		qDebug() << "[SFZ Player] Loading sample" << i + 1 << "/" << m_sfzRegions.size() << region.m_sampleFile.value_or("N/A");
 		bool successfulLoadSample = region.initializeSample(parentDirectory);
-		qDebug() << "sample was load okay?" << successfulLoadSample;
+		if (!successfulLoadSample) { qDebug() << "[SFZ Player] An error occured when loading a sample."; }
+		i++;
 	}
 
 	// Set the initial cc values based on any `set_ccN` opcodes in the <control> header
