@@ -192,7 +192,7 @@ ExportProjectDialog::ExportProjectDialog(const QString& path, Mode mode, QWidget
 
 	if (mode == Mode::ExportProject)
 	{
-		const auto pathExtension = QFileInfo{path}.suffix().prepend(".");
+		const auto pathExtension = QFileInfo{path}.completeSuffix().prepend(".");
 		const auto pathFormat = ProjectRenderer::getFileFormatFromExtension(pathExtension);
 		m_fileFormatComboBox->setCurrentIndex(std::max(0, m_fileFormatComboBox->findData(static_cast<int>(pathFormat))));
 	}
