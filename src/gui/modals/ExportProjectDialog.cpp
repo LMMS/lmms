@@ -190,9 +190,12 @@ ExportProjectDialog::ExportProjectDialog(const QString& path, Mode mode, QWidget
 	m_loopRepeatBox->setValue(1);
 	m_loopRepeatBox->setSuffix(tr(" time(s)"));
 
-	const auto pathExtension = QFileInfo{path}.suffix();
-	const auto pathFormat = ProjectRenderer::getFileFormatFromExtension(pathExtension);
-	m_fileFormatComboBox->setCurrentIndex(std::max(0, m_fileFormatComboBox->findData(static_cast<int>(pathFormat))));
+	if (mode == Mode::ExportProject)
+	{
+		const auto pathExtension = QFileInfo{path}.suffix().prepend(".");
+		const auto pathFormat = ProjectRenderer::getFileFormatFromExtension(pathExtension);
+		m_fileFormatComboBox->setCurrentIndex(std::max(0, m_fileFormatComboBox->findData(static_cast<int>(pathFormat))));
+	}
 
 	m_bitRateComboBox->setCurrentIndex(std::max(0, m_bitRateComboBox->findData(defaultBitRate)));
 	m_bitDepthComboBox->setCurrentIndex(std::max(0, m_bitDepthComboBox->findData(static_cast<int>(defaultBitDepth))));
