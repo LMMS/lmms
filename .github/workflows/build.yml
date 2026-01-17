@@ -332,7 +332,8 @@ jobs:
           ccache --zero-stats
           cmake -S . \
                 -B build \
-                -DCMAKE_TOOLCHAIN_FILE="${VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake" \
+                -DCMAKE_PREFIX_PATH="/usr/x86_64-w64-mingw32/lib/pkgconfig" \
+                -DCMAKE_TOOLCHAIN_FILE="./cmake/toolchains/MinGW-W64-64.cmake" \
                 -DVCPKG_TARGET_TRIPLET="x64-mingw-static" \
                 -DVCPKG_HOST_TRIPLET="x64-linux" \
                 -DVCPKG_MANIFEST_INSTALL="${{ env.should_install_manifest }}" \

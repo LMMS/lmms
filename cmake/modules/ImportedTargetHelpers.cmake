@@ -121,32 +121,17 @@ function(find_package_config_mode_with_fallback _fpcmwf_PACKAGE_NAME _fpcmwf_TAR
 		if(DEFINED _fpcmwf_PKG_CONFIG)
 			find_package(PkgConfig QUIET)
 			if(PKG_CONFIG_FOUND)
-				pkg_check_modules("${_pkg_config_prefix}" QUIET "${_fpcmwf_PKG_CONFIG}")
+				pkg_check_modules("${_pkg_config_prefix}" QUIET IMPORTED_TARGET GLOBAL "${_fpcmwf_PKG_CONFIG}")
 				if("${${_pkg_config_prefix}_FOUND}")
-					set("${_version_var}" "${${_pkg_config_prefix}_VERSION}")
+					add_library("${_fpcmwf_TARGET_NAME}" ALIAS "PkgConfig::${_pkg_config_prefix}")
+
+					get_target_property("${_library_var}" "${_fpcmwf_TARGET_NAME}" INTERFACE_LINK_LIBRARIES)
+					get_target_property("${_include_var}" "${_fpcmwf_TARGET_NAME}" INTERFACE_INCLUDE_DIRECTORIES)
+					if(DEFINED "${_fpcmwf_PACKAGE_NAME}_VERSION")
+						set("${_version_var}" "${${_pkg_config_prefix}_VERSION}")
+					endif()
 				endif()
 			endif()
-		endif()
-
-		# Find the library and headers using the results from pkg-config as a guide
-		find_library("${_library_var}"
-			NAMES ${_fpcmwf_LIBRARY_NAMES}
-			HINTS ${${_pkg_config_prefix}_LIBRARY_DIRS} ${_fpcmwf_LIBRARY_HINTS}
-		)
-
-		find_path("${_include_var}"
-			NAMES ${_fpcmwf_INCLUDE_NAMES}
-			HINTS ${${_pkg_config_prefix}_INCLUDE_DIRS} ${_fpcmwf_INCLUDE_HINTS}
-		)
-
-		# Create an imported target if we succeeded in finding the package
-		if(${_library_var} AND ${_include_var})
-			add_library("${_fpcmwf_TARGET_NAME}" UNKNOWN IMPORTED)
-			set_target_properties("${_fpcmwf_TARGET_NAME}" PROPERTIES
-				IMPORTED_LOCATION "${${_library_var}}"
-				INTERFACE_INCLUDE_DIRECTORIES "${${_include_var}}"
-				INTERFACE_LINK_LIBRARIES "${_fpcmwf_DEPENDS}"
-			)
 		endif()
 
 		mark_as_advanced("${_library_var}" "${_include_var}")
