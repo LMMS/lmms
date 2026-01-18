@@ -5,11 +5,13 @@
 
 include(ImportedTargetHelpers)
 
+set(CMAKE_FIND_DEBUG_MODE TRUE)
 find_package_config_mode_with_fallback(SndFile SndFile::sndfile
 	LIBRARY_NAMES "sndfile" "libsndfile" "libsndfile-1"
 	INCLUDE_NAMES "sndfile.h"
 	PKG_CONFIG sndfile
 )
+set(CMAKE_FIND_DEBUG_MODE FALSE)
 
 determine_version_from_source(SndFile_VERSION SndFile::sndfile [[
 	#include <iostream>

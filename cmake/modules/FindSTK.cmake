@@ -9,15 +9,37 @@ find_package_config_mode_with_fallback(unofficial-libstk unofficial::libstk::lib
 	PREFIX STK
 )
 
+function(getListOfVarsStartingWith _prefix _varResult)
+	get_cmake_property(_vars VARIABLES)
+	string(REGEX MATCHALL "(^|;)${_prefix}[A-Za-z0-9_]*" _matchedVars "${_vars}")
+	set(${_varResult} ${_matchedVars} PARENT_SCOPE)
+endfunction()
+
+message(STATUS "~~~~~ STK_LIBRARY: ${STK_LIBRARY}")
+message(STATUS "~~~~~ STK_INCLUDE_DIRS: ${STK_INCLUDE_DIRS}")
+
+getListOfVarsStartingWith("STK_" matchedVars)
+foreach(_var IN LISTS matchedVars)
+	message(STATUS "~~~~~ ${_var}=${${_var}}")
+endforeach()
+
 # Find STK rawwave path
 if(STK_INCLUDE_DIRS)
+	message(STATUS "~~~~~ include dirs exists")
 	list(GET STK_INCLUDE_DIRS 0 STK_INCLUDE_DIR)
+	message(STATUS "~~~~~ STK_INCLUDE_DIR=${STK_INCLUDE_DIR}")
 	find_path(STK_RAWWAVE_ROOT
 		NAMES silence.raw sinewave.raw
 		HINTS "${STK_INCLUDE_DIR}/.." "${STK_INCLUDE_DIR}/../.."
 		PATH_SUFFIXES share/stk/rawwaves share/libstk/rawwaves
 	)
 endif()
+
+message(STATUS "~~~~~~~~~~~~~~~~~~~~~~")
+getListOfVarsStartingWith("STK_" matchedVars)
+foreach(_var IN LISTS matchedVars)
+	message(STATUS "~~~~~ ${_var}=${${_var}}")
+endforeach()
 
 include(FindPackageHandleStandardArgs)
 
