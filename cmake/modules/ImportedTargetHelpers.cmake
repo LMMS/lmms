@@ -127,7 +127,7 @@ function(find_package_config_mode_with_fallback _fpcmwf_PACKAGE_NAME _fpcmwf_TAR
 					add_library("${_fpcmwf_TARGET_NAME}" ALIAS "PkgConfig::${_pkg_config_prefix}")
 
 					# Extract package details from imported target
-					get_target_property("${_library_var}" "${_fpcmwf_TARGET_NAME}" LOCATION)
+					get_target_property("${_library_var}" "${_fpcmwf_TARGET_NAME}" LOCATION) # NOTE: may fail
 					get_target_property("${_include_var}" "${_fpcmwf_TARGET_NAME}" INTERFACE_INCLUDE_DIRECTORIES)
 					if(DEFINED "${_pkg_config_prefix}_VERSION")
 						set("${_version_var}" "${${_pkg_config_prefix}_VERSION}")
@@ -136,7 +136,8 @@ function(find_package_config_mode_with_fallback _fpcmwf_PACKAGE_NAME _fpcmwf_TAR
 			endif()
 		endif()
 
-		# Find the library and headers using the results from pkg-config as a guide
+		# Find the library and headers using the results from pkg-config (if any) as a guide
+		# This is a final attempt after find_package() and pkg-config failed to provide this info
 		find_library("${_library_var}"
 			NAMES ${_fpcmwf_LIBRARY_NAMES}
 			HINTS ${${_pkg_config_prefix}_LIBRARY_DIRS} ${_fpcmwf_LIBRARY_HINTS}
@@ -147,39 +148,38 @@ function(find_package_config_mode_with_fallback _fpcmwf_PACKAGE_NAME _fpcmwf_TAR
 			HINTS ${${_pkg_config_prefix}_INCLUDE_DIRS} ${_fpcmwf_INCLUDE_HINTS}
 		)
 
-#		function(_getListOfVarsStartingWith _prefix _varResult)
-#			get_cmake_property(_vars VARIABLES)
-#			string(REGEX MATCHALL "(^|;)${_prefix}[A-Za-z0-9_]*" _matchedVars "${_vars}")
-#			set(${_varResult} ${_matchedVars} PARENT_SCOPE)
-#		endfunction()
+		# TODO: Remove this temporary debugging code
+		function(_getListOfVarsStartingWith _prefix _varResult)
+			get_cmake_property(_vars VARIABLES)
+			string(REGEX MATCHALL "(^|;)${_prefix}[A-Za-z0-9_]*" _matchedVars "${_vars}")
+			set(${_varResult} ${_matchedVars} PARENT_SCOPE)
+		endfunction()
 
-#		message(STATUS "%%%% ALL VARIABLES FROM PKGCONFIG: %%%%")
-#		_getListOfVarsStartingWith("${_fpcmwf_PKG_CONFIG}" matchedVars)
-#		foreach(_var IN LISTS matchedVars)
-#			message(STATUS "%%%%% ${_var}=${${_var}}")
-#		endforeach()
+		message(STATUS "%%%% ALL VARIABLES FROM PKGCONFIG: %%%%")
+		_getListOfVarsStartingWith("${_fpcmwf_PKG_CONFIG}" matchedVars)
+		foreach(_var IN LISTS matchedVars)
+			message(STATUS "%%%%% ${_var}=${${_var}}")
+		endforeach()
 		message(STATUS "@@@@@@@@@@ lib NAMES: ${_fpcmwf_LIBRARY_NAMES}")
 		message(STATUS "@@@@@@@@@@ inc NAMES: ${_fpcmwf_INCLUDE_NAMES}")
 		message(STATUS "%%%%%%%%%% Hint: ${_pkg_config_prefix}_LIBRARY_DIRS=${${_pkg_config_prefix}_LIBRARY_DIRS}")
 		message(STATUS "%%%%%%%%%% Hint: ${_pkg_config_prefix}_INCLUDE_DIRS=${${_pkg_config_prefix}_INCLUDE_DIRS}")
 		message(STATUS "%%%%%%%%%% ${_library_var}=${${_library_var}}")
 		message(STATUS "%%%%%%%%%% ${_include_var}=${${_include_var}}")
-#		message(STATUS "########## CMAKE_FIND_LIBRARY_PREFIXES=${CMAKE_FIND_LIBRARY_PREFIXES}")
-#		message(STATUS "########## CMAKE_FIND_LIBRARY_SUFFIXES=${CMAKE_FIND_LIBRARY_SUFFIXES}")
 
 
-		# Create an imported target if we succeeded in finding the package
-#		if(${_library_var} AND ${_include_var})
-#			add_library("${_fpcmwf_TARGET_NAME}" UNKNOWN IMPORTED)
-#			set_target_properties("${_fpcmwf_TARGET_NAME}" PROPERTIES
-#				IMPORTED_LOCATION "${${_library_var}}"
-#				INTERFACE_INCLUDE_DIRECTORIES "${${_include_var}}"
-#				INTERFACE_LINK_LIBRARIES "${_fpcmwf_DEPENDS}"
-#				INTERFACE_LINKER_OPTIONS "${${_pkg_config_prefix}_LDFLAGS}"
-#				INTERFACE_COMPILE_OPTIONS "${${_pkg_config_prefix}_CFLAGS}"
-#				VERSION "${${_version_var}}"
-#			)
-#		endif()
+		if(${_library_var} AND ${_include_var})
+			if(NOT TARGET "${_fpcmwf_TARGET_NAME}")
+				# The final attempt to locate the dependency succeeded, so now create imported target
+				add_library("${_fpcmwf_TARGET_NAME}" UNKNOWN IMPORTED)
+				set_target_properties("${_fpcmwf_TARGET_NAME}" PROPERTIES
+					IMPORTED_LOCATION "${${_library_var}}"
+					INTERFACE_INCLUDE_DIRECTORIES "${${_include_var}}"
+					INTERFACE_LINK_LIBRARIES "${_fpcmwf_DEPENDS}"
+					VERSION "${${_version_var}}"
+				)
+			endif()
+		endif()
 
 		mark_as_advanced("${_library_var}" "${_include_var}")
 	endif()
