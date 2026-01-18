@@ -36,6 +36,7 @@
 #include "AutomationEditor.h"
 #include "ConfigManager.h"
 #include "DeprecationHelper.h"
+#include "ExportProjectDialog.h"
 #include "GuiApplication.h"
 #include "InstrumentTrackView.h"
 #include "MidiClip.h"
@@ -44,6 +45,7 @@
 #include "SongEditor.h"
 #include "TrackContainerView.h"
 #include "TrackView.h"
+#include "VersionedSaveDialog.h"
 
 namespace lmms::gui
 {
@@ -190,6 +192,27 @@ void MidiClipView::transposeSelection()
 }
 
 
+QString MidiClipView::exportClipAudio()
+{
+	const auto outputFilename = VersionedSaveDialog::getSaveFileName(nullptr, tr("Export audio file"), QString(), tr("FLAC (*.flac)"));
+
+	if (!outputFilename.isEmpty())
+	{
+		auto& timeline = Engine::getSong()->getTimeline(Song::PlayMode::Song);
+		TimePos startPos{timeline.loopBegin()};
+		TimePos endPos{timeline.loopEnd()};
+
+		timeline.setLoopBegin(m_clip->startPosition());
+		timeline.setLoopEnd(m_clip->endPosition());
+
+		ExportProjectDialog epd(outputFilename, this, *m_clip->getTrack());
+		epd.exec();
+
+		timeline.setLoopBegin(startPos);
+		timeline.setLoopEnd(endPos);
+	}
+	return outputFilename;
+}
 
 
 void MidiClipView::constructContextMenu( QMenu * _cm )
@@ -252,6 +275,13 @@ void MidiClipView::constructContextMenu( QMenu * _cm )
 		_cm->addAction( embed::getIconPixmap( "step_btn_duplicate" ),
 			tr( "Clone Steps" ), m_clip, SLOT(cloneSteps()));
 	}
+
+	_cm->addAction(
+		embed::getIconPixmap("project_export"),
+		tr("Export clip audio"),
+		this,
+		SLOT(exportClipAudio())
+	);
 }
 
 

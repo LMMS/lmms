@@ -34,13 +34,22 @@
 namespace lmms::gui
 {
 
-ExportProjectDialog::ExportProjectDialog( const QString & _file_name,
-							QWidget * _parent, bool multi_export=false ) :
+ExportProjectDialog::ExportProjectDialog(
+		const QString & _file_name, QWidget * _parent, bool multi_export) :
+		ExportProjectDialog(_file_name, _parent, multi_export ? ExportMode::MultipleTrack : ExportMode::Project, nullptr) {}
+
+ExportProjectDialog::ExportProjectDialog(
+		const QString & _file_name, QWidget * _parent, Track& trackToExport) :
+		ExportProjectDialog(_file_name, _parent, ExportMode::Track, &trackToExport) {}
+
+ExportProjectDialog::ExportProjectDialog(
+		const QString & _file_name, QWidget * _parent, ExportMode exportMode, Track* trackToExport) :
 	QDialog( _parent ),
 	Ui::ExportProjectDialog(),
 	m_fileName( _file_name ),
 	m_fileExtension(),
-	m_multiExport( multi_export ),
+	m_exportMode(exportMode),
+	m_trackToExport(trackToExport),
 	m_renderManager( nullptr )
 {
 	setupUi( this );
@@ -54,6 +63,9 @@ ExportProjectDialog::ExportProjectDialog( const QString & _file_name,
 	{
 		fileExt = "." + parts[parts.size()-1];
 	}
+
+	// auto checking markers for single Track exporting
+	if (m_exportMode == ExportMode::Track) { renderMarkersCB->setChecked(true); }
 
 	int cbIndex = 0;
 	for (auto i = std::size_t{0}; i < ProjectRenderer::NumFileFormats; ++i)
@@ -177,7 +189,7 @@ void ExportProjectDialog::startExport()
 	// Make sure we have the the correct file extension
 	// so there's no confusion about the codec in use.
 	auto output_name = m_fileName;
-	if (!(m_multiExport || output_name.endsWith(m_fileExtension,Qt::CaseInsensitive)))
+	if (!(m_exportMode == ExportMode::MultipleTrack || output_name.endsWith(m_fileExtension,Qt::CaseInsensitive)))
 	{
 		output_name+=m_fileExtension;
 	}
@@ -197,13 +209,17 @@ void ExportProjectDialog::startExport()
 	connect( m_renderManager.get(), SIGNAL(finished()),
 			getGUI()->mainWindow(), SLOT(resetWindowTitle()));
 
-	if ( m_multiExport )
+	switch (m_exportMode)
 	{
-		m_renderManager->renderTracks();
-	}
-	else
-	{
-		m_renderManager->renderProject();
+		case ExportMode::Project:
+			m_renderManager->renderProject();
+			break;
+		case ExportMode::Track:
+			m_renderManager->renderSingleTrack(*m_trackToExport);
+			break;
+		case ExportMode::MultipleTrack:
+			m_renderManager->renderTracks();
+			break;
 	}
 }
 

@@ -25,6 +25,7 @@
 #include "SampleClipView.h"
 
 #include <QApplication>
+#include <QFileInfo> // esists
 #include <QMenu>
 #include <QPainter>
 
@@ -32,6 +33,8 @@
 #include "GuiApplication.h"
 #include "AutomationEditor.h"
 #include "embed.h"
+#include "ExportProjectDialog.h"
+#include "MidiClipView.h"
 #include "PathUtil.h"
 #include "SampleClip.h"
 #include "SampleThumbnail.h"
@@ -39,6 +42,7 @@
 #include "StringPairDrag.h"
 #include "TrackContainerView.h"
 #include "TrackView.h"
+#include "VersionedSaveDialog.h"
 
 namespace lmms::gui
 {
@@ -101,6 +105,12 @@ void SampleClipView::constructContextMenu(QMenu* cm)
 		SLOT(setAutomationGhost())
 	);
 
+	cm->addAction(
+		embed::getIconPixmap("project_export"),
+		tr("Export sample"),
+		this,
+		SLOT(exportStoredSample())
+	);
 }
 
 
@@ -108,10 +118,10 @@ void SampleClipView::constructContextMenu(QMenu* cm)
 
 void SampleClipView::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	if( StringPairDrag::processDragEnterEvent( _dee,
-					"samplefile,sampledata" ) == false )
+	if (StringPairDrag::processDragEnterEvent(_dee,
+		"samplefile,sampledata,clip_" + QString::number(static_cast<int>(Track::Type::Instrument))) == false)
 	{
-		ClipView::dragEnterEvent( _dee );
+		ClipView::dragEnterEvent(_dee);
 	}
 }
 
@@ -133,6 +143,27 @@ void SampleClipView::dropEvent( QDropEvent * _de )
 		m_clip->updateLength();
 		update();
 		_de->accept();
+	}
+	else if (StringPairDrag::decodeKey( _de ) == "clip_" + QString::number(static_cast<int>(Track::Type::Instrument)))
+	{
+		QObject* qwSource = _de->source();
+		if (qwSource != nullptr)
+		{
+			auto sourceMidiClip = dynamic_cast<MidiClipView*>(qwSource);
+			if (sourceMidiClip != nullptr)
+			{
+				QString name = sourceMidiClip->exportClipAudio();
+				QFileInfo fileInfo(name);
+				if (name.isEmpty() == false && fileInfo.exists() && fileInfo.isFile())
+				{
+					m_clip->setSampleFile(name);
+					m_clip->updateLength();
+					update();
+					_de->accept();
+				}
+			}
+		}
+
 	}
 	else
 	{
@@ -359,6 +390,27 @@ void SampleClipView::reverseSample()
 	m_clip->setStartTimeOffset(m_clip->length() - m_clip->startTimeOffset() - m_clip->sampleLength());
 	Engine::getSong()->setModified();
 	update();
+}
+
+void SampleClipView::exportStoredSample()
+{
+	const auto outputFilename = VersionedSaveDialog::getSaveFileName(nullptr, tr("Export audio file"), QString(), tr("FLAC (*.flac)"));
+
+	if (!outputFilename.isEmpty())
+	{
+		auto& timeline = Engine::getSong()->getTimeline(Song::PlayMode::Song);
+		TimePos startPos{timeline.loopBegin()};
+		TimePos endPos{timeline.loopEnd()};
+
+		timeline.setLoopBegin(m_clip->startPosition());
+		timeline.setLoopEnd(m_clip->endPosition());
+
+		ExportProjectDialog epd(outputFilename, this, *m_clip->getTrack());
+		epd.exec();
+
+		timeline.setLoopBegin(startPos);
+		timeline.setLoopEnd(endPos);
+	}
 }
 
 

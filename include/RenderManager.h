@@ -50,6 +50,9 @@ public:
 	/// Export all unmuted tracks into individual file
 	void renderTracks();
 
+	//! exports a track
+	void renderSingleTrack(Track& track);
+
 	void abortProcessing();
 
 signals:
@@ -61,6 +64,8 @@ private slots:
 	void updateConsoleProgress();
 
 private:
+	void setupTrackLists();
+
 	QString pathForTrack( const Track *track, int num );
 	void restoreMutedState();
 
