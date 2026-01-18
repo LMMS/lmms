@@ -166,8 +166,8 @@ private:
 	};
 
 	MouseAction m_mouseAction;
-	const QColor m_pointColor = QColor(60, 223, 110);
-	const QColor m_lineColor = QColor(60, 200, 70);
+	const QColor m_pointColor = QColor(22, 150, 54);
+	const QColor m_lineColor = QColor(11, 213, 86);
 };
 
 } // namespace lmms::gui

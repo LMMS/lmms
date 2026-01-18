@@ -409,15 +409,27 @@ void VectorGraphView::paintEvent(QPaintEvent* pe)
 	QPainter painter(this);
 	drawGrid(painter);
 
-	painter.setPen(m_pointColor);
 
+	QPen lightPen{m_pointColor};
+	lightPen.setWidth(2);
+	QPen darkPen{m_backgroundColor};
+	darkPen.setWidth(3);
+
+	painter.setPen(lightPen);
+	painter.setBrush(QBrush(m_pointColor, Qt::NoBrush));
+
+	painter.setRenderHints(QPainter::Antialiasing, true);
 	auto graphModel{castModel<VectorGraphModel>()};
 	for (size_t i = 0; i < model()->getCount(); ++i)
 	{
 		auto curXY{toViewCoords(QPointF{model()->getItem(i).info.x, model()->getItem(i).info.y})};
 		if (graphModel->getObject(i).type == VGPoint::Type::attribute)
 		{
-			painter.drawEllipse(curXY, 3, 3);
+			painter.setPen(darkPen);
+			painter.setBrush(QBrush(m_pointColor, Qt::SolidPattern));
+			painter.drawEllipse(curXY, 4, 4);
+			painter.setPen(lightPen);
+			painter.setBrush(QBrush(m_pointColor, Qt::NoBrush));
 		}
 		else
 		{
@@ -440,6 +452,7 @@ void VectorGraphView::paintEvent(QPaintEvent* pe)
 			}
 		}
 	}
+	painter.setRenderHints(QPainter::Antialiasing, false);
 
 	if (m_selection.empty())
 	{
