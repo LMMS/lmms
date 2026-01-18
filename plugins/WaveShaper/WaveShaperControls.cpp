@@ -72,6 +72,7 @@ void WaveShaperControls::loadSettings( const QDomElement & _this )
 	m_outputModel.loadSettings( _this, "outputGain" );
 
 	m_clipModel.loadSettings( _this, "clipInput" );
+	m_graphModel.loadSettings(_this, "waveShapeGraph");
 
 //load waveshape
 	int size = 0;
@@ -94,6 +95,7 @@ void WaveShaperControls::saveSettings( QDomDocument & _doc,
 	m_outputModel.saveSettings( _doc, _this, "outputGain" );
 
 	m_clipModel.saveSettings( _doc, _this, "clipInput" );
+	m_graphModel.saveSettings(_doc, _this, "waveShapeGraph");
 
 //save waveshape
 	QString sampleString;
