@@ -1,4 +1,9 @@
-# Toolchain for MinGW compiler
+# Toolchain for MinGW compiler on Linux + vcpkg
+
+if(NOT DEFINED ENV{VCPKG_ROOT})
+	message(FATAL_ERROR "The VCPKG_ROOT environment variable must be set")
+	return()
+endif()
 
 set(CMAKE_SYSTEM_NAME               Windows)
 set(CMAKE_SYSTEM_VERSION            1)
@@ -9,6 +14,7 @@ set(CMAKE_CXX_COMPILER    ${TOOLCHAIN_PREFIX}-g++)
 set(CMAKE_RC_COMPILER     ${TOOLCHAIN_PREFIX}-windres)
 
 set(CMAKE_FIND_ROOT_PATH  /usr/${TOOLCHAIN_PREFIX})
+
 set(ENV{PKG_CONFIG}       /usr/bin/${TOOLCHAIN_PREFIX}-pkg-config)
 
 if(WIN64)
@@ -19,10 +25,10 @@ endif()
 
 # Search for programs in the build host directories
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
-# Search for libraries and headers in the target directories
+
+# Search for libraries/headers/packages in the target directories
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
 
-if(DEFINED ENV{VCPKG_INSTALLATION_ROOT})
-	include($ENV{VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake)
-endif()
+include($ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake)

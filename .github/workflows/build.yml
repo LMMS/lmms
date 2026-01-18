@@ -329,10 +329,11 @@ jobs:
             $(xargs < .github/workflows/deps-ubuntu-24.04-mingw.txt)
       - name: Configure
         run: |
+          export VCPKG_ROOT=${VCPKG_INSTALLATION_ROOT}
+          echo "VCPKG_ROOT=${VCPKG_ROOT}" >> "$GITHUB_ENV"
           ccache --zero-stats
           cmake -S . \
                 -B build \
-                -DCMAKE_PREFIX_PATH="/usr/x86_64-w64-mingw32/lib/pkgconfig" \
                 -DCMAKE_TOOLCHAIN_FILE="./cmake/toolchains/MinGW-W64-64.cmake" \
                 -DVCPKG_TARGET_TRIPLET="x64-mingw-static" \
                 -DVCPKG_HOST_TRIPLET="x64-linux" \
