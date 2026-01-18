@@ -142,18 +142,20 @@ function(find_package_config_mode_with_fallback _fpcmwf_PACKAGE_NAME _fpcmwf_TAR
 			HINTS ${${_pkg_config_prefix}_INCLUDE_DIRS} ${_fpcmwf_INCLUDE_HINTS}
 		)
 
-		set(_fpcmwf_is_valid_dep FALSE)
+		# Check if we succeeded in finding the package
+		set(_fpcmwf_is_valid_package FALSE)
 		if(${_fpcmwf_HEADER_ONLY})
 			if(${_include_var})
-				set(_fpcmwf_is_valid_dep TRUE)
+				set(_fpcmwf_is_valid_package TRUE)
 			endif()
 		else()
 			if(${_library_var} AND ${_include_var})
-				set(_fpcmwf_is_valid_dep TRUE)
+				set(_fpcmwf_is_valid_package TRUE)
 			endif()
 		endif()
-		if(_fpcmwf_is_valid_dep)
-			# The final attempt to locate the dependency succeeded, so now create imported target
+
+		if(_fpcmwf_is_valid_package)
+			# Create an imported target for the package
 			if(${_library_var})
 				add_library("${_fpcmwf_TARGET_NAME}" UNKNOWN IMPORTED)
 				set_target_properties("${_fpcmwf_TARGET_NAME}" PROPERTIES
