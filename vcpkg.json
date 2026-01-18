@@ -42,11 +42,6 @@
 			]
 		},
 		{
-			"name": "libsoundio",
-			"default-features": false,
-			"platform": "!mingw"
-		},
-		{
 			"name": "libstk",
 			"default-features": false
 		},
@@ -56,10 +51,6 @@
 		},
 		{
 			"name": "lilv",
-			"default-features": false
-		},
-		{
-			"name": "lv2",
 			"default-features": false
 		},
 		{

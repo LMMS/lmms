@@ -99,33 +99,21 @@ function(find_package_config_mode_with_fallback _fpcmwf_PACKAGE_NAME _fpcmwf_TAR
 	set(_library_var "${_fpcmwf_PREFIX}_LIBRARY")
 	set(_include_var "${_fpcmwf_PREFIX}_INCLUDE_DIRS")
 
-	message(STATUS "%%%%% BEGIN")
-	message(STATUS "%%%%% Package name: ${_fpcmwf_PACKAGE_NAME}, Target name: ${_fpcmwf_TARGET_NAME}")
-
-	message(STATUS "%%%%% Start of 1st step")
-	message(STATUS "%%%%% Calling find_package(${_fpcmwf_PACKAGE_NAME} CONFIG QUIET)")
 	# Try config mode if possible
 	find_package("${_fpcmwf_PACKAGE_NAME}" CONFIG QUIET)
 
 	if(TARGET "${_fpcmwf_TARGET_NAME}")
-		message(STATUS "%%%%% Found target ${_fpcmwf_TARGET_NAME} from find_package(${_fpcmwf_PACKAGE_NAME} CONFIG QUIET)")
 		# Extract package details from existing target
 		get_target_property("${_library_var}" "${_fpcmwf_TARGET_NAME}" LOCATION)
-		message(STATUS "%%%%% Extracted LOCATION from target ${_fpcmwf_TARGET_NAME}: ${_library_var}=${${_library_var}}")
 		get_target_property("${_include_var}" "${_fpcmwf_TARGET_NAME}" INTERFACE_INCLUDE_DIRECTORIES)
-		message(STATUS "%%%%% Extracted INTERFACE_INCLUDE_DIRECTORIES from target ${_fpcmwf_TARGET_NAME}: ${_include_var}=${${_include_var}}")
 		if(DEFINED "${_fpcmwf_PACKAGE_NAME}_VERSION")
 			set("${_version_var}" "${${_fpcmwf_PACKAGE_NAME}_VERSION}")
-			message(STATUS "%%%%% Found version: ${_version_var}=${${_version_var}}")
-		else()
-			message(STATUS "%%%%% Did not find version")
 		endif()
 	else()
-		message(STATUS "%%%%% Did NOT find target ${_fpcmwf_TARGET_NAME} from find_package(${_fpcmwf_PACKAGE_NAME} CONFIG QUIET)")
 		# Check whether the dependencies exist
 		foreach(_dependency IN LISTS _fpcmwf_DEPENDS)
 			if(NOT TARGET "${_dependency}")
-				message(STATUS "find_package_config_mode_with_fallback: Dependency '${_dependency}' of '${_fpcmwf_PACKAGE_NAME}' is not a target")
+				message(DEBUG "Dependency '${_dependency}' of '${_fpcmwf_PACKAGE_NAME}' is not a target")
 				return()
 			endif()
 		endforeach()
@@ -133,62 +121,14 @@ function(find_package_config_mode_with_fallback _fpcmwf_PACKAGE_NAME _fpcmwf_TAR
 		# Attempt to find the package using pkg-config, if we have it and it was requested
 		set(_pkg_config_prefix "${_fpcmwf_PKG_CONFIG}_PKG")
 		if(DEFINED _fpcmwf_PKG_CONFIG)
-			message(STATUS "%%%%% Start of 2nd step")
-#			message(STATUS "%%%%% PkgConfig prefix ${_fpcmwf_PKG_CONFIG} defined - calling pkg_check_modules(${_pkg_config_prefix} QUIET IMPORTED_TARGET GLOBAL ${_fpcmwf_PKG_CONFIG})")
-
-
-			message(STATUS "%%%%% PkgConfig prefix ${_fpcmwf_PKG_CONFIG} defined - calling pkg_check_modules(${_pkg_config_prefix} QUIET ${_fpcmwf_PKG_CONFIG})")
-
-
 			find_package(PkgConfig QUIET)
 			if(PKG_CONFIG_FOUND)
-#				pkg_check_modules("${_pkg_config_prefix}" QUIET IMPORTED_TARGET GLOBAL "${_fpcmwf_PKG_CONFIG}")
-#				if(TARGET "PkgConfig::${_pkg_config_prefix}")
-#					message(STATUS "%%%%% Found target PkgConfig::${_pkg_config_prefix} from pkg_check_modules(${_pkg_config_prefix} QUIET IMPORTED_TARGET GLOBAL ${_fpcmwf_PKG_CONFIG})")
-#					add_library("${_fpcmwf_TARGET_NAME}" ALIAS "PkgConfig::${_pkg_config_prefix}")
-
-#					# Extract package details from imported target
-#					get_target_property("${_library_var}" "${_fpcmwf_TARGET_NAME}" LOCATION) # NOTE: may fail
-#					message(STATUS "%%%%% Extracted LOCATION from target ${_fpcmwf_TARGET_NAME}: ${_library_var}=${${_library_var}}")
-
-#					get_target_property("${_include_var}" "${_fpcmwf_TARGET_NAME}" INTERFACE_INCLUDE_DIRECTORIES)
-#					message(STATUS "%%%%% Extracted INTERFACE_INCLUDE_DIRECTORIES from target ${_fpcmwf_TARGET_NAME}: ${_include_var}=${${_include_var}}")
-
-#					# bonus for debugging
-#					get_target_property("_temp_link_libs" "${_fpcmwf_TARGET_NAME}" LINK_LIBRARIES)
-#					message(STATUS "%%%%% Extracted LINK_LIBRARIES from target ${_fpcmwf_TARGET_NAME}: _temp_link_libs=${_temp_link_libs}")
-
-#					if(DEFINED "${_pkg_config_prefix}_VERSION")
-#						set("${_version_var}" "${${_pkg_config_prefix}_VERSION}")
-#						message(STATUS "%%%%% Found version: ${_version_var}=${${_version_var}}")
-#					else()
-#						message(STATUS "%%%%% Did not find version")
-#					endif()
-
-
 				pkg_check_modules("${_pkg_config_prefix}" QUIET "${_fpcmwf_PKG_CONFIG}")
 				if("${${_pkg_config_prefix}_FOUND}")
 					set("${_version_var}" "${${_pkg_config_prefix}_VERSION}")
-					message(STATUS "%%%%% Found version: ${_version_var}=${${_version_var}}")
-				else()
-					message(STATUS "%%%%% Did not find version")
 				endif()
-
-
-
-
-
-
 			endif()
-		else()
-			message(STATUS "%%%%% Skipping 2nd step")
-			message(STATUS "%%%%% PkgConfig prefix ${_fpcmwf_PKG_CONFIG} NOT defined")
 		endif()
-
-		message(STATUS "%%%%% Start of 3rd step")
-		message(STATUS "%%%%% Before: ${_library_var}=${${_library_var}}")
-		message(STATUS "%%%%% Before: ${_include_var}=${${_include_var}}")
-		message(STATUS "%%%%% Before: ${_version_var}=${${_version_var}}")
 
 		# Find the library and headers using the results from pkg-config (if any) as a guide
 		# This is a final attempt in case find_package() and pkg-config failed to provide this info
@@ -202,9 +142,6 @@ function(find_package_config_mode_with_fallback _fpcmwf_PACKAGE_NAME _fpcmwf_TAR
 			HINTS ${${_pkg_config_prefix}_INCLUDE_DIRS} ${_fpcmwf_INCLUDE_HINTS}
 		)
 
-		message(STATUS "%%%%% After: ${_library_var}=${${_library_var}}")
-		message(STATUS "%%%%% After: ${_include_var}=${${_include_var}}")
-
 		set(_fpcmwf_is_valid_dep FALSE)
 		if(${_fpcmwf_HEADER_ONLY})
 			if(${_include_var})
@@ -216,60 +153,37 @@ function(find_package_config_mode_with_fallback _fpcmwf_PACKAGE_NAME _fpcmwf_TAR
 			endif()
 		endif()
 		if(_fpcmwf_is_valid_dep)
-#			if(NOT TARGET "${_fpcmwf_TARGET_NAME}")
-				message(STATUS "%%%%% The final attempt to locate the dependency succeeded, so now create imported target ${_fpcmwf_TARGET_NAME}")
-				# The final attempt to locate the dependency succeeded, so now create imported target
+			# The final attempt to locate the dependency succeeded, so now create imported target
+			if(${_library_var})
+				add_library("${_fpcmwf_TARGET_NAME}" UNKNOWN IMPORTED)
+				set_target_properties("${_fpcmwf_TARGET_NAME}" PROPERTIES
+					IMPORTED_LOCATION "${${_library_var}}"
+					INTERFACE_INCLUDE_DIRECTORIES "${${_include_var}}"
+					INTERFACE_LINK_LIBRARIES "${_fpcmwf_DEPENDS}"
+				)
+			else()
+				add_library("${_fpcmwf_TARGET_NAME}" INTERFACE IMPORTED)
+				set_target_properties("${_fpcmwf_TARGET_NAME}" PROPERTIES
+					INTERFACE_INCLUDE_DIRECTORIES "${${_include_var}}"
+					INTERFACE_LINK_LIBRARIES "${_fpcmwf_DEPENDS}"
+				)
+			endif()
 
-				if(${_library_var})
-					add_library("${_fpcmwf_TARGET_NAME}" UNKNOWN IMPORTED)
-					set_target_properties("${_fpcmwf_TARGET_NAME}" PROPERTIES
-						IMPORTED_LOCATION "${${_library_var}}"
-						INTERFACE_INCLUDE_DIRECTORIES "${${_include_var}}"
-						INTERFACE_LINK_LIBRARIES "${_fpcmwf_DEPENDS}"
-					)
-				else()
-					add_library("${_fpcmwf_TARGET_NAME}" INTERFACE IMPORTED)
-					set_target_properties("${_fpcmwf_TARGET_NAME}" PROPERTIES
-						INTERFACE_INCLUDE_DIRECTORIES "${${_include_var}}"
-						INTERFACE_LINK_LIBRARIES "${_fpcmwf_DEPENDS}"
-					)
-				endif()
+			if(DEFINED ${_pkg_config_prefix}_LDFLAGS_OTHER)
+				set_target_properties("${_fpcmwf_TARGET_NAME}" PROPERTIES
+					INTERFACE_LINK_OPTIONS "${${_pkg_config_prefix}_LDFLAGS_OTHER}"
+				)
+			endif()
 
-# Experimental:
-if(DEFINED ${_pkg_config_prefix}_LDFLAGS_OTHER)
-	message(STATUS "%%%%% Has other ldflags: ${_pkg_config_prefix}_LDFLAGS_OTHER=${${_pkg_config_prefix}_LDFLAGS_OTHER}")
-	set_target_properties("${_fpcmwf_TARGET_NAME}" PROPERTIES
-		INTERFACE_LINK_OPTIONS "${${_pkg_config_prefix}_LDFLAGS_OTHER}"
-	)
-else()
-	message(STATUS "%%%%% No other ldflags")
-endif()
-
-if(DEFINED ${_pkg_config_prefix}_CFLAGS_OTHER)
-	message(STATUS "%%%%% Has other cflags: ${_pkg_config_prefix}_CFLAGS_OTHER=${${_pkg_config_prefix}_CFLAGS_OTHER}")
-	set_target_properties("${_fpcmwf_TARGET_NAME}" PROPERTIES
-		INTERFACE_COMPILE_OPTIONS "${${_pkg_config_prefix}_CFLAGS_OTHER}"
-	)
-else()
-	message(STATUS "%%%%% No other cflags")
-endif()
-
-
-#			else()
-#				message(STATUS "%%%%% The final attempt failed")
-#			endif()
+			if(DEFINED ${_pkg_config_prefix}_CFLAGS_OTHER)
+				set_target_properties("${_fpcmwf_TARGET_NAME}" PROPERTIES
+					INTERFACE_COMPILE_OPTIONS "${${_pkg_config_prefix}_CFLAGS_OTHER}"
+				)
+			endif()
 		endif()
 
 		mark_as_advanced("${_library_var}" "${_include_var}")
 	endif()
-
-	message(STATUS "%%%%% ALL DONE")
-	message(STATUS "%%%%% Final: ${_library_var}=${${_library_var}}")
-	message(STATUS "%%%%% Final: ${_include_var}=${${_include_var}}")
-	message(STATUS "%%%%% Final: ${_version_var}=${${_version_var}}")
-	message(STATUS " ")
-	message(STATUS " ")
-	message(STATUS " ")
 
 	# Return results to caller
 	if(DEFINED "${_version_var}")

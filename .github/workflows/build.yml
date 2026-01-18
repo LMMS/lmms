@@ -281,7 +281,7 @@ jobs:
       CMAKE_OPTS: >-
         -Werror=dev
         -DUSE_WERROR=ON
-        -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_BUILD_TYPE=RelWithDebInfo
         -DUSE_COMPILE_CACHE=ON
       CCACHE_MAXSIZE: 0
       CCACHE_NOCOMPRESS: 1
@@ -294,16 +294,7 @@ jobs:
         with:
           fetch-depth: 0
           submodules: recursive
-      - name: Download vcpkg for ACT
-        if: ${{ env.ACT }} # ACT apparently doesn't have vcpkg installed
-        run: |
-          cd /usr/local/share
-          sudo git clone --recursive https://github.com/microsoft/vcpkg.git
-          sudo ./vcpkg/bootstrap-vcpkg.sh
-          echo "VCPKG_INSTALLATION_ROOT=$(pwd)/vcpkg" >> "$GITHUB_ENV"
-          export VCPKG_INSTALLATION_ROOT="$(pwd)/vcpkg"
       - name: Cache vcpkg dependencies
-        if: ${{ !env.ACT }} # skip during local actions testing
         id: cache-deps
         uses: actions/cache@v3
         with:
@@ -312,7 +303,6 @@ jobs:
             vcpkg-mingw${{ matrix.arch }}-
           path: build/vcpkg_installed
       - name: Cache ccache data
-        if: ${{ !env.ACT }} # skip during local actions testing
         uses: actions/cache@v3
         with:
           key: "ccache-${{ github.job }}-64-${{ github.ref }}\
@@ -321,10 +311,9 @@ jobs:
             ccache-${{ github.job }}-64-${{ github.ref }}-
             ccache-${{ github.job }}-64-
           path: ~/.ccache
-      - name: Install system dependencies
+      - name: Install dependencies
         run: |
           sudo .github/workflows/setup-mingw-packages.sh
-          #sudo .github/workflows/install-powershell.sh
           sudo apt-get install -y --no-install-recommends \
             $(xargs < .github/workflows/deps-ubuntu-24.04-mingw.txt)
       - name: Configure
@@ -347,7 +336,6 @@ jobs:
       - name: Package
         run: cmake --build build --target package
       - name: Upload artifacts
-        if: ${{ !env.ACT }} # skip during local actions testing
         uses: actions/upload-artifact@v4
         with:
           name: mingw64
@@ -361,11 +349,6 @@ jobs:
           ccache --show-stats
         env:
           CCACHE_MAXSIZE: 500M
-      - name: Keep container running on failure
-        if: ${{ env.ACT && failure() }}
-        run: |
-          echo "Build failed. Dropping into an interactive shell."
-          tail -f /dev/null
   msvc:
     name: msvc-x64
     runs-on: windows-2022
