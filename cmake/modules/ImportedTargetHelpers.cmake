@@ -137,7 +137,7 @@ function(find_package_config_mode_with_fallback _fpcmwf_PACKAGE_NAME _fpcmwf_TAR
 		endif()
 
 		# Find the library and headers using the results from pkg-config (if any) as a guide
-		# This is a final attempt after find_package() and pkg-config failed to provide this info
+		# This is a final attempt in case find_package() and pkg-config failed to provide this info
 		find_library("${_library_var}"
 			NAMES ${_fpcmwf_LIBRARY_NAMES}
 			HINTS ${${_pkg_config_prefix}_LIBRARY_DIRS} ${_fpcmwf_LIBRARY_HINTS}
@@ -147,26 +147,6 @@ function(find_package_config_mode_with_fallback _fpcmwf_PACKAGE_NAME _fpcmwf_TAR
 			NAMES ${_fpcmwf_INCLUDE_NAMES}
 			HINTS ${${_pkg_config_prefix}_INCLUDE_DIRS} ${_fpcmwf_INCLUDE_HINTS}
 		)
-
-		# TODO: Remove this temporary debugging code
-		function(_getListOfVarsStartingWith _prefix _varResult)
-			get_cmake_property(_vars VARIABLES)
-			string(REGEX MATCHALL "(^|;)${_prefix}[A-Za-z0-9_]*" _matchedVars "${_vars}")
-			set(${_varResult} ${_matchedVars} PARENT_SCOPE)
-		endfunction()
-
-		message(STATUS "%%%% ALL VARIABLES FROM PKGCONFIG: %%%%")
-		_getListOfVarsStartingWith("${_fpcmwf_PKG_CONFIG}" matchedVars)
-		foreach(_var IN LISTS matchedVars)
-			message(STATUS "%%%%% ${_var}=${${_var}}")
-		endforeach()
-		message(STATUS "@@@@@@@@@@ lib NAMES: ${_fpcmwf_LIBRARY_NAMES}")
-		message(STATUS "@@@@@@@@@@ inc NAMES: ${_fpcmwf_INCLUDE_NAMES}")
-		message(STATUS "%%%%%%%%%% Hint: ${_pkg_config_prefix}_LIBRARY_DIRS=${${_pkg_config_prefix}_LIBRARY_DIRS}")
-		message(STATUS "%%%%%%%%%% Hint: ${_pkg_config_prefix}_INCLUDE_DIRS=${${_pkg_config_prefix}_INCLUDE_DIRS}")
-		message(STATUS "%%%%%%%%%% ${_library_var}=${${_library_var}}")
-		message(STATUS "%%%%%%%%%% ${_include_var}=${${_include_var}}")
-
 
 		if(${_library_var} AND ${_include_var})
 			if(NOT TARGET "${_fpcmwf_TARGET_NAME}")
