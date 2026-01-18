@@ -273,8 +273,12 @@ QPointF GridView::toModelCoords(QPointF viewPos) const
 }
 QPoint GridView::toViewCoords(QPointF modelPos) const
 {
+	return toViewCoords(modelPos.x(), modelPos.y());
+}
+QPoint GridView::toViewCoords(float x, float y) const
+{
 	constexpr int borderWidth{1};
-	return QPoint(static_cast<int>(modelPos.x() * m_cubeWidth) + borderWidth, static_cast<int>(-(modelPos.y() - model()->getHeight()) * m_cubeHeight) + borderWidth);
+	return QPoint(static_cast<int>(x * m_cubeWidth) + borderWidth, static_cast<int>(-(y - model()->getHeight()) * m_cubeHeight) + borderWidth);
 }
 
 QPointF GridView::getBoundingBoxCenter(size_t index) const
@@ -385,12 +389,12 @@ void GridView::updateGrid()
 }
 
 VectorGraphView::VectorGraphView(QWidget* parent, size_t cubeWidth, size_t cubeHeight)
-	: GridView{parent, new VectorGraphModel{10, 10, GRID_MAX_STEPS, GRID_MAX_STEPS, nullptr, QString(), true}, cubeWidth, cubeHeight}
+	: GridView{parent, new VectorGraphModel{10, 10, GRID_MAX_STEPS, GRID_MAX_STEPS, 200, nullptr, QString(), true}, cubeWidth, cubeHeight}
 {}
 
 std::pair<QPointF, QPointF> VectorGraphView::getBoundingBox(size_t index) const
 {
-	float radius{castModel<VectorGraphModel>()->getObject(index).isBezierHandle ? 0.5f : 0.5f};
+	float radius{castModel<VectorGraphModel>()->getObject(index).type == VGPoint::Type::attribute ? 0.3f : 0.5f};
 	GridModel::ItemInfo coords{castModel<VectorGraphModel>()->getItem(index).info};
 	return std::make_pair(QPointF{coords.x - radius, coords.y - radius}, QPointF{coords.x + radius, coords.y + radius});
 }
@@ -407,16 +411,43 @@ std::set<size_t> VectorGraphView::getSelection(QPointF start, QPointF end)
 
 void VectorGraphView::paintEvent(QPaintEvent* pe)
 {
+	constexpr int borderWidth{1};
 	QPainter painter(this);
 	drawGrid(painter);
 
 	QColor pointC{60, 223, 110};
 	painter.setPen(pointC);
 
+	auto graphModel{castModel<VectorGraphModel>()};
 	for (size_t i = 0; i < model()->getCount(); ++i)
 	{
 		auto curXY{toViewCoords(QPointF{model()->getItem(i).info.x, model()->getItem(i).info.y})};
-		painter.drawEllipse(curXY, 5, 5);
+		if (graphModel->getObject(i).type == VGPoint::Type::attribute)
+		{
+			painter.drawEllipse(curXY, 3, 3);
+		}
+		else
+		{
+			painter.drawEllipse(curXY, 5, 5);
+		}
+	}
+
+
+	const std::vector<float>& buffer{graphModel->getBuffer()};
+	if (buffer.size() > 0)
+	{
+		QColor pointC{60, 200, 70};
+		painter.setPen(pointC);
+		QPoint oldPos{toViewCoords(0.0f, buffer[0])};
+		for (size_t i = 1; i < buffer.size(); ++i)
+		{
+			QPoint curPos{toViewCoords(static_cast<float>(i * graphModel->getLength()) / buffer.size(), buffer[i])};
+			if (curPos.x() != oldPos.x())
+			{
+				painter.drawLine(oldPos.x(), oldPos.y(), curPos.x(), curPos.y());
+				oldPos = curPos;
+			}
+		}
 	}
 
 	drawSelection(painter);
@@ -446,7 +477,7 @@ void VectorGraphView::mousePressEvent(QMouseEvent* me)
 			if (foundIndex >= model()->getCount())
 			{
 				// place if not found
-				foundIndex = graphModel->addItem(VGPoint{0.0f, 0.0f, false}, GridModel::ItemInfo(modelPos.x(), modelPos.y()));
+				foundIndex = graphModel->addItem(VGPoint{VGPoint::Type::bezier}, GridModel::ItemInfo(modelPos.x(), modelPos.y()));
 			}
 			// select clicked point
 			auto bb{getBoundingBox(foundIndex)};
@@ -506,6 +537,23 @@ void VectorGraphView::keyPressEvent(QKeyEvent* ke)
 				GridView::containSelection(QPointF{0.0f, 0.0f},
 					QPointF(model()->getLength(), model()->getHeight()));
 				update();
+				ke->accept();
+				break;
+			case Qt::Key_T:
+				auto graphModel{castModel<VectorGraphModel>()};
+				size_t foundIndex(GridView::getClickedItem(m_cursorPos));
+				if (foundIndex < model()->getCount())
+				{
+					VGPoint point{graphModel->getObject(foundIndex)};
+					if ((point.type + 1) == VGPoint::Type::count)
+					{
+						graphModel->setObject(foundIndex, VGPoint{VGPoint::Type::bezier});
+					}
+					else
+					{
+						graphModel->setObject(foundIndex, VGPoint{static_cast<VGPoint::Type>(point.type + 1)});
+					}
+				}
 				ke->accept();
 				break;
 		}

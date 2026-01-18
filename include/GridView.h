@@ -101,6 +101,7 @@ protected:
 	QPointF toModelCoords(QPoint viewPos) const;
 	QPointF toModelCoords(QPointF viewPos) const;
 	QPoint toViewCoords(QPointF modelPos) const;
+	QPoint toViewCoords(float x, float y) const;
 
 	//*** selection logic ***
 	//! selects everything between `start` and `end`
