@@ -128,12 +128,19 @@ private:
 	2. constructing T `ItemInfo` pair
 	3. removing T `ItemInfo` pair
 	4. getting T from index in `GridModel`
+	5. converting the stored data into a base64 string
 */
 
 template<typename T, typename SaveData>
 class LMMS_EXPORT GridModelTyped : public GridModel
 {
 private:
+	struct TrueDataPair
+	{
+		GridModel::ItemInfo info;
+		SaveData data;
+	};
+
 	std::vector<T> m_TCustomData;
 public:
 	GridModelTyped(unsigned int length, unsigned int height, unsigned int horizontalSteps, unsigned int verticalSteps,
@@ -174,11 +181,6 @@ public:
 	}
 protected:
 	// save mechanism:
-	struct TrueDataPair
-	{
-		GridModel::ItemInfo info;
-		SaveData data;
-	};
 	QString dataToBase64(const std::set<size_t>* selection = nullptr)
 	{
 		std::vector<TrueDataPair> dataArray{};
@@ -189,7 +191,6 @@ protected:
 			{
 				dataArray.push_back(
 					TrueDataPair{getItem(i).info, customDataToSaveData(getObject(i))});
-				printf("element x: %f, y: %f\n", getItem(i).info.x, getItem(i).info.y);
 			}
 		}
 		else
@@ -214,9 +215,7 @@ protected:
 		TrueDataPair* ptr{startPtr};
 		for (int i = 0; i < size; i += sizeof(TrueDataPair))
 		{
-			printf("loaded element: %d, size: %d\n", i, size);
 			addItem(saveDataToCustomData(ptr->data), ptr->info);
-			printf("element x: %f, y: %f\n", ptr->info.x, ptr->info.y);
 			++ptr;
 		}
 		delete[] startPtr;

@@ -409,6 +409,12 @@ void VectorGraphModel::renderAfter(size_t index, std::vector<float>& buffer, siz
 			default:
 				break;
 		}
+		// clamp
+		const float floatHeight{static_cast<float>(getHeight())};
+		for (size_t i = from; i < end; ++i)
+		{
+			buffer[i] = std::clamp(buffer[i], 0.0f, floatHeight);
+		}
 	}
 }
 void VectorGraphModel::renderStart(std::vector<float>& buffer)
