@@ -8,7 +8,9 @@ ccache
 cmake
 dirmngr
 file
+g++-mingw-w64-i686-posix
 g++-mingw-w64-x86-64-posix
+gcc-mingw-w64-i686-posix
 gcc-mingw-w64-x86-64-posix
 git
 gnupg
