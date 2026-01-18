@@ -94,7 +94,7 @@ public:
 protected:
 	GridModel(unsigned int length, unsigned int height, unsigned int horizontalSteps, unsigned int verticalSteps,
 		Model* parent, QString displayName, bool defaultConstructed);
-	virtual void dataChangedAt(size_t index);
+	virtual void dataChangedAt(ssize_t index) {}
 
 	//! @return index where added
 	size_t addItem(Item itemIn);
@@ -138,6 +138,11 @@ public:
 	~GridModelTyped() = default;
 
 	const T& getObject(size_t index) const { return m_TCustomData[GridModel::getItem(index).objectIndex]; }
+	void setObject(size_t index, T object)
+	{
+		m_TCustomData[GridModel::getItem(index).objectIndex] = object;
+		dataChangedAt(index); emit GridModel::dataChanged();
+	}
 
 	//! @return index where added
 	size_t addItem(T object, ItemInfo info)
@@ -178,7 +183,6 @@ struct VGPoint
 		sine, //!< makes a sine shaped line
 		peak, //!< makes a peak filter shaped line
 		steps, //!< makes a staircase
-		random,
 		count
 	};
 	Type type;
@@ -189,17 +193,22 @@ class LMMS_EXPORT VectorGraphModel : public GridModelTyped<VGPoint>
 Q_OBJECT
 public:
 	VectorGraphModel(unsigned int length, unsigned int height, unsigned int horizontalSteps, unsigned int verticalSteps,
-		Model* parent, QString displayName = QString(), bool defaultConstructed = false);
+		size_t bufferSize, Model* parent, QString displayName = QString(), bool defaultConstructed = false);
 
-	void setPoint(size_t index, float x, float y, bool isBezierHandle);
+	void renderAllTo(std::vector<float>& bufferOut);
+	void renderChangedPoints();
+	//! @param index from where to update the line
+	//! @param updatedTo the index until the line was updated
+	void renderAfter(size_t index, std::vector<float>& buffer, size_t* updatedTo = nullptr);
+	void renderStart(std::vector<float>& buffer);
 
-	void renderPoints(size_t resolution, size_t start, size_t end);
-	void renderAfter(size_t index, std::vector<float>& buffer);
-	const std::vector<float>& getBuffer() const;
+	//! these automatically update the buffer when dataChanged
+	const std::vector<float>& getBuffer();
 	std::vector<float>& getBufferRef();
+	void setRenderSize(size_t newSize);
 
 protected:
-	void dataChangedAt(size_t index) override;
+	void dataChangedAt(ssize_t index) override;
 private:
 	void processLineTypeBezier(std::vector<float>& samplesOut, size_t startLoc, size_t endLoc,
 		float yBefore, float yAfter, float yMid);
@@ -207,13 +216,13 @@ private:
 		float sineAmp, float sineFreq, float sinePhase, float fadeInStartVal);
 	void processLineTypePeak(std::vector<float>& samplesOut, size_t startLoc, size_t endLoc,
 		float peakAmp, float peakX, float peakWidth, float fadeInStartVal);
-	void processLineTypeSteps(std::vector<float>& samplesOut, size_t startLoc, size_t endLoc,
-		std::vector<float>* yArray, float stepCount, float stepCurve, float fadeInStartVal);
-	void processLineTypeRandom(std::vector<float>& samplesOut, size_t startLoc, size_t endLoc,
-		float randomAmp, float randomCount, float randomSeed, float fadeInStartVal);
+	void processLineTypeSteps(std::vector<float>& samplesIO, size_t startLoc, size_t endLoc,
+		float stepHeight, float stepAmp, float yBefore, float fadeInStartVal);
+	void processLineTypeLinInterpolate(std::vector<float>& samplesOut, size_t startLoc, size_t endLoc,
+		float startY, float endY, bool shouldOverride);
+	void processLineTypeFade(std::vector<float>& samplesOut, size_t startLoc, size_t endLoc,
+		float fadeInStartVal);
 
-
-	size_t m_renderSize;
 	std::vector<float> m_buffer;
 	bool m_allChanged;
 	std::set<size_t> m_changedData;

@@ -248,24 +248,82 @@ void GridModel::setSteps(unsigned int horizontalSteps, unsigned int verticalStep
 }
 
 VectorGraphModel::VectorGraphModel(unsigned int length, unsigned int height, unsigned int horizontalSteps, unsigned int verticalSteps,
-	Model* parent, QString displayName, bool defaultConstructed)
+	size_t bufferSize, Model* parent, QString displayName, bool defaultConstructed)
 	: GridModelTyped{length, height, horizontalSteps, verticalSteps, parent, displayName, defaultConstructed}
+	, m_buffer{}
+	, m_allChanged{true}
+	, m_changedData{}
 {
+	m_buffer.resize(bufferSize);
 }
 
-void VectorGraphModel::setPoint(size_t index, float x, float y, bool isBezierHandle)
+void VectorGraphModel::renderAllTo(std::vector<float>& bufferOut)
 {
+	renderStart(bufferOut);
+	for (size_t i = 0; i < getCount(); ++i)
+	{
+		if (getObject(i).type != VGPoint::Type::attribute)
+		{
+			renderAfter(i, bufferOut);
+		}
+	}
+}
+void VectorGraphModel::renderChangedPoints()
+{
+	if (m_allChanged)
+	{
+		renderAllTo(m_buffer);
+		m_allChanged = false;
+		m_changedData.clear();
+		return;
+	}
+	renderStart(m_buffer);
+
+	ssize_t lastNotAttributeIndex{-1};
+	size_t updatedTo{0};
+	for (size_t i : m_changedData)
+	{
+		if (i >= getCount()) { break; }
+		if (i < updatedTo) { continue; }
+
+		// finding lastNotAttributeIndex
+		for (size_t j = i; j-- > 0;)
+		{
+			printf("render changed: last: look at %ld\n", j);
+			if (getObject(j).type != VGPoint::Type::attribute && j != i)
+			{
+				printf("render changed: last: look at %ld FOUND\n", j);
+				lastNotAttributeIndex = j;
+				break;
+			}
+		}
+
+		printf("render changed: last: %ld, updated: %ld, i: %ld\n", lastNotAttributeIndex, updatedTo, i);
+		// render line segment before i
+		if (lastNotAttributeIndex >= static_cast<ssize_t>(updatedTo))
+		{
+			printf("render before %ld, %ld\n", lastNotAttributeIndex, updatedTo);
+			renderAfter(static_cast<size_t>(lastNotAttributeIndex), m_buffer, &updatedTo);
+		}
+		// render line segment after i (if i isn't an attribute)
+		if (getObject(i).type != VGPoint::Type::attribute)
+		{
+			printf("render after\n");
+			renderAfter(i, m_buffer, &updatedTo);
+		}
+	}
+
+	m_changedData.clear();
 }
 
-void VectorGraphModel::renderPoints(size_t resolution, size_t start, size_t end)
+void VectorGraphModel::renderAfter(size_t index, std::vector<float>& buffer, size_t* updatedTo)
 {
-}
-void VectorGraphModel::renderAfter(size_t index, std::vector<float>& buffer)
-{
+	printf("renderAfter: %ld\n", index);
+	assert(getObject(index).type != VGPoint::Type::attribute);
 	// index of next point
 	size_t nextIndex{index};
-	size_t attriIndexA{index};
-	size_t attriIndexB{index};
+	size_t attribIndexA{index};
+	size_t attribIndexB{index};
 	for (size_t i = index + 1; i < getCount(); ++i)
 	{
 		if (getObject(i).type == VGPoint::Type::attribute)
@@ -275,63 +333,144 @@ void VectorGraphModel::renderAfter(size_t index, std::vector<float>& buffer)
 		}
 		else { nextIndex = i; break; }
 	}
+	printf("renderAfter: found indexes: next: %ld, attrib A: %ld, attrib B: %ld\n", nextIndex, attribIndexA, attribIndexB);
+	if (updatedTo != nullptr) { *updatedTo = nextIndex; }
 	// render between these
-	size_t from{static_cast<size_t>(getItem(index).x * buffer.size() / static_cast<float>(getCount()))};
-	size_t end{static_cast<size_t>(getItem(nextIndex).x * buffer.size() / static_cast<float>(getCount()))};
+	size_t from{static_cast<size_t>(getItem(index).info.x * buffer.size() / static_cast<float>(getLength()))};
+	size_t end{static_cast<size_t>(getItem(nextIndex).info.x * buffer.size() / static_cast<float>(getLength()))};
+	printf("renderAfter: from: %ld (x: %f, size: %ld, count: %ld), end: %ld\n", from ,getItem(index).info.x, buffer.size(), getLength(), end);
 
-	// render edges
-	if (index == 0)
+	// render edge after endpoint
+	if (index == nextIndex)
 	{
-		float startY{getItem(index).y};
-		for (size_t i = 0; i < from; ++i) { buffer[i] = startY; }
-	}
-	else if (index + 1 >= getCount())
-	{
-		float startY{getItem(index).y};
+		float startY{getItem(index).info.y};
 		for (size_t i = from; i < buffer.size(); ++i) { buffer[i] = startY; }
 	}
 	else if (from < end)
 	{
 		// attributes
-		float attributeX{getItem(attribIndexA).x - getItem(index).x};
-		float curNextRatio{(getItem(attribIndexA).x - getItem(index).x) / (getItem(nextIndex).x - getItem(index).x)};
-		float attributeY{getItem(attribIndexA).y - (getItem(index).y * (1.0f - curNextRatio) + getItem(nextIndex).y * curNextRatio)};
+		float attributeX{getItem(attribIndexA).info.x - getItem(index).info.x};
+		float attribXRatio{(getItem(attribIndexA).info.x - getItem(index).info.x) / (getItem(nextIndex).info.x - getItem(index).info.x)};
+		float attributeY{getItem(attribIndexA).info.y - (getItem(index).info.y * (1.0f - attribXRatio) + getItem(nextIndex).info.y * attribXRatio)};
+
 		switch (getObject(index).type)
 		{
 			case VGPoint::Type::bezier:
-				float startX{getItem(index).x};
-				float endX{getItem(nextIndex).x};
-				float iRatio{1.0f - curNextRatio};
-				// the attribute point is where the bezier should go trough
-				// calculating the control point's height at coords (curNextRatio, attributeY)
-				float bezierY{(attributeY - startX * curNextRatio * curNextRatio - endX * iRato * iRatio) /
-					(2.0f * curNextRatio * iRatio)};
+			{
+				float startY{getItem(index).info.y};
+				float endY{getItem(nextIndex).info.y};
+				float iRatio{1.0f - attribXRatio};
+				if (attribXRatio != 0.0f && iRatio != 0.0f)
+				{
+					// the attribute point is where the bezier should go trough
+					// calculating the control point's height at coords (attribXRatio, attributeY)
+					float bezierY{(getItem(attribIndexA).info.y - endY * attribXRatio * attribXRatio - startY * iRatio * iRatio) /
+						(2.0f * attribXRatio * iRatio)};
+					processLineTypeBezier(buffer, from, end, getItem(index).info.y, getItem(nextIndex).info.y, bezierY);
+				}
+				else
+				{
+					processLineTypeLinInterpolate(buffer, from, end, getItem(index).info.y, getItem(nextIndex).info.y, true);
+				}
 				break;
+			}
 			case VGPoint::Type::sine:
-				// attributeX is at 75% of T, 1.0f / 0.75f = 1.33333f
-				float periodSamples{attributeX * 1.33333f * buffer.size() / static_cast<float>(getCount())};
-				processLineTypeSine(buffer, from, end,
-					attributeY, 1.0f / periodSamples, 0.0f, 0.05f);
+			{
+				if (index == attribIndexA)
+				{
+					processLineTypeSine(buffer, from, end, 0.5f, 10.0f, 0.0f, 0.05f);
+				}
+				else
+				{
+					// attributeX is at 75% of T, 1.0f / 0.75f = 1.33333f
+					float periodSamples{attributeX * 1.33333f * buffer.size() / static_cast<float>(getLength())};
+					processLineTypeSine(buffer, from, end, -attributeY, (end - from) / periodSamples, 0.0f, 0.05f);
+				}
+				processLineTypeLinInterpolate(buffer, from, end, getItem(index).info.y, getItem(nextIndex).info.y, false);
 				break;
+			}
 			case VGPoint::Type::peak:
+			{
+				if (index == attribIndexA)
+				{
+					processLineTypePeak(buffer, from, end, 0.5f, -0.5f, 10.0f, 0.05f);
+				}
+				else
+				{
+					processLineTypePeak(buffer, from, end, attributeY, -attribXRatio, 10.0f, 0.05f);
+				}
+				processLineTypeLinInterpolate(buffer, from, end, getItem(index).info.y, getItem(nextIndex).info.y, false);
 				break;
+			}
 			case VGPoint::Type::steps:
+			{
+				processLineTypeLinInterpolate(buffer, from, end, getItem(index).info.y, getItem(nextIndex).info.y, true);
+				if (index == attribIndexA)
+				{
+					processLineTypeSteps(buffer, from, end, getHeight() / 10.0f, 1.0f, getItem(index).info.y, 0.05f);
+				}
+				else
+				{
+					size_t attribAt{static_cast<size_t>(getItem(attribIndexA).info.x * buffer.size() / static_cast<float>(getLength()))};
+					// mod at this height
+					float yAtAttrib{buffer[attribAt] - getItem(index).info.y};
+					processLineTypeSteps(buffer, from, end, yAtAttrib, -attributeY / yAtAttrib, getItem(index).info.y, 0.05f);
+				}
 				break;
-			case VGPoint::Type::random:
+			}
+			default:
 				break;
 		}
 	}
 }
-const std::vector<float>& VectorGraphModel::getBuffer() const
+void VectorGraphModel::renderStart(std::vector<float>& buffer)
 {
+	// index of next point
+	size_t nextIndex{0};
+	bool found{false};
+	for (size_t i = 0; i < getCount(); ++i)
+	{
+		if (getObject(i).type != VGPoint::Type::attribute) { found = true; nextIndex = i; break; }
+	}
+	size_t from{buffer.size()};
+	float startY{0.0f};
+	if (found)
+	{
+		from = static_cast<size_t>(getItem(nextIndex).info.x * buffer.size() / static_cast<float>(getLength()));
+		startY = getItem(nextIndex).info.y;
+	}
+	for (size_t i = 0; i < from; ++i) { buffer[i] = startY; }
+}
+
+const std::vector<float>& VectorGraphModel::getBuffer()
+{
+	renderChangedPoints();
 	return m_buffer;
 }
 std::vector<float>& VectorGraphModel::getBufferRef()
 {
+	renderChangedPoints();
 	return m_buffer;
 }
-void VectorGraphModel::dataChangedAt(size_t index)
+void VectorGraphModel::setRenderSize(size_t newSize)
 {
+	if (newSize != m_buffer.size())
+	{
+		m_buffer.resize(newSize);
+		m_allChanged = true;
+	}
+}
+void VectorGraphModel::dataChangedAt(ssize_t index)
+{
+	if (index < 0)
+	{
+		m_allChanged = true;
+	}
+	else
+	{
+		printf("dataChanged signal: %ld\n", index);
+		m_changedData.insert(index);
+	}
 }
 
 void VectorGraphModel::processLineTypeBezier(std::vector<float>& samplesOut, size_t startLoc, size_t endLoc,
@@ -344,187 +483,75 @@ void VectorGraphModel::processLineTypeBezier(std::vector<float>& samplesOut, siz
 		float t = (i - startLoc) / static_cast<float>(endLoc - startLoc);
 		// inverse t
 		float iT = (1.0f - t);
-		samplesOut[i] = yBefore * t * t + yMid * 2.0f * t * iT + yAfter * iT * iT;
-		//samplesOut[i] = std::clamp((*samplesOut)[i] * curveStrength, -1.0f, 1.0f);
+		samplesOut[i] = yAfter * t * t + yMid * 2.0f * t * iT + yBefore * iT * iT;
 	}
-
-	/*
-	// draw line
-	if (curveStrength < 1.0f)
-	{
-		for (size_t i = startLoc; i < endLoc; i++)
-		{
-			(*samplesOut)[i] += (yBefore + (yAfter - yBefore) * (*xArray)[i]) * (1.0f - curveStrength);
-		}
-	}
-	*/
 }
 void VectorGraphModel::processLineTypeSine(std::vector<float>& samplesOut, size_t startLoc, size_t endLoc,
 	float sineAmp, float sineFreq, float sinePhase, float fadeInStartVal)
 {
-	/*
-	float startLocVal = samplesOut[startLoc];
-	float endLocVal = samplesOut[endLoc > 0 ? endLoc - 1 : 0];
-	int count = static_cast<int>(endLoc) - static_cast<int>(startLoc);
-	if (count < 0) { count = 0; }
-	float tValB = 0.001f + ((sineFreq + 1.0f) / 2.0f) * 0.999f;
-	// calculating how many samples are needed for 1 complete wave
-	// we have "count" amount of samples and "tValB * 100.0f" amount of waves
-	int end = static_cast<int>(std::floor(count / (tValB * 100.0f)));
-	if (count < 0)
-	{
-		end = 0;
-	}
-	else if (end > 0)
-	{
-		end = end > count ? count : end + 1;
-	}
-	// "allocate" "end" amount of floats
-	// for 1 whole sine wave
-	// in the universal buffer
-	if (static_cast<int>(m_universalSampleBuffer.size()) < end)
-	{
-		m_universalSampleBuffer.resize(end);
-	}
-	*/
-
-
 	for (size_t i = startLoc; i < endLoc; i++)
 	{
 		float xRatio{(i - startLoc) / static_cast<float>(endLoc - startLoc)};
 		samplesOut[i] = sineAmp * std::sin(
-			xRatio * 6.28318531f * tValB + sinePhase);
+			xRatio * 6.28318531f * sineFreq + sinePhase);
 	}
-
-	/*
-	// calculate 1 wave of sine
-	for (int i = 0; i < end; i++)
-	{
-		// 628.318531f = 100.0f * 2.0f * pi
-		// (1 sine wave is 2pi long and we have 1 * 100 * sineFreq waves)
-		// DO NOT CHANGE THIS WITHOUNT UPDATING `VectorGraphHelpView::s_helpText`
-		m_universalSampleBuffer[i] = sineAmp * std::sin(
-			(*xArray)[startLoc + i] * 628.318531f * tValB + sinePhase * 100.0f);
-	}
-	// copy the first wave until the end
-	for (int i = 0; i < count; i += end)
-	{
-		int endB = i + end >= count ? count - i : end;
-		for (int j = 0; j < endB; j++)
-		{
-			(*samplesOut)[startLoc + j + i] += m_universalSampleBuffer[j];
-		}
-	}
-	*/
-
-	// fade in
-	size_t fadeInEndLoc = static_cast<size_t>(fadeInStartVal * static_cast<float>(endLoc - startLoc));
-	for (size_t i = startLoc; i < startLoc + fadeInEndLoc; i++)
-	{
-		float xRatio{(i - startLoc) / static_cast<float>(endLoc - startLoc)};
-		float x{xRatio / fadeInStartVal};
-		samplesOut[i] = (*samplesOut)[i] * x + startLocVal * (1.0f - x);
-	}
-	// fade out
-	for (size_t i = endLoc - 1; i > endLoc - fadeInEndLoc; i--)
-	{
-		float xRatio{(i - startLoc) / static_cast<float>(endLoc - startLoc)};
-		float x{xRatio / fadeInStartVal};
-		samplesOut[i] = (*samplesOut)[i] * x + startLocVal * (1.0f - x);
-	}
+	processLineTypeFade(samplesOut, startLoc, endLoc, fadeInStartVal);
 }
 void VectorGraphModel::processLineTypePeak(std::vector<float>& samplesOut, size_t startLoc, size_t endLoc,
 	float peakAmp, float peakX, float peakWidth, float fadeInStartVal)
 {
-	float startLocVal = (*samplesOut)[startLoc];
-	float endLocVal = (*samplesOut)[endLoc > 0 ? endLoc - 1 : 0];
-	int count = static_cast<int>(endLoc) - static_cast<int>(startLoc);
-	count = count < 0 ? 0 : count;
-	for (size_t i = 0; i < static_cast<size_t>(count); i++)
+	for (size_t i = startLoc; i < endLoc; i++)
 	{
-		(*samplesOut)[startLoc + i] += std::pow((peakWidth + 1.0f) * 0.2f + 0.01f,
-			std::abs((*xArray)[startLoc + i] - (peakX + 1.0f) * 0.5f) * 10.0f) * peakAmp;
+		float xRatio{(i - startLoc) / static_cast<float>(endLoc - startLoc)};
+		samplesOut[i] = std::pow(0.5f, std::abs(xRatio + peakX) * peakWidth) * peakAmp;
 	}
-
-	// fade in
-	size_t fadeInEndLoc = static_cast<size_t>(fadeInStartVal * static_cast<float>(count));
-	for (size_t i = startLoc; i < startLoc + fadeInEndLoc; i++)
+	processLineTypeFade(samplesOut, startLoc, endLoc, fadeInStartVal);
+}
+void VectorGraphModel::processLineTypeSteps(std::vector<float>& samplesIO, size_t startLoc, size_t endLoc,
+		float stepHeight, float stepAmp, float yBefore, float fadeInStartVal)
+{
+	for (size_t i = startLoc; i < endLoc; i++)
 	{
-		float x = (*xArray)[i] / fadeInStartVal;
-		(*samplesOut)[i] = (*samplesOut)[i] * x + startLocVal * (1.0f - x);
-	}
-	// fade out
-	for (size_t i = endLoc - 1; i > endLoc - fadeInEndLoc; i--)
-	{
-		float x = (1.0f - (*xArray)[i]) / fadeInStartVal;
-		(*samplesOut)[i] = (*samplesOut)[i] * x + endLocVal * (1.0f - x);
+		float modY{std::fmod(samplesIO[i] - yBefore, stepHeight)};
+		samplesIO[i] = samplesIO[i] - modY * stepAmp;
 	}
 }
-void VectorGraphModel::processLineTypeSteps(std::vector<float>& samplesOut, size_t startLoc, size_t endLoc,
-	std::vector<float>& yArray, float stepCount, float stepCurve, float fadeInStartVal)
+void VectorGraphModel::processLineTypeLinInterpolate(std::vector<float>& samplesOut, size_t startLoc, size_t endLoc,
+	float startY, float endY, bool shouldOverride)
 {
-	float startLocVal = (*samplesOut)[startLoc];
-	float endLocVal = (*samplesOut)[endLoc > 0 ? endLoc - 1 : 0];
-	int count = static_cast<int>(endLoc) - static_cast<int>(startLoc);
-	count = count < 0 ? 0 : count;
-
-	// DO NOT CHANGE THIS WITHOUNT UPDATING `VectorGraphHelpView::s_helpText`
-	float stepCountB = (1.0f + stepCount) / 2.0f * 19.0f + 1.0f;
-	for (size_t i = 0; i < static_cast<size_t>(count); i++)
+	if (shouldOverride)
 	{
-		float y = (*yArray)[startLoc + i] + 1.0f;
-		float diff = std::round(y * stepCountB) - y * stepCountB;
-		float smooth = 1.0f - std::abs(diff) * (1.0f - (stepCurve + 1.0f) / 2.0f) * 2.0f;
-		(*samplesOut)[startLoc + i] += diff / stepCountB * smooth;
+		for (size_t i = startLoc; i < endLoc; i++)
+		{
+			float xRatio{(i - startLoc) / static_cast<float>(endLoc - startLoc)};
+			samplesOut[i] = startY * (1.0f - xRatio) + endY * xRatio;
+		}
 	}
-
-	// fade in
-	size_t fadeInEndLoc = static_cast<size_t>(fadeInStartVal * static_cast<float>(count));
-	for (size_t i = startLoc; i < startLoc + fadeInEndLoc; i++)
+	else
 	{
-		float x = (*xArray)[i] / fadeInStartVal;
-		(*samplesOut)[i] = (*samplesOut)[i] * x + startLocVal * (1.0f - x);
-	}
-	// fade out
-	for (size_t i = endLoc - 1; i > endLoc - fadeInEndLoc; i--)
-	{
-		float x = (1.0f - (*xArray)[i]) / fadeInStartVal;
-		(*samplesOut)[i] = (*samplesOut)[i] * x + endLocVal * (1.0f - x);
+		// add interpolation if not override
+		for (size_t i = startLoc; i < endLoc; i++)
+		{
+			float xRatio{(i - startLoc) / static_cast<float>(endLoc - startLoc)};
+			samplesOut[i] += startY * (1.0f - xRatio) + endY * xRatio;
+		}
 	}
 }
-void VectorGraphModel::processLineTypeRandom(std::vector<float>& samplesOut, size_t startLoc, size_t endLoc,
-	float randomAmp, float randomCount, float randomSeed, float fadeInStartVal)
+void VectorGraphModel::processLineTypeFade(std::vector<float>& samplesOut, size_t startLoc, size_t endLoc,
+	float fadeInStartVal)
 {
-	int count = static_cast<int>(endLoc) - static_cast<int>(startLoc);
-	count = count < 0 ? 0 : count;
-
-	// DO NOT CHANGE THIS WITHOUNT UPDATING `VectorGraphHelpView::s_helpText`
-	constexpr size_t maxRandomValueCount = 200;
-	constexpr size_t maxRandomValueSeed = 20;
-	const size_t randomValueCount = static_cast<size_t>(maxRandomValueCount * ((randomCount + 1.0f) * 0.5f));
-
-	if (randomValueCount <= 0) { return; }
-
-	const float seedAsFloat = ((randomSeed + 1.0f) * 0.5f) * static_cast<float>(maxRandomValueSeed - 1);
-	size_t seed = static_cast<size_t>(seedAsFloat);
-	const float blend = seedAsFloat - static_cast<float>(seed);
-	seed = seed * randomValueCount;
-	const size_t seedPlusOne = seed + randomValueCount;
-
-	const std::vector<float>& randomNumbers = VectorGraphModel::getRandomValues();
-	if (seedPlusOne + randomValueCount + 1 >= randomNumbers->size()) { return; }
-
-	for (size_t i = 0; i < static_cast<size_t>(count); i++)
+	// fade in
+	size_t fadeInEndLoc = static_cast<size_t>(fadeInStartVal * static_cast<float>(endLoc - startLoc));
+	for (size_t i = startLoc; i < startLoc + fadeInEndLoc; ++i)
 	{
-		const float randomLocationAsFloat = ((*xArray)[startLoc + i] * randomValueCount);
-		const size_t randomLocation = static_cast<size_t>(randomLocationAsFloat);
-		const float curBlend = randomLocationAsFloat - static_cast<float>(randomLocation);
-		const float curInvBlend = 1.0f - curBlend;
-
-		(*samplesOut)[startLoc + i] += (((*randomNumbers)[seed + randomLocation] * (1.0f - curBlend * curBlend) +
-			(*randomNumbers)[seed + randomLocation + 1] * (1.0f - curInvBlend * curInvBlend)) * (1.0f - blend) +
-			((*randomNumbers)[seedPlusOne + randomLocation] * (1.0f - curBlend * curBlend) +
-			(*randomNumbers)[seedPlusOne + randomLocation + 1] * (1.0f - curInvBlend * curInvBlend)) * (blend)) * randomAmp;
+		float xRatio{(i - startLoc) / (static_cast<float>(endLoc - startLoc) * fadeInStartVal)};
+		samplesOut[i] = samplesOut[i] * xRatio;
+	}
+	// fade out
+	for (size_t i = endLoc - fadeInEndLoc - 1; i < endLoc; ++i)
+	{
+		float xRatio{(endLoc - i - 1) / (static_cast<float>(endLoc - startLoc) * fadeInStartVal)};
+		samplesOut[i] = samplesOut[i] * xRatio;
 	}
 }
 
