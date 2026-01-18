@@ -176,7 +176,6 @@ function(find_package_config_mode_with_fallback _fpcmwf_PACKAGE_NAME _fpcmwf_TAR
 					IMPORTED_LOCATION "${${_library_var}}"
 					INTERFACE_INCLUDE_DIRECTORIES "${${_include_var}}"
 					INTERFACE_LINK_LIBRARIES "${_fpcmwf_DEPENDS}"
-					VERSION "${${_version_var}}"
 				)
 			endif()
 		endif()
