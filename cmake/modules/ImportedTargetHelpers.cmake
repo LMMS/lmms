@@ -128,14 +128,6 @@ function(find_package_config_mode_with_fallback _fpcmwf_PACKAGE_NAME _fpcmwf_TAR
 
 					# Extract package details from imported target
 					get_target_property("${_library_var}" "${_fpcmwf_TARGET_NAME}" LOCATION)
-					if(NOT "${${_library_var}}")
-						# Find the library and headers using the results from pkg-config as a guide
-						find_library("${_library_var}"
-							NAMES ${_fpcmwf_LIBRARY_NAMES}
-							HINTS ${${_pkg_config_prefix}_LIBRARY_DIRS} ${_fpcmwf_LIBRARY_HINTS}
-						)
-					endif()
-
 					get_target_property("${_include_var}" "${_fpcmwf_TARGET_NAME}" INTERFACE_INCLUDE_DIRECTORIES)
 					if(DEFINED "${_pkg_config_prefix}_VERSION")
 						set("${_version_var}" "${${_pkg_config_prefix}_VERSION}")
@@ -144,21 +136,16 @@ function(find_package_config_mode_with_fallback _fpcmwf_PACKAGE_NAME _fpcmwf_TAR
 			endif()
 		endif()
 
-#message(STATUS "CMAKE_FIND_ROOT_PATH=${CMAKE_FIND_ROOT_PATH}")
-#set(CMAKE_FIND_DEBUG_MODE TRUE)
 		# Find the library and headers using the results from pkg-config as a guide
-#		find_library("${_library_var}"
-#			NAMES ${_fpcmwf_LIBRARY_NAMES}
-#			HINTS ${${_pkg_config_prefix}_LIBRARY_DIRS} ${_fpcmwf_LIBRARY_HINTS}
-#			NO_CACHE
-#		)
-#set(CMAKE_FIND_DEBUG_MODE FALSE)
+		find_library("${_library_var}"
+			NAMES ${_fpcmwf_LIBRARY_NAMES}
+			HINTS ${${_pkg_config_prefix}_LIBRARY_DIRS} ${_fpcmwf_LIBRARY_HINTS}
+		)
 
-#		find_path("${_include_var}"
-#			NAMES ${_fpcmwf_INCLUDE_NAMES}
-#			HINTS ${${_pkg_config_prefix}_INCLUDE_DIRS} ${_fpcmwf_INCLUDE_HINTS}
-#			NO_CACHE
-#		)
+		find_path("${_include_var}"
+			NAMES ${_fpcmwf_INCLUDE_NAMES}
+			HINTS ${${_pkg_config_prefix}_INCLUDE_DIRS} ${_fpcmwf_INCLUDE_HINTS}
+		)
 
 #		function(_getListOfVarsStartingWith _prefix _varResult)
 #			get_cmake_property(_vars VARIABLES)
