@@ -30,6 +30,7 @@
 
 #include <QMouseEvent>
 #include <QPainter>
+#include <QWheelEvent>
 
 namespace lmms::gui
 {
@@ -39,7 +40,6 @@ GridView::GridView(QWidget* parent, GridModel* model, size_t cubeWidth, size_t c
 	, ModelView{model, this}
 	, m_selection{}
 	, m_isSelectionPressed{false}
-	, m_mouseAction{}
 	, m_selectStartOld{}
 	, m_selectEndOld{}
 	, m_selectStart{}
@@ -158,29 +158,28 @@ void GridView::paintEvent(QPaintEvent* pe)
 {
 	QPainter painter(this);
 	drawGrid(painter);
-	drawSelection(painter);
+	if (m_selection.empty())
+	{
+		drawSelection(painter);
+	}
 }
 void GridView::keyPressEvent(QKeyEvent* ke)
 {
 	m_isSelectionPressed = ke->modifiers() & Qt::ShiftModifier;
 	switch (ke->key())
 	{
-		case Qt::Key_Home:
 		case Qt::Key_Up:
 			moveToNearest(GridView::MoveDir::up);
 			ke->accept();
 			break;
-		case Qt::Key_Delete:
 		case Qt::Key_Down:
 			moveToNearest(GridView::MoveDir::down);
 			ke->accept();
 			break;
-		case Qt::Key_End:
 		case Qt::Key_Left:
 			moveToNearest(GridView::MoveDir::left);
 			ke->accept();
 			break;
-		case Qt::Key_PageDown:
 		case Qt::Key_Right:
 			moveToNearest(GridView::MoveDir::right);
 			ke->accept();
@@ -195,20 +194,15 @@ void GridView::keyPressEvent(QKeyEvent* ke)
 void GridView::drawGrid(QPainter& painter)
 {
 	constexpr int borderWidth{1};
-	QColor backgroundC{13, 16, 19};
-	QColor borderC{70, 70, 70};
-	QColor gridC{42, 47, 51};
-	QColor highlightedGridC{42, 101, 72};
-
 	// background
-	painter.setPen(borderC);
+	painter.setPen(m_borderColor);
 	painter.drawRect(0, 0, width() - 1, height() - 1);
-	painter.fillRect(borderWidth, borderWidth, width() - 1 - borderWidth, height() - 1 - borderWidth, backgroundC);
+	painter.fillRect(borderWidth, borderWidth, width() - 1 - borderWidth, height() - 1 - borderWidth, m_backgroundColor);
 
 	size_t cubeWidth{(width() - 1 - borderWidth) / model()->getLength()};
 	size_t cubeHeight{(height() - 1 - borderWidth) / model()->getHeight()};
 	size_t lineCounter{1};
-	painter.setPen(gridC);
+	painter.setPen(m_gridLineColor);
 	// vertical 1. pass
 	for (size_t i = 1; i < model()->getLength(); ++i)
 	{
@@ -226,9 +220,9 @@ void GridView::drawGrid(QPainter& painter)
 	{
 		if (lineCounter >= m_gridHighlightMod)
 		{
-			painter.setPen(highlightedGridC);
+			painter.setPen(m_gridHighlightedLineColor);
 			painter.drawLine(borderWidth, i * cubeHeight, width() - 1 - borderWidth, i * cubeHeight);
-			painter.setPen(gridC);
+			painter.setPen(m_gridLineColor);
 			lineCounter = 1;
 		}
 		else
@@ -239,7 +233,7 @@ void GridView::drawGrid(QPainter& painter)
 	}
 
 	// vertical 2. pass (drawing highlights because horizontal draws over 1. pass)
-	painter.setPen(highlightedGridC);
+	painter.setPen(m_gridHighlightedLineColor);
 	for (size_t i = m_gridHighlightMod; i < model()->getLength(); i += m_gridHighlightMod)
 	{
 			painter.drawLine(i * cubeWidth, borderWidth, i * cubeWidth, height() - 1 - borderWidth);
@@ -390,6 +384,7 @@ void GridView::updateGrid()
 
 VectorGraphView::VectorGraphView(QWidget* parent, size_t cubeWidth, size_t cubeHeight)
 	: GridView{parent, new VectorGraphModel{10, 10, GRID_MAX_STEPS, GRID_MAX_STEPS, 200, nullptr, QString(), true}, cubeWidth, cubeHeight}
+	, m_mouseAction{}
 {}
 
 std::pair<QPointF, QPointF> VectorGraphView::getBoundingBox(size_t index) const
@@ -411,12 +406,10 @@ std::set<size_t> VectorGraphView::getSelection(QPointF start, QPointF end)
 
 void VectorGraphView::paintEvent(QPaintEvent* pe)
 {
-	constexpr int borderWidth{1};
 	QPainter painter(this);
 	drawGrid(painter);
 
-	QColor pointC{60, 223, 110};
-	painter.setPen(pointC);
+	painter.setPen(m_pointColor);
 
 	auto graphModel{castModel<VectorGraphModel>()};
 	for (size_t i = 0; i < model()->getCount(); ++i)
@@ -432,12 +425,10 @@ void VectorGraphView::paintEvent(QPaintEvent* pe)
 		}
 	}
 
-
 	const std::vector<float>& buffer{graphModel->getBuffer()};
 	if (buffer.size() > 0)
 	{
-		QColor pointC{60, 200, 70};
-		painter.setPen(pointC);
+		painter.setPen(m_lineColor);
 		QPoint oldPos{toViewCoords(0.0f, buffer[0])};
 		for (size_t i = 1; i < buffer.size(); ++i)
 		{
@@ -450,7 +441,10 @@ void VectorGraphView::paintEvent(QPaintEvent* pe)
 		}
 	}
 
-	drawSelection(painter);
+	if (m_selection.empty())
+	{
+		drawSelection(painter);
+	}
 }
 
 void VectorGraphView::mousePressEvent(QMouseEvent* me)
@@ -466,29 +460,45 @@ void VectorGraphView::mousePressEvent(QMouseEvent* me)
 		if (me->modifiers() & Qt::ControlModifier)
 		{
 			// select
-			m_mouseAction = GridView::MouseAction::selectAction;
+			m_mouseAction = VectorGraphView::MouseAction::selectAction;
 			GridView::containSelection(modelPos, modelPos);
 			m_isSelectionPressed = true;
 		}
 		else
 		{
-			m_mouseAction = GridView::MouseAction::placeAction;
+			m_mouseAction = VectorGraphView::MouseAction::placeAction;
+			// select clicked point
 			size_t foundIndex(GridView::getClickedItem(modelPos));
 			if (foundIndex >= model()->getCount())
 			{
 				// place if not found
-				foundIndex = graphModel->addItem(VGPoint{VGPoint::Type::bezier}, GridModel::ItemInfo(modelPos.x(), modelPos.y()));
+				foundIndex = graphModel->addItem(VGPoint{VGPoint::Type::bezier},
+					GridModel::ItemInfo(modelPos.x(), modelPos.y()));
+				auto bb{getBoundingBox(foundIndex)};
+				GridView::containSelection(bb.first, bb.second);
 			}
-			// select clicked point
-			auto bb{getBoundingBox(foundIndex)};
-			GridView::containSelection(bb.first, bb.second);
+			else
+			{
+				// selection before drag
+				if (modelPos.x() > m_selectStart.x() && modelPos.y() > m_selectStart.y()
+					&& modelPos.x() < m_selectEnd.x() && modelPos.y() < m_selectEnd.y())
+				{
+					m_cursorPos = getBoundingBoxCenter(foundIndex);
+				}
+				else
+				{
+					auto bb{getBoundingBox(foundIndex)};
+					GridView::containSelection(bb.first, bb.second);
+				}
+			}
+			update(); // display selection
 		}
 		me->accept();
 	}
 	else if (me->button() == Qt::RightButton)
 	{
 		// delete
-		m_mouseAction = GridView::MouseAction::removeAction;
+		m_mouseAction = VectorGraphView::MouseAction::removeAction;
 		size_t foundIndex(GridView::getClickedItem(modelPos));
 		if (foundIndex < model()->getCount())
 		{
@@ -502,22 +512,24 @@ void VectorGraphView::keyPressEvent(QKeyEvent* ke)
 	m_isSelectionPressed = ke->modifiers() & Qt::ShiftModifier;
 	if (ke->modifiers() & Qt::ControlModifier)
 	{
+		float moveDistX{model()->getLength() / 50.0f};
+		float moveDistY{model()->getHeight() / 50.0f};
 		switch (ke->key())
 		{
 			case Qt::Key_Up:
-				selectionMoveAction(QPointF{0.0f, 0.2f});
+				selectionMoveAction(QPointF{0.0f, moveDistY});
 				ke->accept();
 				break;
 			case Qt::Key_Down:
-				selectionMoveAction(QPointF{0.0f, -0.2f});
+				selectionMoveAction(QPointF{0.0f, -moveDistY});
 				ke->accept();
 				break;
 			case Qt::Key_Left:
-				selectionMoveAction(QPointF{-0.2f, 0.0f});
+				selectionMoveAction(QPointF{-moveDistX, 0.0f});
 				ke->accept();
 				break;
 			case Qt::Key_Right:
-				selectionMoveAction(QPointF{0.2f, 0.0f});
+				selectionMoveAction(QPointF{moveDistX, 0.0f});
 				ke->accept();
 				break;
 			case Qt::Key_Delete:
@@ -540,27 +552,23 @@ void VectorGraphView::keyPressEvent(QKeyEvent* ke)
 				ke->accept();
 				break;
 			case Qt::Key_T:
-				auto graphModel{castModel<VectorGraphModel>()};
-				size_t foundIndex(GridView::getClickedItem(m_cursorPos));
-				if (foundIndex < model()->getCount())
-				{
-					VGPoint point{graphModel->getObject(foundIndex)};
-					if ((point.type + 1) == VGPoint::Type::count)
-					{
-						graphModel->setObject(foundIndex, VGPoint{VGPoint::Type::bezier});
-					}
-					else
-					{
-						graphModel->setObject(foundIndex, VGPoint{static_cast<VGPoint::Type>(point.type + 1)});
-					}
-				}
+				selectionSwitchTypeAction(true);
 				ke->accept();
 				break;
 		}
 	}
 	else
 	{
-		GridView::keyPressEvent(ke);
+		switch (ke->key())
+		{
+			case Qt::Key_Delete:
+				selectionDeleteAction();
+				ke->accept();
+				break;
+			default:
+				GridView::keyPressEvent(ke);
+				break;
+		}
 	}
 }
 void VectorGraphView::mouseMoveEvent(QMouseEvent* me)
@@ -572,25 +580,25 @@ void VectorGraphView::mouseMoveEvent(QMouseEvent* me)
 
 	switch (m_mouseAction)
 	{
-		case GridView::MouseAction::selectAction:
+		case VectorGraphView::MouseAction::selectAction:
 			m_isSelectionPressed = true;
 			// moving the cursor
 			GridView::containSelection(modelPos, modelPos);
 			update();
 			me->accept();
 			break;
-		case GridView::MouseAction::placeAction:
+		case VectorGraphView::MouseAction::placeAction:
 			// preparing cursorPos for move action
 			m_cursorPos = modelPos;
-			m_mouseAction = GridView::MouseAction::moveAction;
+			m_mouseAction = VectorGraphView::MouseAction::moveAction;
 			break;
-		case GridView::MouseAction::moveAction:
+		case VectorGraphView::MouseAction::moveAction:
 			selectionMoveAction(modelPos - m_cursorPos);
 			// moving the cursor
 			m_cursorPos = modelPos;
 			me->accept();
 			break;
-		case GridView::MouseAction::removeAction:
+		case VectorGraphView::MouseAction::removeAction:
 			// this is expensive, but it is used to ensure
 			// this part of the code works when `getOnClickSearchArea` changes
 			size_t foundIndex(GridView::getClickedItem(modelPos));
@@ -602,6 +610,30 @@ void VectorGraphView::mouseMoveEvent(QMouseEvent* me)
 			break;
 	}
 }
+void VectorGraphView::wheelEvent(QWheelEvent* we)
+{
+	const auto mousePos{we->position()};
+	QPointF modelPos(toModelCoords(mousePos));
+
+	bool dir{we->angleDelta().y() > 0};
+	if (m_selection.empty() == false)
+	{
+		size_t foundIndex(GridView::getClickedItem(modelPos));
+		if (foundIndex < model()->getCount())
+		{
+			we->accept();
+			m_selection.insert(foundIndex);
+			selectionSwitchTypeAction(we->inverted() ? !dir : dir);
+		}
+		we->ignore();
+	}
+	else
+	{
+		we->accept();
+		selectionSwitchTypeAction(we->inverted() ? !dir : dir);
+	}
+	we->ignore();
+}
 void VectorGraphView::selectionDeleteAction()
 {
 	auto graphModel{castModel<VectorGraphModel>()};
@@ -609,7 +641,6 @@ void VectorGraphView::selectionDeleteAction()
 	GridView::updateSelection();
 	for (auto it = m_selection.rbegin(); it != m_selection.rend(); it = m_selection.rbegin())
 	{
-		printf("delete item: %d\n", *it);
 		graphModel->removeItem(*it);
 		m_selection.erase(*it);
 	}
@@ -619,6 +650,20 @@ void VectorGraphView::selectionCopyAction()
 }
 void VectorGraphView::selectionPasteAction()
 {
+}
+void VectorGraphView::selectionSwitchTypeAction(bool direction)
+{
+	auto graphModel{castModel<VectorGraphModel>()};
+
+	GridView::updateSelection();
+	for (auto it = m_selection.begin(); it != m_selection.end(); ++it)
+	{
+		VGPoint point{graphModel->getObject(*it)};
+		int nextType{direction ? point.type + 1 : point.type - 1};
+		if (nextType < 0) { nextType = VGPoint::Type::steps; }
+		if (nextType == VGPoint::Type::count) { nextType = VGPoint::Type::bezier; }
+		graphModel->setObject(*it, VGPoint{static_cast<VGPoint::Type>(nextType)});
+	}
 }
 
 } // namespace lmms::gui

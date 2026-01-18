@@ -27,8 +27,9 @@
 
 #include <set>
 
-#include <QWidget>
+#include <QColor>
 #include <QPointF>
+#include <QWidget>
 
 #include "GridModel.h"
 #include "ModelView.h"
@@ -64,13 +65,6 @@ public:
 		up, // positive y direction
 		down
 	};
-	enum MouseAction
-	{
-		selectAction,
-		placeAction,
-		moveAction,
-		removeAction
-	};
 
 	void moveToWhole(unsigned int x, unsigned int y);
 	//! extends `m_selectStart`, `m_selectEnd` to contain `start` and `end`
@@ -88,16 +82,9 @@ public slots:
 protected:
 	void paintEvent(QPaintEvent* pe) override;
 	void keyPressEvent(QKeyEvent* ke);
-	//void dropEvent(QDropEvent* de) override;
-	//void dragEnterEvent(QDragEnterEvent* dee) override;
-	//void mousePressEvent(QMouseEvent* me) override;
-	//void mouseMoveEvent(QMouseEvent* me) override;
-	//void mouseReleaseEvent(QMouseEvent* me) override;
 	
 	void drawGrid(QPainter& painter);
 	void drawSelection(QPainter& painter);
-	//! transforms a given y coord with the cubeWidth / cubeHeight ratio
-	float transformYToScreen(float yCoord); // TODO
 	QPointF toModelCoords(QPoint viewPos) const;
 	QPointF toModelCoords(QPointF viewPos) const;
 	QPoint toViewCoords(QPointF modelPos) const;
@@ -121,12 +108,13 @@ protected:
 	size_t getClosest(const std::set<size_t>& selection, QPointF point);
 	std::set<size_t> m_selection;
 
-	void modelChanged() override; // TODO
+	void modelChanged() override;
 
 	//! if shift is pressed
 	bool m_isSelectionPressed;
-	MouseAction m_mouseAction;
 
+	//! where the selection will be made
+	//! these values are ignored if a selection is active (it m_selection isn't empty)
 	QPointF m_selectStartOld;
 	QPointF m_selectEndOld;
 	QPointF m_selectStart;
@@ -139,6 +127,12 @@ protected:
 	bool m_isSizeStatic;
 	//! highlights every nth line on the grid
 	size_t m_gridHighlightMod;
+
+	const QColor m_backgroundColor = QColor(13, 16, 19);
+	const QColor m_borderColor = QColor(70, 70, 70);
+	const QColor m_gridLineColor = QColor(42, 47, 51);
+	const QColor m_gridHighlightedLineColor = QColor(42, 101, 72);
+	const QColor m_selectionBoxColor = QColor(40, 255, 70);
 };
 
 class LMMS_EXPORT VectorGraphView : public GridView
@@ -150,15 +144,30 @@ protected:
 	void mousePressEvent(QMouseEvent* me) override;
 	void mouseMoveEvent(QMouseEvent* me) override;
 	void keyPressEvent(QKeyEvent* ke) override;
+	void wheelEvent(QWheelEvent* we) override;
 	std::pair<QPointF, QPointF> getBoundingBox(size_t index) const override;
 	std::pair<QPointF, QPointF> getOnClickSearchArea(QPointF clickedPos) const override;
 	std::set<size_t> getSelection(QPointF start, QPointF end) override;
+
 	//! returns getCount() if not found, else index
 	size_t selectOnClick(QPointF pos);
 
 	void selectionDeleteAction();
 	void selectionCopyAction();
 	void selectionPasteAction();
+	void selectionSwitchTypeAction(bool direction);
+private:
+	enum MouseAction
+	{
+		selectAction,
+		placeAction,
+		moveAction,
+		removeAction
+	};
+
+	MouseAction m_mouseAction;
+	const QColor m_pointColor = QColor(60, 223, 110);
+	const QColor m_lineColor = QColor(60, 200, 70);
 };
 
 } // namespace lmms::gui
