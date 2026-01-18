@@ -5,6 +5,7 @@
 
 include(ImportedTargetHelpers)
 
+set(CMAKE_FIND_DEBUG_MODE TRUE)
 find_package_config_mode_with_fallback(Ogg Ogg::ogg
 	LIBRARY_NAMES "ogg"
 	INCLUDE_NAMES "ogg/ogg.h"
@@ -33,6 +34,7 @@ find_package_config_mode_with_fallback(Vorbis Vorbis::vorbisenc
 	DEPENDS Vorbis::vorbis
 	PREFIX VorbisEnc
 )
+set(CMAKE_FIND_DEBUG_MODE FALSE)
 
 determine_version_from_source(Vorbis_VERSION Vorbis::vorbis [[
 	#include <iostream>

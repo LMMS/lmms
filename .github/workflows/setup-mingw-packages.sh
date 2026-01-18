@@ -2,18 +2,13 @@
 
 # TODO: Stop using this PPA once all MinGW dependencies are available through vcpkg and work with CMake.
 
-# All MinGW dependencies are installed from tobydox's PPA *except* for these:
-#   fluidsynth
-#   libsndfile
-#   lilv
-#   lv2
+# Only these packages from tobydox's PPA are currently used:
+#   libgig-mingw-w64    [vcpkg does not support MinGW yet]
+#   qt5base-mingw-w64   [vcpkg takes too much memory to build this]
+#   qt5svg-mingw-w64
 
-# Some issues with vcpkg dependencies include:
-#   fftw3                 (CMake cannot find vcpkg's version)
-#   fltk                  (vcpkg fails to build it)
-#   libgig                (vcpkg does not support MinGW yet)
-#   portaudio             (CMake cannot find vcpkg's version)
-#   qt5-base              (vcpkg takes too much memory to build)
+# The rest of the MinGW dependencies come from vcpkg.
+# suil, once added, would need to be built with Qt, due to its dependency on it.
 
 sudo sh -c 'echo "deb http://ppa.launchpad.net/tobydox/mingw-w64/ubuntu focal main" > \
   /etc/apt/sources.list.d/tobydox-mingw-w64.list'

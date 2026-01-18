@@ -1,4 +1,4 @@
-# Toolchain for MinGW compiler on Linux + vcpkg
+# Toolchain for cross-compiling Windows binaries from Linux using MinGW-w64 + vcpkg
 
 if(NOT DEFINED ENV{VCPKG_ROOT})
 	message(FATAL_ERROR "The VCPKG_ROOT environment variable must be set")
