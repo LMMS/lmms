@@ -26,7 +26,8 @@
 
 #include <cassert>
 #include <cmath>
-#include "stdio.h" // TODO remove
+
+#include <QDomElement>
 
 namespace lmms
 {
@@ -108,32 +109,27 @@ size_t GridModel::findIndex(float xPos) const
 
 size_t GridModel::addItem(GridModel::Item itemIn)
 {
-	//printf("addItem at %f %ld\n", itemIn.info.x, itemIn.objectIndex);
-	/*
-	for (size_t i = 0; i < m_items.size(); ++i)
-	{
-		printf("item[%ld] = %f\n", i, m_items[i].info.x);
-	}
-	*/
-
 	size_t foundIndex{findIndex(itemIn.info.x)};
 	m_items.push_back(itemIn);
 	if (foundIndex + 1 < m_items.size())
 	{
 		move(m_items.size() - 1, foundIndex);
 	}
-	emit dataChangedAt(foundIndex);
+	dataChangedAt(foundIndex);
 	emit dataChanged();
 	return foundIndex;
 }
 
 void GridModel::removeItem(size_t index)
 {
-	//printf("removeItem: %d\n", index);
 	move(index, m_items.size() - 1);
 	m_items.pop_back();
-	emit dataChangedAt(index);
+	dataChangedAt(index);
 	emit dataChanged();
+}
+void GridModel::clearItems()
+{
+	m_items.clear();
 }
 
 void GridModel::move(size_t startIndex, size_t finalIndex)
@@ -171,15 +167,15 @@ size_t GridModel::setX(size_t index, float newX)
 		foundIndex -= 1;
 	}
 	move(index, foundIndex);
-	emit dataChangedAt(index);
-	emit dataChangedAt(foundIndex);
+	dataChangedAt(index);
+	dataChangedAt(foundIndex);
 	emit dataChanged();
 	return foundIndex;
 }
 void GridModel::setY(size_t index, float newY)
 {
 	m_items[index].info.y = newY;
-	emit dataChangedAt(index);
+	dataChangedAt(index);
 	emit dataChanged();
 }
 size_t GridModel::setInfo(size_t index, const GridModel::ItemInfo& info)
@@ -289,26 +285,21 @@ void VectorGraphModel::renderChangedPoints()
 		// finding lastNotAttributeIndex
 		for (size_t j = i; j-- > 0;)
 		{
-			printf("render changed: last: look at %ld\n", j);
 			if (getObject(j).type != VGPoint::Type::attribute && j != i)
 			{
-				printf("render changed: last: look at %ld FOUND\n", j);
 				lastNotAttributeIndex = j;
 				break;
 			}
 		}
 
-		printf("render changed: last: %ld, updated: %ld, i: %ld\n", lastNotAttributeIndex, updatedTo, i);
 		// render line segment before i
 		if (lastNotAttributeIndex >= static_cast<ssize_t>(updatedTo))
 		{
-			printf("render before %ld, %ld\n", lastNotAttributeIndex, updatedTo);
 			renderAfter(static_cast<size_t>(lastNotAttributeIndex), m_buffer, &updatedTo);
 		}
 		// render line segment after i (if i isn't an attribute)
 		if (getObject(i).type != VGPoint::Type::attribute)
 		{
-			printf("render after\n");
 			renderAfter(i, m_buffer, &updatedTo);
 		}
 	}
@@ -318,7 +309,6 @@ void VectorGraphModel::renderChangedPoints()
 
 void VectorGraphModel::renderAfter(size_t index, std::vector<float>& buffer, size_t* updatedTo)
 {
-	printf("renderAfter: %ld\n", index);
 	assert(getObject(index).type != VGPoint::Type::attribute);
 	// index of next point
 	size_t nextIndex{index};
@@ -333,12 +323,10 @@ void VectorGraphModel::renderAfter(size_t index, std::vector<float>& buffer, siz
 		}
 		else { nextIndex = i; break; }
 	}
-	printf("renderAfter: found indexes: next: %ld, attrib A: %ld, attrib B: %ld\n", nextIndex, attribIndexA, attribIndexB);
 	if (updatedTo != nullptr) { *updatedTo = nextIndex; }
 	// render between these
 	size_t from{static_cast<size_t>(getItem(index).info.x * buffer.size() / static_cast<float>(getLength()))};
 	size_t end{static_cast<size_t>(getItem(nextIndex).info.x * buffer.size() / static_cast<float>(getLength()))};
-	printf("renderAfter: from: %ld (x: %f, size: %ld, count: %ld), end: %ld\n", from ,getItem(index).info.x, buffer.size(), getLength(), end);
 
 	// render edge after endpoint
 	if (index == nextIndex)
@@ -468,7 +456,6 @@ void VectorGraphModel::dataChangedAt(ssize_t index)
 	}
 	else
 	{
-		printf("dataChanged signal: %ld\n", index);
 		m_changedData.insert(index);
 	}
 }
@@ -553,6 +540,51 @@ void VectorGraphModel::processLineTypeFade(std::vector<float>& samplesOut, size_
 		float xRatio{(endLoc - i - 1) / (static_cast<float>(endLoc - startLoc) * fadeInStartVal)};
 		samplesOut[i] = samplesOut[i] * xRatio;
 	}
+}
+
+void VectorGraphModel::saveSettings(QDomDocument& doc, QDomElement& element, const QString& name)
+{
+	QDomElement me = doc.createElement(name);
+	me.setAttribute("graphPoints", dataToBase64(nullptr));
+	element.appendChild(me);
+}
+void VectorGraphModel::loadSettings(const QDomElement& element, const QString& name)
+{
+	QDomNode node = element.namedItem(name);
+
+	/* Try this if loading doesn't work
+	if(node.isNull() == true)
+	{
+		for (QDomElement othernode = element.firstChildElement();
+			!othernode.isNull();
+			othernode = othernode.nextSiblingElement())
+		{
+			if (othernode.nodeName() == name)
+			{
+				node = othernode;
+				break;
+			}
+		}
+	}
+	*/
+
+	if (node.isElement())
+	{
+		QDomElement nodeElement = node.toElement();
+		if (nodeElement.hasAttribute("graphPoints"))
+		{
+			clear();
+			addBase64Data(nodeElement.attribute("graphPoints"));
+		}
+	}
+}
+void VectorGraphModel::saveSettings(QDomDocument& doc, QDomElement& element)
+{
+	saveSettings(doc, element, "VectorGraphModel");
+}
+void VectorGraphModel::loadSettings(const QDomElement& element)
+{
+	loadSettings(element, "VectorGraphModel");
 }
 
 } // namespace lmms

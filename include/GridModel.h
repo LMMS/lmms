@@ -27,10 +27,13 @@
 
 #include <memory> // shared_ptr
 #include <set>
+#include <string>
 #include <vector>
 
 #include "stdio.h" // TODO remove
 
+#include "base64.h"
+#include "JournallingObject.h"
 #include "Model.h"
 
 namespace lmms
@@ -99,6 +102,7 @@ protected:
 	//! @return index where added
 	size_t addItem(Item itemIn);
 	void removeItem(size_t index);
+	void clearItems();
 	//! DOESN'T EMIT, get and set index pointing to custom data
 	size_t& getAndSetObjectIndex(size_t index);
 private:
@@ -126,7 +130,7 @@ private:
 	4. getting T from index in `GridModel`
 */
 
-template<typename T>
+template<typename T, typename SaveData>
 class LMMS_EXPORT GridModelTyped : public GridModel
 {
 private:
@@ -138,7 +142,7 @@ public:
 	~GridModelTyped() = default;
 
 	const T& getObject(size_t index) const { return m_TCustomData[GridModel::getItem(index).objectIndex]; }
-	void setObject(size_t index, T object)
+	virtual void setObject(size_t index, T object)
 	{
 		m_TCustomData[GridModel::getItem(index).objectIndex] = object;
 		dataChangedAt(index); emit GridModel::dataChanged();
@@ -168,10 +172,58 @@ public:
 		// removing the Item (object* + coords pair)
 		GridModel::removeItem(index);
 	}
-	// TODO implement getting the save buffer
-	// toBase64(selection)
-	// addItems(std::string base64String)
-	// clear()
+protected:
+	// save mechanism:
+	struct TrueDataPair
+	{
+		GridModel::ItemInfo info;
+		SaveData data;
+	};
+	QString dataToBase64(const std::set<size_t>* selection = nullptr)
+	{
+		std::vector<TrueDataPair> dataArray{};
+		if (selection == nullptr || selection->empty())
+		{
+			dataArray.reserve(getCount());
+			for (size_t i = 0; i < getCount(); ++i)
+			{
+				dataArray.push_back(
+					TrueDataPair{getItem(i).info, customDataToSaveData(getObject(i))});
+				printf("element x: %f, y: %f\n", getItem(i).info.x, getItem(i).info.y);
+			}
+		}
+		else
+		{
+			dataArray.reserve(selection->size());
+			for (size_t i : *selection)
+			{
+				dataArray.push_back(
+					TrueDataPair{getItem(i).info, customDataToSaveData(getObject(i))});
+			}
+		}
+		QString output{};
+		base64::encode((const char *)(dataArray.data()),
+			dataArray.size() * sizeof(TrueDataPair), output);
+		return output;
+	}
+	void addBase64Data(QString base64String)
+	{
+		int size = 0;
+		TrueDataPair* startPtr = nullptr;
+		base64::decode<TrueDataPair>(base64String, &startPtr, &size);
+		TrueDataPair* ptr{startPtr};
+		for (int i = 0; i < size; i += sizeof(TrueDataPair))
+		{
+			printf("loaded element: %d, size: %d\n", i, size);
+			addItem(saveDataToCustomData(ptr->data), ptr->info);
+			printf("element x: %f, y: %f\n", ptr->info.x, ptr->info.y);
+			++ptr;
+		}
+		delete[] startPtr;
+	}
+	void clear() { GridModel::clearItems(); m_TCustomData.clear(); }
+	virtual SaveData customDataToSaveData(const T& data) { return data; }
+	virtual T saveDataToCustomData(const SaveData& data) { return data; }
 };
 
 struct VGPoint
@@ -188,7 +240,7 @@ struct VGPoint
 	Type type;
 };
 
-class LMMS_EXPORT VectorGraphModel : public GridModelTyped<VGPoint>
+class LMMS_EXPORT VectorGraphModel : public GridModelTyped<VGPoint, VGPoint>, public JournallingObject
 {
 Q_OBJECT
 public:
@@ -207,8 +259,17 @@ public:
 	std::vector<float>& getBufferRef();
 	void setRenderSize(size_t newSize);
 
+	void saveSettings(QDomDocument& doc, QDomElement& element, const QString& name);
+	void loadSettings(const QDomElement& element, const QString& name);
+	QString nodeName() const override
+	{
+		return "vectorgraphmodel";
+	}
 protected:
 	void dataChangedAt(ssize_t index) override;
+
+	void saveSettings(QDomDocument& doc, QDomElement& element) override;
+	void loadSettings(const QDomElement& element) override;
 private:
 	void processLineTypeBezier(std::vector<float>& samplesOut, size_t startLoc, size_t endLoc,
 		float yBefore, float yAfter, float yMid);
