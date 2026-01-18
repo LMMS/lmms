@@ -23,8 +23,14 @@ void SfzGlobalState::processTrigger(const SfzTrigger& trigger)
 	}
 }
 
-std::optional<int> SfzGlobalState::lastKeyPressedInRange(const int lowKey, const int highKey, const std::optional<int> defaultKey) const
+std::optional<int> SfzGlobalState::lastKeyPressedInRange(int lowKey, int highKey, const std::optional<int> defaultKey) const
 {
+	// Some SFZs pass -1 as the lokey, so make sure to clamp it into the range 0-127 before accessing the array to prevent out of range errors
+	lowKey = std::max(lowKey, 0);
+	highKey = std::min(highKey, 127);
+	// If the range is invalid, return the default key.
+	if (lowKey > highKey) { return defaultKey; }
+
 	std::optional<int> lastPlayedKey = std::nullopt;
 	std::optional<int> bestScore = std::nullopt;
 

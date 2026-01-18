@@ -246,7 +246,12 @@ bool SfzParser::parseSfzFile(const QString& filePath, std::vector<SfzRegion>& ou
 	{
 		if (region.m_sw_last != std::nullopt)
 		{
-			controlsConfig.m_switchKeyLabels.insert({region.m_sw_last.value(), region.m_sw_label.value_or("")});
+			SfzControlsConfig::SwitchKeyInfo info;
+			info.sw_label = region.m_sw_label.value_or("");
+			info.sw_lokey = region.m_sw_lokey;
+			info.sw_hikey = region.m_sw_hikey;
+			info.sw_default = region.m_sw_default;
+			controlsConfig.m_switchKeyInfo.insert({region.m_sw_last.value(), info});
 		}
 	}
 

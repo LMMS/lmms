@@ -20,9 +20,10 @@ public:
 
 	// Returns the midi key number of the last pressed key in the range [lowKey, highKey].
 	// If no keys have been pressed yet, it returns defaultKey.
+	// If the key range is invalid, it returns defaultKey
 	// If no default key was given, it returns std::nullopt
 	// TODO add unit tests
-	std::optional<int> lastKeyPressedInRange(const int lowKey, const int highKey, const std::optional<int> defaultKey) const;
+	std::optional<int> lastKeyPressedInRange(int lowKey, int highKey, const std::optional<int> defaultKey) const;
 
 	//! Returns the current value of the given midi CC knob/controller, or the default value if we haven't recieved any midi CC signals for it yet.
 	int midiCCValue(const int index) const { return m_ccValues.at(index); }
