@@ -151,6 +151,8 @@ void SfzSampler::loadFile(const QString& filePath)
 	m_sfzGlobalState = SfzGlobalState();
 	// And any info about control labels, default values, etc
 	m_controlsConfig = SfzControlsConfig();
+	// Reset any loaded samples
+	m_samplePool = SfzSamplePool();
 
 	// Parse all the <region> headers of the .sfz (accounting for <global> and <group> defaults) and populate m_sfzRegions with the new SfzRegion
 	// The <control> header is also parsed into a separate object for easy access by the gui
@@ -166,10 +168,11 @@ void SfzSampler::loadFile(const QString& filePath)
 	for (auto& region : m_sfzRegions)
 	{
 		qDebug() << "[SFZ Player] Loading sample" << i + 1 << "/" << m_sfzRegions.size() << region.m_sampleFile.value_or("N/A");
-		bool successfulLoadSample = region.initializeSample(parentDirectory);
+		bool successfulLoadSample = region.initializeSample(parentDirectory, m_samplePool);
 		if (!successfulLoadSample) { qDebug() << "[SFZ Player] An error occured when loading a sample."; }
 		i++;
 	}
+	qDebug() << "Loaded" << m_sfzRegions.size() << "regions and" << m_samplePool.sampleCount() << "samples.";
 
 	// Set the initial cc values based on any `set_ccN` opcodes in the <control> header
 	m_sfzGlobalState.initializeMidiCCValues(m_controlsConfig);

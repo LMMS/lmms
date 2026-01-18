@@ -36,6 +36,7 @@
 #include "SfzRegionPlayState.h"
 #include "SfzGlobalState.h"
 #include "SfzControlsConfig.h"
+#include "SfzSamplePool.h"
 
 namespace lmms {
 
@@ -77,6 +78,9 @@ private:
 	SfzControlsConfig m_controlsConfig;
 
 	std::vector<SfzRegion> m_sfzRegions;
+
+	//! So that the regions don't accidentally load the same sample multiple times, we store all the sames in one place and the regions ask it to load each sample/retrieve a pointer if it's already been loaded
+	SfzSamplePool m_samplePool;
 
 	// The GUI needs models to connect to midi CC knobs, so a bunch of dummy models are defined here.
 	// Ideally it would be better to reuse the midi CC models for the instrument track

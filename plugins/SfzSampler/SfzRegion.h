@@ -7,8 +7,7 @@
 #include "SfzTrigger.h"
 #include "SfzRegionPlayState.h"
 #include "SfzSampleBuffer.h"
-
-#include "Sample.h"
+#include "SfzSamplePool.h"
 
 #include <QDir>
 
@@ -37,17 +36,18 @@ public:
 	//! Load the sample file given by the `sample` opcode into m_sample.
 	//! The sample path is treated as relative to the path to the sfz file, so the parent directory is also needed
 	//! Returns true if successful
-	bool initializeSample(const QDir& parentDirectory);
+	bool initializeSample(const QDir& parentDirectory, SfzSamplePool& samplePool);
 
-	const SfzSampleBuffer& sample() const { return m_sample; }
+	const SfzSampleBuffer* sample() const { return m_sample; }
 
 private:
 	static constexpr int MAX_ACTIVE_SOUNDS = 128;
 	//! Array to store all active (and inactive) sound play states for this region
 	std::array<SfzRegionPlayState, MAX_ACTIVE_SOUNDS> m_activeSounds;
 
-	//! Sample object to be played. The sample file path is defined in the `sample` opcode, but the data needs to be loaded first
-	SfzSampleBuffer m_sample;
+	//! Pointer to sample object to be played. The sample file path is defined in the `sample` opcode, but the data needs to be loaded first
+	//! The actual sample objects are stored in a shared pool, SfzSamplePool, so that if multiple of the same sample are loaded, they don't waste memory.
+	const SfzSampleBuffer* m_sample = nullptr;
 
 	//! Maximum active index in the play state array
 	//! By always spawning new sounds at the lowest open index and keeping track of the maximum index which contains an actice sound,

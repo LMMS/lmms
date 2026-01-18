@@ -20,6 +20,8 @@ build_plugin(sfzsampler
 	SfzTrigger.h
 	SfzSampleBuffer.cpp
 	SfzSampleBuffer.h
+	SfzSamplePool.cpp
+	SfzSamplePool.h
 	MOCFILES
 	SfzSampler.h
 	SfzSamplerView.h
@@ -31,5 +33,6 @@ build_plugin(sfzsampler
 	SfzControlsConfig.h
 	SfzTrigger.h
 	SfzSampleBuffer.h
+	SfzSamplePool.h
 	EMBEDDED_RESOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.svg"
 )

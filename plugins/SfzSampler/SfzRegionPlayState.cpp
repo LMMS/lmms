@@ -4,6 +4,8 @@
 
 #include "SfzRegion.h"
 
+#include "AudioEngine.h"
+#include "Engine.h"
 #include "lmms_math.h"
 
 #include "MicroTimer.h"
@@ -128,7 +130,7 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const fpp_t frames)
 	float freqRatio = std::exp2(pitch / 12.0f);
 
 	// Sample rate of sample
-	const float sampleSampleRate = m_region->sample().sampleRate();
+	const float sampleSampleRate = m_region->sample()->sampleRate();
 	// Sample rate of LMMS
 	const float sampleRate = Engine::audioEngine()->outputSampleRate();
 	// Play the sample faster/slower to match the correct sample rate
@@ -187,15 +189,15 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const fpp_t frames)
 		);
 		if (filterEnabled) // TODO does this if statement make it faster?
 		{
-			buffer[f][0] += m_filter.update(m_region->sample().at(m_sampleFrame, 0) * amplitude * ampeg * ampVelocity * ampVolume * rightPanAmp, 0);
-			buffer[f][1] += m_filter.update(m_region->sample().at(m_sampleFrame, 1) * amplitude * ampeg * ampVelocity * ampVolume * leftPanAmp, 1);
+			buffer[f][0] += m_filter.update(m_region->sample()->at(m_sampleFrame, 0) * amplitude * ampeg * ampVelocity * ampVolume * rightPanAmp, 0);
+			buffer[f][1] += m_filter.update(m_region->sample()->at(m_sampleFrame, 1) * amplitude * ampeg * ampVelocity * ampVolume * leftPanAmp, 1);
 		}
 		else
 		{
-			buffer[f][0] += m_region->sample().at(m_sampleFrame, 0) * amplitude * ampeg * ampVelocity * ampVolume * rightPanAmp;
-			buffer[f][1] += m_region->sample().at(m_sampleFrame, 1) * amplitude * ampeg * ampVelocity * ampVolume * leftPanAmp;
+			buffer[f][0] += m_region->sample()->at(m_sampleFrame, 0) * amplitude * ampeg * ampVelocity * ampVolume * rightPanAmp;
+			buffer[f][1] += m_region->sample()->at(m_sampleFrame, 1) * amplitude * ampeg * ampVelocity * ampVolume * leftPanAmp;
 		}
-		m_sampleFrame = std::min(static_cast<float>(m_region->sample().size()), m_sampleFrame + freqRatio);
+		m_sampleFrame = std::min(static_cast<float>(m_region->sample()->size()), m_sampleFrame + freqRatio);
 		m_frameCount++;
 	}
 
@@ -207,7 +209,7 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const fpp_t frames)
 	}
 
 	// If loop_mode is one_shot, no noteOff signal will ever come to release it, so we need to manually deactivate when we reach the end of the sample
-	if (m_region->m_loop_mode == SfzOpcodeState::LoopMode::OneShot && m_sampleFrame >= m_region->sample().size())
+	if (m_region->m_loop_mode == SfzOpcodeState::LoopMode::OneShot && m_sampleFrame >= m_region->sample()->size())
 	{
 		m_active = false; // TODO should this forcefully decative or just release?
 	}

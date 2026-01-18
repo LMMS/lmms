@@ -8,7 +8,6 @@
 
 #include "Engine.h"
 #include "AudioEngine.h"
-#include "SampleBuffer.h"
 
 #include <QDebug>
 
@@ -152,7 +151,7 @@ void SfzRegion::recalculateTotalCCModulation(const SfzGlobalState& globalState)
 
 
 
-bool SfzRegion::initializeSample(const QDir& parentDirectory)
+bool SfzRegion::initializeSample(const QDir& parentDirectory, SfzSamplePool& samplePool)
 {
 	if (m_sampleFile == std::nullopt)
 	{
@@ -161,13 +160,11 @@ bool SfzRegion::initializeSample(const QDir& parentDirectory)
 		return false;
 	}
 
-	// TODO is simply adding the default path sufficient?
-	if (auto buffer = SampleBuffer::fromFile(parentDirectory.absoluteFilePath(m_default_path.value_or("") + m_sampleFile.value())))
-	{
-		m_sample = SfzSampleBuffer(buffer->data(), buffer->size(), buffer->sampleRate());
-		return true;
-	}
-	return false;
+	QString path = parentDirectory.absoluteFilePath(m_default_path.value_or("") + m_sampleFile.value());
+	// The sample pool handles making sure the same sample isn't loaded twice, which would waste memory
+	m_sample = samplePool.loadSample(path);
+
+	return m_sample != nullptr;
 }
 
 
