@@ -25,26 +25,16 @@
 #ifndef LMMS_GRID_MODEl_H
 #define LMMS_GRID_MODEl_H
 
-#include <memory> // shared_ptr
 #include <set>
-#include <string>
 #include <vector>
 
-#include "stdio.h" // TODO remove
-
 #include "base64.h"
-#include "JournallingObject.h"
 #include "Model.h"
 
 namespace lmms
 {
 
 static const unsigned int GRID_MAX_STEPS = 100000;
-
-namespace gui
-{
-class GridView;
-}
 
 /* This class handles
 	1. grid's size
@@ -220,72 +210,9 @@ protected:
 		}
 		delete[] startPtr;
 	}
-	void clear() { GridModel::clearItems(); m_TCustomData.clear(); }
+	void clearPairs() { GridModel::clearItems(); m_TCustomData.clear(); }
 	virtual SaveData customDataToSaveData(const T& data) { return data; }
 	virtual T saveDataToCustomData(const SaveData& data) { return data; }
-};
-
-struct VGPoint
-{
-	enum Type
-	{
-		bezier, //!< the normal point
-		attribute, //!< used to adjust other's attributes
-		sine, //!< makes a sine shaped line
-		peak, //!< makes a peak filter shaped line
-		steps, //!< makes a staircase
-		count
-	};
-	Type type;
-};
-
-class LMMS_EXPORT VectorGraphModel : public GridModelTyped<VGPoint, VGPoint>, public JournallingObject
-{
-Q_OBJECT
-public:
-	VectorGraphModel(unsigned int length, unsigned int height, unsigned int horizontalSteps, unsigned int verticalSteps,
-		size_t bufferSize, Model* parent, QString displayName = QString(), bool defaultConstructed = false);
-
-	void renderAllTo(std::vector<float>& bufferOut);
-	void renderChangedPoints();
-	//! @param index from where to update the line
-	//! @param updatedTo the index until the line was updated
-	void renderAfter(size_t index, std::vector<float>& buffer, size_t* updatedTo = nullptr);
-	void renderStart(std::vector<float>& buffer);
-
-	//! these automatically update the buffer when dataChanged
-	const std::vector<float>& getBuffer();
-	std::vector<float>& getBufferRef();
-	void setRenderSize(size_t newSize);
-
-	void saveSettings(QDomDocument& doc, QDomElement& element, const QString& name);
-	void loadSettings(const QDomElement& element, const QString& name);
-	QString nodeName() const override
-	{
-		return "vectorgraphmodel";
-	}
-protected:
-	void dataChangedAt(ssize_t index) override;
-
-	void saveSettings(QDomDocument& doc, QDomElement& element) override;
-	void loadSettings(const QDomElement& element) override;
-private:
-	void processLineTypeBezier(std::vector<float>& samplesOut, size_t startLoc, size_t endLoc,
-		float yBefore, float yAfter, float yMid);
-	void processLineTypeSine(std::vector<float>& samplesOut, size_t startLoc, size_t endLoc,
-		float sineAmp, float sineFreq, float sinePhase, float fadeInStartVal);
-	void processLineTypePeak(std::vector<float>& samplesOut, size_t startLoc, size_t endLoc,
-		float peakAmp, float peakX, float peakWidth, float fadeInStartVal);
-	void processLineTypeSteps(std::vector<float>& samplesIO, size_t startLoc, size_t endLoc,
-		float stepHeight, float stepAmp, float yBefore, float fadeInStartVal);
-	void processLineTypeLinInterpolate(std::vector<float>& samplesOut, size_t startLoc, size_t endLoc,
-		float startY, float endY, bool shouldOverride);
-	void processLineTypeFade(std::vector<float>& samplesOut, size_t startLoc, size_t endLoc,
-		float fadeInStartVal);
-
-	std::vector<float> m_buffer;
-	bool m_allChanged;
-	std::set<size_t> m_changedData;
 };
 
 } // namespace lmms

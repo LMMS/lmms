@@ -135,41 +135,6 @@ protected:
 	const QColor m_selectionBoxColor = QColor(40, 255, 70);
 };
 
-class LMMS_EXPORT VectorGraphView : public GridView
-{
-public:
-	VectorGraphView(QWidget* parent, size_t cubeWidth, size_t cubeHeight);
-protected:
-	void paintEvent(QPaintEvent* pe) override;
-	void mousePressEvent(QMouseEvent* me) override;
-	void mouseMoveEvent(QMouseEvent* me) override;
-	void keyPressEvent(QKeyEvent* ke) override;
-	void wheelEvent(QWheelEvent* we) override;
-	std::pair<QPointF, QPointF> getBoundingBox(size_t index) const override;
-	std::pair<QPointF, QPointF> getOnClickSearchArea(QPointF clickedPos) const override;
-	std::set<size_t> getSelection(QPointF start, QPointF end) override;
-
-	//! returns getCount() if not found, else index
-	size_t selectOnClick(QPointF pos);
-
-	void selectionDeleteAction();
-	void selectionCopyAction();
-	void selectionPasteAction();
-	void selectionSwitchTypeAction(bool direction);
-private:
-	enum MouseAction
-	{
-		selectAction,
-		placeAction,
-		moveAction,
-		removeAction
-	};
-
-	MouseAction m_mouseAction;
-	const QColor m_pointColor = QColor(22, 150, 54);
-	const QColor m_lineColor = QColor(11, 213, 86);
-};
-
 } // namespace lmms::gui
 
 #endif // LMMS_GRID_VIEW_H
