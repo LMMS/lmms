@@ -145,7 +145,7 @@ public:
 
 	void setXOffset(const int x);
 
-	void addToolButtons(QToolBar* _tool_bar );
+	void addToolButtons(QToolBar* _tool_bar, bool addAutoScrolling = true, bool addLoopPoints = true, bool addStopBehavior = true);
 
 	inline int markerX( const TimePos & _t ) const
 	{
