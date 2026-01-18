@@ -5,6 +5,10 @@ if(NOT DEFINED ENV{VCPKG_ROOT})
 	return()
 endif()
 
+if(NOT DEFINED VCPKG_INSTALLED_DIR)
+	set(VCPKG_INSTALLED_DIR "${CMAKE_BINARY_DIR}/vcpkg_installed")
+endif()
+
 set(CMAKE_SYSTEM_NAME               Windows)
 set(CMAKE_SYSTEM_VERSION            1)
 
@@ -13,7 +17,11 @@ set(CMAKE_C_COMPILER      ${TOOLCHAIN_PREFIX}-gcc)
 set(CMAKE_CXX_COMPILER    ${TOOLCHAIN_PREFIX}-g++)
 set(CMAKE_RC_COMPILER     ${TOOLCHAIN_PREFIX}-windres)
 
-set(CMAKE_FIND_ROOT_PATH  /usr/${TOOLCHAIN_PREFIX})
+# Check for vcpkg packages first, then fall back on MinGW system packages
+set(CMAKE_FIND_ROOT_PATH
+	"${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}"
+	"/usr/${TOOLCHAIN_PREFIX}"
+)
 
 set(ENV{PKG_CONFIG}       /usr/bin/${TOOLCHAIN_PREFIX}-pkg-config)
 
