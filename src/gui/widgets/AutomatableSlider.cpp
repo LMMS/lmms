@@ -69,6 +69,13 @@ void AutomatableSlider::mousePressEvent( QMouseEvent * _me )
 	if( _me->button() == Qt::LeftButton &&
 	   ! ( _me->modifiers() & Qt::ControlModifier ) )
 	{
+		AutomatableModel* thisModel = model();
+		if (thisModel)
+		{
+			thisModel->addJournalCheckPoint();
+			thisModel->saveJournallingState(false);
+		}
+
 		m_showStatus = true;
 		QSlider::mousePressEvent( _me );
 	}
@@ -83,6 +90,12 @@ void AutomatableSlider::mousePressEvent( QMouseEvent * _me )
 
 void AutomatableSlider::mouseReleaseEvent( QMouseEvent * _me )
 {
+	AutomatableModel *thisModel = model();
+	if (thisModel)
+	{
+		thisModel->restoreJournallingState();
+	}
+    
 	m_showStatus = false;
 	QSlider::mouseReleaseEvent( _me );
 }
