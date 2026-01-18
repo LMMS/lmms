@@ -19,17 +19,23 @@ find_package_config_mode_with_fallback(serd serd::serd
 	PKG_CONFIG "serd-0"
 )
 
+# NOTE: The zix dependency was added in v0.24.22 of lilv
 find_package_config_mode_with_fallback(zix zix::zix
 	LIBRARY_NAMES "zix" "zix-0"
 	INCLUDE_NAMES "zix/zix.h"
 	PKG_CONFIG "zix-0"
 )
 
+set(_zix_target "")
+if(TARGET zix::zix)
+	set(_zix_target "zix::zix")
+endif()
+
 find_package_config_mode_with_fallback(sord sord::sord
 	LIBRARY_NAMES "sord" "sord-0"
 	INCLUDE_NAMES "sord/sord.h"
 	PKG_CONFIG "sord-0"
-	DEPENDS zix::zix serd::serd
+	DEPENDS ${_zix_target} serd::serd
 )
 
 find_package_config_mode_with_fallback(sratom sratom::sratom
@@ -43,8 +49,17 @@ find_package_config_mode_with_fallback(Lilv Lilv::lilv
 	LIBRARY_NAMES "lilv" "lilv-0"
 	INCLUDE_NAMES "lilv/lilv.h"
 	PKG_CONFIG "lilv-0"
-	DEPENDS lv2::lv2 serd::serd sord::sord sratom::sratom zix::zix
+	DEPENDS lv2::lv2 serd::serd sord::sord sratom::sratom ${_zix_target}
 )
+
+# Make sure zix is present for lilv >=0.24.22
+if("${Lilv_VERSION}" VERSION_GREATER_EQUAL "0.24.22")
+	if(NOT TARGET zix::zix)
+		unset(Lilv_LIBRARY)
+		unset(Lilv_INCLUDE_DIRS)
+		unset(Lilv_VERSION)
+	endif()
+endif()
 
 include(FindPackageHandleStandardArgs)
 
