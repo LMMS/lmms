@@ -29,11 +29,10 @@
 #include "WaveShaperControls.h"
 #include "embed.h"
 #include "FontHelper.h"
-#include "Graph.h"
-#include "GridView.h"
 #include "Knob.h"
 #include "PixmapButton.h"
 #include "LedCheckBox.h"
+#include "VectorGraphView.h"
 
 namespace lmms::gui
 {
@@ -48,21 +47,10 @@ WaveShaperControlDialog::WaveShaperControlDialog(
 	pal.setBrush( backgroundRole(),
 				PLUGIN_NAME::getIconPixmap( "artwork" ) );
 	setPalette( pal );
-	setFixedSize( 700, 700 );
-
-	auto waveGraph = new Graph(this, Graph::Style::LinearNonCyclic, 204, 205);
-	waveGraph -> move( 10, 6 );
-	waveGraph -> setModel( &_controls -> m_wavegraphModel );
-	waveGraph -> setAutoFillBackground( true );
-	pal = QPalette();
-	pal.setBrush( backgroundRole(),
-			PLUGIN_NAME::getIconPixmap("wavegraph") );
-	waveGraph->setPalette( pal );
-	waveGraph->setGraphColor( QColor( 85, 204, 145 ) );
-	waveGraph -> setMaximumSize( 204, 205 );
+	setFixedSize( 224, 274 );
 
 	auto vectorGraph = new VectorGraphView(this, 10, 10);
-	vectorGraph->move(10, 300);
+	vectorGraph->move(10, 6);
 	vectorGraph->setModel(&_controls->m_graphModel);
 	vectorGraph->setAutoFillBackground(true);
 

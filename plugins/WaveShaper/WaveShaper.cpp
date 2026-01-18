@@ -74,7 +74,8 @@ Effect::ProcessStatus WaveShaperEffect::processImpl(SampleFrame* buf, const fpp_
 	const float w = wetLevel();
 	float input = m_wsControls.m_inputModel.value();
 	float output = m_wsControls.m_outputModel.value();
-	const float * samples = m_wsControls.m_wavegraphModel.samples();
+	const auto sampleArray{m_wsControls.m_graphModel.getBuffer()};
+	assert(sampleArray.size() == 200);
 	const bool clip = m_wsControls.m_clipModel.value();
 
 	ValueBuffer *inputBuffer = m_wsControls.m_inputModel.valueBuffer();
@@ -111,15 +112,15 @@ Effect::ProcessStatus WaveShaperEffect::processImpl(SampleFrame* buf, const fpp_
 
 			if( lookup < 1 )
 			{
-				s[i] = frac * samples[0] * posneg;
+				s[i] = frac * sampleArray[0] * posneg;
 			}
 			else if( lookup < 200 )
 			{
-				s[i] = std::lerp(samples[lookup - 1], samples[lookup], frac) * posneg;
+				s[i] = std::lerp(sampleArray[lookup - 1], sampleArray[lookup], frac) * posneg;
 			}
 			else
 			{
-				s[i] *= samples[199];
+				s[i] *= sampleArray[199];
 			}
 		}
 
