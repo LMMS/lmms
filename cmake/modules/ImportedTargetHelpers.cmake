@@ -143,18 +143,18 @@ function(find_package_config_mode_with_fallback _fpcmwf_PACKAGE_NAME _fpcmwf_TAR
 		)
 
 		# Check if we succeeded in finding the package
-		set(_fpcmwf_is_valid_package FALSE)
+		set(_is_valid_package FALSE)
 		if(${_fpcmwf_HEADER_ONLY})
 			if(${_include_var})
-				set(_fpcmwf_is_valid_package TRUE)
+				set(_is_valid_package TRUE)
 			endif()
 		else()
 			if(${_library_var} AND ${_include_var})
-				set(_fpcmwf_is_valid_package TRUE)
+				set(_is_valid_package TRUE)
 			endif()
 		endif()
 
-		if(_fpcmwf_is_valid_package)
+		if(_is_valid_package)
 			# Create an imported target for the package
 			if(${_library_var})
 				add_library("${_fpcmwf_TARGET_NAME}" UNKNOWN IMPORTED)
