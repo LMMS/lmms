@@ -31,7 +31,7 @@ bool SfzParser::parseSfzFile(const QString& filePath, std::vector<SfzRegion>& ou
 	// This amounts to recursively loading and copy/pasting the contents of the other files where the #include is, and find/replacing the #define words with their values
 	fileContents = recursiveHandleIncludeAndDefineStatements(parentDirectory, fileContents);
 
-	qDebug().noquote() << "TESTING: Loaded SFZ:\n" << fileContents; // testing
+	qDebug().noquote() << "[SFZ Parser] DEBUG: Preprocessed SFZ file contents:\n" << fileContents; // testing
 
 	// Now that all the includes/defines are handled, loop through the whole contents and split it up into segments so that it can be parsed
 	// For example, if you have a sfz file like:
@@ -66,7 +66,7 @@ bool SfzParser::parseSfzFile(const QString& filePath, std::vector<SfzRegion>& ou
 		// We can start by splitting on whitespace, but then we will have to go back and group together any chunks which belong to the same opcode assignment, if for example the sample file included spaces
 		// For example, if we had the line:
 		//     <region> sample=My Favorite Sample.flac key=99
-		// Then it would initially by split into "<region>", "sample=My", "Favorite", "Sample.flac", and "key=99"
+		// Then it would initially be split into "<region>", "sample=My", "Favorite", "Sample.flac", and "key=99"
 		// However, we notice that "Favorite" and "Sample.flac" are not valid opcode assignments since they don't have an "=", and they're not headers, since you don't have those <brackets>
 		// So they must belong to the previous opcode assignment, "sample=My"
 		// If we connect them together, we get "<region>", "sample=My Favorite Sample.flac", and "key=99", just as we wanted!
@@ -98,42 +98,9 @@ bool SfzParser::parseSfzFile(const QString& filePath, std::vector<SfzRegion>& ou
 
 
 	// Now that all the segments are collected, we can go through them all and construct the SfzRegions
-	// First, the <global> header(s) must be found. The SFZ format website does not guarantee that <global> will
-	// be the first header, so we have to search through all the segments to find the globals before parsing any <region> headers
 
-	// Create a base opcode state list to keep track of which defaults are global
+	// Create a base opcode state list to keep track of which defaults are <global>
 	SfzOpcodeState globalState;
-
-	bool withinGlobal = false;
-	for (QString segment : parsedSegments)
-	{
-		// Track whether we are entering a <global> header region
-		if (segment.front() == "<" && segment.back() == ">")
-		{
-			if (segment == "<global>")
-			{
-				withinGlobal = true;
-			}
-			else
-			{
-				withinGlobal = false;
-			}
-			continue;
-		}
-
-		// If we are in <global>, update the global opcode state
-		if (withinGlobal)
-		{
-			// Opcodes are stored in name=value format, with no spaces, so splitting on the "=" always works
-			auto opcodeNameAndValue = segment.split("=");
-			if (opcodeNameAndValue.size() != 2) { qDebug() << "[SFZ Parser] Syntax error, could not parse opcode assignment:" << segment; return false; }
-			globalState.setOpcodeByStrings(opcodeNameAndValue[0], opcodeNameAndValue[1]);
-		}
-	}
-
-	// Now that all the global opcode defaults have been parsed, we can start stepping through the file again and
-	// parsing all the <region>s into SfzRegion objects
-
 	// Regions can be within <group>s, which can define default opcodes for all the regions inside them
 	// Keep track of the current group and region states. These will be re-initialized to whatever the global/group settings are, once we encounter a new group or region header
 	SfzOpcodeState currentGroupState = globalState;
@@ -152,7 +119,9 @@ bool SfzParser::parseSfzFile(const QString& filePath, std::vector<SfzRegion>& ou
 			if (segment == "<global>")
 			{
 				currentHeader = Header::Global;
-				// Don't do anything special; we already handled the globals above
+				// If we are entering a new global header, reset the current global settings
+				// TODO is this correct?
+				globalState = SfzOpcodeState();
 			}
 			else if (segment == "<group>")
 			{
@@ -191,13 +160,13 @@ bool SfzParser::parseSfzFile(const QString& filePath, std::vector<SfzRegion>& ou
 		{
 			case Header::Global:
 			{
-				// Do nothing. The global headers were already handled above
-				// TODO this is wrong, some sfz's treat global headers as local, expecting that one after another will overwrite the last
+				// If we are in the global header, update the opcodes of the global state, which will propagate down to any groups or regions after it
+				globalState.setOpcodeByStrings(opcodeNameAndValue[0], opcodeNameAndValue[1]);
 				break;
 			}
 			case Header::Group:
 			{
-				// If we are in a group, update the opcodes of the current group state
+				// If we are in a group, update the opcodes of the current group state, which will propagate to any regions below it
 				currentGroupState.setOpcodeByStrings(opcodeNameAndValue[0], opcodeNameAndValue[1]);
 				break;
 			}
@@ -226,7 +195,7 @@ bool SfzParser::parseSfzFile(const QString& filePath, std::vector<SfzRegion>& ou
 				return false;
 			}
 		}
-		// For the GUI, it's nice to keep track of which midi CC's are being used, and only display those (not all 128)
+		// For the GUI, it's nice to keep track of which midi CC's are being used, and only display those (instead of all 128)
 		// This is a bit hacky, but just checking if the opcode has "ccN" inside it and parsing that number works fine
 		QRegularExpression re("cc\\d+");
 		QRegularExpressionMatch match = re.match(opcodeNameAndValue[0]);

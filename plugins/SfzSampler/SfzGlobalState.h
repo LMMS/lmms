@@ -18,12 +18,16 @@ public:
 	//! Handles updating the last played keys and keeps track of which keys are currently being pressed
 	void processTrigger(const SfzTrigger& trigger);
 
+	//! Handles updating m_lastPlayedSwitchKeys whenever a key defined by sw_last is pressed
+	void switchKeyPressed(const int key);
+
 	// Returns the midi key number of the last pressed key in the range [lowKey, highKey].
+	// If switchKeysOnly is true, it uses the m_lastPlayedSwitchKeys array which only tracks when valid switch keys have been pressed, not just any key.
 	// If no keys have been pressed yet, it returns defaultKey.
 	// If the key range is invalid, it returns defaultKey
 	// If no default key was given, it returns std::nullopt
 	// TODO add unit tests
-	std::optional<int> lastKeyPressedInRange(int lowKey, int highKey, const std::optional<int> defaultKey) const;
+	std::optional<int> lastKeyPressedInRange(int lowKey, int highKey, const std::optional<int> defaultKey, bool switchKeysOnly = false) const;
 
 	//! Returns the current value of the given midi CC knob/controller, or the default value if we haven't recieved any midi CC signals for it yet.
 	int midiCCValue(const int index) const { return m_ccValues.at(index); }
@@ -36,6 +40,8 @@ private:
 	//! The first key played gets a 1, the second key gets a 2, etc, overwriting when keys are played multiple times.
 	//! By finding the maximum number in a range, you can find the last played key
 	std::array<std::optional<int>, 128> m_lastPlayedKeys = {};
+	//! Same as above but only for switch keys (ones defined by sw_last)
+	std::array<std::optional<int>, 128> m_lastPlayedSwitchKeys = {};
 	//! Consequently, we also have to track how many keys have been played so far
 	unsigned long m_keyPressCounter = 0;
 

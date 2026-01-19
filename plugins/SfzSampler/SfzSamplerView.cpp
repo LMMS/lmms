@@ -118,14 +118,16 @@ void SfzSamplerView::onFileLoaded()
 	QStringList switchKeyLabels;
 	for (const auto& [key, info] : m_instrument->m_controlsConfig.m_switchKeyInfo)
 	{
-		switchKeyLabels.push_back(
-			QString("- %1 %2 [range: %3 - %4] default: %5")
-				.arg(SfzOpcodeState::keyNumToString(key))
-				.arg(info.sw_label)
-				.arg(SfzOpcodeState::keyNumToString(info.sw_lokey))
-				.arg(SfzOpcodeState::keyNumToString(info.sw_hikey))
-				.arg(SfzOpcodeState::keyNumToString(info.sw_default.value()))
-		);
+		QString label = QString("- %1 %2 [range: %3 - %4]")
+			.arg(SfzOpcodeState::keyNumToString(key))
+			.arg(info.sw_label)
+			.arg(SfzOpcodeState::keyNumToString(info.sw_lokey))
+			.arg(SfzOpcodeState::keyNumToString(info.sw_hikey));
+		if (info.sw_default != std::nullopt)
+		{
+			label += QString(" default: %1").arg(SfzOpcodeState::keyNumToString(info.sw_default.value()));
+		}
+		switchKeyLabels.push_back(label);
 	}
 	if (switchKeyLabels.size() > 0)
 	{

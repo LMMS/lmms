@@ -27,7 +27,7 @@ public:
 
 	//! Handles spawning a new sound if the all the conditions are met
 	//! Also handles sending the trigger to the currently active sounds, in case they need to deactivate/release (such as on NoteOff)
-	void processTrigger(const SfzGlobalState& globalState, const SfzTrigger& trigger);
+	void processTrigger(SfzGlobalState& globalState, const SfzTrigger& trigger);
 
 	//! Renders sound from each of the active SfzRegionPlayStates and writes it to the given buffer
 	//! Returns true if any sound was actually generated

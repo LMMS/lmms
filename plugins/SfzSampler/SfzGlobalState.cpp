@@ -1,6 +1,8 @@
 
 
 #include "SfzGlobalState.h"
+#include <QDebug>
+#include <iostream>
 
 namespace lmms
 {
@@ -23,8 +25,15 @@ void SfzGlobalState::processTrigger(const SfzTrigger& trigger)
 	}
 }
 
-std::optional<int> SfzGlobalState::lastKeyPressedInRange(int lowKey, int highKey, const std::optional<int> defaultKey) const
+void SfzGlobalState::switchKeyPressed(const int key)
 {
+	// Assuming the m_keyPressCounter was already updated in processTrigger
+	m_lastPlayedSwitchKeys.at(key) = m_keyPressCounter;
+}
+
+std::optional<int> SfzGlobalState::lastKeyPressedInRange(int lowKey, int highKey, const std::optional<int> defaultKey, bool switchKeysOnly) const
+{
+	auto& lastKeyPressArray = switchKeysOnly ? m_lastPlayedSwitchKeys : m_lastPlayedKeys;
 	// Some SFZs pass -1 as the lokey, so make sure to clamp it into the range 0-127 before accessing the array to prevent out of range errors
 	lowKey = std::max(lowKey, 0);
 	highKey = std::min(highKey, 127);
@@ -36,12 +45,12 @@ std::optional<int> SfzGlobalState::lastKeyPressedInRange(int lowKey, int highKey
 
 	for (int key = lowKey; key <= highKey; ++key)
 	{
-		if (m_lastPlayedKeys.at(key) == std::nullopt) { continue; } // This key has not been played yet
+		if (lastKeyPressArray.at(key) == std::nullopt) { continue; } // This key has not been played yet
 	
-		if (bestScore == std::nullopt || m_lastPlayedKeys.at(key) > bestScore)
+		if (bestScore == std::nullopt || lastKeyPressArray.at(key) > bestScore)
 		{
 			lastPlayedKey = key;
-			bestScore = m_lastPlayedKeys.at(key);
+			bestScore = lastKeyPressArray.at(key);
 		}
 	}
 	// If no keys in the region have been played yet, return the default key

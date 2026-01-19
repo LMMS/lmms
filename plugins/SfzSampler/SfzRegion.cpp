@@ -34,9 +34,10 @@ bool SfzRegion::triggerConditionsMet(const SfzGlobalState& globalState, const Sf
 		// And had velocity between `lovel` and `hivel` opcodes
 		if (triggerVelocity > m_hivel || triggerVelocity < m_lovel) { return false; }
 
-		// If a keyswitch range was defined, ensure the last pressed key in that range matches the specified keyswitch for this region
+		// If a keyswitch range was defined, ensure the last pressed valid switch key in that range matches the specified keyswitch for this region
+		// The argument `true` at the end signifies that only switch keys will be considered
 		// TODO add unit tests
-		if (m_sw_last != std::nullopt && globalState.lastKeyPressedInRange(m_sw_lokey, m_sw_hikey, m_sw_default) != m_sw_last) { return false; }
+		if (m_sw_last != std::nullopt && globalState.lastKeyPressedInRange(m_sw_lokey, m_sw_hikey, m_sw_default, true) != m_sw_last) { return false; }
 
 		// If midi CC ranges are defined, make sure the current CC values are within range
 		for (int i = 0; i < SfzOpcodeState::NumMidiCCs; ++i)
@@ -55,8 +56,14 @@ bool SfzRegion::triggerConditionsMet(const SfzGlobalState& globalState, const Sf
 	return false;
 }
 
-void SfzRegion::processTrigger(const SfzGlobalState& globalState, const SfzTrigger& trigger)
+void SfzRegion::processTrigger(SfzGlobalState& globalState, const SfzTrigger& trigger)
 {
+	// Notify the global state whether a switch key has been pressed, so that it can correctly track when `sw_last` is met
+	if (trigger.type() == SfzTrigger::Type::NoteOn && m_sw_last != std::nullopt && m_sw_last == trigger.key().value())
+	{
+		globalState.switchKeyPressed(trigger.key().value());
+	}
+
 	// Before spawning an sounds, real quick do some pre-calculation of the midi CC modulation amounts so that we don't have to do it every buffer
 	if (trigger.type() == SfzTrigger::Type::ControlChange)
 	{
@@ -66,6 +73,7 @@ void SfzRegion::processTrigger(const SfzGlobalState& globalState, const SfzTrigg
 	// If the trigger conditions are met, spawn a new sound
 	if (triggerConditionsMet(globalState, trigger))
 	{
+		qDebug() << "Spawning sound!" << m_sampleFile.value_or("N/A");
 		// Loop through array to find open position
 		bool foundOpenPosition = false;
 		for (size_t i = 0; i <= m_activeSounds.size(); ++i)
