@@ -66,7 +66,6 @@ public:
 	const std::vector<float>& getBuffer();
 	std::vector<float>& getBufferRef();
 	void setRenderSize(size_t newSize);
-	void clear() { clearPairs(); }
 
 	void saveSettings(QDomDocument& doc, QDomElement& element, const QString& name);
 	void loadSettings(const QDomElement& element, const QString& name);
@@ -74,6 +73,10 @@ public:
 	{
 		return "vectorgraphmodel";
 	}
+
+	void clear();
+	QString getPointsBase64(float xOffset, float yOffset, const std::set<size_t>* selection = nullptr);
+	void addPointsBase64(QString base64String, float xOffset, float yOffset);
 protected:
 	void dataChangedAt(ssize_t index) override;
 

@@ -343,8 +343,7 @@ void VectorGraphModel::saveSettings(QDomDocument& doc, QDomElement& element, con
 {
 	QDomElement me = doc.createElement(name);
 	{
-		std::lock_guard<std::mutex> lock(m_setAndBufferMutex);
-		me.setAttribute("graphPoints", dataToBase64(nullptr));
+		me.setAttribute("graphPoints", getPointsBase64(0.0f, 0.0f, nullptr));
 	}
 	element.appendChild(me);
 }
@@ -373,9 +372,8 @@ void VectorGraphModel::loadSettings(const QDomElement& element, const QString& n
 		QDomElement nodeElement = node.toElement();
 		if (nodeElement.hasAttribute("graphPoints"))
 		{
-			std::lock_guard<std::mutex> lock(m_setAndBufferMutex);
 			clear();
-			addBase64Data(nodeElement.attribute("graphPoints"));
+			addPointsBase64(nodeElement.attribute("graphPoints"), 0.0f, 0.0f);
 		}
 	}
 }
@@ -386,6 +384,21 @@ void VectorGraphModel::saveSettings(QDomDocument& doc, QDomElement& element)
 void VectorGraphModel::loadSettings(const QDomElement& element)
 {
 	loadSettings(element, "VectorGraphModel");
+}
+QString VectorGraphModel::getPointsBase64(float xOffset, float yOffset, const std::set<size_t>* selection)
+{
+	std::lock_guard<std::mutex> lock(m_setAndBufferMutex);
+	return dataToBase64(xOffset, yOffset, selection);
+}
+void VectorGraphModel::addPointsBase64(QString base64String, float xOffset, float yOffset)
+{
+	std::lock_guard<std::mutex> lock(m_setAndBufferMutex);
+	addBase64Data(base64String, xOffset, yOffset);
+}
+void VectorGraphModel::clear()
+{
+	std::lock_guard<std::mutex> lock(m_setAndBufferMutex);
+	clearPairs();
 }
 
 } // namespace lmms

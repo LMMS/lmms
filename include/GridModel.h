@@ -171,7 +171,7 @@ public:
 	}
 protected:
 	// save mechanism:
-	QString dataToBase64(const std::set<size_t>* selection = nullptr)
+	QString dataToBase64(float xOffset, float yOffset, const std::set<size_t>* selection = nullptr)
 	{
 		std::vector<TrueDataPair> dataArray{};
 		if (selection == nullptr || selection->empty())
@@ -179,8 +179,9 @@ protected:
 			dataArray.reserve(getCount());
 			for (size_t i = 0; i < getCount(); ++i)
 			{
-				dataArray.push_back(
-					TrueDataPair{getItem(i).info, customDataToSaveData(getObject(i))});
+				dataArray.push_back(TrueDataPair{
+					GridModel::ItemInfo{getItem(i).info.x + xOffset, getItem(i).info.y + yOffset},
+					customDataToSaveData(getObject(i))});
 			}
 		}
 		else
@@ -188,8 +189,9 @@ protected:
 			dataArray.reserve(selection->size());
 			for (size_t i : *selection)
 			{
-				dataArray.push_back(
-					TrueDataPair{getItem(i).info, customDataToSaveData(getObject(i))});
+				dataArray.push_back(TrueDataPair{
+					GridModel::ItemInfo{getItem(i).info.x + xOffset, getItem(i).info.y + yOffset},
+					customDataToSaveData(getObject(i))});
 			}
 		}
 		QString output{};
@@ -197,7 +199,7 @@ protected:
 			dataArray.size() * sizeof(TrueDataPair), output);
 		return output;
 	}
-	void addBase64Data(QString base64String)
+	void addBase64Data(QString base64String, float xOffset, float yOffset)
 	{
 		int size = 0;
 		TrueDataPair* startPtr = nullptr;
@@ -205,7 +207,7 @@ protected:
 		TrueDataPair* ptr{startPtr};
 		for (int i = 0; i < size; i += sizeof(TrueDataPair))
 		{
-			addItem(saveDataToCustomData(ptr->data), ptr->info);
+			addItem(saveDataToCustomData(ptr->data), GridModel::ItemInfo{ptr->info.x + xOffset, ptr->info.y + yOffset});
 			++ptr;
 		}
 		delete[] startPtr;

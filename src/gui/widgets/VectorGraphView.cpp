@@ -28,6 +28,9 @@
 #include <QPainter>
 #include <QWheelEvent>
 
+#include "Clipboard.h"
+#include "StringPairDrag.h"
+
 namespace lmms::gui
 {
 
@@ -58,7 +61,6 @@ void VectorGraphView::paintEvent(QPaintEvent* pe)
 	QPainter painter(this);
 	drawGrid(painter);
 
-
 	QPen lightPen{m_pointColor};
 	lightPen.setWidth(2);
 	QPen darkPen{m_backgroundColor};
@@ -68,11 +70,10 @@ void VectorGraphView::paintEvent(QPaintEvent* pe)
 	painter.setBrush(QBrush(m_pointColor, Qt::NoBrush));
 
 	painter.setRenderHints(QPainter::Antialiasing, true);
-	auto graphModel{castModel<VectorGraphModel>()};
 	for (size_t i = 0; i < model()->getCount(); ++i)
 	{
 		auto curXY{toViewCoords(QPointF{model()->getItem(i).info.x, model()->getItem(i).info.y})};
-		if (graphModel->getObject(i).type == VGPoint::Type::attribute)
+		if (model()->getObject(i).type == VGPoint::Type::attribute)
 		{
 			painter.setPen(darkPen);
 			painter.setBrush(QBrush(m_pointColor, Qt::SolidPattern));
@@ -86,14 +87,14 @@ void VectorGraphView::paintEvent(QPaintEvent* pe)
 		}
 	}
 
-	const std::vector<float>& buffer{graphModel->getBuffer()};
+	const std::vector<float>& buffer{model()->getBuffer()};
 	if (buffer.size() > 0)
 	{
 		painter.setPen(m_lineColor);
 		QPoint oldPos{toViewCoords(0.0f, buffer[0])};
 		for (size_t i = 1; i < buffer.size(); ++i)
 		{
-			QPoint curPos{toViewCoords(static_cast<float>(i * graphModel->getLength()) / buffer.size(), buffer[i])};
+			QPoint curPos{toViewCoords(static_cast<float>(i * model()->getLength()) / buffer.size(), buffer[i])};
 			if (curPos.x() != oldPos.x())
 			{
 				painter.drawLine(oldPos.x(), oldPos.y(), curPos.x(), curPos.y());
@@ -114,8 +115,6 @@ void VectorGraphView::mousePressEvent(QMouseEvent* me)
 	const auto mousePos{me->pos()};
 	QPointF modelPos(toModelCoords(mousePos));
 
-	auto graphModel{castModel<VectorGraphModel>()};
-
 	m_isSelectionPressed = false;
 	if (me->button() == Qt::LeftButton)
 	{
@@ -134,7 +133,7 @@ void VectorGraphView::mousePressEvent(QMouseEvent* me)
 			if (foundIndex >= model()->getCount())
 			{
 				// place if not found
-				foundIndex = graphModel->addItem(VGPoint{VGPoint::Type::bezier},
+				foundIndex = model()->addItem(VGPoint{VGPoint::Type::bezier},
 					GridModel::ItemInfo(modelPos.x(), modelPos.y()));
 				auto bb{getBoundingBox(foundIndex)};
 				GridView::containSelection(bb.first, bb.second);
@@ -164,7 +163,7 @@ void VectorGraphView::mousePressEvent(QMouseEvent* me)
 		size_t foundIndex(GridView::getClickedItem(modelPos));
 		if (foundIndex < model()->getCount())
 		{
-			graphModel->removeItem(foundIndex);
+			model()->removeItem(foundIndex);
 		}
 		me->accept();
 	}
@@ -199,12 +198,16 @@ void VectorGraphView::keyPressEvent(QKeyEvent* ke)
 				ke->accept();
 				break;
 			case Qt::Key_C:
+				selectionCopyAction();
 				ke->accept();
 				break;
 			case Qt::Key_V:
+				selectionPasteAction();
 				ke->accept();
 				break;
 			case Qt::Key_X:
+				selectionCopyAction();
+				selectionDeleteAction();
 				ke->accept();
 				break;
 			case Qt::Key_A:
@@ -238,8 +241,6 @@ void VectorGraphView::mouseMoveEvent(QMouseEvent* me)
 	const auto mousePos{me->pos()};
 	QPointF modelPos(toModelCoords(mousePos));
 
-	auto graphModel{castModel<VectorGraphModel>()};
-
 	switch (m_mouseAction)
 	{
 		case VectorGraphView::MouseAction::selectAction:
@@ -266,7 +267,7 @@ void VectorGraphView::mouseMoveEvent(QMouseEvent* me)
 			size_t foundIndex(GridView::getClickedItem(modelPos));
 			if (foundIndex < model()->getCount())
 			{
-				graphModel->removeItem(foundIndex);
+				model()->removeItem(foundIndex);
 			}
 			me->accept();
 			break;
@@ -298,33 +299,41 @@ void VectorGraphView::wheelEvent(QWheelEvent* we)
 }
 void VectorGraphView::selectionDeleteAction()
 {
-	auto graphModel{castModel<VectorGraphModel>()};
-
 	GridView::updateSelection();
 	for (auto it = m_selection.rbegin(); it != m_selection.rend(); it = m_selection.rbegin())
 	{
-		graphModel->removeItem(*it);
+		model()->removeItem(*it);
 		m_selection.erase(*it);
 	}
 }
 void VectorGraphView::selectionCopyAction()
 {
+	GridView::updateSelection();
+	Clipboard::copyStringPair("VectorGraphData", model()->getPointsBase64(-m_selectStart.x(), -m_selectEnd.y(), &m_selection));
 }
 void VectorGraphView::selectionPasteAction()
 {
+	GridView::updateSelection();
+	const QMimeData* mimeData{Clipboard::getMimeData()};
+	if (mimeData->hasFormat(Clipboard::mimeType(Clipboard::MimeType::StringPair)) == false) { return; }
+
+	QString type = Clipboard::decodeKey(mimeData);
+	QString value = Clipboard::decodeValue(mimeData);
+	if (type == "VectorGraphData")
+	{
+		model()->addPointsBase64(value, m_cursorPos.x(), m_cursorPos.y());
+	}
 }
 void VectorGraphView::selectionSwitchTypeAction(bool direction)
 {
-	auto graphModel{castModel<VectorGraphModel>()};
-
 	GridView::updateSelection();
 	for (auto it = m_selection.begin(); it != m_selection.end(); ++it)
 	{
-		VGPoint point{graphModel->getObject(*it)};
+		VGPoint point{model()->getObject(*it)};
 		int nextType{direction ? point.type + 1 : point.type - 1};
 		if (nextType < 0) { nextType = VGPoint::Type::steps; }
 		if (nextType == VGPoint::Type::count) { nextType = VGPoint::Type::bezier; }
-		graphModel->setObject(*it, VGPoint{static_cast<VGPoint::Type>(nextType)});
+		model()->setObject(*it, VGPoint{static_cast<VGPoint::Type>(nextType)});
 	}
 }
 

@@ -30,6 +30,9 @@
 #include <QPainter>
 #include <QWheelEvent>
 
+#include "Engine.h"
+#include "Song.h"
+
 namespace lmms::gui
 {
 
@@ -377,6 +380,7 @@ void GridView::modelChanged()
 
 void GridView::updateGrid()
 {
+	Engine::getSong()->setModified();
 	update();
 }
 
