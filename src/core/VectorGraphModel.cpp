@@ -66,7 +66,7 @@ void VectorGraphModel::renderChangedPoints()
 	std::lock_guard<std::mutex> lock(m_setAndBufferMutex);
 	renderStart(m_buffer);
 
-	ssize_t lastNotAttributeIndex{-1};
+	signed long long lastNotAttributeIndex{-1};
 	size_t updatedTo{0};
 	for (size_t i : m_changedData)
 	{
@@ -84,7 +84,7 @@ void VectorGraphModel::renderChangedPoints()
 		}
 
 		// render line segment before i
-		if (lastNotAttributeIndex >= static_cast<ssize_t>(updatedTo))
+		if (lastNotAttributeIndex >= static_cast<signed long long>(updatedTo))
 		{
 			renderAfter(static_cast<size_t>(lastNotAttributeIndex), m_buffer, &updatedTo);
 		}
@@ -245,7 +245,7 @@ void VectorGraphModel::setRenderSize(size_t newSize)
 		m_allChanged = true;
 	}
 }
-void VectorGraphModel::dataChangedAt(ssize_t index)
+void VectorGraphModel::dataChangedAt(GridModel::signedSize index)
 {
 	if (index < 0)
 	{

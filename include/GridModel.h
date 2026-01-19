@@ -26,6 +26,7 @@
 #define LMMS_GRID_MODEl_H
 
 #include <set>
+#include <stddef.h>
 #include <vector>
 
 #include "base64.h"
@@ -50,6 +51,7 @@ class LMMS_EXPORT GridModel : public Model
 {
 Q_OBJECT
 public:
+	using signedSize = signed long long;
 	struct ItemInfo
 	{
 		float x;
@@ -87,7 +89,7 @@ public:
 protected:
 	GridModel(unsigned int length, unsigned int height, unsigned int horizontalSteps, unsigned int verticalSteps,
 		Model* parent, QString displayName, bool defaultConstructed);
-	virtual void dataChangedAt(ssize_t index) {}
+	virtual void dataChangedAt(signedSize index) {}
 
 	//! @return index where added
 	size_t addItem(Item itemIn);

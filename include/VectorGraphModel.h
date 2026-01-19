@@ -78,7 +78,7 @@ public:
 	QString getPointsBase64(float xOffset, float yOffset, const std::set<size_t>* selection = nullptr);
 	void addPointsBase64(QString base64String, float xOffset, float yOffset);
 protected:
-	void dataChangedAt(ssize_t index) override;
+	void dataChangedAt(signedSize index) override;
 
 	void saveSettings(QDomDocument& doc, QDomElement& element) override;
 	void loadSettings(const QDomElement& element) override;
