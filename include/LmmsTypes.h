@@ -47,7 +47,8 @@ using ch_cnt_t      = std::uint8_t;  // channel-count (0-DEFAULT_CHANNELS)
 using bpm_t         = std::uint16_t; // tempo (MIN_BPM to MAX_BPM)
 using bitrate_t     = std::uint16_t; // bitrate in kbps
 using mix_ch_t      = std::uint16_t; // Mixer-channel (0 to MAX_CHANNEL)
-using track_ch_t    = std::uint16_t; // track channel index/count (0-256)
+using bus_cnt_t     = std::uint8_t;  // bus index/count (0-MaxBussesPerTrack)
+using track_ch_t    = std::uint16_t; // track channel index/count (0-MaxTrackChannels)
 using proc_ch_t     = std::uint16_t; // audio processor channel index/count
 
 using jo_id_t       = std::uint32_t; // (unique) ID of a journalling object
