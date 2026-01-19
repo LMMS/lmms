@@ -95,20 +95,4 @@ void WaveShaperControls::resetClicked()
 	Engine::getSong()->setModified();
 }
 
-void WaveShaperControls::smoothClicked()
-{
-	Engine::getSong()->setModified();
-}
-
-void WaveShaperControls::addOneClicked()
-{
-	Engine::getSong()->setModified();
-}
-
-void WaveShaperControls::subOneClicked()
-{
-	Engine::getSong()->setModified();
-}
-
-
 } // namespace lmms

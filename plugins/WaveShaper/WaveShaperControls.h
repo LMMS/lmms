@@ -66,10 +66,6 @@ public:
 
 private slots:
 	void resetClicked();
-	void smoothClicked();
-
-	void addOneClicked();
-	void subOneClicked();
 
 private:
 	WaveShaperEffect * m_effect;
