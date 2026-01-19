@@ -474,7 +474,7 @@ void PatchesDialog::diffSelectProgRow(int offset)
 	int newRow = curRow + offset;
 	int rowCount = m_progListView->model()->rowCount();
 	newRow = qBound(0, newRow, rowCount - 1);
-	
+
 	selectionModel->setCurrentIndex(m_progListView->model()->index(newRow, 0),
 		QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
 	m_progListView->scrollTo(m_progListView->model()->index(newRow, 0));
