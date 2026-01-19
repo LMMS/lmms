@@ -1429,7 +1429,7 @@ void MainWindow::onExportProjectMidi()
 void MainWindow::exportProject(bool multiExport)
 {
 	const auto projectFileName = Engine::getSong()->projectFileName();
-	auto efd = FileDialog{getGUI()->mainWindow()};
+	auto efd = FileDialog{this};
 
 	if (multiExport)
 	{
@@ -1440,7 +1440,7 @@ void MainWindow::exportProject(bool multiExport)
 
 		if (efd.exec() == QDialog::Accepted)
 		{
-			auto epd = ExportProjectDialog{efd.selectedFiles()[0], getGUI()->mainWindow(), multiExport};
+			auto epd = ExportProjectDialog{efd.selectedFiles()[0], this, multiExport};
 			epd.exec();
 		}
 	}
@@ -1494,7 +1494,7 @@ void MainWindow::exportProject(bool multiExport)
 				}
 			}
 
-			auto epd = ExportProjectDialog{exportFileName, getGUI()->mainWindow(), multiExport};
+			auto epd = ExportProjectDialog{exportFileName, this, multiExport};
 			epd.exec();
 		}
 	}
