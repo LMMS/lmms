@@ -1462,39 +1462,29 @@ void MainWindow::exportProject(bool multiExport)
 		for (const auto& device : ProjectRenderer::fileEncodeDevices)
 		{
 			if (!device.isAvailable()) { continue; }
-			types << tr(device.m_description);
+			types << device.m_description;
 		}
 
 		efd.setFileMode(FileDialog::AnyFile);
 		efd.setAcceptMode(FileDialog::AcceptSave);
 		efd.setNameFilters(types);
 		efd.setWindowTitle(tr("Select file for project-export..."));
+		efd.setDefaultSuffix(ProjectRenderer::fileEncodeDevices[0].m_extension);
+
+		connect(&efd, &FileDialog::filterSelected, [&efd](const QString& filter) {
+			for (const auto& device : ProjectRenderer::fileEncodeDevices)
+			{
+				if (QString::compare(device.m_description, filter) == 0)
+				{
+					efd.setDefaultSuffix(device.m_extension);
+					break;
+				}
+			}
+		});
 
 		if (efd.exec() == QDialog::Accepted)
 		{
-			auto exportFileName = efd.selectedFiles()[0];
-
-			// If the file name has no extension, we use the extension from the selected name filter
-			if (QFileInfo{exportFileName}.suffix().isEmpty())
-			{
-				const auto selectedNameFilter = efd.selectedNameFilter();
-				for (const auto& device : ProjectRenderer::fileEncodeDevices)
-				{
-					if (QString::compare(tr(device.m_description), selectedNameFilter) != 0) { continue; }
-					exportFileName += device.m_extension;
-					break;
-				}
-
-				// The file with the extension from the name filter might exist, so ask the user if they want to replace
-				// it and back out if they do not
-				if (QFile::exists(exportFileName)
-					&& !VersionedSaveDialog::fileExistsQuery(exportFileName, tr("Save project")))
-				{
-					return;
-				}
-			}
-
-			auto epd = ExportProjectDialog{exportFileName, this, multiExport};
+			auto epd = ExportProjectDialog{efd.selectedFiles()[0], this, multiExport};
 			epd.exec();
 		}
 	}
