@@ -62,12 +62,12 @@ public:
 		setUnit(txt_after);
 	}
 
-	inline bool isVolumeKnob() const
+	bool isVolumeKnob() const
 	{
 		return m_volumeKnob;
 	}	
 
-	inline void setVolumeKnob( const bool val )
+	void setVolumeKnob(const bool val)
 	{
 		m_volumeKnob = val;
 	}
