@@ -40,9 +40,9 @@ static const unsigned int GRID_MAX_STEPS = 100000;
 /* This class handles
 	1. grid's size
 	2. storing and pairing `ItemInfo` to custom data
-	3. getting `ItemInfo` custom data pairs
-	4. saving `ItemInfo` with paired custom data
-	5. changes in `ItemInfo` (position changes)
+	3. getting `ItemInfo` and pairing information
+	4. position changes and quantization
+	5. grid size
 	This class doesn't handle
 	1. constructing, storing, interacting or removing custom data in any way
 */
