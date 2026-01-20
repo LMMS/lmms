@@ -160,6 +160,8 @@ void SfzRegion::recalculateTotalCCModulation(const SfzGlobalState& globalState)
 	m_ampeg_decay_totalCC = totalCCModulation(m_ampeg_decay_oncc, globalState);
 	m_ampeg_sustain_totalCC = totalCCModulation(m_ampeg_sustain_oncc, globalState);
 	m_ampeg_release_totalCC = totalCCModulation(m_ampeg_release_oncc, globalState);
+
+	m_gain_totalCC = totalCCModulation(m_gain_oncc, globalState);
 	// TODO more
 }
 

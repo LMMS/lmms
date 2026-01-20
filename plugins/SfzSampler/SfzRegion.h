@@ -71,6 +71,8 @@ private:
 	float m_ampeg_sustain_totalCC = 0.0f;
 	float m_ampeg_release_totalCC = 0.0f;
 
+	float m_gain_totalCC = 0.0f;
+
 	//! Helper function to calculate the total modulation of all midi CC controllers on a parameter. Essentially it just multiplies the modulation amounts by the current CC values and adds it all up.
 	float totalCCModulation(const std::array<float, SfzOpcodeState::NumMidiCCs>& ccModulationAmounts, const SfzGlobalState& globalState) const;
 	void recalculateTotalCCModulation(const SfzGlobalState& globalState);

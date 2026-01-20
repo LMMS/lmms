@@ -156,7 +156,7 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const fpp_t frames)
 		: (1.0f - normalizedVelocity) * (m_region->m_amp_veltrack / -100) + 1.0f * (1.0f - m_region->m_amp_veltrack / -100);
 
 	// Amplitude due to volume/gain
-	const float ampVolume = dbfsToAmp(m_region->m_volume);
+	const float ampVolume = dbfsToAmp(m_region->m_volume + m_region->m_gain_totalCC);
 
 	// Panning
 	const float pan = m_region->m_pan / 100;
