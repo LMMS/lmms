@@ -56,6 +56,10 @@ private:
 
 	float m_gain_totalCC = 0.0f;
 
+	//! When checking whether all the current CC values fall between loccN and hiccN, it's useful to only check the ones where lo/hiccN is actually defined, not all 128
+	//! This vector stores a list of which CC numbers have lo/hiccN opcodes in this region
+	std::vector<int> m_lohiccDefinedCCNumbers;
+
 	//! Helper function to calculate the total modulation of all midi CC controllers on a parameter. Essentially it just multiplies the modulation amounts by the current CC values and adds it all up.
 	float totalCCModulation(const std::array<float, SfzOpcodeState::NumMidiCCs>& ccModulationAmounts, const SfzGlobalState& globalState) const;
 	void recalculateTotalCCModulation(const SfzGlobalState& globalState);

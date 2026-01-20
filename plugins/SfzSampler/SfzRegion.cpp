@@ -19,6 +19,12 @@ SfzRegion::SfzRegion(SfzOpcodeState opcodeState)
 	: SfzOpcodeState(opcodeState)
 {
 	recalculateTotalCCModulation(SfzGlobalState()); // The region objects don't currently have direct access to the global state, so pass in a blank object just to reset the CC modulations to their defaults.
+
+	// Cache which loccN/hiccN opcodes are defined in this region, so that we only have to loop through and check those upon a trigger, not all 128
+	for (int i = 0; i < SfzOpcodeState::NumMidiCCs; ++i)
+	{
+		if (m_locc.at(i) != 0 || m_hicc.at(i) != 127) { m_lohiccDefinedCCNumbers.push_back(i); }
+	}
 }
 
 bool SfzRegion::triggerConditionsMet(const SfzGlobalState& globalState, const SfzTrigger& trigger)
@@ -48,7 +54,8 @@ bool SfzRegion::triggerConditionsMet(const SfzGlobalState& globalState, const Sf
 	}
 
 	// If midi CC ranges are defined, make sure the current CC values are within range
-	for (int i = 0; i < SfzOpcodeState::NumMidiCCs; ++i)
+	// Only loop over the CC's which have lo/hiccN defined, instead of checking all 128 every time
+	for (const int i : m_lohiccDefinedCCNumbers)
 	{
 		const int ccValue = globalState.midiCCValue(i);
 		if (ccValue > m_hicc.at(i) || ccValue < m_locc.at(i)) { return false; }
@@ -67,7 +74,7 @@ void SfzRegion::processTrigger(SfzGlobalState& globalState, const SfzTrigger& tr
 	// Notify the global state whether a switch key has been pressed, so that it can correctly track when `sw_last` is met
 	if (trigger.type() == SfzTrigger::Type::NoteOn && m_sw_last != std::nullopt && m_sw_last == trigger.key().value())
 	{
-		globalState.switchKeyPressed(trigger.key().value());
+		globalState.switchKeyPressed(trigger.key().value()); // TODO this can probably be moved somewhere else so that it isn't done for every region (if you have 10000+ regions, it needs to be optimized)
 	}
 
 	// Before spawning a sound, do some pre-calculation of the midi CC modulation amounts so that we don't have to do it every buffer
