@@ -31,6 +31,19 @@ public:
 
 
 	//
+	// Trigger Type
+	//
+	enum class TriggerType
+	{
+		Attack,
+		Release,
+		//First, // TODO To be implemented
+		//Legato, // TODO To be implemented
+		//ReleaseKey // TODO To be implemented
+	};
+	TriggerType m_trigger = TriggerType::Attack;
+
+	//
 	// Key Trigger
 	//
 	int m_lokey = 0;

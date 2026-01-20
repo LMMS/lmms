@@ -23,7 +23,14 @@ SfzRegion::SfzRegion(SfzOpcodeState opcodeState)
 
 bool SfzRegion::triggerConditionsMet(const SfzGlobalState& globalState, const SfzTrigger& trigger)
 {
-	if (trigger.type() == SfzTrigger::Type::NoteOn)
+	if (trigger.type() == SfzTrigger::Type::ControlChange) { return false; } // TODO. It is possible for midi CC's to trigger regions, such as using the sustain pedal or on_locc/on_hicc
+
+	// Make sure the trigger type matches
+	if (trigger.type() == SfzTrigger::Type::NoteOn && m_trigger != TriggerType::Attack) { return false; }
+	if (trigger.type() == SfzTrigger::Type::NoteOff && m_trigger != TriggerType::Release) { return false; }
+
+	// Assuming the trigger has key/vel info (i.e., it's a noteOn/noteOff, not a midi CC event), make sure all the key/vel selectors match
+	if (trigger.type() == SfzTrigger::Type::NoteOn || trigger.type() == SfzTrigger::Type::NoteOff)
 	{
 		int triggerKey = trigger.key().value();
 		int triggerVelocity = trigger.velocity().value();
@@ -38,22 +45,21 @@ bool SfzRegion::triggerConditionsMet(const SfzGlobalState& globalState, const Sf
 		// The argument `true` at the end signifies that only switch keys will be considered
 		// TODO add unit tests
 		if (m_sw_last != std::nullopt && globalState.lastKeyPressedInRange(m_sw_lokey, m_sw_hikey, m_sw_default, true) != m_sw_last) { return false; }
-
-		// If midi CC ranges are defined, make sure the current CC values are within range
-		for (int i = 0; i < SfzOpcodeState::NumMidiCCs; ++i)
-		{
-			const int ccValue = globalState.midiCCValue(i);
-			if (ccValue > m_hicc.at(i) || ccValue < m_locc.at(i)) { return false; }
-		}
-
-		// If all conditions up until now have passed, that means we're ready to play sound. However, if round-robin is set up, we only do it if it's our turn.
-		m_roundRobinCount++;
-		if (m_roundRobinCount % m_seq_length != m_seq_position - 1 /*Minus 1 because the opcode is 1-indexed*/) { return false; } // Not our turn
-
-		// If all the contitions passed, return true and spawn a sound
-		return true;
 	}
-	return false;
+
+	// If midi CC ranges are defined, make sure the current CC values are within range
+	for (int i = 0; i < SfzOpcodeState::NumMidiCCs; ++i)
+	{
+		const int ccValue = globalState.midiCCValue(i);
+		if (ccValue > m_hicc.at(i) || ccValue < m_locc.at(i)) { return false; }
+	}
+
+	// If all conditions up until now have passed, that means we're ready to play sound. However, if round-robin is set up, we only do it if it's our turn.
+	m_roundRobinCount++;
+	if (m_roundRobinCount % m_seq_length != m_seq_position - 1 /*Minus 1 because the opcode is 1-indexed*/) { return false; } // Not our turn
+
+	// If all the contitions passed, return true and spawn a sound
+	return true;
 }
 
 void SfzRegion::processTrigger(SfzGlobalState& globalState, const SfzTrigger& trigger)

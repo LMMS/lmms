@@ -86,6 +86,10 @@ private:
 	// Ideally it would be better to reuse the midi CC models for the instrument track
 	std::array<FloatModel, SfzOpcodeState::NumMidiCCs> m_ccModels;
 
+	//! Unfortunately, LMMS by default has the velocity of NoteOff events be 0. However, SFZ expects them to match the velocity of the corresponding NoteOn event.
+	//! To account for this, we store the velocity of the last NoteOn event for each key, and use that value when hanlding NoteOff events.
+	std::array<int, 128> m_previousNoteOnVelocity = {};
+
 	friend class gui::SfzSamplerView;
 };
 } // namespace lmms

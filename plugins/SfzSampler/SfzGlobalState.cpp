@@ -1,8 +1,6 @@
 
 
 #include "SfzGlobalState.h"
-#include <QDebug>
-#include <iostream>
 
 namespace lmms
 {

@@ -83,11 +83,16 @@ bool SfzSampler::handleMidiEvent(const MidiEvent& event, const TimePos& time, f_
 	if (event.type() == MidiNoteOn)
 	{
 		processTrigger(SfzTrigger::noteOnEvent(offset, event.key(), event.velocity()));
+		// Store the velocity of this event so that we can apply it to the corresponding NoteOff event (see comment below)
+		m_previousNoteOnVelocity.at(event.key()) = event.velocity();
 		return true;
 	}
 	else if (event.type() == MidiNoteOff)
 	{
-		processTrigger(SfzTrigger::noteOffEvent(offset, event.key(), event.velocity()));
+		// TODO: Currently, LMMS by default has NoteOff events have 0 velocity. SFZ requires that the NoteOff velocity match its corresponding NoteOn velocity
+		// To account for this, we track the last pressed velocity of each note in an array and use that
+		const int previousVelocity = m_previousNoteOnVelocity.at(event.key());
+		processTrigger(SfzTrigger::noteOffEvent(offset, event.key(), previousVelocity));
 		return true;
 	}
 	else if (event.type() == MidiControlChange)

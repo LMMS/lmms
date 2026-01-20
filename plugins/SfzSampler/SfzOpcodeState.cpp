@@ -36,6 +36,24 @@ bool SfzOpcodeState::setOpcodeByStrings(const QString& name, const QString& valu
 
 
 	//
+	// Trigger Type
+	//
+	else if (name == "trigger")
+	{
+		if (value == "attack") { m_trigger = TriggerType::Attack; }
+		else if (value == "release") { m_trigger = TriggerType::Release; }
+		//else if (value == "first") { m_trigger = TriggerType::First; } // TODO To be implemented
+		//else if (value == "legato") { m_trigger = TriggerType::Legato; } // TODO To be implemented
+		//else if (value == "release_key") { m_trigger = TriggerType::ReleaseKey; } // TODO To be implemented
+		else
+		{
+			qDebug() << "[SFZ Parser] Unknown trigger:" << value;
+			return false;
+		}
+	}
+
+
+	//
 	// Key Trigger
 	//
 	else if (name == "lokey")
