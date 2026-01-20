@@ -1614,9 +1614,10 @@ void MainWindow::onProjectFileNameChanged()
 MainWindow::MovableQMdiArea::MovableQMdiArea(QWidget* parent, keyModifiers* keyMods,
 	std::function<bool()> hasActiveMaxWindow)
 	: QMdiArea(parent)
-	, panAnywhere{false}
 	, m_keyMods{keyMods}
 	, m_isBeingMoved{false}
+	, m_isUniversalPan{false}
+	, m_canUniversalPan{false}
 	, m_lastX{0}
 	, m_lastY{0}
 	, m_hasActiveMaxWindow{hasActiveMaxWindow}
@@ -1624,7 +1625,7 @@ MainWindow::MovableQMdiArea::MovableQMdiArea(QWidget* parent, keyModifiers* keyM
 	parent->installEventFilter(this);
 }
 
-void MainWindow::MovableQMdiArea::initiatePanning(int globalX, int globalY)
+void MainWindow::MovableQMdiArea::panStart(int globalX, int globalY)
 {
 	m_lastX = globalX;
 	m_lastY = globalY;
@@ -1632,16 +1633,8 @@ void MainWindow::MovableQMdiArea::initiatePanning(int globalX, int globalY)
 	setCursor(Qt::ClosedHandCursor);
 }
 
-void MainWindow::MovableQMdiArea::mousePressEvent(QMouseEvent* event)
+void MainWindow::MovableQMdiArea::panMove(int globalX, int globalY)
 {
-	const auto pos = event->globalPos();
-	initiatePanning(pos.x(), pos.y());
-}
-
-void MainWindow::MovableQMdiArea::mouseMoveEvent(QMouseEvent* event)
-{
-	if (m_isBeingMoved == false) { return; }
-
 	int minXBoundary = window()->width() - 100;
 	int maxXBoundary = 100;
 	int minYBoundary = window()->height() - 100;
@@ -1664,9 +1657,8 @@ void MainWindow::MovableQMdiArea::mouseMoveEvent(QMouseEvent* event)
 		}
 	}
 
-	const auto pos = event->globalPos();
-	int scrollX = m_lastX - pos.x();
-	int scrollY = m_lastY - pos.y();
+	int scrollX = m_lastX - globalX;
+	int scrollY = m_lastY - globalY;
 
 	scrollX = scrollX < 0 && minX >= minXBoundary ? 0 : scrollX;
 	scrollX = scrollX > 0 && maxX <= maxXBoundary ? 0 : scrollX;
@@ -1683,14 +1675,36 @@ void MainWindow::MovableQMdiArea::mouseMoveEvent(QMouseEvent* event)
 		}
 	}
 
-	m_lastX = pos.x();
-	m_lastY = pos.y();
+	m_lastX = globalX;
+	m_lastY = globalY;
+}
+
+void MainWindow::MovableQMdiArea::panEnd()
+{
+	setCursor(Qt::ArrowCursor);
+	m_isBeingMoved = false;
+	m_isUniversalPan = false;
+}
+
+void MainWindow::MovableQMdiArea::mousePressEvent(QMouseEvent* event)
+{
+	const auto pos = event->globalPos();
+	m_isUniversalPan = false;
+	panStart(pos.x(), pos.y());
+}
+
+void MainWindow::MovableQMdiArea::mouseMoveEvent(QMouseEvent* event)
+{
+	if (!m_isBeingMoved || m_isUniversalPan) { return; }
+
+	const auto pos = event->globalPos();
+	panMove(pos.x(), pos.y());
 }
 
 void MainWindow::MovableQMdiArea::mouseReleaseEvent(QMouseEvent* event)
 {
-	setCursor(Qt::ArrowCursor);
-	m_isBeingMoved = false;
+	if (!m_isBeingMoved || m_isUniversalPan) { return; }
+	panEnd();
 }
 
 bool MainWindow::MovableQMdiArea::eventFilter(QObject* watched, QEvent* event)
@@ -1699,47 +1713,50 @@ bool MainWindow::MovableQMdiArea::eventFilter(QObject* watched, QEvent* event)
 	// workspace panning without needing to click over a region
 	// without any widgets.
 
-	if (event->type() == QEvent::MouseButtonPress && panAnywhere)
+	constexpr auto UniversalPanKey = Qt::Key_S;
+
+	if (event->type() == QEvent::MouseButtonPress && m_canUniversalPan)
 	{
 		QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
 
 		if (mouseEvent->button() == Qt::LeftButton)
 		{
 			const auto pos = mouseEvent->globalPos();
-			initiatePanning(pos.x(), pos.y());
+			m_isUniversalPan = true;
+			panStart(pos.x(), pos.y());
 			return true;
 		}
 	}
 
-	if (event->type() == QEvent::MouseMove && m_isBeingMoved)
+	if (event->type() == QEvent::MouseMove && m_isBeingMoved && m_isUniversalPan)
 	{
 		QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
-		mouseMoveEvent(mouseEvent);
+		const auto pos = mouseEvent->globalPos();
+		panMove(pos.x(), pos.y());
 		return true;
 	}
 
-	if (event->type() == QEvent::MouseButtonRelease && m_isBeingMoved)
+	if (event->type() == QEvent::MouseButtonRelease && m_isBeingMoved && m_isUniversalPan)
 	{
-		QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
-		mouseReleaseEvent(mouseEvent);
+		panEnd();
 		return true;
 	}
 
-	if (panAnywhere)
+	if (m_canUniversalPan)
 	{
 		if (event->type() == QEvent::KeyPress)
 		{
-			// Ignore keypresses while pan-anywhere is enabled
+			// Ignore keypresses while this is happening
 			return true;
 		}
 
-		if (event->type() == QEvent::KeyRelease && panAnywhere)
+		if (event->type() == QEvent::KeyRelease)
 		{
 			// Disable pan-anywhere if S has been released
 			QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
-			if (keyEvent->key() == Qt::Key_S)
+			if (keyEvent->key() == UniversalPanKey)
 			{
-				panAnywhere = false;
+				m_canUniversalPan = false;
 				return true;
 			}
 		}
@@ -1750,11 +1767,11 @@ bool MainWindow::MovableQMdiArea::eventFilter(QObject* watched, QEvent* event)
 		if (event->type() == QEvent::KeyPress && m_keyMods->m_alt)
 		{
 			QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
-			if (keyEvent->key() == Qt::Key_S)
+			if (keyEvent->key() == UniversalPanKey)
 			{
 				// Only enable it if there are no maximized windows and the
 				// mouse is over the MDI area (or its children).
-				panAnywhere = !m_hasActiveMaxWindow() && underMouse();
+				m_canUniversalPan = !m_hasActiveMaxWindow() && underMouse();
 				return true;
 			}
 		}

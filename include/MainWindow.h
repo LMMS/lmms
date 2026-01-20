@@ -205,20 +205,13 @@ private:
 	{
 	public:
 		/**
-			@param hasActiveMaxWindow Function that should return whether there
-			are any active maximized windows, in order to avoid initiating a pan
-			in that case.
+			@param hasActiveMaxWindow Function that should return whether there are any active maximized windows, in
+			order to avoid initiating a pan in that case.
 		*/
 		MovableQMdiArea(QWidget* parent, keyModifiers* keyMods,
 			std::function<bool()> hasActiveMaxWindow);
 
 		~MovableQMdiArea() {}
-
-		/**
-			Indicates that a panning action can be initiated through a
-			left-button mouse drag.
-		*/
-		bool panAnywhere;
 
 	protected:
 		void mousePressEvent(QMouseEvent* event) override;
@@ -226,11 +219,15 @@ private:
 		void mouseReleaseEvent(QMouseEvent* event) override;
 		bool eventFilter(QObject* watched, QEvent* event) override;
 
-		//! Initiates panning. Must use global positions to avoid errors.
-		void initiatePanning(int globalX, int globalY);
 	private:
+		void panStart(int globalX, int globalY);
+		void panMove(int globalX, int globalY);
+		void panEnd();
+
 		keyModifiers* m_keyMods;
-		bool m_isBeingMoved;
+		bool m_isBeingMoved; //!< Whether the workspace is being panned
+		bool m_isUniversalPan; //!< Whether the current panning is universal
+		bool m_canUniversalPan; //!< Whether panning can be started without clicking on a free area
 		int m_lastX;
 		int m_lastY;
 		std::function<bool()> m_hasActiveMaxWindow;
