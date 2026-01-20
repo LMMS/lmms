@@ -2218,6 +2218,10 @@ void PianoRoll::setKnifeAction()
 		m_knifeDown = false;
 		setCursor(Qt::ArrowCursor);
 		update();
+
+		TextFloat::displayMessage(tr("Knife Tool"),
+			tr("Click and drag over notes to cut along a line\nHold Shift to automatically remove short ends"),
+			embed::getIconPixmap("edit_knife"), 4000);
 	}
 }
 
