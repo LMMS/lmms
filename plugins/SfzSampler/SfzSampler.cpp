@@ -65,11 +65,6 @@ SfzSampler::SfzSampler(InstrumentTrack* instrumentTrack)
 	: Instrument(instrumentTrack, &sfzsampler_plugin_descriptor, nullptr, Flag::IsSingleStreamed)
 	, m_parentTrack(instrumentTrack)
 {
-	//QString path = ConfigManager::inst()->userSamplesDir() + "sfz/jlearman.jRhodes3c-master/jRhodes3c-looped-flac-sfz/";
-	//loadFile(path + "_jRhodes-stereo-looped.sfz");
-
-	//loadFile(ConfigManager::inst()->userSamplesDir() + "sfz/SplendidGrandPiano-master/Splendid\ Grand\ Piano.sfz");
-
 	auto iph = new InstrumentPlayHandle(this, instrumentTrack);
 	Engine::audioEngine()->addPlayHandle(iph);
 
@@ -124,7 +119,42 @@ void SfzSampler::processTrigger(const SfzTrigger& trigger)
 	// Loop through all the regions to check if a new note should be played
 	for (auto& region : m_sfzRegions)
 	{
+		// Notify the region of the event so that it can update cached CC modulations, keyswitch states, etc
 		region.processTrigger(m_sfzGlobalState, trigger);
+
+		// If the trigger conditions are met, spawn a new sound
+		if (region.triggerConditionsMet(m_sfzGlobalState, trigger))
+		{
+			qDebug() << "Spawning sound!" << region.m_sampleFile.value_or("N/A");
+			// Loop through array to find open position
+			bool foundOpenPosition = false;
+			for (size_t i = 0; i <= m_voices.size(); ++i)
+			{
+				auto& regionPlayState = m_voices[i];
+				if (!regionPlayState.active())
+				{
+					regionPlayState = SfzRegionPlayState(&region, trigger);
+					// If this new index is above the current max active index, update it
+					m_maxActiveIndex = std::max(m_maxActiveIndex, i);
+					foundOpenPosition = true;
+					break;
+				}
+			}
+			if (!foundOpenPosition) { qDebug() << "[SFZ Player] Could not find vacant position in m_voices buffer!"; }
+		}
+
+		// Loop through all the active sounds to check if any need to be deactivated/released by the trigger
+		for (size_t i = 0; i <= m_maxActiveIndex; ++i)
+		{
+			auto& regionPlayState = m_voices[i];
+
+			if (regionPlayState.active())
+			{
+				regionPlayState.processTrigger(trigger);
+				// If this was the max active index and the trigger caused it to deactivate, figure out what the next active index is
+				if (!regionPlayState.active() && i == m_maxActiveIndex) { recalculateMaxActiveIndex(); }
+			}
+		}
 	}
 }
 
@@ -136,12 +166,27 @@ void SfzSampler::play(SampleFrame* workingBuffer)
 {
 	const fpp_t frames = Engine::audioEngine()->framesPerPeriod();
 
-	for (auto& region : m_sfzRegions)
+	// Render audio from each of the active voices
+	for (size_t i = 0; i <= m_maxActiveIndex; ++i)
 	{
-		// Render audio from each of the regions
-		// This amounts to the regions themselves rendering the audio from each of their active SfzRegionPlayStates
-		// We pass a temporary buffer which can be used for rendering samples and later summing it to the working buffer.
-		bool anythingPlayed = region.play(workingBuffer, frames);
+		auto& regionPlayState = m_voices[i];
+		if (!regionPlayState.active()) { continue; }
+
+		regionPlayState.play(workingBuffer, frames);
+		// If the play state deactivated during playback, and this was the max active index, figure out what the new max active index is
+		if (!regionPlayState.active() && i == m_maxActiveIndex) { recalculateMaxActiveIndex(); }
+	}
+}
+
+
+
+void SfzSampler::recalculateMaxActiveIndex()
+{
+	// Loop backward from the old max active index to find the next play state which is active
+	while (m_maxActiveIndex > 0)
+	{
+		if (m_voices[m_maxActiveIndex].active()) { return; }
+		else { m_maxActiveIndex--; }
 	}
 }
 

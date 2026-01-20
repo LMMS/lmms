@@ -67,20 +67,27 @@ signals:
 private:
 	void processTrigger(const SfzTrigger& trigger);
 
-	InstrumentTrack* m_parentTrack;
+	//! Holds the configurations for each of the samples/regions: what keys/velocities/etc trigger it, the volume, filter, envelopes, etc
+	std::vector<SfzRegion> m_sfzRegions;
 
-	QString m_sfzFilePath = "";
+	static constexpr int MAX_ACTIVE_SOUNDS = 128;
+	//! Array to store all active (and inactive) sound play-states across all regions
+	std::array<SfzRegionPlayState, MAX_ACTIVE_SOUNDS> m_voices;
+	//! Maximum active index in the play state array
+	//! By always spawning new sounds at the lowest open index and keeping track of the maximum index which contains an actice sound,
+	//! you only need to loop through the first n elements and ignore the rest since you know they are inactive (Thanks to Lost Robot for the idea)
+	size_t m_maxActiveIndex = 0;
+	//! Helper function to figure out what the maximum active index is, in the event the maximum index deacticated
+	void recalculateMaxActiveIndex();
+
+	//! So that the regions don't accidentally load the same sample multiple times, we store all the sames in one place and the regions ask it to load each sample/retrieve a pointer if it's already been loaded
+	SfzSamplePool m_samplePool;
 
 	//! Holds information about the total number of notes active, last switch keys pressed, etc
 	SfzGlobalState m_sfzGlobalState;
 
 	//! Holds information about midi CC default values, labels, which CC's are actually used, etc
 	SfzControlsConfig m_controlsConfig;
-
-	std::vector<SfzRegion> m_sfzRegions;
-
-	//! So that the regions don't accidentally load the same sample multiple times, we store all the sames in one place and the regions ask it to load each sample/retrieve a pointer if it's already been loaded
-	SfzSamplePool m_samplePool;
 
 	// The GUI needs models to connect to midi CC knobs, so a bunch of dummy models are defined here.
 	// Ideally it would be better to reuse the midi CC models for the instrument track
@@ -89,6 +96,10 @@ private:
 	//! Unfortunately, LMMS by default has the velocity of NoteOff events be 0. However, SFZ expects them to match the velocity of the corresponding NoteOn event.
 	//! To account for this, we store the velocity of the last NoteOn event for each key, and use that value when hanlding NoteOff events.
 	std::array<int, 128> m_previousNoteOnVelocity = {};
+
+	InstrumentTrack* m_parentTrack;
+
+	QString m_sfzFilePath = "";
 
 	friend class gui::SfzSamplerView;
 };

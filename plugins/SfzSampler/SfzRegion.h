@@ -25,13 +25,8 @@ public:
 	//! such as which switch key was last pressed) this will return false.
 	bool triggerConditionsMet(const SfzGlobalState& globalState, const SfzTrigger& trigger);
 
-	//! Handles spawning a new sound if the all the conditions are met
-	//! Also handles sending the trigger to the currently active sounds, in case they need to deactivate/release (such as on NoteOff)
+	//! Updates cached CC modulations, and helps update keyswitch states
 	void processTrigger(SfzGlobalState& globalState, const SfzTrigger& trigger);
-
-	//! Renders sound from each of the active SfzRegionPlayStates and writes it to the given buffer
-	//! Returns true if any sound was actually generated
-	bool play(SampleFrame* workingBuffer, const fpp_t frames);
 
 	//! Load the sample file given by the `sample` opcode into m_sample.
 	//! The sample path is treated as relative to the path to the sfz file, so the parent directory is also needed
@@ -41,21 +36,9 @@ public:
 	const SfzSampleBuffer* sample() const { return m_sample; }
 
 private:
-	static constexpr int MAX_ACTIVE_SOUNDS = 128;
-	//! Array to store all active (and inactive) sound play states for this region
-	std::array<SfzRegionPlayState, MAX_ACTIVE_SOUNDS> m_activeSounds;
-
 	//! Pointer to sample object to be played. The sample file path is defined in the `sample` opcode, but the data needs to be loaded first
 	//! The actual sample objects are stored in a shared pool, SfzSamplePool, so that if multiple of the same sample are loaded, they don't waste memory.
 	const SfzSampleBuffer* m_sample = nullptr;
-
-	//! Maximum active index in the play state array
-	//! By always spawning new sounds at the lowest open index and keeping track of the maximum index which contains an actice sound,
-	//! you only need to loop through the first n elements and ignore the rest since you know they are inactive (Thanks to Lost Robot for the idea)
-	size_t m_maxActiveIndex = 0;
-	
-	//! Helper function to figure out what the maximum active index is, in the event the maximum index deacticated
-	void recalculateMaxActiveIndex();
 
 	//! In order to do round robin, the region needs to keep track of how many notes it has played in its lifetime. Or rather, the number of notes it *would* have played if it weren't restricted to only play a note when the round-robin counter hit the right numbers.
 	size_t m_roundRobinCount = 0;
