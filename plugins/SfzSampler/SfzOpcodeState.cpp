@@ -283,7 +283,7 @@ bool SfzOpcodeState::setOpcodeByStrings(const QString& name, const QString& valu
 	{
 		m_volume = value.toFloat(&successful);
 	}
-	else if (name.startsWith("gain_oncc") || name.startsWith("gain_cc"))
+	else if (name.startsWith("gain_oncc") || name.startsWith("gain_cc") || name.startsWith("volume_oncc"))
 	{
 		m_gain_oncc.at(ccNumberFromOpcode(name)) = value.toFloat(&successful);
 	}

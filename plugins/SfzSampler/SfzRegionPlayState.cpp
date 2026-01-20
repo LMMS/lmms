@@ -168,7 +168,7 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const fpp_t frames)
 	// For performance, only update the cutoff frequency/resonance once per buffer
 	if (filterEnabled)
 	{
-		// The cutoff frequency is in hertz, but things like fil_veltrack are defined in cents, so we have to convert them TODO: are we sure it's cents? I removed the /100.0f because I'm not sure.
+		// The cutoff frequency is in hertz, but things like fil_veltrack are defined in cents, so we have to convert them TODO: are we sure it's cents? I saw 20000 being used in Metal GTX which is kind of high for cents (200 octaves?)
 		const float filterCutoffPitchOffset = normalizedVelocity * m_region->m_fil_veltrack;
 		const float filterCutoff = m_region->m_cutoff.value() + std::exp2(filterCutoffPitchOffset / 12.0f);
 		// SFZ has the resonance given in decibals, which is not the same as the resonance passed to the filter, so we have to convert it
