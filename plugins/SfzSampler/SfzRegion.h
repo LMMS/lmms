@@ -23,6 +23,7 @@ public:
 	//! For example, if lokey=24 and hikey=29, and the trigger is a NoteOn event on key 26, then it will return true
 	//! If the trigger does not fall in the key range or velocity range or any other conditions are not met (including global state conditions, 
 	//! such as which switch key was last pressed) this will return false.
+	//! TODO this method also increments the round robin counter, if applicable. Ideally I feel like this method should be const, but I'm not sure how to best organize it.
 	bool triggerConditionsMet(const SfzGlobalState& globalState, const SfzTrigger& trigger);
 
 	//! Updates cached CC modulations, and helps update keyswitch states

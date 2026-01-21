@@ -38,10 +38,11 @@ bool SfzRegion::triggerConditionsMet(const SfzGlobalState& globalState, const Sf
 	// Assuming the trigger has key/vel info (i.e., it's a noteOn/noteOff, not a midi CC event), make sure all the key/vel selectors match
 	if (trigger.type() == SfzTrigger::Type::NoteOn || trigger.type() == SfzTrigger::Type::NoteOff)
 	{
-		int triggerKey = trigger.key().value();
-		int triggerVelocity = trigger.velocity().value();
+		const int triggerKey = trigger.key().value();
+		const int triggerVelocity = trigger.velocity().value();
 
 		// Ensure the key was pressed between the `lokey` and `hikey` opcodes
+		// TODO this can be removed now that SfzRegionManager handles lookup tables for regions by key
 		if (triggerKey > m_hikey || triggerKey < m_lokey) { return false; }
 
 		// And had velocity between `lovel` and `hivel` opcodes
@@ -62,7 +63,7 @@ bool SfzRegion::triggerConditionsMet(const SfzGlobalState& globalState, const Sf
 	}
 
 	// If all conditions up until now have passed, that means we're ready to play sound. However, if round-robin is set up, we only do it if it's our turn.
-	m_roundRobinCount++;
+	m_roundRobinCount++; // TODO it would be nice if this function could be const and we didn't have to update this here. idk.
 	if (m_roundRobinCount % m_seq_length != m_seq_position - 1 /*Minus 1 because the opcode is 1-indexed*/) { return false; } // Not our turn
 
 	// If all the contitions passed, return true and spawn a sound

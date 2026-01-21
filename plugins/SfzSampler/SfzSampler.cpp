@@ -117,15 +117,19 @@ void SfzSampler::processTrigger(const SfzTrigger& trigger)
 	m_sfzGlobalState.processTrigger(trigger);
 
 	// Loop through all the regions to check if a new note should be played
-	for (auto& region : m_sfzRegions)
+	// TODO can we get rid of this loop
+	for (auto* region : m_regionManager.allRegions())
 	{
 		// Notify the region of the event so that it can update cached CC modulations, keyswitch states, etc
-		region.processTrigger(m_sfzGlobalState, trigger);
-
+		region->processTrigger(m_sfzGlobalState, trigger);
+	}
+	
+	for (auto* region : m_regionManager.findPotentialMatchingRegions(trigger))
+	{
 		// If the trigger conditions are met, spawn a new sound
-		if (region.triggerConditionsMet(m_sfzGlobalState, trigger))
+		if (region->triggerConditionsMet(m_sfzGlobalState, trigger))
 		{
-			qDebug() << "Spawning sound!" << region.m_sampleFile.value_or("N/A");
+			qDebug() << "Spawning sound!" << region->m_sampleFile.value_or("N/A");
 			// Loop through array to find open position
 			bool foundOpenPosition = false;
 			for (size_t i = 0; i <= m_voices.size(); ++i)
@@ -133,7 +137,7 @@ void SfzSampler::processTrigger(const SfzTrigger& trigger)
 				auto& regionPlayState = m_voices[i];
 				if (!regionPlayState.active())
 				{
-					regionPlayState = SfzRegionPlayState(&region, trigger);
+					regionPlayState = SfzRegionPlayState(region, trigger);
 					// If this new index is above the current max active index, update it
 					m_maxActiveIndex = std::max(m_maxActiveIndex, i);
 					foundOpenPosition = true;
@@ -142,18 +146,18 @@ void SfzSampler::processTrigger(const SfzTrigger& trigger)
 			}
 			if (!foundOpenPosition) { qDebug() << "[SFZ Player] Could not find vacant position in m_voices buffer!"; }
 		}
+	}
 
-		// Loop through all the active sounds to check if any need to be deactivated/released by the trigger
-		for (size_t i = 0; i <= m_maxActiveIndex; ++i)
+	// Loop through all the active sounds to check if any need to be deactivated/released by the trigger
+	for (size_t i = 0; i <= m_maxActiveIndex; ++i)
+	{
+		auto& regionPlayState = m_voices[i];
+
+		if (regionPlayState.active())
 		{
-			auto& regionPlayState = m_voices[i];
-
-			if (regionPlayState.active())
-			{
-				regionPlayState.processTrigger(trigger);
-				// If this was the max active index and the trigger caused it to deactivate, figure out what the next active index is
-				if (!regionPlayState.active() && i == m_maxActiveIndex) { recalculateMaxActiveIndex(); }
-			}
+			regionPlayState.processTrigger(trigger);
+			// If this was the max active index and the trigger caused it to deactivate, figure out what the next active index is
+			if (!regionPlayState.active() && i == m_maxActiveIndex) { recalculateMaxActiveIndex(); }
 		}
 	}
 }
@@ -195,34 +199,40 @@ void SfzSampler::recalculateMaxActiveIndex()
 
 void SfzSampler::loadFile(const QString& filePath)
 {
-	// Prevent the audio thread from accidentally looping through the region vector while it's being edited
+	// Prevent the audio thread from accidentally looping through the regions while they are being edited
 	const auto guard = Engine::audioEngine()->requestChangesGuard();
 	// Reset the note counts, midi cc values, etc
 	m_sfzGlobalState = SfzGlobalState();
 	// And any info about control labels, default values, etc
 	m_controlsConfig = SfzControlsConfig();
-	// Reset any loaded samples
-	m_samplePool = SfzSamplePool();
 
-	// Parse all the <region> headers of the .sfz (accounting for <global> and <group> defaults) and populate m_sfzRegions with the new SfzRegion
+	// Temporary vector to store SfzRegion objects
+	std::vector<SfzRegion> regions;
+	// Parse all the <region> headers of the .sfz (accounting for <global> and <group> defaults) and populate the regions vector with the new SfzRegions
 	// The <control> header is also parsed into a separate object for easy access by the gui
-	bool successfulParseFile = SfzParser::parseSfzFile(filePath, m_sfzRegions, m_controlsConfig);
+	bool successfulParseFile = SfzParser::parseSfzFile(filePath, regions, m_controlsConfig);
 
 	if (!successfulParseFile) { qDebug() << "[SFZ Player] An error occurred when parsing the SFZ file."; return; }
+
+	// Hand off the vector of regions to SfzRegionManager, which will sort them out to optimize trigger selection
+	m_regionManager = SfzRegionManager(regions); // TODO should move semantics be used here?
 
 	// The SfzParser generates all the SfzRegion objects, but it doesn't load any of the samples
 	// The sample filenames are stored in the regions as from the `sample` opcode, so we just need to load the files into memory to use them
 	// The samples are stored with relative paths with respect to the sfz file, so first find the parent directory:
 	QDir parentDirectory = QFileInfo(filePath).absoluteDir();
+	// Reset any loaded samples
+	m_samplePool = SfzSamplePool();
 	int i = 0;
-	for (auto& region : m_sfzRegions)
+	for (auto* region : m_regionManager.allRegions())
 	{
-		qDebug() << "[SFZ Player] Loading sample" << i + 1 << "/" << m_sfzRegions.size() << region.m_sampleFile.value_or("N/A");
-		bool successfulLoadSample = region.initializeSample(parentDirectory, m_samplePool);
+		qDebug() << "[SFZ Player] Loading sample" << i + 1 << "/" << m_regionManager.allRegions().size() << region->m_sampleFile.value_or("N/A");
+		bool successfulLoadSample = region->initializeSample(parentDirectory, m_samplePool);
 		if (!successfulLoadSample) { qDebug() << "[SFZ Player] An error occured when loading a sample."; }
 		i++;
 	}
-	qDebug() << "Loaded" << m_sfzRegions.size() << "regions and" << m_samplePool.sampleCount() << "samples.";
+	qDebug() << "Loaded" << m_regionManager.allRegions().size() << "regions and" << m_samplePool.sampleCount() << "samples.";
+
 
 	// Set the initial cc values based on any `set_ccN` opcodes in the <control> header
 	m_sfzGlobalState.initializeMidiCCValues(m_controlsConfig);

@@ -13,6 +13,8 @@ build_plugin(sfzsampler
 	SfzParser.h
 	SfzRegionPlayState.cpp
 	SfzRegionPlayState.h
+	SfzRegionManager.cpp
+	SfzRegionManager.h
 	SfzGlobalState.cpp
 	SfzGlobalState.h
 	SfzControlsConfig.h
@@ -29,6 +31,7 @@ build_plugin(sfzsampler
 	SfzRegion.h
 	SfzParser.h
 	SfzRegionPlayState.h
+	SfzRegionManager.h
 	SfzGlobalState.h
 	SfzControlsConfig.h
 	SfzTrigger.h

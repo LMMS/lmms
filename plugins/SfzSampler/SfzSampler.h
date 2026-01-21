@@ -37,6 +37,7 @@
 #include "SfzGlobalState.h"
 #include "SfzControlsConfig.h"
 #include "SfzSamplePool.h"
+#include "SfzRegionManager.h"
 
 namespace lmms {
 
@@ -67,8 +68,9 @@ signals:
 private:
 	void processTrigger(const SfzTrigger& trigger);
 
-	//! Holds the configurations for each of the samples/regions: what keys/velocities/etc trigger it, the volume, filter, envelopes, etc
-	std::vector<SfzRegion> m_sfzRegions;
+	//! Holds a list of all the SfzRegion objects, which have the configurations for each of the samples/regions: what keys/velocities/etc trigger it, the volume, filter, envelopes, etc
+	//! This object helps map triggers to lists of potentially matching regions, so that we don't have to loop over all the regions, checking every single one whether all conditions are matched before spawning a voice.
+	SfzRegionManager m_regionManager;
 
 	static constexpr int MAX_ACTIVE_SOUNDS = 128;
 	//! Array to store all active (and inactive) sound play-states across all regions
