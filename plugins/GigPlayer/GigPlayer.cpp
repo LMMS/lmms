@@ -47,7 +47,6 @@
 #include "MixHelpers.h"
 #include "NotePlayHandle.h"
 #include "PathUtil.h"
-#include "Sample.h"
 #include "Song.h"
 
 #include "PatchesDialog.h"
@@ -257,10 +256,17 @@ QString GigInstrument::getCurrentPatchName()
 	int iBankSelected = m_bankNum.value();
 	int iProgSelected = m_patchNum.value();
 
-	gig::Instrument * pInstrument = m_instance->gig.GetFirstInstrument();
+	const size_t instrumentCount = m_instance->gig.CountInstruments();
 
-	while( pInstrument != nullptr )
+	for (size_t i = 0; i < instrumentCount; ++i)
 	{
+		gig::Instrument* pInstrument =  m_instance->gig.GetInstrument(i);
+
+		if ( !pInstrument )
+		{
+			continue;
+		}
+
 		int iBank = pInstrument->MIDIBank;
 		int iProg = pInstrument->MIDIProgram;
 
@@ -275,8 +281,6 @@ QString GigInstrument::getCurrentPatchName()
 
 			return name;
 		}
-
-		pInstrument = m_instance->gig.GetNextInstrument();
 	}
 
 	return "";
@@ -694,14 +698,11 @@ gui::PluginView* GigInstrument::instantiateView( QWidget * _parent )
 
 // Add the desired samples (either the normal samples or the release samples)
 // to the GigNote
-//
-// Note: not thread safe since libgig stores current region position data in
-// the instrument object
 void GigInstrument::addSamples( GigNote & gignote, bool wantReleaseSample )
 {
 	// Change key dimension, e.g. change samples based on what key is pressed
 	// in a certain range. From LinuxSampler
-	if( wantReleaseSample == true &&
+	if( wantReleaseSample &&
 			gignote.midiNote >= m_instrument->DimensionKeyRange.low &&
 			gignote.midiNote <= m_instrument->DimensionKeyRange.high )
 	{
@@ -711,10 +712,17 @@ void GigInstrument::addSamples( GigNote & gignote, bool wantReleaseSample )
 					m_instrument->DimensionKeyRange.low + 1 );
 	}
 
-	gig::Region* pRegion = m_instrument->GetFirstRegion();
+	const size_t regionCount = m_instrument->CountRegions();
 
-	while( pRegion != nullptr )
+	for (size_t i = 0; i < regionCount; ++i)
 	{
+		gig::Region* pRegion = m_instrument->GetRegionAt(i);
+
+		if ( !pRegion )
+		{
+			continue;
+		}
+
 		Dimension dim = getDimensions( pRegion, gignote.velocity, wantReleaseSample );
 		gig::DimensionRegion * pDimRegion = pRegion->GetDimensionRegionByValue( dim.DimValues );
 		gig::Sample * pSample = pDimRegion->pSample;
@@ -725,7 +733,7 @@ void GigInstrument::addSamples( GigNote & gignote, bool wantReleaseSample )
 
 		// Does this note have release samples? Set this only on the original
 		// notes and not when we get the release samples.
-		if( wantReleaseSample != true )
+		if( !wantReleaseSample )
 		{
 			gignote.release = dim.release;
 		}
@@ -742,7 +750,7 @@ void GigInstrument::addSamples( GigNote & gignote, bool wantReleaseSample )
 
 				// TODO: sample panning? crossfade different layers?
 
-				if( wantReleaseSample == true )
+				if( wantReleaseSample )
 				{
 					// From LinuxSampler, not sure how it was created
 					attenuation *= 1 - 0.01053 * ( 256 >> pDimRegion->ReleaseTriggerDecay ) * length;
@@ -755,8 +763,6 @@ void GigInstrument::addSamples( GigNote & gignote, bool wantReleaseSample )
 				gignote.samples.emplace_back(pSample, pDimRegion, attenuation, AudioResampler::Mode::Linear, gignote.frequency);
 			}
 		}
-
-		pRegion = m_instrument->GetNextRegion();
 	}
 }
 
@@ -846,31 +852,38 @@ Dimension GigInstrument::getDimensions( gig::Region * pRegion, int velocity, boo
 // it already. This is based on the bank and patch numbers.
 void GigInstrument::getInstrument()
 {
+	QMutexLocker locker( &m_synthMutex );
+
+	if (m_instance == nullptr) {
+        return;
+    }
+
 	// Find instrument
 	int iBankSelected = m_bankNum.value();
 	int iProgSelected = m_patchNum.value();
 
-	QMutexLocker locker( &m_synthMutex );
+	const size_t instrumentCount = m_instance->gig.CountInstruments();
 
-	if( m_instance != nullptr )
+	for (size_t i = 0; i < instrumentCount; ++i)
 	{
-		gig::Instrument * pInstrument = m_instance->gig.GetFirstInstrument();
+		gig::Instrument* pInstrument = m_instance->gig.GetInstrument(i);
 
-		while( pInstrument != nullptr )
+		if ( !pInstrument )
 		{
-			int iBank = pInstrument->MIDIBank;
-			int iProg = pInstrument->MIDIProgram;
-
-			if( iBank == iBankSelected && iProg == iProgSelected )
-			{
-				break;
-			}
-
-			pInstrument = m_instance->gig.GetNextInstrument();
+			continue;
 		}
 
-		m_instrument = pInstrument;
+		int iBank = pInstrument->MIDIBank;
+		int iProg = pInstrument->MIDIProgram;
+
+		if( iBank == iBankSelected && iProg == iProgSelected )
+		{
+			m_instrument = pInstrument;
+			return;
+		}
 	}
+
+	m_instrument = nullptr;
 }
 
 
