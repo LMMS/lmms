@@ -30,67 +30,34 @@
 namespace lmms
 {
 
-AudioDevice::AudioDevice( const ch_cnt_t _channels, AudioEngine*  _audioEngine ) :
-	m_supportsCapture( false ),
-	m_sampleRate( _audioEngine->outputSampleRate() ),
-	m_channels( _channels ),
-	m_audioEngine( _audioEngine ),
-	m_buffer(new SampleFrame[audioEngine()->framesPerPeriod()])
+AudioDevice::AudioDevice(const ch_cnt_t _channels, AudioEngine* _audioEngine)
+	: m_supportsCapture(false)
+	, m_sampleRate(_audioEngine->outputSampleRate())
+	, m_channels(_channels)
+	, m_audioEngine(_audioEngine)
 {
 }
-
 
 
 
 AudioDevice::~AudioDevice()
 {
-	delete[] m_buffer;
+	assert(m_running.test() && "device should have been stopped before being destroyed");
 	m_devMutex.tryLock();
 	unlock();
 }
 
-
-
-
-void AudioDevice::processNextBuffer()
+void AudioDevice::startProcessing()
 {
-	const fpp_t frames = getNextBuffer( m_buffer );
-	if (frames) { writeBuffer(m_buffer, frames); }
-	else
-	{
-		m_inProcess = false;
-	}
+	m_running.test_and_set(std::memory_order_acquire);
+	startProcessingImpl();
 }
-
-fpp_t AudioDevice::getNextBuffer(SampleFrame* _ab)
-{
-	fpp_t frames = audioEngine()->framesPerPeriod();
-	const SampleFrame* b = audioEngine()->nextBuffer();
-
-	if (!b) { return 0; }
-
-	memcpy(_ab, b, frames * sizeof(SampleFrame));
-
-	if (audioEngine()->hasFifoWriter()) { delete[] b; }
-	return frames;
-}
-
-
-
 
 void AudioDevice::stopProcessing()
 {
-	if( audioEngine()->hasFifoWriter() )
-	{
-		while( m_inProcess )
-		{
-			processNextBuffer();
-		}
-	}
+	m_running.clear(std::memory_order_release);
+	stopProcessingImpl();
 }
-
-
-
 
 void AudioDevice::stopProcessingThread( QThread * thread )
 {

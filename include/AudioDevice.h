@@ -28,6 +28,7 @@
 #include <QMutex>
 #include <samplerate.h>
 
+#include "AudioBufferView.h"
 #include "LmmsTypes.h"
 
 class QThread;
@@ -75,66 +76,43 @@ public:
 		return m_sampleRate;
 	}
 
-	void processNextBuffer();
+	void startProcessing();
 
-	virtual void startProcessing()
-	{
-		m_inProcess = true;
-	}
+	void stopProcessing();
 
-	virtual void stopProcessing();
+	bool isRunning() const { return m_running.test(std::memory_order_acquire); }
 
 protected:
-	// subclasses can re-implement this for being used in conjunction with
-	// processNextBuffer()
-	virtual void writeBuffer(const SampleFrame* /* _buf*/, const fpp_t /*_frames*/) {}
-
-	// called by according driver for fetching new sound-data
-	fpp_t getNextBuffer(SampleFrame* _ab);
-
 	// convert a given audio-buffer to a buffer in signed 16-bit samples
 	// returns num of bytes in outbuf
-	int convertToS16(const SampleFrame* _ab,
-						const fpp_t _frames,
-						int_sample_t * _output_buffer,
-						const bool _convert_endian = false );
+	int convertToS16(
+		const SampleFrame* _ab, const fpp_t _frames, int_sample_t* _output_buffer, const bool _convert_endian = false);
 
 	// clear given signed-int-16-buffer
-	void clearS16Buffer( int_sample_t * _outbuf,
-							const fpp_t _frames );
+	void clearS16Buffer(int_sample_t* _outbuf, const fpp_t _frames);
 
-	ch_cnt_t channels() const
-	{
-		return m_channels;
-	}
+	ch_cnt_t channels() const { return m_channels; }
 
-	inline void setSampleRate( const sample_rate_t _new_sr )
-	{
-		m_sampleRate = _new_sr;
-	}
+	AudioEngine* audioEngine() { return m_audioEngine; }
 
-	AudioEngine* audioEngine()
-	{
-		return m_audioEngine;
-	}
+	void setSampleRate(const sample_rate_t _new_sr) { m_sampleRate = _new_sr; }
 
 	static void stopProcessingThread( QThread * thread );
-
-
 protected:
 	bool m_supportsCapture;
 
-
 private:
+	virtual void startProcessingImpl() = 0;
+	virtual void stopProcessingImpl() = 0;
+
 	sample_rate_t m_sampleRate;
 	ch_cnt_t m_channels;
-	AudioEngine* m_audioEngine;
-	bool m_inProcess;
+
+	AudioEngine* m_audioEngine = nullptr;
 
 	QMutex m_devMutex;
 
-	SampleFrame* m_buffer;
-
+	std::atomic_flag m_running = ATOMIC_FLAG_INIT;
 };
 
 } // namespace lmms

@@ -361,6 +361,12 @@ public:
 		}
 	}
 
+	//! @return the sample at the given channel and frame position
+	constexpr auto sample(proc_ch_t channel, f_cnt_t frame) noexcept -> T&
+	{
+		return framePtr(frame)[channel];
+	}
+
 	/**
 	 * @return pointer to the frame at the given index.
 	 * The size of the frame is `channels()`.
@@ -499,6 +505,12 @@ public:
 	constexpr auto empty() const noexcept -> bool
 	{
 		return !this->m_data || Base::channels() == 0 || this->m_frames == 0;
+	}
+
+	//! @return the sample at the given channel and frame position
+	constexpr auto sample(proc_ch_t channel, f_cnt_t frame) noexcept -> T&
+	{
+		return bufferPtr(channel)[frame];
 	}
 
 	//! @return the buffer of the given channel

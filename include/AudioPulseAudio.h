@@ -52,7 +52,6 @@ class AudioPulseAudio : public QThread, public AudioDevice
 	Q_OBJECT
 public:
 	AudioPulseAudio( bool & _success_ful, AudioEngine* audioEngine );
-	~AudioPulseAudio() override;
 
 	inline static QString name()
 	{
@@ -83,16 +82,12 @@ public:
 
 	pa_stream * m_s;
 	pa_sample_spec m_sampleSpec;
-
+	double m_latency;
 
 private:
-	void startProcessing() override;
-	void stopProcessing() override;
+	void startProcessingImpl() override;
+	void stopProcessingImpl() override;
 	void run() override;
-
-	volatile bool m_quit;
-
-	bool m_convertEndian;
 
 	bool m_connected;
 	QSemaphore m_connectedSemaphore;

@@ -65,14 +65,10 @@ static const QString PATH_DEV_DSP =
 "/dev/dsp";
 #endif
 
-
-
-AudioOss::AudioOss( bool & _success_ful, AudioEngine*  _audioEngine ) :
-	AudioDevice(std::clamp<ch_cnt_t>(
-		ConfigManager::inst()->value("audiooss", "channels").toInt(),
-		DEFAULT_CHANNELS,
-		DEFAULT_CHANNELS), _audioEngine),
-	m_convertEndian( false )
+AudioOss::AudioOss(bool& _success_ful, AudioEngine* _audioEngine)
+	: AudioDevice(std::clamp<ch_cnt_t>(
+					  ConfigManager::inst()->value("audiooss", "channels").toInt(), DEFAULT_CHANNELS, DEFAULT_CHANNELS),
+		  _audioEngine)
 {
 	_success_ful = false;
 
@@ -99,7 +95,7 @@ AudioOss::AudioOss( bool & _success_ful, AudioEngine*  _audioEngine ) :
 
 	int frag_spec;
 	for (frag_spec = 0;
-		1u << frag_spec < audioEngine()->framesPerPeriod() * channels() * BYTES_PER_INT_SAMPLE;
+		1u << frag_spec < audioEngine()->framesPerAudioBuffer() * channels() * BYTES_PER_INT_SAMPLE;
 		++frag_spec)
 	{
 	}
@@ -112,38 +108,13 @@ AudioOss::AudioOss( bool & _success_ful, AudioEngine*  _audioEngine ) :
 		printf( "Warning: Couldn't set audio fragment size\n" );
 	}
 
-	unsigned int value;
-	// Get a list of supported hardware formats
-	if ( ioctl( m_audioFD, SNDCTL_DSP_GETFMTS, &value ) < 0 )
-	{
-		perror( "SNDCTL_DSP_GETFMTS" );
-		printf( "Couldn't get audio format list\n" );
-		return;
-	}
+	unsigned int value = AFMT_S16_NE;
 
-	// Set the audio format
-	if( value & AFMT_S16_LE )
-	{
-		value = AFMT_S16_LE;
-	}
-	else if( value & AFMT_S16_BE )
-	{
-		value = AFMT_S16_BE;
-	}
-	else
-	{
-		printf(" Soundcard doesn't support signed 16-bit-data\n");
-	}
 	if ( ioctl( m_audioFD, SNDCTL_DSP_SETFMT, &value ) < 0 )
 	{
 		perror( "SNDCTL_DSP_SETFMT" );
 		printf( "Couldn't set audio format\n" );
 		return;
-	}
-	if( ( isLittleEndian() && ( value == AFMT_S16_BE ) ) ||
-			( !isLittleEndian() && ( value == AFMT_S16_LE ) ) )
-	{
-		m_convertEndian = true;
 	}
 
 	// Set the number of channels of output
@@ -188,7 +159,6 @@ AudioOss::AudioOss( bool & _success_ful, AudioEngine*  _audioEngine ) :
 
 AudioOss::~AudioOss()
 {
-	stopProcessing();
 	close( m_audioFD );
 }
 
@@ -236,44 +206,37 @@ QString AudioOss::probeDevice()
 
 
 
-void AudioOss::startProcessing()
+void AudioOss::startProcessingImpl()
 {
-	if( !isRunning() )
-	{
-		start( QThread::HighPriority );
-	}
+	start(QThread::HighPriority);
 }
 
 
 
 
-void AudioOss::stopProcessing()
+void AudioOss::stopProcessingImpl()
 {
 	stopProcessingThread( this );
 }
 
 void AudioOss::run()
 {
-	auto temp = new SampleFrame[audioEngine()->framesPerPeriod()];
-	auto outbuf = new int_sample_t[audioEngine()->framesPerPeriod() * channels()];
+	auto buf = std::vector<float>(audioEngine()->framesPerAudioBuffer() * channels());
+	auto pcmBuf = std::vector<int16_t>(buf.size());
+	const auto bytesToWrite = static_cast<int>(pcmBuf.size() * sizeof(int16_t));
 
-	while( true )
+	while (AudioDevice::isRunning())
 	{
-		const fpp_t frames = getNextBuffer( temp );
-		if( !frames )
+		const auto bufferView = InterleavedBufferView<float>{buf.data(), channels(), audioEngine()->framesPerAudioBuffer()};
+		audioEngine()->renderNextBuffer(bufferView);
+
+		for (auto i = std::size_t{0}; i < buf.size(); ++i)
 		{
-			break;
+			pcmBuf[i] = static_cast<int16_t>(buf[i] * OUTPUT_SAMPLE_MULTIPLIER);
 		}
 
-		int bytes = convertToS16(temp, frames, outbuf, m_convertEndian);
-		if( write( m_audioFD, outbuf, bytes ) != bytes )
-		{
-			break;
-		}
+		if (write(m_audioFD, pcmBuf.data(), bytesToWrite) != bytesToWrite) { break; }
 	}
-
-	delete[] temp;
-	delete[] outbuf;
 }
 
 

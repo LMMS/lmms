@@ -41,12 +41,10 @@
 namespace lmms
 {
 
-AudioSndio::AudioSndio(bool & _success_ful, AudioEngine * _audioEngine) :
-	AudioDevice(std::clamp<ch_cnt_t>(
-		ConfigManager::inst()->value("audiosndio", "channels").toInt(),
-		DEFAULT_CHANNELS,
-		DEFAULT_CHANNELS), _audioEngine),
-	m_convertEndian ( false )
+AudioSndio::AudioSndio(bool& _success_ful, AudioEngine* _audioEngine)
+	: AudioDevice(std::clamp<ch_cnt_t>(ConfigManager::inst()->value("audiosndio", "channels").toInt(), DEFAULT_CHANNELS,
+					  DEFAULT_CHANNELS),
+		  _audioEngine)
 {
 	_success_ful = false;
 
@@ -73,13 +71,8 @@ AudioSndio::AudioSndio(bool & _success_ful, AudioEngine * _audioEngine) :
 	m_par.bits = 16;
 	m_par.le = SIO_LE_NATIVE;
 	m_par.rate = sampleRate();
-	m_par.round = audioEngine()->framesPerPeriod();
+	m_par.round = audioEngine()->framesPerAudioBuffer();
 	m_par.appbufsz = m_par.round * 2;
-
-	if ( (isLittleEndian() && (m_par.le == 0)) ||
-	     (!isLittleEndian() && (m_par.le == 1))) {
-		m_convertEndian = true;
-	}
 
 	struct sio_par reqpar = m_par;
 
@@ -115,7 +108,6 @@ AudioSndio::AudioSndio(bool & _success_ful, AudioEngine * _audioEngine) :
 
 AudioSndio::~AudioSndio()
 {
-	stopProcessing();
 	if (m_hdl != nullptr)
 	{
 		sio_close( m_hdl );
@@ -124,42 +116,28 @@ AudioSndio::~AudioSndio()
 }
 
 
-void AudioSndio::startProcessing()
+void AudioSndio::startProcessingImpl()
 {
-	if( !isRunning() )
-	{
-		start( QThread::HighPriority );
-	}
+	start(QThread::HighPriority);
 }
 
 
-void AudioSndio::stopProcessing()
+void AudioSndio::stopProcessingImpl()
 {
 	stopProcessingThread( this );
 }
 
 void AudioSndio::run()
 {
-	SampleFrame* temp = new SampleFrame[audioEngine()->framesPerPeriod()];
-	int_sample_t * outbuf = new int_sample_t[audioEngine()->framesPerPeriod() * channels()];
+	const auto framesPerAudioBuffer = audioEngine()->framesPerAudioBuffer();
+	auto buf = std::vector<float>(framesPerAudioBuffer * channels());
 
-	while( true )
+	while (AudioDevice::isRunning())
 	{
-		const fpp_t frames = getNextBuffer( temp );
-		if( !frames )
-		{
-			break;
-		}
-
-		uint bytes = convertToS16(temp, frames, outbuf, m_convertEndian);
-		if( sio_write( m_hdl, outbuf, bytes ) != bytes )
-		{
-			break;
-		}
+		const auto bufferView = InterleavedBufferView<float>{buf.data(), channels(), framesPerAudioBuffer};
+		audioEngine()->renderNextBuffer(bufferView);
+		sio_write(m_hdl, buf.data(), buf.size() * sizeof(float));
 	}
-
-	delete[] temp;
-	delete[] outbuf;
 }
 
 

@@ -102,8 +102,8 @@ public:
 	} ;
 
 private:
-	void startProcessing() override;
-	void stopProcessing() override;
+	void startProcessingImpl() override;
+	void stopProcessingImpl() override;
 
 #ifdef PORTAUDIO_V19
 	static int _process_callback( const void *_inputBuffer, void * _outputBuffer,
@@ -144,13 +144,7 @@ private:
 	PaStreamParameters m_inputParameters;
 
 	bool m_wasPAInitError;
-
-	SampleFrame* m_outBuf;
-	std::size_t m_outBufPos;
-	fpp_t m_outBufSize;
-
 	bool m_stopped;
-
 } ;
 
 #endif // LMMS_HAVE_PORTAUDIO
