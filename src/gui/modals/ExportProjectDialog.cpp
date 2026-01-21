@@ -65,6 +65,8 @@ ExportProjectDialog::ExportProjectDialog(const QString& path, Mode mode, QWidget
 	, m_stereoModeComboBox(new QComboBox())
 	, m_compressionLevelLabel(new QLabel(tr("Compression level:")))
 	, m_compressionLevelComboBox(new QComboBox())
+	, m_fileFormatSettingsGroupBox(new QGroupBox(tr("File format settings")))
+	, m_fileFormatSettingsLayout(new QFormLayout(m_fileFormatSettingsGroupBox))
 	, m_exportAsLoopBox(new QCheckBox(tr("Export as loop (remove extra bar)")))
 	, m_exportBetweenLoopMarkersBox(new QCheckBox(tr("Export between loop markers")))
 	, m_loopRepeatLabel(new QLabel(tr("Render looped section:")))
@@ -150,7 +152,6 @@ ExportProjectDialog::ExportProjectDialog(const QString& path, Mode mode, QWidget
 		}
 	}
 
-	auto mainLayout = new QVBoxLayout(this);
 
 	auto loopRepeatLayout = new QHBoxLayout{};
 	loopRepeatLayout->addWidget(m_loopRepeatLabel);
@@ -162,23 +163,16 @@ ExportProjectDialog::ExportProjectDialog(const QString& path, Mode mode, QWidget
 	exportSettingsLayout->addWidget(m_exportBetweenLoopMarkersBox);
 	exportSettingsLayout->addLayout(loopRepeatLayout);
 
-	auto fileFormatSettingsGroupBox = new QGroupBox(tr("File format settings"));
-	auto fileFormatSettingsLayout = new QFormLayout(fileFormatSettingsGroupBox);
-	fileFormatSettingsLayout->addRow(m_fileFormatLabel, m_fileFormatComboBox);
-	fileFormatSettingsLayout->addRow(m_sampleRateLabel, m_sampleRateComboBox);
-	fileFormatSettingsLayout->addRow(m_bitRateLabel, m_bitRateComboBox);
-	fileFormatSettingsLayout->addRow(m_bitDepthLabel, m_bitDepthComboBox);
-	fileFormatSettingsLayout->addRow(m_stereoModeLabel, m_stereoModeComboBox);
-	fileFormatSettingsLayout->addRow(m_compressionLevelLabel, m_compressionLevelComboBox);
-	fileFormatSettingsLayout->setVerticalSpacing(4);
+	m_fileFormatSettingsLayout->addRow(m_fileFormatLabel, m_fileFormatComboBox);
 
 	auto startCancelButtonsLayout = new QHBoxLayout{};
 	startCancelButtonsLayout->addStretch();
 	startCancelButtonsLayout->addWidget(m_startButton);
 	startCancelButtonsLayout->addWidget(m_cancelButton);
 
+	auto mainLayout = new QVBoxLayout(this);
 	mainLayout->addWidget(exportSettingsGroupBox);
-	mainLayout->addWidget(fileFormatSettingsGroupBox);
+	mainLayout->addWidget(m_fileFormatSettingsGroupBox);
 	mainLayout->addStretch();
 	mainLayout->addLayout(startCancelButtonsLayout);
 	mainLayout->addWidget(m_progressBar);
@@ -187,6 +181,10 @@ ExportProjectDialog::ExportProjectDialog(const QString& path, Mode mode, QWidget
 	m_loopRepeatBox->setRange(1, maxLoopRepeat);
 	m_loopRepeatBox->setValue(1);
 	m_loopRepeatBox->setSuffix(tr(" time(s)"));
+
+	m_fileFormatComboBox->setCurrentIndex(-1);
+	connect(m_fileFormatComboBox, qOverload<int>(&QComboBox::currentIndexChanged), this,
+		&ExportProjectDialog::onFileFormatChanged);
 
 	if (mode == Mode::ExportProject)
 	{
@@ -202,14 +200,6 @@ ExportProjectDialog::ExportProjectDialog(const QString& path, Mode mode, QWidget
 		std::max(0, m_stereoModeComboBox->findData(static_cast<int>(defaultStereoMode))));
 	m_compressionLevelComboBox->setCurrentIndex(defaultCompressionLevel);
 
-	// To prevent resizing of dialog when selecting the FLAC format (which has 3 settings, not 2 like the others)
-	const auto currentFileFormat = m_fileFormatComboBox->currentData().toInt();
-	onFileFormatChanged(static_cast<int>(ProjectRenderer::ExportFileFormat::Flac));
-	adjustSize();
-	onFileFormatChanged(currentFileFormat);
-
-	connect(m_fileFormatComboBox, qOverload<int>(&QComboBox::currentIndexChanged), this,
-		&ExportProjectDialog::onFileFormatChanged);
 	connect(m_startButton, &QPushButton::clicked, this, &ExportProjectDialog::onStartButtonClicked);
 	connect(m_cancelButton, &QPushButton::clicked, this, &ExportProjectDialog::reject);
 }
@@ -224,35 +214,32 @@ void ExportProjectDialog::onFileFormatChanged(int index)
 		m_path = fileInfo.path() + QDir::separator() + fileInfo.completeBaseName() + extension;
 	}
 
-	auto setVisible = [](QLabel* label, QComboBox* comboBox, bool visible) {
-		label->setVisible(visible);
-		comboBox->setVisible(visible);
-	};
-
-	setVisible(m_sampleRateLabel, m_sampleRateComboBox, false);
-	setVisible(m_bitDepthLabel, m_bitDepthComboBox, false);
-	setVisible(m_bitRateLabel, m_bitRateComboBox, false);
-	setVisible(m_stereoModeLabel, m_stereoModeComboBox, false);
-	setVisible(m_compressionLevelLabel, m_compressionLevelComboBox, false);
+	// Remove and detach all rows after the file format row
+	while (m_fileFormatSettingsLayout->rowCount() > 1)
+	{
+		const auto& [label, field] = m_fileFormatSettingsLayout->takeRow(1);
+		label->widget()->setParent(nullptr);
+		field->widget()->setParent(nullptr);
+	}
 
 	switch (static_cast<ProjectRenderer::ExportFileFormat>(index))
 	{
 	case ProjectRenderer::ExportFileFormat::Wave:
-		setVisible(m_sampleRateLabel, m_sampleRateComboBox, true);
-		setVisible(m_bitDepthLabel, m_bitDepthComboBox, true);
+		m_fileFormatSettingsLayout->addRow(m_sampleRateLabel, m_sampleRateComboBox);
+		m_fileFormatSettingsLayout->addRow(m_bitDepthLabel, m_bitDepthComboBox);
 		break;
 	case ProjectRenderer::ExportFileFormat::Flac:
-		setVisible(m_sampleRateLabel, m_sampleRateComboBox, true);
-		setVisible(m_bitDepthLabel, m_bitDepthComboBox, true);
-		setVisible(m_compressionLevelLabel, m_compressionLevelComboBox, true);
+		m_fileFormatSettingsLayout->addRow(m_sampleRateLabel, m_sampleRateComboBox);
+		m_fileFormatSettingsLayout->addRow(m_bitDepthLabel, m_bitDepthComboBox);
+		m_fileFormatSettingsLayout->addRow(m_compressionLevelLabel, m_compressionLevelComboBox);
 		break;
 	case ProjectRenderer::ExportFileFormat::Ogg:
-		setVisible(m_sampleRateLabel, m_sampleRateComboBox, true);
-		setVisible(m_bitRateLabel, m_bitRateComboBox, true);
+		m_fileFormatSettingsLayout->addRow(m_sampleRateLabel, m_sampleRateComboBox);
+		m_fileFormatSettingsLayout->addRow(m_bitRateLabel, m_bitRateComboBox);
 		break;
 	case ProjectRenderer::ExportFileFormat::MP3:
-		setVisible(m_stereoModeLabel, m_stereoModeComboBox, true);
-		setVisible(m_bitRateLabel, m_bitRateComboBox, true);
+		m_fileFormatSettingsLayout->addRow(m_stereoModeLabel, m_stereoModeComboBox);
+		m_fileFormatSettingsLayout->addRow(m_bitRateLabel, m_bitRateComboBox);
 	default:
 		break;
 	}

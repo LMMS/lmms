@@ -36,6 +36,8 @@ class QProgressBar;
 class QCheckBox;
 class QComboBox;
 class QSpinBox;
+class QFormLayout;
+class QGroupBox;
 
 namespace lmms::gui {
 
@@ -74,6 +76,9 @@ private:
 
 	QLabel* m_compressionLevelLabel = nullptr;
 	QComboBox* m_compressionLevelComboBox = nullptr;
+
+	QGroupBox* m_fileFormatSettingsGroupBox = nullptr;
+	QFormLayout* m_fileFormatSettingsLayout = nullptr;
 
 	QCheckBox* m_exportAsLoopBox = nullptr;
 	QCheckBox* m_exportBetweenLoopMarkersBox = nullptr;
