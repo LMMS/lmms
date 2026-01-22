@@ -248,7 +248,7 @@ QString GigInstrument::getCurrentPatchName()
 {
 	QMutexLocker locker( &m_synthMutex );
 
-	if( m_instance == nullptr )
+	if(m_instance == nullptr)
 	{
 		return "";
 	}
@@ -262,7 +262,7 @@ QString GigInstrument::getCurrentPatchName()
 	{
 		gig::Instrument* pInstrument =  m_instance->gig.GetInstrument(i);
 
-		if ( !pInstrument )
+		if (!pInstrument)
 		{
 			continue;
 		}
@@ -270,11 +270,11 @@ QString GigInstrument::getCurrentPatchName()
 		int iBank = pInstrument->MIDIBank;
 		int iProg = pInstrument->MIDIProgram;
 
-		if( iBank == iBankSelected && iProg == iProgSelected )
+		if(iBank == iBankSelected && iProg == iProgSelected)
 		{
-			QString name = QString::fromStdString( pInstrument->pInfo->Name );
+			QString name = QString::fromStdString(pInstrument->pInfo->Name);
 
-			if( name == "" )
+			if(name == "")
 			{
 				name = "<no name>";
 			}
@@ -702,9 +702,9 @@ void GigInstrument::addSamples( GigNote & gignote, bool wantReleaseSample )
 {
 	// Change key dimension, e.g. change samples based on what key is pressed
 	// in a certain range. From LinuxSampler
-	if( wantReleaseSample &&
+	if (wantReleaseSample &&
 			gignote.midiNote >= m_instrument->DimensionKeyRange.low &&
-			gignote.midiNote <= m_instrument->DimensionKeyRange.high )
+			gignote.midiNote <= m_instrument->DimensionKeyRange.high)
 	{
 		m_currentKeyDimension = float( gignote.midiNote -
 				m_instrument->DimensionKeyRange.low ) / (
@@ -718,13 +718,13 @@ void GigInstrument::addSamples( GigNote & gignote, bool wantReleaseSample )
 	{
 		gig::Region* pRegion = m_instrument->GetRegionAt(i);
 
-		if ( !pRegion )
+		if (!pRegion)
 		{
 			continue;
 		}
 
 		Dimension dim = getDimensions( pRegion, gignote.velocity, wantReleaseSample );
-		gig::DimensionRegion * pDimRegion = pRegion->GetDimensionRegionByValue( dim.DimValues );
+		gig::DimensionRegion * pDimRegion = pRegion->GetDimensionRegionByValue(dim.DimValues);
 		gig::Sample * pSample = pDimRegion->pSample;
 
 		// If this is a release sample, the note won't ever be
@@ -733,27 +733,27 @@ void GigInstrument::addSamples( GigNote & gignote, bool wantReleaseSample )
 
 		// Does this note have release samples? Set this only on the original
 		// notes and not when we get the release samples.
-		if( !wantReleaseSample )
+		if (!wantReleaseSample)
 		{
 			gignote.release = dim.release;
 		}
 
-		if( pSample != nullptr && pSample->SamplesTotal != 0 )
+		if (pSample != nullptr && pSample->SamplesTotal != 0)
 		{
 			int keyLow = pRegion->KeyRange.low;
 			int keyHigh = pRegion->KeyRange.high;
 
-			if( gignote.midiNote >= keyLow && gignote.midiNote <= keyHigh )
+			if (gignote.midiNote >= keyLow && gignote.midiNote <= keyHigh)
 			{
-				float attenuation = pDimRegion->GetVelocityAttenuation( gignote.velocity );
+				float attenuation = pDimRegion->GetVelocityAttenuation(gignote.velocity);
 				float length = (float) pSample->SamplesTotal / Engine::audioEngine()->outputSampleRate();
 
 				// TODO: sample panning? crossfade different layers?
 
-				if( wantReleaseSample )
+				if (wantReleaseSample)
 				{
 					// From LinuxSampler, not sure how it was created
-					attenuation *= 1 - 0.01053 * ( 256 >> pDimRegion->ReleaseTriggerDecay ) * length;
+					attenuation *= 1 - 0.01053 * (256 >> pDimRegion->ReleaseTriggerDecay) * length;
 				}
 				else
 				{
@@ -868,7 +868,7 @@ void GigInstrument::getInstrument()
 	{
 		gig::Instrument* pInstrument = m_instance->gig.GetInstrument(i);
 
-		if ( !pInstrument )
+		if (!pInstrument)
 		{
 			continue;
 		}
@@ -876,7 +876,7 @@ void GigInstrument::getInstrument()
 		int iBank = pInstrument->MIDIBank;
 		int iProg = pInstrument->MIDIProgram;
 
-		if( iBank == iBankSelected && iProg == iProgSelected )
+		if(iBank == iBankSelected && iProg == iProgSelected)
 		{
 			m_instrument = pInstrument;
 			return;

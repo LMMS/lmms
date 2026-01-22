@@ -149,7 +149,7 @@ void PatchesDialog::setup( GigInstance * pSynth, int iChan,
 	{
 		gig::Instrument* pInstrument = m_pSynth->gig.GetInstrument(i);
 
-		if ( !pInstrument )
+		if (!pInstrument)
 		{
 			continue;
 		}
@@ -157,15 +157,15 @@ void PatchesDialog::setup( GigInstance * pSynth, int iChan,
 		int iBank = pInstrument->MIDIBank;
 		int iProg = pInstrument->MIDIProgram;
 
-		if ( !findBankItem( iBank ) )
+		if (!findBankItem( iBank ))
 		{
-			pBankItem = new PatchItem( m_bankListView, pBankItem );
+			pBankItem = new PatchItem(m_bankListView, pBankItem);
 
-			if( pBankItem )
+			if (pBankItem)
 			{
-				pBankItem->setText( 0, QString::number( iBank ) );
+				pBankItem->setText(0, QString::number(iBank));
 
-				if( iBankDefault == -1 )
+				if (iBankDefault == -1)
 				{
 					iBankDefault = iBank;
 					iProgDefault = iProg;
@@ -352,14 +352,14 @@ void PatchesDialog::bankChanged()
 	{
 		gig::Instrument* pInstrument = m_pSynth->gig.GetInstrument(i);
 
-		if ( !pInstrument )
+		if (!pInstrument)
 		{
 			continue;
 		}
 
 		QString name = QString::fromStdString( pInstrument->pInfo->Name );
 
-		if( name == "" )
+		if(name == "")
 		{
 			name = "<no name>";
 		}
@@ -367,14 +367,14 @@ void PatchesDialog::bankChanged()
 		int iBank = pInstrument->MIDIBank;
 		int iProg = pInstrument->MIDIProgram;
 
-		if( iBank == iBankSelected && !findProgItem( iProg ) )
+		if(iBank == iBankSelected && !findProgItem( iProg ))
 		{
 			pProgItem = new PatchItem( m_progListView, pProgItem );
 
-			if( pProgItem )
+			if (pProgItem)
 			{
-				pProgItem->setText( 0, QString::number( iProg ) );
-				pProgItem->setText( 1, name );
+				pProgItem->setText(0, QString::number(iProg));
+				pProgItem->setText(1, name);
 			}
 		}
 	}
