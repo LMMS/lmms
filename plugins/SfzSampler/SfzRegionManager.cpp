@@ -1,7 +1,6 @@
 
 
 #include "SfzRegionManager.h"
-#include <QDebug>
 
 
 namespace lmms
