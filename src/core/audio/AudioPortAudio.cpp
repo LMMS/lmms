@@ -276,15 +276,8 @@ int AudioPortAudio::process_callback(const float* _inputBuffer, float* _outputBu
 	return paContinue;
 }
 
-
-
-int AudioPortAudio::_process_callback(
-	const void *_inputBuffer,
-	void * _outputBuffer,
-	unsigned long _framesPerBuffer,
-	const PaStreamCallbackTimeInfo * _timeInfo,
-	PaStreamCallbackFlags _statusFlags,
-	void * _arg )
+int AudioPortAudio::_process_callback(const void* _inputBuffer, void* _outputBuffer, unsigned long _framesPerBuffer,
+	const PaStreamCallbackTimeInfo* _timeInfo, PaStreamCallbackFlags _statusFlags, void* _arg) noexcept LMMS_NONBLOCKING
 {
 	Q_UNUSED(_timeInfo);
 	Q_UNUSED(_statusFlags);

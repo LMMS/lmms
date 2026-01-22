@@ -37,7 +37,7 @@
 namespace lmms
 {
 
-static void stream_write_callback(pa_stream *s, size_t length, void *userdata)
+static void stream_write_callback(pa_stream* s, size_t length, void* userdata) noexcept LMMS_NONBLOCKING
 {
 	static_cast<AudioPulseAudio *>( userdata )->streamWriteCallback( s, length );
 }
@@ -110,7 +110,7 @@ void AudioPulseAudio::stopProcessing()
 
 
 /* This routine is called whenever the stream state changes */
-static void stream_state_callback( pa_stream *s, void * userdata )
+static void stream_state_callback(pa_stream* s, void* userdata) noexcept LMMS_NONBLOCKING
 {
 	switch( pa_stream_get_state( s ) )
 	{
@@ -133,7 +133,7 @@ static void stream_state_callback( pa_stream *s, void * userdata )
 
 
 /* This is called whenever the context status changes */
-static void context_state_callback(pa_context *c, void *userdata)
+static void context_state_callback(pa_context *c, void *userdata) noexcept LMMS_NONBLOCKING
 {
 	auto _this = static_cast<AudioPulseAudio*>(userdata);
 	switch( pa_context_get_state( c ) )

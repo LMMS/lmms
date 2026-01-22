@@ -84,7 +84,7 @@ public:
 private:
 	void startProcessing() override;
 	void stopProcessing() override;
-	void run() override;
+	void run() noexcept override;
 
 	int setHWParams( const ch_cnt_t _channels, snd_pcm_access_t _access );
 	int setSWParams();
