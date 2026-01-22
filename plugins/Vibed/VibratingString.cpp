@@ -29,7 +29,6 @@
 #include "LmmsTypes.h"
 
 #include <algorithm>
-#include <cstdlib>
 
 namespace lmms
 {
@@ -40,7 +39,7 @@ VibratingString::VibratingString(float pitch, float pick, float pickup, const fl
 	m_oversample{2 * oversample / static_cast<int>(sampleRate / Engine::audioEngine()->baseSampleRate())},
 	m_randomize{randomize},
 	m_stringLoss{1.0f - stringLoss},
-	m_choice(fastRandInc(m_oversample)),
+	m_choice(fastRand(m_oversample)),
 	m_state{0.1f},
 	m_outsamp{std::make_unique<sample_t[]>(m_oversample)}
 {
