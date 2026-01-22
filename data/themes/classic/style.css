@@ -141,6 +141,7 @@ lmms--gui--FileBrowser QCheckBox
 lmms--gui--PositionLine {
 	qproperty-tailGradient: false;
 	qproperty-lineColor: rgb(255, 255, 255);
+	qproperty-recordingColor: rgb(255, 71, 87);
 }
 
 lmms--gui--PianoRoll {
@@ -792,7 +793,7 @@ lmms--gui--ClipView   {
 	qproperty-selectedColor: rgb( 0, 125, 255 );
 	qproperty-patternClipBackground: rgb( 80, 80, 80 );
 	qproperty-textColor: rgb( 255, 255, 255 );
-	qproperty-textBackgroundColor: rgba(0, 0, 0, 75);
+	qproperty-textBackgroundColor: rgba(0, 0, 0, 100);
 	qproperty-textShadowColor: rgb( 0, 0, 0 );
 	qproperty-gradient: true; /* boolean property, set true to have a gradient */
 	qproperty-markerColor: rgb(0, 0, 0);
@@ -825,6 +826,11 @@ lmms--gui--AutomationClipView {
 /* pattern clip */
 lmms--gui--PatternClipView {
 	background-color: rgb( 128, 182, 175 ); /* default colour for pattern tracks */
+	qproperty-emptyTrackHeightRatio: 0.5; /* height of empty tracks versus non-empty tracks */
+	qproperty-verticalPadding: 0.15; /* padding above and below the beat preview on the clip, fraction of the total clip height */
+	qproperty-noteVerticalSpacing: 0.2; /* spacing above and below each note, fraction of the note height */
+	qproperty-noteHorizontalSpacing: 0.2; /* spacing left/right of each note, fraction of the note width */
+	qproperty-noteColor: #ffffff; /* colour of the beat/note rectangles on the clip */
 }
 
 /* Subwindows in MDI-Area */

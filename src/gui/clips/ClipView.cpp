@@ -40,6 +40,7 @@
 #include "embed.h"
 #include "GuiApplication.h"
 #include "KeyboardShortcuts.h"
+#include "lmms_math.h"
 #include "MidiClipView.h"
 #include "PatternClip.h"
 #include "PatternStore.h"
@@ -353,7 +354,7 @@ void ClipView::selectColor()
 
 void ClipView::randomizeColor()
 {
-	setColor(ColorChooser::getPalette(ColorChooser::Palette::Mixer)[std::rand() % 48]);
+	setColor(ColorChooser::getPalette(ColorChooser::Palette::Mixer)[fastRand(48)]);
 }
 
 void ClipView::resetColor()
@@ -583,7 +584,7 @@ void ClipView::paintTextLabel(QString const & text, QPainter & painter)
 		elidedClipName = text.trimmed();
 	}
 
-	painter.fillRect(QRect(0, 0, width(), fontMetrics.height() + 2 * textTop), textBackgroundColor());
+	painter.fillRect(QRect(0, 0, fontMetrics.horizontalAdvance(elidedClipName) + 8, fontMetrics.height() + 2 * textTop), textBackgroundColor());
 
 	int const finalTextTop = textTop + fontMetrics.ascent();
 	painter.setPen(textShadowColor());
