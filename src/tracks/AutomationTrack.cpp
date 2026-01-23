@@ -36,7 +36,7 @@ namespace lmms
 AutomationTrack::AutomationTrack( TrackContainer* tc, bool _hidden ) :
 	Track( _hidden ? Type::HiddenAutomation : Type::Automation, tc )
 {
-	setName( tr( "Automation track" ) );
+	setName(tr("Automation track"), true);
 }
 
 bool AutomationTrack::play( const TimePos & time_start, const fpp_t _frames,

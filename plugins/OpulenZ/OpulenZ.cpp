@@ -602,7 +602,7 @@ void OpulenzInstrument::loadFile( const QString& file ) {
 		QString sbiname = sbidata.mid(4, 32);
 		// If user has changed track name... let's hope my logic is valid.
 		if( sbiname.size() > 0 && instrumentTrack()->displayName() == storedname ) {
-			instrumentTrack()->setName(sbiname);
+			instrumentTrack()->setName(sbiname, true);
 			storedname = sbiname;
 		}
 
