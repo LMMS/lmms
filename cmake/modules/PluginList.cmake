@@ -64,10 +64,12 @@ SET(LMMS_PLUGIN_LIST
 	SlewDistortion
 	SlicerT
 	SpectrumAnalyzer
+	StepGate
 	StereoEnhancer
 	StereoMatrix
 	Stk
 	TapTempo
+	TransferFunction
 	VstBase
 	Vestige
 	VstEffect
@@ -75,6 +77,7 @@ SET(LMMS_PLUGIN_LIST
 	WaveShaper
 	Vectorscope
 	Vibed
+	Visualiser
 	Xpressive
 	ZynAddSubFx
 )
