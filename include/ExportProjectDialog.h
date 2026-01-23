@@ -87,6 +87,7 @@ private:
 	QPushButton* m_startButton = nullptr;
 	QPushButton* m_cancelButton = nullptr;
 	QProgressBar* m_progressBar = nullptr;
+
 	QString m_path;
 	Mode m_mode;
 	std::unique_ptr<RenderManager> m_renderManager;
