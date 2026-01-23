@@ -586,6 +586,7 @@ void InstrumentTrackWindow::dropEvent( QDropEvent* event )
 {
 	QString type = StringPairDrag::decodeKey( event );
 	QString value = StringPairDrag::decodeValue( event );
+	m_track->addJournalCheckPoint();
 
 	if( type == "instrument" )
 	{
