@@ -220,7 +220,7 @@ void SfzSampler::loadFile(const QString& filePath)
 	// The SfzParser generates all the SfzRegion objects, but it doesn't load any of the samples
 	// The sample filenames are stored in the regions as from the `sample` opcode, so we just need to load the files into memory to use them
 	// The samples are stored with relative paths with respect to the sfz file, so first find the parent directory:
-	QDir parentDirectory = QFileInfo(filePath).absoluteDir();
+	QDir parentDirectory = QDir(QFileInfo(filePath).absoluteDir().absoluteFilePath(m_controlsConfig.m_default_path.value_or("")));
 	// Reset any loaded samples
 	m_samplePool = SfzSamplePool();
 	int i = 0;

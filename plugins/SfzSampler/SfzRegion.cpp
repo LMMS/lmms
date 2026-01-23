@@ -124,7 +124,7 @@ bool SfzRegion::initializeSample(const QDir& parentDirectory, SfzSamplePool& sam
 		return false;
 	}
 
-	QString path = parentDirectory.absoluteFilePath(m_default_path.value_or("") + m_sampleFile.value());
+	QString path = parentDirectory.absoluteFilePath(m_sampleFile.value());
 	// The sample pool handles making sure the same sample isn't loaded twice, which would waste memory
 	m_sample = samplePool.loadSample(path);
 

@@ -179,9 +179,6 @@ bool SfzParser::parseSfzFile(const QString& filePath, std::vector<SfzRegion>& ou
 			case Header::Control:
 			{
 				controlsConfig.setOpcodeByStrings(opcodeNameAndValue[0], opcodeNameAndValue[1]);
-				// Also set the opcode for the global state, that way it will get propagated down to all other regions (this is needed for things like `default_path` to work for all regions)
-				// Technically it could be reworked so that the regions fetch any needed info from the controls state, but for now this way is simpler.
-				globalState.setOpcodeByStrings(opcodeNameAndValue[0], opcodeNameAndValue[1]);
 				break;
 			}
 			case Header::Curve:
