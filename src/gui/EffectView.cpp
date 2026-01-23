@@ -87,26 +87,10 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 					this, SLOT(editControls()));
 
 		m_controlView = effect()->controls()->createView();
-		if( m_controlView )
+		if (m_controlView)
 		{
-			m_subWindow = getGUI()->mainWindow()->addWindowedWidget( m_controlView );
-
-			if ( !m_controlView->isResizable() )
-			{
-				m_subWindow->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
-				if (m_subWindow->layout())
-				{
-					m_subWindow->layout()->setSizeConstraint(QLayout::SetFixedSize);
-				}
-			}
-
-			Qt::WindowFlags flags = m_subWindow->windowFlags();
-			flags &= ~Qt::WindowMaximizeButtonHint;
-			m_subWindow->setWindowFlags( flags );
-
-			connect( m_controlView, SIGNAL(closed()),
-					this, SLOT(closeEffects()));
-
+			m_subWindow = getGUI()->mainWindow()->addWindowedWidget(m_controlView);
+			m_subWindow->setWindowFlag(Qt::WindowMaximizeButtonHint, false);
 			m_subWindow->hide();
 		}
 	}
@@ -134,11 +118,11 @@ void EffectView::editControls()
 {
 	if( m_subWindow )
 	{
-		if( !m_subWindow->isVisible() )
+		if (!m_controlView->isVisible())
 		{
 			m_subWindow->show();
 			m_subWindow->raise();
-			effect()->controls()->setViewVisible( true );
+			effect()->controls()->setViewVisible(true); // TODO is this even needed?
 		}
 		else
 		{
@@ -171,17 +155,6 @@ void EffectView::deletePlugin()
 	emit deletedPlugin(this);
 }
 
-
-
-
-void EffectView::closeEffects()
-{
-	if( m_subWindow )
-	{
-		m_subWindow->hide();
-	}
-	effect()->controls()->setViewVisible( false );
-}
 
 
 
