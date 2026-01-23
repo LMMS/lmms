@@ -143,30 +143,35 @@ void PatchesDialog::setup( GigInstance * pSynth, int iChan,
 	int iBankDefault = -1;
 	int iProgDefault = -1;
 
-	gig::Instrument * pInstrument = m_pSynth->gig.GetFirstInstrument();
+	const size_t instrumentCount = m_pSynth->gig.CountInstruments();
 
-	while( pInstrument )
+	for (size_t i = 0; i < instrumentCount; ++i)
 	{
+		gig::Instrument* pInstrument = m_pSynth->gig.GetInstrument(i);
+
+		if (!pInstrument)
+		{
+			continue;
+		}
+
 		int iBank = pInstrument->MIDIBank;
 		int iProg = pInstrument->MIDIProgram;
 
-		if ( !findBankItem( iBank ) )
+		if (!findBankItem( iBank ))
 		{
-			pBankItem = new PatchItem( m_bankListView, pBankItem );
+			pBankItem = new PatchItem(m_bankListView, pBankItem);
 
-			if( pBankItem )
+			if (pBankItem)
 			{
-				pBankItem->setText( 0, QString::number( iBank ) );
+				pBankItem->setText(0, QString::number(iBank));
 
-				if( iBankDefault == -1 )
+				if (iBankDefault == -1)
 				{
 					iBankDefault = iBank;
 					iProgDefault = iProg;
 				}
 			}
 		}
-
-		pInstrument = m_pSynth->gig.GetNextInstrument();
 	}
 
 	m_bankListView->setSortingEnabled( true );
@@ -341,13 +346,20 @@ void PatchesDialog::bankChanged()
 	m_progListView->clear();
 	QTreeWidgetItem * pProgItem = nullptr;
 
-	gig::Instrument * pInstrument = m_pSynth->gig.GetFirstInstrument();
+	const size_t instrumentCount = m_pSynth->gig.CountInstruments();
 
-	while( pInstrument )
+	for (size_t i = 0; i < instrumentCount; ++i)
 	{
+		gig::Instrument* pInstrument = m_pSynth->gig.GetInstrument(i);
+
+		if (!pInstrument)
+		{
+			continue;
+		}
+
 		QString name = QString::fromStdString( pInstrument->pInfo->Name );
 
-		if( name == "" )
+		if(name == "")
 		{
 			name = "<no name>";
 		}
@@ -355,18 +367,16 @@ void PatchesDialog::bankChanged()
 		int iBank = pInstrument->MIDIBank;
 		int iProg = pInstrument->MIDIProgram;
 
-		if( iBank == iBankSelected && !findProgItem( iProg ) )
+		if(iBank == iBankSelected && !findProgItem( iProg ))
 		{
 			pProgItem = new PatchItem( m_progListView, pProgItem );
 
-			if( pProgItem )
+			if (pProgItem)
 			{
-				pProgItem->setText( 0, QString::number( iProg ) );
-				pProgItem->setText( 1, name );
+				pProgItem->setText(0, QString::number(iProg));
+				pProgItem->setText(1, name);
 			}
 		}
-
-		pInstrument = m_pSynth->gig.GetNextInstrument();
 	}
 
 	m_progListView->setSortingEnabled( true );
