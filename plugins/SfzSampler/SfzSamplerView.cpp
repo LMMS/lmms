@@ -48,6 +48,7 @@
 #include "PathUtil.h"
 #include "embed.h"
 #include "MidiEvent.h"
+#include "InstrumentTrack.h"
 
 namespace lmms {
 
@@ -101,17 +102,17 @@ void SfzSamplerView::onFileLoaded()
 		// Only add a knob if the control is actually used
 		if (m_instrument->m_controlsConfig.m_activeMidiCCs.at(i))
 		{
-			m_instrument->m_ccModels.at(i).setRange(0, 127, 1);
-			m_instrument->m_ccModels.at(i).setValue(m_instrument->m_sfzGlobalState.midiCCValue(i), true);
 			const QString& controlLabel = m_instrument->m_controlsConfig.m_label_cc.at(i).value_or(tr("CC %1").arg(i));
 			auto ccKnob = new Knob(KnobType::Bright26, controlLabel, m_controlsWidget);
-			ccKnob->setModel(&m_instrument->m_ccModels.at(i));
+			ccKnob->setModel(m_instrument->m_parentTrack->midiCCModel(i));
 			m_knobLayout->addWidget(ccKnob, activeControlCount / 8, activeControlCount % 8);
-			connect(&m_instrument->m_ccModels.at(i), &AutomatableModel::dataChanged, this, [i, this](){
-				m_instrument->handleMidiEvent(MidiEvent(MidiControlChange, 0, i, m_instrument->m_ccModels.at(i).value()));
-			});
 			activeControlCount++;
 		}
+	}
+	// If we are using midi CC's make sure to enable them in the instrument track
+	if (activeControlCount > 0)
+	{
+		m_instrument->m_parentTrack->midiCCEnableModel()->setValue(true, true);
 	}
 
 	// Update the switch key list
@@ -149,6 +150,11 @@ void SfzSamplerView::openFile()
 	{
 		if (openFileDialog.selectedFiles().isEmpty()) { return; }
 		m_instrument->loadFile(openFileDialog.selectedFiles()[0]);
+		// If the file is being loaded due to the user clicking the button (not opening a save file) then we also need to update the midi CC knobs
+		for (int i = 0; i < SfzOpcodeState::NumMidiCCs; ++i)
+		{
+			m_instrument->m_parentTrack->midiCCModel(i)->setValue(m_instrument->m_sfzGlobalState.midiCCValue(i), true);
+		}
 	}
 }
 

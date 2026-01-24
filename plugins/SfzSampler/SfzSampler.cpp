@@ -253,6 +253,12 @@ void SfzSampler::loadSettings(const QDomElement& element)
 	{
 		loadFile(m_sfzFilePath);
 	}
+	// Make sure the midi CC knobs send their current values so that saved presets work normally upon loading
+	for (int i = 0; i < SfzOpcodeState::NumMidiCCs; ++i)
+	{
+		// TODO should the trigger be passed to the whole instrument or just the global state? We don't really want to trigger any regions which are triggered by cc events (not implemented yet). But this doesn't feel very clean either.
+		m_sfzGlobalState.processTrigger(SfzTrigger::controlChangeEvent(0, i, m_parentTrack->midiCCModel(i)->value()));
+	}
 }
 
 QString SfzSampler::nodeName() const
