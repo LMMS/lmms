@@ -14,7 +14,7 @@ find_package_config_mode_with_fallback(portaudio portaudio
 
 determine_version_from_source(Portaudio_VERSION portaudio [[
 	#include <iostream>
-	#include "portaudio.h"
+	#include <portaudio.h>
 
 	auto main() -> int
 	{
