@@ -66,7 +66,7 @@ class ClipView : public selectableObject, public ModelView
 public:
 	const static int BORDER_WIDTH = 2;
 
-	ClipView( Clip * clip, TrackView * tv, int offset = 1 );
+	ClipView( Clip * clip, TrackView * tv, int offset = 0 );
 	~ClipView() override;
 
 	bool fixedClips();
@@ -140,6 +140,9 @@ public slots:
 	void randomizeColor();
 	void resetColor();
 
+signals:
+	void closing();
+
 protected:
 	enum class ContextMenuAction
 	{
@@ -147,7 +150,8 @@ protected:
 		Cut,
 		Copy,
 		Paste,
-		Mute
+		Mute,
+		Loop
 	};
 
 	TrackView * m_trackView;
@@ -189,6 +193,7 @@ protected:
 protected slots:
 	void updateLength();
 	void updatePosition();
+	void closeLoopViews();
 
 
 private:
@@ -259,6 +264,11 @@ private:
 		return splitClip(pos);
 	}
 	void updateCursor(QMouseEvent * me);
+
+	/**
+	 * Create a new loop view after this ()
+	 */
+	virtual void loop() {};
 } ;
 
 

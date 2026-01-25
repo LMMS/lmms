@@ -43,7 +43,7 @@ class MidiClipView : public ClipView
 	Q_OBJECT
 
 public:
-	MidiClipView( MidiClip* clip, TrackView* parent );
+	MidiClipView( MidiClip* clip, TrackView* parent, int offset = 0 );
 	~MidiClipView() override = default;
 
 	Q_PROPERTY(QColor noteFillColor READ getNoteFillColor WRITE setNoteFillColor)
@@ -114,6 +114,8 @@ private:
 	bool isResizableBeforeStart() override { return false; }
 	
 	bool destructiveSplitClip(const TimePos pos) override;
+
+	virtual void loop();
 } ;
 
 

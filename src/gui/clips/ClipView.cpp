@@ -344,6 +344,15 @@ void ClipView::updatePosition()
 	m_trackView->trackContainerView()->update();
 }
 
+void ClipView::closeLoopViews()
+{
+	if ( m_offset )
+	{
+		closing();
+		close();
+	}
+}
+
 void ClipView::selectColor()
 {
 	// Get a color from the user
@@ -487,8 +496,8 @@ void ClipView::updateCursor(QMouseEvent * me)
 {
 	const auto posX = position(me).x();
 
-	// If we are at the edges, use the resize cursor
-	if (!me->buttons() && m_clip->manuallyResizable() && !isSelected()
+	// If we are at the edges, use the resize cursor (loop views are not allowed to be resized directly)
+	if (!me->buttons() && m_clip->manuallyResizable() && !isSelected() && !m_offset
 		&& ((posX > width() - RESIZE_GRIP_WIDTH) || (posX < RESIZE_GRIP_WIDTH)))
 	{
 		setCursor(Qt::SizeHorCursor);
@@ -759,7 +768,15 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 		}
 		else if( !fixedClips() )
 		{
-			remove( active );
+			closing();
+			if ( m_offset )
+			{
+				close();
+			}
+			else
+			{
+				remove( active );
+			}
 		}
 	}
 }
@@ -874,7 +891,7 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 			( *it )->movePosition( newPos + m_initialOffsets[index] );
 		}
 	}
-	else if( m_action == Action::Resize || m_action == Action::ResizeLeft )
+	else if( ( m_action == Action::Resize || m_action == Action::ResizeLeft ) && !m_offset ) // Loop views can't be resized directly
 	{
 		const float snapSize = getGUI()->songEditor()->m_editor->getSnapSize();
 		// Length in ticks of one snap increment
@@ -988,6 +1005,7 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 				arg( m_clip->endPosition().getTicks() %
 						TimePos::ticksPerBar() ) );
 		s_textFloat->moveGlobal( this, QPoint( width() + 2, height() + 2) );
+		updatePosition();
 	}
 	else if( m_action == Action::Split )
 	{
@@ -1104,6 +1122,14 @@ void ClipView::contextMenuEvent( QContextMenuEvent * cme )
 		tr( "Paste" ),
 		[this](){ contextMenuAction( ContextMenuAction::Paste ); } );
 
+	if ( m_clip->loopable() )
+	{
+		contextMenu.addAction(
+			embed::getIconPixmap( "edit_paste" ),
+			tr( "Loop" ),
+			[this](){ contextMenuAction( ContextMenuAction::Loop ); } );
+	}
+
 	contextMenu.addSeparator();
 
 	contextMenu.addAction(
@@ -1155,6 +1181,9 @@ void ClipView::contextMenuAction( ContextMenuAction action )
 			break;
 		case ContextMenuAction::Mute:
 			toggleMute( active );
+			break;
+		case ContextMenuAction::Loop:
+			loop();
 			break;
 	}
 }

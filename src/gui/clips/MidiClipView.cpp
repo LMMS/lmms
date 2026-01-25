@@ -50,8 +50,8 @@ namespace lmms::gui
 
 constexpr int BeatStepButtonOffset = 4;
 
-MidiClipView::MidiClipView( MidiClip* clip, TrackView* parent ) :
-	ClipView( clip, parent ),
+MidiClipView::MidiClipView( MidiClip* clip, TrackView* parent, int offset ) :
+	ClipView( clip, parent, offset ),
 	m_clip( clip ),
 	m_paintPixmap(),
 	m_noteFillColor(255, 255, 255, 220),
@@ -935,5 +935,11 @@ bool MidiClipView::destructiveSplitClip(const TimePos pos)
 	return true;
 }
 
+
+void MidiClipView::loop()
+{
+	MidiClipView* newLoop = new MidiClipView(m_clip, m_trackView, offset() + 1);
+	connect(this, SIGNAL(closing()), newLoop, SLOT(closeLoopViews()));
+}
 
 } // namespace lmms::gui
