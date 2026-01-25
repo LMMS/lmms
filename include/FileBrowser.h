@@ -248,6 +248,7 @@ public:
 		Preset,
 		Sample,
 		SoundFont,
+		SFZ,
 		Patch,
 		Midi,
 		VstPlugin,

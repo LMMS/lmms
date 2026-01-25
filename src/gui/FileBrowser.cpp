@@ -811,7 +811,7 @@ void FileBrowserTreeWidget::previewFileItem(FileItem* file)
 		const bool isPlugin = file->handling() == FileItem::FileHandling::LoadByPlugin;
 		newPPH = new PresetPreviewPlayHandle(fileName, isPlugin);
 	}
-	else if (file->type() != FileItem::FileType::VstPlugin && file->isTrack())
+	else if (file->type() != FileItem::FileType::VstPlugin && file->type() != FileItem::FileType::SFZ && file->isTrack())
 	{
 		DataFile dataFile(fileName);
 		if (dataFile.validate(ext))
@@ -880,6 +880,10 @@ void FileBrowserTreeWidget::mouseMoveEvent( QMouseEvent * me )
 				case FileItem::FileType::SoundFont:
 					new StringPairDrag( "soundfontfile", f->fullName(),
 							embed::getIconPixmap( "soundfont_file" ), this );
+					break;
+				case FileItem::FileType::SFZ:
+					new StringPairDrag("sfzfile", f->fullName(),
+							embed::getIconPixmap("soundfont_file"), this);
 					break;
 				case FileItem::FileType::Patch:
 					new StringPairDrag( "patchfile", f->fullName(),
@@ -1196,6 +1200,7 @@ void FileItem::initPixmaps()
 			setIcon(0, s_presetFilePixmap);
 			break;
 		case FileType::SoundFont:
+		case FileType::SFZ:
 			setIcon(0, s_soundfontFilePixmap);
 			break;
 		case FileType::VstPlugin:
@@ -1241,6 +1246,10 @@ void FileItem::determineFileType()
 	else if( ext == "sf2" || ext == "sf3" )
 	{
 		m_type = FileType::SoundFont;
+	}
+	else if (ext == "sfz")
+	{
+		m_type = FileType::SFZ;
 	}
 	else if( ext == "pat" )
 	{
@@ -1310,6 +1319,7 @@ QString FileItem::defaultFilters()
 	const auto projectFilters = QStringList{"*.mmp", "*.mpt", "*.mmpz"};
 	const auto presetFilters = QStringList{"*.xpf", "*.xml", "*.xiz", "*.lv2"};
 	const auto soundFontFilters = QStringList{"*.sf2", "*.sf3"};
+	const auto sfzFilters = QStringList{"*.sfz"};
 	const auto patchFilters = QStringList{"*.pat"};
 	const auto midiFilters = QStringList{"*.mid", "*.midi", "*.rmi"};
 	
@@ -1324,7 +1334,7 @@ QString FileItem::defaultFilters()
 	audioFilters.append("*.mp3");
 #endif
 
-	const auto extensions = projectFilters + presetFilters + soundFontFilters + patchFilters + midiFilters
+	const auto extensions = projectFilters + presetFilters + soundFontFilters + sfzFilters + patchFilters + midiFilters
 		+ vstPluginFilters + audioFilters;
 
 	return extensions.join(" ");

@@ -51,7 +51,7 @@ Plugin::Descriptor PLUGIN_EXPORT sfzsampler_plugin_descriptor = {
 	0x0100,
 	Plugin::Type::Instrument,
 	new PluginPixmapLoader("logo"),
-	nullptr,
+	"sfz",
 	nullptr,
 };
 PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* m, void*)
