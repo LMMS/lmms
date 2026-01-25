@@ -239,6 +239,12 @@ public:
 
 	void autoAssignMidiDevice( bool );
 
+	//! Returns a non-owning pointer to the LED in the MIDI CC rack which toggles whether the knobs send midi control change events
+	BoolModel* midiCCEnableModel() const { return m_midiCCEnable.get(); }
+
+	//! Returns a non-owning pointer to the model for the knob at the given index in the track's MIDI CC rack
+	FloatModel* midiCCModel(int index) const { return m_midiCCModel[index].get(); }
+
 signals:
 	void instrumentChanged();
 	void midiNoteOn( const lmms::Note& );
