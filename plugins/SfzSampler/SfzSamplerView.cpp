@@ -151,6 +151,7 @@ void SfzSamplerView::openFile()
 		if (openFileDialog.selectedFiles().isEmpty()) { return; }
 		m_instrument->loadFile(openFileDialog.selectedFiles()[0]);
 		// If the file is being loaded due to the user clicking the button (not opening a save file) then we also need to update the midi CC knobs
+		// TODO this doesn't work with drag/drop
 		for (int i = 0; i < SfzOpcodeState::NumMidiCCs; ++i)
 		{
 			m_instrument->m_parentTrack->midiCCModel(i)->setValue(m_instrument->m_sfzGlobalState.midiCCValue(i), true);
@@ -161,6 +162,7 @@ void SfzSamplerView::openFile()
 
 void SfzSamplerView::dragEnterEvent(QDragEnterEvent* dee)
 {
+	/*
 	QString value = StringPairDrag::decodeValue(dee);
 	if (value.endsWith(".sfz")) 
 	{
@@ -169,10 +171,12 @@ void SfzSamplerView::dragEnterEvent(QDragEnterEvent* dee)
 		return;
 	}
 	dee->ignore();
+	*/
 }
 
 void SfzSamplerView::dropEvent(QDropEvent* de)
 {
+	/*
 	QString value = StringPairDrag::decodeValue(de);
 	if (value.endsWith(".sfz")) 
 	{
@@ -181,6 +185,7 @@ void SfzSamplerView::dropEvent(QDropEvent* de)
 		return;
 	}
 	de->ignore();
+	*/
 }
 
 void SfzSamplerView::resizeEvent(QResizeEvent* re)
