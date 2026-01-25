@@ -78,7 +78,7 @@ TextFloat * ClipView::s_textFloat = nullptr;
  * \param _tv  The track view that will contain the new object
  */
 ClipView::ClipView( Clip * clip,
-							TrackView * tv ) :
+							TrackView * tv , int offset) :
 	selectableObject( tv->getTrackContentWidget() ),
 	ModelView( nullptr, this ),
 	m_trackView( tv ),
@@ -98,7 +98,8 @@ ClipView::ClipView( Clip * clip,
 	m_patternClipBackground( 0, 0, 0 ),
 	m_gradient( true ),
 	m_markerColor(0, 0, 0),
-	m_needsUpdate( true )
+	m_needsUpdate( true ),
+	m_offset( offset )
 {
 	if( s_textFloat == nullptr )
 	{

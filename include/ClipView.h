@@ -66,7 +66,7 @@ class ClipView : public selectableObject, public ModelView
 public:
 	const static int BORDER_WIDTH = 2;
 
-	ClipView( Clip * clip, TrackView * tv );
+	ClipView( Clip * clip, TrackView * tv, int offset = 1 );
 	~ClipView() override;
 
 	bool fixedClips();
@@ -79,6 +79,11 @@ public:
 	inline TrackView * getTrackView()
 	{
 		return m_trackView;
+	}
+
+	inline int offset() const
+	{
+		return m_offset;
 	}
 
 	// qproperty access func
@@ -202,6 +207,7 @@ private:
 	static TextFloat * s_textFloat;
 
 	Clip * m_clip;
+	int m_offset; // Offset of the View from the Clip, in Clip's lengths (offset != 0 => loop view)
 	Action m_action;
 	QPoint m_initialMousePos;
 	QPoint m_initialMouseGlobalPos;
