@@ -100,6 +100,12 @@ public:
 
 	bool manuallyResizable() const;
 
+	// Returns whether the clip can be looped
+	virtual bool loopable() const
+	{
+		return false;
+	}
+
 	/*! \brief Set whether a clip has been resized yet by the user or the knife tool.
 	 *
 	 *  If a clip has been resized previously, it will not automatically 
