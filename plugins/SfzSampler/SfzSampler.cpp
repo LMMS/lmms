@@ -100,9 +100,9 @@ bool SfzSampler::handleMidiEvent(const MidiEvent& event, const TimePos& time, f_
 
 void SfzSampler::playNote(NotePlayHandle* handle, SampleFrame* workingBuffer)
 {
-	int noteIndex = handle->key();
-	const fpp_t frames = handle->framesLeftForCurrentPeriod();
-	const f_cnt_t offset = handle->noteOffset();
+	//int noteIndex = handle->key();
+	//const fpp_t frames = handle->framesLeftForCurrentPeriod();
+	//const f_cnt_t offset = handle->noteOffset();
 }
 
 void SfzSampler::deleteNotePluginData(NotePlayHandle* handle)
