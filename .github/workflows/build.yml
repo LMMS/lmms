@@ -67,9 +67,9 @@ jobs:
       - name: Configure
         run: |
           ccache --zero-stats
-          source /opt/qt5*/bin/qt5*-env.sh || true
           cmake -S . \
                 -B build \
+                -DWANT_QT6=ON \
                 $CMAKE_OPTS
       - name: Build
         run: cmake --build build
@@ -150,6 +150,7 @@ jobs:
           ccache --zero-stats
           cmake -S . \
                 -B build \
+                -DWANT_QT6=ON \
                 $CMAKE_OPTS
       - name: Build
         run: cmake --build build
@@ -183,9 +184,11 @@ jobs:
           - arch: x86_64
             os: macos-15-intel
             xcode: "16.4"
+            macosx_deployment_target: 10.15
           - arch: arm64
             os: macos-15
             xcode: "16.4"
+            macosx_deployment_target: 11.0
     name: macos-${{ matrix.arch }}
     runs-on: ${{ matrix.os }}
     env:
@@ -235,11 +238,12 @@ jobs:
       - name: Configure
         run: |
           ccache --zero-stats
-          source .github/workflows/macos-env.sh
           mkdir build
           cmake -S . \
                 -B build \
                 -DCMAKE_OSX_ARCHITECTURES=${{ matrix.arch }} \
+                -DCMAKE_OSX_DEPLOYMENT_TARGET=${{ matrix.macosx_deployment_target }} \
+                -DWANT_QT6=ON \
                 $CMAKE_OPTS \
                 -DUSE_WERROR=OFF
       - name: Build
@@ -469,7 +473,7 @@ jobs:
       - name: Configure
         run: |
           /clang64/bin/ccache.exe --zero-stats
-          cmake -B build $CMAKE_OPTS
+          cmake -B build -DWANT_QT6=ON $CMAKE_OPTS
       - name: Build
         run: cmake --build build
       - name: Package
