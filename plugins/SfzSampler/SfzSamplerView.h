@@ -1,7 +1,7 @@
 /*
- * SfzSamplerView.h - Declaration of class SfzSamplerView
+ * SfzSamplerView.h - GUI for SfzSampler
  *
- * Copyright (c) 2023 Daniel Kauss Serna <daniel.kauss.serna@gmail.com>
+ * Copyright (c) 2026 Keratin
  *
  * This file is part of LMMS - https://lmms.io
  *

@@ -1,7 +1,7 @@
 /*
- * SfzSampler.h - Declaration of SfzSampler class, Simple SFZ instrument loader/editor
+ * SfzSampler.h - Simple SFZ instrument player
  *
- * Copyright (c) 2023 Daniel Kauss Serna <daniel.kauss.serna@gmail.com>
+ * Copyright (c) 2026 Keratin
  *
  * This file is part of LMMS - https://lmms.io
  *
