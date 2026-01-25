@@ -95,7 +95,7 @@ bool SfzParser::parseSfzFile(const QString& filePath, std::vector<SfzRegion>& ou
 		std::vector<QString> lineSegments;
 		for (QString segment : line.split(QRegularExpression("\\s"), Qt::SkipEmptyParts)) // Note: Technically by skipping empty parts, double-spaces within names will be lost. Is this okay? I'm not sure.
 		{
-			if (segment.contains("=") || (segment.front() == "<" && segment.back() == ">"))
+			if (segment.contains("=") || (segment.front() == '<' && segment.back() == '>'))
 			{
 				// If this is an opcode assignment or a <header>, go ahead and add it to the list as it is
 				lineSegments.push_back(segment);
@@ -133,7 +133,7 @@ bool SfzParser::parseSfzFile(const QString& filePath, std::vector<SfzRegion>& ou
 	for (QString segment : parsedSegments)
 	{
 		// Track whether we are entering a new header region
-		if (segment.front() == "<" && segment.back() == ">")
+		if (segment.front() == '<' && segment.back() == '>')
 		{
 			// If we were previously in a <region>, then wrap it up and add it to the output vector
 			if (currentHeader == Header::Region) { outputRegions.emplace_back(currentRegionState); }
@@ -273,7 +273,7 @@ QString SfzParser::recursiveHandleIncludeAndDefineStatements(const QDir& parentD
 			const QString variableValue = segments[2];
 			defineMap[variableName] = variableValue;
 			// A define variable should probably start with a $
-			if (variableName.front() != "$") { qDebug() << "[SFZ Parser] Warning: #define variable name does not start with $:" << line; }
+			if (variableName.front() != '$') { qDebug() << "[SFZ Parser] Warning: #define variable name does not start with $:" << line; }
 		}
 		else if (line.startsWith("#include "))
 		{
