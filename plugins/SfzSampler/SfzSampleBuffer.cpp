@@ -30,7 +30,7 @@ namespace lmms
 
 
 SfzSampleBuffer::SfzSampleBuffer(const SampleFrame* data, const f_cnt_t size, const float sampleRate)
-	: m_data(std::make_shared<float[][NUM_CHANNELS]>(size))
+	: m_data(std::shared_ptr<float[][NUM_CHANNELS]>{new float[size][NUM_CHANNELS]})
 	, m_size(size)
 	, m_sampleRate(sampleRate)
 {
