@@ -196,8 +196,21 @@ void SfzSampler::recalculateMaxActiveIndex()
 
 
 
-
 void SfzSampler::loadFile(const QString& filePath)
+{
+	loadSfzFile(filePath);
+	// Reset the instrument track's midi CC knobs to the defaults of the SFZ
+	for (int i = 0; i < SfzOpcodeState::NumMidiCCs; ++i)
+	{
+		m_parentTrack->midiCCModel(i)->setInitValue(m_sfzGlobalState.midiCCValue(i));
+		// For some reason it seems calling `setValue` on the CC models doesn't send a midi event to the instrument when doing drag/drop,
+		// so we also send a trigger to update the region's
+		processTrigger(SfzTrigger::controlChangeEvent(0, i, m_parentTrack->midiCCModel(i)->value())); // TODO there may be a cleaner way to do this
+	}
+}
+
+
+void SfzSampler::loadSfzFile(const QString& filePath)
 {
 	// Prevent the audio thread from accidentally looping through the regions while they are being edited
 	const auto guard = Engine::audioEngine()->requestChangesGuard();
@@ -251,13 +264,13 @@ void SfzSampler::loadSettings(const QDomElement& element)
 	m_sfzFilePath = element.attribute("sfzfile");
 	if (!m_sfzFilePath.isEmpty())
 	{
-		loadFile(m_sfzFilePath);
+		// Using `loadSfzFile` instead of `loadFile` to bypass resetting the midi CC knobs
+		loadSfzFile(m_sfzFilePath);
 	}
-	// Make sure the midi CC knobs send their current values so that saved presets work normally upon loading
+	// Sync the internal CC values so that saved presets/projects work normally upon loading
 	for (int i = 0; i < SfzOpcodeState::NumMidiCCs; ++i)
 	{
-		// TODO should the trigger be passed to the whole instrument or just the global state? We don't really want to trigger any regions which are triggered by cc events (not implemented yet). But this doesn't feel very clean either.
-		m_sfzGlobalState.processTrigger(SfzTrigger::controlChangeEvent(0, i, m_parentTrack->midiCCModel(i)->value()));
+		processTrigger(SfzTrigger::controlChangeEvent(0, i, m_parentTrack->midiCCModel(i)->value()));
 	}
 }
 

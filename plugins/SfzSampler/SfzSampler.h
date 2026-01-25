@@ -58,6 +58,8 @@ public:
 	void loadSettings(const QDomElement& element) override;
 
 	void loadFile(const QString& filePath) override;
+	//! This extra function for loading files is needed so that we can choose only to reset the CC knobs when the user is loading a new file, not a preset/project
+	void loadSfzFile(const QString& filePath);
 
 	QString nodeName() const override;
 	gui::PluginView* instantiateView(QWidget* parent) override;
