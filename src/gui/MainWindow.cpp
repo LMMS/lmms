@@ -170,7 +170,11 @@ MainWindow::MainWindow() :
 	};
 
 	m_workspaceScrollBarV = new QScrollBar(Qt::Vertical, splitter);
+	m_workspaceScrollBarV->setTracking(true);
+
 	m_workspaceScrollBarH = new QScrollBar(Qt::Horizontal, splitter);
+	m_workspaceScrollBarH->setTracking(true);
+
 	m_workspace = new MovableQMdiArea(splitter, &m_keyMods, hasActiveMaxWindow, m_workspaceScrollBarV,
 		m_workspaceScrollBarH);
 
@@ -1627,10 +1631,36 @@ MainWindow::MovableQMdiArea::MovableQMdiArea(QWidget* parent, keyModifiers* keyM
 	, m_hasActiveMaxWindow{hasActiveMaxWindow}
 	, m_scrollBarV{scrollBarV}
 	, m_scrollBarH{scrollBarH}
+	, m_scrollBarLastY{0}
+	, m_scrollBarLastX{0}
 {
 	parent->installEventFilter(this);
 
 	connect(this, &QMdiArea::subWindowActivated, this, [this] { updateScrollBars(); });
+
+	// These avoid stack smashing by checking whether the delta is non-null.
+	// TODO: find a safer way to do this.
+	// FIXME: negative deltas are messed up. Sometimes they're absurd positive 1000 values.
+	connect(m_scrollBarH, &QScrollBar::sliderMoved, this, [this] {
+		int newValue = m_scrollBarH->value();
+		int delta = newValue - m_scrollBarLastX;
+		
+		if (delta != 0)
+		{
+			m_scrollBarLastX = newValue;
+			scroll(delta, 0);
+		}
+	});
+	connect(m_scrollBarV, &QScrollBar::sliderMoved, this, [this] {
+		int newValue = m_scrollBarV->value();
+		int delta = newValue - m_scrollBarLastY;
+		
+		if (delta != 0)
+		{
+			m_scrollBarLastY = newValue;
+			scroll(0, delta);
+		}
+	});
 }
 
 void MainWindow::MovableQMdiArea::updateScrollBars()
@@ -1652,15 +1682,23 @@ void MainWindow::MovableQMdiArea::updateScrollBars()
 	m_scrollBarH->setMaximum(sbMaxX + transX);
 	m_scrollBarV->setMinimum(sbMinY + transY);
 	m_scrollBarV->setMaximum(sbMaxY + transY);
-	m_scrollBarH->setValue(0 + transX);
-	m_scrollBarV->setValue(0 + transY);
+
+	const int newX = 0 + transX;
+	const int newY = 0 + transY;
+
+	m_scrollBarH->setValue(newX);
+	m_scrollBarV->setValue(newY);
+
 	m_scrollBarH->setPageStep(width());
 	m_scrollBarV->setPageStep(height());
+
+	m_scrollBarLastX = newX;
+	m_scrollBarLastY = newY;
 
 	// qDebug() << QString{"H(%0,%1) V(%2,%3)"}.arg(sbMaxX - sbMinX).arg(sbMinY).arg(sbMaxY - sbMinY).arg(sbMinY); // TODO: remove
 }
 
-void MainWindow::MovableQMdiArea::panStart(int globalX, int globalY)
+void MainWindow::MovableQMdiArea::mousePanStart(int globalX, int globalY)
 {
 	m_lastX = globalX;
 	m_lastY = globalY;
@@ -1703,12 +1741,9 @@ std::tuple<int, int, int, int> MainWindow::MovableQMdiArea::getActiveWorkspaceAr
 	}
 }
 
-void MainWindow::MovableQMdiArea::panMove(int globalX, int globalY)
+void MainWindow::MovableQMdiArea::scroll(int scrollX, int scrollY)
 {
 	const auto [minX, maxX, minY, maxY] = getActiveWorkspaceArea();
-
-	int scrollX = m_lastX - globalX;
-	int scrollY = m_lastY - globalY;
 
 	// Boundaries for each region. If trying to move in a direction and its respective boundary has been passed, the
 	// movement will not happen.
@@ -1733,13 +1768,21 @@ void MainWindow::MovableQMdiArea::panMove(int globalX, int globalY)
 		}
 	}
 
-	m_lastX = globalX;
-	m_lastY = globalY;
-
 	updateScrollBars();
 }
 
-void MainWindow::MovableQMdiArea::panEnd()
+void MainWindow::MovableQMdiArea::mousePanMove(int globalX, int globalY)
+{
+	int scrollX = m_lastX - globalX;
+	int scrollY = m_lastY - globalY;
+
+	scroll(scrollX, scrollY);
+
+	m_lastX = globalX;
+	m_lastY = globalY;
+}
+
+void MainWindow::MovableQMdiArea::mousePanEnd()
 {
 	setCursor(Qt::ArrowCursor);
 	m_isBeingMoved = false;
@@ -1750,7 +1793,7 @@ void MainWindow::MovableQMdiArea::mousePressEvent(QMouseEvent* event)
 {
 	const auto pos = event->globalPos();
 	m_isUniversalPan = false;
-	panStart(pos.x(), pos.y());
+	mousePanStart(pos.x(), pos.y());
 }
 
 void MainWindow::MovableQMdiArea::mouseMoveEvent(QMouseEvent* event)
@@ -1758,13 +1801,13 @@ void MainWindow::MovableQMdiArea::mouseMoveEvent(QMouseEvent* event)
 	if (!m_isBeingMoved || m_isUniversalPan) { return; }
 
 	const auto pos = event->globalPos();
-	panMove(pos.x(), pos.y());
+	mousePanMove(pos.x(), pos.y());
 }
 
 void MainWindow::MovableQMdiArea::mouseReleaseEvent(QMouseEvent* event)
 {
 	if (!m_isBeingMoved || m_isUniversalPan) { return; }
-	panEnd();
+	mousePanEnd();
 }
 
 void MainWindow::MovableQMdiArea::resizeEvent(QResizeEvent* event)
@@ -1819,7 +1862,7 @@ bool MainWindow::MovableQMdiArea::eventFilter(QObject* watched, QEvent* event)
 		{
 			const auto pos = mouseEvent->globalPos();
 			m_isUniversalPan = true;
-			panStart(pos.x(), pos.y());
+			mousePanStart(pos.x(), pos.y());
 			return true;
 		}
 	}
@@ -1828,13 +1871,13 @@ bool MainWindow::MovableQMdiArea::eventFilter(QObject* watched, QEvent* event)
 	{
 		QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
 		const auto pos = mouseEvent->globalPos();
-		panMove(pos.x(), pos.y());
+		mousePanMove(pos.x(), pos.y());
 		return true;
 	}
 
 	if (event->type() == QEvent::MouseButtonRelease && m_isBeingMoved && m_isUniversalPan)
 	{
-		panEnd();
+		mousePanEnd();
 		return true;
 	}
 

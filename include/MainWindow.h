@@ -222,9 +222,10 @@ private:
 		bool eventFilter(QObject* watched, QEvent* event) override;
 
 	private:
-		void panStart(int globalX, int globalY);
-		void panMove(int globalX, int globalY);
-		void panEnd();
+		void mousePanStart(int globalX, int globalY);
+		void mousePanMove(int globalX, int globalY);
+		void mousePanEnd();
+		void scroll(int scrollX, int scrollY);
 		void updateScrollBars();
 
 		static constexpr int Margin = 100; //!< Margin used along with the active workspace area.
@@ -241,6 +242,8 @@ private:
 		std::function<bool()> m_hasActiveMaxWindow;
 		QScrollBar* m_scrollBarV;
 		QScrollBar* m_scrollBarH;
+		int m_scrollBarLastY;
+		int m_scrollBarLastX;
 	};
 	MovableQMdiArea* m_workspace;
 	QScrollBar* m_workspaceScrollBarH;
