@@ -169,14 +169,26 @@ MainWindow::MainWindow() :
 		return false;
 	};
 
-	m_workspaceScrollBarV = new QScrollBar(Qt::Vertical, splitter);
+	m_workspaceScrollBarV = new QScrollBar(Qt::Vertical, nullptr);
 	m_workspaceScrollBarV->setTracking(true);
+	m_workspaceScrollBarV->setFixedWidth(12);
 
-	m_workspaceScrollBarH = new QScrollBar(Qt::Horizontal, splitter);
+	m_workspaceScrollBarH = new QScrollBar(Qt::Horizontal, nullptr);
 	m_workspaceScrollBarH->setTracking(true);
+	m_workspaceScrollBarH->setFixedHeight(12);
 
-	m_workspace = new MovableQMdiArea(splitter, &m_keyMods, hasActiveMaxWindow, m_workspaceScrollBarV,
+	constexpr auto HideHandleStyle = "QSplitter::handle { width: 0px; }";
+
+	splitter->setStyleSheet(HideHandleStyle);
+
+	auto workspaceVSplitter = new QSplitter(Qt::Vertical, splitter);
+	workspaceVSplitter->setStyleSheet(HideHandleStyle);
+	workspaceVSplitter->setChildrenCollapsible(false);
+
+	m_workspace = new MovableQMdiArea(workspaceVSplitter, &m_keyMods, hasActiveMaxWindow, m_workspaceScrollBarV,
 		m_workspaceScrollBarH);
+	workspaceVSplitter->insertWidget(-1, m_workspaceScrollBarH);
+	workspaceVSplitter->handle(workspaceVSplitter->indexOf(m_workspaceScrollBarH))->hide();
 
 	// Load background
 	emit initProgress(tr("Loading background picture"));
@@ -199,13 +211,15 @@ MainWindow::MainWindow() :
 	m_workspace->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	m_workspace->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
+	splitter->insertWidget(-1, m_workspaceScrollBarV);
+
 	hbox->addWidget(sideBar);
 	hbox->addWidget(splitter);
 	// If the user wants the sidebar on the right, we move the workspace and
 	// the splitter to the "left" side, or the first widgets in their list
 	if (sideBarOnRight)
 	{
-		splitter->insertWidget(0, m_workspace);
+		splitter->insertWidget(0, workspaceVSplitter);
 		hbox->insertWidget(0, splitter);
 	}
 
@@ -222,7 +236,7 @@ MainWindow::MainWindow() :
 
 	vbox->addWidget( m_toolBar );
 	vbox->addWidget( w );
-	vbox->addWidget(m_workspaceScrollBarH);
+	// vbox->addWidget(m_workspaceScrollBarH);
 	setCentralWidget( main_widget );
 
 	m_updateTimer.start( 1000 / 60, this );  // 60 fps
@@ -1638,7 +1652,6 @@ MainWindow::MovableQMdiArea::MovableQMdiArea(QWidget* parent, keyModifiers* keyM
 
 	connect(this, &QMdiArea::subWindowActivated, this, [this] { updateScrollBars(); });
 
-	// FIXME: negative deltas are messed up. Sometimes they're absurd positive 1000 values.
 	connect(m_scrollBarH, &QScrollBar::sliderMoved, this, [this] {
 		int newValue = m_scrollBarH->value();
 		int delta = newValue - m_scrollBarLastX;
@@ -1833,7 +1846,7 @@ void MainWindow::MovableQMdiArea::childEvent(QChildEvent* event)
 bool MainWindow::MovableQMdiArea::eventFilter(QObject* watched, QEvent* event)
 {
 	// First try to detect if this is a subwindow (we're installing filters on the subwindows) and whether it is being
-	// modified in a way that would affect t he scrollbars.
+	// modified in a way that would affect the scrollbars.
 	if (auto* subWin = dynamic_cast<QMdiSubWindow*>(watched); subWin != nullptr)
 	{
 		switch (event->type())
