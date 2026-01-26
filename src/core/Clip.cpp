@@ -50,7 +50,8 @@ Clip::Clip( Track * track ) :
 	m_startPosition(),
 	m_length(),
 	m_mutedModel( false, this, tr( "Mute" ) ),
-	m_selectViewOnCreate{false}
+	m_selectViewOnCreate{false},
+	m_loopCount(0)
 {
 	if( getTrack() )
 	{
@@ -79,7 +80,8 @@ Clip::Clip(const Clip& other):
 	m_mutedModel(other.m_mutedModel.value(), this, tr( "Mute" )),
 	m_autoResize(other.m_autoResize),
 	m_selectViewOnCreate{other.m_selectViewOnCreate},
-	m_color(other.m_color)
+	m_color(other.m_color),
+	m_loopCount(0)
 {
 	if (getTrack())
 	{

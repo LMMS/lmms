@@ -132,6 +132,11 @@ ClipView::ClipView( Clip * clip,
 		if (!m_clip->color().has_value()) { update(); }
 	});
 
+	if ( offset )
+	{
+		clip->increaseLoopCount();
+	}
+
 	m_trackView->getTrackContentWidget()->addClipView( this );
 	updateLength();
 	updatePosition();
@@ -265,6 +270,10 @@ void ClipView::setNeedsUpdate( bool b )
  */
 bool ClipView::close()
 {
+	if ( m_offset )
+	{
+		m_clip->decreaseLoopCount();
+	}
 	m_trackView->getTrackContentWidget()->removeClipView( this );
 	return QWidget::close();
 }

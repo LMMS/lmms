@@ -790,17 +790,21 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 				? 0
 				: (currentNote->endPos() - cur_start - noteOverlap) * frames_per_tick;
 
-			NotePlayHandle* notePlayHandle = NotePlayHandleManager::acquire(this, _offset, noteFrames, *currentNote);
-			notePlayHandle->setPatternTrack(pattern_track);
-			// are we playing global song?
-			if( _clip_num < 0 )
+			for ( int i = 0; i <= c->loopCount(); i++ )
 			{
-				// then set song-global offset of clip in order to
-				// properly perform the note detuning
-				notePlayHandle->setSongGlobalParentOffset( c->startPosition() + c->startTimeOffset());
+				NotePlayHandle* notePlayHandle = NotePlayHandleManager::acquire(this, _offset + ( i * c->length() * frames_per_tick ), noteFrames, *currentNote);
+				notePlayHandle->setPatternTrack(pattern_track);
+				// are we playing global song?
+				if( _clip_num < 0 )
+				{
+					// then set song-global offset of clip in order to
+					// properly perform the note detuning
+					notePlayHandle->setSongGlobalParentOffset( c->startPosition() + c->startTimeOffset());
+				}
+
+				Engine::audioEngine()->addPlayHandle( notePlayHandle );
 			}
 
-			Engine::audioEngine()->addPlayHandle( notePlayHandle );
 			played_a_note = true;
 			++nit;
 		}
