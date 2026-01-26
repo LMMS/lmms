@@ -208,8 +208,8 @@ private:
 			@param hasActiveMaxWindow Function that should return whether there are any active maximized windows, in
 			order to avoid initiating a pan in that case.
 		*/
-		MovableQMdiArea(QWidget* parent, keyModifiers* keyMods,
-			std::function<bool()> hasActiveMaxWindow);
+		MovableQMdiArea(QWidget* parent, keyModifiers* keyMods, std::function<bool()> hasActiveMaxWindow,
+			QScrollBar* scrollBarV, QScrollBar* scrollBarH);
 
 		~MovableQMdiArea() {}
 
@@ -231,8 +231,12 @@ private:
 		int m_lastX;
 		int m_lastY;
 		std::function<bool()> m_hasActiveMaxWindow;
+		QScrollBar* m_scrollBarV;
+		QScrollBar* m_scrollBarH;
 	};
-	MovableQMdiArea * m_workspace;
+	MovableQMdiArea* m_workspace;
+	QScrollBar* m_workspaceScrollBarH;
+	QScrollBar* m_workspaceScrollBarV;
 
 	QWidget * m_toolBar;
 	QGridLayout * m_toolBarLayout;

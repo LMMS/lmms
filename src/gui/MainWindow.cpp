@@ -169,7 +169,14 @@ MainWindow::MainWindow() :
 		return false;
 	};
 
-	m_workspace = new MovableQMdiArea(splitter, &m_keyMods, hasActiveMaxWindow);
+	m_workspaceScrollBarV = new QScrollBar(Qt::Vertical, splitter);
+	// m_workspaceScrollBarH->setEnabled(false);
+
+	m_workspaceScrollBarH = new QScrollBar(Qt::Horizontal, splitter);
+	// m_workspaceScrollBarH->setEnabled(false);
+
+	m_workspace = new MovableQMdiArea(splitter, &m_keyMods, hasActiveMaxWindow, m_workspaceScrollBarV,
+		m_workspaceScrollBarH);
 
 	// Load background
 	emit initProgress(tr("Loading background picture"));
@@ -215,6 +222,7 @@ MainWindow::MainWindow() :
 
 	vbox->addWidget( m_toolBar );
 	vbox->addWidget( w );
+	vbox->addWidget(m_workspaceScrollBarH);
 	setCentralWidget( main_widget );
 
 	m_updateTimer.start( 1000 / 60, this );  // 60 fps
@@ -1612,7 +1620,7 @@ void MainWindow::onProjectFileNameChanged()
 
 
 MainWindow::MovableQMdiArea::MovableQMdiArea(QWidget* parent, keyModifiers* keyMods,
-	std::function<bool()> hasActiveMaxWindow)
+	std::function<bool()> hasActiveMaxWindow, QScrollBar* scrollBarV, QScrollBar* scrollBarH)
 	: QMdiArea(parent)
 	, m_keyMods{keyMods}
 	, m_isBeingMoved{false}
@@ -1621,6 +1629,8 @@ MainWindow::MovableQMdiArea::MovableQMdiArea(QWidget* parent, keyModifiers* keyM
 	, m_lastX{0}
 	, m_lastY{0}
 	, m_hasActiveMaxWindow{hasActiveMaxWindow}
+	, m_scrollBarV{scrollBarV}
+	, m_scrollBarH{scrollBarH}
 {
 	parent->installEventFilter(this);
 }
@@ -1635,17 +1645,14 @@ void MainWindow::MovableQMdiArea::panStart(int globalX, int globalY)
 
 void MainWindow::MovableQMdiArea::panMove(int globalX, int globalY)
 {
-	int minXBoundary = window()->width() - 100;
-	int maxXBoundary = 100;
-	int minYBoundary = window()->height() - 100;
-	int maxYBoundary = 100;
-
-	int minX = minXBoundary;
-	int maxX = maxXBoundary;
-	int minY = minYBoundary;
-	int maxY = maxYBoundary;
-
 	auto subWindows = subWindowList();
+
+	int minX = INT_MAX;
+	int maxX = INT_MIN;
+	int minY = INT_MAX;
+	int maxY = INT_MIN;
+
+	bool hasPannableWindow = false;
 	for (auto* curWindow : subWindows)
 	{
 		if (curWindow->isVisible())
@@ -1655,10 +1662,27 @@ void MainWindow::MovableQMdiArea::panMove(int globalX, int globalY)
 			minY = std::min(minY, curWindow->y());
 			maxY = std::max(maxY, curWindow->y() + curWindow->height());
 		}
+
+		if (curWindow->isVisible() && !curWindow->isMaximized())
+		{
+			hasPannableWindow = true;
+		}
 	}
+
+	// This code assumes there is at least one visible non-maximized window. If that is not the case, we don't really
+	// need to do panning, and the calculations here may be wrong, so let's just escape.
+	if (!hasPannableWindow) { return; }
 
 	int scrollX = m_lastX - globalX;
 	int scrollY = m_lastY - globalY;
+
+	// Boundaries for each region. If trying to move in a direction and its respective boundary has been passed, the
+	// movement will not happen.
+	constexpr int Margin = 100;
+	int minXBoundary = width() - Margin;
+	int maxXBoundary = Margin;
+	int minYBoundary = height() - Margin;
+	int maxYBoundary = Margin;
 
 	scrollX = scrollX < 0 && minX >= minXBoundary ? 0 : scrollX;
 	scrollX = scrollX > 0 && maxX <= maxXBoundary ? 0 : scrollX;
@@ -1669,11 +1693,33 @@ void MainWindow::MovableQMdiArea::panMove(int globalX, int globalY)
 	{
 		// if widgets are maximized, then they shouldn't be moved
 		// moving a maximized window's normalGeometry is not implemented because of difficulties
-		if (curWindow->isMaximized() == false)
+		if (!curWindow->isMaximized())
 		{
 			curWindow->move(curWindow->x() - scrollX, curWindow->y() - scrollY);
 		}
 	}
+
+	// The scrollbar boundaries pretty much the active workspace area but taking the workspace widget dimensions.
+	int sbMinX = minX - width() + Margin;
+	int sbMaxX = maxX - Margin;
+	int sbMinY = minY - height() + Margin;
+	int sbMaxY = maxY - Margin;
+
+	// We have to translate coordinates here because apparently the scrollbars don't support negative minimum values.
+	//
+	// More specifically, we translate `sbMin` to 0, by subtracting `sbMin`.
+	const int transX = -sbMinX;
+	const int transY = -sbMinY;
+	m_scrollBarH->setMinimum(sbMinX + transX);
+	m_scrollBarH->setMaximum(sbMaxX + transX);
+	m_scrollBarV->setMinimum(sbMinY + transY);
+	m_scrollBarV->setMaximum(sbMaxY + transY);
+	m_scrollBarH->setValue(0 + transX);
+	m_scrollBarV->setValue(0 + transY);
+	m_scrollBarH->setPageStep(width());
+	m_scrollBarV->setPageStep(height());
+
+	// qDebug() << QString{"H(%0,%1) V(%2,%3)"}.arg(sbMaxX - sbMinX).arg(sbMinY).arg(sbMaxY - sbMinY).arg(sbMinY); // TODO: remove
 
 	m_lastX = globalX;
 	m_lastY = globalY;
