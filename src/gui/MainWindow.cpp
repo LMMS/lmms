@@ -26,7 +26,7 @@
 
 #include <QApplication>
 #include <QCloseEvent>
-#include <QDebug> // TODO: remove
+#include <QDebug> // TODO: remove (along with other qDebug instances here)
 #include <QDesktopServices>
 #include <QDomElement>
 #include <QFileInfo>
@@ -1638,28 +1638,28 @@ MainWindow::MovableQMdiArea::MovableQMdiArea(QWidget* parent, keyModifiers* keyM
 
 	connect(this, &QMdiArea::subWindowActivated, this, [this] { updateScrollBars(); });
 
-	// These avoid stack smashing by checking whether the delta is non-null.
-	// TODO: find a safer way to do this.
 	// FIXME: negative deltas are messed up. Sometimes they're absurd positive 1000 values.
 	connect(m_scrollBarH, &QScrollBar::sliderMoved, this, [this] {
 		int newValue = m_scrollBarH->value();
 		int delta = newValue - m_scrollBarLastX;
-		
-		if (delta != 0)
-		{
-			m_scrollBarLastX = newValue;
-			scroll(delta, 0);
-		}
+
+		// qDebug() << "X" << newValue << delta;
+
+		m_scrollBarH->blockSignals(true);
+		m_scrollBarLastX = newValue;
+		scroll(delta, 0);
+		m_scrollBarH->blockSignals(false);
 	});
 	connect(m_scrollBarV, &QScrollBar::sliderMoved, this, [this] {
 		int newValue = m_scrollBarV->value();
 		int delta = newValue - m_scrollBarLastY;
-		
-		if (delta != 0)
-		{
-			m_scrollBarLastY = newValue;
-			scroll(0, delta);
-		}
+
+		// qDebug() << "Y" << newValue << delta;
+
+		m_scrollBarV->blockSignals(true);
+		m_scrollBarLastY = newValue;
+		scroll(0, delta);
+		m_scrollBarV->blockSignals(false);
 	});
 }
 
@@ -1768,7 +1768,8 @@ void MainWindow::MovableQMdiArea::scroll(int scrollX, int scrollY)
 		}
 	}
 
-	updateScrollBars();
+	// We're not updating the scrollbars here for now because it messes up the logic when using the scrollbar itself.
+	// updateScrollBars();
 }
 
 void MainWindow::MovableQMdiArea::mousePanMove(int globalX, int globalY)
