@@ -217,12 +217,20 @@ private:
 		void mousePressEvent(QMouseEvent* event) override;
 		void mouseMoveEvent(QMouseEvent* event) override;
 		void mouseReleaseEvent(QMouseEvent* event) override;
+		void resizeEvent(QResizeEvent* event) override;
+		void childEvent(QChildEvent* event) override;
 		bool eventFilter(QObject* watched, QEvent* event) override;
 
 	private:
 		void panStart(int globalX, int globalY);
 		void panMove(int globalX, int globalY);
 		void panEnd();
+		void updateScrollBars();
+
+		static constexpr int Margin = 100; //!< Margin used along with the active workspace area.
+
+		//! Get the workspace area where there are windows as a [minX, maxX, minY, maxY] tuple.
+		std::tuple<int, int, int, int> getActiveWorkspaceArea();
 
 		keyModifiers* m_keyMods;
 		bool m_isBeingMoved; //!< Whether the workspace is being panned
