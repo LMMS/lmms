@@ -396,6 +396,7 @@ void MidiClipView::clearNotesOutOfBounds()
 	}
 	newClip->changeLength(m_clip->length());
 	newClip->updateLength();
+	newClip->setColor(m_clip->color());
 
 	remove();
 	m_clip->getTrack()->restoreJournallingState();
