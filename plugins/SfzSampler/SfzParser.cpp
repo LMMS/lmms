@@ -138,7 +138,13 @@ bool SfzParser::parseSfzFile(const QString& filePath, std::vector<SfzRegion>& ou
 		// Track whether we are entering a new header region
 		if (segment.front() == '<' && segment.back() == '>')
 		{
-			// If we were previously in a <region>, then wrap it up and add it to the output vector
+			// If we were previously in <global>, propagate down the current defaults to any future <master>, <group>, or <region> headers
+			if (currentHeader == Header::Global) { currentMasterState = currentGroupState = currentRegionState = globalState; }
+			// If we were previously in a <master>, do the same for <group> and <region>
+			if (currentHeader == Header::Master) { currentGroupState = currentRegionState = currentMasterState; }
+			// If we were previously in a <group>, do the same for <region>
+			if (currentHeader == Header::Group) { currentRegionState = currentGroupState; }
+			// If we were previously in a <region>, wrap it up and add it to the output vector
 			if (currentHeader == Header::Region) { outputRegions.emplace_back(currentRegionState); }
 
 			if (segment == "<global>")
@@ -147,6 +153,8 @@ bool SfzParser::parseSfzFile(const QString& filePath, std::vector<SfzRegion>& ou
 				// If we are entering a new global header, reset the current global settings
 				// TODO is this correct?
 				globalState = SfzOpcodeState();
+				// (also real quick, because the <control> header sets the `default_path` opcode but might come before any <global> header, we have to also set it here just in case)
+				globalState.m_default_path = controlsConfig.m_default_path;
 			}
 			else if (segment == "<master>")
 			{
@@ -156,19 +164,12 @@ bool SfzParser::parseSfzFile(const QString& filePath, std::vector<SfzRegion>& ou
 			}
 			else if (segment == "<group>")
 			{
-				// If the SFZ file skipped over the heirarchy of global->master->group->region and just went global->group, we need to make sure
-				// the master state is also updated
-				if (currentHeader == Header::Global) { currentMasterState = globalState; }
 				currentHeader = Header::Group;
 				// Reset the current group settings to the master defaults
 				currentGroupState = currentMasterState;
 			}
 			else if (segment == "<region>")
 			{
-				// If the SFZ file skipped directly from <global> to <region>, make sure to update the <master> and <group> states in between
-				if (currentHeader == Header::Global) { currentMasterState = globalState; currentGroupState = currentMasterState; }
-				// Or if it skipped from <master> to <region>, just update the <group> state
-				if (currentHeader == Header::Master) { currentGroupState = currentMasterState; }
 				currentHeader = Header::Region;
 				// Reset the current region settings to the group defaults
 				currentRegionState = currentGroupState;
