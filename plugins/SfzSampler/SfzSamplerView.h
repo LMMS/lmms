@@ -36,6 +36,10 @@ class SfzSampler;
 
 namespace gui {
 
+
+//! This class is planned to be completely redone!
+//! In it's current form, it's simply a temporary GUI which shows the keyswitch info, the parameters, and a button to load a file.
+//! In the future, it would be great to have a much prettier and useful GUI
 class SfzSamplerView : public InstrumentView
 {
 	Q_OBJECT

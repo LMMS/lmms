@@ -43,20 +43,21 @@ public:
 	void processTrigger(const SfzTrigger& trigger);
 
 	//! Handles updating m_lastPlayedSwitchKeys whenever a key defined by sw_last is pressed
+	// TODO move this inside of processTrigger so that fewer regions need to be looped over
 	void switchKeyPressed(const int key);
 
-	// Returns the midi key number of the last pressed key in the range [lowKey, highKey].
-	// If switchKeysOnly is true, it uses the m_lastPlayedSwitchKeys array which only tracks when valid switch keys have been pressed, not just any key.
-	// If no keys have been pressed yet, it returns defaultKey.
-	// If the key range is invalid, it returns defaultKey
-	// If no default key was given, it returns std::nullopt
+	//! Returns the midi key number of the last pressed key in the range [lowKey, highKey].
+	//! If switchKeysOnly is true, it uses the m_lastPlayedSwitchKeys array which only tracks when valid switch keys have been pressed, not just any key.
+	//! If no keys have been pressed yet, it returns defaultKey.
+	//! If the key range is invalid, it returns defaultKey
+	//! If no default key was given, it returns std::nullopt
 	// TODO add unit tests
 	std::optional<int> lastKeyPressedInRange(int lowKey, int highKey, const std::optional<int> defaultKey, bool switchKeysOnly = false) const;
 
 	//! Returns the current value of the given midi CC knob/controller, or the default value if we haven't recieved any midi CC signals for it yet.
 	int midiCCValue(const int index) const { return m_ccValues.at(index); }
 
-	// Sets initial values for the controls, based on any `set_ccN` opcodes in the <control> header
+	//! Sets initial values for the controls, based on any `set_ccN` opcodes in the <control> header
 	void initializeMidiCCValues(const SfzOpcodeState& controlsConfig);
 
 private:

@@ -39,15 +39,24 @@ public:
 	SfzSampleBuffer() = default;
 	SfzSampleBuffer(const SampleFrame* data, const f_cnt_t size, const float sampleRate);
 
+	//! Returns a hermite-interpolated value for the data at the given sample index and channel.
+	//! The interpolation is so that pitch shifting and resampling is as easy as possible
+	//! If index is out of range, this function returns 0.0f
 	float at(const float index, const size_t channel) const;
 
+	//! Returns the number of frames in the sample.
 	f_cnt_t size() const { return m_size; }
 
+	//! Returns the sample rate of the audio
 	float sampleRate() const { return m_sampleRate; }
 
 private:
 	static constexpr const size_t NUM_CHANNELS = 2;
+	//! The raw sample data is stored as a shared pointer to a 2d array of floats.
+	//! This was originally done so that it would not be copied unnecessarily if, for example, the vector or map containing the SfzSampleBuffer were resized/reallocated
+	//! TODO: is this optimal?
 	std::shared_ptr<float[][NUM_CHANNELS]> m_data;
+
 	f_cnt_t m_size;
 	float m_sampleRate;
 };

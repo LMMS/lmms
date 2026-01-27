@@ -25,7 +25,6 @@
 #ifndef LMMS_SFZ_OPCODE_STATE_H
 #define LMMS_SFZ_OPCODE_STATE_H
 
-//#include "SfzOpcodes.h"
 #include <QString>
 #include <optional>
 #include <array>
@@ -38,13 +37,27 @@ class SfzOpcodeState
 public:
 	SfzOpcodeState(); // We need a constructor to initialize things like m_hicc
 
+	//! Given an opcode assignment such as `lokey=45`, passing "m_lokey" and "45" to this function
+	//! will take those values and figure out if "lokey" is a valid opcode, and whether "45" is a valid value for it.
+	//! If so, it will set the internal member variable corresponding to it, and return false.
+	//! If it was unsucessful, it will print an error message and return false.
 	bool setOpcodeByStrings(const QString& name, const QString& value);
+
+	//! Helper function for converting strings like "A5" or "B#2" into integers representing keys on the midi keyboard.
 	static int stringToKeyNum(QString keyString, bool* successful);
+	//! Helper function for converting integers like 24 or 45 representing midi keys back into strings representing the key and octave on the keyboard (essentially the inverse of `stringToKeyNum`)
 	static QString keyNumToString(int keyNum);
+	//! Helper function for taking an opcode name such as "set_cc45" and extracting the number "45" from it.
+	//! If the string does not contain a substring in the form "ccN" where N is a number, it will return print an error and return 0.
+	//! Likewise, if the number is outside the range 0-127, it will print an error and return 0.
 	static int ccNumberFromOpcode(const QString& opcode);
 
 	// Normal MIDI CC's range from 0 to 127. More advanced SFZ's go beyond that, but for now we cap it at 128. This should be extended in the future.
 	static constexpr const int NumMidiCCs = 128;
+
+	/***********************************************************************/
+	// SFZ OPCODE DEFINITIONS
+	/***********************************************************************/
 
 	//
 	// File Paths
@@ -67,7 +80,7 @@ public:
 	TriggerType m_trigger = TriggerType::Attack;
 
 	//
-	// Key Trigger
+	// Key Conditions
 	//
 	int m_lokey = 0;
 	int m_hikey = 127;
@@ -82,13 +95,13 @@ public:
 	std::optional<QString> m_sw_label = std::nullopt;
 
 	//
-	// Velocity Trigger
+	// Velocity Conditions
 	//
 	int m_lovel = 0;
 	int m_hivel = 127;
 
 	//
-	// Round Robin Trigger
+	// Round Robin Conditions
 	//
 	int m_seq_length = 1;
 	int m_seq_position = 1;

@@ -34,6 +34,7 @@ namespace lmms
 class SfzTrigger
 {
 public:
+	//! Helper functions for creating different types of events
 	static const SfzTrigger noteOnEvent(const int frameOffset, const int key, const int vel);
 	static const SfzTrigger noteOffEvent(const int frameOffset, const int key, const int vel);
 	static const SfzTrigger controlChangeEvent(const int frameOffset, const int controlNumber, const int value);
@@ -54,10 +55,12 @@ public:
 
 private:
 	Type m_type;
+	// TODO should these be optionals or not?
 	std::optional<int> m_key = std::nullopt;
 	std::optional<int> m_velocity = std::nullopt;
 	std::optional<int> m_controlChangeNumber = std::nullopt;
 	std::optional<int> m_controlChangeValue = std::nullopt;
+	//! The event probably occurred partway through a buffer, so this variable keeps track of when exactly it occurred relative to the start of the buffer
 	int m_frameOffset = 0;
 };
 

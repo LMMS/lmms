@@ -38,6 +38,7 @@ class SfzSamplePool
 public:
 	SfzSampleBuffer* const loadSample(const QString& path);
 
+	//! Returns the number of samples currently loaded in the pool
 	const int sampleCount() const { return m_samplePool.size(); }
 
 private:

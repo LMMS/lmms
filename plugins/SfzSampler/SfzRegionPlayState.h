@@ -42,7 +42,7 @@ class SfzRegionPlayState
 {
 public:
 	SfzRegionPlayState(const SfzRegion* region, const SfzTrigger& trigger);
-	SfzRegionPlayState() = default; // Needed to initialize array
+	SfzRegionPlayState() = default; // The default constructor is needed to initialize arrays of the object
 
 	//! Generates the next buffer of audio from this sound. If m_active is false, this function does nothing.
 	//! Returns true if any sound was generated, false if the buffer is left untouched
@@ -51,6 +51,7 @@ public:
 	//! Handle incoming event to decide whether to deactivate/release
 	void processTrigger(const SfzTrigger& trigger);
 
+	//! Returns whether this voice is done playing or not. If m_active is false, this voice object is avaiable to be overwritten and used as a new voice.
 	bool active() const { return m_active; }
 
 	//! Helper function for calculating the envelope value at the current frame

@@ -37,6 +37,9 @@ namespace lmms
 class SfzParser
 {
 public:
+	//! Loads the .sfz file at `filePath`, parses it for all the sfz headers and opcode assignments, and populates the `outputRegions` vector
+	//! with new SfzRegion objects based on the configurations in the .sfz file. Additionally, it sets up `controlsConfig` with misc info about
+	//! switch keys and midi CC's, which is useful for the GUI.
 	static bool parseSfzFile(const QString& filePath, std::vector<SfzRegion>& outputRegions, SfzControlsConfig& controlsConfig);
 
 private:
@@ -51,7 +54,7 @@ private:
 		Group,
 		Region,
 		Control,
-		Curve,
+		Curve, // TODO Not implemented yet
 		None
 	};
 };

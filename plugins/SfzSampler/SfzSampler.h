@@ -99,6 +99,7 @@ private:
 
 	InstrumentTrack* m_parentTrack;
 
+	//! The path to the currently loaded SFZ file
 	QString m_sfzFilePath = "";
 
 	friend class gui::SfzSamplerView;

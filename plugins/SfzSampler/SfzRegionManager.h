@@ -41,6 +41,8 @@ public:
 	//! This is not optimal.
 	//! Instead, because there are only 128 keys, we can construct a mapping, where each key is paired with a list of regions where lokey/hikey matches it
 	//! Doing this for both NoteOn and NoteOff events means having 256 lists of pointers to regions, which is not bad.
+	//! That way, whenever a note is pressed, you can simply look up in the table a list of all the regions which might match.
+	//! This is usually 10-100x fewer regions than the total, which is much faster to loop over.
 	SfzRegionManager() = default;
 	SfzRegionManager(std::vector<SfzRegion>& regions);
 
@@ -48,9 +50,11 @@ public:
 	//! This is meant to intelligently narrow down the number of regions where we manually have to loop over and check
 	const std::vector<SfzRegion*>& findPotentialMatchingRegions(const SfzTrigger& trigger) const;
 
+	//! Returns a vector of pointers for all the regions, in case any code needs to loop over all of them.
 	const std::vector<SfzRegion*>& allRegions() const { return m_allRegions; }
 
 private:
+	//! Stores the actual region objects
 	std::vector<SfzRegion> m_regions;
 
 	std::vector<SfzRegion*> m_allRegions;
