@@ -123,8 +123,11 @@ bool SfzParser::parseSfzFile(const QString& filePath, std::vector<SfzRegion>& ou
 
 	// Create a base opcode state list to keep track of which defaults are <global>
 	SfzOpcodeState globalState;
-	// Regions can be within <group>s, which can define default opcodes for all the regions inside them
+	// Regions can be further organized within groups, which can define default opcodes for all the regions inside them
 	// Keep track of the current group and region states. These will be re-initialized to whatever the global/group settings are, once we encounter a new group or region header
+	// (Also, ARIA supports an additional header, <master> which is essentially the same as a group, but one level up, so you can group your groups under masters. Not a whole lot of SFZ's use it, but some do.)
+	// (The heirarchy of headers essentially goes: <global>, <master>, <group>, <region>)
+	SfzOpcodeState currentMasterState = globalState;
 	SfzOpcodeState currentGroupState = globalState;
 	SfzOpcodeState currentRegionState = globalState;
 
@@ -145,14 +148,27 @@ bool SfzParser::parseSfzFile(const QString& filePath, std::vector<SfzRegion>& ou
 				// TODO is this correct?
 				globalState = SfzOpcodeState();
 			}
+			else if (segment == "<master>")
+			{
+				currentHeader = Header::Master;
+				// Reset the current master settings to the global defaults
+				currentMasterState = globalState;
+			}
 			else if (segment == "<group>")
 			{
+				// If the SFZ file skipped over the heirarchy of global->master->group->region and just went global->group, we need to make sure
+				// the master state is also updated
+				if (currentHeader == Header::Global) { currentMasterState = globalState; }
 				currentHeader = Header::Group;
-				// Reset the current group settings to the global defaults
-				currentGroupState = globalState;
+				// Reset the current group settings to the master defaults
+				currentGroupState = currentMasterState;
 			}
 			else if (segment == "<region>")
 			{
+				// If the SFZ file skipped directly from <global> to <region>, make sure to update the <master> and <group> states in between
+				if (currentHeader == Header::Global) { currentMasterState = globalState; currentGroupState = currentMasterState; }
+				// Or if it skipped from <master> to <region>, just update the <group> state
+				if (currentHeader == Header::Master) { currentGroupState = currentMasterState; }
 				currentHeader = Header::Region;
 				// Reset the current region settings to the group defaults
 				currentRegionState = currentGroupState;
@@ -182,8 +198,14 @@ bool SfzParser::parseSfzFile(const QString& filePath, std::vector<SfzRegion>& ou
 		{
 			case Header::Global:
 			{
-				// If we are in the global header, update the opcodes of the global state, which will propagate down to any groups or regions after it
+				// If we are in the global header, update the opcodes of the global state, which will propagate down to any groups or regions (or master, if the sfz uses any) after it
 				globalState.setOpcodeByStrings(opcodeNameAndValue[0], opcodeNameAndValue[1]);
+				break;
+			}
+			case Header::Master:
+			{
+				// If we are in the master header, update the opcodes of the master state, which will similarly propagate down to any groups or regions after it
+				currentMasterState.setOpcodeByStrings(opcodeNameAndValue[0], opcodeNameAndValue[1]);
 				break;
 			}
 			case Header::Group:

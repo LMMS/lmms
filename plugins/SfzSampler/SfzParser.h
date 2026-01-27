@@ -50,10 +50,11 @@ private:
 	//! All the possible header types in an sfz file
 	enum class Header
 	{
+		Control,
 		Global,
+		Master,
 		Group,
 		Region,
-		Control,
 		Curve, // TODO Not implemented yet
 		None
 	};
