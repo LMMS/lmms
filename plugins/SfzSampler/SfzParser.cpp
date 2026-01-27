@@ -223,6 +223,14 @@ bool SfzParser::parseSfzFile(const QString& filePath, std::vector<SfzRegion>& ou
 			case Header::Control:
 			{
 				controlsConfig.setOpcodeByStrings(opcodeNameAndValue[0], opcodeNameAndValue[1]);
+				// For some reason, one of the things in the controls header is `default_path`, which is supposed to propagate down to the regions below. This doesn't feel very control-related, but it is what it is.
+				// To do this, we also force-set the `default_path` for the current <global>, <master>, and <group>, to make sure it reaches all future regions (until another <control> header changes it)
+				if (opcodeNameAndValue[0] == "default_path")
+				{
+					globalState.setOpcodeByStrings(opcodeNameAndValue[0], opcodeNameAndValue[1]);
+					currentMasterState.setOpcodeByStrings(opcodeNameAndValue[0], opcodeNameAndValue[1]);
+					currentGroupState.setOpcodeByStrings(opcodeNameAndValue[0], opcodeNameAndValue[1]);
+				}
 				break;
 			}
 			case Header::Curve:
