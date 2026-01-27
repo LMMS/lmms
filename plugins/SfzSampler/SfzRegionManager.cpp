@@ -24,6 +24,7 @@
 
 #include "SfzRegionManager.h"
 
+#include <QDebug>
 
 namespace lmms
 {
@@ -32,6 +33,7 @@ namespace lmms
 SfzRegionManager::SfzRegionManager(std::vector<SfzRegion>& regions)
 	: m_regions(regions)
 {
+	qDebug() << "[SFZ Player] Constructing key/region lookup tables...";
 	// For each key, figure out what list of regions could include it, to make a kind of look-up table
 	for (int key = 0; key < 128; ++key)
 	{
@@ -51,6 +53,7 @@ SfzRegionManager::SfzRegionManager(std::vector<SfzRegion>& regions)
 				}
 			}
 		}
+		qDebug() << "[SFZ Player] Key" << key << ":" << m_noteOnRegions.at(key).size() << "NoteOn regions," << m_noteOffRegions.at(key).size() << "NoteOff regions";
 	}
 
 	// Unfortunately, it's more difficult to make lookup tables for midi CC events. Instead, just use a big vector with all the regions by default
