@@ -64,6 +64,9 @@ public:
 	void keyPressEvent(QKeyEvent* ke) override;
 
 	void reset();
+
+	void setChannel(MixerChannel* channel);
+
 	int channelIndex() const { return m_channelIndex; }
 	void setChannelIndex(int index);
 

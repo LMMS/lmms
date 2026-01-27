@@ -405,7 +405,7 @@ void MixerView::deleteChannel(int index)
 	// make sure every channel knows what index it is
 	for (int i = index + 1; i < m_mixerChannelViews.size(); ++i)
 	{
-		m_mixerChannelViews[i]->setChannelIndex(i - 1);
+		m_mixerChannelViews[i]->setChannel(m_mixer->mixerChannel(i - 1));
 	}
 	m_mixerChannelViews.remove(index);
 
@@ -446,8 +446,8 @@ void MixerView::moveChannelLeft(int index, int focusIndex)
 	m->moveChannelLeft(index);
 
 	// Update widgets models
-	m_mixerChannelViews[index]->setChannelIndex(index);
-	m_mixerChannelViews[index - 1]->setChannelIndex(index - 1);
+	m_mixerChannelViews[index]->setChannel(m_mixer->mixerChannel(index));
+	m_mixerChannelViews[index - 1]->setChannel(m_mixer->mixerChannel(index - 1));
 
 	// Focus on new position
 	setCurrentMixerChannel(focusIndex);
