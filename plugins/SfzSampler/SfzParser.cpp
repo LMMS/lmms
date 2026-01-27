@@ -51,7 +51,8 @@ bool SfzParser::parseSfzFile(const QString& filePath, std::vector<SfzRegion>& ou
 
 	// Before parsing the headers and opcodes, we need to hande #include and #define statements
 	// This amounts to recursively loading and copy/pasting the contents of the other files where the #include is, and find/replacing the #define words with their values
-	fileContents = recursiveHandleIncludeAndDefineStatements(parentDirectory, fileContents);
+	std::map<QString, QString> defineMap = {}; // Just a temporary helper variable so that the recursion branches have a persistance object to keep track of #defines
+	fileContents = recursiveHandleIncludeAndDefineStatements(parentDirectory, fileContents, defineMap);
 
 	qDebug().noquote() << "[SFZ Parser] DEBUG: Preprocessed SFZ file contents:\n" << fileContents; // testing
 
@@ -283,7 +284,7 @@ bool SfzParser::parseSfzFile(const QString& filePath, std::vector<SfzRegion>& ou
 
 
 
-QString SfzParser::recursiveHandleIncludeAndDefineStatements(const QDir& parentDirectory, QString fileContents, std::map<QString, QString> defineMap)
+QString SfzParser::recursiveHandleIncludeAndDefineStatements(const QDir& parentDirectory, QString fileContents, std::map<QString, QString>& defineMap)
 {
 	// Reconstruct the file line by line as we parse the defines and includes
 	QStringList reconstructedSegments;

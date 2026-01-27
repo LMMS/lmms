@@ -44,8 +44,9 @@ public:
 
 private:
 	//! Helper function to parse any #include or #define statements from a string, recursively so that the included files have their includes and defines handled too
-	//! The defineMap parameter should be left blank, since it's only there to internally keep track of what $keywords are defined to be what as the recursion goes down each path
-	static QString recursiveHandleIncludeAndDefineStatements(const QDir& parentDirectory, QString fileContents, std::map<QString, QString> defineMap = {});
+	//! The defineMap parameter should be empty {} when initially called; it internally keeps track of what $keywords are defined to be what as the recursion goes down each path
+	//! The defineMap is passes as a reference so that it persists between recursion branches. This doesn't feel quite right, but some SFZ's use it to, for instance, #define the sample file extensions (.flac, .wav, etc) in a separate #include file, and expect that #define to apply to the remainder of the file.
+	static QString recursiveHandleIncludeAndDefineStatements(const QDir& parentDirectory, QString fileContents, std::map<QString, QString>& defineMap);
 
 	//! All the possible header types in an sfz file
 	enum class Header
