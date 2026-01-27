@@ -74,7 +74,7 @@ bool SfzOpcodeState::setOpcodeByStrings(const QString& name, const QString& valu
 
 
 	//
-	// Key Trigger
+	// Key Conditions
 	//
 	else if (name == "lokey")
 	{
@@ -124,7 +124,7 @@ bool SfzOpcodeState::setOpcodeByStrings(const QString& name, const QString& valu
 
 
 	//
-	// Velocity Trigger
+	// Velocity Conditions
 	//
 	else if (name == "lovel")
 	{
@@ -137,7 +137,7 @@ bool SfzOpcodeState::setOpcodeByStrings(const QString& name, const QString& valu
 
 
 	//
-	// Round Robin Trigger
+	// Round Robin Conditions
 	//
 	else if (name == "seq_length")
 	{
@@ -146,6 +146,19 @@ bool SfzOpcodeState::setOpcodeByStrings(const QString& name, const QString& valu
 	else if (name == "seq_position")
 	{
 		m_seq_position = value.toInt(&successful);
+	}
+
+
+	//
+	// Random Conditions
+	//
+	else if (name == "lorand")
+	{
+		m_lorand = value.toFloat(&successful);
+	}
+	else if (name == "hirand")
+	{
+		m_hirand = value.toFloat(&successful);
 	}
 
 

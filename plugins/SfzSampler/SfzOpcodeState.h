@@ -106,6 +106,12 @@ public:
 	int m_seq_length = 1;
 	int m_seq_position = 1;
 
+	//
+	// Random Conditions
+	//
+	float m_lorand = 0.0f;
+	float m_hirand = 1.0f;
+
 
 	//
 	// Sample playback

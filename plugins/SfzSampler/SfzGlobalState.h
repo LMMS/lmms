@@ -57,6 +57,9 @@ public:
 	//! Returns the current value of the given midi CC knob/controller, or the default value if we haven't recieved any midi CC signals for it yet.
 	int midiCCValue(const int index) const { return m_ccValues.at(index); }
 
+	//! Returns the random value for the current trigger
+	const float rand() const { return m_rand; }
+
 	//! Sets initial values for the controls, based on any `set_ccN` opcodes in the <control> header
 	void initializeMidiCCValues(const SfzOpcodeState& controlsConfig);
 
@@ -72,6 +75,9 @@ private:
 
 	//! Keeps track of which keys on the piano are currently being pressed
 	std::array<bool, 128> m_activeKeys = {};
+
+	//! Keeps track of the current random value, updated every trigger. Some regions use lorand/hirand opcodes to decide randomy whether to activate or not, and this is the random value they will compare to.
+	float m_rand = 0.0f;
 
 	//! Stores the current value of all the midi CC knobs/controllers
 	//! Technically, floats should probably be used to allow for HDCC (high definition CC's) as used in ARIA, but for now dividing by 127 to get a float between 0 and 1 works fine.

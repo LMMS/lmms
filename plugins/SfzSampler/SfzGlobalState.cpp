@@ -25,6 +25,7 @@
 
 
 #include "SfzGlobalState.h"
+#include "lmms_math.h"
 
 namespace lmms
 {
@@ -45,6 +46,8 @@ void SfzGlobalState::processTrigger(const SfzTrigger& trigger)
 	{
 		m_activeKeys.at(trigger.key().value()) = false;
 	}
+	// Update the current random value
+	m_rand = fastRand(1.0f);
 }
 
 void SfzGlobalState::switchKeyPressed(const int key)

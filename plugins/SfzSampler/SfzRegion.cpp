@@ -72,6 +72,10 @@ bool SfzRegion::triggerConditionsMet(const SfzGlobalState& globalState, const Sf
 		if (m_sw_last != std::nullopt && globalState.lastKeyPressedInRange(m_sw_lokey, m_sw_hikey, m_sw_default, true) != m_sw_last) { return false; }
 	}
 
+	// If the region uses lorand/hirand, the current random value stored in the global state (updated every trigger) is compared with the range
+	// Note: the upper bound is inclusive, so lorand=0.2 hirand=0.4 will be triggered by any rand value >0.2 or <=0.4
+	if (globalState.rand() > m_hirand || globalState.rand() <= m_lorand) { return false; }
+
 	// If midi CC ranges are defined, make sure the current CC values are within range
 	// Only loop over the CC's which have lo/hiccN defined, instead of checking all 128 every time
 	for (const int i : m_lohiccDefinedCCNumbers)
