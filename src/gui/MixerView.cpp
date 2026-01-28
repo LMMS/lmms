@@ -405,7 +405,7 @@ void MixerView::deleteChannel(int index)
 	// make sure every channel knows what index it is
 	for (int i = index + 1; i < m_mixerChannelViews.size(); ++i)
 	{
-		m_mixerChannelViews[i]->setChannel(m_mixer->mixerChannel(i - 1));
+		m_mixerChannelViews[i]->setChannelIndex(i - 1);
 	}
 	m_mixerChannelViews.remove(index);
 

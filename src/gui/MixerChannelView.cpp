@@ -252,16 +252,6 @@ void MixerChannelView::setChannelIndex(int index)
 	m_channelIndex = index;
 }
 
-void MixerChannelView::setChannel(MixerChannel* channel)
-{
-	m_fader->setModel(&channel->m_volumeModel);
-	m_muteButton->setModel(&channel->m_muteModel);
-	m_soloButton->setModel(&channel->m_soloModel);
-	m_effectRackView->setModel(&channel->m_fxChain);
-	m_renameLineEdit->setText(elideName(channel->m_name));
-	setChannelIndex(channel->index());
-}
-
 void MixerChannelView::renameChannel()
 {
 	m_inRename = true;
