@@ -45,6 +45,7 @@
 #include "embed.h"
 #include "Engine.h"
 #include "InstrumentTrackView.h"
+#include "lmms_math.h"
 #include "KeyboardShortcuts.h"
 #include "Song.h"
 #include "StringPairDrag.h"
@@ -301,7 +302,7 @@ void TrackOperationsWidget::resetTrackColor()
 
 void TrackOperationsWidget::randomizeTrackColor()
 {
-	QColor buffer = ColorChooser::getPalette( ColorChooser::Palette::Track )[ rand() % 48 ];
+	QColor buffer = ColorChooser::getPalette(ColorChooser::Palette::Track)[fastRand(48)];
 	auto track = m_trackView->getTrack();
 	track->addJournalCheckPoint();
 	track->setColor(buffer);
