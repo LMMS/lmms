@@ -93,11 +93,11 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 	m_trackOps->setToolTip(tr("Actions"));
 	m_trackOps->setCursor(Qt::PointingHandCursor);
 
-	m_muteBtn = new AutomatableButton(operationsWidget, tr("Mute"));
+	m_muteBtn = new AutomatableButton(operationsWidget);
 	m_muteBtn->setCheckable(true);
 	m_muteBtn->setToolTip(tr("Mute"));
 	m_muteBtn->setObjectName("btn-mute");
-	m_soloBtn = new AutomatableButton(operationsWidget, tr("Solo"));
+	m_soloBtn = new AutomatableButton(operationsWidget);
 	m_soloBtn->setCheckable(true);
 	m_soloBtn->setToolTip(tr("Solo"));
 	m_soloBtn->setObjectName("btn-solo");

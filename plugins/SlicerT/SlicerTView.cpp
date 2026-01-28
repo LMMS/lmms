@@ -67,14 +67,14 @@ SlicerTView::SlicerTView(SlicerT* instrument, QWidget* parent)
 	m_snapSetting->setToolTip(tr("Set slice snapping for detection"));
 	m_snapSetting->setModel(&m_slicerTParent->m_sliceSnap);
 
-	m_syncToggle = new PixmapButton(this, tr("Sync sample"));
+	m_syncToggle = new PixmapButton(this);
 	m_syncToggle->setActiveGraphic(PLUGIN_NAME::getIconPixmap("sync_active"));
 	m_syncToggle->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("sync_inactive"));
 	m_syncToggle->setCheckable(true);
 	m_syncToggle->setToolTip(tr("Enable BPM sync"));
 	m_syncToggle->setModel(&m_slicerTParent->m_enableSync);
 
-	m_clearButton = new PixmapButton(this, tr("Clear all slices"));
+	m_clearButton = new PixmapButton(this);
 	m_clearButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("clear_slices_active"));
 	m_clearButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("clear_slices_inactive"));
 	m_clearButton->setToolTip(tr("Clear all slices"));
