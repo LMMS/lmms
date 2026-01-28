@@ -12,3 +12,7 @@
 Brewfile.lock.json
 /.cache/
 compile_commands.json
+projects/
+*.mmp
+*.mmp.bak
+*.mmpz
