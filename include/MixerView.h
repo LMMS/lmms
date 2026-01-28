@@ -83,7 +83,6 @@ public:
 
 	// move the channel to the left or right
 	void moveChannelLeft(int index);
-	void moveChannelLeft(int index, int focusIndex);
 	void moveChannelRight(int index);
 
 	void renameChannel(int index);

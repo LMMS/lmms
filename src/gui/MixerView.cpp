@@ -433,38 +433,29 @@ void MixerView::deleteUnusedChannels()
 	}
 }
 
-
-
-void MixerView::moveChannelLeft(int index, int focusIndex)
-{
-	// can't move master or first channel left or last channel right
-	if (index <= 1 || index >= m_mixerChannelViews.size()) return;
-
-	Mixer *m = getMixer();
-
-	// Move instruments channels
-	m->moveChannelLeft(index);
-
-	// Update widgets models
-	m_mixerChannelViews[index]->setChannel(m_mixer->mixerChannel(index));
-	m_mixerChannelViews[index - 1]->setChannel(m_mixer->mixerChannel(index - 1));
-
-	// Focus on new position
-	setCurrentMixerChannel(focusIndex);
-}
-
-
-
 void MixerView::moveChannelLeft(int index)
 {
-	moveChannelLeft(index, index - 1);
+	// can't move master or first channel left or last channel right
+	if (index <= 1 || index >= m_mixerChannelViews.size()) { return; }
+
+	m_mixer->moveChannelLeft(index);
+
+	const auto layoutIndex = chLayout->indexOf(m_mixerChannelViews[index]);
+	assert(layoutIndex >= 1);
+
+	chLayout->removeWidget(m_mixerChannelViews[index]);
+	chLayout->insertWidget(layoutIndex - 1, m_mixerChannelViews[index]);
+
+	m_mixerChannelViews[index]->setChannelIndex(index - 1);
+	m_mixerChannelViews[index - 1]->setChannelIndex(index);
+	std::swap(m_mixerChannelViews[index - 1], m_mixerChannelViews[index]);
 }
 
 
 
 void MixerView::moveChannelRight(int index)
 {
-	moveChannelLeft(index + 1, index + 1);
+	moveChannelLeft(index + 1);
 }
 
 
