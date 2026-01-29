@@ -190,6 +190,11 @@ protected:
 
 	auto hasCustomColor() const -> bool;
 
+	inline bool lastLoopView()
+	{
+		return m_offset == m_clip->loopCount();
+	}
+
 protected slots:
 	void updateLength();
 	void updatePosition();
