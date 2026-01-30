@@ -189,9 +189,8 @@ public:
 	 */
 	auto silenceFlags() const -> const ChannelFlags& { return m_silenceFlags; }
 
-#ifdef LMMS_TESTING
-	auto silenceFlags() -> ChannelFlags& { return m_silenceFlags; }
-#endif
+	//! Forcibly pessimizes silence tracking for a specific channel
+	void assumeNonSilent(track_ch_t channel) { m_silenceFlags[channel] = false; }
 
 	/**
 	 * When silence tracking is enabled, track channels will be checked for silence whenever their data may

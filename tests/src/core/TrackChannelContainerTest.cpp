@@ -272,8 +272,8 @@ private slots:
 		// Make the left channels in both groups non-zero and manually update the silence status
 		tc.buffers(0).buffer(0)[5] = 1.f;
 		tc.buffers(1).buffer(0)[5] = 1.f;
-		tc.silenceFlags()[0] = false;
-		tc.silenceFlags()[2] = false;
+		tc.assumeNonSilent(0);
+		tc.assumeNonSilent(2);
 
 		// Check if any channels are non-zero
 		QCOMPARE(tc.hasInputNoise(0b1111), true);
@@ -305,11 +305,11 @@ private slots:
 
 		// Make left channel of 1st track channel group contain an Inf, and force the channel to non-quiet
 		tc.buffers(0).buffer(0)[5] = std::numeric_limits<float>::infinity();
-		tc.silenceFlags()[0] = false;
+		tc.assumeNonSilent(0);
 
 		// Make right channel of 1st track channel group non-zero too, but using a valid value
 		tc.buffers(0).buffer(1)[5] = 1.f;
-		tc.silenceFlags()[1] = false;
+		tc.assumeNonSilent(1);
 
 		// Sanitize only the left channel
 		tc.sanitize(0b0001);
@@ -322,7 +322,7 @@ private slots:
 
 		// Try again
 		tc.buffers(0).buffer(0)[5] = std::numeric_limits<float>::infinity();
-		tc.silenceFlags()[0] = false;
+		tc.assumeNonSilent(0);
 
 		// This time, sanitize both channels of the 1st track channel group
 		tc.sanitize(0b0011);
@@ -349,7 +349,7 @@ private slots:
 
 		// Make left channel of 2nd track channel group contain a non-zero value, and force the channel to non-quiet
 		tc.buffers(1).buffer(0)[5] = 1.f;
-		tc.silenceFlags()[2] = false;
+		tc.assumeNonSilent(2);
 
 		// Silence only the left channel
 		tc.silenceChannels(0b0100);
@@ -361,7 +361,7 @@ private slots:
 
 		// Make right channel of 2nd track channel group contain a non-zero value, and force the channel to non-quiet
 		tc.buffers(1).buffer(1)[5] = 1.f;
-		tc.silenceFlags()[3] = false;
+		tc.assumeNonSilent(3);
 
 		// Silence only the right channel
 		tc.silenceChannels(0b1000);
@@ -374,11 +374,11 @@ private slots:
 		// Make right channel of 1st track channel group and both channels of 2nd track channel group contain
 		// a non-zero value, and force those channels to non-quiet
 		tc.buffers(1).buffer(1)[5] = 1.f;
-		tc.silenceFlags()[1] = false;
+		tc.assumeNonSilent(1);
 		tc.buffers(1).buffer(0)[5] = 1.f;
-		tc.silenceFlags()[2] = false;
+		tc.assumeNonSilent(2);
 		tc.buffers(1).buffer(1)[5] = 1.f;
-		tc.silenceFlags()[3] = false;
+		tc.assumeNonSilent(3);
 
 		// Silence both channels of the 2nd track channel group, plus the already-quiet left channel of the 1st group
 		tc.silenceChannels(0b1101);
