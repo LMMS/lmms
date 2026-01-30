@@ -228,6 +228,8 @@ void TrackChannelContainer::sanitize(const ChannelFlags& channels, track_ch_t up
 {
 	if (!MixHelpers::useNaNHandler()) { return; }
 
+	bool changesMade = false;
+
 	const auto totalChannels = std::min(upperBound, m_totalChannels);
 	for (track_ch_t tc = 0; tc < totalChannels; ++tc)
 	{
@@ -238,11 +240,12 @@ void TrackChannelContainer::sanitize(const ChannelFlags& channels, track_ch_t up
 			{
 				// Inf/NaN detected and buffer cleared
 				m_silenceFlags[tc] = true;
+				changesMade = true;
 			}
 		}
 	}
 
-	if (channels[0] || channels[1])
+	if (changesMade && (channels[0] || channels[1]))
 	{
 		// Keep the temporary interleaved buffer in sync
 		MixHelpers::copy(interleavedBuffer(), buffers(0));
@@ -253,17 +256,22 @@ void TrackChannelContainer::sanitizeAll()
 {
 	if (!MixHelpers::useNaNHandler()) { return; }
 
+	bool changesMade = false;
 	for (track_ch_t tc = 0; tc < m_totalChannels; ++tc)
 	{
 		if (MixHelpers::sanitize(buffer(tc)))
 		{
 			// Inf/NaN detected and buffer cleared
 			m_silenceFlags[tc] = true;
+			changesMade = true;
 		}
 	}
 
-	// Keep the temporary interleaved buffer in sync
-	MixHelpers::copy(interleavedBuffer(), buffers(0));
+	if (changesMade)
+	{
+		// Keep the temporary interleaved buffer in sync
+		MixHelpers::copy(interleavedBuffer(), buffers(0));
+	}
 }
 
 auto TrackChannelContainer::updateSilenceFlags(const ChannelFlags& channels, track_ch_t upperBound) -> bool
