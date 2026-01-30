@@ -34,7 +34,7 @@ namespace lmms
 {
 
 class Effect;
-class SampleFrame;
+class TrackChannelContainer;
 
 namespace gui
 {
@@ -63,8 +63,7 @@ public:
 	void removeEffect( Effect * _effect );
 	void moveDown( Effect * _effect );
 	void moveUp( Effect * _effect );
-	bool processAudioBuffer( SampleFrame* _buf, const fpp_t _frames, bool hasInputNoise );
-	void startRunning();
+	bool processAudioBuffer(TrackChannelContainer& trackChannels);
 
 	void clear();
 

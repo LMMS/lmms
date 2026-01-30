@@ -8,6 +8,7 @@ set(LMMS_TESTS
 	src/core/AutomatableModelTest.cpp
 	src/core/MathTest.cpp
 	src/core/ProjectVersionTest.cpp
+	src/core/TrackChannelContainerTest.cpp
 	src/core/RelativePathsTest.cpp
 	src/core/TimelineTest.cpp
 	src/tracks/AutomationTrackTest.cpp
@@ -30,4 +31,5 @@ foreach(LMMS_TEST_SRC IN LISTS LMMS_TESTS)
 	)
 
 	target_compile_features(${LMMS_TEST_NAME} PRIVATE cxx_std_20)
+	target_compile_definitions(${LMMS_TEST_NAME} PRIVATE LMMS_TESTING)
 endforeach()
