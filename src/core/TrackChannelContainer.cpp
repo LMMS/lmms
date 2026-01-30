@@ -248,7 +248,7 @@ void TrackChannelContainer::sanitize(const ChannelFlags& channels, track_ch_t up
 	if (changesMade && (channels[0] || channels[1]))
 	{
 		// Keep the temporary interleaved buffer in sync
-		MixHelpers::copy(interleavedBuffer(), buffers(0));
+		toInterleaved(buffers(0), interleavedBuffer());
 	}
 }
 
@@ -270,7 +270,7 @@ void TrackChannelContainer::sanitizeAll()
 	if (changesMade)
 	{
 		// Keep the temporary interleaved buffer in sync
-		MixHelpers::copy(interleavedBuffer(), buffers(0));
+		toInterleaved(buffers(0), interleavedBuffer());
 	}
 }
 
@@ -353,7 +353,7 @@ void TrackChannelContainer::silenceChannels(const ChannelFlags& channels, track_
 	if (needSilenced[0] || needSilenced[1])
 	{
 		// Keep the temporary interleaved buffer in sync
-		MixHelpers::copy(interleavedBuffer(), buffers(0));
+		toInterleaved(buffers(0), interleavedBuffer());
 	}
 
 	m_silenceFlags |= channels;

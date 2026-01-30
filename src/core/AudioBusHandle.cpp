@@ -226,7 +226,7 @@ void AudioBusHandle::doProcessing()
 
 		// Copy from temporary interleaved buffer to the main planar buffer
 		// so they stay in sync
-		MixHelpers::copy(m_trackChannels.buffers(0), buffer);
+		toPlanar(buffer, m_trackChannels.buffers(0));
 
 		m_trackChannels.sanitizeAll();
 

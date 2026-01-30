@@ -564,6 +564,51 @@ template<class T, typename U, proc_ch_t channels = DynamicChannelCount>
 concept AudioBufferView = SampleType<U> && (std::convertible_to<T, InterleavedBufferView<U, channels>>
 	|| std::convertible_to<T, PlanarBufferView<U, channels>>);
 
+
+//! Converts planar buffers to interleaved buffers
+template<class T, proc_ch_t inputs, proc_ch_t outputs>
+constexpr void toInterleaved(PlanarBufferView<T, inputs> src,
+	InterleavedBufferView<std::remove_const_t<T>, outputs> dst)
+{
+	assert(src.frames() == dst.frames());
+	if constexpr (inputs == DynamicChannelCount || outputs == DynamicChannelCount)
+	{
+		assert(src.channels() == dst.channels());
+	}
+	else { static_assert(inputs == outputs); }
+
+	for (f_cnt_t frame = 0; frame < dst.frames(); ++frame)
+	{
+		auto* framePtr = dst.framePtr(frame);
+		for (proc_ch_t channel = 0; channel < dst.channels(); ++channel)
+		{
+			framePtr[channel] = src.bufferPtr(channel)[frame];
+		}
+	}
+}
+
+//! Converts interleaved buffers to planar buffers
+template<class T, proc_ch_t inputs, proc_ch_t outputs>
+constexpr void toPlanar(InterleavedBufferView<T, inputs> src,
+	PlanarBufferView<std::remove_const_t<T>, outputs> dst)
+{
+	assert(src.frames() == dst.frames());
+	if constexpr (inputs == DynamicChannelCount || outputs == DynamicChannelCount)
+	{
+		assert(src.channels() == dst.channels());
+	}
+	else { static_assert(inputs == outputs); }
+
+	for (proc_ch_t channel = 0; channel < dst.channels(); ++channel)
+	{
+		auto* channelPtr = dst.bufferPtr(channel);
+		for (f_cnt_t frame = 0; frame < dst.frames(); ++frame)
+		{
+			channelPtr[frame] = src.framePtr(frame)[channel];
+		}
+	}
+}
+
 } // namespace lmms
 
 #endif // LMMS_AUDIO_BUFFER_VIEW_H

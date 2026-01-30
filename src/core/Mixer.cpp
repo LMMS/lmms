@@ -201,7 +201,7 @@ void MixerChannel::doProcessing()
 					const float v = sender->m_volumeModel.value();
 					MixHelpers::addSanitizedMultipliedByBuffer(buffer.data(), ch_buf.data(), v, sendBuf, fpp);
 				}
-				MixHelpers::copy(m_trackChannels.buffers(0), m_trackChannels.interleavedBuffer()); // to planar
+				toPlanar(m_trackChannels.interleavedBuffer(), m_trackChannels.buffers(0));
 				m_trackChannels.mixQuietChannels(sender->m_trackChannels);
 			}
 		}
@@ -646,7 +646,7 @@ void Mixer::mixToChannel(const TrackChannelContainer& trackChannels, mix_ch_t ch
 		MixHelpers::add(mixerChannel->m_trackChannels.buffers(0), trackChannels.buffers(0));
 
 		// Copy the planar buffer to the temporary interleaved buffer so they stay in sync
-		MixHelpers::copy(mixerChannel->m_trackChannels.interleavedBuffer(), mixerChannel->m_trackChannels.buffers(0));
+		toInterleaved(mixerChannel->m_trackChannels.buffers(0), mixerChannel->m_trackChannels.interleavedBuffer());
 
 		mixerChannel->m_trackChannels.mixQuietChannels(trackChannels);
 

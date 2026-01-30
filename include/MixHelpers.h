@@ -91,50 +91,6 @@ void multiplyAndAddMultiplied( SampleFrame* dst, const SampleFrame* src, float c
 /*! \brief Multiply dst by coeffDst and add samples from srcLeft/srcRight multiplied by coeffSrc */
 void multiplyAndAddMultipliedJoined( SampleFrame* dst, const sample_t* srcLeft, const sample_t* srcRight, float coeffDst, float coeffSrc, int frames );
 
-//! Copies planar buffers to interleaved buffers
-template<class T, proc_ch_t inputs, proc_ch_t outputs>
-constexpr void copy(InterleavedBufferView<std::remove_const_t<T>, outputs> dst,
-	PlanarBufferView<T, inputs> src)
-{
-	assert(src.frames() == dst.frames());
-	if constexpr (inputs == DynamicChannelCount || outputs == DynamicChannelCount)
-	{
-		assert(src.channels() == dst.channels());
-	}
-	else { static_assert(inputs == outputs); }
-
-	for (f_cnt_t frame = 0; frame < dst.frames(); ++frame)
-	{
-		auto* framePtr = dst.framePtr(frame);
-		for (proc_ch_t channel = 0; channel < dst.channels(); ++channel)
-		{
-			framePtr[channel] = src.bufferPtr(channel)[frame];
-		}
-	}
-}
-
-//! Copies interleaved buffers to planar buffers
-template<class T, proc_ch_t inputs, proc_ch_t outputs>
-constexpr void copy(PlanarBufferView<std::remove_const_t<T>, outputs> dst,
-	InterleavedBufferView<T, inputs> src)
-{
-	assert(src.frames() == dst.frames());
-	if constexpr (inputs == DynamicChannelCount || outputs == DynamicChannelCount)
-	{
-		assert(src.channels() == dst.channels());
-	}
-	else { static_assert(inputs == outputs); }
-
-	for (proc_ch_t channel = 0; channel < dst.channels(); ++channel)
-	{
-		auto* channelPtr = dst.bufferPtr(channel);
-		for (f_cnt_t frame = 0; frame < dst.frames(); ++frame)
-		{
-			channelPtr[frame] = src.framePtr(frame)[channel];
-		}
-	}
-}
-
 } // namespace MixHelpers
 
 
