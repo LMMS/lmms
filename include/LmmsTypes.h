@@ -47,7 +47,7 @@ using ch_cnt_t      = std::uint8_t;  // channel-count (0-DEFAULT_CHANNELS)
 using bpm_t         = std::uint16_t; // tempo (MIN_BPM to MAX_BPM)
 using bitrate_t     = std::uint16_t; // bitrate in kbps
 using mix_ch_t      = std::uint16_t; // Mixer-channel (0 to MAX_CHANNEL)
-using bus_cnt_t     = std::uint8_t;  // bus index/count (0-MaxBussesPerTrack)
+using group_cnt_t   = std::uint8_t;  // channel group index/count (0-MaxGroupsPerTrack)
 using track_ch_t    = std::uint16_t; // track channel index/count (0-MaxTrackChannels)
 using proc_ch_t     = std::uint16_t; // audio processor channel index/count
 

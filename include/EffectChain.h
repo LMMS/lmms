@@ -33,8 +33,8 @@
 namespace lmms
 {
 
-class AudioBus;
 class Effect;
+class TrackChannelContainer;
 
 namespace gui
 {
@@ -63,7 +63,7 @@ public:
 	void removeEffect( Effect * _effect );
 	void moveDown( Effect * _effect );
 	void moveUp( Effect * _effect );
-	bool processAudioBuffer(AudioBus& bus);
+	bool processAudioBuffer(TrackChannelContainer& trackChannels);
 
 	void clear();
 

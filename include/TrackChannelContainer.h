@@ -1,7 +1,7 @@
 /*
- * AudioBus.h
+ * TrackChannelContainer.h
  *
- * Copyright (c) 2025 Dalton Messmer <messmer.dalton/at/gmail.com>
+ * Copyright (c) 2026 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef LMMS_AUDIO_BUS_H
-#define LMMS_AUDIO_BUS_H
+#ifndef LMMS_TRACK_CHANNEL_CONTAINER_H
+#define LMMS_TRACK_CHANNEL_CONTAINER_H
 
 #include <bitset>
 #include <memory_resource>
@@ -37,134 +37,142 @@
 namespace lmms
 {
 
+class TrackChannelContainer;
+
+class LMMS_EXPORT ChannelGroup
+{
+public:
+	ChannelGroup(std::pmr::polymorphic_allocator<>& alloc,
+		ch_cnt_t channels, f_cnt_t frames, track_ch_t startingChannel);
+
+	ChannelGroup(const ChannelGroup&) = delete;
+	ChannelGroup(ChannelGroup&&) noexcept = default;
+	auto operator=(const ChannelGroup&) -> ChannelGroup& = delete;
+	auto operator=(ChannelGroup&&) noexcept -> ChannelGroup& = default;
+
+	auto channelBuffers() const -> const float* const* { return m_channelBuffers; }
+	auto channelBuffers() -> float** { return m_channelBuffers; }
+
+	auto channelBuffer(ch_cnt_t channel) const -> const float*
+	{
+		assert(channel < m_channels);
+		return m_channelBuffers[channel];
+	}
+
+	auto channelBuffer(ch_cnt_t channel) -> float*
+	{
+		assert(channel < m_channels);
+		return m_channelBuffers[channel];
+	}
+
+	auto interleavedBuffer() const -> const float* { return m_interleavedBuffer; }
+	auto interleavedBuffer() -> float* { return m_interleavedBuffer; }
+
+	auto channels() const -> ch_cnt_t { return m_channels; }
+
+	auto startingChannel() const -> track_ch_t { return m_startingChannel; }
+
+	// TODO: Future additions: Group names, type (main/aux), speaker arrangements (for surround sound), ...
+
+	friend class TrackChannelContainer;
+
+private:
+	//! Deallocates the buffers - must pass the same allocator used to construct this object
+	void deallocate(std::pmr::polymorphic_allocator<>& alloc, f_cnt_t frames);
+
+	//! Large buffer that all channel buffers are sourced from
+	float*     m_sourceBuffer = nullptr;
+
+	//! Provides access to individual channel buffers within the source buffer
+	float**    m_channelBuffers = nullptr;
+
+	//! Interleaved scratch buffer for conversions between interleaved and planar TODO: Remove once using planar only
+	float*     m_interleavedBuffer = nullptr;
+
+	//! Number of channels in `m_channelBuffers` (`MaxChannelsPerGroup` maximum) - currently only 2 is used
+	ch_cnt_t   m_channels = 0;
+
+	//! Maps channel #0 of this bus to its track channel # within TrackChannelContainer (for performance)
+	track_ch_t m_startingChannel = 0;
+};
+
+
 /**
  * A collection of track channels for an instrument or effect chain
  * which keeps track of signal flow.
  */
-class LMMS_EXPORT AudioBus
+class LMMS_EXPORT TrackChannelContainer
 {
 public:
 	using ChannelFlags = std::bitset<MaxTrackChannels>;
 
-	class LMMS_EXPORT BusData
-	{
-	public:
-		BusData(std::pmr::polymorphic_allocator<>& alloc,
-			ch_cnt_t channels, f_cnt_t frames, track_ch_t startingChannel);
+	TrackChannelContainer() = default;
+	~TrackChannelContainer();
 
-		BusData(const BusData&) = delete;
-		BusData(BusData&&) noexcept = default;
-		auto operator=(const BusData&) -> BusData& = delete;
-		auto operator=(BusData&&) noexcept -> BusData& = default;
+	TrackChannelContainer(const TrackChannelContainer&) = delete;
+	TrackChannelContainer(TrackChannelContainer&&) noexcept = default;
+	auto operator=(const TrackChannelContainer&) -> TrackChannelContainer& = delete;
+	auto operator=(TrackChannelContainer&&) noexcept -> TrackChannelContainer& = default;
 
-		auto channelBuffers() const -> const float* const* { return m_channelBuffers; }
-		auto channelBuffers() -> float** { return m_channelBuffers; }
-
-		auto channelBuffer(ch_cnt_t channel) const -> const float*
-		{
-			assert(channel < m_channels);
-			return m_channelBuffers[channel];
-		}
-
-		auto channelBuffer(ch_cnt_t channel) -> float*
-		{
-			assert(channel < m_channels);
-			return m_channelBuffers[channel];
-		}
-
-		auto interleavedBuffer() const -> const float* { return m_interleavedBuffer; }
-		auto interleavedBuffer() -> float* { return m_interleavedBuffer; }
-
-		auto channels() const -> ch_cnt_t { return m_channels; }
-
-		auto startingChannel() const -> track_ch_t { return m_startingChannel; }
-
-		friend class AudioBus;
-
-	private:
-		//! Large buffer that all channel buffers are sourced from
-		float*     m_sourceBuffer = nullptr;
-
-		//! Provides access to individual channel buffers within the source buffer
-		float**    m_channelBuffers = nullptr;
-
-		//! Interleaved scratch buffer for conversions between interleaved and planar TODO: Remove once using planar only
-		float*     m_interleavedBuffer = nullptr;
-
-		//! Number of channels in `m_channelBuffers` (`MaxChannelsPerBus` maximum) - currently only 2 is used
-		ch_cnt_t   m_channels = 0;
-
-		//! Maps channel #0 of this bus to its track channel # within AudioBus (for performance)
-		track_ch_t m_startingChannel = 0;
-	};
-
-	AudioBus() = default;
-	~AudioBus();
-
-	AudioBus(const AudioBus&) = delete;
-	AudioBus(AudioBus&&) noexcept = default;
-	auto operator=(const AudioBus&) -> AudioBus& = delete;
-	auto operator=(AudioBus&&) noexcept -> AudioBus& = default;
-
-	//! Single bus with `frames` frames, `channels` channels, and all buffers allocated with `bufferResource`
-	explicit AudioBus(f_cnt_t frames, ch_cnt_t channels = DEFAULT_CHANNELS,
+	//! Single channel group with `frames` frames, `channels` channels, and all buffers allocated with `bufferResource`
+	explicit TrackChannelContainer(f_cnt_t frames, ch_cnt_t channels = DEFAULT_CHANNELS,
 		std::pmr::memory_resource* bufferResource = std::pmr::get_default_resource());
 
-	auto busCount() const -> bus_cnt_t { return static_cast<bus_cnt_t>(m_busses.size()); }
+	auto groupCount() const -> group_cnt_t { return static_cast<group_cnt_t>(m_groups.size()); }
 
-	//! @returns the buffers of the given bus
-	auto buffers(bus_cnt_t busIndex) const -> PlanarBufferView<const float>
+	//! @returns the buffers of the given channel group
+	auto buffers(group_cnt_t groupIndex) const -> PlanarBufferView<const float>
 	{
-		assert(busIndex < busCount());
-		const BusData& b = m_busses[busIndex];
-		return {b.channelBuffers(), b.channels(), m_frames};
+		assert(groupIndex < groupCount());
+		const ChannelGroup& g = m_groups[groupIndex];
+		return {g.channelBuffers(), g.channels(), m_frames};
 	}
 
-	//! @returns the buffers of the given bus
-	auto buffers(bus_cnt_t busIndex) -> PlanarBufferView<float>
+	//! @returns the buffers of the given channel group
+	auto buffers(group_cnt_t groupIndex) -> PlanarBufferView<float>
 	{
-		assert(busIndex < busCount());
-		BusData& b = m_busses[busIndex];
-		return {b.channelBuffers(), b.channels(), m_frames};
+		assert(groupIndex < groupCount());
+		ChannelGroup& g = m_groups[groupIndex];
+		return {g.channelBuffers(), g.channels(), m_frames};
 	}
 
-	//! @returns planar channel buffers for the given bus
-	auto operator[](bus_cnt_t busIndex) const -> const float* const*
+	//! @returns planar channel buffers for the given channel group
+	auto operator[](group_cnt_t groupIndex) const -> const float* const*
 	{
-		return m_busses[busIndex].channelBuffers();
+		return m_groups[groupIndex].channelBuffers();
 	}
 
-	//! @returns planar channel buffers for the given bus
-	auto operator[](bus_cnt_t busIndex) -> float**
+	//! @returns planar channel buffers for the given channel group
+	auto operator[](group_cnt_t groupIndex) -> float**
 	{
-		return m_busses[busIndex].channelBuffers();
+		return m_groups[groupIndex].channelBuffers();
 	}
 
-	//! @returns sum of all bus channel counts
+	//! @returns sum of all groups' channel counts
 	auto totalChannels() const -> track_ch_t { return m_totalChannels; }
 
 	//! @returns the frame count for each channel buffer
 	auto frames() const -> f_cnt_t { return m_frames; }
 
 	//! @returns scratch buffer for conversions between interleaved and planar TODO: Remove once using planar only
-	auto interleavedBuffer(bus_cnt_t busIndex) const -> InterleavedBufferView<const float, 2>
+	auto interleavedBuffer(group_cnt_t groupIndex) const -> InterleavedBufferView<const float, 2>
 	{
-		assert(m_busses[busIndex].channels() == 2);
-		return {m_busses[busIndex].interleavedBuffer(), m_frames};
+		assert(m_groups[groupIndex].channels() == 2);
+		return {m_groups[groupIndex].interleavedBuffer(), m_frames};
 	}
 
 	//! @returns scratch buffer for conversions between interleaved and planar TODO: Remove once using planar only
-	auto interleavedBuffer(bus_cnt_t busIndex) -> InterleavedBufferView<float, 2>
+	auto interleavedBuffer(group_cnt_t groupIndex) -> InterleavedBufferView<float, 2>
 	{
-		assert(m_busses[busIndex].channels() == 2);
-		return {m_busses[busIndex].interleavedBuffer(), m_frames};
+		assert(m_groups[groupIndex].channels() == 2);
+		return {m_groups[groupIndex].interleavedBuffer(), m_frames};
 	}
 
 	/**
-	 * @brief Adds a new bus at the end of the list
-	 * @returns the newly created bus, or nullptr upon failure
+	 * @brief Adds a new channel group at the end of the list
+	 * @returns the newly created group, or nullptr upon failure
 	 */
-	auto addBus(ch_cnt_t channels) -> BusData*;
+	auto addGroup(ch_cnt_t channels) -> ChannelGroup*;
 
 	/**
 	 * Track channels which are known to be quiet, AKA the silence status.
@@ -196,8 +204,8 @@ public:
 	void enableSilenceTracking(bool enabled);
 	auto silenceTrackingEnabled() const -> bool { return m_silenceTrackingEnabled; }
 
-	//! Mixes the silence status of the other `AudioBus` with this `AudioBus`
-	void mixQuietChannels(const AudioBus& other);
+	//! Mixes the silence status of the other `TrackChannelContainer` with this `TrackChannelContainer`
+	void mixQuietChannels(const TrackChannelContainer& other);
 
 	/**
 	 * Determines whether a processor has input noise given
@@ -250,10 +258,10 @@ public:
 	void silenceAllChannels();
 
 	//! @returns absolute peak sample value for the given channel
-	auto absPeakValue(bus_cnt_t busIndex, ch_cnt_t busChannel) const -> float;
+	auto absPeakValue(group_cnt_t groupIndex, ch_cnt_t groupChannel) const -> float;
 
 private:
-	ArrayVector<BusData, MaxBussesPerTrack> m_busses;
+	ArrayVector<ChannelGroup, MaxGroupsPerTrack> m_groups;
 
 	//! Caches the sum of `m_busses[idx].channels()` - must never exceed MaxTrackChannels
 	track_ch_t m_totalChannels = 0;
@@ -281,4 +289,4 @@ private:
 
 } // namespace lmms
 
-#endif // LMMS_AUDIO_BUS_H
+#endif // LMMS_TRACK_CHANNEL_CONTAINER_H

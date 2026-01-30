@@ -1,7 +1,6 @@
 set(LMMS_SRCS
 	${LMMS_SRCS}
 
-	core/AudioBus.cpp
 	core/AudioBusHandle.cpp
 	core/AudioEngine.cpp
 	core/AudioEngineProfiler.cpp
@@ -83,6 +82,7 @@ set(LMMS_SRCS
 	core/TimePos.cpp
 	core/ToolPlugin.cpp
 	core/Track.cpp
+	core/TrackChannelContainer.cpp
 	core/TrackContainer.cpp
 	core/UpgradeExtendedNoteRange.h
 	core/UpgradeExtendedNoteRange.cpp

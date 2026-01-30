@@ -27,11 +27,11 @@
 #include <QDomElement>
 #include <cassert>
 
-#include "AudioBus.h"
 #include "EffectChain.h"
 #include "Effect.h"
 #include "DummyEffect.h"
 #include "MixHelpers.h"
+#include "TrackChannelContainer.h"
 
 namespace lmms
 {
@@ -185,19 +185,19 @@ void EffectChain::moveUp( Effect * _effect )
 
 
 
-bool EffectChain::processAudioBuffer(AudioBus& bus)
+bool EffectChain::processAudioBuffer(TrackChannelContainer& trackChannels)
 {
 	if( m_enabledModel.value() == false )
 	{
 		return false;
 	}
 
-	bus.sanitizeAll();
+	trackChannels.sanitizeAll();
 
 	bool moreEffects = false;
 	for (Effect* effect : m_effects)
 	{
-		moreEffects |= effect->processAudioBuffer(bus);
+		moreEffects |= effect->processAudioBuffer(trackChannels);
 	}
 
 	return moreEffects;

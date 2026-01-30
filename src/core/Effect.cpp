@@ -23,17 +23,17 @@
  *
  */
 
+#include "Effect.h"
+
 #include <QDomElement>
 
-#include "AudioBus.h"
-#include "Effect.h"
+#include "ConfigManager.h"
 #include "EffectChain.h"
 #include "EffectControls.h"
 #include "EffectView.h"
 #include "MixHelpers.h"
-
-#include "ConfigManager.h"
 #include "SampleFrame.h"
+#include "TrackChannelContainer.h"
 
 namespace lmms
 {
@@ -93,7 +93,7 @@ void Effect::loadSettings( const QDomElement & _this )
 
 
 
-bool Effect::processAudioBuffer(AudioBus& inOut)
+bool Effect::processAudioBuffer(TrackChannelContainer& inOut)
 {
 	if (!isAwake())
 	{

@@ -37,9 +37,9 @@
 namespace lmms
 {
 
-class AudioBus;
 class EffectChain;
 class EffectControls;
+class TrackChannelContainer;
 
 namespace gui
 {
@@ -66,7 +66,7 @@ public:
 	}
 
 	//! Returns true if audio was processed and should continue being processed
-	bool processAudioBuffer(AudioBus& inOut);
+	bool processAudioBuffer(TrackChannelContainer& inOut);
 
 	inline bool isOkay() const
 	{
