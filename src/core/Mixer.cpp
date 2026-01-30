@@ -172,14 +172,14 @@ void MixerChannel::doProcessing()
 
 			if (sender->m_trackChannels.hasAnyInputNoise() || sender->m_stillRunning)
 			{
-				auto buffer = m_trackChannels.interleavedBuffer(0).asSampleFrames();
+				auto buffer = m_trackChannels.interleavedBuffer().asSampleFrames();
 
 				// figure out if we're getting sample-exact input
 				ValueBuffer * sendBuf = sendModel->valueBuffer();
 				ValueBuffer * volBuf = sender->m_volumeModel.valueBuffer();
 
 				// mix it's output with this one's output
-				auto ch_buf = sender->m_trackChannels.interleavedBuffer(0).asSampleFrames();
+				auto ch_buf = sender->m_trackChannels.interleavedBuffer().asSampleFrames();
 
 				// use sample-exact mixing if sample-exact values are available
 				if( ! volBuf && ! sendBuf ) // neither volume nor send has sample-exact data...
@@ -201,7 +201,7 @@ void MixerChannel::doProcessing()
 					const float v = sender->m_volumeModel.value();
 					MixHelpers::addSanitizedMultipliedByBuffer(buffer.data(), ch_buf.data(), v, sendBuf, fpp);
 				}
-				MixHelpers::copy(m_trackChannels.buffers(0), m_trackChannels.interleavedBuffer(0)); // to planar
+				MixHelpers::copy(m_trackChannels.buffers(0), m_trackChannels.interleavedBuffer()); // to planar
 				m_trackChannels.mixQuietChannels(sender->m_trackChannels);
 			}
 		}
@@ -211,7 +211,7 @@ void MixerChannel::doProcessing()
 
 		m_stillRunning = m_fxChain.processAudioBuffer(m_trackChannels);
 
-		const auto peakSamples = SampleFrame{m_trackChannels.absPeakValue(0, 0), m_trackChannels.absPeakValue(0, 1)};
+		const auto peakSamples = SampleFrame{m_trackChannels.absPeakValue(0), m_trackChannels.absPeakValue(1)};
 		m_peakLeft = std::max(m_peakLeft, peakSamples[0] * v);
 		m_peakRight = std::max(m_peakRight, peakSamples[1] * v);
 	}
@@ -646,7 +646,7 @@ void Mixer::mixToChannel(const TrackChannelContainer& trackChannels, mix_ch_t ch
 		MixHelpers::add(mixerChannel->m_trackChannels.buffers(0), trackChannels.buffers(0));
 
 		// Copy the planar buffer to the temporary interleaved buffer so they stay in sync
-		MixHelpers::copy(mixerChannel->m_trackChannels.interleavedBuffer(0), mixerChannel->m_trackChannels.buffers(0));
+		MixHelpers::copy(mixerChannel->m_trackChannels.interleavedBuffer(), mixerChannel->m_trackChannels.buffers(0));
 
 		mixerChannel->m_trackChannels.mixQuietChannels(trackChannels);
 
@@ -710,7 +710,7 @@ void Mixer::masterMix( SampleFrame* _buf )
 		AudioEngineWorkerThread::startAndWaitForJobs();
 	}
 
-	auto buffer = m_mixerChannels[0]->m_trackChannels.interleavedBuffer(0).asSampleFrames();
+	auto buffer = m_mixerChannels[0]->m_trackChannels.interleavedBuffer().asSampleFrames();
 
 	// handle sample-exact data in master volume fader
 	ValueBuffer * volBuf = m_mixerChannels[0]->m_volumeModel.valueBuffer();

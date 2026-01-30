@@ -118,10 +118,10 @@ bool Effect::processAudioBuffer(TrackChannelContainer& inOut)
 		return false;
 	}
 
-	const auto status = processImpl(inOut.interleavedBuffer(0).asSampleFrames().data(), inOut.frames());
+	const auto status = processImpl(inOut.interleavedBuffer().asSampleFrames().data(), inOut.frames());
 
 	// Copy interleaved plugin output to planar
-	MixHelpers::copy(inOut.buffers(0), inOut.interleavedBuffer(0));
+	MixHelpers::copy(inOut.buffers(0), inOut.interleavedBuffer());
 
 	inOut.sanitize(0b11);
 

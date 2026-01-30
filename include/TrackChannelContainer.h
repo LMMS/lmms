@@ -39,61 +39,42 @@ namespace lmms
 
 class TrackChannelContainer;
 
-class LMMS_EXPORT ChannelGroup
+//! Non-owning collection of audio channels + metadata
+class ChannelGroup
 {
 public:
-	ChannelGroup(std::pmr::polymorphic_allocator<>& alloc,
-		ch_cnt_t channels, f_cnt_t frames, track_ch_t startingChannel);
+	ChannelGroup(float** channelBuffers, ch_cnt_t channels)
+		: m_channelBuffers{channelBuffers}
+		, m_channels{channels}
+	{}
 
-	ChannelGroup(const ChannelGroup&) = delete;
-	ChannelGroup(ChannelGroup&&) noexcept = default;
-	auto operator=(const ChannelGroup&) -> ChannelGroup& = delete;
-	auto operator=(ChannelGroup&&) noexcept -> ChannelGroup& = default;
+	auto buffers() const -> const float* const* { return m_channelBuffers; }
+	auto buffers() -> float** { return m_channelBuffers; }
 
-	auto channelBuffers() const -> const float* const* { return m_channelBuffers; }
-	auto channelBuffers() -> float** { return m_channelBuffers; }
-
-	auto channelBuffer(ch_cnt_t channel) const -> const float*
+	auto buffer(ch_cnt_t channel) const -> const float*
 	{
 		assert(channel < m_channels);
 		return m_channelBuffers[channel];
 	}
 
-	auto channelBuffer(ch_cnt_t channel) -> float*
+	auto buffer(ch_cnt_t channel) -> float*
 	{
 		assert(channel < m_channels);
 		return m_channelBuffers[channel];
 	}
-
-	auto interleavedBuffer() const -> const float* { return m_interleavedBuffer; }
-	auto interleavedBuffer() -> float* { return m_interleavedBuffer; }
 
 	auto channels() const -> ch_cnt_t { return m_channels; }
 
-	auto startingChannel() const -> track_ch_t { return m_startingChannel; }
+	void setBuffers(float** newChannelBuffers) { m_channelBuffers = newChannelBuffers; }
 
 	// TODO: Future additions: Group names, type (main/aux), speaker arrangements (for surround sound), ...
 
-	friend class TrackChannelContainer;
-
 private:
-	//! Deallocates the buffers - must pass the same allocator used to construct this object
-	void deallocate(std::pmr::polymorphic_allocator<>& alloc, f_cnt_t frames);
-
-	//! Large buffer that all channel buffers are sourced from
-	float*     m_sourceBuffer = nullptr;
-
 	//! Provides access to individual channel buffers within the source buffer
 	float**    m_channelBuffers = nullptr;
 
-	//! Interleaved scratch buffer for conversions between interleaved and planar TODO: Remove once using planar only
-	float*     m_interleavedBuffer = nullptr;
-
 	//! Number of channels in `m_channelBuffers` (`MaxChannelsPerGroup` maximum) - currently only 2 is used
 	ch_cnt_t   m_channels = 0;
-
-	//! Maps channel #0 of this bus to its track channel # within TrackChannelContainer (for performance)
-	track_ch_t m_startingChannel = 0;
 };
 
 
@@ -120,12 +101,36 @@ public:
 
 	auto groupCount() const -> group_cnt_t { return static_cast<group_cnt_t>(m_groups.size()); }
 
+	//! @returns the buffers for all channel groups
+	auto allBuffers() const -> PlanarBufferView<const float>
+	{
+		return {m_channelBuffers, m_totalChannels, m_frames};
+	}
+
+	//! @returns the buffers for all channel groups
+	auto allBuffers() -> PlanarBufferView<float>
+	{
+		return {m_channelBuffers, m_totalChannels, m_frames};
+	}
+
+	//! @returns the buffer for the given track channel
+	auto buffer(track_ch_t channel) const -> std::span<const float>
+	{
+		return {m_channelBuffers[channel], m_frames};
+	}
+
+	//! @returns the buffer for the given track channel
+	auto buffer(track_ch_t channel) -> std::span<float>
+	{
+		return {m_channelBuffers[channel], m_frames};
+	}
+
 	//! @returns the buffers of the given channel group
 	auto buffers(group_cnt_t groupIndex) const -> PlanarBufferView<const float>
 	{
 		assert(groupIndex < groupCount());
 		const ChannelGroup& g = m_groups[groupIndex];
-		return {g.channelBuffers(), g.channels(), m_frames};
+		return {g.buffers(), g.channels(), m_frames};
 	}
 
 	//! @returns the buffers of the given channel group
@@ -133,19 +138,19 @@ public:
 	{
 		assert(groupIndex < groupCount());
 		ChannelGroup& g = m_groups[groupIndex];
-		return {g.channelBuffers(), g.channels(), m_frames};
+		return {g.buffers(), g.channels(), m_frames};
 	}
 
 	//! @returns planar channel buffers for the given channel group
 	auto operator[](group_cnt_t groupIndex) const -> const float* const*
 	{
-		return m_groups[groupIndex].channelBuffers();
+		return m_groups[groupIndex].buffers();
 	}
 
 	//! @returns planar channel buffers for the given channel group
 	auto operator[](group_cnt_t groupIndex) -> float**
 	{
-		return m_groups[groupIndex].channelBuffers();
+		return m_groups[groupIndex].buffers();
 	}
 
 	//! @returns sum of all groups' channel counts
@@ -155,17 +160,15 @@ public:
 	auto frames() const -> f_cnt_t { return m_frames; }
 
 	//! @returns scratch buffer for conversions between interleaved and planar TODO: Remove once using planar only
-	auto interleavedBuffer(group_cnt_t groupIndex) const -> InterleavedBufferView<const float, 2>
+	auto interleavedBuffer() const -> InterleavedBufferView<const float, 2>
 	{
-		assert(m_groups[groupIndex].channels() == 2);
-		return {m_groups[groupIndex].interleavedBuffer(), m_frames};
+		return {m_interleavedBuffer, m_frames};
 	}
 
 	//! @returns scratch buffer for conversions between interleaved and planar TODO: Remove once using planar only
-	auto interleavedBuffer(group_cnt_t groupIndex) -> InterleavedBufferView<float, 2>
+	auto interleavedBuffer() -> InterleavedBufferView<float, 2>
 	{
-		assert(m_groups[groupIndex].channels() == 2);
-		return {m_groups[groupIndex].interleavedBuffer(), m_frames};
+		return {m_interleavedBuffer, m_frames};
 	}
 
 	/**
@@ -258,12 +261,21 @@ public:
 	void silenceAllChannels();
 
 	//! @returns absolute peak sample value for the given channel
-	auto absPeakValue(group_cnt_t groupIndex, ch_cnt_t groupChannel) const -> float;
+	auto absPeakValue(track_ch_t channel) const -> float;
 
 private:
+	//! Large buffer that all channel buffers are sourced from
+	float*     m_sourceBuffer = nullptr;
+
+	//! Provides access to individual channel buffers within the source buffer
+	float**    m_channelBuffers = nullptr;
+
+	//! Interleaved scratch buffer for conversions between interleaved and planar TODO: Remove once using planar only
+	float*     m_interleavedBuffer = nullptr;
+
 	ArrayVector<ChannelGroup, MaxGroupsPerTrack> m_groups;
 
-	//! Caches the sum of `m_busses[idx].channels()` - must never exceed MaxTrackChannels
+	//! Caches the sum of `m_groups[idx].channels()` - must never exceed MaxTrackChannels
 	track_ch_t m_totalChannels = 0;
 
 	const f_cnt_t m_frames = 0;

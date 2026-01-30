@@ -85,7 +85,6 @@ private slots:
 		auto group2 = tc.addGroup(5);
 		QVERIFY(group2 != nullptr);
 		QCOMPARE(group2->channels(), 5);
-		QCOMPARE(group2->startingChannel(), 2);
 		QCOMPARE(tc.groupCount(), 2);
 		QCOMPARE(tc.totalChannels(), 7);
 
@@ -93,7 +92,6 @@ private slots:
 		auto group3 = tc.addGroup(1);
 		QVERIFY(group3 != nullptr);
 		QCOMPARE(group3->channels(), 1);
-		QCOMPARE(group3->startingChannel(), 2 + 5);
 		QCOMPARE(tc.groupCount(), 3);
 		QCOMPARE(tc.totalChannels(), 8);
 
@@ -101,7 +99,6 @@ private slots:
 		auto group4 = tc.addGroup(lmms::MaxChannelsPerGroup);
 		QVERIFY(group4 != nullptr);
 		QCOMPARE(group4->channels(), lmms::MaxChannelsPerGroup);
-		QCOMPARE(group4->startingChannel(), 2 + 5 + 1);
 		QCOMPARE(tc.groupCount(), 4);
 		QCOMPARE(tc.totalChannels(), 8 + lmms::MaxChannelsPerGroup);
 

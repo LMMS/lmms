@@ -129,7 +129,7 @@ void AudioBusHandle::doProcessing()
 				m_bufferUsage = true;
 
 				// Writing to temporary interleaved buffer until PlayHandle and MixHelpers switch to planar
-				MixHelpers::add(m_trackChannels.interleavedBuffer(0).asSampleFrames().data(), ph->buffer(), fpp);
+				MixHelpers::add(m_trackChannels.interleavedBuffer().asSampleFrames().data(), ph->buffer(), fpp);
 			}
 			ph->releaseBuffer(); 	// gets rid of playhandle's buffer and sets
 									// pointer to null, so if it doesn't get re-acquired we know to skip it next time
@@ -139,7 +139,7 @@ void AudioBusHandle::doProcessing()
 	if (m_bufferUsage)
 	{
 		// PlayHandle buffers were written to the temporary interleaved buffer
-		auto buffer = m_trackChannels.interleavedBuffer(0);
+		auto buffer = m_trackChannels.interleavedBuffer();
 
 		// handle volume and panning
 		// has both vol and pan models
