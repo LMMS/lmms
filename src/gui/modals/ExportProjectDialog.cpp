@@ -193,6 +193,10 @@ ExportProjectDialog::ExportProjectDialog(const QString& path, Mode mode, QWidget
 		m_fileFormatComboBox->setCurrentIndex(
 			std::max(0, m_fileFormatComboBox->findData(static_cast<int>(pathFormat))));
 	}
+	else if (mode == Mode::ExportTracks)
+	{
+		m_fileFormatComboBox->setCurrentIndex(0);
+	}
 
 	m_bitRateComboBox->setCurrentIndex(std::max(0, m_bitRateComboBox->findData(defaultBitRate)));
 	m_bitDepthComboBox->setCurrentIndex(std::max(0, m_bitDepthComboBox->findData(static_cast<int>(defaultBitDepth))));
