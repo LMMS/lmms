@@ -208,8 +208,7 @@ private:
 			@param hasActiveMaxWindow Function that should return whether there are any active maximized windows, in
 			order to avoid initiating a pan in that case.
 		*/
-		MovableQMdiArea(QWidget* parent, keyModifiers* keyMods, std::function<bool()> hasActiveMaxWindow,
-			QScrollBar* scrollBarV, QScrollBar* scrollBarH);
+		MovableQMdiArea(QWidget* parent, MainWindow* mainWindow, keyModifiers* keyMods, QScrollBar* scrollBarV, QScrollBar* scrollBarH);
 
 		~MovableQMdiArea() {}
 
@@ -227,6 +226,7 @@ private:
 		void mousePanEnd();
 		void scroll(int scrollX, int scrollY);
 		void updateScrollBars();
+		bool hasActiveMaxWindow();
 
 		static constexpr int Margin = 100; //!< Margin used along with the active workspace area.
 
@@ -239,7 +239,7 @@ private:
 		bool m_canUniversalPan; //!< Whether panning can be started without clicking on a free area
 		int m_lastX;
 		int m_lastY;
-		std::function<bool()> m_hasActiveMaxWindow;
+		MainWindow* m_mainWindow;
 		QScrollBar* m_scrollBarV;
 		QScrollBar* m_scrollBarH;
 		int m_scrollBarLastY;

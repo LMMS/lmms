@@ -90,6 +90,8 @@ MainWindow::MainWindow() :
 {
 	setAttribute( Qt::WA_DeleteOnClose );
 
+	constexpr auto HideHandleStyle = "QSplitter::handle { width: 0px; }";
+
 	auto main_widget = new QWidget(this);
 	auto vbox = new QVBoxLayout(main_widget);
 	vbox->setSpacing( 0 );
@@ -103,7 +105,8 @@ MainWindow::MainWindow() :
 	auto sideBar = new SideBar(Qt::Vertical, w);
 
 	auto splitter = new QSplitter(Qt::Horizontal, w);
-	splitter->setChildrenCollapsible( false );
+	splitter->setChildrenCollapsible(false);
+	splitter->setStyleSheet(HideHandleStyle);
 
 	ConfigManager* confMgr = ConfigManager::inst();
 	bool sideBarOnRight = confMgr->value("ui", "sidebaronright").toInt();
@@ -156,19 +159,6 @@ MainWindow::MainWindow() :
 	sideBar->appendTab(new FileBrowser(FileBrowser::Type::Normal, root_paths.join("*"), FileItem::defaultFilters(), title,
 		embed::getIconPixmap("computer").transformed(QTransform().rotate(90)), splitter, dirs_as_items));
 
-	const auto hasActiveMaxWindow = [this]()
-	{
-		for (const auto* sw : workspace()->subWindowList())
-		{
-			if (sw->isVisible() && sw->isMaximized())
-			{
-				return true;
-			}
-		}
-
-		return false;
-	};
-
 	m_workspaceScrollBarV = new QScrollBar(Qt::Vertical, nullptr);
 	m_workspaceScrollBarV->setTracking(true);
 	m_workspaceScrollBarV->setFixedWidth(12);
@@ -177,16 +167,12 @@ MainWindow::MainWindow() :
 	m_workspaceScrollBarH->setTracking(true);
 	m_workspaceScrollBarH->setFixedHeight(12);
 
-	constexpr auto HideHandleStyle = "QSplitter::handle { width: 0px; }";
-
-	splitter->setStyleSheet(HideHandleStyle);
-
+	// Add widget to contain workspace and the scrollbar on the bottom
 	auto workspaceVSplitter = new QSplitter(Qt::Vertical, splitter);
-	workspaceVSplitter->setStyleSheet(HideHandleStyle);
 	workspaceVSplitter->setChildrenCollapsible(false);
+	workspaceVSplitter->setStyleSheet(HideHandleStyle);
 
-	m_workspace = new MovableQMdiArea(workspaceVSplitter, &m_keyMods, hasActiveMaxWindow, m_workspaceScrollBarV,
-		m_workspaceScrollBarH);
+	m_workspace = new MovableQMdiArea(workspaceVSplitter, this, &m_keyMods, m_workspaceScrollBarV, m_workspaceScrollBarH);
 	workspaceVSplitter->insertWidget(-1, m_workspaceScrollBarH);
 	workspaceVSplitter->handle(workspaceVSplitter->indexOf(m_workspaceScrollBarH))->hide();
 
@@ -236,7 +222,6 @@ MainWindow::MainWindow() :
 
 	vbox->addWidget( m_toolBar );
 	vbox->addWidget( w );
-	// vbox->addWidget(m_workspaceScrollBarH);
 	setCentralWidget( main_widget );
 
 	m_updateTimer.start( 1000 / 60, this );  // 60 fps
@@ -1633,8 +1618,8 @@ void MainWindow::onProjectFileNameChanged()
 }
 
 
-MainWindow::MovableQMdiArea::MovableQMdiArea(QWidget* parent, keyModifiers* keyMods,
-	std::function<bool()> hasActiveMaxWindow, QScrollBar* scrollBarV, QScrollBar* scrollBarH)
+MainWindow::MovableQMdiArea::MovableQMdiArea(QWidget* parent, MainWindow* mainWindow, keyModifiers* keyMods,
+	QScrollBar* scrollBarV, QScrollBar* scrollBarH)
 	: QMdiArea(parent)
 	, m_keyMods{keyMods}
 	, m_isBeingMoved{false}
@@ -1642,7 +1627,7 @@ MainWindow::MovableQMdiArea::MovableQMdiArea(QWidget* parent, keyModifiers* keyM
 	, m_canUniversalPan{false}
 	, m_lastX{0}
 	, m_lastY{0}
-	, m_hasActiveMaxWindow{hasActiveMaxWindow}
+	, m_mainWindow{mainWindow}
 	, m_scrollBarV{scrollBarV}
 	, m_scrollBarH{scrollBarH}
 	, m_scrollBarLastY{0}
@@ -1843,6 +1828,19 @@ void MainWindow::MovableQMdiArea::childEvent(QChildEvent* event)
 	}
 }
 
+bool MainWindow::MovableQMdiArea::hasActiveMaxWindow()
+{
+	for (const auto* sw : subWindowList())
+	{
+		if (sw->isVisible() && sw->isMaximized())
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
 bool MainWindow::MovableQMdiArea::eventFilter(QObject* watched, QEvent* event)
 {
 	// First try to detect if this is a subwindow (we're installing filters on the subwindows) and whether it is being
@@ -1924,7 +1922,7 @@ bool MainWindow::MovableQMdiArea::eventFilter(QObject* watched, QEvent* event)
 			{
 				// Only enable it if there are no maximized windows and the
 				// mouse is over the MDI area (or its children).
-				m_canUniversalPan = !m_hasActiveMaxWindow() && underMouse();
+				m_canUniversalPan = !hasActiveMaxWindow() && underMouse();
 				return true;
 			}
 		}
