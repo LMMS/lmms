@@ -1635,30 +1635,34 @@ MainWindow::MovableQMdiArea::MovableQMdiArea(QWidget* parent, MainWindow* mainWi
 {
 	parent->installEventFilter(this);
 
-	connect(this, &QMdiArea::subWindowActivated, this, [this] { updateScrollBars(); });
+	connect(this, &QMdiArea::subWindowActivated, this, &MainWindow::MovableQMdiArea::updateScrollBars);
+	connect(m_scrollBarH, &QScrollBar::sliderMoved, [this] { sliderMoved(m_scrollBarH); });
+	connect(m_scrollBarV, &QScrollBar::sliderMoved, [this] { sliderMoved(m_scrollBarV); });
+}
 
-	connect(m_scrollBarH, &QScrollBar::sliderMoved, this, [this] {
+void MainWindow::MovableQMdiArea::sliderMoved(QScrollBar* scrollBar)
+{
+	// The overall logic here is to calculate scroll delta, and apply it with signals blocked. Invoking a signal while
+	// changing the slider would throw this into a stack-smashing infinite loop :(
+
+	if (scrollBar == m_scrollBarH)
+	{
 		int newValue = m_scrollBarH->value();
 		int delta = newValue - m_scrollBarLastX;
-
-		// qDebug() << "X" << newValue << delta;
-
 		m_scrollBarH->blockSignals(true);
 		m_scrollBarLastX = newValue;
 		scroll(delta, 0);
 		m_scrollBarH->blockSignals(false);
-	});
-	connect(m_scrollBarV, &QScrollBar::sliderMoved, this, [this] {
+	}
+	else if (scrollBar == m_scrollBarV)
+	{
 		int newValue = m_scrollBarV->value();
 		int delta = newValue - m_scrollBarLastY;
-
-		// qDebug() << "Y" << newValue << delta;
-
 		m_scrollBarV->blockSignals(true);
 		m_scrollBarLastY = newValue;
 		scroll(0, delta);
 		m_scrollBarV->blockSignals(false);
-	});
+	}
 }
 
 void MainWindow::MovableQMdiArea::updateScrollBars()
@@ -1667,19 +1671,19 @@ void MainWindow::MovableQMdiArea::updateScrollBars()
 	const auto [minX, maxX, minY, maxY] = getActiveWorkspaceArea();
 
 	// The scrollbar boundaries pretty much the active workspace area but taking the workspace widget dimensions.
-	int sbMinX = minX - width() + Margin;
-	int sbMaxX = maxX - Margin;
-	int sbMinY = minY - height() + Margin;
-	int sbMaxY = maxY - Margin;
+	int scrollBarMinX = minX - width() + Margin;
+	int scrollBarMaxX = maxX - Margin;
+	int scrollBarMinY = minY - height() + Margin;
+	int scrollBarMaxY = maxY - Margin;
 
 	// We have to translate coordinates here because apparently the scrollbars don't support negative minimum values.
-	// More specifically, we translate `sbMin` to 0, by subtracting `sbMin`.
-	const int transX = -sbMinX;
-	const int transY = -sbMinY;
-	m_scrollBarH->setMinimum(sbMinX + transX);
-	m_scrollBarH->setMaximum(sbMaxX + transX);
-	m_scrollBarV->setMinimum(sbMinY + transY);
-	m_scrollBarV->setMaximum(sbMaxY + transY);
+	// More specifically, we translate `scrollBarMin` to 0, by subtracting `scrollBarMin`.
+	const int transX = -scrollBarMinX;
+	const int transY = -scrollBarMinY;
+	m_scrollBarH->setMinimum(scrollBarMinX + transX);
+	m_scrollBarH->setMaximum(scrollBarMaxX + transX);
+	m_scrollBarV->setMinimum(scrollBarMinY + transY);
+	m_scrollBarV->setMaximum(scrollBarMaxY + transY);
 
 	const int newX = 0 + transX;
 	const int newY = 0 + transY;
@@ -1692,8 +1696,6 @@ void MainWindow::MovableQMdiArea::updateScrollBars()
 
 	m_scrollBarLastX = newX;
 	m_scrollBarLastY = newY;
-
-	// qDebug() << QString{"H(%0,%1) V(%2,%3)"}.arg(sbMaxX - sbMinX).arg(sbMinY).arg(sbMaxY - sbMinY).arg(sbMinY); // TODO: remove
 }
 
 void MainWindow::MovableQMdiArea::mousePanStart(int globalX, int globalY)
@@ -1861,8 +1863,12 @@ bool MainWindow::MovableQMdiArea::eventFilter(QObject* watched, QEvent* event)
 		return QObject::eventFilter(watched, event);
 	}
 
-	// Down here, the event filter attempts to steal mouse events related to workspace panning without needing to click
-	// over a region without any widgets.
+	// Down here, the event filter attempts to steal mouse and keyboard events related to workspace panning without
+	// needing to click over a region without any widgets.
+	//
+	// When the universal pan is initiated, mouse and keyboard events within the workspace will not be passed to the
+	// widgets. Doing this allows panning without accidentally clicking on something, and also prevents MIDI keys being
+	// triggered when starting the pan.
 
 	constexpr auto UniversalPanKey = Qt::Key_S;
 

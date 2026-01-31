@@ -219,6 +219,7 @@ private:
 		void resizeEvent(QResizeEvent* event) override;
 		void childEvent(QChildEvent* event) override;
 		bool eventFilter(QObject* watched, QEvent* event) override;
+		void sliderMoved(QScrollBar* scrollBar);
 
 	private:
 		void mousePanStart(int globalX, int globalY);
