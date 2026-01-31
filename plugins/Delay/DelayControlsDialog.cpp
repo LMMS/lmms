@@ -25,6 +25,7 @@
 #include "AutomatableModel.h"
 #include "DelayControlsDialog.h"
 #include "DelayControls.h"
+#include "DeprecationHelper.h"
 #include "embed.h"
 #include "TempoSyncKnob.h"
 #include "../Eq/EqFader.h"
@@ -135,18 +136,20 @@ void XyPad::mouseReleaseEvent(QMouseEvent *event)
 
 void XyPad::mouseMoveEvent(QMouseEvent *event)
 {
-	if( m_acceptInput && (event->x() >= 0) && ( event->x() < width() )
-			&& ( event->y() >= 0) && ( event->y() < height() ) )
+	const auto pos = position(event);
+
+	if (m_acceptInput && (pos.x() >= 0) && (pos.x() < width())
+		&& (pos.y() >= 0) && (pos.y() < height()))
 	{
 		//set xmodel
 		float xRange = m_xModel->maxValue() - m_xModel->minValue();
 		float xInc = xRange / width();
-		m_xModel->setValue( m_xModel->minValue() + ( event->x() * xInc ) );
+		m_xModel->setValue(m_xModel->minValue() + (pos.x() * xInc));
 
 		//set ymodel
 		float yRange = m_yModel->maxValue() - m_yModel->minValue();
 		float yInc = yRange / height();
-		m_yModel->setValue( m_yModel->minValue() + ( event->y() * yInc ) );
+		m_yModel->setValue(m_yModel->minValue() + (pos.y() * yInc));
 	}
 }
 

@@ -40,11 +40,7 @@ class RenderManager : public QObject
 {
 	Q_OBJECT
 public:
-	RenderManager(
-		const AudioEngine::qualitySettings & qualitySettings,
-		const OutputSettings & outputSettings,
-		ProjectRenderer::ExportFileFormat fmt,
-		QString outputPath);
+	RenderManager(const OutputSettings& outputSettings, ProjectRenderer::ExportFileFormat fmt, QString outputPath);
 
 	~RenderManager() override;
 
@@ -70,8 +66,6 @@ private:
 
 	void render( QString outputPath );
 
-	const AudioEngine::qualitySettings m_qualitySettings;
-	const AudioEngine::qualitySettings m_oldQualitySettings;
 	const OutputSettings m_outputSettings;
 	ProjectRenderer::ExportFileFormat m_format;
 	QString m_outputPath;

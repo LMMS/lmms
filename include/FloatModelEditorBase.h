@@ -41,7 +41,6 @@ class LMMS_EXPORT FloatModelEditorBase : public QWidget, public FloatModelView
 {
 	Q_OBJECT
 
-	mapPropertyFromModel(bool, isVolumeKnob, setVolumeKnob, m_volumeKnob);
 	mapPropertyFromModel(float, volumeRatio, setVolumeRatio, m_volumeRatio);
 
 	void initUi(const QString & name); //!< to be called by ctors
@@ -63,6 +62,16 @@ public:
 		setUnit(txt_after);
 	}
 
+	bool isVolumeKnob() const
+	{
+		return m_volumeKnob;
+	}	
+
+	void setVolumeKnob(const bool val)
+	{
+		m_volumeKnob = val;
+	}
+
 signals:
 	void sliderPressed();
 	void sliderReleased();
@@ -81,17 +90,14 @@ protected:
 	void paintEvent(QPaintEvent * me) override;
 	void wheelEvent(QWheelEvent * me) override;
 
-	void enterEvent(QEvent *event) override;
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+	void enterEvent(QEnterEvent*) override;
+#else
+	void enterEvent(QEvent*) override;
+#endif
 	void leaveEvent(QEvent *event) override;
 
 	virtual float getValue(const QPoint & p);
-
-private slots:
-	virtual void enterValue();
-	void friendlyUpdate();
-	void toggleScale();
-
-private:
 	virtual QString displayValue() const;
 
 	void doConnections() override;
@@ -106,7 +112,7 @@ private:
 
 	static SimpleTextFloat * s_textFloat;
 
-	BoolModel m_volumeKnob;
+	bool m_volumeKnob;
 	FloatModel m_volumeRatio;
 
 	QPoint m_lastMousePos; //!< mouse position in last mouseMoveEvent
@@ -114,6 +120,11 @@ private:
 	bool m_buttonPressed;
 
 	DirectionOfManipulation m_directionOfManipulation;
+
+private slots:
+	virtual void enterValue();
+	void friendlyUpdate();
+	void toggleScale();
 };
 
 } // namespace lmms::gui

@@ -33,6 +33,7 @@
 #include <QPainterPath>
 #include <QString>
 
+#include "DeprecationHelper.h"
 #include "fft_helpers.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
@@ -728,17 +729,18 @@ std::vector<std::pair<float, std::string>> SaSpectrumView::makeLogAmpTics(int lo
 
 	// Base zoom level on selected range and how close is the current height
 	// to the sizeHint() (denser scale for bigger window).
-	if ((high - low) < 20 * ((float)height() / sizeHint().height()))
+	const float heightScale = static_cast<float>(height()) / sizeHint().height();
+	if ((high - low) < 20 * heightScale)
 	{
-		increment = fastPow10f(0.3f); // 3 dB steps when really zoomed in
+		increment = fastPow10f(0.3); // 3 dB steps when really zoomed in
 	}
-	else if (high - low < 45 * ((float)height() / sizeHint().height()))
+	else if ((high - low) < 45 * heightScale)
 	{
-		increment = fastPow10f(0.6f); // 6 dB steps when sufficiently zoomed in
+		increment = fastPow10f(0.6); // 6 dB steps when sufficiently zoomed in
 	}
 	else
 	{
-		increment = 10;				// 10 dB steps otherwise
+		increment = 10.0; // 10 dB steps otherwise
 	}
 
 	// Generate n dB increments, start checking at -90 dB. Limits are tweaked
@@ -819,18 +821,14 @@ void SaSpectrumView::periodicUpdate()
 
 
 // Handle mouse input: set new cursor position.
-// For some reason (a bug?), localPos() only returns integers. As a workaround
-// the fractional part is taken from windowPos() (which works correctly).
-void SaSpectrumView::mouseMoveEvent(QMouseEvent *event)
+void SaSpectrumView::mouseMoveEvent(QMouseEvent* event)
 {
-	m_cursor = QPointF(	event->localPos().x() - (event->windowPos().x() - (long)event->windowPos().x()),
-						event->localPos().y() - (event->windowPos().y() - (long)event->windowPos().y()));
+	m_cursor = positionF(event);
 }
 
-void SaSpectrumView::mousePressEvent(QMouseEvent *event)
+void SaSpectrumView::mousePressEvent(QMouseEvent* event)
 {
-	m_cursor = QPointF(	event->localPos().x() - (event->windowPos().x() - (long)event->windowPos().x()),
-						event->localPos().y() - (event->windowPos().y() - (long)event->windowPos().y()));
+	m_cursor = positionF(event);
 }
 
 
