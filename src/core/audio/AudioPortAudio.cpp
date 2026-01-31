@@ -208,7 +208,7 @@ int AudioPortAudio::processCallback(const void*, void* output, unsigned long fra
 			outputBuffer[frame * device->channels() + 1] = device->m_outBuf[device->m_outBufPos][1];
 		}
 
-		device->m_outBufPos = frame % device->m_outBuf.size();
+		device->m_outBufPos = (device->m_outBufPos + 1) % device->m_outBuf.size();
 	}
 
 	return paContinue;
