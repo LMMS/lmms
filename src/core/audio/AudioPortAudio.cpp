@@ -23,6 +23,8 @@
  *
  */
 
+#include <iostream>
+
 #include "lmmsconfig.h"
 
 #ifdef LMMS_HAVE_PORTAUDIO
@@ -98,6 +100,7 @@ AudioPortAudio::AudioPortAudio(bool& successful, AudioEngine* engine)
 	const auto numDevices = Pa_GetDeviceCount();
 	if (numDevices < 0)
 	{
+		std::cerr << "Pa_GetDeviceCount() failed: " << Pa_GetErrorText(numDevices) << '\n';
 		successful = false;
 		return;
 	}
@@ -145,6 +148,7 @@ AudioPortAudio::AudioPortAudio(bool& successful, AudioEngine* engine)
 
 	if (err != paFormatIsSupported)
 	{
+		std::cerr << "Pa_IsFormatSupported() failed: " << Pa_GetErrorText(err) << '\n';
 		successful = false;
 		return;
 	}
@@ -154,6 +158,7 @@ AudioPortAudio::AudioPortAudio(bool& successful, AudioEngine* engine)
 	
 	if (err != paNoError)
 	{
+		std::cerr << "Pa_OpenStream() failed: " << Pa_GetErrorText(err) << '\n';
 		successful = false;
 		return;
 	}
