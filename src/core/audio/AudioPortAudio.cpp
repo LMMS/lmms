@@ -194,7 +194,7 @@ int AudioPortAudio::processCallback(const void*, void* output, unsigned long fra
 	{
 		if (device->m_outBufPos == 0 && device->getNextBuffer(device->m_outBuf.data()) == 0)
 		{
-			std::fill(outputBuffer + frame * device->channels(), outputBuffer + frameCount * device->channels(), 0);
+			std::fill(outputBuffer + frame * device->channels(), outputBuffer + frameCount * device->channels(), 0.f);
 			return paComplete;
 		}
 
