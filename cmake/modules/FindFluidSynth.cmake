@@ -34,7 +34,7 @@ if(FluidSynth_INCLUDE_DIR AND FluidSynth_LIBRARY)
 
 	if(MINGW)
 		# Workaround for fluidsynth on MinGW
-		target_link_libraries(fluidsynth PRIVATE ws2_32)
+		target_link_libraries(fluidsynth INTERFACE ws2_32)
 	endif()
 
 	if(VCPKG_INSTALLED_DIR)
