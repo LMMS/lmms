@@ -7,8 +7,4 @@ if(LMMS_HAVE_FLUIDSYNTH)
 		EMBEDDED_RESOURCES *.png
 	)
 	target_link_libraries(sf2player fluidsynth SampleRate::samplerate)
-	if(MINGW)
-		# Workaround for fluidsynth on MinGW
-		target_link_libraries(sf2player ws2_32)
-	endif()
 endif()

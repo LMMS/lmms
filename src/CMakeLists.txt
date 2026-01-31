@@ -162,11 +162,7 @@ if(LMMS_HAVE_LIBRT)
 endif()
 
 if(LMMS_HAVE_PORTAUDIO)
-	if(MINGW)
-		list(APPEND EXTRA_LIBRARIES portaudio_static)
-	else()
-		list(APPEND EXTRA_LIBRARIES portaudio)
-	endif()
+	list(APPEND EXTRA_LIBRARIES portaudio_lib)
 endif()
 
 if(LMMS_HAVE_MP3LAME)
