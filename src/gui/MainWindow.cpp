@@ -485,7 +485,7 @@ void MainWindow::finalize()
 		ConfigManager::inst()->value( "audioengine", "audiodev" ) ) )
 	{
 		QMessageBox::critical(nullptr, "Audio device setup failed",
-			"Failed to setup audio device for playback. Try adjusting your audio device settings (e.g. the sample rate)");
+			tr("Failed to setup audio device for playback. Try adjusting your audio device settings (e.g. the sample rate), then restart LMMS."));
 
 		// if so, offer the audio settings section of the setup dialog
 		SetupDialog sd( SetupDialog::ConfigTab::AudioSettings );
