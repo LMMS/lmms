@@ -287,12 +287,6 @@ jobs:
       CCACHE_NOCOMPRESS: 1
       MAKEFLAGS: -j2
     steps:
-      - name: Configure apt
-        run: |
-          sudo sh -c 'echo "deb http://ppa.launchpad.net/tobydox/mingw-w64/ubuntu focal main" > \
-          /etc/apt/sources.list.d/tobydox-mingw-w64.list'
-          sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 72931B477E22FEFD47F8DECE02FE5F12ADDE29B2
-          sudo apt-get update -y
       - name: Configure git
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Check out
@@ -300,6 +294,14 @@ jobs:
         with:
           fetch-depth: 0
           submodules: recursive
+      - name: Cache vcpkg dependencies
+        id: cache-deps
+        uses: actions/cache@v3
+        with:
+          key: vcpkg-mingw${{ matrix.arch }}-${{ hashFiles('vcpkg.json') }}
+          restore-keys: |
+            vcpkg-mingw${{ matrix.arch }}-
+          path: build/vcpkg_installed
       - name: Cache ccache data
         uses: actions/cache@v3
         with:
@@ -311,15 +313,24 @@ jobs:
           path: ~/.ccache
       - name: Install dependencies
         run: |
+          sudo .github/workflows/setup-mingw-packages.sh
           sudo apt-get install -y --no-install-recommends \
-          $(xargs < .github/workflows/deps-ubuntu-24.04-mingw.txt)
+            $(xargs < .github/workflows/deps-ubuntu-24.04-mingw.txt)
       - name: Configure
         run: |
+          export VCPKG_ROOT=${VCPKG_INSTALLATION_ROOT}
+          echo "VCPKG_ROOT=${VCPKG_ROOT}" >> "$GITHUB_ENV"
           ccache --zero-stats
           cmake -S . \
                 -B build \
                 -DCMAKE_TOOLCHAIN_FILE="./cmake/toolchains/MinGW-W64-64.cmake" \
+                -DVCPKG_TARGET_TRIPLET="x64-mingw-static" \
+                -DVCPKG_HOST_TRIPLET="x64-linux" \
+                -DVCPKG_MANIFEST_INSTALL="${{ env.should_install_manifest }}" \
                 $CMAKE_OPTS
+        env:
+          should_install_manifest:
+            ${{ steps.cache-deps.outputs.cache-hit == 'true' && 'NO' || 'YES' }}
       - name: Build
         run: cmake --build build
       - name: Package

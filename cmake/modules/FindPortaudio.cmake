@@ -14,7 +14,7 @@ find_package_config_mode_with_fallback(portaudio portaudio
 
 determine_version_from_source(Portaudio_VERSION portaudio [[
 	#include <iostream>
-	#include "portaudio.h"
+	#include <portaudio.h>
 
 	auto main() -> int
 	{
@@ -25,6 +25,15 @@ determine_version_from_source(Portaudio_VERSION portaudio [[
 			<< "." << ((version >> 0) & 0xff);
 	}
 ]])
+
+if(TARGET portaudio)
+	if(MINGW)
+		# MinGW uses the statically linked target
+		add_library(portaudio_lib ALIAS portaudio_static)
+	else()
+		add_library(portaudio_lib ALIAS portaudio)
+	endif()
+endif()
 
 include(FindPackageHandleStandardArgs)
 
