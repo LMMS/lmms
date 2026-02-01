@@ -57,6 +57,7 @@ private:
 		Group,
 		Region,
 		Curve, // TODO Not implemented yet
+		Effect, // TODO Not implemented yet
 		None
 	};
 };

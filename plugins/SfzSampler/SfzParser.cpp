@@ -183,6 +183,10 @@ bool SfzParser::parseSfzFile(const QString& filePath, std::vector<SfzRegion>& ou
 			{
 				currentHeader = Header::Curve;
 			}
+			else if (segment == "<effect>")
+			{
+				currentHeader = Header::Effect;
+			}
 			else
 			{
 				qDebug() << "[SFZ Parser] Error, unknown header type:" << segment;
@@ -238,6 +242,11 @@ bool SfzParser::parseSfzFile(const QString& filePath, std::vector<SfzRegion>& ou
 			case Header::Curve:
 			{
 				qDebug() << "[SFZ Parser] Warning: The <curve> header has not been implemented yet. Encountered opcode assignment:" << segment;
+				break;
+			}
+			case Header::Effect:
+			{
+				qDebug() << "[SFZ Parser] Warning: The <effect> header has not been implemented yet. Encountered opcode assignment:" << segment;
 				break;
 			}
 			default:
