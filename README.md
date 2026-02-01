@@ -30,7 +30,11 @@ What is BLUE-LMMS?
 
 The BluefinServer version of LMMS
 
-This is my own personal version of lmms with which i will experiment (This entire Project is made soley for fun and experimentation sake, it is not to discredit anyones work, It is to see what i can do on my own to make the daw better. I have absolutely no idea what im doing so that is why i dont want to actually work on the main project. If any of my brain worms, ideas and merges work for the project, i urge devs of LMMS to just take it and run with it)
+This is my own personal version of lmms with which i will experiment 
+
+This entire Project is made soley for fun and experimentation sake, it is not to discredit anyones work, It is to see what i can do on my own to make the daw better. 
+
+I have absolutely no idea what im doing! Which is why i dont want to actually work on the main project. If any of my brain worms, ideas and merges do work for the project, i urge devs of LMMS to just take it and run with it, if they want.
 
 Experimental Features
 ---------
