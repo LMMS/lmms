@@ -1,6 +1,6 @@
 <div align="center">
 	<h1>
-	<img width="512" height="512" alt="image" src="https://github.com/user-attachments/assets/1187b4f4-505f-436d-b757-7b05c636065d" alt="LMMS Logo"><br>LMMS />
+	<img width="512" height="512" alt="image" src="https://github.com/user-attachments/assets/1187b4f4-505f-436d-b757-7b05c636065d" alt="LMMS Logo"><br>LMMS
 	</h1>
 	<p>Cross-platform music production software</p>
 	<p>
