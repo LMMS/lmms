@@ -59,10 +59,7 @@
 		},
 		{
 			"name": "portaudio",
-			"default-features": false,
-			"features": [
-				"asio"
-			]
+			"default-features": false
 		},
 		{
 			"name": "sdl2",
