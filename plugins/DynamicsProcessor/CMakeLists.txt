@@ -1,3 +1,0 @@
-INCLUDE(BuildPlugin)
-
-BUILD_PLUGIN(dynamicsprocessor DynamicsProcessor.cpp DynamicsProcessorControls.cpp DynamicsProcessorControlDialog.cpp MOCFILES DynamicsProcessorControls.h DynamicsProcessorControlDialog.h EMBEDDED_RESOURCES *.png)
