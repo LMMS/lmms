@@ -2501,18 +2501,17 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 	{
 		updateKnifePos(me, false);
 	}
-	if (m_editMode == EditMode::Detuning && (m_parameterEditDownLeft || m_parameterEditDownRight))
+	else if (m_editMode == EditMode::Detuning && (m_parameterEditDownLeft || m_parameterEditDownRight))
 	{
 		// Update the current dragging/adding/removal of automation nodes in the detuning curves of the selected notes.
 		updateParameterEditPos(me, Note::ParameterType::Detuning);
 	}
-	// Update Strum position if we are on knife mode
-	if (m_editMode == EditMode::Strum && m_strumEnabled)
+	// Update Strum position if we are in strum mode
+	else if (m_editMode == EditMode::Strum && m_strumEnabled)
 	{
 		updateStrumPos(me, false, me->modifiers() & Qt::ShiftModifier);
 	}
-
-	if (pos.y() > PR_TOP_MARGIN || m_action != Action::None)
+	else if (pos.y() > PR_TOP_MARGIN || m_action != Action::None)
 	{
 		bool edit_note = (pos.y() > noteEditTop())
 			&& m_action != Action::SelectNotes;
