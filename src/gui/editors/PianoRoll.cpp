@@ -2832,7 +2832,7 @@ void PianoRoll::updateParameterEditPos(QMouseEvent* me, Note::ParameterType para
 			TimePos::ticksPerBar() / m_ppb + m_currentPosition;
 
 	// Calculate the relative position of the mouse with respect to the note.
-	TimePos relativePos = posTicks - m_parameterEditClickedNote->pos();
+	TimePos relativePos = Note::quantized(posTicks - m_parameterEditClickedNote->pos(), quantization());
 	int relativeKey = keyNum - m_parameterEditClickedNote->key();
 
 	// Set the quantization of the automation editor to match the piano roll. This is not an ideal system, but it works.
@@ -2848,13 +2848,13 @@ void PianoRoll::updateParameterEditPos(QMouseEvent* me, Note::ParameterType para
 		if (m_parameterEditDownLeft)
 		{
 			// Don't allow the user to drag the first node from the start of the note. They can drag it up and down, but if they try to move it from the first tick, apply the previous drag and start a new one to preserve the node
-			if (m_lastParameterEditTick != std::nullopt && Note::quantized(m_lastParameterEditTick.value() - m_parameterEditClickedNote->pos(), quantization()) == 0 && Note::quantized(relativePos, quantization()) != 0)
+			if (m_lastParameterEditTick != std::nullopt && Note::quantized(m_lastParameterEditTick.value() - m_parameterEditClickedNote->pos(), quantization()) == 0 && relativePos != 0)
 			{
 				updateLastEditTick = false;
 				aClip->setDragValue(0, relativeKey);
 			}
 			// Also, don't let the user drag another node onto the first node, since that creates issues with the first node changing height without the user intending it to
-			else if (m_lastParameterEditTick != std::nullopt && Note::quantized(m_lastParameterEditTick.value() - m_parameterEditClickedNote->pos(), quantization()) > 0 && Note::quantized(relativePos, quantization()) <= 0)
+			else if (m_lastParameterEditTick != std::nullopt && Note::quantized(m_lastParameterEditTick.value() - m_parameterEditClickedNote->pos(), quantization()) > 0 && relativePos <= 0)
 			{
 				updateLastEditTick = false;
 				aClip->setDragValue(quantization(), relativeKey);
