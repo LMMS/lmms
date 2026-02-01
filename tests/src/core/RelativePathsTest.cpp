@@ -41,7 +41,7 @@ private slots:
 
 		QString absPath = fi.absoluteFilePath();
 		QString oldRelPath = "drums/kick01.ogg";
-		QString relPath = PathUtil::basePrefix(PathUtil::Base::FactorySample) + "drums/kick01.ogg";
+		QString relPath = PathUtil::basePrefixQString(PathUtil::Base::FactorySample) + "drums/kick01.ogg";
 		QString fuzPath = absPath;
 		fuzPath.replace(relPath, "drums/.///kick01.ogg");
 
@@ -59,10 +59,10 @@ private slots:
 
 		//Empty paths should stay empty
 		QString empty = QString("");
-		QCOMPARE(PathUtil::stripPrefix(""), empty);
-		QCOMPARE(PathUtil::cleanName(""), empty);
-		QCOMPARE(PathUtil::toAbsolute(""), empty);
-		QCOMPARE(PathUtil::toShortestRelative(""), empty);
+		QCOMPARE(PathUtil::stripPrefix(empty), empty);
+		QCOMPARE(PathUtil::cleanName(empty), empty);
+		QCOMPARE(PathUtil::toAbsolute(empty), empty);
+		QCOMPARE(PathUtil::toShortestRelative(empty), empty);
 	}
 };
 

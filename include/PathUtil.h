@@ -28,30 +28,61 @@
 #include "lmms_export.h"
 
 #include <QDir>
+#include <filesystem>
+#include <optional>
+#include <string>
+#include <string_view>
 
 namespace lmms::PathUtil
 {
 	enum class Base { Absolute, ProjectDir, FactoryProjects, FactorySample, UserSample, UserVST, Preset,
 		FactoryPresets, UserLADSPA, DefaultLADSPA, UserSoundfont, DefaultSoundfont, UserGIG, DefaultGIG,
-		LocalDir };
+		LocalDir, Internal };
 
 	//! Return the directory associated with a given base as a QString
 	//! Optionally, if a pointer to boolean is given the method will
 	//! use it to indicate whether the prefix could be resolved properly
 	//! or not.
 	QString LMMS_EXPORT baseLocation(const Base base, bool* error = nullptr);
+
+	//! Return the directory associated with a given base as a std::string.
+	//! Will return std::nullopt if the prefix could not be resolved.
+	std::optional<std::string> LMMS_EXPORT getBaseLocation(Base base);
+
 	//! Return the directory associated with a given base as a QDir.
 	//! Optional pointer to boolean to indicate if the prefix could
 	//! be resolved properly.
 	QDir LMMS_EXPORT baseQDir (const Base base, bool* error = nullptr);
+
 	//! Return the prefix used to denote this base in path strings
-	QString LMMS_EXPORT basePrefix(const Base base);
+	QString LMMS_EXPORT basePrefixQString(const Base base);
+
+	//! Return the prefix used to denote this base in path strings
+	std::string_view LMMS_EXPORT basePrefix(const Base base);
+
+	//! Return whether the path uses the `base` prefix
+	bool LMMS_EXPORT hasBase(const QString& path, Base base);
+
+	//! Return whether the path uses the `base` prefix
+	bool LMMS_EXPORT hasBase(std::string_view path, Base base);
+
 	//! Check the prefix of a path and return the base it corresponds to
 	//! Defaults to Base::Absolute
 	Base LMMS_EXPORT baseLookup(const QString& input);
 
+	//! Check the prefix of a path and return the base it corresponds to
+	//! Defaults to Base::Absolute
+	Base LMMS_EXPORT baseLookup(std::string_view input);
+
 	//! Remove the prefix from a path, iff there is one
 	QString LMMS_EXPORT stripPrefix(const QString& input);
+
+	//! Remove the prefix from a path, iff there is one
+	std::string LMMS_EXPORT stripPrefix(std::string_view input);
+
+	//! Return the results of baseLookup() and stripPrefix()
+	std::pair<Base, std::string> LMMS_EXPORT parsePath(std::string_view path);
+
 	//! Get the filename for a path, handling prefixed paths correctly
 	QString LMMS_EXPORT cleanName(const QString& input);
 
@@ -61,13 +92,34 @@ namespace lmms::PathUtil
 	//! Make this path absolute. If a pointer to boolean is given
 	//! it will indicate whether the path was converted successfully
 	QString LMMS_EXPORT toAbsolute(const QString& input, bool* error = nullptr);
+
+	//! Make this path absolute. Returns std::nullopt upon failure.
+	std::optional<std::string> LMMS_EXPORT toAbsolute(std::string_view input);
+
 	//! Make this path relative to a given base, return an absolute path if that fails
 	QString LMMS_EXPORT relativeOrAbsolute(const QString& input, const Base base);
+
 	//! Make this path relative to any base, choosing the shortest if there are
 	//! multiple options. allowLocal defines whether local paths should be considered.
 	//! Defaults to an absolute path if all bases fail.
 	QString LMMS_EXPORT toShortestRelative(const QString& input, bool allowLocal = false);
 
+	//! Make this path relative to any base, choosing the shortest if there are
+	//! multiple options. allowLocal defines whether local paths should be considered.
+	//! Defaults to an absolute path if all bases fail.
+	std::string LMMS_EXPORT toShortestRelative(std::string_view input, bool allowLocal = false);
+
+	//! Converts std::u8string_view to std::string_view
+	std::string_view LMMS_EXPORT toStdStringView(std::u8string_view input);
+
+	//! Converts `path` to std::filesystem::path
+	std::filesystem::path LMMS_EXPORT stringToPath(const QString& path);
+
+	//! Converts `path` to a UTF-8 encoded std::string path
+	std::string LMMS_EXPORT pathToString(const std::filesystem::path& path);
+
+	//! Warning-free replacement for the deprecated std::filesystem::u8path function
+	std::filesystem::path LMMS_EXPORT u8path(std::string_view path);
 } // namespace lmms::PathUtil
 
 #endif // LMMS_PATHUTIL_H
