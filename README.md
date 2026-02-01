@@ -6,9 +6,7 @@
 	<p>
 		<a href="https://lmms.io/">Website</a>
 		⦁︎
-		<a href="https://github.com/LMMS/lmms/releases">Releases</a>
-		⦁︎
-		<a href="https://github.com/LMMS/lmms/wiki">Developer wiki</a>
+		<a href="https://github.com/bluefinhomeserver/Blue-lmms/releases">Releases</a>
 		⦁︎
 		<a href="https://lmms.io/documentation">User manual</a>
 		⦁︎
