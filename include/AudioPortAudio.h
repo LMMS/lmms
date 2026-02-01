@@ -53,9 +53,9 @@ public:
 		if (m_error == paNoError) { Pa_Terminate(); }
 	}
 
-	PortAudioInitializationGuard(const PortAudioInitializationGuard&) = default;
+	PortAudioInitializationGuard(const PortAudioInitializationGuard&) = delete;
 	PortAudioInitializationGuard(PortAudioInitializationGuard&&) = delete;
-	PortAudioInitializationGuard& operator=(const PortAudioInitializationGuard&) = default;
+	PortAudioInitializationGuard& operator=(const PortAudioInitializationGuard&) = delete;
 	PortAudioInitializationGuard& operator=(PortAudioInitializationGuard&&) = delete;
 
 private:
