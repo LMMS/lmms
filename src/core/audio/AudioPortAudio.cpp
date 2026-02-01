@@ -277,8 +277,8 @@ public:
 
 private:
 	QComboBox* m_deviceComboBox = nullptr;
-	lmms::gui::LcdSpinBox* m_channelSpinBox = nullptr;
-	lmms::IntModel m_channelModel;
+	LcdSpinBox* m_channelSpinBox = nullptr;
+	IntModel m_channelModel;
 	Direction m_direction;
 };
 
