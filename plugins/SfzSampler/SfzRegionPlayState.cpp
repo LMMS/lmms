@@ -171,7 +171,7 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const fpp_t frames)
 	const float ampVolume = dbfsToAmp(m_region->m_volume + m_region->m_gain_totalCC);
 
 	// Panning
-	const float pan = m_region->m_pan / 100;
+	const float pan = (m_region->m_pan + m_region->m_pan_totalCC) / 100;
 	const float rightPanAmp = std::min(1.0f, 1.0f + pan);
 	const float leftPanAmp = std::min(1.0f, 1.0f - pan);
 

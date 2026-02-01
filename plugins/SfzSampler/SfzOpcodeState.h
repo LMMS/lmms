@@ -202,6 +202,7 @@ public:
 	// Gain is the same as volume. Some opcodes use the word volume, some use gain, both are decibals
 	std::array<float, NumMidiCCs> m_gain_oncc = {};
 	float m_pan = 0.0f;
+	std::array<float, NumMidiCCs> m_pan_oncc = {};
 
 
 	//

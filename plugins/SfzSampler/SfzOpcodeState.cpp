@@ -324,6 +324,10 @@ bool SfzOpcodeState::setOpcodeByStrings(const QString& name, const QString& valu
 	{
 		m_pan = value.toFloat(&successful);
 	}
+	else if (name.startsWith("pan_oncc") || name.startsWith("pan_cc"))
+	{
+		m_pan_oncc.at(ccNumberFromOpcode(name)) = value.toFloat(&successful);
+	}
 
 
 	//

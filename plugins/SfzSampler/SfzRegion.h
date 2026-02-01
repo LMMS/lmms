@@ -79,6 +79,7 @@ private:
 	float m_ampeg_release_totalCC = 0.0f;
 
 	float m_gain_totalCC = 0.0f;
+	float m_pan_totalCC = 0.0f;
 
 	//! When checking whether all the current CC values fall between loccN and hiccN, it's useful to only check the ones where lo/hiccN is actually defined, not all 128
 	//! This vector stores a list of which CC numbers have lo/hiccN opcodes in this region
