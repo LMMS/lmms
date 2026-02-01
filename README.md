@@ -54,4 +54,6 @@ If you are interested in LMMS, its programming, artwork, testing, writing demo s
 
 Information about what you can do and how can be found in the [wiki](https://github.com/LMMS/lmms/wiki).
 
+This is my own personal version of lmms with which i will experiment
+
 Before coding a new big feature, please _always_ [file an issue](https://github.com/LMMS/lmms/issues/new) for your idea and suggestions about your feature and about the intended implementation on GitHub, or ask in one of the tech channels on Discord and wait for replies! Maybe there are different ideas, improvements, or hints, or maybe your feature is not welcome/needed at the moment.
