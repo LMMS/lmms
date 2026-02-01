@@ -308,7 +308,7 @@ AudioPortAudioSetupWidget::AudioPortAudioSetupWidget(QWidget* parent)
 
 void AudioPortAudioSetupWidget::show()
 {
-	static auto s_initGuard = PortAudioInitializationGuard{};
+	static auto s_initGuard = detail::PortAudioInitializationGuard{};
 
 	if (m_backendComboBox->count() == 0)
 	{

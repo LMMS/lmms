@@ -39,6 +39,8 @@
 #include "AudioDeviceSetupWidget.h"
 
 namespace lmms {
+
+namespace detail {
 class PortAudioInitializationGuard
 {
 public:
@@ -61,6 +63,7 @@ public:
 private:
 	PaError m_error = paNoError;
 };
+} // namespace detail
 
 class AudioPortAudio : public AudioDevice
 {
@@ -82,7 +85,7 @@ private:
 	static int processCallback(const void* input, void* output, unsigned long frameCount,
 		const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags, void* userData);
 
-	PortAudioInitializationGuard m_initGuard;
+	detail::PortAudioInitializationGuard m_initGuard;
 
 	PaStream* m_paStream = nullptr;
 	std::vector<SampleFrame> m_outBuf;
