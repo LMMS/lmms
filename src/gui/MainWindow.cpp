@@ -1814,6 +1814,7 @@ void MainWindow::MovableQMdiArea::mouseReleaseEvent(QMouseEvent* event)
 void MainWindow::MovableQMdiArea::resizeEvent(QResizeEvent* event)
 {
 	updateScrollBars();
+	QMdiArea::resizeEvent(event);
 }
 
 void MainWindow::MovableQMdiArea::childEvent(QChildEvent* event)
@@ -1828,6 +1829,7 @@ void MainWindow::MovableQMdiArea::childEvent(QChildEvent* event)
 		event->child()->removeEventFilter(this);
 		updateScrollBars();
 	}
+	QMdiArea::childEvent(event);
 }
 
 bool MainWindow::MovableQMdiArea::hasActiveMaxWindow()
