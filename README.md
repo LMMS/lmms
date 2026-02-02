@@ -25,8 +25,12 @@
 	</p>
 </div>
 
-What is LMMS?
+What is BLUE-LMMS?
 --------------
+
+The BluefinServer version of LMMS
+
+This is my own personal version of lmms with which i will experiment
 
 LMMS is an open-source cross-platform digital audio workstation designed for music production. It includes an advanced Piano Roll, Beat Sequencer, Song Editor, and Mixer for composing, arranging, and mixing music. It comes with 15+ synthesizer plugins by default, along with VST(i) and SoundFont2 support.
 

@@ -1,3 +1,0 @@
-INCLUDE(BuildPlugin)
-
-BUILD_PLUGIN(peakcontrollereffect PeakControllerEffect.cpp PeakControllerEffectControls.cpp PeakControllerEffectControlDialog.cpp PeakControllerEffect.h PeakControllerEffectControls.h PeakControllerEffectControlDialog.h MOCFILES PeakControllerEffectControls.h PeakControllerEffectControlDialog.h EMBEDDED_RESOURCES artwork.svg logo.svg)

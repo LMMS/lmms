@@ -68,6 +68,7 @@ public:
 
 	void addTrack( Track * _track );
 	void removeTrack( Track * _track );
+	void moveTrack(Track* track, int indexTo);
 
 	virtual void updateAfterTrackAdd();
 
@@ -99,6 +100,8 @@ public:
 
 signals:
 	void trackAdded( lmms::Track * _track );
+	void trackRemoved();
+	void trackMoved();
 
 protected:
 	static AutomatedValueMap automatedValuesFromTracks(const TrackList &tracks, TimePos timeStart, int clipNum = -1);

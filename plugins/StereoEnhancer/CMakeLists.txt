@@ -1,4 +1,0 @@
-INCLUDE(BuildPlugin)
-
-BUILD_PLUGIN(stereoenhancer StereoEnhancer.cpp StereoEnhancerControls.cpp StereoEnhancerControlDialog.cpp StereoEnhancer.h StereoEnhancerControls.h StereoEnhancerControlDialog.h MOCFILES StereoEnhancerControls.h StereoEnhancerControlDialog.h EMBEDDED_RESOURCES logo.png)
-

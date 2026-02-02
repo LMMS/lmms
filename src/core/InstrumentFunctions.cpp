@@ -22,13 +22,13 @@
  *
  */
 
-#include <QDomElement>
 
 #include "InstrumentFunctions.h"
 #include "AudioEngine.h"
 #include "embed.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
+#include "lmms_math.h"
 #include "PresetPreviewPlayHandle.h"
 
 #include <vector>
@@ -415,28 +415,20 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 		frames_processed += remaining_frames_for_cur_arp;
 
 		// Skip notes randomly
-		if( m_arpSkipModel.value() )
+		if (m_arpSkipModel.value() && fastRandInc(100.f) <= m_arpSkipModel.value())
 		{
-			if (100 * static_cast<float>(rand()) / (static_cast<float>(RAND_MAX) + 1.0f) < m_arpSkipModel.value())
-			{
-				// update counters
-				frames_processed += arp_frames;
-				cur_frame += arp_frames;
-				continue;
-			}
+			frames_processed += arp_frames;
+			cur_frame += arp_frames;
+			continue;
 		}
 
 		auto dir = static_cast<ArpDirection>(m_arpDirectionModel.value());
 
 		// Miss notes randomly. We intercept int dir and abuse it
 		// after need.  :)
-
-		if( m_arpMissModel.value() )
+		if (m_arpMissModel.value() && fastRandInc(100.f) <= m_arpMissModel.value())
 		{
-			if (100 * static_cast<float>(rand()) / (static_cast<float>(RAND_MAX) + 1.0f) < m_arpMissModel.value())
-			{
-				dir = ArpDirection::Random;
-			}
+			dir = ArpDirection::Random;
 		}
 
 		int cur_arp_idx = 0;
@@ -462,7 +454,7 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 		else if( dir == ArpDirection::Random )
 		{
 			// just pick a random chord-index
-			cur_arp_idx = static_cast<int>(range * static_cast<float>(rand()) / static_cast<float>(RAND_MAX));
+			cur_arp_idx = fastRandInc(range);
 		}
 
 		// Divide cur_arp_idx with wanted repeats. The repeat feature will not affect random notes.
@@ -490,9 +482,9 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 		}
 		else
 		{
-			const auto octaveDiv = std::div(cur_arp_idx, total_chord_size);
+			const auto octaveDiv = std::div(cur_arp_idx, static_cast<int>(total_chord_size));
 			const int octave = octaveDiv.quot;
-			const auto arpDiv = std::div(octaveDiv.rem, cnphv.size());
+			const auto arpDiv = std::div(octaveDiv.rem, static_cast<int>(cnphv.size()));
 			const int arpIndex = arpDiv.rem;
 			const int chordIndex = arpDiv.quot;
 			sub_note_key = cnphv[arpIndex]->key()

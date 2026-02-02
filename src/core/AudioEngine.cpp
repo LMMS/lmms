@@ -23,6 +23,7 @@
  */
 
 #include "AudioEngine.h"
+#include <iostream>
 
 #include "MixHelpers.h"
 #include "denormals.h"
@@ -81,7 +82,6 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 	m_workers(),
 	m_numWorkers( QThread::idealThreadCount()-1 ),
 	m_newPlayHandles( PlayHandle::MaxNumber ),
-	m_qualitySettings(qualitySettings::Interpolation::Linear),
 	m_masterGain( 1.0f ),
 	m_audioDev( nullptr ),
 	m_oldAudioDev( nullptr ),
@@ -128,7 +128,7 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 		}
 	}
 
-	// allocte the FIFO from the determined size
+	// allocate the FIFO from the determined size
 	m_fifo = new Fifo( fifoSize );
 
 	// now that framesPerPeriod is fixed initialize global BufferManager
@@ -464,25 +464,6 @@ void AudioEngine::clearInternal()
 	}
 }
 
-
-
-
-void AudioEngine::changeQuality(const struct qualitySettings & qs)
-{
-	// don't delete the audio-device
-	stopProcessing();
-
-	m_qualitySettings = qs;
-
-	emit sampleRateChanged();
-	emit qualitySettingsChanged();
-
-	startProcessing();
-}
-
-
-
-
 void AudioEngine::doSetAudioDevice( AudioDevice * _dev )
 {
 	// TODO: Use shared_ptr here in the future.
@@ -503,17 +484,9 @@ void AudioEngine::doSetAudioDevice( AudioDevice * _dev )
 	}
 }
 
-
-
-
-void AudioEngine::setAudioDevice(AudioDevice * _dev,
-				const struct qualitySettings & _qs,
-				bool _needs_fifo,
-				bool startNow)
+void AudioEngine::setAudioDevice(AudioDevice* _dev, bool _needs_fifo, bool startNow)
 {
 	stopProcessing();
-
-	m_qualitySettings = _qs;
 
 	doSetAudioDevice( _dev );
 
@@ -910,7 +883,7 @@ AudioDevice * AudioEngine::tryAudioDevices()
 
 
 #ifdef LMMS_HAVE_PORTAUDIO
-	if( dev_name == AudioPortAudio::name() || dev_name == "" )
+	if (dev_name == AudioPortAudio::name() || dev_name.isEmpty())
 	{
 		dev = new AudioPortAudio( success_ful, this );
 		if( success_ful )

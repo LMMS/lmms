@@ -28,14 +28,12 @@
 #include <QMenu>
 #include <QPainter>
 
-#include "AudioEngine.h"
+#include "FileDialog.h"
 #include "GuiApplication.h"
 #include "AutomationEditor.h"
 #include "embed.h"
-#include "FontHelper.h"
 #include "PathUtil.h"
 #include "SampleClip.h"
-#include "SampleLoader.h"
 #include "SampleThumbnail.h"
 #include "Song.h"
 #include "StringPairDrag.h"
@@ -85,12 +83,9 @@ void SampleClipView::constructContextMenu(QMenu* cm)
 {
 	cm->addSeparator();
 
-
-	QAction* recordToggleAction = cm->addAction(embed::getIconPixmap("record"),
-                          tr("Set/clear record"),
-                          m_clip, &SampleClip::toggleRecord);
-	
-	recordToggleAction->setEnabled(recordingCapabilitiesAvailable());
+	/*contextMenu.addAction( embed::getIconPixmap( "record" ),
+				tr( "Set/clear record" ),
+						m_clip, SLOT(toggleRecord()));*/
 
 	cm->addAction(
 		embed::getIconPixmap("flip_x"),
@@ -134,7 +129,7 @@ void SampleClipView::dropEvent( QDropEvent * _de )
 	}
 	else if( StringPairDrag::decodeKey( _de ) == "sampledata" )
 	{
-		m_clip->setSampleBuffer(SampleLoader::createBufferFromBase64(StringPairDrag::decodeValue(_de)));
+		m_clip->setSampleBuffer(SampleBuffer::fromBase64(StringPairDrag::decodeValue(_de)));
 		m_clip->updateLength();
 		update();
 		_de->accept();
@@ -193,13 +188,13 @@ void SampleClipView::mouseDoubleClickEvent( QMouseEvent * )
 {
 	if (m_trackView->trackContainerView()->knifeMode()) { return; }
 
-	const QString selectedAudioFile = SampleLoader::openAudioFile();
+	const QString selectedAudioFile = FileDialog::openAudioFile();
 
 	if (selectedAudioFile.isEmpty()) { return; }
 	
 	if (!m_clip->hasSampleFileLoaded(selectedAudioFile))
 	{
-		auto sampleBuffer = SampleLoader::createBufferFromFile(selectedAudioFile);
+		auto sampleBuffer = SampleBuffer::fromFile(selectedAudioFile);
 		if (sampleBuffer != SampleBuffer::emptyBuffer())
 		{
 			m_clip->setSampleBuffer(sampleBuffer);
@@ -321,7 +316,7 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	p.setPen( c.darker( 200 ) );
 	p.drawRect(-m_paintPixmapXPosition, 0, rect().right(), rect().bottom());
 
-	// draw the 'muted' pixmap only if the clip was manualy muted
+	// draw the 'muted' pixmap only if the clip was manually muted
 	if( m_clip->isMuted() )
 	{
 		const int spacing = BORDER_WIDTH;
@@ -337,34 +332,18 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	}
 	// recording sample tracks is not possible at the moment
 
-	if (m_clip->isRecord())
+	/* if( m_clip->isRecord() )
 	{
-		p.setFont(adjustedToPixelSize(p.font(), 10));
+		p.setFont( pointSize<7>( p.font() ) );
 
-		const auto fontHeight = p.fontMetrics().height();
+		p.setPen( textShadowColor() );
+		p.drawText( 10, p.fontMetrics().height()+1, "Rec" );
+		p.setPen( textColor() );
+		p.drawText( 9, p.fontMetrics().height(), "Rec" );
 
-		const auto baseLine = height() - 3;
-
-		constexpr int recordSymbolRadius = 3;
-		constexpr int recordSymbolCenterX = recordSymbolRadius + 4;
-		const int recordSymbolCenterY = baseLine - fontHeight / 2 + 1;
-
-		constexpr int textStartX = recordSymbolCenterX + recordSymbolRadius + 4;
-
-		auto textPos = QPoint(textStartX, baseLine);
-
-		const auto rec = tr("Rec");
-
-		p.setPen(textShadowColor());
-		p.drawText(textPos + QPoint(1, 1), rec);
-
-		p.setPen(textColor());
-		p.drawText(textPos, rec);
-
-		p.setBrush(QBrush(textColor()));
-
-		p.drawEllipse(QPoint(recordSymbolCenterX, recordSymbolCenterY), recordSymbolRadius, recordSymbolRadius);
-	}
+		p.setBrush( QBrush( textColor() ) );
+		p.drawEllipse( 4, 5, 4, 4 );
+	}*/
 
 	p.end();
 
@@ -391,10 +370,6 @@ void SampleClipView::setAutomationGhost()
 	aEditor->parentWidget()->show();
 	aEditor->show();
 	aEditor->setFocus();
-}
-bool SampleClipView::recordingCapabilitiesAvailable() const
-{
-	return Engine::audioEngine()->captureDeviceAvailable();
 }
 
 } // namespace lmms::gui
