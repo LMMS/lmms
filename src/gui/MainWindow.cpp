@@ -1743,6 +1743,9 @@ std::tuple<int, int, int, int> MainWindow::MovableQMdiArea::getActiveWorkspaceAr
 
 void MainWindow::MovableQMdiArea::scroll(int scrollX, int scrollY)
 {
+	// If there is an active maximized window, do not scroll! Or it will mess up the window positions
+	if (hasActiveMaxWindow()) { return; }
+
 	const auto [minX, maxX, minY, maxY] = getActiveWorkspaceArea();
 
 	// Boundaries for each region. If trying to move in a direction and its respective boundary has been passed, the
@@ -1851,6 +1854,30 @@ bool MainWindow::MovableQMdiArea::eventFilter(QObject* watched, QEvent* event)
 	// modified in a way that would affect the scrollbars.
 	if (auto* subWin = dynamic_cast<QMdiSubWindow*>(watched); subWin != nullptr)
 	{
+		// Hide scrollbars if necessary. Not all events report this properly though, for some reason.
+		// FIXME: confirm why this is the case. This is prone to bugs.
+		switch (event->type())
+		{
+		case QEvent::Hide:
+		case QEvent::Show:
+			if (hasActiveMaxWindow())
+			{
+				m_scrollBarH->hide();
+				m_scrollBarH->updateGeometry();
+
+				m_scrollBarV->hide();
+				m_scrollBarV->updateGeometry();
+			}
+			else
+			{
+				m_scrollBarH->show();
+				m_scrollBarV->show();
+			}
+			break;
+		default:
+			break;
+		}
+
 		switch (event->type())
 		{
 		case QEvent::Move:
