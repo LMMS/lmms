@@ -36,7 +36,11 @@
 		#include <arm_acle.h>
 	#elif defined(__GNUG__)
 		// TODO: Remove this once GCC properly provides __ARM_ACLE
-		inline void __isb(unsigned int scope) { static_assert(scope == 15); asm volatile ("isb 15" ::: "memory"); }
+		// 15 is the only allowed value for the parameter, so just ignore it and use 15 lol
+		inline void __isb(unsigned int scope = 15)
+		{
+			asm volatile ("isb 15" ::: "memory");
+		}
 	#endif
 #elif defined(_M_ARM64) // arm64 msvc
 	#include <intrin.h>
