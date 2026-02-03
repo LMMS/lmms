@@ -143,17 +143,18 @@ void RenderManager::renderProject()
 
 void RenderManager::renderTrack(Track* track)
 {
-	const auto containers = {Engine::getSong()->tracks(), Engine::patternStore()->tracks()};
+	assert(track);
+	assert(track->trackContainer());
 
-	for (auto& otherTrack : containers | std::views::join)
+	for (auto& otherTrack : track->trackContainer()->tracks())
 	{
 		if (otherTrack == track || otherTrack->isMuted() || dynamic_cast<AutomationTrack*>(otherTrack)) { continue; }
 		m_unmuted.push_back(otherTrack);
 	}
 
 	m_tracksToRender = {track};
-
 	m_mode = Mode::ExportTrack;
+
 	renderNextTrack();
 }
 
