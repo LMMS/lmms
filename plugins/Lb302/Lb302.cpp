@@ -53,15 +53,14 @@
 //#define LB_24_RES_TRICK
 
 
+namespace lmms
+{
+
 namespace
 {
 // Helper to get the phase increment per sample, given a note's frequency and the current sample rate
-static inline float phaseInc(float freq) { return freq / lmms::Engine::audioEngine()->outputSampleRate(); }
+inline float phaseInc(float freq) { return freq / Engine::audioEngine()->outputSampleRate(); }
 }
-
-
-namespace lmms
-{
 
 extern "C"
 {
