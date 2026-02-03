@@ -105,7 +105,7 @@ void Lb302Filter::recalc()
 
 void Lb302Filter::envRecalc()
 {
-	vcf_c0 *= fs->envdecay;       // Filter Decay. vcf_decay is adjusted for Hz and ENVINC
+	vcf_c0 *= fs->envdecay; // Filter Decay. vcf_decay is adjusted for Hz and s_envInc
 	// vcf_rescoeff = std::exp(-1.20f + 3.455f * fs->reso); moved above to Lb302Filter::recalc()
 };
 
@@ -134,7 +134,7 @@ void Lb302FilterIIR2::recalc()
 void Lb302FilterIIR2::envRecalc()
 {
 	Lb302Filter::envRecalc();
-	const float w = vcf_e0 + vcf_c0; // e0 is adjusted for Hz and doesn't need ENVINC
+	const float w = vcf_e0 + vcf_c0; // e0 is adjusted for Hz and doesn't need s_envInc
 	const float k = std::exp(-w / vcf_rescoeff); // Does this mean c0 is inheritantly?
 
 	vcf_a = 2.f * std::cos(2.f * w) * k;
@@ -175,7 +175,7 @@ void Lb302Filter3Pole::envRecalc()
 {
 	Lb302Filter::envRecalc();
 
-	// e0 is adjusted for Hz and doesn't need ENVINC
+	// e0 is adjusted for Hz and doesn't need s_envInc
 	float w = vcf_e0 + vcf_c0;
 	float k = std::min(fs->cutoff, 0.975f);
 	// sampleRateCutoff should not be changed to anything dynamic that is outside the
@@ -216,7 +216,7 @@ sample_t Lb302Filter3Pole::process(const sample_t& samp)
 	ay2     = kp1h * (ay1 + ay11) - kp * ay2;
 	aout    = kp1h * (ay2 + ay31) - kp * aout;
 
-	return std::tanh(aout * value) * VOL_ADJUST / (1.f + fs->dist);
+	return std::tanh(aout * value) * s_volAdjust / (1.f + fs->dist);
 }
 
 
@@ -296,12 +296,12 @@ void Lb302Synth::filterChanged()
 	fs.cutoff = vcf_cut_knob.value();
 	fs.reso   = vcf_res_knob.value();
 	fs.envmod = vcf_mod_knob.value();
-	fs.dist   = dist_knob.value() * DIST_RATIO;
+	fs.dist   = dist_knob.value() * s_distRatio;
 
 	float d = 0.2f + (2.3f * vcf_dec_knob.value());
 
 	d *= Engine::audioEngine()->outputSampleRate(); // d *= smpl rate
-	fs.envdecay = std::pow(0.1f, 1.0f / d * ENVINC); // vcf_envdecay is now adjusted for both sampling rate and ENVINC
+	fs.envdecay = std::pow(0.1f, 1.0f / d * s_envInc); // vcf_envdecay is now adjusted for both sampling rate and s_envInc
 	recalcFilter();
 }
 
@@ -327,7 +327,7 @@ void Lb302Synth::recalcFilter()
 	kres = vcf_reso * (((-2.7079f * kp1 + 10.963f) * kp1 - 14.934f) * kp1 + 8.4974f);
 	value = 1.f + (0.f * (1.5f + 2.f * kres * (1.f - kfcn))); // ENVMOD was DIST*/
 
-	vcf_envpos = ENVINC; // Trigger filter update in process()
+	vcf_envpos = s_envInc; // Trigger filter update in process()
 }
 
 
@@ -369,7 +369,7 @@ void Lb302Synth::process(SampleFrame* outbuf, const fpp_t size)
 		{
 			// Swap next two blocks??
 			vcf().playNote();
-			vcf_envpos = ENVINC; // Ensure envelope is recalculated
+			vcf_envpos = s_envInc; // Ensure envelope is recalculated
 		}
 	}
 
@@ -400,7 +400,7 @@ void Lb302Synth::process(SampleFrame* outbuf, const fpp_t size)
 		if (i >= release_frame.load(std::memory_order_relaxed)) { vca_mode = VcaMode::Decay; }
 
 		// update vcf
-		if (vcf_envpos >= ENVINC)
+		if (vcf_envpos >= s_envInc)
 		{
 			filter.envRecalc();
 			vcf_envpos = 0;
@@ -409,7 +409,7 @@ void Lb302Synth::process(SampleFrame* outbuf, const fpp_t size)
 			{
 				vco_inc = vco_slidebase - vco_slide;
 				// Calculate coeff from dec_knob on knob change.
-				// TODO: Adjust for ENVINC
+				// TODO: Adjust for s_envInc
 				vco_slide -= vco_slide * (0.1f - slide_dec_knob.value() * 0.0999f) * sampleRatio;
 			}
 		}
@@ -506,7 +506,7 @@ void Lb302Synth::process(SampleFrame* outbuf, const fpp_t size)
 		// Handle Envelope
 		if (vca_mode == VcaMode::Attack)
 		{
-			vca_a += (vca_a0 - vca_a) * vca_attack;
+			vca_a += (s_vcaA0 - vca_a) * s_vcaAttack;
 			if (sample_cnt >= 0.5f * Engine::audioEngine()->outputSampleRate()) { vca_mode = VcaMode::Idle; }
 		}
 		else if (vca_mode == VcaMode::Decay)
@@ -543,7 +543,7 @@ void Lb302Synth::playNote(NotePlayHandle* nph, SampleFrame*)
 {
 	if (nph->isMasterNote() || (nph->hasParent() && nph->isReleased())) { return; }
 
-	auto tries = MaxNoteEnqueueRetries;
+	auto tries = s_maxNoteEnqueueRetries;
 	auto write_claimed_expected = m_notesWriteClaimed.load(std::memory_order_relaxed);
 	size_t index, next_index;
 	do
@@ -557,7 +557,7 @@ void Lb302Synth::playNote(NotePlayHandle* nph, SampleFrame*)
 		const ptrdiff_t occupied = write_claimed_expected - m_notesReadSeq.load(std::memory_order_acquire);
 		assert(occupied >= 0);
 		// If full, wait for room
-		if (static_cast<size_t>(occupied) >= MaxPendingNotes)
+		if (static_cast<size_t>(occupied) >= s_maxPendingNotes)
 		{
 			busy_wait_hint();
 			// goto rather than continue since we do not want to evaluate the compare_exchange_strong().

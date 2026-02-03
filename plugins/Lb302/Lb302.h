@@ -125,7 +125,7 @@ public:
 	sample_t process(const sample_t& samp) override;
 
 protected:
-	static constexpr float VOL_ADJUST = 3.f;
+	static constexpr float s_volAdjust = 3.f;
 	float kfcn;
 	float kp;
 	float kp1;
@@ -169,10 +169,10 @@ private:
 		BLSawtooth, BLSquare, BLTriangle, BLMoog };
 	enum class VcaMode { Attack, Decay, Idle, NeverPlayed };
 
-	static constexpr float DIST_RATIO = 4.f;
-	static constexpr fpp_t ENVINC = 64; //!< Envelope Recalculation period
-	static constexpr float vca_attack = 1.f - 0.96406088f; //!< Amp attack
-	static constexpr float vca_a0 = 0.5f; //!< Initial amplifier coefficient
+	static constexpr float s_distRatio = 4.f;
+	static constexpr fpp_t s_envInc = 64; //!< Envelope Recalculation period
+	static constexpr float s_vcaAttack = 1.f - 0.96406088f; //!< Amp attack
+	static constexpr float s_vcaA0 = 0.5f; //!< Initial amplifier coefficient
 
 	FloatModel vcf_cut_knob;
 	FloatModel vcf_res_knob;
@@ -211,7 +211,7 @@ private:
 	//! @see db24Toggle
 	inline Lb302Filter& vcf() { return *vcfs[db24Toggle.value()]; }
 
-	f_cnt_t vcf_envpos = ENVINC; //!< Update counter. Updates when >= @ref ENVINC
+	f_cnt_t vcf_envpos = s_envInc; //!< Update counter. Updates when >= @ref ENVINC
 	std::atomic<f_cnt_t> release_frame;
 
 	// Envelope State
@@ -235,14 +235,14 @@ private:
 	//! adjusted as needed, but it must always be a power of 2.
 	//!
 	//! @see m_notes
-	static constexpr size_t MaxPendingNotes = 128;
-	static_assert(std::has_single_bit(MaxPendingNotes)); // MaxPendingNotes MUST be a power of 2
+	static constexpr size_t s_maxPendingNotes = 128;
+	static_assert(std::has_single_bit(s_maxPendingNotes)); // s_maxPendingNotes MUST be a power of 2
 
 	//! @brief The maximum number of retries permitted per enqueue operation before a note is dropped.
 	//!
 	//! Enqueue operations may fail during high contention as multiple threads
 	//! attempt to reserve the next spot in the ringbuffer using atomic CAS
-	//! operations, or when there are already @ref MaxPendingNotes enqueued
+	//! operations, or when there are already @ref s_maxPendingNotes enqueued
 	//! notes in the ringbuffer. This constant determines the maximum number of
 	//! times an enqueue operation is allowed to retry under either of these
 	//! circumstances before it gives up and drops the note.
@@ -252,25 +252,25 @@ private:
 	//! spinlocks.
 	//!
 	//! @see playNote
-	static constexpr size_t MaxNoteEnqueueRetries = MaxPendingNotes;
+	static constexpr size_t s_maxNoteEnqueueRetries = s_maxPendingNotes;
 
 	//! @brief Bitmask used to wrap arbitrary indicies within the bounds of @ref m_notes.
 	//!
 	//! @see m_notesReadSeq
 	//! @see m_notesWriteCommitted
 	//! @see m_notesWriteClaimed
-	static constexpr size_t NotesBufMask = MaxPendingNotes - 1;
+	static constexpr size_t NotesBufMask = s_maxPendingNotes - 1;
 
 	//! @brief Backing array for the multiple-producer single-consumer realtime-safe ring buffer queue for note events.
 	//!
 	//! This is used to implement monophony, since multiple LMMS threads can
 	//! independently send note events to an instance of Lb302.
 	//!
-	//! @see MaxPendingNotes
+	//! @see s_maxPendingNotes
 	//! @see m_notesReadSeq
 	//! @see m_notesWriteCommitted
 	//! @see m_notesWriteClaimed
-	std::array<NotePlayHandle*, MaxPendingNotes> m_notes {};
+	std::array<NotePlayHandle*, s_maxPendingNotes> m_notes {};
 
 	//! @brief Sequence number indicating complete dequeue operations.
 	//!
@@ -280,7 +280,7 @@ private:
 	//! 
 	//! The difference between this sequence number and @ref m_notesReadSeq
 	//! is the number of currently vacant indicies in @ref m_notes that are
-	//! available to be written to, and can never exceed @ref MaxPendingNotes.
+	//! available to be written to, and can never exceed @ref s_maxPendingNotes.
 	//!
 	//! @see play
 	alignas(hardware_destructive_interference_size) std::atomic_size_t m_notesReadSeq {0};
@@ -293,7 +293,7 @@ private:
 	//!
 	//! The difference between this sequence number and @ref m_notesReadSeq
 	//! is the number of currently enqueued notes ready to be dequeued, and can
-	//! never exceed @ref MaxPendingNotes. It should always be less than or
+	//! never exceed @ref s_maxPendingNotes. It should always be less than or
 	//! equal to @ref m_notesWriteClaimed.
 	//!
 	//! @see playNote
@@ -307,7 +307,7 @@ private:
 	//!
 	//! The difference between this sequence number and @ref m_notesReadSeq
 	//! is the number of currently occupied indicies in @ref m_notes (even
-	//! those not yet written to), and can never exceed @ref MaxPendingNotes.
+	//! those not yet written to), and can never exceed @ref s_maxPendingNotes.
 	//!
 	//! @see playNote
 	alignas(hardware_destructive_interference_size) std::atomic_size_t m_notesWriteClaimed {0};
