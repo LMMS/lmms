@@ -153,7 +153,6 @@ ExportProjectDialog::ExportProjectDialog(const QString& path, RenderManager::Mod
 		}
 	}
 
-
 	auto loopRepeatLayout = new QHBoxLayout{};
 	loopRepeatLayout->addWidget(m_loopRepeatLabel);
 	loopRepeatLayout->addWidget(m_loopRepeatBox);
@@ -187,14 +186,10 @@ ExportProjectDialog::ExportProjectDialog(const QString& path, RenderManager::Mod
 	connect(m_fileFormatComboBox, qOverload<int>(&QComboBox::currentIndexChanged), this,
 		&ExportProjectDialog::onFileFormatChanged);
 
-	if (mode == RenderManager::Mode::ExportProject)
-	{
-		const auto pathExtension = QFileInfo{path}.completeSuffix().prepend(".");
-		const auto pathFormat = ProjectRenderer::getFileFormatFromExtension(pathExtension);
-		m_fileFormatComboBox->setCurrentIndex(
-			std::max(0, m_fileFormatComboBox->findData(static_cast<int>(pathFormat))));
-	}
+	const auto pathExtension = QFileInfo{path}.completeSuffix().prepend(".");
+	const auto pathFormat = ProjectRenderer::getFileFormatFromExtension(pathExtension);
 
+	m_fileFormatComboBox->setCurrentIndex(std::max(0, m_fileFormatComboBox->findData(static_cast<int>(pathFormat))));
 	m_bitRateComboBox->setCurrentIndex(std::max(0, m_bitRateComboBox->findData(defaultBitRate)));
 	m_bitDepthComboBox->setCurrentIndex(std::max(0, m_bitDepthComboBox->findData(static_cast<int>(defaultBitDepth))));
 	m_stereoModeComboBox->setCurrentIndex(
