@@ -75,7 +75,7 @@ public:
 
 	virtual void recalc();
 	virtual void envRecalc();
-	virtual sample_t process(const sample_t& samp) = 0;
+	virtual sample_t process(sample_t samp) = 0;
 	virtual void playNote();
 
 protected:
@@ -96,7 +96,7 @@ public:
 
 	void recalc() override;
 	void envRecalc() override;
-	sample_t process(const sample_t& samp) override;
+	sample_t process(sample_t samp) override;
 
 protected:
 	// d1 and d2 are added back into the sample with vcf_a and b as
@@ -122,7 +122,7 @@ public:
 	//virtual void recalc();
 	void envRecalc() override;
 	void recalc() override;
-	sample_t process(const sample_t& samp) override;
+	sample_t process(sample_t samp) override;
 
 protected:
 	static constexpr float s_volAdjust = 3.f;
