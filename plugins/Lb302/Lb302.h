@@ -259,7 +259,7 @@ private:
 	//! @see m_notesReadSeq
 	//! @see m_notesWriteCommitted
 	//! @see m_notesWriteClaimed
-	static constexpr size_t NotesBufMask = s_maxPendingNotes - 1;
+	static constexpr size_t s_notesBufMask = s_maxPendingNotes - 1;
 
 	//! @brief Backing array for the multiple-producer single-consumer realtime-safe ring buffer queue for note events.
 	//!
@@ -276,7 +276,7 @@ private:
 	//!
 	//! As notes are dequeued, this sequence number is incremented. It can be
 	//! used as an index into @ref m_notes if bitwise-AND'd with
-	//! @ref NotesBufMask.
+	//! @ref s_notesBufMask.
 	//! 
 	//! The difference between this sequence number and @ref m_notesReadSeq
 	//! is the number of currently vacant indicies in @ref m_notes that are
@@ -289,7 +289,7 @@ private:
 	//!
 	//! As note enqueue operations complete, this sequence number is
 	//! incremented. It can be used as an index into @ref m_notes if
-	//! bitwise-AND'd with @ref NotesBufMask.
+	//! bitwise-AND'd with @ref s_notesBufMask.
 	//!
 	//! The difference between this sequence number and @ref m_notesReadSeq
 	//! is the number of currently enqueued notes ready to be dequeued, and can
@@ -303,7 +303,7 @@ private:
 	//!
 	//! As note enqueue operations begin, this sequence number is incremented.
 	//! It can be used as an index into @ref m_notes if bitwise-AND'd with
-	//! @ref NotesBufMask.
+	//! @ref s_notesBufMask.
 	//!
 	//! The difference between this sequence number and @ref m_notesReadSeq
 	//! is the number of currently occupied indicies in @ref m_notes (even

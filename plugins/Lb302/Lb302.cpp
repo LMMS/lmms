@@ -569,7 +569,7 @@ void Lb302Synth::playNote(NotePlayHandle* nph, SampleFrame*)
 	}
 	while (!m_notesWriteClaimed.compare_exchange_strong(write_claimed_expected, next_index, std::memory_order_acquire));
 
-	m_notes[index & NotesBufMask] = nph;
+	m_notes[index & s_notesBufMask] = nph;
 	release_frame.store(
 		std::max(release_frame.load(std::memory_order_acquire), nph->framesLeft() + nph->offset()),
 		std::memory_order_release
@@ -619,13 +619,13 @@ void Lb302Synth::play(SampleFrame* working_buffer)
 	// Process notes, but process new notes last
 	for (size_t i = readIdx; i < writeCommitted; ++i)
 	{
-		const auto& nph = m_notes[i & NotesBufMask];
+		const auto& nph = m_notes[i & s_notesBufMask];
 		if (nph->totalFramesPlayed() == 0) { continue; }
 		processNote(nph);
 	}
 	for (size_t i = readIdx; i < writeCommitted; ++i)
 	{
-		const auto& nph = m_notes[i & NotesBufMask];
+		const auto& nph = m_notes[i & s_notesBufMask];
 		if (nph->totalFramesPlayed() != 0) { continue; }
 		processNote(nph);
 	}
