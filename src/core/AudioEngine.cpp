@@ -761,7 +761,7 @@ bool AudioEngine::isMidiDevNameValid(QString name)
 	}
 #endif
 
-#ifdef LMMS_BUILD_WIN32
+#if defined(LMMS_BUILD_WIN32) || defined(LMMS_BUILD_CYGWIN)
 	if (name == MidiWinMM::name())
 	{
 		return true;
@@ -1002,7 +1002,7 @@ MidiClient * AudioEngine::tryMidiClients()
 	}
 #endif
 
-#ifdef LMMS_BUILD_WIN32
+#if defined(LMMS_BUILD_WIN32) || defined(LMMS_BUILD_CYGWIN)
 	if( client_name == MidiWinMM::name() || client_name == "" )
 	{
 		MidiWinMM * mwmm = new MidiWinMM;

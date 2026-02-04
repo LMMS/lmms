@@ -699,7 +699,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 			MidiSetupWidget::create<MidiSndio>(ms_w);
 #endif
 
-#ifdef LMMS_BUILD_WIN32
+#if defined(LMMS_BUILD_WIN32) || defined(LMMS_BUILD_CYGWIN)
 	m_midiIfaceSetupWidgets[MidiWinMM::name()] =
 			MidiSetupWidget::create<MidiWinMM>(ms_w);
 #endif
