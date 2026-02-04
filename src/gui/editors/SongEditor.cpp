@@ -80,8 +80,6 @@ SongEditor::SongEditor( Song * song ) :
 	m_zoomingModel(new IntModel(calculateZoomSliderValue(DEFAULT_PIXELS_PER_BAR), 0, ZOOM_STEPS, nullptr, tr("Zoom"))),
 	m_snappingModel(new ComboBoxModel()),
 	m_proportionalSnap( false ),
-	m_scrollBack( false ),
-	m_smoothScroll( ConfigManager::inst()->value( "ui", "smoothscroll" ).toInt() ),
 	m_mode(EditMode::Draw),
 	m_origin(),
 	m_scrollPos(),
@@ -761,37 +759,38 @@ static inline void animateScroll( QScrollBar *scrollBar, int newVal, bool smooth
 
 
 
+void SongEditor::autoScroll(const TimePos & t)
+{
+	const bool compactTrackButtons = ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt();
+	const bool smoothScroll = ConfigManager::inst()->value("ui", "smoothscroll").toInt();
+	const auto widgetWidth = compactTrackButtons ? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT : DEFAULT_SETTINGS_WIDGET_WIDTH;
+	const auto trackOpWidth = compactTrackButtons ? TRACK_OP_WIDTH_COMPACT : TRACK_OP_WIDTH;
+	const int w = width() - widgetWidth - trackOpWidth - contentWidget()->verticalScrollBar()->width(); // account for width of right scrollbar
+
+	if (m_timeLine->autoScroll() == TimeLineWidget::AutoScrollState::Disabled)
+	{
+		return;
+	}
+	else if (m_timeLine->autoScroll() == TimeLineWidget::AutoScrollState::Stepped)
+	{
+		if (t < m_currentPosition || t > m_currentPosition + w * TimePos::ticksPerBar() / pixelsPerBar())
+		{
+			animateScroll(m_leftRightScroll, t.getTicks(), smoothScroll);
+		}
+	}
+	else if (m_timeLine->autoScroll() == TimeLineWidget::AutoScrollState::Continuous)
+	{
+		animateScroll(m_leftRightScroll, std::max(static_cast<int>(t.getTicks() - w * TimePos::ticksPerBar() / pixelsPerBar() / 2), 0), smoothScroll);
+	}
+}
+
 
 void SongEditor::updatePosition()
 {
-	const TimePos& t = m_timeLine->timeline()->pos();
-	const bool compactTrackButtons = ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt();
-	const auto widgetWidth = compactTrackButtons ? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT : DEFAULT_SETTINGS_WIDGET_WIDTH;
-	const auto trackOpWidth = compactTrackButtons ? TRACK_OP_WIDTH_COMPACT : TRACK_OP_WIDTH;
-
-	if ((m_song->isPlaying() && m_song->m_playMode == Song::PlayMode::Song)
-							|| m_scrollBack)
+	if (Engine::getSong()->isPlaying() && Engine::getSong()->playMode() == Song::PlayMode::Song)
 	{
-		m_smoothScroll = ConfigManager::inst()->value( "ui", "smoothscroll" ).toInt();
-		const int w = width() - widgetWidth
-							- trackOpWidth
-							- contentWidget()->verticalScrollBar()->width(); // width of right scrollbar
-		
-		if (m_timeLine->autoScroll() == TimeLineWidget::AutoScrollState::Stepped)
-		{
-			const auto nextPosition = m_currentPosition + w * TimePos::ticksPerBar() / pixelsPerBar();
-			if (t > nextPosition || t < m_currentPosition) 
-			{
-				animateScroll(m_leftRightScroll, t.getTicks(), m_smoothScroll);
-			}
-		}
-		else if (m_timeLine->autoScroll() == TimeLineWidget::AutoScrollState::Continuous)
-		{
-			m_leftRightScroll->setValue(std::max(t.getTicks() - w * TimePos::ticksPerBar() / pixelsPerBar() / 2, 0.0f));
-		}
-		m_scrollBack = false;
+		autoScroll(m_timeLine->timeline()->pos());
 	}
-
 	updatePositionLine();
 }
 
@@ -1127,6 +1126,8 @@ void SongEditorWindow::stop()
 	getGUI()->pianoRoll()->stopRecording();
 	m_editor->m_timeLine->setRecording(false);
 	m_editor->m_positionLine->setRecording(false);
+	// Scroll back to the start if autoscroll is enabled
+	m_editor->autoScroll(m_editor->m_timeLine->timeline()->pos());
 }
 
 

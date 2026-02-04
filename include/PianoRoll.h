@@ -304,7 +304,7 @@ private:
 	PianoRoll( const PianoRoll & );
 	~PianoRoll() override = default;
 
-	void autoScroll(const TimePos & t );
+	void autoScroll(const TimePos & t);
 
 	TimePos newNoteLen() const;
 
@@ -449,7 +449,6 @@ private:
 	bool m_mouseDownRight; //true if right click is being held down
 
 	TimeLineWidget * m_timeLine;
-	bool m_scrollBack;
 
 	void copyToClipboard(const NoteVector & notes ) const;
 
