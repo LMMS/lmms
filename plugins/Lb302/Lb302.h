@@ -161,8 +161,6 @@ public slots:
 private:
 	void processNote(NotePlayHandle* nph);
 	void process(SampleFrame* outbuf, const fpp_t size);
-	void initNote(float noteVcoInc, bool noteIsDead);
-	void initSlide();
 	void recalcFilter();
 
 	enum class VcoShape { Sawtooth, Square, Triangle, Moog, RoundSquare, Sine, Exponential, WhiteNoise,

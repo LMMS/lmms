@@ -356,6 +356,7 @@ void Lb302Synth::process(SampleFrame* outbuf, const fpp_t size)
 			// Initiate Slide
 			vco_slide = vco_inc - vco_slideinc; // Slide amount
 			vco_slidebase = vco_inc; // The REAL frequency
+			vco_slideinc = 0.f; // reset from-note
 		}
 		else { vco_slide = 0.f; }
 
@@ -522,20 +523,6 @@ void Lb302Synth::process(SampleFrame* outbuf, const fpp_t size)
 	}
 }
 
-
-void Lb302Synth::initSlide()
-{
-	if (vco_slideinc == 0.f)
-	{
-		vco_slide = 0.f;
-		return;
-	}
-
-	// Initiate Slide
-	vco_slide = vco_inc - vco_slideinc; // Slide amount
-	vco_slidebase = vco_inc; // The REAL frequency
-	vco_slideinc = 0.f; // reset from-note
-}
 
 
 void Lb302Synth::playNote(NotePlayHandle* nph, SampleFrame*)
