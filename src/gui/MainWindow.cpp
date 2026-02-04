@@ -1814,41 +1814,6 @@ void MainWindow::MovableQMdiArea::mouseReleaseEvent(QMouseEvent* event)
 	mousePanEnd();
 }
 
-void MainWindow::MovableQMdiArea::wheelEvent(QWheelEvent* event)
-{
-	auto pd = event->pixelDelta();
-	auto ad = event->angleDelta();
-
-	// FIXME: follow #7941?
-
-	if (!pd.isNull())
-	{
-		int dy = pd.y();
-		if (m_keyMods->m_shift)
-		{
-			scroll(dy, 0);
-		}
-		else
-		{
-			scroll(0, dy);
-		}
-    }
-	else if (!ad.isNull())
-	{
-		int dy = (int)(-0.8f * ad.y());
-		if (m_keyMods->m_shift)
-		{
-			scroll(dy, 0);
-		}
-		else
-		{
-			scroll(0, dy);
-		}
-    }
-
-	event->accept();
-}
-
 void MainWindow::MovableQMdiArea::resizeEvent(QResizeEvent* event)
 {
 	updateScrollBars();

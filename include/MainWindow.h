@@ -219,7 +219,7 @@ private:
 		void resizeEvent(QResizeEvent* event) override;
 		void childEvent(QChildEvent* event) override;
 		bool eventFilter(QObject* watched, QEvent* event) override;
-		void wheelEvent(QWheelEvent* event) override;
+		void sliderMoved(QScrollBar* scrollBar);
 
 	private:
 		void mousePanStart(int globalX, int globalY);
@@ -228,7 +228,6 @@ private:
 		void scroll(int scrollX, int scrollY);
 		void updateScrollBars();
 		bool hasActiveMaxWindow();
-		void sliderMoved(QScrollBar* scrollBar);
 
 		static constexpr int Margin = 100; //!< Margin used along with the active workspace area.
 
