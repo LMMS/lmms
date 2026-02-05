@@ -44,8 +44,14 @@ namespace lmms::gui {
 class ExportProjectDialog : public QDialog
 {
 public:
-	ExportProjectDialog(
-		const QString& path, RenderManager::Mode mode, Track* track = nullptr, QWidget* parent = nullptr);
+	enum class Mode
+	{
+		ExportProject,
+		ExportTracks,
+		ExportTrack
+	};
+
+	ExportProjectDialog(const QString& path, Mode mode, Track* track = nullptr, QWidget* parent = nullptr);
 
 private:
 	void accept() override;
@@ -85,7 +91,7 @@ private:
 
 	QString m_path;
 	Track* m_track;
-	RenderManager::Mode m_mode;
+	Mode m_mode;
 	std::unique_ptr<RenderManager> m_renderManager;
 };
 

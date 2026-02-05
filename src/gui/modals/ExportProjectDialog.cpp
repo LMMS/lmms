@@ -51,7 +51,7 @@ constexpr auto defaultStereoMode = OutputSettings::StereoMode::Stereo;
 constexpr auto maxLoopRepeat = std::numeric_limits<int>::max();
 } // namespace
 
-ExportProjectDialog::ExportProjectDialog(const QString& path, RenderManager::Mode mode, Track* track, QWidget* parent)
+ExportProjectDialog::ExportProjectDialog(const QString& path, Mode mode, Track* track, QWidget* parent)
 	: QDialog(parent)
 	, m_fileFormatLabel(new QLabel(tr("File format:")))
 	, m_fileFormatComboBox(new QComboBox())
@@ -202,9 +202,8 @@ ExportProjectDialog::ExportProjectDialog(const QString& path, RenderManager::Mod
 
 void ExportProjectDialog::onFileFormatChanged(int index)
 {
-	if (m_mode == RenderManager::Mode::ExportProject)
+	if (const auto fileInfo = QFileInfo{m_path}; !fileInfo.suffix().isEmpty())
 	{
-		const auto fileInfo = QFileInfo{m_path};
 		const auto extension
 			= ProjectRenderer::getFileExtensionFromFormat(static_cast<ProjectRenderer::ExportFileFormat>(index));
 		m_path = fileInfo.path() + QDir::separator() + fileInfo.completeBaseName() + extension;
@@ -266,13 +265,13 @@ void ExportProjectDialog::onStartButtonClicked()
 
 	switch (m_mode)
 	{
-	case RenderManager::Mode::ExportProject:
+	case Mode::ExportProject:
 		m_renderManager->renderProject();
 		break;
-	case RenderManager::Mode::ExportTrack:
+	case Mode::ExportTrack:
 		m_renderManager->renderTrack(m_track);
 		break;
-	case RenderManager::Mode::ExportTracks:
+	case Mode::ExportTracks:
 		m_renderManager->renderTracks();
 		break;
 	}

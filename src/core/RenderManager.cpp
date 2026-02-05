@@ -26,7 +26,6 @@
 
 #include <QDir>
 #include <QRegularExpression>
-#include <ranges>
 
 #include "AutomationTrack.h"
 #include "PatternStore.h"
@@ -82,17 +81,10 @@ void RenderManager::renderNextTrack()
 		track->setMuted(track != renderTrack);
 	}
 
-	if (m_mode == Mode::ExportTracks)
-	{
-		// for multi-render, prefix each output file with a different number
-		int trackNum = m_tracksToRender.size() + 1;
+	// for multi-render, prefix each output file with a different number
+	int trackNum = m_tracksToRender.size() + 1;
 
-		render( pathForTrack(renderTrack, trackNum) );
-	}
-	else
-	{
-		render(m_outputPath);
-	}
+	render( pathForTrack(renderTrack, trackNum) );
 }
 
 // Render the song into individual tracks
@@ -129,15 +121,12 @@ void RenderManager::renderTracks()
 	// copy the list of unmuted tracks into our rendering queue.
 	// we need to remember which tracks were unmuted to restore state at the end.
 	m_tracksToRender = m_unmuted;
-
-	m_mode = Mode::ExportTracks;
 	renderNextTrack();
 }
 
 // Render the song into a single track
 void RenderManager::renderProject()
 {
-	m_mode = Mode::ExportProject;
 	render( m_outputPath );
 }
 
@@ -153,8 +142,6 @@ void RenderManager::renderTrack(Track* track)
 	}
 
 	m_tracksToRender = {track};
-	m_mode = Mode::ExportTrack;
-
 	renderNextTrack();
 }
 
