@@ -84,7 +84,7 @@ void RenderManager::renderNextTrack()
 	// for multi-render, prefix each output file with a different number
 	int trackNum = m_tracksToRender.size() + 1;
 
-	render( pathForTrack(renderTrack, trackNum) );
+	render(pathForTrack(renderTrack, trackNum));
 }
 
 // Render the song into individual tracks
