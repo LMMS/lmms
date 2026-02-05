@@ -104,7 +104,7 @@ void Lb302Filter::recalc()
 
 void Lb302Filter::envRecalc()
 {
-	vcf_c0 *= fs->envdecay; // Filter Decay. vcf_decay is adjusted for Hz and s_envInc
+	vcf_c0 *= fs->envdecay; // Filter Decay. fs->envdecay is adjusted for Hz and s_envInc
 	// vcf_rescoeff = std::exp(-1.20f + 3.455f * fs->reso); moved above to Lb302Filter::recalc()
 };
 
@@ -242,12 +242,15 @@ Lb302Synth::Lb302Synth(InstrumentTrack* instrumentTrack)
 	connect(&vcf_cut_knob, &FloatModel::dataChanged, this, &Lb302Synth::filterChanged);
 	connect(&vcf_res_knob, &FloatModel::dataChanged, this, &Lb302Synth::filterChanged);
 	connect(&vcf_mod_knob, &FloatModel::dataChanged, this, &Lb302Synth::filterChanged);
-	connect(&vcf_dec_knob, &FloatModel::dataChanged, this, &Lb302Synth::filterChanged);
+	connect(&vcf_dec_knob, &FloatModel::dataChanged, this, &Lb302Synth::decayChanged);
 	connect(&db24Toggle, &BoolModel::dataChanged, this, &Lb302Synth::db24Toggled);
 	connect(&dist_knob, &FloatModel::dataChanged, this, &Lb302Synth::filterChanged);
 
-	// db24Toggled(); // TODO: Remove? This just calls recalcFilter(), which also happens during filterChanged()
+	// db24Toggled() would be called here, but all it does is call
+	// recalcFilter(), which is already done in filterChanged(), so there's no
+	// need call recalcFilter() twice.
 	filterChanged();
+	decayChanged();
 
 	Engine::audioEngine()->addPlayHandle(new InstrumentPlayHandle(this, instrumentTrack));
 }
@@ -284,49 +287,41 @@ void Lb302Synth::loadSettings(const QDomElement& el)
 	deadToggle.loadSettings(el, "dead");
 	db24Toggle.loadSettings(el, "db24");
 
- 	db24Toggled();
+	// db24Toggled() would be called here, but all it does is call
+	// recalcFilter(), which is already done in filterChanged(), so there's no
+	// need to do it twice.
 	filterChanged();
+	decayChanged();
 }
 
-// TODO: Split into one function per knob.  envdecay doesn't require
-// recalcFilter.
+
 void Lb302Synth::filterChanged()
 {
 	fs.cutoff = vcf_cut_knob.value();
 	fs.reso   = vcf_res_knob.value();
 	fs.envmod = vcf_mod_knob.value();
 	fs.dist   = dist_knob.value() * s_distRatio;
-
-	float d = 0.2f + (2.3f * vcf_dec_knob.value());
-
-	d *= Engine::audioEngine()->outputSampleRate(); // d *= smpl rate
-	fs.envdecay = std::pow(0.1f, 1.0f / d * s_envInc); // vcf_envdecay is now adjusted for both sampling rate and s_envInc
 	recalcFilter();
 }
 
 
-void Lb302Synth::db24Toggled() { recalcFilter(); } // These recalcFilter calls might suck
+void Lb302Synth::decayChanged()
+{
+	float d = (2.3f * vcf_dec_knob.value() + 0.2f) * Engine::audioEngine()->outputSampleRate();
+	fs.envdecay = std::pow(0.1f, 1.0f / d * s_envInc);
+}
+
+
+void Lb302Synth::db24Toggled() { recalcFilter(); }
 
 
 QString Lb302Synth::nodeName() const { return lb302_plugin_descriptor.name; }
 
 
-// OBSOLETE. Break apart once we get Q_OBJECT to work. >:[
 void Lb302Synth::recalcFilter()
 {
 	vcf().recalc();
-
-	// THIS IS OLD 3pole/24dB code, I may reintegrate it.  Don't need it
-	// right now.   Should be toggled by LB_24_RES_TRICK at the moment.
-
-	/*kfcn = 2.f * (vcf_cutoff * 3000) / engine::audioEngine()->outputSampleRate();
-	kp   = ((-2.7528f * kfcn + 3.0429f) * kfcn + 1.718f) * kfcn - 0.9984f;
-	kp1  = kp + 1.f;
-	kp1h = 0.5f * kp1;
-	kres = vcf_reso * (((-2.7079f * kp1 + 10.963f) * kp1 - 14.934f) * kp1 + 8.4974f);
-	value = 1.f + (0.f * (1.5f + 2.f * kres * (1.f - kfcn))); // ENVMOD was DIST*/
-
-	vcf_envpos = s_envInc; // Trigger filter update in process()
+	vcf_envpos = s_envInc; // Trigger filter envelope update in process()
 }
 
 

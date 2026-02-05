@@ -156,6 +156,11 @@ public:
 
 public slots:
 	void filterChanged();
+
+	//! @brief Adjusts `fs.envdecay` for both sampling rate and @ref s_envInc
+	//! @see fs
+	void decayChanged();
+
 	void db24Toggled();
 
 private:
