@@ -51,7 +51,7 @@ constexpr auto defaultStereoMode = OutputSettings::StereoMode::Stereo;
 constexpr auto maxLoopRepeat = std::numeric_limits<int>::max();
 } // namespace
 
-ExportProjectDialog::ExportProjectDialog(const QString& path, Mode mode, Track* track, QWidget* parent)
+ExportProjectDialog::ExportProjectDialog(const QString& path, Mode mode, QWidget* parent)
 	: QDialog(parent)
 	, m_fileFormatLabel(new QLabel(tr("File format:")))
 	, m_fileFormatComboBox(new QComboBox())
@@ -75,7 +75,6 @@ ExportProjectDialog::ExportProjectDialog(const QString& path, Mode mode, Track* 
 	, m_cancelButton(new QPushButton(tr("Cancel")))
 	, m_progressBar(new QProgressBar())
 	, m_path(path)
-	, m_track(track)
 	, m_mode(mode)
 {
 	setWindowTitle(tr("Export project"));
@@ -269,6 +268,7 @@ void ExportProjectDialog::onStartButtonClicked()
 		m_renderManager->renderProject();
 		break;
 	case Mode::ExportTrack:
+		assert(m_track && "no track assigned for export");
 		m_renderManager->renderTrack(m_track);
 		break;
 	case Mode::ExportTracks:

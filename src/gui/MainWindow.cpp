@@ -1512,7 +1512,7 @@ void MainWindow::exportProject(bool multiExport)
 			ExportProjectDialog::Mode::ExportTracks :
 			ExportProjectDialog::Mode::ExportProject;
 
-		ExportProjectDialog epd(exportFileName, exportMode, nullptr, getGUI()->mainWindow());
+		auto epd = ExportProjectDialog{exportFileName, exportMode};
 		epd.exec();
 	}
 }

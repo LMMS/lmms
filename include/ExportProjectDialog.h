@@ -51,7 +51,11 @@ public:
 		ExportTrack
 	};
 
-	ExportProjectDialog(const QString& path, Mode mode, Track* track = nullptr, QWidget* parent = nullptr);
+	ExportProjectDialog(const QString& path, Mode mode, QWidget* parent = nullptr);
+
+	//! Assign a single track to export.
+	//! The track is only used when the mode is set to `ExportTrack`.
+	void setTrack(Track* track) { m_track = track; }
 
 private:
 	void accept() override;
@@ -90,8 +94,8 @@ private:
 	QProgressBar* m_progressBar = nullptr;
 
 	QString m_path;
-	Track* m_track;
 	Mode m_mode;
+	Track* m_track = nullptr;
 	std::unique_ptr<RenderManager> m_renderManager;
 };
 
