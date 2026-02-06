@@ -90,7 +90,7 @@ void AutomatableSlider::mousePressEvent( QMouseEvent * _me )
 
 void AutomatableSlider::mouseReleaseEvent( QMouseEvent * _me )
 {
-	AutomatableModel *thisModel = model();
+	AutomatableModel* thisModel = model();
 	if (thisModel)
 	{
 		thisModel->restoreJournallingState();
