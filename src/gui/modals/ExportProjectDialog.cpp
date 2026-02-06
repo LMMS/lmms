@@ -251,7 +251,7 @@ void ExportProjectDialog::onStartButtonClicked()
 	outputSettings.setCompressionLevel(compressionLevel);
 
 	const auto format = static_cast<ProjectRenderer::ExportFileFormat>(m_fileFormatComboBox->currentData().toInt());
-	m_renderManager = std::make_unique<RenderManager>(outputSettings, format, m_path);
+	m_renderManager = std::make_unique<RenderManager>(outputSettings, format);
 	m_startButton->setEnabled(false);
 
 	Engine::getSong()->setExportLoop(m_exportAsLoopBox->isChecked());
@@ -265,14 +265,14 @@ void ExportProjectDialog::onStartButtonClicked()
 	switch (m_mode)
 	{
 	case Mode::ExportProject:
-		m_renderManager->renderProject();
+		m_renderManager->renderProject(m_path);
 		break;
 	case Mode::ExportTrack:
 		assert(m_track && "no track assigned for export");
-		m_renderManager->renderTrack(m_track);
+		m_renderManager->renderTrack(m_track, m_path);
 		break;
 	case Mode::ExportTracks:
-		m_renderManager->renderTracks();
+		m_renderManager->renderTracks(m_path);
 		break;
 	}
 }

@@ -26,19 +26,19 @@
 
 #include <QDir>
 #include <QRegularExpression>
+#include <iostream>
+#include <ranges>
 
-#include "AutomationTrack.h"
-#include "PatternStore.h"
+#include "Engine.h"
 #include "Song.h"
 
 namespace lmms
 {
 
 RenderManager::RenderManager(
-	const OutputSettings& outputSettings, ProjectRenderer::ExportFileFormat fmt, QString outputPath)
+	const OutputSettings& outputSettings, ProjectRenderer::ExportFileFormat fmt)
 	: m_outputSettings(outputSettings)
 	, m_format(fmt)
-	, m_outputPath(outputPath)
 {
 	Engine::audioEngine()->storeAudioDevice();
 }
@@ -50,159 +50,146 @@ RenderManager::~RenderManager()
 
 void RenderManager::abortProcessing()
 {
-	if ( m_activeRenderer ) {
-		disconnect( m_activeRenderer.get(), SIGNAL(finished()),
-				this, SLOT(renderNextTrack()));
+	if (m_activeRenderer)
+	{
 		m_activeRenderer->abortProcessing();
-	}
-	restoreMutedState();
-}
-
-// Called to render each new track when rendering tracks individually.
-void RenderManager::renderNextTrack()
-{
-	m_activeRenderer.reset();
-
-	if (m_tracksToRender.empty())
-	{
-		// nothing left to render
-		restoreMutedState();
-		emit finished();
-		return;
+		m_activeRenderer.reset();
 	}
 
-	// pop the next track from our rendering queue
-	Track* renderTrack = m_tracksToRender.back();
-	m_tracksToRender.pop_back();
-
-	// mute everything but the track we are about to render
-	for (auto track : m_unmuted)
-	{
-		track->setMuted(track != renderTrack);
-	}
-
-	// for multi-render, prefix each output file with a different number
-	int trackNum = m_tracksToRender.size() + 1;
-
-	render(pathForTrack(renderTrack, trackNum));
+	restoreMuteStates();
 }
 
 // Render the song into individual tracks
-void RenderManager::renderTracks()
+void RenderManager::renderTracks(const QString& outputPath)
 {
-	const TrackContainer::TrackList& tl = Engine::getSong()->tracks();
+	auto trackNum = 1;
 
-	// find all currently unnmuted tracks -- we want to render these.
-	for (const auto& tk : tl)
+	// TODO: Currently, only the song is exported (it will require changes and refactors in Song), but in the future we
+	// may want to generalize this function to work with any track container (e.g. the pattern store)
+	for (const auto& track : Engine::getSong()->tracks() | std::views::filter(&Track::isRenderable))
 	{
-		Track::Type type = tk->type();
+		auto extension = ProjectRenderer::getFileExtensionFromFormat(m_format);
+		auto name = track->name();
+		name = name.remove(QRegularExpression(FILENAME_FILTER));
+		name = QString{"%1_%2%3"}.arg(trackNum++).arg(name).arg(extension);
 
-		// Don't render automation tracks
-		if ( tk->isMuted() == false &&
-				( type == Track::Type::Instrument || type == Track::Type::Sample ) )
-		{
-			m_unmuted.push_back(tk);
-		}
+		const auto pathForTrack = QDir{outputPath}.filePath(name);
+		m_renderJobQueue.emplace(pathForTrack, std::vector{track});
 	}
 
-	const TrackContainer::TrackList& t2 = Engine::patternStore()->tracks();
-	for (const auto& tk : t2)
-	{
-		Track::Type type = tk->type();
-
-		// Don't render automation tracks
-		if ( tk->isMuted() == false &&
-				( type == Track::Type::Instrument || type == Track::Type::Sample ) )
-		{
-			m_unmuted.push_back(tk);
-		}
-	}
-
-	// copy the list of unmuted tracks into our rendering queue.
-	// we need to remember which tracks were unmuted to restore state at the end.
-	m_tracksToRender = m_unmuted;
-	renderNextTrack();
+	startRender();
 }
 
 // Render the song into a single track
-void RenderManager::renderProject()
+void RenderManager::renderProject(const QString& outputPath)
 {
-	render( m_outputPath );
+	auto tracks = std::vector<Track*>{};
+
+	// TODO: Currently, only the song is exported (it will require changes and refactors in Song), but in the future we
+	// may want to generalize this function to work with any track container (e.g. the pattern store)
+	for (const auto& track : Engine::getSong()->tracks() | std::views::filter(&Track::isRenderable))
+	{
+		tracks.emplace_back(track);
+	}
+
+	m_renderJobQueue.emplace(outputPath, tracks);
+	startRender();
 }
 
-void RenderManager::renderTrack(Track* track)
+void RenderManager::renderTrack(Track* track, const QString& outputPath)
 {
 	assert(track);
 	assert(track->trackContainer());
 
-	for (auto& otherTrack : track->trackContainer()->tracks())
+	if (!track->isRenderable())
 	{
-		if (otherTrack == track || otherTrack->isMuted() || dynamic_cast<AutomationTrack*>(otherTrack)) { continue; }
-		m_unmuted.push_back(otherTrack);
+		qDebug("Track is not renderable");
+		return;
 	}
 
-	m_tracksToRender = {track};
-	renderNextTrack();
+	// TODO: Currently, only the song is exported (it will require changes and refactors in Song), but in the future we
+	// may want to generalize this function to work with any track container (e.g. the pattern store)
+	if (!dynamic_cast<Song*>(track->trackContainer()))
+	{
+		qDebug("Can only export tracks from the song");
+		return;
+	}
+
+	m_renderJobQueue.emplace(outputPath, std::vector{track});
+	startRender();
 }
 
-void RenderManager::render(QString outputPath)
+void RenderManager::startRender()
 {
-	m_activeRenderer = std::make_unique<ProjectRenderer>(m_outputSettings, m_format, outputPath);
+	m_totalRenderJobs = m_renderJobQueue.size();
+	storeMuteStates();
+	render();
+}
 
-	if( m_activeRenderer->isReady() )
+void RenderManager::renderFinished()
+{
+	restoreMuteStates();
+	render();
+}
+
+void RenderManager::render()
+{
+	if (m_renderJobQueue.empty())
 	{
-		// pass progress signals through
-		connect( m_activeRenderer.get(), SIGNAL(progressChanged(int)),
-				this, SIGNAL(progressChanged(int)));
+		emit finished();
+		return;
+	}
 
-		// when it is finished, render the next track.
-		// if we have not queued any tracks, renderNextTrack will just clean up
-		connect( m_activeRenderer.get(), SIGNAL(finished()),
-				this, SLOT(renderNextTrack()));
+	const auto job = m_renderJobQueue.front();
+	m_renderJobQueue.pop();
 
+	for (const auto& track : Engine::getSong()->tracks() | std::views::filter(&Track::isRenderable))
+	{
+		track->setMuted(
+			std::find(job.tracksToRender.begin(), job.tracksToRender.end(), track) == job.tracksToRender.end());
+	}
+
+	// TODO: We shouldn't need to allocate a new ProjectRenderer each time... we might also want to remove
+	// ProjectRenderer, merge it with RenderManager and use ThreadPool instead
+	m_activeRenderer = std::make_unique<ProjectRenderer>(m_outputSettings, m_format, job.path);
+
+	if (m_activeRenderer->isReady())
+	{
+		connect(m_activeRenderer.get(), &ProjectRenderer::progressChanged, this, &RenderManager::progressChanged);
+		connect(m_activeRenderer.get(), &ProjectRenderer::finished, this, &RenderManager::renderFinished);
 		m_activeRenderer->startProcessing();
 	}
 	else
 	{
-		qDebug( "Renderer failed to acquire a file device!" );
-		renderNextTrack();
+		qDebug("Renderer failed to acquire a file device");
+		m_renderJobQueue = std::queue<RenderJob>{};
 	}
-}
-
-// Unmute all tracks that were muted while rendering tracks
-void RenderManager::restoreMutedState()
-{
-	while (!m_unmuted.empty())
-	{
-		Track* restoreTrack = m_unmuted.back();
-		m_unmuted.pop_back();
-		restoreTrack->setMuted( false );
-	}
-}
-
-// Determine the output path for a track when rendering tracks individually
-QString RenderManager::pathForTrack(const Track *track, int num)
-{
-	QString extension = ProjectRenderer::getFileExtensionFromFormat( m_format );
-	QString name = track->name();
-	name = name.remove(QRegularExpression(FILENAME_FILTER));
-	name = QString( "%1_%2%3" ).arg( num ).arg( name ).arg( extension );
-	return QDir(m_outputPath).filePath(name);
 }
 
 void RenderManager::updateConsoleProgress()
 {
-	if ( m_activeRenderer )
+	if (m_activeRenderer)
 	{
 		m_activeRenderer->updateConsoleProgress();
+		std::cerr << "(" << (m_totalRenderJobs - m_renderJobQueue.size()) << "/" << m_totalRenderJobs << ")";
+	}
+}
 
-		int totalNum = m_unmuted.size();
-		if ( totalNum > 0 )
-		{
-			// we are rendering multiple tracks, append a track counter to the output
-			int trackNum = totalNum - m_tracksToRender.size();
-			fprintf( stderr, "(%d/%d)", trackNum, totalNum );
-		}
+void RenderManager::storeMuteStates()
+{
+	// TODO: Currently, only the song is exported (it will require changes and refactors in Song), but in the future we
+	// may want to generalize this function to work with any track container (e.g. the pattern store)
+	for (const auto& track : Engine::getSong()->tracks() | std::views::filter(&Track::isRenderable))
+	{
+		m_muteStates[track] = track->isMuted();
+	}
+}
+
+void RenderManager::restoreMuteStates()
+{
+	for (const auto& [track, muted] : m_muteStates)
+	{
+		track->setMuted(muted);
 	}
 }
 

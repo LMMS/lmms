@@ -83,6 +83,8 @@ public:
 		m_isPlaying = playing;
 	}
 
+	bool isRenderable() override { return true; }
+
 signals:
 	void playingChanged();
 

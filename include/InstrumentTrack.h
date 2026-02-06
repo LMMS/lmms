@@ -239,6 +239,8 @@ public:
 
 	void autoAssignMidiDevice( bool );
 
+	bool isRenderable() override { return true; }
+
 signals:
 	void instrumentChanged();
 	void midiNoteOn( const lmms::Note& );
