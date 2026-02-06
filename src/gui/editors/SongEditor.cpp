@@ -930,9 +930,8 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 
 	// Set up buttons
 	m_playAction->setToolTip(tr("Play song (Space)"));
-	m_recordAccompanyAction->setToolTip(tr("Record samples from Audio-device while playing song or pattern track"));
+	m_recordAccompanyAction->setToolTip(tr("Record samples from Audio-device during playback"));
 	m_stopAction->setToolTip(tr( "Stop song (Space)" ));
-
 
 	// Track actions
 	DropToolBar *trackActionsToolBar = addDropToolBarToTop(tr("Track actions"));
