@@ -69,6 +69,7 @@ ExportProjectDialog::ExportProjectDialog(const QString& path, Mode mode, QWidget
 	, m_fileFormatSettingsLayout(new QFormLayout(m_fileFormatSettingsGroupBox))
 	, m_exportAsLoopBox(new QCheckBox(tr("Export as loop (remove extra bar)")))
 	, m_exportBetweenLoopMarkersBox(new QCheckBox(tr("Export between loop markers")))
+	, m_importExportedTrackBox(new QCheckBox(tr("Import exported track")))
 	, m_loopRepeatLabel(new QLabel(tr("Render looped section:")))
 	, m_loopRepeatBox(new QSpinBox())
 	, m_startButton(new QPushButton(tr("Start")))
@@ -160,6 +161,13 @@ ExportProjectDialog::ExportProjectDialog(const QString& path, Mode mode, QWidget
 	auto exportSettingsLayout = new QVBoxLayout{exportSettingsGroupBox};
 	exportSettingsLayout->addWidget(m_exportAsLoopBox);
 	exportSettingsLayout->addWidget(m_exportBetweenLoopMarkersBox);
+
+	if (mode == Mode::ExportTrack)
+	{
+		m_importExportedTrackBox->setChecked(true);
+		exportSettingsLayout->addWidget(m_importExportedTrackBox);
+	}
+
 	exportSettingsLayout->addLayout(loopRepeatLayout);
 
 	m_fileFormatSettingsLayout->addRow(m_fileFormatLabel, m_fileFormatComboBox);
