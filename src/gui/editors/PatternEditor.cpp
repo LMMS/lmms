@@ -223,7 +223,7 @@ void PatternEditor::cloneClip()
 
 
 PatternEditorWindow::PatternEditorWindow(PatternStore* ps) :
-	Editor(false),
+	Editor(false, true, false),
 	m_editor(new PatternEditor(ps))
 {
 	setWindowIcon(embed::getIconPixmap("pattern_track_btn"));

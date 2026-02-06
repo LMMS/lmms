@@ -238,7 +238,7 @@ public:
 			m_loopRenderCount = count;
 		m_loopRenderRemaining = m_loopRenderCount;
 	}
-    
+
 	inline int getLoopRenderCount() const
 	{
 		return m_loopRenderCount;
@@ -381,7 +381,6 @@ public:
 
 public slots:
 	void playSong();
-	void record();
 	void playAndRecord();
 	void playPattern();
 	void playMidiClip( const lmms::MidiClip * midiClipToPlay, bool loop = true );
@@ -505,7 +504,7 @@ private:
 	bar_t m_elapsedBars;
 
 	VstSyncController m_vstSyncController;
-    
+
 	int m_loopRenderCount;
 	int m_loopRenderRemaining;
 	TimePos m_exportSongBegin;
