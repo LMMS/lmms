@@ -57,6 +57,9 @@ public:
 	//! The track is only used when the mode is set to `ExportTrack`.
 	void setTrack(Track* track) { m_track = track; }
 
+	//! @returns `true` if the exported track should be imported as a sample track, `false` otherwise
+	bool importExportedTrack();
+
 private:
 	void accept() override;
 	void reject() override;

@@ -303,4 +303,9 @@ void ExportProjectDialog::updateTitleBar(int prog)
 	setWindowTitle(tr("Rendering: %1%").arg(prog));
 }
 
+bool ExportProjectDialog::importExportedTrack()
+{
+	return m_importExportedTrackBox->isChecked();
+}
+
 } // namespace lmms::gui

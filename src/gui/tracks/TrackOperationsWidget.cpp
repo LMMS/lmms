@@ -42,6 +42,7 @@
 #include "FileDialog.h"
 #include "PatternStore.h"
 #include "ProjectRenderer.h"
+#include "SampleClip.h"
 #include "embed.h"
 #include "Engine.h"
 #include "InstrumentTrackView.h"
@@ -274,9 +275,28 @@ void TrackOperationsWidget::exportTrack()
 
 	if (dialog.exec() != QDialog::Accepted) { return; }
 
-	auto exportDialog = ExportProjectDialog{dialog.selectedFiles()[0], ExportProjectDialog::Mode::ExportTrack};
-	exportDialog.setTrack(m_trackView->getTrack());
-	exportDialog.exec();
+	const auto exportPath = dialog.selectedFiles()[0];
+	auto exportDialog = new ExportProjectDialog{exportPath, ExportProjectDialog::Mode::ExportTrack};
+	exportDialog->setAttribute(Qt::WA_DeleteOnClose);
+
+	connect(exportDialog, &ExportProjectDialog::finished, [this, exportDialog, exportPath](int result) {
+		if (!exportDialog->importExportedTrack()) { return; }
+
+		const auto trackContainerView = m_trackView->trackContainerView();
+		auto sampleTrack = Track::create(Track::Type::Sample, trackContainerView->model());
+		auto sampleTrackView = trackContainerView->createTrackView(sampleTrack);
+		auto sampleClip = new SampleClip(sampleTrack);
+
+		const auto indexOfTrack = trackContainerView->trackViews().indexOf(m_trackView);
+		assert(indexOfTrack != -1);
+
+		trackContainerView->moveTrackView(sampleTrackView, indexOfTrack + 1);
+		m_trackView->getTrack()->setMuted(true);
+		sampleClip->setSampleFile(exportPath);
+	});
+
+	exportDialog->setTrack(m_trackView->getTrack());
+	exportDialog->open();
 }
 
 void TrackOperationsWidget::selectTrackColor()
