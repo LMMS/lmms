@@ -95,7 +95,7 @@ void AutomatableSlider::mouseReleaseEvent( QMouseEvent * _me )
 	{
 		thisModel->restoreJournallingState();
 	}
-    
+
 	m_showStatus = false;
 	QSlider::mouseReleaseEvent( _me );
 }
