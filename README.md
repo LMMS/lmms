@@ -28,7 +28,7 @@
 What is LMMS?
 --------------
 
-LMMS is an open-source cross-platform digital audio workstation designed for music production. It includes an advanced Piano Roll, Beat Sequencer, Song Editor, and Mixer for composing, arranging, and mixing music. It comes with 15+ synthesizer plugins by default, along with VST(i) and SoundFont2 support.
+LMMS is an open-source cross-platform digital audio workstation designed for music production. It includes an advanced Piano Roll, Beat Sequencer, Song Editor, and Mixer for composing, arranging, and mixing music. It comes with 15+ synthesizer plugins by default, along with VST2 and SoundFont2 support.
 
 Features
 ---------
@@ -39,7 +39,7 @@ Features
 * A Mixer with unlimited mixer channels and arbitrary number of effects
 * Many powerful instrument and effect-plugins out of the box
 * Full user-defined track-based automation and computer-controlled automation sources
-* Compatible with many standards such as SoundFont2, VST(i), LADSPA, GUS Patches, and full MIDI support
+* Compatible with many standards such as SoundFont2, VST2 (instruments and effects), LADSPA, LV2, GUS Patches, and full MIDI support
 * MIDI file importing and exporting
 
 Building
