@@ -25,6 +25,8 @@
 #ifndef LMMS_GRID_MODEl_H
 #define LMMS_GRID_MODEl_H
 
+#include <atomic>
+#include <mutex>
 #include <set>
 #include <stddef.h>
 #include <vector>
@@ -46,6 +48,54 @@ static const unsigned int GRID_MAX_STEPS = 100000;
 	This class doesn't handle
 	1. constructing, storing, interacting or removing custom data in any way
 */
+
+struct GridLock
+{
+	void readLock()
+	{
+		if (m_isChanging)
+		{
+			m_lock.lock();
+			m_readers += 1;
+			m_lock.unlock();
+		}
+		else { m_readers += 1; }
+	}
+	void readRelease()
+	{
+		m_readers -= 1;
+	}
+	void writeLock()
+	{
+		m_lock.lock();
+		m_isChanging = true;
+		// let it spin until the readers are done
+		while (m_readers >= 1) {}
+	}
+	void writeRelease()
+	{
+		m_lock.unlock();
+	}
+
+	std::atomic<bool> m_isChanging = false;
+	std::atomic<int> m_readers = 0;
+	std::mutex m_lock;
+};
+class GridReadGuard
+{
+public:
+	GridReadGuard(GridLock& lock)
+		: m_lock{&lock}
+	{
+		m_lock->readLock();
+	}
+	~GridReadGuard()
+	{
+		m_lock->readRelease();
+	}
+private:
+	GridLock* m_lock;
+};
 
 class LMMS_EXPORT GridModel : public Model
 {
@@ -70,8 +120,8 @@ public:
 
 	//*** item management ***
 	//! @return new / final index (if x changed)
-	size_t setInfo(size_t index, const ItemInfo& info);
-	size_t setInfo(size_t index, const ItemInfo& info, unsigned int horizontalSteps, unsigned int verticalSteps);
+	size_t setInfo(size_t index, const ItemInfo& info); // TODO LOCK
+	size_t setInfo(size_t index, const ItemInfo& info, unsigned int horizontalSteps, unsigned int verticalSteps); // TODO LOCK
 	const Item& getItem(size_t index) const;
 	//! @return the index where [index - 1].x < xPos and xPos <= [index].x
 	//! so return the first index where xPos <= x (this index can be the size)
@@ -82,7 +132,7 @@ public:
 	size_t getCount() const;
 	unsigned int getLength() const;
 	unsigned int getHeight() const;
-	void resizeGrid(size_t length, size_t height);
+	void resizeGrid(size_t length, size_t height); // TODO LOCK
 	void setSteps(unsigned int horizontalSteps, unsigned int verticalSteps);
 
 	virtual ~GridModel();
@@ -92,9 +142,9 @@ protected:
 	virtual void dataChangedAt(signedSize index) {}
 
 	//! @return index where added
-	size_t addItem(Item itemIn);
-	void removeItem(size_t index);
-	void clearItems();
+	size_t addItem(Item itemIn); // TODO LOCK
+	void removeItem(size_t index); // TODO LOCK
+	void clearItems(); // TODO LOCK
 	//! DOESN'T EMIT, get and set index pointing to custom data
 	size_t& getAndSetObjectIndex(size_t index);
 private:
@@ -140,7 +190,7 @@ public:
 		: GridModel{length, height, horizontalSteps, verticalSteps, parent, displayName, defaultConstructed} {}
 	~GridModelTyped() = default;
 
-	const T& getObject(size_t index) const { return m_TCustomData[GridModel::getItem(index).objectIndex]; }
+	const T& getObject(size_t index) const { return m_TCustomData[GridModel::getItem(index).objectIndex]; } // TODO read lock
 	virtual void setObject(size_t index, T object)
 	{
 		m_TCustomData[GridModel::getItem(index).objectIndex] = object;
@@ -148,12 +198,12 @@ public:
 	}
 
 	//! @return index where added
-	size_t addItem(T object, ItemInfo info)
+	size_t addItem(T object, ItemInfo info) // TODO LOCK
 	{
 		m_TCustomData.push_back(object);
 		return GridModel::addItem(Item{info, m_TCustomData.size() - 1});
 	}
-	void removeItem(size_t index)
+	void removeItem(size_t index) // TODO LOCK
 	{
 		size_t customDataIndex{GridModel::getItem(index).objectIndex};
 		// the stored indexes need to be offset after removing (doing it before because of signals)
