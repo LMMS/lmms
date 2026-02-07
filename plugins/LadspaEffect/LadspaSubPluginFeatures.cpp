@@ -95,15 +95,6 @@ void LadspaSubPluginFeatures::fillDescriptionWidget( QWidget * _parent,
 		);
 	}
 
-	if (lm->isInplaceBroken(lkey))
-	{
-		labelText += QString{"<p><b>%1</b>%2</p>"}.arg(
-			QWidget::tr("In-place Broken: "),
-			QWidget::tr("This plugin cannot process audio &lsquo;in place&rsquo; and may cease to work correctly if "
-				"the host elects to use the same data location for both input and output.")
-		);
-	}
-
 	auto label = new QLabel(labelText, _parent);
 	label->setWordWrap(true);
 }
