@@ -597,7 +597,42 @@ void MidiClipView::paintEvent( QPaintEvent * )
 	}
 	else
 	{
-		p.fillRect( rect(), c );
+		if ( this->offset() == 0 )
+		{
+			p.fillRect( rect(), c );
+		}
+		// Draw loop views with a slight color difference and hatch them
+		else
+		{
+			p.fillRect( rect(), current ? c.lighter( 65 ) : c.darker( 150 ) );
+			p.setPen( c );
+
+			// Change the pen's width in a rather painfull way
+			QPen previousPen = p.pen();
+			QPen newPen = QPen(previousPen);
+			newPen.setWidth(2);
+			p.setPen(newPen);
+
+			for ( int x = -height(); x < width(); x += 10 )
+			{
+				int y1, y2;
+				y1 = 0;
+				if ( x < 0 )
+				{
+					y1 = -x;
+				}
+				y2 = height();
+				if ( x + height() > width() )
+				{
+					y2 = height() - ( x + height() - width() );
+				}
+				if ( y1 < height() && y2 > 0 )
+				{
+					p.drawLine( std::max( 0, x ), y1, std::min( width(), x + height() ), y2 );
+				}
+			}
+			p.setPen(previousPen);
+		}
 	}
 
 	// Check whether we will paint a text box and compute its potential height
@@ -835,25 +870,41 @@ void MidiClipView::paintEvent( QPaintEvent * )
 	}
 
 	// clip name
-	if (drawTextBox)
+	if ( drawTextBox && this->offset() == 0 )
 	{
 		paintTextLabel(m_clip->name(), p);
 	}
 
 	if( !( fixedClips() && beatClip ) )
 	{
-		// inner border
-		p.setPen( c.lighter( current ? 160 : 130 ) );
-		p.drawRect( 1, 1, rect().right() - BORDER_WIDTH,
-			rect().bottom() - BORDER_WIDTH );
+		if ( this->offset() == 0 )
+		{
+			// inner border
+			p.setPen( c.lighter( current ? 160 : 130 ) );
+			p.drawRect( 1, 1, rect().right() - BORDER_WIDTH,
+				rect().bottom() - BORDER_WIDTH );
 
-		// outer border
-		p.setPen( current ? c.lighter( 130 ) : c.darker( 300 ) );
-		p.drawRect( 0, 0, rect().right(), rect().bottom() );
+			// outer border
+			p.setPen( current ? c.lighter( 130 ) : c.darker( 300 ) );
+			p.drawRect( 0, 0, rect().right(), rect().bottom() );
+		}
+		// In case of a loop view, we don't draw inner border and don't draw borders between loop views
+		else
+		{
+			p.setPen( current ? c.lighter( 130 ) : c.darker( 300 ) );
+			p.drawLine( 0, 0, rect().right(), 0 );
+			p.drawLine( 0, rect().bottom(), rect().right(), rect().bottom() );
+
+			// Last loop view gets a right border
+			if ( this->offset() == m_clip->loopCount() )
+			{
+				p.drawLine( rect().right(), 0, rect().right(), rect().bottom() );
+			}
+		}
 	}
 
-	// draw the 'muted' pixmap only if the clip was manually muted
-	if( m_clip->isMuted() )
+	// draw the 'muted' pixmap only if the clip was manually muted, only on the root view
+	if( m_clip->isMuted() && this->offset() == 0 )
 	{
 		const int spacing = BORDER_WIDTH;
 		const int size = 14;
@@ -861,7 +912,7 @@ void MidiClipView::paintEvent( QPaintEvent * )
 			embed::getIconPixmap( "muted", size, size ) );
 	}
 	
-	if (m_marker)
+	if ( m_marker && this->offset() == 0 )
 	{
 		p.setPen(markerColor());
 		p.drawLine(m_markerPos, rect().bottom(), m_markerPos, rect().top());
