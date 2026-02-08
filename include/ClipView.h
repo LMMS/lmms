@@ -142,6 +142,7 @@ public slots:
 
 signals:
 	void closing();
+	void extandLoop();
 
 protected:
 	enum class ContextMenuAction
@@ -199,6 +200,11 @@ protected slots:
 	void updateLength();
 	void updatePosition();
 	void closeLoopViews();
+
+	/**
+	 * Create a new loop view
+	 */
+	virtual void loop() {};
 
 
 private:
@@ -270,10 +276,6 @@ private:
 	}
 	void updateCursor(QMouseEvent * me);
 
-	/**
-	 * Create a new loop view after this ()
-	 */
-	virtual void loop() {};
 } ;
 
 

@@ -83,6 +83,8 @@ protected slots:
 	void transposeSelection();
 	void clearNotesOutOfBounds();
 
+	virtual void loop();
+
 
 protected:
 	void constructContextMenu( QMenu * ) override;
@@ -114,8 +116,6 @@ private:
 	bool isResizableBeforeStart() override { return false; }
 	
 	bool destructiveSplitClip(const TimePos pos) override;
-
-	virtual void loop();
 } ;
 
 

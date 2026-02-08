@@ -994,6 +994,11 @@ void MidiClipView::loop()
 	{
 		MidiClipView* newLoop = new MidiClipView(m_clip, m_trackView, offset() + 1);
 		connect(this, SIGNAL(closing()), newLoop, SLOT(closeLoopViews()));
+		connect(this, SIGNAL(extandLoop()), newLoop, SLOT(loop()));
+	}
+	else
+	{
+		extandLoop();
 	}
 }
 
