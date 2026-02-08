@@ -4890,7 +4890,7 @@ void PianoRoll::updatePositionAccompany()
 		}
 		if( (int) pos > 0 )
 		{
-			m_timeLine->timeline()->setTicks(pos);
+			m_timeLine->timeline()->setTicks(pos, false); // Passing false to prevent any `positionJumped` signals from being emitted, since this movement is supposed to be smoothly tracking the Song's timeline, not the from user forcefully dragging it.
 			autoScroll( pos );
 		}
 	}
