@@ -1665,41 +1665,45 @@ QWidget * MonstroView::setupOperatorsView( QWidget * _parent )
 	auto view = new QWidget(_parent);
 	view-> setFixedSize( 250, 250 );
 
-	makeknob( m_osc1VolKnob, KNOBCOL1, O1ROW, tr( "Volume" ), "%", "osc1Knob" )
-	makeknob( m_osc1PanKnob, KNOBCOL2, O1ROW, tr( "Panning" ), "", "osc1Knob" )
-	makeknob( m_osc1CrsKnob, KNOBCOL3, O1ROW, tr( "Coarse detune" ), tr( " semitones" ), "osc1Knob" )
-	makeknob( m_osc1FtlKnob, KNOBCOL4, O1ROW, tr( "Fine tune left" ), tr( " cents" ), "osc1Knob" )
-	makeknob( m_osc1FtrKnob, KNOBCOL5, O1ROW, tr( "Fine tune right" ), tr( " cents" ), "osc1Knob" )
-	makeknob( m_osc1SpoKnob, KNOBCOL6, O1ROW, tr( "Stereo phase offset" ), tr( " deg" ), "osc1Knob" )
-	makeknob( m_osc1PwKnob,  KNOBCOL7, O1ROW, tr( "Pulse width" ), "%", "osc1Knob" )
+	auto makeTinyLed = [=, this](int x, int y, const QString& tooltip) -> PixmapButton* {
+		auto pb = new PixmapButton(view, nullptr);
+		pb->setCheckable(true);
+		pb->move(x, y);
+		pb->setActiveGraphic(PLUGIN_NAME::getIconPixmap("tinyled_on"));
+		pb->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("tinyled_off"));
+		pb->setToolTip(tooltip);
+		return pb;
+	};
 
-	m_osc1VolKnob -> setVolumeKnob( true );
+	m_osc1VolKnob = makeKnob<VolumeKnob>(view, KNOBCOL1, O1ROW, tr("Volume"), "%", "osc1Knob");
+	m_osc1PanKnob = makeKnob(view, KNOBCOL2, O1ROW, tr("Panning"), "", "osc1Knob");
+	m_osc1CrsKnob = makeKnob(view, KNOBCOL3, O1ROW, tr("Coarse detune"), tr(" semitones"), "osc1Knob");
+	m_osc1FtlKnob = makeKnob(view, KNOBCOL4, O1ROW, tr("Fine tune left"), tr(" cents"), "osc1Knob");
+	m_osc1FtrKnob = makeKnob(view, KNOBCOL5, O1ROW, tr("Fine tune right"), tr(" cents"), "osc1Knob");
+	m_osc1SpoKnob = makeKnob(view, KNOBCOL6, O1ROW, tr("Stereo phase offset"), tr(" deg"), "osc1Knob");
+	m_osc1PwKnob  = makeKnob(view, KNOBCOL7, O1ROW, tr("Pulse width"), "%", "osc1Knob");
 
-	maketinyled( m_osc1SSRButton, 230, 34, tr( "Send sync on pulse rise" ) )
-	maketinyled( m_osc1SSFButton, 230, 44, tr( "Send sync on pulse fall" ) )
+	m_osc1SSRButton = makeTinyLed(230, 34, tr("Send sync on pulse rise"));
+	m_osc1SSFButton = makeTinyLed(230, 44, tr("Send sync on pulse fall"));
 
-	makeknob( m_osc2VolKnob, KNOBCOL1, O2ROW, tr( "Volume" ), "%", "osc2Knob" )
-	makeknob( m_osc2PanKnob, KNOBCOL2, O2ROW, tr( "Panning" ), "", "osc2Knob" )
-	makeknob( m_osc2CrsKnob, KNOBCOL3, O2ROW, tr( "Coarse detune" ), tr( " semitones" ), "osc2Knob" )
-	makeknob( m_osc2FtlKnob, KNOBCOL4, O2ROW, tr( "Fine tune left" ), tr( " cents" ), "osc2Knob" )
-	makeknob( m_osc2FtrKnob, KNOBCOL5, O2ROW, tr( "Fine tune right" ), tr( " cents" ), "osc2Knob" )
-	makeknob( m_osc2SpoKnob, KNOBCOL6, O2ROW, tr( "Stereo phase offset" ), tr( " deg" ), "osc2Knob" )
-
-	m_osc2VolKnob -> setVolumeKnob( true );
+	m_osc2VolKnob = makeKnob<VolumeKnob>(view, KNOBCOL1, O2ROW, tr("Volume"), "%", "osc2Knob");
+	m_osc2PanKnob = makeKnob(view, KNOBCOL2, O2ROW, tr("Panning"), "", "osc2Knob");
+	m_osc2CrsKnob = makeKnob(view, KNOBCOL3, O2ROW, tr("Coarse detune"), tr(" semitones" ), "osc2Knob");
+	m_osc2FtlKnob = makeKnob(view, KNOBCOL4, O2ROW, tr("Fine tune left"), tr(" cents" ), "osc2Knob");
+	m_osc2FtrKnob = makeKnob(view, KNOBCOL5, O2ROW, tr("Fine tune right"), tr(" cents" ), "osc2Knob");
+	m_osc2SpoKnob = makeKnob(view, KNOBCOL6, O2ROW, tr("Stereo phase offset"), tr(" deg" ), "osc2Knob");
 
 	m_osc2WaveBox = new ComboBox( view );
 	m_osc2WaveBox -> setGeometry( 204, O2ROW + 7, 42, ComboBox::DEFAULT_HEIGHT );
 
-	maketinyled( m_osc2SyncHButton, 212, O2ROW - 3, tr( "Hard sync oscillator 2" ) )
-	maketinyled( m_osc2SyncRButton, 191, O2ROW - 3, tr( "Reverse sync oscillator 2" ) )
+	m_osc2SyncHButton = makeTinyLed(212, O2ROW - 3, tr("Hard sync oscillator 2"));
+	m_osc2SyncRButton = makeTinyLed(191, O2ROW - 3, tr("Reverse sync oscillator 2"));
 
-	makeknob( m_osc3VolKnob, KNOBCOL1, O3ROW, tr( "Volume" ), "%", "osc3Knob" )
-	makeknob( m_osc3PanKnob, KNOBCOL2, O3ROW, tr( "Panning" ), "", "osc3Knob" )
-	makeknob( m_osc3CrsKnob, KNOBCOL3, O3ROW, tr( "Coarse detune" ), tr( " semitones" ), "osc3Knob" )
-	makeknob( m_osc3SpoKnob, KNOBCOL4, O3ROW, tr( "Stereo phase offset" ), tr( " deg" ), "osc3Knob" )
-	makeknob( m_osc3SubKnob, KNOBCOL5, O3ROW, tr( "Sub-osc mix" ), "", "osc3Knob" )
-
-	m_osc3VolKnob -> setVolumeKnob( true );
+	m_osc3VolKnob = makeKnob<VolumeKnob>(view, KNOBCOL1, O3ROW, tr("Volume"), "%", "osc3Knob");
+	m_osc3PanKnob = makeKnob(view, KNOBCOL2, O3ROW, tr("Panning"), "", "osc3Knob");
+	m_osc3CrsKnob = makeKnob(view, KNOBCOL3, O3ROW, tr("Coarse detune"), tr(" semitones"), "osc3Knob");
+	m_osc3SpoKnob = makeKnob(view, KNOBCOL4, O3ROW, tr("Stereo phase offset"), tr(" deg"), "osc3Knob");
+	m_osc3SubKnob = makeKnob(view, KNOBCOL5, O3ROW, tr("Sub-osc mix"), "", "osc3Knob");
 
 	m_osc3Wave1Box = new ComboBox( view );
 	m_osc3Wave1Box -> setGeometry( 160, O3ROW + 7, 42, ComboBox::DEFAULT_HEIGHT );
@@ -1707,39 +1711,39 @@ QWidget * MonstroView::setupOperatorsView( QWidget * _parent )
 	m_osc3Wave2Box = new ComboBox( view );
 	m_osc3Wave2Box -> setGeometry( 204, O3ROW + 7, 42, ComboBox::DEFAULT_HEIGHT );
 
-	maketinyled( m_osc3SyncHButton, 212, O3ROW - 3, tr( "Hard sync oscillator 3" ) )
-	maketinyled( m_osc3SyncRButton, 191, O3ROW - 3, tr( "Reverse sync oscillator 3" ) )
+	m_osc3SyncHButton = makeTinyLed(212, O3ROW - 3, tr("Hard sync oscillator 3"));
+	m_osc3SyncRButton = makeTinyLed(191, O3ROW - 3, tr("Reverse sync oscillator 3"));
 
 	m_lfo1WaveBox = new ComboBox( view );
 	m_lfo1WaveBox -> setGeometry( 2, LFOROW + 7, 42, ComboBox::DEFAULT_HEIGHT );
 
-	maketsknob( m_lfo1AttKnob, LFOCOL1, LFOROW, tr( "Attack" ), " ms", "lfoKnob" )
-	maketsknob( m_lfo1RateKnob, LFOCOL2, LFOROW, tr( "Rate" ), " ms", "lfoKnob" )
-	makeknob( m_lfo1PhsKnob, LFOCOL3, LFOROW, tr( "Phase" ), tr( " deg" ), "lfoKnob" )
+	m_lfo1AttKnob = makeKnob<TempoSyncKnob>(view, LFOCOL1, LFOROW, tr("Attack"), " ms", "lfoKnob");
+	m_lfo1RateKnob = makeKnob<TempoSyncKnob>(view, LFOCOL2, LFOROW, tr("Rate"), " ms", "lfoKnob");
+	m_lfo1PhsKnob = makeKnob(view, LFOCOL3, LFOROW, tr("Phase"), tr(" deg"), "lfoKnob");
 
 	m_lfo2WaveBox = new ComboBox( view );
 	m_lfo2WaveBox -> setGeometry( 127, LFOROW + 7, 42, ComboBox::DEFAULT_HEIGHT );
 
-	maketsknob(m_lfo2AttKnob, LFOCOL4, LFOROW, tr("Attack"), " ms", "lfoKnob")
-	maketsknob(m_lfo2RateKnob, LFOCOL5, LFOROW, tr("Rate"), " ms", "lfoKnob")
-	makeknob(m_lfo2PhsKnob, LFOCOL6, LFOROW, tr("Phase"), tr(" deg"), "lfoKnob")
+	m_lfo2AttKnob = makeKnob<TempoSyncKnob>(view, LFOCOL4, LFOROW, tr("Attack"), " ms", "lfoKnob");
+	m_lfo2RateKnob = makeKnob<TempoSyncKnob>(view, LFOCOL5, LFOROW, tr("Rate"), " ms", "lfoKnob");
+	m_lfo2PhsKnob = makeKnob(view, LFOCOL6, LFOROW, tr("Phase"), tr(" deg"), "lfoKnob");
 
-	maketsknob(m_env1PreKnob, KNOBCOL1, E1ROW, tr("Pre-delay"), " ms", "envKnob")
-	maketsknob(m_env1AttKnob, KNOBCOL2, E1ROW, tr("Attack"), " ms", "envKnob")
-	maketsknob(m_env1HoldKnob, KNOBCOL3, E1ROW, tr("Hold"), " ms", "envKnob")
-	maketsknob(m_env1DecKnob, KNOBCOL4, E1ROW, tr("Decay"), " ms", "envKnob")
+	m_env1PreKnob = makeKnob<TempoSyncKnob>(view, KNOBCOL1, E1ROW, tr("Pre-delay"), " ms", "envKnob");
+	m_env1AttKnob = makeKnob<TempoSyncKnob>(view, KNOBCOL2, E1ROW, tr("Attack"), " ms", "envKnob");
+	m_env1HoldKnob = makeKnob<TempoSyncKnob>(view, KNOBCOL3, E1ROW, tr("Hold"), " ms", "envKnob");
+	m_env1DecKnob = makeKnob<TempoSyncKnob>(view, KNOBCOL4, E1ROW, tr("Decay"), " ms", "envKnob");
 
-	makeknob(m_env1SusKnob, KNOBCOL5, E1ROW, tr("Sustain"), "", "envKnob")
-	maketsknob(m_env1RelKnob, KNOBCOL6, E1ROW, tr("Release"), " ms", "envKnob")
-	makeknob(m_env1SlopeKnob, KNOBCOL7, E1ROW, tr("Slope"), "", "envKnob")
+	m_env1SusKnob = makeKnob(view, KNOBCOL5, E1ROW, tr("Sustain"), "", "envKnob");
+	m_env1RelKnob = makeKnob<TempoSyncKnob>(view, KNOBCOL6, E1ROW, tr("Release"), " ms", "envKnob");
+	m_env1SlopeKnob = makeKnob(view, KNOBCOL7, E1ROW, tr("Slope"), "", "envKnob");
 
-	maketsknob(m_env2PreKnob, KNOBCOL1, E2ROW, tr("Pre-delay"), " ms", "envKnob")
-	maketsknob(m_env2AttKnob, KNOBCOL2, E2ROW, tr("Attack"), " ms", "envKnob")
-	maketsknob(m_env2HoldKnob, KNOBCOL3, E2ROW, tr("Hold"), " ms", "envKnob")
-	maketsknob(m_env2DecKnob, KNOBCOL4, E2ROW, tr("Decay"), " ms", "envKnob")
-	makeknob(m_env2SusKnob, KNOBCOL5, E2ROW, tr("Sustain"), "", "envKnob")
-	maketsknob(m_env2RelKnob, KNOBCOL6, E2ROW, tr("Release"), " ms", "envKnob")
-	makeknob(m_env2SlopeKnob, KNOBCOL7, E2ROW, tr("Slope"), "", "envKnob")
+	m_env2PreKnob = makeKnob<TempoSyncKnob>(view, KNOBCOL1, E2ROW, tr("Pre-delay"), " ms", "envKnob");
+	m_env2AttKnob = makeKnob<TempoSyncKnob>(view, KNOBCOL2, E2ROW, tr("Attack"), " ms", "envKnob");
+	m_env2HoldKnob = makeKnob<TempoSyncKnob>(view, KNOBCOL3, E2ROW, tr("Hold"), " ms", "envKnob");
+	m_env2DecKnob = makeKnob<TempoSyncKnob>(view, KNOBCOL4, E2ROW, tr("Decay"), " ms", "envKnob");
+	m_env2SusKnob = makeKnob(view, KNOBCOL5, E2ROW, tr("Sustain"), "", "envKnob");
+	m_env2RelKnob = makeKnob<TempoSyncKnob>(view, KNOBCOL6, E2ROW, tr("Release"), " ms", "envKnob");
+	m_env2SlopeKnob = makeKnob(view, KNOBCOL7, E2ROW, tr("Slope"), "", "envKnob");
 
 	// mod selector
 	auto m_mixButton = new PixmapButton(view, nullptr);
@@ -1785,60 +1789,50 @@ QWidget * MonstroView::setupMatrixView( QWidget * _parent )
 	auto view = new QWidget(_parent);
 	view-> setFixedSize( 250, 250 );
 
-	makeknob( m_vol1env1Knob, MATCOL1, MATROW1, tr( "Modulation amount" ), "", "matrixKnob" )
-	makeknob( m_vol1env2Knob, MATCOL2, MATROW1, tr( "Modulation amount" ), "", "matrixKnob" )
-	makeknob( m_vol1lfo1Knob, MATCOL3, MATROW1, tr( "Modulation amount" ), "", "matrixKnob" )
-	makeknob( m_vol1lfo2Knob, MATCOL4, MATROW1, tr( "Modulation amount" ), "", "matrixKnob" )
-
-	makeknob( m_vol2env1Knob, MATCOL1, MATROW3, tr( "Modulation amount" ), "", "matrixKnob" )
-	makeknob( m_vol2env2Knob, MATCOL2, MATROW3, tr( "Modulation amount" ), "", "matrixKnob" )
-	makeknob( m_vol2lfo1Knob, MATCOL3, MATROW3, tr( "Modulation amount" ), "", "matrixKnob" )
-	makeknob( m_vol2lfo2Knob, MATCOL4, MATROW3, tr( "Modulation amount" ), "", "matrixKnob" )
-
-	makeknob( m_vol3env1Knob, MATCOL1, MATROW5, tr( "Modulation amount" ), "", "matrixKnob" )
-	makeknob( m_vol3env2Knob, MATCOL2, MATROW5, tr( "Modulation amount" ), "", "matrixKnob" )
-	makeknob( m_vol3lfo1Knob, MATCOL3, MATROW5, tr( "Modulation amount" ), "", "matrixKnob" )
-	makeknob( m_vol3lfo2Knob, MATCOL4, MATROW5, tr( "Modulation amount" ), "", "matrixKnob" )
-
-	makeknob( m_phs1env1Knob, MATCOL1, MATROW2, tr( "Modulation amount" ), "", "matrixKnob" )
-	makeknob( m_phs1env2Knob, MATCOL2, MATROW2, tr( "Modulation amount" ), "", "matrixKnob" )
-	makeknob( m_phs1lfo1Knob, MATCOL3, MATROW2, tr( "Modulation amount" ), "", "matrixKnob" )
-	makeknob( m_phs1lfo2Knob, MATCOL4, MATROW2, tr( "Modulation amount" ), "", "matrixKnob" )
-
-	makeknob( m_phs2env1Knob, MATCOL1, MATROW4, tr( "Modulation amount" ), "", "matrixKnob" )
-	makeknob( m_phs2env2Knob, MATCOL2, MATROW4, tr( "Modulation amount" ), "", "matrixKnob" )
-	makeknob( m_phs2lfo1Knob, MATCOL3, MATROW4, tr( "Modulation amount" ), "", "matrixKnob" )
-	makeknob( m_phs2lfo2Knob, MATCOL4, MATROW4, tr( "Modulation amount" ), "", "matrixKnob" )
-
-	makeknob( m_phs3env1Knob, MATCOL1, MATROW6, tr( "Modulation amount" ), "", "matrixKnob" )
-	makeknob( m_phs3env2Knob, MATCOL2, MATROW6, tr( "Modulation amount" ), "", "matrixKnob" )
-	makeknob( m_phs3lfo1Knob, MATCOL3, MATROW6, tr( "Modulation amount" ), "", "matrixKnob" )
-	makeknob( m_phs3lfo2Knob, MATCOL4, MATROW6, tr( "Modulation amount" ), "", "matrixKnob" )
-
-	makeknob( m_pit1env1Knob, MATCOL5, MATROW1, tr( "Modulation amount" ), "", "matrixKnob" )
-	makeknob( m_pit1env2Knob, MATCOL6, MATROW1, tr( "Modulation amount" ), "", "matrixKnob" )
-	makeknob( m_pit1lfo1Knob, MATCOL7, MATROW1, tr( "Modulation amount" ), "", "matrixKnob" )
-	makeknob( m_pit1lfo2Knob, MATCOL8, MATROW1, tr( "Modulation amount" ), "", "matrixKnob" )
-
-	makeknob( m_pit2env1Knob, MATCOL5, MATROW3, tr( "Modulation amount" ), "", "matrixKnob" )
-	makeknob( m_pit2env2Knob, MATCOL6, MATROW3, tr( "Modulation amount" ), "", "matrixKnob" )
-	makeknob( m_pit2lfo1Knob, MATCOL7, MATROW3, tr( "Modulation amount" ), "", "matrixKnob" )
-	makeknob( m_pit2lfo2Knob, MATCOL8, MATROW3, tr( "Modulation amount" ), "", "matrixKnob" )
-
-	makeknob( m_pit3env1Knob, MATCOL5, MATROW5, tr( "Modulation amount" ), "", "matrixKnob" )
-	makeknob( m_pit3env2Knob, MATCOL6, MATROW5, tr( "Modulation amount" ), "", "matrixKnob" )
-	makeknob( m_pit3lfo1Knob, MATCOL7, MATROW5, tr( "Modulation amount" ), "", "matrixKnob" )
-	makeknob( m_pit3lfo2Knob, MATCOL8, MATROW5, tr( "Modulation amount" ), "", "matrixKnob" )
-
-	makeknob( m_pw1env1Knob, MATCOL5, MATROW2, tr( "Modulation amount" ), "", "matrixKnob" )
-	makeknob( m_pw1env2Knob, MATCOL6, MATROW2, tr( "Modulation amount" ), "", "matrixKnob" )
-	makeknob( m_pw1lfo1Knob, MATCOL7, MATROW2, tr( "Modulation amount" ), "", "matrixKnob" )
-	makeknob( m_pw1lfo2Knob, MATCOL8, MATROW2, tr( "Modulation amount" ), "", "matrixKnob" )
-
-	makeknob( m_sub3env1Knob, MATCOL5, MATROW6, tr( "Modulation amount" ), "", "matrixKnob" )
-	makeknob( m_sub3env2Knob, MATCOL6, MATROW6, tr( "Modulation amount" ), "", "matrixKnob" )
-	makeknob( m_sub3lfo1Knob, MATCOL7, MATROW6, tr( "Modulation amount" ), "", "matrixKnob" )
-	makeknob( m_sub3lfo2Knob, MATCOL8, MATROW6, tr( "Modulation amount" ), "", "matrixKnob" )
+	m_vol1env1Knob = makeKnob(view, MATCOL1, MATROW1, tr("Modulation amount"), "", "matrixKnob");
+	m_vol1env2Knob = makeKnob(view, MATCOL2, MATROW1, tr("Modulation amount"), "", "matrixKnob");
+	m_vol1lfo1Knob = makeKnob(view, MATCOL3, MATROW1, tr("Modulation amount"), "", "matrixKnob");
+	m_vol1lfo2Knob = makeKnob(view, MATCOL4, MATROW1, tr("Modulation amount"), "", "matrixKnob");
+	m_vol2env1Knob = makeKnob(view, MATCOL1, MATROW3, tr("Modulation amount"), "", "matrixKnob");
+	m_vol2env2Knob = makeKnob(view, MATCOL2, MATROW3, tr("Modulation amount"), "", "matrixKnob");
+	m_vol2lfo1Knob = makeKnob(view, MATCOL3, MATROW3, tr("Modulation amount"), "", "matrixKnob");
+	m_vol2lfo2Knob = makeKnob(view, MATCOL4, MATROW3, tr("Modulation amount"), "", "matrixKnob");
+	m_vol3env1Knob = makeKnob(view, MATCOL1, MATROW5, tr("Modulation amount"), "", "matrixKnob");
+	m_vol3env2Knob = makeKnob(view, MATCOL2, MATROW5, tr("Modulation amount"), "", "matrixKnob");
+	m_vol3lfo1Knob = makeKnob(view, MATCOL3, MATROW5, tr("Modulation amount"), "", "matrixKnob");
+	m_vol3lfo2Knob = makeKnob(view, MATCOL4, MATROW5, tr("Modulation amount"), "", "matrixKnob");
+	m_phs1env1Knob = makeKnob(view, MATCOL1, MATROW2, tr("Modulation amount"), "", "matrixKnob");
+	m_phs1env2Knob = makeKnob(view, MATCOL2, MATROW2, tr("Modulation amount"), "", "matrixKnob");
+	m_phs1lfo1Knob = makeKnob(view, MATCOL3, MATROW2, tr("Modulation amount"), "", "matrixKnob");
+	m_phs1lfo2Knob = makeKnob(view, MATCOL4, MATROW2, tr("Modulation amount"), "", "matrixKnob");
+	m_phs2env1Knob = makeKnob(view, MATCOL1, MATROW4, tr("Modulation amount"), "", "matrixKnob");
+	m_phs2env2Knob = makeKnob(view, MATCOL2, MATROW4, tr("Modulation amount"), "", "matrixKnob");
+	m_phs2lfo1Knob = makeKnob(view, MATCOL3, MATROW4, tr("Modulation amount"), "", "matrixKnob");
+	m_phs2lfo2Knob = makeKnob(view, MATCOL4, MATROW4, tr("Modulation amount"), "", "matrixKnob");
+	m_phs3env1Knob = makeKnob(view, MATCOL1, MATROW6, tr("Modulation amount"), "", "matrixKnob");
+	m_phs3env2Knob = makeKnob(view, MATCOL2, MATROW6, tr("Modulation amount"), "", "matrixKnob");
+	m_phs3lfo1Knob = makeKnob(view, MATCOL3, MATROW6, tr("Modulation amount"), "", "matrixKnob");
+	m_phs3lfo2Knob = makeKnob(view, MATCOL4, MATROW6, tr("Modulation amount"), "", "matrixKnob");
+	m_pit1env1Knob = makeKnob(view, MATCOL5, MATROW1, tr("Modulation amount"), "", "matrixKnob");
+	m_pit1env2Knob = makeKnob(view, MATCOL6, MATROW1, tr("Modulation amount"), "", "matrixKnob");
+	m_pit1lfo1Knob = makeKnob(view, MATCOL7, MATROW1, tr("Modulation amount"), "", "matrixKnob");
+	m_pit1lfo2Knob = makeKnob(view, MATCOL8, MATROW1, tr("Modulation amount"), "", "matrixKnob");
+	m_pit2env1Knob = makeKnob(view, MATCOL5, MATROW3, tr("Modulation amount"), "", "matrixKnob");
+	m_pit2env2Knob = makeKnob(view, MATCOL6, MATROW3, tr("Modulation amount"), "", "matrixKnob");
+	m_pit2lfo1Knob = makeKnob(view, MATCOL7, MATROW3, tr("Modulation amount"), "", "matrixKnob");
+	m_pit2lfo2Knob = makeKnob(view, MATCOL8, MATROW3, tr("Modulation amount"), "", "matrixKnob");
+	m_pit3env1Knob = makeKnob(view, MATCOL5, MATROW5, tr("Modulation amount"), "", "matrixKnob");
+	m_pit3env2Knob = makeKnob(view, MATCOL6, MATROW5, tr("Modulation amount"), "", "matrixKnob");
+	m_pit3lfo1Knob = makeKnob(view, MATCOL7, MATROW5, tr("Modulation amount"), "", "matrixKnob");
+	m_pit3lfo2Knob = makeKnob(view, MATCOL8, MATROW5, tr("Modulation amount"), "", "matrixKnob");
+	m_pw1env1Knob  = makeKnob(view, MATCOL5, MATROW2, tr("Modulation amount"), "", "matrixKnob");
+	m_pw1env2Knob  = makeKnob(view, MATCOL6, MATROW2, tr("Modulation amount"), "", "matrixKnob");
+	m_pw1lfo1Knob  = makeKnob(view, MATCOL7, MATROW2, tr("Modulation amount"), "", "matrixKnob");
+	m_pw1lfo2Knob  = makeKnob(view, MATCOL8, MATROW2, tr("Modulation amount"), "", "matrixKnob");
+	m_sub3env1Knob = makeKnob(view, MATCOL5, MATROW6, tr("Modulation amount"), "", "matrixKnob");
+	m_sub3env2Knob = makeKnob(view, MATCOL6, MATROW6, tr("Modulation amount"), "", "matrixKnob");
+	m_sub3lfo1Knob = makeKnob(view, MATCOL7, MATROW6, tr("Modulation amount"), "", "matrixKnob");
+	m_sub3lfo2Knob = makeKnob(view, MATCOL8, MATROW6, tr("Modulation amount"), "", "matrixKnob");
 
 	return( view );
 }

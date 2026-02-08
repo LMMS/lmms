@@ -50,8 +50,6 @@ SimpleTextFloat * FloatModelEditorBase::s_textFloat = nullptr;
 FloatModelEditorBase::FloatModelEditorBase(DirectionOfManipulation directionOfManipulation, QWidget * parent, const QString & name) :
 	QWidget(parent),
 	FloatModelView(new FloatModel(0, 0, 0, 1, nullptr, name, true), this),
-	m_volumeKnob(false),
-	m_volumeRatio(100.0, 0.0, 1000000.0),
 	m_buttonPressed(false),
 	m_directionOfManipulation(directionOfManipulation)
 {
@@ -379,44 +377,23 @@ void FloatModelEditorBase::setPosition(const QPoint & p)
 
 void FloatModelEditorBase::enterValue()
 {
-	bool ok;
-	float new_val;
-
-	if (isVolumeKnob())
-	{
-		auto const initalValue = model()->getRoundedValue() / 100.0;
-		auto const initialDbValue = initalValue > 0. ? ampToDbfs(initalValue) : -96;
-
-		new_val = QInputDialog::getDouble(
-			this, tr("Set value"),
-			tr("Please enter a new value between -96.0 dBFS and %1 dBFS:").arg(ampToDbfs(model()->maxValue() / 100.0f)),
-				initialDbValue, -96.0, ampToDbfs(model()->maxValue() / 100.0f), model()->getDigitCount(), &ok);
-
-		if (new_val <= -96.0)
-		{
-			new_val = 0.0f;
-		}
-		else
-		{
-			new_val = dbfsToAmp(new_val) * 100.0;
-		}
-	}
-	else
-	{
-		new_val = QInputDialog::getDouble(
-				this, tr("Set value"),
-				tr("Please enter a new value between "
-						"%1 and %2:").
-						arg(model()->minValue()).
-						arg(model()->maxValue()),
-					model()->getRoundedValue(),
-					model()->minValue(),
-					model()->maxValue(), model()->getDigitCount(), &ok);
-	}
+	bool ok = false;
+	const float newVal = QInputDialog::getDouble(
+		this,
+		tr("Set value"),
+		tr("Please enter a new value between %1 and %2:")
+			.arg(model()->minValue())
+			.arg(model()->maxValue()),
+		model()->getRoundedValue(),
+		model()->minValue(),
+		model()->maxValue(),
+		model()->getDigitCount(),
+		&ok
+	);
 
 	if (ok)
 	{
-		model()->setValue(new_val);
+		model()->setValue(newVal);
 	}
 }
 
@@ -438,14 +415,6 @@ void FloatModelEditorBase::friendlyUpdate()
 
 QString FloatModelEditorBase::pullFloatingText() const
 {
-	if (isVolumeKnob())
-	{
-		auto const valueToVolumeRatio = model()->getRoundedValue() / volumeRatio();
-		return valueToVolumeRatio == 0.
-			? QString("-∞ dBFS")
-			: QString("%1 dBFS").arg(ampToDbfs(valueToVolumeRatio), 3, 'f', 2);
-	}
-
 	return QString::number(model()->getRoundedValue()) + m_unit;
 }
 
