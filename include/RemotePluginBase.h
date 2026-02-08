@@ -31,7 +31,6 @@
 #include <cstdlib>
 #include <cstring>
 #include <string>
-#include <type_traits>
 
 #include "lmmsconfig.h"
 
@@ -371,10 +370,10 @@ public:
 		{
 		}
 
-		template<class T> requires (std::is_same_v<std::remove_cvref_t<T>, std::string>)
-		message& addString(T&& s)
+		template<class... Args>
+		message& addString(Args&&... args)
 		{
-			data.emplace_back(std::forward<T>(s));
+			data.emplace_back(std::forward<Args>(args)...);
 			return *this;
 		}
 

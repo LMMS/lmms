@@ -132,6 +132,8 @@ public slots:
 	void loadProgramNames();
 	void loadParameterLabels();
 	void loadParameterDisplays();
+	void updateParameterLabel(int index);
+	void updateParameterDisplay(int index);
 	void savePreset();
 	void setParam( int i, float f );
 	void idleUpdate();

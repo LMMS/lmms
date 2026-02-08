@@ -456,7 +456,7 @@ bool VstPlugin::processMessage( const message & _m )
 			m_allProgramNames = _m.getQString();
 			break;
 
-		case IdVstAllParameterLabels:
+		case IdVstLoadAllParameterLabels:
 		{
 			const auto labels = _m.getQString();
 			m_allParameterLabels.clear();
@@ -469,7 +469,7 @@ bool VstPlugin::processMessage( const message & _m )
 			break;
 		}
 
-		case IdVstAllParameterDisplays:
+		case IdVstLoadAllParameterDisplays:
 		{
 			const auto displays = _m.getQString();
 			m_allParameterDisplays.clear();
@@ -481,6 +481,14 @@ bool VstPlugin::processMessage( const message & _m )
 			}
 			break;
 		}
+
+		case IdVstUpdateParameterLabel:
+			m_allParameterLabels.at(static_cast<std::size_t>(_m.getInt())) = _m.getQString();
+			break;
+
+		case IdVstUpdateParameterDisplay:
+			m_allParameterDisplays.at(static_cast<std::size_t>(_m.getInt())) = _m.getQString();
+			break;
 
 		case IdVstPluginUniqueID:
 			// TODO: display graphically in case of failure
@@ -572,8 +580,8 @@ void VstPlugin::loadProgramNames()
 void VstPlugin::loadParameterLabels()
 {
 	lock();
-	sendMessage(message(IdVstAllParameterLabels));
-	waitForMessage(IdVstAllParameterLabels, true);
+	sendMessage(message(IdVstLoadAllParameterLabels));
+	waitForMessage(IdVstLoadAllParameterLabels, true);
 	unlock();
 }
 
@@ -583,8 +591,30 @@ void VstPlugin::loadParameterLabels()
 void VstPlugin::loadParameterDisplays()
 {
 	lock();
-	sendMessage(message(IdVstAllParameterDisplays));
-	waitForMessage(IdVstAllParameterDisplays, true);
+	sendMessage(message(IdVstLoadAllParameterDisplays));
+	waitForMessage(IdVstLoadAllParameterDisplays, true);
+	unlock();
+}
+
+
+
+
+void VstPlugin::updateParameterLabel(int index)
+{
+	lock();
+	sendMessage(message(IdVstUpdateParameterLabel).addInt(index));
+	waitForMessage(IdVstUpdateParameterLabel, true);
+	unlock();
+}
+
+
+
+
+void VstPlugin::updateParameterDisplay(int index)
+{
+	lock();
+	sendMessage(message(IdVstUpdateParameterDisplay).addInt(index));
+	waitForMessage(IdVstUpdateParameterDisplay, true);
 	unlock();
 }
 
