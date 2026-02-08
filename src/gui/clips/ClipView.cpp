@@ -1134,7 +1134,7 @@ void ClipView::contextMenuEvent( QContextMenuEvent * cme )
 	if ( m_clip->loopable() )
 	{
 		contextMenu.addAction(
-			embed::getIconPixmap( "edit_paste" ),
+			embed::getIconPixmap( "loop_points_on" ),
 			tr( "Loop" ),
 			[this](){ contextMenuAction( ContextMenuAction::Loop ); } );
 	}
