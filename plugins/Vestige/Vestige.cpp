@@ -28,6 +28,7 @@
 
 #include "Vestige.h"
 
+#include <cassert>
 #include <memory>
 
 #include <QDropEvent>
@@ -962,7 +963,7 @@ ManageVestigeInstrumentView::ManageVestigeInstrumentView( Instrument * _instrume
 	const QMap<QString, QString> & dump = m_vi->m_plugin->parameterDump();
 	m_vi->paramCount = dump.size();
 
-	vstKnobs = new CustomTextKnob *[ m_vi->paramCount ];
+	m_vstKnobs.reserve(m_vi->paramCount);
 
 	bool hasKnobModel = true;
 	if (m_vi->knobFModel == nullptr) {
@@ -982,7 +983,7 @@ ManageVestigeInstrumentView::ManageVestigeInstrumentView( Instrument * _instrume
 
 		auto knob = new CustomTextKnob(KnobType::Bright26, description.left(15), this, description);
 		knob->setDescription(description + ":");
-		vstKnobs[i] = knob;
+		m_vstKnobs.push_back(knob);
 
 		if( !hasKnobModel )
 		{
@@ -994,7 +995,7 @@ ManageVestigeInstrumentView::ManageVestigeInstrumentView( Instrument * _instrume
 		FloatModel * model = m_vi->knobFModel[i];
 		connect( model, &FloatModel::dataChanged, this,
 			[this, model]() { setParameter( model ); }, Qt::DirectConnection);
-		vstKnobs[i] ->setModel( model );
+		knob->setModel(model);
 	}
 	syncParameterText();
 
@@ -1005,7 +1006,7 @@ ManageVestigeInstrumentView::ManageVestigeInstrumentView( Instrument * _instrume
 		{
 			if( i < m_vi->paramCount )
 			{
-				l->addWidget( vstKnobs[i], lrow, lcolumn, Qt::AlignCenter );
+				l->addWidget(m_vstKnobs[i], lrow, lcolumn, Qt::AlignCenter);
 			}
 			i++;
 		}
@@ -1071,12 +1072,12 @@ void ManageVestigeInstrumentView::displayAutomatedOnly( void )
 
 		if( !( m_vi->knobFModel[ i ]->isAutomated() || m_vi->knobFModel[ i ]->controllerConnection() ) )
 		{
-			if( vstKnobs[ i ]->isVisible() == true  && isAuto )
+			if (m_vstKnobs[i]->isVisible() && isAuto)
 			{
-				vstKnobs[ i ]->hide();
+				m_vstKnobs[i]->hide();
 				m_displayAutomatedOnly->setText( "All" );
 			} else {
-				vstKnobs[ i ]->show();
+				m_vstKnobs[i]->show();
 				m_displayAutomatedOnly->setText( "Automated" );
 			}
 		}
@@ -1091,13 +1092,8 @@ ManageVestigeInstrumentView::~ManageVestigeInstrumentView()
 		for( int i = 0; i < m_vi->paramCount; i++ )
 		{
 			delete m_vi->knobFModel[ i ];
-			delete vstKnobs[ i ];
+			delete m_vstKnobs[i];
 		}
-	}
-
-	if (vstKnobs != nullptr) {
-		delete []vstKnobs;
-		vstKnobs = nullptr;
 	}
 
 	if( m_vi->knobFModel != nullptr )
@@ -1141,29 +1137,13 @@ void ManageVestigeInstrumentView::syncParameterText()
 	m_vi->m_plugin->loadParameterLabels();
 	m_vi->m_plugin->loadParameterDisplays();
 
-	QString paramLabelStr   = m_vi->m_plugin->allParameterLabels();
-	QString paramDisplayStr = m_vi->m_plugin->allParameterDisplays();
+	const auto& paramLabels = m_vi->m_plugin->allParameterLabels();
+	const auto& paramDisplays = m_vi->m_plugin->allParameterDisplays();
+	assert(paramLabels.size() == paramDisplays.size());
 
-	QStringList paramLabelList;
-	QStringList paramDisplayList;
-
-	for( int i = 0; i < paramLabelStr.size(); )
+	for (std::size_t i = 0; i < paramLabels.size(); ++i)
 	{
-		const int length = paramLabelStr[i].digitValue();
-		paramLabelList.append(paramLabelStr.mid(i + 1, length));
-		i += length + 1;
-	}
-
-	for( int i = 0; i < paramDisplayStr.size(); )
-	{
-		const int length = paramDisplayStr[i].digitValue();
-		paramDisplayList.append(paramDisplayStr.mid(i + 1, length));
-		i += length + 1;
-	}
-
-	for( int i = 0; i < paramLabelList.size(); ++i )
-	{
-		vstKnobs[i]->setValueText(paramDisplayList[i] + ' ' + paramLabelList[i]);
+		m_vstKnobs[i]->setValueText(paramDisplays[i] + ' ' + paramLabels[i]);
 	}
 }
 

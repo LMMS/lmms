@@ -246,9 +246,9 @@ public:
 	// determine name of current program
 	const char * programName();
 
-	void getParameterDisplays();
+	void getAllParameterDisplays();
 
-	void getParameterLabels();
+	void getAllParameterLabels();
 
 	// send name of current program back to host
 	void sendCurrentProgramName();
@@ -675,7 +675,7 @@ bool RemoteVstPlugin::processMessage( const message & _m )
 			break;
 
 		case IdVstParameterLabels:
-			getParameterLabels();
+			getAllParameterLabels();
 			break;
 
 
@@ -1223,10 +1223,10 @@ void RemoteVstPlugin::getParameterDisplays()
 
 
 // join the ParameterLabels (units) and send them to host
-void RemoteVstPlugin::getParameterLabels()
+void RemoteVstPlugin::getAllParameterLabels()
 {
 	std::string paramLabels;
-	static char buf[9]; // buffer for getting string
+	char buf[9]; // buffer for getting string
 	for (int i=0; i< m_plugin->numParams; ++i)
 	{
 		memset( buf, 0, sizeof( buf ) ); // fill with '\0' because got string may not to be ended with '\0'
@@ -1238,7 +1238,7 @@ void RemoteVstPlugin::getParameterLabels()
 		paramLabels += buf;
 	}
 
-	sendMessage( message( IdVstParameterLabels ).addString( paramLabels.c_str() ) );
+	sendMessage(message(IdVstAllParameterLabels).addString(std::move(paramLabels)));
 }
 
 

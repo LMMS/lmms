@@ -91,12 +91,12 @@ public:
 		return m_allProgramNames;
 	}
 
-	inline const QString& allParameterLabels() const
+	const std::vector<QString>& allParameterLabels() const
 	{
 		return m_allParameterLabels;
 	}
 
-	inline const QString& allParameterDisplays() const
+	const std::vector<QString>& allParameterDisplays() const
 	{
 		return m_allParameterDisplays;
 	}
@@ -160,8 +160,8 @@ private:
 	QString m_productString;
 	QString m_currentProgramName;
 	QString m_allProgramNames;
-	QString m_allParameterLabels;
-	QString m_allParameterDisplays;
+	std::vector<QString> m_allParameterLabels;
+	std::vector<QString> m_allParameterDisplays;
 
 	QString p_name;
 

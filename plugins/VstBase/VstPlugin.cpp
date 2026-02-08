@@ -456,13 +456,31 @@ bool VstPlugin::processMessage( const message & _m )
 			m_allProgramNames = _m.getQString();
 			break;
 
-		case IdVstParameterLabels:
-			m_allParameterLabels = _m.getQString();
+		case IdVstAllParameterLabels:
+		{
+			const auto labels = _m.getQString();
+			m_allParameterLabels.clear();
+			for (int i = 0; i < labels.size();)
+			{
+				const int length = labels[i].digitValue();
+				m_allParameterLabels.push_back(labels.mid(i + 1, length));
+				i += length + 1;
+			}
 			break;
+		}
 
-		case IdVstParameterDisplays:
-			m_allParameterDisplays = _m.getQString();
+		case IdVstAllParameterDisplays:
+		{
+			const auto displays = _m.getQString();
+			m_allParameterDisplays.clear();
+			for (int i = 0; i < displays.size();)
+			{
+				const int length = displays[i].digitValue();
+				m_allParameterDisplays.push_back(displays.mid(i + 1, length));
+				i += length + 1;
+			}
 			break;
+		}
 
 		case IdVstPluginUniqueID:
 			// TODO: display graphically in case of failure
@@ -554,8 +572,8 @@ void VstPlugin::loadProgramNames()
 void VstPlugin::loadParameterLabels()
 {
 	lock();
-	sendMessage( message( IdVstParameterLabels ) );
-	waitForMessage( IdVstParameterLabels, true );
+	sendMessage(message(IdVstAllParameterLabels));
+	waitForMessage(IdVstAllParameterLabels, true);
 	unlock();
 }
 
@@ -565,8 +583,8 @@ void VstPlugin::loadParameterLabels()
 void VstPlugin::loadParameterDisplays()
 {
 	lock();
-	sendMessage( message( IdVstParameterDisplays ) );
-	waitForMessage( IdVstParameterDisplays, true );
+	sendMessage(message(IdVstAllParameterDisplays));
+	waitForMessage(IdVstAllParameterDisplays, true);
 	unlock();
 }
 

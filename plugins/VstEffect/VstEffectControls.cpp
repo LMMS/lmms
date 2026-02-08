@@ -22,6 +22,9 @@
  *
  */
 
+#include "VstEffectControls.h"
+
+#include <cassert>
 #include <QAction>
 #include <QDomElement>
 #include <QGridLayout>
@@ -31,7 +34,6 @@
 
 #include "embed.h"
 #include "CustomTextKnob.h"
-#include "VstEffectControls.h"
 #include "VstEffectControlDialog.h"
 #include "VstEffect.h"
 #include "VstPlugin.h"
@@ -362,7 +364,7 @@ ManageVSTEffectView::ManageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 	const QMap<QString, QString> & dump = m_effect->m_plugin->parameterDump();
 	m_vi->paramCount = dump.size();
 
-	vstKnobs = new CustomTextKnob *[ m_vi->paramCount ];
+	m_vstKnobs.reserve(m_vi->paramCount);
 
 	bool hasKnobModel = true;
 	if (m_vi->knobFModel.empty())
@@ -383,7 +385,7 @@ ManageVSTEffectView::ManageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 
 		auto knob = new CustomTextKnob(KnobType::Bright26, description.left(15), widget, description);
 		knob->setDescription(description + ":");
-		vstKnobs[i] = knob;
+		m_vstKnobs.push_back(knob);
 
 		if( !hasKnobModel )
 		{
@@ -395,7 +397,7 @@ ManageVSTEffectView::ManageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 		FloatModel * model = m_vi->knobFModel[i];
 		connect( model, &FloatModel::dataChanged, this,
 			[this, model]() { setParameter( model ); }, Qt::DirectConnection);
-		vstKnobs[ i ] ->setModel( model );
+		knob->setModel(model);
 	}
 	syncParameterText();
 
@@ -406,7 +408,7 @@ ManageVSTEffectView::ManageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 		{
 			if( i < m_vi->paramCount )
 			{
-				l->addWidget( vstKnobs[i], lrow, lcolumn, Qt::AlignCenter );
+				l->addWidget(m_vstKnobs[i], lrow, lcolumn, Qt::AlignCenter);
 			}
 			i++;
 		}
@@ -474,12 +476,12 @@ void ManageVSTEffectView::displayAutomatedOnly()
 		if( !( m_vi2->knobFModel[ i ]->isAutomated() ||
 					m_vi2->knobFModel[ i ]->controllerConnection() ) )
 		{
-			if( vstKnobs[ i ]->isVisible() == true  && isAuto )
+			if (m_vstKnobs[i]->isVisible() && isAuto)
 			{
-				vstKnobs[ i ]->hide();
+				m_vstKnobs[i]->hide();
 				m_displayAutomatedOnly->setText( "All" );
 			} else {
-				vstKnobs[ i ]->show();
+				m_vstKnobs[i]->show();
 				m_displayAutomatedOnly->setText( "Automated" );
 			}
 		}
@@ -504,29 +506,13 @@ void ManageVSTEffectView::syncParameterText()
 	m_effect->m_plugin->loadParameterLabels();
 	m_effect->m_plugin->loadParameterDisplays();
 
-	QString paramLabelStr   = m_effect->m_plugin->allParameterLabels();
-	QString paramDisplayStr = m_effect->m_plugin->allParameterDisplays();
+	const auto& paramLabels = m_effect->m_plugin->allParameterLabels();
+	const auto& paramDisplays = m_effect->m_plugin->allParameterDisplays();
+	assert(paramLabels.size() == paramDisplays.size());
 
-	QStringList paramLabelList;
-	QStringList paramDisplayList;
-
-	for( int i = 0; i < paramLabelStr.size(); )
+	for (std::size_t i = 0; i < paramLabels.size(); ++i)
 	{
-		const int length = paramLabelStr[i].digitValue();
-		paramLabelList.append(paramLabelStr.mid(i + 1, length));
-		i += length + 1;
-	}
-
-	for( int i = 0; i < paramDisplayStr.size(); )
-	{
-		const int length = paramDisplayStr[i].digitValue();
-		paramDisplayList.append(paramDisplayStr.mid(i + 1, length));
-		i += length + 1;
-	}
-
-	for( int i = 0; i < paramLabelList.size(); ++i )
-	{
-		vstKnobs[i]->setValueText(paramDisplayList[i] + ' ' + paramLabelList[i]);
+		m_vstKnobs[i]->setValueText(paramDisplays[i] + ' ' + paramLabels[i]);
 	}
 }
 
@@ -539,14 +525,8 @@ ManageVSTEffectView::~ManageVSTEffectView()
 		for( int i = 0; i < m_vi2->paramCount; i++ )
 		{
 			delete m_vi2->knobFModel[ i ];
-			delete vstKnobs[ i ];
+			delete m_vstKnobs[i];
 		}
-	}
-
-	if( vstKnobs != nullptr )
-	{
-		delete [] vstKnobs;
-		vstKnobs = nullptr;
 	}
 
 	m_vi2->knobFModel.clear();
