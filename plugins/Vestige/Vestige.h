@@ -46,8 +46,8 @@ class VstPlugin;
 
 namespace gui
 {
+class Knob;
 class PixmapButton;
-class CustomTextKnob;
 class VestigeInstrumentView;
 class ManageVestigeInstrumentView;
 } // namespace gui
@@ -115,6 +115,7 @@ protected slots:
 	void displayAutomatedOnly();
 	void setParameter( lmms::Model * action );
 	void syncParameterText();
+	void updateParameterText(int index);
 	void closeWindow();
 
 
@@ -132,7 +133,7 @@ private:
 	QPushButton * m_syncButton;
 	QPushButton * m_displayAutomatedOnly;
 	QPushButton * m_closeButton;
-	std::vector<CustomTextKnob*> m_vstKnobs;
+	std::vector<Knob*> m_vstKnobs;
 };
 
 

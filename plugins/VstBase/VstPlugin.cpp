@@ -483,11 +483,11 @@ bool VstPlugin::processMessage( const message & _m )
 		}
 
 		case IdVstUpdateParameterLabel:
-			m_allParameterLabels.at(static_cast<std::size_t>(_m.getInt())) = _m.getQString();
+			m_allParameterLabels.at(static_cast<std::size_t>(_m.getInt(0))) = _m.getQString(1);
 			break;
 
 		case IdVstUpdateParameterDisplay:
-			m_allParameterDisplays.at(static_cast<std::size_t>(_m.getInt())) = _m.getQString();
+			m_allParameterDisplays.at(static_cast<std::size_t>(_m.getInt(0))) = _m.getQString(1);
 			break;
 
 		case IdVstPluginUniqueID:

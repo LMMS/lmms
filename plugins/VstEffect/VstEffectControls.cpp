@@ -33,7 +33,8 @@
 #include <QScrollArea>
 
 #include "embed.h"
-#include "CustomTextKnob.h"
+#include "FontHelper.h"
+#include "Knob.h"
 #include "VstEffectControlDialog.h"
 #include "VstEffect.h"
 #include "VstPlugin.h"
@@ -383,8 +384,13 @@ ManageVSTEffectView::ManageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 
 		const auto & description = s_dumpValues.at(1);
 
-		auto knob = new CustomTextKnob(KnobType::Bright26, description.left(15), widget, description);
+		auto knob = new Knob(KnobType::Bright26, description.left(15), SMALL_FONT_SIZE, widget, description);
 		knob->setDescription(description + ":");
+		knob->setFloatingTextPushMode(10);
+		connect(knob, &Knob::floatingTextUpdateRequested, this, [i, this]() {
+			updateParameterText(i);
+		}, Qt::DirectConnection);
+
 		m_vstKnobs.push_back(knob);
 
 		if( !hasKnobModel )
@@ -497,7 +503,6 @@ void ManageVSTEffectView::setParameter( Model * action )
 
 	if ( m_effect->m_plugin != nullptr ) {
 		m_effect->m_plugin->setParam( knobUNID, m_vi2->knobFModel[knobUNID]->value() );
-		syncParameterText();
 	}
 }
 
@@ -512,11 +517,21 @@ void ManageVSTEffectView::syncParameterText()
 
 	for (std::size_t i = 0; i < paramLabels.size(); ++i)
 	{
-		m_vstKnobs[i]->setValueText(paramDisplays[i] + ' ' + paramLabels[i]);
+		m_vstKnobs[i]->pushFloatingText(paramDisplays[i] + ' ' + paramLabels[i]);
 	}
 }
 
+void ManageVSTEffectView::updateParameterText(int index)
+{
+	m_effect->m_plugin->updateParameterLabel(index);
+	m_effect->m_plugin->updateParameterDisplay(index);
 
+	const auto& paramLabels = m_effect->m_plugin->allParameterLabels();
+	const auto& paramDisplays = m_effect->m_plugin->allParameterDisplays();
+	assert(paramLabels.size() == paramDisplays.size());
+
+	m_vstKnobs.at(index)->pushFloatingText(paramDisplays[index] + ' ' + paramLabels[index]);
+}
 
 ManageVSTEffectView::~ManageVSTEffectView()
 {

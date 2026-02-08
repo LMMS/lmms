@@ -52,6 +52,8 @@ SimpleTextFloat::SimpleTextFloat() :
 	m_hideTimer = new QTimer(this);
 	m_hideTimer->setSingleShot(true);
 	QObject::connect(m_hideTimer, &QTimer::timeout, this, &SimpleTextFloat::hide);
+
+	m_refreshTimer = new QTimer(this);
 }
 
 void SimpleTextFloat::setText(const QString & text)
@@ -76,11 +78,44 @@ void SimpleTextFloat::showWithDelay(int msecBeforeDisplay, int msecDisplayTime)
 	}
 }
 
+void SimpleTextFloat::show()
+{
+	if (m_refreshTimer->interval() > 0 && !m_refreshTimer->isActive())
+	{
+		// Emit timeout signal once at very start
+		const auto interval = m_refreshTimer->interval();
+		m_refreshTimer->setSingleShot(true);
+		m_refreshTimer->start(0);
+		m_refreshTimer->setSingleShot(false);
+		m_refreshTimer->setInterval(interval);
+
+		// Now start timer normally
+		m_refreshTimer->start();
+	}
+
+	QWidget::show();
+}
+
 void SimpleTextFloat::hide()
 {
+	disconnect(m_textUpdateConnection);
 	m_showTimer->stop();
 	m_hideTimer->stop();
+	m_refreshTimer->stop();
 	QWidget::hide();
+}
+
+void SimpleTextFloat::setRefreshRate(int timesPerSecond)
+{
+	if (timesPerSecond > 0)
+	{
+		m_refreshTimer->setInterval(1000 / timesPerSecond);
+	}
+	else
+	{
+		m_refreshTimer->stop();
+		m_refreshTimer->setInterval(0);
+	}
 }
 
 } // namespace lmms::gui

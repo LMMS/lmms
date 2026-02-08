@@ -43,13 +43,13 @@
 
 #include "AudioEngine.h"
 #include "ConfigManager.h"
-#include "CustomTextKnob.h"
 #include "Engine.h"
 #include "FileDialog.h"
 #include "GuiApplication.h"
 #include "FontHelper.h"
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
+#include "Knob.h"
 #include "LocaleHelper.h"
 #include "MainWindow.h"
 #include "PathUtil.h"
@@ -59,7 +59,6 @@
 #include "SubWindow.h"
 #include "TextFloat.h"
 #include "Clipboard.h"
-
 
 #include "embed.h"
 
@@ -981,8 +980,13 @@ ManageVestigeInstrumentView::ManageVestigeInstrumentView( Instrument * _instrume
 
 		const auto & description = s_dumpValues.at(1);
 
-		auto knob = new CustomTextKnob(KnobType::Bright26, description.left(15), this, description);
+		auto knob = new Knob(KnobType::Bright26, description.left(15), SMALL_FONT_SIZE, this, description);
 		knob->setDescription(description + ":");
+		knob->setFloatingTextPushMode(10);
+		connect(knob, &Knob::floatingTextUpdateRequested, this, [i, this]() {
+			updateParameterText(i);
+		}, Qt::DirectConnection);
+
 		m_vstKnobs.push_back(knob);
 
 		if( !hasKnobModel )
@@ -1128,7 +1132,6 @@ void ManageVestigeInstrumentView::setParameter( Model * action )
 
 	if ( m_vi->m_plugin != nullptr ) {
 		m_vi->m_plugin->setParam( knobUNID, m_vi->knobFModel[knobUNID]->value() );
-		syncParameterText();
 	}
 }
 
@@ -1143,8 +1146,21 @@ void ManageVestigeInstrumentView::syncParameterText()
 
 	for (std::size_t i = 0; i < paramLabels.size(); ++i)
 	{
-		m_vstKnobs[i]->setValueText(paramDisplays[i] + ' ' + paramLabels[i]);
+		m_vstKnobs[i]->pushFloatingText(paramDisplays[i] + ' ' + paramLabels[i]);
 	}
+}
+
+
+void ManageVestigeInstrumentView::updateParameterText(int index)
+{
+	m_vi->m_plugin->updateParameterLabel(index);
+	m_vi->m_plugin->updateParameterDisplay(index);
+
+	const auto& paramLabels = m_vi->m_plugin->allParameterLabels();
+	const auto& paramDisplays = m_vi->m_plugin->allParameterDisplays();
+	assert(paramLabels.size() == paramDisplays.size());
+
+	m_vstKnobs.at(index)->pushFloatingText(paramDisplays[index] + ' ' + paramLabels[index]);
 }
 
 

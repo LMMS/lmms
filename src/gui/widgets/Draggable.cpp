@@ -107,7 +107,7 @@ void Draggable::mouseMoveEvent(QMouseEvent* me)
 
 		emit sliderMoved(model()->value());
 		m_lastMousePos = pPos;
-		s_textFloat->setText(displayValue());
+		updateFloatingText();
 		s_textFloat->moveGlobal(this, QPoint(width() + 2, 0));
 	}
 }

@@ -26,12 +26,12 @@
 #ifndef LMMS_GUI_SIMPLE_TEXT_FLOAT_H
 #define LMMS_GUI_SIMPLE_TEXT_FLOAT_H
 
+#include <QTimer>
 #include <QWidget>
 
 #include "lmms_export.h"
 
 class QLabel;
-class QTimer;
 
 namespace lmms::gui
 {
@@ -57,12 +57,28 @@ public:
 		move(w->mapToGlobal(QPoint(0, 0)) + offset);
 	}
 
+	void show();
 	void hide();
+
+	void setRefreshRate(int timesPerSecond);
+
+	template<class T>
+	void setRefreshConnection(T* receiver, void(T::* slot)(), Qt::ConnectionType type = Qt::AutoConnection)
+	{
+		if (auto connection = m_refreshTimer->callOnTimeout(receiver, slot,
+			static_cast<Qt::ConnectionType>(type | Qt::UniqueConnection)))
+		{
+			m_textUpdateConnection = connection;
+		}
+	}
 
 private:
 	QLabel * m_textLabel;
 	QTimer * m_showTimer;
 	QTimer * m_hideTimer;
+	QTimer* m_refreshTimer;
+
+	QMetaObject::Connection m_textUpdateConnection;
 };
 
 } // namespace lmms::gui

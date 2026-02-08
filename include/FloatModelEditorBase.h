@@ -72,11 +72,38 @@ public:
 		m_volumeKnob = val;
 	}
 
+	//! In this mode, floating text is obtained by calling `pullFloatingText`.
+	void setFloatingTextPullMode()
+	{
+		m_floatingTextPushMode = false;
+		m_floatingTextRefreshRate = 0;
+	}
+
+	/**
+	 * In this mode, floating text must be set manually by calling `pushFloatingText`.
+	 *
+	 * @param refreshRate How many times per second `floatingTextUpdateRequested` will be emitted
+	 */
+	void setFloatingTextPushMode(std::uint8_t refreshRate = 0)
+	{
+		m_floatingTextPushMode = true;
+		m_floatingTextRefreshRate = refreshRate;
+	}
+
+	//! Manually updates the text float's text
+	void pushFloatingText(const QString& text);
+
 signals:
 	void sliderPressed();
 	void sliderReleased();
 	void sliderMoved(float value);
 
+	/**
+	 * May be emitted periodically when the text float is visible.
+	 * Upon receiving this signal, call `pushFloatingText()` to update the
+	 * text float's text.
+	 */
+	void floatingTextUpdateRequested();
 
 protected:
 	void contextMenuEvent(QContextMenuEvent * me) override;
@@ -98,7 +125,11 @@ protected:
 	void leaveEvent(QEvent *event) override;
 
 	virtual float getValue(const QPoint & p);
-	virtual QString displayValue() const;
+
+	//! Retreives floating text in a "pull" fashion
+	virtual QString pullFloatingText() const;
+
+	void updateFloatingText();
 
 	void doConnections() override;
 
@@ -120,6 +151,9 @@ protected:
 	bool m_buttonPressed;
 
 	DirectionOfManipulation m_directionOfManipulation;
+
+	bool m_floatingTextPushMode = false;
+	std::uint8_t m_floatingTextRefreshRate = 0; //! times per second
 
 private slots:
 	virtual void enterValue();

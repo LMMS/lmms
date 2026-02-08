@@ -74,10 +74,18 @@ void FloatModelEditorBase::initUi(const QString & name)
 }
 
 
+void FloatModelEditorBase::pushFloatingText(const QString& text)
+{
+	if (!m_floatingTextPushMode) { return; }
+	s_textFloat->setText(m_description.trimmed() + ' ' + text);
+}
+
+
 void FloatModelEditorBase::showTextFloat(int msecBeforeDisplay, int msecDisplayTime)
 {
-	s_textFloat->setText(displayValue());
+	updateFloatingText();
 	s_textFloat->moveGlobal(this, QPoint(width() + 2, 0));
+	s_textFloat->setRefreshRate(m_floatingTextRefreshRate);
 	s_textFloat->showWithDelay(msecBeforeDisplay, msecDisplayTime);
 }
 
@@ -172,11 +180,6 @@ void FloatModelEditorBase::mousePressEvent(QMouseEvent * me)
 		emit sliderPressed();
 
 		showTextFloat(0, 0);
-
-		s_textFloat->setText(displayValue());
-		s_textFloat->moveGlobal(this,
-				QPoint(width() + 2, 0));
-		s_textFloat->show();
 		m_buttonPressed = true;
 	}
 	else if (me->button() == Qt::LeftButton &&
@@ -205,7 +208,8 @@ void FloatModelEditorBase::mouseMoveEvent(QMouseEvent * me)
 		// original position for next time is current position
 		m_lastMousePos = pos;
 	}
-	s_textFloat->setText(displayValue());
+
+	updateFloatingText();
 	s_textFloat->show();
 }
 
@@ -340,9 +344,7 @@ void FloatModelEditorBase::wheelEvent(QWheelEvent * we)
 	const int inc = direction * stepMult;
 	model()->incValue(inc);
 
-	s_textFloat->setText(displayValue());
-	s_textFloat->moveGlobal(this, QPoint(width() + 2, 0));
-	s_textFloat->showWithTimeout(1000);
+	showTextFloat(0, 1000);
 
 	emit sliderMoved(model()->value());
 }
@@ -434,20 +436,31 @@ void FloatModelEditorBase::friendlyUpdate()
 }
 
 
-QString FloatModelEditorBase::displayValue() const
+QString FloatModelEditorBase::pullFloatingText() const
 {
 	if (isVolumeKnob())
 	{
 		auto const valueToVolumeRatio = model()->getRoundedValue() / volumeRatio();
-		return m_description.trimmed() + (
-			valueToVolumeRatio == 0.
-			? QString(" -∞ dBFS")
-			: QString(" %1 dBFS").arg(ampToDbfs(valueToVolumeRatio), 3, 'f', 2)
-		);
+		return valueToVolumeRatio == 0.
+			? QString("-∞ dBFS")
+			: QString("%1 dBFS").arg(ampToDbfs(valueToVolumeRatio), 3, 'f', 2);
 	}
 
-	return m_description.trimmed() + QString(" %1").
-					arg(model()->getRoundedValue()) + m_unit;
+	return QString::number(model()->getRoundedValue()) + m_unit;
+}
+
+
+void FloatModelEditorBase::updateFloatingText()
+{
+	if (!m_floatingTextPushMode)
+	{
+		s_textFloat->setText(m_description.trimmed() + ' ' + pullFloatingText());
+	}
+	else if (!s_textFloat->isVisible())
+	{
+		s_textFloat->setText("");
+		s_textFloat->setRefreshConnection(this, &FloatModelEditorBase::floatingTextUpdateRequested);
+	}
 }
 
 
