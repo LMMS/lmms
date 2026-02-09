@@ -93,7 +93,7 @@ public:
 		return m_clipType;
 	}
 
-	virtual bool loopable() const override;
+	bool loopable() const override;
 
 
 	// next/previous track based on position in the containing track
