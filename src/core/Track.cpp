@@ -459,7 +459,7 @@ void Track::getClipsInRange( clipVector & clipV, const TimePos & start,
 	for( Clip* clip : m_clips )
 	{
 		int s = clip->startPosition();
-		int e = clip->endPosition();
+		int e = clip->endPosition() + ( clip->loopCount() * clip->length() );
 		if( ( s <= end ) && ( e >= start ) )
 		{
 			// Clip is within given range
