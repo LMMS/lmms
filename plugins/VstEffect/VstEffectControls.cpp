@@ -386,7 +386,7 @@ ManageVSTEffectView::ManageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 
 		auto knob = new Knob(KnobType::Bright26, description.left(15), SMALL_FONT_SIZE, widget, description);
 		knob->setDescription(description + ":");
-		knob->setFloatingTextPushMode(10);
+		knob->setFloatingTextPushMode(15);
 		connect(knob, &Knob::floatingTextUpdateRequested, this, [i, this]() {
 			updateParameterText(i);
 		}, Qt::DirectConnection);

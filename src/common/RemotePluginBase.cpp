@@ -172,6 +172,7 @@ RemotePluginBase::message RemotePluginBase::waitForMessage(
 #ifndef BUILD_REMOTE_PLUGIN_CLIENT
 		if (_busy_waiting && !messagesLeft())
 		{
+			// FIXME: Can hang sometimes (due to too many messages?)
 			QCoreApplication::processEvents(
 				QEventLoop::ExcludeUserInputEvents, 50);
 			continue;

@@ -52,8 +52,6 @@ SimpleTextFloat::SimpleTextFloat() :
 	m_hideTimer = new QTimer(this);
 	m_hideTimer->setSingleShot(true);
 	QObject::connect(m_hideTimer, &QTimer::timeout, this, &SimpleTextFloat::hide);
-
-	m_refreshTimer = new QTimer(this);
 }
 
 void SimpleTextFloat::setText(const QString & text)
@@ -63,6 +61,8 @@ void SimpleTextFloat::setText(const QString & text)
 
 void SimpleTextFloat::showWithDelay(int msecBeforeDisplay, int msecDisplayTime)
 {
+	auto _ = std::lock_guard{m_mutex};
+
 	if (msecBeforeDisplay > 0)
 	{
 		m_showTimer->start(msecBeforeDisplay);
@@ -80,17 +80,13 @@ void SimpleTextFloat::showWithDelay(int msecBeforeDisplay, int msecDisplayTime)
 
 void SimpleTextFloat::show()
 {
-	if (m_refreshTimer->interval() > 0 && !m_refreshTimer->isActive())
-	{
-		// Emit timeout signal once at very start
-		const auto interval = m_refreshTimer->interval();
-		m_refreshTimer->setSingleShot(true);
-		m_refreshTimer->start(0);
-		m_refreshTimer->setSingleShot(false);
-		m_refreshTimer->setInterval(interval);
+	auto _ = std::lock_guard{m_mutex};
 
-		// Now start timer normally
-		m_refreshTimer->start();
+	m_hideTimer->start();
+
+	if (!isVisible())
+	{
+		emit visibilityChanged(true);
 	}
 
 	QWidget::show();
@@ -98,24 +94,45 @@ void SimpleTextFloat::show()
 
 void SimpleTextFloat::hide()
 {
-	disconnect(m_textUpdateConnection);
+	auto _ = std::lock_guard{m_mutex};
+
 	m_showTimer->stop();
 	m_hideTimer->stop();
-	m_refreshTimer->stop();
+
+	if (isVisible())
+	{
+		emit visibilityChanged(false);
+	}
+
 	QWidget::hide();
 }
 
-void SimpleTextFloat::setRefreshRate(int timesPerSecond)
+void SimpleTextFloat::setSource(QObject* source)
 {
-	if (timesPerSecond > 0)
+	auto _ = std::lock_guard{m_mutex};
+
+	disconnect(m_connection);
+	m_source = source;
+	m_connection = {};
+}
+
+void SimpleTextFloat::setSource(QObject* source, QMetaObject::Connection connection)
+{
+	auto _ = std::lock_guard{m_mutex};
+
+	if (source != m_source || !source)
 	{
-		m_refreshTimer->setInterval(1000 / timesPerSecond);
+		disconnect(m_connection);
+		m_connection = {};
 	}
-	else
+
+	if (connection)
 	{
-		m_refreshTimer->stop();
-		m_refreshTimer->setInterval(0);
+		disconnect(m_connection);
+		m_connection = connection;
 	}
+
+	m_source = source;
 }
 
 } // namespace lmms::gui

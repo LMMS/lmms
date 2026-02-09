@@ -26,8 +26,10 @@
 #ifndef LMMS_GUI_SIMPLE_TEXT_FLOAT_H
 #define LMMS_GUI_SIMPLE_TEXT_FLOAT_H
 
-#include <QTimer>
+
 #include <QWidget>
+#include <atomic>
+#include <mutex>
 
 #include "lmms_export.h"
 
@@ -60,25 +62,28 @@ public:
 	void show();
 	void hide();
 
-	void setRefreshRate(int timesPerSecond);
+	//! Stores which object is currently controlling the text float and disconnects the old source (if any)
+	void setSource(QObject* source);
 
-	template<class T>
-	void setRefreshConnection(T* receiver, void(T::* slot)(), Qt::ConnectionType type = Qt::AutoConnection)
-	{
-		if (auto connection = m_refreshTimer->callOnTimeout(receiver, slot,
-			static_cast<Qt::ConnectionType>(type | Qt::UniqueConnection)))
-		{
-			m_textUpdateConnection = connection;
-		}
-	}
+	//! Stores which object is currently controlling the text float and disconnects the old source (if any)
+	void setSource(QObject* source, QMetaObject::Connection connection);
+
+	//! @returns which object is currently controlling the text float
+	auto source() const -> QObject* { return m_source; }
+
+signals:
+	void visibilityChanged(bool visible);
 
 private:
 	QLabel * m_textLabel;
 	QTimer * m_showTimer;
 	QTimer * m_hideTimer;
-	QTimer* m_refreshTimer;
 
-	QMetaObject::Connection m_textUpdateConnection;
+	std::atomic<QObject*> m_source = nullptr;
+	QMetaObject::Connection m_connection;
+
+	// TODO: See if the mutex usage can be removed or reduced
+	std::recursive_mutex m_mutex;
 };
 
 } // namespace lmms::gui
