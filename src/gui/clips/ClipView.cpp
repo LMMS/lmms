@@ -514,7 +514,14 @@ void ClipView::updateCursor(QMouseEvent * me)
 	// If we are in the middle on knife mode, use the knife cursor
 	else if (m_trackView->trackContainerView()->knifeMode() && !isSelected())
 	{
-		setCursor(Qt::SplitHCursor);
+		if ( m_offset == 0 )
+		{
+			setCursor(Qt::SplitHCursor);
+		}
+		else // Knife mode have no effect on loop views, we use the Forbidden cursor
+		{
+			setCursor(Qt::ForbiddenCursor);
+		}
 	}
 	// If we are in the middle in any other mode, use the hand cursor
 	else { setCursor(Qt::PointingHandCursor); }
@@ -738,7 +745,7 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 			{
 				hint = tr("Press <%1> and drag to make a copy.");
 			}
-			else if (m_action == Action::Split)
+			else if (m_action == Action::Split && m_offset == 0 )
 			{
 				hint = dynamic_cast<MidiClipView*>(this)
 					? tr("Press <%1> or <Alt> for unquantized splitting.\nPress <Shift> for destructive splitting.")
@@ -762,10 +769,12 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 		{
 			remove( active );
 		}
-		if (m_action == Action::Split)
+		if (m_action == Action::Split && m_offset == 0 )
 		{
 			m_action = Action::None;
 			setMarkerEnabled(false);
+			// Destroy the loop
+			closing();
 			update();
 		}
 	}
@@ -1016,7 +1025,7 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 		s_textFloat->moveGlobal( this, QPoint( width() + 2, height() + 2) );
 		updatePosition();
 	}
-	else if( m_action == Action::Split )
+	else if( m_action == Action::Split && m_offset == 0 )
 	{
 		setCursor(Qt::SplitHCursor);
 		setMarkerPos(knifeMarkerPos(me));
@@ -1052,7 +1061,7 @@ void ClipView::mouseReleaseEvent( QMouseEvent * me )
 		// TODO: Fix m_clip->setJournalling() consistency
 		m_clip->setJournalling( true );
 	}
-	else if( m_action == Action::Split )
+	else if( m_action == Action::Split && m_offset == 0 )
 	{
 		const float ppb = m_trackView->trackContainerView()->pixelsPerBar();
 		const TimePos relPos = position(me).x() * TimePos::ticksPerBar() / ppb;
@@ -1065,6 +1074,8 @@ void ClipView::mouseReleaseEvent( QMouseEvent * me )
 			splitClip(unquantizedModHeld(me) ? relPos : quantizeSplitPos(relPos));
 		}
 		setMarkerEnabled(false);
+		// Destroy loop
+		closing();
 	}
 
 	m_action = Action::None;
