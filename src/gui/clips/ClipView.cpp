@@ -132,7 +132,7 @@ ClipView::ClipView( Clip * clip,
 		if (!m_clip->color().has_value()) { update(); }
 	});
 
-	if ( offset )
+	if (offset != 0)
 	{
 		clip->increaseLoopCount();
 	}
@@ -270,7 +270,7 @@ void ClipView::setNeedsUpdate( bool b )
  */
 bool ClipView::close()
 {
-	if ( m_offset )
+	if (m_offset != 0)
 	{
 		m_clip->decreaseLoopCount();
 	}
@@ -355,7 +355,7 @@ void ClipView::updatePosition()
 
 void ClipView::closeLoopViews()
 {
-	if ( m_offset )
+	if (m_offset != 0)
 	{
 		closing();
 		close();
@@ -514,7 +514,7 @@ void ClipView::updateCursor(QMouseEvent * me)
 	// If we are in the middle on knife mode, use the knife cursor
 	else if (m_trackView->trackContainerView()->knifeMode() && !isSelected())
 	{
-		if ( m_offset == 0 )
+		if (m_offset == 0)
 		{
 			setCursor(Qt::SplitHCursor);
 		}
@@ -745,7 +745,7 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 			{
 				hint = tr("Press <%1> and drag to make a copy.");
 			}
-			else if (m_action == Action::Split && m_offset == 0 )
+			else if (m_action == Action::Split && m_offset == 0)
 			{
 				hint = dynamic_cast<MidiClipView*>(this)
 					? tr("Press <%1> or <Alt> for unquantized splitting.\nPress <Shift> for destructive splitting.")
@@ -769,7 +769,7 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 		{
 			remove( active );
 		}
-		if (m_action == Action::Split && m_offset == 0 )
+		if (m_action == Action::Split && m_offset == 0)
 		{
 			m_action = Action::None;
 			setMarkerEnabled(false);
@@ -787,7 +787,7 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 		else if( !fixedClips() )
 		{
 			closing();
-			if ( m_offset )
+			if (m_offset)
 			{
 				close();
 			}
@@ -1142,7 +1142,7 @@ void ClipView::contextMenuEvent( QContextMenuEvent * cme )
 		tr( "Paste" ),
 		[this](){ contextMenuAction( ContextMenuAction::Paste ); } );
 
-	if ( m_clip->loopable() )
+	if (m_clip->loopable())
 	{
 		contextMenu.addAction(
 			embed::getIconPixmap( "loop_points_on" ),

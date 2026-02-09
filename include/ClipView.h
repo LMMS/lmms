@@ -66,7 +66,7 @@ class ClipView : public selectableObject, public ModelView
 public:
 	const static int BORDER_WIDTH = 2;
 
-	ClipView( Clip * clip, TrackView * tv, int offset = 0 );
+	ClipView(Clip * clip, TrackView * tv, int offset = 0);
 	~ClipView() override;
 
 	bool fixedClips();
@@ -204,7 +204,9 @@ protected slots:
 	/**
 	 * Create a new loop view
 	 */
-	virtual void loop() {};
+	virtual void loop()
+	{
+	};
 
 
 private:
@@ -275,7 +277,6 @@ private:
 		return splitClip(pos);
 	}
 	void updateCursor(QMouseEvent * me);
-
 } ;
 
 

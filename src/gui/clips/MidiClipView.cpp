@@ -597,38 +597,38 @@ void MidiClipView::paintEvent( QPaintEvent * )
 	}
 	else
 	{
-		if ( this->offset() == 0 )
+		if (this->offset() == 0)
 		{
-			p.fillRect( rect(), c );
+			p.fillRect(rect(), c);
 		}
 		// Draw loop views with a slight color difference and hatch them
 		else
 		{
-			p.fillRect( rect(), current ? c.lighter( 65 ) : c.darker( 150 ) );
-			p.setPen( c );
+			p.fillRect(rect(), current ? c.lighter( 65 ) : c.darker( 150 ));
+			p.setPen(c);
 
 			// Change the pen's width in a rather painfull way
 			QPen previousPen = p.pen();
-			QPen newPen = QPen(previousPen);
+			QPen newPen(previousPen);
 			newPen.setWidth(2);
 			p.setPen(newPen);
 
-			for ( int x = -height(); x < width(); x += 10 )
+			for (int x = -height(); x < width(); x += 10)
 			{
 				int y1, y2;
 				y1 = 0;
-				if ( x < 0 )
+				if (x < 0)
 				{
 					y1 = -x;
 				}
 				y2 = height();
-				if ( x + height() > width() )
+				if (x + height() > width())
 				{
-					y2 = height() - ( x + height() - width() );
+					y2 = height() - (x + height() - width());
 				}
-				if ( y1 < height() && y2 > 0 )
+				if (y1 < height() && y2 > 0)
 				{
-					p.drawLine( std::max( 0, x ), y1, std::min( width(), x + height() ), y2 );
+					p.drawLine(std::max( 0, x ), y1, std::min( width(), x + height() ), y2);
 				}
 			}
 			p.setPen(previousPen);
@@ -870,14 +870,14 @@ void MidiClipView::paintEvent( QPaintEvent * )
 	}
 
 	// clip name
-	if ( drawTextBox && this->offset() == 0 )
+	if (drawTextBox && this->offset() == 0)
 	{
 		paintTextLabel(m_clip->name(), p);
 	}
 
 	if( !( fixedClips() && beatClip ) )
 	{
-		if ( this->offset() == 0 )
+		if (this->offset() == 0)
 		{
 			// inner border
 			p.setPen( c.lighter( current ? 160 : 130 ) );
