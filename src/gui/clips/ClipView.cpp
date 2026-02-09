@@ -85,6 +85,7 @@ ClipView::ClipView( Clip * clip,
 	m_initialClipPos( TimePos(0) ),
 	m_initialClipEnd( TimePos(0) ),
 	m_clip( clip ),
+	m_offset( offset ),
 	m_action( Action::None ),
 	m_initialMousePos( QPoint( 0, 0 ) ),
 	m_initialMouseGlobalPos( QPoint( 0, 0 ) ),
@@ -98,8 +99,7 @@ ClipView::ClipView( Clip * clip,
 	m_patternClipBackground( 0, 0, 0 ),
 	m_gradient( true ),
 	m_markerColor(0, 0, 0),
-	m_needsUpdate( true ),
-	m_offset( offset )
+	m_needsUpdate( true )
 {
 	if( s_textFloat == nullptr )
 	{
