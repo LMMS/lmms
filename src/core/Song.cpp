@@ -120,7 +120,7 @@ Song::Song() :
 
 	// Aggregate the `positionJumped` signals from all the timelines into a single `playbackPositionJumped` signal for
 	// other objects (sample tracks, LFOs, etc) to use.
-	for (auto i = 0; i < static_cast<std::size_t>(PlayMode::Count); ++i)
+	for (auto i = std::size_t{0}; i < static_cast<std::size_t>(PlayMode::Count); ++i)
 	{
 		const auto onPositionJumped = [this, playMode = static_cast<PlayMode>(i)] {
 			// Only emit the signal when the song is actually playing and the active timeline jumps
