@@ -1218,7 +1218,7 @@ const char * RemoteVstPlugin::programName()
 void RemoteVstPlugin::loadAllParameterDisplays()
 {
 	std::string paramDisplays;
-	char buf[9]; // buffer for getting string
+	static char buf[9]; // buffer for getting string
 	for (int i=0; i< m_plugin->numParams; ++i)
 	{
 		memset( buf, 0, sizeof( buf ) ); // fill with '\0' because got string may not to be ended with '\0'
@@ -1239,7 +1239,7 @@ void RemoteVstPlugin::loadAllParameterDisplays()
 void RemoteVstPlugin::loadAllParameterLabels()
 {
 	std::string paramLabels;
-	char buf[9]; // buffer for getting string
+	static char buf[9]; // buffer for getting string
 	for (int i=0; i< m_plugin->numParams; ++i)
 	{
 		memset( buf, 0, sizeof( buf ) ); // fill with '\0' because got string may not to be ended with '\0'
@@ -1261,7 +1261,7 @@ void RemoteVstPlugin::updateParameterDisplay(int index)
 {
 	assert(index < m_plugin->numParams);
 
-	char display[9]{};
+	static char display[9] = {};
 	pluginDispatch(effGetParamDisplay, index, 0, display);
 	display[8] = '\0';
 
@@ -1275,7 +1275,7 @@ void RemoteVstPlugin::updateParameterLabel(int index)
 {
 	assert(index < m_plugin->numParams);
 
-	char label[9]{};
+	static char label[9] = {};
 	pluginDispatch(effGetParamLabel, index, 0, label);
 	label[8] = '\0';
 

@@ -22,10 +22,8 @@
  *
 */
 
-
 #ifndef LMMS_GUI_SIMPLE_TEXT_FLOAT_H
 #define LMMS_GUI_SIMPLE_TEXT_FLOAT_H
-
 
 #include <QWidget>
 #include <atomic>
