@@ -71,14 +71,14 @@ public:
 // Constructor.
 PatchesDialog::PatchesDialog( QWidget *pParent, Qt::WindowFlags wflags )
 	: QDialog(pParent, wflags)
+	, m_pSynth{nullptr}
+	, m_iChan{0}
+	, m_iBank{0}
+	, m_iProg{0}
+	, m_selProg{0}
 {
 	// Setup UI struct...
 	setupUi( this );
-
-	m_pSynth = nullptr;
-	m_iChan  = 0;
-	m_iBank  = 0;
-	m_iProg  = 0;
 
 	// Configure bank list view
 	auto bankHeader = m_bankListView->header();
@@ -104,13 +104,12 @@ PatchesDialog::PatchesDialog( QWidget *pParent, Qt::WindowFlags wflags )
 	m_progListView->setSortingEnabled(true);
 	m_progListView->sortByColumn(0, Qt::AscendingOrder); // Initial sort by column 0 (Name)
 
-	constexpr int rowHeight = 14;
+	constexpr int RowHeight = 18;
 	auto progVHeader = m_progListView->verticalHeader();
-	// progVHeader->setSectionResizeMode(QHeaderView::ResizeToContents);
 	progVHeader->setSectionResizeMode(QHeaderView::Fixed);
-	progVHeader->setMinimumSectionSize(rowHeight);
-	progVHeader->setMaximumSectionSize(rowHeight);
-	progVHeader->setDefaultSectionSize(rowHeight);
+	progVHeader->setMinimumSectionSize(RowHeight);
+	progVHeader->setMaximumSectionSize(RowHeight);
+	progVHeader->setDefaultSectionSize(RowHeight);
 	progVHeader->hide();
 
 	auto progHeader = m_progListView->horizontalHeader();
@@ -268,7 +267,6 @@ bool PatchesDialog::validateForm()
 	bool bValid = true;
 
 	bValid = bValid && (m_bankListView->currentItem() != nullptr);
-	bValid = bValid && (m_selProg != -1);
 
 	return bValid;
 }
@@ -407,9 +405,6 @@ void PatchesDialog::bankChanged ()
 
 void PatchesDialog::updatePatch(bool updateUi)
 {
-	if (m_selProg < 0)
-		return;
-
 	int iBank = m_bankListView->currentItem()->text(0).toInt();
 	setBankProg(iBank, m_selProg);
 
