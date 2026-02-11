@@ -30,6 +30,7 @@
 #include <QList>
 #include <QMainWindow>
 #include <QMdiArea>
+#include <QScrollBar>
 
 #include "ConfigManager.h"
 
@@ -199,6 +200,16 @@ private:
 	void handleSaveResult(QString const & filename, bool songSavedSuccessfully);
 	bool guiSaveProject();
 	bool guiSaveProjectAs( const QString & filename );
+
+	class WorkspaceScrollBar : public QScrollBar
+	{
+	public:
+		WorkspaceScrollBar(Qt::Orientation orientation, QWidget *parent = nullptr);
+		~WorkspaceScrollBar() {}
+
+	protected:
+		void wheelEvent(QWheelEvent *event) override;
+	};
 
 	struct keyModifiers;
 	class MovableQMdiArea : public QMdiArea

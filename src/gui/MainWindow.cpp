@@ -159,13 +159,8 @@ MainWindow::MainWindow() :
 	sideBar->appendTab(new FileBrowser(FileBrowser::Type::Normal, root_paths.join("*"), FileItem::defaultFilters(), title,
 		embed::getIconPixmap("computer").transformed(QTransform().rotate(90)), splitter, dirs_as_items));
 
-	m_workspaceScrollBarV = new QScrollBar(Qt::Vertical, nullptr);
-	m_workspaceScrollBarV->setTracking(true);
-	m_workspaceScrollBarV->setFixedWidth(12);
-
-	m_workspaceScrollBarH = new QScrollBar(Qt::Horizontal, nullptr);
-	m_workspaceScrollBarH->setTracking(true);
-	m_workspaceScrollBarH->setFixedHeight(12);
+	m_workspaceScrollBarV = new WorkspaceScrollBar(Qt::Vertical, nullptr);
+	m_workspaceScrollBarH = new WorkspaceScrollBar(Qt::Horizontal, nullptr);
 
 	// Add widget to contain workspace and the scrollbar on the bottom
 	auto workspaceVSplitter = new QSplitter(Qt::Vertical, splitter);
@@ -1617,6 +1612,28 @@ void MainWindow::onProjectFileNameChanged()
 	this->resetWindowTitle();
 }
 
+MainWindow::WorkspaceScrollBar::WorkspaceScrollBar(Qt::Orientation orientation, QWidget *parent)
+	: QScrollBar(orientation, parent)
+{
+	constexpr auto Thickness = 12;
+
+	setTracking(true);
+
+	if (orientation == Qt::Vertical)
+	{
+		setFixedWidth(Thickness);
+	}
+	else if (orientation == Qt::Horizontal)
+	{
+		setFixedHeight(Thickness);
+	}
+}
+
+void MainWindow::WorkspaceScrollBar::wheelEvent(QWheelEvent *event)
+{
+	// Accept event so it's catched and thus not handled
+	event->accept();
+}
 
 MainWindow::MovableQMdiArea::MovableQMdiArea(QWidget* parent, MainWindow* mainWindow, keyModifiers* keyMods,
 	QScrollBar* scrollBarV, QScrollBar* scrollBarH)
