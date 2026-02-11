@@ -222,12 +222,6 @@ public:
 		setPlayPos(ticks, m_playMode);
 	}
 
-	//! @returns true if @a timeline is the timeline responsible for the current playback position
-	bool isTimelineActive(Timeline& timeline)
-	{
-		return static_cast<PlayMode>(std::distance(m_timelines.begin(), &timeline)) == m_playMode;
-	}
-
 	auto getTimeline(PlayMode mode) -> Timeline& { return m_timelines[static_cast<std::size_t>(mode)]; }
 	auto getTimeline(PlayMode mode) const -> const Timeline& { return m_timelines[static_cast<std::size_t>(mode)]; }
 	auto getTimeline() -> Timeline& { return getTimeline(m_playMode); }
