@@ -122,14 +122,12 @@ Song::Song() :
 	// other objects (sample tracks, LFOs, etc) to use.
 	for (auto& timeline : m_timelines)
 	{
-		const auto playMode = static_cast<Song::PlayMode>(std::distance(m_timelines.begin(), &timeline));
 		connect(
 			&timeline, &Timeline::positionJumped, this,
-			[this, playMode] {
-				// Only emit the signal when the song is actually playing and the timeline responsible for the current
-				// play mode jumps
+			[this, &timeline] {
+				// Only emit the signal when the song is actually playing and the active timeline jumps
 				// This prevents LFOs from changing phase when the user drags the timeline while paused
-				if (m_playing && m_playMode == playMode) { emit playbackPositionJumped(); }
+				if (m_playing && isTimelineActive(timeline)) { emit playbackPositionJumped(); }
 			},
 			Qt::DirectConnection);
 	}
