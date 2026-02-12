@@ -87,7 +87,7 @@ class LMMS_EXPORT TrackChannelContainer
 public:
 	using ChannelFlags = std::bitset<MaxTrackChannels>;
 
-	TrackChannelContainer() = default;
+	TrackChannelContainer() = delete;
 	~TrackChannelContainer();
 
 	TrackChannelContainer(const TrackChannelContainer&) = delete;
@@ -95,11 +95,23 @@ public:
 	auto operator=(const TrackChannelContainer&) -> TrackChannelContainer& = delete;
 	auto operator=(TrackChannelContainer&&) noexcept -> TrackChannelContainer& = default;
 
-	//! Single channel group with `frames` frames, `channels` channels, and all buffers allocated with `bufferResource`
+	/**
+	 * Creates TrackChannelContainer with a 1st (main) channel group.
+	 *
+	 * Silence tracking is enabled or disabled depending on the auto-quit setting.
+	 *
+	 * @param frames frame count for all channels
+	 * @param channels channel count for the 1st group, or zero to skip adding the 1st group
+	 * @param bufferResource allocator for all buffers
+	 */
 	explicit TrackChannelContainer(f_cnt_t frames, ch_cnt_t channels = DEFAULT_CHANNELS,
 		std::pmr::memory_resource* bufferResource = std::pmr::get_default_resource());
 
+	//! @returns current number of channel groups
 	auto groupCount() const -> group_cnt_t { return static_cast<group_cnt_t>(m_groups.size()); }
+
+	auto group(group_cnt_t index) const -> const ChannelGroup& { return m_groups[index]; }
+	auto group(group_cnt_t index) -> ChannelGroup& { return m_groups[index]; }
 
 	//! @returns the buffers for all channel groups
 	auto allBuffers() const -> PlanarBufferView<const float>

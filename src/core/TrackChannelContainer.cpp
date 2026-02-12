@@ -92,12 +92,16 @@ TrackChannelContainer::TrackChannelContainer(f_cnt_t frames, ch_cnt_t channels,
 {
 	m_interleavedBuffer = m_alloc.allocate_object<float>(2 * frames);
 
+	if (channels == 0)
+	{
+		m_silenceFlags.set();
+		return;
+	}
+
 	if (!addGroup(channels))
 	{
 		throw std::runtime_error{"failed to add group"};
 	}
-
-	m_silenceFlags.set();
 }
 
 TrackChannelContainer::~TrackChannelContainer()
@@ -221,6 +225,8 @@ auto TrackChannelContainer::hasInputNoise(const ChannelFlags& usedChannels) cons
 
 auto TrackChannelContainer::hasAnyInputNoise() const -> bool
 {
+	// This is possible due to the invariant that any channel bits
+	// at or above `totalChannels()` must always be marked silent
 	return !m_silenceFlags.all();
 }
 
@@ -281,6 +287,9 @@ auto TrackChannelContainer::updateSilenceFlags(const ChannelFlags& channels, tra
 	// Invariant: Any channel bits at or above `totalChannels()` must be marked silent
 	assert((~m_silenceFlags & createMask<true>(m_totalChannels)).none());
 
+	// If no channels are selected, return true (all selected channels are silent)
+	if (channels.none()) { return true; }
+
 	const auto totalChannels = std::min(upperBound, m_totalChannels);
 
 	if (!m_silenceTrackingEnabled)
@@ -314,6 +323,9 @@ auto TrackChannelContainer::updateAllSilenceFlags() -> bool
 {
 	// Invariant: Any channel bits at or above `totalChannels()` must be marked silent
 	assert((~m_silenceFlags & createMask<true>(m_totalChannels)).none());
+
+	// If there are no channels, return true (all channels are silent)
+	if (m_totalChannels == 0) { return true; }
 
 	if (!m_silenceTrackingEnabled)
 	{
