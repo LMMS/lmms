@@ -22,8 +22,6 @@
  *
  */
 
-// TODO: Add tests for when silence tracking is disabled
-
 #include "TrackChannelContainer.h"
 
 #include <QObject>
@@ -40,82 +38,104 @@ class TrackChannelContainerTest : public QObject
 {
 	Q_OBJECT
 
-private:
-	std::vector<lmms::SampleFrame> m_buffers;
-	std::vector<lmms::SampleFrame*> m_trackChannels;
-
-	// Creates new TrackChannelContainer with quiet buffers
-	auto createTrackChannelContainer(lmms::f_cnt_t frames) -> TrackChannelContainer
-	{
-		auto tc = TrackChannelContainer{frames};
-		tc.enableSilenceTracking(true);
-		return tc;
-	}
-
 private slots:
-	//! Verifies correct default construction
-	void DefaultConstructor()
+	//! Verifies constructor with default channels adds single stereo group
+	void Constructor_DefaultChannels()
 	{
-		auto tc = TrackChannelContainer{};
-		QCOMPARE(tc.groupCount(), 0);
-		QCOMPARE(tc.totalChannels(), 0);
-		QCOMPARE(tc.frames(), 0);
-		QCOMPARE(tc.silenceFlags().none(), true);
-	}
-
-	//! Verifies correct construction
-	void Constructor()
-	{
-		auto tc = createTrackChannelContainer(10);
+		auto tc = TrackChannelContainer{10};
 		QCOMPARE(tc.groupCount(), 1);
+		QCOMPARE(tc.group(0).channels(), 2);
 		QCOMPARE(tc.totalChannels(), 2);
 		QCOMPARE(tc.frames(), 10);
-		QCOMPARE(tc.silenceFlags().all(), true);
 	}
 
-	//! Verifies that the `addGroup` method works as intended
-	void AddGroup()
+	//! Verifies constructor with no channels does not create a first group
+	void Constructor_NoChannels()
 	{
-		// A group with 2 channels (the main group) is added by default
-		auto tc = createTrackChannelContainer(10);
+		auto tc = TrackChannelContainer{10, 0};
+		QCOMPARE(tc.groupCount(), 0);
+		QCOMPARE(tc.totalChannels(), 0);
+		QCOMPARE(tc.frames(), 10);
+	}
+
+	//! Verifies that the `addGroup` method can add the first group correctly
+	void AddGroup_FirstGroup()
+	{
+		// Begin with zero groups
+		auto tc = TrackChannelContainer{10, 0};
+
+		// Add a first group with 5 channels
+		auto group = tc.addGroup(5);
+		QVERIFY(group != nullptr);
+		QCOMPARE(&tc.group(0), group);
+		QCOMPARE(group->channels(), 5);
+		QCOMPARE(tc.groupCount(), 1);
+		QCOMPARE(tc.totalChannels(), 5);
+	}
+
+	//! Verifies that a 2nd group can be appended after the 1st group
+	void AddGroup_SecondGroup()
+	{
+		// Begin with 1 group
+		auto tc = TrackChannelContainer{10, 3};
+
+		// Add a 2nd group with 4 channels
+		auto group = tc.addGroup(4);
+		QVERIFY(group != nullptr);
+		QCOMPARE(&tc.group(1), group);
+		QCOMPARE(group->channels(), 4);
+		QCOMPARE(tc.groupCount(), 2);
+		QCOMPARE(tc.totalChannels(), 7);
+	}
+
+	//! Verifies that a group with 0 channels cannot be added and doing so has no effect
+	void AddGroup_ZeroChannelsFails()
+	{
+		auto tc = TrackChannelContainer{10};
 		QCOMPARE(tc.groupCount(), 1);
 		QCOMPARE(tc.totalChannels(), 2);
 
-		// Add a group with 5 channels
-		auto group2 = tc.addGroup(5);
-		QVERIFY(group2 != nullptr);
-		QCOMPARE(group2->channels(), 5);
+		auto group = tc.addGroup(0);
+		QCOMPARE(group, nullptr);
+
+		// Nothing should have changed
+		QCOMPARE(tc.groupCount(), 1);
+		QCOMPARE(tc.totalChannels(), 2);
+	}
+
+	//! Verifies that a group with the max channel count can be added
+	void AddGroup_MaximumChannelsInGroup()
+	{
+		auto tc = TrackChannelContainer{10};
+
+		auto group = tc.addGroup(lmms::MaxChannelsPerGroup);
+		QVERIFY(group != nullptr);
+		QCOMPARE(group->channels(), lmms::MaxChannelsPerGroup);
 		QCOMPARE(tc.groupCount(), 2);
-		QCOMPARE(tc.totalChannels(), 7);
+		QCOMPARE(tc.totalChannels(), 2 + lmms::MaxChannelsPerGroup);
+	}
 
-		// Add a group with 1 channel
-		auto group3 = tc.addGroup(1);
-		QVERIFY(group3 != nullptr);
-		QCOMPARE(group3->channels(), 1);
-		QCOMPARE(tc.groupCount(), 3);
-		QCOMPARE(tc.totalChannels(), 8);
+	//! Verifies that a group with over the max channel count cannot
+	//! be added and doing so has no effect
+	void AddGroup_TooManyChannels()
+	{
+		auto tc = TrackChannelContainer{10};
+		QCOMPARE(tc.groupCount(), 1);
+		QCOMPARE(tc.totalChannels(), 2);
 
-		// Add a group with as many channels as possible
-		auto group4 = tc.addGroup(lmms::MaxChannelsPerGroup);
-		QVERIFY(group4 != nullptr);
-		QCOMPARE(group4->channels(), lmms::MaxChannelsPerGroup);
-		QCOMPARE(tc.groupCount(), 4);
-		QCOMPARE(tc.totalChannels(), 8 + lmms::MaxChannelsPerGroup);
+		auto group = tc.addGroup(lmms::MaxChannelsPerGroup + 1);
+		QCOMPARE(group, nullptr);
+		QCOMPARE(tc.groupCount(), 1);
+		QCOMPARE(tc.totalChannels(), 2);
+	}
 
-		// Now, try with too many channels
-		auto group5 = tc.addGroup(lmms::MaxChannelsPerGroup + 1);
-		QCOMPARE(group5, nullptr);
-		QCOMPARE(tc.groupCount(), 4);
-		QCOMPARE(tc.totalChannels(), 8 + lmms::MaxChannelsPerGroup);
+	//! Verifies that groups cannot be added past the maximum group count
+	void AddGroup_MaximumGroups()
+	{
+		auto tc = TrackChannelContainer{10, 0};
 
-		// And again with too few channels
-		auto group6 = tc.addGroup(0);
-		QCOMPARE(group6, nullptr);
-		QCOMPARE(tc.groupCount(), 4);
-		QCOMPARE(tc.totalChannels(), 8 + lmms::MaxChannelsPerGroup);
-
-		// Add more groups until no more can be added
-		auto groupsLeft = static_cast<int>(lmms::MaxGroupsPerTrack - tc.groupCount());
+		// Add groups until no more can be added
+		auto groupsLeft = static_cast<int>(lmms::MaxGroupsPerTrack);
 		QVERIFY(groupsLeft >= 0);
 		while (groupsLeft > 0)
 		{
@@ -124,144 +144,375 @@ private slots:
 			--groupsLeft;
 		}
 		QCOMPARE(groupsLeft, 0);
+		QCOMPARE(tc.groupCount(), lmms::MaxGroupsPerTrack);
+		QCOMPARE(tc.totalChannels(), lmms::MaxGroupsPerTrack);
 
-		// Cannot add more groups
-		auto group7 = tc.addGroup(1);
-		QCOMPARE(group7, nullptr);
-
-		// Create new TrackChannelContainer
-		auto tc2 = createTrackChannelContainer(10);
-		auto channelsLeft = lmms::MaxTrackChannels - tc2.totalChannels();
-		constexpr auto channelsPerGroup = static_cast<int>(lmms::MaxChannelsPerGroup - 1);
-
-		while (channelsLeft - channelsPerGroup > 0)
-		{
-			auto group = tc2.addGroup(channelsPerGroup);
-			QVERIFY(group != nullptr);
-			channelsLeft -= channelsPerGroup;
-		}
-		QVERIFY(channelsLeft > 0);
-		QVERIFY(tc2.groupCount() < lmms::MaxGroupsPerTrack);
-
-		auto group8 = tc2.addGroup(channelsLeft);
-		QVERIFY(group8 != nullptr);
-		QVERIFY(tc2.groupCount() < lmms::MaxGroupsPerTrack);
-		QCOMPARE(tc2.totalChannels(), lmms::MaxTrackChannels);
-
-		// Verify that more groups cannot be added when the maximum track channels
-		// has been reached
-		auto group9 = tc2.addGroup(1);
-		QCOMPARE(group9, nullptr);
-		QCOMPARE(tc2.totalChannels(), lmms::MaxTrackChannels);
+		// Next group should fail
+		auto group = tc.addGroup(1);
+		QCOMPARE(group, nullptr);
+		QCOMPARE(tc.groupCount(), lmms::MaxGroupsPerTrack);
+		QCOMPARE(tc.totalChannels(), lmms::MaxGroupsPerTrack);
 	}
 
-	//! Verifies that the `updateSilenceFlags` method works as intended
-	void UpdateSilenceFlags()
+	//! Verifies that groups cannot be added past the maximum total channel count for the track
+	void AddGroup_MaximumTotalChannels()
 	{
-		auto tc = createTrackChannelContainer(10);
+		auto tc = TrackChannelContainer{10, 0};
 
-		// Add a 2nd stereo group
-		QVERIFY(tc.addGroup(2) != nullptr);
+		static_assert(lmms::MaxTrackChannels % lmms::MaxChannelsPerGroup == 0, "Need to update test");
+		auto groupsLeft = lmms::MaxTrackChannels / lmms::MaxChannelsPerGroup;
+		auto channelsLeft = lmms::MaxTrackChannels;
 
-		// Both channels should be silent
-		QCOMPARE(tc.updateSilenceFlags(0b1111), true);
+		// Add all but the last group
+		while (groupsLeft > 1)
+		{
+			auto group = tc.addGroup(lmms::MaxChannelsPerGroup);
+			QVERIFY(group != nullptr);
+			--groupsLeft;
+			channelsLeft -= lmms::MaxChannelsPerGroup;
+		}
+		QCOMPARE(groupsLeft, 1);
+		QCOMPARE(channelsLeft, lmms::MaxChannelsPerGroup);
+
+		// Add one fewer than the max channels for the last group
+		auto group = tc.addGroup(lmms::MaxChannelsPerGroup - 1);
+		QVERIFY(group != nullptr);
+		QCOMPARE(tc.totalChannels(), lmms::MaxTrackChannels - 1);
+
+		// Ok, now try adding a group with enough channels
+		// to push the total channels past the maximum for the track (should fail)
+		group = tc.addGroup(2);
+		QCOMPARE(group, nullptr);
+		QCOMPARE(tc.totalChannels(), lmms::MaxTrackChannels - 1);
+
+		// Ok, how about just enough to hit the maximum
+		// total channels for the track (should succeed)
+		group = tc.addGroup(1);
+		QVERIFY(group != nullptr);
+		QCOMPARE(tc.totalChannels(), lmms::MaxTrackChannels);
+	}
+
+	//! Verifies all silence flag bits are set when there are no channels
+	void SilenceFlags_AllSilentWhenNoChannels()
+	{
+		auto tc = TrackChannelContainer{10, 0};
+		QCOMPARE(tc.silenceFlags().all(), true);
+	}
+
+	//! Verifies all silence flags bits are set even after adding new groups/channels
+	void SilenceFlags_AllSilentWhenNewGroupsAdded()
+	{
+		auto tc = TrackChannelContainer{10};
 		QCOMPARE(tc.silenceFlags().all(), true);
 
-		// Now introduce a non-zero sample to the right channel of 2nd track channel group
-		// but update all channels except that one
-		tc.buffers(1).buffer(1)[5] = 1.f;
-		QCOMPARE(tc.updateSilenceFlags(0b0111), true);
+		tc.addGroup(4);
+		QCOMPARE(tc.silenceFlags().all(), true);
+	}
+
+	//! Verifies that `assumeNonSilent` clears a specific bit in the silence flags
+	void AssumeNonSilent()
+	{
+		auto tc = TrackChannelContainer{10, 2};
 		QCOMPARE(tc.silenceFlags().all(), true);
 
-		// Now update that channel
-		QCOMPARE(tc.updateSilenceFlags(0b1000), false);
+		// Assume 2nd channel is non-silent
+		tc.assumeNonSilent(1);
+
+		QCOMPARE(tc.silenceFlags().all(), false);
+		QCOMPARE(tc.silenceFlags()[0], true);
+		QCOMPARE(tc.silenceFlags()[1], false);
+	}
+
+	//! Verifies `enableSilenceTracking` enables and disables silence tracking
+	void EnableSilenceTracking_GetterSetter()
+	{
+		auto tc = TrackChannelContainer{10};
+		tc.enableSilenceTracking(true);
+		QCOMPARE(tc.silenceTrackingEnabled(), true);
+
+		tc.enableSilenceTracking(false);
+		QCOMPARE(tc.silenceTrackingEnabled(), false);
+	}
+
+	//! Verifies that `enableSilenceTracking(true)` also updates silence flags
+	void EnableSilenceTracking_UpdatesSilenceFlags()
+	{
+		auto tc = TrackChannelContainer{10, 2};
+		tc.enableSilenceTracking(false);
+
+		// Assume 2nd channel is non-silent
+		tc.assumeNonSilent(1);
+
+		QCOMPARE(tc.silenceFlags().all(), false);
+		QCOMPARE(tc.silenceFlags()[0], true);
+		QCOMPARE(tc.silenceFlags()[1], false);
+
+		tc.enableSilenceTracking(true);
+
+		// Silence flags should be updated
+		QCOMPARE(tc.silenceFlags().all(), true);
 		QCOMPARE(tc.silenceFlags()[0], true);
 		QCOMPARE(tc.silenceFlags()[1], true);
-		QCOMPARE(tc.silenceFlags()[2], true);
-		QCOMPARE(tc.silenceFlags()[3], false);
+	}
 
-		// Should return true if no channels are selected for update
+	//! Verifies that the `updateSilenceFlags` method does nothing to silence flags
+	//! when all channels are already silent, regardless of which channels are selected
+	//! for an update.
+	void UpdateSilenceFlags_DoesNothingWhenSilent()
+	{
+		auto tc = TrackChannelContainer{10};
+		tc.enableSilenceTracking(true);
+
+		QCOMPARE(tc.silenceFlags().all(), true);
+
+		// Right channel only
+		QCOMPARE(tc.updateSilenceFlags(0b01), true);
+		QCOMPARE(tc.silenceFlags().all(), true);
+
+		// Left channel only
+		QCOMPARE(tc.updateSilenceFlags(0b10), true);
+		QCOMPARE(tc.silenceFlags().all(), true);
+
+		// Both channels
+		QCOMPARE(tc.updateSilenceFlags(0b11), true);
+		QCOMPARE(tc.silenceFlags().all(), true);
+	}
+
+	//! Verifies that the `updateSilenceFlags` method updates a single non-silent channel,
+	//! but only when that channel is selected for an update.
+	void UpdateSilenceFlags_UpdatesChannelWhenSelected()
+	{
+		auto tc = TrackChannelContainer{10};
+		tc.enableSilenceTracking(true);
+
+		// Both channels should be silent
+		QCOMPARE(tc.silenceFlags().all(), true);
+
+		// Introduce noise to a frame in the right channel
+		tc.buffers(0).buffer(1)[5] = 1.f;
+
+		// Update the left channel - returns true because the updated channel is silent
+		QCOMPARE(tc.updateSilenceFlags(0b01), true);
+
+		// Silence flags remain the same since the non-silent channel was not updated
+		QCOMPARE(tc.silenceFlags().all(), true);
+
+		// Now update the right channel - returns false since the updated channel is not silent
+		QCOMPARE(tc.updateSilenceFlags(0b10), false);
+
+		// The silence flag for the right channel should now be cleared
+		QCOMPARE(tc.silenceFlags()[0], true);  // left channel
+		QCOMPARE(tc.silenceFlags()[1], false); // right channel
+		QCOMPARE(tc.silenceFlags()[2], true);  // unused 3rd channel
+		// etc.
+
+		// Updating both channels returns false since one of them is non-silent
+		QCOMPARE(tc.updateSilenceFlags(0b11), false);
+	}
+
+	//! Verifies that the `updateSilenceFlags` method works across channel groups
+	void UpdateSilenceFlags_WorksWithGroups()
+	{
+		auto tc = TrackChannelContainer{10, 0};
+		tc.enableSilenceTracking(true);
+
+		tc.addGroup(3);
+		tc.addGroup(1);
+
+		// All channels should be silent
+		QCOMPARE(tc.silenceFlags().all(), true);
+
+		// Introduce noise to a frame in the 2nd channel of the 1st group
+		tc.buffers(0).buffer(1)[5] = 1.f;
+
+		// Introduce noise to a frame in the 1st channel of the 2nd group
+		tc.buffers(1).buffer(0)[5] = 1.f;
+
+		// Update the two silent channels - returns true because both are silent
+		QCOMPARE(tc.updateSilenceFlags(0b0101), true);
+
+		// Silence flags remain the same since the non-silent channels were not updated
+		QCOMPARE(tc.silenceFlags().all(), true);
+
+		// Now update the 3rd channel of the 1st group and the 1st channel of the 2nd group
+		// Returns false since one of the updated channels is not silent
+		QCOMPARE(tc.updateSilenceFlags(0b1100), false);
+
+		// The silence flag for the 1st channel of the 2nd group should now be cleared,
+		// but the 2nd channel of the 1st group should still be marked silent since
+		// it has not been updated yet.
+		QCOMPARE(tc.silenceFlags()[0], true);  // group 1, channel 1
+		QCOMPARE(tc.silenceFlags()[1], true);  // group 1, channel 2
+		QCOMPARE(tc.silenceFlags()[2], true);  // group 1, channel 3
+		QCOMPARE(tc.silenceFlags()[3], false); // group 2, channel 1
+		QCOMPARE(tc.silenceFlags()[4], true);  // unused 5th channel
+		// etc.
+
+		// Now update group 1, channel 2
+		QCOMPARE(tc.updateSilenceFlags(0b0010), false);
+
+		QCOMPARE(tc.silenceFlags()[0], true);  // group 1, channel 1
+		QCOMPARE(tc.silenceFlags()[1], false); // group 1, channel 2
+		QCOMPARE(tc.silenceFlags()[2], true);  // group 1, channel 3
+		QCOMPARE(tc.silenceFlags()[3], false); // group 2, channel 1
+		QCOMPARE(tc.silenceFlags()[4], true);  // unused 5th channel
+		// etc.
+	}
+
+	//! Verifies that the `updateSilenceFlags` method updates a silent channel's flags
+	//! from non-silent to silent when selected for update.
+	void UpdateSilenceFlags_UpdatesFromNonSilenceToSilence()
+	{
+		auto tc = TrackChannelContainer{10, 2};
+		tc.enableSilenceTracking(true);
+
+		QCOMPARE(tc.silenceFlags().all(), true);
+
+		// Assume 2nd channel is non-silent
+		tc.assumeNonSilent(1);
+		QCOMPARE(tc.silenceFlags()[0], true);
+		QCOMPARE(tc.silenceFlags()[1], false);
+
+		// Update 1st channel - does nothing
+		QCOMPARE(tc.updateSilenceFlags(0b01), true);
+		QCOMPARE(tc.silenceFlags()[0], true);
+		QCOMPARE(tc.silenceFlags()[1], false);
+		QCOMPARE(tc.silenceFlags()[2], true); // unused 3rd channel
+
+		// Update 2nd channel (non-silent to silent)
+		// Returns true because the channel's audio data is silent
+		QCOMPARE(tc.updateSilenceFlags(0b10), true);
+		QCOMPARE(tc.silenceFlags()[0], true);
+		QCOMPARE(tc.silenceFlags()[1], true);
+		QCOMPARE(tc.silenceFlags()[2], true); // unused 3rd channel
+
+		// Again, assume 2nd channel is non-silent
+		tc.assumeNonSilent(1);
+		QCOMPARE(tc.silenceFlags()[0], true);
+		QCOMPARE(tc.silenceFlags()[1], false);
+		QCOMPARE(tc.silenceFlags()[2], true); // unused 3rd channel
+
+		// Update both channels
+		// Returns true because both channels' audio data is silent
+		QCOMPARE(tc.updateSilenceFlags(0b11), true);
+		QCOMPARE(tc.silenceFlags()[0], true);
+		QCOMPARE(tc.silenceFlags()[1], true);
+		QCOMPARE(tc.silenceFlags()[2], true); // unused 3rd channel
+	}
+
+	//! Verifies that `updateSilenceFlags` marks selected channels as non-silent when
+	//! silence tracking is disabled.
+	void UpdateSilenceFlags_NonSilentWhenSilenceTrackingDisabled()
+	{
+		auto tc = TrackChannelContainer{10, 2};
+		tc.enableSilenceTracking(false);
+
+		QCOMPARE(tc.silenceFlags().all(), true);
+
+		// Now update the 2nd channel. The audio data is actually silent, but silence tracking
+		// is disabled so it must assume the updated channel is non-silent just to be safe.
+		QCOMPARE(tc.updateSilenceFlags(0b10), false);
+		QCOMPARE(tc.silenceFlags()[0], true);
+		QCOMPARE(tc.silenceFlags()[1], false);
+		QCOMPARE(tc.silenceFlags()[2], true); // unused 3rd channel
+
+		// Again with both channels
+		QCOMPARE(tc.updateSilenceFlags(0b11), false);
+		QCOMPARE(tc.silenceFlags()[0], false);
+		QCOMPARE(tc.silenceFlags()[1], false);
+		QCOMPARE(tc.silenceFlags()[2], true); // unused 3rd channel
+	}
+
+	//! Verifies that when no selected channels are passed to `updateSilenceFlags`,
+	//! it returns true indicating that all selected channels are silent.
+	void UpdateSilenceFlags_NoSelectionIsSilent()
+	{
+		auto tc = TrackChannelContainer{10, 2};
+
+		// First, with silence tracking
+		tc.enableSilenceTracking(true);
 		QCOMPARE(tc.updateSilenceFlags(0), true);
 
-		// Make the left channel of the 1st track channel group non-zero too
-		tc.buffers(0).buffer(0)[5] = 1.f;
-
-		// Update the left channel of the 1st track channel group
-		QCOMPARE(tc.updateSilenceFlags(0b0001), false);
-		QCOMPARE(tc.silenceFlags()[0], false);
-		QCOMPARE(tc.silenceFlags()[1], true);
-		QCOMPARE(tc.silenceFlags()[2], true);
-		QCOMPARE(tc.silenceFlags()[3], false);
-
-		// Make the left channel of the 2nd track channel group non-zero,
-		// and set the left channel of 1st track channel group back to zero
-		tc.buffers(1).buffer(0)[5] = 1.f;
-		tc.buffers(0).buffer(0)[5] = 0.f;
-
-		// Update only the 2nd track channel group
-		QCOMPARE(tc.updateSilenceFlags(0b1100), false);
-		QCOMPARE(tc.silenceFlags()[0], false);
-		QCOMPARE(tc.silenceFlags()[1], true);
-		QCOMPARE(tc.silenceFlags()[2], false);
-		QCOMPARE(tc.silenceFlags()[3], false);
-
-		// Now update the 1st track channel group
-		QCOMPARE(tc.updateSilenceFlags(0b0011), true);
-		QCOMPARE(tc.silenceFlags()[0], true);
-		QCOMPARE(tc.silenceFlags()[1], true);
-		QCOMPARE(tc.silenceFlags()[2], false);
-		QCOMPARE(tc.silenceFlags()[3], false);
-
-		// Zero out all channels again
-		tc.buffers(1).buffer(0)[5] = 0.f;
-		tc.buffers(1).buffer(1)[5] = 0.f;
-		QCOMPARE(tc.updateSilenceFlags(0b0000), true);
-		QCOMPARE(tc.silenceFlags().all(), false);
-		QCOMPARE(tc.updateSilenceFlags(0b1111), true);
-		QCOMPARE(tc.silenceFlags().all(), true);
+		// Should produce the same result without silence tracking
+		tc.enableSilenceTracking(false);
+		QCOMPARE(tc.updateSilenceFlags(0), true);
 	}
 
-	//! Verifies that the `updateAllSilenceFlags` method works as intended
-	void UpdateAllSilenceFlags()
+	//! Verifies that `updateAllSilenceFlags` updates all silence flags
+	//! when silence tracking is enabled.
+	void UpdateAllSilenceFlags_SilenceTrackingEnabled()
 	{
-		auto tc = createTrackChannelContainer(10);
+		auto tc = TrackChannelContainer{10, 2};
+		tc.addGroup(2);
+		tc.enableSilenceTracking(true);
 
-		// Add a 2nd stereo group
-		QVERIFY(tc.addGroup(2) != nullptr);
-
-		// Both channels should be silent
 		QCOMPARE(tc.updateAllSilenceFlags(), true);
 		QCOMPARE(tc.silenceFlags().all(), true);
 
-		// Now introduce a non-zero sample to the right channel of 2nd track channel group
-		tc.buffers(1).buffer(1)[5] = 1.f;
-		QCOMPARE(tc.updateAllSilenceFlags(), false);
-		QCOMPARE(tc.silenceFlags().all(), false);
-		QCOMPARE(tc.silenceFlags()[0], true);
-		QCOMPARE(tc.silenceFlags()[1], true);
-		QCOMPARE(tc.silenceFlags()[2], true);
-		QCOMPARE(tc.silenceFlags()[3], false);
-
-		// Make the left channel of the 1st track channel group non-zero too
+		// Introduce noise to a frame in the 1st channel of the 1st group
 		tc.buffers(0).buffer(0)[5] = 1.f;
-		QCOMPARE(tc.updateAllSilenceFlags(), false);
-		QCOMPARE(tc.silenceFlags().all(), false);
-		QCOMPARE(tc.silenceFlags()[0], false);
-		QCOMPARE(tc.silenceFlags()[1], true);
-		QCOMPARE(tc.silenceFlags()[2], true);
-		QCOMPARE(tc.silenceFlags()[3], false);
 
-		// Zero out all channels again
-		tc.buffers(0).buffer(0)[5] = 0.f;
+		// Introduce noise to a frame in the 2nd channel of the 2nd group
+		tc.buffers(1).buffer(1)[5] = 1.f;
+
+		// Those 2 channels should be marked silent after updating all channels
+		QCOMPARE(tc.updateAllSilenceFlags(), false);
+		QCOMPARE(tc.silenceFlags()[0], false); // channel 1
+		QCOMPARE(tc.silenceFlags()[1], true);  // channel 2
+		QCOMPARE(tc.silenceFlags()[2], true);  // channel 3
+		QCOMPARE(tc.silenceFlags()[3], false); // channel 4
+		QCOMPARE(tc.silenceFlags()[4], true);  // unused 5th channel
+
+		// Silence the frame in the 2nd channel of the 2nd group
 		tc.buffers(1).buffer(1)[5] = 0.f;
-		QCOMPARE(tc.updateAllSilenceFlags(), true);
-		QCOMPARE(tc.silenceFlags().all(), true);
+
+		// Now only the 1st channel should be marked silent after updating all channels
+		QCOMPARE(tc.updateAllSilenceFlags(), false);
+		QCOMPARE(tc.silenceFlags()[0], false); // channel 1
+		QCOMPARE(tc.silenceFlags()[1], true);  // channel 2
+		QCOMPARE(tc.silenceFlags()[2], true);  // channel 3
+		QCOMPARE(tc.silenceFlags()[3], true);  // channel 4
+		QCOMPARE(tc.silenceFlags()[4], true);  // unused 5th channel
 	}
 
-	//! Verifies that the `hasInputNoise` method works as intended
+	//! Verifies that `updateAllSilenceFlags` marks all silence flags
+	//! for used channels as non-silent when silence tracking is disabled.
+	void UpdateAllSilenceFlags_SilenceTrackingDisabled()
+	{
+		auto tc = TrackChannelContainer{10, 2};
+		tc.addGroup(2);
+		tc.enableSilenceTracking(false);
+
+		QCOMPARE(tc.updateAllSilenceFlags(), false);
+
+		QCOMPARE(tc.silenceFlags()[0], false); // channel 1
+		QCOMPARE(tc.silenceFlags()[1], false); // channel 2
+		QCOMPARE(tc.silenceFlags()[2], false); // channel 3
+		QCOMPARE(tc.silenceFlags()[3], false); // channel 4
+		QCOMPARE(tc.silenceFlags()[4], true);  // unused 5th channel
+	}
+
+	//! Verifies that when there are no channels, `updateAllSilenceFlags`
+	//! returns true indicating that all channels are silent.
+	void UpdateAllSilenceFlags_NoChannelsIsSilent()
+	{
+		auto tc = TrackChannelContainer{10, 0};
+
+		// First, with silence tracking
+		tc.enableSilenceTracking(true);
+		QCOMPARE(tc.updateAllSilenceFlags(), true);
+
+		// Should produce the same result without silence tracking
+		tc.enableSilenceTracking(false);
+		QCOMPARE(tc.updateAllSilenceFlags(), true);
+	}
+
+	//! Verifies that `hasInputNoise` returns true if any of the selected
+	//! channels are non-silent.
 	void HasInputNoise()
 	{
-		auto tc = createTrackChannelContainer(10);
+		auto tc = TrackChannelContainer{10, 2};
+		tc.enableSilenceTracking(true);
 
 		// Add a 2nd stereo group
 		QVERIFY(tc.addGroup(2) != nullptr);
@@ -269,110 +520,127 @@ private slots:
 		// No input noise since all track channels are silent
 		QCOMPARE(tc.hasInputNoise(0b1111), false);
 
-		// Make the left channels in both groups non-zero and manually update the silence status
-		tc.buffers(0).buffer(0)[5] = 1.f;
-		tc.buffers(1).buffer(0)[5] = 1.f;
+		// Assume both left channels are non-silent
 		tc.assumeNonSilent(0);
 		tc.assumeNonSilent(2);
 
-		// Check if any channels are non-zero
+		// Check if any channels are non-silent
 		QCOMPARE(tc.hasInputNoise(0b1111), true);
 
-		// Check if either of the left channels are non-zero
+		// Check if either of the left channels are non-silent
 		QCOMPARE(tc.hasInputNoise(0b0101), true);
 
-		// Check if either of the right channels are non-zero
+		// Check if either of the right channels are non-silent
 		QCOMPARE(tc.hasInputNoise(0b1010), false);
 
-		// Check if either channel in the 1st group are non-zero
+		// Check if either channel in the 1st group are non-silent
 		QCOMPARE(tc.hasInputNoise(0b0011), true);
+
+		// Check if the 5th channel (an unused channel) is non-silent
+		QCOMPARE(tc.hasInputNoise(0b10000), false);
 	}
 
-	//! Verifies that the `sanitize` method works as intended
-	void Sanitize()
+	//! Verifies that the `sanitize` method only silences channels containing Inf or NaN
+	void Sanitize_SilencesOnlyInfAndNaN()
 	{
 		lmms::MixHelpers::setNaNHandler(true);
 
-		auto tc = createTrackChannelContainer(10);
+		auto tc = TrackChannelContainer{10, 2};
+		tc.enableSilenceTracking(true);
 
 		// Add a 2nd stereo group
 		QVERIFY(tc.addGroup(2) != nullptr);
 
-		// Should have no effect when all buffers are zeroed
+		// Should have no effect when all buffers are silenced
 		QCOMPARE(tc.silenceFlags().all(), true);
 		tc.sanitize(0b1111);
 		QCOMPARE(tc.silenceFlags().all(), true);
 
-		// Make left channel of 1st track channel group contain an Inf, and force the channel to non-quiet
+		// Make left channel of 1st track channel group
+		// contain an Inf, and force the channel to non-silent
 		tc.buffers(0).buffer(0)[5] = std::numeric_limits<float>::infinity();
 		tc.assumeNonSilent(0);
 
-		// Make right channel of 1st track channel group non-zero too, but using a valid value
+		// Make right channel of 1st track channel group non-silent too,
+		// but using a valid value
 		tc.buffers(0).buffer(1)[5] = 1.f;
 		tc.assumeNonSilent(1);
 
 		// Sanitize only the left channel
 		tc.sanitize(0b0001);
 
-		// The left channel's buffer should be zeroed, while the right channel should be unaffected
+		// The left channel's buffer should be silenced,
+		// while the right channel should be unaffected
 		QCOMPARE(tc.buffers(0).buffer(0)[5], 0.f);
 		QCOMPARE(tc.buffers(0).buffer(1)[5], 1.f);
 		QCOMPARE(tc.silenceFlags()[0], true);
 		QCOMPARE(tc.silenceFlags()[1], false);
+		QCOMPARE(tc.silenceFlags()[2], true);
+		QCOMPARE(tc.silenceFlags()[3], true);
+		QCOMPARE(tc.silenceFlags()[4], true); // unused 5th channel
 
 		// Try again
-		tc.buffers(0).buffer(0)[5] = std::numeric_limits<float>::infinity();
+		tc.buffers(0).buffer(0)[5] = std::numeric_limits<float>::quiet_NaN();
 		tc.assumeNonSilent(0);
 
 		// This time, sanitize both channels of the 1st track channel group
 		tc.sanitize(0b0011);
 
-		// Again, the left channel's buffer should be zeroed, while the right channel should be unaffected
+		// Again, the left channel's buffer should be silence,
+		// while the right channel should be unaffected
 		QCOMPARE(tc.buffers(0).buffer(0)[5], 0.f);
 		QCOMPARE(tc.buffers(0).buffer(1)[5], 1.f);
 		QCOMPARE(tc.silenceFlags()[0], true);
 		QCOMPARE(tc.silenceFlags()[1], false);
+		QCOMPARE(tc.silenceFlags()[2], true);
+		QCOMPARE(tc.silenceFlags()[3], true);
+		QCOMPARE(tc.silenceFlags()[4], true); // unused 5th channel
 	}
 
-	//! Verifies that the `silenceChannels` method works as intended
-	void SilenceChannels()
+	//! Verifies that the `silenceChannels` method silences the selected channels
+	//! and updates their silence flags
+	void SilenceChannels_SilencesSelectedChannels()
 	{
-		auto tc = createTrackChannelContainer(10);
+		auto tc = TrackChannelContainer{10, 2};
+		tc.enableSilenceTracking(true);
 
 		// Add a 2nd stereo group
 		QVERIFY(tc.addGroup(2) != nullptr);
 
-		// Should have no effect when all buffers are zeroed
+		// Should have no effect when all buffers are silent
 		QCOMPARE(tc.silenceFlags().all(), true);
 		tc.silenceChannels(0b1111);
 		QCOMPARE(tc.silenceFlags().all(), true);
 
-		// Make left channel of 2nd track channel group contain a non-zero value, and force the channel to non-quiet
+		// Make left channel of 2nd track channel group contain
+		// a non-silent value, and force the channel to be non-silent
 		tc.buffers(1).buffer(0)[5] = 1.f;
 		tc.assumeNonSilent(2);
 
 		// Silence only the left channel
 		tc.silenceChannels(0b0100);
 
-		QCOMPARE(tc.silenceFlags()[0], true);
-		QCOMPARE(tc.silenceFlags()[1], true);
-		QCOMPARE(tc.silenceFlags()[2], true);
-		QCOMPARE(tc.silenceFlags()[3], true);
+		QCOMPARE(tc.silenceFlags()[0], true); // not selected
+		QCOMPARE(tc.silenceFlags()[1], true); // not selected
+		QCOMPARE(tc.silenceFlags()[2], true); // updated!
+		QCOMPARE(tc.silenceFlags()[3], true); // not selected
 
-		// Make right channel of 2nd track channel group contain a non-zero value, and force the channel to non-quiet
+		// Make right channel of 2nd track channel group contain
+		// a non-silent value, and force the channel to be non-silent
 		tc.buffers(1).buffer(1)[5] = 1.f;
 		tc.assumeNonSilent(3);
 
 		// Silence only the right channel
 		tc.silenceChannels(0b1000);
 
-		QCOMPARE(tc.silenceFlags()[0], true);
-		QCOMPARE(tc.silenceFlags()[1], true);
-		QCOMPARE(tc.silenceFlags()[2], true);
-		QCOMPARE(tc.silenceFlags()[3], true);
+		QCOMPARE(tc.silenceFlags()[0], true); // not selected
+		QCOMPARE(tc.silenceFlags()[1], true); // not selected
+		QCOMPARE(tc.silenceFlags()[2], true); // not selected
+		QCOMPARE(tc.silenceFlags()[3], true); // updated!
 
-		// Make right channel of 1st track channel group and both channels of 2nd track channel group contain
-		// a non-zero value, and force those channels to non-quiet
+		// Make right channel of 1st track channel group and
+		// both channels of 2nd track channel group contain
+		// a non-silent value, and force those channels to be non-silent
 		tc.buffers(1).buffer(1)[5] = 1.f;
 		tc.assumeNonSilent(1);
 		tc.buffers(1).buffer(0)[5] = 1.f;
@@ -380,13 +648,14 @@ private slots:
 		tc.buffers(1).buffer(1)[5] = 1.f;
 		tc.assumeNonSilent(3);
 
-		// Silence both channels of the 2nd track channel group, plus the already-quiet left channel of the 1st group
+		// Silence both channels of the 2nd track channel group,
+		// plus the already-silent left channel of the 1st group
 		tc.silenceChannels(0b1101);
 
-		QCOMPARE(tc.silenceFlags()[0], true);
-		QCOMPARE(tc.silenceFlags()[1], false);
-		QCOMPARE(tc.silenceFlags()[2], true);
-		QCOMPARE(tc.silenceFlags()[3], true);
+		QCOMPARE(tc.silenceFlags()[0], true);  // selected, but already silent
+		QCOMPARE(tc.silenceFlags()[1], false); // not selected, remains non-silent
+		QCOMPARE(tc.silenceFlags()[2], true);  // updated!
+		QCOMPARE(tc.silenceFlags()[3], true);  // updated!
 	}
 };
 

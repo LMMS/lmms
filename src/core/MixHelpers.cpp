@@ -101,7 +101,7 @@ bool sanitize(std::span<sample_t> buffer)
 		{
 #ifdef LMMS_DEBUG
 			std::cerr << "Bad data, clearing buffer. frame: "
-				<< f << ": value " << sample << "\n";
+				<< f << ", value: " << sample << "\n";
 #endif
 
 			// Clear the channel if a problem is found
