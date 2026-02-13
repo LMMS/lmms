@@ -218,8 +218,8 @@ public:
 	void enableSilenceTracking(bool enabled);
 	auto silenceTrackingEnabled() const -> bool { return m_silenceTrackingEnabled; }
 
-	//! Mixes the silence status of the other `TrackChannelContainer` with this `TrackChannelContainer`
-	void mixQuietChannels(const TrackChannelContainer& other);
+	//! Mixes the silence flags of the other `TrackChannelContainer` with this `TrackChannelContainer`
+	void mixSilenceFlags(const TrackChannelContainer& other);
 
 	/**
 	 * Determines whether a processor has input noise given

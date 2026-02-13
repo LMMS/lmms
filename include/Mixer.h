@@ -142,7 +142,7 @@ public:
 	Mixer();
 	~Mixer() override;
 
-	void mixToChannel(const TrackChannelContainer& trackChannels, mix_ch_t channel);
+	void mixToChannel(const TrackChannelContainer& trackChannels, mix_ch_t dest);
 
 	void prepareMasterMix();
 	void masterMix( SampleFrame* _buf );

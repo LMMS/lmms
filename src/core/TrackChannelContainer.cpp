@@ -211,7 +211,7 @@ void TrackChannelContainer::enableSilenceTracking(bool enabled)
 	}
 }
 
-void TrackChannelContainer::mixQuietChannels(const TrackChannelContainer& other)
+void TrackChannelContainer::mixSilenceFlags(const TrackChannelContainer& other)
 {
 	m_silenceFlags &= other.silenceFlags();
 }
