@@ -27,11 +27,10 @@ determine_version_from_source(Portaudio_VERSION portaudio [[
 ]])
 
 if(TARGET portaudio)
-	if(MINGW)
-		# MinGW uses the statically linked target
-		add_library(portaudio_lib ALIAS portaudio_static)
+	if(TARGET portaudio_static)
+		add_library(portaudio::portaudio ALIAS portaudio_static)
 	else()
-		add_library(portaudio_lib ALIAS portaudio)
+		add_library(portaudio::portaudio ALIAS portaudio)
 	endif()
 endif()
 

@@ -162,7 +162,7 @@ if(LMMS_HAVE_LIBRT)
 endif()
 
 if(LMMS_HAVE_PORTAUDIO)
-	list(APPEND EXTRA_LIBRARIES portaudio_lib)
+	list(APPEND EXTRA_LIBRARIES portaudio::portaudio)
 endif()
 
 if(LMMS_HAVE_MP3LAME)
