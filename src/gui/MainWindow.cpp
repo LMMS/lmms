@@ -484,6 +484,9 @@ void MainWindow::finalize()
 	else if( Engine::audioEngine()->audioDevStartFailed() || !AudioEngine::isAudioDevNameValid(
 		ConfigManager::inst()->value( "audioengine", "audiodev" ) ) )
 	{
+		QMessageBox::critical(nullptr, "Audio device setup failed",
+			tr("Failed to setup audio device for playback. Try adjusting your audio device settings (e.g. the sample rate), then restart LMMS."));
+
 		// if so, offer the audio settings section of the setup dialog
 		SetupDialog sd( SetupDialog::ConfigTab::AudioSettings );
 		sd.exec();
@@ -919,7 +922,9 @@ void MainWindow::help()
 
 void MainWindow::toggleWindow( QWidget *window, bool forceShow )
 {
-	QWidget *parent = window->parentWidget();
+	// All "windows" should be inside a SubWindow, because the use of activeSubWindow() depends on it
+	auto parent = dynamic_cast<QMdiSubWindow*>(window->parentWidget());
+	if (parent == nullptr) { return; }
 
 	if( forceShow ||
 		m_workspace->activeSubWindow() != parent ||
@@ -927,7 +932,8 @@ void MainWindow::toggleWindow( QWidget *window, bool forceShow )
 	{
 		parent->show();
 		window->show();
-		window->setFocus();
+		if (window->isEnabled()) { window->setFocus(); }
+		else { m_workspace->setActiveSubWindow(parent); }
 	}
 	else
 	{
@@ -1502,7 +1508,9 @@ void MainWindow::exportProject(bool multiExport)
 			}
 		}
 
-		ExportProjectDialog epd( exportFileName, getGUI()->mainWindow(), multiExport );
+		ExportProjectDialog epd(exportFileName,
+			multiExport ? ExportProjectDialog::Mode::ExportTracks : ExportProjectDialog::Mode::ExportProject,
+			getGUI()->mainWindow());
 		epd.exec();
 	}
 }

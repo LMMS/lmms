@@ -47,7 +47,7 @@ include(StaticDependencies)
 
 STRING(TOUPPER          "${CMAKE_PROJECT_NAME}" PROJECT_NAME_UCASE)
 
-SET(PROJECT_YEAR 2025)
+SET(PROJECT_YEAR 2026)
 
 SET(PROJECT_AUTHOR      "LMMS Developers")
 SET(PROJECT_URL         "https://lmms.io")
@@ -185,7 +185,7 @@ if(WANT_QT6)
 	set(STATUS_QT6 "Enabled")
 else()
 	set(QT_VERSION_MAJOR 5)
-	set(LMMS_QT_MIN_VERSION 5.9.0)
+	set(LMMS_QT_MIN_VERSION 5.15.0)
 	set(STATUS_QT6 "Disabled")
 endif()
 

@@ -147,8 +147,7 @@ void FloatModelEditorBase::dropEvent(QDropEvent * de)
 		auto mod = dynamic_cast<AutomatableModel*>(Engine::projectJournal()->journallingObject(val.toInt()));
 		if (mod != nullptr)
 		{
-			AutomatableModel::linkModels(model(), mod);
-			mod->setValue(model()->value());
+			model()->linkToModel(mod);
 		}
 	}
 }
@@ -388,9 +387,8 @@ void FloatModelEditorBase::enterValue()
 
 		new_val = QInputDialog::getDouble(
 			this, tr("Set value"),
-			tr("Please enter a new value between "
-					"-96.0 dBFS and 6.0 dBFS:"),
-				initialDbValue, -96.0, 6.0, model()->getDigitCount(), &ok);
+			tr("Please enter a new value between -96.0 dBFS and %1 dBFS:").arg(ampToDbfs(model()->maxValue() / 100.0f)),
+				initialDbValue, -96.0, ampToDbfs(model()->maxValue() / 100.0f), model()->getDigitCount(), &ok);
 
 		if (new_val <= -96.0)
 		{
@@ -423,12 +421,16 @@ void FloatModelEditorBase::enterValue()
 
 void FloatModelEditorBase::friendlyUpdate()
 {
-	if (model() && (model()->controllerConnection() == nullptr ||
-		model()->controllerConnection()->getController()->frequentUpdates() == false ||
-				Controller::runningFrames() % (256*4) == 0))
-	{
-		update();
-	}
+	if (model() == nullptr) { return; }
+
+	// If the controller changes constantly, only repaint every 1024th frame
+	if (model()->useControllerValue()
+		&& model()->controllerConnection()
+		&& model()->controllerConnection()->getController()->frequentUpdates()
+		&& Controller::runningFrames() % (256 * 4) != 0)
+	{ return; }
+
+	update();
 }
 
 

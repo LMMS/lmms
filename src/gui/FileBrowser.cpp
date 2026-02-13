@@ -29,12 +29,14 @@
 #include <QApplication>
 #include <QCheckBox>
 #include <QHBoxLayout>
+#include <QHeaderView>
 #include <QLineEdit>
 #include <QMdiArea>
 #include <QMdiSubWindow>
 #include <QMenu>
 #include <QMessageBox>
 #include <QProgressBar>
+#include <QScrollBar>
 #include <QPushButton>
 #include <QShortcut>
 #include <QStringList>
@@ -60,7 +62,6 @@
 #include "PresetPreviewPlayHandle.h"
 #include "Sample.h"
 #include "SampleClip.h"
-#include "SampleLoader.h"
 #include "SamplePlayHandle.h"
 #include "SampleTrack.h"
 #include "Song.h"
@@ -461,10 +462,12 @@ FileBrowserTreeWidget::FileBrowserTreeWidget(QWidget * parent ) :
 	m_mousePressed( false ),
 	m_pressPos(),
 	m_previewPlayHandle( nullptr )
-#if (QT_VERSION < QT_VERSION_CHECK(5,14,0))
-	,m_pphMutex(QMutex::Recursive)
-#endif
 {
+	setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+	setHorizontalScrollMode(ScrollPerPixel);
+	header()->setStretchLastSection(false);
+	header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+
 	setColumnCount( 1 );
 	headerItem()->setHidden( true );
 	setSortingEnabled( false );
@@ -475,14 +478,6 @@ FileBrowserTreeWidget::FileBrowserTreeWidget(QWidget * parent ) :
 				SLOT(updateDirectory(QTreeWidgetItem*)));
 	connect( this, SIGNAL(itemExpanded(QTreeWidgetItem*)),
 				SLOT(updateDirectory(QTreeWidgetItem*)));
-
-#if QT_VERSION < QT_VERSION_CHECK(5, 12, 2) && defined LMMS_BUILD_WIN32
-	// Set the font for the QTreeWidget to the Windows System font to make sure that
-	// truncated (elided) items use the same font as non-truncated items.
-	// This is a workaround for this qt bug, fixed in 5.12.2: https://bugreports.qt.io/browse/QTBUG-29232
-	// TODO: remove this when all builds use a recent enough version of qt.
-	setFont( GuiApplication::getWin32SystemFont() );
-#endif
 }
 
 
@@ -512,6 +507,28 @@ QList<QString> FileBrowserTreeWidget::expandedDirs( QTreeWidgetItem * item ) con
 	return dirs;
 }
 
+void FileBrowserTreeWidget::scrollTo(const QModelIndex &index, ScrollHint hint)
+{
+	// Overide scrollTo to ensure the horizontal scrollbar stay in place
+	int barPos = horizontalScrollBar()->value();
+	QTreeWidget::scrollTo(index, hint);
+	horizontalScrollBar()->setValue(barPos);
+}
+
+void FileBrowserTreeWidget::wheelEvent(QWheelEvent * event)
+{
+	// When shift is pressed, scroll horizontally instead of vertically
+	if (event->modifiers() & Qt::ShiftModifier)
+	{
+		horizontalScrollBar()->setValue(
+			horizontalScrollBar()->value() - event->angleDelta().y());
+		event->accept();
+	}
+	else
+	{
+		QTreeWidget::wheelEvent(event);
+	}
+}
 
 void FileBrowserTreeWidget::keyPressEvent(QKeyEvent * ke )
 {
@@ -778,7 +795,7 @@ void FileBrowserTreeWidget::previewFileItem(FileItem* file)
 			embed::getIconPixmap("sample_file", 24, 24), 0);
 		// TODO: this can be removed once we do this outside the event thread
 		qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-		if (auto buffer = SampleLoader::createBufferFromFile(fileName))
+		if (auto buffer = SampleBuffer::fromFile(fileName))
 		{
 			auto s = new SamplePlayHandle(new lmms::Sample{std::move(buffer)});
 			s->setDoneMayReturnTrue(false);

@@ -638,18 +638,16 @@ FloatModel * Mixer::channelSendModel( mix_ch_t fromChannel, mix_ch_t toChannel )
 
 void Mixer::mixToChannel(const TrackChannelContainer& trackChannels, mix_ch_t channel)
 {
-	auto mixerChannel = m_mixerChannels[channel];
-	if (mixerChannel->m_muteModel.value() == false)
+	const auto mixerChannel = m_mixerChannels[channel];
+	if (!mixerChannel->m_muteModel.value())
 	{
 		mixerChannel->m_lock.lock();
-
 		MixHelpers::add(mixerChannel->m_trackChannels.buffers(0), trackChannels.buffers(0));
 
 		// Copy the planar buffer to the temporary interleaved buffer so they stay in sync
 		toInterleaved(mixerChannel->m_trackChannels.buffers(0), mixerChannel->m_trackChannels.interleavedBuffer());
 
 		mixerChannel->m_trackChannels.mixQuietChannels(trackChannels);
-
 		mixerChannel->m_lock.unlock();
 	}
 }

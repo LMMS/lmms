@@ -46,6 +46,7 @@
 #include "GuiApplication.h"
 #include "Knob.h"
 #include "LcdWidget.h"
+#include "lmms_math.h"
 #include "Mixer.h"
 #include "MixerView.h"
 #include "PeakIndicator.h"
@@ -117,16 +118,16 @@ MixerChannelView::MixerChannelView(QWidget* parent, MixerView* mixerView, int ch
 	m_renameLineEditView->setFixedSize(m_renameLineEdit->height() + 5, m_renameLineEdit->width() + 5);
 
 	m_muteButton = new AutomatableButton(this, tr("Mute"));
-	m_muteButton->setModel(&mixerChannel->m_muteModel);
-	m_muteButton->setCheckable(true);
 	m_muteButton->setObjectName("btn-mute");
 	m_muteButton->setToolTip(tr("Mute this channel"));
+	m_muteButton->setCheckable(true);
+	m_muteButton->setModel(&mixerChannel->m_muteModel);
 
 	m_soloButton = new AutomatableButton(this, tr("Solo"));
-	m_soloButton->setModel(&mixerChannel->m_soloModel);
-	m_soloButton->setCheckable(true);
 	m_soloButton->setObjectName("btn-solo");
 	m_soloButton->setToolTip(tr("Solo this channel"));
+	m_soloButton->setCheckable(true);
+	m_soloButton->setModel(&mixerChannel->m_soloModel);
 
 	auto soloMuteLayout = new QVBoxLayout();
 	soloMuteLayout->setContentsMargins(0, 2, 0, 2);
@@ -248,13 +249,7 @@ void MixerChannelView::keyPressEvent(QKeyEvent* ke)
 
 void MixerChannelView::setChannelIndex(int index)
 {
-	MixerChannel* mixerChannel = Engine::mixer()->mixerChannel(index);
-	m_fader->setModel(&mixerChannel->m_volumeModel);
-	m_muteButton->setModel(&mixerChannel->m_muteModel);
-	m_soloButton->setModel(&mixerChannel->m_soloModel);
-	m_effectRackView->setModel(&mixerChannel->m_fxChain);
 	m_channelNumberLcd->setValue(index);
-	m_renameLineEdit->setText(elideName(mixerChannel->m_name));
 	m_channelIndex = index;
 }
 
@@ -322,7 +317,7 @@ void MixerChannelView::selectColor()
 void MixerChannelView::randomizeColor()
 {
 	auto channel = mixerChannel();
-	channel->setColor(ColorChooser::getPalette(ColorChooser::Palette::Mixer)[rand() % 48]);
+	channel->setColor(ColorChooser::getPalette(ColorChooser::Palette::Mixer)[fastRand(48)]);
 	Engine::getSong()->setModified();
 	update();
 }

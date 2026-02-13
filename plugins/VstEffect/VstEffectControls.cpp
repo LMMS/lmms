@@ -315,19 +315,9 @@ namespace gui
 ManageVSTEffectView::ManageVSTEffectView( VstEffect * _eff, VstEffectControls * m_vi ) :
 	m_effect( _eff )
 {
-#if QT_VERSION < 0x50C00
-	// Workaround for a bug in Qt versions below 5.12,
-	// where argument-dependent-lookup fails for QFlags operators
-	// declared inside a namespace.
-	// This affects the Q_DECLARE_OPERATORS_FOR_FLAGS macro in Instrument.h
-	// See also: https://codereview.qt-project.org/c/qt/qtbase/+/225348
-
-	using ::operator|;
-#endif
-
 	m_vi2 = m_vi;
 	widget = new QWidget();
-        m_vi->m_scrollArea = new QScrollArea( widget );
+	m_vi->m_scrollArea = new QScrollArea(widget);
 	l = new QGridLayout( widget );
 
 	m_vi->m_subWindow = getGUI()->mainWindow()->addWindowedWidget(nullptr, Qt::SubWindow |
@@ -465,8 +455,8 @@ void ManageVSTEffectView::syncPlugin()
 			std::snprintf(paramStr.data(), paramStr.size(), "param%d", i);
 			s_dumpValues = dump[paramStr.data()].split(":");
 			float f_value = LocaleHelper::toFloat(s_dumpValues.at(2));
-			m_vi2->knobFModel[ i ]->setAutomatedValue( f_value );
-			m_vi2->knobFModel[ i ]->setInitValue( f_value );
+			m_vi2->knobFModel[i]->setValue(f_value, true);
+			m_vi2->knobFModel[i]->setInitValue(f_value);
 		}
 	}
 	syncParameterText();
