@@ -58,7 +58,7 @@ namespace lmms::gui
 
 /*! The width of the resize grip in pixels
  */
-const int RESIZE_GRIP_WIDTH = 4;
+const int RESIZE_GRIP_WIDTH = 8;
 
 
 /*! A pointer for that text bubble used when moving segments, etc.
