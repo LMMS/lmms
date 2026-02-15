@@ -273,8 +273,8 @@ void TrackContentWidget::changePosition( const TimePos & newPos )
 
 		clip->changeLength( clip->length() );
 
-		const int ts = clip->startPosition();
-		const int te = clip->endPosition()-3;
+		const int ts = clip->startPosition() + clipView->offset() * clip->length();
+		const int te = clip->endPosition()-3 + clipView->offset() * clip->length();
 		if( ( ts >= begin && ts <= end ) ||
 			( te >= begin && te <= end ) ||
 			( ts <= begin && te >= end ) )

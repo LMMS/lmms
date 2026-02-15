@@ -402,6 +402,16 @@ void MidiClip::splitNotesAlongLine(const NoteVector notes, TimePos pos1, int key
 
 
 
+bool MidiClip::loopable() const
+{
+	if ( isInPattern() ) {
+		return false;
+	}
+	return true;
+}
+
+
+
 void MidiClip::setType( Type _new_clip_type )
 {
 	if( _new_clip_type == Type::BeatClip ||
