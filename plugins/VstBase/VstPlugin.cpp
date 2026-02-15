@@ -456,12 +456,38 @@ bool VstPlugin::processMessage( const message & _m )
 			m_allProgramNames = _m.getQString();
 			break;
 
-		case IdVstParameterLabels:
-			m_allParameterLabels = _m.getQString();
+		case IdVstLoadAllParameterLabels:
+		{
+			const auto labels = _m.getQString();
+			m_allParameterLabels.clear();
+			for (int i = 0; i < labels.size();)
+			{
+				const int length = labels[i].digitValue();
+				m_allParameterLabels.push_back(labels.mid(i + 1, length));
+				i += length + 1;
+			}
+			break;
+		}
+
+		case IdVstLoadAllParameterDisplays:
+		{
+			const auto displays = _m.getQString();
+			m_allParameterDisplays.clear();
+			for (int i = 0; i < displays.size();)
+			{
+				const int length = displays[i].digitValue();
+				m_allParameterDisplays.push_back(displays.mid(i + 1, length));
+				i += length + 1;
+			}
+			break;
+		}
+
+		case IdVstUpdateParameterLabel:
+			m_allParameterLabels.at(static_cast<std::size_t>(_m.getInt(0))) = _m.getQString(1);
 			break;
 
-		case IdVstParameterDisplays:
-			m_allParameterDisplays = _m.getQString();
+		case IdVstUpdateParameterDisplay:
+			m_allParameterDisplays.at(static_cast<std::size_t>(_m.getInt(0))) = _m.getQString(1);
 			break;
 
 		case IdVstPluginUniqueID:
@@ -554,8 +580,8 @@ void VstPlugin::loadProgramNames()
 void VstPlugin::loadParameterLabels()
 {
 	lock();
-	sendMessage( message( IdVstParameterLabels ) );
-	waitForMessage( IdVstParameterLabels, true );
+	sendMessage(message(IdVstLoadAllParameterLabels));
+	waitForMessage(IdVstLoadAllParameterLabels, true);
 	unlock();
 }
 
@@ -565,8 +591,30 @@ void VstPlugin::loadParameterLabels()
 void VstPlugin::loadParameterDisplays()
 {
 	lock();
-	sendMessage( message( IdVstParameterDisplays ) );
-	waitForMessage( IdVstParameterDisplays, true );
+	sendMessage(message(IdVstLoadAllParameterDisplays));
+	waitForMessage(IdVstLoadAllParameterDisplays, true);
+	unlock();
+}
+
+
+
+
+void VstPlugin::updateParameterLabel(int index)
+{
+	lock();
+	sendMessage(message(IdVstUpdateParameterLabel).addInt(index));
+	waitForMessage(IdVstUpdateParameterLabel, true);
+	unlock();
+}
+
+
+
+
+void VstPlugin::updateParameterDisplay(int index)
+{
+	lock();
+	sendMessage(message(IdVstUpdateParameterDisplay).addInt(index));
+	waitForMessage(IdVstUpdateParameterDisplay, true);
 	unlock();
 }
 

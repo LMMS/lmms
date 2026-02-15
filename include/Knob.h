@@ -235,6 +235,25 @@ private:
 	KnobType m_knobNum;
 };
 
+
+class LMMS_EXPORT VolumeKnob : public Knob
+{
+	Q_OBJECT
+
+	mapPropertyFromModel(float, volumeRatio, setVolumeRatio, m_volumeRatio);
+
+public:
+	using Knob::Knob;
+
+protected:
+	QString pullFloatingText() const override;
+	void enterValue() override;
+
+private:
+	FloatModel m_volumeRatio{100.f, 0.f, 1000000.f};
+};
+
+
 } // namespace lmms::gui
 
 #endif // LMMS_GUI_KNOB_H

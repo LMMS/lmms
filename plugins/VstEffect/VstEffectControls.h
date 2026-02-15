@@ -44,7 +44,7 @@ class VstEffect;
 
 namespace gui
 {
-class CustomTextKnob;
+class Knob;
 class ManageVSTEffectView;
 class VstEffectControlDialog;
 }
@@ -121,6 +121,7 @@ protected slots:
 	void displayAutomatedOnly();
 	void setParameter( lmms::Model * action );
 	void syncParameterText();
+	void updateParameterText(int index);
 	void closeWindow();
 
 private:
@@ -139,9 +140,8 @@ private:
 	QPushButton * m_syncButton;
 	QPushButton * m_displayAutomatedOnly;
 	QPushButton * m_closeButton;
-	CustomTextKnob ** vstKnobs;
-
-} ;
+	std::vector<Knob*> m_vstKnobs;
+};
 
 
 } // namespace gui

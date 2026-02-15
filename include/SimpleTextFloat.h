@@ -22,16 +22,16 @@
  *
 */
 
-
 #ifndef LMMS_GUI_SIMPLE_TEXT_FLOAT_H
 #define LMMS_GUI_SIMPLE_TEXT_FLOAT_H
 
 #include <QWidget>
+#include <atomic>
+#include <mutex>
 
 #include "lmms_export.h"
 
 class QLabel;
-class QTimer;
 
 namespace lmms::gui
 {
@@ -57,12 +57,31 @@ public:
 		move(w->mapToGlobal(QPoint(0, 0)) + offset);
 	}
 
+	void show();
 	void hide();
+
+	//! Stores which object is currently controlling the text float and disconnects the old source (if any)
+	void setSource(QObject* source);
+
+	//! Stores which object is currently controlling the text float and disconnects the old source (if any)
+	void setSource(QObject* source, QMetaObject::Connection connection);
+
+	//! @returns which object is currently controlling the text float
+	auto source() const -> QObject* { return m_source; }
+
+signals:
+	void visibilityChanged(bool visible);
 
 private:
 	QLabel * m_textLabel;
 	QTimer * m_showTimer;
 	QTimer * m_hideTimer;
+
+	std::atomic<QObject*> m_source = nullptr;
+	QMetaObject::Connection m_connection;
+
+	// TODO: See if the mutex usage can be removed or reduced
+	std::recursive_mutex m_mutex;
 };
 
 } // namespace lmms::gui

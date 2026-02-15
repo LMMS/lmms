@@ -370,9 +370,10 @@ public:
 		{
 		}
 
-		inline message & addString( const std::string & _s )
+		template<class... Args>
+		message& addString(Args&&... args)
 		{
-			data.push_back( _s );
+			data.emplace_back(std::forward<Args>(args)...);
 			return *this;
 		}
 
