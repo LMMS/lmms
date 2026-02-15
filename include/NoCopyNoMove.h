@@ -25,13 +25,15 @@
 #ifndef LMMS_NOCOPYNOMOVE_H
 #define LMMS_NOCOPYNOMOVE_H
 
+#include "lmms_export.h"
+
 namespace lmms
 {
 
 /**
  * Inherit this class to make your class non-copyable and non-movable
  */
-class NoCopyNoMove
+class LMMS_EXPORT NoCopyNoMove
 {
 protected:
 	NoCopyNoMove() = default;
