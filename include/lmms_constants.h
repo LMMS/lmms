@@ -34,7 +34,11 @@ namespace lmms
 // using this directly
 inline constexpr float F_EPSILON = 1.0e-10f; // 10^-10
 
-inline constexpr ch_cnt_t DEFAULT_CHANNELS = 2;
+// Channel counts
+inline constexpr auto DEFAULT_CHANNELS = ch_cnt_t{2};
+inline constexpr auto MaxChannelsPerGroup = ch_cnt_t{64};
+inline constexpr auto MaxGroupsPerTrack = group_cnt_t{32};
+inline constexpr auto MaxTrackChannels = track_ch_t{256}; // channels per track
 
 // Microtuner
 inline constexpr unsigned MaxScaleCount = 10;  //!< number of scales per project

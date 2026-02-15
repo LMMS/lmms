@@ -319,17 +319,17 @@ public:
 	{
 	}
 
-	//! Construct from std::span<SampleFrame>
-	InterleavedBufferView(std::span<SampleFrame> buffer) noexcept
+	//! Construct from SampleFrame*
+	InterleavedBufferView(SampleFrame* data, f_cnt_t frames) noexcept
 		requires (std::is_same_v<std::remove_const_t<T>, float> && channelCount == 2)
-		: Base{reinterpret_cast<float*>(buffer.data()), buffer.size()}
+		: Base{reinterpret_cast<float*>(data), frames}
 	{
 	}
 
-	//! Construct from std::span<const SampleFrame>
-	InterleavedBufferView(std::span<const SampleFrame> buffer) noexcept
+	//! Construct from const SampleFrame*
+	InterleavedBufferView(const SampleFrame* data, f_cnt_t frames) noexcept
 		requires (std::is_same_v<T, const float> && channelCount == 2)
-		: Base{reinterpret_cast<const float*>(buffer.data()), buffer.size()}
+		: Base{reinterpret_cast<const float*>(data), frames}
 	{
 	}
 
@@ -437,13 +437,13 @@ public:
 		return reinterpret_cast<const SampleFrame*>(this->m_data)[index];
 	}
 
-	auto toSampleFrames() noexcept -> std::span<SampleFrame>
+	auto asSampleFrames() noexcept -> std::span<SampleFrame>
 		requires (std::is_same_v<T, float> && channelCount == 2)
 	{
 		return {reinterpret_cast<SampleFrame*>(this->m_data), this->m_frames};
 	}
 
-	auto toSampleFrames() const noexcept -> std::span<const SampleFrame>
+	auto asSampleFrames() const noexcept -> std::span<const SampleFrame>
 		requires (std::is_same_v<T, const float> && channelCount == 2)
 	{
 		return {reinterpret_cast<const SampleFrame*>(this->m_data), this->m_frames};
@@ -456,6 +456,10 @@ public:
 // Check that the std::span-like space optimization works
 static_assert(sizeof(InterleavedBufferView<float>) > sizeof(InterleavedBufferView<float, 2>));
 static_assert(sizeof(InterleavedBufferView<float, 2>) == sizeof(void*) + sizeof(f_cnt_t));
+
+// Deduction guides
+InterleavedBufferView(const SampleFrame*, f_cnt_t) -> InterleavedBufferView<const float, 2>;
+InterleavedBufferView(SampleFrame*, f_cnt_t) -> InterleavedBufferView<float, 2>;
 
 
 /**
@@ -559,6 +563,51 @@ static_assert(sizeof(PlanarBufferView<float, 2>) == sizeof(void**) + sizeof(f_cn
 template<class T, typename U, proc_ch_t channels = DynamicChannelCount>
 concept AudioBufferView = SampleType<U> && (std::convertible_to<T, InterleavedBufferView<U, channels>>
 	|| std::convertible_to<T, PlanarBufferView<U, channels>>);
+
+
+//! Converts planar buffers to interleaved buffers
+template<class T, proc_ch_t inputs, proc_ch_t outputs>
+constexpr void toInterleaved(PlanarBufferView<T, inputs> src,
+	InterleavedBufferView<std::remove_const_t<T>, outputs> dst)
+{
+	assert(src.frames() == dst.frames());
+	if constexpr (inputs == DynamicChannelCount || outputs == DynamicChannelCount)
+	{
+		assert(src.channels() == dst.channels());
+	}
+	else { static_assert(inputs == outputs); }
+
+	for (f_cnt_t frame = 0; frame < dst.frames(); ++frame)
+	{
+		auto* framePtr = dst.framePtr(frame);
+		for (proc_ch_t channel = 0; channel < dst.channels(); ++channel)
+		{
+			framePtr[channel] = src.bufferPtr(channel)[frame];
+		}
+	}
+}
+
+//! Converts interleaved buffers to planar buffers
+template<class T, proc_ch_t inputs, proc_ch_t outputs>
+constexpr void toPlanar(InterleavedBufferView<T, inputs> src,
+	PlanarBufferView<std::remove_const_t<T>, outputs> dst)
+{
+	assert(src.frames() == dst.frames());
+	if constexpr (inputs == DynamicChannelCount || outputs == DynamicChannelCount)
+	{
+		assert(src.channels() == dst.channels());
+	}
+	else { static_assert(inputs == outputs); }
+
+	for (proc_ch_t channel = 0; channel < dst.channels(); ++channel)
+	{
+		auto* channelPtr = dst.bufferPtr(channel);
+		for (f_cnt_t frame = 0; frame < dst.frames(); ++frame)
+		{
+			channelPtr[frame] = src.framePtr(frame)[channel];
+		}
+	}
+}
 
 } // namespace lmms
 
