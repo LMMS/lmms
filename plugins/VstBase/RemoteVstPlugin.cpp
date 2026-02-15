@@ -469,8 +469,10 @@ private:
 	std::mutex m_shmLock;
 	bool m_shmValid;
 
+	static constexpr const int MidiEventBufferSize = 4096;
 	using VstMidiEventList = std::vector<VstMidiEvent>;
 	VstMidiEventList m_midiEvents;
+	int m_ignoredMidiEvents = 0;
 
 	bpm_t m_bpm;
 	double m_currentSamplePos;
@@ -516,6 +518,8 @@ RemoteVstPlugin::RemoteVstPlugin( const char * socketPath ) :
 	m_currentProgram(-1)
 {
 	__plugin = this;
+
+	m_midiEvents.reserve(MidiEventBufferSize);
 
 	// process until we have loaded the plugin
 	while( 1 )
@@ -1034,13 +1038,17 @@ void RemoteVstPlugin::process( const SampleFrame* _in, SampleFrame* _out )
 	// first we gonna post all MIDI-events we enqueued so far
 	if( m_midiEvents.size() )
 	{
+		if (m_ignoredMidiEvents > 0)
+		{
+			fprintf(stderr, "Too many VstMidiEvents sent this period. Dropping %d events.\n", m_ignoredMidiEvents);
+			m_ignoredMidiEvents = 0;
+		}
 		// since MIDI-events are not received immediately, we
 		// have to have them stored somewhere even after
 		// dispatcher-call, so we create static copies of the
 		// data and post them
-#define MIDI_EVENT_BUFFER_COUNT		1024
-		static char eventsBuffer[sizeof( VstEvents ) + sizeof( VstMidiEvent * ) * MIDI_EVENT_BUFFER_COUNT];
-		static VstMidiEvent vme[MIDI_EVENT_BUFFER_COUNT];
+		static char eventsBuffer[sizeof(VstEvents) + sizeof(VstMidiEvent*) * MidiEventBufferSize];
+		static VstMidiEvent vme[MidiEventBufferSize];
 
 		// first sort events chronologically, since some plugins
 		// (e.g. Sinnah) can hang if they're out of order
@@ -1143,8 +1151,18 @@ void RemoteVstPlugin::processMidiEvent( const MidiEvent& event, const f_cnt_t of
 	}
 	vme.midiData[3] = 0;
 
-	// TODO: Would this cause a data race with the process method? The two methods must not be called concurrently
-	m_midiEvents.push_back( vme );
+
+	// Drop midi events if there are more than can fit in the event buffer.
+	// TODO: Could the events be handled in chunks?
+	if (m_midiEvents.size() < MidiEventBufferSize)
+	{
+		// TODO: Would this cause a data race with the process method? The two methods must not be called concurrently
+		m_midiEvents.push_back(vme);
+	}
+	else
+	{
+		m_ignoredMidiEvents++;
+	}
 }
 
 
