@@ -981,18 +981,37 @@ void MainWindow::refocus()
 {
 	const auto gui = getGUI();
 
-	// Attempt to set the focus on the first of these editors that is not hidden...
-	for (auto editorParent : { gui->songEditor()->parentWidget(), gui->patternEditor()->parentWidget(),
-		gui->pianoRoll()->parentWidget(), gui->automationEditor()->parentWidget() })
+	// qDebug() << "REFOCUS CALLED";
+
+	const std::array<QWidget*, 4> editorWindows{
+		gui->songEditor()->parentWidget(),
+		gui->patternEditor()->parentWidget(),
+		gui->pianoRoll()->parentWidget(),
+		gui->automationEditor()->parentWidget(),
+	};
+
+	const auto isEditorWindow = [&](QMdiSubWindow* sw) -> bool
 	{
-		if (!editorParent->isHidden())
+		return std::find(editorWindows.begin(), editorWindows.end(), (QWidget*)sw) != editorWindows.end();
+	};
+
+	// Go through the subwindow list, from topmost to bottom-most, and find a desirable new focus target.
+	const auto swList = m_workspace->subWindowList(QMdiArea::StackingOrder);
+	for (auto it = swList.rbegin(); it != swList.rend(); ++it)
+	{
+		auto* sw = *it;
+
+		// qDebug() << sw << sw->windowTitle() << sw->isVisible() << sw->isHidden();
+
+		if (sw->isVisible() && (sw->isMaximized() || isEditorWindow(sw)))
 		{
-			editorParent->setFocus();
+			// qDebug() << "FOCUS SET TO" << sw->windowTitle();
+			sw->setFocus();
 			return;
 		}
 	}
 
-	// ... otherwise set the focus on the main window.
+	// In case nothing was found, set the focus on the main window.
 	this->setFocus();
 }
 

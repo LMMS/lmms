@@ -215,12 +215,7 @@ private:
 	class MovableQMdiArea : public QMdiArea
 	{
 	public:
-		/**
-			@param hasActiveMaxWindow Function that should return whether there are any active maximized windows, in
-			order to avoid initiating a pan in that case.
-		*/
 		MovableQMdiArea(QWidget* parent, MainWindow* mainWindow, keyModifiers* keyMods, QScrollBar* scrollBarV, QScrollBar* scrollBarH);
-
 		~MovableQMdiArea() {}
 
 	protected:
