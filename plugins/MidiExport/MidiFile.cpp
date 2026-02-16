@@ -1,105 +1,122 @@
-/**
- * Name:        MidiFile.cpp
- * Purpose:     C++ re-write of the python module MidiFile.py
- * Author:      Mohamed Abdel Maksoud <mohamed at amaksoud.com>
- *-----------------------------------------------------------------------------
- * Name:        MidiFile.py
- * Purpose:     MIDI file manipulation utilities
+/*
+ * MidiFile.cpp - support for exporting MIDI files
  *
- * Author:      Mark Conway Wirt <emergentmusics) at (gmail . com>
+ * Copyright (c) 2009 Mark Conway Wirt <emergentmusics) at (gmail . com>
+ * Copyright (c) 2015 Mohamed Abdel Maksoud <mohamed at amaksoud.com>
+ * Copyright (c) 2020 EmoonX
  *
- * Created:     2008/04/17
- * Copyright:   (c) 2009 Mark Conway Wirt
- * License:     Please see License.txt for the terms under which this
- *              software is distributed.
- *-----------------------------------------------------------------------------
+ * This file was originally based on the Python module MidiFile.py from MIDIUtil
+ * by Mark Conway Wirt, which was later rewritten in C++ by Mohamed Abdel Maksoud.
+ *
+ * --------------------------------------------------------------------------
+ * MIDUTIL, Copyright (c) 2009, Mark Conway Wirt
+ *                        <emergentmusics) at (gmail . com>
+ *
+ * This software is distributed under an Open Source license, the
+ * details of which follow.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+ * OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ * --------------------------------------------------------------------------
+ *
  */
 
 #include "MidiFile.h"
 
 #include <algorithm>
+#include <cassert>
 #include <stack>
 #include <string>
 #include <vector>
-#include <cassert>
 
 #include <QDataStream>
 #include <QFile>
-#include <QSharedPointer>
 #include <QString>
 
 namespace lmms
 {
 
-/*---------------------------------------------------------------------------*/
-
-MidiFile::MidiFile(const QString &filename, int nTracks):
-		m_file(filename),
-		m_header(nTracks)
+MidiFile::MidiFile(const QString& filename, int numTracks)
+	: m_file{filename}
+	, m_header{numTracks}
 {
 	// Open designated blank MIDI file (and data stream) for writing
 	m_file.open(QIODevice::WriteOnly);
-	m_stream = QSharedPointer<QDataStream>(new QDataStream(&m_file));
+	m_stream.setDevice(&m_file);
 
 	// Resize track list
-	m_tracks.resize(nTracks);
+	m_tracks.resize(numTracks);
 }
 
 void MidiFile::writeAllToStream()
 {
-	// reinterpret_cast is used to convert raw uint8_t data to char
-	m_stream->writeRawData(
-			reinterpret_cast<char *>(m_header.m_buffer.data()),
-			m_header.m_buffer.size());
-	for (Track &track : m_tracks)
+	m_stream.writeRawData(
+		reinterpret_cast<char*>(m_header.m_buffer.data()),
+		m_header.m_buffer.size()
+	);
+
+	for (Track& track : m_tracks)
 	{
-		m_stream->writeRawData(
-				reinterpret_cast<char *>(track.m_buffer.data()),
-				track.m_buffer.size());
+		m_stream.writeRawData(
+			reinterpret_cast<char*>(track.m_buffer.data()),
+			track.m_buffer.size()
+		);
 	}
 }
 
-/*---------------------------------------------------------------------------*/
-
 MidiFile::Section::Section()
 {
-	// Increases allocated capacity (not size)
 	m_buffer.reserve(BUFFER_SIZE);
 }
 
-void MidiFile::Section::writeBytes(std::vector<uint8_t> bytes,
-		std::vector<uint8_t> *v)
+void MidiFile::Section::writeBytes(std::vector<std::uint8_t> bytes,
+	std::vector<std::uint8_t>* v)
 {
 	// Insert <bytes> content to the end of *v
-	if (!v) v = &m_buffer;
+	if (!v) { v = &m_buffer; }
 	v->insert(v->end(), bytes.begin(), bytes.end());
 }
 
-void MidiFile::Section::writeVarLength(uint32_t val)
+void MidiFile::Section::writeVarLength(std::uint32_t val)
 {
 	// Build little endian stack from 7-bit packs
-	uint8_t result = val & 0x7F;
-	std::stack<uint8_t> little_endian({result});
+	std::uint8_t result = val & 0x7F;
+	auto littleEndian = std::stack<std::uint8_t>({result});
 	val >>= 7;
 	while (val > 0)
 	{
 		result = val & 0x7F;
 		result |= 0x80;
-		little_endian.push(result);
+		littleEndian.push(result);
 		val >>= 7;
 	}
 	// Add packs in reverse order to actual buffer
-	while (!little_endian.empty())
+	while (!littleEndian.empty())
 	{
-		m_buffer.push_back(little_endian.top());
-		little_endian.pop();
+		m_buffer.push_back(littleEndian.top());
+		littleEndian.pop();
 	}
 }
 
-void MidiFile::Section::writeBigEndian4(uint32_t val,
-		std::vector<uint8_t> *v)
+void MidiFile::Section::writeBigEndian4(std::uint32_t val,
+	std::vector<std::uint8_t>* v)
 {
-	std::vector<uint8_t> bytes;
+	std::vector<std::uint8_t> bytes;
 	bytes.push_back(val >> 24);
 	bytes.push_back((val >> 16) & 0xff),
 	bytes.push_back((val >> 8) & 0xff);
@@ -107,20 +124,19 @@ void MidiFile::Section::writeBigEndian4(uint32_t val,
 	writeBytes(bytes, v);
 }
 
-void MidiFile::Section::writeBigEndian2(uint16_t val,
-		std::vector<uint8_t> *v)
+void MidiFile::Section::writeBigEndian2(std::uint16_t val,
+	std::vector<std::uint8_t>* v)
 {
-	std::vector<uint8_t> bytes;
+	std::vector<std::uint8_t> bytes;
 	bytes.push_back(val >> 8);
 	bytes.push_back(val & 0xff);
 	writeBytes(bytes, v);
 }
 
-/*---------------------------------------------------------------------------*/
-
-MidiFile::Header::Header(int numTracks, int ticksPerBeat):
-		m_numTracks(numTracks),
-		m_ticksPerBeat(ticksPerBeat) {}
+MidiFile::Header::Header(int numTracks, int ticksPerBeat)
+	: m_numTracks{numTracks}
+	, m_ticksPerBeat{ticksPerBeat}
+{}
 
 void MidiFile::Header::writeToBuffer()
 {
@@ -138,55 +154,53 @@ void MidiFile::Header::writeToBuffer()
 	writeBigEndian2(m_ticksPerBeat);
 }
 
-/*---------------------------------------------------------------------------*/
-
-void MidiFile::Track::addEvent(Event event, uint32_t time)
+void MidiFile::Track::addEvent(Event event, std::uint32_t time)
 {
-	event.m_time = time;
-	event.m_channel = m_channel;
+	event.time = time;
+	event.channel = channel;
 	m_events.push_back(event);
 }
 
-void MidiFile::Track::addNote(uint8_t pitch, uint8_t volume,
-		double realTime, double duration)
+void MidiFile::Track::addNote(std::uint8_t pitch, std::uint8_t volume,
+	double realTime, double duration)
 {
 	Event event;
-	event.m_note.volume = volume;
+	event.note.volume = volume;
 
 	// Add start of note
-	event.m_type = Event::NOTE_ON;
-	event.m_note.pitch = pitch;
-	uint32_t time = realTime * TICKS_PER_BEAT;
+	event.type = Event::NOTE_ON;
+	event.note.pitch = pitch;
+	std::uint32_t time = realTime * TICKS_PER_BEAT;
 	addEvent(event, time);
 
 	// Add end of note
-	event.m_type = Event::NOTE_OFF;
-	event.m_note.pitch = pitch;
+	event.type = Event::NOTE_OFF;
+	event.note.pitch = pitch;
 	time = (realTime + duration) * TICKS_PER_BEAT;
 	addEvent(event, time);
 }
 
-void MidiFile::Track::addTempo(uint32_t tempo, uint32_t time)
+void MidiFile::Track::addTempo(std::uint32_t tempo, std::uint32_t time)
 {
 	Event event;
-	event.m_type = Event::TEMPO;
-	event.m_tempo = tempo;
+	event.type = Event::TEMPO;
+	event.tempo = tempo;
 	addEvent(event, time);
 }
 
-void MidiFile::Track::addProgramChange(uint8_t prog, uint32_t time)
+void MidiFile::Track::addProgramChange(std::uint8_t prog, std::uint32_t time)
 {
 	Event event;
-	event.m_type = Event::PROG_CHANGE;
-	event.m_programNumber = prog;
+	event.type = Event::PROG_CHANGE;
+	event.programNumber = prog;
 	addEvent(event, time);
 }
 
-void MidiFile::Track::addName(const std::string &name, uint32_t time)
+void MidiFile::Track::addName(const std::string& name, std::uint32_t time)
 {
 	Event event;
-	event.m_type = Event::TRACK_NAME;
-	event.m_trackName = name;
+	event.type = Event::TRACK_NAME;
+	event.trackName = name;
 	addEvent(event, time);
 }
 
@@ -197,16 +211,16 @@ void MidiFile::Track::writeToBuffer()
 
 	// Chunk size placeholder
 	writeBigEndian4(0);
-	size_t idx = m_buffer.size();
+	std::size_t idx = m_buffer.size();
 
 	// Write all events to buffer
 	writeMIDIToBuffer();
 
 	// Write correct size in placeholder place
-	size_t size = m_buffer.size() - idx;
-	std::vector<uint8_t> v;
+	std::size_t size = m_buffer.size() - idx;
+	std::vector<std::uint8_t> v;
 	writeBigEndian4(size, &v);
-	for (size_t i = 0; i < 4; ++i)
+	for (std::size_t i = 0; i < 4; ++i)
 	{
 		m_buffer[idx - 4 + i] = v[i];
 	}
@@ -228,17 +242,16 @@ void MidiFile::Track::writeEventsToBuffer()
 	std::sort(eventsSorted.begin(), eventsSorted.end());
 
 	int timeLast = 0;
-	for (Event &event : eventsSorted)
+	for (Event& event : eventsSorted)
 	{
 		// If something went wrong on sorting, maybe?
-		if (event.m_time < timeLast)
+		if (event.time < timeLast)
 		{
-			fprintf(stderr, "error: event.m_time=%d timeLast=%d\n",
-					event.m_time, timeLast);
+			std::fprintf(stderr, "error: event.m_time=%d timeLast=%d\n", event.time, timeLast);
 			assert(false);
 		}
-		int tmp = event.m_time;
-		event.m_time -= timeLast;
+		auto tmp = event.time;
+		event.time -= timeLast;
 		timeLast = tmp;
 
 		// Write event to buffer
@@ -249,62 +262,59 @@ void MidiFile::Track::writeEventsToBuffer()
 	}
 }
 
-void MidiFile::Track::writeSingleEventToBuffer(Event &event)
+void MidiFile::Track::writeSingleEventToBuffer(Event& event)
 {
 	// First of all, write event time
-	writeVarLength(event.m_time);
+	writeVarLength(event.time);
 
-	std::vector<uint8_t> fourBytes;
-	switch (event.m_type)
+	std::vector<std::uint8_t> fourBytes;
+	switch (event.type)
 	{
-	case MidiFile::Event::NOTE_ON:
-	{
-		// A note starts playing
-		uint8_t code = (0x9 << 4) | m_channel;
-		writeBytes({code, event.m_note.pitch, event.m_note.volume});
-		break;
-	}
-	case MidiFile::Event::NOTE_OFF:
-	{
-		// A note finishes playing
-		uint8_t code = (0x8 << 4) | m_channel;
-		writeBytes({code, event.m_note.pitch, event.m_note.volume});
-		break;
-	}
-	case MidiFile::Event::TEMPO:
-	{
-		// A tempo measure
-		uint8_t code = 0xFF;
-		writeBytes({code, 0x51, 0x03});
+		case MidiFile::Event::NOTE_ON:
+		{
+			// A note starts playing
+			std::uint8_t code = (0x9 << 4) | channel;
+			writeBytes({code, event.note.pitch, event.note.volume});
+			break;
+		}
+		case MidiFile::Event::NOTE_OFF:
+		{
+			// A note finishes playing
+			std::uint8_t code = (0x8 << 4) | channel;
+			writeBytes({code, event.note.pitch, event.note.volume});
+			break;
+		}
+		case MidiFile::Event::TEMPO:
+		{
+			// A tempo measure
+			std::uint8_t code = 0xFF;
+			writeBytes({code, 0x51, 0x03});
 
-		// Convert to microseconds before writting
-		writeBigEndian4(6e7 / event.m_tempo, &fourBytes);
-		writeBytes({fourBytes[1], fourBytes[2], fourBytes[3]});
-		break;
-	}
-	case MidiFile::Event::PROG_CHANGE:
-	{
-		// Change patch number
-		uint8_t code = (0xC << 4) | m_channel;
-		writeBytes({code, event.m_programNumber});
-		break;
-	}
-	case MidiFile::Event::TRACK_NAME:
-	{
-		// Name of current track
-		writeBytes({0xFF, 0x03});
+			// Convert to microseconds before writting
+			writeBigEndian4(6e7 / event.tempo, &fourBytes);
+			writeBytes({fourBytes[1], fourBytes[2], fourBytes[3]});
+			break;
+		}
+		case MidiFile::Event::PROG_CHANGE:
+		{
+			// Change patch number
+			std::uint8_t code = (0xC << 4) | channel;
+			writeBytes({code, event.programNumber});
+			break;
+		}
+		case MidiFile::Event::TRACK_NAME:
+		{
+			// Name of current track
+			writeBytes({0xFF, 0x03});
 
-		// Write name string size and then copy it's content
-		// to the following size bytes of buffer
-		std::vector<uint8_t> bytes(event.m_trackName.begin(),
-				event.m_trackName.end());
-		writeVarLength(event.m_trackName.size());
-		writeBytes(bytes);
-		break;
-	}
+			// Write name string size and then copy it's content
+			// to the following size bytes of buffer
+			auto bytes = std::vector<std::uint8_t>(event.trackName.begin(), event.trackName.end());
+			writeVarLength(event.trackName.size());
+			writeBytes(bytes);
+			break;
+		}
 	}
 }
-
-/*---------------------------------------------------------------------------*/
 
 } // namespace lmms
