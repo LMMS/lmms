@@ -568,12 +568,12 @@ void MidiClip::clear()
 
 bool MidiClip::canIncreaseLength() const
 {
-	return m_steps < MAX_LENGTH_IN_BARS * TimePos::stepsPerBar();
+	return m_steps < MAX_PATTERN_LENGTH_IN_BARS * TimePos::stepsPerBar();
 }
 
 void MidiClip::displayLengthError() const
 {
-	QString messageRemoveTrack = tr("Not allowed to add past %1 bars.").arg(MAX_LENGTH_IN_BARS);
+	QString messageRemoveTrack = tr("Not allowed to add past %1 bars.").arg(MAX_PATTERN_LENGTH_IN_BARS);
 	QString messageTitleRemoveTrack = tr("Pattern Editor Error");
 
 	QMessageBox mb;

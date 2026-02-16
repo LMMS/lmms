@@ -52,7 +52,7 @@ public:
 		MelodyClip
 	} ;
 
-	static const int MAX_LENGTH_IN_BARS = 500;
+	static const int MAX_PATTERN_LENGTH_IN_BARS = 500;
 
 	MidiClip( InstrumentTrack* instrumentTrack );
 	~MidiClip() override;
