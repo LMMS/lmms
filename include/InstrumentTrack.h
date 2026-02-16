@@ -239,6 +239,9 @@ public:
 
 	void autoAssignMidiDevice( bool );
 
+        /// Gets the auto assigned track (more or less the selected track).
+        static InstrumentTrack* getAutoAssignedTrack() { return InstrumentTrack::s_autoAssignedTrack; }
+
 signals:
 	void instrumentChanged();
 	void midiNoteOn( const lmms::Note& );

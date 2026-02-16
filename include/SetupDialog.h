@@ -192,6 +192,7 @@ private:
 	MswMap m_midiIfaceSetupWidgets;
 	trMap m_midiIfaceNames;
 	QComboBox * m_assignableMidiDevices;
+	QComboBox* m_MCUDawMidiDevices;
 	bool m_midiAutoQuantize;
 
 	// Paths settings widgets.
