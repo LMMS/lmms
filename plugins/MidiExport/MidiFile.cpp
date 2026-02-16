@@ -84,12 +84,18 @@ MidiFile::Section::Section()
 	m_buffer.reserve(BUFFER_SIZE);
 }
 
-void MidiFile::Section::writeBytes(std::vector<std::uint8_t> bytes,
+void MidiFile::Section::writeBytes(std::span<const std::uint8_t> bytes,
 	std::vector<std::uint8_t>* v)
 {
-	// Insert <bytes> content to the end of *v
+	// Append `bytes` content to the end of *v
 	if (!v) { v = &m_buffer; }
 	v->insert(v->end(), bytes.begin(), bytes.end());
+}
+
+void MidiFile::Section::writeBytes(std::initializer_list<std::uint8_t> bytes,
+	std::vector<std::uint8_t>* v)
+{
+	writeBytes(std::span{bytes.begin(), bytes.size()});
 }
 
 void MidiFile::Section::writeVarLength(std::uint32_t val)

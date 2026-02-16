@@ -39,6 +39,8 @@
 #ifndef LMMS_MIDI_FILE_H
 #define LMMS_MIDI_FILE_H
 
+#include <initializer_list>
+#include <span>
 #include <string>
 #include <vector>
 
@@ -48,8 +50,6 @@
 
 namespace lmms
 {
-
-/*---------------------------------------------------------------------------*/
 
 //! MIDI file class for exporting purposes
 class MidiFile
@@ -79,7 +79,14 @@ private:
 		//! @brief Write bytes to vector (or buffer by default)
 		//! @param bytes List of bytes to be written
 		//! @param v Pointer to vector (if none, use @ref m_buffer)
-		void writeBytes(std::vector<std::uint8_t> bytes,
+		void writeBytes(std::span<const std::uint8_t> bytes,
+			std::vector<std::uint8_t>* v = nullptr);
+
+		//! @brief Write bytes to vector (or buffer by default)
+		//! @param bytes List of bytes to be written
+		//! @param v Pointer to vector (if none, use @ref m_buffer)
+		//! TODO C++26: Remove once std::span supports construction from std::initializer_list
+		void writeBytes(std::initializer_list<std::uint8_t> bytes,
 			std::vector<std::uint8_t>* v = nullptr);
 
 		//! @brief Write a MIDI-compatible variable length stream
