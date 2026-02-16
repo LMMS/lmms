@@ -29,7 +29,6 @@
 #include "WaveShaperControls.h"
 #include "WaveShaper.h"
 #include "base64.h"
-#include "Graph.h"
 #include "Engine.h"
 #include "Song.h"
 
@@ -44,22 +43,15 @@ WaveShaperControls::WaveShaperControls( WaveShaperEffect * _eff ) :
 	m_effect( _eff ),
 	m_inputModel( 1.0f, 0.0f, 5.0f, 0.01f, this, tr( "Input gain" ) ),
 	m_outputModel( 1.0f, 0.0f, 5.0f, 0.01f, this, tr( "Output gain" ) ),
-	m_wavegraphModel( 0.0f, 1.0f, 200, this ),
 	m_clipModel( false, this )
+	, m_graphModel(20, 20, GRID_MAX_STEPS, GRID_MAX_STEPS, 200, this, tr("waveshape"))
 {
-	connect( &m_wavegraphModel, SIGNAL( samplesChanged( int, int ) ),
-			this, SLOT( samplesChanged( int, int ) ) );
-
 	setDefaultShape();
 }
 
 
 
 
-void WaveShaperControls::samplesChanged( int _begin, int _end)
-{
-	Engine::getSong()->setModified();
-}
 
 
 
@@ -71,15 +63,7 @@ void WaveShaperControls::loadSettings( const QDomElement & _this )
 	m_outputModel.loadSettings( _this, "outputGain" );
 
 	m_clipModel.loadSettings( _this, "clipInput" );
-
-//load waveshape
-	int size = 0;
-	char * dst = 0;
-	base64::decode( _this.attribute( "waveShape"), &dst, &size );
-
-	m_wavegraphModel.setSamples( (float*) dst );
-	delete[] dst;
-
+	m_graphModel.loadSettings(_this, "waveShapeGraph");
 }
 
 
@@ -93,26 +77,16 @@ void WaveShaperControls::saveSettings( QDomDocument & _doc,
 	m_outputModel.saveSettings( _doc, _this, "outputGain" );
 
 	m_clipModel.saveSettings( _doc, _this, "clipInput" );
-
-//save waveshape
-	QString sampleString;
-	base64::encode( (const char *)m_wavegraphModel.samples(),
-		m_wavegraphModel.length() * sizeof(float), sampleString );
-	_this.setAttribute( "waveShape", sampleString );
-
+	m_graphModel.saveSettings(_doc, _this, "waveShapeGraph");
 }
 
 
 void WaveShaperControls::setDefaultShape()
 {
-	auto shp = std::array<float, 200>{};
-	for ( int i = 0; i<200; i++)
-	{
-		shp[i] = ((float)i + 1.0f) / 200.0f;
-	}
-
-	m_wavegraphModel.setLength( 200 );
-	m_wavegraphModel.setSamples( (float*)&shp );
+	m_graphModel.clear();
+	m_graphModel.addItem(VGPoint{VGPoint::Type::bezier}, GridModel::ItemInfo{0.0f, 0.0f});
+	m_graphModel.addItem(VGPoint{VGPoint::Type::bezier},
+		GridModel::ItemInfo(m_graphModel.getLength(), m_graphModel.getLength()));
 }
 
 void WaveShaperControls::resetClicked()
@@ -120,30 +94,5 @@ void WaveShaperControls::resetClicked()
 	setDefaultShape();
 	Engine::getSong()->setModified();
 }
-
-void WaveShaperControls::smoothClicked()
-{
-	m_wavegraphModel.smoothNonCyclic();
-	Engine::getSong()->setModified();
-}
-
-void WaveShaperControls::addOneClicked()
-{
-	for( int i=0; i<200; i++ )
-	{
-		m_wavegraphModel.setSampleAt( i, qBound( 0.0f, m_wavegraphModel.samples()[i] * onedB, 1.0f ) );
-	}
-	Engine::getSong()->setModified();
-}
-
-void WaveShaperControls::subOneClicked()
-{
-	for( int i=0; i<200; i++ )
-	{
-		m_wavegraphModel.setSampleAt( i, qBound( 0.0f, m_wavegraphModel.samples()[i] / onedB, 1.0f ) );
-	}
-	Engine::getSong()->setModified();
-}
-
 
 } // namespace lmms
