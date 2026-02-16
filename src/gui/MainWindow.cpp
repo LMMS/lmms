@@ -686,42 +686,39 @@ void MainWindow::saveWidgetState( QWidget * _w, QDomElement & _de )
 
 
 
-
-void MainWindow::restoreWidgetState( QWidget * _w, const QDomElement & _de )
+void MainWindow::restoreWidgetState(QWidget* w, const QDomElement& de)
 {
-	QRect r(_de.attribute("x").toInt(),
-			_de.attribute("y").toInt(),
-			qMax( _w->sizeHint().width(), _de.attribute( "width" ).toInt() ),
-			qMax( _w->minimumHeight(), _de.attribute( "height" ).toInt() ) );
-	if( _de.hasAttribute( "visible" ) && !r.isNull() )
+	const int savedWidth = de.attribute("width").toInt();
+	const int savedHeight = de.attribute("height").toInt();
+	const auto widgetMinSize = w->minimumSizeHint();
+	const auto width = qMax(widgetMinSize.width(), savedWidth);
+	const auto height = qMax(widgetMinSize.height(), savedHeight);
+
+	QRect r(de.attribute("x").toInt(), de.attribute("y").toInt(), width, height);
+
+	if (de.hasAttribute("visible") && !r.isNull())
 	{
 		// If our widget is the main content of a window (e.g. piano roll, Mixer, etc),
 		// we really care about the position of the *window* - not the position of the widget within its window
-		if ( _w->parentWidget() != nullptr &&
-			_w->parentWidget()->inherits( "QMdiSubWindow" ) )
-		{
-			_w = _w->parentWidget();
+		QWidget* parent = w->parentWidget();
+		if (parent != nullptr && parent->inherits("QMdiSubWindow")) {
+			w = parent;
 		}
+
 		// first restore the window, as attempting to resize a maximized window causes graphics glitching
-		_w->setWindowState( _w->windowState() & ~(Qt::WindowMaximized | Qt::WindowMinimized) );
+		w->setWindowState(w->windowState() & ~(Qt::WindowMaximized | Qt::WindowMinimized));
 
 		// Check isEmpty() to work around corrupt project files with empty size
-		if ( ! r.size().isEmpty() ) {
-			_w->resize( r.size() );
-		}
-		_w->move( r.topLeft() );
+		if (!r.size().isEmpty()) { w->resize(r.size()); }
+		w->move(r.topLeft());
 
 		// set the window to its correct minimized/maximized/restored state
-		Qt::WindowStates flags = _w->windowState();
-		flags = _de.attribute( "minimized" ).toInt() ?
-				( flags | Qt::WindowMinimized ) :
-				( flags & ~Qt::WindowMinimized );
-		flags = _de.attribute( "maximized" ).toInt() ?
-				( flags | Qt::WindowMaximized ) :
-				( flags & ~Qt::WindowMaximized );
-		_w->setWindowState( flags );
+		Qt::WindowStates flags = w->windowState();
+		flags = de.attribute("minimized").toInt() ? (flags | Qt::WindowMinimized) : (flags & ~Qt::WindowMinimized);
+		flags = de.attribute("maximized").toInt() ? (flags | Qt::WindowMaximized) : (flags & ~Qt::WindowMaximized);
+		w->setWindowState(flags);
 
-		_w->setVisible( _de.attribute( "visible" ).toInt() );
+		w->setVisible(de.attribute("visible").toInt());
 	}
 }
 
