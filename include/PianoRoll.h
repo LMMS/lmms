@@ -122,7 +122,6 @@ public:
 	void showPanTextFloat(panning_t pan, const QPoint &pos, int timeout=-1);
 
 	void setCurrentMidiClip( MidiClip* newMidiClip );
-	void setGhostMidiClip( MidiClip* newMidiClip );
 	void loadGhostNotes( const QDomElement & de );
 	void loadMarkedSemiTones(const QDomElement & de);
 
@@ -241,7 +240,6 @@ protected slots:
 
 	void selectRegionFromPixels( int xStart, int xEnd );
 
-	void clearGhostClip();
 	void glueNotes();
 	void fitNoteLengths(bool fill);
 	void reverseNotes();
@@ -252,7 +250,6 @@ protected slots:
 
 signals:
 	void currentMidiClipChanged();
-	void ghostClipSet(bool);
 	void semiToneMarkerMenuScaleSetEnabled(bool);
 	void semiToneMarkerMenuChordSetEnabled(bool);
 
@@ -372,12 +369,22 @@ private:
 	static const std::vector<float> m_zoomYLevels;
 
 	MidiClip* m_midiClip;
+
 	NoteVector m_ghostNotes;
+	NoteBounds m_ghostBounds; // used to draw repetitions
+	BoolModel m_ghostVisible;
+	BoolModel m_ghostRepeated;
+	BoolModel m_ghostStacked;
+	BoolModel m_ghostStackedDense;
+	QAction* m_pasteGhostAction;
 
 	inline const NoteVector & ghostNotes() const
 	{
 		return m_ghostNotes;
 	}
+	void setGhostNotes(const NoteVector& notes);
+	void setGhostNotesFromSelection();
+	void pasteGhostNotes();
 
 	QScrollBar * m_leftRightScroll;
 	QScrollBar * m_topBottomScroll;
@@ -595,7 +602,6 @@ signals:
 
 private slots:
 	void updateAfterMidiClipChange();
-	void ghostClipSet( bool state );
 	void exportMidiClip();
 	void importMidiClip();
 
@@ -618,7 +624,6 @@ private:
 	ComboBox * m_scaleComboBox;
 	ComboBox * m_chordComboBox;
 	ComboBox* m_snapComboBox;
-	QPushButton * m_clearGhostButton;
 
 };
 
