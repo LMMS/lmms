@@ -684,13 +684,14 @@ void MainWindow::saveWidgetState( QWidget * _w, QDomElement & _de )
 	_de.setAttribute( "height", sizeToStore.height() );
 }
 
-
-
 void MainWindow::restoreWidgetState(QWidget* w, const QDomElement& de)
 {
+	QWidget* parent = w->parentWidget();
+	QMdiSubWindow* parentWin = dynamic_cast<QMdiSubWindow*>(parent);
+
 	const int savedWidth = de.attribute("width").toInt();
 	const int savedHeight = de.attribute("height").toInt();
-	const auto widgetMinSize = w->minimumSizeHint();
+	const auto widgetMinSize = (parentWin != nullptr) ? parentWin->minimumSizeHint() : w->minimumSizeHint();
 	const auto width = qMax(widgetMinSize.width(), savedWidth);
 	const auto height = qMax(widgetMinSize.height(), savedHeight);
 
@@ -698,12 +699,8 @@ void MainWindow::restoreWidgetState(QWidget* w, const QDomElement& de)
 
 	if (de.hasAttribute("visible") && !r.isNull())
 	{
-		// If our widget is the main content of a window (e.g. piano roll, Mixer, etc),
-		// we really care about the position of the *window* - not the position of the widget within its window
-		QWidget* parent = w->parentWidget();
-		if (parent != nullptr && parent->inherits("QMdiSubWindow")) {
-			w = parent;
-		}
+		// If our widget is the main content of a window (e.g. piano roll, Mixer, etc), we really care about the position of the *window*, not the position of the widget within its window.
+		if (parentWin != nullptr) { w = parent; }
 
 		// first restore the window, as attempting to resize a maximized window causes graphics glitching
 		w->setWindowState(w->windowState() & ~(Qt::WindowMaximized | Qt::WindowMinimized));
@@ -721,8 +718,6 @@ void MainWindow::restoreWidgetState(QWidget* w, const QDomElement& de)
 		w->setVisible(de.attribute("visible").toInt());
 	}
 }
-
-
 
 void MainWindow::emptySlot()
 {
