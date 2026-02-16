@@ -131,12 +131,14 @@ private:
 	//! Represents a track event. See @ref Event::Type for more info
 	struct Event
 	{
-		//! Possible event types, ordered most important to least important
-		enum Type
+		//! Possible event types, ordered from most important to least important
+		enum class Type
 		{
-			NOTE_ON, NOTE_OFF, TEMPO, PROG_CHANGE, TRACK_NAME
-		}
-		type = Type::NOTE_ON;
+			NoteOn, NoteOff, Tempo, ProgramChange, TrackName
+		};
+		using enum Type;
+
+		Type type = Type::NoteOn;
 
 		//! Time count when event happens
 		int time = 0; // FIXME: was std::uint32_t

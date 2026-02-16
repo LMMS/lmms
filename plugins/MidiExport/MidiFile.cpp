@@ -174,13 +174,13 @@ void MidiFile::Track::addNote(std::uint8_t pitch, std::uint8_t volume,
 	event.note.volume = volume;
 
 	// Add start of note
-	event.type = Event::NOTE_ON;
+	event.type = Event::NoteOn;
 	event.note.pitch = pitch;
 	std::uint32_t time = realTime * TICKS_PER_BEAT;
 	addEvent(event, time);
 
 	// Add end of note
-	event.type = Event::NOTE_OFF;
+	event.type = Event::NoteOff;
 	event.note.pitch = pitch;
 	time = (realTime + duration) * TICKS_PER_BEAT;
 	addEvent(event, time);
@@ -189,7 +189,7 @@ void MidiFile::Track::addNote(std::uint8_t pitch, std::uint8_t volume,
 void MidiFile::Track::addTempo(std::uint32_t tempo, std::uint32_t time)
 {
 	Event event;
-	event.type = Event::TEMPO;
+	event.type = Event::Tempo;
 	event.tempo = tempo;
 	addEvent(event, time);
 }
@@ -197,7 +197,7 @@ void MidiFile::Track::addTempo(std::uint32_t tempo, std::uint32_t time)
 void MidiFile::Track::addProgramChange(std::uint8_t prog, std::uint32_t time)
 {
 	Event event;
-	event.type = Event::PROG_CHANGE;
+	event.type = Event::ProgramChange;
 	event.programNumber = prog;
 	addEvent(event, time);
 }
@@ -205,7 +205,7 @@ void MidiFile::Track::addProgramChange(std::uint8_t prog, std::uint32_t time)
 void MidiFile::Track::addName(const std::string& name, std::uint32_t time)
 {
 	Event event;
-	event.type = Event::TRACK_NAME;
+	event.type = Event::TrackName;
 	event.trackName = name;
 	addEvent(event, time);
 }
@@ -276,39 +276,39 @@ void MidiFile::Track::writeSingleEventToBuffer(Event& event)
 	std::vector<std::uint8_t> fourBytes;
 	switch (event.type)
 	{
-		case MidiFile::Event::NOTE_ON:
+		case MidiFile::Event::NoteOn:
 		{
 			// A note starts playing
 			std::uint8_t code = (0x9 << 4) | channel;
 			writeBytes({code, event.note.pitch, event.note.volume});
 			break;
 		}
-		case MidiFile::Event::NOTE_OFF:
+		case MidiFile::Event::NoteOff:
 		{
 			// A note finishes playing
 			std::uint8_t code = (0x8 << 4) | channel;
 			writeBytes({code, event.note.pitch, event.note.volume});
 			break;
 		}
-		case MidiFile::Event::TEMPO:
+		case MidiFile::Event::Tempo:
 		{
 			// A tempo measure
 			std::uint8_t code = 0xFF;
 			writeBytes({code, 0x51, 0x03});
 
-			// Convert to microseconds before writting
+			// Convert to microseconds before writing
 			writeBigEndian4(6e7 / event.tempo, &fourBytes);
 			writeBytes({fourBytes[1], fourBytes[2], fourBytes[3]});
 			break;
 		}
-		case MidiFile::Event::PROG_CHANGE:
+		case MidiFile::Event::ProgramChange:
 		{
 			// Change patch number
 			std::uint8_t code = (0xC << 4) | channel;
 			writeBytes({code, event.programNumber});
 			break;
 		}
-		case MidiFile::Event::TRACK_NAME:
+		case MidiFile::Event::TrackName:
 		{
 			// Name of current track
 			writeBytes({0xFF, 0x03});
