@@ -38,6 +38,7 @@
 #include <QApplication>
 #include <QComboBox>
 #include <QCompleter>
+#include <QDebug>
 #include <QFileDialog>
 #include <QHBoxLayout>
 #include <QLabel>
@@ -155,14 +156,19 @@ CarlaInstrument::CarlaInstrument(InstrumentTrack* const instrumentTrack, const D
       fHandle(nullptr),
       fDescriptor(isPatchbay ? carla_get_native_patchbay_plugin() : carla_get_native_rack_plugin()),
       fMidiEventCount(0),
-      m_paramModels()
+      m_paramGroupCount(0),
+      m_paramModels(),
+      m_settingsElem(),
+      m_paramsCompleter(nullptr),
+      m_completerModel(nullptr)
 {
     fHost.handle      = this;
     fHost.uiName      = nullptr;
     fHost.uiParentId  = 0;
 
     // carla/resources contains PyQt scripts required for launch
-    QDir path(carla_get_library_folder());
+    const char* const libraryFolder = carla_get_library_folder();
+    QDir path(libraryFolder != nullptr ? QString::fromUtf8(libraryFolder) : QString());
 #if defined(CARLA_OS_LINUX)
     path.cdUp();
     path.cdUp();
@@ -187,6 +193,12 @@ CarlaInstrument::CarlaInstrument(InstrumentTrack* const instrumentTrack, const D
     std::memset(&fTimeInfo, 0, sizeof(NativeTimeInfo));
     fTimeInfo.bbt.valid = true; // always valid
 
+    if (fDescriptor == nullptr || fDescriptor->instantiate == nullptr)
+    {
+        qWarning() << "Carla descriptor not available, plugin will stay inactive";
+        return;
+    }
+
     fHandle = fDescriptor->instantiate(&fHost);
     Q_ASSERT(fHandle != nullptr);
 
@@ -205,13 +217,16 @@ CarlaInstrument::CarlaInstrument(InstrumentTrack* const instrumentTrack, const D
     m_paramsCompleter->setCompletionMode(QCompleter::PopupCompletion);
 
     // Add static amount of CarlaParamFloatModel's.
-    const auto paramCount = fDescriptor->get_parameter_count(fHandle);
-    m_paramModels.reserve(paramCount);
-    for (auto i = std::size_t{0}; i < paramCount; ++i)
+    if (fDescriptor->get_parameter_count != nullptr)
     {
-        m_paramModels.push_back(new CarlaParamFloatModel(this));
-        connect(m_paramModels[i], &CarlaParamFloatModel::dataChanged,
-            this, [this, i]() {paramModelChanged(i);}, Qt::DirectConnection);
+        const auto paramCount = fDescriptor->get_parameter_count(fHandle);
+        m_paramModels.reserve(paramCount);
+        for (auto i = std::size_t{0}; i < paramCount; ++i)
+        {
+            m_paramModels.push_back(new CarlaParamFloatModel(this));
+            connect(m_paramModels[i], &CarlaParamFloatModel::dataChanged,
+                this, [this, i]() {paramModelChanged(i);}, Qt::DirectConnection);
+        }
     }
 #endif
 
@@ -316,8 +331,8 @@ intptr_t CarlaInstrument::handleDispatcher(const NativeHostDispatcherOpcode opco
         // param index, value as bool
         // true = mousePress
         // false = mouseRelease
-        if (!value) {
-            updateParamModel(index);
+        if (!value && index >= 0) {
+            updateParamModel(static_cast<uint32_t>(index));
         }
         break;
     case NATIVE_HOST_OPCODE_RELOAD_ALL:
@@ -380,6 +395,12 @@ void CarlaInstrument::saveSettings(QDomDocument& doc, QDomElement& parent)
 void CarlaInstrument::refreshParams(bool init)
 {
 	m_paramGroupCount = 0;
+	if (fHandle == nullptr)
+	{
+		emit paramsUpdated();
+		return;
+	}
+
 	if (fDescriptor->get_parameter_count != nullptr &&
 		fDescriptor->get_parameter_info  != nullptr &&
 		fDescriptor->get_parameter_value != nullptr &&
@@ -389,9 +410,24 @@ void CarlaInstrument::refreshParams(bool init)
 		QList<QString> groups; // used to count no. groups.
 
 		uint32_t paramCount = fDescriptor->get_parameter_count(fHandle);
+		if (paramCount > m_paramModels.size())
+		{
+			m_paramModels.reserve(paramCount);
+			for (uint32_t i = static_cast<uint32_t>(m_paramModels.size()); i < paramCount; ++i)
+			{
+				m_paramModels.push_back(new CarlaParamFloatModel(this));
+				connect(m_paramModels[i], &CarlaParamFloatModel::dataChanged,
+					this, [this, i]() {paramModelChanged(i);}, Qt::DirectConnection);
+			}
+		}
+
 		for (uint32_t i=0; i < paramCount; ++i)
 		{
 			const NativeParameter* paramInfo(fDescriptor->get_parameter_info(fHandle, i));
+			if (paramInfo == nullptr)
+			{
+				continue;
+			}
 
 			m_paramModels[i]->setOutput((paramInfo->hints & NATIVE_PARAMETER_IS_OUTPUT));
 			m_paramModels[i]->setEnabled((paramInfo->hints & NATIVE_PARAMETER_IS_ENABLED));
@@ -431,7 +467,10 @@ void CarlaInstrument::refreshParams(bool init)
 			}
 		}
 		// Set completer data
-		m_completerModel->setStringList(completerData);
+		if (m_completerModel != nullptr)
+		{
+			m_completerModel->setStringList(completerData);
+		}
 	}
 	emit paramsUpdated();
 }
@@ -452,6 +491,11 @@ void CarlaInstrument::clearParamModels()
 
 void CarlaInstrument::paramModelChanged(uint32_t index)
 { // Update Carla param (LMMS -> Carla)
+	if (fHandle == nullptr || index >= m_paramModels.size())
+	{
+		return;
+	}
+
 	if (!m_paramModels[index]->isOutput())
 	{
 		if (fDescriptor->set_parameter_value != nullptr)
@@ -470,7 +514,8 @@ void CarlaInstrument::paramModelChanged(uint32_t index)
 
 void CarlaInstrument::updateParamModel(uint32_t index)
 { // Called on param changed (Carla -> LMMS)
-	if (fDescriptor->get_parameter_value != nullptr)
+	if (fHandle != nullptr && index < m_paramModels.size() &&
+		fDescriptor->get_parameter_value != nullptr)
 	{
 		m_paramModels[index]->setValue(
 			fDescriptor->get_parameter_value(fHandle, index)
@@ -593,7 +638,10 @@ gui::PluginView* CarlaInstrument::instantiateView(QWidget* parent)
 
 void CarlaInstrument::sampleRateChanged()
 {
-    fDescriptor->dispatcher(fHandle, NATIVE_PLUGIN_OPCODE_SAMPLE_RATE_CHANGED, 0, 0, nullptr, handleGetSampleRate());
+    if (fHandle != nullptr && fDescriptor != nullptr && fDescriptor->dispatcher != nullptr)
+    {
+        fDescriptor->dispatcher(fHandle, NATIVE_PLUGIN_OPCODE_SAMPLE_RATE_CHANGED, 0, 0, nullptr, handleGetSampleRate());
+    }
 }
 
 // -------------------------------------------------------------------
@@ -909,7 +957,13 @@ void CarlaParamsView::filterKnobs()
 	}
 
 	// Calc how many knobs will fit horizontal in the params window.
-	uint16_t maxKnobWidth = m_maxKnobWidthPerGroup[m_groupFilterCombo->currentIndex()];
+	const int currentGroupIndex = m_groupFilterCombo->currentIndex();
+	if (currentGroupIndex < 0 || currentGroupIndex >= m_maxKnobWidthPerGroup.size())
+	{
+		return;
+	}
+
+	uint16_t maxKnobWidth = m_maxKnobWidthPerGroup[currentGroupIndex];
 	maxKnobWidth += m_inputScrollAreaLayout->spacing();
 	if (!maxKnobWidth)
 	{
@@ -917,6 +971,10 @@ void CarlaParamsView::filterKnobs()
 		return;
 	}
 	m_maxColumns = m_inputScrollArea->width() / maxKnobWidth;
+	if (m_maxColumns == 0)
+	{
+		m_maxColumns = 1;
+	}
 
 	QString text = m_paramsFilterLineEdit->text();
 	for (uint32_t i = 0; i < m_knobs.size(); ++i)
@@ -979,10 +1037,9 @@ void CarlaParamsView::refreshKnobs()
 
 	// Clear max knob width per group
 	m_maxKnobWidthPerGroup.clear();
-	m_maxKnobWidthPerGroup.reserve(m_carlaInstrument->m_paramGroupCount);
-	for (uint8_t i = 0; i < m_carlaInstrument->m_paramGroupCount; i++)
+	for (uint8_t i = 0; i < m_carlaInstrument->m_paramGroupCount; ++i)
 	{
-		m_maxKnobWidthPerGroup[i] = 0;
+		m_maxKnobWidthPerGroup.append(0);
 	}
 
 	if (m_carlaInstrument->m_paramModels.empty()) { return; }
