@@ -1,0 +1,14 @@
+; Gimp scheme script: Uses script-fu to convert .svg to .png
+; All @variables@ need to be manually replaced before calling
+; Usage: gimp -b gimp_convert.scm
+(let* (
+    (image (car (file-svg-load RUN-NONINTERACTIVE "@source_file@" "" @resolution@ @width@ @height@ 0)))
+    (drawable (car (gimp-image-get-active-layer image)))
+    (filename "@png_out@")
+)
+(if (not image)
+	(gimp-message "Error loading SVG: @source_file@")
+	(begin
+	  (gimp-file-save RUN-NONINTERACTIVE image drawable filename filename)
+	  (gimp-message "Image saved: @png_out@")
+	  (gimp-image-delete image))))

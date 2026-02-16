@@ -22,7 +22,7 @@ enable_policy_if_exists(CMP0141) # MSVC debug information format flags are selec
 
 PROJECT(lmms)
 
-SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules" ${CMAKE_MODULE_PATH})
+list(PREPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules" "${CMAKE_SOURCE_DIR}/cmake/modules/branding")
 SET(LMMS_BINARY_DIR ${CMAKE_BINARY_DIR})
 SET(LMMS_SOURCE_DIR ${CMAKE_SOURCE_DIR})
 
@@ -107,6 +107,7 @@ option(WANT_DEBUG_GPROF	"Enable gprof profiler" OFF)
 OPTION(BUNDLE_QT_TRANSLATIONS	"Install Qt translation files for LMMS" OFF)
 option(WANT_DEBUG_CPACK "Show detailed logs for packaging commands" OFF)
 option(WANT_CPACK_TARBALL "Request CPack to create a tarball instead of an installer" OFF)
+option(WANT_DYNAMIC_BRANDING "Enable dynamic branding for alpha/nighty builds" ON)
 option(WANT_QT6 "Build with experimental Qt6 support" OFF)
 
 
@@ -627,6 +628,17 @@ ELSE()
 	SET (STATUS_DEBUG_FPE "Disabled")
 ENDIF(WANT_DEBUG_FPE)
 
+if(WANT_DYNAMIC_BRANDING)
+	include(BrandingHelpers)
+	calculate_branding(VERSION LMMS_BRANDING_NEEDED LMMS_RELEASE_TYPE LMMS_BRANDING_COLOR status_colorized)
+endif()
+if(LMMS_BRANDING_NEEDED)
+	set(STATUS_DYNAMIC_BRANDING "Enabled (${status_colorized})")
+else()
+	set(LMMS_RELEASE_TYPE "Snapshot")
+	set(STATUS_DYNAMIC_BRANDING "Disabled")
+endif()
+
 if(WANT_DEBUG_CPACK)
 	if((LMMS_BUILD_WIN32 AND CMAKE_VERSION VERSION_LESS "3.19") OR WANT_CPACK_TARBALL)
 		set(STATUS_DEBUG_CPACK "Wanted but disabled due to unsupported configuration")
@@ -893,6 +905,7 @@ MESSAGE(
 "* Debug packaging commands          : ${STATUS_DEBUG_CPACK}\n"
 "* Profile using GNU profiler        : ${STATUS_GPROF}\n"
 "* Debug assertions                  : ${STATUS_ASSERTIONS}\n"
+"* Dynamic alpha/nighty branding     : ${STATUS_DYNAMIC_BRANDING}\n"
 "* Experimental Qt6 support          : ${STATUS_QT6}\n"
 )
 
