@@ -26,39 +26,30 @@
 
 namespace lmms {
 
-static void ActionContainer::registerData(ActionData data)
+std::map<QString, ActionData> ActionContainer::s_dataMap;
+
+bool ActionContainer::tryRegister(QString name, ActionData data)
 {
-	// TODO
+	// std::map::insert only inserts an element if it isn't already present
+	const auto [_, success] = s_dataMap.insert({name, data});
+	return success;
 }
 
-static ActionData* ActionContainer::findData(const char* name)
-{
-	// TODO
-}
-
-ActionData::ActionData(QString name, ActionTrigger::Top trigger)
-	: m_name{name}
-	, m_trigger{trigger}
-{
-}
-
-static ActionData* ActionData::getOrCreate(QString name, ActionTrigger::Top trigger)
-{
-	if (auto it = s_dataMap.find(name); it != s_dataMap.end())
-	{
-		return &*it;
-	}
-	else
-	{
-		s_dataMap[name] = ActionData(name, trigger);
-		return &s_dataMap[name];
-	}
-}
-
-static ActionData* findData(const char* name)
+ActionData* ActionContainer::findData(const QString& name)
 {
 	auto it = s_dataMap.find(name);
-	return (it == s_dataMap.end()) ? nullptr : &*it;
+	return (it == s_dataMap.end()) ? nullptr : &s_dataMap.at(name);
+}
+
+ActionData::ActionData(QString name, ActionTrigger::Any trigger)
+	: m_name{name}
+	, m_trigger{trigger}
+{}
+
+ActionData* ActionData::getOrCreate(QString name, ActionTrigger::Any trigger)
+{
+	ActionContainer::tryRegister(name, ActionData(name, trigger));
+	return ActionContainer::findData(name);
 }
 
 GuiAction::GuiAction(QObject* parent, ActionData* data)
@@ -74,5 +65,7 @@ GuiAction::GuiAction(QObject* parent, ActionData* data)
 
 	// TODO: how to signal `GuiAction` when the ActionData has had its trigger changed? Does it even need that?
 }
+
+GuiAction::~GuiAction() {}
 
 } // namespace lmms

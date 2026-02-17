@@ -25,22 +25,36 @@
 #ifndef LMMS_GUI_ACTION_H
 #define LMMS_GUI_ACTION_H
 
-#include <variant>
 #include <QString>
 #include <QObject>
+
+#include <variant>
+#include <functional>
 
 namespace lmms {
 
 class ActionData;
 
+class ActionTrigger
+{
+public:
+	struct Never {}; //!< Can never be triggered
+	struct KeyPressed { uint32_t key, modifiers; };
+	struct KeyHeld { uint32_t key, modifiers; };
+
+	//! Top type for all possible triggers
+	typedef std::variant<Never, KeyPressed, KeyHeld> Any;
+};
+
 class ActionContainer
 {
 public:
-	//! Register a new action. Overrides action with the same name.
-	static void getOrCreate(QString name, ActionTrigger::Top trigger);
+	//! Attempts to register a new action, but refuses if it is already registered. Returns whether the insertion
+	//! happened.
+	static bool tryRegister(QString name, ActionData data);
 
 	//! Find an action by its name. Returns null when it was not found.
-	static ActionData* findData(const char* name);
+	static ActionData* findData(const QString& name);
 
 private:
 	ActionContainer() = delete;
@@ -49,34 +63,24 @@ private:
 	static std::map<QString, ActionData> s_dataMap;
 };
 
-class ActionTrigger
-{
-public:
-	struct Never {}; //!< Can never be triggered
-	struct KeyPressed { QKey key; };
-	struct KeyHeld { QKey upKey, downKey; };
-
-	//! Top type for all possible triggers
-	typedef std::variant<Never, KeyPress, KeyHeld> Any;
-};
-
 class ActionData
 {
 public:
 	//! For now, to avoid memory safety issues, actions are never removed.
-	static ActionData* create(QString name, ActionTrigger::Top trigger = ActionTrigger::Never{});
+	static ActionData* getOrCreate(QString name, ActionTrigger::Any trigger = ActionTrigger::Never{});
+
 	// FIXME: not sure if the lifetime of this returned pointer ^ is all that good either... maybe use a
 	// std::shared_ptr? At the cost of fragmentation
 
 	const QString& name();
-	const ActionTrigger::Top& trigger();
-	void setTrigger(ActionTrigger::Top newTrigger);
+	const ActionTrigger::Any& trigger();
+	void setTrigger(ActionTrigger::Any newTrigger);
 
 private:
-	ActionData(QString name, ActionTrigger::Top trigger);
+	ActionData(QString name, ActionTrigger::Any trigger);
 
 	QString m_name;
-	ActionTrigger::Top m_trigger;
+	ActionTrigger::Any m_trigger;
 };
 
 // TODO: think of a better name. `ActionListener` or `CommandListener` might be good?
@@ -84,6 +88,7 @@ class GuiAction : QObject
 {
 public:
 	GuiAction(QObject* parent, ActionData* data);
+	virtual ~GuiAction();
 
 protected:
 	bool eventFilter(QObject* watched, QEvent* event) override;
@@ -92,8 +97,8 @@ private:
 	ActionData* m_data;
 	bool m_active;
 
-	std::function<QObject*> m_onActivateFunc;
-	std::function<QObject*> m_onDeactivateFunc;
+	std::function<void (QObject*)> m_onActivateFunc;
+	std::function<void (QObject*)> m_onDeactivateFunc;
 };
 
 } // namespace lmms
