@@ -1,5 +1,5 @@
 /*
- * GuiAction.h - declaration of class GuiAction
+ * GuiAction.h - declaration of class GuiAction (and related ones)
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *

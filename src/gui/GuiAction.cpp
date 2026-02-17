@@ -1,5 +1,5 @@
 /*
- * GuiAction.cpp - action listener for .. ?? TODO
+ * GuiAction.cpp - action listener for flexible keybindings
  *
  * Copyright (c) 2014 Lukas W <lukaswhl/at/gmail.com>
  *
