@@ -1,0 +1,63 @@
+---
+name: run-version
+'on': [push, pull_request]
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  version-linux:
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - arch: 'x86_64'
+            runner: 'ubuntu-latest'
+            suffix: ''
+          - arch: 'arm64'
+            runner: 'ubuntu-24.04-arm'
+            suffix: '-arm64'
+    name: version-linux-${{ matrix.config.arch }}
+    runs-on: ${{ matrix.config.runner }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Extract artifact
+        uses: ./.github/actions/extract-artifact
+        with:
+          check-name: linux-${{ matrix.config.arch }}
+          artifact-name: linux${{ matrix.config.suffix }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Display version
+        run: |
+          cd squashfs-root/
+          ./AppRun --version | grep "Copyright (c) .* LMMS Developers"
+  version-macos:
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - arch: 'x86_64'
+            runner: 'macos-latest'
+          - arch: 'arm64'
+            runner: 'macos-latest'
+    name: version-macos-${{ matrix.config.arch }}
+    runs-on: ${{ matrix.config.runner }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Extract artifact
+        uses: ./.github/actions/extract-artifact
+        with:
+          check-name: macos-${{ matrix.config.arch }}
+          artifact-name: macos-${{ matrix.config.arch }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Display version
+        run: |
+          /tmp/LMMS.app/Contents/MacOS/lmms --version | grep "Copyright (c) .* LMMS Developers"
+
+# Windows (does not work due to actions/extract-artifact issues)
+#     - name: Display version
+#       run: >
+#         $result = & "${env:ProgramFiles${{ matrix.config.programfiles-suffix }}}/LMMS/lmms.exe" "--version" |
+#         Select-String -Pattern "Copyright \(c\) .* LMMS Developers";
+#         if($result.Matches.Count -eq 0) { exit 1 }
