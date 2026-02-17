@@ -124,7 +124,7 @@ void MidiFile::Section::writeBigEndian4(std::uint32_t val,
 {
 	std::vector<std::uint8_t> bytes;
 	bytes.push_back(val >> 24);
-	bytes.push_back((val >> 16) & 0xff),
+	bytes.push_back((val >> 16) & 0xff);
 	bytes.push_back((val >> 8) & 0xff);
 	bytes.push_back(val & 0xff);
 	writeBytes(bytes, v);
@@ -163,7 +163,7 @@ void MidiFile::Header::writeToBuffer()
 void MidiFile::Track::addEvent(Event event, std::uint32_t time)
 {
 	event.time = time;
-	event.channel = channel;
+	event.channel = m_channel;
 	m_events.push_back(event);
 }
 
@@ -279,14 +279,14 @@ void MidiFile::Track::writeSingleEventToBuffer(Event& event)
 		case MidiFile::Event::NoteOn:
 		{
 			// A note starts playing
-			std::uint8_t code = (0x9 << 4) | channel;
+			std::uint8_t code = (0x9 << 4) | m_channel;
 			writeBytes({code, event.note.pitch, event.note.volume});
 			break;
 		}
 		case MidiFile::Event::NoteOff:
 		{
 			// A note finishes playing
-			std::uint8_t code = (0x8 << 4) | channel;
+			std::uint8_t code = (0x8 << 4) | m_channel;
 			writeBytes({code, event.note.pitch, event.note.volume});
 			break;
 		}
@@ -304,7 +304,7 @@ void MidiFile::Track::writeSingleEventToBuffer(Event& event)
 		case MidiFile::Event::ProgramChange:
 		{
 			// Change patch number
-			std::uint8_t code = (0xC << 4) | channel;
+			std::uint8_t code = (0xC << 4) | m_channel;
 			writeBytes({code, event.programNumber});
 			break;
 		}

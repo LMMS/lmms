@@ -48,7 +48,7 @@ Plugin::Descriptor PLUGIN_EXPORT midiexport_plugin_descriptor =
 	LMMS_STRINGIFY(PLUGIN_NAME),
 	"MIDI Export",
 	QT_TRANSLATE_NOOP("PluginBrowser",
-		"Filter for exporting MIDI-files from LMMS"),
+		"Filter for exporting MIDI files from LMMS"),
 	"Mohamed Abdel Maksoud <mohamed at amaksoud.com> and "
 		"Hyunjin Song <tteu.ingog/at/gmail.com>",
 	0x0100,
@@ -95,11 +95,11 @@ void MidiExport::Clip::write(const QDomNode& root,
 	}
 }
 
-void MidiExport::Clip::writeToTrack(MidiFile::Track& mTrack) const
+void MidiExport::Clip::writeToTrack(MidiFile::Track& midiTrack) const
 {
 	for (const Note& note : m_notes)
 	{
-		mTrack.addNote(note.pitch, note.volume,
+		midiTrack.addNote(note.pitch, note.volume,
 			note.time / 48.0, note.duration / 48.0);
 	}
 }
@@ -143,7 +143,7 @@ void MidiExport::Clip::writeToPattern(Clip& patternClip,
 	{
 		// Insert periodically repeating notes from <t0> and spaced
 		// by <len> to mimic pattern clip behavior
-		int t0 = note.time + ceil((start - note.time) / len) * len;
+		int t0 = note.time + std::ceil((start - note.time) / len) * len;
 		for (int time = t0;	time < end; time += len)
 		{
 			note.time = base + time;
@@ -161,7 +161,7 @@ bool MidiExport::tryExport(const TrackContainer::TrackList& tracks,
 	int tempo, int masterPitch, const QString& filename)
 {
 	// Count number of instrument (and PatternStore) tracks
-	const auto numTracks = std::ranges::count_if(tracks, [](auto t) {
+	const auto numTracks = std::ranges::count_if(tracks, [](const Track* t) {
 		return t->type() == Track::Type::Instrument;
 	}) + patternStoreTracks.size();
 
@@ -202,34 +202,34 @@ void MidiExport::processTrack(Track& track, MidiFile::Track& midiTrack,
 	int tempo, int masterPitch, bool isPattern)
 {
 	// Cast track as a instrument one and save info from it to element
-	InstrumentTrack& instTrack = dynamic_cast<InstrumentTrack&>(track);
+	auto& instTrack = dynamic_cast<InstrumentTrack&>(track);
 	QDomElement root = instTrack.saveState(m_dataFile, m_dataFile.content());
-
-	// Set the channel of the next MIDI file track object
-	if (m_channel == 9) { ++m_channel; }
-	midiTrack.channel = m_channel++;
-
-	// Add info about tempo and track name
-	midiTrack.addTempo(tempo, 0);
-	midiTrack.addName(track.name().toStdString(), 0);
 
 	// Use the MIDI patch from the instrument, if it supports it.
 	// Note that this only works decently if the current bank is a GM 1~128 one
 	// (which would be needed as the default either way for successful import).
 	// Pattern tracks are always bank 128 (see MidiImport), patch 0.
-	const auto patch = instTrack.instrument()->midiPatch().value_or(MidiPatch{.bank = 0, .program = 0});
+	auto patch = instTrack.instrument()->midiPatch().value_or(MidiPatch{.bank = 0, .program = 0});
 	if (patch.bank == 128)
 	{
-		// Drum track, so set its channel to 10 (and reverse counter increment)
-		midiTrack.channel = 9;
-		--m_channel;
-
-		midiTrack.addProgramChange(0, 0);
+		// Drum track, so set its channel to 10
+		midiTrack.setChannel(9);
+		patch.program = 0;
 	}
 	else
 	{
-		midiTrack.addProgramChange(patch.program, 0);
+		midiTrack.setChannel(m_channel);
+
+		// Update the channel for the next MIDI file track
+		++m_channel;
+		if (m_channel == 9) { ++m_channel; } // skip drum channel
+		m_channel %= 16; // TODO: Give user option for how to handle wrap around?
 	}
+
+	// Add info about tempo, track name, and program
+	midiTrack.addTempo(tempo, 0);
+	midiTrack.addName(track.name().toStdString(), 0);
+	midiTrack.addProgramChange(patch.program, 0);
 
 	// ---- Instrument track ---- //
 	QDomNode trackNode = root.firstChildElement("instrumenttrack");
@@ -288,7 +288,7 @@ void MidiExport::writePatternClip(Clip& clip, const QDomElement& clipElem,
 
 	// Iterate through PatternClip pairs of current list
 	// TODO: This *may* need some corrections?
-	const std::vector<std::pair<int,int>>& plist = m_plists[patternIdx];
+	const std::vector<std::pair<int,int>>& plist = m_plists.at(patternIdx);
 	std::stack<std::pair<int, int>> st;
 	Clip patternClip;
 	for (const std::pair<int, int>& p : plist)
@@ -325,7 +325,7 @@ void MidiExport::writePatternClip(Clip& clip, const QDomElement& clipElem,
 void MidiExport::processPatternTrack(Track& track)
 {
 	// Cast track as a pattern track and save info from it to element
-	PatternTrack& patternTrack = dynamic_cast<PatternTrack&>(track);
+	auto& patternTrack = dynamic_cast<PatternTrack&>(track);
 	QDomElement root = patternTrack.saveState(m_dataFile, m_dataFile.content());
 
 	// Build lists of (start, end) pairs from pattern clip note objects

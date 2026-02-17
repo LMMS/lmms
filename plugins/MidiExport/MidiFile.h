@@ -124,7 +124,7 @@ public:
 		Header(int numTracks, int ticksPerBeat = TICKS_PER_BEAT);
 
 		//! Write header info to buffer
-		void writeToBuffer();
+		void writeToBuffer() override;
 	};
 
 private:
@@ -184,19 +184,9 @@ public:
 	//! Represents a MIDI track
 	class Track : public Section
 	{
-	private:
-		//! Variable-length vector of events
-		std::vector<Event> m_events;
-
 	public:
-		//! Track channel number
-		std::uint8_t channel;
+		void setChannel(std::uint8_t channel) { m_channel = channel; }
 
-	private:
-		//! Append a single event to vector
-		void addEvent(Event event, std::uint32_t time);
-
-	public:
 		//! @brief Add both NOTE_ON and NOTE_OFF effects
 		//! @param pitch Note pitch
 		//! @param volume Note volume
@@ -218,6 +208,9 @@ public:
 		void writeToBuffer();
 
 	private:
+		//! Append a single event to vector
+		void addEvent(Event event, std::uint32_t time);
+
 		//! Write the meta data and note data to buffer
 		void writeMIDIToBuffer();
 
@@ -226,6 +219,12 @@ public:
 
 		//! Write a single event to buffer
 		void writeSingleEventToBuffer(Event& event);
+
+		//! Variable-length vector of events
+		std::vector<Event> m_events;
+
+		//! Track channel number
+		std::uint8_t m_channel = 0;
 	};
 
 private:
