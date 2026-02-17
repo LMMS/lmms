@@ -100,7 +100,7 @@ MidiCCRackView::MidiCCRackView(InstrumentTrack * track) :
 
 	// Set all the models
 	// Set the LED button to enable/disable the track midi cc
-	m_midiCCGroupBox->setModel(m_track->m_midiCCEnable.get());
+	m_midiCCGroupBox->setModel(&m_track->m_midiCCEnable);
 
 	// Connection to update the name of the track on the label
 	connect(m_track, SIGNAL(nameChanged()),

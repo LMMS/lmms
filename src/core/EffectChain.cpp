@@ -36,8 +36,8 @@ namespace lmms
 {
 
 
-EffectChain::EffectChain( Model * _parent ) :
-	Model( _parent ),
+EffectChain::EffectChain() :
+	Model(nullptr),
 	SerializingObject(),
 	m_enabledModel( false, nullptr, tr( "Effects enabled" ) )
 {
@@ -104,7 +104,7 @@ void EffectChain::loadSettings( const QDomElement & _this )
 			else
 			{
 				delete e;
-				e = new DummyEffect( parentModel(), effectData );
+				e = new DummyEffect(this, effectData);
 			}
 
 			m_effects.push_back( e );
