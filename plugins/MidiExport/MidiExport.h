@@ -1,8 +1,9 @@
 /*
- * MidiExport.h - support for Exporting MIDI-files
+ * MidiExport.h - support for exporting MIDI files
  *
  * Copyright (c) 2015 Mohamed Abdel Maksoud <mohamed at amaksoud.com>
  * Copyright (c) 2017 Hyunjin Song <tteu.ingog/at/gmail.com>
+ * Copyright (c) 2020 EmoonX
  *
  * This file is part of LMMS - https://lmms.io
  *

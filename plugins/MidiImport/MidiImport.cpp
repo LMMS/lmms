@@ -209,8 +209,14 @@ public:
 			{
 				isSF2 = true;
 				it_inst->loadFile(ConfigManager::inst()->sf2File());
-				it_inst->childModel("bank")->setValue(0);
-				it_inst->childModel("patch")->setValue(0);
+
+				auto bank = it_inst->childModel("bank");
+				assert(bank != nullptr);
+				bank->setValue(0);
+
+				auto patch = it_inst->childModel("patch");
+				assert(patch != nullptr);
+				patch->setValue(0);
 			}
 			else { it_inst = it->loadInstrument("patman"); }
 #else
@@ -431,6 +437,7 @@ bool MidiImport::readSMF(TrackContainer* tc)
 					{
 						auto& pc = pcs[evt->chan];
 						AutomatableModel* objModel = ch->it_inst->childModel("patch");
+						assert(objModel != nullptr);
 						if (pc.at == nullptr) {
 							pc.create(tc, trackName + " > " + objModel->displayName());
 						}
@@ -465,6 +472,7 @@ bool MidiImport::readSMF(TrackContainer* tc)
 								if (ch->isSF2 && ch->it_inst)
 								{
 									objModel = ch->it_inst->childModel("bank");
+									assert(objModel != nullptr);
 									printf("BANK SELECT %f %d\n", cc, static_cast<int>(cc * 127));
 									cc *= 127.0f;
 								}
@@ -537,8 +545,13 @@ bool MidiImport::readSMF(TrackContainer* tc)
 		if (c.first % 16l == 9 /* channel 10 */
 			&& c.second.hasNotes && c.second.it_inst && c.second.isSF2)
 		{
-			c.second.it_inst->childModel("bank")->setValue(128);
-			c.second.it_inst->childModel("patch")->setValue(0);
+			auto bank = c.second.it_inst->childModel("bank");
+			assert(bank != nullptr);
+			bank->setValue(128);
+
+			auto patch = c.second.it_inst->childModel("patch");
+			assert(patch != nullptr);
+			patch->setValue(0);
 		}
 	}
 

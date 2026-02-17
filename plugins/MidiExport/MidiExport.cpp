@@ -1,5 +1,5 @@
 /*
- * MidiExport.cpp - support for Exporting MIDI files
+ * MidiExport.cpp - support for exporting MIDI files
  *
  * Copyright (c) 2015 Mohamed Abdel Maksoud <mohamed at amaksoud.com>
  * Copyright (c) 2017 Hyunjin Song <tteu.ingog/at/gmail.com>
@@ -213,27 +213,23 @@ void MidiExport::processTrack(Track& track, MidiFile::Track& midiTrack,
 	midiTrack.addTempo(tempo, 0);
 	midiTrack.addName(track.name().toStdString(), 0);
 
-	// If the current track is a Sf2 Player one, set the current
-	// patch to the exporting track. Note that this only works
-	// decently if the current bank is a GM 1~128 one (which would be
-	// needed as the default either way for successful import).
+	// Use the MIDI patch from the instrument, if it supports it.
+	// Note that this only works decently if the current bank is a GM 1~128 one
+	// (which would be needed as the default either way for successful import).
 	// Pattern tracks are always bank 128 (see MidiImport), patch 0.
-	std::uint8_t patch = 0;
-	QString instName = instTrack.instrumentName();
-	if (instName == "Sf2 Player")
+	const auto patch = instTrack.instrument()->midiPatch().value_or(MidiPatch{.bank = 0, .program = 0});
+	if (patch.bank == 128)
 	{
-		Instrument* inst = instTrack.instrument();
-		const auto bank = inst->childModel("bank")->value<std::uint8_t>();
-		if (bank == 128)
-		{
-			// Drum Sf2 track, so set its channel to 10
-			// (and reverse counter increment)
-			midiTrack.channel = 9;
-			m_channel--;
-		}
-		else { patch = inst->childModel("patch")->value<std::uint8_t>(); }
+		// Drum track, so set its channel to 10 (and reverse counter increment)
+		midiTrack.channel = 9;
+		--m_channel;
+
+		midiTrack.addProgramChange(0, 0);
 	}
-	midiTrack.addProgramChange(patch, 0);
+	else
+	{
+		midiTrack.addProgramChange(patch.program, 0);
+	}
 
 	// ---- Instrument track ---- //
 	QDomNode trackNode = root.firstChildElement("instrumenttrack");
