@@ -708,7 +708,17 @@ void ConfigManager::initPortableWorkingDir()
 void ConfigManager::initInstalledWorkingDir()
 {
 	m_workingDir = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/lmms/";
-	m_lmmsRcFile = QDir::home().absolutePath() +"/.lmmsrc.xml";
+	m_lmmsRcFile = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation) + "/lmmsrc.xml";
+
+	// Create canonical config dir if it doesn't exist
+	QDir{QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation)}.mkpath(".");
+
+	// Copy <= 1.2.2 config if new one doesn't exist
+	if (!QFileInfo(m_lmmsRcFile).exists() && QFileInfo(QDir::home().absolutePath() + "/.lmmsrc.xml").exists())
+	{
+		QFile{QDir::home().absolutePath() + "/.lmmsrc.xml"}.copy(m_lmmsRcFile);
+	}
+
 	// Detect < 1.2.0 working directory as a courtesy
 	if ( QFileInfo( QDir::home().absolutePath() + "/lmms/projects/" ).exists() )
 		m_workingDir = QDir::home().absolutePath() + "/lmms/";
