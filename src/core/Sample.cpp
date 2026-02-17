@@ -99,10 +99,17 @@ auto Sample::operator=(Sample&& other) noexcept -> Sample&
 bool Sample::play(SampleFrame* dst, PlaybackState* state, size_t numFrames, Loop loop, double ratio) const
 {
 	state->m_frameIndex = std::max<int>(m_startFrame, state->m_frameIndex);
-
 	const auto sampleRateRatio = static_cast<double>(Engine::audioEngine()->outputSampleRate()) / m_buffer->sampleRate();
 	const auto freqRatio = frequency() / DefaultBaseFreq;
-	state->m_resampler.setRatio(sampleRateRatio * freqRatio * ratio);
+	const auto finalRatio = sampleRateRatio * freqRatio * ratio;
+
+	if (finalRatio == 1.)
+	{
+		render(dst, numFrames, state, loop);
+		return true;
+	}
+
+	state->m_resampler.setRatio(finalRatio);
 
 	// TODO: These kind of playback pipelines/graphs are repeated within other parts of the codebase that work with
 	// audio samples. We should find a way to unify this but the right abstraction is not so clear yet.
