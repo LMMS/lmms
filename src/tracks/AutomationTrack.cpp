@@ -28,6 +28,7 @@
 
 #include "AutomationTrackView.h"
 #include "AutomationClip.h"
+#include "Clip.h"
 
 namespace lmms
 {
@@ -58,9 +59,23 @@ gui::TrackView* AutomationTrack::createView( gui::TrackContainerView* tcv )
 
 Clip* AutomationTrack::createClip(const TimePos & pos)
 {
-	auto p = new AutomationClip(this);
-	p->movePosition(pos);
-	return p;
+	const TimePos endPos = pos + TimePos(Clip::getDefaultClipLength());
+
+	for (const auto& existingClip : getClips())
+	{
+		if (pos < existingClip->endPosition() && endPos > existingClip->startPosition())
+		{
+			return nullptr;  // Don't create - would overlap
+		}
+	}
+	auto aClip = new AutomationClip(this);
+
+	aClip->movePosition(pos);
+
+	const tick_t defaultLength = Clip::getDefaultClipLength();
+	aClip->changeLength(defaultLength);
+
+	return aClip;
 }
 
 

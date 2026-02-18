@@ -100,6 +100,16 @@ public:
 
 	bool manuallyResizable() const;
 
+
+	/*! \brief Helper function to return current Clip size.
+	 *
+	 *  Allows clip editors to know the current snapping size for calculations.
+	 *
+	 */
+	static tick_t getDefaultClipLength();
+
+	void autoResize();
+
 	/*! \brief Set whether a clip has been resized yet by the user or the knife tool.
 	 *
 	 *  If a clip has been resized previously, it will not automatically 

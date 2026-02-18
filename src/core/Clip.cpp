@@ -29,8 +29,10 @@
 #include "AutomationEditor.h"
 #include "AutomationClip.h"
 #include "Engine.h"
+#include "embed.h"
 #include "GuiApplication.h"
 #include "Song.h"
+#include "SongEditor.h"
 #include "Track.h"
 #include "TrackContainer.h"
 
@@ -215,6 +217,52 @@ TimePos Clip::startTimeOffset() const
 }
 
 
+tick_t Clip::getDefaultClipLength()
+{
+    float snapSize = 1.0f;
+
+	auto* gui = gui::getGUI();
+    if (gui != nullptr &&
+        gui->songEditor() != nullptr &&
+        gui->songEditor()->m_editor != nullptr)
+    {
+        snapSize = gui->songEditor()->m_editor->getSnapSize();
+    }
+
+    const tick_t snapTicks = static_cast<tick_t>(snapSize * TimePos::ticksPerBar());
+
+    return std::max(snapTicks, static_cast<tick_t>(TimePos::ticksPerBar() / 16));
+}
+
+void Clip::autoResize()
+{
+
+    if (!m_autoResize)
+    {
+        return;
+    }
+
+    float snapSize = 1.0f;
+
+	auto* gui = gui::getGUI();
+    if (gui != nullptr &&
+        gui->songEditor() != nullptr &&
+        gui->songEditor()->m_editor != nullptr)
+    {
+        snapSize = gui->songEditor()->m_editor->getSnapSize();
+    }
+
+    const tick_t snapTicks = static_cast<tick_t>(snapSize * TimePos::ticksPerBar());
+    const tick_t currentLength = length();
+
+    const tick_t snapUnits = (currentLength + snapTicks - 1) / snapTicks;
+    const tick_t newLength = snapUnits * snapTicks;
+
+    if (newLength != currentLength && newLength >= snapTicks)
+    {
+        changeLength(newLength);
+    }
+}
 
 
 void Clip::setStartTimeOffset( const TimePos &startTimeOffset )
