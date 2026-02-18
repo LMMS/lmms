@@ -19,7 +19,6 @@
  * License along with this program (see COPYING); if not, write to the
  * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA 02110-1301 USA.
- *
  */
 
 #include "FrequencyShifterEffect.h"
@@ -171,12 +170,9 @@ Effect::ProcessStatus FrequencyShifterEffect::processImpl(SampleFrame* buf, cons
 			{
 				const float phaseValue = m_phase[ch] + m_truePhase;
 				
-				const float s = std::sin(phaseValue);
-				const float c = std::cos(phaseValue);
+				float sinP = std::sin(phaseValue);
+				float cosP = std::cos(phaseValue);
 				
-				float cosP = c;
-				float sinP = s;
-
 				if (doHarm)
 				{
 					// arbitrary distortion function, crossfaded with original signal

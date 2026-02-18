@@ -19,7 +19,6 @@
  * License along with this program (see COPYING); if not, write to the
  * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA 02110-1301 USA.
- *
  */
 
 #ifndef LMMS_FREQUENCY_SHIFTER_EFFECT_H

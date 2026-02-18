@@ -19,7 +19,6 @@
  * License along with this program (see COPYING); if not, write to the
  * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA 02110-1301 USA.
- *
  */
 
 #include "FrequencyShifterEffect.h"
@@ -43,7 +42,7 @@ FrequencyShifterControls::FrequencyShifterControls(FrequencyShifterEffect* e) :
 	m_delayDamp(22000.f, 100.f, 22000.f, 0.1f, this, "Delay Damping"),
 	m_delayGlide(0.05f, 0.f, 1.f, 0.0001f, this, "Delay Glide"),
 	m_lfoAmount(0.f, 0.f, 2000.f, 0.001f, this, "LFO Amount"),
-	m_lfoRate(7.f, 0.f, 200.f, 0.001f, this, "LFO Rate"),
+	m_lfoRate(0.2f, 0.f, 200.f, 0.001f, this, "LFO Rate"),
 	m_lfoStereoPhase(0.f, 0.f, 1.f, 0.001f, this, "LFO StereoPhase"),
 	m_glide(0.05f, 0.f, 1.f, 0.0001f, this, "Glide"),
 	m_tone(22000.f, 100.f, 22000.f, 0.1f, this, "Tone"),
