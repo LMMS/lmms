@@ -28,6 +28,7 @@
 #include "GuiApplication.h"
 #include "MainWindow.h"
 #include "Song.h"
+#include "TransportButton.h"
 
 #include "embed.h"
 
@@ -42,11 +43,13 @@ namespace lmms::gui
 
 void Editor::setPauseIcon(bool displayPauseIcon)
 {
+	QPushButton* widget = static_cast<QPushButton*> (m_playAction->defaultWidget());
+
 	// If we're playing, show a pause icon
 	if (displayPauseIcon)
-		m_playAction->setIcon(embed::getIconPixmap("pause"));
+		widget->setIcon(embed::getIconPixmap("pause"));
 	else
-		m_playAction->setIcon(embed::getIconPixmap("play"));
+		widget->setIcon(embed::getIconPixmap("play"));
 }
 
 DropToolBar * Editor::addDropToolBarToTop(QString const & windowTitle)
@@ -106,12 +109,23 @@ Editor::Editor(bool record, bool stepRecord) :
 		m_toolBar->widgetForAction(action)->setObjectName(objectName);
 	};
 
-	// Set up play and record actions
-	m_playAction = new QAction(embed::getIconPixmap("play"), tr("Play (Space)"), this);
-	m_stopAction = new QAction(embed::getIconPixmap("stop"), tr("Stop (Space)"), this);
+	auto addTransportButton = [this](QWidgetAction* action, QString objectName,const char* icon,
+										const char* tooltip,QString menuName)
+	{
+		TransportButton* widget = new TransportButton(nullptr,menuName);
+		widget->setIcon(embed::getIconPixmap(icon));
+		widget->setToolTip(tr(tooltip));
+		action->setDefaultWidget(widget);
+		connect(widget, SIGNAL(toggled(bool)), action, SIGNAL(triggered()));
+		m_toolBar->addAction(action);
+		m_toolBar->widgetForAction(action)->setObjectName(objectName);
+	};
 
-	m_recordAction = new QAction(embed::getIconPixmap("record"), tr("Record"), this);
-	m_recordAccompanyAction = new QAction(embed::getIconPixmap("record_accompany"), tr("Record while playing"), this);
+	// Set up play and record actions
+	m_playAction = new QWidgetAction( this);
+	m_stopAction = new QWidgetAction(this);
+	m_recordAction = new QWidgetAction(this);
+	m_recordAccompanyAction=new QWidgetAction(this);
 	m_toggleStepRecordingAction = new QAction(embed::getIconPixmap("record_step_off"), tr("Toggle Step Recording"), this);
 
 	// Set up connections
@@ -123,17 +137,18 @@ Editor::Editor(bool record, bool stepRecord) :
 	new QShortcut(keySequence(Qt::SHIFT, Qt::Key_F11), this, SLOT(toggleMaximize()));
 
 	// Add actions to toolbar
-	addButton(m_playAction, "playButton");
+	addTransportButton(m_playAction,"playButton","play","Play (Space)","Play");
 	if (record)
 	{
-		addButton(m_recordAction, "recordButton");
-		addButton(m_recordAccompanyAction, "recordAccompanyButton");
+		addTransportButton(m_recordAction,"recordButton","record","Record","Record");
+		addTransportButton(m_recordAccompanyAction,"recordAccompanyButton","record_accompany",
+							 "Record while playing","Record while playing");
 	}
-	if(stepRecord)
+	if (stepRecord)
 	{
 		addButton(m_toggleStepRecordingAction, "stepRecordButton");
 	}
-	addButton(m_stopAction, "stopButton");
+	addTransportButton(m_stopAction,"stopButton","stop","Stop (Space)","Stop");
 }
 
 QAction *Editor::playAction() const
