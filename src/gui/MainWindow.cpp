@@ -303,8 +303,8 @@ void MainWindow::finalize()
 
 	project_menu->addSeparator();
 
-	project_menu->addAction(embed::getIconPixmap("project_import"), tr("Import..."),
-		this, &MainWindow::onImportProject);
+	addAction(project_menu, "project_import", tr("Import..."),
+		keySequence(Qt::CTRL, Qt::Key_I), &MainWindow::onImportProject);
 
 	addAction(project_menu, "project_export", tr("E&xport..."),
 		keySequence(Qt::CTRL, Qt::Key_E), &MainWindow::onExportProject);
@@ -615,19 +615,16 @@ bool MainWindow::mayChangeProject(bool stopPlayback)
 					"last saving. Do you want to save it "
 								"now?" );
 
-	const auto& title = getSession() == SessionState::Recover
-		? messageTitleRecovered
-		: messageTitleUnsaved;
+	auto mb = QMessageBox{
+		QMessageBox::Question,
+		getSession() == SessionState::Recover ? messageTitleRecovered : messageTitleUnsaved,
+		getSession() == SessionState::Recover ? messageRecovered : messageUnsaved,
+		QMessageBox::Save | QMessageBox::Cancel,
+		this
+	};
 
-	const auto& text = getSession() == SessionState::Recover
-		? messageRecovered
-		: messageUnsaved;
-
-	const auto buttons = QMessageBox::Save
-		| QMessageBox::Discard
-		| QMessageBox::Cancel;
-
-	auto mb = QMessageBox{QMessageBox::Question, title, text, buttons, this};
+	QAbstractButton* discardButton = mb.addButton(QMessageBox::Discard);
+	discardButton->setShortcut(keySequence(Qt::CTRL, Qt::Key_D));
 	int answer = mb.exec();
 
 	if( answer == QMessageBox::Save )
