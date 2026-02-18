@@ -180,20 +180,8 @@ gui::TrackView * SampleTrack::createView( gui::TrackContainerView* tcv )
 
 Clip * SampleTrack::createClip(const TimePos & pos)
 {
-	const TimePos endPos = pos + TimePos(Clip::getDefaultClipLength());
-
-	for (const auto& existingClip : getClips())
-	{
-    	if (pos < existingClip->endPosition() && endPos > existingClip->startPosition())
-    	{
-        	return nullptr;
-		}
-	}
 	auto sClip = new SampleClip(this);
 	sClip->movePosition(pos);
-
-	const tick_t defaultLength = Clip::getDefaultClipLength();
-	sClip->changeLength(defaultLength);
 	return sClip;
 }
 
