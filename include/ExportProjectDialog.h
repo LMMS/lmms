@@ -48,9 +48,17 @@ public:
 	{
 		ExportProject,
 		ExportTracks,
+		ExportTrack
 	};
 
 	ExportProjectDialog(const QString& path, Mode mode, QWidget* parent = nullptr);
+
+	//! Assign a single track to export.
+	//! The track is only used when the mode is set to `ExportTrack`.
+	void setTrack(Track* track) { m_track = track; }
+
+	//! @returns `true` if the exported track should be imported as a sample track, `false` otherwise
+	bool importExportedTrack();
 
 private:
 	void accept() override;
@@ -82,6 +90,7 @@ private:
 
 	QCheckBox* m_exportAsLoopBox = nullptr;
 	QCheckBox* m_exportBetweenLoopMarkersBox = nullptr;
+	QCheckBox* m_importExportedTrackBox = nullptr;
 	QLabel* m_loopRepeatLabel = nullptr;
 	QSpinBox* m_loopRepeatBox = nullptr;
 	QPushButton* m_startButton = nullptr;
@@ -90,6 +99,7 @@ private:
 
 	QString m_path;
 	Mode m_mode;
+	Track* m_track = nullptr;
 	std::unique_ptr<RenderManager> m_renderManager;
 };
 

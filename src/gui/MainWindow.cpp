@@ -1508,9 +1508,11 @@ void MainWindow::exportProject(bool multiExport)
 			}
 		}
 
-		ExportProjectDialog epd(exportFileName,
-			multiExport ? ExportProjectDialog::Mode::ExportTracks : ExportProjectDialog::Mode::ExportProject,
-			getGUI()->mainWindow());
+		const auto exportMode = multiExport ?
+			ExportProjectDialog::Mode::ExportTracks :
+			ExportProjectDialog::Mode::ExportProject;
+
+		auto epd = ExportProjectDialog{exportFileName, exportMode};
 		epd.exec();
 	}
 }
