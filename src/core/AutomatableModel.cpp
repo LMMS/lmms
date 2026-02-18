@@ -739,6 +739,7 @@ void AutomatableModel::setUseControllerValue(bool b)
 
 float FloatModel::getRoundedValue() const
 {
+	if (step<float>() == 0.0f) { return value(); }
 	return std::round(value() / step<float>()) * step<float>();
 }
 
@@ -748,6 +749,8 @@ float FloatModel::getRoundedValue() const
 int FloatModel::getDigitCount() const
 {
 	auto steptemp = step<float>();
+	if (steptemp == 0.0f) { return 10; }
+
 	int digits = 0;
 	while ( steptemp < 1 )
 	{
