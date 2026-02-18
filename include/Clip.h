@@ -108,9 +108,6 @@ public:
 	 */
 	static tick_t getDefaultClipLength();
 
-	void autoResize();
-
-
 
 	/*! \brief Set whether a clip has been resized yet by the user or the knife tool.
 	 *
