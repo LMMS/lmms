@@ -703,8 +703,12 @@ void PianoRoll::glueNotes()
 	}
 }
 
-void PianoRoll::fitNoteLengths(bool fill)
+void PianoRoll::cutOverlappingNotes()
 {
+	// TODO remove the code for fill=true
+	// it has been replaced by fillGapsBetweenNotes()
+	bool fill = false;
+
 	if (!hasValidMidiClip()) { return; }
 	m_midiClip->addJournalCheckPoint();
 	m_midiClip->rearrangeAllNotes();
@@ -756,6 +760,79 @@ void PianoRoll::fitNoteLengths(bool fill)
 	getGUI()->songEditor()->update();
 	Engine::getSong()->setModified();
 }
+
+
+
+static bool fillGapsBetweenNotesInVector(
+	const NoteVector& notes,
+	bool onlyEditSelected)
+{
+	bool success = false;
+
+	// Keep track of where the clip ends
+	TimePos lastEndPos;
+
+	for (auto currentNote = notes.begin(); currentNote != notes.end(); ++currentNote)
+	{
+		if (onlyEditSelected && !(*currentNote)->selected()) { continue; }
+
+		/* Note to self:
+		 * Reset the nextNote iterator to currentNote each time. We don't know how far it iterated
+		 * on the previous note since note lengths differ. Also, never start on currentNote + 1
+		 * because that would not set lastEndPos in case the clip only has a single note.
+		 */
+		auto nextNote = currentNote;
+
+		for (; nextNote != notes.end(); ++nextNote)
+		{
+			lastEndPos = std::max(lastEndPos, (*nextNote)->endPos());
+
+			// Break when the overlap between currentNote and nextNote is less than
+			// 50% of the shortest note's length
+			int lengthOfShortestNote = std::min((*currentNote)->length(), (*nextNote)->length());
+			int overlap = (*currentNote)->endPos() - (*nextNote)->pos();
+			if (overlap < (lengthOfShortestNote / 2)) { break; }
+		}
+
+		// If there are no more notes after currentNote, extend it to the end of the bar
+		if (nextNote == notes.end())
+		{
+			TimePos endOfLastBar = lastEndPos.nextFullBar() * TimePos::ticksPerBar();
+			if ((*currentNote)->endPos() < endOfLastBar)
+			{
+				success = true;
+				(*currentNote)->setLength(endOfLastBar - (*currentNote)->pos());
+			}
+		}
+
+		// If there's a gap between currentNote and nextNote, extend currentNote
+		else if ((*currentNote)->endPos() < (*nextNote)->pos())
+		{
+			success = true;
+			(*currentNote)->setLength((*nextNote)->pos() - (*currentNote)->pos());
+		}
+	}
+
+	return success;
+}
+
+
+
+void PianoRoll::fillGapsBetweenNotes()
+{
+	if (!hasValidMidiClip()) { return; }
+	m_midiClip->addJournalCheckPoint();
+
+	// Make sure notes are sorted by start position
+	m_midiClip->rearrangeAllNotes();
+
+	bool hasSelection = !getSelectedNotes().empty();
+
+	fillGapsBetweenNotesInVector(
+		m_midiClip->notes(),
+		/*onlyEditSelected*/ hasSelection);
+}
+
 
 
 void PianoRoll::constrainNoteLengths(bool constrainMax)
@@ -5264,11 +5341,11 @@ PianoRollWindow::PianoRollWindow() :
 	strumAction->setShortcut(keySequence(Qt::SHIFT, Qt::Key_J));
 
 	auto fillAction = new QAction(embed::getIconPixmap("fill"), tr("Fill"), noteToolsButton);
-	connect(fillAction, &QAction::triggered, [this](){ m_editor->fitNoteLengths(true); });
+	connect(fillAction, &QAction::triggered, m_editor, &PianoRoll::fillGapsBetweenNotes);
 	fillAction->setShortcut(keySequence(Qt::SHIFT, Qt::Key_F));
 
 	auto cutOverlapsAction = new QAction(embed::getIconPixmap("cut_overlaps"), tr("Cut overlaps"), noteToolsButton);
-	connect(cutOverlapsAction, &QAction::triggered, [this](){ m_editor->fitNoteLengths(false); });
+	connect(cutOverlapsAction, &QAction::triggered, m_editor, &PianoRoll::cutOverlappingNotes);
 	cutOverlapsAction->setShortcut(keySequence(Qt::SHIFT, Qt::Key_C));
 
 	auto minLengthAction = new QAction(embed::getIconPixmap("min_length"), tr("Min length as last"), noteToolsButton);
