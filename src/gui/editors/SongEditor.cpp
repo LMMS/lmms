@@ -92,7 +92,8 @@ SongEditor::SongEditor( Song * song ) :
 	m_trackHeadWidth(ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt()==1
 					 ? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT
 					 : DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH),
-	m_selectRegion(false)
+	m_selectRegion(false),
+	m_zoomInfo(nullptr)
 {
 	// Set up timeline
 	m_timeLine = new TimeLineWidget(m_trackHeadWidth, 32, pixelsPerBar(),
@@ -513,7 +514,18 @@ void SongEditor::keyPressEvent( QKeyEvent * ke )
 	{
 		m_zoomingModel->reset();
 	}
-	else
+	else if (ke->key() == Qt::Key_L && ke->modifiers() & Qt::ControlModifier)
+	{
+		zoomToAction(ZoomAction::Loop);
+	}
+	else if (ke->key() == Qt::Key_T && ke->modifiers() & Qt::ControlModifier)
+	{
+		zoomToAction(ZoomAction::Selection);
+	}
+	else if ((ke->key() == Qt::Key_F && ke->modifiers() & Qt::ControlModifier))
+	{
+		zoomToAction(ZoomAction::FullSong);
+	}
 	{
 		QWidget::keyPressEvent(ke);
 	}
@@ -910,6 +922,100 @@ int SongEditor::indexOfTrackView(const TrackView *tv)
 {
 	return static_cast<int>(std::distance(trackViews().begin(),
 										  std::find(trackViews().begin(), trackViews().end(), tv)));
+}
+
+
+
+
+void SongEditor::zoomToAction(ZoomAction zAction)
+{
+	int beatZoomBegin;
+	int beatZoomEnd;
+	std::string sAction;
+
+	// get beatBegin and beatEnd and show warnings
+	switch (zAction)
+	{
+		case ZoomAction::Loop: {
+			sAction = "Loop";
+			beatZoomBegin = std::floor(static_cast<float>(m_timeLine->loopBegin()) / TimePos::ticksPerBar());
+			beatZoomEnd = std::ceil(static_cast<float>(m_timeLine->loopEnd()) / TimePos::ticksPerBar());
+			break;
+		}
+		case ZoomAction::Selection:	{
+			sAction = "Selection";
+			QVector<selectableObject*> so = selectedObjects();
+
+			if (so.isEmpty())
+			{
+				m_zoomInfo = TextFloat::displayMessage(tr("Info"),
+													   tr("There is no selection active. \n"
+														  "Please, select some clips to apply zoom to selection."),
+													   embed::getIconPixmap("whatsthis"), 4000);
+				return;
+			}
+			else
+			{
+				TimePos posSelBegin = std::numeric_limits<int32_t>::max();
+				TimePos posSelEnd = 0;
+
+				for (const auto& selectedClip : so)
+				{
+					auto clipv = dynamic_cast<ClipView*>(selectedClip);
+					posSelBegin = std::min(posSelBegin, clipv->getClip()->startPosition());
+					posSelEnd = std::max(posSelEnd, clipv->getClip()->endPosition());
+				}
+				beatZoomBegin = posSelBegin.getBar();
+				beatZoomEnd = posSelEnd.nextFullBar();
+			}
+			break;
+		}
+		case ZoomAction::FullSong: {
+			if (m_song->length() == 0)
+			{
+				m_zoomInfo = TextFloat::displayMessage(tr("Info"),
+													   tr("The song is empty. \n"
+					                                      "No zoom change is applied."),
+					                                   embed::getIconPixmap("whatsthis"), 4000);
+				return;
+			}
+			else
+			{
+				sAction = "Full song";
+				beatZoomBegin = 0;
+				beatZoomEnd = m_song->length();
+			}
+			break;
+		}
+		default:
+			return;
+	}
+
+	// calculate the area for beats in SongEditor
+	float w = width() - m_trackHeadWidth;
+	// substract width of vertical scrollbar, if visible
+	if (contentWidget()->verticalScrollBar()->isVisible())
+	{
+		w -= contentWidget()->verticalScrollBar()->width();
+	}
+
+	int newPPB = static_cast<int>((w / (beatZoomEnd - beatZoomBegin)));
+
+	if (newPPB < MIN_PIXELS_PER_BAR)
+	{
+		m_zoomInfo = TextFloat::displayMessage(tr("Warning"),
+											   tr("%1 is bigger than visible Song-Editor area. \n"
+												  "You may need to increse the size of Song-Editor window.").arg(QString::fromStdString(sAction)),
+											   embed::getIconPixmap("whatsthis"), 4000);
+	}
+
+	newPPB = std::clamp(newPPB, MIN_PIXELS_PER_BAR, MAX_PIXELS_PER_BAR);
+	int newZoom = std::clamp(calculateZoomSliderValue(newPPB) - 1, 0, ZOOM_STEPS);
+	m_zoomingModel->setValue(newZoom);
+
+	// scroll to first beat of selection
+	scrolled(beatZoomBegin);
+	m_leftRightScroll->setValue(beatZoomBegin);
 }
 
 

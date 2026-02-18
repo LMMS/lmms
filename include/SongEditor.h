@@ -64,6 +64,13 @@ public:
 		Select
 	};
 
+	enum class ZoomAction
+	{
+		Loop,
+		Selection,
+		FullSong
+	};
+
 	SongEditor( Song * song );
 	~SongEditor() override = default;
 
@@ -127,6 +134,8 @@ private:
 	int trackIndexFromSelectionPoint(int yPos);
 	int indexOfTrackView(const TrackView* tv);
 
+	void zoomToAction(enum ZoomAction);
+
 	Song * m_song;
 
 	QScrollBar * m_leftRightScroll;
@@ -164,6 +173,8 @@ private:
 	int m_rubberbandPixelsPerBar; //!< pixels per bar when selection starts
 	int m_trackHeadWidth;
 	bool m_selectRegion;
+
+	TextFloat* m_zoomInfo;
 
 	friend class SongEditorWindow;
 
