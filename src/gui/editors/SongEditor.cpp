@@ -478,6 +478,7 @@ void SongEditor::keyPressEvent( QKeyEvent * ke )
 		if( t >= 0 )
 		{
 			m_song->setPlayPos( t, Song::PlayMode::Song );
+			if (!m_song->isPlaying()) { m_song->setPlayPos(t, Song::PlayMode::None); }
 		}
 	}
 	else if( ke->key() == Qt::Key_Right )
@@ -486,11 +487,13 @@ void SongEditor::keyPressEvent( QKeyEvent * ke )
 		if( t < MaxSongLength )
 		{
 			m_song->setPlayPos( t, Song::PlayMode::Song );
+			if (!m_song->isPlaying()) { m_song->setPlayPos(t, Song::PlayMode::None); }
 		}
 	}
 	else if( ke->key() == Qt::Key_Home )
 	{
 		m_song->setPlayPos( 0, Song::PlayMode::Song );
+		if (!m_song->isPlaying()) { m_song->setPlayPos(0, Song::PlayMode::None); }
 	}
 	else if( ke->key() == Qt::Key_Delete || ke->key() == Qt::Key_Backspace )
 	{
