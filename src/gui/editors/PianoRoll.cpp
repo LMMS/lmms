@@ -757,6 +757,42 @@ void PianoRoll::fitNoteLengths(bool fill)
 	Engine::getSong()->setModified();
 }
 
+void PianoRoll::invertSelection(bool up)
+{
+	if (!hasValidMidiClip()) { return; }
+	m_midiClip->addJournalCheckPoint();
+
+	// Notes to edit
+	const NoteVector selectedNotes = getSelectedNotes();
+	const auto& notes = selectedNotes.empty() ? m_midiClip->notes() : selectedNotes;
+
+	const auto [minNote, maxNote] = std::minmax_element(notes.begin(), notes.end(), [](Note* n1, Note* n2) { return n1->key() < n2->key(); });
+	const int minKey = (*minNote)->key();
+	const int maxKey = (*maxNote)->key();
+
+	const auto microtuner = m_midiClip->instrumentTrack()->microtuner();
+	const int octaveSize = microtuner->enabled() ? microtuner->octaveSize() : 12;
+	const int numOctaves = (maxKey - minKey) / octaveSize + 1;
+
+	for (Note* note : notes)
+	{
+		if (up)
+		{
+			if (note->key() == minKey)
+			{
+				note->setKey(minKey + numOctaves * octaveSize);
+			}
+		}
+		else
+		{
+			if (note->key() == maxKey)
+			{
+				note->setKey(maxKey - numOctaves * octaveSize);
+			}
+		}
+	}
+}
+
 
 void PianoRoll::constrainNoteLengths(bool constrainMax)
 {
@@ -5277,6 +5313,14 @@ PianoRollWindow::PianoRollWindow() :
 	auto maxLengthAction = new QAction(embed::getIconPixmap("max_length"), tr("Max length as last"), noteToolsButton);
 	connect(maxLengthAction, &QAction::triggered, [this](){ m_editor->constrainNoteLengths(true); });
 
+	auto upwardInversionAction = new QAction(embed::getIconPixmap("flip_y"), tr("Upward Inversion"), noteToolsButton);
+	connect(upwardInversionAction, &QAction::triggered, [this](){ m_editor->invertSelection(true); });
+	upwardInversionAction->setShortcut(combine(Qt::SHIFT, Qt::Key_U));
+
+	auto downwardInversionAction = new QAction(embed::getIconPixmap("flip_y"), tr("Downward Inversion"), noteToolsButton);
+	connect(downwardInversionAction, &QAction::triggered, [this](){ m_editor->invertSelection(false); });
+	downwardInversionAction->setShortcut(combine(Qt::SHIFT, Qt::Key_I));
+
 	auto reverseAction = new QAction(embed::getIconPixmap("flip_x"), tr("Reverse Notes"), noteToolsButton);
 	connect(reverseAction, &QAction::triggered, [this](){ m_editor->reverseNotes(); });
 	reverseAction->setShortcut(keySequence(Qt::SHIFT, Qt::Key_R));
@@ -5288,6 +5332,8 @@ PianoRollWindow::PianoRollWindow() :
 	noteToolsButton->addAction(cutOverlapsAction);
 	noteToolsButton->addAction(minLengthAction);
 	noteToolsButton->addAction(maxLengthAction);
+	noteToolsButton->addAction(upwardInversionAction);
+	noteToolsButton->addAction(downwardInversionAction);
 	noteToolsButton->addAction(reverseAction);
 
 	notesActionsToolBar->addWidget(noteToolsButton);
