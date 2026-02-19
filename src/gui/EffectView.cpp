@@ -28,6 +28,7 @@
 #include <QMouseEvent>
 #include <QPushButton>
 #include <QPainter>
+#include <QMessageBox>
 
 #include "EffectView.h"
 #include "DummyEffect.h"
@@ -40,6 +41,8 @@
 #include "MainWindow.h"
 #include "SubWindow.h"
 #include "TempoSyncKnob.h"
+#include "DataFile.h"
+#include "FileDialog.h"
 
 
 namespace lmms::gui
@@ -110,7 +113,7 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 			m_subWindow->hide();
 		}
 	}
-	
+
 	m_opacityEffect = new QGraphicsOpacityEffect(this);
 	m_opacityEffect->setOpacity(1);
 	setGraphicsEffect(m_opacityEffect);
@@ -166,6 +169,99 @@ void EffectView::moveDown()
 
 
 
+void EffectView::saveAsPreset()
+{
+	FileDialog sfd(this, tr("Save preset"), "", tr("FX Preset (*.fxp)"));
+
+	QString presetRoot = ConfigManager::inst()->userPresetsDir();
+	if(!QDir(presetRoot).exists())
+	{
+		QDir().mkdir(presetRoot);
+	}
+	if(!QDir(presetRoot + model()->displayName()).exists())
+	{
+		QDir(presetRoot).mkdir(model()->displayName());
+	}
+
+	sfd.setAcceptMode(FileDialog::AcceptSave);
+	sfd.setDirectory(presetRoot + model()->displayName());
+	sfd.setFileMode(FileDialog::AnyFile);
+	sfd.setDefaultSuffix("fxp");
+
+	if( sfd.exec() == QDialog::Accepted &&
+		!sfd.selectedFiles().isEmpty() &&
+		!sfd.selectedFiles().first().isEmpty() )
+	{
+		DataFile dataFile(DataFile::Type::EffectSettings);
+		QDomElement& content(dataFile.content());
+
+		// "displayname" is stored so we can check that we're applying the right preset to the right effect.
+		content.setAttribute("displayname", effect()->displayName());
+
+		// One of the necessary arguments to Effect::instantiate
+		content.setAttribute("pluginname", QString::fromUtf8(effect()->descriptor()->name));
+
+		// Save the effect key for LADSPA instantiation, also used for Effect::instantiate
+		content.appendChild(effect()->key().saveXML(dataFile));
+
+		effect()->saveSettings(dataFile, content);
+
+		QString f = sfd.selectedFiles()[0];
+		dataFile.writeFile(f);
+	}
+}
+
+
+
+void EffectView::loadFromPreset()
+{
+	FileDialog sfd(this, tr("Load preset"), "", tr("FX Preset (*.fxp)"));
+
+	QString presetRoot = ConfigManager::inst()->userPresetsDir();
+	if(!QDir(presetRoot).exists())
+	{
+		QDir().mkdir(presetRoot);
+	}
+	if(!QDir(presetRoot + model()->displayName()).exists())
+	{
+		QDir(presetRoot).mkdir(model()->displayName());
+	}
+
+	sfd.setAcceptMode(FileDialog::AcceptOpen);
+	sfd.setDirectory(presetRoot + model()->displayName());
+	sfd.setFileMode(FileDialog::ExistingFile);
+	sfd.setDefaultSuffix("fxp");
+
+	if( sfd.exec() == QDialog::Accepted &&
+		!sfd.selectedFiles().isEmpty() )
+	{
+		QString f = sfd.selectedFiles()[0];
+		DataFile dataFile(f);
+		const QDomElement content = dataFile.content();
+		const QString presetName = content.attribute("displayname");
+
+		if (content.isNull())
+		{
+			QMessageBox::warning(this, tr("Error"),
+				tr("Could not read the preset file."));
+			return;
+		}
+
+		if( presetName.isEmpty() ||
+			presetName != effect()->displayName() )
+		{
+			QMessageBox::warning(this, tr("Bad file"),
+				tr("Can't apply the preset file to this effect."));
+			return;
+		}
+
+		effect()->loadSettings(content);
+
+	}
+}
+
+
+
 void EffectView::deletePlugin()
 {
 	emit deletedPlugin(this);
@@ -194,6 +290,13 @@ void EffectView::contextMenuEvent( QContextMenuEvent * )
 	contextMenu->addAction( embed::getIconPixmap( "arp_down" ),
 						tr( "Move &down" ),
 						this, SLOT(moveDown()));
+	contextMenu->addSeparator();
+	contextMenu->addAction( embed::getIconPixmap( "file" ),
+						tr( "&Save as a preset" ),
+						this, SLOT(saveAsPreset()));
+	contextMenu->addAction( embed::getIconPixmap( "file" ),
+						tr( "&Load in a preset" ),
+						this, SLOT(loadFromPreset()));
 	contextMenu->addSeparator();
 	contextMenu->addAction( embed::getIconPixmap( "cancel" ),
 						tr( "&Remove this plugin" ),

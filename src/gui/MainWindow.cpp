@@ -125,7 +125,7 @@ MainWindow::MainWindow() :
 		confMgr->userSamplesDir(), confMgr->factorySamplesDir()));
 
 	sideBar->appendTab(new FileBrowser(FileBrowser::Type::Normal,
-		confMgr->userPresetsDir() + "*" + confMgr->factoryPresetsDir(), "*.xpf *.cs.xml *.xiz *.lv2", tr("My Presets"),
+		confMgr->userPresetsDir() + "*" + confMgr->factoryPresetsDir(), "*.xpf *.cs.xml *.xiz *.lv2 *.fxp", tr("My Presets"),
 		embed::getIconPixmap("preset_file").transformed(QTransform().rotate(90)), splitter, false,
 		confMgr->userPresetsDir(), confMgr->factoryPresetsDir()));
 

@@ -72,6 +72,8 @@ public slots:
 	void editControls();
 	void moveUp();
 	void moveDown();
+	void saveAsPreset();
+	void loadFromPreset();
 	void deletePlugin();
 	void closeEffects();
 

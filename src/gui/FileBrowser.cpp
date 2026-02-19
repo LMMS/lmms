@@ -655,6 +655,11 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 				QIcon(embed::getIconPixmap("star")), tr("Add favorite file"), [path] { ConfigManager::inst()->addFavoriteItem(path); });
 		}
 
+		if ( file->type() == FileItem::FileType::PresetEffect )
+		{
+			break;
+		}
+
 		if (file->isTrack())
 		{
 			contextMenu.addSeparator();
@@ -710,6 +715,11 @@ QList<QAction*> FileBrowserTreeWidget::getContextActions(FileItem* file, bool so
 {
 	QList<QAction*> result = QList<QAction*>();
 	const bool fileIsSample = file->type() == FileItem::FileType::Sample;
+
+	if (file->type() == FileItem::FileType::PresetEffect)
+	{
+		return {};
+	}
 
 	QString instrumentAction = fileIsSample ?
 		tr("Send to new AudioFileProcessor instance") :
@@ -872,7 +882,10 @@ void FileBrowserTreeWidget::mouseMoveEvent( QMouseEvent * me )
 							f->fullName(),
 							embed::getIconPixmap( "preset_file" ), this );
 					break;
-
+				case FileItem::FileType::PresetEffect:
+					new StringPairDrag( "preseteffectfile", f->fullName(),
+							embed::getIconPixmap( "preset_file" ), this );
+					break;
 				case FileItem::FileType::Sample:
 					new StringPairDrag( "samplefile", f->fullName(),
 							embed::getIconPixmap( "sample_file" ), this );
@@ -1193,6 +1206,7 @@ void FileItem::initPixmaps()
 			setIcon(0, s_projectFilePixmap);
 			break;
 		case FileType::Preset:
+		case FileType::PresetEffect:
 			setIcon(0, s_presetFilePixmap);
 			break;
 		case FileType::SoundFont:
@@ -1232,6 +1246,11 @@ void FileItem::determineFileType()
 	{
 		m_type = FileType::Preset;
 		m_handling = FileHandling::LoadAsPreset;
+	}
+	else if( ext == "fxp" )
+	{
+		m_type = FileType::PresetEffect;
+		m_handling = FileHandling::LoadAsPresetEffect;
 	}
 	else if( ext == "xiz" && ! getPluginFactory()->pluginSupportingExtension(ext).isNull() )
 	{
@@ -1308,7 +1327,7 @@ QString FileItem::extension(const QString & file )
 QString FileItem::defaultFilters()
 {
 	const auto projectFilters = QStringList{"*.mmp", "*.mpt", "*.mmpz"};
-	const auto presetFilters = QStringList{"*.xpf", "*.xml", "*.xiz", "*.lv2"};
+	const auto presetFilters = QStringList{"*.xpf", "*.xml", "*.xiz", "*.lv2", "*.fxp"};
 	const auto soundFontFilters = QStringList{"*.sf2", "*.sf3"};
 	const auto patchFilters = QStringList{"*.pat"};
 	const auto midiFilters = QStringList{"*.mid", "*.midi", "*.rmi"};
