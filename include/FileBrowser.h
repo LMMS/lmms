@@ -246,6 +246,7 @@ public:
 	{
 		Project,
 		Preset,
+		PresetEffect,
 		Sample,
 		SoundFont,
 		Patch,
@@ -259,6 +260,7 @@ public:
 		NotSupported,
 		LoadAsProject,
 		LoadAsPreset,
+		LoadAsPresetEffect,
 		LoadByPlugin,
 		ImportAsProject
 	} ;

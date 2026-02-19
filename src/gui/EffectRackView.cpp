@@ -30,10 +30,15 @@
 #include <QPushButton>
 #include <QScrollArea>
 #include <QVBoxLayout>
+#include <QMessageBox>
 
+#include "Effect.h"
+#include "DataFile.h"
 #include "DeprecationHelper.h"
+#include "EffectControls.h"
 #include "EffectSelectDialog.h"
 #include "EffectView.h"
+#include "StringPairDrag.h"
 #include "GroupBox.h"
 
 
@@ -71,6 +76,7 @@ EffectRackView::EffectRackView( EffectChain* model, QWidget* parent ) :
 
 	connect( addButton, SIGNAL(clicked()), this, SLOT(addEffect()));
 
+	setAcceptDrops(true);
 
 	m_lastY = 0;
 
@@ -82,6 +88,88 @@ EffectRackView::EffectRackView( EffectChain* model, QWidget* parent ) :
 EffectRackView::~EffectRackView()
 {
 	clearViews();
+}
+
+
+
+
+void EffectRackView::dragEnterEvent(QDragEnterEvent *event)
+{
+	const QString type = StringPairDrag::decodeKey(event);
+	if (type == "preseteffectfile" )
+	{
+		event->acceptProposedAction();
+	}
+	else
+	{
+		event->ignore();
+	}
+}
+
+
+void EffectRackView::dropEvent(QDropEvent *event)
+{
+	const QString type = StringPairDrag::decodeKey(event);
+	const QString filePath = StringPairDrag::decodeValue(event);
+
+	if (type == "preseteffectfile" )
+	{
+		addEffect(filePath);
+		event->accept();
+	}
+	else
+	{
+		event->ignore();
+	}
+}
+
+
+
+void EffectRackView::addEffect(const QString& filePath)
+{
+	DataFile dataFile(filePath);
+	const QDomElement content = dataFile.content();
+
+	if (content.isNull())
+	{
+		QMessageBox::warning(this, tr("Error"),
+			tr("Could not read the preset file."));
+		return;
+	}
+
+	const QString displayName = content.attribute("displayname");
+	const QString pluginName = content.attribute("pluginname");
+
+	if (displayName.isEmpty() || pluginName.isEmpty())
+	{
+		QMessageBox::warning(this, tr("Error"),
+			tr("Preset file is corrupted or invalid."));
+		return;
+	}
+
+	QDomElement keyElement = content.firstChildElement("key");
+	if (keyElement.isNull())
+	{
+		QMessageBox::warning(this, tr("Error"),
+			tr("Preset file does not contain plugin key information."));
+		return;
+	}
+
+	EffectKey key(keyElement);
+
+	Effect *fx = Effect::instantiate(pluginName, fxChain(), &key);
+	if (!fx)
+	{
+		QMessageBox::warning(this, tr("Error"),
+			tr("Failed to instantiate effect: %1").arg(pluginName));
+		return;
+	}
+
+	fx->loadSettings(content);
+
+	fxChain()->appendEffect(fx);
+
+	update();
 }
 
 
@@ -107,7 +195,7 @@ void EffectRackView::moveUp( EffectView* view )
 	if( view != m_effectViews.first() )
 	{
 		int i = 0;
-		for( QVector<EffectView *>::Iterator it = m_effectViews.begin(); 
+		for( QVector<EffectView *>::Iterator it = m_effectViews.begin();
 					it != m_effectViews.end(); it++, i++ )
 		{
 			if( *it == view )
