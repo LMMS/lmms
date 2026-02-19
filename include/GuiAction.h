@@ -1,9 +1,9 @@
 /*
  * GuiAction.h - declaration of class GuiAction (and related ones)
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- *
  * This file is part of LMMS - https://lmms.io
+ *
+ * Copyright (c) 2026 yohannd1 <mitonanan12@gmail.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public

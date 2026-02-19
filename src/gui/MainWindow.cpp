@@ -284,7 +284,8 @@ void MainWindow::finalize()
 
 	static auto testActionData = ActionData::getOrCreate("test", ActionTrigger::pressed(Qt::CTRL, Qt::Key_J));
 	auto testAction = new GuiAction(this, testActionData);
-	testAction->setOnActivate([](auto* parent) {
+	testAction->setOnActivate([](auto* parent)
+	{
 		auto mw = dynamic_cast<MainWindow*>(parent);
 		assert(mw != nullptr);
 		mw->openProject();
