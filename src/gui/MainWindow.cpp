@@ -44,9 +44,10 @@
 #include "ExportProjectDialog.h"
 #include "FileBrowser.h"
 #include "FileDialog.h"
+#include "GuiAction.h"
+#include "GuiApplication.h"
 #include "Metronome.h"
 #include "MixerView.h"
-#include "GuiApplication.h"
 #include "ImportFilter.h"
 #include "InstrumentTrackView.h"
 #include "InstrumentTrackWindow.h"
@@ -280,6 +281,14 @@ void MainWindow::finalize()
 
 	addAction(project_menu, "project_new", tr("&New"),
 		QKeySequence::New, &MainWindow::createNewProject);
+
+	static auto testActionData = ActionData::getOrCreate("test", ActionTrigger::pressed(Qt::CTRL, Qt::Key_J));
+	auto testAction = new GuiAction(this, testActionData);
+	testAction->setOnActivate([](auto* parent) {
+		auto mw = dynamic_cast<MainWindow*>(parent);
+		assert(mw != nullptr);
+		mw->openProject();
+	});
 
 	auto templates_menu = new TemplatesMenu( this );
 	project_menu->addMenu(templates_menu);

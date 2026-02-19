@@ -52,10 +52,22 @@ ActionData* ActionData::getOrCreate(QString name, ActionTrigger::Any trigger)
 	return ActionContainer::findData(name);
 }
 
+ActionTrigger::Any ActionTrigger::pressed(uint32_t mods, uint32_t key)
+{
+	return ActionTrigger::KeyPressed { .mods = mods, .key = key };
+}
+
+ActionTrigger::Any ActionTrigger::held(uint32_t mods, uint32_t key)
+{
+	return ActionTrigger::KeyHeld { .mods = mods, .key = key };
+}
+
 GuiAction::GuiAction(QObject* parent, ActionData* data)
 	: QObject(parent)
 	, m_data{data}
 	, m_active{false}
+	, m_onActivateFunc{nullptr}
+	, m_onDeactivateFunc{nullptr}
 {
 	if (parent != nullptr)
 	{
@@ -67,5 +79,22 @@ GuiAction::GuiAction(QObject* parent, ActionData* data)
 }
 
 GuiAction::~GuiAction() {}
+
+void GuiAction::setOnActivate(std::function<void (QObject*)> func)
+{
+	m_onActivateFunc = func;
+	m_active = false; // TODO: confirm if this is alright
+}
+
+void GuiAction::setOnDeactivate(std::function<void (QObject*)> func)
+{
+	m_onDeactivateFunc = func;
+	m_active = false; // TODO: confirm if this is alright
+}
+
+bool GuiAction::eventFilter(QObject* watched, QEvent* event)
+{
+	return false; // TODO
+}
 
 } // namespace lmms

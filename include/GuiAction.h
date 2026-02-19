@@ -38,12 +38,18 @@ class ActionData;
 class ActionTrigger
 {
 public:
+	// FIXME: For key events, the enums Qt::KeyboardModifier and Qt::Key are used. I can't find them so I'm using
+	// uint32_t...
+
 	struct Never {}; //!< Can never be triggered
-	struct KeyPressed { uint32_t key, modifiers; };
-	struct KeyHeld { uint32_t key, modifiers; };
+	struct KeyPressed { uint32_t mods, key; };
+	struct KeyHeld { uint32_t mods, key; };
 
 	//! Top type for all possible triggers
 	typedef std::variant<Never, KeyPressed, KeyHeld> Any;
+
+	static Any pressed(uint32_t mods, uint32_t key);
+	static Any held(uint32_t mods, uint32_t key);
 };
 
 class ActionContainer
@@ -88,7 +94,10 @@ class GuiAction : QObject
 {
 public:
 	GuiAction(QObject* parent, ActionData* data);
-	virtual ~GuiAction();
+	~GuiAction();
+
+	void setOnActivate(std::function<void (QObject*)> func);
+	void setOnDeactivate(std::function<void (QObject*)> func);
 
 protected:
 	bool eventFilter(QObject* watched, QEvent* event) override;
