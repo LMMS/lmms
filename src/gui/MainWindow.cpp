@@ -34,6 +34,7 @@
 #include <QMessageBox>
 #include <QShortcut>
 #include <QSplitter>
+#include <QDebug>
 
 #include "AboutDialog.h"
 #include "AutomationEditor.h"
@@ -284,10 +285,7 @@ void MainWindow::finalize()
 
 	static auto testActionData = ActionData::getOrCreate("test", ActionTrigger::pressed(Qt::CTRL, Qt::Key_J));
 	auto testAction = new GuiAction(this, testActionData);
-	testAction->setOnActivate([](auto* parent)
-	{
-		auto mw = dynamic_cast<MainWindow*>(parent);
-		assert(mw != nullptr);
+	testAction->setOnActivate<MainWindow>([](auto* mw) {
 		mw->openProject();
 	});
 

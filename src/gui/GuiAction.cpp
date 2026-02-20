@@ -22,9 +22,9 @@
  *
  */
 
+#include <QDebug>
 #include <QEvent>
 #include <QKeyEvent>
-#include <QDebug>
 
 #include "GuiAction.h"
 
@@ -67,7 +67,6 @@ void ActionData::setTrigger(ActionTrigger::Any&& newTrigger)
 	m_trigger = newTrigger;
 }
 
-
 ActionTrigger::Any ActionTrigger::pressed(uint32_t mods, uint32_t key, bool repeat)
 {
 	return ActionTrigger::KeyPressed{.mods = mods, .key = key, .repeat = repeat};
@@ -82,8 +81,8 @@ GuiAction::GuiAction(QObject* parent, ActionData* data)
 	: QObject(parent)
 	, m_data{data}
 	, m_active{false}
-	, m_onActivateFunc{nullptr}
-	, m_onDeactivateFunc{nullptr}
+	, m_onActivateFunc{[](QObject*){}}
+	, m_onDeactivateFunc{[](QObject*){}}
 {
 	if (parent != nullptr)
 	{
@@ -98,13 +97,13 @@ GuiAction::~GuiAction()
 {
 }
 
-void GuiAction::setOnActivate(std::function<void(QObject*)> func)
+void GuiAction::setOnActivateObj(std::function<void(QObject*)> func)
 {
 	m_onActivateFunc = func;
 	m_active = false; // TODO: confirm if this is alright
 }
 
-void GuiAction::setOnDeactivate(std::function<void(QObject*)> func)
+void GuiAction::setOnDeactivateObj(std::function<void(QObject*)> func)
 {
 	m_onDeactivateFunc = func;
 	m_active = false; // TODO: confirm if this is alright
@@ -121,11 +120,12 @@ bool GuiAction::eventFilter(QObject* watched, QEvent* event)
 			auto* ke = dynamic_cast<QKeyEvent*>(event);
 			assert(ke != nullptr);
 
-			// FIXME: "This function cannot always be trusted. The user can confuse it by pressing both Shift keys simultaneously and releasing one of them, for example." @ https://doc.qt.io/qt-6/qkeyevent.html#modifiers
+			// FIXME: "This function cannot always be trusted. The user can confuse it by pressing both Shift keys
+			// simultaneously and releasing one of them, for example." @ https://doc.qt.io/qt-6/qkeyevent.html#modifiers
 
 			if ((uint32_t)ke->key() == trigger.key && ke->modifiers() == trigger.mods)
 			{
-				qDebug() << "ACTIVATE";
+				m_onActivateFunc(watched);
 				m_active = false;
 				return true;
 			}

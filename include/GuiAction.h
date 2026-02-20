@@ -25,11 +25,12 @@
 #ifndef LMMS_GUI_ACTION_H
 #define LMMS_GUI_ACTION_H
 
-#include <QString>
 #include <QObject>
+#include <QString>
+#include <QDebug>
 
-#include <variant>
 #include <functional>
+#include <variant>
 
 namespace lmms {
 
@@ -41,13 +42,18 @@ public:
 	// FIXME: For key events, the enums Qt::KeyboardModifier and Qt::Key are used. I can't find them so I'm using
 	// uint32_t...
 
-	struct Never {}; //!< Can never be triggered
+	struct Never
+	{
+	}; //!< Can never be triggered
 	struct KeyPressed
 	{
 		uint32_t mods, key;
 		bool repeat;
 	};
-	struct KeyHeld { uint32_t mods, key; };
+	struct KeyHeld
+	{
+		uint32_t mods, key;
+	};
 
 	//! Top type for all possible triggers
 	typedef std::variant<Never, KeyPressed, KeyHeld> Any;
@@ -100,8 +106,11 @@ public:
 	GuiAction(QObject* parent, ActionData* data);
 	~GuiAction();
 
-	void setOnActivate(std::function<void (QObject*)> func);
-	void setOnDeactivate(std::function<void (QObject*)> func);
+	template <typename T> inline void setOnActivate(std::function<void(T*)> func);
+	template <typename T> inline void setOnDeactivate(std::function<void(T*)> func);
+
+	void setOnActivateObj(std::function<void(QObject*)> func);
+	void setOnDeactivateObj(std::function<void(QObject*)> func);
 
 protected:
 	bool eventFilter(QObject* watched, QEvent* event) override;
@@ -111,9 +120,27 @@ private:
 	bool m_active;
 	uint32_t m_mods;
 
-	std::function<void (QObject*)> m_onActivateFunc;
-	std::function<void (QObject*)> m_onDeactivateFunc;
+	std::function<void(QObject*)> m_onActivateFunc;
+	std::function<void(QObject*)> m_onDeactivateFunc;
 };
+
+template <typename T> void GuiAction::setOnActivate(std::function<void(T*)> func)
+{
+	static_assert(std::is_convertible<T*, QObject*>::value);
+	setOnActivateObj([func](QObject* parent) {
+		auto* mw = dynamic_cast<T*>(parent);
+		func(mw);
+	});
+}
+
+template <typename T> void GuiAction::setOnDeactivate(std::function<void(T*)> func)
+{
+	static_assert(std::is_convertible<T*, QObject*>::value);
+	setOnDeactivateObj([func](QObject* parent) {
+		auto* mw = dynamic_cast<T*>(parent);
+		func(mw);
+	});
+}
 
 } // namespace lmms
 
