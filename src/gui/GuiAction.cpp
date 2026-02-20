@@ -22,6 +22,10 @@
  *
  */
 
+#include <QEvent>
+#include <QKeyEvent>
+#include <QDebug>
+
 #include "GuiAction.h"
 
 namespace lmms {
@@ -44,7 +48,8 @@ ActionData* ActionContainer::findData(const QString& name)
 ActionData::ActionData(QString name, ActionTrigger::Any trigger)
 	: m_name{name}
 	, m_trigger{trigger}
-{}
+{
+}
 
 ActionData* ActionData::getOrCreate(QString name, ActionTrigger::Any trigger)
 {
@@ -52,14 +57,25 @@ ActionData* ActionData::getOrCreate(QString name, ActionTrigger::Any trigger)
 	return ActionContainer::findData(name);
 }
 
-ActionTrigger::Any ActionTrigger::pressed(uint32_t mods, uint32_t key)
+const ActionTrigger::Any& ActionData::trigger() const
 {
-	return ActionTrigger::KeyPressed { .mods = mods, .key = key };
+	return m_trigger;
+}
+
+void ActionData::setTrigger(ActionTrigger::Any&& newTrigger)
+{
+	m_trigger = newTrigger;
+}
+
+
+ActionTrigger::Any ActionTrigger::pressed(uint32_t mods, uint32_t key, bool repeat)
+{
+	return ActionTrigger::KeyPressed{.mods = mods, .key = key, .repeat = repeat};
 }
 
 ActionTrigger::Any ActionTrigger::held(uint32_t mods, uint32_t key)
 {
-	return ActionTrigger::KeyHeld { .mods = mods, .key = key };
+	return ActionTrigger::KeyHeld{.mods = mods, .key = key};
 }
 
 GuiAction::GuiAction(QObject* parent, ActionData* data)
@@ -78,15 +94,17 @@ GuiAction::GuiAction(QObject* parent, ActionData* data)
 	// TODO: how to signal `GuiAction` when the ActionData has had its trigger changed? Does it even need that?
 }
 
-GuiAction::~GuiAction() {}
+GuiAction::~GuiAction()
+{
+}
 
-void GuiAction::setOnActivate(std::function<void (QObject*)> func)
+void GuiAction::setOnActivate(std::function<void(QObject*)> func)
 {
 	m_onActivateFunc = func;
 	m_active = false; // TODO: confirm if this is alright
 }
 
-void GuiAction::setOnDeactivate(std::function<void (QObject*)> func)
+void GuiAction::setOnDeactivate(std::function<void(QObject*)> func)
 {
 	m_onDeactivateFunc = func;
 	m_active = false; // TODO: confirm if this is alright
@@ -94,7 +112,33 @@ void GuiAction::setOnDeactivate(std::function<void (QObject*)> func)
 
 bool GuiAction::eventFilter(QObject* watched, QEvent* event)
 {
-	return false; // TODO
+	const auto& trigger_g = m_data->trigger();
+	if (std::holds_alternative<ActionTrigger::KeyPressed>(trigger_g))
+	{
+		const auto& trigger = std::get<ActionTrigger::KeyPressed>(trigger_g);
+		if (!m_active && event->type() == QEvent::KeyPress)
+		{
+			auto* ke = dynamic_cast<QKeyEvent*>(event);
+			assert(ke != nullptr);
+
+			// FIXME: "This function cannot always be trusted. The user can confuse it by pressing both Shift keys simultaneously and releasing one of them, for example." @ https://doc.qt.io/qt-6/qkeyevent.html#modifiers
+
+			if ((uint32_t)ke->key() == trigger.key && ke->modifiers() == trigger.mods)
+			{
+				qDebug() << "ACTIVATE";
+				m_active = false;
+				return true;
+			}
+		}
+		// else if (m_active && event->type() == QEvent::KeyRelease)
+		// {
+		// 	auto* ke = dynamic_cast<QKeyEvent*>(event);
+		// 	assert(ke != nullptr);
+		// 	return true;
+		// }
+	}
+
+	return QObject::eventFilter(watched, event);
 }
 
 } // namespace lmms

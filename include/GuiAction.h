@@ -42,13 +42,17 @@ public:
 	// uint32_t...
 
 	struct Never {}; //!< Can never be triggered
-	struct KeyPressed { uint32_t mods, key; };
+	struct KeyPressed
+	{
+		uint32_t mods, key;
+		bool repeat;
+	};
 	struct KeyHeld { uint32_t mods, key; };
 
 	//! Top type for all possible triggers
 	typedef std::variant<Never, KeyPressed, KeyHeld> Any;
 
-	static Any pressed(uint32_t mods, uint32_t key);
+	static Any pressed(uint32_t mods, uint32_t key, bool repeat = true);
 	static Any held(uint32_t mods, uint32_t key);
 };
 
@@ -78,9 +82,9 @@ public:
 	// FIXME: not sure if the lifetime of this returned pointer ^ is all that good either... maybe use a
 	// std::shared_ptr? At the cost of fragmentation
 
-	const QString& name();
-	const ActionTrigger::Any& trigger();
-	void setTrigger(ActionTrigger::Any newTrigger);
+	const QString& name() const;
+	const ActionTrigger::Any& trigger() const;
+	void setTrigger(ActionTrigger::Any&& newTrigger);
 
 private:
 	ActionData(QString name, ActionTrigger::Any trigger);
@@ -105,6 +109,7 @@ protected:
 private:
 	ActionData* m_data;
 	bool m_active;
+	uint32_t m_mods;
 
 	std::function<void (QObject*)> m_onActivateFunc;
 	std::function<void (QObject*)> m_onDeactivateFunc;
