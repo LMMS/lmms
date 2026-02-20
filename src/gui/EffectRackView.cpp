@@ -96,7 +96,7 @@ EffectRackView::~EffectRackView()
 void EffectRackView::dragEnterEvent(QDragEnterEvent *event)
 {
 	const QString type = StringPairDrag::decodeKey(event);
-	if (type == "effectpresetfile" )
+	if (type == "effectpresetfile")
 	{
 		event->acceptProposedAction();
 	}
@@ -112,7 +112,7 @@ void EffectRackView::dropEvent(QDropEvent *event)
 	const QString type = StringPairDrag::decodeKey(event);
 	const QString filePath = StringPairDrag::decodeValue(event);
 
-	if (type == "effectpresetfile" )
+	if (type == "effectpresetfile")
 	{
 		addEffect(filePath);
 		event->accept();
@@ -178,9 +178,7 @@ void EffectRackView::addEffect(const QString& filePath)
 	}
 
 	fx->loadSettings(content);
-
 	fxChain()->appendEffect(fx);
-
 	update();
 }
 
