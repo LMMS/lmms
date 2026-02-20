@@ -30,7 +30,6 @@
 #include <QPushButton>
 #include <QScrollArea>
 #include <QVBoxLayout>
-#include <QMessageBox>
 
 #include "Effect.h"
 #include "DataFile.h"
@@ -39,6 +38,8 @@
 #include "EffectView.h"
 #include "StringPairDrag.h"
 #include "GroupBox.h"
+#include "TextFloat.h"
+#include "embed.h"
 
 
 namespace lmms::gui
@@ -131,8 +132,11 @@ void EffectRackView::addEffect(const QString& filePath)
 
 	if (content.isNull())
 	{
-		QMessageBox::warning(this, tr("Error"),
-			tr("Could not read the preset file."));
+		TextFloat::displayMessage(
+			"Preset loading error",
+			tr("Could not read the preset file."),
+			embed::getIconPixmap("error")
+		);
 		return;
 	}
 
@@ -141,16 +145,22 @@ void EffectRackView::addEffect(const QString& filePath)
 
 	if (displayName.isEmpty() || pluginName.isEmpty())
 	{
-		QMessageBox::warning(this, tr("Error"),
-			tr("Preset file is corrupted or invalid."));
+		TextFloat::displayMessage(
+			"Preset loading error",
+			tr("Preset file is corrupted or invalid."),
+			embed::getIconPixmap("error")
+		);
 		return;
 	}
 
 	QDomElement keyElement = content.firstChildElement("key");
 	if (keyElement.isNull())
 	{
-		QMessageBox::warning(this, tr("Error"),
-			tr("Preset file does not contain plugin key information."));
+		TextFloat::displayMessage(
+			"Preset loading error",
+			tr("Preset file does not contain plugin key information."),
+			embed::getIconPixmap("error")
+		);
 		return;
 	}
 
@@ -159,8 +169,11 @@ void EffectRackView::addEffect(const QString& filePath)
 	Effect *fx = Effect::instantiate(pluginName, fxChain(), &key);
 	if (!fx)
 	{
-		QMessageBox::warning(this, tr("Error"),
-			tr("Failed to instantiate effect."));
+		TextFloat::displayMessage(
+			"Preset loading error",
+			tr("Failed to instantiate effect."),
+			embed::getIconPixmap("error")
+		);
 		return;
 	}
 
