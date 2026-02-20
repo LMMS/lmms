@@ -655,7 +655,7 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 				QIcon(embed::getIconPixmap("star")), tr("Add favorite file"), [path] { ConfigManager::inst()->addFavoriteItem(path); });
 		}
 
-		if ( file->type() == FileItem::FileType::PresetEffect )
+		if ( file->type() == FileItem::FileType::EffectPreset )
 		{
 			break;
 		}
@@ -716,7 +716,7 @@ QList<QAction*> FileBrowserTreeWidget::getContextActions(FileItem* file, bool so
 	QList<QAction*> result = QList<QAction*>();
 	const bool fileIsSample = file->type() == FileItem::FileType::Sample;
 
-	if (file->type() == FileItem::FileType::PresetEffect)
+	if (file->type() == FileItem::FileType::EffectPreset)
 	{
 		return {};
 	}
@@ -882,8 +882,8 @@ void FileBrowserTreeWidget::mouseMoveEvent( QMouseEvent * me )
 							f->fullName(),
 							embed::getIconPixmap( "preset_file" ), this );
 					break;
-				case FileItem::FileType::PresetEffect:
-					new StringPairDrag( "preseteffectfile", f->fullName(),
+				case FileItem::FileType::EffectPreset:
+					new StringPairDrag( "effectpresetfile", f->fullName(),
 							embed::getIconPixmap( "preset_file" ), this );
 					break;
 				case FileItem::FileType::Sample:
@@ -1206,7 +1206,7 @@ void FileItem::initPixmaps()
 			setIcon(0, s_projectFilePixmap);
 			break;
 		case FileType::Preset:
-		case FileType::PresetEffect:
+		case FileType::EffectPreset:
 			setIcon(0, s_presetFilePixmap);
 			break;
 		case FileType::SoundFont:
@@ -1249,8 +1249,8 @@ void FileItem::determineFileType()
 	}
 	else if( ext == "fxp" )
 	{
-		m_type = FileType::PresetEffect;
-		m_handling = FileHandling::LoadAsPresetEffect;
+		m_type = FileType::EffectPreset;
+		m_handling = FileHandling::LoadAsEffectPreset;
 	}
 	else if( ext == "xiz" && ! getPluginFactory()->pluginSupportingExtension(ext).isNull() )
 	{
