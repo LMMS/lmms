@@ -876,8 +876,8 @@ void FileBrowserTreeWidget::mouseMoveEvent( QMouseEvent * me )
 		{
 			switch( f->type() )
 			{
-				case FileItem::FileType::Preset:
-					new StringPairDrag( f->handling() == FileItem::FileHandling::LoadAsPreset ?
+				case FileItem::FileType::InstrumentPreset:
+					new StringPairDrag( f->handling() == FileItem::FileHandling::LoadAsInstrumentPreset ?
 							"presetfile" : "pluginpresetfile",
 							f->fullName(),
 							embed::getIconPixmap( "preset_file" ), this );
@@ -967,7 +967,7 @@ void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it)
 			break;
 		}
 
-		case FileItem::FileHandling::LoadAsPreset: {
+		case FileItem::FileHandling::LoadAsInstrumentPreset: {
 			DataFile dataFile(f->fullName());
 			it->replaceInstrument(dataFile);
 			break;
@@ -1205,7 +1205,7 @@ void FileItem::initPixmaps()
 		case FileType::Project:
 			setIcon(0, s_projectFilePixmap);
 			break;
-		case FileType::Preset:
+		case FileType::InstrumentPreset:
 		case FileType::EffectPreset:
 			setIcon(0, s_presetFilePixmap);
 			break;
@@ -1244,8 +1244,8 @@ void FileItem::determineFileType()
 	}
 	else if( ext == "xpf" || ext == "xml" )
 	{
-		m_type = FileType::Preset;
-		m_handling = FileHandling::LoadAsPreset;
+		m_type = FileType::InstrumentPreset;
+		m_handling = FileHandling::LoadAsInstrumentPreset;
 	}
 	else if( ext == "fxp" )
 	{
@@ -1254,7 +1254,7 @@ void FileItem::determineFileType()
 	}
 	else if( ext == "xiz" && ! getPluginFactory()->pluginSupportingExtension(ext).isNull() )
 	{
-		m_type = FileType::Preset;
+		m_type = FileType::InstrumentPreset;
 		m_handling = FileHandling::LoadByPlugin;
 	}
 	else if( ext == "sf2" || ext == "sf3" )
@@ -1287,7 +1287,7 @@ void FileItem::determineFileType()
 #endif
 	else if ( ext == "lv2" )
 	{
-		m_type = FileType::Preset;
+		m_type = FileType::InstrumentPreset;
 		m_handling = FileHandling::LoadByPlugin;
 	}
 	else
