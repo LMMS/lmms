@@ -160,7 +160,7 @@ void EffectRackView::addEffect(const QString& filePath)
 	if (!fx)
 	{
 		QMessageBox::warning(this, tr("Error"),
-			tr("Failed to instantiate effect: %1").arg(pluginName));
+			tr("Failed to instantiate effect."));
 		return;
 	}
 
