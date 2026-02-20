@@ -72,6 +72,9 @@ public:
 	//! Find an action by its name. Returns null when it was not found.
 	static ActionData* findData(const QString& name);
 
+	using Iterator = std::map<QString, ActionData>::iterator;
+	static Iterator mappingsBegin();
+	static Iterator mappingsEnd();
 private:
 	ActionContainer() = delete;
 	~ActionContainer() = delete;

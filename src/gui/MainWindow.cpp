@@ -289,6 +289,25 @@ void MainWindow::finalize()
 		mw->openProject();
 	});
 
+	static auto lkData = ActionData::getOrCreate("listKeybindings", ActionTrigger::pressed(Qt::CTRL, Qt::Key_K));
+	auto lkAction = new GuiAction(this, lkData);
+	lkAction->setOnActivate<MainWindow>([](auto* mw) {
+		auto s = QString{};
+
+		for (auto it = ActionContainer::mappingsBegin(); it != ActionContainer::mappingsEnd(); it++)
+		{
+			const auto [name, _] = *it;
+			s += name;
+			s += "\n";
+		}
+
+		auto* d = new QDialog(mw);
+		auto* l = new QLabel(d);
+		l->setTextFormat(Qt::PlainText);
+		l->setText(s);
+		d->exec();
+	});
+
 	auto templates_menu = new TemplatesMenu( this );
 	project_menu->addMenu(templates_menu);
 

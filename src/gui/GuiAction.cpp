@@ -109,6 +109,16 @@ void GuiAction::setOnDeactivateObj(std::function<void(QObject*)> func)
 	m_active = false; // TODO: confirm if this is alright
 }
 
+ActionContainer::Iterator ActionContainer::mappingsBegin()
+{
+	return s_dataMap.begin();
+}
+
+ActionContainer::Iterator ActionContainer::mappingsEnd()
+{
+	return s_dataMap.end();
+}
+
 bool GuiAction::eventFilter(QObject* watched, QEvent* event)
 {
 	const auto& trigger_g = m_data->trigger();
