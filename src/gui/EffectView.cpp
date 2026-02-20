@@ -28,7 +28,6 @@
 #include <QMouseEvent>
 #include <QPushButton>
 #include <QPainter>
-#include <QMessageBox>
 
 #include "EffectView.h"
 #include "DummyEffect.h"
@@ -43,6 +42,7 @@
 #include "TempoSyncKnob.h"
 #include "DataFile.h"
 #include "FileDialog.h"
+#include "TextFloat.h"
 
 
 namespace lmms::gui
@@ -242,16 +242,22 @@ void EffectView::loadPreset()
 
 		if (content.isNull())
 		{
-			QMessageBox::warning(this, tr("Error"),
-				tr("Could not read the preset file."));
+			TextFloat::displayMessage(
+				"Preset loading error",
+				tr("Could not read the preset file."),
+				embed::getIconPixmap("error")
+			);
 			return;
 		}
 
 		if( presetName.isEmpty() ||
 			presetName != effect()->displayName() )
 		{
-			QMessageBox::warning(this, tr("Bad file"),
-				tr("Can't apply the preset file to this effect."));
+			TextFloat::displayMessage(
+				"Preset loading error",
+				tr("Can't apply the preset file to this effect."),
+				embed::getIconPixmap("error")
+			);
 			return;
 		}
 
