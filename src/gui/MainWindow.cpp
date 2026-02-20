@@ -34,6 +34,7 @@
 #include <QMessageBox>
 #include <QShortcut>
 #include <QSplitter>
+#include <QDebug>
 
 #include "AboutDialog.h"
 #include "AutomationEditor.h"
@@ -44,9 +45,10 @@
 #include "ExportProjectDialog.h"
 #include "FileBrowser.h"
 #include "FileDialog.h"
+#include "GuiAction.h"
+#include "GuiApplication.h"
 #include "Metronome.h"
 #include "MixerView.h"
-#include "GuiApplication.h"
 #include "ImportFilter.h"
 #include "InstrumentTrackView.h"
 #include "InstrumentTrackWindow.h"
@@ -280,6 +282,31 @@ void MainWindow::finalize()
 
 	addAction(project_menu, "project_new", tr("&New"),
 		QKeySequence::New, &MainWindow::createNewProject);
+
+	static auto testActionData = ActionData::getOrCreate("test", ActionTrigger::pressed(Qt::CTRL, Qt::Key_J));
+	auto testAction = new GuiAction(this, testActionData);
+	testAction->setOnActivate<MainWindow>([](auto* mw) {
+		mw->openProject();
+	});
+
+	static auto lkData = ActionData::getOrCreate("listKeybindings", ActionTrigger::pressed(Qt::CTRL, Qt::Key_K));
+	auto lkAction = new GuiAction(this, lkData);
+	lkAction->setOnActivate<MainWindow>([](auto* mw) {
+		auto s = QString{};
+
+		for (auto it = ActionContainer::mappingsBegin(); it != ActionContainer::mappingsEnd(); it++)
+		{
+			const auto [name, _] = *it;
+			s += name;
+			s += "\n";
+		}
+
+		auto* d = new QDialog(mw);
+		auto* l = new QLabel(d);
+		l->setTextFormat(Qt::PlainText);
+		l->setText(s);
+		d->exec();
+	});
 
 	auto templates_menu = new TemplatesMenu( this );
 	project_menu->addMenu(templates_menu);
