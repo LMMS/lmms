@@ -169,7 +169,7 @@ void EffectView::moveDown()
 
 
 
-void EffectView::saveAsPreset()
+void EffectView::savePreset()
 {
 	FileDialog sfd(this, tr("Save preset"), "", tr("FX Preset (*.fxp)"));
 
@@ -213,7 +213,7 @@ void EffectView::saveAsPreset()
 
 
 
-void EffectView::loadFromPreset()
+void EffectView::loadPreset()
 {
 	FileDialog sfd(this, tr("Load preset"), "", tr("FX Preset (*.fxp)"));
 
@@ -292,10 +292,10 @@ void EffectView::contextMenuEvent( QContextMenuEvent * )
 	contextMenu->addSeparator();
 	contextMenu->addAction( embed::getIconPixmap( "file" ),
 						tr( "&Save as a preset" ),
-						this, SLOT(saveAsPreset()));
+						this, SLOT(savePreset()));
 	contextMenu->addAction( embed::getIconPixmap( "file" ),
 						tr( "&Load in a preset" ),
-						this, SLOT(loadFromPreset()));
+						this, SLOT(loadPreset()));
 	contextMenu->addSeparator();
 	contextMenu->addAction( embed::getIconPixmap( "cancel" ),
 						tr( "&Remove this plugin" ),

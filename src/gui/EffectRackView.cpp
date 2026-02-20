@@ -35,7 +35,6 @@
 #include "Effect.h"
 #include "DataFile.h"
 #include "DeprecationHelper.h"
-#include "EffectControls.h"
 #include "EffectSelectDialog.h"
 #include "EffectView.h"
 #include "StringPairDrag.h"
@@ -96,7 +95,7 @@ EffectRackView::~EffectRackView()
 void EffectRackView::dragEnterEvent(QDragEnterEvent *event)
 {
 	const QString type = StringPairDrag::decodeKey(event);
-	if (type == "preseteffectfile" )
+	if (type == "effectpresetfile" )
 	{
 		event->acceptProposedAction();
 	}
@@ -112,7 +111,7 @@ void EffectRackView::dropEvent(QDropEvent *event)
 	const QString type = StringPairDrag::decodeKey(event);
 	const QString filePath = StringPairDrag::decodeValue(event);
 
-	if (type == "preseteffectfile" )
+	if (type == "effectpresetfile" )
 	{
 		addEffect(filePath);
 		event->accept();
