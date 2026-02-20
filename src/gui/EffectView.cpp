@@ -188,9 +188,9 @@ void EffectView::savePreset()
 	sfd.setFileMode(FileDialog::AnyFile);
 	sfd.setDefaultSuffix("fxp");
 
-	if( sfd.exec() == QDialog::Accepted &&
+	if(sfd.exec() == QDialog::Accepted &&
 		!sfd.selectedFiles().isEmpty() &&
-		!sfd.selectedFiles().first().isEmpty() )
+		!sfd.selectedFiles().first().isEmpty())
 	{
 		DataFile dataFile(DataFile::Type::EffectSettings);
 		QDomElement& content(dataFile.content());
@@ -286,28 +286,28 @@ void EffectView::closeEffects()
 
 
 
-void EffectView::contextMenuEvent( QContextMenuEvent * )
+void EffectView::contextMenuEvent(QContextMenuEvent *)
 {
-	QPointer<CaptionMenu> contextMenu = new CaptionMenu( model()->displayName(), this );
-	contextMenu->addAction( embed::getIconPixmap( "arp_up" ),
-						tr( "Move &up" ),
+	QPointer<CaptionMenu> contextMenu = new CaptionMenu(model()->displayName(), this);
+	contextMenu->addAction(embed::getIconPixmap("arp_up"),
+						tr("Move &up"),
 						this, SLOT(moveUp()));
-	contextMenu->addAction( embed::getIconPixmap( "arp_down" ),
-						tr( "Move &down" ),
+	contextMenu->addAction(embed::getIconPixmap("arp_down"),
+						tr("Move &down"),
 						this, SLOT(moveDown()));
 	contextMenu->addSeparator();
-	contextMenu->addAction( embed::getIconPixmap( "file" ),
-						tr( "&Save as a preset" ),
-						this, SLOT(savePreset()));
-	contextMenu->addAction( embed::getIconPixmap( "file" ),
-						tr( "&Load in a preset" ),
-						this, SLOT(loadPreset()));
+	contextMenu->addAction(embed::getIconPixmap("file"),
+						tr("&Save as preset"),
+						this, &EffectView::savePreset);
+	contextMenu->addAction(embed::getIconPixmap("file"),
+						tr("&Load from preset"),
+						this, &EffectView::loadPreset);
 	contextMenu->addSeparator();
-	contextMenu->addAction( embed::getIconPixmap( "cancel" ),
-						tr( "&Remove this plugin" ),
+	contextMenu->addAction(embed::getIconPixmap("cancel"),
+						tr("&Remove this plugin"),
 						this, SLOT(deletePlugin()));
 	contextMenu->addSeparator();
-	contextMenu->exec( QCursor::pos() );
+	contextMenu->exec(QCursor::pos());
 	delete contextMenu;
 }
 

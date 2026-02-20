@@ -202,25 +202,25 @@ bool DataFile::validate( QString extension )
 	switch( m_type )
 	{
 	case Type::SongProject:
-		if( extension == "mmp" || extension == "mmpz" )
+		if(extension == "mmp" || extension == "mmpz")
 		{
 			return true;
 		}
 		break;
 	case Type::SongProjectTemplate:
-		if(  extension == "mpt" )
+		if(extension == "mpt")
 		{
 			return true;
 		}
 		break;
 	case Type::InstrumentTrackSettings:
-		if ( extension == "xpf" || extension == "xml" )
+		if (extension == "xpf" || extension == "xml")
 		{
 			return true;
 		}
 		break;
 	case Type::EffectSettings:
-		if ( extension == "fxp" )
+		if (extension == "fxp")
 		{
 			return true;
 		}
