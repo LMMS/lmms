@@ -256,7 +256,6 @@ void EffectView::loadFromPreset()
 		}
 
 		effect()->loadSettings(content);
-
 	}
 }
 
