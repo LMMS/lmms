@@ -506,6 +506,8 @@ void Sf2Instrument::updateReverbOn()
 #else
 	fluid_synth_set_reverb_on(m_synth, m_reverbOn.value() ? 1 : 0);
 #endif
+
+	fluid_synth_cc(m_synth, m_channel, MidiControllerReverbDepth, m_reverbOn.value() ? 127 : 0);
 }
 
 void Sf2Instrument::updateReverb()
@@ -529,6 +531,8 @@ void Sf2Instrument::updateChorusOn()
 #else
 	fluid_synth_set_chorus_on(m_synth, m_chorusOn.value() ? 1 : 0);
 #endif
+
+	fluid_synth_cc(m_synth, m_channel, MidiControllerChorusDepth, m_chorusOn.value() ? 127 : 0);
 }
 
 void Sf2Instrument::updateChorus()
