@@ -76,18 +76,17 @@ public:
 	auto push(const T* src, size_t size) -> size_t
 	{
 		auto region = reserveWriteRegion(size);
-		const auto actual = std::min(size, region.size());
-		std::copy_n(src, actual, region);
+		std::copy_n(std::make_move_iterator(src), region.size(), region.data());
 		commitWriteRegion(region.size());
-		return actual;
+		return region.size();
 	}
 
 	auto pop(T* dst, size_t size) -> size_t
 	{
 		auto region = reserveReadRegion(size);
-		const auto actual = std::min(size, region.size());
-		std::copy_n(region.data(), actual, dst);
-		return actual;
+		std::copy_n(std::make_move_iterator(region.data()), region.size(), dst);
+		commitReadRegion(region.size());
+		return region.size();
 	}
 
 	auto push(T value) -> bool { return push(&value, 1) == 1; }
@@ -95,7 +94,7 @@ public:
 	auto pop() -> std::optional<T>
 	{
 		auto value = T{};
-		return pop(&value, 1) == 1 ? std::move(value) : std::nullopt;
+		return pop(&value, 1) == 1 ? std::optional<T>{std::move(value)} : std::nullopt;
 	}
 
 private:
@@ -127,7 +126,7 @@ private:
 		}
 	}
 
-	template <Side Side> constexpr auto storeReadIndex(size_t value) -> size_t
+	template <Side Side> constexpr void storeReadIndex(size_t value)
 	{
 		if constexpr (Sync == CircularBufferSynchronization::None) { return m_readIndex = value; }
 		else if constexpr (Sync == CircularBufferSynchronization::Spsc && Side == Side::Reader)
@@ -136,7 +135,7 @@ private:
 		}
 	}
 
-	template <Side Side> constexpr auto storeWriteIndex(size_t value) -> size_t
+	template <Side Side> constexpr void storeWriteIndex(size_t value)
 	{
 		if constexpr (Sync == CircularBufferSynchronization::None) { return m_writeIndex = value; }
 		else if constexpr (Sync == CircularBufferSynchronization::Spsc && Side == Side::Writer)
