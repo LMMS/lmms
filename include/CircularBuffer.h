@@ -35,7 +35,7 @@ namespace detail {
 enum class CircularBufferSynchronization
 {
 	None,
-	Atomic
+	Spsc
 };
 
 template <typename T, std::size_t N, CircularBufferSynchronization Sync = CircularBufferSynchronization::None>
@@ -44,8 +44,8 @@ class CircularBufferBase
 public:
 	auto reserveWriteRegion(std::size_t count = static_cast<std::size_t>(-1)) -> std::span<T>
 	{
-		const auto readIndex = loadIndex(m_readIndex, std::memory_order_acquire);
-		const auto writeIndex = loadIndex(m_writeIndex, std::memory_order_relaxed);
+		const auto readIndex = loadReadIndex<Side::Writer>();
+		const auto writeIndex = loadWriteIndex<Side::Writer>();
 		const auto available = (readIndex + N - writeIndex - 1) % N;
 		const auto actual = std::min(count, available);
 		return {&m_buffer[writeIndex], actual};
@@ -53,8 +53,8 @@ public:
 
 	auto reserveReadRegion(std::size_t count = static_cast<std::size_t>(-1)) -> std::span<T>
 	{
-		const auto readIndex = loadIndex(m_readIndex, std::memory_order_relaxed);
-		const auto writeIndex = loadIndex(m_writeIndex, std::memory_order_acquire);
+		const auto readIndex = loadReadIndex<Side::Reader>();
+		const auto writeIndex = loadWriteIndex<Side::Reader>();
 		const auto available = (writeIndex + N - readIndex) % N;
 		const auto actual = std::min(count, available);
 		return {&m_buffer[readIndex], actual};
@@ -62,14 +62,14 @@ public:
 
 	void commitWriteRegion(std::size_t count)
 	{
-		const auto writeIndex = loadIndex(m_writeIndex, std::memory_order_relaxed);
-		storeIndex(m_writeIndex, (writeIndex + count) % N, std::memory_order_release);
+		const auto writeIndex = loadWriteIndex<Side::Writer>();
+		storeWriteIndex<Side::Writer>((writeIndex + count) % N);
 	}
 
 	void commitReadRegion(std::size_t count)
 	{
-		const auto readIndex = loadIndex(m_readIndex, std::memory_order_relaxed);
-		storeIndex(m_readIndex, (readIndex + count) % N, std::memory_order_release);
+		const auto readIndex = loadReadIndex<Side::Reader>();
+		storeReadIndex<Side::Reader>((readIndex + count) % N);
 	}
 
 	auto push(T value) -> bool
@@ -93,18 +93,50 @@ public:
 	}
 
 private:
-	using IndexType = std::conditional_t<Sync == CircularBufferSynchronization::Atomic, std::atomic<size_t>, size_t>;
-
-	constexpr auto loadIndex(const IndexType& index, std::memory_order order = std::memory_order_seq_cst)
+	enum class Side
 	{
-		if constexpr (Sync == CircularBufferSynchronization::None) { return index; }
-		else if constexpr (Sync == CircularBufferSynchronization::Atomic) { return index.load(order); }
+		Writer,
+		Reader
+	};
+
+	using IndexType = std::conditional_t<Sync == CircularBufferSynchronization::Spsc, std::atomic<size_t>, size_t>;
+
+	template <Side Side> constexpr auto loadReadIndex() -> size_t
+	{
+		if constexpr (Sync == CircularBufferSynchronization::None) { return m_readIndex; }
+		else if constexpr (Sync == CircularBufferSynchronization::Spsc)
+		{
+			if constexpr (Side == Side::Writer) { return m_readIndex.load(std::memory_order_acquire); }
+			else if constexpr (Side == Side::Reader) { return m_readIndex.load(std::memory_order_relaxed); }
+		}
 	}
 
-	constexpr auto storeIndex(IndexType& index, std::size_t value, std::memory_order order = std::memory_order_seq_cst)
+	template <Side Side> constexpr auto loadWriteIndex() -> size_t
 	{
-		if constexpr (Sync == CircularBufferSynchronization::None) { index = value; }
-		else if constexpr (Sync == CircularBufferSynchronization::Atomic) { return index.store(value, order); }
+		if constexpr (Sync == CircularBufferSynchronization::None) { return m_writeIndex; }
+		else if constexpr (Sync == CircularBufferSynchronization::Spsc)
+		{
+			if constexpr (Side == Side::Writer) { return m_writeIndex.load(std::memory_order_relaxed); }
+			else if constexpr (Side == Side::Reader) { return m_writeIndex.load(std::memory_order_acquire); }
+		}
+	}
+
+	template <Side Side> constexpr auto storeReadIndex(size_t value) -> size_t
+	{
+		if constexpr (Sync == CircularBufferSynchronization::None) { return m_readIndex = value; }
+		else if constexpr (Sync == CircularBufferSynchronization::Spsc && Side == Side::Reader)
+		{
+			return m_readIndex.store(value, std::memory_order_release);
+		}
+	}
+
+	template <Side Side> constexpr auto storeWriteIndex(size_t value) -> size_t
+	{
+		if constexpr (Sync == CircularBufferSynchronization::None) { return m_writeIndex = value; }
+		else if constexpr (Sync == CircularBufferSynchronization::Spsc && Side == Side::Writer)
+		{
+			return m_writeIndex.store(value, std::memory_order_release);
+		}
 	}
 
 	std::array<T, N> m_buffer;
@@ -117,6 +149,6 @@ template <typename T, std::size_t N>
 using CircularBuffer = detail::CircularBufferBase<T, N, detail::CircularBufferSynchronization::None>;
 
 template <typename T, std::size_t N>
-using LockfreeSpscQueue = detail::CircularBufferBase<T, N, detail::CircularBufferSynchronization::Atomic>;
+using LockfreeSpscQueue = detail::CircularBufferBase<T, N, detail::CircularBufferSynchronization::Spsc>;
 
 } // namespace lmms
