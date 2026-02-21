@@ -115,6 +115,26 @@ public:
 		return pop(&value, 1) == 1 ? std::optional<T>{std::move(value)} : std::nullopt;
 	}
 
+	void waitForWriter()
+		requires(Sync == CircularBufferSynchronization::Spsc)
+	{
+		while (m_wakeReader.test())
+		{
+			const auto writeIndex = loadWriteIndex<Side::Reader>();
+			m_writeIndex.wait(writeIndex);
+		}
+
+		m_wakeReader.clear();
+	}
+
+	void wakeReader()
+	{
+		m_wakeReader.test_and_set();
+		m_wakeReader.notify_one();
+	}
+
+	auto capacity() -> std::size_t { return m_buffer.size(); }
+
 private:
 	enum class Side
 	{
@@ -147,10 +167,10 @@ private:
 
 	template <Side Side> constexpr void storeReadIndex(size_t value)
 	{
-		if constexpr (Sync == CircularBufferSynchronization::None) { return m_readIndex = value; }
+		if constexpr (Sync == CircularBufferSynchronization::None) { m_readIndex = value; }
 		else if constexpr (Sync == CircularBufferSynchronization::Spsc && Side == Side::Reader)
 		{
-			return m_readIndex.store(value, std::memory_order_release);
+			m_readIndex.store(value, std::memory_order_release);
 		}
 	}
 
@@ -159,11 +179,13 @@ private:
 		if constexpr (Sync == CircularBufferSynchronization::None) { return m_writeIndex = value; }
 		else if constexpr (Sync == CircularBufferSynchronization::Spsc && Side == Side::Writer)
 		{
-			return m_writeIndex.store(value, std::memory_order_release);
+			m_writeIndex.store(value, std::memory_order_release);
+			m_writeIndex.notify_one();
 		}
 	}
 
 	BufferType m_buffer;
+	alignas(std::hardware_destructive_interference_size) std::atomic_flag m_wakeReader;
 	alignas(std::hardware_destructive_interference_size) IndexType m_readIndex = 0;
 	alignas(std::hardware_destructive_interference_size) IndexType m_writeIndex = 0;
 };

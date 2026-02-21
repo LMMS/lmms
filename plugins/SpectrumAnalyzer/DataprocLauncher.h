@@ -27,8 +27,8 @@
 
 #include <QThread>
 
+#include "CircularBuffer.h"
 #include "SaProcessor.h"
-#include "LocklessRingBuffer.h"
 
 namespace lmms
 {
@@ -37,7 +37,7 @@ namespace lmms
 class DataprocLauncher : public QThread
 {
 public:
-	explicit DataprocLauncher(SaProcessor &proc, LocklessRingBuffer<SampleFrame> &buffer)
+	explicit DataprocLauncher(SaProcessor &proc, LockfreeSpscQueue<SampleFrame> &buffer)
 		: m_processor(&proc),
 		m_inputBuffer(&buffer)
 	{
@@ -50,7 +50,7 @@ private:
 	}
 
 	SaProcessor *m_processor;
-	LocklessRingBuffer<SampleFrame> *m_inputBuffer;
+	LockfreeSpscQueue<SampleFrame> *m_inputBuffer;
 };
 
 

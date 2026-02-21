@@ -97,21 +97,23 @@ SaProcessor::~SaProcessor()
 
 
 // Load data from audio thread ringbuffer and run FFT analysis if buffer is full enough.
-void SaProcessor::analyze(LocklessRingBuffer<SampleFrame> &ring_buffer)
+void SaProcessor::analyze(LockfreeSpscQueue<SampleFrame> &ring_buffer)
 {
-	LocklessRingBufferReader<SampleFrame> reader(ring_buffer);
-
 	// Processing thread loop
 	while (!m_terminate)
 	{
 		// If there is nothing to read, wait for notification from the writing side.
-		if (reader.empty()) {reader.waitForData();}
+		const auto in_buffer = ring_buffer.reserveReadRegion(ring_buffer.capacity() / 4);
+		const auto frame_count = in_buffer.size();
+
+		if (in_buffer.empty())
+		{
+			ring_buffer.waitForWriter();
+			continue;
+		}
 
 		// skip waterfall render if processing can't keep up with input
-		bool overload = ring_buffer.free() < ring_buffer.capacity() / 2;
-
-		auto in_buffer = reader.read_max(ring_buffer.capacity() / 4);
-		std::size_t frame_count = in_buffer.size();
+		const auto overload = in_buffer.size() < ring_buffer.capacity() / 2;
 
 		// Process received data only if any view is visible and not paused.
 		// Also, to prevent a momentary GUI freeze under high load (due to lock
@@ -314,6 +316,8 @@ void SaProcessor::analyze(LocklessRingBuffer<SampleFrame> &ring_buffer)
 					if (total_time / 1000000.0 > m_max_execution) {m_max_execution = total_time / 1000000.0;}
 				#endif
 			}	// frame filler and processing
+
+			ring_buffer.commitReadRegion(in_buffer.size());
 		}	// process if active
 	}	// thread loop end
 }
