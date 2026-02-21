@@ -47,7 +47,8 @@ public:
 	{
 		const auto readIndex = loadReadIndex<Side::Writer>();
 		const auto writeIndex = loadWriteIndex<Side::Writer>();
-		const auto available = (readIndex + N - writeIndex - 1) % N;
+		const auto available
+			= writeIndex < readIndex ? readIndex - writeIndex - 1 : N - writeIndex - (readIndex == 0 ? 1 : 0);
 		const auto actual = std::min(count, available);
 		return {&m_buffer[writeIndex], actual};
 	}
@@ -56,7 +57,7 @@ public:
 	{
 		const auto readIndex = loadReadIndex<Side::Reader>();
 		const auto writeIndex = loadWriteIndex<Side::Reader>();
-		const auto available = (writeIndex + N - readIndex) % N;
+		const auto available = readIndex < writeIndex ? writeIndex - readIndex : N - readIndex;
 		const auto actual = std::min(count, available);
 		return {&m_buffer[readIndex], actual};
 	}
