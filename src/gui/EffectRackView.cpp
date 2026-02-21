@@ -32,7 +32,6 @@
 #include <QVBoxLayout>
 
 #include "Effect.h"
-#include "DataFile.h"
 #include "DeprecationHelper.h"
 #include "EffectSelectDialog.h"
 #include "EffectView.h"
@@ -114,7 +113,7 @@ void EffectRackView::dropEvent(QDropEvent *event)
 
 	if (type == "effectpresetfile")
 	{
-		addEffect(filePath);
+		addFromPreset(filePath);
 		event->accept();
 	}
 	else
@@ -125,59 +124,17 @@ void EffectRackView::dropEvent(QDropEvent *event)
 
 
 
-void EffectRackView::addEffect(const QString& filePath)
+void EffectRackView::addFromPreset(const QString& filePath)
 {
-	DataFile dataFile(filePath);
-	const QDomElement content = dataFile.content();
-
-	if (content.isNull())
-	{
-		TextFloat::displayMessage(
-			"Preset loading error",
-			tr("Could not read the preset file."),
-			embed::getIconPixmap("error")
-		);
-		return;
-	}
-
-	const QString displayName = content.attribute("displayname");
-	const QString pluginName = content.attribute("pluginname");
-
-	if (displayName.isEmpty() || pluginName.isEmpty())
-	{
-		TextFloat::displayMessage(
-			"Preset loading error",
-			tr("Preset file is corrupted or invalid."),
-			embed::getIconPixmap("error")
-		);
-		return;
-	}
-
-	QDomElement keyElement = content.firstChildElement("key");
-	if (keyElement.isNull())
-	{
-		TextFloat::displayMessage(
-			"Preset loading error",
-			tr("Preset file does not contain plugin key information."),
-			embed::getIconPixmap("error")
-		);
-		return;
-	}
-
-	EffectKey key(keyElement);
-
-	Effect *fx = Effect::instantiate(pluginName, fxChain(), &key);
+	Effect *fx = Effect::createFromPreset(filePath, fxChain());
 	if (!fx)
 	{
 		TextFloat::displayMessage(
 			"Preset loading error",
-			tr("Failed to instantiate effect."),
+			tr("Couldn't load preset file."),
 			embed::getIconPixmap("error")
 		);
-		return;
 	}
-
-	fx->loadSettings(content);
 	fxChain()->appendEffect(fx);
 	update();
 }

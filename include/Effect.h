@@ -147,6 +147,8 @@ public:
 				Model * _parent,
 				Descriptor::SubPluginFeatures::Key * _key );
 
+	static Effect * createFromPreset(const QString& filePath, Model * parent);
+
 
 protected:
 	enum class ProcessStatus
