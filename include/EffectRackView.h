@@ -64,7 +64,7 @@ protected:
 	void dropEvent(QDropEvent *event) override;
 
 private:
-	void addEffect(const QString& filePath);
+	void addFromPreset(const QString& filePath);
 	void modelChanged() override;
 	QSize sizeHint() const override;
 	QSize minimumSizeHint() const override { return sizeHint(); }
