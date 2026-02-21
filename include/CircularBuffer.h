@@ -22,6 +22,9 @@
  *
  */
 
+#ifndef LMMS_CIRCULAR_BUFFER_H
+#define LMMS_CIRCULAR_BUFFER_H
+
 #include <algorithm>
 #include <array>
 #include <atomic>
@@ -173,3 +176,5 @@ template <typename T, std::size_t N = detail::DynamicCircularBufferSize>
 using LockfreeSpscQueue = detail::CircularBufferBase<T, N, detail::CircularBufferSynchronization::Spsc>;
 
 } // namespace lmms
+
+#endif // LMMS_CIRCULAR_BUFFER_H
