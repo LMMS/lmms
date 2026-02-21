@@ -22,6 +22,7 @@
  *
  */
 
+#include <algorithm>
 #include <array>
 #include <atomic>
 #include <cstddef>
@@ -72,24 +73,29 @@ public:
 		storeReadIndex<Side::Reader>((readIndex + count) % N);
 	}
 
-	auto push(T value) -> bool
+	auto push(const T* src, size_t size) -> size_t
 	{
-		const auto region = reserveWriteRegion(1);
-		if (region.empty()) { return false; }
-
-		region[0] = std::move(value);
+		auto region = reserveWriteRegion(size);
+		const auto actual = std::min(size, region.size());
+		std::copy_n(src, actual, region);
 		commitWriteRegion(region.size());
-		return true;
+		return actual;
 	}
+
+	auto pop(T* dst, size_t size) -> size_t
+	{
+		auto region = reserveReadRegion(size);
+		const auto actual = std::min(size, region.size());
+		std::copy_n(region.data(), actual, dst);
+		return actual;
+	}
+
+	auto push(T value) -> bool { return push(&value, 1) == 1; }
 
 	auto pop() -> std::optional<T>
 	{
-		const auto region = reserveReadRegion(1);
-		if (region.empty()) { return std::nullopt; }
-
-		const auto value = std::move(region[0]);
-		commitReadRegion(region.size());
-		return value;
+		auto value = T{};
+		return pop(&value, 1) == 1 ? std::move(value) : std::nullopt;
 	}
 
 private:
