@@ -25,22 +25,20 @@
 #ifndef LMMS_AUDIO_ENGINE_H
 #define LMMS_AUDIO_ENGINE_H
 
-#include <mutex>
-
 #include <QThread>
-#include <samplerate.h>
-
 #include <memory>
+#include <mutex>
+#include <samplerate.h>
 #include <vector>
 
 #include "AudioDevice.h"
-#include "LmmsTypes.h"
-#include "SampleFrame.h"
-#include "LocklessList.h"
-#include "FifoBuffer.h"
 #include "AudioEngineProfiler.h"
+#include "CircularBuffer.h"
+#include "FifoBuffer.h"
+#include "LmmsTypes.h"
+#include "LocklessList.h"
 #include "PlayHandle.h"
-
+#include "SampleFrame.h"
 
 namespace lmms
 {
@@ -343,7 +341,7 @@ private:
 	// playhandle stuff
 	PlayHandleList m_playHandles;
 	// place where new playhandles are added temporarily
-	LocklessList<PlayHandle *> m_newPlayHandles;
+	LockfreeSpscQueue<PlayHandle*, PlayHandle::MaxNumber> m_newPlayHandles;
 	ConstPlayHandleList m_playHandlesToRemove;
 
 	float m_masterGain;
