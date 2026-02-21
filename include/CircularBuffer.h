@@ -57,7 +57,7 @@ public:
 	{
 		const auto readIndex = loadReadIndex<Side::Reader>();
 		const auto writeIndex = loadWriteIndex<Side::Reader>();
-		const auto available = readIndex < writeIndex ? writeIndex - readIndex : N - readIndex;
+		const auto available = readIndex <= writeIndex ? writeIndex - readIndex : N - readIndex;
 		const auto actual = std::min(count, available);
 		return {&m_buffer[readIndex], actual};
 	}
@@ -77,7 +77,7 @@ public:
 	auto push(const T* src, size_t size) -> size_t
 	{
 		auto region = reserveWriteRegion(size);
-		std::copy_n(std::make_move_iterator(src), region.size(), region.data());
+		std::copy_n(src, region.size(), region.data());
 		commitWriteRegion(region.size());
 		return region.size();
 	}
@@ -85,7 +85,7 @@ public:
 	auto pop(T* dst, size_t size) -> size_t
 	{
 		auto region = reserveReadRegion(size);
-		std::copy_n(std::make_move_iterator(region.data()), region.size(), dst);
+		std::copy_n(region.data(), region.size(), dst);
 		commitReadRegion(region.size());
 		return region.size();
 	}
