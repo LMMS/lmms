@@ -108,7 +108,7 @@ void SaProcessor::analyze(LockfreeSpscQueue<SampleFrame> &ring_buffer)
 
 		if (in_buffer.empty())
 		{
-			std::this_thread::yield();
+			ring_buffer.waitForData();
 			continue;
 		}
 

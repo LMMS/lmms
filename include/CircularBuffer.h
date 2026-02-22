@@ -118,12 +118,36 @@ public:
 		else if constexpr (S == CircularBufferSide::Writer) { return m_writeIndex.load(std::memory_order_relaxed); }
 	}
 
-	void setReadIndex(size_t value) { m_readIndex.store(value, std::memory_order_release); }
-	void setWriteIndex(size_t value) { m_writeIndex.store(value, std::memory_order_release); }
+	void setReadIndex(size_t value)
+	{
+		m_readIndex.store(value, std::memory_order_release);
+		m_readIndex.notify_all();
+	}
+
+	void setWriteIndex(size_t value)
+	{
+		m_writeIndex.store(value, std::memory_order_release);
+		m_writeIndex.notify_all();
+	}
+
+	void wakeAll()
+	{
+		m_wakeFlag.test_and_set(std::memory_order_relaxed);
+		m_readIndex.store(static_cast<size_t>(-1), std::memory_order_release);
+		m_writeIndex.store(static_cast<size_t>(-1), std::memory_order_release);
+		m_readIndex.notify_all();
+		m_writeIndex.notify_all();
+	}
+
+	void waitOnReadIndex(size_t old) { m_readIndex.wait(old, std::memory_order_relaxed); }
+	void waitOnWriteIndex(size_t old) { m_writeIndex.wait(old, std::memory_order_relaxed); }
+	void clearWakeFlag() { m_wakeFlag.clear(std::memory_order_relaxed); }
+	auto testWakeFlag() const -> bool { return m_wakeFlag.test(); }
 
 private:
 	alignas(std::hardware_destructive_interference_size) std::atomic<size_t> m_readIndex = 0;
 	alignas(std::hardware_destructive_interference_size) std::atomic<size_t> m_writeIndex = 0;
+	alignas(std::hardware_destructive_interference_size) std::atomic_flag m_wakeFlag;
 };
 
 template <typename T, typename IndexPolicy, size_t N = DynamicCircularBufferSize> class CircularBufferBase
@@ -162,8 +186,7 @@ public:
 			std::span<T>{&m_buffer[readIndex], actual}, [this](size_t count) { commitReadRegion(count); }};
 	}
 
-	template<typename Committer>
-	auto commitRegion(CircularBufferRegion<T, Committer>&& region)
+	template <typename Committer> auto commitRegion(CircularBufferRegion<T, Committer>&& region)
 	{
 		auto _ = std::move(region);
 	}
@@ -224,6 +247,24 @@ public:
 		const auto readIndex = m_indexPolicy.template readIndex<CircularBufferSide::Reader>();
 		const auto writeIndex = m_indexPolicy.template writeIndex<CircularBufferSide::Reader>();
 		return readIndex == writeIndex;
+	}
+
+	void waitForData()
+		requires(std::is_same_v<IndexPolicy, CircularBufferSpscPolicy>)
+	{
+		while (empty() && !m_indexPolicy.testWakeFlag())
+		{
+			auto currentWriteIndex = m_indexPolicy.template writeIndex<CircularBufferSide::Reader>();
+			m_indexPolicy.waitOnWriteIndex(currentWriteIndex);
+		}
+
+		m_indexPolicy.clearWakeFlag();
+	}
+
+	void wakeAll()
+		requires(std::is_same_v<IndexPolicy, CircularBufferSpscPolicy>)
+	{
+		m_indexPolicy.wakeAll();
 	}
 
 private:
