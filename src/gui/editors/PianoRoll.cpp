@@ -555,8 +555,12 @@ void PianoRoll::markSemiTone(SemiToneMarkerAction i, bool fromMenu)
 		{
 			if( ! chord )
 			{
-				chord = & InstrumentFunctionNoteStacking::ChordTable::getInstance()
-						.getChordByName( m_chordModel.currentText() );
+				// Because the octave chord is actually just a single note not a true octave, we have to redefine it here.
+				// Ideally this would be fixed by actually changing the octave chord definition, but that would require some
+				// very extensive upgrade routines due to how instrument chord stacking and arpeggiation use it.
+				chord = m_chordModel.currentText() == "octave"
+					? &InstrumentFunctionNoteStacking::ChordTable::s_alternativeOctave
+					: &InstrumentFunctionNoteStacking::ChordTable::getInstance().getChordByName(m_chordModel.currentText());
 			}
 
 			if( chord->isEmpty() )
@@ -1839,8 +1843,10 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 					new_note.setVolume( m_lastNoteVolume );
 					created_new_note = m_midiClip->addNote( new_note );
 
-					const InstrumentFunctionNoteStacking::Chord & chord = InstrumentFunctionNoteStacking::ChordTable::getInstance()
-						.getChordByName( m_chordModel.currentText() );
+					// Unfortunately, because the defined octave chord is actually just a single note, not a true octave, we have to use an alternative version which has both notes
+					const InstrumentFunctionNoteStacking::Chord& chord = m_chordModel.currentText() == "octave"
+						? InstrumentFunctionNoteStacking::ChordTable::s_alternativeOctave
+						: InstrumentFunctionNoteStacking::ChordTable::getInstance().getChordByName(m_chordModel.currentText());
 
 					if( ! chord.isEmpty() )
 					{
@@ -2180,9 +2186,10 @@ void PianoRoll::playChordNotes(int key, int velocity)
 {
 	// if a chord is set, play the chords notes beside the base note.
 	Piano *pianoModel = m_midiClip->instrumentTrack()->pianoModel();
-	const InstrumentFunctionNoteStacking::Chord & chord =
-			InstrumentFunctionNoteStacking::ChordTable::getInstance().getChordByName(
-				m_chordModel.currentText());
+	// Unfortunately, because the defined octave chord is actually just a single note, not a true octave, we have to use an alternative version which has both notes
+	const InstrumentFunctionNoteStacking::Chord& chord = m_chordModel.currentText() == "octave"
+		? InstrumentFunctionNoteStacking::ChordTable::s_alternativeOctave
+		: InstrumentFunctionNoteStacking::ChordTable::getInstance().getChordByName(m_chordModel.currentText());
 	if (!chord.isEmpty())
 	{
 		for (int i = 1; i < chord.size(); ++i)
@@ -2196,9 +2203,10 @@ void PianoRoll::pauseChordNotes(int key)
 {
 	// if a chord was set, stop the chords notes beside the base note.
 	Piano *pianoModel = m_midiClip->instrumentTrack()->pianoModel();
-	const InstrumentFunctionNoteStacking::Chord & chord =
-			InstrumentFunctionNoteStacking::ChordTable::getInstance().getChordByName(
-				m_chordModel.currentText());
+	// Unfortunately, because the defined octave chord is actually just a single note, not a true octave, we have to use an alternative version which has both notes
+	const InstrumentFunctionNoteStacking::Chord& chord = m_chordModel.currentText() == "octave"
+		? InstrumentFunctionNoteStacking::ChordTable::s_alternativeOctave
+		: InstrumentFunctionNoteStacking::ChordTable::getInstance().getChordByName(m_chordModel.currentText());
 	if (!chord.isEmpty())
 	{
 		for (int i = 1; i < chord.size(); ++i)
@@ -5022,8 +5030,10 @@ void PianoRoll::updateSemiToneMarkerMenu()
 			InstrumentFunctionNoteStacking::ChordTable::getInstance();
 	const InstrumentFunctionNoteStacking::Chord& scale =
 			chord_table.getScaleByName( m_scaleModel.currentText() );
-	const InstrumentFunctionNoteStacking::Chord& chord =
-			chord_table.getChordByName( m_chordModel.currentText() );
+	// Unfortunately, because the defined octave chord is actually just a single note, not a true octave, we have to use an alternative version which has both notes
+	const InstrumentFunctionNoteStacking::Chord& chord = m_chordModel.currentText() == "octave"
+		? InstrumentFunctionNoteStacking::ChordTable::s_alternativeOctave
+		: InstrumentFunctionNoteStacking::ChordTable::getInstance().getChordByName(m_chordModel.currentText());
 
 	emit semiToneMarkerMenuScaleSetEnabled( ! scale.isEmpty() );
 	emit semiToneMarkerMenuChordSetEnabled( ! chord.isEmpty() );
