@@ -5179,7 +5179,7 @@ PianoRollWindow::PianoRollWindow() :
 	auto quantizeButton = new QToolButton(notesActionsToolBar);
 	auto quantizeButtonMenu = new QMenu(quantizeButton);
 
-	auto quantizeAction = new QAction(embed::getIconPixmap("quantize"), tr("Quantize"), this);
+	auto quantizeAction = new QAction(embed::getIconPixmap("quantize"), tr("Quantize (Shift+Q)"), this);
 	auto quantizePosAction = new QAction(tr("Quantize positions"), this);
 	auto quantizeLengthAction = new QAction(tr("Quantize lengths"), this);
 
@@ -5192,6 +5192,8 @@ PianoRollWindow::PianoRollWindow() :
 	quantizeButton->setMenu(quantizeButtonMenu);
 	quantizeButtonMenu->addAction(quantizePosAction);
 	quantizeButtonMenu->addAction(quantizeLengthAction);
+
+	quantizeAction->setShortcut(keySequence(Qt::SHIFT, Qt::Key_Q));
 
 	notesActionsToolBar->addAction( drawAction );
 	notesActionsToolBar->addAction( eraseAction );

@@ -60,6 +60,7 @@
 #include "MainApplication.h"
 #include "ConfigManager.h"
 #include "DataFile.h"
+#include "DeprecationHelper.h"
 #include "NotePlayHandle.h"
 #include "embed.h"
 #include "Engine.h"
@@ -826,6 +827,9 @@ int main( int argc, char * * argv )
 			// set icons
 			recover->setIcon( embed::getIconPixmap( "recover" ) );
 			discard->setIcon( embed::getIconPixmap( "discard" ) );
+			
+			// add shortcut to discard
+			discard->setShortcut(keySequence(Qt::CTRL, Qt::Key_D));
 
 			mb.setDefaultButton( recover );
 			mb.setEscapeButton( exit );
