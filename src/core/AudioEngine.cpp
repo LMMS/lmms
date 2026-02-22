@@ -318,7 +318,7 @@ void AudioEngine::renderStageNoteSetup()
 
 	// add all play-handles that have to be added
 	auto handle = std::optional<PlayHandle*>{};
-	while ((handle = m_newPlayHandles.pop()))
+	while ((handle = m_newPlayHandles.tryPop()))
 	{
 		m_playHandles += *handle;
 	}
@@ -435,7 +435,7 @@ void AudioEngine::clearNewPlayHandles()
 {
 	requestChangeInModel();
 	auto handle = std::optional<PlayHandle*>{};
-	while ((handle = m_newPlayHandles.pop())) {}
+	while ((handle = m_newPlayHandles.tryPop())) {}
 	doneChangeInModel();
 }
 
@@ -539,9 +539,12 @@ bool AudioEngine::addPlayHandle( PlayHandle* handle )
 	// associated instrument is created, so add those unconditionally.
 	if (handle->type() == PlayHandle::Type::InstrumentPlayHandle || !criticalXRuns())
 	{
-		m_newPlayHandles.push( handle );
-		handle->audioBusHandle()->addPlayHandle(handle);
-		return true;
+		// TODO: Consider tracking the number of handles that have dropped for metric tracking purposes
+		if (m_newPlayHandles.tryPush(handle))
+		{
+			handle->audioBusHandle()->addPlayHandle(handle);
+			return true;
+		}
 	}
 
 	if( handle->type() == PlayHandle::Type::NotePlayHandle )

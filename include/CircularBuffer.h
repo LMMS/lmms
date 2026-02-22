@@ -197,7 +197,7 @@ public:
 		auto _ = std::move(region);
 	}
 
-	auto push(const T* src, size_t size) -> size_t
+	[[nodiscard]] auto tryPush(const T* src, size_t size) -> size_t
 	{
 		auto pushed = 0;
 		while (pushed < size && !full())
@@ -211,7 +211,7 @@ public:
 		return pushed;
 	}
 
-	auto pop(T* dst, size_t size) -> size_t
+	[[nodiscard]] auto tryPop(T* dst, size_t size) -> size_t
 	{
 		auto popped = 0;
 		while (popped < size && !empty())
@@ -225,12 +225,12 @@ public:
 		return popped;
 	}
 
-	auto push(T value) -> bool { return push(&value, 1) == 1; }
+	[[nodiscard]] auto tryPush(T value) -> bool { return tryPush(&value, 1) == 1; }
 
-	auto pop() -> std::optional<T>
+	[[nodiscard]] auto tryPop() -> std::optional<T>
 	{
 		auto value = T{};
-		return pop(&value, 1) == 1 ? std::optional<T>{std::move(value)} : std::nullopt;
+		return tryPop(&value, 1) == 1 ? std::optional<T>{std::move(value)} : std::nullopt;
 	}
 
 	auto peek() const -> const T&
@@ -238,8 +238,6 @@ public:
 		const auto readIndex = m_indexPolicy.template readIndex<CircularBufferSide::Reader>();
 		return m_buffer[readIndex];
 	}
-
-	auto capacity() const -> size_t { return m_buffer.size(); }
 
 	auto full() const -> bool
 	{
@@ -254,6 +252,8 @@ public:
 		const auto writeIndex = m_indexPolicy.template writeIndex<CircularBufferSide::Reader>();
 		return readIndex == writeIndex;
 	}
+
+	auto capacity() const -> size_t { return m_buffer.size(); }
 
 	void waitForData()
 		requires(std::is_same_v<IndexPolicy, CircularBufferSpscPolicy>)
