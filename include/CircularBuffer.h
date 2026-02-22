@@ -121,33 +121,39 @@ public:
 	void setReadIndex(size_t value)
 	{
 		m_readIndex.store(value, std::memory_order_release);
-		m_readIndex.notify_all();
+		m_wakeReaderFlag.test_and_set(std::memory_order_relaxed);
+		m_wakeReaderFlag.notify_all();
 	}
 
 	void setWriteIndex(size_t value)
 	{
 		m_writeIndex.store(value, std::memory_order_release);
-		m_writeIndex.notify_all();
+		m_wakeWriterFlag.test_and_set(std::memory_order_relaxed);
+		m_wakeWriterFlag.notify_all();
 	}
 
 	void wakeAll()
 	{
-		m_wakeFlag.test_and_set(std::memory_order_relaxed);
-		m_readIndex.store(static_cast<size_t>(-1), std::memory_order_release);
-		m_writeIndex.store(static_cast<size_t>(-1), std::memory_order_release);
-		m_readIndex.notify_all();
-		m_writeIndex.notify_all();
+		m_wakeReaderFlag.test_and_set(std::memory_order_relaxed);
+		m_wakeWriterFlag.test_and_set(std::memory_order_relaxed);
+		m_wakeReaderFlag.notify_all();
+		m_wakeWriterFlag.notify_all();
 	}
 
-	void waitOnReadIndex(size_t old) { m_readIndex.wait(old, std::memory_order_relaxed); }
-	void waitOnWriteIndex(size_t old) { m_writeIndex.wait(old, std::memory_order_relaxed); }
-	void clearWakeFlag() { m_wakeFlag.clear(std::memory_order_relaxed); }
-	auto testWakeFlag() const -> bool { return m_wakeFlag.test(); }
+	void clearReaderFlag() { m_wakeReaderFlag.clear(std::memory_order_relaxed); }
+	void clearWriterFlag() { m_wakeWriterFlag.clear(std::memory_order_relaxed); }
+
+	void waitOnReaderFlag(size_t old) { m_wakeReaderFlag.wait(old, std::memory_order_relaxed); }
+	void waitOnWriterFlag(size_t old) { m_wakeWriterFlag.wait(old, std::memory_order_relaxed); }
+
+	auto testReaderFlag() const -> bool { return m_wakeReaderFlag.test(std::memory_order_relaxed); }
+	auto testWriterFlag() const -> bool { return m_wakeWriterFlag.test(std::memory_order_relaxed); }
 
 private:
 	alignas(std::hardware_destructive_interference_size) std::atomic<size_t> m_readIndex = 0;
 	alignas(std::hardware_destructive_interference_size) std::atomic<size_t> m_writeIndex = 0;
-	alignas(std::hardware_destructive_interference_size) std::atomic_flag m_wakeFlag;
+	alignas(std::hardware_destructive_interference_size) std::atomic_flag m_wakeReaderFlag;
+	alignas(std::hardware_destructive_interference_size) std::atomic_flag m_wakeWriterFlag;
 };
 
 template <typename T, typename IndexPolicy, size_t N = DynamicCircularBufferSize> class CircularBufferBase
@@ -252,13 +258,14 @@ public:
 	void waitForData()
 		requires(std::is_same_v<IndexPolicy, CircularBufferSpscPolicy>)
 	{
-		while (empty() && !m_indexPolicy.testWakeFlag())
+		auto flag = m_indexPolicy.testWriterFlag();
+		while (empty() && !flag)
 		{
-			auto currentWriteIndex = m_indexPolicy.template writeIndex<CircularBufferSide::Reader>();
-			m_indexPolicy.waitOnWriteIndex(currentWriteIndex);
+			m_indexPolicy.waitOnWriterFlag(flag);
+			flag = m_indexPolicy.testWriterFlag();
 		}
 
-		m_indexPolicy.clearWakeFlag();
+		m_indexPolicy.clearWriterFlag();
 	}
 
 	void wakeAll()
