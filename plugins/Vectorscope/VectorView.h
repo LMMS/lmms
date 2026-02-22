@@ -26,7 +26,7 @@
 
 #include <QWidget>
 
-#include "LocklessRingBuffer.h"
+#include "CircularBuffer.h"
 
 namespace lmms
 {
@@ -45,7 +45,7 @@ class VectorView : public QWidget
 {
 	Q_OBJECT
 public:
-	VectorView(VecControls* controls, LocklessRingBuffer<SampleFrame>* inputBuffer, QWidget* parent = nullptr);
+	VectorView(VecControls* controls, LockfreeSpscQueue<SampleFrame>* inputBuffer, QWidget* parent = nullptr);
 	~VectorView() override = default;
 
 	QSize sizeHint() const override {return QSize(300, 300);}
@@ -68,8 +68,7 @@ private:
 private:
 	VecControls *m_controls;
 
-	LocklessRingBuffer<SampleFrame> *m_inputBuffer;
-	LocklessRingBufferReader<SampleFrame> m_bufferReader;
+	LockfreeSpscQueue<SampleFrame> *m_inputBuffer;
 
 	float m_zoom;
 
