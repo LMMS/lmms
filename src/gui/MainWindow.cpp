@@ -286,7 +286,10 @@ void MainWindow::finalize()
 	static auto testActionData = ActionData::getOrCreate("test", ActionTrigger::held(Qt::ControlModifier, Qt::Key_J));
 	auto testAction = new GuiAction(this, testActionData);
 	connect(testAction, &GuiAction::activated, this, [this] { qDebug() << "ON"; });
-	connect(testAction, &GuiAction::deactivated, this, [this] { qDebug() << "OFF"; });
+	connect(testAction, &GuiAction::deactivated, this, [this] {
+		qDebug() << "OFF";
+		testActionData->setTrigger(ActionTrigger::pressed(Qt::AltModifier, Qt::Key_H));
+	});
 
 	static auto lkData = ActionData::getOrCreate("listKeybindings", ActionTrigger::pressed(Qt::ControlModifier, Qt::Key_K));
 	auto lkAction = new GuiAction(this, lkData);
@@ -295,7 +298,7 @@ void MainWindow::finalize()
 
 		for (auto it = ActionContainer::mappingsBegin(); it != ActionContainer::mappingsEnd(); it++)
 		{
-			const auto [name, _] = *it;
+			const auto name = (*it).first;
 			s += name;
 			s += "\n";
 		}

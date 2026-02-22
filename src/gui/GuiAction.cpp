@@ -30,30 +30,32 @@
 
 namespace lmms {
 
-std::map<QString, ActionData> ActionContainer::s_dataMap;
+std::map<QString, ActionData*> ActionContainer::s_dataMap;
 
-bool ActionContainer::tryRegister(QString name, ActionData data)
+bool ActionContainer::tryRegister(QString name, ActionTrigger::Any trigger)
 {
-	// std::map::insert only inserts an element if it isn't already present
-	const auto [_, success] = s_dataMap.insert({name, data});
-	return success;
+	auto it = s_dataMap.find(name);
+	if (it != s_dataMap.end()) { return false; }
+	s_dataMap[name] = new ActionData(name, trigger);
+	return true;
 }
 
 ActionData* ActionContainer::findData(const QString& name)
 {
 	auto it = s_dataMap.find(name);
-	return (it == s_dataMap.end()) ? nullptr : &s_dataMap.at(name);
+	return (it == s_dataMap.end()) ? nullptr : s_dataMap.at(name);
 }
 
 ActionData::ActionData(QString name, ActionTrigger::Any trigger)
-	: m_name{name}
+	: QObject(nullptr)
+	, m_name{name}
 	, m_trigger{trigger}
 {
 }
 
 ActionData* ActionData::getOrCreate(QString name, ActionTrigger::Any trigger)
 {
-	ActionContainer::tryRegister(name, ActionData(name, trigger));
+	ActionContainer::tryRegister(name, trigger);
 	return ActionContainer::findData(name);
 }
 
@@ -65,6 +67,7 @@ const ActionTrigger::Any& ActionData::trigger() const
 void ActionData::setTrigger(ActionTrigger::Any&& newTrigger)
 {
 	m_trigger = newTrigger;
+	emit modified();
 }
 
 ActionTrigger::Any ActionTrigger::pressed(Qt::KeyboardModifiers mods, Qt::Key key, bool repeat)
@@ -72,8 +75,7 @@ ActionTrigger::Any ActionTrigger::pressed(Qt::KeyboardModifiers mods, Qt::Key ke
 	return ActionTrigger::KeyPressed{.mods = mods, .key = key, .repeat = repeat};
 }
 
-ActionTrigger::Any ActionTrigger::held(Qt::KeyboardModifiers mods, Qt::Key key)
-{
+ActionTrigger::Any ActionTrigger::held(Qt::KeyboardModifiers mods, Qt::Key key) {
 	return ActionTrigger::KeyHeld{.mods = mods, .key = key};
 }
 
@@ -82,25 +84,20 @@ GuiAction::GuiAction(QObject* parent, ActionData* data)
 	, m_data{data}
 	, m_active{false}
 {
-	if (parent != nullptr)
-	{
-		parent->installEventFilter(this);
-		// TODO: how to detect when parent has changed?
-	}
-
-	// TODO: how to signal `GuiAction` when the ActionData has had its trigger changed? Does it even need that?
+	if (parent != nullptr) { parent->installEventFilter(this); }
+	connect(data, &ActionData::modified, this, [this] { m_active = false; });
 }
 
 GuiAction::~GuiAction()
 {
 }
 
-ActionContainer::Iterator ActionContainer::mappingsBegin()
+ActionContainer::MappingIterator ActionContainer::mappingsBegin()
 {
 	return s_dataMap.begin();
 }
 
-ActionContainer::Iterator ActionContainer::mappingsEnd()
+ActionContainer::MappingIterator ActionContainer::mappingsEnd()
 {
 	return s_dataMap.end();
 }

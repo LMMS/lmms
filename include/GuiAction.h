@@ -36,8 +36,6 @@ namespace lmms {
 
 class ActionData;
 
-static constexpr Qt::KeyboardModifiers foo{};
-
 class ActionTrigger
 {
 public:
@@ -70,33 +68,39 @@ class ActionContainer
 public:
 	//! Attempts to register a new action, but refuses if it is already registered. Returns whether the insertion
 	//! happened.
-	static bool tryRegister(QString name, ActionData data);
+	static bool tryRegister(QString name, ActionTrigger::Any trigger);
 
 	//! Find an action by its name. Returns null when it was not found.
 	static ActionData* findData(const QString& name);
 
-	using Iterator = std::map<QString, ActionData>::iterator;
-	static Iterator mappingsBegin();
-	static Iterator mappingsEnd();
+	using MappingIterator = std::map<QString, ActionData*>::iterator;
+	static MappingIterator mappingsBegin();
+	static MappingIterator mappingsEnd();
+
 private:
 	ActionContainer() = delete;
 	~ActionContainer() = delete;
 
-	static std::map<QString, ActionData> s_dataMap;
+	//! Map with all known actions (owned by this).
+	static std::map<QString, ActionData*> s_dataMap;
 };
 
-class ActionData
+class ActionData : public QObject
 {
-public:
-	//! For now, to avoid memory safety issues, actions are never removed.
-	static ActionData* getOrCreate(QString name, ActionTrigger::Any trigger = ActionTrigger::Never{});
+	Q_OBJECT
 
-	// FIXME: not sure if the lifetime of this returned pointer ^ is all that good either... maybe use a
-	// std::shared_ptr? At the cost of fragmentation
+public:
+	//! For now, to avoid memory safety issues, ActionData instances are never removed or freed.
+	static ActionData* getOrCreate(QString name, ActionTrigger::Any trigger = ActionTrigger::Never{});
 
 	const QString& name() const;
 	const ActionTrigger::Any& trigger() const;
 	void setTrigger(ActionTrigger::Any&& newTrigger);
+
+	friend class ActionContainer;
+
+signals:
+	void modified();
 
 private:
 	ActionData(QString name, ActionTrigger::Any trigger);
@@ -105,7 +109,11 @@ private:
 	ActionTrigger::Any m_trigger;
 };
 
-// TODO: think of a better name. `ActionListener` or `CommandListener` might be good?
+/**
+	* Do not change the parent of this object! (FIXME: implement this, perhaps)
+	*
+	* TODO: think of a better name. `ActionListener` or `CommandListener` might be good?
+*/
 class GuiAction : public QObject
 {
 	Q_OBJECT
