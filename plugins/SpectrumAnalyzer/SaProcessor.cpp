@@ -108,7 +108,7 @@ void SaProcessor::analyze(LockfreeSpscQueue<SampleFrame> &ring_buffer)
 
 		if (in_buffer.empty())
 		{
-			ring_buffer.waitForWriter();
+			std::this_thread::yield();
 			continue;
 		}
 
@@ -317,7 +317,6 @@ void SaProcessor::analyze(LockfreeSpscQueue<SampleFrame> &ring_buffer)
 				#endif
 			}	// frame filler and processing
 
-			ring_buffer.commitReadRegion(in_buffer.size());
 		}	// process if active
 	}	// thread loop end
 }

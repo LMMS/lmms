@@ -72,7 +72,6 @@ Analyzer::Analyzer(Model *parent, const Plugin::Descriptor::SubPluginFeatures::K
 Analyzer::~Analyzer()
 {
 	m_processor.terminate();
-	m_inputBuffer.wakeReader();
 	m_processorThread.wait();
 }
 

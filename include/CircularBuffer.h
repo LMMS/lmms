@@ -29,7 +29,6 @@
 #include <array>
 #include <atomic>
 #include <cstddef>
-#include <new>
 #include <optional>
 #include <span>
 #include <vector>
@@ -37,19 +36,101 @@
 namespace lmms {
 
 namespace detail {
-enum class CircularBufferSynchronization
-{
-	None,
-	Spsc
-};
 
 constexpr auto DynamicCircularBufferSize = static_cast<size_t>(-1);
 
-template <typename T, size_t N = DynamicCircularBufferSize,
-	CircularBufferSynchronization Sync = CircularBufferSynchronization::None>
-class CircularBufferBase
+enum class CircularBufferSide
+{
+	Writer,
+	Reader
+};
+
+template <typename T, typename Committer> class CircularBufferRegion
 {
 public:
+	CircularBufferRegion(const CircularBufferRegion&) = delete;
+	CircularBufferRegion(CircularBufferRegion&&) = delete;
+	CircularBufferRegion& operator=(const CircularBufferRegion&) = delete;
+	CircularBufferRegion& operator=(CircularBufferRegion&&) = delete;
+
+	CircularBufferRegion(std::span<T> region, Committer comitter)
+		: m_region(std::move(region))
+		, m_comitter(std::move(comitter))
+	{
+	}
+
+	~CircularBufferRegion()
+	{
+		if (!m_committed) { commit(m_region.size()); }
+	}
+
+	operator T*() { return m_region.data(); }
+	operator T*() const { return m_region.data(); }
+
+	auto operator[](size_t index) const { return m_region[index]; }
+	auto operator[](size_t index) { return m_region[index]; }
+
+	auto data() const -> const T* { return m_region.data(); }
+	auto data() -> T* { return m_region.data(); }
+
+	auto size() const -> size_t { return m_region.size(); }
+	auto empty() const -> bool { return m_region.empty(); }
+
+	void commit(size_t count)
+	{
+		assert(count <= m_region.size());
+		m_comitter(count);
+		m_region = m_region.subspan(count);
+		m_committed = true;
+	}
+
+private:
+	std::span<T> m_region;
+	Committer m_comitter;
+	bool m_committed = false;
+};
+
+class CircularBufferSerialPolicy
+{
+public:
+	auto readIndex() const -> size_t { return m_readIndex; }
+	auto writeIndex() const -> size_t { return m_writeIndex; }
+	void setReadIndex(size_t value) { m_readIndex = value; }
+	void setWriteIndex(size_t value) { m_writeIndex = value; }
+
+private:
+	size_t m_readIndex = 0;
+	size_t m_writeIndex = 0;
+};
+
+class CircularBufferSpscPolicy
+{
+public:
+	template <CircularBufferSide S> auto readIndex() const -> size_t
+	{
+		if constexpr (S == CircularBufferSide::Reader) { return m_readIndex.load(std::memory_order_relaxed); }
+		else if constexpr (S == CircularBufferSide::Writer) { return m_readIndex.load(std::memory_order_acquire); }
+	}
+
+	template <CircularBufferSide S> auto writeIndex() const -> size_t
+	{
+		if constexpr (S == CircularBufferSide::Reader) { return m_writeIndex.load(std::memory_order_acquire); }
+		else if constexpr (S == CircularBufferSide::Writer) { return m_writeIndex.load(std::memory_order_relaxed); }
+	}
+
+	void setReadIndex(size_t value) { m_readIndex.store(value, std::memory_order_release); }
+	void setWriteIndex(size_t value) { m_writeIndex.store(value, std::memory_order_release); }
+
+private:
+	alignas(std::hardware_destructive_interference_size) std::atomic<size_t> m_readIndex = 0;
+	alignas(std::hardware_destructive_interference_size) std::atomic<size_t> m_writeIndex = 0;
+};
+
+template <typename T, typename IndexPolicy, size_t N = DynamicCircularBufferSize> class CircularBufferBase : IndexPolicy
+{
+public:
+	static_assert(N >= 2, "Size must at least be 2");
+
 	CircularBufferBase()
 		requires(N != DynamicCircularBufferSize)
 	= default;
@@ -60,42 +141,31 @@ public:
 	{
 	}
 
-	auto reserveWriteRegion(std::size_t count = static_cast<std::size_t>(-1)) -> std::span<T>
+	auto reserveWriteRegion(size_t count = static_cast<size_t>(-1))
 	{
-		const auto readIndex = loadReadIndex<Side::Writer>();
-		const auto writeIndex = loadWriteIndex<Side::Writer>();
+		const auto writeIndex = IndexPolicy::template writeIndex<CircularBufferSide::Writer>();
+		const auto readIndex = IndexPolicy::template readIndex<CircularBufferSide::Writer>();
 		const auto available = writeIndex < readIndex ? readIndex - writeIndex - 1
 													  : m_buffer.size() - writeIndex - (readIndex == 0 ? 1 : 0);
 		const auto actual = std::min(count, available);
-		return {&m_buffer[writeIndex], actual};
+		return CircularBufferRegion{
+			std::span<T>{&m_buffer[writeIndex], actual}, [this](size_t count) { commitWriteRegion(count); }};
 	}
 
-	auto reserveReadRegion(std::size_t count = static_cast<std::size_t>(-1)) -> std::span<T>
+	auto reserveReadRegion(size_t count = static_cast<size_t>(-1))
 	{
-		const auto readIndex = loadReadIndex<Side::Reader>();
-		const auto writeIndex = loadWriteIndex<Side::Reader>();
+		const auto writeIndex = IndexPolicy::template writeIndex<CircularBufferSide::Reader>();
+		const auto readIndex = IndexPolicy::template readIndex<CircularBufferSide::Reader>();
 		const auto available = readIndex <= writeIndex ? writeIndex - readIndex : m_buffer.size() - readIndex;
 		const auto actual = std::min(count, available);
-		return {&m_buffer[readIndex], actual};
-	}
-
-	void commitWriteRegion(std::size_t count)
-	{
-		const auto writeIndex = loadWriteIndex<Side::Writer>();
-		storeWriteIndex<Side::Writer>((writeIndex + count) % m_buffer.size());
-	}
-
-	void commitReadRegion(std::size_t count)
-	{
-		const auto readIndex = loadReadIndex<Side::Reader>();
-		storeReadIndex<Side::Reader>((readIndex + count) % m_buffer.size());
+		return CircularBufferRegion{
+			std::span<T>{&m_buffer[readIndex], actual}, [this](size_t count) { commitReadRegion(count); }};
 	}
 
 	auto push(const T* src, size_t size) -> size_t
 	{
 		auto region = reserveWriteRegion(size);
 		std::copy_n(src, region.size(), region.data());
-		commitWriteRegion(region.size());
 		return region.size();
 	}
 
@@ -103,7 +173,6 @@ public:
 	{
 		auto region = reserveReadRegion(size);
 		std::copy_n(region.data(), region.size(), dst);
-		commitReadRegion(region.size());
 		return region.size();
 	}
 
@@ -115,88 +184,51 @@ public:
 		return pop(&value, 1) == 1 ? std::optional<T>{std::move(value)} : std::nullopt;
 	}
 
-	void waitForWriter()
-		requires(Sync == CircularBufferSynchronization::Spsc)
+	auto peek() const -> const T&
 	{
-		while (m_wakeReader.test())
-		{
-			const auto writeIndex = loadWriteIndex<Side::Reader>();
-			m_writeIndex.wait(writeIndex);
-		}
-
-		m_wakeReader.clear();
+		const auto readIndex = IndexPolicy::template readIndex<CircularBufferSide::Reader>();
+		return m_buffer[readIndex];
 	}
 
-	void wakeReader()
+	auto capacity() const -> size_t { return m_buffer.size(); }
+
+	auto full() const -> bool
 	{
-		m_wakeReader.test_and_set();
-		m_wakeReader.notify_one();
+		const auto readIndex = IndexPolicy::template readIndex<CircularBufferSide::Writer>();
+		const auto writeIndex = IndexPolicy::template writeIndex<CircularBufferSide::Writer>();
+		return (writeIndex + 1) % m_buffer.size() == readIndex;
 	}
 
-	auto capacity() -> std::size_t { return m_buffer.size(); }
+	auto empty() const -> bool
+	{
+		const auto readIndex = IndexPolicy::template readIndex<CircularBufferSide::Reader>();
+		const auto writeIndex = IndexPolicy::template writeIndex<CircularBufferSide::Reader>();
+		return readIndex == writeIndex;
+	}
 
 private:
-	enum class Side
+	auto commitReadRegion(size_t count)
 	{
-		Writer,
-		Reader
-	};
-
-	using IndexType = std::conditional_t<Sync == CircularBufferSynchronization::Spsc, std::atomic<size_t>, size_t>;
-	using BufferType = std::conditional_t<N == DynamicCircularBufferSize, std::vector<T>, std::array<T, N>>;
-
-	template <Side Side> constexpr auto loadReadIndex() -> size_t
-	{
-		if constexpr (Sync == CircularBufferSynchronization::None) { return m_readIndex; }
-		else if constexpr (Sync == CircularBufferSynchronization::Spsc)
-		{
-			if constexpr (Side == Side::Writer) { return m_readIndex.load(std::memory_order_acquire); }
-			else if constexpr (Side == Side::Reader) { return m_readIndex.load(std::memory_order_relaxed); }
-		}
+		const auto readIndex = IndexPolicy::template readIndex<CircularBufferSide::Reader>();
+		IndexPolicy::setReadIndex((readIndex + count) % m_buffer.size());
 	}
 
-	template <Side Side> constexpr auto loadWriteIndex() -> size_t
+	auto commitWriteRegion(size_t count)
 	{
-		if constexpr (Sync == CircularBufferSynchronization::None) { return m_writeIndex; }
-		else if constexpr (Sync == CircularBufferSynchronization::Spsc)
-		{
-			if constexpr (Side == Side::Writer) { return m_writeIndex.load(std::memory_order_relaxed); }
-			else if constexpr (Side == Side::Reader) { return m_writeIndex.load(std::memory_order_acquire); }
-		}
+		const auto writeIndex = IndexPolicy::template writeIndex<CircularBufferSide::Writer>();
+		IndexPolicy::setWriteIndex((writeIndex + count) % m_buffer.size());
 	}
 
-	template <Side Side> constexpr void storeReadIndex(size_t value)
-	{
-		if constexpr (Sync == CircularBufferSynchronization::None) { m_readIndex = value; }
-		else if constexpr (Sync == CircularBufferSynchronization::Spsc && Side == Side::Reader)
-		{
-			m_readIndex.store(value, std::memory_order_release);
-		}
-	}
-
-	template <Side Side> constexpr void storeWriteIndex(size_t value)
-	{
-		if constexpr (Sync == CircularBufferSynchronization::None) { return m_writeIndex = value; }
-		else if constexpr (Sync == CircularBufferSynchronization::Spsc && Side == Side::Writer)
-		{
-			m_writeIndex.store(value, std::memory_order_release);
-			m_writeIndex.notify_one();
-		}
-	}
-
-	BufferType m_buffer;
-	alignas(std::hardware_destructive_interference_size) std::atomic_flag m_wakeReader;
-	alignas(std::hardware_destructive_interference_size) IndexType m_readIndex = 0;
-	alignas(std::hardware_destructive_interference_size) IndexType m_writeIndex = 0;
+	using Buffer = std::conditional_t<N == DynamicCircularBufferSize, std::vector<T>, std::array<T, N>>;
+	Buffer m_buffer;
 };
 } // namespace detail
 
-template <typename T, std::size_t N = detail::DynamicCircularBufferSize>
-using CircularBuffer = detail::CircularBufferBase<T, N, detail::CircularBufferSynchronization::None>;
+template <typename T, size_t N = detail::DynamicCircularBufferSize>
+using CircularBuffer = detail::CircularBufferBase<T, detail::CircularBufferSerialPolicy, N>;
 
-template <typename T, std::size_t N = detail::DynamicCircularBufferSize>
-using LockfreeSpscQueue = detail::CircularBufferBase<T, N, detail::CircularBufferSynchronization::Spsc>;
-
+template <typename T, size_t N = detail::DynamicCircularBufferSize>
+using LockfreeSpscQueue = detail::CircularBufferBase<T, detail::CircularBufferSpscPolicy, N>;
 } // namespace lmms
 
 #endif // LMMS_CIRCULAR_BUFFER_H
