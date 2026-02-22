@@ -283,11 +283,12 @@ void MainWindow::finalize()
 	addAction(project_menu, "project_new", tr("&New"),
 		QKeySequence::New, &MainWindow::createNewProject);
 
-	static auto testActionData = ActionData::getOrCreate("test", ActionTrigger::pressed(Qt::CTRL, Qt::Key_J));
+	static auto testActionData = ActionData::getOrCreate("test", ActionTrigger::held(Qt::ControlModifier, Qt::Key_J));
 	auto testAction = new GuiAction(this, testActionData);
-	connect(testAction, &GuiAction::activated, this, [this] { openProject(); });
+	connect(testAction, &GuiAction::activated, this, [this] { qDebug() << "ON"; });
+	connect(testAction, &GuiAction::deactivated, this, [this] { qDebug() << "OFF"; });
 
-	static auto lkData = ActionData::getOrCreate("listKeybindings", ActionTrigger::pressed(Qt::CTRL, Qt::Key_K));
+	static auto lkData = ActionData::getOrCreate("listKeybindings", ActionTrigger::pressed(Qt::ControlModifier, Qt::Key_K));
 	auto lkAction = new GuiAction(this, lkData);
 	connect(lkAction, &GuiAction::activated, this, [this] {
 		auto s = QString{};

@@ -67,12 +67,12 @@ void ActionData::setTrigger(ActionTrigger::Any&& newTrigger)
 	m_trigger = newTrigger;
 }
 
-ActionTrigger::Any ActionTrigger::pressed(uint32_t mods, uint32_t key, bool repeat)
+ActionTrigger::Any ActionTrigger::pressed(Qt::KeyboardModifiers mods, Qt::Key key, bool repeat)
 {
 	return ActionTrigger::KeyPressed{.mods = mods, .key = key, .repeat = repeat};
 }
 
-ActionTrigger::Any ActionTrigger::held(uint32_t mods, uint32_t key)
+ActionTrigger::Any ActionTrigger::held(Qt::KeyboardModifiers mods, Qt::Key key)
 {
 	return ActionTrigger::KeyHeld{.mods = mods, .key = key};
 }
@@ -111,27 +111,53 @@ bool GuiAction::eventFilter(QObject* watched, QEvent* event)
 	if (std::holds_alternative<ActionTrigger::KeyPressed>(trigger_g))
 	{
 		const auto& trigger = std::get<ActionTrigger::KeyPressed>(trigger_g);
+		if (event->type() == QEvent::KeyPress)
+		{
+			auto* ke = dynamic_cast<QKeyEvent*>(event);
+			assert(ke != nullptr);
+
+			// FIXME: "This function cannot always be trusted. The user can
+			// confuse it by pressing both Shift keys simultaneously and
+			// releasing one of them, for example." @
+			// https://doc.qt.io/qt-6/qkeyevent.html#modifiers
+
+			if (ke->key() == trigger.key && ke->modifiers() == trigger.mods
+				&& !(ke->isAutoRepeat() && !trigger.repeat))
+			{
+				m_active = false;
+				emit activated();
+				return true;
+			}
+		}
+	}
+	else if (std::holds_alternative<ActionTrigger::KeyHeld>(trigger_g))
+	{
+		const auto& trigger = std::get<ActionTrigger::KeyHeld>(trigger_g);
 		if (!m_active && event->type() == QEvent::KeyPress)
 		{
 			auto* ke = dynamic_cast<QKeyEvent*>(event);
 			assert(ke != nullptr);
 
-			// FIXME: "This function cannot always be trusted. The user can confuse it by pressing both Shift keys
-			// simultaneously and releasing one of them, for example." @ https://doc.qt.io/qt-6/qkeyevent.html#modifiers
-
-			if ((uint32_t)ke->key() == trigger.key && ke->modifiers() == trigger.mods)
+			if (ke->key() == trigger.key && ke->modifiers() == trigger.mods)
 			{
+				m_active = true;
 				emit activated();
-				m_active = false;
 				return true;
 			}
 		}
-		// else if (m_active && event->type() == QEvent::KeyRelease)
-		// {
-		// 	auto* ke = dynamic_cast<QKeyEvent*>(event);
-		// 	assert(ke != nullptr);
-		// 	return true;
-		// }
+		else if (m_active && event->type() == QEvent::KeyRelease)
+		{
+			auto* ke = dynamic_cast<QKeyEvent*>(event);
+			assert(ke != nullptr);
+
+			// Ignore auto-repeat releases
+			if (ke->key() == trigger.key && !ke->isAutoRepeat())
+			{
+				m_active = false;
+				emit deactivated();
+				return true;
+			}
+		}
 	}
 
 	return QObject::eventFilter(watched, event);

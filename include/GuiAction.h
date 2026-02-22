@@ -36,30 +36,33 @@ namespace lmms {
 
 class ActionData;
 
+static constexpr Qt::KeyboardModifiers foo{};
+
 class ActionTrigger
 {
 public:
-	// FIXME: For key events, the enums Qt::KeyboardModifier and Qt::Key are used. I can't find them so I'm using
-	// uint32_t...
-
-	struct Never
+	struct Never //!< Can never be triggered
 	{
-	}; //!< Can never be triggered
+	};
+
 	struct KeyPressed
 	{
-		uint32_t mods, key;
+		Qt::KeyboardModifiers mods;
+		Qt::Key key;
 		bool repeat;
 	};
+
 	struct KeyHeld
 	{
-		uint32_t mods, key;
+		Qt::KeyboardModifiers mods;
+		Qt::Key key;
 	};
 
 	//! Top type for all possible triggers
 	typedef std::variant<Never, KeyPressed, KeyHeld> Any;
 
-	static Any pressed(uint32_t mods, uint32_t key, bool repeat = true);
-	static Any held(uint32_t mods, uint32_t key);
+	static Any pressed(Qt::KeyboardModifiers mods, Qt::Key key, bool repeat = true);
+	static Any held(Qt::KeyboardModifiers mods, Qt::Key key);
 };
 
 class ActionContainer
