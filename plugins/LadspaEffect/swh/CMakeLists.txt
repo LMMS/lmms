@@ -1,5 +1,16 @@
 set_directory_properties(PROPERTIES SYSTEM TRUE)
 
+execute_process(
+    COMMAND ${PERL_EXECUTABLE} -MList::MoreUtils -e "1"
+    RESULT_VARIABLE MOREUTILS_RESULT
+    OUTPUT_QUIET
+    ERROR_QUIET
+)
+
+if (NOT MOREUTILS_RESULT EQUAL 0)
+    message(FATAL_ERROR "Perl module \"List::MoreUtils\" is required for building LadspaEffect/swh.\n")
+endif()
+
 # Create blank config.h
 FILE(WRITE ladspa/config.h "")
 
