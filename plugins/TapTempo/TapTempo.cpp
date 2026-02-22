@@ -1,9 +1,7 @@
 /*
  * TapTempo.cpp - Plugin to count beats per minute
  *
- *
  * Copyright (c) 2022 saker <sakertooth@gmail.com>
- *
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -28,6 +26,8 @@
 
 #include <string>
 
+#include "SamplePlayHandle.h"
+#include "Song.h"
 #include "embed.h"
 #include "plugin_export.h"
 
@@ -49,25 +49,56 @@ TapTempo::TapTempo()
 {
 }
 
-void TapTempo::onBpmClick()
+void TapTempo::tap(bool play)
 {
-	const auto currentTime = clock::now();
-	if (m_numTaps == 0)
+	using namespace std::literals;
+
+	if (play)
 	{
-		m_startTime = currentTime;
-	}
-	else
-	{
-		using namespace std::chrono_literals;
-		const auto secondsElapsed = (currentTime - m_startTime) / 1.0s;
-		if (m_numTaps >= m_tapsNeededToDisplay) { m_bpm = m_numTaps / secondsElapsed * 60; }
+		const auto metronomeFile = m_beat == 0 ? "misc/metronome02.ogg" : "misc/metronome01.ogg";
+		Engine::audioEngine()->addPlayHandle(new SamplePlayHandle(metronomeFile));
 	}
 
-	++m_numTaps;
+	if (m_lastTap.time_since_epoch() != 0ms)
+	{
+		const auto delta = std::chrono::duration_cast<std::chrono::milliseconds>(clock::now() - m_lastTap);
+
+		if (delta > 2000ms)
+		{
+			reset();
+			return;
+		}
+
+		// A smoothing factor to reduce jitter in the BPM calculation
+		constexpr auto alpha = 0.2;
+
+		m_bpm = alpha * (60000. / delta.count()) + (1.0 - alpha) * m_bpm;
+	}
+
+	const auto timeSigNumerator = Engine::getSong()->getTimeSigModel().getNumerator();
+	m_beat = (m_beat + 1) % timeSigNumerator;
+	m_lastTap = clock::now();
+}
+
+void TapTempo::sync()
+{
+	Engine::getSong()->setTempo(std::round(m_bpm));
+}
+
+void TapTempo::reset()
+{
+	m_bpm = 0;
+	m_lastTap = std::chrono::time_point<clock>{};
 }
 
 QString TapTempo::nodeName() const
 {
 	return taptempo_plugin_descriptor.name;
 }
+
+double TapTempo::bpm() const
+{
+	return m_bpm;
+}
+
 } // namespace lmms

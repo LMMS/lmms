@@ -29,8 +29,9 @@
 
 #include "ToolPluginView.h"
 
-class QPushButton;
+class QCheckBox;
 class QLabel;
+class QPushButton;
 
 namespace lmms {
 class TapTempo;
@@ -43,16 +44,19 @@ class TapTempoView : public ToolPluginView
 	Q_OBJECT
 public:
 	TapTempoView(TapTempo* plugin);
-	void updateLabels();
-	void keyPressEvent(QKeyEvent* event) override;
-	void closeEvent(QCloseEvent*) override;
 
 private:
+	void closeEvent(QCloseEvent*) override;
+	void update();
+	void reset();
 	QPushButton* m_tapButton;
+	QPushButton* m_resetButton;
+	QPushButton* m_syncButton;
+	QCheckBox* m_precisionCheckBox;
+	QCheckBox* m_muteCheckBox;
 	QLabel* m_msLabel;
 	QLabel* m_hzLabel;
 	TapTempo* m_plugin;
-	friend class TapTempo;
 };
 } // namespace lmms::gui
 
