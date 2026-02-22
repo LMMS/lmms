@@ -285,13 +285,11 @@ void MainWindow::finalize()
 
 	static auto testActionData = ActionData::getOrCreate("test", ActionTrigger::pressed(Qt::CTRL, Qt::Key_J));
 	auto testAction = new GuiAction(this, testActionData);
-	testAction->setOnActivate<MainWindow>([](auto* mw) {
-		mw->openProject();
-	});
+	connect(testAction, &GuiAction::activated, this, [this] { openProject(); });
 
 	static auto lkData = ActionData::getOrCreate("listKeybindings", ActionTrigger::pressed(Qt::CTRL, Qt::Key_K));
 	auto lkAction = new GuiAction(this, lkData);
-	lkAction->setOnActivate<MainWindow>([](auto* mw) {
+	connect(lkAction, &GuiAction::activated, this, [this] {
 		auto s = QString{};
 
 		for (auto it = ActionContainer::mappingsBegin(); it != ActionContainer::mappingsEnd(); it++)
@@ -301,7 +299,7 @@ void MainWindow::finalize()
 			s += "\n";
 		}
 
-		auto* d = new QDialog(mw);
+		auto* d = new QDialog(this);
 		auto* l = new QLabel(d);
 		l->setTextFormat(Qt::PlainText);
 		l->setText(s);

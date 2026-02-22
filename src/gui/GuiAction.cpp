@@ -81,8 +81,6 @@ GuiAction::GuiAction(QObject* parent, ActionData* data)
 	: QObject(parent)
 	, m_data{data}
 	, m_active{false}
-	, m_onActivateFunc{[](QObject*){}}
-	, m_onDeactivateFunc{[](QObject*){}}
 {
 	if (parent != nullptr)
 	{
@@ -95,18 +93,6 @@ GuiAction::GuiAction(QObject* parent, ActionData* data)
 
 GuiAction::~GuiAction()
 {
-}
-
-void GuiAction::setOnActivateObj(std::function<void(QObject*)> func)
-{
-	m_onActivateFunc = func;
-	m_active = false; // TODO: confirm if this is alright
-}
-
-void GuiAction::setOnDeactivateObj(std::function<void(QObject*)> func)
-{
-	m_onDeactivateFunc = func;
-	m_active = false; // TODO: confirm if this is alright
 }
 
 ActionContainer::Iterator ActionContainer::mappingsBegin()
@@ -135,7 +121,7 @@ bool GuiAction::eventFilter(QObject* watched, QEvent* event)
 
 			if ((uint32_t)ke->key() == trigger.key && ke->modifiers() == trigger.mods)
 			{
-				m_onActivateFunc(watched);
+				emit activated();
 				m_active = false;
 				return true;
 			}

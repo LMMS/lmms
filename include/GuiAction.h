@@ -103,47 +103,26 @@ private:
 };
 
 // TODO: think of a better name. `ActionListener` or `CommandListener` might be good?
-class GuiAction : QObject
+class GuiAction : public QObject
 {
+	Q_OBJECT
+
 public:
 	GuiAction(QObject* parent, ActionData* data);
 	~GuiAction();
 
-	template <typename T> inline void setOnActivate(std::function<void(T*)> func);
-	template <typename T> inline void setOnDeactivate(std::function<void(T*)> func);
-
-	void setOnActivateObj(std::function<void(QObject*)> func);
-	void setOnDeactivateObj(std::function<void(QObject*)> func);
-
 protected:
 	bool eventFilter(QObject* watched, QEvent* event) override;
+
+signals:
+	void activated();
+	void deactivated();
 
 private:
 	ActionData* m_data;
 	bool m_active;
 	uint32_t m_mods;
-
-	std::function<void(QObject*)> m_onActivateFunc;
-	std::function<void(QObject*)> m_onDeactivateFunc;
 };
-
-template <typename T> void GuiAction::setOnActivate(std::function<void(T*)> func)
-{
-	static_assert(std::is_convertible<T*, QObject*>::value);
-	setOnActivateObj([func](QObject* parent) {
-		auto* mw = dynamic_cast<T*>(parent);
-		func(mw);
-	});
-}
-
-template <typename T> void GuiAction::setOnDeactivate(std::function<void(T*)> func)
-{
-	static_assert(std::is_convertible<T*, QObject*>::value);
-	setOnDeactivateObj([func](QObject* parent) {
-		auto* mw = dynamic_cast<T*>(parent);
-		func(mw);
-	});
-}
 
 } // namespace lmms
 
