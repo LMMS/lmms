@@ -90,7 +90,6 @@ OPTION(WANT_SOUNDIO	"Include libsoundio support" ON)
 OPTION(WANT_SDL		"Include SDL (Simple DirectMedia Layer) support" ON)
 OPTION(WANT_SF2		"Include SoundFont2 player plugin" ON)
 OPTION(WANT_GIG		"Include GIG player plugin" ON)
-option(WANT_SID		"Include Sid instrument" ON)
 OPTION(WANT_STK		"Include Stk (Synthesis Toolkit) support" ON)
 OPTION(WANT_SWH		"Include Steve Harris's LADSPA plugins" ON)
 OPTION(WANT_TAP		"Include Tom's Audio Processing LADSPA plugins" ON)
@@ -318,6 +317,11 @@ ELSE(WANT_CMT)
 ENDIF(WANT_CMT)
 
 IF(WANT_SWH)
+	IF(LMMS_BUILD_APPLE)
+		# Prefer system perl over Homebrew, MacPorts, etc
+		SET(Perl_ROOT "/usr/bin")
+	ENDIF()
+	FIND_PACKAGE(Perl)
 	IF(PERL_FOUND)
 		SET(LMMS_HAVE_SWH TRUE)
 		SET(STATUS_SWH "OK")
@@ -366,15 +370,26 @@ IF(WANT_SDL)
 	ENDIF()
 ENDIF()
 
-# check for Sid
-if(WANT_SID)
-	if(PERL_FOUND)
-		set(LMMS_HAVE_SID TRUE)
-		set(STATUS_SID "OK")
-	else()
-		set(STATUS_SID "not found, please install perl if you require the Sid instrument")
-	endif()
-endif()
+# fallback to SDL1
+IF(WANT_SDL AND NOT LMMS_HAVE_SDL2)
+	# Fallback to SDL1.2
+	SET(SDL_BUILDING_LIBRARY TRUE)
+	FIND_PACKAGE(SDL)
+	IF(SDL_FOUND)
+		SET(LMMS_HAVE_SDL TRUE)
+		SET(STATUS_SDL "OK, using SDL1.2")
+		# fix mingw since 53abd65
+		IF(NOT SDL_INCLUDE_DIR)
+			SET(SDL_INCLUDE_DIR "${CMAKE_FIND_ROOT_PATH}/include")
+		ENDIF()
+
+	ELSE()
+		SET(STATUS_SDL "not found, please install libsdl2-dev (or similar) "
+			"if you require SDL support")
+		SET(SDL_INCLUDE_DIR "")
+		SET(SDL_LIBRARY "")
+	ENDIF()
+ENDIF()
 
 # check for Stk
 IF(WANT_STK)
@@ -869,7 +884,6 @@ MESSAGE(
 "* ZynAddSubFX instrument      : ${STATUS_ZYN}\n"
 "* Carla Patchbay & Rack       : ${STATUS_CARLA}\n"
 "* SoundFont2 player           : ${STATUS_FLUIDSYNTH}\n"
-"* Sid instrument              : ${STATUS_SID}\n"
 "* Stk Mallets                 : ${STATUS_STK}\n"
 "* VST plugin host             : ${STATUS_VST}\n"
 "  * 32-bit Windows host       : ${STATUS_VST_32}\n"
