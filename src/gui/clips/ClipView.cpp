@@ -1101,13 +1101,13 @@ void ClipView::contextMenuEvent( QContextMenuEvent * cme )
 	using namespace Clipboard;
 	TimePos clipPos{m_clip->startPosition()};
 	TrackContentWidget *tcw = getTrackView()->getTrackContentWidget();
-	bool canPaste = tcw->canPasteSelection( clipPos, getMimeData() );
+	bool canPaste = tcw->canPasteSelection(clipPos, getMimeData());
 
 	auto pasteAction = contextMenu.addAction(
 		embed::getIconPixmap( "edit_paste" ),
 		tr( "Paste" ),
 		[this](){ contextMenuAction( ContextMenuAction::Paste ); } );
-	pasteAction->setEnabled( canPaste );
+	pasteAction->setEnabled(canPaste);
 
 	contextMenu.addSeparator();
 
