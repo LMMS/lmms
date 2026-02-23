@@ -27,7 +27,7 @@
 
 #include <QObject>
 #include <QString>
-#include <QDebug>
+#include <QAction>
 
 #include <functional>
 #include <variant>
@@ -66,8 +66,10 @@ public:
 class ActionContainer
 {
 public:
-	//! Attempts to register a new action, but refuses if it is already registered. Returns whether the insertion
-	//! happened.
+	/**
+		Attempts to register a new action, but refuses if it is already registered. Returns whether the insertion
+		happened.
+	*/
 	static bool tryRegister(QString name, ActionTrigger::Any trigger);
 
 	//! Find an action by its name. Returns null when it was not found.
@@ -81,7 +83,7 @@ private:
 	ActionContainer() = delete;
 	~ActionContainer() = delete;
 
-	//! Map with all known actions (owned by this).
+	//! Map owning the data to all known acitons.
 	static std::map<QString, ActionData*> s_dataMap;
 };
 
@@ -90,8 +92,12 @@ class ActionData : public QObject
 	Q_OBJECT
 
 public:
-	//! For now, to avoid memory safety issues, ActionData instances are never removed or freed.
-	static ActionData* getOrCreate(QString name, ActionTrigger::Any trigger = ActionTrigger::Never{});
+	/**
+		Obtains the data of the action with the specified name. Constructs one if it has not been present, and returns it.
+
+		For now, to avoid memory safety issues, ActionData instances are never removed or freed.
+	*/
+	static ActionData* get(const QString& name, ActionTrigger::Any trigger = ActionTrigger::Never{});
 
 	const QString& name() const;
 	const ActionTrigger::Any& trigger() const;
@@ -110,9 +116,9 @@ private:
 };
 
 /**
-	* Do not change the parent of this object! (FIXME: implement this, perhaps)
-	*
-	* TODO: think of a better name. `ActionListener` or `CommandListener` might be good?
+	Do not change the parent of this object! (FIXME: implement this, perhaps)
+	
+	TODO: think of a better name. `ActionListener` or `CommandListener` might be good?
 */
 class GuiAction : public QObject
 {
@@ -134,6 +140,12 @@ private:
 	bool m_active;
 	uint32_t m_mods;
 };
+
+/**
+	Estabilishes a one-way sync between an ActionData and a QAction, such that changes to the ActionData affect the
+	state of the QAction. Useful for menu actions with keybindings.
+*/
+void syncActionDataToQAction(ActionData* data, QAction* action);
 
 } // namespace lmms
 

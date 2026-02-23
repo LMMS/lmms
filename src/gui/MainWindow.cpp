@@ -266,8 +266,8 @@ void MainWindow::finalize()
 	resetWindowTitle();
 	setWindowIcon( embed::getIconPixmap( "icon_small" ) );
 
-	auto addAction = [this](QMenu* menu, std::string_view icon, const QString& text,
-		const QKeySequence& shortcut, auto(MainWindow::* slot)()) -> QAction*
+	auto addAction = [this](QMenu* menu, std::string_view icon, const QString& text, const QKeySequence& shortcut,
+		auto(MainWindow::* slot)()) -> QAction*
 	{
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 3, 0))
 		return menu->addAction(embed::getIconPixmap(icon), text, shortcut, this, slot);
@@ -276,22 +276,38 @@ void MainWindow::finalize()
 #endif
 	};
 
+	auto menuAddAction = [this, addAction](QMenu* menu, std::string_view icon, const QString& text, ActionData* data,
+		auto(MainWindow::* slot)()) -> void
+	{
+		const auto emptyShortcut = QKeySequence{};
+		auto* action = addAction(menu, icon, text, emptyShortcut, slot);
+		syncActionDataToQAction(data, action);
+	};
+
 	// project-popup-menu
 	auto project_menu = new QMenu(this);
-	menuBar()->addMenu( project_menu )->setText( tr( "&File" ) );
+	menuBar()->addMenu(project_menu)->setText(tr("&File"));
 
-	addAction(project_menu, "project_new", tr("&New"),
-		QKeySequence::New, &MainWindow::createNewProject);
+	static auto* adNewProject = ActionData::get("project_new", ActionTrigger::pressed(Qt::ControlModifier, Qt::Key_N));
+	menuAddAction(project_menu, "project_new", tr("&New"), adNewProject, &MainWindow::createNewProject);
 
-	static auto testActionData = ActionData::getOrCreate("test", ActionTrigger::held(Qt::ControlModifier, Qt::Key_J));
+	static auto testActionData = ActionData::get("test", ActionTrigger::held(Qt::ControlModifier, Qt::Key_J));
 	auto testAction = new GuiAction(this, testActionData);
 	connect(testAction, &GuiAction::activated, this, [this] { qDebug() << "ON"; });
 	connect(testAction, &GuiAction::deactivated, this, [this] {
 		qDebug() << "OFF";
-		testActionData->setTrigger(ActionTrigger::pressed(Qt::AltModifier, Qt::Key_H));
+		adNewProject->setTrigger(ActionTrigger::pressed(Qt::ControlModifier, Qt::Key_H));
 	});
 
-	static auto lkData = ActionData::getOrCreate("listKeybindings", ActionTrigger::pressed(Qt::ControlModifier, Qt::Key_K));
+	// static auto testActionData = ActionData::get("test", ActionTrigger::held(Qt::ControlModifier, Qt::Key_J));
+	// auto testAction = new GuiAction(this, testActionData);
+	// connect(testAction, &GuiAction::activated, this, [this] { qDebug() << "ON"; });
+	// connect(testAction, &GuiAction::deactivated, this, [this] {
+	// 	qDebug() << "OFF";
+	// 	testActionData->setTrigger(ActionTrigger::pressed(Qt::AltModifier, Qt::Key_H));
+	// });
+
+	static auto lkData = ActionData::get("listKeybindings", ActionTrigger::pressed(Qt::ControlModifier, Qt::Key_K));
 	auto lkAction = new GuiAction(this, lkData);
 	connect(lkAction, &GuiAction::activated, this, [this] {
 		auto s = QString{};

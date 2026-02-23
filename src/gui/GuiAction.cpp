@@ -22,9 +22,11 @@
  *
  */
 
-#include <QDebug>
+#include <QObject>
+#include <QDebug> // TODO: remove
 #include <QEvent>
 #include <QKeyEvent>
+#include <QKeySequence>
 
 #include "GuiAction.h"
 
@@ -53,7 +55,7 @@ ActionData::ActionData(QString name, ActionTrigger::Any trigger)
 {
 }
 
-ActionData* ActionData::getOrCreate(QString name, ActionTrigger::Any trigger)
+ActionData* ActionData::get(const QString& name, ActionTrigger::Any trigger)
 {
 	ActionContainer::tryRegister(name, trigger);
 	return ActionContainer::findData(name);
@@ -158,6 +160,28 @@ bool GuiAction::eventFilter(QObject* watched, QEvent* event)
 	}
 
 	return QObject::eventFilter(watched, event);
+}
+
+void syncActionDataToQAction(ActionData* data, QAction* action)
+{
+	auto updateAction = [action, data]
+	{
+		const auto& trigger_g = data->trigger();
+		if (std::holds_alternative<ActionTrigger::KeyPressed>(trigger_g))
+		{
+			const auto& trigger = std::get<ActionTrigger::KeyPressed>(trigger_g);
+			action->setShortcut(QKeySequence{static_cast<int>(trigger.mods + trigger.key)});
+			action->setAutoRepeat(trigger.repeat);
+		}
+		else
+		{
+			qWarning() << "Expected KeyPressed trigger! QAction will have no trigger keybinding.";
+			action->setShortcut(QKeySequence{});
+		}
+	};
+
+	updateAction();
+	QObject::connect(data, &ActionData::modified, action, updateAction);
 }
 
 } // namespace lmms
