@@ -794,6 +794,97 @@ void PianoRoll::reverseNotes()
 	Engine::getSong()->setModified();
 }
 
+void PianoRoll::duplicateNotes(bool quanitized)
+{
+	auto roundUp = [](int value, int step) -> int
+	{
+		// Rounds the value up to the next step
+		return std::ceil(static_cast<float>(value) / step) * step;
+	};
+
+	auto nextPowerOfTwo = [](int value, int step) -> int
+	{
+		// Rounds the value to the next power-of-two of step
+		// (works for fractions too, e.g. 1/2, 1/4, 1/8)
+		return std::exp2(std::ceil(std::log2(static_cast<float>(value) / step))) * step;
+	};
+
+	auto smallestSimpleDivision = [](int sectionLength, int stepLength) -> int
+	{
+		// Find the smallest simple subdivision (e.g. 1/2, 1/4, 1/8) of a section with n sized steps
+		int stepCount = std::max(1, sectionLength / stepLength);
+		while (stepCount % 2 == 0) { stepCount /= 2; }
+		return stepCount * stepLength;
+	};
+
+	if (!hasValidMidiClip()) { return; }
+
+	const NoteVector selectedNotes = getSelectedNotes();
+	const NoteVector notes = selectedNotes.empty() ? m_midiClip->notes() : selectedNotes;
+
+	const auto bounds = boundsForNotes(notes);
+	if (!bounds.has_value()) { return; }
+
+	m_midiClip->addJournalCheckPoint();
+
+	TimePos unquantizedLength = bounds->end - bounds->start;
+	TimePos length = unquantizedLength;
+
+	const TimePos barLength = TimePos::ticksPerBar();
+	const TimePos beatLength = barLength / Engine::getSong()->getTimeSigModel().getNumerator();
+	const TimePos smallestSimpleDivisionOfBar = smallestSimpleDivision(barLength, beatLength);
+	const TimePos smallestSimpleDivisionOfBeat = smallestSimpleDivision(beatLength, quantization());
+
+	const bool beatsAlignWithQuantization = beatLength % quantization() == 0 || quantization() % beatLength == 0;
+	const bool everyBarHasQuantization = quantization() <= barLength;
+
+	if (beatsAlignWithQuantization && everyBarHasQuantization)
+	{
+		// Step 1: Round length to the appropriate unit - quantization steps, beats or bars.
+		length = roundUp(length, quantization());
+
+		if (length > barLength)
+		{
+			length = roundUp(length, barLength);
+		}
+		else if (length > beatLength)
+		{
+			length = roundUp(length, beatLength);
+		}
+
+		// Step 2: Round length to powers of two when possible
+		if (length > smallestSimpleDivisionOfBar / 2)
+		{
+			length = nextPowerOfTwo(roundUp(length, smallestSimpleDivisionOfBar), barLength);
+		}
+		else if (length > smallestSimpleDivisionOfBeat / 2)
+		{
+			length = nextPowerOfTwo(roundUp(length, smallestSimpleDivisionOfBeat), beatLength);
+		}
+	}
+	else
+	{
+		// If the quantization grid doesn't align with beats and bars, ignore it and round to whole bars
+		length = nextPowerOfTwo(roundUp(unquantizedLength, barLength), barLength);
+	}
+
+
+	for (auto note : notes)
+	{
+		Note newNote = Note{*note};
+		newNote.setPos(note->pos() + (quanitized ? length : unquantizedLength));
+		newNote.setSelected(true);
+		m_midiClip->addNote(newNote, false);
+		note->setSelected(false);
+	}
+
+	m_midiClip->rearrangeAllNotes();
+
+	update();
+	getGUI()->songEditor()->update();
+	Engine::getSong()->setModified();
+}
+
 
 void PianoRoll::loadMarkedSemiTones(const QDomElement & de)
 {
@@ -5277,6 +5368,16 @@ PianoRollWindow::PianoRollWindow() :
 	auto maxLengthAction = new QAction(embed::getIconPixmap("max_length"), tr("Max length as last"), noteToolsButton);
 	connect(maxLengthAction, &QAction::triggered, [this](){ m_editor->constrainNoteLengths(true); });
 
+
+	auto duplicateQuantizedAction = new QAction(embed::getIconPixmap("edit_copy"), tr("Duplicate"), noteToolsButton);
+	connect(duplicateQuantizedAction, &QAction::triggered, [this](){ m_editor->duplicateNotes(true); });
+	duplicateQuantizedAction->setShortcut(combine(Qt::CTRL, Qt::Key_D));
+
+	auto duplicateUnquantizedAction = new QAction(embed::getIconPixmap("edit_copy"), tr("Duplicate (Unquantized)"), noteToolsButton);
+	connect(duplicateUnquantizedAction, &QAction::triggered, [this](){ m_editor->duplicateNotes(false); });
+	duplicateUnquantizedAction->setShortcut(combine(Qt::CTRL, Qt::SHIFT, Qt::Key_D));
+
+
 	auto reverseAction = new QAction(embed::getIconPixmap("flip_x"), tr("Reverse Notes"), noteToolsButton);
 	connect(reverseAction, &QAction::triggered, [this](){ m_editor->reverseNotes(); });
 	reverseAction->setShortcut(keySequence(Qt::SHIFT, Qt::Key_R));
@@ -5289,6 +5390,8 @@ PianoRollWindow::PianoRollWindow() :
 	noteToolsButton->addAction(minLengthAction);
 	noteToolsButton->addAction(maxLengthAction);
 	noteToolsButton->addAction(reverseAction);
+	noteToolsButton->addAction(duplicateQuantizedAction);
+	noteToolsButton->addAction(duplicateUnquantizedAction);
 
 	notesActionsToolBar->addWidget(noteToolsButton);
 
