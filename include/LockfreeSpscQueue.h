@@ -66,19 +66,20 @@ public:
 
 	void push(const T* values, size_t size)
 	{
-		auto region = reserveContiguousWriteSpace(size);
+		auto region = reserveContiguousWriteSpace(size, size);
 		std::copy_n(values, size, region.data());
 		commitWrite(size);
 	}
 
 	auto tryPush(T value) -> bool { return tryPush(&value, 1); }
 
-	auto tryPush(const T* values, size_t size) -> size_t
+	auto tryPush(const T* values, size_t size) -> bool
 	{
 		auto region = reserveContiguousWriteSpace(0, size);
+		if (region.size() < size) { return false; }
 		std::copy_n(values, region.size(), region.data());
 		commitWrite(region.size());
-		return region.size();
+		return true;
 	}
 
 	auto pop() -> T
@@ -90,7 +91,7 @@ public:
 
 	void pop(T* values, size_t size)
 	{
-		auto region = reserveContiguousReadSpace(size);
+		auto region = reserveContiguousReadSpace(size, size);
 		std::copy_n(region.data(), size, values);
 		commitRead(size);
 	}
@@ -101,12 +102,13 @@ public:
 		return tryPop(&value, 1) == 0 ? std::nullopt : std::optional<T>{value};
 	}
 
-	auto tryPop(T* values, size_t size) -> size_t
+	auto tryPop(T* values, size_t size) -> bool
 	{
 		auto region = reserveContiguousReadSpace(0, size);
+		if (region.size() != size) { return false; }
 		std::copy_n(region.data(), region.size(), values);
 		commitRead(region.size());
-		return region.size();
+		return true;
 	}
 
 	auto reserveContiguousWriteSpace(size_t min = 0, size_t max = static_cast<size_t>(-1)) -> std::span<T>
