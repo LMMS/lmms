@@ -93,6 +93,7 @@ private slots:
 	void resetAutoSave();
 	void toggleAutoSave(bool enabled);
 	void toggleRunningAutoSave(bool enabled);
+	void toggleVersionedAutoSave(bool enabled);
 	void toggleSmoothScroll(bool enabled);
 	void toggleAnimateAFP(bool enabled);
 	void vstEmbedMethodChanged();
@@ -158,10 +159,12 @@ private:
 	int m_saveInterval;
 	bool m_enableAutoSave;
 	bool m_enableRunningAutoSave;
+	bool m_enableVersionedAutoSave;
 	QSlider * m_saveIntervalSlider;
 	QLabel * m_saveIntervalLbl;
 	QCheckBox * m_autoSave;
 	QCheckBox * m_runningAutoSave;
+	QCheckBox * m_versionedAutoSave;
 	bool m_smoothScroll;
 	bool m_animateAFP;
 	QLabel * m_vstEmbedLbl;
