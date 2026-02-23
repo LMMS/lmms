@@ -869,7 +869,7 @@ void FileBrowserTreeWidget::mouseMoveEvent(QMouseEvent * me)
 		auto f = dynamic_cast<FileItem*>(itemAt(m_pressPos));
 		if(f != nullptr)
 		{
-			switch(f->type())
+			switch (f->type())
 			{
 				case FileItem::FileType::InstrumentPreset:
 					new StringPairDrag(f->handling() == FileItem::FileHandling::LoadAsInstrumentPreset ?
@@ -938,7 +938,7 @@ void FileBrowserTreeWidget::mouseReleaseEvent(QMouseEvent * me)
 void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it)
 {
 	Engine::audioEngine()->requestChangeInModel();
-	switch( f->handling() )
+	switch ( f->handling() )
 	{
 		case FileItem::FileHandling::LoadAsProject:
 			if( getGUI()->mainWindow()->mayChangeProject(true) )
@@ -1195,7 +1195,7 @@ void FileItem::initPixmaps()
 	static auto s_midiFilePixmap = embed::getIconPixmap("midi_file", 16, 16);
 	static auto s_unknownFilePixmap = embed::getIconPixmap("unknown_file");
 
-	switch( m_type )
+	switch (m_type)
 	{
 		case FileType::Project:
 			setIcon(0, s_projectFilePixmap);

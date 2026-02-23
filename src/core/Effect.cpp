@@ -58,7 +58,7 @@ Effect::Effect( const Plugin::Descriptor * _desc,
 	connect(&m_enabledModel, &BoolModel::dataChanged, [this] { onEnabledChanged(); });
 }
 
-void Effect::saveSettings( QDomDocument & _doc, QDomElement & _this )
+void Effect::saveSettings(QDomDocument& _doc, QDomElement& _this)
 {
 	m_enabledModel.saveSettings( _doc, _this, "on" );
 	m_wetDryModel.saveSettings( _doc, _this, "wet" );
@@ -69,7 +69,7 @@ void Effect::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 
 
-void Effect::loadSettings( const QDomElement & _this )
+void Effect::loadSettings(const QDomElement& _this)
 {
 	m_enabledModel.loadSettings( _this, "on" );
 	m_wetDryModel.loadSettings( _this, "wet" );
@@ -120,13 +120,13 @@ bool Effect::processAudioBuffer(SampleFrame* buf, const fpp_t frames)
 
 
 
-Effect * Effect::instantiate( const QString& pluginName,
-				Model * _parent,
-				Descriptor::SubPluginFeatures::Key * _key )
+Effect * Effect::instantiate(const QString& pluginName,
+				Model* _parent,
+				Descriptor::SubPluginFeatures::Key* _key )
 {
-	Plugin * p = Plugin::instantiateWithKey( pluginName, _parent, _key );
+	Plugin* p = Plugin::instantiateWithKey( pluginName, _parent, _key );
 	// check whether instantiated plugin is an effect
-	if( dynamic_cast<Effect *>( p ) != nullptr )
+	if( dynamic_cast<Effect*>( p ) != nullptr )
 	{
 		// everything ok, so return pointer
 		auto effect = dynamic_cast<Effect*>(p);
@@ -142,12 +142,12 @@ Effect * Effect::instantiate( const QString& pluginName,
 
 
 
-Effect * Effect::createFromPreset(const QString& filePath, Model * parent)
+Effect* Effect::createFromPreset(const QString& filePath, Model * parent)
 {
 	DataFile dataFile(filePath);
 
 	const QDomElement content = dataFile.content();
-	if (content.isNull()) {	return nullptr;	}
+	if (content.isNull()) { return nullptr; }
 
 	const QString displayName = content.attribute("displayname");
 	const QString pluginName = content.attribute("pluginname");
@@ -158,7 +158,7 @@ Effect * Effect::createFromPreset(const QString& filePath, Model * parent)
 
 	EffectKey key(keyElement);
 
-	Effect *fx = Effect::instantiate(pluginName, parent, &key);
+	Effect* fx = Effect::instantiate(pluginName, parent, &key);
 	if (!fx) { return nullptr; }
 
 	fx->loadSettings(content);
