@@ -551,40 +551,46 @@ void AutomationClip::applyDragValue()
 
 
 
-float AutomationClip::valueAt( const TimePos & _time ) const
+float AutomationClip::valueAt(const TimePos& _time, bool wantInValue /*= false*/) const
 {
 	QMutexLocker m(&m_clipMutex);
 
-	if( m_timeMap.isEmpty() )
+	if (m_timeMap.isEmpty())
 	{
 		return 0;
+	}
+
+	const auto v = m_timeMap.lowerBound(_time);
+	if (v == m_timeMap.end())
+	{
+		// When the time is after the last node, we want the outValue of it
+		return std::prev(v)->getOutValue();
 	}
 
 	// If we have a node at that time, just return its value
-	if (m_timeMap.contains(_time))
+	if (v.key() == _time)
 	{
-		// When the time is exactly the node's time, we want the inValue
-		return m_timeMap[_time].getInValue();
+		// When the time is exactly the node's time, we want the outValue
+		// to ensure that discrete jumps are handled correctly while playing.
+		// UI functions may want the inValue instead.
+		if (wantInValue)
+		{
+			return v->getInValue();
+		}
+		else
+		{
+			return v->getOutValue();
+		}
 	}
 
-	// lowerBound returns next value with equal or greater key. Since we already
-	// checked if the key contains a node, we know the returned node has a greater
-	// key than _time. Therefore we take the previous element to calculate the current value
-	timeMap::const_iterator v = m_timeMap.lowerBound(_time);
-
-	if( v == m_timeMap.begin() )
+	if (v == m_timeMap.begin())
 	{
 		return 0;
 	}
 
+	// The returned node has a greater key than _time. Therefore we take the
+	// previous element to calculate the current value.
 	const auto pv = std::prev(v);
-
-	if( v == m_timeMap.end() )
-	{
-		// When the time is after the last node, we want the outValue of it
-		return OUTVAL(pv);
-	}
-
 	return valueAt(pv, _time - POS(pv));
 }
 
@@ -593,7 +599,7 @@ float AutomationClip::valueAt( const TimePos & _time ) const
 
 // This method will get the value at an offset from a node, so we use the outValue of
 // that node and the inValue of the next node for the calculations.
-float AutomationClip::valueAt( timeMap::const_iterator v, int offset ) const
+float AutomationClip::valueAt(timeMap::const_iterator v, int offset) const
 {
 	QMutexLocker m(&m_clipMutex);
 
