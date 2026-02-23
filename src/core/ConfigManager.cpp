@@ -778,7 +778,6 @@ void ConfigManager::initDevelopmentWorkingDir()
 
 		cmakeCache.close();
 	}
-  return initInstalledWorkingDir();
 }
 
 // If configversion is not present, we will convert the LMMS version to the appropriate
