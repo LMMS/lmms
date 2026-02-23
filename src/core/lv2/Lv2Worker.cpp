@@ -177,8 +177,8 @@ LV2_Worker_Status Lv2Worker::scheduleWork(uint32_t size, const void *data)
 		else
 		{
 			// Schedule a request to be executed by the worker thread
-			m_requests.push((const char*)&size, sizeof(size));
-			if(size && data) { m_requests.push((const char*)data, size); }
+			m_requests.push(reinterpret_cast<const char*>(&size), sizeof(size));
+			if(size && data) { m_requests.push(reinterpret_cast<const char*>(data), size); }
 			m_sem.post();
 		}
 	}
