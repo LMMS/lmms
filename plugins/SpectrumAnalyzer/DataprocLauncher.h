@@ -27,7 +27,7 @@
 
 #include <QThread>
 
-#include "CircularBuffer.h"
+#include "LockfreeSpscQueue.h"
 #include "SaProcessor.h"
 
 namespace lmms

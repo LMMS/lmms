@@ -26,7 +26,7 @@
 
 #include <QWidget>
 
-#include "CircularBuffer.h"
+#include "LockfreeSpscQueue.h"
 
 namespace lmms
 {

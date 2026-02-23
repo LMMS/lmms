@@ -32,7 +32,7 @@
 #include <QMutex>
 #include <QRgb>
 #include <vector>
-#include "CircularBuffer.h"
+#include "LockfreeSpscQueue.h"
 
 
 

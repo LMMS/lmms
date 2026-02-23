@@ -103,14 +103,8 @@ void SaProcessor::analyze(LockfreeSpscQueue<SampleFrame> &ring_buffer)
 	while (!m_terminate)
 	{
 		// If there is nothing to read, wait for notification from the writing side.
-		const auto in_buffer = ring_buffer.reserveReadRegion(ring_buffer.capacity() / 4);
+		const auto in_buffer = ring_buffer.reserveContiguousReadSpace(1, ring_buffer.capacity() / 4);
 		const auto frame_count = in_buffer.size();
-
-		if (in_buffer.empty())
-		{
-			ring_buffer.waitForData();
-			continue;
-		}
 
 		// skip waterfall render if processing can't keep up with input
 		const auto overload = in_buffer.size() < ring_buffer.capacity() / 2;
@@ -316,8 +310,8 @@ void SaProcessor::analyze(LockfreeSpscQueue<SampleFrame> &ring_buffer)
 					if (total_time / 1000000.0 > m_max_execution) {m_max_execution = total_time / 1000000.0;}
 				#endif
 			}	// frame filler and processing
-
 		}	// process if active
+		ring_buffer.commitRead(in_buffer.size());
 	}	// thread loop end
 }
 

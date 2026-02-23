@@ -33,7 +33,7 @@
 
 #include "AudioDevice.h"
 #include "AudioEngineProfiler.h"
-#include "CircularBuffer.h"
+#include "LockfreeSpscQueue.h"
 #include "FifoBuffer.h"
 #include "LmmsTypes.h"
 #include "PlayHandle.h"
