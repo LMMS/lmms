@@ -1097,6 +1097,7 @@ void PianoRoll::drawDetuningInfo( QPainter & _p, const Note * _n, int _x,
 	// as straight lines for now. Also draw discrete jumps.
 	int old_x = 0;
 	int old_y = 0;
+	int old_ticks = 0;
 
 	timeMap & map = _n->detuning()->automationClip()->getTimeMap();
 	for (timeMap::const_iterator it = map.begin(); it != map.end(); ++it)
@@ -1126,8 +1127,9 @@ void PianoRoll::drawDetuningInfo( QPainter & _p, const Note * _n, int _x,
 			const float pre_level = OUTVAL(pit);
 			int pre_y = middle_y - pre_level * m_keyLineHeight;
 
-			// Draws the line representing the discrete jump if there's one
-			if (old_y != pre_y)
+			// Draws the line representing the discrete jump if there's one.
+			// Displaying this line in CubicHermite mode would add clutter, so we'll stop that, except when editing mode is active and on that note.
+			if ((old_y != pre_y) && (_n->detuning()->automationClip()->progressionType() != AutomationClip::ProgressionType::CubicHermite || (m_editMode == EditMode::Detuning && _n->selected())))
 			{
 				_p.drawLine(old_x, old_y, old_x, pre_y);
 			}
@@ -1140,7 +1142,20 @@ void PianoRoll::drawDetuningInfo( QPainter & _p, const Note * _n, int _x,
 					_p.drawLine(old_x, pre_y, cur_x, pre_y);
 					_p.drawLine(cur_x, pre_y, cur_x, cur_y);
 					break;
-				case AutomationClip::ProgressionType::CubicHermite: /* TODO */
+				case AutomationClip::ProgressionType::CubicHermite: /* TODO: Make this more performant.*/
+				{
+					int cubiccurve_pre_x = old_x;
+					int cubiccurve_pre_y = old_y;
+					for (int cubiccurve_counter = old_ticks; cubiccurve_counter <= cur_ticks; cubiccurve_counter++)
+					{
+						int cubiccurve_cur_x = _x + cubiccurve_counter * m_ppb / TimePos::ticksPerBar();
+						int cubiccurve_cur_y = middle_y - _n->detuning()->automationClip()->valueAt(cubiccurve_counter) * m_keyLineHeight;
+						_p.drawLine(cubiccurve_pre_x, cubiccurve_pre_y, cubiccurve_cur_x, cubiccurve_cur_y);
+						cubiccurve_pre_x = cubiccurve_cur_x;
+						cubiccurve_pre_y = cubiccurve_cur_y;
+					}
+					break;
+				}
 				case AutomationClip::ProgressionType::Linear:
 					_p.drawLine(old_x, pre_y, cur_x, cur_y);
 					break;
@@ -1155,12 +1170,22 @@ void PianoRoll::drawDetuningInfo( QPainter & _p, const Note * _n, int _x,
 				{
 					int last_y = middle_y - last_level * m_keyLineHeight;
 					_p.drawLine(cur_x, cur_y, cur_x, last_y);
+					// Draw a little hook to signal end of automation.
+					_p.drawLine(cur_x, last_y - 1, cur_x + 5 * m_ppb / TimePos::ticksPerBar(), last_y - 1);
+					_p.drawLine(cur_x, last_y + 1, cur_x + 5 * m_ppb / TimePos::ticksPerBar(), last_y + 1);
+				}
+				else
+				{
+					// Draw a little hook to signal end of automation.
+					_p.drawLine(cur_x, cur_y - 1, cur_x + 5 * m_ppb / TimePos::ticksPerBar(), cur_y - 1);
+					_p.drawLine(cur_x, cur_y + 1, cur_x + 5 * m_ppb / TimePos::ticksPerBar(), cur_y + 1);
 				}
 			}
 		}
 
 		old_x = cur_x;
 		old_y = cur_y;
+		old_ticks = cur_ticks;
 	}
 
 	if (m_editMode == EditMode::Detuning && _n->selected())
@@ -1170,7 +1195,19 @@ void PianoRoll::drawDetuningInfo( QPainter & _p, const Note * _n, int _x,
 			int curTicks = POS(it);
 			int curX = _x + curTicks * m_ppb / TimePos::ticksPerBar();
 			const float curLevel = INVAL(it);
+			const float outLevel = OUTVAL(it);
 			int curY = middle_y - curLevel * m_keyLineHeight;
+			int outY = middle_y - outLevel * m_keyLineHeight;
+
+			if (curLevel != outLevel)
+			{
+				_p.drawEllipse(
+					curX - DETUNING_HANDLE_RADIUS / 2,
+					outY - DETUNING_HANDLE_RADIUS / 2,
+					2 * DETUNING_HANDLE_RADIUS / 2,
+					2 * DETUNING_HANDLE_RADIUS / 2);
+			}
+
 			_p.drawEllipse(
 				curX - DETUNING_HANDLE_RADIUS,
 				curY - DETUNING_HANDLE_RADIUS,
