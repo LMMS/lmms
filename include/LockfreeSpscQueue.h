@@ -66,9 +66,14 @@ public:
 
 	void push(const T* values, size_t size)
 	{
-		auto region = reserveContiguousWriteSpace(size, size);
-		std::copy_n(values, size, region.data());
-		commitWrite(size);
+		while (size > 0)
+		{
+			auto region = reserveContiguousWriteSpace(1, size);
+			std::copy_n(values, region.size(), region.data());
+			commitWrite(region.size());
+			values += region.size();
+			size -= region.size();
+		}
 	}
 
 	auto tryPush(T value) -> bool { return tryPush(&value, 1); }
@@ -91,9 +96,14 @@ public:
 
 	void pop(T* values, size_t size)
 	{
-		auto region = reserveContiguousReadSpace(size, size);
-		std::copy_n(region.data(), size, values);
-		commitRead(size);
+		while (size > 0)
+		{
+			auto region = reserveContiguousReadSpace(1, size);
+			std::copy_n(region.data(), region.size(), values);
+			commitRead(region.size());
+			values += region.size();
+			size -= region.size();
+		}
 	}
 
 	auto tryPop() -> std::optional<T>
@@ -156,7 +166,9 @@ public:
 	void commitWrite(size_t count)
 	{
 		const auto index = m_writeIndex.load(std::memory_order_relaxed);
-		m_writeIndex.store((index + count) % m_buffer.size());
+		const auto value = std::has_single_bit(m_buffer.size()) ? (index + count) & (m_buffer.size() - 1)
+																: (index + count) % m_buffer.size();
+		m_writeIndex.store(value, std::memory_order_release);
 
 		m_dataAvailableFlag.test_and_set(std::memory_order_relaxed);
 		m_dataAvailableFlag.notify_all();
@@ -165,7 +177,9 @@ public:
 	void commitRead(size_t count)
 	{
 		const auto index = m_readIndex.load(std::memory_order_relaxed);
-		m_readIndex.store((index + count) % m_buffer.size());
+		const auto value = std::has_single_bit(m_buffer.size()) ? (index + count) & (m_buffer.size() - 1)
+																: (index + count) % m_buffer.size();
+		m_readIndex.store(value, std::memory_order_release);
 
 		m_spaceAvailableFlag.test_and_set(std::memory_order_relaxed);
 		m_spaceAvailableFlag.notify_all();
@@ -180,21 +194,23 @@ public:
 		m_spaceAvailableFlag.notify_all();
 	}
 
-	auto empty() const -> bool
-	{
-		const auto readIndex = m_readIndex.load(std::memory_order_relaxed);
-		const auto writeIndex = m_writeIndex.load(std::memory_order_acquire);
-		return readIndex == writeIndex;
-	}
-
-	auto full() const -> bool
+	auto peek() const -> const T&
 	{
 		const auto readIndex = m_readIndex.load(std::memory_order_acquire);
-		const auto writeIndex = m_writeIndex.load(std::memory_order_relaxed);
-		return (writeIndex + 1) % m_buffer.size() == readIndex;
+		return m_buffer[readIndex];
 	}
 
-	auto capacity() -> size_t { return m_buffer.size(); }
+	auto size() const -> size_t
+	{
+		const auto readIndex = m_readIndex.load(std::memory_order_relaxed);
+		const auto writeIndex = m_writeIndex.load(std::memory_order_relaxed);
+		return (writeIndex + m_buffer.size() - readIndex) % m_buffer.size();
+	}
+
+	auto empty() const -> bool { return size() == 0; }
+	auto full() const -> bool { return size() == capacity(); }
+	auto free() const -> size_t { return capacity() - size(); }
+	auto capacity() const -> size_t { return m_buffer.size() - 1; }
 
 private:
 	std::conditional_t<N == DynamicSize, std::vector<T>, std::array<T, N>> m_buffer;
