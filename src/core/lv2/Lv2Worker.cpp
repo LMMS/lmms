@@ -121,8 +121,8 @@ LV2_Worker_Status Lv2Worker::respond(uint32_t size, const void* data)
 		}
 		else
 		{
-			m_responses.tryPush(reinterpret_cast<const char*>(&size), sizeof(size));
-			if(size && data) { m_responses.tryPush(reinterpret_cast<const char*>(data), size); }
+			m_responses.push(reinterpret_cast<const char*>(&size), sizeof(size));
+			if(size && data) { m_responses.push(reinterpret_cast<const char*>(data), size); }
 		}
 	}
 	else
@@ -149,10 +149,10 @@ void Lv2Worker::workerFunc()
 		const std::size_t readSpace = m_responses.size();
 		if (readSpace <= sizeof(size)) { continue; } // (should not happen)
 
-		m_requests.tryPop(reinterpret_cast<char*>(&size), sizeof(size));
+		m_requests.pop(reinterpret_cast<char*>(&size), sizeof(size));
 		assert(size <= readSpace - sizeof(size));
 		if(size > buf.size()) { buf.resize(size); }
-		if(size) { m_requests.tryPop(buf.data(), size); }
+		if(size) { m_requests.pop(buf.data(), size); }
 
 		assert(m_handle);
 		assert(m_interface);
@@ -177,8 +177,8 @@ LV2_Worker_Status Lv2Worker::scheduleWork(uint32_t size, const void *data)
 		else
 		{
 			// Schedule a request to be executed by the worker thread
-			m_requests.tryPush((const char*)&size, sizeof(size));
-			if(size && data) { m_requests.tryPush((const char*)data, size); }
+			m_requests.push((const char*)&size, sizeof(size));
+			if(size && data) { m_requests.push((const char*)data, size); }
 			m_sem.post();
 		}
 	}
@@ -207,8 +207,8 @@ void Lv2Worker::emitResponses()
 	{
 		assert(m_handle);
 		assert(m_interface);
-		m_requests.tryPop(reinterpret_cast<char*>(&size), sizeof(size));
-		if(size) { m_responses.tryPop(m_response.data(), size); }
+		m_requests.pop(reinterpret_cast<char*>(&size), sizeof(size));
+		if(size) { m_responses.pop(m_response.data(), size); }
 		m_interface->work_response(m_handle, size, m_response.data());
 		read_space -= sizeof(size) + size;
 	}

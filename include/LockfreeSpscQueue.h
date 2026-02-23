@@ -62,9 +62,35 @@ public:
 		if (!m_shutdownFlag.test(std::memory_order_relaxed)) { shutdown(); }
 	}
 
-	void push(T value) { push(&value, 1); }
+	auto push(T value) -> bool { return push(&value, 1); }
 
-	void push(const T* values, size_t size)
+	auto push(const T* values, size_t size) -> bool
+	{
+		auto region = reserveContiguousWriteSpace(0, size);
+		if (region.size() < size) { return false; }
+		std::copy_n(values, region.size(), region.data());
+		commitWrite(region.size());
+		return true;
+	}
+
+	auto pop() -> std::optional<T>
+	{
+		auto value = T{};
+		return pop(&value, 1) == 0 ? std::nullopt : std::optional<T>{value};
+	}
+
+	auto pop(T* values, size_t size) -> bool
+	{
+		auto region = reserveContiguousReadSpace(0, size);
+		if (region.size() != size) { return false; }
+		std::copy_n(region.data(), region.size(), values);
+		commitRead(region.size());
+		return true;
+	}
+
+	void pushBlocking(T value) { pushBlocking(&value, 1); }
+
+	void pushBlocking(const T* values, size_t size)
 	{
 		while (size > 0)
 		{
@@ -76,25 +102,14 @@ public:
 		}
 	}
 
-	auto tryPush(T value) -> bool { return tryPush(&value, 1); }
-
-	auto tryPush(const T* values, size_t size) -> bool
-	{
-		auto region = reserveContiguousWriteSpace(0, size);
-		if (region.size() < size) { return false; }
-		std::copy_n(values, region.size(), region.data());
-		commitWrite(region.size());
-		return true;
-	}
-
-	auto pop() -> T
+	auto popBlocking() -> T
 	{
 		auto value = T{};
-		pop(&value, 1);
+		popBlocking(&value, 1);
 		return value;
 	}
 
-	void pop(T* values, size_t size)
+	void popBlocking(T* values, size_t size)
 	{
 		while (size > 0)
 		{
@@ -104,21 +119,6 @@ public:
 			values += region.size();
 			size -= region.size();
 		}
-	}
-
-	auto tryPop() -> std::optional<T>
-	{
-		auto value = T{};
-		return tryPop(&value, 1) == 0 ? std::nullopt : std::optional<T>{value};
-	}
-
-	auto tryPop(T* values, size_t size) -> bool
-	{
-		auto region = reserveContiguousReadSpace(0, size);
-		if (region.size() != size) { return false; }
-		std::copy_n(region.data(), region.size(), values);
-		commitRead(region.size());
-		return true;
 	}
 
 	auto reserveContiguousWriteSpace(size_t min = 0, size_t max = static_cast<size_t>(-1)) -> std::span<T>
