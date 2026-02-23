@@ -291,38 +291,32 @@ void MainWindow::finalize()
 	static auto* adNewProject = ActionData::get("project_new", ActionTrigger::pressed(Qt::ControlModifier, Qt::Key_N));
 	menuAddAction(project_menu, "project_new", tr("&New"), adNewProject, &MainWindow::createNewProject);
 
-	static auto testActionData = ActionData::get("test", ActionTrigger::held(Qt::ControlModifier, Qt::Key_J));
-	auto testAction = new GuiAction(this, testActionData);
+	static auto* adTest = ActionData::get("random_test", ActionTrigger::held(Qt::ControlModifier, Qt::Key_J));
+	auto testAction = new GuiAction(this, adTest);
 	connect(testAction, &GuiAction::activated, this, [this] { qDebug() << "ON"; });
 	connect(testAction, &GuiAction::deactivated, this, [this] {
 		qDebug() << "OFF";
 		adNewProject->setTrigger(ActionTrigger::pressed(Qt::ControlModifier, Qt::Key_H));
 	});
 
-	// static auto testActionData = ActionData::get("test", ActionTrigger::held(Qt::ControlModifier, Qt::Key_J));
-	// auto testAction = new GuiAction(this, testActionData);
-	// connect(testAction, &GuiAction::activated, this, [this] { qDebug() << "ON"; });
-	// connect(testAction, &GuiAction::deactivated, this, [this] {
-	// 	qDebug() << "OFF";
-	// 	testActionData->setTrigger(ActionTrigger::pressed(Qt::AltModifier, Qt::Key_H));
-	// });
-
-	static auto lkData = ActionData::get("listKeybindings", ActionTrigger::pressed(Qt::ControlModifier, Qt::Key_K));
+	static auto* lkData = ActionData::get("keybindings_list", ActionTrigger::pressed(Qt::ControlModifier, Qt::Key_K));
 	auto lkAction = new GuiAction(this, lkData);
 	connect(lkAction, &GuiAction::activated, this, [this] {
 		auto s = QString{};
+		s += "Keybindings:\n";
 
-		for (auto it = ActionContainer::mappingsBegin(); it != ActionContainer::mappingsEnd(); it++)
+		for (auto it = ActionContainer::mappingsBegin(); it != ActionContainer::mappingsEnd(); ++it)
 		{
-			const auto name = (*it).first;
-			s += name;
-			s += "\n";
+			s += QString{"- %0\n"}.arg(it->first);
 		}
 
 		auto* d = new QDialog(this);
+		d->resize(500, 500);
+
 		auto* l = new QLabel(d);
 		l->setTextFormat(Qt::PlainText);
 		l->setText(s);
+
 		d->exec();
 	});
 
