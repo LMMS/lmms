@@ -35,11 +35,9 @@
 
 namespace lmms {
 
-namespace {
-constexpr auto DynamicSize = static_cast<size_t>(-1);
-}
+inline constexpr auto DynamicSpscQueueSize = static_cast<size_t>(-1);
 
-template <typename T, size_t N = DynamicSize> class LockfreeSpscQueue
+template <typename T, size_t N = DynamicSpscQueueSize> class LockfreeSpscQueue
 {
 public:
 	LockfreeSpscQueue(const LockfreeSpscQueue&) = delete;
@@ -48,11 +46,11 @@ public:
 	LockfreeSpscQueue& operator=(LockfreeSpscQueue&&) = delete;
 
 	LockfreeSpscQueue()
-		requires(N != DynamicSize)
+		requires(N != DynamicSpscQueueSize)
 	= default;
 
 	LockfreeSpscQueue(size_t size)
-		requires(N == DynamicSize)
+		requires(N == DynamicSpscQueueSize)
 		: m_buffer(size)
 	{
 	}
@@ -213,7 +211,7 @@ public:
 	auto capacity() const -> size_t { return m_buffer.size() - 1; }
 
 private:
-	std::conditional_t<N == DynamicSize, std::vector<T>, std::array<T, N>> m_buffer;
+	std::conditional_t<N == DynamicSpscQueueSize, std::vector<T>, std::array<T, N>> m_buffer;
 	alignas(std::hardware_destructive_interference_size) std::atomic_size_t m_readIndex;
 	alignas(std::hardware_destructive_interference_size) std::atomic_size_t m_writeIndex;
 	alignas(std::hardware_destructive_interference_size) std::atomic_flag m_dataAvailableFlag;
