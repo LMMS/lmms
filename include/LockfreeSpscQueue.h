@@ -32,6 +32,7 @@
 #include <optional>
 #include <span>
 #include <vector>
+#include <bit>
 
 namespace lmms {
 
