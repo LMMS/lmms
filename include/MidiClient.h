@@ -81,6 +81,26 @@ public:
 		return QStringList();
 	}
 
+	virtual QStringList friendlyReadablePorts() const
+	{
+		return QStringList();
+	}
+	virtual QStringList friendlyWritablePorts() const
+	{
+		return QStringList();
+	}
+
+	virtual QString toFriendly(const QString& port) const
+	{
+		return port;
+	}
+
+	virtual QString fromFriendly(const QString& friendlyPort) const
+	{
+		return friendlyPort;
+	}
+
+
 	// return name of port which specified MIDI event came from
 	virtual QString sourcePortName( const MidiEvent & ) const
 	{
