@@ -216,6 +216,7 @@ private:
 	public:
 		MovableQMdiArea(QWidget* parent, MainWindow* mainWindow, QScrollBar* scrollBarV, QScrollBar* scrollBarH);
 		~MovableQMdiArea() {}
+		bool universalPanClick; //!< Whether clicking is needed to initiate universal panning
 
 	protected:
 		void mousePressEvent(QMouseEvent* event) override;

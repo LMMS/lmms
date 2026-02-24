@@ -170,6 +170,8 @@ MainWindow::MainWindow() :
 	workspaceVSplitter->insertWidget(-1, m_workspaceScrollBarH);
 	workspaceVSplitter->handle(workspaceVSplitter->indexOf(m_workspaceScrollBarH))->hide();
 
+	m_workspace->universalPanClick = confMgr->value("ui", "universal_pan_click", "0").toInt();
+
 	// Load background
 	emit initProgress(tr("Loading background picture"));
 	QString backgroundPicFile = ConfigManager::inst()->backgroundPicFile();
@@ -494,6 +496,7 @@ void MainWindow::finalize()
 		// no, so show it that user can setup everything
 		SetupDialog sd;
 		sd.exec();
+		m_workspace->universalPanClick = ConfigManager::inst()->value("ui", "universal_pan_click", "0").toInt();
 	}
 	// look whether the audio engine failed to start the audio device selected by the
 	// user and is using AudioDummy as a fallback
@@ -504,6 +507,7 @@ void MainWindow::finalize()
 		// if so, offer the audio settings section of the setup dialog
 		SetupDialog sd( SetupDialog::ConfigTab::AudioSettings );
 		sd.exec();
+		m_workspace->universalPanClick = ConfigManager::inst()->value("ui", "universal_pan_click", "0").toInt();
 	}
 
 	// Add editor subwindows
@@ -907,6 +911,7 @@ void MainWindow::showSettingsDialog()
 {
 	SetupDialog sd;
 	sd.exec();
+	m_workspace->universalPanClick = ConfigManager::inst()->value("ui", "universal_pan_click", "0").toInt();
 }
 
 
@@ -1647,6 +1652,7 @@ void MainWindow::WorkspaceScrollBar::wheelEvent(QWheelEvent *event)
 MainWindow::MovableQMdiArea::MovableQMdiArea(QWidget* parent, MainWindow* mainWindow, QScrollBar* scrollBarV,
 	QScrollBar* scrollBarH)
 	: QMdiArea(parent)
+	, universalPanClick{false}
 	, m_isPanning{false}
 	, m_isUniversalPan{false}
 	, m_canUniversalPan{false}
@@ -1926,7 +1932,6 @@ bool MainWindow::MovableQMdiArea::eventFilter(QObject* watched, QEvent* event)
 
 	constexpr auto UniversalPanKey = Qt::Key_S;
 	constexpr auto UniversalPanMod = Qt::AltModifier;
-	constexpr auto UniversalPanClick = false; //!< Whether clicking is needed to initiate universal panning
 
 	const auto triggerCond = [&]() -> bool { return !hasActiveMaxWindow() && underMouse(); };
 
@@ -1936,7 +1941,7 @@ bool MainWindow::MovableQMdiArea::eventFilter(QObject* watched, QEvent* event)
 		// the mouse is over the MDI area (or its children).
 		auto* ke = static_cast<QKeyEvent*>(event);
 
-		if (!UniversalPanClick && !m_isPanning && ke->modifiers() == UniversalPanMod && ke->key() == UniversalPanKey
+		if (!universalPanClick && !m_isPanning && ke->modifiers() == UniversalPanMod && ke->key() == UniversalPanKey
 			&& triggerCond())
 		{
 			// Start panning right away
@@ -1945,7 +1950,7 @@ bool MainWindow::MovableQMdiArea::eventFilter(QObject* watched, QEvent* event)
 			mousePanStart();
 			return true;
 		}
-		else if (UniversalPanClick && !m_isPanning && ke->modifiers() == UniversalPanMod && ke->key() == UniversalPanKey)
+		else if (universalPanClick && !m_isPanning && ke->modifiers() == UniversalPanMod && ke->key() == UniversalPanKey)
 		{
 			// Register that panning may be initiated
 			m_canUniversalPan = true;
@@ -1972,7 +1977,7 @@ bool MainWindow::MovableQMdiArea::eventFilter(QObject* watched, QEvent* event)
 	{
 		auto* me = static_cast<QMouseEvent*>(event);
 
-		if (UniversalPanClick && me->button() == Qt::LeftButton && m_canUniversalPan && triggerCond())
+		if (universalPanClick && me->button() == Qt::LeftButton && m_canUniversalPan && triggerCond())
 		{
 			m_isUniversalPan = true;
 			const auto pos = me->globalPos();
@@ -2004,7 +2009,7 @@ bool MainWindow::MovableQMdiArea::eventFilter(QObject* watched, QEvent* event)
 	if (event->type() == QEvent::MouseButtonRelease)
 	{
 		auto* me = static_cast<QMouseEvent*>(event);
-		if (UniversalPanClick && m_isUniversalPan && me->button() == Qt::LeftButton)
+		if (universalPanClick && m_isUniversalPan && me->button() == Qt::LeftButton)
 		{
 			m_canUniversalPan = false;
 			mousePanEnd();
