@@ -82,10 +82,12 @@ protected:
 	Lb302FilterKnobState *fs;
 
 	// Filter Decay
-	float vcf_c0 = 0.f; //!< @ref vcf_c0 = @ref vcf_e1 on retrigger; @ref vcf_c0 *=ed every sample; cutoff = @ref vcf_e0 + @ref vcf_c0
-	float vcf_e0 = 0.f; //!< @ref vcf_e0 and @ref vcf_e1 for interpolation
-	float vcf_e1 = 0.f;
-	float vcf_rescoeff; //!< %Resonance coefficient [0.30, 9.54]
+	struct
+	{
+		float c0 = 0.f; //!< @ref c0 = @ref e[1] on retrigger; @ref c0 *=ed every sample; cutoff = @ref e[0] + @ref c0
+		std::array<float, 2> e = {0.f, 0.f}; //!< Two values for interpolation
+		float resCoeff; //!< %Resonance coefficient [0.30, 9.54]
+	} m_vcf;
 };
 
 
@@ -99,16 +101,18 @@ public:
 	sample_t process(sample_t samp) override;
 
 protected:
-	// d1 and d2 are added back into the sample with vcf_a and b as
-	// coefficients. IIR2 resonance loop.
-	float vcf_d1 = 0.f;
-	float vcf_d2 = 0.f;
+	struct
+	{
+		//! @brief IIR2 resonance loop.
+		//! @ref d[0] and @ref d[1] are added back into the sample with @ref a
+		//! and @ref b as coefficients.
+		std::array<float, 2> d = {0.f, 0.f};
 
-	// IIR2 Coefficients for mixing dry and delay.
-	// Mixing coefficients for the final sound.
-	float vcf_a = 0.f;
-	float vcf_b = 0.f;
-	float vcf_c = 1.f;
+		// IIR2 Coefficients for mixing dry and delay. Mixing coefficients for the final sound.
+		float a = 0.f;
+		float b = 0.f;
+		float c = 1.f;
+	} m_iir2;
 
 	std::unique_ptr<DspEffectLibrary::Distortion> m_dist;
 };
@@ -156,8 +160,7 @@ public:
 public slots:
 	void filterChanged();
 
-	//! @brief Adjusts `fs.envdecay` for both sampling rate and @ref s_envInc
-	//! @see fs
+	//! @brief Adjusts @ref fs 's @ref Lb302FilterKnobState::envdecay for both sampling rate and @ref s_envInc
 	void decayChanged();
 
 	void db24Toggled();

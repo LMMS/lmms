@@ -91,25 +91,25 @@ PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* m, void*)
 
 void Lb302Filter::recalc()
 {
-	vcf_e1 = std::exp(6.109f + 1.5876f * fs->envmod + 2.1553f * fs->cutoff - 1.2f * (1.0f - fs->reso));
-	vcf_e0 = std::exp(5.613f - 0.8f * fs->envmod + 2.1553f * fs->cutoff - 0.7696f * (1.0f - fs->reso));
+	m_vcf.e[1] = std::exp(6.109f + 1.5876f * fs->envmod + 2.1553f * fs->cutoff - 1.2f * (1.0f - fs->reso));
+	m_vcf.e[0] = std::exp(5.613f - 0.8f * fs->envmod + 2.1553f * fs->cutoff - 0.7696f * (1.0f - fs->reso));
 	const float pi_sr = std::numbers::pi_v<float> / Engine::audioEngine()->outputSampleRate();
-	vcf_e0 *= pi_sr;
-	vcf_e1 *= pi_sr;
-	vcf_e1 -= vcf_e0;
+	m_vcf.e[0] *= pi_sr;
+	m_vcf.e[1] *= pi_sr;
+	m_vcf.e[1] -= m_vcf.e[0];
 
-	vcf_rescoeff = std::exp(-1.20f + 3.455f * fs->reso);
+	m_vcf.resCoeff = std::exp(-1.20f + 3.455f * fs->reso);
 };
 
 
 void Lb302Filter::envRecalc()
 {
-	vcf_c0 *= fs->envdecay; // Filter Decay. fs->envdecay is adjusted for Hz and s_envInc
-	// vcf_rescoeff = std::exp(-1.20f + 3.455f * fs->reso); moved above to Lb302Filter::recalc()
+	m_vcf.c0 *= fs->envdecay; // Filter Decay. fs->envdecay is adjusted for Hz and s_envInc
+	// m_vcf.resCoeff = std::exp(-1.20f + 3.455f * fs->reso); moved above to Lb302Filter::recalc()
 };
 
 
-void Lb302Filter::playNote() { vcf_c0 = vcf_e1; }
+void Lb302Filter::playNote() { m_vcf.c0 = m_vcf.e[1]; }
 
 
 //
@@ -133,21 +133,21 @@ void Lb302FilterIIR2::recalc()
 void Lb302FilterIIR2::envRecalc()
 {
 	Lb302Filter::envRecalc();
-	const float w = vcf_e0 + vcf_c0; // e0 is adjusted for Hz and doesn't need s_envInc
-	const float k = std::exp(-w / vcf_rescoeff); // Does this mean c0 is inheritantly?
+	const float w = m_vcf.e[0] + m_vcf.c0; // e[0] is adjusted for Hz and doesn't need s_envInc
+	const float k = std::exp(-w / m_vcf.resCoeff); // Does this mean c0 is inheritantly?
 
-	vcf_a = 2.f * std::cos(2.f * w) * k;
-	vcf_b = -k * k;
-	vcf_c = 1.f - vcf_a - vcf_b;
+	m_iir2.a = 2.f * std::cos(2.f * w) * k;
+	m_iir2.b = -k * k;
+	m_iir2.c = 1.f - m_iir2.a - m_iir2.b;
 }
 
 
 sample_t Lb302FilterIIR2::process(sample_t samp)
 {
-	sample_t ret = vcf_a * vcf_d1 + vcf_b * vcf_d2 + vcf_c * samp;
+	sample_t ret = m_iir2.a * m_iir2.d[0] + m_iir2.b * m_iir2.d[1] + m_iir2.c * samp;
 	// Delayed samples for filter
-	vcf_d2 = vcf_d1;
-	vcf_d1 = ret;
+	m_iir2.d[1] = m_iir2.d[0];
+	m_iir2.d[0] = ret;
 
 	if (fs->dist > 0.f) { ret = m_dist->nextSample(ret); }
 
@@ -164,8 +164,8 @@ sample_t Lb302FilterIIR2::process(sample_t samp)
 void Lb302Filter3Pole::recalc()
 {
 	// DO NOT CALL BASE CLASS
-	vcf_e0 = 0.000001f;
-	vcf_e1 = 1.f;
+	m_vcf.e[0] = 0.000001f;
+	m_vcf.e[1] = 1.f;
 }
 
 
@@ -175,7 +175,7 @@ void Lb302Filter3Pole::envRecalc()
 	Lb302Filter::envRecalc();
 
 	// e0 is adjusted for Hz and doesn't need s_envInc
-	float w = vcf_e0 + vcf_c0;
+	float w = m_vcf.e[0] + m_vcf.c0;
 	float k = std::min(fs->cutoff, 0.975f);
 	// sampleRateCutoff should not be changed to anything dynamic that is outside the
 	// scope of LB302 (like e.g. the audio engine's sample rate) as this changes the filter's cutoff
@@ -196,7 +196,7 @@ void Lb302Filter3Pole::envRecalc()
 	kp1  = kp + 1.f;
 	kp1h = 0.5f * kp1;
 #ifdef LB_24_RES_TRICK
-	k = std::exp(-w / vcf_rescoeff);
+	k = std::exp(-w / m_vcf.resCoeff);
 	kres = k * (((-2.7079f * kp1 + 10.963f) * kp1 - 14.934f) * kp1 + 8.4974f);
 #else
 	kres = fs->reso * (((-2.7079f * kp1 + 10.963f) * kp1 - 14.934f) * kp1 + 8.4974f);
