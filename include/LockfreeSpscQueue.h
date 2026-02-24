@@ -127,14 +127,14 @@ public:
 		}
 	}
 
-	auto reserveContiguousReadSpace(size_t requested = static_cast<size_t>(-1))
+	auto reserveContiguousReadSpace(size_t requested = static_cast<size_t>(-1)) -> std::span<const T>
 	{
 		const auto region = reserveReadSpace(requested);
 		const auto contiguousRegionSize = std::min(region.first.size(), requested);
 		return region.first.subspan(0, contiguousRegionSize);
 	}
 
-	auto reserveContiguousWriteSpace(size_t requested = static_cast<size_t>(-1))
+	auto reserveContiguousWriteSpace(size_t requested = static_cast<size_t>(-1)) -> std::span<T>
 	{
 		const auto region = reserveWriteSpace(requested);
 		const auto contiguousRegionSize = std::min(region.first.size(), requested);
