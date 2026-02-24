@@ -198,10 +198,10 @@ public:
 
 private:
 	std::conditional_t<N == DynamicSpscQueueSize, std::vector<T>, std::array<T, N>> m_buffer;
-	alignas(std::hardware_destructive_interference_size) std::atomic_size_t m_readIndex;
-	alignas(std::hardware_destructive_interference_size) std::atomic_size_t m_writeIndex;
-	alignas(std::hardware_destructive_interference_size) std::atomic_flag m_dataAvailableFlag;
-	alignas(std::hardware_destructive_interference_size) std::atomic_flag m_shutdownFlag;
+	alignas(64) std::atomic_size_t m_readIndex;
+	alignas(64) std::atomic_size_t m_writeIndex;
+	alignas(64) std::atomic_flag m_dataAvailableFlag;
+	alignas(64) std::atomic_flag m_shutdownFlag;
 };
 
 } // namespace lmms
