@@ -166,7 +166,7 @@ MainWindow::MainWindow() :
 	workspaceVSplitter->setChildrenCollapsible(false);
 	workspaceVSplitter->setStyleSheet(HideHandleStyle);
 
-	m_workspace = new MovableQMdiArea(workspaceVSplitter, this, &m_keyMods, m_workspaceScrollBarV, m_workspaceScrollBarH);
+	m_workspace = new MovableQMdiArea(workspaceVSplitter, this, m_workspaceScrollBarV, m_workspaceScrollBarH);
 	workspaceVSplitter->insertWidget(-1, m_workspaceScrollBarH);
 	workspaceVSplitter->handle(workspaceVSplitter->indexOf(m_workspaceScrollBarH))->hide();
 
@@ -187,7 +187,9 @@ MainWindow::MainWindow() :
 		m_workspace->setBackground( Qt::NoBrush );
 	}
 
-	m_workspace->setOption( QMdiArea::DontMaximizeSubWindowOnActivation );
+	m_workspace->setOption(QMdiArea::DontMaximizeSubWindowOnActivation);
+
+	// Hide built-in scrollbars as we will be using custom ones here (see MainWindow::WorkspaceScrollBar)
 	m_workspace->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	m_workspace->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
@@ -1630,6 +1632,7 @@ MainWindow::WorkspaceScrollBar::WorkspaceScrollBar(Qt::Orientation orientation, 
 {
 	constexpr auto Thickness = 12;
 	setTracking(true);
+	setToolTip(tr("You can also navigate with ") + "Alt-S");
 
 	if (orientation == Qt::Vertical) { setFixedWidth(Thickness); }
 	else if (orientation == Qt::Horizontal) { setFixedHeight(Thickness); }
@@ -1641,11 +1644,10 @@ void MainWindow::WorkspaceScrollBar::wheelEvent(QWheelEvent *event)
 	event->accept();
 }
 
-MainWindow::MovableQMdiArea::MovableQMdiArea(QWidget* parent, MainWindow* mainWindow, keyModifiers* keyMods,
-	QScrollBar* scrollBarV, QScrollBar* scrollBarH)
+MainWindow::MovableQMdiArea::MovableQMdiArea(QWidget* parent, MainWindow* mainWindow, QScrollBar* scrollBarV,
+	QScrollBar* scrollBarH)
 	: QMdiArea(parent)
-	, m_keyMods{keyMods}
-	, m_isBeingMoved{false}
+	, m_isPanning{false}
 	, m_isUniversalPan{false}
 	, m_canUniversalPan{false}
 	, m_lastX{0}
@@ -1721,11 +1723,9 @@ void MainWindow::MovableQMdiArea::updateScrollBars()
 	m_scrollBarLastY = newY;
 }
 
-void MainWindow::MovableQMdiArea::mousePanStart(int globalX, int globalY)
+void MainWindow::MovableQMdiArea::mousePanStart()
 {
-	m_lastX = globalX;
-	m_lastY = globalY;
-	m_isBeingMoved = true;
+	m_isPanning = true;
 	setCursor(Qt::ClosedHandCursor);
 }
 
@@ -1812,7 +1812,7 @@ void MainWindow::MovableQMdiArea::mousePanMove(int globalX, int globalY)
 void MainWindow::MovableQMdiArea::mousePanEnd()
 {
 	setCursor(Qt::ArrowCursor);
-	m_isBeingMoved = false;
+	m_isPanning = false;
 	m_isUniversalPan = false;
 }
 
@@ -1820,12 +1820,14 @@ void MainWindow::MovableQMdiArea::mousePressEvent(QMouseEvent* event)
 {
 	const auto pos = event->globalPos();
 	m_isUniversalPan = false;
-	mousePanStart(pos.x(), pos.y());
+	m_lastX = pos.x();
+	m_lastY = pos.y();
+	mousePanStart();
 }
 
 void MainWindow::MovableQMdiArea::mouseMoveEvent(QMouseEvent* event)
 {
-	if (!m_isBeingMoved || m_isUniversalPan) { return; }
+	if (!m_isPanning || m_isUniversalPan) { return; }
 
 	const auto pos = event->globalPos();
 	mousePanMove(pos.x(), pos.y());
@@ -1833,7 +1835,7 @@ void MainWindow::MovableQMdiArea::mouseMoveEvent(QMouseEvent* event)
 
 void MainWindow::MovableQMdiArea::mouseReleaseEvent(QMouseEvent* event)
 {
-	if (!m_isBeingMoved || m_isUniversalPan) { return; }
+	if (!m_isPanning || m_isUniversalPan) { return; }
 	mousePanEnd();
 }
 
@@ -1915,74 +1917,108 @@ bool MainWindow::MovableQMdiArea::eventFilter(QObject* watched, QEvent* event)
 		return QObject::eventFilter(watched, event);
 	}
 
-	// Down here, the event filter attempts to steal mouse and keyboard events related to workspace panning without
-	// needing to click over a region without any widgets.
+	// Down here, the event filter attempts to steal mouse and keyboard events from the main window that are related to
+	// workspace panning without needing to click over a region without any widgets.
 	//
-	// When the universal pan is initiated, mouse and keyboard events within the workspace will not be passed to the
-	// widgets. Doing this allows panning without accidentally clicking on something, and also prevents MIDI keys being
-	// triggered when starting the pan.
+	// When it is initiated, mouse and keyboard events within the workspace will not be passed to the widgets. Doing
+	// this allows panning without accidentally clicking on something, and also prevents MIDI keys being triggered when
+	// starting the pan.
 
 	constexpr auto UniversalPanKey = Qt::Key_S;
+	constexpr auto UniversalPanMod = Qt::AltModifier;
+	constexpr auto UniversalPanClick = false; //!< Whether clicking is needed to initiate universal panning
 
-	if (event->type() == QEvent::MouseButtonPress && m_canUniversalPan)
+	const auto triggerCond = [&]() -> bool { return !hasActiveMaxWindow() && underMouse(); };
+
+	if (event->type() == QEvent::KeyPress)
 	{
-		QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
+		// Enable universal panning upon pressing the key combo. Only enable it if there are no maximized windows and
+		// the mouse is over the MDI area (or its children).
+		auto* ke = static_cast<QKeyEvent*>(event);
 
-		if (mouseEvent->button() == Qt::LeftButton)
+		if (!UniversalPanClick && !m_isPanning && ke->modifiers() == UniversalPanMod && ke->key() == UniversalPanKey
+			&& triggerCond())
 		{
-			const auto pos = mouseEvent->globalPos();
+			// Start panning right away
+			m_canUniversalPan = true;
 			m_isUniversalPan = true;
-			mousePanStart(pos.x(), pos.y());
+			mousePanStart();
+			return true;
+		}
+		else if (UniversalPanClick && !m_isPanning && ke->modifiers() == UniversalPanMod && ke->key() == UniversalPanKey)
+		{
+			// Register that panning may be initiated
+			m_canUniversalPan = true;
+			return true;
+		}
+		else if (m_isPanning) // Ignore other keypresses if already panning
+		{
 			return true;
 		}
 	}
 
-	if (event->type() == QEvent::MouseMove && m_isBeingMoved && m_isUniversalPan)
+	if (event->type() == QEvent::KeyRelease)
 	{
-		QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
-		const auto pos = mouseEvent->globalPos();
-		mousePanMove(pos.x(), pos.y());
-		return true;
-	}
+		auto* ke = static_cast<QKeyEvent*>(event);
 
-	if (event->type() == QEvent::MouseButtonRelease && m_isBeingMoved && m_isUniversalPan)
-	{
-		mousePanEnd();
-		return true;
-	}
-
-	if (m_canUniversalPan)
-	{
-		if (event->type() == QEvent::KeyPress)
+		if (!ke->isAutoRepeat() && ke->key() == UniversalPanKey)
 		{
-			// Ignore keypresses while this is happening
+			m_canUniversalPan = false;
+			mousePanEnd();
+		}
+	}
+
+	if (event->type() == QEvent::MouseButtonPress)
+	{
+		auto* me = static_cast<QMouseEvent*>(event);
+
+		if (UniversalPanClick && me->button() == Qt::LeftButton && m_canUniversalPan && triggerCond())
+		{
+			m_isUniversalPan = true;
+			const auto pos = me->globalPos();
+			m_lastX = pos.x();
+			m_lastY = pos.y();
+			mousePanStart();
+		}
+	}
+
+	if (event->type() == QEvent::MouseMove)
+	{
+		auto* me = static_cast<QMouseEvent*>(event);
+
+		if (m_isPanning && m_isUniversalPan)
+		{
+			const auto pos = me->globalPos();
+			mousePanMove(pos.x(), pos.y());
 			return true;
 		}
-
-		if (event->type() == QEvent::KeyRelease)
+		else if (!m_isPanning)
 		{
-			// Disable pan-anywhere if S has been released
-			QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
-			if (keyEvent->key() == UniversalPanKey)
-			{
-				m_canUniversalPan = false;
-				return true;
-			}
+			// Update "last position", but still allow the event to go through.
+			const auto pos = me->globalPos();
+			m_lastX = pos.x();
+			m_lastY = pos.y();
 		}
 	}
-	else
+
+	if (event->type() == QEvent::MouseButtonRelease)
 	{
-		// Enable pan-anywhere upon pressing Alt+S
-		if (event->type() == QEvent::KeyPress && m_keyMods->m_alt)
+		auto* me = static_cast<QMouseEvent*>(event);
+		if (UniversalPanClick && m_isUniversalPan && me->button() == Qt::LeftButton)
 		{
-			QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
-			if (keyEvent->key() == UniversalPanKey)
-			{
-				// Only enable it if there are no maximized windows and the
-				// mouse is over the MDI area (or its children).
-				m_canUniversalPan = !hasActiveMaxWindow() && underMouse();
-				return true;
-			}
+			m_canUniversalPan = false;
+			mousePanEnd();
+		}
+	}
+
+	if (event->type() == QEvent::FocusOut)
+	{
+		auto* fe = static_cast<QFocusEvent*>(event);
+
+		// If we lost the focus from going to another window, disable all panning behavior.
+		if (fe->reason() != Qt::MouseFocusReason && (m_isPanning || m_isUniversalPan)) {
+			m_canUniversalPan = false;
+			mousePanEnd();
 		}
 	}
 
