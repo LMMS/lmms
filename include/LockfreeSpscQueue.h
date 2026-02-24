@@ -117,7 +117,11 @@ public:
 		const auto writeIndex = m_writeIndex.load(std::memory_order_relaxed);
 		const auto readIndex = m_readIndex.load(std::memory_order_acquire);
 
-		if (writeIndex < readIndex) { return {{&m_buffer[writeIndex], readIndex - writeIndex - 1}, {}}; }
+		if (writeIndex < readIndex)
+		{
+			const auto size = std::min(readIndex - writeIndex - 1, requested);
+			return {{&m_buffer[writeIndex], size}, {}};
+		}
 		else
 		{
 			const auto tailAvailable = m_buffer.size() - writeIndex - (readIndex == 0 ? 1 : 0);
@@ -130,15 +134,13 @@ public:
 	auto reserveContiguousReadSpace(size_t requested = static_cast<size_t>(-1)) -> std::span<const T>
 	{
 		const auto region = reserveReadSpace(requested);
-		const auto contiguousRegionSize = std::min(region.first.size(), requested);
-		return region.first.subspan(0, contiguousRegionSize);
+		return region.first;
 	}
 
 	auto reserveContiguousWriteSpace(size_t requested = static_cast<size_t>(-1)) -> std::span<T>
 	{
 		const auto region = reserveWriteSpace(requested);
-		const auto contiguousRegionSize = std::min(region.first.size(), requested);
-		return region.first.subspan(0, contiguousRegionSize);
+		return region.first;
 	}
 
 	void commitWrite(size_t count)
