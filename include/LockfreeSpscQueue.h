@@ -64,10 +64,13 @@ public:
 
 	auto push(const T* values, size_t size) -> bool
 	{
-		auto region = reserveContiguousWriteSpace(0, size);
-		if (region.size() < size) { return false; }
-		std::copy_n(values, region.size(), region.data());
-		commitWrite(region.size());
+		auto region = reserveWriteSpace(size);
+		const auto totalSize = region.first.size() + region.second.size();
+		if (totalSize != size) { return false; }
+
+		std::copy_n(values, region.first.size(), region.first.data());
+		std::copy_n(values + region.first.size(), region.second.size(), region.second.data());
+		commitWrite(totalSize);
 		return true;
 	}
 
@@ -79,86 +82,63 @@ public:
 
 	auto pop(T* values, size_t size) -> bool
 	{
-		auto region = reserveContiguousReadSpace(0, size);
-		if (region.size() != size) { return false; }
-		std::copy_n(region.data(), region.size(), values);
-		commitRead(region.size());
+		const auto region = reserveReadSpace(size);
+		const auto totalSize = region.first.size() + region.second.size();
+		if (totalSize != size) { return false; }
+
+		std::copy_n(region.first.data(), region.first.size(), values);
+		std::copy_n(region.second.data(), region.second.size(), values + region.first.size());
+		commitRead(totalSize);
 		return true;
 	}
 
-	void pushBlocking(T value) { pushBlocking(&value, 1); }
-
-	void pushBlocking(const T* values, size_t size)
-	{
-		while (size > 0)
-		{
-			auto region = reserveContiguousWriteSpace(1, size);
-			std::copy_n(values, region.size(), region.data());
-			commitWrite(region.size());
-			values += region.size();
-			size -= region.size();
-		}
-	}
-
-	auto popBlocking() -> T
-	{
-		auto value = T{};
-		popBlocking(&value, 1);
-		return value;
-	}
-
-	void popBlocking(T* values, size_t size)
-	{
-		while (size > 0)
-		{
-			auto region = reserveContiguousReadSpace(1, size);
-			std::copy_n(region.data(), region.size(), values);
-			commitRead(region.size());
-			values += region.size();
-			size -= region.size();
-		}
-	}
-
-	auto reserveContiguousWriteSpace(size_t min = 0, size_t max = static_cast<size_t>(-1)) -> std::span<T>
-	{
-		const auto writeIndex = m_writeIndex.load(std::memory_order_relaxed);
-		auto available = size_t{0};
-
-		do
-		{
-			const auto readIndex = m_readIndex.load(std::memory_order_acquire);
-			available = writeIndex < readIndex ? readIndex - writeIndex - 1
-											   : m_buffer.size() - writeIndex - (readIndex == 0 ? 1 : 0);
-			if (available < min)
-			{
-				m_spaceAvailableFlag.clear(std::memory_order_relaxed);
-				m_spaceAvailableFlag.wait(false, std::memory_order_relaxed);
-			}
-
-		} while (available < min && !m_shutdownFlag.test(std::memory_order_relaxed));
-
-		return {&m_buffer[writeIndex], std::min(available, max)};
-	}
-
-	auto reserveContiguousReadSpace(size_t min = 0, size_t max = static_cast<size_t>(-1)) -> std::span<T>
+	auto reserveReadSpace(size_t requested = static_cast<size_t>(-1))
+		-> std::pair<std::span<const T>, std::span<const T>>
 	{
 		const auto readIndex = m_readIndex.load(std::memory_order_relaxed);
-		auto available = size_t{0};
+		const auto writeIndex = m_writeIndex.load(std::memory_order_acquire);
 
-		do
+		if (readIndex <= writeIndex)
 		{
-			const auto writeIndex = m_writeIndex.load(std::memory_order_acquire);
-			available = readIndex <= writeIndex ? writeIndex - readIndex : m_buffer.size() - readIndex;
+			const auto size = std::min(writeIndex - readIndex, requested);
+			return {{&m_buffer[readIndex], size}, {}};
+		}
+		else
+		{
+			const auto tailAvailable = m_buffer.size() - readIndex;
+			const auto tailSize = std::min(tailAvailable, requested);
+			const auto headSize = std::min(requested - tailSize, writeIndex);
+			return {{&m_buffer[readIndex], tailSize}, {&m_buffer[0], headSize}};
+		}
+	}
 
-			if (available < min)
-			{
-				m_dataAvailableFlag.clear(std::memory_order_relaxed);
-				m_dataAvailableFlag.wait(false, std::memory_order_relaxed);
-			}
+	auto reserveWriteSpace(size_t requested = static_cast<size_t>(-1)) -> std::pair<std::span<T>, std::span<T>>
+	{
+		const auto writeIndex = m_writeIndex.load(std::memory_order_relaxed);
+		const auto readIndex = m_readIndex.load(std::memory_order_acquire);
 
-		} while (available < min && !m_shutdownFlag.test(std::memory_order_relaxed));
+		if (writeIndex < readIndex) { return {{&m_buffer[writeIndex], readIndex - writeIndex - 1}, {}}; }
+		else
+		{
+			const auto tailAvailable = m_buffer.size() - writeIndex - (readIndex == 0 ? 1 : 0);
+			const auto tailSize = std::min(tailAvailable, requested);
+			const auto headSize = std::min(requested - tailSize, readIndex - 1);
+			return {{&m_buffer[writeIndex], tailSize}, {&m_buffer[0], headSize}};
+		}
+	}
 
-		return {&m_buffer[readIndex], std::min(available, max)};
+	auto reserveContiguousReadSpace(size_t requested = static_cast<size_t>(-1))
+	{
+		const auto region = reserveReadSpace(requested);
+		const auto contiguousRegionSize = std::min(region.first.size(), requested);
+		return region.first.subspan(0, contiguousRegionSize);
+	}
+
+	auto reserveContiguousWriteSpace(size_t requested = static_cast<size_t>(-1))
+	{
+		const auto region = reserveWriteSpace(requested);
+		const auto contiguousRegionSize = std::min(region.first.size(), requested);
+		return region.first.subspan(0, contiguousRegionSize);
 	}
 
 	void commitWrite(size_t count)
@@ -178,18 +158,22 @@ public:
 		const auto value = std::has_single_bit(m_buffer.size()) ? (index + count) & (m_buffer.size() - 1)
 																: (index + count) % m_buffer.size();
 		m_readIndex.store(value, std::memory_order_release);
-
-		m_spaceAvailableFlag.test_and_set(std::memory_order_relaxed);
-		m_spaceAvailableFlag.notify_all();
 	}
 
 	void shutdown()
 	{
 		m_shutdownFlag.test_and_set(std::memory_order_relaxed);
 		m_dataAvailableFlag.test_and_set(std::memory_order_relaxed);
-		m_spaceAvailableFlag.test_and_set(std::memory_order_relaxed);
 		m_dataAvailableFlag.notify_all();
-		m_spaceAvailableFlag.notify_all();
+	}
+
+	void waitForData()
+	{
+		while (empty() && !m_shutdownFlag.test(std::memory_order_relaxed))
+		{
+			m_dataAvailableFlag.clear(std::memory_order_relaxed);
+			m_dataAvailableFlag.wait(false, std::memory_order_relaxed);
+		}
 	}
 
 	auto peek() const -> const T&
@@ -215,7 +199,6 @@ private:
 	alignas(std::hardware_destructive_interference_size) std::atomic_size_t m_readIndex;
 	alignas(std::hardware_destructive_interference_size) std::atomic_size_t m_writeIndex;
 	alignas(std::hardware_destructive_interference_size) std::atomic_flag m_dataAvailableFlag;
-	alignas(std::hardware_destructive_interference_size) std::atomic_flag m_spaceAvailableFlag;
 	alignas(std::hardware_destructive_interference_size) std::atomic_flag m_shutdownFlag;
 };
 

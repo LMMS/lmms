@@ -101,9 +101,14 @@ void SaProcessor::analyze(LockfreeSpscQueue<SampleFrame> &ring_buffer)
 	// Processing thread loop
 	while (!m_terminate)
 	{
+		const auto in_buffer = ring_buffer.reserveContiguousReadSpace();
+
 		// If there is nothing to read, wait for notification from the writing side.
-		const auto in_buffer = ring_buffer.reserveContiguousReadSpace(1, ring_buffer.capacity() / 4);
-		const auto frame_count = in_buffer.size();
+		if (in_buffer.empty())
+		{
+			ring_buffer.waitForData();
+			continue;
+		}
 
 		// skip waterfall render if processing can't keep up with input
 		const auto overload = in_buffer.size() < ring_buffer.capacity() / 2;
@@ -115,7 +120,7 @@ void SaProcessor::analyze(LockfreeSpscQueue<SampleFrame> &ring_buffer)
 		{
 			const bool stereo = m_controls->m_stereoModel.value();
 			fpp_t in_frame = 0;
-			while (in_frame < frame_count)
+			while (in_frame < in_buffer.size())
 			{
 				// Lock data access to prevent reallocation from changing
 				// buffers and control variables.
@@ -123,7 +128,7 @@ void SaProcessor::analyze(LockfreeSpscQueue<SampleFrame> &ring_buffer)
 
 				// Fill sample buffers and check for zero input.
 				bool block_empty = true;
-				for (; in_frame < frame_count && m_framesFilledUp < m_inBlockSize; in_frame++, m_framesFilledUp++)
+				for (; in_frame < in_buffer.size() && m_framesFilledUp < m_inBlockSize; in_frame++, m_framesFilledUp++)
 				{
 					if (stereo)
 					{
