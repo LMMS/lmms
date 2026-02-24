@@ -35,7 +35,7 @@
 	#if defined(__ARM_ACLE)
 		#include <arm_acle.h>
 	#elif defined(__GNUG__)
-		// TODO: Remove this once GCC properly provides __ARM_ACLE
+		// HACK: Remove this once GCC properly provides __ARM_ACLE
 		// 15 is the only allowed value for the parameter, so just ignore it and use 15 lol
 		inline void __isb(unsigned int scope = 15)
 		{
@@ -65,7 +65,8 @@ inline constexpr std::size_t hardware_destructive_interference_size =
 #endif
 	;
 
-// TODO: Add docs now that this isn't a macro
+//! @brief Platform-dependent hint to the processor that it is in a busy-wait loop.
+//! This helps optimize spinlocks by slowing down the processor a bit, which helps reduce contention on atomics.
 inline void busy_wait_hint()
 {
 #if defined(LMMS_HOST_X86_64) || defined(LMMS_HOST_X86)

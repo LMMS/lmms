@@ -82,10 +82,10 @@ protected:
 	Lb302FilterKnobState *fs;
 
 	// Filter Decay
-	float vcf_c0 = 0.f; // c0=e1 on retrigger; c0*=ed every sample; cutoff=e0+c0
-	float vcf_e0 = 0.f; // e0 and e1 for interpolation
+	float vcf_c0 = 0.f; //!< @ref vcf_c0 = @ref vcf_e1 on retrigger; @ref vcf_c0 *=ed every sample; cutoff = @ref vcf_e0 + @ref vcf_c0
+	float vcf_e0 = 0.f; //!< @ref vcf_e0 and @ref vcf_e1 for interpolation
 	float vcf_e1 = 0.f;
-	float vcf_rescoeff; //!< Resonance coefficient [0.30, 9.54]
+	float vcf_rescoeff; //!< %Resonance coefficient [0.30, 9.54]
 };
 
 
@@ -119,7 +119,6 @@ class Lb302Filter3Pole : public Lb302Filter
 public:
 	Lb302Filter3Pole(Lb302FilterKnobState* p_fs) : Lb302Filter(p_fs) {};
 
-	//virtual void recalc();
 	void envRecalc() override;
 	void recalc() override;
 	sample_t process(sample_t samp) override;
@@ -173,8 +172,8 @@ private:
 	enum class VcaMode { Attack, Decay, Idle, NeverPlayed };
 
 	static constexpr float s_distRatio = 4.f;
-	static constexpr fpp_t s_envInc = 64; //!< Envelope Recalculation period
-	static constexpr float s_vcaAttack = 1.f - 0.96406088f; //!< Amp attack
+	static constexpr fpp_t s_envInc = 64; //!< %Envelope Recalculation period
+	static constexpr float s_vcaAttack = 1.f - 0.96406088f; //!< Amplitude attack
 	static constexpr float s_vcaA0 = 0.5f; //!< Initial amplifier coefficient
 
 	FloatModel vcf_cut_knob;
@@ -194,7 +193,7 @@ private:
 	BoolModel db24Toggle;
 
 	// Oscillator
-	float vco_inc = 0.f; //!< Sample increment for the frequency. Creates Sawtooth.
+	float vco_inc = 0.f; //!< %Sample increment for the frequency. Creates Sawtooth.
 	float vco_k = 0.f;   //!< Raw oscillator sample [-0.5, 0.5]
 	float vco_c = 0.f;   //!< Raw oscillator sample [-0.5, 0.5]
 
@@ -214,7 +213,7 @@ private:
 	//! @see db24Toggle
 	inline Lb302Filter& vcf() { return *vcfs[db24Toggle.value()]; }
 
-	f_cnt_t vcf_envpos = s_envInc; //!< Update counter. Updates when >= @ref ENVINC
+	f_cnt_t vcf_envpos = s_envInc; //!< Update counter. Updates when >= @ref s_envInc
 	std::atomic<f_cnt_t> release_frame;
 
 	// Envelope State
