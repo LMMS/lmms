@@ -26,7 +26,6 @@
 
 #include <QApplication>
 #include <QCloseEvent>
-#include <QDebug> // TODO: remove (along with other qDebug instances here)
 #include <QDesktopServices>
 #include <QDomElement>
 #include <QFileInfo>
@@ -981,8 +980,6 @@ void MainWindow::refocus()
 {
 	const auto gui = getGUI();
 
-	// qDebug() << "REFOCUS CALLED";
-
 	const std::array<QWidget*, 4> editorWindows{
 		gui->songEditor()->parentWidget(),
 		gui->patternEditor()->parentWidget(),
@@ -1001,11 +998,8 @@ void MainWindow::refocus()
 	{
 		auto* sw = *it;
 
-		// qDebug() << sw << sw->windowTitle() << sw->isVisible() << sw->isHidden();
-
 		if (sw->isVisible() && (sw->isMaximized() || isEditorWindow(sw)))
 		{
-			// qDebug() << "FOCUS SET TO" << sw->windowTitle();
 			sw->setFocus();
 			return;
 		}
@@ -1635,17 +1629,10 @@ MainWindow::WorkspaceScrollBar::WorkspaceScrollBar(Qt::Orientation orientation, 
 	: QScrollBar(orientation, parent)
 {
 	constexpr auto Thickness = 12;
-
 	setTracking(true);
 
-	if (orientation == Qt::Vertical)
-	{
-		setFixedWidth(Thickness);
-	}
-	else if (orientation == Qt::Horizontal)
-	{
-		setFixedHeight(Thickness);
-	}
+	if (orientation == Qt::Vertical) { setFixedWidth(Thickness); }
+	else if (orientation == Qt::Horizontal) { setFixedHeight(Thickness); }
 }
 
 void MainWindow::WorkspaceScrollBar::wheelEvent(QWheelEvent *event)
@@ -1672,8 +1659,8 @@ MainWindow::MovableQMdiArea::MovableQMdiArea(QWidget* parent, MainWindow* mainWi
 	parent->installEventFilter(this);
 
 	connect(this, &QMdiArea::subWindowActivated, this, &MainWindow::MovableQMdiArea::updateScrollBars);
-	connect(m_scrollBarH, &QScrollBar::sliderMoved, [this] { sliderMoved(m_scrollBarH); });
-	connect(m_scrollBarV, &QScrollBar::sliderMoved, [this] { sliderMoved(m_scrollBarV); });
+	connect(m_scrollBarH, &QScrollBar::sliderMoved, this, [this] { sliderMoved(m_scrollBarH); });
+	connect(m_scrollBarV, &QScrollBar::sliderMoved, this, [this] { sliderMoved(m_scrollBarV); });
 }
 
 void MainWindow::MovableQMdiArea::sliderMoved(QScrollBar* scrollBar)
