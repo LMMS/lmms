@@ -152,7 +152,7 @@ public:
 		m_writeIndex.store(value, std::memory_order_release);
 
 		m_dataAvailableFlag.test_and_set(std::memory_order_relaxed);
-		m_dataAvailableFlag.notify_all();
+		m_dataAvailableFlag.notify_one();
 	}
 
 	void commitRead(size_t count)
@@ -167,7 +167,7 @@ public:
 	{
 		m_shutdownFlag.test_and_set(std::memory_order_relaxed);
 		m_dataAvailableFlag.test_and_set(std::memory_order_relaxed);
-		m_dataAvailableFlag.notify_all();
+		m_dataAvailableFlag.notify_one();
 	}
 
 	void waitForData()
