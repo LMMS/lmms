@@ -330,7 +330,7 @@ void Lb302Synth::process(SampleFrame* outbuf, const fpp_t size)
 	const float sampleRatio = 44100.f / Engine::audioEngine()->outputSampleRate();
 	Lb302Filter& filter = vcf(); // Hold on to the current VCF, and use it throughout this period
 
-	if (release_frame.load(std::memory_order_relaxed) == 0 || !m_playingNote) { vca_mode = VcaMode::Decay; }
+	if (release_frame == 0 || !m_playingNote) { vca_mode = VcaMode::Decay; }
 	if (new_freq)
 	{
 		new_freq = false;
@@ -392,7 +392,7 @@ void Lb302Synth::process(SampleFrame* outbuf, const fpp_t size)
 	for (f_cnt_t i = 0; i < size; ++i)
 	{
 		// start decay if we're past release
-		if (i >= release_frame.load(std::memory_order_relaxed)) { vca_mode = VcaMode::Decay; }
+		if (i >= release_frame) { vca_mode = VcaMode::Decay; }
 
 		// update vcf
 		if (vcf_envpos >= s_envInc)
@@ -551,10 +551,6 @@ void Lb302Synth::playNote(NotePlayHandle* nph, SampleFrame*)
 	while (!m_notesWriteClaimed.compare_exchange_strong(write_claimed_expected, next_index, std::memory_order_acquire));
 
 	m_notes[index & s_notesBufMask] = nph;
-	release_frame.store(
-		std::max(release_frame.load(std::memory_order_acquire), nph->framesLeft() + nph->offset()),
-		std::memory_order_release
-	);
 
 	size_t write_committed_expected = index;
 	while (!m_notesWriteCommitted.compare_exchange_strong(write_committed_expected, next_index, std::memory_order_release))
@@ -575,8 +571,10 @@ void Lb302Synth::processNote(NotePlayHandle* nph)
 		new_freq = true;
 		nph->m_pluginData = this;
 	}
+
+	release_frame = std::max(release_frame, nph->framesLeft() + nph->offset());
 	
-	if (!m_playingNote && !nph->isReleased() && release_frame.load(std::memory_order_relaxed) > 0)
+	if (!m_playingNote && !nph->isReleased() && release_frame > 0)
 	{
 		m_playingNote = nph;
 		if (slideToggle.value()) { vco_slideinc = phaseInc(nph->frequency()); }

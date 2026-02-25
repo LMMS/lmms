@@ -217,7 +217,7 @@ private:
 	inline Lb302Filter& vcf() { return *vcfs[db24Toggle.value()]; }
 
 	f_cnt_t vcf_envpos = s_envInc; //!< Update counter. Updates when >= @ref s_envInc
-	std::atomic<f_cnt_t> release_frame;
+	f_cnt_t release_frame;
 
 	// Envelope State
 	float vca_a = 0.f; //!< Amplifier coefficient.
