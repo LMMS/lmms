@@ -258,7 +258,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 		m_trackDeletionWarning, SLOT(toggleTrackDeletionWarning(bool)), false);
 	addCheckBox(tr("Show warning when deleting a mixer channel that is in use"), guiGroupBox, guiGroupLayout,
 		m_mixerChannelDeletionWarning,	SLOT(toggleMixerChannelDeletionWarning(bool)), false);
-	addCheckBox(tr("Require click for universal panning"), guiGroupBox, guiGroupLayout,
+	addCheckBox(tr("Require click upon pressing Alt-S for panning (moving) through the workspace"), guiGroupBox, guiGroupLayout,
 		m_universalPanClick, SLOT(toggleUniversalPanClick(bool)), false);
 
 	m_loopMarkerComboBox = new QComboBox{guiGroupBox};
