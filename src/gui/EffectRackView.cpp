@@ -31,10 +31,14 @@
 #include <QScrollArea>
 #include <QVBoxLayout>
 
+#include "Effect.h"
 #include "DeprecationHelper.h"
 #include "EffectSelectDialog.h"
 #include "EffectView.h"
+#include "StringPairDrag.h"
 #include "GroupBox.h"
+#include "TextFloat.h"
+#include "embed.h"
 
 
 namespace lmms::gui
@@ -71,6 +75,7 @@ EffectRackView::EffectRackView( EffectChain* model, QWidget* parent ) :
 
 	connect( addButton, SIGNAL(clicked()), this, SLOT(addEffect()));
 
+	setAcceptDrops(true);
 
 	m_lastY = 0;
 
@@ -82,6 +87,56 @@ EffectRackView::EffectRackView( EffectChain* model, QWidget* parent ) :
 EffectRackView::~EffectRackView()
 {
 	clearViews();
+}
+
+
+
+
+void EffectRackView::dragEnterEvent(QDragEnterEvent *event)
+{
+	const QString type = StringPairDrag::decodeKey(event);
+	if (type == "effectpresetfile")
+	{
+		event->acceptProposedAction();
+	}
+	else
+	{
+		event->ignore();
+	}
+}
+
+
+void EffectRackView::dropEvent(QDropEvent *event)
+{
+	const QString type = StringPairDrag::decodeKey(event);
+	const QString filePath = StringPairDrag::decodeValue(event);
+
+	if (type == "effectpresetfile")
+	{
+		addFromPreset(filePath);
+		event->accept();
+	}
+	else
+	{
+		event->ignore();
+	}
+}
+
+
+
+void EffectRackView::addFromPreset(const QString& filePath)
+{
+	Effect *fx = Effect::createFromPreset(filePath, fxChain());
+	if (!fx)
+	{
+		TextFloat::displayMessage(
+			"Preset loading error",
+			tr("Couldn't load preset file."),
+			embed::getIconPixmap("error")
+		);
+	}
+	fxChain()->appendEffect(fx);
+	update();
 }
 
 
@@ -107,7 +162,7 @@ void EffectRackView::moveUp( EffectView* view )
 	if( view != m_effectViews.first() )
 	{
 		int i = 0;
-		for( QVector<EffectView *>::Iterator it = m_effectViews.begin(); 
+		for( QVector<EffectView *>::Iterator it = m_effectViews.begin();
 					it != m_effectViews.end(); it++, i++ )
 		{
 			if( *it == view )

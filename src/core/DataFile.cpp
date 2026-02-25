@@ -199,22 +199,28 @@ DataFile::DataFile( const QByteArray & _data ) :
 
 bool DataFile::validate( QString extension )
 {
-	switch( m_type )
+	switch (m_type)
 	{
 	case Type::SongProject:
-		if( extension == "mmp" || extension == "mmpz" )
+		if (extension == "mmp" || extension == "mmpz")
 		{
 			return true;
 		}
 		break;
 	case Type::SongProjectTemplate:
-		if(  extension == "mpt" )
+		if (extension == "mpt")
 		{
 			return true;
 		}
 		break;
 	case Type::InstrumentTrackSettings:
-		if ( extension == "xpf" || extension == "xml" )
+		if (extension == "xpf" || extension == "xml")
+		{
+			return true;
+		}
+		break;
+	case Type::EffectSettings:
+		if (extension == "fxp")
 		{
 			return true;
 		}
@@ -263,14 +269,14 @@ QString DataFile::nameWithExtension( const QString & _fn ) const
 {
 	const QString extension = _fn.section( '.', -1 );
 
-	switch( type() )
+	switch (type())
 	{
 		case Type::SongProject:
-			if( extension != "mmp" &&
+			if ( extension != "mmp" &&
 					extension != "mpt" &&
 					extension != "mmpz" )
 			{
-				if( ConfigManager::inst()->value( "app",
+				if ( ConfigManager::inst()->value( "app",
 						"nommpz" ).toInt() == 0 )
 				{
 					return _fn + ".mmpz";
@@ -279,13 +285,13 @@ QString DataFile::nameWithExtension( const QString & _fn ) const
 			}
 			break;
 		case Type::SongProjectTemplate:
-			if( extension != "mpt" )
+			if ( extension != "mpt" )
 			{
 				return _fn + ".mpt";
 			}
 			break;
 		case Type::InstrumentTrackSettings:
-			if( extension != "xpf" )
+			if ( extension != "xpf" )
 			{
 				return _fn + ".xpf";
 			}

@@ -59,8 +59,12 @@ private slots:
 	virtual void update();
 	void addEffect();
 
+protected:
+	void dragEnterEvent(QDragEnterEvent *event) override;
+	void dropEvent(QDropEvent *event) override;
 
 private:
+	void addFromPreset(const QString& filePath);
 	void modelChanged() override;
 	QSize sizeHint() const override;
 	QSize minimumSizeHint() const override { return sizeHint(); }
