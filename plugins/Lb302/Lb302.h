@@ -160,7 +160,7 @@ public:
 public slots:
 	void filterChanged();
 
-	//! @brief Adjusts @ref fs 's @ref Lb302FilterKnobState::envdecay for both sampling rate and @ref s_envInc
+	//! @brief Adjusts @ref m_fs 's @ref Lb302FilterKnobState::envdecay for both sampling rate and @ref s_envInc
 	void decayChanged();
 
 	void db24Toggled();
@@ -177,54 +177,53 @@ private:
 	static constexpr float s_distRatio = 4.f;
 	static constexpr fpp_t s_envInc = 64; //!< %Envelope Recalculation period
 	static constexpr float s_vcaAttack = 1.f - 0.96406088f; //!< Amplitude attack
-	static constexpr float s_vcaA0 = 0.5f; //!< Initial amplifier coefficient
+	static constexpr float s_vcaInitial = 0.5f; //!< Initial amplifier coefficient
 
-	FloatModel vcf_cut_knob;
-	FloatModel vcf_res_knob;
-	FloatModel vcf_mod_knob;
-	FloatModel vcf_dec_knob;
+	FloatModel m_vcfCutKnob;
+	FloatModel m_vcfResKnob;
+	FloatModel m_vcfModKnob;
+	FloatModel m_vcfDecKnob;
 
-	FloatModel vco_fine_detune_knob;
+	FloatModel m_vcoDetuneKnob;
 
-	FloatModel dist_knob;
-	IntModel wave_shape;
-	FloatModel slide_dec_knob;
+	FloatModel m_distKnob;
+	IntModel m_waveShape;
+	FloatModel m_slideDecKnob;
 
-	BoolModel slideToggle;
-	BoolModel accentToggle;
-	BoolModel deadToggle;
-	BoolModel db24Toggle;
+	BoolModel m_slideToggle;
+	BoolModel m_accentToggle;
+	BoolModel m_deadToggle;
+	BoolModel m_db24Toggle;
 
 	// Oscillator
-	float vco_inc = 0.f; //!< %Sample increment for the frequency. Creates Sawtooth.
-	float vco_k = 0.f;   //!< Raw oscillator sample [-0.5, 0.5]
-	float vco_c = 0.f;   //!< Raw oscillator sample [-0.5, 0.5]
+	float m_vcoInc = 0.f; //!< %Sample increment for the frequency. Creates Sawtooth.
+	float m_vcoK = 0.f;   //!< Raw oscillator sample [-0.5, 0.5]
+	float m_vcoC = 0.f;   //!< Raw oscillator sample [-0.5, 0.5]
 
-	float vco_slide = 0.f;     //!< Current value of slide exponential curve. Nonzero=sliding
-	float vco_slideinc = 0.f;  //!< Slide base to use in next node. Nonzero=slide next note
-	float vco_slidebase = 0.f; //!< The base @ref vco_inc while sliding.
+	bool  m_newFreq = false;
+	float m_trueFreq;
+	float m_slide = 0.f;     //!< Current value of slide exponential curve. Nonzero=sliding
+	float m_slideInc = 0.f;  //!< Slide base to use in next node. Nonzero=slide next note
+	float m_slideBase = 0.f; //!< The base @ref m_vcoInc while sliding.
 
-	VcoShape vco_shape = VcoShape::BLSawtooth;
+	VcoShape m_vcoShape = VcoShape::BLSawtooth;
 
 	// User settings
-	Lb302FilterKnobState fs = {};
+	Lb302FilterKnobState m_fs = {};
 
-	std::array<std::unique_ptr<Lb302Filter>, 2> vcfs; //!< Filters (just keep both loaded and switch)
+	std::array<std::unique_ptr<Lb302Filter>, 2> m_vcfs; //!< Filters (just keep both loaded and switch)
 
 	//! @brief Helper to get current vcf
-	//! @see vcfs
+	//! @see m_vcfs
 	//! @see db24Toggle
-	inline Lb302Filter& vcf() { return *vcfs[db24Toggle.value()]; }
+	inline Lb302Filter& vcf() { return *m_vcfs[m_db24Toggle.value()]; }
 
-	f_cnt_t vcf_envpos = s_envInc; //!< Update counter. Updates when >= @ref s_envInc
-	f_cnt_t release_frame;
+	f_cnt_t m_vcfEnvPos = s_envInc; //!< Update counter. Updates when >= @ref s_envInc
+	f_cnt_t m_releaseFrame;
 
 	// Envelope State
-	float vca_a = 0.f; //!< Amplifier coefficient.
-	VcaMode vca_mode = VcaMode::NeverPlayed;
-
-	bool new_freq = false;
-	float true_freq;
+	float m_vca = 0.f; //!< Amplifier coefficient.
+	VcaMode m_vcaMode = VcaMode::NeverPlayed;
 
 	NotePlayHandle* m_playingNote;
 
