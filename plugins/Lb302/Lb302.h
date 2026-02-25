@@ -223,10 +223,6 @@ private:
 	float vca_a = 0.f; //!< Amplifier coefficient.
 	VcaMode vca_mode = VcaMode::NeverPlayed;
 
-	// My hacks
-	f_cnt_t sample_cnt = 0;
-	// f_cnt_t catch_decay = 0;
-
 	bool new_freq = false;
 	float true_freq;
 

@@ -248,7 +248,7 @@ Lb302Synth::Lb302Synth(InstrumentTrack* instrumentTrack)
 
 	// db24Toggled() would be called here, but all it does is call
 	// recalcFilter(), which is already done in filterChanged(), so there's no
-	// need call recalcFilter() twice.
+	// need to explicitly call recalcFilter() again.
 	filterChanged();
 	decayChanged();
 
@@ -289,7 +289,7 @@ void Lb302Synth::loadSettings(const QDomElement& el)
 
 	// db24Toggled() would be called here, but all it does is call
 	// recalcFilter(), which is already done in filterChanged(), so there's no
-	// need to do it twice.
+	// need to explicitly call recalcFilter() again.
 	filterChanged();
 	decayChanged();
 }
@@ -335,13 +335,11 @@ void Lb302Synth::process(SampleFrame* outbuf, const fpp_t size)
 	{
 		new_freq = false;
 		const bool noteIsDead = deadToggle.value();
-		// catch_decay = 0;
 		vco_inc = phaseInc(true_freq);
 
 		// Always reset vca on non-dead notes, and only reset vca on decaying (decayed) and never-played
 		if (!noteIsDead || (vca_mode == VcaMode::Decay || vca_mode == VcaMode::NeverPlayed))
 		{
-			sample_cnt = 0;
 			vca_mode = VcaMode::Attack;
 		}
 		else { vca_mode = VcaMode::Idle; }
@@ -367,9 +365,6 @@ void Lb302Synth::process(SampleFrame* outbuf, const fpp_t size)
 			vcf_envpos = s_envInc; // Ensure envelope is recalculated
 		}
 	}
-
-	// TODO: NORMAL RELEASE
-	// vca_mode = VcaMode::Decay;
 
 	// Note: this has to be computed during processing and cannot be initialized
 	// in the constructor because it's dependent on the sample rate and that might
@@ -409,18 +404,16 @@ void Lb302Synth::process(SampleFrame* outbuf, const fpp_t size)
 			}
 		}
 
-		sample_cnt++;
 		vcf_envpos++;
-
-		// f_cnt_t decay_frames = 128;
 
 		// update vco
 		vco_c += vco_inc;
 		if (vco_c > 0.5f) { vco_c -= 1.f; }
 		vco_shape = static_cast<VcoShape>(wave_shape.value());
 
-		// add vco_shape_param the changes the shape of each curve.
-		// merge sawtooths with triangle and square with round square?
+		// TODO: Add VCO shape parameters (p0, p1) that changes the shape of
+		// each waveform. Merge sawtooths with triangle, and merge square with
+		// round square?
 		switch (vco_shape)
 		{
 			// p0: curviness of line
@@ -482,27 +475,14 @@ void Lb302Synth::process(SampleFrame* outbuf, const fpp_t size)
 				break;
 		}
 
-		// vca_a = 0.5f;
-
 		// Write out samples.
-		//samp = vcf->process(vco_k) * 2.f * vca_a;
-		//samp = vcf->process(vco_k) * 2.f;
 		sample_t samp = filter.process(vco_k) * vca_a;
-
-		//samp = vco_k * vca_a;
-		// if (sample_cnt <= 4) { vca_a = 0.f; }
-
-		// float releaseFrames = desiredReleaseFrames();
-		// samp *= (releaseFrames - catch_decay) / releaseFrames;
-		// samp *= static_cast<float>(decay_frames - catch_decay) / static_cast<float>(decay_frames); // LB302
-
 		for (ch_cnt_t c = 0; c < DEFAULT_CHANNELS; c++) { outbuf[i][c] = samp; }
 
 		// Handle Envelope
 		if (vca_mode == VcaMode::Attack)
 		{
 			vca_a += (s_vcaA0 - vca_a) * s_vcaAttack;
-			if (sample_cnt >= 0.5f * Engine::audioEngine()->outputSampleRate()) { vca_mode = VcaMode::Idle; }
 		}
 		else if (vca_mode == VcaMode::Decay)
 		{
