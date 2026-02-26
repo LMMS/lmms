@@ -27,6 +27,8 @@
 #define _PATCHES_DIALOG_H
 
 #include <fluidsynth/types.h>
+#include <QSortFilterProxyModel>
+#include <QStandardItemModel>
 
 #include "ui_PatchesDialog.h"
 #include "LcdSpinBox.h"
@@ -60,21 +62,36 @@ public slots:
 
 	void stabilizeForm();
 	void bankChanged();
-	void progChanged( QTreeWidgetItem * _curr, QTreeWidgetItem * _prev );
+	void progChanged(const QModelIndex& cur, const QModelIndex& prev);
 
 protected slots:
 
 	void accept() override;
 	void reject() override;
+	bool eventFilter(QObject *obj, QEvent *event) override;
 
 protected:
 
 	void setBankProg(int iBank, int iProg);
 
 	QTreeWidgetItem *findBankItem(int iBank);
-	QTreeWidgetItem *findProgItem(int iProg);
+
+	//! Finds the program item of given program number id in the source model.
+	QStandardItem *findProgItem(int iProg);
 
 	bool validateForm();
+
+	/**
+		Updates the current patch, and updates the UI controls if `updateUi` is
+		true.
+	*/
+	void updatePatch(bool updateUi);
+
+	/**
+		Selects a row in the program selector based off a signed offset from the
+		currently selected row. Also clamps the selection.
+	*/
+	void diffSelectProgRow(int offset);
 
 private:
 
@@ -89,9 +106,14 @@ private:
 	//int m_iDirtyCount;
 	int m_dirty;
 
+	int m_selProg;
+	QString m_selProgName;
+
 	LcdSpinBoxModel * m_bankModel;
 	LcdSpinBoxModel * m_progModel;
 	QLabel *m_patchLabel;
+	QStandardItemModel m_progListSourceModel; //!< Programs on the selected bank
+	QSortFilterProxyModel m_progListProxyModel; //!< Model to allow searching
 };
 
 

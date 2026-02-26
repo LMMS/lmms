@@ -29,7 +29,12 @@
 #include <QHeaderView>
 //#include <QFileInfo>
 #include <QLabel>
+#include <QKeyEvent>
+#include <QSortFilterProxyModel>
+#include <QStandardItemModel>
+#include <QStandardItem>
 
+#include "embed.h"
 #include "fluidsynthshims.h"
 
 namespace lmms::gui
@@ -63,51 +68,92 @@ public:
 	}
 };
 
-
-
 // Constructor.
 PatchesDialog::PatchesDialog( QWidget *pParent, Qt::WindowFlags wflags )
-	: QDialog( pParent, wflags )
+	: QDialog(pParent, wflags)
+	, m_pSynth{nullptr}
+	, m_iChan{0}
+	, m_iBank{0}
+	, m_iProg{0}
+	, m_selProg{0}
 {
 	// Setup UI struct...
 	setupUi( this );
 
-	m_pSynth = nullptr;
-	m_iChan  = 0;
-	m_iBank  = 0;
-	m_iProg  = 0;
+	// Configure bank list view
+	auto bankHeader = m_bankListView->header();
+	bankHeader->setSectionResizeMode(0, QHeaderView::Stretch);
+	bankHeader->setStretchLastSection(true);
+	bankHeader->resizeSection(0, 30);
 
-	// Soundfonts list view...
-	QHeaderView *pHeader = m_progListView->header();
-//	pHeader->setResizeMode(QHeaderView::Custom);
-	pHeader->setDefaultAlignment(Qt::AlignLeft);
-//	pHeader->setDefaultSectionSize(200);
-	pHeader->setSectionsMovable(false);
-	pHeader->setStretchLastSection(true);
+	m_splitter->setStretchFactor(0, 2);
+	m_splitter->setStretchFactor(1, 6);
 
-	m_progListView->resizeColumnToContents(0);	// Prog.
-	//pHeader->resizeSection(1, 200);					// Name.
+	// Configure program list models
+	m_progListSourceModel.setHorizontalHeaderLabels({tr("Patch"), tr("Name")});
+	m_progListProxyModel.setSourceModel(&m_progListSourceModel);
+	m_progListProxyModel.setFilterCaseSensitivity(Qt::CaseInsensitive);
+	m_progListProxyModel.setFilterKeyColumn(1); // "Name" column
+	m_progListProxyModel.setDynamicSortFilter(true);
+
+	// Configure program list view
+	m_progListView->setModel(&m_progListProxyModel);
+	m_progListView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+	m_progListView->setSelectionBehavior(QAbstractItemView::SelectRows);
+	m_progListView->setSelectionMode(QAbstractItemView::SingleSelection);
+	m_progListView->setSortingEnabled(true);
+	m_progListView->sortByColumn(0, Qt::AscendingOrder); // Initial sort by column 0 (Name)
+
+	constexpr int RowHeight = 18;
+	auto progVHeader = m_progListView->verticalHeader();
+	progVHeader->setSectionResizeMode(QHeaderView::Fixed);
+	progVHeader->setMinimumSectionSize(RowHeight);
+	progVHeader->setMaximumSectionSize(RowHeight);
+	progVHeader->setDefaultSectionSize(RowHeight);
+	progVHeader->hide();
+
+	auto progHeader = m_progListView->horizontalHeader();
+	progHeader->setDefaultAlignment(Qt::AlignLeft);
+	progHeader->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+	progHeader->setSectionResizeMode(1, QHeaderView::Stretch);
+	progHeader->setSectionsMovable(false);
+	progHeader->setStretchLastSection(true);
 
 	// Initial sort order...
 	m_bankListView->sortItems(0, Qt::AscendingOrder);
-	m_progListView->sortItems(0, Qt::AscendingOrder);
+
+	m_filterEdit->setPlaceholderText(tr("Search"));
+	m_filterEdit->setClearButtonEnabled(true);
+	m_filterEdit->addAction(embed::getIconPixmap("zoom"), QLineEdit::LeadingPosition);
+
+	// Configure focus (only allow for search bar and dialog buttons)
+	m_filterEdit->setFocus();
+	m_filterEdit->setFocusPolicy(Qt::StrongFocus);
+	m_bankListView->setFocusPolicy(Qt::NoFocus);
+	m_progListView->setFocusPolicy(Qt::NoFocus);
 
 	// UI connections...
+	QObject::connect(m_filterEdit, &QLineEdit::textChanged, this, [this](const QString& text) {
+		m_progListProxyModel.setFilterRegularExpression(
+			QRegularExpression(text, QRegularExpression::CaseInsensitiveOption));
+		diffSelectProgRow(0); // just fix the selection if it has been invalidated
+	});
 	QObject::connect(m_bankListView,
 		SIGNAL(currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)),
 		SLOT(bankChanged()));
 	QObject::connect(m_progListView,
-		SIGNAL(currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)),
-		SLOT(progChanged(QTreeWidgetItem*,QTreeWidgetItem*)));
-	QObject::connect(m_progListView,
-		SIGNAL(itemActivated(QTreeWidgetItem*,int)),
-		SLOT(accept()));
+		&QTableView::doubleClicked, this, &PatchesDialog::accept);
+	QObject::connect(m_progListView->selectionModel(),
+		&QItemSelectionModel::currentRowChanged, this,
+		[this](auto& cur, auto& prev) { progChanged(cur, prev); });
 	QObject::connect(m_okButton,
 		SIGNAL(clicked()),
 		SLOT(accept()));
 	QObject::connect(m_cancelButton,
 		SIGNAL(clicked()),
 		SLOT(reject()));
+
+	installEventFilter(this);
 }
 
 
@@ -118,7 +164,6 @@ void PatchesDialog::setup ( fluid_synth_t * pSynth, int iChan,
 						LcdSpinBoxModel * _progModel,
 							QLabel * _patchLabel )
 {
-
 	// We'll going to changes the whole thing...
 	m_dirty = 0;
 	m_bankModel = _bankModel;
@@ -138,7 +183,6 @@ void PatchesDialog::setup ( fluid_synth_t * pSynth, int iChan,
 	// now it should be safe to set internal stuff
 	m_pSynth = pSynth;
 	m_iChan  = iChan;
-
 
 	QTreeWidgetItem *pBankItem = nullptr;
 	// For all soundfonts (in reversed stack order) fill the available banks...
@@ -189,9 +233,21 @@ void PatchesDialog::setup ( fluid_synth_t * pSynth, int iChan,
 	// Set the selected program.
 	if (pPreset)
 		m_iProg = fluid_preset_get_num(pPreset);
-	QTreeWidgetItem *pProgItem = findProgItem(m_iProg);
-	m_progListView->setCurrentItem(pProgItem);
-	m_progListView->scrollToItem(pProgItem);
+
+	if (auto progItem = findProgItem(m_iProg); progItem != nullptr)
+	{
+		auto sourceIdx = progItem->index();
+		auto proxyIdx = m_progListProxyModel.mapFromSource(sourceIdx);
+		if (proxyIdx.isValid())
+		{
+			int row = proxyIdx.row();
+			auto idx = m_progListView->model()->index(row, 0);
+
+			m_progListView->selectionModel()->setCurrentIndex(idx,
+				QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
+			m_progListView->scrollTo(idx);
+		}
+	}
 
 	// Done with setup...
 	//m_iDirtySetup--;
@@ -211,7 +267,6 @@ bool PatchesDialog::validateForm()
 	bool bValid = true;
 
 	bValid = bValid && (m_bankListView->currentItem() != nullptr);
-	bValid = bValid && (m_progListView->currentItem() != nullptr);
 
 	return bValid;
 }
@@ -235,23 +290,14 @@ void PatchesDialog::setBankProg ( int iBank, int iProg )
 void PatchesDialog::accept()
 {
 	if (validateForm()) {
-		// Unload from current selected dialog items.
-		int iBank = (m_bankListView->currentItem())->text(0).toInt();
-		int iProg = (m_progListView->currentItem())->text(0).toInt();
-		// And set it right away...
-		setBankProg(iBank, iProg);
-		
-		if (m_dirty > 0) {
-			m_bankModel->setValue( iBank );
-			m_progModel->setValue( iProg );
-			m_patchLabel->setText( m_progListView->
-						currentItem()->text( 1 ) );
-		}
+		bool updateUi = m_dirty > 0;
+		updatePatch(updateUi);
 
 		// Do remember preview state...
 		// if (m_pOptions)
 			// m_pOptions->bPresetPreview = m_ui.PreviewCheckBox->isChecked();
 		// We got it.
+
 		QDialog::accept();
 	}
 }
@@ -283,20 +329,17 @@ QTreeWidgetItem *PatchesDialog::findBankItem ( int iBank )
 }
 
 
-// Find the program item of given program number id.
-QTreeWidgetItem *PatchesDialog::findProgItem ( int iProg )
+QStandardItem *PatchesDialog::findProgItem(int iProg)
 {
-	QList<QTreeWidgetItem *> progs
-		= m_progListView->findItems(
-			QString::number(iProg), Qt::MatchExactly, 0);
+	QList<QStandardItem*> progs = m_progListSourceModel.findItems(
+		QString::number(iProg), Qt::MatchExactly, 0);
 
-	QListIterator<QTreeWidgetItem *> iter(progs);
+	QListIterator<QStandardItem*> iter(progs);
 	if (iter.hasNext())
 		return iter.next();
 	else
 		return nullptr;
 }
-
 
 
 // Bank change slot.
@@ -311,13 +354,14 @@ void PatchesDialog::bankChanged ()
 
 	int iBankSelected = pBankItem->text(0).toInt();
 
-	// Clear up the program listview.
+	// Clear up the program list to refill
 	m_progListView->setSortingEnabled(false);
-	m_progListView->clear();
-	QTreeWidgetItem *pProgItem = nullptr;
+	m_progListSourceModel.setRowCount(0);
+
 	// For all soundfonts (in reversed stack order) fill the available programs...
+	bool stop = false; // replaces the `pProgItem` check that used to exist here
 	int cSoundFonts = ::fluid_synth_sfcount(m_pSynth);
-	for (int i = 0; i < cSoundFonts && !pProgItem; i++) {
+	for (int i = 0; i < cSoundFonts && !stop; i++) {
 		fluid_sfont_t *pSoundFont = ::fluid_synth_get_sfont(m_pSynth, i);
 		if (pSoundFont) {
 #ifdef CONFIG_FLUID_BANK_OFFSET
@@ -337,14 +381,18 @@ void PatchesDialog::bankChanged ()
 #endif
 				int iProg = fluid_preset_get_num(pCurPreset);
 				if (iBank == iBankSelected && !findProgItem(iProg)) {
-					pProgItem = new PatchItem(m_progListView, pProgItem);
-					if (pProgItem) {
-						pProgItem->setText(0, QString::number(iProg));
-						pProgItem->setText(1, fluid_preset_get_name(pCurPreset));
-						//pProgItem->setText(2, QString::number(fluid_sfont_get_id(pSoundFont)));
-						//pProgItem->setText(3, QFileInfo(
-						//	fluid_sfont_get_name(pSoundFont).baseName());
-					}
+					// Numeric value on the batch number column - allows for numerical sorting
+					auto patchNumItem = new QStandardItem();
+					patchNumItem->setData(iProg, Qt::DisplayRole);
+
+					auto patchNameItem = new QStandardItem(fluid_preset_get_name(pCurPreset));
+
+					stop = true;
+
+					m_progListSourceModel.appendRow({patchNumItem, patchNameItem});
+					// Old columns:
+					// Col. 2: QString::number(fluid_sfont_get_id(pSoundFont))
+					// Col. 3: QFileInfo(fluid_sfont_get_name(pSoundFont).baseName())
 				}
 			}
 		}
@@ -355,20 +403,40 @@ void PatchesDialog::bankChanged ()
 	stabilizeForm();
 }
 
+void PatchesDialog::updatePatch(bool updateUi)
+{
+	int iBank = m_bankListView->currentItem()->text(0).toInt();
+	setBankProg(iBank, m_selProg);
+
+	if (updateUi)
+	{
+		m_bankModel->setValue(iBank);
+		m_progModel->setValue(m_selProg);
+		m_patchLabel->setText(m_selProgName);
+	}
+}
 
 // Program change slot.
-void PatchesDialog::progChanged (QTreeWidgetItem * _curr, QTreeWidgetItem * _prev)
+void PatchesDialog::progChanged(const QModelIndex& cur, const QModelIndex& prev)
 {
-	if (m_pSynth == nullptr || _curr == nullptr)
+	if (m_pSynth == nullptr)
 		return;
 
+	auto curRow = m_progListProxyModel.mapToSource(cur).row();
+	if (curRow < 0)
+		return;
+
+	auto progIdx = m_progListSourceModel.index(curRow, 0);
+	m_selProg = m_progListSourceModel.data(progIdx).toInt();
+
+	auto nameIdx = m_progListSourceModel.index(curRow, 1);
+	m_selProgName = m_progListSourceModel.data(nameIdx).toString();
+
 	// Which preview state...
-	if( validateForm() ) {
-		// Set current selection.
-		int iBank = (m_bankListView->currentItem())->text(0).toInt();
-		int iProg = _curr->text(0).toInt();
-		// And set it right away...
-		setBankProg(iBank, iProg);
+	if (validateForm())
+	{
+		updatePatch(false);
+
 		// Now we're dirty nuff.
 		m_dirty++;
 	}
@@ -377,5 +445,34 @@ void PatchesDialog::progChanged (QTreeWidgetItem * _curr, QTreeWidgetItem * _pre
 	stabilizeForm();
 }
 
+bool PatchesDialog::eventFilter(QObject *obj, QEvent *event)
+{
+	if (obj == this && event->type() == QEvent::KeyPress)
+	{
+		auto key = static_cast<QKeyEvent*>(event)->key();
+		if (key == Qt::Key_Up || key == Qt::Key_Down)
+		{
+			int rowDiff = (key == Qt::Key_Up) ? -1 : +1;
+			diffSelectProgRow(rowDiff);
+			return true;
+		}
+	}
+
+	return QDialog::eventFilter(obj, event);
+}
+
+void PatchesDialog::diffSelectProgRow(int offset)
+{
+	QItemSelectionModel* selectionModel = m_progListView->selectionModel();
+
+	int curRow = selectionModel->currentIndex().row();
+	int newRow = curRow + offset;
+	int rowCount = m_progListView->model()->rowCount();
+	newRow = qBound(0, newRow, rowCount - 1);
+
+	selectionModel->setCurrentIndex(m_progListView->model()->index(newRow, 0),
+		QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
+	m_progListView->scrollTo(m_progListView->model()->index(newRow, 0));
+}
 
 } // namespace lmms::gui
