@@ -28,9 +28,11 @@
 
 #include "AutomationEditor.h"
 #include "AutomationClip.h"
+#include "embed.h"
 #include "Engine.h"
 #include "GuiApplication.h"
 #include "Song.h"
+#include "SongEditor.h"
 #include "Track.h"
 #include "TrackContainer.h"
 
@@ -214,7 +216,22 @@ TimePos Clip::startTimeOffset() const
 	return m_startTimeOffset;
 }
 
+tick_t Clip::getDefaultClipLength()
+{
+    float snapSize = 1.0f;
 
+	auto* gui = gui::getGUI();
+    if (gui != nullptr &&
+        gui->songEditor() != nullptr &&
+        gui->songEditor()->m_editor != nullptr)
+    {
+        snapSize = gui->songEditor()->m_editor->getSnapSize();
+    }
+
+    const tick_t snapTicks = static_cast<tick_t>(snapSize * TimePos::ticksPerBar());
+
+    return std::max(snapTicks, static_cast<tick_t>(TimePos::ticksPerBar() / 16));
+}
 
 
 void Clip::setStartTimeOffset( const TimePos &startTimeOffset )
