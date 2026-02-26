@@ -336,17 +336,30 @@ void Sf2Instrument::loadFile( const QString & _file )
 
 
 
-AutomatableModel * Sf2Instrument::childModel( const QString & _modelName )
+auto Sf2Instrument::midiPatch() const -> std::optional<MidiPatch>
 {
-	if( _modelName == "bank" )
+	return MidiPatch {
+		.bank = static_cast<std::uint16_t>(m_bankNum.value()),
+		.program = static_cast<std::uint8_t>(m_patchNum.value())
+	};
+}
+
+
+
+
+AutomatableModel* Sf2Instrument::childModel(std::string_view modelName)
+{
+	if (modelName == "bank")
 	{
 		return &m_bankNum;
 	}
-	else if( _modelName == "patch" )
+	else if (modelName == "patch")
 	{
 		return &m_patchNum;
 	}
-	qCritical() << "requested unknown model " << _modelName;
+
+	qCritical() << "requested unknown model " << QString::fromUtf8(modelName.data(), modelName.size());
+
 	return nullptr;
 }
 

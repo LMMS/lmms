@@ -31,11 +31,13 @@
 #include "Flags.h"
 #include "lmms_export.h"
 #include "LmmsTypes.h"
+#include "MidiPatch.h"
 #include "Plugin.h"
 #include "TimePos.h"
 
 #include <cmath>
-
+#include <optional>
+#include <string_view>
 
 namespace lmms
 {
@@ -88,6 +90,19 @@ public:
 	// cast void-ptr so that the plugin-data is deleted properly
 	// (call of dtor if it's a class etc.)
 	virtual void deleteNotePluginData( NotePlayHandle * _note_to_play );
+
+	//! For applicable instruments: Provides host with current MIDI bank and program
+	virtual auto midiPatch() const -> std::optional<MidiPatch>
+	{
+		return std::nullopt;
+	}
+
+	//! Called if external source needs to change something but we cannot
+	//! reference the class header. Should return null if not key not found.
+	virtual auto childModel(std::string_view modelName) -> AutomatableModel*
+	{
+		return nullptr;
+	}
 
 	// Get number of sample-frames that should be used when playing beat
 	// (note with unspecified length)
