@@ -122,6 +122,13 @@ AudioBuffer::~AudioBuffer()
 	}
 }
 
+auto AudioBuffer::getAllocatedSize(f_cnt_t frames, ch_cnt_t channels) -> std::size_t
+{
+	return frames * channels * sizeof(float) // for m_sourceBuffer
+		+ channels * sizeof(float*) // for m_channelBuffers
+		+ frames * 2 * sizeof(float); // for m_interleavedBuffer
+}
+
 auto AudioBuffer::addGroup(ch_cnt_t channels) -> ChannelGroup*
 {
 	if (m_groups.size() >= m_groups.capacity())

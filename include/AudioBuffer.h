@@ -43,6 +43,7 @@ class AudioBuffer;
 class ChannelGroup
 {
 public:
+	ChannelGroup() = default;
 	ChannelGroup(float** buffers, ch_cnt_t channels)
 		: m_buffers{buffers}
 		, m_channels{channels}
@@ -66,6 +67,7 @@ public:
 	auto channels() const -> ch_cnt_t { return m_channels; }
 
 	void setBuffers(float** newBuffers) { m_buffers = newBuffers; }
+	void setChannels(ch_cnt_t channels) { m_channels = channels; }
 
 	// TODO: Future additions: Group names, type (main/aux), speaker arrangements (for surround sound), ...
 
@@ -127,6 +129,31 @@ public:
 	 */
 	explicit AudioBuffer(f_cnt_t frames, ch_cnt_t channels = DEFAULT_CHANNELS,
 		std::pmr::memory_resource* bufferResource = std::pmr::get_default_resource());
+
+	/**
+	 * Creates AudioBuffer with groups defined.
+	 *
+	 * Silence tracking is enabled or disabled depending on the auto-quit setting.
+	 *
+	 * @param frames frame count for all channels
+	 * @param channels total channel count
+	 * @param groups group count
+	 * @param bufferResource allocator for all buffers
+	 * @param groupVisitor see @ref setGroups
+	 */
+	template<class F>
+	AudioBuffer(f_cnt_t frames, ch_cnt_t channels, group_cnt_t groups,
+		std::pmr::memory_resource* bufferResource, F&& groupVisitor)
+		: AudioBuffer{frames, channels, bufferResource}
+	{
+		setGroups(groups, std::forward<F>(groupVisitor));
+	}
+
+	/**
+	 * @returns the number of bytes allocated for the given frame and channel counts.
+	 *          Useful for preallocating a buffer for a custom memory resource.
+	 */
+	static auto getAllocatedSize(f_cnt_t frames, ch_cnt_t channels) -> std::size_t;
 
 	//! @returns current number of channel groups
 	auto groupCount() const -> group_cnt_t { return static_cast<group_cnt_t>(m_groups.size()); }
@@ -199,6 +226,41 @@ public:
 	 * @returns the newly created group, or nullptr upon failure
 	 */
 	auto addGroup(ch_cnt_t channels) -> ChannelGroup*;
+
+	/**
+	 * @brief Changes the channel grouping without changing the channel count.
+	 *        Does not reallocate any buffers.
+	 *
+	 * @param groups the new group count
+	 * @param groupVisitor called for each new group, passed the index and group reference, and is
+	 *                     expected to return the channel count for that group. The visitor may
+	 *                     also set the group's metadata.
+	 */
+	template<class F>
+	void setGroups(group_cnt_t groups, F&& groupVisitor)
+	{
+		static_assert(std::is_invocable_r_v<ch_cnt_t, F, group_cnt_t, ChannelGroup&>,
+			"groupVisitor is passed the group index + group reference and must return the group's channel count");
+
+		m_groups.clear();
+		ch_cnt_t ch = 0;
+		for (group_cnt_t idx = 0; idx < groups; ++idx)
+		{
+			auto& group = m_groups.emplace_back();
+
+			const auto channels = groupVisitor(idx, group);
+			if (channels == 0) { throw std::runtime_error{"group cannot have zero channels"}; }
+
+			group.setBuffers(&m_channelBuffers[ch]);
+			group.setChannels(channels);
+
+			ch += channels;
+			if (ch > this->m_totalChannels)
+			{
+				throw std::runtime_error{"sum of group channel counts exceeds total channels"};
+			}
+		}
+	}
 
 	/**
 	 * Channels which are known to be quiet, AKA the silence status.

@@ -146,6 +146,34 @@ private slots:
 		QCOMPARE(tc.totalChannels(), lmms::MaxChannelsPerTrack);
 	}
 
+	//! Verifies that groups can be specified using `setGroups`
+	void SetGroups()
+	{
+		// Start with 6 channels, all in one group
+		auto tc = AudioBuffer{10, 6};
+		float* const* allBuffers = tc.allBuffers().data();
+
+		QCOMPARE(tc.groupCount(), 1);
+		QCOMPARE(tc.group(0).channels(), 6);
+
+		// Split into group of 2 channels and group of 4 channels
+		tc.setGroups(2, [](lmms::group_cnt_t idx, lmms::ChannelGroup&) {
+			switch (idx)
+			{
+				case 0: return 2;
+				case 1: return 4;
+				default: return 0;
+			}
+		});
+
+		QCOMPARE(tc.groupCount(), 2);
+		QCOMPARE(tc.group(0).channels(), 2);
+		QCOMPARE(tc.group(1).channels(), 4);
+
+		// Check that no reallocation occurred
+		QCOMPARE(tc.allBuffers().data(), allBuffers);
+	}
+
 	//! Verifies all silence flag bits are set when there are no channels
 	void SilenceFlags_AllSilentWhenNoChannels()
 	{
