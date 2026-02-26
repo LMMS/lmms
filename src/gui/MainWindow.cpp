@@ -1941,19 +1941,17 @@ bool MainWindow::MovableQMdiArea::eventFilter(QObject* watched, QEvent* event)
 		// the mouse is over the MDI area (or its children).
 		auto* ke = static_cast<QKeyEvent*>(event);
 
-		if (!universalPanClick && !m_isPanning && ke->modifiers() == UniversalPanMod && ke->key() == UniversalPanKey
-			&& triggerCond())
+		if (!m_isPanning && ke->modifiers() == UniversalPanMod && ke->key() == UniversalPanKey)
 		{
-			// Start panning right away
-			m_canUniversalPan = true;
-			m_isUniversalPan = true;
-			mousePanStart();
-			return true;
-		}
-		else if (universalPanClick && !m_isPanning && ke->modifiers() == UniversalPanMod && ke->key() == UniversalPanKey)
-		{
-			// Register that panning may be initiated
-			m_canUniversalPan = true;
+			m_canUniversalPan = true; // this is a valid panning condition
+
+			// If we don't need a click, try starting panning right away
+			if (!universalPanClick && triggerCond())
+			{
+				m_isUniversalPan = true;
+				mousePanStart();
+			}
+
 			return true;
 		}
 		else if (m_isPanning) // Ignore other keypresses if already panning
@@ -1969,11 +1967,13 @@ bool MainWindow::MovableQMdiArea::eventFilter(QObject* watched, QEvent* event)
 		if (!ke->isAutoRepeat() && ke->key() == UniversalPanKey)
 		{
 			m_canUniversalPan = false;
-			mousePanEnd();
+
+			// If it's not through a click, immediately abort panning
+			if (!universalPanClick) { mousePanEnd(); }
 		}
 	}
 
-	if (event->type() == QEvent::MouseButtonPress)
+	if (event->type() == QEvent::MouseButtonPress || event->type() == QEvent::MouseButtonDblClick)
 	{
 		auto* me = static_cast<QMouseEvent*>(event);
 
@@ -1984,6 +1984,7 @@ bool MainWindow::MovableQMdiArea::eventFilter(QObject* watched, QEvent* event)
 			m_lastX = pos.x();
 			m_lastY = pos.y();
 			mousePanStart();
+			return true;
 		}
 	}
 
@@ -2020,7 +2021,7 @@ bool MainWindow::MovableQMdiArea::eventFilter(QObject* watched, QEvent* event)
 	{
 		auto* fe = static_cast<QFocusEvent*>(event);
 
-		// If we lost the focus from going to another window, disable all panning behavior.
+		// If we lost the focus from going to another window, abort all possible panning.
 		if (fe->reason() != Qt::MouseFocusReason && (m_isPanning || m_isUniversalPan)) {
 			m_canUniversalPan = false;
 			mousePanEnd();
