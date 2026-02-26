@@ -38,6 +38,8 @@ namespace MixHelpers
 
 bool isSilent( const SampleFrame* src, int frames );
 
+bool isSilent(std::span<sample_t> buffer);
+
 bool useNaNHandler();
 
 void setNaNHandler( bool use );

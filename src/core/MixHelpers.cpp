@@ -67,7 +67,7 @@ static inline void run( SampleFrame* dst, const sample_t* srcLeft, const sample_
 
 bool isSilent( const SampleFrame* src, int frames )
 {
-	const float silenceThreshold = 0.0000001f;
+	constexpr float silenceThreshold = 0.0000001f;
 
 	for( int i = 0; i < frames; ++i )
 	{
@@ -78,6 +78,12 @@ bool isSilent( const SampleFrame* src, int frames )
 	}
 
 	return true;
+}
+
+bool isSilent(std::span<sample_t> buffer)
+{
+	constexpr float silenceThreshold = 0.0000001f;
+	return std::ranges::all_of(buffer, [&](const float s) { return std::abs(s) < silenceThreshold; });
 }
 
 bool useNaNHandler()

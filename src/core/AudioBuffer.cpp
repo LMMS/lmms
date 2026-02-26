@@ -37,29 +37,6 @@ namespace lmms
 namespace
 {
 
-/*
- * In the past, the RMS was calculated then compared with a threshold of 10^(-10).
- * Now we use a different algorithm to determine whether a buffer is non-quiet, so
- * a new threshold is needed for the best compatibility. The following is how it's derived.
- *
- * Old method:
- * RMS = average (L^2 + R^2) across stereo buffer.
- * RMS threshold = 10^(-10)
- *
- * So for a single channel, it would be:
- * RMS/2 = average M^2 across single channel buffer.
- * RMS/2 threshold = 5^(-11)
- *
- * The new algorithm for determining whether a buffer is non-silent compares M with the threshold,
- * not M^2, so the square root of M^2's threshold should give us the most compatible threshold for
- * the new algorithm:
- *
- * (RMS/2)^0.5 = (5^(-11))^0.5 = 0.0001431 (approx.)
- *
- * In practice though, the exact value shouldn't really matter so long as it's sufficiently small.
- */
-constexpr auto SilenceThreshold = 0.0001431f;
-
 //! @returns Bitset with all bits at or above `pos` set to `value` and the rest set to `!value`
 template<bool value>
 auto createMask(ch_cnt_t pos) noexcept -> AudioBuffer::ChannelFlags
@@ -314,9 +291,7 @@ auto AudioBuffer::updateSilenceFlags(const ChannelFlags& channels, ch_cnt_t uppe
 		if (channels[ch])
 		{
 			// This channel needs to be updated
-			const auto quiet = std::ranges::all_of(buffer(ch), [](const float sample) {
-				return std::abs(sample) < SilenceThreshold;
-			});
+			const auto quiet = MixHelpers::isSilent(buffer(ch));
 
 			m_silenceFlags[ch] = quiet;
 			allQuiet = allQuiet && quiet;
@@ -344,9 +319,7 @@ auto AudioBuffer::updateAllSilenceFlags() -> bool
 	bool allQuiet = true;
 	for (ch_cnt_t ch = 0; ch < m_totalChannels; ++ch)
 	{
-		const auto quiet = std::ranges::all_of(buffer(ch), [](const float sample) {
-			return std::abs(sample) < SilenceThreshold;
-		});
+		const auto quiet = MixHelpers::isSilent(buffer(ch));
 
 		m_silenceFlags[ch] = quiet;
 		allQuiet = allQuiet && quiet;
