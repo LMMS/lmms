@@ -85,28 +85,28 @@ DynProcControlDialog::DynProcControlDialog(
 
 //wavegraph control buttons
 
-	auto resetButton = new PixmapButton(this, tr("Reset wavegraph"));
+	auto resetButton = new PixmapButton(this);
 	resetButton -> move( 162, 223 );
 	resetButton -> resize( 13, 48 );
 	resetButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "reset_active" ) );
 	resetButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "reset_inactive" ) );
 	resetButton->setToolTip(tr("Reset wavegraph"));
 
-	auto smoothButton = new PixmapButton(this, tr("Smooth wavegraph"));
+	auto smoothButton = new PixmapButton(this);
 	smoothButton -> move( 162, 239 );
 	smoothButton -> resize( 13, 48 );
 	smoothButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "smooth_active" ) );
 	smoothButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "smooth_inactive" ) );
 	smoothButton->setToolTip(tr("Smooth wavegraph"));
 
-	auto addOneButton = new PixmapButton(this, tr("Increase wavegraph amplitude by 1 dB"));
+	auto addOneButton = new PixmapButton(this);
 	addOneButton -> move( 131, 223 );
 	addOneButton -> resize( 13, 29 );
 	addOneButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "add1_active" ) );
 	addOneButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "add1_inactive" ) );
 	addOneButton->setToolTip(tr("Increase wavegraph amplitude by 1 dB"));
 
-	auto subOneButton = new PixmapButton(this, tr("Decrease wavegraph amplitude by 1 dB"));
+	auto subOneButton = new PixmapButton(this);
 	subOneButton -> move( 131, 239 );
 	subOneButton -> resize( 13, 29 );
 	subOneButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "sub1_active" ) );
@@ -114,21 +114,21 @@ DynProcControlDialog::DynProcControlDialog(
 	subOneButton->setToolTip(tr("Decrease wavegraph amplitude by 1 dB"));
 
 //stereomode switches
-	auto smMaxButton = new PixmapButton(this, tr("Stereo mode: maximum"));
+	auto smMaxButton = new PixmapButton(this);
 	smMaxButton -> move( 131, 257 );
 	smMaxButton -> resize( 78, 17 );
 	smMaxButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "max_active" ) );
 	smMaxButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "max_inactive" ) );
 	smMaxButton->setToolTip(tr("Process based on the maximum of both stereo channels"));
 
-	auto smAvgButton = new PixmapButton(this, tr("Stereo mode: average"));
+	auto smAvgButton = new PixmapButton(this);
 	smAvgButton -> move( 131, 274 );
 	smAvgButton -> resize( 78, 16 );
 	smAvgButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "avg_active" ) );
 	smAvgButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "avg_inactive" ) );
 	smAvgButton->setToolTip(tr("Process based on the average of both stereo channels"));
 
-	auto smUnlButton = new PixmapButton(this, tr("Stereo mode: unlinked"));
+	auto smUnlButton = new PixmapButton(this);
 	smUnlButton -> move( 131, 290 );
 	smUnlButton -> resize( 78, 17 );
 	smUnlButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "unl_active" ) );

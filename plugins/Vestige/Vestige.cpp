@@ -494,7 +494,7 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	InstrumentViewFixedSize( _instrument, _parent ),
 	lastPosInMenu (0)
 {
-	m_openPluginButton = new PixmapButton( this, "" );
+	m_openPluginButton = new PixmapButton(this);
 	m_openPluginButton->setCheckable( false );
 	m_openPluginButton->setCursor( Qt::PointingHandCursor );
 	m_openPluginButton->move( 216, 81 );
@@ -506,7 +506,7 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 						SLOT( openPlugin() ) );
 	m_openPluginButton->setToolTip(tr("Open VST plugin"));
 
-	m_managePluginButton = new PixmapButton( this, "" );
+	m_managePluginButton = new PixmapButton(this);
 	m_managePluginButton->setCheckable( false );
 	m_managePluginButton->setCursor( Qt::PointingHandCursor );
 	m_managePluginButton->move( 216, 101 );
@@ -519,7 +519,7 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	m_managePluginButton->setToolTip(tr("Control VST plugin from LMMS host"));
 
 
-	m_openPresetButton = new PixmapButton( this, "" );
+	m_openPresetButton = new PixmapButton(this);
 	m_openPresetButton->setCheckable( false );
 	m_openPresetButton->setCursor( Qt::PointingHandCursor );
 	m_openPresetButton->move( 200, 224 );
@@ -543,7 +543,7 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	m_rolLPresetButton->setShortcut( Qt::Key_Minus );
 
 
-	m_savePresetButton = new PixmapButton( this, "" );
+	m_savePresetButton = new PixmapButton(this);
 	m_savePresetButton->setCheckable( false );
 	m_savePresetButton->setCursor( Qt::PointingHandCursor );
 	m_savePresetButton->move( 224, 224 );

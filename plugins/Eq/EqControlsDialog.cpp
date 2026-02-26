@@ -119,7 +119,7 @@ EqControlsDialog::EqControlsDialog( EqControls *controls ) :
 		freqKnob->setHintText( tr( "Frequency:" ), "Hz" );
 
 		// adds the Number Active buttons
-		auto activeButton = new PixmapButton(this, nullptr);
+		auto activeButton = new PixmapButton(this);
 		activeButton->setCheckable(true);
 		activeButton->setModel( m_parameterWidget->getBandModels( i )->active );
 
@@ -152,38 +152,38 @@ EqControlsDialog::EqControlsDialog( EqControls *controls ) :
 	outSpecButton->move( 302, 240 );
 
 	//hp filter type
-	auto hp12Button = new PixmapButton(this, nullptr);
+	auto hp12Button = new PixmapButton(this);
 	hp12Button->setModel( m_parameterWidget->getBandModels( 0 )->hp12 );
 	hp12Button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "12dB" ) );
 	hp12Button->setInactiveGraphic(  PLUGIN_NAME::getIconPixmap( "12dBoff" ) );
 	hp12Button->move( 79, 298 );
-	auto hp24Button = new PixmapButton(this, nullptr);
+	auto hp24Button = new PixmapButton(this);
 	hp24Button->setModel(m_parameterWidget->getBandModels( 0 )->hp24 );
 	hp24Button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "24dB" ) );
 	hp24Button->setInactiveGraphic(  PLUGIN_NAME::getIconPixmap( "24dBoff" ) );
 
 	hp24Button->move( 79 , 328 );
-	auto hp48Button = new PixmapButton(this, nullptr);
+	auto hp48Button = new PixmapButton(this);
 	hp48Button->setModel( m_parameterWidget->getBandModels(0)->hp48 );
 	hp48Button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "48dB" ) );
 	hp48Button->setInactiveGraphic(  PLUGIN_NAME::getIconPixmap( "48dBoff" ) );
 
 	hp48Button->move( 79, 358 );
 	//LP filter type
-	auto lp12Button = new PixmapButton(this, nullptr);
+	auto lp12Button = new PixmapButton(this);
 	lp12Button->setModel( m_parameterWidget->getBandModels( 7 )->lp12 );
 	lp12Button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "12dB" ) );
 	lp12Button->setInactiveGraphic(  PLUGIN_NAME::getIconPixmap( "12dBoff" ) );
 
 	lp12Button->move( 387, 298 );
-	auto lp24Button = new PixmapButton(this, nullptr);
+	auto lp24Button = new PixmapButton(this);
 	lp24Button->setModel( m_parameterWidget->getBandModels( 7 )->lp24 );
 	lp24Button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "24dB" ) );
 	lp24Button->setInactiveGraphic(  PLUGIN_NAME::getIconPixmap( "24dBoff" ) );
 
 	lp24Button->move( 387, 328 );
 
-	auto lp48Button = new PixmapButton(this, nullptr);
+	auto lp48Button = new PixmapButton(this);
 	lp48Button->setModel( m_parameterWidget->getBandModels( 7 )->lp48 );
 	lp48Button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "48dB" ) );
 	lp48Button->setInactiveGraphic(  PLUGIN_NAME::getIconPixmap( "48dBoff" ) );

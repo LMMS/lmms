@@ -410,7 +410,7 @@ OrganicInstrumentView::OrganicInstrumentView( Instrument * _instrument,
 	m_volKnob->setObjectName( "volKnob" );
 
 	// randomise
-	m_randBtn = new PixmapButton( this, tr( "Randomise" ) );
+	m_randBtn = new PixmapButton(this);
 	m_randBtn->move( 148, 224 );
 	m_randBtn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"randomise_pressed" ) );

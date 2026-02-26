@@ -159,7 +159,7 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 
 	m_midiAutoDetectCheckBox =
 			new LedCheckBox( tr("Auto Detect"),
-				m_midiGroupBox, tr("Auto Detect") );
+				m_midiGroupBox);
 	m_midiAutoDetectCheckBox->setModel( &m_midiAutoDetect );
 	m_midiAutoDetectCheckBox->move( 8, 60 );
 	connect( &m_midiAutoDetect, SIGNAL(dataChanged()),

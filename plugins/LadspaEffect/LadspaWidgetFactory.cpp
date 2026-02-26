@@ -58,7 +58,7 @@ QWidget * LadspaWidgetFactory::createWidget(LadspaControl * ladspaControl, QWidg
 		QHBoxLayout * layout = new QHBoxLayout(widgetWithLayout);
 		layout->setContentsMargins(0, 0, 0, 0);
 		LedCheckBox * toggle = new LedCheckBox(
-			name, parent, QString(), LedCheckBox::LedColor::Green, false);
+			name, parent, LedCheckBox::LedColor::Green, false);
 		toggle->setModel(ladspaControl->toggledModel());
 		layout->addWidget(toggle, 0, Qt::AlignLeft);
 

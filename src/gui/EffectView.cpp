@@ -57,7 +57,7 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 
 	// Disable effects that are of type "DummyEffect"
 	bool isEnabled = !dynamic_cast<DummyEffect *>( effect() );
-	m_bypass = new LedCheckBox( this, "", isEnabled ? LedCheckBox::LedColor::Green : LedCheckBox::LedColor::Red );
+	m_bypass = new LedCheckBox(this, isEnabled ? LedCheckBox::LedColor::Green : LedCheckBox::LedColor::Red);
 	m_bypass->move( 3, 3 );
 	m_bypass->setEnabled( isEnabled );
 

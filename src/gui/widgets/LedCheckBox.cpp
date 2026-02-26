@@ -45,8 +45,8 @@ static const auto names = std::array<QString, 3>
 
 
 LedCheckBox::LedCheckBox( const QString & _text, QWidget * _parent,
-				const QString & _name, LedColor _color, bool legacyMode ) :
-	AutomatableButton( _parent, _name ),
+				LedColor _color, bool legacyMode) :
+	AutomatableButton(_parent),
 	m_text( _text ),
 	m_legacyMode(legacyMode)
 {
@@ -56,9 +56,8 @@ LedCheckBox::LedCheckBox( const QString & _text, QWidget * _parent,
 
 
 
-LedCheckBox::LedCheckBox( QWidget * _parent,
-				const QString & _name, LedColor _color, bool legacyMode ) :
-	LedCheckBox( QString(), _parent, _name, _color, legacyMode )
+LedCheckBox::LedCheckBox(QWidget* parent, LedColor color, bool legacyMode)
+	: LedCheckBox(QString(), parent, color, legacyMode)
 {
 }
 

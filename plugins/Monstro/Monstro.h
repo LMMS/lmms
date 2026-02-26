@@ -57,7 +57,7 @@
 	name ->setFixedSize( 20, 20 );
 
 #define maketinyled( name, x, y, ttip ) \
-	name = new PixmapButton( view, nullptr ); 	\
+	name = new PixmapButton(view); 	\
 	name -> setCheckable( true );			\
 	name -> move( x, y );					\
 	name -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "tinyled_on" ) ); \

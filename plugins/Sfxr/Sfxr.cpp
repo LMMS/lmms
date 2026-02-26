@@ -561,7 +561,7 @@ public:
 
 
 #define createButton( _button, _x, _y, _name, _resName )\
-	_button = new PixmapButton( this, tr( _name ) );\
+	_button = new PixmapButton(this);\
 	_button->move( _x, _y );\
 	_button->setActiveGraphic( embed::getIconPixmap( _resName "_active" ) );\
 	_button->setInactiveGraphic( embed::getIconPixmap( _resName "_inactive" ) );\
@@ -571,7 +571,7 @@ public:
 
 
 #define createButtonLocalGraphic( _button, _x, _y, _name, _resName )\
-	_button = new PixmapButton( this, tr( _name ) );\
+	_button = new PixmapButton(this);\
 	_button->move( _x, _y );\
 	_button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( _resName "_active" ) );\
 	_button->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( _resName "_inactive" ) );\
