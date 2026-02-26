@@ -23,15 +23,15 @@
  *
  */
 
+#include "EffectChain.h"
 
 #include <QDomElement>
 #include <cassert>
 
-#include "EffectChain.h"
+#include "AudioBuffer.h"
 #include "Effect.h"
 #include "DummyEffect.h"
 #include "MixHelpers.h"
-#include "TrackChannelContainer.h"
 
 namespace lmms
 {
@@ -185,19 +185,19 @@ void EffectChain::moveUp( Effect * _effect )
 
 
 
-bool EffectChain::processAudioBuffer(TrackChannelContainer& trackChannels)
+bool EffectChain::processAudioBuffer(AudioBuffer& buffer)
 {
 	if( m_enabledModel.value() == false )
 	{
 		return false;
 	}
 
-	trackChannels.sanitizeAll();
+	buffer.sanitizeAll();
 
 	bool moreEffects = false;
 	for (Effect* effect : m_effects)
 	{
-		moreEffects |= effect->processAudioBuffer(trackChannels);
+		moreEffects |= effect->processAudioBuffer(buffer);
 	}
 
 	return moreEffects;

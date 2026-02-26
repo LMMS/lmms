@@ -1,7 +1,7 @@
 /*
  * LmmsPolyfill.h - Small helpers and stand-in for newer C++ features
  *
- * Copyright (c) 2025 Dalton Messmer <messmer.dalton/at/gmail.com>
+ * Copyright (c) 2026 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *

@@ -1,5 +1,5 @@
 /*
- * TrackChannelContainer.cpp
+ * AudioBuffer.cpp
  *
  * Copyright (c) 2026 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
@@ -22,7 +22,7 @@
  *
  */
 
-#include "TrackChannelContainer.h"
+#include "AudioBuffer.h"
 
 #include <algorithm>
 #include <type_traits>
@@ -62,11 +62,11 @@ constexpr auto SilenceThreshold = 0.0001431f;
 
 //! @returns Bitset with all bits at or above `pos` set to `value` and the rest set to `!value`
 template<bool value>
-auto createMask(track_ch_t pos) noexcept -> TrackChannelContainer::ChannelFlags
+auto createMask(ch_cnt_t pos) noexcept -> AudioBuffer::ChannelFlags
 {
-	assert(pos <= MaxTrackChannels);
+	assert(pos <= MaxChannelsPerTrack);
 
-	TrackChannelContainer::ChannelFlags mask;
+	AudioBuffer::ChannelFlags mask;
 	mask.set();
 
 	if constexpr (value)
@@ -75,7 +75,7 @@ auto createMask(track_ch_t pos) noexcept -> TrackChannelContainer::ChannelFlags
 	}
 	else
 	{
-		mask >>= (MaxTrackChannels - pos);
+		mask >>= (MaxChannelsPerTrack - pos);
 	}
 
 	return mask;
@@ -84,7 +84,7 @@ auto createMask(track_ch_t pos) noexcept -> TrackChannelContainer::ChannelFlags
 } // namespace
 
 
-TrackChannelContainer::TrackChannelContainer(f_cnt_t frames, ch_cnt_t channels,
+AudioBuffer::AudioBuffer(f_cnt_t frames, ch_cnt_t channels,
 	std::pmr::memory_resource* bufferResource)
 	: m_frames{frames}
 	, m_alloc{bufferResource}
@@ -104,7 +104,7 @@ TrackChannelContainer::TrackChannelContainer(f_cnt_t frames, ch_cnt_t channels,
 	}
 }
 
-TrackChannelContainer::~TrackChannelContainer()
+AudioBuffer::~AudioBuffer()
 {
 	if (m_sourceBuffer)
 	{
@@ -122,7 +122,7 @@ TrackChannelContainer::~TrackChannelContainer()
 	}
 }
 
-auto TrackChannelContainer::addGroup(ch_cnt_t channels) -> ChannelGroup*
+auto AudioBuffer::addGroup(ch_cnt_t channels) -> ChannelGroup*
 {
 	if (m_groups.size() >= m_groups.capacity())
 	{
@@ -137,9 +137,9 @@ auto TrackChannelContainer::addGroup(ch_cnt_t channels) -> ChannelGroup*
 	}
 
 	const auto newTotalChannels = m_totalChannels + channels;
-	if (newTotalChannels > MaxTrackChannels)
+	if (newTotalChannels > MaxChannelsPerTrack)
 	{
-		// Not enough room for requested track channels
+		// Not enough room for requested channels
 		return nullptr;
 	}
 
@@ -158,7 +158,7 @@ auto TrackChannelContainer::addGroup(ch_cnt_t channels) -> ChannelGroup*
 
 	// Initialize new channel buffers
 	float* ptr = newSourceBuffer;
-	track_ch_t channel = 0;
+	ch_cnt_t channel = 0;
 	while (channel < newTotalChannels)
 	{
 		newChannelBuffers[channel] = ptr;
@@ -189,8 +189,8 @@ auto TrackChannelContainer::addGroup(ch_cnt_t channels) -> ChannelGroup*
 		channel += group.channels();
 	}
 
-	// Ensure the new track channels (and all the higher, unused
-	// track channels) are set to "silent"
+	// Ensure the new channels (and all the higher, unused
+	// channels) are set to "silent"
 	m_silenceFlags |= createMask<true>(m_totalChannels);
 
 	// Append new group
@@ -201,7 +201,7 @@ auto TrackChannelContainer::addGroup(ch_cnt_t channels) -> ChannelGroup*
 	return &newGroup;
 }
 
-void TrackChannelContainer::enableSilenceTracking(bool enabled)
+void AudioBuffer::enableSilenceTracking(bool enabled)
 {
 	const auto oldValue = m_silenceTrackingEnabled;
 	m_silenceTrackingEnabled = enabled;
@@ -211,41 +211,41 @@ void TrackChannelContainer::enableSilenceTracking(bool enabled)
 	}
 }
 
-void TrackChannelContainer::mixSilenceFlags(const TrackChannelContainer& other)
+void AudioBuffer::mixSilenceFlags(const AudioBuffer& other)
 {
 	m_silenceFlags &= other.silenceFlags();
 }
 
-auto TrackChannelContainer::hasInputNoise(const ChannelFlags& usedChannels) const -> bool
+auto AudioBuffer::hasInputNoise(const ChannelFlags& usedChannels) const -> bool
 {
 	auto nonSilent = ~m_silenceFlags;
 	nonSilent &= usedChannels;
 	return nonSilent.any();
 }
 
-auto TrackChannelContainer::hasAnyInputNoise() const -> bool
+auto AudioBuffer::hasAnyInputNoise() const -> bool
 {
 	// This is possible due to the invariant that any channel bits
 	// at or above `totalChannels()` must always be marked silent
 	return !m_silenceFlags.all();
 }
 
-void TrackChannelContainer::sanitize(const ChannelFlags& channels, track_ch_t upperBound)
+void AudioBuffer::sanitize(const ChannelFlags& channels, ch_cnt_t upperBound)
 {
 	if (!MixHelpers::useNaNHandler()) { return; }
 
 	bool changesMade = false;
 
 	const auto totalChannels = std::min(upperBound, m_totalChannels);
-	for (track_ch_t tc = 0; tc < totalChannels; ++tc)
+	for (ch_cnt_t ch = 0; ch < totalChannels; ++ch)
 	{
-		if (channels[tc])
+		if (channels[ch])
 		{
 			// This channel needs to be sanitized
-			if (MixHelpers::sanitize(buffer(tc)))
+			if (MixHelpers::sanitize(buffer(ch)))
 			{
 				// Inf/NaN detected and buffer cleared
-				m_silenceFlags[tc] = true;
+				m_silenceFlags[ch] = true;
 				changesMade = true;
 			}
 		}
@@ -254,21 +254,21 @@ void TrackChannelContainer::sanitize(const ChannelFlags& channels, track_ch_t up
 	if (changesMade && (channels[0] || channels[1]))
 	{
 		// Keep the temporary interleaved buffer in sync
-		toInterleaved(buffers(0), interleavedBuffer());
+		toInterleaved(groupBuffers(0), interleavedBuffer());
 	}
 }
 
-void TrackChannelContainer::sanitizeAll()
+void AudioBuffer::sanitizeAll()
 {
 	if (!MixHelpers::useNaNHandler()) { return; }
 
 	bool changesMade = false;
-	for (track_ch_t tc = 0; tc < m_totalChannels; ++tc)
+	for (ch_cnt_t ch = 0; ch < m_totalChannels; ++ch)
 	{
-		if (MixHelpers::sanitize(buffer(tc)))
+		if (MixHelpers::sanitize(buffer(ch)))
 		{
 			// Inf/NaN detected and buffer cleared
-			m_silenceFlags[tc] = true;
+			m_silenceFlags[ch] = true;
 			changesMade = true;
 		}
 	}
@@ -276,13 +276,13 @@ void TrackChannelContainer::sanitizeAll()
 	if (changesMade)
 	{
 		// Keep the temporary interleaved buffer in sync
-		toInterleaved(buffers(0), interleavedBuffer());
+		toInterleaved(groupBuffers(0), interleavedBuffer());
 	}
 }
 
-auto TrackChannelContainer::updateSilenceFlags(const ChannelFlags& channels, track_ch_t upperBound) -> bool
+auto AudioBuffer::updateSilenceFlags(const ChannelFlags& channels, ch_cnt_t upperBound) -> bool
 {
-	assert(upperBound <= MaxTrackChannels);
+	assert(upperBound <= MaxChannelsPerTrack);
 
 	// Invariant: Any channel bits at or above `totalChannels()` must be marked silent
 	assert((~m_silenceFlags & createMask<true>(m_totalChannels)).none());
@@ -302,16 +302,16 @@ auto TrackChannelContainer::updateSilenceFlags(const ChannelFlags& channels, tra
 	}
 
 	bool allQuiet = true;
-	for (track_ch_t tc = 0; tc < totalChannels; ++tc)
+	for (ch_cnt_t ch = 0; ch < totalChannels; ++ch)
 	{
-		if (channels[tc])
+		if (channels[ch])
 		{
 			// This channel needs to be updated
-			const auto quiet = std::ranges::all_of(buffer(tc), [](const float sample) {
+			const auto quiet = std::ranges::all_of(buffer(ch), [](const float sample) {
 				return std::abs(sample) < SilenceThreshold;
 			});
 
-			m_silenceFlags[tc] = quiet;
+			m_silenceFlags[ch] = quiet;
 			allQuiet = allQuiet && quiet;
 		}
 	}
@@ -319,7 +319,7 @@ auto TrackChannelContainer::updateSilenceFlags(const ChannelFlags& channels, tra
 	return allQuiet;
 }
 
-auto TrackChannelContainer::updateAllSilenceFlags() -> bool
+auto AudioBuffer::updateAllSilenceFlags() -> bool
 {
 	// Invariant: Any channel bits at or above `totalChannels()` must be marked silent
 	assert((~m_silenceFlags & createMask<true>(m_totalChannels)).none());
@@ -335,43 +335,43 @@ auto TrackChannelContainer::updateAllSilenceFlags() -> bool
 	}
 
 	bool allQuiet = true;
-	for (track_ch_t tc = 0; tc < m_totalChannels; ++tc)
+	for (ch_cnt_t ch = 0; ch < m_totalChannels; ++ch)
 	{
-		const auto quiet = std::ranges::all_of(buffer(tc), [](const float sample) {
+		const auto quiet = std::ranges::all_of(buffer(ch), [](const float sample) {
 			return std::abs(sample) < SilenceThreshold;
 		});
 
-		m_silenceFlags[tc] = quiet;
+		m_silenceFlags[ch] = quiet;
 		allQuiet = allQuiet && quiet;
 	}
 
 	return allQuiet;
 }
 
-void TrackChannelContainer::silenceChannels(const ChannelFlags& channels, track_ch_t upperBound)
+void AudioBuffer::silenceChannels(const ChannelFlags& channels, ch_cnt_t upperBound)
 {
 	auto needSilenced = ~m_silenceFlags;
 	needSilenced &= channels;
 
 	const auto totalChannels = std::min(upperBound, m_totalChannels);
-	for (track_ch_t tc = 0; tc < totalChannels; ++tc)
+	for (ch_cnt_t ch = 0; ch < totalChannels; ++ch)
 	{
-		if (needSilenced[tc])
+		if (needSilenced[ch])
 		{
-			std::ranges::fill(buffer(tc), 0.f);
+			std::ranges::fill(buffer(ch), 0.f);
 		}
 	}
 
 	if (needSilenced[0] || needSilenced[1])
 	{
 		// Keep the temporary interleaved buffer in sync
-		toInterleaved(buffers(0), interleavedBuffer());
+		toInterleaved(groupBuffers(0), interleavedBuffer());
 	}
 
 	m_silenceFlags |= channels;
 }
 
-void TrackChannelContainer::silenceAllChannels()
+void AudioBuffer::silenceAllChannels()
 {
 	std::fill_n(m_sourceBuffer, m_totalChannels * m_frames, 0);
 	std::fill_n(m_interleavedBuffer, 2 * m_frames, 0);
@@ -379,7 +379,7 @@ void TrackChannelContainer::silenceAllChannels()
 	m_silenceFlags.set();
 }
 
-auto TrackChannelContainer::absPeakValue(track_ch_t channel) const -> float
+auto AudioBuffer::absPeakValue(ch_cnt_t channel) const -> float
 {
 	if (m_silenceFlags[channel])
 	{

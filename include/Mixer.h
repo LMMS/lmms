@@ -25,11 +25,11 @@
 #ifndef LMMS_MIXER_H
 #define LMMS_MIXER_H
 
+#include "AudioBuffer.h"
 #include "EffectChain.h"
 #include "JournallingObject.h"
 #include "Model.h"
 #include "ThreadableJob.h"
-#include "TrackChannelContainer.h"
 
 #include <atomic>
 #include <optional>
@@ -55,7 +55,7 @@ public:
 
 	float m_peakLeft;
 	float m_peakRight;
-	TrackChannelContainer m_trackChannels;
+	AudioBuffer m_buffer;
 	bool m_muteBeforeSolo;
 	BoolModel m_muteModel;
 	BoolModel m_soloModel;
@@ -142,7 +142,7 @@ public:
 	Mixer();
 	~Mixer() override;
 
-	void mixToChannel(const TrackChannelContainer& trackChannels, mix_ch_t dest);
+	void mixToChannel(const AudioBuffer& buffer, mix_ch_t dest);
 
 	void prepareMasterMix();
 	void masterMix( SampleFrame* _buf );

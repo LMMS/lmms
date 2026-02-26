@@ -27,13 +27,13 @@
 
 #include <QDomElement>
 
+#include "AudioBuffer.h"
 #include "ConfigManager.h"
 #include "EffectChain.h"
 #include "EffectControls.h"
 #include "EffectView.h"
 #include "MixHelpers.h"
 #include "SampleFrame.h"
-#include "TrackChannelContainer.h"
 
 namespace lmms
 {
@@ -93,7 +93,7 @@ void Effect::loadSettings( const QDomElement & _this )
 
 
 
-bool Effect::processAudioBuffer(TrackChannelContainer& inOut)
+bool Effect::processAudioBuffer(AudioBuffer& inOut)
 {
 	if (!isAwake())
 	{
@@ -121,7 +121,7 @@ bool Effect::processAudioBuffer(TrackChannelContainer& inOut)
 	const auto status = processImpl(inOut.interleavedBuffer().asSampleFrames().data(), inOut.frames());
 
 	// Copy interleaved plugin output to planar
-	toPlanar(inOut.interleavedBuffer(), inOut.buffers(0));
+	toPlanar(inOut.interleavedBuffer(), inOut.groupBuffers(0));
 
 	inOut.sanitize(0b11);
 

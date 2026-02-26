@@ -138,7 +138,7 @@ void add(PlanarBufferView<sample_t> dst, PlanarBufferView<const sample_t> src)
 
 	const auto channels = dst.channels();
 	const auto frames = dst.frames();
-	for (proc_ch_t channel = 0; channel < channels; ++channel)
+	for (ch_cnt_t channel = 0; channel < channels; ++channel)
 	{
 		auto* dstPtr = dst.bufferPtr(channel);
 		const auto* srcPtr = src.bufferPtr(channel);

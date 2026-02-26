@@ -30,8 +30,8 @@
 #include <QString>
 #include <QMutex>
 
+#include "AudioBuffer.h"
 #include "PlayHandle.h"
-#include "TrackChannelContainer.h"
 
 namespace lmms
 {
@@ -84,7 +84,7 @@ public:
 private:
 	volatile bool m_bufferUsage;
 
-	TrackChannelContainer m_trackChannels;
+	AudioBuffer m_buffer;
 
 	bool m_extOutputEnabled;
 	mix_ch_t m_nextMixerChannel;

@@ -1,5 +1,5 @@
 /*
- * TrackChannelContainerTest.cpp
+ * AudioBufferTest.cpp
  *
  * Copyright (c) 2026 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
@@ -22,7 +22,7 @@
  *
  */
 
-#include "TrackChannelContainer.h"
+#include "AudioBuffer.h"
 
 #include <QObject>
 #include <QtTest>
@@ -32,9 +32,9 @@
 
 #include "MixHelpers.h"
 
-using lmms::TrackChannelContainer;
+using lmms::AudioBuffer;
 
-class TrackChannelContainerTest : public QObject
+class AudioBufferTest : public QObject
 {
 	Q_OBJECT
 
@@ -42,7 +42,7 @@ private slots:
 	//! Verifies constructor with default channels adds single stereo group
 	void Constructor_DefaultChannels()
 	{
-		auto tc = TrackChannelContainer{10};
+		auto tc = AudioBuffer{10};
 		QCOMPARE(tc.groupCount(), 1);
 		QCOMPARE(tc.group(0).channels(), 2);
 		QCOMPARE(tc.totalChannels(), 2);
@@ -52,7 +52,7 @@ private slots:
 	//! Verifies constructor with no channels does not create a first group
 	void Constructor_NoChannels()
 	{
-		auto tc = TrackChannelContainer{10, 0};
+		auto tc = AudioBuffer{10, 0};
 		QCOMPARE(tc.groupCount(), 0);
 		QCOMPARE(tc.totalChannels(), 0);
 		QCOMPARE(tc.frames(), 10);
@@ -62,7 +62,7 @@ private slots:
 	void AddGroup_FirstGroup()
 	{
 		// Begin with zero groups
-		auto tc = TrackChannelContainer{10, 0};
+		auto tc = AudioBuffer{10, 0};
 
 		// Add a first group with 5 channels
 		auto group = tc.addGroup(5);
@@ -77,7 +77,7 @@ private slots:
 	void AddGroup_SecondGroup()
 	{
 		// Begin with 1 group
-		auto tc = TrackChannelContainer{10, 3};
+		auto tc = AudioBuffer{10, 3};
 
 		// Add a 2nd group with 4 channels
 		auto group = tc.addGroup(4);
@@ -91,7 +91,7 @@ private slots:
 	//! Verifies that a group with 0 channels cannot be added and doing so has no effect
 	void AddGroup_ZeroChannelsFails()
 	{
-		auto tc = TrackChannelContainer{10};
+		auto tc = AudioBuffer{10};
 		QCOMPARE(tc.groupCount(), 1);
 		QCOMPARE(tc.totalChannels(), 2);
 
@@ -106,7 +106,7 @@ private slots:
 	//! Verifies that a group with the max channel count can be added
 	void AddGroup_MaximumChannelsInGroup()
 	{
-		auto tc = TrackChannelContainer{10};
+		auto tc = AudioBuffer{10};
 
 		auto group = tc.addGroup(lmms::MaxChannelsPerGroup);
 		QVERIFY(group != nullptr);
@@ -119,7 +119,7 @@ private slots:
 	//! be added and doing so has no effect
 	void AddGroup_TooManyChannels()
 	{
-		auto tc = TrackChannelContainer{10};
+		auto tc = AudioBuffer{10};
 		QCOMPARE(tc.groupCount(), 1);
 		QCOMPARE(tc.totalChannels(), 2);
 
@@ -132,7 +132,7 @@ private slots:
 	//! Verifies that groups cannot be added past the maximum group count
 	void AddGroup_MaximumGroups()
 	{
-		auto tc = TrackChannelContainer{10, 0};
+		auto tc = AudioBuffer{10, 0};
 
 		// Add groups until no more can be added
 		auto groupsLeft = static_cast<int>(lmms::MaxGroupsPerTrack);
@@ -157,11 +157,11 @@ private slots:
 	//! Verifies that groups cannot be added past the maximum total channel count for the track
 	void AddGroup_MaximumTotalChannels()
 	{
-		auto tc = TrackChannelContainer{10, 0};
+		auto tc = AudioBuffer{10, 0};
 
-		static_assert(lmms::MaxTrackChannels % lmms::MaxChannelsPerGroup == 0, "Need to update test");
-		auto groupsLeft = lmms::MaxTrackChannels / lmms::MaxChannelsPerGroup;
-		auto channelsLeft = lmms::MaxTrackChannels;
+		static_assert(lmms::MaxChannelsPerTrack % lmms::MaxChannelsPerGroup == 0, "Need to update test");
+		auto groupsLeft = lmms::MaxChannelsPerTrack / lmms::MaxChannelsPerGroup;
+		auto channelsLeft = lmms::MaxChannelsPerTrack;
 
 		// Add all but the last group
 		while (groupsLeft > 1)
@@ -177,32 +177,32 @@ private slots:
 		// Add one fewer than the max channels for the last group
 		auto group = tc.addGroup(lmms::MaxChannelsPerGroup - 1);
 		QVERIFY(group != nullptr);
-		QCOMPARE(tc.totalChannels(), lmms::MaxTrackChannels - 1);
+		QCOMPARE(tc.totalChannels(), lmms::MaxChannelsPerTrack - 1);
 
 		// Ok, now try adding a group with enough channels
 		// to push the total channels past the maximum for the track (should fail)
 		group = tc.addGroup(2);
 		QCOMPARE(group, nullptr);
-		QCOMPARE(tc.totalChannels(), lmms::MaxTrackChannels - 1);
+		QCOMPARE(tc.totalChannels(), lmms::MaxChannelsPerTrack - 1);
 
 		// Ok, how about just enough to hit the maximum
 		// total channels for the track (should succeed)
 		group = tc.addGroup(1);
 		QVERIFY(group != nullptr);
-		QCOMPARE(tc.totalChannels(), lmms::MaxTrackChannels);
+		QCOMPARE(tc.totalChannels(), lmms::MaxChannelsPerTrack);
 	}
 
 	//! Verifies all silence flag bits are set when there are no channels
 	void SilenceFlags_AllSilentWhenNoChannels()
 	{
-		auto tc = TrackChannelContainer{10, 0};
+		auto tc = AudioBuffer{10, 0};
 		QCOMPARE(tc.silenceFlags().all(), true);
 	}
 
 	//! Verifies all silence flags bits are set even after adding new groups/channels
 	void SilenceFlags_AllSilentWhenNewGroupsAdded()
 	{
-		auto tc = TrackChannelContainer{10};
+		auto tc = AudioBuffer{10};
 		QCOMPARE(tc.silenceFlags().all(), true);
 
 		tc.addGroup(4);
@@ -212,7 +212,7 @@ private slots:
 	//! Verifies that `assumeNonSilent` clears a specific bit in the silence flags
 	void AssumeNonSilent()
 	{
-		auto tc = TrackChannelContainer{10, 2};
+		auto tc = AudioBuffer{10, 2};
 		QCOMPARE(tc.silenceFlags().all(), true);
 
 		// Assume 2nd channel is non-silent
@@ -226,7 +226,7 @@ private slots:
 	//! Verifies `enableSilenceTracking` enables and disables silence tracking
 	void EnableSilenceTracking_GetterSetter()
 	{
-		auto tc = TrackChannelContainer{10};
+		auto tc = AudioBuffer{10};
 		tc.enableSilenceTracking(true);
 		QCOMPARE(tc.silenceTrackingEnabled(), true);
 
@@ -237,7 +237,7 @@ private slots:
 	//! Verifies that `enableSilenceTracking(true)` also updates silence flags
 	void EnableSilenceTracking_UpdatesSilenceFlags()
 	{
-		auto tc = TrackChannelContainer{10, 2};
+		auto tc = AudioBuffer{10, 2};
 		tc.enableSilenceTracking(false);
 
 		// Assume 2nd channel is non-silent
@@ -260,7 +260,7 @@ private slots:
 	//! for an update.
 	void UpdateSilenceFlags_DoesNothingWhenSilent()
 	{
-		auto tc = TrackChannelContainer{10};
+		auto tc = AudioBuffer{10};
 		tc.enableSilenceTracking(true);
 
 		QCOMPARE(tc.silenceFlags().all(), true);
@@ -282,14 +282,14 @@ private slots:
 	//! but only when that channel is selected for an update.
 	void UpdateSilenceFlags_UpdatesChannelWhenSelected()
 	{
-		auto tc = TrackChannelContainer{10};
+		auto tc = AudioBuffer{10};
 		tc.enableSilenceTracking(true);
 
 		// Both channels should be silent
 		QCOMPARE(tc.silenceFlags().all(), true);
 
 		// Introduce noise to a frame in the right channel
-		tc.buffers(0).buffer(1)[5] = 1.f;
+		tc.group(0).buffer(1)[5] = 1.f;
 
 		// Update the left channel - returns true because the updated channel is silent
 		QCOMPARE(tc.updateSilenceFlags(0b01), true);
@@ -313,7 +313,7 @@ private slots:
 	//! Verifies that the `updateSilenceFlags` method works across channel groups
 	void UpdateSilenceFlags_WorksWithGroups()
 	{
-		auto tc = TrackChannelContainer{10, 0};
+		auto tc = AudioBuffer{10, 0};
 		tc.enableSilenceTracking(true);
 
 		tc.addGroup(3);
@@ -323,10 +323,10 @@ private slots:
 		QCOMPARE(tc.silenceFlags().all(), true);
 
 		// Introduce noise to a frame in the 2nd channel of the 1st group
-		tc.buffers(0).buffer(1)[5] = 1.f;
+		tc.group(0).buffer(1)[5] = 1.f;
 
 		// Introduce noise to a frame in the 1st channel of the 2nd group
-		tc.buffers(1).buffer(0)[5] = 1.f;
+		tc.group(1).buffer(0)[5] = 1.f;
 
 		// Update the two silent channels - returns true because both are silent
 		QCOMPARE(tc.updateSilenceFlags(0b0101), true);
@@ -363,7 +363,7 @@ private slots:
 	//! from non-silent to silent when selected for update.
 	void UpdateSilenceFlags_UpdatesFromNonSilenceToSilence()
 	{
-		auto tc = TrackChannelContainer{10, 2};
+		auto tc = AudioBuffer{10, 2};
 		tc.enableSilenceTracking(true);
 
 		QCOMPARE(tc.silenceFlags().all(), true);
@@ -404,7 +404,7 @@ private slots:
 	//! silence tracking is disabled.
 	void UpdateSilenceFlags_NonSilentWhenSilenceTrackingDisabled()
 	{
-		auto tc = TrackChannelContainer{10, 2};
+		auto tc = AudioBuffer{10, 2};
 		tc.enableSilenceTracking(false);
 
 		QCOMPARE(tc.silenceFlags().all(), true);
@@ -427,7 +427,7 @@ private slots:
 	//! it returns true indicating that all selected channels are silent.
 	void UpdateSilenceFlags_NoSelectionIsSilent()
 	{
-		auto tc = TrackChannelContainer{10, 2};
+		auto tc = AudioBuffer{10, 2};
 
 		// First, with silence tracking
 		tc.enableSilenceTracking(true);
@@ -442,7 +442,7 @@ private slots:
 	//! when silence tracking is enabled.
 	void UpdateAllSilenceFlags_SilenceTrackingEnabled()
 	{
-		auto tc = TrackChannelContainer{10, 2};
+		auto tc = AudioBuffer{10, 2};
 		tc.addGroup(2);
 		tc.enableSilenceTracking(true);
 
@@ -450,10 +450,10 @@ private slots:
 		QCOMPARE(tc.silenceFlags().all(), true);
 
 		// Introduce noise to a frame in the 1st channel of the 1st group
-		tc.buffers(0).buffer(0)[5] = 1.f;
+		tc.group(0).buffer(0)[5] = 1.f;
 
 		// Introduce noise to a frame in the 2nd channel of the 2nd group
-		tc.buffers(1).buffer(1)[5] = 1.f;
+		tc.group(1).buffer(1)[5] = 1.f;
 
 		// Those 2 channels should be marked silent after updating all channels
 		QCOMPARE(tc.updateAllSilenceFlags(), false);
@@ -464,7 +464,7 @@ private slots:
 		QCOMPARE(tc.silenceFlags()[4], true);  // unused 5th channel
 
 		// Silence the frame in the 2nd channel of the 2nd group
-		tc.buffers(1).buffer(1)[5] = 0.f;
+		tc.group(1).buffer(1)[5] = 0.f;
 
 		// Now only the 1st channel should be marked silent after updating all channels
 		QCOMPARE(tc.updateAllSilenceFlags(), false);
@@ -479,7 +479,7 @@ private slots:
 	//! for used channels as non-silent when silence tracking is disabled.
 	void UpdateAllSilenceFlags_SilenceTrackingDisabled()
 	{
-		auto tc = TrackChannelContainer{10, 2};
+		auto tc = AudioBuffer{10, 2};
 		tc.addGroup(2);
 		tc.enableSilenceTracking(false);
 
@@ -496,7 +496,7 @@ private slots:
 	//! returns true indicating that all channels are silent.
 	void UpdateAllSilenceFlags_NoChannelsIsSilent()
 	{
-		auto tc = TrackChannelContainer{10, 0};
+		auto tc = AudioBuffer{10, 0};
 
 		// First, with silence tracking
 		tc.enableSilenceTracking(true);
@@ -511,13 +511,13 @@ private slots:
 	//! channels are non-silent.
 	void HasInputNoise()
 	{
-		auto tc = TrackChannelContainer{10, 2};
+		auto tc = AudioBuffer{10, 2};
 		tc.enableSilenceTracking(true);
 
 		// Add a 2nd stereo group
 		QVERIFY(tc.addGroup(2) != nullptr);
 
-		// No input noise since all track channels are silent
+		// No input noise since all channels are silent
 		QCOMPARE(tc.hasInputNoise(0b1111), false);
 
 		// Assume both left channels are non-silent
@@ -545,7 +545,7 @@ private slots:
 	{
 		lmms::MixHelpers::setNaNHandler(true);
 
-		auto tc = TrackChannelContainer{10, 2};
+		auto tc = AudioBuffer{10, 2};
 		tc.enableSilenceTracking(true);
 
 		// Add a 2nd stereo group
@@ -556,14 +556,14 @@ private slots:
 		tc.sanitize(0b1111);
 		QCOMPARE(tc.silenceFlags().all(), true);
 
-		// Make left channel of 1st track channel group
+		// Make left channel of 1st channel group
 		// contain an Inf, and force the channel to non-silent
-		tc.buffers(0).buffer(0)[5] = std::numeric_limits<float>::infinity();
+		tc.group(0).buffer(0)[5] = std::numeric_limits<float>::infinity();
 		tc.assumeNonSilent(0);
 
-		// Make right channel of 1st track channel group non-silent too,
+		// Make right channel of 1st channel group non-silent too,
 		// but using a valid value
-		tc.buffers(0).buffer(1)[5] = 1.f;
+		tc.group(0).buffer(1)[5] = 1.f;
 		tc.assumeNonSilent(1);
 
 		// Sanitize only the left channel
@@ -571,8 +571,8 @@ private slots:
 
 		// The left channel's buffer should be silenced,
 		// while the right channel should be unaffected
-		QCOMPARE(tc.buffers(0).buffer(0)[5], 0.f);
-		QCOMPARE(tc.buffers(0).buffer(1)[5], 1.f);
+		QCOMPARE(tc.group(0).buffer(0)[5], 0.f);
+		QCOMPARE(tc.group(0).buffer(1)[5], 1.f);
 		QCOMPARE(tc.silenceFlags()[0], true);
 		QCOMPARE(tc.silenceFlags()[1], false);
 		QCOMPARE(tc.silenceFlags()[2], true);
@@ -580,16 +580,16 @@ private slots:
 		QCOMPARE(tc.silenceFlags()[4], true); // unused 5th channel
 
 		// Try again
-		tc.buffers(0).buffer(0)[5] = std::numeric_limits<float>::quiet_NaN();
+		tc.group(0).buffer(0)[5] = std::numeric_limits<float>::quiet_NaN();
 		tc.assumeNonSilent(0);
 
-		// This time, sanitize both channels of the 1st track channel group
+		// This time, sanitize both channels of the 1st channel group
 		tc.sanitize(0b0011);
 
 		// Again, the left channel's buffer should be silence,
 		// while the right channel should be unaffected
-		QCOMPARE(tc.buffers(0).buffer(0)[5], 0.f);
-		QCOMPARE(tc.buffers(0).buffer(1)[5], 1.f);
+		QCOMPARE(tc.group(0).buffer(0)[5], 0.f);
+		QCOMPARE(tc.group(0).buffer(1)[5], 1.f);
 		QCOMPARE(tc.silenceFlags()[0], true);
 		QCOMPARE(tc.silenceFlags()[1], false);
 		QCOMPARE(tc.silenceFlags()[2], true);
@@ -601,7 +601,7 @@ private slots:
 	//! and updates their silence flags
 	void SilenceChannels_SilencesSelectedChannels()
 	{
-		auto tc = TrackChannelContainer{10, 2};
+		auto tc = AudioBuffer{10, 2};
 		tc.enableSilenceTracking(true);
 
 		// Add a 2nd stereo group
@@ -612,9 +612,9 @@ private slots:
 		tc.silenceChannels(0b1111);
 		QCOMPARE(tc.silenceFlags().all(), true);
 
-		// Make left channel of 2nd track channel group contain
+		// Make left channel of 2nd channel group contain
 		// a non-silent value, and force the channel to be non-silent
-		tc.buffers(1).buffer(0)[5] = 1.f;
+		tc.group(1).buffer(0)[5] = 1.f;
 		tc.assumeNonSilent(2);
 
 		// Silence only the left channel
@@ -625,9 +625,9 @@ private slots:
 		QCOMPARE(tc.silenceFlags()[2], true); // updated!
 		QCOMPARE(tc.silenceFlags()[3], true); // not selected
 
-		// Make right channel of 2nd track channel group contain
+		// Make right channel of 2nd channel group contain
 		// a non-silent value, and force the channel to be non-silent
-		tc.buffers(1).buffer(1)[5] = 1.f;
+		tc.group(1).buffer(1)[5] = 1.f;
 		tc.assumeNonSilent(3);
 
 		// Silence only the right channel
@@ -638,17 +638,17 @@ private slots:
 		QCOMPARE(tc.silenceFlags()[2], true); // not selected
 		QCOMPARE(tc.silenceFlags()[3], true); // updated!
 
-		// Make right channel of 1st track channel group and
-		// both channels of 2nd track channel group contain
+		// Make right channel of 1st channel group and
+		// both channels of 2nd channel group contain
 		// a non-silent value, and force those channels to be non-silent
-		tc.buffers(1).buffer(1)[5] = 1.f;
+		tc.group(1).buffer(1)[5] = 1.f;
 		tc.assumeNonSilent(1);
-		tc.buffers(1).buffer(0)[5] = 1.f;
+		tc.group(1).buffer(0)[5] = 1.f;
 		tc.assumeNonSilent(2);
-		tc.buffers(1).buffer(1)[5] = 1.f;
+		tc.group(1).buffer(1)[5] = 1.f;
 		tc.assumeNonSilent(3);
 
-		// Silence both channels of the 2nd track channel group,
+		// Silence both channels of the 2nd channel group,
 		// plus the already-silent left channel of the 1st group
 		tc.silenceChannels(0b1101);
 
@@ -659,5 +659,5 @@ private slots:
 	}
 };
 
-QTEST_GUILESS_MAIN(TrackChannelContainerTest)
-#include "TrackChannelContainerTest.moc"
+QTEST_GUILESS_MAIN(AudioBufferTest)
+#include "AudioBufferTest.moc"

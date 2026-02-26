@@ -5,10 +5,10 @@ set(CMAKE_AUTOMOC ON)
 
 set(LMMS_TESTS
 	src/core/ArrayVectorTest.cpp
+	src/core/AudioBufferTest.cpp
 	src/core/AutomatableModelTest.cpp
 	src/core/MathTest.cpp
 	src/core/ProjectVersionTest.cpp
-	src/core/TrackChannelContainerTest.cpp
 	src/core/RelativePathsTest.cpp
 	src/core/TimelineTest.cpp
 	src/tracks/AutomationTrackTest.cpp

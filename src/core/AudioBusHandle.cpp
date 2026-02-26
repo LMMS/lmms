@@ -41,7 +41,7 @@ AudioBusHandle::AudioBusHandle(const QString& name, bool hasEffectChain,
 	FloatModel* volumeModel, FloatModel* panningModel,
 	BoolModel* mutedModel) :
 	m_bufferUsage(false),
-	m_trackChannels(Engine::audioEngine()->framesPerPeriod()),
+	m_buffer(Engine::audioEngine()->framesPerPeriod()),
 	m_extOutputEnabled(false),
 	m_nextMixerChannel(0),
 	m_name(name),
@@ -98,7 +98,7 @@ bool AudioBusHandle::processEffects()
 {
 	if (m_effects)
 	{
-		bool more = m_effects->processAudioBuffer(m_trackChannels);
+		bool more = m_effects->processAudioBuffer(m_buffer);
 		return more;
 	}
 	return false;
@@ -115,7 +115,7 @@ void AudioBusHandle::doProcessing()
 	const fpp_t fpp = Engine::audioEngine()->framesPerPeriod();
 
 	// clear the buffer
-	m_trackChannels.silenceAllChannels();
+	m_buffer.silenceAllChannels();
 
 	//qDebug( "Playhandles: %d", m_playHandles.size() );
 	for (PlayHandle* ph : m_playHandles) // now we mix all playhandle buffers into our internal buffer
@@ -129,7 +129,7 @@ void AudioBusHandle::doProcessing()
 				m_bufferUsage = true;
 
 				// Writing to temporary interleaved buffer until PlayHandle and MixHelpers switch to planar
-				MixHelpers::add(m_trackChannels.interleavedBuffer().asSampleFrames().data(), ph->buffer(), fpp);
+				MixHelpers::add(m_buffer.interleavedBuffer().asSampleFrames().data(), ph->buffer(), fpp);
 			}
 			ph->releaseBuffer(); 	// gets rid of playhandle's buffer and sets
 									// pointer to null, so if it doesn't get re-acquired we know to skip it next time
@@ -139,7 +139,7 @@ void AudioBusHandle::doProcessing()
 	if (m_bufferUsage)
 	{
 		// PlayHandle buffers were written to the temporary interleaved buffer
-		auto buffer = m_trackChannels.interleavedBuffer();
+		auto buffer = m_buffer.interleavedBuffer();
 
 		// handle volume and panning
 		// has both vol and pan models
@@ -226,12 +226,12 @@ void AudioBusHandle::doProcessing()
 
 		// Copy from temporary interleaved buffer to the main planar buffer
 		// so they stay in sync
-		toPlanar(buffer, m_trackChannels.buffers(0));
+		toPlanar(buffer, m_buffer.groupBuffers(0));
 
-		m_trackChannels.sanitizeAll();
+		m_buffer.sanitizeAll();
 
-		// Update silence status of track channels for instrument output
-		m_trackChannels.updateAllSilenceFlags();
+		// Update silence status of all channels for instrument output
+		m_buffer.updateAllSilenceFlags();
 	}
 	// as of now there's no situation where we only have panning model but no volume model
 	// if we have neither, we don't have to do anything here - just pass the audio as is
@@ -241,7 +241,7 @@ void AudioBusHandle::doProcessing()
 	if (anyOutputAfterEffects || m_bufferUsage)
 	{
 		// TODO: improve the flow here - convert to pull model
-		Engine::mixer()->mixToChannel(m_trackChannels, m_nextMixerChannel); // send output to mixer
+		Engine::mixer()->mixToChannel(m_buffer, m_nextMixerChannel); // send output to mixer
 		m_bufferUsage = false;
 	}
 }
