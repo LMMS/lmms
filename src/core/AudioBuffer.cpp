@@ -130,7 +130,7 @@ auto AudioBuffer::addGroup(ch_cnt_t channels) -> ChannelGroup*
 		return nullptr;
 	}
 
-	if (channels > MaxChannelsPerGroup || channels == 0)
+	if (channels == 0)
 	{
 		// Invalid channel count for a group
 		return nullptr;
@@ -216,14 +216,14 @@ void AudioBuffer::mixSilenceFlags(const AudioBuffer& other)
 	m_silenceFlags &= other.silenceFlags();
 }
 
-auto AudioBuffer::hasInputNoise(const ChannelFlags& usedChannels) const -> bool
+auto AudioBuffer::hasSignal(const ChannelFlags& channels) const -> bool
 {
 	auto nonSilent = ~m_silenceFlags;
-	nonSilent &= usedChannels;
+	nonSilent &= channels;
 	return nonSilent.any();
 }
 
-auto AudioBuffer::hasAnyInputNoise() const -> bool
+auto AudioBuffer::hasAnySignal() const -> bool
 {
 	// This is possible due to the invariant that any channel bits
 	// at or above `totalChannels()` must always be marked silent

@@ -103,32 +103,6 @@ private slots:
 		QCOMPARE(tc.totalChannels(), 2);
 	}
 
-	//! Verifies that a group with the max channel count can be added
-	void AddGroup_MaximumChannelsInGroup()
-	{
-		auto tc = AudioBuffer{10};
-
-		auto group = tc.addGroup(lmms::MaxChannelsPerGroup);
-		QVERIFY(group != nullptr);
-		QCOMPARE(group->channels(), lmms::MaxChannelsPerGroup);
-		QCOMPARE(tc.groupCount(), 2);
-		QCOMPARE(tc.totalChannels(), 2 + lmms::MaxChannelsPerGroup);
-	}
-
-	//! Verifies that a group with over the max channel count cannot
-	//! be added and doing so has no effect
-	void AddGroup_TooManyChannels()
-	{
-		auto tc = AudioBuffer{10};
-		QCOMPARE(tc.groupCount(), 1);
-		QCOMPARE(tc.totalChannels(), 2);
-
-		auto group = tc.addGroup(lmms::MaxChannelsPerGroup + 1);
-		QCOMPARE(group, nullptr);
-		QCOMPARE(tc.groupCount(), 1);
-		QCOMPARE(tc.totalChannels(), 2);
-	}
-
 	//! Verifies that groups cannot be added past the maximum group count
 	void AddGroup_MaximumGroups()
 	{
@@ -157,31 +131,11 @@ private slots:
 	//! Verifies that groups cannot be added past the maximum total channel count for the track
 	void AddGroup_MaximumTotalChannels()
 	{
-		auto tc = AudioBuffer{10, 0};
+		auto tc = AudioBuffer{10, lmms::MaxChannelsPerTrack - 1};
 
-		static_assert(lmms::MaxChannelsPerTrack % lmms::MaxChannelsPerGroup == 0, "Need to update test");
-		auto groupsLeft = lmms::MaxChannelsPerTrack / lmms::MaxChannelsPerGroup;
-		auto channelsLeft = lmms::MaxChannelsPerTrack;
-
-		// Add all but the last group
-		while (groupsLeft > 1)
-		{
-			auto group = tc.addGroup(lmms::MaxChannelsPerGroup);
-			QVERIFY(group != nullptr);
-			--groupsLeft;
-			channelsLeft -= lmms::MaxChannelsPerGroup;
-		}
-		QCOMPARE(groupsLeft, 1);
-		QCOMPARE(channelsLeft, lmms::MaxChannelsPerGroup);
-
-		// Add one fewer than the max channels for the last group
-		auto group = tc.addGroup(lmms::MaxChannelsPerGroup - 1);
-		QVERIFY(group != nullptr);
-		QCOMPARE(tc.totalChannels(), lmms::MaxChannelsPerTrack - 1);
-
-		// Ok, now try adding a group with enough channels
+		// Try adding a group with enough channels
 		// to push the total channels past the maximum for the track (should fail)
-		group = tc.addGroup(2);
+		auto group = tc.addGroup(2);
 		QCOMPARE(group, nullptr);
 		QCOMPARE(tc.totalChannels(), lmms::MaxChannelsPerTrack - 1);
 
@@ -507,9 +461,9 @@ private slots:
 		QCOMPARE(tc.updateAllSilenceFlags(), true);
 	}
 
-	//! Verifies that `hasInputNoise` returns true if any of the selected
+	//! Verifies that `hasSignal` returns true if any of the selected
 	//! channels are non-silent.
-	void HasInputNoise()
+	void HasSignal()
 	{
 		auto tc = AudioBuffer{10, 2};
 		tc.enableSilenceTracking(true);
@@ -517,27 +471,27 @@ private slots:
 		// Add a 2nd stereo group
 		QVERIFY(tc.addGroup(2) != nullptr);
 
-		// No input noise since all channels are silent
-		QCOMPARE(tc.hasInputNoise(0b1111), false);
+		// No signal since all channels are silent
+		QCOMPARE(tc.hasSignal(0b1111), false);
 
 		// Assume both left channels are non-silent
 		tc.assumeNonSilent(0);
 		tc.assumeNonSilent(2);
 
 		// Check if any channels are non-silent
-		QCOMPARE(tc.hasInputNoise(0b1111), true);
+		QCOMPARE(tc.hasSignal(0b1111), true);
 
 		// Check if either of the left channels are non-silent
-		QCOMPARE(tc.hasInputNoise(0b0101), true);
+		QCOMPARE(tc.hasSignal(0b0101), true);
 
 		// Check if either of the right channels are non-silent
-		QCOMPARE(tc.hasInputNoise(0b1010), false);
+		QCOMPARE(tc.hasSignal(0b1010), false);
 
 		// Check if either channel in the 1st group are non-silent
-		QCOMPARE(tc.hasInputNoise(0b0011), true);
+		QCOMPARE(tc.hasSignal(0b0011), true);
 
 		// Check if the 5th channel (an unused channel) is non-silent
-		QCOMPARE(tc.hasInputNoise(0b10000), false);
+		QCOMPARE(tc.hasSignal(0b10000), false);
 	}
 
 	//! Verifies that the `sanitize` method only silences channels containing Inf or NaN

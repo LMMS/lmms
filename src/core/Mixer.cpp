@@ -170,7 +170,7 @@ void MixerChannel::doProcessing()
 			FloatModel * sendModel = senderRoute->amount();
 			if( ! sendModel ) qFatal( "Error: no send model found from %d to %d", senderRoute->senderIndex(), m_channelIndex );
 
-			if (sender->m_buffer.hasAnyInputNoise() || sender->m_stillRunning)
+			if (sender->m_buffer.hasAnySignal() || sender->m_stillRunning)
 			{
 				auto buffer = m_buffer.interleavedBuffer().asSampleFrames();
 

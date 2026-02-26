@@ -70,17 +70,38 @@ public:
 	// TODO: Future additions: Group names, type (main/aux), speaker arrangements (for surround sound), ...
 
 private:
-	//! Provides access to individual channel buffers within the source buffer
+	/**
+	 * Provides access to individual channel buffers.
+	 * [channel index][frame index]
+	 */
 	float** m_buffers = nullptr;
 
-	//! Number of channels in `m_channelBuffers` (`MaxChannelsPerGroup` maximum) - currently only 2 is used
+	//! Number of channels in `m_channelBuffers` - currently only 2 is used
 	ch_cnt_t m_channels = 0;
 };
 
 
 /**
- * A collection of audio channels for an instrument track or mixer channel
- * which keeps track of signal flow.
+ * An owning collection of audio channels for an instrument track, mixer channel, or audio processor.
+ *
+ * Features:
+ * - Up to `MaxChannelsPerTrack` total channels
+ * - Audio data in planar format (plus a temporary interleaved buffer for conversions until we use planar only)
+ * - All planar buffers are sourced from the same large buffer for better cache locality
+ * - Custom allocator support
+ * - Silence tracking for each channel (NOTE: requires careful use so that non-silent data is not written to a
+ *       channel marked silent without updating that channel's silence flag afterward)
+ * - Methods for sanitizing, silencing, and calculating the absolute peak value of channels, and doing so more
+ *       efficiently using the data from silence tracking
+ * - Can organize channels into arbitrary groups. For example, you could have 6 total channels divided into 2 groups
+ *       where the 1st group contains 2 channels (stereo) and the 2nd contains 4 channels (quadraphonic).
+ *
+ * When this class is used in an instrument track or mixer channel, its channels could be referred to
+ * as "track channels" or "internal channels", since they are equivalent to the "track channels" used
+ * in other DAWs such as REAPER.
+ *
+ * When this class is used in an audio processor or audio plugin, its channels could be referred to
+ * as "processor channels" or "plugin channels".
  */
 class LMMS_EXPORT AudioBuffer
 {
@@ -172,7 +193,9 @@ public:
 	}
 
 	/**
-	 * @brief Adds a new channel group at the end of the list
+	 * @brief Adds a new channel group at the end of the list.
+	 *        Reallocates the source and channel buffers.
+	 *
 	 * @returns the newly created group, or nullptr upon failure
 	 */
 	auto addGroup(ch_cnt_t channels) -> ChannelGroup*;
@@ -210,21 +233,21 @@ public:
 	void mixSilenceFlags(const AudioBuffer& other);
 
 	/**
-	 * Determines whether a processor has input noise given
-	 * which channels are routed to the processor's inputs.
+	 * Checks whether any of the selected channels are non-silent (has a signal).
 	 *
-	 * For `usedChannels`:
-	 *   0 = channel is not routed to any processor inputs
-	 *   1 = channel is routed to at least one processor input
-	 *
-	 * If the processor is sleeping and has input noise, it should wake up.
 	 * If silence tracking is disabled, all channels that aren't marked
-	 * as silent are assumed to have input noise.
+	 * as silent are assumed to be non-silent.
+	 *
+	 * A processor could check for a signal present at any of its inputs by
+	 * calling this method selecting all of the track channels that are routed
+	 * to at least one of its inputs.
+	 *
+	 * @param channels channels to check for a signal; 1 = selected, 0 = ignore
 	 */
-	auto hasInputNoise(const ChannelFlags& usedChannels) const -> bool;
+	auto hasSignal(const ChannelFlags& channels) const -> bool;
 
-	//! Determines whether there is input noise on any channel. @see hasInputNoise
-	auto hasAnyInputNoise() const -> bool;
+	//! Checks whether any channel is non-silent (has a signal). @see hasSignal
+	auto hasAnySignal() const -> bool;
 
 	/**
 	 * @brief Sanitizes specified channels of any Inf/NaN values if "nanhandler" setting is enabled
@@ -264,20 +287,37 @@ public:
 	auto absPeakValue(ch_cnt_t channel) const -> float;
 
 private:
-	//! Large buffer that all channel buffers are sourced from
+	/**
+	 * Large buffer that all channel buffers are sourced from.
+	 * Owning raw pointer.
+	 *
+	 * [channel index]
+	 */
 	float* m_sourceBuffer = nullptr;
 
-	//! Provides access to individual channel buffers within the source buffer
+	/**
+	 * Provides access to individual channel buffers within the source buffer.
+	 * Owning raw pointer.
+	 *
+	 * [channel index][frame index]
+	 */
 	float** m_channelBuffers = nullptr;
 
-	//! Interleaved scratch buffer for conversions between interleaved and planar TODO: Remove once using planar only
+	/**
+	 * Interleaved scratch buffer for conversions between interleaved and planar.
+	 * Owning raw pointer.
+	 *
+	 * TODO: Remove once using planar only
+	 */
 	float* m_interleavedBuffer = nullptr;
 
+	//! Divides channels into arbitrary groups
 	ArrayVector<ChannelGroup, MaxGroupsPerTrack> m_groups;
 
 	//! Caches the sum of `m_groups[idx].channels()` - must never exceed MaxChannelsPerTrack
 	ch_cnt_t m_totalChannels = 0;
 
+	//! Frame count for every channel buffer
 	const f_cnt_t m_frames = 0;
 
 	//! Allocator used by all buffers

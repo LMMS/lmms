@@ -97,7 +97,7 @@ bool Effect::processAudioBuffer(AudioBuffer& inOut)
 {
 	if (!isAwake())
 	{
-		if (!inOut.hasInputNoise(0b11))
+		if (!inOut.hasSignal(0b11))
 		{
 			// Sleeping plugins need to zero any track channels their output is routed to in order to
 			// prevent sudden track channel passthrough behavior when the plugin is put to sleep.
