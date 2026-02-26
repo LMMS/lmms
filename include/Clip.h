@@ -100,6 +100,12 @@ public:
 
 	bool manuallyResizable() const;
 
+	// Returns whether the clip can be looped
+	virtual bool loopable() const
+	{
+		return false;
+	}
+
 	/*! \brief Set whether a clip has been resized yet by the user or the knife tool.
 	 *
 	 *  If a clip has been resized previously, it will not automatically 
@@ -114,6 +120,25 @@ public:
 	bool getAutoResize() const
 	{
 		return m_autoResize;
+	}
+
+	int loopCount() const 
+	{
+		return m_loopCount; 
+	}
+
+	// Increase/decrease loop count by one
+	// Note : does not create / close the corresponding view
+	virtual void increaseLoopCount() 
+	{ 
+		++m_loopCount; 
+	}
+	virtual void decreaseLoopCount() 
+	{ 
+		if (m_loopCount > 0) 
+		{
+			--m_loopCount; 
+		}
 	}
 
 	auto color() const -> const std::optional<QColor>& { return m_color; }
@@ -170,6 +195,7 @@ private:
 	TimePos m_startPosition;
 	TimePos m_length;
 	TimePos m_startTimeOffset;
+	int m_loopCount;
 
 	BoolModel m_mutedModel;
 	BoolModel m_soloModel;

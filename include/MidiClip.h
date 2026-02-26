@@ -93,6 +93,8 @@ public:
 		return m_clipType;
 	}
 
+	bool loopable() const override;
+
 
 	// next/previous track based on position in the containing track
 	MidiClip * previousMidiClip() const;

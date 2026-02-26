@@ -754,55 +754,62 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 			cur_start -= c->startPosition() + c->startTimeOffset();
 		}
 
-		// get all notes from the given clip...
+		// get all notes from the given clip
 		const NoteVector & notes = c->notes();
-		// ...and set our index to zero
-		auto nit = notes.begin();
-
-		// very effective algorithm for playing notes that are
-		// posated within the current sample-frame
-
-		if( cur_start > 0 )
+		
+		for ( int loop = 0; loop <= c->loopCount(); loop++ )
 		{
-			// skip notes which end before start-bar
-			while( nit != notes.end() && ( *nit )->endPos() < cur_start )
+			TimePos loopOffset = loop * c->length();
+
+			// set our index to zero
+			auto nit = notes.begin();
+
+			// very effective algorithm for playing notes that are
+			// posated within the current sample-frame
+
+			if( cur_start > 0 )
 			{
+				// skip notes which end before start-bar
+				while( nit != notes.end() && ( *nit )->endPos() + loopOffset < cur_start )
+				{
+					++nit;
+				}
+			}
+
+			while ( nit != notes.end() && (*nit)->pos() < c->length() - c->startTimeOffset() )
+			{
+				const auto currentNote = *nit;
+				// Skip any notes note not at the current time pos and not overlapping with the start.
+				if (!(currentNote->pos() + loopOffset == cur_start
+					|| (cur_start == -c->startTimeOffset() && (*nit)->pos() + loopOffset < cur_start && (*nit)->endPos() + loopOffset > cur_start)))
+				{
+					++nit;
+					continue;
+				}
+
+				// Calculate the overlap of the note over the clip end.
+				const auto noteOverlap = std::max(0, currentNote->endPos() - (c->length() - c->startTimeOffset()));
+				// If the note is a Step Note, frames will be 0 so the NotePlayHandle
+				// plays for the whole length of the sample
+				const auto noteFrames = currentNote->type() == Note::Type::Step
+					? 0
+					: (currentNote->endPos() + loopOffset - cur_start - noteOverlap) * frames_per_tick;
+
+				NotePlayHandle* notePlayHandle = NotePlayHandleManager::acquire( this, _offset, noteFrames, *currentNote );
+				notePlayHandle->setPatternTrack(pattern_track);
+				// are we playing global song?
+				if( _clip_num < 0 )
+				{
+					// then set song-global offset of clip in order to
+					// properly perform the note detuning
+					notePlayHandle->setSongGlobalParentOffset( c->startPosition() + c->startTimeOffset());
+				}
+
+				Engine::audioEngine()->addPlayHandle( notePlayHandle );
+
+				played_a_note = true;
 				++nit;
 			}
-		}
-
-		while (nit != notes.end() && (*nit)->pos() < c->length() - c->startTimeOffset())
-		{
-			const auto currentNote = *nit;
-			// Skip any notes note at the current time pos or not overlapping with the start.
-			if (!(currentNote->pos() == cur_start
-				|| (cur_start == -c->startTimeOffset() && (*nit)->pos() < cur_start && (*nit)->endPos() > cur_start)))
-			{
-				++nit;
-				continue;
-			}
-
-			// Calculate the overlap of the note over the clip end.
-			const auto noteOverlap = std::max(0, currentNote->endPos() - (c->length() - c->startTimeOffset()));
-			// If the note is a Step Note, frames will be 0 so the NotePlayHandle
-			// plays for the whole length of the sample
-			const auto noteFrames = currentNote->type() == Note::Type::Step
-				? 0
-				: (currentNote->endPos() - cur_start - noteOverlap) * frames_per_tick;
-
-			NotePlayHandle* notePlayHandle = NotePlayHandleManager::acquire(this, _offset, noteFrames, *currentNote);
-			notePlayHandle->setPatternTrack(pattern_track);
-			// are we playing global song?
-			if( _clip_num < 0 )
-			{
-				// then set song-global offset of clip in order to
-				// properly perform the note detuning
-				notePlayHandle->setSongGlobalParentOffset( c->startPosition() + c->startTimeOffset());
-			}
-
-			Engine::audioEngine()->addPlayHandle( notePlayHandle );
-			played_a_note = true;
-			++nit;
 		}
 	}
 	unlock();

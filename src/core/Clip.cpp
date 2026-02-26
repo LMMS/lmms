@@ -49,6 +49,7 @@ Clip::Clip( Track * track ) :
 	m_track( track ),
 	m_startPosition(),
 	m_length(),
+	m_loopCount(0),
 	m_mutedModel( false, this, tr( "Mute" ) ),
 	m_selectViewOnCreate{false}
 {
@@ -76,6 +77,7 @@ Clip::Clip(const Clip& other):
 	m_startPosition(other.m_startPosition),
 	m_length(other.m_length),
 	m_startTimeOffset(other.m_startTimeOffset),
+	m_loopCount(0),
 	m_mutedModel(other.m_mutedModel.value(), this, tr( "Mute" )),
 	m_autoResize(other.m_autoResize),
 	m_selectViewOnCreate{other.m_selectViewOnCreate},
