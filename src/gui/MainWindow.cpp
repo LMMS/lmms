@@ -34,6 +34,7 @@
 #include <QMessageBox>
 #include <QShortcut>
 #include <QSplitter>
+#include <QDebug>
 
 #include "AboutDialog.h"
 #include "AutomationEditor.h"
@@ -44,9 +45,10 @@
 #include "ExportProjectDialog.h"
 #include "FileBrowser.h"
 #include "FileDialog.h"
+#include "GuiAction.h"
+#include "GuiApplication.h"
 #include "Metronome.h"
 #include "MixerView.h"
-#include "GuiApplication.h"
 #include "ImportFilter.h"
 #include "InstrumentTrackView.h"
 #include "InstrumentTrackWindow.h"
@@ -264,8 +266,8 @@ void MainWindow::finalize()
 	resetWindowTitle();
 	setWindowIcon( embed::getIconPixmap( "icon_small" ) );
 
-	auto addAction = [this](QMenu* menu, std::string_view icon, const QString& text,
-		const QKeySequence& shortcut, auto(MainWindow::* slot)()) -> QAction*
+	auto addAction = [this](QMenu* menu, std::string_view icon, const QString& text, const QKeySequence& shortcut,
+		auto(MainWindow::* slot)()) -> QAction*
 	{
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 3, 0))
 		return menu->addAction(embed::getIconPixmap(icon), text, shortcut, this, slot);
@@ -274,12 +276,55 @@ void MainWindow::finalize()
 #endif
 	};
 
+	auto menuAddAction = [this, addAction](QMenu* menu, std::string_view icon, const QString& text, ActionData* data,
+		auto(MainWindow::* slot)()) -> void
+	{
+		const auto emptyShortcut = QKeySequence{};
+		auto* action = addAction(menu, icon, text, emptyShortcut, slot);
+		syncActionDataToQAction(data, action);
+	};
+
 	// project-popup-menu
 	auto project_menu = new QMenu(this);
-	menuBar()->addMenu( project_menu )->setText( tr( "&File" ) );
+	menuBar()->addMenu(project_menu)->setText(tr("&File"));
 
-	addAction(project_menu, "project_new", tr("&New"),
-		QKeySequence::New, &MainWindow::createNewProject);
+	static auto* adNewProject = ActionData::get("project_new", ActionTrigger::pressed(Qt::ControlModifier, Qt::Key_N));
+	menuAddAction(project_menu, "project_new", tr("&New"), adNewProject, &MainWindow::createNewProject);
+
+	static auto testActionData = ActionData::get("test", ActionTrigger::held(Qt::ControlModifier, Qt::Key_J));
+	auto testAction = new GuiAction(this, testActionData);
+	connect(testAction, &GuiAction::activated, this, [this] { qDebug() << "ON"; });
+	connect(testAction, &GuiAction::deactivated, this, [this] {
+		qDebug() << "OFF";
+		adNewProject->setTrigger(ActionTrigger::pressed(Qt::ControlModifier, Qt::Key_H));
+	});
+
+	// static auto testActionData = ActionData::get("test", ActionTrigger::held(Qt::ControlModifier, Qt::Key_J));
+	// auto testAction = new GuiAction(this, testActionData);
+	// connect(testAction, &GuiAction::activated, this, [this] { qDebug() << "ON"; });
+	// connect(testAction, &GuiAction::deactivated, this, [this] {
+	// 	qDebug() << "OFF";
+	// 	testActionData->setTrigger(ActionTrigger::pressed(Qt::AltModifier, Qt::Key_H));
+	// });
+
+	static auto lkData = ActionData::get("listKeybindings", ActionTrigger::pressed(Qt::ControlModifier, Qt::Key_K));
+	auto lkAction = new GuiAction(this, lkData);
+	connect(lkAction, &GuiAction::activated, this, [this] {
+		auto s = QString{};
+
+		for (auto it = ActionContainer::mappingsBegin(); it != ActionContainer::mappingsEnd(); it++)
+		{
+			const auto name = (*it).first;
+			s += name;
+			s += "\n";
+		}
+
+		auto* d = new QDialog(this);
+		auto* l = new QLabel(d);
+		l->setTextFormat(Qt::PlainText);
+		l->setText(s);
+		d->exec();
+	});
 
 	auto templates_menu = new TemplatesMenu( this );
 	project_menu->addMenu(templates_menu);
