@@ -5422,7 +5422,6 @@ void PianoRollWindow::saveSettings( QDomDocument & doc, QDomElement & de )
 void PianoRollWindow::loadSettings( const QDomElement & de )
 {
 	m_editor->loadGhostNotes( de.firstChildElement("ghostnotes") );
-	m_editor->loadMarkedSemiTones(de.firstChildElement("markedSemiTones"));
 
 	MainWindow::restoreWidgetState( this, de );
 
@@ -5432,6 +5431,7 @@ void PianoRollWindow::loadSettings( const QDomElement & de )
 	m_editor->m_keyModel.setValue(de.attribute("key").toInt());
 	m_editor->m_chordModel.setValue(de.attribute("chord").toInt());
 	m_editor->m_scaleModel.setValue(de.attribute("scale").toInt());
+	m_editor->loadMarkedSemiTones(de.firstChildElement("markedSemiTones"));
 
 	// update margins here because we're later in the startup process
 	// We can't earlier because everything is still starting with the
