@@ -27,6 +27,7 @@
 #define LMMS_RENDER_MANAGER_H
 
 #include <memory>
+#include <queue>
 
 #include "ProjectRenderer.h"
 #include "OutputSettings.h"
@@ -40,15 +41,17 @@ class RenderManager : public QObject
 {
 	Q_OBJECT
 public:
-	RenderManager(const OutputSettings& outputSettings, ProjectRenderer::ExportFileFormat fmt, QString outputPath);
-
+	RenderManager(const OutputSettings& outputSettings, ProjectRenderer::ExportFileFormat fmt);
 	~RenderManager() override;
 
 	/// Export all unmuted tracks into a single file
-	void renderProject();
+	void renderProject(const QString& outputPath);
 
 	/// Export all unmuted tracks into individual file
-	void renderTracks();
+	void renderTracks(const QString& outputPath);
+
+	/// Export a a track into a single file
+	void renderTrack(Track* track, const QString& outputPath);
 
 	void abortProcessing();
 
@@ -57,23 +60,29 @@ signals:
 	void finished();
 
 private slots:
-	void renderNextTrack();
 	void updateConsoleProgress();
 
 private:
-	QString pathForTrack( const Track *track, int num );
-	void restoreMutedState();
+	struct RenderJob
+	{
+		QString path;
+		std::vector<Track*> tracksToRender;
+	};
 
-	void render( QString outputPath );
+	void render();
+	void startRender();
+	void renderFinished();
+
+	void storeMuteStates();
+	void restoreMuteStates();
 
 	const OutputSettings m_outputSettings;
 	ProjectRenderer::ExportFileFormat m_format;
-	QString m_outputPath;
-
 	std::unique_ptr<ProjectRenderer> m_activeRenderer;
 
-	std::vector<Track*> m_tracksToRender;
-	std::vector<Track*> m_unmuted;
+	std::queue<RenderJob> m_renderJobQueue;
+	std::unordered_map<Track*, bool> m_muteStates;
+	int m_totalRenderJobs = 0;
 } ;
 
 
