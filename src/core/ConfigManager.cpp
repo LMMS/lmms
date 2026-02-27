@@ -708,7 +708,18 @@ void ConfigManager::initPortableWorkingDir()
 void ConfigManager::initInstalledWorkingDir()
 {
 	m_workingDir = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/lmms/";
-	m_lmmsRcFile = QDir::home().absolutePath() +"/.lmmsrc.xml";
+
+	// Handle branded versions
+	QString brandingNeeded(LMMS_BRANDING_NEEDED);
+	QString filePath;
+
+	if (brandingNeeded.isEmpty()) {
+		filePath = "/.lmmsrc.xml";
+	} else {
+		filePath = QString("/.lmmsrc-%1.xml").arg(brandingNeeded);
+	}
+
+	m_lmmsRcFile = QDir::home().absolutePath() + filePath;
 	// Detect < 1.2.0 working directory as a courtesy
 	if ( QFileInfo( QDir::home().absolutePath() + "/lmms/projects/" ).exists() )
 		m_workingDir = QDir::home().absolutePath() + "/lmms/";

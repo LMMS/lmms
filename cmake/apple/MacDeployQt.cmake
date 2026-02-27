@@ -7,7 +7,15 @@
 
 # Variables must be prefixed with "CPACK_" to be visible here
 set(lmms "${CPACK_PROJECT_NAME}")
-set(APP "${CPACK_TEMPORARY_INSTALL_DIRECTORY}/${CPACK_PROJECT_NAME_UCASE}.app")
+set(APP_NAME "${CPACK_PROJECT_NAME_UCASE}")
+
+# Use dedicated folder for "LMMS Nightly", "LMMS Alpha", etc
+if(CPACK_BRANDING_NEEDED)
+	set(APP_NAME "${CPACK_PROJECT_NAME_UCASE} ${CPACK_RELEASE_TYPE}")
+endif()
+
+set(APP "${CPACK_TEMPORARY_INSTALL_DIRECTORY}/${APP_NAME}.app")
+set(DMG_BACKGROUND "${CPACK_SOURCE_DIR}/cmake/apple/background.png")
 
 # Toggle command echoing & verbosity
 # 0 = no output, 1 = error/warning, 2 = normal, 3 = debug
@@ -69,6 +77,16 @@ configure_file("${CPACK_CURRENT_SOURCE_DIR}/lmms.plist.in" "${APP}/Contents/Info
 file(COPY "${CPACK_CURRENT_SOURCE_DIR}/project.icns" DESTINATION "${APP}/Contents/Resources")
 file(COPY "${CPACK_CURRENT_SOURCE_DIR}/icon.icns" DESTINATION "${APP}/Contents/Resources")
 file(RENAME "${APP}/Contents/Resources/icon.icns" "${APP}/Contents/Resources/${lmms}.icns")
+
+# Overwrite any branded files
+if(CPACK_BRANDING_NEEDED)
+	file(GLOB branded_items "${CPACK_BRANDED_APP_DIR}/*")
+	foreach(item IN LISTS branded_items)
+		file(COPY "${item}" DESTINATION "${APP}")
+	endforeach()
+	# @2x size automatically handled by appdmg
+	set(DMG_BACKGROUND "${CPACK_BRANDED_DIR}/dmg_background.png")
+endif()
 
 # Copy Suil modules
 if(CPACK_SUIL_MODULES)
