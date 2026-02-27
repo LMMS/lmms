@@ -34,6 +34,7 @@
 #include <QGridLayout>
 #include <QPainter>
 #include <QPushButton>
+#include <QLineEdit>
 #include <QScrollArea>
 #include <QMdiArea>
 #include <QMenu>
@@ -941,6 +942,7 @@ ManageVestigeInstrumentView::ManageVestigeInstrumentView( Instrument * _instrume
 	l->addWidget( m_syncButton, 0, 0, 1, 2, Qt::AlignLeft );
 
 	m_displayAutomatedOnly = new QPushButton( tr( "Automated" ), this );
+	m_isAuto = false;
 	connect( m_displayAutomatedOnly, SIGNAL( clicked() ), this,
 							SLOT( displayAutomatedOnly() ) );
 
@@ -953,6 +955,15 @@ ManageVestigeInstrumentView::ManageVestigeInstrumentView( Instrument * _instrume
 
 	l->addWidget( m_closeButton, 0, 2, 1, 7, Qt::AlignLeft );
 
+	auto m_searchBar = new QLineEdit(this);
+	m_searchBar->setPlaceholderText(tr("Search"));
+	m_searchBar->setMaxLength(35);
+	m_searchBar->setClearButtonEnabled(true);
+	m_searchBar->addAction(embed::getIconPixmap("zoom"), QLineEdit::LeadingPosition);
+	l->addWidget( m_searchBar, 0, 3, 1, 2, Qt::AlignLeft );
+
+	connect( m_searchBar, SIGNAL( textEdited( const QString& ) ),
+			 this, SLOT( onFilterChanged( const QString& ) ) );
 
 	for( int i = 0; i < 10; i++ )
 	{
@@ -1064,21 +1075,32 @@ void ManageVestigeInstrumentView::syncPlugin( void )
 
 void ManageVestigeInstrumentView::displayAutomatedOnly( void )
 {
-	bool isAuto = QString::compare( m_displayAutomatedOnly->text(), tr( "Automated" ) ) == 0;
+	m_isAuto = !m_isAuto;
+	displayFilteredKnobs();
+}
 
-	for( int i = 0; i< m_vi->paramCount; i++ )
+
+void ManageVestigeInstrumentView::displayFilteredKnobs( void )
+{
+	if (m_isAuto) {
+		m_displayAutomatedOnly->setText( "All" );
+	} else {
+		m_displayAutomatedOnly->setText( "Automated" );
+	}
+
+	const QMap<QString, QString> & dump = m_vi->m_plugin->parameterDump();
+	auto paramStr = std::array<char, 35>{};
+	QStringList s_dumpValues;
+	for( int i = 0; i < m_vi->paramCount; i++ )
 	{
-
-		if( !( m_vi->knobFModel[ i ]->isAutomated() || m_vi->knobFModel[ i ]->controllerConnection() ) )
+		sprintf(paramStr.data(), "param%d", i);
+		s_dumpValues = dump[paramStr.data()].split(":");
+		if( !s_dumpValues.at(1).contains(m_filter, Qt::CaseInsensitive)
+			|| (m_isAuto && !( m_vi->knobFModel[ i ]->isAutomated() || m_vi->knobFModel[ i ]->controllerConnection())))
 		{
-			if( vstKnobs[ i ]->isVisible() == true  && isAuto )
-			{
-				vstKnobs[ i ]->hide();
-				m_displayAutomatedOnly->setText( "All" );
-			} else {
-				vstKnobs[ i ]->show();
-				m_displayAutomatedOnly->setText( "Automated" );
-			}
+			vstKnobs[ i ]->hide();
+		}  else {
+			vstKnobs[ i ]->show();
 		}
 	}
 }
@@ -1218,6 +1240,11 @@ void ManageVestigeInstrumentView::paintEvent( QPaintEvent * )
 					+ tr( " - VST plugin control" ) );
 }
 
+void ManageVestigeInstrumentView::onFilterChanged( const QString & filter )
+{
+	m_filter = filter;
+	displayFilteredKnobs();
+}
 
 } // namespace gui
 
