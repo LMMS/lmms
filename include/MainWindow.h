@@ -30,6 +30,7 @@
 #include <QList>
 #include <QMainWindow>
 #include <QMdiArea>
+#include <QScrollBar>
 
 #include "ConfigManager.h"
 
@@ -204,22 +205,59 @@ private:
 	bool guiSaveProject();
 	bool guiSaveProjectAs( const QString & filename );
 
+	class WorkspaceScrollBar : public QScrollBar
+	{
+	public:
+		WorkspaceScrollBar(Qt::Orientation orientation, QWidget *parent = nullptr);
+		~WorkspaceScrollBar() {}
+
+	protected:
+		void wheelEvent(QWheelEvent *event) override;
+	};
+
 	class MovableQMdiArea : public QMdiArea
 	{
 	public:
-		MovableQMdiArea(QWidget* parent = nullptr);
+		MovableQMdiArea(QWidget* parent, MainWindow* mainWindow, QScrollBar* scrollBarV, QScrollBar* scrollBarH);
 		~MovableQMdiArea() {}
+		bool universalPanClick; //!< Whether clicking is needed to initiate universal panning
+
 	protected:
 		void mousePressEvent(QMouseEvent* event) override;
 		void mouseMoveEvent(QMouseEvent* event) override;
 		void mouseReleaseEvent(QMouseEvent* event) override;
+		void resizeEvent(QResizeEvent* event) override;
+		void childEvent(QChildEvent* event) override;
+		bool eventFilter(QObject* watched, QEvent* event) override;
+		void sliderMoved(QScrollBar* scrollBar);
+
 	private:
-		bool m_isBeingMoved;
+		void mousePanStart(); //!< Previous position must have been already fed to `m_lastX` and `m_lastY`
+		void mousePanMove(int globalX, int globalY);
+		void mousePanEnd();
+		void scroll(int scrollX, int scrollY);
+		void updateScrollBars();
+		bool hasActiveMaxWindow();
+
+		static constexpr int Margin = 100; //!< Margin used along with the active workspace area.
+
+		//! Get the workspace area where there are windows as a [minX, maxX, minY, maxY] tuple.
+		std::tuple<int, int, int, int> getActiveWorkspaceArea();
+
+		bool m_isPanning; //!< Whether the workspace is being panned
+		bool m_isUniversalPan; //!< Whether the current panning is universal
+		bool m_canUniversalPan; //!< Whether universal panning can be started (for when )
 		int m_lastX;
 		int m_lastY;
+		MainWindow* m_mainWindow;
+		QScrollBar* m_scrollBarV;
+		QScrollBar* m_scrollBarH;
+		int m_scrollBarLastY;
+		int m_scrollBarLastX;
 	};
-
-	MovableQMdiArea * m_workspace;
+	MovableQMdiArea* m_workspace;
+	QScrollBar* m_workspaceScrollBarH;
+	QScrollBar* m_workspaceScrollBarV;
 
 	QWidget * m_toolBar;
 	QGridLayout * m_toolBarLayout;
