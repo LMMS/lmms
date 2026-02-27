@@ -120,13 +120,13 @@ bool Effect::processAudioBuffer(SampleFrame* buf, const fpp_t frames)
 
 
 
-Effect * Effect::instantiate(const QString& pluginName,
-				Model* _parent,
-				Descriptor::SubPluginFeatures::Key* _key )
+Effect* Effect::instantiate(const QString& pluginName,
+	Model* _parent,
+	Descriptor::SubPluginFeatures::Key* _key)
 {
-	Plugin* p = Plugin::instantiateWithKey( pluginName, _parent, _key );
+	Plugin* p = Plugin::instantiateWithKey(pluginName, _parent, _key);
 	// check whether instantiated plugin is an effect
-	if( dynamic_cast<Effect*>( p ) != nullptr )
+	if (dynamic_cast<Effect*>(p) != nullptr)
 	{
 		// everything ok, so return pointer
 		auto effect = dynamic_cast<Effect*>(p);
@@ -142,7 +142,7 @@ Effect * Effect::instantiate(const QString& pluginName,
 
 
 
-Effect* Effect::createFromPreset(const QString& filePath, Model * parent)
+Effect* Effect::createFromPreset(const QString& filePath, Model* parent)
 {
 	DataFile dataFile(filePath);
 

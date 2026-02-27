@@ -655,6 +655,10 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 				QIcon(embed::getIconPixmap("star")), tr("Add favorite file"), [path] { ConfigManager::inst()->addFavoriteItem(path); });
 		}
 
+		// This is here so you don't see the "Song Editor" and "Pattern Editor" headers
+		// when right clicking on effect presets in the browser.
+		//
+		// TODO: Restructure this method in the future so each file type is handled separately.
 		if (file->type() == FileItem::FileType::EffectPreset)
 		{
 			break;
@@ -859,7 +863,7 @@ void FileBrowserTreeWidget::stopPreview()
 
 
 
-void FileBrowserTreeWidget::mouseMoveEvent(QMouseEvent * me)
+void FileBrowserTreeWidget::mouseMoveEvent(QMouseEvent* me)
 {
 	if (m_mousePressed && (m_pressPos - position(me)).manhattanLength() > QApplication::startDragDistance())
 	{
@@ -867,7 +871,7 @@ void FileBrowserTreeWidget::mouseMoveEvent(QMouseEvent * me)
 		mouseReleaseEvent(nullptr);
 
 		auto f = dynamic_cast<FileItem*>(itemAt(m_pressPos));
-		if(f != nullptr)
+		if (f != nullptr)
 		{
 			switch (f->type())
 			{
@@ -916,7 +920,7 @@ void FileBrowserTreeWidget::mouseMoveEvent(QMouseEvent * me)
 
 
 
-void FileBrowserTreeWidget::mouseReleaseEvent(QMouseEvent * me)
+void FileBrowserTreeWidget::mouseReleaseEvent(QMouseEvent* me)
 {
 	m_mousePressed = false;
 
@@ -938,7 +942,7 @@ void FileBrowserTreeWidget::mouseReleaseEvent(QMouseEvent * me)
 void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it)
 {
 	Engine::audioEngine()->requestChangeInModel();
-	switch ( f->handling() )
+	switch (f->handling())
 	{
 		case FileItem::FileHandling::LoadAsProject:
 			if( getGUI()->mainWindow()->mayChangeProject(true) )
@@ -1232,35 +1236,35 @@ void FileItem::determineFileType()
 	m_handling = FileHandling::NotSupported;
 
 	const QString ext = extension();
-	if(ext == "mmp" || ext == "mpt" || ext == "mmpz")
+	if (ext == "mmp" || ext == "mpt" || ext == "mmpz")
 	{
 		m_type = FileType::Project;
 		m_handling = FileHandling::LoadAsProject;
 	}
-	else if( ext == "xpf" || ext == "xml")
+	else if ( ext == "xpf" || ext == "xml")
 	{
 		m_type = FileType::InstrumentPreset;
 		m_handling = FileHandling::LoadAsInstrumentPreset;
 	}
-	else if(ext == "fxp")
+	else if (ext == "fxp")
 	{
 		m_type = FileType::EffectPreset;
 		m_handling = FileHandling::LoadAsEffectPreset;
 	}
-	else if(ext == "xiz" && ! getPluginFactory()->pluginSupportingExtension(ext).isNull())
+	else if (ext == "xiz" && !getPluginFactory()->pluginSupportingExtension(ext).isNull())
 	{
 		m_type = FileType::InstrumentPreset;
 		m_handling = FileHandling::LoadByPlugin;
 	}
-	else if(ext == "sf2" || ext == "sf3")
+	else if (ext == "sf2" || ext == "sf3")
 	{
 		m_type = FileType::SoundFont;
 	}
-	else if(ext == "pat")
+	else if (ext == "pat")
 	{
 		m_type = FileType::Patch;
 	}
-	else if(ext == "mid" || ext == "midi" || ext == "rmi")
+	else if (ext == "mid" || ext == "midi" || ext == "rmi")
 	{
 		m_type = FileType::Midi;
 		m_handling = FileHandling::ImportAsProject;

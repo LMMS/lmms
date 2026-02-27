@@ -188,9 +188,9 @@ void EffectView::savePreset()
 	sfd.setFileMode(FileDialog::AnyFile);
 	sfd.setDefaultSuffix("fxp");
 
-	if(sfd.exec() == QDialog::Accepted &&
-		!sfd.selectedFiles().isEmpty() &&
-		!sfd.selectedFiles().first().isEmpty())
+	if (sfd.exec() == QDialog::Accepted
+			&& !sfd.selectedFiles().isEmpty()
+			&& !sfd.selectedFiles().first().isEmpty())
 	{
 		DataFile dataFile(DataFile::Type::EffectSettings);
 		QDomElement& content(dataFile.content());
@@ -232,8 +232,8 @@ void EffectView::loadPreset()
 	sfd.setFileMode(FileDialog::ExistingFile);
 	sfd.setDefaultSuffix("fxp");
 
-	if( sfd.exec() == QDialog::Accepted &&
-		!sfd.selectedFiles().isEmpty() )
+	if (sfd.exec() == QDialog::Accepted
+		&& !sfd.selectedFiles().isEmpty())
 	{
 		QString f = sfd.selectedFiles()[0];
 		DataFile dataFile(f);
@@ -286,7 +286,7 @@ void EffectView::closeEffects()
 
 
 
-void EffectView::contextMenuEvent(QContextMenuEvent *)
+void EffectView::contextMenuEvent(QContextMenuEvent*)
 {
 	QPointer<CaptionMenu> contextMenu = new CaptionMenu(model()->displayName(), this);
 	contextMenu->addAction(embed::getIconPixmap("arp_up"),

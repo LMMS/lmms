@@ -92,7 +92,7 @@ EffectRackView::~EffectRackView()
 
 
 
-void EffectRackView::dragEnterEvent(QDragEnterEvent *event)
+void EffectRackView::dragEnterEvent(QDragEnterEvent* event)
 {
 	const QString type = StringPairDrag::decodeKey(event);
 	if (type == "effectpresetfile")
@@ -106,7 +106,7 @@ void EffectRackView::dragEnterEvent(QDragEnterEvent *event)
 }
 
 
-void EffectRackView::dropEvent(QDropEvent *event)
+void EffectRackView::dropEvent(QDropEvent* event)
 {
 	const QString type = StringPairDrag::decodeKey(event);
 	const QString filePath = StringPairDrag::decodeValue(event);
@@ -126,7 +126,7 @@ void EffectRackView::dropEvent(QDropEvent *event)
 
 void EffectRackView::addFromPreset(const QString& filePath)
 {
-	Effect *fx = Effect::createFromPreset(filePath, fxChain());
+	Effect* fx = Effect::createFromPreset(filePath, fxChain());
 	if (!fx)
 	{
 		TextFloat::displayMessage(
@@ -134,6 +134,7 @@ void EffectRackView::addFromPreset(const QString& filePath)
 			tr("Couldn't load preset file."),
 			embed::getIconPixmap("error")
 		);
+		return;
 	}
 	fxChain()->appendEffect(fx);
 	update();
@@ -158,14 +159,14 @@ void EffectRackView::clearViews()
 
 void EffectRackView::moveUp( EffectView* view )
 {
-	fxChain()->moveUp( view->effect() );
-	if( view != m_effectViews.first() )
+	fxChain()->moveUp(view->effect());
+	if (view != m_effectViews.first())
 	{
 		int i = 0;
-		for( QVector<EffectView *>::Iterator it = m_effectViews.begin();
-					it != m_effectViews.end(); it++, i++ )
+		for (auto it = m_effectViews.begin();
+			it != m_effectViews.end(); it++, i++)
 		{
-			if( *it == view )
+			if (*it == view)
 			{
 				break;
 			}
