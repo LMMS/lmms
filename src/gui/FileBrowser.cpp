@@ -364,6 +364,42 @@ void FileBrowser::giveFocusToFilter()
 }
 
 
+bool naturalCompare(const QString& a, const QString& b)
+{
+    static QRegularExpression re("(\\d+|\\D+)");
+    QRegularExpressionMatchIterator itA = re.globalMatch(a);
+    QRegularExpressionMatchIterator itB = re.globalMatch(b);
+
+    while (itA.hasNext() && itB.hasNext()) {
+        QRegularExpressionMatch matchA = itA.next();
+        QRegularExpressionMatch matchB = itB.next();
+
+        QString partA = matchA.captured(0);
+        QString partB = matchB.captured(0);
+
+        bool isDigitA = partA[0].isDigit();
+        bool isDigitB = partB[0].isDigit();
+
+        if (isDigitA && isDigitB) {
+            int numA = partA.toInt();
+            int numB = partB.toInt();
+            if (numA != numB) {
+                return numA < numB;
+            }
+        } else if (isDigitA) {
+            return true; 
+        } else if (isDigitB) {
+            return false; 
+        } else {
+            int cmp = QString::compare(partA, partB, Qt::CaseInsensitive);
+            if (cmp != 0) {
+                return cmp < 0;
+            }
+        }
+    }
+
+    return a.length() < b.length();
+}
 
 void FileBrowser::addItems(const QString & path )
 {
@@ -391,7 +427,7 @@ void FileBrowser::addItems(const QString & path )
 			for (int i = 0; i < m_fileBrowserTreeWidget->topLevelItemCount(); ++i)
 			{
 				auto d = dynamic_cast<Directory*>(m_fileBrowserTreeWidget->topLevelItem(i));
-				if (d == nullptr || fileName < d->text(0))
+				if (d == nullptr || naturalCompare(fileName, d->text(0)))
 				{
 					// insert before item, we're done
 					auto dd = new Directory(fileName, path, m_filter);
