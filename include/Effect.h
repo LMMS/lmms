@@ -175,7 +175,7 @@ protected:
 	virtual void processBypassedImpl() {}
 
 
-	gui::PluginView* instantiateView( QWidget* ) override;
+	gui::PluginView* instantiateView(QWidget*) override;
 
 	virtual void onEnabledChanged() {}
 

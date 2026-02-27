@@ -425,7 +425,7 @@ void InstrumentTrackWindow::saveSettingsBtnClicked()
 	sfd.selectFile(fname.remove(QRegularExpression(FILENAME_FILTER)));
 	sfd.setDefaultSuffix( "xpf");
 
-	if(sfd.exec() == QDialog::Accepted &&
+	if (sfd.exec() == QDialog::Accepted &&
 		!sfd.selectedFiles().isEmpty() &&
 		!sfd.selectedFiles().first().isEmpty())
 	{

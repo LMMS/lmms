@@ -60,8 +60,8 @@ private slots:
 	void addEffect();
 
 protected:
-	void dragEnterEvent(QDragEnterEvent *event) override;
-	void dropEvent(QDropEvent *event) override;
+	void dragEnterEvent(QDragEnterEvent* event) override;
+	void dropEvent(QDropEvent* event) override;
 
 private:
 	void addFromPreset(const QString& filePath);

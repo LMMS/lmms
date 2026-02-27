@@ -272,12 +272,12 @@ QString DataFile::nameWithExtension( const QString & _fn ) const
 	switch (type())
 	{
 		case Type::SongProject:
-			if ( extension != "mmp" &&
+			if (extension != "mmp" &&
 					extension != "mpt" &&
-					extension != "mmpz" )
+					extension != "mmpz")
 			{
-				if ( ConfigManager::inst()->value( "app",
-						"nommpz" ).toInt() == 0 )
+				if (ConfigManager::inst()->value("app",
+						"nommpz" ).toInt() == 0)
 				{
 					return _fn + ".mmpz";
 				}
@@ -285,13 +285,13 @@ QString DataFile::nameWithExtension( const QString & _fn ) const
 			}
 			break;
 		case Type::SongProjectTemplate:
-			if ( extension != "mpt" )
+			if (extension != "mpt")
 			{
 				return _fn + ".mpt";
 			}
 			break;
 		case Type::InstrumentTrackSettings:
-			if ( extension != "xpf" )
+			if (extension != "xpf")
 			{
 				return _fn + ".xpf";
 			}
