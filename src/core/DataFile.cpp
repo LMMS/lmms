@@ -87,7 +87,8 @@ const std::vector<DataFile::UpgradeMethod> DataFile::UPGRADE_METHODS = {
 	&DataFile::upgrade_loopsRename      ,   &DataFile::upgrade_noteTypes,
 	&DataFile::upgrade_fixCMTDelays     ,   &DataFile::upgrade_fixBassLoopsTypo,
 	&DataFile::findProblematicLadspaPlugins,
-	&DataFile::upgrade_noHiddenAutomationTracks
+	&DataFile::upgrade_noHiddenAutomationTracks,
+	&DataFile::upgrade_fixSf2Effects
 };
 
 // Vector of all versions that have upgrade routines.
@@ -2082,6 +2083,67 @@ void DataFile::upgrade_fixBassLoopsTypo()
 	};
 
 	mapSrcAttributeInElementsWithResources(replacementMap);
+}
+
+/**
+ * @brief Sf2 Player's built in effects now work for most Soundfonts
+ * 
+ * Due to this fix, this can change how a Soundfont sounds (especially if 
+ * an effect was enabled and left enabled since it didn't do anything
+ * and didn't have to be turned off).
+ * 
+ * This will disable reverb/chorus on all Sf2 Players if they're enabled. The biggest
+ * problem with this is that it doesn't check if a Soundfont has a default value
+ * set for the reverb/chorus parameter. Since most Soundfonts don't have it set
+ * anyway, this shouldn't impact how it sounds. For now, we can prompt the user
+ * to double-check their instrument.
+ * 
+ * TODO: This could've been done in Sf2 Player directly, but I couldn't find a good way 
+ * to check for a Soundfont's default reverb/chorus parameter without hacks involving
+ * voices. This also makes it more difficult to check if a project has been 
+ * upgraded/fixed previously (without adding a different/new variable for 
+ * toggling effects, which could also be hacky unless I implemented
+ * my effect mode idea).
+ * 
+ * TODO: I don't like the use of QMessageBox::warning since it blocks the loading
+ * process (like DataFile::findProblematicLadspaPlugins), but I need to let the 
+ * user know about the changes. Unfortunately Song::collectError doesn't work 
+ * because the error list gets cleared after DataFile is initialized.
+ */
+void DataFile::upgrade_fixSf2Effects()
+{
+	QList<QString> affectedInstruments;
+
+	QDomNodeList tracks = elementsByTagName("track");
+	for (int i = 0; i < tracks.size(); i++)
+	{
+		QDomElement trackElement = tracks.item(i).toElement();
+		QString trackName = trackElement.attribute("name");
+		QDomNodeList sF2Players = trackElement.elementsByTagName("sf2player");
+		bool effectsChanged = false;
+		for (int j = 0; j < sF2Players.size(); j++)
+		{
+			if (sF2Players.item(j).toElement().attribute("reverbOn") == "1")
+			{
+				sF2Players.item(j).toElement().setAttribute("reverbOn", 0);
+				effectsChanged = true; 
+			}
+
+			if (sF2Players.item(j).toElement().attribute("chorusOn") == "1")
+			{
+				sF2Players.item(j).toElement().setAttribute("chorusOn", 0);
+				effectsChanged = true;
+			}
+		}
+
+		if (effectsChanged) { affectedInstruments.append(trackName); }
+	}
+
+	if (affectedInstruments.size() > 0)
+	{
+		QMessageBox::warning(nullptr, QObject::tr("Sf2 Player Effects"),
+			QObject::tr("For compatibility, the built-in reverb and chorus effects were disabled in following Sf2 Player instruments: \n- %1 \nPlease check that each instrument sounds as intended.").arg(affectedInstruments.join("\n- ")));
+	}
 }
 
 void DataFile::upgrade()
