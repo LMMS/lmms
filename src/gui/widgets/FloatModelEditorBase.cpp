@@ -3,6 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2023 Michael Gregorius
+ * Copyright (c) 2026 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -28,6 +29,7 @@
 #include <QApplication>
 #include <QInputDialog>
 #include <QPainter>
+#include <QTimerEvent>
 
 #include "lmms_math.h"
 #include "DeprecationHelper.h"
@@ -50,8 +52,6 @@ SimpleTextFloat * FloatModelEditorBase::s_textFloat = nullptr;
 FloatModelEditorBase::FloatModelEditorBase(DirectionOfManipulation directionOfManipulation, QWidget * parent, const QString & name) :
 	QWidget(parent),
 	FloatModelView(new FloatModel(0, 0, 0, 1, nullptr, name, true), this),
-	m_volumeKnob(false),
-	m_volumeRatio(100.0, 0.0, 1000000.0),
 	m_buttonPressed(false),
 	m_directionOfManipulation(directionOfManipulation)
 {
@@ -74,10 +74,37 @@ void FloatModelEditorBase::initUi(const QString & name)
 }
 
 
+void FloatModelEditorBase::setFloatingTextPullMode()
+{
+	m_floatingTextMode = FloatingTextMode::Pull;
+	m_floatingTextRefreshRate = 0;
+
+	killTimer(m_textFloatRefreshTimerId);
+	m_textFloatRefreshTimerId = 0;
+
+	disconnect(s_textFloat, &SimpleTextFloat::visibilityChanged,
+		this, &FloatModelEditorBase::textFloatVisibilityChanged);
+}
+
+
+void FloatModelEditorBase::setFloatingTextPushMode(std::uint8_t refreshRate)
+{
+	m_floatingTextMode = FloatingTextMode::Push;
+	m_floatingTextRefreshRate = refreshRate;
+}
+
+
+void FloatModelEditorBase::pushFloatingText(const QString& text)
+{
+	if (m_floatingTextMode == FloatingTextMode::Pull || s_textFloat->source() != this) { return; }
+
+	s_textFloat->setText(m_description.trimmed() + ' ' + text);
+}
+
+
 void FloatModelEditorBase::showTextFloat(int msecBeforeDisplay, int msecDisplayTime)
 {
-	s_textFloat->setText(displayValue());
-	s_textFloat->moveGlobal(this, QPoint(width() + 2, 0));
+	takeControlOfTextFloat();
 	s_textFloat->showWithDelay(msecBeforeDisplay, msecDisplayTime);
 }
 
@@ -172,11 +199,6 @@ void FloatModelEditorBase::mousePressEvent(QMouseEvent * me)
 		emit sliderPressed();
 
 		showTextFloat(0, 0);
-
-		s_textFloat->setText(displayValue());
-		s_textFloat->moveGlobal(this,
-				QPoint(width() + 2, 0));
-		s_textFloat->show();
 		m_buttonPressed = true;
 	}
 	else if (me->button() == Qt::LeftButton &&
@@ -205,7 +227,8 @@ void FloatModelEditorBase::mouseMoveEvent(QMouseEvent * me)
 		// original position for next time is current position
 		m_lastMousePos = pos;
 	}
-	s_textFloat->setText(displayValue());
+
+	takeControlOfTextFloat();
 	s_textFloat->show();
 }
 
@@ -340,9 +363,8 @@ void FloatModelEditorBase::wheelEvent(QWheelEvent * we)
 	const int inc = direction * stepMult;
 	model()->incValue(inc);
 
-	s_textFloat->setText(displayValue());
-	s_textFloat->moveGlobal(this, QPoint(width() + 2, 0));
-	s_textFloat->showWithTimeout(1000);
+	// NOTE: Calling timerEvent(nullptr) here can cause RemotePlugin to hang
+	showTextFloat(0, 1000);
 
 	emit sliderMoved(model()->value());
 }
@@ -377,44 +399,23 @@ void FloatModelEditorBase::setPosition(const QPoint & p)
 
 void FloatModelEditorBase::enterValue()
 {
-	bool ok;
-	float new_val;
-
-	if (isVolumeKnob())
-	{
-		auto const initalValue = model()->getRoundedValue() / 100.0;
-		auto const initialDbValue = initalValue > 0. ? ampToDbfs(initalValue) : -96;
-
-		new_val = QInputDialog::getDouble(
-			this, tr("Set value"),
-			tr("Please enter a new value between -96.0 dBFS and %1 dBFS:").arg(ampToDbfs(model()->maxValue() / 100.0f)),
-				initialDbValue, -96.0, ampToDbfs(model()->maxValue() / 100.0f), model()->getDigitCount(), &ok);
-
-		if (new_val <= -96.0)
-		{
-			new_val = 0.0f;
-		}
-		else
-		{
-			new_val = dbfsToAmp(new_val) * 100.0;
-		}
-	}
-	else
-	{
-		new_val = QInputDialog::getDouble(
-				this, tr("Set value"),
-				tr("Please enter a new value between "
-						"%1 and %2:").
-						arg(model()->minValue()).
-						arg(model()->maxValue()),
-					model()->getRoundedValue(),
-					model()->minValue(),
-					model()->maxValue(), model()->getDigitCount(), &ok);
-	}
+	bool ok = false;
+	const float newVal = QInputDialog::getDouble(
+		this,
+		tr("Set value"),
+		tr("Please enter a new value between %1 and %2:")
+			.arg(model()->minValue())
+			.arg(model()->maxValue()),
+		model()->getRoundedValue(),
+		model()->minValue(),
+		model()->maxValue(),
+		model()->getDigitCount(),
+		&ok
+	);
 
 	if (ok)
 	{
-		model()->setValue(new_val);
+		model()->setValue(newVal);
 	}
 }
 
@@ -434,20 +435,58 @@ void FloatModelEditorBase::friendlyUpdate()
 }
 
 
-QString FloatModelEditorBase::displayValue() const
+QString FloatModelEditorBase::pullFloatingText() const
 {
-	if (isVolumeKnob())
+	return QString::number(model()->getRoundedValue()) + m_unit;
+}
+
+
+void FloatModelEditorBase::takeControlOfTextFloat()
+{
+	if (m_floatingTextMode == FloatingTextMode::Pull)
 	{
-		auto const valueToVolumeRatio = model()->getRoundedValue() / volumeRatio();
-		return m_description.trimmed() + (
-			valueToVolumeRatio == 0.
-			? QString(" -∞ dBFS")
-			: QString(" %1 dBFS").arg(ampToDbfs(valueToVolumeRatio), 3, 'f', 2)
-		);
+		s_textFloat->setSource(this);
+		s_textFloat->setText(m_description.trimmed() + ' ' + pullFloatingText());
+	}
+	else if (m_floatingTextRefreshRate > 0)
+	{
+		const auto connection = connect(s_textFloat, &SimpleTextFloat::visibilityChanged,
+			this, &FloatModelEditorBase::textFloatVisibilityChanged,
+			static_cast<Qt::ConnectionType>(Qt::AutoConnection | Qt::UniqueConnection));
+
+		s_textFloat->setSource(this, connection);
 	}
 
-	return m_description.trimmed() + QString(" %1").
-					arg(model()->getRoundedValue()) + m_unit;
+	s_textFloat->moveGlobal(this, QPoint(width() + 2, 0));
+}
+
+void FloatModelEditorBase::timerEvent(QTimerEvent* event)
+{
+	if (event && event->timerId() != m_textFloatRefreshTimerId) { return; }
+
+	// TODO: Thread check?
+
+	emit floatingTextUpdateRequested();
+}
+
+void FloatModelEditorBase::textFloatVisibilityChanged(bool visible)
+{
+	killTimer(m_textFloatRefreshTimerId);
+	if (visible)
+	{
+		if (m_floatingTextRefreshRate > 0)
+		{
+			// Emit timeout signal once at the very start so that the text is ready
+			// to be displayed when the text float becomes visible
+			timerEvent(nullptr);
+
+			// Now start timer normally
+			m_textFloatRefreshTimerId = startTimer(1000 / m_floatingTextRefreshRate);
+			return;
+		}
+	}
+
+	m_textFloatRefreshTimerId = 0;
 }
 
 

@@ -49,32 +49,26 @@ FlangerControlsDialog::FlangerControlsDialog( FlangerControls *controls ) :
 	mainLayout->addLayout(knobLayout);
 
 	auto delayKnob = new Knob(KnobType::Bright26, tr("DELAY"), this);
-	delayKnob->setVolumeKnob( false );
 	delayKnob->setModel( &controls->m_delayTimeModel );
 	delayKnob->setHintText( tr( "Delay time:" ) + " ", "s" );
 
 	auto lfoFreqKnob = new TempoSyncKnob(KnobType::Bright26, tr("RATE"), this);
-	lfoFreqKnob->setVolumeKnob( false );
 	lfoFreqKnob->setModel( &controls->m_lfoFrequencyModel );
 	lfoFreqKnob->setHintText( tr( "Period:" ) , " Sec" );
 
 	auto lfoAmtKnob = new Knob(KnobType::Bright26, tr("AMNT"), this);
-	lfoAmtKnob->setVolumeKnob( false );
 	lfoAmtKnob->setModel( &controls->m_lfoAmountModel );
 	lfoAmtKnob->setHintText( tr( "Amount:" ) , "" );
 
 	auto lfoPhaseKnob = new Knob(KnobType::Bright26, tr("PHASE"), this);
-	lfoPhaseKnob->setVolumeKnob( false );
 	lfoPhaseKnob->setModel( &controls->m_lfoPhaseModel );
 	lfoPhaseKnob->setHintText( tr( "Phase:" ) , " degrees" );
 
-	auto feedbackKnob = new Knob(KnobType::Bright26, tr("FDBK"), this);
-	feedbackKnob->setVolumeKnob( true) ;
+	auto feedbackKnob = new VolumeKnob(KnobType::Bright26, tr("FDBK"), this);
 	feedbackKnob->setModel( &controls->m_feedbackModel );
 	feedbackKnob->setHintText( tr( "Feedback amount:" ) , "" );
 
-	auto whiteNoiseKnob = new Knob(KnobType::Bright26, tr("NOISE"), this);
-	whiteNoiseKnob->setVolumeKnob( true) ;
+	auto whiteNoiseKnob = new VolumeKnob(KnobType::Bright26, tr("NOISE"), this);
 	whiteNoiseKnob->setModel( &controls->m_whiteNoiseAmountModel );
 	whiteNoiseKnob->setHintText( tr( "White noise amount:" ) , "" );
 

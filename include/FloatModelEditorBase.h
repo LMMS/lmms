@@ -3,6 +3,7 @@
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2023 Michael Gregorius
+ * Copyright (c) 2026 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -41,12 +42,10 @@ class LMMS_EXPORT FloatModelEditorBase : public QWidget, public FloatModelView
 {
 	Q_OBJECT
 
-	mapPropertyFromModel(float, volumeRatio, setVolumeRatio, m_volumeRatio);
-
 	void initUi(const QString & name); //!< to be called by ctors
 
 public:
-	enum class DirectionOfManipulation
+	enum class DirectionOfManipulation : bool
 	{
 		Vertical,
 		Horizontal
@@ -62,21 +61,47 @@ public:
 		setUnit(txt_after);
 	}
 
-	bool isVolumeKnob() const
+	//! Push model or pull model for floating text updates
+	enum class FloatingTextMode : bool
 	{
-		return m_volumeKnob;
-	}	
+		//! Floating text is updated by this widget calling `pullFloatingText` as needed
+		Pull,
 
-	void setVolumeKnob(const bool val)
-	{
-		m_volumeKnob = val;
-	}
+		/**
+		 * Floating text is updated by an external component calling `pushFloatingText` when needed.
+		 *
+		 * This mode may optionally function in a hybrid fashion where this widget periodically emits
+		 * the `floatingTextUpdateRequested` signal for an external component to respond to by pushing
+		 * an update to `pushFloatingText`.
+		 */
+		Push
+	};
+
+	//! In this mode, floating text is updated by this widget calling `pullFloatingText` as needed
+	void setFloatingTextPullMode();
+
+	/**
+	 * In this mode, floating text must be updated by an external component calling `pushFloatingText`.
+	 *
+	 * @param refreshRate How many times per second `floatingTextUpdateRequested` will be emitted
+	 *                    while the text float is visible
+	 */
+	void setFloatingTextPushMode(std::uint8_t refreshRate = 0);
+
+	//! When using the push mode, external components must call this to update the text float's text
+	void pushFloatingText(const QString& text);
 
 signals:
 	void sliderPressed();
 	void sliderReleased();
 	void sliderMoved(float value);
 
+	/**
+	 * In push mode, may be emitted periodically when the text float is visible.
+	 * Upon receiving this signal, call `pushFloatingText` to update the
+	 * text float's text.
+	 */
+	void floatingTextUpdateRequested();
 
 protected:
 	void contextMenuEvent(QContextMenuEvent * me) override;
@@ -98,7 +123,12 @@ protected:
 	void leaveEvent(QEvent *event) override;
 
 	virtual float getValue(const QPoint & p);
-	virtual QString displayValue() const;
+
+	//! When using the pull mode, this method is periodically called to obtain the text float's text
+	virtual QString pullFloatingText() const;
+
+	//! Call before showing the text float
+	void takeControlOfTextFloat();
 
 	void doConnections() override;
 
@@ -112,19 +142,25 @@ protected:
 
 	static SimpleTextFloat * s_textFloat;
 
-	bool m_volumeKnob;
-	FloatModel m_volumeRatio;
-
 	QPoint m_lastMousePos; //!< mouse position in last mouseMoveEvent
 	float m_leftOver;
 	bool m_buttonPressed;
 
 	DirectionOfManipulation m_directionOfManipulation;
 
+	FloatingTextMode m_floatingTextMode = FloatingTextMode::Pull;
+	std::uint8_t m_floatingTextRefreshRate = 0; //! times per second
+	int m_textFloatRefreshTimerId = 0;
+
+private:
+	void timerEvent(QTimerEvent* event) override;
+
 private slots:
 	virtual void enterValue();
 	void friendlyUpdate();
 	void toggleScale();
+
+	void textFloatVisibilityChanged(bool visible);
 };
 
 } // namespace lmms::gui

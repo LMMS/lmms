@@ -24,12 +24,13 @@
 
 #include "Knob.h"
 
+#include <QInputDialog>
 #include <QPainter>
-#include <numbers>
 
 #include "DeprecationHelper.h"
 #include "embed.h"
 #include "FontHelper.h"
+#include "lmms_math.h"
 
 #include <algorithm>
 
@@ -530,6 +531,46 @@ void Knob::changeEvent(QEvent * ev)
 	}
 }
 
+QString VolumeKnob::pullFloatingText() const
+{
+	auto const valueToVolumeRatio = model()->getRoundedValue() / volumeRatio();
+	return valueToVolumeRatio == 0.
+		? QString("-∞ dBFS")
+		: QString("%1 dBFS").arg(ampToDbfs(valueToVolumeRatio), 3, 'f', 2);
+}
+
+void VolumeKnob::enterValue()
+{
+	auto const initalValue = model()->getRoundedValue() / 100.0;
+	auto const initialDbValue = initalValue > 0. ? ampToDbfs(initalValue) : -96;
+
+	bool ok = false;
+	float newVal = QInputDialog::getDouble(
+		this,
+		tr("Set value"),
+		tr("Please enter a new value between -96.0 dBFS and %1 dBFS:")
+			.arg(ampToDbfs(model()->maxValue() / 100.0f)),
+		initialDbValue,
+		-96.0,
+		ampToDbfs(model()->maxValue() / 100.0f),
+		model()->getDigitCount(),
+		&ok
+	);
+
+	if (newVal <= -96.0)
+	{
+		newVal = 0.0f;
+	}
+	else
+	{
+		newVal = dbfsToAmp(newVal) * 100.0;
+	}
+
+	if (ok)
+	{
+		model()->setValue(newVal);
+	}
+}
 
 void convertPixmapToGrayScale(QPixmap& pixMap)
 {
