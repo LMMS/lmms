@@ -58,7 +58,7 @@ void MixerRoute::updateName()
 
 
 MixerChannel::MixerChannel( int idx, Model * _parent ) :
-	m_fxChain( nullptr ),
+	m_fxChain(),
 	m_hasInput( false ),
 	m_stillRunning( false ),
 	m_peakLeft( 0.0f ),

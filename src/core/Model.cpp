@@ -39,11 +39,6 @@ bool Model::isDefaultConstructed() const
 	return m_defaultConstructed;
 }
 
-Model* Model::parentModel() const
-{
-	return dynamic_cast<Model*>(parent());
-}
-
 QString Model::displayName() const
 {
 	return m_displayName;
@@ -58,9 +53,9 @@ QString Model::fullDisplayName() const
 {
 	const QString n = displayName();
 
-	if (parentModel())
+	if (auto parentModel = dynamic_cast<Model*>(parent()))
 	{
-		const QString p = parentModel()->fullDisplayName();
+		const QString p = parentModel->fullDisplayName();
 
 		if (!p.isEmpty())
 		{
