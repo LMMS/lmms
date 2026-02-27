@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef LMMS_TRACK_CHANNEL_CONTAINER_H
-#define LMMS_TRACK_CHANNEL_CONTAINER_H
+#ifndef LMMS_AUDIO_BUFFER_H
+#define LMMS_AUDIO_BUFFER_H
 
 #include <bitset>
 #include <memory_resource>
@@ -403,4 +403,4 @@ private:
 
 } // namespace lmms
 
-#endif // LMMS_TRACK_CHANNEL_CONTAINER_H
+#endif // LMMS_AUDIO_BUFFER_H
