@@ -133,8 +133,6 @@ public:
 
 	QString nodeName() const override;
 
-	int intRand( int min, int max );
-
 	static float * s_harmonics;
 
 public slots:

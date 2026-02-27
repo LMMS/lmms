@@ -95,6 +95,8 @@ PeakControllerEffectControlDialog::PeakControllerEffectControlDialog(
 	mainLayout->addLayout( knobLayout );
 	mainLayout->addLayout( ledLayout );
 
+	mainLayout->setSizeConstraint(QLayout::SetFixedSize);
+
 	setLayout( mainLayout );
 }
 
