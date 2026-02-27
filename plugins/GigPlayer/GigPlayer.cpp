@@ -257,26 +257,19 @@ QString GigInstrument::getCurrentPatchName()
 	int iBankSelected = m_bankNum.value();
 	int iProgSelected = m_patchNum.value();
 
-	gig::Instrument * pInstrument = m_instance->gig.GetFirstInstrument();
-
-	while( pInstrument != nullptr )
+	for (size_t i = 0; i < m_instance->gig.CountInstruments(); ++i)
 	{
+		auto pInstrument = m_instance->gig.GetInstrument(i);
+
 		int iBank = pInstrument->MIDIBank;
 		int iProg = pInstrument->MIDIProgram;
 
-		if( iBank == iBankSelected && iProg == iProgSelected )
+		if (iBank == iBankSelected && iProg == iProgSelected)
 		{
-			QString name = QString::fromStdString( pInstrument->pInfo->Name );
+			QString name = QString::fromStdString(pInstrument->pInfo->Name);
 
-			if( name == "" )
-			{
-				name = "<no name>";
-			}
-
-			return name;
+			return name.isEmpty() ? "<no name>" : name;
 		}
-
-		pInstrument = m_instance->gig.GetNextInstrument();
 	}
 
 	return "";
@@ -711,10 +704,10 @@ void GigInstrument::addSamples( GigNote & gignote, bool wantReleaseSample )
 					m_instrument->DimensionKeyRange.low + 1 );
 	}
 
-	gig::Region* pRegion = m_instrument->GetFirstRegion();
-
-	while( pRegion != nullptr )
+	for (size_t i = 0; i < m_instrument->CountRegions(); ++i)
 	{
+		gig::Region* pRegion = m_instrument->GetRegionAt(i);
+
 		Dimension dim = getDimensions( pRegion, gignote.velocity, wantReleaseSample );
 		gig::DimensionRegion * pDimRegion = pRegion->GetDimensionRegionByValue( dim.DimValues );
 		gig::Sample * pSample = pDimRegion->pSample;
@@ -755,8 +748,6 @@ void GigInstrument::addSamples( GigNote & gignote, bool wantReleaseSample )
 				gignote.samples.emplace_back(pSample, pDimRegion, attenuation, AudioResampler::Mode::Linear, gignote.frequency);
 			}
 		}
-
-		pRegion = m_instrument->GetNextRegion();
 	}
 }
 
@@ -854,22 +845,19 @@ void GigInstrument::getInstrument()
 
 	if( m_instance != nullptr )
 	{
-		gig::Instrument * pInstrument = m_instance->gig.GetFirstInstrument();
-
-		while( pInstrument != nullptr )
+		for (size_t i = 0; i < m_instance->gig.CountInstruments(); ++i)
 		{
+			gig::Instrument* pInstrument = m_instance->gig.GetInstrument(i);
+
 			int iBank = pInstrument->MIDIBank;
 			int iProg = pInstrument->MIDIProgram;
 
-			if( iBank == iBankSelected && iProg == iProgSelected )
+			if (iBank == iBankSelected && iProg == iProgSelected)
 			{
-				break;
+				m_instrument = pInstrument;
+				return;
 			}
-
-			pInstrument = m_instance->gig.GetNextInstrument();
 		}
-
-		m_instrument = pInstrument;
 	}
 }
 
