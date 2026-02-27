@@ -1,4 +1,13 @@
-# Toolchain for MinGW compiler
+# Toolchain for cross-compiling Windows binaries from Linux using MinGW-w64 + vcpkg
+
+if(NOT DEFINED ENV{VCPKG_ROOT})
+	message(FATAL_ERROR "The VCPKG_ROOT environment variable must be set")
+	return()
+endif()
+
+if(NOT DEFINED VCPKG_INSTALLED_DIR)
+	set(VCPKG_INSTALLED_DIR "${CMAKE_BINARY_DIR}/vcpkg_installed")
+endif()
 
 set(CMAKE_SYSTEM_NAME               Windows)
 set(CMAKE_SYSTEM_VERSION            1)
@@ -8,7 +17,12 @@ set(CMAKE_C_COMPILER      ${TOOLCHAIN_PREFIX}-gcc)
 set(CMAKE_CXX_COMPILER    ${TOOLCHAIN_PREFIX}-g++)
 set(CMAKE_RC_COMPILER     ${TOOLCHAIN_PREFIX}-windres)
 
-set(CMAKE_FIND_ROOT_PATH  /usr/${TOOLCHAIN_PREFIX})
+# Check for vcpkg packages first, then fall back on MinGW system packages
+set(CMAKE_FIND_ROOT_PATH
+	"${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}"
+	"/usr/${TOOLCHAIN_PREFIX}"
+)
+
 set(ENV{PKG_CONFIG}       /usr/bin/${TOOLCHAIN_PREFIX}-pkg-config)
 
 if(WIN64)
@@ -19,6 +33,10 @@ endif()
 
 # Search for programs in the build host directories
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
-# Search for libraries and headers in the target directories
+
+# Search for libraries/headers/packages in the target directories
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
+
+include($ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake)

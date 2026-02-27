@@ -1,3 +1,4 @@
+# Toolchain for cross-compiling Windows binaries from Linux using MinGW-w64 + vcpkg
 
 set(WIN64                           TRUE)
 
