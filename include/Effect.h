@@ -143,9 +143,9 @@ public:
 
 	virtual EffectControls* controls() = 0;
 
-	static Effect* instantiate( const QString & _plugin_name,
-				Model* _parent,
-				Descriptor::SubPluginFeatures::Key* _key );
+	static Effect* instantiate(const QString & _plugin_name,
+		Model* _parent,
+		Descriptor::SubPluginFeatures::Key* _key);
 
 	static Effect* createFromPreset(const QString& filePath, Model* parent);
 
