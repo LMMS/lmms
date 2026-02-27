@@ -86,6 +86,7 @@ private slots:
 	void toggleMMPZ(bool enabled);
 	void toggleDisableBackup(bool enabled);
 	void toggleOpenLastProject(bool enabled);
+	void detachBehaviorChanged();
 	void loopMarkerModeChanged();
 	void setLanguage(int lang);
 
@@ -149,6 +150,8 @@ private:
 	bool m_MMPZ;
 	bool m_disableBackup;
 	bool m_openLastProject;
+	QString m_detachBehavior;
+	QComboBox* m_detachBehaviorComboBox;
 	QString m_loopMarkerMode;
 	QComboBox* m_loopMarkerComboBox;
 	QString m_autoScroll;

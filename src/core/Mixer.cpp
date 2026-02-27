@@ -644,12 +644,13 @@ FloatModel * Mixer::channelSendModel( mix_ch_t fromChannel, mix_ch_t toChannel )
 
 void Mixer::mixToChannel( const SampleFrame* _buf, mix_ch_t _ch )
 {
-	if( m_mixerChannels[_ch]->m_muteModel.value() == false )
+	const auto channel = m_mixerChannels[_ch];
+	if (!channel->m_muteModel.value())
 	{
-		m_mixerChannels[_ch]->m_lock.lock();
-		MixHelpers::add( m_mixerChannels[_ch]->m_buffer, _buf, Engine::audioEngine()->framesPerPeriod() );
-		m_mixerChannels[_ch]->m_hasInput = true;
-		m_mixerChannels[_ch]->m_lock.unlock();
+		channel->m_lock.lock();
+		MixHelpers::add(channel->m_buffer, _buf, Engine::audioEngine()->framesPerPeriod());
+		channel->m_hasInput = true;
+		channel->m_lock.unlock();
 	}
 }
 

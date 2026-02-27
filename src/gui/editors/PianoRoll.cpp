@@ -2218,6 +2218,10 @@ void PianoRoll::setKnifeAction()
 		m_knifeDown = false;
 		setCursor(Qt::ArrowCursor);
 		update();
+
+		TextFloat::displayMessage(tr("Knife Tool"),
+			tr("Click and drag over notes to cut along a line\nHold Shift to automatically remove short ends"),
+			embed::getIconPixmap("edit_knife"), 4000);
 	}
 }
 
@@ -2501,18 +2505,17 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 	{
 		updateKnifePos(me, false);
 	}
-	if (m_editMode == EditMode::Detuning && (m_parameterEditDownLeft || m_parameterEditDownRight))
+	else if (m_editMode == EditMode::Detuning && (m_parameterEditDownLeft || m_parameterEditDownRight))
 	{
 		// Update the current dragging/adding/removal of automation nodes in the detuning curves of the selected notes.
 		updateParameterEditPos(me, Note::ParameterType::Detuning);
 	}
-	// Update Strum position if we are on knife mode
-	if (m_editMode == EditMode::Strum && m_strumEnabled)
+	// Update Strum position if we are in strum mode
+	else if (m_editMode == EditMode::Strum && m_strumEnabled)
 	{
 		updateStrumPos(me, false, me->modifiers() & Qt::ShiftModifier);
 	}
-
-	if (pos.y() > PR_TOP_MARGIN || m_action != Action::None)
+	else if (pos.y() > PR_TOP_MARGIN || m_action != Action::None)
 	{
 		bool edit_note = (pos.y() > noteEditTop())
 			&& m_action != Action::SelectNotes;
@@ -2832,7 +2835,7 @@ void PianoRoll::updateParameterEditPos(QMouseEvent* me, Note::ParameterType para
 			TimePos::ticksPerBar() / m_ppb + m_currentPosition;
 
 	// Calculate the relative position of the mouse with respect to the note.
-	TimePos relativePos = posTicks - m_parameterEditClickedNote->pos();
+	TimePos relativePos = Note::quantized(posTicks - m_parameterEditClickedNote->pos(), quantization());
 	int relativeKey = keyNum - m_parameterEditClickedNote->key();
 
 	// Set the quantization of the automation editor to match the piano roll. This is not an ideal system, but it works.
@@ -2848,13 +2851,13 @@ void PianoRoll::updateParameterEditPos(QMouseEvent* me, Note::ParameterType para
 		if (m_parameterEditDownLeft)
 		{
 			// Don't allow the user to drag the first node from the start of the note. They can drag it up and down, but if they try to move it from the first tick, apply the previous drag and start a new one to preserve the node
-			if (m_lastParameterEditTick != std::nullopt && Note::quantized(m_lastParameterEditTick.value() - m_parameterEditClickedNote->pos(), quantization()) == 0 && Note::quantized(relativePos, quantization()) != 0)
+			if (m_lastParameterEditTick != std::nullopt && Note::quantized(m_lastParameterEditTick.value() - m_parameterEditClickedNote->pos(), quantization()) == 0 && relativePos != 0)
 			{
 				updateLastEditTick = false;
 				aClip->setDragValue(0, relativeKey);
 			}
 			// Also, don't let the user drag another node onto the first node, since that creates issues with the first node changing height without the user intending it to
-			else if (m_lastParameterEditTick != std::nullopt && Note::quantized(m_lastParameterEditTick.value() - m_parameterEditClickedNote->pos(), quantization()) > 0 && Note::quantized(relativePos, quantization()) <= 0)
+			else if (m_lastParameterEditTick != std::nullopt && Note::quantized(m_lastParameterEditTick.value() - m_parameterEditClickedNote->pos(), quantization()) > 0 && relativePos <= 0)
 			{
 				updateLastEditTick = false;
 				aClip->setDragValue(quantization(), relativeKey);
@@ -4055,15 +4058,31 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 
 		// When alt is pressed we only edit the note under the cursor
 		bool altPressed = we->modifiers() & Qt::AltModifier;
+
 		// go through notes to figure out which one we want to change
 		NoteVector nv;
+		bool isSelection = false;
 		for ( Note * i : m_midiClip->notes() )
 		{
-			if( i->withinRange( ticks_start, ticks_end ) || ( i->selected() && !altPressed ) )
+			if (i->selected() && !altPressed) // found a selected note
+			{
+				if (!isSelection)
+				{
+					// drop other notes if we are realizing this is a selection now
+					isSelection = true;
+					nv.clear();
+				}
+
+				nv.push_back(i);
+			}
+
+			// not on selection - just push back the note if it is within range
+			if (!isSelection && i->withinRange(ticks_start, ticks_end))
 			{
 				nv.push_back(i);
 			}
 		}
+
 		if( nv.size() > 0 )
 		{
 			const int step = (we->angleDelta().y() > 0 ? 1 : -1) * (we->inverted() ? -1 : 1);
@@ -4086,6 +4105,8 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 					// same volume
 					showVolTextFloat(nv[0]->getVolume(), pos, 1000);
 				}
+				// Emit MIDI clip has changed
+				m_midiClip->dataChanged();
 			}
 			else if( m_noteEditMode == NoteEditMode::Panning )
 			{
@@ -4873,7 +4894,9 @@ void PianoRoll::updatePositionAccompany()
 		}
 		if( (int) pos > 0 )
 		{
-			m_timeLine->timeline()->setTicks(pos);
+			// Passing false to prevent any `positionJumped` signals from being emitted, since this movement is supposed
+			// to be smoothly tracking the Song's timeline, not the from user forcefully dragging it.
+			m_timeLine->timeline()->setTicks(pos, false);
 			autoScroll( pos );
 		}
 	}
