@@ -162,10 +162,10 @@ MixerView::MixerView(Mixer* mixer) :
 	// timer for updating faders
 	connect(mainWindow, &MainWindow::periodicUpdate, this, &MixerView::updateFaders);
 
-	// add ourself to workspace
-	QMdiSubWindow* subWin = mainWindow->addWindowedWidget(this);
 	layout()->setSizeConstraint(QLayout::SetMinimumSize);
-	subWin->layout()->setSizeConstraint(QLayout::SetMinAndMaxSize);
+
+	// add ourself to workspace
+	mainWindow->addWindowedWidget(this);
 
 	parentWidget()->setAttribute(Qt::WA_DeleteOnClose, false);
 	parentWidget()->move(5, 310);
@@ -529,21 +529,6 @@ void MixerView::keyPressEvent(QKeyEvent * e)
 			break;
 	}
 }
-
-
-
-void MixerView::closeEvent(QCloseEvent * ce)
- {
-	if (parentWidget())
-	{
-		parentWidget()->hide();
-	}
-	else
-	{
-		hide();
-	}
-	ce->ignore();
- }
 
 
 

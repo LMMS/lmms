@@ -59,9 +59,6 @@ public slots:
 	void updateScaleForm();
 	void updateKeymapForm();
 
-protected:
-	void closeEvent(QCloseEvent *ce) override;
-
 private slots:
 	bool loadScaleFromFile();
 	bool loadKeymapFromFile();
