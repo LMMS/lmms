@@ -52,9 +52,9 @@ class LMMS_EXPORT Effect : public Plugin
 {
 	Q_OBJECT
 public:
-	Effect( const Plugin::Descriptor* _desc,
-			Model* _parent,
-			const Descriptor::SubPluginFeatures::Key* _key );
+	Effect(const Plugin::Descriptor* _desc,
+		Model* _parent,
+		const Descriptor::SubPluginFeatures::Key* _key);
 
 	void saveSettings( QDomDocument& _doc, QDomElement& _parent ) override;
 	void loadSettings( const QDomElement& _this ) override;
