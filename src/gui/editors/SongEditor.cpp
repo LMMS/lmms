@@ -248,6 +248,7 @@ SongEditor::SongEditor( Song * song ) :
 	m_zoomingModel->setParent(this);
 	m_zoomingModel->setJournalling(false);
 	connect(m_zoomingModel, SIGNAL(dataChanged()), this, SLOT(zoomingChanged()));
+	m_zoomingModel->setValue(ConfigManager::inst()->value("ui","songeditorzoom",QString::number(calculateZoomSliderValue(DEFAULT_PIXELS_PER_BAR))).toInt());
 
 
 	// Set up snapping model
@@ -267,13 +268,17 @@ SongEditor::SongEditor( Song * song ) :
 			m_snappingModel->addItem(QString("1/%1 Bar").arg(1 / bars));
 		}
 	}
-	m_snappingModel->setInitValue( m_snappingModel->findText( "1/4 Bar" ) );
+	m_snappingModel->setInitValue(ConfigManager::inst()->value("ui", "songeditorsnap", QString::number(m_snappingModel->findText( "1/4 Bar" ))).toInt());
 
 	setFocusPolicy( Qt::StrongFocus );
 	setFocus();
 }
 
-
+SongEditor::~SongEditor()
+{
+	ConfigManager::inst()->setValue("ui", "songeditorzoom", QString::number(m_zoomingModel->value()));
+	ConfigManager::inst()->setValue("ui", "songeditorsnap", QString::number(m_snappingModel->value()));
+}
 
 
 void SongEditor::saveSettings( QDomDocument& doc, QDomElement& element )
