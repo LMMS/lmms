@@ -1,5 +1,5 @@
 /*
- * PredictionDistort.h - PredictionDistort-effect-plugin
+ * PolynomialExtrapolate.h - PolynomialExtrapolate-effect-plugin
  *
  * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
  * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
@@ -23,11 +23,11 @@
  *
  */
 
-#ifndef LMMS_PREDICTIONDISTORT_H
-#define LMMS_PREDICTIONDISTORT_H
+#ifndef LMMS_POLYNOMIALEXTRAPOLATE_H
+#define LMMS_POLYNOMIALEXTRAPOLATE_H
 
 #include "Effect.h"
-#include "PredictionDistortControls.h"
+#include "PolynomialExtrapolateControls.h"
 
 #include <cmath>
 #include <vector>
@@ -35,11 +35,13 @@
 namespace lmms
 {
 
-class PredictionDistortEffect : public Effect
+class PolynomialExtrapolateEffect : public Effect
 {
 public:
-	PredictionDistortEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
-	~PredictionDistortEffect() override = default;
+	PolynomialExtrapolateEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
+	~PolynomialExtrapolateEffect() override = default;
+
+	static const s_maxPolynomialDegree = 20;
 
 	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
 
@@ -75,14 +77,19 @@ private:
 	void getMatrix(std::vector<float>& matrix, size_t width);
 	float polinomialAt(float x, const std::vector<float>& polinomial, size_t width) const;
 
-	PredictionDistortControls m_effectControls;
+	PolynomialExtrapolateControls m_effectControls;
 	storageBuffer<SampleFrame> m_inputData;
 	//! how much data to store in `m_inputData` from the last input
 	size_t m_retainCount = 3;
 
-	friend class PredictionDistortControls;
+	//! helps generate `m_polynomialMatrix`
+	std::vector<float> m_coefficientMatrix;
+	//! helps generate polynomial coefficients
+	std::vector<float> m_polynomialMatrix;
+
+	friend class PolynomialExtrapolateControls;
 };
 
 } // namespace lmms
 
-#endif // LMMS_PREDICTIONDISTORT_H
+#endif // LMMS_POLYNOMIALEXTRAPOLATE_H

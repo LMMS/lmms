@@ -1,5 +1,5 @@
 /*
- * PredictionDistortControls.cpp - controls for PredictionDistort effect
+ * PolynomialExtrapolateControls.cpp - controls for PolynomialExtrapolate effect
  *
  * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
@@ -25,13 +25,13 @@
 
 #include <QDomElement>
 
-#include "PredictionDistortControls.h"
-#include "PredictionDistort.h"
+#include "PolynomialExtrapolateControls.h"
+#include "PolynomialExtrapolate.h"
 
 namespace lmms
 {
 
-PredictionDistortControls::PredictionDistortControls(PredictionDistortEffect* effect) :
+PolynomialExtrapolateControls::PolynomialExtrapolateControls(PolynomialExtrapolateEffect* effect) :
 	EffectControls(effect),
 	m_effect(effect),
 	m_mixModel(1.0f, 0.0f, 1.0f, 0.001f, this, tr("Mix")),
@@ -42,7 +42,7 @@ PredictionDistortControls::PredictionDistortControls(PredictionDistortEffect* ef
 }
 
 
-void PredictionDistortControls::loadSettings(const QDomElement& parent)
+void PolynomialExtrapolateControls::loadSettings(const QDomElement& parent)
 {
 	m_mixModel.loadSettings(parent, "mix");
 	m_decayModel.loadSettings(parent, "decay");
@@ -51,7 +51,7 @@ void PredictionDistortControls::loadSettings(const QDomElement& parent)
 }
 
 
-void PredictionDistortControls::saveSettings(QDomDocument& doc, QDomElement& parent)
+void PolynomialExtrapolateControls::saveSettings(QDomDocument& doc, QDomElement& parent)
 {
 	m_mixModel.saveSettings(doc, parent, "mix"); 
 	m_decayModel.saveSettings(doc, parent, "decay");

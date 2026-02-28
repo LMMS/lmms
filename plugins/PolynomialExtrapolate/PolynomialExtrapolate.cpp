@@ -1,7 +1,7 @@
 /*
- * PredictionDistort.cpp - A native distort effect that tries to predict the next sample
+ * PolynomialExtrapolate.cpp - A native distort effect that tries to predict the next sample
  *
- * Copyright (c) 2025 szeli1
+ * Copyright (c) 2025 - 2026 szeli1
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -22,7 +22,7 @@
  *
  */
 
-#include "PredictionDistort.h"
+#include "PolynomialExtrapolate.h"
 
 #include "embed.h"
 #include "plugin_export.h"
@@ -33,11 +33,11 @@ namespace lmms
 extern "C"
 {
 
-Plugin::Descriptor PLUGIN_EXPORT PredictionDistort_plugin_descriptor =
+Plugin::Descriptor PLUGIN_EXPORT PolynomialExtrapolate_plugin_descriptor =
 {
 	LMMS_STRINGIFY(PLUGIN_NAME),
 	"Prediction Distortion",
-	QT_TRANSLATE_NOOP("PluginBrowser", "This effect tries to predict the next sample using second degree polynomials"),
+	QT_TRANSLATE_NOOP("PluginBrowser", "This effect tries to predict future audio using polynomials"),
 	"szeli1",
 	0x0100,
 	Plugin::Type::Effect,
@@ -49,14 +49,16 @@ Plugin::Descriptor PLUGIN_EXPORT PredictionDistort_plugin_descriptor =
 }
 
 
-PredictionDistortEffect::PredictionDistortEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key) :
-	Effect(&PredictionDistort_plugin_descriptor, parent, key),
-	m_effectControls(this)
+PolynomialExtrapolateEffect::PolynomialExtrapolateEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key)
+	: Effect(&PolynomialExtrapolate_plugin_descriptor, parent, key)
+	, m_effectControls(this)
+	, m_coefficientMatrix(s_maxPolynomialDegree * s_maxPolynomialDegree)
+	, m_polynomialMatrix(s_maxPolynomialDegree * s_maxPolynomialDegree)
 {
 }
 
 
-Effect::ProcessStatus PredictionDistortEffect::processImpl(SampleFrame* buf, const fpp_t frames)
+Effect::ProcessStatus PolynomialExtrapolateEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 {
 	size_t range = m_effectControls.m_rangeModel.value();
 	float mixVal = m_effectControls.m_mixModel.value();
@@ -104,7 +106,7 @@ Effect::ProcessStatus PredictionDistortEffect::processImpl(SampleFrame* buf, con
 	return ProcessStatus::ContinueIfNotQuiet;
 }
 
-float PredictionDistortEffect::predictNext(float y1, float y2, float y3, float predictX)
+float PolynomialExtrapolateEffect::predictNext(float y1, float y2, float y3, float predictX)
 {
 	// calculating second degree polynomial with 3 input points
 	// y = ax^2 + bx + c
@@ -116,29 +118,29 @@ float PredictionDistortEffect::predictNext(float y1, float y2, float y3, float p
 }
 
 template<typename T>
-T& PredictionDistortEffect::storageBuffer<T>::operator[](size_t index)
+T& PolynomialExtrapolateEffect::storageBuffer<T>::operator[](size_t index)
 {
 	return m_data[(m_readIndex + index) % m_data.size()];
 }
 template<typename T>
-void PredictionDistortEffect::storageBuffer<T>::clear()
+void PolynomialExtrapolateEffect::storageBuffer<T>::clear()
 {
 	m_data.clear();
 	m_readIndex = 0;
 }
 template<typename T>
-size_t PredictionDistortEffect::storageBuffer<T>::size()
+size_t PolynomialExtrapolateEffect::storageBuffer<T>::size()
 {
 	return m_data.size();
 }
 template<typename T>
-void PredictionDistortEffect::storageBuffer<T>::resize(size_t newSize)
+void PolynomialExtrapolateEffect::storageBuffer<T>::resize(size_t newSize)
 {
 	m_data.resize(newSize);
 	m_readIndex = m_readIndex % m_data.size();
 }
 template<typename T>
-void PredictionDistortEffect::storageBuffer<T>::write(const T* buf, size_t frames)
+void PolynomialExtrapolateEffect::storageBuffer<T>::write(const T* buf, size_t frames)
 {
 	if (m_data.size() <= 0 || frames <= 0) { return; }
 	for (size_t i = 0; i < frames; i++)
@@ -303,7 +305,7 @@ extern "C"
 // necessary for getting instance out of shared lib
 PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* parent, void* data)
 {
-	return new PredictionDistortEffect(parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key*>(data));
+	return new PolynomialExtrapolateEffect(parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key*>(data));
 }
 
 }

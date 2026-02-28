@@ -1,5 +1,5 @@
 /*
- * PredictionDistortControlDialog.cpp - control dialog for PredictionDistort effect
+ * PolynomialExtrapolateControlDialog.cpp - control dialog for PolynomialExtrapolate effect
  *
  * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
  * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
@@ -23,8 +23,8 @@
  *
  */
 
-#include "PredictionDistortControlDialog.h"
-#include "PredictionDistortControls.h"
+#include "PolynomialExtrapolateControlDialog.h"
+#include "PolynomialExtrapolateControls.h"
 
 #include "embed.h"
 #include "Knob.h"
@@ -34,7 +34,7 @@
 namespace lmms::gui
 {
 
-PredictionDistortControlDialog::PredictionDistortControlDialog(PredictionDistortControls* controls) :
+PolynomialExtrapolateControlDialog::PolynomialExtrapolateControlDialog(PolynomialExtrapolateControls* controls) :
 	EffectControlDialog(controls)
 {
 	setAutoFillBackground(true);

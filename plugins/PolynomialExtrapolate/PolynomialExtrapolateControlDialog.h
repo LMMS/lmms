@@ -1,5 +1,5 @@
 /*
- * PredictionDistortControlDialog.h - control dialog for PredictionDistort effect
+ * PolynomialExtrapolateControlDialog.h - control dialog for PolynomialExtrapolate effect
  *
  * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
  * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
@@ -23,15 +23,15 @@
  *
  */
 
-#ifndef LMMS_GUI_PREDICTIONDISTORT_CONTROL_DIALOG_H
-#define LMMS_GUI_PREDICTIONDISTORT_CONTROL_DIALOG_H
+#ifndef LMMS_GUI_POLYNOMIALEXTRAPOLATE_CONTROL_DIALOG_H
+#define LMMS_GUI_POLYNOMIALEXTRAPOLATE_CONTROL_DIALOG_H
 
 #include "EffectControlDialog.h"
 
 namespace lmms
 {
 
-class PredictionDistortControls;
+class PolynomialExtrapolateControls;
 class FloatModel;
 
 namespace gui
@@ -39,16 +39,16 @@ namespace gui
 
 class Knob;
 
-class PredictionDistortControlDialog : public EffectControlDialog
+class PolynomialExtrapolateControlDialog : public EffectControlDialog
 {
 	Q_OBJECT
 public:
-	PredictionDistortControlDialog(PredictionDistortControls* controls);
-	~PredictionDistortControlDialog() override = default;
+	PolynomialExtrapolateControlDialog(PolynomialExtrapolateControls* controls);
+	~PolynomialExtrapolateControlDialog() override = default;
 };
 
 } // namespace gui
 
 } // namespace lmms
 
-#endif // LMMS_GUI_PREDICTIONDISTORT_CONTROL_DIALOG_H
+#endif // LMMS_GUI_POLYNOMIALEXTRAPOLATE_CONTROL_DIALOG_H
