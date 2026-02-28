@@ -148,6 +148,155 @@ void PredictionDistortEffect::storageBuffer<T>::write(const T* buf, size_t frame
 	}
 }
 
+
+void PredictinDistortEffect::getPolinomialCoefficients(const std::vector<float>& helperMatrix,
+	const std::vector<float>& samples, std::vector<float>& polinomial, size_t width)
+{
+	for (size_t y = 0; y < width; ++y)
+	{
+		polinomial[y] = 0.0f;
+		for (size_t x = 0; x < width; ++x)
+		{
+			polinomial[y] += helperMatrix[y * width + x] * samples[x];
+		}
+	}
+}
+
+void PredictinDistortEffect::getMatrix(std::vector<float>& matrix, size_t width)
+{
+	std::vector<float> coefficientMatrix(width * width);
+	// x coordinates correspond to indexes in the source audio
+	// a polinomial consist of increasing whole powers of these x coords:
+	// "a*x^2 + b*x + c"
+	// w = 3    c  b  a   f(1) f(2) f(3)    ---->    c  b  a      1 <= t <= w [matrix] OUT
+	// x = 1 [  1  1  1  |  1    0    0  ]        [  1  0  0  | linear combination of f(t) ]
+	// x = 2 [  1  2  4  |  0    1    0  ]        [  0  1  0  | linear combination of f(t) ]
+	// x = 3 [  1  3  9  |  0    0    1  ]        [  0  0  1  | linear combination of f(t) ]
+	for (size_t i = 0; i < size; ++i)
+	{
+		float poweredInput{i + 1};
+		for (size_t j = 0; j < width; ++j)
+		{
+			size_t index = i * width + j;
+			coefficientMatrix[index] = poweredInput;
+			poweredInput = poweredInput * i;
+		}
+	}
+	for (size_t i = 0; i < width; ++i)
+	{
+		for (size_t j = 0; j < width; ++j)
+		{
+			matrix[i * width + j] = 0.0f;
+		}
+		matrix[i * width + i] = 1.0f;
+	}
+
+	
+	// Gauss elimination
+	int x = 0;
+	int y = 0;
+	for (; y < width; ++y)
+	{
+		// if 0
+		if (std::abs(coefficientMatrix[y * width + x]) < 0.0001f)
+		{
+			while (x < width)
+			{
+				bool found = false;
+				for (int ny = y + 1; ny < width; ++ny)
+				{
+					if (std::abs(coefficientMatrix[ny * width + x]) >= 0.0001f)
+					{
+						// swap y with ny
+						for (int nx = x; nx < width; ++nx)
+						{
+							float swap = coefficientMatrix[ny * width + nx];
+							coefficientMatrix[ny * width + nx] = coefficientMatrix[y * width + nx];
+							coefficientMatrix[y * width + nx] = swap;
+							// mirror
+							swap = matrix[ny * width + nx];
+							matrix[ny * width + nx] = matrix[y * width + nx];
+							matrix[y * width + nx] = swap;
+						}
+						found = true;
+						break;
+					}
+				}
+				// if we managed to move a non 0 row to (x, y)
+				if (found) { break; }
+				++x;
+			}
+			if (x >= width) { assert(false); /* 0 row isn't handled (should never happen for this input) */ }
+		}
+		
+		float quotient = 1.0f / coefficientMatrix[y * width + x];
+		coefficientMatrix[y * width + x] = 1.0f;
+		matrix[y * width + x] *= quotient; // mirror
+		for (int nx = x + 1; nx < width; ++nx)
+		{
+			coefficientMatrix[y * width + nx] *= quotient;
+			// mirror
+			matrix[y * width + nx] *= quotient;
+		}
+
+		for (int ny = y + 1; ny < width; ++ny)
+		{
+			float multiplier = -coefficientMatrix[ny * width + x];
+			coefficientMatrix[ny * width + x] = 0.0f;
+			matrix[ny * width + x] += matrix[y * width + x] * multiplier; // mirror
+			for (int nx = x + 1; nx < width; ++nx)
+			{
+				coefficientMatrix[ny * width + nx] += coefficientMatrix[y * width + nx] * multiplier;
+				// mirror
+				matrix[ny * width + nx] += matrix[y * width + nx] * multiplier;
+			}
+		}
+		++x;
+		if (x >= width) { break; }
+	}
+	assert(x == width); // Gauss elimination didn't finish
+	assert(y == width); // Gauss elimination didn't finish
+	--x;
+	--y;
+	for (; y >= 0; --y)
+	{
+		// finding leading 1
+		if (std::abs(coefficientMatrix[y * width + x] - 1.0f) > 0.0001f)
+		{
+			while (--x >= 0)
+			{
+				// if we found the leading edge
+				if (std::abs(coefficientMatrix[y * width + x] - 1.0f) > 0.0001f) { break; }
+			}
+
+			if (x < 0) { assert(false); /* this should never happen */ }
+		}
+		
+		for (size_t ny = y - 1; ny >= 0; --ny)
+		{
+			float multiplier = -coefficientMatrix[ny * width + x];
+			coefficientMatrix[ny * width + x] = 0.0f;
+			for (size_t nx = 0; nx < width; ++nx)
+			{
+				// mirror
+				matrix[ny * width + nx] += matrix[y * width + nx] * multiplier;
+			}
+		}
+		--x;
+		if (x < 0) { break; }
+	}
+}
+
+float PredictinDistortEffect::polinomialAt(float x, const std::vector<float>& polinomial, size_t width) const
+{
+	float factor = polinomial[width - 1];
+	for (int i = width - 2; i >= 0; --i)
+	{
+		factor = factor * x + polinomial[i];
+	}
+	return factor;
+}
+
 extern "C"
 {
 

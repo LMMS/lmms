@@ -70,6 +70,11 @@ private:
 		std::vector<T> m_data = {};
 	};
 
+	void getPolinomialCoefficients(const std::vector<float>& helperMatrix,
+		const std::vector<float>& samples, std::vector<float>& polinomial, size_t width);
+	void getMatrix(std::vector<float>& matrix, size_t width);
+	float polinomialAt(float x, const std::vector<float>& polinomial, size_t width) const;
+
 	PredictionDistortControls m_effectControls;
 	storageBuffer<SampleFrame> m_inputData;
 	//! how much data to store in `m_inputData` from the last input
