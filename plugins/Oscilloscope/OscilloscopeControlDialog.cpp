@@ -1,7 +1,7 @@
 /*
  * OscilloscopeControlDialog.cpp - Oscilloscope effect gui window
  *
- * Copyright (c) 2025 Keratin
+ * Copyright (c) 2025-2026 Keratin
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -19,7 +19,6 @@
  * License along with this program (see COPYING); if not, write to the
  * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA 02110-1301 USA.
- *
  */
 
 #include "OscilloscopeControlDialog.h"
