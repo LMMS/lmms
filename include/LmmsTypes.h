@@ -43,11 +43,11 @@ using int_sample_t  = std::int16_t;  // 16-bit-int-sample
 using sample_rate_t = std::uint32_t; // sample-rate
 using fpp_t         = std::size_t;   // frames per period (0-16384)
 using f_cnt_t       = std::size_t;   // standard frame-count
-using ch_cnt_t      = std::uint8_t;  // audio channel index/count (0-MaxChannelsPerTrack)
+using ch_cnt_t      = std::uint8_t;  // audio channel index/count (0-MaxChannelsPerAudioBuffer)
 using bpm_t         = std::uint16_t; // tempo (MIN_BPM to MAX_BPM)
 using bitrate_t     = std::uint16_t; // bitrate in kbps
 using mix_ch_t      = std::uint16_t; // Mixer-channel (0 to MAX_CHANNEL)
-using group_cnt_t   = std::uint8_t;  // channel group index/count (0-MaxGroupsPerTrack)
+using group_cnt_t   = std::uint8_t;  // channel group index/count (0-MaxGroupsPerAudioBuffer)
 
 using jo_id_t       = std::uint32_t; // (unique) ID of a journalling object
 

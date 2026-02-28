@@ -41,7 +41,7 @@ namespace lmms
  * An owning collection of audio channels for an instrument track, mixer channel, or audio processor.
  *
  * Features:
- * - Up to `MaxChannelsPerTrack` total channels
+ * - Up to `MaxChannelsPerAudioBuffer` total channels
  * - Audio data in planar format (plus a temporary interleaved buffer for conversions until we use planar only)
  * - All planar buffers are sourced from the same large buffer for better cache locality
  * - Custom allocator support
@@ -62,7 +62,7 @@ namespace lmms
 class LMMS_EXPORT AudioBuffer
 {
 public:
-	using ChannelFlags = std::bitset<MaxChannelsPerTrack>;
+	using ChannelFlags = std::bitset<MaxChannelsPerAudioBuffer>;
 
 	//! Non-owning collection of audio channels + metadata
 	class ChannelGroup
@@ -314,7 +314,7 @@ public:
 	 * @param channels channels to sanitize; 1 = selected, 0 = skip
 	 * @param upperBound any channel indexes at or above this are skipped
 	 */
-	void sanitize(const ChannelFlags& channels, ch_cnt_t upperBound = MaxChannelsPerTrack);
+	void sanitize(const ChannelFlags& channels, ch_cnt_t upperBound = MaxChannelsPerAudioBuffer);
 
 	//! Sanitizes all channels. @see sanitize
 	void sanitizeAll();
@@ -326,7 +326,7 @@ public:
 	 * @param upperBound any channel indexes at or above this are skipped
 	 * @returns true if all selected channels were silent
 	 */
-	auto updateSilenceFlags(const ChannelFlags& channels, ch_cnt_t upperBound = MaxChannelsPerTrack) -> bool;
+	auto updateSilenceFlags(const ChannelFlags& channels, ch_cnt_t upperBound = MaxChannelsPerAudioBuffer) -> bool;
 
 	//! Updates the silence status of all channels. @see updateSilenceFlags
 	auto updateAllSilenceFlags() -> bool;
@@ -337,7 +337,7 @@ public:
 	 * @param channels channels to silence; 1 = selected, 0 = skip
 	 * @param upperBound any channel indexes at or above this are skipped
 	 */
-	void silenceChannels(const ChannelFlags& channels, ch_cnt_t upperBound = MaxChannelsPerTrack);
+	void silenceChannels(const ChannelFlags& channels, ch_cnt_t upperBound = MaxChannelsPerAudioBuffer);
 
 	//! Silences (zeroes) all channels. @see silenceChannels
 	void silenceAllChannels();
@@ -371,9 +371,9 @@ private:
 	float* m_interleavedBuffer = nullptr;
 
 	//! Divides channels into arbitrary groups
-	ArrayVector<ChannelGroup, MaxGroupsPerTrack> m_groups;
+	ArrayVector<ChannelGroup, MaxGroupsPerAudioBuffer> m_groups;
 
-	//! Caches the sum of `m_groups[idx].channels()` - must never exceed MaxChannelsPerTrack
+	//! Caches the sum of `m_groups[idx].channels()` - must never exceed MaxChannelsPerAudioBuffer
 	ch_cnt_t m_totalChannels = 0;
 
 	//! Frame count for every channel buffer

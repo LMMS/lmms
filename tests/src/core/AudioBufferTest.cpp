@@ -109,7 +109,7 @@ private slots:
 		auto ab = AudioBuffer{10, 0};
 
 		// Add groups until no more can be added
-		auto groupsLeft = static_cast<int>(lmms::MaxGroupsPerTrack);
+		auto groupsLeft = static_cast<int>(lmms::MaxGroupsPerAudioBuffer);
 		QVERIFY(groupsLeft >= 0);
 		while (groupsLeft > 0)
 		{
@@ -118,32 +118,32 @@ private slots:
 			--groupsLeft;
 		}
 		QCOMPARE(groupsLeft, 0);
-		QCOMPARE(ab.groupCount(), lmms::MaxGroupsPerTrack);
-		QCOMPARE(ab.totalChannels(), lmms::MaxGroupsPerTrack);
+		QCOMPARE(ab.groupCount(), lmms::MaxGroupsPerAudioBuffer);
+		QCOMPARE(ab.totalChannels(), lmms::MaxGroupsPerAudioBuffer);
 
 		// Next group should fail
 		auto group = ab.addGroup(1);
 		QCOMPARE(group, nullptr);
-		QCOMPARE(ab.groupCount(), lmms::MaxGroupsPerTrack);
-		QCOMPARE(ab.totalChannels(), lmms::MaxGroupsPerTrack);
+		QCOMPARE(ab.groupCount(), lmms::MaxGroupsPerAudioBuffer);
+		QCOMPARE(ab.totalChannels(), lmms::MaxGroupsPerAudioBuffer);
 	}
 
 	//! Verifies that groups cannot be added past the maximum total channel count for the track
 	void AddGroup_MaximumTotalChannels()
 	{
-		auto ab = AudioBuffer{10, lmms::MaxChannelsPerTrack - 1};
+		auto ab = AudioBuffer{10, lmms::MaxChannelsPerAudioBuffer - 1};
 
 		// Try adding a group with enough channels
 		// to push the total channels past the maximum for the track (should fail)
 		auto group = ab.addGroup(2);
 		QCOMPARE(group, nullptr);
-		QCOMPARE(ab.totalChannels(), lmms::MaxChannelsPerTrack - 1);
+		QCOMPARE(ab.totalChannels(), lmms::MaxChannelsPerAudioBuffer - 1);
 
 		// Ok, how about just enough to hit the maximum
 		// total channels for the track (should succeed)
 		group = ab.addGroup(1);
 		QVERIFY(group != nullptr);
-		QCOMPARE(ab.totalChannels(), lmms::MaxChannelsPerTrack);
+		QCOMPARE(ab.totalChannels(), lmms::MaxChannelsPerAudioBuffer);
 	}
 
 	//! Verifies that groups can be specified using `setGroups`

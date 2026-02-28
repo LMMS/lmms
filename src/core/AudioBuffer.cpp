@@ -41,7 +41,7 @@ namespace
 template<bool value>
 auto createMask(ch_cnt_t pos) noexcept -> AudioBuffer::ChannelFlags
 {
-	assert(pos <= MaxChannelsPerTrack);
+	assert(pos <= MaxChannelsPerAudioBuffer);
 
 	AudioBuffer::ChannelFlags mask;
 	mask.set();
@@ -52,7 +52,7 @@ auto createMask(ch_cnt_t pos) noexcept -> AudioBuffer::ChannelFlags
 	}
 	else
 	{
-		mask >>= (MaxChannelsPerTrack - pos);
+		mask >>= (MaxChannelsPerAudioBuffer - pos);
 	}
 
 	return mask;
@@ -121,7 +121,7 @@ auto AudioBuffer::addGroup(ch_cnt_t channels) -> ChannelGroup*
 	}
 
 	const auto newTotalChannels = m_totalChannels + channels;
-	if (newTotalChannels > MaxChannelsPerTrack)
+	if (newTotalChannels > MaxChannelsPerAudioBuffer)
 	{
 		// Not enough room for requested channels
 		return nullptr;
@@ -266,7 +266,7 @@ void AudioBuffer::sanitizeAll()
 
 auto AudioBuffer::updateSilenceFlags(const ChannelFlags& channels, ch_cnt_t upperBound) -> bool
 {
-	assert(upperBound <= MaxChannelsPerTrack);
+	assert(upperBound <= MaxChannelsPerAudioBuffer);
 
 	// Invariant: Any channel bits at or above `totalChannels()` must be marked silent
 	assert((~m_silenceFlags & createMask<true>(m_totalChannels)).none());
