@@ -43,8 +43,6 @@ class OscilloscopeControlDialog : public EffectControlDialog
 public:
 	OscilloscopeControlDialog(OscilloscopeControls* controls);
 	~OscilloscopeControlDialog() override = default;
-
-	bool isResizable() const override { return true; }
 };
 
 } // namespace gui
