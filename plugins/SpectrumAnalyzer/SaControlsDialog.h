@@ -48,7 +48,6 @@ public:
 	explicit SaControlsDialog(SaControls *controls, SaProcessor *processor);
 	~SaControlsDialog() override = default;
 
-	bool isResizable() const override {return true;}
 	QSize sizeHint() const override;
 
 private:

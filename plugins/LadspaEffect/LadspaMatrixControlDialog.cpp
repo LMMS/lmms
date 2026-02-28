@@ -47,6 +47,7 @@ LadspaMatrixControlDialog::LadspaMatrixControlDialog(LadspaControls * ladspaCont
 	m_stereoLink(nullptr)
 {
 	QVBoxLayout * mainLayout = new QVBoxLayout(this);
+	mainLayout->setSizeConstraint(QLayout::SetMinAndMaxSize);
 
 	m_scrollArea = new QScrollArea(this);
 	m_scrollArea->setWidgetResizable(true);
@@ -70,11 +71,6 @@ LadspaMatrixControlDialog::LadspaMatrixControlDialog(LadspaControls * ladspaCont
 		m_stereoLink->setModel(&ladspaControls->m_stereoLinkModel);
 		mainLayout->addWidget(m_stereoLink, 0, Qt::AlignCenter);
 	}
-}
-
-bool LadspaMatrixControlDialog::isResizable() const
-{
-	return true;
 }
 
 bool LadspaMatrixControlDialog::needsLinkColumn() const

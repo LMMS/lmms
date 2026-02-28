@@ -171,6 +171,7 @@ QMenu::indicator:selected {
 lmms--gui--PositionLine {
 	qproperty-tailGradient: true;
 	qproperty-lineColor: rgb(255, 255, 255);
+	qproperty-recordingColor: rgb(255, 71, 87);
 }
 
 lmms--gui--PianoRoll {

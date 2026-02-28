@@ -40,22 +40,10 @@ namespace gui
 
 class ControllerDialog : public QWidget, public ModelView
 {
-    Q_OBJECT
 public:
-	ControllerDialog( Controller * _controller, QWidget * _parent );
-
+	ControllerDialog(Controller* controller, QWidget* parent);
 	~ControllerDialog() override = default;
-
-
-signals:
-	void closed();
-
-
-protected:
-	void closeEvent( QCloseEvent * _ce ) override;
-
-} ;
-
+};
 
 } // namespace gui
 

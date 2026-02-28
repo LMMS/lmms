@@ -57,6 +57,7 @@ AmplifierControlDialog::AmplifierControlDialog(AmplifierControls* controls) :
 	gridLayout->addWidget(makeKnob(tr("PAN"), tr("Panning:"), "%", &controls->m_panModel, false), 0, 1, Qt::AlignHCenter);
 	gridLayout->addWidget(makeKnob(tr("LEFT"), tr("Left gain:"), "%", &controls->m_leftModel, true), 1, 0, Qt::AlignHCenter);
 	gridLayout->addWidget(makeKnob(tr("RIGHT"), tr("Right gain:"), "%", &controls->m_rightModel, true), 1, 1, Qt::AlignHCenter);
+	gridLayout->setSizeConstraint(QLayout::SetFixedSize);
 }
 
 } // namespace lmms::gui

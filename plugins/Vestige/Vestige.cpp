@@ -103,8 +103,9 @@ public:
 	vstSubWin( QWidget * _parent ) :
 		SubWindow( _parent )
 	{
-		setAttribute( Qt::WA_DeleteOnClose, false );
-		setWindowFlags( Qt::WindowCloseButtonHint );
+		setAttribute(Qt::WA_DeleteOnClose, false);
+		setWindowFlag(Qt::WindowMaximizeButtonHint, false);
+		setDetachable(false);
 	}
 
 	~vstSubWin() override = default;
@@ -918,12 +919,9 @@ ManageVestigeInstrumentView::ManageVestigeInstrumentView( Instrument * _instrume
 	widget = new QWidget(this);
 	l = new QGridLayout( this );
 
-	m_vi->m_subWindow = getGUI()->mainWindow()->addWindowedWidget(nullptr, Qt::SubWindow |
-			Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
-	m_vi->m_subWindow->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::MinimumExpanding );
-	m_vi->m_subWindow->setFixedWidth( 960 );
-	m_vi->m_subWindow->setMinimumHeight( 300 );
-	m_vi->m_subWindow->setWidget(m_vi->m_scrollArea);
+	m_vi->m_subWindow = getGUI()->mainWindow()->addWindowedWidget(m_vi->m_scrollArea);
+	m_vi->m_scrollArea->setFixedWidth(960);
+	m_vi->m_scrollArea->setMinimumHeight(300);
 	m_vi->m_subWindow->setWindowTitle( m_vi->instrumentTrack()->name()
 								+ tr( " - VST plugin control" ) );
 	m_vi->m_subWindow->setWindowIcon( PLUGIN_NAME::getIconPixmap( "logo" ) );
@@ -1052,8 +1050,8 @@ void ManageVestigeInstrumentView::syncPlugin( void )
 			std::snprintf(paramStr.data(), paramStr.size(), "param%d", i);
 			s_dumpValues = dump[paramStr.data()].split(":");
 			float f_value = LocaleHelper::toFloat(s_dumpValues.at(2));
-			m_vi->knobFModel[ i ]->setAutomatedValue( f_value );
-			m_vi->knobFModel[ i ]->setInitValue( f_value );
+			m_vi->knobFModel[i]->setValue(f_value, true);
+			m_vi->knobFModel[i]->setInitValue(f_value);
 		}
 	}
 	syncParameterText();
