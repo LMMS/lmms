@@ -420,10 +420,13 @@ void MidiClip::setType( Type _new_clip_type )
 
 void MidiClip::checkType()
 {
-	// If all notes are StepNotes, we have a BeatClip
-	const auto beatClip = std::all_of(m_notes.begin(), m_notes.end(), [](auto note) { return note->type() == Note::Type::Step; });
+	// Clip type can only be checked if there are notes
+	if (!m_notes.empty()) {
+		// If all notes are StepNotes, we have a BeatClip
+		const auto beatClip = std::all_of(m_notes.begin(), m_notes.end(), [](auto note) { return note->type() == Note::Type::Step; });
 
-	setType(beatClip ? Type::BeatClip : Type::MelodyClip);
+		setType(beatClip ? Type::BeatClip : Type::MelodyClip);
+	}
 }
 
 
