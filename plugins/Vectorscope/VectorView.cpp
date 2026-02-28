@@ -102,7 +102,7 @@ void VectorView::paintEvent(QPaintEvent *event)
 	painter.setTransform(tracePaintingTransform);
 
 	// Get new samples from the lockless input FIFO buffer
-	const auto inBuffer = m_inputBuffer->reserveContiguousReadSpace();
+	const auto inBuffer = m_inputBuffer->reserveReadSpace();
 	const std::size_t frameCount = inBuffer.size();
 
 	for (std::size_t frame = 0; frame < frameCount; ++frame)
@@ -156,8 +156,6 @@ void VectorView::paintEvent(QPaintEvent *event)
 
 		m_lastPoint = currentPoint;
 	}
-
-	m_inputBuffer->commitRead(inBuffer.size());
 
 	// Draw grid and labels overlay
 	painter.setCompositionMode(QPainter::CompositionMode_SourceOver);

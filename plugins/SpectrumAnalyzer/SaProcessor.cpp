@@ -101,7 +101,7 @@ void SaProcessor::analyze(LockfreeSpscQueue<SampleFrame> &ring_buffer)
 	// Processing thread loop
 	while (!m_terminate)
 	{
-		const auto in_buffer = ring_buffer.reserveContiguousReadSpace();
+		const auto in_buffer = ring_buffer.reserveReadSpace();
 
 		// If there is nothing to read, wait for notification from the writing side.
 		if (in_buffer.empty())
@@ -315,7 +315,6 @@ void SaProcessor::analyze(LockfreeSpscQueue<SampleFrame> &ring_buffer)
 				#endif
 			}	// frame filler and processing
 		}	// process if active
-		ring_buffer.commitRead(in_buffer.size());
 	}	// thread loop end
 }
 
