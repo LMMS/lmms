@@ -707,8 +707,33 @@ void ConfigManager::initPortableWorkingDir()
 
 void ConfigManager::initInstalledWorkingDir()
 {
+	auto configDir = QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation) + "/lmms";
+	QDir{configDir}.mkpath(".");
+
 	m_workingDir = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/lmms/";
-	m_lmmsRcFile = QDir::home().absolutePath() +"/.lmmsrc.xml";
+	m_lmmsRcFile = configDir + "/lmmsrc.xml";
+
+	// Copy <= 1.2.2 config if new one doesn't exist
+	if (!QFileInfo(m_lmmsRcFile).exists() && QFileInfo(QDir::home().absolutePath() + "/.lmmsrc.xml").exists())
+	{
+		QFile{QDir::home().absolutePath() + "/.lmmsrc.xml"}.copy(m_lmmsRcFile);
+
+		using gui::MainWindow;
+
+		QString title, message;
+		title = MainWindow::tr("Config file has been moved");
+		message = MainWindow::tr(
+			"Configuration file has been moved to %1. "
+			"Remove the old file?"
+			).arg(m_lmmsRcFile);
+
+		if (QMessageBox::question(nullptr, title, message, QMessageBox::Yes, QMessageBox::No)
+		    == QMessageBox::Yes)
+		{
+			QFile{QDir::home().absolutePath() + "/.lmmsrc.xml"}.remove();
+		}
+	}
+
 	// Detect < 1.2.0 working directory as a courtesy
 	if ( QFileInfo( QDir::home().absolutePath() + "/lmms/projects/" ).exists() )
 		m_workingDir = QDir::home().absolutePath() + "/lmms/";
