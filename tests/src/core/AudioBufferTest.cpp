@@ -157,7 +157,7 @@ private slots:
 		QCOMPARE(ab.group(0).channels(), 6);
 
 		// Split into group of 2 channels and group of 4 channels
-		ab.setGroups(2, [](lmms::group_cnt_t idx, lmms::ChannelGroup&) {
+		ab.setGroups(2, [](lmms::group_cnt_t idx, lmms::AudioBuffer::ChannelGroup&) {
 			switch (idx)
 			{
 				case 0: return 2;

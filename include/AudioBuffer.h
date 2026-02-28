@@ -37,52 +37,6 @@
 namespace lmms
 {
 
-class AudioBuffer;
-
-//! Non-owning collection of audio channels + metadata
-class ChannelGroup
-{
-public:
-	ChannelGroup() = default;
-	ChannelGroup(float** buffers, ch_cnt_t channels)
-		: m_buffers{buffers}
-		, m_channels{channels}
-	{}
-
-	auto buffers() const -> const float* const* { return m_buffers; }
-	auto buffers() -> float** { return m_buffers; }
-
-	auto buffer(ch_cnt_t channel) const -> const float*
-	{
-		assert(channel < m_channels);
-		return m_buffers[channel];
-	}
-
-	auto buffer(ch_cnt_t channel) -> float*
-	{
-		assert(channel < m_channels);
-		return m_buffers[channel];
-	}
-
-	auto channels() const -> ch_cnt_t { return m_channels; }
-
-	void setBuffers(float** newBuffers) { m_buffers = newBuffers; }
-	void setChannels(ch_cnt_t channels) { m_channels = channels; }
-
-	// TODO: Future additions: Group names, type (main/aux), speaker arrangements (for surround sound), ...
-
-private:
-	/**
-	 * Provides access to individual channel buffers.
-	 * [channel index][frame index]
-	 */
-	float** m_buffers = nullptr;
-
-	//! Number of channels in `m_channelBuffers` - currently only 2 is used
-	ch_cnt_t m_channels = 0;
-};
-
-
 /**
  * An owning collection of audio channels for an instrument track, mixer channel, or audio processor.
  *
@@ -109,6 +63,49 @@ class LMMS_EXPORT AudioBuffer
 {
 public:
 	using ChannelFlags = std::bitset<MaxChannelsPerTrack>;
+
+	//! Non-owning collection of audio channels + metadata
+	class ChannelGroup
+	{
+	public:
+		ChannelGroup() = default;
+		ChannelGroup(float** buffers, ch_cnt_t channels)
+			: m_buffers{buffers}
+			, m_channels{channels}
+		{}
+
+		auto buffers() const -> const float* const* { return m_buffers; }
+		auto buffers() -> float** { return m_buffers; }
+
+		auto buffer(ch_cnt_t channel) const -> const float*
+		{
+			assert(channel < m_channels);
+			return m_buffers[channel];
+		}
+
+		auto buffer(ch_cnt_t channel) -> float*
+		{
+			assert(channel < m_channels);
+			return m_buffers[channel];
+		}
+
+		auto channels() const -> ch_cnt_t { return m_channels; }
+
+		void setBuffers(float** newBuffers) { m_buffers = newBuffers; }
+		void setChannels(ch_cnt_t channels) { m_channels = channels; }
+
+		// TODO: Future additions: Group names, type (main/aux), speaker arrangements (for surround sound), ...
+
+	private:
+		/**
+		 * Provides access to individual channel buffers.
+		 * [channel index][frame index]
+		 */
+		float** m_buffers = nullptr;
+
+		//! Number of channels in `m_channelBuffers` - currently only 2 is used
+		ch_cnt_t m_channels = 0;
+	};
 
 	AudioBuffer() = delete;
 	~AudioBuffer();
