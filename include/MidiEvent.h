@@ -25,6 +25,7 @@
 #ifndef LMMS_MIDI_EVENT_H
 #define LMMS_MIDI_EVENT_H
 
+#include <cassert>
 #include <cstdlib>
 #include "Midi.h"
 #include "panning.h"
@@ -39,18 +40,19 @@ public:
 	enum class Source { Internal, External };
 
 	MidiEvent(MidiEventTypes type = MidiActiveSensing,
-				int8_t channel = 0,
+				uint8_t channel = 0,
 				int16_t param1 = 0,
 				int16_t param2 = 0,
 				const void* sourcePort = nullptr,
 				Source source = Source::External) :
 		m_type( type ),
 		m_metaEvent( MidiMetaInvalid ),
-		m_channel( channel ),
+		m_channel(channel),
 		m_sysExData( nullptr ),
 		m_sourcePort(sourcePort),
 		m_source(source)
 	{
+		assert(m_channel >= 0 && m_channel < MidiChannelCount);
 		m_data.m_param[0] = param1;
 		m_data.m_param[1] = param2;
 	}
@@ -88,13 +90,14 @@ public:
 		return m_metaEvent;
 	}
 
-	int8_t channel() const
+	uint8_t channel() const
 	{
 		return m_channel;
 	}
 
-	void setChannel( int8_t channel )
+	void setChannel(uint8_t channel)
 	{
+		assert(channel >= 0 && channel < MidiChannelCount);
 		m_channel = channel;
 	}
 
@@ -206,7 +209,7 @@ public:
 private:
 	MidiEventTypes m_type;		// MIDI event type
 	MidiMetaEventType m_metaEvent;	// Meta event (mostly unused)
-	int8_t m_channel;		// MIDI channel
+	uint8_t m_channel;		// MIDI channel
 	union
 	{
 		int16_t m_param[2];	// first/second parameter (key/velocity)

@@ -121,16 +121,17 @@ enum MidiControllerRegisteredParameterNumbers
 	MidiTuningProgramChangeRPN = 0x0003,
 	MidiTuningBankSelectRPN = 0x0004,
 	MidiModulationDepthRangeRPN = 0x0005,
+	MidiMPEConfigurationRPN = 0x0006,
 	MidiNullFunctionNumberRPN = 0x7F7F
 };
 
+const int MidiKeyCount = 128;
 const int MidiChannelCount = 16;
 const int MidiControllerCount = 128;
 const int MidiProgramCount = 128;
 const int MidiMaxVelocity = 127;
 const int MidiDefaultVelocity = MidiMaxVelocity / 2;
 const int MidiMaxControllerValue = 127;
-const int MidiMaxKey = 127;
 
 const int MidiMaxPanning = 127;
 const int MidiMinPanning = -128;

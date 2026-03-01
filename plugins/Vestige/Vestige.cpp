@@ -812,9 +812,12 @@ void VestigeInstrumentView::noteOffAll( void )
 	m_vi->m_pluginMutex.lock();
 	if( m_vi->m_plugin != nullptr )
 	{
-		for( int key = 0; key <= MidiMaxKey; ++key )
+		for (int channel = 0; channel < 16; ++channel)
 		{
-			m_vi->m_plugin->processMidiEvent( MidiEvent( MidiNoteOff, 0, key, 0 ), 0 );
+			for(int key = 0; key < MidiKeyCount; ++key)
+			{
+				m_vi->m_plugin->processMidiEvent(MidiEvent(MidiNoteOff, channel, key, 0), 0);
+			}
 		}
 	}
 	m_vi->m_pluginMutex.unlock();

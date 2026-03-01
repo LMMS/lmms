@@ -67,7 +67,7 @@ public:
 					const f_cnt_t frames,
 					const Note& noteToPlay,
 					NotePlayHandle* parent = nullptr,
-					int midiEventChannel = -1,
+					uint8_t midiEventChannel = 0,
 					Origin origin = Origin::MidiClip );
 	~NotePlayHandle() override;
 
@@ -79,11 +79,15 @@ public:
 	void setVolume( volume_t volume ) override;
 	void setPanning( panning_t panning ) override;
 
-	int midiKey() const;
 	int midiChannel() const
 	{
 		return m_midiChannel;
 	}
+
+	//! Returns the index of the piano key which would need to be played in order to generate this note.
+	//! WARNING: This value can change during the lifetime of the NotePlayHandle if the user changes the
+	//! base note or global detuning. Do not use this in critical code such as emitting NoteOff events.
+	int physicalKey() const;
 
 	/*! convenience function that returns offset for the first period and zero otherwise,
 		used by instruments to handle the offset: instruments have to check this property and
@@ -292,6 +296,9 @@ private:
 
 	void updateFrequency();
 
+	//! Calls processOutEvent on the instrument track to send a MidiPitchBend event with the current detuning value on the correct midi channel.
+	void sendMPEDetuning();
+
 	InstrumentTrack* m_instrumentTrack;		// needed for calling
 											// InstrumentTrack::playNote
 	f_cnt_t m_frames;						// total frames to play
@@ -318,15 +325,13 @@ private:
 	bpm_t m_origTempo;						// original tempo
 	f_cnt_t m_origFrames;					// original m_frames
 
-	int m_origBaseNote;
-
 	float m_frequency;
 	float m_unpitchedFrequency;
 
 	BaseDetuning* m_baseDetuning;
 	TimePos m_songGlobalParentOffset;
 
-	int m_midiChannel;
+	uint8_t m_midiChannel;
 	Origin m_origin;
 
 	bool m_frequencyNeedsUpdate;				// used to update pitch
@@ -345,7 +350,7 @@ public:
 					const f_cnt_t frames,
 					const Note& noteToPlay,
 					NotePlayHandle* parent = nullptr,
-					int midiEventChannel = -1,
+					uint8_t midiEventChannel = 0,
 					NotePlayHandle::Origin origin = NotePlayHandle::Origin::MidiClip );
 	static void release( NotePlayHandle * nph );
 	static void extend( int i );
