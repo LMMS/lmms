@@ -37,6 +37,7 @@
 namespace lmms
 {
 
+class AudioBuffer;
 class EffectChain;
 class EffectControls;
 
@@ -65,7 +66,7 @@ public:
 	}
 
 	//! Returns true if audio was processed and should continue being processed
-	bool processAudioBuffer(SampleFrame* buf, const fpp_t frames);
+	bool processAudioBuffer(AudioBuffer& inOut);
 
 	inline bool isOkay() const
 	{
@@ -77,22 +78,10 @@ public:
 		m_okay = _state;
 	}
 
-
-	inline bool isRunning() const
+	//! "Awake" means the effect has not been put to sleep by auto-quit
+	bool isAwake() const
 	{
-		return m_running;
-	}
-
-	void startRunning()
-	{
-		m_quietBufferCount = 0;
-		m_running = true;
-	}
-
-	void stopRunning()
-	{
-		m_quietBufferCount = 0;
-		m_running = false;
+		return m_awake;
 	}
 
 	inline bool isEnabled() const
@@ -125,7 +114,13 @@ public:
 	{
 		m_noRun = _state;
 	}
-	
+
+	//! "Running" means the effect will be processing audio
+	bool isRunning() const
+	{
+		return isEnabled() && isAwake() && isOkay() && !dontRun();
+	}
+
 	inline TempoSyncKnobModel* autoQuitModel()
 	{
 		return &m_autoQuitModel;
@@ -162,21 +157,32 @@ protected:
 	};
 
 	/**
-	 * The main audio processing method that runs when plugin is not asleep
+	 * The main audio processing method that runs when plugin is awake and running
 	 */
 	virtual ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) = 0;
 
 	/**
-	 * Optional method that runs when plugin is sleeping (not enabled,
-	 * not running, not in the Okay state, or in the Don't Run state)
+	 * Optional method that runs instead of `processImpl` when an effect
+	 * is awake but not running.
 	 */
 	virtual void processBypassedImpl() {}
 
 
 	gui::PluginView* instantiateView( QWidget * ) override;
 
-	virtual void onEnabledChanged() {}
+	void startRunning()
+	{
+		m_quietBufferCount = 0;
+		m_awake = true;
+	}
 
+	void stopRunning()
+	{
+		m_quietBufferCount = 0;
+		m_awake = false;
+	}
+
+	virtual void onEnabledChanged() {}
 
 private:
 	/**
@@ -184,14 +190,14 @@ private:
 	 * after "decay" ms of the output buffer remaining below the silence threshold, the effect is
 	 * turned off and won't be processed again until it receives new audio input.
 	 */
-	void handleAutoQuit(std::span<const SampleFrame> output);
+	void handleAutoQuit(bool silentOutput);
 
 
 	EffectChain * m_parent;
 
 	bool m_okay;
 	bool m_noRun;
-	bool m_running;
+	bool m_awake;
 
 	//! The number of consecutive periods where output buffers remain below the silence threshold
 	f_cnt_t m_quietBufferCount = 0;

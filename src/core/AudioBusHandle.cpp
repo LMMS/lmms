@@ -23,16 +23,16 @@
  *
  */
 
+#include "AudioBusHandle.h"
+
 #include <QMutexLocker>
 
-#include "AudioBusHandle.h"
 #include "AudioDevice.h"
 #include "AudioEngine.h"
 #include "EffectChain.h"
 #include "Mixer.h"
 #include "Engine.h"
 #include "MixHelpers.h"
-#include "BufferManager.h"
 
 namespace lmms
 {
@@ -41,7 +41,7 @@ AudioBusHandle::AudioBusHandle(const QString& name, bool hasEffectChain,
 	FloatModel* volumeModel, FloatModel* panningModel,
 	BoolModel* mutedModel) :
 	m_bufferUsage(false),
-	m_buffer(BufferManager::acquire()),
+	m_buffer(Engine::audioEngine()->framesPerPeriod()),
 	m_extOutputEnabled(false),
 	m_nextMixerChannel(0),
 	m_name(name),
@@ -61,7 +61,6 @@ AudioBusHandle::~AudioBusHandle()
 {
 	setExtOutputEnabled(false);
 	Engine::audioEngine()->removeAudioBusHandle(this);
-	BufferManager::release(m_buffer);
 }
 
 
@@ -99,7 +98,7 @@ bool AudioBusHandle::processEffects()
 {
 	if (m_effects)
 	{
-		bool more = m_effects->processAudioBuffer(m_buffer, Engine::audioEngine()->framesPerPeriod(), m_bufferUsage);
+		bool more = m_effects->processAudioBuffer(m_buffer);
 		return more;
 	}
 	return false;
@@ -116,7 +115,7 @@ void AudioBusHandle::doProcessing()
 	const fpp_t fpp = Engine::audioEngine()->framesPerPeriod();
 
 	// clear the buffer
-	zeroSampleFrames(m_buffer, fpp);
+	m_buffer.silenceAllChannels();
 
 	//qDebug( "Playhandles: %d", m_playHandles.size() );
 	for (PlayHandle* ph : m_playHandles) // now we mix all playhandle buffers into our internal buffer
@@ -128,7 +127,9 @@ void AudioBusHandle::doProcessing()
 					|| !MixHelpers::isSilent(ph->buffer(), fpp)))
 			{
 				m_bufferUsage = true;
-				MixHelpers::add(m_buffer, ph->buffer(), fpp);
+
+				// Writing to temporary interleaved buffer until PlayHandle and MixHelpers switch to planar
+				MixHelpers::add(m_buffer.interleavedBuffer().asSampleFrames().data(), ph->buffer(), fpp);
 			}
 			ph->releaseBuffer(); 	// gets rid of playhandle's buffer and sets
 									// pointer to null, so if it doesn't get re-acquired we know to skip it next time
@@ -137,6 +138,9 @@ void AudioBusHandle::doProcessing()
 
 	if (m_bufferUsage)
 	{
+		// PlayHandle buffers were written to the temporary interleaved buffer
+		auto buffer = m_buffer.interleavedBuffer();
+
 		// handle volume and panning
 		// has both vol and pan models
 		if (m_volumeModel && m_panningModel)
@@ -151,8 +155,8 @@ void AudioBusHandle::doProcessing()
 				{
 					float v = volBuf->values()[f] * 0.01f;
 					float p = panBuf->values()[f] * 0.01f;
-					m_buffer[f][0] *= (p <= 0 ? 1.0f : 1.0f - p) * v;
-					m_buffer[f][1] *= (p >= 0 ? 1.0f : 1.0f + p) * v;
+					buffer[f][0] *= (p <= 0 ? 1.0f : 1.0f - p) * v;
+					buffer[f][1] *= (p >= 0 ? 1.0f : 1.0f + p) * v;
 				}
 			}
 
@@ -165,8 +169,8 @@ void AudioBusHandle::doProcessing()
 				for (f_cnt_t f = 0; f < fpp; ++f)
 				{
 					float v = volBuf->values()[f] * 0.01f;
-					m_buffer[f][0] *= v * l;
-					m_buffer[f][1] *= v * r;
+					buffer[f][0] *= v * l;
+					buffer[f][1] *= v * r;
 				}
 			}
 
@@ -177,8 +181,8 @@ void AudioBusHandle::doProcessing()
 				for (f_cnt_t f = 0; f < fpp; ++f)
 				{
 					float p = panBuf->values()[f] * 0.01f;
-					m_buffer[f][0] *= (p <= 0 ? 1.0f : 1.0f - p) * v;
-					m_buffer[f][1] *= (p >= 0 ? 1.0f : 1.0f + p) * v;
+					buffer[f][0] *= (p <= 0 ? 1.0f : 1.0f - p) * v;
+					buffer[f][1] *= (p >= 0 ? 1.0f : 1.0f + p) * v;
 				}
 			}
 
@@ -189,8 +193,8 @@ void AudioBusHandle::doProcessing()
 				float v = m_volumeModel->value() * 0.01f;
 				for (f_cnt_t f = 0; f < fpp; ++f)
 				{
-					m_buffer[f][0] *= (p <= 0 ? 1.0f : 1.0f - p) * v;
-					m_buffer[f][1] *= (p >= 0 ? 1.0f : 1.0f + p) * v;
+					buffer[f][0] *= (p <= 0 ? 1.0f : 1.0f - p) * v;
+					buffer[f][1] *= (p >= 0 ? 1.0f : 1.0f + p) * v;
 				}
 			}
 		}
@@ -205,8 +209,8 @@ void AudioBusHandle::doProcessing()
 				for (f_cnt_t f = 0; f < fpp; ++f)
 				{
 					float v = volBuf->values()[f] * 0.01f;
-					m_buffer[f][0] *= v;
-					m_buffer[f][1] *= v;
+					buffer[f][0] *= v;
+					buffer[f][1] *= v;
 				}
 			}
 			else
@@ -214,11 +218,20 @@ void AudioBusHandle::doProcessing()
 				float v = m_volumeModel->value() * 0.01f;
 				for (f_cnt_t f = 0; f < fpp; ++f)
 				{
-					m_buffer[f][0] *= v;
-					m_buffer[f][1] *= v;
+					buffer[f][0] *= v;
+					buffer[f][1] *= v;
 				}
 			}
 		}
+
+		// Copy from temporary interleaved buffer to the main planar buffer
+		// so they stay in sync
+		toPlanar(buffer, m_buffer.groupBuffers(0));
+
+		m_buffer.sanitizeAll();
+
+		// Update silence status of all channels for instrument output
+		m_buffer.updateAllSilenceFlags();
 	}
 	// as of now there's no situation where we only have panning model but no volume model
 	// if we have neither, we don't have to do anything here - just pass the audio as is
@@ -227,8 +240,8 @@ void AudioBusHandle::doProcessing()
 	const bool anyOutputAfterEffects = processEffects();
 	if (anyOutputAfterEffects || m_bufferUsage)
 	{
-		Engine::mixer()->mixToChannel(m_buffer, m_nextMixerChannel);	// send output to mixer
-																		// TODO: improve the flow here - convert to pull model
+		// TODO: improve the flow here - convert to pull model
+		Engine::mixer()->mixToChannel(m_buffer, m_nextMixerChannel); // send output to mixer
 		m_bufferUsage = false;
 	}
 }
