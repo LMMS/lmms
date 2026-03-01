@@ -29,10 +29,10 @@
 #include <algorithm>
 #include <cassert>
 #include <cmath>
+#include <concepts>
 #include <cstdint>
 #include <cstring>
 #include <numbers>
-#include <concepts>
 
 #include "lmms_constants.h"
 
@@ -347,6 +347,15 @@ inline int numDigitsAsInt(float f)
 	}
 	return digits;
 }
+
+
+//! Taken from N3876 / boost::hash_combine
+template<typename T>
+inline void hashCombine(std::size_t& seed, const T& val) noexcept
+{
+	seed ^= std::hash<T>{}(val) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+}
+
 
 template <typename T>
 class LinearMap

@@ -10,6 +10,7 @@ target_include_directories(jack_headers INTERFACE jack2/common)
 
 ADD_SUBDIRECTORY(hiir)
 ADD_SUBDIRECTORY(weakjack)
+ADD_SUBDIRECTORY(clap)
 
 # The lockless ring buffer library is linked as part of the core
 add_library(ringbuffer OBJECT

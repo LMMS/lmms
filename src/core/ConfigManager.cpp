@@ -195,30 +195,21 @@ bool ConfigManager::enableBlockedPlugins()
 	return (envVar && *envVar);
 }
 
-QStringList ConfigManager::availableVstEmbedMethods()
+WindowEmbed::Method ConfigManager::vstEmbedMethod() const
 {
-	QStringList methods;
-	methods.append("none");
-	methods.append("qt");
-#ifdef LMMS_BUILD_WIN32
-	methods.append("win32");
-#endif
-#if defined(LMMS_BUILD_LINUX) && (QT_VERSION < QT_VERSION_CHECK(6,0,0))
-	if (static_cast<QGuiApplication*>(QApplication::instance())->
-		platformName() == "xcb")
-	{
-		methods.append("xembed");
-	}
-#endif
-	return methods;
-}
+	const auto methods = WindowEmbed::availableMethods();
+	const auto defaultMethod = methods.empty() ? WindowEmbed::Method::Floating : methods.back();
+	const auto defaultMethodStr = QString{WindowEmbed::toString(defaultMethod).data()};
+	const auto currentMethodStr = value("ui", "vstembedmethod", defaultMethodStr);
+	const auto currentMethod = WindowEmbed::toEnum(currentMethodStr.toStdString());
 
-QString ConfigManager::vstEmbedMethod() const
-{
-	QStringList methods = availableVstEmbedMethods();
-	QString defaultMethod = *(methods.end() - 1);
-	QString currentMethod = value( "ui", "vstembedmethod", defaultMethod );
-	return methods.contains(currentMethod) ? currentMethod : defaultMethod;
+	// If floating, use that
+	if (currentMethod == WindowEmbed::Method::Floating) { return currentMethod; }
+
+	// If embedding, use method from configuration if available, else default method
+	return std::find(methods.begin(), methods.end(), currentMethod) != methods.end()
+		? currentMethod
+		: defaultMethod;
 }
 
 bool ConfigManager::hasWorkingDir() const

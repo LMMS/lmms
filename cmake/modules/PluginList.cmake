@@ -30,6 +30,8 @@ SET(LMMS_PLUGIN_LIST
 	CarlaBase
 	CarlaPatchbay
 	CarlaRack
+	ClapEffect
+	ClapInstrument
 	Compressor
 	CrossoverEQ
 	Delay

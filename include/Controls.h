@@ -29,7 +29,6 @@
 #include "AutomatableModel.h"
 #include "ComboBoxModel.h"
 
-
 class QString;
 class QWidget;
 class QLabel;
@@ -42,6 +41,7 @@ namespace gui
 
 class AutomatableModelView;
 class Knob;
+class CustomTextKnob;
 class ComboBox;
 class LedCheckBox;
 
@@ -78,8 +78,26 @@ public:
 	FloatModel* model() override;
 	AutomatableModelView* modelView() override;
 
-	KnobControl(const QString& text, QWidget* parent = nullptr);
+	KnobControl(const QString& text = QString{}, QWidget* parent = nullptr);
 	~KnobControl() override = default;
+};
+
+
+class CustomTextKnobControl : public Control
+{
+	CustomTextKnob* m_knob;
+
+public:
+	void setText(const QString& text) override;
+	QWidget* topWidget() override;
+
+	void setModel(AutomatableModel* model) override;
+	FloatModel* model() override;
+	AutomatableModelView* modelView() override;
+	CustomTextKnob* customTextModelView() { return m_knob; }
+
+	CustomTextKnobControl(QWidget* parent = nullptr);
+	~CustomTextKnobControl() override = default;
 };
 
 

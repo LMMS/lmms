@@ -160,13 +160,13 @@ void PatternTrack::saveTrackSpecificSettings(QDomDocument& doc, QDomElement& _th
 /*	_this.setAttribute( "current", s_infoMap[this] ==
 					engine::getPatternEditor()->currentPattern() );*/
 	if( s_infoMap[this] == 0 &&
-			_this.parentNode().parentNode().nodeName() != "clonedtrack" &&
+			_this.parentNode().parentNode().nodeName() != "clonedtrack" && // TODO: Does this work?
 			_this.parentNode().parentNode().nodeName() != "journaldata" )
 	{
 		Engine::patternStore()->saveState(doc, _this);
 	}
 	// If we are creating drag-n-drop data for Track::clone() only save pattern ID, not pattern content
-	if (_this.parentNode().parentNode().nodeName() == "clonedtrack")
+	if (_this.parentNode().parentNode().nodeName() == "clonedtrack") // TODO: Does this work?
 	{
 		_this.setAttribute("sourcepattern", s_infoMap[this]);
 	}
