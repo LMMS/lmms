@@ -28,7 +28,7 @@
 
 #include "EffectControls.h"
 #include "WaveShaperControlDialog.h"
-#include "Graph.h"
+#include "VectorGraphModel.h"
 
 namespace lmms
 {
@@ -65,20 +65,14 @@ public:
 
 
 private slots:
-	void samplesChanged( int, int );
-
 	void resetClicked();
-	void smoothClicked();
-
-	void addOneClicked();
-	void subOneClicked();
 
 private:
 	WaveShaperEffect * m_effect;
 	FloatModel m_inputModel;
 	FloatModel m_outputModel;
-	graphModel m_wavegraphModel;
 	BoolModel  m_clipModel;
+	VectorGraphModel m_graphModel;
 
 	friend class gui::WaveShaperControlDialog;
 	friend class WaveShaperEffect;
