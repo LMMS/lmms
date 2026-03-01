@@ -99,6 +99,8 @@ enum MidiStandardControllers
 	MidiControllerSostenuto = 66,
 	MidiControllerSoftPedal = 67,
 	MidiControllerLegatoFootswitch = 68,
+	MidiControllerReverbDepth = 91,
+	MidiControllerChorusDepth = 93,
 	MidiControllerRegisteredParameterNumberLSB = 100,
 	MidiControllerRegisteredParameterNumberMSB = 101,
 	// Channel Mode Messages are controllers too...
