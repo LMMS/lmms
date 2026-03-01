@@ -234,6 +234,8 @@ MainWindow::MainWindow() :
 	{
 		qApp->installEventFilter(this);
 	}
+
+	installEventFilter(this);
 }
 
 
@@ -1277,23 +1279,41 @@ void MainWindow::sessionCleanup()
 
 bool MainWindow::eventFilter(QObject* watched, QEvent* event)
 {
-	// For now this function is only used to globally block tooltips
-	// It must be installed to QApplication through installEventFilter
+	const auto isWinDeactivate = [](QEvent* event) -> bool
+	{
+		if (event->type() == QEvent::WindowDeactivate) { return true; }
+
+		if (event->type() == QEvent::FocusOut)
+		{
+			auto* fe = dynamic_cast<QFocusEvent*>(event);
+			switch (fe->reason())
+			{
+			case Qt::ActiveWindowFocusReason:
+			case Qt::PopupFocusReason:
+			case Qt::OtherFocusReason:
+				return true;
+				break;
+			default:
+				break;
+			}
+		}
+
+		return false;
+	};
+
+	// Clear modifiers when the window has been unfocused
+	// (Install event filter on the window itself)
+	if (dynamic_cast<MainWindow*>(watched) != nullptr && isWinDeactivate(event))
+	{
+		clearKeyModifiers();
+		return QObject::eventFilter(watched, event);
+	}
+
+	// Block tooltips globally
+	// (Install event filter on QApplication instance)
 	if (event->type() == QEvent::ToolTip) { return true; }
 
 	return QObject::eventFilter(watched, event);
-}
-
-
-
-
-void MainWindow::focusOutEvent( QFocusEvent * _fe )
-{
-	// TODO Remove this function, since it is apparently never actually called!
-	// when loosing focus we do not receive key-(release!)-events anymore,
-	// so we might miss release-events of one the modifiers we're watching!
-	clearKeyModifiers();
-	QMainWindow::leaveEvent( _fe );
 }
 
 
