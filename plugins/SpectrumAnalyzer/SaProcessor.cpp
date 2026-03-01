@@ -37,7 +37,6 @@
 
 #include "fft_helpers.h"
 #include "lmms_constants.h"
-#include "LocklessRingBuffer.h"
 #include "SaControls.h"
 
 #include <cassert>
@@ -97,21 +96,22 @@ SaProcessor::~SaProcessor()
 
 
 // Load data from audio thread ringbuffer and run FFT analysis if buffer is full enough.
-void SaProcessor::analyze(LocklessRingBuffer<SampleFrame> &ring_buffer)
+void SaProcessor::analyze(LockfreeSpscQueue<SampleFrame> &ring_buffer)
 {
-	LocklessRingBufferReader<SampleFrame> reader(ring_buffer);
-
 	// Processing thread loop
 	while (!m_terminate)
 	{
+		const auto in_buffer = ring_buffer.reserveReadSpace();
+
 		// If there is nothing to read, wait for notification from the writing side.
-		if (reader.empty()) {reader.waitForData();}
+		if (in_buffer.empty())
+		{
+			ring_buffer.waitForData();
+			continue;
+		}
 
 		// skip waterfall render if processing can't keep up with input
-		bool overload = ring_buffer.free() < ring_buffer.capacity() / 2;
-
-		auto in_buffer = reader.read_max(ring_buffer.capacity() / 4);
-		std::size_t frame_count = in_buffer.size();
+		const auto overload = in_buffer.size() < ring_buffer.capacity() / 2;
 
 		// Process received data only if any view is visible and not paused.
 		// Also, to prevent a momentary GUI freeze under high load (due to lock
@@ -120,7 +120,7 @@ void SaProcessor::analyze(LocklessRingBuffer<SampleFrame> &ring_buffer)
 		{
 			const bool stereo = m_controls->m_stereoModel.value();
 			fpp_t in_frame = 0;
-			while (in_frame < frame_count)
+			while (in_frame < in_buffer.size())
 			{
 				// Lock data access to prevent reallocation from changing
 				// buffers and control variables.
@@ -128,7 +128,7 @@ void SaProcessor::analyze(LocklessRingBuffer<SampleFrame> &ring_buffer)
 
 				// Fill sample buffers and check for zero input.
 				bool block_empty = true;
-				for (; in_frame < frame_count && m_framesFilledUp < m_inBlockSize; in_frame++, m_framesFilledUp++)
+				for (; in_frame < in_buffer.size() && m_framesFilledUp < m_inBlockSize; in_frame++, m_framesFilledUp++)
 				{
 					if (stereo)
 					{

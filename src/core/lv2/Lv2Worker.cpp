@@ -63,8 +63,6 @@ Lv2Worker::Lv2Worker(Semaphore* commonWorkLock, bool threaded) :
 	m_response(bufferSize()),
 	m_requests(bufferSize()),
 	m_responses(bufferSize()),
-	m_requestsReader(m_requests),
-	m_responsesReader(m_responses),
 	m_sem(0),
 	m_workLock(commonWorkLock)
 {
@@ -77,9 +75,6 @@ Lv2Worker::Lv2Worker(Semaphore* commonWorkLock, bool threaded) :
 		};
 
 	if (threaded) { m_thread = std::thread(&Lv2Worker::workerFunc, this); }
-
-	m_requests.mlock();
-	m_responses.mlock();
 }
 
 
@@ -126,8 +121,8 @@ LV2_Worker_Status Lv2Worker::respond(uint32_t size, const void* data)
 		}
 		else
 		{
-			m_responses.write((const char*)&size, sizeof(size));
-			if(size && data) { m_responses.write((const char*)data, size); }
+			m_responses.push(reinterpret_cast<const char*>(&size), sizeof(size));
+			if(size && data) { m_responses.push(reinterpret_cast<const char*>(data), size); }
 		}
 	}
 	else
@@ -151,13 +146,13 @@ void Lv2Worker::workerFunc()
 		m_sem.wait();
 		if (m_exit) { break; }
 
-		const std::size_t readSpace = m_requestsReader.read_space();
+		const std::size_t readSpace = m_responses.size();
 		if (readSpace <= sizeof(size)) { continue; } // (should not happen)
 
-		m_requestsReader.read(sizeof(size)).copy((char*)&size, sizeof(size));
+		m_requests.pop(reinterpret_cast<char*>(&size), sizeof(size));
 		assert(size <= readSpace - sizeof(size));
 		if(size > buf.size()) { buf.resize(size); }
-		if(size) { m_requestsReader.read(size).copy(buf.data(), size); }
+		if(size) { m_requests.pop(buf.data(), size); }
 
 		assert(m_handle);
 		assert(m_interface);
@@ -182,8 +177,8 @@ LV2_Worker_Status Lv2Worker::scheduleWork(uint32_t size, const void *data)
 		else
 		{
 			// Schedule a request to be executed by the worker thread
-			m_requests.write((const char*)&size, sizeof(size));
-			if(size && data) { m_requests.write((const char*)data, size); }
+			m_requests.push(reinterpret_cast<const char*>(&size), sizeof(size));
+			if(size && data) { m_requests.push(reinterpret_cast<const char*>(data), size); }
 			m_sem.post();
 		}
 	}
@@ -206,14 +201,14 @@ LV2_Worker_Status Lv2Worker::scheduleWork(uint32_t size, const void *data)
 // Let the audio thread read incoming worker responses, and process it
 void Lv2Worker::emitResponses()
 {
-	std::size_t read_space = m_responsesReader.read_space();
+	std::size_t read_space = m_responses.size();
 	uint32_t size;
 	while (read_space > sizeof(size))
 	{
 		assert(m_handle);
 		assert(m_interface);
-		m_responsesReader.read(sizeof(size)).copy((char*)&size, sizeof(size));
-		if(size) { m_responsesReader.read(size).copy(m_response.data(), size); }
+		m_requests.pop(reinterpret_cast<char*>(&size), sizeof(size));
+		if(size) { m_responses.pop(m_response.data(), size); }
 		m_interface->work_response(m_handle, size, m_response.data());
 		read_space -= sizeof(size) + size;
 	}

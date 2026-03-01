@@ -30,7 +30,6 @@
 
 #include "DataprocLauncher.h"
 #include "Effect.h"
-#include "LocklessRingBuffer.h"
 #include "SaControls.h"
 #include "SaProcessor.h"
 
@@ -64,7 +63,7 @@ private:
 	//m_processorThread = QThread::create([=]{m_processor.analyze(m_inputBuffer);});
 	DataprocLauncher m_processorThread;
 
-	LocklessRingBuffer<SampleFrame> m_inputBuffer;
+	LockfreeSpscQueue<SampleFrame> m_inputBuffer;
 
 	#ifdef SA_DEBUG
 		int m_last_dump_time;

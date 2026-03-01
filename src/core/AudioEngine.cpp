@@ -64,8 +64,6 @@
 namespace lmms
 {
 
-using LocklessListElement = LocklessList<PlayHandle*>::Element;
-
 static thread_local bool s_renderingThread = false;
 
 
@@ -81,7 +79,6 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 	m_outputBufferWrite(nullptr),
 	m_workers(),
 	m_numWorkers( QThread::idealThreadCount()-1 ),
-	m_newPlayHandles( PlayHandle::MaxNumber ),
 	m_masterGain( 1.0f ),
 	m_audioDev( nullptr ),
 	m_oldAudioDev( nullptr ),
@@ -320,12 +317,10 @@ void AudioEngine::renderStageNoteSetup()
 	Engine::getSong()->processNextBuffer();
 
 	// add all play-handles that have to be added
-	for( LocklessListElement * e = m_newPlayHandles.popList(); e; )
+	auto handle = std::optional<PlayHandle*>{};
+	while ((handle = m_newPlayHandles.pop()))
 	{
-		m_playHandles += e->value;
-		LocklessListElement * next = e->next;
-		m_newPlayHandles.free( e );
-		e = next;
+		m_playHandles += *handle;
 	}
 }
 
@@ -439,12 +434,8 @@ void AudioEngine::clear()
 void AudioEngine::clearNewPlayHandles()
 {
 	requestChangeInModel();
-	for( LocklessListElement * e = m_newPlayHandles.popList(); e; )
-	{
-		LocklessListElement * next = e->next;
-		m_newPlayHandles.free( e );
-		e = next;
-	}
+	auto handle = std::optional<PlayHandle*>{};
+	while ((handle = m_newPlayHandles.pop())) {}
 	doneChangeInModel();
 }
 
@@ -548,9 +539,12 @@ bool AudioEngine::addPlayHandle( PlayHandle* handle )
 	// associated instrument is created, so add those unconditionally.
 	if (handle->type() == PlayHandle::Type::InstrumentPlayHandle || !criticalXRuns())
 	{
-		m_newPlayHandles.push( handle );
-		handle->audioBusHandle()->addPlayHandle(handle);
-		return true;
+		// TODO: Consider tracking the number of handles that have dropped for metric tracking purposes
+		if (m_newPlayHandles.push(handle))
+		{
+			handle->audioBusHandle()->addPlayHandle(handle);
+			return true;
+		}
 	}
 
 	if( handle->type() == PlayHandle::Type::NotePlayHandle )
@@ -572,26 +566,6 @@ void AudioEngine::removePlayHandle(PlayHandle * ph)
 	{
 		ph->audioBusHandle()->removePlayHandle(ph);
 		bool removedFromList = false;
-		// Check m_newPlayHandles first because doing it the other way around
-		// creates a race condition
-		for( LocklessListElement * e = m_newPlayHandles.first(),
-				* ePrev = nullptr; e; ePrev = e, e = e->next )
-		{
-			if (e->value == ph)
-			{
-				if( ePrev )
-				{
-					ePrev->next = e->next;
-				}
-				else
-				{
-					m_newPlayHandles.setFirst( e->next );
-				}
-				m_newPlayHandles.free( e );
-				removedFromList = true;
-				break;
-			}
-		}
 		// Now check m_playHandles
 		PlayHandleList::Iterator it = std::find(m_playHandles.begin(), m_playHandles.end(), ph);
 		if (it != m_playHandles.end())

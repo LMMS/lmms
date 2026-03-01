@@ -25,7 +25,6 @@
 #define VECTORSCOPE_H
 
 #include "Effect.h"
-#include "LocklessRingBuffer.h"
 #include "VecControls.h"
 
 namespace lmms
@@ -42,14 +41,14 @@ public:
 	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
 
 	EffectControls *controls() override {return &m_controls;}
-	LocklessRingBuffer<SampleFrame> *getBuffer() {return &m_inputBuffer;}
+	LockfreeSpscQueue<SampleFrame> *getBuffer() {return &m_inputBuffer;}
 
 private:
 	VecControls m_controls;
 
 	// Maximum LMMS buffer size (hard coded, the actual constant is hard to get)
 	const unsigned int m_maxBufferSize = 4096;
-	LocklessRingBuffer<SampleFrame> m_inputBuffer;
+	LockfreeSpscQueue<SampleFrame> m_inputBuffer;
 };
 
 
