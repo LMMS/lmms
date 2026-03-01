@@ -24,9 +24,7 @@
 
 #include "AudioBuffer.h"
 
-#include <QObject>
 #include <QtTest>
-#include <algorithm>
 #include <iostream>
 #include <numeric>
 

@@ -51,6 +51,7 @@ namespace lmms
  *       efficiently using the data from silence tracking
  * - Can organize channels into arbitrary groups. For example, you could have 6 total channels divided into 2 groups
  *       where the 1st group contains 2 channels (stereo) and the 2nd contains 4 channels (quadraphonic).
+ * - Extensive unit testing - @ref AudioBufferTest.cpp
  *
  * When this class is used in an instrument track or mixer channel, its channels could be referred to
  * as "track channels" or "internal channels", since they are equivalent to the "track channels" used
@@ -108,7 +109,6 @@ public:
 	};
 
 	AudioBuffer() = delete;
-	~AudioBuffer();
 
 	AudioBuffer(const AudioBuffer&) = delete;
 	AudioBuffer(AudioBuffer&&) noexcept = default;
@@ -161,13 +161,13 @@ public:
 	//! @returns the buffers for all channel groups
 	auto allBuffers() const -> PlanarBufferView<const float>
 	{
-		return {m_channelBuffers, m_totalChannels, m_frames};
+		return {m_channelBuffers.data(), m_totalChannels, m_frames};
 	}
 
 	//! @returns the buffers for all channel groups
 	auto allBuffers() -> PlanarBufferView<float>
 	{
-		return {m_channelBuffers, m_totalChannels, m_frames};
+		return {m_channelBuffers.data(), m_totalChannels, m_frames};
 	}
 
 	//! @returns the buffers of the given channel group
@@ -207,13 +207,13 @@ public:
 	//! @returns scratch buffer for conversions between interleaved and planar TODO: Remove once using planar only
 	auto interleavedBuffer() const -> InterleavedBufferView<const float, 2>
 	{
-		return {m_interleavedBuffer, m_frames};
+		return {m_interleavedBuffer.data(), m_frames};
 	}
 
 	//! @returns scratch buffer for conversions between interleaved and planar TODO: Remove once using planar only
 	auto interleavedBuffer() -> InterleavedBufferView<float, 2>
 	{
-		return {m_interleavedBuffer, m_frames};
+		return {m_interleavedBuffer.data(), m_frames};
 	}
 
 	/**
@@ -348,27 +348,24 @@ public:
 private:
 	/**
 	 * Large buffer that all channel buffers are sourced from.
-	 * Owning raw pointer.
 	 *
 	 * [channel index]
 	 */
-	float* m_sourceBuffer = nullptr;
+	std::pmr::vector<float> m_sourceBuffer;
 
 	/**
 	 * Provides access to individual channel buffers within the source buffer.
-	 * Owning raw pointer.
 	 *
 	 * [channel index][frame index]
 	 */
-	float** m_channelBuffers = nullptr;
+	std::pmr::vector<float*> m_channelBuffers;
 
 	/**
 	 * Interleaved scratch buffer for conversions between interleaved and planar.
-	 * Owning raw pointer.
 	 *
 	 * TODO: Remove once using planar only
 	 */
-	float* m_interleavedBuffer = nullptr;
+	std::pmr::vector<float> m_interleavedBuffer;
 
 	//! Divides channels into arbitrary groups
 	ArrayVector<ChannelGroup, MaxGroupsPerAudioBuffer> m_groups;
@@ -377,10 +374,7 @@ private:
 	ch_cnt_t m_totalChannels = 0;
 
 	//! Frame count for every channel buffer
-	const f_cnt_t m_frames = 0;
-
-	//! Allocator used by all buffers
-	std::pmr::polymorphic_allocator<> m_alloc;
+	f_cnt_t m_frames = 0;
 
 	/**
 	 * Stores which channels are known to be quiet, AKA the silence status.

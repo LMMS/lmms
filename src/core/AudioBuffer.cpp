@@ -24,11 +24,7 @@
 
 #include "AudioBuffer.h"
 
-#include <algorithm>
-#include <type_traits>
-
 #include "ConfigManager.h"
-#include "LmmsPolyfill.h"
 #include "MixHelpers.h"
 
 namespace lmms
@@ -63,11 +59,13 @@ auto createMask(ch_cnt_t pos) noexcept -> AudioBuffer::ChannelFlags
 
 AudioBuffer::AudioBuffer(f_cnt_t frames, ch_cnt_t channels,
 	std::pmr::memory_resource* bufferResource)
-	: m_frames{frames}
-	, m_alloc{bufferResource}
+	: m_sourceBuffer{bufferResource}
+	, m_channelBuffers{bufferResource}
+	, m_interleavedBuffer{bufferResource}
+	, m_frames{frames}
 	, m_silenceTrackingEnabled{ConfigManager::inst()->value("ui", "disableautoquit", "1").toInt() == 0}
 {
-	m_interleavedBuffer = m_alloc.allocate_object<float>(2 * frames);
+	m_interleavedBuffer.resize(2 * frames);
 
 	if (channels == 0)
 	{
@@ -78,24 +76,6 @@ AudioBuffer::AudioBuffer(f_cnt_t frames, ch_cnt_t channels,
 	if (!addGroup(channels))
 	{
 		throw std::runtime_error{"failed to add group"};
-	}
-}
-
-AudioBuffer::~AudioBuffer()
-{
-	if (m_sourceBuffer)
-	{
-		m_alloc.deallocate_object(m_sourceBuffer, m_totalChannels * m_frames);
-	}
-
-	if (m_channelBuffers)
-	{
-		m_alloc.deallocate_object(m_channelBuffers, m_totalChannels);
-	}
-
-	if (m_interleavedBuffer)
-	{
-		m_alloc.deallocate_object(m_interleavedBuffer, 2 * m_frames);
 	}
 }
 
@@ -127,45 +107,22 @@ auto AudioBuffer::addGroup(ch_cnt_t channels) -> ChannelGroup*
 		return nullptr;
 	}
 
-	// Allocate new buffers
-	auto newSourceBuffer = m_alloc.allocate_object<float>(newTotalChannels * m_frames);
-	auto newChannelBuffers = m_alloc.allocate_object<float*>(newTotalChannels);
+	// Resize buffers
+	m_sourceBuffer.resize(newTotalChannels * m_frames);
+	m_channelBuffers.resize(newTotalChannels);
 
-	// Copy old buffer contents to new buffers
-	if (m_sourceBuffer)
-	{
-		std::copy_n(m_sourceBuffer, m_totalChannels * m_frames, newSourceBuffer);
-	}
-
-	// Set new channel buffers to zero (silent)
-	std::fill_n(&newSourceBuffer[m_totalChannels * m_frames], (newTotalChannels - m_totalChannels) * m_frames, 0.f);
-
-	// Initialize new channel buffers
-	float* ptr = newSourceBuffer;
+	// Fix channel buffers
+	float* ptr = m_sourceBuffer.data();
 	ch_cnt_t channel = 0;
 	while (channel < newTotalChannels)
 	{
-		newChannelBuffers[channel] = ptr;
+		m_channelBuffers[channel] = ptr;
 
 		ptr += m_frames;
 		++channel;
 	}
 
-	// Deallocate old buffers
-	if (m_sourceBuffer)
-	{
-		m_alloc.deallocate_object(m_sourceBuffer, m_totalChannels * m_frames);
-	}
-
-	if (m_channelBuffers)
-	{
-		m_alloc.deallocate_object(m_channelBuffers, m_totalChannels);
-	}
-
-	// Use new buffers
-	m_sourceBuffer = newSourceBuffer;
-	m_channelBuffers = newChannelBuffers;
-
+	// Fix group buffers
 	channel = 0;
 	for (ChannelGroup& group : m_groups)
 	{
@@ -353,8 +310,8 @@ void AudioBuffer::silenceChannels(const ChannelFlags& channels, ch_cnt_t upperBo
 
 void AudioBuffer::silenceAllChannels()
 {
-	std::fill_n(m_sourceBuffer, m_totalChannels * m_frames, 0);
-	std::fill_n(m_interleavedBuffer, 2 * m_frames, 0);
+	std::ranges::fill(m_sourceBuffer, 0);
+	std::ranges::fill(m_interleavedBuffer, 0);
 
 	m_silenceFlags.set();
 }

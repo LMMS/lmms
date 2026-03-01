@@ -115,8 +115,7 @@ public:
 		m_noRun = _state;
 	}
 
-	//! "Running" means the effect will be processing audio
-	bool isRunning() const
+	bool isProcessingAudio() const
 	{
 		return isEnabled() && isAwake() && isOkay() && !dontRun();
 	}
@@ -170,16 +169,16 @@ protected:
 
 	gui::PluginView* instantiateView( QWidget * ) override;
 
-	void startRunning()
-	{
-		m_quietBufferCount = 0;
-		m_awake = true;
-	}
-
-	void stopRunning()
+	void goToSleep()
 	{
 		m_quietBufferCount = 0;
 		m_awake = false;
+	}
+
+	void wakeUp()
+	{
+		m_quietBufferCount = 0;
+		m_awake = true;
 	}
 
 	virtual void onEnabledChanged() {}

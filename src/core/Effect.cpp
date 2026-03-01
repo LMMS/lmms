@@ -32,7 +32,6 @@
 #include "EffectChain.h"
 #include "EffectControls.h"
 #include "EffectView.h"
-#include "MixHelpers.h"
 #include "SampleFrame.h"
 
 namespace lmms
@@ -108,12 +107,12 @@ bool Effect::processAudioBuffer(AudioBuffer& inOut)
 			return false;
 		}
 
-		startRunning();
+		wakeUp();
 	}
 
-	if (!isRunning())
+	if (!isProcessingAudio())
 	{
-		// Plugin is awake but not running
+		// Plugin is awake but not processing audio
 		processBypassedImpl();
 		return false;
 	}
@@ -136,7 +135,7 @@ bool Effect::processAudioBuffer(AudioBuffer& inOut)
 			handleAutoQuit(silentOutput);
 			break;
 		case ProcessStatus::Sleep:
-			stopRunning();
+			goToSleep();
 			return false;
 		default:
 			break;
@@ -187,7 +186,7 @@ void Effect::handleAutoQuit(bool silentOutput)
 		if (++m_quietBufferCount > timeout())
 		{
 			// Activate auto-quit
-			stopRunning();
+			goToSleep();
 		}
 	}
 	else
