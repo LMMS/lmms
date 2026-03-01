@@ -719,7 +719,9 @@ void MainWindow::restoreWidgetState(QWidget* w, const QDomElement& de)
 
 		// set the window to its correct minimized/maximized/restored state
 		auto winState = win->windowState();
-		winState = de.attribute("maximized").toInt() ? (winState | Qt::WindowMaximized) : (winState & ~Qt::WindowMaximized);
+		winState = de.attribute("maximized").toInt()
+			? (winState | Qt::WindowMaximized)
+			: (winState & ~Qt::WindowMaximized);
 		win->setWindowState(winState);
 	}
 
