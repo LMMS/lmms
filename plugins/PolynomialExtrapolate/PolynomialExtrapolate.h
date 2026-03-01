@@ -41,7 +41,10 @@ public:
 	PolynomialExtrapolateEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
 	~PolynomialExtrapolateEffect() override = default;
 
-	static const s_maxPolynomialDegree = 20;
+	static constexpr size_t MAX_POLYNOMIAL_DEGREE = 8;
+	static constexpr size_t MAX_SAMPLING_GAP = 500;
+	static constexpr size_t MAX_PREDICTION_COUNT = MAX_POLYNOMIAL_DEGREE * MAX_SAMPLING_GAP;
+	static constexpr size_t MAX_SAMPLES_BETWEEN_PREDICTION = 40;
 
 	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
 
@@ -57,7 +60,7 @@ public:
 	}
 
 private:
-	template<typename T>
+	template<typename T, size_t maxSize>
 	class storageBuffer
 	{
 	public:
@@ -67,25 +70,44 @@ private:
 		size_t size();
 		void resize(size_t newSize);
 		void write(const T* buf, size_t frames);
+		void swap(const T* buf, size_t frames);
+		T swap(T data);
 	private:
 		size_t m_readIndex = 0;
-		std::vector<T> m_data = {};
+		size_t m_size = 0;
+		std::array<T, maxSize> m_data = {};
 	};
 
-	void getPolinomialCoefficients(const std::vector<float>& helperMatrix,
-		const std::vector<float>& samples, std::vector<float>& polinomial, size_t width);
-	void getMatrix(std::vector<float>& matrix, size_t width);
-	float polinomialAt(float x, const std::vector<float>& polinomial, size_t width) const;
+	void processNewFrames(SampleFrame* buf, const fpp_t frames,
+		size_t sampesBetweenPredicions, size_t width, size_t gap,
+		int predictionCount, float xMultiplier);
+
+	void getPolynomialCoefficients(const std::span<float>& helperMatrix,
+		const std::span<float>& samples, std::span<float>& polinomial, size_t width);
+	void generateMatrix(std::span<float>& matrix, size_t width);
+	float polinomialAt(float x, const std::span<float>& polinomial, size_t width) const;
+
+	void makeExtrapolation(size_t startIndex, size_t width,
+		size_t gap, int predictionCount, float xMultiplier);
+
+	void printMatrixDebug(const std::span<float>& matrix, size_t width);
 
 	PolynomialExtrapolateControls m_effectControls;
-	storageBuffer<SampleFrame> m_inputData;
+	//! first: input data and feedback
+	//! output data
+	storageBuffer<std::pair<SampleFrame, SampleFrame>, MAX_POLYNOMIAL_DEGREE * MAX_SAMPLING_GAP * 2> m_inputData;
 	//! how much data to store in `m_inputData` from the last input
 	size_t m_retainCount = 3;
+	size_t m_retainCounter = 0;
 
+	//! matrix width, equivalent with polynomial degree
+	size_t m_width = 0;
 	//! helps generate `m_polynomialMatrix`
-	std::vector<float> m_coefficientMatrix;
+	std::array<float, MAX_POLYNOMIAL_DEGREE * MAX_POLYNOMIAL_DEGREE>
+		m_coefficientMatrix;
 	//! helps generate polynomial coefficients
-	std::vector<float> m_polynomialMatrix;
+	std::array<float, MAX_POLYNOMIAL_DEGREE * MAX_POLYNOMIAL_DEGREE>
+		m_polynomialMatrix;
 
 	friend class PolynomialExtrapolateControls;
 };
