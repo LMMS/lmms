@@ -686,9 +686,6 @@ void MainWindow::saveWidgetState(QWidget* w, QDomElement& de)
 	de.setAttribute("height", normalGeometry.height());
 }
 
-
-
-
 void MainWindow::restoreWidgetState(QWidget* w, const QDomElement& de)
 {
 	// TODO: Only use one of these
@@ -697,18 +694,20 @@ void MainWindow::restoreWidgetState(QWidget* w, const QDomElement& de)
 	{
 		// Fall back on parent
 		win = qobject_cast<SubWindow*>(w->parentWidget());
-		if (!win)
-		{
-			// Still could not find the window - soft fail
-			return;
-		}
+
+		// Still could not find the window - soft fail
+		if (!win) { return; }
 	}
 
-	const auto normalGeometry = QRect {
+	const auto savedWidth = de.attribute("width").toInt();
+	const auto savedHeight = de.attribute("height").toInt();
+	const auto widgetMinSize = win->minimumSizeHint();
+
+	const auto normalGeometry = QRect{
 		de.attribute("x").toInt(),
 		de.attribute("y").toInt(),
-		de.attribute("width").toInt(),
-		de.attribute("height").toInt()
+		qMax(widgetMinSize.width(), savedWidth),
+		qMax(widgetMinSize.height(), savedHeight),
 	};
 
 	if (normalGeometry.isValid())
@@ -719,10 +718,8 @@ void MainWindow::restoreWidgetState(QWidget* w, const QDomElement& de)
 		win->setGeometry(normalGeometry);
 
 		// set the window to its correct minimized/maximized/restored state
-		Qt::WindowStates winState = win->windowState();
-		winState = de.attribute("maximized").toInt()
-			? (winState | Qt::WindowMaximized)
-			: (winState & ~Qt::WindowMaximized);
+		auto winState = win->windowState();
+		winState = de.attribute("maximized").toInt() ? (winState | Qt::WindowMaximized) : (winState & ~Qt::WindowMaximized);
 		win->setWindowState(winState);
 	}
 
@@ -731,9 +728,6 @@ void MainWindow::restoreWidgetState(QWidget* w, const QDomElement& de)
 		win->setVisible(visible.toInt());
 	}
 }
-
-
-
 
 void MainWindow::emptySlot()
 {
