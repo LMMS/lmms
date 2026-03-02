@@ -161,13 +161,13 @@ public:
 	//! @returns the buffers for all channel groups
 	auto allBuffers() const -> PlanarBufferView<const float>
 	{
-		return {m_channelBuffers.data(), m_totalChannels, m_frames};
+		return {m_channelBuffers.data(), totalChannels(), m_frames};
 	}
 
 	//! @returns the buffers for all channel groups
 	auto allBuffers() -> PlanarBufferView<float>
 	{
-		return {m_channelBuffers.data(), m_totalChannels, m_frames};
+		return {m_channelBuffers.data(), totalChannels(), m_frames};
 	}
 
 	//! @returns the buffers of the given channel group
@@ -198,8 +198,8 @@ public:
 		return {m_channelBuffers[channel], m_frames};
 	}
 
-	//! @returns sum of all groups' channel counts
-	auto totalChannels() const -> ch_cnt_t { return m_totalChannels; }
+	//! @returns the total channel count (never exceeds MaxChannelsPerAudioBuffer)
+	auto totalChannels() const -> ch_cnt_t { return static_cast<ch_cnt_t>(m_channelBuffers.size()); }
 
 	//! @returns the frame count for each channel buffer
 	auto frames() const -> f_cnt_t { return m_frames; }
@@ -252,7 +252,7 @@ public:
 			group.setChannels(channels);
 
 			ch += channels;
-			if (ch > this->m_totalChannels)
+			if (ch > this->totalChannels())
 			{
 				throw std::runtime_error{"sum of group channel counts exceeds total channels"};
 			}
@@ -263,7 +263,7 @@ public:
 	 * Channels which are known to be quiet, AKA the silence status.
 	 * 1 = channel is known to be silent
 	 * 0 = channel is assumed to be non-silent (or, when silence tracking
-	 *     is enabled, known to be non-silent)
+	 *     is enabled, *known* to be non-silent)
 	 *
 	 * NOTE: If any channel buffers are used and their data modified outside of this class,
 	 *       their silence flags will be invalidated until `updateSilenceFlags()` is called.
@@ -370,9 +370,6 @@ private:
 	//! Divides channels into arbitrary groups
 	ArrayVector<ChannelGroup, MaxGroupsPerAudioBuffer> m_groups;
 
-	//! Caches the sum of `m_groups[idx].channels()` - must never exceed MaxChannelsPerAudioBuffer
-	ch_cnt_t m_totalChannels = 0;
-
 	//! Frame count for every channel buffer
 	f_cnt_t m_frames = 0;
 
@@ -381,11 +378,11 @@ private:
 	 *
 	 * This must always be kept in sync with the buffer data when enabled - at minimum
 	 * avoiding any false positives where a channel is marked as "silent" when it isn't.
-	 * Any channel bits at or above `m_totalChannels` must always be marked silent.
+	 * Any channel bits at or above `totalChannels()` must always be marked silent.
 	 *
 	 * 1 = channel is known to be silent
 	 * 0 = channel is assumed to be non-silent (or, when silence tracking
-	 *     is enabled, known to be non-silent)
+	 *     is enabled, *known* to be non-silent)
 	 */
 	ChannelFlags m_silenceFlags;
 

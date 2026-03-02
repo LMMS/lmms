@@ -100,7 +100,8 @@ auto AudioBuffer::addGroup(ch_cnt_t channels) -> ChannelGroup*
 		return nullptr;
 	}
 
-	const auto newTotalChannels = m_totalChannels + channels;
+	const auto oldTotalChannels = totalChannels();
+	const auto newTotalChannels = totalChannels() + channels;
 	if (newTotalChannels > MaxChannelsPerAudioBuffer)
 	{
 		// Not enough room for requested channels
@@ -132,14 +133,10 @@ auto AudioBuffer::addGroup(ch_cnt_t channels) -> ChannelGroup*
 
 	// Ensure the new channels (and all the higher, unused
 	// channels) are set to "silent"
-	m_silenceFlags |= createMask<true>(m_totalChannels);
+	m_silenceFlags |= createMask<true>(oldTotalChannels);
 
 	// Append new group
-	auto& newGroup = m_groups.emplace_back(&m_channelBuffers[m_totalChannels], channels);
-
-	m_totalChannels = newTotalChannels;
-
-	return &newGroup;
+	return &m_groups.emplace_back(&m_channelBuffers[oldTotalChannels], channels);
 }
 
 void AudioBuffer::enableSilenceTracking(bool enabled)
@@ -177,7 +174,7 @@ void AudioBuffer::sanitize(const ChannelFlags& channels, ch_cnt_t upperBound)
 
 	bool changesMade = false;
 
-	const auto totalChannels = std::min(upperBound, m_totalChannels);
+	const auto totalChannels = std::min(upperBound, this->totalChannels());
 	for (ch_cnt_t ch = 0; ch < totalChannels; ++ch)
 	{
 		if (channels[ch])
@@ -204,7 +201,7 @@ void AudioBuffer::sanitizeAll()
 	if (!MixHelpers::useNaNHandler()) { return; }
 
 	bool changesMade = false;
-	for (ch_cnt_t ch = 0; ch < m_totalChannels; ++ch)
+	for (ch_cnt_t ch = 0; ch < totalChannels(); ++ch)
 	{
 		if (MixHelpers::sanitize(buffer(ch)))
 		{
@@ -226,12 +223,12 @@ auto AudioBuffer::updateSilenceFlags(const ChannelFlags& channels, ch_cnt_t uppe
 	assert(upperBound <= MaxChannelsPerAudioBuffer);
 
 	// Invariant: Any channel bits at or above `totalChannels()` must be marked silent
-	assert((~m_silenceFlags & createMask<true>(m_totalChannels)).none());
+	assert((~m_silenceFlags & createMask<true>(totalChannels())).none());
 
 	// If no channels are selected, return true (all selected channels are silent)
 	if (channels.none()) { return true; }
 
-	const auto totalChannels = std::min(upperBound, m_totalChannels);
+	const auto totalChannels = std::min(upperBound, this->totalChannels());
 
 	if (!m_silenceTrackingEnabled)
 	{
@@ -261,20 +258,20 @@ auto AudioBuffer::updateSilenceFlags(const ChannelFlags& channels, ch_cnt_t uppe
 auto AudioBuffer::updateAllSilenceFlags() -> bool
 {
 	// Invariant: Any channel bits at or above `totalChannels()` must be marked silent
-	assert((~m_silenceFlags & createMask<true>(m_totalChannels)).none());
+	assert((~m_silenceFlags & createMask<true>(totalChannels())).none());
 
 	// If there are no channels, return true (all channels are silent)
-	if (m_totalChannels == 0) { return true; }
+	if (totalChannels() == 0) { return true; }
 
 	if (!m_silenceTrackingEnabled)
 	{
 		// Mark all channels below `totalChannels()` as non-silent
-		m_silenceFlags &= createMask<true>(m_totalChannels);
+		m_silenceFlags &= createMask<true>(totalChannels());
 		return false;
 	}
 
 	bool allQuiet = true;
-	for (ch_cnt_t ch = 0; ch < m_totalChannels; ++ch)
+	for (ch_cnt_t ch = 0; ch < totalChannels(); ++ch)
 	{
 		const auto quiet = MixHelpers::isSilent(buffer(ch));
 
@@ -290,7 +287,7 @@ void AudioBuffer::silenceChannels(const ChannelFlags& channels, ch_cnt_t upperBo
 	auto needSilenced = ~m_silenceFlags;
 	needSilenced &= channels;
 
-	const auto totalChannels = std::min(upperBound, m_totalChannels);
+	const auto totalChannels = std::min(upperBound, this->totalChannels());
 	for (ch_cnt_t ch = 0; ch < totalChannels; ++ch)
 	{
 		if (needSilenced[ch])
