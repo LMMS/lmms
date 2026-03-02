@@ -699,15 +699,14 @@ void MainWindow::restoreWidgetState(QWidget* w, const QDomElement& de)
 		if (!win) { return; }
 	}
 
-	const auto savedWidth = de.attribute("width").toInt();
-	const auto savedHeight = de.attribute("height").toInt();
-	const auto widgetMinSize = win->minimumSizeHint();
-
 	const auto normalGeometry = QRect{
 		de.attribute("x").toInt(),
 		de.attribute("y").toInt(),
-		qMax(widgetMinSize.width(), savedWidth),
-		qMax(widgetMinSize.height(), savedHeight),
+
+		// Always make dimensions at least 1, to work around "corrupt" project files with empty size. The size needs to
+		// be positive so the rect is valid, and the minimum size is taken into account by `QWidget::setGeometry`.
+		std::max(1, de.attribute("width").toInt()),
+		std::max(1, de.attribute("height").toInt()),
 	};
 
 	if (normalGeometry.isValid())
