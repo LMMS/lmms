@@ -26,6 +26,7 @@
 
 #include "ConfigManager.h"
 #include "MixHelpers.h"
+#include "SharedMemory.h"
 
 namespace lmms
 {
@@ -65,8 +66,6 @@ AudioBuffer::AudioBuffer(f_cnt_t frames, ch_cnt_t channels,
 	, m_frames{frames}
 	, m_silenceTrackingEnabled{ConfigManager::inst()->value("ui", "disableautoquit", "1").toInt() == 0}
 {
-	m_interleavedBuffer.resize(2 * frames);
-
 	if (channels == 0)
 	{
 		m_silenceFlags.set();
@@ -79,11 +78,22 @@ AudioBuffer::AudioBuffer(f_cnt_t frames, ch_cnt_t channels,
 	}
 }
 
-auto AudioBuffer::getAllocatedSize(f_cnt_t frames, ch_cnt_t channels) -> std::size_t
+void AudioBuffer::allocateInterleavedBuffer()
 {
-	return frames * channels * sizeof(float) // for m_sourceBuffer
-		+ channels * sizeof(float*) // for m_channelBuffers
-		+ frames * 2 * sizeof(float); // for m_interleavedBuffer
+	m_interleavedBuffer.resize(2 * m_frames);
+}
+
+auto AudioBuffer::allocationSize(f_cnt_t frames, ch_cnt_t channels, bool withInterleavedBuffer) -> std::size_t
+{
+	auto bytes = frames * channels * sizeof(float) // for m_sourceBuffer
+		+ channels * sizeof(float*); // for m_channelBuffers
+
+	if (withInterleavedBuffer)
+	{
+		bytes += frames * 2 * sizeof(float); // for m_interleavedBuffer
+	}
+
+	return bytes;
 }
 
 auto AudioBuffer::addGroup(ch_cnt_t channels) -> ChannelGroup*
@@ -108,9 +118,32 @@ auto AudioBuffer::addGroup(ch_cnt_t channels) -> ChannelGroup*
 		return nullptr;
 	}
 
-	// Resize buffers
-	m_sourceBuffer.resize(newTotalChannels * m_frames);
+	// Check if using a shared memory resource since its semantics are
+	// more restrictive than the default memory resource
+	const auto usesSharedMemory = dynamic_cast<SharedMemoryResource*>(
+		m_channelBuffers.get_allocator().resource()) != nullptr;
+
+	const auto usesInterleavedBuffer = hasInterleavedBuffer();
+
+	if (usesSharedMemory)
+	{
+		// Shared memory must be reallocated without any over-allocations,
+		// since it only has a fixed amount of space
+		m_channelBuffers.clear();
+		m_sourceBuffer.clear();
+		m_interleavedBuffer.clear();
+	}
+
+	// Next, resize the buffers. The order here is important so no padding bytes
+	// are needed when allocating using a shared memory resource. The buffer
+	// with stricter padding requirements (m_channelBuffers) gets allocated first.
+	static_assert(alignof(float*) >= alignof(float));
 	m_channelBuffers.resize(newTotalChannels);
+	m_sourceBuffer.resize(newTotalChannels * m_frames);
+	if (usesInterleavedBuffer)
+	{
+		m_interleavedBuffer.resize(2 * m_frames);
+	}
 
 	// Fix channel buffers
 	float* ptr = m_sourceBuffer.data();
@@ -189,7 +222,7 @@ void AudioBuffer::sanitize(const ChannelFlags& channels, ch_cnt_t upperBound)
 		}
 	}
 
-	if (changesMade && (channels[0] || channels[1]))
+	if (changesMade && hasInterleavedBuffer() && (channels[0] || channels[1]))
 	{
 		// Keep the temporary interleaved buffer in sync
 		toInterleaved(groupBuffers(0), interleavedBuffer());
@@ -211,7 +244,7 @@ void AudioBuffer::sanitizeAll()
 		}
 	}
 
-	if (changesMade)
+	if (changesMade && hasInterleavedBuffer())
 	{
 		// Keep the temporary interleaved buffer in sync
 		toInterleaved(groupBuffers(0), interleavedBuffer());
@@ -296,7 +329,7 @@ void AudioBuffer::silenceChannels(const ChannelFlags& channels, ch_cnt_t upperBo
 		}
 	}
 
-	if (needSilenced[0] || needSilenced[1])
+	if (hasInterleavedBuffer() && (needSilenced[0] || needSilenced[1]))
 	{
 		// Keep the temporary interleaved buffer in sync
 		toInterleaved(groupBuffers(0), interleavedBuffer());

@@ -50,6 +50,8 @@ AudioBusHandle::AudioBusHandle(const QString& name, bool hasEffectChain,
 	m_panningModel(panningModel),
 	m_mutedModel(mutedModel)
 {
+	m_buffer.allocateInterleavedBuffer();
+
 	Engine::audioEngine()->addAudioBusHandle(this);
 	setExtOutputEnabled(true);
 }

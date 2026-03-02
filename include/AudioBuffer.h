@@ -146,11 +146,17 @@ public:
 		setGroups(groups, std::forward<F>(groupVisitor));
 	}
 
+	//! The presence of the temporary interleaved buffer is opt-in. Call this to create it.
+	void allocateInterleavedBuffer();
+
+	auto hasInterleavedBuffer() const -> bool { return !m_interleavedBuffer.empty(); }
+
 	/**
-	 * @returns the number of bytes allocated for the given frame and channel counts.
-	 *          Useful for preallocating a buffer for a custom memory resource.
+	 * @returns the number of bytes needed to allocate buffers with given frame and channel counts.
+	 *          Useful for preallocating a buffer for a shared memory resource.
 	 */
-	static auto getAllocatedSize(f_cnt_t frames, ch_cnt_t channels) -> std::size_t;
+	static auto allocationSize(f_cnt_t frames, ch_cnt_t channels,
+		bool withInterleavedBuffer = false) -> std::size_t;
 
 	//! @returns current number of channel groups
 	auto groupCount() const -> group_cnt_t { return static_cast<group_cnt_t>(m_groups.size()); }
@@ -207,19 +213,25 @@ public:
 	//! @returns scratch buffer for conversions between interleaved and planar TODO: Remove once using planar only
 	auto interleavedBuffer() const -> InterleavedBufferView<const float, 2>
 	{
+		assert(hasInterleavedBuffer());
 		return {m_interleavedBuffer.data(), m_frames};
 	}
 
 	//! @returns scratch buffer for conversions between interleaved and planar TODO: Remove once using planar only
 	auto interleavedBuffer() -> InterleavedBufferView<float, 2>
 	{
+		assert(hasInterleavedBuffer());
 		return {m_interleavedBuffer.data(), m_frames};
 	}
 
 	/**
 	 * @brief Adds a new channel group at the end of the list.
-	 *        Reallocates the source and channel buffers.
 	 *
+	 * If the memory resource is `SharedMemoryResource`, all buffers (source, channels,
+	 * and interleaved) will be reallocated. The number of bytes allocated will be
+	 * `allocationSize(frames(), totalChannels() + channels, hasInterleavedBuffer())`.
+	 *
+	 * @param channels how many channels the new group should have
 	 * @returns the newly created group, or nullptr upon failure
 	 */
 	auto addGroup(ch_cnt_t channels) -> ChannelGroup*;
