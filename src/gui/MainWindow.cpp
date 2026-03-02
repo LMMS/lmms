@@ -709,7 +709,8 @@ void MainWindow::restoreWidgetState(QWidget* w, const QDomElement& de)
 	// First restore the window, as attempting to resize a maximized window can cause graphical glitches.
 	win->setWindowState(win->windowState() & ~(Qt::WindowMaximized | Qt::WindowMinimized));
 
-	// Then resize the window. There used to be validity checks here, but they are not needed anymore.
+	// Then resize it. Previously present validity checks are not needed anymore and taken into account by
+	// `QWidget::setGeometry`.
 	win->setGeometry(normalGeometry);
 
 	// Set the window to its correct "maximized?" state.
