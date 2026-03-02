@@ -129,7 +129,7 @@ SidInstrument::SidInstrument( InstrumentTrack * _instrument_track ) :
 {
     // A Filter object needs to be created only once to do some initialization, avoiding
 	// dropouts down the line when we have to play a note for the first time.
-	[[maybe_unused]] static auto s_filter = reSID::Filter{};
+	[[maybe_unused]] static auto s_filter = Filter{};
 
 	for( int i = 0; i < 3; ++i )
 	{
@@ -236,7 +236,9 @@ float SidInstrument::desiredReleaseTimeMs() const
 }
 
 
-static int sid_fillbuffer(unsigned char* sidreg, reSID::SID *sid, int tdelta, short *ptr, int samples)
+
+
+static int sid_fillbuffer(unsigned char* sidreg, SID *sid, int tdelta, short *ptr, int samples)
 {
 	int total = 0;
 	int badline = fastRand(NUMSIDREGS);
@@ -289,9 +291,9 @@ void SidInstrument::playNote( NotePlayHandle * _n,
 
 	if (!_n->m_pluginData)
 	{
-		auto sid = new reSID::SID();
-		sid->set_sampling_parameters(clockrate, reSID::SAMPLE_FAST, samplerate);
-		sid->set_chip_model(reSID::MOS8580);
+		SID *sid = new SID();
+		sid->set_sampling_parameters( clockrate, SAMPLE_FAST, samplerate );
+		sid->set_chip_model( MOS8580 );
 		sid->enable_filter( true );
 		sid->reset();
 		_n->m_pluginData = sid;
@@ -299,7 +301,7 @@ void SidInstrument::playNote( NotePlayHandle * _n,
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();
 
-	auto sid = static_cast<reSID::SID*>(_n->m_pluginData);
+	SID *sid = static_cast<SID *>( _n->m_pluginData );
 	int delta_t = clockrate * frames / samplerate + 4;
 #ifndef _MSC_VER
 	short buf[frames];
@@ -315,20 +317,20 @@ void SidInstrument::playNote( NotePlayHandle * _n,
 
 	if( (ChipModel)m_chipModel.value() == ChipModel::MOS6581 )
 	{
-		sid->set_chip_model(reSID::MOS6581);
+		sid->set_chip_model( MOS6581 );
 	}
 	else
 	{
-		sid->set_chip_model(reSID::MOS8580);
+		sid->set_chip_model( MOS8580 );
 	}
 
 	// voices
-	reSID::reg8 data8 = 0;
-	reSID::reg16 data16 = 0;
-	size_t base = 0;
+	reg8 data8 = 0;
+	reg8 data16 = 0;
+	reg8 base = 0;
 	float freq = 0.0;
 	float note = 0.0;
-	for (size_t i = 0; i < 3; ++i)
+	for( reg8 i = 0 ; i < 3 ; ++i )
 	{
 		base = i*7;
 		// freq ( Fn = Fout / Fclk * 16777216 ) + coarse detuning
@@ -427,7 +429,7 @@ void SidInstrument::playNote( NotePlayHandle * _n,
 
 void SidInstrument::deleteNotePluginData( NotePlayHandle * _n )
 {
-	delete static_cast<reSID::SID*>(_n->m_pluginData);
+	delete static_cast<SID *>( _n->m_pluginData );
 }
 
 
