@@ -89,6 +89,8 @@ MainWindow::MainWindow() :
 {
 	setAttribute( Qt::WA_DeleteOnClose );
 
+	constexpr auto HideHandleStyle = "QSplitter::handle { width: 0px; }";
+
 	auto main_widget = new QWidget(this);
 	auto vbox = new QVBoxLayout(main_widget);
 	vbox->setSpacing( 0 );
@@ -102,7 +104,8 @@ MainWindow::MainWindow() :
 	auto sideBar = new SideBar(Qt::Vertical, w);
 
 	auto splitter = new QSplitter(Qt::Horizontal, w);
-	splitter->setChildrenCollapsible( false );
+	splitter->setChildrenCollapsible(false);
+	splitter->setStyleSheet(HideHandleStyle);
 
 	ConfigManager* confMgr = ConfigManager::inst();
 	bool sideBarOnRight = confMgr->value("ui", "sidebaronright").toInt();
@@ -155,7 +158,19 @@ MainWindow::MainWindow() :
 	sideBar->appendTab(new FileBrowser(FileBrowser::Type::Normal, root_paths.join("*"), FileItem::defaultFilters(), title,
 		embed::getIconPixmap("computer").transformed(QTransform().rotate(90)), splitter, dirs_as_items));
 
-	m_workspace = new MovableQMdiArea(splitter);
+	m_workspaceScrollBarV = new WorkspaceScrollBar(Qt::Vertical, nullptr);
+	m_workspaceScrollBarH = new WorkspaceScrollBar(Qt::Horizontal, nullptr);
+
+	// Add widget to contain workspace and the scrollbar on the bottom
+	auto workspaceVSplitter = new QSplitter(Qt::Vertical, splitter);
+	workspaceVSplitter->setChildrenCollapsible(false);
+	workspaceVSplitter->setStyleSheet(HideHandleStyle);
+
+	m_workspace = new MovableQMdiArea(workspaceVSplitter, this, m_workspaceScrollBarV, m_workspaceScrollBarH);
+	workspaceVSplitter->insertWidget(-1, m_workspaceScrollBarH);
+	workspaceVSplitter->handle(workspaceVSplitter->indexOf(m_workspaceScrollBarH))->hide();
+
+	m_workspace->universalPanClick = confMgr->value("ui", "universal_pan_click", "0").toInt();
 
 	// Load background
 	emit initProgress(tr("Loading background picture"));
@@ -174,9 +189,13 @@ MainWindow::MainWindow() :
 		m_workspace->setBackground( Qt::NoBrush );
 	}
 
-	m_workspace->setOption( QMdiArea::DontMaximizeSubWindowOnActivation );
+	m_workspace->setOption(QMdiArea::DontMaximizeSubWindowOnActivation);
+
+	// Hide built-in scrollbars as we will be using custom ones here (see MainWindow::WorkspaceScrollBar)
 	m_workspace->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	m_workspace->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+	splitter->insertWidget(-1, m_workspaceScrollBarV);
 
 	hbox->addWidget(sideBar);
 	hbox->addWidget(splitter);
@@ -184,7 +203,7 @@ MainWindow::MainWindow() :
 	// the splitter to the "left" side, or the first widgets in their list
 	if (sideBarOnRight)
 	{
-		splitter->insertWidget(0, m_workspace);
+		splitter->insertWidget(0, workspaceVSplitter);
 		hbox->insertWidget(0, splitter);
 	}
 
@@ -471,6 +490,7 @@ void MainWindow::finalize()
 		// no, so show it that user can setup everything
 		SetupDialog sd;
 		sd.exec();
+		m_workspace->universalPanClick = ConfigManager::inst()->value("ui", "universal_pan_click", "0").toInt();
 	}
 	// look whether the audio engine failed to start the audio device selected by the
 	// user and is using AudioDummy as a fallback
@@ -484,6 +504,7 @@ void MainWindow::finalize()
 		// if so, offer the audio settings section of the setup dialog
 		SetupDialog sd( SetupDialog::ConfigTab::AudioSettings );
 		sd.exec();
+		m_workspace->universalPanClick = ConfigManager::inst()->value("ui", "universal_pan_click", "0").toInt();
 	}
 
 	// Add editor subwindows
@@ -898,6 +919,7 @@ void MainWindow::showSettingsDialog()
 {
 	SetupDialog sd;
 	sd.exec();
+	m_workspace->universalPanClick = ConfigManager::inst()->value("ui", "universal_pan_click", "0").toInt();
 }
 
 
@@ -973,18 +995,32 @@ void MainWindow::refocus()
 {
 	const auto gui = getGUI();
 
-	// Attempt to set the focus on the first of these editors that is not hidden...
-	for (auto editorParent : { gui->songEditor()->parentWidget(), gui->patternEditor()->parentWidget(),
-		gui->pianoRoll()->parentWidget(), gui->automationEditor()->parentWidget() })
+	const std::array<QWidget*, 4> editorWindows{
+		gui->songEditor()->parentWidget(),
+		gui->patternEditor()->parentWidget(),
+		gui->pianoRoll()->parentWidget(),
+		gui->automationEditor()->parentWidget(),
+	};
+
+	const auto isEditorWindow = [&](QMdiSubWindow* sw) -> bool
 	{
-		if (!editorParent->isHidden())
+		return std::find(editorWindows.begin(), editorWindows.end(), (QWidget*)sw) != editorWindows.end();
+	};
+
+	// Go through the subwindow list, from topmost to bottom-most, and find a desirable new focus target.
+	const auto swList = m_workspace->subWindowList(QMdiArea::StackingOrder);
+	for (auto it = swList.rbegin(); it != swList.rend(); ++it)
+	{
+		auto* sw = *it;
+
+		if (sw->isVisible() && (sw->isMaximized() || isEditorWindow(sw)))
 		{
-			editorParent->setFocus();
+			sw->setFocus();
 			return;
 		}
 	}
 
-	// ... otherwise set the focus on the main window.
+	// In case nothing was found, set the focus on the main window.
 	this->setFocus();
 }
 
@@ -1622,39 +1658,118 @@ void MainWindow::onProjectFileNameChanged()
 	this->resetWindowTitle();
 }
 
-
-MainWindow::MovableQMdiArea::MovableQMdiArea(QWidget* parent) :
-	QMdiArea(parent),
-	m_isBeingMoved(false),
-	m_lastX(0),
-	m_lastY(0)
-{}
-
-void MainWindow::MovableQMdiArea::mousePressEvent(QMouseEvent* event)
+MainWindow::WorkspaceScrollBar::WorkspaceScrollBar(Qt::Orientation orientation, QWidget *parent)
+	: QScrollBar(orientation, parent)
 {
-	const auto pos = position(event);
-	m_lastX = pos.x();
-	m_lastY = pos.y();
-	m_isBeingMoved = true;
+	constexpr auto Thickness = 12;
+	setTracking(true);
+	setToolTip(tr("You can also navigate with ") + "Alt-S");
+
+	if (orientation == Qt::Vertical) { setFixedWidth(Thickness); }
+	else if (orientation == Qt::Horizontal) { setFixedHeight(Thickness); }
+}
+
+void MainWindow::WorkspaceScrollBar::wheelEvent(QWheelEvent *event)
+{
+	// Accept event so it's catched and thus not handled
+	event->accept();
+}
+
+MainWindow::MovableQMdiArea::MovableQMdiArea(QWidget* parent, MainWindow* mainWindow, QScrollBar* scrollBarV,
+	QScrollBar* scrollBarH)
+	: QMdiArea(parent)
+	, universalPanClick{false}
+	, m_isPanning{false}
+	, m_isUniversalPan{false}
+	, m_canUniversalPan{false}
+	, m_lastX{0}
+	, m_lastY{0}
+	, m_mainWindow{mainWindow}
+	, m_scrollBarV{scrollBarV}
+	, m_scrollBarH{scrollBarH}
+	, m_scrollBarLastY{0}
+	, m_scrollBarLastX{0}
+{
+	parent->installEventFilter(this);
+
+	connect(this, &QMdiArea::subWindowActivated, this, &MainWindow::MovableQMdiArea::updateScrollBars);
+	connect(m_scrollBarH, &QScrollBar::sliderMoved, this, [this] { sliderMoved(m_scrollBarH); });
+	connect(m_scrollBarV, &QScrollBar::sliderMoved, this, [this] { sliderMoved(m_scrollBarV); });
+}
+
+void MainWindow::MovableQMdiArea::sliderMoved(QScrollBar* scrollBar)
+{
+	// The overall logic here is to calculate scroll delta, and apply it with signals blocked. Invoking a signal while
+	// changing the slider would throw this into a stack-smashing infinite loop :(
+
+	if (scrollBar == m_scrollBarH)
+	{
+		int newValue = m_scrollBarH->value();
+		int delta = newValue - m_scrollBarLastX;
+		m_scrollBarH->blockSignals(true);
+		m_scrollBarLastX = newValue;
+		scroll(delta, 0);
+		m_scrollBarH->blockSignals(false);
+	}
+	else if (scrollBar == m_scrollBarV)
+	{
+		int newValue = m_scrollBarV->value();
+		int delta = newValue - m_scrollBarLastY;
+		m_scrollBarV->blockSignals(true);
+		m_scrollBarLastY = newValue;
+		scroll(0, delta);
+		m_scrollBarV->blockSignals(false);
+	}
+}
+
+void MainWindow::MovableQMdiArea::updateScrollBars()
+{
+	constexpr int Margin = MainWindow::MovableQMdiArea::Margin;
+	const auto [minX, maxX, minY, maxY] = getActiveWorkspaceArea();
+
+	// The scrollbar boundaries pretty much the active workspace area but taking the workspace widget dimensions.
+	int scrollBarMinX = minX - width() + Margin;
+	int scrollBarMaxX = maxX - Margin;
+	int scrollBarMinY = minY - height() + Margin;
+	int scrollBarMaxY = maxY - Margin;
+
+	// We have to translate coordinates here because apparently the scrollbars don't support negative minimum values.
+	// More specifically, we translate `scrollBarMin` to 0, by subtracting `scrollBarMin`.
+	const int transX = -scrollBarMinX;
+	const int transY = -scrollBarMinY;
+	m_scrollBarH->setMinimum(scrollBarMinX + transX);
+	m_scrollBarH->setMaximum(scrollBarMaxX + transX);
+	m_scrollBarV->setMinimum(scrollBarMinY + transY);
+	m_scrollBarV->setMaximum(scrollBarMaxY + transY);
+
+	const int newX = 0 + transX;
+	const int newY = 0 + transY;
+
+	m_scrollBarH->setValue(newX);
+	m_scrollBarV->setValue(newY);
+
+	m_scrollBarH->setPageStep(width());
+	m_scrollBarV->setPageStep(height());
+
+	m_scrollBarLastX = newX;
+	m_scrollBarLastY = newY;
+}
+
+void MainWindow::MovableQMdiArea::mousePanStart()
+{
+	m_isPanning = true;
 	setCursor(Qt::ClosedHandCursor);
 }
 
-void MainWindow::MovableQMdiArea::mouseMoveEvent(QMouseEvent* event)
+std::tuple<int, int, int, int> MainWindow::MovableQMdiArea::getActiveWorkspaceArea()
 {
-	if (m_isBeingMoved == false) { return; }
+	int minX = INT_MAX;
+	int maxX = INT_MIN;
+	int minY = INT_MAX;
+	int maxY = INT_MIN;
 
-	int minXBoundary = window()->width() - 100;
-	int maxXBoundary = 100;
-	int minYBoundary = window()->height() - 100;
-	int maxYBoundary = 100;
-
-	int minX = minXBoundary;
-	int maxX = maxXBoundary;
-	int minY = minYBoundary;
-	int maxY = maxYBoundary;
-
-	auto subWindows = subWindowList();
-	for (auto* curWindow : subWindows)
+	bool hasPannableWindow = false;
+	for (auto* curWindow : subWindowList())
 	{
 		if (curWindow->isVisible())
 		{
@@ -1663,35 +1778,283 @@ void MainWindow::MovableQMdiArea::mouseMoveEvent(QMouseEvent* event)
 			minY = std::min(minY, curWindow->y());
 			maxY = std::max(maxY, curWindow->y() + curWindow->height());
 		}
+
+		if (curWindow->isVisible() && !curWindow->isMaximized())
+		{
+			hasPannableWindow = true;
+		}
 	}
 
-	const auto pos = position(event);
-	int scrollX = m_lastX - pos.x();
-	int scrollY = m_lastY - pos.y();
+	if (hasPannableWindow)
+	{
+		return {minX, maxX, minY, maxY};
+	}
+	else
+	{
+		// If there is no visible non-maximized window, just return the visible portion of the workspace.
+		return {0, width(), 0, height()};
+	}
+}
+
+void MainWindow::MovableQMdiArea::scroll(int scrollX, int scrollY)
+{
+	// If there is an active maximized window, do not scroll! Or it will mess up the window positions
+	if (hasActiveMaxWindow()) { return; }
+
+	const auto [minX, maxX, minY, maxY] = getActiveWorkspaceArea();
+
+	// Boundaries for each region. If trying to move in a direction and its respective boundary has been passed, the
+	// movement will not happen.
+	constexpr int Margin = MainWindow::MovableQMdiArea::Margin;
+	int minXBoundary = width() - Margin;
+	int maxXBoundary = Margin;
+	int minYBoundary = height() - Margin;
+	int maxYBoundary = Margin;
 
 	scrollX = scrollX < 0 && minX >= minXBoundary ? 0 : scrollX;
 	scrollX = scrollX > 0 && maxX <= maxXBoundary ? 0 : scrollX;
 	scrollY = scrollY < 0 && minY >= minYBoundary ? 0 : scrollY;
 	scrollY = scrollY > 0 && maxY <= maxYBoundary ? 0 : scrollY;
 
-	for (auto* curWindow : subWindows)
+	for (auto* curWindow : subWindowList())
 	{
 		// if widgets are maximized, then they shouldn't be moved
 		// moving a maximized window's normalGeometry is not implemented because of difficulties
-		if (curWindow->isMaximized() == false)
+		if (!curWindow->isMaximized())
 		{
 			curWindow->move(curWindow->x() - scrollX, curWindow->y() - scrollY);
 		}
 	}
 
+	// We're not updating the scrollbars here for now because it messes up the logic when using the scrollbar itself.
+	// updateScrollBars();
+}
+
+void MainWindow::MovableQMdiArea::mousePanMove(int globalX, int globalY)
+{
+	int scrollX = m_lastX - globalX;
+	int scrollY = m_lastY - globalY;
+
+	scroll(scrollX, scrollY);
+
+	m_lastX = globalX;
+	m_lastY = globalY;
+}
+
+void MainWindow::MovableQMdiArea::mousePanEnd()
+{
+	setCursor(Qt::ArrowCursor);
+	m_isPanning = false;
+	m_isUniversalPan = false;
+}
+
+void MainWindow::MovableQMdiArea::mousePressEvent(QMouseEvent* event)
+{
+	const auto pos = event->globalPos();
+	m_isUniversalPan = false;
 	m_lastX = pos.x();
 	m_lastY = pos.y();
+	mousePanStart();
+}
+
+void MainWindow::MovableQMdiArea::mouseMoveEvent(QMouseEvent* event)
+{
+	if (!m_isPanning || m_isUniversalPan) { return; }
+
+	const auto pos = event->globalPos();
+	mousePanMove(pos.x(), pos.y());
 }
 
 void MainWindow::MovableQMdiArea::mouseReleaseEvent(QMouseEvent* event)
 {
-	setCursor(Qt::ArrowCursor);
-	m_isBeingMoved = false;
+	if (!m_isPanning || m_isUniversalPan) { return; }
+	mousePanEnd();
+}
+
+void MainWindow::MovableQMdiArea::resizeEvent(QResizeEvent* event)
+{
+	updateScrollBars();
+	QMdiArea::resizeEvent(event);
+}
+
+void MainWindow::MovableQMdiArea::childEvent(QChildEvent* event)
+{
+	if (event->type() == QEvent::ChildAdded)
+	{
+		event->child()->installEventFilter(this);
+		updateScrollBars();
+	}
+	else if (event->type() == QEvent::ChildRemoved)
+	{
+		event->child()->removeEventFilter(this);
+		updateScrollBars();
+	}
+	QMdiArea::childEvent(event);
+}
+
+bool MainWindow::MovableQMdiArea::hasActiveMaxWindow()
+{
+	for (const auto* sw : subWindowList())
+	{
+		if (sw->isVisible() && sw->isMaximized())
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool MainWindow::MovableQMdiArea::eventFilter(QObject* watched, QEvent* event)
+{
+	// First try to detect if this is a subwindow (we're installing filters on the subwindows) and whether it is being
+	// modified in a way that would affect the scrollbars.
+	if (auto* subWin = dynamic_cast<QMdiSubWindow*>(watched); subWin != nullptr)
+	{
+		// Hide scrollbars if necessary. Not all events report this properly though, for some reason.
+		// FIXME: confirm why this is the case. This is prone to bugs.
+		switch (event->type())
+		{
+		case QEvent::Hide:
+		case QEvent::Show:
+			if (hasActiveMaxWindow())
+			{
+				m_scrollBarH->hide();
+				m_scrollBarH->updateGeometry();
+
+				m_scrollBarV->hide();
+				m_scrollBarV->updateGeometry();
+			}
+			else
+			{
+				m_scrollBarH->show();
+				m_scrollBarV->show();
+			}
+			break;
+		default:
+			break;
+		}
+
+		switch (event->type())
+		{
+		case QEvent::Move:
+		case QEvent::Resize:
+		case QEvent::Hide:
+		case QEvent::Show:
+			updateScrollBars();
+			break;
+		default:
+			break;
+		}
+		return QObject::eventFilter(watched, event);
+	}
+
+	// Down here, the event filter attempts to steal mouse and keyboard events from the main window that are related to
+	// workspace panning without needing to click over a region without any widgets.
+	//
+	// When it is initiated, mouse and keyboard events within the workspace will not be passed to the widgets. Doing
+	// this allows panning without accidentally clicking on something, and also prevents MIDI keys being triggered when
+	// starting the pan.
+
+	constexpr auto UniversalPanKey = Qt::Key_S;
+	constexpr auto UniversalPanMod = Qt::AltModifier;
+
+	const auto triggerCond = [&]() -> bool { return !hasActiveMaxWindow() && underMouse(); };
+
+	if (event->type() == QEvent::KeyPress)
+	{
+		// Enable universal panning upon pressing the key combo. Only enable it if there are no maximized windows and
+		// the mouse is over the MDI area (or its children).
+		auto* ke = static_cast<QKeyEvent*>(event);
+
+		if (!m_isPanning && ke->modifiers() == UniversalPanMod && ke->key() == UniversalPanKey)
+		{
+			m_canUniversalPan = true; // this is a valid panning condition
+
+			// If we don't need a click, try starting panning right away
+			if (!universalPanClick && triggerCond())
+			{
+				m_isUniversalPan = true;
+				mousePanStart();
+			}
+
+			return true;
+		}
+		else if (m_isPanning) // Ignore other keypresses if already panning
+		{
+			return true;
+		}
+	}
+
+	if (event->type() == QEvent::KeyRelease)
+	{
+		auto* ke = static_cast<QKeyEvent*>(event);
+
+		if (!ke->isAutoRepeat() && ke->key() == UniversalPanKey)
+		{
+			m_canUniversalPan = false;
+
+			// If it's not through a click, immediately abort panning
+			if (!universalPanClick) { mousePanEnd(); }
+		}
+	}
+
+	if (event->type() == QEvent::MouseButtonPress || event->type() == QEvent::MouseButtonDblClick)
+	{
+		auto* me = static_cast<QMouseEvent*>(event);
+
+		if (universalPanClick && me->button() == Qt::LeftButton && m_canUniversalPan && triggerCond())
+		{
+			m_isUniversalPan = true;
+			const auto pos = me->globalPos();
+			m_lastX = pos.x();
+			m_lastY = pos.y();
+			mousePanStart();
+			return true;
+		}
+	}
+
+	if (event->type() == QEvent::MouseMove)
+	{
+		auto* me = static_cast<QMouseEvent*>(event);
+
+		if (m_isPanning && m_isUniversalPan)
+		{
+			const auto pos = me->globalPos();
+			mousePanMove(pos.x(), pos.y());
+			return true;
+		}
+		else if (!m_isPanning)
+		{
+			// Update "last position", but still allow the event to go through.
+			const auto pos = me->globalPos();
+			m_lastX = pos.x();
+			m_lastY = pos.y();
+		}
+	}
+
+	if (event->type() == QEvent::MouseButtonRelease)
+	{
+		auto* me = static_cast<QMouseEvent*>(event);
+		if (universalPanClick && m_isUniversalPan && me->button() == Qt::LeftButton)
+		{
+			m_canUniversalPan = false;
+			mousePanEnd();
+		}
+	}
+
+	if (event->type() == QEvent::FocusOut)
+	{
+		auto* fe = static_cast<QFocusEvent*>(event);
+
+		// If we lost the focus from going to another window, abort all possible panning.
+		if (fe->reason() != Qt::MouseFocusReason && (m_isPanning || m_isUniversalPan)) {
+			m_canUniversalPan = false;
+			mousePanEnd();
+		}
+	}
+
+	return QObject::eventFilter(watched, event);
 }
 
 } // namespace lmms::gui
