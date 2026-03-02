@@ -702,27 +702,20 @@ void MainWindow::restoreWidgetState(QWidget* w, const QDomElement& de)
 	const auto normalGeometry = QRect{
 		de.attribute("x").toInt(),
 		de.attribute("y").toInt(),
-
-		// Always make dimensions at least 1, to work around "corrupt" project files with empty size. The size needs to
-		// be positive so the rect is valid, and the minimum size is taken into account by `QWidget::setGeometry`.
-		std::max(1, de.attribute("width").toInt()),
-		std::max(1, de.attribute("height").toInt()),
+		de.attribute("width").toInt(),
+		de.attribute("height").toInt(),
 	};
 
-	if (normalGeometry.isValid())
-	{
-		// first restore the window, as attempting to resize a maximized window causes graphics glitching
-		win->setWindowState(win->windowState() & ~(Qt::WindowMaximized | Qt::WindowMinimized));
+	// First restore the window, as attempting to resize a maximized window can cause graphical glitches.
+	win->setWindowState(win->windowState() & ~(Qt::WindowMaximized | Qt::WindowMinimized));
 
-		win->setGeometry(normalGeometry);
+	// Then resize the window. There used to be validity checks here, but they are not needed anymore.
+	win->setGeometry(normalGeometry);
 
-		// set the window to its correct minimized/maximized/restored state
-		auto winState = win->windowState();
-		winState = de.attribute("maximized").toInt()
-			? (winState | Qt::WindowMaximized)
-			: (winState & ~Qt::WindowMaximized);
-		win->setWindowState(winState);
-	}
+	// Set the window to its correct "maximized?" state.
+	auto winState = win->windowState();
+	winState.setFlag(Qt::WindowMaximized, de.attribute("maximized").toInt());
+	win->setWindowState(winState);
 
 	if (const auto visible = de.attribute("visible"); !visible.isEmpty())
 	{
