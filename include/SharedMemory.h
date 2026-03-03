@@ -2,6 +2,7 @@
  * SharedMemory.h
  *
  * Copyright (c) 2022 Dominic Clark <mrdomclark/at/gmail.com>
+ * Copyright (c) 2025-2026 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -152,25 +153,21 @@ public:
 	void attach(std::string key)
 	{
 		m_data = detail::SharedMemoryData{std::move(key), std::is_const_v<T>, false};
-		m_resource.reset(m_data.get(), size_bytes());
 	}
 
 	void create(std::string key)
 	{
 		m_data = detail::SharedMemoryData{std::move(key), sizeof(T), std::is_const_v<T>, false};
-		m_resource.reset(m_data.get(), size_bytes());
 	}
 
 	void create()
 	{
 		m_data = detail::SharedMemoryData{sizeof(T), std::is_const_v<T>, false};
-		m_resource.reset(m_data.get(), size_bytes());
 	}
 
 	void detach() noexcept
 	{
 		m_data = detail::SharedMemoryData{};
-		m_resource.reset(nullptr, 0);
 	}
 
 	const std::string& key() const noexcept { return m_data.key(); }
@@ -183,11 +180,8 @@ public:
 	T& operator*() const noexcept { return *get(); }
 	explicit operator bool() const noexcept { return get() != nullptr; }
 
-	SharedMemoryResource* resource() noexcept { return &m_resource; }
-
 private:
 	detail::SharedMemoryData m_data;
-	SharedMemoryResource m_resource;
 };
 
 template<typename T>

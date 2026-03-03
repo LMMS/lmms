@@ -2,6 +2,7 @@
  * SharedMemory.cpp
  *
  * Copyright (c) 2022 Dominic Clark <mrdomclark/at/gmail.com>
+ * Copyright (c) 2025-2026 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
