@@ -238,7 +238,10 @@ void SampleTrack::setPlayingClips( bool isPlaying )
 	{
 		Clip * clip = getClip( i );
 		auto sClip = dynamic_cast<SampleClip*>(clip);
-		sClip->setIsPlaying( isPlaying );
+		if (sClip != nullptr)
+		{
+			sClip->setIsPlaying( isPlaying );
+		}
 	}
 }
 
