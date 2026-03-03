@@ -197,7 +197,7 @@ public:
 		if (isArray)
 		{
 			// Array size is stored in-band
-			m_arraySize = *static_cast<std::uint64_t*>(m_view.get());
+			m_arraySize = *static_cast<std::uint64_t*>(static_cast<void*>(m_view.get()));
 		}
 	}
 
@@ -222,7 +222,7 @@ public:
 		if (isArray)
 		{
 			// Provide array size in-band
-			new (m_view.get()) std::uint64_t(size);
+			new (static_cast<void*>(m_view.get())) std::uint64_t(size);
 			m_arraySize = size;
 		}
 	}
@@ -233,7 +233,7 @@ public:
 	auto get() const noexcept -> void*
 	{
 		return m_arraySize > 0
-			? static_cast<char*>(m_view.get()) + sizeof(std::uint64_t)
+			? static_cast<char*>(static_cast<void*>(m_view.get())) + sizeof(std::uint64_t)
 			: m_view.get();
 	}
 
