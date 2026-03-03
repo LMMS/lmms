@@ -44,9 +44,9 @@ class SharedMemoryData
 {
 public:
 	SharedMemoryData() noexcept;
-	SharedMemoryData(std::string&& key, bool readOnly);
-	SharedMemoryData(std::string&& key, std::size_t size, bool readOnly);
-	SharedMemoryData(std::size_t size, bool readOnly);
+	SharedMemoryData(std::string&& key, bool readOnly, bool isArray);
+	SharedMemoryData(std::string&& key, std::size_t size, bool readOnly, bool isArray);
+	SharedMemoryData(std::size_t size, bool readOnly, bool isArray);
 	~SharedMemoryData();
 
 	SharedMemoryData(SharedMemoryData&& other) noexcept;
@@ -67,7 +67,7 @@ public:
 
 	const std::string& key() const noexcept { return m_key; }
 	void* get() const noexcept { return m_ptr; }
-	std::size_t size_bytes() const noexcept;
+	std::size_t arraySize() const noexcept;
 
 private:
 	std::string m_key;
@@ -151,19 +151,19 @@ public:
 
 	void attach(std::string key)
 	{
-		m_data = detail::SharedMemoryData{std::move(key), std::is_const_v<T>};
+		m_data = detail::SharedMemoryData{std::move(key), std::is_const_v<T>, false};
 		m_resource.reset(m_data.get(), size_bytes());
 	}
 
 	void create(std::string key)
 	{
-		m_data = detail::SharedMemoryData{std::move(key), sizeof(T), std::is_const_v<T>};
+		m_data = detail::SharedMemoryData{std::move(key), sizeof(T), std::is_const_v<T>, false};
 		m_resource.reset(m_data.get(), size_bytes());
 	}
 
 	void create()
 	{
-		m_data = detail::SharedMemoryData{sizeof(T), std::is_const_v<T>};
+		m_data = detail::SharedMemoryData{sizeof(T), std::is_const_v<T>, false};
 		m_resource.reset(m_data.get(), size_bytes());
 	}
 
@@ -206,19 +206,19 @@ public:
 
 	void attach(std::string key)
 	{
-		m_data = detail::SharedMemoryData{std::move(key), std::is_const_v<T>};
+		m_data = detail::SharedMemoryData{std::move(key), std::is_const_v<T>, true};
 		m_resource.reset(m_data.get(), size_bytes());
 	}
 
 	void create(std::string key, std::size_t size)
 	{
-		m_data = detail::SharedMemoryData{std::move(key), size * sizeof(T), std::is_const_v<T>};
+		m_data = detail::SharedMemoryData{std::move(key), size * sizeof(T), std::is_const_v<T>, true};
 		m_resource.reset(m_data.get(), size_bytes());
 	}
 
 	void create(std::size_t size)
 	{
-		m_data = detail::SharedMemoryData{size * sizeof(T), std::is_const_v<T>};
+		m_data = detail::SharedMemoryData{size * sizeof(T), std::is_const_v<T>, true};
 		m_resource.reset(m_data.get(), size_bytes());
 	}
 
@@ -231,8 +231,8 @@ public:
 	const std::string& key() const noexcept { return m_data.key(); }
 	T* get() const noexcept { return static_cast<T*>(m_data.get()); }
 
-	std::size_t size() const noexcept { return m_data.size_bytes() / sizeof(T); }
-	std::size_t size_bytes() const noexcept { return m_data.size_bytes(); }
+	std::size_t size() const noexcept { return m_data.arraySize() / sizeof(T); }
+	std::size_t size_bytes() const noexcept { return m_data.arraySize(); }
 
 	T& operator[](std::size_t index) const noexcept { return get()[index]; }
 	explicit operator bool() const noexcept { return get() != nullptr; }
