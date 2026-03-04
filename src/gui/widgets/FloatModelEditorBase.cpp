@@ -74,38 +74,29 @@ void FloatModelEditorBase::initUi(const QString & name)
 }
 
 
-void FloatModelEditorBase::setFloatingTextPullMode()
-{
-	m_floatingTextMode = FloatingTextMode::Pull;
-	m_floatingTextRefreshRate = 0;
-
-	killTimer(m_textFloatRefreshTimerId);
-	m_textFloatRefreshTimerId = 0;
-
-	disconnect(s_textFloat, &SimpleTextFloat::visibilityChanged,
-		this, &FloatModelEditorBase::textFloatVisibilityChanged);
-}
-
-
-void FloatModelEditorBase::setFloatingTextPushMode(std::uint8_t refreshRate)
-{
-	m_floatingTextMode = FloatingTextMode::Push;
-	m_floatingTextRefreshRate = refreshRate;
-}
-
-
-void FloatModelEditorBase::pushFloatingText(const QString& text)
-{
-	if (m_floatingTextMode == FloatingTextMode::Pull || s_textFloat->source() != this) { return; }
-
-	s_textFloat->setText(m_description.trimmed() + ' ' + text);
-}
-
-
 void FloatModelEditorBase::showTextFloat(int msecBeforeDisplay, int msecDisplayTime)
 {
-	takeControlOfTextFloat();
+	if (s_textFloat->source() != this)
+	{
+		s_textFloat->setText(m_description + ' ' + getCustomFloatingText() + m_unit);
+		s_textFloat->setSource(this);
+	}
+
+	s_textFloat->moveGlobal(this, QPoint(width() + 2, 0));
 	s_textFloat->showWithDelay(msecBeforeDisplay, msecDisplayTime);
+}
+
+
+void FloatModelEditorBase::showTextFloat()
+{
+	if (s_textFloat->source() != this)
+	{
+		s_textFloat->setText(m_description + ' ' + getCustomFloatingText() + m_unit);
+		s_textFloat->setSource(this);
+	}
+
+	s_textFloat->moveGlobal(this, QPoint(width() + 2, 0));
+	s_textFloat->show();
 }
 
 
@@ -228,8 +219,7 @@ void FloatModelEditorBase::mouseMoveEvent(QMouseEvent * me)
 		m_lastMousePos = pos;
 	}
 
-	takeControlOfTextFloat();
-	s_textFloat->show();
+	showTextFloat();
 }
 
 
@@ -363,7 +353,6 @@ void FloatModelEditorBase::wheelEvent(QWheelEvent * we)
 	const int inc = direction * stepMult;
 	model()->incValue(inc);
 
-	// NOTE: Calling timerEvent(nullptr) here can cause RemotePlugin to hang
 	showTextFloat(0, 1000);
 
 	emit sliderMoved(model()->value());
@@ -431,62 +420,24 @@ void FloatModelEditorBase::friendlyUpdate()
 		&& Controller::runningFrames() % (256 * 4) != 0)
 	{ return; }
 
+	// If this float model is currently controlling the TextFloat...
+	if (textFloat().source() == this)
+	{
+		// ...and if the text changed since last time...
+		if (auto updatedText = getCustomFloatingTextUpdate())
+		{
+			// ...then update the floating text
+			s_textFloat->setText(m_description + ' ' + std::move(*updatedText) + m_unit);
+		}
+	}
+
 	update();
 }
 
 
-QString FloatModelEditorBase::pullFloatingText() const
+QString FloatModelEditorBase::getCustomFloatingText()
 {
-	return QString::number(model()->getRoundedValue()) + m_unit;
-}
-
-
-void FloatModelEditorBase::takeControlOfTextFloat()
-{
-	if (m_floatingTextMode == FloatingTextMode::Pull)
-	{
-		s_textFloat->setSource(this);
-		s_textFloat->setText(m_description.trimmed() + ' ' + pullFloatingText());
-	}
-	else if (m_floatingTextRefreshRate > 0)
-	{
-		const auto connection = connect(s_textFloat, &SimpleTextFloat::visibilityChanged,
-			this, &FloatModelEditorBase::textFloatVisibilityChanged,
-			static_cast<Qt::ConnectionType>(Qt::AutoConnection | Qt::UniqueConnection));
-
-		s_textFloat->setSource(this, connection);
-	}
-
-	s_textFloat->moveGlobal(this, QPoint(width() + 2, 0));
-}
-
-void FloatModelEditorBase::timerEvent(QTimerEvent* event)
-{
-	if (event && event->timerId() != m_textFloatRefreshTimerId) { return; }
-
-	// TODO: Thread check?
-
-	emit floatingTextUpdateRequested();
-}
-
-void FloatModelEditorBase::textFloatVisibilityChanged(bool visible)
-{
-	killTimer(m_textFloatRefreshTimerId);
-	if (visible)
-	{
-		if (m_floatingTextRefreshRate > 0)
-		{
-			// Emit timeout signal once at the very start so that the text is ready
-			// to be displayed when the text float becomes visible
-			timerEvent(nullptr);
-
-			// Now start timer normally
-			m_textFloatRefreshTimerId = startTimer(1000 / m_floatingTextRefreshRate);
-			return;
-		}
-	}
-
-	m_textFloatRefreshTimerId = 0;
+	return QString::number(model()->getRoundedValue());
 }
 
 

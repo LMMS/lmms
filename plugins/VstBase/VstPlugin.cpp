@@ -33,6 +33,7 @@
 #include <QFileInfo>
 #include <QLocale>
 #include <QTemporaryFile>
+#include <QTimerEvent>
 
 #if defined(LMMS_BUILD_LINUX) && (QT_VERSION < QT_VERSION_CHECK(6,0,0))
 #	include <QX11Info>
@@ -50,10 +51,12 @@
 #include "AudioEngine.h"
 #include "ConfigManager.h"
 #include "FileDialog.h"
+#include "FontHelper.h"
 #include "GuiApplication.h"
 #include "LocaleHelper.h"
 #include "MainWindow.h"
 #include "PathUtil.h"
+#include "SimpleTextFloat.h"
 #include "Song.h"
 
 #ifdef LMMS_BUILD_LINUX
@@ -861,5 +864,68 @@ QString VstPlugin::embedMethod() const
 	return m_embedMethod;
 }
 
+namespace gui {
 
+VstPluginKnob::VstPluginKnob(VstPlugin* plugin, int paramIndex, const QString& name, QWidget* parent)
+	: gui::Knob{gui::KnobType::Bright26, name.left(15), SMALL_FONT_SIZE, parent, name}
+	, m_plugin{plugin}
+	, m_paramIndex{paramIndex}
+{
+	assert(m_plugin != nullptr);
+	setDescription(name + ":");
+}
+
+void VstPluginKnob::timerEvent(QTimerEvent* event)
+{
+	if (event->timerId() != m_rateLimitTimerId) { return; }
+
+	if (textFloat().source() != static_cast<FloatModelEditorBase*>(this))
+	{
+		// This knob is no longer controlling the text float,
+		// so we don't need the timer to continue running.
+		killTimer(m_rateLimitTimerId);
+		m_rateLimitTimerId = 0;
+		return;
+	}
+
+	// Enough time has passed, so time for an update
+	m_updateNow = true;
+}
+
+auto VstPluginKnob::getCustomFloatingText() -> QString
+{
+	constexpr auto updatesPerSecond = 15;
+
+	if (m_rateLimitTimerId == 0)
+	{
+		// Use a timer to control the rate of text float updates.
+		// Otherwise the CPU will spike when the parameter emits a bunch of dataChanged()
+		// events in a short period of time - i.e. when the parameter's value changes rapidly.
+		m_rateLimitTimerId = startTimer(std::chrono::milliseconds{1000} / updatesPerSecond);
+	}
+
+	return getParameterText();
+}
+
+auto VstPluginKnob::getCustomFloatingTextUpdate() -> std::optional<QString>
+{
+	if (!m_updateNow) { return std::nullopt; }
+	m_updateNow = false;
+
+	return getParameterText();
+}
+
+auto VstPluginKnob::getParameterText() const -> QString
+{
+	m_plugin->updateParameterLabel(m_paramIndex);
+	m_plugin->updateParameterDisplay(m_paramIndex);
+
+	const auto& paramLabels = m_plugin->allParameterLabels();
+	const auto& paramDisplays = m_plugin->allParameterDisplays();
+	assert(paramLabels.size() == paramDisplays.size());
+
+	return paramDisplays[m_paramIndex] + ' ' + paramLabels[m_paramIndex];
+}
+
+} // namespace gui
 } // namespace lmms

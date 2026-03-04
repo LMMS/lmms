@@ -83,12 +83,6 @@ void SimpleTextFloat::show()
 	auto _ = std::lock_guard{m_mutex};
 
 	m_hideTimer->start();
-
-	if (!isVisible())
-	{
-		emit visibilityChanged(true);
-	}
-
 	QWidget::show();
 }
 
@@ -96,43 +90,10 @@ void SimpleTextFloat::hide()
 {
 	auto _ = std::lock_guard{m_mutex};
 
+	m_source = nullptr;
 	m_showTimer->stop();
 	m_hideTimer->stop();
-
-	if (isVisible())
-	{
-		emit visibilityChanged(false);
-	}
-
 	QWidget::hide();
-}
-
-void SimpleTextFloat::setSource(QObject* source)
-{
-	auto _ = std::lock_guard{m_mutex};
-
-	disconnect(m_connection);
-	m_source = source;
-	m_connection = {};
-}
-
-void SimpleTextFloat::setSource(QObject* source, QMetaObject::Connection connection)
-{
-	auto _ = std::lock_guard{m_mutex};
-
-	if (source != m_source || !source)
-	{
-		disconnect(m_connection);
-		m_connection = {};
-	}
-
-	if (connection)
-	{
-		disconnect(m_connection);
-		m_connection = connection;
-	}
-
-	m_source = source;
 }
 
 } // namespace lmms::gui

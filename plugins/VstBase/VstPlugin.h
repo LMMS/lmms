@@ -31,6 +31,7 @@
 #include <QString>
 #include <QTimer>
 
+#include "Knob.h"
 #include "JournallingObject.h"
 #include "RemotePlugin.h"
 
@@ -175,7 +176,30 @@ private:
 
 } ;
 
+namespace gui {
 
+class VSTBASE_EXPORT VstPluginKnob : public gui::Knob
+{
+public:
+	VstPluginKnob(VstPlugin* plugin, int paramIndex, const QString& name, QWidget* parent);
+	~VstPluginKnob() override = default;
+
+private:
+	void timerEvent(QTimerEvent* event) override;
+
+	auto getCustomFloatingText() -> QString;
+	auto getCustomFloatingTextUpdate() -> std::optional<QString> override;
+
+	auto getParameterText() const -> QString;
+
+	VstPlugin* m_plugin = nullptr;
+	int m_paramIndex = 0;
+
+	int m_rateLimitTimerId = 0;
+	bool m_updateNow = false;
+};
+
+} // namespace gui
 } // namespace lmms
 
 #endif

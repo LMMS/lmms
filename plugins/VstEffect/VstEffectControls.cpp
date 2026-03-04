@@ -382,15 +382,9 @@ ManageVSTEffectView::ManageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 		std::snprintf(paramStr.data(), paramStr.size(), "param%d", i);
 		s_dumpValues = dump[paramStr.data()].split(":");
 
-		const auto & description = s_dumpValues.at(1);
+		const auto& description = s_dumpValues.at(1);
 
-		auto knob = new Knob(KnobType::Bright26, description.left(15), SMALL_FONT_SIZE, widget, description);
-		knob->setDescription(description + ":");
-		knob->setFloatingTextPushMode(15);
-		connect(knob, &Knob::floatingTextUpdateRequested, this, [i, this]() {
-			updateParameterText(i);
-		}, Qt::DirectConnection);
-
+		auto knob = new VstPluginKnob{m_effect->m_plugin.get(), i, description, widget};
 		m_vstKnobs.push_back(knob);
 
 		if( !hasKnobModel )
@@ -405,7 +399,8 @@ ManageVSTEffectView::ManageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 			[this, model]() { setParameter( model ); }, Qt::DirectConnection);
 		knob->setModel(model);
 	}
-	syncParameterText();
+	m_effect->m_plugin->loadParameterLabels();
+	m_effect->m_plugin->loadParameterDisplays();
 
 	int i = 0;
 	for( int lrow = 1; lrow < ( int( m_vi->paramCount / 10 ) + 1 ) + 1; lrow++ )
@@ -467,7 +462,8 @@ void ManageVSTEffectView::syncPlugin()
 			m_vi2->knobFModel[i]->setInitValue(f_value);
 		}
 	}
-	syncParameterText();
+	m_effect->m_plugin->loadParameterLabels();
+	m_effect->m_plugin->loadParameterDisplays();
 }
 
 
@@ -504,33 +500,6 @@ void ManageVSTEffectView::setParameter( Model * action )
 	if ( m_effect->m_plugin != nullptr ) {
 		m_effect->m_plugin->setParam( knobUNID, m_vi2->knobFModel[knobUNID]->value() );
 	}
-}
-
-void ManageVSTEffectView::syncParameterText()
-{
-	m_effect->m_plugin->loadParameterLabels();
-	m_effect->m_plugin->loadParameterDisplays();
-
-	const auto& paramLabels = m_effect->m_plugin->allParameterLabels();
-	const auto& paramDisplays = m_effect->m_plugin->allParameterDisplays();
-	assert(paramLabels.size() == paramDisplays.size());
-
-	for (std::size_t i = 0; i < paramLabels.size(); ++i)
-	{
-		m_vstKnobs[i]->pushFloatingText(paramDisplays[i] + ' ' + paramLabels[i]);
-	}
-}
-
-void ManageVSTEffectView::updateParameterText(int index)
-{
-	m_effect->m_plugin->updateParameterLabel(index);
-	m_effect->m_plugin->updateParameterDisplay(index);
-
-	const auto& paramLabels = m_effect->m_plugin->allParameterLabels();
-	const auto& paramDisplays = m_effect->m_plugin->allParameterDisplays();
-	assert(paramLabels.size() == paramDisplays.size());
-
-	m_vstKnobs.at(index)->pushFloatingText(paramDisplays[index] + ' ' + paramLabels[index]);
 }
 
 ManageVSTEffectView::~ManageVSTEffectView()

@@ -246,7 +246,7 @@ public:
 	using Knob::Knob;
 
 protected:
-	QString pullFloatingText() const override;
+	QString getCustomFloatingText() override;
 	void enterValue() override;
 
 private:

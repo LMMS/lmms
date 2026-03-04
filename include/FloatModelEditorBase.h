@@ -29,9 +29,9 @@
 
 #include <QWidget>
 #include <QPoint>
+#include <optional>
 
 #include "AutomatableModelView.h"
-
 
 namespace lmms::gui
 {
@@ -61,47 +61,10 @@ public:
 		setUnit(txt_after);
 	}
 
-	//! Push model or pull model for floating text updates
-	enum class FloatingTextMode : bool
-	{
-		//! Floating text is updated by this widget calling `pullFloatingText` as needed
-		Pull,
-
-		/**
-		 * Floating text is updated by an external component calling `pushFloatingText` when needed.
-		 *
-		 * This mode may optionally function in a hybrid fashion where this widget periodically emits
-		 * the `floatingTextUpdateRequested` signal for an external component to respond to by pushing
-		 * an update to `pushFloatingText`.
-		 */
-		Push
-	};
-
-	//! In this mode, floating text is updated by this widget calling `pullFloatingText` as needed
-	void setFloatingTextPullMode();
-
-	/**
-	 * In this mode, floating text must be updated by an external component calling `pushFloatingText`.
-	 *
-	 * @param refreshRate How many times per second `floatingTextUpdateRequested` will be emitted
-	 *                    while the text float is visible
-	 */
-	void setFloatingTextPushMode(std::uint8_t refreshRate = 0);
-
-	//! When using the push mode, external components must call this to update the text float's text
-	void pushFloatingText(const QString& text);
-
 signals:
 	void sliderPressed();
 	void sliderReleased();
 	void sliderMoved(float value);
-
-	/**
-	 * In push mode, may be emitted periodically when the text float is visible.
-	 * Upon receiving this signal, call `pushFloatingText` to update the
-	 * text float's text.
-	 */
-	void floatingTextUpdateRequested();
 
 protected:
 	void contextMenuEvent(QContextMenuEvent * me) override;
@@ -124,15 +87,46 @@ protected:
 
 	virtual float getValue(const QPoint & p);
 
-	//! When using the pull mode, this method is periodically called to obtain the text float's text
-	virtual QString pullFloatingText() const;
+	/**
+	 * This method is called just prior to displaying the floating text
+	 * in order to set its value. If the getCustomFloatingTextUpdate() method
+	 * is not overridden, this method is also called to periodically update
+	 * the floating text.
+	 *
+	 * Floating text is displayed in the following format:
+	 *     "[description] [custom text][unit]"
+	 *
+	 * This method controls only the "custom text" portion.
+	 * To modify the other portions, call setDescription() or setUnit().
+	 */
+	virtual QString getCustomFloatingText();
 
-	//! Call before showing the text float
-	void takeControlOfTextFloat();
+	/**
+	 * This method is called periodically while the floating text is visible
+	 * and the value of the float model is changing, allowing dynamic updates
+	 * of the floating text.
+	 *
+	 * Floating text is displayed in the following format:
+	 *     "[description] [custom text][unit]"
+	 *
+	 * This method controls only the "custom text" portion.
+	 * To modify the other portions, call setDescription() or setUnit().
+	 *
+	 * @returns the up-to-date value for the floating text, or std::nullopt to indicate
+	 *          nothing changed and the previous floating text value should continue being used
+	 */
+	virtual std::optional<QString> getCustomFloatingTextUpdate()
+	{
+		return getCustomFloatingText();
+	}
 
 	void doConnections() override;
 
 	void showTextFloat(int msecBeforeDisplay, int msecDisplayTime);
+	void showTextFloat();
+
+	const SimpleTextFloat& textFloat() const { return *s_textFloat; }
+
 	void setPosition(const QPoint & p);
 
 	inline float pageSize() const
@@ -140,27 +134,19 @@ protected:
 		return (model()->maxValue() - model()->minValue()) / 100.0f;
 	}
 
-	static SimpleTextFloat * s_textFloat;
-
 	QPoint m_lastMousePos; //!< mouse position in last mouseMoveEvent
 	float m_leftOver;
 	bool m_buttonPressed;
 
 	DirectionOfManipulation m_directionOfManipulation;
 
-	FloatingTextMode m_floatingTextMode = FloatingTextMode::Pull;
-	std::uint8_t m_floatingTextRefreshRate = 0; //! times per second
-	int m_textFloatRefreshTimerId = 0;
-
-private:
-	void timerEvent(QTimerEvent* event) override;
-
 private slots:
 	virtual void enterValue();
 	void friendlyUpdate();
 	void toggleScale();
 
-	void textFloatVisibilityChanged(bool visible);
+private:
+	static SimpleTextFloat* s_textFloat;
 };
 
 } // namespace lmms::gui

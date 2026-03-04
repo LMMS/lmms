@@ -108,8 +108,7 @@ void Draggable::mouseMoveEvent(QMouseEvent* me)
 		emit sliderMoved(model()->value());
 		m_lastMousePos = pPos;
 
-		takeControlOfTextFloat();
-		s_textFloat->show();
+		showTextFloat();
 	}
 }
 

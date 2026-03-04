@@ -60,25 +60,16 @@ public:
 	void show();
 	void hide();
 
-	//! Stores which object is currently controlling the text float and disconnects the old source (if any)
-	void setSource(QObject* source);
-
-	//! Stores which object is currently controlling the text float and disconnects the old source (if any)
-	void setSource(QObject* source, QMetaObject::Connection connection);
-
-	//! @returns which object is currently controlling the text float
-	auto source() const -> QObject* { return m_source; }
-
-signals:
-	void visibilityChanged(bool visible);
+	const QObject* source() const { return m_source; }
+	void setSource(const QObject* source) { m_source = source; }
 
 private:
 	QLabel * m_textLabel;
 	QTimer * m_showTimer;
 	QTimer * m_hideTimer;
 
-	std::atomic<QObject*> m_source = nullptr;
-	QMetaObject::Connection m_connection;
+	//! Which object is currently controlling this text float
+	const QObject* m_source = nullptr;
 
 	// TODO: See if the mutex usage can be removed or reduced
 	std::recursive_mutex m_mutex;
