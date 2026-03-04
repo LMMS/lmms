@@ -204,19 +204,17 @@ public:
 		write( &_i, sizeof( _i ) );
 	}
 
-	inline std::string readString()
+	std::string readString()
 	{
+		std::string ret;
 		const int len = readInt();
-		if( len )
+		if (len > 0)
 		{
-			char * sc = new char[len + 1];
-			read( sc, len );
-			sc[len] = 0;
-			std::string s( sc );
-			delete[] sc;
-			return s;
+			ret.resize(static_cast<std::size_t>(len));
+			read(ret.data(), len);
+			ret[len] = '\0';
 		}
-		return std::string();
+		return ret;
 	}
 
 
@@ -481,19 +479,17 @@ public:
 		write( &_i, sizeof( _i ) );
 	}
 
-	inline std::string readString()
+	std::string readString()
 	{
+		std::string ret;
 		const int len = readInt();
-		if( len )
+		if (len > 0)
 		{
-			char * sc = new char[len + 1];
-			read( sc, len );
-			sc[len] = 0;
-			std::string s( sc );
-			delete[] sc;
-			return s;
+			ret.resize(static_cast<std::size_t>(len));
+			read(ret.data(), len);
+			ret[len] = '\0';
 		}
-		return std::string();
+		return ret;
 	}
 
 
