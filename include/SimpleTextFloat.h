@@ -58,7 +58,7 @@ public:
 	void show();
 	void hide();
 
-	//! Which object is currently controlling this text float (if known)
+	//! @returns which object is currently controlling this text float (if known)
 	const QObject* source() const { return m_source; }
 
 	//! Sets which object is currently controlling this text float

@@ -120,7 +120,6 @@ protected slots:
 	void syncPlugin();
 	void displayAutomatedOnly();
 	void setParameter( lmms::Model * action );
-	void updateParameterText(int index);
 	void closeWindow();
 
 private:
