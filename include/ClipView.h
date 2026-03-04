@@ -66,7 +66,7 @@ class ClipView : public selectableObject, public ModelView
 public:
 	const static int BORDER_WIDTH = 2;
 
-	ClipView( Clip * clip, TrackView * tv );
+	ClipView(Clip * clip, TrackView * tv, int offset = 0);
 	~ClipView() override;
 
 	bool fixedClips();
@@ -79,6 +79,11 @@ public:
 	inline TrackView * getTrackView()
 	{
 		return m_trackView;
+	}
+
+	inline int offset() const
+	{
+		return m_offset;
 	}
 
 	// qproperty access func
@@ -135,6 +140,10 @@ public slots:
 	void randomizeColor();
 	void resetColor();
 
+signals:
+	void closing();
+	void extandLoop();
+
 protected:
 	enum class ContextMenuAction
 	{
@@ -142,7 +151,8 @@ protected:
 		Cut,
 		Copy,
 		Paste,
-		Mute
+		Mute,
+		Loop
 	};
 
 	TrackView * m_trackView;
@@ -181,9 +191,22 @@ protected:
 
 	auto hasCustomColor() const -> bool;
 
+	inline bool lastLoopView()
+	{
+		return m_offset == m_clip->loopCount();
+	}
+
 protected slots:
 	void updateLength();
 	void updatePosition();
+	void closeLoopViews();
+
+	/**
+	 * Create a new loop view
+	 */
+	virtual void loop()
+	{
+	};
 
 
 private:
@@ -202,6 +225,7 @@ private:
 	static TextFloat * s_textFloat;
 
 	Clip * m_clip;
+	int m_offset; // Offset of the View from the Clip, in Clip's lengths (offset != 0 => loop view)
 	Action m_action;
 	QPoint m_initialMousePos;
 	QPoint m_initialMouseGlobalPos;

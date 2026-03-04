@@ -78,13 +78,14 @@ TextFloat * ClipView::s_textFloat = nullptr;
  * \param _tv  The track view that will contain the new object
  */
 ClipView::ClipView( Clip * clip,
-							TrackView * tv ) :
+							TrackView * tv , int offset) :
 	selectableObject( tv->getTrackContentWidget() ),
 	ModelView( nullptr, this ),
 	m_trackView( tv ),
 	m_initialClipPos( TimePos(0) ),
 	m_initialClipEnd( TimePos(0) ),
 	m_clip( clip ),
+	m_offset( offset ),
 	m_action( Action::None ),
 	m_initialMousePos( QPoint( 0, 0 ) ),
 	m_initialMouseGlobalPos( QPoint( 0, 0 ) ),
@@ -130,6 +131,11 @@ ClipView::ClipView( Clip * clip,
 		// redraw if clip uses track color
 		if (!m_clip->color().has_value()) { update(); }
 	});
+
+	if (offset != 0)
+	{
+		clip->increaseLoopCount();
+	}
 
 	m_trackView->getTrackContentWidget()->addClipView( this );
 	updateLength();
@@ -264,6 +270,10 @@ void ClipView::setNeedsUpdate( bool b )
  */
 bool ClipView::close()
 {
+	if (m_offset != 0)
+	{
+		m_clip->decreaseLoopCount();
+	}
 	m_trackView->getTrackContentWidget()->removeClipView( this );
 	return QWidget::close();
 }
@@ -341,6 +351,15 @@ void ClipView::updatePosition()
 	// moving a Clip can result in change of song-length etc.,
 	// therefore we update the track-container
 	m_trackView->trackContainerView()->update();
+}
+
+void ClipView::closeLoopViews()
+{
+	if (m_offset != 0)
+	{
+		closing();
+		close();
+	}
 }
 
 void ClipView::selectColor()
@@ -486,8 +505,8 @@ void ClipView::updateCursor(QMouseEvent * me)
 {
 	const auto posX = position(me).x();
 
-	// If we are at the edges, use the resize cursor
-	if (!me->buttons() && m_clip->manuallyResizable() && !isSelected()
+	// If we are at the edges, use the resize cursor (loop views are not allowed to be resized directly)
+	if (!me->buttons() && m_clip->manuallyResizable() && !isSelected() && !m_offset
 		&& ((posX > width() - RESIZE_GRIP_WIDTH) || (posX < RESIZE_GRIP_WIDTH)))
 	{
 		setCursor(Qt::SizeHorCursor);
@@ -495,7 +514,14 @@ void ClipView::updateCursor(QMouseEvent * me)
 	// If we are in the middle on knife mode, use the knife cursor
 	else if (m_trackView->trackContainerView()->knifeMode() && !isSelected())
 	{
-		setCursor(Qt::SplitHCursor);
+		if (m_offset == 0)
+		{
+			setCursor(Qt::SplitHCursor);
+		}
+		else // Knife mode have no effect on loop views, we use the Forbidden cursor
+		{
+			setCursor(Qt::ForbiddenCursor);
+		}
 	}
 	// If we are in the middle in any other mode, use the hand cursor
 	else { setCursor(Qt::PointingHandCursor); }
@@ -719,7 +745,7 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 			{
 				hint = tr("Press <%1> and drag to make a copy.");
 			}
-			else if (m_action == Action::Split)
+			else if (m_action == Action::Split && m_offset == 0)
 			{
 				hint = dynamic_cast<MidiClipView*>(this)
 					? tr("Press <%1> or <Alt> for unquantized splitting.\nPress <Shift> for destructive splitting.")
@@ -743,10 +769,12 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 		{
 			remove( active );
 		}
-		if (m_action == Action::Split)
+		if (m_action == Action::Split && m_offset == 0)
 		{
 			m_action = Action::None;
 			setMarkerEnabled(false);
+			// Destroy the loop
+			closing();
 			update();
 		}
 	}
@@ -758,7 +786,15 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 		}
 		else if( !fixedClips() )
 		{
-			remove( active );
+			closing();
+			if (m_offset)
+			{
+				close();
+			}
+			else
+			{
+				remove( active );
+			}
 		}
 	}
 }
@@ -873,7 +909,7 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 			( *it )->movePosition( newPos + m_initialOffsets[index] );
 		}
 	}
-	else if( m_action == Action::Resize || m_action == Action::ResizeLeft )
+	else if( ( m_action == Action::Resize || m_action == Action::ResizeLeft ) && !m_offset ) // Loop views can't be resized directly
 	{
 		const float snapSize = getGUI()->songEditor()->m_editor->getSnapSize();
 		// Length in ticks of one snap increment
@@ -987,8 +1023,9 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 				arg( m_clip->endPosition().getTicks() %
 						TimePos::ticksPerBar() ) );
 		s_textFloat->moveGlobal( this, QPoint( width() + 2, height() + 2) );
+		updatePosition();
 	}
-	else if( m_action == Action::Split )
+	else if( m_action == Action::Split && m_offset == 0 )
 	{
 		setCursor(Qt::SplitHCursor);
 		setMarkerPos(knifeMarkerPos(me));
@@ -1024,7 +1061,7 @@ void ClipView::mouseReleaseEvent( QMouseEvent * me )
 		// TODO: Fix m_clip->setJournalling() consistency
 		m_clip->setJournalling( true );
 	}
-	else if( m_action == Action::Split )
+	else if( m_action == Action::Split && m_offset == 0 )
 	{
 		const float ppb = m_trackView->trackContainerView()->pixelsPerBar();
 		const TimePos relPos = position(me).x() * TimePos::ticksPerBar() / ppb;
@@ -1037,6 +1074,8 @@ void ClipView::mouseReleaseEvent( QMouseEvent * me )
 			splitClip(unquantizedModHeld(me) ? relPos : quantizeSplitPos(relPos));
 		}
 		setMarkerEnabled(false);
+		// Destroy loop
+		closing();
 	}
 
 	m_action = Action::None;
@@ -1103,6 +1142,14 @@ void ClipView::contextMenuEvent( QContextMenuEvent * cme )
 		tr( "Paste" ),
 		[this](){ contextMenuAction( ContextMenuAction::Paste ); } );
 
+	if (m_clip->loopable())
+	{
+		contextMenu.addAction(
+			embed::getIconPixmap( "loop_points_on" ),
+			tr( "Loop" ),
+			[this](){ contextMenuAction( ContextMenuAction::Loop ); } );
+	}
+
 	contextMenu.addSeparator();
 
 	contextMenu.addAction(
@@ -1154,6 +1201,9 @@ void ClipView::contextMenuAction( ContextMenuAction action )
 			break;
 		case ContextMenuAction::Mute:
 			toggleMute( active );
+			break;
+		case ContextMenuAction::Loop:
+			loop();
 			break;
 	}
 }
