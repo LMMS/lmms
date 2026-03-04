@@ -61,8 +61,6 @@ void SimpleTextFloat::setText(const QString & text)
 
 void SimpleTextFloat::showWithDelay(int msecBeforeDisplay, int msecDisplayTime)
 {
-	auto _ = std::lock_guard{m_mutex};
-
 	if (msecBeforeDisplay > 0)
 	{
 		m_showTimer->start(msecBeforeDisplay);
@@ -80,16 +78,12 @@ void SimpleTextFloat::showWithDelay(int msecBeforeDisplay, int msecDisplayTime)
 
 void SimpleTextFloat::show()
 {
-	auto _ = std::lock_guard{m_mutex};
-
 	m_hideTimer->start();
 	QWidget::show();
 }
 
 void SimpleTextFloat::hide()
 {
-	auto _ = std::lock_guard{m_mutex};
-
 	m_source = nullptr;
 	m_showTimer->stop();
 	m_hideTimer->stop();

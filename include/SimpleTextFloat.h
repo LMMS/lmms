@@ -26,8 +26,6 @@
 #define LMMS_GUI_SIMPLE_TEXT_FLOAT_H
 
 #include <QWidget>
-#include <atomic>
-#include <mutex>
 
 #include "lmms_export.h"
 
@@ -60,7 +58,10 @@ public:
 	void show();
 	void hide();
 
+	//! Which object is currently controlling this text float (if known)
 	const QObject* source() const { return m_source; }
+
+	//! Sets which object is currently controlling this text float
 	void setSource(const QObject* source) { m_source = source; }
 
 private:
@@ -70,9 +71,6 @@ private:
 
 	//! Which object is currently controlling this text float
 	const QObject* m_source = nullptr;
-
-	// TODO: See if the mutex usage can be removed or reduced
-	std::recursive_mutex m_mutex;
 };
 
 } // namespace lmms::gui
