@@ -22,34 +22,29 @@
  *
  */
 
-#include <QtGlobal>
-
-#include "VstPlugin.h"
-
 #include "Vestige.h"
 
-#include <cassert>
-#include <memory>
-
+#include <QDomElement>
 #include <QDropEvent>
 #include <QGridLayout>
+#include <QMdiArea>
+#include <QMenu>
 #include <QPainter>
 #include <QPushButton>
 #include <QScrollArea>
-#include <QMdiArea>
-#include <QMenu>
-#include <QDomElement>
-
+#include <QtGlobal>
+#include <memory>
 
 #include "AudioEngine.h"
+#include "Clipboard.h"
 #include "ConfigManager.h"
+#include "embed.h"
 #include "Engine.h"
 #include "FileDialog.h"
-#include "GuiApplication.h"
 #include "FontHelper.h"
+#include "GuiApplication.h"
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
-#include "Knob.h"
 #include "LocaleHelper.h"
 #include "MainWindow.h"
 #include "PathUtil.h"
@@ -58,9 +53,7 @@
 #include "StringPairDrag.h"
 #include "SubWindow.h"
 #include "TextFloat.h"
-#include "Clipboard.h"
-
-#include "embed.h"
+#include "VstPlugin.h"
 
 namespace lmms
 {

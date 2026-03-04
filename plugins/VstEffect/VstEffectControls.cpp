@@ -24,8 +24,8 @@
 
 #include "VstEffectControls.h"
 
-#include <cassert>
 #include <QAction>
+#include <QApplication>
 #include <QDomElement>
 #include <QGridLayout>
 #include <QMenu>
@@ -33,17 +33,13 @@
 #include <QScrollArea>
 
 #include "embed.h"
-#include "FontHelper.h"
-#include "Knob.h"
+#include "GuiApplication.h"
+#include "LocaleHelper.h"
+#include "MainWindow.h"
+#include "SubWindow.h"
 #include "VstEffectControlDialog.h"
 #include "VstEffect.h"
 #include "VstPlugin.h"
-
-#include "LocaleHelper.h"
-#include "MainWindow.h"
-#include "GuiApplication.h"
-#include "SubWindow.h"
-#include <QApplication>
 
 namespace lmms
 {
