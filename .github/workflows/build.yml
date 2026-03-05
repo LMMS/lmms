@@ -323,9 +323,7 @@ jobs:
           ccache --zero-stats
           cmake -S . \
                 -B build \
-                -DCMAKE_TOOLCHAIN_FILE="./cmake/toolchains/MinGW-W64-64.cmake" \
-                -DVCPKG_TARGET_TRIPLET="x64-mingw-static" \
-                -DVCPKG_HOST_TRIPLET="x64-linux" \
+                -DCMAKE_TOOLCHAIN_FILE="./cmake/toolchains/x64-mingw-vcpkg.cmake" \
                 -DVCPKG_MANIFEST_INSTALL="${{ env.should_install_manifest }}" \
                 $CMAKE_OPTS
         env:

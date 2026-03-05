@@ -9,6 +9,10 @@ if(NOT DEFINED VCPKG_INSTALLED_DIR)
 	set(VCPKG_INSTALLED_DIR "${CMAKE_BINARY_DIR}/vcpkg_installed")
 endif()
 
+if(NOT DEFINED VCPKG_TARGET_TRIPLET)
+	set(VCPKG_TARGET_TRIPLET "x64-mingw-static" CACHE STRING "Vcpkg target triplet" FORCE)
+endif()
+
 set(CMAKE_SYSTEM_NAME               Windows)
 set(CMAKE_SYSTEM_VERSION            1)
 
