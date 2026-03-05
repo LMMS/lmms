@@ -186,8 +186,8 @@ void Lb302Filter3Pole::envRecalc()
 #else
 	kfcn = w;
 #endif
-	kp   = ((-2.7528f * kfcn + 3.0429f) * kfcn + 1.718f) * kfcn - 0.9984f;
-	kp1  = kp + 1.f;
+	kp = ((-2.7528f * kfcn + 3.0429f) * kfcn + 1.718f) * kfcn - 0.9984f;
+	const auto kp1  = kp + 1.f;
 	kp1h = 0.5f * kp1;
 #ifdef LB_24_RES_TRICK
 	k = std::exp(-w / m_vcf.resCoeff);

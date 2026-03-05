@@ -131,8 +131,7 @@ protected:
 	static constexpr float s_volAdjust = 3.f;
 	float kfcn;
 	float kp;
-	float kp1;
-	float kp1h;
+	float kp1h; //!< Cached value of (@ref kp + 1) / 2
 	float kres;
 	float ay1 = 0.f;
 	float ay2 = 0.f;
