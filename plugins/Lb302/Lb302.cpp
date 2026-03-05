@@ -182,34 +182,33 @@ void Lb302Filter3Pole::envRecalc()
 
 #ifdef LB_24_IGNORE_ENVELOPE
 	// kfcn = fs->cutoff;
-	kfcn = 2.f * kfco / Engine::audioEngine()->outputSampleRate();
+	m_kfcn = 2.f * kfco / Engine::audioEngine()->outputSampleRate();
 #else
 	kfcn = w;
 #endif
-	kp = ((-2.7528f * kfcn + 3.0429f) * kfcn + 1.718f) * kfcn - 0.9984f;
-	const auto kp1  = kp + 1.f;
-	kp1h = 0.5f * kp1;
+	m_kp = ((-2.7528f * m_kfcn + 3.0429f) * m_kfcn + 1.718f) * m_kfcn - 0.9984f;
+	const auto kp1  = m_kp + 1.f;
+	m_kp1h = 0.5f * kp1;
 #ifdef LB_24_RES_TRICK
 	k = std::exp(-w / m_vcf.resCoeff);
 	kres = k * (((-2.7079f * kp1 + 10.963f) * kp1 - 14.934f) * kp1 + 8.4974f);
 #else
-	kres = fs->reso * (((-2.7079f * kp1 + 10.963f) * kp1 - 14.934f) * kp1 + 8.4974f);
+	m_kres = fs->reso * (((-2.7079f * kp1 + 10.963f) * kp1 - 14.934f) * kp1 + 8.4974f);
 #endif
-	value = 1.f + (fs->dist * (1.5f + 2.f * kres * (1.f - kfcn))); // ENVMOD was DIST
+	m_value = 1.f + (fs->dist * (1.5f + 2.f * m_kres * (1.f - m_kfcn))); // ENVMOD was DIST
 }
 
 
 sample_t Lb302Filter3Pole::process(sample_t samp)
 {
-	float ax1  = lastin;
-	float ay11 = ay1;
-	float ay31 = ay2;
-	lastin  = samp - std::tanh(kres * aout);
-	ay1     = kp1h * (lastin + ax1) - kp * ay1;
-	ay2     = kp1h * (ay1 + ay11) - kp * ay2;
-	aout    = kp1h * (ay2 + ay31) - kp * aout;
-
-	return std::tanh(aout * value) * s_volAdjust / (1.f + fs->dist);
+	static constexpr float s_volAdjust = 3.f;
+	const sample_t ax1 = m_lastin;
+	const std::array<sample_t, 2> ay1 = { m_ay[0], m_ay[1] };
+	m_lastin = samp - std::tanh(m_kres * m_ay[2]);
+	m_ay[0]  = m_kp1h * (m_lastin + ax1)   - m_kp * m_ay[0];
+	m_ay[1]  = m_kp1h * (m_ay[0] + ay1[0]) - m_kp * m_ay[1];
+	m_ay[2]  = m_kp1h * (m_ay[1] + ay1[1]) - m_kp * m_ay[2];
+	return std::tanh(m_ay[2] * m_value) * s_volAdjust / (1.f + fs->dist);
 }
 
 

@@ -128,16 +128,13 @@ public:
 	sample_t process(sample_t samp) override;
 
 protected:
-	static constexpr float s_volAdjust = 3.f;
-	float kfcn;
-	float kp;
-	float kp1h; //!< Cached value of (@ref kp + 1) / 2
-	float kres;
-	float ay1 = 0.f;
-	float ay2 = 0.f;
-	float aout = 0.f;
-	float lastin = 0.f;
-	float value;
+	float m_kfcn;
+	float m_kp;
+	float m_kp1h; //!< Cached value of (@ref kp + 1) / 2
+	float m_kres;
+	std::array<sample_t, 3> m_ay = { 0.f, 0.f, 0.f };
+	float m_lastin = 0.f;
+	float m_value;
 };
 
 
