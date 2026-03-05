@@ -27,7 +27,7 @@
 #include "fft_helpers.h"
 
 #include <cmath>
-#include <numbers>
+#include "lmms_constants.h"
 
 namespace lmms
 {
