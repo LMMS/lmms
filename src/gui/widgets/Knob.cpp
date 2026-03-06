@@ -533,7 +533,7 @@ void Knob::changeEvent(QEvent * ev)
 
 QString VolumeKnob::getCustomFloatingText()
 {
-	auto const valueToVolumeRatio = model()->getRoundedValue() / volumeRatio();
+	const auto valueToVolumeRatio = model()->getRoundedValue() / volumeRatio();
 	return valueToVolumeRatio == 0.
 		? QString("-∞ dBFS")
 		: QString("%1 dBFS").arg(ampToDbfs(valueToVolumeRatio), 3, 'f', 2);
@@ -541,8 +541,8 @@ QString VolumeKnob::getCustomFloatingText()
 
 void VolumeKnob::enterValue()
 {
-	auto const initalValue = model()->getRoundedValue() / 100.0;
-	auto const initialDbValue = initalValue > 0. ? ampToDbfs(initalValue) : -96;
+	const auto initalValue = model()->getRoundedValue() / 100.0;
+	const auto initialDbValue = initalValue > 0. ? ampToDbfs(initalValue) : -96;
 
 	bool ok = false;
 	float newVal = QInputDialog::getDouble(

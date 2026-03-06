@@ -103,7 +103,7 @@ void FloatModelEditorBase::showTextFloat()
 float FloatModelEditorBase::getValue(const QPoint & p)
 {
 	// Find out which direction/coordinate is relevant for this control
-	int const coordinate = m_directionOfManipulation == DirectionOfManipulation::Vertical ? p.y() : -p.x();
+	const int coordinate = m_directionOfManipulation == DirectionOfManipulation::Vertical ? p.y() : -p.x();
 
 	// knob value increase is linear to mouse movement
 	float value = .4f * coordinate;
@@ -277,16 +277,16 @@ void FloatModelEditorBase::paintEvent(QPaintEvent *)
 {
 	QPainter p(this);
 
-	QColor const foreground(3, 94, 97);
+	const auto foreground = QColor{3, 94, 97};
 
-	auto const * mod = model();
-	auto const minValue = mod->minValue();
-	auto const maxValue = mod->maxValue();
-	auto const range = maxValue - minValue;
+	const auto* mod = model();
+	const auto minValue = mod->minValue();
+	const auto maxValue = mod->maxValue();
+	const auto range = maxValue - minValue;
 
 	// Compute the percentage
 	// min + x * (max - min) = v <=> x = (v - min) / (max - min)
-	auto const percentage = range == 0 ? 1. : (mod->value() - minValue) / range;
+	const auto percentage = range == 0 ? 1. : (mod->value() - minValue) / range;
 
 	QRect r = rect();
 	p.setPen(foreground);
@@ -302,15 +302,15 @@ void FloatModelEditorBase::wheelEvent(QWheelEvent * we)
 	float direction = deltaY > 0 ? 1 : -1;
 
 	auto * m = model();
-	float const step = m->step<float>();
-	float const range = m->range();
+	const float step = m->step<float>();
+	const float range = m->range();
 
 	// This is the default number of steps or mouse wheel events that it takes to sweep
 	// from the lowest value to the highest value.
 	// It might be modified if the user presses modifier keys. See below.
 	float numberOfStepsForFullSweep = 100.;
 
-	auto const modKeys = we->modifiers();
+	const auto modKeys = we->modifiers();
 	if (modKeys == Qt::ShiftModifier)
 	{
 		// The shift is intended to go through the values in very coarse steps as in:
@@ -332,7 +332,7 @@ void FloatModelEditorBase::wheelEvent(QWheelEvent * we)
 		// left and right. Account for this quirk.
 		if (deltaY == 0)
 		{
-			int const deltaX = we->angleDelta().x();
+			const int deltaX = we->angleDelta().x();
 			if (deltaX != 0)
 			{
 				direction = deltaX > 0 ? 1 : -1;
