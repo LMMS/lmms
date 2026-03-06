@@ -80,7 +80,7 @@ private:
 
 
 //! Similar to std::pmr::monotonic_buffer_resource, but the initial buffer can be replaced
-class SharedMemoryResource : public std::pmr::memory_resource
+class SharedMemoryResource final : public std::pmr::memory_resource
 {
 public:
 	SharedMemoryResource() = default;
@@ -89,7 +89,12 @@ public:
 		, m_availableBytes{bufferSize}
 		, m_initialBuffer{buffer}
 		, m_initialBufferSize{bufferSize}
-	{ }
+	{}
+
+	SharedMemoryResource(const SharedMemoryResource&) = delete;
+	auto operator=(const SharedMemoryResource&) -> SharedMemoryResource& = delete;
+	SharedMemoryResource(SharedMemoryResource&&) = default;
+	auto operator=(SharedMemoryResource&&) -> SharedMemoryResource& = default;
 
 	//! Returns the buffer back to its initial state
 	void reset() noexcept
@@ -98,6 +103,7 @@ public:
 		m_availableBytes = m_initialBufferSize;
 	}
 
+	//! @returns the number of bytes that can still be allocated
 	auto availableBytes() const noexcept -> std::size_t { return m_availableBytes; }
 
 	template<typename T>

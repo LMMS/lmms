@@ -47,6 +47,18 @@
 
 namespace lmms::detail {
 
+namespace {
+
+//! Header for communicating the shared memory's data size in-band
+struct Header
+{
+	//! The requested shared memory data size in bytes.
+	//! `sizeof(Header) + size` is the total allocation size.
+	std::uint64_t size;
+};
+
+} // namespace
+
 #if _POSIX_SHARED_MEMORY_OBJECTS > 0 || defined(LMMS_BUILD_APPLE)
 
 namespace {
@@ -98,7 +110,7 @@ public:
 		if (isArray)
 		{
 			// Array size is stored in-band
-			m_arraySize = *static_cast<std::uint64_t*>(m_mapping);
+			m_arraySize = static_cast<Header*>(m_mapping)->size;
 		}
 	}
 
@@ -108,7 +120,7 @@ public:
 	{
 		if (isArray)
 		{
-			m_size += sizeof(std::uint64_t); // space for writing the array size
+			m_size += sizeof(Header); // space for the header
 			m_arraySize = size;
 		}
 
@@ -128,8 +140,7 @@ public:
 
 		if (isArray)
 		{
-			// Provide array size in-band
-			new (m_mapping) std::uint64_t(size);
+			new (m_mapping) Header(size);
 		}
 	}
 
@@ -144,7 +155,7 @@ public:
 	auto get() const noexcept -> void*
 	{
 		return m_arraySize > 0
-			? static_cast<char*>(m_mapping) + sizeof(std::uint64_t)
+			? static_cast<char*>(m_mapping) + sizeof(Header)
 			: m_mapping;
 	}
 
@@ -197,14 +208,14 @@ public:
 		if (isArray)
 		{
 			// Array size is stored in-band
-			m_arraySize = *static_cast<std::uint64_t*>(static_cast<void*>(m_view.get()));
+			m_arraySize = static_cast<Header*>(static_cast<void*>(m_view.get()))->size;
 		}
 	}
 
 	SharedMemoryImpl(const std::string& key, std::size_t size, bool readOnly, bool isArray)
 	{
 		const auto [high, low] = isArray
-			? sizeToHighAndLow(size + sizeof(std::uint64_t))
+			? sizeToHighAndLow(size + sizeof(Header))
 			: sizeToHighAndLow(size);
 		m_mapping.reset(CreateFileMappingA(INVALID_HANDLE_VALUE, nullptr, PAGE_READWRITE, high, low, key.c_str()));
 		// This constructor is supposed to create a new shared memory object,
@@ -221,8 +232,7 @@ public:
 
 		if (isArray)
 		{
-			// Provide array size in-band
-			new (static_cast<void*>(m_view.get())) std::uint64_t(size);
+			new (static_cast<void*>(m_view.get())) Header(size);
 			m_arraySize = size;
 		}
 	}
@@ -233,7 +243,7 @@ public:
 	auto get() const noexcept -> void*
 	{
 		return m_arraySize > 0
-			? static_cast<char*>(static_cast<void*>(m_view.get())) + sizeof(std::uint64_t)
+			? static_cast<char*>(static_cast<void*>(m_view.get())) + sizeof(Header)
 			: m_view.get();
 	}
 
