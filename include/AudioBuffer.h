@@ -53,12 +53,27 @@ namespace lmms
  *       where the 1st group contains 2 channels (stereo) and the 2nd contains 4 channels (quadraphonic).
  * - Extensive unit testing - @ref AudioBufferTest.cpp
  *
- * When this class is used in an instrument track or mixer channel, its channels could be referred to
- * as "track channels" or "internal channels", since they are equivalent to the "track channels" used
- * in other DAWs such as REAPER.
+ * Audio data layout explanation:
+ * - All planar audio data for all channels in an AudioBuffer is sourced from the same large contiguous
+ *       buffer called the source buffer (m_sourceBuffer).
+ * - The source buffer consists of the buffer for 1st channel followed by the buffer for the 2nd channel, and so on
+ *       for all channels. In total, the number of elements is `channels * frames`.
+ * - A separate vector of non-owning pointers to channel buffers is also maintained. In this vector, each index
+ *       corresponds to a channel, providing a mapping from the channel index to a pointer to the start of that
+ *       channel's buffer within the source buffer. This is called the access buffer (m_accessBuffer).
+ * - The purpose of the access buffer is to provide channel-wise access to buffers within the source buffer, so
+ *       it's `m_accessBuffer[channelIdx][frameIdx]` instead of `m_sourceBuffer[channelIdx * frames + frameIdx]`.
+ *       This is very important since many APIs dealing with planar audio expect it in this `float**` 2D array form.
+ * - Groups have no effect on the audio data layout in the source/access buffers and are merely a layer built on top.
+ *       Conveniently, if you take `m_accessBuffer` and offset it by `channelIndex`, you get another `float**`
+ *       starting at that channel. This what the `float**` buffer stored in each ChannelGroup is.
  *
- * When this class is used in an audio processor or audio plugin, its channels could be referred to
- * as "processor channels" or "plugin channels".
+ * Naming notes:
+ * - When this class is used in an instrument track or mixer channel, its channels could be referred to
+ *       as "track channels" or "internal channels", since they are equivalent to the "track channels" used
+ *       in other DAWs such as REAPER.
+ * - When this class is used in an audio processor or audio plugin, its channels could be referred to
+ *       as "processor channels" or "plugin channels".
  */
 class LMMS_EXPORT AudioBuffer
 {
@@ -104,7 +119,7 @@ public:
 		 */
 		float** m_buffers = nullptr;
 
-		//! Number of channels in `m_channelBuffers` - currently only 2 is used
+		//! Number of channels in `m_buffers` - currently only 2 is used
 		ch_cnt_t m_channels = 0;
 	};
 
@@ -120,28 +135,28 @@ public:
 	 *
 	 * Silence tracking is enabled or disabled depending on the auto-quit setting.
 	 *
-	 * @param frames frame count for all channels
+	 * @param frames frame count for each channel
 	 * @param channels channel count for the 1st group, or zero to skip adding the 1st group
-	 * @param bufferResource allocator for all buffers
+	 * @param resource memory resource for all buffers
 	 */
 	explicit AudioBuffer(f_cnt_t frames, ch_cnt_t channels = DEFAULT_CHANNELS,
-		std::pmr::memory_resource* bufferResource = std::pmr::get_default_resource());
+		std::pmr::memory_resource* resource = std::pmr::get_default_resource());
 
 	/**
 	 * Creates AudioBuffer with groups defined.
 	 *
 	 * Silence tracking is enabled or disabled depending on the auto-quit setting.
 	 *
-	 * @param frames frame count for all channels
+	 * @param frames frame count for each channel
 	 * @param channels total channel count
 	 * @param groups group count
-	 * @param bufferResource allocator for all buffers
+	 * @param resource memory resource for all buffers
 	 * @param groupVisitor see @ref setGroups
 	 */
 	template<class F>
 	AudioBuffer(f_cnt_t frames, ch_cnt_t channels, group_cnt_t groups,
-		std::pmr::memory_resource* bufferResource, F&& groupVisitor)
-		: AudioBuffer{frames, channels, bufferResource}
+		std::pmr::memory_resource* resource, F&& groupVisitor)
+		: AudioBuffer{frames, channels, resource}
 	{
 		setGroups(groups, std::forward<F>(groupVisitor));
 	}
@@ -167,13 +182,13 @@ public:
 	//! @returns the buffers for all channel groups
 	auto allBuffers() const -> PlanarBufferView<const float>
 	{
-		return {m_channelBuffers.data(), totalChannels(), m_frames};
+		return {m_accessBuffer.data(), totalChannels(), m_frames};
 	}
 
 	//! @returns the buffers for all channel groups
 	auto allBuffers() -> PlanarBufferView<float>
 	{
-		return {m_channelBuffers.data(), totalChannels(), m_frames};
+		return {m_accessBuffer.data(), totalChannels(), m_frames};
 	}
 
 	//! @returns the buffers of the given channel group
@@ -195,17 +210,17 @@ public:
 	//! @returns the buffer for the given channel
 	auto buffer(ch_cnt_t channel) const -> std::span<const float>
 	{
-		return {m_channelBuffers[channel], m_frames};
+		return {m_accessBuffer[channel], m_frames};
 	}
 
 	//! @returns the buffer for the given channel
 	auto buffer(ch_cnt_t channel) -> std::span<float>
 	{
-		return {m_channelBuffers[channel], m_frames};
+		return {m_accessBuffer[channel], m_frames};
 	}
 
 	//! @returns the total channel count (never exceeds MaxChannelsPerAudioBuffer)
-	auto totalChannels() const -> ch_cnt_t { return static_cast<ch_cnt_t>(m_channelBuffers.size()); }
+	auto totalChannels() const -> ch_cnt_t { return static_cast<ch_cnt_t>(m_accessBuffer.size()); }
 
 	//! @returns the frame count for each channel buffer
 	auto frames() const -> f_cnt_t { return m_frames; }
@@ -260,7 +275,7 @@ public:
 			const auto channels = groupVisitor(idx, group);
 			if (channels == 0) { throw std::runtime_error{"group cannot have zero channels"}; }
 
-			group.setBuffers(&m_channelBuffers[ch]);
+			group.setBuffers(&m_accessBuffer[ch]);
 			group.setChannels(channels);
 
 			ch += channels;
@@ -370,7 +385,7 @@ private:
 	 *
 	 * [channel index][frame index]
 	 */
-	std::pmr::vector<float*> m_channelBuffers;
+	std::pmr::vector<float*> m_accessBuffer;
 
 	/**
 	 * Interleaved scratch buffer for conversions between interleaved and planar.

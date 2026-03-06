@@ -61,7 +61,7 @@ auto createMask(ch_cnt_t pos) noexcept -> AudioBuffer::ChannelFlags
 AudioBuffer::AudioBuffer(f_cnt_t frames, ch_cnt_t channels,
 	std::pmr::memory_resource* bufferResource)
 	: m_sourceBuffer{bufferResource}
-	, m_channelBuffers{bufferResource}
+	, m_accessBuffer{bufferResource}
 	, m_interleavedBuffer{bufferResource}
 	, m_frames{frames}
 	, m_silenceTrackingEnabled{ConfigManager::inst()->value("ui", "disableautoquit", "1").toInt() == 0}
@@ -86,7 +86,7 @@ void AudioBuffer::allocateInterleavedBuffer()
 auto AudioBuffer::allocationSize(f_cnt_t frames, ch_cnt_t channels, bool withInterleavedBuffer) -> std::size_t
 {
 	auto bytes = frames * channels * sizeof(float) // for m_sourceBuffer
-		+ channels * sizeof(float*); // for m_channelBuffers
+		+ channels * sizeof(float*); // for m_accessBuffer
 
 	if (withInterleavedBuffer)
 	{
@@ -121,7 +121,7 @@ auto AudioBuffer::addGroup(ch_cnt_t channels) -> ChannelGroup*
 	// Check if using a shared memory resource since its semantics are
 	// more restrictive than the default memory resource
 	const auto usesSharedMemory = dynamic_cast<SharedMemoryResource*>(
-		m_channelBuffers.get_allocator().resource()) != nullptr;
+		m_accessBuffer.get_allocator().resource()) != nullptr;
 
 	const auto usesInterleavedBuffer = hasInterleavedBuffer();
 
@@ -129,16 +129,16 @@ auto AudioBuffer::addGroup(ch_cnt_t channels) -> ChannelGroup*
 	{
 		// Shared memory must be reallocated without any over-allocations,
 		// since it only has a fixed amount of space
-		m_channelBuffers.clear();
+		m_accessBuffer.clear();
 		m_sourceBuffer.clear();
 		m_interleavedBuffer.clear();
 	}
 
 	// Next, resize the buffers. The order here is important so no padding bytes
 	// are needed when allocating using a shared memory resource. The buffer
-	// with stricter padding requirements (m_channelBuffers) gets allocated first.
+	// with stricter padding requirements (m_accessBuffer) gets allocated first.
 	static_assert(alignof(float*) >= alignof(float));
-	m_channelBuffers.resize(newTotalChannels);
+	m_accessBuffer.resize(newTotalChannels);
 	m_sourceBuffer.resize(newTotalChannels * m_frames);
 	if (usesInterleavedBuffer)
 	{
@@ -150,7 +150,7 @@ auto AudioBuffer::addGroup(ch_cnt_t channels) -> ChannelGroup*
 	ch_cnt_t channel = 0;
 	while (channel < newTotalChannels)
 	{
-		m_channelBuffers[channel] = ptr;
+		m_accessBuffer[channel] = ptr;
 
 		ptr += m_frames;
 		++channel;
@@ -160,7 +160,7 @@ auto AudioBuffer::addGroup(ch_cnt_t channels) -> ChannelGroup*
 	channel = 0;
 	for (ChannelGroup& group : m_groups)
 	{
-		group.setBuffers(&m_channelBuffers[channel]);
+		group.setBuffers(&m_accessBuffer[channel]);
 		channel += group.channels();
 	}
 
@@ -169,7 +169,7 @@ auto AudioBuffer::addGroup(ch_cnt_t channels) -> ChannelGroup*
 	m_silenceFlags |= createMask<true>(oldTotalChannels);
 
 	// Append new group
-	return &m_groups.emplace_back(&m_channelBuffers[oldTotalChannels], channels);
+	return &m_groups.emplace_back(&m_accessBuffer[oldTotalChannels], channels);
 }
 
 void AudioBuffer::enableSilenceTracking(bool enabled)
