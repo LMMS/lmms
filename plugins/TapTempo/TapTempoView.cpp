@@ -138,7 +138,7 @@ void TapTempoView::update()
 
 void TapTempoView::reset()
 {
-	m_tapButton->setText(tr("Press to begin"));
+	m_tapButton->setText(tr("Tap to begin"));
 	m_msLabel->setText(tr("0 ms"));
 	m_hzLabel->setText(tr("0.0000 hz"));
 }
