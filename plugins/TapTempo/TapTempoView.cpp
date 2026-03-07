@@ -144,10 +144,11 @@ void TapTempoView::reset()
 	m_hzLabel->setText(tr("0.0000 hz"));
 }
 
-void TapTempoView::closeEvent(QCloseEvent*)
+void TapTempoView::closeEvent(QCloseEvent* event)
 {
 	m_plugin->reset();
 	reset();
+	QWidget::closeEvent(event);
 }
 
 void TapTempoView::keyPressEvent(QKeyEvent* event)
