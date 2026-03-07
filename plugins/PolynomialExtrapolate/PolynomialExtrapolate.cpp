@@ -27,7 +27,9 @@
 #include "embed.h"
 #include "plugin_export.h"
 
-#include "stdio.h" // TODO REMOVE DEBUG
+#ifdef PolynomialDebug
+#include "stdio.h" // printf
+#endif
 
 namespace lmms
 {
@@ -66,6 +68,7 @@ Effect::ProcessStatus PolynomialExtrapolateEffect::processImpl(SampleFrame* buf,
 	size_t predictionCountIn = static_cast<size_t>(m_effectControls.m_predictionCountModel.value());
 	float invMix = 1.0f - mixVal;
 	float xMultiplier = m_effectControls.m_xMultiplierModel.value();
+	float volumeOut = m_effectControls.m_volumeModel.value();
 
 	//! how many samples should we wait before making a prediction
 	size_t samplesBetweenPredictions = 1;
@@ -100,9 +103,9 @@ Effect::ProcessStatus PolynomialExtrapolateEffect::processImpl(SampleFrame* buf,
 		size_t startIndex = predictionCount;
 		// the finished value is at startIndex
 		// predictions will be made at startIndex - i (where 0 < i < startIndex)
-		//auto pair = m_inputData[startIndex];
-		auto pair = m_inputData.swap(std::make_pair(buf[j], SampleFrame{}));
-		buf[j] = pair.second * mixVal + pair.first * invMix;
+		auto pair = m_inputData[startIndex];
+		m_inputData.swap(std::make_pair(buf[j], SampleFrame{}));
+		buf[j] = pair.second * mixVal * volumeOut + pair.first * invMix;
 
 		if (m_retainCounter >= samplesBetweenPredictions)
 		{
@@ -118,18 +121,6 @@ Effect::ProcessStatus PolynomialExtrapolateEffect::processImpl(SampleFrame* buf,
 	}
 
 	return ProcessStatus::ContinueIfNotQuiet;
-}
-
-
-float PolynomialExtrapolateEffect::predictNext(float y1, float y2, float y3, float predictX)
-{
-	// calculating second degree polynomial with 3 input points
-	// y = ax^2 + bx + c
-	// x1 = 0, x2 = 1, x3 = 2, output: x4 = `predictX`
-	float c = y1;
-	float b = 2.0f * y2 - (3.0f * y1 + y3) / 2.0f;
-	float a = y2 - y1 - b;
-	return predictX * predictX * a + predictX * b + c;
 }
 
 template<typename T, size_t maxSize>
@@ -192,13 +183,13 @@ void PolynomialExtrapolateEffect::makeExtrapolation(size_t startIndex, size_t wi
 			// why -i?? because the polynomial coefficents were generated at positive x coords, so the future is at negative x coords
 			// source: at the start of gauss elimination x is positive
 			float prediction = polinomialAt(-i * xMultiplier - start, coefficients, width);
-			float weight = i / static_cast<float>(predictionCount);
-			float iWeight = i == 1 ? 1.0f : 1.0f - weight;
+			float weight = i == 1 ? 0.0f : i / static_cast<float>(predictionCount);
+			float iWeight = 1.0f - weight;
 
-			//float weightedPrediction = std::clamp(prediction, -1.0f, 1.0f) * iWeight;
 			float weightedPrediction = prediction * iWeight * precitVolumeCorrection;
 			m_inputData[startIndex + i].second[channel] += weightedPrediction;
-			//m_inputData[startIndex + i].first[channel] = weightedPrediction + weight * m_inputData[startIndex + i].first[channel];
+			m_inputData[startIndex + i].first[channel] = feedback > 0.0001f ?
+				std::clamp(prediction * precitVolumeCorrection, -1.0f, 1.0f) * iWeight * feedback + (weight * (1.0f - feedback)) * m_inputData[startIndex + i].first[channel] : 0.0f;
 		}
 	}
 }
@@ -236,8 +227,10 @@ void PolynomialExtrapolateEffect::generateMatrix(std::span<float>& matrix, size_
 			poweredXCoord = poweredXCoord * (i + 1);
 		}
 	}
+#ifdef PolynomialDebug
 	printf("init 1.:\n");
 	printMatrixDebug(coefficientMatrix, sizeTWidth);
+#endif
 	for (size_t i = 0; i < sizeTWidth; ++i)
 	{
 		for (size_t j = 0; j < sizeTWidth; ++j)
@@ -246,9 +239,10 @@ void PolynomialExtrapolateEffect::generateMatrix(std::span<float>& matrix, size_
 		}
 		matrix[i * sizeTWidth + i] = 1.0f;
 	}
+#ifdef PolynomialDebug
 	printf("init 2.:\n");
 	printMatrixDebug(matrix, sizeTWidth);
-
+#endif
 	
 	// Gauss elimination
 	int x = 0;
@@ -266,10 +260,12 @@ void PolynomialExtrapolateEffect::generateMatrix(std::span<float>& matrix, size_
 				{
 					if (std::abs(coefficientMatrix[ny * width + x]) >= 0.0001f)
 					{
+#ifdef PolynomialDebug
 						printf("swap (%d) row with (%d)\n", y, ny);
 						printMatrixDebug(coefficientMatrix, sizeTWidth);
 						printf("MIRROR:\n");
 						printMatrixDebug(matrix, sizeTWidth);
+#endif
 
 						// swap y with ny
 						for (int nx = x; nx < width; ++nx)
@@ -282,9 +278,11 @@ void PolynomialExtrapolateEffect::generateMatrix(std::span<float>& matrix, size_
 							matrix[ny * width + nx] = matrix[y * width + nx];
 							matrix[y * width + nx] = swap;
 						}
+#ifdef PolynomialDebug
 						printMatrixDebug(coefficientMatrix, sizeTWidth);
 						printf("MIRROR:\n");
 						printMatrixDebug(matrix, sizeTWidth);
+#endif
 
 						found = true;
 						break;
@@ -296,7 +294,9 @@ void PolynomialExtrapolateEffect::generateMatrix(std::span<float>& matrix, size_
 			}
 			if (x >= width) { assert(false); /* 0 row isn't handled (should never happen for this input) */ }
 		}
+#ifdef PolynomialDebug
 		printf("leading 1 identified at (%d, %d)\n", x, y);
+#endif
 		
 		float quotient = 1.0f / coefficientMatrix[y * width + x];
 		coefficientMatrix[y * width + x] = 1.0f;
@@ -309,10 +309,12 @@ void PolynomialExtrapolateEffect::generateMatrix(std::span<float>& matrix, size_
 		{
 			matrix[y * width + nx] *= quotient;
 		}
+#ifdef PolynomialDebug
 		printf("(%d) row multiplied by %f\n", y, quotient);
 		printMatrixDebug(coefficientMatrix, sizeTWidth);
 		printf("MIRROR:\n");
 		printMatrixDebug(matrix, sizeTWidth);
+#endif
 
 		for (int ny = y + 1; ny < width; ++ny)
 		{
@@ -328,10 +330,12 @@ void PolynomialExtrapolateEffect::generateMatrix(std::span<float>& matrix, size_
 				matrix[ny * width + nx] += matrix[y * width + nx] * multiplier;
 			}
 
+#ifdef PolynomialDebug
 			printf("substracted (%d) row from (%d)\n", y, ny);
 			printMatrixDebug(coefficientMatrix, sizeTWidth);
 			printf("MIRROR:\n");
 			printMatrixDebug(matrix, sizeTWidth);
+#endif
 		}
 		++x;
 		if (x >= width)
@@ -341,7 +345,9 @@ void PolynomialExtrapolateEffect::generateMatrix(std::span<float>& matrix, size_
 			break;
 		}
 	}
+#ifdef PolynomialDebug
 	printf("x = %d, y = %d\n", x, y);
+#endif
 	assert(x == width); // Gauss elimination couldn't finish
 	assert(y == width); // Gauss elimination couldn't finish
 	--x;
@@ -359,7 +365,9 @@ void PolynomialExtrapolateEffect::generateMatrix(std::span<float>& matrix, size_
 
 			if (x < 0) { assert(false); /* this should never happen */ }
 		}
+#ifdef PolynomialDebug
 		printf("leading 1 identified at (%d, %d)\n", x, y);
+#endif
 		
 		for (int ny = y - 1; ny >= 0; --ny)
 		{
@@ -370,7 +378,9 @@ void PolynomialExtrapolateEffect::generateMatrix(std::span<float>& matrix, size_
 				// mirror
 				matrix[ny * width + nx] += matrix[y * width + nx] * multiplier;
 			}
+#ifdef PolynomialDebug
 			printf("substracted (%d) row from (%d)\n", y, ny);
+#endif
 		}
 		--x;
 		if (x < 0) { break; }
@@ -379,8 +389,10 @@ void PolynomialExtrapolateEffect::generateMatrix(std::span<float>& matrix, size_
 	assert(x < 0); // Gauss elimination couldn't finish
 	assert(y <= 0); // Gauss elimination couldn't finish
 
+#ifdef PolynomialDebug
 	printf("final matrix:\n");
 	printMatrixDebug(matrix, sizeTWidth);
+#endif
 }
 
 float PolynomialExtrapolateEffect::polinomialAt(float x, const std::span<float>& polinomial, size_t width) const
@@ -395,6 +407,7 @@ float PolynomialExtrapolateEffect::polinomialAt(float x, const std::span<float>&
 
 void PolynomialExtrapolateEffect::printMatrixDebug(const std::span<float>& matrix, size_t width)
 {
+#ifdef PolynomialDebug
 	printf("matrix %ld x %ld\n  ", width, width);
 
 	for (size_t x = 0; x < width; ++x)
@@ -411,6 +424,7 @@ void PolynomialExtrapolateEffect::printMatrixDebug(const std::span<float>& matri
 		}
 		printf(" ]\n");
 	}
+#endif
 }
 
 extern "C"

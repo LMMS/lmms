@@ -49,12 +49,6 @@ public:
 
 	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
 
-	//! @param y1: the sample at relative index [0]
-	//! @param y2: the sample at relative index [1]
-	//! @param y3: the sample at relative index [2]
-	//! @param predictX: prediction x, starts from relative index [0], use 3.0f if you want to predict the [3] sample
-	static float predictNext(float y1, float y2, float y3, float predictX);
-
 	EffectControls* controls() override
 	{
 		return &m_effectControls;
@@ -109,9 +103,6 @@ private:
 
 	//! matrix width, equivalent with polynomial degree
 	size_t m_width = 0;
-	//! helps generate `m_polynomialMatrix`
-	std::array<float, MAX_POLYNOMIAL_DEGREE * MAX_POLYNOMIAL_DEGREE>
-		m_coefficientMatrix;
 	//! helps generate polynomial coefficients
 	std::array<float, MAX_POLYNOMIAL_DEGREE * MAX_POLYNOMIAL_DEGREE>
 		m_polynomialMatrix;
