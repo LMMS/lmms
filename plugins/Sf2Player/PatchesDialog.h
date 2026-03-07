@@ -77,7 +77,7 @@ protected:
 	QTreeWidgetItem *findBankItem(int iBank);
 
 	//! Finds the program item of given program number id in the source model.
-	QStandardItem *findProgItem(int iProg);
+	QStandardItem* findProgItem(int iProg);
 
 	bool validateForm();
 

@@ -327,7 +327,7 @@ QTreeWidgetItem *PatchesDialog::findBankItem ( int iBank )
 }
 
 
-QStandardItem *PatchesDialog::findProgItem(int iProg)
+QStandardItem* PatchesDialog::findProgItem(int iProg)
 {
 	QList<QStandardItem*> progs = m_progListSourceModel.findItems(
 		QString::number(iProg), Qt::MatchExactly, 0);
@@ -421,8 +421,7 @@ void PatchesDialog::progChanged(const QModelIndex& cur, const QModelIndex& prev)
 		return;
 
 	auto curRow = m_progListProxyModel.mapToSource(cur).row();
-	if (curRow < 0)
-		return;
+	if (curRow < 0) { return; }
 
 	auto progIdx = m_progListSourceModel.index(curRow, 0);
 	m_selProg = m_progListSourceModel.data(progIdx).toInt();
