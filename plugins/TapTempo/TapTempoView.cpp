@@ -48,9 +48,10 @@ TapTempoView::TapTempoView(TapTempo* plugin)
 	, m_plugin(plugin)
 {
 	setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+	setFocusPolicy(Qt::FocusPolicy::StrongFocus);
 
 	auto font = QFont();
-
+	m_tapButton->setFocusPolicy(Qt::NoFocus);
 	m_tapButton->setFixedSize(200, 200);
 	m_tapButton->setFont(adjustedToPixelSize(font, 24));
 
@@ -138,7 +139,7 @@ void TapTempoView::update()
 
 void TapTempoView::reset()
 {
-	m_tapButton->setText(tr("Click to begin"));
+	m_tapButton->setText(tr("Press to begin"));
 	m_msLabel->setText(tr("0 ms"));
 	m_hzLabel->setText(tr("0.0000 hz"));
 }
@@ -147,6 +148,17 @@ void TapTempoView::closeEvent(QCloseEvent*)
 {
 	m_plugin->reset();
 	reset();
+}
+
+void TapTempoView::keyPressEvent(QKeyEvent* event)
+{
+	if (event->key() == Qt::Key_Space)
+	{
+		m_tapButton->animateClick();
+		return;
+	}
+
+	ToolPluginView::keyPressEvent(event);
 }
 
 } // namespace lmms::gui
