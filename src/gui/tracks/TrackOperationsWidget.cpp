@@ -278,7 +278,7 @@ void TrackOperationsWidget::exportTrack()
 	const auto exportPath = dialog.selectedFiles()[0];
 	const auto exportDialog = ExportProjectDialog::exportTrackDialog(exportPath, m_trackView->getTrack());
 
-	connect(exportDialog, &ExportProjectDialog::finished, [this, exportDialog, exportPath](int result) {
+	connect(exportDialog, &ExportProjectDialog::accepted, [this, exportDialog, exportPath] {
 		if (!exportDialog->importExportedTrack()) { return; }
 
 		const auto trackContainerView = m_trackView->trackContainerView();
