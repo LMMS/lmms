@@ -24,6 +24,7 @@
 
 #include "TapTempo.h"
 
+#include <qdebug.h>
 #include <string>
 
 #include "SamplePlayHandle.h"
@@ -62,17 +63,31 @@ void TapTempo::tap(bool play)
 	if (m_lastTap.time_since_epoch() != 0ms)
 	{
 		const auto delta = std::chrono::duration_cast<std::chrono::milliseconds>(clock::now() - m_lastTap);
+		m_intervals[m_index++] = delta;
 
-		if (delta > 2000ms)
+		if (m_index == MaxIntervals)
 		{
-			reset();
-			return;
+			m_index = 0;
+			m_calculateBPM = true;
 		}
 
-		// A smoothing factor to reduce jitter in the BPM calculation
-		constexpr auto alpha = 0.2;
+		if (m_calculateBPM)
+		{
+			if (delta > 2000ms)
+			{
+				reset();
+				return;
+			}
 
-		m_bpm = alpha * (60000. / delta.count()) + (1.0 - alpha) * m_bpm;
+			// calculate the median of the stored intervals to reject outliers
+			std::nth_element(m_intervals.begin(), m_intervals.begin() + m_intervals.size() / 2, m_intervals.end());
+			const auto newBpm = 60000.0 / m_intervals[m_intervals.size() / 2].count();
+
+			// use an adaptive EMA to smooth out jitter when in the ballpark and update quickly when moving to a new BPM
+			const auto error = std::abs(newBpm - m_bpm);
+			const auto alpha = std::clamp(error / 100.0, 0.2, 0.8);
+			m_bpm = alpha * newBpm + (1.0 - alpha) * m_bpm;
+		}
 	}
 
 	const auto timeSigNumerator = Engine::getSong()->getTimeSigModel().getNumerator();
@@ -88,7 +103,10 @@ void TapTempo::sync()
 void TapTempo::reset()
 {
 	m_bpm = 0;
+	m_index = 0;
 	m_lastTap = std::chrono::time_point<clock>{};
+	m_calculateBPM = false;
+	std::fill(m_intervals.begin(), m_intervals.end(), std::chrono::milliseconds::zero());
 }
 
 QString TapTempo::nodeName() const
