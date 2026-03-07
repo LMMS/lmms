@@ -276,8 +276,7 @@ void TrackOperationsWidget::exportTrack()
 	if (dialog.exec() != QDialog::Accepted) { return; }
 
 	const auto exportPath = dialog.selectedFiles()[0];
-	auto exportDialog = new ExportProjectDialog{exportPath, ExportProjectDialog::Mode::ExportTrack};
-	exportDialog->setAttribute(Qt::WA_DeleteOnClose);
+	const auto exportDialog = ExportProjectDialog::exportTrackDialog(exportPath, m_trackView->getTrack());
 
 	connect(exportDialog, &ExportProjectDialog::finished, [this, exportDialog, exportPath](int result) {
 		if (!exportDialog->importExportedTrack()) { return; }
@@ -295,7 +294,6 @@ void TrackOperationsWidget::exportTrack()
 		sampleClip->setSampleFile(exportPath);
 	});
 
-	exportDialog->setTrack(m_trackView->getTrack());
 	exportDialog->open();
 }
 

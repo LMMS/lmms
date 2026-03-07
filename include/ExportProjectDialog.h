@@ -44,6 +44,15 @@ namespace lmms::gui {
 class ExportProjectDialog : public QDialog
 {
 public:
+	static ExportProjectDialog* exportProjectDialog(const QString& path);
+	static ExportProjectDialog* exportTracksDialog(const QString& path);
+	static ExportProjectDialog* exportTrackDialog(const QString& path, Track* track);
+
+	//! @returns `true` if the exported track should be imported as a sample track, `false` otherwise
+	//! @note only applies when exporting in single track mode
+	bool importExportedTrack();
+
+private:
 	enum class Mode
 	{
 		ExportProject,
@@ -51,16 +60,8 @@ public:
 		ExportTrack
 	};
 
-	ExportProjectDialog(const QString& path, Mode mode, QWidget* parent = nullptr);
+	ExportProjectDialog(const QString& path, Mode mode, Track* track = nullptr, QWidget* parent = nullptr);
 
-	//! Assign a single track to export.
-	//! The track is only used when the mode is set to `ExportTrack`.
-	void setTrack(Track* track) { m_track = track; }
-
-	//! @returns `true` if the exported track should be imported as a sample track, `false` otherwise
-	bool importExportedTrack();
-
-private:
 	void accept() override;
 	void reject() override;
 	void onFileFormatChanged(int index);

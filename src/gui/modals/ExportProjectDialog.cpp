@@ -51,7 +51,7 @@ constexpr auto defaultStereoMode = OutputSettings::StereoMode::Stereo;
 constexpr auto maxLoopRepeat = std::numeric_limits<int>::max();
 } // namespace
 
-ExportProjectDialog::ExportProjectDialog(const QString& path, Mode mode, QWidget* parent)
+ExportProjectDialog::ExportProjectDialog(const QString& path, Mode mode, Track* track, QWidget* parent)
 	: QDialog(parent)
 	, m_fileFormatLabel(new QLabel(tr("File format:")))
 	, m_fileFormatComboBox(new QComboBox())
@@ -77,8 +77,10 @@ ExportProjectDialog::ExportProjectDialog(const QString& path, Mode mode, QWidget
 	, m_progressBar(new QProgressBar())
 	, m_path(path)
 	, m_mode(mode)
+	, m_track(track)
 {
 	setWindowTitle(tr("Export project"));
+	setAttribute(Qt::WA_DeleteOnClose);
 
 	for (const auto& device : ProjectRenderer::fileEncodeDevices)
 	{
@@ -306,6 +308,21 @@ void ExportProjectDialog::updateTitleBar(int prog)
 bool ExportProjectDialog::importExportedTrack()
 {
 	return m_importExportedTrackBox->isChecked();
+}
+
+ExportProjectDialog* ExportProjectDialog::exportProjectDialog(const QString& path)
+{
+	return new ExportProjectDialog{path, Mode::ExportProject, nullptr, nullptr};
+}
+
+ExportProjectDialog* ExportProjectDialog::exportTrackDialog(const QString& path, Track* track)
+{
+	return new ExportProjectDialog{path, Mode::ExportTrack, track, nullptr};
+}
+
+ExportProjectDialog* ExportProjectDialog::exportTracksDialog(const QString& path)
+{
+	return new ExportProjectDialog{path, Mode::ExportTracks, nullptr, nullptr};
 }
 
 } // namespace lmms::gui
