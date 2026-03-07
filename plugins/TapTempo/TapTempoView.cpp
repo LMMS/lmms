@@ -50,10 +50,9 @@ TapTempoView::TapTempoView(TapTempo* plugin)
 	setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 	setFocusPolicy(Qt::FocusPolicy::StrongFocus);
 
-	auto font = QFont();
 	m_tapButton->setFocusPolicy(Qt::NoFocus);
 	m_tapButton->setFixedSize(200, 200);
-	m_tapButton->setFont(adjustedToPixelSize(font, 24));
+	m_tapButton->setFont(adjustedToPixelSize(QFont{}, 24));
 
 	m_precisionCheckBox->setFocusPolicy(Qt::NoFocus);
 	m_precisionCheckBox->setToolTip(tr("Display in high precision"));
