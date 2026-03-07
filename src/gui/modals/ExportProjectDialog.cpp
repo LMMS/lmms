@@ -307,6 +307,7 @@ void ExportProjectDialog::updateTitleBar(int prog)
 
 bool ExportProjectDialog::importExportedTrack()
 {
+	assert(m_mode == Mode::ExportTrack);
 	return m_importExportedTrackBox->isChecked();
 }
 

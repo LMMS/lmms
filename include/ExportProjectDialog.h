@@ -49,7 +49,7 @@ public:
 	static ExportProjectDialog* exportTrackDialog(const QString& path, Track* track);
 
 	//! @returns `true` if the exported track should be imported as a sample track, `false` otherwise
-	//! @note only applies when exporting in single track mode
+	//! @note only applies when exporting a single track
 	bool importExportedTrack();
 
 private:
