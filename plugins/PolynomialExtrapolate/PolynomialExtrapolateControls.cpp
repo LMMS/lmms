@@ -35,9 +35,13 @@ PolynomialExtrapolateControls::PolynomialExtrapolateControls(PolynomialExtrapola
 	EffectControls(effect),
 	m_effect(effect),
 	m_mixModel(1.0f, 0.0f, 1.0f, 0.001f, this, tr("Mix")),
-	m_decayModel(1, 1, 40, this, tr("Decay")),
-	m_rangeModel(1, 1, 500, this, tr("Range")),
-	m_isReverseModel(false, this, tr("Reversed"))
+	m_degreeModel(1, 1, 40, this, tr("Degree")),
+	m_gapModel(1, 1, 500, this, tr("Gap")),
+	m_predictionCountModel(1, 1, 500, this, tr("Prediction count")),
+	m_xMultiplierModel(1.0f, 0.0f, 5.0f, 0.001f, this, tr("X multiplier")),
+	m_feedbackModel(0.0f, 0.0f, 1.0f, 0.001f, this, tr("feedback")),
+	m_reusePercentModel(0.0f, 0.0f, 1.0f, 0.001f, this, tr("reuse")),
+	m_volumeModel(1.0f, 0.0f, 1.0f, 0.001f, this, tr("volume"))
 {
 }
 
@@ -45,18 +49,26 @@ PolynomialExtrapolateControls::PolynomialExtrapolateControls(PolynomialExtrapola
 void PolynomialExtrapolateControls::loadSettings(const QDomElement& parent)
 {
 	m_mixModel.loadSettings(parent, "mix");
-	m_decayModel.loadSettings(parent, "decay");
-	m_rangeModel.loadSettings(parent, "range");
-	m_isReverseModel.loadSettings(parent, "reversed");
+	m_degreeModel.loadSettings(parent, "degree");
+	m_gapModel.loadSettings(parent, "gap");
+	m_predictionCountModel.loadSettings(parent, "predictionCount");
+	m_xMultiplierModel.loadSettings(parent, "xMultiplier");
+	m_feedbackModel.loadSettings(parent, "feedback");
+	m_reusePercentModel.loadSettings(parent, "reuse");
+	m_volumeModel.loadSettings(parent, "volume");
 }
 
 
 void PolynomialExtrapolateControls::saveSettings(QDomDocument& doc, QDomElement& parent)
 {
 	m_mixModel.saveSettings(doc, parent, "mix"); 
-	m_decayModel.saveSettings(doc, parent, "decay");
-	m_rangeModel.saveSettings(doc, parent, "range");
-	m_isReverseModel.saveSettings(doc, parent, "reversed");
+	m_degreeModel.saveSettings(doc, parent, "degree");
+	m_gapModel.saveSettings(doc, parent, "gap");
+	m_predictionCountModel.saveSettings(doc, parent, "predictionCount");
+	m_xMultiplierModel.saveSettings(doc, parent, "xMultiplier");
+	m_feedbackModel.saveSettings(doc, parent, "feedback");
+	m_reusePercentModel.saveSettings(doc, parent, "reuse");
+	m_volumeModel.saveSettings(doc, parent, "volume");
 }
 
 

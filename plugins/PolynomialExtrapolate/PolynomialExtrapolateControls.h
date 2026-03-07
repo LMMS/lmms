@@ -61,9 +61,14 @@ public:
 private:
 	PolynomialExtrapolateEffect* m_effect;
 	FloatModel m_mixModel;
-	IntModel m_decayModel;
-	IntModel m_rangeModel;
-	BoolModel m_isReverseModel;
+	IntModel m_degreeModel;
+	IntModel m_gapModel;
+	IntModel m_predictionCountModel;
+	FloatModel m_xMultiplierModel;
+	FloatModel m_feedbackModel;
+	FloatModel m_reusePercentModel;
+	FloatModel m_volumeModel;
+	//BoolModel m_isReverseModel;
 
 	friend class gui::PolynomialExtrapolateControlDialog;
 	friend class PolynomialExtrapolateEffect;

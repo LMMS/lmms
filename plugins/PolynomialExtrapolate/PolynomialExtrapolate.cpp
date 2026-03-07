@@ -60,71 +60,30 @@ PolynomialExtrapolateEffect::PolynomialExtrapolateEffect(Model* parent, const De
 
 Effect::ProcessStatus PolynomialExtrapolateEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 {
-	size_t range = m_effectControls.m_rangeModel.value();
+	size_t gapIn = m_effectControls.m_gapModel.value();
 	float mixVal = m_effectControls.m_mixModel.value();
-	size_t decayVal = static_cast<size_t>(m_effectControls.m_decayModel.value());
+	size_t degree = static_cast<size_t>(m_effectControls.m_degreeModel.value());
+	size_t predictionCountIn = static_cast<size_t>(m_effectControls.m_predictionCountModel.value());
 	float invMix = 1.0f - mixVal;
-
-	/*
-	size_t decayRange = range + 3;
-	size_t decayRangeMid = decayRange / 2;
-	size_t decayRangeEnd = decayRange - 1;
-	m_retainCount = decayVal + decayRange;
-	//if (m_inputData.size() - m_retainCount != frames) { m_inputData.resize(frames + m_retainCount); }
-
-
-	//m_inputData.write(buf, frames);
-
-	constexpr float treshold = 0.002f;
-	size_t processDecayCount = mixVal <= treshold ? 1 : static_cast<size_t>(std::log(mixVal) / std::log(invMix) + 1.0f);
-	processDecayCount = std::min(decayVal, processDecayCount);
-
-	bool isReverse = m_effectControls.m_isReverseModel.value();
-	*/
-	/*
-	if (isReverse == false)
-	{
-		size_t processDecayCountX = processDecayCount + 2;
-		for (fpp_t i = 0; i < frames; i++)
-		{
-			for (fpp_t j = 0; j < processDecayCount; j++)
-			{
-				fpp_t index = i + j;
-				// buf[i] is m_retainCount foreward compared to m_inputData[i]
-				buf[i][0] = std::clamp(predictNext(m_inputData[index][0], m_inputData[index + decayRangeMid][0], m_inputData[index + decayRangeEnd][0], processDecayCountX - j), -1.0f, 1.0f) * mixVal + buf[i][0] * invMix;
-				buf[i][1] = std::clamp(predictNext(m_inputData[index][1], m_inputData[index + decayRangeMid][1], m_inputData[index + decayRangeEnd][1], processDecayCountX - j), -1.0f, 1.0f) * mixVal + buf[i][1] * invMix;
-			}
-		}
-	}
-	else
-	{
-		for (fpp_t i = 0; i < frames; i++)
-		{
-			for (fpp_t j = processDecayCount - 1; j-- > 0;)
-			{
-				fpp_t index = i + j;
-				buf[i][0] = std::clamp(predictNext(m_inputData[index][0], m_inputData[index + decayRangeMid][0], m_inputData[index + decayRangeEnd][0], 3), -1.0f, 1.0f) * mixVal + buf[i][0] * invMix;
-				buf[i][1] = std::clamp(predictNext(m_inputData[index][1], m_inputData[index + decayRangeMid][1], m_inputData[index + decayRangeEnd][1], 3), -1.0f, 1.0f) * mixVal + buf[i][1] * invMix;
-			}
-		}
-	}
-	*/
-
+	float xMultiplier = m_effectControls.m_xMultiplierModel.value();
 
 	//! how many samples should we wait before making a prediction
 	size_t samplesBetweenPredictions = 1;
 	//! how many sample points will be used for the prediction
-	size_t width = decayVal;
+	size_t width = degree + 1;
+	assert(width <= MAX_POLYNOMIAL_DEGREE);
 	//! how many sample gaps should be between the sample points
-	size_t gap = range;
+	size_t gap = gapIn;
+	assert(gap <= MAX_SAMPLING_GAP);
 	//! how many samples to predict each prediction
-	int predictionCount = decayVal * gap;
-	float xMultiplier = 1.0f;
+	int predictionCount = predictionCountIn;
+	assert(predictionCount <= (int)MAX_PREDICTION_COUNT);
 
-	width = std::min(width, MAX_POLYNOMIAL_DEGREE);
-	gap = std::min(gap, MAX_SAMPLING_GAP);
-	predictionCount = std::min(predictionCount, (int)MAX_PREDICTION_COUNT);
-	samplesBetweenPredictions = std::min(samplesBetweenPredictions, MAX_SAMPLES_BETWEEN_PREDICTION);
+	float feedback = m_effectControls.m_feedbackModel.value();
+	assert(0.0f <= feedback && feedback < 1.0001f);
+
+	float predictionStart = m_effectControls.m_reusePercentModel.value() * width;
+
 	if (m_width != width)
 	{
 		m_width = width;
@@ -133,22 +92,24 @@ Effect::ProcessStatus PolynomialExtrapolateEffect::processImpl(SampleFrame* buf,
 		generateMatrix(matrix, m_width);
 	}
 
-	const size_t requiredSize = m_width * gap + predictionCount;
-	m_inputData.resize(requiredSize);
-
 	// we have the data
 	for (fpp_t j = 0; j < frames; ++j)
 	{
+		// extrapolation is done between 0 and startIndex
+		// coefficients are generated from samples after startIndex
+		size_t startIndex = predictionCount;
+		// the finished value is at startIndex
+		// predictions will be made at startIndex - i (where 0 < i < startIndex)
+		//auto pair = m_inputData[startIndex];
 		auto pair = m_inputData.swap(std::make_pair(buf[j], SampleFrame{}));
 		buf[j] = pair.second * mixVal + pair.first * invMix;
 
 		if (m_retainCounter >= samplesBetweenPredictions)
 		{
 			m_retainCounter = 0;
-			size_t startIndex = predictionCount;
 
 			// do the processing
-			makeExtrapolation(startIndex, width, gap, predictionCount, xMultiplier);
+			makeExtrapolation(startIndex, width, gap, predictionCount, xMultiplier, feedback, -predictionStart);
 		}
 		else
 		{
@@ -193,30 +154,9 @@ void PolynomialExtrapolateEffect::storageBuffer<T, maxSize>::resize(size_t newSi
 	assert(maxSize >= newSize);
 	if (newSize != m_size)
 	{
-		m_size = std::max(newSize, maxSize);
+		m_size = std::min(newSize, maxSize);
+		assert(m_size > 0);
 		m_readIndex = m_readIndex % m_size;
-	}
-}
-template<typename T, size_t maxSize>
-void PolynomialExtrapolateEffect::storageBuffer<T, maxSize>::write(const T* buf, size_t frames)
-{
-	if (m_size <= 0 || frames <= 0) { return; }
-	for (size_t i = 0; i < frames; i++)
-	{
-		m_data[m_readIndex] = buf[i];
-		m_readIndex = m_readIndex + 1 < m_size ? m_readIndex + 1 : 0;
-	}
-}
-template<typename T, size_t maxSize>
-void PolynomialExtrapolateEffect::storageBuffer<T, maxSize>::swap(const T* buf, size_t frames)
-{
-	if (m_size <= 0 || frames <= 0) { return; }
-	for (size_t i = 0; i < frames; i++)
-	{
-		T temp = m_data[m_readIndex];
-		m_data[m_readIndex] = buf[i];
-		buf[i] = temp;
-		m_readIndex = m_readIndex + 1 < m_size ? m_readIndex + 1 : 0;
 	}
 }
 template<typename T, size_t maxSize>
@@ -229,8 +169,9 @@ T PolynomialExtrapolateEffect::storageBuffer<T, maxSize>::swap(T data)
 }
 
 void PolynomialExtrapolateEffect::makeExtrapolation(size_t startIndex, size_t width,
-	size_t gap, int predictionCount, float xMultiplier)
+	size_t gap, int predictionCount, float xMultiplier, float feedback, float start)
 {
+	float precitVolumeCorrection = 1.0f / predictionCount;
 	for (size_t channel = 0; channel <= 1; ++channel)
 	{
 		std::array<float, MAX_POLYNOMIAL_DEGREE> inputSamples;
@@ -242,24 +183,22 @@ void PolynomialExtrapolateEffect::makeExtrapolation(size_t startIndex, size_t wi
 
 		{
 			std::span<float> coefficientHelper(coefficients);
+			// this is the more expensive algorithm with width^2 complexity
 			getPolynomialCoefficients(m_polynomialMatrix, inputSamples, coefficientHelper, width);
 		}
 
-		//m_inputData[startIndex].second[channel] = m_inputData[startIndex].first[channel];
 		for (int i = 1; i <= predictionCount; ++i)
 		{
-			float predictionAfter = polinomialAt(-i * xMultiplier, coefficients, width);
-			float predictionBefore = polinomialAt(i * xMultiplier, coefficients, width);
+			// why -i?? because the polynomial coefficents were generated at positive x coords, so the future is at negative x coords
+			// source: at the start of gauss elimination x is positive
+			float prediction = polinomialAt(-i * xMultiplier - start, coefficients, width);
 			float weight = i / static_cast<float>(predictionCount);
-			float iWeight = 1.0f - weight;
-			weight = 1.0f - (weight * weight);
-			iWeight = 1.0f - (iWeight * iWeight);
+			float iWeight = i == 1 ? 1.0f : 1.0f - weight;
 
-			//m_inputData[startIndex - i].first[channel] = predictionAfter * weight;
-			//m_inputData[startIndex + i].first[channel] = predictionBefore * weight;
-
-			//m_inputData[startIndex - i].second[channel] = predictionBefore * weight;
-			m_inputData[startIndex + i].second[channel] = predictionAfter * weight;
+			//float weightedPrediction = std::clamp(prediction, -1.0f, 1.0f) * iWeight;
+			float weightedPrediction = prediction * iWeight * precitVolumeCorrection;
+			m_inputData[startIndex + i].second[channel] += weightedPrediction;
+			//m_inputData[startIndex + i].first[channel] = weightedPrediction + weight * m_inputData[startIndex + i].first[channel];
 		}
 	}
 }
@@ -289,12 +228,12 @@ void PolynomialExtrapolateEffect::generateMatrix(std::span<float>& matrix, size_
 	// x = 3 [  1  3  9  |  0    0    1  ]        [  0  0  1  | linear combination of f(t) ]
 	for (size_t i = 0; i < sizeTWidth; ++i)
 	{
-		float poweredInput{1.0f};
+		float poweredXCoord{1.0f};
 		for (size_t j = 0; j < sizeTWidth; ++j)
 		{
 			size_t index = i * sizeTWidth + j;
-			coefficientMatrix[index] = poweredInput;
-			poweredInput = poweredInput * (i + 1);
+			coefficientMatrix[index] = poweredXCoord;
+			poweredXCoord = poweredXCoord * (i + 1);
 		}
 	}
 	printf("init 1.:\n");

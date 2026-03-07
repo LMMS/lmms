@@ -41,7 +41,7 @@ PolynomialExtrapolateControlDialog::PolynomialExtrapolateControlDialog(Polynomia
 	QPalette pal;
 	pal.setBrush(backgroundRole(), PLUGIN_NAME::getIconPixmap("artwork"));
 	setPalette(pal);
-	setFixedSize(225, 60);
+	setFixedSize(500, 60);
 	
 	Knob* mixKnob = new Knob(KnobType::Bright26, this);
 	mixKnob->move(5, 8);
@@ -49,18 +49,19 @@ PolynomialExtrapolateControlDialog::PolynomialExtrapolateControlDialog(Polynomia
 	mixKnob->setLabel(tr("MIX"));
 	mixKnob->setHintText(tr("Mix:") , "");
 
-	LcdSpinBox* decayBox = new LcdSpinBox(3, this, "Amount");
-	decayBox->setModel(&controls->m_decayModel);
-	decayBox->move(55, 10);
-	decayBox->setLabel(tr("DECAY"));
-	decayBox->setToolTip(tr("How many passes to do with this filter"));
+	LcdSpinBox* degreeBox = new LcdSpinBox(3, this, "Amount");
+	degreeBox->setModel(&controls->m_degreeModel);
+	degreeBox->move(55, 10);
+	degreeBox->setLabel(tr("DEGREE"));
+	degreeBox->setToolTip(tr("What degree of polynomial to use"));
 
-	LcdSpinBox* rangeBox = new LcdSpinBox(3, this, "Amount");
-	rangeBox->setModel(&controls->m_rangeModel);
-	rangeBox->move(105, 10);
-	rangeBox->setLabel(tr("RANGE"));
-	rangeBox->setToolTip(tr("How wide should the samples come from"));
+	LcdSpinBox* gapBox = new LcdSpinBox(3, this, "Amount");
+	gapBox->setModel(&controls->m_gapModel);
+	gapBox->move(105, 10);
+	gapBox->setLabel(tr("GAP"));
+	gapBox->setToolTip(tr("How many samples to skip between sample points"));
 	
+	/*
 	PixmapButton* isReversedButton = new PixmapButton(this, tr("Reverse"));
 	isReversedButton->move(160, 16);
 	isReversedButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("reverse_on"));
@@ -68,6 +69,37 @@ PolynomialExtrapolateControlDialog::PolynomialExtrapolateControlDialog(Polynomia
 	isReversedButton->setCheckable(true);
 	isReversedButton->setModel(&controls->m_isReverseModel);
 	isReversedButton->setToolTip(tr("Should the reverse value have the biggest weight?"));
+	*/
+
+	LcdSpinBox* predictionCountBox = new LcdSpinBox(3, this, "Amount");
+	predictionCountBox->setModel(&controls->m_predictionCountModel);
+	predictionCountBox->move(155, 10);
+	predictionCountBox->setLabel(tr("PREDICT"));
+	predictionCountBox->setToolTip(tr("How many samples to predict"));
+
+	Knob* xMultiplierKnob = new Knob(KnobType::Bright26, this);
+	xMultiplierKnob->move(190, 10);
+	xMultiplierKnob->setModel(&controls->m_xMultiplierModel);
+	xMultiplierKnob->setLabel(tr("X"));
+	xMultiplierKnob->setHintText(tr("X multiplier:") , "");
+
+	Knob* feedbackKnob = new Knob(KnobType::Bright26, this);
+	feedbackKnob->move(260, 10);
+	feedbackKnob->setModel(&controls->m_feedbackModel);
+	feedbackKnob->setLabel(tr("Feedback"));
+	feedbackKnob->setHintText(tr("Feedback") , "%");
+
+	Knob* reuseKnob = new Knob(KnobType::Bright26, this);
+	reuseKnob->move(300, 10);
+	reuseKnob->setModel(&controls->m_reusePercentModel);
+	reuseKnob->setLabel(tr("Reuse"));
+	reuseKnob->setHintText(tr("Reuses ") , "%");
+
+	Knob* volumeKnob = new Knob(KnobType::Bright26, this);
+	volumeKnob->move(350, 10);
+	volumeKnob->setModel(&controls->m_volumeModel);
+	volumeKnob->setLabel(tr("Volume"));
+	volumeKnob->setHintText(tr("Volume") , "");
 }
 
 } // namespace lmms::gui

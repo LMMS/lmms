@@ -43,8 +43,9 @@ public:
 
 	static constexpr size_t MAX_POLYNOMIAL_DEGREE = 8;
 	static constexpr size_t MAX_SAMPLING_GAP = 500;
-	static constexpr size_t MAX_PREDICTION_COUNT = MAX_POLYNOMIAL_DEGREE * MAX_SAMPLING_GAP;
-	static constexpr size_t MAX_SAMPLES_BETWEEN_PREDICTION = 40;
+	static constexpr size_t MAX_PREDICTION_COUNT = 20;
+	static constexpr size_t MAX_SAMPLES_BETWEEN_PREDICTION = 1;
+	static constexpr size_t MAX_BUFFER_SIZE = MAX_POLYNOMIAL_DEGREE * MAX_SAMPLING_GAP + MAX_PREDICTION_COUNT + MAX_SAMPLES_BETWEEN_PREDICTION;
 
 	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
 
@@ -69,12 +70,11 @@ private:
 		void clear();
 		size_t size();
 		void resize(size_t newSize);
-		void write(const T* buf, size_t frames);
-		void swap(const T* buf, size_t frames);
+		// pushes front `data`, returns replaced back
 		T swap(T data);
 	private:
 		size_t m_readIndex = 0;
-		size_t m_size = 0;
+		size_t m_size = maxSize;
 		std::array<T, maxSize> m_data = {};
 	};
 
@@ -87,15 +87,22 @@ private:
 	void generateMatrix(std::span<float>& matrix, size_t width);
 	float polinomialAt(float x, const std::span<float>& polinomial, size_t width) const;
 
+	//! @param startIdnex the index before the extraploation
+	//! @param width the count of combined polynomials, degree + 1
+	//! @param gap how many samples to skip while generatin the coefficients
+	//! @param predictionCount how many samples to extrapolate from startIndex
+	//! @param xMultiplier changes the sampling positions for the extrapolations: x * xMultiplier
+	//! @param feedback mixes the extrapolation with the input samples, 0 -> 0% extrapolation, 100% input
+	//! @param start changes the sampling positions fot the extrapolations: x + start
 	void makeExtrapolation(size_t startIndex, size_t width,
-		size_t gap, int predictionCount, float xMultiplier);
+		size_t gap, int predictionCount, float xMultiplier, float feedback, float start);
 
 	void printMatrixDebug(const std::span<float>& matrix, size_t width);
 
 	PolynomialExtrapolateControls m_effectControls;
 	//! first: input data and feedback
 	//! output data
-	storageBuffer<std::pair<SampleFrame, SampleFrame>, MAX_POLYNOMIAL_DEGREE * MAX_SAMPLING_GAP * 2> m_inputData;
+	storageBuffer<std::pair<SampleFrame, SampleFrame>, MAX_BUFFER_SIZE> m_inputData;
 	//! how much data to store in `m_inputData` from the last input
 	size_t m_retainCount = 3;
 	size_t m_retainCounter = 0;
