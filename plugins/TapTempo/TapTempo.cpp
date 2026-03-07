@@ -24,7 +24,6 @@
 
 #include "TapTempo.h"
 
-#include <qdebug.h>
 #include <string>
 
 #include "SamplePlayHandle.h"

@@ -26,7 +26,6 @@
 #define LMMS_TAP_TEMPO_H
 
 #include <chrono>
-#include <deque>
 
 #include "TapTempoView.h"
 #include "ToolPlugin.h"
