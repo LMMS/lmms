@@ -95,7 +95,7 @@ void MidiFile::Section::writeBytes(std::span<const std::uint8_t> bytes,
 void MidiFile::Section::writeBytes(std::initializer_list<std::uint8_t> bytes,
 	std::vector<std::uint8_t>* v)
 {
-	writeBytes(std::span{bytes.begin(), bytes.size()});
+	writeBytes(std::span{bytes.begin(), bytes.size()}, v);
 }
 
 void MidiFile::Section::writeVarLength(std::uint32_t val)

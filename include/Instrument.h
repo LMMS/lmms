@@ -98,7 +98,7 @@ public:
 	}
 
 	//! Called if external source needs to change something but we cannot
-	//! reference the class header. Should return null if not key not found.
+	//! reference the class header. Should return nullptr if the model is not found.
 	virtual auto childModel(std::string_view modelName) -> AutomatableModel*
 	{
 		return nullptr;
