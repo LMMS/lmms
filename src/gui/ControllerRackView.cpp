@@ -45,9 +45,9 @@ namespace lmms::gui
 {
 
 
-ControllerRackView::ControllerRackView() :
-	QWidget(),
-	m_nextIndex(0)
+ControllerRackView::ControllerRackView()
+	: QWidget{}
+	, m_nextIndex{0}
 {
 	setWindowIcon( embed::getIconPixmap( "controller" ) );
 	setWindowTitle( tr( "Controller Rack" ) );
@@ -79,7 +79,10 @@ ControllerRackView::ControllerRackView() :
 	layout->addWidget( m_addButton );
 	this->setLayout( layout );
 
-	QMdiSubWindow * subWin = getGUI()->mainWindow()->addWindowedWidget( this );
+	SubWindow* subWin = getGUI()->mainWindow()->addWindowedWidget(this);
+
+	setFixedWidth(350);
+	setMinimumHeight(200);
 
 	// No maximize button
 	Qt::WindowFlags flags = subWin->windowFlags();
@@ -88,9 +91,6 @@ ControllerRackView::ControllerRackView() :
 	
 	subWin->setAttribute( Qt::WA_DeleteOnClose, false );
 	subWin->move( 680, 310 );
-	subWin->resize( 350, 200 );
-	subWin->setFixedWidth( 350 );
-	subWin->setMinimumHeight( 200 );
 }
 
 
@@ -169,13 +169,13 @@ void ControllerRackView::addController(Controller* controller)
 	connect(controllerView, &ControllerView::removedController, this, &ControllerRackView::deleteController, Qt::QueuedConnection);
 
 	auto moveUpAction = new QAction(controllerView);
-	moveUpAction->setShortcut(combine(Qt::Key_Up, Qt::AltModifier));
+	moveUpAction->setShortcut(keySequence(Qt::Key_Up, Qt::AltModifier));
 	moveUpAction->setShortcutContext(Qt::WidgetShortcut);
 	connect(moveUpAction, &QAction::triggered, controllerView, &ControllerView::moveUp);
 	controllerView->addAction(moveUpAction);
 
 	auto moveDownAction = new QAction(controllerView);
-	moveDownAction->setShortcut(combine(Qt::Key_Down, Qt::AltModifier));
+	moveDownAction->setShortcut(keySequence(Qt::Key_Down, Qt::AltModifier));
 	moveDownAction->setShortcutContext(Qt::WidgetShortcut);
 	connect(moveDownAction, &QAction::triggered, controllerView, &ControllerView::moveDown);
 	controllerView->addAction(moveDownAction);
@@ -228,22 +228,5 @@ void ControllerRackView::addController()
 	// new controller
 	setFocus();
 }
-
-
-
-
-void ControllerRackView::closeEvent( QCloseEvent * _ce )
- {
-	if( parentWidget() )
-	{
-		parentWidget()->hide();
-	}
-	else
-	{
-		hide();
-	}
-	_ce->ignore();
- }
-
 
 } // namespace lmms::gui

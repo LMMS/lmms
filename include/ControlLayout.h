@@ -96,6 +96,8 @@ class ControlLayout : public QLayout
 {
 	Q_OBJECT
 
+	using ControlLayoutMap = QMap<QString, QLayoutItem*>;
+
 public:
 	explicit ControlLayout(QWidget *parent,
 		int margin = -1, int hSpacing = -1, int vSpacing = -1);
@@ -124,9 +126,9 @@ private slots:
 private:
 	int doLayout(const QRect &rect, bool testOnly) const;
 	int smartSpacing(QStyle::PixelMetric pm) const;
-	QMap<QString, QLayoutItem *>::const_iterator pairAt(int index) const;
+	ControlLayoutMap::const_iterator pairAt(int index) const;
 
-	QMultiMap<QString, QLayoutItem *> m_itemMap;
+	ControlLayoutMap m_itemMap;
 	int m_hSpace;
 	int m_vSpace;
 	// relevant dimension is width, as later, heightForWidth() will be called

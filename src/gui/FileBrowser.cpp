@@ -29,12 +29,14 @@
 #include <QApplication>
 #include <QCheckBox>
 #include <QHBoxLayout>
+#include <QHeaderView>
 #include <QLineEdit>
 #include <QMdiArea>
 #include <QMdiSubWindow>
 #include <QMenu>
 #include <QMessageBox>
 #include <QProgressBar>
+#include <QScrollBar>
 #include <QPushButton>
 #include <QShortcut>
 #include <QStringList>
@@ -43,9 +45,10 @@
 #include "AudioEngine.h"
 #include "ConfigManager.h"
 #include "DataFile.h"
+#include "DeprecationHelper.h"
 #include "Engine.h"
+#include "FileBrowser.h"
 #include "FileRevealer.h"
-#include "FileSearch.h"
 #include "GuiApplication.h"
 #include "ImportFilter.h"
 #include "Instrument.h"
@@ -54,17 +57,18 @@
 #include "KeyboardShortcuts.h"
 #include "MainWindow.h"
 #include "PatternStore.h"
+#include "Plugin.h"
 #include "PluginFactory.h"
 #include "PresetPreviewPlayHandle.h"
 #include "Sample.h"
 #include "SampleClip.h"
-#include "SampleLoader.h"
 #include "SamplePlayHandle.h"
 #include "SampleTrack.h"
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "TextFloat.h"
 #include "ThreadPool.h"
+#include "Track.h"
 #include "embed.h"
 
 namespace lmms::gui
@@ -104,6 +108,9 @@ FileBrowser::FileBrowser(Type type, const QString& directories, const QString& f
 	m_filterEdit->addAction(embed::getIconPixmap("zoom"), QLineEdit::LeadingPosition);
 
 	connect(m_filterEdit, &QLineEdit::textEdited, this, &FileBrowser::onSearch);
+	connect(&m_searchJob, &FileSearchJob::started, this, &FileBrowser::onSearchStarted, Qt::QueuedConnection);
+	connect(&m_searchJob, &FileSearchJob::finished, this, &FileBrowser::onSearchFinished, Qt::QueuedConnection);
+	connect(&m_searchJob, &FileSearchJob::foundMatch, this, &FileBrowser::onSearchMatch, Qt::QueuedConnection);
 
 	auto reload_btn = new QPushButton(embed::getIconPixmap("reload"), QString(), searchWidget);
 	reload_btn->setToolTip( tr( "Refresh list" ) );
@@ -123,8 +130,7 @@ FileBrowser::FileBrowser(Type type, const QString& directories, const QString& f
 	addContentWidget(m_searchTreeWidget);
 
 	m_searchIndicator = new QProgressBar(this);
-	m_searchIndicator->setMinimum(0);
-	m_searchIndicator->setMaximum(100);
+	m_searchIndicator->setRange(0, 1);
 	addContentWidget(m_searchIndicator);
 
 	// Whenever the FileBrowser has focus, Ctrl+F should direct focus to its filter box.
@@ -173,7 +179,13 @@ void FileBrowser::addContentCheckBox()
 	auto configCheckBox = [this](QBoxLayout* boxLayout, QCheckBox* box, Qt::CheckState checkState)
 	{
 		box->setCheckState(checkState);
-		connect(box, SIGNAL(stateChanged(int)), this, SLOT(reloadTree()));
+
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
+		connect(box, &QCheckBox::checkStateChanged, this, &FileBrowser::reloadTree);
+#else
+		connect(box, &QCheckBox::stateChanged, this, &FileBrowser::reloadTree);
+#endif
+
 		boxLayout->addWidget(box);
 	};
 
@@ -203,89 +215,12 @@ void FileBrowser::restoreDirectoriesStates()
 	expandItems(m_savedExpandedDirs);
 }
 
-void FileBrowser::foundSearchMatch(FileSearch* search, const QString& match)
-{
-	assert(search != nullptr);
-	if (m_currentSearch.get() != search) { return; }
-
-	auto basePath = QString{};
-	for (const auto& path : m_directories.split('*'))
-	{
-		if (!match.startsWith(QDir{path}.absolutePath())) { continue; }
-		basePath = path;
-		break;
-	}
-
-	if (basePath.isEmpty()) { return; }
-
-	const auto baseDir = QDir{basePath};
-	const auto matchInfo = QFileInfo{match};
-	const auto matchRelativeToBasePath = baseDir.relativeFilePath(match);
-
-	auto pathParts = QDir::cleanPath(matchRelativeToBasePath).split("/");
-	auto currentItem = static_cast<QTreeWidgetItem*>(nullptr);
-	auto currentDir = baseDir;
-
-	for (const auto& pathPart : pathParts)
-	{
-		auto childCount = currentItem ? currentItem->childCount() : m_searchTreeWidget->topLevelItemCount();
-		auto childItem = static_cast<QTreeWidgetItem*>(nullptr);
-
-		for (int i = 0; i < childCount; ++i)
-		{
-			auto item = currentItem ? currentItem->child(i) : m_searchTreeWidget->topLevelItem(i);
-			if (item->text(0) == pathPart)
-			{
-				childItem = item;
-				break;
-			}
-
-		}
-
-		if (!childItem)
-		{
-			auto pathPartInfo = QFileInfo(currentDir, pathPart);
-			if (pathPartInfo.isDir())
-			{
-				// Only update directory (i.e., add entries) when it is the matched directory (so do not update
-				// parents since entries would be added to them that did not match the filter)
-				const auto disablePopulation = pathParts.indexOf(pathPart) < pathParts.size() - 1;
-
-				auto item = new Directory(pathPart, currentDir.path(), m_filter, disablePopulation);
-				currentItem ? currentItem->addChild(item) : m_searchTreeWidget->addTopLevelItem(item);
-				item->update();
-				if (disablePopulation) { m_searchTreeWidget->expandItem(item); }
-				childItem = item;
-			}
-			else
-			{
-				auto item = new FileItem(pathPart, currentDir.path());
-				currentItem ? currentItem->addChild(item) : m_searchTreeWidget->addTopLevelItem(item);
-				childItem = item;
-			}
-		}
-
-		currentItem = childItem;
-		if (!currentDir.cd(pathPart)) { break; }
-	}
-}
-
-void FileBrowser::searchCompleted(FileSearch* search)
-{
-	assert(search != nullptr);
-	if (m_currentSearch.get() != search) { return; }
-
-	m_currentSearch.reset();
-	m_searchIndicator->setMaximum(100);
-}
-
 void FileBrowser::onSearch(const QString& filter)
 {
-	if (m_currentSearch) { m_currentSearch->cancel(); }
-
 	if (filter.isEmpty())
 	{
-		displaySearch(false);
+		m_searchTreeWidget->hide();
+		m_fileBrowserTreeWidget->show();
 		return;
 	}
 
@@ -294,36 +229,39 @@ void FileBrowser::onSearch(const QString& filter)
 	if (m_showFactoryContent && !m_showFactoryContent->isChecked()) { directories.removeAll(m_factoryDir); }
 	if (directories.isEmpty()) { return; }
 
+	auto directoryFilters = QDir::AllEntries | QDir::NoDotAndDotDot;
+	if (m_showHiddenContent) { directoryFilters |= QDir::Hidden; }
+
+	const auto searchTask = FileSearchJob::Task{.filter = filter,
+		.paths = directories,
+		.extensions = FileItem::defaultFilters().split(" "),
+		.dirFilters = directoryFilters};
+
 	m_searchTreeWidget->clear();
-	displaySearch(true);
-
-	auto browserExtensions = m_filter;
-	const auto searchExtensions = browserExtensions.remove("*.").split(' ');
-
-	auto search = std::make_shared<FileSearch>(
-		filter, directories, searchExtensions, excludedPaths(), dirFilters(), sortFlags());
-	connect(search.get(), &FileSearch::foundMatch, this, &FileBrowser::foundSearchMatch, Qt::QueuedConnection);
-	connect(search.get(), &FileSearch::searchCompleted, this, &FileBrowser::searchCompleted, Qt::QueuedConnection);
-
-	m_currentSearch = search;
-	ThreadPool::instance().enqueue([search] { (*search)(); });
+	m_searchTreeWidget->show();
+	m_fileBrowserTreeWidget->hide();
+	m_searchJob.search(searchTask);
 }
 
-void FileBrowser::displaySearch(bool on)
+void FileBrowser::onSearchMatch(const QString& path)
 {
-	if (on)
-	{
-		m_searchTreeWidget->show();
-		m_fileBrowserTreeWidget->hide();
-		m_searchIndicator->setMaximum(0);
-		return;
-	}
-	
-	m_searchTreeWidget->hide();
-	m_fileBrowserTreeWidget->show();
-	m_searchIndicator->setMaximum(100);
+	const auto fileInfo = QFileInfo{path};
+	auto item = static_cast<QTreeWidgetItem*>(nullptr);
+	if (fileInfo.isDir()) { item = new Directory(fileInfo.fileName(), fileInfo.dir().path(), m_filter); }
+	else if (fileInfo.isFile()) { item = new FileItem(fileInfo.fileName(), fileInfo.dir().path()); }
+
+	m_searchTreeWidget->addTopLevelItem(item);
 }
 
+void FileBrowser::onSearchStarted()
+{
+	m_searchIndicator->setRange(0, 0);
+}
+
+void FileBrowser::onSearchFinished()
+{
+	m_searchIndicator->setRange(0, 1);
+}
 
 void FileBrowser::reloadTree()
 {
@@ -429,8 +367,6 @@ void FileBrowser::giveFocusToFilter()
 
 void FileBrowser::addItems(const QString & path )
 {
-	if (FileBrowser::excludedPaths().contains(path)) { return; }
-
 	if( m_dirsAsItems )
 	{
 		m_fileBrowserTreeWidget->addTopLevelItem( new Directory( path, QString(), m_filter ) );
@@ -446,8 +382,6 @@ void FileBrowser::addItems(const QString & path )
 		QDir::LocaleAware | QDir::DirsFirst | QDir::Name | QDir::IgnoreCase);
 	for (const auto& entry : entries)
 	{
-		if (FileBrowser::excludedPaths().contains(entry.absoluteFilePath())) { continue; }
-
 		QString fileName = entry.fileName();
 		if (entry.isHidden() && m_showHiddenContent && !m_showHiddenContent->isChecked()) continue;
 		if (entry.isDir())
@@ -528,10 +462,12 @@ FileBrowserTreeWidget::FileBrowserTreeWidget(QWidget * parent ) :
 	m_mousePressed( false ),
 	m_pressPos(),
 	m_previewPlayHandle( nullptr )
-#if (QT_VERSION < QT_VERSION_CHECK(5,14,0))
-	,m_pphMutex(QMutex::Recursive)
-#endif
 {
+	setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+	setHorizontalScrollMode(ScrollPerPixel);
+	header()->setStretchLastSection(false);
+	header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+
 	setColumnCount( 1 );
 	headerItem()->setHidden( true );
 	setSortingEnabled( false );
@@ -542,14 +478,6 @@ FileBrowserTreeWidget::FileBrowserTreeWidget(QWidget * parent ) :
 				SLOT(updateDirectory(QTreeWidgetItem*)));
 	connect( this, SIGNAL(itemExpanded(QTreeWidgetItem*)),
 				SLOT(updateDirectory(QTreeWidgetItem*)));
-
-#if QT_VERSION < QT_VERSION_CHECK(5, 12, 2) && defined LMMS_BUILD_WIN32
-	// Set the font for the QTreeWidget to the Windows System font to make sure that
-	// truncated (elided) items use the same font as non-truncated items.
-	// This is a workaround for this qt bug, fixed in 5.12.2: https://bugreports.qt.io/browse/QTBUG-29232
-	// TODO: remove this when all builds use a recent enough version of qt.
-	setFont( GuiApplication::getWin32SystemFont() );
-#endif
 }
 
 
@@ -579,6 +507,28 @@ QList<QString> FileBrowserTreeWidget::expandedDirs( QTreeWidgetItem * item ) con
 	return dirs;
 }
 
+void FileBrowserTreeWidget::scrollTo(const QModelIndex &index, ScrollHint hint)
+{
+	// Overide scrollTo to ensure the horizontal scrollbar stay in place
+	int barPos = horizontalScrollBar()->value();
+	QTreeWidget::scrollTo(index, hint);
+	horizontalScrollBar()->setValue(barPos);
+}
+
+void FileBrowserTreeWidget::wheelEvent(QWheelEvent * event)
+{
+	// When shift is pressed, scroll horizontally instead of vertically
+	if (event->modifiers() & Qt::ShiftModifier)
+	{
+		horizontalScrollBar()->setValue(
+			horizontalScrollBar()->value() - event->angleDelta().y());
+		event->accept();
+	}
+	else
+	{
+		QTreeWidget::wheelEvent(event);
+	}
+}
 
 void FileBrowserTreeWidget::keyPressEvent(QKeyEvent * ke )
 {
@@ -663,19 +613,36 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 	QString fileManager = tr("file manager");
 #endif
 
-	QTreeWidgetItem* item = itemAt(e->pos());
-	if (item == nullptr) { return; } // program hangs when right-clicking on empty space otherwise
+	auto item = dynamic_cast<FileBrowserWidgetItem*>(itemAt(e->pos()));
+	if (item == nullptr) { return; }
 
-	QMenu contextMenu(this);
+	auto contextMenu = QMenu{this};
+
+	const auto fontMetrics = QFontMetrics{qApp->font()};
+	const auto maxHeaderWidth = 50 * fontMetrics.averageCharWidth();
+	const auto elidedPath = fontMetrics.elidedText(PathUtil::toShortestRelative(item->fullName()), Qt::TextElideMode::ElideMiddle, maxHeaderWidth);
+
+	auto header = new QAction{elidedPath};
+	header->setDisabled(true);
+
+	contextMenu.addAction(header);
+	contextMenu.addSeparator();
 
 	switch (item->type())
 	{
 	case TypeFileItem: {
 		auto file = dynamic_cast<FileItem*>(item);
-		const auto path = QFileInfo{file->fullName()}.absoluteFilePath();
 
 		contextMenu.addAction(QIcon(embed::getIconPixmap("folder")), tr("Show in %1").arg(fileManager),
-			[=] { FileRevealer::reveal(file->fullName()); });
+			[file] { FileRevealer::reveal(file->fullName()); });
+
+		if (file->isTrack())
+		{
+			contextMenu.addAction(
+				tr("Send to active instrument-track"), [file, this] { sendToActiveInstrumentTrack(file); });
+		}
+
+		const auto path = QFileInfo{file->fullName()}.absoluteFilePath();
 
 		if (ConfigManager::inst()->isFavoriteItem(file->fullName()))
 		{
@@ -691,19 +658,18 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 		if (file->isTrack())
 		{
 			contextMenu.addSeparator();
-			contextMenu.addAction(
-				tr("Send to active instrument-track"), [=, this] { sendToActiveInstrumentTrack(file); });
+			contextMenu.addAction(tr("Send to active instrument-track"), [&] { sendToActiveInstrumentTrack(file); });
 		}
 
 		auto songEditorHeader = new QAction(tr("Song Editor"), nullptr);
 		songEditorHeader->setDisabled(true);
-		contextMenu.addAction( songEditorHeader );
-		contextMenu.addActions( getContextActions(file, true) );
+		contextMenu.addAction(songEditorHeader);
+		contextMenu.addActions(getContextActions(file, true));
 
 		auto patternEditorHeader = new QAction(tr("Pattern Editor"), nullptr);
 		patternEditorHeader->setDisabled(true);
 		contextMenu.addAction(patternEditorHeader);
-		contextMenu.addActions( getContextActions(file, false) );
+		contextMenu.addActions(getContextActions(file, false));
 		break;
 	}
 	case TypeDirectoryItem: {
@@ -730,6 +696,16 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 	if (!contextMenu.isEmpty()) { contextMenu.exec(e->globalPos()); }
 }
 
+void FileBrowserTreeWidget::openInSlicerT(FileItem* item)
+{
+    TrackContainer* tc = Engine::getSong();
+
+    auto* track = dynamic_cast<InstrumentTrack*>(Track::create(Track::Type::Instrument, tc));
+
+	track->loadInstrument("slicert");
+	track->instrument()->loadFile(item->fullName());
+}
+
 QList<QAction*> FileBrowserTreeWidget::getContextActions(FileItem* file, bool songEditor)
 {
 	QList<QAction*> result = QList<QAction*>();
@@ -740,17 +716,25 @@ QList<QAction*> FileBrowserTreeWidget::getContextActions(FileItem* file, bool so
 		tr("Send to new instrument track");
 	QString shortcutMod = songEditor ? "" : UI_CTRL_KEY + QString(" + ");
 
-	auto toInstrument = new QAction(instrumentAction + tr(" (%2Enter)").arg(shortcutMod), nullptr);
+	auto toInstrument = new QAction(instrumentAction + tr(" (%2Enter)").arg(shortcutMod));
 	connect(toInstrument, &QAction::triggered,
 		[=, this]{ openInNewInstrumentTrack(file, songEditor); });
 	result.append(toInstrument);
 
 	if (songEditor && fileIsSample)
 	{
-		auto toSampleTrack = new QAction(tr("Send to new sample track (Shift + Enter)"), nullptr);
+		auto toSampleTrack = new QAction(tr("Send to new sample track (Shift + Enter)"));
 		connect(toSampleTrack, &QAction::triggered,
 			[=, this]{ openInNewSampleTrack(file); });
 		result.append(toSampleTrack);
+	}
+
+	if (fileIsSample && !PluginFactory::instance()->pluginInfo("slicert").isNull())
+	{
+		auto openInSlicer = new QAction(tr("Send to new SlicerT instance"));
+		connect(openInSlicer, &QAction::triggered,
+			[=, this]{ openInSlicerT(file); });
+		result.append(openInSlicer);
 	}
 
 	return result;
@@ -761,8 +745,10 @@ QList<QAction*> FileBrowserTreeWidget::getContextActions(FileItem* file, bool so
 
 void FileBrowserTreeWidget::mousePressEvent(QMouseEvent * me )
 {
+	const auto pos = position(me);
+
 	// Forward the event
-	QTreeWidgetItem * i = itemAt(me->pos());
+	QTreeWidgetItem* i = itemAt(pos);
 	QTreeWidget::mousePressEvent(me);
 	// QTreeWidget handles right clicks for us, so we only care about left clicks
 	if(me->button() != Qt::LeftButton) { return; }
@@ -770,13 +756,13 @@ void FileBrowserTreeWidget::mousePressEvent(QMouseEvent * me )
 	if (i)
 	{
 		// TODO: Restrict to visible selection
-//		if ( _me->x() > header()->cellPos( header()->mapToActual( 0 ) )
+//		if ( pos.x() > header()->cellPos( header()->mapToActual( 0 ) )
 //			+ treeStepSize() * ( i->depth() + ( rootIsDecorated() ?
 //						1 : 0 ) ) + itemMargin() ||
-//				_me->x() < header()->cellPos(
+//				pos.x() < header()->cellPos(
 //						header()->mapToActual( 0 ) ) )
 //		{
-			m_pressPos = me->pos();
+			m_pressPos = pos;
 			m_mousePressed = true;
 //		}
 	}
@@ -809,7 +795,7 @@ void FileBrowserTreeWidget::previewFileItem(FileItem* file)
 			embed::getIconPixmap("sample_file", 24, 24), 0);
 		// TODO: this can be removed once we do this outside the event thread
 		qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-		if (auto buffer = SampleLoader::createBufferFromFile(fileName))
+		if (auto buffer = SampleBuffer::fromFile(fileName))
 		{
 			auto s = new SamplePlayHandle(new lmms::Sample{std::move(buffer)});
 			s->setDoneMayReturnTrue(false);
@@ -870,9 +856,7 @@ void FileBrowserTreeWidget::stopPreview()
 
 void FileBrowserTreeWidget::mouseMoveEvent( QMouseEvent * me )
 {
-	if( m_mousePressed == true &&
-		( m_pressPos - me->pos() ).manhattanLength() >
-					QApplication::startDragDistance() )
+	if (m_mousePressed && (m_pressPos - position(me)).manhattanLength() > QApplication::startDragDistance())
 	{
 		// make sure any playback is stopped
 		mouseReleaseEvent( nullptr );
@@ -983,7 +967,6 @@ void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it)
 		case FileItem::FileHandling::NotSupported:
 		default:
 			break;
-
 	}
 	Engine::audioEngine()->doneChangeInModel();
 }
@@ -1089,12 +1072,16 @@ void FileBrowserTreeWidget::updateDirectory(QTreeWidgetItem * item )
 	}
 }
 
-Directory::Directory(const QString& filename, const QString& path, const QString& filter, bool disableEntryPopulation)
-	: QTreeWidgetItem(QStringList(filename), TypeDirectoryItem)
+FileBrowserWidgetItem::FileBrowserWidgetItem(const QStringList& strings, int type, QTreeWidget* parent)
+	: QTreeWidgetItem(parent, strings, type)
+{
+}
+
+Directory::Directory(const QString& filename, const QString& path, const QString& filter)
+	: FileBrowserWidgetItem(QStringList{filename}, TypeDirectoryItem)
 	, m_directories(path)
 	, m_filter(filter)
 	, m_dirCount(0)
-	, m_disableEntryPopulation(disableEntryPopulation)
 {
 	setIcon(0, !QDir{fullName()}.isReadable() ? m_folderLockedPixmap : m_folderPixmap);
 	setChildIndicatorPolicy( QTreeWidgetItem::ShowIndicator );
@@ -1109,7 +1096,7 @@ void Directory::update()
 	}
 
 	setIcon(0, m_folderOpenedPixmap);
-	if (!m_disableEntryPopulation && !childCount())
+	if (!childCount())
 	{
 		m_dirCount = 0;
 		// for all paths leading here, add their items
@@ -1129,7 +1116,7 @@ void Directory::update()
 							"--- Factory files ---" ) );
 					sep->setIcon( 0, embed::getIconPixmap(
 								"factory_files" ) );
-					// add delimeter after last file before appending our files
+					// add delimiter after last file before appending our files
 					insertChild( filesBeforeAdd + m_dirCount, sep );
 				}
 			}
@@ -1142,8 +1129,6 @@ void Directory::update()
 
 bool Directory::addItems(const QString& path)
 {
-	if (FileBrowser::excludedPaths().contains(path)) { return false; }
-
 	QDir thisDir(path);
 	if (!thisDir.isReadable()) { return false; }
 
@@ -1153,8 +1138,6 @@ bool Directory::addItems(const QString& path)
 		= thisDir.entryInfoList(m_filter.split(' '), FileBrowser::dirFilters(), FileBrowser::sortFlags());
 	for (const auto& entry : entries)
 	{
-		if (FileBrowser::excludedPaths().contains(entry.absoluteFilePath())) { continue; }
-
 		QString fileName = entry.fileName();
 		if (entry.isDir())
 		{
@@ -1175,24 +1158,17 @@ bool Directory::addItems(const QString& path)
 	return childCount() > 0;
 }
 
-
-
-
-FileItem::FileItem(QTreeWidget * parent, const QString & name,
-						const QString & path ) :
-	QTreeWidgetItem( parent, QStringList( name) , TypeFileItem ),
-	m_path( path )
+FileItem::FileItem(QTreeWidget* parent, const QString& name, const QString& path)
+	: FileBrowserWidgetItem(QStringList{name}, TypeFileItem, parent)
+	, m_path(path)
 {
 	determineFileType();
 	initPixmaps();
 }
 
-
-
-
-FileItem::FileItem(const QString & name, const QString & path ) :
-	QTreeWidgetItem( QStringList( name ), TypeFileItem ),
-	m_path( path )
+FileItem::FileItem(const QString& name, const QString& path)
+	: FileBrowserWidgetItem(QStringList{name}, TypeFileItem)
+	, m_path(path)
 {
 	determineFileType();
 	initPixmaps();

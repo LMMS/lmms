@@ -15,6 +15,7 @@ SET(LMMS_SRCS
 	gui/embed.cpp
 	gui/FileBrowser.cpp
 	gui/FileRevealer.cpp
+	gui/FileSearchJob.cpp
 	gui/GuiApplication.cpp
 	gui/LadspaControlView.cpp
 	gui/LfoControllerDialog.cpp
@@ -34,7 +35,6 @@ SET(LMMS_SRCS
 	gui/PluginBrowser.cpp
 	gui/ProjectNotes.cpp
 	gui/RowTableView.cpp
-	gui/SampleLoader.cpp
 	gui/SampleTrackWindow.cpp
 	gui/SampleThumbnail.cpp
 	gui/SendButtonIndicator.cpp
@@ -105,6 +105,7 @@ SET(LMMS_SRCS
 	gui/widgets/CaptionMenu.cpp
 	gui/widgets/ComboBox.cpp
 	gui/widgets/CustomTextKnob.cpp
+	gui/widgets/Draggable.cpp
 	gui/widgets/Fader.cpp
 	gui/widgets/FloatModelEditorBase.cpp
 	gui/widgets/Graph.cpp

@@ -46,7 +46,7 @@ public:
 
 	void reset();
 
-	// Must have the sub-models exposed to programatically connect
+	// Must have the sub-models exposed to programmatically connect
 	// to automation or controllers
 	IntModel & numeratorModel()
 	{

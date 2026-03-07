@@ -139,9 +139,6 @@ RemotePlugin::RemotePlugin() :
 #endif
 	m_failed( true ),
 	m_watcher( this ),
-#if (QT_VERSION < QT_VERSION_CHECK(5,14,0))
-	m_commMutex(QMutex::Recursive),
-#endif
 	m_splitChannels( false ),
 	m_audioBufferSize( 0 ),
 	m_inputCount( DEFAULT_CHANNELS ),

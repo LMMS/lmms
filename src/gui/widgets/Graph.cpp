@@ -26,7 +26,8 @@
 #include <QPainter>
 
 #include "Graph.h"
-#include "SampleLoader.h"
+#include "DeprecationHelper.h"
+#include "FileDialog.h"
 #include "StringPairDrag.h"
 #include "Oscillator.h"
 
@@ -99,9 +100,11 @@ void graph::loadSampleFromFile( const QString & _filename )
 
 void Graph::mouseMoveEvent ( QMouseEvent * _me )
 {
+	const auto pos = position(_me);
+
 	// get position
-	int x = _me->x();
-	int y = _me->y();
+	int x = pos.x();
+	int y = pos.y();
 
 /*	static bool skip = false;
 
@@ -146,13 +149,15 @@ void Graph::mouseMoveEvent ( QMouseEvent * _me )
 
 void Graph::mousePressEvent( QMouseEvent * _me )
 {
+	const auto pos = position(_me);
+
 	if( _me->button() == Qt::LeftButton )
 	{
 		if ( !( _me->modifiers() & Qt::ShiftModifier ) )
 		{
 			// get position
-			int x = _me->x();
-			int y = _me->y();
+			int x = pos.x();
+			int y = pos.y();
 
 			changeSampleAt( x, y );
 
@@ -165,8 +170,8 @@ void Graph::mousePressEvent( QMouseEvent * _me )
 		{
 			//when shift-clicking, draw a line from last position to current
 			//position
-			int x = _me->x();
-			int y = _me->y();
+			int x = pos.x();
+			int y = pos.y();
 
 			drawLineAt( x, y, m_lastCursorX );
 
@@ -580,10 +585,10 @@ void graphModel::setWaveToNoise()
 
 QString graphModel::setWaveToUser()
 {
-	QString fileName = gui::SampleLoader::openWaveformFile();
+	QString fileName = gui::FileDialog::openWaveformFile();
 	if( fileName.isEmpty() == false )
 	{
-		auto sampleBuffer = gui::SampleLoader::createBufferFromFile(fileName);
+		auto sampleBuffer = SampleBuffer::fromFile(fileName);
 		for( int i = 0; i < length(); i++ )
 		{
 			m_samples[i] = Oscillator::userWaveSample(sampleBuffer.get(), i / static_cast<float>(length()));

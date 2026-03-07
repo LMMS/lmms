@@ -57,7 +57,7 @@ public:
 	}
 
 
-	// if audio-driver supports ports, classes inherting AudioBusHandle
+	// if audio-driver supports ports, classes inheriting AudioBusHandle
 	// (e.g. channel-tracks) can register themselves for making
 	// audio-driver able to collect their individual output and provide
 	// them at a specific port - currently only supported by JACK
@@ -111,6 +111,11 @@ protected:
 	inline void setSampleRate( const sample_rate_t _new_sr )
 	{
 		m_sampleRate = _new_sr;
+	}
+
+	void setChannels(const ch_cnt_t channels)
+	{
+		m_channels = channels;
 	}
 
 	AudioEngine* audioEngine()

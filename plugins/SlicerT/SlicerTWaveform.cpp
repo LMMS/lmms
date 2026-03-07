@@ -29,6 +29,7 @@
 #include <QPainter>
 #include <QPainterPath>
 
+#include "DeprecationHelper.h"
 #include "SampleThumbnail.h"
 #include "SlicerT.h"
 #include "SlicerTView.h"
@@ -297,13 +298,15 @@ void SlicerTWaveform::updateUI()
 // updates the closest object and changes the cursor respectivly
 void SlicerTWaveform::updateClosest(QMouseEvent* me)
 {
-	float normalizedClickSeeker = static_cast<float>(me->x() - s_seekerHorMargin) / m_seekerWidth;
-	float normalizedClickEditor = static_cast<float>(me->x()) / m_editorWidth;
+	const auto pos = position(me);
+
+	float normalizedClickSeeker = static_cast<float>(pos.x() - s_seekerHorMargin) / m_seekerWidth;
+	float normalizedClickEditor = static_cast<float>(pos.x()) / m_editorWidth;
 
 	m_closestObject = UIObjects::Nothing;
 	m_closestSlice = -1;
 
-	if (me->y() < m_seekerHeight)
+	if (pos.y() < m_seekerHeight)
 	{
 		if (std::abs(normalizedClickSeeker - m_seekerStart) < s_distanceForClick)
 		{
@@ -358,6 +361,8 @@ void SlicerTWaveform::updateCursor()
 // handles deletion, reset and middles seeker
 void SlicerTWaveform::mousePressEvent(QMouseEvent* me)
 {
+	const auto pos = position(me);
+
 	switch (me->button())
 	{
 	case Qt::MouseButton::MiddleButton:
@@ -369,7 +374,7 @@ void SlicerTWaveform::mousePressEvent(QMouseEvent* me)
 	case Qt::MouseButton::LeftButton:
 		if (m_slicerTParent->m_originalSample.sampleSize() <= 1) { static_cast<SlicerTView*>(parent())->openFiles(); }
 		// update seeker middle for correct movement
-		m_seekerMiddle = static_cast<float>(me->x() - s_seekerHorMargin) / m_seekerWidth;
+		m_seekerMiddle = static_cast<float>(pos.x() - s_seekerHorMargin) / m_seekerWidth;
 		break;
 	case Qt::MouseButton::RightButton:
 		if (m_slicerTParent->m_slicePoints.size() > 2 && m_closestObject == UIObjects::SlicePoint)
@@ -400,8 +405,10 @@ void SlicerTWaveform::mouseMoveEvent(QMouseEvent* me)
 		return;
 	}
 
-	float normalizedClickSeeker = static_cast<float>(me->x() - s_seekerHorMargin) / m_seekerWidth;
-	float normalizedClickEditor = static_cast<float>(me->x()) / m_editorWidth;
+	const auto pos = position(me);
+
+	float normalizedClickSeeker = static_cast<float>(pos.x() - s_seekerHorMargin) / m_seekerWidth;
+	float normalizedClickEditor = static_cast<float>(pos.x()) / m_editorWidth;
 
 	float distStart = m_seekerStart - m_seekerMiddle;
 	float distEnd = m_seekerEnd - m_seekerMiddle;
@@ -449,9 +456,11 @@ void SlicerTWaveform::mouseMoveEvent(QMouseEvent* me)
 
 void SlicerTWaveform::mouseDoubleClickEvent(QMouseEvent* me)
 {
-	if (me->button() != Qt::MouseButton::LeftButton || me->y() < m_seekerHeight) { return; }
+	const auto pos = position(me);
 
-	float normalizedClickEditor = static_cast<float>(me->x()) / m_editorWidth;
+	if (me->button() != Qt::MouseButton::LeftButton || pos.y() < m_seekerHeight) { return; }
+
+	float normalizedClickEditor = static_cast<float>(pos.x()) / m_editorWidth;
 	float startFrame = m_seekerStart;
 	float endFrame = m_seekerEnd;
 	float slicePosition = startFrame + normalizedClickEditor * (endFrame - startFrame);

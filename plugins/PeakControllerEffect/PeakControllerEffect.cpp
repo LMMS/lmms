@@ -49,7 +49,7 @@ Plugin::Descriptor PLUGIN_EXPORT peakcontrollereffect_plugin_descriptor =
 	"Paul Giblock <drfaygo/at/gmail.com>",
 	0x0100,
 	Plugin::Type::Effect,
-	new PluginPixmapLoader("logo"),
+	new PixmapLoader("lmms-plugin-logo"),
 	nullptr,
 	nullptr,
 } ;
@@ -66,7 +66,7 @@ PeakControllerEffect::PeakControllerEffect(
 			Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key ) :
 	Effect( &peakcontrollereffect_plugin_descriptor, _parent, _key ),
-	m_effectId( rand() ),
+	m_effectId(fastRand()),
 	m_peakControls( this ),
 	m_lastSample( 0 ),
 	m_autoController( nullptr )

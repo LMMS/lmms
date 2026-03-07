@@ -103,8 +103,9 @@ public:
 	vstSubWin( QWidget * _parent ) :
 		SubWindow( _parent )
 	{
-		setAttribute( Qt::WA_DeleteOnClose, false );
-		setWindowFlags( Qt::WindowCloseButtonHint );
+		setAttribute(Qt::WA_DeleteOnClose, false);
+		setWindowFlag(Qt::WindowMaximizeButtonHint, false);
+		setDetachable(false);
 	}
 
 	~vstSubWin() override = default;
@@ -532,14 +533,10 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	m_openPresetButton->setToolTip(tr("Open VST plugin preset"));
 
 
-	m_rolLPresetButton = new PixmapButton( this, "" );
-	m_rolLPresetButton->setCheckable( false );
-	m_rolLPresetButton->setCursor( Qt::PointingHandCursor );
+	m_rolLPresetButton = new QPushButton(this);
+	m_rolLPresetButton->setObjectName("btn-stepper-left");
+	m_rolLPresetButton->setCursor(Qt::PointingHandCursor);
 	m_rolLPresetButton->move( 190, 201 );
-	m_rolLPresetButton->setActiveGraphic( embed::getIconPixmap(
-							"stepper-left-press" ) );
-	m_rolLPresetButton->setInactiveGraphic( embed::getIconPixmap(
-							"stepper-left" ) );
 	connect( m_rolLPresetButton, SIGNAL( clicked() ), this,
 						SLOT( previousProgram() ) );
 	m_rolLPresetButton->setToolTip(tr("Previous (-)"));
@@ -560,14 +557,10 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	m_savePresetButton->setToolTip(tr("Save preset"));
 
 
-	m_rolRPresetButton = new PixmapButton( this, "" );
-	m_rolRPresetButton->setCheckable( false );
-	m_rolRPresetButton->setCursor( Qt::PointingHandCursor );
+	m_rolRPresetButton = new QPushButton(this);
+	m_rolRPresetButton->setObjectName("btn-stepper-right");
+	m_rolRPresetButton->setCursor(Qt::PointingHandCursor);
 	m_rolRPresetButton->move( 209, 201 );
-	m_rolRPresetButton->setActiveGraphic( embed::getIconPixmap(
-							"stepper-right-press" ) );
-	m_rolRPresetButton->setInactiveGraphic( embed::getIconPixmap(
-							"stepper-right" ) );
 	connect( m_rolRPresetButton, SIGNAL( clicked() ), this,
 						SLOT( nextProgram() ) );
 	m_rolRPresetButton->setToolTip(tr("Next (+)"));
@@ -575,15 +568,14 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	m_rolRPresetButton->setShortcut( Qt::Key_Plus );
 
 
-	m_selPresetButton = new QPushButton( tr( "" ), this );
-	m_selPresetButton->setGeometry( 228, 201, 16, 16 );
+	m_selPresetButton = new QPushButton(this);
+	m_selPresetButton->setObjectName("btn-stepper-down");
+	m_selPresetButton->setCursor(Qt::PointingHandCursor);
+	m_selPresetButton->move(228, 201);
 
 	auto menu = new QMenu;
 
 	connect( menu, SIGNAL( aboutToShow() ), this, SLOT( updateMenu() ) );
-
-
-	m_selPresetButton->setIcon( embed::getIconPixmap( "stepper-down" ) );
 
 	m_selPresetButton->setMenu(menu);
 
@@ -922,28 +914,14 @@ ManageVestigeInstrumentView::ManageVestigeInstrumentView( Instrument * _instrume
 							QWidget * _parent, VestigeInstrument * m_vi2 ) :
 	InstrumentViewFixedSize( _instrument, _parent )
 {
-#if QT_VERSION < 0x50C00
-	// Workaround for a bug in Qt versions below 5.12,
-	// where argument-dependent-lookup fails for QFlags operators
-	// declared inside a namepsace.
-	// This affects the Q_DECLARE_OPERATORS_FOR_FLAGS macro in Instrument.h
-	// See also: https://codereview.qt-project.org/c/qt/qtbase/+/225348
-
-	using ::operator|;
-
-#endif
-
 	m_vi = m_vi2;
 	m_vi->m_scrollArea = new QScrollArea( this );
 	widget = new QWidget(this);
 	l = new QGridLayout( this );
 
-	m_vi->m_subWindow = getGUI()->mainWindow()->addWindowedWidget(nullptr, Qt::SubWindow |
-			Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
-	m_vi->m_subWindow->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::MinimumExpanding );
-	m_vi->m_subWindow->setFixedWidth( 960 );
-	m_vi->m_subWindow->setMinimumHeight( 300 );
-	m_vi->m_subWindow->setWidget(m_vi->m_scrollArea);
+	m_vi->m_subWindow = getGUI()->mainWindow()->addWindowedWidget(m_vi->m_scrollArea);
+	m_vi->m_scrollArea->setFixedWidth(960);
+	m_vi->m_scrollArea->setMinimumHeight(300);
 	m_vi->m_subWindow->setWindowTitle( m_vi->instrumentTrack()->name()
 								+ tr( " - VST plugin control" ) );
 	m_vi->m_subWindow->setWindowIcon( PLUGIN_NAME::getIconPixmap( "logo" ) );
@@ -1072,8 +1050,8 @@ void ManageVestigeInstrumentView::syncPlugin( void )
 			std::snprintf(paramStr.data(), paramStr.size(), "param%d", i);
 			s_dumpValues = dump[paramStr.data()].split(":");
 			float f_value = LocaleHelper::toFloat(s_dumpValues.at(2));
-			m_vi->knobFModel[ i ]->setAutomatedValue( f_value );
-			m_vi->knobFModel[ i ]->setInitValue( f_value );
+			m_vi->knobFModel[i]->setValue(f_value, true);
+			m_vi->knobFModel[i]->setInitValue(f_value);
 		}
 	}
 	syncParameterText();

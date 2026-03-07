@@ -45,7 +45,7 @@ jobs:
           sudo apt-get update -y
           sudo apt-get install -y --no-install-recommends \
             $(xargs < .github/workflows/deps-ubuntu-24.04-gcc.txt)
-          sudo apt-get install -y --install-recommends g++-multilib gcc-multilib winehq-stable wine-stable-dev
+          sudo apt-get install -y --install-recommends g++-multilib gcc-multilib winehq-devel wine-devel-dev
           sudo apt-get install -y --install-recommends \
             $(xargs < .github/workflows/deps-ubuntu-24.04-fltk.txt)
       - name: Cache ccache data
@@ -181,11 +181,11 @@ jobs:
         arch: [ x86_64, arm64 ]
         include:
           - arch: x86_64
-            os: macos-13
-            xcode: "15.2"
+            os: macos-15-intel
+            xcode: "16.4"
           - arch: arm64
-            os: macos-14
-            xcode: "15.4"
+            os: macos-15
+            xcode: "16.4"
     name: macos-${{ matrix.arch }}
     runs-on: ${{ matrix.os }}
     env:
@@ -372,10 +372,10 @@ jobs:
       - name: Install tools
         run: choco install ccache
       - name: Install Qt
-        uses: jurplel/install-qt-action@b3ea5275e37b734d027040e2c7fe7a10ea2ef946
+        uses: jurplel/install-qt-action@d325aaf2a8baeeda41ad0b5d39f84a6af9bcf005
         with:
-          version: '5.15.2'
-          arch: "win64_msvc2019_64"
+          version: '6.8.*'
+          arch: "win64_msvc2022_64"
           archives: qtbase qtsvg qttools
           cache: true
       - name: Set up build environment
@@ -392,6 +392,7 @@ jobs:
             --toolchain C:/vcpkg/scripts/buildsystems/vcpkg.cmake `
             -Werror=dev `
             -DCMAKE_BUILD_TYPE=RelWithDebInfo `
+            -DWANT_QT6=ON `
             -DUSE_COMPILE_CACHE=ON `
             -DUSE_WERROR=ON `
             -DVCPKG_TARGET_TRIPLET="x64-windows" `

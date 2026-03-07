@@ -50,6 +50,8 @@ public:
 									const QString &directory = QString(),
 									const QString &filter = QString(),
 									QString *selectedFilter = 0);
+	static QString openAudioFile(const QString& previousFile = "");
+	static QString openWaveformFile(const QString& previousFile = "");
 	void clearSelection();
 };
 

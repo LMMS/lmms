@@ -31,6 +31,7 @@
 
 #include "Instrument.h"
 #include "InstrumentView.h"
+#include "SubWindow.h"
 
 
 class QGridLayout;
@@ -86,7 +87,7 @@ private:
 	QMutex m_pluginMutex;
 
 	QString m_pluginDLL;
-	QMdiSubWindow * m_subWindow;
+	gui::SubWindow* m_subWindow;
 	QScrollArea * m_scrollArea;
 	FloatModel ** knobFModel;
 	QObject * p_subWindow;
@@ -174,8 +175,8 @@ private:
 
 	PixmapButton * m_openPluginButton;
 	PixmapButton * m_openPresetButton;
-	PixmapButton * m_rolLPresetButton;
-	PixmapButton * m_rolRPresetButton;
+	QPushButton* m_rolLPresetButton;
+	QPushButton* m_rolRPresetButton;
 	QPushButton * m_selPresetButton;
 	QPushButton * m_toggleGUIButton;
 	PixmapButton * m_managePluginButton;

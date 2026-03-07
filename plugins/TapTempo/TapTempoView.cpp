@@ -112,11 +112,11 @@ TapTempoView::TapTempoView(TapTempo* plugin)
 
 	reset();
 	hide();
+	layout()->setSizeConstraint(QLayout::SetFixedSize);
 
 	if (parentWidget())
 	{
 		parentWidget()->hide();
-		parentWidget()->layout()->setSizeConstraint(QLayout::SetFixedSize);
 
 		Qt::WindowFlags flags = parentWidget()->windowFlags();
 		flags |= Qt::MSWindowsFixedSizeDialogHint;

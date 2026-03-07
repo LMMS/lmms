@@ -41,6 +41,7 @@
 #include "embed.h"
 #include "Engine.h"
 #include "InstrumentTrackView.h"
+#include "lmms_math.h"
 #include "KeyboardShortcuts.h"
 #include "Song.h"
 #include "StringPairDrag.h"
@@ -90,6 +91,7 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 	m_trackOps->setFocusPolicy( Qt::NoFocus );
 	m_trackOps->setMenu( toMenu );
 	m_trackOps->setToolTip(tr("Actions"));
+	m_trackOps->setCursor(Qt::PointingHandCursor);
 
 	m_muteBtn = new AutomatableButton(operationsWidget, tr("Mute"));
 	m_muteBtn->setCheckable(true);
@@ -174,10 +176,16 @@ bool TrackOperationsWidget::confirmRemoval()
 	QString messageTitleRemoveTrack = tr("Confirm removal");
 	QString askAgainText = tr("Don't ask again");
 	auto askAgainCheckBox = new QCheckBox(askAgainText, nullptr);
-	connect(askAgainCheckBox, &QCheckBox::stateChanged, [](int state){
+	auto onCheckedStateChanged = [](auto state){
 		// Invert button state, if it's checked we *shouldn't* ask again
-		ConfigManager::inst()->setValue("ui", "trackdeletionwarning", state ? "0" : "1");
-	});
+		ConfigManager::inst()->setValue("ui", "trackdeletionwarning", state != Qt::Unchecked ? "0" : "1");
+	};
+
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
+	connect(askAgainCheckBox, &QCheckBox::checkStateChanged, onCheckedStateChanged);
+#else
+	connect(askAgainCheckBox, &QCheckBox::stateChanged, onCheckedStateChanged);
+#endif
 
 	QMessageBox mb;
 	mb.setText(messageRemoveTrack);
@@ -263,7 +271,7 @@ void TrackOperationsWidget::resetTrackColor()
 
 void TrackOperationsWidget::randomizeTrackColor()
 {
-	QColor buffer = ColorChooser::getPalette( ColorChooser::Palette::Track )[ rand() % 48 ];
+	QColor buffer = ColorChooser::getPalette(ColorChooser::Palette::Track)[fastRand(48)];
 	auto track = m_trackView->getTrack();
 	track->addJournalCheckPoint();
 	track->setColor(buffer);
