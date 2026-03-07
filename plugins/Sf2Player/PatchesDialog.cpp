@@ -143,9 +143,8 @@ PatchesDialog::PatchesDialog( QWidget *pParent, Qt::WindowFlags wflags )
 		SLOT(bankChanged()));
 	QObject::connect(m_progListView,
 		&QTableView::doubleClicked, this, &PatchesDialog::accept);
-	QObject::connect(m_progListView->selectionModel(),
-		&QItemSelectionModel::currentRowChanged, this,
-		[this](auto& cur, auto& prev) { progChanged(cur, prev); });
+	QObject::connect(m_progListView->selectionModel(), &QItemSelectionModel::currentRowChanged, this,
+		&PatchesDialog::progChanged);
 	QObject::connect(m_okButton,
 		SIGNAL(clicked()),
 		SLOT(accept()));
@@ -414,11 +413,9 @@ void PatchesDialog::updatePatch(bool updateUi)
 	}
 }
 
-// Program change slot.
 void PatchesDialog::progChanged(const QModelIndex& cur, const QModelIndex& prev)
 {
-	if (m_pSynth == nullptr)
-		return;
+	if (m_pSynth == nullptr) { return; }
 
 	auto curRow = m_progListProxyModel.mapToSource(cur).row();
 	if (curRow < 0) { return; }

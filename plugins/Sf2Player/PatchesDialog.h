@@ -48,25 +48,18 @@ class PatchesDialog : public QDialog, private Ui::PatchesDialog
 	Q_OBJECT
 
 public:
-
-	// Constructor.
-	PatchesDialog(QWidget *pParent = 0, Qt::WindowFlags wflags = QFlag(0));
-
-	// Destructor.
+	PatchesDialog(QWidget* pParent = 0, Qt::WindowFlags wflags = QFlag(0));
 	~PatchesDialog() override = default;
 
-
-	void setup(fluid_synth_t *pSynth, int iChan, const QString & _chanName,
-			LcdSpinBoxModel * _bankModel, LcdSpinBoxModel * _progModel, QLabel *_patchLabel );
+	void setup(fluid_synth_t* pSynth, int iChan, const QString& _chanName, LcdSpinBoxModel* _bankModel,
+		LcdSpinBoxModel* _progModel, QLabel* _patchLabel);
 
 public slots:
-
 	void stabilizeForm();
 	void bankChanged();
 	void progChanged(const QModelIndex& cur, const QModelIndex& prev);
 
 protected slots:
-
 	void accept() override;
 	void reject() override;
 
@@ -74,7 +67,7 @@ protected:
 
 	void setBankProg(int iBank, int iProg);
 
-	QTreeWidgetItem *findBankItem(int iBank);
+	QTreeWidgetItem* findBankItem(int iBank);
 
 	//! Finds the program item of given program number id in the source model.
 	QStandardItem* findProgItem(int iProg);
@@ -82,14 +75,13 @@ protected:
 	bool validateForm();
 
 	/**
-		Updates the current patch, and updates the UI controls if `updateUi` is
-		true.
+		Updates the current patch, and updates the UI controls if `updateUi` is true.
 	*/
 	void updatePatch(bool updateUi);
 
 	/**
-		Selects a row in the program selector based off a signed offset from the
-		currently selected row. Also clamps the selection.
+		Selects a row in the program selector based off a signed offset from the currently selected row. Also clamps the
+		selection.
 	*/
 	void diffSelectProgRow(int offset);
 
@@ -97,23 +89,20 @@ private:
 
 	void keyPressEvent(QKeyEvent* event) override;
 
-	// Instance variables.
-	fluid_synth_t *m_pSynth;
-
+	fluid_synth_t* m_pSynth;
 	int m_iChan;
 	int m_iBank;
 	int m_iProg;
-
-	//int m_iDirtySetup;
-	//int m_iDirtyCount;
 	int m_dirty;
+	// int m_iDirtySetup;
+	// int m_iDirtyCount;
 
 	int m_selProg;
 	QString m_selProgName;
 
-	LcdSpinBoxModel * m_bankModel;
-	LcdSpinBoxModel * m_progModel;
-	QLabel *m_patchLabel;
+	LcdSpinBoxModel* m_bankModel;
+	LcdSpinBoxModel* m_progModel;
+	QLabel* m_patchLabel;
 	QStandardItemModel m_progListSourceModel; //!< Programs on the selected bank
 	QSortFilterProxyModel m_progListProxyModel; //!< Model to allow searching
 };
