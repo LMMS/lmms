@@ -1,3 +1,3 @@
 INCLUDE(BuildPlugin)
 
-BUILD_PLUGIN(PolynomialExtrapolate PolynomialExtrapolate.cpp PolynomialExtrapolateControls.cpp PolynomialExtrapolateControlDialog.cpp MOCFILES PolynomialExtrapolateControls.h PolynomialExtrapolateControlDialog.h EMBEDDED_RESOURCES artwork.svg logo.svg reverse_off.png reverse_on.png)
+BUILD_PLUGIN(PolynomialExtrapolate PolynomialExtrapolate.cpp PolynomialExtrapolateControls.cpp PolynomialExtrapolateControlDialog.cpp MOCFILES PolynomialExtrapolateControls.h PolynomialExtrapolateControlDialog.h EMBEDDED_RESOURCES artwork.svg logo.svg)
