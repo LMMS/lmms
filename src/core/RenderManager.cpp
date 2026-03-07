@@ -27,7 +27,6 @@
 #include <QDir>
 #include <QRegularExpression>
 #include <iostream>
-#include <ranges>
 
 #include "Engine.h"
 #include "Song.h"
@@ -66,8 +65,10 @@ void RenderManager::renderTracks(const QString& outputPath)
 
 	// TODO: Currently, only the song is exported (it will require changes and refactors in Song), but in the future we
 	// may want to generalize this function to work with any track container (e.g. the pattern store)
-	for (const auto& track : Engine::getSong()->tracks() | std::views::filter(&Track::isRenderable))
+	for (const auto& track : Engine::getSong()->tracks())
 	{
+		if (!track->isRenderable()) { continue; }
+
 		auto extension = ProjectRenderer::getFileExtensionFromFormat(m_format);
 		auto name = track->name();
 		name = name.remove(QRegularExpression(FILENAME_FILTER));
@@ -87,8 +88,9 @@ void RenderManager::renderProject(const QString& outputPath)
 
 	// TODO: Currently, only the song is exported (it will require changes and refactors in Song), but in the future we
 	// may want to generalize this function to work with any track container (e.g. the pattern store)
-	for (const auto& track : Engine::getSong()->tracks() | std::views::filter(&Track::isRenderable))
+	for (const auto& track : Engine::getSong()->tracks())
 	{
+		if (!track->isRenderable()) { continue; }
 		tracks.emplace_back(track);
 	}
 
@@ -143,8 +145,9 @@ void RenderManager::render()
 	const auto job = m_renderJobQueue.front();
 	m_renderJobQueue.pop();
 
-	for (const auto& track : Engine::getSong()->tracks() | std::views::filter(&Track::isRenderable))
+	for (const auto& track : Engine::getSong()->tracks())
 	{
+		if (!track->isRenderable()) { continue; }
 		track->setMuted(
 			std::find(job.tracksToRender.begin(), job.tracksToRender.end(), track) == job.tracksToRender.end());
 	}
@@ -179,8 +182,9 @@ void RenderManager::storeMuteStates()
 {
 	// TODO: Currently, only the song is exported (it will require changes and refactors in Song), but in the future we
 	// may want to generalize this function to work with any track container (e.g. the pattern store)
-	for (const auto& track : Engine::getSong()->tracks() | std::views::filter(&Track::isRenderable))
+	for (const auto& track : Engine::getSong()->tracks())
 	{
+		if (!track->isRenderable()) { continue; }
 		m_muteStates[track] = track->isMuted();
 	}
 }
