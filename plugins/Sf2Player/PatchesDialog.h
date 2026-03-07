@@ -29,6 +29,7 @@
 #include <fluidsynth/types.h>
 #include <QSortFilterProxyModel>
 #include <QStandardItemModel>
+#include <QEvent>
 
 #include "ui_PatchesDialog.h"
 #include "LcdSpinBox.h"
@@ -68,7 +69,6 @@ protected slots:
 
 	void accept() override;
 	void reject() override;
-	bool eventFilter(QObject *obj, QEvent *event) override;
 
 protected:
 
@@ -94,6 +94,8 @@ protected:
 	void diffSelectProgRow(int offset);
 
 private:
+
+	void keyPressEvent(QKeyEvent* event) override;
 
 	// Instance variables.
 	fluid_synth_t *m_pSynth;

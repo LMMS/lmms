@@ -152,8 +152,6 @@ PatchesDialog::PatchesDialog( QWidget *pParent, Qt::WindowFlags wflags )
 	QObject::connect(m_cancelButton,
 		SIGNAL(clicked()),
 		SLOT(reject()));
-
-	installEventFilter(this);
 }
 
 
@@ -445,20 +443,21 @@ void PatchesDialog::progChanged(const QModelIndex& cur, const QModelIndex& prev)
 	stabilizeForm();
 }
 
-bool PatchesDialog::eventFilter(QObject *obj, QEvent *event)
+void PatchesDialog::keyPressEvent(QKeyEvent* event)
 {
-	if (obj == this && event->type() == QEvent::KeyPress)
-	{
-		auto key = static_cast<QKeyEvent*>(event)->key();
-		if (key == Qt::Key_Up || key == Qt::Key_Down)
-		{
-			int rowDiff = (key == Qt::Key_Up) ? -1 : +1;
-			diffSelectProgRow(rowDiff);
-			return true;
-		}
-	}
+	const auto key = event->key();
 
-	return QDialog::eventFilter(obj, event);
+	if (key == Qt::Key_Up || key == Qt::Key_Down)
+	{
+		event->accept();
+		int rowDiff = (key == Qt::Key_Up) ? -1 : +1;
+		diffSelectProgRow(rowDiff);
+	}
+	else if (key == Qt::Key_Return || key == Qt::Key_Enter)
+	{
+		event->accept();
+		accept();
+	}
 }
 
 void PatchesDialog::diffSelectProgRow(int offset)
