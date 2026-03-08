@@ -112,13 +112,7 @@ bool GuiAction::eventFilter(QObject* watched, QEvent* event)
 		const auto& trigger = std::get<ActionTrigger::KeyPressed>(trigger_g);
 		if (event->type() == QEvent::KeyPress)
 		{
-			auto* ke = dynamic_cast<QKeyEvent*>(event);
-			assert(ke != nullptr);
-
-			// FIXME: "This function cannot always be trusted. The user can
-			// confuse it by pressing both Shift keys simultaneously and
-			// releasing one of them, for example." @
-			// https://doc.qt.io/qt-6/qkeyevent.html#modifiers
+			auto* ke = static_cast<QKeyEvent*>(event);
 
 			if (ke->key() == trigger.key && ke->modifiers() == trigger.mods
 				&& !(ke->isAutoRepeat() && !trigger.repeat))
@@ -134,8 +128,7 @@ bool GuiAction::eventFilter(QObject* watched, QEvent* event)
 		const auto& trigger = std::get<ActionTrigger::KeyHeld>(trigger_g);
 		if (!m_active && event->type() == QEvent::KeyPress)
 		{
-			auto* ke = dynamic_cast<QKeyEvent*>(event);
-			assert(ke != nullptr);
+			auto* ke = static_cast<QKeyEvent*>(event);
 
 			if (ke->key() == trigger.key && ke->modifiers() == trigger.mods)
 			{
@@ -146,8 +139,7 @@ bool GuiAction::eventFilter(QObject* watched, QEvent* event)
 		}
 		else if (m_active && event->type() == QEvent::KeyRelease)
 		{
-			auto* ke = dynamic_cast<QKeyEvent*>(event);
-			assert(ke != nullptr);
+			auto* ke = static_cast<QKeyEvent*>(event);
 
 			// Ignore auto-repeat releases
 			if (ke->key() == trigger.key && !ke->isAutoRepeat())
