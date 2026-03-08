@@ -189,7 +189,7 @@ void PolynomialExtrapolateEffect::makeExtrapolation(size_t startIndex, size_t wi
 			float weightedPrediction = prediction * iWeight * precitVolumeCorrection;
 			m_inputData[startIndex + i].second[channel] += weightedPrediction;
 			m_inputData[startIndex + i].first[channel] = feedback > 0.0001f ?
-				std::clamp(prediction * precitVolumeCorrection, -1.0f, 1.0f) * iWeight * feedback + (weight * (1.0f - feedback)) * m_inputData[startIndex + i].first[channel] : 0.0f;
+				std::clamp(prediction * precitVolumeCorrection, -1.0f, 1.0f) * iWeight * feedback + (1.0f - iWeight * feedback) * m_inputData[startIndex + i].first[channel] : 0.0f;
 		}
 	}
 }
