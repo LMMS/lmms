@@ -68,6 +68,137 @@ public:
 		return s_instanceOfMe;
 	}
 
+	struct Config
+	{
+		struct Ui
+		{
+			bool animateafp = true;
+			std::string autoscroll = "stepped"; // TODO enum
+			bool compacttrackbuttons = false;
+			std::string detachbehavior = "show"; // TODO enum; other: "hide", "detached"
+			bool disableautoquit = true; // enable?
+			bool displaywaveform = false;
+			bool enableautosave = true;
+			bool enablerunningautosave = false; // maybe unite with prev.?
+			bool letpreviewsfinish = false;
+			bool mixerchanneldeletionwarning = true;
+			bool oneinstrumenttrackwindow = false;
+			bool printnotelabels = false;
+			uint32_t saveinterval = 2;
+			bool showfaderticks = false;
+			bool sidebaronright = false;
+			bool smoothscroll = false;
+			bool trackdeletionwarning = true;
+			bool vstalwaysontop = false;
+			std::string vstembedmethod = "none"; // TODO enum
+		} ui;
+
+		struct App
+		{
+			bool configured = false; // default to true?
+			bool disablebackup = false; // -> enable?
+			std::string language = "en"; // TODO enum?
+			std::string loopmarkermode = "dual"; // TODO enum
+			bool nanhandler = true;
+			bool nommpz = false; // -> compressmmp?
+			bool openlastproject = false;
+			bool sololegacybehavior = false;
+		} app;
+
+		struct Paths // TODO use std::filesystem::path
+		{
+			std::string backgroundtheme;
+			std::string defaultsf2;
+			std::string gigdir;
+			std::string ladspadir;
+			std::string sf2dir;
+			std::string stkdir;
+			std::string theme = "data:/themes/default";
+			std::string vstdir;
+			std::string workingdir;
+		} paths;
+
+		struct Tooltips { bool disabled = false; } tooltips; // -> enable?
+
+		struct AudioEngine
+		{
+			std::string audiodev;
+			std::string mididev;
+			uint32_t framesperaudiobuffer = 256;
+			uint32_t samplerate = 44100;
+		} audioengine;
+
+		struct AudioAlsa // TODO make these a union?
+		{
+			uint32_t channels = 2;
+			std::string device = "null";
+		} audioalsa;
+
+		struct AudioJack
+		{
+			std::string clientname = "lmms";
+			std::string output1;
+			std::string output2;
+			std::string input1;
+			std::string input2;
+		} audiojack;
+
+		struct AudioOss
+		{
+			uint32_t channels = 2;
+			std::string device = "/dev/dsp";
+		} audiooss;
+
+		struct AudioPA
+		{
+			uint32_t channels = 2;
+			std::string device = "default";
+		} audiopa;
+
+		struct AudioPortAudio
+		{
+			std::string inputdevice;
+			std::string outputdevice;
+			uint32_t inputchannels = 0;
+			uint32_t outputchannels = 0;
+			std::string backend;
+		} audioportaudio;
+
+		struct AudioSDL
+		{
+			std::string inputdevice;
+			std::string device;
+		} audiosdl;
+
+		struct AudioSndio
+		{
+			uint32_t channels = 2;
+			std::string device;
+		} audiosndio;
+
+		struct AudioSoundio
+		{
+			std::string backend;
+			std::string out_device_id;
+			std::string out_device_raw; // TODO probably bool
+		} audiosoundio;
+
+		struct Midi
+		{
+			bool autoquantize = false;
+			std::string midiautoassign = "none"; // TODO check string
+		} midi;
+
+		struct MidiAlsaRaw { std::string device = "default"; } MidiAlsaRaw;
+		struct MidiAlsaSeq { std::string device = "default"; } Midialsaseq;
+		struct MidiJack { std::string device = "lmms"; } MidiJack;
+		struct MidiSndio { std::string device; } MidiSndio;
+		struct MidiOss { std::string device = "/dev/midi"; } midioss;
+
+		//std::vector<std::string> recentfiles; // TODO
+		//std::vector<std::string> favoriteitems; // TODO
+	} m_config;
+
 
 	const QString & workingDir() const
 	{
