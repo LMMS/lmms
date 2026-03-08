@@ -324,6 +324,13 @@ void Lb302Synth::process(SampleFrame* outbuf, const fpp_t size)
 	Lb302Filter& filter = vcf(); // Hold on to the current VCF, and use it throughout this period
 
 	if (m_releaseFrame == 0 || !m_playingNote) { m_vcaMode = VcaMode::Decay; }
+
+	if (m_playingNote)
+	{
+		constexpr float s_volRatio = 1.f / DefaultVolume;
+		m_noteVolume = m_playingNote->getVolume() * s_volRatio;
+	}
+
 	if (m_newFreq)
 	{
 		m_newFreq = false;
@@ -357,7 +364,6 @@ void Lb302Synth::process(SampleFrame* outbuf, const fpp_t size)
 			m_vcfEnvPos = s_envInc; // Ensure envelope is recalculated
 		}
 	}
-
 	// Note: this has to be computed during processing and cannot be initialized
 	// in the constructor because it's dependent on the sample rate and that might
 	// change during rendering!
@@ -468,7 +474,7 @@ void Lb302Synth::process(SampleFrame* outbuf, const fpp_t size)
 		}
 
 		// Write out samples.
-		sample_t samp = filter.process(m_vcoK) * m_vca;
+		sample_t samp = filter.process(m_vcoK) * m_vca * m_noteVolume;
 		for (ch_cnt_t c = 0; c < DEFAULT_CHANNELS; c++) { outbuf[i][c] = samp; }
 
 		// Handle Envelope

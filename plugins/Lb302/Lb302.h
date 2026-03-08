@@ -130,7 +130,7 @@ public:
 protected:
 	float m_kfcn;
 	float m_kp;
-	float m_kp1h; //!< Cached value of (@ref kp + 1) / 2
+	float m_kp1h; //!< Cached value of (@ref m_kp + 1) / 2
 	float m_kres;
 	std::array<sample_t, 3> m_ay = { 0.f, 0.f, 0.f };
 	float m_lastin = 0.f;
@@ -219,6 +219,7 @@ private:
 
 	// Envelope State
 	float m_vca = 0.f; //!< Amplifier coefficient.
+	float m_noteVolume; //!< The "velocity" of the most recent note, within [0, 1]
 	VcaMode m_vcaMode = VcaMode::NeverPlayed;
 
 	NotePlayHandle* m_playingNote;
