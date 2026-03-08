@@ -91,65 +91,42 @@ inline void labelWidget(QWidget * w, const QString & txt)
 
 
 SetupDialog::SetupDialog(ConfigTab tab_to_open) :
-	m_tooltips(!ConfigManager::inst()->value(
-			"tooltips", "disabled").toInt()),
-	m_displayWaveform(ConfigManager::inst()->value(
-			"ui", "displaywaveform").toInt()),
-	m_printNoteLabels(ConfigManager::inst()->value(
-			"ui", "printnotelabels").toInt()),
-	m_showFaderTicks(ConfigManager::inst()->value(
-			"ui", "showfaderticks").toInt()),
-	m_compactTrackButtons(ConfigManager::inst()->value(
-			"ui", "compacttrackbuttons").toInt()),
-	m_oneInstrumentTrackWindow(ConfigManager::inst()->value(
-			"ui", "oneinstrumenttrackwindow").toInt()),
-	m_sideBarOnRight(ConfigManager::inst()->value(
-			"ui", "sidebaronright").toInt()),
-	m_letPreviewsFinish(ConfigManager::inst()->value(
-			"ui", "letpreviewsfinish").toInt()),
-	m_soloLegacyBehavior(ConfigManager::inst()->value(
-			"app", "sololegacybehavior", "0").toInt()),
-	m_trackDeletionWarning(ConfigManager::inst()->value(
-			"ui", "trackdeletionwarning", "1").toInt()),
-	m_mixerChannelDeletionWarning(ConfigManager::inst()->value(
-			"ui", "mixerchanneldeletionwarning", "1").toInt()),
-	m_MMPZ(!ConfigManager::inst()->value(
-			"app", "nommpz").toInt()),
-	m_disableBackup(!ConfigManager::inst()->value(
-			"app", "disablebackup").toInt()),
-	m_openLastProject(ConfigManager::inst()->value(
-			"app", "openlastproject").toInt()),
-	m_detachBehavior{ConfigManager::inst()->value("ui", "detachbehavior", "show")},
-	m_loopMarkerMode{ConfigManager::inst()->value("app", "loopmarkermode", "dual")},
-	m_autoScroll(ConfigManager::inst()->value("ui", "autoscroll", "stepped")),
-	m_lang(ConfigManager::inst()->value(
-			"app", "language")),
-	m_saveInterval(	ConfigManager::inst()->value(
-			"ui", "saveinterval").toInt() < 1 ?
-			MainWindow::DEFAULT_SAVE_INTERVAL_MINUTES :
-			ConfigManager::inst()->value(
-			"ui", "saveinterval").toInt()),
-	m_enableAutoSave(ConfigManager::inst()->value(
-			"ui", "enableautosave", "1").toInt()),
-	m_enableRunningAutoSave(ConfigManager::inst()->value(
-			"ui", "enablerunningautosave", "0").toInt()),
-	m_smoothScroll(ConfigManager::inst()->value(
-			"ui", "smoothscroll").toInt()),
-	m_animateAFP(ConfigManager::inst()->value(
-			"ui", "animateafp", "1").toInt()),
-	m_vstEmbedMethod(ConfigManager::inst()->vstEmbedMethod()),
-	m_vstAlwaysOnTop(ConfigManager::inst()->value(
-			"ui", "vstalwaysontop").toInt()),
-	m_disableAutoQuit(ConfigManager::inst()->value(
-			"ui", "disableautoquit", "1").toInt()),
-	m_NaNHandler(ConfigManager::inst()->value(
-			"app", "nanhandler", "1").toInt()),
-	m_bufferSize(ConfigManager::inst()->value(
-			"audioengine", "framesperaudiobuffer").toInt()),
-	m_sampleRate(ConfigManager::inst()->value(
-			"audioengine", "samplerate").toInt()),
-	m_midiAutoQuantize(ConfigManager::inst()->value(
-			"midi", "autoquantize", "0").toInt() != 0),
+	m_tooltips{!ConfigManager::inst()->m_config.tooltips.disabled},
+	m_displayWaveform{ConfigManager::inst()->m_config.ui.displaywaveform},
+	m_printNoteLabels{ConfigManager::inst()->m_config.ui.printnotelabels},
+	m_showFaderTicks{ConfigManager::inst()->m_config.ui.showfaderticks},
+	m_compactTrackButtons{ConfigManager::inst()->m_config.ui.compacttrackbuttons},
+	m_oneInstrumentTrackWindow{ConfigManager::inst()->m_config.ui.oneinstrumenttrackwindow},
+	m_sideBarOnRight{ConfigManager::inst()->m_config.ui.sidebaronright},
+	m_letPreviewsFinish{ConfigManager::inst()->m_config.ui.letpreviewsfinish},
+	m_soloLegacyBehavior{ConfigManager::inst()->m_config.app.sololegacybehavior},
+	m_trackDeletionWarning{ConfigManager::inst()->m_config.ui.trackdeletionwarning},
+	m_mixerChannelDeletionWarning{ConfigManager::inst()->m_config.ui.mixerchanneldeletionwarning},
+	m_MMPZ{!ConfigManager::inst()->m_config.app.nommpz},
+	m_disableBackup{!ConfigManager::inst()->m_config.app.disablebackup},
+	m_openLastProject{ConfigManager::inst()->m_config.app.openlastproject},
+	m_detachBehavior{QString::fromStdString(
+			ConfigManager::inst()->m_config.ui.detachbehavior)},
+	m_loopMarkerMode{QString::fromStdString(
+			ConfigManager::inst()->m_config.app.loopmarkermode)},
+	m_autoScroll{QString::fromStdString(
+			ConfigManager::inst()->m_config.ui.autoscroll)},
+	m_lang{QString::fromStdString(
+			ConfigManager::inst()->m_config.app.language)},
+	m_saveInterval{ConfigManager::inst()->m_config.ui.saveinterval < 1
+			? MainWindow::DEFAULT_SAVE_INTERVAL_MINUTES
+			: ConfigManager::inst()->m_config.ui.saveinterval},
+	m_enableAutoSave{ConfigManager::inst()->m_config.ui.enableautosave},
+	m_enableRunningAutoSave{ConfigManager::inst()->m_config.ui.enablerunningautosave},
+	m_smoothScroll{ConfigManager::inst()->m_config.ui.smoothscroll},
+	m_animateAFP{ConfigManager::inst()->m_config.ui.animateafp},
+	m_vstEmbedMethod{ConfigManager::inst()->vstEmbedMethod()},
+	m_vstAlwaysOnTop{ConfigManager::inst()->m_config.ui.vstalwaysontop},
+	m_disableAutoQuit{ConfigManager::inst()->m_config.ui.disableautoquit},
+	m_NaNHandler{ConfigManager::inst()->m_config.app.nanhandler},
+	m_bufferSize{ConfigManager::inst()->m_config.audioengine.framesperaudiobuffer},
+	m_sampleRate{ConfigManager::inst()->m_config.audioengine.samplerate},
+	m_midiAutoQuantize{ConfigManager::inst()->m_config.midi.autoquantize},
 	m_workingDir(QDir::toNativeSeparators(ConfigManager::inst()->workingDir())),
 	m_vstDir(QDir::toNativeSeparators(ConfigManager::inst()->vstDir())),
 	m_ladspaDir(QDir::toNativeSeparators(ConfigManager::inst()->ladspaDir())),
@@ -1039,6 +1016,39 @@ void SetupDialog::accept()
 					m_assignableMidiDevices->currentText());
 	ConfigManager::inst()->setValue("midi", "autoquantize", QString::number(m_midiAutoQuantize));
 
+	ConfigManager::inst()->m_config.tooltips.disabled = !m_tooltips;
+	ConfigManager::inst()->m_config.ui.displaywaveform = m_displayWaveform;
+	ConfigManager::inst()->m_config.ui.printnotelabels = m_printNoteLabels;
+	ConfigManager::inst()->m_config.ui.showfaderticks = m_showFaderTicks;
+	ConfigManager::inst()->m_config.ui.compacttrackbuttons = m_compactTrackButtons;
+	ConfigManager::inst()->m_config.ui.oneinstrumenttrackwindow = m_oneInstrumentTrackWindow;
+	ConfigManager::inst()->m_config.ui.sidebaronright = m_sideBarOnRight;
+	ConfigManager::inst()->m_config.ui.letpreviewsfinish = m_letPreviewsFinish;
+	ConfigManager::inst()->m_config.app.sololegacybehavior = m_soloLegacyBehavior;
+	ConfigManager::inst()->m_config.ui.trackdeletionwarning = m_trackDeletionWarning;
+	ConfigManager::inst()->m_config.ui.mixerchanneldeletionwarning = m_mixerChannelDeletionWarning;
+	ConfigManager::inst()->m_config.app.nommpz = !m_MMPZ;
+	ConfigManager::inst()->m_config.app.disablebackup = !m_disableBackup;
+	ConfigManager::inst()->m_config.app.openlastproject = m_openLastProject;
+	ConfigManager::inst()->m_config.ui.detachbehavior = m_detachBehavior.toStdString();
+	ConfigManager::inst()->m_config.app.loopmarkermode = m_loopMarkerMode.toStdString();
+	ConfigManager::inst()->m_config.app.language = m_lang.toStdString();
+	ConfigManager::inst()->m_config.ui.autoscroll = m_autoScroll.toStdString();
+	ConfigManager::inst()->m_config.ui.saveinterval = m_saveInterval;
+	ConfigManager::inst()->m_config.ui.enableautosave = m_enableAutoSave;
+	ConfigManager::inst()->m_config.ui.enablerunningautosave = m_enableRunningAutoSave;
+	ConfigManager::inst()->m_config.ui.smoothscroll = m_smoothScroll;
+	ConfigManager::inst()->m_config.ui.animateafp = m_animateAFP;
+	ConfigManager::inst()->m_config.ui.vstembedmethod = m_vstEmbedComboBox->currentData().toString().toStdString();
+	ConfigManager::inst()->m_config.ui.vstalwaysontop = m_vstAlwaysOnTop;
+	ConfigManager::inst()->m_config.ui.disableautoquit = m_disableAutoQuit;
+	ConfigManager::inst()->m_config.audioengine.audiodev = m_audioIfaceNames[m_audioInterfaces->currentText()].toStdString();
+	ConfigManager::inst()->m_config.app.nanhandler = m_NaNHandler;
+	ConfigManager::inst()->m_config.audioengine.samplerate = m_sampleRate;
+	ConfigManager::inst()->m_config.audioengine.framesperaudiobuffer = m_bufferSize;
+	ConfigManager::inst()->m_config.audioengine.mididev = m_midiIfaceNames[m_midiInterfaces->currentText()].toStdString();
+	ConfigManager::inst()->m_config.midi.midiautoassign = m_assignableMidiDevices->currentText().toStdString();
+	ConfigManager::inst()->m_config.midi.autoquantize = m_midiAutoQuantize;
 
 	ConfigManager::inst()->setWorkingDir(QDir::fromNativeSeparators(m_workingDir));
 	ConfigManager::inst()->setVSTDir(QDir::fromNativeSeparators(m_vstDir));
