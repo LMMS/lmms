@@ -761,6 +761,12 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 		{
 			TimePos loopOffset = loop * c->length();
 
+			if ( cur_start < loopOffset - c->startTimeOffset() )
+			{
+				// we can skip all the loops that start after the current position
+				// this also avoid to loop notes starting before startTimeOffset
+				break;
+			}
 			// set our index to zero
 			auto nit = notes.begin();
 
@@ -781,7 +787,7 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 				const auto currentNote = *nit;
 				// Skip any notes note not at the current time pos and not overlapping with the start.
 				if (!(currentNote->pos() + loopOffset == cur_start
-					|| (cur_start == -c->startTimeOffset() && (*nit)->pos() + loopOffset < cur_start && (*nit)->endPos() + loopOffset > cur_start)))
+					|| (cur_start == -c->startTimeOffset() + loopOffset && (*nit)->pos() + loopOffset < cur_start && (*nit)->endPos() + loopOffset > cur_start)))
 				{
 					++nit;
 					continue;
