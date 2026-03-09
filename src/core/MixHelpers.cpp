@@ -42,9 +42,13 @@ static bool s_NaNHandler;
 namespace lmms::MixHelpers
 {
 
+namespace {
+
+constexpr auto SilenceThreshold = 0.000001f; // -120 dBFS
+
 /*! \brief Function for applying MIXOP on all sample frames */
 template<typename MIXOP>
-static inline void run( SampleFrame* dst, const SampleFrame* src, int frames, const MIXOP& OP )
+inline void run(SampleFrame* dst, const SampleFrame* src, int frames, const MIXOP& OP)
 {
 	for( int i = 0; i < frames; ++i )
 	{
@@ -54,7 +58,7 @@ static inline void run( SampleFrame* dst, const SampleFrame* src, int frames, co
 
 /*! \brief Function for applying MIXOP on all sample frames - split source */
 template<typename MIXOP>
-static inline void run( SampleFrame* dst, const sample_t* srcLeft, const sample_t* srcRight, int frames, const MIXOP& OP )
+inline void run(SampleFrame* dst, const sample_t* srcLeft, const sample_t* srcRight, int frames, const MIXOP& OP)
 {
 	for( int i = 0; i < frames; ++i )
 	{
@@ -63,15 +67,13 @@ static inline void run( SampleFrame* dst, const sample_t* srcLeft, const sample_
 	}
 }
 
-
+} // namespace
 
 bool isSilent( const SampleFrame* src, int frames )
 {
-	constexpr float silenceThreshold = 0.0000001f;
-
 	for( int i = 0; i < frames; ++i )
 	{
-		if (std::abs(src[i][0]) >= silenceThreshold || std::abs(src[i][1]) >= silenceThreshold)
+		if (std::abs(src[i][0]) >= SilenceThreshold || std::abs(src[i][1]) >= SilenceThreshold)
 		{
 			return false;
 		}
@@ -82,8 +84,7 @@ bool isSilent( const SampleFrame* src, int frames )
 
 bool isSilent(std::span<sample_t> buffer)
 {
-	constexpr float silenceThreshold = 0.0000001f;
-	return std::ranges::all_of(buffer, [&](const float s) { return std::abs(s) < silenceThreshold; });
+	return std::ranges::all_of(buffer, [&](const sample_t s) { return std::abs(s) < SilenceThreshold; });
 }
 
 bool useNaNHandler()
