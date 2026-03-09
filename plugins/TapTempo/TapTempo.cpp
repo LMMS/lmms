@@ -47,6 +47,7 @@ PLUGIN_EXPORT Plugin* lmms_plugin_main(Model*, void*)
 TapTempo::TapTempo()
 	: ToolPlugin(&taptempo_plugin_descriptor, nullptr)
 {
+	m_intervals.fill(std::chrono::milliseconds::zero());
 }
 
 void TapTempo::tap(bool play)
@@ -105,7 +106,7 @@ void TapTempo::reset()
 	m_index = 0;
 	m_lastTap = std::chrono::time_point<clock>{};
 	m_calculateBPM = false;
-	std::fill(m_intervals.begin(), m_intervals.end(), std::chrono::milliseconds::zero());
+	m_intervals.fill(std::chrono::milliseconds::zero());
 }
 
 QString TapTempo::nodeName() const
