@@ -133,7 +133,7 @@ void TapTempoView::update()
 
 	m_tapButton->setText(QString::number(bpm, 'f', m_precisionCheckBox->isChecked() ? 1 : 0));
 	m_msLabel->setText(tr("%1 ms").arg(ms, 0, 'f', m_precisionCheckBox->isChecked() ? 1 : 0));
-	m_hzLabel->setText(tr("%1 hz").arg(hz, 0, 'f', 4));
+	m_hzLabel->setText(tr("%1 Hz").arg(hz, 0, 'f', 4));
 }
 
 void TapTempoView::reset()
