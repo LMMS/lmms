@@ -53,10 +53,9 @@ private:
 	using clock = std::chrono::steady_clock;
 	std::chrono::time_point<clock> m_lastTap;
 	std::array<std::chrono::milliseconds, MaxIntervals> m_intervals;
-	int m_index = 0;
 	int m_beat = 0;
+	int m_taps = 0;
 	double m_bpm = 0;
-	bool m_calculateBPM = false;
 };
 } // namespace lmms
 
