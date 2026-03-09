@@ -30,6 +30,7 @@
 #include <QString>
 #include <QMutex>
 
+#include "AudioBuffer.h"
 #include "PlayHandle.h"
 
 namespace lmms
@@ -58,8 +59,6 @@ public:
 		BoolModel* mutedModel = nullptr);
 	virtual ~AudioBusHandle();
 
-	SampleFrame* buffer() { return m_buffer; }
-
 	// indicate whether JACK & Co should provide output-buffer at ext. port
 	bool extOutputEnabled() const { return m_extOutputEnabled; }
 	void setExtOutputEnabled(bool enabled);
@@ -85,7 +84,7 @@ public:
 private:
 	volatile bool m_bufferUsage;
 
-	SampleFrame* const m_buffer;
+	AudioBuffer m_buffer;
 
 	bool m_extOutputEnabled;
 	mix_ch_t m_nextMixerChannel;

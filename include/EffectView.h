@@ -75,8 +75,6 @@ public slots:
 	void savePreset();
 	void loadPreset();
 	void deletePlugin();
-	void closeEffects();
-
 
 signals:
 	void movedUp(EffectView* view);
