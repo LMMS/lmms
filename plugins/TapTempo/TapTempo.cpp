@@ -74,6 +74,7 @@ void TapTempo::tap(bool play)
 	if (delta >= resetTime)
 	{
 		reset();
+		m_lastTap = clock::now();
 		return;
 	}
 
@@ -108,7 +109,7 @@ void TapTempo::reset()
 {
 	m_bpm = 0;
 	m_taps = 0;
-	m_lastTap = clock::now();
+	m_lastTap = std::chrono::time_point<clock>{};
 	m_intervals.fill(std::chrono::milliseconds::zero());
 }
 
