@@ -75,6 +75,7 @@ void TapTempo::tap(bool play)
 	{
 		m_bpm = 0;
 		m_taps = 0;
+		m_beat = 0;
 		m_lastTap = clock::now();
 		return;
 	}
@@ -110,6 +111,7 @@ void TapTempo::reset()
 {
 	m_bpm = 0;
 	m_taps = 0;
+	m_beat = 0;
 	m_lastTap = std::chrono::time_point<clock>{};
 }
 
