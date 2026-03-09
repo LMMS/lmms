@@ -506,8 +506,8 @@ void ConfigManager::loadConfigFile(const QString & configFile)
 
 			// Populate the struct
 			// TODO C++26: use type reflections instead of this unrolled mess
-#define cfgSetInt(CLS, ATTR) if (node = root.namedItem(#CLS).attributes().namedItem(#ATTR); !node.isNull()) { m_config.CLS.ATTR = node.toAttr().value().toInt(); }
-#define cfgSetStr(CLS, ATTR) if (node = root.namedItem(#CLS).attributes().namedItem(#ATTR); !node.isNull()) { m_config.CLS.ATTR = node.toAttr().value().toStdString(); }
+#define cfgSetInt(CLS, ATTR) if (node = root.namedItem(#CLS).attributes().namedItem(#ATTR); !node.isNull()) { config.CLS.ATTR = node.toAttr().value().toInt(); }
+#define cfgSetStr(CLS, ATTR) if (node = root.namedItem(#CLS).attributes().namedItem(#ATTR); !node.isNull()) { config.CLS.ATTR = node.toAttr().value().toStdString(); }
 
 			cfgSetInt(ui, animateafp);
 			cfgSetStr(ui, autoscroll);

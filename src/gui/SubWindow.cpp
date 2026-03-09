@@ -178,7 +178,7 @@ void SubWindow::setVisible(bool visible)
 
 void SubWindow::showEvent(QShowEvent* e)
 {
-	if (ConfigManager::inst()->m_config.ui.detachbehavior == "detached") { detach(); }
+	if (ConfigManager::inst()->config.ui.detachbehavior == "detached") { detach(); }
 	if (isDetached())
 	{
 		widget()->setWindowState((widget()->windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
@@ -610,7 +610,7 @@ bool SubWindow::eventFilter(QObject* obj, QEvent* event)
 		case QEvent::Close:
 			if (isDetached())
 			{
-				std::string detachBehavior = ConfigManager::inst()->m_config.ui.detachbehavior;
+				std::string detachBehavior = ConfigManager::inst()->config.ui.detachbehavior;
 				if (detachBehavior == "show")
 				{
 					attach();

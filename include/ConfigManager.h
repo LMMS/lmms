@@ -197,7 +197,7 @@ public:
 
 		//std::vector<std::string> recentfiles; // TODO
 		//std::vector<std::string> favoriteitems; // TODO
-	} m_config;
+	} config;
 
 
 	const QString & workingDir() const
