@@ -47,11 +47,11 @@ namespace lmms::gui
 {
 
 
-SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
-	QWidget(),
-	ModelView(nullptr, this),
-	m_track(tv->model()),
-	m_stv(tv)
+SampleTrackWindow::SampleTrackWindow(SampleTrackView* stv)
+	: QWidget{}
+	, ModelView{nullptr, this}
+	, m_track{stv->model()}
+	, m_stv{stv}
 {
 	// init own layout + widgets
 	setFocusPolicy(Qt::StrongFocus);
@@ -148,29 +148,25 @@ SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
 
 	generalSettingsLayout->addLayout(basicControlsLayout);
 
-	m_effectRack = new EffectRackView(tv->model()->audioBusHandle()->effects());
+	m_effectRack = new EffectRackView(stv->model()->audioBusHandle()->effects());
 	m_effectRack->setFixedSize(EffectRackView::DEFAULT_WIDTH, 242);
 
 	vlayout->addWidget(generalSettingsWidget);
 	vlayout->addWidget(m_effectRack);
 
 
-	setModel(tv->model());
+	setModel(stv->model());
 
 	QMdiSubWindow * subWin = getGUI()->mainWindow()->addWindowedWidget(this);
 	Qt::WindowFlags flags = subWin->windowFlags();
-	flags |= Qt::MSWindowsFixedSizeDialogHint;
+	flags |= Qt::MSWindowsFixedSizeDialogHint;  // resizing is disabled regardless, this makes SubWindow hide related actions
 	flags &= ~Qt::WindowMaximizeButtonHint;
 	subWin->setWindowFlags(flags);
 
-	// Hide the Size and Maximize options from the system menu
-	// since the dialog size is fixed.
-	QMenu * systemMenu = subWin->systemMenu();
-	systemMenu->actions().at(2)->setVisible(false); // Size
-	systemMenu->actions().at(4)->setVisible(false); // Maximize
+	// better than `setFixedSize` because it still responds to layout changes
+	layout()->setSizeConstraint(QLayout::SetFixedSize);
 
-	subWin->setWindowIcon(embed::getIconPixmap("sample_track"));
-	subWin->setFixedSize(subWin->size());
+	setWindowIcon(embed::getIconPixmap("sample_track"));
 	subWin->hide();
 }
 
@@ -247,27 +243,15 @@ void SampleTrackWindow::toggleVisibility(bool on)
 
 void SampleTrackWindow::closeEvent(QCloseEvent* ce)
 {
-	ce->ignore();
-
-	if(getGUI()->mainWindow()->workspace())
-	{
-		parentWidget()->hide();
-	}
-	else
-	{
-		hide();
-	}
-
 	m_stv->setFocus();
 	m_stv->m_tlb->setChecked(false);
 }
 
 
 
-void SampleTrackWindow::saveSettings(QDomDocument& doc, QDomElement & element)
+void SampleTrackWindow::saveSettings(QDomDocument& doc, QDomElement& element)
 {
 	MainWindow::saveWidgetState(this, element);
-	Q_UNUSED(element)
 }
 
 

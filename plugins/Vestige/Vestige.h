@@ -31,6 +31,7 @@
 
 #include "Instrument.h"
 #include "InstrumentView.h"
+#include "SubWindow.h"
 
 
 class QGridLayout;
@@ -86,7 +87,7 @@ private:
 	QMutex m_pluginMutex;
 
 	QString m_pluginDLL;
-	QMdiSubWindow * m_subWindow;
+	gui::SubWindow* m_subWindow;
 	QScrollArea * m_scrollArea;
 	FloatModel ** knobFModel;
 	QObject * p_subWindow;

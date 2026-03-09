@@ -44,6 +44,7 @@ FlangerControlsDialog::FlangerControlsDialog( FlangerControls *controls ) :
 	setPalette( pal );
 
 	auto mainLayout = new QVBoxLayout(this);
+	mainLayout->setSizeConstraint(QLayout::SetFixedSize);
 	auto knobLayout = new QHBoxLayout();
 	mainLayout->addLayout(knobLayout);
 

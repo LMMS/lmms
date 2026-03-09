@@ -128,7 +128,7 @@ void LadspaEffect::changeSampleRate()
 Effect::ProcessStatus LadspaEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 {
 	m_pluginMutex.lock();
-	if (!isOkay() || dontRun() || !isEnabled() || !isRunning())
+	if (!isProcessingAudio())
 	{
 		m_pluginMutex.unlock();
 		return ProcessStatus::Sleep;
