@@ -82,11 +82,12 @@ void TapTempo::tap(bool play)
 
 	m_intervals[(m_taps++) % MaxIntervals] = delta;
 
+	constexpr auto millisecondsPerMinute = 60000.0;
 	if (m_taps >= MaxIntervals)
 	{
 		// calculate the median of the stored intervals to reject outliers
 		std::nth_element(m_intervals.begin(), m_intervals.begin() + m_intervals.size() / 2, m_intervals.end());
-		const auto newBpm = 60000.0 / m_intervals[m_intervals.size() / 2].count();
+		const auto newBpm = millisecondsPerMinute / m_intervals[m_intervals.size() / 2].count();
 
 		// use an adaptive EMA to smooth out jitter when in the ballpark and update quickly when moving to a new BPM
 		const auto error = std::abs(newBpm - m_bpm);
@@ -96,7 +97,7 @@ void TapTempo::tap(bool play)
 	else
 	{
 		// calculate the instant BPM for now until we have enough taps
-		m_bpm = 60000.0 / delta.count();
+		m_bpm = millisecondsPerMinute / delta.count();
 	}
 
 	m_lastTap = clock::now();
