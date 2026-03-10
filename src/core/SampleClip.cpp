@@ -274,6 +274,7 @@ void SampleClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		_this.setAttribute( "pos", startPosition() );
 	}
 	_this.setAttribute( "len", length() );
+	_this.setAttribute( "loopcount", loopCount() );
 	_this.setAttribute( "muted", isMuted() );
 	_this.setAttribute( "src", sampleFile() );
 	_this.setAttribute( "off", startTimeOffset() );
@@ -327,6 +328,12 @@ void SampleClip::loadSettings( const QDomElement & _this )
 	setMuted( _this.attribute( "muted" ).toInt() );
 	setStartTimeOffset( _this.attribute( "off" ).toInt() );
 	setAutoResize(_this.attribute("autoresize", "1").toInt());
+
+	int loopCount = _this.attribute("loopcount").toInt();
+	for (int i = 0; i < loopCount; ++i)
+	{
+		increaseLoopCount();
+	}
 
 	if (_this.hasAttribute("color"))
 	{

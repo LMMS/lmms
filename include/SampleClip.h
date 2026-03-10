@@ -74,6 +74,10 @@ public:
 	void setSamplePlayLength( f_cnt_t length );
 	gui::ClipView * createView( gui::TrackView * _tv ) override;
 
+	bool loopable() const override
+	{
+		return true;
+	}
 
 	bool isPlaying() const;
 	void setIsPlaying(bool isPlaying);
