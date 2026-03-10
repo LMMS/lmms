@@ -227,7 +227,6 @@ private:
 		void mouseMoveEvent(QMouseEvent* event) override;
 		void mouseReleaseEvent(QMouseEvent* event) override;
 		void resizeEvent(QResizeEvent* event) override;
-		void childEvent(QChildEvent* event) override;
 		bool eventFilter(QObject* watched, QEvent* event) override;
 		void sliderMoved(QScrollBar* scrollBar);
 

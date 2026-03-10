@@ -1877,21 +1877,6 @@ void MainWindow::MovableQMdiArea::resizeEvent(QResizeEvent* event)
 	QMdiArea::resizeEvent(event);
 }
 
-void MainWindow::MovableQMdiArea::childEvent(QChildEvent* event)
-{
-	if (event->type() == QEvent::ChildAdded)
-	{
-		event->child()->installEventFilter(this);
-		updateScrollBars();
-	}
-	else if (event->type() == QEvent::ChildRemoved)
-	{
-		event->child()->removeEventFilter(this);
-		updateScrollBars();
-	}
-	QMdiArea::childEvent(event);
-}
-
 bool MainWindow::MovableQMdiArea::hasActiveMaxWindow()
 {
 	for (const auto* sw : subWindowList())
@@ -1907,9 +1892,9 @@ bool MainWindow::MovableQMdiArea::hasActiveMaxWindow()
 
 bool MainWindow::MovableQMdiArea::eventFilter(QObject* watched, QEvent* event)
 {
-	// First try to detect if this is a subwindow (we're installing filters on the subwindows) and whether it is being
-	// modified in a way that would affect the scrollbars.
-	if (auto* subWin = dynamic_cast<QMdiSubWindow*>(watched); subWin != nullptr)
+	// First try to detect if this is a subwindow and whether it is being modified in a way that would affect
+	// the scrollbars.
+	if (dynamic_cast<QMdiSubWindow*>(watched) != nullptr)
 	{
 		// Hide scrollbars if necessary. Not all events report this properly though, for some reason.
 		// FIXME: confirm why this is the case. This is prone to bugs.
@@ -1946,7 +1931,8 @@ bool MainWindow::MovableQMdiArea::eventFilter(QObject* watched, QEvent* event)
 		default:
 			break;
 		}
-		return QObject::eventFilter(watched, event);
+
+		return QMdiArea::eventFilter(watched, event);
 	}
 
 	// Down here, the event filter attempts to steal mouse and keyboard events from the main window that are related to
@@ -2048,13 +2034,14 @@ bool MainWindow::MovableQMdiArea::eventFilter(QObject* watched, QEvent* event)
 		auto* fe = static_cast<QFocusEvent*>(event);
 
 		// If we lost the focus from going to another window, abort all possible panning.
-		if (fe->reason() != Qt::MouseFocusReason && (m_isPanning || m_isUniversalPan)) {
+		if (fe->reason() != Qt::MouseFocusReason && (m_isPanning || m_isUniversalPan))
+		{
 			m_canUniversalPan = false;
 			mousePanEnd();
 		}
 	}
 
-	return QObject::eventFilter(watched, event);
+	return QMdiArea::eventFilter(watched, event);
 }
 
 } // namespace lmms::gui
