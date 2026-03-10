@@ -602,8 +602,7 @@ void MidiClipView::paintEvent( QPaintEvent * )
 
 	// Check whether we will paint a text box and compute its potential height
 	// This is needed so we can paint the notes underneath it.
-	bool const drawName = !m_clip->name().isEmpty();
-	bool const drawTextBox = !beatClip && drawName;
+	bool const drawTextBox = !m_clip->name().isEmpty();
 
 	// TODO Warning! This might cause problems if ClipView::paintTextLabel changes
 	int textBoxHeight = 0;
