@@ -1805,7 +1805,7 @@ void MainWindow::MovableQMdiArea::scroll(int scrollX, int scrollY)
 
 	// Boundaries for each region. If trying to move in a direction and its respective boundary has been passed, the
 	// movement will not happen.
-	constexpr int Margin = MainWindow::MovableQMdiArea::Margin;
+	constexpr auto Margin = MainWindow::MovableQMdiArea::Margin;
 	int minXBoundary = width() - Margin;
 	int maxXBoundary = Margin;
 	int minYBoundary = height() - Margin;
@@ -1892,9 +1892,10 @@ bool MainWindow::MovableQMdiArea::hasActiveMaxWindow()
 
 bool MainWindow::MovableQMdiArea::eventFilter(QObject* watched, QEvent* event)
 {
+
 	// First try to detect if this is a subwindow and whether it is being modified in a way that would affect
 	// the scrollbars.
-	if (dynamic_cast<QMdiSubWindow*>(watched) != nullptr)
+	if (auto* sw = qobject_cast<QMdiSubWindow*>(watched); sw != nullptr)
 	{
 		// Hide scrollbars if necessary. Not all events report this properly though, for some reason.
 		// FIXME: confirm why this is the case. This is prone to bugs.
@@ -1905,15 +1906,14 @@ bool MainWindow::MovableQMdiArea::eventFilter(QObject* watched, QEvent* event)
 			if (hasActiveMaxWindow())
 			{
 				m_scrollBarH->hide();
-				m_scrollBarH->updateGeometry();
-
 				m_scrollBarV->hide();
-				m_scrollBarV->updateGeometry();
+				sw->updateGeometry();
 			}
 			else
 			{
 				m_scrollBarH->show();
 				m_scrollBarV->show();
+				sw->updateGeometry();
 			}
 			break;
 		default:
