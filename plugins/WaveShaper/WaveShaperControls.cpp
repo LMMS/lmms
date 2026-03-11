@@ -44,7 +44,7 @@ WaveShaperControls::WaveShaperControls( WaveShaperEffect * _eff ) :
 	m_inputModel( 1.0f, 0.0f, 5.0f, 0.01f, this, tr( "Input gain" ) ),
 	m_outputModel( 1.0f, 0.0f, 5.0f, 0.01f, this, tr( "Output gain" ) ),
 	m_clipModel( false, this )
-	, m_graphModel(20, 20, GRID_MAX_STEPS, GRID_MAX_STEPS, 200, this, tr("waveshape"))
+	, m_graphModel(20, 20, 20, GRID_MAX_STEPS, GRID_MAX_STEPS, 200, this, tr("waveshape"))
 {
 	setDefaultShape();
 }

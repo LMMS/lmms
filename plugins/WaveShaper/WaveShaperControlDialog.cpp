@@ -49,9 +49,8 @@ WaveShaperControlDialog::WaveShaperControlDialog(
 	setPalette( pal );
 	setFixedSize( 224, 274 );
 
-	auto vectorGraph = new VectorGraphView(this, 10, 10);
+	auto vectorGraph = new VectorGraphView(this, &_controls->m_graphModel, 10, 10);
 	vectorGraph->move(10, 6);
-	vectorGraph->setModel(&_controls->m_graphModel);
 	vectorGraph->setAutoFillBackground(true);
 
 	auto inputKnob = new Knob(KnobType::Bright26, tr("INPUT"), SMALL_FONT_SIZE, this);
