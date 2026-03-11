@@ -34,8 +34,8 @@
 namespace lmms::gui
 {
 
-VectorGraphView::VectorGraphView(QWidget* parent, size_t cubeWidth, size_t cubeHeight)
-	: GridView{parent, new VectorGraphModel{10, 10, GRID_MAX_STEPS, GRID_MAX_STEPS, 200, nullptr, QString(), true}, cubeWidth, cubeHeight}
+VectorGraphView::VectorGraphView(QWidget* parent, VectorGraphModel* model, size_t cubeWidth, size_t cubeHeight)
+	: GridView{parent, model, cubeWidth, cubeHeight}
 	, m_mouseAction{}
 {}
 
@@ -135,8 +135,11 @@ void VectorGraphView::mousePressEvent(QMouseEvent* me)
 				// place if not found
 				foundIndex = model()->addItem(VGPoint{VGPoint::Type::bezier},
 					GridModel::ItemInfo(modelPos.x(), modelPos.y()));
-				auto bb{getBoundingBox(foundIndex)};
-				GridView::containSelection(bb.first, bb.second);
+				if (foundIndex < model()->getCount())
+				{
+					auto bb{getBoundingBox(foundIndex)};
+					GridView::containSelection(bb.first, bb.second);
+				}
 			}
 			else
 			{

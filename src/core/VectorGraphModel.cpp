@@ -32,9 +32,9 @@
 namespace lmms
 {
 
-VectorGraphModel::VectorGraphModel(unsigned int length, unsigned int height, unsigned int horizontalSteps, unsigned int verticalSteps,
+VectorGraphModel::VectorGraphModel(size_t countLimit, unsigned int length, unsigned int height, unsigned int horizontalSteps, unsigned int verticalSteps,
 	size_t bufferSize, Model* parent, QString displayName, bool defaultConstructed)
-	: GridModelTyped{length, height, horizontalSteps, verticalSteps, parent, displayName, defaultConstructed}
+	: GridModelTyped{countLimit, length, height, horizontalSteps, verticalSteps, parent, displayName, defaultConstructed}
 	, m_buffer{}
 	, m_allChanged{true}
 	, m_changedData{}
@@ -245,7 +245,7 @@ void VectorGraphModel::setRenderSize(size_t newSize)
 		m_allChanged = true;
 	}
 }
-void VectorGraphModel::dataChangedAt(GridModel::signedSize index)
+void VectorGraphModel::dataChangedAt(signed long long index)
 {
 	if (index < 0)
 	{
