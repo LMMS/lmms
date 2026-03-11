@@ -104,33 +104,44 @@ bool SampleTrack::play( const TimePos & _start, const fpp_t _frames,
 			Clip * clip = getClip( i );
 			auto sClip = dynamic_cast<SampleClip*>(clip);
 
-			if( _start >= sClip->startPosition() && _start < sClip->endPosition() )
+			for ( int loop = 0; loop <= sClip->loopCount(); loop++ )
 			{
-				if( sClip->isPlaying() == false && _start >= (sClip->startPosition() + sClip->startTimeOffset()) )
+				TimePos loopOffset = loop * sClip->length();
+
+				if ( _start - sClip->startPosition() < loopOffset )
 				{
-					auto bufferFramesPerTick = Engine::framesPerTick(sClip->sample().sampleRate());
-					f_cnt_t sampleStart = bufferFramesPerTick * ( _start - sClip->startPosition() - sClip->startTimeOffset() );
-					f_cnt_t clipFrameLength = bufferFramesPerTick * ( sClip->endPosition() - sClip->startPosition() - sClip->startTimeOffset() );
-					f_cnt_t sampleBufferLength = sClip->sample().sampleSize();
-					//if the Clip smaller than the sample length we play only until Clip end
-					//else we play the sample to the end but nothing more
-					f_cnt_t samplePlayLength = clipFrameLength > sampleBufferLength ? sampleBufferLength : clipFrameLength;
-					//we only play within the sampleBuffer limits
-					if( sampleStart < sampleBufferLength )
+					// No need to check further loops, also avoid to loop the part left of startTimeOffset()
+					break;
+				}
+
+				if( _start >= sClip->startPosition() + loopOffset && _start < sClip->endPosition() + loopOffset )
+				{
+					if( sClip->isPlaying() == false && _start >= (sClip->startPosition() + sClip->startTimeOffset() + loopOffset) )
 					{
-						sClip->setSampleStartFrame( sampleStart );
-						sClip->setSamplePlayLength( samplePlayLength );
-						clips.push_back( sClip );
-						sClip->setIsPlaying( true );
-						nowPlaying = true;
+						auto bufferFramesPerTick = Engine::framesPerTick(sClip->sample().sampleRate());
+						f_cnt_t sampleStart = bufferFramesPerTick * ( _start - sClip->startPosition() - sClip->startTimeOffset() - loopOffset );
+						f_cnt_t clipFrameLength = bufferFramesPerTick * ( sClip->endPosition() - sClip->startPosition() - sClip->startTimeOffset() );
+						f_cnt_t sampleBufferLength = sClip->sample().sampleSize();
+						//if the Clip smaller than the sample length we play only until Clip end
+						//else we play the sample to the end but nothing more
+						f_cnt_t samplePlayLength = clipFrameLength > sampleBufferLength ? sampleBufferLength : clipFrameLength;
+						//we only play within the sampleBuffer limits
+						if( sampleStart < sampleBufferLength )
+						{
+							sClip->setSampleStartFrame( sampleStart );
+							sClip->setSamplePlayLength( samplePlayLength );
+							clips.push_back( sClip );
+							sClip->setIsPlaying( true, loop );
+							nowPlaying = true;
+						}
 					}
 				}
+				else
+				{
+					sClip->setIsPlaying( false, loop );
+				}
+				nowPlaying = nowPlaying || sClip->isPlaying();
 			}
-			else
-			{
-				sClip->setIsPlaying( false );
-			}
-			nowPlaying = nowPlaying || sClip->isPlaying();
 		}
 		setPlaying(nowPlaying);
 	}

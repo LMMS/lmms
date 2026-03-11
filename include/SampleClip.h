@@ -80,7 +80,7 @@ public:
 	}
 
 	bool isPlaying() const;
-	void setIsPlaying(bool isPlaying);
+	void setIsPlaying(bool isPlaying, int loop = -1);
 	void setSampleBuffer(std::shared_ptr<const SampleBuffer> sb);
 
 	SampleClip* clone() override
@@ -102,6 +102,7 @@ private:
 	Sample m_sample;
 	BoolModel m_recordModel;
 	bool m_isPlaying;
+	int m_currentLoop;
 
 	friend class gui::SampleClipView;
 
