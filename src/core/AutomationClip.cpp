@@ -782,6 +782,7 @@ void AutomationClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 	_this.setAttribute( "pos", startPosition() );
 	_this.setAttribute( "len", length() );
+	_this.setAttribute( "loopcount", loopCount() );
 	_this.setAttribute( "name", name() );
 	_this.setAttribute( "prog", QString::number( static_cast<int>(progressionType()) ) );
 	_this.setAttribute( "tens", QString::number( getTension() ) );
@@ -893,6 +894,12 @@ void AutomationClip::loadSettings( const QDomElement & _this )
 	else
 	{
 		changeLength( len );
+	}
+
+	int loopCount = _this.attribute("loopcount").toInt();
+	for (int i = 0; i < loopCount; ++i)
+	{
+		increaseLoopCount();
 	}
 
 	if (shouldGenerateTangents) { generateTangents(); }
