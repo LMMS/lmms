@@ -42,7 +42,7 @@ public:
 	VectorGraphModel* model() { return castModel<VectorGraphModel>(); }
 	const VectorGraphModel* model() const { return castModel<VectorGraphModel>(); }
 
-	VectorGraphView(QWidget* parent, size_t cubeWidth, size_t cubeHeight);
+	VectorGraphView(QWidget* parent, VectorGraphModel* model, size_t cubeWidth, size_t cubeHeight);
 protected:
 	void paintEvent(QPaintEvent* pe) override;
 	void mousePressEvent(QMouseEvent* me) override;

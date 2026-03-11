@@ -52,7 +52,7 @@ class LMMS_EXPORT VectorGraphModel : public GridModelTyped<VGPoint, VGPoint>, pu
 {
 Q_OBJECT
 public:
-	VectorGraphModel(unsigned int length, unsigned int height, unsigned int horizontalSteps, unsigned int verticalSteps,
+	VectorGraphModel(size_t countLimit, unsigned int length, unsigned int height, unsigned int horizontalSteps, unsigned int verticalSteps,
 		size_t bufferSize, Model* parent, QString displayName = QString(), bool defaultConstructed = false);
 
 	void renderAllTo(std::vector<float>& bufferOut);
@@ -78,7 +78,7 @@ public:
 	QString getPointsBase64(float xOffset, float yOffset, const std::set<size_t>* selection = nullptr);
 	void addPointsBase64(QString base64String, float xOffset, float yOffset);
 protected:
-	void dataChangedAt(signedSize index) override;
+	void dataChangedAt(signed long long index) override;
 
 	void saveSettings(QDomDocument& doc, QDomElement& element) override;
 	void loadSettings(const QDomElement& element) override;

@@ -27,17 +27,24 @@
 #include <cassert>
 #include <cmath>
 
+#include "Engine.h"
+#include "AudioEngine.h"
+
 namespace lmms
 {
 
-GridModel::GridModel(unsigned int length, unsigned int height, unsigned int horizontalSteps, unsigned int verticalSteps,
-	Model* parent, QString displayName, bool defaultConstructed)
+GridModel::GridModel(size_t countLimit, unsigned int length, unsigned int height,
+	unsigned int horizontalSteps, unsigned int verticalSteps, Model* parent, QString displayName, bool defaultConstructed)
 	: Model(parent, displayName, defaultConstructed)
 	, m_length{length}
 	, m_height{height}
 	, m_horizontalSteps{horizontalSteps}
 	, m_verticalSteps{verticalSteps}
-{}
+	, m_countLimit{countLimit}
+{
+	m_items.reserve(countLimit);
+	assert(m_countLimit == m_items.capacity());
+}
 
 GridModel::~GridModel()
 {}
@@ -107,6 +114,9 @@ size_t GridModel::findIndex(float xPos) const
 
 size_t GridModel::addItem(GridModel::Item itemIn)
 {
+	assert(m_countLimit == m_items.capacity());
+	if (m_items.size() >= m_countLimit) { return m_countLimit; }
+
 	size_t foundIndex{findIndex(itemIn.info.x)};
 	m_items.push_back(itemIn);
 	if (foundIndex + 1 < m_items.size())
@@ -127,6 +137,7 @@ void GridModel::removeItem(size_t index)
 }
 void GridModel::clearItems()
 {
+	// "Calling clear() does not affect the result of capacity()"
 	m_items.clear();
 }
 
@@ -208,6 +219,10 @@ size_t GridModel::getCount() const
 {
 	return m_items.size();
 }
+size_t GridModel::getCountLimit() const
+{
+	return m_countLimit;
+}
 unsigned int GridModel::getLength() const
 {
 	return m_length;
@@ -217,7 +232,7 @@ unsigned int GridModel::getHeight() const
 	return m_height;
 }
 
-void GridModel::resizeGrid(size_t length, size_t height)
+void GridModel::resizeGridArea(size_t length, size_t height)
 {
 	bool shouldClamp = length < m_length || height < m_height;
 	m_length = length;
@@ -225,13 +240,32 @@ void GridModel::resizeGrid(size_t length, size_t height)
 	
 	if (shouldClamp)
 	{
-		// innefficiently clamping
+		// inefficiently clamping
 		for (size_t i = 0; i < m_items.size(); ++i)
 		{
 			setInfo(i, m_items[i].info);
 		}
 	}
 	emit propertiesChanged();
+}
+int GridModel::resizeGridCountLimit(size_t newLimit)
+{
+	int deleteCount = 0;
+	Engine::audioEngine()->requestChangeInModel();
+	if (m_items.size() > newLimit)
+	{
+		deleteCount = m_items.size() - newLimit;
+		m_items.resize(newLimit);
+	}
+	else
+	{
+		m_items.shrink_to_fit();
+		m_items.reserve(newLimit);
+	}
+	Engine::audioEngine()->doneChangeInModel();
+	m_countLimit = newLimit;
+	assert(m_countLimit == m_items.capacity());
+	return deleteCount;
 }
 
 void GridModel::setSteps(unsigned int horizontalSteps, unsigned int verticalSteps)

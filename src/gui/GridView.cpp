@@ -62,6 +62,8 @@ GridView::GridView(QWidget* parent, GridModel* model, size_t cubeWidth, size_t c
 	{
 		resize(m_cubeWidth, m_cubeHeight);
 	}
+
+	GridView::modelChanged();
 }
 
 void GridView::moveToWhole(unsigned int x, unsigned int y)

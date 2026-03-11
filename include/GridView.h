@@ -54,7 +54,7 @@ class LMMS_EXPORT GridView : public QWidget, public ModelView
 Q_OBJECT
 public:
 	GridView(QWidget* parent, GridModel* model, size_t cubeWidth, size_t cubeHeight);
-	~GridView() override = default;	
+	~GridView() override = default;
 
 	GridModel* model() { return castModel<GridModel>(); }
 	const GridModel* model() const { return castModel<GridModel>(); }
