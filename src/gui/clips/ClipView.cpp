@@ -1182,7 +1182,7 @@ void ClipView::contextMenuEvent( QContextMenuEvent * cme )
 	{
 		contextMenu.addAction(
 			embed::getIconPixmap( "loop_points_on" ),
-			tr( "Loop" ),
+			tr( "Add linked clone" ),
 			[this](){ contextMenuAction( ContextMenuAction::Loop ); } );
 	}
 
