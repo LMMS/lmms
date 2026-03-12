@@ -33,7 +33,7 @@
 namespace lmms
 {
 
-GridModel::GridModel(size_t countLimit, std::vector<size_t>* indexLookup, unsigned int length, unsigned int height,
+GridModel::GridModel(unsigned int countLimit, unsigned int length, unsigned int height,
 	unsigned int horizontalSteps, unsigned int verticalSteps, Model* parent, QString displayName, bool defaultConstructed)
 	: Model(parent, displayName, defaultConstructed)
 	, m_length{length}
@@ -41,11 +41,9 @@ GridModel::GridModel(size_t countLimit, std::vector<size_t>* indexLookup, unsign
 	, m_horizontalSteps{horizontalSteps}
 	, m_verticalSteps{verticalSteps}
 	, m_countLimit{countLimit}
-	, m_indexLookup{indexLookup}
 {
 	m_items.reserve(countLimit);
 	assert(m_countLimit == m_items.capacity());
-	assert(m_indexLookup != nullptr);
 }
 
 GridModel::~GridModel()
@@ -143,6 +141,12 @@ void GridModel::clearItems()
 	m_items.clear();
 }
 
+void GridModel::setStaticIndex(size_t index, unsigned int newStaticIndex)
+{
+	m_items[index].staticIndex = newStaticIndex;
+	m_items[m_items[index].staticIndex].lookupIndex = index;
+}
+
 void GridModel::move(size_t startIndex, size_t finalIndex)
 {
 	auto itemData{m_items[startIndex]};
@@ -150,26 +154,20 @@ void GridModel::move(size_t startIndex, size_t finalIndex)
 	{
 		for (size_t i = startIndex; i > finalIndex; --i)
 		{
-			(*m_indexLookup)[m_items[i - 1].staticIndex] = i;
-			m_items[i] = m_items[i - 1];
+			m_items[m_items[i - 1].staticIndex].lookupIndex = i;
+			m_items[i] << m_items[i - 1];
 		}
 	}
 	else
 	{
 		for (size_t i = startIndex; i < finalIndex; ++i)
 		{
-			(*m_indexLookup)[m_items[i + 1].staticIndex] = i;
-			m_items[i] = m_items[i + 1];
+			m_items[m_items[i + 1].staticIndex].lookupIndex = i;
+			m_items[i] << m_items[i + 1];
 		}
 	}
-	(*m_indexLookup)[itemData.staticIndex] = finalIndex;
-	m_items[finalIndex] = itemData;
-}
-
-size_t& GridModel::getAndSetStaticIndex(size_t index)
-{
-	assert(index < m_items.size());
-	return m_items[index].staticIndex;
+	m_items[itemData.staticIndex].lookupIndex = finalIndex;
+	m_items[finalIndex] << itemData;
 }
 
 size_t GridModel::setX(size_t index, float newX)
@@ -224,7 +222,7 @@ size_t GridModel::getCount() const
 {
 	return m_items.size();
 }
-size_t GridModel::getCountLimit() const
+unsigned int GridModel::getCountLimit() const
 {
 	return m_countLimit;
 }

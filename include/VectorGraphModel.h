@@ -52,7 +52,7 @@ class LMMS_EXPORT VectorGraphModel : public GridModelTyped<VGPoint, VGPoint>, pu
 {
 Q_OBJECT
 public:
-	VectorGraphModel(size_t countLimit, unsigned int length, unsigned int height, unsigned int horizontalSteps, unsigned int verticalSteps,
+	VectorGraphModel(unsigned int countLimit, unsigned int length, unsigned int height, unsigned int horizontalSteps, unsigned int verticalSteps,
 		size_t bufferSize, Model* parent, QString displayName = QString(), bool defaultConstructed = false);
 
 	void renderAllTo(std::vector<float>& bufferOut);

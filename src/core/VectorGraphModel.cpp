@@ -32,7 +32,7 @@
 namespace lmms
 {
 
-VectorGraphModel::VectorGraphModel(size_t countLimit, unsigned int length, unsigned int height, unsigned int horizontalSteps, unsigned int verticalSteps,
+VectorGraphModel::VectorGraphModel(unsigned int countLimit, unsigned int length, unsigned int height, unsigned int horizontalSteps, unsigned int verticalSteps,
 	size_t bufferSize, Model* parent, QString displayName, bool defaultConstructed)
 	: GridModelTyped{countLimit, length, height, horizontalSteps, verticalSteps, parent, displayName, defaultConstructed}
 	, m_buffer{}
