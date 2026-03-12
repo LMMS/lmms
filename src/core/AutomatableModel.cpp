@@ -682,7 +682,7 @@ float AutomatableModel::globalAutomationValueAt( const TimePos& time )
 		for (const auto& clip : clips)
 		{
 			int s = clip->startPosition();
-			int e = clip->endPosition();
+			int e = clip->endPosition() + clip->loopCount() * (clip->length() + 1)  - clip->startTimeOffset();
 			if (s <= time && e >= time) { clipsInRange.push_back(clip); }
 		}
 
@@ -701,7 +701,7 @@ float AutomatableModel::globalAutomationValueAt( const TimePos& time )
 
 			for (const auto& clip : clips)
 			{
-				int e = clip->endPosition();
+				int e = clip->endPosition() + clip->loopCount() * (clip->length() + 1) - clip->startTimeOffset();
 				if (e <= time && e > latestPosition)
 				{
 					latestPosition = e;

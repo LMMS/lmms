@@ -560,17 +560,23 @@ float AutomationClip::valueAt( const TimePos & _time ) const
 		return 0;
 	}
 
+	TimePos loopOffset = 0;
+	while ( _time + loopOffset > length() - startTimeOffset() && -loopOffset < loopCount() * length() )
+	{
+		loopOffset -= length();
+	}
+
 	// If we have a node at that time, just return its value
-	if (m_timeMap.contains(_time))
+	if (m_timeMap.contains(_time + loopOffset))
 	{
 		// When the time is exactly the node's time, we want the inValue
-		return m_timeMap[_time].getInValue();
+		return m_timeMap[_time + loopOffset].getInValue();
 	}
 
 	// lowerBound returns next value with equal or greater key. Since we already
 	// checked if the key contains a node, we know the returned node has a greater
 	// key than _time. Therefore we take the previous element to calculate the current value
-	timeMap::const_iterator v = m_timeMap.lowerBound(_time);
+	timeMap::const_iterator v = m_timeMap.lowerBound(_time + loopOffset);
 
 	if( v == m_timeMap.begin() )
 	{
@@ -585,7 +591,7 @@ float AutomationClip::valueAt( const TimePos & _time ) const
 		return OUTVAL(pv);
 	}
 
-	return valueAt(pv, _time - POS(pv));
+	return valueAt(pv, _time + loopOffset - POS(pv));
 }
 
 
