@@ -188,6 +188,7 @@ protected:
 	DataFile createClipDataFiles(const QVector<ClipView *> & clips) const;
 
 	virtual void paintTextLabel(QString const & text, QPainter & painter);
+	void paintHatching( QPainter & painter, QColor color );
 
 	auto hasCustomColor() const -> bool;
 

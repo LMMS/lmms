@@ -619,6 +619,42 @@ void ClipView::paintTextLabel(QString const & text, QPainter & painter)
 	painter.drawText( textLeft, finalTextTop, elidedClipName );
 }
 
+void ClipView::paintHatching( QPainter & painter, QColor color )
+{
+	if (m_offset == 0)
+	{
+		// Only paint hatching on the loop views
+		return;
+	}
+	painter.setPen(color);
+
+	// Change the pen's width in a rather painfull way
+	QPen previousPen = painter.pen();
+	QPen newPen(previousPen);
+	newPen.setWidth(2);
+	painter.setPen(newPen);
+	
+	for (int x = -height(); x < width(); x += 10)
+	{
+		int y1, y2;
+		y1 = 0;
+		if (x < 0)
+		{
+			y1 = -x;
+		}
+		y2 = height();
+		if (x + height() > width())
+		{
+			y2 = height() - (x + height() - width());
+		}
+		if (y1 < height() && y2 > 0)
+		{
+			painter.drawLine(std::max( 0, x ), y1, std::min( width(), x + height() ), y2);
+		}
+	}
+	painter.setPen(previousPen);
+}
+
 /*! \brief Handle a mouse press on this ClipView.
  *
  *  Handles the various ways in which a ClipView can be

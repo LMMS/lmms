@@ -272,39 +272,14 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 		{
 			p.fillRect(rect(), c);
 		}
-		// Draw loop views with a slight color difference and hatch them (after painting the shape of the waveform bellow)
+		// Draw loop views with a slight color difference
 		else
 		{
 			p.fillRect(rect(), c.darker( 150 ));
-			p.setPen( clipColor.darker( 150 ) );
-
-			// Change the pen's width in a rather painfull way
-			QPen previousPen = p.pen();
-			QPen newPen(previousPen);
-			newPen.setWidth(2);
-			p.setPen(newPen);
-
-			for (int x = -height(); x < width(); x += 10)
-			{
-				int y1, y2;
-				y1 = 0;
-				if (x < 0)
-				{
-					y1 = -x;
-				}
-				y2 = height();
-				if (x + height() > width())
-				{
-					y2 = height() - (x + height() - width());
-				}
-				if (y1 < height() && y2 > 0)
-				{
-					p.drawLine(std::max( 0, x ), y1, std::min( width(), x + height() ), y2);
-				}
-			}
-			p.setPen(previousPen);
 		}
 	}
+	// Draw hatching on loop views
+	paintHatching( p, clipColor.darker( 150 ) );
 
 	p.setPen(clipColor);
 
