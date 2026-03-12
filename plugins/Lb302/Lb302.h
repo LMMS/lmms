@@ -219,7 +219,8 @@ private:
 
 	// Envelope State
 	float m_vca = 0.f; //!< Amplifier coefficient.
-	float m_noteVolume; //!< The "velocity" of the most recent note, within [0, 1]
+	float m_noteVolume; //!< The per-note volume (velocity) of the most recent note, within [0, 1]
+	panning_t m_notePan; //!< The per-note panning of the most recent note
 	VcaMode m_vcaMode = VcaMode::NeverPlayed;
 
 	NotePlayHandle* m_playingNote;

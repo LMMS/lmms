@@ -329,6 +329,7 @@ void Lb302Synth::process(SampleFrame* outbuf, const fpp_t size)
 	{
 		constexpr float s_volRatio = 1.f / DefaultVolume;
 		m_noteVolume = m_playingNote->getVolume() * s_volRatio;
+		m_notePan = std::clamp(m_playingNote->getPanning(), PanningLeft, PanningRight);
 	}
 
 	if (m_newFreq)
@@ -474,8 +475,9 @@ void Lb302Synth::process(SampleFrame* outbuf, const fpp_t size)
 		}
 
 		// Write out samples.
-		sample_t samp = filter.process(m_vcoK) * m_vca * m_noteVolume;
-		for (ch_cnt_t c = 0; c < DEFAULT_CHANNELS; c++) { outbuf[i][c] = samp; }
+		sample_t samp = filter.process(m_vcoK) * m_vca;
+		const auto vv = panningToVolumeVector(m_notePan, m_noteVolume);
+		for (ch_cnt_t c = 0; c < DEFAULT_CHANNELS; c++) { outbuf[i][c] = samp * vv.vol[c]; }
 
 		// Handle Envelope
 		if (m_vcaMode == VcaMode::Attack)
