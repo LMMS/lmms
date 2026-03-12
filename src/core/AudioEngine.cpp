@@ -23,6 +23,7 @@
  */
 
 #include "AudioEngine.h"
+#include <iostream>
 
 #include "MixHelpers.h"
 #include "denormals.h"
@@ -30,13 +31,12 @@
 #include "lmmsconfig.h"
 
 #include "AudioEngineWorkerThread.h"
-#include "AudioPort.h"
+#include "AudioBusHandle.h"
 #include "Mixer.h"
 #include "Song.h"
 #include "EnvelopeAndLfoParameters.h"
 #include "NotePlayHandle.h"
 #include "ConfigManager.h"
-#include "SamplePlayHandle.h"
 
 // platform-specific audio-interface-classes
 #include "AudioAlsa.h"
@@ -74,6 +74,7 @@ static thread_local bool s_renderingThread = false;
 AudioEngine::AudioEngine( bool renderOnly ) :
 	m_renderOnly( renderOnly ),
 	m_framesPerPeriod( DEFAULT_BUFFER_SIZE ),
+	m_baseSampleRate(std::max(ConfigManager::inst()->value("audioengine", "samplerate").toInt(), SUPPORTED_SAMPLERATES.front())),
 	m_inputBufferRead( 0 ),
 	m_inputBufferWrite( 1 ),
 	m_outputBufferRead(nullptr),
@@ -81,7 +82,6 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 	m_workers(),
 	m_numWorkers( QThread::idealThreadCount()-1 ),
 	m_newPlayHandles( PlayHandle::MaxNumber ),
-	m_qualitySettings(qualitySettings::Interpolation::Linear),
 	m_masterGain( 1.0f ),
 	m_audioDev( nullptr ),
 	m_oldAudioDev( nullptr ),
@@ -128,7 +128,7 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 		}
 	}
 
-	// allocte the FIFO from the determined size
+	// allocate the FIFO from the determined size
 	m_fifo = new Fifo( fifoSize );
 
 	// now that framesPerPeriod is fixed initialize global BufferManager
@@ -241,34 +241,6 @@ void AudioEngine::stopProcessing()
 
 
 
-sample_rate_t AudioEngine::baseSampleRate() const
-{
-	sample_rate_t sr = ConfigManager::inst()->value( "audioengine", "samplerate" ).toInt();
-	if( sr < 44100 )
-	{
-		sr = 44100;
-	}
-	return sr;
-}
-
-
-
-
-sample_rate_t AudioEngine::outputSampleRate() const
-{
-	return m_audioDev != nullptr ? m_audioDev->sampleRate() :
-							baseSampleRate();
-}
-
-
-
-
-sample_rate_t AudioEngine::inputSampleRate() const
-{
-	return m_audioDev != nullptr ? m_audioDev->sampleRate() :
-							baseSampleRate();
-}
-
 bool AudioEngine::criticalXRuns() const
 {
 	return cpuLoad() >= 99 && Engine::getSong()->isExporting() == false;
@@ -326,13 +298,13 @@ void AudioEngine::renderStageNoteSetup()
 
 		if( it != m_playHandles.end() )
 		{
-			( *it )->audioPort()->removePlayHandle( ( *it ) );
-			if( ( *it )->type() == PlayHandle::Type::NotePlayHandle )
+			(*it)->audioBusHandle()->removePlayHandle(*it);
+			if((*it)->type() == PlayHandle::Type::NotePlayHandle)
 			{
-				NotePlayHandleManager::release( (NotePlayHandle*) *it );
+				NotePlayHandleManager::release((NotePlayHandle*)*it);
 			}
 			else delete *it;
-			m_playHandles.erase( it );
+			m_playHandles.erase(it);
 		}
 
 		it_rem = m_playHandlesToRemove.erase( it_rem );
@@ -374,7 +346,7 @@ void AudioEngine::renderStageEffects()
 	AudioEngineProfiler::Probe profilerProbe(m_profiler, AudioEngineProfiler::DetailType::Effects);
 
 	// STAGE 2: process effects of all instrument- and sampletracks
-	AudioEngineWorkerThread::fillJobQueue(m_audioPorts);
+	AudioEngineWorkerThread::fillJobQueue(m_audioBusHandles);
 	AudioEngineWorkerThread::startAndWaitForJobs();
 
 	// removed all play handles which are done
@@ -389,13 +361,13 @@ void AudioEngine::renderStageEffects()
 		}
 		if( ( *it )->isFinished() )
 		{
-			( *it )->audioPort()->removePlayHandle( ( *it ) );
-			if( ( *it )->type() == PlayHandle::Type::NotePlayHandle )
+			(*it)->audioBusHandle()->removePlayHandle(*it);
+			if((*it)->type() == PlayHandle::Type::NotePlayHandle)
 			{
-				NotePlayHandleManager::release( (NotePlayHandle*) *it );
+				NotePlayHandleManager::release((NotePlayHandle*)*it);
 			}
 			else delete *it;
-			it = m_playHandles.erase( it );
+			it = m_playHandles.erase(it);
 		}
 		else
 		{
@@ -492,25 +464,6 @@ void AudioEngine::clearInternal()
 	}
 }
 
-
-
-
-void AudioEngine::changeQuality(const struct qualitySettings & qs)
-{
-	// don't delete the audio-device
-	stopProcessing();
-
-	m_qualitySettings = qs;
-
-	emit sampleRateChanged();
-	emit qualitySettingsChanged();
-
-	startProcessing();
-}
-
-
-
-
 void AudioEngine::doSetAudioDevice( AudioDevice * _dev )
 {
 	// TODO: Use shared_ptr here in the future.
@@ -531,17 +484,9 @@ void AudioEngine::doSetAudioDevice( AudioDevice * _dev )
 	}
 }
 
-
-
-
-void AudioEngine::setAudioDevice(AudioDevice * _dev,
-				const struct qualitySettings & _qs,
-				bool _needs_fifo,
-				bool startNow)
+void AudioEngine::setAudioDevice(AudioDevice* _dev, bool _needs_fifo, bool startNow)
 {
 	stopProcessing();
-
-	m_qualitySettings = _qs;
 
 	doSetAudioDevice( _dev );
 
@@ -583,14 +528,14 @@ void AudioEngine::restoreAudioDevice()
 
 
 
-void AudioEngine::removeAudioPort(AudioPort * port)
+void AudioEngine::removeAudioBusHandle(AudioBusHandle* busHandle)
 {
 	requestChangeInModel();
 
-	auto it = std::find(m_audioPorts.begin(), m_audioPorts.end(), port);
-	if (it != m_audioPorts.end())
+	auto it = std::find(m_audioBusHandles.begin(), m_audioBusHandles.end(), busHandle);
+	if (it != m_audioBusHandles.end())
 	{
-		m_audioPorts.erase(it);
+		m_audioBusHandles.erase(it);
 	}
 	doneChangeInModel();
 }
@@ -604,7 +549,7 @@ bool AudioEngine::addPlayHandle( PlayHandle* handle )
 	if (handle->type() == PlayHandle::Type::InstrumentPlayHandle || !criticalXRuns())
 	{
 		m_newPlayHandles.push( handle );
-		handle->audioPort()->addPlayHandle( handle );
+		handle->audioBusHandle()->addPlayHandle(handle);
 		return true;
 	}
 
@@ -625,7 +570,7 @@ void AudioEngine::removePlayHandle(PlayHandle * ph)
 	// which were created in a thread different than the audio engine thread
 	if (ph->affinityMatters() && ph->affinity() == QThread::currentThread())
 	{
-		ph->audioPort()->removePlayHandle(ph);
+		ph->audioBusHandle()->removePlayHandle(ph);
 		bool removedFromList = false;
 		// Check m_newPlayHandles first because doing it the other way around
 		// creates a race condition
@@ -684,13 +629,13 @@ void AudioEngine::removePlayHandlesOfTypes(Track * track, PlayHandle::Types type
 	{
 		if ((*it)->isFromTrack(track) && ((*it)->type() & types))
 		{
-			( *it )->audioPort()->removePlayHandle( ( *it ) );
-			if( ( *it )->type() == PlayHandle::Type::NotePlayHandle )
+			(*it)->audioBusHandle()->removePlayHandle(*it);
+			if((*it)->type() == PlayHandle::Type::NotePlayHandle)
 			{
-				NotePlayHandleManager::release( (NotePlayHandle*) *it );
+				NotePlayHandleManager::release((NotePlayHandle*)*it);
 			}
 			else delete *it;
-			it = m_playHandles.erase( it );
+			it = m_playHandles.erase(it);
 		}
 		else
 		{
@@ -934,7 +879,7 @@ AudioDevice * AudioEngine::tryAudioDevices()
 
 
 #ifdef LMMS_HAVE_PORTAUDIO
-	if( dev_name == AudioPortAudio::name() || dev_name == "" )
+	if (dev_name == AudioPortAudio::name() || dev_name.isEmpty())
 	{
 		dev = new AudioPortAudio( success_ful, this );
 		if( success_ful )
@@ -1130,17 +1075,6 @@ void AudioEngine::fifoWriter::finish()
 void AudioEngine::fifoWriter::run()
 {
 	disable_denormals();
-
-#if 0
-#if defined(LMMS_BUILD_LINUX) || defined(LMMS_BUILD_FREEBSD)
-#ifdef LMMS_HAVE_SCHED_H
-	cpu_set_t mask;
-	CPU_ZERO( &mask );
-	CPU_SET( 0, &mask );
-	sched_setaffinity( 0, sizeof( mask ), &mask );
-#endif
-#endif
-#endif
 
 	const fpp_t frames = m_audioEngine->framesPerPeriod();
 	while( m_writing )

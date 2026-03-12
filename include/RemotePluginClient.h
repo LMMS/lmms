@@ -38,6 +38,8 @@
 #	include <unistd.h>
 #endif
 
+#include "LmmsTypes.h"
+#include "MidiEvent.h"
 #include "SharedMemory.h"
 #include "VstSyncData.h"
 
@@ -259,8 +261,8 @@ bool RemotePluginClient::processMessage( const message & _m )
 				debugMessage(std::string{"Failed to attach sync data: "} + error.what() + '\n');
 				std::exit(EXIT_FAILURE);
 			}
-			m_bufferSize = m_vstSyncData->m_bufferSize;
-			m_sampleRate = m_vstSyncData->m_sampleRate;
+			m_bufferSize = m_vstSyncData->bufferSize;
+			m_sampleRate = m_vstSyncData->sampleRate;
 			reply_message.id = IdHostInfoGotten;
 			reply = true;
 			break;
@@ -309,7 +311,7 @@ bool RemotePluginClient::processMessage( const message & _m )
 		default:
 		{
 			char buf[64];
-			sprintf( buf, "undefined message: %d\n", (int) _m.id );
+			std::snprintf(buf, 64, "undefined message: %d\n", _m.id);
 			debugMessage( buf );
 			break;
 		}

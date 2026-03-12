@@ -75,18 +75,12 @@ const std::array<ProjectRenderer::FileEncodeDevice, 5> ProjectRenderer::fileEnco
 
 } ;
 
-
-
-
-ProjectRenderer::ProjectRenderer( const AudioEngine::qualitySettings & qualitySettings,
-					const OutputSettings & outputSettings,
-					ExportFileFormat exportFileFormat,
-					const QString & outputFilename ) :
-	QThread( Engine::audioEngine() ),
-	m_fileDev( nullptr ),
-	m_qualitySettings( qualitySettings ),
-	m_progress( 0 ),
-	m_abort( false )
+ProjectRenderer::ProjectRenderer(
+	const OutputSettings& outputSettings, ExportFileFormat exportFileFormat, const QString& outputFilename)
+	: QThread(Engine::audioEngine())
+	, m_fileDev(nullptr)
+	, m_progress(0)
+	, m_abort(false)
 {
 	AudioFileDeviceInstantiaton audioEncoderFactory = fileEncodeDevices[static_cast<std::size_t>(exportFileFormat)].m_getDevInst;
 
@@ -145,7 +139,7 @@ void ProjectRenderer::startProcessing()
 	{
 		// Have to do audio engine stuff with GUI-thread affinity in order to
 		// make slots connected to sampleRateChanged()-signals being called immediately.
-		Engine::audioEngine()->setAudioDevice( m_fileDev, m_qualitySettings, false, false );
+		Engine::audioEngine()->setAudioDevice(m_fileDev, false, false);
 
 		start(
 #ifndef LMMS_BUILD_WIN32
@@ -159,17 +153,6 @@ void ProjectRenderer::startProcessing()
 
 void ProjectRenderer::run()
 {
-#if 0
-#if defined(LMMS_BUILD_LINUX) || defined(LMMS_BUILD_FREEBSD)
-#ifdef LMMS_HAVE_SCHED_H
-	cpu_set_t mask;
-	CPU_ZERO( &mask );
-	CPU_SET( 0, &mask );
-	sched_setaffinity( 0, sizeof( mask ), &mask );
-#endif
-#endif
-#endif
-
 	PerfLogTimer perfLog("Project Render");
 
 	Engine::getSong()->startExport();
@@ -221,7 +204,7 @@ void ProjectRenderer::abortProcessing()
 
 void ProjectRenderer::updateConsoleProgress()
 {
-	const int cols = 50;
+	constexpr int cols = 50;
 	static int rot = 0;
 	auto buf = std::array<char, 80>{};
 	auto prog = std::array<char, cols + 1>{};
@@ -232,9 +215,9 @@ void ProjectRenderer::updateConsoleProgress()
 	}
 	prog[cols] = 0;
 
-	const auto activity = (const char*)"|/-\\";
+	const auto activity = "|/-\\";
 	std::fill(buf.begin(), buf.end(), 0);
-	sprintf(buf.data(), "\r|%s|    %3d%%   %c  ", prog.data(), m_progress,
+	std::snprintf(buf.data(), buf.size(), "\r|%s|    %3d%%   %c  ", prog.data(), m_progress,
 							activity[rot] );
 	rot = ( rot+1 ) % 4;
 

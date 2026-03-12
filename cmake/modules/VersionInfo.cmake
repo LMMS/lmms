@@ -8,6 +8,18 @@ IF(GIT_FOUND AND NOT FORCE_VERSION)
 	# number from the environment and add it to the build metadata
 	if("$ENV{GITHUB_REF}" MATCHES "refs/pull/([0-9]+)/merge")
 		list(APPEND BUILD_METADATA "pr${CMAKE_MATCH_1}")
+		# Parse hash from merge description
+		# e.g. "Merge abc1234 into def4567"
+		execute_process(
+			COMMAND "${GIT_EXECUTABLE}" log -n 1 --format=%s
+			OUTPUT_VARIABLE COMMIT_HASH
+			WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+			TIMEOUT 10
+			OUTPUT_STRIP_TRAILING_WHITESPACE)
+		# If successful, use the first 7 characters to mimic github's hash style
+		if(COMMIT_HASH)
+			string(SUBSTRING "${COMMIT_HASH}" 6 7 COMMIT_HASH)
+		endif()
 	endif()
 
 	# Look for git tag information (e.g. Tagged: "v1.0.0", Untagged: "v1.0.0-123-a1b2c3d")
@@ -44,7 +56,12 @@ IF(GIT_FOUND AND NOT FORCE_VERSION)
 	ELSEIF(TAG_LIST_LENGTH EQUAL 3)
 		# Get the number of commits and latest commit hash
 		LIST(GET TAG_LIST 1 EXTRA_COMMITS)
-		LIST(GET TAG_LIST 2 COMMIT_HASH)
+		# Prefer PR hash from above if present
+		if(NOT COMMIT_HASH)
+			list(GET TAG_LIST 2 COMMIT_HASH)
+			# Mimic github's hash style
+			string(SUBSTRING "${COMMIT_HASH}" 1 7 COMMIT_HASH)
+		endif()
 		list(APPEND PRERELEASE_DATA "${EXTRA_COMMITS}")
 		list(APPEND BUILD_METADATA "${COMMIT_HASH}")
 		# Bump the patch version, since a pre-release (as specified by the extra
@@ -57,7 +74,12 @@ IF(GIT_FOUND AND NOT FORCE_VERSION)
 		# Get the pre-release stage, number of commits, and latest commit hash
 		LIST(GET TAG_LIST 1 VERSION_STAGE)
 		LIST(GET TAG_LIST 2 EXTRA_COMMITS)
-		LIST(GET TAG_LIST 3 COMMIT_HASH)
+		# Prefer PR hash from above if present
+        if(NOT COMMIT_HASH)
+			list(GET TAG_LIST 3 COMMIT_HASH)
+			# Mimic github's hash style
+			string(SUBSTRING "${COMMIT_HASH}" 1 7 COMMIT_HASH)
+		endif()
 		list(APPEND PRERELEASE_DATA "${VERSION_STAGE}")
 		list(APPEND PRERELEASE_DATA "${EXTRA_COMMITS}")
 		list(APPEND BUILD_METADATA "${COMMIT_HASH}")

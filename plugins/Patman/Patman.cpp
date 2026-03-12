@@ -33,7 +33,7 @@
 #include "endian_handling.h"
 #include "Engine.h"
 #include "FileDialog.h"
-#include "gui_templates.h"
+#include "FontHelper.h"
 #include "InstrumentTrack.h"
 #include "NotePlayHandle.h"
 #include "PathUtil.h"
@@ -154,7 +154,7 @@ void PatmanInstrument::playNote( NotePlayHandle * _n,
 						hdata->sample->frequency();
 
 	if (hdata->sample->play(_working_buffer + offset, hdata->state, frames,
-					play_freq, m_loopedModel.value() ? Sample::Loop::On : Sample::Loop::Off))
+			m_loopedModel.value() ? Sample::Loop::On : Sample::Loop::Off, DefaultBaseFreq / play_freq))
 	{
 		applyRelease( _working_buffer, _n );
 	}
@@ -407,7 +407,7 @@ void PatmanInstrument::selectSample( NotePlayHandle * _n )
 	auto hdata = new handle_data;
 	hdata->tuned = m_tunedModel.value();
 	hdata->sample = sample ? sample : std::make_shared<Sample>();
-	hdata->state = new Sample::PlaybackState(_n->hasDetuningInfo());
+	hdata->state = new Sample::PlaybackState(AudioResampler::Mode::Linear);
 
 	_n->m_pluginData = hdata;
 }
@@ -442,7 +442,7 @@ PatmanView::PatmanView( Instrument * _instrument, QWidget * _parent ) :
 
 	m_openFileButton = new PixmapButton( this, nullptr );
 	m_openFileButton->setObjectName( "openFileButton" );
-	m_openFileButton->setCursor( QCursor( Qt::PointingHandCursor ) );
+	m_openFileButton->setCursor(Qt::PointingHandCursor);
 	m_openFileButton->move( 227, 86 );
 	m_openFileButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"select_file_on" ) );
@@ -545,7 +545,7 @@ void PatmanView::updateFilename()
  	m_displayFilename = "";
 	int idx = m_pi->m_patchFile.length();
 
-	QFontMetrics fm(adjustedToPixelSize(font(), 8));
+	QFontMetrics fm(adjustedToPixelSize(font(), SMALL_FONT_SIZE));
 
 	// simple algorithm for creating a text from the filename that
 	// matches in the white rectangle
@@ -615,7 +615,7 @@ void PatmanView::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
 
-	p.setFont(adjustedToPixelSize(font() ,8));
+	p.setFont(adjustedToPixelSize(font(), SMALL_FONT_SIZE));
 	p.drawText( 8, 116, 235, 16,
 			Qt::AlignLeft | Qt::TextSingleLine | Qt::AlignVCenter,
 			m_displayFilename );

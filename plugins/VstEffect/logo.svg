@@ -1,0 +1,15 @@
+<svg version="1.1" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+	<metadata>
+		<rdf:RDF>
+			<cc:Work rdf:about="">
+				<cc:license rdf:resource="http://creativecommons.org/publicdomain/zero/1.0/"/>
+			</cc:Work>
+			<cc:License rdf:about="http://creativecommons.org/publicdomain/zero/1.0/">
+				<cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction"/>
+				<cc:permits rdf:resource="http://creativecommons.org/ns#Distribution"/>
+				<cc:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks"/>
+			</cc:License>
+		</rdf:RDF>
+	</metadata>
+	<path d="m4.0098 0c-2.2219 0-4.0098 1.7879-4.0098 4.0098v39.98c0 2.2219 1.7879 4.0098 4.0098 4.0098h39.98c2.2219 0 4.0098-1.7879 4.0098-4.0098v-39.98c0-2.2219-1.7879-4.0098-4.0098-4.0098zm5.9785 16.004h16.02v3.9922h-6.0039v8.0156h6.0039v3.9883h-16.008l-8.0039-8.0039zm18.02 0h9.9961l7.9922 7.9922-8.0039 8.0039h-9.9844v-5.9922h-6.0078v-4h6.0078z" fill="#fff" stroke-width="0" style="mix-blend-mode:normal"/>
+</svg>

@@ -27,10 +27,11 @@
 
 #include <QWidget>
 
-#include "InstrumentSoundShaping.h"
 #include "ModelView.h"
 
 class QLabel;
+
+namespace lmms { class InstrumentSoundShaping; }
 
 namespace lmms::gui
 {
@@ -58,7 +59,10 @@ private:
 
 	InstrumentSoundShaping * m_ss = nullptr;
 	TabWidget * m_targetsTabWidget;
-	EnvelopeAndLfoView * m_envLfoViews[InstrumentSoundShaping::NumTargets];
+
+	EnvelopeAndLfoView* m_volumeView;
+	EnvelopeAndLfoView* m_cutoffView;
+	EnvelopeAndLfoView* m_resonanceView;
 
 	// filter-stuff
 	GroupBox * m_filterGroupBox;
@@ -67,8 +71,7 @@ private:
 	Knob * m_filterResKnob;
 
 	QLabel* m_singleStreamInfoLabel;
-
-} ;
+};
 
 
 } // namespace lmms::gui

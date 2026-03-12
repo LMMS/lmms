@@ -258,13 +258,15 @@ void PluginDescWidget::paintEvent( QPaintEvent * )
 }
 
 
-
-
-void PluginDescWidget::enterEvent( QEvent * _e )
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+void PluginDescWidget::enterEvent(QEnterEvent* event)
+#else
+void PluginDescWidget::enterEvent(QEvent* event)
+#endif
 {
 	m_mouseOver = true;
 
-	QWidget::enterEvent( _e );
+	QWidget::enterEvent(event);
 }
 
 
@@ -297,7 +299,7 @@ void PluginDescWidget::contextMenuEvent(QContextMenuEvent* e)
 	QMenu contextMenu(this);
 	contextMenu.addAction(
 		tr("Send to new instrument track"),
-		[=]{ openInNewInstrumentTrack(m_pluginKey.desc->name); }
+		[=, this]{ openInNewInstrumentTrack(m_pluginKey.desc->name); }
 	);
 	contextMenu.exec(e->globalPos());
 }

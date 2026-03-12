@@ -36,9 +36,7 @@ class LMMS_EXPORT CustomTextKnob : public Knob
 protected:
 	inline void setHintText( const QString & _txt_before, const QString & _txt_after ) {} // inaccessible
 public:
-	CustomTextKnob( KnobType _knob_num, QWidget * _parent = nullptr, const QString & _name = QString(), const QString & _value_text = QString() );
-
-	CustomTextKnob( QWidget * _parent = nullptr, const QString & _name = QString(), const QString & _value_text = QString() ); //!< default ctor
+	CustomTextKnob( KnobType _knob_num, const QString& label, QWidget * _parent = nullptr, const QString & _name = QString(), const QString & _value_text = QString() );
 
 	CustomTextKnob( const Knob& other ) = delete;
 

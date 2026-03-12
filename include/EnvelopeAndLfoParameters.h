@@ -26,13 +26,12 @@
 #define LMMS_ENVELOPE_AND_LFO_PARAMETERS_H
 
 #include <memory>
-#include <vector>
 
 #include "JournallingObject.h"
 #include "AutomatableModel.h"
 #include "SampleBuffer.h"
 #include "TempoSyncKnobModel.h"
-#include "lmms_basics.h"
+#include "LmmsTypes.h"
 
 namespace lmms
 {

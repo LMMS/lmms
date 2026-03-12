@@ -44,7 +44,7 @@ Plugin::Descriptor PLUGIN_EXPORT stereoenhancer_plugin_descriptor =
 	"Lou Herard <lherard/at/gmail.com>",
 	0x0100,
 	Plugin::Type::Effect,
-	new PluginPixmapLoader("logo"),
+	new PixmapLoader("lmms-plugin-logo"),
 	nullptr,
 	nullptr,
 } ;
@@ -82,28 +82,18 @@ StereoEnhancerEffect::~StereoEnhancerEffect()
 
 
 
-bool StereoEnhancerEffect::processAudioBuffer( SampleFrame* _buf,
-							const fpp_t _frames )
+Effect::ProcessStatus StereoEnhancerEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 {
-
-	// This appears to be used for determining whether or not to continue processing
-	// audio with this effect
-	double out_sum = 0.0;
-
-	if( !isEnabled() || !isRunning() )
-	{
-		return( false );
-	}
-
+	m_delayBufferCleared = false;
 	const float d = dryLevel();
 	const float w = wetLevel();
 
-	for( fpp_t f = 0; f < _frames; ++f )
+	for (fpp_t f = 0; f < frames; ++f)
 	{
 
 		// copy samples into the delay buffer
-		m_delayBuffer[m_currFrame][0] = _buf[f][0];
-		m_delayBuffer[m_currFrame][1] = _buf[f][1];
+		m_delayBuffer[m_currFrame][0] = buf[f][0];
+		m_delayBuffer[m_currFrame][1] = buf[f][1];
 
 		// Get the width knob value from the Stereo Enhancer effect
 		float width = m_seFX.wideCoeff();
@@ -117,27 +107,28 @@ bool StereoEnhancerEffect::processAudioBuffer( SampleFrame* _buf,
 			frameIndex += DEFAULT_BUFFER_SIZE;
 		}
 
-		//sample_t s[2] = { _buf[f][0], _buf[f][1] };	//Vanilla
-		auto s = std::array{_buf[f][0], m_delayBuffer[frameIndex][1]};	//Chocolate
+		//sample_t s[2] = { buf[f][0], buf[f][1] };	//Vanilla
+		auto s = std::array{buf[f][0], m_delayBuffer[frameIndex][1]};	//Chocolate
 
 		m_seFX.nextSample( s[0], s[1] );
 
-		_buf[f][0] = d * _buf[f][0] + w * s[0];
-		_buf[f][1] = d * _buf[f][1] + w * s[1];
-		out_sum += _buf[f][0]*_buf[f][0] + _buf[f][1]*_buf[f][1];
+		buf[f][0] = d * buf[f][0] + w * s[0];
+		buf[f][1] = d * buf[f][1] + w * s[1];
 
 		// Update currFrame
 		m_currFrame += 1;
 		m_currFrame %= DEFAULT_BUFFER_SIZE;
 	}
 
-	checkGate( out_sum / _frames );
-	if( !isRunning() )
-	{
-		clearMyBuffer();
-	}
+	return ProcessStatus::ContinueIfNotQuiet;
+}
 
-	return( isRunning() );
+
+
+
+void StereoEnhancerEffect::processBypassedImpl()
+{
+	clearMyBuffer();
 }
 
 
@@ -145,6 +136,8 @@ bool StereoEnhancerEffect::processAudioBuffer( SampleFrame* _buf,
 
 void StereoEnhancerEffect::clearMyBuffer()
 {
+	if (m_delayBufferCleared) { return; }
+
 	for (auto i = std::size_t{0}; i < DEFAULT_BUFFER_SIZE; i++)
 	{
 		m_delayBuffer[i][0] = 0.0f;
@@ -152,6 +145,7 @@ void StereoEnhancerEffect::clearMyBuffer()
 	}
 
 	m_currFrame = 0;
+	m_delayBufferCleared = true;
 }
 
 

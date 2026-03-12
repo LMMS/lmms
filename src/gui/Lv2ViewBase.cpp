@@ -38,7 +38,7 @@
 #include "Engine.h"
 #include "GuiApplication.h"
 #include "embed.h"
-#include "gui_templates.h"
+#include "FontHelper.h"
 #include "lmms_math.h"
 #include "Lv2ControlBase.h"
 #include "Lv2Manager.h"
@@ -70,7 +70,7 @@ Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* proc, int colNum) :
 				switch (port.m_vis)
 				{
 					case PortVis::Generic:
-						m_control = new KnobControl(m_parent);
+						m_control = new KnobControl(port.name(), m_parent);
 						break;
 					case PortVis::Integer:
 					{
@@ -157,7 +157,7 @@ Lv2ViewBase::Lv2ViewBase(QWidget* meAsWidget, Lv2ControlBase *ctrlBase) :
 		m_toggleUIButton->setCheckable(true);
 		m_toggleUIButton->setChecked(false);
 		m_toggleUIButton->setIcon(embed::getIconPixmap("zoom"));
-		m_toggleUIButton->setFont(adjustedToPixelSize(m_toggleUIButton->font(), 8));
+		m_toggleUIButton->setFont(adjustedToPixelSize(m_toggleUIButton->font(), SMALL_FONT_SIZE));
 		btnBox->addWidget(m_toggleUIButton, 0);
 	}
 	btnBox->addStretch(1);

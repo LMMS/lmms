@@ -25,7 +25,6 @@
 
 #include "PeakController.h"
 
-#include <cmath>
 
 #include <QDomElement>
 #include <QMessageBox>
@@ -190,7 +189,7 @@ PeakController * PeakController::getControllerBySetting(const QDomElement & _thi
 	int effectId = _this.attribute( "effectId" ).toInt();
 
 	//Backward compatibility for bug in <= 0.4.15 . For >= 1.0.0 ,
-	//foundCount should always be 1 because m_effectId is initialized with rand()
+	//foundCount should always be 1 because m_effectId is initialized with fastRand()
 	int foundCount = 0;
 	if( m_buggedFile == false )
 	{

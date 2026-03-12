@@ -26,12 +26,10 @@
 #define LMMS_SAMPLE_DECODER_H
 
 #include <QString>
-#include <functional>
 #include <optional>
 #include <string>
 #include <vector>
 
-#include "lmms_basics.h"
 #include "SampleFrame.h"
 
 namespace lmms {

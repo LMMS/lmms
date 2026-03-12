@@ -24,7 +24,6 @@
 
 #include <QToolButton>
 #include <QHBoxLayout>
-#include <QLabel>
 #include <QVBoxLayout>
 
 #include "InstrumentMidiIOView.h"
@@ -33,7 +32,6 @@
 #include "Engine.h"
 #include "embed.h"
 #include "GroupBox.h"
-#include "gui_templates.h"
 #include "LcdSpinBox.h"
 #include "MidiClient.h"
 

@@ -51,7 +51,6 @@
 #include <mididata.h>
 
 #include "embed.h"
-#include "debug.h"
 
 #include "Knob.h"
 #include "PixmapButton.h"
@@ -497,7 +496,7 @@ void OpulenzInstrument::loadPatch(const unsigned char inst[14]) {
 
 void OpulenzInstrument::tuneEqual(int center, float Hz) {
 	for(int n=0; n<128; ++n) {
-		float tmp = Hz * pow(2.0, (n - center) * (1.0 / 12.0) + pitchbend * (1.0 / 1200.0));
+		float tmp = Hz * std::exp2((n - center) / 12.0f + pitchbend / 1200.0f);
 		fnums[n] = Hz2fnum( tmp );
 	}
 }
@@ -505,7 +504,7 @@ void OpulenzInstrument::tuneEqual(int center, float Hz) {
 // Find suitable F number in lowest possible block
 int OpulenzInstrument::Hz2fnum(float Hz) {
 	for(int block=0; block<8; ++block) {
-		unsigned int fnum = Hz * pow( 2.0, 20.0 - (double)block ) * ( 1.0 / 49716.0 );
+		auto fnum = static_cast<unsigned>(Hz * std::exp2(20.0f - static_cast<float>(block)) / 49716.0f);
 		if(fnum<1023) {
 			return fnum + (block << 10);
 		}
@@ -515,7 +514,7 @@ int OpulenzInstrument::Hz2fnum(float Hz) {
 
 // Load one of the default patches
 void OpulenzInstrument::loadGMPatch() {
-	unsigned char *inst = midi_fm_instruments[m_patchModel.value()];
+	const unsigned char* inst = midi_fm_instruments[m_patchModel.value()];
 	loadPatch(inst);
 }
 
@@ -591,7 +590,7 @@ void OpulenzInstrument::loadFile( const QString& file ) {
 			return;
 		}
 		if( sbidata.size() != 52 ) {
-			printf("SBI size error: expected 52, got %d\n",sbidata.size() );
+			printf("SBI size error: expected 52, got %d\n", static_cast<int>(sbidata.size()));
 		}
 
 		// Minimum size of SBI if we ignore "reserved" bytes at end
@@ -712,7 +711,7 @@ OpulenzInstrumentView::OpulenzInstrumentView( Instrument * _instrument,
 	BUTTON_GEN(op1_vib_btn, "Vibrato", 93, 87);
 	KNOB_GEN(feedback_kn, "Feedback", "", 128, 48);
 
-	op1_waveform = new automatableButtonGroup( this );
+	op1_waveform = new AutomatableButtonGroup( this );
 	WAVEBUTTON_GEN(op1_w0_btn,"Sine", 154, 86, "wave1_on", "wave1_off", op1_waveform);
 	WAVEBUTTON_GEN(op1_w1_btn,"Half sine", 178, 86, "wave2_on", "wave2_off", op1_waveform);
 	WAVEBUTTON_GEN(op1_w2_btn,"Absolute sine", 199, 86, "wave3_on", "wave3_off", op1_waveform);
@@ -732,7 +731,7 @@ OpulenzInstrumentView::OpulenzInstrumentView( Instrument * _instrument,
 	BUTTON_GEN(op2_trem_btn, "Tremolo", 65, 177);
 	BUTTON_GEN(op2_vib_btn, "Vibrato", 93, 177);
 
-	op2_waveform = new automatableButtonGroup( this );
+	op2_waveform = new AutomatableButtonGroup( this );
 	WAVEBUTTON_GEN(op2_w0_btn,"Sine", 154, 176, "wave1_on", "wave1_off", op2_waveform);
 	WAVEBUTTON_GEN(op2_w1_btn,"Half sine", 178, 176, "wave2_on", "wave2_off", op2_waveform);
 	WAVEBUTTON_GEN(op2_w2_btn,"Absolute sine", 199, 176, "wave3_on", "wave3_off", op2_waveform);

@@ -23,6 +23,9 @@
  */
 
 #include "FlangerEffect.h"
+
+#include <numbers>
+
 #include "Engine.h"
 #include "MonoDelay.h"
 #include "QuadratureLfo.h"
@@ -46,7 +49,7 @@ Plugin::Descriptor PLUGIN_EXPORT flanger_plugin_descriptor =
 	"Dave French <contact/dot/dave/dot/french3/at/googlemail/dot/com>",
 	0x0100,
 	Plugin::Type::Effect,
-	new PluginPixmapLoader("logo"),
+	new PixmapLoader("lmms-plugin-logo"),
 	nullptr,
 	nullptr,
 } ;
@@ -85,13 +88,8 @@ FlangerEffect::~FlangerEffect()
 
 
 
-bool FlangerEffect::processAudioBuffer( SampleFrame* buf, const fpp_t frames )
+Effect::ProcessStatus FlangerEffect::processImpl(SampleFrame* buf, const fpp_t frames)
 {
-	if( !isEnabled() || !isRunning () )
-	{
-		return( false );
-	}
-	double outSum = 0.0;
 	const float d = dryLevel();
 	const float w = wetLevel();
 	const float length = m_flangerControls.m_delayTimeModel.value() * Engine::audioEngine()->outputSampleRate();
@@ -99,7 +97,7 @@ bool FlangerEffect::processAudioBuffer( SampleFrame* buf, const fpp_t frames )
 	float amplitude = m_flangerControls.m_lfoAmountModel.value() * Engine::audioEngine()->outputSampleRate();
 	bool invertFeedback = m_flangerControls.m_invertFeedbackModel.value();
 	m_lfo->setFrequency(  1.0/m_flangerControls.m_lfoFrequencyModel.value() );
-	m_lfo->setOffset( m_flangerControls.m_lfoPhaseModel.value() / 180 * D_PI );
+	m_lfo->setOffset(m_flangerControls.m_lfoPhaseModel.value() / 180 * std::numbers::pi);
 	m_lDelay->setFeedback( m_flangerControls.m_feedbackModel.value() );
 	m_rDelay->setFeedback( m_flangerControls.m_feedbackModel.value() );
 	auto dryS = std::array<sample_t, 2>{};
@@ -108,8 +106,8 @@ bool FlangerEffect::processAudioBuffer( SampleFrame* buf, const fpp_t frames )
 		float leftLfo;
 		float rightLfo;
 
-		buf[f][0] += (fastRandf(2.0f) - 1.0f) * noise;
-		buf[f][1] += (fastRandf(2.0f) - 1.0f) * noise;
+		buf[f][0] += fastRandInc(-1.f, 1.f) * noise;
+		buf[f][1] += fastRandInc(-1.f, 1.f) * noise;
 		dryS[0] = buf[f][0];
 		dryS[1] = buf[f][1];
 		m_lfo->tick(&leftLfo, &rightLfo);
@@ -127,10 +125,9 @@ bool FlangerEffect::processAudioBuffer( SampleFrame* buf, const fpp_t frames )
 
 		buf[f][0] = ( d * dryS[0] ) + ( w * buf[f][0] );
 		buf[f][1] = ( d * dryS[1] ) + ( w * buf[f][1] );
-		outSum += buf[f][0]*buf[f][0] + buf[f][1]*buf[f][1];
 	}
-	checkGate( outSum / frames );
-	return isRunning();
+
+	return ProcessStatus::ContinueIfNotQuiet;
 }
 
 

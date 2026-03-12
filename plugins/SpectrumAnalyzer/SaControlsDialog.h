@@ -26,7 +26,6 @@
 #define SACONTROLSDIALOG_H
 
 #include "EffectControlDialog.h"
-#include "fft_helpers.h"
 
 namespace lmms
 {
@@ -49,7 +48,6 @@ public:
 	explicit SaControlsDialog(SaControls *controls, SaProcessor *processor);
 	~SaControlsDialog() override = default;
 
-	bool isResizable() const override {return true;}
 	QSize sizeHint() const override;
 
 private:

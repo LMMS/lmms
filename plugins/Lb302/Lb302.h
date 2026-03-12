@@ -32,7 +32,6 @@
 #ifndef LB302_H
 #define LB302_H
 
-#include "DspEffectLibrary.h"
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "NotePlayHandle.h"
@@ -44,12 +43,15 @@ namespace lmms
 
 static const int NUM_FILTERS = 2;
 
-class NotePlayHandle;
 
+namespace DspEffectLibrary
+{
+class Distortion;
+}
 
 namespace gui
 {
-class automatableButtonGroup;
+class AutomatableButtonGroup;
 class Knob;
 class Lb302SynthView;
 class LedCheckBox;
@@ -214,7 +216,7 @@ private:
 	Lb302FilterKnobState fs;
 	QAtomicPointer<Lb302Filter> vcf;
 
-	int release_frame;
+	size_t release_frame;
 
 	// More States
 	int   vcf_envpos;       // Update counter. Updates when >= ENVINC
@@ -246,7 +248,7 @@ private:
 
 	void recalcFilter();
 
-	int process(SampleFrame* outbuf, const int size);
+	int process(SampleFrame* outbuf, const std::size_t size);
 
 	friend class gui::Lb302SynthView;
 
@@ -278,7 +280,7 @@ private:
 
 	Knob * m_distKnob;
 	Knob * m_slideDecKnob;
-	automatableButtonGroup * m_waveBtnGrp;
+	AutomatableButtonGroup * m_waveBtnGrp;
 
 	LedCheckBox * m_slideToggle;
 	/*LedCheckBox * m_accentToggle;*/ // removed pending accent implementation

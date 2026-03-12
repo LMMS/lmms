@@ -26,7 +26,6 @@
 #ifndef LMMS_FREEBOY_H
 #define LMMS_FREEBOY_H
 
-#include <Blip_Buffer.h>
 
 #include "AutomatableModel.h"
 #include "Instrument.h"
@@ -36,7 +35,7 @@
 namespace lmms
 {
 
-class NotePlayHandle;
+class NotePlayHandle;  // IWYU pragma: keep
 
 
 namespace gui

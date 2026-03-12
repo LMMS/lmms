@@ -97,7 +97,6 @@ public:
 public slots:
 	void execConnectionDialog();
 	void removeConnection();
-	void unlinkAllModels();
 
 private slots:
 	/// Copy the model's value to the clipboard.

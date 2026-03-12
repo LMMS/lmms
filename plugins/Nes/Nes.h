@@ -25,7 +25,6 @@
 #ifndef NES_H
 #define NES_H
 
-#include <cmath>
 
 #include "Instrument.h"
 #include "InstrumentView.h"
@@ -84,7 +83,7 @@ class NesInstrument;
 
 namespace gui
 {
-class Knob;
+class Knob;  // IWYU pragma: keep
 class NesInstrumentView;
 } // namespace gui
 
@@ -318,7 +317,7 @@ private:
 	PixmapButton *	m_ch1EnvLoopedBtn;
 	Knob *			m_ch1EnvLenKnob;
 	
-	automatableButtonGroup *	m_ch1DutyCycleGrp;
+	AutomatableButtonGroup *	m_ch1DutyCycleGrp;
 	
 	PixmapButton *	m_ch1SweepEnabledBtn;
 	Knob *			m_ch1SweepAmtKnob;
@@ -333,7 +332,7 @@ private:
 	PixmapButton *	m_ch2EnvLoopedBtn;
 	Knob *			m_ch2EnvLenKnob;
 	
-	automatableButtonGroup *	m_ch2DutyCycleGrp;
+	AutomatableButtonGroup *	m_ch2DutyCycleGrp;
 	
 	PixmapButton *	m_ch2SweepEnabledBtn;
 	Knob *			m_ch2SweepAmtKnob;
