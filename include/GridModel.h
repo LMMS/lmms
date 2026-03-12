@@ -29,6 +29,8 @@
 #include <stddef.h>
 #include <vector>
 
+#include <stdio.h>
+
 #include "base64.h"
 #include "Model.h"
 
@@ -64,7 +66,8 @@ public:
 	struct Item
 	{
 		ItemInfo info;
-		size_t objectIndex; //!< custom data index
+		size_t staticIndex; //!< custom data index
+		size_t lookupIndex;
 	};
 
 	//*** util ***
@@ -88,7 +91,7 @@ public:
 
 	virtual ~GridModel();
 protected:
-	GridModel(size_t countLimit, unsigned int length, unsigned int height,
+	GridModel(size_t countLimit, std::vector<size_t>* indexLookup, unsigned int length, unsigned int height,
 		unsigned int horizontalSteps, unsigned int verticalSteps, Model* parent, QString displayName, bool defaultConstructed);
 	virtual void dataChangedAt(signed long long index) {}
 
@@ -101,7 +104,7 @@ protected:
 	void removeItem(size_t index);
 	void clearItems();
 	//! @return get and set index pointing to custom data, DOESN'T EMIT
-	size_t& getAndSetObjectIndex(size_t index);
+	size_t& getAndSetStaticIndex(size_t index);
 
 	//*** model management ***
 	void resizeGridArea(size_t length, size_t height);
@@ -126,6 +129,8 @@ private:
 	std::vector<Item> m_items;
 	//! limits m_items size
 	size_t m_countLimit;
+	//! custom data uses this to find it's position
+	std::vector<size_t>* m_indexLookup;
 
 	friend class gui::GridView;
 };
@@ -149,19 +154,21 @@ private:
 	};
 
 	std::vector<T> m_TCustomData;
+	std::vector<size_t> m_indexLookup;
 public:
 	GridModelTyped(size_t countLimit, unsigned int length, unsigned int height, unsigned int horizontalSteps, unsigned int verticalSteps,
 		Model* parent, QString displayName = QString(), bool defaultConstructed = false)
-		: GridModel{countLimit, length, height, horizontalSteps, verticalSteps, parent, displayName, defaultConstructed}
+		: GridModel{countLimit, &m_indexLookup, length, height, horizontalSteps, verticalSteps, parent, displayName, defaultConstructed}
 	{
 		m_TCustomData.reserve(countLimit);
+		m_indexLookup.reserve(countLimit);
 	}
 	~GridModelTyped() = default;
 
-	const T& getObject(size_t index) const { return m_TCustomData[GridModel::getItem(index).objectIndex]; }
+	const T& getObject(size_t index) const { return m_TCustomData[GridModel::getItem(index).staticIndex]; }
 	virtual void setObject(size_t index, T object)
 	{
-		m_TCustomData[GridModel::getItem(index).objectIndex] = object;
+		m_TCustomData[GridModel::getItem(index).staticIndex] = object;
 		dataChangedAt(index); emit GridModel::dataChanged();
 	}
 
@@ -170,16 +177,20 @@ public:
 	{
 		if (getCount() >= getCountLimit()) { return getCountLimit(); }
 		m_TCustomData.push_back(object);
-		return GridModel::addItem(Item{info, m_TCustomData.size() - 1});
+		m_indexLookup.push_back(0);
+		size_t returnIndex = GridModel::addItem(Item{info, m_TCustomData.size() - 1});
+		m_indexLookup[m_indexLookup.size() - 1] = returnIndex;
+		printf("addItem: static: %ld dynamic: %ld\n", m_TVustomData.size() - 1, returnIndex);
+		return returnIndex;
 	}
 	void removeItem(size_t index)
 	{
-		size_t customDataIndex{GridModel::getItem(index).objectIndex};
+		size_t customDataIndex{GridModel::getItem(index).staticIndex};
 		// the stored indexes need to be offset after removing (doing it before because of signals)
 		for (size_t i = 0; i < getCount(); ++i)
 		{
-			size_t& storedIndex{GridModel::getAndSetObjectIndex(i)};
-			if (storedIndex > customDataIndex) { --storedIndex; }
+			size_t& storedIndex{GridModel::getAndSetStaticIndex(i)};
+			if (storedIndex > customDataIndex) { --storedIndex; } // TODO does changing this will cause bugs in m_indexLookup?
 		}
 		// removing the custom data
 		for (size_t i = customDataIndex; i < m_TCustomData.size(); ++i)
@@ -188,7 +199,8 @@ public:
 		}
 		m_TCustomData.pop_back();
 		// removing the Item (object* + coords pair)
-		GridModel::removeItem(index);
+		GridModel::removeItem(index); //TODO
+		m_indexLookup.pop_back();
 	}
 protected:
 	// save mechanism:

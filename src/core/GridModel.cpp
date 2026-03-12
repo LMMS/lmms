@@ -33,7 +33,7 @@
 namespace lmms
 {
 
-GridModel::GridModel(size_t countLimit, unsigned int length, unsigned int height,
+GridModel::GridModel(size_t countLimit, std::vector<size_t>* indexLookup, unsigned int length, unsigned int height,
 	unsigned int horizontalSteps, unsigned int verticalSteps, Model* parent, QString displayName, bool defaultConstructed)
 	: Model(parent, displayName, defaultConstructed)
 	, m_length{length}
@@ -41,9 +41,11 @@ GridModel::GridModel(size_t countLimit, unsigned int length, unsigned int height
 	, m_horizontalSteps{horizontalSteps}
 	, m_verticalSteps{verticalSteps}
 	, m_countLimit{countLimit}
+	, m_indexLookup{indexLookup}
 {
 	m_items.reserve(countLimit);
 	assert(m_countLimit == m_items.capacity());
+	assert(m_indexLookup != nullptr);
 }
 
 GridModel::~GridModel()
@@ -148,6 +150,7 @@ void GridModel::move(size_t startIndex, size_t finalIndex)
 	{
 		for (size_t i = startIndex; i > finalIndex; --i)
 		{
+			(*m_indexLookup)[m_items[i - 1].staticIndex] = i;
 			m_items[i] = m_items[i - 1];
 		}
 	}
@@ -155,16 +158,18 @@ void GridModel::move(size_t startIndex, size_t finalIndex)
 	{
 		for (size_t i = startIndex; i < finalIndex; ++i)
 		{
+			(*m_indexLookup)[m_items[i + 1].staticIndex] = i;
 			m_items[i] = m_items[i + 1];
 		}
 	}
+	(*m_indexLookup)[itemData.staticIndex] = finalIndex;
 	m_items[finalIndex] = itemData;
 }
 
-size_t& GridModel::getAndSetObjectIndex(size_t index)
+size_t& GridModel::getAndSetStaticIndex(size_t index)
 {
 	assert(index < m_items.size());
-	return m_items[index].objectIndex;
+	return m_items[index].staticIndex;
 }
 
 size_t GridModel::setX(size_t index, float newX)
