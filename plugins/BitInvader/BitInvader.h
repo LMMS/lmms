@@ -71,17 +71,15 @@ protected slots:
 private:
 	FloatModel m_sampleLength;
 	graphModel m_graph;
-	
+
 	BoolModel m_interpolation;
 
 	// TODO: Change to drop-down menu with the following options:
-	// - Full: Normalize according to the amplitude of the entire wavetable
-	//         (current behavior)
-	// - Length-dependent: Normalize according to the wavetable length knob value
-	// - Legacy: Normalize according to the entire wavetable without DC offset removal
-	//           (default when loading old project files)
+	// - Full: Normalize according to the amplitude of the entire wavetable (current behavior)
+	// - Length-dependent: Normalize according to the wavetable length knob value (default for new instances)
+	// - Legacy: Normalize according to the entire wavetable without DC offset removal (default when loading an instance from an old project file)
 	BoolModel m_normalize;
-	
+
 	float m_normalizeFactor; //!< Factor by which to amplify output such that the output is normalized
 	float m_normalizeOffset; //!< Amount by which to offset the output such that no DC offset is produced when normalized
 };
@@ -112,7 +110,6 @@ protected slots:
 
 private:
 	void modelChanged() override;
-	static QPixmap* s_artwork;
 
 	Knob* m_sampleLengthKnob;
 	PixmapButton* m_sinWaveBtn;

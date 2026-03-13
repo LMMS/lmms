@@ -95,7 +95,7 @@ void BitInvader::saveSettings(QDomDocument& doc, QDomElement& el)
 	QString sampleString;
 	base64::encode(reinterpret_cast<const char*>(m_graph.samples()), wavetableSize * sizeof(float), sampleString);
 	el.setAttribute("sampleShape", sampleString);
-	
+
 	m_interpolation.saveSettings(doc, el, "interpolation");
 	m_normalize.saveSettings(doc, el, "normalize");
 }
@@ -231,10 +231,10 @@ BitInvaderView::BitInvaderView(Instrument* instrument, QWidget* parent)
 {
 	setAutoFillBackground(true);
 	QPalette pal;
-
-	pal.setBrush(backgroundRole(), PLUGIN_NAME::getIconPixmap("artwork"));
+	static auto s_artwork = PLUGIN_NAME::getIconPixmap("artwork");
+	pal.setBrush(backgroundRole(), s_artwork);
 	setPalette(pal);
-	
+
 	m_sampleLengthKnob = new Knob(KnobType::Dark28, this);
 	m_sampleLengthKnob->move(6, 201);
 	m_sampleLengthKnob->setHintText(tr("Sample length"), "");
@@ -298,7 +298,7 @@ BitInvaderView::BitInvaderView(Instrument* instrument, QWidget* parent)
 
 	m_normalizeToggle = new LedCheckBox("Normalize", this, tr("Normalize"), LedCheckBox::LedColor::Green);
 	m_normalizeToggle->move(131, 236);
-	
+
 	connect(m_sinWaveBtn, &PixmapButton::clicked, this, &BitInvaderView::sinWaveClicked);
 	connect(m_triangleWaveBtn, &PixmapButton::clicked, this, &BitInvaderView::triangleWaveClicked);
 	connect(m_sawWaveBtn, &PixmapButton::clicked, this, &BitInvaderView::sawWaveClicked);
