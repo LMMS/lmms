@@ -36,6 +36,7 @@ namespace lmms
 {
 
 
+// TODO: Are these forward decls necessary?
 namespace gui
 {
 class BitInvaderView;
@@ -45,71 +46,54 @@ class PixmapButton;
 }
 
 
-class BSynth
+class BitInvaderNote
 {
 public:
-	BSynth( float * sample, NotePlayHandle * _nph,
-			bool _interpolation, float factor, 
-			const sample_rate_t _sample_rate );
-	virtual ~BSynth();
-	
-	sample_t nextStringSample( float sample_length );
-
+	BitInvaderNote(float* sample, NotePlayHandle* nph, bool _interpolation, float factor);
+	virtual ~BitInvaderNote();
+	sample_t nextStringSample(float sample_length);
 
 private:
-	int sample_index;
-	float sample_realindex;
+	std::size_t sample_index = 0;
+	float sample_realindex = 0.f; // TODO: Only store fractional index in this
 	float* sample_shape;
-	NotePlayHandle* nph;
-	const sample_rate_t sample_rate;
+	NotePlayHandle* m_nph;
 
 	bool interpolation;
-	
-} ;
+};
 
 class BitInvader : public Instrument
 {
 	Q_OBJECT
+	friend class gui::BitInvaderView;
 public:
-	BitInvader(InstrumentTrack * _instrument_track );
+	BitInvader(InstrumentTrack* _instrument_track);
 	~BitInvader() override = default;
 
-	void playNote( NotePlayHandle * _n,
-						SampleFrame* _working_buffer ) override;
-	void deleteNotePluginData( NotePlayHandle * _n ) override;
-
-
-	void saveSettings( QDomDocument & _doc,
-							QDomElement & _parent ) override;
-	void loadSettings( const QDomElement & _this ) override;
-
+	void playNote(NotePlayHandle* _n, SampleFrame* _working_buffer) override;
+	void deleteNotePluginData(NotePlayHandle* _n) override;
+	void saveSettings(QDomDocument& _doc, QDomElement& _parent) override;
+	void loadSettings(const QDomElement& _this) override;
 	QString nodeName() const override;
-
-	float desiredReleaseTimeMs() const override
-	{
-		return 1.5f;
-	}
-
-	gui::PluginView * instantiateView( QWidget * _parent ) override;
+	float desiredReleaseTimeMs() const override { return 1.5f; }
+	gui::PluginView* instantiateView(QWidget* _parent) override;
+	void normalize();
 
 protected slots:
 	void lengthChanged();
-	void samplesChanged( int, int );
-
-	void normalize();
-
+	void samplesChanged(int, int);
 
 private:
-	FloatModel  m_sampleLength;
-	graphModel  m_graph;
+	FloatModel m_sampleLength;
+	graphModel m_graph;
 	
 	BoolModel m_interpolation;
 	BoolModel m_normalize;
 	
 	float m_normalizeFactor;
-	
-	friend class gui::BitInvaderView;
-} ;
+};
+
+
 
 
 namespace gui
@@ -119,49 +103,40 @@ class BitInvaderView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:
-	BitInvaderView( Instrument * _instrument,
-					QWidget * _parent );
-
+	BitInvaderView(Instrument* _instrument, QWidget* _parent);
 	~BitInvaderView() override = default;
 
 protected slots:
-	//void sampleSizeChanged( float _new_sample_length );
-
-	void interpolationToggled( bool value );
-	void normalizeToggled( bool value );
-
+	void interpolationToggled(bool value);
+	void normalizeToggled(bool value);
 	void sinWaveClicked();
 	void triangleWaveClicked();
 	void sqrWaveClicked();
 	void sawWaveClicked();
 	void noiseWaveClicked();
 	void usrWaveClicked();
-	
-	void smoothClicked(  );
+	void smoothClicked();
 
 private:
 	void modelChanged() override;
+	static QPixmap* s_artwork;
 
-	Knob * m_sampleLengthKnob;
-	PixmapButton * m_sinWaveBtn;
-	PixmapButton * m_triangleWaveBtn;
-	PixmapButton * m_sqrWaveBtn;
-	PixmapButton * m_sawWaveBtn;
-	PixmapButton * m_whiteNoiseWaveBtn;
-	PixmapButton * m_smoothBtn;
-	PixmapButton * m_usrWaveBtn;
-
-	static QPixmap * s_artwork;
-
-	Graph * m_graph;
-	LedCheckBox * m_interpolationToggle;
-	LedCheckBox * m_normalizeToggle;
-
-} ;
+	Knob* m_sampleLengthKnob;
+	PixmapButton* m_sinWaveBtn;
+	PixmapButton* m_triangleWaveBtn;
+	PixmapButton* m_sqrWaveBtn;
+	PixmapButton* m_sawWaveBtn;
+	PixmapButton* m_whiteNoiseWaveBtn;
+	PixmapButton* m_smoothBtn;
+	PixmapButton* m_usrWaveBtn;
+	Graph* m_graph;
+	LedCheckBox* m_interpolationToggle;
+	LedCheckBox* m_normalizeToggle;
+};
 
 
 } // namespace gui
 
 } // namespace lmms
 
-#endif
+#endif // BIT_INVADER_H
