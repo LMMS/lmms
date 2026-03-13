@@ -46,19 +46,10 @@ class PixmapButton;
 }
 
 
-class BitInvaderNote
+struct BitInvaderNote
 {
-public:
-	BitInvaderNote(const float* sample, NotePlayHandle* nph, bool _interpolation);
-	sample_t nextStringSample(float sample_length);
-
-private:
-	std::size_t sample_index = 0;
-	float sample_realindex = 0.f; // TODO: Only store fractional index in this
-	const float* sample_shape;
-	NotePlayHandle* m_nph;
-
-	bool interpolation;
+	std::size_t index = 0;
+	float indexFrac = 0.f; // TODO: Only store fractional index in this
 };
 
 class BitInvader : public Instrument
@@ -66,16 +57,16 @@ class BitInvader : public Instrument
 	Q_OBJECT
 	friend class gui::BitInvaderView;
 public:
-	BitInvader(InstrumentTrack* _instrument_track);
+	BitInvader(InstrumentTrack*);
 	~BitInvader() override = default;
 
-	void playNote(NotePlayHandle* _n, SampleFrame* _working_buffer) override;
-	void deleteNotePluginData(NotePlayHandle* _n) override;
-	void saveSettings(QDomDocument& _doc, QDomElement& _parent) override;
-	void loadSettings(const QDomElement& _this) override;
+	void playNote(NotePlayHandle* nph, SampleFrame* workingBuffer) override;
+	void deleteNotePluginData(NotePlayHandle* nph) override;
+	void saveSettings(QDomDocument& doc, QDomElement& el) override;
+	void loadSettings(const QDomElement& el) override;
 	QString nodeName() const override;
 	float desiredReleaseTimeMs() const override { return 1.5f; }
-	gui::PluginView* instantiateView(QWidget* _parent) override;
+	gui::PluginView* instantiateView(QWidget* parent) override;
 	void normalize();
 
 protected slots:
@@ -87,6 +78,13 @@ private:
 	graphModel m_graph;
 	
 	BoolModel m_interpolation;
+
+	// TODO: Change to drop-down menu with the following options:
+	// - Full: Normalize according to the amplitude of the entire wavetable
+	//         (current behavior)
+	// - Length-dependent: Normalize according to the wavetable length knob value
+	// - Legacy: Normalize according to the entire wavetable without DC offset removal
+	//           (default when loading old project files)
 	BoolModel m_normalize;
 	
 	float m_normalizeFactor; //!< Factor by which to amplify output such that the output is normalized

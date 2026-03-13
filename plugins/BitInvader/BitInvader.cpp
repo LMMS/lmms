@@ -74,41 +74,8 @@ PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* m, void*)
 
 
 
-BitInvaderNote::BitInvaderNote(const float* _shape, NotePlayHandle* nph, bool _interpolation)
-	: sample_shape{_shape}
-	, m_nph{nph}
-	, interpolation{_interpolation}
-{}
-
-
-
-
-sample_t BitInvaderNote::nextStringSample(float sample_length)
-{
-	const float sample_step = sample_length * m_nph->frequency() / Engine::audioEngine()->outputSampleRate();
-
-	// check overflow
-	while (sample_realindex >= sample_length) { sample_realindex -= sample_length; }
-
-	const auto currentRealIndex = sample_realindex;
-	const auto currentIndex = static_cast<std::size_t>(sample_realindex);
-	sample_realindex += sample_step;
-
-	if (!interpolation)
-	{
-		sample_index = currentIndex;
-		return sample_shape[sample_index];
-	}
-
-	const auto nextIndex = currentIndex < sample_length - 1 ? currentIndex + 1 : 0;
-	return std::lerp(sample_shape[currentIndex], sample_shape[nextIndex], fraction(currentRealIndex));
-}	
-
-
-
-
-BitInvader::BitInvader(InstrumentTrack* _instrument_track)
-	: Instrument(_instrument_track, &bitinvader_plugin_descriptor)
+BitInvader::BitInvader(InstrumentTrack* instrumentTrack)
+	: Instrument(instrumentTrack, &bitinvader_plugin_descriptor)
 	, m_sampleLength(wavetableSize, 4, wavetableSize, 1, this, tr("Sample length"))
 	, m_graph(-1.f, 1.f, wavetableSize, this)
 	, m_interpolation(false, this, tr("Interpolation"))
@@ -124,40 +91,40 @@ BitInvader::BitInvader(InstrumentTrack* _instrument_track)
 
 
 
-void BitInvader::saveSettings(QDomDocument& _doc, QDomElement& _this)
+void BitInvader::saveSettings(QDomDocument& doc, QDomElement& el)
 {
-	_this.setAttribute("version", "0.1");
-	m_sampleLength.saveSettings(_doc, _this, "sampleLength");
+	el.setAttribute("version", "0.1");
+	m_sampleLength.saveSettings(doc, el, "sampleLength");
 
 	QString sampleString;
 	base64::encode(reinterpret_cast<const char*>(m_graph.samples()), wavetableSize * sizeof(float), sampleString);
-	_this.setAttribute("sampleShape", sampleString);
+	el.setAttribute("sampleShape", sampleString);
 	
-	m_interpolation.saveSettings(_doc, _this, "interpolation");
-	m_normalize.saveSettings(_doc, _this, "normalize");
+	m_interpolation.saveSettings(doc, el, "interpolation");
+	m_normalize.saveSettings(doc, el, "normalize");
 }
 
 
 
 
-void BitInvader::loadSettings(const QDomElement& _this)
+void BitInvader::loadSettings(const QDomElement& el)
 {
 	m_graph.clear();
-	m_sampleLength.loadSettings(_this, "sampleLength");
+	m_sampleLength.loadSettings(el, "sampleLength");
 	auto sampleLength = static_cast<int>(m_sampleLength.value());
 
 	// Load sample shape
 	int size = 0;
 	char* dst = 0;
-	base64::decode(_this.attribute("sampleShape"), &dst, &size);
+	base64::decode(el.attribute("sampleShape"), &dst, &size);
 
 	m_graph.setLength(size / sizeof(float));
 	m_graph.setSamples(reinterpret_cast<float*>(dst));
 	m_graph.setLength(sampleLength);
 	delete[] dst;
 
-	m_interpolation.loadSettings(_this, "interpolation");
-	m_normalize.loadSettings(_this, "normalize");
+	m_interpolation.loadSettings(el, "interpolation");
+	m_normalize.loadSettings(el, "normalize");
 }
 
 
@@ -172,7 +139,7 @@ void BitInvader::lengthChanged()
 
 
 
-void BitInvader::samplesChanged(int _begin, int _end)
+void BitInvader::samplesChanged(int, int)
 {
 	normalize();
 	//engine::getSongEditor()->setModified();
@@ -205,42 +172,55 @@ QString BitInvader::nodeName() const { return bitinvader_plugin_descriptor.name;
 
 
 
-void BitInvader::playNote(NotePlayHandle* _n, SampleFrame* _working_buffer)
+void BitInvader::playNote(NotePlayHandle* nph, SampleFrame* workingBuffer)
 {
-	if (!_n->m_pluginData)
-	{
-		_n->m_pluginData = new BitInvaderNote(m_graph.samples(), _n, m_interpolation.value());
-	}
+	if (!nph->m_pluginData) { nph->m_pluginData = new BitInvaderNote{}; }
 
-	const f_cnt_t frames = _n->framesLeftForCurrentPeriod();
-	const f_cnt_t offset = _n->noteOffset();
-
-	auto ps = static_cast<BitInvaderNote*>(_n->m_pluginData);
 	const auto nfac = m_normalize.value() ? m_normalizeFactor : 1.f;
 	const auto norg = m_normalize.value() ? m_normalizeOffset : 0.f;
+	const auto& wavetable = m_graph.samples();
+	const auto wavetableLenReal = static_cast<float>(m_graph.length());
+	const auto phasePerSample = nph->frequency() / Engine::audioEngine()->outputSampleRate();
+	const f_cnt_t frames = nph->framesLeftForCurrentPeriod();
+	const f_cnt_t offset = nph->noteOffset();
 
-	for(f_cnt_t frame = offset; frame < frames + offset; ++frame)
+	auto note = static_cast<BitInvaderNote*>(nph->m_pluginData);
+	for (f_cnt_t frame = offset; frame < frames + offset; ++frame)
 	{
-		_working_buffer[frame] = SampleFrame(ps->nextStringSample(m_graph.length()) * nfac + norg);
+		note->indexFrac = std::fmod(
+			note->indexFrac + phasePerSample * wavetableLenReal,
+			wavetableLenReal
+		);
+		note->index = static_cast<std::size_t>(note->indexFrac);
+
+		const auto samp = m_interpolation.value()
+			? std::lerp(
+				wavetable[note->index],
+				wavetable[(1 + note->index) % m_graph.length()],
+				fraction(note->indexFrac)
+			)
+			: wavetable[note->index];
+
+		workingBuffer[frame] = SampleFrame(samp * nfac + norg);
 	}
 
-	applyRelease(_working_buffer, _n);
+	applyRelease(workingBuffer, nph);
 }
 
 
 
 
-void BitInvader::deleteNotePluginData(NotePlayHandle* _n)
+void BitInvader::deleteNotePluginData(NotePlayHandle* nph)
 {
-	delete static_cast<BitInvaderNote*>(_n->m_pluginData);
+	delete static_cast<BitInvaderNote*>(nph->m_pluginData);
 }
 
 
 
 
-gui::PluginView* BitInvader::instantiateView(QWidget* _parent)
+gui::PluginView* BitInvader::instantiateView(QWidget* parent)
 {
-	return new gui::BitInvaderView(this, _parent);
+	return new gui::BitInvaderView(this, parent);
 }
 
 
@@ -250,8 +230,8 @@ namespace gui
 {
 
 
-BitInvaderView::BitInvaderView(Instrument* _instrument, QWidget* _parent)
-	: InstrumentViewFixedSize(_instrument, _parent)
+BitInvaderView::BitInvaderView(Instrument* instrument, QWidget* parent)
+	: InstrumentViewFixedSize(instrument, parent)
 {
 	setAutoFillBackground(true);
 	QPalette pal;
