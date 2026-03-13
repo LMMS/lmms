@@ -278,14 +278,16 @@ void EffectSelectDialog::rowChanged(const QModelIndex& idx, const QModelIndex&)
 		}
 		else
 		{
+			// HACK: Markup inside translation strings due to RTL not being handled correctly.
+			// Move the markup out of the translation strings and into the QString template as soon as RTL layout works properly
 			auto labelText = QString{
-				"<p><b>%1</b>%2</p>"
-				"<p><b>%3</b>%4</p>"
-				"<p><b>%5</b>%6</p>"
+				"<p>%1%2</p>"
+				"<p>%3%4</p>"
+				"<p>%5%6</p>"
 			}.arg(
-				tr("Name: "), descriptor.displayName,
-				tr("Description: "), qApp->translate("PluginBrowser", descriptor.description).toHtmlEscaped(),
-				tr("Author: "), QString::fromUtf8(descriptor.author)
+				tr("<b>Name: </b>"), descriptor.displayName,
+				tr("<b>Description: </b>"), qApp->translate("PluginBrowser", descriptor.description).toHtmlEscaped(),
+				tr("<b>Author: </b>"), QString::fromUtf8(descriptor.author)
 					.replace("/dot/", ".").replace("/at/", "@").toHtmlEscaped()
 			);
 		
