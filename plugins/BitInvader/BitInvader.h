@@ -49,14 +49,13 @@ class PixmapButton;
 class BitInvaderNote
 {
 public:
-	BitInvaderNote(float* sample, NotePlayHandle* nph, bool _interpolation, float factor);
-	virtual ~BitInvaderNote();
+	BitInvaderNote(const float* sample, NotePlayHandle* nph, bool _interpolation);
 	sample_t nextStringSample(float sample_length);
 
 private:
 	std::size_t sample_index = 0;
 	float sample_realindex = 0.f; // TODO: Only store fractional index in this
-	float* sample_shape;
+	const float* sample_shape;
 	NotePlayHandle* m_nph;
 
 	bool interpolation;
@@ -90,7 +89,8 @@ private:
 	BoolModel m_interpolation;
 	BoolModel m_normalize;
 	
-	float m_normalizeFactor;
+	float m_normalizeFactor; //!< Factor by which to amplify output such that the output is normalized
+	float m_normalizeOffset; //!< Amount by which to offset the output such that no DC offset is produced when normalized
 };
 
 

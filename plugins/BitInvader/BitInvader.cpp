@@ -74,29 +74,13 @@ PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* m, void*)
 
 
 
-BitInvaderNote::BitInvaderNote(float* _shape, NotePlayHandle* nph, bool _interpolation, float _factor)
-	: m_nph{nph}
+BitInvaderNote::BitInvaderNote(const float* _shape, NotePlayHandle* nph, bool _interpolation)
+	: sample_shape{_shape}
+	, m_nph{nph}
 	, interpolation{_interpolation}
-{
-	sample_shape = new float[wavetableSize];
-	for (int i=0; i < wavetableSize; ++i)
-	{
-		float buf = _shape[i] * _factor;
-
-		/* Double check that normalization has been performed correctly,
-		i.e., the absolute value of all samples is <= 1.0 if _factor
-		is different to the default normalization factor. If there is
-		a value > 1.0, clip the sample to 1.0 to limit the range. */
-		if (_factor != defaultNormalizationFactor && std::abs(buf) > 1.0f)
-		{
-			buf = (buf < 0) ? -1.0f : 1.0f;
-		}
-		sample_shape[i] = buf;
-	}
-}
+{}
 
 
-BitInvaderNote::~BitInvaderNote() { delete[] sample_shape; }
 
 
 sample_t BitInvaderNote::nextStringSample(float sample_length)
@@ -199,14 +183,18 @@ void BitInvader::samplesChanged(int _begin, int _end)
 
 void BitInvader::normalize()
 {
-	float max = std::numeric_limits<float>::epsilon();
-	const float* samples = m_graph.samples();
-	for (auto i = 0; i < m_graph.length(); ++i)
+	const auto samples = std::span<const float, wavetableSize>{m_graph.samples(), wavetableSize};
+	const auto maxSamp = std::max_element(samples.begin(), samples.end())[0];
+	const auto minSamp = std::min_element(samples.begin(), samples.end())[0];
+	if (minSamp == maxSamp)
 	{
-		const float f = std::abs(samples[i]);
-		if (f > max) { max = f; }
+		m_normalizeFactor = 1.f;
+		m_normalizeOffset = 0.f;
+		return;
 	}
-	m_normalizeFactor = 1.0 / max;
+	const auto diff = maxSamp - minSamp;
+	m_normalizeFactor = 2.f / diff;
+	m_normalizeOffset = (maxSamp + minSamp) / -diff;
 }
 
 
@@ -221,17 +209,19 @@ void BitInvader::playNote(NotePlayHandle* _n, SampleFrame* _working_buffer)
 {
 	if (!_n->m_pluginData)
 	{
-		float factor = !m_normalize.value() ? defaultNormalizationFactor : m_normalizeFactor;
-		_n->m_pluginData = new BitInvaderNote(const_cast<float*>(m_graph.samples()), _n, m_interpolation.value(), factor);
+		_n->m_pluginData = new BitInvaderNote(m_graph.samples(), _n, m_interpolation.value());
 	}
 
 	const f_cnt_t frames = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();
 
 	auto ps = static_cast<BitInvaderNote*>(_n->m_pluginData);
+	const auto nfac = m_normalize.value() ? m_normalizeFactor : 1.f;
+	const auto norg = m_normalize.value() ? m_normalizeOffset : 0.f;
+
 	for(f_cnt_t frame = offset; frame < frames + offset; ++frame)
 	{
-		_working_buffer[frame] = SampleFrame(ps->nextStringSample(m_graph.length()));
+		_working_buffer[frame] = SampleFrame(ps->nextStringSample(m_graph.length()) * nfac + norg);
 	}
 
 	applyRelease(_working_buffer, _n);
