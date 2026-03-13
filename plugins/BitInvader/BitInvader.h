@@ -23,27 +23,21 @@
  *
  */
 
-
 #ifndef BIT_INVADER_H
 #define BIT_INVADER_H
 
 #include "AutomatableModel.h"
+#include "Graph.h"
 #include "Instrument.h"
 #include "InstrumentView.h"
-#include "Graph.h"
+#include "Knob.h"
+#include "LedCheckBox.h"
+#include "PixmapButton.h"
 
 namespace lmms
 {
 
-
-// TODO: Are these forward decls necessary?
-namespace gui
-{
-class BitInvaderView;
-class Knob;
-class LedCheckBox;
-class PixmapButton;
-}
+namespace gui { class BitInvaderView; }
 
 
 struct BitInvaderNote
@@ -51,6 +45,7 @@ struct BitInvaderNote
 	std::size_t index = 0;
 	float indexFrac = 0.f; // TODO: Only store fractional index in this
 };
+
 
 class BitInvader : public Instrument
 {
@@ -101,7 +96,7 @@ class BitInvaderView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:
-	BitInvaderView(Instrument* _instrument, QWidget* _parent);
+	BitInvaderView(Instrument*, QWidget* parent);
 	~BitInvaderView() override = default;
 
 protected slots:

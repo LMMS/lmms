@@ -22,31 +22,27 @@
  *
  */
 
-#include <cmath>
-#include <QDomElement>
-#include <qnamespace.h>
-
 #include "BitInvader.h"
+
+#include <cmath>
+
+#include <QDomElement>
+
 #include "AudioEngine.h"
 #include "base64.h"
-#include "Engine.h"
-#include "Graph.h"
-#include "InstrumentTrack.h"
-#include "Knob.h"
-#include "LedCheckBox.h"
-#include "NotePlayHandle.h"
-#include "PixmapButton.h"
-#include "Song.h"
-#include "lmms_math.h"
-
 #include "embed.h"
+#include "Engine.h"
+#include "InstrumentTrack.h"
+#include "lmms_math.h"
+#include "NotePlayHandle.h"
 #include "plugin_export.h"
+#include "Song.h"
+
 
 namespace lmms
 {
 
 inline constexpr std::size_t wavetableSize = 200;
-inline constexpr float defaultNormalizationFactor = 1.f;
 
 extern "C"
 {
