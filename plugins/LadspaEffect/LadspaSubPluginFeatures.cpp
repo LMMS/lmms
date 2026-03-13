@@ -64,24 +64,26 @@ void LadspaSubPluginFeatures::fillDescriptionWidget( QWidget * _parent,
 	Ladspa2LMMS * lm = Engine::getLADSPAManager();
 	const auto ldesc = lm->getDescription(lkey);
 
+	// HACK: Markup inside translation strings due to RTL not being handled correctly.
+	// Move the markup out of the translation strings and into the QString template as soon as RTL layout works properly
 	auto labelText = QString{
-		"<p><b>%1</b>%2</p>" // Name
-		"<p><b>%3</b><code>%4</code></p>" // File
-		"<p><b>%5</b>%6</p>" // Author
-		"<p><b>%7</b>%8</p>" // Copyright
-		"<p><b>%9</b>%10</p>" // Channels
+		"<p>%1%2</p>" // Name
+		"<p>%3<code>%4</code></p>" // File
+		"<p>%5%6</p>" // Author
+		"<p>%7%8</p>" // Copyright
+		"<p>%9%10</p>" // Channels
 	}.arg(
-		QWidget::tr("Name: "), lm->getName(lkey),
-		QWidget::tr("File: "), lkey.first,
-		QWidget::tr("Author: "), lm->getMaker(lkey).replace(" at ", "@").replace(" dot ", ".").toHtmlEscaped(),
-		QWidget::tr("Copyright: "), lm->getCopyright(lkey),
-		QWidget::tr("Channels: "), QWidget::tr("%1 in, %2 out").arg(ldesc->inputChannels).arg(ldesc->outputChannels)
+		QWidget::tr("<b>Name: </b>"), lm->getName(lkey),
+		QWidget::tr("<b>File: </b>"), lkey.first,
+		QWidget::tr("<b>Author: </b>"), lm->getMaker(lkey).replace(" at ", "@").replace(" dot ", ".").toHtmlEscaped(),
+		QWidget::tr("<b>Copyright: </b>"), lm->getCopyright(lkey),
+		QWidget::tr("<b>Channels: </b>"), QWidget::tr("%1 in, %2 out").arg(ldesc->inputChannels).arg(ldesc->outputChannels)
 	);
 
 	if (lm->hasRealTimeDependency(lkey))
 	{
-		labelText += QString{"<p><b>%1</b>%2</p>"}.arg(
-			QWidget::tr("Real-time Dependency: "),
+		labelText += QString{"<p>%1%2</p>"}.arg(
+			QWidget::tr("<b>Real-time Dependency: </b>"),
 			QWidget::tr("This plugin has a real-time dependency (e.g. listens to a MIDI device) so its output must "
 				"not be cached or subject to significant latency.")
 		);
@@ -89,8 +91,8 @@ void LadspaSubPluginFeatures::fillDescriptionWidget( QWidget * _parent,
 
 	if (!lm->isRealTimeCapable(lkey))
 	{
-		labelText += QString{"<p><b>%1</b>%2</p>"}.arg(
-			QWidget::tr("Not Real-time Capable: "),
+		labelText += QString{"<p>%1%2</p>"}.arg(
+			QWidget::tr("<b>Not Real-time Capable: </b>"),
 			QWidget::tr("This plugin is not suitable for use in a &lsquo;hard real-time&rsquo; environment.")
 		);
 	}
