@@ -130,7 +130,7 @@ void BitInvader::saveSettings(QDomDocument& _doc, QDomElement& _this)
 	m_sampleLength.saveSettings(_doc, _this, "sampleLength");
 
 	QString sampleString;
-	base64::encode((const char*)m_graph.samples(), wavetableSize * sizeof(float), sampleString);
+	base64::encode(reinterpret_cast<const char*>(m_graph.samples()), wavetableSize * sizeof(float), sampleString);
 	_this.setAttribute("sampleShape", sampleString);
 	
 	m_interpolation.saveSettings(_doc, _this, "interpolation");
@@ -144,7 +144,7 @@ void BitInvader::loadSettings(const QDomElement& _this)
 {
 	m_graph.clear();
 	m_sampleLength.loadSettings(_this, "sampleLength");
-	int sampleLength = (int)m_sampleLength.value();
+	auto sampleLength = static_cast<int>(m_sampleLength.value());
 
 	// Load sample shape
 	int size = 0;
@@ -165,7 +165,7 @@ void BitInvader::loadSettings(const QDomElement& _this)
 
 void BitInvader::lengthChanged()
 {
-	m_graph.setLength((int)m_sampleLength.value());
+	m_graph.setLength(static_cast<int>(m_sampleLength.value()));
 	normalize();
 }
 
