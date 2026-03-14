@@ -143,8 +143,8 @@ void GridModel::clearItems()
 
 void GridModel::setStaticIndex(size_t index, unsigned int newStaticIndex)
 {
-	m_items[index].staticIndex = newStaticIndex;
-	m_items[m_items[index].staticIndex].lookupIndex = index;
+	m_items[index].staticIndex.store(newStaticIndex, std::memory_order_relaxed);
+	m_items[newStaticIndex].lookupIndex.store(index, std::memory_order_release);
 }
 
 void GridModel::move(size_t startIndex, size_t finalIndex)
@@ -154,7 +154,7 @@ void GridModel::move(size_t startIndex, size_t finalIndex)
 	{
 		for (size_t i = startIndex; i > finalIndex; --i)
 		{
-			m_items[m_items[i - 1].staticIndex].lookupIndex = i;
+			m_items[m_items[i - 1].staticIndex.load(std::memory_order_acquire)].lookupIndex.store(i, std::memory_order_release);
 			m_items[i] << m_items[i - 1];
 		}
 	}
@@ -162,11 +162,11 @@ void GridModel::move(size_t startIndex, size_t finalIndex)
 	{
 		for (size_t i = startIndex; i < finalIndex; ++i)
 		{
-			m_items[m_items[i + 1].staticIndex].lookupIndex = i;
+			m_items[m_items[i + 1].staticIndex.load(std::memory_order_acquire)].lookupIndex.store(i, std::memory_order_release);
 			m_items[i] << m_items[i + 1];
 		}
 	}
-	m_items[itemData.staticIndex].lookupIndex = finalIndex;
+	m_items[itemData.staticIndex.load(std::memory_order_acquire)].lookupIndex.store(finalIndex, std::memory_order_release);
 	m_items[finalIndex] << itemData;
 }
 

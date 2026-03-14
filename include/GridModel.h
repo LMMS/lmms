@@ -25,6 +25,7 @@
 #ifndef LMMS_GRID_MODEl_H
 #define LMMS_GRID_MODEl_H
 
+#include <atomic>
 #include <set>
 #include <stddef.h>
 #include <vector>
@@ -64,15 +65,35 @@ public:
 	struct Item
 	{
 		ItemInfo info;
-		unsigned int staticIndex; //!< converts `m_items` index to static index
-		unsigned int lookupIndex; //!< converts static index to `m_items` index
+		std::atomic<unsigned int> staticIndex; //!< converts `m_items` index to static index
+		std::atomic<unsigned int> lookupIndex; //!< converts static index to `m_items` index
 
-		Item operator<<(Item& rhs) //! used to assign while keeping `lookupIndex` intact
+		Item(ItemInfo infoIn, unsigned int staticIndexIn, unsigned int lookupIndexIn)
+			: info{infoIn}
+			, staticIndex{staticIndexIn}
+			, lookupIndex{lookupIndexIn}
+		{}
+		Item()
+			: info{0.0f, 0.0f}
+			, staticIndex{0}
+			, lookupIndex{0}
+		{}
+		Item(const Item& rhs)
+			: info{rhs.info}
+			, staticIndex{rhs.staticIndex.load(std::memory_order_relaxed)}
+			, lookupIndex{rhs.lookupIndex.load()}
+		{}
+		void operator==(const Item& rhs)
 		{
 			info = rhs.info;
-			staticIndex = rhs.staticIndex;
+			staticIndex.store(rhs.staticIndex.load(std::memory_order_relaxed), std::memory_order_relaxed);
+			lookupIndex.store(rhs.lookupIndex.load(std::memory_order_acquire), std::memory_order_release);
+		}
+		void operator<<(const Item& rhs) //! used to assign while keeping `lookupIndex` intact
+		{
+			info = rhs.info;
+			staticIndex.store(rhs.staticIndex.load(std::memory_order_acquire), std::memory_order_release);
 			// lookupIndex shouldn't be changed, it is at a static index!
-			return *this;
 		}
 	};
 
