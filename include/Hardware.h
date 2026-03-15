@@ -65,6 +65,8 @@ inline constexpr std::size_t hardware_destructive_interference_size =
 #endif
 	;
 
+
+
 //! @brief Platform-dependent hint to the processor that it is in a busy-wait loop.
 //! This helps optimize spinlocks by slowing down the processor a bit, which helps reduce contention on atomics.
 inline void busyWaitHint()
@@ -78,6 +80,38 @@ inline void busyWaitHint()
 	#error No busy-wait hint intrinsic available for this platform!
 #endif
 	;
+}
+
+
+
+#if defined(LMMS_HOST_X86_64) || defined(LMMS_HOST_X86)
+// Intel® 64 and IA-32 Architectures Software Developer’s Manual,
+// Volume 1: Basic Architecture,
+// 11.6.3 Checking for the DAZ Flag in the MXCSR Register
+int inline canWeDAZ()
+{
+	alignas(16) unsigned char buffer[512] = {0};
+#if defined(LMMS_HOST_X86)
+	_fxsave(buffer);
+#elif defined(LMMS_HOST_X86_64)
+	_fxsave64(buffer);
+#endif
+	// Bit 6 of the MXCSR_MASK, i.e. in the lowest byte,
+	// tells if we can use the DAZ flag.
+	return (buffer[28] & (1 << 6)) != 0;
+}
+#endif
+
+
+
+// Set denormal protection for this thread.
+void inline disableDenormals()
+{
+#if defined(LMMS_HOST_X86_64) || defined(LMMS_HOST_X86)
+	// Setting DAZ might freeze systems not supporting it
+	if (canWeDAZ()) { _MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON); }
+	_MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON); // FTZ flag
+#endif // TODO: ARM support
 }
 
 } // namespace lmms

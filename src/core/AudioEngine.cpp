@@ -25,12 +25,12 @@
 #include "AudioEngine.h"
 
 #include "MixHelpers.h"
-#include "denormals.h"
 
 #include "lmmsconfig.h"
 
 #include "AudioEngineWorkerThread.h"
 #include "AudioBusHandle.h"
+#include "Hardware.h"
 #include "Mixer.h"
 #include "Song.h"
 #include "EnvelopeAndLfoParameters.h"
@@ -1073,7 +1073,7 @@ void AudioEngine::fifoWriter::finish()
 
 void AudioEngine::fifoWriter::run()
 {
-	disable_denormals();
+	disableDenormals();
 
 	const fpp_t frames = m_audioEngine->framesPerPeriod();
 	while( m_writing )

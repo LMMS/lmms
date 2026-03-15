@@ -24,6 +24,11 @@ SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 # Enable C++20
 SET(CMAKE_CXX_STANDARD 20)
 
+# GCC complains about std::hardware_destructive_interference_size used in Hardware.h
+IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+	ADD_COMPILE_OPTIONS(-Wno-interference-size)
+ENDIF()
+
 IF(LMMS_BUILD_APPLE AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
 ENDIF()

@@ -1,5 +1,6 @@
 INCLUDE(BuildPlugin)
 
+# GCC complains about std::hardware_destructive_interference_size used in Hardware.h
 IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 	ADD_COMPILE_OPTIONS(-Wno-interference-size)
 ENDIF()
