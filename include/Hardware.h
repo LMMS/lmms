@@ -26,7 +26,7 @@
 
 #include <new>
 #include "lmmsconfig.h"
-// Includes for busy_wait_hint()
+// Includes for busyWaitHint()
 #if defined(LMMS_HOST_X86_64) || defined(LMMS_HOST_X86)
 	#include <immintrin.h>
 // TODO: Use LMMS_HOST_ARM64 instead of __aarch64__ and _M_ARM64 once MSVC quits
@@ -67,7 +67,7 @@ inline constexpr std::size_t hardware_destructive_interference_size =
 
 //! @brief Platform-dependent hint to the processor that it is in a busy-wait loop.
 //! This helps optimize spinlocks by slowing down the processor a bit, which helps reduce contention on atomics.
-inline void busy_wait_hint()
+inline void busyWaitHint()
 {
 #if defined(LMMS_HOST_X86_64) || defined(LMMS_HOST_X86)
 	_mm_pause()

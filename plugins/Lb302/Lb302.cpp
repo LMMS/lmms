@@ -201,14 +201,14 @@ void Lb302Filter3Pole::envRecalc()
 
 sample_t Lb302Filter3Pole::process(sample_t samp)
 {
-	static constexpr float s_volAdjust = 3.f;
+	constexpr float volAdjust = 3.f;
 	const sample_t ax1 = m_lastin;
 	const std::array<sample_t, 2> ay1 = { m_ay[0], m_ay[1] };
 	m_lastin = samp - std::tanh(m_kres * m_ay[2]);
 	m_ay[0]  = m_kp1h * (m_lastin + ax1)   - m_kp * m_ay[0];
 	m_ay[1]  = m_kp1h * (m_ay[0] + ay1[0]) - m_kp * m_ay[1];
 	m_ay[2]  = m_kp1h * (m_ay[1] + ay1[1]) - m_kp * m_ay[2];
-	return std::tanh(m_ay[2] * m_value) * s_volAdjust / (1.f + fs->dist);
+	return std::tanh(m_ay[2] * m_value) * volAdjust / (1.f + fs->dist);
 }
 
 
@@ -327,8 +327,8 @@ void Lb302Synth::process(SampleFrame* outbuf, const fpp_t size)
 
 	if (m_playingNote)
 	{
-		constexpr float s_volRatio = 1.f / DefaultVolume;
-		m_noteVolume = m_playingNote->getVolume() * s_volRatio;
+		constexpr float volRatio = 1.f / DefaultVolume;
+		m_noteVolume = m_playingNote->getVolume() * volRatio;
 		m_notePan = std::clamp(m_playingNote->getPanning(), PanningLeft, PanningRight);
 	}
 
@@ -520,7 +520,7 @@ void Lb302Synth::playNote(NotePlayHandle* nph, SampleFrame*)
 		// If full, wait for room
 		if (static_cast<size_t>(occupied) >= s_maxPendingNotes)
 		{
-			busy_wait_hint();
+			busyWaitHint();
 			// goto rather than continue since we do not want to evaluate the compare_exchange_strong().
 			// However, the CAS is what normally updates write_claimed_expected, so load it manually
 			write_claimed_expected = m_notesWriteClaimed.load(std::memory_order_relaxed);
@@ -536,7 +536,7 @@ void Lb302Synth::playNote(NotePlayHandle* nph, SampleFrame*)
 	while (!m_notesWriteCommitted.compare_exchange_strong(write_committed_expected, next_index, std::memory_order_release))
 	{
 		write_committed_expected = index; // Reset this as the CAS will have changed it
-		busy_wait_hint();
+		busyWaitHint();
 	}
 }
 
@@ -602,7 +602,7 @@ void Lb302Synth::deleteNotePluginData(NotePlayHandle* nph)
 }
 
 
-gui::PluginView * Lb302Synth::instantiateView(QWidget* parent)
+gui::PluginView* Lb302Synth::instantiateView(QWidget* parent)
 {
 	return new gui::Lb302SynthView(this, parent);
 }
