@@ -46,10 +46,10 @@ class VstPlugin;
 
 namespace gui
 {
-class VstPluginKnob;
+class ManageVestigeInstrumentView;
 class PixmapButton;
 class VestigeInstrumentView;
-class ManageVestigeInstrumentView;
+class VstPluginKnob;
 } // namespace gui
 
 

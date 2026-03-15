@@ -30,6 +30,7 @@
 #include "lmms_export.h"
 
 class QLabel;
+class QTimer;
 
 namespace lmms::gui
 {

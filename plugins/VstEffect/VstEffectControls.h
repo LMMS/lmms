@@ -44,9 +44,9 @@ class VstEffect;
 
 namespace gui
 {
-class VstPluginKnob;
 class ManageVSTEffectView;
 class VstEffectControlDialog;
+class VstPluginKnob;
 }
 
 

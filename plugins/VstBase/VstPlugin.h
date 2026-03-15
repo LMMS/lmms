@@ -178,7 +178,7 @@ private:
 
 namespace gui {
 
-class VSTBASE_EXPORT VstPluginKnob : public gui::Knob
+class VSTBASE_EXPORT VstPluginKnob : public Knob
 {
 public:
 	VstPluginKnob(VstPlugin* plugin, int paramIndex, const QString& name, QWidget* parent);
