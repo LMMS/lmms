@@ -23,6 +23,7 @@
  */
 
 #include "AudioEngine.h"
+#include <iostream>
 
 #include "MixHelpers.h"
 
@@ -832,7 +833,7 @@ AudioDevice * AudioEngine::tryAudioDevices()
 
 
 #ifdef LMMS_HAVE_PORTAUDIO
-	if( dev_name == AudioPortAudio::name() || dev_name == "" )
+	if (dev_name == AudioPortAudio::name() || dev_name.isEmpty())
 	{
 		dev = new AudioPortAudio( success_ful, this );
 		if( success_ful )

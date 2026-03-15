@@ -96,6 +96,7 @@ protected:
 	AudioEngine* audioEngine() { return m_audioEngine; }
 
 	void setSampleRate(const sample_rate_t _new_sr) { m_sampleRate = _new_sr; }
+	void setChannels(const ch_cnt_t channels) { m_channels = channels; }
 
 	static void stopProcessingThread( QThread * thread );
 protected:

@@ -48,6 +48,8 @@ namespace lmms::gui
 class TextFloat;
 
 
+
+
 class TimeLineWidget : public QWidget
 {
 	Q_OBJECT
@@ -67,6 +69,10 @@ public:
 	Q_PROPERTY(QSize mouseHotspotSelLeft READ mouseHotspotSelLeft WRITE setMouseHotspotSelLeft)
 	Q_PROPERTY(QSize mouseHotspotSelRight READ mouseHotspotSelRight WRITE setMouseHotspotSelRight)
 
+	static constexpr const char* AutoScrollDisabledString = "disabled";
+	static constexpr const char* AutoScrollSteppedString = "stepped";
+	static constexpr const char* AutoScrollContinuousString = "continuous";
+
 	enum class AutoScrollState
 	{
 		Stepped,
@@ -74,8 +80,8 @@ public:
 		Disabled
 	};
 
-	TimeLineWidget(int xoff, int yoff, float ppb, Song::PlayPos& pos, Timeline& timeline,
-				const TimePos& begin, Song::PlayMode mode, QWidget* parent);
+	TimeLineWidget(int xoff, int yoff, float ppb, Timeline& timeline,
+				const TimePos& begin, QWidget* parent);
 	~TimeLineWidget() override;
 
 	inline QColor const & getBarLineColor() const { return m_barLineColor; }
@@ -127,15 +133,9 @@ public:
 		m_cursorSelectRight = QCursor{m_cursorSelectRight.pixmap(), s.width(), s.height()};
 	}
 
-	inline Song::PlayPos & pos()
-	{
-		return( m_pos );
-	}
-
-	AutoScrollState autoScroll() const
-	{
-		return m_autoScroll;
-	}
+	static AutoScrollState defaultAutoScrollState();
+	AutoScrollState autoScroll() const { return m_autoScroll; }
+	void setAutoScroll(AutoScrollState state) { m_autoScroll = state; }
 
 	inline void setPixelsPerBar( float ppb )
 	{
@@ -153,13 +153,22 @@ public:
 					m_ppb / TimePos::ticksPerBar() );
 	}
 
+	Timeline* timeline()
+	{
+		return m_timeline;
+	}
+
+	bool isRecording() const { return m_isRecording; }
+	void setRecording(bool recording) { m_isRecording = recording; }
+
+	bool isPlayheadVisible() const { return m_isPlayheadVisible; }
+	void setPlayheadVisible(bool visible) { m_isPlayheadVisible = visible; }
+
 signals:
-	void positionChanged(const lmms::TimePos& postion);
 	void regionSelectedFromPixels( int, int );
 	void selectionFinished();
 
 public slots:
-	void updatePosition();
 	void setSnapSize( const float snapSize )
 	{
 		m_snapSize = snapSize;
@@ -189,6 +198,7 @@ private:
 	auto actionCursor(Action action) const -> QCursor;
 
 	QPixmap m_posMarkerPixmap = embed::getIconPixmap("playpos_marker");
+	QPixmap m_recordingPosMarkerPixmap = embed::getIconPixmap("recording_playpos_marker");
 
 	QColor m_inactiveLoopColor = QColor{52, 63, 53, 64};
 	QBrush m_inactiveLoopBrush = QColor{255, 255, 255, 32};
@@ -209,21 +219,23 @@ private:
 	QCursor m_cursorSelectLeft = QCursor{embed::getIconPixmap("cursor_select_left"), 0, 16};
 	QCursor m_cursorSelectRight = QCursor{embed::getIconPixmap("cursor_select_right"), 32, 16};
 
-	AutoScrollState m_autoScroll = AutoScrollState::Stepped;
-
 	// Width of the unused region on the widget's left (above track labels or piano)
 	int m_xOffset;
 	float m_ppb;
 	float m_snapSize = 1.f;
-	Song::PlayPos & m_pos;
 	Timeline* m_timeline;
 	// Leftmost position visible in parent editor
 	const TimePos & m_begin;
-	const Song::PlayMode m_mode;
+
+	AutoScrollState m_autoScroll = defaultAutoScrollState();
+
 	// When in MoveLoop mode we need the initial positions. Storing only the latest
 	// position allows for unquantized drag but fails when toggling quantization.
 	std::array<TimePos, 2> m_oldLoopPos;
 	TimePos m_dragStartPos;
+
+	bool m_isRecording = false;
+	bool m_isPlayheadVisible = true;
 
 	TextFloat* m_hint = nullptr;
 	int m_initalXSelect;

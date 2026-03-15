@@ -70,9 +70,12 @@ public:
 	void saveSettings( QDomDocument& doc, QDomElement& element ) override;
 	void loadSettings( const QDomElement& element ) override;
 
-	ComboBoxModel *snappingModel() const;
+	ComboBoxModel* snappingModel() const;
 	float getSnapSize() const;
 	QString getSnapSizeString() const;
+
+	TimeLineWidget* timeLine() const { return m_timeLine; }
+	PositionLine* positionLine() const { return m_positionLine; }
 
 public slots:
 	void scrolled( int new_pos );
@@ -86,12 +89,11 @@ public slots:
 	void setEditModeSelect();
 	void toggleProportionalSnap();
 
-	void updatePosition( const lmms::TimePos & t );
+	void updatePosition();
 	void updatePositionLine();
 	void selectAllClips( bool select );
 
 protected:
-	void closeEvent( QCloseEvent * ce ) override;
 	void mousePressEvent(QMouseEvent * me) override;
 	void mouseMoveEvent(QMouseEvent * me) override;
 	void mouseReleaseEvent(QMouseEvent * me) override;
@@ -132,7 +134,8 @@ private:
 
 	LcdSpinBox * m_tempoSpinBox;
 
-	TimeLineWidget * m_timeLine;
+	TimeLineWidget* m_timeLine;
+	PositionLine* m_positionLine;
 
 	MeterDialog * m_timeSigDisplay;
 	AutomatableSlider * m_masterVolumeSlider;
@@ -141,7 +144,6 @@ private:
 	TextFloat * m_mvsStatus;
 	TextFloat * m_mpsStatus;
 
-	PositionLine * m_positionLine;
 
 	IntModel* m_zoomingModel;
 	ComboBoxModel* m_snappingModel;

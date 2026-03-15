@@ -119,6 +119,10 @@ void AutomatableButton::mousePressEvent( QMouseEvent * _me )
 		{
 			toggle();
 		}
+		else
+		{
+			model()->setValue(true);
+		}
 		_me->accept();
 	}
 	else
@@ -150,6 +154,10 @@ void AutomatableButton::mouseReleaseEvent( QMouseEvent * _me )
 {
 	if( _me && _me->button() == Qt::LeftButton )
 	{
+		if(!isCheckable())
+		{
+			model()->setValue(false);
+		}
 		emit clicked();
 	}
 }

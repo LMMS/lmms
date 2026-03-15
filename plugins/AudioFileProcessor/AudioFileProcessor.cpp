@@ -27,7 +27,6 @@
 
 #include "InstrumentTrack.h"
 #include "PathUtil.h"
-#include "SampleLoader.h"
 #include "Song.h"
 
 #include "LmmsTypes.h"
@@ -225,7 +224,7 @@ void AudioFileProcessor::loadSettings(const QDomElement& elem)
 	}
 	else if (auto sampleData = elem.attribute("sampledata"); !sampleData.isEmpty())
 	{
-		m_sample = Sample(gui::SampleLoader::createBufferFromBase64(sampleData));
+		m_sample = Sample(SampleBuffer::fromBase64(sampleData));
 	}
 
 	m_loopModel.loadSettings(elem, "looped");
@@ -288,13 +287,14 @@ auto AudioFileProcessor::beatLen(NotePlayHandle* note) const -> f_cnt_t
 	const auto freqFactor = baseFreq / note->frequency()
 		* Engine::audioEngine()->outputSampleRate()
 		/ Engine::audioEngine()->baseSampleRate();
+	const auto sampleRateRatio = static_cast<double>(Engine::audioEngine()->outputSampleRate()) / m_sample.sampleRate();
 
 	const auto startFrame = m_nextPlayStartPoint >= static_cast<std::size_t>(m_sample.endFrame())
 		? m_sample.startFrame()
 		: m_nextPlayStartPoint;
 	const auto duration = m_sample.endFrame() - startFrame;
 
-	return static_cast<f_cnt_t>(std::floor(duration * freqFactor));
+	return static_cast<f_cnt_t>(std::floor(duration * freqFactor * sampleRateRatio));
 }
 
 
@@ -318,8 +318,10 @@ void AudioFileProcessor::setAudioFile(const QString& _audio_file, bool _rename)
 	}
 	// else we don't touch the track-name, because the user named it self
 
-	m_sample = Sample(gui::SampleLoader::createBufferFromFile(_audio_file));
+	m_sample = Sample(SampleBuffer::fromFile(_audio_file));
 	loopPointChanged();
+	ampModelChanged();
+	reverseModelChanged();
 	emit sampleUpdated();
 }
 

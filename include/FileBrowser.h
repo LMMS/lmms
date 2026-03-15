@@ -147,6 +147,8 @@ protected:
 	void keyReleaseEvent( QKeyEvent * ke ) override;
 	void hideEvent( QHideEvent * he ) override;
 	void focusOutEvent( QFocusEvent * fe ) override;
+	void scrollTo(const QModelIndex &index, ScrollHint hint = EnsureVisible) override;
+	void wheelEvent(QWheelEvent * event) override;
 
 
 private:
