@@ -255,16 +255,31 @@ public:
 		return m_inputBufferFrames[ m_inputBufferRead ];
 	}
 
-	//! Renders the next period of the audio buffer
-	//! The audio buffer can contain many periods, depending on the chosen buffer size
-	//! @returns The next audio period
+	/**
+	 * @brief Renders the next audio period.
+	 *
+	 * An audio period is a fixed-size chunk of audio the engine generates, and represents a single cycle of the
+	 * engine's output.
+	 * Rendering is chunked into discrete periods to timely handle per-buffer updates like automation.
+	 * The audio period generated is interleaved, stereo, and has @a DEFAULT_BUFFER_SIZE frames in size.
+	 *
+	 * @returns A non-owning buffer to the next audio period.
+	 */
 	const SampleFrame* renderNextPeriod();
 
-	//! Renders audio and outputs it into @a dst
-	void renderNextBuffer(InterleavedBufferView<float> dst);
-
-	//! Renders audio and outputs it into @a dst
-	void renderNextBuffer(PlanarBufferView<float> dst);
+	/**
+	 * @brief Renders an audio buffer into @a dst.
+	 *
+	 * This function renders audio into @a dst in discrete chunks of audio periods. As @a dst can have any number of
+	 * frames, it can contain a whole number of periods or some fraction of a period.
+	 *
+	 * If @a dst has 1 channel, the audio periods are averaged to mono.
+	 * If @a dst has 2 channels, the audio periods are directly copied.
+	 * If @a dst has more than 2 channels, the stero channels are copied and the rest zero-filled.
+	 *
+	 * @param dst An interleaved or planar audio view over the buffer to write into.
+	 */
+	void renderNextBuffer(AudioBufferView<float> auto dst);
 
 	//! Block until a change in model can be done (i.e. wait for audio thread)
 	void requestChangeInModel();

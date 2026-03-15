@@ -329,10 +329,12 @@ const SampleFrame* AudioEngine::renderNextPeriod()
 
 	s_renderingThread = false;
 	m_profiler.finishPeriod(outputSampleRate(), m_framesPerPeriod);
+	m_outputBufferReadIndex = 0;
+
 	return m_outputBufferRead.get();
 }
 
-void AudioEngine::renderNextBuffer(InterleavedBufferView<float> dst)
+void AudioEngine::renderNextBuffer(AudioBufferView<float> auto dst)
 {
 	for (auto frame = f_cnt_t{0}; frame < dst.frames(); ++frame)
 	{
@@ -345,18 +347,18 @@ void AudioEngine::renderNextBuffer(InterleavedBufferView<float> dst)
 			assert(false);
 			break;
 		case 1:
-			dst[frame][0] = m_outputBufferRead[m_outputBufferReadIndex].average();
+			dst.sample(0, frame) = m_outputBufferRead[m_outputBufferReadIndex].average();
 			break;
 		case 2:
-			dst[frame][0] = m_outputBufferRead[m_outputBufferReadIndex][0];
-			dst[frame][1] = m_outputBufferRead[m_outputBufferReadIndex][1];
+			dst.sample(0, frame) = m_outputBufferRead[m_outputBufferReadIndex][0];
+			dst.sample(1, frame) = m_outputBufferRead[m_outputBufferReadIndex][1];
 			break;
 		default:
-			dst[frame][0] = m_outputBufferRead[m_outputBufferReadIndex][0];
-			dst[frame][1] = m_outputBufferRead[m_outputBufferReadIndex][1];
+			dst.sample(0, frame) = m_outputBufferRead[m_outputBufferReadIndex][0];
+			dst.sample(1, frame) = m_outputBufferRead[m_outputBufferReadIndex][1];
 			for (auto channel = 2; channel < dst.channels(); ++channel)
 			{
-				dst[frame][channel] = 0.f;
+				dst.sample(channel, frame) = 0.f;
 			}
 			break;
 		}
@@ -364,42 +366,6 @@ void AudioEngine::renderNextBuffer(InterleavedBufferView<float> dst)
 		++m_outputBufferReadIndex;
 	}
 }
-
-void AudioEngine::renderNextBuffer(PlanarBufferView<float> dst)
-{
-	for (auto frame = f_cnt_t{0}; frame < dst.frames(); ++frame)
-	{
-		if (m_outputBufferReadIndex == m_framesPerPeriod) { m_outputBufferReadIndex = 0; }
-		if (m_outputBufferReadIndex == 0) { renderNextPeriod(); }
-
-		switch (dst.channels())
-		{
-		case 0:
-			assert(false);
-			break;
-		case 1:
-			dst[0][frame] = m_outputBufferRead[m_outputBufferReadIndex].average();
-			break;
-		case 2:
-			dst[0][frame] = m_outputBufferRead[m_outputBufferReadIndex][0];
-			dst[1][frame] = m_outputBufferRead[m_outputBufferReadIndex][1];
-			break;
-		default:
-			dst[0][frame] = m_outputBufferRead[m_outputBufferReadIndex][0];
-			dst[1][frame] = m_outputBufferRead[m_outputBufferReadIndex][1];
-			for (auto channel = 2; channel < dst.channels(); ++channel)
-			{
-				dst[channel][frame] = 0.f;
-			}
-			break;
-		}
-
-		++m_outputBufferReadIndex;
-	}
-}
-
-
-
 
 void AudioEngine::swapBuffers()
 {
@@ -1027,5 +993,8 @@ MidiClient * AudioEngine::tryMidiClients()
 
 	return new MidiDummy;
 }
+
+template void AudioEngine::renderNextBuffer(InterleavedBufferView<float> dst);
+template void AudioEngine::renderNextBuffer(PlanarBufferView<float> dst);
 
 } // namespace lmms
