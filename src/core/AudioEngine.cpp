@@ -71,13 +71,14 @@ AudioEngine::AudioEngine(bool renderOnly)
 	: m_renderOnly(renderOnly)
 	, m_framesPerAudioBuffer(std::clamp(ConfigManager::inst()->value("audioengine", "framesperaudiobuffer").toULong(),
 		  MINIMUM_BUFFER_SIZE, MAXIMUM_BUFFER_SIZE))
-	, m_framesPerPeriod(std::min(m_framesPerAudioBuffer, DEFAULT_BUFFER_SIZE))
+	, m_framesPerPeriod(DEFAULT_BUFFER_SIZE)
 	, m_baseSampleRate(
 		  std::max(ConfigManager::inst()->value("audioengine", "samplerate").toInt(), SUPPORTED_SAMPLERATES.front()))
 	, m_inputBufferRead(0)
 	, m_inputBufferWrite(1)
 	, m_outputBufferRead(nullptr)
 	, m_outputBufferWrite(nullptr)
+	, m_outputBufferReadIndex(0)
 	, m_workers()
 	, m_numWorkers(QThread::idealThreadCount() - 1)
 	, m_newPlayHandles(PlayHandle::MaxNumber)
@@ -88,11 +89,6 @@ AudioEngine::AudioEngine(bool renderOnly)
 	, m_profiler()
 	, m_clearSignal(false)
 {
-	if (m_framesPerAudioBuffer % m_framesPerPeriod != 0)
-	{
-		throw std::invalid_argument{"Frames per period is not a multiple of buffer size"};
-	}
-
 	for( int i = 0; i < 2; ++i )
 	{
 		m_inputBufferFrames[i] = 0;
@@ -340,8 +336,8 @@ void AudioEngine::renderNextBuffer(InterleavedBufferView<float> dst)
 {
 	for (auto frame = f_cnt_t{0}; frame < dst.frames(); ++frame)
 	{
-		const auto index = frame % m_framesPerPeriod;
-		if (index == 0) { renderNextPeriod(); }
+		if (m_outputBufferReadIndex == m_framesPerPeriod) { m_outputBufferReadIndex = 0; }
+		if (m_outputBufferReadIndex == 0) { renderNextPeriod(); }
 
 		switch (dst.channels())
 		{
@@ -349,21 +345,23 @@ void AudioEngine::renderNextBuffer(InterleavedBufferView<float> dst)
 			assert(false);
 			break;
 		case 1:
-			dst[frame][0] = m_outputBufferRead[index].average();
+			dst[frame][0] = m_outputBufferRead[m_outputBufferReadIndex].average();
 			break;
 		case 2:
-			dst[frame][0] = m_outputBufferRead[index][0];
-			dst[frame][1] = m_outputBufferRead[index][1];
+			dst[frame][0] = m_outputBufferRead[m_outputBufferReadIndex][0];
+			dst[frame][1] = m_outputBufferRead[m_outputBufferReadIndex][1];
 			break;
 		default:
-			dst[frame][0] = m_outputBufferRead[index][0];
-			dst[frame][1] = m_outputBufferRead[index][1];
+			dst[frame][0] = m_outputBufferRead[m_outputBufferReadIndex][0];
+			dst[frame][1] = m_outputBufferRead[m_outputBufferReadIndex][1];
 			for (auto channel = 2; channel < dst.channels(); ++channel)
 			{
 				dst[frame][channel] = 0.f;
 			}
 			break;
 		}
+
+		++m_outputBufferReadIndex;
 	}
 }
 
@@ -371,8 +369,8 @@ void AudioEngine::renderNextBuffer(PlanarBufferView<float> dst)
 {
 	for (auto frame = f_cnt_t{0}; frame < dst.frames(); ++frame)
 	{
-		const auto index = frame % m_framesPerPeriod;
-		if (index == 0) { renderNextPeriod(); }
+		if (m_outputBufferReadIndex == m_framesPerPeriod) { m_outputBufferReadIndex = 0; }
+		if (m_outputBufferReadIndex == 0) { renderNextPeriod(); }
 
 		switch (dst.channels())
 		{
@@ -380,21 +378,23 @@ void AudioEngine::renderNextBuffer(PlanarBufferView<float> dst)
 			assert(false);
 			break;
 		case 1:
-			dst[0][frame] = m_outputBufferRead[index].average();
+			dst[0][frame] = m_outputBufferRead[m_outputBufferReadIndex].average();
 			break;
 		case 2:
-			dst[0][frame] = m_outputBufferRead[index][0];
-			dst[1][frame] = m_outputBufferRead[index][1];
+			dst[0][frame] = m_outputBufferRead[m_outputBufferReadIndex][0];
+			dst[1][frame] = m_outputBufferRead[m_outputBufferReadIndex][1];
 			break;
 		default:
-			dst[0][frame] = m_outputBufferRead[index][0];
-			dst[1][frame] = m_outputBufferRead[index][1];
+			dst[0][frame] = m_outputBufferRead[m_outputBufferReadIndex][0];
+			dst[1][frame] = m_outputBufferRead[m_outputBufferReadIndex][1];
 			for (auto channel = 2; channel < dst.channels(); ++channel)
 			{
 				dst[channel][frame] = 0.f;
 			}
 			break;
 		}
+
+		++m_outputBufferReadIndex;
 	}
 }
 

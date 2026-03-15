@@ -322,6 +322,7 @@ private:
 
 	std::unique_ptr<SampleFrame[]> m_outputBufferRead;
 	std::unique_ptr<SampleFrame[]> m_outputBufferWrite;
+	f_cnt_t m_outputBufferReadIndex;
 
 	// worker thread stuff
 	std::vector<AudioEngineWorkerThread *> m_workers;
