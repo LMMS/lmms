@@ -287,7 +287,7 @@ void AudioSoundIo::writeCallback(int frameCountMin, int frameCountMax)
 		else
 		{
 			const auto bufferView = PlanarBufferView<float>{
-				buffers.data(), static_cast<proc_ch_t>(layout->channel_count), static_cast<f_cnt_t>(frameCount)};
+				buffers.data(), static_cast<ch_cnt_t>(layout->channel_count), static_cast<f_cnt_t>(frameCount)};
 			audioEngine()->renderNextBuffer(bufferView);
 		}
 

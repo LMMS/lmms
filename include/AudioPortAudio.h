@@ -76,13 +76,12 @@ public:
 	AudioPortAudio& operator=(const AudioPortAudio&) = delete;
 	AudioPortAudio& operator=(AudioPortAudio&&) = delete;
 
+	static auto name() -> QString { return QT_TRANSLATE_NOOP("AudioDeviceSetupWidget", "PortAudio"); }
+
 private:
 	void startProcessingImpl() override;
 	void stopProcessingImpl() override;
 
-	static auto name() -> QString { return QT_TRANSLATE_NOOP("AudioDeviceSetupWidget", "PortAudio"); }
-
-private:
 	static int processCallback(const void* input, void* output, unsigned long frameCount,
 		const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags, void* userData);
 

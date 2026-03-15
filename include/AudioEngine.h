@@ -260,11 +260,11 @@ public:
 	//! @returns The next audio period
 	const SampleFrame* renderNextPeriod();
 
-	//! Renders the stereo, interleaved audio buffer into @a dst
-	//! @note @a dst is expected to have a frame count of `framesPerAudioBuffer()`
-	//! @note if @a dst is mono, the buffer is converted to mono
-	//! @note if @a dst is non stereo, the other channels are zero-filled
-	void renderNextBuffer(AudioBufferView<float> auto dst);
+	//! Renders audio and outputs it into @a dst
+	void renderNextBuffer(InterleavedBufferView<float> dst);
+
+	//! Renders audio and outputs it into @a dst
+	void renderNextBuffer(PlanarBufferView<float> dst);
 
 	//! Block until a change in model can be done (i.e. wait for audio thread)
 	void requestChangeInModel();

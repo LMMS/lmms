@@ -336,9 +336,7 @@ const SampleFrame* AudioEngine::renderNextPeriod()
 	return m_outputBufferRead.get();
 }
 
-template void AudioEngine::renderNextBuffer<InterleavedBufferView<float>>(InterleavedBufferView<float> dst);
-template void AudioEngine::renderNextBuffer<PlanarBufferView<float>>(PlanarBufferView<float> dst);
-void AudioEngine::renderNextBuffer(AudioBufferView<float> auto dst)
+void AudioEngine::renderNextBuffer(InterleavedBufferView<float> dst)
 {
 	for (auto frame = f_cnt_t{0}; frame < dst.frames(); ++frame)
 	{
@@ -351,18 +349,49 @@ void AudioEngine::renderNextBuffer(AudioBufferView<float> auto dst)
 			assert(false);
 			break;
 		case 1:
-			dst.sample(0, frame) = m_outputBufferRead[index].average();
+			dst[frame][0] = m_outputBufferRead[index].average();
 			break;
 		case 2:
-			dst.sample(0, frame) = m_outputBufferRead[index][0];
-			dst.sample(1, frame) = m_outputBufferRead[index][1];
+			dst[frame][0] = m_outputBufferRead[index][0];
+			dst[frame][1] = m_outputBufferRead[index][1];
 			break;
 		default:
-			dst.sample(0, frame) = m_outputBufferRead[index][0];
-			dst.sample(1, frame) = m_outputBufferRead[index][1];
+			dst[frame][0] = m_outputBufferRead[index][0];
+			dst[frame][1] = m_outputBufferRead[index][1];
 			for (auto channel = 2; channel < dst.channels(); ++channel)
 			{
-				dst.sample(channel, frame) = 0.f;
+				dst[frame][channel] = 0.f;
+			}
+			break;
+		}
+	}
+}
+
+void AudioEngine::renderNextBuffer(PlanarBufferView<float> dst)
+{
+	for (auto frame = f_cnt_t{0}; frame < dst.frames(); ++frame)
+	{
+		const auto index = frame % m_framesPerPeriod;
+		if (index == 0) { renderNextPeriod(); }
+
+		switch (dst.channels())
+		{
+		case 0:
+			assert(false);
+			break;
+		case 1:
+			dst[0][frame] = m_outputBufferRead[index].average();
+			break;
+		case 2:
+			dst[0][frame] = m_outputBufferRead[index][0];
+			dst[1][frame] = m_outputBufferRead[index][1];
+			break;
+		default:
+			dst[0][frame] = m_outputBufferRead[index][0];
+			dst[1][frame] = m_outputBufferRead[index][1];
+			for (auto channel = 2; channel < dst.channels(); ++channel)
+			{
+				dst[channel][frame] = 0.f;
 			}
 			break;
 		}
