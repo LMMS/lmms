@@ -27,6 +27,8 @@
 #include <cassert>
 #include <cmath>
 
+#include <stdio.h>
+
 #include "Engine.h"
 #include "AudioEngine.h"
 
@@ -128,11 +130,13 @@ size_t GridModel::addItem(GridModel::Item itemIn)
 	return foundIndex;
 }
 
-void GridModel::removeItem(size_t index)
+void GridModel::removeItem(size_t relIndex)
 {
-	move(index, m_items.size() - 1);
+	move(relIndex, m_items.size() - 1);
+	// TODO LOCK SAFETY
+	// ONLY ACTUALLY DESTRUCT THIS AFTER THE USERS ARE DONE TODO
 	m_items.pop_back();
-	dataChangedAt(index);
+	dataChangedAt(relIndex);
 	emit dataChanged();
 }
 void GridModel::clearItems()
@@ -141,14 +145,27 @@ void GridModel::clearItems()
 	m_items.clear();
 }
 
-void GridModel::setStaticIndex(size_t index, unsigned int newStaticIndex)
+void GridModel::setStaticIndex(size_t relIndex, unsigned int newStaticIndex)
 {
-	m_items[index].staticIndex.store(newStaticIndex, std::memory_order_relaxed);
-	m_items[newStaticIndex].lookupIndex.store(index, std::memory_order_release);
+	m_items[relIndex].staticIndex.store(newStaticIndex, std::memory_order_relaxed);
+	m_items[newStaticIndex].lookupIndex.store(relIndex, std::memory_order_release);
+}
+size_t GridModel::sToRIndex(size_t staticIndex) const
+{
+	return m_items[staticIndex].lookupIndex.load(std::memory_order_acquire);
+}
+size_t GridModel::rToSIndex(size_t relIndex) const
+{
+	return m_items[relIndex].staticIndex.load(std::memory_order_acquire);
 }
 
 void GridModel::move(size_t startIndex, size_t finalIndex)
 {
+	printf("move %d to %d\n", startIndex, finalIndex);
+	for (size_t i = 0; i < m_items.size(); ++i)
+	{
+		printf("[%d]: x: %f, static: %d, lookup: %d\n", i, m_items[i].info.x, m_items[i].staticIndex.load(std::memory_order_acquire), m_items[i].lookupIndex.load(std::memory_order_acquire));
+	}
 	auto itemData{m_items[startIndex]};
 	if (startIndex > finalIndex)
 	{
@@ -168,46 +185,50 @@ void GridModel::move(size_t startIndex, size_t finalIndex)
 	}
 	m_items[itemData.staticIndex.load(std::memory_order_acquire)].lookupIndex.store(finalIndex, std::memory_order_release);
 	m_items[finalIndex] << itemData;
+	for (size_t i = 0; i < m_items.size(); ++i)
+	{
+		printf("[%d]: x: %f, static: %d, lookup: %d\n", i, m_items[i].info.x, m_items[i].staticIndex.load(std::memory_order_acquire), m_items[i].lookupIndex.load(std::memory_order_acquire));
+	}
 }
 
-size_t GridModel::setX(size_t index, float newX)
+size_t GridModel::setX(size_t relIndex, float newX)
 {
 	size_t foundIndex{findIndex(newX)};
-	m_items[index].info.x = newX;
-	if (foundIndex > index)
+	m_items[relIndex].info.x = newX;
+	if (foundIndex > relIndex)
 	{
 		foundIndex -= 1;
 	}
-	move(index, foundIndex);
-	dataChangedAt(index);
+	move(relIndex, foundIndex);
+	dataChangedAt(relIndex);
 	dataChangedAt(foundIndex);
 	emit dataChanged();
 	return foundIndex;
 }
-void GridModel::setY(size_t index, float newY)
+void GridModel::setY(size_t relIndex, float newY)
 {
-	m_items[index].info.y = newY;
-	dataChangedAt(index);
+	m_items[relIndex].info.y = newY;
+	dataChangedAt(relIndex);
 	emit dataChanged();
 }
-size_t GridModel::setInfo(size_t index, const GridModel::ItemInfo& info)
+size_t GridModel::setInfo(size_t relIndex, const GridModel::ItemInfo& info)
 {
-	return setInfo(index, info, m_horizontalSteps, m_verticalSteps);
+	return setInfo(relIndex, info, m_horizontalSteps, m_verticalSteps);
 }
-size_t GridModel::setInfo(size_t index, const GridModel::ItemInfo& info, unsigned int horizontalSteps, unsigned int verticalSteps)
+size_t GridModel::setInfo(size_t relIndex, const GridModel::ItemInfo& info, unsigned int horizontalSteps, unsigned int verticalSteps)
 {
 	float newY = fitPos(info.y, m_height, verticalSteps);
-	if (newY != m_items[index].info.y) { setY(index, newY); }
+	if (newY != m_items[relIndex].info.y) { setY(relIndex, newY); }
 
-	size_t finalIndex{index};
+	size_t finalIndex{relIndex};
 	float newX = fitPos(info.x, m_length, horizontalSteps);
-	if (newX != m_items[index].info.x) { finalIndex = setX(index, newX); }
+	if (newX != m_items[relIndex].info.x) { finalIndex = setX(relIndex, newX); }
 	return finalIndex;
 }
-const GridModel::Item& GridModel::getItem(size_t index) const
+const GridModel::Item& GridModel::getItem(size_t relIndex) const
 {
-	assert(index < m_items.size());
-	return m_items[index];
+	assert(relIndex < m_items.size());
+	return m_items[relIndex];
 }
 float GridModel::fitPos(float position, unsigned int max, unsigned int steps) const
 {

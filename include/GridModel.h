@@ -66,7 +66,7 @@ public:
 	{
 		ItemInfo info;
 		std::atomic<unsigned int> staticIndex; //!< converts `m_items` index to static index
-		std::atomic<unsigned int> lookupIndex; //!< converts static index to `m_items` index
+		std::atomic<unsigned int> lookupIndex; //!< converts static index to `m_items` relative index
 
 		Item(ItemInfo infoIn, unsigned int staticIndexIn, unsigned int lookupIndexIn)
 			: info{infoIn}
@@ -96,9 +96,22 @@ public:
 			// lookupIndex shouldn't be changed, it is at a static index!
 		}
 	};
+	struct StaticIndex
+	{
+		StaticIndex() : index{0} {}
+		StaticIndex(size_t indexIn) : index{indexIn} {}
+		StaticIndex(StaticIndex stIndex) : index{stIndex.index} {}
+		StaticIndex& operator=(StaticIndex rhs) { index = rhs.index; }
+		StaticIndex operator+(size_t rhs) { return StaticIndex{index + rhs}; }
+		StaticIndex operator-(size_t rhs) { return StaticIndex{index - rhs}; }
+		operator size_t() = delete;
+	private:
+		size_t index;
+		friend class GridModel;
+	};
 
 	//*** util ***
-	//! @return index if found inside radius, else -1
+	//! @return relative index if found inside radius, else -1
 	//! (the first index is returned where `xPos` is found)
 	int findIndexFromPos(float xPos, float radius) const;
 	//! @return the index where [index - 1].x < xPos and xPos <= [index].x
@@ -106,7 +119,12 @@ public:
 	size_t findIndex(float xPos) const;
 
 	//*** item management ***
-	const Item& getItem(size_t index) const;
+	const Item& getItem(size_t relIndex) const;
+	//! @return new / final relative index (if x changed)
+	size_t setInfo(size_t relIndex, const ItemInfo& info);
+	size_t setInfo(size_t relIndex, const ItemInfo& info, unsigned int horizontalSteps, unsigned int verticalSteps);
+	size_t sToRIndex(size_t statIndex) const; //!< converts static indexes to relative index
+	size_t rToSIndex(size_t relIndex) const; //!< converts relative indexes to static index
 
 	//*** model management ***
 	//! @return item count
@@ -115,6 +133,9 @@ public:
 	unsigned int getLength() const;
 	unsigned int getHeight() const;
 	void setSteps(unsigned int horizontalSteps, unsigned int verticalSteps);
+	void resizeGridArea(size_t length, size_t height);
+	//! @return how many items were deleted
+	int resizeGridCountLimit(size_t newLimit);
 
 	virtual ~GridModel();
 protected:
@@ -123,28 +144,20 @@ protected:
 	virtual void dataChangedAt(signed long long index) {}
 
 	//*** item management ***
-	//! @return new / final index (if x changed)
-	size_t setInfo(size_t index, const ItemInfo& info); // TODO LOCK
-	size_t setInfo(size_t index, const ItemInfo& info, unsigned int horizontalSteps, unsigned int verticalSteps); // TODO LOCK
-	//! @return index where added, `getCount()` if fails
+	//! @return relative index where added, `getCount()` if fails
 	size_t addItem(Item itemIn);
-	void removeItem(size_t index);
+	void removeItem(size_t relIndex); // TODO UNSAFE, DESTRUCTS LAST ELEM WHILE IT IS USED
 	void clearItems();
-	//! @return get and set index pointing to custom data, DOESN'T EMIT
-	void setStaticIndex(size_t index, unsigned int newStaticIndex);
-
-	//*** model management ***
-	void resizeGridArea(size_t length, size_t height);
-	//! @return how many items were deleted
-	int resizeGridCountLimit(size_t newLimit);
+	//! @return get and set relative index pointing to custom data, DOESN'T EMIT
+	void setStaticIndex(size_t relIndex, unsigned int newStaticIndex);
 private:
 	//! only call these with fitted values (`fitPos`)
-	//! @return new / final index (if x changed)
-	size_t setX(size_t index, float newX);
-	void setY(size_t index, float newY);
+	//! @return new / final relIndex (if x changed)
+	size_t setX(size_t relIndex, float newX);
+	void setY(size_t relIndex, float newY);
 	float fitPos(float position, unsigned int max, unsigned int steps) const;
 	//! moves `startIndex` to `finalIndex` by swapping
-	void move(size_t startIndex, size_t finalIndex); // TODO LOCK
+	void move(size_t startRelIndex, size_t finalRelIndex); // TODO LOCK?
 
 	unsigned int m_length;
 	unsigned int m_height;
@@ -187,11 +200,14 @@ public:
 	}
 	~GridModelTyped() = default;
 
-	const T& getObject(size_t index) const { return m_TCustomData[GridModel::getItem(index).staticIndex]; }
-	virtual void setObject(size_t index, T object)
+	const T& getObject(size_t relIndex) const
 	{
-		m_TCustomData[GridModel::getItem(index).staticIndex] = object;
-		dataChangedAt(index); emit GridModel::dataChanged();
+		return m_TCustomData[GridModel::getItem(relIndex).staticIndex.load(std::memory_order_acquire)];
+	}
+	virtual void setObject(size_t relIndex, T object)
+	{
+		m_TCustomData[GridModel::getItem(relIndex).staticIndex.load(std::memory_order_acquire)] = object;
+		dataChangedAt(relIndex); emit GridModel::dataChanged();
 	}
 
 	//! @return index where added, `getCount()` if fails
@@ -202,16 +218,18 @@ public:
 		size_t returnIndex = GridModel::addItem(Item{info, (unsigned int)(m_TCustomData.size() - 1), (unsigned int)(m_TCustomData.size() - 1)});
 		return returnIndex;
 	}
-	void removeItem(size_t index)
+	//! @return the new index of the last elem
+	size_t removeItem(size_t relIndex)
 	{
-		size_t removeThisIndex{GridModel::getItem(index).staticIndex};
-		size_t swapIndex{GridModel::getItem(getCount() - 1).lookupIndex};
+		size_t removeThisIndex{GridModel::getItem(relIndex).staticIndex.load(std::memory_order_acquire)};
+		size_t swapIndex{GridModel::getItem(getCount() - 1).lookupIndex.load(std::memory_order_relaxed)};
 		//! set the last element's static index to `removeThisIndex`, then copy the last element to `removeThisIndex`
 		GridModel::setStaticIndex(swapIndex, removeThisIndex);
 		m_TCustomData[removeThisIndex] = m_TCustomData[m_TCustomData.size() - 1];
 		// removing the Item (object* + coords pair)
-		GridModel::removeItem(index);
+		GridModel::removeItem(relIndex);
 		m_TCustomData.pop_back();
+		return swapIndex;
 	}
 protected:
 	// save mechanism:
