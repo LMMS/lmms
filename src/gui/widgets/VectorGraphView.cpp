@@ -39,10 +39,11 @@ VectorGraphView::VectorGraphView(QWidget* parent, VectorGraphModel* model, size_
 	, m_mouseAction{}
 {}
 
-std::pair<QPointF, QPointF> VectorGraphView::getBoundingBox(size_t index) const
+std::pair<QPointF, QPointF> VectorGraphView::getBoundingBox(GridView::StaticIndex index) const
 {
-	float radius{castModel<VectorGraphModel>()->getObject(index).type == VGPoint::Type::attribute ? 0.3f : 0.5f};
-	GridModel::ItemInfo coords{castModel<VectorGraphModel>()->getItem(index).info};
+	size_t relIndex = model()->sToRIndex(index);
+	float radius{model()->getObject(relIndex).type == VGPoint::Type::attribute ? 0.3f : 0.5f};
+	GridModel::ItemInfo coords{model()->getItem(relIndex).info};
 	return std::make_pair(QPointF{coords.x - radius, coords.y - radius}, QPointF{coords.x + radius, coords.y + radius});
 }
 std::pair<QPointF, QPointF> VectorGraphView::getOnClickSearchArea(QPointF clickedPos) const
@@ -51,7 +52,7 @@ std::pair<QPointF, QPointF> VectorGraphView::getOnClickSearchArea(QPointF clicke
 	return std::make_pair(QPointF{clickedPos.x() - radius, clickedPos.y() - radius}, QPointF{clickedPos.x() + radius, clickedPos.y() + radius});
 }
 
-std::set<size_t> VectorGraphView::getSelection(QPointF start, QPointF end)
+std::set<GridView::StaticIndex> VectorGraphView::getSelection(QPointF start, QPointF end)
 {
 	return GridView::select(start, end, 0.0f);
 }
@@ -129,15 +130,15 @@ void VectorGraphView::mousePressEvent(QMouseEvent* me)
 		{
 			m_mouseAction = VectorGraphView::MouseAction::placeAction;
 			// select clicked point
-			size_t foundIndex(GridView::getClickedItem(modelPos));
-			if (foundIndex >= model()->getCount())
+			GridView::StaticIndex foundIndexS(GridView::getClickedItem(modelPos));
+			if (foundIndexS >= model()->getCount())
 			{
 				// place if not found
-				foundIndex = model()->addItem(VGPoint{VGPoint::Type::bezier},
+				size_t foundIndex = model()->addItem(VGPoint{VGPoint::Type::bezier},
 					GridModel::ItemInfo(modelPos.x(), modelPos.y()));
 				if (foundIndex < model()->getCount())
 				{
-					auto bb{getBoundingBox(foundIndex)};
+					auto bb{getBoundingBox(model()->rToSIndex(foundIndex))};
 					GridView::containSelection(bb.first, bb.second);
 				}
 			}
@@ -147,11 +148,11 @@ void VectorGraphView::mousePressEvent(QMouseEvent* me)
 				if (modelPos.x() > m_selectStart.x() && modelPos.y() > m_selectStart.y()
 					&& modelPos.x() < m_selectEnd.x() && modelPos.y() < m_selectEnd.y())
 				{
-					m_cursorPos = getBoundingBoxCenter(foundIndex);
+					m_cursorPos = getBoundingBoxCenter(foundIndexS);
 				}
 				else
 				{
-					auto bb{getBoundingBox(foundIndex)};
+					auto bb{getBoundingBox(foundIndexS)};
 					GridView::containSelection(bb.first, bb.second);
 				}
 			}
@@ -163,10 +164,10 @@ void VectorGraphView::mousePressEvent(QMouseEvent* me)
 	{
 		// delete
 		m_mouseAction = VectorGraphView::MouseAction::removeAction;
-		size_t foundIndex(GridView::getClickedItem(modelPos));
+		StaticIndex foundIndex(GridView::getClickedItem(modelPos));
 		if (foundIndex < model()->getCount())
 		{
-			model()->removeItem(foundIndex);
+			model()->removeItem(model()->sToRIndex(foundIndex));
 		}
 		me->accept();
 	}
@@ -267,10 +268,10 @@ void VectorGraphView::mouseMoveEvent(QMouseEvent* me)
 		case VectorGraphView::MouseAction::removeAction:
 			// this is expensive, but it is used to ensure
 			// this part of the code works when `getOnClickSearchArea` changes
-			size_t foundIndex(GridView::getClickedItem(modelPos));
+			GridView::StaticIndex foundIndex(GridView::getClickedItem(modelPos));
 			if (foundIndex < model()->getCount())
 			{
-				model()->removeItem(foundIndex);
+				model()->removeItem(model()->sToRIndex(foundIndex));
 			}
 			me->accept();
 			break;
@@ -284,7 +285,7 @@ void VectorGraphView::wheelEvent(QWheelEvent* we)
 	bool dir{we->angleDelta().y() > 0};
 	if (m_selection.empty() == false)
 	{
-		size_t foundIndex(GridView::getClickedItem(modelPos));
+		GridView::StaticIndex foundIndex(GridView::getClickedItem(modelPos));
 		if (foundIndex < model()->getCount())
 		{
 			we->accept();
@@ -305,14 +306,19 @@ void VectorGraphView::selectionDeleteAction()
 	GridView::updateSelection();
 	for (auto it = m_selection.rbegin(); it != m_selection.rend(); it = m_selection.rbegin())
 	{
-		model()->removeItem(*it);
+		model()->removeItem(model()->sToRIndex(*it));
 		m_selection.erase(*it);
 	}
 }
 void VectorGraphView::selectionCopyAction()
 {
 	GridView::updateSelection();
-	Clipboard::copyStringPair("VectorGraphData", model()->getPointsBase64(-m_selectStart.x(), -m_selectEnd.y(), &m_selection));
+	std::set<size_t> relativeSelection;
+	for (auto it = m_selection.begin(); it != m_selection.end(); ++it)
+	{
+		relativeSelection.insert(model()->sToRIndex(*it));
+	}
+	Clipboard::copyStringPair("VectorGraphData", model()->getPointsBase64(-m_selectStart.x(), -m_selectEnd.y(), &relativeSelection));
 }
 void VectorGraphView::selectionPasteAction()
 {
@@ -332,11 +338,12 @@ void VectorGraphView::selectionSwitchTypeAction(bool direction)
 	GridView::updateSelection();
 	for (auto it = m_selection.begin(); it != m_selection.end(); ++it)
 	{
-		VGPoint point{model()->getObject(*it)};
+		size_t relIndex = model()->sToRIndex(*it);
+		VGPoint point{model()->getObject(relIndex)};
 		int nextType{direction ? point.type + 1 : point.type - 1};
 		if (nextType < 0) { nextType = VGPoint::Type::steps; }
 		if (nextType == VGPoint::Type::count) { nextType = VGPoint::Type::bezier; }
-		model()->setObject(*it, VGPoint{static_cast<VGPoint::Type>(nextType)});
+		model()->setObject(relIndex, VGPoint{static_cast<VGPoint::Type>(nextType)});
 	}
 }
 

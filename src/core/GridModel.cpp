@@ -162,13 +162,13 @@ void GridModel::setStaticIndex(size_t relIndex, unsigned int newStaticIndex)
 	m_items[relIndex].staticIndex.store(newStaticIndex, std::memory_order_relaxed);
 	m_items[newStaticIndex].lookupIndex.store(relIndex, std::memory_order_release);
 }
-size_t GridModel::sToRIndex(size_t staticIndex) const
+size_t GridModel::sToRIndex(GridModel::StaticIndex staticIndex) const
 {
-	return m_items[staticIndex].lookupIndex.load(std::memory_order_acquire);
+	return m_items[staticIndex.index].lookupIndex.load(std::memory_order_acquire);
 }
-size_t GridModel::rToSIndex(size_t relIndex) const
+GridModel::StaticIndex GridModel::rToSIndex(size_t relIndex) const
 {
-	return m_items[relIndex].staticIndex.load(std::memory_order_acquire);
+	return StaticIndex(m_items[relIndex].staticIndex.load(std::memory_order_acquire));
 }
 
 void GridModel::move(size_t startIndex, size_t finalIndex)

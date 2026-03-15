@@ -56,7 +56,7 @@ public:
 	GridView(QWidget* parent, GridModel* model, size_t cubeWidth, size_t cubeHeight);
 	~GridView() override = default;
 
-	using static_size_t = size_t;
+	using StaticIndex = GridModel::StaticIndex;
 
 	GridModel* model() { return castModel<GridModel>(); }
 	const GridModel* model() const { return castModel<GridModel>(); }
@@ -75,7 +75,7 @@ public:
 	void moveToNearest(MoveDir dir);
 
 	//! @return `getCount()` if not found, else index
-	static_size_t getClickedItem(QPointF pos);
+	StaticIndex getClickedItem(QPointF pos);
 
 	void updateSelection();
 	void selectionMoveAction(QPointF offset);
@@ -96,20 +96,20 @@ protected:
 	//! selects everything between `start` and `end`
 	//! uses getBoundingBox's center for bounds checking
 	//! @param offset: how before start.x should we start searching
-	std::set<static_size_t> select(QPointF start, QPointF end, float offset);
-	QPointF getBoundingBoxCenter(static_size_t staticIndex) const;
+	std::set<StaticIndex> select(QPointF start, QPointF end, float offset);
+	QPointF getBoundingBoxCenter(StaticIndex staticIndex) const;
 	QPointF getBoundingBoxCenter(QPointF start, QPointF end) const;
 	//! should return the start coords and the end coords of an object / note / point
-	virtual std::pair<QPointF, QPointF> getBoundingBox(static_size_t staticIndex) const = 0;
+	virtual std::pair<QPointF, QPointF> getBoundingBox(StaticIndex staticIndex) const = 0;
 	//! should return an area where `getSelection()` could run
 	virtual std::pair<QPointF, QPointF> getOnClickSearchArea(QPointF clickedPos) const = 0;
 	//! use `select()` to apply selection automatically
 	//! @return a set of static indexes, that are inside the (start, end) box
-	virtual std::set<static_size_t> getSelection(QPointF start, QPointF end) { return select(start, end, 0.0); }
+	virtual std::set<StaticIndex> getSelection(QPointF start, QPointF end) { return select(start, end, 0.0); }
 	//! @return model->getCount() if failed else closest static index
-	static_size_t getClosest(const std::set<static_size_t>& selection, QPointF point);
+	StaticIndex getClosest(const std::set<StaticIndex>& selection, QPointF point);
 	//! contains static indexes to items in model()
-	std::set<static_size_t> m_selection;
+	std::set<StaticIndex> m_selection;
 
 	void modelChanged() override;
 

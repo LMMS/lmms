@@ -49,12 +49,9 @@ protected:
 	void mouseMoveEvent(QMouseEvent* me) override;
 	void keyPressEvent(QKeyEvent* ke) override;
 	void wheelEvent(QWheelEvent* we) override;
-	std::pair<QPointF, QPointF> getBoundingBox(size_t index) const override;
+	std::pair<QPointF, QPointF> getBoundingBox(GridView::StaticIndex index) const override;
 	std::pair<QPointF, QPointF> getOnClickSearchArea(QPointF clickedPos) const override;
-	std::set<size_t> getSelection(QPointF start, QPointF end) override;
-
-	//! returns getCount() if not found, else index
-	size_t selectOnClick(QPointF pos);
+	std::set<GridView::StaticIndex> getSelection(QPointF start, QPointF end) override;
 
 	void selectionDeleteAction();
 	void selectionCopyAction();

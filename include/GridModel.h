@@ -99,13 +99,24 @@ public:
 	struct StaticIndex
 	{
 		StaticIndex() : index{0} {}
-		StaticIndex(size_t indexIn) : index{indexIn} {}
 		StaticIndex(const StaticIndex& stIndex) : index{stIndex.index} {}
 		StaticIndex& operator=(StaticIndex rhs) { index = rhs.index; return *this; }
 		StaticIndex operator+(size_t rhs) { return StaticIndex{index + rhs}; }
 		StaticIndex operator-(size_t rhs) { return StaticIndex{index - rhs}; }
+		bool operator>=(const StaticIndex& rhs) const { return index >= rhs.index; }
+		bool operator>(const StaticIndex& rhs) const { return index > rhs.index; }
+		bool operator<=(const StaticIndex& rhs) const { return index <= rhs.index; }
+		bool operator<(const StaticIndex& rhs) const { return index < rhs.index; }
+		bool operator==(const StaticIndex& rhs) const { return index == rhs.index; }
+		bool operator>=(size_t rhs) const { return index >= rhs; }
+		bool operator>(size_t rhs) const { return index > rhs; }
+		bool operator<=(size_t rhs) const { return index <= rhs; }
+		bool operator<(size_t rhs) const { return index < rhs; }
 		operator size_t() = delete;
+		size_t getRaw() { return index; }
+		void setRaw(size_t indexIn) { index = indexIn; }
 	private:
+		StaticIndex(size_t indexIn) : index{indexIn} {}
 		size_t index;
 		friend class GridModel;
 	};
@@ -123,8 +134,8 @@ public:
 	//! @return new / final relative index (if x changed)
 	size_t setInfo(size_t relIndex, const ItemInfo& info);
 	size_t setInfo(size_t relIndex, const ItemInfo& info, unsigned int horizontalSteps, unsigned int verticalSteps);
-	size_t sToRIndex(size_t statIndex) const; //!< converts static indexes to relative index
-	size_t rToSIndex(size_t relIndex) const; //!< converts relative indexes to static index
+	size_t sToRIndex(StaticIndex statIndex) const; //!< converts static indexes to relative index
+	StaticIndex rToSIndex(size_t relIndex) const; //!< converts relative indexes to static index
 
 	//*** model management ***
 	//! @return item count
@@ -231,11 +242,6 @@ public:
 		GridModel::removeItem(relIndex);
 		m_TCustomData.pop_back();
 		return swapIndex;
-		/*
-		relIndex = 1 // rel
-		removeThisIndex = 2 // static
-		swapIndex = 2 // rel
-		*/
 	}
 protected:
 	// save mechanism:
