@@ -132,12 +132,24 @@ size_t GridModel::addItem(GridModel::Item itemIn)
 
 void GridModel::removeItem(size_t relIndex)
 {
+	printf("REMOVE ITEM BEFORE: %d\n", relIndex);
+	for (size_t i = 0; i < m_items.size(); ++i)
+	{
+		printf("[%ld]: x: %f, static: %ld, lookup: %ld (%ld)\n", i, m_items[i].info.x, m_items[i].staticIndex.load(std::memory_order_acquire),
+				m_items[i].lookupIndex.load(std::memory_order_acquire), m_items[m_items[i].staticIndex.load(std::memory_order_acquire)].lookupIndex.load(std::memory_order_acquire));
+	}
 	move(relIndex, m_items.size() - 1);
 	// TODO LOCK SAFETY
 	// ONLY ACTUALLY DESTRUCT THIS AFTER THE USERS ARE DONE TODO
 	m_items.pop_back();
 	dataChangedAt(relIndex);
 	emit dataChanged();
+	printf("REMOVE ITEM AFTER: %d\n", relIndex);
+	for (size_t i = 0; i < m_items.size(); ++i)
+	{
+		printf("[%ld]: x: %f, static: %ld, lookup: %ld (%ld)\n", i, m_items[i].info.x, m_items[i].staticIndex.load(std::memory_order_acquire),
+				m_items[i].lookupIndex.load(std::memory_order_acquire), m_items[m_items[i].staticIndex.load(std::memory_order_acquire)].lookupIndex.load(std::memory_order_acquire));
+	}
 }
 void GridModel::clearItems()
 {
@@ -164,7 +176,8 @@ void GridModel::move(size_t startIndex, size_t finalIndex)
 	printf("move %d to %d\n", startIndex, finalIndex);
 	for (size_t i = 0; i < m_items.size(); ++i)
 	{
-		printf("[%d]: x: %f, static: %d, lookup: %d\n", i, m_items[i].info.x, m_items[i].staticIndex.load(std::memory_order_acquire), m_items[i].lookupIndex.load(std::memory_order_acquire));
+		printf("[%ld]: x: %f, static: %ld, lookup: %ld (%ld)\n", i, m_items[i].info.x, m_items[i].staticIndex.load(std::memory_order_acquire),
+				m_items[i].lookupIndex.load(std::memory_order_acquire), m_items[m_items[i].staticIndex.load(std::memory_order_acquire)].lookupIndex.load(std::memory_order_acquire));
 	}
 	auto itemData{m_items[startIndex]};
 	if (startIndex > finalIndex)
@@ -187,7 +200,8 @@ void GridModel::move(size_t startIndex, size_t finalIndex)
 	m_items[finalIndex] << itemData;
 	for (size_t i = 0; i < m_items.size(); ++i)
 	{
-		printf("[%d]: x: %f, static: %d, lookup: %d\n", i, m_items[i].info.x, m_items[i].staticIndex.load(std::memory_order_acquire), m_items[i].lookupIndex.load(std::memory_order_acquire));
+		printf("[%ld]: x: %f, static: %ld, lookup: %ld (%ld)\n", i, m_items[i].info.x, m_items[i].staticIndex.load(std::memory_order_acquire),
+				m_items[i].lookupIndex.load(std::memory_order_acquire), m_items[m_items[i].staticIndex.load(std::memory_order_acquire)].lookupIndex.load(std::memory_order_acquire));
 	}
 }
 

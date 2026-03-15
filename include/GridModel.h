@@ -100,8 +100,8 @@ public:
 	{
 		StaticIndex() : index{0} {}
 		StaticIndex(size_t indexIn) : index{indexIn} {}
-		StaticIndex(StaticIndex stIndex) : index{stIndex.index} {}
-		StaticIndex& operator=(StaticIndex rhs) { index = rhs.index; }
+		StaticIndex(const StaticIndex& stIndex) : index{stIndex.index} {}
+		StaticIndex& operator=(StaticIndex rhs) { index = rhs.index; return *this; }
 		StaticIndex operator+(size_t rhs) { return StaticIndex{index + rhs}; }
 		StaticIndex operator-(size_t rhs) { return StaticIndex{index - rhs}; }
 		operator size_t() = delete;
@@ -226,10 +226,16 @@ public:
 		//! set the last element's static index to `removeThisIndex`, then copy the last element to `removeThisIndex`
 		GridModel::setStaticIndex(swapIndex, removeThisIndex);
 		m_TCustomData[removeThisIndex] = m_TCustomData[m_TCustomData.size() - 1];
+		GridModel::setStaticIndex(relIndex, m_TCustomData.size() - 1);
 		// removing the Item (object* + coords pair)
 		GridModel::removeItem(relIndex);
 		m_TCustomData.pop_back();
 		return swapIndex;
+		/*
+		relIndex = 1 // rel
+		removeThisIndex = 2 // static
+		swapIndex = 2 // rel
+		*/
 	}
 protected:
 	// save mechanism:
