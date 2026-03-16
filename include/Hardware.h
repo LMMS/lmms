@@ -29,21 +29,12 @@
 // Includes for busyWaitHint()
 #if defined(LMMS_HOST_X86_64) || defined(LMMS_HOST_X86)
 	#include <immintrin.h>
-// TODO: Use LMMS_HOST_ARM64 instead of __aarch64__ and _M_ARM64 once MSVC quits
-// using its own non-standard intrinsics headers (which may be never)
-#elif defined(__aarch64__) // arm64
-	#if defined(__ARM_ACLE)
+#elif defined(LMMS_HOST_ARM64)
+	#if defined(__ARM_ACLE) || defined(__GNUG__) // HACK: GCC does not define __ARM_ACLE, include anyways
 		#include <arm_acle.h>
-	#elif defined(__GNUG__)
-		// HACK: Remove this once GCC properly provides __ARM_ACLE
-		// 15 is the only allowed value for the parameter, so just ignore it and use 15 lol
-		inline void __isb(unsigned int scope = 15)
-		{
-			asm volatile ("isb 15" ::: "memory");
-		}
+	#elif defined(_M_ARM64) // arm64 msvc
+		#include <intrin.h>
 	#endif
-#elif defined(_M_ARM64) // arm64 msvc
-	#include <intrin.h>
 #endif
 
 namespace lmms
@@ -110,29 +101,11 @@ inline void disableDenormals()
 	// ARMv7-A and ARMv7-R edition
 	// B4.1.58 FPSCR, Floating-point Status and Control Register, VMSA
 	constexpr intptr_t flushToZero = 1 << 24;
-
-	// TODO: Use the ACLE __arm_wsr()/__arm_rsr instead of inline asm
-	// 
-	constexpr char* FPSCR =
 	#if defined(__ARM_NEON)
-		"fpscr"
+		__arm_wsr("fpscr", __arm_rsr("fpscr") | flushToZero);
 	#else
-		"fpcr"
+		__arm_wsr("fpcr", __arm_rsr("fpcr") | flushToZero);
 	#endif
-		;
-
-	__arm_wsr(FPSCR, __arm_rsr(FPSCR) | flushToZero);
-	
-	// intptr_t fpsr = 0;
-	// #if defined(__ARM_NEON)
-	// 	asm volatile ("vmrs %0, fpscr" : "=r" (fpsr));
-	// 	fpsr |= flushToZero;
-	// 	asm volatile ("vmsr fpscr, %0" :: "ri" (fpsr));
-	// #else
-	// 	asm volatile ("mrs %0, fpcr" : "=r" (fpsr));
-	// 	fpsr |= flushToZero;
-	// 	asm volatile ("msr fpcr, %0" :: "ri" (fpsr));
-	// #endif
 #else
 	#warning Cannot disable floating-point denormals or enable flush-to-zero mode on this platform! Performance may suffer.
 #endif
