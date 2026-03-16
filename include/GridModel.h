@@ -178,8 +178,7 @@ private:
 
 	//! items are sorted by x position ascending
 	std::vector<Item> m_items;
-	//! limits m_items size
-	unsigned int m_countLimit;
+	//! what users of this class see as the size
 	std::atomic<unsigned int> m_viewerSize;
 };
 

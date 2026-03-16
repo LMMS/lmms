@@ -40,7 +40,6 @@ GridModel::GridModel(unsigned int countLimit, unsigned int length, unsigned int 
 	, m_height{height}
 	, m_horizontalSteps{horizontalSteps}
 	, m_verticalSteps{verticalSteps}
-	, m_countLimit{countLimit}
 	, m_viewerSize{0}
 {
 	m_items.resize(countLimit);
@@ -114,7 +113,7 @@ size_t GridModel::findIndex(float xPos) const
 
 size_t GridModel::addItemG(GridModel::Item itemIn)
 {
-	if (getCount() >= m_countLimit) { return m_countLimit; }
+	if (getCount() >= getCountLimit()) { return getCountLimit(); }
 
 	size_t foundIndex{findIndex(itemIn.info.x)};
 	m_items[getCount()] = itemIn;
@@ -232,7 +231,7 @@ size_t GridModel::getCount() const
 }
 unsigned int GridModel::getCountLimit() const
 {
-	return m_countLimit;
+	return m_items.size();
 }
 unsigned int GridModel::getLength() const
 {
@@ -265,8 +264,7 @@ int GridModel::resizeGridCountLimitG(size_t newLimit)
 
 	size_t curSize{getCount()};
 	int deleteCount = std::max(0, (int)curSize - (int)newLimit);
-	m_countLimit = newLimit;
-	m_viewerSize.store(std::min(curSize, m_countLimit), std::memory_order_release);
+	m_viewerSize.store(std::min(curSize, newLimit), std::memory_order_release);
 	m_items.resize(newLimit);
 
 	Engine::audioEngine()->doneChangeInModel();
