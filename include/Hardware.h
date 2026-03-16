@@ -33,9 +33,6 @@
 	#if defined(__ARM_ACLE)
 		#include <arm_acle.h>
 	#elif defined(__GNUG__) // HACK: Remove this once GCC properly provides __ARM_ACLE
-		// Include for __arm_wsr() & __arm_rsr() even though __ARM_ACLE is not defined
-		#include <arm_acle.h>
-
 		// HACK: Use the actual __isb() ACLE once GCC provides it
 		// 15 is the only allowed value for the parameter, so just ignore it and use 15 lol
 		inline void __isb(unsigned int scope = 15)
@@ -107,15 +104,11 @@ inline void disableDenormals()
 		_MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON);
 	}
 #elif defined(LMMS_HOST_ARM64)
-	// ARM® Architecture Reference Manual
-	// ARMv7-A and ARMv7-R edition
-	// B4.1.58 FPSCR, Floating-point Status and Control Register, VMSA
-	constexpr intptr_t flushToZero = 1 << 24;
-	#if defined(__ARM_NEON)
-		__arm_wsr("FPSCR", __arm_rsr("FPSCR") | flushToZero);
-	#else
-		__arm_wsr("FPCR", __arm_rsr("FPCR") | flushToZero);
-	#endif
+	// https://developer.arm.com/documentation/ddi0601/2025-12/AArch64-Registers/FPCR--Floating-point-Control-Register
+	constexpr std::intptr_t fz = 1 << 24; // Flushing denormalized numbers to zero control bit
+	std::intptr_t fpcr;
+	asm volatile ("mrs %0, fpcr" : "=r" (fpcr));
+	asm volatile ("msr fpcr, %0" :: "ri" (fpcr | fz));
 #else
 	#warning Cannot disable floating-point denormals or enable flush-to-zero mode on this platform! Performance may suffer.
 #endif
