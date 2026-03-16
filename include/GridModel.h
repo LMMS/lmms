@@ -40,8 +40,8 @@ static const unsigned int GRID_MAX_STEPS = 100000;
 
 /* This class handles
 	1. grid area
-	2. storing and pairing `ItemInfo` to custom data
-	3. getting `ItemInfo` and pairing information
+	2. storing `ItemInfo`
+	3. managing static lookup indexes for the stored items 
 	4. position changes and quantization
 	5. RT safe allocation
 	This class doesn't handle
@@ -59,8 +59,8 @@ Q_OBJECT
 public:
 	struct ItemInfo
 	{
-		float x;
-		float y;
+		float x = 0.0f;
+		float y = 0.0f;
 	};
 	struct Item
 	{
@@ -83,7 +83,7 @@ public:
 			, staticIndex{rhs.staticIndex.load(std::memory_order_relaxed)}
 			, lookupIndex{rhs.lookupIndex.load()}
 		{}
-		void operator==(const Item& rhs)
+		void operator=(const Item& rhs)
 		{
 			info = rhs.info;
 			staticIndex.store(rhs.staticIndex.load(std::memory_order_relaxed), std::memory_order_relaxed);
@@ -113,7 +113,7 @@ public:
 		bool operator<=(size_t rhs) const { return index <= rhs; }
 		bool operator<(size_t rhs) const { return index < rhs; }
 		operator size_t() = delete;
-		size_t getRaw() { return index; }
+		size_t getRaw() const { return index; }
 		void setRaw(size_t indexIn) { index = indexIn; }
 	private:
 		StaticIndex(size_t indexIn) : index{indexIn} {}
@@ -145,8 +145,6 @@ public:
 	unsigned int getHeight() const;
 	void setSteps(unsigned int horizontalSteps, unsigned int verticalSteps);
 	void resizeGridArea(size_t length, size_t height);
-	//! @return how many items were deleted
-	int resizeGridCountLimit(size_t newLimit);
 
 	virtual ~GridModel();
 protected:
@@ -156,11 +154,14 @@ protected:
 
 	//*** item management ***
 	//! @return relative index where added, `getCount()` if fails
-	size_t addItem(Item itemIn);
-	void removeItem(size_t relIndex); // TODO UNSAFE, DESTRUCTS LAST ELEM WHILE IT IS USED
-	void clearItems();
+	size_t addItemG(Item itemIn);
+	void removeItemG(size_t relIndex);
+	void clearItemsG();
 	//! @return get and set relative index pointing to custom data, DOESN'T EMIT
 	void setStaticIndex(size_t relIndex, unsigned int newStaticIndex);
+
+	//! @return how many items were deleted
+	int resizeGridCountLimitG(size_t newLimit);
 private:
 	//! only call these with fitted values (`fitPos`)
 	//! @return new / final relIndex (if x changed)
@@ -168,7 +169,7 @@ private:
 	void setY(size_t relIndex, float newY);
 	float fitPos(float position, unsigned int max, unsigned int steps) const;
 	//! moves `startIndex` to `finalIndex` by swapping
-	void move(size_t startRelIndex, size_t finalRelIndex); // TODO LOCK?
+	void move(size_t startRelIndex, size_t finalRelIndex);
 
 	unsigned int m_length;
 	unsigned int m_height;
@@ -179,8 +180,7 @@ private:
 	std::vector<Item> m_items;
 	//! limits m_items size
 	unsigned int m_countLimit;
-
-	friend class gui::GridView;
+	std::atomic<unsigned int> m_viewerSize;
 };
 
 /* This class handles
@@ -207,7 +207,7 @@ public:
 		Model* parent, QString displayName = QString(), bool defaultConstructed = false)
 		: GridModel{countLimit, length, height, horizontalSteps, verticalSteps, parent, displayName, defaultConstructed}
 	{
-		m_TCustomData.reserve(countLimit);
+		m_TCustomData.resize(countLimit);
 	}
 	~GridModelTyped() = default;
 
@@ -221,27 +221,36 @@ public:
 		dataChangedAt(relIndex); emit GridModel::dataChanged();
 	}
 
-	//! @return index where added, `getCount()` if fails
+	//! @return relative index where added, `getCount()` if fails
 	size_t addItem(T object, ItemInfo info)
 	{
-		if (getCount() >= getCountLimit()) { return getCountLimit(); }
-		m_TCustomData.push_back(object);
-		size_t returnIndex = GridModel::addItem(Item{info, (unsigned int)(m_TCustomData.size() - 1), (unsigned int)(m_TCustomData.size() - 1)});
+		size_t curCount = getCount();
+		if (curCount >= getCountLimit()) { return getCountLimit(); }
+		m_TCustomData[curCount] = object;
+		size_t returnIndex = GridModel::addItemG(Item{info, (unsigned int)(curCount), (unsigned int)(curCount)});
 		return returnIndex;
 	}
-	//! @return the new index of the last elem
+	//! @return the new relative index of the last elem
 	size_t removeItem(size_t relIndex)
 	{
+		size_t curCount = getCount();
 		size_t removeThisIndex{GridModel::getItem(relIndex).staticIndex.load(std::memory_order_acquire)};
 		size_t swapIndex{GridModel::getItem(getCount() - 1).lookupIndex.load(std::memory_order_relaxed)};
 		//! set the last element's static index to `removeThisIndex`, then copy the last element to `removeThisIndex`
 		GridModel::setStaticIndex(swapIndex, removeThisIndex);
-		m_TCustomData[removeThisIndex] = m_TCustomData[m_TCustomData.size() - 1];
-		GridModel::setStaticIndex(relIndex, m_TCustomData.size() - 1);
+		m_TCustomData[removeThisIndex] = m_TCustomData[curCount - 1];
+		GridModel::setStaticIndex(relIndex, curCount - 1);
 		// removing the Item (object* + coords pair)
-		GridModel::removeItem(relIndex);
-		m_TCustomData.pop_back();
+		GridModel::removeItemG(relIndex);
 		return swapIndex;
+	}
+	//! @return how many items were deleted, NOTE: LOCKS
+	int resizeGridCountLimit(size_t newLimit)
+	{
+		if (newLimit > getCountLimit()) { m_TCustomData.resize(newLimit); }
+		int deleteCount = resizeGridCountLimit(newLimit);
+		if (newLimit <= getCountLimit()) { m_TCustomData.resize(newLimit); }
+		return deleteCount;
 	}
 protected:
 	// save mechanism:
@@ -286,7 +295,7 @@ protected:
 		}
 		delete[] startPtr;
 	}
-	void clearPairs() { GridModel::clearItems(); m_TCustomData.clear(); }
+	void clearPairs() { clearItemsG(); }
 	virtual SaveData customDataToSaveData(const T& data) { return data; }
 	virtual T saveDataToCustomData(const SaveData& data) { return data; }
 };

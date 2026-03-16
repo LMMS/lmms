@@ -27,8 +27,6 @@
 #include <cassert>
 #include <cmath>
 
-#include <stdio.h>
-
 #include "Engine.h"
 #include "AudioEngine.h"
 
@@ -43,9 +41,9 @@ GridModel::GridModel(unsigned int countLimit, unsigned int length, unsigned int 
 	, m_horizontalSteps{horizontalSteps}
 	, m_verticalSteps{verticalSteps}
 	, m_countLimit{countLimit}
+	, m_viewerSize{0}
 {
-	m_items.reserve(countLimit);
-	assert(m_countLimit == m_items.capacity());
+	m_items.resize(countLimit);
 }
 
 GridModel::~GridModel()
@@ -54,7 +52,7 @@ GridModel::~GridModel()
 int GridModel::findIndexFromPos(float xPos, float radius) const
 {
 	size_t output = findIndex(xPos);
-	if (output < m_items.size() && std::abs(m_items[output].info.x - xPos) < radius)
+	if (output < getCount() && std::abs(m_items[output].info.x - xPos) < radius)
 	{
 		return output;
 	}
@@ -69,7 +67,7 @@ size_t GridModel::findIndex(float xPos) const
 {
 	// binary search
 	int low = 0;
-	int high = m_items.size();
+	int high = getCount();
 	int mid = 0;
 	// if the target is smaller
 	bool isSmaller = false;
@@ -78,7 +76,7 @@ size_t GridModel::findIndex(float xPos) const
         mid = ((high - low) / 2) + low;
 
         // DO NOT CHANGE
-        if (static_cast<size_t>(mid) >= m_items.size()
+        if (static_cast<size_t>(mid) >= getCount()
 			|| (xPos <= m_items[mid].info.x && (mid == 0 || m_items[mid - 1].info.x < xPos)))
 		{
 			break;
@@ -95,11 +93,11 @@ size_t GridModel::findIndex(float xPos) const
     }
 #ifdef LMMS_DEBUG
 	// asserts:
-	if (static_cast<size_t>(mid) >= m_items.size())
+	if (static_cast<size_t>(mid) >= getCount())
 	{
-		if (m_items.size() > 0)
+		if (getCount() > 0)
 		{
-			assert(xPos > m_items[m_items.size() - 1].info.x);
+			assert(xPos > m_items[getCount() - 1].info.x);
 		}
 	}
 	else
@@ -114,47 +112,33 @@ size_t GridModel::findIndex(float xPos) const
   	return mid;
 }
 
-size_t GridModel::addItem(GridModel::Item itemIn)
+size_t GridModel::addItemG(GridModel::Item itemIn)
 {
-	assert(m_countLimit == m_items.capacity());
-	if (m_items.size() >= m_countLimit) { return m_countLimit; }
+	if (getCount() >= m_countLimit) { return m_countLimit; }
 
 	size_t foundIndex{findIndex(itemIn.info.x)};
-	m_items.push_back(itemIn);
-	if (foundIndex + 1 < m_items.size())
+	m_items[getCount()] = itemIn;
+	++m_viewerSize;
+	if (foundIndex + 1 < getCount())
 	{
-		move(m_items.size() - 1, foundIndex);
+		move(getCount() - 1, foundIndex);
 	}
 	dataChangedAt(foundIndex);
 	emit dataChanged();
 	return foundIndex;
 }
 
-void GridModel::removeItem(size_t relIndex)
+void GridModel::removeItemG(size_t relIndex)
 {
-	printf("REMOVE ITEM BEFORE: %d\n", relIndex);
-	for (size_t i = 0; i < m_items.size(); ++i)
-	{
-		printf("[%ld]: x: %f, static: %ld, lookup: %ld (%ld)\n", i, m_items[i].info.x, m_items[i].staticIndex.load(std::memory_order_acquire),
-				m_items[i].lookupIndex.load(std::memory_order_acquire), m_items[m_items[i].staticIndex.load(std::memory_order_acquire)].lookupIndex.load(std::memory_order_acquire));
-	}
-	move(relIndex, m_items.size() - 1);
-	// TODO LOCK SAFETY
-	// ONLY ACTUALLY DESTRUCT THIS AFTER THE USERS ARE DONE TODO
-	m_items.pop_back();
+	if (getCount() <= 0) { return; }
+	move(relIndex, getCount() - 1);
+	--m_viewerSize;
 	dataChangedAt(relIndex);
 	emit dataChanged();
-	printf("REMOVE ITEM AFTER: %d\n", relIndex);
-	for (size_t i = 0; i < m_items.size(); ++i)
-	{
-		printf("[%ld]: x: %f, static: %ld, lookup: %ld (%ld)\n", i, m_items[i].info.x, m_items[i].staticIndex.load(std::memory_order_acquire),
-				m_items[i].lookupIndex.load(std::memory_order_acquire), m_items[m_items[i].staticIndex.load(std::memory_order_acquire)].lookupIndex.load(std::memory_order_acquire));
-	}
 }
-void GridModel::clearItems()
+void GridModel::clearItemsG()
 {
-	// "Calling clear() does not affect the result of capacity()"
-	m_items.clear();
+	m_viewerSize.store(0, std::memory_order_release);
 }
 
 void GridModel::setStaticIndex(size_t relIndex, unsigned int newStaticIndex)
@@ -173,12 +157,6 @@ GridModel::StaticIndex GridModel::rToSIndex(size_t relIndex) const
 
 void GridModel::move(size_t startIndex, size_t finalIndex)
 {
-	printf("move %d to %d\n", startIndex, finalIndex);
-	for (size_t i = 0; i < m_items.size(); ++i)
-	{
-		printf("[%ld]: x: %f, static: %ld, lookup: %ld (%ld)\n", i, m_items[i].info.x, m_items[i].staticIndex.load(std::memory_order_acquire),
-				m_items[i].lookupIndex.load(std::memory_order_acquire), m_items[m_items[i].staticIndex.load(std::memory_order_acquire)].lookupIndex.load(std::memory_order_acquire));
-	}
 	auto itemData{m_items[startIndex]};
 	if (startIndex > finalIndex)
 	{
@@ -198,11 +176,6 @@ void GridModel::move(size_t startIndex, size_t finalIndex)
 	}
 	m_items[itemData.staticIndex.load(std::memory_order_acquire)].lookupIndex.store(finalIndex, std::memory_order_release);
 	m_items[finalIndex] << itemData;
-	for (size_t i = 0; i < m_items.size(); ++i)
-	{
-		printf("[%ld]: x: %f, static: %ld, lookup: %ld (%ld)\n", i, m_items[i].info.x, m_items[i].staticIndex.load(std::memory_order_acquire),
-				m_items[i].lookupIndex.load(std::memory_order_acquire), m_items[m_items[i].staticIndex.load(std::memory_order_acquire)].lookupIndex.load(std::memory_order_acquire));
-	}
 }
 
 size_t GridModel::setX(size_t relIndex, float newX)
@@ -241,7 +214,7 @@ size_t GridModel::setInfo(size_t relIndex, const GridModel::ItemInfo& info, unsi
 }
 const GridModel::Item& GridModel::getItem(size_t relIndex) const
 {
-	assert(relIndex < m_items.size());
+	assert(relIndex < getCount());
 	return m_items[relIndex];
 }
 float GridModel::fitPos(float position, unsigned int max, unsigned int steps) const
@@ -255,7 +228,7 @@ float GridModel::fitPos(float position, unsigned int max, unsigned int steps) co
 
 size_t GridModel::getCount() const
 {
-	return m_items.size();
+	return m_viewerSize.load(std::memory_order_acquire);
 }
 unsigned int GridModel::getCountLimit() const
 {
@@ -279,30 +252,24 @@ void GridModel::resizeGridArea(size_t length, size_t height)
 	if (shouldClamp)
 	{
 		// inefficiently clamping
-		for (size_t i = 0; i < m_items.size(); ++i)
+		for (size_t i = 0; i < getCount(); ++i)
 		{
 			setInfo(i, m_items[i].info);
 		}
 	}
 	emit propertiesChanged();
 }
-int GridModel::resizeGridCountLimit(size_t newLimit)
+int GridModel::resizeGridCountLimitG(size_t newLimit)
 {
-	int deleteCount = 0;
 	Engine::audioEngine()->requestChangeInModel();
-	if (m_items.size() > newLimit)
-	{
-		deleteCount = m_items.size() - newLimit;
-		m_items.resize(newLimit);
-	}
-	else
-	{
-		m_items.shrink_to_fit();
-		m_items.reserve(newLimit);
-	}
-	Engine::audioEngine()->doneChangeInModel();
+
+	size_t curSize{getCount()};
+	int deleteCount = std::max(0, (int)curSize - (int)newLimit);
 	m_countLimit = newLimit;
-	assert(m_countLimit == m_items.capacity());
+	m_viewerSize.store(std::min(curSize, m_countLimit), std::memory_order_release);
+	m_items.resize(newLimit);
+
+	Engine::audioEngine()->doneChangeInModel();
 	return deleteCount;
 }
 

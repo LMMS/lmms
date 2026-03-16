@@ -291,7 +291,6 @@ QPointF GridView::getBoundingBoxCenter(QPointF start, QPointF end) const
 
 std::set<GridView::StaticIndex> GridView::select(QPointF start, QPointF end, float offset)
 {
-	printf("select() between: %f and %f\n", start.x(), end.x());
 	std::set<StaticIndex> output{};
 	size_t startIndex = model()->findIndex(start.x() - offset);
 	for (size_t i = startIndex; i < model()->getCount(); ++i)
@@ -302,7 +301,6 @@ std::set<GridView::StaticIndex> GridView::select(QPointF start, QPointF end, flo
 		if (end.x() <= bb.first.x()) { break; }
 		if (start.x() < curCenter.x() && curCenter.x() < end.x() && start.y() < curCenter.y() && curCenter.y() < end.y())
 		{
-			printf("selected: [%d] %f stat: %d\n", i, curCenter.x(), model()->rToSIndex(i));
 			output.insert(model()->rToSIndex(i));
 		}
 	}
@@ -325,12 +323,10 @@ void GridView::selectionMoveAction(QPointF offset)
 	if (m_selection.empty()) { return; }
 	for (auto it = m_selection.rbegin(); it != m_selection.rend(); ++it)
 	{
-		printf("MoveSelection\nselectionMoveAction static: %d -> %d relative\n", *it, model()->sToRIndex(*it));
 		GridModel::ItemInfo curInfo{model()->getItem(model()->sToRIndex(*it)).info};
 		model()->setInfo(model()->sToRIndex(*it), GridModel::ItemInfo{
 			curInfo.x + static_cast<float>(offset.x()),
 			curInfo.y + static_cast<float>(offset.y())});
-		printf("selectionMoveAction static: %d -> %d relative\n", *it, model()->sToRIndex(*it));
 	}
 }
 GridView::StaticIndex GridView::getClosest(const std::set<GridView::StaticIndex>& selection, QPointF point)
