@@ -30,8 +30,18 @@
 #if defined(LMMS_HOST_X86_64) || defined(LMMS_HOST_X86)
 	#include <immintrin.h>
 #elif defined(LMMS_HOST_ARM64)
-	#if defined(__ARM_ACLE) || defined(__GNUG__) // HACK: GCC does not define __ARM_ACLE, include anyways
+	#if defined(__ARM_ACLE)
 		#include <arm_acle.h>
+	#elif defined(__GNUG__) // HACK: Remove this once GCC properly provides __ARM_ACLE
+		// Include for __arm_wsr() & __arm_rsr() even though __ARM_ACLE is not defined
+		#include <arm_acle.h>
+
+		// HACK: Use the actual __isb() ACLE once GCC provides it
+		// 15 is the only allowed value for the parameter, so just ignore it and use 15 lol
+		inline void __isb(unsigned int scope = 15)
+		{
+			asm volatile ("isb 15" ::: "memory");
+		}
 	#elif defined(_M_ARM64) // arm64 msvc
 		#include <intrin.h>
 	#endif
@@ -102,9 +112,9 @@ inline void disableDenormals()
 	// B4.1.58 FPSCR, Floating-point Status and Control Register, VMSA
 	constexpr intptr_t flushToZero = 1 << 24;
 	#if defined(__ARM_NEON)
-		__arm_wsr("fpscr", __arm_rsr("fpscr") | flushToZero);
+		__arm_wsr("FPSCR", __arm_rsr("FPSCR") | flushToZero);
 	#else
-		__arm_wsr("fpcr", __arm_rsr("fpcr") | flushToZero);
+		__arm_wsr("FPCR", __arm_rsr("FPCR") | flushToZero);
 	#endif
 #else
 	#warning Cannot disable floating-point denormals or enable flush-to-zero mode on this platform! Performance may suffer.
