@@ -38,7 +38,6 @@ VectorGraphModel::VectorGraphModel(unsigned int countLimit, unsigned int length,
 	, m_buffer{}
 	, m_allChanged{true}
 	, m_changedData{}
-	, m_setAndBufferMutex{}
 {
 	m_buffer.resize(bufferSize);
 }
@@ -63,7 +62,6 @@ void VectorGraphModel::renderChangedPoints()
 		m_changedData.clear();
 		return;
 	}
-	std::lock_guard<std::mutex> lock(m_setAndBufferMutex);
 	renderStart(m_buffer);
 
 	signed long long lastNotAttributeIndex{-1};
@@ -387,17 +385,14 @@ void VectorGraphModel::loadSettings(const QDomElement& element)
 }
 QString VectorGraphModel::getPointsBase64(float xOffset, float yOffset, const std::set<size_t>* selection)
 {
-	std::lock_guard<std::mutex> lock(m_setAndBufferMutex);
 	return dataToBase64(xOffset, yOffset, selection);
 }
 void VectorGraphModel::addPointsBase64(QString base64String, float xOffset, float yOffset)
 {
-	std::lock_guard<std::mutex> lock(m_setAndBufferMutex);
 	addBase64Data(base64String, xOffset, yOffset);
 }
 void VectorGraphModel::clear()
 {
-	std::lock_guard<std::mutex> lock(m_setAndBufferMutex);
 	clearPairs();
 }
 

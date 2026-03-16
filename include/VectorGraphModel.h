@@ -26,7 +26,6 @@
 #define LMMS_VECTOR_GRAPH_MODEL_H
 
 #include <set>
-#include <mutex>
 
 #include "GridModel.h"
 #include "JournallingObject.h"
@@ -99,7 +98,6 @@ private:
 	std::vector<float> m_buffer;
 	bool m_allChanged;
 	std::set<size_t> m_changedData;
-	std::mutex m_setAndBufferMutex;
 };
 
 } // namespace lmms
