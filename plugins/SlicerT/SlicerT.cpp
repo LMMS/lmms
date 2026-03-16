@@ -336,7 +336,7 @@ void SlicerT::saveSettings(QDomDocument& document, QDomElement& element)
 	element.setAttribute("totalSlices", static_cast<int>(m_slicePoints.size()));
 	for (auto i = std::size_t{0}; i < m_slicePoints.size(); i++)
 	{
-		element.setAttribute(tr("slice_%1").arg(i), m_slicePoints[i]);
+		element.setAttribute(QString("slice_%1").arg(i), m_slicePoints[i]);
 	}
 
 	m_fadeOutFrames.saveSettings(document, element, "fadeOut");
@@ -372,7 +372,7 @@ void SlicerT::loadSettings(const QDomElement& element)
 		m_slicePoints = {};
 		for (int i = 0; i < totalSlices; i++)
 		{
-			m_slicePoints.push_back(element.attribute(tr("slice_%1").arg(i)).toFloat());
+			m_slicePoints.push_back(element.attribute(QString("slice_%1").arg(i)).toFloat());
 		}
 	}
 
