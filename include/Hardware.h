@@ -84,34 +84,58 @@ inline void busyWaitHint()
 
 
 
-#if defined(LMMS_HOST_X86_64) || defined(LMMS_HOST_X86)
-// Intel® 64 and IA-32 Architectures Software Developer’s Manual,
-// Volume 1: Basic Architecture,
-// 11.6.3 Checking for the DAZ Flag in the MXCSR Register
-int inline canWeDAZ()
-{
-	alignas(16) unsigned char buffer[512] = {0};
-#if defined(LMMS_HOST_X86)
-	_fxsave(buffer);
-#elif defined(LMMS_HOST_X86_64)
-	_fxsave64(buffer);
-#endif
-	// Bit 6 of the MXCSR_MASK, i.e. in the lowest byte,
-	// tells if we can use the DAZ flag.
-	return (buffer[28] & (1 << 6)) != 0;
-}
-#endif
-
-
-
 // Set denormal protection for this thread.
-void inline disableDenormals()
+inline void disableDenormals()
 {
 #if defined(LMMS_HOST_X86_64) || defined(LMMS_HOST_X86)
-	// Setting DAZ might freeze systems not supporting it
-	if (canWeDAZ()) { _MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON); }
 	_MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON); // FTZ flag
-#endif // TODO: ARM support
+	// Setting DAZ might freeze systems not supporting it:
+	// Intel® 64 and IA-32 Architectures Software Developer’s Manual,
+	// Volume 1: Basic Architecture,
+	// 11.6.3 Checking for the DAZ Flag in the MXCSR Register
+	alignas(16) unsigned char buffer[512] = {0};
+	#if defined(LMMS_HOST_X86)
+		_fxsave(buffer);
+	#elif defined(LMMS_HOST_X86_64)
+		_fxsave64(buffer);
+	#endif
+	// Bit 6 of the MXCSR_MASK, i.e. in the lowest byte, tells if we
+	// can use the DAZ flag.
+	if (buffer[28] & (1 << 6))
+	{
+		_MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON);
+	}
+#elif defined(LMMS_HOST_ARM64)
+	// ARM® Architecture Reference Manual
+	// ARMv7-A and ARMv7-R edition
+	// B4.1.58 FPSCR, Floating-point Status and Control Register, VMSA
+	constexpr intptr_t flushToZero = 1 << 24;
+
+	// TODO: Use the ACLE __arm_wsr()/__arm_rsr instead of inline asm
+	// 
+	constexpr char* FPSCR =
+	#if defined(__ARM_NEON)
+		"fpscr"
+	#else
+		"fpcr"
+	#endif
+		;
+
+	__arm_wsr(FPSCR, __arm_rsr(FPSCR) | flushToZero);
+	
+	// intptr_t fpsr = 0;
+	// #if defined(__ARM_NEON)
+	// 	asm volatile ("vmrs %0, fpscr" : "=r" (fpsr));
+	// 	fpsr |= flushToZero;
+	// 	asm volatile ("vmsr fpscr, %0" :: "ri" (fpsr));
+	// #else
+	// 	asm volatile ("mrs %0, fpcr" : "=r" (fpsr));
+	// 	fpsr |= flushToZero;
+	// 	asm volatile ("msr fpcr, %0" :: "ri" (fpsr));
+	// #endif
+#else
+	#warning Cannot disable floating-point denormals or enable flush-to-zero mode on this platform! Performance may suffer.
+#endif
 }
 
 } // namespace lmms
