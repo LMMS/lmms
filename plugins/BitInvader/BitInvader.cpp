@@ -170,36 +170,35 @@ QString BitInvader::nodeName() const { return bitinvader_plugin_descriptor.name;
 
 void BitInvader::playNote(NotePlayHandle* nph, SampleFrame* workingBuffer)
 {
-	if (!nph->m_pluginData) { nph->m_pluginData = new BitInvaderNote{}; }
+	if (!nph->m_pluginData) { nph->m_pluginData = new BitInvaderIndex{}; }
 
 	const auto nfac = m_normalize.value() ? m_normalizeFactor : 1.f;
 	const auto norg = m_normalize.value() ? m_normalizeOffset : 0.f;
 	const auto& wavetable = m_graph.samples();
-	const auto wavetableLenReal = static_cast<float>(m_graph.length());
+	const auto wavetableLenReal = static_cast<BitInvaderIndex>(m_graph.length());
 	const auto phasePerSample = nph->frequency() / Engine::audioEngine()->outputSampleRate();
 	const f_cnt_t frames = nph->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = nph->noteOffset();
 
-	auto note = static_cast<BitInvaderNote*>(nph->m_pluginData);
+	auto& note = *static_cast<BitInvaderIndex*>(nph->m_pluginData);
 	for (f_cnt_t frame = offset; frame < frames + offset; ++frame)
 	{
-		note->indexFrac = std::fmod(
-			note->indexFrac + phasePerSample * wavetableLenReal,
+		note = std::fmod(
+			note + phasePerSample * wavetableLenReal,
 			wavetableLenReal
 		);
-		note->index = static_cast<std::size_t>(note->indexFrac);
+		const auto idx = static_cast<std::size_t>(note);
 
 		const auto samp = m_interpolation.value()
 			? std::lerp(
-				wavetable[note->index],
-				wavetable[(1 + note->index) % m_graph.length()],
-				fraction(note->indexFrac)
+				wavetable[idx],
+				wavetable[(1 + idx) % m_graph.length()],
+				fraction(note)
 			)
-			: wavetable[note->index];
+			: wavetable[idx];
 
 		workingBuffer[frame] = SampleFrame(samp * nfac + norg);
 	}
-
 	applyRelease(workingBuffer, nph);
 }
 
@@ -208,7 +207,7 @@ void BitInvader::playNote(NotePlayHandle* nph, SampleFrame* workingBuffer)
 
 void BitInvader::deleteNotePluginData(NotePlayHandle* nph)
 {
-	delete static_cast<BitInvaderNote*>(nph->m_pluginData);
+	delete static_cast<BitInvaderIndex*>(nph->m_pluginData);
 }
 
 

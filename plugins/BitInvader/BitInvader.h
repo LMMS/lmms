@@ -39,13 +39,8 @@ namespace lmms
 
 namespace gui { class BitInvaderView; }
 
-
-struct BitInvaderNote
-{
-	std::size_t index = 0;
-	float indexFrac = 0.f; // TODO: Only store fractional index in this
-};
-
+//! @brief The phase of a note, represented as an index into a wavetable.
+using BitInvaderIndex = float;
 
 class BitInvader : public Instrument
 {
