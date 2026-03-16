@@ -48,7 +48,7 @@ class PatchesDialog : public QDialog, private Ui::PatchesDialog
 	Q_OBJECT
 
 public:
-	PatchesDialog(QWidget* pParent = 0, Qt::WindowFlags wflags = QFlag(0));
+	PatchesDialog(QWidget* parent = nullptr, Qt::WindowFlags wflags = QFlag{0});
 	~PatchesDialog() override = default;
 
 	void setup(fluid_synth_t* pSynth, int iChan, const QString& _chanName, LcdSpinBoxModel* _bankModel,
@@ -56,7 +56,6 @@ public:
 
 public slots:
 	void stabilizeForm();
-	void bankChanged();
 	void progChanged(const QModelIndex& cur, const QModelIndex& prev);
 
 protected slots:
@@ -74,16 +73,23 @@ protected:
 
 	bool validateForm();
 
-	/**
-		Updates the current patch, and updates the UI controls if `updateUi` is true.
-	*/
+	//! Updates the current patch, and updates the UI controls if `updateUi` is true.
 	void updatePatch(bool updateUi);
 
 	/**
-		Selects a row in the program selector based off a signed offset from the currently selected row. Also clamps the
-		selection.
+		Selects a row in the program selector based off a signed offset from the currently selected row. Also
+		clamps the selection.
 	*/
 	void diffSelectProgRow(int offset);
+
+	//! Used for changing things on the UI based on whether the user is searching or not.
+	void updateSearchUi(bool isSearching);
+
+	//! Whether to show patches from all banks at once or not. Re-fetches as needed.
+	void showAllBankPatches(bool value);
+
+	//! May show only the current bank or all of them (depends on what was set via `showAllBankPatches()`).
+	void updatePatchList();
 
 private:
 
@@ -97,6 +103,7 @@ private:
 	// int m_iDirtySetup;
 	// int m_iDirtyCount;
 
+	bool m_showingAllBankPatches;
 	int m_selProg;
 	QString m_selProgName;
 
