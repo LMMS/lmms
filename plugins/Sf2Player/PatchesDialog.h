@@ -105,6 +105,7 @@ private:
 
 	bool m_showingAllBankPatches;
 	int m_selProg;
+	int m_selBank;
 	QString m_selProgName;
 
 	LcdSpinBoxModel* m_bankModel;

@@ -22,12 +22,10 @@
  *
  */
 
-
 #include "PatchesDialog.h"
 
 #include <fluidsynth.h>
 #include <QHeaderView>
-//#include <QFileInfo>
 #include <QLabel>
 #include <QKeyEvent>
 #include <QSortFilterProxyModel>
@@ -83,6 +81,7 @@ PatchesDialog::PatchesDialog(QWidget* parent, Qt::WindowFlags wflags)
 	, m_iProg{0}
 	, m_showingAllBankPatches{false}
 	, m_selProg{0}
+	, m_selBank{0}
 {
 	// Setup UI struct...
 	setupUi( this );
@@ -172,13 +171,8 @@ PatchesDialog::PatchesDialog(QWidget* parent, Qt::WindowFlags wflags)
 		SLOT(reject()));
 }
 
-
-// Dialog setup loader.
-void PatchesDialog::setup ( fluid_synth_t * pSynth, int iChan,
-						const QString & _chanName,
-						LcdSpinBoxModel * _bankModel,
-						LcdSpinBoxModel * _progModel,
-							QLabel * _patchLabel )
+void PatchesDialog::setup(fluid_synth_t* pSynth, int iChan, const QString& _chanName,
+	LcdSpinBoxModel* _bankModel, LcdSpinBoxModel* _progModel, QLabel* _patchLabel)
 {
 	// We'll going to changes the whole thing...
 	m_dirty = 0;
@@ -187,7 +181,7 @@ void PatchesDialog::setup ( fluid_synth_t * pSynth, int iChan,
 	m_patchLabel =  _patchLabel;
 
 	// Set the proper caption...
-	setWindowTitle( _chanName + " - Soundfont patches" );
+	setWindowTitle(tr("%1 - Soundfont patches").arg(_chanName));
 
 	// set m_pSynth to NULL so we don't trigger any progChanged events
 	m_pSynth = nullptr;
@@ -198,14 +192,16 @@ void PatchesDialog::setup ( fluid_synth_t * pSynth, int iChan,
 
 	// now it should be safe to set internal stuff
 	m_pSynth = pSynth;
-	m_iChan  = iChan;
+	m_iChan = iChan;
 
 	QTreeWidgetItem *bankItem = nullptr;
 	// For all soundfonts (in reversed stack order) fill the available banks...
 	int cSoundFonts = ::fluid_synth_sfcount(m_pSynth);
-	for (int i = 0; i < cSoundFonts; i++) {
+	for (int i = 0; i < cSoundFonts; i++)
+	{
 		fluid_sfont_t *pSoundFont = ::fluid_synth_get_sfont(m_pSynth, i);
-		if (pSoundFont) {
+		if (pSoundFont)
+		{
 #ifdef CONFIG_FLUID_BANK_OFFSET
 			int iBankOffset = ::fluid_synth_get_bank_offset(m_pSynth, fluid_sfont_get_id(pSoundFont));
 #endif
@@ -216,15 +212,18 @@ void PatchesDialog::setup ( fluid_synth_t * pSynth, int iChan,
 #else
 			fluid_preset_t *pCurPreset = nullptr;
 #endif
-			while ((pCurPreset = fluid_sfont_iteration_next_wrapper(pSoundFont, pCurPreset))) {
+			while ((pCurPreset = fluid_sfont_iteration_next_wrapper(pSoundFont, pCurPreset)))
+			{
 				int iBank = fluid_preset_get_banknum(pCurPreset);
 #ifdef CONFIG_FLUID_BANK_OFFSET
 				iBank += iBankOffset;
 #endif
-				if (!findBankItem(iBank)) {
+				if (!findBankItem(iBank))
+				{
 					bankItem = new PatchItem(m_bankListView, bankItem);
-					if (bankItem)
+					if (bankItem) {
 						bankItem->setText(0, QString::number(iBank));
+					}
 				}
 			}
 		}
@@ -354,12 +353,11 @@ QStandardItem* PatchesDialog::findProgItem(int iProg)
 
 void PatchesDialog::updatePatch(bool updateUi)
 {
-	int iBank = m_bankListView->currentItem()->text(0).toInt();
-	setBankProg(iBank, m_selProg);
+	setBankProg(m_selBank, m_selProg);
 
 	if (updateUi)
 	{
-		m_bankModel->setValue(iBank);
+		m_bankModel->setValue(m_selBank);
 		m_progModel->setValue(m_selProg);
 		m_patchLabel->setText(m_selProgName);
 	}
@@ -372,13 +370,16 @@ void PatchesDialog::progChanged(const QModelIndex& cur, const QModelIndex& prev)
 	auto curRow = m_progListProxyModel.mapToSource(cur).row();
 	if (curRow < 0) { return; }
 
-	auto progIdx = m_progListSourceModel.index(curRow, ColPatch);
-	m_selProg = m_progListSourceModel.data(progIdx).toInt();
+	const auto modelAt = [this](int row, int col) -> QVariant
+	{
+		const auto idx = m_progListSourceModel.index(row, col);
+		return m_progListSourceModel.data(idx);
+	};
 
-	auto nameIdx = m_progListSourceModel.index(curRow, ColName);
-	m_selProgName = m_progListSourceModel.data(nameIdx).toString();
+	m_selBank = modelAt(curRow, ColBank).toInt();
+	m_selProg = modelAt(curRow, ColPatch).toInt();
+	m_selProgName = modelAt(curRow, ColName).toString();
 
-	// Which preview state...
 	if (validateForm())
 	{
 		updatePatch(false);
@@ -387,7 +388,6 @@ void PatchesDialog::progChanged(const QModelIndex& cur, const QModelIndex& prev)
 		m_dirty++;
 	}
 
-	// Stabilize the form.
 	stabilizeForm();
 }
 
@@ -420,7 +420,7 @@ void PatchesDialog::diffSelectProgRow(int offset)
 	int curRow = selectionModel->currentIndex().row();
 	int newRow = curRow + offset;
 	int rowCount = m_progListView->model()->rowCount();
-	newRow = qBound(0, newRow, rowCount - 1);
+	newRow = std::clamp(0, newRow, rowCount - 1);
 
 	constexpr auto selMask = QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows;
 	const auto idx = m_progListView->model()->index(newRow, 0);
