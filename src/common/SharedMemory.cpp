@@ -2,6 +2,7 @@
  * SharedMemory.cpp
  *
  * Copyright (c) 2022 Dominic Clark <mrdomclark/at/gmail.com>
+ * Copyright (c) 2025-2026 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -46,6 +47,18 @@
 
 namespace lmms::detail {
 
+namespace {
+
+//! Header for communicating the shared memory's data size in-band
+struct Header
+{
+	//! The requested shared memory data size in bytes.
+	//! `sizeof(Header) + size` is the total allocation size.
+	std::uint64_t size;
+};
+
+} // namespace
+
 #if _POSIX_SHARED_MEMORY_OBJECTS > 0 || defined(LMMS_BUILD_APPLE)
 
 namespace {
@@ -75,8 +88,8 @@ using ShmObject = UniqueNullableResource<const char*, nullptr, deleteShmObject>;
 class SharedMemoryImpl
 {
 public:
-	SharedMemoryImpl(const std::string& key, bool readOnly) :
-		m_key{'/' + key}
+	SharedMemoryImpl(const std::string& key, bool readOnly, bool isArray)
+		: m_key{'/' + key}
 	{
 		const auto openFlags = readOnly ? O_RDONLY : O_RDWR;
 		const auto fd = FileDescriptor{
@@ -86,17 +99,31 @@ public:
 
 		auto stat = (struct stat){};
 		if (fstat(fd.get(), &stat) == -1) { throwSystemError("SharedMemoryImpl: fstat() failed"); }
+
+		// NOTE: On macOS, this is the page size, not the size used to create the shared memory
 		m_size = stat.st_size;
 
 		const auto mappingProtection = readOnly ? PROT_READ : PROT_READ | PROT_WRITE;
 		m_mapping = mmap(nullptr, m_size, mappingProtection, MAP_SHARED, fd.get(), 0);
 		if (m_mapping == MAP_FAILED) { throwSystemError("SharedMemoryImpl: mmap() failed"); }
+
+		if (isArray)
+		{
+			// Array size is stored in-band
+			m_arraySize = static_cast<Header*>(m_mapping)->size;
+		}
 	}
 
-	SharedMemoryImpl(const std::string& key, std::size_t size, bool readOnly) :
-		m_key{'/' + key},
-		m_size{size}
+	SharedMemoryImpl(const std::string& key, std::size_t size, bool readOnly, bool isArray)
+		: m_key{'/' + key}
+		, m_size{size}
 	{
+		if (isArray)
+		{
+			m_size += sizeof(Header); // space for the header
+			m_arraySize = size;
+		}
+
 		const auto fd = FileDescriptor{
 			retryWhileInterrupted([&]() noexcept { return shm_open(m_key.c_str(), O_RDWR | O_CREAT | O_EXCL, 0600); })
 		};
@@ -110,6 +137,11 @@ public:
 		const auto mappingProtection = readOnly ? PROT_READ : PROT_READ | PROT_WRITE;
 		m_mapping = mmap(nullptr, m_size, mappingProtection, MAP_SHARED, fd.get(), 0);
 		if (m_mapping == MAP_FAILED) { throwSystemError("SharedMemoryImpl: mmap() failed"); }
+
+		if (isArray)
+		{
+			new (m_mapping) Header(size);
+		}
 	}
 
 	SharedMemoryImpl(const SharedMemoryImpl&) = delete;
@@ -120,12 +152,19 @@ public:
 		munmap(m_mapping, m_size);
 	}
 
-	auto get() const noexcept -> void* { return m_mapping; }
-	auto size_bytes() const noexcept -> std::size_t { return m_size; }
+	auto get() const noexcept -> void*
+	{
+		return m_arraySize > 0
+			? static_cast<char*>(m_mapping) + sizeof(Header)
+			: m_mapping;
+	}
+
+	auto arraySize() const noexcept -> std::size_t { return m_arraySize; }
 
 private:
 	std::string m_key;
 	std::size_t m_size = 0;
+	std::size_t m_arraySize = 0; // non-zero if it's an array
 	void* m_mapping = nullptr;
 	ShmObject m_object;
 };
@@ -157,7 +196,7 @@ using FileView = UniqueNullableResource<void*, nullptr, UnmapViewOfFile>;
 class SharedMemoryImpl
 {
 public:
-	SharedMemoryImpl(const std::string& key, bool readOnly)
+	SharedMemoryImpl(const std::string& key, bool readOnly, bool isArray)
 	{
 		const auto access = readOnly ? FILE_MAP_READ : FILE_MAP_WRITE;
 		m_mapping.reset(OpenFileMappingA(access, false, key.c_str()));
@@ -166,19 +205,18 @@ public:
 		m_view.reset(MapViewOfFile(m_mapping.get(), access, 0, 0, 0));
 		if (!m_view) { throwLastError("SharedMemoryImpl: MapViewOfFile() failed"); }
 
-		MEMORY_BASIC_INFORMATION mbi;
-		if (VirtualQuery(m_view.get(), &mbi, sizeof(mbi)) == 0)
+		if (isArray)
 		{
-			throwLastError("SharedMemoryImpl: VirtualQuery() failed");
+			// Array size is stored in-band
+			m_arraySize = static_cast<Header*>(static_cast<void*>(m_view.get()))->size;
 		}
-
-		m_size = static_cast<std::size_t>(mbi.RegionSize);
 	}
 
-	SharedMemoryImpl(const std::string& key, std::size_t size, bool readOnly) :
-		m_size{size}
+	SharedMemoryImpl(const std::string& key, std::size_t size, bool readOnly, bool isArray)
 	{
-		const auto [high, low] = sizeToHighAndLow(size);
+		const auto [high, low] = isArray
+			? sizeToHighAndLow(size + sizeof(Header))
+			: sizeToHighAndLow(size);
 		m_mapping.reset(CreateFileMappingA(INVALID_HANDLE_VALUE, nullptr, PAGE_READWRITE, high, low, key.c_str()));
 		// This constructor is supposed to create a new shared memory object,
 		// but passing the name of an existing object causes CreateFileMappingA
@@ -191,18 +229,30 @@ public:
 		const auto access = readOnly ? FILE_MAP_READ : FILE_MAP_WRITE;
 		m_view.reset(MapViewOfFile(m_mapping.get(), access, 0, 0, 0));
 		if (!m_view) { throwLastError("SharedMemoryImpl: MapViewOfFile() failed"); }
+
+		if (isArray)
+		{
+			new (static_cast<void*>(m_view.get())) Header(size);
+			m_arraySize = size;
+		}
 	}
 
 	SharedMemoryImpl(const SharedMemoryImpl&) = delete;
 	auto operator=(const SharedMemoryImpl&) -> SharedMemoryImpl& = delete;
 
-	auto get() const noexcept -> void* { return m_view.get(); }
-	auto size_bytes() const noexcept -> std::size_t { return m_size; }
+	auto get() const noexcept -> void*
+	{
+		return m_arraySize > 0
+			? static_cast<char*>(static_cast<void*>(m_view.get())) + sizeof(Header)
+			: m_view.get();
+	}
+
+	auto arraySize() const noexcept -> std::size_t { return m_arraySize; }
 
 private:
 	UniqueHandle m_mapping;
 	FileView m_view;
-	std::size_t m_size = 0;
+	std::size_t m_arraySize = 0; // non-zero if it's an array
 };
 
 #endif
@@ -232,20 +282,20 @@ auto createKey() -> std::string
 
 SharedMemoryData::SharedMemoryData() noexcept = default;
 
-SharedMemoryData::SharedMemoryData(std::string&& key, bool readOnly) :
-	m_key{std::move(key)},
-	m_impl{std::make_unique<SharedMemoryImpl>(m_key, readOnly)},
-	m_ptr{m_impl->get()}
+SharedMemoryData::SharedMemoryData(std::string&& key, bool readOnly, bool isArray)
+	: m_key{std::move(key)}
+	, m_impl{std::make_unique<SharedMemoryImpl>(m_key, readOnly, isArray)}
+	, m_ptr{m_impl->get()}
 { }
 
-SharedMemoryData::SharedMemoryData(std::string&& key, std::size_t size, bool readOnly) :
-	m_key{std::move(key)},
-	m_impl{std::make_unique<SharedMemoryImpl>(m_key, std::max(size, std::size_t{1}), readOnly)},
-	m_ptr{m_impl->get()}
+SharedMemoryData::SharedMemoryData(std::string&& key, std::size_t size, bool readOnly, bool isArray)
+	: m_key{std::move(key)}
+	, m_impl{std::make_unique<SharedMemoryImpl>(m_key, std::max(size, std::size_t{1}), readOnly, isArray)}
+	, m_ptr{m_impl->get()}
 { }
 
-SharedMemoryData::SharedMemoryData(std::size_t size, bool readOnly) :
-	SharedMemoryData{createKey(), size, readOnly}
+SharedMemoryData::SharedMemoryData(std::size_t size, bool readOnly, bool isArray)
+	: SharedMemoryData{createKey(), size, readOnly, isArray}
 { }
 
 SharedMemoryData::~SharedMemoryData() = default;
@@ -256,9 +306,9 @@ SharedMemoryData::SharedMemoryData(SharedMemoryData&& other) noexcept :
 	m_ptr{std::exchange(other.m_ptr, nullptr)}
 { }
 
-auto SharedMemoryData::size_bytes() const noexcept -> std::size_t
+auto SharedMemoryData::arraySize() const noexcept -> std::size_t
 {
-	return m_impl ? m_impl->size_bytes() : 0;
+	return m_impl ? m_impl->arraySize() : 0;
 }
 
 } // namespace lmms::detail

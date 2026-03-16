@@ -147,7 +147,7 @@ const QStringList& FileRevealer::getSelectCommand()
 	}
 
 	// Fallback to empty list
-	selectCommandCache = {};
+	selectCommandCache = QStringList{};
 	return selectCommandCache.value();
 }
 
