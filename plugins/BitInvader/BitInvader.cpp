@@ -75,13 +75,20 @@ BitInvader::BitInvader(InstrumentTrack* instrumentTrack)
 	, m_sampleLength(wavetableSize, 4, wavetableSize, 1, this, tr("Sample length"))
 	, m_graph(-1.f, 1.f, wavetableSize, this)
 	, m_interpolation(false, this, tr("Interpolation"))
-	, m_normalize(false, this, tr("Normalize"))
+	, m_normalizeMode(this, tr("Normalize"))
 {
+	m_normalizeMode.addItem("Off");
+	m_normalizeMode.addItem("Full");
+	m_normalizeMode.addItem("Length only");
+	m_normalizeMode.addItem("Legacy");
+	m_normalizeMode.setValue(m_normalizeMode.findText("Length only"));
+
 	m_graph.setWaveToSine();
 	lengthChanged();
 
 	connect(&m_sampleLength, &FloatModel::dataChanged, this, &BitInvader::lengthChanged, Qt::DirectConnection);
-	connect(&m_graph, &graphModel::samplesChanged, this, &BitInvader::samplesChanged);
+	connect(&m_normalizeMode, &IntModel::dataChanged, this, &BitInvader::normalize, Qt::DirectConnection);
+	connect(&m_graph, &graphModel::samplesChanged, this, &BitInvader::normalize);
 }
 
 
@@ -89,7 +96,7 @@ BitInvader::BitInvader(InstrumentTrack* instrumentTrack)
 
 void BitInvader::saveSettings(QDomDocument& doc, QDomElement& el)
 {
-	el.setAttribute("version", "0.1");
+	el.setAttribute("version", "0.2");
 	m_sampleLength.saveSettings(doc, el, "sampleLength");
 
 	QString sampleString;
@@ -97,7 +104,7 @@ void BitInvader::saveSettings(QDomDocument& doc, QDomElement& el)
 	el.setAttribute("sampleShape", sampleString);
 
 	m_interpolation.saveSettings(doc, el, "interpolation");
-	m_normalize.saveSettings(doc, el, "normalize");
+	m_normalizeMode.saveSettings(doc, el, "normalize");
 }
 
 
@@ -120,7 +127,12 @@ void BitInvader::loadSettings(const QDomElement& el)
 	delete[] dst;
 
 	m_interpolation.loadSettings(el, "interpolation");
-	m_normalize.loadSettings(el, "normalize");
+	m_normalizeMode.loadSettings(el, "normalize");
+	// If normalization was enabled on an old preset, change it to "Legacy" normalization mode
+	if (el.attribute("version") == "0.1")
+	{
+		m_normalizeMode.setValue(m_normalizeMode.value() * m_normalizeMode.findText("Legacy"));
+	}
 }
 
 
@@ -135,18 +147,27 @@ void BitInvader::lengthChanged()
 
 
 
-void BitInvader::samplesChanged(int, int)
-{
-	normalize();
-	//engine::getSongEditor()->setModified();
-}
-
-
-
-
 void BitInvader::normalize()
 {
-	const auto samples = std::span<const float, wavetableSize>{m_graph.samples(), wavetableSize};
+	if (m_normalizeMode.value() == m_normalizeMode.findText("Off"))
+	{
+		m_normalizeFactor = 1.f;
+		m_normalizeOffset = 0.f;
+		return;
+	}
+
+	const auto len = m_normalizeMode.value() == m_normalizeMode.findText("Length only")
+		? static_cast<std::size_t>(m_sampleLength.value())
+		: wavetableSize;
+	auto samples = std::span<const float>{ m_graph.samples(), len };
+
+	if (m_normalizeMode.value() == m_normalizeMode.findText("Legacy"))
+	{
+		m_normalizeOffset = 0.f;
+		m_normalizeFactor = 1.f / std::max_element(samples.begin(), samples.end(), [](auto a, auto b){ return std::abs(a) < std::abs(b); })[0];
+		return;
+	}
+
 	const auto maxSamp = std::max_element(samples.begin(), samples.end())[0];
 	const auto minSamp = std::min_element(samples.begin(), samples.end())[0];
 	if (minSamp == maxSamp)
@@ -166,14 +187,10 @@ void BitInvader::normalize()
 QString BitInvader::nodeName() const { return bitinvader_plugin_descriptor.name; }
 
 
-
-
 void BitInvader::playNote(NotePlayHandle* nph, SampleFrame* workingBuffer)
 {
 	if (!nph->m_pluginData) { nph->m_pluginData = new BitInvaderIndex{}; }
 
-	const auto nfac = m_normalize.value() ? m_normalizeFactor : 1.f;
-	const auto norg = m_normalize.value() ? m_normalizeOffset : 0.f;
 	const auto& wavetable = m_graph.samples();
 	const auto wavetableLenReal = static_cast<BitInvaderIndex>(m_graph.length());
 	const auto phasePerSample = nph->frequency() / Engine::audioEngine()->outputSampleRate();
@@ -197,7 +214,7 @@ void BitInvader::playNote(NotePlayHandle* nph, SampleFrame* workingBuffer)
 			)
 			: wavetable[idx];
 
-		workingBuffer[frame] = SampleFrame(samp * nfac + norg);
+		workingBuffer[frame] = SampleFrame(samp * m_normalizeFactor + m_normalizeOffset);
 	}
 	applyRelease(workingBuffer, nph);
 }
@@ -290,13 +307,12 @@ BitInvaderView::BitInvaderView(Instrument* instrument, QWidget* parent)
 	m_smoothBtn->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("smooth_inactive"));
 	m_smoothBtn->setToolTip(tr("Smooth waveform"));
 
-
 	m_interpolationToggle = new LedCheckBox("Interpolation", this, tr("Interpolation"), LedCheckBox::LedColor::Yellow);
 	m_interpolationToggle->move(131, 221);
 
-
-	m_normalizeToggle = new LedCheckBox("Normalize", this, tr("Normalize"), LedCheckBox::LedColor::Green);
-	m_normalizeToggle->move(131, 236);
+	m_normalizeMode = new ComboBox(this, tr("Normalize"));
+	m_normalizeMode->move(32, 205);
+	m_normalizeMode->setToolTip(tr("Set wavetable normalization mode"));
 
 	connect(m_sinWaveBtn, &PixmapButton::clicked, this, &BitInvaderView::sinWaveClicked);
 	connect(m_triangleWaveBtn, &PixmapButton::clicked, this, &BitInvaderView::triangleWaveClicked);
@@ -306,7 +322,6 @@ BitInvaderView::BitInvaderView(Instrument* instrument, QWidget* parent)
 	connect(m_usrWaveBtn, &PixmapButton::clicked, this, &BitInvaderView::usrWaveClicked);
 	connect(m_smoothBtn, &PixmapButton::clicked, this, &BitInvaderView::smoothClicked);
 	connect(m_interpolationToggle, &LedCheckBox::toggled, this, &BitInvaderView::interpolationToggled);
-	connect(m_normalizeToggle, &LedCheckBox::toggled, this, &BitInvaderView::normalizeToggled);
 }
 
 
@@ -318,7 +333,7 @@ void BitInvaderView::modelChanged()
 	m_graph->setModel(&b->m_graph);
 	m_sampleLengthKnob->setModel(&b->m_sampleLength);
 	m_interpolationToggle->setModel(&b->m_interpolation);
-	m_normalizeToggle->setModel(&b->m_normalize);
+	m_normalizeMode->setModel(&b->m_normalizeMode);
 }
 
 
@@ -400,16 +415,9 @@ void BitInvaderView::smoothClicked()
 void BitInvaderView::interpolationToggled(bool value)
 {
 	m_graph->setGraphStyle(value ? Graph::Style::Linear : Graph::Style::Nearest);
-	Engine::getSong()->setModified();
 }
 
 
-
-
-void BitInvaderView::normalizeToggled(bool value)
-{
-	Engine::getSong()->setModified();
-}
 
 
 } // namespace gui

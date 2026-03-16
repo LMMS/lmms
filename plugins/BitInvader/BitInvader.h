@@ -27,6 +27,8 @@
 #define BIT_INVADER_H
 
 #include "AutomatableModel.h"
+#include "ComboBox.h"
+#include "ComboBoxModel.h"
 #include "Graph.h"
 #include "Instrument.h"
 #include "InstrumentView.h"
@@ -57,11 +59,10 @@ public:
 	QString nodeName() const override;
 	float desiredReleaseTimeMs() const override { return 1.5f; }
 	gui::PluginView* instantiateView(QWidget* parent) override;
-	void normalize();
 
 protected slots:
 	void lengthChanged();
-	void samplesChanged(int, int);
+	void normalize();
 
 private:
 	FloatModel m_sampleLength;
@@ -69,11 +70,7 @@ private:
 
 	BoolModel m_interpolation;
 
-	// TODO: Change to drop-down menu with the following options:
-	// - Full: Normalize according to the amplitude of the entire wavetable (current behavior)
-	// - Length-dependent: Normalize according to the wavetable length knob value (default for new instances)
-	// - Legacy: Normalize according to the entire wavetable without DC offset removal (default when loading an instance from an old project file)
-	BoolModel m_normalize;
+	ComboBoxModel m_normalizeMode;
 
 	float m_normalizeFactor; //!< Factor by which to amplify output such that the output is normalized
 	float m_normalizeOffset; //!< Amount by which to offset the output such that no DC offset is produced when normalized
@@ -94,7 +91,6 @@ public:
 
 protected slots:
 	void interpolationToggled(bool value);
-	void normalizeToggled(bool value);
 	void sinWaveClicked();
 	void triangleWaveClicked();
 	void sqrWaveClicked();
@@ -116,7 +112,7 @@ private:
 	PixmapButton* m_usrWaveBtn;
 	Graph* m_graph;
 	LedCheckBox* m_interpolationToggle;
-	LedCheckBox* m_normalizeToggle;
+	ComboBox* m_normalizeMode;
 };
 
 
