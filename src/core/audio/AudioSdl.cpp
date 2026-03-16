@@ -46,9 +46,6 @@ AudioSdl::AudioSdl(bool& _success_ful, AudioEngine* _audioEngine)
 {
 	_success_ful = false;
 
-	m_currentBufferFramesCount = 0;
-	m_currentBufferFramePos = 0;
-
 	if( SDL_Init( SDL_INIT_AUDIO | SDL_INIT_NOPARACHUTE ) < 0 )
 	{
 		qCritical( "Couldn't initialize SDL: %s\n", SDL_GetError() );
