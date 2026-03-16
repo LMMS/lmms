@@ -173,14 +173,12 @@ public:
 	void removePlayHandlesOfTypes(Track * track, PlayHandle::Types types);
 
 	//! @return the number of frames rendered per period
-	//! @note this represents the size of the buffer for each call to @ref renderNextBuffer
 	fpp_t framesPerPeriod() const
 	{
 		return m_framesPerPeriod;
 	}
 
 	//! @returns the number of audio frames per audio buffer
-	//! @note this represents the size of the underlying device buffer
 	fpp_t framesPerAudioBuffer() const
 	{
 		return m_framesPerAudioBuffer;
