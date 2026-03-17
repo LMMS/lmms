@@ -117,7 +117,6 @@ void BitInvader::loadSettings(const QDomElement& el)
 {
 	m_graph.clear();
 	m_sampleLength.loadSettings(el, "sampleLength");
-	auto sampleLength = static_cast<int>(m_sampleLength.value());
 
 	// Load sample shape
 	int size = 0;
@@ -126,7 +125,7 @@ void BitInvader::loadSettings(const QDomElement& el)
 
 	m_graph.setLength(size / sizeof(float));
 	m_graph.setSamples(reinterpret_cast<float*>(dst));
-	m_graph.setLength(sampleLength);
+	m_graph.setLength(static_cast<int>(m_sampleLength.value()));
 	delete[] dst;
 
 	m_interpolation.loadSettings(el, "interpolation");
@@ -162,7 +161,7 @@ void BitInvader::normalize()
 	const auto len = m_normalizeMode.value() == m_normalizeMode.findText("Length only")
 		? static_cast<std::size_t>(m_sampleLength.value())
 		: wavetableSize;
-	auto samples = std::span<const float>{ m_graph.samples(), len };
+	const auto samples = std::span<const float>{ m_graph.samples(), len };
 
 	if (m_normalizeMode.value() == m_normalizeMode.findText("Legacy"))
 	{

@@ -42,6 +42,9 @@ namespace lmms
 namespace gui { class BitInvaderView; }
 
 //! @brief The phase of a note, represented as an index into a wavetable.
+//! The phase is normalized such that it has a range of [0, n), where n
+//! is the current length of the wavetable. It can therefore be
+//! truncated to obtain a valid index into that wavetable.
 using BitInvaderIndex = float;
 
 class BitInvader : public Instrument
@@ -67,9 +70,7 @@ protected slots:
 private:
 	FloatModel m_sampleLength;
 	graphModel m_graph;
-
 	BoolModel m_interpolation;
-
 	ComboBoxModel m_normalizeMode;
 
 	float m_normalizeFactor; //!< Factor by which to amplify output such that the output is normalized
