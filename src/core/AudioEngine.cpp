@@ -71,7 +71,7 @@ AudioEngine::AudioEngine(bool renderOnly)
 	: m_renderOnly(renderOnly)
 	, m_framesPerAudioBuffer(std::clamp(ConfigManager::inst()->value("audioengine", "framesperaudiobuffer").toULong(),
 		  MINIMUM_BUFFER_SIZE, MAXIMUM_BUFFER_SIZE))
-	, m_framesPerPeriod(DEFAULT_BUFFER_SIZE)
+	, m_framesPerPeriod(std::min(m_framesPerAudioBuffer, DEFAULT_BUFFER_SIZE))
 	, m_baseSampleRate(
 		  std::max(ConfigManager::inst()->value("audioengine", "samplerate").toInt(), SUPPORTED_SAMPLERATES.front()))
 	, m_inputBufferRead(0)
