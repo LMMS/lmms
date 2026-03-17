@@ -88,6 +88,8 @@ class BitInvaderView : public InstrumentViewFixedSize
 public:
 	BitInvaderView(Instrument*, QWidget* parent);
 	~BitInvaderView() override = default;
+	QSize sizeHint() const override { return QSize(250, 280); }
+	QSize minimumSizeHint() const override { return sizeHint(); }
 
 protected slots:
 	void interpolationToggled(bool value);

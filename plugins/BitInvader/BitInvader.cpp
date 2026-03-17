@@ -27,11 +27,14 @@
 #include <cmath>
 
 #include <QDomElement>
+#include <QGridLayout>
+#include <QLabel>
 
 #include "AudioEngine.h"
 #include "base64.h"
 #include "embed.h"
 #include "Engine.h"
+#include "FontHelper.h"
 #include "InstrumentTrack.h"
 #include "lmms_math.h"
 #include "NotePlayHandle.h"
@@ -254,6 +257,7 @@ BitInvaderView::BitInvaderView(Instrument* instrument, QWidget* parent)
 	m_sampleLengthKnob = new Knob(KnobType::Dark28, this);
 	m_sampleLengthKnob->move(6, 201);
 	m_sampleLengthKnob->setHintText(tr("Sample length"), "");
+	m_sampleLengthKnob->setLabel(tr("Length"));
 
 	m_graph = new Graph(this, Graph::Style::Nearest, 204, 134);
 	m_graph->move(23,59); // 55,120 - 2px border
@@ -311,8 +315,18 @@ BitInvaderView::BitInvaderView(Instrument* instrument, QWidget* parent)
 	m_interpolationToggle->move(131, 221);
 
 	m_normalizeMode = new ComboBox(this, tr("Normalize"));
-	m_normalizeMode->move(32, 205);
 	m_normalizeMode->setToolTip(tr("Set wavetable normalization mode"));
+	auto normalizeLabel = new QLabel(tr("Normalization:"), this);
+	normalizeLabel->setFont(adjustedToPixelSize(normalizeLabel->font(), DEFAULT_FONT_SIZE));
+	// FIXME: Evil awful terrible layout. This should be fine for now,
+	// since a full UI overhaul for Bit Invader is planned.
+	auto normalizeLayout = new QGridLayout(this);
+	normalizeLayout->setContentsMargins(6, 6, 6, 6);
+	normalizeLayout->setVerticalSpacing(1);
+	normalizeLayout->setAlignment(Qt::AlignBottom);
+	normalizeLayout->addItem(new QSpacerItem(250 - 131, 1), 0, 0); // Do NOT ever do this LMAO
+	normalizeLayout->addWidget(normalizeLabel, 0, 1);
+	normalizeLayout->addWidget(m_normalizeMode, 1, 1);
 
 	connect(m_sinWaveBtn, &PixmapButton::clicked, this, &BitInvaderView::sinWaveClicked);
 	connect(m_triangleWaveBtn, &PixmapButton::clicked, this, &BitInvaderView::triangleWaveClicked);
