@@ -50,7 +50,7 @@ LadspaControlView::LadspaControlView( QWidget * _parent,
 
 	if( m_ctl->m_link )
 	{
-		link = new LedCheckBox( "", this );
+		link = new LedCheckBox(this );
 		link->setModel( &m_ctl->m_linkEnabledModel );
 		link->setToolTip(tr("Link channels"));
 		layout->addWidget( link );
@@ -62,7 +62,7 @@ LadspaControlView::LadspaControlView( QWidget * _parent,
 	{
 		case BufferDataType::Toggled:
 		{
-			auto toggle = new LedCheckBox(m_ctl->port()->name, this, QString(), LedCheckBox::LedColor::Green);
+			auto toggle = new LedCheckBox(m_ctl->port()->name, this, LedCheckBox::LedColor::Green);
 			toggle->setModel( m_ctl->toggledModel() );
 			layout->addWidget( toggle );
 			if( link != nullptr )

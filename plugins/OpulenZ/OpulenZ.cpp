@@ -681,7 +681,7 @@ OpulenzInstrumentView::OpulenzInstrumentView( Instrument * _instrument,
 	knobname->move(xpos,ypos);
 
 #define BUTTON_GEN(buttname, tooltip, xpos, ypos) \
-	buttname = new PixmapButton( this, nullptr );\
+	buttname = new PixmapButton(this);\
         buttname->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "led_on" ) );\
         buttname->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "led_off" ) );\
 	buttname->setCheckable( true );\
@@ -689,7 +689,7 @@ OpulenzInstrumentView::OpulenzInstrumentView( Instrument * _instrument,
         buttname->move( xpos, ypos );
 
 #define WAVEBUTTON_GEN(buttname, tooltip, xpos, ypos, icon_on, icon_off, buttgroup) \
-	buttname = new PixmapButton( this, nullptr );\
+	buttname = new PixmapButton(this);\
         buttname->setActiveGraphic( PLUGIN_NAME::getIconPixmap( icon_on ) ); \
         buttname->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( icon_off ) ); \
         buttname->setToolTip(tr(tooltip));\

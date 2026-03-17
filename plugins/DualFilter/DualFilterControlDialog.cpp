@@ -63,8 +63,8 @@ DualFilterControlDialog::DualFilterControlDialog( DualFilterControls* controls )
 	gain1Knob-> setVolumeKnob( true );
 	gain2Knob-> setVolumeKnob( true );
 
-	auto enabled1Toggle = new LedCheckBox("", this, tr("Filter 1 enabled"), LedCheckBox::LedColor::Green);
-	auto enabled2Toggle = new LedCheckBox("", this, tr("Filter 2 enabled"), LedCheckBox::LedColor::Green);
+	auto enabled1Toggle = new LedCheckBox(this, LedCheckBox::LedColor::Green);
+	auto enabled2Toggle = new LedCheckBox(this, LedCheckBox::LedColor::Green);
 
 	enabled1Toggle -> move( 12, 11 );
 	enabled1Toggle -> setModel( &controls -> m_enabled1Model );
