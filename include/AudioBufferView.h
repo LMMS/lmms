@@ -348,12 +348,6 @@ public:
 		return std::span<T>{this->m_data, this->m_frames * Base::channels()};
 	}
 
-	//! @return the sample at the given channel and frame position
-	constexpr auto sample(ch_cnt_t channel, f_cnt_t frame) noexcept -> T&
-	{
-		return framePtr(frame)[channel];
-	}
-
 	//! @return the frame at the given index
 	constexpr auto frame(f_cnt_t index) const noexcept
 	{
@@ -509,12 +503,6 @@ public:
 	constexpr auto empty() const noexcept -> bool
 	{
 		return !this->m_data || Base::channels() == 0 || this->m_frames == 0;
-	}
-
-	//! @return the sample at the given channel and frame position
-	constexpr auto sample(ch_cnt_t channel, f_cnt_t frame) noexcept -> T&
-	{
-		return bufferPtr(channel)[frame];
 	}
 
 	//! @return the buffer of the given channel
