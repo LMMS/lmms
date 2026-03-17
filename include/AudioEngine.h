@@ -259,7 +259,7 @@ public:
 	 * An audio period is a fixed-size chunk of audio the engine generates, and represents a single cycle of the
 	 * engine's output.
 	 * Rendering is chunked into discrete periods to timely handle per-buffer updates like automation.
-	 * The audio period generated is interleaved, stereo, and has @a DEFAULT_BUFFER_SIZE frames in size.
+	 * The audio period generated is interleaved and stereo.
 	 *
 	 * @returns A non-owning buffer to the next audio period.
 	 */
@@ -273,7 +273,7 @@ public:
 	 *
 	 * If @a dst has 1 channel, the audio periods are averaged to mono.
 	 * If @a dst has 2 channels, the audio periods are directly copied.
-	 * If @a dst has more than 2 channels, the stero channels are copied and the rest zero-filled.
+	 * If @a dst has more than 2 channels, the stero channels are copied and the rest are zero-filled.
 	 *
 	 * @param dst An interleaved audio view over the buffer to write into.
 	 */
@@ -287,7 +287,7 @@ public:
 	 *
 	 * If @a dst has 1 channel, the audio periods are averaged to mono.
 	 * If @a dst has 2 channels, the audio periods are directly copied.
-	 * If @a dst has more than 2 channels, the stero channels are copied and the rest zero-filled.
+	 * If @a dst has more than 2 channels, the stero channels are copied and the rest are zero-filled.
 	 *
 	 * @param dst A planar audio view over the buffer to write into.
 	 */
