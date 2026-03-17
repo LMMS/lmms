@@ -445,7 +445,7 @@ void OpulenzInstrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 void OpulenzInstrument::loadSettings( const QDomElement & _this )
 {
-	if(_this.attribute("version").toInt() < 1)
+	if (_this.attribute("version", "0").toInt() < 1)
 	{
 		op1_scale_mdl.setValue(0);
 		op2_scale_mdl.setValue(0);
