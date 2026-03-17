@@ -38,30 +38,27 @@
 namespace lmms::gui
 {
 
-
-// Custom list-view item (as for numerical sort purposes...)
+//! Custom list-view item (for numerical sorting purposes)
 class PatchItem : public QTreeWidgetItem
 {
 public:
+	PatchItem(QTreeWidget* pListView, QTreeWidgetItem *pItemAfter)
+		: QTreeWidgetItem(pListView, pItemAfter)
+	{
+	}
 
-	// Constructor.
-	PatchItem( QTreeWidget *pListView,
-		QTreeWidgetItem *pItemAfter )
-		: QTreeWidgetItem( pListView, pItemAfter ) {}
-
-	// Sort/compare overriden method.
-	bool operator< ( const QTreeWidgetItem& other ) const override
+	bool operator<(const QTreeWidgetItem& other) const override
 	{
 		int iColumn = QTreeWidgetItem::treeWidget()->sortColumn();
 		const QString& s1 = text( iColumn );
 		const QString& s2 = other.text( iColumn );
-		if( iColumn == 0 || iColumn == 2 )
+		if (iColumn == 0 || iColumn == 2)
 		{
-			return( s1.toInt() < s2.toInt() );
-		} 
-		else 
+			return s1.toInt() < s2.toInt();
+		}
+		else
 		{
-			return( s1 < s2 );
+			return s1 < s2;
 		}
 	}
 };
@@ -84,7 +81,7 @@ PatchesDialog::PatchesDialog(QWidget* parent, Qt::WindowFlags wflags)
 	, m_selBank{0}
 {
 	// Setup UI struct...
-	setupUi( this );
+	setupUi(this);
 
 	// Configure bank list view
 	auto bankHeader = m_bankListView->header();
@@ -98,7 +95,7 @@ PatchesDialog::PatchesDialog(QWidget* parent, Qt::WindowFlags wflags)
 	// FIXME: this looks awful.
 	auto headerLabels = QList<QString>();
 	headerLabels.reserve(TotalCols);
-	for (int i = 0; i < TotalCols; i++) { headerLabels.append(QString{"?"}); }
+	for (int i = 0; i < TotalCols; i++) { headerLabels.append(QString{}); }
 	headerLabels[ColName] = tr("Name");
 	headerLabels[ColBank] = tr("Bank");
 	headerLabels[ColPatch] = tr("Patch");
@@ -135,9 +132,9 @@ PatchesDialog::PatchesDialog(QWidget* parent, Qt::WindowFlags wflags)
 	progHeader->setSectionsMovable(false);
 	progHeader->setStretchLastSection(true);
 
-	// Initial sort order...
 	m_bankListView->sortItems(ColPatch, Qt::AscendingOrder);
 
+	// Configure search bar
 	m_filterEdit->setPlaceholderText(tr("Search"));
 	m_filterEdit->setClearButtonEnabled(true);
 	m_filterEdit->addAction(embed::getIconPixmap("zoom"), QLineEdit::LeadingPosition);
@@ -155,47 +152,45 @@ PatchesDialog::PatchesDialog(QWidget* parent, Qt::WindowFlags wflags)
 
 		const auto regexp = QRegularExpression(text, QRegularExpression::CaseInsensitiveOption);
 		m_progListProxyModel.setFilterRegularExpression(regexp);
-		diffSelectProgRow(0); // fix the selection if it has been invalidated
+
+		// Fix the selection if it has been invalidated.
+		diffSelectProgRow(0);
 	});
 
-	// TODO: update all these connections to use more modern syntax...
 	QObject::connect(m_bankListView, &QTreeWidget::currentItemChanged, this, &PatchesDialog::updatePatchList);
 	QObject::connect(m_progListView, &QTableView::doubleClicked, this, &PatchesDialog::accept);
 	QObject::connect(m_progListView->selectionModel(), &QItemSelectionModel::currentRowChanged,
 		this, &PatchesDialog::progChanged);
-	QObject::connect(m_okButton,
-		SIGNAL(clicked()),
-		SLOT(accept()));
-	QObject::connect(m_cancelButton,
-		SIGNAL(clicked()),
-		SLOT(reject()));
+
+	QObject::connect(m_okButton, &QPushButton::clicked, this, &PatchesDialog::accept);
+	QObject::connect(m_cancelButton, &QPushButton::clicked, this, &PatchesDialog::reject);
 }
 
 void PatchesDialog::setup(fluid_synth_t* pSynth, int iChan, const QString& _chanName,
 	LcdSpinBoxModel* _bankModel, LcdSpinBoxModel* _progModel, QLabel* _patchLabel)
 {
-	// We'll going to changes the whole thing...
+	// We're going to change the whole thing...
 	m_dirty = 0;
 	m_bankModel = _bankModel;
 	m_progModel = _progModel;
-	m_patchLabel =  _patchLabel;
+	m_patchLabel = _patchLabel;
 
-	// Set the proper caption...
+	// Set the proper caption
 	setWindowTitle(tr("%1 - Soundfont patches").arg(_chanName));
 
-	// set m_pSynth to NULL so we don't trigger any progChanged events
+	// Set m_pSynth to null so we don't trigger any progChanged events
 	m_pSynth = nullptr;
 
 	// Load bank list from actual synth stack...
 	m_bankListView->setSortingEnabled(false);
 	m_bankListView->clear();
 
-	// now it should be safe to set internal stuff
+	// Now it should be safe to set internal stuff
 	m_pSynth = pSynth;
 	m_iChan = iChan;
 
 	QTreeWidgetItem *bankItem = nullptr;
-	// For all soundfonts (in reversed stack order) fill the available banks...
+	// For all soundfonts, in reversed stack order, fill the available banks
 	int cSoundFonts = ::fluid_synth_sfcount(m_pSynth);
 	for (int i = 0; i < cSoundFonts; i++)
 	{
@@ -221,7 +216,8 @@ void PatchesDialog::setup(fluid_synth_t* pSynth, int iChan, const QString& _chan
 				if (!findBankItem(iBank))
 				{
 					bankItem = new PatchItem(m_bankListView, bankItem);
-					if (bankItem) {
+					if (bankItem)
+					{
 						bankItem->setText(0, QString::number(iBank));
 					}
 				}
@@ -265,33 +261,22 @@ void PatchesDialog::setup(fluid_synth_t* pSynth, int iChan, const QString& _chan
 	}
 
 	// Done with setup...
-	//m_iDirtySetup--;
+	// m_iDirtySetup--;
 }
 
-
-// Stabilize current state form.
 void PatchesDialog::stabilizeForm()
 {
 	m_okButton->setEnabled(validateForm());
 }
 
-
-// Validate form fields.
 bool PatchesDialog::validateForm()
 {
-	bool bValid = true;
-
-	bValid = bValid && (m_bankListView->currentItem() != nullptr);
-
-	return bValid;
+	return m_bankListView->currentItem() != nullptr;
 }
 
-
-// Realize a bank-program selection preset.
-void PatchesDialog::setBankProg ( int iBank, int iProg )
+void PatchesDialog::setBankProg(int iBank, int iProg)
 {
-	if (m_pSynth == nullptr)
-		return;
+	if (m_pSynth == nullptr) { return; }
 
 	// just select the synth's program preset...
 	::fluid_synth_bank_select(m_pSynth, m_iChan, iBank);
@@ -300,11 +285,11 @@ void PatchesDialog::setBankProg ( int iBank, int iProg )
 	::fluid_synth_program_reset(m_pSynth);
 }
 
-
 // Validate form fields and accept it valid.
 void PatchesDialog::accept()
 {
-	if (validateForm()) {
+	if (validateForm())
+	{
 		bool updateUi = m_dirty > 0;
 		updatePatch(updateUi);
 
@@ -317,35 +302,24 @@ void PatchesDialog::accept()
 	}
 }
 
-
-// Reject settings (Cancel button slot).
-void PatchesDialog::reject ()
+void PatchesDialog::reject()
 {
-	// Reset selection to initial selection, if applicable...
-	if (m_dirty > 0)
-		setBankProg(m_bankModel->value(), m_progModel->value());
-	// Done (hopefully nothing).
+	// Reset selection to original selection, if applicable
+	if (m_dirty > 0) { setBankProg(m_bankModel->value(), m_progModel->value()); }
 	QDialog::reject();
 }
 
-// Find the bank item of given bank number id.
-QTreeWidgetItem *PatchesDialog::findBankItem ( int iBank )
+QTreeWidgetItem* PatchesDialog::findBankItem(int iBank)
 {
-	QList<QTreeWidgetItem *> banks
-		= m_bankListView->findItems(
-			QString::number(iBank), Qt::MatchExactly, 0);
+	auto banks = m_bankListView->findItems(QString::number(iBank), Qt::MatchExactly, ColBank);
 
-	QListIterator<QTreeWidgetItem *> iter(banks);
-	if (iter.hasNext())
-		return iter.next();
-	else
-		return nullptr;
+	auto it = QListIterator<QTreeWidgetItem*>(banks);
+	return it.hasNext() ? it.next() : nullptr;
 }
 
 QStandardItem* PatchesDialog::findProgItem(int iProg)
 {
-	QList<QStandardItem*> progs = m_progListSourceModel.findItems(
-		QString::number(iProg), Qt::MatchExactly, ColPatch);
+	auto progs = m_progListSourceModel.findItems(QString::number(iProg), Qt::MatchExactly, ColPatch);
 
 	auto it = QListIterator<QStandardItem*>(progs);
 	return it.hasNext() ? it.next() : nullptr;

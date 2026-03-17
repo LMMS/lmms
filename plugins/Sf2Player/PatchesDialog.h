@@ -55,7 +55,7 @@ public:
 		LcdSpinBoxModel* _progModel, QLabel* _patchLabel);
 
 public slots:
-	void stabilizeForm();
+	void stabilizeForm(); //!< Stabilize current state form
 	void progChanged(const QModelIndex& cur, const QModelIndex& prev);
 
 protected slots:
@@ -63,15 +63,16 @@ protected slots:
 	void reject() override;
 
 protected:
-
+	//! Realize a bank-program selection.
 	void setBankProg(int iBank, int iProg);
 
+	//! Finds the bank item from the sidebar of a given bank number.
 	QTreeWidgetItem* findBankItem(int iBank);
 
 	//! Finds the program item of given program number id in the source model.
 	QStandardItem* findProgItem(int iProg);
 
-	bool validateForm();
+	bool validateForm(); //!< Check whether the dialog fields are valid
 
 	//! Updates the current patch, and updates the UI controls if `updateUi` is true.
 	void updatePatch(bool updateUi);
