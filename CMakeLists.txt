@@ -338,28 +338,45 @@ ENDIF(WANT_TAP)
 
 # check for CARLA
 IF(WANT_CARLA)
-	PKG_CHECK_MODULES(CARLA carla-native-plugin)
+	set(CARLA_PKG_NAME carla-native-plugin)
+	PKG_CHECK_MODULES(CARLA ${CARLA_PKG_NAME})
 	# look for carla under old name
 	IF(NOT CARLA_FOUND)
-		PKG_CHECK_MODULES(CARLA carla-standalone>=1.9.5)
+		set(CARLA_PKG_NAME carla-standalone)
+		PKG_CHECK_MODULES(CARLA ${CARLA_PKG_NAME}>=1.9.5)
 	ENDIF()
 	IF(CARLA_FOUND)
+		pkg_get_variable(CARLA_PREFIX ${CARLA_PKG_NAME} prefix)
+		set(CARLA_RESOURCE_SEARCH_PATHS)
+		if(CARLA_PREFIX)
+			list(APPEND CARLA_RESOURCE_SEARCH_PATHS
+				"${CARLA_PREFIX}/share/carla/resources"
+				"${CARLA_PREFIX}/lib/carla/resources")
+		endif()
+		if(APPLE)
+			list(APPEND CARLA_RESOURCE_SEARCH_PATHS
+				/opt/homebrew/share/carla/resources
+				/usr/local/share/carla/resources
+				/opt/local/share/carla/resources)
+		else()
+			list(APPEND CARLA_RESOURCE_SEARCH_PATHS
+				/usr/share/carla/resources
+				/usr/lib/carla/resources)
+		endif()
 		find_path(CARLA_RESOURCES_DIR
 			NAMES carla-plugin
-			PATHS
-				/usr/share/carla/resources
-				/usr/lib/carla/resources
+			PATHS ${CARLA_RESOURCE_SEARCH_PATHS}
 			NO_DEFAULT_PATH
 		)
 		if(NOT CARLA_RESOURCES_DIR)
 			message(FATAL_ERROR
 				"Found Carla development files, but not the Carla runtime resources. "
-				"Please install the 'carla' runtime package in addition to 'carla-dev'.")
+				"Please install the Carla runtime package in addition to the development files.")
 		endif()
 		SET(LMMS_HAVE_CARLA TRUE)
 		SET(STATUS_CARLA "OK")
 	ELSE(CARLA_FOUND)
-		SET(STATUS_CARLA "not found, install carla-dev and carla")
+		SET(STATUS_CARLA "not found, install Carla runtime and development files")
 	ENDIF(CARLA_FOUND)
 ENDIF(WANT_CARLA)
 
