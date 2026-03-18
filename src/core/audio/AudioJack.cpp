@@ -495,14 +495,14 @@ void AudioJack::shutdownCallback(void* udata)
 AudioJack::setupWidget::setupWidget(QWidget* parent)
 	: AudioDeviceSetupWidget(AudioJack::name(), parent)
 {
-	// TODO: Add a button to start the JACK server?
+	// TODO: Once backend can be changed without restarting LMMS, add a button to start/stop
+	//       the JACK server and an indicator for the JACK server status.
 
 	jack_status_t status;
 	m_client = jack_client_open("LMMS-Setup Dialog", JackNoStartServer, &status);
 	if (!m_client)
 	{
-		std::fprintf(stderr, "jack_client_open() failed, ");
-		printJackStatus(status);
+		// Failure is expected when not using the JACK backend
 	}
 
 	QFormLayout * form = new QFormLayout(this);
