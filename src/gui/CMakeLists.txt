@@ -54,6 +54,7 @@ SET(LMMS_SRCS
 	gui/editors/Editor.cpp
 	gui/editors/PatternEditor.cpp
 	gui/editors/PianoRoll.cpp
+	gui/editors/PianoRollPainter.cpp
 	gui/editors/PositionLine.cpp
 	gui/editors/Rubberband.cpp
 	gui/editors/SongEditor.cpp
@@ -133,4 +134,3 @@ SET(LMMS_SRCS
 
 	PARENT_SCOPE
 )
-
