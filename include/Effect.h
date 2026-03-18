@@ -158,7 +158,7 @@ protected:
 	/**
 	 * The main audio processing method that runs when plugin is awake and running
 	 */
-	virtual ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) = 0;
+	virtual ProcessStatus processImpl(SampleFrame* buf, const f_cnt_t frames) = 0;
 
 	/**
 	 * Optional method that runs instead of `processImpl` when an effect
