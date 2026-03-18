@@ -1,6 +1,5 @@
 // TODO: follow brace & spacing guidelines
 // TODO: follow name guidelines (remove snake case, use s_ for static variables)
-// TODO: saveSettings(): s/_doc/doc
 
 /*
  * OpulenZ.cpp - AdLib OPL2 FM synth based instrument
@@ -233,7 +232,8 @@ void OpulenzInstrument::reloadEmulator()
 	theEmulator->init();
 	theEmulator->write(0x01,0x20);
 	emulatorMutex.unlock();
-	for(int i=0; i<OPL2_VOICES; ++i) {
+	for (int i = 0; i < OPL2_VOICES; ++i)
+	{
 		voiceNote[i] = OPL2_VOICE_FREE;
 		voiceLRU[i] = i;
 	}
@@ -371,28 +371,27 @@ bool OpulenzInstrument::handleMidiEvent(const MidiEvent& event, const TimePos& t
 			break;
 		}
 		break;
-		default:
+	default:
 #ifdef LMMS_DEBUG
-			printf("Midi event type %d\n",event.type());
+		printf("Midi event type %d\n",event.type());
 #endif
 		break;
-		}
+	}
 	emulatorMutex.unlock();
 	return true;
 }
 
 QString OpulenzInstrument::nodeName() const
 {
-	return(opulenz_plugin_descriptor.name);
+	return opulenz_plugin_descriptor.name;
 }
 
-gui::PluginView* OpulenzInstrument::instantiateView(QWidget* _parent)
+gui::PluginView* OpulenzInstrument::instantiateView(QWidget* parent)
 {
-	return(new gui::OpulenzInstrumentView(this, _parent));
+	return new gui::OpulenzInstrumentView(this, parent);
 }
 
-
-void OpulenzInstrument::play(SampleFrame* _working_buffer)
+void OpulenzInstrument::play(SampleFrame* workingBuffer)
 {
 	emulatorMutex.lock();
 	theEmulator->update(renderbuffer, frameCount);
@@ -402,104 +401,105 @@ void OpulenzInstrument::play(SampleFrame* _working_buffer)
 		sample_t s = float(renderbuffer[frame]) / 8192.0;
 		for (ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch)
 		{
-			_working_buffer[frame][ch] = s;
+			workingBuffer[frame][ch] = s;
 		}
 	}
 	emulatorMutex.unlock();
 }
 
-void OpulenzInstrument::saveSettings(QDomDocument& _doc, QDomElement& _this)
+void OpulenzInstrument::saveSettings(QDomDocument& doc, QDomElement& el)
 {
-	op1_a_mdl.saveSettings(_doc, _this, "op1_a");
-	op1_d_mdl.saveSettings(_doc, _this, "op1_d");
-	op1_s_mdl.saveSettings(_doc, _this, "op1_s");
-	op1_r_mdl.saveSettings(_doc, _this, "op1_r");
-	op1_lvl_mdl.saveSettings(_doc, _this, "op1_lvl");
-	op1_scale_mdl.saveSettings(_doc, _this, "op1_scale");
-	op1_mul_mdl.saveSettings(_doc, _this, "op1_mul");
-	feedback_mdl.saveSettings(_doc, _this, "feedback");
-	op1_ksr_mdl.saveSettings(_doc, _this, "op1_ksr");
-	op1_perc_mdl.saveSettings(_doc, _this, "op1_perc");
-	op1_trem_mdl.saveSettings(_doc, _this, "op1_trem");
-	op1_vib_mdl.saveSettings(_doc, _this, "op1_vib");
-	op1_waveform_mdl.saveSettings(_doc, _this, "op1_waveform");
+	op1_a_mdl.saveSettings(doc, el, "op1_a");
+	op1_d_mdl.saveSettings(doc, el, "op1_d");
+	op1_s_mdl.saveSettings(doc, el, "op1_s");
+	op1_r_mdl.saveSettings(doc, el, "op1_r");
+	op1_lvl_mdl.saveSettings(doc, el, "op1_lvl");
+	op1_scale_mdl.saveSettings(doc, el, "op1_scale");
+	op1_mul_mdl.saveSettings(doc, el, "op1_mul");
+	feedback_mdl.saveSettings(doc, el, "feedback");
+	op1_ksr_mdl.saveSettings(doc, el, "op1_ksr");
+	op1_perc_mdl.saveSettings(doc, el, "op1_perc");
+	op1_trem_mdl.saveSettings(doc, el, "op1_trem");
+	op1_vib_mdl.saveSettings(doc, el, "op1_vib");
+	op1_waveform_mdl.saveSettings(doc, el, "op1_waveform");
 
-	op2_a_mdl.saveSettings(_doc, _this, "op2_a");
-	op2_d_mdl.saveSettings(_doc, _this, "op2_d");
-	op2_s_mdl.saveSettings(_doc, _this, "op2_s");
-	op2_r_mdl.saveSettings(_doc, _this, "op2_r");
-	op2_lvl_mdl.saveSettings(_doc, _this, "op2_lvl");
-	op2_scale_mdl.saveSettings(_doc, _this, "op2_scale");
-	op2_mul_mdl.saveSettings(_doc, _this, "op2_mul");
-	op2_ksr_mdl.saveSettings(_doc, _this, "op2_ksr");
-	op2_perc_mdl.saveSettings(_doc, _this, "op2_perc");
-	op2_trem_mdl.saveSettings(_doc, _this, "op2_trem");
-	op2_vib_mdl.saveSettings(_doc, _this, "op2_vib");
-	op2_waveform_mdl.saveSettings(_doc, _this, "op2_waveform");
+	op2_a_mdl.saveSettings(doc, el, "op2_a");
+	op2_d_mdl.saveSettings(doc, el, "op2_d");
+	op2_s_mdl.saveSettings(doc, el, "op2_s");
+	op2_r_mdl.saveSettings(doc, el, "op2_r");
+	op2_lvl_mdl.saveSettings(doc, el, "op2_lvl");
+	op2_scale_mdl.saveSettings(doc, el, "op2_scale");
+	op2_mul_mdl.saveSettings(doc, el, "op2_mul");
+	op2_ksr_mdl.saveSettings(doc, el, "op2_ksr");
+	op2_perc_mdl.saveSettings(doc, el, "op2_perc");
+	op2_trem_mdl.saveSettings(doc, el, "op2_trem");
+	op2_vib_mdl.saveSettings(doc, el, "op2_vib");
+	op2_waveform_mdl.saveSettings(doc, el, "op2_waveform");
 
-	fm_mdl.saveSettings(_doc, _this, "fm");
-	vib_depth_mdl.saveSettings(_doc, _this, "vib_depth");
-	trem_depth_mdl.saveSettings(_doc, _this, "trem_depth");
+	fm_mdl.saveSettings(doc, el, "fm");
+	vib_depth_mdl.saveSettings(doc, el, "vib_depth");
+	trem_depth_mdl.saveSettings(doc, el, "trem_depth");
 }
 
-void OpulenzInstrument::loadSettings(const QDomElement& _this)
+void OpulenzInstrument::loadSettings(const QDomElement& el)
 {
-	op1_a_mdl.loadSettings(_this, "op1_a");
-	op1_d_mdl.loadSettings(_this, "op1_d");
-	op1_s_mdl.loadSettings(_this, "op1_s");
-	op1_r_mdl.loadSettings(_this, "op1_r");
-	op1_lvl_mdl.loadSettings(_this, "op1_lvl");
-	op1_scale_mdl.loadSettings(_this, "op1_scale");
-	op1_mul_mdl.loadSettings(_this, "op1_mul");
-	feedback_mdl.loadSettings(_this, "feedback");
-	op1_ksr_mdl.loadSettings(_this, "op1_ksr");
-	op1_perc_mdl.loadSettings(_this, "op1_perc");
-	op1_trem_mdl.loadSettings(_this, "op1_trem");
-	op1_vib_mdl.loadSettings(_this, "op1_vib");
-	op1_waveform_mdl.loadSettings(_this, "op1_waveform");
+	op1_a_mdl.loadSettings(el, "op1_a");
+	op1_d_mdl.loadSettings(el, "op1_d");
+	op1_s_mdl.loadSettings(el, "op1_s");
+	op1_r_mdl.loadSettings(el, "op1_r");
+	op1_lvl_mdl.loadSettings(el, "op1_lvl");
+	op1_scale_mdl.loadSettings(el, "op1_scale");
+	op1_mul_mdl.loadSettings(el, "op1_mul");
+	feedback_mdl.loadSettings(el, "feedback");
+	op1_ksr_mdl.loadSettings(el, "op1_ksr");
+	op1_perc_mdl.loadSettings(el, "op1_perc");
+	op1_trem_mdl.loadSettings(el, "op1_trem");
+	op1_vib_mdl.loadSettings(el, "op1_vib");
+	op1_waveform_mdl.loadSettings(el, "op1_waveform");
 
-	op2_a_mdl.loadSettings(_this, "op2_a");
-	op2_d_mdl.loadSettings(_this, "op2_d");
-	op2_s_mdl.loadSettings(_this, "op2_s");
-	op2_r_mdl.loadSettings(_this, "op2_r");
-	op2_lvl_mdl.loadSettings(_this, "op2_lvl");
-	op2_scale_mdl.loadSettings(_this, "op2_scale");
-	op2_mul_mdl.loadSettings(_this, "op2_mul");
-	op2_ksr_mdl.loadSettings(_this, "op2_ksr");
-	op2_perc_mdl.loadSettings(_this, "op2_perc");
-	op2_trem_mdl.loadSettings(_this, "op2_trem");
-	op2_vib_mdl.loadSettings(_this, "op2_vib");
-	op2_waveform_mdl.loadSettings(_this, "op2_waveform");
+	op2_a_mdl.loadSettings(el, "op2_a");
+	op2_d_mdl.loadSettings(el, "op2_d");
+	op2_s_mdl.loadSettings(el, "op2_s");
+	op2_r_mdl.loadSettings(el, "op2_r");
+	op2_lvl_mdl.loadSettings(el, "op2_lvl");
+	op2_scale_mdl.loadSettings(el, "op2_scale");
+	op2_mul_mdl.loadSettings(el, "op2_mul");
+	op2_ksr_mdl.loadSettings(el, "op2_ksr");
+	op2_perc_mdl.loadSettings(el, "op2_perc");
+	op2_trem_mdl.loadSettings(el, "op2_trem");
+	op2_vib_mdl.loadSettings(el, "op2_vib");
+	op2_waveform_mdl.loadSettings(el, "op2_waveform");
 
-	fm_mdl.loadSettings(_this, "fm");
-	vib_depth_mdl.loadSettings(_this, "vib_depth");
-	trem_depth_mdl.loadSettings(_this, "trem_depth");
-
+	fm_mdl.loadSettings(el, "fm");
+	vib_depth_mdl.loadSettings(el, "vib_depth");
+	trem_depth_mdl.loadSettings(el, "trem_depth");
 }
 
 // Load a patch into the emulator
 void OpulenzInstrument::loadPatch(const unsigned char inst[14])
 {
 	emulatorMutex.lock();
-	for(int v=0; v<OPL2_VOICES; ++v) {
-		theEmulator->write(0x20+adlib_opadd[v],inst[0]); // op1 AM/VIB/EG/KSR/Multiplier
-		theEmulator->write(0x23+adlib_opadd[v],inst[1]); // op2
-		// theEmulator->write(0x40+adlib_opadd[v],inst[2]); // op1 KSL/Output Level - these are handled by noteon/aftertouch code
-		// theEmulator->write(0x43+adlib_opadd[v],inst[3]); // op2
-		theEmulator->write(0x60+adlib_opadd[v],inst[4]); // op1 A/D
-		theEmulator->write(0x63+adlib_opadd[v],inst[5]); // op2
-		theEmulator->write(0x80+adlib_opadd[v],inst[6]); // op1 S/R
-		theEmulator->write(0x83+adlib_opadd[v],inst[7]); // op2
-		theEmulator->write(0xe0+adlib_opadd[v],inst[8]); // op1 waveform
-		theEmulator->write(0xe3+adlib_opadd[v],inst[9]); // op2
-		theEmulator->write(0xc0+v,inst[10]);             // feedback/algorithm
+	for (int v = 0; v < OPL2_VOICES; ++v)
+	{
+		theEmulator->write(0x20 + adlib_opadd[v], inst[0]); // op1 AM/VIB/EG/KSR/Multiplier
+		theEmulator->write(0x23 + adlib_opadd[v], inst[1]); // op2
+		// theEmulator->write(0x40+adlib_opadd[v],inst[2]); // op1 KSL/Output Level - these are handled by
+		// noteon/aftertouch code theEmulator->write(0x43+adlib_opadd[v],inst[3]); // op2
+		theEmulator->write(0x60 + adlib_opadd[v], inst[4]); // op1 A/D
+		theEmulator->write(0x63 + adlib_opadd[v], inst[5]); // op2
+		theEmulator->write(0x80 + adlib_opadd[v], inst[6]); // op1 S/R
+		theEmulator->write(0x83 + adlib_opadd[v], inst[7]); // op2
+		theEmulator->write(0xe0 + adlib_opadd[v], inst[8]); // op1 waveform
+		theEmulator->write(0xe3 + adlib_opadd[v], inst[9]); // op2
+		theEmulator->write(0xc0 + v, inst[10]);				// feedback/algorithm
 	}
 	emulatorMutex.unlock();
 }
 
 void OpulenzInstrument::tuneEqual(int center, float Hz)
 {
-	for(int n=0; n<128; ++n) {
+	for (int n = 0; n < 128; ++n)
+	{
 		float tmp = Hz * std::exp2((n - center) / 12.0f + pitchbend / 1200.0f);
 		fnums[n] = Hz2fnum(tmp);
 	}
@@ -508,11 +508,10 @@ void OpulenzInstrument::tuneEqual(int center, float Hz)
 // Find suitable F number in lowest possible block
 int OpulenzInstrument::Hz2fnum(float Hz)
 {
-	for(int block=0; block<8; ++block) {
+	for (int block=0; block<8; ++block)
+	{
 		auto fnum = static_cast<unsigned>(Hz * std::exp2(20.0f - static_cast<float>(block)) / 49716.0f);
-		if(fnum<1023) {
-			return fnum + (block << 10);
-		}
+		if (fnum < 1023) { return fnum + (block << 10); }
 	}
 	return 0;
 }
@@ -673,8 +672,8 @@ void OpulenzInstrument::loadFile(const QString& file)
 namespace gui
 {
 
-OpulenzInstrumentView::OpulenzInstrumentView(Instrument* _instrument, QWidget* _parent)
-	: InstrumentViewFixedSize(_instrument, _parent)
+OpulenzInstrumentView::OpulenzInstrumentView(Instrument* instrument, QWidget* parent)
+	: InstrumentViewFixedSize(instrument, parent)
 {
 	const auto knobGen = [this](QString hintText, QString hintUnit, int xpos, int ypos)
 	{
@@ -784,19 +783,19 @@ void OpulenzInstrumentView::updateKnobHints()
 {
 	// Envelope times in ms: t[0] = 0, t[n] = (1<<n) * X, X = 0.11597 for A, 0.6311 for D/R
 	// Here some rounding has been applied.
-	const auto attackTimes = std::array<float, 16>{
+	constexpr auto AttackTimes = std::array<float, 16>{
 		0.f, 0.2f, 0.4f, 0.9f, 1.8f, 3.7f, 7.4f,
 		15.f, 30.f, 60.f, 120.f, 240.f, 480.f,
 		950.f, 1900.f, 3800.f
 	};
 
-	const auto drTimes = std::array<float, 16>{
+	constexpr auto DrTimes = std::array<float, 16>{
 		0.f, 1.2f, 2.5f, 5.f, 10.f, 20.f, 40.f,
 		80.f, 160.f, 320.f, 640.f, 1300.f, 2600.f,
 		5200.f, 10000.f, 20000.f
 	};
 
-	const auto freqMults = std::array<int, 16>{
+	constexpr auto FreqMults = std::array<int, 16>{
 		-12, 0, 12, 19, 24, 28, 31, 34, 36, 38, 40, 40, 43, 43, 47, 47
 	};
 
@@ -812,14 +811,14 @@ void OpulenzInstrumentView::updateKnobHints()
 		knob->setHintText(name, QString{" (%1 semitones)"}.arg(val));
 	};
 
-	setTimeHint(op1_a_kn, tr("Attack"), attackTimes[(int)m->op1_a_mdl.value()]);
-	setTimeHint(op2_a_kn, tr("Attack"), attackTimes[(int)m->op2_a_mdl.value()]);
-	setTimeHint(op1_d_kn, tr("Decay"), drTimes[(int)m->op1_d_mdl.value()]);
-	setTimeHint(op2_d_kn, tr("Decay"), drTimes[(int)m->op2_d_mdl.value()]);
-	setTimeHint(op1_r_kn, tr("Release"), drTimes[(int)m->op1_r_mdl.value()]);
-	setTimeHint(op2_r_kn, tr("Release"), drTimes[(int)m->op2_r_mdl.value()]);
-	setHintSemitone(op1_mul_kn, tr("Frequency multiplier"), freqMults[(int)m->op1_mul_mdl.value()]);
-	setHintSemitone(op2_mul_kn, tr("Frequency multiplier"), freqMults[(int)m->op2_mul_mdl.value()]);
+	setTimeHint(op1_a_kn, tr("Attack"), AttackTimes[(int)m->op1_a_mdl.value()]);
+	setTimeHint(op2_a_kn, tr("Attack"), AttackTimes[(int)m->op2_a_mdl.value()]);
+	setTimeHint(op1_d_kn, tr("Decay"), DrTimes[(int)m->op1_d_mdl.value()]);
+	setTimeHint(op2_d_kn, tr("Decay"), DrTimes[(int)m->op2_d_mdl.value()]);
+	setTimeHint(op1_r_kn, tr("Release"), DrTimes[(int)m->op1_r_mdl.value()]);
+	setTimeHint(op2_r_kn, tr("Release"), DrTimes[(int)m->op2_r_mdl.value()]);
+	setHintSemitone(op1_mul_kn, tr("Frequency multiplier"), FreqMults[(int)m->op1_mul_mdl.value()]);
+	setHintSemitone(op2_mul_kn, tr("Frequency multiplier"), FreqMults[(int)m->op2_mul_mdl.value()]);
 }
 
 void OpulenzInstrumentView::modelChanged()
@@ -858,7 +857,6 @@ void OpulenzInstrumentView::modelChanged()
 	vib_depth_btn->setModel(&m->vib_depth_mdl);
 	trem_depth_btn->setModel(&m->trem_depth_mdl);
 
-	// All knobs needing a user friendly unit (FIXME: unit? maybe "hints"? check on the git blame)
 	const auto connHint = [this](FloatModel* model)
 	{
 		connect(model, &FloatModel::dataChanged, this, &OpulenzInstrumentView::updateKnobHints);

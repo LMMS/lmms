@@ -197,6 +197,7 @@ public:
 	PixmapButton* trem_depth_btn;
 
 private slots:
+	//! Update hints to have user-friendly formatting and units.
 	void updateKnobHints();
 
 private:
