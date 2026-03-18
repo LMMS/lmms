@@ -50,7 +50,7 @@ public:
 	OutputSettings const & getOutputSettings() const { return m_outputSettings; }
 
 	//! Write `size` sample frames from `buf` into the output file.
-	virtual void writeBuffer(const SampleFrame* buf, std::size_t size) = 0;
+	virtual void writeBuffer(const SampleFrame* buf, const f_cnt_t frames) = 0;
 
 protected:
 	int writeData( const void* data, int len );
