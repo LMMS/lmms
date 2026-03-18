@@ -42,7 +42,6 @@ INCLUDE(CheckSubmodules)
 INCLUDE(AddFileDependencies)
 INCLUDE(CheckIncludeFiles)
 INCLUDE(FindPkgConfig)
-include(FindPython3)
 INCLUDE(GenerateExportHeader)
 include(StaticDependencies)
 
@@ -345,28 +344,22 @@ IF(WANT_CARLA)
 		PKG_CHECK_MODULES(CARLA carla-standalone>=1.9.5)
 	ENDIF()
 	IF(CARLA_FOUND)
-		SET(LMMS_HAVE_CARLA TRUE)
-		SET(STATUS_CARLA "OK")
-	ELSEIF(EXISTS "${CMAKE_SOURCE_DIR}/plugins/CarlaBase/carla/cmake/CMakeLists.txt")
-		find_package(Python3 COMPONENTS Interpreter REQUIRED)
-		execute_process(
-			COMMAND "${Python3_EXECUTABLE}" -c "import PyQt5"
-			RESULT_VARIABLE LMMS_CARLA_PYQT5_RESULT
-			OUTPUT_QUIET
-			ERROR_QUIET
+		find_path(CARLA_RESOURCES_DIR
+			NAMES carla-plugin
+			PATHS
+				/usr/share/carla/resources
+				/usr/lib/carla/resources
+			NO_DEFAULT_PATH
 		)
-		if(NOT LMMS_CARLA_PYQT5_RESULT EQUAL 0)
+		if(NOT CARLA_RESOURCES_DIR)
 			message(FATAL_ERROR
-				"Bundled Carla requires Python3 with PyQt5 available. "
-				"Missing module for interpreter: ${Python3_EXECUTABLE}")
+				"Found Carla development files, but not the Carla runtime resources. "
+				"Please install the 'carla' runtime package in addition to 'carla-dev'.")
 		endif()
 		SET(LMMS_HAVE_CARLA TRUE)
-		SET(LMMS_USE_BUNDLED_CARLA TRUE)
-		SET(LMMS_CARLA_PYTHON_EXECUTABLE "${Python3_EXECUTABLE}")
-		SET(STATUS_CARLA "OK (bundled Carla)")
+		SET(STATUS_CARLA "OK")
 	ELSE(CARLA_FOUND)
-		SET(LMMS_HAVE_WEAKCARLA TRUE)
-		SET(STATUS_CARLA "OK (weak linking enabled)")
+		SET(STATUS_CARLA "not found, install carla-dev and carla")
 	ENDIF(CARLA_FOUND)
 ENDIF(WANT_CARLA)
 

@@ -227,6 +227,9 @@ if(LMMS_HAVE_CARLA OR LMMS_HAVE_WEAKCARLA)
             EMBEDDED_RESOURCES artwork-patchbay.png artwork-rack.png
             EXPORT_BASE_NAME carlabase
             LINK SHARED)
+        if(CARLA_RESOURCES_DIR)
+                target_compile_definitions(carlabase PRIVATE LMMS_CARLA_RESOURCES_PATH="${CARLA_RESOURCES_DIR}")
+        endif()
         if(LMMS_USE_BUNDLED_CARLA)
                 add_dependencies(carlabase carla-utils carla-bundled-frontend)
                 target_compile_definitions(carlabase PRIVATE LMMS_CARLA_RESOURCES_PATH="${CARLA_BUNDLED_RESOURCES_DIR}")
