@@ -227,8 +227,7 @@ void AudioOss::run()
 
 	while (AudioDevice::isRunning())
 	{
-		const auto bufferView = InterleavedBufferView<float>{buf.data(), channels(), audioEngine()->framesPerAudioBuffer()};
-		audioEngine()->renderNextBuffer(bufferView);
+		audioEngine()->renderNextBuffer({buf.data(), channels(), audioEngine()->framesPerAudioBuffer()});
 
 		for (auto i = std::size_t{0}; i < buf.size(); ++i)
 		{

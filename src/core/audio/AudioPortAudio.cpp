@@ -202,8 +202,7 @@ int AudioPortAudio::processCallback(const void*, void* output, unsigned long fra
 		return paComplete;
 	}
 
-	const auto bufferView = InterleavedBufferView<float>{outputBuffer, channels, frameCount};
-	device->audioEngine()->renderNextBuffer(bufferView);
+	device->audioEngine()->renderNextBuffer({outputBuffer, channels, frameCount});
 	return paContinue;
 }
 } // namespace lmms

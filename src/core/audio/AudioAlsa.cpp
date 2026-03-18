@@ -240,8 +240,7 @@ void AudioAlsa::run()
 	auto buf = std::vector<float>(framesPerAudioBuffer * channels());
 	while (AudioDevice::isRunning())
 	{
-		const auto bufferView = InterleavedBufferView<float>{buf.data(), channels(), framesPerAudioBuffer};
-		audioEngine()->renderNextBuffer(bufferView);
+		audioEngine()->renderNextBuffer({buf.data(), channels(), framesPerAudioBuffer});
 
 		if (const auto framesWritten = snd_pcm_writei(m_handle, buf.data(), framesPerAudioBuffer); framesWritten < 0)
 		{

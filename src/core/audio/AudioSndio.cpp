@@ -134,8 +134,7 @@ void AudioSndio::run()
 
 	while (AudioDevice::isRunning())
 	{
-		const auto bufferView = InterleavedBufferView<float>{buf.data(), channels(), framesPerAudioBuffer};
-		audioEngine()->renderNextBuffer(bufferView);
+		audioEngine()->renderNextBuffer({buf.data(), channels(), framesPerAudioBuffer});
 		sio_write(m_hdl, buf.data(), buf.size() * sizeof(float));
 	}
 }

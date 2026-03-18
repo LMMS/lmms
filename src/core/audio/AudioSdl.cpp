@@ -171,8 +171,7 @@ void AudioSdl::sdlAudioCallback( Uint8 * _buf, int _len )
 	}
 
 	const auto frameCount = _len / sizeof(float) / channels();
-	const auto bufferView = InterleavedBufferView<float>{reinterpret_cast<float*>(_buf), channels(), frameCount};
-	audioEngine()->renderNextBuffer(bufferView);
+	audioEngine()->renderNextBuffer({reinterpret_cast<float*>(_buf), channels(), frameCount});
 }
 
 void AudioSdl::sdlInputAudioCallback(void *_udata, Uint8 *_buf, int _len) {
