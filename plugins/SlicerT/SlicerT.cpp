@@ -80,7 +80,7 @@ void SlicerT::playNote(NotePlayHandle* handle, SampleFrame* workingBuffer)
 	if (m_originalSample.sampleSize() <= 1) { return; }
 
 	int noteIndex = handle->key() - m_parentTrack->baseNote();
-	const fpp_t frames = handle->framesLeftForCurrentPeriod();
+	const f_cnt_t frames = handle->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = handle->noteOffset();
 	const int bpm = Engine::getSong()->getTempo();
 	const float pitchRatio = 1 / std::exp2(m_parentTrack->pitchModel()->value() / 1200);

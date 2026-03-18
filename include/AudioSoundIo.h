@@ -111,8 +111,8 @@ private:
 
 	SampleFrame* m_outBuf;
 	int m_outBufSize;
-	fpp_t m_outBufFramesTotal;
-	fpp_t m_outBufFrameIndex;
+	f_cnt_t m_outBufFramesTotal;
+	f_cnt_t m_outBufFrameIndex;
 
 	bool m_stopped;
 	bool m_outstreamStarted;

@@ -123,7 +123,7 @@ private slots:
 private:
 	Copl *theEmulator;
 	QString storedname;
-	fpp_t frameCount;
+	f_cnt_t frameCount;
 	short *renderbuffer;
 	int voiceNote[OPL2_VOICES];
 	// Least recently used voices
