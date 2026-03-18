@@ -318,7 +318,7 @@ void Lb302Synth::recalcFilter()
 }
 
 
-void Lb302Synth::process(SampleFrame* outbuf, const fpp_t size)
+void Lb302Synth::process(SampleFrame* outbuf, const f_cnt_t size)
 {
 	const float sampleRatio = 44100.f / Engine::audioEngine()->outputSampleRate();
 	Lb302Filter& filter = vcf(); // Hold on to the current VCF, and use it throughout this period

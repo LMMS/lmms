@@ -394,7 +394,7 @@ void OpulenzInstrument::play( SampleFrame* _working_buffer )
 	emulatorMutex.lock();
 	theEmulator->update(renderbuffer, frameCount);
 
-	for( fpp_t frame = 0; frame < frameCount; ++frame )
+	for( f_cnt_t frame = 0; frame < frameCount; ++frame )
         {
                 sample_t s = float(renderbuffer[frame]) / 8192.0;
                 for( ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch )

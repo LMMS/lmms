@@ -60,7 +60,7 @@ SlewDistortion::SlewDistortion(Model* parent, const Descriptor::SubPluginFeature
 
 
 #ifdef __SSE2__
-Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t frames)
+Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const f_cnt_t frames)
 {
 	const float d = dryLevel();
 	const float w = wetLevel();
@@ -136,7 +136,7 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 		m_hp.setHighpass(split);
 	}
 
-	for (fpp_t f = 0; f < frames; ++f)
+	for (f_cnt_t f = 0; f < frames; ++f)
 	{
 		// interpolate bias to remove crackling when moving the parameter
 		m_trueBias1 = m_biasInterpCoef * m_trueBias1 + (1.f - m_biasInterpCoef) * bias1;
@@ -436,7 +436,7 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 
 
 #else
-Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t frames)
+Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const f_cnt_t frames)
 {
 	const float d = dryLevel();
 	const float w = wetLevel();
@@ -509,7 +509,7 @@ Effect::ProcessStatus SlewDistortion::processImpl(SampleFrame* buf, const fpp_t 
 		m_hp.setHighpass(split);
 	}
 	
-	for (fpp_t f = 0; f < frames; ++f)
+	for (f_cnt_t f = 0; f < frames; ++f)
 	{
 		// interpolate bias to remove crackling when moving the parameter
 		m_trueBias1 = m_biasInterpCoef * m_trueBias1 + (1.f - m_biasInterpCoef) * bias1;

@@ -23,6 +23,7 @@
  */
 
 #include "AudioEngine.h"
+#include <iostream>
 
 #include "MixHelpers.h"
 
@@ -104,7 +105,7 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 	if( renderOnly == false )
 	{
 		m_framesPerPeriod = 
-			( fpp_t ) ConfigManager::inst()->value( "audioengine", "framesperaudiobuffer" ).toInt();
+			( f_cnt_t ) ConfigManager::inst()->value( "audioengine", "framesperaudiobuffer" ).toInt();
 
 		// if the value read from user configuration is not set or
 		// lower than the minimum allowed, use the default value and
@@ -878,7 +879,7 @@ AudioDevice * AudioEngine::tryAudioDevices()
 
 
 #ifdef LMMS_HAVE_PORTAUDIO
-	if( dev_name == AudioPortAudio::name() || dev_name == "" )
+	if (dev_name == AudioPortAudio::name() || dev_name.isEmpty())
 	{
 		dev = new AudioPortAudio( success_ful, this );
 		if( success_ful )
@@ -1075,7 +1076,7 @@ void AudioEngine::fifoWriter::run()
 {
 	disableDenormals();
 
-	const fpp_t frames = m_audioEngine->framesPerPeriod();
+	const f_cnt_t frames = m_audioEngine->framesPerPeriod();
 	while( m_writing )
 	{
 		auto buffer = new SampleFrame[frames];

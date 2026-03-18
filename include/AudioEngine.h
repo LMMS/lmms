@@ -49,9 +49,9 @@ class MidiClient;
 class AudioBusHandle;  // IWYU pragma: keep
 class AudioEngineWorkerThread;
 
-constexpr fpp_t MINIMUM_BUFFER_SIZE = 32;
-constexpr fpp_t DEFAULT_BUFFER_SIZE = 256;
-constexpr fpp_t MAXIMUM_BUFFER_SIZE = 4096;
+constexpr f_cnt_t MINIMUM_BUFFER_SIZE = 32;
+constexpr f_cnt_t DEFAULT_BUFFER_SIZE = 256;
+constexpr f_cnt_t MAXIMUM_BUFFER_SIZE = 4096;
 
 constexpr int BYTES_PER_SAMPLE = sizeof(sample_t);
 constexpr int BYTES_PER_INT_SAMPLE = sizeof(int_sample_t);
@@ -173,7 +173,7 @@ public:
 
 
 	// methods providing information for other classes
-	inline fpp_t framesPerPeriod() const
+	inline f_cnt_t framesPerPeriod() const
 	{
 		return m_framesPerPeriod;
 	}
@@ -324,7 +324,7 @@ private:
 
 	std::vector<AudioBusHandle*> m_audioBusHandles;
 
-	fpp_t m_framesPerPeriod;
+	f_cnt_t m_framesPerPeriod;
 
 	SampleFrame* m_inputBuffer[2];
 	f_cnt_t m_inputBufferFrames[2];

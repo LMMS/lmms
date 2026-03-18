@@ -163,23 +163,22 @@ public slots:
 
 private:
 	void processNote(NotePlayHandle* nph);
-	void process(SampleFrame* outbuf, const fpp_t size);
+	void process(SampleFrame* outbuf, const f_cnt_t size);
 	void recalcFilter();
 
 	enum class VcoShape { Sawtooth, Square, Triangle, Moog, RoundSquare, Sine, Exponential, WhiteNoise,
 		BLSawtooth, BLSquare, BLTriangle, BLMoog };
 	enum class VcaMode { Attack, Decay, Idle, NeverPlayed };
 
-	static constexpr float s_distRatio = 4.f;
-	static constexpr fpp_t s_envInc = 64; //!< %Envelope Recalculation period
-	static constexpr float s_vcaAttack = 1.f - 0.96406088f; //!< Amplitude attack
-	static constexpr float s_vcaInitial = 0.5f; //!< Initial amplifier coefficient
+	static constexpr float   s_distRatio = 4.f;
+	static constexpr f_cnt_t s_envInc = 64; //!< %Envelope Recalculation period
+	static constexpr float   s_vcaAttack = 1.f - 0.96406088f; //!< Amplitude attack
+	static constexpr float   s_vcaInitial = 0.5f; //!< Initial amplifier coefficient
 
 	FloatModel m_vcfCutKnob;
 	FloatModel m_vcfResKnob;
 	FloatModel m_vcfModKnob;
 	FloatModel m_vcfDecKnob;
-
 	FloatModel m_vcoDetuneKnob;
 
 	FloatModel m_distKnob;

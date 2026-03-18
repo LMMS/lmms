@@ -177,7 +177,7 @@ public:
 	MonstroSynth( MonstroInstrument * _i, NotePlayHandle * _nph );
 	virtual ~MonstroSynth() = default;
 
-	void renderOutput( fpp_t _frames, SampleFrame* _buf );
+	void renderOutput( f_cnt_t _frames, SampleFrame* _buf );
 
 private:
 
@@ -432,7 +432,7 @@ protected:
 	f_cnt_t m_lfo2_att;
 
 	sample_rate_t m_samplerate;
-	fpp_t m_fpp;
+	f_cnt_t m_fpp;
 	
 	float m_integrator;
 	float m_fmCorrection;

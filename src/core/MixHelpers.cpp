@@ -25,9 +25,10 @@
 #include "MixHelpers.h"
 
 #ifdef LMMS_DEBUG
-#include <cstdio>
+#include <iostream>
 #endif
 
+#include <algorithm>
 #include <cmath>
 
 #include "ValueBuffer.h"
@@ -41,9 +42,13 @@ static bool s_NaNHandler;
 namespace lmms::MixHelpers
 {
 
+namespace {
+
+constexpr auto SilenceThreshold = 0.000001f; // -120 dBFS
+
 /*! \brief Function for applying MIXOP on all sample frames */
 template<typename MIXOP>
-static inline void run( SampleFrame* dst, const SampleFrame* src, int frames, const MIXOP& OP )
+inline void run(SampleFrame* dst, const SampleFrame* src, int frames, const MIXOP& OP)
 {
 	for( int i = 0; i < frames; ++i )
 	{
@@ -53,7 +58,7 @@ static inline void run( SampleFrame* dst, const SampleFrame* src, int frames, co
 
 /*! \brief Function for applying MIXOP on all sample frames - split source */
 template<typename MIXOP>
-static inline void run( SampleFrame* dst, const sample_t* srcLeft, const sample_t* srcRight, int frames, const MIXOP& OP )
+inline void run(SampleFrame* dst, const sample_t* srcLeft, const sample_t* srcRight, int frames, const MIXOP& OP)
 {
 	for( int i = 0; i < frames; ++i )
 	{
@@ -62,21 +67,24 @@ static inline void run( SampleFrame* dst, const sample_t* srcLeft, const sample_
 	}
 }
 
-
+} // namespace
 
 bool isSilent( const SampleFrame* src, int frames )
 {
-	const float silenceThreshold = 0.0000001f;
-
 	for( int i = 0; i < frames; ++i )
 	{
-		if (std::abs(src[i][0]) >= silenceThreshold || std::abs(src[i][1]) >= silenceThreshold)
+		if (std::abs(src[i][0]) >= SilenceThreshold || std::abs(src[i][1]) >= SilenceThreshold)
 		{
 			return false;
 		}
 	}
 
 	return true;
+}
+
+bool isSilent(std::span<sample_t> buffer)
+{
+	return std::ranges::all_of(buffer, [&](const sample_t s) { return std::abs(s) < SilenceThreshold; });
 }
 
 bool useNaNHandler()
@@ -89,40 +97,32 @@ void setNaNHandler( bool use )
 	s_NaNHandler = use;
 }
 
-/*! \brief Function for sanitizing a buffer of infs/nans - returns true if those are found */
-bool sanitize( SampleFrame* src, int frames )
+bool sanitize(std::span<sample_t> buffer)
 {
-	if( !useNaNHandler() )
-	{
-		return false;
-	}
+	if (!useNaNHandler()) { return false; }
 
-	for (int f = 0; f < frames; ++f)
+	for (std::size_t f = 0; f < buffer.size(); ++f)
 	{
-		auto& currentFrame = src[f];
-
-		if (currentFrame.containsInf() || currentFrame.containsNaN())
+		sample_t& sample = buffer[f];
+		if (std::isinf(sample) || std::isnan(sample))
 		{
-			#ifdef LMMS_DEBUG
-					// TODO don't use printf here
-					printf("Bad data, clearing buffer. frame: ");
-					printf("%d: value %f, %f\n", f, currentFrame.left(), currentFrame.right());
-			#endif
+#ifdef LMMS_DEBUG
+			std::cerr << "Bad data, clearing buffer. frame: "
+				<< f << ", value: " << sample << "\n";
+#endif
 
-			// Clear the whole buffer if a problem is found
-			zeroSampleFrames(src, frames);
+			// Clear the channel if a problem is found
+			std::ranges::fill(buffer, 0.f);
 
 			return true;
 		}
 		else
 		{
-			currentFrame.clamp(sample_t(-1000.0), sample_t(1000.0));
+			sample = std::clamp(sample, sample_t(-1000.0), sample_t(1000.0));
 		}
-	};
-
+	}
 	return false;
 }
-
 
 struct AddOp
 {
@@ -137,6 +137,24 @@ void add( SampleFrame* dst, const SampleFrame* src, int frames )
 	run<>( dst, src, frames, AddOp() );
 }
 
+
+void add(PlanarBufferView<sample_t> dst, PlanarBufferView<const sample_t> src)
+{
+	assert(dst.channels() == src.channels());
+	assert(dst.frames() == src.frames());
+
+	const auto channels = dst.channels();
+	const auto frames = dst.frames();
+	for (ch_cnt_t channel = 0; channel < channels; ++channel)
+	{
+		auto* dstPtr = dst.bufferPtr(channel);
+		const auto* srcPtr = src.bufferPtr(channel);
+		for (f_cnt_t frame = 0; frame < frames; ++frame)
+		{
+			dstPtr[frame] += srcPtr[frame];
+		}
+	}
+}
 
 
 struct AddMultipliedOp
