@@ -42,6 +42,7 @@ INCLUDE(CheckSubmodules)
 INCLUDE(AddFileDependencies)
 INCLUDE(CheckIncludeFiles)
 INCLUDE(FindPkgConfig)
+include(FindPython3)
 INCLUDE(GenerateExportHeader)
 include(StaticDependencies)
 
@@ -346,6 +347,23 @@ IF(WANT_CARLA)
 	IF(CARLA_FOUND)
 		SET(LMMS_HAVE_CARLA TRUE)
 		SET(STATUS_CARLA "OK")
+	ELSEIF(EXISTS "${CMAKE_SOURCE_DIR}/plugins/CarlaBase/carla/cmake/CMakeLists.txt")
+		find_package(Python3 COMPONENTS Interpreter REQUIRED)
+		execute_process(
+			COMMAND "${Python3_EXECUTABLE}" -c "import PyQt5"
+			RESULT_VARIABLE LMMS_CARLA_PYQT5_RESULT
+			OUTPUT_QUIET
+			ERROR_QUIET
+		)
+		if(NOT LMMS_CARLA_PYQT5_RESULT EQUAL 0)
+			message(FATAL_ERROR
+				"Bundled Carla requires Python3 with PyQt5 available. "
+				"Missing module for interpreter: ${Python3_EXECUTABLE}")
+		endif()
+		SET(LMMS_HAVE_CARLA TRUE)
+		SET(LMMS_USE_BUNDLED_CARLA TRUE)
+		SET(LMMS_CARLA_PYTHON_EXECUTABLE "${Python3_EXECUTABLE}")
+		SET(STATUS_CARLA "OK (bundled Carla)")
 	ELSE(CARLA_FOUND)
 		SET(LMMS_HAVE_WEAKCARLA TRUE)
 		SET(STATUS_CARLA "OK (weak linking enabled)")
