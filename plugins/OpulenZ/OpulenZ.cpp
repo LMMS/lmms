@@ -1,3 +1,7 @@
+// TODO: follow brace & spacing guidelines
+// TODO: follow name guidelines (remove snake case, use s_ for static variables)
+// TODO: saveSettings(): s/_doc/doc
+
 /*
  * OpulenZ.cpp - AdLib OPL2 FM synth based instrument
  *
@@ -60,41 +64,38 @@
 namespace lmms
 {
 
-
 extern "C"
 {
 
 Plugin::Descriptor PLUGIN_EXPORT opulenz_plugin_descriptor =
 {
-        LMMS_STRINGIFY(PLUGIN_NAME),
-        "OpulenZ",
-        QT_TRANSLATE_NOOP("PluginBrowser",
-			   "2-operator FM Synth"),
-        "Raine M. Ekman <raine/at/iki/fi>",
-        0x0100,
-        Plugin::Type::Instrument,
-        new PluginPixmapLoader("logo"),
-        "sbi",
-        nullptr,
+	LMMS_STRINGIFY(PLUGIN_NAME),
+	"OpulenZ",
+	QT_TRANSLATE_NOOP("PluginBrowser", "2-operator FM Synth"),
+	"Raine M. Ekman <raine/at/iki/fi>",
+	0x0100,
+	Plugin::Type::Instrument,
+	new PluginPixmapLoader("logo"),
+	"sbi",
+	nullptr,
 };
 
 // necessary for getting instance out of shared lib
-PLUGIN_EXPORT Plugin * lmms_plugin_main(Model *m, void *)
+PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* m, void*)
 {
-	return(new OpulenzInstrument(static_cast<InstrumentTrack *>(m)));
+	return new OpulenzInstrument(static_cast<InstrumentTrack*>(m));
 }
 
 }
 
-// I'd much rather do without a mutex, but it looks like
-// the emulator code isn't really ready for threads
+// I'd much rather do without a mutex, but it looks like the emulator code isn't really ready for threads
 QMutex OpulenzInstrument::emulatorMutex;
 
 // Weird ordering of voice parameters
 const auto adlib_opadd = std::array<unsigned int, OPL2_VOICES>{0x00, 0x01, 0x02, 0x08, 0x09, 0x0A, 0x10, 0x11, 0x12};
 
-OpulenzInstrument::OpulenzInstrument(InstrumentTrack* _instrument_track)
-	: Instrument(_instrument_track, &opulenz_plugin_descriptor, nullptr, Flag::IsSingleStreamed | Flag::IsMidiBased)
+OpulenzInstrument::OpulenzInstrument(InstrumentTrack* insTrack)
+	: Instrument(insTrack, &opulenz_plugin_descriptor, nullptr, Flag::IsSingleStreamed | Flag::IsMidiBased)
 	, m_patchModel(0, 0, 127, this, tr("Patch"))
 	, op1_a_mdl(14.0, 0.0, 15.0, 1.0, this, tr("Op 1 attack"))
 	, op1_d_mdl(14.0, 0.0, 15.0, 1.0, this, tr("Op 1 decay"))
@@ -112,7 +113,7 @@ OpulenzInstrument::OpulenzInstrument(InstrumentTrack* _instrument_track)
 	, op1_w1_mdl()
 	, op1_w2_mdl()
 	, op1_w3_mdl()
-	, op1_waveform_mdl(0,0,3,this, tr("Op 1 waveform"))
+	, op1_waveform_mdl(0,0,3, this, tr("Op 1 waveform"))
 	, op2_a_mdl(1.0, 0.0, 15.0, 1.0, this, tr("Op 2 attack"))
 	, op2_d_mdl(3.0, 0.0, 15.0, 1.0, this, tr("Op 2 decay"))
 	, op2_s_mdl(14.0, 0.0, 15.0, 1.0, this, tr("Op 2 sustain"))
@@ -128,24 +129,24 @@ OpulenzInstrument::OpulenzInstrument(InstrumentTrack* _instrument_track)
 	, op2_w1_mdl()
 	, op2_w2_mdl()
 	, op2_w3_mdl()
-	, op2_waveform_mdl(0,0,3,this, tr("Op 2 waveform"))
+	, op2_waveform_mdl(0, 0, 3, this, tr("Op 2 waveform"))
 	, fm_mdl(true, this, tr("FM"))
 	, vib_depth_mdl(false, this, tr("Vibrato depth"))
 	, trem_depth_mdl(false, this, tr("Tremolo depth"))
 {
-
 	// Create an emulator - samplerate, 16 bit, mono
 	emulatorMutex.lock();
 	theEmulator = new CTemuopl(Engine::audioEngine()->outputSampleRate(), true, false);
 	theEmulator->init();
 	// Enable waveform selection
-	theEmulator->write(0x01,0x20);
+	theEmulator->write(0x01, 0x20);
 	emulatorMutex.unlock();
 
-	//Initialize voice values
+	// Initialize voice values
 	// voiceNote[0] = 0;
 	// voiceLRU[0] = 0;
-	for(int i=0; i<OPL2_VOICES; ++i) {
+	for (int i = 0; i < OPL2_VOICES; ++i)
+	{
 		voiceNote[i] = OPL2_VOICE_FREE;
 		voiceLRU[i] = i;
 	}
@@ -211,20 +212,21 @@ OpulenzInstrument::OpulenzInstrument(InstrumentTrack* _instrument_track)
 	MOD_CON(trem_depth_mdl);
 
 	// Connect the plugin to the audio engine...
-	auto iph = new InstrumentPlayHandle(this, _instrument_track);
+	auto iph = new InstrumentPlayHandle(this, insTrack);
 	Engine::audioEngine()->addPlayHandle(iph);
 }
 
-OpulenzInstrument::~OpulenzInstrument() {
+OpulenzInstrument::~OpulenzInstrument()
+{
 	delete theEmulator;
 	Engine::audioEngine()->removePlayHandlesOfTypes(instrumentTrack(),
-				PlayHandle::Type::NotePlayHandle
-				| PlayHandle::Type::InstrumentPlayHandle);
-	delete [] renderbuffer;
+		PlayHandle::Type::NotePlayHandle | PlayHandle::Type::InstrumentPlayHandle);
+	delete[] renderbuffer;
 }
 
 // Samplerate changes when choosing oversampling, so this is more or less mandatory
-void OpulenzInstrument::reloadEmulator() {
+void OpulenzInstrument::reloadEmulator()
+{
 	delete theEmulator;
 	emulatorMutex.lock();
 	theEmulator = new CTemuopl(Engine::audioEngine()->outputSampleRate(), true, false);
@@ -239,7 +241,8 @@ void OpulenzInstrument::reloadEmulator() {
 }
 
 // This shall only be called from code protected by the holy Mutex!
-void OpulenzInstrument::setVoiceVelocity(int voice, int vel) {
+void OpulenzInstrument::setVoiceVelocity(int voice, int vel)
+{
 	int vel_adjusted = !fm_mdl.value()
 		? 63 - (op1_lvl_mdl.value() * vel / 127.0)
 		: 63 - op1_lvl_mdl.value();
@@ -259,7 +262,8 @@ void OpulenzInstrument::setVoiceVelocity(int voice, int vel) {
 }
 
 // Pop least recently used voice
-int OpulenzInstrument::popVoice() {
+int OpulenzInstrument::popVoice()
+{
 	int tmp = voiceLRU[0];
 	for(int i=0; i<OPL2_VOICES-1; ++i) {
 		voiceLRU[i] = voiceLRU[i+1];
@@ -267,12 +271,14 @@ int OpulenzInstrument::popVoice() {
 	voiceLRU[OPL2_VOICES-1] = OPL2_NO_VOICE;
 #ifdef false
 	printf("<-- %d %d %d %d %d %d %d %d %d \n", voiceLRU[0],voiceLRU[1],voiceLRU[2],
-	       voiceLRU[3],voiceLRU[4],voiceLRU[5],voiceLRU[6],voiceLRU[7],voiceLRU[8]);
+		voiceLRU[3],voiceLRU[4],voiceLRU[5],voiceLRU[6],voiceLRU[7],voiceLRU[8]);
 #endif
 	return tmp;
 }
+
 // Push voice into first free slot
-int OpulenzInstrument::pushVoice(int v) {
+int OpulenzInstrument::pushVoice(int v)
+{
 	int i;
 	assert(voiceLRU[OPL2_VOICES-1]==OPL2_NO_VOICE);
 	for(i=OPL2_VOICES-1; i>0; --i) {
@@ -283,7 +289,7 @@ int OpulenzInstrument::pushVoice(int v) {
 	voiceLRU[i] = v;
 #ifdef false
 	printf("%d %d %d %d %d %d %d %d %d <-- \n", voiceLRU[0],voiceLRU[1],voiceLRU[2],
-	       voiceLRU[3],voiceLRU[4],voiceLRU[5],voiceLRU[6],voiceLRU[7],voiceLRU[8]);
+	   voiceLRU[3],voiceLRU[4],voiceLRU[5],voiceLRU[6],voiceLRU[7],voiceLRU[8]);
 #endif
 	return i;
 }
@@ -365,9 +371,9 @@ bool OpulenzInstrument::handleMidiEvent(const MidiEvent& event, const TimePos& t
 			break;
 		}
 		break;
-        default:
+		default:
 #ifdef LMMS_DEBUG
-                printf("Midi event type %d\n",event.type());
+			printf("Midi event type %d\n",event.type());
 #endif
 		break;
 		}
@@ -377,12 +383,12 @@ bool OpulenzInstrument::handleMidiEvent(const MidiEvent& event, const TimePos& t
 
 QString OpulenzInstrument::nodeName() const
 {
-        return(opulenz_plugin_descriptor.name);
+	return(opulenz_plugin_descriptor.name);
 }
 
-gui::PluginView* OpulenzInstrument::instantiateView(QWidget * _parent)
+gui::PluginView* OpulenzInstrument::instantiateView(QWidget* _parent)
 {
-        return(new gui::OpulenzInstrumentView(this, _parent));
+	return(new gui::OpulenzInstrumentView(this, _parent));
 }
 
 
@@ -391,19 +397,18 @@ void OpulenzInstrument::play(SampleFrame* _working_buffer)
 	emulatorMutex.lock();
 	theEmulator->update(renderbuffer, frameCount);
 
-	for(f_cnt_t frame = 0; frame < frameCount; ++frame)
-        {
-                sample_t s = float(renderbuffer[frame]) / 8192.0;
-                for(ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch)
-                {
-                        _working_buffer[frame][ch] = s;
-                }
+	for (f_cnt_t frame = 0; frame < frameCount; ++frame)
+	{
+		sample_t s = float(renderbuffer[frame]) / 8192.0;
+		for (ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch)
+		{
+			_working_buffer[frame][ch] = s;
+		}
 	}
 	emulatorMutex.unlock();
 }
 
-
-void OpulenzInstrument::saveSettings(QDomDocument & _doc, QDomElement & _this)
+void OpulenzInstrument::saveSettings(QDomDocument& _doc, QDomElement& _this)
 {
 	op1_a_mdl.saveSettings(_doc, _this, "op1_a");
 	op1_d_mdl.saveSettings(_doc, _this, "op1_d");
@@ -437,7 +442,7 @@ void OpulenzInstrument::saveSettings(QDomDocument & _doc, QDomElement & _this)
 	trem_depth_mdl.saveSettings(_doc, _this, "trem_depth");
 }
 
-void OpulenzInstrument::loadSettings(const QDomElement & _this)
+void OpulenzInstrument::loadSettings(const QDomElement& _this)
 {
 	op1_a_mdl.loadSettings(_this, "op1_a");
 	op1_d_mdl.loadSettings(_this, "op1_d");
@@ -473,7 +478,8 @@ void OpulenzInstrument::loadSettings(const QDomElement & _this)
 }
 
 // Load a patch into the emulator
-void OpulenzInstrument::loadPatch(const unsigned char inst[14]) {
+void OpulenzInstrument::loadPatch(const unsigned char inst[14])
+{
 	emulatorMutex.lock();
 	for(int v=0; v<OPL2_VOICES; ++v) {
 		theEmulator->write(0x20+adlib_opadd[v],inst[0]); // op1 AM/VIB/EG/KSR/Multiplier
@@ -491,7 +497,8 @@ void OpulenzInstrument::loadPatch(const unsigned char inst[14]) {
 	emulatorMutex.unlock();
 }
 
-void OpulenzInstrument::tuneEqual(int center, float Hz) {
+void OpulenzInstrument::tuneEqual(int center, float Hz)
+{
 	for(int n=0; n<128; ++n) {
 		float tmp = Hz * std::exp2((n - center) / 12.0f + pitchbend / 1200.0f);
 		fnums[n] = Hz2fnum(tmp);
@@ -499,7 +506,8 @@ void OpulenzInstrument::tuneEqual(int center, float Hz) {
 }
 
 // Find suitable F number in lowest possible block
-int OpulenzInstrument::Hz2fnum(float Hz) {
+int OpulenzInstrument::Hz2fnum(float Hz)
+{
 	for(int block=0; block<8; ++block) {
 		auto fnum = static_cast<unsigned>(Hz * std::exp2(20.0f - static_cast<float>(block)) / 49716.0f);
 		if(fnum<1023) {
@@ -518,23 +526,23 @@ void OpulenzInstrument::loadGMPatch() {
 // Update patch from the models to the chip emulation
 void OpulenzInstrument::updatePatch() {
 	auto inst = std::array<unsigned char, 14>{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-	inst[0] = (op1_trem_mdl.value() ?  128 : 0) +
-		(op1_vib_mdl.value() ?  64 : 0) +
-		(op1_perc_mdl.value() ?  0 : 32) + // NB. This envelope mode is "perc", not "sus"
-		(op1_ksr_mdl.value() ?  16 : 0) +
+	inst[0] = (op1_trem_mdl.value() ? 128 : 0) +
+		(op1_vib_mdl.value() ? 64 : 0) +
+		(op1_perc_mdl.value() ? 0 : 32) + // NB. This envelope mode is "perc", not "sus"
+		(op1_ksr_mdl.value() ? 16 : 0) +
 		((int)op1_mul_mdl.value() & 0x0f);
-	inst[1] = (op2_trem_mdl.value() ?  128 : 0) +
-		(op2_vib_mdl.value() ?  64 : 0) +
-		(op2_perc_mdl.value() ?  0 : 32) + // NB. This envelope mode is "perc", not "sus"
-		(op2_ksr_mdl.value() ?  16 : 0) +
+	inst[1] = (op2_trem_mdl.value() ? 128 : 0) +
+		(op2_vib_mdl.value() ? 64 : 0) +
+		(op2_perc_mdl.value() ? 0 : 32) + // NB. This envelope mode is "perc", not "sus"
+		(op2_ksr_mdl.value() ? 16 : 0) +
 		((int)op2_mul_mdl.value() & 0x0f);
 	inst[2] = (((int)op1_scale_mdl.value() & 0x03) << 6) +
 		(63 - ((int)op1_lvl_mdl.value() & 0x3f));
 	inst[3] = (((int)op2_scale_mdl.value() & 0x03) << 6) +
 		(63 - ((int)op2_lvl_mdl.value() & 0x3f));
-	inst[4] = ((15 - ((int)op1_a_mdl.value() & 0x0f)) << 4)+
+	inst[4] = ((15 - ((int)op1_a_mdl.value() & 0x0f)) << 4) +
 		(15 - ((int)op1_d_mdl.value() & 0x0f));
-	inst[5] = ((15 - ((int)op2_a_mdl.value() & 0x0f)) << 4)+
+	inst[5] = ((15 - ((int)op2_a_mdl.value() & 0x0f)) << 4) +
 		(15 - ((int)op2_d_mdl.value() & 0x0f));
 	inst[6] = ((15 - ((int)op1_s_mdl.value() & 0x0f)) << 4) +
 		(15 - ((int)op1_r_mdl.value() & 0x0f));
@@ -543,26 +551,27 @@ void OpulenzInstrument::updatePatch() {
 	inst[8] = (int)op1_waveform_mdl.value() & 0x03;
 	inst[9] = (int)op2_waveform_mdl.value() & 0x03;
 	inst[10] = (fm_mdl.value() ? 0 : 1) +
-		(((int)feedback_mdl.value() & 0x07)<< 1);
+		(((int)feedback_mdl.value() & 0x07) << 1);
 	// These are always 0 in the list I had?
 	inst[11] = 0;
 	inst[12] = 0;
 	inst[13] = 0;
 
 	// Not part of the per-voice patch info
-	theEmulator->write(0xBD, (trem_depth_mdl.value() ? 128 : 0) +
-			   (vib_depth_mdl.value() ? 64 : 0));
+	theEmulator->write(0xBD, (trem_depth_mdl.value() ? 128 : 0) + (vib_depth_mdl.value() ? 64 : 0));
 
 	// have to do this, as the level knobs might've changed
-	for(int voice = 0; voice < OPL2_VOICES ; ++voice) {
-		if(voiceNote[voice] && OPL2_VOICE_FREE == 0) {
+	for (int voice = 0; voice < OPL2_VOICES; ++voice)
+	{
+		if (voiceNote[voice] && OPL2_VOICE_FREE == 0)
+		{
 			setVoiceVelocity(voice, velocities[voiceNote[voice]]);
 		}
 	}
 #ifdef false
 		printf("UPD: %02x %02x %02x %02x %02x -- %02x %02x %02x %02x %02x %02x\n",
-		       inst[0], inst[1], inst[2], inst[3], inst[4],
-		       inst[5], inst[6], inst[7], inst[8], inst[9], inst[10]);
+			inst[0], inst[1], inst[2], inst[3], inst[4],
+			inst[5], inst[6], inst[7], inst[8], inst[9], inst[10]);
 #endif
 
 
@@ -570,10 +579,11 @@ void OpulenzInstrument::updatePatch() {
 }
 
 // Load an SBI file into the knob models
-void OpulenzInstrument::loadFile(const QString& file) {
+void OpulenzInstrument::loadFile(const QString& file)
+{
 	// http://cd.textfiles.com/soundsensations/SYNTH/SBINS/
 	// http://cd.textfiles.com/soundsensations/SYNTH/SBI1198/1198SBI.ZIP
-	if(!file.isEmpty() && QFileInfo(file).exists())
+	if (!file.isEmpty() && QFileInfo(file).exists())
 	{
 		QFile sbifile(file);
 		if (!sbifile.open(QIODevice::ReadOnly)) {
@@ -663,101 +673,110 @@ void OpulenzInstrument::loadFile(const QString& file) {
 namespace gui
 {
 
-OpulenzInstrumentView::OpulenzInstrumentView(Instrument * _instrument,
-                                                        QWidget * _parent) :
-        InstrumentViewFixedSize(_instrument, _parent)
+OpulenzInstrumentView::OpulenzInstrumentView(Instrument* _instrument, QWidget* _parent)
+	: InstrumentViewFixedSize(_instrument, _parent)
 {
+	const auto knobGen = [this](QString hintText, QString hintUnit, int xpos, int ypos)
+	{
+		auto* k = new Knob(KnobType::Styled, this);
+		k->setHintText(hintText, hintUnit);
+		k->setFixedSize(22, 22);
+		k->setCenterPointX(11.0);
+		k->setCenterPointY(11.0);
+		k->setTotalAngle(270.0);
+		k->move(xpos, ypos);
+		return k;
+	};
 
-#define KNOB_GEN(knobname, hinttext, hintunit,xpos,ypos) \
-	knobname = new Knob(KnobType::Styled, this);\
-	knobname->setHintText(tr(hinttext), hintunit);\
-	knobname->setFixedSize(22,22);\
-	knobname->setCenterPointX(11.0);\
-	knobname->setCenterPointY(11.0);\
-	knobname->setTotalAngle(270.0);\
-	knobname->move(xpos,ypos);
+	const auto buttonGen = [this](QString tooltip, int xpos, int ypos)
+	{
+		auto* b = new PixmapButton(this, nullptr);
+		b->setActiveGraphic(PLUGIN_NAME::getIconPixmap("led_on"));
+		b->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("led_off"));
+		b->setCheckable(true);
+		b->setToolTip(tooltip);
+		b->move(xpos, ypos);
+		return b;
+	};
 
-#define BUTTON_GEN(buttname, tooltip, xpos, ypos) \
-	buttname = new PixmapButton(this, nullptr);\
-        buttname->setActiveGraphic(PLUGIN_NAME::getIconPixmap("led_on"));\
-        buttname->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("led_off"));\
-	buttname->setCheckable(true);\
-        buttname->setToolTip(tr(tooltip));\
-        buttname->move(xpos, ypos);
-
-#define WAVEBUTTON_GEN(buttname, tooltip, xpos, ypos, icon_on, icon_off, buttgroup) \
-	buttname = new PixmapButton(this, nullptr);\
-        buttname->setActiveGraphic(PLUGIN_NAME::getIconPixmap(icon_on)); \
-        buttname->setInactiveGraphic(PLUGIN_NAME::getIconPixmap(icon_off)); \
-        buttname->setToolTip(tr(tooltip));\
-        buttname->move(xpos, ypos);\
-	buttgroup->addButton(buttname);
-
+	const auto waveButtonGen = [this](QString tooltip, int xpos, int ypos, const char* iconOn, const char* iconOff, AutomatableButtonGroup* group)
+	{
+		auto* b = new PixmapButton(this, nullptr);
+		b->setActiveGraphic(PLUGIN_NAME::getIconPixmap(iconOn));
+		b->setInactiveGraphic(PLUGIN_NAME::getIconPixmap(iconOff));
+		b->setToolTip(tooltip);
+		b->move(xpos, ypos);
+		group->addButton(b);
+		return b;
+	};
 
 	// OP1 knobs & buttons...
-	KNOB_GEN(op1_a_kn, "Attack", "", 6, 48);
-	KNOB_GEN(op1_d_kn, "Decay", "", 34, 48);
-	KNOB_GEN(op1_s_kn, "Sustain", "", 62, 48);
-	KNOB_GEN(op1_r_kn, "Release", "", 90, 48);
-	KNOB_GEN(op1_lvl_kn, "Level", "", 166, 48);
-	KNOB_GEN(op1_scale_kn, "Scale", "", 194, 48);
-	KNOB_GEN(op1_mul_kn, "Frequency multiplier", "", 222, 48);
-	BUTTON_GEN(op1_ksr_btn, "Keyboard scaling rate", 9, 87);
-	BUTTON_GEN(op1_perc_btn, "Percussive envelope", 36, 87);
-	BUTTON_GEN(op1_trem_btn, "Tremolo", 65, 87);
-	BUTTON_GEN(op1_vib_btn, "Vibrato", 93, 87);
-	KNOB_GEN(feedback_kn, "Feedback", "", 128, 48);
+	op1_a_kn = knobGen(tr("Attack"), "", 6, 48);
+	op1_d_kn = knobGen(tr("Decay"), "", 34, 48);
+	op1_s_kn = knobGen(tr("Sustain"), "", 62, 48);
+	op1_r_kn = knobGen(tr("Release"), "", 90, 48);
+	op1_lvl_kn = knobGen(tr("Level"), "", 166, 48);
+	op1_scale_kn = knobGen(tr("Scale"), "", 194, 48);
+	op1_mul_kn = knobGen(tr("Frequency multiplier"), "", 222, 48);
+	op1_ksr_btn = buttonGen(tr("Keyboard scaling rate"), 9, 87);
+	op1_perc_btn = buttonGen(tr("Percussive envelope"), 36, 87);
+	op1_trem_btn = buttonGen(tr("Tremolo"), 65, 87);
+	op1_vib_btn = buttonGen(tr("Vibrato"), 93, 87);
+	feedback_kn = knobGen(tr("Feedback"), "", 128, 48);
 
 	op1_waveform = new AutomatableButtonGroup(this);
-	WAVEBUTTON_GEN(op1_w0_btn,"Sine", 154, 86, "wave1_on", "wave1_off", op1_waveform);
-	WAVEBUTTON_GEN(op1_w1_btn,"Half sine", 178, 86, "wave2_on", "wave2_off", op1_waveform);
-	WAVEBUTTON_GEN(op1_w2_btn,"Absolute sine", 199, 86, "wave3_on", "wave3_off", op1_waveform);
-	WAVEBUTTON_GEN(op1_w3_btn,"Quarter sine", 220, 86, "wave4_on", "wave4_off", op1_waveform);
-
+	op1_w0_btn = waveButtonGen(tr("Sine"), 154, 86, "wave1_on", "wave1_off", op1_waveform);
+	op1_w1_btn = waveButtonGen(tr("Half sine"), 178, 86, "wave2_on", "wave2_off", op1_waveform);
+	op1_w2_btn = waveButtonGen(tr("Absolute sine"), 199, 86, "wave3_on", "wave3_off", op1_waveform);
+	op1_w3_btn = waveButtonGen(tr("Quarter sine"), 220, 86, "wave4_on", "wave4_off", op1_waveform);
 
 	// And the same for OP2
-	KNOB_GEN(op2_a_kn, "Attack", "", 6, 138);
-	KNOB_GEN(op2_d_kn, "Decay", "", 34, 138);
-	KNOB_GEN(op2_s_kn, "Sustain", "", 62, 138);
-	KNOB_GEN(op2_r_kn, "Release", "", 90, 138);
-	KNOB_GEN(op2_lvl_kn, "Level", "", 166, 138);
-	KNOB_GEN(op2_scale_kn, "Scale", "", 194, 138);
-	KNOB_GEN(op2_mul_kn, "Frequency multiplier", "", 222, 138);
-	BUTTON_GEN(op2_ksr_btn, "Keyboard scaling rate", 9, 177);
-	BUTTON_GEN(op2_perc_btn, "Percussive envelope", 36, 177);
-	BUTTON_GEN(op2_trem_btn, "Tremolo", 65, 177);
-	BUTTON_GEN(op2_vib_btn, "Vibrato", 93, 177);
+	op2_a_kn = knobGen(tr("Attack"), "", 6, 138);
+	op2_d_kn = knobGen(tr("Decay"), "", 34, 138);
+	op2_s_kn = knobGen(tr("Sustain"), "", 62, 138);
+	op2_r_kn = knobGen(tr("Release"), "", 90, 138);
+	op2_lvl_kn = knobGen(tr("Level"), "", 166, 138);
+	op2_scale_kn = knobGen(tr("Scale"), "", 194, 138);
+	op2_mul_kn = knobGen(tr("Frequency multiplier"), "", 222, 138);
+	op2_ksr_btn = buttonGen(tr("Keyboard scaling rate"), 9, 177);
+	op2_perc_btn = buttonGen(tr("Percussive envelope"), 36, 177);
+	op2_trem_btn = buttonGen(tr("Tremolo"), 65, 177);
+	op2_vib_btn = buttonGen(tr("Vibrato"), 93, 177);
 
 	op2_waveform = new AutomatableButtonGroup(this);
-	WAVEBUTTON_GEN(op2_w0_btn,"Sine", 154, 176, "wave1_on", "wave1_off", op2_waveform);
-	WAVEBUTTON_GEN(op2_w1_btn,"Half sine", 178, 176, "wave2_on", "wave2_off", op2_waveform);
-	WAVEBUTTON_GEN(op2_w2_btn,"Absolute sine", 199, 176, "wave3_on", "wave3_off", op2_waveform);
-	WAVEBUTTON_GEN(op2_w3_btn,"Quarter Sine", 220, 176, "wave4_on", "wave4_off", op2_waveform);
+	op2_w0_btn = waveButtonGen(tr("Sine"), 154, 176, "wave1_on", "wave1_off", op2_waveform);
+	op2_w1_btn = waveButtonGen(tr("Half sine"), 178, 176, "wave2_on", "wave2_off", op2_waveform);
+	op2_w2_btn = waveButtonGen(tr("Absolute sine"), 199, 176, "wave3_on", "wave3_off", op2_waveform);
+	op2_w3_btn = waveButtonGen(tr("Quarter Sine"), 220, 176, "wave4_on", "wave4_off", op2_waveform);
 
-	BUTTON_GEN(fm_btn, "FM", 9, 220);
-	BUTTON_GEN(vib_depth_btn, "Vibrato depth", 65, 220);
-	BUTTON_GEN(trem_depth_btn, "Tremolo depth", 93, 220);
-
+	fm_btn = buttonGen(tr("FM"), 9, 220);
+	vib_depth_btn = buttonGen(tr("Vibrato depth"), 65, 220);
+	trem_depth_btn = buttonGen(tr("Tremolo depth"), 93, 220);
 
 	setAutoFillBackground(true);
-        QPalette pal;
-        pal.setBrush(backgroundRole(), PLUGIN_NAME::getIconPixmap(
-                                                                "artwork"));
-        setPalette(pal);
-}
-OpulenzInstrumentView::~OpulenzInstrumentView() {
-	// Knobs are QWidgets and our children, so they're
-	// destroyed automagically
+	QPalette pal;
+	pal.setBrush(backgroundRole(), PLUGIN_NAME::getIconPixmap("artwork"));
+	setPalette(pal);
 }
 
-// Returns text for time knob formatted nicely
-inline QString OpulenzInstrumentView::knobHintHelper(float n) {
-	if(n>1000) {
-		return QString::number(n/1000, 'f', 0)+ " s";
-	} else if(n>10) {
-		return QString::number(n, 'f', 0)+ " ms";
-	} else {
-		return QString::number(n, 'f', 1)+ " ms";
+OpulenzInstrumentView::~OpulenzInstrumentView()
+{
+	// Knobs are QWidgets and our children, so they're destroyed automatically
+}
+
+inline QString OpulenzInstrumentView::timeKnobHint(float n)
+{
+	if (n > 1000)
+	{
+		return QString::number(n/1000, 'f', 0) + " s";
+	}
+	else if (n > 10)
+	{
+		return QString::number(n, 'f', 0) + " ms";
+	}
+	else
+	{
+		return QString::number(n, 'f', 1) + " ms";
 	}
 }
 
@@ -765,40 +784,42 @@ void OpulenzInstrumentView::updateKnobHints()
 {
 	// Envelope times in ms: t[0] = 0, t[n] = (1<<n) * X, X = 0.11597 for A, 0.6311 for D/R
 	// Here some rounding has been applied.
-	const auto attack_times = std::array<float, 16>{
+	const auto attackTimes = std::array<float, 16>{
 		0.f, 0.2f, 0.4f, 0.9f, 1.8f, 3.7f, 7.4f,
 		15.f, 30.f, 60.f, 120.f, 240.f, 480.f,
 		950.f, 1900.f, 3800.f
 	};
 
-	const auto dr_times = std::array<float, 16>{
+	const auto drTimes = std::array<float, 16>{
 		0.f, 1.2f, 2.5f, 5.f, 10.f, 20.f, 40.f,
 		80.f, 160.f, 320.f, 640.f, 1300.f, 2600.f,
 		5200.f, 10000.f, 20000.f
 	};
 
-	const auto fmultipliers = std::array<int, 16>{
+	const auto freqMults = std::array<int, 16>{
 		-12, 0, 12, 19, 24, 28, 31, 34, 36, 38, 40, 40, 43, 43, 47, 47
 	};
 
 	auto m = castModel<OpulenzInstrument>();
 
-	op1_a_kn->setHintText(tr("Attack"),
-						   " (" + knobHintHelper(attack_times[(int)m->op1_a_mdl.value()]) + ")");
-	op2_a_kn->setHintText(tr("Attack"),
-						   " (" + knobHintHelper(attack_times[(int)m->op2_a_mdl.value()]) + ")");
-	op1_d_kn->setHintText(tr("Decay"),
-						   " (" + knobHintHelper(dr_times[(int)m->op1_d_mdl.value()]) + ")");
-	op2_d_kn->setHintText(tr("Decay"),
-						   " (" + knobHintHelper(dr_times[(int)m->op2_d_mdl.value()]) + ")");
-	op1_r_kn->setHintText(tr("Release"),
-						   " (" + knobHintHelper(dr_times[(int)m->op1_r_mdl.value()]) + ")");
-	op2_r_kn->setHintText(tr("Release"),
-						   " (" + knobHintHelper(dr_times[(int)m->op2_r_mdl.value()]) + ")");
-	op1_mul_kn->setHintText(tr("Frequency multiplier"),
-			       " (" + QString::number(fmultipliers[(int)m->op1_mul_mdl.value()]) + " semitones)");
-	op2_mul_kn->setHintText(tr("Frequency multiplier"),
-			       " (" + QString::number(fmultipliers[(int)m->op2_mul_mdl.value()]) + " semitones)");
+	const auto setTimeHint = [this](Knob* knob, const QString& name, float val)
+	{
+		knob->setHintText(name, QString{" (%1)"}.arg(timeKnobHint(val)));
+	};
+
+	const auto setHintSemitone = [this](Knob* knob, const QString& name, int val)
+	{
+		knob->setHintText(name, QString{" (%1 semitones)"}.arg(val));
+	};
+
+	setTimeHint(op1_a_kn, tr("Attack"), attackTimes[(int)m->op1_a_mdl.value()]);
+	setTimeHint(op2_a_kn, tr("Attack"), attackTimes[(int)m->op2_a_mdl.value()]);
+	setTimeHint(op1_d_kn, tr("Decay"), drTimes[(int)m->op1_d_mdl.value()]);
+	setTimeHint(op2_d_kn, tr("Decay"), drTimes[(int)m->op2_d_mdl.value()]);
+	setTimeHint(op1_r_kn, tr("Release"), drTimes[(int)m->op1_r_mdl.value()]);
+	setTimeHint(op2_r_kn, tr("Release"), drTimes[(int)m->op2_r_mdl.value()]);
+	setHintSemitone(op1_mul_kn, tr("Frequency multiplier"), freqMults[(int)m->op1_mul_mdl.value()]);
+	setHintSemitone(op2_mul_kn, tr("Frequency multiplier"), freqMults[(int)m->op2_mul_mdl.value()]);
 }
 
 void OpulenzInstrumentView::modelChanged()
@@ -820,7 +841,6 @@ void OpulenzInstrumentView::modelChanged()
 	op1_vib_btn->setModel(&m->op1_vib_mdl);
 	op1_waveform->setModel(&m->op1_waveform_mdl);
 
-
 	op2_a_kn->setModel(&m->op2_a_mdl);
 	op2_d_kn->setModel(&m->op2_d_mdl);
 	op2_s_kn->setModel(&m->op2_s_mdl);
@@ -838,24 +858,23 @@ void OpulenzInstrumentView::modelChanged()
 	vib_depth_btn->setModel(&m->vib_depth_mdl);
 	trem_depth_btn->setModel(&m->trem_depth_mdl);
 
+	// All knobs needing a user friendly unit (FIXME: unit? maybe "hints"? check on the git blame)
+	const auto connHint = [this](FloatModel* model)
+	{
+		connect(model, &FloatModel::dataChanged, this, &OpulenzInstrumentView::updateKnobHints);
+	};
 
-	// All knobs needing a user friendly unit
-	connect(&m->op1_a_mdl, SIGNAL(dataChanged()), this, SLOT(updateKnobHints()));
-	connect(&m->op2_a_mdl, SIGNAL(dataChanged()), this, SLOT(updateKnobHints()));
-
-	connect(&m->op1_d_mdl, SIGNAL(dataChanged()), this, SLOT(updateKnobHints()));
-	connect(&m->op2_d_mdl, SIGNAL(dataChanged()), this, SLOT(updateKnobHints()));
-
-	connect(&m->op1_r_mdl, SIGNAL(dataChanged()), this, SLOT(updateKnobHints()));
-	connect(&m->op2_r_mdl, SIGNAL(dataChanged()), this, SLOT(updateKnobHints()));
-
-	connect(&m->op1_mul_mdl, SIGNAL(dataChanged()), this, SLOT(updateKnobHints()));
-	connect(&m->op2_mul_mdl, SIGNAL(dataChanged()), this, SLOT(updateKnobHints()));
+	connHint(&m->op1_a_mdl);
+	connHint(&m->op2_a_mdl);
+	connHint(&m->op1_d_mdl);
+	connHint(&m->op2_d_mdl);
+	connHint(&m->op1_r_mdl);
+	connHint(&m->op2_r_mdl);
+	connHint(&m->op1_mul_mdl);
+	connHint(&m->op2_mul_mdl);
 
 	updateKnobHints();
-
 }
-
 
 } // namespace gui
 
