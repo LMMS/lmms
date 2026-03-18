@@ -64,7 +64,7 @@ Plugin::Descriptor PLUGIN_EXPORT watsyn_plugin_descriptor =
 
 WatsynObject::WatsynObject( float * _A1wave, float * _A2wave,
 					float * _B1wave, float * _B2wave,
-					int _amod, int _bmod, const sample_rate_t _samplerate, NotePlayHandle * _nph, fpp_t _frames,
+					int _amod, int _bmod, const sample_rate_t _samplerate, NotePlayHandle * _nph, f_cnt_t _frames,
 					WatsynInstrument * _w ) :
 				m_amod( _amod ),
 				m_bmod( _bmod ),
@@ -103,14 +103,14 @@ WatsynObject::~WatsynObject()
 }
 
 
-void WatsynObject::renderOutput( fpp_t _frames )
+void WatsynObject::renderOutput( f_cnt_t _frames )
 {
 	if( m_abuf == nullptr )
 		m_abuf = new SampleFrame[m_fpp];
 	if( m_bbuf == nullptr )
 		m_bbuf = new SampleFrame[m_fpp];
 
-	for( fpp_t frame = 0; frame < _frames; frame++ )
+	for( f_cnt_t frame = 0; frame < _frames; frame++ )
 	{
 		// put phases of 1-series oscs into variables because phase modulation might happen
 		float A1_lphase = m_lphase[A1_OSC];
@@ -352,7 +352,7 @@ void WatsynInstrument::playNote( NotePlayHandle * _n,
 		_n->m_pluginData = w;
 	}
 
-	const fpp_t frames = _n->framesLeftForCurrentPeriod();
+	const f_cnt_t frames = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();
 	SampleFrame* buffer = _working_buffer + offset;
 
@@ -375,7 +375,7 @@ void WatsynInstrument::playNote( NotePlayHandle * _n,
 	// disabled pending proper implementation of sample-exactness
 /*	if( engine::audioEngine()->currentQualitySettings().sampleExactControllers )
 	{
-		for( fpp_t f=0; f < frames; f++ )
+		for( f_cnt_t f=0; f < frames; f++ )
 		{
 			const float tfp = tfp_ + f;
 			// handle mixing envelope
@@ -413,7 +413,7 @@ void WatsynInstrument::playNote( NotePlayHandle * _n,
 	if( envAmt != 0.0f && tfp_ < envLen )
 	{
 		const float mixvalue_ = m_abmix.value();
-		for( fpp_t f=0; f < frames; f++ )
+		for( f_cnt_t f=0; f < frames; f++ )
 		{
 			float mixvalue = mixvalue_;
 			const float tfp = tfp_ + f;
@@ -449,7 +449,7 @@ void WatsynInstrument::playNote( NotePlayHandle * _n,
 		// get knob values
 		const float bmix = ( ( m_abmix.value() + 100.0 ) / 200.0 );
 		const float amix = 1.0 - bmix;
-		for( fpp_t f=0; f < frames; f++ )
+		for( f_cnt_t f=0; f < frames; f++ )
 		{
 			// mix a/b streams according to mixing knob
 			buffer[f][0] = ( abuf[f][0] * amix ) +

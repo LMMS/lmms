@@ -58,7 +58,7 @@ public:
 	}
 
 private:
-	void writeBuffer(const SampleFrame* /* _buf*/, const fpp_t /*_frames*/) override;
+	void writeBuffer(const SampleFrame* /* _buf*/, const f_cnt_t /*_frames*/) override;
 	void flushRemainingBuffers();
 	bool initEncoder();
 	void tearDownEncoder();

@@ -48,9 +48,9 @@ class MidiClient;
 class AudioBusHandle;  // IWYU pragma: keep
 class AudioEngineWorkerThread;
 
-constexpr fpp_t MINIMUM_BUFFER_SIZE = 32;
-constexpr fpp_t DEFAULT_BUFFER_SIZE = 256;
-constexpr fpp_t MAXIMUM_BUFFER_SIZE = 4096;
+constexpr f_cnt_t MINIMUM_BUFFER_SIZE = 32;
+constexpr f_cnt_t DEFAULT_BUFFER_SIZE = 256;
+constexpr f_cnt_t MAXIMUM_BUFFER_SIZE = 4096;
 
 constexpr int BYTES_PER_SAMPLE = sizeof(sample_t);
 constexpr int BYTES_PER_INT_SAMPLE = sizeof(int_sample_t);
@@ -173,16 +173,10 @@ public:
 	void removePlayHandlesOfTypes(Track * track, PlayHandle::Types types);
 
 	//! @return the number of frames rendered per period
-	fpp_t framesPerPeriod() const
-	{
-		return m_framesPerPeriod;
-	}
+	f_cnt_t framesPerPeriod() const { return m_framesPerPeriod; }
 
 	//! @returns the number of audio frames per audio buffer
-	fpp_t framesPerAudioBuffer() const
-	{
-		return m_framesPerAudioBuffer;
-	}
+	f_cnt_t framesPerAudioBuffer() const { return m_framesPerAudioBuffer; }
 
 	AudioEngineProfiler& profiler()
 	{
@@ -337,8 +331,8 @@ private:
 
 	std::vector<AudioBusHandle*> m_audioBusHandles;
 
-	fpp_t m_framesPerAudioBuffer;
-	fpp_t m_framesPerPeriod;
+	f_cnt_t m_framesPerAudioBuffer;
+	f_cnt_t m_framesPerPeriod;
 	sample_rate_t m_baseSampleRate;
 
 	SampleFrame* m_inputBuffer[2];

@@ -371,7 +371,7 @@ void TripleOscillator::playNote( NotePlayHandle * _n,
 	Oscillator * osc_l = static_cast<oscPtr *>( _n->m_pluginData )->oscLeft;
 	Oscillator * osc_r = static_cast<oscPtr *>( _n->m_pluginData )->oscRight;
 
-	const fpp_t frames = _n->framesLeftForCurrentPeriod();
+	const f_cnt_t frames = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();
 
 	osc_l->update( _working_buffer + offset, frames, 0 );

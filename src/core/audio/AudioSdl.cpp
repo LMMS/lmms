@@ -183,7 +183,7 @@ void AudioSdl::sdlInputAudioCallback(void *_udata, Uint8 *_buf, int _len) {
 
 void AudioSdl::sdlInputAudioCallback(Uint8 *_buf, int _len) {
 	auto samples_buffer = (SampleFrame*)_buf;
-	fpp_t frames = _len / sizeof ( SampleFrame );
+	f_cnt_t frames = _len / sizeof ( SampleFrame );
 
 	audioEngine()->pushInputFrames (samples_buffer, frames);
 }
