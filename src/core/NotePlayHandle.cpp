@@ -350,7 +350,7 @@ f_cnt_t NotePlayHandle::framesLeftForCurrentPeriod() const
 {
 	if( m_totalFramesPlayed == 0 )
 	{
-		return static_cast<f_cnt_t>(std::min<f_cnt_t>(framesLeft(), Engine::audioEngine()->framesPerPeriod() - offset()));
+		return std::min(framesLeft(), Engine::audioEngine()->framesPerPeriod() - offset());
 	}
 	return static_cast<f_cnt_t>(std::min<f_cnt_t>(framesLeft(), Engine::audioEngine()->framesPerPeriod()));
 }
