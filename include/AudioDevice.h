@@ -28,7 +28,6 @@
 #include <QMutex>
 #include <samplerate.h>
 
-#include "AudioBufferView.h"
 #include "LmmsTypes.h"
 
 class QThread;
@@ -46,17 +45,6 @@ class AudioDevice
 public:
 	AudioDevice( const ch_cnt_t _channels, AudioEngine* audioEngine );
 	virtual ~AudioDevice();
-
-	inline void lock()
-	{
-		m_devMutex.lock();
-	}
-
-	inline void unlock()
-	{
-		m_devMutex.unlock();
-	}
-
 
 	// if audio-driver supports ports, classes inheriting AudioBusHandle
 	// (e.g. channel-tracks) can register themselves for making
@@ -108,11 +96,7 @@ private:
 
 	sample_rate_t m_sampleRate;
 	ch_cnt_t m_channels;
-
 	AudioEngine* m_audioEngine = nullptr;
-
-	QMutex m_devMutex;
-
 	std::atomic_flag m_running = ATOMIC_FLAG_INIT;
 };
 

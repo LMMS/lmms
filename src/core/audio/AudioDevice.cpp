@@ -43,8 +43,6 @@ AudioDevice::AudioDevice(const ch_cnt_t _channels, AudioEngine* _audioEngine)
 AudioDevice::~AudioDevice()
 {
 	assert(!isRunning() && "device should have been stopped before being destroyed");
-	m_devMutex.tryLock();
-	unlock();
 }
 
 void AudioDevice::startProcessing()

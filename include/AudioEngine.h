@@ -33,6 +33,7 @@
 #include <memory>
 #include <vector>
 
+#include "AudioBufferView.h"
 #include "AudioDevice.h"
 #include "LmmsTypes.h"
 #include "SampleFrame.h"
