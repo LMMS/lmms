@@ -87,11 +87,7 @@ PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* m, void*)
 
 }
 
-// I'd much rather do without a mutex, but it looks like the emulator code isn't really ready for threads
 QMutex OpulenzInstrument::s_emulatorMutex;
-
-// Weird ordering of voice parameters
-const auto adlib_opadd = std::array<unsigned int, OPL2_VOICES>{0x00, 0x01, 0x02, 0x08, 0x09, 0x0A, 0x10, 0x11, 0x12};
 
 OpulenzInstrument::OpulenzInstrument(InstrumentTrack* insTrack)
 	: Instrument(insTrack, &opulenz_plugin_descriptor, nullptr, Flag::IsSingleStreamed | Flag::IsMidiBased)
@@ -165,8 +161,7 @@ OpulenzInstrument::OpulenzInstrument(InstrumentTrack* insTrack)
 
 	tuneEqual(69, 440);
 
-	connect(Engine::audioEngine(), SIGNAL(sampleRateChanged()),
-		 this, SLOT(reloadEmulator()));
+	connect(Engine::audioEngine(), SIGNAL(sampleRateChanged()), this, SLOT(reloadEmulator()));
 
 	// Connect knobs
 	// This one's for testing...
@@ -229,7 +224,6 @@ OpulenzInstrument::~OpulenzInstrument()
 	delete[] renderbuffer;
 }
 
-// Samplerate changes when choosing oversampling, so this is more or less mandatory
 void OpulenzInstrument::reloadEmulator()
 {
 	delete theEmulator;
@@ -246,7 +240,11 @@ void OpulenzInstrument::reloadEmulator()
 	updatePatch();
 }
 
-// This shall only be called from code protected by the holy Mutex!
+void OpulenzInstrument::writeVoice(int voice, int reg, int val)
+{
+	theEmulator->write(OpulenzInstrument::OpAdd[voice] + reg, val);
+}
+
 void OpulenzInstrument::setVoiceVelocity(int voice, int vel)
 {
 	int vel_adjusted = !fm_mdl.value()
@@ -255,19 +253,13 @@ void OpulenzInstrument::setVoiceVelocity(int voice, int vel)
 
 	// Velocity calculation, some kind of approximation
 	// Only calculate for operator 1 if in adding mode, don't want to change timbre
-	theEmulator->write(0x40+adlib_opadd[voice],
-		((int)op1_scale_mdl.value() & 0x03 << 6) +
-		(vel_adjusted & 0x3f));
-
+	writeVoice(voice, 0x40, ((int)op1_scale_mdl.value() & 0x03 << 6) + (vel_adjusted & 0x3f));
 
 	vel_adjusted = 63 - (op2_lvl_mdl.value() * vel / 127.0);
 	// vel_adjusted = 63 - op2_lvl_mdl.value();
-	theEmulator->write(0x43+adlib_opadd[voice],
-		((int)op2_scale_mdl.value() & 0x03 << 6) +
-		(vel_adjusted & 0x3f));
+	writeVoice(voice, 0x43, ((int)op2_scale_mdl.value() & 0x03 << 6) + (vel_adjusted & 0x3f));
 }
 
-// Pop least recently used voice
 int OpulenzInstrument::popVoice()
 {
 	int tmp = voiceLRU[0];
@@ -283,7 +275,6 @@ int OpulenzInstrument::popVoice()
 	return tmp;
 }
 
-// Push voice into first free slot
 int OpulenzInstrument::pushVoice(int v)
 {
 	int i;
@@ -312,7 +303,7 @@ bool OpulenzInstrument::handleMidiEvent(const MidiEvent& event, const TimePos& t
 		if (int voice = popVoice(); voice != OPL2_NO_VOICE)
 		{
 			// Turn voice on, NB! the frequencies are straight by voice number,
-			// not by the adlib_opadd table!
+			// not by the OpulenzInstrument::OpAdd table!
 			theEmulator->write(0xA0 + voice, fnums[key] & 0xff);
 			theEmulator->write(0xB0 + voice, 32 + ((fnums[key] & 0x1f00) >> 8));
 			setVoiceVelocity(voice, vel);
@@ -358,7 +349,8 @@ bool OpulenzInstrument::handleMidiEvent(const MidiEvent& event, const TimePos& t
 		}
 		break;
 	case MidiControlChange:
-		switch (event.controllerNumber()) {
+		switch (event.controllerNumber())
+		{
 		case MidiControllerRegisteredParameterNumberLSB:
 			RPNfine = event.controllerValue();
 			break;
@@ -366,7 +358,8 @@ bool OpulenzInstrument::handleMidiEvent(const MidiEvent& event, const TimePos& t
 			RPNcoarse = event.controllerValue();
 			break;
 		case MidiControllerDataEntry:
-			if((RPNcoarse << 8) + RPNfine == MidiPitchBendSensitivityRPN) {
+			if ((RPNcoarse << 8) + RPNfine == MidiPitchBendSensitivityRPN)
+			{
 				pitchBendRange = event.controllerValue() * 100;
 			}
 			break;
@@ -481,23 +474,25 @@ void OpulenzInstrument::loadSettings(const QDomElement& el)
 	trem_depth_mdl.loadSettings(el, "trem_depth");
 }
 
-// Load a patch into the emulator
 void OpulenzInstrument::loadPatch(const unsigned char inst[14])
 {
 	s_emulatorMutex.lock();
 	for (int v = 0; v < OPL2_VOICES; ++v)
 	{
-		theEmulator->write(0x20 + adlib_opadd[v], inst[0]); // op1 AM/VIB/EG/KSR/Multiplier
-		theEmulator->write(0x23 + adlib_opadd[v], inst[1]); // op2
-		// theEmulator->write(0x40+adlib_opadd[v],inst[2]); // op1 KSL/Output Level - these are handled by
-		// noteon/aftertouch code theEmulator->write(0x43+adlib_opadd[v],inst[3]); // op2
-		theEmulator->write(0x60 + adlib_opadd[v], inst[4]); // op1 A/D
-		theEmulator->write(0x63 + adlib_opadd[v], inst[5]); // op2
-		theEmulator->write(0x80 + adlib_opadd[v], inst[6]); // op1 S/R
-		theEmulator->write(0x83 + adlib_opadd[v], inst[7]); // op2
-		theEmulator->write(0xe0 + adlib_opadd[v], inst[8]); // op1 waveform
-		theEmulator->write(0xe3 + adlib_opadd[v], inst[9]); // op2
-		theEmulator->write(0xc0 + v, inst[10]);				// feedback/algorithm
+		writeVoice(v, 0x20, inst[0]); // op1 AM/VIB/EG/KSR/Multiplier
+		writeVoice(v, 0x23, inst[1]); // op2
+#if 0
+		// The handling of these registers is currently done by setVoiceVelocity().
+		writeVoice(v, 0x40, inst[2]); // op1 KSL/Output Level
+		writeVoice(v, 0x43, inst[3]); // op2
+#endif
+		writeVoice(v, 0x60, inst[4]); // op1 A/D
+		writeVoice(v, 0x63, inst[5]); // op2
+		writeVoice(v, 0x80, inst[6]); // op1 S/R
+		writeVoice(v, 0x83, inst[7]); // op2
+		writeVoice(v, 0xe0, inst[8]); // op1 waveform
+		writeVoice(v, 0xe3, inst[9]); // op2
+		theEmulator->write(0xc0 + v, inst[10]);	// feedback/algorithm
 	}
 	s_emulatorMutex.unlock();
 }
@@ -511,7 +506,6 @@ void OpulenzInstrument::tuneEqual(int center, float Hz)
 	}
 }
 
-// Find suitable F number in lowest possible block
 int OpulenzInstrument::Hz2fnum(float Hz)
 {
 	for (int block = 0; block < 8; ++block)
@@ -522,14 +516,14 @@ int OpulenzInstrument::Hz2fnum(float Hz)
 	return 0;
 }
 
-// Load one of the default patches
-void OpulenzInstrument::loadGMPatch() {
+void OpulenzInstrument::loadGMPatch()
+{
 	const unsigned char* inst = midi_fm_instruments[m_patchModel.value()];
 	loadPatch(inst);
 }
 
-// Update patch from the models to the chip emulation
-void OpulenzInstrument::updatePatch() {
+void OpulenzInstrument::updatePatch()
+{
 	auto inst = std::array<unsigned char, 14>{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	inst[0] = (op1_trem_mdl.value() ? 128 : 0) +
 		(op1_vib_mdl.value() ? 64 : 0) +
@@ -576,7 +570,6 @@ void OpulenzInstrument::updatePatch() {
 	loadPatch(inst.data());
 }
 
-// Load an SBI file into the knob models
 void OpulenzInstrument::loadFile(const QString& file)
 {
 	// http://cd.textfiles.com/soundsensations/SYNTH/SBINS/

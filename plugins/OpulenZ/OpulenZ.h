@@ -67,9 +67,11 @@ public:
 
 	void saveSettings(QDomDocument& _doc, QDomElement& _this) override;
 	void loadSettings(const QDomElement& _this) override;
-	void loadPatch(const unsigned char inst[14]);
+
+	void loadPatch(const unsigned char inst[14]); //!< Load a patch into the emulator
+
 	void tuneEqual(int center, float Hz);
-	void loadFile(const QString& file) override;
+	void loadFile(const QString& file) override; //!< Load an SBI file into the knob models
 
 	IntModel m_patchModel;
 
@@ -113,9 +115,9 @@ public:
 	BoolModel trem_depth_mdl;
 
 private slots:
-	void updatePatch();
-	void reloadEmulator();
-	void loadGMPatch();
+	void updatePatch(); //!< Update patch from the models to the chip emulation
+	void reloadEmulator(); //!< Samplerate changes when choosing oversampling, so this is more or less mandatory
+	void loadGMPatch(); //!< Load one of the default patches
 
 private:
 	Copl* theEmulator;
@@ -123,21 +125,41 @@ private:
 	f_cnt_t frameCount;
 	short* renderbuffer;
 	int voiceNote[OPL2_VOICES];
-	// Least recently used voices
-	int voiceLRU[OPL2_VOICES];
+
+	int voiceLRU[OPL2_VOICES]; //!< Least recently used voices
+
 	// 0 - no note, >0 - note on velocity
 	int velocities[128];
+
 	// These include both octave and Fnumber
 	int fnums[128];
+
 	// in cents, range defaults to +/-100 cents (should this be changeable?)
 	int pitchbend;
 	int pitchBendRange;
 
-	int popVoice();
-	int pushVoice(int v);
+	int popVoice(); //!< Pop least recently used voice
+	int pushVoice(int v); //!< Push voice into first free slot
+	int Hz2fnum(float Hz); //!< Find suitable F number in lowest possible block
 
-	int Hz2fnum(float Hz);
+	/**
+		Mutex for the emulator code. "I'd much rather do without a mutex, but it looks like the emulator code isn't
+		really ready for threads"
+	*/
 	static QMutex s_emulatorMutex;
+
+	//! (Weird) offsets for voice parameters
+	static constexpr auto OpAdd = std::array<unsigned int, OPL2_VOICES>{
+		0x00, 0x01, 0x02, 0x08, 0x09, 0x0A, 0x10, 0x11, 0x12
+	};
+
+	/**
+		Write data to a specific voice's register, according to the `OpAdd` table. Can only be called by code
+		protected by the holy mutex!
+	*/
+	void writeVoice(int voice, int reg, int val);
+
+	//! Can only be called by code protected by the holy mutex!
 	void setVoiceVelocity(int voice, int vel);
 
 	// Pitch bend range comes through RPNs.
