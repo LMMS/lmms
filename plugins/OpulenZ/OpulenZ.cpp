@@ -1,5 +1,5 @@
-// TODO: follow brace & spacing guidelines
-// TODO: follow name guidelines (remove snake case, use s_ for static variables)
+// TODO: follow name guidelines (remove snake case)
+// TODO: are m_patchModel & loadGMPatch used at all??
 
 /*
  * OpulenZ.cpp - AdLib OPL2 FM synth based instrument
@@ -88,7 +88,7 @@ PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* m, void*)
 }
 
 // I'd much rather do without a mutex, but it looks like the emulator code isn't really ready for threads
-QMutex OpulenzInstrument::emulatorMutex;
+QMutex OpulenzInstrument::s_emulatorMutex;
 
 // Weird ordering of voice parameters
 const auto adlib_opadd = std::array<unsigned int, OPL2_VOICES>{0x00, 0x01, 0x02, 0x08, 0x09, 0x0A, 0x10, 0x11, 0x12};
@@ -134,12 +134,12 @@ OpulenzInstrument::OpulenzInstrument(InstrumentTrack* insTrack)
 	, trem_depth_mdl(false, this, tr("Tremolo depth"))
 {
 	// Create an emulator - samplerate, 16 bit, mono
-	emulatorMutex.lock();
+	s_emulatorMutex.lock();
 	theEmulator = new CTemuopl(Engine::audioEngine()->outputSampleRate(), true, false);
 	theEmulator->init();
 	// Enable waveform selection
 	theEmulator->write(0x01, 0x20);
-	emulatorMutex.unlock();
+	s_emulatorMutex.unlock();
 
 	// Initialize voice values
 	// voiceNote[0] = 0;
@@ -167,48 +167,54 @@ OpulenzInstrument::OpulenzInstrument(InstrumentTrack* insTrack)
 
 	connect(Engine::audioEngine(), SIGNAL(sampleRateChanged()),
 		 this, SLOT(reloadEmulator()));
+
 	// Connect knobs
 	// This one's for testing...
-	connect(&m_patchModel, SIGNAL(dataChanged()), this, SLOT(loadGMPatch()));
-#define MOD_CON(model) connect(&model, SIGNAL(dataChanged()), this, SLOT(updatePatch()));
-	MOD_CON(op1_a_mdl);
-	MOD_CON(op1_d_mdl);
-	MOD_CON(op1_s_mdl);
-	MOD_CON(op1_r_mdl);
-	MOD_CON(op1_lvl_mdl);
-	MOD_CON(op1_scale_mdl);
-	MOD_CON(op1_mul_mdl);
-	MOD_CON(feedback_mdl);
-	MOD_CON(op1_ksr_mdl);
-	MOD_CON(op1_perc_mdl);
-	MOD_CON(op1_trem_mdl);
-	MOD_CON(op1_vib_mdl);
-	MOD_CON(op1_w0_mdl);
-	MOD_CON(op1_w1_mdl);
-	MOD_CON(op1_w2_mdl);
-	MOD_CON(op1_w3_mdl);
-	MOD_CON(op1_waveform_mdl);
+	connect(&m_patchModel, &IntModel::dataChanged, this, &OpulenzInstrument::loadGMPatch);
 
-	MOD_CON(op2_a_mdl);
-	MOD_CON(op2_d_mdl);
-	MOD_CON(op2_s_mdl);
-	MOD_CON(op2_r_mdl);
-	MOD_CON(op2_lvl_mdl);
-	MOD_CON(op2_scale_mdl);
-	MOD_CON(op2_mul_mdl);
-	MOD_CON(op2_ksr_mdl);
-	MOD_CON(op2_perc_mdl);
-	MOD_CON(op2_trem_mdl);
-	MOD_CON(op2_vib_mdl);
-	MOD_CON(op2_w0_mdl);
-	MOD_CON(op2_w1_mdl);
-	MOD_CON(op2_w2_mdl);
-	MOD_CON(op2_w3_mdl);
-	MOD_CON(op2_waveform_mdl);
+	const auto modelConn = [this](auto& model)
+	{
+		connect(&model, SIGNAL(dataChanged()), this, SLOT(updatePatch()));
+	};
 
-	MOD_CON(fm_mdl);
-	MOD_CON(vib_depth_mdl);
-	MOD_CON(trem_depth_mdl);
+	modelConn(op1_a_mdl);
+	modelConn(op1_d_mdl);
+	modelConn(op1_s_mdl);
+	modelConn(op1_r_mdl);
+	modelConn(op1_lvl_mdl);
+	modelConn(op1_scale_mdl);
+	modelConn(op1_mul_mdl);
+	modelConn(feedback_mdl);
+	modelConn(op1_ksr_mdl);
+	modelConn(op1_perc_mdl);
+	modelConn(op1_trem_mdl);
+	modelConn(op1_vib_mdl);
+	modelConn(op1_w0_mdl);
+	modelConn(op1_w1_mdl);
+	modelConn(op1_w2_mdl);
+	modelConn(op1_w3_mdl);
+	modelConn(op1_waveform_mdl);
+
+	modelConn(op2_a_mdl);
+	modelConn(op2_d_mdl);
+	modelConn(op2_s_mdl);
+	modelConn(op2_r_mdl);
+	modelConn(op2_lvl_mdl);
+	modelConn(op2_scale_mdl);
+	modelConn(op2_mul_mdl);
+	modelConn(op2_ksr_mdl);
+	modelConn(op2_perc_mdl);
+	modelConn(op2_trem_mdl);
+	modelConn(op2_vib_mdl);
+	modelConn(op2_w0_mdl);
+	modelConn(op2_w1_mdl);
+	modelConn(op2_w2_mdl);
+	modelConn(op2_w3_mdl);
+	modelConn(op2_waveform_mdl);
+
+	modelConn(fm_mdl);
+	modelConn(vib_depth_mdl);
+	modelConn(trem_depth_mdl);
 
 	// Connect the plugin to the audio engine...
 	auto iph = new InstrumentPlayHandle(this, insTrack);
@@ -227,11 +233,11 @@ OpulenzInstrument::~OpulenzInstrument()
 void OpulenzInstrument::reloadEmulator()
 {
 	delete theEmulator;
-	emulatorMutex.lock();
+	s_emulatorMutex.lock();
 	theEmulator = new CTemuopl(Engine::audioEngine()->outputSampleRate(), true, false);
 	theEmulator->init();
 	theEmulator->write(0x01,0x20);
-	emulatorMutex.unlock();
+	s_emulatorMutex.unlock();
 	for (int i = 0; i < OPL2_VOICES; ++i)
 	{
 		voiceNote[i] = OPL2_VOICE_FREE;
@@ -296,7 +302,7 @@ int OpulenzInstrument::pushVoice(int v)
 
 bool OpulenzInstrument::handleMidiEvent(const MidiEvent& event, const TimePos& time, f_cnt_t offset)
 {
-	emulatorMutex.lock();
+	s_emulatorMutex.lock();
 
 	int key = event.key();
 	int vel = event.velocity();
@@ -377,7 +383,7 @@ bool OpulenzInstrument::handleMidiEvent(const MidiEvent& event, const TimePos& t
 #endif
 		break;
 	}
-	emulatorMutex.unlock();
+	s_emulatorMutex.unlock();
 	return true;
 }
 
@@ -393,7 +399,7 @@ gui::PluginView* OpulenzInstrument::instantiateView(QWidget* parent)
 
 void OpulenzInstrument::play(SampleFrame* workingBuffer)
 {
-	emulatorMutex.lock();
+	s_emulatorMutex.lock();
 	theEmulator->update(renderbuffer, frameCount);
 
 	for (f_cnt_t frame = 0; frame < frameCount; ++frame)
@@ -404,7 +410,7 @@ void OpulenzInstrument::play(SampleFrame* workingBuffer)
 			workingBuffer[frame][ch] = s;
 		}
 	}
-	emulatorMutex.unlock();
+	s_emulatorMutex.unlock();
 }
 
 void OpulenzInstrument::saveSettings(QDomDocument& doc, QDomElement& el)
@@ -478,7 +484,7 @@ void OpulenzInstrument::loadSettings(const QDomElement& el)
 // Load a patch into the emulator
 void OpulenzInstrument::loadPatch(const unsigned char inst[14])
 {
-	emulatorMutex.lock();
+	s_emulatorMutex.lock();
 	for (int v = 0; v < OPL2_VOICES; ++v)
 	{
 		theEmulator->write(0x20 + adlib_opadd[v], inst[0]); // op1 AM/VIB/EG/KSR/Multiplier
@@ -493,7 +499,7 @@ void OpulenzInstrument::loadPatch(const unsigned char inst[14])
 		theEmulator->write(0xe3 + adlib_opadd[v], inst[9]); // op2
 		theEmulator->write(0xc0 + v, inst[10]);				// feedback/algorithm
 	}
-	emulatorMutex.unlock();
+	s_emulatorMutex.unlock();
 }
 
 void OpulenzInstrument::tuneEqual(int center, float Hz)
