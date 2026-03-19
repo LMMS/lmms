@@ -44,6 +44,7 @@ set(LMMS_SRCS
 	core/MicroTimer.cpp
 	core/Microtuner.cpp
 	core/MixHelpers.cpp
+	core/MixerChannelModel.cpp
 	core/Model.cpp
 	core/ModelVisitor.cpp
 	core/Note.cpp

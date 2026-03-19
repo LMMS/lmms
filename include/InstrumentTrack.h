@@ -26,7 +26,6 @@
 #ifndef LMMS_INSTRUMENT_TRACK_H
 #define LMMS_INSTRUMENT_TRACK_H
 
-
 #include "AudioBusHandle.h"
 #include "InstrumentFunctions.h"
 #include "InstrumentSoundShaping.h"
@@ -34,11 +33,11 @@
 #include "Midi.h"
 #include "MidiEventProcessor.h"
 #include "MidiPort.h"
+#include "MixerChannelModel.h"
 #include "NotePlayHandle.h"
 #include "Piano.h"
 #include "Plugin.h"
 #include "Track.h"
-
 
 namespace lmms
 {
@@ -261,9 +260,6 @@ protected slots:
 	void updatePitch();
 	void updatePitchRange();
 	void updateMixerChannel();
-	void mixerChannelsSwapped(int fromIndex, int toIndex);
-	void mixerChannelDeleted(int index);
-	void mixerChannelCreated(int index);
 
 private:
 	void processCCEvent(int controller);
@@ -298,7 +294,7 @@ private:
 
 	FloatModel m_pitchModel;
 	IntModel m_pitchRangeModel;
-	IntModel m_mixerChannelModel;
+	MixerChannelModel m_mixerChannelModel;
 	BoolModel m_useMasterPitchModel;
 
 	Instrument * m_instrument;

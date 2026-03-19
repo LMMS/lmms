@@ -48,19 +48,13 @@ SampleTrack::SampleTrack(TrackContainer* tc) :
 	Track(Track::Type::Sample, tc),
 	m_volumeModel(DefaultVolume, MinVolume, MaxVolume, 0.1f, this, tr("Volume")),
 	m_panningModel(DefaultPanning, PanningLeft, PanningRight, 0.1f, this, tr("Panning")),
-	m_mixerChannelModel(0, 0, 0, this, tr("Mixer channel")),
 	m_audioBusHandle(tr("Sample track"), true, &m_volumeModel, &m_panningModel, &m_mutedModel),
 	m_isPlaying(false)
 {
 	setName(tr("Sample track"));
 	m_panningModel.setCenterValue(DefaultPanning);
-	m_mixerChannelModel.setRange(0, Engine::mixer()->numChannels()-1, 1);
 
 	connect(&m_mixerChannelModel, SIGNAL(dataChanged()), this, SLOT(updateMixerChannel()));
-	connect(Engine::mixer(), &Mixer::channelsSwapped, this, &SampleTrack::mixerChannelsSwapped);
-	connect(Engine::mixer(), &Mixer::channelDeleted, this, &SampleTrack::mixerChannelDeleted);
-	connect(Engine::mixer(), &Mixer::channelCreated, this, &SampleTrack::mixerChannelCreated);
-
 }
 
 
@@ -252,24 +246,6 @@ void SampleTrack::setPlayingClips( bool isPlaying )
 void SampleTrack::updateMixerChannel()
 {
 	m_audioBusHandle.setNextMixerChannel(m_mixerChannelModel.value());
-}
-
-void SampleTrack::mixerChannelsSwapped(int fromIndex, int toIndex)
-{
-	if (m_mixerChannelModel.value() == fromIndex) { m_mixerChannelModel.setValue(toIndex); }
-	else if (m_mixerChannelModel.value() == toIndex) { m_mixerChannelModel.setValue(fromIndex); }
-}
-
-void SampleTrack::mixerChannelDeleted(int index)
-{
-	if (m_mixerChannelModel.value() == index) { m_mixerChannelModel.setValue(0); }
-	else if (m_mixerChannelModel.value() > index) { m_mixerChannelModel.setValue(m_mixerChannelModel.value() - 1); }
-	m_mixerChannelModel.setRange(0, m_mixerChannelModel.maxValue() - 1);
-}
-
-void SampleTrack::mixerChannelCreated(int index)
-{
-	m_mixerChannelModel.setRange(0, m_mixerChannelModel.maxValue() + 1);
 }
 
 } // namespace lmms

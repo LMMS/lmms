@@ -63,7 +63,6 @@ InstrumentTrack::InstrumentTrack(TrackContainer* tc) :
 	m_audioBusHandle(tr("unnamed_track"), true, &m_volumeModel, &m_panningModel, &m_mutedModel),
 	m_pitchModel(0, MinPitchDefault, MaxPitchDefault, 1, this, tr("Pitch")),
 	m_pitchRangeModel(1, 1, 60, this, tr("Pitch range")),
-	m_mixerChannelModel(0, 0, 0, this, tr("Mixer channel")),
 	m_useMasterPitchModel(true, this, tr("Master pitch")),
 	m_instrument(nullptr),
 	m_soundShaping(this),
@@ -78,8 +77,6 @@ InstrumentTrack::InstrumentTrack(TrackContainer* tc) :
 	m_baseNoteModel.setInitValue( DefaultKey );
 	m_firstKeyModel.setInitValue(0);
 	m_lastKeyModel.setInitValue(NumKeys - 1);
-
-	m_mixerChannelModel.setRange( 0, Engine::mixer()->numChannels()-1, 1);
 
 	for( int i = 0; i < NumKeys; ++i )
 	{
@@ -109,9 +106,6 @@ InstrumentTrack::InstrumentTrack(TrackContainer* tc) :
 	connect(&m_pitchModel, SIGNAL(dataChanged()), this, SLOT(updatePitch()), Qt::DirectConnection);
 	connect(&m_pitchRangeModel, SIGNAL(dataChanged()), this, SLOT(updatePitchRange()), Qt::DirectConnection);
 	connect(&m_mixerChannelModel, SIGNAL(dataChanged()), this, SLOT(updateMixerChannel()), Qt::DirectConnection);
-	connect(Engine::mixer(), &Mixer::channelsSwapped, this, &InstrumentTrack::mixerChannelsSwapped);
-	connect(Engine::mixer(), &Mixer::channelDeleted, this, &InstrumentTrack::mixerChannelDeleted);
-	connect(Engine::mixer(), &Mixer::channelCreated, this, &InstrumentTrack::mixerChannelCreated);
 
 	autoAssignMidiDevice(true);
 }
@@ -677,24 +671,6 @@ void InstrumentTrack::updatePitchRange()
 void InstrumentTrack::updateMixerChannel()
 {
 	m_audioBusHandle.setNextMixerChannel(m_mixerChannelModel.value());
-}
-
-void InstrumentTrack::mixerChannelsSwapped(int fromIndex, int toIndex)
-{
-	if (m_mixerChannelModel.value() == fromIndex) { m_mixerChannelModel.setValue(toIndex); }
-	else if (m_mixerChannelModel.value() == toIndex) { m_mixerChannelModel.setValue(fromIndex); }
-}
-
-void InstrumentTrack::mixerChannelDeleted(int index)
-{
-	if (m_mixerChannelModel.value() == index) { m_mixerChannelModel.setValue(0); }
-	else if (m_mixerChannelModel.value() > index) { m_mixerChannelModel.setValue(m_mixerChannelModel.value() - 1); }
-	m_mixerChannelModel.setRange(0, m_mixerChannelModel.maxValue() - 1);
-}
-
-void InstrumentTrack::mixerChannelCreated(int index)
-{
-	m_mixerChannelModel.setRange(0, m_mixerChannelModel.maxValue() + 1);
 }
 
 int InstrumentTrack::masterKey( int _midi_key ) const
