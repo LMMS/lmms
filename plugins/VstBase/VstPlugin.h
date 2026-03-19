@@ -44,10 +44,10 @@ class VSTBASE_EXPORT VstPlugin : public RemotePlugin, public JournallingObject
 {
 	Q_OBJECT
 public:
-	VstPlugin( const QString & _plugin );
+	VstPlugin(const QString & _plugin, bool skipInit = false);
 	~VstPlugin() override;
 
-	void tryLoad( const QString &remoteVstPluginExecutable );
+	void tryLoad(const QString &remoteVstPluginExecutable, bool skipInit = false);
 
 	bool processMessage( const message & _m ) override;
 
@@ -103,6 +103,8 @@ public:
 
 	int currentProgram();
 
+	bool isLoaded() const { return m_loaded; }
+
 	const QMap<QString, QString> & parameterDump();
 	void setParameterDump( const QMap<QString, QString> & _pdump );
 
@@ -149,6 +151,7 @@ private:
 	void toggleEditorVisibility(int visible = -1);
 
 	QString m_plugin;
+	bool m_loaded = false;
 	QPointer<QWidget> m_pluginWidget;
 	int m_pluginWindowID;
 	QSize m_pluginGeometry;

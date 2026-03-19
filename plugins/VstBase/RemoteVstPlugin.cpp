@@ -171,9 +171,9 @@ class RemoteVstPlugin : public RemotePluginClient
 {
 public:
 #ifdef SYNC_WITH_SHM_FIFO
-	RemoteVstPlugin( const std::string& _shm_in, const std::string& _shm_out );
+	RemoteVstPlugin(const std::string& _shm_in, const std::string& _shm_out, bool skipInit = false);
 #else
-	RemoteVstPlugin( const char * socketPath );
+	RemoteVstPlugin(const char* socketPath, bool skipInit = false);
 #endif
 	virtual ~RemoteVstPlugin();
 
@@ -485,16 +485,17 @@ private:
 	};
 
 	Sync m_sync;
+	bool m_skipInit;
 };
 
 
 
 
 #ifdef SYNC_WITH_SHM_FIFO
-RemoteVstPlugin::RemoteVstPlugin( const std::string& _shm_in, const std::string& _shm_out ) :
+RemoteVstPlugin::RemoteVstPlugin(const std::string& _shm_in, const std::string& _shm_out, bool skipInit) :
 	RemotePluginClient( _shm_in, _shm_out ),
 #else
-RemoteVstPlugin::RemoteVstPlugin( const char * socketPath ) :
+RemoteVstPlugin::RemoteVstPlugin(const char * socketPath, bool skipInit) :
 	RemotePluginClient( socketPath ),
 #endif
 	m_libInst( nullptr ),
@@ -513,7 +514,8 @@ RemoteVstPlugin::RemoteVstPlugin( const char * socketPath ) :
 	m_midiEvents(),
 	m_bpm( 0 ),
 	m_currentSamplePos( 0 ),
-	m_currentProgram(-1)
+	m_currentProgram(-1),
+	m_skipInit{skipInit}
 {
 	__plugin = this;
 
@@ -736,9 +738,11 @@ void RemoteVstPlugin::init( const std::string & _plugin_file )
 
 	setResumed( true );
 
-	debugMessage( "creating editor\n" );
-	initEditor();
-	debugMessage( "editor successfully created\n" );
+	if (!m_skipInit) {
+		debugMessage( "creating editor\n" );
+		initEditor();
+		debugMessage( "editor successfully created\n" );
+	}
 
 
 	// now post some information about our plugin
@@ -2439,9 +2443,9 @@ int main( int _argc, char * * _argv )
 	using lmms::RemoteVstPlugin;
 
 #ifdef SYNC_WITH_SHM_FIFO
-	if( _argc < 4 )
+	if( _argc < 5 )
 #else
-	if( _argc < 3 )
+	if( _argc < 4 )
 #endif
 	{
 		fprintf( stderr, "not enough arguments\n" );
@@ -2499,6 +2503,7 @@ int main( int _argc, char * * _argv )
 	}
 
 #endif
+	bool skipInit;
 	{
 	#ifdef SYNC_WITH_SHM_FIFO
 		int embedMethodIndex = 3;
@@ -2506,6 +2511,7 @@ int main( int _argc, char * * _argv )
 		int embedMethodIndex = 2;
 	#endif
 		std::string embedMethod = _argv[embedMethodIndex];
+		skipInit = _argv[embedMethodIndex+1][0] != '0';
 
 		if ( embedMethod == "none" )
 		{
@@ -2549,9 +2555,9 @@ int main( int _argc, char * * _argv )
 	// constructor automatically will process messages until it receives
 	// a IdVstLoadPlugin message and processes it
 #ifdef SYNC_WITH_SHM_FIFO
-	__plugin = new RemoteVstPlugin( _argv[1], _argv[2] );
+	__plugin = new RemoteVstPlugin{_argv[1], _argv[2], skipInit};
 #else
-	__plugin = new RemoteVstPlugin( _argv[1] );
+	__plugin = new RemoteVstPlugin{_argv[1], skipInit};
 #endif
 
 	if( __plugin->isInitialized() )

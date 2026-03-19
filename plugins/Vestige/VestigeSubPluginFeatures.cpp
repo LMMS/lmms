@@ -30,6 +30,7 @@
 #include <QLabel>
 
 #include "ConfigManager.h"
+#include "VstList.h"
 #include "Effect.h"
 
 namespace lmms {
@@ -47,16 +48,13 @@ void VestigeSubPluginFeatures::fillDescriptionWidget(QWidget* parent, const Key*
 
 void VestigeSubPluginFeatures::listSubPluginKeys(const Plugin::Descriptor* desc, KeyList& keylist) const
 {
-	auto vstPaths = new QStringList;
-	addPluginsFromDir(vstPaths, "");
 	// TODO: eval m_type
-	for (QString& filename : *vstPaths)
+	for (const auto& data : VstList::inst()->instrumentPlugins())
 	{
 		EffectKey::AttributeMap am;
-		am["file"] = filename;
-		keylist.push_back(Key(desc, QFileInfo{filename}.baseName(), am));
+		am["file"] = QString::fromStdString(data.path.string());
+		keylist.push_back(Key(desc, QString::fromStdString(data.name), am));
 	}
-	delete vstPaths;
 }
 
 void VestigeSubPluginFeatures::addPluginsFromDir(QStringList* filenames, QString path) const
