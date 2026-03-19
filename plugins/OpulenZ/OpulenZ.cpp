@@ -1,4 +1,6 @@
+// TODO: de-duplication for GUI controls (Knob/PixmapButton)
 // TODO: follow name guidelines (remove snake case)
+// TODO: use static_cast
 // TODO: are m_patchModel & loadGMPatch used at all??
 
 /*
@@ -90,38 +92,35 @@ PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* m, void*)
 
 QMutex OpulenzInstrument::s_emulatorMutex;
 
+OpulenzOperatorModels::OpulenzOperatorModels(OpulenzInstrument* ins, int num)
+	: attack(0.0, 0.0, 15.0, 1.0, ins, QObject::tr("Op %1 attack").arg(num))
+	, decay(0.0, 0.0, 15.0, 1.0, ins, QObject::tr("Op %1 decay").arg(num))
+	, sustain(0.0, 0.0, 15.0, 1.0, ins, QObject::tr("Op %1 sustain").arg(num))
+	, release(0.0, 0.0, 15.0, 1.0, ins, QObject::tr("Op %1 release").arg(num))
+	, level(0.0, 0.0, 63.0, 1.0, ins, QObject::tr("Op %1 level").arg(num))
+	, scale(0.0, 0.0, 3.0, 1.0, ins, QObject::tr("Op %1 level scaling").arg(num))
+	, multiplier(0.0, 0.0, 15.0, 1.0, ins, QObject::tr("Op %1 frequency multiplier").arg(num))
+	, ksr(false, ins, QObject::tr("Op %1 key scaling rate").arg(num))
+	, perc(false, ins, QObject::tr("Op %1 percussive envelope").arg(num))
+	, tremolo(false, ins, QObject::tr("Op %1 tremolo").arg(num))
+	, vibrato(false, ins, QObject::tr("Op %1 vibrato").arg(num))
+	, waveform(0, 0, 3, ins, QObject::tr("Op %1 waveform").arg(num))
+{
+}
+
 OpulenzInstrument::OpulenzInstrument(InstrumentTrack* insTrack)
 	: Instrument(insTrack, &opulenz_plugin_descriptor, nullptr, Flag::IsSingleStreamed | Flag::IsMidiBased)
 	, m_patchModel(0, 0, 127, this, tr("Patch"))
-	, op1_a_mdl(14.0, 0.0, 15.0, 1.0, this, tr("Op 1 attack"))
-	, op1_d_mdl(14.0, 0.0, 15.0, 1.0, this, tr("Op 1 decay"))
-	, op1_s_mdl(3.0, 0.0, 15.0, 1.0, this, tr("Op 1 sustain"))
-	, op1_r_mdl(10.0, 0.0, 15.0, 1.0, this, tr("Op 1 release"))
-	, op1_lvl_mdl(62.0, 0.0, 63.0, 1.0, this, tr("Op 1 level"))
-	, op1_scale_mdl(0.0, 0.0, 3.0, 1.0, this, tr("Op 1 level scaling"))
-	, op1_mul_mdl(0.0, 0.0, 15.0, 1.0, this, tr("Op 1 frequency multiplier"))
-	, feedback_mdl(0.0, 0.0, 7.0, 1.0, this, tr("Op 1 feedback"))
-	, op1_ksr_mdl(false, this, tr("Op 1 key scaling rate"))
-	, op1_perc_mdl(false, this, tr("Op 1 percussive envelope"))
-	, op1_trem_mdl(true, this, tr("Op 1 tremolo"))
-	, op1_vib_mdl(false, this, tr("Op 1 vibrato"))
-	, op1_waveform_mdl(0, 0, 3, this, tr("Op 1 waveform"))
-	, op2_a_mdl(1.0, 0.0, 15.0, 1.0, this, tr("Op 2 attack"))
-	, op2_d_mdl(3.0, 0.0, 15.0, 1.0, this, tr("Op 2 decay"))
-	, op2_s_mdl(14.0, 0.0, 15.0, 1.0, this, tr("Op 2 sustain"))
-	, op2_r_mdl(12.0, 0.0, 15.0, 1.0, this, tr("Op 2 release"))
-	, op2_lvl_mdl(63.0, 0.0, 63.0, 1.0, this, tr("Op 2 level"))
-	, op2_scale_mdl(0.0, 0.0, 3.0, 1.0, this, tr("Op 2 level scaling"))
-	, op2_mul_mdl(1.0, 0.0, 15.0, 1.0, this, tr("Op 2 frequency multiplier"))
-	, op2_ksr_mdl(false, this, tr("Op 2 key scaling rate"))
-	, op2_perc_mdl(false, this, tr("Op 2 percussive envelope"))
-	, op2_trem_mdl(false, this, tr("Op 2 tremolo"))
-	, op2_vib_mdl(true, this, tr("Op 2 vibrato"))
-	, op2_waveform_mdl(0, 0, 3, this, tr("Op 2 waveform"))
-	, fm_mdl(true, this, tr("FM"))
-	, vib_depth_mdl(false, this, tr("Vibrato depth"))
-	, trem_depth_mdl(false, this, tr("Tremolo depth"))
+	, m_feedbackModel(0.0, 0.0, 7.0, 1.0, this, tr("Op 1 feedback"))
+	, m_fmModel(false, this, tr("FM"))
+	, m_vibDepthModel(false, this, tr("Vibrato depth"))
+	, m_tremDepthModel(false, this, tr("Tremolo depth"))
+	, m_op1(this, 1)
+	, m_op2(this, 2)
 {
+	// Load the default patch. Cannot be done at construction time anymore.
+	loadDefaultPatch();
+
 	// Create an emulator - samplerate, 16 bit, mono
 	s_emulatorMutex.lock();
 	theEmulator = new CTemuopl(Engine::audioEngine()->outputSampleRate(), true, false);
@@ -158,6 +157,7 @@ OpulenzInstrument::OpulenzInstrument(InstrumentTrack* insTrack)
 
 	// Connect knobs
 	// This one's for testing...
+	// FIXME: remove, or use it...
 	connect(&m_patchModel, &IntModel::dataChanged, this, &OpulenzInstrument::loadGMPatch);
 
 	const auto modelConn = [this](auto& model)
@@ -165,36 +165,28 @@ OpulenzInstrument::OpulenzInstrument(InstrumentTrack* insTrack)
 		connect(&model, SIGNAL(dataChanged()), this, SLOT(updatePatch()));
 	};
 
-	modelConn(op1_a_mdl);
-	modelConn(op1_d_mdl);
-	modelConn(op1_s_mdl);
-	modelConn(op1_r_mdl);
-	modelConn(op1_lvl_mdl);
-	modelConn(op1_scale_mdl);
-	modelConn(op1_mul_mdl);
-	modelConn(feedback_mdl);
-	modelConn(op1_ksr_mdl);
-	modelConn(op1_perc_mdl);
-	modelConn(op1_trem_mdl);
-	modelConn(op1_vib_mdl);
-	modelConn(op1_waveform_mdl);
+	const auto opConn = [this,&modelConn](OpulenzOperatorModels& opm)
+	{
+		modelConn(opm.attack);
+		modelConn(opm.decay);
+		modelConn(opm.sustain);
+		modelConn(opm.release);
+		modelConn(opm.level);
+		modelConn(opm.scale);
+		modelConn(opm.multiplier);
+		modelConn(opm.ksr);
+		modelConn(opm.perc);
+		modelConn(opm.tremolo);
+		modelConn(opm.vibrato);
+		modelConn(opm.waveform);
+	};
 
-	modelConn(op2_a_mdl);
-	modelConn(op2_d_mdl);
-	modelConn(op2_s_mdl);
-	modelConn(op2_r_mdl);
-	modelConn(op2_lvl_mdl);
-	modelConn(op2_scale_mdl);
-	modelConn(op2_mul_mdl);
-	modelConn(op2_ksr_mdl);
-	modelConn(op2_perc_mdl);
-	modelConn(op2_trem_mdl);
-	modelConn(op2_vib_mdl);
-	modelConn(op2_waveform_mdl);
-
-	modelConn(fm_mdl);
-	modelConn(vib_depth_mdl);
-	modelConn(trem_depth_mdl);
+	modelConn(m_fmModel);
+	modelConn(m_vibDepthModel);
+	modelConn(m_tremDepthModel);
+	modelConn(m_feedbackModel);
+	opConn(m_op1);
+	opConn(m_op2);
 
 	// Connect the plugin to the audio engine...
 	auto iph = new InstrumentPlayHandle(this, insTrack);
@@ -232,17 +224,17 @@ void OpulenzInstrument::writeVoice(int voice, int reg, int val)
 
 void OpulenzInstrument::setVoiceVelocity(int voice, int vel)
 {
-	int vel_adjusted = !fm_mdl.value()
-		? 63 - (op1_lvl_mdl.value() * vel / 127.0)
-		: 63 - op1_lvl_mdl.value();
+	int vel_adjusted = !m_fmModel.value()
+		? 63 - (m_op1.level.value() * vel / 127.0)
+		: 63 - m_op1.level.value();
 
 	// Velocity calculation, some kind of approximation
 	// Only calculate for operator 1 if in adding mode, don't want to change timbre
-	writeVoice(voice, 0x40, ((static_cast<int>(op1_scale_mdl.value()) & 0x03) << 6) + (vel_adjusted & 0x3f));
+	writeVoice(voice, 0x40, ((static_cast<int>(m_op1.scale.value()) & 0x03) << 6) + (vel_adjusted & 0x3f));
 
-	vel_adjusted = 63 - (op2_lvl_mdl.value() * vel / 127.0);
-	// vel_adjusted = 63 - op2_lvl_mdl.value();
-	writeVoice(voice, 0x43, ((static_cast<int>(op2_scale_mdl.value()) & 0x03) << 6) + (vel_adjusted & 0x3f));
+	vel_adjusted = 63 - (m_op2.level.value() * vel / 127.0);
+	// vel_adjusted = 63 - m_op2.level.value();
+	writeVoice(voice, 0x43, ((static_cast<int>(m_op2.scale.value()) & 0x03) << 6) + (vel_adjusted & 0x3f));
 }
 
 int OpulenzInstrument::popVoice()
@@ -393,36 +385,36 @@ void OpulenzInstrument::play(SampleFrame* workingBuffer)
 
 void OpulenzInstrument::saveSettings(QDomDocument& doc, QDomElement& el)
 {
-	op1_a_mdl.saveSettings(doc, el, "op1_a");
-	op1_d_mdl.saveSettings(doc, el, "op1_d");
-	op1_s_mdl.saveSettings(doc, el, "op1_s");
-	op1_r_mdl.saveSettings(doc, el, "op1_r");
-	op1_lvl_mdl.saveSettings(doc, el, "op1_lvl");
-	op1_scale_mdl.saveSettings(doc, el, "op1_scale");
-	op1_mul_mdl.saveSettings(doc, el, "op1_mul");
-	feedback_mdl.saveSettings(doc, el, "feedback");
-	op1_ksr_mdl.saveSettings(doc, el, "op1_ksr");
-	op1_perc_mdl.saveSettings(doc, el, "op1_perc");
-	op1_trem_mdl.saveSettings(doc, el, "op1_trem");
-	op1_vib_mdl.saveSettings(doc, el, "op1_vib");
-	op1_waveform_mdl.saveSettings(doc, el, "op1_waveform");
+	m_op1.attack.saveSettings(doc, el, "op1_a");
+	m_op1.decay.saveSettings(doc, el, "op1_d");
+	m_op1.sustain.saveSettings(doc, el, "op1_s");
+	m_op1.release.saveSettings(doc, el, "op1_r");
+	m_op1.level.saveSettings(doc, el, "op1_lvl");
+	m_op1.scale.saveSettings(doc, el, "op1_scale");
+	m_op1.multiplier.saveSettings(doc, el, "op1_mul");
+	m_feedbackModel.saveSettings(doc, el, "feedback");
+	m_op1.ksr.saveSettings(doc, el, "op1_ksr");
+	m_op1.perc.saveSettings(doc, el, "op1_perc");
+	m_op1.tremolo.saveSettings(doc, el, "op1_trem");
+	m_op1.vibrato.saveSettings(doc, el, "op1_vib");
+	m_op1.waveform.saveSettings(doc, el, "op1_waveform");
 
-	op2_a_mdl.saveSettings(doc, el, "op2_a");
-	op2_d_mdl.saveSettings(doc, el, "op2_d");
-	op2_s_mdl.saveSettings(doc, el, "op2_s");
-	op2_r_mdl.saveSettings(doc, el, "op2_r");
-	op2_lvl_mdl.saveSettings(doc, el, "op2_lvl");
-	op2_scale_mdl.saveSettings(doc, el, "op2_scale");
-	op2_mul_mdl.saveSettings(doc, el, "op2_mul");
-	op2_ksr_mdl.saveSettings(doc, el, "op2_ksr");
-	op2_perc_mdl.saveSettings(doc, el, "op2_perc");
-	op2_trem_mdl.saveSettings(doc, el, "op2_trem");
-	op2_vib_mdl.saveSettings(doc, el, "op2_vib");
-	op2_waveform_mdl.saveSettings(doc, el, "op2_waveform");
+	m_op2.attack.saveSettings(doc, el, "op2_a");
+	m_op2.decay.saveSettings(doc, el, "op2_d");
+	m_op2.sustain.saveSettings(doc, el, "op2_s");
+	m_op2.release.saveSettings(doc, el, "op2_r");
+	m_op2.level.saveSettings(doc, el, "op2_lvl");
+	m_op2.scale.saveSettings(doc, el, "op2_scale");
+	m_op2.multiplier.saveSettings(doc, el, "op2_mul");
+	m_op2.ksr.saveSettings(doc, el, "op2_ksr");
+	m_op2.perc.saveSettings(doc, el, "op2_perc");
+	m_op2.tremolo.saveSettings(doc, el, "op2_trem");
+	m_op2.vibrato.saveSettings(doc, el, "op2_vib");
+	m_op2.waveform.saveSettings(doc, el, "op2_waveform");
 
-	fm_mdl.saveSettings(doc, el, "fm");
-	vib_depth_mdl.saveSettings(doc, el, "vib_depth");
-	trem_depth_mdl.saveSettings(doc, el, "trem_depth");
+	m_fmModel.saveSettings(doc, el, "fm");
+	m_vibDepthModel.saveSettings(doc, el, "vib_depth");
+	m_tremDepthModel.saveSettings(doc, el, "trem_depth");
 
 	el.setAttribute("version", 1);
 }
@@ -431,43 +423,43 @@ void OpulenzInstrument::loadSettings(const QDomElement& el)
 {
 	if (el.attribute("version", "0").toInt() < 1)
 	{
-		op1_scale_mdl.setValue(0);
-		op2_scale_mdl.setValue(0);
+		m_op1.scale.setValue(0);
+		m_op2.scale.setValue(0);
 	}
 	else
 	{
-		op1_scale_mdl.loadSettings(el, "op1_scale");
-		op2_scale_mdl.loadSettings(el, "op2_scale");
+		m_op1.scale.loadSettings(el, "op1_scale");
+		m_op2.scale.loadSettings(el, "op2_scale");
 	}
 
-	op1_a_mdl.loadSettings(el, "op1_a");
-	op1_d_mdl.loadSettings(el, "op1_d");
-	op1_s_mdl.loadSettings(el, "op1_s");
-	op1_r_mdl.loadSettings(el, "op1_r");
-	op1_lvl_mdl.loadSettings(el, "op1_lvl");
-	op1_mul_mdl.loadSettings(el, "op1_mul");
-	feedback_mdl.loadSettings(el, "feedback");
-	op1_ksr_mdl.loadSettings(el, "op1_ksr");
-	op1_perc_mdl.loadSettings(el, "op1_perc");
-	op1_trem_mdl.loadSettings(el, "op1_trem");
-	op1_vib_mdl.loadSettings(el, "op1_vib");
-	op1_waveform_mdl.loadSettings(el, "op1_waveform");
+	m_op1.attack.loadSettings(el, "op1_a");
+	m_op1.decay.loadSettings(el, "op1_d");
+	m_op1.sustain.loadSettings(el, "op1_s");
+	m_op1.release.loadSettings(el, "op1_r");
+	m_op1.level.loadSettings(el, "op1_lvl");
+	m_op1.multiplier.loadSettings(el, "op1_mul");
+	m_feedbackModel.loadSettings(el, "feedback");
+	m_op1.ksr.loadSettings(el, "op1_ksr");
+	m_op1.perc.loadSettings(el, "op1_perc");
+	m_op1.tremolo.loadSettings(el, "op1_trem");
+	m_op1.vibrato.loadSettings(el, "op1_vib");
+	m_op1.waveform.loadSettings(el, "op1_waveform");
 
-	op2_a_mdl.loadSettings(el, "op2_a");
-	op2_d_mdl.loadSettings(el, "op2_d");
-	op2_s_mdl.loadSettings(el, "op2_s");
-	op2_r_mdl.loadSettings(el, "op2_r");
-	op2_lvl_mdl.loadSettings(el, "op2_lvl");
-	op2_mul_mdl.loadSettings(el, "op2_mul");
-	op2_ksr_mdl.loadSettings(el, "op2_ksr");
-	op2_perc_mdl.loadSettings(el, "op2_perc");
-	op2_trem_mdl.loadSettings(el, "op2_trem");
-	op2_vib_mdl.loadSettings(el, "op2_vib");
-	op2_waveform_mdl.loadSettings(el, "op2_waveform");
+	m_op2.attack.loadSettings(el, "op2_a");
+	m_op2.decay.loadSettings(el, "op2_d");
+	m_op2.sustain.loadSettings(el, "op2_s");
+	m_op2.release.loadSettings(el, "op2_r");
+	m_op2.level.loadSettings(el, "op2_lvl");
+	m_op2.multiplier.loadSettings(el, "op2_mul");
+	m_op2.ksr.loadSettings(el, "op2_ksr");
+	m_op2.perc.loadSettings(el, "op2_perc");
+	m_op2.tremolo.loadSettings(el, "op2_trem");
+	m_op2.vibrato.loadSettings(el, "op2_vib");
+	m_op2.waveform.loadSettings(el, "op2_waveform");
 
-	fm_mdl.loadSettings(el, "fm");
-	vib_depth_mdl.loadSettings(el, "vib_depth");
-	trem_depth_mdl.loadSettings(el, "trem_depth");
+	m_fmModel.loadSettings(el, "fm");
+	m_vibDepthModel.loadSettings(el, "vib_depth");
+	m_tremDepthModel.loadSettings(el, "trem_depth");
 }
 
 void OpulenzInstrument::loadPatch(const unsigned char inst[14])
@@ -521,32 +513,32 @@ void OpulenzInstrument::loadGMPatch()
 void OpulenzInstrument::updatePatch()
 {
 	auto inst = std::array<unsigned char, 14>{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-	inst[0] = (op1_trem_mdl.value() ? 128 : 0) +
-		(op1_vib_mdl.value() ? 64 : 0) +
-		(op1_perc_mdl.value() ? 0 : 32) + // NB. This envelope mode is "perc", not "sus"
-		(op1_ksr_mdl.value() ? 16 : 0) +
-		((int)op1_mul_mdl.value() & 0x0f);
-	inst[1] = (op2_trem_mdl.value() ? 128 : 0) +
-		(op2_vib_mdl.value() ? 64 : 0) +
-		(op2_perc_mdl.value() ? 0 : 32) + // NB. This envelope mode is "perc", not "sus"
-		(op2_ksr_mdl.value() ? 16 : 0) +
-		((int)op2_mul_mdl.value() & 0x0f);
-	inst[2] = (((int)op1_scale_mdl.value() & 0x03) << 6) + (63 - ((int)op1_lvl_mdl.value() & 0x3f));
-	inst[3] = (((int)op2_scale_mdl.value() & 0x03) << 6) + (63 - ((int)op2_lvl_mdl.value() & 0x3f));
-	inst[4] = ((15 - ((int)op1_a_mdl.value() & 0x0f)) << 4) + (15 - ((int)op1_d_mdl.value() & 0x0f));
-	inst[5] = ((15 - ((int)op2_a_mdl.value() & 0x0f)) << 4) + (15 - ((int)op2_d_mdl.value() & 0x0f));
-	inst[6] = ((15 - ((int)op1_s_mdl.value() & 0x0f)) << 4) + (15 - ((int)op1_r_mdl.value() & 0x0f));
-	inst[7] = ((15 - ((int)op2_s_mdl.value() & 0x0f)) << 4) + (15 - ((int)op2_r_mdl.value() & 0x0f));
-	inst[8] = (int)op1_waveform_mdl.value() & 0x03;
-	inst[9] = (int)op2_waveform_mdl.value() & 0x03;
-	inst[10] = (fm_mdl.value() ? 0 : 1) + (((int)feedback_mdl.value() & 0x07) << 1);
+	inst[0] = (m_op1.tremolo.value() ? 128 : 0) +
+		(m_op1.vibrato.value() ? 64 : 0) +
+		(m_op1.perc.value() ? 0 : 32) + // NB. This envelope mode is "perc", not "sus"
+		(m_op1.ksr.value() ? 16 : 0) +
+		((int)m_op1.multiplier.value() & 0x0f);
+	inst[1] = (m_op2.tremolo.value() ? 128 : 0) +
+		(m_op2.vibrato.value() ? 64 : 0) +
+		(m_op2.perc.value() ? 0 : 32) + // NB. This envelope mode is "perc", not "sus"
+		(m_op2.ksr.value() ? 16 : 0) +
+		((int)m_op2.multiplier.value() & 0x0f);
+	inst[2] = (((int)m_op1.scale.value() & 0x03) << 6) + (63 - ((int)m_op1.level.value() & 0x3f));
+	inst[3] = (((int)m_op2.scale.value() & 0x03) << 6) + (63 - ((int)m_op2.level.value() & 0x3f));
+	inst[4] = ((15 - ((int)m_op1.attack.value() & 0x0f)) << 4) + (15 - ((int)m_op1.decay.value() & 0x0f));
+	inst[5] = ((15 - ((int)m_op2.attack.value() & 0x0f)) << 4) + (15 - ((int)m_op2.decay.value() & 0x0f));
+	inst[6] = ((15 - ((int)m_op1.sustain.value() & 0x0f)) << 4) + (15 - ((int)m_op1.release.value() & 0x0f));
+	inst[7] = ((15 - ((int)m_op2.sustain.value() & 0x0f)) << 4) + (15 - ((int)m_op2.release.value() & 0x0f));
+	inst[8] = (int)m_op1.waveform.value() & 0x03;
+	inst[9] = (int)m_op2.waveform.value() & 0x03;
+	inst[10] = (m_fmModel.value() ? 0 : 1) + (((int)m_feedbackModel.value() & 0x07) << 1);
 	// These are always 0 in the list I had?
 	inst[11] = 0;
 	inst[12] = 0;
 	inst[13] = 0;
 
 	// Not part of the per-voice patch info
-	theEmulator->write(0xBD, (trem_depth_mdl.value() ? 128 : 0) + (vib_depth_mdl.value() ? 64 : 0));
+	theEmulator->write(0xBD, (m_tremDepthModel.value() ? 128 : 0) + (m_vibDepthModel.value() ? 64 : 0));
 
 	// have to do this, as the level knobs might've changed
 	for (int voice = 0; voice < OPL2_VOICES; ++voice)
@@ -556,14 +548,48 @@ void OpulenzInstrument::updatePatch()
 			setVoiceVelocity(voice, velocities[voiceNote[voice]]);
 		}
 	}
+
 #ifdef false
-		printf("UPD: %02x %02x %02x %02x %02x -- %02x %02x %02x %02x %02x %02x\n",
-			inst[0], inst[1], inst[2], inst[3], inst[4],
-			inst[5], inst[6], inst[7], inst[8], inst[9], inst[10]);
+	printf("UPD: %02x %02x %02x %02x %02x -- %02x %02x %02x %02x %02x %02x\n",
+		inst[0], inst[1], inst[2], inst[3], inst[4],
+		inst[5], inst[6], inst[7], inst[8], inst[9], inst[10]);
 #endif
 
-
 	loadPatch(inst.data());
+}
+
+void OpulenzInstrument::loadDefaultPatch()
+{
+	m_op1.attack.setValue(14.0);
+	m_op1.decay.setValue(14.0);
+	m_op1.sustain.setValue(13.0);
+	m_op1.release.setValue(10.0);
+	m_op1.level.setValue(62.0);
+	m_op1.scale.setValue(0.0);
+	m_op1.multiplier.setValue(0.0);
+	m_op1.ksr.setValue(false);
+	m_op1.perc.setValue(false);
+	m_op1.tremolo.setValue(true);
+	m_op1.vibrato.setValue(false);
+	m_op1.waveform.setValue(0);
+
+	m_op2.attack.setValue(1.0);
+	m_op2.decay.setValue(3.0);
+	m_op2.sustain.setValue(14.0);
+	m_op2.release.setValue(12.0);
+	m_op2.level.setValue(63.0);
+	m_op2.scale.setValue(0.0);
+	m_op2.multiplier.setValue(1.0);
+	m_op2.ksr.setValue(false);
+	m_op2.perc.setValue(false);
+	m_op2.tremolo.setValue(false);
+	m_op2.vibrato.setValue(true);
+	m_op2.waveform.setValue(0);
+
+	m_feedbackModel.setValue(0.0);
+	m_fmModel.setValue(true);
+	m_vibDepthModel.setValue(false);
+	m_tremDepthModel.setValue(false);
 }
 
 void OpulenzInstrument::loadFile(const QString& file)
@@ -610,52 +636,52 @@ void OpulenzInstrument::loadFile(const QString& file)
 			(unsigned char)sbidata[45], (unsigned char)sbidata[46]);
 #endif
 		// Modulator Sound Characteristic (Mult, KSR, EG, VIB, AM)
-		op1_trem_mdl.setValue((sbidata[36] & 0x80) == 0x80 ? true : false);
-		op1_vib_mdl.setValue((sbidata[36] & 0x40) == 0x40 ? true : false);
-		op1_perc_mdl.setValue((sbidata[36] & 0x20) == 0x20 ? false : true);
-		op1_ksr_mdl.setValue((sbidata[36] & 0x10) == 0x10 ? true : false);
-		op1_mul_mdl.setValue(sbidata[36] & 0x0f);
+		m_op1.tremolo.setValue((sbidata[36] & 0x80) == 0x80 ? true : false);
+		m_op1.vibrato.setValue((sbidata[36] & 0x40) == 0x40 ? true : false);
+		m_op1.perc.setValue((sbidata[36] & 0x20) == 0x20 ? false : true);
+		m_op1.ksr.setValue((sbidata[36] & 0x10) == 0x10 ? true : false);
+		m_op1.multiplier.setValue(sbidata[36] & 0x0f);
 
 		// Carrier Sound Characteristic
-		op2_trem_mdl.setValue((sbidata[37] & 0x80) == 0x80 ? true : false);
-		op2_vib_mdl.setValue((sbidata[37] & 0x40) == 0x40 ? true : false);
-		op2_perc_mdl.setValue((sbidata[37] & 0x20) == 0x20 ? false : true);
-		op2_ksr_mdl.setValue((sbidata[37] & 0x10) == 0x10 ? true : false);
-		op2_mul_mdl.setValue(sbidata[37] & 0x0f);
+		m_op2.tremolo.setValue((sbidata[37] & 0x80) == 0x80 ? true : false);
+		m_op2.vibrato.setValue((sbidata[37] & 0x40) == 0x40 ? true : false);
+		m_op2.perc.setValue((sbidata[37] & 0x20) == 0x20 ? false : true);
+		m_op2.ksr.setValue((sbidata[37] & 0x10) == 0x10 ? true : false);
+		m_op2.multiplier.setValue(sbidata[37] & 0x0f);
 
 		// Modulator Scaling/Output Level
-		op1_scale_mdl.setValue((sbidata[38] & 0xc0) >> 6);
-		op1_lvl_mdl.setValue(63 - (sbidata[38] & 0x3f));
+		m_op1.scale.setValue((sbidata[38] & 0xc0) >> 6);
+		m_op1.level.setValue(63 - (sbidata[38] & 0x3f));
 
 		// Carrier Scaling/Output Level
-		op2_scale_mdl.setValue((sbidata[39] & 0xc0) >> 6);
-		op2_lvl_mdl.setValue(63 - (sbidata[39] & 0x3f));
+		m_op2.scale.setValue((sbidata[39] & 0xc0) >> 6);
+		m_op2.level.setValue(63 - (sbidata[39] & 0x3f));
 
 		// Modulator Attack/Decay
-		op1_a_mdl.setValue(15 - ((sbidata[40] & 0xf0) >> 4));
-		op1_d_mdl.setValue(15 - (sbidata[40] & 0x0f));
+		m_op1.attack.setValue(15 - ((sbidata[40] & 0xf0) >> 4));
+		m_op1.decay.setValue(15 - (sbidata[40] & 0x0f));
 
 		// Carrier Attack/Decay
-		op2_a_mdl.setValue(15 - ((sbidata[41] & 0xf0) >> 4));
-		op2_d_mdl.setValue(15 - (sbidata[41] & 0x0f));
+		m_op2.attack.setValue(15 - ((sbidata[41] & 0xf0) >> 4));
+		m_op2.decay.setValue(15 - (sbidata[41] & 0x0f));
 
 		// Modulator Sustain/Release
-		op1_s_mdl.setValue(15 - ((sbidata[42] & 0xf0) >> 4));
-		op1_r_mdl.setValue(15 - (sbidata[42] & 0x0f));
+		m_op1.sustain.setValue(15 - ((sbidata[42] & 0xf0) >> 4));
+		m_op1.release.setValue(15 - (sbidata[42] & 0x0f));
 
 		// Carrier Sustain/Release
-		op2_s_mdl.setValue(15 - ((sbidata[43] & 0xf0) >> 4));
-		op2_r_mdl.setValue(15 - (sbidata[43] & 0x0f));
+		m_op2.sustain.setValue(15 - ((sbidata[43] & 0xf0) >> 4));
+		m_op2.release.setValue(15 - (sbidata[43] & 0x0f));
 
 		// Modulator Wave Select
-		op1_waveform_mdl.setValue(sbidata[44] & 0x03);
+		m_op1.waveform.setValue(sbidata[44] & 0x03);
 
 		// Carrier Wave Select
-		op2_waveform_mdl.setValue(sbidata[45] & 0x03);
+		m_op2.waveform.setValue(sbidata[45] & 0x03);
 
 		// Feedback/Connection
-		fm_mdl.setValue((sbidata[46] & 0x01) == 0x01 ? false : true);
-		feedback_mdl.setValue(((sbidata[46] & 0x0e) >> 1));
+		m_fmModel.setValue((sbidata[46] & 0x01) == 0x01 ? false : true);
+		m_feedbackModel.setValue(((sbidata[46] & 0x0e) >> 1));
 	}
 }
 
@@ -793,14 +819,14 @@ void OpulenzInstrumentView::updateKnobHints()
 		knob->setHintText(name, QString{" (%1 semitones)"}.arg(val));
 	};
 
-	setTimeHint(op1_a_kn, tr("Attack"), AttackTimes[(int)m->op1_a_mdl.value()]);
-	setTimeHint(op2_a_kn, tr("Attack"), AttackTimes[(int)m->op2_a_mdl.value()]);
-	setTimeHint(op1_d_kn, tr("Decay"), DrTimes[(int)m->op1_d_mdl.value()]);
-	setTimeHint(op2_d_kn, tr("Decay"), DrTimes[(int)m->op2_d_mdl.value()]);
-	setTimeHint(op1_r_kn, tr("Release"), DrTimes[(int)m->op1_r_mdl.value()]);
-	setTimeHint(op2_r_kn, tr("Release"), DrTimes[(int)m->op2_r_mdl.value()]);
-	setHintSemitone(op1_mul_kn, tr("Frequency multiplier"), FreqMults[(int)m->op1_mul_mdl.value()]);
-	setHintSemitone(op2_mul_kn, tr("Frequency multiplier"), FreqMults[(int)m->op2_mul_mdl.value()]);
+	setTimeHint(op1_a_kn, tr("Attack"), AttackTimes[(int)m->m_op1.attack.value()]);
+	setTimeHint(op2_a_kn, tr("Attack"), AttackTimes[(int)m->m_op2.attack.value()]);
+	setTimeHint(op1_d_kn, tr("Decay"), DrTimes[(int)m->m_op1.decay.value()]);
+	setTimeHint(op2_d_kn, tr("Decay"), DrTimes[(int)m->m_op2.decay.value()]);
+	setTimeHint(op1_r_kn, tr("Release"), DrTimes[(int)m->m_op1.release.value()]);
+	setTimeHint(op2_r_kn, tr("Release"), DrTimes[(int)m->m_op2.release.value()]);
+	setHintSemitone(op1_mul_kn, tr("Frequency multiplier"), FreqMults[(int)m->m_op1.multiplier.value()]);
+	setHintSemitone(op2_mul_kn, tr("Frequency multiplier"), FreqMults[(int)m->m_op2.multiplier.value()]);
 }
 
 void OpulenzInstrumentView::modelChanged()
@@ -808,50 +834,51 @@ void OpulenzInstrumentView::modelChanged()
 	auto m = castModel<OpulenzInstrument>();
 	// m_patch->setModel(&m->m_patchModel);
 
-	op1_a_kn->setModel(&m->op1_a_mdl);
-	op1_d_kn->setModel(&m->op1_d_mdl);
-	op1_s_kn->setModel(&m->op1_s_mdl);
-	op1_r_kn->setModel(&m->op1_r_mdl);
-	op1_lvl_kn->setModel(&m->op1_lvl_mdl);
-	op1_scale_kn->setModel(&m->op1_scale_mdl);
-	op1_mul_kn->setModel(&m->op1_mul_mdl);
-	feedback_kn->setModel(&m->feedback_mdl);
-	op1_ksr_btn->setModel(&m->op1_ksr_mdl);
-	op1_perc_btn->setModel(&m->op1_perc_mdl);
-	op1_trem_btn->setModel(&m->op1_trem_mdl);
-	op1_vib_btn->setModel(&m->op1_vib_mdl);
-	op1_waveform->setModel(&m->op1_waveform_mdl);
+	op1_a_kn->setModel(&m->m_op1.attack);
+	op1_d_kn->setModel(&m->m_op1.decay);
+	op1_s_kn->setModel(&m->m_op1.sustain);
+	op1_r_kn->setModel(&m->m_op1.release);
+	op1_lvl_kn->setModel(&m->m_op1.level);
+	op1_scale_kn->setModel(&m->m_op1.scale);
+	op1_mul_kn->setModel(&m->m_op1.multiplier);
+	feedback_kn->setModel(&m->m_feedbackModel);
+	op1_ksr_btn->setModel(&m->m_op1.ksr);
+	op1_perc_btn->setModel(&m->m_op1.perc);
+	op1_trem_btn->setModel(&m->m_op1.tremolo);
+	op1_vib_btn->setModel(&m->m_op1.vibrato);
+	op1_waveform->setModel(&m->m_op1.waveform);
 
-	op2_a_kn->setModel(&m->op2_a_mdl);
-	op2_d_kn->setModel(&m->op2_d_mdl);
-	op2_s_kn->setModel(&m->op2_s_mdl);
-	op2_r_kn->setModel(&m->op2_r_mdl);
-	op2_lvl_kn->setModel(&m->op2_lvl_mdl);
-	op2_scale_kn->setModel(&m->op2_scale_mdl);
-	op2_mul_kn->setModel(&m->op2_mul_mdl);
-	op2_ksr_btn->setModel(&m->op2_ksr_mdl);
-	op2_perc_btn->setModel(&m->op2_perc_mdl);
-	op2_trem_btn->setModel(&m->op2_trem_mdl);
-	op2_vib_btn->setModel(&m->op2_vib_mdl);
-	op2_waveform->setModel(&m->op2_waveform_mdl);
+	op2_a_kn->setModel(&m->m_op2.attack);
+	op2_d_kn->setModel(&m->m_op2.decay);
+	op2_s_kn->setModel(&m->m_op2.sustain);
+	op2_r_kn->setModel(&m->m_op2.release);
+	op2_lvl_kn->setModel(&m->m_op2.level);
+	op2_scale_kn->setModel(&m->m_op2.scale);
+	op2_mul_kn->setModel(&m->m_op2.multiplier);
+	op2_ksr_btn->setModel(&m->m_op2.ksr);
+	op2_perc_btn->setModel(&m->m_op2.perc);
+	op2_trem_btn->setModel(&m->m_op2.tremolo);
+	op2_vib_btn->setModel(&m->m_op2.vibrato);
+	op2_waveform->setModel(&m->m_op2.waveform);
 
-	fm_btn->setModel(&m->fm_mdl);
-	vib_depth_btn->setModel(&m->vib_depth_mdl);
-	trem_depth_btn->setModel(&m->trem_depth_mdl);
+	fm_btn->setModel(&m->m_fmModel);
+	vib_depth_btn->setModel(&m->m_vibDepthModel);
+	trem_depth_btn->setModel(&m->m_tremDepthModel);
 
 	const auto connHint = [this](FloatModel* model)
 	{
 		connect(model, &FloatModel::dataChanged, this, &OpulenzInstrumentView::updateKnobHints);
 	};
 
-	connHint(&m->op1_a_mdl);
-	connHint(&m->op2_a_mdl);
-	connHint(&m->op1_d_mdl);
-	connHint(&m->op2_d_mdl);
-	connHint(&m->op1_r_mdl);
-	connHint(&m->op2_r_mdl);
-	connHint(&m->op1_mul_mdl);
-	connHint(&m->op2_mul_mdl);
+	connHint(&m->m_op1.attack);
+	connHint(&m->m_op1.decay);
+	connHint(&m->m_op1.release);
+	connHint(&m->m_op1.multiplier);
+
+	connHint(&m->m_op2.attack);
+	connHint(&m->m_op2.decay);
+	connHint(&m->m_op2.release);
+	connHint(&m->m_op2.multiplier);
 
 	updateKnobHints();
 }

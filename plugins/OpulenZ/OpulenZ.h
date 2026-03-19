@@ -52,6 +52,29 @@ class AutomatableButtonGroup;
 // The "normal" range for LMMS pitchbends
 #define DEFAULT_BEND_CENTS 100
 
+class OpulenzInstrument;
+
+//! Stores parameters unique to both operators, to avoid duplication.
+struct OpulenzOperatorModels
+{
+	//! `num` is the number of the operator (1 or 2 on an OPL2)
+	OpulenzOperatorModels(OpulenzInstrument* ins, int num);
+	~OpulenzOperatorModels() = default;
+
+	FloatModel attack;
+	FloatModel decay;
+	FloatModel sustain;
+	FloatModel release;
+	FloatModel level;
+	FloatModel scale;
+	FloatModel multiplier;
+	BoolModel ksr;
+	BoolModel perc;
+	BoolModel tremolo;
+	BoolModel vibrato;
+	IntModel waveform;
+};
+
 class OpulenzInstrument : public Instrument
 {
 	Q_OBJECT
@@ -68,51 +91,19 @@ public:
 	void saveSettings(QDomDocument& _doc, QDomElement& _this) override;
 	void loadSettings(const QDomElement& _this) override;
 
+	void loadDefaultPatch(); //!< Load default patch
 	void loadPatch(const unsigned char inst[14]); //!< Load a patch into the emulator
 
 	void tuneEqual(int center, float Hz);
 	void loadFile(const QString& file) override; //!< Load an SBI file into the knob models
 
 	IntModel m_patchModel;
-
-	FloatModel op1_a_mdl;
-	FloatModel op1_d_mdl;
-	FloatModel op1_s_mdl;
-	FloatModel op1_r_mdl;
-	FloatModel op1_lvl_mdl;
-	FloatModel op1_scale_mdl;
-	FloatModel op1_mul_mdl;
-	FloatModel feedback_mdl;
-	BoolModel op1_ksr_mdl;
-	BoolModel op1_perc_mdl;
-	BoolModel op1_trem_mdl;
-	BoolModel op1_vib_mdl;
-	BoolModel op1_w0_mdl;
-	BoolModel op1_w1_mdl;
-	BoolModel op1_w2_mdl;
-	BoolModel op1_w3_mdl;
-	IntModel op1_waveform_mdl;
-
-	FloatModel op2_a_mdl;
-	FloatModel op2_d_mdl;
-	FloatModel op2_s_mdl;
-	FloatModel op2_r_mdl;
-	FloatModel op2_lvl_mdl;
-	FloatModel op2_scale_mdl;
-	FloatModel op2_mul_mdl;
-	BoolModel op2_ksr_mdl;
-	BoolModel op2_perc_mdl;
-	BoolModel op2_trem_mdl;
-	BoolModel op2_vib_mdl;
-	BoolModel op2_w0_mdl;
-	BoolModel op2_w1_mdl;
-	BoolModel op2_w2_mdl;
-	BoolModel op2_w3_mdl;
-	IntModel op2_waveform_mdl;
-
-	BoolModel fm_mdl;
-	BoolModel vib_depth_mdl;
-	BoolModel trem_depth_mdl;
+	FloatModel m_feedbackModel;
+	BoolModel m_fmModel;
+	BoolModel m_vibDepthModel;
+	BoolModel m_tremDepthModel;
+	OpulenzOperatorModels m_op1;
+	OpulenzOperatorModels m_op2;
 
 private slots:
 	void updatePatch(); //!< Update patch from the models to the chip emulation
