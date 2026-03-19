@@ -28,8 +28,6 @@
 #include <QHeaderView>
 #include <QLabel>
 #include <QKeyEvent>
-#include <QSortFilterProxyModel>
-#include <QStandardItemModel>
 #include <QStandardItem>
 
 #include "embed.h"
@@ -69,7 +67,8 @@ namespace
 static constexpr auto ColBank = 0;
 static constexpr auto ColPatch = 1;
 static constexpr auto ColName = 2;
-static constexpr auto TotalCols = 3;
+static constexpr auto ColSearchSort = 3; //!< For an invisible column used in sorting
+static constexpr auto TotalCols = 4;
 }
 
 PatchesDialog::PatchesDialog(QWidget* parent, Qt::WindowFlags wflags)
@@ -101,13 +100,14 @@ PatchesDialog::PatchesDialog(QWidget* parent, Qt::WindowFlags wflags)
 	headerLabels[ColName] = tr("Name");
 	headerLabels[ColBank] = tr("Bank");
 	headerLabels[ColPatch] = tr("Patch");
+	headerLabels[ColSearchSort] = "HIDE THIS";
 	m_progListSourceModel.setHorizontalHeaderLabels(headerLabels);
 
 	// Configure program list models
 	m_progListProxyModel.setSourceModel(&m_progListSourceModel);
 	m_progListProxyModel.setFilterCaseSensitivity(Qt::CaseInsensitive);
-	m_progListProxyModel.setFilterKeyColumn(ColName);
 	m_progListProxyModel.setDynamicSortFilter(true);
+	m_progListProxyModel.setFilterKeyColumn(ColName);
 
 	// Configure program list view
 	m_progListView->setModel(&m_progListProxyModel);
@@ -117,6 +117,7 @@ PatchesDialog::PatchesDialog(QWidget* parent, Qt::WindowFlags wflags)
 	m_progListView->setSortingEnabled(true);
 	m_progListView->sortByColumn(ColPatch, Qt::AscendingOrder);
 	m_progListView->setColumnHidden(ColBank, true);
+	m_progListView->setColumnHidden(ColSearchSort, true);
 
 	constexpr int RowHeight = 18;
 	auto progVHeader = m_progListView->verticalHeader();
@@ -407,6 +408,11 @@ void PatchesDialog::diffSelectProgRow(int offset)
 
 void PatchesDialog::updateSearchUi(bool isSearching)
 {
+	// FIXME: every time the search starts or stops, the sort column is changed, violating what the user may
+	// have picked. I'd say this doesn't matter most of the time (I doubt most would sort before searching)
+	// but it might get annoying.
+	m_progListView->sortByColumn(isSearching ? ColSearchSort : ColPatch, Qt::AscendingOrder);
+
 	m_progListView->setColumnHidden(ColBank, !isSearching);
 	showAllBankPatches(isSearching);
 	m_bankListView->setHidden(isSearching);
@@ -414,6 +420,7 @@ void PatchesDialog::updateSearchUi(bool isSearching)
 
 void PatchesDialog::showAllBankPatches(bool value)
 {
+	// This check here avoids having to reload all patches for every character typed.
 	if (value == m_showingAllBankPatches) { return; }
 	m_showingAllBankPatches = value;
 	updatePatchList();
@@ -469,12 +476,13 @@ void PatchesDialog::updatePatchList()
 					const auto patchNumItem = makeNumItem(iProg);
 					const auto bankNumItem = makeNumItem(iBank);
 					const auto patchNameItem = new QStandardItem(fluid_preset_get_name(pCurPreset));
+					const auto sortNumItem = makeNumItem(iBank * 1000 + iProg);
 
 					// Old columns:
 					// - QString::number(fluid_sfont_get_id(pSoundFont))
 					// - QFileInfo(fluid_sfont_get_name(pSoundFont).baseName())
 
-					m_progListSourceModel.appendRow({bankNumItem, patchNumItem, patchNameItem});
+					m_progListSourceModel.appendRow({bankNumItem, patchNumItem, patchNameItem, sortNumItem});
 					if (!m_showingAllBankPatches) { stop = true; }
 				}
 			}
