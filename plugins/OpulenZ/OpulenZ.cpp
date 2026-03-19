@@ -251,14 +251,14 @@ void OpulenzInstrument::setVoiceVelocity(int voice, int vel) {
 	// Velocity calculation, some kind of approximation
 	// Only calculate for operator 1 if in adding mode, don't want to change timbre
 	theEmulator->write(0x40+adlib_opadd[voice],
-			   (((int)op1_scale_mdl.value() & 0x03) << 6) +
+			   ((static_cast<int>(op1_scale_mdl.value()) & 0x03) << 6) +
 			   ( vel_adjusted & 0x3f ) );
 
 
 	vel_adjusted = 63 - ( op2_lvl_mdl.value() * vel/127.0 );
 	// vel_adjusted = 63 - op2_lvl_mdl.value();
 	theEmulator->write(0x43+adlib_opadd[voice],
-			   (((int)op2_scale_mdl.value() & 0x03) << 6) +
+			   ((static_cast<int>(op2_scale_mdl.value()) & 0x03) << 6) +
 			   ( vel_adjusted & 0x3f ) );
 }
 
