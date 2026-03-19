@@ -212,10 +212,8 @@ void VstPlugin::tryLoad(const QString &remoteVstPluginExecutable, bool skipInit)
 	waitForHostInfoGotten();
 	if( failed() )
 	{
-		m_loaded = false;
 		return;
 	}
-	m_loaded = true;
 
 	lock();
 

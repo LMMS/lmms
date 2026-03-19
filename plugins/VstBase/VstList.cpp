@@ -61,7 +61,7 @@ void VstList::scanDirRecursive(fs::path dirPath)
 			}
 			
 			VstPlugin plug{QString::fromStdString(entry.path().string()), true};
-			if (!plug.isLoaded())
+			if (plug.name().isEmpty()) // TODO: figure out a better way to check load fail
 			{
 				m_plugins.emplace(entry.path(), Metadata {entry.path(), Metadata::PluginType::NotVst});
 				continue;
