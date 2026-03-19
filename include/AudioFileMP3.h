@@ -57,8 +57,10 @@ public:
 					 outputFilename, audioEngine );
 	}
 
-private:
+protected:
 	void writeBuffer(const SampleFrame* /* _buf*/, const f_cnt_t /*_frames*/) override;
+
+private:
 	void flushRemainingBuffers();
 	bool initEncoder();
 	void tearDownEncoder();
