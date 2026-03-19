@@ -8,9 +8,17 @@ MixerChannelModel::MixerChannelModel(Model* parent)
 	: IntModel(0, 0, 0, parent, tr("Mixer channel"))
 {
 	setRange(0, Engine::mixer()->numChannels() - 1, 1);
+
 	connect(Engine::mixer(), &Mixer::channelsSwapped, this, &MixerChannelModel::channelsSwapped);
 	connect(Engine::mixer(), &Mixer::channelDeleted, this, &MixerChannelModel::channelDeleted);
 	connect(Engine::mixer(), &Mixer::channelCreated, this, &MixerChannelModel::channelCreated);
+
+	connect(this, &MixerChannelModel::dataChanged, Engine::mixer(), [this] {
+		--Engine::mixer()->mixerChannel(oldValue())->m_useCount;
+		++Engine::mixer()->mixerChannel(value())->m_useCount;
+	});
+
+	++Engine::mixer()->mixerChannel(0)->m_useCount;
 }
 
 void MixerChannelModel::channelsSwapped(int fromIndex, int toIndex)

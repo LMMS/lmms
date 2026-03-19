@@ -65,6 +65,7 @@ class MixerChannel : public ThreadableJob
 		QMutex m_lock;
 		bool m_queued; // are we queued up for rendering yet?
 		bool m_muted; // are we muted? updated per period so we don't have to call m_muteModel.value() twice
+		int m_useCount;
 
 		// pointers to other channels that this one sends to
 		MixerRouteVector m_sends;

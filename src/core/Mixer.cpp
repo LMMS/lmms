@@ -70,6 +70,7 @@ MixerChannel::MixerChannel( int idx, Model * _parent ) :
 	m_name(),
 	m_lock(),
 	m_queued( false ),
+	m_useCount(0),
 	m_dependenciesMet(0),
 	m_channelIndex(idx)
 {
@@ -813,41 +814,12 @@ void Mixer::validateChannelName( int index, int oldIndex )
 
 bool Mixer::isChannelInUse(int index)
 {
+	assert(index >= 0 && index < m_mixerChannels.size());
+
 	// check if the index mixer channel receives audio from any other channel
-	if (!m_mixerChannels[index]->m_receives.empty())
-	{
-		return true;
-	}
+	if (!m_mixerChannels[index]->m_receives.empty()) { return true; }
 
-	// check if the destination mixer channel on any instrument or sample track is the index mixer channel
-	TrackContainer::TrackList tracks;
-
-	auto& songTracks = Engine::getSong()->tracks();
-	auto& patternStoreTracks = Engine::patternStore()->tracks();
-	tracks.insert(tracks.end(), songTracks.begin(), songTracks.end());
-	tracks.insert(tracks.end(), patternStoreTracks.begin(), patternStoreTracks.end());
-
-	for (const auto t : tracks)
-	{
-		if (t->type() == Track::Type::Instrument)
-		{
-			auto inst = dynamic_cast<InstrumentTrack*>(t);
-			if (inst->mixerChannelModel()->value() == index)
-			{
-				return true;
-			}
-		}
-		else if (t->type() == Track::Type::Sample)
-		{
-			auto strack = dynamic_cast<SampleTrack*>(t);
-			if (strack->mixerChannelModel()->value() == index)
-			{
-				return true;
-			}
-		}
-	}
-
-	return false;
+	return m_mixerChannels[index]->m_useCount > 0;
 }
 
 
