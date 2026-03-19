@@ -91,11 +91,11 @@ class WatsynObject
 public:
 	WatsynObject( 	float * _A1wave, float * _A2wave,
 					float * _B1wave, float * _B2wave,
-					int _amod, int _bmod, const sample_rate_t _samplerate, NotePlayHandle * _nph, fpp_t _frames,
+					int _amod, int _bmod, const sample_rate_t _samplerate, NotePlayHandle * _nph, f_cnt_t _frames,
 					WatsynInstrument * _w );
 	virtual ~WatsynObject();
 
-	void renderOutput( fpp_t _frames );
+	void renderOutput( f_cnt_t _frames );
 
 	inline SampleFrame* abuf() const
 	{
@@ -117,7 +117,7 @@ private:
 	const sample_rate_t m_samplerate;
 	NotePlayHandle * m_nph;
 
-	fpp_t m_fpp;
+	f_cnt_t m_fpp;
 
 	WatsynInstrument * m_parent;
 

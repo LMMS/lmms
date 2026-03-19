@@ -42,12 +42,12 @@
 
 #include <cstdio>
 
+namespace lmms {
+namespace {
 
-namespace
-{
-static const QString audioJackClass("audiojack");
-static const QString clientNameKey("clientname");
-static const QString disconnectedRepresentation("-");
+const auto audioJackClass = QString{"audiojack"};
+const auto clientNameKey = QString{"clientname"};
+const auto disconnectedRepresentation = QString{"-"};
 
 QString getOutputKeyByChannel(size_t channel)
 {
@@ -74,25 +74,22 @@ void printJackStatus(jack_status_t status)
 	}
 }
 
-}
-
-namespace lmms
-{
-
-static QString buildChannelSuffix(ch_cnt_t ch)
+QString buildChannelSuffix(ch_cnt_t ch)
 {
 	return (ch % 2 ? "R" : "L") + QString::number(ch / 2 + 1);
 }
 
-static QString buildOutputName(ch_cnt_t ch)
+QString buildOutputName(ch_cnt_t ch)
 {
 	return QString("master out ") + buildChannelSuffix(ch);
 }
 
-static QString buildInputName(ch_cnt_t ch)
+QString buildInputName(ch_cnt_t ch)
 {
 	return QString("master in ") + buildChannelSuffix(ch);
 }
+
+} // namespace
 
 AudioJack::AudioJack(bool& successful, AudioEngine* audioEngineParam)
 	: AudioDevice(
@@ -184,9 +181,9 @@ bool AudioJack::initJackClient()
 	QString clientName = ConfigManager::inst()->value(audioJackClass, clientNameKey);
 	if (clientName.isEmpty()) { clientName = "lmms"; }
 
-	const char* serverName = nullptr;
+	// Will attempt to start the JACK server
 	jack_status_t status;
-	m_client = jack_client_open(clientName.toLatin1().constData(), JackNullOption, &status, serverName);
+	m_client = jack_client_open(clientName.toLatin1().constData(), JackNullOption, &status);
 	if (m_client == nullptr)
 	{
 		std::fprintf(stderr, "jack_client_open() failed, ");
@@ -498,13 +495,14 @@ void AudioJack::shutdownCallback(void* udata)
 AudioJack::setupWidget::setupWidget(QWidget* parent)
 	: AudioDeviceSetupWidget(AudioJack::name(), parent)
 {
-	const char* serverName = nullptr;
+	// TODO: Once backend can be changed without restarting LMMS, add a button to start/stop
+	//       the JACK server and an indicator for the JACK server status.
+
 	jack_status_t status;
-	m_client = jack_client_open("LMMS-Setup Dialog", JackNullOption, &status, serverName);
+	m_client = jack_client_open("LMMS-Setup Dialog", JackNoStartServer, &status);
 	if (!m_client)
 	{
-		std::fprintf(stderr, "jack_client_open() failed, ");
-		printJackStatus(status);
+		// Failure is expected when not using the JACK backend
 	}
 
 	QFormLayout * form = new QFormLayout(this);

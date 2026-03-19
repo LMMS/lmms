@@ -107,7 +107,7 @@ AudioFileProcessor::AudioFileProcessor( InstrumentTrack * _instrument_track ) :
 void AudioFileProcessor::playNote( NotePlayHandle * _n,
 						SampleFrame* _working_buffer )
 {
-	const fpp_t frames = _n->framesLeftForCurrentPeriod();
+	const f_cnt_t frames = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();
 
 	// Magic key - a frequency < 20 (say, the bottom piano note if using
@@ -320,6 +320,7 @@ void AudioFileProcessor::setAudioFile(const QString& _audio_file, bool _rename)
 
 	m_sample = Sample(SampleBuffer::fromFile(_audio_file));
 	loopPointChanged();
+	ampModelChanged();
 	reverseModelChanged();
 	emit sampleUpdated();
 }

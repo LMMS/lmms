@@ -107,7 +107,7 @@ MonstroSynth::MonstroSynth( MonstroInstrument * _i, NotePlayHandle * _nph ) :
 }
 
 
-void MonstroSynth::renderOutput( fpp_t _frames, SampleFrame* _buf  )
+void MonstroSynth::renderOutput( f_cnt_t _frames, SampleFrame* _buf  )
 {
 	float modtmp; // temp variable for freq modulation
 // macros for modulating with env/lfos
@@ -1061,7 +1061,7 @@ MonstroInstrument::MonstroInstrument( InstrumentTrack * _instrument_track ) :
 void MonstroInstrument::playNote( NotePlayHandle * _n,
 						SampleFrame* _working_buffer )
 {
-	const fpp_t frames = _n->framesLeftForCurrentPeriod();
+	const f_cnt_t frames = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();
 
 	if (!_n->m_pluginData)
