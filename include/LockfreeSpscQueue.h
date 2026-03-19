@@ -150,21 +150,21 @@ public:
 		if (!m_shutdownFlag.test(std::memory_order_relaxed)) { shutdown(); }
 	}
 
-	auto push(T value) -> bool { return push(&value, 1); }
+	auto enqueue(T value) -> bool { return enqueue(&value, 1); }
 
-	auto pop() -> std::optional<T>
-	{
-		auto value = T{};
-		return pop(&value, 1) == 0 ? std::nullopt : std::optional<T>{value};
-	}
-
-	auto push(const T* values, size_t size) -> bool
+	auto enqueue(const T* values, size_t size) -> bool
 	{
 		auto region = reserveWriteSpace(size);
 		return region.write(values, size);
 	}
 
-	auto pop(T* values, size_t size) -> bool
+	auto dequeue() -> std::optional<T>
+	{
+		auto value = T{};
+		return dequeue(&value, 1) == 0 ? std::nullopt : std::optional<T>{value};
+	}
+
+	auto dequeue(T* values, size_t size) -> bool
 	{
 		const auto region = reserveReadSpace(size);
 		return region.read(values, size);
