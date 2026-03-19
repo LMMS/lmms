@@ -67,11 +67,11 @@ struct OpulenzOperatorModels
 	FloatModel release;
 	FloatModel level;
 	FloatModel scale;
-	FloatModel multiplier;
-	BoolModel ksr;
-	BoolModel perc;
-	BoolModel tremolo;
-	BoolModel vibrato;
+	FloatModel mul; //!< Frequency multiplier
+	BoolModel ksr; //!< Key-Scale Rate
+	BoolModel perc; //!< Percussive envelope mode
+	BoolModel trem; //!< Tremolo
+	BoolModel vib; //!< Vibrato
 	IntModel waveform;
 };
 
@@ -169,11 +169,11 @@ struct OpulenzOperatorControls
 	Knob* release;
 	Knob* level;
 	Knob* scale;
-	Knob* multiplier;
+	Knob* mul;
 	PixmapButton* ksr;
 	PixmapButton* perc;
-	PixmapButton* tremolo;
-	PixmapButton* vibrato;
+	PixmapButton* trem;
+	PixmapButton* vib;
 	AutomatableButtonGroup* waveform;
 	PixmapButton* w0;
 	PixmapButton* w1;
