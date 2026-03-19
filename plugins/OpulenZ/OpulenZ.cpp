@@ -236,7 +236,7 @@ void OpulenzInstrument::reloadEmulator()
 	s_emulatorMutex.lock();
 	theEmulator = new CTemuopl(Engine::audioEngine()->outputSampleRate(), true, false);
 	theEmulator->init();
-	theEmulator->write(0x01,0x20);
+	theEmulator->write(0x01, 0x20);
 	s_emulatorMutex.unlock();
 	for (int i = 0; i < OPL2_VOICES; ++i)
 	{
@@ -256,28 +256,29 @@ void OpulenzInstrument::setVoiceVelocity(int voice, int vel)
 	// Velocity calculation, some kind of approximation
 	// Only calculate for operator 1 if in adding mode, don't want to change timbre
 	theEmulator->write(0x40+adlib_opadd[voice],
-			   ((int)op1_scale_mdl.value() & 0x03 << 6) +
-			   (vel_adjusted & 0x3f));
+		((int)op1_scale_mdl.value() & 0x03 << 6) +
+		(vel_adjusted & 0x3f));
 
 
-	vel_adjusted = 63 - (op2_lvl_mdl.value() * vel/127.0);
+	vel_adjusted = 63 - (op2_lvl_mdl.value() * vel / 127.0);
 	// vel_adjusted = 63 - op2_lvl_mdl.value();
 	theEmulator->write(0x43+adlib_opadd[voice],
-			   ((int)op2_scale_mdl.value() & 0x03 << 6) +
-			   (vel_adjusted & 0x3f));
+		((int)op2_scale_mdl.value() & 0x03 << 6) +
+		(vel_adjusted & 0x3f));
 }
 
 // Pop least recently used voice
 int OpulenzInstrument::popVoice()
 {
 	int tmp = voiceLRU[0];
-	for(int i=0; i<OPL2_VOICES-1; ++i) {
-		voiceLRU[i] = voiceLRU[i+1];
+	for (int i = 0; i < OPL2_VOICES - 1; ++i)
+	{
+		voiceLRU[i] = voiceLRU[i + 1];
 	}
-	voiceLRU[OPL2_VOICES-1] = OPL2_NO_VOICE;
+	voiceLRU[OPL2_VOICES - 1] = OPL2_NO_VOICE;
 #ifdef false
-	printf("<-- %d %d %d %d %d %d %d %d %d \n", voiceLRU[0],voiceLRU[1],voiceLRU[2],
-		voiceLRU[3],voiceLRU[4],voiceLRU[5],voiceLRU[6],voiceLRU[7],voiceLRU[8]);
+	printf("<-- %d %d %d %d %d %d %d %d %d \n", voiceLRU[0], voiceLRU[1], voiceLRU[2],
+		voiceLRU[3], voiceLRU[4], voiceLRU[5], voiceLRU[6], voiceLRU[7], voiceLRU[8]);
 #endif
 	return tmp;
 }
@@ -286,16 +287,15 @@ int OpulenzInstrument::popVoice()
 int OpulenzInstrument::pushVoice(int v)
 {
 	int i;
-	assert(voiceLRU[OPL2_VOICES-1]==OPL2_NO_VOICE);
-	for(i=OPL2_VOICES-1; i>0; --i) {
-		if(voiceLRU[i-1] != OPL2_NO_VOICE) {
-			break;
-		}
+	assert(voiceLRU[OPL2_VOICES-1] == OPL2_NO_VOICE);
+	for (i = OPL2_VOICES - 1; i > 0; --i)
+	{
+		if (voiceLRU[i-1] != OPL2_NO_VOICE) { break; }
 	}
 	voiceLRU[i] = v;
 #ifdef false
-	printf("%d %d %d %d %d %d %d %d %d <-- \n", voiceLRU[0],voiceLRU[1],voiceLRU[2],
-	   voiceLRU[3],voiceLRU[4],voiceLRU[5],voiceLRU[6],voiceLRU[7],voiceLRU[8]);
+	printf("%d %d %d %d %d %d %d %d %d <-- \n", voiceLRU[0], voiceLRU[1], voiceLRU[2],
+		voiceLRU[3], voiceLRU[4], voiceLRU[5], voiceLRU[6], voiceLRU[7], voiceLRU[8]);
 #endif
 	return i;
 }
@@ -514,7 +514,7 @@ void OpulenzInstrument::tuneEqual(int center, float Hz)
 // Find suitable F number in lowest possible block
 int OpulenzInstrument::Hz2fnum(float Hz)
 {
-	for (int block=0; block<8; ++block)
+	for (int block = 0; block < 8; ++block)
 	{
 		auto fnum = static_cast<unsigned>(Hz * std::exp2(20.0f - static_cast<float>(block)) / 49716.0f);
 		if (fnum < 1023) { return fnum + (block << 10); }
@@ -541,22 +541,15 @@ void OpulenzInstrument::updatePatch() {
 		(op2_perc_mdl.value() ? 0 : 32) + // NB. This envelope mode is "perc", not "sus"
 		(op2_ksr_mdl.value() ? 16 : 0) +
 		((int)op2_mul_mdl.value() & 0x0f);
-	inst[2] = (((int)op1_scale_mdl.value() & 0x03) << 6) +
-		(63 - ((int)op1_lvl_mdl.value() & 0x3f));
-	inst[3] = (((int)op2_scale_mdl.value() & 0x03) << 6) +
-		(63 - ((int)op2_lvl_mdl.value() & 0x3f));
-	inst[4] = ((15 - ((int)op1_a_mdl.value() & 0x0f)) << 4) +
-		(15 - ((int)op1_d_mdl.value() & 0x0f));
-	inst[5] = ((15 - ((int)op2_a_mdl.value() & 0x0f)) << 4) +
-		(15 - ((int)op2_d_mdl.value() & 0x0f));
-	inst[6] = ((15 - ((int)op1_s_mdl.value() & 0x0f)) << 4) +
-		(15 - ((int)op1_r_mdl.value() & 0x0f));
-	inst[7] = ((15 - ((int)op2_s_mdl.value() & 0x0f)) << 4) +
-		(15 - ((int)op2_r_mdl.value() & 0x0f));
+	inst[2] = (((int)op1_scale_mdl.value() & 0x03) << 6) + (63 - ((int)op1_lvl_mdl.value() & 0x3f));
+	inst[3] = (((int)op2_scale_mdl.value() & 0x03) << 6) + (63 - ((int)op2_lvl_mdl.value() & 0x3f));
+	inst[4] = ((15 - ((int)op1_a_mdl.value() & 0x0f)) << 4) + (15 - ((int)op1_d_mdl.value() & 0x0f));
+	inst[5] = ((15 - ((int)op2_a_mdl.value() & 0x0f)) << 4) + (15 - ((int)op2_d_mdl.value() & 0x0f));
+	inst[6] = ((15 - ((int)op1_s_mdl.value() & 0x0f)) << 4) + (15 - ((int)op1_r_mdl.value() & 0x0f));
+	inst[7] = ((15 - ((int)op2_s_mdl.value() & 0x0f)) << 4) + (15 - ((int)op2_r_mdl.value() & 0x0f));
 	inst[8] = (int)op1_waveform_mdl.value() & 0x03;
 	inst[9] = (int)op2_waveform_mdl.value() & 0x03;
-	inst[10] = (fm_mdl.value() ? 0 : 1) +
-		(((int)feedback_mdl.value() & 0x07) << 1);
+	inst[10] = (fm_mdl.value() ? 0 : 1) + (((int)feedback_mdl.value() & 0x07) << 1);
 	// These are always 0 in the list I had?
 	inst[11] = 0;
 	inst[12] = 0;
@@ -591,37 +584,41 @@ void OpulenzInstrument::loadFile(const QString& file)
 	if (!file.isEmpty() && QFileInfo(file).exists())
 	{
 		QFile sbifile(file);
-		if (!sbifile.open(QIODevice::ReadOnly)) {
+		if (!sbifile.open(QIODevice::ReadOnly))
+		{
 			printf("Can't open file\n");
 			return;
 		}
 
 		QByteArray sbidata = sbifile.read(52);
-		if(!sbidata.startsWith("SBI\0x1a")) {
+		if (!sbidata.startsWith("SBI\0x1a"))
+		{
 			printf("No SBI signature\n");
 			return;
 		}
-		if(sbidata.size() != 52) {
+		if (sbidata.size() != 52)
+		{
 			printf("SBI size error: expected 52, got %d\n", static_cast<int>(sbidata.size()));
 		}
 
 		// Minimum size of SBI if we ignore "reserved" bytes at end
 		// https://courses.engr.illinois.edu/ece390/resources/sound/cmf.txt.html
-		if(sbidata.size() < 47) {
-			return;
-		}
+		if (sbidata.size() < 47) { return; }
 
 		QString sbiname = sbidata.mid(4, 32);
 		// If user has changed track name... let's hope my logic is valid.
-		if(sbiname.size() > 0 && instrumentTrack()->displayName() == storedname) {
+		if (sbiname.size() > 0 && instrumentTrack()->displayName() == storedname)
+		{
 			instrumentTrack()->setName(sbiname);
 			storedname = sbiname;
 		}
 
 #ifdef false
 		printf("SBI: %02x %02x %02x %02x %02x -- %02x %02x %02x %02x %02x %02x\n",
-		       (unsigned char)sbidata[36], (unsigned char)sbidata[37], (unsigned char)sbidata[38], (unsigned char)sbidata[39], (unsigned char)sbidata[40],
-		       (unsigned char)sbidata[41], (unsigned char)sbidata[42], (unsigned char)sbidata[43], (unsigned char)sbidata[44], (unsigned char)sbidata[45], (unsigned char)sbidata[46]);
+			(unsigned char)sbidata[36], (unsigned char)sbidata[37], (unsigned char)sbidata[38],
+			(unsigned char)sbidata[39], (unsigned char)sbidata[40], (unsigned char)sbidata[41],
+			(unsigned char)sbidata[42], (unsigned char)sbidata[43], (unsigned char)sbidata[44],
+			(unsigned char)sbidata[45], (unsigned char)sbidata[46]);
 #endif
 		// Modulator Sound Characteristic (Mult, KSR, EG, VIB, AM)
 		op1_trem_mdl.setValue((sbidata[36] & 0x80) == 0x80 ? true : false);
@@ -673,8 +670,6 @@ void OpulenzInstrument::loadFile(const QString& file)
 	}
 }
 
-
-
 namespace gui
 {
 
@@ -704,7 +699,8 @@ OpulenzInstrumentView::OpulenzInstrumentView(Instrument* instrument, QWidget* pa
 		return b;
 	};
 
-	const auto waveButtonGen = [this](QString tooltip, int xpos, int ypos, const char* iconOn, const char* iconOff, AutomatableButtonGroup* group)
+	const auto waveButtonGen = [this](QString tooltip, int xpos, int ypos, const char* iconOn, const char* iconOff,
+		AutomatableButtonGroup* group)
 	{
 		auto* b = new PixmapButton(this, nullptr);
 		b->setActiveGraphic(PLUGIN_NAME::getIconPixmap(iconOn));
@@ -771,18 +767,9 @@ OpulenzInstrumentView::~OpulenzInstrumentView()
 
 inline QString OpulenzInstrumentView::timeKnobHint(float n)
 {
-	if (n > 1000)
-	{
-		return QString::number(n/1000, 'f', 0) + " s";
-	}
-	else if (n > 10)
-	{
-		return QString::number(n, 'f', 0) + " ms";
-	}
-	else
-	{
-		return QString::number(n, 'f', 1) + " ms";
-	}
+	if (n > 1000) { return QString::number(n/1000, 'f', 0) + " s"; }
+	else if (n > 10) { return QString::number(n, 'f', 0) + " ms"; }
+	else { return QString::number(n, 'f', 1) + " ms"; }
 }
 
 void OpulenzInstrumentView::updateKnobHints()
