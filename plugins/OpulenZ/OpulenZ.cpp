@@ -105,11 +105,7 @@ OpulenzInstrument::OpulenzInstrument(InstrumentTrack* insTrack)
 	, op1_perc_mdl(false, this, tr("Op 1 percussive envelope"))
 	, op1_trem_mdl(true, this, tr("Op 1 tremolo"))
 	, op1_vib_mdl(false, this, tr("Op 1 vibrato"))
-	, op1_w0_mdl()
-	, op1_w1_mdl()
-	, op1_w2_mdl()
-	, op1_w3_mdl()
-	, op1_waveform_mdl(0,0,3, this, tr("Op 1 waveform"))
+	, op1_waveform_mdl(0, 0, 3, this, tr("Op 1 waveform"))
 	, op2_a_mdl(1.0, 0.0, 15.0, 1.0, this, tr("Op 2 attack"))
 	, op2_d_mdl(3.0, 0.0, 15.0, 1.0, this, tr("Op 2 decay"))
 	, op2_s_mdl(14.0, 0.0, 15.0, 1.0, this, tr("Op 2 sustain"))
@@ -121,10 +117,6 @@ OpulenzInstrument::OpulenzInstrument(InstrumentTrack* insTrack)
 	, op2_perc_mdl(false, this, tr("Op 2 percussive envelope"))
 	, op2_trem_mdl(false, this, tr("Op 2 tremolo"))
 	, op2_vib_mdl(true, this, tr("Op 2 vibrato"))
-	, op2_w0_mdl()
-	, op2_w1_mdl()
-	, op2_w2_mdl()
-	, op2_w3_mdl()
 	, op2_waveform_mdl(0, 0, 3, this, tr("Op 2 waveform"))
 	, fm_mdl(true, this, tr("FM"))
 	, vib_depth_mdl(false, this, tr("Vibrato depth"))
@@ -185,10 +177,6 @@ OpulenzInstrument::OpulenzInstrument(InstrumentTrack* insTrack)
 	modelConn(op1_perc_mdl);
 	modelConn(op1_trem_mdl);
 	modelConn(op1_vib_mdl);
-	modelConn(op1_w0_mdl);
-	modelConn(op1_w1_mdl);
-	modelConn(op1_w2_mdl);
-	modelConn(op1_w3_mdl);
 	modelConn(op1_waveform_mdl);
 
 	modelConn(op2_a_mdl);
@@ -202,10 +190,6 @@ OpulenzInstrument::OpulenzInstrument(InstrumentTrack* insTrack)
 	modelConn(op2_perc_mdl);
 	modelConn(op2_trem_mdl);
 	modelConn(op2_vib_mdl);
-	modelConn(op2_w0_mdl);
-	modelConn(op2_w1_mdl);
-	modelConn(op2_w2_mdl);
-	modelConn(op2_w3_mdl);
 	modelConn(op2_waveform_mdl);
 
 	modelConn(fm_mdl);
