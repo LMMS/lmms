@@ -160,6 +160,27 @@ private:
 namespace gui
 {
 
+//! Aggregates controls for models available in OpulenzOperatorModels. All pointers are non-owning.
+struct OpulenzOperatorControls
+{
+	Knob* attack;
+	Knob* decay;
+	Knob* sustain;
+	Knob* release;
+	Knob* level;
+	Knob* scale;
+	Knob* multiplier;
+	PixmapButton* ksr;
+	PixmapButton* perc;
+	PixmapButton* tremolo;
+	PixmapButton* vibrato;
+	AutomatableButtonGroup* waveform;
+	PixmapButton* w0;
+	PixmapButton* w1;
+	PixmapButton* w2;
+	PixmapButton* w3;
+};
+
 class OpulenzInstrumentView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
@@ -170,44 +191,12 @@ public:
 	LcdSpinBox* m_patch;
 	void modelChanged() override;
 
-	Knob* op1_a_kn;
-	Knob* op1_d_kn;
-	Knob* op1_s_kn;
-	Knob* op1_r_kn;
-	Knob* op1_lvl_kn;
-	Knob* op1_scale_kn;
-	Knob* op1_mul_kn;
-	Knob* feedback_kn;
-	PixmapButton* op1_ksr_btn;
-	PixmapButton* op1_perc_btn;
-	PixmapButton* op1_trem_btn;
-	PixmapButton* op1_vib_btn;
-	PixmapButton* op1_w0_btn;
-	PixmapButton* op1_w1_btn;
-	PixmapButton* op1_w2_btn;
-	PixmapButton* op1_w3_btn;
-	AutomatableButtonGroup* op1_waveform;
-
-	Knob* op2_a_kn;
-	Knob* op2_d_kn;
-	Knob* op2_s_kn;
-	Knob* op2_r_kn;
-	Knob* op2_lvl_kn;
-	Knob* op2_scale_kn;
-	Knob* op2_mul_kn;
-	PixmapButton* op2_ksr_btn;
-	PixmapButton* op2_perc_btn;
-	PixmapButton* op2_trem_btn;
-	PixmapButton* op2_vib_btn;
-	PixmapButton* op2_w0_btn;
-	PixmapButton* op2_w1_btn;
-	PixmapButton* op2_w2_btn;
-	PixmapButton* op2_w3_btn;
-	AutomatableButtonGroup* op2_waveform;
-
-	PixmapButton* fm_btn;
-	PixmapButton* vib_depth_btn;
-	PixmapButton* trem_depth_btn;
+	OpulenzOperatorControls op1View;
+	OpulenzOperatorControls op2View;
+	Knob* feedbackKnob;
+	PixmapButton* fmButton;
+	PixmapButton* vibDepthButton;
+	PixmapButton* tremDepthButton;
 
 private slots:
 	//! Update hints to have user-friendly formatting and units.

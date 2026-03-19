@@ -1,7 +1,6 @@
-// TODO: de-duplication for GUI controls (Knob/PixmapButton)
+// TODO: multiplier->mult, vibrato->vib, tremolo->trem
 // TODO: follow name guidelines (remove snake case)
 // TODO: use static_cast
-// TODO: are m_patchModel & loadGMPatch used at all??
 
 /*
  * OpulenZ.cpp - AdLib OPL2 FM synth based instrument
@@ -432,13 +431,17 @@ void OpulenzInstrument::loadSettings(const QDomElement& el)
 		m_op2.scale.loadSettings(el, "op2_scale");
 	}
 
+	m_feedbackModel.loadSettings(el, "feedback");
+	m_fmModel.loadSettings(el, "fm");
+	m_vibDepthModel.loadSettings(el, "vib_depth");
+	m_tremDepthModel.loadSettings(el, "trem_depth");
+
 	m_op1.attack.loadSettings(el, "op1_a");
 	m_op1.decay.loadSettings(el, "op1_d");
 	m_op1.sustain.loadSettings(el, "op1_s");
 	m_op1.release.loadSettings(el, "op1_r");
 	m_op1.level.loadSettings(el, "op1_lvl");
 	m_op1.multiplier.loadSettings(el, "op1_mul");
-	m_feedbackModel.loadSettings(el, "feedback");
 	m_op1.ksr.loadSettings(el, "op1_ksr");
 	m_op1.perc.loadSettings(el, "op1_perc");
 	m_op1.tremolo.loadSettings(el, "op1_trem");
@@ -456,10 +459,6 @@ void OpulenzInstrument::loadSettings(const QDomElement& el)
 	m_op2.tremolo.loadSettings(el, "op2_trem");
 	m_op2.vibrato.loadSettings(el, "op2_vib");
 	m_op2.waveform.loadSettings(el, "op2_waveform");
-
-	m_fmModel.loadSettings(el, "fm");
-	m_vibDepthModel.loadSettings(el, "vib_depth");
-	m_tremDepthModel.loadSettings(el, "trem_depth");
 }
 
 void OpulenzInstrument::loadPatch(const unsigned char inst[14])
@@ -560,6 +559,11 @@ void OpulenzInstrument::updatePatch()
 
 void OpulenzInstrument::loadDefaultPatch()
 {
+	m_feedbackModel.setValue(0.0);
+	m_fmModel.setValue(true);
+	m_vibDepthModel.setValue(false);
+	m_tremDepthModel.setValue(false);
+
 	m_op1.attack.setValue(14.0);
 	m_op1.decay.setValue(14.0);
 	m_op1.sustain.setValue(13.0);
@@ -585,11 +589,6 @@ void OpulenzInstrument::loadDefaultPatch()
 	m_op2.tremolo.setValue(false);
 	m_op2.vibrato.setValue(true);
 	m_op2.waveform.setValue(0);
-
-	m_feedbackModel.setValue(0.0);
-	m_fmModel.setValue(true);
-	m_vibDepthModel.setValue(false);
-	m_tremDepthModel.setValue(false);
 }
 
 void OpulenzInstrument::loadFile(const QString& file)
@@ -691,7 +690,7 @@ namespace gui
 OpulenzInstrumentView::OpulenzInstrumentView(Instrument* instrument, QWidget* parent)
 	: InstrumentViewFixedSize(instrument, parent)
 {
-	const auto knobGen = [this](QString hintText, QString hintUnit, int xpos, int ypos)
+	const auto makeKnob = [this](QString hintText, QString hintUnit, int xpos, int ypos)
 	{
 		auto* k = new Knob(KnobType::Styled, this);
 		k->setHintText(hintText, hintUnit);
@@ -703,7 +702,7 @@ OpulenzInstrumentView::OpulenzInstrumentView(Instrument* instrument, QWidget* pa
 		return k;
 	};
 
-	const auto buttonGen = [this](QString tooltip, int xpos, int ypos)
+	const auto makeButton = [this](QString tooltip, int xpos, int ypos)
 	{
 		auto* b = new PixmapButton(this, nullptr);
 		b->setActiveGraphic(PLUGIN_NAME::getIconPixmap("led_on"));
@@ -714,7 +713,7 @@ OpulenzInstrumentView::OpulenzInstrumentView(Instrument* instrument, QWidget* pa
 		return b;
 	};
 
-	const auto waveButtonGen = [this](QString tooltip, int xpos, int ypos, const char* iconOn, const char* iconOff,
+	const auto makeWaveButton = [this](QString tooltip, int xpos, int ypos, const char* iconOn, const char* iconOff,
 		AutomatableButtonGroup* group)
 	{
 		auto* b = new PixmapButton(this, nullptr);
@@ -726,48 +725,38 @@ OpulenzInstrumentView::OpulenzInstrumentView(Instrument* instrument, QWidget* pa
 		return b;
 	};
 
-	// OP1 knobs & buttons...
-	op1_a_kn = knobGen(tr("Attack"), "", 6, 48);
-	op1_d_kn = knobGen(tr("Decay"), "", 34, 48);
-	op1_s_kn = knobGen(tr("Sustain"), "", 62, 48);
-	op1_r_kn = knobGen(tr("Release"), "", 90, 48);
-	op1_lvl_kn = knobGen(tr("Level"), "", 166, 48);
-	op1_scale_kn = knobGen(tr("Scale"), "", 194, 48);
-	op1_mul_kn = knobGen(tr("Frequency multiplier"), "", 222, 48);
-	op1_ksr_btn = buttonGen(tr("Keyboard scaling rate"), 9, 87);
-	op1_perc_btn = buttonGen(tr("Percussive envelope"), 36, 87);
-	op1_trem_btn = buttonGen(tr("Tremolo"), 65, 87);
-	op1_vib_btn = buttonGen(tr("Vibrato"), 93, 87);
-	feedback_kn = knobGen(tr("Feedback"), "", 128, 48);
+	const auto makeOpControls = [&](int offX, int offY) -> OpulenzOperatorControls
+	{
+		OpulenzOperatorControls ret;
 
-	op1_waveform = new AutomatableButtonGroup(this);
-	op1_w0_btn = waveButtonGen(tr("Sine"), 154, 86, "wave1_on", "wave1_off", op1_waveform);
-	op1_w1_btn = waveButtonGen(tr("Half sine"), 178, 86, "wave2_on", "wave2_off", op1_waveform);
-	op1_w2_btn = waveButtonGen(tr("Absolute sine"), 199, 86, "wave3_on", "wave3_off", op1_waveform);
-	op1_w3_btn = waveButtonGen(tr("Quarter sine"), 220, 86, "wave4_on", "wave4_off", op1_waveform);
+		ret.attack = makeKnob(tr("Attack"), "", 6 + offX, 48 + offY);
+		ret.decay = makeKnob(tr("Decay"), "", 34 + offX, 48 + offY);
+		ret.sustain = makeKnob(tr("Sustain"), "", 62 + offX, 48 + offY);
+		ret.release = makeKnob(tr("Release"), "", 90 + offX, 48 + offY);
+		ret.level = makeKnob(tr("Level"), "", 166 + offX, 48 + offY);
+		ret.scale = makeKnob(tr("Scale"), "", 194 + offX, 48 + offY);
+		ret.multiplier = makeKnob(tr("Frequency multiplier"), "", 222 + offX, 48 + offY);
+		ret.ksr = makeButton(tr("Keyboard scaling rate"), 9 + offX, 87 + offY);
+		ret.perc = makeButton(tr("Percussive envelope"), 36 + offX, 87 + offY);
+		ret.tremolo = makeButton(tr("Tremolo"), 65 + offX, 87 + offY);
+		ret.vibrato = makeButton(tr("Vibrato"), 93 + offX, 87 + offY);
 
-	// And the same for OP2
-	op2_a_kn = knobGen(tr("Attack"), "", 6, 138);
-	op2_d_kn = knobGen(tr("Decay"), "", 34, 138);
-	op2_s_kn = knobGen(tr("Sustain"), "", 62, 138);
-	op2_r_kn = knobGen(tr("Release"), "", 90, 138);
-	op2_lvl_kn = knobGen(tr("Level"), "", 166, 138);
-	op2_scale_kn = knobGen(tr("Scale"), "", 194, 138);
-	op2_mul_kn = knobGen(tr("Frequency multiplier"), "", 222, 138);
-	op2_ksr_btn = buttonGen(tr("Keyboard scaling rate"), 9, 177);
-	op2_perc_btn = buttonGen(tr("Percussive envelope"), 36, 177);
-	op2_trem_btn = buttonGen(tr("Tremolo"), 65, 177);
-	op2_vib_btn = buttonGen(tr("Vibrato"), 93, 177);
+		ret.waveform = new AutomatableButtonGroup(this);
+		ret.w0 = makeWaveButton(tr("Sine"), 154 + offX, 86 + offY, "wave1_on", "wave1_off", ret.waveform);
+		ret.w1 = makeWaveButton(tr("Half sine"), 178 + offX, 86 + offY, "wave2_on", "wave2_off", ret.waveform);
+		ret.w2 = makeWaveButton(tr("Absolute sine"), 199 + offX, 86 + offY, "wave3_on", "wave3_off", ret.waveform);
+		ret.w3 = makeWaveButton(tr("Quarter sine"), 220 + offX, 86 + offY, "wave4_on", "wave4_off", ret.waveform);
 
-	op2_waveform = new AutomatableButtonGroup(this);
-	op2_w0_btn = waveButtonGen(tr("Sine"), 154, 176, "wave1_on", "wave1_off", op2_waveform);
-	op2_w1_btn = waveButtonGen(tr("Half sine"), 178, 176, "wave2_on", "wave2_off", op2_waveform);
-	op2_w2_btn = waveButtonGen(tr("Absolute sine"), 199, 176, "wave3_on", "wave3_off", op2_waveform);
-	op2_w3_btn = waveButtonGen(tr("Quarter Sine"), 220, 176, "wave4_on", "wave4_off", op2_waveform);
+		return ret;
+	};
 
-	fm_btn = buttonGen(tr("FM"), 9, 220);
-	vib_depth_btn = buttonGen(tr("Vibrato depth"), 65, 220);
-	trem_depth_btn = buttonGen(tr("Tremolo depth"), 93, 220);
+	feedbackKnob = makeKnob(tr("Feedback"), "", 128, 48);
+	fmButton = makeButton(tr("FM"), 9, 220);
+	vibDepthButton = makeButton(tr("Vibrato depth"), 65, 220);
+	tremDepthButton = makeButton(tr("Tremolo depth"), 93, 220);
+
+	op1View = makeOpControls(0, 0);
+	op2View = makeOpControls(0, 90);
 
 	setAutoFillBackground(true);
 	QPalette pal;
@@ -819,14 +808,14 @@ void OpulenzInstrumentView::updateKnobHints()
 		knob->setHintText(name, QString{" (%1 semitones)"}.arg(val));
 	};
 
-	setTimeHint(op1_a_kn, tr("Attack"), AttackTimes[(int)m->m_op1.attack.value()]);
-	setTimeHint(op2_a_kn, tr("Attack"), AttackTimes[(int)m->m_op2.attack.value()]);
-	setTimeHint(op1_d_kn, tr("Decay"), DrTimes[(int)m->m_op1.decay.value()]);
-	setTimeHint(op2_d_kn, tr("Decay"), DrTimes[(int)m->m_op2.decay.value()]);
-	setTimeHint(op1_r_kn, tr("Release"), DrTimes[(int)m->m_op1.release.value()]);
-	setTimeHint(op2_r_kn, tr("Release"), DrTimes[(int)m->m_op2.release.value()]);
-	setHintSemitone(op1_mul_kn, tr("Frequency multiplier"), FreqMults[(int)m->m_op1.multiplier.value()]);
-	setHintSemitone(op2_mul_kn, tr("Frequency multiplier"), FreqMults[(int)m->m_op2.multiplier.value()]);
+	setTimeHint(op1View.attack, tr("Attack"), AttackTimes[(int)m->m_op1.attack.value()]);
+	setTimeHint(op2View.attack, tr("Attack"), AttackTimes[(int)m->m_op2.attack.value()]);
+	setTimeHint(op1View.decay, tr("Decay"), DrTimes[(int)m->m_op1.decay.value()]);
+	setTimeHint(op2View.decay, tr("Decay"), DrTimes[(int)m->m_op2.decay.value()]);
+	setTimeHint(op1View.release, tr("Release"), DrTimes[(int)m->m_op1.release.value()]);
+	setTimeHint(op2View.release, tr("Release"), DrTimes[(int)m->m_op2.release.value()]);
+	setHintSemitone(op1View.multiplier, tr("Frequency multiplier"), FreqMults[(int)m->m_op1.multiplier.value()]);
+	setHintSemitone(op2View.multiplier, tr("Frequency multiplier"), FreqMults[(int)m->m_op2.multiplier.value()]);
 }
 
 void OpulenzInstrumentView::modelChanged()
@@ -834,36 +823,36 @@ void OpulenzInstrumentView::modelChanged()
 	auto m = castModel<OpulenzInstrument>();
 	// m_patch->setModel(&m->m_patchModel);
 
-	op1_a_kn->setModel(&m->m_op1.attack);
-	op1_d_kn->setModel(&m->m_op1.decay);
-	op1_s_kn->setModel(&m->m_op1.sustain);
-	op1_r_kn->setModel(&m->m_op1.release);
-	op1_lvl_kn->setModel(&m->m_op1.level);
-	op1_scale_kn->setModel(&m->m_op1.scale);
-	op1_mul_kn->setModel(&m->m_op1.multiplier);
-	feedback_kn->setModel(&m->m_feedbackModel);
-	op1_ksr_btn->setModel(&m->m_op1.ksr);
-	op1_perc_btn->setModel(&m->m_op1.perc);
-	op1_trem_btn->setModel(&m->m_op1.tremolo);
-	op1_vib_btn->setModel(&m->m_op1.vibrato);
-	op1_waveform->setModel(&m->m_op1.waveform);
+	feedbackKnob->setModel(&m->m_feedbackModel);
+	fmButton->setModel(&m->m_fmModel);
+	vibDepthButton->setModel(&m->m_vibDepthModel);
+	tremDepthButton->setModel(&m->m_tremDepthModel);
 
-	op2_a_kn->setModel(&m->m_op2.attack);
-	op2_d_kn->setModel(&m->m_op2.decay);
-	op2_s_kn->setModel(&m->m_op2.sustain);
-	op2_r_kn->setModel(&m->m_op2.release);
-	op2_lvl_kn->setModel(&m->m_op2.level);
-	op2_scale_kn->setModel(&m->m_op2.scale);
-	op2_mul_kn->setModel(&m->m_op2.multiplier);
-	op2_ksr_btn->setModel(&m->m_op2.ksr);
-	op2_perc_btn->setModel(&m->m_op2.perc);
-	op2_trem_btn->setModel(&m->m_op2.tremolo);
-	op2_vib_btn->setModel(&m->m_op2.vibrato);
-	op2_waveform->setModel(&m->m_op2.waveform);
+	op1View.attack->setModel(&m->m_op1.attack);
+	op1View.decay->setModel(&m->m_op1.decay);
+	op1View.sustain->setModel(&m->m_op1.sustain);
+	op1View.release->setModel(&m->m_op1.release);
+	op1View.level->setModel(&m->m_op1.level);
+	op1View.scale->setModel(&m->m_op1.scale);
+	op1View.multiplier->setModel(&m->m_op1.multiplier);
+	op1View.ksr->setModel(&m->m_op1.ksr);
+	op1View.perc->setModel(&m->m_op1.perc);
+	op1View.tremolo->setModel(&m->m_op1.tremolo);
+	op1View.vibrato->setModel(&m->m_op1.vibrato);
+	op1View.waveform->setModel(&m->m_op1.waveform);
 
-	fm_btn->setModel(&m->m_fmModel);
-	vib_depth_btn->setModel(&m->m_vibDepthModel);
-	trem_depth_btn->setModel(&m->m_tremDepthModel);
+	op2View.attack->setModel(&m->m_op2.attack);
+	op2View.decay->setModel(&m->m_op2.decay);
+	op2View.sustain->setModel(&m->m_op2.sustain);
+	op2View.release->setModel(&m->m_op2.release);
+	op2View.level->setModel(&m->m_op2.level);
+	op2View.scale->setModel(&m->m_op2.scale);
+	op2View.multiplier->setModel(&m->m_op2.multiplier);
+	op2View.ksr->setModel(&m->m_op2.ksr);
+	op2View.perc->setModel(&m->m_op2.perc);
+	op2View.tremolo->setModel(&m->m_op2.tremolo);
+	op2View.vibrato->setModel(&m->m_op2.vibrato);
+	op2View.waveform->setModel(&m->m_op2.waveform);
 
 	const auto connHint = [this](FloatModel* model)
 	{
