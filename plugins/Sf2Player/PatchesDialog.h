@@ -51,8 +51,8 @@ public:
 	PatchesDialog(QWidget* parent = nullptr, Qt::WindowFlags wflags = QFlag{0});
 	~PatchesDialog() override = default;
 
-	void setup(fluid_synth_t* pSynth, int iChan, const QString& _chanName, LcdSpinBoxModel* _bankModel,
-		LcdSpinBoxModel* _progModel, QLabel* _patchLabel);
+	void setup(fluid_synth_t* pSynth, int iChan, const QString& chanName, LcdSpinBoxModel* bankModel,
+		LcdSpinBoxModel* progModel, QLabel* patchLabel);
 
 public slots:
 	void stabilizeForm(); //!< Stabilize current state form

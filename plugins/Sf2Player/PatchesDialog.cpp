@@ -50,8 +50,8 @@ public:
 	bool operator<(const QTreeWidgetItem& other) const override
 	{
 		int iColumn = QTreeWidgetItem::treeWidget()->sortColumn();
-		const QString& s1 = text( iColumn );
-		const QString& s2 = other.text( iColumn );
+		const QString& s1 = text(iColumn);
+		const QString& s2 = other.text(iColumn);
 		if (iColumn == 0 || iColumn == 2)
 		{
 			return s1.toInt() < s2.toInt();
@@ -63,12 +63,14 @@ public:
 	}
 };
 
-// Row numbers for each column in the table.
-// The code here is written as to allow reordering these. Might not be needed...
+namespace
+{
+// Row numbers for each column in the table, as to reduce issues when reordering them.
 static constexpr auto ColBank = 0;
 static constexpr auto ColPatch = 1;
 static constexpr auto ColName = 2;
 static constexpr auto TotalCols = 3;
+}
 
 PatchesDialog::PatchesDialog(QWidget* parent, Qt::WindowFlags wflags)
 	: QDialog(parent, wflags)
@@ -166,17 +168,17 @@ PatchesDialog::PatchesDialog(QWidget* parent, Qt::WindowFlags wflags)
 	QObject::connect(m_cancelButton, &QPushButton::clicked, this, &PatchesDialog::reject);
 }
 
-void PatchesDialog::setup(fluid_synth_t* pSynth, int iChan, const QString& _chanName,
-	LcdSpinBoxModel* _bankModel, LcdSpinBoxModel* _progModel, QLabel* _patchLabel)
+void PatchesDialog::setup(fluid_synth_t* pSynth, int iChan, const QString& chanName,
+	LcdSpinBoxModel* bankModel, LcdSpinBoxModel* progModel, QLabel* patchLabel)
 {
 	// We're going to change the whole thing...
 	m_dirty = 0;
-	m_bankModel = _bankModel;
-	m_progModel = _progModel;
-	m_patchLabel = _patchLabel;
+	m_bankModel = bankModel;
+	m_progModel = progModel;
+	m_patchLabel = patchLabel;
 
 	// Set the proper caption
-	setWindowTitle(tr("%1 - Soundfont patches").arg(_chanName));
+	setWindowTitle(tr("%1 - Soundfont patches").arg(chanName));
 
 	// Set m_pSynth to null so we don't trigger any progChanged events
 	m_pSynth = nullptr;
@@ -229,7 +231,8 @@ void PatchesDialog::setup(fluid_synth_t* pSynth, int iChan, const QString& _chan
 	// Set the selected bank.
 	m_iBank = 0;
 	fluid_preset_t *pPreset = ::fluid_synth_get_channel_preset(m_pSynth, m_iChan);
-	if (pPreset) {
+	if (pPreset)
+	{
 		m_iBank = fluid_preset_get_banknum(pPreset);
 #ifdef CONFIG_FLUID_BANK_OFFSET
 		m_iBank += ::fluid_synth_get_bank_offset(m_pSynth, fluid_sfont_get_id(fluid_preset_get_sfont(sfont)));
