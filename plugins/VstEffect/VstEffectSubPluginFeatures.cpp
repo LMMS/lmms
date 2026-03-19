@@ -24,7 +24,7 @@
  *
  */
 
-#include "VestigeSubPluginFeatures.h"
+#include "VstEffectSubPluginFeatures.h"
 
 #include <QDir>
 #include <QLabel>
@@ -34,21 +34,21 @@
 
 namespace lmms {
 
-VestigeSubPluginFeatures::VestigeSubPluginFeatures(Plugin::Type pluginType)
+VstEffectSubPluginFeatures::VstEffectSubPluginFeatures(Plugin::Type pluginType)
 	: SubPluginFeatures(pluginType)
 {
 }
 
-void VestigeSubPluginFeatures::fillDescriptionWidget(QWidget* parent, const Key* key) const
+void VstEffectSubPluginFeatures::fillDescriptionWidget(QWidget* parent, const Key* key) const
 {
 	new QLabel(QWidget::tr("Name: ") + key->name, parent);
 	new QLabel(QWidget::tr("File: ") + key->attributes["file"], parent);
 }
 
-void VestigeSubPluginFeatures::listSubPluginKeys(const Plugin::Descriptor* desc, KeyList& keylist) const
+void VstEffectSubPluginFeatures::listSubPluginKeys(const Plugin::Descriptor* desc, KeyList& keylist) const
 {
 	// TODO: eval m_type
-	for (const auto& data : VstList::inst()->instrumentPlugins())
+	for (const auto& data : VstList::inst()->effectPlugins())
 	{
 		EffectKey::AttributeMap am;
 		am["file"] = QString::fromStdString(data.path.string());

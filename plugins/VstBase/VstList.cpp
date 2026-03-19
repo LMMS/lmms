@@ -82,8 +82,19 @@ void VstList::scanDirRecursive(fs::path dirPath)
 std::vector<VstList::Metadata> VstList::instrumentPlugins()
 {
 	std::vector<VstList::Metadata> out;
-	for (const auto& [_, data] : std::views::filter(m_plugins,
-		[](const auto& elem){return elem.second.type == Metadata::PluginType::Instrument;}))
+	for (const auto& [_, data] : m_plugins
+		| std::views::filter([](const auto& elem){return elem.second.type == Metadata::PluginType::Instrument;}))
+	{
+		out.push_back(data);
+	}
+	return out;
+}
+
+std::vector<VstList::Metadata> VstList::effectPlugins()
+{
+	std::vector<VstList::Metadata> out;
+	for (const auto& [_, data] : m_plugins
+		| std::views::filter([](const auto& elem){return elem.second.type == Metadata::PluginType::Effect;}))
 	{
 		out.push_back(data);
 	}

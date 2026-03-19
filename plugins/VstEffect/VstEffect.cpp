@@ -29,7 +29,7 @@
 #include "Song.h"
 #include "TextFloat.h"
 #include "VstPlugin.h"
-#include "VstSubPluginFeatures.h"
+#include "VstEffectSubPluginFeatures.h"
 
 #include "embed.h"
 #include "plugin_export.h"
@@ -52,7 +52,7 @@ Plugin::Descriptor PLUGIN_EXPORT vsteffect_plugin_descriptor =
 	Plugin::Type::Effect,
 	new PluginPixmapLoader("logo"),
 	nullptr,
-	new VstSubPluginFeatures( Plugin::Type::Effect )
+	new VstEffectSubPluginFeatures(Plugin::Type::Effect)
 } ;
 
 }
