@@ -36,31 +36,6 @@
 namespace lmms::gui
 {
 
-//! Custom list-view item (for numerical sorting purposes)
-class PatchItem : public QTreeWidgetItem
-{
-public:
-	PatchItem(QTreeWidget* pListView, QTreeWidgetItem *pItemAfter)
-		: QTreeWidgetItem(pListView, pItemAfter)
-	{
-	}
-
-	bool operator<(const QTreeWidgetItem& other) const override
-	{
-		int iColumn = QTreeWidgetItem::treeWidget()->sortColumn();
-		const QString& s1 = text(iColumn);
-		const QString& s2 = other.text(iColumn);
-		if (iColumn == 0 || iColumn == 2)
-		{
-			return s1.toInt() < s2.toInt();
-		}
-		else
-		{
-			return s1 < s2;
-		}
-	}
-};
-
 namespace
 {
 // Row numbers for each column in the table, as to reduce issues when reordering them.
@@ -192,7 +167,6 @@ void PatchesDialog::setup(fluid_synth_t* pSynth, int iChan, const QString& chanN
 	m_pSynth = pSynth;
 	m_iChan = iChan;
 
-	QTreeWidgetItem *bankItem = nullptr;
 	// For all soundfonts, in reversed stack order, fill the available banks
 	int cSoundFonts = ::fluid_synth_sfcount(m_pSynth);
 	for (int i = 0; i < cSoundFonts; i++)
@@ -218,11 +192,9 @@ void PatchesDialog::setup(fluid_synth_t* pSynth, int iChan, const QString& chanN
 #endif
 				if (!findBankItem(iBank))
 				{
-					bankItem = new PatchItem(m_bankListView, bankItem);
-					if (bankItem)
-					{
-						bankItem->setText(0, QString::number(iBank));
-					}
+					auto* bankItem = new QTreeWidgetItem();
+					bankItem->setText(0, QString::number(iBank));
+					m_bankListView->addTopLevelItem(bankItem);
 				}
 			}
 		}
@@ -240,7 +212,7 @@ void PatchesDialog::setup(fluid_synth_t* pSynth, int iChan, const QString& chanN
 #endif
 	}
 
-	bankItem = findBankItem(m_iBank);
+	auto* bankItem = findBankItem(m_iBank);
 	m_bankListView->setCurrentItem(bankItem);
 	m_bankListView->scrollToItem(bankItem);
 	updatePatchList();
