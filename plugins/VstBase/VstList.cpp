@@ -68,7 +68,9 @@ void VstList::scanDirRecursive(fs::path dirPath)
 			}
 			m_plugins.emplace(entry.path(), Metadata {
 				entry.path(),
-				Metadata::PluginType::Instrument, // FIXME
+				plug.isSynth()
+					? Metadata::PluginType::Instrument
+					: Metadata::PluginType::Effect,
 				plug.name().toStdString(),
 				plug.productString().toStdString(),
 				plug.vendorString().toStdString()

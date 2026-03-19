@@ -84,7 +84,8 @@ enum VstRemoteMessageIDs
 	IdVstPluginUniqueID,
 	IdVstSetParameter,
 	IdVstParameterCount,
-	IdVstParameterDump
+	IdVstParameterDump,
+	IdVstIsSynth
 
 } ;
 

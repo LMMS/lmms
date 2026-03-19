@@ -746,20 +746,17 @@ void RemoteVstPlugin::init( const std::string & _plugin_file )
 
 
 	// now post some information about our plugin
-	sendMessage( message( IdVstPluginWindowID ).addInt( m_windowID ) );
+	sendMessage(message(IdVstPluginWindowID).addInt(m_windowID));
 
-	sendMessage( message( IdVstPluginEditorGeometry ).
-						addInt( m_windowWidth ).
-						addInt( m_windowHeight ) );
-	sendMessage( message( IdVstPluginName ).addString( pluginName() ) );
-	debugMessage( std::string("plugin name: ") + pluginName() + "\n" );
-	sendMessage( message( IdVstPluginVersion ).addInt( pluginVersion() ) );
-	sendMessage( message( IdVstPluginVendorString ).
-					addString( pluginVendorString() ) );
-	sendMessage( message( IdVstPluginProductString ).
-					addString( pluginProductString() ) );
-	sendMessage( message( IdVstParameterCount ).
-					addInt( m_plugin->numParams ) );
+	sendMessage(message(IdVstPluginEditorGeometry).addInt(m_windowWidth).addInt(m_windowHeight));
+	sendMessage(message(IdVstPluginName).addString(pluginName()));
+	debugMessage(std::string("plugin name: ") + pluginName() + "\n");
+	sendMessage(message(IdVstPluginVersion).addInt(pluginVersion()));
+	sendMessage(message(IdVstPluginVendorString).addString(pluginVendorString()));
+	sendMessage(message(IdVstPluginProductString).addString(pluginProductString()));
+	sendMessage(message(IdVstParameterCount).addInt(m_plugin->numParams));
+
+	if (m_plugin->flags & effFlagsIsSynth) { sendMessage(message(IdVstIsSynth)); }
 
 	sendMessage( IdInitDone );
 

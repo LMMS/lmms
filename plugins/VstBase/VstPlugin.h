@@ -101,6 +101,11 @@ public:
 		return m_allParameterDisplays;
 	}
 
+	inline bool isSynth() const
+	{
+		return m_isSynth;
+	}
+
 	int currentProgram();
 
 	bool isLoaded() const { return m_loaded; }
@@ -165,6 +170,7 @@ private:
 	QString m_allProgramNames;
 	QString m_allParameterLabels;
 	QString m_allParameterDisplays;
+	bool m_isSynth;
 
 	QString p_name;
 

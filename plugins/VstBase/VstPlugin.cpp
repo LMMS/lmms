@@ -128,6 +128,7 @@ VstPlugin::VstPlugin(const QString & _plugin, bool skipInit) :
 			? ConfigManager::inst()->vstEmbedMethod()
 			: "headless" ),
 	m_version( 0 ),
+	m_isSynth{false},
 	m_currentProgram()
 {
 	setSplittedChannels( true );
@@ -428,6 +429,10 @@ bool VstPlugin::processMessage( const message & _m )
 	case IdVstPluginEditorGeometry:
 		m_pluginGeometry = QSize( _m.getInt( 0 ),
 								  _m.getInt( 1 ) );
+			break;
+
+		case IdVstIsSynth:
+			m_isSynth = true;
 			break;
 
 		case IdVstPluginName:
