@@ -193,7 +193,7 @@ void PatchesDialog::setup(fluid_synth_t* pSynth, int iChan, const QString& chanN
 				if (!findBankItem(iBank))
 				{
 					auto* bankItem = new QTreeWidgetItem();
-					bankItem->setText(0, QString::number(iBank));
+					bankItem->setData(0, Qt::DisplayRole, iBank);
 					m_bankListView->addTopLevelItem(bankItem);
 				}
 			}
@@ -455,6 +455,8 @@ void PatchesDialog::updatePatchList()
 					// - QFileInfo(fluid_sfont_get_name(pSoundFont).baseName())
 
 					m_progListSourceModel.appendRow({bankNumItem, patchNumItem, patchNameItem, sortNumItem});
+
+					// If only showing the patches of a single bank, stop.
 					if (!m_showingAllBankPatches) { stop = true; }
 				}
 			}
