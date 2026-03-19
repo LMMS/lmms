@@ -229,8 +229,7 @@ void PatchesDialog::setup(fluid_synth_t* pSynth, int iChan, const QString& chanN
 		{
 			constexpr auto setMask = QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows;
 			int row = proxyIdx.row();
-			auto idx = m_progListView->model()->index(row, 0);
-
+			auto idx = m_progListView->model()->index(row, ColPatch);
 			m_progListView->selectionModel()->setCurrentIndex(idx, setMask);
 			m_progListView->scrollTo(idx);
 		}
@@ -373,8 +372,10 @@ void PatchesDialog::diffSelectProgRow(int offset)
 	newRow = std::clamp(0, newRow, rowCount - 1);
 
 	constexpr auto selMask = QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows;
-	const auto idx = m_progListView->model()->index(newRow, 0);
+	const auto idx = m_progListView->model()->index(newRow, ColPatch);
 	selectionModel->setCurrentIndex(idx, selMask);
+
+	// NOTE: scrollTo() has to receive an index that points to a visible column. Be careful about that!
 	m_progListView->scrollTo(idx);
 }
 
