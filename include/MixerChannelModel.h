@@ -1,5 +1,5 @@
 /*
- * MixerChannelLcdSpinBox.h
+ * MixerChannelModel.h
  *
  * Copyright (c) 2026 saker <sakertooth@gmail.com>
  *
