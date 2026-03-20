@@ -1,5 +1,3 @@
-// TODO: use static_cast
-
 /*
  * OpulenZ.cpp - AdLib OPL2 FM synth based instrument
  *
@@ -509,26 +507,41 @@ void OpulenzInstrument::loadGMPatch()
 
 void OpulenzInstrument::updatePatch()
 {
+	const auto encodeFlags = [](const OpulenzOperatorModels& op) -> unsigned char
+	{
+		return (op.trem.value() ? 128 : 0)
+			+ (op.vib.value() ? 64 : 0)
+			+ (op.perc.value() ? 0 : 32) // NB. This envelope mode is "perc", not "sus"
+			+ (op.ksr.value() ? 16 : 0)
+			+ (static_cast<int>(op.mul.value()) & 0x0f);
+	};
+
+	const auto encodeScaleFlags = [](const OpulenzOperatorModels& op) -> unsigned char
+	{
+		return ((static_cast<int>(op.scale.value()) & 0x03) << 6)
+			+ (63 - (static_cast<int>(op.level.value()) & 0x3f));
+	};
+
+	const auto encodeEnvPart = [](const auto& m1, const auto& m2) -> unsigned char
+	{
+		return ((15 - (static_cast<int>(m1.value()) & 0x0f)) << 4)
+			+ (15 - (static_cast<int>(m2.value()) & 0x0f));
+	};
+
 	auto inst = std::array<unsigned char, 14>{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-	inst[0] = (m_op1.trem.value() ? 128 : 0) +
-		(m_op1.vib.value() ? 64 : 0) +
-		(m_op1.perc.value() ? 0 : 32) + // NB. This envelope mode is "perc", not "sus"
-		(m_op1.ksr.value() ? 16 : 0) +
-		((int)m_op1.mul.value() & 0x0f);
-	inst[1] = (m_op2.trem.value() ? 128 : 0) +
-		(m_op2.vib.value() ? 64 : 0) +
-		(m_op2.perc.value() ? 0 : 32) + // NB. This envelope mode is "perc", not "sus"
-		(m_op2.ksr.value() ? 16 : 0) +
-		((int)m_op2.mul.value() & 0x0f);
-	inst[2] = (((int)m_op1.scale.value() & 0x03) << 6) + (63 - ((int)m_op1.level.value() & 0x3f));
-	inst[3] = (((int)m_op2.scale.value() & 0x03) << 6) + (63 - ((int)m_op2.level.value() & 0x3f));
-	inst[4] = ((15 - ((int)m_op1.attack.value() & 0x0f)) << 4) + (15 - ((int)m_op1.decay.value() & 0x0f));
-	inst[5] = ((15 - ((int)m_op2.attack.value() & 0x0f)) << 4) + (15 - ((int)m_op2.decay.value() & 0x0f));
-	inst[6] = ((15 - ((int)m_op1.sustain.value() & 0x0f)) << 4) + (15 - ((int)m_op1.release.value() & 0x0f));
-	inst[7] = ((15 - ((int)m_op2.sustain.value() & 0x0f)) << 4) + (15 - ((int)m_op2.release.value() & 0x0f));
-	inst[8] = (int)m_op1.waveform.value() & 0x03;
-	inst[9] = (int)m_op2.waveform.value() & 0x03;
-	inst[10] = (m_fmModel.value() ? 0 : 1) + (((int)m_feedbackModel.value() & 0x07) << 1);
+
+	inst[0] = encodeFlags(m_op1);
+	inst[1] = encodeFlags(m_op2);
+	inst[2] = encodeScaleFlags(m_op1);
+	inst[3] = encodeScaleFlags(m_op2);
+	inst[4] = encodeEnvPart(m_op1.attack, m_op1.decay);
+	inst[5] = encodeEnvPart(m_op2.attack, m_op2.decay);
+	inst[6] = encodeEnvPart(m_op1.sustain, m_op1.release);
+	inst[7] = encodeEnvPart(m_op2.sustain, m_op2.release);
+	inst[8] = static_cast<int>(m_op1.waveform.value()) & 0x03;
+	inst[9] = static_cast<int>(m_op2.waveform.value()) & 0x03;
+	inst[10] = (m_fmModel.value() ? 0 : 1) + ((static_cast<int>(m_feedbackModel.value()) & 0x07) << 1);
+
 	// These are always 0 in the list I had?
 	inst[11] = 0;
 	inst[12] = 0;
@@ -796,24 +809,26 @@ void OpulenzInstrumentView::updateKnobHints()
 
 	auto m = castModel<OpulenzInstrument>();
 
-	const auto setTimeHint = [this](Knob* knob, const QString& name, float val)
+	const auto setTimeHint = [this](Knob* knob, const QString& name, const auto& arr, const FloatModel& model)
 	{
+		const auto val = arr[static_cast<int>(model.value())];
 		knob->setHintText(name, QString{" (%1)"}.arg(timeKnobHint(val)));
 	};
 
-	const auto setHintSemitone = [this](Knob* knob, const QString& name, int val)
+	const auto setHintSemitone = [this,&FreqMults](Knob* knob, const QString& name, const FloatModel& model)
 	{
-		knob->setHintText(name, QString{" (%1 semitones)"}.arg(val));
+		const auto mul = FreqMults[static_cast<int>(model.value())];
+		knob->setHintText(name, QString{" (%1 semitones)"}.arg(mul));
 	};
 
-	setTimeHint(op1View.attack, tr("Attack"), AttackTimes[(int)m->m_op1.attack.value()]);
-	setTimeHint(op2View.attack, tr("Attack"), AttackTimes[(int)m->m_op2.attack.value()]);
-	setTimeHint(op1View.decay, tr("Decay"), DrTimes[(int)m->m_op1.decay.value()]);
-	setTimeHint(op2View.decay, tr("Decay"), DrTimes[(int)m->m_op2.decay.value()]);
-	setTimeHint(op1View.release, tr("Release"), DrTimes[(int)m->m_op1.release.value()]);
-	setTimeHint(op2View.release, tr("Release"), DrTimes[(int)m->m_op2.release.value()]);
-	setHintSemitone(op1View.mul, tr("Frequency multiplier"), FreqMults[(int)m->m_op1.mul.value()]);
-	setHintSemitone(op2View.mul, tr("Frequency multiplier"), FreqMults[(int)m->m_op2.mul.value()]);
+	setTimeHint(op1View.attack, tr("Attack"), AttackTimes, m->m_op1.attack);
+	setTimeHint(op2View.attack, tr("Attack"), AttackTimes, m->m_op2.attack);
+	setTimeHint(op1View.decay, tr("Decay"), DrTimes, m->m_op1.decay);
+	setTimeHint(op2View.decay, tr("Decay"), DrTimes, m->m_op2.decay);
+	setTimeHint(op1View.release, tr("Release"), DrTimes, m->m_op1.release);
+	setTimeHint(op2View.release, tr("Release"), DrTimes, m->m_op2.release);
+	setHintSemitone(op1View.mul, tr("Frequency multiplier"), m->m_op1.mul);
+	setHintSemitone(op2View.mul, tr("Frequency multiplier"), m->m_op2.mul);
 }
 
 void OpulenzInstrumentView::modelChanged()
