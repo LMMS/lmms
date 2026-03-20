@@ -93,7 +93,7 @@ void VstList::scanDirRecursive(fs::path dirPath)
 		if (path.filename().string()[0] == '.') { continue; }
 
 		// resolve symlinks and fetch data from the other end
-		const fs::file_status& stat = entry.symlink_status();
+		const fs::file_status& stat = entry.status();
 
 		if (fs::is_directory(stat)) { scanDirRecursive(path); }
 		else if (fs::is_regular_file(stat))
