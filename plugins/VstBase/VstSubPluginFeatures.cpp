@@ -30,9 +30,23 @@
 #include <QLabel>
 
 #include "VstList.h"
-#include "Effect.h"
+#include "Plugin.h"
 
-namespace lmms {
+using AttributeMap = lmms::Plugin::Descriptor::SubPluginFeatures::Key::AttributeMap;
+
+namespace
+{
+
+inline std::filesystem::path getPath(const lmms::Plugin::Descriptor::SubPluginFeatures::Key& key)
+{
+	return key.attributes["file"].toStdString();
+}
+
+} // namespace
+
+
+namespace lmms
+{
 
 VstSubPluginFeatures::VstSubPluginFeatures(Plugin::Type pluginType)
 	: SubPluginFeatures{pluginType}
@@ -53,10 +67,20 @@ void VstSubPluginFeatures::listSubPluginKeys(const Plugin::Descriptor* desc, Key
 		? VstList::inst()->instrumentPlugins()
 		: VstList::inst()->effectPlugins())
 	{
-		EffectKey::AttributeMap am;
+		AttributeMap am;
 		am["file"] = QString::fromStdString(data.path.string());
 		keylist.push_back(Key(desc, QString::fromStdString(data.name), am));
 	}
+}
+
+QString VstSubPluginFeatures::displayName(const Key& key) const
+{
+	return QString::fromStdString(VstList::inst()->plugins()[getPath(key)].name);
+}
+
+QString VstSubPluginFeatures::description(const Key& key) const
+{
+	return QString::fromStdString(VstList::inst()->plugins()[getPath(key)].product);
 }
 
 } // namespace lmms

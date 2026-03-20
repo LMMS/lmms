@@ -23,9 +23,9 @@ public:
 		Checksum file_checksum;
 		// TODO add file hash to detect changes
 		enum class PluginType: uint8_t { NotVst, Instrument, Effect } type = PluginType::NotVst;
-		std::string name = "";
-		std::string product = "";
-		std::string vendor = "";
+		std::string name = "no name";
+		std::string product = "no product";
+		std::string vendor = "no vendor";
 		int version = 0;
 	};
 
@@ -44,6 +44,7 @@ public:
 
 	std::vector<Metadata> instrumentPlugins();
 	std::vector<Metadata> effectPlugins();
+	std::unordered_map<std::filesystem::path, Metadata>& plugins() {return m_plugins;}
 
 private:
 	static VstList* s_inst;

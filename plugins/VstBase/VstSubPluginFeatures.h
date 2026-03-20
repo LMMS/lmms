@@ -44,6 +44,9 @@ public:
 
 	void listSubPluginKeys(const Plugin::Descriptor* desc, KeyList& key) const override;
 
+	QString displayName(const Key& key) const override;
+	QString description(const Key& key) const override;
+
 private:
 	Plugin::Type m_pluginType;
 } ;
