@@ -31,18 +31,30 @@ namespace lmms {
 MixerChannelModel::MixerChannelModel(Model* parent)
 	: IntModel(0, 0, 0, parent, tr("Mixer channel"))
 {
-	setRange(0, Engine::mixer()->numChannels() - 1, 1);
+	const auto mixer = Engine::mixer();
+	setRange(0, mixer->numChannels() - 1, 1);
 
-	connect(Engine::mixer(), &Mixer::channelsSwapped, this, &MixerChannelModel::channelsSwapped);
-	connect(Engine::mixer(), &Mixer::channelDeleted, this, &MixerChannelModel::channelDeleted);
-	connect(Engine::mixer(), &Mixer::channelCreated, this, &MixerChannelModel::channelCreated);
+	connect(mixer, &Mixer::channelsSwapped, this, &MixerChannelModel::channelsSwapped);
+	connect(mixer, &Mixer::channelDeleted, this, &MixerChannelModel::channelDeleted);
+	connect(mixer, &Mixer::channelCreated, this, &MixerChannelModel::channelCreated);
 
-	connect(this, &MixerChannelModel::dataChanged, Engine::mixer(), [this] {
-		--Engine::mixer()->mixerChannel(oldValue())->m_useCount;
-		++Engine::mixer()->mixerChannel(value())->m_useCount;
+	connect(this, &MixerChannelModel::dataChanged, mixer, [this, mixer] {
+		// both channels must exist so we know the channel was actually changed to another
+		if (oldValue() < 0 || oldValue() >= mixer->numChannels()) { return; }
+		if (value() < 0 || value() >= mixer->numChannels()) { return; }
+
+		--mixer->mixerChannel(oldValue())->m_useCount;
+		++mixer->mixerChannel(value())->m_useCount;
 	});
 
-	++Engine::mixer()->mixerChannel(0)->m_useCount;
+	++mixer->mixerChannel(0)->m_useCount;
+}
+
+MixerChannelModel::~MixerChannelModel()
+{
+	const auto mixer = Engine::mixer();
+	if (value() < 0 || value() >= mixer->numChannels()) { return; }
+	--mixer->mixerChannel(value())->m_useCount;
 }
 
 void MixerChannelModel::channelsSwapped(int fromIndex, int toIndex)

@@ -38,6 +38,12 @@ class MixerChannelModel : public IntModel
 {
 public:
 	MixerChannelModel(Model* parent = nullptr);
+	~MixerChannelModel();
+
+	MixerChannelModel(const MixerChannelModel&) = delete;
+	MixerChannelModel(MixerChannelModel&&) = delete;
+	MixerChannelModel& operator=(const MixerChannelModel&) = delete;
+	MixerChannelModel& operator=(MixerChannelModel&&) = delete;
 
 private:
 	void channelsSwapped(int fromIndex, int toIndex);
