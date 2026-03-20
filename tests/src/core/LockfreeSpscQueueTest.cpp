@@ -107,7 +107,7 @@ private slots:
 		auto queue = LockfreeSpscQueue<int>{4};
 
 		auto producer = std::thread{[&queue] {
-			std::this_thread::sleep_for(100ms);
+			std::this_thread::sleep_for(25ms);
 			queue.enqueue(1);
 		}};
 
@@ -132,7 +132,7 @@ private slots:
 		auto queue = LockfreeSpscQueue<int>{4};
 
 		auto producer = std::thread{[&queue] {
-			std::this_thread::sleep_for(100ms);
+			std::this_thread::sleep_for(25ms);
 			queue.shutdown();
 		}};
 
