@@ -207,7 +207,7 @@ void Lv2Worker::emitResponses()
 	{
 		assert(m_handle);
 		assert(m_interface);
-		m_requests.dequeue(reinterpret_cast<char*>(&size), sizeof(size));
+		m_responses.dequeue(reinterpret_cast<char*>(&size), sizeof(size));
 		if(size) { m_responses.dequeue(m_response.data(), size); }
 		m_interface->work_response(m_handle, size, m_response.data());
 		read_space -= sizeof(size) + size;
