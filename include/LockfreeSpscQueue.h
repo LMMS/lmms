@@ -82,7 +82,7 @@ public:
 		static_assert(Mode == LockfreeSpscQueueRegionMode::Read, "Can only use this overload in read mode");
 		if (m_size < size) { return false; }
 
-		const auto readRegion = [this, &values, &size](const std::span<T>& region) {
+		const auto readRegion = [&values, &size](const std::span<T>& region) {
 			const auto copySize = std::min(region.size(), size);
 			std::copy_n(region.data(), copySize, values);
 			size -= copySize;
@@ -100,7 +100,7 @@ public:
 		static_assert(Mode == LockfreeSpscQueueRegionMode::Write, "Can only use this overload in write mode");
 		if (m_size < size) { return false; }
 
-		auto writeRegion = [this, &values, &size](std::span<T>& region) {
+		auto writeRegion = [&values, &size](std::span<T>& region) {
 			const auto copySize = std::min(region.size(), size);
 			std::copy_n(values, copySize, region.data());
 			size -= copySize;
