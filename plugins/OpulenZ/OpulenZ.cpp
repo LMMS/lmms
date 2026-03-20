@@ -516,7 +516,7 @@ void OpulenzInstrument::updatePatch()
 			+ (static_cast<int>(op.mul.value()) & 0x0f);
 	};
 
-	const auto encodeScaleFlags = [](const OpulenzOperatorModels& op) -> unsigned char
+	const auto encodeScaleLevel = [](const OpulenzOperatorModels& op) -> unsigned char
 	{
 		return ((static_cast<int>(op.scale.value()) & 0x03) << 6)
 			+ (63 - (static_cast<int>(op.level.value()) & 0x3f));
@@ -532,8 +532,8 @@ void OpulenzInstrument::updatePatch()
 
 	inst[0] = encodeFlags(m_op1);
 	inst[1] = encodeFlags(m_op2);
-	inst[2] = encodeScaleFlags(m_op1);
-	inst[3] = encodeScaleFlags(m_op2);
+	inst[2] = encodeScaleLevel(m_op1);
+	inst[3] = encodeScaleLevel(m_op2);
 	inst[4] = encodeEnvPart(m_op1.attack, m_op1.decay);
 	inst[5] = encodeEnvPart(m_op2.attack, m_op2.decay);
 	inst[6] = encodeEnvPart(m_op1.sustain, m_op1.release);
