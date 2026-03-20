@@ -22,7 +22,11 @@ namespace
 
 lmms::VstList::Metadata::Checksum checksum(fs::path filePath)
 {
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+	QFile file{filePath.string()};
+#else
 	QFile file{filePath};
+#endif
 	if (!file.open(QFile::ReadOnly)) { return 0; }
 	QCryptographicHash hash{QCryptographicHash::Md5};
 	if (!hash.addData(&file)) { return 0; }
