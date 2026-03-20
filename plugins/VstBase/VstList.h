@@ -17,12 +17,12 @@ class VSTBASE_EXPORT VstList
 public:
 	struct Metadata
 	{
-		using Checksum = std::bitset<128>;
+		using Checksum = std::bitset<128>; // md5
 
 		std::filesystem::path path;
 		Checksum file_checksum;
 		// TODO add file hash to detect changes
-		enum class PluginType { NotVst, Instrument, Effect } type = PluginType::NotVst;
+		enum class PluginType: uint8_t { NotVst, Instrument, Effect } type = PluginType::NotVst;
 		std::string name = "";
 		std::string product = "";
 		std::string vendor = "";
@@ -38,6 +38,9 @@ public:
 
 	VstList(bool initDefaultDir = true);
 	void scanDirRecursive(std::filesystem::path dirPath);
+
+	void loadCache(std::filesystem::path cacheFilePath);
+	void saveCache(std::filesystem::path cacheFilePath);
 
 	std::vector<Metadata> instrumentPlugins();
 	std::vector<Metadata> effectPlugins();
