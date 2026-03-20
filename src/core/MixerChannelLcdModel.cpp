@@ -1,5 +1,5 @@
 /*
- * MixerChannelModel.cpp
+ * MixerChannelLcdModel.cpp
  *
  * Copyright (c) 2026 saker <sakertooth@gmail.com>
  *
