@@ -24,7 +24,7 @@
  *
  */
 
-#include "VstEffectSubPluginFeatures.h"
+#include "VstSubPluginFeatures.h"
 
 #include <QDir>
 #include <QLabel>
@@ -34,21 +34,24 @@
 
 namespace lmms {
 
-VstEffectSubPluginFeatures::VstEffectSubPluginFeatures(Plugin::Type pluginType)
-	: SubPluginFeatures(pluginType)
+VstSubPluginFeatures::VstSubPluginFeatures(Plugin::Type pluginType)
+	: SubPluginFeatures{pluginType}
+	, m_pluginType{pluginType}
 {
 }
 
-void VstEffectSubPluginFeatures::fillDescriptionWidget(QWidget* parent, const Key* key) const
+void VstSubPluginFeatures::fillDescriptionWidget(QWidget* parent, const Key* key) const
 {
 	new QLabel(QWidget::tr("Name: ") + key->name, parent);
 	new QLabel(QWidget::tr("File: ") + key->attributes["file"], parent);
 }
 
-void VstEffectSubPluginFeatures::listSubPluginKeys(const Plugin::Descriptor* desc, KeyList& keylist) const
+void VstSubPluginFeatures::listSubPluginKeys(const Plugin::Descriptor* desc, KeyList& keylist) const
 {
 	// TODO: eval m_type
-	for (const auto& data : VstList::inst()->effectPlugins())
+	for (const auto& data : m_pluginType == Plugin::Type::Instrument
+		? VstList::inst()->instrumentPlugins()
+		: VstList::inst()->effectPlugins())
 	{
 		EffectKey::AttributeMap am;
 		am["file"] = QString::fromStdString(data.path.string());

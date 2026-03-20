@@ -13,5 +13,5 @@ ELSE()
 	SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${PLUGIN_DIR}")
 ENDIF()
 
-BUILD_PLUGIN(vsteffect VstEffect.cpp VstEffectControls.cpp VstEffectControlDialog.cpp VstEffectSubPluginFeatures.cpp VstEffect.h VstEffectControls.h VstEffectControlDialog.h VstEffectSubPluginFeatures.h MOCFILES VstEffectControlDialog.h VstEffectControls.h EMBEDDED_RESOURCES *.png *.svg)
+BUILD_PLUGIN(vsteffect VstEffect.cpp VstEffectControls.cpp VstEffectControlDialog.cpp VstEffect.h VstEffectControls.h VstEffectControlDialog.h MOCFILES VstEffectControlDialog.h VstEffectControls.h EMBEDDED_RESOURCES *.png *.svg)
 TARGET_LINK_LIBRARIES(vsteffect vstbase)

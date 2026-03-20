@@ -25,6 +25,7 @@
 #include <QtGlobal>
 
 #include "VstPlugin.h"
+#include "VstSubPluginFeatures.h"
 
 #include "Vestige.h"
 
@@ -62,8 +63,6 @@
 
 #include "embed.h"
 
-#include "VestigeSubPluginFeatures.h"
-
 namespace lmms
 {
 
@@ -90,7 +89,7 @@ Plugin::Descriptor Q_DECL_EXPORT  vestige_plugin_descriptor =
 		"so",
 #	endif
 #endif
-		new VestigeSubPluginFeatures(Plugin::Type::Instrument),
+		new VstSubPluginFeatures(Plugin::Type::Instrument),
 } ;
 
 }

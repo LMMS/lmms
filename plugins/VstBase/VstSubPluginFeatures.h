@@ -24,24 +24,28 @@
  *
  */
 
-#ifndef _VSTEFFECT_SUBPLUGIN_FEATURES_H
-#define _VSTEFFECT_SUBPLUGIN_FEATURES_H
+#ifndef _VST_SUBPLUGIN_FEATURES_H
+#define _VST_SUBPLUGIN_FEATURES_H
 
 
 #include "Plugin.h"
+#include "vstbase_export.h"
 
 namespace lmms
 {
 
 
-class VstEffectSubPluginFeatures : public Plugin::Descriptor::SubPluginFeatures
+class VSTBASE_EXPORT VstSubPluginFeatures : public Plugin::Descriptor::SubPluginFeatures
 {
 public:
-	VstEffectSubPluginFeatures(Plugin::Type type);
+	VstSubPluginFeatures(Plugin::Type type);
 
 	void fillDescriptionWidget(QWidget* parent, const Key* key) const override;
 
 	void listSubPluginKeys(const Plugin::Descriptor* desc, KeyList& key) const override;
+
+private:
+	Plugin::Type m_pluginType;
 } ;
 
 
