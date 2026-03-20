@@ -26,7 +26,7 @@
 #define LMMS_SAMPLE_TRACK_H
 
 #include "AudioBusHandle.h"
-#include "MixerChannelModel.h"
+#include "MixerChannelLcdModel.h"
 #include "Track.h"
 
 
@@ -95,7 +95,7 @@ public slots:
 private:
 	FloatModel m_volumeModel;
 	FloatModel m_panningModel;
-	MixerChannelModel m_mixerChannelModel;
+	MixerChannelLcdModel m_mixerChannelModel;
 	AudioBusHandle m_audioBusHandle;
 	bool m_isPlaying;
 

@@ -33,7 +33,7 @@
 #include "Midi.h"
 #include "MidiEventProcessor.h"
 #include "MidiPort.h"
-#include "MixerChannelModel.h"
+#include "MixerChannelLcdModel.h"
 #include "NotePlayHandle.h"
 #include "Piano.h"
 #include "Plugin.h"
@@ -294,7 +294,7 @@ private:
 
 	FloatModel m_pitchModel;
 	IntModel m_pitchRangeModel;
-	MixerChannelModel m_mixerChannelModel;
+	MixerChannelLcdModel m_mixerChannelModel;
 	BoolModel m_useMasterPitchModel;
 
 	Instrument * m_instrument;

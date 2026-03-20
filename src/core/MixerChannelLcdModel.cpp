@@ -22,23 +22,23 @@
  *
  */
 
-#include "MixerChannelModel.h"
+#include "MixerChannelLcdModel.h"
 
 #include "Engine.h"
 #include "Mixer.h"
 
 namespace lmms {
-MixerChannelModel::MixerChannelModel(Model* parent)
+MixerChannelLcdModel::MixerChannelLcdModel(Model* parent)
 	: IntModel(0, 0, 0, parent, tr("Mixer channel"))
 {
 	const auto mixer = Engine::mixer();
 	setRange(0, mixer->numChannels() - 1, 1);
 
-	connect(mixer, &Mixer::channelsSwapped, this, &MixerChannelModel::channelsSwapped);
-	connect(mixer, &Mixer::channelDeleted, this, &MixerChannelModel::channelDeleted);
-	connect(mixer, &Mixer::channelCreated, this, &MixerChannelModel::channelCreated);
+	connect(mixer, &Mixer::channelsSwapped, this, &MixerChannelLcdModel::channelsSwapped);
+	connect(mixer, &Mixer::channelDeleted, this, &MixerChannelLcdModel::channelDeleted);
+	connect(mixer, &Mixer::channelCreated, this, &MixerChannelLcdModel::channelCreated);
 
-	connect(this, &MixerChannelModel::dataChanged, mixer, [this, mixer] {
+	connect(this, &MixerChannelLcdModel::dataChanged, mixer, [this, mixer] {
 		// both channels must exist so we know the channel was actually changed to another
 		if (oldValue() < 0 || oldValue() >= mixer->numChannels()) { return; }
 		if (value() < 0 || value() >= mixer->numChannels()) { return; }
@@ -50,27 +50,27 @@ MixerChannelModel::MixerChannelModel(Model* parent)
 	mixer->mixerChannel(0)->incrementUseCount();
 }
 
-MixerChannelModel::~MixerChannelModel()
+MixerChannelLcdModel::~MixerChannelLcdModel()
 {
 	const auto mixer = Engine::mixer();
 	if (value() < 0 || value() >= mixer->numChannels()) { return; }
 	mixer->mixerChannel(value())->decrementUseCount();
 }
 
-void MixerChannelModel::channelsSwapped(int fromIndex, int toIndex)
+void MixerChannelLcdModel::channelsSwapped(int fromIndex, int toIndex)
 {
 	if (value() == fromIndex) { setValue(toIndex); }
 	else if (value() == toIndex) { setValue(fromIndex); }
 }
 
-void MixerChannelModel::channelDeleted(int index)
+void MixerChannelLcdModel::channelDeleted(int index)
 {
 	if (value() == index) { setValue(0); }
 	else if (value() > index) { setValue(value() - 1); }
 	setRange(0, maxValue() - 1);
 }
 
-void MixerChannelModel::channelCreated(int index)
+void MixerChannelLcdModel::channelCreated(int index)
 {
 	setRange(0, maxValue() + 1);
 }

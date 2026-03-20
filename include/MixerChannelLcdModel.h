@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef LMMS_MIXER_CHANNEL_MODEL_H
-#define LMMS_MIXER_CHANNEL_MODEL_H
+#ifndef LMMS_MIXER_CHANNEL_LCD_MODEL_H
+#define LMMS_MIXER_CHANNEL_LCD_MODEL_H
 
 #include "AutomatableModel.h"
 
@@ -34,16 +34,16 @@ namespace lmms {
  * This model tracks its assigned mixer channel. It is a subclass of IntModel that adds functionality to handle channel
  * creation, deletion, and swapping. Both the value and valid range are automatically updated to reflect these changes.
  */
-class MixerChannelModel : public IntModel
+class MixerChannelLcdModel : public IntModel
 {
 public:
-	MixerChannelModel(Model* parent = nullptr);
-	~MixerChannelModel();
+	MixerChannelLcdModel(Model* parent = nullptr);
+	~MixerChannelLcdModel();
 
-	MixerChannelModel(const MixerChannelModel&) = delete;
-	MixerChannelModel(MixerChannelModel&&) = delete;
-	MixerChannelModel& operator=(const MixerChannelModel&) = delete;
-	MixerChannelModel& operator=(MixerChannelModel&&) = delete;
+	MixerChannelLcdModel(const MixerChannelLcdModel&) = delete;
+	MixerChannelLcdModel(MixerChannelLcdModel&&) = delete;
+	MixerChannelLcdModel& operator=(const MixerChannelLcdModel&) = delete;
+	MixerChannelLcdModel& operator=(MixerChannelLcdModel&&) = delete;
 
 private:
 	void channelsSwapped(int fromIndex, int toIndex);
@@ -53,4 +53,4 @@ private:
 
 } // namespace lmms
 
-#endif // LMMS_MIXER_CHANNEL_MODEL_H
+#endif // LMMS_MIXER_CHANNEL_LCD_MODEL_H
