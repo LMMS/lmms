@@ -80,11 +80,12 @@ BitInvader::BitInvader(InstrumentTrack* instrumentTrack)
 	, m_interpolation(false, this, tr("Interpolation"))
 	, m_normalizeMode(this, tr("Normalize"))
 {
-	m_normalizeMode.addItem("Off");
-	m_normalizeMode.addItem("Full");
-	m_normalizeMode.addItem("Length only");
-	m_normalizeMode.addItem("Legacy");
-	m_normalizeMode.setValue(m_normalizeMode.findText("Length only"));
+	// The order these items are added must correspond to the modes in BitInvader::NormalizeMode
+	m_normalizeMode.addItem(tr("Off"));         // NormalizeMode::Off
+	m_normalizeMode.addItem(tr("Full"));        // NormalizeMode::Full
+	m_normalizeMode.addItem(tr("Length only")); // NormalizeMode::LengthOnly
+	m_normalizeMode.addItem(tr("Legacy"));      // NormalizeMode::Legacy
+	m_normalizeMode.setValue(static_cast<int>(NormalizeMode::LengthOnly));
 
 	m_graph.setWaveToSine();
 	lengthChanged();
@@ -131,9 +132,9 @@ void BitInvader::loadSettings(const QDomElement& el)
 	m_interpolation.loadSettings(el, "interpolation");
 	m_normalizeMode.loadSettings(el, "normalize");
 	// If normalization was enabled on an old preset, change it to "Legacy" normalization mode
-	if (el.attribute("version") == "0.1")
+	if (el.attribute("version") == "0.1") // TODO: Make new version 1 instead, cast to int and compare < 1
 	{
-		m_normalizeMode.setValue(m_normalizeMode.value() * m_normalizeMode.findText("Legacy"));
+		m_normalizeMode.setValue(m_normalizeMode.value() * static_cast<int>(NormalizeMode::Legacy));
 	}
 }
 
@@ -151,19 +152,21 @@ void BitInvader::lengthChanged()
 
 void BitInvader::normalize()
 {
-	if (m_normalizeMode.value() == m_normalizeMode.findText("Off"))
+	if (m_normalizeMode.value() == static_cast<int>(NormalizeMode::Off))
 	{
 		m_normalizeFactor = 1.f;
 		m_normalizeOffset = 0.f;
 		return;
 	}
 
-	const auto len = m_normalizeMode.value() == m_normalizeMode.findText("Length only")
-		? static_cast<std::size_t>(m_sampleLength.value())
-		: wavetableSize;
-	const auto samples = std::span<const float>{ m_graph.samples(), len };
+	const auto samples = std::span<const float>{
+		m_graph.samples(),
+		m_normalizeMode.value() == static_cast<int>(NormalizeMode::LengthOnly)
+			? static_cast<std::size_t>(m_sampleLength.value())
+			: wavetableSize
+		};
 
-	if (m_normalizeMode.value() == m_normalizeMode.findText("Legacy"))
+	if (m_normalizeMode.value() == static_cast<int>(NormalizeMode::Legacy))
 	{
 		m_normalizeOffset = 0.f;
 		m_normalizeFactor = 1.f / std::max_element(samples.begin(), samples.end(), [](auto a, auto b){ return std::abs(a) < std::abs(b); })[0];
@@ -318,12 +321,12 @@ BitInvaderView::BitInvaderView(Instrument* instrument, QWidget* parent)
 	auto normalizeLabel = new QLabel(tr("Normalization:"), this);
 	normalizeLabel->setFont(adjustedToPixelSize(normalizeLabel->font(), DEFAULT_FONT_SIZE));
 	// FIXME: Evil awful terrible layout. This should be fine for now,
-	// since a full UI overhaul for Bit Invader is planned.
+	// since a full UI overhaul for Bit Invader is planned in #8122.
 	auto normalizeLayout = new QGridLayout(this);
 	normalizeLayout->setContentsMargins(6, 6, 6, 6);
 	normalizeLayout->setVerticalSpacing(1);
 	normalizeLayout->setAlignment(Qt::AlignBottom);
-	normalizeLayout->addItem(new QSpacerItem(250 - 131, 1), 0, 0); // Do NOT ever do this LMAO
+	normalizeLayout->addItem(new QSpacerItem(250 - 131, 1), 0, 0); // HACK: Do NOT ever do this LMAO
 	normalizeLayout->addWidget(normalizeLabel, 0, 1);
 	normalizeLayout->addWidget(m_normalizeMode, 1, 1);
 

@@ -65,13 +65,39 @@ public:
 
 protected slots:
 	void lengthChanged();
+
+	//! @brief Normalize the wavetable according to the current normalization mode.
+	//! @see NormalizeMode
+	//! @see m_graph
+	//! @see m_normalizeMode
 	void normalize();
 
 private:
+	//! @brief A kind of normalization to apply to BitInvader's wavetable.
+	enum class NormalizeMode
+	{
+		//! No normalization.
+		Off,
+
+		//! Normalization is applied and DC offset removed, such that
+		//! the entire waveform has a range of [-1, 1].
+		Full,
+
+		//! Normalization is applied and DC offset removed, such that
+		//! the waveform within domain [0, L] has a range of [-1, 1],
+		//! with L being the value of @ref m_sampleLength.
+		LengthOnly,
+
+		//! Normalization is applied, such that the absolute value of
+		//! the entire waveform has a range of [0, 1]. DC offset is
+		//! preserved.
+		Legacy
+	};
+
 	FloatModel m_sampleLength;
 	graphModel m_graph;
 	BoolModel m_interpolation;
-	ComboBoxModel m_normalizeMode;
+	ComboBoxModel m_normalizeMode; //!< Which normalization mode to use. @see NormalizeMode
 
 	float m_normalizeFactor; //!< Factor by which to amplify output such that the output is normalized
 	float m_normalizeOffset; //!< Amount by which to offset the output such that no DC offset is produced when normalized
