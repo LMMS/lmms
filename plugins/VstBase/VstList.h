@@ -1,11 +1,10 @@
 #ifndef _VST_LISTING_H
 #define _VST_LISTING_H
 
+#include <bitset>
 #include <filesystem>
 #include <unordered_map>
 #include <vector>
-
-#include <QObject>
 
 #include "vstbase_export.h"
 
@@ -13,13 +12,15 @@ namespace lmms
 {
 
 
-class VSTBASE_EXPORT VstList : public QObject
+class VSTBASE_EXPORT VstList
 {
-	Q_OBJECT
 public:
 	struct Metadata
 	{
+		using Checksum = std::bitset<128>;
+
 		std::filesystem::path path;
+		Checksum file_checksum;
 		// TODO add file hash to detect changes
 		enum class PluginType { NotVst, Instrument, Effect } type = PluginType::NotVst;
 		std::string name = "";

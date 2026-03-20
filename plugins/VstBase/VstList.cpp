@@ -3,15 +3,31 @@
 #include "VstPlugin.h"
 
 #include <filesystem>
+#include <ranges>
 #include <string>
 #include <vector>
-#include <ranges>
 
 #include <QString>
+#include <QFile>
+#include <QCryptographicHash>
 
 #include "ConfigManager.h"
 
 namespace fs = std::filesystem;
+
+namespace
+{
+
+lmms::VstList::Metadata::Checksum checksum(fs::path filePath)
+{
+	QFile file{filePath};
+	if (!file.open(QFile::ReadOnly)) { return 0; }
+	QCryptographicHash hash{QCryptographicHash::Md5};
+	if (!hash.addData(&file)) { return 0; }
+	return *hash.result();
+}
+
+}
 
 namespace lmms
 {
@@ -33,20 +49,22 @@ void VstList::scanDirRecursive(fs::path dirPath)
 {
 	for (const auto& entry : fs::directory_iterator{dirPath})
 	{
+		const fs::path& path = entry.path();
+
 		// skip loading already analyzed executables
-		if (m_plugins.contains(entry.path())) { continue; }
+		if (m_plugins.contains(path) && m_plugins[path].file_checksum == checksum(path)) { continue; }
 		
 		// ignore "hidden" files and folders. Dot and dot-dot are skipped by C++ STL, not here.
 		// this doesn't go out of bounds unless the filesystem somehow has an empty string as a file name.
-		if (entry.path().filename().string()[0] == '.') { continue; }
+		if (path.filename().string()[0] == '.') { continue; }
 
 		// resolve symlinks and fetch data from the other end
 		const fs::file_status& stat = entry.symlink_status();
 		
-		if (fs::is_directory(stat)) { scanDirRecursive(entry.path()); }
+		if (fs::is_directory(stat)) { scanDirRecursive(path); }
 		else if (fs::is_regular_file(stat))
 		{
-			if (const auto& ext = entry.path().extension();
+			if (const auto& ext = path.extension();
 #if defined(LMMS_BUILD_WIN32)
 				ext != ".dll")
 #elif defined(LMMS_BUILD_LINUX)
@@ -60,14 +78,18 @@ void VstList::scanDirRecursive(fs::path dirPath)
 				continue;
 			}
 			
-			VstPlugin plug{QString::fromStdString(entry.path().string()), true};
+			VstPlugin plug{QString::fromStdString(path.string()), true};
 			if (plug.name().isEmpty()) // TODO: figure out a better way to check load fail
 			{
-				m_plugins.emplace(entry.path(), Metadata {entry.path(), Metadata::PluginType::NotVst});
+				m_plugins.emplace(path, Metadata {
+					path,
+					checksum(path),
+					Metadata::PluginType::NotVst});
 				continue;
 			}
-			m_plugins.emplace(entry.path(), Metadata {
-				entry.path(),
+			m_plugins.emplace(path, Metadata {
+				path,
+				checksum(path),
 				plug.isSynth()
 					? Metadata::PluginType::Instrument
 					: Metadata::PluginType::Effect,
