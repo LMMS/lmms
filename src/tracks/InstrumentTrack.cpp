@@ -221,7 +221,7 @@ InstrumentTrack::~InstrumentTrack()
 
 
 
-void InstrumentTrack::processAudioBuffer( SampleFrame* buf, const fpp_t frames, NotePlayHandle* n )
+void InstrumentTrack::processAudioBuffer( SampleFrame* buf, const f_cnt_t frames, NotePlayHandle* n )
 {
 	// we must not play the sound if this InstrumentTrack is muted...
 	if( isMuted() || ( Engine::getSong()->playMode() != Song::PlayMode::MidiClip &&
@@ -248,10 +248,6 @@ void InstrumentTrack::processAudioBuffer( SampleFrame* buf, const fpp_t frames, 
 	{
 		m_silentBuffersProcessed = false;
 	}
-
-	// if effects "went to sleep" because there was no input, wake them up
-	// now
-	m_audioBusHandle.effects()->startRunning();
 
 	// get volume knob data
 	static const float DefaultVolumeRatio = 1.0f / DefaultVolume;
@@ -588,7 +584,7 @@ void InstrumentTrack::playNote( NotePlayHandle* n, SampleFrame* workingBuffer )
 		// Calling processAudioBuffer with a nullptr leads to crashes. Hence the check.
 		if (n->usesBuffer())
 		{
-			const fpp_t frames = n->framesLeftForCurrentPeriod();
+			const f_cnt_t frames = n->framesLeftForCurrentPeriod();
 			const f_cnt_t offset = n->noteOffset();
 			processAudioBuffer(workingBuffer, frames + offset, n);
 		}
@@ -698,7 +694,7 @@ void InstrumentTrack::removeMidiPortNode( DataFile & _dataFile )
 
 
 
-bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
+bool InstrumentTrack::play( const TimePos & _start, const f_cnt_t _frames,
 							const f_cnt_t _offset, int _clip_num )
 {
 	if( ! m_instrument || ! tryLock() )

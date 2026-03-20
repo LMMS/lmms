@@ -223,7 +223,7 @@ QString OrganicInstrument::nodeName() const
 void OrganicInstrument::playNote( NotePlayHandle * _n,
 						SampleFrame* _working_buffer )
 {
-	const fpp_t frames = _n->framesLeftForCurrentPeriod();
+	const f_cnt_t frames = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();
 
 	if (!_n->m_pluginData)

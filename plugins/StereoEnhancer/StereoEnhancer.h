@@ -41,7 +41,8 @@ public:
 	                      const Descriptor::SubPluginFeatures::Key * _key );
 	~StereoEnhancerEffect() override;
 
-	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
+	ProcessStatus processImpl(SampleFrame* buf, const f_cnt_t frames) override;
+	void processBypassedImpl() override;
 
 	EffectControls * controls() override
 	{
@@ -56,7 +57,8 @@ private:
 	
 	SampleFrame* m_delayBuffer;
 	int m_currFrame;
-	
+	bool m_delayBufferCleared = true;
+
 	StereoEnhancerControls m_bbControls;
 
 	friend class StereoEnhancerControls;

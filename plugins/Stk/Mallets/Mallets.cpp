@@ -376,7 +376,7 @@ void MalletsInstrument::playNote( NotePlayHandle * _n,
 		static_cast<MalletsSynth *>(_n->m_pluginData)->setPresetIndex(p);
 	}
 
-	const fpp_t frames = _n->framesLeftForCurrentPeriod();
+	const f_cnt_t frames = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();
 
 	auto ps = static_cast<MalletsSynth*>(_n->m_pluginData);
@@ -401,7 +401,7 @@ void MalletsInstrument::playNote( NotePlayHandle * _n,
 		add_scale = static_cast<sample_t>( m_strikeModel.value() ) * freq * 2.5f;
 	}
 
-	for( fpp_t frame = offset; frame < frames + offset; ++frame )
+	for( f_cnt_t frame = offset; frame < frames + offset; ++frame )
 	{
 		_working_buffer[frame][0] = ps->nextSampleLeft() *
 				( m_scalers[p] + add_scale );
