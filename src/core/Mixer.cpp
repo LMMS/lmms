@@ -819,7 +819,7 @@ bool Mixer::isChannelInUse(int index)
 	// check if the index mixer channel receives audio from any other channel
 	if (!m_mixerChannels[index]->m_receives.empty()) { return true; }
 
-	return m_mixerChannels[index]->m_useCount > 0;
+	return m_mixerChannels[index]->useCount() > 0;
 }
 
 

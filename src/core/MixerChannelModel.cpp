@@ -43,18 +43,18 @@ MixerChannelModel::MixerChannelModel(Model* parent)
 		if (oldValue() < 0 || oldValue() >= mixer->numChannels()) { return; }
 		if (value() < 0 || value() >= mixer->numChannels()) { return; }
 
-		--mixer->mixerChannel(oldValue())->m_useCount;
-		++mixer->mixerChannel(value())->m_useCount;
+		mixer->mixerChannel(oldValue())->decrementUseCount();
+		mixer->mixerChannel(value())->incrementUseCount();
 	});
 
-	++mixer->mixerChannel(0)->m_useCount;
+	mixer->mixerChannel(0)->incrementUseCount();
 }
 
 MixerChannelModel::~MixerChannelModel()
 {
 	const auto mixer = Engine::mixer();
 	if (value() < 0 || value() >= mixer->numChannels()) { return; }
-	--mixer->mixerChannel(value())->m_useCount;
+	mixer->mixerChannel(value())->decrementUseCount();
 }
 
 void MixerChannelModel::channelsSwapped(int fromIndex, int toIndex)
