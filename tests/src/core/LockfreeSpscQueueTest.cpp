@@ -100,6 +100,38 @@ private slots:
 		QCOMPARE(queue.peek(), 1);
 	}
 
+	void canReserveEmptyWriteRegion()
+	{
+		auto queue = LockfreeSpscQueue<int, 4>{};
+		auto region = queue.reserveWriteSpace(0);
+
+		QCOMPARE(region.size(), 0);
+	}
+
+	void canReserveEmptyReadRegionTest()
+	{
+		auto queue = LockfreeSpscQueue<int, 4>{};
+		auto region = queue.reserveReadSpace(0);
+
+		QCOMPARE(region.size(), 0);
+	}
+
+	void canReserveMaxWriteRegion()
+	{
+		auto queue = LockfreeSpscQueue<int, 4>{};
+		auto region = queue.reserveWriteSpace();
+
+		QCOMPARE(region.size(), queue.capacity());
+	}
+
+	void canReserveMaxReadRegionTest()
+	{
+		auto queue = LockfreeSpscQueue<int, 4>{};
+		auto region = queue.reserveReadSpace();
+
+		QCOMPARE(region.size(), 0);
+	}
+
 	void canWaitForDataTest()
 	{
 		using namespace std::chrono_literals;
