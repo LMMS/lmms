@@ -36,14 +36,14 @@ private slots:
 	void hasCorrectDefaults()
 	{
 		constexpr auto size = 4;
-		auto queue = LockfreeSpscQueue<int>{size};
+		auto queue = LockfreeSpscQueue<int, size>{};
 		QCOMPARE(queue.size(), 0);
 		QCOMPARE(queue.capacity(), size - 1);
 	}
 
 	void canEnqueueDequeueTest()
 	{
-		auto queue = LockfreeSpscQueue<int>{4};
+		auto queue = LockfreeSpscQueue<int, 4>{};
 
 		QVERIFY(queue.enqueue(1));
 		QCOMPARE(queue.peek(), 1);
@@ -59,7 +59,7 @@ private slots:
 
 	void canEnqueueDequeueBatchTest()
 	{
-		auto queue = LockfreeSpscQueue<int>{4};
+		auto queue = LockfreeSpscQueue<int, 4>{};
 		auto buffer = std::array{1, 2, 3};
 
 		QVERIFY(queue.enqueue(buffer.data(), buffer.size()));
@@ -75,10 +75,10 @@ private slots:
 
 	void cantEnqueueWhenFullTest()
 	{
-		auto queue = LockfreeSpscQueue<int>{4};
+		auto queue = LockfreeSpscQueue<int, 4>{};
 		auto buffer = std::array{1, 2, 3};
 
-		queue.enqueue(buffer.data(), buffer.size());
+		QVERIFY(queue.enqueue(buffer.data(), buffer.size()));
 		QVERIFY(queue.full());
 
 		QVERIFY(!queue.enqueue(4));
@@ -86,7 +86,7 @@ private slots:
 
 	void cantDequeueWhenEmptyTest()
 	{
-		auto queue = LockfreeSpscQueue<int>{4};
+		auto queue = LockfreeSpscQueue<int, 4>{};
 		QVERIFY(queue.empty());
 
 		QVERIFY(!queue.dequeue());
@@ -94,7 +94,7 @@ private slots:
 
 	void canPeekBeforeDequeueTest()
 	{
-		auto queue = LockfreeSpscQueue<int>{4};
+		auto queue = LockfreeSpscQueue<int, 4>{};
 
 		QVERIFY(queue.enqueue(1));
 		QCOMPARE(queue.peek(), 1);
@@ -104,7 +104,7 @@ private slots:
 	{
 		using namespace std::chrono_literals;
 
-		auto queue = LockfreeSpscQueue<int>{4};
+		auto queue = LockfreeSpscQueue<int, 4>{};
 
 		auto producer = std::thread{[&queue] {
 			std::this_thread::sleep_for(25ms);
@@ -129,7 +129,7 @@ private slots:
 	{
 		using namespace std::chrono_literals;
 
-		auto queue = LockfreeSpscQueue<int>{4};
+		auto queue = LockfreeSpscQueue<int, 4>{};
 
 		auto producer = std::thread{[&queue] {
 			std::this_thread::sleep_for(25ms);
