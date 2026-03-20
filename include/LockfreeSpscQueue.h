@@ -211,7 +211,7 @@ public:
 		{
 			const auto tailAvailable = m_buffer.size() - writeIndex - (readIndex == 0 ? 1 : 0);
 			const auto tailSize = std::min(tailAvailable, max);
-			const auto headSize = std::min(max - tailSize, readIndex - 1);
+			const auto headSize = std::min(max - tailSize, readIndex == 0 ? 0 : readIndex - 1);
 			return WriteRegion{{&m_buffer[writeIndex], tailSize}, {&m_buffer[0], headSize}, committer};
 		}
 	}
