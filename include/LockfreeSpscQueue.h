@@ -246,6 +246,8 @@ public:
 	}
 
 	auto empty() const -> bool { return size() == 0; }
+	auto full() const -> bool { return size() == capacity(); }
+
 	auto free() const -> size_t { return capacity() - size(); }
 	auto capacity() const -> size_t { return m_buffer.size() - 1; }
 
