@@ -173,7 +173,11 @@ VestigeInstrument::VestigeInstrument(InstrumentTrack* instrumentTrack, Plugin::D
 	connect( ConfigManager::inst(), SIGNAL( valueChanged(QString,QString,QString) ),
 			 this, SLOT( handleConfigChange(QString, QString, QString) ),
 			 Qt::QueuedConnection );
-	if (auto& path = key->attributes["file"]; !path.isEmpty()) { loadFile(path); }
+	if (auto& path = key->attributes["file"]; !path.isEmpty())
+	{
+		loadFile(path);
+		setDisplayName(key->displayName());
+	}
 }
 
 
