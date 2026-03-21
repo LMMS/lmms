@@ -69,9 +69,9 @@ MixerChannel::MixerChannel( int idx, Model * _parent ) :
 	m_name(),
 	m_lock(),
 	m_queued( false ),
-	m_useCount(0),
 	m_dependenciesMet(0),
-	m_channelIndex(idx)
+	m_channelIndex(idx),
+	m_useCount(0)
 {
 	m_buffer.allocateInterleavedBuffer();
 }
