@@ -71,6 +71,11 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 	m_tlb->setIcon(determinePixmap(_it));
 	m_tlb->show();
 
+	// Check if an instrument has been loaded, if not disable the track label button to prevent opening an empty instrument window.
+	if( !_it->m_instrument ) {
+		m_tlb->setEnabled( false );
+	}
+
 	connect( m_tlb, SIGNAL(toggled(bool)),
 			this, SLOT(toggleInstrumentWindow(bool)));
 
@@ -79,6 +84,10 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 
 	connect(ConfigManager::inst(), SIGNAL(valueChanged(QString,QString,QString)),
 			this, SLOT(handleConfigChange(QString,QString,QString)));
+
+	// update the state of the track label button when the instrument changes, as an instrument may be loaded or removed.
+	connect( _it, SIGNAL(instrumentChanged()),
+			this, SLOT(onInstrumentChanged()));
 
 	m_mixerChannelNumber = new MixerChannelLcdSpinBox(2, getTrackSettingsWidget(), tr("Mixer channel"), this);
 	m_mixerChannelNumber->show();
@@ -295,6 +304,15 @@ void InstrumentTrackView::dropEvent( QDropEvent * _de )
 {
 	getInstrumentTrackWindow()->dropEvent( _de );
 	TrackView::dropEvent( _de );
+}
+
+
+
+
+void InstrumentTrackView::onInstrumentChanged()
+{
+	// Check if an instrument has been loaded, if not disable the track label button to prevent opening an empty instrument window.
+	m_tlb->setEnabled( model()->m_instrument != nullptr );
 }
 
 
