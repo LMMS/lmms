@@ -59,8 +59,6 @@ constexpr int BYTES_PER_FRAME = sizeof(SampleFrame);
 
 constexpr float OUTPUT_SAMPLE_MULTIPLIER = 32767.0f;
 
-constexpr sample_rate_t DEFAULT_SAMPLE_RATE = 44100;
-
 constexpr auto SUPPORTED_SAMPLERATES = std::array{44100, 48000, 88200, 96000, 192000};
 constexpr auto SUPPORTED_BITRATES = std::array{64, 128, 160, 192, 256, 320};
 
