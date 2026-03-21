@@ -40,6 +40,7 @@
 #include "embed.h"
 #include "GuiApplication.h"
 #include "KeyboardShortcuts.h"
+#include "lmms_math.h"
 #include "MidiClipView.h"
 #include "PatternClip.h"
 #include "PatternStore.h"
@@ -57,7 +58,7 @@ namespace lmms::gui
 
 /*! The width of the resize grip in pixels
  */
-const int RESIZE_GRIP_WIDTH = 4;
+const int RESIZE_GRIP_WIDTH = 8;
 
 
 /*! A pointer for that text bubble used when moving segments, etc.
@@ -353,7 +354,7 @@ void ClipView::selectColor()
 
 void ClipView::randomizeColor()
 {
-	setColor(ColorChooser::getPalette(ColorChooser::Palette::Mixer)[std::rand() % 48]);
+	setColor(ColorChooser::getPalette(ColorChooser::Palette::Mixer)[fastRand(48)]);
 }
 
 void ClipView::resetColor()

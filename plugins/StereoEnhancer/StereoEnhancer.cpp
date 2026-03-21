@@ -82,12 +82,13 @@ StereoEnhancerEffect::~StereoEnhancerEffect()
 
 
 
-Effect::ProcessStatus StereoEnhancerEffect::processImpl(SampleFrame* buf, const fpp_t frames)
+Effect::ProcessStatus StereoEnhancerEffect::processImpl(SampleFrame* buf, const f_cnt_t frames)
 {
+	m_delayBufferCleared = false;
 	const float d = dryLevel();
 	const float w = wetLevel();
 
-	for (fpp_t f = 0; f < frames; ++f)
+	for (f_cnt_t f = 0; f < frames; ++f)
 	{
 
 		// copy samples into the delay buffer
@@ -119,12 +120,15 @@ Effect::ProcessStatus StereoEnhancerEffect::processImpl(SampleFrame* buf, const 
 		m_currFrame %= DEFAULT_BUFFER_SIZE;
 	}
 
-	if( !isRunning() )
-	{
-		clearMyBuffer();
-	}
-
 	return ProcessStatus::ContinueIfNotQuiet;
+}
+
+
+
+
+void StereoEnhancerEffect::processBypassedImpl()
+{
+	clearMyBuffer();
 }
 
 
@@ -132,6 +136,8 @@ Effect::ProcessStatus StereoEnhancerEffect::processImpl(SampleFrame* buf, const 
 
 void StereoEnhancerEffect::clearMyBuffer()
 {
+	if (m_delayBufferCleared) { return; }
+
 	for (auto i = std::size_t{0}; i < DEFAULT_BUFFER_SIZE; i++)
 	{
 		m_delayBuffer[i][0] = 0.0f;
@@ -139,6 +145,7 @@ void StereoEnhancerEffect::clearMyBuffer()
 	}
 
 	m_currFrame = 0;
+	m_delayBufferCleared = true;
 }
 
 

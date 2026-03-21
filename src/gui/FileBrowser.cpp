@@ -29,12 +29,14 @@
 #include <QApplication>
 #include <QCheckBox>
 #include <QHBoxLayout>
+#include <QHeaderView>
 #include <QLineEdit>
 #include <QMdiArea>
 #include <QMdiSubWindow>
 #include <QMenu>
 #include <QMessageBox>
 #include <QProgressBar>
+#include <QScrollBar>
 #include <QPushButton>
 #include <QShortcut>
 #include <QStringList>
@@ -60,7 +62,6 @@
 #include "PresetPreviewPlayHandle.h"
 #include "Sample.h"
 #include "SampleClip.h"
-#include "SampleLoader.h"
 #include "SamplePlayHandle.h"
 #include "SampleTrack.h"
 #include "Song.h"
@@ -462,6 +463,11 @@ FileBrowserTreeWidget::FileBrowserTreeWidget(QWidget * parent ) :
 	m_pressPos(),
 	m_previewPlayHandle( nullptr )
 {
+	setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+	setHorizontalScrollMode(ScrollPerPixel);
+	header()->setStretchLastSection(false);
+	header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+
 	setColumnCount( 1 );
 	headerItem()->setHidden( true );
 	setSortingEnabled( false );
@@ -501,6 +507,28 @@ QList<QString> FileBrowserTreeWidget::expandedDirs( QTreeWidgetItem * item ) con
 	return dirs;
 }
 
+void FileBrowserTreeWidget::scrollTo(const QModelIndex &index, ScrollHint hint)
+{
+	// Overide scrollTo to ensure the horizontal scrollbar stay in place
+	int barPos = horizontalScrollBar()->value();
+	QTreeWidget::scrollTo(index, hint);
+	horizontalScrollBar()->setValue(barPos);
+}
+
+void FileBrowserTreeWidget::wheelEvent(QWheelEvent * event)
+{
+	// When shift is pressed, scroll horizontally instead of vertically
+	if (event->modifiers() & Qt::ShiftModifier)
+	{
+		horizontalScrollBar()->setValue(
+			horizontalScrollBar()->value() - event->angleDelta().y());
+		event->accept();
+	}
+	else
+	{
+		QTreeWidget::wheelEvent(event);
+	}
+}
 
 void FileBrowserTreeWidget::keyPressEvent(QKeyEvent * ke )
 {
@@ -767,7 +795,7 @@ void FileBrowserTreeWidget::previewFileItem(FileItem* file)
 			embed::getIconPixmap("sample_file", 24, 24), 0);
 		// TODO: this can be removed once we do this outside the event thread
 		qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-		if (auto buffer = SampleLoader::createBufferFromFile(fileName))
+		if (auto buffer = SampleBuffer::fromFile(fileName))
 		{
 			auto s = new SamplePlayHandle(new lmms::Sample{std::move(buffer)});
 			s->setDoneMayReturnTrue(false);

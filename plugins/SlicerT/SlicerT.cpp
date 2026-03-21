@@ -31,7 +31,6 @@
 #include "Engine.h"
 #include "InstrumentTrack.h"
 #include "PathUtil.h"
-#include "SampleLoader.h"
 #include "SlicerTView.h"
 #include "Song.h"
 #include "embed.h"
@@ -81,7 +80,7 @@ void SlicerT::playNote(NotePlayHandle* handle, SampleFrame* workingBuffer)
 	if (m_originalSample.sampleSize() <= 1) { return; }
 
 	int noteIndex = handle->key() - DefaultBaseKey;
-	const fpp_t frames = handle->framesLeftForCurrentPeriod();
+	const f_cnt_t frames = handle->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = handle->noteOffset();
 	const int bpm = Engine::getSong()->getTempo();
 	const float pitchRatio = 1 / std::exp2(m_parentTrack->pitchModel()->value() / 1200);
@@ -307,7 +306,7 @@ std::vector<Note> SlicerT::getMidi()
 
 void SlicerT::updateFile(QString file)
 {
-	if (auto buffer = gui::SampleLoader::createBufferFromFile(file)) { m_originalSample = Sample(std::move(buffer)); }
+	if (auto buffer = SampleBuffer::fromFile(file)) { m_originalSample = Sample(std::move(buffer)); }
 
 	findBPM();
 	findSlices();
@@ -337,7 +336,7 @@ void SlicerT::saveSettings(QDomDocument& document, QDomElement& element)
 	element.setAttribute("totalSlices", static_cast<int>(m_slicePoints.size()));
 	for (auto i = std::size_t{0}; i < m_slicePoints.size(); i++)
 	{
-		element.setAttribute(tr("slice_%1").arg(i), m_slicePoints[i]);
+		element.setAttribute(QString("slice_%1").arg(i), m_slicePoints[i]);
 	}
 
 	m_fadeOutFrames.saveSettings(document, element, "fadeOut");
@@ -352,7 +351,7 @@ void SlicerT::loadSettings(const QDomElement& element)
 	{
 		if (QFileInfo(PathUtil::toAbsolute(srcFile)).exists())
 		{
-			auto buffer = gui::SampleLoader::createBufferFromFile(srcFile);
+			auto buffer = SampleBuffer::fromFile(srcFile);
 			m_originalSample = Sample(std::move(buffer));
 		}
 		else
@@ -363,7 +362,7 @@ void SlicerT::loadSettings(const QDomElement& element)
 	}
 	else if (auto sampleData = element.attribute("sampledata"); !sampleData.isEmpty())
 	{
-		auto buffer = gui::SampleLoader::createBufferFromBase64(sampleData);
+		auto buffer = SampleBuffer::fromBase64(sampleData);
 		m_originalSample = Sample(std::move(buffer));
 	}
 
@@ -373,7 +372,7 @@ void SlicerT::loadSettings(const QDomElement& element)
 		m_slicePoints = {};
 		for (int i = 0; i < totalSlices; i++)
 		{
-			m_slicePoints.push_back(element.attribute(tr("slice_%1").arg(i)).toFloat());
+			m_slicePoints.push_back(element.attribute(QString("slice_%1").arg(i)).toFloat());
 		}
 	}
 

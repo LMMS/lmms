@@ -224,7 +224,17 @@ void Note::loadSettings( const QDomElement & _this )
 }
 
 
-
+AutomationClip* Note::parameterCurve(ParameterType paramType)
+{
+	switch (paramType)
+	{
+	// TODO: In the future, more per-note parameters which can be automated are planned. Perhaps velocity, panning, and/or some other plugin-specific parameter.
+	case ParameterType::Detuning:
+		return detuning()->automationClip();
+	default:
+		return nullptr;
+	}
+}
 
 
 void Note::createDetuning()

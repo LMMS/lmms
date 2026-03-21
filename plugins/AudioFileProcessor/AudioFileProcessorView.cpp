@@ -31,9 +31,9 @@
 
 #include "ComboBox.h"
 #include "DataFile.h"
+#include "FileDialog.h"
 #include "FontHelper.h"
 #include "PixmapButton.h"
-#include "SampleLoader.h"
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "Track.h"
@@ -257,7 +257,7 @@ void AudioFileProcessorView::sampleUpdated()
 
 void AudioFileProcessorView::openAudioFile()
 {
-	QString af = SampleLoader::openAudioFile();
+	QString af = FileDialog::openAudioFile();
 	if (af.isEmpty()) { return; }
 
 	castModel<AudioFileProcessor>()->setAudioFile(af);

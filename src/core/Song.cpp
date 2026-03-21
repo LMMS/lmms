@@ -118,14 +118,17 @@ Song::Song() :
 	for (auto& scale : m_scales) {scale = std::make_shared<Scale>();}
 	for (auto& keymap : m_keymaps) {keymap = std::make_shared<Keymap>();}
 
-	// Aggregate the `positionJumped` signals from all the timelines into a single `playbackPositionJumped` signal for other objects (sample tracks, LFOs, etc) to use.
-	for (auto& timeline : m_timelines)
+	// Aggregate the `positionJumped` signals from all the timelines into a single `playbackPositionJumped` signal for
+	// other objects (sample tracks, LFOs, etc) to use.
+	for (auto i = std::size_t{0}; i < static_cast<std::size_t>(PlayMode::Count); ++i)
 	{
-		connect(&timeline, &Timeline::positionJumped, this, [this](){
-			// Only emit the signal when the song is actually playing
+		const auto onPositionJumped = [this, playMode = static_cast<PlayMode>(i)] {
+			// Only emit the signal when the song is actually playing and the active timeline jumps
 			// This prevents LFOs from changing phase when the user drags the timeline while paused
-			if (isPlaying()) { emit playbackPositionJumped(); }
-		}, Qt::DirectConnection);
+			if (m_playing && m_playMode == playMode) { emit playbackPositionJumped(); }
+		};
+
+		connect(&m_timelines[i], &Timeline::positionJumped, this, onPositionJumped);
 	}
 
 	// Inform VST plugins if the user moved the play head
@@ -349,7 +352,7 @@ void Song::processNextBuffer()
 }
 
 
-void Song::processAutomations(const TrackList &tracklist, TimePos timeStart, fpp_t)
+void Song::processAutomations(const TrackList &tracklist, TimePos timeStart, f_cnt_t)
 {
 	AutomatedValueMap values;
 
@@ -412,7 +415,7 @@ void Song::processAutomations(const TrackList &tracklist, TimePos timeStart, fpp
 	for (auto it = m_oldAutomatedValues.begin(); it != m_oldAutomatedValues.end(); it++)
 	{
 		AutomatableModel * am = it.key();
-		if (am->controllerConnection() && !values.contains(am))
+		if (!values.contains(am))
 		{
 			am->setUseControllerValue(true);
 		}
@@ -422,13 +425,18 @@ void Song::processAutomations(const TrackList &tracklist, TimePos timeStart, fpp
 	// Apply values
 	for (auto it = values.begin(); it != values.end(); it++)
 	{
-		if (! recordedModels.contains(it.key()))
+		AutomatableModel* model = it.key();
+		bool isRecording = recordedModels.contains(model);
+		model->setUseControllerValue(isRecording);
+
+		if (!isRecording)
 		{
-			it.key()->setAutomatedValue(it.value());
-		}
-		else if (!it.key()->useControllerValue())
-		{
-			it.key()->setUseControllerValue(true);
+			/* TODO
+			 * Remove scaleValue() from here when automation editor's
+			 * Y axis can be set to logarithmic, and automation clips store
+			 * the actual values, and not the invertedScaledValue.
+			 */
+			model->setValue(model->scaledValue(it.value()), true);
 		}
 	}
 }

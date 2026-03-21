@@ -86,7 +86,7 @@ PatternTrack::~PatternTrack()
 
 
 // play _frames frames of given Clip within starting with _start
-bool PatternTrack::play( const TimePos & _start, const fpp_t _frames,
+bool PatternTrack::play( const TimePos & _start, const f_cnt_t _frames,
 					const f_cnt_t _offset, int _clip_num )
 {
 	if( isMuted() )

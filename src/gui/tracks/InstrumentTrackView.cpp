@@ -24,6 +24,8 @@
 
 #include "InstrumentTrackView.h"
 
+#include <ranges>
+
 #include <QAction>
 #include <QApplication>
 #include <QDragEnterEvent>
@@ -205,20 +207,21 @@ void InstrumentTrackView::toggleMidiCCRack()
 
 
 
-InstrumentTrackWindow * InstrumentTrackView::topLevelInstrumentTrackWindow()
+InstrumentTrackWindow* InstrumentTrackView::topLevelInstrumentTrackWindow()
 {
-	InstrumentTrackWindow * w = nullptr;
-	for( const QMdiSubWindow * sw :
-				getGUI()->mainWindow()->workspace()->subWindowList(
-											QMdiArea::ActivationHistoryOrder ) )
+	const auto subWindows = getGUI()->mainWindow()->workspace()->subWindowList(QMdiArea::ActivationHistoryOrder);
+
+	for (QMdiSubWindow* sw : subWindows | std::views::reverse)
 	{
-		if( sw->isVisible() && sw->widget()->inherits( "lmms::gui::InstrumentTrackWindow" ) )
+		if (!sw->widget() || !sw->widget()->isVisible()) { continue; }
+
+		if (auto itw = qobject_cast<InstrumentTrackWindow*>(sw->widget()))
 		{
-			w = qobject_cast<InstrumentTrackWindow *>( sw->widget() );
+			return itw;
 		}
 	}
 
-	return w;
+	return nullptr;
 }
 
 
