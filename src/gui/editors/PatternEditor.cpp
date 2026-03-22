@@ -25,8 +25,12 @@
 #include "PatternEditor.h"
 
 #include <QAction>
+#include <QLabel>
+#include <QScrollBar>
+#include <QSlider>
 #include <QVBoxLayout>
 
+#include "AutomatableSlider.h"
 #include "ClipView.h"
 #include "ComboBox.h"
 #include "DataFile.h"
@@ -48,6 +52,7 @@ namespace lmms::gui
 
 PatternEditor::PatternEditor(PatternStore* ps) :
 	TrackContainerView(ps),
+	m_zoomingModel(new IntModel(0, 0, 200, nullptr, tr("Zoom"))),
 	m_ps(ps),
 	m_trackHeadWidth(ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt() == 1
 		? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT
@@ -65,6 +70,10 @@ PatternEditor::PatternEditor(PatternStore* ps) :
 
 	connect(m_ps, &PatternStore::trackUpdated,
 		this, &PatternEditor::updateMaxSteps);
+
+	// Set up zooming model
+	m_zoomingModel->setParent(this);
+	m_zoomingModel->setJournalling(false);
 
 	setFocusPolicy(Qt::StrongFocus);
 	setFocus();
@@ -327,6 +336,22 @@ PatternEditorWindow::PatternEditorWindow(PatternStore* ps) :
 	stretch->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	trackAndStepActionsToolBar->addWidget(stretch);
 
+	auto zoom_lbl = new QLabel(m_toolBar);
+	zoom_lbl->setPixmap( embed::getIconPixmap( "zoom" ) );
+
+	// Set slider zoom
+	m_zoomingSlider = new AutomatableSlider(m_toolBar, tr("Zoom"));
+	m_zoomingSlider->setModel(m_editor->m_zoomingModel);
+	m_zoomingSlider->setOrientation(Qt::Horizontal);
+	m_zoomingSlider->setPageStep(1);
+	m_zoomingSlider->setFocusPolicy(Qt::NoFocus);
+	m_zoomingSlider->setFixedSize(100, 26);
+	m_zoomingSlider->setToolTip(tr("Zoom"));
+	m_zoomingSlider->setContextMenuPolicy(Qt::NoContextMenu);
+	connect(m_editor->m_zoomingModel, SIGNAL(dataChanged()), this, SLOT(updateSnapLabel()));
+
+	trackAndStepActionsToolBar->addWidget(zoom_lbl);
+	trackAndStepActionsToolBar->addWidget(m_zoomingSlider);
 
 	// Step actions
 	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("step_btn_remove"), tr("Remove steps"),

@@ -28,17 +28,21 @@
 #include "Editor.h"
 #include "TrackContainerView.h"
 
+class QLabel;
+class QScrollBar;
+
 namespace lmms
 {
 
+class IntModel;
 class PatternStore;
 
 namespace gui
 {
 
+class AutomatableSlider;
 class ComboBox;
 class TimeLineWidget;
-
 
 class PatternEditor : public TrackContainerView
 {
@@ -72,11 +76,15 @@ protected slots:
 	void updatePixelsPerBar();
 
 private:
+	IntModel* m_zoomingModel;
+
 	PatternStore* m_ps;
 	TimeLineWidget* m_timeLine;
 	int m_trackHeadWidth;
 	tick_t m_maxClipLength;
 	void makeSteps( bool clone );
+
+	friend class PatternEditorWindow;
 };
 
 
@@ -96,6 +104,7 @@ public slots:
 	void stop() override;
 
 private:
+	AutomatableSlider * m_zoomingSlider;
 	ComboBox* m_patternComboBox;
 };
 
