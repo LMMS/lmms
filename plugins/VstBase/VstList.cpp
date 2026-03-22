@@ -14,6 +14,7 @@
 #include <QStandardPaths>
 
 #include "ConfigManager.h"
+#include "lmmsconfig.h"
 
 namespace fs = std::filesystem;
 
@@ -42,6 +43,19 @@ fs::path cacheFilePath()
 	auto cacheDir = fs::path{QStandardPaths::writableLocation(QStandardPaths::GenericCacheLocation).toStdString()} / "lmms";
 	fs::create_directories(cacheDir);
 	return cacheDir / "vst-list.bin";
+}
+
+fs::path winePrefixPath()
+{
+	if (const char* wineprefix_str = std::getenv("WINEPREFIX"))
+	{
+		return wineprefix_str;
+	}
+	else if (const char* home_str = std::getenv("HOME"))
+	{
+		return fs::path{home_str} / ".wine";
+	}
+	return {};
 }
 
 // helpers for cache I/O
@@ -73,7 +87,27 @@ VstList::VstList(bool initDefaultDir)
 	if (initDefaultDir)
 	{
 		loadCache(cacheFilePath());
-		scanDirRecursive(fs::path{ConfigManager::inst()->vstDir().toStdString()});
+
+		scanDirRecursive(ConfigManager::inst()->vstDir().toStdString());
+
+#		if defined(LMMS_BUILD_WIN32)
+
+			scanDirRecursive("C:/Program Files/Steinberg/VstPlugins");
+
+#		elif defined(LMMS_BUILD_LINUX)
+
+			scanDirRecursive("/usr/lib/vst");
+			scanDirRecursive("/usr/lib64/vst");
+
+#			if defined(LMMS_HAVE_VST_32) || defined(LMMS_HAVE_VST_64)
+
+				if (const fs::path wineprefix = winePrefixPath(); !wineprefix.empty())
+				{
+					scanDirRecursive(wineprefix / "drive_c/Program Files/Steinberg/VstPlugins");
+				}
+#			endif
+#		endif
+
 		saveCache(cacheFilePath());
 	}
 }
@@ -81,6 +115,7 @@ VstList::VstList(bool initDefaultDir)
 
 void VstList::scanDirRecursive(fs::path dirPath)
 {
+	if (!fs::exists(dirPath)) { return; }
 	for (const auto& entry : fs::directory_iterator{dirPath})
 	{
 		const fs::path& path = entry.path();
@@ -103,10 +138,9 @@ void VstList::scanDirRecursive(fs::path dirPath)
 				ext != ".dll")
 #elif defined(LMMS_BUILD_LINUX)
 #	if defined(LMMS_HAVE_VST_32) || defined(LMMS_HAVE_VST_64)
-				ext != ".dll" && ext != ".so")
-#	else
-				ext != ".so")  // TODO: is this actually possible?
+				ext != ".dll" &&
 #	endif
+				ext != ".so")
 #endif
 			{
 				continue;
@@ -204,9 +238,6 @@ void VstList::loadCache(fs::path cacheFilePath)
 
 		cache.getline(buf, 4096, '\0');
 		data.vendor = std::string{buf};
-
-		// if (version >= N) { new code here; }
-		// if (version >= N+1) { etc; }
 
 		m_plugins.insert({data.path, data});
 	}
