@@ -45,18 +45,60 @@ fs::path cacheFilePath()
 	return cacheDir / "vst-list.bin";
 }
 
-fs::path winePrefixPath()
+fs::path toWinePath(const fs::path& winPath)
 {
 	if (const char* wineprefix_str = std::getenv("WINEPREFIX"))
 	{
-		return wineprefix_str;
+		return fs::path{wineprefix_str} / "drive_c" / winPath.relative_path();
 	}
 	else if (const char* home_str = std::getenv("HOME"))
 	{
-		return fs::path{home_str} / ".wine";
+		return fs::path{home_str} / ".wine"/ "drive_c" / winPath.relative_path();
 	}
 	return {};
 }
+
+bool isSubPath(const fs::path& sub, const fs::path& base)
+{
+    auto rel = std::filesystem::relative(sub, base);
+    return !rel.empty() && *rel.begin() != "..";
+}
+
+namespace VstPaths
+{
+	const fs::path Win64 = "C:/Program Files/Steinberg/VstPlugins";
+	const fs::path Linux64 = "/usr/lib64/vst";
+	const fs::path Linux32 = "/usr/lib/vst";
+	const fs::path Wine64 = toWinePath(Win64);
+}
+
+// enum to determine order of preference for VST dirs
+// int comparison is used so this isn't an enum class
+// 0 is most favorable
+enum VstPreferenceType
+{
+	NativeUser,
+	Native64,
+	Native32,
+	WineUser,
+	Wine64,
+	Wine32,
+};
+
+VstPreferenceType prefType(const lmms::VstList::Metadata& data)
+{
+#ifdef LMMS_BUILD_WIN32
+	if isSuPath(data.path, VstPaths::Win64) { return Native64; }
+	return NativeUser;
+#else
+	if      (isSubPath(data.path, VstPaths::Linux64)) { return Native64; }
+	else if (isSubPath(data.path, VstPaths::Linux32)) { return Native32; }
+	else if (!VstPaths::Wine64.empty() && isSubPath(data.path, VstPaths::Wine64))  { return Wine64; }
+	else if (data.path.extension() == ".dll") { return WineUser; }
+	return NativeUser;
+#endif
+}
+
 
 // helpers for cache I/O
 
@@ -92,19 +134,16 @@ VstList::VstList(bool initDefaultDir)
 
 #		if defined(LMMS_BUILD_WIN32)
 
-			scanDirRecursive("C:/Program Files/Steinberg/VstPlugins");
+			scanDirRecursive(VstPaths::Win64);
 
 #		elif defined(LMMS_BUILD_LINUX)
 
-			scanDirRecursive("/usr/lib/vst");
-			scanDirRecursive("/usr/lib64/vst");
+			scanDirRecursive(VstPaths::Linux64);
+			scanDirRecursive(VstPaths::Linux32);
 
 #			if defined(LMMS_HAVE_VST_32) || defined(LMMS_HAVE_VST_64)
 
-				if (const fs::path wineprefix = winePrefixPath(); !wineprefix.empty())
-				{
-					scanDirRecursive(wineprefix / "drive_c/Program Files/Steinberg/VstPlugins");
-				}
+				if (!VstPaths::Wine64.empty()) { scanDirRecursive(VstPaths::Wine64); }
 #			endif
 #		endif
 
@@ -121,7 +160,11 @@ void VstList::scanDirRecursive(fs::path dirPath)
 		const fs::path& path = entry.path();
 
 		// skip loading already analyzed executables
-		if (m_plugins.contains(path) && m_plugins[path].file_checksum == checksum(path)) { continue; }
+		if (m_pluginsCache.contains(path) && m_pluginsCache[path].file_checksum == checksum(path))
+		{
+			addPlugin(m_pluginsCache[path]);
+			continue;
+		}
 
 		// ignore "hidden" files and folders. Dot and dot-dot are skipped by C++ STL, not here.
 		// this doesn't go out of bounds unless the filesystem somehow has an empty string as a file name.
@@ -149,25 +192,39 @@ void VstList::scanDirRecursive(fs::path dirPath)
 			VstPlugin plug{QString::fromStdString(path.string()), true};
 			if (plug.name().isEmpty()) // TODO: figure out a better way to check load fail
 			{
-				m_plugins.emplace(path, Metadata {
+				m_pluginsCache.emplace(path, Metadata {
 					path,
 					checksum(path),
 					Metadata::PluginType::NotVst});
 				continue;
 			}
-			m_plugins.emplace(path, Metadata {
+			Metadata metadata = {
 				path,
 				checksum(path),
 				plug.isSynth()
 					? Metadata::PluginType::Instrument
 					: Metadata::PluginType::Effect,
+				plug.uniqueID().toStdString(),
 				plug.name().toStdString(),
 				plug.productString().toStdString(),
 				plug.vendorString().toStdString()
-			});
+			};
+			m_pluginsCache.insert({path, metadata});
+			addPlugin(metadata);
 		}
 	}
 }
+
+
+void VstList::addPlugin(Metadata& data)
+{
+	if (data.type != Metadata::PluginType::NotVst
+	    && (!m_plugins.contains(data.ID) || prefType(data) < prefType(m_plugins[data.ID])))
+	{
+		m_plugins.insert_or_assign(data.ID, data);
+	}
+}
+
 
 std::vector<VstList::Metadata> VstList::instrumentPlugins()
 {
@@ -192,7 +249,7 @@ std::vector<VstList::Metadata> VstList::effectPlugins()
 }
 
 
-constexpr uint32_t CACHE_VER = 1; // increment this when changing the functions' output
+constexpr uint32_t CACHE_VER = 2; // increment this when changing the functions' output
 
 // `saveCache` and `loadCache` implementations should be kept in sync
 // All values should be dumped because cache existing for a file implies
@@ -202,11 +259,12 @@ void VstList::saveCache(fs::path cacheFilePath)
 {
 	std::ofstream cache{cacheFilePath, std::ios::binary};
 	writeBin(cache, CACHE_VER);
-	for (const auto& [_, data] : m_plugins)
+	for (const auto& [_, data] : m_pluginsCache)
 	{
 		cache << data.path.string() << '\0';
 		writeBin(cache, data.file_checksum);
 		writeBin(cache, data.type);
+		cache << data.ID << '\0';
 		cache << data.name << '\0';
 		cache << data.product << '\0';
 		cache << data.vendor << '\0';
@@ -231,15 +289,18 @@ void VstList::loadCache(fs::path cacheFilePath)
 		readBin(cache, data.type);
 
 		cache.getline(buf, 4096, '\0');
-		data.name = std::string{buf};
+		data.ID = buf;
 
 		cache.getline(buf, 4096, '\0');
-		data.product = std::string{buf};
+		data.name = buf;
 
 		cache.getline(buf, 4096, '\0');
-		data.vendor = std::string{buf};
+		data.product = buf;
 
-		m_plugins.insert({data.path, data});
+		cache.getline(buf, 4096, '\0');
+		data.vendor = buf;
+
+		m_pluginsCache.insert({data.path, data});
 	}
 }
 

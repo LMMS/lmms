@@ -101,6 +101,11 @@ public:
 		return m_allParameterDisplays;
 	}
 
+	inline const QString& uniqueID() const
+	{
+		return m_uniqueID;
+	}
+
 	inline bool isSynth() const
 	{
 		return m_isSynth;
@@ -167,6 +172,7 @@ private:
 	QString m_allProgramNames;
 	QString m_allParameterLabels;
 	QString m_allParameterDisplays;
+	QString m_uniqueID;
 	bool m_isSynth;
 
 	QString p_name;

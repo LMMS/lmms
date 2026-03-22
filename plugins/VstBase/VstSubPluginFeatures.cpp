@@ -37,9 +37,9 @@ using AttributeMap = lmms::Plugin::Descriptor::SubPluginFeatures::Key::Attribute
 namespace
 {
 
-inline std::filesystem::path getPath(const lmms::Plugin::Descriptor::SubPluginFeatures::Key& key)
+inline lmms::VstList::Metadata& getMetadata(const lmms::Plugin::Descriptor::SubPluginFeatures::Key& key)
 {
-	return key.attributes["file"].toStdString();
+	return lmms::VstList::inst()->plugins()[key.attributes["id"].toStdString()];
 }
 
 } // namespace
@@ -69,18 +69,20 @@ void VstSubPluginFeatures::listSubPluginKeys(const Plugin::Descriptor* desc, Key
 	{
 		AttributeMap am;
 		am["file"] = QString::fromStdString(data.path.string());
+		am["id"] = QString::fromStdString(data.ID);
 		keylist.push_back(Key(desc, QString::fromStdString(data.name), am));
 	}
 }
 
 QString VstSubPluginFeatures::displayName(const Key& key) const
 {
-	return QString::fromStdString(VstList::inst()->plugins()[getPath(key)].name);
+	return QString::fromStdString(getMetadata(key).name);
 }
 
 QString VstSubPluginFeatures::description(const Key& key) const
 {
-	return QString::fromStdString(VstList::inst()->plugins()[getPath(key)].product);
+	const auto& metadata = getMetadata(key);
+	return QString::fromStdString(metadata.product + " (" + metadata.path.string() + ")");
 }
 
 } // namespace lmms

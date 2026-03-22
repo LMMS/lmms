@@ -1022,7 +1022,7 @@ bool RemoteVstPlugin::load( const std::string & _plugin_file )
 
 	sendMessage( message( IdVstPluginUniqueID ).addString( id ) );
 
-	pluginDispatch( effOpen );
+	if (!m_skipInit){ pluginDispatch(effOpen); }
 
 	return true;
 }

@@ -471,6 +471,7 @@ bool VstPlugin::processMessage( const message & _m )
 
 		case IdVstPluginUniqueID:
 			// TODO: display graphically in case of failure
+			m_uniqueID = _m.getQString();
 			printf("unique ID: %s\n", _m.getString().c_str() );
 			break;
 
