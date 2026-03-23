@@ -30,7 +30,9 @@
 #include <QPushButton>
 #include <QScrollArea>
 #include <QVBoxLayout>
+#include <qevent.h>
 
+#include "DataFile.h"
 #include "Effect.h"
 #include "DeprecationHelper.h"
 #include "EffectSelectDialog.h"
@@ -38,6 +40,9 @@
 #include "StringPairDrag.h"
 #include "GroupBox.h"
 #include "TextFloat.h"
+#include "FileDialog.h"
+#include "CaptionMenu.h"
+#include "ConfigManager.h"
 #include "embed.h"
 
 
@@ -209,6 +214,81 @@ void EffectRackView::deletePlugin( EffectView* view )
 
 
 
+void EffectRackView::contextMenuEvent(QContextMenuEvent* event)
+{
+	QPointer<CaptionMenu> contextMenu = new CaptionMenu(tr("Effect Chain"), this);
+
+	contextMenu->addAction(embed::getIconPixmap("file"),
+		tr("&Save as preset"),
+		this, SLOT(savePreset()));
+
+	contextMenu->addAction(embed::getIconPixmap("file"),
+		tr("&Load from preset"),
+		this, SLOT(loadPreset()));
+
+	contextMenu->exec(event->globalPos());
+	delete contextMenu;
+
+}
+
+
+
+
+
+void EffectRackView::savePreset()
+{
+	FileDialog sfd(this, tr("Load preset"), "", tr("FX Chain (*.fxc)"));
+	QString workingDir = ConfigManager::inst()->workingDir();
+
+	sfd.setAcceptMode(FileDialog::AcceptSave);
+	sfd.setDirectory(workingDir);
+	sfd.setFileMode(FileDialog::AnyFile);
+	sfd.setDefaultSuffix("fxc");
+
+	if (sfd.exec() == QDialog::Accepted
+		&& !sfd.selectedFiles().isEmpty()
+		&& !sfd.selectedFiles().first().isEmpty())
+	{
+		DataFile dataFile(DataFile::Type::EffectSettings);
+		QDomElement& content(dataFile.content());
+
+		fxChain()->saveSettings(dataFile, content);
+
+		QString f = sfd.selectedFiles()[0];
+
+		dataFile.writeFile(f);
+	}
+}
+
+
+
+
+void EffectRackView::loadPreset()
+{
+	FileDialog sfd(this, tr("Load preset"), "", tr("FX Chain (*.fxc)"));
+	QString workingDir = ConfigManager::inst()->workingDir();
+
+	sfd.setAcceptMode(FileDialog::AcceptOpen);
+	sfd.setDirectory(workingDir);
+	sfd.setFileMode(FileDialog::ExistingFile);
+	sfd.setDefaultSuffix("fxc");
+
+	if (sfd.exec() == QDialog::Accepted
+		&& !sfd.selectedFiles().isEmpty()
+		&& !sfd.selectedFiles().first().isEmpty())
+	{
+		QString f = sfd.selectedFiles()[0];
+		DataFile dataFile(f);
+
+		const QDomElement content = dataFile.content();
+		fxChain()->loadSettings(content);
+	}
+}
+
+
+
+
+
 void EffectRackView::update()
 {
 	QWidget * w = m_scrollArea->widget();
@@ -265,7 +345,7 @@ void EffectRackView::update()
 	const int EffectViewMargin = 3;
 	m_lastY = EffectViewMargin;
 
-	for( QVector<EffectView *>::Iterator it = m_effectViews.begin(); 
+	for( QVector<EffectView *>::Iterator it = m_effectViews.begin();
 					it != m_effectViews.end(); i++ )
 	{
 		if( i < view_map.size() && view_map[i] == false )

@@ -54,6 +54,9 @@ public slots:
 	void moveUp(EffectView* view);
 	void moveDown(EffectView* view);
 	void deletePlugin(EffectView* view);
+	void contextMenuEvent(QContextMenuEvent* event) override;
+	void savePreset();
+	void loadPreset();
 
 private slots:
 	virtual void update();
