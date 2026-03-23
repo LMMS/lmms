@@ -28,6 +28,8 @@
 #include <numbers>
 #include <cmath>
 
+#include "lmms_math.h"
+
 namespace lmms
 {
 
@@ -80,8 +82,7 @@ public:
 	{
 		*l = std::sin(m_phase);
 		*r = std::sin(m_phase + m_offset);
-		m_phase += m_increment;
-		m_phase = std::fmod(m_phase, 2 * std::numbers::pi);
+		m_phase = normalizePhase(m_phase + m_increment);
 	}
 
 private:
