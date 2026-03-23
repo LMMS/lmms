@@ -43,6 +43,8 @@ namespace lmms {
  * resizeable container is needed for use in real-time code. Can be thought of
  * as a hybrid between `std::array` and `std::vector`. The interface follows
  * that of `std::vector` - see standard C++ documentation.
+ *
+ * TODO C++26: Replace uses of this class with std::inplace_vector
  */
 template<typename T, std::size_t N>
 class ArrayVector
