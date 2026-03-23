@@ -37,17 +37,6 @@
 
 namespace lmms {
 
-namespace detail {
-
-template<typename T, typename = void>
-constexpr bool is_input_iterator_v = false;
-
-template<typename T>
-constexpr bool is_input_iterator_v<T, std::void_t<typename std::iterator_traits<T>::iterator_category>> =
-	std::is_convertible_v<typename std::iterator_traits<T>::iterator_category, std::input_iterator_tag>;
-
-} // namespace detail
-
 /**
  * A container that stores up to a maximum of `N` elements of type `T` directly
  * within itself, rather than separately on the heap. Useful when a dynamically
@@ -100,7 +89,7 @@ public:
 		std::uninitialized_value_construct_n(begin(), count);
 	}
 
-	template<typename It, std::enable_if_t<detail::is_input_iterator_v<It>, int> = 0>
+	template<std::input_iterator It>
 	ArrayVector(It first, It last)
 	{
 		// Can't check the size first as the iterator may not be multipass
@@ -173,7 +162,7 @@ public:
 		m_size = count;
 	}
 
-	template<typename It, std::enable_if_t<detail::is_input_iterator_v<It>, int> = 0>
+	template<std::input_iterator It>
 	void assign(It first, It last)
 	{
 		// Can't check the size first as the iterator may not be multipass
@@ -262,7 +251,7 @@ public:
 		return mutPos;
 	}
 
-	template<typename It, std::enable_if_t<detail::is_input_iterator_v<It>, int> = 0>
+	template<std::input_iterator It>
 	iterator insert(const_iterator pos, It first, It last)
 	{
 		// Can't check the size first as the iterator may not be multipass
