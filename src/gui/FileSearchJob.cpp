@@ -79,25 +79,32 @@ void FileSearchJob::runSearch(Task task)
 
 	for (const auto& path : task.paths)
 	{
+		if (validEntry(path, tokens, task.extensions)) { emit foundMatch(path); }
+
 		auto dirIt = QDirIterator{path, task.dirFilters,
 			QDirIterator::IteratorFlag::Subdirectories | QDirIterator::IteratorFlag::FollowSymlinks};
 
 		while (dirIt.hasNext() && !m_stop.test(std::memory_order_relaxed))
 		{
-			const auto fileInfo = QFileInfo{dirIt.next()};
-			const auto fileName = fileInfo.fileName();
-			const auto containsToken = std::all_of(tokens.begin(), tokens.end(),
-				[&](const auto& token) { return fileName.contains(token, Qt::CaseInsensitive); });
-
-			const auto validDir = fileInfo.isDir() && containsToken;
-			const auto validFile = fileInfo.isFile() && containsToken
-				&& task.extensions.contains(QString{"*.%1"}.arg(fileInfo.completeSuffix()), Qt::CaseInsensitive);
-
-			if (validDir || validFile) { emit foundMatch(fileInfo.filePath()); }
+			if (validEntry(dirIt.next(), tokens, task.extensions)) { emit foundMatch(dirIt.filePath()); }
 		}
 	}
 
 	emit finished();
+}
+
+bool FileSearchJob::validEntry(QString entry, QStringList tokens, QStringList extensions)
+{
+	const auto fileInfo = QFileInfo{entry};
+	const auto fileName = fileInfo.fileName();
+	const auto containsToken = std::all_of(
+		tokens.begin(), tokens.end(), [&](const auto& token) { return fileName.contains(token, Qt::CaseInsensitive); });
+
+	const auto validDir = fileInfo.isDir() && containsToken;
+	const auto validFile = fileInfo.isFile() && containsToken
+		&& extensions.contains(QString{"*.%1"}.arg(fileInfo.completeSuffix()), Qt::CaseInsensitive);
+
+	return validDir || validFile;
 }
 
 } // namespace lmms::gui

@@ -74,6 +74,7 @@ signals:
 
 private:
 	void runSearch(Task task);
+	bool validEntry(QString entry, QStringList tokens, QStringList extensions);
 	std::future<void> m_task;
 	std::atomic_flag m_stop = ATOMIC_FLAG_INIT;
 };
