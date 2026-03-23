@@ -53,7 +53,7 @@ fs::path toWinePath(const fs::path& winPath)
 	}
 	else if (const char* home_str = std::getenv("HOME"))
 	{
-		return fs::path{home_str} / ".wine"/ "drive_c" / winPath.relative_path();
+		return fs::path{home_str} / ".wine" / "drive_c" / winPath.relative_path();
 	}
 	return {};
 }
@@ -88,7 +88,7 @@ enum VstPreferenceType
 VstPreferenceType prefType(const lmms::VstList::Metadata& data)
 {
 #ifdef LMMS_BUILD_WIN32
-	if isSuPath(data.path, VstPaths::Win64) { return Native64; }
+	if (isSubPath(data.path, VstPaths::Win64)) { return Native64; }
 	return NativeUser;
 #else
 	if      (isSubPath(data.path, VstPaths::Linux64)) { return Native64; }
@@ -124,35 +124,39 @@ namespace lmms
 VstList* VstList::s_inst = nullptr;
 
 
-VstList::VstList(bool initDefaultDir)
+VstList::VstList(bool initDefaultDir, bool loadNewlyFound)
 {
 	if (initDefaultDir)
 	{
 		loadCache(cacheFilePath());
-
-		scanDirRecursive(ConfigManager::inst()->vstDir().toStdString());
-
-#		if defined(LMMS_BUILD_WIN32)
-
-			scanDirRecursive(VstPaths::Win64);
-
-#		elif defined(LMMS_BUILD_LINUX)
-
-			scanDirRecursive(VstPaths::Linux64);
-			scanDirRecursive(VstPaths::Linux32);
-
-#			if defined(LMMS_HAVE_VST_32) || defined(LMMS_HAVE_VST_64)
-
-				if (!VstPaths::Wine64.empty()) { scanDirRecursive(VstPaths::Wine64); }
-#			endif
-#		endif
-
+		scanDefaultDirs(loadNewlyFound);
 		saveCache(cacheFilePath());
 	}
 }
 
 
-void VstList::scanDirRecursive(fs::path dirPath)
+void VstList::scanDefaultDirs(bool loadNewlyFound)
+{
+	scanDirRecursive(ConfigManager::inst()->vstDir().toStdString(), loadNewlyFound);
+
+	#if defined(LMMS_BUILD_WIN32)
+
+		scanDirRecursive(VstPaths::Win64, loadNewlyFound);
+
+	#elif defined(LMMS_BUILD_LINUX)
+
+		scanDirRecursive(VstPaths::Linux64, loadNewlyFound);
+		scanDirRecursive(VstPaths::Linux32, loadNewlyFound);
+
+		#if defined(LMMS_HAVE_VST_32) || defined(LMMS_HAVE_VST_64)
+
+			if (!VstPaths::Wine64.empty()) { scanDirRecursive(VstPaths::Wine64, loadNewlyFound); }
+		#endif
+	#endif
+}
+
+
+void VstList::scanDirRecursive(fs::path dirPath, bool loadNewlyFound)
 {
 	if (!fs::exists(dirPath)) { return; }
 	for (const auto& entry : fs::directory_iterator{dirPath})
@@ -173,9 +177,10 @@ void VstList::scanDirRecursive(fs::path dirPath)
 		// resolve symlinks and fetch data from the other end
 		const fs::file_status& stat = entry.status();
 
-		if (fs::is_directory(stat)) { scanDirRecursive(path); }
+		if (fs::is_directory(stat)) { scanDirRecursive(path, loadNewlyFound); }
 		else if (fs::is_regular_file(stat))
 		{
+			if (!loadNewlyFound) { continue; }
 			if (const auto& ext = path.extension();
 #if defined(LMMS_BUILD_WIN32)
 				ext != ".dll")

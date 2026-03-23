@@ -35,8 +35,9 @@ public:
 		return s_inst;
 	}
 
-	VstList(bool initDefaultDir = true);
-	void scanDirRecursive(std::filesystem::path dirPath);
+	VstList(bool initDefaultDir = true, bool loadNewlyFound = true);
+	void scanDefaultDirs(bool loadNewlyFound);
+	void scanDirRecursive(std::filesystem::path dirPath, bool loadNewlyFound);
 
 	void loadCache(std::filesystem::path cacheFilePath);
 	void saveCache(std::filesystem::path cacheFilePath);
