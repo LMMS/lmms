@@ -135,7 +135,7 @@ public:
 		while( t < MAXTBL && _wavelen >= TLENS[t+1] ) { t++; }
 
 		int tlen = TLENS[t];
-		const float ph = fraction( _ph );
+		const float ph = normalizePhase<1>(_ph);
 		const float lookupf = ph * static_cast<float>( tlen );
 		int lookup = static_cast<int>( lookupf );
 		const float ip = fraction( lookupf );
