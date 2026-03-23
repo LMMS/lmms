@@ -54,9 +54,16 @@ public slots:
 	void moveUp(EffectView* view);
 	void moveDown(EffectView* view);
 	void deletePlugin(EffectView* view);
-	void contextMenuEvent(QContextMenuEvent* event) override;
-	void savePreset();
-	void loadPreset();
+
+	inline EffectChain* fxChain()
+	{
+		return castModel<EffectChain>();
+	}
+
+	inline const EffectChain* fxChain() const
+	{
+		return castModel<EffectChain>();
+	}
 
 private slots:
 	virtual void update();
@@ -71,17 +78,6 @@ private:
 	void modelChanged() override;
 	QSize sizeHint() const override;
 	QSize minimumSizeHint() const override { return sizeHint(); }
-
-	inline EffectChain* fxChain()
-	{
-		return castModel<EffectChain>();
-	}
-
-	inline const EffectChain* fxChain() const
-	{
-		return castModel<EffectChain>();
-	}
-
 
 	QVector<EffectView *> m_effectViews;
 

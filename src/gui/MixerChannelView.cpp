@@ -52,6 +52,8 @@
 #include "PeakIndicator.h"
 #include "SendButtonIndicator.h"
 #include "Song.h"
+#include "FileDialog.h"
+#include "DataFile.h"
 
 namespace lmms::gui {
 MixerChannelView::MixerChannelView(QWidget* parent, MixerView* mixerView, int channelIndex)
@@ -185,6 +187,19 @@ void MixerChannelView::contextMenuEvent(QContextMenuEvent*)
 		embed::getIconPixmap("cancel"), tr("Remove &unused channels"), this, &MixerChannelView::removeUnusedChannels);
 	contextMenu->addSeparator();
 
+	contextMenu->addAction(
+		embed::getIconPixmap("file"),
+		tr("Save effect chain as preset"),
+		this, SLOT(saveChainPreset())
+	);
+
+	contextMenu->addAction(
+		embed::getIconPixmap("file"),
+		tr("Load effect chain from preset"),
+		this, SLOT(loadChainPreset())
+	);
+	contextMenu->addSeparator();
+
 	auto colorMenu = QMenu{tr("Color"), this};
 	colorMenu.setIcon(embed::getIconPixmap("colorize"));
 	colorMenu.addAction(tr("Change"), this, &MixerChannelView::selectColor);
@@ -194,6 +209,53 @@ void MixerChannelView::contextMenuEvent(QContextMenuEvent*)
 
 	contextMenu->exec(QCursor::pos());
 	delete contextMenu;
+}
+
+void MixerChannelView::saveChainPreset()
+{
+	FileDialog sfd(this, tr("Load preset"), "", tr("FX Chain (*.fxc)"));
+	QString workingDir = ConfigManager::inst()->workingDir();
+
+	sfd.setAcceptMode(FileDialog::AcceptSave);
+	sfd.setDirectory(workingDir);
+	sfd.setFileMode(FileDialog::AnyFile);
+	sfd.setDefaultSuffix("fxc");
+
+	if (sfd.exec() == QDialog::Accepted
+		&& !sfd.selectedFiles().isEmpty()
+		&& !sfd.selectedFiles().first().isEmpty())
+	{
+		DataFile dataFile(DataFile::Type::EffectSettings);
+		QDomElement& content(dataFile.content());
+
+		effectRackView()->fxChain()->saveSettings(dataFile, content);
+
+		QString f = sfd.selectedFiles()[0];
+
+		dataFile.writeFile(f);
+	}
+}
+
+void MixerChannelView::loadChainPreset()
+{
+	FileDialog sfd(this, tr("Load preset"), "", tr("FX Chain (*.fxc)"));
+	QString workingDir = ConfigManager::inst()->workingDir();
+
+	sfd.setAcceptMode(FileDialog::AcceptOpen);
+	sfd.setDirectory(workingDir);
+	sfd.setFileMode(FileDialog::ExistingFile);
+	sfd.setDefaultSuffix("fxc");
+
+	if (sfd.exec() == QDialog::Accepted
+		&& !sfd.selectedFiles().isEmpty()
+		&& !sfd.selectedFiles().first().isEmpty())
+	{
+		QString f = sfd.selectedFiles()[0];
+		DataFile dataFile(f);
+
+		const QDomElement content = dataFile.content();
+		effectRackView()->fxChain()->loadSettings(content);
+	}
 }
 
 void MixerChannelView::paintEvent(QPaintEvent*)
