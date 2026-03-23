@@ -269,7 +269,7 @@ private:
 
 	std::conditional_t<N == DynamicSpscQueueSize, std::vector<T>, std::array<T, N>> m_buffer;
 
-	// TODO: Use std::hardware_destructive_interference_size when supported by CI
+	// TODO: Use std::hardware_destructive_interference_size once supported by CI
 	alignas(64) std::atomic_size_t m_readIndex;
 	alignas(64) std::atomic_size_t m_writeIndex;
 	alignas(64) std::atomic_flag m_shutdownFlag;
