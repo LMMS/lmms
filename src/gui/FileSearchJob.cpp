@@ -81,9 +81,10 @@ void FileSearchJob::runSearch(Task task)
 	{
 		if (validEntry(path, tokens, task.extensions)) { emit foundMatch(path); }
 
-		auto dirIt = QDirIterator{path, task.dirFilters,
-			QDirIterator::IteratorFlag::Subdirectories | QDirIterator::IteratorFlag::FollowSymlinks};
+		auto searchFilters = QDir::AllEntries | QDir::NoDotAndDotDot;
+		if (task.hidden) { searchFilters |= QDir::Hidden; }
 
+		auto dirIt = QDirIterator{path, searchFilters, QDirIterator::Subdirectories | QDirIterator::FollowSymlinks};
 		while (dirIt.hasNext() && !m_stop.test(std::memory_order_relaxed))
 		{
 			if (validEntry(dirIt.next(), tokens, task.extensions)) { emit foundMatch(dirIt.filePath()); }

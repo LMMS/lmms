@@ -43,7 +43,7 @@ public:
 		QString filter;					 //! The filter to be tokenized.
 		QStringList paths;				 //! The list of paths to search recursively through.
 		QStringList extensions;			 //! The list of allowed extensions.
-		QFlags<QDir::Filter> dirFilters; //! The directory filter flag.
+		bool hidden;					 //! Include hidden entries.
 	};
 
 	//! Create a search job with the given @p parent (if any).
