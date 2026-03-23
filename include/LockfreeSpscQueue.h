@@ -219,16 +219,14 @@ public:
 	void shutdown()
 	{
 		m_shutdownFlag.test_and_set(std::memory_order_relaxed);
-		m_dataAvailableFlag.test_and_set(std::memory_order_relaxed);
-		m_dataAvailableFlag.notify_one();
 	}
 
 	void waitForData()
 	{
 		while (empty() && !m_shutdownFlag.test(std::memory_order_relaxed))
 		{
-			m_dataAvailableFlag.clear(std::memory_order_relaxed);
-			m_dataAvailableFlag.wait(false, std::memory_order_relaxed);
+			const auto writeIndex = m_writeIndex.load(std::memory_order_acquire);
+			m_writeIndex.wait(writeIndex, std::memory_order_acquire);
 		}
 	}
 
@@ -258,9 +256,7 @@ private:
 		const auto value = std::has_single_bit(m_buffer.size()) ? (index + count) & (m_buffer.size() - 1)
 																: (index + count) % m_buffer.size();
 		m_writeIndex.store(value, std::memory_order_release);
-
-		m_dataAvailableFlag.test_and_set(std::memory_order_relaxed);
-		m_dataAvailableFlag.notify_one();
+		m_writeIndex.notify_one();
 	}
 
 	void commitRead(size_t count)
@@ -276,7 +272,6 @@ private:
 	// TODO: Use std::hardware_destructive_interference_size when supported by CI
 	alignas(64) std::atomic_size_t m_readIndex;
 	alignas(64) std::atomic_size_t m_writeIndex;
-	alignas(64) std::atomic_flag m_dataAvailableFlag;
 	alignas(64) std::atomic_flag m_shutdownFlag;
 };
 
