@@ -262,7 +262,7 @@ BitInvaderView::BitInvaderView(Instrument* instrument, QWidget* parent)
 	m_sampleLengthKnob->setLabel(tr("Length"));
 
 	m_graph = new Graph(this, Graph::Style::Nearest, 204, 134);
-	m_graph->move(23,59); // 55,120 - 2px border
+	m_graph->move(23, 59);
 	m_graph->setAutoFillBackground(true);
 	m_graph->setGraphColor(QColor{255, 255, 255});
 	m_graph->setToolTip(tr("Draw your own waveform here by dragging your mouse on this graph."));
