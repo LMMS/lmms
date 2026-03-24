@@ -79,8 +79,6 @@ protected:
 
 
 private slots:
-	//! Slot to update the state of the track label button when the instrument changes.
-	//! An instrument may be loaded or removed, so the button should be enabled or disabled accordingly.
 	void onInstrumentChanged();
 	void toggleInstrumentWindow( bool _on );
 	void toggleMidiCCRack();

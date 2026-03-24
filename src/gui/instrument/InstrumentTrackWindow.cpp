@@ -721,11 +721,6 @@ void InstrumentTrackWindow::viewPrevInstrument()
 
 void InstrumentTrackWindow::adjustTabSize(QWidget *w)
 {
-	// Check if the widget is null, as not all tabs are always present (e.g. the plugin tab is only present if an instrument is loaded)
-	if( w == nullptr )
-	{
-		return;
-	}
 	// "-1" :
 	// in "TabWidget::addTab", under "Position tab's window", the widget is
 	// moved up by 1 pixel
