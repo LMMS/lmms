@@ -77,7 +77,6 @@ Plugin::Descriptor PLUGIN_EXPORT opulenz_plugin_descriptor =
 	nullptr,
 };
 
-// necessary for getting instance out of shared lib
 PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* m, void*)
 {
 	return new OpulenzInstrument(static_cast<InstrumentTrack*>(m));
@@ -240,7 +239,7 @@ int OpulenzInstrument::popVoice()
 		voiceLRU[i] = voiceLRU[i + 1];
 	}
 	voiceLRU[OPL2_VOICES - 1] = OPL2_NO_VOICE;
-#ifdef false
+#if 0
 	printf("<-- %d %d %d %d %d %d %d %d %d \n", voiceLRU[0], voiceLRU[1], voiceLRU[2],
 		voiceLRU[3], voiceLRU[4], voiceLRU[5], voiceLRU[6], voiceLRU[7], voiceLRU[8]);
 #endif
@@ -256,7 +255,7 @@ int OpulenzInstrument::pushVoice(int v)
 		if (voiceLRU[i-1] != OPL2_NO_VOICE) { break; }
 	}
 	voiceLRU[i] = v;
-#ifdef false
+#if 0
 	printf("%d %d %d %d %d %d %d %d %d <-- \n", voiceLRU[0], voiceLRU[1], voiceLRU[2],
 		voiceLRU[3], voiceLRU[4], voiceLRU[5], voiceLRU[6], voiceLRU[7], voiceLRU[8]);
 #endif
@@ -559,7 +558,7 @@ void OpulenzInstrument::updatePatch()
 		}
 	}
 
-#ifdef false
+#if 0
 	printf("UPD: %02x %02x %02x %02x %02x -- %02x %02x %02x %02x %02x %02x\n",
 		inst[0], inst[1], inst[2], inst[3], inst[4],
 		inst[5], inst[6], inst[7], inst[8], inst[9], inst[10]);
@@ -638,7 +637,7 @@ void OpulenzInstrument::loadFile(const QString& file)
 			storedname = sbiName;
 		}
 
-#ifdef false
+#if 0
 		printf("SBI: %02x %02x %02x %02x %02x -- %02x %02x %02x %02x %02x %02x\n",
 			(unsigned char)sbiData[36], (unsigned char)sbiData[37], (unsigned char)sbiData[38],
 			(unsigned char)sbiData[39], (unsigned char)sbiData[40], (unsigned char)sbiData[41],
@@ -782,7 +781,7 @@ OpulenzInstrumentView::~OpulenzInstrumentView()
 
 inline QString OpulenzInstrumentView::timeKnobHint(float n)
 {
-	if (n > 1000) { return QString::number(n/1000, 'f', 0) + " s"; }
+	if (n > 1000) { return QString::number(n / 1000, 'f', 0) + " s"; }
 	else if (n > 10) { return QString::number(n, 'f', 0) + " ms"; }
 	else { return QString::number(n, 'f', 1) + " ms"; }
 }
@@ -815,20 +814,22 @@ void OpulenzInstrumentView::updateKnobHints()
 		knob->setHintText(name, QString{" (%1)"}.arg(timeKnobHint(val)));
 	};
 
-	const auto setHintSemitone = [this,&FreqMults](Knob* knob, const QString& name, const FloatModel& model)
+	const auto setHintSemitone = [&](Knob* knob, const QString& name, const FloatModel& model)
 	{
 		const auto mul = FreqMults[static_cast<int>(model.value())];
 		knob->setHintText(name, QString{" (%1 semitones)"}.arg(mul));
 	};
 
-	setTimeHint(op1View.attack, tr("Attack"), AttackTimes, m->m_op1.attack);
-	setTimeHint(op2View.attack, tr("Attack"), AttackTimes, m->m_op2.attack);
-	setTimeHint(op1View.decay, tr("Decay"), DrTimes, m->m_op1.decay);
-	setTimeHint(op2View.decay, tr("Decay"), DrTimes, m->m_op2.decay);
-	setTimeHint(op1View.release, tr("Release"), DrTimes, m->m_op1.release);
-	setTimeHint(op2View.release, tr("Release"), DrTimes, m->m_op2.release);
-	setHintSemitone(op1View.mul, tr("Frequency multiplier"), m->m_op1.mul);
-	setHintSemitone(op2View.mul, tr("Frequency multiplier"), m->m_op2.mul);
+	const auto setHints = [&](OpulenzOperatorControls& opc, OpulenzOperatorModels& opm)
+	{
+		setTimeHint(opc.attack, tr("Attack"), AttackTimes, opm.attack);
+		setTimeHint(opc.decay, tr("Decay"), DrTimes, opm.decay);
+		setTimeHint(opc.release, tr("Release"), DrTimes, opm.release);
+		setHintSemitone(opc.mul, tr("Frequency multiplier"), opm.mul);
+	};
+
+	setHints(op1View, m->m_op1);
+	setHints(op2View, m->m_op2);
 }
 
 void OpulenzInstrumentView::modelChanged()
@@ -841,47 +842,34 @@ void OpulenzInstrumentView::modelChanged()
 	vibDepthButton->setModel(&m->m_vibDepthModel);
 	tremDepthButton->setModel(&m->m_tremDepthModel);
 
-	op1View.attack->setModel(&m->m_op1.attack);
-	op1View.decay->setModel(&m->m_op1.decay);
-	op1View.sustain->setModel(&m->m_op1.sustain);
-	op1View.release->setModel(&m->m_op1.release);
-	op1View.level->setModel(&m->m_op1.level);
-	op1View.scale->setModel(&m->m_op1.scale);
-	op1View.mul->setModel(&m->m_op1.mul);
-	op1View.ksr->setModel(&m->m_op1.ksr);
-	op1View.perc->setModel(&m->m_op1.perc);
-	op1View.trem->setModel(&m->m_op1.trem);
-	op1View.vib->setModel(&m->m_op1.vib);
-	op1View.waveform->setModel(&m->m_op1.waveform);
-
-	op2View.attack->setModel(&m->m_op2.attack);
-	op2View.decay->setModel(&m->m_op2.decay);
-	op2View.sustain->setModel(&m->m_op2.sustain);
-	op2View.release->setModel(&m->m_op2.release);
-	op2View.level->setModel(&m->m_op2.level);
-	op2View.scale->setModel(&m->m_op2.scale);
-	op2View.mul->setModel(&m->m_op2.mul);
-	op2View.ksr->setModel(&m->m_op2.ksr);
-	op2View.perc->setModel(&m->m_op2.perc);
-	op2View.trem->setModel(&m->m_op2.trem);
-	op2View.vib->setModel(&m->m_op2.vib);
-	op2View.waveform->setModel(&m->m_op2.waveform);
-
 	const auto connHint = [this](FloatModel* model)
 	{
 		connect(model, &FloatModel::dataChanged, this, &OpulenzInstrumentView::updateKnobHints);
 	};
 
-	connHint(&m->m_op1.attack);
-	connHint(&m->m_op1.decay);
-	connHint(&m->m_op1.release);
-	connHint(&m->m_op1.mul);
+	const auto connCtrlModels = [&connHint](OpulenzOperatorControls& opc, OpulenzOperatorModels& opm)
+	{
+		opc.attack->setModel(&opm.attack);
+		opc.decay->setModel(&opm.decay);
+		opc.sustain->setModel(&opm.sustain);
+		opc.release->setModel(&opm.release);
+		opc.level->setModel(&opm.level);
+		opc.scale->setModel(&opm.scale);
+		opc.mul->setModel(&opm.mul);
+		opc.ksr->setModel(&opm.ksr);
+		opc.perc->setModel(&opm.perc);
+		opc.trem->setModel(&opm.trem);
+		opc.vib->setModel(&opm.vib);
+		opc.waveform->setModel(&opm.waveform);
 
-	connHint(&m->m_op2.attack);
-	connHint(&m->m_op2.decay);
-	connHint(&m->m_op2.release);
-	connHint(&m->m_op2.mul);
+		connHint(&opm.attack);
+		connHint(&opm.decay);
+		connHint(&opm.release);
+		connHint(&opm.mul);
+	};
 
+	connCtrlModels(op1View, m->m_op1);
+	connCtrlModels(op2View, m->m_op2);
 	updateKnobHints();
 }
 
