@@ -276,8 +276,7 @@ QString DataFile::nameWithExtension( const QString & _fn ) const
 					extension != "mpt" &&
 					extension != "mmpz")
 			{
-				if (ConfigManager::inst()->value("app",
-						"nommpz" ).toInt() == 0)
+				if (ConfigManager::inst()->value("app", "nommpz" ).toInt() == 0)
 				{
 					return _fn + ".mmpz";
 				}

@@ -158,11 +158,11 @@ void EffectView::savePreset()
 	FileDialog sfd(this, tr("Save preset"), "", tr("FX Preset (*.fxp)"));
 
 	QString presetRoot = ConfigManager::inst()->userPresetsDir();
-	if(!QDir(presetRoot).exists())
+	if (!QDir(presetRoot).exists())
 	{
 		QDir().mkdir(presetRoot);
 	}
-	if(!QDir(presetRoot + model()->displayName()).exists())
+	if (!QDir(presetRoot + model()->displayName()).exists())
 	{
 		QDir(presetRoot).mkdir(model()->displayName());
 	}
@@ -202,11 +202,11 @@ void EffectView::loadPreset()
 	FileDialog sfd(this, tr("Load preset"), "", tr("FX Preset (*.fxp)"));
 
 	QString presetRoot = ConfigManager::inst()->userPresetsDir();
-	if(!QDir(presetRoot).exists())
+	if (!QDir(presetRoot).exists())
 	{
 		QDir().mkdir(presetRoot);
 	}
-	if(!QDir(presetRoot + model()->displayName()).exists())
+	if (!QDir(presetRoot + model()->displayName()).exists())
 	{
 		QDir(presetRoot).mkdir(model()->displayName());
 	}
@@ -234,8 +234,8 @@ void EffectView::loadPreset()
 			return;
 		}
 
-		if( presetName.isEmpty() ||
-			presetName != effect()->displayName() )
+		if (presetName.isEmpty()
+			|| presetName != effect()->displayName())
 		{
 			TextFloat::displayMessage(
 				"Preset loading error",

@@ -190,13 +190,13 @@ void MixerChannelView::contextMenuEvent(QContextMenuEvent*)
 	contextMenu->addAction(
 		embed::getIconPixmap("file"),
 		tr("Save effect chain as preset"),
-		this, SLOT(saveChainPreset())
+		this, &MixerChannelView::saveChainPreset
 	);
 
 	contextMenu->addAction(
 		embed::getIconPixmap("file"),
 		tr("Load effect chain from preset"),
-		this, SLOT(loadChainPreset())
+		this, &MixerChannelView::loadChainPreset
 	);
 	contextMenu->addSeparator();
 

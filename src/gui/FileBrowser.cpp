@@ -1241,7 +1241,7 @@ void FileItem::determineFileType()
 		m_type = FileType::Project;
 		m_handling = FileHandling::LoadAsProject;
 	}
-	else if ( ext == "xpf" || ext == "xml")
+	else if (ext == "xpf" || ext == "xml")
 	{
 		m_type = FileType::InstrumentPreset;
 		m_handling = FileHandling::LoadAsInstrumentPreset;

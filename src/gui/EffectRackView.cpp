@@ -267,8 +267,7 @@ void EffectRackView::update()
 	const int EffectViewMargin = 3;
 	m_lastY = EffectViewMargin;
 
-	for( QVector<EffectView *>::Iterator it = m_effectViews.begin();
-					it != m_effectViews.end(); i++ )
+	for (auto it = m_effectViews.begin(); it != m_effectViews.end(); i++)
 	{
 		if( i < view_map.size() && view_map[i] == false )
 		{
