@@ -26,6 +26,7 @@
 
 #include "VstPlugin.h"
 #include "VstSubPluginFeatures.h"
+#include "VstList.h"
 
 #include "Vestige.h"
 
@@ -89,7 +90,9 @@ Plugin::Descriptor Q_DECL_EXPORT  vestige_plugin_descriptor =
 		"so",
 #	endif
 #endif
-		new VstSubPluginFeatures(Plugin::Type::Instrument),
+	VstList::inst()->plugins().empty()
+		? nullptr // makes Vestige appear as a plugin by itself
+		: new VstSubPluginFeatures(Plugin::Type::Instrument),
 } ;
 
 }
