@@ -190,13 +190,13 @@ void MixerChannelView::contextMenuEvent(QContextMenuEvent*)
 	contextMenu->addAction(
 		embed::getIconPixmap("file"),
 		tr("Save effect chain as preset"),
-		this, &MixerChannelView::saveChainPreset
+		this, &MixerChannelView::saveChainToPreset
 	);
 
 	contextMenu->addAction(
 		embed::getIconPixmap("file"),
 		tr("Load effect chain from preset"),
-		this, &MixerChannelView::loadChainPreset
+		this, &MixerChannelView::loadChainFromPreset
 	);
 	contextMenu->addSeparator();
 
@@ -211,7 +211,7 @@ void MixerChannelView::contextMenuEvent(QContextMenuEvent*)
 	delete contextMenu;
 }
 
-void MixerChannelView::saveChainPreset()
+void MixerChannelView::saveChainToPreset()
 {
 	FileDialog sfd(this, tr("Load preset"), "", tr("FX Chain (*.fxc)"));
 	QString workingDir = ConfigManager::inst()->workingDir();
@@ -236,7 +236,7 @@ void MixerChannelView::saveChainPreset()
 	}
 }
 
-void MixerChannelView::loadChainPreset()
+void MixerChannelView::loadChainFromPreset()
 {
 	FileDialog sfd(this, tr("Load preset"), "", tr("FX Chain (*.fxc)"));
 	QString workingDir = ConfigManager::inst()->workingDir();

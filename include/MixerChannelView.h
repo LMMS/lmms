@@ -92,8 +92,8 @@ public slots:
 	void resetColor();
 	void selectColor();
 	void randomizeColor();
-	void saveChainPreset();
-	void loadChainPreset();
+	void saveChainToPreset();
+	void loadChainFromPreset();
 
 private slots:
 	void renameFinished();
