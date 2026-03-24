@@ -42,6 +42,7 @@
 #include "KeyboardShortcuts.h"
 #include "lmms_math.h"
 #include "MidiClipView.h"
+#include "PatternEditor.h"
 #include "PatternClip.h"
 #include "PatternStore.h"
 #include "Song.h"
@@ -119,6 +120,7 @@ ClipView::ClipView( Clip * clip,
 	connect( m_clip, SIGNAL(lengthChanged()),
 			this, SLOT(updateLength()));
 	connect(getGUI()->songEditor()->m_editor, &SongEditor::pixelsPerBarChanged, this, &ClipView::updateLength);
+	connect(getGUI()->patternEditor()->m_editor, &PatternEditor::zoomLevelChanged, this, &ClipView::updateLength);
 	connect( m_clip, SIGNAL(positionChanged()),
 			this, SLOT(updatePosition()));
 	connect( m_clip, SIGNAL(destroyedClip()), this, SLOT(close()));
@@ -314,7 +316,7 @@ void ClipView::updateLength()
 {
 	if( fixedClips() )
 	{
-		setFixedWidth( parentWidget()->width() );
+		setFixedWidth( parentWidget()->width() * getGUI()->patternEditor()->zoomLevel() );
 	}
 	else
 	{

@@ -74,6 +74,7 @@ PatternEditor::PatternEditor(PatternStore* ps) :
 	// Set up zooming model
 	m_zoomingModel->setParent(this);
 	m_zoomingModel->setJournalling(false);
+	connect(m_zoomingModel, SIGNAL(dataChanged()), this, SLOT(zoomingChanged()));
 
 	setFocusPolicy(Qt::StrongFocus);
 	setFocus();
@@ -215,7 +216,7 @@ void PatternEditor::updatePixelsPerBar()
 	setPixelsPerBar(m_maxClipLength != 0
 		? (width() - m_trackHeadWidth) * TimePos::ticksPerBar() / m_maxClipLength
 		: (width() - m_trackHeadWidth));
-	m_timeLine->setPixelsPerBar(pixelsPerBar());
+	m_timeLine->setPixelsPerBar(pixelsPerBar() * (1 + (double)getZoom() / 100));
 }
 
 void PatternEditor::updateMaxSteps()
@@ -277,6 +278,16 @@ void PatternEditor::cloneClip()
 		newTrack->deleteClips();
 		newTrack->unlock();
 	}
+}
+
+
+void PatternEditor::zoomingChanged()
+{
+	int value = m_zoomingModel->value();
+
+	updatePixelsPerBar();
+
+	emit zoomLevelChanged();
 }
 
 

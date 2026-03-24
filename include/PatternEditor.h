@@ -27,6 +27,7 @@
 
 #include "Editor.h"
 #include "TrackContainerView.h"
+#include "AutomatableModel.h"
 
 class QLabel;
 class QScrollBar;
@@ -69,11 +70,19 @@ public slots:
 	void cloneClip();
 	void updateMaxSteps();
 
+signals:
+	void zoomLevelChanged();
+
 protected slots:
 	void dropEvent(QDropEvent * de ) override;
 	void resizeEvent(QResizeEvent* de) override;
 	void updatePosition();
 	void updatePixelsPerBar();
+
+	int getZoom()
+	{
+		return m_zoomingModel->value();
+	}
 
 private:
 	IntModel* m_zoomingModel;
@@ -83,6 +92,9 @@ private:
 	int m_trackHeadWidth;
 	tick_t m_maxClipLength;
 	void makeSteps( bool clone );
+
+private slots:
+	void zoomingChanged();
 
 	friend class PatternEditorWindow;
 };
@@ -96,6 +108,11 @@ public:
 	~PatternEditorWindow() = default;
 
 	QSize sizeHint() const override;
+
+	double zoomLevel() const
+	{
+		return 1 + (double)m_editor->getZoom() / 100;
+	}
 
 	PatternEditor* m_editor;
 
