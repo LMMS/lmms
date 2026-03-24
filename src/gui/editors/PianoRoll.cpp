@@ -4471,6 +4471,10 @@ void PianoRoll::finishRecordNote(const Note & n )
 						n1.quantizeLength(quantization());
 						n1.quantizePos(quantization());
 					}
+					if (n1.length() == 0)
+					{
+						n1.setLength(1);
+					}
 					m_midiClip->addNote(n1, false);
 					update();
 					m_recordingNotes.erase( it );
