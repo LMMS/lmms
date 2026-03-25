@@ -55,6 +55,9 @@ public slots:
 	void moveDown(EffectView* view);
 	void deletePlugin(EffectView* view);
 
+	void saveChainToPreset();
+	void loadChainFromPreset();
+
 	inline EffectChain* fxChain()
 	{
 		return castModel<EffectChain>();
