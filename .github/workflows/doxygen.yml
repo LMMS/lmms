@@ -18,6 +18,10 @@ jobs:
       CCACHE_NOCOMPRESS: 1
       MAKEFLAGS: -j2
     steps:
+      - name: Install doxygen (early on)
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y --install-recommends doxygen
       - name: Configure git
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Check out
@@ -62,12 +66,9 @@ jobs:
           cmake -S . -B build $CMAKE_OPTS
       - name: Build docs
         run: |
-          echo "WE ARE AT $(pwd); CURRENT TREE:"
-          find -type d
-          echo "THEN WE RUN CMAKE WITH THE DOC TARGET"
           cmake --build build --target doc
-          echo "THEN WE LIST STUFF AGAIN"
-          find -type d
+		  echo "IN THE BUILD FOLDER:"
+          (cd build/doc && find -type d)
       - name: Setup Pages
         uses: actions/configure-pages@v2
       - name: Upload generated website
