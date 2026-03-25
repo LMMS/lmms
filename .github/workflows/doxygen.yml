@@ -4,6 +4,10 @@ name: doxygen
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
+permissions:
+  contents: read
+  pages: write
+  id-token: write
 jobs:
   linux-x86_64:
     name: linux-x86_64
@@ -18,10 +22,6 @@ jobs:
       CCACHE_NOCOMPRESS: 1
       MAKEFLAGS: -j2
     steps:
-      - name: Install doxygen (early on)
-        run: |
-          sudo apt-get update -y
-          sudo apt-get install -y --install-recommends doxygen
       - name: Configure git
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Check out
@@ -47,6 +47,7 @@ jobs:
       - name: Install packages
         run: |
           sudo apt-get update -y
+          sudo apt-get install -y --install-recommends doxygen
           sudo apt-get install -y --no-install-recommends \
             $(xargs < .github/workflows/deps-ubuntu-24.04-gcc.txt)
           sudo apt-get install -y --install-recommends g++-multilib gcc-multilib winehq-devel wine-devel-dev
@@ -65,10 +66,7 @@ jobs:
           source /opt/qt5*/bin/qt5*-env.sh || true
           cmake -S . -B build $CMAKE_OPTS
       - name: Build docs
-        run: |
-          cmake --build build --target doc
-          echo "IN THE BUILD FOLDER:"
-          (cd build/doc && find -type d)
+        run: cmake --build build --target doc
       - name: Setup Pages
         uses: actions/configure-pages@v2
       - name: Upload generated website
