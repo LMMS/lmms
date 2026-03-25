@@ -55,8 +55,8 @@ public slots:
 	void moveDown(EffectView* view);
 	void deletePlugin(EffectView* view);
 
-	void saveChainToPreset();
-	void loadChainFromPreset();
+	void savePreset();
+	void loadPreset();
 
 	inline EffectChain* fxChain()
 	{
@@ -77,7 +77,7 @@ protected:
 	void dropEvent(QDropEvent* event) override;
 
 private:
-	void addFromPreset(const QString& filePath);
+	void addEffectFromPreset(const QString& filePath);
 	void modelChanged() override;
 	QSize sizeHint() const override;
 	QSize minimumSizeHint() const override { return sizeHint(); }

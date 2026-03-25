@@ -159,7 +159,7 @@ void EffectChain::removeEffect( Effect * _effect )
 
 
 
-void EffectChain::loadChain(const QString& filePath)
+void EffectChain::loadPreset(const QString& filePath)
 {
 	DataFile dataFile(filePath);
 	const QDomElement content = dataFile.content();
