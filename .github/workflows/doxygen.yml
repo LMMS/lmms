@@ -61,10 +61,12 @@ jobs:
           source /opt/qt5*/bin/qt5*-env.sh || true
           cmake -S . -B build $CMAKE_OPTS
       - name: Build docs
-        run: cmake --build build --target doc
-      - name: Please is this working
         run: |
-          echo "please?"
+          echo "WE ARE AT $(pwd); CURRENT TREE:"
+          find -type d
+          echo "THEN WE RUN CMAKE WITH THE DOC TARGET"
+          cmake --build build --target doc
+          echo "THEN WE LIST STUFF AGAIN"
           find -type d
       - name: Setup Pages
         uses: actions/configure-pages@v2
