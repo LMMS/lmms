@@ -266,7 +266,7 @@ public:
 	 *
 	 * If @a dst has 1 channel, the audio periods are averaged to mono.
 	 * If @a dst has 2 channels, the audio periods are directly copied.
-	 * If @a dst has more than 2 channels, the stero channels are copied and the rest are zero-filled.
+	 * If @a dst has more than 2 channels, the stereo channels are copied and the rest are zero-filled.
 	 *
 	 * @param dst An audio buffer view to write into. Both interleaved and planar overloads are provided.
 	 */
