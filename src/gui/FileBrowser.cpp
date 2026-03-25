@@ -114,6 +114,10 @@ FileBrowser::FileBrowser(Type type, const QString& directories, const QString& f
 
 	auto reload_btn = new QPushButton(embed::getIconPixmap("reload"), QString(), searchWidget);
 	reload_btn->setToolTip( tr( "Refresh list" ) );
+
+    m_fileBrowserTreeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(m_fileBrowserTreeWidget, &QTreeWidget::customContextMenuRequested, this, &FileBrowser::openContextMenu);
+
 	connect( reload_btn, SIGNAL(clicked()), this, SLOT(reloadTree()));
 
 	searchWidgetLayout->addWidget( m_filterEdit );
