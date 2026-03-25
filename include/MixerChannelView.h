@@ -83,8 +83,6 @@ public:
 	QColor strokeInnerInactive() const { return m_strokeInnerInactive; }
 	void setStrokeInnerInactive(const QColor& c) { m_strokeInnerInactive = c; }
 
-	EffectRackView *effectRackView() const { return m_effectRackView; }
-
 	Fader* fader() const { return m_fader; }
 
 public slots:
