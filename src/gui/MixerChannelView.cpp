@@ -52,8 +52,6 @@
 #include "PeakIndicator.h"
 #include "SendButtonIndicator.h"
 #include "Song.h"
-#include "FileDialog.h"
-#include "DataFile.h"
 
 namespace lmms::gui {
 MixerChannelView::MixerChannelView(QWidget* parent, MixerView* mixerView, int channelIndex)
