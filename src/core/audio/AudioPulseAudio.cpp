@@ -231,7 +231,7 @@ void AudioPulseAudio::streamWriteCallback(pa_stream*, size_t)
 	}
 	else
 	{
-		audioEngine()->renderNextBuffer({reinterpret_cast<float*>(buf), channels(), numFrames});
+		audioEngine()->renderNextBuffer({static_cast<float*>(buf), channels(), numFrames});
 	}
 
 	pa_stream_write(m_s, buf, maxBufSizeInBytes, nullptr, 0, PA_SEEK_RELATIVE);
