@@ -219,8 +219,7 @@ void AudioPulseAudio::streamWriteCallback(pa_stream*, size_t)
 	auto buf = static_cast<void*>(nullptr);
 	auto maxBufSizeInBytes = audioEngine()->framesPerAudioBuffer() * channels() * sizeof(float);
 
-	pa_stream_begin_write(m_s, &buf, &maxBufSizeInBytes);
-	if (!buf) { return; }
+	if (pa_stream_begin_write(m_s, &buf, &maxBufSizeInBytes) != 0 || !buf) { return; }
 
 	const auto numSamples = maxBufSizeInBytes / sizeof(float);
 	const auto numFrames = numSamples / channels();
