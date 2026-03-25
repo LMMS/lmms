@@ -48,14 +48,6 @@ jobs:
           sudo apt-get install -y --install-recommends g++-multilib gcc-multilib winehq-devel wine-devel-dev
           sudo apt-get install -y --install-recommends \
             $(xargs < .github/workflows/deps-ubuntu-24.04-fltk.txt)
-      - name: Cache ccache data
-        uses: actions/cache@v3
-        with:
-          key: ccache-${{ github.job }}-${{ github.ref }}-${{ github.run_id }}
-          restore-keys: |
-            ccache-${{ github.job }}-${{ github.ref }}-
-            ccache-${{ github.job }}-
-          path: ~/.ccache
       - name: Configure fltk
         run: |
           cmake -S fltk -B fltk/build -DFLTK_BUILD_SHARED_LIBS=ON -DFLTK_BACKEND_WAYLAND=ON \
@@ -66,19 +58,16 @@ jobs:
           sudo cmake --install fltk/build --prefix /usr
       - name: Configure
         run: |
-          ccache --zero-stats
           source /opt/qt5*/bin/qt5*-env.sh || true
-          cmake -S . \
-                -B build \
-                $CMAKE_OPTS
-      - name: Build
+          cmake -S . -B build $CMAKE_OPTS
+      - name: Build docs
         run: cmake --build build --target doc
-      - name: Setup Pages
-        uses: actions/configure-pages@v2
-      - name: Build
+      - name: Please is this working
         run: |
           echo "please?"
           find -type d
+      - name: Setup Pages
+        uses: actions/configure-pages@v2
       - name: Upload generated website
         uses: actions/upload-pages-artifact@v3
         with:
