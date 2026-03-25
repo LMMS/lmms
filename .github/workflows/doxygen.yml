@@ -67,7 +67,7 @@ jobs:
       - name: Build docs
         run: |
           cmake --build build --target doc
-		  echo "IN THE BUILD FOLDER:"
+          echo "IN THE BUILD FOLDER:"
           (cd build/doc && find -type d)
       - name: Setup Pages
         uses: actions/configure-pages@v2
