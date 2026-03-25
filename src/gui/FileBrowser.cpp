@@ -81,6 +81,34 @@ enum TreeWidgetItemTypes
 	TypeDirectoryItem
 } ;
 
+void FileBrowser::openContextMenu(const QPoint & pos)
+{
+    QModelIndex index = m_fileBrowserTreeWidget->indexAt(pos);
+    if (!index.isValid()) {
+        return;
+    }
+
+    QString filePath = index.data(Qt::UserRole).toString();
+    if (filePath.isEmpty()) {
+        return;
+    }
+
+    QMenu menu;
+    QAction * openAction = menu.addAction(tr("Open"));
+    QAction * sendToNewTrackAction = menu.addAction(tr("Send to new instrument track"));
+
+    QAction * selectedAction = menu.exec_(m_fileBrowserTreeWidget->mapToGlobal(pos));
+    if (selectedAction == openAction) {
+        openFile(filePath);
+    } else if (selectedAction == sendToNewTrackAction) {
+        if (filePath.endsWith(".lmms")) {
+            sendToNewTrackAction->setEnabled(false);
+        } else {
+            openFile(filePath);
+            // Implement logic to send to new track
+        }
+}
+
 FileBrowser::FileBrowser(Type type, const QString& directories, const QString& filter, const QString& title, const QPixmap& pm,
 	QWidget* parent, bool dirs_as_items, const QString& userDir, const QString& factoryDir)
 	: SideBarWidget(title, pm, parent)
@@ -114,10 +142,6 @@ FileBrowser::FileBrowser(Type type, const QString& directories, const QString& f
 
 	auto reload_btn = new QPushButton(embed::getIconPixmap("reload"), QString(), searchWidget);
 	reload_btn->setToolTip( tr( "Refresh list" ) );
-
-    m_fileBrowserTreeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(m_fileBrowserTreeWidget, &QTreeWidget::customContextMenuRequested, this, &FileBrowser::openContextMenu);
-
 	connect( reload_btn, SIGNAL(clicked()), this, SLOT(reloadTree()));
 
 	searchWidgetLayout->addWidget( m_filterEdit );
