@@ -77,8 +77,8 @@ jobs:
         uses: actions/configure-pages@v2
       - name: Build
         run: |
-		  echo "please?"
-		  find -type d
+          echo "please?"
+          find -type d
       - name: Upload generated website
         uses: actions/upload-pages-artifact@v3
         with:
