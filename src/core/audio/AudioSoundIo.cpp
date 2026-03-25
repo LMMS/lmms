@@ -268,7 +268,6 @@ void AudioSoundIo::writeCallback(int frameCountMin, int frameCountMax)
 		if (!frameCount) { break; }
 
 		auto buffers = std::array<float*, SOUNDIO_MAX_CHANNELS>{};
-		buffers.fill(nullptr);
 
 		for (auto i = 0; i < layout->channel_count; ++i)
 		{
