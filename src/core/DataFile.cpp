@@ -220,7 +220,7 @@ bool DataFile::validate( QString extension )
 		}
 		break;
 	case Type::EffectSettings:
-		if (extension == "fxp")
+		if (extension == "fxp" || extension == "fxc")
 		{
 			return true;
 		}

@@ -123,7 +123,7 @@ EffectRackView::~EffectRackView()
 void EffectRackView::dragEnterEvent(QDragEnterEvent* event)
 {
 	const QString type = StringPairDrag::decodeKey(event);
-	if (type == "effectpresetfile")
+	if (type == "effectpresetfile" || type == "chainpresetfile")
 	{
 		event->acceptProposedAction();
 	}
@@ -142,6 +142,11 @@ void EffectRackView::dropEvent(QDropEvent* event)
 	if (type == "effectpresetfile")
 	{
 		addFromPreset(filePath);
+		event->accept();
+	}
+	else if (type == "chainpresetfile")
+	{
+		fxChain()->loadChain(filePath);
 		event->accept();
 	}
 	else
@@ -173,7 +178,7 @@ void EffectRackView::addFromPreset(const QString& filePath)
 void EffectRackView::saveChainToPreset()
 {
 	FileDialog sfd(this, tr("Save preset"), "", tr("FX Chain (*.fxc)"));
-	QString workingDir = ConfigManager::inst()->workingDir();
+	QString workingDir = ConfigManager::inst()->userPresetsDir();
 
 	sfd.setAcceptMode(FileDialog::AcceptSave);
 	sfd.setDirectory(workingDir);
@@ -198,7 +203,7 @@ void EffectRackView::saveChainToPreset()
 void EffectRackView::loadChainFromPreset()
 {
 	FileDialog sfd(this, tr("Load preset"), "", tr("FX Chain (*.fxc)"));
-	QString workingDir = ConfigManager::inst()->workingDir();
+	QString workingDir = ConfigManager::inst()->userPresetsDir();
 
 	sfd.setAcceptMode(FileDialog::AcceptOpen);
 	sfd.setDirectory(workingDir);
@@ -210,10 +215,7 @@ void EffectRackView::loadChainFromPreset()
 		&& !sfd.selectedFiles().first().isEmpty())
 	{
 		QString f = sfd.selectedFiles()[0];
-		DataFile dataFile(f);
-
-		const QDomElement content = dataFile.content();
-		fxChain()->loadSettings(content);
+		fxChain()->loadChain(f);
 	}
 }
 

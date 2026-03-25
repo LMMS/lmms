@@ -247,6 +247,7 @@ public:
 		Project,
 		InstrumentPreset,
 		EffectPreset,
+		EffectChainPreset,
 		Sample,
 		SoundFont,
 		Patch,
@@ -261,6 +262,7 @@ public:
 		LoadAsProject,
 		LoadAsInstrumentPreset,
 		LoadAsEffectPreset,
+		LoadAsEffectChainPreset,
 		LoadByPlugin,
 		ImportAsProject
 	} ;

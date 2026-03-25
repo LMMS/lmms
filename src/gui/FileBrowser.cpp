@@ -659,7 +659,8 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 		// when right clicking on effect presets in the browser.
 		//
 		// TODO: Restructure this method in the future so each file type is handled separately.
-		if (file->type() == FileItem::FileType::EffectPreset)
+		if (file->type() == FileItem::FileType::EffectPreset
+			|| file->type() == FileItem::FileType::EffectChainPreset)
 		{
 			break;
 		}
@@ -883,6 +884,10 @@ void FileBrowserTreeWidget::mouseMoveEvent(QMouseEvent* me)
 					break;
 				case FileItem::FileType::EffectPreset:
 					new StringPairDrag("effectpresetfile", f->fullName(),
+							embed::getIconPixmap("preset_file"), this);
+					break;
+				case FileItem::FileType::EffectChainPreset:
+					new StringPairDrag("chainpresetfile", f->fullName(),
 							embed::getIconPixmap("preset_file"), this);
 					break;
 				case FileItem::FileType::Sample:
@@ -1206,6 +1211,7 @@ void FileItem::initPixmaps()
 			break;
 		case FileType::InstrumentPreset:
 		case FileType::EffectPreset:
+		case FileType::EffectChainPreset:
 			setIcon(0, s_presetFilePixmap);
 			break;
 		case FileType::SoundFont:
@@ -1250,6 +1256,11 @@ void FileItem::determineFileType()
 	{
 		m_type = FileType::EffectPreset;
 		m_handling = FileHandling::LoadAsEffectPreset;
+	}
+	else if (ext == "fxc")
+	{
+		m_type = FileType::EffectChainPreset;
+		m_handling = FileHandling::LoadAsEffectChainPreset;
 	}
 	else if (ext == "xiz" && !getPluginFactory()->pluginSupportingExtension(ext).isNull())
 	{
@@ -1326,11 +1337,11 @@ QString FileItem::extension(const QString & file )
 QString FileItem::defaultFilters()
 {
 	const auto projectFilters = QStringList{"*.mmp", "*.mpt", "*.mmpz"};
-	const auto presetFilters = QStringList{"*.xpf", "*.xml", "*.xiz", "*.lv2", "*.fxp"};
+	const auto presetFilters = QStringList{"*.xpf", "*.xml", "*.xiz", "*.lv2", "*.fxp", ".fxc"};
 	const auto soundFontFilters = QStringList{"*.sf2", "*.sf3"};
 	const auto patchFilters = QStringList{"*.pat"};
 	const auto midiFilters = QStringList{"*.mid", "*.midi", "*.rmi"};
-	
+
 	auto vstPluginFilters = QStringList{"*.dll"};
 #ifdef LMMS_BUILD_LINUX
 	vstPluginFilters.append("*.so");

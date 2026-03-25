@@ -61,6 +61,7 @@ public:
 
 	void appendEffect( Effect * _effect );
 	void removeEffect( Effect * _effect );
+	void loadChain(const QString& filePath);
 	void moveDown( Effect * _effect );
 	void moveUp( Effect * _effect );
 	bool processAudioBuffer(AudioBuffer& buffer);
