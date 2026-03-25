@@ -100,8 +100,8 @@ EffectRackView::EffectRackView( EffectChain* model, QWidget* parent ) :
 	effectsLayout->addLayout(rowLayout);
 
 	connect( addButton, SIGNAL(clicked()), this, SLOT(addEffect()));
-	connect( savePresetButton, SIGNAL(clicked()), this, SLOT(saveChainToPreset()));
-	connect( loadPresetButton, SIGNAL(clicked()), this, SLOT(loadChainFromPreset()));
+	connect( savePresetButton, SIGNAL(clicked()), this, SLOT(savePreset()));
+	connect( loadPresetButton, SIGNAL(clicked()), this, SLOT(loadPreset()));
 
 	setAcceptDrops(true);
 
