@@ -270,8 +270,7 @@ QString DataFile::nameWithExtension( const QString & _fn ) const
 					extension != "mpt" &&
 					extension != "mmpz" )
 			{
-				if( ConfigManager::inst()->value( "app",
-						"nommpz" ).toInt() == 0 )
+				if (!ConfigManager::inst()->config.app.nommpz)
 				{
 					return _fn + ".mmpz";
 				}
@@ -422,7 +421,7 @@ bool DataFile::writeFile(const QString& filename, bool withResources)
 		return false;
 	}
 
-	if (ConfigManager::inst()->value("app", "disablebackup").toInt())
+	if (ConfigManager::inst()->config.app.disablebackup)
 	{
 		// remove current file
 		QFile::remove(fullName);

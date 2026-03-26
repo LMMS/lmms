@@ -673,11 +673,10 @@ int main( int argc, char * * argv )
 	ConfigManager::inst()->loadConfigFile(configFile);
 
 	// Hidden settings
-	MixHelpers::setNaNHandler( ConfigManager::inst()->value( "app",
-						"nanhandler", "1" ).toInt() );
+	MixHelpers::setNaNHandler(ConfigManager::inst()->config.app.nanhandler);
 
 	// set language
-	QString pos = ConfigManager::inst()->value( "app", "language" );
+	QString pos = QString::fromStdString(ConfigManager::inst()->config.app.language);
 	if( pos.isEmpty() )
 	{
 		pos = QLocale::system().name().left( 2 );
@@ -777,8 +776,7 @@ int main( int argc, char * * argv )
 
 		bool recoveryFilePresent = QFileInfo( recoveryFile ).exists() &&
 				QFileInfo( recoveryFile ).isFile();
-		bool autoSaveEnabled =
-			ConfigManager::inst()->value( "ui", "enableautosave" ).toInt();
+		bool autoSaveEnabled = ConfigManager::inst()->config.ui.enableautosave;
 		if( recoveryFilePresent )
 		{
 			QMessageBox mb;

@@ -1087,7 +1087,7 @@ void InstrumentTrack::autoAssignMidiDevice(bool assign)
 		s_autoAssignedTrack = this;
 	}
 
-	const QString &device = ConfigManager::inst()->value("midi", "midiautoassign");
+	const std::string &device = ConfigManager::inst()->config.midi.midiautoassign;
 	if ( Engine::audioEngine()->midiClient()->isRaw() && device != "none" )
 	{
 		m_midiPort.setReadable( assign );
@@ -1097,7 +1097,7 @@ void InstrumentTrack::autoAssignMidiDevice(bool assign)
 	// Check if the device exists
 	if ( Engine::audioEngine()->midiClient()->readablePorts().indexOf(device) >= 0 )
 	{
-		m_midiPort.subscribeReadablePort(device, assign);
+		m_midiPort.subscribeReadablePort(QString::fromStdString(device), assign);
 		m_hasAutoMidiDev = assign;
 	}
 }

@@ -74,7 +74,7 @@ static thread_local bool s_renderingThread = false;
 AudioEngine::AudioEngine( bool renderOnly ) :
 	m_renderOnly( renderOnly ),
 	m_framesPerPeriod( DEFAULT_BUFFER_SIZE ),
-	m_baseSampleRate(std::max(ConfigManager::inst()->value("audioengine", "samplerate").toInt(), SUPPORTED_SAMPLERATES.front())),
+	m_baseSampleRate(std::max(static_cast<int>(ConfigManager::inst()->config.audioengine.samplerate), SUPPORTED_SAMPLERATES.front())),
 	m_inputBufferRead( 0 ),
 	m_inputBufferWrite( 1 ),
 	m_outputBufferRead(nullptr),
@@ -105,16 +105,19 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 	if( renderOnly == false )
 	{
 		m_framesPerPeriod = 
+<<<<<<< HEAD
 			( f_cnt_t ) ConfigManager::inst()->value( "audioengine", "framesperaudiobuffer" ).toInt();
+=======
+			( f_cnt_t ) ConfigManager::inst()->config.audioengine.framesperaudiobuffer;
+>>>>>>> 1f96ba850 (update more files, see diff)
 
 		// if the value read from user configuration is not set or
 		// lower than the minimum allowed, use the default value and
 		// save it to the configuration
 		if( m_framesPerPeriod < MINIMUM_BUFFER_SIZE )
 		{
-			ConfigManager::inst()->setValue( "audioengine",
-						"framesperaudiobuffer",
-						QString::number( DEFAULT_BUFFER_SIZE ) );
+			ConfigManager::inst()->config.audioengine.framesperaudiobuffer = DEFAULT_BUFFER_SIZE;
+			ConfigManager::inst()->configUpdated();
 
 			m_framesPerPeriod = DEFAULT_BUFFER_SIZE;
 		}
@@ -787,7 +790,7 @@ AudioDevice * AudioEngine::tryAudioDevices()
 {
 	bool success_ful = false;
 	AudioDevice * dev = nullptr;
-	QString dev_name = ConfigManager::inst()->value( "audioengine", "audiodev" );
+	QString dev_name = QString::fromStdString(ConfigManager::inst()->config.audioengine.audiodev);
 	if( !isAudioDevNameValid( dev_name ) )
 	{
 		dev_name = "";
@@ -933,7 +936,7 @@ AudioDevice * AudioEngine::tryAudioDevices()
 
 MidiClient * AudioEngine::tryMidiClients()
 {
-	QString client_name = ConfigManager::inst()->value( "audioengine", "mididev" );
+	QString client_name = QString::fromStdString(ConfigManager::inst()->config.audioengine.mididev);
 	if( !isMidiDevNameValid( client_name ) )
 	{
 		client_name = "";

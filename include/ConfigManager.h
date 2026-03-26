@@ -399,7 +399,8 @@ public:
 	void createWorkingDir();
 
 signals:
-	void valueChanged( QString cls, QString attribute, QString value );
+	void valueChanged(QString cls, QString attribute, QString value);
+	void configUpdated();
 	void favoritesChanged();
 
 private:
