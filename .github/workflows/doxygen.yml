@@ -13,10 +13,6 @@ jobs:
     name: linux-x86_64
     runs-on: ubuntu-22.04
     env:
-      CMAKE_OPTS: >-
-        -DUSE_WERROR=ON
-        -DUSE_COMPILE_CACHE=ON
-        -DWANT_DEBUG_CPACK=ON
       MAKEFLAGS: -j2
     steps:
       - name: Configure git
@@ -29,7 +25,8 @@ jobs:
       - name: Install packages
         run: |
           sudo apt-get update -y
-          sudo apt-get install -y --no-install-recommends binutils doxygen cmake
+          sudo apt-get install -y --no-install-recommends $(xargs < .github/workflows/deps-ubuntu-24.04-gcc.txt)
+          sudo apt-get install -y --no-install-recommends doxygen
       - name: Configure
         run: |
           source /opt/qt5*/bin/qt5*-env.sh || true
