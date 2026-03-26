@@ -26,36 +26,11 @@ jobs:
         with:
           fetch-depth: 0
           submodules: recursive
-      - name: Clone fltk
-        uses: actions/checkout@v4
-        with:
-          repository: fltk/fltk
-          path: fltk
-          ref: 27d991f046bdebb12bfd58f7c05a19f135979c29
-          fetch-depth: 1
-      - name: Configure winehq
-        run: |
-          sudo dpkg --add-architecture i386
-          sudo mkdir -pm755 /etc/apt/keyrings
-          wget -O - https://dl.winehq.org/wine-builds/winehq.key | \
-          sudo gpg --dearmor -o /etc/apt/keyrings/winehq-archive.key -
-          sudo wget -NP /etc/apt/sources.list.d/ \
-          https://dl.winehq.org/wine-builds/ubuntu/dists/$(lsb_release -cs)/winehq-$(lsb_release -cs).sources
       - name: Install packages
         run: |
           sudo apt-get update -y
-          sudo apt-get install -y --install-recommends doxygen
+          sudo apt-get install -y --no-install-recommends binutils doxygen
           sudo apt-get install -y --no-install-recommends $(xargs < .github/workflows/deps-ubuntu-24.04-gcc.txt)
-          sudo apt-get install -y --install-recommends g++-multilib gcc-multilib winehq-devel wine-devel-dev
-          sudo apt-get install -y --install-recommends $(xargs < .github/workflows/deps-ubuntu-24.04-fltk.txt)
-      # - name: Configure fltk
-      #   run: |
-      #     cmake -S fltk -B fltk/build -DFLTK_BUILD_SHARED_LIBS=ON -DFLTK_BACKEND_WAYLAND=ON \
-      #       -DFLTK_USE_LIBDECOR_GTK=OFF -DFLTK_BUILD_TEST=OFF -DFLTK_BUILD_GL=OFF
-      # - name: Install fltk
-      #   run: |
-      #     cmake --build fltk/build
-      #     sudo cmake --install fltk/build --prefix /usr
       - name: Configure
         run: |
           source /opt/qt5*/bin/qt5*-env.sh || true
