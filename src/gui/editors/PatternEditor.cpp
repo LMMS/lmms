@@ -77,6 +77,12 @@ PatternEditor::PatternEditor(PatternStore* ps) :
 	m_zoomingModel->setJournalling(false);
 	connect(m_zoomingModel, SIGNAL(dataChanged()), this, SLOT(zoomingChanged()));
 
+	connect(Engine::getSong(), &Song::stopped, this, [this]()
+	{
+		// Show zoom controls again as they are hidden during playback
+		emit zoomControlsVisibilityChanged( m_maxClipLength / TimePos::ticksPerBar() > 1 );
+	});
+
 	// Set up horizontal scroll bar
 	m_leftRightScroll = new QScrollBar( Qt::Horizontal, this );
 	m_leftRightScroll->setMinimum(0);
@@ -432,13 +438,20 @@ double PatternEditorWindow::horizontalScrollValue() const
 
 void PatternEditorWindow::play()
 {
+	showZoomControls( false );
+
 	if (Engine::getSong()->playMode() != Song::PlayMode::Pattern)
 	{
+		m_zoomingSlider->setValue(0);
 		Engine::getSong()->playPattern();
 	}
 	else
 	{
 		Engine::getSong()->togglePause();
+		if ( Engine::getSong()->isPaused())
+		{
+			showZoomControls( true );
+		}
 	}
 }
 
@@ -451,8 +464,11 @@ void PatternEditorWindow::stop()
 
 void PatternEditorWindow::showZoomControls( bool show )
 {
-	m_zoomIconAction->setVisible( show );
-	m_zoomSliderAction->setVisible( show );
+	if ( !Engine::getSong()->isPlaying() )
+	{
+		m_zoomIconAction->setVisible( show );
+		m_zoomSliderAction->setVisible( show );
+	}
 }
 
 
