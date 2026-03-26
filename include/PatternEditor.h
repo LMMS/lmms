@@ -77,7 +77,7 @@ signals:
 
 protected:
 
-	double getZoom()
+	double getZoom() const
 	{
 		// The zoom level is calculated such as exactly one bar is visible when the zoom slider is at its maximum value,
 		// and the whole pattern is visible when the zoom slider is at its minimum value.

@@ -393,7 +393,6 @@ PatternEditorWindow::PatternEditorWindow(PatternStore* ps) :
 	m_zoomingSlider->setFixedSize(100, 26);
 	m_zoomingSlider->setToolTip(tr("Zoom"));
 	m_zoomingSlider->setContextMenuPolicy(Qt::NoContextMenu);
-	connect(m_editor->m_zoomingModel, SIGNAL(dataChanged()), this, SLOT(updateSnapLabel()));
 	connect(m_editor, &PatternEditor::zoomControlsVisibilityChanged, this, &PatternEditorWindow::showZoomControls);
 
 	m_zoomIconAction =  trackAndStepActionsToolBar->addWidget(zoom_lbl);
