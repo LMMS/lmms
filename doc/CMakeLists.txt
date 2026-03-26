@@ -1,7 +1,7 @@
 FIND_PACKAGE(Doxygen)
 
-if(DOXYGEN_FOUND)
-	set(INPUTDIRS 
+if(Doxygen_FOUND OR DOXYGEN_FOUND)
+	set(INPUTDIRS
 		"\"${CMAKE_CURRENT_SOURCE_DIR}../src/core\"
 		\"${CMAKE_CURRENT_SOURCE_DIR}../src/gui\"
 		\"${CMAKE_CURRENT_SOURCE_DIR}../src/tracks\"
@@ -14,7 +14,9 @@ if(DOXYGEN_FOUND)
 		WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
 		COMMENT "Generating API documentation with Doxygen"
 		SOURCES Doxyfile.in)
-endif(DOXYGEN_FOUND)
+else
+	message(FATAL_ERROR
+		"Doxygen was not found - could not generate docs.")
+endif()
 
 ADD_SUBDIRECTORY(bash-completion)
-
