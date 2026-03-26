@@ -97,8 +97,6 @@ public:
 public slots:
 	void execConnectionDialog();
 	void removeConnection();
-	void editSongGlobalAutomation();
-	void removeSongGlobalAutomation();
 
 private slots:
 	/// Copy the model's value to the clipboard.
