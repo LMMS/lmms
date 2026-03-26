@@ -548,8 +548,8 @@ void Lb302Synth::processNote(NotePlayHandle* nph)
 	if (nph->m_pluginData != this)
 	{
 		m_playingNote = nph;
-		m_newFreq = true;
 		nph->m_pluginData = this;
+		m_newFreq = true;
 	}
 
 	m_releaseFrame = std::max(m_releaseFrame, nph->framesLeft() + nph->offset());
@@ -557,6 +557,7 @@ void Lb302Synth::processNote(NotePlayHandle* nph)
 	if (!m_playingNote && !nph->isReleased() && m_releaseFrame > 0)
 	{
 		m_playingNote = nph;
+		nph->m_pluginData = this;
 		if (m_slideToggle.value()) { m_slideInc = phaseInc(nph->frequency()); }
 	}
 

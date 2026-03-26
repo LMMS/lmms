@@ -218,11 +218,11 @@ private:
 
 	// Envelope State
 	float m_vca = 0.f; //!< Amplifier coefficient.
-	float m_noteVolume; //!< The per-note volume (velocity) of the most recent note, within [0, 1]
-	panning_t m_notePan; //!< The per-note panning of the most recent note
+	float m_noteVolume = 1.f; //!< The per-note volume (velocity) of the most recent note, within [0, 1]
+	panning_t m_notePan = DefaultPanning; //!< The per-note panning of the most recent note
 	VcaMode m_vcaMode = VcaMode::NeverPlayed;
 
-	NotePlayHandle* m_playingNote;
+	NotePlayHandle* m_playingNote = nullptr;
 
 	//! @brief The maximum number of note events Lb302 can process per audio buffer.
 	//!
