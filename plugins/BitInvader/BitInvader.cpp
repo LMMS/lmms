@@ -45,7 +45,7 @@
 namespace lmms
 {
 
-inline constexpr std::size_t wavetableSize = 200;
+inline constexpr std::size_t WavetableSize = 200;
 
 extern "C"
 {
@@ -75,8 +75,8 @@ PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* m, void*)
 
 BitInvader::BitInvader(InstrumentTrack* instrumentTrack)
 	: Instrument(instrumentTrack, &bitinvader_plugin_descriptor)
-	, m_sampleLength(wavetableSize, 4, wavetableSize, 1, this, tr("Sample length"))
-	, m_graph(-1.f, 1.f, wavetableSize, this)
+	, m_sampleLength(WavetableSize, 4, WavetableSize, 1, this, tr("Sample length"))
+	, m_graph(-1.f, 1.f, WavetableSize, this)
 	, m_interpolation(false, this, tr("Interpolation"))
 	, m_normalizeMode(this, tr("Normalize"))
 {
@@ -100,11 +100,11 @@ BitInvader::BitInvader(InstrumentTrack* instrumentTrack)
 
 void BitInvader::saveSettings(QDomDocument& doc, QDomElement& el)
 {
-	el.setAttribute("version", "0.2");
+	el.setAttribute("version", "1");
 	m_sampleLength.saveSettings(doc, el, "sampleLength");
 
 	QString sampleString;
-	base64::encode(reinterpret_cast<const char*>(m_graph.samples()), wavetableSize * sizeof(float), sampleString);
+	base64::encode(reinterpret_cast<const char*>(m_graph.samples()), WavetableSize * sizeof(float), sampleString);
 	el.setAttribute("sampleShape", sampleString);
 
 	m_interpolation.saveSettings(doc, el, "interpolation");
@@ -131,8 +131,7 @@ void BitInvader::loadSettings(const QDomElement& el)
 
 	m_interpolation.loadSettings(el, "interpolation");
 	m_normalizeMode.loadSettings(el, "normalize");
-	// If normalization was enabled on an old preset, change it to "Legacy" normalization mode
-	if (el.attribute("version") == "0.1") // TODO: Make new version 1 instead, cast to int and compare < 1
+	if (el.attribute("version").toInt() < 1)
 	{
 		m_normalizeMode.setValue(m_normalizeMode.value() * static_cast<int>(NormalizeMode::Legacy));
 	}
@@ -163,7 +162,7 @@ void BitInvader::normalize()
 		m_graph.samples(),
 		m_normalizeMode.value() == static_cast<int>(NormalizeMode::LengthOnly)
 			? static_cast<std::size_t>(m_sampleLength.value())
-			: wavetableSize
+			: WavetableSize
 		};
 
 	if (m_normalizeMode.value() == static_cast<int>(NormalizeMode::Legacy))
