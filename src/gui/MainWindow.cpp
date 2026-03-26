@@ -1271,7 +1271,6 @@ bool MainWindow::eventFilter(QObject* watched, QEvent* event)
 			case Qt::PopupFocusReason:
 			case Qt::OtherFocusReason:
 				return true;
-				break;
 			default:
 				break;
 			}
@@ -1280,16 +1279,14 @@ bool MainWindow::eventFilter(QObject* watched, QEvent* event)
 		return false;
 	};
 
-	// Clear modifiers when the window has been unfocused
-	// (Install event filter on the window itself)
+	// Clear modifiers when the window has been unfocused (install event filter on the window itself)
 	if (dynamic_cast<MainWindow*>(watched) != nullptr && isWinDeactivate(event))
 	{
 		clearKeyModifiers();
 		return QObject::eventFilter(watched, event);
 	}
 
-	// Block tooltips globally
-	// (Install event filter on QApplication instance)
+	// Block tooltips globally (install event filter on QApplication instance)
 	if (event->type() == QEvent::ToolTip) { return true; }
 
 	return QObject::eventFilter(watched, event);
