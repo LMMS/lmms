@@ -498,7 +498,8 @@ void MidiClipView::wheelEvent(QWheelEvent * we)
 	const auto pos = we->position().toPoint();
 	if(m_clip->m_clipType == MidiClip::Type::BeatClip &&
 				(fixedClips() || pixelsPerBar() >= 96) &&
-				pos.y() > height() - m_stepBtnOff.height())
+				pos.y() > height() - m_stepBtnOff.height() &&
+				!(we->modifiers() & (Qt::ControlModifier | Qt::ShiftModifier)))
 	{
 //	get the step number that was wheeled on and
 //	do calculations in floats to prevent rounding errors...

@@ -92,6 +92,8 @@ protected slots:
 	void updateScrollBar();
 
 private:
+	void wheelEvent( QWheelEvent * we ) override;
+
 	IntModel* m_zoomingModel;
 	QScrollBar* m_leftRightScroll;
 

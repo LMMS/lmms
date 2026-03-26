@@ -52,7 +52,7 @@ namespace lmms::gui
 
 PatternEditor::PatternEditor(PatternStore* ps) :
 	TrackContainerView(ps),
-	m_zoomingModel(new IntModel(0, 0, 200, nullptr, tr("Zoom"))),
+	m_zoomingModel(new IntModel(0, 0, 100, nullptr, tr("Zoom"))),
 	m_ps(ps),
 	m_trackHeadWidth(ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt() == 1
 		? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT
@@ -260,6 +260,30 @@ void PatternEditor::updateScrollBar()
 {
 	m_leftRightScroll->setPageStep( m_maxClipLength / getZoom() );
 	m_leftRightScroll->setMaximum( m_maxClipLength - m_leftRightScroll->pageStep() );
+}
+
+
+void PatternEditor::wheelEvent( QWheelEvent * we )
+{
+	const auto posX = we->position().toPoint().x();
+	if ((we->modifiers() & Qt::ControlModifier) && (posX > m_trackHeadWidth))
+	{
+		// move zoom slider (pixelsPerBar will change automatically)
+		int step = we->modifiers() & Qt::ShiftModifier ? 1 : 5;
+		// when Alt is pressed, wheelEvent returns delta for x coordinate (mimics horizontal mouse wheel)
+		int direction = (we->angleDelta().y() + we->angleDelta().x()) > 0 ? 1 : -1;
+		m_zoomingModel->incValue(step * direction);
+	}
+	else if (we->modifiers() & Qt::ShiftModifier)
+	{
+		m_leftRightScroll->setValue( m_leftRightScroll->value() - we->angleDelta().y() );
+	}
+	else
+	{
+		we->ignore();
+		return;
+	}
+	we->accept();
 }
 
 
