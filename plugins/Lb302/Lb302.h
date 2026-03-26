@@ -166,7 +166,7 @@ private:
 	void process(SampleFrame* outbuf, const f_cnt_t size);
 	void recalcFilter();
 
-	enum class VcoShape { Sawtooth, Square, Triangle, Moog, RoundSquare, Sine, Exponential, WhiteNoise,
+	enum class VcoShape { Sawtooth, Triangle, Square, RoundSquare, Moog, Sine, Exponential, WhiteNoise,
 		BLSawtooth, BLSquare, BLTriangle, BLMoog };
 	enum class VcaMode { Attack, Decay, Idle, NeverPlayed };
 
