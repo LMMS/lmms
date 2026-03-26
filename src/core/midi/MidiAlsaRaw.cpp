@@ -77,7 +77,7 @@ MidiAlsaRaw::~MidiAlsaRaw()
 
 QString MidiAlsaRaw::probeDevice()
 {
-	QString dev = ConfigManager::inst()->value( "MidiAlsaRaw", "device" );
+	QString dev = QString::fromStdString(ConfigManager::inst()->config.MidiAlsaRaw.device);
 	if( dev == "" )
 	{
 		if( getenv( "MIDIDEV" ) != nullptr )

@@ -244,7 +244,7 @@ QString TrackLabelButton::elideName( const QString &name )
 
 bool TrackLabelButton::isInCompactMode() const
 {
-	return ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt();
+	return ConfigManager::inst()->config.ui.compacttrackbuttons;
 }
 
 } // namespace lmms::gui

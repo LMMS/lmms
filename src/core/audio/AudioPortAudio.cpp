@@ -41,40 +41,31 @@ enum class Direction
 	Output
 };
 
-constexpr auto tag()
+inline auto& cfg()
 {
-	return "audioportaudio";
+	return lmms::ConfigManager::inst()->config.audioportaudio;
 }
 
-constexpr auto backendAttribute()
-{
-	return "backend";
-}
-
-constexpr auto deviceNameAttribute(Direction direction)
+inline auto& cfgDeviceName(Direction direction)
 {
 	switch (direction)
 	{
 	case Direction::Input:
-		return "inputdevice";
+		return cfg().inputdevice;
 	case Direction::Output:
-		return "outputdevice";
+		return cfg().outputdevice;
 	}
-
-	return "";
 }
 
-constexpr auto channelsAttribute(Direction direction)
+inline auto& cfgChannels(Direction direction)
 {
 	switch (direction)
 	{
 	case Direction::Input:
-		return "inputchannels";
+		return cfg().inputchannels;
 	case Direction::Output:
-		return "outputchannels";
+		return cfg().outputchannels;
 	}
-
-	return "";
 }
 
 int maxChannels(const PaDeviceInfo* info, Direction direction)
@@ -105,16 +96,19 @@ AudioPortAudio::AudioPortAudio(bool& successful, AudioEngine* engine)
 		return;
 	}
 
-	const auto backend = ConfigManager::inst()->value(tag(), backendAttribute());
+	const auto backend = cfg().backend;
 	
-	const auto inputDeviceName = ConfigManager::inst()->value(tag(), deviceNameAttribute(Direction::Input));
-	const auto inputDeviceChannels = ConfigManager::inst()->value(tag(), channelsAttribute(Direction::Input)).toInt();
+	const auto inputDeviceName = cfgDeviceName(Direction::Input);
+	const auto inputDeviceChannels = cfgChannels(Direction::Input);
 
-	const auto outputDeviceName = ConfigManager::inst()->value(tag(), deviceNameAttribute(Direction::Output));
-	const auto outputDeviceChannels = ConfigManager::inst()->value(tag(), channelsAttribute(Direction::Output)).toInt();
+	const auto outputDeviceName = cfgDeviceName(Direction::Output);
+	const auto outputDeviceChannels = cfgChannels(Direction::Output);
 
 	auto inputDeviceIndex = paNoDevice;
 	auto outputDeviceIndex = paNoDevice;
+
+
+
 
 	for (auto i = 0; i < numDevices && (inputDeviceIndex == paNoDevice || outputDeviceIndex == paNoDevice); ++i)
 	{
@@ -257,7 +251,7 @@ public:
 			}
 		}
 
-		const auto selectedDeviceName = ConfigManager::inst()->value(tag(), deviceNameAttribute(m_direction));
+		const auto selectedDeviceName = cfgDeviceName(m_direction);
 		const auto selectedDeviceIndex = std::max(0, m_deviceComboBox->findText(selectedDeviceName));
 		m_deviceComboBox->setCurrentIndex(selectedDeviceIndex);
 	}
@@ -265,7 +259,7 @@ public:
 	void refreshChannels(PaDeviceIndex deviceIndex)
 	{
 		const auto maxChannelCount = maxChannels(Pa_GetDeviceInfo(deviceIndex), m_direction);
-		const auto channelCount = ConfigManager::inst()->value(tag(), channelsAttribute(m_direction)).toInt();
+		const auto channelCount = cfgChannels(m_direction);
 		m_channelModel.setRange(1, maxChannelCount);
 		m_channelModel.setValue(channelCount == 0 ? DEFAULT_CHANNELS : channelCount);
 		m_channelSpinBox->setNumDigits(QString::number(maxChannelCount).length());
@@ -273,8 +267,9 @@ public:
 
 	void saveToConfig()
 	{
-		ConfigManager::inst()->setValue(tag(), deviceNameAttribute(m_direction), m_deviceComboBox->currentText());
-		ConfigManager::inst()->setValue(tag(), channelsAttribute(m_direction), QString::number(m_channelModel.value()));
+		cfgDeviceName(m_direction) =  m_deviceComboBox->currentText().toStdString();
+		cfgChannels(m_direction) = m_channelModel.value();
+		ConfigManager::inst()->configUpdated();
 	}
 
 private:
@@ -317,7 +312,7 @@ void AudioPortAudioSetupWidget::show()
 			m_backendComboBox->addItem(Pa_GetHostApiInfo(i)->name, i);
 		}
 
-		const auto selectedBackendName = ConfigManager::inst()->value(tag(), backendAttribute());
+		const auto selectedBackendName = cfg().backend;
 		const auto selectedBackendIndex = std::max(0, m_backendComboBox->findText(selectedBackendName));
 		m_backendComboBox->setCurrentIndex(selectedBackendIndex);
 	}
@@ -327,7 +322,7 @@ void AudioPortAudioSetupWidget::show()
 
 void AudioPortAudioSetupWidget::saveSettings()
 {
-	ConfigManager::inst()->setValue(tag(), backendAttribute(), m_backendComboBox->currentText());
+	cfg().backend = m_backendComboBox->currentText()
 	m_inputDevice->saveToConfig();
 	m_outputDevice->saveToConfig();
 }

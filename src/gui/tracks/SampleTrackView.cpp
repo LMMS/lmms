@@ -204,7 +204,7 @@ void SampleTrackView::dropEvent(QDropEvent *de)
 
 	if (type == "samplefile")
 	{
-		int trackHeadWidth = ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt()==1
+		int trackHeadWidth = ConfigManager::inst()->config.ui.compacttrackbuttons
 				? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT
 				: DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH;
 

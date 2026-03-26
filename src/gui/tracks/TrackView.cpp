@@ -130,8 +130,7 @@ TrackView::TrackView( Track * track, TrackContainerView * tcv ) :
  */
 void TrackView::resizeEvent( QResizeEvent * re )
 {
-	if( ConfigManager::inst()->value( "ui",
-					  "compacttrackbuttons" ).toInt() )
+	if (ConfigManager::inst()->config.ui.compacttrackbuttons)
 	{
 		m_trackOperationsWidget.setFixedSize( TRACK_OP_WIDTH_COMPACT, height() - 1 );
 		m_trackSettingsWidget.setFixedSize( DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT, height() - 1 );
@@ -272,11 +271,10 @@ void TrackView::mousePressEvent( QMouseEvent * me )
 	}
 
 
-	int widgetTotal = ConfigManager::inst()->value( "ui",
-							"compacttrackbuttons" ).toInt()==1 ?
-		DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT :
-		DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH;
-	if (m_trackContainerView->allowRubberband() == true  && pos.x() > widgetTotal)
+	int widgetTotal = ConfigManager::inst()->config.ui.compacttrackbuttons
+		? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT
+		: DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH;
+	if (m_trackContainerView->allowRubberband() && pos.x() > widgetTotal)
 	{
 		QWidget::mousePressEvent( me );
 	}
@@ -320,11 +318,10 @@ void TrackView::mouseMoveEvent( QMouseEvent * me )
 {
 	const auto pos = position(me);
 
-	int widgetTotal = ConfigManager::inst()->value( "ui",
-							"compacttrackbuttons" ).toInt()==1 ?
-		DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT :
-		DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH;
-	if (m_trackContainerView->allowRubberband() == true && pos.x() > widgetTotal)
+	int widgetTotal = ConfigManager::inst()->config.ui.compacttrackbuttons
+		? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT
+		: DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH;
+	if (m_trackContainerView->allowRubberband() && pos.x() > widgetTotal)
 	{
 		QWidget::mouseMoveEvent( me );
 	}

@@ -919,7 +919,7 @@ void FileBrowserTreeWidget::mouseReleaseEvent(QMouseEvent * me )
 	// Only sample previews may continue after mouse up. Is this a sample preview?
 	bool isSample = m_previewPlayHandle->type() == PlayHandle::Type::SamplePlayHandle;
 	// Even sample previews should only continue if the user wants them to. Do they?
-	bool shouldContinue = ConfigManager::inst()->value("ui", "letpreviewsfinish").toInt();
+	bool shouldContinue = ConfigManager::inst()->config.ui.letpreviewsfinish;
 	// If both are true the preview may continue, otherwise we stop it
 	if (!(isSample && shouldContinue)) { stopPreview(); }
 }

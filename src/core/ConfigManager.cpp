@@ -558,10 +558,33 @@ void ConfigManager::loadConfigFile(const QString & configFile)
 			cfgSetStr(audioalsa, device);
 
 			cfgSetStr(audiojack, clientname);
-			cfgSetStr(audiojack, input1);
-			cfgSetStr(audiojack, input2);
-			cfgSetStr(audiojack, output1);
-			cfgSetStr(audiojack, output2);
+			config.audiojack.input = {};
+			config.audiojack.output = {};
+			for (int i = 0;; i++)
+			{
+				if (node = root.namedItem("audiojack").attributes().namedItem(
+						QString::fromStdString(std::format("input{}", i))); !node.isNull())
+				{
+					config.audiojack.input.push_back(node.toAttr().value().toStdString());
+				}
+				else
+				{
+					break;
+				}
+			}
+			for (int i = 0;; i++)
+			{
+				if (node = root.namedItem("audiojack").attributes().namedItem(
+						QString::fromStdString(std::format("output{}", i))); !node.isNull())
+				{
+					config.audiojack.output.push_back(node.toAttr().value().toStdString());
+				}
+				else
+				{
+					break;
+				}
+			}
+
 
 			cfgSetInt(audiooss, channels);
 			cfgSetStr(audiooss, device);

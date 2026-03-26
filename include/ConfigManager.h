@@ -90,6 +90,7 @@ public:
 			bool smoothscroll = false;
 			bool trackdeletionwarning = true;
 			bool vstalwaysontop = false;
+			bool legacysebb = false;
 			std::string vstembedmethod = "none"; // TODO enum
 		} ui;
 
@@ -137,10 +138,8 @@ public:
 		struct AudioJack
 		{
 			std::string clientname = "lmms";
-			std::string output1;
-			std::string output2;
-			std::string input1;
-			std::string input2;
+			std::vector<std::string> output;
+			std::vector<std::string> input;
 		} audiojack;
 
 		struct AudioOss
@@ -446,6 +445,7 @@ private:
 	friend class Engine;
 };
 
+using Config = ConfigManager::Config;
 
 } // namespace lmms
 

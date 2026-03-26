@@ -36,7 +36,7 @@ namespace lmms
 
 AudioAlsa::AudioAlsa( bool & _success_ful, AudioEngine*  _audioEngine ) :
 	AudioDevice(std::clamp<ch_cnt_t>(
-		ConfigManager::inst()->value("audioalsa", "channels").toInt(),
+		ConfigManager::inst()->config.audioalsa.channels,
 		DEFAULT_CHANNELS,
 		DEFAULT_CHANNELS), _audioEngine),
 	m_handle( nullptr ),
@@ -119,7 +119,7 @@ AudioAlsa::~AudioAlsa()
 
 QString AudioAlsa::probeDevice()
 {
-	QString dev = ConfigManager::inst()->value( "audioalsa", "device" );
+	QString dev = QString::fromStdString(ConfigManager::inst()->config.audioalsa.device);
 	if( dev == "" )
 	{
 		if( getenv( "AUDIODEV" ) != nullptr )

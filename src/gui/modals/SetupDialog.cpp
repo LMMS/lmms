@@ -116,7 +116,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 			ConfigManager::inst()->config.app.language)},
 	m_saveInterval{ConfigManager::inst()->config.ui.saveinterval < 1
 			? MainWindow::DEFAULT_SAVE_INTERVAL_MINUTES
-			: ConfigManager::inst()->config.ui.saveinterval},
+			: static_cast<int>(ConfigManager::inst()->config.ui.saveinterval)},
 	m_enableAutoSave{ConfigManager::inst()->config.ui.enableautosave},
 	m_enableRunningAutoSave{ConfigManager::inst()->config.ui.enablerunningautosave},
 	m_smoothScroll{ConfigManager::inst()->config.ui.smoothscroll},
@@ -125,8 +125,8 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	m_vstAlwaysOnTop{ConfigManager::inst()->config.ui.vstalwaysontop},
 	m_disableAutoQuit{ConfigManager::inst()->config.ui.disableautoquit},
 	m_NaNHandler{ConfigManager::inst()->config.app.nanhandler},
-	m_bufferSize{ConfigManager::inst()->config.audioengine.framesperaudiobuffer},
-	m_sampleRate{ConfigManager::inst()->config.audioengine.samplerate},
+	m_bufferSize{static_cast<int>(ConfigManager::inst()->config.audioengine.framesperaudiobuffer)},
+	m_sampleRate{static_cast<int>(ConfigManager::inst()->config.audioengine.samplerate)},
 	m_midiAutoQuantize{ConfigManager::inst()->config.midi.autoquantize},
 	m_workingDir(QDir::toNativeSeparators(ConfigManager::inst()->workingDir())),
 	m_vstDir(QDir::toNativeSeparators(ConfigManager::inst()->vstDir())),

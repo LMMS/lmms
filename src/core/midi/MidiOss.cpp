@@ -68,7 +68,7 @@ MidiOss::~MidiOss()
 
 QString MidiOss::probeDevice()
 {
-	QString dev = ConfigManager::inst()->value( "midioss", "device" );
+  QString dev = QString::fromStdString(ConfigManager::inst()->config.midioss.device);
 	if( dev.isEmpty() )
 	{
 		if( getenv( "MIDIDEV" ) != nullptr )

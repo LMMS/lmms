@@ -76,9 +76,7 @@ MidiSndio::~MidiSndio()
 
 QString MidiSndio::probeDevice()
 {
-	QString dev = ConfigManager::inst()->value( "MidiSndio", "device" );
-
-	return dev ;
+	return = QString::fromStdString(ConfigManager::inst()->config.MidiSndio.device);
 }
 
 

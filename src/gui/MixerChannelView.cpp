@@ -325,7 +325,7 @@ void MixerChannelView::randomizeColor()
 bool MixerChannelView::confirmRemoval(int index)
 {
 	// if config variable is set to false, there is no need for user confirmation
-	bool needConfirm = ConfigManager::inst()->value("ui", "mixerchanneldeletionwarning", "1").toInt();
+	bool needConfirm = ConfigManager::inst()->config.ui.mixerchanneldeletionwarning;
 	if (!needConfirm) { return true; }
 
 	// is the channel is not in use, there is no need for user confirmation
@@ -340,7 +340,8 @@ bool MixerChannelView::confirmRemoval(int index)
 	auto askAgainCheckBox = new QCheckBox(askAgainText, nullptr);
 	auto onCheckedStateChanged = [](auto state) {
 		// Invert button state, if it's checked we *shouldn't* ask again
-		ConfigManager::inst()->setValue("ui", "mixerchanneldeletionwarning", state != Qt::Unchecked ? "0" : "1");
+		ConfigManager::inst()->config.ui.mixerchanneldeletionwarning = (state == Qt::Unchecked);
+		ConfigManager::inst()->configUpdated();
 	};
 
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))

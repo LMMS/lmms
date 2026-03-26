@@ -44,7 +44,7 @@ AudioAlsaSetupWidget::AudioAlsaSetupWidget( QWidget * _parent ) :
 
 	m_deviceInfos = AudioAlsa::getAvailableDevices();
 
-	QString deviceText = ConfigManager::inst()->value( "audioalsa", "device" );
+	QString deviceText = QString::fromStdString(ConfigManager::inst()->config.audioalsa.device);
 
 	m_deviceComboBox = new QComboBox(this);
 	for (size_t i = 0; i < m_deviceInfos.size(); ++i)
@@ -73,8 +73,7 @@ AudioAlsaSetupWidget::AudioAlsaSetupWidget( QWidget * _parent ) :
 	auto m = new LcdSpinBoxModel(/* this */);
 	m->setRange(DEFAULT_CHANNELS, DEFAULT_CHANNELS);
 	m->setStep( 2 );
-	m->setValue( ConfigManager::inst()->value( "audioalsa",
-							"channels" ).toInt() );
+	m->setValue(ConfigManager::inst()->config.audioalsa.channels);
 
 	m_channels = new LcdSpinBox( 1, this );
 	m_channels->setModel( m );
@@ -103,9 +102,9 @@ void AudioAlsaSetupWidget::saveSettings()
 		deviceText = selectedDevice.getDeviceName();
 	}
 
-	ConfigManager::inst()->setValue( "audioalsa", "device", deviceText );
-	ConfigManager::inst()->setValue( "audioalsa", "channels",
-				QString::number( m_channels->value<int>() ) );
+	ConfigManager::inst()->config.audioalsa.device = deviceText.toStdString();
+	ConfigManager::inst()->config.audioalsa.channels = m_channels->value<int>();
+	ConfigManager::inst()->configUpdated();
 }
 
 

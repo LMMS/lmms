@@ -167,7 +167,7 @@ void TrackOperationsWidget::paintEvent(QPaintEvent*)
 /*! \brief Show a message box warning the user that this track is about to be closed */
 bool TrackOperationsWidget::confirmRemoval()
 {
-	bool needConfirm = ConfigManager::inst()->value("ui", "trackdeletionwarning", "1").toInt();
+	bool needConfirm = ConfigManager::inst()->config.ui.trackdeletionwarning;
 	if (!needConfirm){ return true; }
 	
 	QString messageRemoveTrack = tr("After removing a track, it can not "
@@ -178,7 +178,8 @@ bool TrackOperationsWidget::confirmRemoval()
 	auto askAgainCheckBox = new QCheckBox(askAgainText, nullptr);
 	auto onCheckedStateChanged = [](auto state){
 		// Invert button state, if it's checked we *shouldn't* ask again
-		ConfigManager::inst()->setValue("ui", "trackdeletionwarning", state != Qt::Unchecked ? "0" : "1");
+		ConfigManager::inst()->config.ui.trackdeletionwarning = (state == Qt::Unchecked);
+		ConfigManager::inst()->configUpdated();
 	};
 
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
