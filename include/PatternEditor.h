@@ -72,20 +72,23 @@ public slots:
 
 signals:
 	void zoomLevelChanged();
+	void offsetValueChanged();
 
 protected slots:
 	void dropEvent(QDropEvent * de ) override;
 	void resizeEvent(QResizeEvent* de) override;
 	void updatePosition();
 	void updatePixelsPerBar();
+	void updateScrollBar();
 
-	int getZoom()
+	double getZoom()
 	{
-		return m_zoomingModel->value();
+		return 1 + m_zoomingModel->value() / 100.0;
 	}
 
 private:
 	IntModel* m_zoomingModel;
+	QScrollBar* m_leftRightScroll;
 
 	PatternStore* m_ps;
 	TimeLineWidget* m_timeLine;
@@ -95,6 +98,7 @@ private:
 
 private slots:
 	void zoomingChanged();
+	void horizontalScrollChanged();
 
 	friend class PatternEditorWindow;
 };
@@ -111,8 +115,10 @@ public:
 
 	double zoomLevel() const
 	{
-		return 1 + (double)m_editor->getZoom() / 100;
+		return m_editor->getZoom();
 	}
+
+	double horizontalScrollValue() const;
 
 	PatternEditor* m_editor;
 

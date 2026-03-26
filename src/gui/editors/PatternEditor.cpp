@@ -65,6 +65,7 @@ PatternEditor::PatternEditor(PatternStore* ps) :
 		Engine::getSong()->getTimeline(Song::PlayMode::Pattern),
 		m_currentPosition, this
 	);
+	connect(this, &TrackContainerView::positionChanged, m_timeLine, qOverload<>(&QWidget::update));
 	connect(m_timeLine->timeline(), &Timeline::positionChanged, this, &PatternEditor::updatePosition);
 	static_cast<QVBoxLayout*>(layout())->insertWidget(0, m_timeLine);
 
@@ -75,6 +76,15 @@ PatternEditor::PatternEditor(PatternStore* ps) :
 	m_zoomingModel->setParent(this);
 	m_zoomingModel->setJournalling(false);
 	connect(m_zoomingModel, SIGNAL(dataChanged()), this, SLOT(zoomingChanged()));
+
+	// Set up horizontal scroll bar
+	m_leftRightScroll = new QScrollBar( Qt::Horizontal, this );
+	m_leftRightScroll->setMinimum(0);
+	m_leftRightScroll->setMaximum(0);
+	m_leftRightScroll->setSingleStep(1);
+	m_leftRightScroll->setPageStep( m_maxClipLength );
+	static_cast<QVBoxLayout *>( layout() )->addWidget( m_leftRightScroll );
+	connect(m_leftRightScroll, SIGNAL(valueChanged(int)),this, SLOT(horizontalScrollChanged()));
 
 	setFocusPolicy(Qt::StrongFocus);
 	setFocus();
@@ -216,7 +226,7 @@ void PatternEditor::updatePixelsPerBar()
 	setPixelsPerBar(m_maxClipLength != 0
 		? (width() - m_trackHeadWidth) * TimePos::ticksPerBar() / m_maxClipLength
 		: (width() - m_trackHeadWidth));
-	m_timeLine->setPixelsPerBar(pixelsPerBar() * (1 + (double)getZoom() / 100));
+	m_timeLine->setPixelsPerBar(pixelsPerBar() * getZoom());
 }
 
 void PatternEditor::updateMaxSteps()
@@ -233,6 +243,14 @@ void PatternEditor::updateMaxSteps()
 		}
 	}
 	updatePixelsPerBar();
+	updateScrollBar();
+}
+
+
+void PatternEditor::updateScrollBar()
+{
+	m_leftRightScroll->setPageStep( m_maxClipLength / getZoom() );
+	m_leftRightScroll->setMaximum( m_maxClipLength - m_leftRightScroll->pageStep() );
 }
 
 
@@ -283,11 +301,18 @@ void PatternEditor::cloneClip()
 
 void PatternEditor::zoomingChanged()
 {
-	int value = m_zoomingModel->value();
-
 	updatePixelsPerBar();
+	updateScrollBar();
 
 	emit zoomLevelChanged();
+}
+
+void PatternEditor::horizontalScrollChanged()
+{
+	m_currentPosition = TimePos( m_leftRightScroll->value() );
+	updatePosition();
+
+	emit offsetValueChanged();
 }
 
 
@@ -391,6 +416,12 @@ PatternEditorWindow::PatternEditorWindow(PatternStore* ps) :
 QSize PatternEditorWindow::sizeHint() const
 {
 	return {minimumWidth() + 10, 300};
+}
+
+
+double PatternEditorWindow::horizontalScrollValue() const
+{
+	return m_editor->m_leftRightScroll->value() / static_cast<double>(m_editor->m_leftRightScroll->pageStep());
 }
 
 
