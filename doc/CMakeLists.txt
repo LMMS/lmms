@@ -14,7 +14,7 @@ if(Doxygen_FOUND OR DOXYGEN_FOUND)
 		WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
 		COMMENT "Generating API documentation with Doxygen"
 		SOURCES Doxyfile.in)
-else
+else()
 	message(FATAL_ERROR
 		"Doxygen was not found - could not generate docs.")
 endif()
