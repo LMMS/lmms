@@ -70,7 +70,7 @@ SampleTrack::~SampleTrack()
 
 
 
-bool SampleTrack::play( const TimePos & _start, const fpp_t _frames,
+bool SampleTrack::play( const TimePos & _start, const f_cnt_t _frames,
 					const f_cnt_t _offset, int _clip_num )
 {
 	bool played_a_note = false; // will be return variable

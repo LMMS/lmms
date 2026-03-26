@@ -87,7 +87,7 @@ SamplePlayHandle::~SamplePlayHandle()
 
 void SamplePlayHandle::play( SampleFrame* buffer )
 {
-	const fpp_t fpp = Engine::audioEngine()->framesPerPeriod();
+	const f_cnt_t fpp = Engine::audioEngine()->framesPerPeriod();
 	//play( 0, _try_parallelizing );
 	if( framesDone() >= totalFrames() )
 	{

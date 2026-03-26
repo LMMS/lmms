@@ -229,11 +229,11 @@ void Vibed::playNote(NotePlayHandle* n, SampleFrame* workingBuffer)
 		}
 	}
 
-	const fpp_t frames = n->framesLeftForCurrentPeriod();
+	const f_cnt_t frames = n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = n->noteOffset();
 	auto ps = static_cast<StringContainer*>(n->m_pluginData);
 
-	for (fpp_t i = offset; i < frames + offset; ++i)
+	for (f_cnt_t i = offset; i < frames + offset; ++i)
 	{
 		workingBuffer[i][0] = 0.0f;
 		workingBuffer[i][1] = 0.0f;
