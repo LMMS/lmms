@@ -244,6 +244,9 @@ void PatternEditor::updateMaxSteps()
 	}
 	updatePixelsPerBar();
 	updateScrollBar();
+
+	// Show zoom controls if the pattern is longer than one bar, hide them otherwise as they would have no effect anyway
+	emit zoomControlsVisibilityChanged( m_maxClipLength / TimePos::ticksPerBar() > 1 );
 }
 
 
@@ -372,7 +375,7 @@ PatternEditorWindow::PatternEditorWindow(PatternStore* ps) :
 	stretch->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	trackAndStepActionsToolBar->addWidget(stretch);
 
-	auto zoom_lbl = new QLabel(m_toolBar);
+	QLabel* zoom_lbl = new QLabel(m_toolBar);
 	zoom_lbl->setPixmap( embed::getIconPixmap( "zoom" ) );
 
 	// Set slider zoom
@@ -385,9 +388,11 @@ PatternEditorWindow::PatternEditorWindow(PatternStore* ps) :
 	m_zoomingSlider->setToolTip(tr("Zoom"));
 	m_zoomingSlider->setContextMenuPolicy(Qt::NoContextMenu);
 	connect(m_editor->m_zoomingModel, SIGNAL(dataChanged()), this, SLOT(updateSnapLabel()));
+	connect(m_editor, &PatternEditor::zoomControlsVisibilityChanged, this, &PatternEditorWindow::showZoomControls);
 
-	trackAndStepActionsToolBar->addWidget(zoom_lbl);
-	trackAndStepActionsToolBar->addWidget(m_zoomingSlider);
+	m_zoomIconAction =  trackAndStepActionsToolBar->addWidget(zoom_lbl);
+	m_zoomSliderAction = trackAndStepActionsToolBar->addWidget(m_zoomingSlider);
+	showZoomControls( false );
 
 	// Step actions
 	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("step_btn_remove"), tr("Remove steps"),
@@ -441,6 +446,13 @@ void PatternEditorWindow::play()
 void PatternEditorWindow::stop()
 {
 	Engine::getSong()->stop();
+}
+
+
+void PatternEditorWindow::showZoomControls( bool show )
+{
+	m_zoomIconAction->setVisible( show );
+	m_zoomSliderAction->setVisible( show );
 }
 
 

@@ -73,6 +73,16 @@ public slots:
 signals:
 	void zoomLevelChanged();
 	void offsetValueChanged();
+	void zoomControlsVisibilityChanged( bool show );
+
+protected:
+
+	double getZoom()
+	{
+		// The zoom level is calculated such as exactly one bar is visible when the zoom slider is at its maximum value,
+		// and the whole pattern is visible when the zoom slider is at its minimum value.
+		return 1 + m_zoomingModel->value() * ( m_maxClipLength / TimePos::ticksPerBar() - 1 ) / static_cast<double>(m_zoomingModel->maxValue());
+	}
 
 protected slots:
 	void dropEvent(QDropEvent * de ) override;
@@ -80,11 +90,6 @@ protected slots:
 	void updatePosition();
 	void updatePixelsPerBar();
 	void updateScrollBar();
-
-	double getZoom()
-	{
-		return 1 + m_zoomingModel->value() / 100.0;
-	}
 
 private:
 	IntModel* m_zoomingModel;
@@ -126,9 +131,14 @@ public slots:
 	void play() override;
 	void stop() override;
 
+	void showZoomControls( bool show );
+
 private:
 	AutomatableSlider * m_zoomingSlider;
 	ComboBox* m_patternComboBox;
+
+	QAction* m_zoomIconAction;
+	QAction* m_zoomSliderAction;
 };
 
 
