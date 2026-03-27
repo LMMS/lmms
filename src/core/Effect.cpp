@@ -122,7 +122,7 @@ bool Effect::processAudioBuffer(AudioBuffer& inOut)
 	// Copy interleaved plugin output to planar
 	toPlanar(inOut.interleavedBuffer(), inOut.groupBuffers(0));
 
-	inOut.sanitize(0b11);
+	setCorrupted(inOut.sanitize(0b11));
 
 	// Update silence status for track channels the processor wrote to
 	const bool silentOutput = inOut.updateSilenceFlags(0b11);

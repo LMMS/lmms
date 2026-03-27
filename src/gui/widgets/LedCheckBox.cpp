@@ -68,8 +68,10 @@ void LedCheckBox::setText( const QString &s )
 	onTextUpdated();
 }
 
-
-
+void LedCheckBox::setLedColor(LedColor color)
+{
+	m_ledOnPixmap = embed::getIconPixmap(names[static_cast<size_t>(color)].toUtf8().constData());
+}
 
 void LedCheckBox::paintEvent( QPaintEvent * pe )
 {

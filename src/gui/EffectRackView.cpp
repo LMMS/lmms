@@ -150,6 +150,11 @@ void EffectRackView::deletePlugin( EffectView* view )
 	update();
 }
 
+EffectView* EffectRackView::findView(Effect* effect)
+{
+	const auto it = std::ranges::find_if(m_effectViews, [&](auto view) { return view->effect() == effect; });
+	return it == m_effectViews.end() ? nullptr : *it; 
+}
 
 
 

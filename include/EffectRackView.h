@@ -55,6 +55,10 @@ public slots:
 	void moveDown(EffectView* view);
 	void deletePlugin(EffectView* view);
 
+	//! Finds the view associated with given @a effect.
+	//! @returns the @ref EffectView if found, or nullptr otherwise.
+	EffectView* findView(Effect* effect);
+
 private slots:
 	virtual void update();
 	void addEffect();

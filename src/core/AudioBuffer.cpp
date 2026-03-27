@@ -201,9 +201,9 @@ auto AudioBuffer::hasAnySignal() const -> bool
 	return !m_silenceFlags.all();
 }
 
-void AudioBuffer::sanitize(const ChannelFlags& channels, ch_cnt_t upperBound)
+bool AudioBuffer::sanitize(const ChannelFlags& channels, ch_cnt_t upperBound)
 {
-	if (!MixHelpers::sanitizationEnabled()) { return; }
+	if (!MixHelpers::sanitizationEnabled()) { return false; }
 
 	bool changesMade = false;
 
@@ -227,11 +227,13 @@ void AudioBuffer::sanitize(const ChannelFlags& channels, ch_cnt_t upperBound)
 		// Keep the temporary interleaved buffer in sync
 		toInterleaved(groupBuffers(0), interleavedBuffer());
 	}
+
+	return changesMade;
 }
 
-void AudioBuffer::sanitizeAll()
+bool AudioBuffer::sanitizeAll()
 {
-	if (!MixHelpers::sanitizationEnabled()) { return; }
+	if (!MixHelpers::sanitizationEnabled()) { return false; }
 
 	bool changesMade = false;
 	for (ch_cnt_t ch = 0; ch < totalChannels(); ++ch)
@@ -249,6 +251,8 @@ void AudioBuffer::sanitizeAll()
 		// Keep the temporary interleaved buffer in sync
 		toInterleaved(groupBuffers(0), interleavedBuffer());
 	}
+
+	return changesMade;
 }
 
 auto AudioBuffer::updateSilenceFlags(const ChannelFlags& channels, ch_cnt_t upperBound) -> bool
