@@ -247,6 +247,7 @@ void EffectView::modelChanged()
 void EffectView::update()
 {
 	m_bypass->setLedColor(effect()->isCorrupted() ? LedCheckBox::LedColor::Red : m_defaultLedColor);
+	m_bypass->setToolTip(effect()->isCorrupted() ? tr("This effect is corrupted and has been muted") : tr("On/Off"));
 }
 
 } // namespace lmms::gui
