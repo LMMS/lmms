@@ -35,7 +35,7 @@
 
 #include "lmmsconfig.h"
 
-namespace lmms {
+namespace lmms::gui {
 bool FileRevealer::s_canSelect = false;
 
 const QString& FileRevealer::getDefaultFileManager()
@@ -147,7 +147,7 @@ const QStringList& FileRevealer::getSelectCommand()
 	}
 
 	// Fallback to empty list
-	selectCommandCache = {};
+	selectCommandCache = QStringList{};
 	return selectCommandCache.value();
 }
 
@@ -180,4 +180,4 @@ bool FileRevealer::supportsArg(const QString& command, const QString& arg)
 	return output.contains(arg);
 }
 
-} // namespace lmms
+} // namespace lmms::gui

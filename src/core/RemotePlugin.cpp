@@ -35,6 +35,7 @@
 
 #include "AudioEngine.h"
 #include "Engine.h"
+#include "MidiEvent.h"
 #include "Song.h"
 
 #include <QCoreApplication>
@@ -138,9 +139,6 @@ RemotePlugin::RemotePlugin() :
 #endif
 	m_failed( true ),
 	m_watcher( this ),
-#if (QT_VERSION < QT_VERSION_CHECK(5,14,0))
-	m_commMutex(QMutex::Recursive),
-#endif
 	m_splitChannels( false ),
 	m_audioBufferSize( 0 ),
 	m_inputCount( DEFAULT_CHANNELS ),
@@ -331,7 +329,7 @@ bool RemotePlugin::init(const QString &pluginExecutable,
 
 bool RemotePlugin::process( const SampleFrame* _in_buf, SampleFrame* _out_buf )
 {
-	const fpp_t frames = Engine::audioEngine()->framesPerPeriod();
+	const f_cnt_t frames = Engine::audioEngine()->framesPerPeriod();
 
 	if( m_failed || !isRunning() )
 	{
@@ -371,7 +369,7 @@ bool RemotePlugin::process( const SampleFrame* _in_buf, SampleFrame* _out_buf )
 		{
 			for( ch_cnt_t ch = 0; ch < inputs; ++ch )
 			{
-				for( fpp_t frame = 0; frame < frames; ++frame )
+				for( f_cnt_t frame = 0; frame < frames; ++frame )
 				{
 					m_audioBuffer[ch * frames + frame] =
 							_in_buf[frame][ch];
@@ -388,7 +386,7 @@ bool RemotePlugin::process( const SampleFrame* _in_buf, SampleFrame* _out_buf )
 			auto o = (SampleFrame*)m_audioBuffer.get();
 			for( ch_cnt_t ch = 0; ch < inputs; ++ch )
 			{
-				for( fpp_t frame = 0; frame < frames; ++frame )
+				for( f_cnt_t frame = 0; frame < frames; ++frame )
 				{
 					o[frame][ch] = _in_buf[frame][ch];
 				}
@@ -414,7 +412,7 @@ bool RemotePlugin::process( const SampleFrame* _in_buf, SampleFrame* _out_buf )
 	{
 		for( ch_cnt_t ch = 0; ch < outputs; ++ch )
 		{
-			for( fpp_t frame = 0; frame < frames; ++frame )
+			for( f_cnt_t frame = 0; frame < frames; ++frame )
 			{
 				_out_buf[frame][ch] = m_audioBuffer[( m_inputCount+ch )*
 								frames + frame];
@@ -435,7 +433,7 @@ bool RemotePlugin::process( const SampleFrame* _in_buf, SampleFrame* _out_buf )
 		for (ch_cnt_t ch = 0; ch <
 				std::min<int>(DEFAULT_CHANNELS, outputs); ++ch)
 		{
-			for( fpp_t frame = 0; frame < frames; ++frame )
+			for( f_cnt_t frame = 0; frame < frames; ++frame )
 			{
 				_out_buf[frame][ch] = o[frame][ch];
 			}

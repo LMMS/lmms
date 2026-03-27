@@ -40,6 +40,11 @@ namespace gui
 class PatternClipView : public ClipView
 {
 	Q_OBJECT
+	Q_PROPERTY(float emptyTrackHeightRatio MEMBER m_emptyTrackHeightRatio)
+	Q_PROPERTY(float verticalPadding MEMBER m_verticalPadding)
+	Q_PROPERTY(float noteVerticalSpacing MEMBER m_noteVerticalSpacing)
+	Q_PROPERTY(float noteHorizontalSpacing MEMBER m_noteHorizontalSpacing)
+	Q_PROPERTY(QColor noteColor MEMBER m_noteColor)
 public:
 	PatternClipView(Clip* clip, TrackView* tv);
 	~PatternClipView() override = default;
@@ -65,6 +70,12 @@ private:
 	QPixmap m_paintPixmap;
 	
 	QStaticText m_staticTextName;
+
+	float m_emptyTrackHeightRatio {0.5f};
+	float m_verticalPadding {0.15f};
+	float m_noteVerticalSpacing {0.2f};
+	float m_noteHorizontalSpacing {0.2f};
+	QColor m_noteColor {255, 255, 255};
 } ;
 
 

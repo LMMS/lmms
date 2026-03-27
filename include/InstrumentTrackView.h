@@ -25,7 +25,6 @@
 #ifndef LMMS_GUI_INSTRUMENT_TRACK_VIEW_H
 #define LMMS_GUI_INSTRUMENT_TRACK_VIEW_H
 
-#include "MixerChannelLcdSpinBox.h"
 #include "TrackView.h"
 
 #include "InstrumentTrack.h"
@@ -38,6 +37,7 @@ namespace lmms::gui
 class InstrumentTrackWindow;
 class Knob;
 class MidiCCRackView;
+class MixerChannelLcdSpinBox;
 class TrackContainerView;
 class TrackLabelButton;
 

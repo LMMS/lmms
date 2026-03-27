@@ -44,7 +44,7 @@ Plugin::Descriptor PLUGIN_EXPORT stereomatrix_plugin_descriptor =
 	"Paul Giblock <drfaygo/at/gmail.com>",
 	0x0100,
 	Plugin::Type::Effect,
-	new PluginPixmapLoader("logo"),
+	new PixmapLoader("lmms-plugin-logo"),
 	nullptr,
 	nullptr,
 } ;
@@ -64,9 +64,9 @@ StereoMatrixEffect::StereoMatrixEffect(
 
 
 
-Effect::ProcessStatus StereoMatrixEffect::processImpl(SampleFrame* buf, const fpp_t frames)
+Effect::ProcessStatus StereoMatrixEffect::processImpl(SampleFrame* buf, const f_cnt_t frames)
 {
-	for (fpp_t f = 0; f < frames; ++f)
+	for (f_cnt_t f = 0; f < frames; ++f)
 	{	
 		const float d = dryLevel();
 		const float w = wetLevel();

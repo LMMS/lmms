@@ -40,13 +40,10 @@ namespace lmms
 {
 
 
-class NotePlayHandle;
-class graphModel;
+class NotePlayHandle;  // IWYU pragma: keep
 
 namespace gui
 {
-class Graph;
-class LedCheckBox;
 class VibedView;
 }
 
@@ -119,7 +116,7 @@ private:
 	void modelChanged() override;
 
 	// String-related
-	Knob m_volumeKnob;
+	VolumeKnob m_volumeKnob;
 	Knob m_stiffnessKnob;
 	Knob m_pickKnob;
 	Knob m_pickupKnob;

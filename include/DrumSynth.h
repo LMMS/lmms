@@ -26,7 +26,8 @@
 #ifndef LMMS_DRUM_SYNTH_H
 #define LMMS_DRUM_SYNTH_H
 
-#include <stdint.h>
+#include <cstddef>
+#include <cstdint>
 
 #include "LmmsTypes.h"
 
@@ -48,8 +49,9 @@ private:
 
 	float waveform(float ph, int form);
 
-	int GetPrivateProfileString(
-		const char* sec, const char* key, const char* def, char* buffer, int size, QString file);
+	std::size_t GetPrivateProfileString(const char* sec,
+		const char* key, const char* def, char* buffer,
+		std::size_t size, QString file);
 	int GetPrivateProfileInt(const char* sec, const char* key, int def, QString file);
 	float GetPrivateProfileFloat(const char* sec, const char* key, float def, QString file);
 };

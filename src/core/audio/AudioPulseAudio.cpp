@@ -154,7 +154,7 @@ static void context_state_callback(pa_context *c, void *userdata)
 
 			buffer_attr.maxlength = (uint32_t)(-1);
 
-			// play silence in case of buffer underun instead of using default rewind
+			// play silence in case of buffer underrun instead of using default rewind
 			buffer_attr.prebuf = 0;
 
 			buffer_attr.minreq = (uint32_t)(-1);
@@ -229,7 +229,7 @@ void AudioPulseAudio::run()
 	}
 	else
 	{
-		const fpp_t fpp = audioEngine()->framesPerPeriod();
+		const f_cnt_t fpp = audioEngine()->framesPerPeriod();
 		auto temp = new SampleFrame[fpp];
 		while( getNextBuffer( temp ) )
 		{
@@ -248,14 +248,14 @@ void AudioPulseAudio::run()
 
 void AudioPulseAudio::streamWriteCallback( pa_stream *s, size_t length )
 {
-	const fpp_t fpp = audioEngine()->framesPerPeriod();
+	const f_cnt_t fpp = audioEngine()->framesPerPeriod();
 	auto temp = new SampleFrame[fpp];
 	auto pcmbuf = (int_sample_t*)pa_xmalloc(fpp * channels() * sizeof(int_sample_t));
 
 	size_t fd = 0;
 	while( fd < length/4 && m_quit == false )
 	{
-		const fpp_t frames = getNextBuffer( temp );
+		const f_cnt_t frames = getNextBuffer( temp );
 		if( !frames )
 		{
 			m_quit = true;

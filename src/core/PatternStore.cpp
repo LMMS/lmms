@@ -38,19 +38,13 @@ PatternStore::PatternStore() :
 	TrackContainer(),
 	m_patternComboBoxModel(this)
 {
-	connect(&m_patternComboBoxModel, SIGNAL(dataChanged()),
-			this, SLOT(currentPatternChanged()));
-	// we *always* want to receive updates even in case pattern actually did
-	// not change upon setCurrentPattern()-call
-	connect(&m_patternComboBoxModel, SIGNAL(dataUnchanged()),
-			this, SLOT(currentPatternChanged()));
 	setType(Type::Pattern);
 }
 
 
 
 
-bool PatternStore::play(TimePos start, fpp_t frames, f_cnt_t offset, int clipNum)
+bool PatternStore::play(TimePos start, f_cnt_t frames, f_cnt_t offset, int clipNum)
 {
 	bool notePlayed = false;
 
@@ -152,6 +146,7 @@ void PatternStore::updatePatternTrack(Clip* clip)
 	{
 		t->dataChanged();
 	}
+	emit trackUpdated();
 }
 
 
@@ -207,22 +202,6 @@ void PatternStore::updateComboBox()
 		m_patternComboBoxModel.addItem(pt->name());
 	}
 	setCurrentPattern(curPattern);
-}
-
-
-
-
-void PatternStore::currentPatternChanged()
-{
-	// now update all track-labels (the current one has to become white, the others gray)
-	const TrackList& tl = Engine::getSong()->tracks();
-	for (Track * t : tl)
-	{
-		if (t->type() == Track::Type::Pattern)
-		{
-			t->dataChanged();
-		}
-	}
 }
 
 

@@ -26,19 +26,17 @@
 #define LMMS_GUI_SAMPLE_TRACK_VIEW_H
 
 
-#include "MixerChannelLcdSpinBox.h"
+#include "SampleTrack.h"
 #include "TrackView.h"
 
 namespace lmms
 {
 
-class SampleTrack;
-
-
 namespace gui
 {
 
 class Knob;
+class MixerChannelLcdSpinBox;
 class SampleTrackWindow;
 class TrackLabelButton;
 

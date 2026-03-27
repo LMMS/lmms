@@ -40,11 +40,8 @@
 #include "StepRecorder.h"
 #include "StepRecorderWidget.h"
 
-class QPainter;
-class QPixmap;
 class QPushButton;
 class QScrollBar;
-class QString;
 class QMenu;
 class QToolButton;
 
@@ -52,7 +49,6 @@ namespace lmms
 {
 
 
-class NotePlayHandle;
 class MidiClip;
 
 
@@ -192,7 +188,6 @@ protected:
 	void focusOutEvent( QFocusEvent * ) override;
 	void focusInEvent( QFocusEvent * ) override;
 
-	int getKey( int y ) const;
 	void drawNoteRect( QPainter & p, int x, int y,
 					int  width, const Note * n, const QColor & noteCol, const QColor & noteTextColor,
 					const QColor & selCol, const int noteOpc, const bool borderless, bool drawNoteName );
@@ -226,8 +221,8 @@ protected slots:
 	void pasteNotes();
 	bool deleteSelectedNotes();
 
-	void updatePosition(const lmms::TimePos & t );
-	void updatePositionAccompany(const lmms::TimePos & t );
+	void updatePosition();
+	void updatePositionAccompany();
 	void updatePositionStepRecording(const lmms::TimePos & t );
 
 	void zoomingChanged();
@@ -332,6 +327,7 @@ private:
 	void cancelStrumAction();
 
 	void updateScrollbars();
+	void updatePositionLinePos();
 	void updatePositionLineHeight();
 
 	QList<int> getAllOctavesForKey( int keyToMirror ) const;
@@ -342,6 +338,9 @@ private:
 	int keyAreaTop() const;
 	int noteEditRight() const;
 	int noteEditLeft() const;
+
+	int getKey(int y) const;
+	int yCoordOfKey(int key) const;
 
 	void dragNotes(int x, int y, bool alt, bool shift, bool ctrl);
 
@@ -457,6 +456,8 @@ private:
 	void drawDetuningInfo( QPainter & _p, const Note * _n, int _x, int _y ) const;
 	bool mouseOverNote();
 	Note * noteUnderMouse();
+	//! Calculates the closest note to the mouse given their parameter automation curve
+	Note* parameterEditNoteUnderMouse(Note::ParameterType paramType);
 
 	// turn a selection rectangle into selected notes
 	void computeSelectedNotes( bool shift );
@@ -473,6 +474,20 @@ private:
 	bool m_knifeDown;
 
 	void updateKnifePos(QMouseEvent* me, bool initial);
+
+	//! Varaibles which hold which mouse buttons are being held while editing the detuning/parameter of notes.
+	bool m_parameterEditDownLeft = false;
+	bool m_parameterEditDownRight = false;
+	//! Stores the last edited position for the note detuning/parameter curves.
+	//! When erasing nodes when dragging the mouse, all nodes in the range of the last mouse pos to the current mouse pos are removed. Without this, when dragging the mouse super fast, some nodes could get missed; this ensures all nodes from the previous mouse position to the current one will get deleted.
+	std::optional<int> m_lastParameterEditTick = std::nullopt;
+	//! The current note whose detuning/parameter curve is being edited.
+	Note* m_parameterEditClickedNote;
+
+	//! Updates the currently dragged node position in the detuning/parameter curves of the selected notes.
+	void updateParameterEditPos(QMouseEvent* me, Note::ParameterType paramType);
+	//! Finishes the dragging of the current node of the detuning/parameter curves
+	void applyParameterEditPos(Note::ParameterType paramType);
 
 	//! Stores the chords for the strum tool
 	std::vector<NoteVector> m_selectedChords;
@@ -532,9 +547,6 @@ private:
 	QBrush m_blackKeyActiveBackground;
 	QBrush m_blackKeyInactiveBackground;
 	QBrush m_blackKeyDisabledBackground;
-
-signals:
-	void positionChanged( const lmms::TimePos & );
 } ;
 
 
@@ -590,6 +602,8 @@ private slots:
 private:
 	void clipRenamed();
 	void focusInEvent(QFocusEvent * event) override;
+	void showEvent(QShowEvent* se) override;
+
 	void stopStepRecording();
 	void updateStepRecordingIcon();
 

@@ -25,11 +25,11 @@
 #include "MixHelpers.h"
 
 #ifdef LMMS_DEBUG
-#include <cstdio>
+#include <iostream>
 #endif
 
+#include <algorithm>
 #include <cmath>
-#include <QtGlobal>
 
 #include "ValueBuffer.h"
 #include "SampleFrame.h"
@@ -37,9 +37,14 @@
 namespace lmms::MixHelpers
 {
 
+namespace {
+
+constexpr auto SilenceThreshold = 0.000001f; // -120 dBFS
+auto santizationEnabled = false;
+
 /*! \brief Function for applying MIXOP on all sample frames */
 template<typename MIXOP>
-static inline void run( SampleFrame* dst, const SampleFrame* src, int frames, const MIXOP& OP )
+inline void run(SampleFrame* dst, const SampleFrame* src, int frames, const MIXOP& OP)
 {
 	for( int i = 0; i < frames; ++i )
 	{
@@ -49,7 +54,7 @@ static inline void run( SampleFrame* dst, const SampleFrame* src, int frames, co
 
 /*! \brief Function for applying MIXOP on all sample frames - split source */
 template<typename MIXOP>
-static inline void run( SampleFrame* dst, const sample_t* srcLeft, const sample_t* srcRight, int frames, const MIXOP& OP )
+inline void run(SampleFrame* dst, const sample_t* srcLeft, const sample_t* srcRight, int frames, const MIXOP& OP)
 {
 	for( int i = 0; i < frames; ++i )
 	{
@@ -58,21 +63,61 @@ static inline void run( SampleFrame* dst, const sample_t* srcLeft, const sample_
 	}
 }
 
-
+} // namespace
 
 bool isSilent( const SampleFrame* src, int frames )
 {
-	const float silenceThreshold = 0.0000001f;
-
 	for( int i = 0; i < frames; ++i )
 	{
-		if (std::abs(src[i][0]) >= silenceThreshold || std::abs(src[i][1]) >= silenceThreshold)
+		if (std::abs(src[i][0]) >= SilenceThreshold || std::abs(src[i][1]) >= SilenceThreshold)
 		{
 			return false;
 		}
 	}
 
 	return true;
+}
+
+bool isSilent(std::span<sample_t> buffer)
+{
+	return std::ranges::all_of(buffer, [&](const sample_t s) { return std::abs(s) < SilenceThreshold; });
+}
+
+bool sanitzationEnabled()
+{
+	return santizationEnabled;
+}
+
+void setSanitizationEnabled(bool on)
+{
+	santizationEnabled = on;
+}
+
+bool sanitize(std::span<sample_t> buffer)
+{
+	if (!sanitzationEnabled()) { return false; }
+
+	for (std::size_t f = 0; f < buffer.size(); ++f)
+	{
+		sample_t& sample = buffer[f];
+		if (std::isinf(sample) || std::isnan(sample))
+		{
+#ifdef LMMS_DEBUG
+			std::cerr << "Bad data, clearing buffer. frame: "
+				<< f << ", value: " << sample << "\n";
+#endif
+
+			// Clear the channel if a problem is found
+			std::ranges::fill(buffer, 0.f);
+
+			return true;
+		}
+		else
+		{
+			sample = std::clamp(sample, sample_t(-1000.0), sample_t(1000.0));
+		}
+	}
+	return false;
 }
 
 struct AddOp
@@ -88,6 +133,24 @@ void add( SampleFrame* dst, const SampleFrame* src, int frames )
 	run<>( dst, src, frames, AddOp() );
 }
 
+
+void add(PlanarBufferView<sample_t> dst, PlanarBufferView<const sample_t> src)
+{
+	assert(dst.channels() == src.channels());
+	assert(dst.frames() == src.frames());
+
+	const auto channels = dst.channels();
+	const auto frames = dst.frames();
+	for (ch_cnt_t channel = 0; channel < channels; ++channel)
+	{
+		auto* dstPtr = dst.bufferPtr(channel);
+		const auto* srcPtr = src.bufferPtr(channel);
+		for (f_cnt_t frame = 0; frame < frames; ++frame)
+		{
+			dstPtr[frame] += srcPtr[frame];
+		}
+	}
+}
 
 
 struct AddMultipliedOp

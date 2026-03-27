@@ -24,13 +24,15 @@
 
 #include "Knob.h"
 
+#include <QInputDialog>
 #include <QPainter>
-#include <numbers>
 
-#include "lmms_math.h"
 #include "DeprecationHelper.h"
 #include "embed.h"
 #include "FontHelper.h"
+#include "lmms_math.h"
+
+#include <algorithm>
 
 
 namespace lmms::gui
@@ -39,8 +41,6 @@ namespace lmms::gui
 Knob::Knob( KnobType _knob_num, QWidget * _parent, const QString & _name ) :
 	FloatModelEditorBase(DirectionOfManipulation::Vertical, _parent, _name),
 	m_label( "" ),
-	m_isHtmlLabel(false),
-	m_tdRenderer(nullptr),
 	m_angle( -10 ),
 	m_lineWidth( 0 ),
 	m_textColor( 255, 255, 255 ),
@@ -49,11 +49,28 @@ Knob::Knob( KnobType _knob_num, QWidget * _parent, const QString & _name ) :
 	initUi( _name );
 }
 
+Knob::Knob(KnobType knobNum, const QString& labelText, QWidget* parent, LabelRendering labelRendering, const QString& name) :
+	Knob(knobNum, parent, name)
+{
+	setLabel(labelText);
+
+	if (labelRendering == LabelRendering::LegacyFixedFontSize)
+	{
+		setFixedFontSizeLabelRendering();
+	}
+}
+
+Knob::Knob(KnobType knobNum, const QString& labelText, int labelPixelSize, QWidget* parent, const QString& name) :
+	Knob(knobNum, parent, name)
+{
+	setFont(adjustedToPixelSize(font(), labelPixelSize));
+	setLabel(labelText);
+}
+
 Knob::Knob( QWidget * _parent, const QString & _name ) :
 	Knob( KnobType::Bright26, _parent, _name )
 {
 }
-
 
 
 
@@ -127,46 +144,65 @@ void Knob::onKnobNumUpdated()
 }
 
 
+const QString& Knob::getLabel() const
+{
+	return m_label;
+}
 
 
-void Knob::setLabel( const QString & txt )
+void Knob::setLabel(const QString& txt)
 {
 	m_label = txt;
-	m_isHtmlLabel = false;
-	if( m_knobPixmap )
-	{
-		setFixedSize(qMax<int>( m_knobPixmap->width(),
-					horizontalAdvance(QFontMetrics(adjustedToPixelSize(font(), SMALL_FONT_SIZE)), m_label)),
-						m_knobPixmap->height() + 10);
-	}
+
+	updateFixedSize();
 
 	update();
 }
 
 
-void Knob::setHtmlLabel(const QString &htmltxt)
+void Knob::setFixedFontSizeLabelRendering()
 {
-	m_label = htmltxt;
-	m_isHtmlLabel = true;
-	// Put the rendered HTML content into cache
-	if (!m_tdRenderer)
-	{
-		m_tdRenderer = new QTextDocument(this);
-	}
+	m_fixedFontSizeLabelRendering = true;
 
-	m_tdRenderer->setHtml(QString("<span style=\"color:%1;\">%2</span>").arg(textColor().name(), m_label));
-
-	if (m_knobPixmap)
-	{
-		setFixedSize(m_knobPixmap->width(),
-				m_knobPixmap->height() + 15);
-	}
+	updateFixedSize();
 
 	update();
 }
 
+void Knob::updateFixedSize()
+{
+	if (fixedFontSizeLabelRendering())
+	{
+		if (m_knobPixmap)
+		{
+			// In legacy mode only the width of the label is taken into account while the height is not
+			const int labelWidth = QFontMetrics(adjustedToPixelSize(font(), SMALL_FONT_SIZE)).horizontalAdvance(m_label);
+			const int width = std::max(m_knobPixmap->width(), labelWidth);
 
+			// Legacy mode assumes that the label will fit into 10 pixels plus some of the pixmap area
+			setFixedSize(width, m_knobPixmap->height() + 10);
+		}
+	}
+	else
+	{
+		// Styled knobs do not use pixmaps and have no labels. Their size is set from the outside and
+		// they are painted within these limits. Hence we should not compute a new size from a pixmap
+		// and/or label the case of styled knobs.
+		if (knobNum() == KnobType::Styled)
+		{
+			return;
+		}
 
+		QSize pixmapSize = m_knobPixmap ? m_knobPixmap->size() : QSize(0, 0);
+
+		auto fm = QFontMetrics(font());
+
+		const int width = std::max(pixmapSize.width(), fm.horizontalAdvance(m_label));
+		const int height = pixmapSize.height() + fm.height();
+
+		setFixedSize(width, height);
+	}
+}
 
 void Knob::setTotalAngle( float angle )
 {
@@ -447,29 +483,30 @@ void Knob::drawKnob( QPainter * _p )
 	_p->drawImage( 0, 0, m_cache );
 }
 
-void Knob::paintEvent( QPaintEvent * _me )
+void Knob::drawLabel(QPainter& p)
 {
-	QPainter p( this );
-
-	drawKnob( &p );
 	if( !m_label.isEmpty() )
 	{
-		if (!m_isHtmlLabel)
+		if (fixedFontSizeLabelRendering())
 		{
 			p.setFont(adjustedToPixelSize(p.font(), SMALL_FONT_SIZE));
-			p.setPen(textColor());
-			p.drawText(width() / 2 -
-				horizontalAdvance(p.fontMetrics(), m_label) / 2,
-				height() - 2, m_label);
 		}
-		else
-		{
-			// TODO setHtmlLabel is never called so this will never be executed. Remove functionality?
-			m_tdRenderer->setDefaultFont(adjustedToPixelSize(p.font(), SMALL_FONT_SIZE));
-			p.translate((width() - m_tdRenderer->idealWidth()) / 2, (height() - m_tdRenderer->pageSize().height()) / 2);
-			m_tdRenderer->drawContents(&p);
-		}
+		auto fm = p.fontMetrics();
+		const auto x = (width() - fm.horizontalAdvance(m_label)) / 2;
+		const auto descent = fixedFontSizeLabelRendering() ? 2 : fm.descent();
+		const auto y = height() - descent; 
+
+		p.setPen(textColor());
+		p.drawText(x, y, m_label);
 	}
+}
+
+void Knob::paintEvent(QPaintEvent*)
+{
+	QPainter p(this);
+
+	drawKnob(&p);
+	drawLabel(p);
 }
 
 void Knob::changeEvent(QEvent * ev)
@@ -484,8 +521,56 @@ void Knob::changeEvent(QEvent * ev)
 		m_cache = QImage();
 		update();
 	}
+	else if (ev->type() == QEvent::FontChange)
+	{
+		// The size of the label might have changed so update
+		// the size of this widget.
+		updateFixedSize();
+
+		update();
+	}
 }
 
+QString VolumeKnob::getCustomFloatingText()
+{
+	const auto valueToVolumeRatio = model()->getRoundedValue() / volumeRatio();
+	return valueToVolumeRatio == 0.
+		? QString("-∞ dBFS")
+		: QString("%1 dBFS").arg(ampToDbfs(valueToVolumeRatio), 3, 'f', 2);
+}
+
+void VolumeKnob::enterValue()
+{
+	const auto initalValue = model()->getRoundedValue() / 100.0;
+	const auto initialDbValue = initalValue > 0. ? ampToDbfs(initalValue) : -96;
+
+	bool ok = false;
+	float newVal = QInputDialog::getDouble(
+		this,
+		tr("Set value"),
+		tr("Please enter a new value between -96.0 dBFS and %1 dBFS:")
+			.arg(ampToDbfs(model()->maxValue() / 100.0f)),
+		initialDbValue,
+		-96.0,
+		ampToDbfs(model()->maxValue() / 100.0f),
+		model()->getDigitCount(),
+		&ok
+	);
+
+	if (newVal <= -96.0)
+	{
+		newVal = 0.0f;
+	}
+	else
+	{
+		newVal = dbfsToAmp(newVal) * 100.0;
+	}
+
+	if (ok)
+	{
+		model()->setValue(newVal);
+	}
+}
 
 void convertPixmapToGrayScale(QPixmap& pixMap)
 {

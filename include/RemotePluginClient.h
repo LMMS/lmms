@@ -38,6 +38,8 @@
 #	include <unistd.h>
 #endif
 
+#include "LmmsTypes.h"
+#include "MidiEvent.h"
 #include "SharedMemory.h"
 #include "VstSyncData.h"
 
@@ -80,7 +82,7 @@ public:
 		return m_sampleRate;
 	}
 
-	inline fpp_t bufferSize() const
+	inline f_cnt_t bufferSize() const
 	{
 		return m_bufferSize;
 	}
@@ -133,7 +135,7 @@ private:
 	int m_outputCount;
 
 	sample_rate_t m_sampleRate;
-	fpp_t m_bufferSize;
+	f_cnt_t m_bufferSize;
 } ;
 
 #ifndef LMMS_BUILD_WIN32
@@ -259,8 +261,8 @@ bool RemotePluginClient::processMessage( const message & _m )
 				debugMessage(std::string{"Failed to attach sync data: "} + error.what() + '\n');
 				std::exit(EXIT_FAILURE);
 			}
-			m_bufferSize = m_vstSyncData->m_bufferSize;
-			m_sampleRate = m_vstSyncData->m_sampleRate;
+			m_bufferSize = m_vstSyncData->bufferSize;
+			m_sampleRate = m_vstSyncData->sampleRate;
 			reply_message.id = IdHostInfoGotten;
 			reply = true;
 			break;

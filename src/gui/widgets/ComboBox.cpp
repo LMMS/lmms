@@ -33,12 +33,7 @@
 
 #include "CaptionMenu.h"
 #include "FontHelper.h"
-
-#define QT_SUPPORTS_WIDGET_SCREEN (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
-#if !QT_SUPPORTS_WIDGET_SCREEN
-#include <QApplication>
-#include <QDesktopWidget>
-#endif
+#include "DeprecationHelper.h"
 
 namespace lmms::gui
 {
@@ -69,7 +64,7 @@ ComboBox::ComboBox( QWidget * _parent, const QString & _name ) :
 
 void ComboBox::selectNext()
 {
-	model()->setInitValue( model()->value() + 1 );
+	model()->setValue(model()->value() + 1);
 }
 
 
@@ -77,7 +72,7 @@ void ComboBox::selectNext()
 
 void ComboBox::selectPrevious()
 {
-	model()->setInitValue( model()->value() - 1 );
+	model()->setValue(model()->value() - 1);
 }
 
 
@@ -105,9 +100,11 @@ void ComboBox::mousePressEvent( QMouseEvent* event )
 		return;
 	}
 
+	const auto pos = position(event);
+
 	if( event->button() == Qt::LeftButton && ! ( event->modifiers() & Qt::ControlModifier ) )
 	{
-		if( event->x() > width() - CB_ARROW_BTN_WIDTH )
+		if (pos.x() > width() - CB_ARROW_BTN_WIDTH)
 		{
 			m_pressed = true;
 			update();
@@ -122,12 +119,7 @@ void ComboBox::mousePressEvent( QMouseEvent* event )
 
 			QPoint gpos = mapToGlobal(QPoint(0, height()));
 
-			#if (QT_SUPPORTS_WIDGET_SCREEN)
 			bool const menuCanBeFullyShown = screen()->geometry().contains(QRect(gpos, m_menu.sizeHint()));
-			#else
-			bool const menuCanBeFullyShown = gpos.y() + m_menu.sizeHint().height() < qApp->desktop()->height();
-			#endif
-
 			if (menuCanBeFullyShown)
 			{
 				m_menu.exec(gpos);
@@ -221,7 +213,7 @@ void ComboBox::wheelEvent( QWheelEvent* event )
 	if( model() )
 	{
 		const int direction = (event->angleDelta().y() < 0 ? 1 : -1) * (event->inverted() ? -1 : 1);
-		model()->setInitValue(model()->value() + direction);
+		model()->setValue(model()->value() + direction);
 		update();
 		event->accept();
 	}
@@ -234,7 +226,7 @@ void ComboBox::setItem( QAction* item )
 {
 	if( model() )
 	{
-		model()->setInitValue( item->data().toInt() );
+		model()->setValue(item->data().toInt());
 	}
 }
 

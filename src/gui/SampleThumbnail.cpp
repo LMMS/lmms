@@ -25,8 +25,10 @@
 
 #include "SampleThumbnail.h"
 
-#include <QDebug>
 #include <QFileInfo>
+#include <QPainter>
+
+#include "Sample.h"
 
 namespace {
 	constexpr auto MaxSampleThumbnailCacheSize = 32;

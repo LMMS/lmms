@@ -38,6 +38,7 @@
 #include "FileDialog.h"
 #include "MainWindow.h"
 #include "MidiSetupWidget.h"
+#include "MixHelpers.h"
 #include "ProjectJournal.h"
 #include "SetupDialog.h"
 #include "TabBar.h"
@@ -497,7 +498,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 
 #ifdef LMMS_HAVE_PORTAUDIO
 	m_audioIfaceSetupWidgets[AudioPortAudio::name()] =
-			new AudioPortAudio::setupWidget(as_w);
+			new AudioPortAudioSetupWidget(as_w);
 #endif
 
 #ifdef LMMS_HAVE_SOUNDIO
@@ -638,6 +639,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 
 	connect(sanitizeEffectOutputCheckbox, &QCheckBox::stateChanged, [sanitizeEffectOutputCheckbox, this] {
 		m_sanitizeEffectOutput = sanitizeEffectOutputCheckbox->isChecked();
+		MixHelpers::setSanitizationEnabled(m_sanitizeEffectOutput);
 		showRestartWarning();
 	});
 
