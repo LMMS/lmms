@@ -145,8 +145,8 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 			"ui", "disableautoquit", "1").toInt()),
 	m_bufferSize(ConfigManager::inst()->value(
 			"audioengine", "framesperaudiobuffer").toInt()),
-	m_sanitizeMixer(ConfigManager::inst()->value(
-			"audioengine", "sanitizemixer", "1").toInt()),
+	m_mixSanitization(ConfigManager::inst()->value(
+			"audioengine", "sanitizemix", "1").toInt()),
 	m_sampleRate(ConfigManager::inst()->value(
 			"audioengine", "samplerate").toInt()),
 	m_midiAutoQuantize(ConfigManager::inst()->value(
@@ -658,14 +658,14 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	const auto otherBox = new QGroupBox(tr("Other"), audio_w);
 	const auto otherBoxLayout = new QVBoxLayout{otherBox};
 
-	const auto sanitizeMixerCheckBox = new QCheckBox{};
-	sanitizeMixerCheckBox->setText(tr("Enable mixer sanitization"));
-	sanitizeMixerCheckBox->setChecked(m_sanitizeMixer);
-	otherBoxLayout->addWidget(sanitizeMixerCheckBox);
+	const auto mixSanitzationCheckbox = new QCheckBox{};
+	mixSanitzationCheckbox->setText(tr("Enable mix sanitization"));
+	mixSanitzationCheckbox->setChecked(m_mixSanitization);
+	otherBoxLayout->addWidget(mixSanitzationCheckbox);
 
-	connect(sanitizeMixerCheckBox, &QCheckBox::stateChanged, [sanitizeMixerCheckBox, this] {
-		m_sanitizeMixer = sanitizeMixerCheckBox->isChecked();
-		MixHelpers::setSanitizationEnabled(m_sanitizeMixer);
+	connect(mixSanitzationCheckbox, &QCheckBox::stateChanged, [mixSanitzationCheckbox, this] {
+		m_mixSanitization = mixSanitzationCheckbox->isChecked();
+		MixHelpers::setSanitizationEnabled(m_mixSanitization);
 		showRestartWarning();
 	});
 
@@ -1036,8 +1036,8 @@ void SetupDialog::accept()
 					QString::number(m_disableAutoQuit));
 	ConfigManager::inst()->setValue("audioengine", "audiodev",
 					m_audioIfaceNames[m_audioInterfaces->currentText()]);
-	ConfigManager::inst()->setValue("audioengine", "sanitizemixer",
-					QString::number(m_sanitizeMixer));
+	ConfigManager::inst()->setValue("audioengine", "sanitizemix",
+					QString::number(m_mixSanitization));
 	ConfigManager::inst()->setValue("audioengine", "samplerate",
 					QString::number(m_sampleRate));
 	ConfigManager::inst()->setValue("audioengine", "framesperaudiobuffer",
