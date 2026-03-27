@@ -122,6 +122,8 @@ bool Effect::processAudioBuffer(AudioBuffer& inOut)
 	// Copy interleaved plugin output to planar
 	toPlanar(inOut.interleavedBuffer(), inOut.groupBuffers(0));
 
+	// TODO: We may also want to try and reset the plugin, as it's internal state may be corrupted with infs/NaNs
+	// forever until then.
 	setCorrupted(inOut.sanitize(0b11));
 
 	// Update silence status for track channels the processor wrote to
