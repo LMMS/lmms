@@ -203,7 +203,7 @@ auto AudioBuffer::hasAnySignal() const -> bool
 
 void AudioBuffer::sanitize(const ChannelFlags& channels, ch_cnt_t upperBound)
 {
-	if (!MixHelpers::sanitzationEnabled()) { return; }
+	if (!MixHelpers::sanitizationEnabled()) { return; }
 
 	bool changesMade = false;
 
@@ -231,7 +231,7 @@ void AudioBuffer::sanitize(const ChannelFlags& channels, ch_cnt_t upperBound)
 
 void AudioBuffer::sanitizeAll()
 {
-	if (!MixHelpers::sanitzationEnabled()) { return; }
+	if (!MixHelpers::sanitizationEnabled()) { return; }
 
 	bool changesMade = false;
 	for (ch_cnt_t ch = 0; ch < totalChannels(); ++ch)

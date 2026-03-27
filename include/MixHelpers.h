@@ -55,7 +55,7 @@ bool isSilent(std::span<sample_t> buffer);
 bool sanitize(std::span<sample_t> buffer);
 
 //! @returns whether sanitzation is enabled.
-bool sanitzationEnabled();
+bool sanitizationEnabled();
 
 //! Enable or disable sanitization.
 void setSanitizationEnabled(bool on);

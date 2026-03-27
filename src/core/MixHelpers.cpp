@@ -83,7 +83,7 @@ bool isSilent(std::span<sample_t> buffer)
 	return std::ranges::all_of(buffer, [&](const sample_t s) { return std::abs(s) < SilenceThreshold; });
 }
 
-bool sanitzationEnabled()
+bool sanitizationEnabled()
 {
 	return santizationEnabled;
 }
@@ -95,7 +95,7 @@ void setSanitizationEnabled(bool on)
 
 bool sanitize(std::span<sample_t> buffer)
 {
-	if (!sanitzationEnabled()) { return false; }
+	if (!sanitizationEnabled()) { return false; }
 
 	if (std::ranges::any_of(buffer, [](auto val) { return !std::isfinite(val); }))
 	{
