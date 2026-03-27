@@ -97,26 +97,15 @@ bool sanitize(std::span<sample_t> buffer)
 {
 	if (!sanitzationEnabled()) { return false; }
 
-	for (std::size_t f = 0; f < buffer.size(); ++f)
+	if (std::ranges::any_of(buffer, [](auto val) { return !std::isfinite(val); }))
 	{
-		sample_t& sample = buffer[f];
-		if (std::isinf(sample) || std::isnan(sample))
-		{
 #ifdef LMMS_DEBUG
-			std::cerr << "Bad data, clearing buffer. frame: "
-				<< f << ", value: " << sample << "\n";
+		std::cerr << "Mix sanitization: found inf/nans, silencing entire buffer\n";
 #endif
-
-			// Clear the channel if a problem is found
-			std::ranges::fill(buffer, 0.f);
-
-			return true;
-		}
-		else
-		{
-			sample = std::clamp(sample, sample_t(-1000.0), sample_t(1000.0));
-		}
+		std::ranges::fill(buffer, 0.f);
+		return true;
 	}
+
 	return false;
 }
 
