@@ -56,11 +56,8 @@
 namespace lmms
 {
 
-namespace
-{
 // Helper to get the phase increment per sample, given a note's frequency and the current sample rate
-inline float phaseInc(float freq) { return freq / Engine::audioEngine()->outputSampleRate(); }
-}
+static inline float phaseInc(float freq) { return freq / Engine::audioEngine()->outputSampleRate(); }
 
 extern "C"
 {
@@ -84,6 +81,7 @@ PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* m, void*)
 }
 
 } // extern "C"
+
 
 //
 // Lb302Filter
@@ -155,7 +153,6 @@ sample_t Lb302FilterIIR2::process(sample_t samp)
 // Lb302Filter3Pole
 //
 
-
 void Lb302Filter3Pole::recalc()
 {
 	// DO NOT CALL BASE CLASS
@@ -213,7 +210,7 @@ sample_t Lb302Filter3Pole::process(sample_t samp)
 
 
 //
-// LBSynth
+// Lb302Synth
 //
 
 Lb302Synth::Lb302Synth(InstrumentTrack* instrumentTrack)
@@ -499,7 +496,6 @@ void Lb302Synth::process(SampleFrame* outbuf, const f_cnt_t size)
 }
 
 
-
 void Lb302Synth::playNote(NotePlayHandle* nph, SampleFrame*)
 {
 	if (nph->isMasterNote() || (nph->hasParent() && nph->isReleased())) { return; }
@@ -541,7 +537,6 @@ void Lb302Synth::playNote(NotePlayHandle* nph, SampleFrame*)
 }
 
 
-
 void Lb302Synth::processNote(NotePlayHandle* nph)
 {
 	/// Start a new note.
@@ -571,7 +566,6 @@ void Lb302Synth::processNote(NotePlayHandle* nph)
 }
 
 
-
 void Lb302Synth::play(SampleFrame* working_buffer)
 {
 	const auto readIdx = m_notesReadSeq.load(std::memory_order_relaxed);
@@ -596,7 +590,6 @@ void Lb302Synth::play(SampleFrame* working_buffer)
 }
 
 
-
 void Lb302Synth::deleteNotePluginData(NotePlayHandle* nph)
 {
 	if (m_playingNote == nph) { m_playingNote = nullptr; }
@@ -607,6 +600,11 @@ gui::PluginView* Lb302Synth::instantiateView(QWidget* parent)
 {
 	return new gui::Lb302SynthView(this, parent);
 }
+
+
+//
+// gui::Lb302SynthView
+//
 
 namespace gui
 {
@@ -661,7 +659,6 @@ Lb302SynthView::Lb302SynthView(Instrument* instrument, QWidget* parent)
 	m_distKnob->setHintText(tr("DIST:"), "");
 
 	// Shapes
-	// move to 120,75
 	const int waveBtnX = 10;
 	const int waveBtnY = 96;
 	m_waveBtnGrp = new AutomatableButtonGroup(this);

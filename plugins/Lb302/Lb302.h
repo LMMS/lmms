@@ -43,10 +43,7 @@
 namespace lmms
 {
 
-namespace DspEffectLibrary
-{
-class Distortion;
-}
+namespace DspEffectLibrary { class Distortion; }
 
 namespace gui
 {
@@ -75,8 +72,8 @@ public:
 
 	virtual void recalc();
 	virtual void envRecalc();
-	virtual sample_t process(sample_t samp) = 0;
 	virtual void playNote();
+	virtual sample_t process(sample_t samp) = 0;
 
 protected:
 	Lb302FilterKnobState *fs;
