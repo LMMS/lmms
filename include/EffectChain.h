@@ -66,9 +66,6 @@ public:
 	void moveUp( Effect * _effect );
 	bool processAudioBuffer(AudioBuffer& buffer);
 
-	auto begin() const { return m_effects.begin(); }
-	auto end() const { return m_effects.end(); }
-
 	void clear();
 
 
