@@ -15,8 +15,9 @@ if(Doxygen_FOUND OR DOXYGEN_FOUND)
 		COMMENT "Generating API documentation with Doxygen"
 		SOURCES Doxyfile.in)
 else()
-	message(FATAL_ERROR
-		"Doxygen was not found - could not generate docs.")
+	ADD_CUSTOM_TARGET(doc
+		COMMAND ${CMAKE_COMMAND} -E echo "Doxygen was not found. Unable to generate docs."
+		COMMAND ${CMAKE_COMMAND} -E false)
 endif()
 
 ADD_SUBDIRECTORY(bash-completion)

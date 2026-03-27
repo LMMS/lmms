@@ -26,7 +26,7 @@ jobs:
         run: |
           sudo apt-get update -y
           sudo apt-get install -y --no-install-recommends $(xargs < .github/workflows/deps-ubuntu-24.04-gcc.txt)
-          sudo apt-get install -y --no-install-recommends doxygen
+          # sudo apt-get install -y --no-install-recommends doxygen
       - name: Configure
         run: |
           source /opt/qt5*/bin/qt5*-env.sh || true
