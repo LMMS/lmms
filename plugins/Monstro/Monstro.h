@@ -38,32 +38,6 @@
 #include "lmms_math.h"
 #include "BandLimitedWave.h"
 
-//
-//	UI Macros
-//
-
-#define makeknob( name, x, y, hint, unit, oname ) 		\
-	name = new Knob( KnobType::Styled, view ); 				\
-	name ->move( x, y );								\
-	name ->setHintText( hint, unit );             \
-	name ->setObjectName( oname );						\
-	name ->setFixedSize( 20, 20 );
-
-#define maketsknob( name, x, y, hint, unit, oname ) 		\
-	name = new TempoSyncKnob( KnobType::Styled, view ); 				\
-	name ->move( x, y );								\
-	name ->setHintText( hint, unit );		\
-	name ->setObjectName( oname );						\
-	name ->setFixedSize( 20, 20 );
-
-#define maketinyled( name, x, y, ttip ) \
-	name = new PixmapButton( view, nullptr ); 	\
-	name -> setCheckable( true );			\
-	name -> move( x, y );					\
-	name -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "tinyled_on" ) ); \
-	name -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "tinyled_off" ) ); \
-	name->setToolTip(ttip);
-
 namespace lmms
 {
 
@@ -177,7 +151,7 @@ public:
 	MonstroSynth( MonstroInstrument * _i, NotePlayHandle * _nph );
 	virtual ~MonstroSynth() = default;
 
-	void renderOutput( fpp_t _frames, SampleFrame* _buf );
+	void renderOutput( f_cnt_t _frames, SampleFrame* _buf );
 
 private:
 
@@ -432,7 +406,7 @@ protected:
 	f_cnt_t m_lfo2_att;
 
 	sample_rate_t m_samplerate;
-	fpp_t m_fpp;
+	f_cnt_t m_fpp;
 	
 	float m_integrator;
 	float m_fmCorrection;
@@ -603,6 +577,18 @@ private:
 	void setWidgetBackground( QWidget * _widget, const QString & _pic );
 	QWidget * setupOperatorsView( QWidget * _parent );
 	QWidget * setupMatrixView( QWidget * _parent );
+
+	template<class T = Knob>
+	auto makeKnob(QWidget* view, int x, int y, const QString& hint,
+		const QString& unit, const QString& objName) -> T*
+	{
+		T* knob = new T(KnobType::Styled, view);
+		knob->move(x, y);
+		knob->setHintText(hint, unit);
+		knob->setObjectName(objName);
+		knob->setFixedSize(20, 20);
+		return knob;
+	}
 
 //////////////////////////////////////
 //                                  //

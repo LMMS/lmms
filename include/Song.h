@@ -395,7 +395,7 @@ private:
 	void saveKeymapStates(QDomDocument &doc, QDomElement &element);
 	void restoreKeymapStates(const QDomElement &element);
 
-	void processAutomations(const TrackList& tracks, TimePos timeStart, fpp_t frames);
+	void processAutomations(const TrackList& tracks, TimePos timeStart, f_cnt_t frames);
 	void processMetronome(size_t bufferOffset);
 
 	void setModified(bool value);

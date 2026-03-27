@@ -89,7 +89,7 @@ AudioFileOgg::~AudioFileOgg()
 	vorbis_info_clear(&m_vi);
 }
 
-void AudioFileOgg::writeBuffer(const SampleFrame* _ab, const fpp_t _frames)
+void AudioFileOgg::writeBuffer(const SampleFrame* _ab, const f_cnt_t _frames)
 {
 	if (_frames == 0)
 	{

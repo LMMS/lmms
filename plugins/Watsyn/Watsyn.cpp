@@ -64,7 +64,7 @@ Plugin::Descriptor PLUGIN_EXPORT watsyn_plugin_descriptor =
 
 WatsynObject::WatsynObject( float * _A1wave, float * _A2wave,
 					float * _B1wave, float * _B2wave,
-					int _amod, int _bmod, const sample_rate_t _samplerate, NotePlayHandle * _nph, fpp_t _frames,
+					int _amod, int _bmod, const sample_rate_t _samplerate, NotePlayHandle * _nph, f_cnt_t _frames,
 					WatsynInstrument * _w ) :
 				m_amod( _amod ),
 				m_bmod( _bmod ),
@@ -103,14 +103,14 @@ WatsynObject::~WatsynObject()
 }
 
 
-void WatsynObject::renderOutput( fpp_t _frames )
+void WatsynObject::renderOutput( f_cnt_t _frames )
 {
 	if( m_abuf == nullptr )
 		m_abuf = new SampleFrame[m_fpp];
 	if( m_bbuf == nullptr )
 		m_bbuf = new SampleFrame[m_fpp];
 
-	for( fpp_t frame = 0; frame < _frames; frame++ )
+	for( f_cnt_t frame = 0; frame < _frames; frame++ )
 	{
 		// put phases of 1-series oscs into variables because phase modulation might happen
 		float A1_lphase = m_lphase[A1_OSC];
@@ -352,7 +352,7 @@ void WatsynInstrument::playNote( NotePlayHandle * _n,
 		_n->m_pluginData = w;
 	}
 
-	const fpp_t frames = _n->framesLeftForCurrentPeriod();
+	const f_cnt_t frames = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();
 	SampleFrame* buffer = _working_buffer + offset;
 
@@ -375,7 +375,7 @@ void WatsynInstrument::playNote( NotePlayHandle * _n,
 	// disabled pending proper implementation of sample-exactness
 /*	if( engine::audioEngine()->currentQualitySettings().sampleExactControllers )
 	{
-		for( fpp_t f=0; f < frames; f++ )
+		for( f_cnt_t f=0; f < frames; f++ )
 		{
 			const float tfp = tfp_ + f;
 			// handle mixing envelope
@@ -413,7 +413,7 @@ void WatsynInstrument::playNote( NotePlayHandle * _n,
 	if( envAmt != 0.0f && tfp_ < envLen )
 	{
 		const float mixvalue_ = m_abmix.value();
-		for( fpp_t f=0; f < frames; f++ )
+		for( f_cnt_t f=0; f < frames; f++ )
 		{
 			float mixvalue = mixvalue_;
 			const float tfp = tfp_ + f;
@@ -449,7 +449,7 @@ void WatsynInstrument::playNote( NotePlayHandle * _n,
 		// get knob values
 		const float bmix = ( ( m_abmix.value() + 100.0 ) / 200.0 );
 		const float amix = 1.0 - bmix;
-		for( fpp_t f=0; f < frames; f++ )
+		for( f_cnt_t f=0; f < frames; f++ )
 		{
 			// mix a/b streams according to mixing knob
 			buffer[f][0] = ( abuf[f][0] * amix ) +
@@ -684,46 +684,40 @@ WatsynView::WatsynView( Instrument * _instrument,
 
 // knobs... lots of em
 
-	makeknob( a1_volKnob, 130, A1ROW, tr( "Volume" ), "%", "aKnob" )
-	makeknob( a2_volKnob, 130, A2ROW, tr( "Volume" ), "%", "aKnob" )
-	makeknob( b1_volKnob, 130, B1ROW, tr( "Volume" ), "%", "bKnob" )
-	makeknob( b2_volKnob, 130, B2ROW, tr( "Volume" ), "%", "bKnob"  )
+	a1_volKnob = makeKnob<VolumeKnob>(130, A1ROW, tr("Volume"), "%", "aKnob");
+	a2_volKnob = makeKnob<VolumeKnob>(130, A2ROW, tr("Volume"), "%", "aKnob");
+	b1_volKnob = makeKnob<VolumeKnob>(130, B1ROW, tr("Volume"), "%", "bKnob");
+	b2_volKnob = makeKnob<VolumeKnob>(130, B2ROW, tr("Volume"), "%", "bKnob");
 
-	makeknob( a1_panKnob, 154, A1ROW, tr( "Panning" ), "", "aKnob" )
-	makeknob( a2_panKnob, 154, A2ROW, tr( "Panning" ), "", "aKnob" )
-	makeknob( b1_panKnob, 154, B1ROW, tr( "Panning" ), "", "bKnob"  )
-	makeknob( b2_panKnob, 154, B2ROW, tr( "Panning" ), "", "bKnob"  )
+	a1_panKnob = makeKnob(154, A1ROW, tr("Panning"), "", "aKnob");
+	a2_panKnob = makeKnob(154, A2ROW, tr("Panning"), "", "aKnob");
+	b1_panKnob = makeKnob(154, B1ROW, tr("Panning"), "", "bKnob");
+	b2_panKnob = makeKnob(154, B2ROW, tr("Panning"), "", "bKnob");
 
-	makeknob( a1_multKnob, 178, A1ROW, tr( "Freq. multiplier" ), "/8", "aKnob" )
-	makeknob( a2_multKnob, 178, A2ROW, tr( "Freq. multiplier" ), "/8", "aKnob" )
-	makeknob( b1_multKnob, 178, B1ROW, tr( "Freq. multiplier" ), "/8", "bKnob"  )
-	makeknob( b2_multKnob, 178, B2ROW, tr( "Freq. multiplier" ), "/8", "bKnob"  )
+	a1_multKnob = makeKnob(178, A1ROW, tr("Freq. multiplier"), "/8", "aKnob");
+	a2_multKnob = makeKnob(178, A2ROW, tr("Freq. multiplier"), "/8", "aKnob");
+	b1_multKnob = makeKnob(178, B1ROW, tr("Freq. multiplier"), "/8", "bKnob");
+	b2_multKnob = makeKnob(178, B2ROW, tr("Freq. multiplier"), "/8", "bKnob");
 
-	makeknob( a1_ltuneKnob, 202, A1ROW, tr( "Left detune" ), tr( " cents" ), "aKnob" )
-	makeknob( a2_ltuneKnob, 202, A2ROW, tr( "Left detune" ), tr( " cents" ), "aKnob" )
-	makeknob( b1_ltuneKnob, 202, B1ROW, tr( "Left detune" ), tr( " cents" ), "bKnob"  )
-	makeknob( b2_ltuneKnob, 202, B2ROW, tr( "Left detune" ), tr( " cents" ), "bKnob"  )
+	a1_ltuneKnob = makeKnob(202, A1ROW, tr("Left detune"), tr(" cents"), "aKnob");
+	a2_ltuneKnob = makeKnob(202, A2ROW, tr("Left detune"), tr(" cents"), "aKnob");
+	b1_ltuneKnob = makeKnob(202, B1ROW, tr("Left detune"), tr(" cents"), "bKnob");
+	b2_ltuneKnob = makeKnob(202, B2ROW, tr("Left detune"), tr(" cents"), "bKnob");
 
-	makeknob( a1_rtuneKnob, 226, A1ROW, tr( "Right detune" ), tr( " cents" ), "aKnob" )
-	makeknob( a2_rtuneKnob, 226, A2ROW, tr( "Right detune" ), tr( " cents" ), "aKnob" )
-	makeknob( b1_rtuneKnob, 226, B1ROW, tr( "Right detune" ), tr( " cents" ), "bKnob"  )
-	makeknob( b2_rtuneKnob, 226, B2ROW, tr( "Right detune" ), tr( " cents" ), "bKnob"  )
+	a1_rtuneKnob = makeKnob(226, A1ROW, tr("Right detune"), tr(" cents"), "aKnob");
+	a2_rtuneKnob = makeKnob(226, A2ROW, tr("Right detune"), tr(" cents"), "aKnob");
+	b1_rtuneKnob = makeKnob(226, B1ROW, tr("Right detune"), tr(" cents"), "bKnob");
+	b2_rtuneKnob = makeKnob(226, B2ROW, tr("Right detune"), tr(" cents"), "bKnob");
 
-	makeknob( m_abmixKnob, 4, 3, tr( "A-B Mix" ), "", "mixKnob" )
+	m_abmixKnob = makeKnob(4, 3, tr("A-B Mix"), "", "mixKnob");
 
-	makeknob( m_envAmtKnob, 88, 3, tr( "Mix envelope amount" ), "", "mixenvKnob" )
+	m_envAmtKnob = makeKnob(88, 3, tr("Mix envelope amount"), "", "mixenvKnob");
 
-	maketsknob( m_envAttKnob, 88, A1ROW, tr( "Mix envelope attack" ), " ms", "mixenvKnob" )
-	maketsknob( m_envHoldKnob, 88, A2ROW, tr( "Mix envelope hold" ), " ms", "mixenvKnob" )
-	maketsknob( m_envDecKnob, 88, B1ROW, tr( "Mix envelope decay" ), " ms", "mixenvKnob" )
+	m_envAttKnob = makeKnob<TempoSyncKnob>(88, A1ROW, tr("Mix envelope attack"), " ms", "mixenvKnob");
+	m_envHoldKnob = makeKnob<TempoSyncKnob>(88, A2ROW, tr("Mix envelope hold"), " ms", "mixenvKnob");
+	m_envDecKnob = makeKnob<TempoSyncKnob>(88, B1ROW, tr("Mix envelope decay"), " ms", "mixenvKnob");
 
-	makeknob( m_xtalkKnob, 88, B2ROW, tr( "Crosstalk" ), "", "xtalkKnob" )
-
-// let's set volume knobs
-	a1_volKnob -> setVolumeKnob( true );
-	a2_volKnob -> setVolumeKnob( true );
-	b1_volKnob -> setVolumeKnob( true );
-	b2_volKnob -> setVolumeKnob( true );
+	m_xtalkKnob = makeKnob(88, B2ROW, tr("Crosstalk"), "", "xtalkKnob");
 
 	m_abmixKnob -> setFixedSize( 31, 31 );
 

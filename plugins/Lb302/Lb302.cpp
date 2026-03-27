@@ -792,7 +792,7 @@ void Lb302Synth::play( SampleFrame* _working_buffer )
 	};
 	m_notesMutex.unlock();
 	
-	const fpp_t frames = Engine::audioEngine()->framesPerPeriod();
+	const f_cnt_t frames = Engine::audioEngine()->framesPerPeriod();
 
 	process( _working_buffer, frames );
 //	release_frame = 0; //removed for issue # 1432

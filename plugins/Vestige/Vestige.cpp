@@ -22,33 +22,27 @@
  *
  */
 
-#include <QtGlobal>
-
-#include "VstPlugin.h"
-#include "VstSubPluginFeatures.h"
-#include "VstList.h"
-
 #include "Vestige.h"
 
-#include <memory>
-
+#include <QDomElement>
 #include <QDropEvent>
 #include <QGridLayout>
+#include <QMdiArea>
+#include <QMenu>
 #include <QPainter>
 #include <QPushButton>
 #include <QScrollArea>
-#include <QMdiArea>
-#include <QMenu>
-#include <QDomElement>
-
+#include <QtGlobal>
+#include <memory>
 
 #include "AudioEngine.h"
+#include "Clipboard.h"
 #include "ConfigManager.h"
-#include "CustomTextKnob.h"
+#include "embed.h"
 #include "Engine.h"
 #include "FileDialog.h"
-#include "GuiApplication.h"
 #include "FontHelper.h"
+#include "GuiApplication.h"
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
 #include "LocaleHelper.h"
@@ -59,10 +53,9 @@
 #include "StringPairDrag.h"
 #include "SubWindow.h"
 #include "TextFloat.h"
-#include "Clipboard.h"
-
-
-#include "embed.h"
+#include "VstPlugin.h"
+#include "VstSubPluginFeatures.h"
+#include "VstList.h"
 
 namespace lmms
 {
@@ -969,7 +962,7 @@ ManageVestigeInstrumentView::ManageVestigeInstrumentView( Instrument * _instrume
 	const QMap<QString, QString> & dump = m_vi->m_plugin->parameterDump();
 	m_vi->paramCount = dump.size();
 
-	vstKnobs = new CustomTextKnob *[ m_vi->paramCount ];
+	m_vstKnobs.reserve(m_vi->paramCount);
 
 	bool hasKnobModel = true;
 	if (m_vi->knobFModel == nullptr) {
@@ -985,11 +978,10 @@ ManageVestigeInstrumentView::ManageVestigeInstrumentView( Instrument * _instrume
 		std::snprintf(paramStr.data(), paramStr.size(), "param%d", i);
 		s_dumpValues = dump[paramStr.data()].split(":");
 
-		const auto & description = s_dumpValues.at(1);
+		const auto& description = s_dumpValues.at(1);
 
-		auto knob = new CustomTextKnob(KnobType::Bright26, description.left(15), this, description);
-		knob->setDescription(description + ":");
-		vstKnobs[i] = knob;
+		auto knob = new VstPluginKnob{m_vi->m_plugin, i, description, this};
+		m_vstKnobs.push_back(knob);
 
 		if( !hasKnobModel )
 		{
@@ -1001,9 +993,10 @@ ManageVestigeInstrumentView::ManageVestigeInstrumentView( Instrument * _instrume
 		FloatModel * model = m_vi->knobFModel[i];
 		connect( model, &FloatModel::dataChanged, this,
 			[this, model]() { setParameter( model ); }, Qt::DirectConnection);
-		vstKnobs[i] ->setModel( model );
+		knob->setModel(model);
 	}
-	syncParameterText();
+	m_vi->m_plugin->loadParameterLabels();
+	m_vi->m_plugin->loadParameterDisplays();
 
 	int i = 0;
 	for( int lrow = 1; lrow < ( int( m_vi->paramCount / 10 ) + 1 ) + 1; lrow++ )
@@ -1012,7 +1005,7 @@ ManageVestigeInstrumentView::ManageVestigeInstrumentView( Instrument * _instrume
 		{
 			if( i < m_vi->paramCount )
 			{
-				l->addWidget( vstKnobs[i], lrow, lcolumn, Qt::AlignCenter );
+				l->addWidget(m_vstKnobs[i], lrow, lcolumn, Qt::AlignCenter);
 			}
 			i++;
 		}
@@ -1063,7 +1056,8 @@ void ManageVestigeInstrumentView::syncPlugin( void )
 			m_vi->knobFModel[i]->setInitValue(f_value);
 		}
 	}
-	syncParameterText();
+	m_vi->m_plugin->loadParameterLabels();
+	m_vi->m_plugin->loadParameterDisplays();
 }
 
 
@@ -1078,12 +1072,12 @@ void ManageVestigeInstrumentView::displayAutomatedOnly( void )
 
 		if( !( m_vi->knobFModel[ i ]->isAutomated() || m_vi->knobFModel[ i ]->controllerConnection() ) )
 		{
-			if( vstKnobs[ i ]->isVisible() == true  && isAuto )
+			if (m_vstKnobs[i]->isVisible() && isAuto)
 			{
-				vstKnobs[ i ]->hide();
+				m_vstKnobs[i]->hide();
 				m_displayAutomatedOnly->setText( "All" );
 			} else {
-				vstKnobs[ i ]->show();
+				m_vstKnobs[i]->show();
 				m_displayAutomatedOnly->setText( "Automated" );
 			}
 		}
@@ -1098,13 +1092,8 @@ ManageVestigeInstrumentView::~ManageVestigeInstrumentView()
 		for( int i = 0; i < m_vi->paramCount; i++ )
 		{
 			delete m_vi->knobFModel[ i ];
-			delete vstKnobs[ i ];
+			delete m_vstKnobs[i];
 		}
-	}
-
-	if (vstKnobs != nullptr) {
-		delete []vstKnobs;
-		vstKnobs = nullptr;
 	}
 
 	if( m_vi->knobFModel != nullptr )
@@ -1139,40 +1128,9 @@ void ManageVestigeInstrumentView::setParameter( Model * action )
 
 	if ( m_vi->m_plugin != nullptr ) {
 		m_vi->m_plugin->setParam( knobUNID, m_vi->knobFModel[knobUNID]->value() );
-		syncParameterText();
 	}
 }
 
-void ManageVestigeInstrumentView::syncParameterText()
-{
-	m_vi->m_plugin->loadParameterLabels();
-	m_vi->m_plugin->loadParameterDisplays();
-
-	QString paramLabelStr   = m_vi->m_plugin->allParameterLabels();
-	QString paramDisplayStr = m_vi->m_plugin->allParameterDisplays();
-
-	QStringList paramLabelList;
-	QStringList paramDisplayList;
-
-	for( int i = 0; i < paramLabelStr.size(); )
-	{
-		const int length = paramLabelStr[i].digitValue();
-		paramLabelList.append(paramLabelStr.mid(i + 1, length));
-		i += length + 1;
-	}
-
-	for( int i = 0; i < paramDisplayStr.size(); )
-	{
-		const int length = paramDisplayStr[i].digitValue();
-		paramDisplayList.append(paramDisplayStr.mid(i + 1, length));
-		i += length + 1;
-	}
-
-	for( int i = 0; i < paramLabelList.size(); ++i )
-	{
-		vstKnobs[i]->setValueText(paramDisplayList[i] + ' ' + paramLabelList[i]);
-	}
-}
 
 
 
