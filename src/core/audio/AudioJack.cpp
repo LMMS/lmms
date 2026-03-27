@@ -99,8 +99,6 @@ AudioJack::AudioJack(bool& successful, AudioEngine* audioEngineParam)
 	, m_active(false)
 	, m_midiClient(nullptr)
 	, m_tempOutBufs(new jack_default_audio_sample_t*[channels()])
-	, m_framesDoneInCurBuf(0)
-	, m_framesToDoInCurBuf(0)
 {
 	successful = initJackClient();
 	if (successful) {
@@ -412,9 +410,9 @@ int AudioJack::processCallback(jack_nframes_t nframes)
 
 	if (!isRunning())
 	{
-		for (int channel = 0; channel < channels(); ++channel)
+		for (int c = 0; c < channels(); ++c)
 		{
-			std::fill_n(m_tempOutBufs[channel], nframes * channels(), 0.f);
+			std::fill_n(m_tempOutBufs[c], nframes, 0.f);
 		}
 	}
 	else
@@ -422,6 +420,16 @@ int AudioJack::processCallback(jack_nframes_t nframes)
 		audioEngine()->renderNextBuffer({m_tempOutBufs, channels(), nframes});
 	}
 
+	for (int c = 0; c < channels(); ++c)
+	{
+		jack_default_audio_sample_t* jack_input_buffer = (jack_default_audio_sample_t*) jack_port_get_buffer(m_inputPorts[c], nframes);
+
+		for (jack_nframes_t frame = 0; frame < nframes; frame++)
+		{
+			m_inputFrameBuffer[frame][c] = static_cast<sample_t>(jack_input_buffer[frame]);
+		}
+	}
+	audioEngine()->pushInputFrames (m_inputFrameBuffer.data(), nframes);
 	return 0;
 }
 

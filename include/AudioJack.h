@@ -129,9 +129,6 @@ private:
 	jack_default_audio_sample_t** m_tempOutBufs;
 	std::vector<SampleFrame> m_inputFrameBuffer;
 
-	f_cnt_t m_framesDoneInCurBuf;
-	f_cnt_t m_framesToDoInCurBuf;
-
 #ifdef AUDIO_BUS_HANDLE_SUPPORT
 	struct StereoPort
 	{
