@@ -171,12 +171,6 @@ public:
 
 	void removePlayHandlesOfTypes(Track * track, PlayHandle::Types types);
 
-	//! @return the number of frames rendered per period
-	f_cnt_t framesPerPeriod() const { return m_framesPerPeriod; }
-
-	//! @returns the number of audio frames per audio buffer
-	f_cnt_t framesPerAudioBuffer() const { return m_framesPerAudioBuffer; }
-
 	AudioEngineProfiler& profiler()
 	{
 		return m_profiler;
@@ -247,12 +241,32 @@ public:
 	}
 
 	/**
+	 * @returns The internal buffer size used by audio plugins and other processing done within the audio engine.
+	 * It's maximum value is @ref DEFAULT_BUFFER_SIZE, or equal to @ref framesPerAudioBuffer() if it is less than @ref
+	 * DEFAULT_BUFFER_SIZE.
+	 * @see renderNextPeriod()
+	 */
+	f_cnt_t framesPerPeriod() const { return m_framesPerPeriod; }
+
+	/**
+	 * @returns The buffer size used by the configured @ref AudioDevice "output audio device". It is in the range
+	 * of @ref MINIMUM_BUFFER_SIZE and @ref MAXIMUM_BUFFER_SIZE.
+	 * @note This should not be needed for a majority of cases. Currently, it's only being used to set up the
+	 * audio devices.
+	 */
+	f_cnt_t framesPerAudioBuffer() const { return m_framesPerAudioBuffer; }
+
+	/**
 	 * @brief Renders the next audio period.
 	 *
 	 * An audio period is a fixed-size chunk of audio the engine generates, and represents a single cycle of the
-	 * engine's output.
-	 * Rendering is chunked into discrete periods to timely handle per-buffer updates like automation.
+	 * engine's output. The rendering is chunked into smaller periods to timely handle per-buffer updates like
+	 * non-sample-accurate automation, as well as to improve memory cache performance.
+	 *
 	 * The audio period generated is interleaved and stereo.
+	 *
+	 * @note The audio period returned is non-owning and will be changed on subsequent calls to @ref renderNextPeriod()
+	 * and @ref renderNextBuffer(). Callers must copy the data into their own local buffers if they need it to persist.
 	 *
 	 * @returns A non-owning buffer to the next audio period.
 	 */
@@ -261,18 +275,19 @@ public:
 	/**
 	 * @brief Renders an audio buffer into @a dst.
 	 *
-	 * This function renders audio into @a dst in discrete chunks of audio periods. As @a dst can have any number of
-	 * frames, it can contain a whole number of periods or some fraction of a period.
+	 * Renders @ref renderNextAudioPeriod() "audio periods" into @a dst. If @a dst is not a multiple of the period
+	 * size, the remaining frames are partially rendered (an extra period may be rendered in such cases, which can
+	 * degradge performance).
 	 *
-	 * If @a dst has 1 channel, the audio periods are averaged to mono.
-	 * If @a dst has 2 channels, the audio periods are directly copied.
+	 * If @a dst has 1 channel, the channels are averaged to mono.
+	 * If @a dst has 2 channels, the channels are directly copied.
 	 * If @a dst has more than 2 channels, the stereo channels are copied and the rest are zero-filled.
 	 *
 	 * @param dst An audio buffer view to write into. Both interleaved and planar overloads are provided.
 	 */
 	void renderNextBuffer(InterleavedBufferView<float> dst) { renderNextBuffer<InterleavedBufferView<float>>(dst); }
 
-	//! @copydoc AudioEngine::renderNextBuffer(InterleavedBufferView<float>)
+	//! @copydoc renderNextBuffer(InterleavedBufferView<float>)
 	void renderNextBuffer(PlanarBufferView<float> dst) { renderNextBuffer<PlanarBufferView<float>>(dst); }
 
 	//! Block until a change in model can be done (i.e. wait for audio thread)
