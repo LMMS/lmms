@@ -163,10 +163,6 @@ MixerChannelView::MixerChannelView(QWidget* parent, MixerView* mixerView, int ch
 	connect(m_renameLineEdit, &QLineEdit::editingFinished, this, &MixerChannelView::renameFinished);
 
 	setFocusPolicy(Qt::StrongFocus);
-
-	auto checkCorruptedChainTimer = new QTimer{this};
-	connect(checkCorruptedChainTimer, &QTimer::timeout, this, &MixerChannelView::checkCorruptedChain);
-	checkCorruptedChainTimer->start(1000);
 }
 
 void MixerChannelView::contextMenuEvent(QContextMenuEvent*)
@@ -412,24 +408,6 @@ MixerChannel* MixerChannelView::mixerChannel() const
 void MixerChannelView::reset()
 {
 	m_peakIndicator->resetPeakToMinusInf();
-}
-
-void MixerChannelView::checkCorruptedChain()
-{
-	if (!MixHelpers::sanitizationEnabled()) { return; }
-
-	const auto& chain = mixerChannel()->m_fxChain;
-	for (const auto& effect : chain)
-	{
-		if (!effect->isCorrupted()) { continue; }
-
-		const auto& view = m_effectRackView->findView(effect);
-
-		// The effect is in our chain so it should exist
-		assert(view);
-
-		view->update();
-	}
 }
 
 } // namespace lmms::gui

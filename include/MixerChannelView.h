@@ -103,7 +103,6 @@ private:
 	QString elideName(const QString& name);
 	MixerChannel* mixerChannel() const;
 	auto isMasterChannel() const -> bool { return m_channelIndex == 0; }
-	void checkCorruptedChain();
 
 private:
 	SendButtonIndicator* m_sendButton;

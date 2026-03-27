@@ -28,6 +28,7 @@
 #include <QApplication>
 #include <QAction>
 #include <QPushButton>
+#include <QTimer>
 #include <QScrollArea>
 #include <QVBoxLayout>
 
@@ -35,6 +36,7 @@
 #include "EffectSelectDialog.h"
 #include "EffectView.h"
 #include "GroupBox.h"
+#include "MixHelpers.h"
 
 
 namespace lmms::gui
@@ -75,6 +77,10 @@ EffectRackView::EffectRackView( EffectChain* model, QWidget* parent ) :
 	m_lastY = 0;
 
 	setModel( model );
+
+	auto checkForCorruptionTimer = new QTimer{this};
+	connect(checkForCorruptionTimer, &QTimer::timeout, this, &EffectRackView::checkForCorruption);
+	checkForCorruptionTimer->start(1000);
 }
 
 
@@ -149,14 +155,6 @@ void EffectRackView::deletePlugin( EffectView* view )
 	e->deleteLater();
 	update();
 }
-
-EffectView* EffectRackView::findView(Effect* effect)
-{
-	const auto it = std::ranges::find_if(m_effectViews, [&](auto view) { return view->effect() == effect; });
-	return it == m_effectViews.end() ? nullptr : *it; 
-}
-
-
 
 void EffectRackView::update()
 {
@@ -287,7 +285,15 @@ QSize EffectRackView::sizeHint() const
 	return QSize{EffectRackView::DEFAULT_WIDTH, 254 /* INSTRUMENT_HEIGHT */ - 4 - 1};
 }
 
+void EffectRackView::checkForCorruption()
+{
+	if (!MixHelpers::sanitizationEnabled()) { return; }
 
-
+	for (const auto& view : m_effectViews)
+	{
+		if (!view->effect()->isCorrupted()) { continue; }
+		view->update();
+	}
+}
 
 } // namespace lmms::gui
