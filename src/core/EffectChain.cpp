@@ -224,10 +224,4 @@ void EffectChain::clear()
 	m_enabledModel.setValue( false );
 }
 
-bool EffectChain::sanitizeEffectOutput()
-{
-	static auto value = ConfigManager::inst()->value("audioengine", "sanitizeeffectoutput", "1").toInt();
-	return value;
-}
-
 } // namespace lmms
