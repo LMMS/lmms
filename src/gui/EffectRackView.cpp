@@ -78,9 +78,9 @@ EffectRackView::EffectRackView( EffectChain* model, QWidget* parent ) :
 
 	setModel( model );
 
-	auto checkForCorruptionTimer = new QTimer{this};
-	connect(checkForCorruptionTimer, &QTimer::timeout, this, &EffectRackView::checkForCorruption);
-	checkForCorruptionTimer->start(1000);
+	auto updateTimer = new QTimer{this};
+	connect(updateTimer, &QTimer::timeout, this, &EffectRackView::updateEffects);
+	updateTimer->start(1000);
 }
 
 
@@ -285,13 +285,10 @@ QSize EffectRackView::sizeHint() const
 	return QSize{EffectRackView::DEFAULT_WIDTH, 254 /* INSTRUMENT_HEIGHT */ - 4 - 1};
 }
 
-void EffectRackView::checkForCorruption()
+void EffectRackView::updateEffects()
 {
-	if (!MixHelpers::sanitizationEnabled()) { return; }
-
 	for (const auto& view : m_effectViews)
 	{
-		if (!view->effect()->isCorrupted()) { continue; }
 		view->update();
 	}
 }
