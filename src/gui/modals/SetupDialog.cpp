@@ -666,7 +666,6 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	connect(mixSanitzationCheckbox, &QCheckBox::stateChanged, [mixSanitzationCheckbox, this] {
 		m_mixSanitization = mixSanitzationCheckbox->isChecked();
 		MixHelpers::setSanitizationEnabled(m_mixSanitization);
-		showRestartWarning();
 	});
 
 	// Audio layout ordering.
