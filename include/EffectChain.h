@@ -70,8 +70,6 @@ public:
 
 
 private:
-	static auto sanitizeEffectOutput() -> bool;
-
 	using EffectList = std::vector<Effect*>;
 	EffectList m_effects;
 
