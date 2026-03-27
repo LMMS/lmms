@@ -25,11 +25,9 @@ jobs:
       - name: Install packages
         run: |
           sudo apt-get update -y
-          # sudo apt-get install -y --no-install-recommends $(xargs < .github/workflows/deps-ubuntu-24.04-gcc.txt)
           sudo apt-get install -y --no-install-recommends \
-            binutils \
-            ca-certificates \
             cmake \
+            make \
             fluid \
             libasound2-dev \
             libc6-dev \
@@ -60,7 +58,6 @@ jobs:
             libxml-perl \
             lsb-release \
             lv2-dev \
-            make \
             portaudio19-dev \
             qt5-qmake \
             qtbase5-dev \
@@ -69,8 +66,7 @@ jobs:
             qttools5-dev-tools \
             qtwayland5 \
             stk \
-            wget
-          sudo apt-get install -y --no-install-recommends doxygen
+            doxygen
       - name: Configure
         run: |
           source /opt/qt5*/bin/qt5*-env.sh || true
