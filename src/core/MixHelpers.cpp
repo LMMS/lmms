@@ -99,9 +99,6 @@ bool sanitize(std::span<sample_t> buffer)
 
 	if (std::ranges::any_of(buffer, [](auto val) { return !std::isfinite(val); }))
 	{
-#ifdef LMMS_DEBUG
-		std::cerr << "Mix sanitization: found inf/nans, silencing entire buffer\n";
-#endif
 		std::ranges::fill(buffer, 0.f);
 		return true;
 	}
