@@ -252,7 +252,7 @@ public:
 	 * @returns The buffer size used by the configured @ref AudioDevice "output audio device". It is in the range
 	 * of @ref MINIMUM_BUFFER_SIZE and @ref MAXIMUM_BUFFER_SIZE.
 	 * @note This should not be needed for a majority of cases. Currently, it's only being used to set up the
-	 * audio devices.
+	 * audio devices. This member function may be removed in a later refactor.
 	 */
 	f_cnt_t framesPerAudioBuffer() const { return m_framesPerAudioBuffer; }
 
