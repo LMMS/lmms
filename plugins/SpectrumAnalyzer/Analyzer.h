@@ -64,6 +64,7 @@ private:
 	DataprocLauncher m_processorThread;
 
 	LockfreeSpscQueue<SampleFrame> m_inputBuffer;
+	std::binary_semaphore m_waitFlag{0};
 
 	#ifdef SA_DEBUG
 		int m_last_dump_time;

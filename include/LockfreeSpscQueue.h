@@ -34,7 +34,6 @@
 #include <optional>
 #include <span>
 #include <vector>
-#include <limits>
 
 namespace lmms {
 
@@ -214,23 +213,6 @@ public:
 		}
 	}
 
-	void waitForData()
-	{
-		auto index = m_writeIndex.load(std::memory_order_acquire);
-		while (empty() && index != std::numeric_limits<size_t>::max())
-		{
-			m_writeIndex.wait(index, std::memory_order_acquire);
-			index = m_writeIndex.load(std::memory_order_acquire);
-		}
-	}
-
-	void shutdown()
-	{
-		m_writeIndex.store(std::numeric_limits<size_t>::max(), std::memory_order_relaxed);
-		m_readIndex.store(std::numeric_limits<size_t>::max(), std::memory_order_relaxed);
-		m_writeIndex.notify_one();
-	}
-
 	auto peek() const -> const T&
 	{
 		const auto readIndex = m_readIndex.load(std::memory_order_acquire);
@@ -257,7 +239,6 @@ private:
 		const auto value = std::has_single_bit(m_buffer.size()) ? (index + count) & (m_buffer.size() - 1)
 																: (index + count) % m_buffer.size();
 		m_writeIndex.store(value, std::memory_order_release);
-		m_writeIndex.notify_one();
 	}
 
 	void commitRead(size_t count)

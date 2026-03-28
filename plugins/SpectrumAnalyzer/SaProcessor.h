@@ -31,6 +31,7 @@
 #include <fftw3.h>
 #include <QMutex>
 #include <QRgb>
+#include <semaphore>
 #include <vector>
 #include "LockfreeSpscQueue.h"
 
@@ -51,7 +52,7 @@ public:
 	virtual ~SaProcessor();
 
 	// analysis thread and a method to terminate it
-	void analyze(LockfreeSpscQueue<SampleFrame> &ring_buffer);
+	void analyze(LockfreeSpscQueue<SampleFrame>& ring_buffer, std::binary_semaphore& flag);
 	void terminate() {m_terminate = true;}
 
 	// inform processor if any processing is actually required

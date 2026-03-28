@@ -96,7 +96,7 @@ SaProcessor::~SaProcessor()
 
 
 // Load data from audio thread ringbuffer and run FFT analysis if buffer is full enough.
-void SaProcessor::analyze(LockfreeSpscQueue<SampleFrame> &ring_buffer)
+void SaProcessor::analyze(LockfreeSpscQueue<SampleFrame> &ring_buffer, std::binary_semaphore& flag)
 {
 	// Processing thread loop
 	while (!m_terminate)
@@ -106,7 +106,7 @@ void SaProcessor::analyze(LockfreeSpscQueue<SampleFrame> &ring_buffer)
 		// If there is nothing to read, wait for notification from the writing side.
 		if (in_buffer.empty())
 		{
-			ring_buffer.waitForData();
+			flag.acquire();
 			continue;
 		}
 

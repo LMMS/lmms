@@ -131,51 +131,6 @@ private slots:
 
 		QCOMPARE(region.size(), 0);
 	}
-
-	void canWaitForDataTest()
-	{
-		using namespace std::chrono_literals;
-
-		auto queue = LockfreeSpscQueue<int, 4>{};
-
-		auto producer = std::thread{[&queue] {
-			std::this_thread::sleep_for(25ms);
-			queue.enqueue(1);
-		}};
-
-		auto consumer = std::thread{[&queue] {
-			QVERIFY(queue.empty());
-			queue.waitForData();
-
-			auto value = queue.dequeue();
-
-			QVERIFY(value);
-			QCOMPARE(*value, 1);
-		}};
-
-		producer.join();
-		consumer.join();
-	}
-
-	void canShutdownWhenWaitingForDataTest()
-	{
-		using namespace std::chrono_literals;
-
-		auto queue = LockfreeSpscQueue<int, 4>{};
-
-		auto producer = std::thread{[&queue] {
-			std::this_thread::sleep_for(25ms);
-			queue.shutdown();
-		}};
-
-		auto consumer = std::thread{[&queue] {
-			QVERIFY(queue.empty());
-			queue.waitForData();
-		}};
-
-		producer.join();
-		consumer.join();
-	}
 };
 
 QTEST_GUILESS_MAIN(LockfreeSpscQueueTest)
