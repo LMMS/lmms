@@ -147,7 +147,17 @@ public:
 
 	~LockfreeSpscQueue() = default;
 
-	auto enqueue(T value) -> bool { return enqueue(&value, 1); }
+	auto enqueue(T value) -> bool
+	{
+		const auto readIndex = m_readIndex.load(std::memory_order_acquire);
+		const auto writeIndex = m_writeIndex.load(std::memory_order_relaxed);
+		const auto nextWriteIndex = advanceIndex(writeIndex, 1);
+		if (nextWriteIndex == readIndex) { return false; }
+
+		m_buffer[writeIndex] = std::move(value);
+		m_writeIndex.store(nextWriteIndex, std::memory_order_release);
+		return true;
+	}
 
 	auto enqueue(const T* values, size_t size) -> bool
 	{
@@ -157,8 +167,13 @@ public:
 
 	auto dequeue() -> std::optional<T>
 	{
-		auto value = T{};
-		return dequeue(&value, 1) == 0 ? std::nullopt : std::optional<T>{value};
+		const auto readIndex = m_readIndex.load(std::memory_order_relaxed);
+		const auto writeIndex = m_writeIndex.load(std::memory_order_acquire);
+		if (readIndex == writeIndex) { return std::nullopt; }
+
+		auto value = std::move(m_buffer[readIndex]);
+		m_readIndex.store(advanceIndex(readIndex, 1), std::memory_order_release);
+		return value;
 	}
 
 	auto dequeue(T* values, size_t size) -> bool
@@ -233,20 +248,21 @@ public:
 	auto capacity() const -> size_t { return m_buffer.size() - 1; }
 
 private:
+	size_t advanceIndex(size_t index, size_t count)
+	{
+		return std::has_single_bit(index) ? (index + count) & (m_buffer.size() - 1) : (index + count) % m_buffer.size();
+	}
+
 	void commitWrite(size_t count)
 	{
 		const auto index = m_writeIndex.load(std::memory_order_relaxed);
-		const auto value = std::has_single_bit(m_buffer.size()) ? (index + count) & (m_buffer.size() - 1)
-																: (index + count) % m_buffer.size();
-		m_writeIndex.store(value, std::memory_order_release);
+		m_writeIndex.store(advanceIndex(index, count), std::memory_order_release);
 	}
 
 	void commitRead(size_t count)
 	{
 		const auto index = m_readIndex.load(std::memory_order_relaxed);
-		const auto value = std::has_single_bit(m_buffer.size()) ? (index + count) & (m_buffer.size() - 1)
-																: (index + count) % m_buffer.size();
-		m_readIndex.store(value, std::memory_order_release);
+		m_readIndex.store(advanceIndex(index, count), std::memory_order_release);
 	}
 
 	std::conditional_t<N == DynamicSpscQueueSize, std::vector<T>, std::array<T, N>> m_buffer;
