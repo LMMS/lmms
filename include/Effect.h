@@ -84,15 +84,6 @@ public:
 		return m_corrupted;
 	}
 
-	/**
-	 * @brief Set the corrupted state for the effect.
-	 * @see isCorrupted()
-	 */
-	void setCorrupted(bool corrupted)
-	{
-		m_corrupted = corrupted;
-	}
-
 	//! "Awake" means the effect has not been put to sleep by auto-quit
 	bool isAwake() const
 	{
