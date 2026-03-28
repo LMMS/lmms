@@ -58,8 +58,6 @@ public:
 		return( m_text );
 	}
 
-	LedColor color() const { return m_color; }
-
 	void setText( const QString& s );
 	void setLedColor(LedColor color);
 
