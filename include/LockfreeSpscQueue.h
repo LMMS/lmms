@@ -77,42 +77,6 @@ public:
 		return index < m_firstRegion.size() ? m_firstRegion[index] : m_secondRegion[index - m_firstRegion.size()];
 	}
 
-	auto read(T* values, size_t size) const -> bool
-	{
-		static_assert(Mode == LockfreeSpscQueueRegionMode::Read, "Can only use this overload in read mode");
-		if (m_size < size) { return false; }
-
-		const auto readRegion = [&values, &size](const std::span<T>& region) {
-			const auto copySize = std::min(region.size(), size);
-			std::copy_n(region.data(), copySize, values);
-			size -= copySize;
-		};
-
-		readRegion(m_firstRegion);
-		if (size > 0) { readRegion(m_secondRegion); }
-
-		assert(size == 0);
-		return true;
-	}
-
-	auto write(const T* values, size_t size) -> bool
-	{
-		static_assert(Mode == LockfreeSpscQueueRegionMode::Write, "Can only use this overload in write mode");
-		if (m_size < size) { return false; }
-
-		auto writeRegion = [&values, &size](std::span<T>& region) {
-			const auto copySize = std::min(region.size(), size);
-			std::copy_n(values, copySize, region.data());
-			size -= copySize;
-		};
-
-		writeRegion(m_firstRegion);
-		if (size > 0) { writeRegion(m_secondRegion); }
-
-		assert(size == 0);
-		return true;
-	}
-
 	auto size() const -> size_t { return m_size; }
 	auto empty() const -> bool { return m_size == 0; }
 
@@ -161,8 +125,27 @@ public:
 
 	auto enqueue(const T* values, size_t size) -> bool
 	{
-		auto region = reserveWriteSpace(size);
-		return region.write(values, size);
+		const auto readIndex = m_readIndex.load(std::memory_order_acquire);
+		const auto writeIndex = m_writeIndex.load(std::memory_order_relaxed);
+
+		if (writeIndex < readIndex)
+		{
+			if (size > readIndex - writeIndex - 1) { return false; }
+			std::copy_n(values, size, &m_buffer[writeIndex]);
+		}
+		else
+		{
+			const auto spaceToEnd = m_buffer.size() - writeIndex - (readIndex == 0 ? 1 : 0);
+			const auto wrapSpace = readIndex == 0 ? 0 : readIndex - 1;
+			if (size > (spaceToEnd + wrapSpace)) { return false; }
+
+			const auto countToEnd = std::min(size, spaceToEnd);
+			std::copy_n(values, countToEnd, &m_buffer[writeIndex]);
+			if (size > countToEnd) { std::copy_n(values + countToEnd, size - countToEnd, &m_buffer[0]); }
+		}
+
+		m_writeIndex.store(advanceIndex(writeIndex, size), std::memory_order_release);
+		return true;
 	}
 
 	auto dequeue() -> std::optional<T>
@@ -178,15 +161,36 @@ public:
 
 	auto dequeue(T* values, size_t size) -> bool
 	{
-		const auto region = reserveReadSpace(size);
-		return region.read(values, size);
+		const auto readIndex = m_readIndex.load(std::memory_order_acquire);
+		const auto writeIndex = m_writeIndex.load(std::memory_order_relaxed);
+
+		if (readIndex < writeIndex)
+		{
+			if (size > readIndex - writeIndex) { return false; }
+			std::copy_n(&m_buffer[readIndex], size, values);
+		}
+		else
+		{
+			if (size > m_buffer.size() - readIndex + writeIndex) { return false; }
+
+			const auto countToEnd = std::min(size, m_buffer.size() - readIndex);
+			std::copy_n(&m_buffer[readIndex], countToEnd, values);
+			if (size > countToEnd) { std::copy_n(&m_buffer[0], size - countToEnd, values + countToEnd); }
+		}
+
+		m_readIndex.store(advanceIndex(readIndex, size), std::memory_order_release);
+		return true;
 	}
 
 	auto reserveReadSpace(size_t max = static_cast<size_t>(-1))
 	{
 		const auto readIndex = m_readIndex.load(std::memory_order_relaxed);
 		const auto writeIndex = m_writeIndex.load(std::memory_order_acquire);
-		const auto committer = [this](size_t count) { commitRead(count); };
+
+		const auto committer = [this](size_t count) {
+			const auto index = m_readIndex.load(std::memory_order_relaxed);
+			m_readIndex.store(advanceIndex(index, count), std::memory_order_release);
+		};
 
 		constexpr auto mode = detail::LockfreeSpscQueueRegionMode::Read;
 		using ReadRegion = detail::LockfreeSpscQueueRegion<T, mode, decltype(committer)>;
@@ -209,7 +213,11 @@ public:
 	{
 		const auto writeIndex = m_writeIndex.load(std::memory_order_relaxed);
 		const auto readIndex = m_readIndex.load(std::memory_order_acquire);
-		const auto committer = [this](size_t count) { commitWrite(count); };
+
+		const auto committer = [this](size_t count) {
+			const auto index = m_writeIndex.load(std::memory_order_relaxed);
+			m_writeIndex.store(advanceIndex(index, count), std::memory_order_release);
+		};
 
 		constexpr auto mode = detail::LockfreeSpscQueueRegionMode::Write;
 		using WriteRegion = detail::LockfreeSpscQueueRegion<T, mode, decltype(committer)>;
@@ -250,19 +258,7 @@ public:
 private:
 	size_t advanceIndex(size_t index, size_t count)
 	{
-		return std::has_single_bit(index) ? (index + count) & (m_buffer.size() - 1) : (index + count) % m_buffer.size();
-	}
-
-	void commitWrite(size_t count)
-	{
-		const auto index = m_writeIndex.load(std::memory_order_relaxed);
-		m_writeIndex.store(advanceIndex(index, count), std::memory_order_release);
-	}
-
-	void commitRead(size_t count)
-	{
-		const auto index = m_readIndex.load(std::memory_order_relaxed);
-		m_readIndex.store(advanceIndex(index, count), std::memory_order_release);
+		return std::has_single_bit(m_buffer.size()) ? (index + count) & (m_buffer.size() - 1) : (index + count) % m_buffer.size();
 	}
 
 	std::conditional_t<N == DynamicSpscQueueSize, std::vector<T>, std::array<T, N>> m_buffer;
