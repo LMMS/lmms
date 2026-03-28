@@ -36,7 +36,6 @@
 #include "EffectSelectDialog.h"
 #include "EffectView.h"
 #include "GroupBox.h"
-#include "MixHelpers.h"
 
 
 namespace lmms::gui
