@@ -34,6 +34,7 @@
 #include <optional>
 #include <span>
 #include <vector>
+#include <limits>
 
 namespace lmms {
 
@@ -145,10 +146,7 @@ public:
 	{
 	}
 
-	~LockfreeSpscQueue()
-	{
-		if (!m_shutdownFlag.test(std::memory_order_relaxed)) { shutdown(); }
-	}
+	~LockfreeSpscQueue() = default;
 
 	auto enqueue(T value) -> bool { return enqueue(&value, 1); }
 
@@ -216,20 +214,21 @@ public:
 		}
 	}
 
-	void shutdown()
-	{
-		m_shutdownFlag.test_and_set(std::memory_order_relaxed);
-		m_dataAvailableFlag.test_and_set(std::memory_order_relaxed);
-		m_dataAvailableFlag.notify_one();
-	}
-
 	void waitForData()
 	{
-		while (empty() && !m_shutdownFlag.test(std::memory_order_relaxed))
+		auto index = m_writeIndex.load(std::memory_order_acquire);
+		while (empty() && index != std::numeric_limits<size_t>::max())
 		{
-			m_dataAvailableFlag.clear(std::memory_order_relaxed);
-			m_dataAvailableFlag.wait(false, std::memory_order_relaxed);
+			m_writeIndex.wait(index, std::memory_order_acquire);
+			index = m_writeIndex.load(std::memory_order_acquire);
 		}
+	}
+
+	void shutdown()
+	{
+		m_writeIndex.store(std::numeric_limits<size_t>::max(), std::memory_order_relaxed);
+		m_readIndex.store(std::numeric_limits<size_t>::max(), std::memory_order_relaxed);
+		m_writeIndex.notify_one();
 	}
 
 	auto peek() const -> const T&
@@ -258,9 +257,7 @@ private:
 		const auto value = std::has_single_bit(m_buffer.size()) ? (index + count) & (m_buffer.size() - 1)
 																: (index + count) % m_buffer.size();
 		m_writeIndex.store(value, std::memory_order_release);
-
-		m_dataAvailableFlag.test_and_set(std::memory_order_relaxed);
-		m_dataAvailableFlag.notify_one();
+		m_writeIndex.notify_one();
 	}
 
 	void commitRead(size_t count)
@@ -276,8 +273,6 @@ private:
 	// TODO: Use std::hardware_destructive_interference_size once supported by CI
 	alignas(64) std::atomic_size_t m_readIndex;
 	alignas(64) std::atomic_size_t m_writeIndex;
-	alignas(64) std::atomic_flag m_dataAvailableFlag;
-	alignas(64) std::atomic_flag m_shutdownFlag;
 };
 
 } // namespace lmms
