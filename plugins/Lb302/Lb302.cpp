@@ -317,9 +317,6 @@ void Lb302Synth::recalcFilter()
 
 void Lb302Synth::process(SampleFrame* outbuf, const f_cnt_t size)
 {
-	const float sampleRatio = 44100.f / Engine::audioEngine()->outputSampleRate();
-	Lb302Filter& filter = vcf(); // Hold on to the current VCF, and use it throughout this period
-
 	if (m_releaseFrame == 0 || !m_playingNote) { m_vcaMode = VcaMode::Decay; }
 
 	if (m_playingNote)
@@ -328,7 +325,9 @@ void Lb302Synth::process(SampleFrame* outbuf, const f_cnt_t size)
 		m_noteVolume = m_playingNote->getVolume() * volRatio;
 		m_notePan = std::clamp(m_playingNote->getPanning(), PanningLeft, PanningRight);
 	}
+	const auto vv = panningToVolumeVector(m_notePan, m_noteVolume);
 
+	Lb302Filter& filter = vcf(); // Hold on to the current VCF, and use it throughout this period
 	if (m_newFreq)
 	{
 		m_newFreq = false;
@@ -358,7 +357,7 @@ void Lb302Synth::process(SampleFrame* outbuf, const f_cnt_t size)
 		recalcFilter();
 		if (!noteIsDead)
 		{
-			vcf().playNote();
+			filter.playNote();
 			m_vcfEnvPos = s_envInc; // Ensure envelope is recalculated
 		}
 	}
@@ -380,6 +379,7 @@ void Lb302Synth::process(SampleFrame* outbuf, const f_cnt_t size)
 	constexpr auto gateThreshold = 1.f / 65536.f; // Signal below this value is silenced
 	const auto decay = computeDecayFactor(0.245260770975f, gateThreshold);
 
+	const float sampleRatio = 44100.f / Engine::audioEngine()->outputSampleRate();
 	for (f_cnt_t i = 0; i < size; ++i)
 	{
 		// start decay if we're past release
@@ -473,7 +473,6 @@ void Lb302Synth::process(SampleFrame* outbuf, const f_cnt_t size)
 
 		// Write out samples.
 		sample_t samp = filter.process(m_vcoK) * m_vca;
-		const auto vv = panningToVolumeVector(m_notePan, m_noteVolume);
 		for (ch_cnt_t c = 0; c < DEFAULT_CHANNELS; c++) { outbuf[i][c] = samp * vv.vol[c]; }
 
 		// Handle Envelope
