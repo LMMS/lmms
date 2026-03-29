@@ -2,7 +2,7 @@
 	<h1>
 	<img src="https://raw.githubusercontent.com/LMMS/artwork/master/Icon%20%26%20Mimetypes/lmms-64x64.svg" alt="LMMS Logo"><br>LMMS
 	</h1>
-	<p>Cross-platform music production software</p>
+	<p>Cross-platform Music Production Software.</p>
 	<p>
 		<a href="https://lmms.io/">Website</a>
 		⦁︎
@@ -25,30 +25,26 @@
 	</p>
 </div>
 
-What is LMMS?
---------------
+## What is LMMS?
 
 LMMS is an open-source cross-platform digital audio workstation designed for music production. It includes an advanced Piano Roll, Beat Sequencer, Song Editor, and Mixer for composing, arranging, and mixing music. It comes with 15+ synthesizer plugins by default, along with VST2 and SoundFont2 support.
 
-Features
----------
+## Features
 
-* Song-Editor for arranging melodies, samples, patterns, and automation
-* Pattern-Editor for creating beats and patterns
-* An easy-to-use Piano-Roll for editing patterns and melodies
-* A Mixer with unlimited mixer channels and arbitrary number of effects
-* Many powerful instrument and effect-plugins out of the box
-* Full user-defined track-based automation and computer-controlled automation sources
-* Compatible with many standards such as SoundFont2, VST2 (instruments and effects), LADSPA, LV2, GUS Patches, and full MIDI support
-* MIDI file importing and exporting
+- Song-Editor for arranging melodies, samples, patterns, and automation.
+- Pattern-Editor for creating beats and patterns.
+- An easy-to-use Piano-Roll for editing patterns and melodies.
+- A Mixer with unlimited mixer channels and arbitrary number of effects.
+- Many powerful instrument and effect-plugins out of the box.
+- Full user-defined track-based automation and computer-controlled automation sources.
+- Compatible with many standards such as SoundFont2, VST2 (instruments and effects), LADSPA, LV2, GUS Patches, and full MIDI support.
+- MIDI file importing and exporting.
 
-Building
----------
+## Building
 
 See [Compiling LMMS](https://github.com/LMMS/lmms/wiki/Compiling)
 
-Join LMMS-development
-----------------------
+## Join LMMS-development
 
 If you are interested in LMMS, its programming, artwork, testing, writing demo songs, (and improving this README...) or something like that, you're welcome to participate in the development of LMMS!
 
