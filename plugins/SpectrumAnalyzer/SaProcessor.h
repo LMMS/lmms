@@ -52,7 +52,7 @@ public:
 	virtual ~SaProcessor();
 
 	// analysis thread and a method to terminate it
-	void analyze(LockfreeSpscQueue<SampleFrame>& ring_buffer, std::binary_semaphore& flag);
+	void analyze(LockfreeSpscQueue<SampleFrame>& ring_buffer);
 	void terminate() {m_terminate = true;}
 
 	// inform processor if any processing is actually required

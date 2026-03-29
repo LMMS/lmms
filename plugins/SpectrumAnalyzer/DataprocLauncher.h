@@ -37,22 +37,20 @@ namespace lmms
 class DataprocLauncher : public QThread
 {
 public:
-	explicit DataprocLauncher(SaProcessor& proc, LockfreeSpscQueue<SampleFrame>& buffer, std::binary_semaphore& flag)
+	explicit DataprocLauncher(SaProcessor& proc, LockfreeSpscQueue<SampleFrame>& buffer)
 		: m_processor(&proc)
 		, m_inputBuffer(&buffer)
-		, m_flag(&flag)
 	{
 	}
 
 private:
 	void run() override
 	{
-		m_processor->analyze(*m_inputBuffer, *m_flag);
+		m_processor->analyze(*m_inputBuffer);
 	}
 
 	SaProcessor *m_processor;
 	LockfreeSpscQueue<SampleFrame> *m_inputBuffer;
-	std::binary_semaphore* m_flag;
 };
 
 
