@@ -696,9 +696,12 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 	if (!contextMenu.isEmpty()) { contextMenu.exec(e->globalPos()); }
 }
 
-void FileBrowserTreeWidget::openInSlicerT(FileItem* item)
+void FileBrowserTreeWidget::openInSlicerT(FileItem* item, bool songEditor)
 {
+	// Get the right TrackContainer. Ternary doesn't compile due to a type mismatch
+	// (similar to FileBrowserTreeWidget::openInNewInstrumentTrack)
     TrackContainer* tc = Engine::getSong();
+	if (!songEditor) { tc = Engine::patternStore(); }
 
     auto* track = dynamic_cast<InstrumentTrack*>(Track::create(Track::Type::Instrument, tc));
 
@@ -733,7 +736,7 @@ QList<QAction*> FileBrowserTreeWidget::getContextActions(FileItem* file, bool so
 	{
 		auto openInSlicer = new QAction(tr("Send to new SlicerT instance"));
 		connect(openInSlicer, &QAction::triggered,
-			[=, this]{ openInSlicerT(file); });
+			[=, this]{ openInSlicerT(file, songEditor); });
 		result.append(openInSlicer);
 	}
 
