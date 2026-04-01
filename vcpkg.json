@@ -51,16 +51,6 @@
 			"default-features": false
 		},
 		{
-			"name": "libxft",
-			"default-features": false,
-			"platform": "linux"
-		},
-		{
-			"name": "libxinerama",
-			"default-features": false,
-			"platform": "linux"
-		},
-		{
 			"name": "lilv",
 			"default-features": false
 		},
@@ -70,8 +60,7 @@
 		},
 		{
 			"name": "portaudio",
-			"default-features": false,
-			"platform": "!linux"
+			"default-features": false
 		},
 		{
 			"name": "pulseaudio",
