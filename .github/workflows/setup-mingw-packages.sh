@@ -10,7 +10,7 @@
 # The rest of the MinGW dependencies come from vcpkg.
 # suil, once added, would need to be built with Qt, due to its dependency on it.
 
-sudo sh -c 'echo "deb http://ppa.launchpad.net/tobydox/mingw-w64/ubuntu focal main" > \
+sh -c 'echo "deb http://ppa.launchpad.net/tobydox/mingw-w64/ubuntu focal main" > \
   /etc/apt/sources.list.d/tobydox-mingw-w64.list'
-sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 72931B477E22FEFD47F8DECE02FE5F12ADDE29B2
-sudo apt-get update -y
+apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 72931B477E22FEFD47F8DECE02FE5F12ADDE29B2
+apt-get update -y
