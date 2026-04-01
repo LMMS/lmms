@@ -23,6 +23,7 @@
 #include "EqSpectrumView.h"
 
 #include <cmath>
+#include <numbers>
 #include <QPainter>
 #include <QPen>
 
@@ -31,7 +32,6 @@
 #include "EqCurve.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
-#include "lmms_constants.h"
 
 namespace lmms
 {
@@ -43,6 +43,7 @@ EqAnalyser::EqAnalyser() :
 	m_sampleRate ( 1 ),
 	m_active ( true )
 {
+	using namespace std::numbers;
 	m_inProgress=false;
 	m_specBuf = ( fftwf_complex * ) fftwf_malloc( ( FFT_BUFFER_SIZE + 1 ) * sizeof( fftwf_complex ) );
 	m_fftPlan = fftwf_plan_dft_r2c_1d( FFT_BUFFER_SIZE*2, m_buffer, m_specBuf, FFTW_MEASURE );
@@ -56,9 +57,9 @@ EqAnalyser::EqAnalyser() :
 
 	for (auto i = std::size_t{0}; i < FFT_BUFFER_SIZE; i++)
 	{
-		m_fftWindow[i] = (a0 - a1 * std::cos(2 * numbers::pi_v<float> * i / ((float)FFT_BUFFER_SIZE - 1.0))
-			+ a2 * std::cos(4 * numbers::pi_v<float> * i / ((float)FFT_BUFFER_SIZE - 1.0))
-			- a3 * std::cos(6 * numbers::pi_v<float> * i / ((float)FFT_BUFFER_SIZE - 1.0)));
+		m_fftWindow[i] = a0 - a1 * std::cos(2 * pi_v<float> * i / static_cast<float>(FFT_BUFFER_SIZE - 1.0))
+			+ a2 * std::cos(4 * pi_v<float> * i / static_cast<float>(FFT_BUFFER_SIZE - 1.0))
+			- a3 * std::cos(6 * pi_v<float> * i / static_cast<float>(FFT_BUFFER_SIZE - 1.0));
 	}
 	clear();
 }
@@ -75,14 +76,14 @@ EqAnalyser::~EqAnalyser()
 
 
 
-void EqAnalyser::analyze( SampleFrame* buf, const fpp_t frames )
+void EqAnalyser::analyze( SampleFrame* buf, const f_cnt_t frames )
 {
 	//only analyse if the view is visible
 	if ( m_active )
 	{
 		m_inProgress=true;
 		const int FFT_BUFFER_SIZE = 2048;
-		fpp_t f = 0;
+		f_cnt_t f = 0;
 		if( frames > FFT_BUFFER_SIZE )
 		{
 			m_framesFilledUp = 0;

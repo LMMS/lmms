@@ -24,17 +24,14 @@
 
 #include "Editor.h"
 
+#include <QAction>
+#include <QShortcut>
+
 #include "DeprecationHelper.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
 #include "Song.h"
-
 #include "embed.h"
-
-#include <QAction>
-#include <QShortcut>
-#include <QCloseEvent>
-
 
 namespace lmms::gui
 {
@@ -73,6 +70,7 @@ DropToolBar * Editor::addDropToolBar(QWidget * parent, Qt::ToolBarArea whereToAd
 
 void Editor::togglePlayStop()
 {
+	s_lastPlayedEditor = this;
 	if (Engine::getSong()->isPlaying())
 		stop();
 	else
@@ -81,6 +79,7 @@ void Editor::togglePlayStop()
 
 void Editor::togglePause()
 {
+	s_lastPlayedEditor = this;
 	Engine::getSong()->togglePause();
 }
 
@@ -90,6 +89,7 @@ void Editor::toggleMaximize()
 }
 
 Editor::Editor(bool record, bool stepRecord) :
+	QMainWindow(),
 	m_toolBar(new DropToolBar(this)),
 	m_playAction(nullptr),
 	m_recordAction(nullptr),
@@ -118,9 +118,7 @@ Editor::Editor(bool record, bool stepRecord) :
 	connect(m_recordAccompanyAction, SIGNAL(triggered()), this, SLOT(recordAccompany()));
 	connect(m_toggleStepRecordingAction, SIGNAL(triggered()), this, SLOT(toggleStepRecording()));
 	connect(m_stopAction, SIGNAL(triggered()), this, SLOT(stop()));
-	new QShortcut(Qt::Key_Space, this, SLOT(togglePlayStop()));
-	new QShortcut(QKeySequence(combine(Qt::SHIFT, Qt::Key_Space)), this, SLOT(togglePause()));
-	new QShortcut(QKeySequence(combine(Qt::SHIFT, Qt::Key_F11)), this, SLOT(toggleMaximize()));
+	new QShortcut(keySequence(Qt::SHIFT, Qt::Key_F11), this, SLOT(toggleMaximize()));
 
 	// Add actions to toolbar
 	addButton(m_playAction, "playButton");
@@ -141,19 +139,22 @@ QAction *Editor::playAction() const
 	return m_playAction;
 }
 
-void Editor::closeEvent(QCloseEvent * event)
+void Editor::keyPressEvent(QKeyEvent* ke)
 {
-	if( parentWidget() )
+	if (ke->key() == Qt::Key_Space)
 	{
-		parentWidget()->hide();
+		if (ke->modifiers() & Qt::ShiftModifier)
+		{
+			togglePause();
+		}
+		else
+		{
+			togglePlayStop();
+		}
+		return;
 	}
-	else
-	{
-		hide();
-	}
-	getGUI()->mainWindow()->refocus();
-	event->ignore();
- }
+	ke->ignore();
+}
 
 DropToolBar::DropToolBar(QWidget* parent) : QToolBar(parent)
 {

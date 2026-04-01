@@ -34,7 +34,6 @@
 #include "endian_handling.h"
 #include "LcdSpinBox.h"
 #include "AudioEngine.h"
-#include "Engine.h"
 
 #include "ConfigManager.h"
 
@@ -146,7 +145,7 @@ void AudioSndio::run()
 
 	while( true )
 	{
-		const fpp_t frames = getNextBuffer( temp );
+		const f_cnt_t frames = getNextBuffer( temp );
 		if( !frames )
 		{
 			break;

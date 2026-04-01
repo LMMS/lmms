@@ -31,7 +31,6 @@
 #include "embed.h"
 #include "Engine.h"
 #include "FontHelper.h"
-#include "lmms_constants.h"
 #include "lmms_math.h"
 
 
@@ -200,13 +199,14 @@ bool EqHandle::mousePressed() const
 
 float EqHandle::getPeakCurve( float x )
 {
+	using namespace std::numbers;
 	double freqZ = xPixelToFreq( EqHandle::x(), m_width );
-	double w0 = numbers::tau * freqZ / Engine::audioEngine()->outputSampleRate();
+	double w0 = 2 * pi * freqZ / Engine::audioEngine()->outputSampleRate();
 	double c = std::cos(w0);
 	double s = std::sin(w0);
 	double Q = getResonance();
 	double A = fastPow10f(yPixelToGain(EqHandle::y(), m_heigth, m_pixelsPerUnitHeight) / 40);
-	double alpha = s * std::sinh(std::log(2.0) / 2 * Q * w0 / std::sin(w0));
+	double alpha = s * std::sinh(ln2 / 2 * Q * w0 / std::sin(w0));
 
 	//calc coefficents
 	double b0 = 1 + alpha * A;
@@ -237,7 +237,7 @@ float EqHandle::getPeakCurve( float x )
 float EqHandle::getHighShelfCurve( float x )
 {
 	double freqZ = xPixelToFreq( EqHandle::x(), m_width );
-	double w0 = numbers::tau * freqZ / Engine::audioEngine()->outputSampleRate();
+	double w0 = 2 * std::numbers::pi * freqZ / Engine::audioEngine()->outputSampleRate();
 	double c = std::cos(w0);
 	double s = std::sin(w0);
 	double A = fastPow10f(yPixelToGain(EqHandle::y(), m_heigth, m_pixelsPerUnitHeight) * 0.025);
@@ -272,7 +272,7 @@ float EqHandle::getHighShelfCurve( float x )
 float EqHandle::getLowShelfCurve( float x )
 {
 	double freqZ = xPixelToFreq( EqHandle::x(), m_width );
-	double w0 = numbers::tau * freqZ / Engine::audioEngine()->outputSampleRate();
+	double w0 = 2 * std::numbers::pi * freqZ / Engine::audioEngine()->outputSampleRate();
 	double c = std::cos(w0);
 	double s = std::sin(w0);
 	double A = fastPow10f(yPixelToGain(EqHandle::y(), m_heigth, m_pixelsPerUnitHeight) / 40);
@@ -307,7 +307,7 @@ float EqHandle::getLowShelfCurve( float x )
 float EqHandle::getLowCutCurve( float x )
 {
 	double freqZ = xPixelToFreq( EqHandle::x(), m_width );
-	double w0 = numbers::tau * freqZ / Engine::audioEngine()->outputSampleRate();
+	double w0 = 2 * std::numbers::pi * freqZ / Engine::audioEngine()->outputSampleRate();
 	double c = std::cos(w0);
 	double s = std::sin(w0);
 	double resonance = getResonance();
@@ -349,7 +349,7 @@ float EqHandle::getLowCutCurve( float x )
 float EqHandle::getHighCutCurve( float x )
 {
 	double freqZ = xPixelToFreq( EqHandle::x(), m_width );
-	double w0 = numbers::tau * freqZ / Engine::audioEngine()->outputSampleRate();
+	double w0 = 2 * std::numbers::pi * freqZ / Engine::audioEngine()->outputSampleRate();
 	double c = std::cos(w0);
 	double s = std::sin(w0);
 	double resonance = getResonance();
@@ -522,7 +522,7 @@ void EqHandle::setlp48()
 
 double EqHandle::calculateGain(const double freq, const double a1, const double a2, const double b0, const double b1, const double b2 )
 {
-	const double w = std::sin(numbers::pi * freq / Engine::audioEngine()->outputSampleRate());
+	const double w = std::sin(std::numbers::pi * freq / Engine::audioEngine()->outputSampleRate());
 	const double PHI = w * w * 4;
 
 	auto bb = b0 + b1 + b2;

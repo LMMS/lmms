@@ -26,12 +26,12 @@
 #include "NotePlayHandle.h"
 
 #include "AudioEngine.h"
-#include "BasicFilters.h"
 #include "DetuningHelper.h"
 #include "InstrumentSoundShaping.h"
 #include "InstrumentTrack.h"
 #include "Instrument.h"
 #include "Song.h"
+#include "lmms_math.h"
 
 namespace lmms
 {
@@ -54,7 +54,7 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 								int midiEventChannel,
 								Origin origin ) :
 	PlayHandle( PlayHandle::Type::NotePlayHandle, _offset ),
-	Note( n.length(), n.pos(), n.key(), n.getVolume(), n.getPanning(), n.detuning() ),
+	Note(n),
 	m_pluginData( nullptr ),
 	m_instrumentTrack( instrumentTrack ),
 	m_frames( 0 ),
@@ -84,7 +84,7 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 	lock();
 	if( hasParent() == false )
 	{
-		m_baseDetuning = new BaseDetuning( detuning() );
+		m_baseDetuning = new BaseDetuning(detuning().get());
 		m_instrumentTrack->m_processHandles.push_back( this );
 	}
 	else
@@ -114,7 +114,7 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 		setUsesBuffer( false );
 	}
 
-	setAudioPort( instrumentTrack->audioPort() );
+	setAudioBusHandle(instrumentTrack->audioBusHandle());
 
 	unlock();
 }
@@ -346,13 +346,13 @@ f_cnt_t NotePlayHandle::framesLeft() const
 
 
 
-fpp_t NotePlayHandle::framesLeftForCurrentPeriod() const
+f_cnt_t NotePlayHandle::framesLeftForCurrentPeriod() const
 {
 	if( m_totalFramesPlayed == 0 )
 	{
-		return static_cast<fpp_t>(std::min<f_cnt_t>(framesLeft(), Engine::audioEngine()->framesPerPeriod() - offset()));
+		return std::min(framesLeft(), Engine::audioEngine()->framesPerPeriod() - offset());
 	}
-	return static_cast<fpp_t>(std::min<f_cnt_t>(framesLeft(), Engine::audioEngine()->framesPerPeriod()));
+	return std::min(framesLeft(), Engine::audioEngine()->framesPerPeriod());
 }
 
 

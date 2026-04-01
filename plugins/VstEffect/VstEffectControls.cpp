@@ -22,7 +22,10 @@
  *
  */
 
+#include "VstEffectControls.h"
+
 #include <QAction>
+#include <QApplication>
 #include <QDomElement>
 #include <QGridLayout>
 #include <QMenu>
@@ -30,17 +33,13 @@
 #include <QScrollArea>
 
 #include "embed.h"
-#include "CustomTextKnob.h"
-#include "VstEffectControls.h"
+#include "GuiApplication.h"
+#include "LocaleHelper.h"
+#include "MainWindow.h"
+#include "SubWindow.h"
 #include "VstEffectControlDialog.h"
 #include "VstEffect.h"
 #include "VstPlugin.h"
-
-#include "LocaleHelper.h"
-#include "MainWindow.h"
-#include "GuiApplication.h"
-#include "SubWindow.h"
-#include <QApplication>
 
 namespace lmms
 {
@@ -315,19 +314,9 @@ namespace gui
 ManageVSTEffectView::ManageVSTEffectView( VstEffect * _eff, VstEffectControls * m_vi ) :
 	m_effect( _eff )
 {
-#if QT_VERSION < 0x50C00
-	// Workaround for a bug in Qt versions below 5.12,
-	// where argument-dependent-lookup fails for QFlags operators
-	// declared inside a namepsace.
-	// This affects the Q_DECLARE_OPERATORS_FOR_FLAGS macro in Instrument.h
-	// See also: https://codereview.qt-project.org/c/qt/qtbase/+/225348
-
-	using ::operator|;
-#endif
-
 	m_vi2 = m_vi;
 	widget = new QWidget();
-        m_vi->m_scrollArea = new QScrollArea( widget );
+	m_vi->m_scrollArea = new QScrollArea(widget);
 	l = new QGridLayout( widget );
 
 	m_vi->m_subWindow = getGUI()->mainWindow()->addWindowedWidget(nullptr, Qt::SubWindow |
@@ -372,7 +361,7 @@ ManageVSTEffectView::ManageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 	const QMap<QString, QString> & dump = m_effect->m_plugin->parameterDump();
 	m_vi->paramCount = dump.size();
 
-	vstKnobs = new CustomTextKnob *[ m_vi->paramCount ];
+	m_vstKnobs.reserve(m_vi->paramCount);
 
 	bool hasKnobModel = true;
 	if (m_vi->knobFModel.empty())
@@ -389,9 +378,10 @@ ManageVSTEffectView::ManageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 		std::snprintf(paramStr.data(), paramStr.size(), "param%d", i);
 		s_dumpValues = dump[paramStr.data()].split(":");
 
-		vstKnobs[ i ] = new CustomTextKnob( KnobType::Bright26, widget, s_dumpValues.at( 1 ) );
-		vstKnobs[ i ]->setDescription( s_dumpValues.at( 1 ) + ":" );
-		vstKnobs[ i ]->setLabel( s_dumpValues.at( 1 ).left( 15 ) );
+		const auto& description = s_dumpValues.at(1);
+
+		auto knob = new VstPluginKnob{m_effect->m_plugin.get(), i, description, widget};
+		m_vstKnobs.push_back(knob);
 
 		if( !hasKnobModel )
 		{
@@ -403,9 +393,10 @@ ManageVSTEffectView::ManageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 		FloatModel * model = m_vi->knobFModel[i];
 		connect( model, &FloatModel::dataChanged, this,
 			[this, model]() { setParameter( model ); }, Qt::DirectConnection);
-		vstKnobs[ i ] ->setModel( model );
+		knob->setModel(model);
 	}
-	syncParameterText();
+	m_effect->m_plugin->loadParameterLabels();
+	m_effect->m_plugin->loadParameterDisplays();
 
 	int i = 0;
 	for( int lrow = 1; lrow < ( int( m_vi->paramCount / 10 ) + 1 ) + 1; lrow++ )
@@ -414,7 +405,7 @@ ManageVSTEffectView::ManageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 		{
 			if( i < m_vi->paramCount )
 			{
-				l->addWidget( vstKnobs[i], lrow, lcolumn, Qt::AlignCenter );
+				l->addWidget(m_vstKnobs[i], lrow, lcolumn, Qt::AlignCenter);
 			}
 			i++;
 		}
@@ -463,11 +454,12 @@ void ManageVSTEffectView::syncPlugin()
 			std::snprintf(paramStr.data(), paramStr.size(), "param%d", i);
 			s_dumpValues = dump[paramStr.data()].split(":");
 			float f_value = LocaleHelper::toFloat(s_dumpValues.at(2));
-			m_vi2->knobFModel[ i ]->setAutomatedValue( f_value );
-			m_vi2->knobFModel[ i ]->setInitValue( f_value );
+			m_vi2->knobFModel[i]->setValue(f_value, true);
+			m_vi2->knobFModel[i]->setInitValue(f_value);
 		}
 	}
-	syncParameterText();
+	m_effect->m_plugin->loadParameterLabels();
+	m_effect->m_plugin->loadParameterDisplays();
 }
 
 
@@ -482,12 +474,12 @@ void ManageVSTEffectView::displayAutomatedOnly()
 		if( !( m_vi2->knobFModel[ i ]->isAutomated() ||
 					m_vi2->knobFModel[ i ]->controllerConnection() ) )
 		{
-			if( vstKnobs[ i ]->isVisible() == true  && isAuto )
+			if (m_vstKnobs[i]->isVisible() && isAuto)
 			{
-				vstKnobs[ i ]->hide();
+				m_vstKnobs[i]->hide();
 				m_displayAutomatedOnly->setText( "All" );
 			} else {
-				vstKnobs[ i ]->show();
+				m_vstKnobs[i]->show();
 				m_displayAutomatedOnly->setText( "Automated" );
 			}
 		}
@@ -503,42 +495,8 @@ void ManageVSTEffectView::setParameter( Model * action )
 
 	if ( m_effect->m_plugin != nullptr ) {
 		m_effect->m_plugin->setParam( knobUNID, m_vi2->knobFModel[knobUNID]->value() );
-		syncParameterText();
 	}
 }
-
-void ManageVSTEffectView::syncParameterText()
-{
-	m_effect->m_plugin->loadParameterLabels();
-	m_effect->m_plugin->loadParameterDisplays();
-
-	QString paramLabelStr   = m_effect->m_plugin->allParameterLabels();
-	QString paramDisplayStr = m_effect->m_plugin->allParameterDisplays();
-
-	QStringList paramLabelList;
-	QStringList paramDisplayList;
-
-	for( int i = 0; i < paramLabelStr.size(); )
-	{
-		const int length = paramLabelStr[i].digitValue();
-		paramLabelList.append(paramLabelStr.mid(i + 1, length));
-		i += length + 1;
-	}
-
-	for( int i = 0; i < paramDisplayStr.size(); )
-	{
-		const int length = paramDisplayStr[i].digitValue();
-		paramDisplayList.append(paramDisplayStr.mid(i + 1, length));
-		i += length + 1;
-	}
-
-	for( int i = 0; i < paramLabelList.size(); ++i )
-	{
-		vstKnobs[i]->setValueText(paramDisplayList[i] + ' ' + paramLabelList[i]);
-	}
-}
-
-
 
 ManageVSTEffectView::~ManageVSTEffectView()
 {
@@ -547,14 +505,8 @@ ManageVSTEffectView::~ManageVSTEffectView()
 		for( int i = 0; i < m_vi2->paramCount; i++ )
 		{
 			delete m_vi2->knobFModel[ i ];
-			delete vstKnobs[ i ];
+			delete m_vstKnobs[i];
 		}
-	}
-
-	if( vstKnobs != nullptr )
-	{
-		delete [] vstKnobs;
-		vstKnobs = nullptr;
 	}
 
 	m_vi2->knobFModel.clear();

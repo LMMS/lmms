@@ -32,7 +32,9 @@
 #include <QString>
 
 #include "lmms_export.h"
-#include "lmms_basics.h"
+#ifdef PLUGIN_NAME
+#include "LmmsCommonMacros.h"
+#endif
 
 namespace lmms {
 
@@ -50,6 +52,20 @@ namespace embed {
 auto LMMS_EXPORT getIconPixmap(std::string_view name,
 	int width = -1, int height = -1, const char* const* xpm = nullptr) -> QPixmap;
 auto LMMS_EXPORT getText(std::string_view name) -> QString;
+
+/**
+ * @brief Temporary shim for QPixmap::deviceIndependentSize.
+ * @param pixmap The pixmap to get the size of.
+ * @return The device-independent size of the pixmap.
+ */
+inline auto logicalSize(const QPixmap& pixmap) noexcept
+{
+#if QT_VERSION >= QT_VERSION_CHECK(6, 2, 0)
+	return pixmap.deviceIndependentSize().toSize();
+#else
+	return pixmap.isNull() ? QSize(0, 0) : pixmap.size() / pixmap.devicePixelRatio();
+#endif
+}
 
 } // namespace embed
 

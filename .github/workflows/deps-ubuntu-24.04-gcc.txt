@@ -11,7 +11,6 @@ g++
 libasound2-dev
 libc6-dev
 libfftw3-dev
-libfltk1.3-dev
 libfluidsynth-dev
 libgig-dev
 libgtk2.0-0
@@ -46,6 +45,7 @@ qtbase5-dev
 qtbase5-dev-tools
 qtbase5-private-dev
 qttools5-dev-tools
+qtwayland5
 software-properties-common
 ssh-client
 stk

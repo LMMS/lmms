@@ -32,7 +32,7 @@ class QPushButton;
 namespace lmms::gui
 {
 
-class PixmapButton;
+class AutomatableButton;
 class TrackGrip;
 class TrackView;
 
@@ -69,8 +69,8 @@ private:
 
 	TrackGrip* m_trackGrip;
 	QPushButton * m_trackOps;
-	PixmapButton * m_muteBtn;
-	PixmapButton * m_soloBtn;
+	AutomatableButton* m_muteBtn;
+	AutomatableButton* m_soloBtn;
 
 
 	friend class TrackView;

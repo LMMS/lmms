@@ -89,6 +89,9 @@ void TempoSyncBarModelEditor::contextMenuEvent(QContextMenuEvent *)
 
 	CaptionMenu contextMenu(tempoSyncModel->displayName(), this);
 	addDefaultActions(&contextMenu);
+	contextMenu.addAction(QPixmap(),
+		model()->isScaleLogarithmic() ? tr("Set linear") : tr("Set logarithmic"),
+		this, SLOT(toggleScale()));
 
 	contextMenu.addSeparator();
 
@@ -202,11 +205,11 @@ void TempoSyncBarModelEditor::showCustom()
 	if(m_custom == nullptr)
 	{
 		m_custom = new MeterDialog(getGUI()->mainWindow()->workspace());
-		QMdiSubWindow * subWindow = getGUI()->mainWindow()->addWindowedWidget(m_custom);
+		SubWindow* subWindow = getGUI()->mainWindow()->addWindowedWidget(m_custom);
 		Qt::WindowFlags flags = subWindow->windowFlags();
 		flags &= ~Qt::WindowMaximizeButtonHint;
 		subWindow->setWindowFlags(flags);
-		subWindow->setFixedSize(subWindow->size());
+		setFixedSize(size());
 		m_custom->setWindowTitle("Meter");
 		m_custom->setModel(&model()->getCustomMeterModel());
 	}

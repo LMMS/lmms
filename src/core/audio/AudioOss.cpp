@@ -33,7 +33,6 @@
 #include "endian_handling.h"
 #include "LcdSpinBox.h"
 #include "AudioEngine.h"
-#include "Engine.h"
 
 #ifdef LMMS_HAVE_UNISTD_H
 #include <unistd.h>
@@ -260,7 +259,7 @@ void AudioOss::run()
 
 	while( true )
 	{
-		const fpp_t frames = getNextBuffer( temp );
+		const f_cnt_t frames = getNextBuffer( temp );
 		if( !frames )
 		{
 			break;

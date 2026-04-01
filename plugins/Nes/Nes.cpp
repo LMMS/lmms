@@ -22,14 +22,12 @@
  *
  */
 
-#include <QDomElement>
 
 #include "Nes.h"
 
 #include "AudioEngine.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
-#include "interpolation.h"
 #include "Knob.h"
 #include "Oscillator.h"
 
@@ -104,7 +102,7 @@ NesObject::NesObject( NesInstrument * nes, const sample_rate_t samplerate, NoteP
 }
 
 
-void NesObject::renderOutput( SampleFrame* buf, fpp_t frames )
+void NesObject::renderOutput( SampleFrame* buf, f_cnt_t frames )
 {
 	////////////////////////////////
 	//	                          //
@@ -398,7 +396,7 @@ void NesObject::renderOutput( SampleFrame* buf, fpp_t frames )
 		pin1 = pin1 * 2.0f - 1.0f;
 		
 		// simple first order iir filter, to simulate the frequency response falloff in nes analog audio output
-		pin1 = linearInterpolate( pin1, m_12Last, m_nsf );
+		pin1 = std::lerp(pin1, m_12Last, m_nsf);
 		m_12Last = pin1;
 
 		// compensate DC offset
@@ -416,7 +414,7 @@ void NesObject::renderOutput( SampleFrame* buf, fpp_t frames )
 		pin2 = pin2 * 2.0f - 1.0f;
 
 		// simple first order iir filter, to simulate the frequency response falloff in nes analog audio output
-		pin2 = linearInterpolate( pin2, m_34Last, m_nsf );
+		pin2 = std::lerp(pin2, m_34Last, m_nsf);
 		m_34Last = pin2;
 		
 		// compensate DC offset
@@ -548,7 +546,7 @@ NesInstrument::NesInstrument( InstrumentTrack * instrumentTrack ) :
 
 void NesInstrument::playNote( NotePlayHandle * n, SampleFrame* workingBuffer )
 {
-	const fpp_t frames = n->framesLeftForCurrentPeriod();
+	const f_cnt_t frames = n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = n->noteOffset();
 	
 	if (!n->m_pluginData)
@@ -768,7 +766,7 @@ NesInstrumentView::NesInstrumentView( Instrument * instrument,	QWidget * parent 
 	dcx += 13;
 	makedcled( ch1_dc4, dcx, 42, tr( "75% Duty cycle" ), "nesdc4_on" )
 		
-	m_ch1DutyCycleGrp = new automatableButtonGroup( this );
+	m_ch1DutyCycleGrp = new AutomatableButtonGroup( this );
 	m_ch1DutyCycleGrp -> addButton( ch1_dc1 );
 	m_ch1DutyCycleGrp -> addButton( ch1_dc2 );
 	m_ch1DutyCycleGrp -> addButton( ch1_dc3 );
@@ -799,7 +797,7 @@ NesInstrumentView::NesInstrumentView( Instrument * instrument,	QWidget * parent 
 	dcx += 13;
 	makedcled( ch2_dc4, dcx, 99, tr( "75% Duty cycle" ), "nesdc4_on" )
 		
-	m_ch2DutyCycleGrp = new automatableButtonGroup( this );
+	m_ch2DutyCycleGrp = new AutomatableButtonGroup( this );
 	m_ch2DutyCycleGrp -> addButton( ch2_dc1 );
 	m_ch2DutyCycleGrp -> addButton( ch2_dc2 );
 	m_ch2DutyCycleGrp -> addButton( ch2_dc3 );

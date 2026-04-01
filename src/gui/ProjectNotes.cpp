@@ -26,8 +26,8 @@
 #include "ProjectNotes.h"
 
 #include <QAction>
+#include <QActionGroup>
 #include <QApplication>
-#include <QCloseEvent>
 #include <QColorDialog>
 #include <QComboBox>
 #include <QFontDatabase>
@@ -49,8 +49,8 @@ namespace lmms::gui
 {
 
 
-ProjectNotes::ProjectNotes() :
-	QMainWindow( getGUI()->mainWindow()->workspace() )
+ProjectNotes::ProjectNotes()
+	: QMainWindow{getGUI()->mainWindow()->workspace()}
 {
 	m_edit = new QTextEdit( this );
 	m_edit->setAutoFillBackground( true );
@@ -146,8 +146,9 @@ void ProjectNotes::setupActions()
 	m_comboFont->setEditable( true );
 	QFontDatabase db;
 	m_comboFont->addItems( db.families() );
-	connect( m_comboFont, SIGNAL( activated( const QString& ) ),
-			m_edit, SLOT( setFontFamily( const QString& ) ) );
+
+	connect(m_comboFont, &QComboBox::textActivated, m_edit, &QTextEdit::setFontFamily);
+
 	m_comboFont->lineEdit()->setText( QApplication::font().family() );
 
 	m_comboSize = new QComboBox( tb );
@@ -158,8 +159,9 @@ void ProjectNotes::setupActions()
 	{
 		m_comboSize->addItem( QString::number( *it ) );
 	}
-	connect( m_comboSize, SIGNAL( activated( const QString& ) ),
-		     this, SLOT( textSize( const QString& ) ) );
+
+	connect(m_comboSize, &QComboBox::textActivated, this, &ProjectNotes::textSize);
+
 	m_comboSize->lineEdit()->setText( QString::number(
 					QApplication::font().pointSize() ) );
 
@@ -387,21 +389,5 @@ void ProjectNotes::loadSettings( const QDomElement & _this )
 	MainWindow::restoreWidgetState( this, _this );
 	m_edit->setHtml( _this.text() );
 }
-
-
-
-
-void ProjectNotes::closeEvent( QCloseEvent * _ce )
-{
-	if( parentWidget() )
-	{
-		parentWidget()->hide();
-	}
-	else
-	{
-		hide();
-	}
-	_ce->ignore();
- }
 
 } // namespace lmms::gui

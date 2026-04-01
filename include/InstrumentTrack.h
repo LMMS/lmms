@@ -26,9 +26,8 @@
 #ifndef LMMS_INSTRUMENT_TRACK_H
 #define LMMS_INSTRUMENT_TRACK_H
 
-#include <limits>
 
-#include "AudioPort.h"
+#include "AudioBusHandle.h"
 #include "InstrumentFunctions.h"
 #include "InstrumentSoundShaping.h"
 #include "Microtuner.h"
@@ -68,7 +67,7 @@ public:
 	~InstrumentTrack() override;
 
 	// used by instrument
-	void processAudioBuffer( SampleFrame* _buf, const fpp_t _frames,
+	void processAudioBuffer( SampleFrame* _buf, const f_cnt_t _frames,
 							NotePlayHandle * _n );
 
 	MidiEvent applyMasterKey( const MidiEvent& event );
@@ -123,7 +122,7 @@ public:
 	}
 
 	// play everything in given frame-range - creates note-play-handles
-	bool play( const TimePos & _start, const fpp_t _frames,
+	bool play( const TimePos & _start, const f_cnt_t _frames,
 						const f_cnt_t _frame_base, int _clip_num = -1 ) override;
 	// create new view for me
 	gui::TrackView* createView( gui::TrackContainerView* tcv ) override;
@@ -144,9 +143,9 @@ public:
 				const Plugin::Descriptor::SubPluginFeatures::Key* key = nullptr,
 				bool keyFromDnd = false);
 
-	AudioPort * audioPort()
+	AudioBusHandle* audioBusHandle()
 	{
-		return &m_audioPort;
+		return &m_audioBusHandle;
 	}
 
 	MidiPort * midiPort()
@@ -293,7 +292,7 @@ private:
 	FloatModel m_volumeModel;
 	FloatModel m_panningModel;
 
-	AudioPort m_audioPort;
+	AudioBusHandle m_audioBusHandle;
 
 	FloatModel m_pitchModel;
 	IntModel m_pitchRangeModel;

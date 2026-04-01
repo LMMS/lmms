@@ -81,11 +81,11 @@ LadspaControlView::LadspaControlView( QWidget * _parent,
 		case BufferDataType::Integer:
 		case BufferDataType::Enum:
 		case BufferDataType::Floating:
-			knb = new Knob( KnobType::Bright26, this, m_ctl->port()->name );
+			knb = new Knob(KnobType::Bright26, m_ctl->port()->name, this, Knob::LabelRendering::WidgetFont, m_ctl->port()->name);
 			break;
 
 		case BufferDataType::Time:
-			knb = new TempoSyncKnob( KnobType::Bright26, this, m_ctl->port()->name );
+			knb = new TempoSyncKnob(KnobType::Bright26, m_ctl->port()->name, this, Knob::LabelRendering::WidgetFont, m_ctl->port()->name);
 			break;
 
 		default:
@@ -102,7 +102,6 @@ LadspaControlView::LadspaControlView( QWidget * _parent,
 		{
 			knb->setModel( m_ctl->tempoSyncKnobModel() );
 		}
-		knb->setLabel( m_ctl->port()->name );
 		knb->setHintText( tr( "Value:" ), "" );
 		layout->addWidget( knb );
 		if( link != nullptr )

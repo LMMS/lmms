@@ -38,8 +38,6 @@ class Sample;
 namespace gui
 {
 
-class AudioFileProcessorView;
-
 class AudioFileProcessorWaveView : public QWidget
 {
 	Q_OBJECT
@@ -73,7 +71,6 @@ public:
 			m_waveView(0),
 			m_relatedKnob(0)
 		{
-			setFixedSize(37, 47);
 		}
 
 		void setWaveView(const AudioFileProcessorWaveView* wv)
@@ -172,7 +169,8 @@ private:
 
 	void updateGraph();
 	void reverse();
-	void updateCursor(QMouseEvent* me = nullptr);
+	void updateCursor(const QMouseEvent* me = nullptr);
+	bool pointerCloseToStartEndOrLoop(const QMouseEvent* me) const;
 
 	void configureKnobRelationsAndWaveViews();
 

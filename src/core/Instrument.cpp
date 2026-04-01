@@ -25,12 +25,11 @@
 #include "Instrument.h"
 
 #include <cmath>
+#include <numbers>
 
 #include "DummyInstrument.h"
 #include "InstrumentTrack.h"
-#include "lmms_basics.h"
-#include "lmms_constants.h"
-
+#include "LmmsTypes.h"
 
 namespace lmms
 {
@@ -90,7 +89,7 @@ bool Instrument::isFromTrack( const Track * _track ) const
 }
 
 // helper function for Instrument::applyFadeIn
-static int countZeroCrossings(SampleFrame* buf, fpp_t start, fpp_t frames)
+static int countZeroCrossings(SampleFrame* buf, f_cnt_t start, f_cnt_t frames)
 {
 	// zero point crossing counts of all channels
 	auto zeroCrossings = std::array<int, DEFAULT_CHANNELS>{};
@@ -98,7 +97,7 @@ static int countZeroCrossings(SampleFrame* buf, fpp_t start, fpp_t frames)
 	int maxZeroCrossings = 0;
 
 	// determine the zero point crossing counts
-	for (fpp_t f = start; f < frames; ++f)
+	for (f_cnt_t f = start; f < frames; ++f)
 	{
 		for (ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch)
 		{
@@ -119,13 +118,13 @@ static int countZeroCrossings(SampleFrame* buf, fpp_t start, fpp_t frames)
 }
 
 // helper function for Instrument::applyFadeIn
-fpp_t getFadeInLength(float maxLength, fpp_t frames, int zeroCrossings)
+f_cnt_t getFadeInLength(float maxLength, f_cnt_t frames, int zeroCrossings)
 {
 	// calculate the length of the fade in
 	// Length is inversely proportional to the max of zeroCrossings,
 	// because for low frequencies, we need a longer fade in to
 	// prevent clicking.
-	return (fpp_t) (maxLength  / ((float) zeroCrossings / ((float) frames / 128.0f) + 1.0f));
+	return (f_cnt_t) (maxLength  / ((float) zeroCrossings / ((float) frames / 128.0f) + 1.0f));
 }
 
 
@@ -135,7 +134,7 @@ void Instrument::applyFadeIn(SampleFrame* buf, NotePlayHandle * n)
 	f_cnt_t total = n->totalFramesPlayed();
 	if (total == 0)
 	{
-		const fpp_t frames = n->framesLeftForCurrentPeriod();
+		const f_cnt_t frames = n->framesLeftForCurrentPeriod();
 		const f_cnt_t offset = n->offset();
 
 		// We need to skip the first sample because it almost always
@@ -143,32 +142,32 @@ void Instrument::applyFadeIn(SampleFrame* buf, NotePlayHandle * n)
 		// determining the fade in length. Hence 1
 		int maxZeroCrossings = countZeroCrossings(buf, offset + 1, offset + frames);
 
-		fpp_t length = getFadeInLength(MAX_FADE_IN_LENGTH, frames, maxZeroCrossings);
+		f_cnt_t length = getFadeInLength(MAX_FADE_IN_LENGTH, frames, maxZeroCrossings);
 		n->m_fadeInLength = length;
 
 		// apply fade in
 		length = length < frames ? length : frames;
-		for (fpp_t f = 0; f < length; ++f)
+		for (f_cnt_t f = 0; f < length; ++f)
 		{
 			for (ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch)
 			{
-				buf[offset + f][ch] *= 0.5 - 0.5 * std::cos(numbers::pi_v<float> * (float) f / (float) n->m_fadeInLength);
+				buf[offset + f][ch] *= 0.5 - 0.5 * std::cos(std::numbers::pi_v<float> * static_cast<float>(f) / static_cast<float>(n->m_fadeInLength));
 			}
 		}
 	}
 	else if (total < n->m_fadeInLength)
 	{
-		const fpp_t frames = n->framesLeftForCurrentPeriod();
+		const f_cnt_t frames = n->framesLeftForCurrentPeriod();
 
 		int new_zc = countZeroCrossings(buf, 1, frames);
-		fpp_t new_length = getFadeInLength(MAX_FADE_IN_LENGTH, frames, new_zc);
+		f_cnt_t new_length = getFadeInLength(MAX_FADE_IN_LENGTH, frames, new_zc);
 
-		for (fpp_t f = 0; f < frames; ++f)
+		for (f_cnt_t f = 0; f < frames; ++f)
 		{
 			for (ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch)
 			{
 				float currentLength = n->m_fadeInLength * (1.0f - (float) f / frames) + new_length * ((float) f / frames);
-				buf[f][ch] *= 0.5 - 0.5 * std::cos(numbers::pi_v<float> * (float) (total + f) / currentLength);
+				buf[f][ch] *= 0.5 - 0.5 * std::cos(std::numbers::pi_v<float> * static_cast<float>(total + f) / currentLength);
 				if (total + f >= currentLength)
 				{
 					n->m_fadeInLength = currentLength;

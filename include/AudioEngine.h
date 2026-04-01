@@ -34,7 +34,7 @@
 #include <vector>
 
 #include "AudioDevice.h"
-#include "lmms_basics.h"
+#include "LmmsTypes.h"
 #include "SampleFrame.h"
 #include "LocklessList.h"
 #include "FifoBuffer.h"
@@ -45,21 +45,22 @@
 namespace lmms
 {
 
-class AudioDevice;
 class MidiClient;
-class AudioPort;
+class AudioBusHandle;  // IWYU pragma: keep
 class AudioEngineWorkerThread;
 
-
-constexpr fpp_t MINIMUM_BUFFER_SIZE = 32;
-constexpr fpp_t DEFAULT_BUFFER_SIZE = 256;
-constexpr fpp_t MAXIMUM_BUFFER_SIZE = 4096;
+constexpr f_cnt_t MINIMUM_BUFFER_SIZE = 32;
+constexpr f_cnt_t DEFAULT_BUFFER_SIZE = 256;
+constexpr f_cnt_t MAXIMUM_BUFFER_SIZE = 4096;
 
 constexpr int BYTES_PER_SAMPLE = sizeof(sample_t);
 constexpr int BYTES_PER_INT_SAMPLE = sizeof(int_sample_t);
 constexpr int BYTES_PER_FRAME = sizeof(SampleFrame);
 
 constexpr float OUTPUT_SAMPLE_MULTIPLIER = 32767.0f;
+
+constexpr auto SUPPORTED_SAMPLERATES = std::array{44100, 48000, 88200, 96000, 192000};
+constexpr auto SUPPORTED_BITRATES = std::array{64, 128, 160, 192, 256, 320};
 
 class LMMS_EXPORT AudioEngine : public QObject
 {
@@ -105,40 +106,6 @@ public:
 		AudioEngine* m_audioEngine;
 	};
 
-	struct qualitySettings
-	{
-		enum class Interpolation
-		{
-			Linear,
-			SincFastest,
-			SincMedium,
-			SincBest
-		} ;
-
-		Interpolation interpolation;
-
-		qualitySettings(Interpolation i) :
-			interpolation(i)
-		{
-		}
-
-		int libsrcInterpolation() const
-		{
-			switch( interpolation )
-			{
-				case Interpolation::Linear:
-					return SRC_ZERO_ORDER_HOLD;
-				case Interpolation::SincFastest:
-					return SRC_SINC_FASTEST;
-				case Interpolation::SincMedium:
-					return SRC_SINC_MEDIUM_QUALITY;
-				case Interpolation::SincBest:
-					return SRC_SINC_BEST_QUALITY;
-			}
-			return SRC_LINEAR;
-		}
-	} ;
-
 	void initDevices();
 	void clear();
 	void clearNewPlayHandles();
@@ -160,10 +127,7 @@ public:
 
 	//! Set new audio device. Old device will be deleted,
 	//! unless it's stored using storeAudioDevice
-	void setAudioDevice( AudioDevice * _dev,
-				const struct qualitySettings & _qs,
-				bool _needs_fifo,
-				bool startNow );
+	void setAudioDevice(AudioDevice* _dev, bool _needs_fifo, bool startNow);
 	void storeAudioDevice();
 	void restoreAudioDevice();
 	inline AudioDevice * audioDev()
@@ -172,15 +136,15 @@ public:
 	}
 
 
-	// audio-port-stuff
-	inline void addAudioPort(AudioPort * port)
+	// audio-bus-handle-stuff
+	inline void addAudioBusHandle(AudioBusHandle* busHandle)
 	{
 		requestChangeInModel();
-		m_audioPorts.push_back(port);
+		m_audioBusHandles.push_back(busHandle);
 		doneChangeInModel();
 	}
 
-	void removeAudioPort(AudioPort * port);
+	void removeAudioBusHandle(AudioBusHandle* busHandle);
 
 
 	// MIDI-client-stuff
@@ -209,7 +173,7 @@ public:
 
 
 	// methods providing information for other classes
-	inline fpp_t framesPerPeriod() const
+	inline f_cnt_t framesPerPeriod() const
 	{
 		return m_framesPerPeriod;
 	}
@@ -229,12 +193,6 @@ public:
 	{
 		return m_profiler.detailLoad(type);
 	}
-
-	const qualitySettings & currentQualitySettings() const
-	{
-		return m_qualitySettings;
-	}
-
 
 	sample_rate_t baseSampleRate() const { return m_baseSampleRate; }
 
@@ -300,8 +258,6 @@ public:
 		return hasFifoWriter() ? m_fifo->read() : renderNextBuffer();
 	}
 
-	void changeQuality(const struct qualitySettings & qs);
-
 	//! Block until a change in model can be done (i.e. wait for audio thread)
 	void requestChangeInModel();
 	void doneChangeInModel();
@@ -366,9 +322,9 @@ private:
 
 	bool m_renderOnly;
 
-	std::vector<AudioPort *> m_audioPorts;
+	std::vector<AudioBusHandle*> m_audioBusHandles;
 
-	fpp_t m_framesPerPeriod;
+	f_cnt_t m_framesPerPeriod;
 
 	SampleFrame* m_inputBuffer[2];
 	f_cnt_t m_inputBufferFrames[2];
@@ -390,8 +346,6 @@ private:
 	LocklessList<PlayHandle *> m_newPlayHandles;
 	ConstPlayHandleList m_playHandlesToRemove;
 
-
-	struct qualitySettings m_qualitySettings;
 	float m_masterGain;
 
 	// audio device stuff

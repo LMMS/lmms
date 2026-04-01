@@ -28,7 +28,7 @@
 
 #include <cmath>
 #include <QObject>
-#include "lmms_basics.h"
+#include "LmmsTypes.h"
 #include "lmms_export.h"
 
 
@@ -213,7 +213,7 @@ private:
 		return static_cast<f_cnt_t>( ceilf( ms * (float)m_samplerate * 0.001f ) );
 	}
 
-	const fpp_t m_fpp;
+	const f_cnt_t m_fpp;
 	sample_rate_t m_samplerate;
 	size_t m_size;
 	SampleFrame* m_buffer;

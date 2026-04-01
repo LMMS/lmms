@@ -28,7 +28,7 @@
 #include <QMutex>
 #include <samplerate.h>
 
-#include "lmms_basics.h"
+#include "LmmsTypes.h"
 
 class QThread;
 
@@ -36,7 +36,7 @@ namespace lmms
 {
 
 class AudioEngine;
-class AudioPort;
+class AudioBusHandle;
 class SampleFrame;
 
 
@@ -57,13 +57,13 @@ public:
 	}
 
 
-	// if audio-driver supports ports, classes inherting AudioPort
+	// if audio-driver supports ports, classes inheriting AudioBusHandle
 	// (e.g. channel-tracks) can register themselves for making
 	// audio-driver able to collect their individual output and provide
 	// them at a specific port - currently only supported by JACK
-	virtual void registerPort( AudioPort * _port );
-	virtual void unregisterPort( AudioPort * _port );
-	virtual void renamePort( AudioPort * _port );
+	virtual void registerPort(AudioBusHandle* port);
+	virtual void unregisterPort(AudioBusHandle* port);
+	virtual void renamePort(AudioBusHandle* port);
 
 	inline bool supportsCapture() const
 	{
@@ -87,21 +87,21 @@ public:
 protected:
 	// subclasses can re-implement this for being used in conjunction with
 	// processNextBuffer()
-	virtual void writeBuffer(const SampleFrame* /* _buf*/, const fpp_t /*_frames*/) {}
+	virtual void writeBuffer(const SampleFrame* /* _buf*/, const f_cnt_t /*_frames*/) {}
 
 	// called by according driver for fetching new sound-data
-	fpp_t getNextBuffer(SampleFrame* _ab);
+	f_cnt_t getNextBuffer(SampleFrame* _ab);
 
 	// convert a given audio-buffer to a buffer in signed 16-bit samples
 	// returns num of bytes in outbuf
 	int convertToS16(const SampleFrame* _ab,
-						const fpp_t _frames,
+						const f_cnt_t _frames,
 						int_sample_t * _output_buffer,
 						const bool _convert_endian = false );
 
 	// clear given signed-int-16-buffer
 	void clearS16Buffer( int_sample_t * _outbuf,
-							const fpp_t _frames );
+							const f_cnt_t _frames );
 
 	ch_cnt_t channels() const
 	{
@@ -111,6 +111,11 @@ protected:
 	inline void setSampleRate( const sample_rate_t _new_sr )
 	{
 		m_sampleRate = _new_sr;
+	}
+
+	void setChannels(const ch_cnt_t channels)
+	{
+		m_channels = channels;
 	}
 
 	AudioEngine* audioEngine()

@@ -31,6 +31,7 @@
 #include <QMenu>
 #include <QVBoxLayout>
 
+#include "AutomatableButton.h"
 #include "EffectRackView.h"
 #include "embed.h"
 #include "GuiApplication.h"
@@ -46,22 +47,12 @@ namespace lmms::gui
 {
 
 
-SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
-	QWidget(),
-	ModelView(nullptr, this),
-	m_track(tv->model()),
-	m_stv(tv)
+SampleTrackWindow::SampleTrackWindow(SampleTrackView* stv)
+	: QWidget{}
+	, ModelView{nullptr, this}
+	, m_track{stv->model()}
+	, m_stv{stv}
 {
-#if QT_VERSION < 0x50C00
-	// Workaround for a bug in Qt versions below 5.12,
-	// where argument-dependent-lookup fails for QFlags operators
-	// declared inside a namepsace.
-	// This affects the Q_DECLARE_OPERATORS_FOR_FLAGS macro in Instrument.h
-	// See also: https://codereview.qt-project.org/c/qt/qtbase/+/225348
-
-	using ::operator|;
-#endif
-
 	// init own layout + widgets
 	setFocusPolicy(Qt::StrongFocus);
 	auto vlayout = new QVBoxLayout(this);
@@ -95,73 +86,86 @@ SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
 	QString labelStyleSheet = "font-size: 10px;";
 	Qt::Alignment labelAlignment = Qt::AlignHCenter | Qt::AlignTop;
 	Qt::Alignment widgetAlignment = Qt::AlignHCenter | Qt::AlignCenter;
+	
+	auto soloMuteLayout = new QVBoxLayout();
+	soloMuteLayout->setContentsMargins(0, 0, 2, 0);
+	soloMuteLayout->setSpacing(2);
+
+	m_muteBtn = new AutomatableButton(this, tr("Mute"));
+	m_muteBtn->setModel(&m_track->m_mutedModel);
+	m_muteBtn->setObjectName("btn-mute");
+	m_muteBtn->setCheckable(true);
+	m_muteBtn->setToolTip(tr("Mute this sample track"));
+	soloMuteLayout->addWidget(m_muteBtn, 0, widgetAlignment);
+
+	m_soloBtn = new AutomatableButton(this, tr("Solo"));
+	m_soloBtn->setModel(&m_track->m_soloModel);
+	m_soloBtn->setObjectName("btn-solo");
+	m_soloBtn->setCheckable(true);
+	m_soloBtn->setToolTip(tr("Solo this sample track"));
+	soloMuteLayout->addWidget(m_soloBtn, 0, widgetAlignment);
+
+	basicControlsLayout->addLayout(soloMuteLayout, 0, 0, 2, 1, widgetAlignment);
 
 	// set up volume knob
-	m_volumeKnob = new Knob(KnobType::Bright26, nullptr, tr("Sample volume"));
-	m_volumeKnob->setVolumeKnob(true);
+	m_volumeKnob = new VolumeKnob(KnobType::Bright26, nullptr, tr("Sample volume"));
 	m_volumeKnob->setHintText(tr("Volume:"), "%");
 
-	basicControlsLayout->addWidget(m_volumeKnob, 0, 0);
+	basicControlsLayout->addWidget(m_volumeKnob, 0, 1);
 	basicControlsLayout->setAlignment(m_volumeKnob, widgetAlignment);
 
 	auto label = new QLabel(tr("VOL"), this);
 	label->setStyleSheet(labelStyleSheet);
-	basicControlsLayout->addWidget(label, 1, 0);
+	basicControlsLayout->addWidget(label, 1, 1);
 	basicControlsLayout->setAlignment(label, labelAlignment);
-
 
 	// set up panning knob
 	m_panningKnob = new Knob(KnobType::Bright26, nullptr, tr("Panning"));
 	m_panningKnob->setHintText(tr("Panning:"), "");
 
-	basicControlsLayout->addWidget(m_panningKnob, 0, 1);
+	basicControlsLayout->addWidget(m_panningKnob, 0, 2);
 	basicControlsLayout->setAlignment(m_panningKnob, widgetAlignment);
 
 	label = new QLabel(tr("PAN"),this);
 	label->setStyleSheet(labelStyleSheet);
-	basicControlsLayout->addWidget(label, 1, 1);
+	basicControlsLayout->addWidget(label, 1, 2);
 	basicControlsLayout->setAlignment(label, labelAlignment);
 
-
-	basicControlsLayout->setColumnStretch(2, 1);
+	basicControlsLayout->setColumnStretch(3, 1);
 
 
 	// setup spinbox for selecting Mixer-channel
 	m_mixerChannelNumber = new MixerChannelLcdSpinBox(2, nullptr, tr("Mixer channel"), m_stv);
 
-	basicControlsLayout->addWidget(m_mixerChannelNumber, 0, 3);
+	basicControlsLayout->addWidget(m_mixerChannelNumber, 0, 4);
 	basicControlsLayout->setAlignment(m_mixerChannelNumber, widgetAlignment);
 
-	label = new QLabel(tr("CHANNEL"), this);
+	label = new QLabel(tr("CHAN"), this);
 	label->setStyleSheet(labelStyleSheet);
-	basicControlsLayout->addWidget(label, 1, 3);
+	basicControlsLayout->addWidget(label, 1, 4);
 	basicControlsLayout->setAlignment(label, labelAlignment);
 
 	generalSettingsLayout->addLayout(basicControlsLayout);
 
-	m_effectRack = new EffectRackView(tv->model()->audioPort()->effects());
+	m_effectRack = new EffectRackView(stv->model()->audioBusHandle()->effects());
 	m_effectRack->setFixedSize(EffectRackView::DEFAULT_WIDTH, 242);
 
 	vlayout->addWidget(generalSettingsWidget);
 	vlayout->addWidget(m_effectRack);
 
 
-	setModel(tv->model());
+	setModel(stv->model());
 
 	QMdiSubWindow * subWin = getGUI()->mainWindow()->addWindowedWidget(this);
 	Qt::WindowFlags flags = subWin->windowFlags();
-	flags |= Qt::MSWindowsFixedSizeDialogHint;
+	flags |= Qt::MSWindowsFixedSizeDialogHint;  // resizing is disabled regardless, this makes SubWindow hide related actions
 	flags &= ~Qt::WindowMaximizeButtonHint;
 	subWin->setWindowFlags(flags);
 
-	// Hide the Size and Maximize options from the system menu
-	// since the dialog size is fixed.
-	QMenu * systemMenu = subWin->systemMenu();
-	systemMenu->actions().at(2)->setVisible(false); // Size
-	systemMenu->actions().at(4)->setVisible(false); // Maximize
+	// better than `setFixedSize` because it still responds to layout changes
+	layout()->setSizeConstraint(QLayout::SetFixedSize);
 
-	subWin->setWindowIcon(embed::getIconPixmap("sample_track"));
-	subWin->setFixedSize(subWin->size());
+	setWindowIcon(embed::getIconPixmap("sample_track"));
 	subWin->hide();
 }
 
@@ -238,27 +242,15 @@ void SampleTrackWindow::toggleVisibility(bool on)
 
 void SampleTrackWindow::closeEvent(QCloseEvent* ce)
 {
-	ce->ignore();
-
-	if(getGUI()->mainWindow()->workspace())
-	{
-		parentWidget()->hide();
-	}
-	else
-	{
-		hide();
-	}
-
-	m_stv->m_tlb->setFocus();
+	m_stv->setFocus();
 	m_stv->m_tlb->setChecked(false);
 }
 
 
 
-void SampleTrackWindow::saveSettings(QDomDocument& doc, QDomElement & element)
+void SampleTrackWindow::saveSettings(QDomDocument& doc, QDomElement& element)
 {
 	MainWindow::saveWidgetState(this, element);
-	Q_UNUSED(element)
 }
 
 

@@ -24,9 +24,9 @@
 
 #include "SaControls.h"
 
-#include <QDomElement>
 
 #include "Analyzer.h"
+#include "fft_helpers.h"
 #include "SaControlsDialog.h"
 
 namespace lmms

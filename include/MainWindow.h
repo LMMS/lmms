@@ -29,18 +29,16 @@
 #include <QTimer>
 #include <QList>
 #include <QMainWindow>
+#include <QMdiArea>
 
 #include "ConfigManager.h"
 
 class QAction;
 class QDomElement;
 class QGridLayout;
-class QMdiArea;
 
 namespace lmms
 {
-
-class ConfigManager;
 
 namespace gui
 {
@@ -48,7 +46,6 @@ namespace gui
 class PluginView;
 class SubWindow;
 class ToolButton;
-class GuiApplication;
 
 
 class MainWindow : public QMainWindow
@@ -57,7 +54,7 @@ class MainWindow : public QMainWindow
 public:
 	QMdiArea* workspace()
 	{
-		return m_workspace;
+		return static_cast<QMdiArea*>(m_workspace);
 	}
 
 	QWidget* toolBar()
@@ -144,8 +141,12 @@ public:
 
 	static void saveWidgetState( QWidget * _w, QDomElement & _de );
 	static void restoreWidgetState( QWidget * _w, const QDomElement & _de );
+	void setAllSubWindowsDetached(bool detached);
 
 	bool eventFilter(QObject* watched, QEvent* event) override;
+
+signals:
+	void detachAllSubWindows(bool detached);
 
 public slots:
 	void resetWindowTitle();
@@ -203,7 +204,22 @@ private:
 	bool guiSaveProject();
 	bool guiSaveProjectAs( const QString & filename );
 
-	QMdiArea * m_workspace;
+	class MovableQMdiArea : public QMdiArea
+	{
+	public:
+		MovableQMdiArea(QWidget* parent = nullptr);
+		~MovableQMdiArea() {}
+	protected:
+		void mousePressEvent(QMouseEvent* event) override;
+		void mouseMoveEvent(QMouseEvent* event) override;
+		void mouseReleaseEvent(QMouseEvent* event) override;
+	private:
+		bool m_isBeingMoved;
+		int m_lastX;
+		int m_lastY;
+	};
+
+	MovableQMdiArea * m_workspace;
 
 	QWidget * m_toolBar;
 	QGridLayout * m_toolBarLayout;
@@ -257,7 +273,6 @@ signals:
 	void initProgress(const QString &msg);
 
 } ;
-
 
 } // namespace gui
 

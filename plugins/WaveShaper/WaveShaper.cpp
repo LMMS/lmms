@@ -27,7 +27,6 @@
 #include "WaveShaper.h"
 #include "lmms_math.h"
 #include "embed.h"
-#include "interpolation.h"
 
 #include "plugin_export.h"
 
@@ -47,7 +46,7 @@ Plugin::Descriptor PLUGIN_EXPORT waveshaper_plugin_descriptor =
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
 	0x0100,
 	Plugin::Type::Effect,
-	new PluginPixmapLoader("logo"),
+	new PixmapLoader("lmms-plugin-logo"),
 	nullptr,
 	nullptr,
 } ;
@@ -66,7 +65,7 @@ WaveShaperEffect::WaveShaperEffect( Model * _parent,
 
 
 
-Effect::ProcessStatus WaveShaperEffect::processImpl(SampleFrame* buf, const fpp_t frames)
+Effect::ProcessStatus WaveShaperEffect::processImpl(SampleFrame* buf, const f_cnt_t frames)
 {
 // variables for effect
 	int i = 0;
@@ -87,7 +86,7 @@ Effect::ProcessStatus WaveShaperEffect::processImpl(SampleFrame* buf, const fpp_
 	const float *inputPtr = inputBuffer ? &( inputBuffer->values()[ 0 ] ) : &input;
 	const float *outputPtr = outputBufer ? &( outputBufer->values()[ 0 ] ) : &output;
 
-	for (fpp_t f = 0; f < frames; ++f)
+	for (f_cnt_t f = 0; f < frames; ++f)
 	{
 		auto s = std::array{buf[f][0], buf[f][1]};
 
@@ -116,9 +115,7 @@ Effect::ProcessStatus WaveShaperEffect::processImpl(SampleFrame* buf, const fpp_
 			}
 			else if( lookup < 200 )
 			{
-				s[i] = linearInterpolate( samples[ lookup - 1 ],
-						samples[ lookup ], frac )
-						* posneg;
+				s[i] = std::lerp(samples[lookup - 1], samples[lookup], frac) * posneg;
 			}
 			else
 			{

@@ -34,7 +34,6 @@
 #include "Engine.h"
 #include "Song.h"
 #include "embed.h"
-#include "BufferManager.h"
 
 namespace lmms::gui
 {
@@ -51,10 +50,9 @@ Oscilloscope::Oscilloscope( QWidget * _p ) :
 	m_clippingColor(255, 64, 64)
 {
 	setFixedSize( m_background.width(), m_background.height() );
-	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	setActive( ConfigManager::inst()->value( "ui", "displaywaveform").toInt() );
 
-	const fpp_t frames = Engine::audioEngine()->framesPerPeriod();
+	const f_cnt_t frames = Engine::audioEngine()->framesPerPeriod();
 	m_buffer = new SampleFrame[frames];
 
 	zeroSampleFrames(m_buffer, frames);
@@ -79,7 +77,7 @@ void Oscilloscope::updateAudioBuffer(const SampleFrame* buffer)
 {
 	if( !Engine::getSong()->isExporting() )
 	{
-		const fpp_t fpp = Engine::audioEngine()->framesPerPeriod();
+		const f_cnt_t fpp = Engine::audioEngine()->framesPerPeriod();
 		memcpy(m_buffer, buffer, sizeof(SampleFrame) * fpp);
 	}
 }
@@ -167,7 +165,7 @@ void Oscilloscope::paintEvent( QPaintEvent * )
 
 		float masterOutput = audioEngine->masterGain();
 
-		const fpp_t frames = audioEngine->framesPerPeriod();
+		const f_cnt_t frames = audioEngine->framesPerPeriod();
 		SampleFrame peakValues = getAbsPeakValues(m_buffer, frames);
 
 		auto const leftChannelClips = clips(peakValues.left() * masterOutput);

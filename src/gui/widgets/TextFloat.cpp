@@ -25,8 +25,6 @@
 #include "TextFloat.h"
 
 #include <QTimer>
-#include <QPainter>
-#include <QStyleOption>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QLabel>
@@ -44,7 +42,7 @@ TextFloat::TextFloat() :
 }
 
 TextFloat::TextFloat(const QString & title, const QString & text, const QPixmap & pixmap) :
-	QWidget(getGUI()->mainWindow(), Qt::Tool | Qt::FramelessWindowHint)
+	QWidget(getGUI()->mainWindow(), Qt::ToolTip)
 {
 	QHBoxLayout * mainLayout = new QHBoxLayout();
 	setLayout(mainLayout);

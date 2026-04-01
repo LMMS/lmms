@@ -26,7 +26,6 @@
 
 #include "AudioSampleRecorder.h"
 #include "SampleBuffer.h"
-#include "debug.h"
 
 
 namespace lmms
@@ -85,10 +84,10 @@ std::shared_ptr<const SampleBuffer> AudioSampleRecorder::createSampleBuffer()
 	return std::make_shared<const SampleBuffer>(std::move(bigBuffer), sampleRate());
 }
 
-void AudioSampleRecorder::writeBuffer(const SampleFrame* _ab, const fpp_t _frames)
+void AudioSampleRecorder::writeBuffer(const SampleFrame* _ab, const f_cnt_t _frames)
 {
 	auto buf = new SampleFrame[_frames];
-	for( fpp_t frame = 0; frame < _frames; ++frame )
+	for( f_cnt_t frame = 0; frame < _frames; ++frame )
 	{
 		for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
 		{

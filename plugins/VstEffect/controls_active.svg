@@ -1,0 +1,23 @@
+<svg version="1.1" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+	<defs>
+		<filter id="filter1" x="-.059364" y="-.10182" width="1.1187" height="1.2036" color-interpolation-filters="sRGB">
+			<feGaussianBlur stdDeviation="0.59344559"/>
+		</filter>
+	</defs>
+	<g>
+		<path transform="matrix(.8336 0 0 .8336 .32953 .32953)" d="m4.0039 7.0058-2 2v2h3.9961v6c-1.5421 0-3.6625-0.0017-3.9961 0v1.9961l1.9922 1.9922h4.0039l2.0098-1.9922v-1.9961h8.0098v1.9962l1.9883 1.9922h3.9961l1.9922-1.9922v-1.9961h-4v-6c1.4663 0 2.3327 6e-6 4 0v-2l-2-2h-3.9883l-1.9883 2v1.9941h-8.0098v-1.9941l-2.0098-2z" fill="#404040" filter="url(#filter1)" opacity=".75"/>
+		<path transform="matrix(.8336 0 0 .8336 .32953 .32953)" d="m4.0039 7.0058-2 2v2h3.9961v6c-1.5421 0-3.6625-0.0017-3.9961 0v1.9961l1.9922 1.9922h4.0039l2.0098-1.9922v-1.9961h8.0098v1.9962l1.9883 1.9922h3.9961l1.9922-1.9922v-1.9961h-4v-6c1.4663 0 2.3327 6e-6 4 0v-2l-2-2h-3.9883l-1.9883 2v1.9941h-8.0098v-1.9941l-2.0098-2z" fill="#1bcc00"/>
+	</g>
+	<metadata>
+		<rdf:RDF>
+			<cc:Work rdf:about="">
+				<cc:license rdf:resource="http://creativecommons.org/publicdomain/zero/1.0/"/>
+			</cc:Work>
+			<cc:License rdf:about="http://creativecommons.org/publicdomain/zero/1.0/">
+				<cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction"/>
+				<cc:permits rdf:resource="http://creativecommons.org/ns#Distribution"/>
+				<cc:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks"/>
+			</cc:License>
+		</rdf:RDF>
+	</metadata>
+</svg>

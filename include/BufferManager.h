@@ -27,7 +27,7 @@
 #define LMMS_BUFFER_MANAGER_H
 
 #include "lmms_export.h"
-#include "lmms_basics.h"
+#include "LmmsTypes.h"
 
 namespace lmms
 {
@@ -37,12 +37,12 @@ class SampleFrame;
 class LMMS_EXPORT BufferManager
 {
 public:
-	static void init( fpp_t fpp );
+	static void init( f_cnt_t fpp );
 	static SampleFrame* acquire();
 	static void release( SampleFrame* buf );
 
 private:
-	static fpp_t s_framesPerPeriod;
+	static f_cnt_t s_framesPerPeriod;
 };
 
 

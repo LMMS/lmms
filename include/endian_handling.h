@@ -1,5 +1,5 @@
 /*
- * endian_handling.h - handle endianess
+ * endian_handling.h - handle endianness
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -25,9 +25,8 @@
 #ifndef LMMS_ENDIAN_HANDLING_H
 #define LMMS_ENDIAN_HANDLING_H
 
+#include <cstdint>
 #include <QSysInfo>
-
-#include "lmms_basics.h"
 
 
 namespace lmms

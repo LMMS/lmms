@@ -23,6 +23,9 @@
  */
 
 #include "FlangerEffect.h"
+
+#include <numbers>
+
 #include "Engine.h"
 #include "MonoDelay.h"
 #include "QuadratureLfo.h"
@@ -46,7 +49,7 @@ Plugin::Descriptor PLUGIN_EXPORT flanger_plugin_descriptor =
 	"Dave French <contact/dot/dave/dot/french3/at/googlemail/dot/com>",
 	0x0100,
 	Plugin::Type::Effect,
-	new PluginPixmapLoader("logo"),
+	new PixmapLoader("lmms-plugin-logo"),
 	nullptr,
 	nullptr,
 } ;
@@ -85,7 +88,7 @@ FlangerEffect::~FlangerEffect()
 
 
 
-Effect::ProcessStatus FlangerEffect::processImpl(SampleFrame* buf, const fpp_t frames)
+Effect::ProcessStatus FlangerEffect::processImpl(SampleFrame* buf, const f_cnt_t frames)
 {
 	const float d = dryLevel();
 	const float w = wetLevel();
@@ -94,17 +97,17 @@ Effect::ProcessStatus FlangerEffect::processImpl(SampleFrame* buf, const fpp_t f
 	float amplitude = m_flangerControls.m_lfoAmountModel.value() * Engine::audioEngine()->outputSampleRate();
 	bool invertFeedback = m_flangerControls.m_invertFeedbackModel.value();
 	m_lfo->setFrequency(  1.0/m_flangerControls.m_lfoFrequencyModel.value() );
-	m_lfo->setOffset(m_flangerControls.m_lfoPhaseModel.value() / 180 * numbers::pi);
+	m_lfo->setOffset(m_flangerControls.m_lfoPhaseModel.value() / 180 * std::numbers::pi);
 	m_lDelay->setFeedback( m_flangerControls.m_feedbackModel.value() );
 	m_rDelay->setFeedback( m_flangerControls.m_feedbackModel.value() );
 	auto dryS = std::array<sample_t, 2>{};
-	for( fpp_t f = 0; f < frames; ++f )
+	for( f_cnt_t f = 0; f < frames; ++f )
 	{
 		float leftLfo;
 		float rightLfo;
 
-		buf[f][0] += (fastRandf(2.0f) - 1.0f) * noise;
-		buf[f][1] += (fastRandf(2.0f) - 1.0f) * noise;
+		buf[f][0] += fastRandInc(-1.f, 1.f) * noise;
+		buf[f][1] += fastRandInc(-1.f, 1.f) * noise;
 		dryS[0] = buf[f][0];
 		dryS[1] = buf[f][1];
 		m_lfo->tick(&leftLfo, &rightLfo);

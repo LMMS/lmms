@@ -31,7 +31,7 @@
 
 #include "AutomatableModel.h"
 #include "JournallingObject.h"
-#include "lmms_basics.h"
+#include "LmmsTypes.h"
 #include <optional>
 
 
@@ -99,7 +99,7 @@ public:
 		return m_type;
 	}
 
-	virtual bool play( const TimePos & start, const fpp_t frames,
+	virtual bool play( const TimePos & start, const f_cnt_t frames,
 						const f_cnt_t frameBase, int clipNum = -1 ) = 0;
 
 
@@ -219,9 +219,9 @@ private:
 
 protected:
 	BoolModel m_mutedModel;
+	BoolModel m_soloModel;
 
 private:
-	BoolModel m_soloModel;
 	bool m_mutedBeforeSolo;
 
 	clipVector m_clips;

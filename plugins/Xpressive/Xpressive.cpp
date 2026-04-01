@@ -40,8 +40,6 @@
 #include "Song.h"
 
 #include "base64.h"
-#include "lmms_constants.h"
-
 #include "embed.h"
 
 #include "ExprSynth.h"
@@ -229,7 +227,7 @@ void Xpressive::playNote(NotePlayHandle* nph, SampleFrame* working_buffer) {
 	}
 
 	auto ps = static_cast<ExprSynth*>(nph->m_pluginData);
-	const fpp_t frames = nph->framesLeftForCurrentPeriod();
+	const f_cnt_t frames = nph->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = nph->noteOffset();
 
 	ps->renderOutput(frames, working_buffer + offset);
@@ -252,7 +250,8 @@ void Xpressive::smooth(float smoothness,const graphModel * in,graphModel * out)
 		const int guass_size = (int)(smoothness * 5) | 1;
 		const int guass_center = guass_size/2;
 		const float delta = smoothness;
-		const float a = 1.0f / (std::sqrt(numbers::tau_v<float>) * delta);
+		constexpr float inv_sqrt2pi = std::numbers::inv_sqrtpi_v<float> / std::numbers::sqrt2_v<float>;
+		const float a = inv_sqrt2pi / delta;
 		auto const guassian = new float[guass_size];
 		float sum = 0.0f;
 		float temp = 0.0f;
@@ -371,7 +370,7 @@ XpressiveView::XpressiveView(Instrument * _instrument, QWidget * _parent) :
 	m_helpBtn->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("help_inactive"));
 	m_helpBtn->setToolTip(tr("Open help window"));
 
-	m_selectedGraphGroup = new automatableButtonGroup(this);
+	m_selectedGraphGroup = new AutomatableButtonGroup(this);
 	m_selectedGraphGroup->addButton(m_w1Btn);
 	m_selectedGraphGroup->addButton(m_w2Btn);
 	m_selectedGraphGroup->addButton(m_w3Btn);
@@ -862,18 +861,6 @@ QString XpressiveHelpView::s_helpText=
 
 XpressiveHelpView::XpressiveHelpView():QTextEdit(s_helpText)
 {
-
-#if QT_VERSION < 0x50C00
-	// Workaround for a bug in Qt versions below 5.12,
-	// where argument-dependent-lookup fails for QFlags operators
-	// declared inside a namepsace.
-	// This affects the Q_DECLARE_OPERATORS_FOR_FLAGS macro in Instrument.h
-	// See also: https://codereview.qt-project.org/c/qt/qtbase/+/225348
-
-	using ::operator|;
-
-#endif
-
 	setWindowTitle ( "Xpressive Help" );
 	setTextInteractionFlags ( Qt::TextSelectableByKeyboard | Qt::TextSelectableByMouse );
 	getGUI()->mainWindow()->addWindowedWidget( this );
