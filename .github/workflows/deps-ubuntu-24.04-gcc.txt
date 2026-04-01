@@ -19,6 +19,8 @@ liblist-moreutils-perl
 libtool
 libqt5svg5-dev
 libqt5x11extras5-dev
+libsndio-dev
+libsoundio-dev
 libsuil-dev
 libx11-xcb-dev
 libxcb-keysyms1-dev
@@ -27,6 +29,7 @@ libxft-dev
 libxinerama-dev
 libxml2-utils
 libxml-perl
+linux-libc-dev
 make
 perl
 qt5-qmake
