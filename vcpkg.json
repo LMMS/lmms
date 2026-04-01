@@ -6,8 +6,14 @@
 			"name": "fftw3",
 			"default-features": false,
 			"features": [
-				"sse",
-				"sse2"
+				{
+					"name": "sse2",
+					"platform": "x86 | x64"
+				},
+				{
+					"name": "neon",
+					"platform": "arm"
+				}
 			]
 		},
 		{
