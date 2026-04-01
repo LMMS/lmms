@@ -33,8 +33,8 @@
 #include <thread>
 #include <vector>
 
-#include "LocklessRingBuffer.h"
 #include "LmmsSemaphore.h"
+#include "LockfreeSpscQueue.h"
 
 namespace lmms
 {
@@ -77,8 +77,7 @@ private:
 	// threading/synchronization
 	std::thread m_thread;
 	std::vector<char> m_response;  //!< buffer where single requests from m_requests are unpacked
-	LocklessRingBuffer<char> m_requests, m_responses;  //!< ringbuffer to queue multiple requests
-	LocklessRingBufferReader<char> m_requestsReader, m_responsesReader;
+	LockfreeSpscQueue<char> m_requests, m_responses;  //!< ringbuffer to queue multiple requests
 	std::atomic<bool> m_exit = false;  //!< Whether the worker function should keep looping
 	Semaphore m_sem;
 	Semaphore* m_workLock;

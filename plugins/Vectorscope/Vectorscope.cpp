@@ -65,7 +65,7 @@ Effect::ProcessStatus Vectorscope::processImpl(SampleFrame* buf, const f_cnt_t f
 	{
 		// To avoid processing spikes on audio thread, data are stored in
 		// a lockless ringbuffer and processed in a separate thread.
-		m_inputBuffer.write(buf, frames);
+		m_inputBuffer.enqueue(buf, frames);
 	}
 
 	return ProcessStatus::Continue;

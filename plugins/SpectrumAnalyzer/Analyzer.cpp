@@ -72,7 +72,6 @@ Analyzer::Analyzer(Model *parent, const Plugin::Descriptor::SubPluginFeatures::K
 Analyzer::~Analyzer()
 {
 	m_processor.terminate();
-	m_inputBuffer.wakeAll();
 	m_processorThread.wait();
 }
 
@@ -96,7 +95,7 @@ Effect::ProcessStatus Analyzer::processImpl(SampleFrame* buf, const f_cnt_t fram
 	{
 		// To avoid processing spikes on audio thread, data are stored in
 		// a lockless ringbuffer and processed in a separate thread.
-		m_inputBuffer.write(buf, frames, true);
+		m_inputBuffer.enqueue(buf, frames);
 	}
 	#ifdef SA_DEBUG
 		audio_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - audio_time;

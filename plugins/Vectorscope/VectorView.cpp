@@ -39,11 +39,10 @@ namespace lmms::gui
 {
 
 
-VectorView::VectorView(VecControls* controls, LocklessRingBuffer<SampleFrame>* inputBuffer, QWidget* parent) :
+VectorView::VectorView(VecControls* controls, LockfreeSpscQueue<SampleFrame>* inputBuffer, QWidget* parent) :
 	QWidget(parent),
 	m_controls(controls),
 	m_inputBuffer(inputBuffer),
-	m_bufferReader(*inputBuffer),
 	m_zoom(1.f),
 	m_zoomTimestamp(0)
 {
@@ -103,7 +102,7 @@ void VectorView::paintEvent(QPaintEvent *event)
 	painter.setTransform(tracePaintingTransform);
 
 	// Get new samples from the lockless input FIFO buffer
-	const auto inBuffer = m_bufferReader.read_max(m_inputBuffer->capacity());
+	const auto inBuffer = m_inputBuffer->reserveReadSpace();
 	const std::size_t frameCount = inBuffer.size();
 
 	for (std::size_t frame = 0; frame < frameCount; ++frame)

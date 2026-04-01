@@ -1,0 +1,273 @@
+/*
+ * LockfreeSpscQueue.h
+ *
+ * Copyright (c) 2026 saker <sakertooth@gmail.com>
+ *
+ * This file is part of LMMS - https://lmms.io
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program (see COPYING); if not, write to the
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA.
+ *
+ */
+
+#ifndef LMMS_LOCKFREE_SPSC_QUEUE_H
+#define LMMS_LOCKFREE_SPSC_QUEUE_H
+
+#include <algorithm>
+#include <array>
+#include <atomic>
+#include <bit>
+#include <cassert>
+#include <cstddef>
+#include <optional>
+#include <span>
+#include <vector>
+
+namespace lmms {
+
+namespace detail {
+
+enum class LockfreeSpscQueueRegionMode
+{
+	Write,
+	Read
+};
+
+template <typename T, LockfreeSpscQueueRegionMode Mode, typename Committer> class LockfreeSpscQueueRegion
+{
+public:
+	LockfreeSpscQueueRegion(const LockfreeSpscQueueRegion&) = delete;
+	LockfreeSpscQueueRegion(LockfreeSpscQueueRegion&&) = delete;
+	LockfreeSpscQueueRegion& operator=(const LockfreeSpscQueueRegion&) = delete;
+	LockfreeSpscQueueRegion& operator=(LockfreeSpscQueueRegion&&) = delete;
+
+	LockfreeSpscQueueRegion(std::span<T> first, std::span<T> second, Committer committer)
+		: m_committer(committer)
+		, m_firstRegion(first)
+		, m_secondRegion(second)
+		, m_size(first.size() + second.size())
+	{
+	}
+
+	~LockfreeSpscQueueRegion() { m_committer(m_size); }
+
+	auto operator[](size_t index) const -> const T&
+	{
+		static_assert(Mode == LockfreeSpscQueueRegionMode::Read, "Can only use this overload in read mode");
+		assert(index >= 0 && index <= m_size);
+		return index < m_firstRegion.size() ? m_firstRegion[index] : m_secondRegion[index - m_firstRegion.size()];
+	}
+
+	auto operator[](size_t index) -> T&
+	{
+		static_assert(Mode == LockfreeSpscQueueRegionMode::Write, "Can only use this overload in write mode");
+		assert(index >= 0 && index <= m_size);
+		return index < m_firstRegion.size() ? m_firstRegion[index] : m_secondRegion[index - m_firstRegion.size()];
+	}
+
+	auto size() const -> size_t { return m_size; }
+	auto empty() const -> bool { return m_size == 0; }
+
+private:
+	Committer m_committer = nullptr;
+	std::span<T> m_firstRegion;
+	std::span<T> m_secondRegion;
+	size_t m_size = 0;
+};
+
+} // namespace detail
+
+inline constexpr auto DynamicSpscQueueSize = static_cast<size_t>(-1);
+
+template <typename T, size_t N = DynamicSpscQueueSize> class LockfreeSpscQueue
+{
+public:
+	LockfreeSpscQueue(const LockfreeSpscQueue&) = delete;
+	LockfreeSpscQueue(LockfreeSpscQueue&&) = delete;
+	LockfreeSpscQueue& operator=(const LockfreeSpscQueue&) = delete;
+	LockfreeSpscQueue& operator=(LockfreeSpscQueue&&) = delete;
+
+	LockfreeSpscQueue()
+		requires(N != DynamicSpscQueueSize)
+	= default;
+
+	LockfreeSpscQueue(size_t size)
+		requires(N == DynamicSpscQueueSize)
+		: m_buffer(size)
+	{
+	}
+
+	~LockfreeSpscQueue() = default;
+
+	auto enqueue(T value) -> bool
+	{
+		const auto readIndex = m_readIndex.load(std::memory_order_acquire);
+		const auto writeIndex = m_writeIndex.load(std::memory_order_relaxed);
+		const auto nextWriteIndex = advanceIndex(writeIndex, 1);
+		if (nextWriteIndex == readIndex) { return false; }
+
+		m_buffer[writeIndex] = std::move(value);
+		m_writeIndex.store(nextWriteIndex, std::memory_order_release);
+		return true;
+	}
+
+	auto enqueue(const T* values, size_t size) -> bool
+	{
+		const auto readIndex = m_readIndex.load(std::memory_order_acquire);
+		const auto writeIndex = m_writeIndex.load(std::memory_order_relaxed);
+
+		if (writeIndex < readIndex)
+		{
+			if (size > readIndex - writeIndex - 1) { return false; }
+			std::copy_n(values, size, &m_buffer[writeIndex]);
+		}
+		else
+		{
+			const auto spaceToEnd = m_buffer.size() - writeIndex - (readIndex == 0 ? 1 : 0);
+			const auto wrapSpace = readIndex == 0 ? 0 : readIndex - 1;
+			if (size > (spaceToEnd + wrapSpace)) { return false; }
+
+			const auto countToEnd = std::min(size, spaceToEnd);
+			std::copy_n(values, countToEnd, &m_buffer[writeIndex]);
+			if (size > countToEnd) { std::copy_n(values + countToEnd, size - countToEnd, &m_buffer[0]); }
+		}
+
+		m_writeIndex.store(advanceIndex(writeIndex, size), std::memory_order_release);
+		return true;
+	}
+
+	auto dequeue() -> std::optional<T>
+	{
+		const auto readIndex = m_readIndex.load(std::memory_order_relaxed);
+		const auto writeIndex = m_writeIndex.load(std::memory_order_acquire);
+		if (readIndex == writeIndex) { return std::nullopt; }
+
+		auto value = std::move(m_buffer[readIndex]);
+		m_readIndex.store(advanceIndex(readIndex, 1), std::memory_order_release);
+		return value;
+	}
+
+	auto dequeue(T* values, size_t size) -> bool
+	{
+		const auto readIndex = m_readIndex.load(std::memory_order_acquire);
+		const auto writeIndex = m_writeIndex.load(std::memory_order_relaxed);
+
+		if (readIndex < writeIndex)
+		{
+			if (size > readIndex - writeIndex) { return false; }
+			std::copy_n(&m_buffer[readIndex], size, values);
+		}
+		else
+		{
+			if (size > m_buffer.size() - readIndex + writeIndex) { return false; }
+
+			const auto countToEnd = std::min(size, m_buffer.size() - readIndex);
+			std::copy_n(&m_buffer[readIndex], countToEnd, values);
+			if (size > countToEnd) { std::copy_n(&m_buffer[0], size - countToEnd, values + countToEnd); }
+		}
+
+		m_readIndex.store(advanceIndex(readIndex, size), std::memory_order_release);
+		return true;
+	}
+
+	auto reserveReadSpace(size_t max = static_cast<size_t>(-1))
+	{
+		const auto readIndex = m_readIndex.load(std::memory_order_relaxed);
+		const auto writeIndex = m_writeIndex.load(std::memory_order_acquire);
+
+		const auto committer = [this](size_t count) {
+			const auto index = m_readIndex.load(std::memory_order_relaxed);
+			m_readIndex.store(advanceIndex(index, count), std::memory_order_release);
+		};
+
+		constexpr auto mode = detail::LockfreeSpscQueueRegionMode::Read;
+		using ReadRegion = detail::LockfreeSpscQueueRegion<T, mode, decltype(committer)>;
+
+		if (readIndex <= writeIndex)
+		{
+			const auto size = std::min(writeIndex - readIndex, max);
+			return ReadRegion{{&m_buffer[readIndex], size}, {}, committer};
+		}
+		else
+		{
+			const auto tailAvailable = m_buffer.size() - readIndex;
+			const auto tailSize = std::min(tailAvailable, max);
+			const auto headSize = std::min(max - tailSize, writeIndex);
+			return ReadRegion{{&m_buffer[readIndex], tailSize}, {&m_buffer[0], headSize}, committer};
+		}
+	}
+
+	auto reserveWriteSpace(size_t max = static_cast<size_t>(-1))
+	{
+		const auto writeIndex = m_writeIndex.load(std::memory_order_relaxed);
+		const auto readIndex = m_readIndex.load(std::memory_order_acquire);
+
+		const auto committer = [this](size_t count) {
+			const auto index = m_writeIndex.load(std::memory_order_relaxed);
+			m_writeIndex.store(advanceIndex(index, count), std::memory_order_release);
+		};
+
+		constexpr auto mode = detail::LockfreeSpscQueueRegionMode::Write;
+		using WriteRegion = detail::LockfreeSpscQueueRegion<T, mode, decltype(committer)>;
+
+		if (writeIndex < readIndex)
+		{
+			const auto size = std::min(readIndex - writeIndex - 1, max);
+			return WriteRegion{{&m_buffer[writeIndex], size}, {}, committer};
+		}
+		else
+		{
+			const auto tailAvailable = m_buffer.size() - writeIndex - (readIndex == 0 ? 1 : 0);
+			const auto tailSize = std::min(tailAvailable, max);
+			const auto headSize = std::min(max - tailSize, readIndex == 0 ? 0 : readIndex - 1);
+			return WriteRegion{{&m_buffer[writeIndex], tailSize}, {&m_buffer[0], headSize}, committer};
+		}
+	}
+
+	auto peek() const -> const T&
+	{
+		const auto readIndex = m_readIndex.load(std::memory_order_acquire);
+		return m_buffer[readIndex];
+	}
+
+	auto size() const -> size_t
+	{
+		const auto readIndex = m_readIndex.load(std::memory_order_relaxed);
+		const auto writeIndex = m_writeIndex.load(std::memory_order_relaxed);
+		return (writeIndex + m_buffer.size() - readIndex) % m_buffer.size();
+	}
+
+	auto empty() const -> bool { return size() == 0; }
+	auto full() const -> bool { return size() == capacity(); }
+
+	auto free() const -> size_t { return capacity() - size(); }
+	auto capacity() const -> size_t { return m_buffer.size() - 1; }
+
+private:
+	size_t advanceIndex(size_t index, size_t count)
+	{
+		return std::has_single_bit(m_buffer.size()) ? (index + count) & (m_buffer.size() - 1) : (index + count) % m_buffer.size();
+	}
+
+	std::conditional_t<N == DynamicSpscQueueSize, std::vector<T>, std::array<T, N>> m_buffer;
+
+	// TODO: Use std::hardware_destructive_interference_size once supported by CI
+	alignas(64) std::atomic_size_t m_readIndex;
+	alignas(64) std::atomic_size_t m_writeIndex;
+};
+
+} // namespace lmms
+
+#endif // LMMS_LOCKFREE_SPSC_QUEUE_H

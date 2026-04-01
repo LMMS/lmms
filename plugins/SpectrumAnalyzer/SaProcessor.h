@@ -31,15 +31,14 @@
 #include <fftw3.h>
 #include <QMutex>
 #include <QRgb>
+#include <semaphore>
 #include <vector>
+#include "LockfreeSpscQueue.h"
 
 
 
 namespace lmms
 {
-
-template<class T>
-class LocklessRingBuffer;
 
 class SaControls;
 class SampleFrame;
@@ -53,7 +52,7 @@ public:
 	virtual ~SaProcessor();
 
 	// analysis thread and a method to terminate it
-	void analyze(LocklessRingBuffer<SampleFrame> &ring_buffer);
+	void analyze(LockfreeSpscQueue<SampleFrame>& ring_buffer);
 	void terminate() {m_terminate = true;}
 
 	// inform processor if any processing is actually required
