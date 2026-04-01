@@ -2141,7 +2141,7 @@ void PianoRoll::testPlayNote( Note * n )
 		// if a chord is set, play the chords notes as well:
 		playChordNotes(n->key(), n->midiVelocity(baseVelocity));
 
-		MidiEvent event( MidiMetaEvent, -1, n->key(), panningToMidi( n->getPanning() ) );
+		MidiEvent event(MidiMetaEvent, 0, n->key(), panningToMidi(n->getPanning()));
 
 		event.setMetaEvent( MidiNotePanning );
 
@@ -2640,12 +2640,12 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 
 						const int baseVelocity = m_midiClip->instrumentTrack()->midiPort()->baseVelocity();
 
-						m_midiClip->instrumentTrack()->processInEvent( MidiEvent( MidiKeyPressure, -1, n->key(), n->midiVelocity( baseVelocity ) ) );
+						m_midiClip->instrumentTrack()->processInEvent(MidiEvent(MidiKeyPressure, 0, n->key(), n->midiVelocity(baseVelocity)));
 					}
 					else if( m_noteEditMode == NoteEditMode::Panning )
 					{
 						n->setPanning( pan );
-						MidiEvent evt( MidiMetaEvent, -1, n->key(), panningToMidi( pan ) );
+						MidiEvent evt(MidiMetaEvent, 0, n->key(), panningToMidi(pan));
 						evt.setMetaEvent( MidiNotePanning );
 						m_midiClip->instrumentTrack()->processInEvent( evt );
 					}
@@ -4210,8 +4210,7 @@ void PianoRoll::focusOutEvent( QFocusEvent * )
 	{
 		for( int i = 0; i < NumKeys; ++i )
 		{
-			m_midiClip->instrumentTrack()->pianoModel()->midiEventProcessor()->processInEvent( MidiEvent( MidiNoteOff, -1, i, 0 ) );
-			m_midiClip->instrumentTrack()->pianoModel()->setKeyState( i, false );
+			m_midiClip->instrumentTrack()->pianoModel()->midiEventProcessor()->processInEvent(MidiEvent(MidiNoteOff, 0, i, 0));
 		}
 	}
 	if (m_editMode == EditMode::Knife) {
