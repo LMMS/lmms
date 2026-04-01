@@ -242,8 +242,7 @@ public:
 
 	/**
 	 * @returns The internal buffer size used by audio plugins and other processing done within the audio engine.
-	 * It's maximum value is @ref DEFAULT_BUFFER_SIZE, or equal to @ref framesPerAudioBuffer() if it is less than @ref
-	 * DEFAULT_BUFFER_SIZE.
+	 * Its value is @ref DEFAULT_BUFFER_SIZE or @ref framesPerAudioBuffer() - whichever is lower.
 	 * @see renderNextPeriod()
 	 */
 	f_cnt_t framesPerPeriod() const { return m_framesPerPeriod; }
