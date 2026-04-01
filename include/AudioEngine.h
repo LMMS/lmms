@@ -277,7 +277,7 @@ public:
 	 *
 	 * Renders @ref renderNextAudioPeriod() "audio periods" into @a dst. If @a dst is not a multiple of the period
 	 * size, the remaining frames are partially rendered (an extra period may be rendered in such cases, which can
-	 * degradge performance).
+	 * degrade performance).
 	 *
 	 * If @a dst has 1 channel, the channels are averaged to mono.
 	 * If @a dst has 2 channels, the channels are directly copied.
