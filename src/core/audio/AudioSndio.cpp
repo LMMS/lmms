@@ -41,16 +41,18 @@
 namespace lmms
 {
 
-AudioSndio::AudioSndio(bool & _success_ful, AudioEngine * _audioEngine) :
-	AudioDevice(std::clamp<ch_cnt_t>(
-		ConfigManager::inst()->value("audiosndio", "channels").toInt(),
-		DEFAULT_CHANNELS,
-		DEFAULT_CHANNELS), _audioEngine),
-	m_convertEndian ( false )
+AudioSndio::AudioSndio(bool& _success_ful, AudioEngine* _audioEngine)
+	: AudioDevice{
+		std::clamp<ch_cnt_t>(
+			ConfigManager::inst()->config.audiosndio.channels,
+			DEFAULT_CHANNELS,
+			DEFAULT_CHANNELS),
+		_audioEngine}
+	, m_convertEndian{false}
 {
 	_success_ful = false;
 
-	QString dev = ConfigManager::inst()->value( "audiosndio", "device" );
+	QString dev = QString::fromStdString(ConfigManager::inst()->config.audiosndio.device);
 
 	if (dev == "")
 	{
@@ -162,34 +164,30 @@ void AudioSndio::run()
 	delete[] outbuf;
 }
 
-
-AudioSndio::setupWidget::setupWidget( QWidget * _parent ) :
-	AudioDeviceSetupWidget( AudioSndio::name(), _parent )
+AudioSndio::setupWidget::setupWidget(QWidget* _parent)
+	: AudioDeviceSetupWidget(AudioSndio::name(), _parent)
 {
-	QFormLayout * form = new QFormLayout(this);
+	auto form = new QFormLayout{this};
 
-	m_device = new QLineEdit( "", this );
+	m_device = new QLineEdit{"", this};
 	form->addRow(tr("Device"), m_device);
 
-	gui::LcdSpinBoxModel * m = new gui::LcdSpinBoxModel( /* this */ );
+	auto m = new gui::LcdSpinBoxModel{/* this */};
 	m->setRange(DEFAULT_CHANNELS, DEFAULT_CHANNELS);
-	m->setStep( 2 );
-	m->setValue( ConfigManager::inst()->value( "audiosndio",
-	    "channels" ).toInt() );
+	m->setStep(2);
+	m->setValue(ConfigManager::inst()->config.audiosndio.channels);
 
-	m_channels = new gui::LcdSpinBox( 1, this );
-	m_channels->setModel( m );
+	m_channels = new gui::LcdSpinBox{1, this};
+	m_channels->setModel(m);
 
 	form->addRow(tr("Channels"), m_channels);
 }
 
-
 void AudioSndio::setupWidget::saveSettings()
 {
-	ConfigManager::inst()->setValue( "audiosndio", "device",
-	    m_device->text() );
-	ConfigManager::inst()->setValue( "audiosndio", "channels",
-	    QString::number( m_channels->value<int>() ) );
+	ConfigManager::inst()->config.audiosndio.device = m_device->text().toStdString();
+	ConfigManager::inst()->config.audiosndio.channels = m_channels->value<int>();
+	ConfigManager::inst()->configUpdated();
 }
 
 

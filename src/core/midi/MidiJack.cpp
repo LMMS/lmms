@@ -168,7 +168,7 @@ jack_client_t* MidiJack::jackClient()
 
 QString MidiJack::probeDevice()
 {
-	QString jid = ConfigManager::inst()->value( "midijack", "lmms" );
+	QString jid = QString::fromStdString(ConfigManager::inst()->config.MidiJack.device);
 	if( jid.isEmpty() )
 	{
 		return "lmms";

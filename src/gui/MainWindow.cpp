@@ -205,15 +205,13 @@ MainWindow::MainWindow() :
 
 	m_updateTimer.start( 1000 / 60, this );  // 60 fps
 
-	if( ConfigManager::inst()->value( "ui", "enableautosave" ).toInt() )
+	if (ConfigManager::inst()->config.ui.enableautosave)
 	{
 		// connect auto save
 		connect(&m_autoSaveTimer, SIGNAL(timeout()), this, SLOT(autoSave()));
-		m_autoSaveInterval = ConfigManager::inst()->value(
-					"ui", "saveinterval" ).toInt() < 1 ?
-						DEFAULT_AUTO_SAVE_INTERVAL :
-				ConfigManager::inst()->value(
-					"ui", "saveinterval" ).toInt();
+		m_autoSaveInterval = ConfigManager::inst()->config.ui.saveinterval < 1
+			? DEFAULT_AUTO_SAVE_INTERVAL
+			: ConfigManager::inst()->config.ui.saveinterval;
 
 		// The auto save function mustn't run until there is a project
 		// to save or it will run over recover.mmp if you hesitate at the
@@ -230,7 +228,7 @@ MainWindow::MainWindow() :
 	maximized = isMaximized();
 	new QShortcut(QKeySequence(Qt::Key_F11), this, SLOT(toggleFullscreen()));
 
-	if (ConfigManager::inst()->value("tooltips", "disabled").toInt())
+	if (ConfigManager::inst()->config.tooltips.disabled)
 	{
 		qApp->installEventFilter(this);
 	}
@@ -465,9 +463,9 @@ void MainWindow::finalize()
 	m_toolBarLayout->setColumnStretch( 100, 1 );
 
 	// setup-dialog opened before?
-	if( !ConfigManager::inst()->value( "app", "configured" ).toInt() )
+	if (!ConfigManager::inst()->config.app.configured)
 	{
-		ConfigManager::inst()->setValue( "app", "configured", "1" );
+		ConfigManager::inst()->config.app.configured = true;
 		// no, so show it that user can setup everything
 		SetupDialog sd;
 		sd.exec();
@@ -475,14 +473,14 @@ void MainWindow::finalize()
 	// look whether the audio engine failed to start the audio device selected by the
 	// user and is using AudioDummy as a fallback
 	// or the audio device is set to invalid one
-	else if( Engine::audioEngine()->audioDevStartFailed() || !AudioEngine::isAudioDevNameValid(
-		ConfigManager::inst()->value( "audioengine", "audiodev" ) ) )
+	else if (Engine::audioEngine()->audioDevStartFailed() || !AudioEngine::isAudioDevNameValid(
+		 QString::fromStdString(ConfigManager::inst()->config.audioengine.audiodev)))
 	{
 		QMessageBox::critical(nullptr, "Audio device setup failed",
 			tr("Failed to setup audio device for playback. Try adjusting your audio device settings (e.g. the sample rate), then restart LMMS."));
 
 		// if so, offer the audio settings section of the setup dialog
-		SetupDialog sd( SetupDialog::ConfigTab::AudioSettings );
+		SetupDialog sd{SetupDialog::ConfigTab::AudioSettings};
 		sd.exec();
 	}
 
@@ -814,10 +812,7 @@ bool MainWindow::saveProjectAs()
 	}
 
 	// Don't write over file with suffix if no suffix is provided.
-	QString suffix = ConfigManager::inst()->value( "app",
-							"nommpz" ).toInt() == 0
-						? "mmpz"
-						: "mmp" ;
+	QString suffix = ConfigManager::inst()->config.app.nommpz ? "mmp" : "mmpz";
 	sfd.setDefaultSuffix( suffix );
 
 	if( sfd.exec () == FileDialog::Accepted &&
@@ -1093,13 +1088,13 @@ void MainWindow::updateViewMenu()
 
 	auto detachAllAction = m_viewMenu->addAction(embed::getIconPixmap("detach"),
 		tr("Detach all subwindows"),
-		this, [this](){ setAllSubWindowsDetached(true); },
-		QKeySequence{Qt::CTRL | Qt::SHIFT | Qt::Key_D}
+		QKeySequence{Qt::CTRL | Qt::SHIFT | Qt::Key_D},
+		this, [this](){ setAllSubWindowsDetached(true); }
 	);
 	auto attachAllAction = m_viewMenu->addAction(embed::getIconPixmap("detach"),
 		tr("Attach all subwindows"),
-		this, [this](){ setAllSubWindowsDetached(false); },
-		QKeySequence{Qt::CTRL | Qt::ALT | Qt::SHIFT | Qt::Key_D}
+		QKeySequence{Qt::CTRL | Qt::ALT | Qt::SHIFT | Qt::Key_D},
+		this, [this](){ setAllSubWindowsDetached(false); }
 	);
 
 	detachAllAction->setShortcutContext(Qt::ApplicationShortcut);
@@ -1110,60 +1105,46 @@ void MainWindow::updateViewMenu()
 	// Here we should put all look&feel -stuff from configmanager
 	// that is safe to change on the fly. There is probably some
 	// more elegant way to do this.
-	auto qa = new QAction(tr("Smooth scroll"), this);
+	QAction* qa = m_viewMenu->addAction(tr("Smooth scroll"));
 	qa->setData("smoothscroll");
-	qa->setCheckable( true );
-	qa->setChecked( ConfigManager::inst()->value( "ui", "smoothscroll" ).toInt() );
-	m_viewMenu->addAction(qa);
+	qa->setCheckable(true);
+	qa->setChecked(ConfigManager::inst()->config.ui.smoothscroll);
 
 	// Not yet.
 	/* qa = new QAction(tr( "One instrument track window" ), this);
 	qa->setData("oneinstrument");
 	qa->setCheckable( true );
-	qa->setChecked( ConfigManager::inst()->value( "ui", "oneinstrumenttrackwindow" ).toInt() );
+	qa->setChecked(ConfigManager::inst()->config.ui.oneinstrumenttrackwindow);
 	m_viewMenu->addAction(qa);
 	*/
 
-	qa = new QAction(tr( "Enable note labels in piano roll" ), this);
+	qa = m_viewMenu->addAction("Enable note labels in piano roll");
 	qa->setData("printnotelabels");
-	qa->setCheckable( true );
-	qa->setChecked( ConfigManager::inst()->value( "ui", "printnotelabels" ).toInt() );
-	m_viewMenu->addAction(qa);
-
+	qa->setCheckable(true);
+	qa->setChecked(ConfigManager::inst()->config.ui.printnotelabels);
 }
 
 
 
 
-void MainWindow::updateConfig( QAction * _who )
+void MainWindow::updateConfig(QAction* act)
 {
-	QString tag = _who->data().toString();
-	bool checked = _who->isChecked();
+	QString tag = act->data().toString();
+	bool checked = act->isChecked();
 
 	if (tag == "tooltips")
 	{
-		ConfigManager::inst()->setValue( "tooltips", "disabled",
-						 QString::number(!checked) );
+		ConfigManager::inst()->config.tooltips.disabled = !checked;
 
 		if (checked) { qApp->removeEventFilter(this); }
 		else { qApp->installEventFilter(this); }
 
 	}
-	else if ( tag == "smoothscroll" )
-	{
-		ConfigManager::inst()->setValue( "ui", "smoothscroll",
-						 QString::number(checked) );
-	}
-	else if ( tag == "oneinstrument" )
-	{
-		ConfigManager::inst()->setValue( "ui", "oneinstrumenttrackwindow",
-						 QString::number(checked) );
-	}
-	else if ( tag == "printnotelabels" )
-	{
-		ConfigManager::inst()->setValue( "ui", "printnotelabels",
-						 QString::number(checked) );
-	}
+	else if (tag == "smoothscroll")    { ConfigManager::inst()->config.ui.smoothscroll = checked; }
+	else if (tag == "oneinstrument")   { ConfigManager::inst()->config.ui.oneinstrumenttrackwindow = checked; }
+	else if (tag == "printnotelabels") { ConfigManager::inst()->config.ui.printnotelabels = checked; }
+
+	ConfigManager::inst()->configUpdated();
 }
 
 
@@ -1390,13 +1371,11 @@ void MainWindow::browseHelp()
 
 void MainWindow::autoSave()
 {
-	if( !Engine::getSong()->isExporting() &&
-		!Engine::getSong()->isLoadingProject() &&
-		!RemotePluginBase::isMainThreadWaiting() &&
-		!QApplication::mouseButtons() &&
-		( ConfigManager::inst()->value( "ui",
-				"enablerunningautosave" ).toInt() ||
-			! Engine::getSong()->isPlaying() ) )
+	if (!Engine::getSong()->isExporting()
+		&& !Engine::getSong()->isLoadingProject()
+		&& !RemotePluginBase::isMainThreadWaiting()
+		&& !QApplication::mouseButtons()
+		&& (ConfigManager::inst()->config.ui.enablerunningautosave || !Engine::getSong()->isPlaying()))
 	{
 		Engine::getSong()->saveProjectFile(ConfigManager::inst()->recoveryFile());
 		autoSaveTimerReset();  // Reset timer

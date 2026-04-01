@@ -504,6 +504,119 @@ void ConfigManager::loadConfigFile(const QString & configFile)
 				node = node.nextSibling();
 			}
 
+			// Populate the struct
+			// TODO C++26: use type reflections instead of this unrolled mess
+#define cfgSetInt(CLS, ATTR) if (node = root.namedItem(#CLS).attributes().namedItem(#ATTR); !node.isNull()) { config.CLS.ATTR = node.toAttr().value().toInt(); }
+#define cfgSetStr(CLS, ATTR) if (node = root.namedItem(#CLS).attributes().namedItem(#ATTR); !node.isNull()) { config.CLS.ATTR = node.toAttr().value().toStdString(); }
+
+			cfgSetInt(ui, animateafp);
+			cfgSetStr(ui, autoscroll);
+			cfgSetInt(ui, compacttrackbuttons);
+			cfgSetStr(ui, detachbehavior);
+			cfgSetInt(ui, disableautoquit);
+			cfgSetInt(ui, displaywaveform);
+			cfgSetInt(ui, enableautosave);
+			cfgSetInt(ui, enablerunningautosave);
+			cfgSetInt(ui, letpreviewsfinish);
+			cfgSetInt(ui, mixerchanneldeletionwarning);
+			cfgSetInt(ui, oneinstrumenttrackwindow);
+			cfgSetInt(ui, printnotelabels);
+			cfgSetInt(ui, saveinterval);
+			cfgSetInt(ui, showfaderticks);
+			cfgSetInt(ui, sidebaronright);
+			cfgSetInt(ui, smoothscroll);
+			cfgSetInt(ui, trackdeletionwarning);
+			cfgSetInt(ui, vstalwaysontop);
+
+			cfgSetInt(app, configured);
+			cfgSetInt(app, disablebackup);
+			cfgSetStr(app, language);
+			cfgSetStr(app, loopmarkermode);
+			cfgSetInt(app, nanhandler);
+			cfgSetInt(app, nommpz);
+			cfgSetInt(app, openlastproject);
+			cfgSetInt(app, sololegacybehavior);
+
+			cfgSetStr(paths, backgroundtheme);
+			cfgSetStr(paths, defaultsf2);
+			cfgSetStr(paths, gigdir);
+			cfgSetStr(paths, ladspadir);
+			cfgSetStr(paths, sf2dir);
+			cfgSetStr(paths, stkdir);
+			cfgSetStr(paths, theme);
+			cfgSetStr(paths, vstdir);
+			cfgSetStr(paths, workingdir);
+
+			cfgSetInt(tooltips, disabled);
+
+			cfgSetStr(audioengine, audiodev);
+			cfgSetStr(audioengine, mididev);
+			cfgSetInt(audioengine, framesperaudiobuffer);
+			cfgSetInt(audioengine, samplerate);
+
+			cfgSetInt(audioalsa, channels);
+			cfgSetStr(audioalsa, device);
+
+			cfgSetStr(audiojack, clientname);
+			config.audiojack.input = {};
+			config.audiojack.output = {};
+			for (int i = 0;; i++)
+			{
+				if (node = root.namedItem("audiojack").attributes().namedItem(
+						QString::fromStdString(std::format("input{}", i))); !node.isNull())
+				{
+					config.audiojack.input.push_back(node.toAttr().value().toStdString());
+				}
+				else
+				{
+					break;
+				}
+			}
+			for (int i = 0;; i++)
+			{
+				if (node = root.namedItem("audiojack").attributes().namedItem(
+						QString::fromStdString(std::format("output{}", i))); !node.isNull())
+				{
+					config.audiojack.output.push_back(node.toAttr().value().toStdString());
+				}
+				else
+				{
+					break;
+				}
+			}
+
+
+			cfgSetInt(audiooss, channels);
+			cfgSetStr(audiooss, device);
+
+			cfgSetInt(audiopa, channels);
+			cfgSetStr(audiopa, device);
+
+			cfgSetStr(audioportaudio, inputdevice);
+			cfgSetStr(audioportaudio, outputdevice);
+			cfgSetInt(audioportaudio, inputchannels);
+			cfgSetInt(audioportaudio, outputchannels);
+			cfgSetStr(audioportaudio, backend);
+
+			cfgSetInt(audiosndio, channels);
+			cfgSetStr(audiosndio, device);
+
+			cfgSetStr(audiosoundio, backend);
+			cfgSetStr(audiosoundio, out_device_id);
+			cfgSetStr(audiosoundio, out_device_raw);
+
+			cfgSetInt(midi, autoquantize);
+			cfgSetStr(midi, midiautoassign);
+
+			cfgSetStr(MidiAlsaRaw, device);
+			cfgSetStr(Midialsaseq, device);
+			cfgSetStr(MidiJack, device);
+			cfgSetStr(MidiSndio, device);
+			cfgSetStr(midioss, device);
+
+#undef cfgSetStr
+#undef cfgSetInt
+
 			if(value("paths", "theme") != "")
 			{
 				m_themeDir = value("paths", "theme");

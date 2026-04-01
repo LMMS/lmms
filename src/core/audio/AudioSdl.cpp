@@ -69,7 +69,7 @@ AudioSdl::AudioSdl( bool & _success_ful, AudioEngine*  _audioEngine ) :
 
   	SDL_AudioSpec actual; 
 
-	const auto playbackDevice = ConfigManager::inst()->value(SectionSDL, PlaybackDeviceSDL).toStdString();
+	const auto playbackDevice = ConfigManager::inst()->config.audiosdl.device;
 	const bool isDefaultPlayback = playbackDevice.empty();
 
 	// Try with the configured device
@@ -95,7 +95,7 @@ AudioSdl::AudioSdl( bool & _success_ful, AudioEngine*  _audioEngine ) :
 	m_inputAudioHandle = m_audioHandle;
 	m_inputAudioHandle.callback = sdlInputAudioCallback;
 
-	const auto inputDevice = ConfigManager::inst()->value(SectionSDL, InputDeviceSDL).toStdString();
+	const auto inputDevice = ConfigManager::inst()->config.audiosdl.inputdevice;
 	const bool isDefaultInput = inputDevice.empty();
 
 	// Try with the configured device
@@ -253,23 +253,25 @@ void AudioSdl::setupWidget::saveSettings()
 	if (currentPlaybackDevice == s_systemDefaultDevice)
 	{
 		// Represent the default playback device with an empty string
-		ConfigManager::inst()->setValue(SectionSDL, PlaybackDeviceSDL, "");
+		ConfigManager::inst()->config.audiosdl.device = "";
 	}
 	else if (!currentPlaybackDevice.isEmpty())
 	{
-		ConfigManager::inst()->setValue(SectionSDL, PlaybackDeviceSDL, currentPlaybackDevice);
+		ConfigManager::inst()->config.audiosdl.device = currentPlaybackDevice.toStdString();
 	}
 
 	const auto currentInputDevice = m_inputDeviceComboBox->currentText();
 	if (currentInputDevice == s_systemDefaultDevice)
 	{
 		// Represent the default input device with an empty string
-		ConfigManager::inst()->setValue(SectionSDL, InputDeviceSDL, "");
+		ConfigManager::inst()->config.audiosdl.inputdevice = "";
 	}
 	else if (!currentInputDevice.isEmpty())
 	{
-		ConfigManager::inst()->setValue(SectionSDL, InputDeviceSDL, currentInputDevice);
+		ConfigManager::inst()->config.audiosdl.inputdevice = currentInputDevice.toStdString();
 	}
+
+	ConfigManager::inst()->configUpdated(); // this is usually called higher in the call stack anyway, but just to be safe
 }
 
 void AudioSdl::setupWidget::populatePlaybackDeviceComboBox()
@@ -288,7 +290,7 @@ void AudioSdl::setupWidget::populatePlaybackDeviceComboBox()
 
 	m_playbackDeviceComboBox->addItems(playbackDevices);
 
-	const auto playbackDevice = ConfigManager::inst()->value(SectionSDL, PlaybackDeviceSDL);
+	const auto playbackDevice = QString::fromStdString(ConfigManager::inst()->config.audiosdl.device);
 	m_playbackDeviceComboBox->setCurrentText(playbackDevice.isEmpty() ? s_systemDefaultDevice : playbackDevice);
 }
 
@@ -309,7 +311,7 @@ void AudioSdl::setupWidget::populateInputDeviceComboBox()
 	m_inputDeviceComboBox->addItems(inputDevices);
 
 	// Set the current device to the one in the configuration
-	const auto inputDevice = ConfigManager::inst()->value(SectionSDL, InputDeviceSDL);
+	const auto inputDevice = QString::fromStdString(ConfigManager::inst()->config.audiosdl.inputdevice);
 	m_inputDeviceComboBox->setCurrentText(inputDevice.isEmpty() ? s_systemDefaultDevice : inputDevice);
 }
 

@@ -47,7 +47,7 @@ static void stream_write_callback(pa_stream *s, size_t length, void *userdata)
 
 AudioPulseAudio::AudioPulseAudio( bool & _success_ful, AudioEngine*  _audioEngine ) :
 	AudioDevice(std::clamp<ch_cnt_t>(
-		ConfigManager::inst()->value("audiopa", "channels").toInt(),
+		ConfigManager::inst()->config.audiopa.channels,
 		DEFAULT_CHANNELS,
 		DEFAULT_CHANNELS), _audioEngine),
 	m_s( nullptr ),
@@ -76,7 +76,7 @@ AudioPulseAudio::~AudioPulseAudio()
 
 QString AudioPulseAudio::probeDevice()
 {
-	QString dev = ConfigManager::inst()->value( "audiopa", "device" );
+	QString dev = QString::fromStdString(ConfigManager::inst()->config.audiopa.device);
 	if( dev.isEmpty() )
 	{
 		if( getenv( "AUDIODEV" ) != nullptr )
@@ -286,31 +286,24 @@ void AudioPulseAudio::signalConnected( bool connected )
 	}
 }
 
-
-
-
-AudioPulseAudio::setupWidget::setupWidget( QWidget * _parent ) :
-	AudioDeviceSetupWidget( AudioPulseAudio::name(), _parent )
+AudioPulseAudio::setupWidget::setupWidget(QWidget* parent)
+	: AudioDeviceSetupWidget{AudioPulseAudio::name(), parent}
 {
-	QFormLayout * form = new QFormLayout(this);
+	auto form = new QFormLayout{this};
 
-	m_device = new QLineEdit( AudioPulseAudio::probeDevice(), this );
+	m_device = new QLineEdit(AudioPulseAudio::probeDevice(), this);
 	form->addRow(tr("Device"), m_device);
 
-	auto m = new gui::LcdSpinBoxModel();
+	auto m = new gui::LcdSpinBoxModel;
 	m->setRange(DEFAULT_CHANNELS, DEFAULT_CHANNELS);
-	m->setStep( 2 );
-	m->setValue( ConfigManager::inst()->value( "audiopa",
-										 "channels" ).toInt() );
+	m->setStep(2);
+	m->setValue(ConfigManager::inst()->config.audiopa.channels);
 
-	m_channels = new gui::LcdSpinBox( 1, this );
-	m_channels->setModel( m );
+	m_channels = new gui::LcdSpinBox(1, this);
+	m_channels->setModel(m);
 
 	form->addRow(tr("Channels"), m_channels);
 }
-
-
-
 
 AudioPulseAudio::setupWidget::~setupWidget()
 {
@@ -322,10 +315,9 @@ AudioPulseAudio::setupWidget::~setupWidget()
 
 void AudioPulseAudio::setupWidget::saveSettings()
 {
-	ConfigManager::inst()->setValue( "audiopa", "device",
-							m_device->text() );
-	ConfigManager::inst()->setValue( "audiopa", "channels",
-				QString::number( m_channels->value<int>() ) );
+	ConfigManager::inst()->config.audiopa.device = m_device->text().toStdString();
+	ConfigManager::inst()->config.audiopa.channels = m_channels->value<int>();
+	ConfigManager::inst()->configUpdated();
 }
 
 } // namespace lmms

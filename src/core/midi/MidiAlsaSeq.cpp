@@ -141,7 +141,7 @@ MidiAlsaSeq::~MidiAlsaSeq()
 
 QString MidiAlsaSeq::probeDevice()
 {
-	QString dev = ConfigManager::inst()->value( "Midialsaseq", "device" );
+	QString dev = QString::fromStdString(ConfigManager::inst()->config.Midialsaseq.device);
 	if( dev.isEmpty() )
 	{
 		if( getenv( "MIDIDEV" ) != nullptr )

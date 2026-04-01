@@ -58,7 +58,7 @@
 namespace lmms
 {
 
-static const QString PATH_DEV_DSP =
+constexpr std::string PATH_DEV_DSP =
 #if defined(__NetBSD__) || defined(__OpenBSD__)
 "/dev/audio";
 #else
@@ -69,7 +69,7 @@ static const QString PATH_DEV_DSP =
 
 AudioOss::AudioOss( bool & _success_ful, AudioEngine*  _audioEngine ) :
 	AudioDevice(std::clamp<ch_cnt_t>(
-		ConfigManager::inst()->value("audiooss", "channels").toInt(),
+		ConfigManager::inst()->config.audiooss.channels,
 		DEFAULT_CHANNELS,
 		DEFAULT_CHANNELS), _audioEngine),
 	m_convertEndian( false )
@@ -192,49 +192,34 @@ AudioOss::~AudioOss()
 	close( m_audioFD );
 }
 
-
-
-
 QString AudioOss::probeDevice()
 {
-	QString dev = ConfigManager::inst()->value( "AudioOss", "Device" );
-	if( dev.isEmpty() )
+	namespace fs = std::filesystem;
+	fs::path dev = ConfigManager::inst()->config.audiooss.device;
+	if (dev.empty())
 	{
-		char * adev = getenv( "AUDIODEV" );	// Is there a standard
-							// variable name?
-		if( adev != nullptr )
-		{
-			dev = adev;
-		}
-		else
-		{
-			dev = PATH_DEV_DSP;		// default device
-		}
+		char* adev = std::getenv("AUDIODEV"); // Is there a standard
+		if (adev) { dev = adev; }
+		else { dev = PATH_DEV_DSP; } // default device
 	}
 
 	// if the first open fails, look for other devices
-	if( QFileInfo( dev ).isWritable() == false )
+	if (!QFileInfo(dev).isWritable())
 	{
 		int instance = -1;
-		while( true )
+		while (true)
 		{
-			dev = PATH_DEV_DSP + QString::number( ++instance );
-			if( !QFileInfo( dev ).exists() )
+			dev = PATH_DEV_DSP + std::to_string(++instance);
+			if (!fs::exists(dev))
 			{
 				dev = PATH_DEV_DSP;
 				break;
 			}
-			if( QFileInfo( dev ).isWritable() )
-			{
-				break;
-			}
+			if (QFileInfo(dev).isWritable()) { break; }
 		}
 	}
-	return dev;
+	return QString::fromStdString(dev.string());
 }
-
-
-
 
 void AudioOss::startProcessing()
 {
@@ -276,32 +261,25 @@ void AudioOss::run()
 	delete[] outbuf;
 }
 
-
-
-
-AudioOss::setupWidget::setupWidget( QWidget * _parent ) :
-	AudioDeviceSetupWidget( AudioOss::name(), _parent )
+AudioOss::setupWidget::setupWidget(QWidget* _parent)
+	: AudioDeviceSetupWidget(AudioOss::name(), _parent)
 {
-	QFormLayout * form = new QFormLayout(this);
+	auto form = new QFormLayout{this};
 
-	m_device = new QLineEdit( probeDevice(), this );
+	m_device = new QLineEdit{probeDevice(), this};
 
 	form->addRow(tr("Device"), m_device);
 
-	auto m = new gui::LcdSpinBoxModel(/* this */);
+	auto m = new gui::LcdSpinBoxModel{/* this */};
 	m->setRange(DEFAULT_CHANNELS, DEFAULT_CHANNELS);
-	m->setStep( 2 );
-	m->setValue( ConfigManager::inst()->value( "audiooss",
-							"channels" ).toInt() );
+	m->setStep(2);
+	m->setValue(ConfigManager::inst()->config.audiooss.channels);
 
-	m_channels = new gui::LcdSpinBox( 1, this );
-	m_channels->setModel( m );
+	m_channels = new gui::LcdSpinBox{1, this};
+	m_channels->setModel(m);
 
 	form->addRow(tr("Channels"), m_channels);
 }
-
-
-
 
 AudioOss::setupWidget::~setupWidget()
 {
@@ -313,10 +291,9 @@ AudioOss::setupWidget::~setupWidget()
 
 void AudioOss::setupWidget::saveSettings()
 {
-	ConfigManager::inst()->setValue( "audiooss", "device",
-							m_device->text() );
-	ConfigManager::inst()->setValue( "audiooss", "channels",
-				QString::number( m_channels->value<int>() ) );
+	ConfigManager::inst()->config.audiooss.device = m_device->text().toStdString();
+	ConfigManager::inst()->config.audiooss.channels =  m_channels->value<int>();
+	ConfigManager::inst()->configUpdated();
 }
 
 

@@ -301,7 +301,7 @@ void InstrumentTrackView::dropEvent( QDropEvent * _de )
 
 void InstrumentTrackView::toggleInstrumentWindow( bool _on )
 {
-	if (_on && ConfigManager::inst()->value("ui", "oneinstrumenttrackwindow").toInt())
+	if (_on && ConfigManager::inst()->config.ui.oneinstrumenttrackwindow)
 	{
 		if (topLevelInstrumentTrackWindow())
 		{

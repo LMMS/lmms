@@ -50,7 +50,7 @@ Oscilloscope::Oscilloscope( QWidget * _p ) :
 	m_clippingColor(255, 64, 64)
 {
 	setFixedSize( m_background.width(), m_background.height() );
-	setActive( ConfigManager::inst()->value( "ui", "displaywaveform").toInt() );
+	setActive(ConfigManager::inst()->config.ui.displaywaveform);
 
 	const f_cnt_t frames = Engine::audioEngine()->framesPerPeriod();
 	m_buffer = new SampleFrame[frames];

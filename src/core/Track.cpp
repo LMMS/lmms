@@ -604,7 +604,7 @@ void Track::toggleSolo()
 
 	const bool solo = m_soloModel.value();
 	// Should we use the new behavior of solo or the older/legacy one?
-	const bool soloLegacyBehavior = ConfigManager::inst()->value("app", "sololegacybehavior", "0").toInt();
+	const bool soloLegacyBehavior = ConfigManager::inst()->config.app.sololegacybehavior;
 
 	for (const auto& track : tl)
 	{

@@ -49,7 +49,7 @@ namespace lmms::gui
 PatternEditor::PatternEditor(PatternStore* ps) :
 	TrackContainerView(ps),
 	m_ps(ps),
-	m_trackHeadWidth(ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt() == 1
+	m_trackHeadWidth(ConfigManager::inst()->config.ui.compacttrackbuttons
 		? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT
 		: DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH),
 	m_maxClipLength(TimePos::ticksPerBar())
@@ -287,7 +287,7 @@ PatternEditorWindow::PatternEditorWindow(PatternStore* ps) :
 	connect(m_toolBar, SIGNAL(dropped(QDropEvent*)), m_editor, SLOT(dropEvent(QDropEvent*)));
 
 	// TODO: Use style sheet
-	if (ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt())
+	if (ConfigManager::inst()->config.ui.compacttrackbuttons)
 	{
 		setMinimumWidth(TRACK_OP_WIDTH_COMPACT + DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + 2 * ClipView::BORDER_WIDTH + 384);
 	}

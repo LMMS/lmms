@@ -163,7 +163,7 @@ PianoRoll::PianoRoll() :
 	m_midiClip( nullptr ),
 	m_currentPosition(),
 	m_recording( false ),
-	m_doAutoQuantization(ConfigManager::inst()->value("midi", "autoquantize").toInt() != 0),
+	m_doAutoQuantization(ConfigManager::inst()->config.midi.autoquantize),
 	m_currentNote( nullptr ),
 	m_action( Action::None ),
 	m_noteEditMode( NoteEditMode::Volume ),
@@ -3282,7 +3282,7 @@ void PianoRoll::dragNotes(int x, int y, bool alt, bool shift, bool ctrl)
 
 void PianoRoll::paintEvent(QPaintEvent * pe )
 {
-	bool drawNoteNames = ConfigManager::inst()->value( "ui", "printnotelabels").toInt();
+	bool drawNoteNames = ConfigManager::inst()->config.ui.printnotelabels;
 
 	QStyleOption opt;
 	opt.initFrom( this );
@@ -5756,10 +5756,9 @@ void PianoRollWindow::exportMidiClip()
 		!exportDialog.selectedFiles().isEmpty() &&
 		!exportDialog.selectedFiles().first().isEmpty())
 	{
-		QString suffix =
-			ConfigManager::inst()->value("app", "nommpz").toInt() == 0
-				? "xptz"
-				: "xpt";
+		QString suffix = ConfigManager::inst()->config.app.nommpz
+				? "xpt"
+				: "xptz";
 		exportDialog.setDefaultSuffix(suffix);
 
 		const QString fullPath = exportDialog.selectedFiles()[0];

@@ -72,27 +72,25 @@ constexpr std::array PROPORTIONAL_SNAP_SIZES{64.f, 32.f, 16.f, 8.f, 4.f, 2.f, 1.
 
 }
 
-
-
-SongEditor::SongEditor( Song * song ) :
-	TrackContainerView( song ),
-	m_song( song ),
-	m_zoomingModel(new IntModel(calculateZoomSliderValue(DEFAULT_PIXELS_PER_BAR), 0, ZOOM_STEPS, nullptr, tr("Zoom"))),
-	m_snappingModel(new ComboBoxModel()),
-	m_proportionalSnap( false ),
-	m_scrollBack( false ),
-	m_smoothScroll( ConfigManager::inst()->value( "ui", "smoothscroll" ).toInt() ),
-	m_mode(EditMode::Draw),
-	m_origin(),
-	m_scrollPos(),
-	m_mousePos(),
-	m_rubberBandStartTrackview(0),
-	m_rubberbandStartTimePos(0),
-	m_rubberbandPixelsPerBar(DEFAULT_PIXELS_PER_BAR),
-	m_trackHeadWidth(ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt()==1
-					 ? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT
-					 : DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH),
-	m_selectRegion(false)
+SongEditor::SongEditor(Song* song)
+	: TrackContainerView{song}
+	, m_song{song}
+	, m_zoomingModel{new IntModel{calculateZoomSliderValue(DEFAULT_PIXELS_PER_BAR), 0, ZOOM_STEPS, nullptr, tr("Zoom")}}
+	, m_snappingModel{new ComboBoxModel}
+	, m_proportionalSnap{false}
+	, m_scrollBack{false}
+	, m_smoothScroll{ConfigManager::inst()->config.ui.smoothscroll}
+	, m_mode{EditMode::Draw}
+	, m_origin{}
+	, m_scrollPos{}
+	, m_mousePos{}
+	, m_rubberBandStartTrackview{0}
+	, m_rubberbandStartTimePos{0}
+	, m_rubberbandPixelsPerBar{DEFAULT_PIXELS_PER_BAR}
+	, m_trackHeadWidth{ConfigManager::inst()->config.ui.compacttrackbuttons
+			  ? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT
+			  : DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH}
+	, m_selectRegion{false}
 {
 	// Set up timeline
 	m_timeLine = new TimeLineWidget(m_trackHeadWidth, 32, pixelsPerBar(),
@@ -750,14 +748,14 @@ static inline void animateScroll( QScrollBar *scrollBar, int newVal, bool smooth
 void SongEditor::updatePosition()
 {
 	const TimePos& t = m_timeLine->timeline()->pos();
-	const bool compactTrackButtons = ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt();
+	const bool compactTrackButtons = ConfigManager::inst()->config.ui.compacttrackbuttons;
 	const auto widgetWidth = compactTrackButtons ? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT : DEFAULT_SETTINGS_WIDGET_WIDTH;
 	const auto trackOpWidth = compactTrackButtons ? TRACK_OP_WIDTH_COMPACT : TRACK_OP_WIDTH;
 
 	if ((m_song->isPlaying() && m_song->m_playMode == Song::PlayMode::Song)
 							|| m_scrollBack)
 	{
-		m_smoothScroll = ConfigManager::inst()->value( "ui", "smoothscroll" ).toInt();
+		m_smoothScroll = ConfigManager::inst()->config.ui.smoothscroll;
 		const int w = width() - widgetWidth
 							- trackOpWidth
 							- contentWidget()->verticalScrollBar()->width(); // width of right scrollbar
@@ -785,7 +783,7 @@ void SongEditor::updatePosition()
 
 void SongEditor::updatePositionLine()
 {
-	const bool compactTrackButtons = ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt();
+	const bool compactTrackButtons = ConfigManager::inst()->config.ui.compacttrackbuttons;
 	const auto widgetWidth = compactTrackButtons ? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT : DEFAULT_SETTINGS_WIDGET_WIDTH;
 	const auto trackOpWidth = compactTrackButtons ? TRACK_OP_WIDTH_COMPACT : TRACK_OP_WIDTH;
 	const int x = m_timeLine->markerX(m_timeLine->timeline()->pos());

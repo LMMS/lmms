@@ -59,7 +59,7 @@ MidiClipView::MidiClipView( MidiClip* clip, TrackView* parent ) :
 	m_mutedNoteFillColor(100, 100, 100, 220),
 	m_mutedNoteBorderColor(100, 100, 100, 220),
 	// TODO if this option is ever added to the GUI, rename it to legacysepattern
-	m_legacySEPattern(ConfigManager::inst()->value("ui", "legacysebb", "0").toInt())
+	m_legacySEPattern(ConfigManager::inst()->config.ui.legacysebb)
 {
 	connect( getGUI()->pianoRoll(), SIGNAL(currentMidiClipChanged()),
 			this, SLOT(update()));

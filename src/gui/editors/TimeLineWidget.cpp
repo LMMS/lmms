@@ -198,7 +198,7 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 	p.drawRect( innerRectangle );
 	
 	// Draw loop handles if necessary
-	const auto handleMode = ConfigManager::inst()->value("app", "loopmarkermode") == "handles";
+	const auto handleMode = (ConfigManager::inst()->config.app.loopmarkermode == "handles");
 	if (handleMode && underMouse() && QGuiApplication::keyboardModifiers().testFlag(Qt::ShiftModifier))
 	{
 		const auto handleWidth = std::min(m_loopHandleWidth, loopRectWidth / 2 - 1);
@@ -234,7 +234,7 @@ auto TimeLineWidget::getLoopAction(QMouseEvent* event) const -> TimeLineWidget::
 {
 	const auto pos = position(event);
 
-	const auto mode = ConfigManager::inst()->value("app", "loopmarkermode");
+	const auto mode = ConfigManager::inst()->config.app.loopmarkermode;
 	const auto xPos = pos.x();
 	const auto button = event->button();
 
@@ -433,10 +433,11 @@ void TimeLineWidget::contextMenuEvent(QContextMenuEvent* event)
 	menu.addSeparator();
 
 	const auto loopMenu = menu.addMenu(tr("Loop edit mode (hold shift)"));
-	const auto loopMode = ConfigManager::inst()->value("app", "loopmarkermode", "dual");
+	const auto loopMode = ConfigManager::inst()->config.app.loopmarkermode;
 	const auto addLoopModeAction = [loopMenu, &loopMode](QString text, QString mode) {
 		const auto action = loopMenu->addAction(text, [mode] {
-			ConfigManager::inst()->setValue("app", "loopmarkermode", mode);
+			ConfigManager::inst()->config.app.loopmarkermode = mode.toStdString();
+			ConfigManager::inst()->configUpdated();
 		});
 		action->setCheckable(true);
 		if (loopMode == mode) { action->setChecked(true); }
@@ -451,7 +452,7 @@ void TimeLineWidget::contextMenuEvent(QContextMenuEvent* event)
 
 TimeLineWidget::AutoScrollState TimeLineWidget::defaultAutoScrollState()
 {
-	QString autoScrollState = ConfigManager::inst()->value("ui", "autoscroll");
+	QString autoScrollState = QString::fromStdString(ConfigManager::inst()->config.ui.autoscroll);
 	if (autoScrollState == AutoScrollSteppedString) { return AutoScrollState::Stepped; }
 	else if (autoScrollState == AutoScrollContinuousString) { return AutoScrollState::Continuous; }
 	else if (autoScrollState == AutoScrollDisabledString) { return AutoScrollState::Disabled; }
