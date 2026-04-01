@@ -13,6 +13,10 @@ if(NOT DEFINED VCPKG_TARGET_TRIPLET)
 	set(VCPKG_TARGET_TRIPLET "x64-mingw-static" CACHE STRING "Vcpkg target triplet" FORCE)
 endif()
 
+if(NOT DEFINED VCPKG_HOST_TRIPLET)
+	set(VCPKG_HOST_TRIPLET "x64-linux" CACHE STRING "Vcpkg host triplet" FORCE)
+endif()
+
 set(CMAKE_SYSTEM_NAME               Windows)
 set(CMAKE_SYSTEM_VERSION            1)
 
@@ -21,10 +25,11 @@ set(CMAKE_C_COMPILER      ${TOOLCHAIN_PREFIX}-gcc)
 set(CMAKE_CXX_COMPILER    ${TOOLCHAIN_PREFIX}-g++)
 set(CMAKE_RC_COMPILER     ${TOOLCHAIN_PREFIX}-windres)
 
-# Check for vcpkg packages first, then fall back on MinGW system packages
+# Check for vcpkg target packages first, then fall back on MinGW system packages and vcpkg host packages
 set(CMAKE_FIND_ROOT_PATH
 	"${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}"
 	"/usr/${TOOLCHAIN_PREFIX}"
+	"${VCPKG_INSTALLED_DIR}/${VCPKG_HOST_TRIPLET}"
 )
 
 set(ENV{PKG_CONFIG}       /usr/bin/${TOOLCHAIN_PREFIX}-pkg-config)
