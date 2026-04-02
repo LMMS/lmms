@@ -745,7 +745,7 @@ ExprSynth::~ExprSynth()
 	}
 }
 
-void ExprSynth::renderOutput(fpp_t frames, SampleFrame* buf)
+void ExprSynth::renderOutput(f_cnt_t frames, SampleFrame* buf)
 {
 	try
 	{
@@ -772,7 +772,7 @@ void ExprSynth::renderOutput(fpp_t frames, SampleFrame* buf)
 		}
 		if (o1_valid && o2_valid)
 		{
-			for (fpp_t frame = 0; frame < frames ; ++frame)
+			for (f_cnt_t frame = 0; frame < frames ; ++frame)
 			{
 				if (is_released && m_released < 1)
 				{
@@ -802,7 +802,7 @@ void ExprSynth::renderOutput(fpp_t frames, SampleFrame* buf)
 				last_func1 = last_func2;
 				pn1 = pn2;
 			}
-			for (fpp_t frame = 0; frame < frames ; ++frame)
+			for (f_cnt_t frame = 0; frame < frames ; ++frame)
 			{
 				if (is_released && m_released < 1)
 				{

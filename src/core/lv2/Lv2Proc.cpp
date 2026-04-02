@@ -326,7 +326,7 @@ void Lv2Proc::copyModelsToCore()
 
 void Lv2Proc::copyBuffersFromCore(const SampleFrame* buf,
 									unsigned firstChan, unsigned num,
-									fpp_t frames)
+									f_cnt_t frames)
 {
 	inPorts().m_left->copyBuffersFromCore(buf, firstChan, frames);
 	if (num > 1)
@@ -351,7 +351,7 @@ void Lv2Proc::copyBuffersFromCore(const SampleFrame* buf,
 
 void Lv2Proc::copyBuffersToCore(SampleFrame* buf,
 								unsigned firstChan, unsigned num,
-								fpp_t frames) const
+								f_cnt_t frames) const
 {
 	outPorts().m_left->copyBuffersToCore(buf, firstChan + 0, frames);
 	if (num > 1)
@@ -368,7 +368,7 @@ void Lv2Proc::copyBuffersToCore(SampleFrame* buf,
 
 
 
-void Lv2Proc::run(fpp_t frames)
+void Lv2Proc::run(f_cnt_t frames)
 {
 	if (m_worker)
 	{

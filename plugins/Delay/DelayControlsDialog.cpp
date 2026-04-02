@@ -47,25 +47,21 @@ DelayControlsDialog::DelayControlsDialog( DelayControls *controls ) :
 
 	auto sampleDelayKnob = new TempoSyncKnob(KnobType::Bright26, tr("DELAY"), this, Knob::LabelRendering::LegacyFixedFontSize);
 	sampleDelayKnob->move( 10,14 );
-	sampleDelayKnob->setVolumeKnob( false );
 	sampleDelayKnob->setModel( &controls->m_delayTimeModel );
 	sampleDelayKnob->setHintText( tr( "Delay time" ) + " ", " s" );
 
-	auto feedbackKnob = new Knob(KnobType::Bright26, tr("FDBK"), this, Knob::LabelRendering::LegacyFixedFontSize);
+	auto feedbackKnob = new VolumeKnob(KnobType::Bright26, tr("FDBK"), this, Knob::LabelRendering::LegacyFixedFontSize);
 	feedbackKnob->move( 11, 58 );
-	feedbackKnob->setVolumeKnob( true) ;
 	feedbackKnob->setModel( &controls->m_feedbackModel);
 	feedbackKnob->setHintText( tr ( "Feedback amount" ) + " " , "" );
 
 	auto lfoFreqKnob = new TempoSyncKnob(KnobType::Bright26, tr("RATE"), this, Knob::LabelRendering::LegacyFixedFontSize);
 	lfoFreqKnob->move( 11, 119 );
-	lfoFreqKnob->setVolumeKnob( false );
 	lfoFreqKnob->setModel( &controls->m_lfoTimeModel );
 	lfoFreqKnob->setHintText( tr ( "LFO frequency") + " ", " s" );
 
 	auto lfoAmtKnob = new TempoSyncKnob(KnobType::Bright26, tr("AMNT"), this, Knob::LabelRendering::LegacyFixedFontSize);
 	lfoAmtKnob->move( 11, 159 );
-	lfoAmtKnob->setVolumeKnob( false );
 	lfoAmtKnob->setModel( &controls->m_lfoAmountModel );
 	lfoAmtKnob->setHintText( tr ( "LFO amount" ) + " " , " s" );
 

@@ -1,7 +1,7 @@
 /*
  * TapTempo.h - Plugin to count beats per minute
  *
- * Copyright (c) 2022 saker <sakertooth@gmail.com>
+ * Copyright (c) 2026 saker <sakertooth@gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -36,10 +36,11 @@ class TapTempo : public ToolPlugin
 {
 	Q_OBJECT
 public:
-	using clock = std::chrono::steady_clock;
-
 	TapTempo();
-	void onBpmClick();
+	void tap(bool play);
+	void sync();
+	void reset();
+	double bpm() const;
 
 	QString nodeName() const override;
 	void saveSettings(QDomDocument&, QDomElement&) override {}
@@ -48,13 +49,13 @@ public:
 	gui::PluginView* instantiateView(QWidget*) override { return new gui::TapTempoView(this); }
 
 private:
-	std::chrono::time_point<clock> m_startTime;
-	int m_numTaps = 0;
-	int m_tapsNeededToDisplay = 2;
-	double m_bpm = 0.0;
-	bool m_showDecimal = false;
-
-	friend class gui::TapTempoView;
+	static constexpr auto MaxIntervals = 3;
+	using clock = std::chrono::steady_clock;
+	std::chrono::time_point<clock> m_lastTap;
+	std::array<std::chrono::milliseconds, MaxIntervals> m_intervals;
+	int m_beat = 0;
+	int m_taps = 0;
+	double m_bpm = 0;
 };
 } // namespace lmms
 

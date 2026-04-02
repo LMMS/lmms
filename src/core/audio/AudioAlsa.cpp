@@ -259,7 +259,7 @@ void AudioAlsa::run()
 			if( outbuf_pos == 0 )
 			{
 				// frames depend on the sample rate
-				const fpp_t frames = getNextBuffer( temp );
+				const f_cnt_t frames = getNextBuffer( temp );
 				if( !frames )
 				{
 					quit = true;
