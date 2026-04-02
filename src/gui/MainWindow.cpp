@@ -276,8 +276,8 @@ void MainWindow::finalize()
 #endif
 	};
 
-	auto menuAddAction = [this, addAction](QMenu* menu, std::string_view icon, const QString& text, ActionData* data,
-		auto(MainWindow::* slot)()) -> void
+	auto menuAddAction = [this, addAction](QMenu* menu, std::string_view icon, const QString& text,
+		ActionData* data, auto(MainWindow::* slot)()) -> void
 	{
 		const auto emptyShortcut = QKeySequence{};
 		auto* action = addAction(menu, icon, text, emptyShortcut, slot);
@@ -291,8 +291,8 @@ void MainWindow::finalize()
 	static auto* adNewProject = ActionData::get("project_new", ActionTrigger::pressed(Qt::ControlModifier, Qt::Key_N));
 	menuAddAction(project_menu, "project_new", tr("&New"), adNewProject, &MainWindow::createNewProject);
 
-	static auto* adTest = ActionData::get("random_test", ActionTrigger::held(Qt::ControlModifier, Qt::Key_J));
-	auto testAction = new GuiAction(this, adTest);
+	static auto* adRandomTest = ActionData::get("random_test", ActionTrigger::held(Qt::ControlModifier, Qt::Key_J));
+	auto testAction = new GuiAction(this, adRandomTest);
 	connect(testAction, &GuiAction::activated, this, [this] { qDebug() << "ON"; });
 	connect(testAction, &GuiAction::deactivated, this, [this] {
 		qDebug() << "OFF";

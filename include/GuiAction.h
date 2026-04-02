@@ -25,10 +25,9 @@
 #ifndef LMMS_GUI_ACTION_H
 #define LMMS_GUI_ACTION_H
 
+#include <QAction>
 #include <QObject>
 #include <QString>
-#include <QAction>
-
 #include <functional>
 #include <variant>
 
@@ -36,12 +35,19 @@ namespace lmms {
 
 class ActionData;
 
+/**
+ * Hosts different types of conditions that may trigger an action.
+ */
 class ActionTrigger
 {
 public:
 	struct Never //!< Can never be triggered
 	{
 	};
+
+	// TODO: maybe refactor KeyPressed and KeyHeld into a single type? I think the auto-repeat and release handling
+	// should be done on the action data side, or else the user might end up changing this accidentally and making
+	// the action work in an unintended way.
 
 	struct KeyPressed
 	{
@@ -59,17 +65,24 @@ public:
 	//! Top type for all possible triggers
 	typedef std::variant<Never, KeyPressed, KeyHeld> Any;
 
-	static Any pressed(Qt::KeyboardModifiers mods, Qt::Key key, bool repeat = true);
-	static Any held(Qt::KeyboardModifiers mods, Qt::Key key);
+	static constexpr Any pressed(Qt::KeyboardModifiers mods, Qt::Key key, bool repeat = true)
+	{
+		return KeyPressed{.mods = mods, .key = key, .repeat = repeat};
+	}
+
+	static constexpr Any held(Qt::KeyboardModifiers mods, Qt::Key key)
+	{
+		return ActionTrigger::KeyHeld{.mods = mods, .key = key};
+	}
 };
 
 class ActionContainer
 {
 public:
 	/**
-		Attempts to register a new action, but refuses if it is already registered. Returns whether the insertion
-		happened.
-	*/
+	 * Attempts to register a new action, but refuses if it is already registered. Returns whether the insertion
+	 * happened.
+	 */
 	static bool tryRegister(QString name, ActionTrigger::Any trigger);
 
 	//! Find an action by its name. Returns null when it was not found.
@@ -93,10 +106,11 @@ class ActionData : public QObject
 
 public:
 	/**
-		Obtains the data of the action with the specified name. Constructs one if it has not been present, and returns it.
-
-		For now, to avoid memory safety issues, ActionData instances are never removed or freed.
-	*/
+	 * Obtains the data of the action with the specified name. Constructs one if it has not been present, and
+	 * returns it.
+	 *
+	 * For now, to avoid memory safety issues, ActionData instances are never removed or freed.
+	 */
 	static ActionData* get(const QString& name, ActionTrigger::Any trigger = ActionTrigger::Never{});
 
 	const QString& name() const;
@@ -116,10 +130,10 @@ private:
 };
 
 /**
-	Do not change the parent of this object! (FIXME: implement this, perhaps)
-	
-	TODO: think of a better name. `ActionListener` or `CommandListener` might be good?
-*/
+ * Do not change the parent of this object! (FIXME: implement this, perhaps)
+ *
+ * TODO: think of a better name. `ActionListener` or `CommandListener` might be good?
+ */
 class GuiAction : public QObject
 {
 	Q_OBJECT
@@ -142,9 +156,9 @@ private:
 };
 
 /**
-	Estabilishes a one-way sync between an ActionData and a QAction, such that changes to the ActionData affect the
-	state of the QAction. Useful for menu actions with keybindings.
-*/
+ * Estabilishes a one-way sync between an ActionData and a QAction, such that changes to the ActionData affect the state
+ * of the QAction. Currently updates the keybinding hint in menus that display the action.
+ */
 void syncActionDataToQAction(ActionData* data, QAction* action);
 
 } // namespace lmms

@@ -48,6 +48,16 @@ ActionData* ActionContainer::findData(const QString& name)
 	return (it == s_dataMap.end()) ? nullptr : s_dataMap.at(name);
 }
 
+ActionContainer::MappingIterator ActionContainer::mappingsBegin()
+{
+	return s_dataMap.begin();
+}
+
+ActionContainer::MappingIterator ActionContainer::mappingsEnd()
+{
+	return s_dataMap.end();
+}
+
 ActionData::ActionData(QString name, ActionTrigger::Any trigger)
 	: QObject(nullptr)
 	, m_name{name}
@@ -72,15 +82,6 @@ void ActionData::setTrigger(ActionTrigger::Any&& newTrigger)
 	emit modified();
 }
 
-ActionTrigger::Any ActionTrigger::pressed(Qt::KeyboardModifiers mods, Qt::Key key, bool repeat)
-{
-	return ActionTrigger::KeyPressed{.mods = mods, .key = key, .repeat = repeat};
-}
-
-ActionTrigger::Any ActionTrigger::held(Qt::KeyboardModifiers mods, Qt::Key key) {
-	return ActionTrigger::KeyHeld{.mods = mods, .key = key};
-}
-
 GuiAction::GuiAction(QObject* parent, ActionData* data)
 	: QObject(parent)
 	, m_data{data}
@@ -94,22 +95,13 @@ GuiAction::~GuiAction()
 {
 }
 
-ActionContainer::MappingIterator ActionContainer::mappingsBegin()
-{
-	return s_dataMap.begin();
-}
-
-ActionContainer::MappingIterator ActionContainer::mappingsEnd()
-{
-	return s_dataMap.end();
-}
-
 bool GuiAction::eventFilter(QObject* watched, QEvent* event)
 {
-	const auto& trigger_g = m_data->trigger();
-	if (std::holds_alternative<ActionTrigger::KeyPressed>(trigger_g))
+	const auto& triggerGeneral = m_data->trigger();
+
+	if (std::holds_alternative<ActionTrigger::KeyPressed>(triggerGeneral))
 	{
-		const auto& trigger = std::get<ActionTrigger::KeyPressed>(trigger_g);
+		const auto& trigger = std::get<ActionTrigger::KeyPressed>(triggerGeneral);
 		if (event->type() == QEvent::KeyPress)
 		{
 			auto* ke = static_cast<QKeyEvent*>(event);
@@ -123,9 +115,9 @@ bool GuiAction::eventFilter(QObject* watched, QEvent* event)
 			}
 		}
 	}
-	else if (std::holds_alternative<ActionTrigger::KeyHeld>(trigger_g))
+	else if (std::holds_alternative<ActionTrigger::KeyHeld>(triggerGeneral))
 	{
-		const auto& trigger = std::get<ActionTrigger::KeyHeld>(trigger_g);
+		const auto& trigger = std::get<ActionTrigger::KeyHeld>(triggerGeneral);
 		if (!m_active && event->type() == QEvent::KeyPress)
 		{
 			auto* ke = static_cast<QKeyEvent*>(event);
@@ -158,10 +150,10 @@ void syncActionDataToQAction(ActionData* data, QAction* action)
 {
 	auto updateAction = [action, data]
 	{
-		const auto& trigger_g = data->trigger();
-		if (std::holds_alternative<ActionTrigger::KeyPressed>(trigger_g))
+		const auto& triggerGeneral = data->trigger();
+		if (std::holds_alternative<ActionTrigger::KeyPressed>(triggerGeneral))
 		{
-			const auto& trigger = std::get<ActionTrigger::KeyPressed>(trigger_g);
+			const auto& trigger = std::get<ActionTrigger::KeyPressed>(triggerGeneral);
 			action->setShortcut(QKeySequence{static_cast<int>(trigger.mods + trigger.key)});
 			action->setAutoRepeat(trigger.repeat);
 		}
