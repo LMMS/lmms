@@ -16,8 +16,8 @@ if(Doxygen_FOUND OR DOXYGEN_FOUND)
 		SOURCES Doxyfile.in)
 else()
 	ADD_CUSTOM_TARGET(doc
-		COMMAND ${CMAKE_COMMAND} -E echo "Doxygen was not found. Unable to generate docs."
-		COMMAND ${CMAKE_COMMAND} -E exit 1)
+		COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/doc_fail.cmake
+		VERBATIM)
 endif()
 
 ADD_SUBDIRECTORY(bash-completion)
