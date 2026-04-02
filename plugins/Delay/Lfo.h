@@ -25,9 +25,6 @@
 #ifndef LFO_H
 #define LFO_H
 
-#include <cmath>
-#include <numbers>
-
 #include "lmms_math.h"
 
 namespace lmms
