@@ -1120,7 +1120,16 @@ void RemoteVstPlugin::process( const SampleFrame* _in, SampleFrame* _out )
 
 	unlockShm();
 
-	m_currentSamplePos += bufferSize();
+	const auto syncData = __plugin->getVstSyncData();
+	if (syncData && syncData->isPlaying)
+	{
+		__plugin->m_currentSamplePos = syncData->ppqPos
+			* syncData->sampleRate * 60.0 / syncData->bpm;
+	}
+	else
+	{
+		// TODO Synchronize m_currentSamplePos with the bar and beat
+	}
 }
 
 
