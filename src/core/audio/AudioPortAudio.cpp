@@ -95,7 +95,6 @@ int maxChannels(const PaDeviceInfo* info, Direction direction)
 namespace lmms {
 AudioPortAudio::AudioPortAudio(bool& successful, AudioEngine* engine)
 	: AudioDevice(DEFAULT_CHANNELS, engine)
-	, m_outBuf(engine->framesPerPeriod())
 {
 	const auto numDevices = Pa_GetDeviceCount();
 	if (numDevices < 0)

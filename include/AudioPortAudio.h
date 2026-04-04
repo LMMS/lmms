@@ -86,10 +86,7 @@ private:
 		const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags, void* userData);
 
 	detail::PortAudioInitializationGuard m_initGuard;
-
 	PaStream* m_paStream = nullptr;
-	std::vector<SampleFrame> m_outBuf;
-	std::size_t m_outBufPos = 0;
 };
 } // namespace lmms
 
