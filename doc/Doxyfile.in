@@ -738,16 +738,18 @@ WARN_LOGFILE           =
 #---------------------------------------------------------------------------
 
 # The INPUT tag is used to specify the files and/or directories that contain
-# documented source files. You may enter file names like myfile.cpp or
-# directories like /usr/src/myproject. Separate the files or directories with
-# spaces.
-# Note: If this tag is empty the current directory is searched.
+# documented source files.
+#
+# Note: keep the main page as the first page in this list, or it might be
+# overriden by other main pages (e.g. the ones in included libraries).
 
-INPUT                  = "@CMAKE_CURRENT_SOURCE_DIR@/../src/core" \
-			"@CMAKE_CURRENT_SOURCE_DIR@/../src/gui" \
-			"@CMAKE_CURRENT_SOURCE_DIR@/../src/tracks" \
-			"@CMAKE_CURRENT_SOURCE_DIR@/../include" \
-			"@CMAKE_CURRENT_SOURCE_DIR@/../plugins" \
+INPUT = \
+	"@CMAKE_CURRENT_SOURCE_DIR@/../README.md" \
+	"@CMAKE_CURRENT_SOURCE_DIR@/../src/core" \
+	"@CMAKE_CURRENT_SOURCE_DIR@/../src/gui" \
+	"@CMAKE_CURRENT_SOURCE_DIR@/../src/tracks" \
+	"@CMAKE_CURRENT_SOURCE_DIR@/../include" \
+	"@CMAKE_CURRENT_SOURCE_DIR@/../plugins" \
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses
@@ -886,7 +888,7 @@ FILTER_SOURCE_PATTERNS =
 # (index.html). This can be useful if you have a project on for instance GitHub
 # and want to reuse the introduction page also for the doxygen output.
 
-USE_MDFILE_AS_MAINPAGE =
+USE_MDFILE_AS_MAINPAGE = "@CMAKE_CURRENT_SOURCE_DIR@/../README.md"
 
 #---------------------------------------------------------------------------
 # Configuration options related to source browsing
