@@ -479,7 +479,7 @@ AudioJack::setupWidget::setupWidget(QWidget* parent)
 
 	form->addRow(tr("Client name"), m_clientName);
 
-	auto buildToolButton = [this](QWidget* parent, const QString& currentSelection, const std::vector<std::string>& names, const QString& filteredLMMSClientName)
+	auto buildToolButton = [](QWidget* parent, const QString& currentSelection, const std::vector<std::string>& names, const QString& filteredLMMSClientName)
 	{
 		auto toolButton = new QToolButton(parent);
 		// Make sure that the tool button will fill out the available space in the form layout
