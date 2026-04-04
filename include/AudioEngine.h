@@ -269,7 +269,7 @@ public:
 	 *
 	 * @returns A non-owning buffer to the next audio period.
 	 */
-	const SampleFrame* renderNextPeriod();
+	std::span<const SampleFrame> renderNextPeriod();
 
 	/**
 	 * @brief Renders an audio buffer into @a dst.

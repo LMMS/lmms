@@ -315,7 +315,7 @@ void AudioEngine::renderStageMix()
 
 
 
-const SampleFrame* AudioEngine::renderNextPeriod()
+std::span<const SampleFrame> AudioEngine::renderNextPeriod()
 {
 	const auto lock = std::lock_guard{m_changeMutex};
 
@@ -331,7 +331,7 @@ const SampleFrame* AudioEngine::renderNextPeriod()
 	m_profiler.finishPeriod(outputSampleRate(), m_framesPerPeriod);
 	m_outputBufferReadIndex = 0;
 
-	return m_outputBufferRead.get();
+	return {m_outputBufferRead.get(), m_framesPerPeriod};
 }
 
 void AudioEngine::swapBuffers()
