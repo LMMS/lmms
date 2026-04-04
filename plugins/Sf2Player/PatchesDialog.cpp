@@ -364,12 +364,12 @@ void PatchesDialog::keyPressEvent(QKeyEvent* event)
 
 void PatchesDialog::diffSelectProgRow(int offset)
 {
-	QItemSelectionModel* selectionModel = m_progListView->selectionModel();
+	auto* selectionModel = m_progListView->selectionModel();
 
-	int curRow = selectionModel->currentIndex().row();
+	const int curRow = selectionModel->currentIndex().row();
 	int newRow = curRow + offset;
-	int rowCount = m_progListView->model()->rowCount();
-	newRow = std::clamp(0, newRow, rowCount - 1);
+	const int rowCount = m_progListView->model()->rowCount();
+	newRow = std::clamp(newRow, 0, std::max(0, rowCount - 1));
 
 	constexpr auto selMask = QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows;
 	const auto idx = m_progListView->model()->index(newRow, ColPatch);
