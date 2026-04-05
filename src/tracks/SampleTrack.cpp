@@ -152,7 +152,6 @@ bool SampleTrack::play( const TimePos & _start, const f_cnt_t _frames,
 			else
 			{
 				auto smpHandle = new SamplePlayHandle(st);
-				smpHandle->setVolumeModel( &m_volumeModel );
 				smpHandle->setPatternTrack(pattern_track);
 				handle = smpHandle;
 			}

@@ -27,7 +27,6 @@
 #define LMMS_SAMPLE_PLAY_HANDLE_H
 
 #include "Sample.h"
-#include "AutomatableModel.h"
 #include "PlayHandle.h"
 
 namespace lmms
@@ -73,27 +72,14 @@ public:
 		m_patternTrack = pt;
 	}
 
-	void setVolumeModel( FloatModel * _model )
-	{
-		m_volumeModel = _model;
-	}
-
-
 private:
-	Sample* m_sample;
-	bool m_doneMayReturnTrue;
-
-	f_cnt_t m_frame;
 	Sample::PlaybackState m_state;
-
-	const bool m_ownAudioBusHandle;
-
-	FloatModel m_defaultVolumeModel;
-	FloatModel * m_volumeModel;
+	f_cnt_t m_frame;
+	Sample* m_sample;
 	Track * m_track;
-
 	PatternTrack* m_patternTrack;
-
+	bool m_doneMayReturnTrue;
+	bool m_ownAudioBusHandle;
 } ;
 
 
