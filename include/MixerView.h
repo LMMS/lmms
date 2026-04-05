@@ -25,6 +25,7 @@
 #ifndef LMMS_GUI_MIXER_VIEW_H
 #define LMMS_GUI_MIXER_VIEW_H
 
+#include <QScrollBar>
 #include <QWidget>
 
 #include "MixerChannelView.h"
@@ -119,6 +120,7 @@ private:
 	QScrollArea* channelArea;
 	QHBoxLayout* chLayout;
 	QWidget* m_channelAreaWidget;
+	QScrollBar* m_channelAreaScrollBar;
 	QStackedLayout* m_racksLayout;
 	QWidget* m_racksWidget;
 	Mixer* m_mixer;
