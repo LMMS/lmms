@@ -34,6 +34,7 @@
 #include <QMessageBox>
 #include <QShortcut>
 #include <QSplitter>
+#include <qtoolbutton.h>
 
 #include "AboutDialog.h"
 #include "AutomationEditor.h"
@@ -438,10 +439,15 @@ void MainWindow::finalize()
 	auto piano_roll_window = new ToolButton(
 		embed::getIconPixmap("piano"), tr("Piano Roll") + " (Ctrl+3)", this, SLOT(togglePianoRollWin()), m_toolBar);
 	piano_roll_window->setShortcut(keySequence(Qt::CTRL, Qt::Key_3));
+	piano_roll_window->setEnabled(false);
+	connect(getGUI()->pianoRoll(), &PianoRollWindow::currentMidiClipChanged, this, [piano_roll_window](){ piano_roll_window->setEnabled(getGUI()->pianoRoll()->hasValidMidiClip()); });
 
 	auto automation_editor_window = new ToolButton(embed::getIconPixmap("automation"),
 		tr("Automation Editor") + " (Ctrl+4)", this, SLOT(toggleAutomationEditorWin()), m_toolBar);
 	automation_editor_window->setShortcut(keySequence(Qt::CTRL, Qt::Key_4));
+	automation_editor_window->setEnabled(false);
+	connect(getGUI()->automationEditor(), &AutomationEditorWindow::currentClipChanged, this, [automation_editor_window](){ automation_editor_window->setEnabled(getGUI()->automationEditor()->hasValidClip()); });
+	connect(getGUI()->automationEditor()->m_editor, &AutomationEditor::currentClipChanged, this, [automation_editor_window](){ automation_editor_window->setEnabled(getGUI()->automationEditor()->m_editor->validClip()); });
 
 	auto mixer_window = new ToolButton(
 		embed::getIconPixmap("mixer"), tr("Mixer") + " (Ctrl+5)", this, SLOT(toggleMixerWin()), m_toolBar);
@@ -1042,8 +1048,6 @@ void MainWindow::toggleMicrotunerWin()
 {
 	toggleWindow( getGUI()->getMicrotunerConfig() );
 }
-
-
 
 
 void MainWindow::updateViewMenu()
