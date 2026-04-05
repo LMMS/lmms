@@ -55,6 +55,7 @@ class LMMS_EXPORT MixerView
 public:
 	MixerView(Mixer* mixer);
 	void keyPressEvent(QKeyEvent* e) override;
+	void wheelEvent(QWheelEvent* e) override;
 
 	void saveSettings(QDomDocument& doc, QDomElement& domElement) override;
 	void loadSettings(const QDomElement& domElement) override;
