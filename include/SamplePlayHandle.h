@@ -43,7 +43,6 @@ class LMMS_EXPORT SamplePlayHandle : public PlayHandle
 {
 public:
 	SamplePlayHandle(Sample* sample, bool ownAudioBusHandle = true);
-	SamplePlayHandle( const QString& sampleFile );
 	SamplePlayHandle( SampleClip* clip );
 	~SamplePlayHandle() override;
 
