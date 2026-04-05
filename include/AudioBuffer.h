@@ -336,15 +336,19 @@ public:
 	auto hasAnySignal() const -> bool;
 
 	/**
-	 * @brief Sanitizes specified channels of any Inf/NaN values if "nanhandler" setting is enabled
+	 * @brief Sanitizes specified channels of any Inf/NaN values if the @ref SetupDialog "sanitizemix" setting is
+	 * enabled
 	 *
 	 * @param channels channels to sanitize; 1 = selected, 0 = skip
 	 * @param upperBound any channel indexes at or above this are skipped
+	 *
+	 * @returns true if sanitization occurred
 	 */
-	void sanitize(const ChannelFlags& channels, ch_cnt_t upperBound = MaxChannelsPerAudioBuffer);
+	bool sanitize(const ChannelFlags& channels, ch_cnt_t upperBound = MaxChannelsPerAudioBuffer);
 
 	//! Sanitizes all channels. @see sanitize
-	void sanitizeAll();
+	//! @returns true if sanitization occurred
+	bool sanitizeAll();
 
 	/**
 	 * @brief Updates the silence status of the given channels, up to the upperBound index.

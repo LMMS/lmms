@@ -28,6 +28,7 @@
 #include <QApplication>
 #include <QAction>
 #include <QPushButton>
+#include <QTimer>
 #include <QScrollArea>
 #include <QVBoxLayout>
 
@@ -75,6 +76,10 @@ EffectRackView::EffectRackView( EffectChain* model, QWidget* parent ) :
 	m_lastY = 0;
 
 	setModel( model );
+
+	auto updateTimer = new QTimer{this};
+	connect(updateTimer, &QTimer::timeout, this, &EffectRackView::updateEffects);
+	updateTimer->start(1000);
 }
 
 
@@ -149,9 +154,6 @@ void EffectRackView::deletePlugin( EffectView* view )
 	e->deleteLater();
 	update();
 }
-
-
-
 
 void EffectRackView::update()
 {
@@ -282,7 +284,12 @@ QSize EffectRackView::sizeHint() const
 	return QSize{EffectRackView::DEFAULT_WIDTH, 254 /* INSTRUMENT_HEIGHT */ - 4 - 1};
 }
 
-
-
+void EffectRackView::updateEffects()
+{
+	for (const auto& view : m_effectViews)
+	{
+		view->update();
+	}
+}
 
 } // namespace lmms::gui

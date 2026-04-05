@@ -40,19 +40,25 @@ bool isSilent( const SampleFrame* src, int frames );
 
 bool isSilent(std::span<sample_t> buffer);
 
-bool useNaNHandler();
-
-void setNaNHandler( bool use );
-
 /**
- * @brief Sanitizes a buffer of infs/NaNs, zeroing the entire buffer if
- *        any is detected.
+ * @brief Sanitizes a buffer of infs/NaNs, zeroing the entire buffer if any is detected.
  *
- * Only performs sanitization when the NaN handler is active.
+ * Only performs sanitization when it is enabled.
+ *
+ * @note Zeroing out the entire buffer, rather than just the problematic samples, is done due to needing to mitigate
+ * potentially loud, errorneous output before an inf or NaN occur.
  *
  * @returns true if inf or NaN was detected
+ * @returns false when an inf or NaN was not dectected or sanitzation is disabled.
+ * @see sanitizationEnabled()
  */
 bool sanitize(std::span<sample_t> buffer);
+
+//! @returns whether sanitzation is enabled.
+bool sanitizationEnabled();
+
+//! Enable or disable sanitization.
+void setSanitizationEnabled(bool on);
 
 /*! \brief Add samples from src to dst */
 void add( SampleFrame* dst, const SampleFrame* src, int frames );
@@ -74,15 +80,6 @@ void addMultipliedByBuffer( SampleFrame* dst, const SampleFrame* src, float coef
 
 /*! \brief Add samples from src multiplied by coeffSrc and coeffSrcBuf to dst */
 void addMultipliedByBuffers( SampleFrame* dst, const SampleFrame* src, ValueBuffer * coeffSrcBuf1, ValueBuffer * coeffSrcBuf2, int frames );
-
-/*! \brief Same as addMultiplied, but sanitize output (strip out infs/nans) */
-void addSanitizedMultiplied( SampleFrame* dst, const SampleFrame* src, float coeffSrc, int frames );
-
-/*! \brief Add samples from src multiplied by coeffSrc and coeffSrcBuf to dst - sanitized version */
-void addSanitizedMultipliedByBuffer( SampleFrame* dst, const SampleFrame* src, float coeffSrc, ValueBuffer * coeffSrcBuf, int frames );
-
-/*! \brief Add samples from src multiplied by coeffSrc and coeffSrcBuf to dst - sanitized version */
-void addSanitizedMultipliedByBuffers( SampleFrame* dst, const SampleFrame* src, ValueBuffer * coeffSrcBuf1, ValueBuffer * coeffSrcBuf2, int frames );
 
 /*! \brief Add samples from src multiplied by coeffSrcLeft/coeffSrcRight to dst */
 void addMultipliedStereo( SampleFrame* dst, const SampleFrame* src, float coeffSrcLeft, float coeffSrcRight, int frames );

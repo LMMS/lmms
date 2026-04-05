@@ -637,7 +637,7 @@ private slots:
 	//! Verifies that the `sanitize` method only silences channels containing Inf or NaN
 	void Sanitize_SilencesOnlyInfAndNaN()
 	{
-		lmms::MixHelpers::setNaNHandler(true);
+		lmms::MixHelpers::setSanitizationEnabled(true);
 
 		auto ab = AudioBuffer{10, 2};
 		ab.enableSilenceTracking(true);

@@ -34,17 +34,13 @@
 #include "ValueBuffer.h"
 #include "SampleFrame.h"
 
-
-
-static bool s_NaNHandler;
-
-
 namespace lmms::MixHelpers
 {
 
 namespace {
 
 constexpr auto SilenceThreshold = 0.000001f; // -120 dBFS
+auto santizationEnabled = false;
 
 /*! \brief Function for applying MIXOP on all sample frames */
 template<typename MIXOP>
@@ -87,40 +83,26 @@ bool isSilent(std::span<sample_t> buffer)
 	return std::ranges::all_of(buffer, [&](const sample_t s) { return std::abs(s) < SilenceThreshold; });
 }
 
-bool useNaNHandler()
+bool sanitizationEnabled()
 {
-	return s_NaNHandler;
+	return santizationEnabled;
 }
 
-void setNaNHandler( bool use )
+void setSanitizationEnabled(bool on)
 {
-	s_NaNHandler = use;
+	santizationEnabled = on;
 }
 
 bool sanitize(std::span<sample_t> buffer)
 {
-	if (!useNaNHandler()) { return false; }
+	if (!sanitizationEnabled()) { return false; }
 
-	for (std::size_t f = 0; f < buffer.size(); ++f)
+	if (std::ranges::any_of(buffer, [](auto val) { return !std::isfinite(val); }))
 	{
-		sample_t& sample = buffer[f];
-		if (std::isinf(sample) || std::isnan(sample))
-		{
-#ifdef LMMS_DEBUG
-			std::cerr << "Bad data, clearing buffer. frame: "
-				<< f << ", value: " << sample << "\n";
-#endif
-
-			// Clear the channel if a problem is found
-			std::ranges::fill(buffer, 0.f);
-
-			return true;
-		}
-		else
-		{
-			sample = std::clamp(sample, sample_t(-1000.0), sample_t(1000.0));
-		}
+		std::ranges::fill(buffer, 0.f);
+		return true;
 	}
+
 	return false;
 }
 
@@ -221,70 +203,6 @@ void addMultipliedByBuffers( SampleFrame* dst, const SampleFrame* src, ValueBuff
 	}
 
 }
-
-void addSanitizedMultipliedByBuffer( SampleFrame* dst, const SampleFrame* src, float coeffSrc, ValueBuffer * coeffSrcBuf, int frames )
-{
-	if ( !useNaNHandler() )
-	{
-		addMultipliedByBuffer( dst, src, coeffSrc, coeffSrcBuf,
-								frames );
-		return;
-	}
-
-	for( int f = 0; f < frames; ++f )
-	{
-		dst[f][0] += ( std::isinf( src[f][0] ) || std::isnan( src[f][0] ) ) ? 0.0f : src[f][0] * coeffSrc * coeffSrcBuf->values()[f];
-		dst[f][1] += ( std::isinf( src[f][1] ) || std::isnan( src[f][1] ) ) ? 0.0f : src[f][1] * coeffSrc * coeffSrcBuf->values()[f];
-	}
-}
-
-void addSanitizedMultipliedByBuffers( SampleFrame* dst, const SampleFrame* src, ValueBuffer * coeffSrcBuf1, ValueBuffer * coeffSrcBuf2, int frames )
-{
-	if ( !useNaNHandler() )
-	{
-		addMultipliedByBuffers( dst, src, coeffSrcBuf1, coeffSrcBuf2,
-								frames );
-		return;
-	}
-
-	for( int f = 0; f < frames; ++f )
-	{
-		dst[f][0] += ( std::isinf( src[f][0] ) || std::isnan( src[f][0] ) )
-			? 0.0f
-			: src[f][0] * coeffSrcBuf1->values()[f] * coeffSrcBuf2->values()[f];
-		dst[f][1] += ( std::isinf( src[f][1] ) || std::isnan( src[f][1] ) )
-			? 0.0f
-			: src[f][1] * coeffSrcBuf1->values()[f] * coeffSrcBuf2->values()[f];
-	}
-
-}
-
-
-struct AddSanitizedMultipliedOp
-{
-	AddSanitizedMultipliedOp( float coeff ) : m_coeff( coeff ) { }
-
-	void operator()( SampleFrame& dst, const SampleFrame& src ) const
-	{
-		dst[0] += ( std::isinf( src[0] ) || std::isnan( src[0] ) ) ? 0.0f : src[0] * m_coeff;
-		dst[1] += ( std::isinf( src[1] ) || std::isnan( src[1] ) ) ? 0.0f : src[1] * m_coeff;
-	}
-
-	const float m_coeff;
-};
-
-void addSanitizedMultiplied( SampleFrame* dst, const SampleFrame* src, float coeffSrc, int frames )
-{
-	if ( !useNaNHandler() )
-	{
-		addMultiplied( dst, src, coeffSrc, frames );
-		return;
-	}
-
-	run<>( dst, src, frames, AddSanitizedMultipliedOp(coeffSrc) );
-}
-
-
 
 struct AddMultipliedStereoOp
 {
