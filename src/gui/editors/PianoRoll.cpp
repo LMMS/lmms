@@ -4519,6 +4519,22 @@ void PianoRoll::setEditMode(int mode)
 			tr("Click and drag on a note or selection to edit its detuning curve\nShift-click to open the note in Automation Editor"),
 			embed::getIconPixmap("automation"), 4000);
 	}
+	else if (static_cast<EditMode>(mode) == EditMode::Knife)
+	{
+		TextFloat::displayMessage(tr("Knife Tool"),
+			tr("Click and drag over notes to cut along a line\nHold Shift to automatically remove short ends"),
+			embed::getIconPixmap("edit_knife"), 4000);
+		m_action = Action::Knife;
+		m_knifeDown = false;
+	}
+	else
+	{
+		if (m_editMode == EditMode::Knife)
+		{
+			m_action = Action::None;
+			m_knifeDown = false;
+		}
+	}
 	m_ctrlMode = m_editMode = (EditMode) mode;
 }
 
@@ -5169,6 +5185,8 @@ PianoRollWindow::PianoRollWindow() :
 	QAction* eraseAction = editModeGroup->addAction( embed::getIconPixmap( "edit_erase" ), tr("Erase mode (Shift+E)" ) );
 	QAction* selectAction = editModeGroup->addAction( embed::getIconPixmap( "edit_select" ), tr( "Select mode (Shift+S)" ) );
 	QAction* pitchBendAction = editModeGroup->addAction( embed::getIconPixmap( "automation" ), tr("Pitch Bend mode (Shift+T)" ) );
+	QAction* knifeAction = editModeGroup->addAction(embed::getIconPixmap("edit_knife"), tr("Knife mode (Shift+K)"));
+
 
 	drawAction->setChecked( true );
 
@@ -5176,6 +5194,8 @@ PianoRollWindow::PianoRollWindow() :
 	eraseAction->setShortcut(keySequence(Qt::SHIFT, Qt::Key_E));
 	selectAction->setShortcut(keySequence(Qt::SHIFT, Qt::Key_S));
 	pitchBendAction->setShortcut(keySequence(Qt::SHIFT, Qt::Key_T));
+	knifeAction->setShortcut(keySequence(Qt::SHIFT, Qt::Key_K));
+
 
 	connect( editModeGroup, SIGNAL(triggered(int)), m_editor, SLOT(setEditMode(int)));
 
@@ -5201,8 +5221,10 @@ PianoRollWindow::PianoRollWindow() :
 	notesActionsToolBar->addAction( eraseAction );
 	notesActionsToolBar->addAction( selectAction );
 	notesActionsToolBar->addAction( pitchBendAction );
+	notesActionsToolBar->addAction( knifeAction );
 	notesActionsToolBar->addSeparator();
 	notesActionsToolBar->addWidget(quantizeButton);
+
 
 	// -- File actions
 	DropToolBar* fileActionsToolBar = addDropToolBarToTop(tr("File actions"));
@@ -5259,9 +5281,7 @@ PianoRollWindow::PianoRollWindow() :
 	connect(glueAction, SIGNAL(triggered()), m_editor, SLOT(glueNotes()));
 	glueAction->setShortcut(keySequence(Qt::SHIFT, Qt::Key_G));
 
-	auto knifeAction = new QAction(embed::getIconPixmap("edit_knife"), tr("Knife"), noteToolsButton);
-	connect(knifeAction, &QAction::triggered, m_editor, &PianoRoll::setKnifeAction);
-	knifeAction->setShortcut(keySequence(Qt::SHIFT, Qt::Key_K));
+
 
 	auto strumAction = new QAction(embed::getIconPixmap("arp_free"), tr("Strum"), noteToolsButton);
 	connect(strumAction, &QAction::triggered, m_editor, &PianoRoll::setStrumAction);
@@ -5286,7 +5306,6 @@ PianoRollWindow::PianoRollWindow() :
 	reverseAction->setShortcut(keySequence(Qt::SHIFT, Qt::Key_R));
 
 	noteToolsButton->addAction(glueAction);
-	noteToolsButton->addAction(knifeAction);
 	noteToolsButton->addAction(strumAction);
 	noteToolsButton->addAction(fillAction);
 	noteToolsButton->addAction(cutOverlapsAction);
