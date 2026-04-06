@@ -44,8 +44,8 @@ namespace lmms::gui
 {
 
 
-SampleClipView::SampleClipView( SampleClip * _clip, TrackView * _tv ) :
-	ClipView( _clip, _tv ),
+SampleClipView::SampleClipView( SampleClip * _clip, TrackView * _tv, int offset ) :
+	ClipView( _clip, _tv, offset ),
 	m_clip( _clip ),
 	m_paintPixmap(),
 	m_paintPixmapXPosition(0)
@@ -59,6 +59,20 @@ SampleClipView::SampleClipView( SampleClip * _clip, TrackView * _tv ) :
 	connect(m_clip, SIGNAL(wasReversed()), this, SLOT(update()));
 
 	setStyle( QApplication::style() );
+
+	if ( offset == 0 && m_clip->loopCount() > 0 )
+	{
+		int loopCount = m_clip->loopCount();
+		while ( m_clip->loopCount() > 0 )
+		{
+			// We set the loop count to 0 so the lastLoopView() check in loop() returns the expected value
+			m_clip->decreaseLoopCount();
+		}
+		while ( m_clip->loopCount() < loopCount )
+		{
+			loop();
+		}
+	}
 }
 
 void SampleClipView::updateSample()
@@ -246,16 +260,26 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	// paint a black rectangle under the clip to prevent glitches with transparent backgrounds
 	p.fillRect( rect(), QColor( 0, 0, 0 ) );
 
+	auto clipColor = m_clip->color().value_or(m_clip->getTrack()->color().value_or(painter.pen().brush().color()));
+
 	if( gradient() )
 	{
 		p.fillRect( rect(), lingrad );
 	}
 	else
 	{
-		p.fillRect( rect(), c );
+		if (this->offset() == 0)
+		{
+			p.fillRect(rect(), c);
+		}
+		// Draw loop views with a slight color difference
+		else
+		{
+			p.fillRect(rect(), c.darker( 150 ));
+		}
 	}
-
-	auto clipColor = m_clip->color().value_or(m_clip->getTrack()->color().value_or(painter.pen().brush().color()));
+	// Draw hatching on loop views
+	paintHatching( p, clipColor.darker( 150 ) );
 
 	p.setPen(clipColor);
 
@@ -298,26 +322,46 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 		m_sampleThumbnail.visualize(param, p);
 	}
 
-	QString name = PathUtil::cleanName(m_clip->m_sample.sampleFile());
-	paintTextLabel(name, p);
+	if ( this->offset() == 0 )
+	{
+		// Only draw the name on the first loop view, otherwise it would be drawn multiple times and look bad
+		QString name = PathUtil::cleanName(m_clip->m_sample.sampleFile());
+		paintTextLabel(name, p);
+	}
 
 	// disable antialiasing for borders, since its not needed
 	p.setRenderHint( QPainter::Antialiasing, false );
 
-	// inner border
-	p.setPen( c.lighter( 135 ) );
-	p.drawRect(
-		-m_paintPixmapXPosition + 1,
-		1,
-		rect().right() - BORDER_WIDTH,
-		rect().bottom() - BORDER_WIDTH );
+	if ( this->offset() == 0 )
+	{
+		// inner border
+		p.setPen( c.lighter( 135 ) );
+		p.drawRect(
+			-m_paintPixmapXPosition + 1,
+			1,
+			rect().right() - BORDER_WIDTH,
+			rect().bottom() - BORDER_WIDTH );
 
-	// outer border
-	p.setPen( c.darker( 200 ) );
-	p.drawRect(-m_paintPixmapXPosition, 0, rect().right(), rect().bottom());
+		// outer border
+		p.setPen( c.darker( 200 ) );
+		p.drawRect(-m_paintPixmapXPosition, 0, rect().right(), rect().bottom());
+	}
+	// In case of a loop view, we don't draw inner border and don't draw borders between loop views
+	else
+	{
+		p.setPen( c.darker( 300 ) );
+		p.drawLine( 0, 0, rect().right(), 0 );
+		p.drawLine( 0, rect().bottom(), rect().right(), rect().bottom() );
+
+		// Last loop view gets a right border
+		if ( this->offset() == m_clip->loopCount() )
+		{
+			p.drawLine( rect().right(), 0, rect().right(), rect().bottom() );
+		}
+	}
 
 	// draw the 'muted' pixmap only if the clip was manually muted
-	if( m_clip->isMuted() )
+	if( m_clip->isMuted()  && this->offset() == 0 )
 	{
 		const int spacing = BORDER_WIDTH;
 		const int size = 14;
@@ -325,7 +369,7 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 			embed::getIconPixmap( "muted", size, size ) );
 	}
 
-	if ( m_marker )
+	if ( m_marker  && this->offset() == 0 )
 	{
 		p.setPen(markerColor());
 		p.drawLine(m_markerPos, rect().bottom(), m_markerPos, rect().top());
@@ -348,6 +392,24 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	p.end();
 
 	painter.drawPixmap(m_paintPixmapXPosition, 0, m_paintPixmap);
+}
+
+
+
+
+void SampleClipView::loop()
+{
+	// We don't create a loop if there's already one
+	if ( lastLoopView() )
+	{
+		SampleClipView* newLoop = new SampleClipView(m_clip, m_trackView, offset() + 1);
+		connect(this, SIGNAL(closing()), newLoop, SLOT(closeLoopViews()));
+		connect(this, SIGNAL(extandLoop()), newLoop, SLOT(loop()));
+	}
+	else
+	{
+		extandLoop();
+	}
 }
 
 
