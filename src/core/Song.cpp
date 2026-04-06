@@ -126,6 +126,15 @@ Song::Song() :
 			// Only emit the signal when the song is actually playing and the active timeline jumps
 			// This prevents LFOs from changing phase when the user drags the timeline while paused
 			if (m_playing && m_playMode == playMode) { emit playbackPositionJumped(); }
+
+			// Update VST plugins with the new position so they stay in sync when skipping around,
+			// even when playback is paused.
+			if ((m_playing && m_playMode == playMode) || (!m_playing)) {
+				const auto& tl = m_timelines[static_cast<std::size_t>(playMode)];
+				m_vstSyncController.setAbsolutePosition(
+					tl.ticks() + tl.frameOffset() / static_cast<double>(Engine::framesPerTick())
+				);
+			}
 		};
 
 		connect(&m_timelines[i], &Timeline::positionJumped, this, onPositionJumped);
