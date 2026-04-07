@@ -1,6 +1,6 @@
 ---
 name: doxygen
-'on': [push, pull_request]
+'on': [push] # only auto-run on pushing to a branch
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
