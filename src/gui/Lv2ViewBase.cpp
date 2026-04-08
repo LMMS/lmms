@@ -26,6 +26,7 @@
 
 #ifdef LMMS_HAVE_LV2
 
+#include <format>
 #include <QGridLayout>
 #include <QPushButton>
 #include <QHBoxLayout>
@@ -74,10 +75,11 @@ Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* proc, int colNum) :
 						break;
 					case PortVis::Integer:
 					{
-						sample_rate_t sr = Engine::audioEngine()->outputSampleRate();
-						auto pMin = port.min(sr);
-						auto pMax = port.max(sr);
-						int numDigits = std::max(numDigitsAsInt(pMin), numDigitsAsInt(pMax));
+						const sample_rate_t sr = Engine::audioEngine()->outputSampleRate();
+						const auto numDigits = std::max(
+							std::formatted_size("{}", static_cast<long>(std::round(port.min(sr)))),
+							std::formatted_size("{}", static_cast<long>(std::round(port.max(sr))))
+						);
 						m_control = new LcdControl(numDigits, m_parent);
 						break;
 					}
