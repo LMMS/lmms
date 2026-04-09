@@ -28,13 +28,10 @@
 #include <QMutex>
 #include <QWaitCondition>
 
-#include "denormals.h"
 #include "AudioEngine.h"
+#include "Hardware.h"
 #include "ThreadableJob.h"
 
-#if __SSE__
-#include <xmmintrin.h>
-#endif
 
 namespace lmms
 {
@@ -99,12 +96,7 @@ void AudioEngineWorkerThread::JobQueue::run()
 
 void AudioEngineWorkerThread::JobQueue::wait()
 {
-	while (m_itemsDone < m_writeIndex)
-	{
-#ifdef __SSE__
-		_mm_pause();
-#endif
-	}
+	while (m_itemsDone < m_writeIndex) { busyWaitHint(); }
 }
 
 
@@ -166,7 +158,7 @@ void AudioEngineWorkerThread::startAndWaitForJobs()
 
 void AudioEngineWorkerThread::run()
 {
-	disable_denormals();
+	disableDenormals();
 
 	QMutex m;
 	while( m_quit == false )
