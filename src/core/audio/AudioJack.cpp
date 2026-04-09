@@ -99,12 +99,7 @@ AudioJack::AudioJack(bool& successful, AudioEngine* audioEngineParam)
 	, m_active(false)
 	, m_midiClient(nullptr)
 	, m_tempOutBufs(new jack_default_audio_sample_t*[channels()])
-	, m_outBuf(new SampleFrame[audioEngine()->framesPerPeriod()])
-	, m_framesDoneInCurBuf(0)
-	, m_framesToDoInCurBuf(0)
 {
-	m_stopped = true;
-
 	successful = initJackClient();
 	if (successful) {
 		connect(this, SIGNAL(zombified()), this, SLOT(restartAfterZombified()), Qt::QueuedConnection);
@@ -118,7 +113,6 @@ AudioJack::AudioJack(bool& successful, AudioEngine* audioEngineParam)
 
 AudioJack::~AudioJack()
 {
-	AudioJack::stopProcessing();
 #ifdef AUDIO_BUS_HANDLE_SUPPORT
 	while (m_portMap.size())
 	{
@@ -133,8 +127,6 @@ AudioJack::~AudioJack()
 	}
 
 	delete[] m_tempOutBufs;
-
-	delete[] m_outBuf;
 }
 
 
@@ -289,13 +281,9 @@ void AudioJack::attemptToReconnectInput(size_t inputIndex, const QString& source
 }
 
 
-void AudioJack::startProcessing()
+void AudioJack::startProcessingImpl()
 {
-	if (m_active || m_client == nullptr)
-	{
-		m_stopped = false;
-		return;
-	}
+	if (m_active || m_client == nullptr) { return; }
 
 	if (jack_activate(m_client))
 	{
@@ -320,16 +308,13 @@ void AudioJack::startProcessing()
 	{
 		attemptToReconnectInput(i, cm->value(audioJackClass, getInputKeyByChannel(i)));
 	}
-
-	m_stopped = false;
 }
 
 
 
 
-void AudioJack::stopProcessing()
+void AudioJack::stopProcessingImpl()
 {
-	m_stopped = true;
 }
 
 void AudioJack::registerPort(AudioBusHandle* port)
@@ -407,7 +392,7 @@ int AudioJack::processCallback(jack_nframes_t nframes)
 	}
 
 #ifdef AUDIO_BUS_HANDLE_SUPPORT
-	const int frames = std::min<int>(nframes, audioEngine()->framesPerPeriod());
+	const int frames = std::min<int>(nframes, audioEngine()->framesPerAudioBuffer());
 	for (JackPortMap::iterator it = m_portMap.begin(); it != m_portMap.end(); ++it)
 	{
 		for (ch_cnt_t ch = 0; ch < channels(); ++ch)
@@ -423,39 +408,16 @@ int AudioJack::processCallback(jack_nframes_t nframes)
 	}
 #endif
 
-	jack_nframes_t done = 0;
-	while (done < nframes && !m_stopped)
+	if (!isRunning())
 	{
-		jack_nframes_t todo = std::min<jack_nframes_t>(nframes - done, m_framesToDoInCurBuf - m_framesDoneInCurBuf);
 		for (int c = 0; c < channels(); ++c)
 		{
-			jack_default_audio_sample_t* o = m_tempOutBufs[c];
-			for (jack_nframes_t frame = 0; frame < todo; ++frame)
-			{
-				o[done + frame] = m_outBuf[m_framesDoneInCurBuf + frame][c];
-			}
-		}
-		done += todo;
-		m_framesDoneInCurBuf += todo;
-		if (m_framesDoneInCurBuf == m_framesToDoInCurBuf)
-		{
-			m_framesToDoInCurBuf = getNextBuffer(m_outBuf);
-			m_framesDoneInCurBuf = 0;
-			if (!m_framesToDoInCurBuf)
-			{
-				m_stopped = true;
-				break;
-			}
+			std::fill_n(m_tempOutBufs[c], nframes, 0.f);
 		}
 	}
-
-	if (nframes != done)
+	else
 	{
-		for (int c = 0; c < channels(); ++c)
-		{
-			jack_default_audio_sample_t* b = m_tempOutBufs[c] + done;
-			memset(b, 0, sizeof(*b) * (nframes - done));
-		}
+		audioEngine()->renderNextBuffer({m_tempOutBufs, channels(), nframes});
 	}
 
 	for (int c = 0; c < channels(); ++c)
@@ -517,7 +479,7 @@ AudioJack::setupWidget::setupWidget(QWidget* parent)
 
 	form->addRow(tr("Client name"), m_clientName);
 
-	auto buildToolButton = [this](QWidget* parent, const QString& currentSelection, const std::vector<std::string>& names, const QString& filteredLMMSClientName)
+	auto buildToolButton = [](QWidget* parent, const QString& currentSelection, const std::vector<std::string>& names, const QString& filteredLMMSClientName)
 	{
 		auto toolButton = new QToolButton(parent);
 		// Make sure that the tool button will fill out the available space in the form layout
