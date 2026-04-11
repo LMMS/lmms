@@ -114,10 +114,13 @@ void MidiClip::init()
 {
 	connect( Engine::getSong(), SIGNAL(timeSignatureChanged(int,int)),
 				this, SLOT(changeTimeSignature()));
-	saveJournallingState( false );
-
-	updateLength();
-	restoreJournallingState();
+	
+	if (getTrack()->trackContainer() != Engine::patternStore())
+	{	
+		saveJournallingState( false );
+		updateLength();
+		restoreJournallingState();
+	}
 }
 
 
