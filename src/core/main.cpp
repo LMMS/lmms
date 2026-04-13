@@ -766,6 +766,23 @@ int main( int argc, char * * argv )
 	{
 		using namespace lmms::gui;
 
+		// prompt the user to create the LMMS working directory (e.g. ~/Documents/lmms) if it doesn't exist
+		if (!ConfigManager::inst()->hasWorkingDir())
+		{
+			const auto msg = MainWindow::tr("The LMMS working directory %1 does not exist. Create it now?"
+				" You can change the directory later via Edit -> Settings.")
+				.arg(ConfigManager::inst()->workingDir());
+			const auto res = QMessageBox::question(nullptr, MainWindow::tr("Working directory"), msg,
+				QMessageBox::Yes | QMessageBox::No | QMessageBox::Abort, QMessageBox::Yes);
+
+			if (res == QMessageBox::Abort)
+			{
+				if (destroyEngine) { Engine::destroy(); }
+				return EXIT_SUCCESS;
+			}
+			else if (res == QMessageBox::Yes) { ConfigManager::inst()->createWorkingDir(); }
+		}
+
 		new GuiApplication();
 
 		// re-intialize RNG - shared libraries might have srand() or
