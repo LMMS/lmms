@@ -80,17 +80,17 @@ PatternEditor::PatternEditor(PatternStore* ps) :
 	connect(Engine::getSong(), &Song::stopped, this, [this]()
 	{
 		// Show zoom controls again as they are hidden during playback
-		emit zoomControlsVisibilityChanged( m_maxClipLength / TimePos::ticksPerBar() > 1 );
+		emit zoomControlsVisibilityChanged(m_maxClipLength / TimePos::ticksPerBar() > 1);
 	});
 
 	// Set up horizontal scroll bar
-	m_leftRightScroll = new QScrollBar( Qt::Horizontal, this );
+	m_leftRightScroll = new QScrollBar(Qt::Horizontal, this);
 	m_leftRightScroll->setMinimum(0);
 	m_leftRightScroll->setMaximum(0);
 	m_leftRightScroll->setSingleStep(1);
-	m_leftRightScroll->setPageStep( m_maxClipLength );
-	static_cast<QVBoxLayout *>( layout() )->addWidget( m_leftRightScroll );
-	connect(m_leftRightScroll, SIGNAL(valueChanged(int)),this, SLOT(horizontalScrollChanged()));
+	m_leftRightScroll->setPageStep(m_maxClipLength);
+	static_cast<QVBoxLayout*>(layout())->addWidget(m_leftRightScroll);
+	connect(m_leftRightScroll, SIGNAL(valueChanged(int)), this, SLOT(horizontalScrollChanged()));
 
 	setFocusPolicy(Qt::StrongFocus);
 	setFocus();
@@ -252,18 +252,18 @@ void PatternEditor::updateMaxSteps()
 	updateScrollBar();
 
 	// Show zoom controls if the pattern is longer than one bar, hide them otherwise as they would have no effect anyway
-	emit zoomControlsVisibilityChanged( m_maxClipLength / TimePos::ticksPerBar() > 1 );
+	emit zoomControlsVisibilityChanged(m_maxClipLength / TimePos::ticksPerBar() > 1);
 }
 
 
 void PatternEditor::updateScrollBar()
 {
-	m_leftRightScroll->setPageStep( m_maxClipLength / getZoom() );
-	m_leftRightScroll->setMaximum( m_maxClipLength - m_leftRightScroll->pageStep() );
+	m_leftRightScroll->setPageStep(m_maxClipLength / getZoom());
+	m_leftRightScroll->setMaximum(m_maxClipLength - m_leftRightScroll->pageStep());
 }
 
 
-void PatternEditor::wheelEvent( QWheelEvent * we )
+void PatternEditor::wheelEvent(QWheelEvent* we)
 {
 	const auto posX = we->position().toPoint().x();
 	if ((we->modifiers() & Qt::ControlModifier) && (posX > m_trackHeadWidth))
@@ -276,7 +276,7 @@ void PatternEditor::wheelEvent( QWheelEvent * we )
 	}
 	else if (we->modifiers() & Qt::ShiftModifier)
 	{
-		m_leftRightScroll->setValue( m_leftRightScroll->value() - we->angleDelta().y() );
+		m_leftRightScroll->setValue(m_leftRightScroll->value() - we->angleDelta().y());
 	}
 	else
 	{
@@ -342,7 +342,7 @@ void PatternEditor::zoomingChanged()
 
 void PatternEditor::horizontalScrollChanged()
 {
-	m_currentPosition = TimePos( m_leftRightScroll->value() );
+	m_currentPosition = TimePos(m_leftRightScroll->value());
 	updatePosition();
 
 	emit offsetValueChanged();
@@ -406,7 +406,7 @@ PatternEditorWindow::PatternEditorWindow(PatternStore* ps) :
 	trackAndStepActionsToolBar->addWidget(stretch);
 
 	QLabel* zoom_lbl = new QLabel(m_toolBar);
-	zoom_lbl->setPixmap( embed::getIconPixmap( "zoom" ) );
+	zoom_lbl->setPixmap(embed::getIconPixmap("zoom"));
 
 	// Set slider zoom
 	m_zoomingSlider = new AutomatableSlider(m_toolBar, tr("Zoom"));
@@ -461,7 +461,7 @@ double PatternEditorWindow::horizontalScrollValue() const
 
 void PatternEditorWindow::play()
 {
-	showZoomControls( false );
+	showZoomControls(false);
 
 	if (Engine::getSong()->playMode() != Song::PlayMode::Pattern)
 	{
@@ -471,9 +471,9 @@ void PatternEditorWindow::play()
 	else
 	{
 		Engine::getSong()->togglePause();
-		if ( Engine::getSong()->isPaused())
+		if (Engine::getSong()->isPaused())
 		{
-			showZoomControls( true );
+			showZoomControls(true);
 		}
 	}
 }
@@ -485,12 +485,12 @@ void PatternEditorWindow::stop()
 }
 
 
-void PatternEditorWindow::showZoomControls( bool show )
+void PatternEditorWindow::showZoomControls(bool show)
 {
-	if ( !Engine::getSong()->isPlaying() )
+	if (!Engine::getSong()->isPlaying())
 	{
-		m_zoomIconAction->setVisible( show );
-		m_zoomSliderAction->setVisible( show );
+		m_zoomIconAction->setVisible(show);
+		m_zoomSliderAction->setVisible(show);
 	}
 }
 

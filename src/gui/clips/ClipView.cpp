@@ -317,7 +317,7 @@ void ClipView::updateLength()
 {
 	if( fixedClips() )
 	{
-		setFixedWidth( parentWidget()->width() * getGUI()->patternEditor()->zoomLevel() );
+		setFixedWidth(parentWidget()->width() * getGUI()->patternEditor()->zoomLevel());
 	}
 	else
 	{
@@ -340,9 +340,9 @@ void ClipView::updateLength()
  */
 void ClipView::updatePosition()
 {
-	if ( fixedClips() )
+	if (fixedClips())
 	{
-		move( -parentWidget()->width() * getGUI()->patternEditor()->horizontalScrollValue(), 0 );
+		move(-parentWidget()->width() * getGUI()->patternEditor()->horizontalScrollValue(), 0);
 	}
 	else
 	{	
