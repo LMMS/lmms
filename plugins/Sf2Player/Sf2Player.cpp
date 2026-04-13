@@ -241,6 +241,7 @@ Sf2Instrument::~Sf2Instrument()
 
 void Sf2Instrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
+	_this.setAttribute("version", 1);
 	_this.setAttribute( "src", m_filename );
 	m_patchNum.saveSettings( _doc, _this, "patch" );
 	m_bankNum.saveSettings( _doc, _this, "bank" );
@@ -283,6 +284,22 @@ void Sf2Instrument::loadSettings( const QDomElement & _this )
 	m_chorusSpeed.loadSettings( _this, "chorusSpeed" );
 	m_chorusDepth.loadSettings( _this, "chorusDepth" );
 
+	// Disable reverb/chorus for instruments in older files since they now work and can
+	// make them sound different
+	if (_this.attribute("version", "0").toInt() < 1)
+	{
+		/* Not sure if we should tell the user or not
+		if (m_reverbOn.value() || m_chorusOn.value())
+		{
+			collectErrorForUI("Built-in reverb and chorus effects were disabled for compatibility. Please check this instrument sounds as intended.");
+		}
+		*/
+
+		// TODO: Figure out a way to check for default reverb/chorus parameters in a Soundfont
+		// (otherwise this change is questionable)
+		m_reverbOn.setValue(false);
+		m_chorusOn.setValue(false);
+	}
 }
 
 
@@ -506,6 +523,8 @@ void Sf2Instrument::updateReverbOn()
 #else
 	fluid_synth_set_reverb_on(m_synth, m_reverbOn.value() ? 1 : 0);
 #endif
+
+	fluid_synth_cc(m_synth, m_channel, MidiControllerReverbDepth, m_reverbOn.value() ? 127 : 0);
 }
 
 void Sf2Instrument::updateReverb()
@@ -529,6 +548,8 @@ void Sf2Instrument::updateChorusOn()
 #else
 	fluid_synth_set_chorus_on(m_synth, m_chorusOn.value() ? 1 : 0);
 #endif
+
+	fluid_synth_cc(m_synth, m_channel, MidiControllerChorusDepth, m_chorusOn.value() ? 127 : 0);
 }
 
 void Sf2Instrument::updateChorus()
