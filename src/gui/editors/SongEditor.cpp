@@ -66,9 +66,7 @@ namespace
 constexpr int MIN_PIXELS_PER_BAR = 4;
 constexpr int MAX_PIXELS_PER_BAR = 400;
 constexpr int ZOOM_STEPS = 200;
-
-constexpr std::array SNAP_SIZES{8.f, 4.f, 2.f, 1.f, 1/2.f, 1/4.f, 1/8.f, 1/16.f};
-constexpr std::array PROPORTIONAL_SNAP_SIZES{64.f, 32.f, 16.f, 8.f, 4.f, 2.f, 1.f, 1/2.f, 1/4.f, 1/8.f, 1/16.f, 1/32.f, 1/64.f};
+constexpr int SNAP_SIZE_MAX_BARS = 8;
 
 }
 
@@ -249,31 +247,74 @@ SongEditor::SongEditor( Song * song ) :
 	m_zoomingModel->setJournalling(false);
 	connect(m_zoomingModel, SIGNAL(dataChanged()), this, SLOT(zoomingChanged()));
 
-
 	// Set up snapping model
 	m_snappingModel->setParent(this);
-	for (float bars : SNAP_SIZES)
-	{
-		if (bars > 1.0f)
-		{
-			m_snappingModel->addItem(QString("%1 Bars").arg(bars));
-		}
-		else if (bars == 1.0f)
-		{
-			m_snappingModel->addItem( "1 Bar" );
-		}
-		else
-		{
-			m_snappingModel->addItem(QString("1/%1 Bar").arg(1 / bars));
-		}
-	}
-	m_snappingModel->setInitValue( m_snappingModel->findText( "1/4 Bar" ) );
+	connect(m_song, &Song::timeSignatureChanged, this, &SongEditor::updateSnapSizes);
+	updateSnapSizes();
+	// Find 1/numerator snap size
+	auto defaultSnapIndex = std::find(m_snapSizes.begin(), m_snapSizes.end(), 1.0f / m_song->getTimeSigModel().getNumerator());
+	m_snappingModel->setInitValue(defaultSnapIndex != m_snapSizes.end() ? std::distance(m_snapSizes.begin(), defaultSnapIndex) : 0);
 
 	setFocusPolicy( Qt::StrongFocus );
 	setFocus();
 }
 
+void SongEditor::updateSnapSizes()
+{
+	// Helper function for displaying note fractions
+	auto simplifyFraction = [](int& num, int& den)
+	{
+		for (int i = 2; i <= num; ++i)
+		{
+			while (num % i == 0 and den % i == 0)
+			{
+				num /= i;
+				den /= i;
+			}
+		}
+	};
 
+	int oldIndex = m_snappingModel->value();
+	m_snappingModel->clear();
+	m_snapSizes.clear();
+	int numerator = m_song->getTimeSigModel().getNumerator();
+	int denominator = m_song->getTimeSigModel().getDenominator();
+	// Add the snap sizes larger than 1 bar
+	for (int snapSize = SNAP_SIZE_MAX_BARS; snapSize >= 1; snapSize /= 2)
+	{
+		m_snapSizes.push_back(snapSize);
+		m_snappingModel->addItem(QString("%1 Bar").arg(snapSize));
+	}
+	// Add the 1 / numerator snap size
+	// Additionally, for large numerators, the divisors of the numerator are also added as snap sizes (so using 12/8 timesig would allow 1/12, but also 1/2, 1/3, 1/4 and 1/6)
+	// Find divisors of numerator (this will also include the numerator itself due to the <= bound) (starting at 2 because 1 divides all numbers)
+	for (int i = 2; i <= numerator; ++i)
+	{
+		if (numerator % i != 0) { continue; }
+		// Don't add snap sizes which are not clean divisors of the ticks per bar
+		if ((DefaultTicksPerBar * numerator / denominator) % i != 0) { continue; }
+
+		float snapSize = 1.0f / i;
+		m_snapSizes.push_back(snapSize);
+		// Find the numerator and denominator of the snap size in terms of note lengths. For example, 1/3 of a bar in 3/4 time is a quarter note.
+		// This can get tricky since larger time signatures might end up with unsimplified fractions, such as: 1/2 of a bar in 12/8 time = 12/16 note, but that equals 3/4 note.
+		int noteNumerator = numerator;
+		int noteDenominator = denominator * i;
+		simplifyFraction(noteNumerator, noteDenominator);
+		m_snappingModel->addItem(QString("%1/%2").arg(noteNumerator).arg(noteDenominator));
+	}
+	// Add the snap sizes smaller than 1 / numerator of a bar, until the snap size no longer evenly divides the ticks per bar
+	for (int invSnapSize = 2 * numerator; (DefaultTicksPerBar * numerator / denominator) % invSnapSize == 0; invSnapSize *= 2)
+	{
+		float snapSize = 1.0f / invSnapSize;
+		m_snapSizes.push_back(snapSize);
+		int noteNumerator = numerator;
+		int noteDenominator = denominator * invSnapSize;
+		simplifyFraction(noteNumerator, noteDenominator);
+		m_snappingModel->addItem(QString("%1/%2").arg(noteNumerator).arg(noteDenominator));
+	}
+	m_snappingModel->setValue(oldIndex);
+}
 
 
 void SongEditor::saveSettings( QDomDocument& doc, QDomElement& element )
@@ -292,14 +333,14 @@ void SongEditor::loadSettings( const QDomElement& element )
 /*! \brief Return grid size as number of bars */
 float SongEditor::getSnapSize() const
 {
-	float snapSize = SNAP_SIZES[m_snappingModel->value()];
+	float snapSize = m_snapSizes[m_snappingModel->value()];
 
 	// If proportional snap is on, we snap to finer values when zoomed in
 	if (m_proportionalSnap)
 	{
 		// Finds the closest available snap size
 		const float optimalSize = snapSize * DEFAULT_PIXELS_PER_BAR / pixelsPerBar();
-		return *std::min_element(PROPORTIONAL_SNAP_SIZES.begin(), PROPORTIONAL_SNAP_SIZES.end(), [optimalSize](float a, float b)
+		return *std::min_element(m_snapSizes.begin(), m_snapSizes.end(), [optimalSize](float a, float b)
 		{
 			return std::abs(a - optimalSize) < std::abs(b - optimalSize);
 		});
