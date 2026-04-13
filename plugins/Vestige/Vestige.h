@@ -31,6 +31,7 @@
 
 #include "Instrument.h"
 #include "InstrumentView.h"
+#include "SubWindow.h"
 
 
 class QGridLayout;
@@ -46,10 +47,10 @@ class VstPlugin;
 
 namespace gui
 {
-class PixmapButton;
-class CustomTextKnob;
-class VestigeInstrumentView;
 class ManageVestigeInstrumentView;
+class PixmapButton;
+class VestigeInstrumentView;
+class VstPluginKnob;
 } // namespace gui
 
 
@@ -86,7 +87,7 @@ private:
 	QMutex m_pluginMutex;
 
 	QString m_pluginDLL;
-	QMdiSubWindow * m_subWindow;
+	gui::SubWindow* m_subWindow;
 	QScrollArea * m_scrollArea;
 	FloatModel ** knobFModel;
 	QObject * p_subWindow;
@@ -107,22 +108,18 @@ class ManageVestigeInstrumentView : public InstrumentViewFixedSize
 	Q_OBJECT
 public:
 	ManageVestigeInstrumentView( Instrument * _instrument, QWidget * _parent, VestigeInstrument * m_vi2 );
-	virtual ~ManageVestigeInstrumentView();
-
+	~ManageVestigeInstrumentView() override;
 
 protected slots:
 	void syncPlugin();
 	void displayAutomatedOnly();
 	void setParameter( lmms::Model * action );
-	void syncParameterText();
 	void closeWindow();
-
 
 protected:
 	virtual void dragEnterEvent( QDragEnterEvent * _dee );
 	virtual void dropEvent( QDropEvent * _de );
 	virtual void paintEvent( QPaintEvent * _pe );
-
 
 private:
 	VestigeInstrument * m_vi;
@@ -132,9 +129,8 @@ private:
 	QPushButton * m_syncButton;
 	QPushButton * m_displayAutomatedOnly;
 	QPushButton * m_closeButton;
-	CustomTextKnob ** vstKnobs;
-
-} ;
+	std::vector<VstPluginKnob*> m_vstKnobs;
+};
 
 
 class VestigeInstrumentView : public InstrumentViewFixedSize

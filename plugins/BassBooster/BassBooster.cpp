@@ -69,7 +69,7 @@ BassBoosterEffect::BassBoosterEffect( Model* parent, const Descriptor::SubPlugin
 
 
 
-Effect::ProcessStatus BassBoosterEffect::processImpl(SampleFrame* buf, const fpp_t frames)
+Effect::ProcessStatus BassBoosterEffect::processImpl(SampleFrame* buf, const f_cnt_t frames)
 {
 	// check out changed controls
 	if( m_frequencyChangeNeeded || m_bbControls.m_freqModel.isValueChanged() )
@@ -86,7 +86,7 @@ Effect::ProcessStatus BassBoosterEffect::processImpl(SampleFrame* buf, const fpp
 	const float d = dryLevel();
 	const float w = wetLevel();
 
-	for (fpp_t f = 0; f < frames; ++f)
+	for (f_cnt_t f = 0; f < frames; ++f)
 	{
 		auto& currentFrame = buf[f];
 

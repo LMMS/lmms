@@ -32,9 +32,9 @@
 namespace lmms
 {
 
-fpp_t BufferManager::s_framesPerPeriod;
+f_cnt_t BufferManager::s_framesPerPeriod;
 
-void BufferManager::init( fpp_t fpp )
+void BufferManager::init( f_cnt_t fpp )
 {
 	s_framesPerPeriod = fpp;
 }
