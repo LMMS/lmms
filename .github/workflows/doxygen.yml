@@ -72,11 +72,11 @@ jobs:
       - name: Build docs
         run: cmake --build build --target doc
       - name: Setup Pages
-        uses: actions/configure-pages@v2
+        uses: actions/configure-pages@v5
       - name: Upload generated website
         uses: actions/upload-pages-artifact@v3
         with:
           path: 'build/doc/doc/html'
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
