@@ -1,0 +1,82 @@
+---
+name: doxygen
+'on': [push] # only auto-run on pushing to a branch
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+jobs:
+  linux-x86_64:
+    name: linux-x86_64
+    runs-on: ubuntu-latest
+    env:
+      MAKEFLAGS: -j2
+    steps:
+      - name: Configure git
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: Check out
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          submodules: recursive
+      - name: Install packages
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y --no-install-recommends \
+            cmake \
+            make \
+            libasound2-dev \
+            libc6-dev \
+            libfftw3-dev \
+            libgig-dev \
+            libgtk2.0-0 \
+            libjack-jackd2-dev \
+            liblilv-dev \
+            liblist-moreutils-perl \
+            libmp3lame-dev \
+            libogg-dev \
+            libqt5svg5-dev \
+            libqt5x11extras5-dev \
+            libsamplerate0-dev \
+            libsdl2-dev \
+            libsndfile1-dev \
+            libsoundio-dev \
+            libstk-dev \
+            libsuil-dev \
+            libvorbis-dev \
+            libx11-xcb-dev \
+            libxcb-keysyms1-dev \
+            libxcb-util0-dev \
+            libxft-dev \
+            libxinerama-dev \
+            libxml2-utils \
+            libxml-perl \
+            lsb-release \
+            lv2-dev \
+            portaudio19-dev \
+            qt5-qmake \
+            qtbase5-dev \
+            qtbase5-dev-tools \
+            qtbase5-private-dev \
+            qttools5-dev-tools \
+            qtwayland5 \
+            stk \
+            doxygen
+      - name: Configure
+        run: |
+          source /opt/qt5*/bin/qt5*-env.sh || true
+          cmake -S . -B build $CMAKE_OPTS
+      - name: Build docs
+        run: cmake --build build --target doc
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+      - name: Upload generated website
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: 'build/doc/doc/html'
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
