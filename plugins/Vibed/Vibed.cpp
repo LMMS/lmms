@@ -294,7 +294,7 @@ VibedView::VibedView(Instrument* instrument, QWidget* parent) :
 	setPalette(pal);
 
 	m_volumeKnob.move(103, 142);
-	m_volumeKnob.setHintText(tr("String volume:"), "");
+	m_volumeKnob.setDescription(tr("String volume:"));
 
 	m_stiffnessKnob.move(129, 142);
 	m_stiffnessKnob.setHintText(tr("String stiffness:"), "");

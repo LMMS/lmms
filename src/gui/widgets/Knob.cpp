@@ -535,8 +535,8 @@ QString VolumeKnob::getCustomFloatingText()
 {
 	const auto valueToVolumeRatio = model()->getRoundedValue() / volumeRatio();
 	return valueToVolumeRatio == 0.
-		? QString("-∞ dBFS")
-		: QString("%1 dBFS").arg(ampToDbfs(valueToVolumeRatio), 3, 'f', 2);
+		? QStringLiteral("-∞")
+		: QString("%1").arg(ampToDbfs(valueToVolumeRatio), 3, 'f', 2);
 }
 
 void VolumeKnob::enterValue()

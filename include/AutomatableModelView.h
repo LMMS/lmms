@@ -66,7 +66,7 @@ public:
 		m_description = desc.trimmed();
 	}
 
-	inline void setUnit( const QString& unit )
+	virtual void setUnit(const QString& unit)
 	{
 		m_unit = unit;
 	}

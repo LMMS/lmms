@@ -684,10 +684,10 @@ WatsynView::WatsynView( Instrument * _instrument,
 
 // knobs... lots of em
 
-	a1_volKnob = makeKnob<VolumeKnob>(130, A1ROW, tr("Volume"), "%", "aKnob");
-	a2_volKnob = makeKnob<VolumeKnob>(130, A2ROW, tr("Volume"), "%", "aKnob");
-	b1_volKnob = makeKnob<VolumeKnob>(130, B1ROW, tr("Volume"), "%", "bKnob");
-	b2_volKnob = makeKnob<VolumeKnob>(130, B2ROW, tr("Volume"), "%", "bKnob");
+	a1_volKnob = makeKnob<VolumeKnob>(130, A1ROW, tr("Volume"), "", "aKnob");
+	a2_volKnob = makeKnob<VolumeKnob>(130, A2ROW, tr("Volume"), "", "aKnob");
+	b1_volKnob = makeKnob<VolumeKnob>(130, B1ROW, tr("Volume"), "", "bKnob");
+	b2_volKnob = makeKnob<VolumeKnob>(130, B2ROW, tr("Volume"), "", "bKnob");
 
 	a1_panKnob = makeKnob(154, A1ROW, tr("Panning"), "", "aKnob");
 	a2_panKnob = makeKnob(154, A2ROW, tr("Panning"), "", "aKnob");
