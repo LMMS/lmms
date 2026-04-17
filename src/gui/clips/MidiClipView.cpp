@@ -823,16 +823,46 @@ void MidiClipView::paintEvent( QPaintEvent * )
 	const int lineSize = 3;
 	p.setPen( c.darker( 200 ) );
 
-	for(float t = (offset % TimePos::ticksPerBar()) * pixelsPerBar / TimePos::ticksPerBar(); t < m_clip->length(); t += pixelsPerBar)
+	if (fixedClips())
 	{
-		p.drawLine( x_base + t - 1,
+		// We don't draw the bar lines the same way in the pattern editor as the view's lenght and position are
+		// modified arbitrarily by zoom and scroll values, and the clip always start at t=0
+		const int steps = std::max(1, m_clip->m_steps);
+		const int w = width() - 2 * BORDER_WIDTH;
+
+		for (int step = TimePos::stepsPerBar(); step < steps; step += TimePos::stepsPerBar())
+		{
+			p.drawLine(
+				BORDER_WIDTH + step * w / static_cast<float>(steps),
+				BORDER_WIDTH,
+				BORDER_WIDTH + step * w / static_cast<float>(steps),
+				BORDER_WIDTH + lineSize
+			);
+			p.drawLine(
+				BORDER_WIDTH + step * w / static_cast<float>(steps),
+				rect().bottom() - (lineSize + BORDER_WIDTH),
+				BORDER_WIDTH + step * w / static_cast<float>(steps),
+				rect().bottom() - BORDER_WIDTH
+			);
+		}
+	}
+	else
+	{
+		for(float t = (offset % TimePos::ticksPerBar()) * pixelsPerBar / TimePos::ticksPerBar(); t < m_clip->length(); t += pixelsPerBar)
+		{
+			p.drawLine(
+				x_base + t - 1,
 				BORDER_WIDTH,
 				x_base + t - 1,
-				BORDER_WIDTH + lineSize );
-		p.drawLine( x_base + t - 1,
-				rect().bottom() - ( lineSize + BORDER_WIDTH ),
+				BORDER_WIDTH + lineSize
+			);
+			p.drawLine(
 				x_base + t - 1,
-				rect().bottom() - BORDER_WIDTH );
+				rect().bottom() - (lineSize + BORDER_WIDTH),
+				x_base + t - 1,
+				rect().bottom() - BORDER_WIDTH
+			);
+		}
 	}
 
 	// clip name
