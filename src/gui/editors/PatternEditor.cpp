@@ -266,7 +266,7 @@ void PatternEditor::updateScrollBar()
 void PatternEditor::wheelEvent(QWheelEvent* we)
 {
 	const auto posX = we->position().toPoint().x();
-	if ((we->modifiers() & Qt::ControlModifier) && (posX > m_trackHeadWidth))
+	if ((we->modifiers() & Qt::ControlModifier) && (posX > m_trackHeadWidth) && !Engine::getSong()->isPlaying())
 	{
 		// move zoom slider (pixelsPerBar will change automatically)
 		int step = we->modifiers() & Qt::ShiftModifier ? 1 : 5;
