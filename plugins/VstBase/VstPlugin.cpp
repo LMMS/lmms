@@ -924,7 +924,7 @@ auto VstPluginKnob::getParameterText() const -> QString
 	const auto& paramDisplays = m_plugin->allParameterDisplays();
 	assert(paramLabels.size() == paramDisplays.size());
 
-	assert(m_paramIndex < paramLabels.size());
+	assert(static_cast<std::size_t>(m_paramIndex) < paramLabels.size());
 	return paramDisplays[m_paramIndex] + ' ' + paramLabels[m_paramIndex];
 }
 
