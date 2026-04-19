@@ -41,34 +41,31 @@ public:
 	TextFloat();
 	~TextFloat() override = default;
 
-	void setTitle(const QString & title);
-	void setText(const QString & text);
-	void setPixmap(const QPixmap & pixmap);
+	void setTitle(const QString& title);
+	void setText(const QString& text);
+	void setPixmap(const QPixmap& pixmap);
 
 	void setVisibilityTimeOut(int msecs);
 
-	static TextFloat * displayMessage(const QString & title,
+	static TextFloat*  displayMessage(const QString & title,
 						const QString & msg,
 						const QPixmap & pixmap = QPixmap(),
 						int timeout = 2000,
 						QWidget * parent = nullptr);
 
-	void moveGlobal(QWidget * w, const QPoint & offset)
-	{
-		move(w->mapToGlobal(QPoint(0, 0)) + offset);
-	}
+	void moveGlobal(QWidget* w, const QPoint& offset);
 
 
 protected:
-	void mousePressEvent(QMouseEvent * me) override;
+	void mousePressEvent(QMouseEvent* me) override;
 
 
 private:
-	TextFloat(const QString & title, const QString & text, const QPixmap & pixmap);
+	TextFloat(const QString& title, const QString& text, const QPixmap& pixmap);
 
-	QLabel * m_pixmapLabel;
-	QLabel * m_titleLabel;
-	QLabel * m_textLabel;
+	QLabel* m_pixmapLabel;
+	QLabel* m_titleLabel;
+	QLabel* m_textLabel;
 
 };
 

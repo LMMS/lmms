@@ -28,6 +28,7 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QLabel>
+#include <QScreen>
 
 #include "GuiApplication.h"
 #include "MainWindow.h"
@@ -41,10 +42,12 @@ TextFloat::TextFloat() :
 {
 }
 
-TextFloat::TextFloat(const QString & title, const QString & text, const QPixmap & pixmap) :
+TextFloat::TextFloat(const QString& title, const QString& text, const QPixmap& pixmap) :
 	QWidget(getGUI()->mainWindow(), Qt::ToolTip)
 {
-	QHBoxLayout * mainLayout = new QHBoxLayout();
+	QHBoxLayout* mainLayout = new QHBoxLayout();
+	mainLayout->setAlignment(Qt::AlignLeft);
+	mainLayout->setContentsMargins(8, 2, 8, 2);
 	setLayout(mainLayout);
 
 	// Create the label that displays the pixmap
@@ -52,9 +55,10 @@ TextFloat::TextFloat(const QString & title, const QString & text, const QPixmap 
 	mainLayout->addWidget(m_pixmapLabel);
 
 	// Create the widget that displays the title and the text
-	QWidget * titleAndTextWidget = new QWidget(this);
-	QVBoxLayout * titleAndTextLayout = new QVBoxLayout();
+	QWidget* titleAndTextWidget = new QWidget(this);
+	QVBoxLayout* titleAndTextLayout = new QVBoxLayout();
 	titleAndTextWidget->setLayout(titleAndTextLayout);
+	titleAndTextLayout->setAlignment(Qt::AlignLeft);
 
 	m_titleLabel = new QLabel(titleAndTextWidget);
 	m_titleLabel->setStyleSheet("font-weight: bold;");
@@ -71,19 +75,19 @@ TextFloat::TextFloat(const QString & title, const QString & text, const QPixmap 
 	setPixmap(pixmap);
 }
 
-void TextFloat::setTitle(const QString & title)
+void TextFloat::setTitle(const QString& title)
 {
 	m_titleLabel->setText(title);
 	m_titleLabel->setHidden(title.isEmpty());
 }
 
-void TextFloat::setText(const QString & text)
+void TextFloat::setText(const QString& text)
 {
 	m_textLabel->setText(text);
 	m_textLabel->setHidden(text.isEmpty());
 }
 
-void TextFloat::setPixmap(const QPixmap & pixmap)
+void TextFloat::setPixmap(const QPixmap& pixmap)
 {
 	m_pixmapLabel->setPixmap(pixmap);
 	m_pixmapLabel->setHidden(pixmap.isNull());
@@ -95,10 +99,10 @@ void TextFloat::setVisibilityTimeOut(int msecs)
 	show();
 }
 
-TextFloat * TextFloat::displayMessage(const QString & title,
-					const QString & msg,
-					const QPixmap & pixmap,
-					int timeout, QWidget * parent)
+TextFloat* TextFloat::displayMessage(const QString& title,
+					const QString& msg,
+					const QPixmap& pixmap,
+					int timeout, QWidget* parent)
 {
 	auto tf = new TextFloat(title, msg, pixmap);
 
@@ -125,7 +129,19 @@ TextFloat * TextFloat::displayMessage(const QString & title,
 	return tf;
 }
 
-void TextFloat::mousePressEvent(QMouseEvent *)
+void TextFloat::moveGlobal(QWidget* w, const QPoint& offset)
+{
+	auto position = w->mapToGlobal(QPoint(0, 0)) + offset;
+	
+	// Clamp position to screen before moving it there
+	auto screenSize = screen()->size();
+	position.setX(std::clamp(position.x(), 4, screenSize.width() - width() - 4));
+	position.setY(std::clamp(position.y(), 4, screenSize.height() - height() - 4));
+	
+	move(position);
+}
+
+void TextFloat::mousePressEvent(QMouseEvent*)
 {
 	close();
 }
