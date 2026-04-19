@@ -134,9 +134,11 @@ void TextFloat::moveGlobal(QWidget* w, const QPoint& offset)
 	auto position = w->mapToGlobal(QPoint(0, 0)) + offset;
 	
 	// Clamp position to screen before moving it there
-	auto screenSize = screen()->size();
-	position.setX(std::clamp(position.x(), 4, screenSize.width() - width() - 4));
-	position.setY(std::clamp(position.y(), 4, screenSize.height() - height() - 4));
+	auto screen = w->screen();
+	auto screenOrigin = screen->availableVirtualGeometry().topLeft();
+	auto screenSize = screen->availableVirtualGeometry().size();
+	position.setX(std::clamp(position.x(), screenOrigin.x() + 4, screenOrigin.x() + screenSize.width() - width() - 4));
+	position.setY(std::clamp(position.y(), screenOrigin.y() + 4, screenOrigin.y() + screenSize.height() - height() - 4));
 	
 	move(position);
 }
