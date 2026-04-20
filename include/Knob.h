@@ -245,6 +245,8 @@ class LMMS_EXPORT VolumeKnob : public Knob
 public:
 	VolumeKnob(const VolumeKnob&) = delete;
 	VolumeKnob(const Knob&) = delete;
+	VolumeKnob(VolumeKnob&&) = delete;
+	VolumeKnob(Knob&&) = delete;
 
 	template<typename... Args>
 	VolumeKnob(Args&&... args)
