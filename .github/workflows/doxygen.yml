@@ -34,6 +34,7 @@ jobs:
             libqt5x11extras5-dev \
             libqt5svg5-dev \
             libx11-xcb-dev \
+            liblist-moreutils-perl \
             libxcb-keysyms1-dev \
             libxcb-util0-dev \
             qt5-qmake \
