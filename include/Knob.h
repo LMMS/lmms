@@ -250,6 +250,8 @@ public:
 		AutomatableModelView::setUnit(" dBFS");
 	}
 
+	VolumeKnob(const VolumeKnob&) = delete;
+
 	//! Volume knobs are always dBFS
 	void setUnit(const QString& unit) override {}
 
