@@ -178,6 +178,7 @@ void Fader::mouseMoveEvent(QMouseEvent* mouseEvent)
 	setVolumeByLocalPixelValue(localY);
 
 	updateTextFloat();
+	s_textFloat->show();
 
 	mouseEvent->accept();
 }
@@ -496,6 +497,7 @@ void Fader::setPeak_R(float fPeak)
 // update tooltip showing value and adjust position while changing fader value
 void Fader::updateTextFloat()
 {
+	s_textFloat->setSource(this);
 	if (m_conversionFactor == 100.0)
 	{
 		s_textFloat->setText(getModelValueAsDbString());
