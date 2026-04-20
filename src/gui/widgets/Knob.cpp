@@ -26,6 +26,7 @@
 
 #include <QInputDialog>
 #include <QPainter>
+#include <QWheelEvent>
 
 #include "DeprecationHelper.h"
 #include "embed.h"
@@ -569,6 +570,60 @@ void VolumeKnob::enterValue()
 	if (ok)
 	{
 		model()->setValue(newVal);
+	}
+}
+
+void VolumeKnob::adjustByDecibelDelta(float dbDelta)
+{
+	adjustModelByDBDelta(dbDelta);
+}
+
+void VolumeKnob::wheelEvent(QWheelEvent* we)
+{
+	we->accept();
+	const int direction = (we->angleDelta().y() > 0 ? 1 : -1) * (we->inverted() ? -1 : 1);
+	adjustModelByDBDelta(determineAdjustmentDelta(we->modifiers()) * direction);
+	showTextFloat(0, 1000);
+	emit sliderMoved(model()->value());
+}
+
+float VolumeKnob::determineAdjustmentDelta(Qt::KeyboardModifiers modifiers) const
+{
+	// Matches Fader::determineAdjustmentDelta:
+	// Shift = coarse (3 dB), Ctrl = fine (0.1 dB), default = 1 dB
+	if (modifiers == Qt::ShiftModifier)   { return 3.f; }
+	if (modifiers == Qt::ControlModifier) { return 0.1f; }
+	return 1.f;
+}
+
+void VolumeKnob::adjustModelByDBDelta(float dbDelta)
+{
+	// Model stores volume as a percentage (e.g. 100 = unity = 0 dBFS).
+	// Convert: modelValue / volumeRatio() → linear amplitude → dBFS.
+	constexpr float c_minDb = -120.f;
+	const float currentModelValue = model()->value();
+
+	if (currentModelValue <= 0.f)
+	{
+		// At -inf dB; only move up
+		if (dbDelta > 0)
+		{
+			model()->setValue(dbfsToAmp(c_minDb) * volumeRatio());
+		}
+		return;
+	}
+
+	const float currentDb = ampToDbfs(currentModelValue / volumeRatio());
+	const float newDb     = currentDb + dbDelta;
+
+	if (newDb <= c_minDb)
+	{
+		model()->setValue(0.f);
+	}
+	else
+	{
+		model()->setValue(std::clamp(dbfsToAmp(newDb) * volumeRatio(),
+			model()->minValue(), model()->maxValue()));
 	}
 }
 
