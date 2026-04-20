@@ -28,6 +28,7 @@ jobs:
           sudo apt-get install -y --no-install-recommends \
             cmake \
             make \
+            libfftw3-dev \
             libsndfile1-dev \
             libqt5x11extras5-dev \
             libqt5svg5-dev \
