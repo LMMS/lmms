@@ -26,7 +26,6 @@
 
 #include "PianoRoll.h"
 
-#include <algorithm>
 #include <QtMath>  // IWYU pragma: keep
 #include <QApplication>
 #include <QCheckBox>
@@ -44,6 +43,7 @@
 #include <QStyleOption>
 #include <QToolButton>
 
+#include <algorithm>
 #include <cmath>
 #include <utility>
 
