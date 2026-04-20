@@ -531,7 +531,7 @@ void Knob::changeEvent(QEvent * ev)
 	}
 }
 
-QString VolumeKnob::getCustomFloatingText()
+QString VolumeKnob::getDynamicFloatingText()
 {
 	const auto valueToVolumeRatio = model()->getRoundedValue() / volumeRatio();
 	return valueToVolumeRatio == 0.

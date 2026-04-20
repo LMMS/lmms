@@ -254,7 +254,7 @@ public:
 	void setUnit(const QString& unit) override {}
 
 protected:
-	QString getCustomFloatingText() override;
+	QString getDynamicFloatingText() override;
 	void enterValue() override;
 
 private:
