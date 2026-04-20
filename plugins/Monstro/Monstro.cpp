@@ -1675,7 +1675,7 @@ QWidget * MonstroView::setupOperatorsView( QWidget * _parent )
 		return pb;
 	};
 
-	m_osc1VolKnob = makeKnob<VolumeKnob>(view, KNOBCOL1, O1ROW, tr("Volume"), "%", "osc1Knob");
+	m_osc1VolKnob = makeKnob<VolumeKnob>(view, KNOBCOL1, O1ROW, tr("Volume"), "", "osc1Knob");
 	m_osc1PanKnob = makeKnob(view, KNOBCOL2, O1ROW, tr("Panning"), "", "osc1Knob");
 	m_osc1CrsKnob = makeKnob(view, KNOBCOL3, O1ROW, tr("Coarse detune"), tr(" semitones"), "osc1Knob");
 	m_osc1FtlKnob = makeKnob(view, KNOBCOL4, O1ROW, tr("Fine tune left"), tr(" cents"), "osc1Knob");
@@ -1686,7 +1686,7 @@ QWidget * MonstroView::setupOperatorsView( QWidget * _parent )
 	m_osc1SSRButton = makeTinyLed(230, 34, tr("Send sync on pulse rise"));
 	m_osc1SSFButton = makeTinyLed(230, 44, tr("Send sync on pulse fall"));
 
-	m_osc2VolKnob = makeKnob<VolumeKnob>(view, KNOBCOL1, O2ROW, tr("Volume"), "%", "osc2Knob");
+	m_osc2VolKnob = makeKnob<VolumeKnob>(view, KNOBCOL1, O2ROW, tr("Volume"), "", "osc2Knob");
 	m_osc2PanKnob = makeKnob(view, KNOBCOL2, O2ROW, tr("Panning"), "", "osc2Knob");
 	m_osc2CrsKnob = makeKnob(view, KNOBCOL3, O2ROW, tr("Coarse detune"), tr(" semitones" ), "osc2Knob");
 	m_osc2FtlKnob = makeKnob(view, KNOBCOL4, O2ROW, tr("Fine tune left"), tr(" cents" ), "osc2Knob");
@@ -1699,7 +1699,7 @@ QWidget * MonstroView::setupOperatorsView( QWidget * _parent )
 	m_osc2SyncHButton = makeTinyLed(212, O2ROW - 3, tr("Hard sync oscillator 2"));
 	m_osc2SyncRButton = makeTinyLed(191, O2ROW - 3, tr("Reverse sync oscillator 2"));
 
-	m_osc3VolKnob = makeKnob<VolumeKnob>(view, KNOBCOL1, O3ROW, tr("Volume"), "%", "osc3Knob");
+	m_osc3VolKnob = makeKnob<VolumeKnob>(view, KNOBCOL1, O3ROW, tr("Volume"), "", "osc3Knob");
 	m_osc3PanKnob = makeKnob(view, KNOBCOL2, O3ROW, tr("Panning"), "", "osc3Knob");
 	m_osc3CrsKnob = makeKnob(view, KNOBCOL3, O3ROW, tr("Coarse detune"), tr(" semitones"), "osc3Knob");
 	m_osc3SpoKnob = makeKnob(view, KNOBCOL4, O3ROW, tr("Stereo phase offset"), tr(" deg"), "osc3Knob");

@@ -66,11 +66,11 @@ FlangerControlsDialog::FlangerControlsDialog( FlangerControls *controls ) :
 
 	auto feedbackKnob = new VolumeKnob(KnobType::Bright26, tr("FDBK"), this);
 	feedbackKnob->setModel( &controls->m_feedbackModel );
-	feedbackKnob->setHintText( tr( "Feedback amount:" ) , "" );
+	feedbackKnob->setDescription(tr("Feedback amount:"));
 
 	auto whiteNoiseKnob = new VolumeKnob(KnobType::Bright26, tr("NOISE"), this);
 	whiteNoiseKnob->setModel( &controls->m_whiteNoiseAmountModel );
-	whiteNoiseKnob->setHintText( tr( "White noise amount:" ) , "" );
+	whiteNoiseKnob->setDescription(tr("White noise amount:"));
 
 	knobLayout->addWidget(delayKnob);
 	knobLayout->addWidget(lfoFreqKnob);

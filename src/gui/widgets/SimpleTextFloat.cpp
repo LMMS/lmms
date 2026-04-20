@@ -78,7 +78,6 @@ void SimpleTextFloat::showWithDelay(int msecBeforeDisplay, int msecDisplayTime)
 
 void SimpleTextFloat::show()
 {
-	m_hideTimer->start();
 	QWidget::show();
 }
 

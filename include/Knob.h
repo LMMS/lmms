@@ -243,10 +243,23 @@ class LMMS_EXPORT VolumeKnob : public Knob
 	mapPropertyFromModel(float, volumeRatio, setVolumeRatio, m_volumeRatio);
 
 public:
-	using Knob::Knob;
+	VolumeKnob(const VolumeKnob&) = delete;
+	VolumeKnob(const Knob&) = delete;
+	VolumeKnob(VolumeKnob&&) = delete;
+	VolumeKnob(Knob&&) = delete;
+
+	template<typename... Args>
+	VolumeKnob(Args&&... args)
+		: Knob{std::forward<Args>(args)...}
+	{
+		AutomatableModelView::setUnit(" dBFS");
+	}
+
+	//! Volume knobs are always dBFS
+	void setUnit(const QString& unit) override {}
 
 protected:
-	QString getCustomFloatingText() override;
+	QString getDynamicFloatingText() override;
 	void enterValue() override;
 
 private:

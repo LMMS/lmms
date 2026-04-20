@@ -187,8 +187,8 @@ public:
 private:
 	void timerEvent(QTimerEvent* event) override;
 
-	auto getCustomFloatingText() -> QString override;
-	auto getCustomFloatingTextUpdate() -> std::optional<QString> override;
+	auto getDynamicFloatingText() -> QString override;
+	auto getDynamicFloatingTextUpdate() -> std::optional<QString> override;
 
 	auto getParameterText() const -> QString;
 

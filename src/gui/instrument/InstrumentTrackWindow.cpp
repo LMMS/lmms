@@ -153,7 +153,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 
 	// set up volume knob
 	m_volumeKnob = new VolumeKnob(KnobType::Bright26, nullptr, tr("Volume"));
-	m_volumeKnob->setHintText( tr( "Volume:" ), "%" );
+	m_volumeKnob->setDescription(tr("Volume:"));
 
 	basicControlsLayout->addWidget(m_volumeKnob, 0, 1);
 	basicControlsLayout->setAlignment( m_volumeKnob, widgetAlignment );
