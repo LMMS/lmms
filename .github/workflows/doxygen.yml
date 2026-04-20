@@ -28,6 +28,7 @@ jobs:
           sudo apt-get install -y --no-install-recommends \
             cmake \
             make \
+            libqt5x11extras5-dev \
             libqt5svg5-dev \
             qt5-qmake \
             qtbase5-dev \
