@@ -74,12 +74,12 @@ public:
 
 private:
 	Sample::PlaybackState m_state;
-	f_cnt_t m_frame;
-	Sample* m_sample;
-	Track * m_track;
-	PatternTrack* m_patternTrack;
-	bool m_doneMayReturnTrue;
-	bool m_ownAudioBusHandle;
+	f_cnt_t m_frame = 0;
+	Sample* m_sample = nullptr;
+	Track* m_track = nullptr;
+	PatternTrack* m_patternTrack = nullptr;
+	bool m_doneMayReturnTrue = true;
+	bool m_ownAudioBusHandle = false;
 } ;
 
 

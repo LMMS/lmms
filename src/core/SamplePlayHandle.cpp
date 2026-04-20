@@ -33,15 +33,10 @@
 namespace lmms
 {
 
-
-SamplePlayHandle::SamplePlayHandle(Sample* sample, bool ownAudioBusHandle) :
-	PlayHandle(Type::SamplePlayHandle),
-	m_frame(0),
-	m_sample(sample),
-	m_track(nullptr),
-	m_patternTrack(nullptr),
-	m_doneMayReturnTrue(true),
-	m_ownAudioBusHandle(ownAudioBusHandle)
+SamplePlayHandle::SamplePlayHandle(Sample* sample, bool ownAudioBusHandle)
+	: PlayHandle(Type::SamplePlayHandle)
+	, m_sample(sample)
+	, m_ownAudioBusHandle(ownAudioBusHandle)
 {
 	if (ownAudioBusHandle)
 	{
