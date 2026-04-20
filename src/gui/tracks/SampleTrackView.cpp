@@ -69,7 +69,7 @@ SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 
 	m_volumeKnob = new VolumeKnob(KnobType::Small17, tr("VOL"), getTrackSettingsWidget(), Knob::LabelRendering::LegacyFixedFontSize, tr("Track volume"));
 	m_volumeKnob->setModel( &_t->m_volumeModel );
-	m_volumeKnob->setDescription(tr("Channel volume:"));
+	m_volumeKnob->setDescription(tr("Volume:"));
 	m_volumeKnob->show();
 
 	m_panningKnob = new Knob(KnobType::Small17, tr("PAN"), getTrackSettingsWidget(), Knob::LabelRendering::LegacyFixedFontSize, tr("Panning"));
