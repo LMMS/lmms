@@ -33,6 +33,7 @@ jobs:
             libsndfile1-dev \
             libqt5x11extras5-dev \
             libqt5svg5-dev \
+            libx11-xcb-dev \
             qt5-qmake \
             qtbase5-dev \
             qtbase5-dev-tools \
