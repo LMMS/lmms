@@ -31,9 +31,11 @@ namespace lmms {
 class Metronome
 {
 public:
+	Metronome(bool active = false);
+
 	bool active() const { return m_active; }
 	void setActive(bool active) { m_active = active; }
-	void processTick(int currentTick, int ticksPerBar, int beatsPerBar, size_t bufferOffset);
+	void processTick(int currentTick, int ticksPerBar, int beatsPerBar, size_t bufferOffset = 0);
 
 private:
 	bool m_active = false;
