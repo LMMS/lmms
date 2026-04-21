@@ -43,8 +43,11 @@ jobs:
             qtbase5-private-dev \
             qttools5-dev-tools \
             qtwayland5 \
-            stk \
-            doxygen
+            stk
+      - name: Install doxygen
+        uses: ssciwr/doxygen-install@v2
+        with:
+          version: "1.16.1"
       - name: Configure
         run: |
           source /opt/qt5*/bin/qt5*-env.sh || true
