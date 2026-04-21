@@ -49,24 +49,14 @@
 namespace lmms::gui
 {
 
-/*! \brief Create a new track View.
- *
- *  The track View is handles the actual display of the track, including
- *  displaying its various widgets and the track segments.
- *
- *  \param track The track to display.
- *  \param tcv The track Container View for us to be displayed in.
- *  \todo Is my description of these properties correct?
- */
-TrackView::TrackView( Track * track, TrackContainerView * tcv ) :
-	QWidget( tcv->contentWidget() ),   /*!< The Track Container View's content widget. */
-	ModelView( nullptr, this ),            /*!< The model view of this track */
-	m_track( track ),                  /*!< The track we're displaying */
-	m_trackContainerView( tcv ),       /*!< The track Container View we're displayed in */
-	m_trackOperationsWidget( this ),    /*!< Our trackOperationsWidget */
-	m_trackSettingsWidget( this ),      /*!< Our trackSettingsWidget */
-	m_trackContentWidget( this ),       /*!< Our trackContentWidget */
-	m_action( Action::None )                /*!< The action we're currently performing */
+TrackView::TrackView(Track* track, TrackContainerView* tcv)
+	: QWidget(tcv->contentWidget())
+	, ModelView(nullptr, this)
+	, m_track(track)
+	, m_trackContainerView(tcv)
+	, m_trackOperationsWidget(this)
+	, m_trackSettingsWidget(this)
+	, m_trackContentWidget(this)
 {
 	setAutoFillBackground( true );
 	QPalette pal;
@@ -120,14 +110,6 @@ TrackView::TrackView( Track * track, TrackContainerView * tcv ) :
 
 
 
-
-
-
-
-/*! \brief Resize this track View.
- *
- *  \param re the Resize Event to handle.
- */
 void TrackView::resizeEvent( QResizeEvent * re )
 {
 	if( ConfigManager::inst()->value( "ui",
@@ -147,9 +129,6 @@ void TrackView::resizeEvent( QResizeEvent * re )
 
 
 
-/*! \brief Update this track View and all its content objects.
- *
- */
 void TrackView::update()
 {
 	m_trackContentWidget.update();
@@ -163,9 +142,6 @@ void TrackView::update()
 
 
 
-/*! \brief Create a menu for assigning/creating channels for this track.
- *
- */
 QMenu * TrackView::createMixerMenu(QString title, QString newMixerLabel)
 {
 	Q_UNUSED(title)
@@ -176,9 +152,6 @@ QMenu * TrackView::createMixerMenu(QString title, QString newMixerLabel)
 
 
 
-/*! \brief Close this track View.
- *
- */
 bool TrackView::close()
 {
 	m_trackContainerView->removeTrackView( this );
@@ -188,9 +161,6 @@ bool TrackView::close()
 
 
 
-/*! \brief Register that the model of this track View has changed.
- *
- */
 void TrackView::modelChanged()
 {
 	m_track = castModel<Track>();
@@ -205,10 +175,6 @@ void TrackView::modelChanged()
 
 
 
-/*! \brief Start a drag event on this track View.
- *
- *  \param dee the DragEnterEvent to start.
- */
 void TrackView::dragEnterEvent( QDragEnterEvent * dee )
 {
 	StringPairDrag::processDragEnterEvent( dee, "track_" +
@@ -218,14 +184,6 @@ void TrackView::dragEnterEvent( QDragEnterEvent * dee )
 
 
 
-/*! \brief Accept a drop event on this track View.
- *
- *  We only accept drop events that are of the same type as this track.
- *  If so, we decode the data from the drop event by just feeding it
- *  back into the engine as a state.
- *
- *  \param de the DropEvent to handle.
- */
 void TrackView::dropEvent( QDropEvent * de )
 {
 	QString type = StringPairDrag::decodeKey( de );
@@ -245,19 +203,6 @@ void TrackView::dropEvent( QDropEvent * de )
 
 
 
-/*! \brief Handle a mouse press event on this track View.
- *
- *  If this track container supports rubber band selection, let the
- *  widget handle that and don't bother with any other handling.
- *
- *  If the left mouse button is pressed, we handle two things.  If
- *  SHIFT is pressed, then we resize vertically.  Otherwise we start
- *  the process of moving this track to a new position.
- *
- *  Otherwise we let the widget handle the mouse event as normal.
- *
- *  \param me the MouseEvent to handle.
- */
 void TrackView::mousePressEvent( QMouseEvent * me )
 {
 	const auto pos = position(me);
@@ -300,22 +245,6 @@ void TrackView::mousePressEvent( QMouseEvent * me )
 
 
 
-/*! \brief Handle a mouse move event on this track View.
- *
- *  If this track container supports rubber band selection, let the
- *  widget handle that and don't bother with any other handling.
- *
- *  Otherwise if we've started the move process (from mousePressEvent())
- *  then move ourselves into that position, reordering the track list
- *  with moveTrackViewUp() and moveTrackViewDown() to suit.  We make a
- *  note of this in the undo journal in case the user wants to undo this
- *  move.
- *
- *  Likewise if we've started a resize process, handle this too, making
- *  sure that we never go below the minimum track height.
- *
- *  \param me the MouseEvent to handle.
- */
 void TrackView::mouseMoveEvent( QMouseEvent * me )
 {
 	const auto pos = position(me);
@@ -365,10 +294,6 @@ void TrackView::mouseMoveEvent( QMouseEvent * me )
 
 
 
-/*! \brief Handle a mouse release event on this track View.
- *
- *  \param me the MouseEvent to handle.
- */
 void TrackView::mouseReleaseEvent( QMouseEvent * me )
 {
 	m_action = Action::None;
@@ -403,10 +328,6 @@ void TrackView::wheelEvent(QWheelEvent* we)
 
 
 
-/*! \brief Repaint this track View.
- *
- *  \param pe the PaintEvent to start.
- */
 void TrackView::paintEvent( QPaintEvent * pe )
 {
 	QStyleOption opt;
@@ -418,11 +339,6 @@ void TrackView::paintEvent( QPaintEvent * pe )
 
 
 
-/*! \brief Create a Clip View in this track View.
- *
- *  \param clip the Clip to create the view for.
- *  \todo is this a good description for what this method does?
- */
 void TrackView::createClipView( Clip * clip )
 {
 	ClipView * tv = clip->createView( this );
