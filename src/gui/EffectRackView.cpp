@@ -30,11 +30,20 @@
 #include <QPushButton>
 #include <QScrollArea>
 #include <QVBoxLayout>
+#include <qevent.h>
 
+#include "Effect.h"
 #include "DeprecationHelper.h"
 #include "EffectSelectDialog.h"
 #include "EffectView.h"
+#include "StringPairDrag.h"
 #include "GroupBox.h"
+#include "TextFloat.h"
+#include "FileDialog.h"
+#include "ConfigManager.h"
+#include "DataFile.h"
+#include "CaptionMenu.h"
+#include "embed.h"
 
 
 namespace lmms::gui
@@ -63,14 +72,38 @@ EffectRackView::EffectRackView( EffectChain* model, QWidget* parent ) :
 
 	effectsLayout->addWidget( m_scrollArea );
 
+	auto rowLayout = new QHBoxLayout;
+	QSize smallIconSize(14, 14);
+
 	auto addButton = new QPushButton;
 	addButton->setText( tr( "Add effect" ) );
 	addButton->setFocusPolicy(Qt::NoFocus);
 
-	effectsLayout->addWidget( addButton );
+	auto savePresetButton = new QPushButton;
+	savePresetButton->setIcon(embed::getIconPixmap("project_import"));
+	savePresetButton->setFocusPolicy(Qt::NoFocus);
+	savePresetButton->setIconSize(smallIconSize);
+	savePresetButton->setFixedSize(18, 18);
+	savePresetButton->setToolTip(tr("Save the effect chain to a preset file"));
+
+	auto loadPresetButton = new QPushButton;
+	loadPresetButton->setIcon(embed::getIconPixmap("project_export"));
+	loadPresetButton->setFocusPolicy(Qt::NoFocus);
+	loadPresetButton->setIconSize(smallIconSize);
+	loadPresetButton->setFixedSize(18, 18);
+	loadPresetButton->setToolTip(tr("Load the effect chain from a preset file, overriding the current one"));
+
+	rowLayout->addWidget(addButton, 90);
+	rowLayout->addWidget(savePresetButton, 5);
+	rowLayout->addWidget(loadPresetButton, 5);
+
+	effectsLayout->addLayout(rowLayout);
 
 	connect( addButton, SIGNAL(clicked()), this, SLOT(addEffect()));
+	connect( savePresetButton, SIGNAL(clicked()), this, SLOT(savePreset()));
+	connect( loadPresetButton, SIGNAL(clicked()), this, SLOT(loadPreset()));
 
+	setAcceptDrops(true);
 
 	m_lastY = 0;
 
@@ -82,6 +115,108 @@ EffectRackView::EffectRackView( EffectChain* model, QWidget* parent ) :
 EffectRackView::~EffectRackView()
 {
 	clearViews();
+}
+
+
+
+
+void EffectRackView::dragEnterEvent(QDragEnterEvent* event)
+{
+	const QString type = StringPairDrag::decodeKey(event);
+	if (type == "effectpresetfile" || type == "chainpresetfile")
+	{
+		event->acceptProposedAction();
+	}
+	else
+	{
+		event->ignore();
+	}
+}
+
+
+void EffectRackView::dropEvent(QDropEvent* event)
+{
+	const QString type = StringPairDrag::decodeKey(event);
+	const QString filePath = StringPairDrag::decodeValue(event);
+
+	if (type == "effectpresetfile")
+	{
+		addEffectFromPreset(filePath);
+		event->accept();
+	}
+	else if (type == "chainpresetfile")
+	{
+		fxChain()->loadPreset(filePath);
+		event->accept();
+	}
+	else
+	{
+		event->ignore();
+	}
+}
+
+
+
+void EffectRackView::addEffectFromPreset(const QString& filePath)
+{
+	Effect* fx = Effect::createFromPreset(filePath, fxChain());
+	if (!fx)
+	{
+		TextFloat::displayMessage(
+			"Preset loading error",
+			tr("Couldn't load preset file."),
+			embed::getIconPixmap("error")
+		);
+		return;
+	}
+	fxChain()->appendEffect(fx);
+	update();
+}
+
+
+
+void EffectRackView::savePreset()
+{
+	FileDialog sfd(this, tr("Save preset"), "", tr("FX Chain (*.fxc)"));
+	QString workingDir = ConfigManager::inst()->userPresetsDir();
+
+	sfd.setAcceptMode(FileDialog::AcceptSave);
+	sfd.setDirectory(workingDir);
+	sfd.setFileMode(FileDialog::AnyFile);
+	sfd.setDefaultSuffix("fxc");
+
+	if (sfd.exec() == QDialog::Accepted
+		&& !sfd.selectedFiles().isEmpty()
+		&& !sfd.selectedFiles().first().isEmpty())
+	{
+		DataFile dataFile(DataFile::Type::EffectSettings);
+		QDomElement& content(dataFile.content());
+
+		fxChain()->saveSettings(dataFile, content);
+
+		QString f = sfd.selectedFiles()[0];
+
+		dataFile.writeFile(f);
+	}
+}
+
+void EffectRackView::loadPreset()
+{
+	FileDialog sfd(this, tr("Load preset"), "", tr("FX Chain (*.fxc)"));
+	QString workingDir = ConfigManager::inst()->userPresetsDir();
+
+	sfd.setAcceptMode(FileDialog::AcceptOpen);
+	sfd.setDirectory(workingDir);
+	sfd.setFileMode(FileDialog::ExistingFile);
+	sfd.setDefaultSuffix("fxc");
+
+	if (sfd.exec() == QDialog::Accepted
+		&& !sfd.selectedFiles().isEmpty()
+		&& !sfd.selectedFiles().first().isEmpty())
+	{
+		QString f = sfd.selectedFiles()[0];
+		fxChain()->loadPreset(f);
+	}
 }
 
 
@@ -103,14 +238,14 @@ void EffectRackView::clearViews()
 
 void EffectRackView::moveUp( EffectView* view )
 {
-	fxChain()->moveUp( view->effect() );
-	if( view != m_effectViews.first() )
+	fxChain()->moveUp(view->effect());
+	if (view != m_effectViews.first())
 	{
 		int i = 0;
-		for( QVector<EffectView *>::Iterator it = m_effectViews.begin(); 
-					it != m_effectViews.end(); it++, i++ )
+		for (auto it = m_effectViews.begin();
+			it != m_effectViews.end(); it++, i++)
 		{
-			if( *it == view )
+			if (*it == view)
 			{
 				break;
 			}
@@ -209,8 +344,7 @@ void EffectRackView::update()
 	const int EffectViewMargin = 3;
 	m_lastY = EffectViewMargin;
 
-	for( QVector<EffectView *>::Iterator it = m_effectViews.begin(); 
-					it != m_effectViews.end(); i++ )
+	for (auto it = m_effectViews.begin(); it != m_effectViews.end(); i++)
 	{
 		if( i < view_map.size() && view_map[i] == false )
 		{
