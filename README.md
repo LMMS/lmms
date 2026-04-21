@@ -8,13 +8,15 @@
 		⦁︎
 		<a href="https://github.com/LMMS/lmms/releases">Releases</a>
 		⦁︎
-		<a href="https://github.com/LMMS/lmms/wiki">Developer wiki</a>
-		⦁︎
 		<a href="https://lmms.io/documentation">User manual</a>
 		⦁︎
 		<a href="https://lmms.io/showcase/">Showcase</a>
 		⦁︎
 		<a href="https://lmms.io/lsp/">Sharing platform</a>
+		⦁︎
+		<a href="https://github.com/LMMS/lmms/wiki">Developer wiki</a>
+		⦁︎
+		<a href="https://lmms.github.io/lmms">Internal documentation</a>
 	</p>
 	<p>
 		<a href="https://github.com/LMMS/lmms/actions/workflows/build.yml"><img src="https://github.com/LMMS/lmms/actions/workflows/build.yml/badge.svg" alt="Build status"></a>

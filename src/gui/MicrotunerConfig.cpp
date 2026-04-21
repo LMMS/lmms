@@ -205,10 +205,6 @@ MicrotunerConfig::MicrotunerConfig() :
 }
 
 
-/**
- * \brief Update list of available scales.
- * \param index Index of the scale to update; update all scales if -1 or out of range.
- */
 void MicrotunerConfig::updateScaleList(int index)
 {
 	if (index >= 0 && static_cast<std::size_t>(index) < MaxScaleCount)
@@ -227,10 +223,6 @@ void MicrotunerConfig::updateScaleList(int index)
 }
 
 
-/**
- * \brief Update list of available keymaps.
- * \param index Index of the keymap to update; update all keymaps if -1 or out of range.
- */
 void MicrotunerConfig::updateKeymapList(int index)
 {
 	if (index >= 0 && static_cast<std::size_t>(index) < MaxKeymapCount)
@@ -249,9 +241,6 @@ void MicrotunerConfig::updateKeymapList(int index)
 }
 
 
-/**
- * \brief Fill all the scale-related values based on currently selected scale
- */
 void MicrotunerConfig::updateScaleForm()
 {
 	Song *song = Engine::getSong();
@@ -275,9 +264,6 @@ void MicrotunerConfig::updateScaleForm()
 }
 
 
-/**
- * \brief Fill all the keymap-related values based on currently selected keymap
- */
 void MicrotunerConfig::updateKeymapForm()
 {
 	Song *song = Engine::getSong();
@@ -306,10 +292,6 @@ void MicrotunerConfig::updateKeymapForm()
 }
 
 
-/**
- * \brief Validate the scale name and entered interval definitions
- * \return true if input is valid, false if problems were detected
- */
 bool MicrotunerConfig::validateScaleForm()
 {
 	auto fail = [this](const QString& message){ QMessageBox::critical(this, tr("Scale parsing error"), message); };
@@ -350,10 +332,6 @@ bool MicrotunerConfig::validateScaleForm()
 }
 
 
-/**
- * \brief Validate the entered key mapping and other values
- * \return true if input is valid, false if problems were detected
- */
 bool MicrotunerConfig::validateKeymapForm()
 {
 	auto fail = [this](const QString& message){ QMessageBox::critical(this, tr("Keymap parsing error"), message); };
@@ -383,10 +361,6 @@ bool MicrotunerConfig::validateKeymapForm()
 }
 
 
-/**
- * \brief Parse and apply the entered scale definition
- * \return true if input is valid, false if problems were detected
- */
 bool MicrotunerConfig::applyScale()
 {
 	if (!validateScaleForm()) {return false;};
@@ -426,10 +400,6 @@ bool MicrotunerConfig::applyScale()
 }
 
 
-/**
- * \brief Parse and apply the entered keymap definition
- * \return true if input is valid, false if problems were detected
- */
 bool MicrotunerConfig::applyKeymap()
 {
 	if (!validateKeymapForm()) {return false;}
@@ -471,10 +441,6 @@ bool MicrotunerConfig::applyKeymap()
 }
 
 
-/**
- * \brief Parse an .scl file and apply the loaded scale if it is valid
- * \return true if input is valid, false if problems were detected
- */
 bool MicrotunerConfig::loadScaleFromFile()
 {
 	QString fileName = FileDialog::getOpenFileName(this, tr("Open scale"), "", tr("Scala scale definition (*.scl)"));
@@ -506,10 +472,6 @@ bool MicrotunerConfig::loadScaleFromFile()
 }
 
 
-/**
- * \brief Parse a .kbm file and apply the loaded keymap if it is valid
- * \return true if input is valid, false if problems were detected
- */
 bool MicrotunerConfig::loadKeymapFromFile()
 {
 	QString fileName = FileDialog::getOpenFileName(this, tr("Open keymap"), "", tr("Scala keymap definition (*.kbm)"));
@@ -554,10 +516,6 @@ bool MicrotunerConfig::loadKeymapFromFile()
 }
 
 
-/**
- * \brief Save currently entered scale definition as .scl file
- * \return true if input is valid, false if problems were detected
- */
 bool MicrotunerConfig::saveScaleToFile()
 {
 	if (!applyScale()) {return false;}
@@ -590,10 +548,6 @@ bool MicrotunerConfig::saveScaleToFile()
 }
 
 
-/**
- * \brief Save currently entered keymap definition as .kbm file
- * \return true if input is valid, false if problems were detected
- */
 bool MicrotunerConfig::saveKeymapToFile()
 {
 	if (!applyKeymap()) {return false;}
