@@ -43,7 +43,7 @@ class SampleClipView : public ClipView
 	Q_OBJECT
 
 public:
-	SampleClipView( SampleClip * _clip, TrackView * _tv );
+	SampleClipView( SampleClip * _clip, TrackView * _tv, int offset = 0 );
 	~SampleClipView() override = default;
 
 public slots:
@@ -62,6 +62,8 @@ protected:
 	void mouseDoubleClickEvent( QMouseEvent * ) override;
 	void paintEvent( QPaintEvent * ) override;
 
+protected slots:
+	virtual void loop();
 
 private:
 	SampleClip * m_clip;

@@ -43,7 +43,7 @@ class MidiClipView : public ClipView
 	Q_OBJECT
 
 public:
-	MidiClipView( MidiClip* clip, TrackView* parent );
+	MidiClipView(MidiClip* clip, TrackView* parent, int offset = 0);
 	~MidiClipView() override = default;
 
 	Q_PROPERTY(QColor noteFillColor READ getNoteFillColor WRITE setNoteFillColor)
@@ -82,6 +82,8 @@ protected slots:
 	void changeName();
 	void transposeSelection();
 	void clearNotesOutOfBounds();
+
+	virtual void loop();
 
 
 protected:

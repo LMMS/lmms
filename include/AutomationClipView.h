@@ -44,7 +44,7 @@ class AutomationClipView : public ClipView
 
 
 public:
-	AutomationClipView( AutomationClip * _clip, TrackView * _parent );
+	AutomationClipView( AutomationClip * _clip, TrackView * _parent, int offset = 0 );
 	~AutomationClipView() override = default;
 
 public slots:
@@ -68,6 +68,8 @@ protected:
 	void dragEnterEvent( QDragEnterEvent * _dee ) override;
 	void dropEvent( QDropEvent * _de ) override;
 
+protected slots:
+	virtual void loop();
 
 private:
 	AutomationClip * m_clip;
