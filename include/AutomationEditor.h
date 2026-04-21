@@ -125,13 +125,21 @@ protected:
 	float yCoordOfLevel( float level );
 	inline void drawLevelTick(QPainter & p, int tick, float value);
 
+	//! @brief Returns the automation node at a given mouse position, if any.
+	//
+	//! Given a mouse coordinate, returns a timeMap::iterator that points to the first node inside a square of side "r"
+	//! pixels from those coordinates.
+	//!
+	//! @param x X coordinate
+	//! @param y Y coordinate
+	//! @param outValue True to check if the outValue of the node was clicked instead (defaults to false)
+	//! @param r R distance in pixels
+	//! @return `timeMap::iterator` with the clicked node, or `timeMap.end()` if none was clicked.
 	timeMap::iterator getNodeAt(int x, int y, bool outValue = false, int r = 5);
-	/**
-	 * @brief Given a mouse X coordinate, returns a timeMap::iterator that points to
-	 *        the closest node.
-	 * @param Int X coordinate
-	 * @return timeMap::iterator with the closest node or timeMap.end() if there are no nodes.
-	 */
+
+	//! @brief Given a mouse X coordinate, returns a `timeMap::iterator` that points to the closest node.
+	//! @param x The X coordinate
+	//! @return `timeMap::iterator` with the closest node or `timeMap.end()` if there are no nodes.
 	timeMap::iterator getClosestNode(int x);
 
 	void drawLine( int x0, float y0, int x1, float y1 );
@@ -148,12 +156,12 @@ protected slots:
 	void setEditMode(int mode);
 
 	void setProgressionType(AutomationClip::ProgressionType type);
-	/**
-	 * @brief This method handles the AutomationEditorWindow event of changing
-	 * progression types. After that, it calls updateEditTanButton so the edit
-	 * tangents button is updated accordingly
-	 * @param Int New progression type
-	 */
+
+	//! @brief Handles the AutomationEditorWindow event of changing progression types.
+	//!
+	//! After that, it calls updateEditTanButton so the edit tangents button is updated accordingly
+	//!
+	//! @param type New progression type
 	void setProgressionType(int type);
 	void setTension();
 
@@ -162,7 +170,7 @@ protected slots:
 	void zoomingXChanged();
 	void zoomingYChanged();
 
-	/// Updates the clip's quantization using the current user selected value.
+	//! @brief Updates the clip's quantization using the current user selected value.
 	void setQuantization();
 
 	void resetGhostNotes()
@@ -196,9 +204,9 @@ private:
 
 	static const int VALUES_WIDTH = 64;
 
-	static const int NOTE_HEIGHT = 10; // height of individual notes
-	static const int NOTE_MARGIN = 40; // total border margin for notes
-	static const int MIN_NOTE_RANGE = 20; // min number of keys for fixed size
+	static const int NOTE_HEIGHT = 10; //!< Height of individual notes
+	static const int NOTE_MARGIN = 40; //!< Total border margin for notes
+	static const int MIN_NOTE_RANGE = 20; //!< Min number of keys for fixed size
 	static const int SAMPLE_MARGIN = 40;
 	static constexpr int MAX_SAMPLE_HEIGHT = 400; // constexpr for use in min
 
@@ -255,12 +263,13 @@ private:
 	int m_y_delta;
 	bool m_y_auto;
 
-	// Time position (key) of automation node whose outValue is being dragged
+	//! Time position (key) of automation node whose outValue is being dragged
 	int m_draggedOutValueKey;
 
-	// The tick from the node whose tangent is being dragged
+	//! The tick from the node whose tangent is being dragged
 	int m_draggedTangentTick;
-	// Whether the tangent being dragged is the InTangent or OutTangent
+
+	//! Whether the tangent being dragged is the InTangent or OutTangent
 	bool m_draggedOutTangent;
 
 	EditMode m_editMode;
@@ -344,12 +353,9 @@ protected slots:
 private slots:
 	void updateWindowTitle();
 	void setProgressionType(int progType);
-	/**
-	 * @brief The Edit Tangent edit mode should only be available for
-	 * Cubic Hermite progressions, so this method is responsible for disabling it
-	 * for other edit modes and reenabling it when it changes back to the Edit Tangent
-	 * mode.
-	 */
+
+	//! The Edit Tangent edit mode should only be available for Cubic Hermite progressions, so this method is responsible
+	//! for disabling it for other edit modes and reenabling it when it changes back to the Edit Tangent mode.
 	void updateEditTanButton();
 
 private:

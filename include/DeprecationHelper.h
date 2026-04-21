@@ -41,7 +41,7 @@ namespace lmms
 /**
  * @brief position is a backwards-compatible adapter for
  * QDropEvent::position and pos functions.
- * @param me
+ * @param de
  * @return the position of the drop event
  */
 inline QPoint position(const QDropEvent* de)

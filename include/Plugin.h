@@ -234,11 +234,15 @@ public:
 	// typedef a list so we can easily work with list of plugin descriptors
 	using DescriptorList = QList<Descriptor*>;
 
-	//! Constructor of a plugin
+	//! @brief Constructor of a plugin
 	//! @param key Sub plugins must pass a key here, optional otherwise.
-	//!   See the key() function
-	Plugin(const Descriptor * descriptor, Model * parent,
-		const Descriptor::SubPluginFeatures::Key *key = nullptr);
+	//! See the key() function
+	Plugin(
+		const Descriptor* descriptor,
+		Model* parent,
+		const Descriptor::SubPluginFeatures::Key* key = nullptr
+	);
+
 	~Plugin() override = default;
 
 	//! Return display-name out of sub plugin or descriptor
@@ -277,17 +281,21 @@ public:
 	virtual AutomatableModel* childModel( const QString & modelName );
 
 	//! Overload if the argument passed to the plugin is a subPluginKey
-	//! If you can not pass the key and are aware that it's stored in
-	//! Engine::pickDndPluginKey(), use this function, too
-	static Plugin * instantiateWithKey(const QString& pluginName, Model * parent,
-					const Descriptor::SubPluginFeatures::Key *key,
-					bool keyFromDnd = false);
+	//! If you can not pass the key and are aware that it's stored in Engine::pickDndPluginKey(), use this function, too
+	static Plugin* instantiateWithKey(
+		const QString& pluginName,
+		Model* parent,
+		const Descriptor::SubPluginFeatures::Key* key,
+		bool keyFromDnd = false
+	);
 
-	//! Return an instance of a plugin whose name matches to given one
-	//! if specified plugin couldn't be loaded, it creates a dummy-plugin
-	//! @param data Anything the plugin expects. If this is a pointer to a sub plugin key,
-	//!   use instantiateWithKey instead
-	static Plugin * instantiate(const QString& pluginName, Model * parent, void *data);
+	//! Return an instance of a plugin whose name matches to given one.
+	//!
+	//! If specified plugin couldn't be loaded, it creates a dummy-plugin.
+	//!
+	//! @param pluginName The name of the desired plugin to search for
+	//! @param data Anything the plugin expects. If this is a pointer to a sub plugin key, use instantiateWithKey instead
+	static Plugin* instantiate(const QString& pluginName, Model* parent, void* data);
 
 	//! Create a view for the model
 	gui::PluginView * createView( QWidget * parent );

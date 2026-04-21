@@ -57,6 +57,7 @@ public:
 	static void sigintHandler(int);
 	static bool isWayland();
 #ifdef LMMS_BUILD_WIN32
+	//! @brief Returns the Windows System font.
 	static QFont getWin32SystemFont();
 #endif
 

@@ -64,14 +64,10 @@ public:
 		Favorites
 	};
 
-	/**
-			Create a file browser side bar widget
-			@param directories '*'-separated list of directories to search for.
-				If a directory of factory files should be in the list it
-				must be the last one (for the factory files delimiter to work)
-			@param filter Filter as used in QDir::match
-			@param recurse *to be documented*
-		*/
+	//! @brief Create a file browser side bar widget
+	//! @param directories '*'-separated list of directories to search for. If a directory of factory files should be in
+	//! the list it must be the last one (for the factory files delimiter to work)
+	//! @param filter Filter as used in QDir::match
 	FileBrowser(Type type, const QString& directories, const QString& filter, const QString& title, const QPixmap& pm,
 		QWidget* parent, bool dirs_as_items = false, const QString& userDir = "", const QString& factoryDir = "");
 

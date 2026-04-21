@@ -237,6 +237,8 @@ public:
 	
 	void replaceInstrument(DataFile dataFile);
 
+	//! @brief Automatically assign a midi controller to this track, based on the midiautoassign setting
+	//! @param assign Set to true to connect the midi device, set to false to disconnect
 	void autoAssignMidiDevice( bool );
 
 signals:

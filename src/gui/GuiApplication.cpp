@@ -303,9 +303,6 @@ void GuiApplication::sigintOccurred()
 }
 
 #ifdef LMMS_BUILD_WIN32
-/*!
- * @brief Returns the Windows System font.
- */
 QFont GuiApplication::getWin32SystemFont()
 {
 	auto metrics = NONCLIENTMETRICSW{ .cbSize = sizeof(NONCLIENTMETRICSW) };

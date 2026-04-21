@@ -255,19 +255,22 @@ public:
 	//! @return number of other models linked to this
 	size_t countLinks() const;
 
-	/**
-	 * @brief Saves settings (value, automation links and controller connections) of AutomatableModel into
-	 *  specified DOM element using <name> as attribute/node name
-	 * @param doc TODO
-	 * @param element Where this option shall be saved.
-	 *  Depending on the model, this can be done in an attribute or in a subnode.
-	 * @param name Name to store this model as.
-	 */
-	virtual void saveSettings( QDomDocument& doc, QDomElement& element, const QString& name );
+	//! @brief Saves settings of AutomatableModel into a DOM element
+	//!
+	//! Saves settings (value, automation links and controller connections) of AutomatableModel into DOM element
+	//! @p element using @p name as attribute/node name.
+	//! 
+	//! @param doc TODO
+	//! @param element Where this option shall be saved. Depending on the model, this can be done in an attribute or in a
+	//! subnode.
+	//! @param name Name to store this model as.
+	virtual void saveSettings(QDomDocument& doc, QDomElement& element, const QString& name);
 
-	/*! \brief Loads settings (value, automation links and controller connections) of AutomatableModel from
-				specified DOM element using <name> as attribute/node name */
-	virtual void loadSettings( const QDomElement& element, const QString& name );
+	//! @brief Loads settings of AutomatableModel from a DOM element
+	//!
+	//! Loads settings (value, automation links and controller connections) of AutomatableModel from DOM element
+	//! @p element using @p name as attribute/node name.
+	virtual void loadSettings(const QDomElement& element, const QString& name);
 
 	QString nodeName() const override
 	{
@@ -374,16 +377,17 @@ private:
 	//! @return the model whose `m_nextLink` is `this`,
 	//! or `this` if there are no linked models
 	AutomatableModel* getLastLinkedModel() const;
+
 	//! @return true if the `model` is in the linked list
 	bool isLinkedToModel(AutomatableModel* model) const;
 	
-	//! @brief Scales @value from linear to logarithmic.
-	//! Value should be within [0,1]
-	template<class T> T logToLinearScale( T value ) const;
+	//! @brief Scales @p value from linear to logarithmic.
+	//! @param value A linear value. Should be within [0,1].
+	template<class T> T logToLinearScale(T value) const;
 
 	//! rounds @a value to @a where if it is close to it
 	//! @param value will be modified to rounded value
-	template<class T> void roundAt( T &value, const T &where ) const;
+	template<class T> void roundAt(T &value, const T &where) const;
 
 
 	ScaleType m_scaleType; //!< scale type, linear by default

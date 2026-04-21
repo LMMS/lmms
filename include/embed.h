@@ -40,24 +40,22 @@ namespace lmms {
 
 namespace embed {
 
-/**
- * Return an image for the icon pixmap cache.
- *
- * @param name Identifier for the pixmap. If it is not in the icon pixmap
- *   cache, it will be loaded from the artwork QDir search paths (exceptions are
- *   compiled-in XPMs, you need to provide @p xpm for loading them).
- * @param xpm Must be XPM data if the source should be raw XPM data instead of
- *   a file
- */
-auto LMMS_EXPORT getIconPixmap(std::string_view name,
-	int width = -1, int height = -1, const char* const* xpm = nullptr) -> QPixmap;
+//! @brief Return an image for the icon pixmap cache.
+//! @param name Identifier for the pixmap. If it is not in the icon pixmap cache, it will be loaded from the artwork
+//! QDir search paths (exceptions are compiled-in XPMs, you need to provide @p xpm for loading them).
+//! @param xpm Must be XPM data if the source should be raw XPM data instead of a file
+auto LMMS_EXPORT getIconPixmap(
+	std::string_view name,
+	int width = -1,
+	int height = -1,
+	const char* const* xpm = nullptr
+) -> QPixmap;
+
 auto LMMS_EXPORT getText(std::string_view name) -> QString;
 
-/**
- * @brief Temporary shim for QPixmap::deviceIndependentSize.
- * @param pixmap The pixmap to get the size of.
- * @return The device-independent size of the pixmap.
- */
+//! @brief Temporary shim for QPixmap::deviceIndependentSize.
+//! @param pixmap The pixmap to get the size of.
+//! @return The device-independent size of the pixmap.
 inline auto logicalSize(const QPixmap& pixmap) noexcept
 {
 #if QT_VERSION >= QT_VERSION_CHECK(6, 2, 0)

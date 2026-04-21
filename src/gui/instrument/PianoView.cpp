@@ -60,8 +60,7 @@ namespace lmms::gui
 {
 
 
-/*! The scale of C Major - white keys only.
- */
+//! @brief The scale of C Major - white keys only.
 auto WhiteKeys = std::array
 {
 	Key::C, Key::D, Key::E, Key::F, Key::G, Key::A, Key::H
@@ -77,18 +76,10 @@ const int LABEL_TEXT_SIZE = 8;      /*!< The height of the key label text */
 
 
 
-/*! \brief Create a new keyboard display view
- *
- *  \param _parent the parent instrument plugin window
- *  \todo are the descriptions of the m_startkey and m_lastkey properties correct?
- */
-PianoView::PianoView(QWidget *parent) :
-	QWidget(parent),                 /*!< Our parent */
-	ModelView(nullptr, this),        /*!< Our view Model */
-	m_piano(nullptr),                /*!< Our piano Model */
-	m_startKey(Octave::Octave_3 + Key::C), /*!< The first key displayed? */
-	m_lastKey(-1),                   /*!< The last key displayed? */
-	m_movedNoteModel(nullptr)        /*!< Key marker which is being moved */
+PianoView::PianoView(QWidget *parent)
+	: QWidget(parent)
+	, ModelView(nullptr, this)
+	, m_startKey{Octave::Octave_3 + Key::C}
 {
 	setFocusPolicy(Qt::StrongFocus);
 
@@ -258,18 +249,12 @@ static int getKeyOffsetFromKeyEvent( QKeyEvent * _ke )
 	return -100;
 }
 
-/*! \brief Map a keyboard key being pressed to a note in our keyboard view
- *
- */
 int PianoView::getKeyFromKeyEvent( QKeyEvent * ke )
 {
 	const auto key = static_cast<Key>(getKeyOffsetFromKeyEvent(ke));
 	return DefaultOctave + key - KeysPerOctave;
 }
 
-/*! \brief Register a change to this piano display view
- *
- */
 void PianoView::modelChanged()
 {
 	m_piano = castModel<Piano>();
@@ -287,11 +272,6 @@ void PianoView::modelChanged()
 
 
 
-// Gets the key from the given mouse position
-/*! \brief Get the key from the mouse position in the piano display
- *
- *  \param p The point that the mouse was pressed.
- */
 int PianoView::getKeyFromMouse(const QPoint& p) const
 {
 	// The left-most key visible in the piano display is always white
@@ -351,13 +331,6 @@ int PianoView::getKeyFromMouse(const QPoint& p) const
 
 
 
-// handler for scrolling-event
-/*! \brief Handle the scrolling on the piano display view
- *
- *  We need to update our start key position based on the new position.
- *
- *  \param newPos the new key position, counting only white keys.
- */
 void PianoView::pianoScrolled(int newPos)
 {
 	m_startKey = static_cast<Octave>(newPos / Piano::WhiteKeysPerOctave)
@@ -369,11 +342,6 @@ void PianoView::pianoScrolled(int newPos)
 
 
 
-/*! \brief Handle a context menu selection on the piano display view
- *
- *  \param me the ContextMenuEvent to handle.
- *  \todo Is this right, or does this create the context menu?
- */
 void PianoView::contextMenuEvent(QContextMenuEvent *me)
 {
 	if (me->pos().y() > PIANO_BASE || m_piano == nullptr ||
@@ -396,24 +364,6 @@ void PianoView::contextMenuEvent(QContextMenuEvent *me)
 
 
 
-// handler for mouse-click-event
-/*! \brief Handle a mouse click on this piano display view
- *
- *  We first determine the key number using the getKeyFromMouse() method.
- *
- *  If we're below the 'root key selection' area,
- *  we set the volume of the note to be proportional to the vertical
- *  position on the keyboard - lower down the key is louder, within the
- *  boundaries of the (white or black) key pressed.  We then tell the
- *  instrument to play that note, scaling for MIDI max loudness = 127.
- *
- *  If we're in the 'root key selection' area, of course, we set the
- *  root key to be that key.
- *
- *  We finally update ourselves to show the key press
- *
- *  \param me the mouse click to handle.
- */
 void PianoView::mousePressEvent(QMouseEvent *me)
 {
 	if (me->button() == Qt::LeftButton && m_piano != nullptr)
@@ -472,14 +422,6 @@ void PianoView::mousePressEvent(QMouseEvent *me)
 
 
 
-// handler for mouse-release-event
-/*! \brief Handle a mouse release event on the piano display view
- *
- *  If a key was pressed by the in the mousePressEvent() function, we
- *  turn the note off.
- *
- *  \param _me the mousePressEvent to handle.
- */
 void PianoView::mouseReleaseEvent( QMouseEvent * )
 {
 	if( m_lastKey != -1 )
@@ -501,20 +443,6 @@ void PianoView::mouseReleaseEvent( QMouseEvent * )
 
 
 
-// handler for mouse-move-event
-/*! \brief Handle a mouse move event on the piano display view
- *
- *  This handles the user dragging the mouse across the keys.  It uses
- *  code from mousePressEvent() and mouseReleaseEvent(), also correcting
- *  for if the mouse movement has stayed within one key and if the mouse
- *  has moved outside the vertical area of the keyboard (which is still
- *  allowed but won't make the volume go up to 11).
- *
- *  \param _me the ContextMenuEvent to handle.
- *  \todo Paul Wayper thinks that this code should be refactored to
- *  reduce or remove the duplication between this, the mousePressEvent()
- *  and mouseReleaseEvent() methods.
- */
 void PianoView::mouseMoveEvent( QMouseEvent * _me )
 {
 	if( m_piano == nullptr )
@@ -581,14 +509,6 @@ void PianoView::mouseMoveEvent( QMouseEvent * _me )
 
 
 
-/*! \brief Handle a key press event on the piano display view
- *
- *  We determine our key number from the getKeyFromKeyEvent() method,
- *  and pass the event on to the piano's handleKeyPress() method if
- *  auto-repeat is off.
- *
- *  \param _ke the KeyEvent to handle.
- */
 void PianoView::keyPressEvent( QKeyEvent * _ke )
 {
 	const int key_num = getKeyFromKeyEvent( _ke );
@@ -611,12 +531,6 @@ void PianoView::keyPressEvent( QKeyEvent * _ke )
 
 
 
-/*! \brief Handle a key release event on the piano display view
- *
- *  The same logic as the keyPressEvent() method.
- *
- *  \param _ke the KeyEvent to handle.
- */
 void PianoView::keyReleaseEvent( QKeyEvent * _ke )
 {
 	const int key_num = getKeyFromKeyEvent( _ke );
@@ -638,12 +552,6 @@ void PianoView::keyReleaseEvent( QKeyEvent * _ke )
 
 
 
-/*! \brief Handle the focus leaving the piano display view
- *
- *  Turn off all notes if we lose focus.
- *
- *  \todo Is there supposed to be a parameter given here?
- */
 void PianoView::focusOutEvent( QFocusEvent * )
 {
 	if( m_piano == nullptr )
@@ -686,13 +594,6 @@ void PianoView::focusInEvent( QFocusEvent * )
 
 
 
-/*! \brief update scrollbar range after resize
- *
- *  After resizing we need to adjust range of scrollbar for not allowing
- *  to scroll too far to the right.
- *
- *  \param event resize-event object (unused)
- */
 void PianoView::resizeEvent(QResizeEvent* event)
 {
 	QWidget::resizeEvent(event);
@@ -703,32 +604,19 @@ void PianoView::resizeEvent(QResizeEvent* event)
 
 
 
-/*! \brief Convert a key number to an X coordinate in the piano display view
- *
- *  We can immediately discard the trivial case of when the key number is
- *  less than our starting key.  We then iterate through the keys from the
- *  start key to this key, adding the width of each key as we go.  For
- *  black keys, and the first white key if there is no black key between
- *  two white keys, we add half a white key width; for that second white
- *  key, we add a whole width.  That takes us to the boundary of a white
- *  key - subtract half a width to get to the middle.
- *
- *  \param _key_num the keyboard key to translate
- *  \todo is this description of what the method does correct?
- *  \todo replace the final subtract with initialising x to width/2.
- */
-int PianoView::getKeyX( int _key_num ) const
+//! @todo Replace the final subtract with initialising x to width/2.
+int PianoView::getKeyX(int key_num) const
 {
 	int k = m_startKey;
-	if( _key_num < m_startKey )
+	if (key_num < m_startKey)
 	{
-		return ( _key_num - k ) * PW_WHITE_KEY_WIDTH / 2;
+		return (key_num - k) * PW_WHITE_KEY_WIDTH / 2;
 	}
 
 	int x = 0;
 	int white_cnt = 0;
 
-	while( k <= _key_num )
+	while (k <= key_num)
 	{
 		if( Piano::isWhiteKey( k ) )
 		{
@@ -757,23 +645,17 @@ int PianoView::getKeyX( int _key_num ) const
 }
 
 
-/*! \brief Return the width of a given key
- */
 int PianoView::getKeyWidth(int key_num) const
 {
 	return Piano::isWhiteKey(key_num) ? PW_WHITE_KEY_WIDTH : PW_BLACK_KEY_WIDTH;
 }
 
-/*! \brief Return the height of a given key
- */
 int PianoView::getKeyHeight(int key_num) const
 {
 	return Piano::isWhiteKey(key_num) ? PW_WHITE_KEY_HEIGHT : PW_BLACK_KEY_HEIGHT;
 }
 
 
-/*! \brief Return model and title of the marker closest to the given key
- */
 IntModel* PianoView::getNearestMarker(int key, QString* title)
 {
 	const int base = m_piano->instrumentTrack()->baseNote();
@@ -798,13 +680,6 @@ IntModel* PianoView::getNearestMarker(int key, QString* title)
 }
 
 
-/*! \brief Paint the piano display view in response to an event
- *
- *  This method draws the piano and the 'root note' base.  It draws
- *  the base first, then all the white keys, then all the black keys.
- *
- *  \todo Is there supposed to be a parameter given here?
- */
 void PianoView::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );

@@ -46,8 +46,15 @@ public:
 		Black
 	} ;
 
+	//! @brief Create a new keyboard display
+	//!
+	//! @param track The InstrumentTrack window to attach to
 	Piano(InstrumentTrack* track);
 
+	//! @brief Turn a key on or off
+	//!
+	//! @param key the key number to change
+	//! @param state the state to set the key to
 	void setKeyState(int key, bool state);
 
 	bool isKeyPressed(int key) const
@@ -55,7 +62,14 @@ public:
 		return m_pressedKeys[key];
 	}
 
+	//! @brief Handle a note being pressed on our keyboard display
+	//!
+	//! @param key the key being pressed
 	void handleKeyPress(int key, int midiVelocity = -1);
+
+	//! @brief Handle a note being released on our keyboard display
+	//!
+	//! @param key the key being releassed
 	void handleKeyRelease(int key);
 
 	InstrumentTrack* instrumentTrack() const

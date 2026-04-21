@@ -56,14 +56,14 @@ public:
 		Bar, //!< draw thick bars
 	};
 
-	/**
-	 * @brief Constructor
-	 * @param _width Pixel width of widget
-	 * @param _height Pixel height of widget
-	 */
-	Graph( QWidget * _parent, Style _style = Style::Linear,
-		int _width = 132,
-		int _height = 104
+	//! @brief Constructor
+	//! @param width Pixel width of widget
+	//! @param height Pixel height of widget
+	Graph(
+		QWidget* parent,
+		Style style = Style::Linear,
+		int width = 132,
+		int height = 104
 	);
 	~Graph() override = default;
 
@@ -139,6 +139,8 @@ public:
 	 * @param _min Minimum y value to display
 	 * @param _max Maximum y value to display
 	 * @param _size Number of samples (e.g. x value)
+	 * @param _parent
+	 * @param _default_constructed
 	 * @param _step Step size on y axis where values snap to, or 0.0f
 	 *   for "no snapping"
 	 */

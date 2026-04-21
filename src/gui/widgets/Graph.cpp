@@ -37,27 +37,23 @@ namespace lmms
 namespace gui
 {
 
-Graph::Graph( QWidget * _parent, Style _style, int _width,
-		int _height ) :
-	QWidget( _parent ),
+Graph::Graph(QWidget* parent, Style style, int width, int height)
+	: QWidget(parent)
 	/* TODO: size, background? */
-	ModelView( new graphModel( -1.0, 1.0, 128, nullptr, true ), this ),
-	m_graphStyle( _style )
+	, ModelView(new graphModel(-1.0, 1.0, 128, nullptr, true), this)
+	, m_graphStyle(style)
 {
 	m_mouseDown = false;
-	m_graphColor = QColor( 0xFF, 0xAA, 0x00 );
+	m_graphColor = QColor(0xFF, 0xAA, 0x00);
 
-	resize( _width, _height );
-	setAcceptDrops( true );
-	setCursor( Qt::CrossCursor );
+	resize(width, height);
+	setAcceptDrops(true);
+	setCursor(Qt::CrossCursor);
 
 	auto gModel = castModel<graphModel>();
 
-	QObject::connect( gModel, SIGNAL(samplesChanged(int,int)),
-			this, SLOT(updateGraph(int,int)));
-
-	QObject::connect( gModel, SIGNAL(lengthChanged()),
-			this, SLOT(updateGraph()));
+	QObject::connect(gModel, SIGNAL(samplesChanged(int,int)), this, SLOT(updateGraph(int,int)));
+	QObject::connect(gModel, SIGNAL(lengthChanged()), this, SLOT(updateGraph()));
 }
 
 void Graph::setForeground( const QPixmap &_pixmap )

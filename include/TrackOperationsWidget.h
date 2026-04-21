@@ -36,25 +36,50 @@ class AutomatableButton;
 class TrackGrip;
 class TrackView;
 
+//! @brief The grip and the mute/solo buttons of a track.
 class TrackOperationsWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	TrackOperationsWidget( TrackView * parent );
+
+	//! @brief Create a new TrackOperationsWidget
+	//! @param parent The TrackView to contain this widget
+	TrackOperationsWidget(TrackView* parent);
+
 	~TrackOperationsWidget() override = default;
 
 	TrackGrip* getTrackGrip() const { return m_trackGrip; }
 
 protected:
+	//! @brief Respond to trackOperationsWidget mouse events
+	//!
+	//! If it's the left mouse button, and Ctrl is held down, and we're not a Pattern Editor track, then start a new
+	//! drag event to copy this track. Otherwise, ignore all other events.
+	//!
+	//! @param me The mouse event to respond to.
 	void mousePressEvent( QMouseEvent * me ) override;
-	void paintEvent( QPaintEvent * pe ) override;
+
+	//! @brief Repaint the trackOperationsWidget
+	//!
+	//! Only things that's done for now is to paint the background with the brush of the window from the palette.
+	void paintEvent(QPaintEvent* pe) override;
+
+	//! @brief Show a message box warning the user that this track is about to be closed
 	bool confirmRemoval();
 
 
 private slots:
-	void cloneTrack();
-	void removeTrack();
+	void cloneTrack(); //!< @brief Clone this track
+	void removeTrack(); //!< @brief Remove this track from the track list
+
+	//! @brief Update the trackOperationsWidget context menu
+	//!
+	//! For all track types, we have the Clone and Remove options.
+	//! For instrument-tracks we also offer the MIDI-control-menu
+	//! For automation tracks, extra options: turn on/off recording on all Clips (same should be added for sample tracks
+	//! when sampletrack recording is implemented)
 	void updateMenu();
+
 	void selectTrackColor();
 	void randomizeTrackColor();
 	void resetTrackColor();
@@ -62,7 +87,7 @@ private slots:
 	void toggleRecording(bool on);
 	void recordingOn();
 	void recordingOff();
-	void clearTrack();
+	void clearTrack(); //!< @brief Clears all Clips from the track
 
 private:
 	TrackView * m_trackView;

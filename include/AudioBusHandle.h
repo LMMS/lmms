@@ -46,7 +46,7 @@ class BoolModel;
 	A @ref ThreadableJob class located at the exit point of each @ref PlayHandle into a @ref MixerChannel
 	(or into an audio device, in case of @ref AudioJack, but this is not supported in AudioBusHandle yet).
 	It contains an optional @ref EffectChain which is e.g. visualized in the
-	@ref InstrumentTrackWindow or @ref SampleTrackWindow.
+	@ref gui::InstrumentTrackWindow or @ref gui::SampleTrackWindow.
 	For processing, it adds all input play handles into an internal buffer,
 	processes the @ref EffectChain (if existing) on that buffer
 	and finally merges the buffer into its @ref MixerChannel.

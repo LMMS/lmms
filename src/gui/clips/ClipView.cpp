@@ -56,27 +56,17 @@ namespace lmms::gui
 {
 
 
-/*! The width of the resize grip in pixels
- */
+//! @brief The width of the resize grip in pixels
 const int RESIZE_GRIP_WIDTH = 8;
 
 
-/*! A pointer for that text bubble used when moving segments, etc.
- *
- * In a number of situations, LMMS displays a floating text bubble
- * beside the cursor as you move or resize elements of a track about.
- * This pointer keeps track of it, as you only ever need one at a time.
- */
-TextFloat * ClipView::s_textFloat = nullptr;
+//! @brief A pointer for that text bubble used when moving segments, etc.
+//!
+//! In a number of situations, LMMS displays a floating text bubble beside the cursor as you move or resize elements
+//! of a track about. This pointer keeps track of it, as you only ever need one at a time.
+TextFloat* ClipView::s_textFloat = nullptr;
 
 
-/*! \brief Create a new ClipView
- *
- *  Creates a new clip view for the given clip in the given track view.
- *
- * \param _clip The clip to be displayed
- * \param _tv  The track view that will contain the new object
- */
 ClipView::ClipView( Clip * clip,
 							TrackView * tv ) :
 	selectableObject( tv->getTrackContentWidget() ),
@@ -139,11 +129,6 @@ ClipView::ClipView( Clip * clip,
 
 
 
-/*! \brief Destroy a ClipView
- *
- *  Destroys the given ClipView.
- *
- */
 ClipView::~ClipView()
 {
 	delete m_hint;
@@ -155,13 +140,6 @@ ClipView::~ClipView()
 }
 
 
-/*! \brief Update a ClipView
- *
- *  Clip's get drawn only when needed,
- *  and when a Clip is updated,
- *  it needs to be redrawn.
- *
- */
 void ClipView::update()
 {
 	if( fixedClips() )
@@ -174,13 +152,6 @@ void ClipView::update()
 
 
 
-/*! \brief Does this ClipView have a fixed Clip?
- *
- *  Returns whether the containing trackView has fixed
- *  Clips.
- *
- * \todo In what circumstance are they fixed?
- */
 bool ClipView::fixedClips()
 {
 	return m_trackView->trackContainerView()->fixedClips();
@@ -188,80 +159,7 @@ bool ClipView::fixedClips()
 
 
 
-// qproperty access functions, to be inherited & used by Clipviews
-//! \brief CSS theming qproperty access method
-QColor ClipView::mutedColor() const
-{ return m_mutedColor; }
 
-QColor ClipView::mutedBackgroundColor() const
-{ return m_mutedBackgroundColor; }
-
-QColor ClipView::selectedColor() const
-{ return m_selectedColor; }
-
-QColor ClipView::textColor() const
-{ return m_textColor; }
-
-QColor ClipView::textBackgroundColor() const
-{
-	return m_textBackgroundColor;
-}
-
-QColor ClipView::textShadowColor() const
-{ return m_textShadowColor; }
-
-QColor ClipView::patternClipBackground() const
-{ return m_patternClipBackground; }
-
-bool ClipView::gradient() const
-{ return m_gradient; }
-
-QColor ClipView::markerColor() const
-{ return m_markerColor; }
-
-//! \brief CSS theming qproperty access method
-void ClipView::setMutedColor( const QColor & c )
-{ m_mutedColor = QColor( c ); }
-
-void ClipView::setMutedBackgroundColor( const QColor & c )
-{ m_mutedBackgroundColor = QColor( c ); }
-
-void ClipView::setSelectedColor( const QColor & c )
-{ m_selectedColor = QColor( c ); }
-
-void ClipView::setTextColor( const QColor & c )
-{ m_textColor = QColor( c ); }
-
-void ClipView::setTextBackgroundColor( const QColor & c )
-{
-	m_textBackgroundColor = c;
-}
-
-void ClipView::setTextShadowColor( const QColor & c )
-{ m_textShadowColor = QColor( c ); }
-
-void ClipView::setPatternClipBackground( const QColor & c )
-{ m_patternClipBackground = QColor( c ); }
-
-void ClipView::setGradient( const bool & b )
-{ m_gradient = b; }
-
-void ClipView::setMarkerColor(const QColor & c)
-{ m_markerColor = QColor(c); }
-
-// access needsUpdate member variable
-bool ClipView::needsUpdate()
-{ return m_needsUpdate; }
-void ClipView::setNeedsUpdate( bool b )
-{ m_needsUpdate = b; }
-
-/*! \brief Close a ClipView
- *
- *  Closes a ClipView by asking the track
- *  view to remove us and then asking the QWidget to close us.
- *
- * \return Boolean state of whether the QWidget was able to close.
- */
 bool ClipView::close()
 {
 	m_trackView->getTrackContentWidget()->removeClipView( this );
@@ -271,13 +169,6 @@ bool ClipView::close()
 
 
 
-/*! \brief Removes a ClipView from its track view.
- *
- *  Like the close() method, this asks the track view to remove this
- *  ClipView.  However, the clip is
- *  scheduled for later deletion rather than closed immediately.
- *
- */
 void ClipView::remove()
 {
 	m_trackView->getTrack()->addJournalCheckPoint();
@@ -303,13 +194,6 @@ void ClipView::remove()
 
 
 
-/*! \brief Updates a ClipView's length
- *
- *  If this ClipView has a fixed Clip, then we must
- *  keep the width of our parent.  Otherwise, calculate our width from
- *  the clip's length in pixels adding in the border.
- *
- */
 void ClipView::updateLength()
 {
 	if( fixedClips() )
@@ -328,13 +212,6 @@ void ClipView::updateLength()
 
 
 
-/*! \brief Updates a ClipView's position.
- *
- *  Ask our track view to change our position.  Then make sure that the
- *  track view is updated in case this position has changed the track
- *  view's length.
- *
- */
 void ClipView::updatePosition()
 {
 	m_trackView->getTrackContentWidget()->changePosition();
@@ -362,10 +239,6 @@ void ClipView::resetColor()
 	setColor(std::nullopt);
 }
 
-/*! \brief Change color of all selected clips
- *
- *  \param color The new color.
- */
 void ClipView::setColor(const std::optional<QColor>& color)
 {
 	std::set<Track*> journaledTracks;
@@ -397,14 +270,6 @@ void ClipView::setColor(const std::optional<QColor>& color)
 	Engine::getSong()->setModified();
 }
 
-/*! \brief Change the ClipView's display when something
- *  being dragged enters it.
- *
- *  We need to notify Qt to change our display if something being
- *  dragged has entered our 'airspace'.
- *
- * \param dee The QDragEnterEvent to watch.
- */
 void ClipView::dragEnterEvent( QDragEnterEvent * dee )
 {
 	TrackContentWidget * tcw = getTrackView()->getTrackContentWidget();
@@ -424,15 +289,6 @@ void ClipView::dragEnterEvent( QDragEnterEvent * dee )
 
 
 
-/*! \brief Handle something being dropped on this ClipObjectView.
- *
- *  When something has been dropped on this ClipView, and
- *  it's a clip, then use an instance of our dataFile reader
- *  to take the xml of the clip and turn it into something
- *  we can write over our current state.
- *
- * \param de The QDropEvent to handle.
- */
 void ClipView::dropEvent( QDropEvent * de )
 {
 	QString type = StringPairDrag::decodeKey( de );
@@ -478,10 +334,6 @@ void ClipView::dropEvent( QDropEvent * de )
 
 
 
-/* @brief Chooses the correct cursor to be displayed on the widget
- *
- * @param me The QMouseEvent that is triggering the cursor change
- */
 void ClipView::updateCursor(QMouseEvent * me)
 {
 	const auto posX = position(me).x();
@@ -504,15 +356,6 @@ void ClipView::updateCursor(QMouseEvent * me)
 
 
 
-/*! \brief Create a DataFile suitable for copying multiple clips.
- *
- *	Clips in the vector are written to the "clips" node in the
- *  DataFile.  The ClipView's initial mouse position is written
- *  to the "initialMouseX" node in the DataFile.  When dropped on a track,
- *  this is used to create copies of the Clips.
- *
- * \param clips The trackContectObjects to save in a DataFile
- */
 DataFile ClipView::createClipDataFiles(
     				const QVector<ClipView *> & clipViews) const
 {
@@ -593,21 +436,6 @@ void ClipView::paintTextLabel(QString const & text, QPainter & painter)
 	painter.drawText( textLeft, finalTextTop, elidedClipName );
 }
 
-/*! \brief Handle a mouse press on this ClipView.
- *
- *  Handles the various ways in which a ClipView can be
- *  used with a click of a mouse button.
- *
- *  * If our container supports rubber band selection then handle
- *    selection events.
- *  * or if shift-left button, add this object to the selection
- *  * or if ctrl-left button, start a drag-copy event
- *  * or if just plain left button, resize if we're resizeable
- *  * or if ctrl-middle button, mute the clip
- *  * or if middle button, maybe delete the clip.
- *
- * \param me The QMouseEvent to handle.
- */
 void ClipView::mousePressEvent( QMouseEvent * me )
 {
 	const auto pos = position(me);
@@ -766,19 +594,6 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 
 
 
-/*! \brief Handle a mouse movement (drag) on this ClipView.
- *
- *  Handles the various ways in which a ClipView can be
- *  used with a mouse drag.
- *
- *  * If in move mode, move ourselves in the track,
- *  * or if in move-selection mode, move the entire selection,
- *  * or if in resize mode, resize ourselves,
- *  * otherwise ???
- *
- * \param me The QMouseEvent to handle.
- * \todo what does the final else case do here?
- */
 void ClipView::mouseMoveEvent( QMouseEvent * me )
 {
 	if( m_action == Action::CopySelection || m_action == Action::ToggleSelected )
@@ -1001,13 +816,6 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 
 
 
-/*! \brief Handle a mouse release on this ClipView.
- *
- *  If we're in move or resize mode, journal the change as appropriate.
- *  Then tidy up.
- *
- * \param me The QMouseEvent to handle.
- */
 void ClipView::mouseReleaseEvent( QMouseEvent * me )
 {
 	// If the Action::CopySelection was chosen as the action due to mouse movement,
@@ -1050,13 +858,6 @@ void ClipView::mouseReleaseEvent( QMouseEvent * me )
 
 
 
-/*! \brief Set up the context menu for this ClipView.
- *
- *  Set up the various context menu events that can apply to a
- *  ClipView.
- *
- * \param cme The QContextMenuEvent to add the actions to.
- */
 void ClipView::contextMenuEvent( QContextMenuEvent * cme )
 {
 	QVector<ClipView*> selectedClips = getClickedClips();
@@ -1251,17 +1052,12 @@ void ClipView::toggleSelectedAutoResize()
 	}
 }
 
-/*! \brief How many pixels a bar takes for this ClipView.
- *
- * \return the number of pixels per bar.
- */
 float ClipView::pixelsPerBar()
 {
 	return m_trackView->trackContainerView()->pixelsPerBar();
 }
 
 
-/*! \brief Save the offsets between all selected tracks and a clicked track */
 void ClipView::setInitialOffsets()
 {
 	QVector<selectableObject *> so = m_trackView->trackContainerView()->selectedObjects();
@@ -1282,11 +1078,6 @@ void ClipView::setInitialOffsets()
 
 
 
-/*! \brief Detect whether the mouse moved more than n pixels on screen.
- *
- * \param _me The QMouseEvent.
- * \param distance The threshold distance that the mouse has moved to return true.
- */
 bool ClipView::mouseMovedDistance( QMouseEvent * me, int distance )
 {
 	QPoint dPos = mapToGlobal(position(me)) - m_initialMouseGlobalPos;
@@ -1305,11 +1096,6 @@ bool ClipView::unquantizedModHeld( QMouseEvent * me )
 
 
 
-/*! \brief Calculate the new position of a dragged Clip from a mouse event
- *
- *
- * \param me The QMouseEvent
- */
 TimePos ClipView::draggedClipPos( QMouseEvent * me )
 {
 	//Pixels per bar

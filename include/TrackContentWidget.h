@@ -64,11 +64,30 @@ class TrackContentWidget : public QWidget, public JournallingObject
 	Q_PROPERTY(int embossOffset READ embossOffset WRITE setEmbossOffset)
 
 public:
-	TrackContentWidget( TrackView * parent );
+	//! @brief Create a new trackContentWidget
+	//!
+	//! Creates a new track content widget for the given track.
+	//! The content widget comprises the 'grip bar' and the 'tools' button for the track's context menu.
+	//!
+	//! @param parent The parent track.
+	TrackContentWidget(TrackView* parent);
+
 	~TrackContentWidget() override = default;
 
-	void addClipView( ClipView * clipv );
-	void removeClipView( ClipView * clipv );
+	//! @brief Adds a ClipView to this widget.
+	//!
+	//! Adds a(nother) ClipView to our list of views. We also check that our position is up-to-date.
+	//!
+	//! @param clipv The ClipView to add.
+	void addClipView(ClipView* clipv);
+
+	//! @brief Removes the given ClipView from this widget.
+	//!
+	//! Removes the given ClipView from our list of views.
+	//!
+	//! @param clipv The ClipView to remove.
+	void removeClipView(ClipView* clipv);
+
 	void removeClipView( int clipNum )
 	{
 		if( clipNum >= 0 && clipNum < m_clipViews.size() )
@@ -77,47 +96,64 @@ public:
 		}
 	}
 
-	bool canPasteSelection( TimePos clipPos, const QDropEvent *de );
-	bool canPasteSelection( TimePos clipPos, const QMimeData *md, bool allowSameBar = false );
-	bool pasteSelection( TimePos clipPos, QDropEvent * de );
+	//! @brief Returns whether a selection of Clips can be pasted into this
+	//! @param clipPos The position of the Clip slot being pasted on
+	//! @param de The DropEvent generated
+	bool canPasteSelection(TimePos clipPos, const QDropEvent* de);
+
+	//! @overload
+	//! Overloaded method to make it possible to call this method without a Drag&Drop event
+	bool canPasteSelection(TimePos clipPos, const QMimeData* md, bool allowSameBar = false);
+
+	//! @brief Pastes a selection of Clips onto the track
+	//! @param clipPos The position of the Clip slot being pasted on
+	//! @param de The DropEvent generated
+	bool pasteSelection(TimePos clipPos, QDropEvent* de);
+
+	//! @overload
+	//! Overloaded method to make it possible to call this method without a Drag&Drop event
 	bool pasteSelection( TimePos clipPos, const QMimeData * md, bool skipSafetyCheck = false );
 
-	TimePos endPosition( const TimePos & posStart );
+	//! @brief Return the end position of the trackContentWidget in Bars.
+	//! @param posStart The starting position of the Widget (from getPosition())
+	TimePos endPosition(const TimePos& posStart);
 
-	// qproperty access methods
+	QBrush darkerColor() const { return m_darkerColor; }
+	QBrush lighterColor() const { return m_lighterColor; }
+	QBrush coarseGridColor() const { return m_coarseGridColor; }
+	QBrush fineGridColor() const { return m_fineGridColor; }
+	QBrush horizontalColor() const { return m_horizontalColor; }
+	QBrush embossColor() const { return m_embossColor; }
+	int coarseGridWidth() const { return m_coarseGridWidth; }
+	int fineGridWidth() const { return m_fineGridWidth; }
+	int horizontalWidth() const { return m_horizontalWidth; }
+	int embossWidth() const { return m_embossWidth; }
+	int embossOffset() const { return m_embossOffset; }
 
-	QBrush darkerColor() const;
-	QBrush lighterColor() const;
-	QBrush coarseGridColor() const;
-	QBrush fineGridColor() const;
-	QBrush horizontalColor() const;
-	QBrush embossColor() const;
-
-	int coarseGridWidth() const;
-	int fineGridWidth() const;
-	int horizontalWidth() const;
-	int embossWidth() const;
-
-	int embossOffset() const;
-
-	void setDarkerColor(const QBrush & c);
-	void setLighterColor(const QBrush & c);
-	void setCoarseGridColor(const QBrush & c);
-	void setFineGridColor(const QBrush & c);
-	void setHorizontalColor(const QBrush & c);
-	void setEmbossColor(const QBrush & c);
-
-	void setCoarseGridWidth(int c);
-	void setFineGridWidth(int c);
-	void setHorizontalWidth(int c);
-	void setEmbossWidth(int c);
-
-	void setEmbossOffset(int c);
+	void setDarkerColor(const QBrush& c) { m_darkerColor = c; }
+	void setLighterColor(const QBrush& c) { m_lighterColor = c; }
+	void setCoarseGridColor(const QBrush& c) { m_coarseGridColor = c; }
+	void setFineGridColor(const QBrush& c) { m_fineGridColor = c; }
+	void setHorizontalColor(const QBrush& c) { m_horizontalColor = c; }
+	void setEmbossColor(const QBrush& c) { m_embossColor = c; }
+	void setCoarseGridWidth(int c) { m_coarseGridWidth = c; }
+	void setFineGridWidth(int c) { m_fineGridWidth = c; }
+	void setHorizontalWidth(int c) { m_horizontalWidth = c; }
+	void setEmbossWidth(int c) { m_embossWidth = c; }
+	void setEmbossOffset(int c) { m_embossOffset = c; }
 
 public slots:
+	//! @brief Update ourselves by updating all the ClipViews attached.
 	void update();
+
+	//! @brief Move the trackContentWidget to a new place in time
+	//!
+	//! Responsible for moving track-content-widgets to appropriate position after change of visible viewport
+	//!
+	//! @param newPos The MIDI time to move to.
 	void changePosition( const lmms::TimePos & newPos = TimePos( -1 ) );
-	/*! \brief Updates the background tile pixmap. */
+
+	//! @brief Updates the background tile pixmap.
 	void updateBackground();
 
 protected:
@@ -128,12 +164,28 @@ protected:
 
 	void contextMenuEvent( QContextMenuEvent * cme ) override;
 	void contextMenuAction( QContextMenuEvent * cme, ContextMenuAction action );
-	void dragEnterEvent( QDragEnterEvent * dee ) override;
-	void dropEvent( QDropEvent * de ) override;
-	void mousePressEvent( QMouseEvent * me ) override;
+
+	//! @brief Respond to a drag enter event on the trackContentWidget
+	//! @param dee the Drag Enter Event to respond to
+	void dragEnterEvent(QDragEnterEvent* dee) override;
+
+	//! @brief Respond to a drop event on the trackContentWidget
+	//! @param de The Drop Event to respond to
+	void dropEvent(QDropEvent* de) override;
+
+	//! @brief Respond to a mouse press on the trackContentWidget
+	//! @param me The mouse press event to respond to
+	void mousePressEvent(QMouseEvent* me) override;
+
 	void mouseReleaseEvent( QMouseEvent * me ) override;
-	void paintEvent( QPaintEvent * pe ) override;
-	void resizeEvent( QResizeEvent * re ) override;
+
+	//! @brief Repaint the trackContentWidget on command
+	//! @param pe The Paint Event to respond to
+	void paintEvent(QPaintEvent* pe) override;
+
+	//! @brief Updates the background tile pixmap on size changes.
+	//! @param resizeEvent The resize event to pass to base class
+	void resizeEvent(QResizeEvent* re) override;
 
 	QString nodeName() const override
 	{
@@ -153,8 +205,12 @@ protected:
 
 
 private:
-	Track * getTrack();
-	TimePos getPosition( int mouseX );
+	//! @brief Return the track shown by the trackContentWidget
+	Track* getTrack();
+
+	//! @brief Return the position of the trackContentWidget in bars.
+	//! @param mouseX The mouse's current X position in pixels.
+	TimePos getPosition(int mouseX);
 
 	TrackView * m_trackView;
 

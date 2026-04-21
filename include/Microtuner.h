@@ -53,7 +53,11 @@ public:
 	int baseKey() const;
 	float baseFreq() const;
 
+	//! @brief Return frequency for a given MIDI key, using the active mapping and scale.
+	//! @param key A MIDI key number ranging from 0 to 127.
+	//! @return Frequency in Hz; 0 if key is out of range or not mapped.
 	float keyToFreq(int key, int userBaseNote) const;
+
 	int octaveSize() const;
 
 	QString nodeName() const override {return "microtuner";}
@@ -61,7 +65,12 @@ public:
 	void loadSettings(const QDomElement &element) override;
 
 protected slots:
+	//! @brief Update scale name displayed in the microtuner scale list.
+	//! @param index Index of the scale to update; update all scales if -1 or out of range.
 	void updateScaleList(int index);
+
+	//! @brief Update keymap name displayed in the microtuner scale list.
+	//! @param index Index of the keymap to update; update all keymaps if -1 or out of range.
 	void updateKeymapList(int index);
 
 private:

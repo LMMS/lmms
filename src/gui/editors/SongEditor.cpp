@@ -289,7 +289,6 @@ void SongEditor::loadSettings( const QDomElement& element )
 
 
 
-/*! \brief Return grid size as number of bars */
 float SongEditor::getSnapSize() const
 {
 	float snapSize = SNAP_SIZES[m_snappingModel->value()];
@@ -805,7 +804,6 @@ void SongEditor::updatePositionLine()
 
 
 
-//! Convert zoom slider's value to bar width in pixels
 int SongEditor::calculatePixelsPerBar() const
 {
 	// What we need to raise 2 by to get MIN_PIXELS_PER_BAR and MAX_PIXELS_PER_BAR
@@ -822,7 +820,6 @@ int SongEditor::calculatePixelsPerBar() const
 
 
 
-//! Convert bar width in pixels to zoom slider value
 int SongEditor::calculateZoomSliderValue(int pixelsPerBar) const
 {
 	// What we need to raise 2 by to get MIN_PIXELS_PER_BAR and MAX_PIXELS_PER_BAR
