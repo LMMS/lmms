@@ -187,8 +187,7 @@ private slots:
 signals:
 	void keyPressed( int );
 	void baseNoteChanged();
-
-} ;
+};
 
 
 } // namespace gui

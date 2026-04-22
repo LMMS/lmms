@@ -187,8 +187,7 @@ private:
 	std::optional<QColor> m_color;
 
 	friend class ClipView;
-
-} ;
+};
 
 
 } // namespace lmms

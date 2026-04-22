@@ -102,8 +102,7 @@ private:
 
 signals:
 	void trackRemovalScheduled( lmms::gui::TrackView * t );
-
-} ;
+};
 
 
 } // namespace lmms::gui

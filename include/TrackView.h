@@ -60,7 +60,6 @@ class TrackView : public QWidget, public ModelView, public JournallingObject
 {
 	Q_OBJECT
 public:
-
 	//! @brief Create a new track View.
 	//!
 	//! The track View is handles the actual display of the track, including
