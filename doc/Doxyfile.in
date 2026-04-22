@@ -26,15 +26,15 @@ FILE_PATTERNS          = *.c \
                          *.hpp
 RECURSIVE              = YES
 EXCLUDE                = @CMAKE_SOURCE_DIR@/src/3rdparty \
-                         # @CMAKE_SOURCE_DIR@/plugins/CarlaBase/carla \
-                         # @CMAKE_SOURCE_DIR@/plugins/FreeBoy/game-music-emu \
+                         @CMAKE_SOURCE_DIR@/plugins/CarlaBase/carla \
+                         @CMAKE_SOURCE_DIR@/plugins/FreeBoy/game-music-emu \
                          @CMAKE_SOURCE_DIR@/plugins/LadspaEffect/calf/veal \
                          @CMAKE_SOURCE_DIR@/plugins/LadspaEffect/cmt/cmt \
                          @CMAKE_SOURCE_DIR@/plugins/LadspaEffect/swh/ladspa \
                          @CMAKE_SOURCE_DIR@/plugins/LadspaEffect/tap/tap-plugins \
-                         # @CMAKE_SOURCE_DIR@/plugins/OpulenZ/adplug \
-                         # @CMAKE_SOURCE_DIR@/plugins/Sid/resid/resid \
-                         # @CMAKE_SOURCE_DIR@/plugins/Xpressive/exprtk \
+                         @CMAKE_SOURCE_DIR@/plugins/OpulenZ/adplug \
+                         @CMAKE_SOURCE_DIR@/plugins/Sid/resid/resid \
+                         @CMAKE_SOURCE_DIR@/plugins/Xpressive/exprtk \
                          @CMAKE_SOURCE_DIR@/plugins/ZynAddSubFx/zynaddsubfx
 USE_MDFILE_AS_MAINPAGE = @CMAKE_SOURCE_DIR@/README.md
 USE_MATHJAX            = YES
