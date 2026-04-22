@@ -235,6 +235,8 @@ public:
 	using DescriptorList = QList<Descriptor*>;
 
 	//! @brief Constructor of a plugin
+	//! @param descriptor The plugin @ref Descriptor
+	//! @param parent The parent Model
 	//! @param key Sub plugins must pass a key here, optional otherwise.
 	//! See the key() function
 	Plugin(
@@ -294,6 +296,7 @@ public:
 	//! If specified plugin couldn't be loaded, it creates a dummy-plugin.
 	//!
 	//! @param pluginName The name of the desired plugin to search for
+	//! @param parent The parent Model
 	//! @param data Anything the plugin expects. If this is a pointer to a sub plugin key, use instantiateWithKey instead
 	static Plugin* instantiate(const QString& pluginName, Model* parent, void* data);
 

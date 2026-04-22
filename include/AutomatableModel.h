@@ -385,8 +385,9 @@ private:
 	//! @param value A linear value. Should be within [0,1].
 	template<class T> T logToLinearScale(T value) const;
 
-	//! rounds @a value to @a where if it is close to it
-	//! @param value will be modified to rounded value
+	//! @brief Rounds @p value to @p where if it is close to it
+	//! @param[out] value Will be modified to rounded value
+	//! @param[in] where The number to round @p value to, if it is near enough
 	template<class T> void roundAt(T &value, const T &where) const;
 
 

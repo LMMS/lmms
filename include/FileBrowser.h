@@ -65,9 +65,17 @@ public:
 	};
 
 	//! @brief Create a file browser side bar widget
+	//! @param type The @ref Type of file browser
 	//! @param directories '*'-separated list of directories to search for. If a directory of factory files should be in
 	//! the list it must be the last one (for the factory files delimiter to work)
 	//! @param filter Filter as used in QDir::match
+	//! @param title The name of the file browser, shown when it is selected in the side bar
+	//! @param pm The pixmap icon to show in the sidebar
+	//! @param parent The parent widget
+	//! @param dirs_as_items Whether or not to insert directories as top-level items
+	//! @param userDir The user content directory
+	//! @param factoryDir The factory content directory
+	// TODO: Is dirs_as_items ever true?
 	FileBrowser(Type type, const QString& directories, const QString& filter, const QString& title, const QPixmap& pm,
 		QWidget* parent, bool dirs_as_items = false, const QString& userDir = "", const QString& factoryDir = "");
 

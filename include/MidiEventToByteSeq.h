@@ -38,6 +38,7 @@ namespace lmms
 //!
 //! Conforming to http://lv2plug.in/ns/ext/midi#MidiEvent
 //!
+//! @param ev The MIDI event to write
 //! @param data Pointer to the target buffer for the byte sequence. Must point to existing memory with at least 3 bytes
 //! size.
 //! @param bufsize Available size of the target buffer.

@@ -62,8 +62,11 @@ class Control;  // IWYU pragma: keep
 class LinkedModelGroupView : public QWidget
 {
 public:
+	//! @param parent The parent widget
+	//! @param model The linked model group
 	//! @param colNum numbers of columns for the controls (link LEDs not counted)
 	LinkedModelGroupView(QWidget* parent, LinkedModelGroup* model, std::size_t colNum);
+
 	~LinkedModelGroupView() override = default;
 
 	//! Reconnect models if model changed

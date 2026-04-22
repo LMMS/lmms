@@ -65,6 +65,7 @@ public:
 	//! @brief Handle a note being pressed on our keyboard display
 	//!
 	//! @param key the key being pressed
+	//! @param midiVelocity An optional MIDI velocity override
 	void handleKeyPress(int key, int midiVelocity = -1);
 
 	//! @brief Handle a note being released on our keyboard display

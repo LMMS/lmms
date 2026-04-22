@@ -55,6 +55,7 @@ public:
 
 	//! @brief Return frequency for a given MIDI key, using the active mapping and scale.
 	//! @param key A MIDI key number ranging from 0 to 127.
+	//! @param userBaseNote The "A4" or "440 Hz" equivalent "base note". @see InstrumentTrack::baseNoteModel
 	//! @return Frequency in Hz; 0 if key is out of range or not mapped.
 	float keyToFreq(int key, int userBaseNote) const;
 

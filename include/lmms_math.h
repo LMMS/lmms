@@ -235,6 +235,8 @@ inline float signedPowf(float v, float e)
 
 
 //! @brief Scales @p value from linear to logarithmic.
+//! @param min The minimum possible value, after scaling
+//! @param max The maximum possible value, after scaling
 //! @param value A linear value. Should be within [0,1].
 inline float logToLinearScale(float min, float max, float value)
 {

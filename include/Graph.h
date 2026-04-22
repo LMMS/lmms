@@ -57,6 +57,8 @@ public:
 	};
 
 	//! @brief Constructor
+	//! @param parent The parent QWidget
+	//! @param style The @ref Style to display this Graph with
 	//! @param width Pixel width of widget
 	//! @param height Pixel height of widget
 	Graph(

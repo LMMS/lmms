@@ -43,6 +43,8 @@ namespace embed {
 //! @brief Return an image for the icon pixmap cache.
 //! @param name Identifier for the pixmap. If it is not in the icon pixmap cache, it will be loaded from the artwork
 //! QDir search paths (exceptions are compiled-in XPMs, you need to provide @p xpm for loading them).
+//! @param width A specific pixmap width. When this and @p height are provided, the pixmap is cached.
+//! @param height A specific pixmap height. When this and @p width are provided, the pixmap is cached.
 //! @param xpm Must be XPM data if the source should be raw XPM data instead of a file
 auto LMMS_EXPORT getIconPixmap(
 	std::string_view name,

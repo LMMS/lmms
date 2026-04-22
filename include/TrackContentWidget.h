@@ -184,7 +184,7 @@ protected:
 	void paintEvent(QPaintEvent* pe) override;
 
 	//! @brief Updates the background tile pixmap on size changes.
-	//! @param resizeEvent The resize event to pass to base class
+	//! @param re The resize event to pass to base class
 	void resizeEvent(QResizeEvent* re) override;
 
 	QString nodeName() const override
