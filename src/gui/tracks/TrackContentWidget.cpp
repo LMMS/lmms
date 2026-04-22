@@ -241,7 +241,6 @@ void TrackContentWidget::changePosition( const TimePos & newPos )
 		{
 			if (clipView->getClip()->startPosition().getBar() == curPattern)
 			{
-				clipView->move(0, clipView->y());
 				clipView->raise();
 				clipView->show();
 			}
