@@ -744,12 +744,12 @@ WARN_LOGFILE           =
 # overriden by other main pages (e.g. the ones in included libraries).
 
 INPUT = \
-	"@CMAKE_CURRENT_SOURCE_DIR@/../README.md" \
-	"@CMAKE_CURRENT_SOURCE_DIR@/../src/core" \
-	"@CMAKE_CURRENT_SOURCE_DIR@/../src/gui" \
-	"@CMAKE_CURRENT_SOURCE_DIR@/../src/tracks" \
-	"@CMAKE_CURRENT_SOURCE_DIR@/../include" \
-	"@CMAKE_CURRENT_SOURCE_DIR@/../plugins" \
+	"@CMAKE_SOURCE_DIR@/README.md" \
+	"@CMAKE_SOURCE_DIR@/src/core" \
+	"@CMAKE_SOURCE_DIR@/src/gui" \
+	"@CMAKE_SOURCE_DIR@/src/tracks" \
+	"@CMAKE_SOURCE_DIR@/include" \
+	"@CMAKE_SOURCE_DIR@/plugins" \
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses
@@ -888,7 +888,7 @@ FILTER_SOURCE_PATTERNS =
 # (index.html). This can be useful if you have a project on for instance GitHub
 # and want to reuse the introduction page also for the doxygen output.
 
-USE_MDFILE_AS_MAINPAGE = "@CMAKE_CURRENT_SOURCE_DIR@/../README.md"
+USE_MDFILE_AS_MAINPAGE = "@CMAKE_SOURCE_DIR@/README.md"
 
 #---------------------------------------------------------------------------
 # Configuration options related to source browsing
