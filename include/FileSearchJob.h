@@ -43,7 +43,7 @@ public:
 		QString filter;					 //! The filter to be tokenized.
 		QStringList paths;				 //! The list of paths to search recursively through.
 		QStringList extensions;			 //! The list of allowed extensions.
-		QFlags<QDir::Filter> dirFilters; //! The directory filter flag.
+		bool hidden;					 //! Include hidden entries.
 	};
 
 	//! Create a search job with the given @p parent (if any).
@@ -74,6 +74,7 @@ signals:
 
 private:
 	void runSearch(Task task);
+	bool validEntry(QString entry, QStringList tokens, QStringList extensions);
 	std::future<void> m_task;
 	std::atomic_flag m_stop = ATOMIC_FLAG_INIT;
 };
