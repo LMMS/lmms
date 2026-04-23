@@ -1895,18 +1895,6 @@ void AutomationEditor::updateTopBottomLevels()
 
 
 
-/**
- * @brief Given a mouse coordinate, returns a timeMap::iterator that points to
- *        the first node inside a square of side "r" pixels from those
- *        coordinates. In simpler terms, returns the automation node on those
- *        coordinates.
- * @param Int X coordinate
- * @param Int Y coordinate
- * @param Boolean. True to check if the outValue of the node was clicked instead
- *        (defaults to false)
- * @param Int R distance in pixels
- * @return timeMap::iterator with the clicked node, or timeMap.end() if none was clicked.
- */
 AutomationEditor::timeMap::iterator AutomationEditor::getNodeAt(int x, int y, bool outValue /* = false */, int r /* = 5 */)
 {
 	// Remove the VALUES_WIDTH from the x position, so we have the actual viewport x

@@ -52,8 +52,10 @@ class LMMS_EXPORT Clip : public Model, public JournallingObject
 	mapPropertyFromModel(bool,isMuted,setMuted,m_mutedModel);
 	mapPropertyFromModel(bool,isSolo,setSolo,m_soloModel);
 public:
-	Clip( Track * track );
-	~Clip() override;
+	//! @brief Creates a new clip for the given track @p track.
+	//! @param track The track that will contain the new object
+	Clip(Track* track);
+	~Clip() override; //!< @brief Destroys the given clip.
 
 	inline Track * getTrack() const
 	{
@@ -100,16 +102,10 @@ public:
 
 	bool manuallyResizable() const;
 
-	/*! \brief Set whether a clip has been resized yet by the user or the knife tool.
-	 *
-	 *  If a clip has been resized previously, it will not automatically 
-	 *  resize when editing it.
-	 *
-	 */
-	void setAutoResize(const bool r)
-	{
-		m_autoResize = r;
-	}
+	//! @brief Set whether a clip has been resized yet by the user or the knife tool.
+	//!
+	//! If a clip has been resized previously, it will not automatically resize when editing it.
+	void setAutoResize(const bool r) { m_autoResize = r; }
 
 	bool getAutoResize() const
 	{
@@ -119,8 +115,19 @@ public:
 	auto color() const -> const std::optional<QColor>& { return m_color; }
 	void setColor(const std::optional<QColor>& color);
 
-	virtual void movePosition( const TimePos & pos );
-	virtual void changeLength( const TimePos & length );
+	//! @brief Move this Clip's position in time
+	//!
+	//! If the clip has moved, update its position. We also add a journal entry for undo and update the display.
+	//!
+	//! @param pos The new position of the clip.
+	virtual void movePosition(const TimePos& pos);
+
+	//! @brief Change the length of this Clip
+	//!
+	//! If the clip's length has changed, update it. We also add a journal entry for undo and update the display.
+	//!
+	//! @param length The new length of the clip.
+	virtual void changeLength(const TimePos& length);
 	virtual void updateLength() {};
 
 	virtual gui::ClipView * createView( gui::TrackView * tv ) = 0;
@@ -135,24 +142,21 @@ public:
 		return m_selectViewOnCreate;
 	}
 
-	/// Returns true if and only if a->startPosition() < b->startPosition()
+	//! @brief Returns true if and only if `a->startPosition()` < `b->startPosition()`
 	static bool comparePosition(const Clip* a, const Clip* b);
 
 	TimePos startTimeOffset() const;
 	void setStartTimeOffset( const TimePos &startTimeOffset );
 
-	// Will copy the state of a clip to another clip
-	static void copyStateTo( Clip *src, Clip *dst );
+	//! @brief Copies the state of a clip to another clip
+	static void copyStateTo(Clip* src, Clip* dst);
 
-	/**
-	* Creates a copy of this clip
-	* @return pointer to the new clip object
-	*/
+	//! @brief Creates a copy of this clip
+	//! @return Pointer to the new clip object
 	virtual Clip* clone() = 0;
 
 public slots:
-	void toggleMute();
-
+	void toggleMute(); //!< @brief Mutes this Clip
 
 signals:
 	void lengthChanged();
@@ -161,6 +165,9 @@ signals:
 	void colorChanged();
 
 protected:
+
+	//! @brief Creates a duplicate clip of the one provided.
+	//! @param other The clip object which will be copied.
 	Clip(const Clip& other);
 
 private:
@@ -180,8 +187,7 @@ private:
 	std::optional<QColor> m_color;
 
 	friend class ClipView;
-
-} ;
+};
 
 
 } // namespace lmms

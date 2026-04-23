@@ -2011,8 +2011,6 @@ void DataFile::upgrade_loopsRename()
 	mapSrcAttributeInElementsWithResources(namesToNamesWithBPMsMap);
 }
 
-//! Update MIDI CC indexes, so that they are counted from 0. Older releases of LMMS
-//! count the CCs from 1.
 void DataFile::upgrade_midiCCIndexing()
 {
 	static constexpr std::array attributesToUpdate{"inputcontroller", "outputcontroller"};

@@ -51,7 +51,7 @@ namespace lmms
  *       efficiently using the data from silence tracking
  * - Can organize channels into arbitrary groups. For example, you could have 6 total channels divided into 2 groups
  *       where the 1st group contains 2 channels (stereo) and the 2nd contains 4 channels (quadraphonic).
- * - Extensive unit testing - @ref AudioBufferTest.cpp
+ * - Extensive unit testing - See AudioBufferTest.cpp
  *
  * Audio data layout explanation:
  * - All planar audio data for all channels in an AudioBuffer is sourced from the same large contiguous

@@ -71,7 +71,10 @@ public:
 	void loadSettings( const QDomElement& element ) override;
 
 	ComboBoxModel* snappingModel() const;
+
+	//! @brief Return grid size as number of bars
 	float getSnapSize() const;
+
 	QString getSnapSizeString() const;
 
 	TimeLineWidget* timeLine() const { return m_timeLine; }
@@ -120,7 +123,10 @@ private:
 	bool allowRubberband() const override;
 	bool knifeMode() const override;
 
+	//! @brief Convert zoom slider's value to bar width in pixels
 	int calculatePixelsPerBar() const;
+
+	//! @brief Convert bar width in pixels to zoom slider value
 	int calculateZoomSliderValue(int pixelsPerBar) const;
 
 	int trackIndexFromSelectionPoint(int yPos);

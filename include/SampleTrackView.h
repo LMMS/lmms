@@ -83,7 +83,10 @@ protected:
 	void dropEvent(QDropEvent *de) override;
 
 private slots:
-	void assignMixerLine( int channelIndex );
+	//! @brief Assign a specific mixer Channel for this track.
+	void assignMixerLine(int channelIndex);
+
+	//! @brief Create and assign a new mixer Channel for this track.
 	void createMixerLine();
 
 

@@ -1072,10 +1072,6 @@ Instrument * InstrumentTrack::loadInstrument(const QString & _plugin_name,
 
 InstrumentTrack *InstrumentTrack::s_autoAssignedTrack = nullptr;
 
-/*! \brief Automatically assign a midi controller to this track, based on the midiautoassign setting
- *
- *  \param assign set to true to connect the midi device, set to false to disconnect
- */
 void InstrumentTrack::autoAssignMidiDevice(bool assign)
 {
 	if (assign)

@@ -34,7 +34,7 @@ namespace lmms
 namespace
 {
 
-//! @returns Bitset with all bits at or above `pos` set to `value` and the rest set to `!value`
+//! @returns Bitset with all bits at or above @p pos set to @p value and the rest set to `!` @p value
 template<bool value>
 auto createMask(ch_cnt_t pos) noexcept -> AudioBuffer::ChannelFlags
 {
