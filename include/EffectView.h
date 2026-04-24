@@ -27,6 +27,7 @@
 #define LMMS_GUI_EFFECT_VIEW_H
 
 #include "AutomatableModel.h"
+#include "LedCheckBox.h"
 #include "PluginView.h"
 #include "Effect.h"
 
@@ -61,6 +62,8 @@ public:
 		return castModel<Effect>();
 	}
 
+	void update();
+
 	static constexpr int DEFAULT_WIDTH = 215;
 	static constexpr int DEFAULT_HEIGHT = 60;
 	
@@ -94,6 +97,8 @@ private:
 	EffectControlDialog * m_controlView;
 	
 	bool m_dragging;
+	bool m_isEnabled;
+	LedCheckBox::LedColor m_defaultLedColor;
 	QGraphicsOpacityEffect* m_opacityEffect;
 
 } ;

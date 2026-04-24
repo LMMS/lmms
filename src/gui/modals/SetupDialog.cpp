@@ -33,6 +33,7 @@
 #include <QScrollArea>
 
 #include "AudioEngine.h"
+#include "MixHelpers.h"
 #include "embed.h"
 #include "Engine.h"
 #include "FileDialog.h"
@@ -142,10 +143,10 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 			"ui", "vstalwaysontop").toInt()),
 	m_disableAutoQuit(ConfigManager::inst()->value(
 			"ui", "disableautoquit", "1").toInt()),
-	m_NaNHandler(ConfigManager::inst()->value(
-			"app", "nanhandler", "1").toInt()),
 	m_bufferSize(ConfigManager::inst()->value(
 			"audioengine", "framesperaudiobuffer").toInt()),
+	m_mixSanitization(ConfigManager::inst()->value(
+			"audioengine", "sanitizemix", "1").toInt()),
 	m_sampleRate(ConfigManager::inst()->value(
 			"audioengine", "samplerate").toInt()),
 	m_midiAutoQuantize(ConfigManager::inst()->value(
@@ -579,12 +580,6 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 
 	connect(m_audioInterfaces, &QComboBox::textActivated, this, &SetupDialog::audioInterfaceChanged);
 
-	// Advanced setting, hidden for now
-	// // TODO Handle or remove.
-	// auto useNaNHandler = new LedCheckBox(tr("Use built-in NaN handler"), audio_w);
-	// audio_layout->addWidget(useNaNHandler);
-	// useNaNHandler->setChecked(m_NaNHandler);
-
 	auto sampleRateBox = new QGroupBox{tr("Sample rate"), audio_w};
 
 	m_sampleRateSlider = new QSlider{Qt::Horizontal};
@@ -660,12 +655,24 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 
 	setBufferSize(m_bufferSizeSlider->value());
 
+	const auto otherBox = new QGroupBox(tr("Other"), audio_w);
+	const auto otherBoxLayout = new QVBoxLayout{otherBox};
+
+	const auto mixSanitzationCheckbox = new QCheckBox{};
+	mixSanitzationCheckbox->setText(tr("Enable mix sanitization"));
+	mixSanitzationCheckbox->setChecked(m_mixSanitization);
+	otherBoxLayout->addWidget(mixSanitzationCheckbox);
+
+	connect(mixSanitzationCheckbox, &QCheckBox::stateChanged, [mixSanitzationCheckbox, this] {
+		m_mixSanitization = mixSanitzationCheckbox->isChecked();
+	});
 
 	// Audio layout ordering.
 	audio_layout->addWidget(audioInterfaceBox);
 	audio_layout->addWidget(as_w);
 	audio_layout->addWidget(sampleRateBox);
 	audio_layout->addWidget(bufferSizeBox);
+	audio_layout->addWidget(otherBox);
 	audio_layout->addStretch();
 
 
@@ -1027,8 +1034,8 @@ void SetupDialog::accept()
 					QString::number(m_disableAutoQuit));
 	ConfigManager::inst()->setValue("audioengine", "audiodev",
 					m_audioIfaceNames[m_audioInterfaces->currentText()]);
-	ConfigManager::inst()->setValue("app", "nanhandler",
-					QString::number(m_NaNHandler));
+	ConfigManager::inst()->setValue("audioengine", "sanitizemix",
+					QString::number(m_mixSanitization));
 	ConfigManager::inst()->setValue("audioengine", "samplerate",
 					QString::number(m_sampleRate));
 	ConfigManager::inst()->setValue("audioengine", "framesperaudiobuffer",
@@ -1064,6 +1071,8 @@ void SetupDialog::accept()
 		it.value()->saveSettings();
 	}
 	ConfigManager::inst()->saveConfigFile();
+
+	MixHelpers::setSanitizationEnabled(m_mixSanitization);
 }
 
 

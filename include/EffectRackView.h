@@ -64,6 +64,7 @@ private:
 	void modelChanged() override;
 	QSize sizeHint() const override;
 	QSize minimumSizeHint() const override { return sizeHint(); }
+	void updateEffects();
 
 	inline EffectChain* fxChain()
 	{

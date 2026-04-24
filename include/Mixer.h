@@ -25,15 +25,16 @@
 #ifndef LMMS_MIXER_H
 #define LMMS_MIXER_H
 
+#include <QColor>
+#include <atomic>
+#include <optional>
+
 #include "AudioBuffer.h"
+#include "ConfigManager.h"
 #include "EffectChain.h"
 #include "JournallingObject.h"
 #include "Model.h"
 #include "ThreadableJob.h"
-
-#include <atomic>
-#include <optional>
-#include <QColor>
 
 namespace lmms
 {
