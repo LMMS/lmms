@@ -176,7 +176,7 @@ private slots:
 	void activateListItem(QTreeWidgetItem* item, int column);
 	void openInNewInstrumentTrack(FileItem* item, bool songEditor);
 	bool openInNewSampleTrack(FileItem* item);
-	void openInSlicerT(FileItem* item);
+	void openInSlicerT(FileItem* item, bool songEditor);
 	void sendToActiveInstrumentTrack(FileItem* item);
 	void updateDirectory(QTreeWidgetItem* item);
 } ;
