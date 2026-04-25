@@ -40,7 +40,7 @@ jobs:
       - name: Upload generated website
         uses: actions/upload-pages-artifact@v3
         with:
-          path: 'build/doc/doc/html'
+          path: 'build/doc/html'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5
