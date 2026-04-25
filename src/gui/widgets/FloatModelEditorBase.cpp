@@ -44,8 +44,19 @@
 #include "StringPairDrag.h"
 
 
-namespace lmms::gui
+namespace lmms::gui {
+
+namespace {
+
+//! Whether the mouse is adjusting the control by dragging
+auto isMouseDragAdjustment(QMouseEvent* event) -> bool
 {
+	return event->button() == Qt::LeftButton
+		&& !(event->modifiers() & KBD_COPY_MODIFIER)
+		&& !(event->modifiers() & Qt::ShiftModifier);
+}
+
+} // namespace
 
 SimpleTextFloat * FloatModelEditorBase::s_textFloat = nullptr;
 
@@ -188,9 +199,7 @@ void FloatModelEditorBase::mousePressEvent(QMouseEvent * me)
 {
 	updateInteractionState(me);
 
-	if (me->button() == Qt::LeftButton &&
-			! (me->modifiers() & KBD_COPY_MODIFIER) &&
-			! (me->modifiers() & Qt::ShiftModifier))
+	if (isMouseDragAdjustment(me))
 	{
 		AutomatableModel *thisModel = model();
 		if (thisModel)
@@ -419,25 +428,17 @@ void FloatModelEditorBase::updateInteractionState(QEvent* event)
 	switch (event->type())
 	{
 		case QEvent::Type::MouseButtonPress:
-		{
-			auto me = static_cast<QMouseEvent*>(event);
-			if (me->button() == Qt::LeftButton
-				&& !(me->modifiers() & KBD_COPY_MODIFIER)
-				&& !(me->modifiers() & Qt::ShiftModifier))
+			if (isMouseDragAdjustment(static_cast<QMouseEvent*>(event)))
 			{
 				m_interaction = InteractionType::MouseDrag;
 			}
 			break;
-		}
 		case QEvent::Type::MouseButtonRelease:
-		{
-			auto me = static_cast<QMouseEvent*>(event);
-			if (me->button() == Qt::LeftButton)
+			if (static_cast<QMouseEvent*>(event)->button() == Qt::LeftButton)
 			{
 				m_interaction = InteractionType::None;
 			}
 			break;
-		}
 		case QEvent::Type::MouseMove:
 			if (m_interaction == InteractionType::None)
 			{
