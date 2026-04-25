@@ -1,0 +1,46 @@
+---
+name: doxygen
+'on': [push] # only auto-run on pushing to a branch
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+jobs:
+  linux-x86_64:
+    name: linux-x86_64
+    runs-on: ubuntu-latest
+    env:
+      MAKEFLAGS: -j2
+    steps:
+      - name: Configure git
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: Check out
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          submodules: recursive
+      - name: Install packages
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y --no-install-recommends cmake make
+      - name: Install doxygen
+        uses: ssciwr/doxygen-install@v2
+        with:
+          version: "1.16.1"
+      - name: Configure
+        run: |
+          cmake -S doc -B build $CMAKE_OPTS
+      - name: Build docs
+        run: cmake --build build --target doc
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+      - name: Upload generated website
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: 'build/doc/html'
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
