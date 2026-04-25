@@ -27,8 +27,6 @@
 #include "lmmsversion.h"
 #include "versioninfo.h"
 
-#include "denormals.h"
-
 #include <QDebug>
 #include <QFileInfo>
 #include <QLocale>
@@ -64,6 +62,7 @@
 #include "embed.h"
 #include "Engine.h"
 #include "GuiApplication.h"
+#include "Hardware.h"
 #include "ImportFilter.h"
 #include "MainWindow.h"
 #include "MixHelpers.h"
@@ -351,7 +350,7 @@ int main( int argc, char * * argv )
 	// initialize RNG
 	srand( getpid() + time( 0 ) );
 
-	disable_denormals();
+	disableDenormals();
 
 #if !defined(LMMS_BUILD_WIN32) && !defined(LMMS_BUILD_HAIKU)
 	if ( ( getuid() == 0 || geteuid() == 0 ) && !allowRoot )

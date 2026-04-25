@@ -30,6 +30,7 @@
 
 #include "AudioEngineWorkerThread.h"
 #include "AudioBusHandle.h"
+#include "Hardware.h"
 #include "Mixer.h"
 #include "Song.h"
 #include "EnvelopeAndLfoParameters.h"
