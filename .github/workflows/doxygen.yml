@@ -25,33 +25,14 @@ jobs:
       - name: Install packages
         run: |
           sudo apt-get update -y
-          sudo apt-get install -y --no-install-recommends \
-            cmake \
-            make \
-            libsamplerate0-dev \
-            libfftw3-dev \
-            libsndfile1-dev \
-            libqt5x11extras5-dev \
-            libqt5svg5-dev \
-            libx11-xcb-dev \
-            liblist-moreutils-perl \
-            libxcb-keysyms1-dev \
-            libxcb-util0-dev \
-            qt5-qmake \
-            qtbase5-dev \
-            qtbase5-dev-tools \
-            qtbase5-private-dev \
-            qttools5-dev-tools \
-            qtwayland5 \
-            stk
+          sudo apt-get install -y --no-install-recommends cmake make
       - name: Install doxygen
         uses: ssciwr/doxygen-install@v2
         with:
           version: "1.16.1"
       - name: Configure
         run: |
-          source /opt/qt5*/bin/qt5*-env.sh || true
-          cmake -S . -B build $CMAKE_OPTS
+          cmake -S doc -B build $CMAKE_OPTS
       - name: Build docs
         run: cmake --build build --target doc
       - name: Setup Pages
