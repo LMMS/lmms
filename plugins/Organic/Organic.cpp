@@ -415,7 +415,7 @@ OrganicInstrumentView::OrganicInstrumentView( Instrument * _instrument,
 	m_volKnob = new OrganicVolumeKnob(this);
 	m_volKnob->move( 60, 201 );
 	m_volKnob->setFixedSize( 37, 47 );
-	m_volKnob->setHintText( tr( "Volume:" ), "%" );
+	m_volKnob->setDescription(tr("Volume:"));
 	m_volKnob->setObjectName( "volKnob" );
 
 	// randomise
@@ -482,8 +482,7 @@ void OrganicInstrumentView::modelChanged()
 		auto volKnob = new VolumeKnob(KnobType::Styled, this);
 		volKnob->move( x + i * colWidth, y + rowHeight*1 );
 		volKnob->setFixedSize( 21, 21 );
-		volKnob->setHintText( tr( "Osc %1 volume:" ).arg(
-								i + 1 ), "%" );
+		volKnob->setDescription(tr("Osc %1 volume:").arg(i + 1));
 
 		// setup panning-knob
 		Knob * panKnob = new OrganicKnob( this );

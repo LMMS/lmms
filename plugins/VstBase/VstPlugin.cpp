@@ -892,7 +892,7 @@ void VstPluginKnob::timerEvent(QTimerEvent* event)
 	m_updateNow = true;
 }
 
-auto VstPluginKnob::getCustomFloatingText() -> QString
+auto VstPluginKnob::getDynamicFloatingText() -> QString
 {
 	constexpr auto updatesPerSecond = 15;
 
@@ -907,7 +907,7 @@ auto VstPluginKnob::getCustomFloatingText() -> QString
 	return getParameterText();
 }
 
-auto VstPluginKnob::getCustomFloatingTextUpdate() -> std::optional<QString>
+auto VstPluginKnob::getDynamicFloatingTextUpdate() -> std::optional<QString>
 {
 	if (!m_updateNow) { return std::nullopt; }
 	m_updateNow = false;
@@ -924,7 +924,7 @@ auto VstPluginKnob::getParameterText() const -> QString
 	const auto& paramDisplays = m_plugin->allParameterDisplays();
 	assert(paramLabels.size() == paramDisplays.size());
 
-	assert(m_paramIndex < paramLabels.size());
+	assert(static_cast<std::size_t>(m_paramIndex) < paramLabels.size());
 	return paramDisplays[m_paramIndex] + ' ' + paramLabels[m_paramIndex];
 }
 
