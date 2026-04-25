@@ -245,11 +245,24 @@ class LMMS_EXPORT VolumeKnob : public Knob
 public:
 	using Knob::Knob;
 
+	//! Adjusts the volume by @p dbDelta decibels.
+	//! Matches the Fader::adjustByDecibelDelta API.
+	void adjustByDecibelDelta(float dbDelta);
+
 protected:
 	QString getCustomFloatingText() override;
 	void enterValue() override;
+	void wheelEvent(QWheelEvent* we) override;
 
 private:
+	//! Returns the dB adjustment step for the given modifier keys.
+	//! Mirrors Fader::determineAdjustmentDelta.
+	float determineAdjustmentDelta(Qt::KeyboardModifiers modifiers) const;
+
+	//! Adjusts the model value by @p dbDelta decibels.
+	//! Mirrors Fader::adjustModelByDBDelta.
+	void adjustModelByDBDelta(float dbDelta);
+
 	FloatModel m_volumeRatio{100.f, 0.f, 1000000.f};
 };
 
