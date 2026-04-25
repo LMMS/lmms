@@ -207,7 +207,7 @@ protected:
 	 * @returns which type of floating text is currently being displayed based on how the user
 	 *          is interacting with the control and whether a static tooltip has been set for the control.
 	 */
-	FloatingTextType currentFloatingText() const;
+	FloatingTextType floatingTextType() const;
 
 	QPoint m_lastMousePos; //!< mouse position in last mouseMoveEvent
 	float m_leftOver;

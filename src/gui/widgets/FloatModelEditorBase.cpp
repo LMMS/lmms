@@ -94,7 +94,7 @@ void FloatModelEditorBase::showTextFloat(int msecBeforeDisplay, int msecDisplayT
 		s_textFloat->setSource(this);
 
 		// Next, set the floating text depending on the floating text type
-		if (currentFloatingText() == FloatingTextType::Static)
+		if (floatingTextType() == FloatingTextType::Static)
 		{
 			// Using static floating text
 			assert(m_staticToolTip.has_value());
@@ -470,7 +470,7 @@ void FloatModelEditorBase::updateInteractionState(QEvent* event)
 	}
 }
 
-auto FloatModelEditorBase::currentFloatingText() const -> FloatingTextType
+auto FloatModelEditorBase::floatingTextType() const -> FloatingTextType
 {
 	switch (m_interaction)
 	{
@@ -532,7 +532,7 @@ void FloatModelEditorBase::friendlyUpdate()
 	{ return; }
 
 	// If this float model is currently controlling dynamic floating text...
-	if (currentFloatingText() == FloatingTextType::Dynamic)
+	if (floatingTextType() == FloatingTextType::Dynamic)
 	{
 		// ...and if the text changed since last time...
 		if (auto updatedText = getDynamicFloatingTextUpdate())
