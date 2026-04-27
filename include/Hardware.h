@@ -25,7 +25,14 @@
 #define LMMS_HARDWARE_H
 
 #include <cstdint>
-#include <new>
+#include <version>
+#if __cpp_lib_hardware_interference_size >= 201703L
+	#include <new>
+	#if defined(__GNUG__) && !defined(__clang__)
+		// https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Winterference-size
+		#pragma GCC diagnostic ignored "-Winterference-size"
+	#endif
+#endif
 #include "lmmsconfig.h"
 #if defined(LMMS_HOST_X86_64) || defined(LMMS_HOST_X86)
 	#include <immintrin.h>
@@ -38,7 +45,7 @@
 		#if defined(LMMS_HOST_ARM64)
 			// https://developer.arm.com/documentation/ddi0602/2026-03/Base-Instructions/ISB--Instruction-synchronization-barrier-
 			// 15 is the only allowed value for the parameter, so just ignore it and use 15 lol
-			inline void __isb(unsigned int scope = 15) { asm volatile ("isb 15" ::: "memory"); }
+			inline void __isb(unsigned int) { asm volatile ("isb 15" ::: "memory"); }
 		#elif defined(LMMS_HOST_ARM32)
 			inline void __yield() { asm volatile ("yield"); }
 		#endif
@@ -98,7 +105,7 @@ inline void disableDenormals()
 	// Intel® 64 and IA-32 Architectures Software Developer's Manual Volume 1: Basic Architecture
 	// 11.6.3 Checking for the DAZ Flag in the MXCSR Register
 	unsigned int flags = 0x8000; // FTZ
-	std::uint8_t buf[512] = {0};
+	alignas(16) std::uint8_t buf[512] = {0};
 	#if defined(LMMS_HOST_X86_64)
 		_fxsave64(buf);
 	#elif defined(LMMS_HOST_X86)

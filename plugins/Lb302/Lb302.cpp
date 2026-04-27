@@ -499,38 +499,44 @@ void Lb302Synth::playNote(NotePlayHandle* nph, SampleFrame*)
 {
 	if (nph->isMasterNote() || (nph->hasParent() && nph->isReleased())) { return; }
 
+	// Enqueue new note in m_notes
 	auto tries = s_maxNoteEnqueueRetries;
-	auto write_claimed_expected = m_notesWriteClaimed.load(std::memory_order_relaxed);
-	size_t index, next_index;
-	do
+	auto writeClaimedExpected = m_notesWriteClaimed.load(std::memory_order_relaxed);
+	std::size_t index;
+	std::size_t next_index;
+	for (;;)
 	{
-		retry_send_note:
 		if (!tries--)
 		{
 			qDebug() << "Lb302: Note dropped due to catastrophically poor performance! This should never happen!";
 			return;
 		}
-		const ptrdiff_t occupied = write_claimed_expected - m_notesReadSeq.load(std::memory_order_acquire);
+		const auto occupied = static_cast<std::ptrdiff_t>(writeClaimedExpected)
+			- static_cast<std::ptrdiff_t>(m_notesReadSeq.load(std::memory_order_acquire));
 		assert(occupied >= 0);
-		// If full, wait for room
-		if (static_cast<size_t>(occupied) >= s_maxPendingNotes)
+		// TODO C++23: [[assume(occupied >= 0)]]
+		if (static_cast<std::size_t>(occupied) >= s_maxPendingNotes)
 		{
+			// Queue is full, try again (at least one sender always makes progress)
 			busyWaitHint();
-			// goto rather than continue since we do not want to evaluate the compare_exchange_strong().
-			// However, the CAS is what normally updates write_claimed_expected, so load it manually
-			write_claimed_expected = m_notesWriteClaimed.load(std::memory_order_relaxed);
-			goto retry_send_note;
+			writeClaimedExpected = m_notesWriteClaimed.load(std::memory_order_relaxed);
+			continue;
 		}
-		index = write_claimed_expected; next_index = write_claimed_expected + 1;
+		index = writeClaimedExpected;
+		next_index = writeClaimedExpected + 1;
+		if (m_notesWriteClaimed.compare_exchange_strong(
+			writeClaimedExpected,
+			next_index,
+			std::memory_order_acquire)
+		) { break; } // Note sent
 	}
-	while (!m_notesWriteClaimed.compare_exchange_strong(write_claimed_expected, next_index, std::memory_order_acquire));
 
 	m_notes[index & s_notesBufMask] = nph;
 
-	size_t write_committed_expected = index;
-	while (!m_notesWriteCommitted.compare_exchange_strong(write_committed_expected, next_index, std::memory_order_release))
+	std::size_t writeCommittedExpected = index;
+	while (!m_notesWriteCommitted.compare_exchange_strong(writeCommittedExpected, next_index, std::memory_order_release))
 	{
-		write_committed_expected = index; // Reset this as the CAS will have changed it
+		writeCommittedExpected = index; // Reset this as the CAS will have changed it
 		busyWaitHint();
 	}
 }
@@ -559,8 +565,8 @@ void Lb302Synth::processNote(NotePlayHandle* nph)
 	if (m_playingNote == nph)
 	{
 		m_trueFreq = nph->frequency();
-		const auto true_inc = phaseInc(m_trueFreq);
-		if (m_slideToggle.value()) { m_slideBase = true_inc; } else { m_vcoInc = true_inc; }
+		const auto trueInc = phaseInc(m_trueFreq);
+		if (m_slideToggle.value()) { m_slideBase = trueInc; } else { m_vcoInc = trueInc; }
 	}
 }
 
@@ -570,13 +576,13 @@ void Lb302Synth::play(SampleFrame* working_buffer)
 	const auto readIdx = m_notesReadSeq.load(std::memory_order_relaxed);
 	const auto writeCommitted = m_notesWriteCommitted.load(std::memory_order_acquire);
 	// Process notes, but process new notes last
-	for (size_t i = readIdx; i < writeCommitted; ++i)
+	for (auto i = readIdx; i < writeCommitted; ++i)
 	{
 		const auto& nph = m_notes[i & s_notesBufMask];
 		if (nph->totalFramesPlayed() == 0) { continue; }
 		processNote(nph);
 	}
-	for (size_t i = readIdx; i < writeCommitted; ++i)
+	for (auto i = readIdx; i < writeCommitted; ++i)
 	{
 		const auto& nph = m_notes[i & s_notesBufMask];
 		if (nph->totalFramesPlayed() != 0) { continue; }

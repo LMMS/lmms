@@ -229,7 +229,7 @@ private:
 	//! adjusted as needed, but it must always be a power of 2.
 	//!
 	//! @see m_notes
-	static constexpr size_t s_maxPendingNotes = 128;
+	static constexpr std::size_t s_maxPendingNotes = 128;
 	static_assert(std::has_single_bit(s_maxPendingNotes)); // s_maxPendingNotes MUST be a power of 2
 
 	//! @brief The maximum number of retries permitted per enqueue operation before a note is dropped.
@@ -246,14 +246,14 @@ private:
 	//! spinlocks.
 	//!
 	//! @see playNote
-	static constexpr size_t s_maxNoteEnqueueRetries = s_maxPendingNotes;
+	static constexpr std::size_t s_maxNoteEnqueueRetries = s_maxPendingNotes;
 
 	//! @brief Bitmask used to wrap arbitrary indicies within the bounds of @ref m_notes.
 	//!
 	//! @see m_notesReadSeq
 	//! @see m_notesWriteCommitted
 	//! @see m_notesWriteClaimed
-	static constexpr size_t s_notesBufMask = s_maxPendingNotes - 1;
+	static constexpr std::size_t s_notesBufMask = s_maxPendingNotes - 1;
 
 	//! @brief Backing array for the multiple-producer single-consumer realtime-safe ring buffer queue for note events.
 	//!
