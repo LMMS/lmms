@@ -118,7 +118,7 @@ protected:
 class Lb302Filter3Pole : public Lb302Filter
 {
 public:
-	Lb302Filter3Pole(Lb302FilterKnobState* p_fs) : Lb302Filter(p_fs) {};
+	Lb302Filter3Pole(Lb302FilterKnobState* p_fs) : Lb302Filter(p_fs) { envRecalc(); };
 
 	void envRecalc() override;
 	void recalc() override;

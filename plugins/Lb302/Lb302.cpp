@@ -188,7 +188,7 @@ void Lb302Filter3Pole::envRecalc()
 	m_kp1h = 0.5f * kp1;
 #ifdef LB_24_RES_TRICK
 	k = std::exp(-w / m_vcf.resCoeff);
-	kres = k * (((-2.7079f * kp1 + 10.963f) * kp1 - 14.934f) * kp1 + 8.4974f);
+	m_kres = k * (((-2.7079f * kp1 + 10.963f) * kp1 - 14.934f) * kp1 + 8.4974f);
 #else
 	m_kres = fs->reso * (((-2.7079f * kp1 + 10.963f) * kp1 - 14.934f) * kp1 + 8.4974f);
 #endif
