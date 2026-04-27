@@ -60,7 +60,7 @@ Oscilloscope::Oscilloscope(Model* parent, const Descriptor::SubPluginFeatures::K
 }
 
 
-Effect::ProcessStatus Oscilloscope::processImpl(SampleFrame* buffer, const fpp_t frames)
+Effect::ProcessStatus Oscilloscope::processImpl(SampleFrame* buffer, const f_cnt_t frames)
 {
 	if (!m_controls.m_pauseModel.value())
 	{
