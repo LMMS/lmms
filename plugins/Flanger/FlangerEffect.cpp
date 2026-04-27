@@ -88,7 +88,7 @@ FlangerEffect::~FlangerEffect()
 
 
 
-Effect::ProcessStatus FlangerEffect::processImpl(SampleFrame* buf, const fpp_t frames)
+Effect::ProcessStatus FlangerEffect::processImpl(SampleFrame* buf, const f_cnt_t frames)
 {
 	const float d = dryLevel();
 	const float w = wetLevel();
@@ -101,7 +101,7 @@ Effect::ProcessStatus FlangerEffect::processImpl(SampleFrame* buf, const fpp_t f
 	m_lDelay->setFeedback( m_flangerControls.m_feedbackModel.value() );
 	m_rDelay->setFeedback( m_flangerControls.m_feedbackModel.value() );
 	auto dryS = std::array<sample_t, 2>{};
-	for( fpp_t f = 0; f < frames; ++f )
+	for( f_cnt_t f = 0; f < frames; ++f )
 	{
 		float leftLfo;
 		float rightLfo;

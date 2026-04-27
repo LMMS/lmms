@@ -26,7 +26,6 @@
 #include "AudioEngine.h"
 #include "AudioBusHandle.h"
 #include "Engine.h"
-#include "Note.h"
 #include "PatternTrack.h"
 #include "SampleClip.h"
 #include "SampleTrack.h"
@@ -34,17 +33,10 @@
 namespace lmms
 {
 
-
-SamplePlayHandle::SamplePlayHandle(Sample* sample, bool ownAudioBusHandle) :
-	PlayHandle(Type::SamplePlayHandle),
-	m_sample(sample),
-	m_doneMayReturnTrue(true),
-	m_frame(0),
-	m_ownAudioBusHandle(ownAudioBusHandle),
-	m_defaultVolumeModel(DefaultVolume, MinVolume, MaxVolume, 1),
-	m_volumeModel(&m_defaultVolumeModel),
-	m_track(nullptr),
-	m_patternTrack(nullptr)
+SamplePlayHandle::SamplePlayHandle(Sample* sample, bool ownAudioBusHandle)
+	: PlayHandle(Type::SamplePlayHandle)
+	, m_sample(sample)
+	, m_ownAudioBusHandle(ownAudioBusHandle)
 {
 	if (ownAudioBusHandle)
 	{
@@ -87,7 +79,7 @@ SamplePlayHandle::~SamplePlayHandle()
 
 void SamplePlayHandle::play( SampleFrame* buffer )
 {
-	const fpp_t fpp = Engine::audioEngine()->framesPerPeriod();
+	const f_cnt_t fpp = Engine::audioEngine()->framesPerPeriod();
 	//play( 0, _try_parallelizing );
 	if( framesDone() >= totalFrames() )
 	{

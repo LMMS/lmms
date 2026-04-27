@@ -267,11 +267,11 @@ void BitInvader::playNote( NotePlayHandle * _n,
 				Engine::audioEngine()->outputSampleRate() );
 	}
 
-	const fpp_t frames = _n->framesLeftForCurrentPeriod();
+	const f_cnt_t frames = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();
 
 	auto ps = static_cast<BSynth*>(_n->m_pluginData);
-	for( fpp_t frame = offset; frame < frames + offset; ++frame )
+	for( f_cnt_t frame = offset; frame < frames + offset; ++frame )
 	{
 		_working_buffer[frame] = SampleFrame(ps->nextStringSample(m_graph.length()));
 	}
