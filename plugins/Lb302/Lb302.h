@@ -193,7 +193,7 @@ private:
 	float m_vcoC = 0.f;   //!< Raw oscillator sample [-0.5, 0.5]
 
 	bool  m_newFreq = false;
-	float m_trueFreq;
+	float m_trueFreq = 0.f;
 	float m_slide = 0.f;     //!< Current value of slide exponential curve. Nonzero=sliding
 	float m_slideInc = 0.f;  //!< Slide base to use in next node. Nonzero=slide next note
 	float m_slideBase = 0.f; //!< The base @ref m_vcoInc while sliding.
@@ -208,10 +208,10 @@ private:
 	//! @brief Helper to get current vcf
 	//! @see m_vcfs
 	//! @see db24Toggle
-	inline Lb302Filter& vcf() { return *m_vcfs[m_db24Toggle.value()]; }
+	Lb302Filter& vcf() { return *m_vcfs[m_db24Toggle.value()]; }
 
 	f_cnt_t m_vcfEnvPos = s_envInc; //!< Update counter. Updates when >= @ref s_envInc
-	f_cnt_t m_releaseFrame;
+	f_cnt_t m_releaseFrame = 0;
 
 	// Envelope State
 	float m_vca = 0.f; //!< Amplifier coefficient.

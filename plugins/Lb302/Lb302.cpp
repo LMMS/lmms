@@ -178,10 +178,10 @@ void Lb302Filter3Pole::envRecalc()
 	); // + iacc * (0.3f + 0.7f * kfco * kenvmod) * kaccent * kaccurve * 2000.f
 
 #ifdef LB_24_IGNORE_ENVELOPE
-	// kfcn = fs->cutoff;
+	// m_kfcn = fs->cutoff;
 	m_kfcn = 2.f * kfco / Engine::audioEngine()->outputSampleRate();
 #else
-	kfcn = w;
+	m_kfcn = w;
 #endif
 	m_kp = ((-2.7528f * m_kfcn + 3.0429f) * m_kfcn + 1.718f) * m_kfcn - 0.9984f;
 	const auto kp1  = m_kp + 1.f;
