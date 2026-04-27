@@ -74,9 +74,8 @@ OscilloscopeControlDialog::OscilloscopeControlDialog(OscilloscopeControls* contr
 	phaseKnob->setModel(&controls->m_phaseModel);
 	controlsLayout->addWidget(phaseKnob);
 
-	Knob* ampknob = new Knob(KnobType::Bright26, tr("Scale"), this);
+	Knob* ampknob = new VolumeKnob(KnobType::Bright26, tr("Scale"), this);
 	ampknob->setModel(&controls->m_ampModel);
-	ampknob->setVolumeKnob(true);
 	controlsLayout->addWidget(ampknob);
 }
 
