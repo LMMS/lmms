@@ -503,7 +503,7 @@ void Lb302Synth::playNote(NotePlayHandle* nph, SampleFrame*)
 	auto tries = s_maxNoteEnqueueRetries;
 	auto writeClaimedExpected = m_notesWriteClaimed.load(std::memory_order_relaxed);
 	std::size_t index;
-	std::size_t next_index;
+	std::size_t nextIndex;
 	for (;;)
 	{
 		if (!tries--)
@@ -523,10 +523,10 @@ void Lb302Synth::playNote(NotePlayHandle* nph, SampleFrame*)
 			continue;
 		}
 		index = writeClaimedExpected;
-		next_index = writeClaimedExpected + 1;
+		nextIndex = writeClaimedExpected + 1;
 		if (m_notesWriteClaimed.compare_exchange_strong(
 			writeClaimedExpected,
-			next_index,
+			nextIndex,
 			std::memory_order_acquire)
 		) { break; } // Note sent
 	}
@@ -534,7 +534,7 @@ void Lb302Synth::playNote(NotePlayHandle* nph, SampleFrame*)
 	m_notes[index & s_notesBufMask] = nph;
 
 	std::size_t writeCommittedExpected = index;
-	while (!m_notesWriteCommitted.compare_exchange_strong(writeCommittedExpected, next_index, std::memory_order_release))
+	while (!m_notesWriteCommitted.compare_exchange_strong(writeCommittedExpected, nextIndex, std::memory_order_release))
 	{
 		writeCommittedExpected = index; // Reset this as the CAS will have changed it
 		busyWaitHint();
@@ -672,28 +672,28 @@ Lb302SynthView::Lb302SynthView(Instrument* instrument, QWidget* parent)
 	sawWaveBtn->move(waveBtnX, waveBtnY);
 	sawWaveBtn->setActiveGraphic(embed::getIconPixmap("saw_wave_active"));
 	sawWaveBtn->setInactiveGraphic(embed::getIconPixmap("saw_wave_inactive"));
-	sawWaveBtn->setToolTip(tr("Click here for a saw-wave."));
+	sawWaveBtn->setToolTip(tr("Click here for a sawtooth wave."));
 	m_waveBtnGrp->addButton(sawWaveBtn);
 
 	auto triangleWaveBtn = new PixmapButton(this, tr("Triangle wave"));
 	triangleWaveBtn->move(waveBtnX + (16 * 1), waveBtnY);
 	triangleWaveBtn->setActiveGraphic(embed::getIconPixmap("triangle_wave_active"));
 	triangleWaveBtn->setInactiveGraphic(embed::getIconPixmap("triangle_wave_inactive"));
-	triangleWaveBtn->setToolTip(tr("Click here for a triangle-wave."));
+	triangleWaveBtn->setToolTip(tr("Click here for a triangle wave."));
 	m_waveBtnGrp->addButton(triangleWaveBtn);
 
 	auto sqrWaveBtn = new PixmapButton(this, tr("Square wave"));
 	sqrWaveBtn->move(waveBtnX + (16 * 2), waveBtnY);
 	sqrWaveBtn->setActiveGraphic(embed::getIconPixmap("square_wave_active"));
 	sqrWaveBtn->setInactiveGraphic(embed::getIconPixmap("square_wave_inactive"));
-	sqrWaveBtn->setToolTip(tr("Click here for a square-wave."));
+	sqrWaveBtn->setToolTip(tr("Click here for a square wave."));
 	m_waveBtnGrp->addButton(sqrWaveBtn);
 
 	auto roundSqrWaveBtn = new PixmapButton(this, tr("Rounded square wave"));
 	roundSqrWaveBtn->move(waveBtnX + (16 * 3), waveBtnY);
 	roundSqrWaveBtn->setActiveGraphic( embed::getIconPixmap("round_square_wave_active"));
 	roundSqrWaveBtn->setInactiveGraphic( embed::getIconPixmap("round_square_wave_inactive"));
-	roundSqrWaveBtn->setToolTip(tr("Click here for a square-wave with a rounded end."));
+	roundSqrWaveBtn->setToolTip(tr("Click here for a square wave with a rounded end."));
 	m_waveBtnGrp->addButton(roundSqrWaveBtn);
 
 	auto moogWaveBtn = new PixmapButton(this, tr("Moog wave"));
@@ -707,7 +707,7 @@ Lb302SynthView::Lb302SynthView(Instrument* instrument, QWidget* parent)
 	sinWaveBtn->move(waveBtnX + (16 * 5), waveBtnY);
 	sinWaveBtn->setActiveGraphic(embed::getIconPixmap("sin_wave_active"));
 	sinWaveBtn->setInactiveGraphic(embed::getIconPixmap("sin_wave_inactive"));
-	sinWaveBtn->setToolTip(tr("Click for a sine-wave."));
+	sinWaveBtn->setToolTip(tr("Click for a sine wave."));
 	m_waveBtnGrp->addButton(sinWaveBtn);
 
 	auto exponentialWaveBtn = new PixmapButton(this, tr("White noise wave"));
@@ -721,14 +721,14 @@ Lb302SynthView::Lb302SynthView(Instrument* instrument, QWidget* parent)
 	whiteNoiseWaveBtn->move(waveBtnX + (16 * 7), waveBtnY);
 	whiteNoiseWaveBtn->setActiveGraphic(embed::getIconPixmap("white_noise_wave_active"));
 	whiteNoiseWaveBtn->setInactiveGraphic(embed::getIconPixmap("white_noise_wave_inactive"));
-	whiteNoiseWaveBtn->setToolTip(tr("Click here for white-noise."));
+	whiteNoiseWaveBtn->setToolTip(tr("Click here for white noise."));
 	m_waveBtnGrp->addButton(whiteNoiseWaveBtn);
 
 	auto blSawWaveBtn = new PixmapButton(this, tr("Bandlimited saw wave"));
 	blSawWaveBtn->move(waveBtnX + (16 * 9) - 8, waveBtnY);
 	blSawWaveBtn->setActiveGraphic(embed::getIconPixmap("saw_wave_active"));
 	blSawWaveBtn->setInactiveGraphic(embed::getIconPixmap("saw_wave_inactive"));
-	blSawWaveBtn->setToolTip(tr("Click here for bandlimited saw wave."));
+	blSawWaveBtn->setToolTip(tr("Click here for bandlimited sawtooth wave."));
 	m_waveBtnGrp->addButton(blSawWaveBtn);
 
 	auto blSquareWaveBtn = new PixmapButton(this, tr("Bandlimited square wave"));
@@ -749,7 +749,7 @@ Lb302SynthView::Lb302SynthView(Instrument* instrument, QWidget* parent)
 	blMoogWaveBtn->move(waveBtnX + (16 * 12) - 8, waveBtnY);
 	blMoogWaveBtn->setActiveGraphic(embed::getIconPixmap("moog_saw_wave_active"));
 	blMoogWaveBtn->setInactiveGraphic(embed::getIconPixmap("moog_saw_wave_inactive"));
-	blMoogWaveBtn->setToolTip(tr("Click here for bandlimited moog saw wave."));
+	blMoogWaveBtn->setToolTip(tr("Click here for bandlimited moog-like wave."));
 	m_waveBtnGrp->addButton(blMoogWaveBtn);
 }
 
