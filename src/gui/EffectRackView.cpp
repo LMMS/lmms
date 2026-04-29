@@ -30,7 +30,7 @@
 #include <QPushButton>
 #include <QScrollArea>
 #include <QVBoxLayout>
-#include <qevent.h>
+#include <QEvent>
 
 #include "Effect.h"
 #include "DeprecationHelper.h"
@@ -99,9 +99,9 @@ EffectRackView::EffectRackView( EffectChain* model, QWidget* parent ) :
 
 	effectsLayout->addLayout(rowLayout);
 
-	connect( addButton, SIGNAL(clicked()), this, SLOT(addEffect()));
-	connect( savePresetButton, SIGNAL(clicked()), this, SLOT(savePreset()));
-	connect( loadPresetButton, SIGNAL(clicked()), this, SLOT(loadPreset()));
+	connect(addButton, &QPushButton::clicked, this, &EffectRackView::addEffect);
+	connect(savePresetButton, &QPushButton::clicked, this, &EffectRackView::savePreset);
+	connect(loadPresetButton, &QPushButton::clicked, this, &EffectRackView::loadPreset);
 
 	setAcceptDrops(true);
 

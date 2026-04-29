@@ -39,10 +39,10 @@ namespace lmms
 {
 
 
-Effect::Effect( const Plugin::Descriptor * _desc,
-			Model * _parent,
-			const Descriptor::SubPluginFeatures::Key * _key ) :
-	Plugin( _desc, _parent, _key ),
+Effect::Effect( const Plugin::Descriptor * desc,
+			Model * parent,
+			const Descriptor::SubPluginFeatures::Key * key ) :
+	Plugin( desc, parent, key ),
 	m_parent( nullptr ),
 	m_okay( true ),
 	m_noRun( false ),
@@ -59,24 +59,24 @@ Effect::Effect( const Plugin::Descriptor * _desc,
 	connect(&m_enabledModel, &BoolModel::dataChanged, [this] { onEnabledChanged(); });
 }
 
-void Effect::saveSettings(QDomDocument& _doc, QDomElement& _this)
+void Effect::saveSettings(QDomDocument& doc, QDomElement& thisElement)
 {
-	m_enabledModel.saveSettings( _doc, _this, "on" );
-	m_wetDryModel.saveSettings( _doc, _this, "wet" );
-	m_autoQuitModel.saveSettings( _doc, _this, "autoquit" );
-	controls()->saveState( _doc, _this );
+	m_enabledModel.saveSettings( doc, thisElement, "on" );
+	m_wetDryModel.saveSettings( doc, thisElement, "wet" );
+	m_autoQuitModel.saveSettings( doc, thisElement, "autoquit" );
+	controls()->saveState( doc, thisElement );
 }
 
 
 
 
-void Effect::loadSettings(const QDomElement& _this)
+void Effect::loadSettings(const QDomElement& thisElement)
 {
-	m_enabledModel.loadSettings( _this, "on" );
-	m_wetDryModel.loadSettings( _this, "wet" );
-	m_autoQuitModel.loadSettings( _this, "autoquit" );
+	m_enabledModel.loadSettings( thisElement, "on" );
+	m_wetDryModel.loadSettings( thisElement, "wet" );
+	m_autoQuitModel.loadSettings( thisElement, "autoquit" );
 
-	QDomNode node = _this.firstChild();
+	QDomNode node = thisElement.firstChild();
 	while( !node.isNull() )
 	{
 		if( node.isElement() )
@@ -149,16 +149,16 @@ bool Effect::processAudioBuffer(AudioBuffer& inOut)
 
 
 Effect* Effect::instantiate(const QString& pluginName,
-	Model* _parent,
-	Descriptor::SubPluginFeatures::Key* _key)
+	Model* parent,
+	Descriptor::SubPluginFeatures::Key* key)
 {
-	Plugin* p = Plugin::instantiateWithKey(pluginName, _parent, _key);
+	Plugin* p = Plugin::instantiateWithKey(pluginName, parent, key);
 	// check whether instantiated plugin is an effect
 	if (dynamic_cast<Effect*>(p) != nullptr)
 	{
 		// everything ok, so return pointer
 		auto effect = dynamic_cast<Effect*>(p);
-		effect->m_parent = dynamic_cast<EffectChain *>(_parent);
+		effect->m_parent = dynamic_cast<EffectChain *>(parent);
 		return effect;
 	}
 

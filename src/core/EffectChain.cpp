@@ -27,7 +27,6 @@
 
 #include <QDomElement>
 #include <cassert>
-#include <qchar.h>
 
 #include "AudioBuffer.h"
 #include "DataFile.h"
