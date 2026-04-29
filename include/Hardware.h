@@ -25,9 +25,8 @@
 #define LMMS_HARDWARE_H
 
 #include <cstdint>
-#include <version>
+#include <new>
 #if __cpp_lib_hardware_interference_size >= 201703L
-	#include <new>
 	#if defined(__GNUG__) && !defined(__clang__)
 		// https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Winterference-size
 		#pragma GCC diagnostic ignored "-Winterference-size"
@@ -44,7 +43,7 @@
 	#elif defined(__GNUG__) // HACK: Remove this once GCC properly provides __ARM_ACLE
 		#if defined(LMMS_HOST_ARM64)
 			// https://developer.arm.com/documentation/ddi0602/2026-03/Base-Instructions/ISB--Instruction-synchronization-barrier-
-			// 15 is the only allowed value for the parameter, so just ignore it and use 15 lol
+			// The parameter is ignored since 15 is the only valid value
 			inline void __isb(unsigned int) { asm volatile ("isb 15" ::: "memory"); }
 		#elif defined(LMMS_HOST_ARM32)
 			inline void __yield() { asm volatile ("yield"); }
@@ -56,24 +55,37 @@ namespace lmms
 {
 
 //! @brief Platform-dependent minimum amount of padding between objects to prevent false cache sharing.
-// TODO: Add other platforms as needed (LMMS currently only supports 64-bit x86 and ARM)
+//! @hideinitializer
+//! @see [`std::hardware_destructive_interference_size`](https://wg21.link/p0154)
 inline constexpr std::size_t hardware_destructive_interference_size =
 #if __cpp_lib_hardware_interference_size >= 201703L
-	std::hardware_destructive_interference_size
-#elif defined(LMMS_HOST_ARM64)
-	256
+	std::hardware_destructive_interference_size;
 #elif defined(LMMS_HOST_X86_64) || defined(LMMS_HOST_X86)
-	64
+	64;
+#elif defined(LMMS_HOST_ARM64)
+	256;
+#elif defined(LMMS_HOST_ARM32)
+	64;
+#elif defined(LMMS_HOST_RISCV64) || defined(LMMS_HOST_RISCV32)
+	64;
+#elif defined(LMMS_HOST_PPC64)
+	128;
+#elif defined(LMMS_HOST_PPC32)
+	32;
 #else
+	64;
 	#warning Defaulting to 64 for lmms::hardware_destructive_interference_size for this architecture. This may be incorrect.
-	64
 #endif
-	;
 
 
 
 //! @brief Platform-dependent hint to the processor that it is in a busy-wait loop.
 //! This helps optimize spinlocks by slowing down the processor a bit, which helps reduce contention on atomics.
+//! @see [x86-64 `pause`](https://www.felixcloutier.com/x86/pause)
+//! @see [ARM64 `isb`](https://developer.arm.com/documentation/ddi0602/2026-03/Base-Instructions/ISB--Instruction-synchronization-barrier-)
+//! (and [why it is used instead of `yield`](https://github.com/rust-lang/rust/commit/c064b6560b7ce0adeb9bbf5d7dcf12b1acb0c807))
+//! @see [ARM32 `yield`](https://developer.arm.com/documentation/ddi0597/2026-03/Base-Instructions/YIELD--Yield-hint-)
+//! @see [RISC-V `pause`](https://docs.riscv.org/reference/isa/unpriv/zihintpause.html)
 inline void busyWaitHint()
 {
 #if defined(LMMS_HOST_X86_64) || defined(LMMS_HOST_X86)
