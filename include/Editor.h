@@ -80,11 +80,11 @@ private:
 signals:
 
 protected:
-	/// \brief	Constructor.
-	///
-	/// \param	record	If set true, the editor's toolbar will contain record
-	///					buttons in addition to the play and stop buttons.
-	Editor(bool record = false, bool record_step = false);
+	//! @brief Constructor.
+	//! @param record If set true, the editor's toolbar will contain record buttons in addition to the play and stop
+	//! buttons.
+	//! @param stepRecord If set true, the edtior's toolbar will also contain a step record button.
+	Editor(bool record = false, bool stepRecord = false);
 	~Editor() override = default;
 
 

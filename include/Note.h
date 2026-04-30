@@ -290,6 +290,9 @@ struct NoteBounds
 };
 
 
+//! @brief Get the start/end/bottom/top positions of notes in a vector.
+//!
+//! Returns no value if there are no notes.
 std::optional<NoteBounds> boundsForNotes(const NoteVector& notes);
 
 

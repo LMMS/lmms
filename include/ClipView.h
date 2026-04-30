@@ -66,9 +66,16 @@ class ClipView : public selectableObject, public ModelView
 public:
 	const static int BORDER_WIDTH = 2;
 
-	ClipView( Clip * clip, TrackView * tv );
+	//! @brief Creates a new clip view for the given clip in the given track view.
+	//! @param clip The clip to be displayed
+	//! @param tv The track view that will contain the new object
+	ClipView(Clip* clip, TrackView* tv);
+
+	//! @brief Destroys the given ClipView.
 	~ClipView() override;
 
+	//! @brief Checks if the containing trackView has fixed Clips.
+	//! @todo In what circumstance are they fixed?
 	bool fixedClips();
 
 	inline Clip * getClip()
@@ -81,29 +88,28 @@ public:
 		return m_trackView;
 	}
 
-	// qproperty access func
-	QColor mutedColor() const;
-	QColor mutedBackgroundColor() const;
-	QColor selectedColor() const;
-	QColor textColor() const;
-	QColor textBackgroundColor() const;
-	QColor textShadowColor() const;
-	QColor patternClipBackground() const;
-	QColor markerColor() const;
-	bool gradient() const;
-	void setMutedColor( const QColor & c );
-	void setMutedBackgroundColor( const QColor & c );
-	void setSelectedColor( const QColor & c );
-	void setTextColor( const QColor & c );
-	void setTextBackgroundColor( const QColor & c );
-	void setTextShadowColor( const QColor & c );
-	void setPatternClipBackground(const QColor& c);
-	void setGradient( const bool & b );
-	void setMarkerColor(const QColor& c);
+	// qproperty access functions, to be inherited & used by Clipviews
+	QColor mutedColor() const { return m_mutedColor; }
+	QColor mutedBackgroundColor() const { return m_mutedBackgroundColor; }
+	QColor selectedColor() const { return m_selectedColor; }
+	QColor textColor() const { return m_textColor; }
+	QColor textBackgroundColor() const { return m_textBackgroundColor; }
+	QColor textShadowColor() const { return m_textShadowColor; }
+	QColor patternClipBackground() const { return m_patternClipBackground; }
+	bool gradient() const { return m_gradient; }
+	QColor markerColor() const { return m_markerColor; }
+	void setMutedColor(const QColor& c) { m_mutedColor = QColor(c); }
+	void setMutedBackgroundColor(const QColor& c) { m_mutedBackgroundColor = QColor(c); }
+	void setSelectedColor(const QColor& c) { m_selectedColor = QColor(c); }
+	void setTextColor(const QColor& c) { m_textColor = QColor(c); }
+	void setTextBackgroundColor(const QColor& c) { m_textBackgroundColor = QColor(c); }
+	void setTextShadowColor(const QColor& c) { m_textShadowColor = QColor(c); }
+	void setPatternClipBackground(const QColor& c) { m_patternClipBackground = QColor(c); }
+	void setGradient(const bool& b) { m_gradient = b; }
+	void setMarkerColor(const QColor& c) { m_markerColor = QColor(c); }
 
-	// access needsUpdate member variable
-	bool needsUpdate();
-	void setNeedsUpdate( bool b );
+	bool needsUpdate() const { return m_needsUpdate; }
+	void setNeedsUpdate(bool b) { m_needsUpdate = b; }
 
 	// Method to get a QVector of Clips to be affected by a context menu action
 	QVector<ClipView *> getClickedClips();
@@ -127,8 +133,23 @@ public:
 	void inline setMarkerEnabled(bool e) { m_marker = e; }
 
 public slots:
+
+	//! @brief Close a ClipView
+	//!
+	//! Closes a ClipView by asking the track view to remove it and then asking the QWidget to close it.
+	//!
+	//! @return Boolean state of whether the QWidget was able to close.
 	virtual bool close();
+
+	//! @brief Removes a ClipView from its track view.
+	//!
+	//! Like the @ref close method, this asks the track view to remove this ClipView. However, the clip is scheduled for
+	//! later deletion rather than closed immediately.
 	void remove();
+
+	//! @brief Update a ClipView
+	//!
+	//! Clips get drawn only when needed, and when a Clip is updated, it needs to be redrawn.
 	void update() override;
 
 	void selectColor();
@@ -156,13 +177,64 @@ protected:
 	{
 	}
 
+	//! @brief Set up the context menu for this ClipView.
+	//!
+	//! Set up the various context menu events that can apply to a ClipView.
+	//!
+	//! @param cme The QContextMenuEvent to add the actions to.
 	void contextMenuEvent( QContextMenuEvent * cme ) override;
+
 	void contextMenuAction( ContextMenuAction action );
-	void dragEnterEvent( QDragEnterEvent * dee ) override;
+
+	//! @brief Change the ClipView's display when something being dragged enters it.
+	//!
+	//! We need to notify Qt to change our display if something being dragged has entered our 'airspace'.
+	//!
+	//! @param dee The QDragEnterEvent to watch.
+	void dragEnterEvent(QDragEnterEvent* dee) override;
+
+	//! @brief Handle something being dropped on this ClipObjectView.
+	//!
+	//! When something has been dropped on this ClipView, and it's a clip, then use an instance of our dataFile reader to
+	//! take the xml of the clip and turn it into something we can write over our current state.
+	//!
+	//! @param de The QDropEvent to handle.
 	void dropEvent( QDropEvent * de ) override;
-	void mousePressEvent( QMouseEvent * me ) override;
-	void mouseMoveEvent( QMouseEvent * me ) override;
-	void mouseReleaseEvent( QMouseEvent * me ) override;
+
+	//! @brief Handle a mouse press on this ClipView.
+	//!
+	//! Handles the various ways in which a ClipView can be used with a click of a mouse button.
+	//!
+	//! - If our container supports rubber band selection then handle selection events.
+	//! - or if shift-left button, add this object to the selection
+	//! - or if ctrl-left button, start a drag-copy event
+	//! - or if just plain left button, resize if we're resizeable
+	//! - or if ctrl-middle button, mute the clip
+	//! - or if middle button, maybe delete the clip.
+	//!
+	//! @param me The QMouseEvent to handle.
+	void mousePressEvent(QMouseEvent* me) override;
+
+	//! @brief Handle a mouse movement (drag) on this ClipView.
+	//!
+	//! Handles the various ways in which a ClipView can be used with a mouse drag.
+	//!
+	//! - If in move mode, move ourselves in the track,
+	//! - or if in move-selection mode, move the entire selection,
+	//! - or if in resize mode, resize ourselves,
+	//! - otherwise ???
+	//!
+	//! @param me The QMouseEvent to handle.
+	//! @todo What does the final else case do here?
+	void mouseMoveEvent(QMouseEvent* me) override;
+
+	//! @brief Handle a mouse release on this ClipView.
+	//!
+	//! If we're in move or resize mode, journal the change as appropriate. Then tidy up.
+	//!
+	//! @param me The QMouseEvent to handle.
+	void mouseReleaseEvent(QMouseEvent* me) override;
+
 	void resizeEvent( QResizeEvent * re ) override
 	{
 		m_needsUpdate = true;
@@ -172,9 +244,17 @@ protected:
 	bool unquantizedModHeld( QMouseEvent * me );
 	TimePos quantizeSplitPos(TimePos);
 
+	//! @brief How many pixels a bar takes for this ClipView.
+	//! @return the number of pixels per bar.
 	float pixelsPerBar();
 
-
+	//! @brief Create a DataFile suitable for copying multiple clips.
+	//!
+	//!	Clips in the vector are written to the "clips" node in the DataFile. The ClipView's initial mouse position is
+	//! written to the "initialMouseX" node in the DataFile.  When dropped on a track, this is used to create copies of
+	//! the Clips.
+	//!
+	//! @param clips The trackContectObjects to save in a DataFile
 	DataFile createClipDataFiles(const QVector<ClipView *> & clips) const;
 
 	virtual void paintTextLabel(QString const & text, QPainter & painter);
@@ -182,9 +262,17 @@ protected:
 	auto hasCustomColor() const -> bool;
 
 protected slots:
+	//! @brief Updates a ClipView's length
+	//!
+	//! If this ClipView has a fixed Clip, then we must keep the width of our parent.  Otherwise, calculate our width
+	//! from the clip's length in pixels adding in the border.
 	void updateLength();
-	void updatePosition();
 
+	//! @brief Updates a ClipView's position.
+	//!
+	//! Ask our track view to change our position.  Then make sure that the track view is updated in case this position
+	//! has changed the track view's length.
+	void updatePosition();
 
 private:
 	enum class Action
@@ -228,31 +316,48 @@ private:
 		m_initialClipPos = m_clip->startPosition();
 		m_initialClipEnd = m_initialClipPos + m_clip->length();
 	}
+
+	//! @brief Save the offsets between all selected tracks and a clicked track
 	void setInitialOffsets();
 
-	bool mouseMovedDistance( QMouseEvent * me, int distance );
-	TimePos draggedClipPos( QMouseEvent * me );
+	//! @brief Detect whether the mouse moved more than n pixels on screen.
+	//! @param me The QMouseEvent.
+	//! @param distance The threshold distance that the mouse has moved to return true.
+	bool mouseMovedDistance(QMouseEvent* me, int distance);
+
+	//! @brief Calculate the new position of a dragged Clip from a mouse event
+	//! @param me The QMouseEvent
+	TimePos draggedClipPos(QMouseEvent* me);
+
 	int knifeMarkerPos( QMouseEvent * me );
+
+	//! @brief Change color of all selected clips
+	//! @param color The new color, if any.
 	void setColor(const std::optional<QColor>& color);
 	
 	//! Returns whether the user can left-resize this clip so that the start of the clip bounds is before the start of the clip content.
 	virtual bool isResizableBeforeStart() { return true; };
-	/**
-	* Split this Clip into two clips
-	* @param pos the position of the split, relative to the start of the clip
-	* @return true if the clip could be split
-	*/
+
+	
+	//! @brief Split this Clip into two clips
+	//! @param pos the position of the split, relative to the start of the clip
+	//! @return true if the clip could be split
 	bool splitClip(const TimePos pos);
-	/**
-	* Destructively split this Clip into two clips. If the clip type does not implement this feature, it will default to normal splitting.
-	* @param pos the position of the split, relative to the start of the clip
-	* @return true if the clip could be split
-	*/
+
+	//! @brief Destructively split this Clip into two clips.
+	//!
+	//! If the clip type does not implement this feature, it will default to normal splitting.
+	//!
+	//! @param pos the position of the split, relative to the start of the clip
+	//! @return true if the clip could be split
 	virtual bool destructiveSplitClip(const TimePos pos)
 	{
 		return splitClip(pos);
 	}
-	void updateCursor(QMouseEvent * me);
+
+	//! @brief Chooses the correct cursor to be displayed on the widget
+	//! @param me The QMouseEvent that is triggering the cursor change
+	void updateCursor(QMouseEvent* me);
 } ;
 
 

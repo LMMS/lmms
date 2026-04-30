@@ -226,7 +226,6 @@ InstrumentTrackWindow* InstrumentTrackView::topLevelInstrumentTrackWindow()
 
 
 
-/*! \brief Create and assign a new mixer Channel for this track */
 void InstrumentTrackView::createMixerLine()
 {
 	int channelIndex = getGUI()->mixerView()->addNewChannel();
@@ -241,7 +240,6 @@ void InstrumentTrackView::createMixerLine()
 
 
 
-/*! \brief Assign a specific mixer Channel for this track */
 void InstrumentTrackView::assignMixerLine(int channelIndex)
 {
 	model()->mixerChannelModel()->setValue( channelIndex );

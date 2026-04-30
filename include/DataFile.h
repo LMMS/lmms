@@ -128,7 +128,10 @@ private:
 	void upgrade_mixerRename();
 	void upgrade_bbTcoRename();
 	void upgrade_sampleAndHold();
+
+	//! Update MIDI CC indexes, so that they are counted from 0. Older releases of LMMS count the CCs from 1.
 	void upgrade_midiCCIndexing();
+
 	void upgrade_loopsRename();
 	void upgrade_noteTypes();
 	void upgrade_fixCMTDelays();

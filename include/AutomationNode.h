@@ -32,13 +32,13 @@ namespace lmms
 class AutomationClip;
 
 
-// Note: We use the default copy-assignment on the AutomationClip constructor. It's
+// NOTE: We use the default copy-assignment on the AutomationClip constructor. It's
 // fine for now as we don't have dynamic allocated members, but if any are added we should
 // have an user-defined one to perform a deep-copy.
 class AutomationNode
 {
 public:
-	AutomationNode(); // Dummy constructor for the QMap
+	AutomationNode(); //!< @brief Dummy constructor for the QMap
 	AutomationNode(AutomationClip* clip, float value, int pos);
 	AutomationNode(AutomationClip* clip, float inValue, float outValue, int pos);
 
@@ -71,107 +71,68 @@ public:
 	{
 		return m_inValue;
 	}
+
+	//! @brief Sets the inValue of an automation node
+	//! @param value A `float` value to be assigned
 	void setInValue(float value);
 
-	inline const float getOutValue() const
-	{
-		return m_outValue;
-	}
+	inline const float getOutValue() const { return m_outValue; }
+
+	//! @brief Sets the outValue of an automation node
+	//! @param value A `float` value to be assigned
 	void setOutValue(float value);
+
+	//! @brief Resets the outValue so it matches inValue
 	void resetOutValue();
 
-	/**
-	 * @brief Gets the offset between inValue and outValue
-	 * @return Float representing the offset between inValue and outValue
-	 */
-	inline const float getValueOffset() const
-	{
-		return m_outValue - m_inValue;
-	}
+	//! @brief Gets the offset between inValue and outValue
+	//! @return A `float` representing the offset between inValue and outValue
+	inline const float getValueOffset() const { return m_outValue - m_inValue; }
 
-	/**
-	 * @brief Gets the tangent of the left side of the node
-	 * @return Float with the tangent from the inValue side
-	 */
-	inline const float getInTangent() const
-	{
-		return m_inTangent;
-	}
+	//! @brief Gets the tangent of the left side of the node
+	//! @return A `float` with the tangent from the inValue side
+	inline const float getInTangent() const { return m_inTangent; }
 
-	/**
-	 * @brief Sets the tangent of the left side of the node
-	 * @param Float with the tangent for the inValue side
-	 */
-	inline void setInTangent(float tangent)
-	{
-		m_inTangent = tangent;
-	}
+	//! @brief Sets the tangent of the left side of the node
+	//! @param tangent A `float` with the tangent for the inValue side
+	inline void setInTangent(float tangent) { m_inTangent = tangent; }
 
-	/**
-	 * @brief Gets the tangent of the right side of the node
-	 * @return Float with the tangent from the outValue side
-	 */
-	inline const float getOutTangent() const
-	{
-		return m_outTangent;
-	}
+	//! @brief Gets the tangent of the right side of the node
+	//! @return A `float` with the tangent from the outValue side
+	inline const float getOutTangent() const { return m_outTangent; }
 
-	/**
-	 * @brief Sets the tangent of the right side of the node
-	 * @param Float with the tangent for the outValue side
-	 */
-	inline void setOutTangent(float tangent)
-	{
-		m_outTangent = tangent;
-	}
+	//! @brief Sets the tangent of the right side of the node
+	//! @param tangent A `float` with the tangent for the outValue side
+	inline void setOutTangent(float tangent) { m_outTangent = tangent; }
 
-	/**
-	 * @brief Checks if the tangents from the node are locked
-	 */
-	inline const bool lockedTangents() const
-	{
-		return m_lockedTangents;
-	}
+	//! @brief Checks if the tangents from the node are locked
+	inline const bool lockedTangents() const { return m_lockedTangents; }
 
-	/**
-	 * @brief Locks or Unlocks the tangents from this node
-	 */
-	inline void setLockedTangents(bool b)
-	{
-		m_lockedTangents = b;
-	}
+	//! @brief Locks or Unlocks the tangents from this node
+	//! @param b Whether or not the tangents should be locked
+	inline void setLockedTangents(bool b) { m_lockedTangents = b; }
 
-	/**
-	 * @brief Sets the clip this node belongs to
-	 * @param AutomationClip* clip that m_clip will be
-	 * set to
-	 */
-	inline void setClip(AutomationClip* clip)
-	{
-		m_clip = clip;
-	}
+	//! @brief Sets the clip this node belongs to
+	//! @param clip clip that m_clip will be set to
+	inline void setClip(AutomationClip* clip) { m_clip = clip; }
 
 private:
-	// Clip that this node belongs to
-	AutomationClip* m_clip;
-
-	// Time position of this node (matches the timeMap key)
-	int m_pos;
+	AutomationClip* m_clip; //!< @brief Clip that this node belongs to
+	int m_pos; //!< Time position of this node (matches the timeMap key)
 
 	// Values of this node
 	float m_inValue;
 	float m_outValue;
 
-	// Slope at each point for calculating spline
-	// We might have discrete jumps between curves, so we possibly have
-	// two different tangents for each side of the curve. If inValue and
-	// outValue are equal, inTangent and outTangent are equal too.
+	//! @brief Slope at each point for calculating spline
+	//!
+	//! We might have discrete jumps between curves, so we possibly have two different tangents for each side of the
+	//! curve. If @ref m_inValue and @ref m_outValue are equal, @ref m_inTangent and @ref m_outTangent are equal too.
 	float m_inTangent;
-	float m_outTangent;
+	float m_outTangent; //!< @copydoc m_inTangent
 
-	// If the tangents were edited manually, this will be true. That way
-	// the tangents from this node will not be recalculated. It's set back
-	// to false if the tangents are reset.
+	//! If the tangents were edited manually, this will be true. That way the tangents from this node will not be
+	//! recalculated. It's set back to false if the tangents are reset.
 	bool m_lockedTangents;
 };
 

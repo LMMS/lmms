@@ -45,8 +45,7 @@ namespace lmms
 {
 
 
-/*! The black / white order of keys as they appear on the keyboard.
- */
+//! The black/white order of keys as they appear on the keyboard.
 static const auto KEY_ORDER = std::array
 {
 //	C                      CIS                    D                      DIS
@@ -58,22 +57,13 @@ static const auto KEY_ORDER = std::array
 } ;
 
 
-/*! \brief Create a new keyboard display
- *
- *  \param _it the InstrumentTrack window to attach to
- */
-Piano::Piano(InstrumentTrack* track) :
-	Model(nullptr),              /*!< base class ctor */
-	m_instrumentTrack(track),
-	m_midiEvProc(track)        /*!< the InstrumentTrack Model */
-{
-}
+Piano::Piano(InstrumentTrack* track)
+	: Model(nullptr)
+	, m_instrumentTrack(track)
+	, m_midiEvProc(track)
+{}
 
-/*! \brief Turn a key on or off
- *
- *  \param key the key number to change
- *  \param state the state to set the key to
- */
+
 void Piano::setKeyState(int key, bool state)
 {
 	if (isValidKey(key))
@@ -85,12 +75,6 @@ void Piano::setKeyState(int key, bool state)
 }
 
 
-
-
-/*! \brief Handle a note being pressed on our keyboard display
- *
- *  \param key the key being pressed
- */
 void Piano::handleKeyPress(int key, int midiVelocity)
 {
 	if (midiVelocity == -1)
@@ -105,13 +89,6 @@ void Piano::handleKeyPress(int key, int midiVelocity)
 }
 
 
-
-
-
-/*! \brief Handle a note being released on our keyboard display
- *
- *  \param key the key being releassed
- */
 void Piano::handleKeyRelease(int key)
 {
 	if (isValidKey(key))
