@@ -316,7 +316,7 @@ PianoRoll::PianoRoll() :
 	{
 		m_zoomingModel.addItem(QString("%1%").arg(zoomLevel * 100));
 	}
-	m_zoomingModel.setValue(ConfigManager::inst()->value("ui", "pianorollzoom", QString::number(m_zoomingModel.findText("100%"))).toInt());
+	m_zoomingModel.setInitValue(ConfigManager::inst()->value("ui", "pianorollzoom", QString::number(m_zoomingModel.findText("100%"))).toInt());
 	zoomingChanged();
 	connect( &m_zoomingModel, SIGNAL(dataChanged()),
 					this, SLOT(zoomingChanged()));
@@ -326,7 +326,7 @@ PianoRoll::PianoRoll() :
 	{
 		m_zoomingYModel.addItem(QString("%1%").arg(zoomLevel * 100));
 	}
-	m_zoomingYModel.setValue(ConfigManager::inst()->value("ui", "pianorollzoomvertical", QString::number(m_zoomingModel.findText("100%"))).toInt());
+	m_zoomingYModel.setInitValue(ConfigManager::inst()->value("ui", "pianorollzoomvertical", QString::number(m_zoomingModel.findText("100%"))).toInt());
 	zoomingYChanged();
 	connect(&m_zoomingYModel, SIGNAL(dataChanged()),
 					this, SLOT(zoomingYChanged()));
@@ -336,7 +336,7 @@ PianoRoll::PianoRoll() :
 	for (auto q : Quantizations) {
 		m_quantizeModel.addItem(QString("1/%1").arg(q));
 	}
-	m_quantizeModel.setValue(ConfigManager::inst()->value("ui", "pianorollquantization", QString::number(m_zoomingModel.findText("1/16"))).toInt());
+	m_quantizeModel.setInitValue(ConfigManager::inst()->value("ui", "pianorollquantization", QString::number(m_zoomingModel.findText("1/16"))).toInt());
 
 	connect( &m_quantizeModel, SIGNAL(dataChanged()),
 					this, SLOT(quantizeChanged()));
@@ -359,7 +359,7 @@ PianoRoll::PianoRoll() :
 		auto loader = std::make_unique<PixmapLoader>( "note_" + pixmaps[i+NUM_EVEN_LENGTHS] );
 		m_noteLenModel.addItem( "1/" + QString::number( (1 << i) * 3 ), std::move(loader) );
 	}
-	m_noteLenModel.setValue(ConfigManager::inst()->value("ui", "pianorollnotelength", "0").toInt());
+	m_noteLenModel.setInitValue(ConfigManager::inst()->value("ui", "pianorollnotelength", "0").toInt());
 
 	// Note length change can cause a redraw if Q is set to lock
 	connect( &m_noteLenModel, SIGNAL(dataChanged()),
@@ -428,7 +428,7 @@ PianoRoll::PianoRoll() :
 	// Set up snap model
 	m_snapModel.addItem(tr("Nudge"));
 	m_snapModel.addItem(tr("Snap"));
-	m_snapModel.setValue(ConfigManager::inst()->value("ui", "pianorollsnap", "0").toInt());
+	m_snapModel.setInitValue(ConfigManager::inst()->value("ui", "pianorollsnap", "0").toInt());
 	changeSnapMode();
 	connect(&m_snapModel, SIGNAL(dataChanged()),
 		this, SLOT(changeSnapMode()));
@@ -5428,9 +5428,9 @@ void PianoRollWindow::loadSettings( const QDomElement & de )
 	Engine::getSong()->getTimeline(Song::PlayMode::MidiClip).setStopBehaviour(
 		static_cast<Timeline::StopBehaviour>(de.attribute("stopbehaviour").toInt()));
 
-	m_editor->m_keyModel.setValue(de.attribute("key").toInt());
-	m_editor->m_chordModel.setValue(de.attribute("chord").toInt());
-	m_editor->m_scaleModel.setValue(de.attribute("scale").toInt());
+	m_editor->m_keyModel.setInitValue(de.attribute("key").toInt());
+	m_editor->m_chordModel.setInitValue(de.attribute("chord").toInt());
+	m_editor->m_scaleModel.setInitValue(de.attribute("scale").toInt());
 	m_editor->loadMarkedSemiTones(de.firstChildElement("markedSemiTones"));
 
 	// update margins here because we're later in the startup process
