@@ -738,16 +738,18 @@ WARN_LOGFILE           =
 #---------------------------------------------------------------------------
 
 # The INPUT tag is used to specify the files and/or directories that contain
-# documented source files. You may enter file names like myfile.cpp or
-# directories like /usr/src/myproject. Separate the files or directories with
-# spaces.
-# Note: If this tag is empty the current directory is searched.
+# documented source files.
+#
+# Note: keep the main page as the first page in this list, or it might be
+# overriden by other main pages (e.g. the ones in included libraries).
 
-INPUT                  = "@CMAKE_CURRENT_SOURCE_DIR@/../src/core" \
-			"@CMAKE_CURRENT_SOURCE_DIR@/../src/gui" \
-			"@CMAKE_CURRENT_SOURCE_DIR@/../src/tracks" \
-			"@CMAKE_CURRENT_SOURCE_DIR@/../include" \
-			"@CMAKE_CURRENT_SOURCE_DIR@/../plugins" \
+INPUT = \
+	"@CMAKE_SOURCE_DIR@/../README.md" \
+	"@CMAKE_SOURCE_DIR@/../src/core" \
+	"@CMAKE_SOURCE_DIR@/../src/gui" \
+	"@CMAKE_SOURCE_DIR@/../src/tracks" \
+	"@CMAKE_SOURCE_DIR@/../include" \
+	"@CMAKE_SOURCE_DIR@/../plugins" \
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses
@@ -886,7 +888,7 @@ FILTER_SOURCE_PATTERNS =
 # (index.html). This can be useful if you have a project on for instance GitHub
 # and want to reuse the introduction page also for the doxygen output.
 
-USE_MDFILE_AS_MAINPAGE =
+USE_MDFILE_AS_MAINPAGE = "@CMAKE_SOURCE_DIR@/../README.md"
 
 #---------------------------------------------------------------------------
 # Configuration options related to source browsing
@@ -1942,7 +1944,47 @@ INCLUDE_FILE_PATTERNS  =
 # recursively expanded use the := operator instead of the = operator.
 # This tag requires that the tag ENABLE_PREPROCESSING is set to YES.
 
-PREDEFINED             =
+PREDEFINED             = "LMMS_BUILD_LINUX=" \
+                         "LMMS_HOST_X86_64=" \
+                         "LMMS_HAVE_ALSA=" \
+                         "LMMS_HAVE_FLUIDSYNTH=" \
+                         "LMMS_HAVE_JACK=" \
+                         "LMMS_HAVE_JACK_PRENAME=" \
+                         "LMMS_HAVE_WEAKJACK=" \
+                         "LMMS_HAVE_LV2=" \
+                         "LMMS_HAVE_SUIL=" \
+                         "LMMS_HAVE_MP3LAME=" \
+                         "LMMS_HAVE_SNDFILE_MP3=" \
+                         "LMMS_HAVE_OGGVORBIS=" \
+                         "LMMS_HAVE_OSS=" \
+                         "LMMS_HAVE_SNDIO=" \
+                         "LMMS_HAVE_PORTAUDIO=" \
+                         "LMMS_HAVE_SOUNDIO=" \
+                         "LMMS_HAVE_PULSEAUDIO=" \
+                         "LMMS_HAVE_SDL=" \
+                         "LMMS_HAVE_STK=" \
+                         "LMMS_HAVE_VST=" \
+                         "LMMS_HAVE_VST_32=" \
+                         "LMMS_HAVE_VST_64=" \
+                         "LMMS_HAVE_SF_COMPLEVEL=" \
+                         "LMMS_DEBUG_FPE=" \
+                         "LMMS_HAVE_PTHREAD_H=" \
+                         "LMMS_HAVE_UNISTD_H=" \
+                         "LMMS_HAVE_SYS_TYPES_H=" \
+                         "LMMS_HAVE_SYS_IPC_H=" \
+                         "LMMS_HAVE_SEMAPHORE_H=" \
+                         "LMMS_HAVE_SYS_TIME_H=" \
+                         "LMMS_HAVE_SYS_TIMES_H=" \
+                         "LMMS_HAVE_SYS_PRCTL_H=" \
+                         "LMMS_HAVE_SCHED_H=" \
+                         "LMMS_HAVE_SYS_SOUNDCARD_H=" \
+                         "LMMS_HAVE_SOUNDCARD_H=" \
+                         "LMMS_HAVE_FCNTL_H=" \
+                         "LMMS_HAVE_SYS_IOCTL_H=" \
+                         "LMMS_HAVE_CTYPE_H=" \
+                         "LMMS_HAVE_STRING_H=" \
+                         "LMMS_HAVE_PROCESS_H=" \
+                         "LMMS_HAVE_LOCALE_H=" \
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
 # tag can be used to specify a list of macro names that should be expanded. The
