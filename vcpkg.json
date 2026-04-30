@@ -6,13 +6,20 @@
 			"name": "fftw3",
 			"default-features": false,
 			"features": [
-				"sse",
-				"sse2"
+				{
+					"name": "sse2",
+					"platform": "x86 | x64"
+				},
+				{
+					"name": "neon",
+					"platform": "arm"
+				}
 			]
 		},
 		{
 			"name": "fltk",
-			"default-features": false
+			"default-features": false,
+			"platform": "!linux"
 		},
 		{
 			"name": "fluidsynth",
@@ -60,6 +67,11 @@
 		{
 			"name": "portaudio",
 			"default-features": false
+		},
+		{
+			"name": "pulseaudio",
+			"default-features": false,
+			"platform": "linux"
 		},
 		{
 			"name": "sdl2",

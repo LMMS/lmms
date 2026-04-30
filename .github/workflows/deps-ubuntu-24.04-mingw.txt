@@ -1,13 +1,18 @@
 autoconf
 autoconf-archive
+automake
 binutils
 binutils-mingw-w64
 ca-certificates
 ccache
+cmake
+file
 g++-mingw-w64-i686-posix
 g++-mingw-w64-x86-64-posix
 gcc-mingw-w64-i686-posix
 gcc-mingw-w64-x86-64-posix
+git
+gpg
 libc6-dev
 libegl-dev
 libgig-mingw-w64
@@ -15,6 +20,7 @@ libglx-dev
 liblist-moreutils-perl
 libmpc3
 libopengl-dev
+libtool
 libxml-perl
 libxml2-utils
 make
