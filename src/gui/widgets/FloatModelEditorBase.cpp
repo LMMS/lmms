@@ -44,15 +44,25 @@
 #include "StringPairDrag.h"
 
 
-namespace lmms::gui
+namespace lmms::gui {
+
+namespace {
+
+//! Whether the mouse is adjusting the control by dragging
+auto isMouseDragAdjustment(QMouseEvent* event) -> bool
 {
+	return event->button() == Qt::LeftButton
+		&& !(event->modifiers() & KBD_COPY_MODIFIER)
+		&& !(event->modifiers() & Qt::ShiftModifier);
+}
+
+} // namespace
 
 SimpleTextFloat * FloatModelEditorBase::s_textFloat = nullptr;
 
 FloatModelEditorBase::FloatModelEditorBase(DirectionOfManipulation directionOfManipulation, QWidget * parent, const QString & name) :
 	QWidget(parent),
 	FloatModelView(new FloatModel(0, 0, 0, 1, nullptr, name, true), this),
-	m_buttonPressed(false),
 	m_directionOfManipulation(directionOfManipulation)
 {
 	initUi(name);
@@ -74,12 +84,33 @@ void FloatModelEditorBase::initUi(const QString & name)
 }
 
 
-void FloatModelEditorBase::showTextFloat(int msecBeforeDisplay, int msecDisplayTime)
+void FloatModelEditorBase::showTextFloat(int msecBeforeDisplay, int msecDisplayTime, bool forceTextUpdate)
 {
-	if (s_textFloat->source() != this)
+	assert(m_interaction != InteractionType::None);
+
+	// First, check if the text needs to be updated
+	if (s_textFloat->source() != this || forceTextUpdate)
 	{
-		s_textFloat->setText(m_description + ' ' + getCustomFloatingText() + m_unit);
 		s_textFloat->setSource(this);
+
+		// Next, set the floating text depending on the floating text type
+		if (floatingTextType() == FloatingTextType::Static)
+		{
+			// Using static floating text
+			assert(m_staticToolTip.has_value());
+			if (m_staticToolTip->isEmpty())
+			{
+				// Using neither static nor dynamic floating text - don't display anything
+				s_textFloat->hide();
+				return;
+			}
+			s_textFloat->setText(*m_staticToolTip);
+		}
+		else
+		{
+			// Using dynamic floating text
+			s_textFloat->setText(m_description + ' ' + getDynamicFloatingText() + m_unit);
+		}
 	}
 
 	s_textFloat->moveGlobal(this, QPoint(width() + 2, 0));
@@ -87,16 +118,9 @@ void FloatModelEditorBase::showTextFloat(int msecBeforeDisplay, int msecDisplayT
 }
 
 
-void FloatModelEditorBase::showTextFloat()
+void FloatModelEditorBase::showTextFloat(bool forceTextUpdate)
 {
-	if (s_textFloat->source() != this)
-	{
-		s_textFloat->setText(m_description + ' ' + getCustomFloatingText() + m_unit);
-		s_textFloat->setSource(this);
-	}
-
-	s_textFloat->moveGlobal(this, QPoint(width() + 2, 0));
-	s_textFloat->show();
+	showTextFloat(0, 0, forceTextUpdate);
 }
 
 
@@ -173,9 +197,9 @@ void FloatModelEditorBase::dropEvent(QDropEvent * de)
 
 void FloatModelEditorBase::mousePressEvent(QMouseEvent * me)
 {
-	if (me->button() == Qt::LeftButton &&
-			! (me->modifiers() & KBD_COPY_MODIFIER) &&
-			! (me->modifiers() & Qt::ShiftModifier))
+	updateInteractionState(me);
+
+	if (isMouseDragAdjustment(me))
 	{
 		AutomatableModel *thisModel = model();
 		if (thisModel)
@@ -189,8 +213,7 @@ void FloatModelEditorBase::mousePressEvent(QMouseEvent * me)
 
 		emit sliderPressed();
 
-		showTextFloat(0, 0);
-		m_buttonPressed = true;
+		showTextFloat(true);
 	}
 	else if (me->button() == Qt::LeftButton &&
 			(me->modifiers() & Qt::ShiftModifier))
@@ -208,9 +231,10 @@ void FloatModelEditorBase::mousePressEvent(QMouseEvent * me)
 
 void FloatModelEditorBase::mouseMoveEvent(QMouseEvent * me)
 {
-	const auto pos = position(me);
+	updateInteractionState(me);
 
-	if (m_buttonPressed && pos != m_lastMousePos)
+	const auto pos = position(me);
+	if (m_interaction == InteractionType::MouseDrag && pos != m_lastMousePos)
 	{
 		// knob position is changed depending on last mouse position
 		setPosition(pos - m_lastMousePos);
@@ -225,6 +249,8 @@ void FloatModelEditorBase::mouseMoveEvent(QMouseEvent * me)
 
 void FloatModelEditorBase::mouseReleaseEvent(QMouseEvent* event)
 {
+	updateInteractionState(event);
+
 	if (event && event->button() == Qt::LeftButton)
 	{
 		AutomatableModel *thisModel = model();
@@ -234,8 +260,6 @@ void FloatModelEditorBase::mouseReleaseEvent(QMouseEvent* event)
 		}
 	}
 
-	m_buttonPressed = false;
-
 	emit sliderReleased();
 
 	QApplication::restoreOverrideCursor();
@@ -244,17 +268,19 @@ void FloatModelEditorBase::mouseReleaseEvent(QMouseEvent* event)
 }
 
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
-void FloatModelEditorBase::enterEvent(QEnterEvent*)
+void FloatModelEditorBase::enterEvent(QEnterEvent* event)
 #else
-void FloatModelEditorBase::enterEvent(QEvent*)
+void FloatModelEditorBase::enterEvent(QEvent* event)
 #endif
 {
+	updateInteractionState(event);
 	showTextFloat(700, 2000);
 }
 
 
 void FloatModelEditorBase::leaveEvent(QEvent *event)
 {
+	updateInteractionState(event);
 	s_textFloat->hide();
 }
 
@@ -297,6 +323,9 @@ void FloatModelEditorBase::paintEvent(QPaintEvent *)
 
 void FloatModelEditorBase::wheelEvent(QWheelEvent * we)
 {
+	const auto oldInteraction = m_interaction;
+	updateInteractionState(we);
+
 	we->accept();
 	const int deltaY = we->angleDelta().y();
 	float direction = deltaY > 0 ? 1 : -1;
@@ -353,7 +382,8 @@ void FloatModelEditorBase::wheelEvent(QWheelEvent * we)
 	const int inc = direction * stepMult;
 	model()->incValue(inc);
 
-	showTextFloat(0, 1000);
+	// Only force a text update for the 1st wheel event
+	showTextFloat(0, 1000, m_interaction != oldInteraction);
 
 	emit sliderMoved(model()->value());
 }
@@ -383,6 +413,87 @@ void FloatModelEditorBase::setPosition(const QPoint & p)
 			m_leftOver = valueOffset;
 		}
 	}
+}
+
+void FloatModelEditorBase::updateInteractionState(QEvent* event)
+{
+	// This is a state machine for updating m_interaction
+
+	if (!event)
+	{
+		m_interaction = InteractionType::None;
+		return;
+	}
+
+	switch (event->type())
+	{
+		case QEvent::Type::MouseButtonPress:
+			if (isMouseDragAdjustment(static_cast<QMouseEvent*>(event)))
+			{
+				m_interaction = InteractionType::MouseDrag;
+			}
+			break;
+		case QEvent::Type::MouseButtonRelease:
+			if (static_cast<QMouseEvent*>(event)->button() == Qt::LeftButton)
+			{
+				m_interaction = InteractionType::None;
+			}
+			break;
+		case QEvent::Type::MouseMove:
+			if (m_interaction == InteractionType::None)
+			{
+				m_interaction = InteractionType::MouseHover;
+			}
+			break;
+		case QEvent::Type::Enter:
+			if (m_interaction == InteractionType::None)
+			{
+				m_interaction = InteractionType::MouseHover;
+			}
+			break;
+		case QEvent::Type::Leave:
+			// Preserve MouseDrag because the user can drag the mouse outside the bounds of the control
+			// while adjusting its value, but the floating text should still be shown
+			if (m_interaction != InteractionType::MouseDrag)
+			{
+				m_interaction = InteractionType::None;
+			}
+			break;
+		case QEvent::Type::Wheel:
+			if (m_interaction != InteractionType::MouseDrag)
+			{
+				m_interaction = InteractionType::MouseWheel;
+			}
+			break;
+		default:
+			throw std::logic_error{"updateInteractionState: unknown event type"};
+	}
+}
+
+auto FloatModelEditorBase::floatingTextType() const -> FloatingTextType
+{
+	switch (m_interaction)
+	{
+		case InteractionType::None: return FloatingTextType::None;
+		case InteractionType::MouseHover:
+			if (s_textFloat->source() != this)
+			{
+				// The mouse is hovering over the control but not long enough
+				// for the floating text to be shown
+				return FloatingTextType::None;
+			}
+
+			return m_staticToolTip
+				? FloatingTextType::Static
+				: FloatingTextType::Dynamic;
+		default: break;
+	}
+
+	// For MouseDrag or MouseWheel interactions, check whether the floating
+	// text is shown for this control
+	return s_textFloat->source() == this
+		? FloatingTextType::Dynamic
+		: FloatingTextType::None;
 }
 
 
@@ -420,11 +531,11 @@ void FloatModelEditorBase::friendlyUpdate()
 		&& Controller::runningFrames() % (256 * 4) != 0)
 	{ return; }
 
-	// If this float model is currently controlling the TextFloat...
-	if (textFloat().source() == this)
+	// If this float model is currently controlling dynamic floating text...
+	if (floatingTextType() == FloatingTextType::Dynamic)
 	{
 		// ...and if the text changed since last time...
-		if (auto updatedText = getCustomFloatingTextUpdate())
+		if (auto updatedText = getDynamicFloatingTextUpdate())
 		{
 			// ...then update the floating text
 			s_textFloat->setText(m_description + ' ' + std::move(*updatedText) + m_unit);
@@ -435,7 +546,7 @@ void FloatModelEditorBase::friendlyUpdate()
 }
 
 
-QString FloatModelEditorBase::getCustomFloatingText()
+QString FloatModelEditorBase::getDynamicFloatingText()
 {
 	return QString::number(model()->getRoundedValue());
 }

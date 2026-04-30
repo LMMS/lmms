@@ -56,11 +56,11 @@ DualFilterControlDialog::DualFilterControlDialog( DualFilterControls* controls )
 
 	makeKnob(24, 26, &controls->m_cut1Model, tr("FREQ"), tr("Cutoff frequency"), "Hz");
 	makeKnob(74, 26, &controls->m_res1Model, tr("RESO"), tr("Resonance"), "");
-	makeKnob(124, 26, &controls->m_gain1Model, tr("GAIN"), tr("Gain"), "%", true);
+	makeKnob(124, 26, &controls->m_gain1Model, tr("GAIN"), tr("Gain"), "", true);
 	makeKnob(173, 37, &controls->m_mixModel, tr("MIX"), tr("Mix"), "");
 	makeKnob(222, 26, &controls->m_cut2Model, tr("FREQ"), tr("Cutoff frequency"), "Hz");
 	makeKnob(272, 26, &controls->m_res2Model, tr("RESO"), tr("Resonance"), "");
-	makeKnob(322, 26, &controls->m_gain2Model, tr("GAIN"), tr("Gain"), "%", true);
+	makeKnob(322, 26, &controls->m_gain2Model, tr("GAIN"), tr("Gain"), "", true);
 
 	auto enabled1Toggle = new LedCheckBox("", this, tr("Filter 1 enabled"), LedCheckBox::LedColor::Green);
 	auto enabled2Toggle = new LedCheckBox("", this, tr("Filter 2 enabled"), LedCheckBox::LedColor::Green);

@@ -85,7 +85,7 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 
 	m_volumeKnob = new VolumeKnob(KnobType::Small17, tr("VOL"), getTrackSettingsWidget(), Knob::LabelRendering::LegacyFixedFontSize, tr("VOL"));
 	m_volumeKnob->setModel( &_it->m_volumeModel );
-	m_volumeKnob->setHintText( tr( "Volume:" ), "%" );
+	m_volumeKnob->setDescription(tr("Volume:"));
 	m_volumeKnob->show();
 
 	m_panningKnob = new Knob(KnobType::Small17, tr("PAN"), getTrackSettingsWidget(), Knob::LabelRendering::LegacyFixedFontSize, tr("Panning"));

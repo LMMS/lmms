@@ -63,13 +63,13 @@ DynProcControlDialog::DynProcControlDialog(
 	inputKnob->setVolumeRatio(1.0);
 	inputKnob -> move( 26, 223 );
 	inputKnob->setModel( &_controls->m_inputModel );
-	inputKnob->setHintText( tr( "Input gain:" ) , "" );
+	inputKnob->setDescription(tr("Input gain:"));
 
 	auto outputKnob = new VolumeKnob(KnobType::Bright26, tr("OUTPUT"), SMALL_FONT_SIZE, this);
 	outputKnob->setVolumeRatio(1.0);
 	outputKnob -> move( 76, 223 );
 	outputKnob->setModel( &_controls->m_outputModel );
-	outputKnob->setHintText( tr( "Output gain:" ) , "" );
+	outputKnob->setDescription(tr("Output gain:"));
 
 	auto attackKnob = new Knob(KnobType::Bright26, tr("ATTACK"), SMALL_FONT_SIZE, this);
 	attackKnob -> move( 24, 268 );

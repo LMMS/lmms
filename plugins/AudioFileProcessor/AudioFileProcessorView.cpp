@@ -116,7 +116,7 @@ AudioFileProcessorView::AudioFileProcessorView(Instrument* instrument,
 
 	m_ampKnob = new VolumeKnob(KnobType::Bright26, this);
 	m_ampKnob->move(5, 108);
-	m_ampKnob->setHintText(tr("Amplify:"), "%");
+	m_ampKnob->setDescription(tr("Amplify:"));
 
 	m_startKnob = new AudioFileProcessorWaveView::knob(this);
 	m_startKnob->move(50, 108);
