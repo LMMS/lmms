@@ -56,6 +56,8 @@ public:
 
 	//! Returns the current value of the given midi CC knob/controller, or the default value if we haven't recieved any midi CC signals for it yet.
 	int midiCCValue(const int index) const { return m_ccValues.at(index); }
+	//! Returns a const array of the current CC knob values
+	const std::array<int, SfzOpcodeState::NumMidiCCs> midiCCValues() const { return m_ccValues; }
 
 	//! Returns the random value for the current trigger
 	const float rand() const { return m_rand; }

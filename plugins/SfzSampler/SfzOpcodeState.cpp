@@ -42,16 +42,17 @@ bool SfzOpcodeState::setOpcodeByStrings(const QString& name, const QString& valu
 {
 	bool successful = true;
 
+	m_ampeg.parseEnvelopeGeneratorOpcode(name, value, &successful);
 	//
 	// File paths
 	//
 	if (name == "sample")
 	{
-		m_sampleFile = value;
+		m_sampleFile.setValue(value);
 	}
 	else if (name == "default_path")
 	{
-		m_default_path = value;
+		m_default_path.setValue(value);
 	}
 
 
@@ -60,8 +61,8 @@ bool SfzOpcodeState::setOpcodeByStrings(const QString& name, const QString& valu
 	//
 	else if (name == "trigger")
 	{
-		if (value == "attack") { m_trigger = TriggerType::Attack; }
-		else if (value == "release") { m_trigger = TriggerType::Release; }
+		if (value == "attack") { m_trigger.setValue(TriggerType::Attack); }
+		else if (value == "release") { m_trigger.setValue(TriggerType::Release); }
 		//else if (value == "first") { m_trigger = TriggerType::First; } // TODO To be implemented
 		//else if (value == "legato") { m_trigger = TriggerType::Legato; } // TODO To be implemented
 		//else if (value == "release_key") { m_trigger = TriggerType::ReleaseKey; } // TODO To be implemented
@@ -269,6 +270,7 @@ bool SfzOpcodeState::setOpcodeByStrings(const QString& name, const QString& valu
 	//
 	// Amplitude Envelope Generator (ampeg)
 	//
+	/*TODO
 	else if (name == "ampeg_delay") { m_ampeg_delay = value.toFloat(&successful); }
 	else if (name == "ampeg_attack") { m_ampeg_attack = value.toFloat(&successful); }
 	else if (name == "ampeg_hold") { m_ampeg_hold = value.toFloat(&successful); }
@@ -307,6 +309,7 @@ bool SfzOpcodeState::setOpcodeByStrings(const QString& name, const QString& valu
 	{
 		m_ampeg_release_oncc.at(ccNumberFromOpcode(name)) = value.toFloat(&successful);
 	}
+	*/
 
 
 	//
@@ -473,5 +476,111 @@ QString SfzOpcodeState::keyNumToString(int keyNum)
 	return key + octave;
 }
 
+
+template<>
+void SfzOpcodeState::Opcode<float>::parseFromString(const QString& opcodeName, const QString& opcodeValue, bool* successful)
+{
+	if (m_opcodeName != opcodeName) { return; }
+	m_value = opcodeValue.toFloat(successful);
+	qDebug() << "Float opcode" << m_opcodeName << "set to" << m_value;
+}
+
+template<>
+void SfzOpcodeState::Opcode<int>::parseFromString(const QString& opcodeName, const QString& opcodeValue, bool* successful)
+{
+	if (m_opcodeName != opcodeName) { return; }
+	m_value = opcodeValue.toInt(successful);
+	// Integer opcodes can also define keys, which can be specified either by a key number of by a string like e4 or c#5
+	if (!successful) { m_value = stringToKeyNum(opcodeValue, successful); }
+}
+
+template<>
+void SfzOpcodeState::Opcode<std::optional<QString>>::parseFromString(const QString& opcodeName, const QString& opcodeValue, bool* successful)
+{
+	if (m_opcodeName != opcodeName) { return; }
+	m_value = opcodeValue;
+	*successful = true;
+}
+
+// Modulatable Opcodes are a type of float opcode which can be adjusted based on different midi CC knob values
+// They have both an initial value defined by their opcodename=value
+// but also opcodename_oncc123=modulation_amount
+// or opcodenamecc123=modulation_amount
+void SfzOpcodeState::ModulatableOpcode::parseFromString(const QString& opcodeName, const QString& opcodeValue, bool* successful)
+{
+	if (opcodeName == m_opcodeName)
+	{
+		m_value = opcodeValue.toFloat(successful);
+		qDebug() << "ModulatableOpcode" << m_opcodeName << "set to" << m_value;
+	}
+	else if (opcodeName.startsWith(m_opcodeName + "_oncc") || opcodeName.startsWith(m_opcodeName + "cc"))
+	{
+		value_oncc.at(ccNumberFromOpcode(opcodeName)) = opcodeValue.toFloat(successful);
+		qDebug() << "ModulatableOpcode" << m_opcodeName << "set cc mod" << ccNumberFromOpcode(opcodeName) << value_oncc.at(ccNumberFromOpcode(opcodeName));
+	}
+}
+
+
+// The modulation of Modulatable opcodes can change whenever a midi CC knob changes. There are 128 of them,
+// which is a bit much to keep checking every single frame when generating audio.
+// Instead, the current modulation value is only calculated and cached each time a midi CC event is sent, which saves a lot of compute.
+void SfzOpcodeState::ModulatableOpcode::updateCachedModulation(const std::array<int, SfzOpcodeState::NumMidiCCs>& ccValues)
+{
+	cachedModulation = 0.0f;
+	// TODO this may be optimized if we only loop through the CC's which are actually used by the region
+	for (int i = 0; i < SfzOpcodeState::NumMidiCCs; ++i)
+	{
+		cachedModulation += value_oncc.at(i) * ccValues.at(i) / 128.0f;
+	}
+}
+
+
+
+
+// Envelope Generator Opcodes
+void SfzOpcodeState::EnvelopeOpcodes::parseEnvelopeGeneratorOpcode(const QString& opcode, const QString& value, bool* successful)
+{
+	// Pass the opcode name/value to all of the bundled opcodes.
+	// If it matches one of them, that's great. If not, they will return and nothing will happen.
+	// TODO is this error handling with "successful" correct?
+	delay.parseFromString(opcode, value, successful);
+	attack.parseFromString(opcode, value, successful);
+	hold.parseFromString(opcode, value, successful);
+	decay.parseFromString(opcode, value, successful);
+	sustain.parseFromString(opcode, value, successful);
+	release.parseFromString(opcode, value, successful);
+
+	vel2delay.parseFromString(opcode, value, successful);
+	vel2attack.parseFromString(opcode, value, successful);
+	vel2hold.parseFromString(opcode, value, successful);
+	vel2decay.parseFromString(opcode, value, successful);
+	vel2sustain.parseFromString(opcode, value, successful);
+	vel2release.parseFromString(opcode, value, successful);
+}
+
+
+
+
+//
+// Bespoke Enum-like Opcodes
+//
+
+template<>
+void SfzOpcodeState::Opcode<SfzOpcodeState::TriggerType>::parseFromString(const QString& opcodeName, const QString& opcodeValue, bool* successful)
+{
+	if (m_opcodeName != opcodeName) { return; }
+
+	if (opcodeValue == "attack") { m_value = TriggerType::Attack; }
+	else if (opcodeValue == "release") { m_value = TriggerType::Release; }
+	//else if (value == "first") { m_trigger = TriggerType::First; } // TODO To be implemented
+	//else if (value == "legato") { m_trigger = TriggerType::Legato; } // TODO To be implemented
+	//else if (value == "release_key") { m_trigger = TriggerType::ReleaseKey; } // TODO To be implemented
+	else
+	{
+		qDebug() << "[SFZ Parser] Unknown trigger:" << opcodeValue;
+		return;
+	}
+	*successful = true;
+}
 
 } // namespace lmms

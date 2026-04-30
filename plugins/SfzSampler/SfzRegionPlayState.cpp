@@ -152,12 +152,12 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const fpp_t frames)
 	const float amplitude = (m_region->m_amplitude + m_region->m_amplitude_totalCC) / 100.0f; // Amplitude is stored as a percent
 
 	// Amplitude envelope
-	const f_cnt_t ampegDelayFrames = (m_region->m_ampeg_delay + m_region->m_ampeg_delay_totalCC) * sampleRate;
-	const f_cnt_t ampegAttackFrames = (m_region->m_ampeg_attack + m_region->m_ampeg_attack_totalCC) * sampleRate;
-	const f_cnt_t ampegHoldFrames = (m_region->m_ampeg_hold + m_region->m_ampeg_hold_totalCC) * sampleRate;
-	const f_cnt_t ampegDecayFrames = (m_region->m_ampeg_decay + m_region->m_ampeg_decay_totalCC) * sampleRate;
-	const float ampegSustain = (m_region->m_ampeg_sustain + m_region->m_ampeg_sustain_totalCC) / 100.0f; // Sustain is stored in percent, so divide by 100 to get ratio
-	const f_cnt_t ampegReleaseFrames = (m_region->m_ampeg_release + m_region->m_ampeg_release_totalCC) * sampleRate;
+	const f_cnt_t ampegDelayFrames = (m_region->m_ampeg.delay.value() + m_region->m_ampeg.delay.cachedModulation) * sampleRate;
+	const f_cnt_t ampegAttackFrames = (m_region->m_ampeg.attack.value() + m_region->m_ampeg.attack.cachedModulation) * sampleRate;
+	const f_cnt_t ampegHoldFrames = (m_region->m_ampeg.hold.value() + m_region->m_ampeg.hold.cachedModulation) * sampleRate;
+	const f_cnt_t ampegDecayFrames = (m_region->m_ampeg.decay.value() + m_region->m_ampeg.decay.cachedModulation) * sampleRate;
+	const float ampegSustain = (m_region->m_ampeg.sustain.value() + m_region->m_ampeg.sustain.cachedModulation) / 100.0f; // Sustain is stored in percent, so divide by 100 to get ratio
+	const f_cnt_t ampegReleaseFrames = (m_region->m_ampeg.release.value() + m_region->m_ampeg.release.cachedModulation) * sampleRate;
 
 	// Amplitude due to velocity
 	// If amp_keytrack is 100, then 0 velocity = 0 amp, and 127 velocity = 1.0f amp (as expected)

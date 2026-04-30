@@ -42,7 +42,7 @@ SfzRegionManager::SfzRegionManager(std::vector<SfzRegion>& regions)
 			if (key >= region.m_lokey && key <= region.m_hikey)
 			{
 				// Additionally sort by trigger type
-				switch (region.m_trigger)
+				switch (region.m_trigger.value())
 				{
 				case SfzOpcodeState::TriggerType::Attack:
 					m_noteOnRegions.at(key).push_back(&region);

@@ -39,7 +39,7 @@ public:
 
 	//! Given an opcode assignment such as `lokey=45`, passing "m_lokey" and "45" to this function
 	//! will take those values and figure out if "lokey" is a valid opcode, and whether "45" is a valid value for it.
-	//! If so, it will set the internal member variable corresponding to it, and return false.
+	//! If so, it will set the internal member variable corresponding to it, and return true.
 	//! If it was unsucessful, it will print an error message and return false.
 	bool setOpcodeByStrings(const QString& name, const QString& value);
 
@@ -55,6 +55,109 @@ public:
 	// Normal MIDI CC's range from 0 to 127. More advanced SFZ's go beyond that, but for now we cap it at 128. This should be extended in the future.
 	static constexpr const int NumMidiCCs = 128;
 
+
+	/* Helper structs for opcodes */
+
+	// A base struct for all opcodes, just a name and a value.
+	template<typename T>
+	struct Opcode
+	{
+		QString m_opcodeName;
+		T m_value;
+
+		Opcode(QString name, T defaultValue) : m_opcodeName(name), m_value(defaultValue) {}
+		void setValue(const T& value) { m_value = value; }
+		const T& value() const { return m_value; }
+
+		// Function for taking in a string like "pitch_keytrack=1200", split into name/value as "pitch_keytrack", "1200", and updating the value if the name matches.
+		virtual void parseFromString(const QString& opcodeName, const QString& opcodeValue, bool* successful) {};
+	};
+
+	// Float/decimal opcodes (such as amplitude, panning, etc)
+	struct FloatOpcode : Opcode<float>
+	{
+		FloatOpcode(QString name = "", float defaultValue = 0.0f) : Opcode<float>(name, defaultValue) {};
+		//void parseFromString(const QString& opcodeName, const QString& opcodeValue, bool* successful) override;
+	};
+
+	// Key opcodes (such as lokey, hikey, pitch_keycenter, etc)
+	struct KeyOpcode : Opcode<int>
+	{
+		KeyOpcode(QString name = "", int defaultValue = 0) : Opcode<int>(name, defaultValue) {};
+		//void parseFromString(const QString& opcodeName, const QString& opcodeValue, bool* successful) override;
+	};
+
+	// String opcodes (such as sample file path)
+	struct StringOpcode : Opcode<std::optional<QString>>
+	{
+		StringOpcode(QString name, std::optional<QString> defaultValue) : Opcode<std::optional<QString>>(name, defaultValue) {};
+		//void parseFromString(const QString& opcodeName, const QString& opcodeValue, bool* successful) override;
+	};
+
+	// Many opcodes can be modulated by MIDI CC knobs, so each of them needs an array to store the modulation weights for each one.
+	struct ModulatableOpcode : FloatOpcode
+	{
+		std::array<float, NumMidiCCs> value_oncc = {};
+		//! Store the current total midi CC modulation amounts for the different targets, just so that we don't
+		// have to recalculate them every buffer, instead only when a trigger occurs.
+		float cachedModulation = 0.0f;
+
+		ModulatableOpcode(QString name = "", float defaultValue = 0.0f) : FloatOpcode(name, defaultValue) {};
+		// Helper function for parsing these kinds of opcodes, where you have both `opcode` and `opcode_onccN` where N is the midi cc number, so
+		// that the code isn't duplicated for every modulatable parameter.
+		void parseFromString(const QString& opcodeName, const QString& opcodeValue, bool* successful) override;
+		// Helper function to update the cached CC modulation amount every time a midi Control Change trigger occurs
+		void updateCachedModulation(const std::array<int, SfzOpcodeState::NumMidiCCs>& ccValues);
+	};
+
+	// Additionally, things like amplitude, pitch, and filter freq envelopes and lfo's all have very similar parameters, so it makes sense to put
+	// them all together in a handy definition
+	struct EnvelopeOpcodes
+	{
+		// Envelope parameters (these can be modulated by midi CCs)
+		ModulatableOpcode delay;
+		ModulatableOpcode attack;
+		ModulatableOpcode hold;
+		ModulatableOpcode decay;
+		ModulatableOpcode sustain;
+		ModulatableOpcode release;
+		// Velocity modulation amount
+		FloatOpcode vel2delay;
+		FloatOpcode vel2attack;
+		FloatOpcode vel2hold;
+		FloatOpcode vel2decay;
+		FloatOpcode vel2sustain;
+		FloatOpcode vel2release;
+
+		// Initialize opcodes with correct names and default values
+		EnvelopeOpcodes(QString name)
+			: delay(name + "_delay", 0.0f)
+			, attack(name + "_attack", 0.0f)
+			, hold(name + "_hold", 0.0f)
+			, decay(name + "_decay", 0.0f)
+			, sustain(name + "_sustain", 100.0f)
+			, release(name + "_release", 0.0f)
+			, vel2delay(name + "_vel2delay", 0.0f)
+			, vel2attack(name + "_vel2attack", 0.0f)
+			, vel2hold(name + "_vel2hold", 0.0f)
+			, vel2decay(name + "_vel2decay", 0.0f)
+			, vel2sustain(name + "_vel2sustain", 0.0f)
+			, vel2release(name + "_vel2release", 0.0f)
+		{}
+		// Helper function to update all of the cached modulations for the individual opcodes
+		void updateCachedModulation(const std::array<int, SfzOpcodeState::NumMidiCCs>& ccValues)
+		{
+			delay.updateCachedModulation(ccValues);
+			attack.updateCachedModulation(ccValues);
+			hold.updateCachedModulation(ccValues);
+			decay.updateCachedModulation(ccValues);
+			sustain.updateCachedModulation(ccValues);
+			release.updateCachedModulation(ccValues);
+		}
+		// Helper function for parsing all these envelope generator opcodes, so that the code isn't duplicated for the amplitude, pitch, and filter envelopes
+		void parseEnvelopeGeneratorOpcode(const QString& opcode, const QString& value, bool* successful);
+	};
+
 	/***********************************************************************/
 	// SFZ OPCODE DEFINITIONS
 	/***********************************************************************/
@@ -62,8 +165,8 @@ public:
 	//
 	// File Paths
 	//
-	std::optional<QString> m_sampleFile = std::nullopt;
-	std::optional<QString> m_default_path = std::nullopt;
+	StringOpcode m_sampleFile {"sample", std::nullopt};
+	StringOpcode m_default_path {"default_path", std::nullopt};
 
 
 	//
@@ -77,7 +180,7 @@ public:
 		//Legato, // TODO To be implemented
 		//ReleaseKey // TODO To be implemented
 	};
-	TriggerType m_trigger = TriggerType::Attack;
+	Opcode<TriggerType> m_trigger {"trigger", TriggerType::Attack};
 
 	//
 	// Key Conditions
@@ -173,26 +276,7 @@ public:
 	//
 	// Amplitude Envelope Generator (ampeg)
 	//
-	float m_ampeg_delay = 0.0f;
-	float m_ampeg_attack = 0.0f;
-	float m_ampeg_hold = 0.0f;
-	float m_ampeg_decay = 0.0f;
-	float m_ampeg_sustain = 100.0f;
-	float m_ampeg_release = 0.001f;
-	// Velocity modulation amount
-	float m_ampeg_vel2delay = 0.0f;
-	float m_ampeg_vel2attack = 0.0f;
-	float m_ampeg_vel2hold = 0.0f;
-	float m_ampeg_vel2decay = 0.0f;
-	float m_ampeg_vel2sustain = 0.0f;
-	float m_ampeg_vel2release = 0.0f;
-	// Midi CC modulation amounts
-	std::array<float, NumMidiCCs> m_ampeg_delay_oncc = {};
-	std::array<float, NumMidiCCs> m_ampeg_attack_oncc = {};
-	std::array<float, NumMidiCCs> m_ampeg_hold_oncc = {};
-	std::array<float, NumMidiCCs> m_ampeg_decay_oncc = {};
-	std::array<float, NumMidiCCs> m_ampeg_sustain_oncc = {};
-	std::array<float, NumMidiCCs> m_ampeg_release_oncc = {};
+	EnvelopeOpcodes m_ampeg {"ampeg"};
 
 
 	//
@@ -217,6 +301,14 @@ public:
 
 	friend class SfzRegion;
 };
+
+
+
+// Template specializations
+
+// Trigger Type
+template<> void SfzOpcodeState::Opcode<SfzOpcodeState::TriggerType>::parseFromString(const QString& opcodeName, const QString& opcodeValue, bool* successful);
+
 
 
 } // namespace lmms

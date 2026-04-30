@@ -129,7 +129,7 @@ void SfzSampler::processTrigger(const SfzTrigger& trigger)
 		// If the trigger conditions are met, spawn a new sound
 		if (region->triggerConditionsMet(m_sfzGlobalState, trigger))
 		{
-			qDebug() << "Spawning sound!" << region->m_sampleFile.value_or("N/A");
+			qDebug() << "Spawning sound!" << region->m_sampleFile.value().value_or("N/A");
 			// Loop through array to find open position
 			bool foundOpenPosition = false;
 			for (size_t i = 0; i <= m_voices.size(); ++i)
@@ -239,7 +239,7 @@ void SfzSampler::loadSfzFile(const QString& filePath)
 	int i = 0;
 	for (auto* region : m_regionManager.allRegions())
 	{
-		qDebug() << "[SFZ Player] Loading sample" << i + 1 << "/" << m_regionManager.allRegions().size() << region->m_sampleFile.value_or("N/A");
+		qDebug() << "[SFZ Player] Loading sample" << i + 1 << "/" << m_regionManager.allRegions().size() << region->m_sampleFile.value().value_or("N/A");
 		bool successfulLoadSample = region->initializeSample(parentDirectory, m_samplePool);
 		if (!successfulLoadSample) { qDebug() << "[SFZ Player] An error occured when loading a sample."; }
 		i++;

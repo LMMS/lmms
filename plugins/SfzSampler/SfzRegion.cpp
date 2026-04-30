@@ -50,8 +50,8 @@ bool SfzRegion::triggerConditionsMet(const SfzGlobalState& globalState, const Sf
 	if (trigger.type() == SfzTrigger::Type::ControlChange) { return false; } // TODO. It is possible for midi CC's to trigger regions, such as using the sustain pedal or on_locc/on_hicc
 
 	// Make sure the trigger type matches
-	if (trigger.type() == SfzTrigger::Type::NoteOn && m_trigger != TriggerType::Attack) { return false; }
-	if (trigger.type() == SfzTrigger::Type::NoteOff && m_trigger != TriggerType::Release) { return false; }
+	if (trigger.type() == SfzTrigger::Type::NoteOn && m_trigger.value() != TriggerType::Attack) { return false; }
+	if (trigger.type() == SfzTrigger::Type::NoteOff && m_trigger.value() != TriggerType::Release) { return false; }
 
 	// Assuming the trigger has key/vel info (i.e., it's a noteOn/noteOff, not a midi CC event), make sure all the key/vel selectors match
 	if (trigger.type() == SfzTrigger::Type::NoteOn || trigger.type() == SfzTrigger::Type::NoteOff)
@@ -103,7 +103,8 @@ void SfzRegion::processTrigger(SfzGlobalState& globalState, const SfzTrigger& tr
 	// Before spawning a sound, do some pre-calculation of the midi CC modulation amounts so that we don't have to do it every buffer
 	if (trigger.type() == SfzTrigger::Type::ControlChange)
 	{
-		recalculateTotalCCModulation(globalState);
+		//recalculateTotalCCModulation(globalState);
+		m_ampeg.updateCachedModulation(globalState.midiCCValues());
 	}
 }
 
@@ -124,12 +125,14 @@ void SfzRegion::recalculateTotalCCModulation(const SfzGlobalState& globalState)
 {
 	m_amplitude_totalCC = totalCCModulation(m_amplitude_oncc, globalState);
 
+	/*TODO
 	m_ampeg_delay_totalCC = totalCCModulation(m_ampeg_delay_oncc, globalState);
 	m_ampeg_attack_totalCC = totalCCModulation(m_ampeg_attack_oncc, globalState);
 	m_ampeg_hold_totalCC = totalCCModulation(m_ampeg_hold_oncc, globalState);
 	m_ampeg_decay_totalCC = totalCCModulation(m_ampeg_decay_oncc, globalState);
 	m_ampeg_sustain_totalCC = totalCCModulation(m_ampeg_sustain_oncc, globalState);
 	m_ampeg_release_totalCC = totalCCModulation(m_ampeg_release_oncc, globalState);
+	*/
 
 	m_gain_totalCC = totalCCModulation(m_gain_oncc, globalState);
 	m_pan_totalCC = totalCCModulation(m_pan_oncc, globalState);
@@ -140,15 +143,15 @@ void SfzRegion::recalculateTotalCCModulation(const SfzGlobalState& globalState)
 
 bool SfzRegion::initializeSample(const QDir& parentDirectory, SfzSamplePool& samplePool)
 {
-	if (m_sampleFile == std::nullopt)
+	if (m_sampleFile.value() == std::nullopt)
 	{
 		// It's weird for a region not to have a sample defined. That's literally all regions do, play samples, right?
 		qDebug() << "[SFZ Player] Warning: `sample` opcode not assigned";
 		return false;
 	}
 
-	QDir defaultDirectory = QDir(parentDirectory.absoluteFilePath(m_default_path.value_or("")));
-	QString path = defaultDirectory.absoluteFilePath(m_sampleFile.value());
+	QDir defaultDirectory = QDir(parentDirectory.absoluteFilePath(m_default_path.value().value_or(""))); // TODO
+	QString path = defaultDirectory.absoluteFilePath(m_sampleFile.value().value()); // TODO
 	// The sample pool handles making sure the same sample isn't loaded twice, which would waste memory
 	m_sample = samplePool.loadSample(path);
 
