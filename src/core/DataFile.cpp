@@ -2084,6 +2084,7 @@ void DataFile::upgrade_fixBassLoopsTypo()
 	mapSrcAttributeInElementsWithResources(replacementMap);
 }
 
+
 void DataFile::upgrade()
 {
 	// Runs all necessary upgrade methods
