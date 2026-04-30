@@ -71,7 +71,7 @@ Plugin::Descriptor PLUGIN_EXPORT tripleoscillator_plugin_descriptor =
 OscillatorObject::OscillatorObject( Model * _parent, int _idx ) :
 	Model( _parent ),
 	m_volumeModel( DefaultVolume / NUM_OF_OSCILLATORS, MinVolume,
-			MaxVolume, 1.0f, this, tr( "Osc %1 volume" ).arg( _idx+1 ) ),
+			MaxVolume, 0, this, tr("Osc %1 volume").arg(_idx + 1)),
 	m_panModel( DefaultPanning, PanningLeft, PanningRight, 1.0f, this,
 			tr( "Osc %1 panning" ).arg( _idx+1 ) ),
 	m_coarseModel( -_idx*KeysPerOctave,
