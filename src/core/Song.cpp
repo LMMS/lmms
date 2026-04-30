@@ -456,7 +456,7 @@ bool Song::isExportDone() const
 int Song::getExportProgress() const
 {
 	TimePos pos = getPlayPos();
-    
+
 	if (pos >= m_exportSongEnd)
 	{
 		return 100;
@@ -504,14 +504,6 @@ void Song::playSong()
 	emit playbackStateChanged();
 }
 
-
-
-
-void Song::record()
-{
-	m_recording = true;
-	// TODO: Implement
-}
 
 
 
@@ -741,7 +733,6 @@ void Song::startExport()
 	else
 	{
 		m_exportSongEnd = TimePos(m_length, 0);
-        
 		// Handle potentially ridiculous loop points gracefully.
 		if (m_loopRenderCount > 1 && timeline.loopEnd() > m_exportSongEnd) 
 		{
@@ -750,7 +741,7 @@ void Song::startExport()
 
 		if (!m_exportLoop) 
 			m_exportSongEnd += TimePos(1,0);
-        
+
 		m_exportSongBegin = TimePos(0,0);
 		m_exportLoopBegin = timeline.loopBegin() < m_exportSongEnd && timeline.loopEnd() <= m_exportSongEnd
 			? timeline.loopBegin()
