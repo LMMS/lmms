@@ -229,13 +229,10 @@ void FileBrowser::onSearch(const QString& filter)
 	if (m_showFactoryContent && !m_showFactoryContent->isChecked()) { directories.removeAll(m_factoryDir); }
 	if (directories.isEmpty()) { return; }
 
-	auto directoryFilters = QDir::AllEntries | QDir::NoDotAndDotDot;
-	if (m_showHiddenContent) { directoryFilters |= QDir::Hidden; }
-
 	const auto searchTask = FileSearchJob::Task{.filter = filter,
 		.paths = directories,
 		.extensions = FileItem::defaultFilters().split(" "),
-		.dirFilters = directoryFilters};
+		.hidden = m_showHiddenContent->isChecked()};
 
 	m_searchTreeWidget->clear();
 	m_searchTreeWidget->show();
