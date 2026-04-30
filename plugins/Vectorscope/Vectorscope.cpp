@@ -40,7 +40,7 @@ extern "C" {
 		"Martin Pavelek <he29/dot/HS/at/gmail/dot/com>",
 		0x0100,
 		Plugin::Type::Effect,
-		new PluginPixmapLoader("logo"),
+		new PixmapLoader("lmms-plugin-logo"),
 		nullptr,
 		nullptr,
 	};
@@ -58,7 +58,7 @@ Vectorscope::Vectorscope(Model *parent, const Plugin::Descriptor::SubPluginFeatu
 
 
 // Take audio data and store them for processing and display in the GUI thread.
-Effect::ProcessStatus Vectorscope::processImpl(SampleFrame* buf, const fpp_t frames)
+Effect::ProcessStatus Vectorscope::processImpl(SampleFrame* buf, const f_cnt_t frames)
 {
 	// Skip processing if the controls dialog isn't visible, it would only waste CPU cycles.
 	if (m_controls.isViewVisible())

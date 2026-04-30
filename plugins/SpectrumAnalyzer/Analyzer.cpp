@@ -49,7 +49,7 @@ extern "C" {
 		"Martin Pavelek <he29/dot/HS/at/gmail/dot/com>",
 		0x0112,
 		Plugin::Type::Effect,
-		new PluginPixmapLoader("logo"),
+		new PixmapLoader("lmms-plugin-logo"),
 		nullptr,
 		nullptr,
 	};
@@ -77,7 +77,7 @@ Analyzer::~Analyzer()
 }
 
 // Take audio data and pass them to the spectrum processor.
-Effect::ProcessStatus Analyzer::processImpl(SampleFrame* buf, const fpp_t frames)
+Effect::ProcessStatus Analyzer::processImpl(SampleFrame* buf, const f_cnt_t frames)
 {
 	// Measure time spent in audio thread; both average and peak should be well under 1 ms.
 	#ifdef SA_DEBUG

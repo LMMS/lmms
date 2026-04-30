@@ -73,8 +73,6 @@ public slots:
 	void moveUp();
 	void moveDown();
 	void deletePlugin();
-	void closeEffects();
-
 
 signals:
 	void movedUp(EffectView* view);
@@ -92,7 +90,6 @@ private:
 	LedCheckBox * m_bypass;
 	Knob * m_wetDry;
 	TempoSyncKnob * m_autoQuit;
-	Knob * m_gate;
 	QMdiSubWindow * m_subWindow;
 	EffectControlDialog * m_controlView;
 	

@@ -62,7 +62,7 @@ void Engine::init( bool renderOnly )
 	emit engine->initProgress(tr("Generating wavetables"));
 	// generate (load from file) bandlimited wavetables
 	BandLimitedWave::generateWaves();
-	//initilize oscillators
+	//initialize oscillators
 	Oscillator::waveTableInit();
 
 	emit engine->initProgress(tr("Initializing data structures"));

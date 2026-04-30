@@ -40,8 +40,7 @@ namespace lmms::gui
 
 void KnobControl::setText(const QString& text)
 {
-	// For KnobControls the text is set in the constructor
-	// so we do nothing here
+	m_knob->setLabel(text);
 }
 
 QWidget *KnobControl::topWidget() { return m_knob; }

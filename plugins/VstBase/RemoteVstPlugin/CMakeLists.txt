@@ -6,7 +6,7 @@ endif()
 
 project(RemoteVstPlugin 
 	LANGUAGES CXX)
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 
 include(CheckCXXPreprocessor)
 include(CheckCXXSourceCompiles)
@@ -59,8 +59,7 @@ if(LMMS_HAVE_LIBRT)
 endif()
 
 target_include_directories(${EXE_NAME}
-	PRIVATE 
-		"${LMMS_SOURCE_DIR}/plugins/vst_base/common"
+	PRIVATE
 		"${LMMS_SOURCE_DIR}/include"
 		"${LMMS_BINARY_DIR}"
 )
@@ -72,8 +71,17 @@ if(MSVC)
 	target_link_options(${EXE_NAME} PRIVATE "/entry:mainCRTStartup")
 endif()
 
+# If we're building a Windows executable, add linker flags to disable ASLR
+# This is needed because several old VST dlls crash when high entropy ASLR is in use
+# /HIGHENTROPYVA:YES relies on /DYNAMICBASE:YES so this ensures maximum VST compatiblity
+if(MSVC)
+	target_link_options(${EXE_NAME} PRIVATE "/DYNAMICBASE:NO")
+elseif(IS_MINGW)
+	target_link_options(${EXE_NAME} PRIVATE "-Wl,--disable-dynamicbase")
+endif()
+
 if(IS_MINGW)
-	SET(CMAKE_REQUIRED_FLAGS "-std=c++17")
+	SET(CMAKE_REQUIRED_FLAGS "-std=c++20")
 endif()
 
 if(LMMS_BUILD_WIN32)

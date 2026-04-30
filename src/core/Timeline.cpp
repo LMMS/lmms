@@ -26,7 +26,6 @@
 #include <algorithm>
 #include <tuple>
 
-#include <QDomDocument>
 #include <QDomElement>
 
 namespace lmms {

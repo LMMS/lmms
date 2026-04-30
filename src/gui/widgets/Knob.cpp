@@ -24,13 +24,13 @@
 
 #include "Knob.h"
 
+#include <QInputDialog>
 #include <QPainter>
-#include <numbers>
 
-#include "lmms_math.h"
 #include "DeprecationHelper.h"
 #include "embed.h"
 #include "FontHelper.h"
+#include "lmms_math.h"
 
 #include <algorithm>
 
@@ -41,8 +41,6 @@ namespace lmms::gui
 Knob::Knob( KnobType _knob_num, QWidget * _parent, const QString & _name ) :
 	FloatModelEditorBase(DirectionOfManipulation::Vertical, _parent, _name),
 	m_label( "" ),
-	m_isHtmlLabel(false),
-	m_tdRenderer(nullptr),
 	m_angle( -10 ),
 	m_lineWidth( 0 ),
 	m_textColor( 255, 255, 255 ),
@@ -146,39 +144,21 @@ void Knob::onKnobNumUpdated()
 }
 
 
+const QString& Knob::getLabel() const
+{
+	return m_label;
+}
 
 
 void Knob::setLabel(const QString& txt)
 {
 	m_label = txt;
-	m_isHtmlLabel = false;
 
 	updateFixedSize();
 
 	update();
 }
 
-
-void Knob::setHtmlLabel(const QString &htmltxt)
-{
-	m_label = htmltxt;
-	m_isHtmlLabel = true;
-	// Put the rendered HTML content into cache
-	if (!m_tdRenderer)
-	{
-		m_tdRenderer = new QTextDocument(this);
-	}
-
-	m_tdRenderer->setHtml(QString("<span style=\"color:%1;\">%2</span>").arg(textColor().name(), m_label));
-
-	if (m_knobPixmap)
-	{
-		setFixedSize(m_knobPixmap->width(),
-				m_knobPixmap->height() + 15);
-	}
-
-	update();
-}
 
 void Knob::setFixedFontSizeLabelRendering()
 {
@@ -196,7 +176,7 @@ void Knob::updateFixedSize()
 		if (m_knobPixmap)
 		{
 			// In legacy mode only the width of the label is taken into account while the height is not
-			const int labelWidth = horizontalAdvance(QFontMetrics(adjustedToPixelSize(font(), SMALL_FONT_SIZE)), m_label);
+			const int labelWidth = QFontMetrics(adjustedToPixelSize(font(), SMALL_FONT_SIZE)).horizontalAdvance(m_label);
 			const int width = std::max(m_knobPixmap->width(), labelWidth);
 
 			// Legacy mode assumes that the label will fit into 10 pixels plus some of the pixmap area
@@ -217,7 +197,7 @@ void Knob::updateFixedSize()
 
 		auto fm = QFontMetrics(font());
 
-		const int width = std::max(pixmapSize.width(), horizontalAdvance(fm, m_label));
+		const int width = std::max(pixmapSize.width(), fm.horizontalAdvance(m_label));
 		const int height = pixmapSize.height() + fm.height();
 
 		setFixedSize(width, height);
@@ -507,27 +487,17 @@ void Knob::drawLabel(QPainter& p)
 {
 	if( !m_label.isEmpty() )
 	{
-		if (!m_isHtmlLabel)
+		if (fixedFontSizeLabelRendering())
 		{
-			if (fixedFontSizeLabelRendering())
-			{
-				p.setFont(adjustedToPixelSize(p.font(), SMALL_FONT_SIZE));
-			}
-			auto fm = p.fontMetrics();
-			const auto x = (width() - horizontalAdvance(fm, m_label)) / 2;
-			const auto descent = fixedFontSizeLabelRendering() ? 2 : fm.descent();
-			const auto y = height() - descent; 
+			p.setFont(adjustedToPixelSize(p.font(), SMALL_FONT_SIZE));
+		}
+		auto fm = p.fontMetrics();
+		const auto x = (width() - fm.horizontalAdvance(m_label)) / 2;
+		const auto descent = fixedFontSizeLabelRendering() ? 2 : fm.descent();
+		const auto y = height() - descent; 
 
-			p.setPen(textColor());
-			p.drawText(x, y, m_label);
-		}
-		else
-		{
-			// TODO setHtmlLabel is never called so this will never be executed. Remove functionality?
-			m_tdRenderer->setDefaultFont(font());
-			p.translate((width() - m_tdRenderer->idealWidth()) / 2, (height() - m_tdRenderer->pageSize().height()) / 2);
-			m_tdRenderer->drawContents(&p);
-		}
+		p.setPen(textColor());
+		p.drawText(x, y, m_label);
 	}
 }
 
@@ -561,6 +531,46 @@ void Knob::changeEvent(QEvent * ev)
 	}
 }
 
+QString VolumeKnob::getCustomFloatingText()
+{
+	const auto valueToVolumeRatio = model()->getRoundedValue() / volumeRatio();
+	return valueToVolumeRatio == 0.
+		? QString("-∞ dBFS")
+		: QString("%1 dBFS").arg(ampToDbfs(valueToVolumeRatio), 3, 'f', 2);
+}
+
+void VolumeKnob::enterValue()
+{
+	const auto initalValue = model()->getRoundedValue() / 100.0;
+	const auto initialDbValue = initalValue > 0. ? ampToDbfs(initalValue) : -96;
+
+	bool ok = false;
+	float newVal = QInputDialog::getDouble(
+		this,
+		tr("Set value"),
+		tr("Please enter a new value between -96.0 dBFS and %1 dBFS:")
+			.arg(ampToDbfs(model()->maxValue() / 100.0f)),
+		initialDbValue,
+		-96.0,
+		ampToDbfs(model()->maxValue() / 100.0f),
+		model()->getDigitCount(),
+		&ok
+	);
+
+	if (newVal <= -96.0)
+	{
+		newVal = 0.0f;
+	}
+	else
+	{
+		newVal = dbfsToAmp(newVal) * 100.0;
+	}
+
+	if (ok)
+	{
+		model()->setValue(newVal);
+	}
+}
 
 void convertPixmapToGrayScale(QPixmap& pixMap)
 {

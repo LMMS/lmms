@@ -26,18 +26,14 @@
 #define LMMS_GUI_KNOB_H
 
 #include <memory>
-#include <QTextDocument>
 
 #include "FloatModelEditorBase.h"
 
 
-class QPixmap;
 
 namespace lmms::gui
 {
 
-
-class SimpleTextFloat;
 
 enum class KnobType
 {
@@ -136,7 +132,8 @@ public:
 	
 	Knob( const Knob& other ) = delete;
 
-	void setHtmlLabel( const QString &htmltxt );
+	const QString& getLabel() const;
+	void setLabel(const QString& txt);
 
 	void setTotalAngle( float angle );
 
@@ -167,8 +164,6 @@ public:
 
 
 protected:
-	void setLabel(const QString& txt);
-	
 	void paintEvent(QPaintEvent*) override;
 
 	void changeEvent(QEvent * ev) override;
@@ -216,8 +211,6 @@ private:
 
 	QString m_label;
 	bool m_fixedFontSizeLabelRendering = false;
-	bool m_isHtmlLabel;
-	QTextDocument* m_tdRenderer;
 
 	std::unique_ptr<QPixmap> m_knobPixmap;
 
@@ -241,6 +234,25 @@ private:
 
 	KnobType m_knobNum;
 };
+
+
+class LMMS_EXPORT VolumeKnob : public Knob
+{
+	Q_OBJECT
+
+	mapPropertyFromModel(float, volumeRatio, setVolumeRatio, m_volumeRatio);
+
+public:
+	using Knob::Knob;
+
+protected:
+	QString getCustomFloatingText() override;
+	void enterValue() override;
+
+private:
+	FloatModel m_volumeRatio{100.f, 0.f, 1000000.f};
+};
+
 
 } // namespace lmms::gui
 

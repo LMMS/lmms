@@ -31,9 +31,9 @@
 
 #include "ComboBox.h"
 #include "DataFile.h"
+#include "FileDialog.h"
 #include "FontHelper.h"
 #include "PixmapButton.h"
-#include "SampleLoader.h"
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "Track.h"
@@ -51,7 +51,7 @@ AudioFileProcessorView::AudioFileProcessorView(Instrument* instrument,
 	InstrumentViewFixedSize(instrument, parent)
 {
 	m_openAudioFileButton = new PixmapButton(this);
-	m_openAudioFileButton->setCursor(QCursor(Qt::PointingHandCursor));
+	m_openAudioFileButton->setCursor(Qt::PointingHandCursor);
 	m_openAudioFileButton->move(227, 72);
 	m_openAudioFileButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap(
 							"select_file"));
@@ -99,7 +99,7 @@ AudioFileProcessorView::AudioFileProcessorView(Instrument* instrument,
 							"loop_pingpong_off"));
 	m_loopPingPongButton->setToolTip(tr("Enable ping-pong loop"));
 
-	m_loopGroup = new automatableButtonGroup(this);
+	m_loopGroup = new AutomatableButtonGroup(this);
 	m_loopGroup->addButton(m_loopOffButton);
 	m_loopGroup->addButton(m_loopOnButton);
 	m_loopGroup->addButton(m_loopPingPongButton);
@@ -114,8 +114,7 @@ AudioFileProcessorView::AudioFileProcessorView(Instrument* instrument,
 	m_stutterButton->setToolTip(
 		tr("Continue sample playback across notes"));
 
-	m_ampKnob = new Knob(KnobType::Bright26, this);
-	m_ampKnob->setVolumeKnob(true);
+	m_ampKnob = new VolumeKnob(KnobType::Bright26, this);
 	m_ampKnob->move(5, 108);
 	m_ampKnob->setHintText(tr("Amplify:"), "%");
 
@@ -257,7 +256,7 @@ void AudioFileProcessorView::sampleUpdated()
 
 void AudioFileProcessorView::openAudioFile()
 {
-	QString af = SampleLoader::openAudioFile();
+	QString af = FileDialog::openAudioFile();
 	if (af.isEmpty()) { return; }
 
 	castModel<AudioFileProcessor>()->setAudioFile(af);

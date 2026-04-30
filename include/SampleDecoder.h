@@ -26,7 +26,6 @@
 #define LMMS_SAMPLE_DECODER_H
 
 #include <QString>
-#include <functional>
 #include <optional>
 #include <string>
 #include <vector>

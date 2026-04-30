@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" version="1.1" width="20" height="20">
+	<metadata>
+		<rdf:RDF>
+			<cc:Work>
+				<dc:title>Knife tool icon</dc:title>
+				<dc:creator><cc:Agent><dc:title>Spekular</dc:title></cc:Agent></dc:creator>
+			</cc:Work>
+			<cc:License rdf:about="http://creativecommons.org/publicdomain/zero/1.0/">
+				<cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction" />
+				<cc:permits rdf:resource="http://creativecommons.org/ns#Distribution" />
+				<cc:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks" />
+			</cc:License>
+		</rdf:RDF>
+	</metadata>
+  <path fill="#fff" d="m18.5 0-6 6v1.5l5 5H19l1-1V0Zm-7 8.5L3 17l11.5-1.5 2-2ZM13 17 1.5 18.5 0 20l11.5-1.5Z"/>
+</svg>

@@ -30,8 +30,8 @@
 #include "JournallingObject.h"
 #include "TimePos.h"
 
+class QMimeData;  // IWYU pragma: keep
 
-class QMimeData;
 
 namespace lmms
 {
@@ -41,8 +41,8 @@ class Track;
 namespace gui
 {
 
+class ClipView;  // IWYU pragma: keep
 class TrackView;
-class ClipView;
 
 class TrackContentWidget : public QWidget, public JournallingObject
 {

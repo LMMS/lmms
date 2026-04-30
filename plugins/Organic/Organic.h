@@ -31,13 +31,12 @@
 #include "InstrumentView.h"
 #include "AutomatableModel.h"
 
-class QPixmap;
 
 namespace lmms
 {
 
 
-class NotePlayHandle;
+class NotePlayHandle;  // IWYU pragma: keep
 class Oscillator;
 
 namespace gui
@@ -133,8 +132,6 @@ public:
 	void loadSettings(const QDomElement& elem) override;
 
 	QString nodeName() const override;
-
-	int intRand( int min, int max );
 
 	static float * s_harmonics;
 
