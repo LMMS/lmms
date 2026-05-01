@@ -80,7 +80,9 @@ void StringOpcode::parseFromString(const QString& opcodeName, const QString& opc
 // Modulatable Opcodes are a type of float opcode which can be adjusted based on different midi CC knob values
 // They have both an initial value defined by their opcodename=value
 // but also opcodename_oncc123=modulation_amount
+// or opcodename_cc123=modulation_amount
 // or opcodenamecc123=modulation_amount
+// will make the value be increased proportional to modulation_amount when the midi CC knob 123 is turned up
 void ModulatableOpcode::parseFromString(const QString& opcodeName, const QString& opcodeValue, bool* parsed, bool* successful)
 {
 	for (QString alias : m_opcodeNames)
@@ -147,6 +149,7 @@ template<>
 void Opcode<TriggerType>::parseFromString(const QString& opcodeName, const QString& opcodeValue, bool* parsed, bool* successful)
 {
 	if (std::find(m_opcodeNames.begin(), m_opcodeNames.end(), opcodeName) == m_opcodeNames.end()) { return; }
+	*parsed = true;
 
 	if (opcodeValue == "attack") { m_value = TriggerType::Attack; }
 	else if (opcodeValue == "release") { m_value = TriggerType::Release; }
@@ -158,7 +161,6 @@ void Opcode<TriggerType>::parseFromString(const QString& opcodeName, const QStri
 		qDebug() << "[SFZ Parser] Unknown trigger:" << opcodeValue;
 		return;
 	}
-	*parsed = true;
 	*successful = true;
 }
 
@@ -167,6 +169,7 @@ template<>
 void Opcode<LoopMode>::parseFromString(const QString& opcodeName, const QString& opcodeValue, bool* parsed, bool* successful)
 {
 	if (std::find(m_opcodeNames.begin(), m_opcodeNames.end(), opcodeName) == m_opcodeNames.end()) { return; }
+	*parsed = true;
 
 	if (opcodeValue == "no_loop") { m_value = LoopMode::NoLoop; }
 	else if (opcodeValue == "one_shot") { m_value = LoopMode::OneShot; }
@@ -177,7 +180,6 @@ void Opcode<LoopMode>::parseFromString(const QString& opcodeName, const QString&
 		qDebug() << "[SFZ Parser] Unknown loop_mode:" << opcodeValue;
 		return;
 	}
-	*parsed = true;
 	*successful = true;
 }
 
@@ -186,6 +188,7 @@ template<>
 void Opcode<FilterType>::parseFromString(const QString& opcodeName, const QString& opcodeValue, bool* parsed, bool* successful)
 {
 	if (std::find(m_opcodeNames.begin(), m_opcodeNames.end(), opcodeName) == m_opcodeNames.end()) { return; }
+	*parsed = true;
 
 	if (opcodeValue == "lpf_1p") { m_value = FilterType::Lowpass1Pole; }
 	else if (opcodeValue == "lpf_2p") { m_value = FilterType::Lowpass2Pole; }
@@ -198,7 +201,6 @@ void Opcode<FilterType>::parseFromString(const QString& opcodeName, const QStrin
 		qDebug() << "[SFZ Parser] Unknown filter type:" << opcodeValue;
 		return;
 	}
-	*parsed = true;
 	*successful = true;
 }
 
