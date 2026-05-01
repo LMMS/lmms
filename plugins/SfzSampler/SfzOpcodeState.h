@@ -106,7 +106,7 @@ public:
 	//
 	// Delay
 	//
-	FloatOpcode m_delay {"delay", 0.0f}; // In seconds
+	ModulatableOpcode m_delay {"delay", 0.0f}; // In seconds
 	FloatOpcode m_delay_random {"delay_random", 0.0f};
 
 

@@ -112,6 +112,7 @@ void SfzRegion::recalculateTotalCCModulation(const SfzGlobalState& globalState)
 	m_amplitude.updateCachedModulation(globalState.midiCCValues());
 	m_volume.updateCachedModulation(globalState.midiCCValues());
 	m_pan.updateCachedModulation(globalState.midiCCValues());
+	m_delay.updateCachedModulation(globalState.midiCCValues());
 
 	m_ampeg.updateCachedModulation(globalState.midiCCValues());
 }

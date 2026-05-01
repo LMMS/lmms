@@ -90,7 +90,7 @@ void ModulatableOpcode::parseFromString(const QString& opcodeName, const QString
 			m_value = opcodeValue.toFloat(successful);
 			*parsed = true;
 		}
-		else if (opcodeName.startsWith(alias + "_oncc") || opcodeName.startsWith(alias + "cc"))
+		else if (opcodeName.startsWith(alias + "_oncc") || opcodeName.startsWith(alias + "_cc") || opcodeName.startsWith(alias + "cc"))
 		{
 			value_oncc.at(ccNumberFromOpcode(opcodeName)) = opcodeValue.toFloat(successful);
 			*parsed = true;
