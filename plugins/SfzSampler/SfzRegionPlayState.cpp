@@ -149,15 +149,15 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const fpp_t frames)
 	freqRatio *= sampleSampleRate / sampleRate;
 
 	// Amplitude
-	const float amplitude = m_region->m_amplitude.modulatedValue() / 100.0f; // Amplitude is stored as a percent
+	const float amplitude = m_region->m_amplitude.value() / 100.0f; // Amplitude is stored as a percent
 
 	// Amplitude envelope
-	const f_cnt_t ampegDelayFrames = m_region->m_ampeg.delay.modulatedValue() * sampleRate;
-	const f_cnt_t ampegAttackFrames = m_region->m_ampeg.attack.modulatedValue() * sampleRate;
-	const f_cnt_t ampegHoldFrames = m_region->m_ampeg.hold.modulatedValue() * sampleRate;
-	const f_cnt_t ampegDecayFrames = m_region->m_ampeg.decay.modulatedValue() * sampleRate;
-	const float ampegSustain = m_region->m_ampeg.sustain.modulatedValue() / 100.0f; // Sustain is stored in percent, so divide by 100 to get ratio
-	const f_cnt_t ampegReleaseFrames = m_region->m_ampeg.release.modulatedValue() * sampleRate;
+	const f_cnt_t ampegDelayFrames = m_region->m_ampeg.delay.value() * sampleRate;
+	const f_cnt_t ampegAttackFrames = m_region->m_ampeg.attack.value() * sampleRate;
+	const f_cnt_t ampegHoldFrames = m_region->m_ampeg.hold.value() * sampleRate;
+	const f_cnt_t ampegDecayFrames = m_region->m_ampeg.decay.value() * sampleRate;
+	const float ampegSustain = m_region->m_ampeg.sustain.value() / 100.0f; // Sustain is stored in percent, so divide by 100 to get ratio
+	const f_cnt_t ampegReleaseFrames = m_region->m_ampeg.release.value() * sampleRate;
 
 	// Amplitude due to velocity
 	// If amp_keytrack is 100, then 0 velocity = 0 amp, and 127 velocity = 1.0f amp (as expected)
@@ -168,10 +168,10 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const fpp_t frames)
 		: (1.0f - normalizedVelocity) * (m_region->m_amp_veltrack.value() / -100) + 1.0f * (1.0f - m_region->m_amp_veltrack.value() / -100);
 
 	// Amplitude due to volume/gain
-	const float ampVolume = dbfsToAmp(m_region->m_volume.modulatedValue());
+	const float ampVolume = dbfsToAmp(m_region->m_volume.value());
 
 	// Panning
-	const float pan = m_region->m_pan.modulatedValue() / 100;
+	const float pan = m_region->m_pan.value() / 100;
 	const float rightPanAmp = std::min(1.0f, 1.0f + pan);
 	const float leftPanAmp = std::min(1.0f, 1.0f - pan);
 

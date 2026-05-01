@@ -69,8 +69,8 @@ struct Opcode : BaseOpcode
 
 	Opcode(QString name, T defaultValue) : m_opcodeNames({name}), m_value(defaultValue) {}
 	Opcode(std::vector<QString> names, T defaultValue) : m_opcodeNames(names), m_value(defaultValue) {}
-	void setValue(const T& value) { m_value = value; }
-	const T& value() const { return m_value; }
+	virtual void setValue(const T& value) { m_value = value; }
+	virtual const T value() const { return m_value; }
 
 	void parseFromString(const QString& opcodeName, const QString& opcodeValue, bool* parsed, bool* successful) override;
 };
@@ -103,8 +103,8 @@ struct ModulatableOpcode : FloatOpcode
 
 	ModulatableOpcode(QString name = "", float defaultValue = 0.0f) : FloatOpcode(name, defaultValue) {};
 	ModulatableOpcode(std::vector<QString> names = {}, float defaultValue = 0.0f) : FloatOpcode(names, defaultValue) {};
-	//! Function which returns the sum of the base opcode value and whatever the modulation is currently
-	float modulatedValue() const { return m_value + cachedModulation; }
+	//! Redefine the value() function to return the sum of the base opcode value and whatever the modulation is currently
+	const float value() const override { return m_value + cachedModulation; }
 	//! Helper function for parsing these kinds of opcodes, where you have both `opcode` and `opcode_onccN` where N is the midi cc number, so
 	// that the code isn't duplicated for every modulatable parameter.
 	void parseFromString(const QString& opcodeName, const QString& opcodeValue, bool* parsed, bool* successful) override;
