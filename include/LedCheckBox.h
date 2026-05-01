@@ -59,6 +59,7 @@ public:
 	}
 
 	void setText( const QString& s );
+	void setLedColor(LedColor color);
 
 	Q_PROPERTY( QString text READ text WRITE setText )
 
@@ -69,6 +70,7 @@ protected:
 private:
 	QPixmap m_ledOnPixmap;
 	QPixmap m_ledOffPixmap;
+	LedColor m_color;
 
 	QString m_text;
 
