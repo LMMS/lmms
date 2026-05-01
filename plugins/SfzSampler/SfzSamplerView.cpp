@@ -97,7 +97,7 @@ void SfzSamplerView::onFileLoaded()
 
 	// Initialize new knobs
 	int activeControlCount = 0;
-	for (int i = 0; i < SfzOpcodeState::NumMidiCCs; ++i)
+	for (int i = 0; i < NumMidiCCs; ++i)
 	{
 		// Only add a knob if the control is actually used
 		if (m_instrument->m_controlsConfig.m_activeMidiCCs.at(i))
@@ -120,13 +120,13 @@ void SfzSamplerView::onFileLoaded()
 	for (const auto& [key, info] : m_instrument->m_controlsConfig.m_switchKeyInfo)
 	{
 		QString label = QString("- %1 %2 [range: %3 - %4]")
-			.arg(SfzOpcodeState::keyNumToString(key))
+			.arg(keyNumToString(key))
 			.arg(info.sw_label)
-			.arg(SfzOpcodeState::keyNumToString(info.sw_lokey))
-			.arg(SfzOpcodeState::keyNumToString(info.sw_hikey));
+			.arg(keyNumToString(info.sw_lokey))
+			.arg(keyNumToString(info.sw_hikey));
 		if (info.sw_default != std::nullopt)
 		{
-			label += QString(" default: %1").arg(SfzOpcodeState::keyNumToString(info.sw_default.value()));
+			label += QString(" default: %1").arg(keyNumToString(info.sw_default.value()));
 		}
 		switchKeyLabels.push_back(label);
 	}

@@ -67,26 +67,11 @@ private:
 	//! In order to do round robin, the region needs to keep track of how many notes it has played in its lifetime. Or rather, the number of notes it *would* have played if it weren't restricted to only play a note when the round-robin counter hit the right numbers.
 	int m_roundRobinCount = 0;
 
-	//! Store the current total midi CC modulation amounts for the different targets, just so that we don't
-	// have to recalculate them every buffer, instead only when a trigger occurs.
-	float m_amplitude_totalCC = 0.0f;
-
-	float m_ampeg_delay_totalCC = 0.0f;
-	float m_ampeg_attack_totalCC = 0.0f;
-	float m_ampeg_hold_totalCC = 0.0f;
-	float m_ampeg_decay_totalCC = 0.0f;
-	float m_ampeg_sustain_totalCC = 0.0f;
-	float m_ampeg_release_totalCC = 0.0f;
-
-	float m_gain_totalCC = 0.0f;
-	float m_pan_totalCC = 0.0f;
-
 	//! When checking whether all the current CC values fall between loccN and hiccN, it's useful to only check the ones where lo/hiccN is actually defined, not all 128
 	//! This vector stores a list of which CC numbers have lo/hiccN opcodes in this region
 	std::vector<int> m_lohiccDefinedCCNumbers;
 
-	//! Helper function to calculate the total modulation of all midi CC controllers on a parameter. Essentially it just multiplies the modulation amounts by the current CC values and adds it all up.
-	float totalCCModulation(const std::array<float, SfzOpcodeState::NumMidiCCs>& ccModulationAmounts, const SfzGlobalState& globalState) const;
+	//! Helper function to update the total modulation of all midi CC controllers on each modulatable parameter.
 	void recalculateTotalCCModulation(const SfzGlobalState& globalState);
 
 	friend class SfzRegionPlayState; // TODO this was just to make it easy but...?

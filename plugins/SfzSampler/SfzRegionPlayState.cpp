@@ -46,34 +46,34 @@ SfzRegionPlayState::SfzRegionPlayState(const SfzRegion* region, const SfzTrigger
 	// Delay the start of the playback by the trigger offset
 	m_frameCount -= trigger.frameOffset();
 	// And by the delay opcode in seconds
-	m_frameCount -= region->m_delay * sampleRate;
+	m_frameCount -= region->m_delay.value() * sampleRate;
 	// And any random delay amount
-	m_frameCount -= fastRand(1.0f) * region->m_delay_random * sampleRate;
+	m_frameCount -= fastRand(1.0f) * region->m_delay_random.value() * sampleRate;
 
 	// Set initial sample start frame offset
-	m_sampleFrame += m_region->m_offset;
+	m_sampleFrame += m_region->m_offset.value();
 
 	// Setup the filter
-	switch (m_region->m_fil_type)
+	switch (m_region->m_fil_type.value())
 	{
 	// This is not correct! I'm using the default filters from BasicFilters, but I don't believe they necessarily match the 1 pole vs 2 pole specifications for sfz.
 	// For example, the default lowpass is a biquad, which I believe has 2 poles. For now I'm using it for both lowpass types, but it should probably be changed in the future.
-	case SfzOpcodeState::FilterType::Lowpass1Pole:
+	case FilterType::Lowpass1Pole:
 		m_filter.setFilterType(BasicFilters<2>::FilterType::LowPass);
 		break;
-	case SfzOpcodeState::FilterType::Lowpass2Pole:
+	case FilterType::Lowpass2Pole:
 		m_filter.setFilterType(BasicFilters<2>::FilterType::LowPass);
 		break;
-	case SfzOpcodeState::FilterType::Highpass1Pole:
+	case FilterType::Highpass1Pole:
 		m_filter.setFilterType(BasicFilters<2>::FilterType::HiPass);
 		break;
-	case SfzOpcodeState::FilterType::Highpass2Pole:
+	case FilterType::Highpass2Pole:
 		m_filter.setFilterType(BasicFilters<2>::FilterType::HiPass);
 		break;
-	case SfzOpcodeState::FilterType::Bandpass2Pole:
+	case FilterType::Bandpass2Pole:
 		m_filter.setFilterType(BasicFilters<2>::FilterType::BandPass_CSG); // I am not well versed in the difference between BandPass_CSG and BandPass_CZPG. It seems to be something about how it uses Q/resonance? I'm not sure.
 		break;
-	case SfzOpcodeState::FilterType::Bandstop2Pole:
+	case FilterType::Bandstop2Pole:
 		m_filter.setFilterType(BasicFilters<2>::FilterType::Notch);
 		break;
 	}
@@ -134,11 +134,11 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const fpp_t frames)
 	const float normalizedVelocity = m_trigger.velocity().value() / 127.0f;
 
 	// Calculate pitch difference relative to original sample
-	const float semitoneDifference = m_trigger.key().value() - m_region->m_pitch_keycenter;
+	const float semitoneDifference = m_trigger.key().value() - m_region->m_pitch_keycenter.value();
 	// The total pitch depends on 1. the key offset 2. the fine `tune` adjustment 3. the velocity, if pitch_veltrack is nonzero
-	const float pitch = semitoneDifference * m_region->m_pitch_keytrack / 100.0f
-		+ m_region->m_tune / 100.0f
-		+ normalizedVelocity * m_region->m_pitch_veltrack / 100.0f;
+	const float pitch = semitoneDifference * m_region->m_pitch_keytrack.value() / 100.0f
+		+ m_region->m_tune.value() / 100.0f
+		+ normalizedVelocity * m_region->m_pitch_veltrack.value() / 100.0f;
 	float freqRatio = std::exp2(pitch / 12.0f);
 
 	// Sample rate of sample
@@ -149,42 +149,42 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const fpp_t frames)
 	freqRatio *= sampleSampleRate / sampleRate;
 
 	// Amplitude
-	const float amplitude = (m_region->m_amplitude + m_region->m_amplitude_totalCC) / 100.0f; // Amplitude is stored as a percent
+	const float amplitude = m_region->m_amplitude.modulatedValue() / 100.0f; // Amplitude is stored as a percent
 
 	// Amplitude envelope
-	const f_cnt_t ampegDelayFrames = (m_region->m_ampeg.delay.value() + m_region->m_ampeg.delay.cachedModulation) * sampleRate;
-	const f_cnt_t ampegAttackFrames = (m_region->m_ampeg.attack.value() + m_region->m_ampeg.attack.cachedModulation) * sampleRate;
-	const f_cnt_t ampegHoldFrames = (m_region->m_ampeg.hold.value() + m_region->m_ampeg.hold.cachedModulation) * sampleRate;
-	const f_cnt_t ampegDecayFrames = (m_region->m_ampeg.decay.value() + m_region->m_ampeg.decay.cachedModulation) * sampleRate;
-	const float ampegSustain = (m_region->m_ampeg.sustain.value() + m_region->m_ampeg.sustain.cachedModulation) / 100.0f; // Sustain is stored in percent, so divide by 100 to get ratio
-	const f_cnt_t ampegReleaseFrames = (m_region->m_ampeg.release.value() + m_region->m_ampeg.release.cachedModulation) * sampleRate;
+	const f_cnt_t ampegDelayFrames = m_region->m_ampeg.delay.modulatedValue() * sampleRate;
+	const f_cnt_t ampegAttackFrames = m_region->m_ampeg.attack.modulatedValue() * sampleRate;
+	const f_cnt_t ampegHoldFrames = m_region->m_ampeg.hold.modulatedValue() * sampleRate;
+	const f_cnt_t ampegDecayFrames = m_region->m_ampeg.decay.modulatedValue() * sampleRate;
+	const float ampegSustain = m_region->m_ampeg.sustain.modulatedValue() / 100.0f; // Sustain is stored in percent, so divide by 100 to get ratio
+	const f_cnt_t ampegReleaseFrames = m_region->m_ampeg.release.modulatedValue() * sampleRate;
 
 	// Amplitude due to velocity
 	// If amp_keytrack is 100, then 0 velocity = 0 amp, and 127 velocity = 1.0f amp (as expected)
 	// If amp_keytrack is -100, it's the reverse. If amp_keytrack is 0, the volume is not affected by the velocity.
 	// Essentially this means lerping between y = x, y = 1, and y = 1 - x, if you think of y being the amp and x being vel/127
-	const float ampVelocity = m_region->m_amp_veltrack > 0
-		? (normalizedVelocity) * (m_region->m_amp_veltrack / 100) + 1.0f * (1.0f - m_region->m_amp_veltrack / 100)
-		: (1.0f - normalizedVelocity) * (m_region->m_amp_veltrack / -100) + 1.0f * (1.0f - m_region->m_amp_veltrack / -100);
+	const float ampVelocity = m_region->m_amp_veltrack.value() > 0
+		? (normalizedVelocity) * (m_region->m_amp_veltrack.value() / 100) + 1.0f * (1.0f - m_region->m_amp_veltrack.value() / 100)
+		: (1.0f - normalizedVelocity) * (m_region->m_amp_veltrack.value() / -100) + 1.0f * (1.0f - m_region->m_amp_veltrack.value() / -100);
 
 	// Amplitude due to volume/gain
-	const float ampVolume = dbfsToAmp(m_region->m_volume + m_region->m_gain_totalCC);
+	const float ampVolume = dbfsToAmp(m_region->m_volume.modulatedValue());
 
 	// Panning
-	const float pan = (m_region->m_pan + m_region->m_pan_totalCC) / 100;
+	const float pan = m_region->m_pan.modulatedValue() / 100;
 	const float rightPanAmp = std::min(1.0f, 1.0f + pan);
 	const float leftPanAmp = std::min(1.0f, 1.0f - pan);
 
 	// Filter
-	const bool filterEnabled = m_region->m_cutoff != std::nullopt;
+	const bool filterEnabled = m_region->m_cutoff.value() != std::nullopt;
 	// For performance, only update the cutoff frequency/resonance once per buffer
 	if (filterEnabled)
 	{
 		// The cutoff frequency is in hertz, but things like fil_veltrack are defined in cents, so we have to convert them TODO: are we sure it's cents? I saw 20000 being used in Metal GTX which is kind of high for cents (200 octaves?)
-		const float filterCutoffPitchOffset = normalizedVelocity * m_region->m_fil_veltrack;
-		const float filterCutoff = m_region->m_cutoff.value() + std::exp2(filterCutoffPitchOffset / 12.0f);
+		const float filterCutoffPitchOffset = normalizedVelocity * m_region->m_fil_veltrack.value();
+		const float filterCutoff = m_region->m_cutoff.value().value() + std::exp2(filterCutoffPitchOffset / 12.0f);
 		// SFZ has the resonance given in decibals, which is not the same as the resonance passed to the filter, so we have to convert it
-		const float q = std::sqrt(2.0f) * dbfsToAmp(m_region->m_resonance); // TODO is this equation correct? I'm sort of basing it off https://www.musicdsp.org/en/latest/Filters/180-cool-sounding-lowpass-with-decibel-measured-resonance.html but I'm not sure.
+		const float q = std::sqrt(2.0f) * dbfsToAmp(m_region->m_resonance.value()); // TODO is this equation correct? I'm sort of basing it off https://www.musicdsp.org/en/latest/Filters/180-cool-sounding-lowpass-with-decibel-measured-resonance.html but I'm not sure.
 		m_filter.calcFilterCoeffs(filterCutoff, q);
 	}
 
@@ -221,7 +221,7 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const fpp_t frames)
 	}
 
 	// If loop_mode is one_shot, no noteOff signal will ever come to release it, so we need to manually deactivate when we reach the end of the sample
-	if (m_region->m_loop_mode == SfzOpcodeState::LoopMode::OneShot && m_sampleFrame >= m_region->sample()->size())
+	if (m_region->m_loop_mode.value() == LoopMode::OneShot && m_sampleFrame >= m_region->sample()->size())
 	{
 		m_active = false; // TODO should this forcefully decative or just release?
 	}
@@ -236,7 +236,7 @@ void SfzRegionPlayState::processTrigger(const SfzTrigger& trigger)
 
 	if (trigger.type() == SfzTrigger::Type::NoteOff)
 	{
-		if (m_region->m_loop_mode == SfzOpcodeState::LoopMode::OneShot) { return; } // If one_shot looping is enabled, the whole sample will play regardless of if the note is released
+		if (m_region->m_loop_mode.value() == LoopMode::OneShot) { return; } // If one_shot looping is enabled, the whole sample will play regardless of if the note is released
 
 		if (trigger.key() == m_trigger.key())
 		{

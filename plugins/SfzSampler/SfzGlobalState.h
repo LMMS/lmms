@@ -57,7 +57,7 @@ public:
 	//! Returns the current value of the given midi CC knob/controller, or the default value if we haven't recieved any midi CC signals for it yet.
 	int midiCCValue(const int index) const { return m_ccValues.at(index); }
 	//! Returns a const array of the current CC knob values
-	const std::array<int, SfzOpcodeState::NumMidiCCs> midiCCValues() const { return m_ccValues; }
+	const std::array<int, NumMidiCCs> midiCCValues() const { return m_ccValues; }
 
 	//! Returns the random value for the current trigger
 	const float rand() const { return m_rand; }
@@ -84,7 +84,7 @@ private:
 	//! Stores the current value of all the midi CC knobs/controllers
 	//! Technically, floats should probably be used to allow for HDCC (high definition CC's) as used in ARIA, but for now dividing by 127 to get a float between 0 and 1 works fine.
 	//! std::optional is used so that sfz file can specify default cc values
-	std::array<int, SfzOpcodeState::NumMidiCCs> m_ccValues = {};
+	std::array<int, NumMidiCCs> m_ccValues = {};
 };
 
 

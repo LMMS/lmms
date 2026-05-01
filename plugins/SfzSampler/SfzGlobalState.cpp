@@ -86,7 +86,7 @@ std::optional<int> SfzGlobalState::lastKeyPressedInRange(int lowKey, int highKey
 
 void SfzGlobalState::initializeMidiCCValues(const SfzOpcodeState& controlsConfig)
 {
-	for (int i = 0; i < SfzOpcodeState::NumMidiCCs; ++i)
+	for (int i = 0; i < NumMidiCCs; ++i)
 	{
 		m_ccValues.at(i) = controlsConfig.m_set_cc.at(i);
 	}

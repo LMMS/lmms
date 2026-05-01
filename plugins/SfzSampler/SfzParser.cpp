@@ -262,7 +262,7 @@ bool SfzParser::parseSfzFile(const QString& filePath, std::vector<SfzRegion>& ou
 		if (match.hasMatch())
 		{
 			int ccNumber = match.captured(0).split("cc")[1].toInt();
-			if (ccNumber >= 0 && ccNumber <= SfzOpcodeState::NumMidiCCs) { controlsConfig.m_activeMidiCCs.at(ccNumber) = true; }
+			if (ccNumber >= 0 && ccNumber <= NumMidiCCs) { controlsConfig.m_activeMidiCCs.at(ccNumber) = true; }
 		}
 	}
 	// Check one last time in case the file ended with a region and didn't get added
@@ -273,14 +273,14 @@ bool SfzParser::parseSfzFile(const QString& filePath, std::vector<SfzRegion>& ou
 	// make a list of them in the controlsConfig object for easy access
 	for (const auto& region : outputRegions)
 	{
-		if (region.m_sw_last != std::nullopt)
+		if (region.m_sw_last.value() != std::nullopt)
 		{
 			SfzControlsConfig::SwitchKeyInfo info;
-			info.sw_label = region.m_sw_label.value_or("");
-			info.sw_lokey = region.m_sw_lokey;
-			info.sw_hikey = region.m_sw_hikey;
-			info.sw_default = region.m_sw_default;
-			controlsConfig.m_switchKeyInfo.insert({region.m_sw_last.value(), info});
+			info.sw_label = region.m_sw_label.value().value_or("");
+			info.sw_lokey = region.m_sw_lokey.value();
+			info.sw_hikey = region.m_sw_hikey.value();
+			info.sw_default = region.m_sw_default.value();
+			controlsConfig.m_switchKeyInfo.insert({region.m_sw_last.value().value(), info});
 		}
 	}
 

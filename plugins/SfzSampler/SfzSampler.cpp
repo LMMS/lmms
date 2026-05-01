@@ -200,7 +200,7 @@ void SfzSampler::loadFile(const QString& filePath)
 {
 	loadSfzFile(filePath);
 	// Reset the instrument track's midi CC knobs to the defaults of the SFZ
-	for (int i = 0; i < SfzOpcodeState::NumMidiCCs; ++i)
+	for (int i = 0; i < NumMidiCCs; ++i)
 	{
 		m_parentTrack->midiCCModel(i)->setInitValue(m_sfzGlobalState.midiCCValue(i));
 		// For some reason it seems calling `setValue` on the CC models doesn't send a midi event to the instrument when doing drag/drop,
@@ -268,7 +268,7 @@ void SfzSampler::loadSettings(const QDomElement& element)
 		loadSfzFile(m_sfzFilePath);
 	}
 	// Sync the internal CC values so that saved presets/projects work normally upon loading
-	for (int i = 0; i < SfzOpcodeState::NumMidiCCs; ++i)
+	for (int i = 0; i < NumMidiCCs; ++i)
 	{
 		processTrigger(SfzTrigger::controlChangeEvent(0, i, m_parentTrack->midiCCModel(i)->value()));
 	}
