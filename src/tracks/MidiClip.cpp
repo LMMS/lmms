@@ -27,6 +27,7 @@
 
 #include <algorithm>
 #include <QDomElement>
+#include <qmessagebox.h>
 
 #include "GuiApplication.h"
 #include "InstrumentTrack.h"
@@ -433,7 +434,7 @@ void MidiClip::exportToXML(QDomDocument& doc, QDomElement& midiClipElement, bool
 	midiClipElement.setAttribute("name", name());
 	midiClipElement.setAttribute("autoresize", QString::number(getAutoResize()));
 	midiClipElement.setAttribute("off", startTimeOffset());
-	
+
 	if (const auto& c = color())
 	{
 		midiClipElement.setAttribute("color", c->name());
@@ -526,7 +527,7 @@ void MidiClip::loadSettings( const QDomElement & _this )
 	{
 		changeLength(len);
 	}
-	
+
 	setAutoResize(_this.attribute("autoresize", "1").toInt());
 	setStartTimeOffset(_this.attribute("off").toInt());
 
@@ -569,11 +570,33 @@ void MidiClip::clear()
 	clearNotes();
 }
 
+bool MidiClip::canIncreaseLength() const
+{
+	return m_steps < MAX_PATTERN_LENGTH_IN_BARS * TimePos::stepsPerBar();
+}
 
+void MidiClip::displayLengthError() const
+{
+	QString messageRemoveTrack = tr("Not allowed to add past %1 bars.").arg(MAX_PATTERN_LENGTH_IN_BARS);
+	QString messageTitleRemoveTrack = tr("Pattern Editor Error");
 
+	QMessageBox mb;
+	mb.setText(messageRemoveTrack);
+	mb.setWindowTitle(messageTitleRemoveTrack);
+	mb.setIcon(QMessageBox::Warning);
+	mb.addButton(QMessageBox::Ok);
+
+	mb.exec();
+}
 
 void MidiClip::addSteps()
 {
+	if (!canIncreaseLength())
+	{
+		displayLengthError();
+		return;
+	}
+
 	m_steps += TimePos::stepsPerBar();
 	updateLength();
 	emit dataChanged();
@@ -581,21 +604,32 @@ void MidiClip::addSteps()
 
 void MidiClip::cloneSteps()
 {
+	if (!canIncreaseLength())
+	{
+		displayLengthError();
+		return;
+	}
+
 	int oldLength = m_steps;
 	m_steps *= 2; // cloning doubles the track
-	for(int i = 0; i < oldLength; ++i )
-	{
-		Note *toCopy = noteAtStep( i );
-		if( toCopy )
-		{
-			setStep( oldLength + i, true );
-			Note *newNote = noteAtStep( oldLength + i );
-			newNote->setKey( toCopy->key() );
-			newNote->setLength( toCopy->length() );
-			newNote->setPanning( toCopy->getPanning() );
-			newNote->setVolume( toCopy->getVolume() );
-		}
+
+	const TimePos endPosition = TimePos::stepPosition(oldLength);
+
+	// Must reserve so that we don't accidentally grow the vector.
+	m_notes.reserve(m_notes.size() * 2);
+
+	instrumentTrack()->lock();
+
+	for (auto& note: m_notes)  {
+		if (note->pos() >= endPosition) { continue; }
+		auto newNote = note->clone();
+
+		newNote->setPos(endPosition + note->pos());
+		m_notes.push_back(newNote);
 	}
+
+	instrumentTrack()->unlock();
+
 	updateLength();
 	emit dataChanged();
 }
