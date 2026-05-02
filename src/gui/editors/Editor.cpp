@@ -139,6 +139,11 @@ QAction *Editor::playAction() const
 	return m_playAction;
 }
 
+void Editor::closeEvent(QCloseEvent* event)
+{
+	event->ignore();
+}
+
 void Editor::keyPressEvent(QKeyEvent* ke)
 {
 	if (ke->key() == Qt::Key_Space)
