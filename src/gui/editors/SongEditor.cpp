@@ -24,6 +24,8 @@
 
 #include "SongEditor.h"
 
+#include <algorithm>
+#include <array>
 #include <cmath>
 
 #include <QAction>
@@ -503,7 +505,10 @@ void SongEditor::keyPressEvent( QKeyEvent * ke )
 		for (const auto& selectedClip : so)
 		{
 			auto clipv = dynamic_cast<ClipView*>(selectedClip);
-			clipv->remove();
+			if (clipv != nullptr)
+			{
+				clipv->remove();
+			}
 		}
 	}
 	else if( ke->key() == Qt::Key_A && ke->modifiers() & Qt::ControlModifier )
@@ -1147,5 +1152,4 @@ void SongEditorWindow::adjustUiAfterProjectLoad()
 
 
 } // namespace lmms::gui
-
 
