@@ -716,10 +716,12 @@ QList<QAction*> FileBrowserTreeWidget::getContextActions(FileItem* file, bool so
 		tr("Send to new instrument track");
 	QString shortcutMod = songEditor ? "" : UI_CTRL_KEY + QString(" + ");
 
-	auto toInstrument = new QAction(instrumentAction + tr(" (%2Enter)").arg(shortcutMod));
-	connect(toInstrument, &QAction::triggered,
-		[=, this]{ openInNewInstrumentTrack(file, songEditor); });
-	result.append(toInstrument);
+	if (file->type() != FileItem::FileType::Project)
+	{
+		auto toInstrument = new QAction(instrumentAction + tr(" (%2Enter)").arg(shortcutMod));
+		connect(toInstrument, &QAction::triggered, [=, this] { openInNewInstrumentTrack(file, songEditor); });
+		result.append(toInstrument);
+	}
 
 	if (songEditor && fileIsSample)
 	{
