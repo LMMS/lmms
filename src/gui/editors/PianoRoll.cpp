@@ -5877,6 +5877,10 @@ void PianoRollWindow::updateStepRecordingIcon()
 	}
 }
 
+bool PianoRollWindow::hasValidMidiClip()
+{
+	return m_editor->hasValidMidiClip();
+}
 
 } // namespace gui
 
