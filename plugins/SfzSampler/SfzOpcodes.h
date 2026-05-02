@@ -123,6 +123,8 @@ struct EnvelopeOpcodes
 	ModulatableOpcode decay;
 	ModulatableOpcode sustain;
 	ModulatableOpcode release;
+	// Depth is only used for pitcheg and fileg, not ampeg, but we have it here anyway
+	ModulatableOpcode depth;
 	// Velocity modulation amount
 	FloatOpcode vel2delay;
 	FloatOpcode vel2attack;
@@ -130,6 +132,7 @@ struct EnvelopeOpcodes
 	FloatOpcode vel2decay;
 	FloatOpcode vel2sustain;
 	FloatOpcode vel2release;
+	FloatOpcode vel2depth;
 
 	// Initialize opcodes with correct names and default values
 	EnvelopeOpcodes(QString name)
@@ -139,12 +142,14 @@ struct EnvelopeOpcodes
 		, decay(name + "_decay", 0.0f)
 		, sustain(name + "_sustain", 100.0f)
 		, release(name + "_release", 0.0f)
+		, depth(name + "_depth", 0.0f)
 		, vel2delay(name + "_vel2delay", 0.0f)
 		, vel2attack(name + "_vel2attack", 0.0f)
 		, vel2hold(name + "_vel2hold", 0.0f)
 		, vel2decay(name + "_vel2decay", 0.0f)
 		, vel2sustain(name + "_vel2sustain", 0.0f)
 		, vel2release(name + "_vel2release", 0.0f)
+		, vel2depth(name + "_vel2depth", 0.0f)
 	{}
 	//! Helper function to update all of the cached modulations for the individual opcodes
 	void updateCachedModulation(const std::array<int, NumMidiCCs>& ccValues)
@@ -155,6 +160,7 @@ struct EnvelopeOpcodes
 		decay.updateCachedModulation(ccValues);
 		sustain.updateCachedModulation(ccValues);
 		release.updateCachedModulation(ccValues);
+		depth.updateCachedModulation(ccValues);
 	}
 	//! Helper function for parsing all these envelope generator opcodes, so that the code isn't duplicated for the amplitude, pitch, and filter envelopes
 	void parseEnvelopeGeneratorOpcode(const QString& opcode, const QString& value, bool* parsed, bool* successful);

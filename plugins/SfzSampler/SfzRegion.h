@@ -31,6 +31,7 @@
 #include "SfzRegionPlayState.h"
 #include "SfzSampleBuffer.h"
 #include "SfzSamplePool.h"
+#include "SfzBasicWaves.h"
 
 #include <QDir>
 
@@ -58,11 +59,15 @@ public:
 	bool initializeSample(const QDir& parentDirectory, SfzSamplePool& samplePool);
 
 	const SfzSampleBuffer* sample() const { return m_sample; }
+	const SfzBasicWaves::Shape basicWaveShape() const { return m_basicWaveShape; }
 
 private:
 	//! Pointer to sample object to be played. The sample file path is defined in the `sample` opcode, but the data needs to be loaded first
 	//! The actual sample objects are stored in a shared pool, SfzSamplePool, so that if multiple of the same sample are loaded, they don't waste memory.
 	const SfzSampleBuffer* m_sample = nullptr;
+	//! However, if a basic wave keyword such as *sine, *saw, *triangle, etc is used, handle it separately (see SfzBasicWaves.h/.cpp)
+	SfzBasicWaves::Shape m_basicWaveShape = SfzBasicWaves::Shape::Silence;
+
 
 	//! In order to do round robin, the region needs to keep track of how many notes it has played in its lifetime. Or rather, the number of notes it *would* have played if it weren't restricted to only play a note when the round-robin counter hit the right numbers.
 	int m_roundRobinCount = 0;

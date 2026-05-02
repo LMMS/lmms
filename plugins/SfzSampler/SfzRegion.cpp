@@ -115,6 +115,7 @@ void SfzRegion::recalculateTotalCCModulation(const SfzGlobalState& globalState)
 	m_delay.updateCachedModulation(globalState.midiCCValues());
 
 	m_ampeg.updateCachedModulation(globalState.midiCCValues());
+	m_pitcheg.updateCachedModulation(globalState.midiCCValues());
 }
 
 
@@ -127,12 +128,27 @@ bool SfzRegion::initializeSample(const QDir& parentDirectory, SfzSamplePool& sam
 		return false;
 	}
 
-	QDir defaultDirectory = QDir(parentDirectory.absoluteFilePath(m_default_path.value().value_or(""))); // TODO
-	QString path = defaultDirectory.absoluteFilePath(m_sampleFile.value().value()); // TODO
-	// The sample pool handles making sure the same sample isn't loaded twice, which would waste memory
-	m_sample = samplePool.loadSample(path);
+	// There are some special sample keywords for simple wave shapes, such as *sine, *triangle, *silence, etc
+	// If one of them is used, we don't load a sample file, instead leave m_sample as nullptr and set m_basicWaveShape
+	// to let the region know that we are doing a procedurally generated wave
+	if (m_sampleFile.value() == "*sine") { m_basicWaveShape = SfzBasicWaves::Shape::Sine; }
+	else if (m_sampleFile.value() == "*saw") { m_basicWaveShape = SfzBasicWaves::Shape::Saw; }
+	else if (m_sampleFile.value() == "*square") { m_basicWaveShape = SfzBasicWaves::Shape::Square; }
+	else if (m_sampleFile.value() == "*triangle") { m_basicWaveShape = SfzBasicWaves::Shape::Triangle; }
+	else if (m_sampleFile.value() == "*tri") { m_basicWaveShape = SfzBasicWaves::Shape::Triangle; }
+	else if (m_sampleFile.value() == "*noise") { m_basicWaveShape = SfzBasicWaves::Shape::Noise; }
+	else if (m_sampleFile.value() == "*silence") { m_basicWaveShape = SfzBasicWaves::Shape::Silence; }
+	else
+	{
+		// If it's not a basic wave, load the real sample file.
+		QDir defaultDirectory = QDir(parentDirectory.absoluteFilePath(m_default_path.value().value_or(""))); // TODO
+		QString path = defaultDirectory.absoluteFilePath(m_sampleFile.value().value()); // TODO
+		// The sample pool handles making sure the same sample isn't loaded twice, which would waste memory
+		m_sample = samplePool.loadSample(path);
 
-	return m_sample != nullptr;
+		return m_sample != nullptr;
+	}
+	return true;
 }
 
 

@@ -133,31 +133,48 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const fpp_t frames)
 	// Helper variable
 	const float normalizedVelocity = m_trigger.velocity().value() / 127.0f;
 
+
+	// Sample rate of LMMS
+	const float lmmsSampleRate = Engine::audioEngine()->outputSampleRate();
+	// Sample rate of sample (if we are using a sample, not a basic wave like *sine or *saw)
+	const float sampleSampleRate = m_region->sample() != nullptr
+		? m_region->sample()->sampleRate()
+		: lmmsSampleRate; // If we are using a basic wave instead of a sample, set it to LMMS's sample rate
+
+
+	// Pitch envelope
+	// This is only computed once per buffer to same compute, since doing it per-frame seems a bit excessive
+	const float pitcheg = envelopeGenerator(
+		m_region->m_pitcheg.delay.value() * lmmsSampleRate,
+		m_region->m_pitcheg.attack.value() * lmmsSampleRate,
+		m_region->m_pitcheg.hold.value() * lmmsSampleRate,
+		m_region->m_pitcheg.decay.value() * lmmsSampleRate,
+		m_region->m_pitcheg.sustain.value() / 100.0f, // Sustain is stored in percent, so divide by 100 to get ratio,
+		m_region->m_pitcheg.release.value() * lmmsSampleRate
+	) * m_region->m_pitcheg.depth.value();
+
 	// Calculate pitch difference relative to original sample
 	const float semitoneDifference = m_trigger.key().value() - m_region->m_pitch_keycenter.value();
-	// The total pitch depends on 1. the key offset 2. the fine `tune` adjustment 3. the velocity, if pitch_veltrack is nonzero
+	// The total pitch depends on 1. the key offset 2. the fine `tune` adjustment 3. the velocity, if pitch_veltrack is nonzero 4. the pitch envelope
 	const float pitch = semitoneDifference * m_region->m_pitch_keytrack.value() / 100.0f
 		+ m_region->m_tune.value() / 100.0f
-		+ normalizedVelocity * m_region->m_pitch_veltrack.value() / 100.0f;
+		+ normalizedVelocity * m_region->m_pitch_veltrack.value() / 100.0f
+		+ pitcheg / 100.0f;
 	float freqRatio = std::exp2(pitch / 12.0f);
 
-	// Sample rate of sample
-	const float sampleSampleRate = m_region->sample()->sampleRate();
-	// Sample rate of LMMS
-	const float sampleRate = Engine::audioEngine()->outputSampleRate();
 	// Play the sample faster/slower to match the correct sample rate
-	freqRatio *= sampleSampleRate / sampleRate;
+	freqRatio *= sampleSampleRate / lmmsSampleRate;
 
 	// Amplitude
 	const float amplitude = m_region->m_amplitude.value() / 100.0f; // Amplitude is stored as a percent
 
 	// Amplitude envelope
-	const f_cnt_t ampegDelayFrames = m_region->m_ampeg.delay.value() * sampleRate;
-	const f_cnt_t ampegAttackFrames = m_region->m_ampeg.attack.value() * sampleRate;
-	const f_cnt_t ampegHoldFrames = m_region->m_ampeg.hold.value() * sampleRate;
-	const f_cnt_t ampegDecayFrames = m_region->m_ampeg.decay.value() * sampleRate;
+	const f_cnt_t ampegDelayFrames = m_region->m_ampeg.delay.value() * lmmsSampleRate;
+	const f_cnt_t ampegAttackFrames = m_region->m_ampeg.attack.value() * lmmsSampleRate;
+	const f_cnt_t ampegHoldFrames = m_region->m_ampeg.hold.value() * lmmsSampleRate;
+	const f_cnt_t ampegDecayFrames = m_region->m_ampeg.decay.value() * lmmsSampleRate;
 	const float ampegSustain = m_region->m_ampeg.sustain.value() / 100.0f; // Sustain is stored in percent, so divide by 100 to get ratio
-	const f_cnt_t ampegReleaseFrames = m_region->m_ampeg.release.value() * sampleRate;
+	const f_cnt_t ampegReleaseFrames = m_region->m_ampeg.release.value() * lmmsSampleRate;
 
 	// Amplitude due to velocity
 	// If amp_keytrack is 100, then 0 velocity = 0 amp, and 127 velocity = 1.0f amp (as expected)
@@ -199,17 +216,35 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const fpp_t frames)
 			ampegSustain,
 			ampegReleaseFrames
 		);
-		if (filterEnabled) // TODO does this if statement make it faster?
+		// If a sample file was loaded, use the buffer to get the audio data
+		// Otherwise, if a basic wave shape is being used (like *sine, *saw, *silence, etc) use a function to generate the shape
+		float sampleLeftValue = 0.0f;
+		float sampleRightValue = 0.0f;
+		if (m_region->sample() != nullptr) // TODO: should this check be outside of the loop?
 		{
-			buffer[f][0] += m_filter.update(m_region->sample()->at(m_sampleFrame, 0) * amplitude * ampeg * ampVelocity * ampVolume * rightPanAmp, 0);
-			buffer[f][1] += m_filter.update(m_region->sample()->at(m_sampleFrame, 1) * amplitude * ampeg * ampVelocity * ampVolume * leftPanAmp, 1);
+			sampleLeftValue = m_region->sample()->at(m_sampleFrame, 0);
+			sampleRightValue = m_region->sample()->at(m_sampleFrame, 1);
 		}
 		else
 		{
-			buffer[f][0] += m_region->sample()->at(m_sampleFrame, 0) * amplitude * ampeg * ampVelocity * ampVolume * rightPanAmp;
-			buffer[f][1] += m_region->sample()->at(m_sampleFrame, 1) * amplitude * ampeg * ampVelocity * ampVolume * leftPanAmp;
+			sampleLeftValue = SfzBasicWaves::generate(m_region->basicWaveShape(), lmmsSampleRate, m_sampleFrame);
+			sampleRightValue = SfzBasicWaves::generate(m_region->basicWaveShape(), lmmsSampleRate, m_sampleFrame);
 		}
-		m_sampleFrame = std::min(static_cast<float>(m_region->sample()->size()), m_sampleFrame + freqRatio);
+
+		if (filterEnabled) // TODO does this if statement make it faster?
+		{
+			buffer[f][0] += m_filter.update(sampleLeftValue * amplitude * ampeg * ampVelocity * ampVolume * rightPanAmp, 0);
+			buffer[f][1] += m_filter.update(sampleRightValue * amplitude * ampeg * ampVelocity * ampVolume * leftPanAmp, 1);
+		}
+		else
+		{
+			buffer[f][0] += sampleLeftValue * amplitude * ampeg * ampVelocity * ampVolume * rightPanAmp;
+			buffer[f][1] += sampleRightValue * amplitude * ampeg * ampVelocity * ampVolume * leftPanAmp;
+		}
+		// Increment the frame count. If we are using a sample, make sure to stop at the end, but if we are using a basic wave like *sine or *saw, there's no need
+		m_sampleFrame = m_region->sample() != nullptr
+			? std::min(static_cast<float>(m_region->sample()->size()), m_sampleFrame + freqRatio)
+			: m_sampleFrame + freqRatio;
 		m_frameCount++;
 	}
 
@@ -221,7 +256,7 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const fpp_t frames)
 	}
 
 	// If loop_mode is one_shot, no noteOff signal will ever come to release it, so we need to manually deactivate when we reach the end of the sample
-	if (m_region->m_loop_mode.value() == LoopMode::OneShot && m_sampleFrame >= m_region->sample()->size())
+	if (m_region->m_loop_mode.value() == LoopMode::OneShot && m_region->sample() != nullptr && m_sampleFrame >= m_region->sample()->size())
 	{
 		m_active = false; // TODO should this forcefully decative or just release?
 	}

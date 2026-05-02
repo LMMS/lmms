@@ -142,6 +142,12 @@ public:
 
 
 	//
+	// Pitch Envelope Generator (pitcheg)
+	//
+	EnvelopeOpcodes m_pitcheg {"pitcheg"};
+
+
+	//
 	// Misc Volume
 	//
 	// Gain is the same as volume. Some opcodes use the word volume, some use gain, both are decibals

@@ -129,6 +129,7 @@ void EnvelopeOpcodes::parseEnvelopeGeneratorOpcode(const QString& opcode, const 
 	decay.parseFromString(opcode, value, parsed, successful);
 	sustain.parseFromString(opcode, value, parsed, successful);
 	release.parseFromString(opcode, value, parsed, successful);
+	depth.parseFromString(opcode, value, parsed, successful);
 
 	vel2delay.parseFromString(opcode, value, parsed, successful);
 	vel2attack.parseFromString(opcode, value, parsed, successful);
@@ -136,6 +137,7 @@ void EnvelopeOpcodes::parseEnvelopeGeneratorOpcode(const QString& opcode, const 
 	vel2decay.parseFromString(opcode, value, parsed, successful);
 	vel2sustain.parseFromString(opcode, value, parsed, successful);
 	vel2release.parseFromString(opcode, value, parsed, successful);
+	vel2depth.parseFromString(opcode, value, parsed, successful);
 }
 
 

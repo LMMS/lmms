@@ -88,7 +88,8 @@ bool SfzOpcodeState::setOpcodeByStrings(const QString& name, const QString& valu
 	};
 
 	std::vector<EnvelopeOpcodes*> envelopeGeneratorList = {
-		&m_ampeg
+		&m_ampeg,
+		&m_pitcheg
 	};
 
 	bool parsed = false;
