@@ -89,7 +89,7 @@ bar_t PatternStore::lengthOfPattern(int pattern) const
 	for (Track * t : tl)
 	{
 		// Don't create Clips here if they don't exist
-		if (pattern < t->numOfClips())
+		if (pattern < t->numOfClips() && t->type() == Track::Type::Instrument)
 		{
 			maxLength = std::max(maxLength, t->getClip(pattern)->length());
 		}

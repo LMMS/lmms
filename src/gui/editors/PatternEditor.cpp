@@ -221,6 +221,13 @@ void PatternEditor::updateMaxSteps()
 			auto mClip = static_cast<MidiClip*>(track->getClip(m_ps->currentPattern()));
 			m_maxClipLength = std::max(m_maxClipLength, static_cast<tick_t>(mClip->length()));
 		}
+		else
+		{
+			// The length of automation and sample clips is updated here.
+			// "Why here ?" will you ask. The answer is: Because.
+			auto clip = track->getClip(m_ps->currentPattern());
+			clip->updateLength();
+		}
 	}
 	updatePixelsPerBar();
 }
