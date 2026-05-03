@@ -238,4 +238,4 @@ template<> void Opcode<FilterType>::parseFromString(const QString& opcodeName, c
 } // namespace lmms
 
 
-#endif // LMMS_SFZ_OPCODES
+#endif // LMMS_SFZ_OPCODES_H
