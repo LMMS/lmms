@@ -168,21 +168,20 @@ void BitInvader::normalize()
 	if (m_normalizeMode.value() == static_cast<int>(NormalizeMode::Legacy))
 	{
 		m_normalizeOffset = 0.f;
-		m_normalizeFactor = 1.f / std::max_element(samples.begin(), samples.end(), [](auto a, auto b){ return std::abs(a) < std::abs(b); })[0];
+		m_normalizeFactor = 1.f / *std::max_element(samples.begin(), samples.end(), [](auto a, auto b){ return std::abs(a) < std::abs(b); });
 		return;
 	}
 
-	const auto maxSamp = std::max_element(samples.begin(), samples.end())[0];
-	const auto minSamp = std::min_element(samples.begin(), samples.end())[0];
-	if (minSamp == maxSamp)
+	const auto [minSamp, maxSamp] = std::minmax_element(samples.begin(), samples.end());
+	if (*minSamp == *maxSamp)
 	{
-		m_normalizeFactor = 1.f;
+		m_normalizeFactor = 0.f;
 		m_normalizeOffset = 0.f;
 		return;
 	}
-	const auto diff = maxSamp - minSamp;
+	const auto diff = *maxSamp - *minSamp;
 	m_normalizeFactor = 2.f / diff;
-	m_normalizeOffset = (maxSamp + minSamp) / -diff;
+	m_normalizeOffset = (*maxSamp + *minSamp) / -diff;
 }
 
 
