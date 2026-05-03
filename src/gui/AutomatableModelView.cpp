@@ -31,6 +31,7 @@
 #include "ControllerConnection.h"
 #include "embed.h"
 #include "GuiApplication.h"
+#include "KeyboardShortcuts.h"
 #include "MainWindow.h"
 #include "StringPairDrag.h"
 #include "Clipboard.h"
@@ -48,7 +49,7 @@ AutomatableModelView::AutomatableModelView( Model* model, QWidget* _this ) :
 	m_conversionFactor( 1.0 )
 {
 	widget()->setAcceptDrops( true );
-	widget()->setCursor( QCursor( embed::getIconPixmap( "hand" ), 3, 3 ) );
+	widget()->setCursor(Qt::PointingHandCursor);
 }
 
 void AutomatableModelView::addDefaultActions( QMenu* menu )
@@ -83,23 +84,11 @@ void AutomatableModelView::addDefaultActions( QMenu* menu )
 
 	menu->addSeparator();
 
-	menu->addAction( embed::getIconPixmap( "automation" ),
-						AutomatableModel::tr( "Edit song-global automation" ),
-							amvSlots,
-							SLOT(editSongGlobalAutomation()));
-
-	menu->addAction( QPixmap(),
-						AutomatableModel::tr( "Remove song-global automation" ),
-						amvSlots,
-						SLOT(removeSongGlobalAutomation()));
-
-	menu->addSeparator();
-
-	if( model->hasLinkedModels() )
+	if (model->isLinked())
 	{
-		menu->addAction( embed::getIconPixmap( "edit-delete" ),
-							AutomatableModel::tr( "Remove all linked controls" ),
-							amvSlots, SLOT(unlinkAllModels()));
+		menu->addAction(embed::getIconPixmap("edit_unlink"),
+							AutomatableModel::tr("Remove all linked controls"),
+							model, SLOT(unlink()));
 		menu->addSeparator();
 	}
 
@@ -171,7 +160,7 @@ void AutomatableModelView::unsetModel()
 
 void AutomatableModelView::mousePressEvent( QMouseEvent* event )
 {
-	if( event->button() == Qt::LeftButton && event->modifiers() & Qt::ControlModifier )
+	if (event->button() == Qt::LeftButton && event->modifiers() & KBD_COPY_MODIFIER)
 	{
 		new gui::StringPairDrag( "automatable_model", QString::number( modelUntyped()->id() ), QPixmap(), widget() );
 		event->accept();
@@ -259,26 +248,6 @@ void AutomatableModelViewSlots::removeConnection()
 
 
 
-
-void AutomatableModelViewSlots::editSongGlobalAutomation()
-{
-	getGUI()->automationEditor()->open(
-				AutomationClip::globalAutomationClip(m_amv->modelUntyped())
-	);
-}
-
-
-
-void AutomatableModelViewSlots::removeSongGlobalAutomation()
-{
-	delete AutomationClip::globalAutomationClip( m_amv->modelUntyped() );
-}
-
-
-void AutomatableModelViewSlots::unlinkAllModels()
-{
-	m_amv->modelUntyped()->unlinkAllModels();
-}
 
 void AutomatableModelViewSlots::copyToClipboard()
 {

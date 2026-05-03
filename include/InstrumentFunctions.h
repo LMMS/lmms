@@ -25,16 +25,17 @@
 #ifndef LMMS_INSTRUMENT_FUNCTIONS_H
 #define LMMS_INSTRUMENT_FUNCTIONS_H
 
-#include "JournallingObject.h"
-#include "lmms_basics.h"
+#include <array>
+
 #include "AutomatableModel.h"
-#include "TempoSyncKnobModel.h"
 #include "ComboBoxModel.h"
+#include "JournallingObject.h"
+#include "TempoSyncKnobModel.h"
 
 namespace lmms
 {
 
-class InstrumentTrack;
+class InstrumentTrack;  // IWYU pragma: keep
 class NotePlayHandle;
 
 namespace gui

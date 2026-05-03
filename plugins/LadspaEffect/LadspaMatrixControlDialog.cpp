@@ -24,21 +24,17 @@
  */
 
 
-#include <QGroupBox>
-#include <QLayout>
 #include <QLabel>
 #include <QScrollArea>
 #include <QScrollBar>
 #include <QSpacerItem>
-#include <QMdiArea>
+#include <QVBoxLayout>
 
 
-#include "LadspaBase.h"
 #include "LadspaControl.h"
-#include "LadspaEffect.h"
+#include "LadspaControls.h"
 #include "LadspaMatrixControlDialog.h"
 #include "LadspaWidgetFactory.h"
-#include "LadspaControlView.h"
 #include "LedCheckBox.h"
 
 
@@ -51,6 +47,7 @@ LadspaMatrixControlDialog::LadspaMatrixControlDialog(LadspaControls * ladspaCont
 	m_stereoLink(nullptr)
 {
 	QVBoxLayout * mainLayout = new QVBoxLayout(this);
+	mainLayout->setSizeConstraint(QLayout::SetMinAndMaxSize);
 
 	m_scrollArea = new QScrollArea(this);
 	m_scrollArea->setWidgetResizable(true);
@@ -74,11 +71,6 @@ LadspaMatrixControlDialog::LadspaMatrixControlDialog(LadspaControls * ladspaCont
 		m_stereoLink->setModel(&ladspaControls->m_stereoLinkModel);
 		mainLayout->addWidget(m_stereoLink, 0, Qt::AlignCenter);
 	}
-}
-
-bool LadspaMatrixControlDialog::isResizable() const
-{
-	return true;
 }
 
 bool LadspaMatrixControlDialog::needsLinkColumn() const
@@ -182,7 +174,7 @@ QWidget * LadspaMatrixControlDialog::createMatrixWidget()
 {
 	QWidget *widget = new QWidget(this);
 	QGridLayout *gridLayout = new QGridLayout(widget);
-	gridLayout->setMargin(0);
+	gridLayout->setContentsMargins(0, 0, 0, 0);
 	widget->setLayout(gridLayout);
 
 	arrangeControls(widget, gridLayout);

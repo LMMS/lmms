@@ -45,7 +45,7 @@ Plugin::Descriptor PLUGIN_EXPORT eq_plugin_descriptor =
 	"Dave French <contact/dot/dave/dot/french3/at/googlemail/dot/com>",
 	0x0100,
 	Plugin::Type::Effect,
-	new PluginPixmapLoader("logo"),
+	new PixmapLoader("lmms-plugin-logo"),
 	nullptr,
 	nullptr,
 } ;
@@ -64,7 +64,7 @@ EqEffect::EqEffect( Model *parent, const Plugin::Descriptor::SubPluginFeatures::
 
 
 
-bool EqEffect::processAudioBuffer( sampleFrame *buf, const fpp_t frames )
+Effect::ProcessStatus EqEffect::processImpl(SampleFrame* buf, const f_cnt_t frames)
 {
 	const int sampleRate = Engine::audioEngine()->outputSampleRate();
 
@@ -131,13 +131,6 @@ bool EqEffect::processAudioBuffer( sampleFrame *buf, const fpp_t frames )
 	m_lp481.setParameters( sampleRate, lpFreq, lpRes, 1 );
 
 
-
-
-	if( !isEnabled() || !isRunning () )
-	{
-		return( false );
-	}
-
 	if( m_eqControls.m_outGainModel.isValueChanged() )
 	{
 		m_outGain = dbfsToAmp(m_eqControls.m_outGainModel.value());
@@ -151,13 +144,13 @@ bool EqEffect::processAudioBuffer( sampleFrame *buf, const fpp_t frames )
 	m_eqControls.m_inProgress = true;
 	double outSum = 0.0;
 
-	for( fpp_t f = 0; f < frames; ++f )
+	for (f_cnt_t f = 0; f < frames; ++f)
 	{
-		outSum += buf[f][0]*buf[f][0] + buf[f][1]*buf[f][1];
+		outSum += buf[f][0] * buf[f][0] + buf[f][1] * buf[f][1];
 	}
 
 	const float outGain =  m_outGain;
-	sampleFrame m_inPeak = { 0, 0 };
+	SampleFrame m_inPeak = { 0, 0 };
 
 	if(m_eqControls.m_analyseInModel.value( true ) &&  outSum > 0 && m_eqControls.isViewVisible()  )
 	{
@@ -173,7 +166,7 @@ bool EqEffect::processAudioBuffer( sampleFrame *buf, const fpp_t frames )
 	m_eqControls.m_inPeakR = m_eqControls.m_inPeakR < m_inPeak[1] ? m_inPeak[1] : m_eqControls.m_inPeakR;
 
 	float periodProgress = 0.0f; // percentage of period processed
-	for( fpp_t f = 0; f < frames; ++f)
+	for( f_cnt_t f = 0; f < frames; ++f)
 	{
 		periodProgress = (float)f / (float)(frames-1);
 		//wet dry buffer
@@ -263,12 +256,10 @@ bool EqEffect::processAudioBuffer( sampleFrame *buf, const fpp_t frames )
 
 	}
 
-	sampleFrame outPeak = { 0, 0 };
+	SampleFrame outPeak = { 0, 0 };
 	gain( buf, frames, outGain, &outPeak );
 	m_eqControls.m_outPeakL = m_eqControls.m_outPeakL < outPeak[0] ? outPeak[0] : m_eqControls.m_outPeakL;
 	m_eqControls.m_outPeakR = m_eqControls.m_outPeakR < outPeak[1] ? outPeak[1] : m_eqControls.m_outPeakR;
-
-	checkGate( outSum / frames );
 
 	if(m_eqControls.m_analyseOutModel.value( true ) && outSum > 0 && m_eqControls.isViewVisible() )
 	{
@@ -281,7 +272,8 @@ bool EqEffect::processAudioBuffer( sampleFrame *buf, const fpp_t frames )
 	}
 
 	m_eqControls.m_inProgress = false;
-	return isRunning();
+
+	return Effect::ProcessStatus::ContinueIfNotQuiet;
 }
 
 

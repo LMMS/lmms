@@ -38,7 +38,7 @@ namespace lmms
 #define KICKER_PRESET_VERSION 1
 
 
-class NotePlayHandle;
+class NotePlayHandle;  // IWYU pragma: keep
 
 namespace gui
 {
@@ -56,7 +56,7 @@ public:
 	~KickerInstrument() override = default;
 
 	void playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer ) override;
+						SampleFrame* _working_buffer ) override;
 	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
 	void saveSettings(QDomDocument& doc, QDomElement& elem) override;

@@ -72,11 +72,11 @@ public:
 
 	~StringContainer() = default;
 
-	void addString(int harm, float pick, float pickup, const float* impulse, float randomize,
+	void addString(std::size_t harm, float pick, float pickup, const float* impulse, float randomize,
 		float stringLoss, float detune, int oversample, bool state, int id)
 	{
 		constexpr auto octave = std::array{0.25f, 0.5f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f};
-		assert(harm >= 0 && harm < octave.size());
+		assert(harm < octave.size());
 
 		m_strings[id] = VibratingString{m_pitch * octave[harm], pick, pickup, impulse, m_bufferLength,
 			m_sampleRate, oversample, randomize, stringLoss, detune, state};
@@ -201,7 +201,7 @@ QString Vibed::nodeName() const
 	return vibedstrings_plugin_descriptor.name;
 }
 
-void Vibed::playNote(NotePlayHandle* n, sampleFrame* workingBuffer)
+void Vibed::playNote(NotePlayHandle* n, SampleFrame* workingBuffer)
 {
 	if (!n->m_pluginData)
 	{
@@ -229,11 +229,11 @@ void Vibed::playNote(NotePlayHandle* n, sampleFrame* workingBuffer)
 		}
 	}
 
-	const fpp_t frames = n->framesLeftForCurrentPeriod();
+	const f_cnt_t frames = n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = n->noteOffset();
 	auto ps = static_cast<StringContainer*>(n->m_pluginData);
 
-	for (fpp_t i = offset; i < frames + offset; ++i)
+	for (f_cnt_t i = offset; i < frames + offset; ++i)
 	{
 		workingBuffer[i][0] = 0.0f;
 		workingBuffer[i][1] = 0.0f;
@@ -293,7 +293,6 @@ VibedView::VibedView(Instrument* instrument, QWidget* parent) :
 	pal.setBrush(backgroundRole(), PLUGIN_NAME::getIconPixmap("artwork"));
 	setPalette(pal);
 
-	m_volumeKnob.setVolumeKnob(true);
 	m_volumeKnob.move(103, 142);
 	m_volumeKnob.setHintText(tr("String volume:"), "");
 

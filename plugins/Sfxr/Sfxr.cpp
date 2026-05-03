@@ -23,23 +23,13 @@
  * Boston, MA 02110-1301 USA.
  */
 
+#include "Sfxr.h"
+
 #include <cstdlib>
 #include <ctime>
-
-#define rnd(n) (rand()%(n+1))
-
-#define PI 3.14159265f
-
-float frnd(float range)
-{
-	return (float)rnd(10000)/10000*range;
-}
-
 #include <cmath>
-
 #include <QDomElement>
 
-#include "Sfxr.h"
 #include "AudioEngine.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
@@ -47,9 +37,8 @@ float frnd(float range)
 #include "NotePlayHandle.h"
 #include "PixmapButton.h"
 #include "MidiEvent.h"
-
+#include "lmms_math.h"
 #include "embed.h"
-
 #include "plugin_export.h"
 
 namespace lmms
@@ -97,33 +86,34 @@ void SfxrSynth::resetSample( bool restart )
 	fperiod=100.0/(s->m_startFreqModel.value()*s->m_startFreqModel.value()+0.001);
 	period=(int)fperiod;
 	fmaxperiod=100.0/(s->m_minFreqModel.value()*s->m_minFreqModel.value()+0.001);
-	fslide=1.0-pow((double)s->m_slideModel.value(), 3.0)*0.01;
-	fdslide=-pow((double)s->m_dSlideModel.value(), 3.0)*0.000001;
+	const auto sv = static_cast<double>(s->m_slideModel.value());
+	const auto dsv = static_cast<double>(s->m_dSlideModel.value());
+	fslide = 1.0 - sv * sv * sv * 0.01;
+	fdslide = -dsv * dsv * dsv * 0.000001;
 	square_duty=0.5f-s->m_sqrDutyModel.value()*0.5f;
 	square_slide=-s->m_sqrSweepModel.value()*0.00005f;
-	if(s->m_changeAmtModel.value()>=0.0f)
-		arp_mod=1.0-pow((double)s->m_changeAmtModel.value(), 2.0)*0.9;
-	else
-		arp_mod=1.0+pow((double)s->m_changeAmtModel.value(), 2.0)*10.0;
-	arp_time=0;
-	arp_limit=(int)(pow(1.0f-s->m_changeSpeedModel.value(), 2.0f)*20000+32);
-	if(s->m_changeSpeedModel.value()==1.0f)
-		arp_limit=0;
+	const auto cha = static_cast<double>(s->m_changeAmtModel.value());
+	arp_mod = (cha >= 0.0)
+		? 1.0 - cha * cha * 0.9
+		: 1.0 + cha * cha * 10.0;
+	arp_time = 0;
+	const auto chs = 1.f - s->m_changeSpeedModel.value();
+	arp_limit = (chs == 0.f) ? 0 : static_cast<int>(chs * chs * 20000 + 32);
 	if(!restart)
 	{
 		// reset filter
 		fltp=0.0f;
 		fltdp=0.0f;
-		fltw=pow(s->m_lpFilCutModel.value(), 3.0f)*0.1f;
+		fltw = std::pow(s->m_lpFilCutModel.value(), 3.f) * 0.1f;
 		fltw_d=1.0f+s->m_lpFilCutSweepModel.value()*0.0001f;
-		fltdmp=5.0f/(1.0f+pow(s->m_lpFilResoModel.value(), 2.0f)*20.0f)*(0.01f+fltw);
+		fltdmp = 5.0f / (1.0f + std::pow(s->m_lpFilResoModel.value(), 2.0f) * 20.0f) * (0.01f + fltw);
 		if(fltdmp>0.8f) fltdmp=0.8f;
 		fltphp=0.0f;
-		flthp=pow(s->m_hpFilCutModel.value(), 2.0f)*0.1f;
+		flthp = std::pow(s->m_hpFilCutModel.value(), 2.f) * 0.1f;
 		flthp_d=1.0+s->m_hpFilCutSweepModel.value()*0.0003f;
 		// reset vibrato
 		vib_phase=0.0f;
-		vib_speed=pow(s->m_vibSpeedModel.value(), 2.0f)*0.01f;
+		vib_speed = std::pow(s->m_vibSpeedModel.value(), 2.f) * 0.01f;
 		vib_amp=s->m_vibDepthModel.value()*0.5f;
 		// reset envelope
 		env_vol=0.0f;
@@ -134,9 +124,9 @@ void SfxrSynth::resetSample( bool restart )
 		env_length[1]=(int)(s->m_holdModel.value()*s->m_holdModel.value()*99999.0f)+1;
 		env_length[2]=(int)(s->m_decModel.value()*s->m_decModel.value()*99999.0f)+1;
 
-		fphase=pow(s->m_phaserOffsetModel.value(), 2.0f)*1020.0f;
+		fphase = std::pow(s->m_phaserOffsetModel.value(), 2.f) * 1020.f;
 		if(s->m_phaserOffsetModel.value()<0.0f) fphase=-fphase;
-		fdphase=pow(s->m_phaserSweepModel.value(), 2.0f)*1.0f;
+		fdphase = std::pow(s->m_phaserSweepModel.value(), 2.f) * 1.f;
 		if(s->m_phaserSweepModel.value()<0.0f) fdphase=-fdphase;
 		iphase=abs((int)fphase);
 		ipp=0;
@@ -144,20 +134,20 @@ void SfxrSynth::resetSample( bool restart )
 		phaser_buffer.fill(0.0f);
 		for (auto& noiseSample : noise_buffer) 
 		{
-			noiseSample = frnd(2.0f) - 1.0f; 
+			noiseSample = fastRandInc(-1.f, 1.f);
 		}
 
 		rep_time=0;
-		rep_limit=(int)(pow(1.0f-s->m_repeatSpeedModel.value(), 2.0f)*20000+32);
+		rep_limit = static_cast<int>(std::pow(1.0f - s->m_repeatSpeedModel.value(), 2.0f) * 20000 + 32);
 		if(s->m_repeatSpeedModel.value()==0.0f)
 			rep_limit=0;
-    }
+	}
 }
 
 
 
 
-void SfxrSynth::update( sampleFrame * buffer, const int32_t frameNum )
+void SfxrSynth::update( SampleFrame* buffer, const int32_t frameNum )
 {
 	for(int i=0;i<frameNum;i++)
 	{
@@ -195,7 +185,7 @@ void SfxrSynth::update( sampleFrame * buffer, const int32_t frameNum )
 		if(vib_amp>0.0f)
 		{
 			vib_phase+=vib_speed;
-			rfperiod=fperiod*(1.0+sin(vib_phase)*vib_amp);
+			rfperiod = fperiod * (1.0 + std::sin(vib_phase) * vib_amp);
 		}
 		period=(int)rfperiod;
 		if(period<8) period=8;
@@ -214,7 +204,7 @@ void SfxrSynth::update( sampleFrame * buffer, const int32_t frameNum )
 		if(env_stage==0)
 			env_vol=(float)env_time/env_length[0];
 		if(env_stage==1)
-			env_vol=1.0f+pow(1.0f-(float)env_time/env_length[1], 1.0f)*2.0f*s->m_susModel.value();
+			{ env_vol = 1.0f + (1.0f - static_cast<float>(env_time) / env_length[1]) * 2.0f * s->m_susModel.value(); }
 		if(env_stage==2)
 			env_vol=1.0f-(float)env_time/env_length[2];
 
@@ -238,12 +228,14 @@ void SfxrSynth::update( sampleFrame * buffer, const int32_t frameNum )
 			if(phase>=period)
 			{
 //				phase=0;
-				phase%=period;
-				if(s->m_waveFormModel.value()==3)
-					for (auto& noiseSample : noise_buffer) 
+				phase %= period;
+				if (s->m_waveFormModel.value() == 3)
+				{
+					for (auto& noiseSample : noise_buffer)
 					{
-						noiseSample = frnd(2.0f) - 1.0f;
+						noiseSample = fastRandInc(-1.f, 1.f);
 					}
+				}
 			}
 			// base waveform
 			float fp=(float)phase/period;
@@ -259,7 +251,7 @@ void SfxrSynth::update( sampleFrame * buffer, const int32_t frameNum )
 				sample=1.0f-fp*2;
 				break;
 			case 2: // sine
-				sample=(float)sin(fp*2*PI);
+				sample = std::sin(fp * 2.f * std::numbers::pi_v<float>);
 				break;
 			case 3: // noise
 				sample=noise_buffer[phase*32/period];
@@ -442,11 +434,11 @@ QString SfxrInstrument::nodeName() const
 
 
 
-void SfxrInstrument::playNote( NotePlayHandle * _n, sampleFrame * _working_buffer )
+void SfxrInstrument::playNote( NotePlayHandle * _n, SampleFrame* _working_buffer )
 {
 	float currentSampleRate = Engine::audioEngine()->outputSampleRate();
 
-	fpp_t frameNum = _n->framesLeftForCurrentPeriod();
+	f_cnt_t frameNum = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();
 	if (!_n->m_pluginData)
 	{
@@ -454,7 +446,7 @@ void SfxrInstrument::playNote( NotePlayHandle * _n, sampleFrame * _working_buffe
 	}
 	else if( static_cast<SfxrSynth*>(_n->m_pluginData)->isPlaying() == false )
 	{
-		memset(_working_buffer + offset, 0, sizeof(sampleFrame) * frameNum);
+		zeroSampleFrames(_working_buffer + offset, frameNum);
 		_n->noteOff();
 		return;
 	}
@@ -467,9 +459,9 @@ void SfxrInstrument::playNote( NotePlayHandle * _n, sampleFrame * _working_buffe
 // debug code
 //	qDebug( "pFN %d", pitchedFrameNum );
 
-	auto pitchedBuffer = new sampleFrame[pitchedFrameNum];
+	auto pitchedBuffer = new SampleFrame[pitchedFrameNum];
 	static_cast<SfxrSynth*>(_n->m_pluginData)->update( pitchedBuffer, pitchedFrameNum );
-	for( fpp_t i=0; i<frameNum; i++ )
+	for( f_cnt_t i=0; i<frameNum; i++ )
 	{
 		for( ch_cnt_t j=0; j<DEFAULT_CHANNELS; j++ )
 		{
@@ -592,7 +584,6 @@ SfxrInstrumentView::SfxrInstrumentView( Instrument * _instrument,
 					QWidget * _parent ) :
 	InstrumentViewFixedSize( _instrument, _parent )
 {
-	srand(time(nullptr));
 	setAutoFillBackground( true );
 	QPalette pal;
 	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap( "artwork" ) );
@@ -661,7 +652,7 @@ SfxrInstrumentView::SfxrInstrumentView( Instrument * _instrument,
 	createButtonLocalGraphic(m_sinWaveBtn,		KNOBS_BASE_X+WAVEFORM_BUTTON_WIDTH*2, WAVEFORM_BASE_Y, "Sine Wave", "sfxr_sin_wave");
 	createButtonLocalGraphic(m_noiseWaveBtn,	KNOBS_BASE_X+WAVEFORM_BUTTON_WIDTH*3, WAVEFORM_BASE_Y, "Noise", "sfxr_white_noise_wave");
 
-	m_waveBtnGroup = new automatableButtonGroup( this );
+	m_waveBtnGroup = new AutomatableButtonGroup( this );
 	m_waveBtnGroup->addButton(m_sqrWaveBtn);
 	m_waveBtnGroup->addButton(m_sawWaveBtn);
 	m_waveBtnGroup->addButton(m_sinWaveBtn);
@@ -744,26 +735,22 @@ void SfxrInstrumentView::modelChanged()
 }
 
 
-
-
 void SfxrInstrumentView::genPickup()
 {
 	auto s = castModel<SfxrInstrument>();
 	s->resetModels();
-	s->m_startFreqModel.setValue( 0.4f+frnd(0.5f) );
-	s->m_attModel.setValue( 0.0f );
-	s->m_holdModel.setValue( frnd(0.1f) );
-	s->m_decModel.setValue( 0.1f+frnd(0.4f) );
-	s->m_susModel.setValue( 0.3f+frnd(0.3f) );
+	s->m_startFreqModel.setValue(fastRandInc(0.4f, 0.9f));
+	s->m_attModel.setValue(0.f);
+	s->m_holdModel.setValue(fastRandInc(0.1f));
+	s->m_decModel.setValue(fastRandInc(0.1f, 0.5f));
+	s->m_susModel.setValue(fastRandInc(0.3f, 0.6f));
 
-	if(rnd(1))
+	if (oneIn(2))
 	{
-		s->m_changeSpeedModel.setValue( 0.5f+frnd(0.2f) );
-		s->m_changeAmtModel.setValue( 0.2f+frnd(0.4f) );
+		s->m_changeSpeedModel.setValue(fastRandInc(0.5f, 0.7f));
+		s->m_changeAmtModel.setValue(fastRandInc(0.2f, 0.6f));
 	}
 }
-
-
 
 
 void SfxrInstrumentView::genLaser()
@@ -771,58 +758,44 @@ void SfxrInstrumentView::genLaser()
 	auto s = castModel<SfxrInstrument>();
 	s->resetModels();
 
-	s->m_waveFormModel.setValue( rnd(2) );
-	if(s->m_waveFormModel.value()==2 && rnd(1))
-		s->m_waveFormModel.setValue( rnd(1) );
+	s->m_waveFormModel.setValue(fastRandInc(2));
+	if (s->m_waveFormModel.value() == 2 && oneIn(2)) { s->m_waveFormModel.setValue(fastRand() & 1); }
+	s->m_startFreqModel.setValue(fastRandInc(0.5f, 1.f));
+	s->m_minFreqModel.setValue(std::max(0.2f, s->m_startFreqModel.value() - fastRandInc(0.2f, 0.8f)));
+	s->m_slideModel.setValue(fastRandInc(-0.15f, -0.35f));
 
-	s->m_startFreqModel.setValue( 0.5f+frnd(0.5f) );
-	s->m_minFreqModel.setValue(	s->m_startFreqModel.value()-0.2f-frnd(0.6f)	);
-
-	if(s->m_minFreqModel.value()<0.2f)
+	if (oneIn(3))
 	{
-		s->m_minFreqModel.setValue(0.2f);
+		s->m_startFreqModel.setValue(fastRandInc(0.3f, 0.9f));
+		s->m_minFreqModel.setValue(fastRandInc(0.1f));
+		s->m_slideModel.setValue(fastRandInc(-0.65f,-0.35f));
 	}
 
-	s->m_slideModel.setValue( -0.15f-frnd(0.2f) );
-
-	if(rnd(2)==0)
+	if (oneIn(2))
 	{
-		s->m_startFreqModel.setValue( 0.3f+frnd(0.6f) );
-		s->m_minFreqModel.setValue( frnd(0.1f) );
-		s->m_slideModel.setValue( -0.35f-frnd(0.3f) );
-	}
-
-	if(rnd(1))
-	{
-		s->m_sqrDutyModel.setValue( frnd(0.5f) );
-		s->m_sqrSweepModel.setValue( 0.2f );
+		s->m_sqrDutyModel.setValue(fastRandInc(0.5f));
+		s->m_sqrSweepModel.setValue(0.2f);
 	}
 	else
 	{
-		s->m_sqrDutyModel.setValue( 0.4f+frnd(0.5f) );
-		s->m_sqrSweepModel.setValue( -frnd(0.7f) );
+		s->m_sqrDutyModel.setValue(fastRandInc(0.4f, 0.9f));
+		s->m_sqrSweepModel.setValue(fastRandInc(-0.7f));
 	}
 
-	s->m_attModel.setValue( 0.0f );
-	s->m_holdModel.setValue( 0.1f+frnd(0.2f) );
-	s->m_decModel.setValue( frnd(0.4f) );
+	s->m_attModel.setValue(0.f);
+	s->m_holdModel.setValue(fastRandInc(0.1f, 0.3f));
+	s->m_decModel.setValue(fastRandInc(0.4f));
 
-	if(rnd(1))
+	if (oneIn(2)) { s->m_susModel.setValue(fastRandInc(0.3f)); }
+
+	if (oneIn(3))
 	{
-		s->m_susModel.setValue( frnd(0.3f) );
+		s->m_phaserOffsetModel.setValue(fastRandInc(0.2f));
+		s->m_phaserSweepModel.setValue(fastRandInc(-0.2f));
 	}
 
-	if(rnd(2)==0)
-	{
-		s->m_phaserOffsetModel.setValue( frnd(0.2f) );
-		s->m_phaserSweepModel.setValue( -frnd(0.2f) );
-	}
-
-	if(rnd(1))
-		s->m_hpFilCutModel.setValue( frnd(0.3f) );
+	if (oneIn(2)) { s->m_hpFilCutModel.setValue(fastRandInc(0.3f)); }
 }
-
-
 
 
 void SfxrInstrumentView::genExplosion()
@@ -830,54 +803,45 @@ void SfxrInstrumentView::genExplosion()
 	auto s = castModel<SfxrInstrument>();
 	s->resetModels();
 
-	s->m_waveFormModel.setValue( 3 );
+	s->m_waveFormModel.setValue(3);
 
-	if(rnd(1))
+	if (oneIn(2))
 	{
-		s->m_startFreqModel.setValue( 0.1f+frnd(0.4f) );
-		s->m_slideModel.setValue( -0.1f+frnd(0.4f) );
+		s->m_startFreqModel.setValue(fastRandInc(0.1f, 0.5f));
+		s->m_slideModel.setValue(fastRandInc(-0.1f, 0.3f));
 	}
 	else
 	{
-		s->m_startFreqModel.setValue( 0.2f+frnd(0.7f) );
-		s->m_slideModel.setValue( -0.2f-frnd(0.2f) );
+		s->m_startFreqModel.setValue(fastRandInc(0.2f, 0.9f));
+		s->m_slideModel.setValue(fastRandInc(-0.4f, -0.2f));
 	}
-	s->m_startFreqModel.setValue( s->m_startFreqModel.value()*s->m_startFreqModel.value() );
+	s->m_startFreqModel.setValue(s->m_startFreqModel.value() * s->m_startFreqModel.value());
 
-	if(rnd(4)==0)
-	{
-		s->m_slideModel.setValue( 0.0f );
-	}
+	if (oneIn(5)) { s->m_slideModel.setValue(0.0f); }
+	if (oneIn(3)) { s->m_repeatSpeedModel.setValue(fastRandInc(0.3f, 0.8f)); }
 
-	if(rnd(2)==0)
+	s->m_attModel.setValue(0.f);
+	s->m_holdModel.setValue(fastRandInc(0.1f, 0.4f));
+	s->m_decModel.setValue(0.5f);
+	if (oneIn(2))
 	{
-		s->m_repeatSpeedModel.setValue( 0.3f+frnd(0.5f) );
+		s->m_phaserOffsetModel.setValue(fastRandInc(-0.3f, 0.6f));
+		s->m_phaserSweepModel.setValue(fastRandInc(-0.3f));
 	}
+	s->m_susModel.setValue(fastRandInc(0.2f, 0.8f));
 
-	s->m_attModel.setValue( 0.0f );
-	s->m_holdModel.setValue( 0.1f+frnd(0.3f) );
-	s->m_decModel.setValue( 0.5f );
-	if(rnd(1)==0)
+	if (oneIn(2))
 	{
-		s->m_phaserOffsetModel.setValue( -0.3f+frnd(0.9f) );
-		s->m_phaserSweepModel.setValue( -frnd(0.3f) );
-	}
-	s->m_susModel.setValue( 0.2f+frnd(0.6f) );
-
-	if(rnd(1))
-	{
-		s->m_vibDepthModel.setValue( frnd(0.7f) );
-		s->m_vibSpeedModel.setValue( frnd(0.6f) );
-	}
-	if(rnd(2)==0)
-	{
-		s->m_changeSpeedModel.setValue( 0.6f+frnd(0.3f) );
-		s->m_changeAmtModel.setValue( 0.8f-frnd(1.6f) );
+		s->m_vibDepthModel.setValue(fastRandInc(0.7f));
+		s->m_vibSpeedModel.setValue(fastRandInc(0.6f));
 	}
 
+	if (oneIn(3))
+	{
+		s->m_changeSpeedModel.setValue(fastRandInc(0.6f, 0.9f));
+		s->m_changeAmtModel.setValue(fastRandInc(-0.8f, 0.8f));
+	}
 }
-
-
 
 
 void SfxrInstrumentView::genPowerup()
@@ -885,33 +849,30 @@ void SfxrInstrumentView::genPowerup()
 	auto s = castModel<SfxrInstrument>();
 	s->resetModels();
 
-	if(rnd(1))
-		s->m_waveFormModel.setValue( 1 );
-	else
-		s->m_sqrDutyModel.setValue( frnd(0.6f) );
-	if(rnd(1))
+	if (oneIn(2)) { s->m_waveFormModel.setValue(1); }
+	else { s->m_sqrDutyModel.setValue(fastRandInc(0.6f)); }
+
+	if (oneIn(2))
 	{
-		s->m_startFreqModel.setValue( 0.2f+frnd(0.3f) );
-		s->m_slideModel.setValue( 0.1f+frnd(0.4f) );
-		s->m_repeatSpeedModel.setValue( 0.4f+frnd(0.4f) );
+		s->m_startFreqModel.setValue(fastRandInc(0.2f, 0.5f));
+		s->m_slideModel.setValue(fastRandInc(0.1f, 0.5f));
+		s->m_repeatSpeedModel.setValue(fastRandInc(0.4f, 0.8f));
 	}
 	else
 	{
-		s->m_startFreqModel.setValue( 0.2f+frnd(0.3f) );
-		s->m_slideModel.setValue( 0.05f+frnd(0.2f) );
-		if(rnd(1))
+		s->m_startFreqModel.setValue(fastRandInc(0.2f, 0.5f));
+		s->m_slideModel.setValue(fastRandInc(0.05f, 0.25f));
+		if (oneIn(2))
 		{
-			s->m_vibDepthModel.setValue( frnd(0.7f) );
-			s->m_vibSpeedModel.setValue( frnd(0.6f) );
+			s->m_vibDepthModel.setValue(fastRandInc(0.7f));
+			s->m_vibSpeedModel.setValue(fastRandInc(0.6f));
 		}
 	}
 
-	s->m_attModel.setValue( 0.0f );
-	s->m_holdModel.setValue( frnd(0.4f) );
-	s->m_decModel.setValue( 0.1f+frnd(0.4f) );
+	s->m_attModel.setValue(0.0f);
+	s->m_holdModel.setValue(fastRandInc(0.4f));
+	s->m_decModel.setValue(fastRandInc(0.1f, 0.5f));
 }
-
-
 
 
 void SfxrInstrumentView::genHit()
@@ -919,29 +880,17 @@ void SfxrInstrumentView::genHit()
 	auto s = castModel<SfxrInstrument>();
 	s->resetModels();
 
-	s->m_waveFormModel.setValue( rnd(2) );
-	if(s->m_waveFormModel.value()==2)
-	{
-		s->m_waveFormModel.setValue( 3 );
-	}
-	if(s->m_waveFormModel.value()==0)
-	{
-		s->m_sqrDutyModel.setValue( frnd(0.6f) );
-	}
+	s->m_waveFormModel.setValue(fastRandInc(2));
+	if (s->m_waveFormModel.value() == 2) { s->m_waveFormModel.setValue(3); }
+	if (s->m_waveFormModel.value() == 0) { s->m_sqrDutyModel.setValue(fastRandInc(0.6f)); }
 
-	s->m_startFreqModel.setValue( 0.2f+frnd(0.6f) );
-	s->m_slideModel.setValue( -0.3f-frnd(0.4f) );
-
-	s->m_attModel.setValue( 0.0f );
-	s->m_holdModel.setValue( frnd(0.1f) );
-	s->m_decModel.setValue( 0.1f+frnd(0.2f) );
-	if(rnd(1))
-	{
-		s->m_hpFilCutModel.setValue( frnd(0.3f) );
-	}
+	s->m_startFreqModel.setValue(fastRandInc(0.2f, 0.8f));
+	s->m_slideModel.setValue(fastRandInc(-0.7f, -0.3f));
+	s->m_attModel.setValue(0.f);
+	s->m_holdModel.setValue(fastRandInc(0.1f));
+	s->m_decModel.setValue(fastRandInc(0.1f, 0.3f));
+	if (oneIn(2)) { s->m_hpFilCutModel.setValue(fastRandInc(0.3f)); }
 }
-
-
 
 
 void SfxrInstrumentView::genJump()
@@ -949,29 +898,19 @@ void SfxrInstrumentView::genJump()
 	auto s = castModel<SfxrInstrument>();
 	s->resetModels();
 
-	s->m_waveFormModel.setValue( 0 );
-	s->m_sqrDutyModel.setValue( frnd(0.6f) );
+	s->m_waveFormModel.setValue(0);
+	s->m_sqrDutyModel.setValue(fastRandInc(0.6f));
 
-	s->m_startFreqModel.setValue( 0.3f+frnd(0.3f) );
-	s->m_slideModel.setValue( 0.1f+frnd(0.2f) );
+	s->m_startFreqModel.setValue(fastRandInc(0.3f, 0.6f));
+	s->m_slideModel.setValue(fastRandInc(0.1f, 0.3f));
 
-	s->m_attModel.setValue( 0.0f );
-	s->m_holdModel.setValue( 0.1f+frnd(0.3f) );
-	s->m_decModel.setValue( 0.1f+frnd(0.2f) );
+	s->m_attModel.setValue(0.0f);
+	s->m_holdModel.setValue(fastRandInc(0.1f, 0.4f));
+	s->m_decModel.setValue(fastRandInc(0.1f, 0.3f));
 
-	if(rnd(1))
-	{
-		s->m_hpFilCutModel.setValue( frnd(0.3f) );
-	}
-	if(rnd(1))
-	{
-
-		s->m_lpFilCutModel.setValue( 1.0f-frnd(0.6f) );
-	}
-
+	if (oneIn(2)) { s->m_hpFilCutModel.setValue(fastRandInc(0.3f)); }
+	if (oneIn(2)) { s->m_lpFilCutModel.setValue(fastRandInc(0.4f, 1.f)); }
 }
-
-
 
 
 void SfxrInstrumentView::genBlip()
@@ -979,122 +918,122 @@ void SfxrInstrumentView::genBlip()
 	auto s = castModel<SfxrInstrument>();
 	s->resetModels();
 
-	s->m_waveFormModel.setValue( rnd(1) );
-	if( s->m_waveFormModel.value()==0 )
-	{
-		s->m_sqrDutyModel.setValue( frnd(0.6f) );
-	}
+	s->m_waveFormModel.setValue(fastRand() & 1);
+	if (s->m_waveFormModel.value() == 0) { s->m_sqrDutyModel.setValue(fastRandInc(0.6f)); }
 
-	s->m_startFreqModel.setValue( 0.2f+frnd(0.4f) );
-
-	s->m_attModel.setValue( 0.0f );
-	s->m_holdModel.setValue( 0.1f+frnd(0.1f) );
-	s->m_decModel.setValue( frnd(0.2f) );
-	s->m_hpFilCutModel.setValue( 0.1f );
+	s->m_startFreqModel.setValue(fastRandInc(0.2f, 0.6f));
+	s->m_attModel.setValue(0.f);
+	s->m_holdModel.setValue(fastRandInc(0.1f, 0.2f));
+	s->m_decModel.setValue(fastRandInc(0.2f));
+	s->m_hpFilCutModel.setValue(0.1f);
 }
 
 
+namespace
+{
+// HACK This expands pow_hack<3>(5) to (5 * 5 * 5) to avoid actual pow()
+template <unsigned N> constexpr auto pow_hack(float x) { return x * pow_hack<N - 1>(x); }
+template <> constexpr auto pow_hack<1>(float x) { return x; }
+}
 
 
 void SfxrInstrumentView::randomize()
 {
 	auto s = castModel<SfxrInstrument>();
 
-	s->m_startFreqModel.setValue( pow(frnd(2.0f)-1.0f, 2.0f) );
-	if(rnd(1))
+	s->m_startFreqModel.setValue(pow_hack<2>(fastRandInc(-1.f, 1.f)));
+	if (oneIn(2))
 	{
-		s->m_startFreqModel.setValue( pow(frnd(2.0f)-1.0f, 3.0f)+0.5f );
-	}
-	s->m_minFreqModel.setValue( 0.0f );
-	s->m_slideModel.setValue( pow(frnd(2.0f)-1.0f, 5.0f) );
-	if( s->m_startFreqModel.value()>0.7f && s->m_slideModel.value()>0.2f )
-	{
-		s->m_slideModel.setValue( -s->m_slideModel.value() );
-	}
-	if( s->m_startFreqModel.value()<0.2f && s->m_slideModel.value()<-0.05f )
-	{
-		s->m_slideModel.setValue( -s->m_slideModel.value() );
-	}
-	s->m_dSlideModel.setValue( pow(frnd(2.0f)-1.0f, 3.0f) );
-
-	s->m_sqrDutyModel.setValue( frnd(2.0f)-1.0f );
-	s->m_sqrSweepModel.setValue( pow(frnd(2.0f)-1.0f, 3.0f) );
-
-	s->m_vibDepthModel.setValue( pow(frnd(2.0f)-1.0f, 3.0f) );
-	s->m_vibSpeedModel.setValue( frnd(2.0f)-1.0f );
-	//s->m_vibDelayModel.setValue( frnd(2.0f)-1.0f );
-
-	s->m_attModel.setValue( pow(frnd(2.0f)-1.0f, 3.0f) );
-	s->m_holdModel.setValue( pow(frnd(2.0f)-1.0f, 2.0f) );
-	s->m_decModel.setValue( frnd(2.0f)-1.0f );
-	s->m_susModel.setValue( pow(frnd(0.8f), 2.0f) );
-	if(s->m_attModel.value()+s->m_holdModel.value()+s->m_decModel.value()<0.2f)
-	{
-		s->m_holdModel.setValue( s->m_holdModel.value()+0.2f+frnd(0.3f) );
-		s->m_decModel.setValue( s->m_decModel.value()+0.2f+frnd(0.3f) );
+		s->m_startFreqModel.setValue(pow_hack<3>(fastRandInc(-1.f, 1.f)) + 0.5f);
 	}
 
-	s->m_lpFilResoModel.setValue( frnd(2.0f)-1.0f );
-	s->m_lpFilCutModel.setValue( 1.0f-pow(frnd(1.0f), 3.0f) );
-	s->m_lpFilCutSweepModel.setValue( pow(frnd(2.0f)-1.0f, 3.0f) );
-	if(s->m_lpFilCutModel.value()<0.1f && s->m_lpFilCutSweepModel.value()<-0.05f)
+	s->m_minFreqModel.setValue(0.0f);
+	s->m_slideModel.setValue(pow_hack<5>(fastRandInc(-1.f, 1.f)));
+
+	if (s->m_startFreqModel.value() > 0.7f && s->m_slideModel.value() > 0.2f)
 	{
-		s->m_lpFilCutSweepModel.setValue( -s->m_lpFilCutSweepModel.value() );
+		s->m_slideModel.setValue(-s->m_slideModel.value());
 	}
-	s->m_hpFilCutModel.setValue( pow(frnd(1.0f), 5.0f) );
-	s->m_hpFilCutSweepModel.setValue( pow(frnd(2.0f)-1.0f, 5.0f) );
 
-	s->m_phaserOffsetModel.setValue( pow(frnd(2.0f)-1.0f, 3.0f) );
-	s->m_phaserSweepModel.setValue( pow(frnd(2.0f)-1.0f, 3.0f) );
+	if (s->m_startFreqModel.value() < 0.2f && s->m_slideModel.value() < -0.05f)
+	{
+		s->m_slideModel.setValue(-s->m_slideModel.value());
+	}
 
-	s->m_repeatSpeedModel.setValue( frnd(2.0f)-1.0f );
+	s->m_dSlideModel.setValue(pow_hack<3>(fastRandInc(-1.f, 1.f)));
 
-	s->m_changeSpeedModel.setValue( frnd(2.0f)-1.0f );
-	s->m_changeAmtModel.setValue( frnd(2.0f)-1.0f );
+	s->m_sqrDutyModel.setValue(fastRandInc(-1.f, 1.f));
+	s->m_sqrSweepModel.setValue(pow_hack<3>(fastRandInc(-1.f, 1.f)));
 
+	s->m_vibDepthModel.setValue(pow_hack<3>(fastRandInc(-1.f, 1.f)));
+	s->m_vibSpeedModel.setValue(fastRandInc(-1.f, 1.f));
+	//s->m_vibDelayModel.setValue(fastRand(-1.f, 1.f));
+
+	s->m_attModel.setValue(pow_hack<3>(fastRandInc(-1.f, 1.f)));
+	s->m_holdModel.setValue(pow_hack<2>(fastRandInc(-1.f, 1.f)));
+	s->m_decModel.setValue(fastRandInc(-1.f, 1.f));
+	s->m_susModel.setValue(pow_hack<2>(fastRandInc(0.8f)));
+	if (s->m_attModel.value() + s->m_holdModel.value() + s->m_decModel.value() < 0.2f)
+	{
+		s->m_holdModel.setValue(s->m_holdModel.value() + fastRandInc(0.2f, 0.5f));
+		s->m_decModel.setValue(s->m_decModel.value() + fastRandInc(0.2f, 0.5f));
+	}
+
+	s->m_lpFilResoModel.setValue(fastRandInc(-1.f, 1.f));
+	s->m_lpFilCutModel.setValue(1.0f - pow_hack<3>(fastRandInc(1.f)));
+	s->m_lpFilCutSweepModel.setValue(pow_hack<3>(fastRandInc(-1.f, 1.f)));
+	if (s->m_lpFilCutModel.value() < 0.1f && s->m_lpFilCutSweepModel.value() < -0.05f)
+	{
+		s->m_lpFilCutSweepModel.setValue(-s->m_lpFilCutSweepModel.value());
+	}
+	s->m_hpFilCutModel.setValue(pow_hack<5>(fastRandInc(1.f)));
+	s->m_hpFilCutSweepModel.setValue(pow_hack<5>(fastRandInc(-1.f, 1.f)));
+
+	s->m_phaserOffsetModel.setValue(pow_hack<3>(fastRandInc(-1.f, 1.f)));
+	s->m_phaserSweepModel.setValue(pow_hack<3>(fastRandInc(-1.f, 1.f)));
+
+	s->m_repeatSpeedModel.setValue(fastRandInc(-1.f, 1.f));
+
+	s->m_changeSpeedModel.setValue(fastRandInc(-1.f, 1.f));
+	s->m_changeAmtModel.setValue(fastRandInc(-1.f, 1.f));
 }
-
-
 
 
 void SfxrInstrumentView::mutate()
 {
 	auto s = castModel<SfxrInstrument>();
 
-	if(rnd(1)) s->m_startFreqModel.setValue( s->m_startFreqModel.value()+frnd(0.1f)-0.05f );
-	//		if(rnd(1)) s->m_minFreqModel.setValue( s->m_minFreqModel.value()+frnd(0.1f)-0.05f );
-	if(rnd(1)) s->m_slideModel.setValue( s->m_slideModel.value()+frnd(0.1f)-0.05f );
-	if(rnd(1)) s->m_dSlideModel.setValue( s->m_dSlideModel.value()+frnd(0.1f)-0.05f );
+	if (oneIn(2)) { s->m_startFreqModel.setValue(s->m_startFreqModel.value() + fastRandInc(-0.05f, 0.05f)); }
+	// if (oneIn(2)) { s->m_minFreqModel.setValue(s->m_minFreqModel.value() + fastRand(-0.05f, 0.05f))); }
+	if (oneIn(2)) { s->m_slideModel.setValue( s->m_slideModel.value() + fastRandInc(-0.05f, 0.05f)); }
+	if (oneIn(2)) { s->m_dSlideModel.setValue( s->m_dSlideModel.value() + fastRandInc(-0.05f, 0.05f)); }
 
-	if(rnd(1)) s->m_sqrDutyModel.setValue( s->m_sqrDutyModel.value()+frnd(0.1f)-0.05f );
-	if(rnd(1)) s->m_sqrSweepModel.setValue( s->m_sqrSweepModel.value()+frnd(0.1f)-0.05f );
+	if (oneIn(2)) { s->m_sqrDutyModel.setValue( s->m_sqrDutyModel.value() + fastRandInc(-0.05f, 0.05f)); }
+	if (oneIn(2)) { s->m_sqrSweepModel.setValue( s->m_sqrSweepModel.value() + fastRandInc(-0.05f, 0.05f)); }
 
-	if(rnd(1)) s->m_vibDepthModel.setValue( s->m_vibDepthModel.value()+frnd(0.1f)-0.05f );
-	if(rnd(1)) s->m_vibSpeedModel.setValue( s->m_vibSpeedModel.value()+frnd(0.1f)-0.05f );
-	//		if(rnd(1)) s->m_vibDelayModel.setValue( s->m_vibDelayModel.value()+frnd(0.1f)-0.05f );
+	if (oneIn(2)) { s->m_vibDepthModel.setValue( s->m_vibDepthModel.value() + fastRandInc(-0.05f, 0.05f)); }
+	if (oneIn(2)) { s->m_vibSpeedModel.setValue( s->m_vibSpeedModel.value() + fastRandInc(-0.05f, 0.05f)); }
+	// if (oneIn(2)) { s->m_vibDelayModel.setValue( s->m_vibDelayModel.value() + fastRand(-0.05f, 0.05f))); }
 
-	if(rnd(1)) s->m_attModel.setValue( s->m_attModel.value()+frnd(0.1f)-0.05f );
-	if(rnd(1)) s->m_holdModel.setValue( s->m_holdModel.value()+frnd(0.1f)-0.05f );
-	if(rnd(1)) s->m_decModel.setValue( s->m_decModel.value()+frnd(0.1f)-0.05f );
-	if(rnd(1)) s->m_susModel.setValue( s->m_susModel.value()+frnd(0.1f)-0.05f );
+	if (oneIn(2)) { s->m_attModel.setValue( s->m_attModel.value() + fastRandInc(-0.05f, 0.05f)); }
+	if (oneIn(2)) { s->m_holdModel.setValue( s->m_holdModel.value() + fastRandInc(-0.05f, 0.05f)); }
+	if (oneIn(2)) { s->m_decModel.setValue( s->m_decModel.value() + fastRandInc(-0.05f, 0.05f)); }
+	if (oneIn(2)) { s->m_susModel.setValue( s->m_susModel.value() + fastRandInc(-0.05f, 0.05f)); }
 
-	if(rnd(1)) s->m_lpFilResoModel.setValue( s->m_lpFilResoModel.value()+frnd(0.1f)-0.05f );
-	if(rnd(1)) s->m_lpFilCutModel.setValue( s->m_lpFilCutModel.value()+frnd(0.1f)-0.05f );
-	if(rnd(1)) s->m_lpFilCutSweepModel.setValue( s->m_lpFilCutSweepModel.value()+frnd(0.1f)-0.05f );
-	if(rnd(1)) s->m_hpFilCutModel.setValue( s->m_hpFilCutModel.value()+frnd(0.1f)-0.05f );
-	if(rnd(1)) s->m_hpFilCutSweepModel.setValue( s->m_hpFilCutSweepModel.value()+frnd(0.1f)-0.05f );
+	if (oneIn(2)) { s->m_lpFilResoModel.setValue( s->m_lpFilResoModel.value() + fastRandInc(-0.05f, 0.05f)); }
+	if (oneIn(2)) { s->m_lpFilCutModel.setValue( s->m_lpFilCutModel.value() + fastRandInc(-0.05f, 0.05f)); }
+	if (oneIn(2)) { s->m_lpFilCutSweepModel.setValue( s->m_lpFilCutSweepModel.value() + fastRandInc(-0.05f, 0.05f)); }
+	if (oneIn(2)) { s->m_hpFilCutModel.setValue( s->m_hpFilCutModel.value() + fastRandInc(-0.05f, 0.05f)); }
+	if (oneIn(2)) { s->m_hpFilCutSweepModel.setValue( s->m_hpFilCutSweepModel.value() + fastRandInc(-0.05f, 0.05f)); }
 
-	if(rnd(1)) s->m_phaserOffsetModel.setValue( s->m_phaserOffsetModel.value()+frnd(0.1f)-0.05f );
-	if(rnd(1)) s->m_phaserSweepModel.setValue( s->m_phaserSweepModel.value()+frnd(0.1f)-0.05f );
+	if (oneIn(2)) { s->m_phaserOffsetModel.setValue( s->m_phaserOffsetModel.value() + fastRandInc(-0.05f, 0.05f)); }
+	if (oneIn(2)) { s->m_phaserSweepModel.setValue( s->m_phaserSweepModel.value() + fastRandInc(-0.05f, 0.05f)); }
 
-	if(rnd(1)) s->m_repeatSpeedModel.setValue( s->m_repeatSpeedModel.value()+frnd(0.1f)-0.05f );
+	if (oneIn(2)) { s->m_repeatSpeedModel.setValue( s->m_repeatSpeedModel.value() + fastRandInc(-0.05f, 0.05f)); }
 
-	if(rnd(1)) s->m_changeSpeedModel.setValue( s->m_changeSpeedModel.value()+frnd(0.1f)-0.05f );
-	if(rnd(1)) s->m_changeAmtModel.setValue( s->m_changeAmtModel.value()+frnd(0.1f)-0.05f );
-
+	if (oneIn(2)) { s->m_changeSpeedModel.setValue( s->m_changeSpeedModel.value() + fastRandInc(-0.05f, 0.05f)); }
+	if (oneIn(2)) { s->m_changeAmtModel.setValue( s->m_changeAmtModel.value() + fastRandInc(-0.05f, 0.05f)); }
 }
-
-
 
 
 void SfxrInstrumentView::previewSound()

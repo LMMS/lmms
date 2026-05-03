@@ -42,7 +42,7 @@ Plugin::Descriptor PLUGIN_EXPORT amplifier_plugin_descriptor =
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
 	0x0100,
 	Plugin::Type::Effect,
-	new PluginPixmapLoader("logo"),
+	new PixmapLoader("lmms-plugin-logo"),
 	nullptr,
 	nullptr,
 } ;
@@ -57,11 +57,8 @@ AmplifierEffect::AmplifierEffect(Model* parent, const Descriptor::SubPluginFeatu
 }
 
 
-bool AmplifierEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
+Effect::ProcessStatus AmplifierEffect::processImpl(SampleFrame* buf, const f_cnt_t frames)
 {
-	if (!isEnabled() || !isRunning()) { return false ; }
-
-	double outSum = 0.0;
 	const float d = dryLevel();
 	const float w = wetLevel();
 
@@ -70,7 +67,7 @@ bool AmplifierEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	const ValueBuffer* leftBuf = m_ampControls.m_leftModel.valueBuffer();
 	const ValueBuffer* rightBuf = m_ampControls.m_rightModel.valueBuffer();
 
-	for (fpp_t f = 0; f < frames; ++f)
+	for (f_cnt_t f = 0; f < frames; ++f)
 	{
 		const float volume = (volumeBuf ? volumeBuf->value(f) : m_ampControls.m_volumeModel.value()) * 0.01f;
 		const float pan = (panBuf ? panBuf->value(f) : m_ampControls.m_panModel.value()) * 0.01f;
@@ -80,19 +77,15 @@ bool AmplifierEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 		const float panLeft = std::min(1.0f, 1.0f - pan);
 		const float panRight = std::min(1.0f, 1.0f + pan);
 
-		auto s = std::array{buf[f][0], buf[f][1]};
+		auto& currentFrame = buf[f];
 
-		s[0] *= volume * left * panLeft;
-		s[1] *= volume * right * panRight;
+		const auto s = currentFrame * SampleFrame(left * panLeft, right * panRight) * volume;
 
-		buf[f][0] = d * buf[f][0] + w * s[0];
-		buf[f][1] = d * buf[f][1] + w * s[1];
-		outSum += buf[f][0] * buf[f][0] + buf[f][1] * buf[f][1];
+		// Dry/wet mix
+		currentFrame = currentFrame * d + s * w;
 	}
 
-	checkGate(outSum / frames);
-
-	return isRunning();
+	return ProcessStatus::ContinueIfNotQuiet;
 }
 
 

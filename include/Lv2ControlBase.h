@@ -32,7 +32,6 @@
 #include <lilv/lilv.h>
 #include <memory>
 
-#include "DataFile.h"
 #include "LinkedModelGroups.h"
 #include "lmms_export.h"
 #include "Plugin.h"
@@ -43,6 +42,7 @@ namespace lmms
 
 class Lv2Proc;
 class PluginIssue;
+class SampleFrame;
 
 /**
 	Common base class for Lv2 plugins
@@ -118,11 +118,11 @@ protected:
 	void copyModelsToLmms() const;
 
 	//! Copy buffer passed by LMMS into our ports
-	void copyBuffersFromLmms(const sampleFrame *buf, fpp_t frames);
+	void copyBuffersFromLmms(const SampleFrame* buf, f_cnt_t frames);
 	//! Copy our ports into buffers passed by LMMS
-	void copyBuffersToLmms(sampleFrame *buf, fpp_t frames) const;
+	void copyBuffersToLmms(SampleFrame* buf, f_cnt_t frames) const;
 	//! Run the Lv2 plugin instance for @param frames frames
-	void run(fpp_t frames);
+	void run(f_cnt_t frames);
 
 	/*
 		load/save, must be called from virtuals

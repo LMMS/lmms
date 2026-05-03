@@ -22,18 +22,17 @@
  *
  */
 
-#include <QDomElement>
 
 #include "Nes.h"
 
 #include "AudioEngine.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
-#include "interpolation.h"
 #include "Knob.h"
 #include "Oscillator.h"
 
 #include "embed.h"
+#include "lmms_math.h"
 #include "plugin_export.h"
 
 namespace lmms
@@ -103,7 +102,7 @@ NesObject::NesObject( NesInstrument * nes, const sample_rate_t samplerate, NoteP
 }
 
 
-void NesObject::renderOutput( sampleFrame * buf, fpp_t frames )
+void NesObject::renderOutput( SampleFrame* buf, f_cnt_t frames )
 {
 	////////////////////////////////
 	//	                          //
@@ -392,16 +391,16 @@ void NesObject::renderOutput( sampleFrame * buf, fpp_t frames )
 		pin1 *= 1.0 + ( Oscillator::noiseSample( 0.0f ) * DITHER_AMP );		
 		pin1 = pin1 / 30.0f;
 		
-		pin1 = signedPow( pin1, NES_DIST );
+		pin1 = signedPowf(pin1, NES_DIST);
 		
 		pin1 = pin1 * 2.0f - 1.0f;
 		
 		// simple first order iir filter, to simulate the frequency response falloff in nes analog audio output
-		pin1 = linearInterpolate( pin1, m_12Last, m_nsf );
+		pin1 = std::lerp(pin1, m_12Last, m_nsf);
 		m_12Last = pin1;
 
 		// compensate DC offset
-		pin1 += 1.0f - signedPow( static_cast<float>( ch1Level + ch2Level ) / 30.0f, NES_DIST );
+		pin1 += 1.0f - signedPowf(static_cast<float>(ch1Level + ch2Level) / 30.0f, NES_DIST);
 		
 		pin1 *= NES_MIXING_12;
 
@@ -410,16 +409,16 @@ void NesObject::renderOutput( sampleFrame * buf, fpp_t frames )
 		pin2 *= 1.0 + ( Oscillator::noiseSample( 0.0f ) * DITHER_AMP );		
 		pin2 = pin2 / 30.0f;
 		
-		pin2 = signedPow( pin2, NES_DIST );
+		pin2 = signedPowf(pin2, NES_DIST);
 		
 		pin2 = pin2 * 2.0f - 1.0f;
 
 		// simple first order iir filter, to simulate the frequency response falloff in nes analog audio output
-		pin2 = linearInterpolate( pin2, m_34Last, m_nsf );
+		pin2 = std::lerp(pin2, m_34Last, m_nsf);
 		m_34Last = pin2;
 		
 		// compensate DC offset
-		pin2 += 1.0f - signedPow( static_cast<float>( ch3Level + ch4Level ) / 30.0f, NES_DIST );
+		pin2 += 1.0f - signedPowf(static_cast<float>(ch3Level + ch4Level) / 30.0f, NES_DIST);
 		
 		pin2 *= NES_MIXING_34;
 		
@@ -545,9 +544,9 @@ NesInstrument::NesInstrument( InstrumentTrack * instrumentTrack ) :
 
 
 
-void NesInstrument::playNote( NotePlayHandle * n, sampleFrame * workingBuffer )
+void NesInstrument::playNote( NotePlayHandle * n, SampleFrame* workingBuffer )
 {
-	const fpp_t frames = n->framesLeftForCurrentPeriod();
+	const f_cnt_t frames = n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = n->noteOffset();
 	
 	if (!n->m_pluginData)
@@ -699,19 +698,19 @@ gui::PluginView* NesInstrument::instantiateView( QWidget * parent )
 
 void NesInstrument::updateFreq1()
 {
-	m_freq1 = powf( 2, m_ch1Crs.value() / 12.0f );
+	m_freq1 = std::exp2(m_ch1Crs.value() / 12.0f);
 }
 
 
 void NesInstrument::updateFreq2()
 {
-	m_freq2 = powf( 2, m_ch2Crs.value() / 12.0f );
+	m_freq2 = std::exp2(m_ch2Crs.value() / 12.0f);
 }
 
 
 void NesInstrument::updateFreq3()
 {
-	m_freq3 = powf( 2, m_ch3Crs.value() / 12.0f );
+	m_freq3 = std::exp2(m_ch3Crs.value() / 12.0f);
 }
 
 
@@ -767,7 +766,7 @@ NesInstrumentView::NesInstrumentView( Instrument * instrument,	QWidget * parent 
 	dcx += 13;
 	makedcled( ch1_dc4, dcx, 42, tr( "75% Duty cycle" ), "nesdc4_on" )
 		
-	m_ch1DutyCycleGrp = new automatableButtonGroup( this );
+	m_ch1DutyCycleGrp = new AutomatableButtonGroup( this );
 	m_ch1DutyCycleGrp -> addButton( ch1_dc1 );
 	m_ch1DutyCycleGrp -> addButton( ch1_dc2 );
 	m_ch1DutyCycleGrp -> addButton( ch1_dc3 );
@@ -798,7 +797,7 @@ NesInstrumentView::NesInstrumentView( Instrument * instrument,	QWidget * parent 
 	dcx += 13;
 	makedcled( ch2_dc4, dcx, 99, tr( "75% Duty cycle" ), "nesdc4_on" )
 		
-	m_ch2DutyCycleGrp = new automatableButtonGroup( this );
+	m_ch2DutyCycleGrp = new AutomatableButtonGroup( this );
 	m_ch2DutyCycleGrp -> addButton( ch2_dc1 );
 	m_ch2DutyCycleGrp -> addButton( ch2_dc2 );
 	m_ch2DutyCycleGrp -> addButton( ch2_dc3 );

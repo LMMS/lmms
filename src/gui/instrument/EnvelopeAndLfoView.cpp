@@ -27,13 +27,12 @@
 
 #include <string_view>
 
-#include <QBoxLayout>
+#include <QSizePolicy>
+#include <QVBoxLayout>
 
 #include "EnvelopeGraph.h"
 #include "LfoGraph.h"
 #include "EnvelopeAndLfoParameters.h"
-#include "SampleLoader.h"
-#include "gui_templates.h"
 #include "Knob.h"
 #include "LedCheckBox.h"
 #include "DataFile.h"
@@ -54,11 +53,10 @@ EnvelopeAndLfoView::EnvelopeAndLfoView(QWidget * parent) :
 	ModelView(nullptr, this),
 	m_params(nullptr)
 {
-	// Helper lambdas for consistent repeated buiding of certain widgets
+	// Helper lambdas for consistent repeated building of certain widgets
 	auto buildKnob = [&](const QString& label, const QString& hintText)
 	{
-		auto knob = new Knob(KnobType::Bright26, this);
-		knob->setLabel(label);
+		auto knob = new Knob(KnobType::Bright26, label, this, Knob::LabelRendering::LegacyFixedFontSize);
 		knob->setHintText(hintText, "");
 		
 		return knob;
@@ -86,6 +84,7 @@ EnvelopeAndLfoView::EnvelopeAndLfoView(QWidget * parent) :
 
 	m_envelopeGraph = new EnvelopeGraph(this);
 	graphAndAmountLayout->addWidget(m_envelopeGraph);
+	m_envelopeGraph->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
 	m_amountKnob = buildKnob(tr("AMT"), tr("Modulation amount:"));
 	graphAndAmountLayout->addWidget(m_amountKnob, 0, Qt::AlignCenter);
@@ -125,6 +124,7 @@ EnvelopeAndLfoView::EnvelopeAndLfoView(QWidget * parent) :
 	lfoLayout->addLayout(graphAndTypesLayout);
 
 	m_lfoGraph = new LfoGraph(this);
+	m_lfoGraph->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	graphAndTypesLayout->addWidget(m_lfoGraph);
 
 	QHBoxLayout* typesLayout = new QHBoxLayout();
@@ -148,7 +148,7 @@ EnvelopeAndLfoView::EnvelopeAndLfoView(QWidget * parent) :
 	typesLayout->addWidget(random_lfo_btn);
 	typesLayout->addWidget(m_userLfoBtn);
 
-	m_lfoWaveBtnGrp = new automatableButtonGroup(this);
+	m_lfoWaveBtnGrp = new AutomatableButtonGroup(this);
 	m_lfoWaveBtnGrp->addButton(sin_lfo_btn);
 	m_lfoWaveBtnGrp->addButton(triangle_lfo_btn);
 	m_lfoWaveBtnGrp->addButton(saw_lfo_btn);
@@ -168,8 +168,7 @@ EnvelopeAndLfoView::EnvelopeAndLfoView(QWidget * parent) :
 	m_lfoAttackKnob = buildKnob(tr("ATT"), tr("Attack:"));
 	lfoKnobsLayout->addWidget(m_lfoAttackKnob);
 
-	m_lfoSpeedKnob = new TempoSyncKnob(KnobType::Bright26, this);
-	m_lfoSpeedKnob->setLabel(tr("SPD"));
+	m_lfoSpeedKnob = new TempoSyncKnob(KnobType::Bright26, tr("SPD"), this, Knob::LabelRendering::LegacyFixedFontSize);
 	m_lfoSpeedKnob->setHintText(tr("Frequency:"), "");
 	lfoKnobsLayout->addWidget(m_lfoSpeedKnob);
 
@@ -242,7 +241,7 @@ void EnvelopeAndLfoView::dropEvent( QDropEvent * _de )
 	QString value = StringPairDrag::decodeValue( _de );
 	if( type == "samplefile" )
 	{
-		m_params->m_userWave = SampleLoader::createBufferFromFile(value);
+		m_params->m_userWave = SampleBuffer::fromFile(value);
 		m_userLfoBtn->model()->setValue( true );
 		m_params->m_lfoWaveModel.setValue(static_cast<int>(EnvelopeAndLfoParameters::LfoShape::UserDefinedWave));
 		_de->accept();
@@ -254,7 +253,7 @@ void EnvelopeAndLfoView::dropEvent( QDropEvent * _de )
 		auto file = dataFile.content().
 					firstChildElement().firstChildElement().
 					firstChildElement().attribute("src");
-		m_params->m_userWave = SampleLoader::createBufferFromFile(file);
+		m_params->m_userWave = SampleBuffer::fromFile(file);
 		m_userLfoBtn->model()->setValue( true );
 		m_params->m_lfoWaveModel.setValue(static_cast<int>(EnvelopeAndLfoParameters::LfoShape::UserDefinedWave));
 		_de->accept();

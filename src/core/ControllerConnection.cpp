@@ -159,11 +159,10 @@ inline void ControllerConnection::setTargetName( const QString & _name )
  */
 void ControllerConnection::finalizeConnections()
 {
-	for( int i = 0; i < s_connections.size(); ++i )
+	for (auto i = std::size_t{0}; i < s_connections.size(); ++i)
 	{
 		ControllerConnection * c = s_connections[i];
-		if ( !c->isFinalized() && c->m_controllerId <
-				Engine::getSong()->controllers().size() )
+		if (!c->isFinalized() && static_cast<std::size_t>(c->m_controllerId) < Engine::getSong()->controllers().size())
 		{
 			c->setController( Engine::getSong()->
 					controllers().at( c->m_controllerId ) );
@@ -221,7 +220,7 @@ void ControllerConnection::loadSettings( const QDomElement & _this )
 
 		if (!Engine::getSong()->isLoadingProject()
 			&& m_controllerId != -1
-			&& m_controllerId < Engine::getSong()->controllers().size())
+			&& static_cast<std::size_t>(m_controllerId) < Engine::getSong()->controllers().size())
 		{
 			setController( Engine::getSong()->
 					controllers().at( m_controllerId ) );

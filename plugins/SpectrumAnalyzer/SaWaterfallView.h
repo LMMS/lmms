@@ -29,7 +29,6 @@
 #include <QWidget>
 
 
-class QMouseEvent;
 
 namespace lmms
 {

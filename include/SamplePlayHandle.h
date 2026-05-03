@@ -27,8 +27,6 @@
 #define LMMS_SAMPLE_PLAY_HANDLE_H
 
 #include "Sample.h"
-#include "SampleBuffer.h"
-#include "AutomatableModel.h"
 #include "PlayHandle.h"
 
 namespace lmms
@@ -38,13 +36,12 @@ namespace lmms
 class PatternTrack;
 class SampleClip;
 class Track;
-class AudioPort;
 
 
 class LMMS_EXPORT SamplePlayHandle : public PlayHandle
 {
 public:
-	SamplePlayHandle(Sample* sample, bool ownAudioPort = true);
+	SamplePlayHandle(Sample* sample, bool ownAudioBusHandle = true);
 	SamplePlayHandle( const QString& sampleFile );
 	SamplePlayHandle( SampleClip* clip );
 	~SamplePlayHandle() override;
@@ -55,7 +52,7 @@ public:
 	}
 
 
-	void play( sampleFrame * buffer ) override;
+	void play( SampleFrame* buffer ) override;
 	bool isFinished() const override;
 
 	bool isFromTrack( const Track * _track ) const override;
@@ -75,27 +72,14 @@ public:
 		m_patternTrack = pt;
 	}
 
-	void setVolumeModel( FloatModel * _model )
-	{
-		m_volumeModel = _model;
-	}
-
-
 private:
-	Sample* m_sample;
-	bool m_doneMayReturnTrue;
-
-	f_cnt_t m_frame;
 	Sample::PlaybackState m_state;
-
-	const bool m_ownAudioPort;
-
-	FloatModel m_defaultVolumeModel;
-	FloatModel * m_volumeModel;
-	Track * m_track;
-
-	PatternTrack* m_patternTrack;
-
+	f_cnt_t m_frame = 0;
+	Sample* m_sample = nullptr;
+	Track* m_track = nullptr;
+	PatternTrack* m_patternTrack = nullptr;
+	bool m_doneMayReturnTrue = true;
+	bool m_ownAudioBusHandle = false;
 } ;
 
 

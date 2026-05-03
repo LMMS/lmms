@@ -31,7 +31,6 @@
 #include "Engine.h"
 #include "Oscillator.h"
 #include "PathUtil.h"
-#include "SampleLoader.h"
 #include "Song.h"
 
 namespace lmms
@@ -97,13 +96,13 @@ EnvelopeAndLfoParameters::EnvelopeAndLfoParameters(
 							Model * _parent ) :
 	Model( _parent ),
 	m_used( false ),
-	m_predelayModel( 0.0, 0.0, 2.0, 0.001, this, tr( "Env pre-delay" ) ),
-	m_attackModel( 0.0, 0.0, 2.0, 0.001, this, tr( "Env attack" ) ),
-	m_holdModel( 0.5, 0.0, 2.0, 0.001, this, tr( "Env hold" ) ),
-	m_decayModel( 0.5, 0.0, 2.0, 0.001, this, tr( "Env decay" ) ),
-	m_sustainModel( 0.5, 0.0, 1.0, 0.001, this, tr( "Env sustain" ) ),
-	m_releaseModel( 0.1, 0.0, 2.0, 0.001, this, tr( "Env release" ) ),
-	m_amountModel( 0.0, -1.0, 1.0, 0.005, this, tr( "Env mod amount" ) ),
+	m_predelayModel(0.f, 0.f, 2.f, 0.001f, this, tr("Env pre-delay")),
+	m_attackModel(0.f, 0.f, 2.f, 0.001f, this, tr("Env attack")),
+	m_holdModel(0.5f, 0.f, 2.f, 0.001f, this, tr("Env hold")),
+	m_decayModel(0.5f, 0.f, 2.f, 0.001f, this, tr("Env decay")),
+	m_sustainModel(0.5f, 0.f, 1.f, 0.001f, this, tr("Env sustain")),
+	m_releaseModel(0.1f, 0.f, 2.f, 0.001f, this, tr("Env release")),
+	m_amountModel(0.f, -1.f, 1.f, 0.005f, this, tr("Env mod amount")),
 	m_valueForZeroAmount( _value_for_zero_amount ),
 	m_pahdFrames( 0 ),
 	m_rFrames( 0 ),
@@ -111,12 +110,12 @@ EnvelopeAndLfoParameters::EnvelopeAndLfoParameters(
 	m_rEnv( nullptr ),
 	m_pahdBufSize( 0 ),
 	m_rBufSize( 0 ),
-	m_lfoPredelayModel( 0.0, 0.0, 1.0, 0.001, this, tr( "LFO pre-delay" ) ),
-	m_lfoAttackModel( 0.0, 0.0, 1.0, 0.001, this, tr( "LFO attack" ) ),
-	m_lfoSpeedModel( 0.1, 0.001, 1.0, 0.0001,
-				SECS_PER_LFO_OSCILLATION * 1000.0, this,
-							tr( "LFO frequency" ) ),
-	m_lfoAmountModel( 0.0, -1.0, 1.0, 0.005, this, tr( "LFO mod amount" ) ),
+	m_lfoPredelayModel(0.f, 0.f, 1.f, 0.001f, this, tr("LFO pre-delay")),
+	m_lfoAttackModel(0.f, 0.f, 1.f, 0.001f, this, tr("LFO attack")),
+	m_lfoSpeedModel(0.1f, 0.001f, 1.f, 0.0001f,
+				SECS_PER_LFO_OSCILLATION * 1000.f, this,
+							tr("LFO frequency")),
+	m_lfoAmountModel(0.f, -1.f, 1.f, 0.005f, this, tr("LFO mod amount")),
 	m_lfoWaveModel( static_cast<int>(LfoShape::SineWave), 0, NumLfoShapes, this, tr( "LFO wave shape" ) ),
 	m_x100Model( false, this, tr( "LFO frequency x 100" ) ),
 	m_controlEnvAmountModel( false, this, tr( "Modulate env amount" ) ),
@@ -207,7 +206,7 @@ EnvelopeAndLfoParameters::~EnvelopeAndLfoParameters()
 
 
 
-inline sample_t EnvelopeAndLfoParameters::lfoShapeSample( fpp_t _frame_offset )
+inline sample_t EnvelopeAndLfoParameters::lfoShapeSample( f_cnt_t _frame_offset )
 {
 	f_cnt_t frame = ( m_lfoFrame + _frame_offset ) % m_lfoOscillationFrames;
 	const float phase = frame / static_cast<float>(
@@ -247,8 +246,8 @@ inline sample_t EnvelopeAndLfoParameters::lfoShapeSample( fpp_t _frame_offset )
 
 void EnvelopeAndLfoParameters::updateLfoShapeData()
 {
-	const fpp_t frames = Engine::audioEngine()->framesPerPeriod();
-	for( fpp_t offset = 0; offset < frames; ++offset )
+	const f_cnt_t frames = Engine::audioEngine()->framesPerPeriod();
+	for( f_cnt_t offset = 0; offset < frames; ++offset )
 	{
 		m_lfoShapeData[offset] = lfoShapeSample( offset );
 	}
@@ -260,11 +259,11 @@ void EnvelopeAndLfoParameters::updateLfoShapeData()
 
 inline void EnvelopeAndLfoParameters::fillLfoLevel( float * _buf,
 							f_cnt_t _frame,
-							const fpp_t _frames )
+							const f_cnt_t _frames )
 {
 	if( m_lfoAmountIsZero || _frame <= m_lfoPredelayFrames )
 	{
-		for( fpp_t offset = 0; offset < _frames; ++offset )
+		for( f_cnt_t offset = 0; offset < _frames; ++offset )
 		{
 			*_buf++ = 0.0f;
 		}
@@ -277,7 +276,7 @@ inline void EnvelopeAndLfoParameters::fillLfoLevel( float * _buf,
 		updateLfoShapeData();
 	}
 
-	fpp_t offset = 0;
+	f_cnt_t offset = 0;
 	const float lafI = 1.0f / std::max(minimumFrames, m_lfoAttackFrames);
 	for( ; offset < _frames && _frame < m_lfoAttackFrames; ++offset,
 								++_frame )
@@ -295,18 +294,13 @@ inline void EnvelopeAndLfoParameters::fillLfoLevel( float * _buf,
 
 void EnvelopeAndLfoParameters::fillLevel( float * _buf, f_cnt_t _frame,
 						const f_cnt_t _release_begin,
-						const fpp_t _frames )
+						const f_cnt_t _frames )
 {
 	QMutexLocker m(&m_paramMutex);
 
-	if( _frame < 0 || _release_begin < 0 )
-	{
-		return;
-	}
-
 	fillLfoLevel( _buf, _frame, _frames );
 
-	for( fpp_t offset = 0; offset < _frames; ++offset, ++_buf, ++_frame )
+	for( f_cnt_t offset = 0; offset < _frames; ++offset, ++_buf, ++_frame )
 	{
 		float env_level;
 		if( _frame < _release_begin )
@@ -394,7 +388,7 @@ void EnvelopeAndLfoParameters::loadSettings( const QDomElement & _this )
 	{
 		if (QFileInfo(PathUtil::toAbsolute(userWaveFile)).exists())
 		{
-			m_userWave = gui::SampleLoader::createBufferFromFile(_this.attribute("userwavefile"));
+			m_userWave = SampleBuffer::fromFile(_this.attribute("userwavefile"));
 		}
 		else { Engine::getSong()->collectError(QString("%1: %2").arg(tr("Sample not found"), userWaveFile)); }  
 	}

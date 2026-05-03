@@ -1,7 +1,7 @@
 /*
  * Lv2Manager.h - Implementation of Lv2Manager class
  *
- * Copyright (c) 2018-2023 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
+ * Copyright (c) 2018-2024 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -131,14 +131,23 @@ public:
 	AutoLilvNodes findNodes(const LilvNode *subject,
 		const LilvNode *predicate, const LilvNode *object);
 
-	static const std::set<std::string_view>& getPluginBlacklist()
+	static bool pluginIsUnstable(const char* pluginUri)
 	{
-		return pluginBlacklist;
+		return unstablePlugins.find(pluginUri) != unstablePlugins.end();
 	}
-	static const std::set<std::string_view>& getPluginBlacklistBuffersizeLessThan32()
+	static bool pluginIsOnlyUsefulWithUi(const char* pluginUri)
 	{
-		return pluginBlacklistBuffersizeLessThan32;
+		return pluginsOnlyUsefulWithUi.find(pluginUri) != pluginsOnlyUsefulWithUi.end();
 	}
+	static bool pluginIsUnstableWithBuffersizeLessEqual32(const char* pluginUri)
+	{
+		return unstablePluginsBuffersizeLessEqual32.find(pluginUri) !=
+			unstablePluginsBuffersizeLessEqual32.end();
+	}
+
+	//! Whether the user generally wants a UI (and we generally support that)
+	//! Since we do not generally support UI right now, this will always return false...
+	static bool wantUi();
 
 private:
 	// general data
@@ -154,8 +163,9 @@ private:
 	Lv2UridCache m_uridCache;
 
 	// static
-	static const std::set<std::string_view>
-		pluginBlacklist, pluginBlacklistBuffersizeLessThan32;
+	static const std::set<std::string_view> unstablePlugins;
+	static const std::set<std::string_view> pluginsOnlyUsefulWithUi;
+	static const std::set<std::string_view> unstablePluginsBuffersizeLessEqual32;
 
 	// functions
 	bool isSubclassOf(const LilvPluginClass *clvss, const char *uriStr);

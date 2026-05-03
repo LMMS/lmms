@@ -30,7 +30,7 @@
 
 #include "lmmsconfig.h"
 #include "lmms_export.h"
-#include "lmms_basics.h"
+#include "LmmsTypes.h"
 
 namespace lmms
 {
@@ -80,8 +80,6 @@ public:
 	{
 		return s_projectJournal;
 	}
-
-	static bool ignorePluginBlacklist();
 
 #ifdef LMMS_HAVE_LV2
 	static class Lv2Manager * getLv2Manager()

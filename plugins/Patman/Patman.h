@@ -29,7 +29,6 @@
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "Sample.h"
-#include "SampleBuffer.h"
 #include "AutomatableModel.h"
 
 namespace lmms
@@ -60,7 +59,7 @@ public:
 	~PatmanInstrument() override;
 
 	void playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer ) override;
+						SampleFrame* _working_buffer ) override;
 	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
 

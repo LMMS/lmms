@@ -24,6 +24,8 @@
 
 #include "FlangerControlsDialog.h"
 
+#include <QVBoxLayout>
+
 #include "embed.h"
 #include "FlangerControls.h"
 #include "LedCheckBox.h"
@@ -40,55 +42,47 @@ FlangerControlsDialog::FlangerControlsDialog( FlangerControls *controls ) :
 	QPalette pal;
 	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap( "artwork" ) );
 	setPalette( pal );
-	setFixedSize( 233, 75 );
 
-	auto delayKnob = new Knob(KnobType::Bright26, this);
-	delayKnob->move( 10,10 );
-	delayKnob->setVolumeKnob( false );
+	auto mainLayout = new QVBoxLayout(this);
+	mainLayout->setSizeConstraint(QLayout::SetFixedSize);
+	auto knobLayout = new QHBoxLayout();
+	mainLayout->addLayout(knobLayout);
+
+	auto delayKnob = new Knob(KnobType::Bright26, tr("DELAY"), this);
 	delayKnob->setModel( &controls->m_delayTimeModel );
-	delayKnob->setLabel( tr( "DELAY" ) );
 	delayKnob->setHintText( tr( "Delay time:" ) + " ", "s" );
 
-	auto lfoFreqKnob = new TempoSyncKnob(KnobType::Bright26, this);
-	lfoFreqKnob->move( 48,10 );
-	lfoFreqKnob->setVolumeKnob( false );
+	auto lfoFreqKnob = new TempoSyncKnob(KnobType::Bright26, tr("RATE"), this);
 	lfoFreqKnob->setModel( &controls->m_lfoFrequencyModel );
-	lfoFreqKnob->setLabel( tr( "RATE" ) );
 	lfoFreqKnob->setHintText( tr( "Period:" ) , " Sec" );
 
-	auto lfoAmtKnob = new Knob(KnobType::Bright26, this);
-	lfoAmtKnob->move( 85,10 );
-	lfoAmtKnob->setVolumeKnob( false );
+	auto lfoAmtKnob = new Knob(KnobType::Bright26, tr("AMNT"), this);
 	lfoAmtKnob->setModel( &controls->m_lfoAmountModel );
-	lfoAmtKnob->setLabel( tr( "AMNT" ) );
 	lfoAmtKnob->setHintText( tr( "Amount:" ) , "" );
 
-	auto lfoPhaseKnob = new Knob(KnobType::Bright26, this);
-	lfoPhaseKnob->move( 123,10 );
-	lfoPhaseKnob->setVolumeKnob( false );
+	auto lfoPhaseKnob = new Knob(KnobType::Bright26, tr("PHASE"), this);
 	lfoPhaseKnob->setModel( &controls->m_lfoPhaseModel );
-	lfoPhaseKnob->setLabel( tr( "PHASE" ) );
 	lfoPhaseKnob->setHintText( tr( "Phase:" ) , " degrees" );
 
-	auto feedbackKnob = new Knob(KnobType::Bright26, this);
-	feedbackKnob->move( 160,10 );
-	feedbackKnob->setVolumeKnob( true) ;
+	auto feedbackKnob = new VolumeKnob(KnobType::Bright26, tr("FDBK"), this);
 	feedbackKnob->setModel( &controls->m_feedbackModel );
-	feedbackKnob->setLabel( tr( "FDBK" ) );
 	feedbackKnob->setHintText( tr( "Feedback amount:" ) , "" );
 
-	auto whiteNoiseKnob = new Knob(KnobType::Bright26, this);
-	whiteNoiseKnob->move( 196,10 );
-	whiteNoiseKnob->setVolumeKnob( true) ;
+	auto whiteNoiseKnob = new VolumeKnob(KnobType::Bright26, tr("NOISE"), this);
 	whiteNoiseKnob->setModel( &controls->m_whiteNoiseAmountModel );
-	whiteNoiseKnob->setLabel( tr( "NOISE" ) );
 	whiteNoiseKnob->setHintText( tr( "White noise amount:" ) , "" );
 
+	knobLayout->addWidget(delayKnob);
+	knobLayout->addWidget(lfoFreqKnob);
+	knobLayout->addWidget(lfoAmtKnob);
+	knobLayout->addWidget(lfoPhaseKnob);
+	knobLayout->addWidget(feedbackKnob);
+	knobLayout->addWidget(whiteNoiseKnob);
+
 	auto invertCb = new LedCheckBox(tr("Invert"), this);
-	invertCb->move( 10,53 );
-
-
-
+	invertCb->setModel(&controls->m_invertFeedbackModel);
+	
+	mainLayout->addWidget(invertCb, 0, Qt::AlignLeft);
 }
 
 

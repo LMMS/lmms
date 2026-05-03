@@ -36,6 +36,7 @@ class QLineEdit;
 namespace lmms::gui
 {
 
+class AutomatableButton;
 class EffectRackView;
 class Knob;
 class MixerChannelLcdSpinBox;
@@ -46,7 +47,7 @@ class SampleTrackWindow : public QWidget, public ModelView, public SerializingOb
 {
 	Q_OBJECT
 public:
-	SampleTrackWindow(SampleTrackView * tv);
+	SampleTrackWindow(SampleTrackView* stv);
 	~SampleTrackWindow() override = default;
 
 	SampleTrack * model()
@@ -75,7 +76,7 @@ public slots:
 
 protected:
 	// capture close-events for toggling sample-track-button
-	void closeEvent(QCloseEvent * ce) override;
+	void closeEvent(QCloseEvent* ce) override;
 
 	void saveSettings(QDomDocument & doc, QDomElement & element) override;
 	void loadSettings(const QDomElement & element) override;
@@ -90,6 +91,8 @@ private:
 	QLineEdit * m_nameLineEdit;
 	Knob * m_volumeKnob;
 	Knob * m_panningKnob;
+	AutomatableButton* m_muteBtn;
+	AutomatableButton* m_soloBtn;
 	MixerChannelLcdSpinBox * m_mixerChannelNumber;
 
 	EffectRackView * m_effectRack;

@@ -40,13 +40,10 @@ namespace lmms
 {
 
 
-class NotePlayHandle;
-class graphModel;
+class NotePlayHandle;  // IWYU pragma: keep
 
 namespace gui
 {
-class Graph;
-class LedCheckBox;
 class VibedView;
 }
 
@@ -57,7 +54,7 @@ public:
 	Vibed(InstrumentTrack* instrumentTrack);
 	~Vibed() override = default;
 
-	void playNote(NotePlayHandle* n, sampleFrame* workingBuffer) override;
+	void playNote(NotePlayHandle* n, SampleFrame* workingBuffer) override;
 	void deleteNotePluginData(NotePlayHandle* n) override;
 
 	void saveSettings(QDomDocument& doc, QDomElement& elem) override;
@@ -119,7 +116,7 @@ private:
 	void modelChanged() override;
 
 	// String-related
-	Knob m_volumeKnob;
+	VolumeKnob m_volumeKnob;
 	Knob m_stiffnessKnob;
 	Knob m_pickKnob;
 	Knob m_pickupKnob;

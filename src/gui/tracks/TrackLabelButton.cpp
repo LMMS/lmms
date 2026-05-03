@@ -29,8 +29,8 @@
 #include <QMouseEvent>
 
 #include "ConfigManager.h"
+#include "DeprecationHelper.h"
 #include "embed.h"
-#include "InstrumentTrackView.h"
 #include "Instrument.h"
 #include "InstrumentTrack.h"
 #include "RenameDialog.h"
@@ -46,10 +46,11 @@ TrackLabelButton::TrackLabelButton( TrackView * _tv, QWidget * _parent ) :
 	m_trackView( _tv ),
 	m_iconName()
 {
-	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	setAcceptDrops( true );
-	setCursor( QCursor( embed::getIconPixmap( "hand" ), 3, 3 ) );
+	setFocusPolicy(Qt::NoFocus);
+	setCursor(Qt::PointingHandCursor);
 	setToolButtonStyle( Qt::ToolButtonTextBesideIcon );
+
 	m_renameLineEdit = new TrackRenameLineEdit( this );
 	m_renameLineEdit->hide();
 	
@@ -60,8 +61,6 @@ TrackLabelButton::TrackLabelButton( TrackView * _tv, QWidget * _parent ) :
 	else
 	{
 		setFixedSize( 160, 29 );
-		m_renameLineEdit->move( 30, ( height() / 2 ) - ( m_renameLineEdit->sizeHint().height() / 2 ) );
-		m_renameLineEdit->setFixedWidth( width() - 33 );
 		connect( m_renameLineEdit, SIGNAL(editingFinished()), this, SLOT(renameFinished()));
 	}
 	
@@ -89,11 +88,22 @@ void TrackLabelButton::rename()
 	}
 	else
 	{
-		QString txt = m_trackView->getTrack()->name();
-		m_renameLineEdit->show();
-		m_renameLineEdit->setText( txt );
+		const auto & trackName = m_trackView->getTrack()->name();
+		m_renameLineEdit->setText(trackName);
 		m_renameLineEdit->selectAll();
 		m_renameLineEdit->setFocus();
+
+		// Make sure that the rename line edit uses the same font as the widget
+		// which is set via style sheets
+		m_renameLineEdit->setFont(font());
+
+		// Move the line edit to the correct position by taking the size of the
+		// icon into account.
+		const auto iconWidth = iconSize().width();
+		m_renameLineEdit->move(iconWidth + 1, (height() / 2  - m_renameLineEdit->sizeHint().height() / 2) + 1);
+		m_renameLineEdit->setFixedWidth(width() - (iconWidth + 6));
+
+		m_renameLineEdit->show();
 	}
 }
 
@@ -172,7 +182,8 @@ void TrackLabelButton::mouseDoubleClickEvent( QMouseEvent * _me )
 
 void TrackLabelButton::mouseReleaseEvent( QMouseEvent *_me )
 {
-	if( m_buttonRect.contains( _me->globalPos(), true ) && m_renameLineEdit->isHidden() )
+	const auto globalPos = globalPosition(_me);
+	if (m_buttonRect.contains(globalPos, true) && m_renameLineEdit->isHidden())
 	{
 		QToolButton::mousePressEvent( _me );
 	}

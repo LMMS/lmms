@@ -123,7 +123,7 @@ struct Sf2PluginData
 
 Sf2Instrument::Sf2Instrument( InstrumentTrack * _instrument_track ) :
 	Instrument(_instrument_track, &sf2player_plugin_descriptor, nullptr, Flag::IsSingleStreamed),
-	m_srcState( nullptr ),
+	m_resampler(AudioResampler::Mode::Linear),
 	m_synth(nullptr),
 	m_font( nullptr ),
 	m_fontId( 0 ),
@@ -136,14 +136,14 @@ Sf2Instrument::Sf2Instrument( InstrumentTrack * _instrument_track ) :
 	m_gain( 1.0f, 0.0f, 5.0f, 0.01f, this, tr( "Gain" ) ),
 	m_reverbOn( false, this, tr( "Reverb" ) ),
 	m_reverbRoomSize( FLUID_REVERB_DEFAULT_ROOMSIZE, 0, 1.0, 0.01f, this, tr( "Reverb room size" ) ),
-	m_reverbDamping( FLUID_REVERB_DEFAULT_DAMP, 0, 1.0, 0.01, this, tr( "Reverb damping" ) ),
+	m_reverbDamping(FLUID_REVERB_DEFAULT_DAMP, 0, 1.f, 0.01f, this, tr("Reverb damping")),
 	m_reverbWidth( FLUID_REVERB_DEFAULT_WIDTH, 0, 1.0, 0.01f, this, tr( "Reverb width" ) ),
 	m_reverbLevel( FLUID_REVERB_DEFAULT_LEVEL, 0, 1.0, 0.01f, this, tr( "Reverb level" ) ),
 	m_chorusOn( false, this, tr( "Chorus" ) ),
 	m_chorusNum( FLUID_CHORUS_DEFAULT_N, 0, 10.0, 1.0, this, tr( "Chorus voices" ) ),
-	m_chorusLevel( FLUID_CHORUS_DEFAULT_LEVEL, 0, 10.0, 0.01, this, tr( "Chorus level" ) ),
-	m_chorusSpeed( FLUID_CHORUS_DEFAULT_SPEED, 0.29, 5.0, 0.01, this, tr( "Chorus speed" ) ),
-	m_chorusDepth( FLUID_CHORUS_DEFAULT_DEPTH, 0, 46.0, 0.05, this, tr( "Chorus depth" ) )
+	m_chorusLevel(FLUID_CHORUS_DEFAULT_LEVEL, 0, 10.f, 0.01f, this, tr("Chorus level")),
+	m_chorusSpeed(FLUID_CHORUS_DEFAULT_SPEED, 0.29f, 5.f, 0.01f, this, tr("Chorus speed")),
+	m_chorusDepth(FLUID_CHORUS_DEFAULT_DEPTH, 0, 46.f, 0.05f, this, tr("Chorus depth"))
 {
 
 
@@ -235,11 +235,6 @@ Sf2Instrument::~Sf2Instrument()
 	freeFont();
 	delete_fluid_synth( m_synth );
 	delete_fluid_settings( m_settings );
-	if( m_srcState != nullptr )
-	{
-		src_delete( m_srcState );
-	}
-
 }
 
 
@@ -499,50 +494,64 @@ void Sf2Instrument::updateGain()
 	fluid_synth_set_gain( m_synth, m_gain.value() );
 }
 
-
-
+#define FLUIDSYNTH_VERSION_HEX ((FLUIDSYNTH_VERSION_MAJOR << 16) \
+	| (FLUIDSYNTH_VERSION_MINOR << 8) \
+	| FLUIDSYNTH_VERSION_MICRO)
+#define USE_NEW_EFFECT_API (FLUIDSYNTH_VERSION_HEX >= 0x020200)
 
 void Sf2Instrument::updateReverbOn()
 {
-	fluid_synth_set_reverb_on( m_synth, m_reverbOn.value() ? 1 : 0 );
+#if USE_NEW_EFFECT_API
+	fluid_synth_reverb_on(m_synth, -1, m_reverbOn.value() ? 1 : 0);
+#else
+	fluid_synth_set_reverb_on(m_synth, m_reverbOn.value() ? 1 : 0);
+#endif
 }
-
-
-
 
 void Sf2Instrument::updateReverb()
 {
-	fluid_synth_set_reverb( m_synth, m_reverbRoomSize.value(),
+#if USE_NEW_EFFECT_API
+	fluid_synth_set_reverb_group_roomsize(m_synth, -1, m_reverbRoomSize.value());
+	fluid_synth_set_reverb_group_damp(m_synth, -1, m_reverbDamping.value());
+	fluid_synth_set_reverb_group_width(m_synth, -1, m_reverbWidth.value());
+	fluid_synth_set_reverb_group_level(m_synth, -1, m_reverbLevel.value());
+#else
+	fluid_synth_set_reverb(m_synth, m_reverbRoomSize.value(),
 			m_reverbDamping.value(), m_reverbWidth.value(),
-			m_reverbLevel.value() );
+			m_reverbLevel.value());
+#endif
 }
 
-
-
-
-void  Sf2Instrument::updateChorusOn()
+void Sf2Instrument::updateChorusOn()
 {
-	fluid_synth_set_chorus_on( m_synth, m_chorusOn.value() ? 1 : 0 );
+#if USE_NEW_EFFECT_API
+	fluid_synth_chorus_on(m_synth, -1, m_chorusOn.value() ? 1 : 0);
+#else
+	fluid_synth_set_chorus_on(m_synth, m_chorusOn.value() ? 1 : 0);
+#endif
 }
 
-
-
-
-void  Sf2Instrument::updateChorus()
+void Sf2Instrument::updateChorus()
 {
-	fluid_synth_set_chorus( m_synth, static_cast<int>( m_chorusNum.value() ),
+#if USE_NEW_EFFECT_API
+	fluid_synth_set_chorus_group_nr(m_synth, -1, static_cast<int>(m_chorusNum.value()));
+	fluid_synth_set_chorus_group_level(m_synth, -1, m_chorusLevel.value());
+	fluid_synth_set_chorus_group_speed(m_synth, -1, m_chorusSpeed.value());
+	fluid_synth_set_chorus_group_depth(m_synth, -1, m_chorusDepth.value());
+	fluid_synth_set_chorus_group_type(m_synth, -1, FLUID_CHORUS_MOD_SINE);
+#else
+	fluid_synth_set_chorus(m_synth, static_cast<int>(m_chorusNum.value()),
 			m_chorusLevel.value(), m_chorusSpeed.value(),
-			m_chorusDepth.value(), 0 );
+			m_chorusDepth.value(), FLUID_CHORUS_MOD_SINE);
+#endif
 }
-
-
 
 void Sf2Instrument::updateTuning()
 {
 	if (instrumentTrack()->microtuner()->enabledModel()->value())
 	{
 		auto centArray = std::array<double, 128>{};
-		double lowestHz = pow(2., -69. / 12.) * 440.;// Frequency of MIDI note 0, which is approximately 8.175798916 Hz
+		double lowestHz = std::exp2(-69. / 12.) * 440.; // Frequency of MIDI note 0, which is approximately 8.175798916 Hz
 		for (int i = 0; i < 128; ++i)
 		{
 			// Get desired Hz of note
@@ -576,7 +585,9 @@ void Sf2Instrument::reloadSynth()
 	// Set & get, returns the true sample rate
 	fluid_settings_setnum( m_settings, (char *) "synth.sample-rate", Engine::audioEngine()->outputSampleRate() );
 	fluid_settings_getnum( m_settings, (char *) "synth.sample-rate", &tempRate );
+
 	m_internalSampleRate = static_cast<int>( tempRate );
+	m_resampler.setRatio(m_internalSampleRate, Engine::audioEngine()->outputSampleRate());
 
 	if( m_font )
 	{
@@ -606,31 +617,19 @@ void Sf2Instrument::reloadSynth()
 	}
 
 	m_synthMutex.lock();
-	if( Engine::audioEngine()->currentQualitySettings().interpolation >=
-			AudioEngine::qualitySettings::Interpolation::SincFastest )
+
+	if (m_internalSampleRate != Engine::audioEngine()->outputSampleRate())
 	{
-		fluid_synth_set_interp_method( m_synth, -1, FLUID_INTERP_7THORDER );
+		// LMMS supports a sample rate of 192 kHZ, while FluidSynth only supports up to 96 kHZ.
+		// Because of this, the instrument is resampled using libsamplerate when necessary.
+		// This uses linear interpolation, so the instrument's interpolation is set to FLUID_INTERP_LINEAR
+		// to match. A better option might be to make the interpolation option modifiable by the user, as well as only
+		// supporting only up to 96 kHZ (though that may be a problem if theres a strong need for 192 kHZ).
+		fluid_synth_set_interp_method(m_synth, -1, FLUID_INTERP_LINEAR);
 	}
-	else
-	{
-		fluid_synth_set_interp_method( m_synth, -1, FLUID_INTERP_DEFAULT );
-	}
+
 	m_synthMutex.unlock();
-	if( m_internalSampleRate < Engine::audioEngine()->outputSampleRate() )
-	{
-		m_synthMutex.lock();
-		if( m_srcState != nullptr )
-		{
-			src_delete( m_srcState );
-		}
-		int error;
-		m_srcState = src_new( Engine::audioEngine()->currentQualitySettings().libsrcInterpolation(), DEFAULT_CHANNELS, &error );
-		if( m_srcState == nullptr || error )
-		{
-			qCritical("error while creating libsamplerate data structure in Sf2Instrument::reloadSynth()");
-		}
-		m_synthMutex.unlock();
-	}
+
 	updateReverb();
 	updateChorus();
 	updateReverbOn();
@@ -647,7 +646,7 @@ void Sf2Instrument::reloadSynth()
 
 
 
-void Sf2Instrument::playNote( NotePlayHandle * _n, sampleFrame * )
+void Sf2Instrument::playNote( NotePlayHandle * _n, SampleFrame* )
 {
 	if( _n->isMasterNote() || ( _n->hasParent() && _n->isReleased() ) )
 	{
@@ -782,9 +781,9 @@ void Sf2Instrument::noteOff( Sf2PluginData * n )
 }
 
 
-void Sf2Instrument::play( sampleFrame * _working_buffer )
+void Sf2Instrument::play( SampleFrame* _working_buffer )
 {
-	const fpp_t frames = Engine::audioEngine()->framesPerPeriod();
+	const f_cnt_t frames = Engine::audioEngine()->framesPerPeriod();
 
 	// set midi pitch for this period
 	const int currentMidiPitch = instrumentTrack()->midiPitch();
@@ -868,46 +867,40 @@ void Sf2Instrument::play( sampleFrame * _working_buffer )
 }
 
 
-void Sf2Instrument::renderFrames( f_cnt_t frames, sampleFrame * buf )
+void Sf2Instrument::renderFrames( f_cnt_t frames, SampleFrame* buf )
 {
-	m_synthMutex.lock();
-	fluid_synth_get_gain(m_synth); // This flushes voice updates as a side effect
-	if( m_internalSampleRate < Engine::audioEngine()->outputSampleRate() &&
-							m_srcState != nullptr )
-	{
-		const fpp_t f = frames * m_internalSampleRate / Engine::audioEngine()->outputSampleRate();
-#ifdef __GNUC__
-		sampleFrame tmp[f];
-#else
-		sampleFrame * tmp = new sampleFrame[f];
-#endif
-		fluid_synth_write_float( m_synth, f, tmp, 0, 2, tmp, 1, 2 );
+	const auto guard = std::lock_guard{m_synthMutex};
 
-		SRC_DATA src_data;
-		src_data.data_in = (float *)tmp;
-		src_data.data_out = (float *)buf;
-		src_data.input_frames = f;
-		src_data.output_frames = frames;
-		src_data.src_ratio = (double) frames / f;
-		src_data.end_of_input = 0;
-		int error = src_process( m_srcState, &src_data );
-#ifndef __GNUC__
-		delete[] tmp;
-#endif
-		if( error )
-		{
-			qCritical( "Sf2Instrument: error while resampling: %s", src_strerror( error ) );
-		}
-		if( src_data.output_frames_gen > frames )
-		{
-			qCritical( "Sf2Instrument: not enough frames: %ld / %d", src_data.output_frames_gen, frames );
-		}
+	fluid_synth_get_gain(m_synth); // This flushes voice updates as a side effect
+
+	if (m_internalSampleRate == Engine::audioEngine()->outputSampleRate()) {
+		fluid_synth_write_float(m_synth, frames, buf, 0, 2, buf, 1, 2);
+		return;
 	}
-	else
+
+	// TODO: These kind of playback pipelines/graphs are repeated within other parts of the codebase that work with
+	// audio samples. We should find a way to unify this but the right abstraction is not so clear yet.
+	while (frames > 0)
 	{
-		fluid_synth_write_float( m_synth, frames, buf, 0, 2, buf, 1, 2 );
+		if (m_bufferView.empty())
+		{
+			fluid_synth_write_float(m_synth, m_buffer.size(), m_buffer.data(), 0, 2, m_buffer.data(), 1, 2);
+			m_bufferView = m_buffer;
+		}
+
+		const auto [inputFramesUsed, outputFramesGenerated]
+			= m_resampler.process({&m_bufferView.data()[0][0], 2, m_bufferView.size()}, {&buf[0][0], 2, frames});
+
+		if (inputFramesUsed == 0 && outputFramesGenerated == 0)
+		{
+			std::fill_n(buf, frames, SampleFrame{});
+			break;
+		}
+
+		m_bufferView = m_bufferView.subspan(inputFramesUsed);
+		buf += outputFramesGenerated;
+		frames -= outputFramesGenerated;
 	}
-	m_synthMutex.unlock();
 }
 
 
@@ -970,7 +963,7 @@ Sf2InstrumentView::Sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 
 	// File Button
 	m_fileDialogButton = new PixmapButton(this);
-	m_fileDialogButton->setCursor(QCursor(Qt::PointingHandCursor));
+	m_fileDialogButton->setCursor(Qt::PointingHandCursor);
 	m_fileDialogButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("fileselect_on"));
 	m_fileDialogButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("fileselect_off"));
 	m_fileDialogButton->move(217, 107);
@@ -981,7 +974,7 @@ Sf2InstrumentView::Sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 
 	// Patch Button
 	m_patchDialogButton = new PixmapButton(this);
-	m_patchDialogButton->setCursor(QCursor(Qt::PointingHandCursor));
+	m_patchDialogButton->setCursor(Qt::PointingHandCursor);
 	m_patchDialogButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("patches_on"));
 	m_patchDialogButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("patches_off"));
 	m_patchDialogButton->setEnabled(false);

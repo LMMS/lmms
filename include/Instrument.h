@@ -30,7 +30,7 @@
 
 #include "Flags.h"
 #include "lmms_export.h"
-#include "lmms_basics.h"
+#include "LmmsTypes.h"
 #include "Plugin.h"
 #include "TimePos.h"
 
@@ -45,6 +45,7 @@ class InstrumentTrack;
 class MidiEvent;
 class NotePlayHandle;
 class Track;
+class SampleFrame;
 
 
 class LMMS_EXPORT Instrument : public Plugin
@@ -75,11 +76,11 @@ public:
 	// if the plugin doesn't play each note, it can create an instrument-
 	// play-handle and re-implement this method, so that it mixes its
 	// output buffer only once per audio engine period
-	virtual void play( sampleFrame * _working_buffer );
+	virtual void play( SampleFrame* _working_buffer );
 
 	// to be implemented by actual plugin
 	virtual void playNote( NotePlayHandle * /* _note_to_play */,
-					sampleFrame * /* _working_buf */ )
+					SampleFrame* /* _working_buf */ )
 	{
 	}
 
@@ -160,12 +161,12 @@ public:
 
 protected:
 	// fade in to prevent clicks
-	void applyFadeIn(sampleFrame * buf, NotePlayHandle * n);
+	void applyFadeIn(SampleFrame* buf, NotePlayHandle * n);
 
 	// instruments may use this to apply a soft fade out at the end of
 	// notes - method does this only if really less or equal
 	// desiredReleaseFrames() frames are left
-	void applyRelease( sampleFrame * buf, const NotePlayHandle * _n );
+	void applyRelease( SampleFrame* buf, const NotePlayHandle * _n );
 
 	float computeReleaseTimeMsByFrameCount(f_cnt_t frames) const;
 

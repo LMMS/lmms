@@ -37,10 +37,10 @@ InstrumentPlayHandle::InstrumentPlayHandle(Instrument * instrument, InstrumentTr
 	PlayHandle(Type::InstrumentPlayHandle),
 	m_instrument(instrument)
 {
-	setAudioPort(instrumentTrack->audioPort());
+	setAudioBusHandle(instrumentTrack->audioBusHandle());
 }
 
-void InstrumentPlayHandle::play(sampleFrame * working_buffer)
+void InstrumentPlayHandle::play(SampleFrame* working_buffer)
 {
 	InstrumentTrack * instrumentTrack = m_instrument->instrumentTrack();
 
@@ -65,7 +65,7 @@ void InstrumentPlayHandle::play(sampleFrame * working_buffer)
 	m_instrument->play(working_buffer);
 
 	// Process the audio buffer that the instrument has just worked on...
-	const fpp_t frames = Engine::audioEngine()->framesPerPeriod();
+	const f_cnt_t frames = Engine::audioEngine()->framesPerPeriod();
 	instrumentTrack->processAudioBuffer(working_buffer, frames, nullptr);
 }
 

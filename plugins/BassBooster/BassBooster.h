@@ -38,7 +38,8 @@ class BassBoosterEffect : public Effect
 public:
 	BassBoosterEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key );
 	~BassBoosterEffect() override = default;
-	bool processAudioBuffer( sampleFrame* buf, const fpp_t frames ) override;
+
+	ProcessStatus processImpl(SampleFrame* buf, const f_cnt_t frames) override;
 
 	EffectControls* controls() override
 	{

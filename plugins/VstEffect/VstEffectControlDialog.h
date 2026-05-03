@@ -29,7 +29,6 @@
 
 #include <QSharedPointer>
 
-class QPixmap;
 class QPushButton;
 class QLabel;
 
@@ -61,8 +60,8 @@ private:
 
 	QPushButton * m_togglePluginButton;
 	PixmapButton * m_openPresetButton;
-	PixmapButton * m_rolLPresetButton;
-	PixmapButton * m_rolRPresetButton;
+	QPushButton* m_rolLPresetButton;
+	QPushButton* m_rolRPresetButton;
 	PixmapButton * m_managePluginButton;
 	PixmapButton * m_savePresetButton;
 

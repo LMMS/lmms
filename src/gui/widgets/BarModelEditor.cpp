@@ -1,7 +1,6 @@
 #include <BarModelEditor.h>
 
 #include <QPainter>
-#include <QStyle>
 
 
 namespace lmms::gui
@@ -86,7 +85,7 @@ void BarModelEditor::paintEvent(QPaintEvent *event)
 	// Paint the bar
 	// Compute the percentage as:
 	// min + x * (max - min) = v <=> x = (v - min) / (max - min)
-	auto const percentage = range == 0 ? 1. : (mod->value() - minValue) / range;
+	auto const percentage = range == 0 ? 1. : (model()->inverseScaledValue(model()->value()) - minValue) / range;
 
 	int const margin = 3;
 	QMargins const margins(margin, margin, margin, margin);

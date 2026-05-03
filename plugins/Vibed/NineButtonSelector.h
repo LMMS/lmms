@@ -27,11 +27,9 @@
 #define LMMS_GUI_NINE_BUTTON_SELECTOR_H
 
 #include <array>
-#include <memory>
 #include <QWidget>
 
 #include "AutomatableModelView.h"
-#include "PixmapButton.h"
 
 namespace lmms
 {
@@ -40,12 +38,14 @@ namespace lmms
 namespace gui
 {
 
+class PixmapButton;
+
 
 class NineButtonSelector : public QWidget, public IntModelView
 {
 	Q_OBJECT
 public:
-	NineButtonSelector(std::array<QPixmap, 18> onOffIcons, int defaultButton, int x, int y, QWidget* parent);
+	NineButtonSelector(const std::array<QPixmap, 18>& onOffIcons, int defaultButton, int x, int y, QWidget* parent);
 	~NineButtonSelector() override = default;
 
 protected:
@@ -62,7 +62,7 @@ private:
 	void modelChanged() override;
 	void updateButton(int);
 
-	std::array<std::unique_ptr<PixmapButton>, 9> m_buttons;
+	std::array<PixmapButton*, 9> m_buttons;
 	PixmapButton* m_lastBtn;
 };
 

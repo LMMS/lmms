@@ -30,7 +30,6 @@
 #include <QLineEdit>
 
 #include "Engine.h"
-#include "debug.h"
 #include "ConfigManager.h"
 #include "ComboBox.h"
 #include "AudioEngine.h"
@@ -42,15 +41,12 @@ AudioSoundIo::AudioSoundIo( bool & outSuccessful, AudioEngine * _audioEngine ) :
 	AudioDevice(std::clamp<ch_cnt_t>(
 		ConfigManager::inst()->value("audiosoundio", "channels").toInt(),
 		DEFAULT_CHANNELS,
-		SURROUND_CHANNELS), _audioEngine)
+		DEFAULT_CHANNELS), _audioEngine)
 {
 	outSuccessful = false;
 	m_soundio = nullptr;
 	m_outstream = nullptr;
-	m_outBuf = nullptr;
 	m_disconnectErr = 0;
-	m_outBufFrameIndex = 0;
-	m_outBufFramesTotal = 0;
 	m_stopped = true;
 	m_outstreamStarted = false;
 
@@ -152,7 +148,7 @@ AudioSoundIo::AudioSoundIo( bool & outSuccessful, AudioEngine * _audioEngine ) :
 			break;
 		}
 		if (closestSupportedSampleRate == -1 ||
-			abs(range->max - currentSampleRate) < abs(closestSupportedSampleRate - currentSampleRate))
+			std::abs(range->max - currentSampleRate) < std::abs(closestSupportedSampleRate - currentSampleRate))
 		{
 			closestSupportedSampleRate = range->max;
 		}
@@ -165,7 +161,7 @@ AudioSoundIo::AudioSoundIo( bool & outSuccessful, AudioEngine * _audioEngine ) :
 	}
 
 	m_outstream->name = "LMMS";
-	m_outstream->software_latency = (double)audioEngine()->framesPerPeriod() / (double)currentSampleRate;
+	m_outstream->software_latency = static_cast<double>(audioEngine()->framesPerAudioBuffer()) / currentSampleRate;
 	m_outstream->userdata = this;
 	m_outstream->write_callback = staticWriteCallback;
 	m_outstream->error_callback = staticErrorCallback;
@@ -193,8 +189,6 @@ void AudioSoundIo::onBackendDisconnect(int err)
 
 AudioSoundIo::~AudioSoundIo()
 {
-	stopProcessing();
-	
 	if (m_outstream)
 	{
 		soundio_outstream_destroy(m_outstream);
@@ -207,14 +201,8 @@ AudioSoundIo::~AudioSoundIo()
 	}
 }
 
-void AudioSoundIo::startProcessing()
+void AudioSoundIo::startProcessingImpl()
 {
-	m_outBufFrameIndex = 0;
-	m_outBufFramesTotal = 0;
-	m_outBufSize = audioEngine()->framesPerPeriod();
-
-	m_outBuf = new surroundSampleFrame[m_outBufSize];
-
 	if (! m_outstreamStarted)
 	{
 		if (int err = soundio_outstream_start(m_outstream))
@@ -238,7 +226,7 @@ void AudioSoundIo::startProcessing()
 	}
 }
 
-void AudioSoundIo::stopProcessing()
+void AudioSoundIo::stopProcessingImpl()
 {
 	m_stopped = true;
 	if (m_outstream)
@@ -249,12 +237,6 @@ void AudioSoundIo::stopProcessing()
 				"AudioSoundIo::stopProcessing() :: pausing result error: %s\n",
 				soundio_strerror(err));
 		}
-	}
-
-	if (m_outBuf)
-	{
-		delete[] m_outBuf;
-		m_outBuf = nullptr;
 	}
 }
 
@@ -270,55 +252,41 @@ void AudioSoundIo::underflowCallback()
 
 void AudioSoundIo::writeCallback(int frameCountMin, int frameCountMax)
 {
-	if (m_stopped) {return;}
-	const struct SoundIoChannelLayout *layout = &m_outstream->layout;
-	SoundIoChannelArea* areas;
-	int bytesPerSample = m_outstream->bytes_per_sample;
-	int framesLeft = frameCountMax;
+	const auto layout = static_cast<SoundIoChannelLayout*>(&m_outstream->layout);
+	auto areas = static_cast<SoundIoChannelArea*>(nullptr);
+	auto framesLeft = frameCountMax;
 
 	while (framesLeft > 0)
 	{
-		int frameCount = framesLeft;
-		if (int err = soundio_outstream_begin_write(m_outstream, &areas, &frameCount))
+		auto frameCount = framesLeft;
+		if (int error = soundio_outstream_begin_write(m_outstream, &areas, &frameCount))
 		{
-			errorCallback(err);
+			errorCallback(error);
 			return;
 		}
 
-		if (!frameCount)
-			break;
+		if (!frameCount) { break; }
 
-		
-		if (m_stopped)
+		auto buffers = std::array<float*, SOUNDIO_MAX_CHANNELS>{};
+
+		for (auto i = 0; i < layout->channel_count; ++i)
 		{
-			for (int channel = 0; channel < layout->channel_count; ++channel)
-			{
-				memset(areas[channel].ptr, 0, bytesPerSample * frameCount);
-				areas[channel].ptr += areas[channel].step * frameCount;
-			}
-			continue;
+			buffers[i] = reinterpret_cast<float*>(areas[i].ptr);
 		}
 
-		for (int frame = 0; frame < frameCount; frame += 1)
+		if (!isRunning())
 		{
-			if (m_outBufFrameIndex >= m_outBufFramesTotal)
+			for (auto i = 0; i < layout->channel_count; ++i)
 			{
-				m_outBufFramesTotal = getNextBuffer(m_outBuf);
-				if (m_outBufFramesTotal == 0)
-				{
-					m_stopped = true;
-					break;
-				}
-				m_outBufFrameIndex = 0;
+				std::fill_n(buffers[i], frameCount * layout->channel_count, 0.f);
 			}
 
-			for (int channel = 0; channel < layout->channel_count; channel += 1)
-			{
-				float sample = m_outBuf[m_outBufFrameIndex][channel];
-				memcpy(areas[channel].ptr, &sample, bytesPerSample);
-				areas[channel].ptr += areas[channel].step;
-			}
-			m_outBufFrameIndex += 1;
+			break;
+		}
+		else
+		{
+			audioEngine()->renderNextBuffer(
+				{buffers.data(), static_cast<ch_cnt_t>(layout->channel_count), static_cast<f_cnt_t>(frameCount)});
 		}
 
 		if (int err = soundio_outstream_end_write(m_outstream))
@@ -467,7 +435,8 @@ AudioSoundIo::setupWidget::setupWidget( QWidget * _parent ) :
 
 	reconnectSoundIo();
 
-	bool ok = connect( &m_backendModel, SIGNAL(dataChanged()), &m_setupUtil, SLOT(reconnectSoundIo()));
+	[[maybe_unused]] bool ok = connect(&m_backendModel, &ComboBoxModel::dataChanged,
+		&m_setupUtil, &AudioSoundIoSetupUtil::reconnectSoundIo);
 	assert(ok);
 
 	m_backend->setModel( &m_backendModel );
@@ -476,7 +445,8 @@ AudioSoundIo::setupWidget::setupWidget( QWidget * _parent ) :
 
 AudioSoundIo::setupWidget::~setupWidget()
 {
-	bool ok = disconnect( &m_backendModel, SIGNAL(dataChanged()), &m_setupUtil, SLOT(reconnectSoundIo()));
+	[[maybe_unused]] bool ok = disconnect(&m_backendModel, &ComboBoxModel::dataChanged,
+		&m_setupUtil, &AudioSoundIoSetupUtil::reconnectSoundIo);
 	assert(ok);
 	if (m_soundio)
 	{

@@ -1,6 +1,8 @@
 # Note:
 # 	The last version of Calf that was LADSPA-capable is version 0.0.18.2
 
+set_directory_properties(PROPERTIES SYSTEM TRUE)
+
 # Parse version info from autoconf
 FILE(READ veal/configure.ac VERSION_FILE)
 STRING(REPLACE "[" ";" VERSION_FILE ${VERSION_FILE} )
@@ -8,7 +10,7 @@ STRING(REPLACE "]" ";" VERSION_FILE ${VERSION_FILE} )
 LIST(GET VERSION_FILE 2 VERSION)
 CONFIGURE_FILE(config.h.in config.h)
 
-FILE(GLOB SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/veal/src/*.cpp")
+FILE(GLOB SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/veal/src/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/veal/src/*.c")
 LIST(SORT SOURCES)
 
 # Skip files matching pattern
@@ -35,16 +37,12 @@ SET_TARGET_PROPERTIES(veal PROPERTIES PREFIX "")
 TARGET_COMPILE_DEFINITIONS(veal PRIVATE DISABLE_OSC=1)
 
 SET(INLINE_FLAGS "")
-SET(OTHER_FLAGS "")
 IF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 	SET(INLINE_FLAGS -finline-functions-called-once -finline-limit=80)
-	SET(OTHER_FLAGS -Wno-format-overflow)
 ENDIF()
 
-if(MSVC)
-	target_compile_options(veal PRIVATE /wd4099 /wd4244 /wd4305)
-else()
-	target_compile_options(veal PRIVATE -fexceptions -O2 -finline-functions ${INLINE_FLAGS} ${OTHER_FLAGS})
+if(NOT MSVC)
+	target_compile_options(veal PRIVATE -fexceptions -O2 -finline-functions ${INLINE_FLAGS})
 endif()
 
 if(MSVC)

@@ -44,7 +44,7 @@ Plugin::Descriptor PLUGIN_EXPORT dualfilter_plugin_descriptor =
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
 	0x0100,
 	Plugin::Type::Effect,
-	new PluginPixmapLoader( "logo" ),
+	new PixmapLoader("lmms-plugin-logo"),
 	nullptr,
 	nullptr,
 } ;
@@ -77,23 +77,17 @@ DualFilterEffect::~DualFilterEffect()
 
 
 
-bool DualFilterEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
+Effect::ProcessStatus DualFilterEffect::processImpl(SampleFrame* buf, const f_cnt_t frames)
 {
-	if( !isEnabled() || !isRunning () )
-	{
-		return( false );
-	}
-
-	double outSum = 0.0;
 	const float d = dryLevel();
 	const float w = wetLevel();
 
-    if( m_dfControls.m_filter1Model.isValueChanged() || m_filter1changed )
+	if (m_dfControls.m_filter1Model.isValueChanged() || m_filter1changed)
 	{
 		m_filter1->setFilterType( static_cast<BasicFilters<2>::FilterType>(m_dfControls.m_filter1Model.value()) );
 		m_filter1changed = true;
 	}
-    if( m_dfControls.m_filter2Model.isValueChanged() || m_filter2changed )
+	if (m_dfControls.m_filter2Model.isValueChanged() || m_filter2changed)
 	{
 		m_filter2->setFilterType( static_cast<BasicFilters<2>::FilterType>(m_dfControls.m_filter2Model.value()) );
 		m_filter2changed = true;
@@ -138,7 +132,7 @@ bool DualFilterEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames 
 
 
 	// buffer processing loop
-	for( fpp_t f = 0; f < frames; ++f )
+	for( f_cnt_t f = 0; f < frames; ++f )
 	{
 		// get mix amounts for wet signals of both filters
 		const float mix2 = ( ( *mixPtr + 1.0f ) * 0.5f );
@@ -201,7 +195,6 @@ bool DualFilterEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames 
 		// do another mix with dry signal
 		buf[f][0] = d * buf[f][0] + w * s[0];
 		buf[f][1] = d * buf[f][1] + w * s[1];
-		outSum += buf[f][0] * buf[f][0] + buf[f][1] * buf[f][1];
 
 		//increment pointers
 		cut1Ptr += cut1Inc;
@@ -213,9 +206,7 @@ bool DualFilterEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames 
 		mixPtr += mixInc;
 	}
 
-	checkGate( outSum / frames );
-
-	return isRunning();
+	return ProcessStatus::ContinueIfNotQuiet;
 }
 
 void DualFilterEffect::onEnabledChanged()

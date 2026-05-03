@@ -3,6 +3,7 @@
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2023 Michael Gregorius
+ * Copyright (c) 2026 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -28,9 +29,9 @@
 
 #include <QWidget>
 #include <QPoint>
+#include <optional>
 
 #include "AutomatableModelView.h"
-
 
 namespace lmms::gui
 {
@@ -41,13 +42,10 @@ class LMMS_EXPORT FloatModelEditorBase : public QWidget, public FloatModelView
 {
 	Q_OBJECT
 
-	mapPropertyFromModel(bool, isVolumeKnob, setVolumeKnob, m_volumeKnob);
-	mapPropertyFromModel(float, volumeRatio, setVolumeRatio, m_volumeRatio);
-
 	void initUi(const QString & name); //!< to be called by ctors
 
 public:
-	enum class DirectionOfManipulation
+	enum class DirectionOfManipulation : bool
 	{
 		Vertical,
 		Horizontal
@@ -68,7 +66,6 @@ signals:
 	void sliderReleased();
 	void sliderMoved(float value);
 
-
 protected:
 	void contextMenuEvent(QContextMenuEvent * me) override;
 	void dragEnterEvent(QDragEnterEvent * dee) override;
@@ -81,22 +78,55 @@ protected:
 	void paintEvent(QPaintEvent * me) override;
 	void wheelEvent(QWheelEvent * me) override;
 
-	void enterEvent(QEvent *event) override;
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+	void enterEvent(QEnterEvent*) override;
+#else
+	void enterEvent(QEvent*) override;
+#endif
 	void leaveEvent(QEvent *event) override;
 
 	virtual float getValue(const QPoint & p);
 
-private slots:
-	virtual void enterValue();
-	void friendlyUpdate();
-	void toggleScale();
+	/**
+	 * This method is called just prior to displaying the floating text
+	 * in order to set its value. If the getCustomFloatingTextUpdate() method
+	 * is not overridden, this method is also called to periodically update
+	 * the floating text.
+	 *
+	 * Floating text is displayed in the following format:
+	 *     "[description] [custom text][unit]"
+	 *
+	 * This method controls only the "custom text" portion.
+	 * To modify the other portions, call setDescription() or setUnit().
+	 */
+	virtual QString getCustomFloatingText();
 
-private:
-	virtual QString displayValue() const;
+	/**
+	 * This method is called periodically while the floating text is visible
+	 * and the value of the float model is changing, allowing dynamic updates
+	 * of the floating text.
+	 *
+	 * Floating text is displayed in the following format:
+	 *     "[description] [custom text][unit]"
+	 *
+	 * This method controls only the "custom text" portion.
+	 * To modify the other portions, call setDescription() or setUnit().
+	 *
+	 * @returns the up-to-date value for the floating text, or std::nullopt to indicate
+	 *          nothing changed and the previous floating text value should continue being used
+	 */
+	virtual std::optional<QString> getCustomFloatingTextUpdate()
+	{
+		return getCustomFloatingText();
+	}
 
 	void doConnections() override;
 
 	void showTextFloat(int msecBeforeDisplay, int msecDisplayTime);
+	void showTextFloat();
+
+	const SimpleTextFloat& textFloat() const { return *s_textFloat; }
+
 	void setPosition(const QPoint & p);
 
 	inline float pageSize() const
@@ -104,16 +134,19 @@ private:
 		return (model()->maxValue() - model()->minValue()) / 100.0f;
 	}
 
-	static SimpleTextFloat * s_textFloat;
-
-	BoolModel m_volumeKnob;
-	FloatModel m_volumeRatio;
-
 	QPoint m_lastMousePos; //!< mouse position in last mouseMoveEvent
 	float m_leftOver;
 	bool m_buttonPressed;
 
 	DirectionOfManipulation m_directionOfManipulation;
+
+private slots:
+	virtual void enterValue();
+	void friendlyUpdate();
+	void toggleScale();
+
+private:
+	static SimpleTextFloat* s_textFloat;
 };
 
 } // namespace lmms::gui

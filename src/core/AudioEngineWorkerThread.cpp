@@ -28,13 +28,10 @@
 #include <QMutex>
 #include <QWaitCondition>
 
-#include "denormals.h"
 #include "AudioEngine.h"
+#include "Hardware.h"
 #include "ThreadableJob.h"
 
-#if __SSE__
-#include <xmmintrin.h>
-#endif
 
 namespace lmms
 {
@@ -79,7 +76,7 @@ void AudioEngineWorkerThread::JobQueue::run()
 	while (processedJob && m_itemsDone < m_writeIndex)
 	{
 		processedJob = false;
-		for( int i = 0; i < m_writeIndex && i < JOB_QUEUE_SIZE; ++i )
+		for (auto i = std::size_t{0}; i < m_writeIndex && i < JOB_QUEUE_SIZE; ++i)
 		{
 			ThreadableJob * job = m_items[i].exchange(nullptr);
 			if( job )
@@ -99,12 +96,7 @@ void AudioEngineWorkerThread::JobQueue::run()
 
 void AudioEngineWorkerThread::JobQueue::wait()
 {
-	while (m_itemsDone < m_writeIndex)
-	{
-#ifdef __SSE__
-		_mm_pause();
-#endif
-	}
+	while (m_itemsDone < m_writeIndex) { busyWaitHint(); }
 }
 
 
@@ -166,7 +158,7 @@ void AudioEngineWorkerThread::startAndWaitForJobs()
 
 void AudioEngineWorkerThread::run()
 {
-	disable_denormals();
+	disableDenormals();
 
 	QMutex m;
 	while( m_quit == false )

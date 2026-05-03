@@ -32,6 +32,7 @@
 
 #include "Instrument.h"
 #include "Sample.h"
+#include "LmmsTypes.h"
 
 
 namespace lmms
@@ -44,7 +45,7 @@ public:
 	AudioFileProcessor( InstrumentTrack * _instrument_track );
 
 	void playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer ) override;
+						SampleFrame* _working_buffer ) override;
 	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
 	void saveSettings(QDomDocument& doc, QDomElement& elem) override;
@@ -54,7 +55,7 @@ public:
 
 	QString nodeName() const override;
 
-	auto beatLen(NotePlayHandle* note) const -> int override;
+	auto beatLen(NotePlayHandle* note) const -> f_cnt_t override;
 
 	float desiredReleaseTimeMs() const override
 	{

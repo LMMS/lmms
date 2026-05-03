@@ -29,8 +29,8 @@
 #include <QFileInfo>
 
 #include "AudioEngine.h"
+#include "Oscillator.h"
 #include "PathUtil.h"
-#include "SampleLoader.h"
 #include "Song.h"
 
 namespace lmms
@@ -39,9 +39,9 @@ namespace lmms
 
 LfoController::LfoController( Model * _parent ) :
 	Controller( ControllerType::Lfo, _parent, tr( "LFO Controller" ) ),
-	m_baseModel( 0.5, 0.0, 1.0, 0.001, this, tr( "Base value" ) ),
-	m_speedModel( 2.0, 0.01, 20.0, 0.0001, 20000.0, this, tr( "Oscillator speed" ) ),
-	m_amountModel( 1.0, -1.0, 1.0, 0.005, this, tr( "Oscillator amount" ) ),
+	m_baseModel(0.5f, 0.f, 1.f, 0.001f, this, tr("Base value")),
+	m_speedModel(2.f, 0.01f, 20.f, 0.0001f, 20000.f, this, tr("Oscillator speed")),
+	m_amountModel(1.f, -1.f, 1.f, 0.005f, this, tr("Oscillator amount")),
 	m_phaseModel( 0.0, 0.0, 360.0, 4.0, this, tr( "Oscillator phase" ) ),
 	m_waveModel( static_cast<int>(Oscillator::WaveShape::Sine), 0, Oscillator::NumWaveShapes,
 			this, tr( "Oscillator waveform" ) ),
@@ -65,8 +65,8 @@ LfoController::LfoController( Model * _parent ) :
 
 	connect( Engine::getSong(), SIGNAL(playbackStateChanged()),
 			this, SLOT(updatePhase()));
-	connect( Engine::getSong(), SIGNAL(playbackPositionChanged()),
-			this, SLOT(updatePhase()));
+	connect(Engine::getSong(), &Song::playbackPositionJumped,
+			this, &LfoController::updatePhase);
 
 	updateDuration();
 }
@@ -243,7 +243,7 @@ void LfoController::loadSettings( const QDomElement & _this )
 	{
 		if (QFileInfo(PathUtil::toAbsolute(userWaveFile)).exists())
 		{
-			m_userDefSampleBuffer = gui::SampleLoader::createBufferFromFile(_this.attribute("userwavefile"));
+			m_userDefSampleBuffer = SampleBuffer::fromFile(_this.attribute("userwavefile"));
 		}
 		else { Engine::getSong()->collectError(QString("%1: %2").arg(tr("Sample not found"), userWaveFile)); }
 	}

@@ -22,7 +22,7 @@ find_path(FluidSynth_INCLUDE_DIR
 )
 
 find_library(FluidSynth_LIBRARY
-	NAMES "fluidsynth"
+	NAMES "fluidsynth" "fluidsynth-3" "fluidsynth-2" "fluidsynth-1"
 	HINTS ${FLUIDSYNTH_PKG_LIBRARY_DIRS}
 )
 
@@ -31,6 +31,11 @@ if(FluidSynth_INCLUDE_DIR AND FluidSynth_LIBRARY)
 	set_target_properties(fluidsynth PROPERTIES
 		INTERFACE_INCLUDE_DIRECTORIES "${FluidSynth_INCLUDE_DIR}"
 	)
+
+	if(MINGW)
+		# Workaround for fluidsynth on MinGW
+		target_link_libraries(fluidsynth INTERFACE ws2_32)
+	endif()
 
 	if(VCPKG_INSTALLED_DIR)
 		include(ImportedTargetHelpers)

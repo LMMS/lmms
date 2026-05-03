@@ -94,17 +94,13 @@ SongEditor::SongEditor( Song * song ) :
 					 : DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH),
 	m_selectRegion(false)
 {
-	m_zoomingModel->setParent(this);
-	m_snappingModel->setParent(this);
-
+	// Set up timeline
 	m_timeLine = new TimeLineWidget(m_trackHeadWidth, 32, pixelsPerBar(),
-		m_song->getPlayPos(Song::PlayMode::Song),
 		m_song->getTimeline(Song::PlayMode::Song),
-		m_currentPosition, Song::PlayMode::Song, this
+		m_currentPosition, this
 	);
-	connect(this, &TrackContainerView::positionChanged, m_timeLine, &TimeLineWidget::updatePosition);
-	connect( m_timeLine, SIGNAL( positionChanged( const lmms::TimePos& ) ),
-			this, SLOT( updatePosition( const lmms::TimePos& ) ) );
+	connect(this, &TrackContainerView::positionChanged, m_timeLine, qOverload<>(&QWidget::update));
+	connect(m_timeLine->timeline(), &Timeline::positionChanged, this, &SongEditor::updatePosition);
 	connect( m_timeLine, SIGNAL(regionSelectedFromPixels(int,int)),
 			this, SLOT(selectRegionFromPixels(int,int)));
 	connect( m_timeLine, SIGNAL(selectionFinished()),
@@ -113,7 +109,7 @@ SongEditor::SongEditor( Song * song ) :
 	// when tracks realign, adjust height of position line
 	connect(this, &TrackContainerView::tracksRealigned, this, &SongEditor::updatePositionLine);
 
-	m_positionLine = new PositionLine(this);
+	m_positionLine = new PositionLine(this, Song::PlayMode::Song);
 	static_cast<QVBoxLayout *>( layout() )->insertWidget( 1, m_timeLine );
 
 	connect( m_song, SIGNAL(playbackStateChanged()),
@@ -122,7 +118,10 @@ SongEditor::SongEditor( Song * song ) :
 	// When zoom changes, update position line
 	// But we must convert pixels per bar to a zoom factor where 1.0 is 100%
 	connect(this, &SongEditor::pixelsPerBarChanged, m_positionLine,
-		[this]() { m_positionLine->zoomChange(pixelsPerBar() / float(DEFAULT_PIXELS_PER_BAR)); });
+		[this]() {
+			m_positionLine->zoomChange(pixelsPerBar() / float(DEFAULT_PIXELS_PER_BAR));
+			updatePositionLine();
+		});
 
 	// Ensure loop markers snap to same increments as clips. Zoom & proportional
 	// snap changes are handled in zoomingChanged() and toggleProportionalSnap()
@@ -231,10 +230,10 @@ SongEditor::SongEditor( Song * song ) :
 	static_cast<QVBoxLayout *>( layout() )->insertWidget( 0, m_timeLine );
 
 	m_leftRightScroll = new QScrollBar( Qt::Horizontal, this );
-	m_leftRightScroll->setMinimum( 0 );
-	m_leftRightScroll->setMaximum( 0 );
-	m_leftRightScroll->setSingleStep( 1 );
-	m_leftRightScroll->setPageStep( 20 );
+	m_leftRightScroll->setMinimum(0);
+	m_leftRightScroll->setMaximum(0);
+	m_leftRightScroll->setSingleStep(1);
+	m_leftRightScroll->setPageStep(20 * TimePos::ticksPerBar());
 	static_cast<QVBoxLayout *>( layout() )->addWidget( m_leftRightScroll );
 	connect( m_leftRightScroll, SIGNAL(valueChanged(int)),
 					this, SLOT(scrolled(int)));
@@ -244,10 +243,16 @@ SongEditor::SongEditor( Song * song ) :
 	connect(contentWidget()->verticalScrollBar(), SIGNAL(valueChanged(int)),this, SLOT(updateRubberband()));
 	connect(m_timeLine, SIGNAL(selectionFinished()), this, SLOT(stopSelectRegion()));
 
-	//zoom connects
+
+	// Set up zooming model
+	m_zoomingModel->setParent(this);
+	m_zoomingModel->setJournalling(false);
 	connect(m_zoomingModel, SIGNAL(dataChanged()), this, SLOT(zoomingChanged()));
+	m_zoomingModel->setInitValue(ConfigManager::inst()->value("ui","songeditorzoom",QString::number(calculateZoomSliderValue(DEFAULT_PIXELS_PER_BAR))).toInt());
+
 
 	// Set up snapping model
+	m_snappingModel->setParent(this);
 	for (float bars : SNAP_SIZES)
 	{
 		if (bars > 1.0f)
@@ -263,13 +268,17 @@ SongEditor::SongEditor( Song * song ) :
 			m_snappingModel->addItem(QString("1/%1 Bar").arg(1 / bars));
 		}
 	}
-	m_snappingModel->setInitValue( m_snappingModel->findText( "1/4 Bar" ) );
+	m_snappingModel->setInitValue(ConfigManager::inst()->value("ui", "songeditorsnap", QString::number(m_snappingModel->findText( "1/4 Bar" ))).toInt());
 
 	setFocusPolicy( Qt::StrongFocus );
 	setFocus();
 }
 
-
+SongEditor::~SongEditor()
+{
+	ConfigManager::inst()->setValue("ui", "songeditorzoom", QString::number(m_zoomingModel->value()));
+	ConfigManager::inst()->setValue("ui", "songeditorsnap", QString::number(m_snappingModel->value()));
+}
 
 
 void SongEditor::saveSettings( QDomDocument& doc, QDomElement& element )
@@ -325,7 +334,8 @@ QString SongEditor::getSnapSizeString() const
 void SongEditor::scrolled( int new_pos )
 {
 	update();
-	emit positionChanged( m_currentPosition = TimePos( new_pos, 0 ) );
+	emit positionChanged(m_currentPosition = TimePos(new_pos));
+	updatePositionLine();
 }
 
 
@@ -384,7 +394,7 @@ void SongEditor::updateRubberband()
 		}
 
 		//take care of the scrollbar position
-		int hs = (m_leftRightScroll->value() - m_scrollPos.x()) * pixelsPerBar();
+		int hs = (m_leftRightScroll->value() - m_scrollPos.x()) * pixelsPerBar() / TimePos::ticksPerBar();
 		int vs = contentWidget()->verticalScrollBar()->value() - m_scrollPos.y();
 
 		//the adjusted origin point
@@ -469,7 +479,7 @@ void SongEditor::keyPressEvent( QKeyEvent * ke )
 	}
 	else if( ke->key() == Qt::Key_Left )
 	{
-		tick_t t = m_song->currentTick() - TimePos::ticksPerBar();
+		tick_t t = m_song->getPlayPos(Song::PlayMode::Song).getTicks() - TimePos::ticksPerBar();
 		if( t >= 0 )
 		{
 			m_song->setPlayPos( t, Song::PlayMode::Song );
@@ -477,7 +487,7 @@ void SongEditor::keyPressEvent( QKeyEvent * ke )
 	}
 	else if( ke->key() == Qt::Key_Right )
 	{
-		tick_t t = m_song->currentTick() + TimePos::ticksPerBar();
+		tick_t t = m_song->getPlayPos(Song::PlayMode::Song).getTicks() + TimePos::ticksPerBar();
 		if( t < MaxSongLength )
 		{
 			m_song->setPlayPos( t, Song::PlayMode::Song );
@@ -516,14 +526,21 @@ void SongEditor::keyPressEvent( QKeyEvent * ke )
 
 
 
+void SongEditor::adjustLeftRightScoll(int value)
+{
+	m_leftRightScroll->setValue(m_leftRightScroll->value()
+						- value * DEFAULT_PIXELS_PER_BAR / pixelsPerBar());
+}
+
 
 void SongEditor::wheelEvent( QWheelEvent * we )
 {
-	if ((we->modifiers() & Qt::ControlModifier) && (position(we).x() > m_trackHeadWidth))
+	const auto posX = we->position().toPoint().x();
+	if ((we->modifiers() & Qt::ControlModifier) && (posX > m_trackHeadWidth))
 	{
-		int x = position(we).x() - m_trackHeadWidth;
-		// bar based on the mouse x-position where the scroll wheel was used
-		int bar = x / pixelsPerBar();
+		int x = posX - m_trackHeadWidth;
+		// tick based on the mouse x-position where the scroll wheel was used
+		int tick = x / pixelsPerBar() * TimePos::ticksPerBar();
 
 		// move zoom slider (pixelsPerBar will change automatically)
 		int step = we->modifiers() & Qt::ShiftModifier ? 1 : 5;
@@ -531,9 +548,9 @@ void SongEditor::wheelEvent( QWheelEvent * we )
 		int direction = (we->angleDelta().y() + we->angleDelta().x()) > 0 ? 1 : -1;
 		m_zoomingModel->incValue(step * direction);
 
-		// scroll to zooming around cursor's bar
-		int newBar = static_cast<int>(x / pixelsPerBar());
-		m_leftRightScroll->setValue(m_leftRightScroll->value() + bar - newBar);
+		// scroll to zooming around cursor's tick
+		int newTick = static_cast<int>(x / pixelsPerBar() * TimePos::ticksPerBar());
+		m_leftRightScroll->setValue(m_leftRightScroll->value() + tick - newTick);
 
 		// update timeline
 		m_timeLine->setPixelsPerBar(pixelsPerBar());
@@ -542,15 +559,13 @@ void SongEditor::wheelEvent( QWheelEvent * we )
 	}
 
 	// FIXME: Reconsider if determining orientation is necessary in Qt6.
-	else if(abs(we->angleDelta().x()) > abs(we->angleDelta().y())) // scrolling is horizontal
+	else if (std::abs(we->angleDelta().x()) > std::abs(we->angleDelta().y())) // scrolling is horizontal
 	{
-		m_leftRightScroll->setValue(m_leftRightScroll->value() -
-							we->angleDelta().x() /30);
+		adjustLeftRightScoll(we->angleDelta().x());
 	}
-	else if(we->modifiers() & Qt::ShiftModifier)
+	else if (we->modifiers() & Qt::ShiftModifier)
 	{
-		m_leftRightScroll->setValue(m_leftRightScroll->value() -
-							we->angleDelta().y() / 30);
+		adjustLeftRightScoll(we->angleDelta().y());
 	}
 	else
 	{
@@ -562,29 +577,16 @@ void SongEditor::wheelEvent( QWheelEvent * we )
 
 
 
-void SongEditor::closeEvent( QCloseEvent * ce )
-{
-	if( parentWidget() )
-	{
-		parentWidget()->hide();
-	}
-	else
-	{
-		hide();
-	}
-	ce->ignore();
-}
-
-
-
 
 void SongEditor::mousePressEvent(QMouseEvent *me)
 {
+	const auto pos = position(me);
+	
 	if (allowRubberband())
 	{
 		//we save the position of scrollbars, mouse position and zooming level
 		m_scrollPos = QPoint(m_leftRightScroll->value(), contentWidget()->verticalScrollBar()->value());
-		m_origin = contentWidget()->mapFromParent(QPoint(me->pos().x(), me->pos().y()));
+		m_origin = contentWidget()->mapFromParent(pos);
 		m_rubberbandPixelsPerBar = pixelsPerBar();
 
 		//paint the rubberband
@@ -593,8 +595,8 @@ void SongEditor::mousePressEvent(QMouseEvent *me)
 		rubberBand()->show();
 
 		//the trackView(index) and the time position where the mouse was clicked
-		m_rubberBandStartTrackview = trackIndexFromSelectionPoint(me->y());
-		m_rubberbandStartTimePos = TimePos((me->x() - m_trackHeadWidth)
+		m_rubberBandStartTrackview = trackIndexFromSelectionPoint(pos.y());
+		m_rubberbandStartTimePos = TimePos((pos.x() - m_trackHeadWidth)
 											/ pixelsPerBar() * TimePos::ticksPerBar())
 											+ m_currentPosition;
 	}
@@ -606,7 +608,7 @@ void SongEditor::mousePressEvent(QMouseEvent *me)
 
 void SongEditor::mouseMoveEvent(QMouseEvent *me)
 {
-	m_mousePos = me->pos();
+	m_mousePos = position(me);
 	updateRubberband();
 	QWidget::mouseMoveEvent(me);
 }
@@ -711,9 +713,9 @@ void SongEditor::hideMasterPitchFloat( void )
 
 
 
-void SongEditor::updateScrollBar( int len )
+void SongEditor::updateScrollBar(int len)
 {
-	m_leftRightScroll->setMaximum( len );
+	m_leftRightScroll->setMaximum(len * TimePos::ticksPerBar());
 }
 
 
@@ -750,41 +752,34 @@ static inline void animateScroll( QScrollBar *scrollBar, int newVal, bool smooth
 
 
 
-void SongEditor::updatePosition( const TimePos & t )
+void SongEditor::updatePosition()
 {
+	const TimePos& t = m_timeLine->timeline()->pos();
 	const bool compactTrackButtons = ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt();
 	const auto widgetWidth = compactTrackButtons ? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT : DEFAULT_SETTINGS_WIDGET_WIDTH;
 	const auto trackOpWidth = compactTrackButtons ? TRACK_OP_WIDTH_COMPACT : TRACK_OP_WIDTH;
 
-	if( ( m_song->isPlaying() && m_song->m_playMode == Song::PlayMode::Song
-		  && m_timeLine->autoScroll() == TimeLineWidget::AutoScrollState::Enabled) ||
-							m_scrollBack == true )
+	if ((m_song->isPlaying() && m_song->m_playMode == Song::PlayMode::Song)
+							|| m_scrollBack)
 	{
 		m_smoothScroll = ConfigManager::inst()->value( "ui", "smoothscroll" ).toInt();
 		const int w = width() - widgetWidth
 							- trackOpWidth
 							- contentWidget()->verticalScrollBar()->width(); // width of right scrollbar
-		if( t > m_currentPosition + w * TimePos::ticksPerBar() /
-							pixelsPerBar() )
+		
+		if (m_timeLine->autoScroll() == TimeLineWidget::AutoScrollState::Stepped)
 		{
-			animateScroll( m_leftRightScroll, t.getBar(), m_smoothScroll );
+			const auto nextPosition = m_currentPosition + w * TimePos::ticksPerBar() / pixelsPerBar();
+			if (t > nextPosition || t < m_currentPosition) 
+			{
+				animateScroll(m_leftRightScroll, t.getTicks(), m_smoothScroll);
+			}
 		}
-		else if( t < m_currentPosition )
+		else if (m_timeLine->autoScroll() == TimeLineWidget::AutoScrollState::Continuous)
 		{
-			animateScroll( m_leftRightScroll, t.getBar(), m_smoothScroll );
+			m_leftRightScroll->setValue(std::max(t.getTicks() - w * TimePos::ticksPerBar() / pixelsPerBar() / 2, 0.0f));
 		}
 		m_scrollBack = false;
-	}
-
-	const int x = m_timeLine->markerX(t);
-	if( x >= trackOpWidth + widgetWidth -1 )
-	{
-		m_positionLine->show();
-		m_positionLine->move( x-( m_positionLine->width() - 1 ), m_timeLine->height() );
-	}
-	else
-	{
-		m_positionLine->hide();
 	}
 
 	updatePositionLine();
@@ -795,6 +790,20 @@ void SongEditor::updatePosition( const TimePos & t )
 
 void SongEditor::updatePositionLine()
 {
+	const bool compactTrackButtons = ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt();
+	const auto widgetWidth = compactTrackButtons ? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT : DEFAULT_SETTINGS_WIDGET_WIDTH;
+	const auto trackOpWidth = compactTrackButtons ? TRACK_OP_WIDTH_COMPACT : TRACK_OP_WIDTH;
+	const int x = m_timeLine->markerX(m_timeLine->timeline()->pos());
+	if( x >= trackOpWidth + widgetWidth -1 )
+	{
+		m_positionLine->show();
+		m_positionLine->move( x-( m_positionLine->width() - 1 ), m_timeLine->height() );
+	}
+	else
+	{
+		m_positionLine->hide();
+	}
+
 	m_positionLine->setFixedHeight(totalHeightOfTracks());
 }
 
@@ -952,7 +961,7 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 
 	m_editModeGroup = new ActionGroup(this);
 	m_drawModeAction = m_editModeGroup->addAction(embed::getIconPixmap("edit_draw"), tr("Draw mode"));
-	m_knifeModeAction = m_editModeGroup->addAction(embed::getIconPixmap("edit_knife"), tr("Knife mode (split sample clips)"));
+	m_knifeModeAction = m_editModeGroup->addAction(embed::getIconPixmap("edit_knife"), tr("Knife mode (split clips)"));
 	m_selectModeAction = m_editModeGroup->addAction(embed::getIconPixmap("edit_select"), tr("Edit mode (select and move)"));
 	m_drawModeAction->setChecked(true);
 
@@ -1085,6 +1094,8 @@ void SongEditorWindow::play()
 void SongEditorWindow::record()
 {
 	m_editor->m_song->record();
+	m_editor->m_timeLine->setRecording(true);
+	m_editor->m_positionLine->setRecording(true);
 }
 
 
@@ -1093,6 +1104,8 @@ void SongEditorWindow::record()
 void SongEditorWindow::recordAccompany()
 {
 	m_editor->m_song->playAndRecord();
+	m_editor->m_timeLine->setRecording(true);
+	m_editor->m_positionLine->setRecording(true);
 }
 
 
@@ -1102,6 +1115,8 @@ void SongEditorWindow::stop()
 {
 	m_editor->m_song->stop();
 	getGUI()->pianoRoll()->stopRecording();
+	m_editor->m_timeLine->setRecording(false);
+	m_editor->m_positionLine->setRecording(false);
 }
 
 
@@ -1123,7 +1138,7 @@ void SongEditorWindow::adjustUiAfterProjectLoad()
 {
 	// make sure to bring us to front as the song editor is the central
 	// widget in a song and when just opening a song in order to listen to
-	// it, it's very annyoing to manually bring up the song editor each time
+	// it, it's very annoying to manually bring up the song editor each time
 	getGUI()->mainWindow()->workspace()->setActiveSubWindow(
 			qobject_cast<QMdiSubWindow *>( parentWidget() ) );
 	connect( qobject_cast<SubWindow *>( parentWidget() ), SIGNAL(focusLost()), this, SLOT(lostFocus()));

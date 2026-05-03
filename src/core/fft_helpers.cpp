@@ -27,7 +27,7 @@
 #include "fft_helpers.h"
 
 #include <cmath>
-#include "lmms_constants.h"
+#include <numbers>
 
 namespace lmms
 {
@@ -104,6 +104,7 @@ int notEmpty(const std::vector<float> &spectrum)
  */
 int precomputeWindow(float *window, unsigned int length, FFTWindow type, bool normalized)
 {
+	using namespace std::numbers;
 	if (window == nullptr) {return -1;}
 
 	float gain = 0;
@@ -122,13 +123,13 @@ int precomputeWindow(float *window, unsigned int length, FFTWindow type, bool no
 			gain = 1;
 			return 0;
 		case FFTWindow::BlackmanHarris:	
-			a0 = 0.35875;
-			a1 = 0.48829;
-			a2 = 0.14128;
-			a3 = 0.01168;
+			a0 = 0.35875f;
+			a1 = 0.48829f;
+			a2 = 0.14128f;
+			a3 = 0.01168f;
 			break;
 		case FFTWindow::Hamming:
-			a0 = 0.54;
+			a0 = 0.54f;
 			a1 = 1.0 - a0;
 			a2 = 0;
 			a3 = 0;
@@ -144,9 +145,9 @@ int precomputeWindow(float *window, unsigned int length, FFTWindow type, bool no
 	// common computation for cosine-sum based windows
 	for (unsigned int i = 0; i < length; i++)
 	{
-		window[i] =	(a0 - a1 * cos(2 * F_PI * i / ((float)length - 1.0))
-						+ a2 * cos(4 * F_PI * i / ((float)length - 1.0))
-						- a3 * cos(6 * F_PI * i / ((float)length - 1.0)));
+		window[i] = (a0 - a1 * std::cos(2 * pi_v<float> * i / (static_cast<float>(length) - 1.0))
+			+ a2 * std::cos(4 * pi_v<float> * i / (static_cast<float>(length) - 1.0))
+			- a3 * std::cos(6 * pi_v<float> * i / (static_cast<float>(length) - 1.0)));
 		gain += window[i];
 	}
 
@@ -204,11 +205,11 @@ int compressbands(const float *absspec_buffer, float *compressedband, int num_ol
 
 		float j_min = (i * ratio) + bottom;
 
-		if (j_min < 0) {j_min = bottom;}
+		if (j_min < 0) { j_min = static_cast<float>(bottom); }
 
 		float j_max = j_min + ratio;
 
-		for (float j = (int)j_min; j <= j_max; j++)
+		for (float j = std::floor(j_min); j <= j_max; j++)
 		{
 			compressedband[i] += absspec_buffer[(int)j];
 		}

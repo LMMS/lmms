@@ -32,14 +32,13 @@
 #include <jack/jack.h>
 #include <jack/midiport.h>
 #else
-#include "weak_libjack.h"
+#include <weak_libjack.h>
 #endif
 
 #include <QThread>
 
 #include "MidiClient.h"
 
-class QLineEdit;
 
 namespace lmms
 {

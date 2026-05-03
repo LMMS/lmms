@@ -25,58 +25,73 @@
 #ifndef LMMS_MIX_HELPERS_H
 #define LMMS_MIX_HELPERS_H
 
-#include "lmms_basics.h"
+#include "AudioBufferView.h"
 
 namespace lmms
 {
 
 class ValueBuffer;
+class SampleFrame;
+
 namespace MixHelpers
 {
 
-bool isSilent( const sampleFrame* src, int frames );
+bool isSilent( const SampleFrame* src, int frames );
+
+bool isSilent(std::span<sample_t> buffer);
 
 bool useNaNHandler();
 
 void setNaNHandler( bool use );
 
-bool sanitize( sampleFrame * src, int frames );
+/**
+ * @brief Sanitizes a buffer of infs/NaNs, zeroing the entire buffer if
+ *        any is detected.
+ *
+ * Only performs sanitization when the NaN handler is active.
+ *
+ * @returns true if inf or NaN was detected
+ */
+bool sanitize(std::span<sample_t> buffer);
 
 /*! \brief Add samples from src to dst */
-void add( sampleFrame* dst, const sampleFrame* src, int frames );
+void add( SampleFrame* dst, const SampleFrame* src, int frames );
+
+/*! \brief Add samples from src to dst */
+void add(PlanarBufferView<sample_t> dst, PlanarBufferView<const sample_t> src);
 
 /*! \brief Multiply samples from `dst` by `coeff` */
-void multiply(sampleFrame* dst, float coeff, int frames);
+void multiply(SampleFrame* dst, float coeff, int frames);
 
 /*! \brief Add samples from src multiplied by coeffSrc to dst */
-void addMultiplied( sampleFrame* dst, const sampleFrame* src, float coeffSrc, int frames );
+void addMultiplied( SampleFrame* dst, const SampleFrame* src, float coeffSrc, int frames );
 
 /*! \brief Add samples from src multiplied by coeffSrc to dst, swap inputs */
-void addSwappedMultiplied( sampleFrame* dst, const sampleFrame* src, float coeffSrc, int frames );
+void addSwappedMultiplied( SampleFrame* dst, const SampleFrame* src, float coeffSrc, int frames );
 
 /*! \brief Add samples from src multiplied by coeffSrc and coeffSrcBuf to dst */
-void addMultipliedByBuffer( sampleFrame* dst, const sampleFrame* src, float coeffSrc, ValueBuffer * coeffSrcBuf, int frames );
+void addMultipliedByBuffer( SampleFrame* dst, const SampleFrame* src, float coeffSrc, ValueBuffer * coeffSrcBuf, int frames );
 
 /*! \brief Add samples from src multiplied by coeffSrc and coeffSrcBuf to dst */
-void addMultipliedByBuffers( sampleFrame* dst, const sampleFrame* src, ValueBuffer * coeffSrcBuf1, ValueBuffer * coeffSrcBuf2, int frames );
+void addMultipliedByBuffers( SampleFrame* dst, const SampleFrame* src, ValueBuffer * coeffSrcBuf1, ValueBuffer * coeffSrcBuf2, int frames );
 
 /*! \brief Same as addMultiplied, but sanitize output (strip out infs/nans) */
-void addSanitizedMultiplied( sampleFrame* dst, const sampleFrame* src, float coeffSrc, int frames );
+void addSanitizedMultiplied( SampleFrame* dst, const SampleFrame* src, float coeffSrc, int frames );
 
 /*! \brief Add samples from src multiplied by coeffSrc and coeffSrcBuf to dst - sanitized version */
-void addSanitizedMultipliedByBuffer( sampleFrame* dst, const sampleFrame* src, float coeffSrc, ValueBuffer * coeffSrcBuf, int frames );
+void addSanitizedMultipliedByBuffer( SampleFrame* dst, const SampleFrame* src, float coeffSrc, ValueBuffer * coeffSrcBuf, int frames );
 
 /*! \brief Add samples from src multiplied by coeffSrc and coeffSrcBuf to dst - sanitized version */
-void addSanitizedMultipliedByBuffers( sampleFrame* dst, const sampleFrame* src, ValueBuffer * coeffSrcBuf1, ValueBuffer * coeffSrcBuf2, int frames );
+void addSanitizedMultipliedByBuffers( SampleFrame* dst, const SampleFrame* src, ValueBuffer * coeffSrcBuf1, ValueBuffer * coeffSrcBuf2, int frames );
 
 /*! \brief Add samples from src multiplied by coeffSrcLeft/coeffSrcRight to dst */
-void addMultipliedStereo( sampleFrame* dst, const sampleFrame* src, float coeffSrcLeft, float coeffSrcRight, int frames );
+void addMultipliedStereo( SampleFrame* dst, const SampleFrame* src, float coeffSrcLeft, float coeffSrcRight, int frames );
 
 /*! \brief Multiply dst by coeffDst and add samples from src multiplied by coeffSrc */
-void multiplyAndAddMultiplied( sampleFrame* dst, const sampleFrame* src, float coeffDst, float coeffSrc, int frames );
+void multiplyAndAddMultiplied( SampleFrame* dst, const SampleFrame* src, float coeffDst, float coeffSrc, int frames );
 
 /*! \brief Multiply dst by coeffDst and add samples from srcLeft/srcRight multiplied by coeffSrc */
-void multiplyAndAddMultipliedJoined( sampleFrame* dst, const sample_t* srcLeft, const sample_t* srcRight, float coeffDst, float coeffSrc, int frames );
+void multiplyAndAddMultipliedJoined( SampleFrame* dst, const sample_t* srcLeft, const sample_t* srcRight, float coeffDst, float coeffSrc, int frames );
 
 } // namespace MixHelpers
 

@@ -33,6 +33,8 @@
 #include <memory>
 #include <optional>
 
+#include <ringbuffer/ringbuffer.h>
+
 #include "LinkedModelGroups.h"
 #include "LmmsSemaphore.h"
 #include "Lv2Basics.h"
@@ -40,7 +42,6 @@
 #include "Lv2Options.h"
 #include "Lv2Worker.h"
 #include "Plugin.h"
-#include "../src/3rdparty/ringbuffer/include/ringbuffer/ringbuffer.h"
 #include "TimePos.h"
 
 
@@ -48,6 +49,7 @@ namespace lmms
 {
 
 class PluginIssue;
+class SampleFrame;
 
 // forward declare port structs/enums
 namespace Lv2Ports
@@ -55,10 +57,6 @@ namespace Lv2Ports
 	struct Audio;
 	struct PortBase;
 	struct AtomSeq;
-
-	enum class Type;
-	enum class Flow;
-	enum class Vis;
 }
 
 
@@ -133,8 +131,8 @@ public:
 	 * @param num Number of channels we must read from @param buf (starting at
 	 *   @p offset)
 	 */
-	void copyBuffersFromCore(const sampleFrame *buf,
-								unsigned firstChan, unsigned num, fpp_t frames);
+	void copyBuffersFromCore(const SampleFrame* buf,
+								unsigned firstChan, unsigned num, f_cnt_t frames);
 	/**
 	 * Copy our ports into buffers passed by the core
 	 * @param buf buffer of sample frames, each sample frame is something like
@@ -146,10 +144,10 @@ public:
 	 * @param num Number of channels we must write to @param buf (starting at
 	 *   @p offset)
 	 */
-	void copyBuffersToCore(sampleFrame *buf, unsigned firstChan, unsigned num,
-								fpp_t frames) const;
+	void copyBuffersToCore(SampleFrame* buf, unsigned firstChan, unsigned num,
+								f_cnt_t frames) const;
 	//! Run the Lv2 plugin instance for @param frames frames
-	void run(fpp_t frames);
+	void run(f_cnt_t frames);
 
 	void handleMidiInputEvent(const class MidiEvent &event,
 		const TimePos &time, f_cnt_t offset);

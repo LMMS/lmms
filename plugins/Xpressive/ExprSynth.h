@@ -28,7 +28,6 @@
 #include <cmath>
 #include <cstddef>
 #include <limits>
-#include "AutomatableModel.h"
 #include "Graph.h"
 
 namespace lmms
@@ -36,15 +35,9 @@ namespace lmms
 
 
 class ExprFrontData;
+class FloatModel;
 class NotePlayHandle;
-
-namespace gui
-{
-class automatableButtonGroup;
-class Knob;
-class LedCheckBox;
-class PixmapButton;
-}
+class SampleFrame;
 
 
 class ExprFront
@@ -106,7 +99,7 @@ public:
 			const sample_rate_t sample_rate, const FloatModel* pan1, const FloatModel* pan2, float rel_trans);
 	virtual ~ExprSynth();
 
-	void renderOutput(fpp_t frames, sampleFrame* buf );
+	void renderOutput(f_cnt_t frames, SampleFrame* buf );
 
 
 private:

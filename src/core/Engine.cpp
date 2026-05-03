@@ -62,7 +62,7 @@ void Engine::init( bool renderOnly )
 	emit engine->initProgress(tr("Generating wavetables"));
 	// generate (load from file) bandlimited wavetables
 	BandLimitedWave::generateWaves();
-	//initilize oscillators
+	//initialize oscillators
 	Oscillator::waveTableInit();
 
 	emit engine->initProgress(tr("Initializing data structures"));
@@ -121,15 +121,6 @@ void Engine::destroy()
 	// The oscillator FFT plans remain throughout the application lifecycle
 	// due to being expensive to create, and being used whenever a userwave form is changed
 	Oscillator::destroyFFTPlans();
-}
-
-
-
-
-bool Engine::ignorePluginBlacklist()
-{
-	const char* envVar = getenv("LMMS_IGNORE_BLACKLIST");
-	return (envVar && *envVar);
 }
 
 

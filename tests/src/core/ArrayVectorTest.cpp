@@ -25,7 +25,7 @@
 #include "ArrayVector.h"
 
 #include <QObject>
-#include <QtTest/QtTest>
+#include <QtTest>
 #include <array>
 #include <iterator>
 
@@ -231,12 +231,14 @@ private slots:
 			//// https://gcc.gnu.org/bugzilla/show_bug.cgi?id=81159
 			auto v = ArrayVector<int, 5>{1, 2, 3};
 			const auto oldValue = v;
-#pragma GCC diagnostic push
 #if __GNUC__ >= 13
-# pragma GCC diagnostic ignored "-Wself-move"
+#	pragma GCC diagnostic push
+#	pragma GCC diagnostic ignored "-Wself-move"
 #endif
 			v = std::move(v);
-#pragma GCC diagnostic pop
+#if __GNUC__ >= 13
+#	pragma GCC diagnostic pop
+#endif
 			QCOMPARE(v, oldValue);
 		}
 		{

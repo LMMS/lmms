@@ -1,3 +1,5 @@
+set_directory_properties(PROPERTIES SYSTEM TRUE)
+
 INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/include")
 FILE(GLOB_RECURSE SOURCES cmt/src/*.cpp)
 LIST(SORT SOURCES)
@@ -6,10 +8,8 @@ INSTALL(TARGETS cmt LIBRARY DESTINATION "${PLUGIN_DIR}/ladspa")
 
 SET_TARGET_PROPERTIES(cmt PROPERTIES PREFIX "")
 
-if(MSVC)
-	target_compile_options(cmt PRIVATE /wd4244 /wd4305)
-else()
-	target_compile_options(cmt PRIVATE -Wall -O3 -fno-strict-aliasing)
+if(NOT MSVC)
+	target_compile_options(cmt PRIVATE -O3 -fno-strict-aliasing)
 endif()
 
 if(LMMS_BUILD_WIN32)

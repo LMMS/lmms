@@ -27,13 +27,17 @@
 #ifndef SF2_PLAYER_H
 #define SF2_PLAYER_H
 
+#include <array>
 #include <fluidsynth/types.h>
 #include <QMutex>
 #include <samplerate.h>
 
+#include "AudioEngine.h"
+#include "AudioResampler.h"
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "LcdSpinBox.h"
+#include "SampleFrame.h"
 
 class QLabel;
 
@@ -41,7 +45,6 @@ namespace lmms
 {
 
 
-class Sf2Font;
 struct Sf2PluginData;
 class NotePlayHandle;
 
@@ -64,10 +67,10 @@ public:
 	Sf2Instrument( InstrumentTrack * _instrument_track );
 	~Sf2Instrument() override;
 
-	void play( sampleFrame * _working_buffer ) override;
+	void play( SampleFrame* _working_buffer ) override;
 
 	void playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer ) override;
+						SampleFrame* _working_buffer ) override;
 	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
 
@@ -103,7 +106,9 @@ public slots:
 	void updateTuning();
 
 private:
-	SRC_STATE * m_srcState;
+	AudioResampler m_resampler;
+	std::array<SampleFrame, DEFAULT_BUFFER_SIZE> m_buffer;
+	std::span<SampleFrame> m_bufferView;
 
 	fluid_settings_t* m_settings;
 	fluid_synth_t* m_synth;
@@ -150,7 +155,7 @@ private:
 	void freeFont();
 	void noteOn( Sf2PluginData * n );
 	void noteOff( Sf2PluginData * n );
-	void renderFrames( f_cnt_t frames, sampleFrame * buf );
+	void renderFrames( f_cnt_t frames, SampleFrame* buf );
 
 	friend class gui::Sf2InstrumentView;
 
