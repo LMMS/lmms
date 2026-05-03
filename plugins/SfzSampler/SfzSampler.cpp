@@ -212,8 +212,6 @@ void SfzSampler::loadFile(const QString& filePath)
 
 void SfzSampler::loadSfzFile(const QString& filePath)
 {
-	// Prevent the audio thread from accidentally looping through the regions while they are being edited
-	const auto guard = Engine::audioEngine()->requestChangesGuard();
 	// Reset the note counts, midi cc values, etc
 	m_sfzGlobalState = SfzGlobalState();
 	// And any info about control labels, default values, etc
@@ -228,23 +226,35 @@ void SfzSampler::loadSfzFile(const QString& filePath)
 	if (!successfulParseFile) { qDebug() << "[SFZ Player] An error occurred when parsing the SFZ file."; return; }
 
 	// Hand off the vector of regions to SfzRegionManager, which will sort them out to optimize trigger selection
-	m_regionManager = SfzRegionManager(regions); // TODO should move semantics be used here?
+	// Don't immediately set m_regionManager, since the audio threads may still be accessing it; instead use a temporary object here
+	SfzRegionManager newRegionManager = SfzRegionManager(regions);
 
 	// The SfzParser generates all the SfzRegion objects, but it doesn't load any of the samples
 	// The sample filenames are stored in the regions as from the `sample` opcode, so we just need to load the files into memory to use them
 	// The samples are stored with relative paths with respect to the sfz file, so first find the parent directory:
 	QDir parentDirectory = QFileInfo(filePath).absoluteDir();
 	// Reset any loaded samples
-	m_samplePool = SfzSamplePool();
+	// Create a new sample pool, but don't delete the old one just yet, since the audio thread may still be accessing the samples
+	SfzSamplePool newSamplePool = SfzSamplePool();
 	int i = 0;
-	for (auto* region : m_regionManager.allRegions())
+	for (auto* region : newRegionManager.allRegions())
 	{
-		qDebug() << "[SFZ Player] Loading sample" << i + 1 << "/" << m_regionManager.allRegions().size() << region->m_sampleFile.value().value_or("N/A");
-		bool successfulLoadSample = region->initializeSample(parentDirectory, m_samplePool);
+		qDebug() << "[SFZ Player] Loading sample" << i + 1 << "/" << newRegionManager.allRegions().size() << region->m_sampleFile.value().value_or("N/A");
+		bool successfulLoadSample = region->initializeSample(parentDirectory, newSamplePool);
 		if (!successfulLoadSample) { qDebug() << "[SFZ Player] An error occured when loading a sample."; }
 		i++;
 	}
-	qDebug() << "Loaded" << m_regionManager.allRegions().size() << "regions and" << m_samplePool.sampleCount() << "samples.";
+	qDebug() << "Loaded" << newRegionManager.allRegions().size() << "regions and" << newSamplePool.sampleCount() << "samples.";
+
+	// Now delete the old sample pool by replacing it with the new one, and also swap out the region data
+	// Make sure whatever audio processing currently being done is finished before swapping out the data
+	Engine::audioEngine()->requestChangeInModel();
+	// TODO are these moves correct?
+	m_samplePool = std::move(newSamplePool);
+	m_regionManager = std::move(newRegionManager);
+	// Also delete all the current voices, since they still have m_region pointers to the old region data
+	std::fill(m_voices.begin(), m_voices.end(), SfzRegionPlayState());
+	Engine::audioEngine()->doneChangeInModel();
 
 
 	// Set the initial cc values based on any `set_ccN` opcodes in the <control> header
