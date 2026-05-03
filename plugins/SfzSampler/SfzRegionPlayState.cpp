@@ -183,7 +183,7 @@ float SfzRegionPlayState::lfoGenerator(const f_cnt_t delay, const f_cnt_t fade, 
 
 	if (static_cast<f_cnt_t>(m_frameCount) < delay) { return 0.0f; }
 
-	float lfoValue = std::sin(static_cast<float>(m_frameCount - delay - fade) / m_lmmsSampleRate * freq * 2 * std::numbers::pi);
+	float lfoValue = std::sin(static_cast<float>(m_frameCount - delay) / m_lmmsSampleRate * freq * 2 * std::numbers::pi);
 
 	// Make the lfo ramp up to its max amplitude during the fade frames
 	if (static_cast<f_cnt_t>(m_frameCount) < delay + fade)
