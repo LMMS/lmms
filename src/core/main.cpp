@@ -736,7 +736,7 @@ int main( int argc, char * * argv )
 		}
 
 		// create renderer
-		auto r = new RenderManager(os, eff, renderOut);
+		auto r = new RenderManager(os, eff);
 		QCoreApplication::instance()->connect( r,
 				SIGNAL(finished()), SLOT(quit()));
 
@@ -754,11 +754,11 @@ int main( int argc, char * * argv )
 		// start now!
 		if ( renderTracks )
 		{
-			r->renderTracks();
+			r->renderTracks(renderOut);
 		}
 		else
 		{
-			r->renderProject();
+			r->renderProject(renderOut);
 		}
 	}
 	else // otherwise, start the GUI
