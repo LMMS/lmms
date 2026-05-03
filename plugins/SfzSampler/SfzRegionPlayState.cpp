@@ -38,17 +38,19 @@ namespace lmms
 
 SfzRegionPlayState::SfzRegionPlayState(const SfzRegion* region, const SfzTrigger& trigger)
 	: m_active(true)
-	, m_filter(Engine::audioEngine()->outputSampleRate())
+	, m_lmmsSampleRate(Engine::audioEngine()->outputSampleRate())
+	, m_filter(m_lmmsSampleRate)
 	, m_trigger(trigger)
 	, m_region(region)
 {
-	const float sampleRate = Engine::audioEngine()->outputSampleRate();
+	// Calculate the base pitch and amplitude
+	precomputeBaseValues();
 	// Delay the start of the playback by the trigger offset
 	m_frameCount -= trigger.frameOffset();
 	// And by the delay opcode in seconds
-	m_frameCount -= region->m_delay.value() * sampleRate;
+	m_frameCount -= region->m_delay.value() * m_lmmsSampleRate;
 	// And any random delay amount
-	m_frameCount -= fastRand(1.0f) * region->m_delay_random.value() * sampleRate;
+	m_frameCount -= fastRand(1.0f) * region->m_delay_random.value() * m_lmmsSampleRate;
 
 	// Set initial sample start frame offset
 	m_sampleFrame += m_region->m_offset.value();
@@ -81,6 +83,58 @@ SfzRegionPlayState::SfzRegionPlayState(const SfzRegion* region, const SfzTrigger
 
 
 
+void SfzRegionPlayState::precomputeBaseValues()
+{
+	// Helper variable
+	const float normalizedVelocity = m_trigger.velocity().value() / 127.0f;
+
+	// Compute the base pitch
+	// The pitch env/lfo will be applied on top of this, as they are calcualted per frame
+
+	// Calculate pitch difference relative to original sample
+	const float semitoneDifference = m_trigger.key().value() - m_region->m_pitch_keycenter.value();
+	// The base pitch depends on 1. the key offset, 2. the fine `tune` adjustment, 3. the velocity, if pitch_veltrack is nonzero
+	// These are all in cents, so divide by 100 to get semitones
+	const float pitch = semitoneDifference * m_region->m_pitch_keytrack.value() / 100.0f
+		+ m_region->m_tune.value() / 100.0f
+		+ normalizedVelocity * m_region->m_pitch_veltrack.value() / 100.0f;
+	m_baseFreqRatio = std::exp2(pitch / 12.0f);
+
+	// Sample rate of sample (if we are using a sample, not a basic wave like *sine or *saw)
+	const float sampleSampleRate = m_region->sample() != nullptr
+		? m_region->sample()->sampleRate()
+		: m_lmmsSampleRate; // If we are using a basic wave instead of a sample, set it to LMMS's sample rate
+	// Play the sample faster/slower to match the correct sample rate
+	m_baseFreqRatio *= sampleSampleRate / m_lmmsSampleRate;
+
+
+	// Compute the base amplitude
+
+	// Amplitude opcode
+	const float amplitude = m_region->m_amplitude.value() / 100.0f; // Amplitude is stored as a percent
+
+	// Amplitude due to velocity
+	// If amp_keytrack is 100, then 0 velocity = 0 amp, and 127 velocity = 1.0f amp (as expected)
+	// If amp_keytrack is -100, it's the reverse. If amp_keytrack is 0, the volume is not affected by the velocity.
+	// Essentially this means lerping between y = x, y = 1, and y = 1 - x, if you think of y being the amp and x being vel/127
+	const float ampVelocity = m_region->m_amp_veltrack.value() > 0
+		? (normalizedVelocity) * (m_region->m_amp_veltrack.value() / 100) + 1.0f * (1.0f - m_region->m_amp_veltrack.value() / 100)
+		: (1.0f - normalizedVelocity) * (m_region->m_amp_veltrack.value() / -100) + 1.0f * (1.0f - m_region->m_amp_veltrack.value() / -100);
+
+	// Amplitude due to volume/gain
+	const float ampVolume = dbfsToAmp(m_region->m_volume.value());
+
+	// Panning
+	const float pan = m_region->m_pan.value() / 100;
+	const float rightPanAmp = std::min(1.0f, 1.0f + pan);
+	const float leftPanAmp = std::min(1.0f, 1.0f - pan);
+
+	m_baseAmplitudeLeft = amplitude * ampVelocity * ampVolume * leftPanAmp;
+	m_baseAmplitudeRight = amplitude * ampVelocity * ampVolume * rightPanAmp;
+}
+
+
+// Helper function for envelope shapes
 float SfzRegionPlayState::envelopeGenerator(const f_cnt_t delay, const f_cnt_t attack, const f_cnt_t hold, const f_cnt_t decay, const float sustain, const f_cnt_t release) const
 {
 	// If the note hasn't started yet, don't do anything
@@ -121,6 +175,30 @@ float SfzRegionPlayState::envelopeGenerator(const f_cnt_t delay, const f_cnt_t a
 
 
 
+// Helper function for LFOs
+float SfzRegionPlayState::lfoGenerator(const f_cnt_t delay, const f_cnt_t fade, const float freq) const
+{
+	// If the note hasn't started yet, don't do anything
+	if (m_frameCount < 0) { return 0.0f; }
+
+	if (static_cast<f_cnt_t>(m_frameCount) < delay) { return 0.0f; }
+
+	float lfoValue = std::sin(static_cast<float>(m_frameCount - delay - fade) / m_lmmsSampleRate * freq * 2 * std::numbers::pi);
+
+	// Make the lfo ramp up to its max amplitude during the fade frames
+	if (static_cast<f_cnt_t>(m_frameCount) < delay + fade)
+	{
+		return static_cast<float>(m_frameCount - delay) / fade * lfoValue;
+	}
+	else
+	{
+		return lfoValue;
+	}
+}
+
+
+
+
 
 bool SfzRegionPlayState::play(SampleFrame* buffer, const fpp_t frames)
 {
@@ -133,64 +211,35 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const fpp_t frames)
 	// Helper variable
 	const float normalizedVelocity = m_trigger.velocity().value() / 127.0f;
 
-
-	// Sample rate of LMMS
-	const float lmmsSampleRate = Engine::audioEngine()->outputSampleRate();
-	// Sample rate of sample (if we are using a sample, not a basic wave like *sine or *saw)
-	const float sampleSampleRate = m_region->sample() != nullptr
-		? m_region->sample()->sampleRate()
-		: lmmsSampleRate; // If we are using a basic wave instead of a sample, set it to LMMS's sample rate
-
-
-	// Pitch envelope
-	// This is only computed once per buffer to same compute, since doing it per-frame seems a bit excessive
-	const float pitcheg = envelopeGenerator(
-		m_region->m_pitcheg.delay.value() * lmmsSampleRate,
-		m_region->m_pitcheg.attack.value() * lmmsSampleRate,
-		m_region->m_pitcheg.hold.value() * lmmsSampleRate,
-		m_region->m_pitcheg.decay.value() * lmmsSampleRate,
-		m_region->m_pitcheg.sustain.value() / 100.0f, // Sustain is stored in percent, so divide by 100 to get ratio,
-		m_region->m_pitcheg.release.value() * lmmsSampleRate
-	) * m_region->m_pitcheg.depth.value();
-
-	// Calculate pitch difference relative to original sample
-	const float semitoneDifference = m_trigger.key().value() - m_region->m_pitch_keycenter.value();
-	// The total pitch depends on 1. the key offset 2. the fine `tune` adjustment 3. the velocity, if pitch_veltrack is nonzero 4. the pitch envelope
-	const float pitch = semitoneDifference * m_region->m_pitch_keytrack.value() / 100.0f
-		+ m_region->m_tune.value() / 100.0f
-		+ normalizedVelocity * m_region->m_pitch_veltrack.value() / 100.0f
-		+ pitcheg / 100.0f;
-	float freqRatio = std::exp2(pitch / 12.0f);
-
-	// Play the sample faster/slower to match the correct sample rate
-	freqRatio *= sampleSampleRate / lmmsSampleRate;
-
-	// Amplitude
-	const float amplitude = m_region->m_amplitude.value() / 100.0f; // Amplitude is stored as a percent
-
-	// Amplitude envelope
-	const f_cnt_t ampegDelayFrames = m_region->m_ampeg.delay.value() * lmmsSampleRate;
-	const f_cnt_t ampegAttackFrames = m_region->m_ampeg.attack.value() * lmmsSampleRate;
-	const f_cnt_t ampegHoldFrames = m_region->m_ampeg.hold.value() * lmmsSampleRate;
-	const f_cnt_t ampegDecayFrames = m_region->m_ampeg.decay.value() * lmmsSampleRate;
+	// Amplitude Envelope Parameters
+	const f_cnt_t ampegDelayFrames = m_region->m_ampeg.delay.value() * m_lmmsSampleRate;
+	const f_cnt_t ampegAttackFrames = m_region->m_ampeg.attack.value() * m_lmmsSampleRate;
+	const f_cnt_t ampegHoldFrames = m_region->m_ampeg.hold.value() * m_lmmsSampleRate;
+	const f_cnt_t ampegDecayFrames = m_region->m_ampeg.decay.value() * m_lmmsSampleRate;
 	const float ampegSustain = m_region->m_ampeg.sustain.value() / 100.0f; // Sustain is stored in percent, so divide by 100 to get ratio
-	const f_cnt_t ampegReleaseFrames = m_region->m_ampeg.release.value() * lmmsSampleRate;
+	const f_cnt_t ampegReleaseFrames = m_region->m_ampeg.release.value() * m_lmmsSampleRate;
 
-	// Amplitude due to velocity
-	// If amp_keytrack is 100, then 0 velocity = 0 amp, and 127 velocity = 1.0f amp (as expected)
-	// If amp_keytrack is -100, it's the reverse. If amp_keytrack is 0, the volume is not affected by the velocity.
-	// Essentially this means lerping between y = x, y = 1, and y = 1 - x, if you think of y being the amp and x being vel/127
-	const float ampVelocity = m_region->m_amp_veltrack.value() > 0
-		? (normalizedVelocity) * (m_region->m_amp_veltrack.value() / 100) + 1.0f * (1.0f - m_region->m_amp_veltrack.value() / 100)
-		: (1.0f - normalizedVelocity) * (m_region->m_amp_veltrack.value() / -100) + 1.0f * (1.0f - m_region->m_amp_veltrack.value() / -100);
+	// Amplitude LFO parameters
+	const f_cnt_t amplfoDelayFrames = m_region->m_amplfo.delay.value() * m_lmmsSampleRate;
+	const f_cnt_t amplfoFadeFrames = m_region->m_amplfo.fade.value() * m_lmmsSampleRate;
+	const float amplfoFreq = m_region->m_amplfo.freq.value();
+	const float amplfoDepth = m_region->m_amplfo.depth.value();
 
-	// Amplitude due to volume/gain
-	const float ampVolume = dbfsToAmp(m_region->m_volume.value());
+	// Pitch Envelope Parameters
+	const f_cnt_t pitchegDelayFrames = m_region->m_pitcheg.delay.value() * m_lmmsSampleRate;
+	const f_cnt_t pitchegAttackFrames = m_region->m_pitcheg.attack.value() * m_lmmsSampleRate;
+	const f_cnt_t pitchegHoldFrames = m_region->m_pitcheg.hold.value() * m_lmmsSampleRate;
+	const f_cnt_t pitchegDecayFrames = m_region->m_pitcheg.decay.value() * m_lmmsSampleRate;
+	const float pitchegSustain = m_region->m_pitcheg.sustain.value() / 100.0f; // Sustain is stored in percent, so divide by 100 to get ratio
+	const f_cnt_t pitchegReleaseFrames = m_region->m_pitcheg.release.value() * m_lmmsSampleRate;
+	const float pitchegDepth = m_region->m_pitcheg.depth.value();
 
-	// Panning
-	const float pan = m_region->m_pan.value() / 100;
-	const float rightPanAmp = std::min(1.0f, 1.0f + pan);
-	const float leftPanAmp = std::min(1.0f, 1.0f - pan);
+	// Pitch LFO parameters
+	const f_cnt_t pitchlfoDelayFrames = m_region->m_pitchlfo.delay.value() * m_lmmsSampleRate;
+	const f_cnt_t pitchlfoFadeFrames = m_region->m_pitchlfo.fade.value() * m_lmmsSampleRate;
+	const float pitchlfoFreq = m_region->m_pitchlfo.freq.value();
+	const float pitchlfoDepth = m_region->m_pitchlfo.depth.value();
+
 
 	// Filter
 	const bool filterEnabled = m_region->m_cutoff.value() != std::nullopt;
@@ -205,17 +254,21 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const fpp_t frames)
 		m_filter.calcFilterCoeffs(filterCutoff, q);
 	}
 
+	// Now render the audio
 	for (f_cnt_t f = 0; f < frames; ++f)
 	{
-		// The amplitude envelope is computed every frame, since doing it once per buffer could result in discontinuities/clicks
-		const float ampeg = envelopeGenerator(
-			ampegDelayFrames,
-			ampegAttackFrames,
-			ampegHoldFrames,
-			ampegDecayFrames,
-			ampegSustain,
-			ampegReleaseFrames
-		);
+		const float ampeg = envelopeGenerator(ampegDelayFrames, ampegAttackFrames, ampegHoldFrames, ampegDecayFrames, ampegSustain, ampegReleaseFrames);
+		const float amplfo = amplfoDepth != 0.0f // Only compute the amplitude lfo if the depth is nonzero
+			? dbfsToAmp(lfoGenerator(amplfoDelayFrames, amplfoFadeFrames, amplfoFreq) * amplfoDepth) // amplfo depth is in decibels, so convert to amplitude
+			: 1.0f;
+		const float pitcheg = envelopeGenerator(pitchegDelayFrames, pitchegAttackFrames, pitchegHoldFrames, pitchegDecayFrames, pitchegSustain, pitchegReleaseFrames) * pitchegDepth;
+		const float pitchlfo = pitchlfoDepth != 0.0f // Only compute the pitch lfo if the depth is nonzero
+			? lfoGenerator(pitchlfoDelayFrames, pitchlfoFadeFrames, pitchlfoFreq) * pitchlfoDepth
+			: 0.0f;
+		const float pitchmodFreqRatio = (pitcheg + pitchlfo != 0) // Only calculate the pitch per-frame if the pitch envelope/lfo is actually active
+			? std::exp2((pitcheg + pitchlfo) / 1200)
+			: 1.0f;
+
 		// If a sample file was loaded, use the buffer to get the audio data
 		// Otherwise, if a basic wave shape is being used (like *sine, *saw, *silence, etc) use a function to generate the shape
 		float sampleLeftValue = 0.0f;
@@ -227,24 +280,25 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const fpp_t frames)
 		}
 		else
 		{
-			sampleLeftValue = SfzBasicWaves::generate(m_region->basicWaveShape(), lmmsSampleRate, m_sampleFrame);
-			sampleRightValue = SfzBasicWaves::generate(m_region->basicWaveShape(), lmmsSampleRate, m_sampleFrame);
+			sampleLeftValue = SfzBasicWaves::generate(m_region->basicWaveShape(), m_lmmsSampleRate, m_sampleFrame);
+			sampleRightValue = SfzBasicWaves::generate(m_region->basicWaveShape(), m_lmmsSampleRate, m_sampleFrame);
 		}
 
 		if (filterEnabled) // TODO does this if statement make it faster?
 		{
-			buffer[f][0] += m_filter.update(sampleLeftValue * amplitude * ampeg * ampVelocity * ampVolume * rightPanAmp, 0);
-			buffer[f][1] += m_filter.update(sampleRightValue * amplitude * ampeg * ampVelocity * ampVolume * leftPanAmp, 1);
+			buffer[f][0] += m_filter.update(sampleLeftValue * m_baseAmplitudeLeft * ampeg * amplfo, 0);
+			buffer[f][1] += m_filter.update(sampleRightValue * m_baseAmplitudeRight * ampeg * amplfo, 1);
 		}
 		else
 		{
-			buffer[f][0] += sampleLeftValue * amplitude * ampeg * ampVelocity * ampVolume * rightPanAmp;
-			buffer[f][1] += sampleRightValue * amplitude * ampeg * ampVelocity * ampVolume * leftPanAmp;
+			buffer[f][0] += sampleLeftValue * m_baseAmplitudeLeft * ampeg * amplfo;
+			buffer[f][1] += sampleRightValue * m_baseAmplitudeRight * ampeg * amplfo;
 		}
 		// Increment the frame count. If we are using a sample, make sure to stop at the end, but if we are using a basic wave like *sine or *saw, there's no need
+		const float frameIncrement = m_baseFreqRatio * pitchmodFreqRatio; // Apply the pitch modulation by speeding up/slowing down the playback
 		m_sampleFrame = m_region->sample() != nullptr
-			? std::min(static_cast<float>(m_region->sample()->size()), m_sampleFrame + freqRatio)
-			: m_sampleFrame + freqRatio;
+			? std::min(static_cast<float>(m_region->sample()->size()), m_sampleFrame + frameIncrement)
+			: m_sampleFrame + frameIncrement;
 		m_frameCount++;
 	}
 
@@ -278,6 +332,12 @@ void SfzRegionPlayState::processTrigger(const SfzTrigger& trigger)
 			m_released = true;
 			m_releaseFrame = m_frameCount; // testing
 		}
+	}
+	// Since the base pitch and amplitude are precomputed in the constructor, they need to be re-computed if any of the CC modulations may have changed
+	// For simplicity, if any CC trigger occurs, recompute everything
+	if (trigger.type() == SfzTrigger::Type::ControlChange)
+	{
+		precomputeBaseValues();
 	}
 }
 

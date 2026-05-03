@@ -44,6 +44,11 @@ public:
 	SfzRegionPlayState(const SfzRegion* region, const SfzTrigger& trigger);
 	SfzRegionPlayState() = default; // The default constructor is needed to initialize arrays of the object
 
+	//! Helper function to calculate the base pitch and amplitude so that it doesn't have to be done per-buffer.
+	// This is done once during the constructor, but it must also be done whenever a CC knob
+	// changes, since that could affect the base pitch/amp of the playback.
+	void precomputeBaseValues();
+
 	//! Generates the next buffer of audio from this sound. If m_active is false, this function does nothing.
 	//! Returns true if any sound was generated, false if the buffer is left untouched
 	bool play(SampleFrame* buffer, const fpp_t frames);
@@ -57,12 +62,26 @@ public:
 	//! Helper function for calculating the envelope value at the current frame
 	float envelopeGenerator(const f_cnt_t delay, const f_cnt_t attack, const f_cnt_t hold, const f_cnt_t decay, const float sustain, const f_cnt_t release) const;
 
+	//! Helper function for calculating the lfo value at the current frame
+	float lfoGenerator(const f_cnt_t delay, const f_cnt_t fade, const float freq) const;
+
+
 private:
 	//! Stores whether this object still represents a sound which exists.
 	//! This will be true when the sound is active, but will become false once the release has ended or it has been forcefully deactivated.
 	bool m_active = false;
 	//! Stores whether the note has been released yet
 	bool m_released = false;
+
+	//! Stores the current sample rate for convenience
+	float m_lmmsSampleRate = 0.0f;
+
+	//! Cache the rate the sample should be played (based on pitch and sample rate, compared to lmms's sample rate)
+	// rather than computing it per buffer/frame. This does not include the effect of the pitch env/lfo, since those are computed every frame
+	float m_baseFreqRatio = 0.0f;
+	//! Cache the base amplitude. The amplitude envelope/lfo will be applied on top of this.
+	float m_baseAmplitudeLeft = 1.0f;
+	float m_baseAmplitudeRight = 1.0f;
 
 	//! The number of frames since the start of the sound. This may be negative if the region has delay or the note starts partway through a buffer.
 	int m_frameCount = 0;

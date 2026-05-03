@@ -141,6 +141,18 @@ void EnvelopeOpcodes::parseEnvelopeGeneratorOpcode(const QString& opcode, const 
 }
 
 
+// LFO Opcodes
+void LfoOpcodes::parseLfoGeneratorOpcode(const QString& opcode, const QString& value, bool* parsed, bool* successful)
+{
+	// Pass the opcode name/value to all of the bundled opcodes.
+	// If it matches one of them, that's great. If not, they will return and nothing will happen.
+	// TODO is this error handling with "successful" correct?
+	delay.parseFromString(opcode, value, parsed, successful);
+	fade.parseFromString(opcode, value, parsed, successful);
+	freq.parseFromString(opcode, value, parsed, successful);
+	depth.parseFromString(opcode, value, parsed, successful);
+}
+
 
 
 //

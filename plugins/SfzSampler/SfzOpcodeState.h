@@ -140,12 +140,21 @@ public:
 	//
 	EnvelopeOpcodes m_ampeg {"ampeg"};
 
+	//
+	// Amplitude LFO
+	//
+	LfoOpcodes m_amplfo {"amplfo"};
+
 
 	//
 	// Pitch Envelope Generator (pitcheg)
 	//
 	EnvelopeOpcodes m_pitcheg {"pitcheg"};
 
+	//
+	// Pitch LFO
+	//
+	LfoOpcodes m_pitchlfo {"pitchlfo"};
 
 	//
 	// Misc Volume

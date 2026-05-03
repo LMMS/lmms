@@ -116,6 +116,9 @@ void SfzRegion::recalculateTotalCCModulation(const SfzGlobalState& globalState)
 
 	m_ampeg.updateCachedModulation(globalState.midiCCValues());
 	m_pitcheg.updateCachedModulation(globalState.midiCCValues());
+
+	m_amplfo.updateCachedModulation(globalState.midiCCValues());
+	m_pitchlfo.updateCachedModulation(globalState.midiCCValues());
 }
 
 

@@ -112,8 +112,8 @@ struct ModulatableOpcode : FloatOpcode
 	void updateCachedModulation(const std::array<int, NumMidiCCs>& ccValues);
 };
 
-// Additionally, things like amplitude, pitch, and filter freq envelopes and lfo's all have very similar parameters, so it makes sense to put
-// them all together in a handy definition
+// Things like amplitude, pitch, and filter freq envelopes and lfo's all have very similar parameters, so it makes sense to put
+// them all together in handy definitions
 struct EnvelopeOpcodes
 {
 	// Envelope parameters (these can be modulated by midi CCs)
@@ -164,6 +164,33 @@ struct EnvelopeOpcodes
 	}
 	//! Helper function for parsing all these envelope generator opcodes, so that the code isn't duplicated for the amplitude, pitch, and filter envelopes
 	void parseEnvelopeGeneratorOpcode(const QString& opcode, const QString& value, bool* parsed, bool* successful);
+};
+
+// Simple SFZ1 LFO Opcodes, for amplfo, pitchlfo, and fillfo
+struct LfoOpcodes
+{
+	ModulatableOpcode delay;
+	ModulatableOpcode fade;
+	ModulatableOpcode freq;
+	ModulatableOpcode depth;
+
+	// Initialize opcodes with correct names and default values
+	LfoOpcodes(QString name)
+		: delay(name + "_delay", 0.0f)
+		, fade(name + "_fade", 0.0f)
+		, freq(name + "_freq", 0.0f)
+		, depth(name + "_depth", 0.0f)
+	{}
+	//! Helper function to update all of the cached modulations for the individual opcodes
+	void updateCachedModulation(const std::array<int, NumMidiCCs>& ccValues)
+	{
+		delay.updateCachedModulation(ccValues);
+		fade.updateCachedModulation(ccValues);
+		freq.updateCachedModulation(ccValues);
+		depth.updateCachedModulation(ccValues);
+	}
+	//! Helper function for parsing these lfo generator opcodes, so that the code isn't duplicated for the amplitude, pitch, and filter lfos
+	void parseLfoGeneratorOpcode(const QString& opcode, const QString& value, bool* parsed, bool* successful);
 };
 
 

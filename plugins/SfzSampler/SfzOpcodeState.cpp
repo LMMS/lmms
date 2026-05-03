@@ -92,6 +92,11 @@ bool SfzOpcodeState::setOpcodeByStrings(const QString& name, const QString& valu
 		&m_pitcheg
 	};
 
+	std::vector<LfoOpcodes*> lfoGeneratorList = {
+		&m_amplfo,
+		&m_pitchlfo
+	};
+
 	bool parsed = false;
 	bool successful = true;
 
@@ -100,11 +105,13 @@ bool SfzOpcodeState::setOpcodeByStrings(const QString& name, const QString& valu
 		//if (parsed) { break; } // Do not break even if the opcode has already been parsed, since some opcodes like "key" are effectively aliases for multiple opcodes (lokey, hikey, and pitch_keytrack)
 		opcode->parseFromString(name, value, &parsed, &successful);
 	}
-
 	for (auto* envelopeGenerator : envelopeGeneratorList)
 	{
-		//if (parsed) { break; }
 		envelopeGenerator->parseEnvelopeGeneratorOpcode(name, value, &parsed, &successful);
+	}
+	for (auto* lfoGenerator : lfoGeneratorList)
+	{
+		lfoGenerator->parseLfoGeneratorOpcode(name, value, &parsed, &successful);
 	}
 
 
