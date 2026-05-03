@@ -156,21 +156,17 @@ void SfzSamplerView::openFile()
 
 void SfzSamplerView::dragEnterEvent(QDragEnterEvent* dee)
 {
-	/*
 	QString value = StringPairDrag::decodeValue(dee);
 	if (value.endsWith(".sfz")) 
 	{
 		dee->accept();
-		m_instrument->loadFile(value);
 		return;
 	}
 	dee->ignore();
-	*/
 }
 
 void SfzSamplerView::dropEvent(QDropEvent* de)
 {
-	/*
 	QString value = StringPairDrag::decodeValue(de);
 	if (value.endsWith(".sfz")) 
 	{
@@ -179,7 +175,6 @@ void SfzSamplerView::dropEvent(QDropEvent* de)
 		return;
 	}
 	de->ignore();
-	*/
 }
 
 void SfzSamplerView::resizeEvent(QResizeEvent* re)
