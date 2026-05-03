@@ -711,14 +711,29 @@ QList<QAction*> FileBrowserTreeWidget::getContextActions(FileItem* file, bool so
 	QList<QAction*> result = QList<QAction*>();
 	const bool fileIsSample = file->type() == FileItem::FileType::Sample;
 
-	QString instrumentAction = fileIsSample ?
-		tr("Send to new AudioFileProcessor instance") :
-		tr("Send to new instrument track");
-	QString shortcutMod = songEditor ? "" : UI_CTRL_KEY + QString(" + ");
+	auto fileCanBeInstrument = false;
+	switch (file->type()) {
+	case FileItem::FileType::Preset:
+	case FileItem::FileType::Sample:
+	case FileItem::FileType::SoundFont:
+	case FileItem::FileType::Patch:
+	case FileItem::FileType::VstPlugin:
+		fileCanBeInstrument = true;
 
-	if (file->type() != FileItem::FileType::Project)
+	case FileItem::FileType::Project:
+	case FileItem::FileType::Midi:
+	case FileItem::FileType::Unknown:
+		break;
+	}
+
+	if (fileCanBeInstrument)
 	{
-		auto toInstrument = new QAction(instrumentAction + tr(" (%2Enter)").arg(shortcutMod));
+		const auto instrumentAction = fileIsSample
+			? tr("Send to new AudioFileProcessor instance")
+			: tr("Send to new instrument track");
+		const auto shortcutMod = songEditor ? "" : UI_CTRL_KEY + QString(" + ");
+
+		auto* toInstrument = new QAction(instrumentAction + tr(" (%2Enter)").arg(shortcutMod));
 		connect(toInstrument, &QAction::triggered, [=, this] { openInNewInstrumentTrack(file, songEditor); });
 		result.append(toInstrument);
 	}
