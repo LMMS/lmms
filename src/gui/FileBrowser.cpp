@@ -628,6 +628,15 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 	contextMenu.addAction(header);
 	contextMenu.addSeparator();
 
+	const auto addActionsGroup = [&](QString name, QList<QAction*> actions) -> void {
+		if (actions.isEmpty()) { return; }
+
+		auto* action = new QAction(name, nullptr);
+		action->setDisabled(true);
+		contextMenu.addAction(action);
+		contextMenu.addActions(actions);
+	};
+
 	switch (item->type())
 	{
 	case TypeFileItem: {
@@ -654,15 +663,9 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 			contextMenu.addAction(tr("Send to active instrument-track"), [&] { sendToActiveInstrumentTrack(file); });
 		}
 
-		auto songEditorHeader = new QAction(tr("Song Editor"), nullptr);
-		songEditorHeader->setDisabled(true);
-		contextMenu.addAction(songEditorHeader);
-		contextMenu.addActions(getContextActions(file, true));
+		addActionsGroup(tr("Song Editor"), getContextActions(file, true));
+		addActionsGroup(tr("Pattern Editor"), getContextActions(file, false));
 
-		auto patternEditorHeader = new QAction(tr("Pattern Editor"), nullptr);
-		patternEditorHeader->setDisabled(true);
-		contextMenu.addAction(patternEditorHeader);
-		contextMenu.addActions(getContextActions(file, false));
 		break;
 	}
 	case TypeDirectoryItem: {
