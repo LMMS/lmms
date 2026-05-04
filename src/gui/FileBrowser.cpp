@@ -636,12 +636,6 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 		contextMenu.addAction(QIcon(embed::getIconPixmap("folder")), tr("Show in %1").arg(fileManager),
 			[file] { FileRevealer::reveal(file->fullName()); });
 
-		if (file->isTrack())
-		{
-			contextMenu.addAction(
-				tr("Send to active instrument-track"), [file, this] { sendToActiveInstrumentTrack(file); });
-		}
-
 		const auto path = QFileInfo{file->fullName()}.absoluteFilePath();
 
 		if (ConfigManager::inst()->isFavoriteItem(file->fullName()))
@@ -657,7 +651,6 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 
 		if (file->isTrack())
 		{
-			contextMenu.addSeparator();
 			contextMenu.addAction(tr("Send to active instrument-track"), [&] { sendToActiveInstrumentTrack(file); });
 		}
 
