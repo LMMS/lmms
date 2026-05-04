@@ -628,6 +628,15 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 	contextMenu.addAction(header);
 	contextMenu.addSeparator();
 
+	const auto addActionsGroup = [&](QString name, QList<QAction*> actions) -> void {
+		if (actions.isEmpty()) { return; }
+
+		auto* action = new QAction(name, nullptr);
+		action->setDisabled(true);
+		contextMenu.addAction(action);
+		contextMenu.addActions(actions);
+	};
+
 	switch (item->type())
 	{
 	case TypeFileItem: {
@@ -635,12 +644,6 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 
 		contextMenu.addAction(QIcon(embed::getIconPixmap("folder")), tr("Show in %1").arg(fileManager),
 			[file] { FileRevealer::reveal(file->fullName()); });
-
-		if (file->isTrack())
-		{
-			contextMenu.addAction(
-				tr("Send to active instrument-track"), [file, this] { sendToActiveInstrumentTrack(file); });
-		}
 
 		const auto path = QFileInfo{file->fullName()}.absoluteFilePath();
 
@@ -657,19 +660,12 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 
 		if (file->isTrack())
 		{
-			contextMenu.addSeparator();
 			contextMenu.addAction(tr("Send to active instrument-track"), [&] { sendToActiveInstrumentTrack(file); });
 		}
 
-		auto songEditorHeader = new QAction(tr("Song Editor"), nullptr);
-		songEditorHeader->setDisabled(true);
-		contextMenu.addAction(songEditorHeader);
-		contextMenu.addActions(getContextActions(file, true));
+		addActionsGroup(tr("Song Editor"), getContextActions(file, true));
+		addActionsGroup(tr("Pattern Editor"), getContextActions(file, false));
 
-		auto patternEditorHeader = new QAction(tr("Pattern Editor"), nullptr);
-		patternEditorHeader->setDisabled(true);
-		contextMenu.addAction(patternEditorHeader);
-		contextMenu.addActions(getContextActions(file, false));
 		break;
 	}
 	case TypeDirectoryItem: {
@@ -711,15 +707,32 @@ QList<QAction*> FileBrowserTreeWidget::getContextActions(FileItem* file, bool so
 	QList<QAction*> result = QList<QAction*>();
 	const bool fileIsSample = file->type() == FileItem::FileType::Sample;
 
-	QString instrumentAction = fileIsSample ?
-		tr("Send to new AudioFileProcessor instance") :
-		tr("Send to new instrument track");
-	QString shortcutMod = songEditor ? "" : UI_CTRL_KEY + QString(" + ");
+	auto fileCanBeInstrument = false;
+	switch (file->type()) {
+	case FileItem::FileType::Preset:
+	case FileItem::FileType::Sample:
+	case FileItem::FileType::SoundFont:
+	case FileItem::FileType::Patch:
+	case FileItem::FileType::VstPlugin:
+		fileCanBeInstrument = true;
 
-	auto toInstrument = new QAction(instrumentAction + tr(" (%2Enter)").arg(shortcutMod));
-	connect(toInstrument, &QAction::triggered,
-		[=, this]{ openInNewInstrumentTrack(file, songEditor); });
-	result.append(toInstrument);
+	case FileItem::FileType::Project:
+	case FileItem::FileType::Midi:
+	case FileItem::FileType::Unknown:
+		break;
+	}
+
+	if (fileCanBeInstrument)
+	{
+		const auto instrumentAction = fileIsSample
+			? tr("Send to new AudioFileProcessor instance")
+			: tr("Send to new instrument track");
+		const auto shortcutMod = songEditor ? "" : UI_CTRL_KEY + QString(" + ");
+
+		auto* toInstrument = new QAction(instrumentAction + tr(" (%2Enter)").arg(shortcutMod));
+		connect(toInstrument, &QAction::triggered, [=, this] { openInNewInstrumentTrack(file, songEditor); });
+		result.append(toInstrument);
+	}
 
 	if (songEditor && fileIsSample)
 	{
