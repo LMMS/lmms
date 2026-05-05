@@ -22,14 +22,18 @@
  *
  */
 
-#include <QLabel>
-
 #include "InstrumentSoundShapingView.h"
+
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QVBoxLayout>
+
 #include "EnvelopeAndLfoParameters.h"
 #include "EnvelopeAndLfoView.h"
 #include "ComboBox.h"
 #include "GroupBox.h"
-#include "gui_templates.h"
+#include "FontHelper.h"
+#include "InstrumentSoundShaping.h"
 #include "Knob.h"
 #include "TabWidget.h"
 
@@ -37,69 +41,52 @@
 namespace lmms::gui
 {
 
-const int TARGETS_TABWIDGET_X = 4;
-const int TARGETS_TABWIDGET_Y = 5;
-const int TARGETS_TABWIDGET_WIDTH = 242;
-const int TARGETS_TABWIDGET_HEIGTH = 175;
-
-const int FILTER_GROUPBOX_X = TARGETS_TABWIDGET_X;
-const int FILTER_GROUPBOX_Y = TARGETS_TABWIDGET_Y+TARGETS_TABWIDGET_HEIGTH+5;
-const int FILTER_GROUPBOX_WIDTH = TARGETS_TABWIDGET_WIDTH;
-const int FILTER_GROUPBOX_HEIGHT = 245-FILTER_GROUPBOX_Y;
-
-
-
-InstrumentSoundShapingView::InstrumentSoundShapingView( QWidget * _parent ) :
-	QWidget( _parent ),
-	ModelView( nullptr, this ),
-	m_ss( nullptr )
+InstrumentSoundShapingView::InstrumentSoundShapingView(QWidget* parent) :
+	QWidget(parent),
+	ModelView(nullptr, this)
 {
-	m_targetsTabWidget = new TabWidget( tr( "TARGET" ), this );
-	m_targetsTabWidget->setGeometry( TARGETS_TABWIDGET_X,
-						TARGETS_TABWIDGET_Y,
-						TARGETS_TABWIDGET_WIDTH,
-						TARGETS_TABWIDGET_HEIGTH );
+	QVBoxLayout* mainLayout = new QVBoxLayout(this);
+	mainLayout->setContentsMargins(5, 5, 5, 5);
 
-	for( int i = 0; i < InstrumentSoundShaping::NumTargets; ++i )
-	{
-		m_envLfoViews[i] = new EnvelopeAndLfoView( m_targetsTabWidget );
-		m_targetsTabWidget->addTab( m_envLfoViews[i],
-						tr( InstrumentSoundShaping::targetNames[i][0] ), 
-                                                nullptr );
-	}
+	m_targetsTabWidget = new TabWidget(tr("TARGET"), this);
 
+	m_volumeView = new EnvelopeAndLfoView(m_targetsTabWidget);
+	m_cutoffView = new EnvelopeAndLfoView(m_targetsTabWidget);
+	m_resonanceView = new EnvelopeAndLfoView(m_targetsTabWidget);
 
-	m_filterGroupBox = new GroupBox( tr( "FILTER" ), this );
-	m_filterGroupBox->setGeometry( FILTER_GROUPBOX_X, FILTER_GROUPBOX_Y,
-						FILTER_GROUPBOX_WIDTH,
-						FILTER_GROUPBOX_HEIGHT );
+	m_targetsTabWidget->addTab(m_volumeView, tr("VOLUME"), nullptr);
+	m_targetsTabWidget->addTab(m_cutoffView, tr("CUTOFF"), nullptr);
+	m_targetsTabWidget->addTab(m_resonanceView, tr("RESO"), nullptr);
+
+	mainLayout->addWidget(m_targetsTabWidget, 1);
 
 
-	m_filterComboBox = new ComboBox( m_filterGroupBox );
-	m_filterComboBox->setGeometry( 14, 22, 120, ComboBox::DEFAULT_HEIGHT );
-	m_filterComboBox->setFont( pointSize<8>( m_filterComboBox->font() ) );
+	m_filterGroupBox = new GroupBox(tr("FILTER"), this);
+	QHBoxLayout* filterLayout = new QHBoxLayout(m_filterGroupBox);
+	QMargins filterMargins = filterLayout->contentsMargins();
+	filterMargins.setTop(18);
+	filterLayout->setContentsMargins(filterMargins);
+
+	m_filterComboBox = new ComboBox(m_filterGroupBox);
+	filterLayout->addWidget(m_filterComboBox);
+
+	m_filterCutKnob = new Knob(KnobType::Bright26, tr("FREQ"), m_filterGroupBox, Knob::LabelRendering::LegacyFixedFontSize);
+	m_filterCutKnob->setHintText(tr("Cutoff frequency:"), " " + tr("Hz"));
+	filterLayout->addWidget(m_filterCutKnob);
+
+	m_filterResKnob = new Knob(KnobType::Bright26, tr("Q/RESO"), m_filterGroupBox, Knob::LabelRendering::LegacyFixedFontSize);
+	m_filterResKnob->setHintText(tr("Q/Resonance:"), "");
+	filterLayout->addWidget(m_filterResKnob);
+
+	mainLayout->addWidget(m_filterGroupBox);
 
 
-	m_filterCutKnob = new Knob( knobBright_26, m_filterGroupBox );
-	m_filterCutKnob->setLabel( tr( "FREQ" ) );
-	m_filterCutKnob->move( 140, 18 );
-	m_filterCutKnob->setHintText( tr( "Cutoff frequency:" ), " " + tr( "Hz" ) );
+	m_singleStreamInfoLabel = new QLabel(tr("Envelopes, LFOs and filters are not supported by the current instrument."), this);
+	m_singleStreamInfoLabel->setWordWrap(true);
+	// TODO Could also be rendered in system font size...
+	m_singleStreamInfoLabel->setFont(adjustedToPixelSize(m_singleStreamInfoLabel->font(), DEFAULT_FONT_SIZE));
 
-
-	m_filterResKnob = new Knob( knobBright_26, m_filterGroupBox );
-	m_filterResKnob->setLabel( tr( "Q/RESO" ) );
-	m_filterResKnob->move( 196, 18 );
-	m_filterResKnob->setHintText( tr( "Q/Resonance:" ), "" );
-
-
-	m_singleStreamInfoLabel = new QLabel( tr( "Envelopes, LFOs and filters are not supported by the current instrument." ), this );
-	m_singleStreamInfoLabel->setWordWrap( true );
-	m_singleStreamInfoLabel->setFont( pointSize<8>( m_singleStreamInfoLabel->font() ) );
-
-	m_singleStreamInfoLabel->setGeometry( TARGETS_TABWIDGET_X,
-						TARGETS_TABWIDGET_Y,
-						TARGETS_TABWIDGET_WIDTH,
-						TARGETS_TABWIDGET_HEIGTH );
+	mainLayout->addWidget(m_singleStreamInfoLabel, 0, Qt::AlignTop);
 }
 
 
@@ -124,14 +111,14 @@ void InstrumentSoundShapingView::setFunctionsHidden( bool hidden )
 void InstrumentSoundShapingView::modelChanged()
 {
 	m_ss = castModel<InstrumentSoundShaping>();
-	m_filterGroupBox->setModel( &m_ss->m_filterEnabledModel );
-	m_filterComboBox->setModel( &m_ss->m_filterModel );
-	m_filterCutKnob->setModel( &m_ss->m_filterCutModel );
-	m_filterResKnob->setModel( &m_ss->m_filterResModel );
-	for( int i = 0; i < InstrumentSoundShaping::NumTargets; ++i )
-	{
-		m_envLfoViews[i]->setModel( m_ss->m_envLfoParameters[i] );
-	}
+	m_filterGroupBox->setModel(&m_ss->getFilterEnabledModel());
+	m_filterComboBox->setModel(&m_ss->getFilterModel());
+	m_filterCutKnob->setModel(&m_ss->getFilterCutModel());
+	m_filterResKnob->setModel(&m_ss->getFilterResModel());
+
+	m_volumeView->setModel(&m_ss->getVolumeParameters());
+	m_cutoffView->setModel(&m_ss->getCutoffParameters());
+	m_resonanceView->setModel(&m_ss->getResonanceParameters());
 }
 
 

@@ -42,7 +42,7 @@ ToolPlugin * ToolPlugin::instantiate( const QString & _plugin_name, Model * _par
 {
 	Plugin * p = Plugin::instantiate( _plugin_name, _parent, nullptr );
 	// check whether instantiated plugin is a tool
-	if( p->type() == Plugin::Tool )
+	if( p->type() == Plugin::Type::Tool )
 	{
 		// everything ok, so return pointer
 		return dynamic_cast<ToolPlugin *>( p );

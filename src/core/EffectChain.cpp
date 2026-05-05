@@ -23,10 +23,12 @@
  *
  */
 
+#include "EffectChain.h"
 
 #include <QDomElement>
+#include <cassert>
 
-#include "EffectChain.h"
+#include "AudioBuffer.h"
 #include "Effect.h"
 #include "DummyEffect.h"
 #include "MixHelpers.h"
@@ -56,7 +58,7 @@ EffectChain::~EffectChain()
 void EffectChain::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	m_enabledModel.saveSettings( _doc, _this, "enabled" );
-	_this.setAttribute( "numofeffects", m_effects.count() );
+	_this.setAttribute("numofeffects", static_cast<int>(m_effects.size()));
 
 	for( Effect* effect : m_effects)
 	{
@@ -121,7 +123,7 @@ void EffectChain::loadSettings( const QDomElement & _this )
 void EffectChain::appendEffect( Effect * _effect )
 {
 	Engine::audioEngine()->requestChangeInModel();
-	m_effects.append( _effect );
+	m_effects.push_back(_effect);
 	Engine::audioEngine()->doneChangeInModel();
 
 	m_enabledModel.setValue( true );
@@ -136,7 +138,7 @@ void EffectChain::removeEffect( Effect * _effect )
 {
 	Engine::audioEngine()->requestChangeInModel();
 
-	Effect ** found = std::find( m_effects.begin(), m_effects.end(), _effect );
+	auto found = std::find(m_effects.begin(), m_effects.end(), _effect);
 	if( found == m_effects.end() )
 	{
 		Engine::audioEngine()->doneChangeInModel();
@@ -146,7 +148,7 @@ void EffectChain::removeEffect( Effect * _effect )
 
 	Engine::audioEngine()->doneChangeInModel();
 
-	if( m_effects.isEmpty() )
+	if (m_effects.empty())
 	{
 		m_enabledModel.setValue( false );
 	}
@@ -159,10 +161,11 @@ void EffectChain::removeEffect( Effect * _effect )
 
 void EffectChain::moveDown( Effect * _effect )
 {
-	if( _effect != m_effects.last() )
+	if (_effect != m_effects.back())
 	{
-		int i = m_effects.indexOf(_effect);
-		std::swap(m_effects[i + 1], m_effects[i]);
+		auto it = std::find(m_effects.begin(), m_effects.end(), _effect);
+		assert(it != m_effects.end());
+		std::swap(*std::next(it), *it);
 	}
 }
 
@@ -171,52 +174,33 @@ void EffectChain::moveDown( Effect * _effect )
 
 void EffectChain::moveUp( Effect * _effect )
 {
-	if( _effect != m_effects.first() )
+	if (_effect != m_effects.front())
 	{
-		int i = m_effects.indexOf(_effect);
-		std::swap(m_effects[i - 1], m_effects[i]);
+		auto it = std::find(m_effects.begin(), m_effects.end(), _effect);
+		assert(it != m_effects.end());
+		std::swap(*std::prev(it), *it);
 	}
 }
 
 
 
 
-bool EffectChain::processAudioBuffer( sampleFrame * _buf, const fpp_t _frames, bool hasInputNoise )
+bool EffectChain::processAudioBuffer(AudioBuffer& buffer)
 {
 	if( m_enabledModel.value() == false )
 	{
 		return false;
 	}
 
-	MixHelpers::sanitize( _buf, _frames );
+	buffer.sanitizeAll();
 
 	bool moreEffects = false;
-	for (const auto& effect : m_effects)
+	for (Effect* effect : m_effects)
 	{
-		if (hasInputNoise || effect->isRunning())
-		{
-			moreEffects |= effect->processAudioBuffer(_buf, _frames);
-			MixHelpers::sanitize(_buf, _frames);
-		}
+		moreEffects |= effect->processAudioBuffer(buffer);
 	}
 
 	return moreEffects;
-}
-
-
-
-
-void EffectChain::startRunning()
-{
-	if( m_enabledModel.value() == false )
-	{
-		return;
-	}
-
-	for (const auto& effect : m_effects)
-	{
-		effect->startRunning();
-	}
 }
 
 
@@ -228,9 +212,9 @@ void EffectChain::clear()
 
 	Engine::audioEngine()->requestChangeInModel();
 
-	while( m_effects.count() )
+	while (m_effects.size())
 	{
-		Effect * e = m_effects[m_effects.count() - 1];
+		auto e = m_effects[m_effects.size() - 1];
 		m_effects.pop_back();
 		delete e;
 	}

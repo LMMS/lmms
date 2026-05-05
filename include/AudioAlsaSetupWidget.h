@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef AUDIO_ALSA_SETUP_WIDGET_H
-#define AUDIO_ALSA_SETUP_WIDGET_H
+#ifndef LMMS_GUI_AUDIO_ALSA_SETUP_WIDGET_H
+#define LMMS_GUI_AUDIO_ALSA_SETUP_WIDGET_H
 
 #include "lmmsconfig.h"
 
@@ -66,4 +66,4 @@ private:
 
 #endif // LMMS_HAVE_ALSA
 
-#endif
+#endif // LMMS_GUI_AUDIO_ALSA_SETUP_WIDGET_H

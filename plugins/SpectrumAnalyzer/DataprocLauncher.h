@@ -37,7 +37,7 @@ namespace lmms
 class DataprocLauncher : public QThread
 {
 public:
-	explicit DataprocLauncher(SaProcessor &proc, LocklessRingBuffer<sampleFrame> &buffer)
+	explicit DataprocLauncher(SaProcessor &proc, LocklessRingBuffer<SampleFrame> &buffer)
 		: m_processor(&proc),
 		m_inputBuffer(&buffer)
 	{
@@ -50,7 +50,7 @@ private:
 	}
 
 	SaProcessor *m_processor;
-	LocklessRingBuffer<sampleFrame> *m_inputBuffer;
+	LocklessRingBuffer<SampleFrame> *m_inputBuffer;
 };
 
 

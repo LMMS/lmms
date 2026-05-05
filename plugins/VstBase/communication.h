@@ -40,15 +40,15 @@ struct VstParameterDumpItem
 
 
 
-enum VstHostLanguages
+enum class VstHostLanguage
 {
-	LanguageEnglish = 1,
-	LanguageGerman,
-	LanguageFrench,
-	LanguageItalian,
-	LanguageSpanish,
-	LanguageJapanese,
-	LanguageKorean
+	English = 1,
+	German,
+	French,
+	Italian,
+	Spanish,
+	Japanese,
+	Korean
 } ;
 
 
@@ -69,8 +69,10 @@ enum VstRemoteMessageIDs
 	IdVstSetProgram,
 	IdVstRotateProgram,
 	IdVstIdleUpdate,
-	IdVstParameterDisplays,
-	IdVstParameterLabels,
+	IdVstLoadAllParameterDisplays,
+	IdVstLoadAllParameterLabels,
+	IdVstUpdateParameterDisplay,
+	IdVstUpdateParameterLabel,
 
 	// remoteVstPlugin -> vstPlugin
 	IdVstFailedLoadingPlugin,

@@ -22,32 +22,33 @@
  *
  */
 
-#ifndef INLINE_AUTOMATION_H
-#define INLINE_AUTOMATION_H
+#ifndef LMMS_INLINE_AUTOMATION_H
+#define LMMS_INLINE_AUTOMATION_H
 
 #include "AutomationNode.h"
 #include "AutomationClip.h"
-#include "shared_object.h"
 
 namespace lmms
 {
 
-class InlineAutomation : public FloatModel, public sharedObject
+class InlineAutomation : public FloatModel
 {
 public:
 	InlineAutomation() :
-		FloatModel(),
-		sharedObject(),
-		m_autoClip( nullptr )
+		FloatModel()
 	{
+	}
+
+	InlineAutomation(const InlineAutomation& _copy) :
+		FloatModel(_copy.value(), _copy.minValue(), _copy.maxValue(), _copy.step<float>()),
+		m_autoClip(_copy.m_autoClip->clone())
+	{
+		m_autoClip->clearObjects();
+		m_autoClip->addObject(this);
 	}
 
 	~InlineAutomation() override
 	{
-		if( m_autoClip )
-		{
-			delete m_autoClip;
-		}
 	}
 
 	virtual float defaultValue() const = 0;
@@ -81,10 +82,10 @@ public:
 	{
 		if( m_autoClip == nullptr )
 		{
-			m_autoClip = new AutomationClip( nullptr );
+			m_autoClip = std::make_unique<AutomationClip>(nullptr);
 			m_autoClip->addObject( this );
 		}
-		return m_autoClip;
+		return m_autoClip.get();
 	}
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
@@ -92,11 +93,11 @@ public:
 
 
 private:
-	AutomationClip * m_autoClip;
+	std::unique_ptr<AutomationClip> m_autoClip;
 
 } ;
 
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_INLINE_AUTOMATION_H

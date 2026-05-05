@@ -2178,7 +2178,7 @@ Please make sure you have write-permission to the file and the directory contain
     </message>
 </context>
 <context>
-    <name>MixerLine</name>
+    <name>MixerChannelView</name>
     <message>
         <source>Channel send amount</source>
         <translation type="unfinished"/>
@@ -2956,7 +2956,7 @@ You can remove and move mixer channels in the context menu, which is accessed by
     </message>
 </context>
 <context>
-    <name>InstrumentMiscView</name>
+    <name>InstrumentTuningView</name>
     <message>
         <source>MASTER PITCH</source>
         <translation type="unfinished"/>
@@ -7752,7 +7752,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
 </context>
 <context>
-    <name>MixerLineLcdSpinBox</name>
+    <name>MixerChannelLcdSpinBox</name>
     <message>
         <source>Assign to:</source>
         <translation type="unfinished"/>

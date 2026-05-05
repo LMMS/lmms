@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef AUDIO_DUMMY_H
-#define AUDIO_DUMMY_H
+#ifndef LMMS_AUDIO_DUMMY_H
+#define LMMS_AUDIO_DUMMY_H
 
 #include "AudioDevice.h"
 #include "AudioDeviceSetupWidget.h"
@@ -78,12 +78,12 @@ public:
 
 
 private:
-	void startProcessing() override
+	void startProcessingImpl() override
 	{
 		start();
 	}
 
-	void stopProcessing() override
+	void stopProcessingImpl() override
 	{
 		stopProcessingThread( this );
 	}
@@ -91,20 +91,12 @@ private:
 	void run() override
 	{
 		MicroTimer timer;
-		while( true )
+		while (AudioDevice::isRunning())
 		{
 			timer.reset();
-			const surroundSampleFrame* b = audioEngine()->nextBuffer();
-			if( !b )
-			{
-				break;
-			}
-			if( audioEngine()->hasFifoWriter() )
-			{
-				delete[] b;
-			}
+			audioEngine()->renderNextPeriod();
 
-			const int microseconds = static_cast<int>( audioEngine()->framesPerPeriod() * 1000000.0f / audioEngine()->processingSampleRate() - timer.elapsed() );
+			const int microseconds = static_cast<int>( audioEngine()->framesPerPeriod() * 1000000.0f / audioEngine()->outputSampleRate() - timer.elapsed() );
 			if( microseconds > 0 )
 			{
 				usleep( microseconds );
@@ -116,4 +108,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_AUDIO_DUMMY_H

@@ -22,9 +22,8 @@
  *
  */
 
-
-#ifndef ACTION_GROUP_H
-#define ACTION_GROUP_H
+#ifndef LMMS_GUI_ACTION_GROUP_H
+#define LMMS_GUI_ACTION_GROUP_H
 
 #include <QActionGroup>
 
@@ -59,4 +58,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_ACTION_GROUP_H

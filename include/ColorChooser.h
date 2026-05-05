@@ -21,8 +21,8 @@
  *
  */
 
-#ifndef COLOR_CHOOSER_H
-#define COLOR_CHOOSER_H
+#ifndef LMMS_GUI_COLOR_CHOOSER_H
+#define LMMS_GUI_COLOR_CHOOSER_H
 
 #include <QApplication>
 #include <QColor>
@@ -34,7 +34,7 @@ namespace lmms::gui
 {
 
 
-class ColorChooser: public QColorDialog
+class ColorChooser : public QColorDialog
 {
 public:
 	ColorChooser(const QColor &initial, QWidget *parent): QColorDialog(initial, parent) {};
@@ -55,8 +55,7 @@ protected:
 	//! Forward key events to the parent to prevent stuck notes when the dialog gets focus
 	void keyReleaseEvent(QKeyEvent *event) override
 	{
-		QKeyEvent ke(*event);
-		QApplication::sendEvent(parentWidget(), &ke);
+		QApplication::sendEvent(parentWidget(), event);
 	}
 private:
 	//! Copy the current QColorDialog palette into an array
@@ -68,5 +67,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif
-
+#endif // LMMS_GUI_COLOR_CHOOSER_H

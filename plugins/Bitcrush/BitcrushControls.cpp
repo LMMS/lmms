@@ -24,7 +24,6 @@
  */
 
 
-#include <QDomElement>
 
 #include "BitcrushControls.h"
 #include "Bitcrush.h"

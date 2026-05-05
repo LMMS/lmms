@@ -16,7 +16,7 @@
       <arpeggiator arptime="100" arprange="1" arptime_denominator="4" syncmode="0" arpmode="0" arp-enabled="0" arp="0" arptime_numerator="4" arpdir="0" arpgate="100"/>
       <midiport inputcontroller="0" inports="" fixedoutputvelocity="0" inputchannel="0" outputcontroller="0" writable="0" outputchannel="1" fixedinputvelocity="-1" fixedoutputnote="-1" outputprogram="1" basevelocity="127" readable="0"/>
       <fxchain numofeffects="7" enabled="1">
-        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" autoquit="8000" gate="0" name="ladspaeffect" wet="1" on="1">
+        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" autoquit="8000" name="ladspaeffect" wet="1" on="1">
           <ladspacontrols link="1" ports="2">
             <port01 link="1" data="72"/>
             <port11 data="72"/>
@@ -26,7 +26,7 @@
             <attribute value="Clip" name="plugin"/>
           </key>
         </effect>
-        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" autoquit="8000" gate="0" name="ladspaeffect" wet="1" on="1">
+        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" autoquit="8000" name="ladspaeffect" wet="1" on="1">
           <ladspacontrols link="1" ports="2">
             <port01 link="1" data="-10.08"/>
             <port11 data="-10.08"/>
@@ -36,7 +36,7 @@
             <attribute value="Clip" name="plugin"/>
           </key>
         </effect>
-        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" autoquit="1" gate="0" name="ladspaeffect" wet="0.5" on="1">
+        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" autoquit="1" name="ladspaeffect" wet="0.5" on="1">
           <ladspacontrols link="1" ports="20">
             <port01 link="1" data="-30.06"/>
             <port02 link="1" data="0"/>
@@ -64,7 +64,7 @@
             <attribute value="Eq" name="plugin"/>
           </key>
         </effect>
-        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" autoquit="8000" gate="0" name="ladspaeffect" wet="1" on="1">
+        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" autoquit="8000" name="ladspaeffect" wet="1" on="1">
           <ladspacontrols link="1" ports="8">
             <port01 link="1" data="0.25"/>
             <port02 link="1" data="0.75"/>
@@ -80,7 +80,7 @@
             <attribute value="PhaserII" name="plugin"/>
           </key>
         </effect>
-        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" autoquit="8000" gate="0" name="ladspaeffect" wet="1" on="1">
+        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" autoquit="8000" name="ladspaeffect" wet="1" on="1">
           <ladspacontrols ports="4">
             <port02 data="0.50197"/>
             <port03 data="0.749"/>
@@ -92,7 +92,7 @@
             <attribute value="Plate2x2" name="plugin"/>
           </key>
         </effect>
-        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" autoquit="8000" gate="0" name="ladspaeffect" wet="-0.5" on="1">
+        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" autoquit="8000" name="ladspaeffect" wet="-0.5" on="1">
           <ladspacontrols ports="10">
             <port00 data="320"/>
             <port01 data="50"/>
@@ -110,7 +110,7 @@
             <attribute value="tap_stereo_echo" name="plugin"/>
           </key>
         </effect>
-        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" autoquit="1" gate="0" name="stereomatrix" wet="1" on="1">
+        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" autoquit="1" name="stereomatrix" wet="1" on="1">
           <stereomatrixcontrols l-l="0.66" l-r="0" r-l="0.33" r-r="0.5"/>
           <key/>
         </effect>

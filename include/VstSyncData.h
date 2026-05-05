@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef VST_SYNC_DATA_H
-#define VST_SYNC_DATA_H
+#ifndef LMMS_VST_SYNC_DATA_H
+#define LMMS_VST_SYNC_DATA_H
 
 namespace lmms
 {
@@ -48,17 +48,17 @@ struct VstSyncData
 	bool isCycle;
 	float cycleStart;
 	float cycleEnd;
-	bool m_playbackJumped;
-	int m_bufferSize;
-	int m_sampleRate;
-	int m_bpm;
+	bool playbackJumped;
+	int bufferSize;
+	int sampleRate;
+	int bpm;
 
 #ifdef VST_SNC_LATENCY
-	float m_latency;
+	float latency;
 #endif
 } ;
 
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_VST_SYNC_DATA_H

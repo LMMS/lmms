@@ -22,9 +22,8 @@
  *
  */
 
-
-#ifndef COMBOBOX_H
-#define COMBOBOX_H
+#ifndef LMMS_GUI_COMBOBOX_H
+#define LMMS_GUI_COMBOBOX_H
 
 #include <QMenu>
 #include <QWidget>
@@ -67,9 +66,9 @@ protected:
 
 
 private:
-	static QPixmap* s_background;
-	static QPixmap* s_arrow;
-	static QPixmap* s_arrowSelected;
+	QPixmap m_background = embed::getIconPixmap("combobox_bg");
+	QPixmap m_arrow = embed::getIconPixmap("combobox_arrow");
+	QPixmap m_arrowSelected = embed::getIconPixmap("combobox_arrow_selected");
 
 	QMenu m_menu;
 
@@ -83,4 +82,4 @@ private slots:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_COMBOBOX_H

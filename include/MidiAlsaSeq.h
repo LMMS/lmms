@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef MIDI_ALSA_SEQ_H
-#define MIDI_ALSA_SEQ_H
+#ifndef LMMS_MIDI_ALSA_SEQ_H
+#define LMMS_MIDI_ALSA_SEQ_H
 
 #include "lmmsconfig.h"
 
@@ -39,7 +39,6 @@
 #include "MidiClient.h"
 
 
-struct pollfd;
 
 
 namespace lmms
@@ -158,5 +157,4 @@ signals:
 
 #endif // LMMS_HAVE_ALSA
 
-#endif
-
+#endif // LMMS_MIDI_ALSA_SEQ_H

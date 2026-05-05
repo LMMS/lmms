@@ -76,12 +76,12 @@ LV2_URID UridMap::map(const char *uri)
 		if (itr == m_map.end())
 		{
 			// 1 is the first free URID
-			std::size_t index = 1u + m_unMap.size();
+			const auto index = static_cast<LV2_URID>(1u + m_unMap.size());
 			auto pr = m_map.emplace(std::move(uriStr), index);
 			if (pr.second)
 			{
 				m_unMap.emplace_back(pr.first->first.c_str());
-				result = static_cast<LV2_URID>(index);
+				result = index;
 			}
 		}
 		else { result = itr->second; }

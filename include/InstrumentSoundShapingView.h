@@ -22,15 +22,16 @@
  *
  */
 
-#ifndef INSTRUMENT_SOUND_SHAPING_VIEW_H
-#define INSTRUMENT_SOUND_SHAPING_VIEW_H
+#ifndef LMMS_GUI_INSTRUMENT_SOUND_SHAPING_VIEW_H
+#define LMMS_GUI_INSTRUMENT_SOUND_SHAPING_VIEW_H
 
 #include <QWidget>
 
-#include "InstrumentSoundShaping.h"
 #include "ModelView.h"
 
 class QLabel;
+
+namespace lmms { class InstrumentSoundShaping; }
 
 namespace lmms::gui
 {
@@ -56,9 +57,12 @@ private:
 	void modelChanged() override;
 
 
-	InstrumentSoundShaping * m_ss;
+	InstrumentSoundShaping * m_ss = nullptr;
 	TabWidget * m_targetsTabWidget;
-	EnvelopeAndLfoView * m_envLfoViews[InstrumentSoundShaping::NumTargets];
+
+	EnvelopeAndLfoView* m_volumeView;
+	EnvelopeAndLfoView* m_cutoffView;
+	EnvelopeAndLfoView* m_resonanceView;
 
 	// filter-stuff
 	GroupBox * m_filterGroupBox;
@@ -67,10 +71,9 @@ private:
 	Knob * m_filterResKnob;
 
 	QLabel* m_singleStreamInfoLabel;
-
-} ;
+};
 
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_INSTRUMENT_SOUND_SHAPING_VIEW_H

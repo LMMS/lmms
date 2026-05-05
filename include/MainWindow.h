@@ -22,25 +22,23 @@
  *
  */
 
-#ifndef MAIN_WINDOW_H
-#define MAIN_WINDOW_H
+#ifndef LMMS_GUI_MAIN_WINDOW_H
+#define LMMS_GUI_MAIN_WINDOW_H
 
 #include <QBasicTimer>
 #include <QTimer>
 #include <QList>
 #include <QMainWindow>
+#include <QMdiArea>
 
 #include "ConfigManager.h"
 
 class QAction;
 class QDomElement;
 class QGridLayout;
-class QMdiArea;
 
 namespace lmms
 {
-
-class ConfigManager;
 
 namespace gui
 {
@@ -48,7 +46,6 @@ namespace gui
 class PluginView;
 class SubWindow;
 class ToolButton;
-class GuiApplication;
 
 
 class MainWindow : public QMainWindow
@@ -57,7 +54,7 @@ class MainWindow : public QMainWindow
 public:
 	QMdiArea* workspace()
 	{
-		return m_workspace;
+		return static_cast<QMdiArea*>(m_workspace);
 	}
 
 	QWidget* toolBar()
@@ -71,6 +68,8 @@ public:
 	// wrap the widget with a window decoration and add it to the workspace
 	LMMS_EXPORT SubWindow* addWindowedWidget(QWidget *w, Qt::WindowFlags windowFlags = QFlag(0));
 
+
+	void refocus();
 
 	///
 	/// \brief	Asks whether changes made to the project are to be saved.
@@ -113,7 +112,7 @@ public:
 		return m_autoSaveTimer.interval();
 	}
 
-	enum SessionState
+	enum class SessionState
 	{
 		Normal,
 		Recover
@@ -142,8 +141,12 @@ public:
 
 	static void saveWidgetState( QWidget * _w, QDomElement & _de );
 	static void restoreWidgetState( QWidget * _w, const QDomElement & _de );
+	void setAllSubWindowsDetached(bool detached);
 
 	bool eventFilter(QObject* watched, QEvent* event) override;
+
+signals:
+	void detachAllSubWindows(bool detached);
 
 public slots:
 	void resetWindowTitle();
@@ -195,14 +198,28 @@ private:
 	void finalize();
 
 	void toggleWindow( QWidget *window, bool forceShow = false );
-	void refocus();
 
 	void exportProject(bool multiExport = false);
 	void handleSaveResult(QString const & filename, bool songSavedSuccessfully);
 	bool guiSaveProject();
 	bool guiSaveProjectAs( const QString & filename );
 
-	QMdiArea * m_workspace;
+	class MovableQMdiArea : public QMdiArea
+	{
+	public:
+		MovableQMdiArea(QWidget* parent = nullptr);
+		~MovableQMdiArea() {}
+	protected:
+		void mousePressEvent(QMouseEvent* event) override;
+		void mouseMoveEvent(QMouseEvent* event) override;
+		void mouseReleaseEvent(QMouseEvent* event) override;
+	private:
+		bool m_isBeingMoved;
+		int m_lastX;
+		int m_lastY;
+	};
+
+	MovableQMdiArea * m_workspace;
 
 	QWidget * m_toolBar;
 	QGridLayout * m_toolBarLayout;
@@ -248,7 +265,6 @@ private slots:
 	void onExportProject();
 	void onExportProjectTracks();
 	void onImportProject();
-	void onSongStopped();
 	void onSongModified();
 	void onProjectFileNameChanged();
 
@@ -258,9 +274,8 @@ signals:
 
 } ;
 
-
 } // namespace gui
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_MAIN_WINDOW_H

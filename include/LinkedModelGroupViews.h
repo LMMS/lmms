@@ -22,14 +22,12 @@
  *
  */
 
-#ifndef LINKEDMODELGROUPVIEWS_H
-#define LINKEDMODELGROUPVIEWS_H
-
+#ifndef LMMS_GUI_LINKED_MODEL_GROUP_VIEWS_H
+#define LMMS_GUI_LINKED_MODEL_GROUP_VIEWS_H
 
 #include <cstddef>
 #include <memory>
 #include <QWidget>
-
 
 namespace lmms
 {
@@ -42,7 +40,7 @@ class LinkedModelGroups;
 namespace gui
 {
 
-class Control;
+class Control;  // IWYU pragma: keep
 
 /**
 	@file LinkedModelGroupViews.h
@@ -120,4 +118,4 @@ private:
 
 } // namespace lmms
 
-#endif // LINKEDMODELGROUPVIEWS_H
+#endif // LMMS_GUI_LINKED_MODEL_GROUP_VIEWS_H

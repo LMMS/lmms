@@ -23,28 +23,31 @@
  *
  */
 
+#include "ControllerRackView.h"
+
 #include <QApplication>
+#include <QAction>
 #include <QPushButton>
 #include <QScrollArea>
 #include <QMessageBox>
 #include <QVBoxLayout>
 
-#include "Song.h"
+#include "ControllerView.h"
+#include "DeprecationHelper.h"
 #include "embed.h"
 #include "GuiApplication.h"
-#include "MainWindow.h"
-#include "ControllerRackView.h"
-#include "ControllerView.h"
 #include "LfoController.h"
+#include "MainWindow.h"
+#include "Song.h"
 #include "SubWindow.h"
 
 namespace lmms::gui
 {
 
 
-ControllerRackView::ControllerRackView() :
-	QWidget(),
-	m_nextIndex(0)
+ControllerRackView::ControllerRackView()
+	: QWidget{}
+	, m_nextIndex{0}
 {
 	setWindowIcon( embed::getIconPixmap( "controller" ) );
 	setWindowTitle( tr( "Controller Rack" ) );
@@ -68,15 +71,18 @@ ControllerRackView::ControllerRackView() :
 			this, SLOT(addController()));
 
 	Song * song = Engine::getSong();
-	connect( song, SIGNAL(controllerAdded(lmms::Controller*)), SLOT(onControllerAdded(lmms::Controller*)));
-	connect( song, SIGNAL(controllerRemoved(lmms::Controller*)), SLOT(onControllerRemoved(lmms::Controller*)));
+	connect(song, &Song::controllerAdded, this, qOverload<Controller*>(&ControllerRackView::addController));
+	connect(song, &Song::controllerRemoved, this, &ControllerRackView::removeController);
 
 	auto layout = new QVBoxLayout();
 	layout->addWidget( m_scrollArea );
 	layout->addWidget( m_addButton );
 	this->setLayout( layout );
 
-	QMdiSubWindow * subWin = getGUI()->mainWindow()->addWindowedWidget( this );
+	SubWindow* subWin = getGUI()->mainWindow()->addWindowedWidget(this);
+
+	setFixedWidth(350);
+	setMinimumHeight(200);
 
 	// No maximize button
 	Qt::WindowFlags flags = subWin->windowFlags();
@@ -85,9 +91,6 @@ ControllerRackView::ControllerRackView() :
 	
 	subWin->setAttribute( Qt::WA_DeleteOnClose, false );
 	subWin->move( 680, 310 );
-	subWin->resize( 350, 200 );
-	subWin->setFixedWidth( 350 );
-	subWin->setMinimumHeight( 200 );
 }
 
 
@@ -132,17 +135,51 @@ void ControllerRackView::deleteController( ControllerView * _view )
 	song->removeController( c );
 }
 
+void ControllerRackView::moveUp(ControllerView* view)
+{
+	if (view == m_controllerViews.first()) { return; }
 
+	const auto storedView = std::find(m_controllerViews.begin(), m_controllerViews.end(), view);
+	assert(storedView != m_controllerViews.end());
 
+	const auto index = std::distance(m_controllerViews.begin(), storedView);
 
-void ControllerRackView::onControllerAdded( Controller * controller )
+	std::swap(m_controllerViews[index - 1], m_controllerViews[index]);
+	m_scrollAreaLayout->removeWidget(view);
+	m_scrollAreaLayout->insertWidget(index - 1, view);
+}
+
+void ControllerRackView::moveDown(ControllerView* view)
+{
+	if (view == m_controllerViews.last()) { return; }
+
+	const auto storedView = std::find(m_controllerViews.begin(), m_controllerViews.end(), view);
+	assert(storedView != m_controllerViews.end());
+	moveUp(*std::next(storedView));
+}
+
+void ControllerRackView::addController(Controller* controller)
 {
 	QWidget * scrollAreaWidget = m_scrollArea->widget();
 
 	auto controllerView = new ControllerView(controller, scrollAreaWidget);
 
-	connect( controllerView, SIGNAL(deleteController(lmms::gui::ControllerView*)),
-		 this, SLOT(deleteController(lmms::gui::ControllerView*)), Qt::QueuedConnection );
+	connect(controllerView, &ControllerView::movedUp, this, &ControllerRackView::moveUp);
+	connect(controllerView, &ControllerView::movedDown, this, &ControllerRackView::moveDown);
+	connect(controllerView, &ControllerView::removedController, this, &ControllerRackView::deleteController, Qt::QueuedConnection);
+
+	auto moveUpAction = new QAction(controllerView);
+	moveUpAction->setShortcut(keySequence(Qt::Key_Up, Qt::AltModifier));
+	moveUpAction->setShortcutContext(Qt::WidgetShortcut);
+	connect(moveUpAction, &QAction::triggered, controllerView, &ControllerView::moveUp);
+	controllerView->addAction(moveUpAction);
+
+	auto moveDownAction = new QAction(controllerView);
+	moveDownAction->setShortcut(keySequence(Qt::Key_Down, Qt::AltModifier));
+	moveDownAction->setShortcutContext(Qt::WidgetShortcut);
+	connect(moveDownAction, &QAction::triggered, controllerView, &ControllerView::moveDown);
+	controllerView->addAction(moveDownAction);
+
 
 	m_controllerViews.append( controllerView );
 	m_scrollAreaLayout->insertWidget( m_nextIndex, controllerView );
@@ -153,7 +190,7 @@ void ControllerRackView::onControllerAdded( Controller * controller )
 
 
 
-void ControllerRackView::onControllerRemoved( Controller * removedController )
+void ControllerRackView::removeController(Controller* removedController)
 {
 	ControllerView * viewOfRemovedController = 0;
 
@@ -191,22 +228,5 @@ void ControllerRackView::addController()
 	// new controller
 	setFocus();
 }
-
-
-
-
-void ControllerRackView::closeEvent( QCloseEvent * _ce )
- {
-	if( parentWidget() )
-	{
-		parentWidget()->hide();
-	}
-	else
-	{
-		hide();
-	}
-	_ce->ignore();
- }
-
 
 } // namespace lmms::gui

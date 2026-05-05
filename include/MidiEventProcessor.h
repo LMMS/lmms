@@ -22,11 +22,10 @@
  *
  */
 
-#ifndef MIDI_EVENT_PROCESSOR_H
-#define MIDI_EVENT_PROCESSOR_H
+#ifndef LMMS_MIDI_EVENT_PROCESSOR_H
+#define LMMS_MIDI_EVENT_PROCESSOR_H
 
 #include "MidiEvent.h"
-#include "MemoryManager.h"
 #include "TimePos.h"
 
 namespace lmms
@@ -35,7 +34,6 @@ namespace lmms
 // all classes being able to process MIDI-events should inherit from this
 class MidiEventProcessor
 {
-	MM_OPERATORS
 public:
 	MidiEventProcessor() = default;
 
@@ -49,4 +47,4 @@ public:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_MIDI_EVENT_PROCESSOR_H

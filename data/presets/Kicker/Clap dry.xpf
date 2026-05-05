@@ -16,7 +16,7 @@
       <arpeggiator arptime="100" arprange="1" arptime_denominator="4" syncmode="0" arpmode="0" scale_type="linear" arp-enabled="0" arp="0" arptime_numerator="4" arpdir="0" arpgate="100"/>
       <midiport inputcontroller="0" fixedoutputvelocity="-1" inputchannel="0" scale_type="linear" outputcontroller="0" writable="0" outputchannel="1" fixedinputvelocity="-1" fixedoutputnote="-1" outputprogram="1" basevelocity="63" readable="0"/>
       <fxchain numofeffects="2" enabled="1">
-        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" scale_type="linear" autoquit="1" gate="0" name="ladspaeffect" wet="1" on="1">
+        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" scale_type="linear" autoquit="1" name="ladspaeffect" wet="1" on="1">
           <ladspacontrols ports="10">
             <port02 scale_type="linear" data="-47.97"/>
             <port03 scale_type="linear" data="0"/>
@@ -34,7 +34,7 @@
             <attribute value="Eq2x2" name="plugin"/>
           </key>
         </effect>
-        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" scale_type="linear" autoquit="1" gate="0" name="dualfilter" wet="1" on="1">
+        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" scale_type="linear" autoquit="1" name="dualfilter" wet="1" on="1">
           <DualFilterControls gain2="100" cut1="1721" cut2="6461" mix="-0.4" res1="1.64" res2="0.5" scale_type="linear" filter1="0" filter2="1" enabled1="1" enabled2="1" gain1="100"/>
           <key/>
         </effect>

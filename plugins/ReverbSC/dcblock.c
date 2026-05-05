@@ -33,7 +33,7 @@ int sp_dcblock_init(sp_data *sp, sp_dcblock *p, int oversampling )
     p->inputs = 0.0;
     p->gain = pow( 0.99, 1.0f / oversampling );
     if (p->gain == 0.0 || p->gain>=1.0 || p->gain<=-1.0)
-      p->gain = 0.99;
+      p->gain = 0.99f;
     return SP_OK;
 }
 

@@ -8,18 +8,18 @@
         <lb302 db24="0" vcf_res="1.01" vcf_dec="0.1" dead="0" vcf_cut="0.18" vcf_mod="1" dist="1" slide_dec="0.5" slide="1" shape="0"/>
       </instrument>
       <fxchain numofeffects="6" enabled="1">
-        <effect autoquit="1" gate="0" name="ladspaeffect" wet="0.5" on="1">
+        <effect autoquit="1" name="ladspaeffect" wet="0.5" on="1">
           <ladspacontrols port11="0.1" port01="0.1" port12="1" port02="1" port13="3.14159" port03="3.14159" port14="0.74925" port04="0.74925" port04link="1" port02link="1" port03link="1" link="0" ports="8" port01link="0"/>
           <key>
             <attribute value="caps" name="file"/>
             <attribute value="PhaserI" name="plugin"/>
           </key>
         </effect>
-        <effect autoquit="1" gate="0" name="stereoenhancer" wet="1" on="1">
+        <effect autoquit="1" name="stereoenhancer" wet="1" on="1">
           <stereoenhancercontrols width="177"/>
           <key/>
         </effect>
-        <effect autoquit="1" gate="0" name="ladspaeffect" wet="1" on="1">
+        <effect autoquit="1" name="ladspaeffect" wet="1" on="1">
           <ladspacontrols link="1" ports="0"/>
           <key>
             <attribute value="dc_remove_1207" name="file"/>

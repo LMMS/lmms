@@ -22,9 +22,8 @@
  *
  */
 
-
-#ifndef PROJECT_NOTES_H
-#define PROJECT_NOTES_H
+#ifndef LMMS_GUI_PROJECT_NOTES_H
+#define LMMS_GUI_PROJECT_NOTES_H
 
 #include <QMainWindow>
 
@@ -59,7 +58,6 @@ public:
 
 
 protected:
-	void closeEvent( QCloseEvent * _ce ) override;
 	void setupActions();
 
 
@@ -94,4 +92,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_PROJECT_NOTES_H

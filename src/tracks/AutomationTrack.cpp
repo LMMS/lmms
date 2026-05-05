@@ -34,12 +34,12 @@ namespace lmms
 
 
 AutomationTrack::AutomationTrack( TrackContainer* tc, bool _hidden ) :
-	Track( _hidden ? HiddenAutomationTrack : Track::AutomationTrack, tc )
+	Track( _hidden ? Type::HiddenAutomation : Type::Automation, tc )
 {
 	setName( tr( "Automation track" ) );
 }
 
-bool AutomationTrack::play( const TimePos & time_start, const fpp_t _frames,
+bool AutomationTrack::play( const TimePos & time_start, const f_cnt_t _frames,
 							const f_cnt_t _frame_base, int _clip_num )
 {
 	return false;
@@ -66,8 +66,7 @@ Clip* AutomationTrack::createClip(const TimePos & pos)
 
 
 
-void AutomationTrack::saveTrackSpecificSettings( QDomDocument & _doc,
-							QDomElement & _this )
+void AutomationTrack::saveTrackSpecificSettings(QDomDocument& doc, QDomElement& _this, bool presetMode)
 {
 }
 
@@ -77,7 +76,7 @@ void AutomationTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 void AutomationTrack::loadTrackSpecificSettings( const QDomElement & _this )
 {
 	// just in case something somehow wrent wrong...
-	if( type() == HiddenAutomationTrack )
+	if( type() == Type::HiddenAutomation )
 	{
 		setMuted( false );
 	}

@@ -23,11 +23,14 @@
  */
 
 #include <cstdlib>
+#include <QDomElement>
 
 #include "ProjectJournal.h"
 #include "Engine.h"
 #include "JournallingObject.h"
+#include "lmms_math.h"
 #include "Song.h"
+#include "AutomationClip.h"
 
 namespace lmms
 {
@@ -58,7 +61,7 @@ void ProjectJournal::undo()
 
 		if( jo )
 		{
-			DataFile curState( DataFile::JournalData );
+			DataFile curState( DataFile::Type::JournalData );
 			jo->saveState( curState, curState.content() );
 			m_redoCheckPoints.push( CheckPoint( c.joID, curState ) );
 
@@ -67,6 +70,12 @@ void ProjectJournal::undo()
 			jo->restoreState( c.data.content().firstChildElement() );
 			setJournalling( prev );
 			Engine::getSong()->setModified();
+
+			// loading AutomationClip connections correctly
+			if (!c.data.content().elementsByTagName("automationclip").isEmpty())
+			{
+				AutomationClip::resolveAllIDs();
+			}
 			break;
 		}
 	}
@@ -83,7 +92,7 @@ void ProjectJournal::redo()
 
 		if( jo )
 		{
-			DataFile curState( DataFile::JournalData );
+			DataFile curState( DataFile::Type::JournalData );
 			jo->saveState( curState, curState.content() );
 			m_undoCheckPoints.push( CheckPoint( c.joID, curState ) );
 
@@ -115,7 +124,7 @@ void ProjectJournal::addJournalCheckPoint( JournallingObject *jo )
 	{
 		m_redoCheckPoints.clear();
 
-		DataFile dataFile( DataFile::JournalData );
+		DataFile dataFile( DataFile::Type::JournalData );
 		jo->saveState( dataFile, dataFile.content() );
 
 		m_undoCheckPoints.push( CheckPoint( jo->id(), dataFile ) );
@@ -127,22 +136,13 @@ void ProjectJournal::addJournalCheckPoint( JournallingObject *jo )
 }
 
 
-
-
-jo_id_t ProjectJournal::allocID( JournallingObject * _obj )
+jo_id_t ProjectJournal::allocID(JournallingObject* obj)
 {
 	jo_id_t id;
-	for( jo_id_t tid = rand(); m_joIDs.contains( id = tid % EO_ID_MSB
-							| EO_ID_MSB ); tid++ )
-	{
-	}
-
-	m_joIDs[id] = _obj;
-	//printf("new id: %d\n", id );
+	for (jo_id_t tid = fastRand(); m_joIDs.contains(id = tid % EO_ID_MSB | EO_ID_MSB); tid++) {}
+	m_joIDs[id] = obj;
 	return id;
 }
-
-
 
 
 void ProjectJournal::reallocID( const jo_id_t _id, JournallingObject * _obj )

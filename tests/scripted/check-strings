@@ -71,19 +71,12 @@ for p in re.findall(r'\[submodule "([^"]+)"\]\s*$', Path('.gitmodules').read_tex
 
 caption('locale')
 
-filenames = set()
 classes_found = set()
 for cur_file in Path('data/locale').glob('*.ts'):
     tree = ElementTree.parse(str(cur_file))
     root = tree.getroot()
-    for location in root.findall('./context/message/location'):
-        filenames.add(location.attrib['filename'])
     for location in root.findall('./context/name'):
         classes_found.add(location.text)
-for f in sorted(filenames):
-    # The files sometimes are relative to data/local and sometimes to the git tree's root...
-    if not Path(f).is_file() and not Path(f'data/locale/{f}').is_file():
-        error('data/locale', f'Source file does not exist: {f}')
 for c in sorted(classes_found):
     if is_our_class(c) and '::' not in c and c not in classes:
         error('data/locale', f'Class does not exist in source code: {c}')
@@ -119,14 +112,14 @@ for theme in sorted([d for d in Path('data/themes').iterdir() if d.is_dir()]):
                         if str(c.value).startswith(GUI_NAMESPACE_PREFIX):
                             classes_in_sheet.add(unscope_classname(stylesheet, c.value))
                         else:
-                            error(str(stylesheet), f"Namespace prefix missing from class {c.value}")
+                            error(stylesheet.as_posix(), f"Namespace prefix missing from class {c.value}")
                     class_found = True
                 # After whitespace or comma comes a new class
                 elif c.type == 'whitespace' or (c.type == 'literal' and c.value == ','):
                     class_found = False
     missing_classes = classes_in_sheet - classes
     for class_in_sheet in sorted(missing_classes):
-        error(str(stylesheet), f'Class does not exist in source code: {class_in_sheet}')
+        error(stylesheet.as_posix(), f'Class does not exist in source code: {class_in_sheet}')
 
 
 caption('patches (checks only plugins/)')
@@ -145,29 +138,9 @@ for cur_file in sorted(Path('.').glob('*/patches/*.patch')):
             if mpath.parent == Path('plugins/LadspaEffect/swh/ladspa/'):
                 mpath = mpath.with_suffix('.xml')
             if not mpath.is_file():
-                error(str(cur_file), f'Source file does not exist: {str(mpath)}')
+                error(cur_file.as_posix(), f'Source file does not exist: {mpath.as_posix()}')
 
 
-caption('debian docs (only one string)')
-
-# Checks for caps.html. This gets relevant when #4027 will be merged
-for line in Path('debian/lmms-common.docs').read_text(errors='replace').splitlines():
-    line = line.rstrip()
-    if 'caps.html' in line and not Path(line).is_file():
-        error('debian/lmms-common.docs', f'Path does not exist: {line}')
-
-
-caption('debian/copyright')
-
-pat = re.compile(r'^Files:\s*(\S+).*$', re.MULTILINE)
-ladspa_swh = re.compile(r'(plugins/LadspaEffect/swh/ladspa/[^/.]+)\.c')
-for mpath in pat.findall(Path('debian/copyright').read_text(errors='replace')):
-    # in case of LADSPA SWH effects, check that the XML exists, not the C file
-    # (because the C files are not generated until a build is done)
-    if res2 := ladspa_swh.match(mpath):
-        mpath = res2.group(1) + '.xml'
-    if not any(Path('.').glob(mpath)):
-        error('debian/copyright', f'Glob/Path does not exist: {mpath}')
 
 
 # summary

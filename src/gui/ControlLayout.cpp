@@ -101,8 +101,7 @@ ControlLayout::ControlLayout(QWidget *parent, int margin, int hSpacing, int vSpa
 
 ControlLayout::~ControlLayout()
 {
-	QLayoutItem *item;
-	while ((item = takeAt(0))) { delete item; }
+	while (auto item = takeAt(0)) { delete item; }
 }
 
 void ControlLayout::onTextChanged(const QString&)
@@ -142,7 +141,7 @@ int ControlLayout::count() const
 	return m_itemMap.size() - 1;
 }
 
-QMap<QString, QLayoutItem*>::const_iterator
+ControlLayout::ControlLayoutMap::const_iterator
 ControlLayout::pairAt(int index) const
 {
 	if (index < 0) { return m_itemMap.cend(); }
@@ -152,7 +151,7 @@ ControlLayout::pairAt(int index) const
 		return item->widget()->objectName() == s_searchBarName;
 	};
 
-	QMap<QString, QLayoutItem*>::const_iterator itr = m_itemMap.cbegin();
+	auto itr = m_itemMap.cbegin();
 	for (; itr != m_itemMap.cend() && (index > 0 || skip(itr.value())); ++itr)
 	{
 		if(!skip(itr.value())) { index--; }
@@ -243,10 +242,8 @@ int ControlLayout::doLayout(const QRect &rect, bool testOnly) const
 	const QString filterText = m_searchBar->text();
 	bool first = true;
 
-	QMapIterator<QString, QLayoutItem*> itr(m_itemMap);
-	while (itr.hasNext())
+	for (auto itr = m_itemMap.cbegin(); itr != m_itemMap.cend(); ++itr)
 	{
-		itr.next();
 		QLayoutItem* item = itr.value();
 		QWidget *wid = item->widget();
 		if (wid)
@@ -258,8 +255,8 @@ int ControlLayout::doLayout(const QRect &rect, bool testOnly) const
 				if (first)
 				{
 					// for the search bar, only show it if there are at least
-					// two control widgets (i.e. at least 3 widgets)
-					if (m_itemMap.size() > 2) { wid->show(); }
+					// five control widgets (i.e. at least 6 widgets)
+					if (m_itemMap.size() > 5) { wid->show(); }
 					else { wid->hide(); }
 				}
 				else { wid->show(); }

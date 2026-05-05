@@ -23,9 +23,8 @@
  *
  */
 
-
-#ifndef CONTROLLER_CONNECTION_DIALOG_H
-#define CONTROLLER_CONNECTION_DIALOG_H
+#ifndef LMMS_GUI_CONTROLLER_CONNECTION_DIALOG_H
+#define LMMS_GUI_CONTROLLER_CONNECTION_DIALOG_H
 
 #include <QDialog>
 #include <QSortFilterProxyModel>
@@ -111,4 +110,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_CONTROLLER_CONNECTION_DIALOG_H

@@ -25,6 +25,7 @@
 #include <set>
 #include <algorithm>
 #include <assert.h>
+#include <array>
 
 using std::string;
 using std::vector;
@@ -47,8 +48,8 @@ int writeVarLength(uint32_t val, uint8_t *buffer)
 	byte in question is the last in the stream
 	*/
 	int size = 0;
-	uint8_t result, little_endian[4];
-	result = val & 0x7F;
+	uint8_t little_endian[4];
+	uint8_t result = val & 0x7F;
 	little_endian[size++] = result;
 	val = val >> 7;
 	while (val > 0)
@@ -129,31 +130,37 @@ struct Event
 	
 	inline int writeToBuffer(uint8_t *buffer) const 
 	{
-		uint8_t code, fourbytes[4];
-		int size=0;
-		switch (type) 
+		int size = 0;
+		switch (type)
 		{
 			case NOTE_ON:
-				code = 0x9 << 4 | channel;
+			{
+				uint8_t code = 0x9 << 4 | channel;
 				size += writeVarLength(time, buffer+size);
 				buffer[size++] = code;
 				buffer[size++] = pitch;
 				buffer[size++] = volume;
 				break;
+			}
 			case NOTE_OFF:
-				code = 0x8 << 4 | channel;
+			{
+				uint8_t code = 0x8 << 4 | channel;
 				size += writeVarLength(time, buffer+size);
 				buffer[size++] = code;
 				buffer[size++] = pitch;
 				buffer[size++] = volume;
 				break;
+			}
 			case TEMPO:
-				code = 0xFF;
+			{
+				uint8_t code = 0xFF;
 				size += writeVarLength(time, buffer+size);
 				buffer[size++] = code;
 				buffer[size++] = 0x51;
 				buffer[size++] = 0x03;
-				writeBigEndian4(int(60000000.0 / tempo), fourbytes);
+
+				std::array<uint8_t, 4> fourbytes;
+				writeBigEndian4(int(60000000.0 / tempo), fourbytes.data());
 				
 				//printf("tempo of %x translates to ", tempo);
 				/*
@@ -164,23 +171,27 @@ struct Event
 				buffer[size++] = fourbytes[2];
 				buffer[size++] = fourbytes[3];
 				break;
+			}
 			case PROG_CHANGE:
-				code = 0xC << 4 | channel;
+			{
+				uint8_t code = 0xC << 4 | channel;
 				size += writeVarLength(time, buffer+size);
 				buffer[size++] = code;
 				buffer[size++] = programNumber;
 				break;
+			}
 			case TRACK_NAME:
+			{
 				size += writeVarLength(time, buffer+size);
 				buffer[size++] = 0xFF;
 				buffer[size++] = 0x03;
 				size += writeVarLength(trackName.size(), buffer+size);
 				trackName.copy((char *)(&buffer[size]), trackName.size());
 				size += trackName.size();
-//				 buffer[size++] = '\0';
-//				 buffer[size++] = '\0';
-				
 				break;
+				//				 buffer[size++] = '\0';
+				//				 buffer[size++] = '\0';
+			}
 		}
 		return size;
 	} // writeEventsToBuffer
@@ -275,7 +286,7 @@ class MIDITrack
 		vector<Event> _events = events;
 		std::sort(_events.begin(), _events.end());
 		vector<Event>::const_iterator it;
-		uint32_t time_last = 0, tmp;
+		uint32_t time_last = 0;
 		for (it = _events.begin(); it!=_events.end(); ++it)
 		{
 			Event e = *it;
@@ -283,7 +294,7 @@ class MIDITrack
 				printf("error: e.time=%d  time_last=%d\n", e.time, time_last);
 				assert(false);
 			}
-			tmp = e.time;
+			uint32_t tmp = e.time;
 			e.time -= time_last;
 			time_last = tmp;
 			start += e.writeToBuffer(buffer+start);

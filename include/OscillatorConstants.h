@@ -1,5 +1,5 @@
 /*
- * OscillatorConstants.h - declaration of constants used in  Oscillator and SampleBuffer
+ * OscillatorConstants.h - declaration of constants used in Oscillator and SampleBuffer
  * for band limited wave tables
  *
  * Copyright (c) 2018      Dave French	<dave/dot/french3/at/googlemail/dot/com>
@@ -23,12 +23,12 @@
  *
  */
 
-#ifndef OSCILLATORCONSTANTS_H
-#define OSCILLATORCONSTANTS_H
+#ifndef LMMS_OSCILLATORCONSTANTS_H
+#define LMMS_OSCILLATORCONSTANTS_H
 
 #include <array>
 
-#include "lmms_basics.h"
+#include "LmmsTypes.h"
 
 namespace lmms::OscillatorConstants
 {
@@ -55,4 +55,4 @@ namespace lmms::OscillatorConstants
 
 } // namespace lmms::OscillatorConstants
 
-#endif // OSCILLATORCONSTANTS_H
+#endif // LMMS_OSCILLATORCONSTANTS_H

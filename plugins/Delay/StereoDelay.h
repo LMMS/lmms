@@ -25,11 +25,12 @@
 #ifndef STEREODELAY_H
 #define STEREODELAY_H
 
-#include "lmms_basics.h"
 
 
 namespace lmms
 {
+
+class SampleFrame;
 
 class StereoDelay
 {
@@ -49,11 +50,11 @@ public:
 		m_feedback = feedback;
 	}
 
-	void tick( sampleFrame& frame );
+	void tick( SampleFrame& frame );
 	void setSampleRate( int sampleRate );
 
 private:
-	sampleFrame* m_buffer;
+	SampleFrame* m_buffer;
 	int m_maxLength;
 	float m_length;
 	int m_writeIndex;

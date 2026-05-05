@@ -75,7 +75,7 @@ class EqParameterWidget : public QWidget
 public:
 	explicit EqParameterWidget( QWidget *parent = 0, EqControls * controls = 0 );
 	~EqParameterWidget() override;
-	QList<EqHandle*> *m_handleList;
+	QList<EqHandle*> m_handleList;
 
 	const int bandCount()
 	{

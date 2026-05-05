@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef LOCKLESS_ALLOCATOR_H
-#define LOCKLESS_ALLOCATOR_H
+#ifndef LMMS_LOCKLESS_ALLOCATOR_H
+#define LMMS_LOCKLESS_ALLOCATOR_H
 
 #include <atomic>
 #include <cstddef>
@@ -50,8 +50,8 @@ private:
 	std::atomic_int * m_freeState;
 	size_t m_freeStateSets;
 
-	std::atomic_int m_available;
-	std::atomic_int m_startIndex;
+	std::atomic_size_t m_available;
+	std::atomic_size_t m_startIndex;
 
 } ;
 
@@ -84,4 +84,4 @@ public:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_LOCKLESS_ALLOCATOR_H

@@ -1,4 +1,4 @@
 INCLUDE(BuildPlugin)
 
-BUILD_PLUGIN(hydrogenimport HydrogenImport.cpp HydrogenImport.h local_file_mgr.cpp LocalFileMng.h)
+BUILD_PLUGIN(hydrogenimport HydrogenImport.cpp HydrogenImport.h LocalFileMng.cpp LocalFileMng.h)
 

@@ -19,9 +19,9 @@
  * Boston, MA 02110-1301 USA.
  *
  */
-#ifndef STEP_RECOREDER_WIDGET_H
-#define STEP_RECOREDER_WIDGET_H
 
+#ifndef LMMS_GUI_STEP_RECOREDER_WIDGET_H
+#define LMMS_GUI_STEP_RECOREDER_WIDGET_H
 
 #include <QWidget>
 #include <QColor>
@@ -95,4 +95,4 @@ signals:
 
 } // namespace lmms::gui
 
-#endif //STEP_RECOREDER_WIDGET_H
+#endif // LMMS_GUI_STEP_RECOREDER_WIDGET_H

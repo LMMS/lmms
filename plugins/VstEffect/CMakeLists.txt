@@ -1,4 +1,7 @@
-IF(LMMS_SUPPORT_VST)
+if(NOT LMMS_HAVE_VST)
+	return()
+endif()
+
 INCLUDE(BuildPlugin)
 INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/../vst_base")
 LINK_DIRECTORIES("${CMAKE_CURRENT_BINARY_DIR}/..")
@@ -10,8 +13,5 @@ ELSE()
 	SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${PLUGIN_DIR}")
 ENDIF()
 
-BUILD_PLUGIN(vsteffect VstEffect.cpp VstEffectControls.cpp VstEffectControlDialog.cpp VstSubPluginFeatures.cpp VstEffect.h VstEffectControls.h VstEffectControlDialog.h VstSubPluginFeatures.h MOCFILES VstEffectControlDialog.h VstEffectControls.h EMBEDDED_RESOURCES *.png)
+BUILD_PLUGIN(vsteffect VstEffect.cpp VstEffectControls.cpp VstEffectControlDialog.cpp VstSubPluginFeatures.cpp VstEffect.h VstEffectControls.h VstEffectControlDialog.h VstSubPluginFeatures.h MOCFILES VstEffectControlDialog.h VstEffectControls.h EMBEDDED_RESOURCES *.png *.svg)
 TARGET_LINK_LIBRARIES(vsteffect vstbase)
-
-ENDIF(LMMS_SUPPORT_VST)
-

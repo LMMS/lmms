@@ -26,12 +26,14 @@
 
 #include <QGridLayout>
 #include <QLabel>
+#include <QPainterPath>
 #include <QSizePolicy>
 #include <QSplitter>
 #include <QWidget>
 
 #include "ComboBox.h"
 #include "ComboBoxModel.h"
+#include "FontHelper.h"
 #include "Knob.h"
 #include "LedCheckBox.h"
 #include "PixmapButton.h"
@@ -89,28 +91,28 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	// pause and freeze buttons
 	auto pauseButton = new PixmapButton(this, tr("Pause"));
 	pauseButton->setToolTip(tr("Pause data acquisition"));
-	auto pauseOnPixmap = new QPixmap(
-		PLUGIN_NAME::getIconPixmap("play").scaled(buttonSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
-	auto pauseOffPixmap = new QPixmap(
-		PLUGIN_NAME::getIconPixmap("pause").scaled(buttonSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
-	pauseOnPixmap->setDevicePixelRatio(devicePixelRatio());
-	pauseOffPixmap->setDevicePixelRatio(devicePixelRatio());
-	pauseButton->setActiveGraphic(*pauseOnPixmap);
-	pauseButton->setInactiveGraphic(*pauseOffPixmap);
+	static auto s_pauseOnPixmap
+		= PLUGIN_NAME::getIconPixmap("play").scaled(buttonSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+	static auto s_pauseOffPixmap
+		= PLUGIN_NAME::getIconPixmap("pause").scaled(buttonSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+	s_pauseOnPixmap.setDevicePixelRatio(devicePixelRatio());
+	s_pauseOffPixmap.setDevicePixelRatio(devicePixelRatio());
+	pauseButton->setActiveGraphic(s_pauseOnPixmap);
+	pauseButton->setInactiveGraphic(s_pauseOffPixmap);
 	pauseButton->setCheckable(true);
 	pauseButton->setModel(&controls->m_pauseModel);
 	config_layout->addWidget(pauseButton, 0, 0, 2, 1, Qt::AlignHCenter);
 
 	auto refFreezeButton = new PixmapButton(this, tr("Reference freeze"));
 	refFreezeButton->setToolTip(tr("Freeze current input as a reference / disable falloff in peak-hold mode."));
-	auto freezeOnPixmap = new QPixmap(
-		PLUGIN_NAME::getIconPixmap("freeze").scaled(buttonSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
-	auto freezeOffPixmap = new QPixmap(
-		PLUGIN_NAME::getIconPixmap("freeze_off").scaled(buttonSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
-	freezeOnPixmap->setDevicePixelRatio(devicePixelRatio());
-	freezeOffPixmap->setDevicePixelRatio(devicePixelRatio());
-	refFreezeButton->setActiveGraphic(*freezeOnPixmap);
-	refFreezeButton->setInactiveGraphic(*freezeOffPixmap);
+	static auto s_freezeOnPixmap
+		= PLUGIN_NAME::getIconPixmap("freeze").scaled(buttonSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+	static auto s_freezeOffPixmap
+		= PLUGIN_NAME::getIconPixmap("freeze_off").scaled(buttonSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+	s_freezeOnPixmap.setDevicePixelRatio(devicePixelRatio());
+	s_freezeOffPixmap.setDevicePixelRatio(devicePixelRatio());
+	refFreezeButton->setActiveGraphic(s_freezeOnPixmap);
+	refFreezeButton->setInactiveGraphic(s_freezeOffPixmap);
 	refFreezeButton->setCheckable(true);
 	refFreezeButton->setModel(&controls->m_refFreezeModel);
 	config_layout->addWidget(refFreezeButton, 2, 0, 2, 1, Qt::AlignHCenter);
@@ -119,42 +121,42 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	auto waterfallButton = new LedCheckBox(tr("Waterfall"), this);
 	waterfallButton->setToolTip(tr("Display real-time spectrogram"));
 	waterfallButton->setCheckable(true);
-	waterfallButton->setMinimumSize(70, 12);
+	waterfallButton->setMinimumSize(100, 12);
 	waterfallButton->setModel(&controls->m_waterfallModel);
 	config_layout->addWidget(waterfallButton, 0, 1);
 
 	auto smoothButton = new LedCheckBox(tr("Averaging"), this);
 	smoothButton->setToolTip(tr("Enable exponential moving average"));
 	smoothButton->setCheckable(true);
-	smoothButton->setMinimumSize(70, 12);
+	smoothButton->setMinimumSize(100, 12);
 	smoothButton->setModel(&controls->m_smoothModel);
 	config_layout->addWidget(smoothButton, 1, 1);
 
 	auto stereoButton = new LedCheckBox(tr("Stereo"), this);
 	stereoButton->setToolTip(tr("Display stereo channels separately"));
 	stereoButton->setCheckable(true);
-	stereoButton->setMinimumSize(70, 12);
+	stereoButton->setMinimumSize(100, 12);
 	stereoButton->setModel(&controls->m_stereoModel);
 	config_layout->addWidget(stereoButton, 2, 1);
 
 	auto peakHoldButton = new LedCheckBox(tr("Peak hold"), this);
 	peakHoldButton->setToolTip(tr("Display envelope of peak values"));
 	peakHoldButton->setCheckable(true);
-	peakHoldButton->setMinimumSize(70, 12);
+	peakHoldButton->setMinimumSize(100, 12);
 	peakHoldButton->setModel(&controls->m_peakHoldModel);
 	config_layout->addWidget(peakHoldButton, 3, 1);
 
 	// frequency: linear / log. switch and range selector
 	auto logXButton = new PixmapButton(this, tr("Logarithmic frequency"));
 	logXButton->setToolTip(tr("Switch between logarithmic and linear frequency scale"));
-	auto logXOnPixmap = new QPixmap(
-		PLUGIN_NAME::getIconPixmap("x_log").scaled(iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
-	auto logXOffPixmap = new QPixmap(
-		PLUGIN_NAME::getIconPixmap("x_linear").scaled(iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
-	logXOnPixmap->setDevicePixelRatio(devicePixelRatio());
-	logXOffPixmap->setDevicePixelRatio(devicePixelRatio());
-	logXButton->setActiveGraphic(*logXOnPixmap);
-	logXButton->setInactiveGraphic(*logXOffPixmap);
+	static auto s_logXOnPixmap
+		= PLUGIN_NAME::getIconPixmap("x_log").scaled(iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+	static auto s_logXOffPixmap
+		= PLUGIN_NAME::getIconPixmap("x_linear").scaled(iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+	s_logXOnPixmap.setDevicePixelRatio(devicePixelRatio());
+	s_logXOffPixmap.setDevicePixelRatio(devicePixelRatio());
+	logXButton->setActiveGraphic(s_logXOnPixmap);
+	logXButton->setInactiveGraphic(s_logXOffPixmap);
 	logXButton->setCheckable(true);
 	logXButton->setModel(&controls->m_logXModel);
 	config_layout->addWidget(logXButton, 0, 2, 2, 1, Qt::AlignRight);
@@ -169,14 +171,14 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	// amplitude: linear / log switch and range selector
 	auto logYButton = new PixmapButton(this, tr("Logarithmic amplitude"));
 	logYButton->setToolTip(tr("Switch between logarithmic and linear amplitude scale"));
-	auto logYOnPixmap = new QPixmap(
-		PLUGIN_NAME::getIconPixmap("y_log").scaled(iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
-	auto logYOffPixmap = new QPixmap(
-		PLUGIN_NAME::getIconPixmap("y_linear").scaled(iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
-	logYOnPixmap->setDevicePixelRatio(devicePixelRatio());
-	logYOffPixmap->setDevicePixelRatio(devicePixelRatio());
-	logYButton->setActiveGraphic(*logYOnPixmap);
-	logYButton->setInactiveGraphic(*logYOffPixmap);
+	static auto s_logYOnPixmap
+		= PLUGIN_NAME::getIconPixmap("y_log").scaled(iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+	static auto s_logYOffPixmap
+		= PLUGIN_NAME::getIconPixmap("y_linear").scaled(iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+	s_logYOnPixmap.setDevicePixelRatio(devicePixelRatio());
+	s_logYOffPixmap.setDevicePixelRatio(devicePixelRatio());
+	logYButton->setActiveGraphic(s_logYOnPixmap);
+	logYButton->setInactiveGraphic(s_logYOffPixmap);
 	logYButton->setCheckable(true);
 	logYButton->setModel(&controls->m_logYModel);
 	config_layout->addWidget(logYButton, 2, 2, 2, 1, Qt::AlignRight);
@@ -190,9 +192,9 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 
 	// FFT: block size: icon and selector
 	auto blockSizeLabel = new QLabel("", this);
-	auto blockSizeIcon = new QPixmap(PLUGIN_NAME::getIconPixmap("block_size"));
-	blockSizeIcon->setDevicePixelRatio(devicePixelRatio());
-	blockSizeLabel->setPixmap(blockSizeIcon->scaled(iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+	static auto s_blockSizeIcon = PLUGIN_NAME::getIconPixmap("block_size");
+	s_blockSizeIcon.setDevicePixelRatio(devicePixelRatio());
+	blockSizeLabel->setPixmap(s_blockSizeIcon.scaled(iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
 	config_layout->addWidget(blockSizeLabel, 0, 4, 2, 1, Qt::AlignRight);
 
 	auto blockSizeCombo = new ComboBox(this, tr("FFT block size"));
@@ -206,9 +208,9 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 
 	// FFT: window type: icon and selector
 	auto windowLabel = new QLabel("", this);
-	auto windowIcon = new QPixmap(PLUGIN_NAME::getIconPixmap("window"));
-	windowIcon->setDevicePixelRatio(devicePixelRatio());
-	windowLabel->setPixmap(windowIcon->scaled(iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+	static auto s_windowIcon = PLUGIN_NAME::getIconPixmap("window");
+	s_windowIcon.setDevicePixelRatio(devicePixelRatio());
+	windowLabel->setPixmap(s_windowIcon.scaled(iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
 	config_layout->addWidget(windowLabel, 2, 4, 2, 1, Qt::AlignRight);
 
 	auto windowCombo = new ComboBox(this, tr("FFT window type"));
@@ -236,67 +238,59 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	controls_layout->setStretchFactor(advanced_widget, 10);
 
 	// Peak envelope resolution
-	auto envelopeResolutionKnob = new Knob(knobSmall_17, this);
+	auto envelopeResolutionKnob = new Knob(KnobType::Small17, tr("Envelope res."), SMALL_FONT_SIZE, this);
 	envelopeResolutionKnob->setModel(&controls->m_envelopeResolutionModel);
-	envelopeResolutionKnob->setLabel(tr("Envelope res."));
 	envelopeResolutionKnob->setToolTip(tr("Increase envelope resolution for better details, decrease for better GUI performance."));
-	envelopeResolutionKnob->setHintText(tr("Draw at most"), tr(" envelope points per pixel"));
+	envelopeResolutionKnob->setHintText(tr("Maximum number of envelope points drawn per pixel:"), "");
 	advanced_layout->addWidget(envelopeResolutionKnob, 0, 0, 1, 1, Qt::AlignCenter);
 
 	// Spectrum graph resolution
-	auto spectrumResolutionKnob = new Knob(knobSmall_17, this);
+	auto spectrumResolutionKnob = new Knob(KnobType::Small17, tr("Spectrum res."), SMALL_FONT_SIZE, this);
 	spectrumResolutionKnob->setModel(&controls->m_spectrumResolutionModel);
-	spectrumResolutionKnob->setLabel(tr("Spectrum res."));
 	spectrumResolutionKnob->setToolTip(tr("Increase spectrum resolution for better details, decrease for better GUI performance."));
-	spectrumResolutionKnob->setHintText(tr("Draw at most"), tr(" spectrum points per pixel"));
+	spectrumResolutionKnob->setHintText(tr("Maximum number of spectrum points drawn per pixel:"), "");
 	advanced_layout->addWidget(spectrumResolutionKnob, 1, 0, 1, 1, Qt::AlignCenter);
 
 	// Peak falloff speed
-	auto peakDecayFactorKnob = new Knob(knobSmall_17, this);
+	auto peakDecayFactorKnob = new Knob(KnobType::Small17, tr("Falloff factor"), SMALL_FONT_SIZE, this);
 	peakDecayFactorKnob->setModel(&controls->m_peakDecayFactorModel);
-	peakDecayFactorKnob->setLabel(tr("Falloff factor"));
 	peakDecayFactorKnob->setToolTip(tr("Decrease to make peaks fall faster."));
 	peakDecayFactorKnob->setHintText(tr("Multiply buffered value by"), "");
 	advanced_layout->addWidget(peakDecayFactorKnob, 0, 1, 1, 1, Qt::AlignCenter);
 
 	// Averaging weight
-	auto averagingWeightKnob = new Knob(knobSmall_17, this);
+	auto averagingWeightKnob = new Knob(KnobType::Small17, tr("Averaging weight"), SMALL_FONT_SIZE, this);
 	averagingWeightKnob->setModel(&controls->m_averagingWeightModel);
-	averagingWeightKnob->setLabel(tr("Averaging weight"));
 	averagingWeightKnob->setToolTip(tr("Decrease to make averaging slower and smoother."));
 	averagingWeightKnob->setHintText(tr("New sample contributes"), "");
 	advanced_layout->addWidget(averagingWeightKnob, 1, 1, 1, 1, Qt::AlignCenter);
 
 	// Waterfall history size
-	auto waterfallHeightKnob = new Knob(knobSmall_17, this);
+	auto waterfallHeightKnob = new Knob(KnobType::Small17, tr("Waterfall height"), SMALL_FONT_SIZE, this);
 	waterfallHeightKnob->setModel(&controls->m_waterfallHeightModel);
-	waterfallHeightKnob->setLabel(tr("Waterfall height"));
 	waterfallHeightKnob->setToolTip(tr("Increase to get slower scrolling, decrease to see fast transitions better. Warning: medium CPU usage."));
-	waterfallHeightKnob->setHintText(tr("Keep"), tr(" lines"));
+	waterfallHeightKnob->setHintText(tr("Number of lines to keep:"), "");
 	advanced_layout->addWidget(waterfallHeightKnob, 0, 2, 1, 1, Qt::AlignCenter);
 	processor->reallocateBuffers();
 	connect(&controls->m_waterfallHeightModel, &FloatModel::dataChanged, [=] {processor->reallocateBuffers();});
 
 	// Waterfall gamma correction
-	auto waterfallGammaKnob = new Knob(knobSmall_17, this);
+	auto waterfallGammaKnob = new Knob(KnobType::Small17, tr("Waterfall gamma"), SMALL_FONT_SIZE, this);
 	waterfallGammaKnob->setModel(&controls->m_waterfallGammaModel);
-	waterfallGammaKnob->setLabel(tr("Waterfall gamma"));
 	waterfallGammaKnob->setToolTip(tr("Decrease to see very weak signals, increase to get better contrast."));
 	waterfallGammaKnob->setHintText(tr("Gamma value:"), "");
 	advanced_layout->addWidget(waterfallGammaKnob, 1, 2, 1, 1, Qt::AlignCenter);
 
 	// FFT window overlap
-	auto windowOverlapKnob = new Knob(knobSmall_17, this);
+	auto windowOverlapKnob = new Knob(KnobType::Small17, tr("Window overlap"), SMALL_FONT_SIZE, this);
 	windowOverlapKnob->setModel(&controls->m_windowOverlapModel);
-	windowOverlapKnob->setLabel(tr("Window overlap"));
 	windowOverlapKnob->setToolTip(tr("Increase to prevent missing fast transitions arriving near FFT window edges. Warning: high CPU usage."));
-	windowOverlapKnob->setHintText(tr("Each sample processed"), tr(" times"));
+	windowOverlapKnob->setHintText(tr("Number of times each sample is processed:"), "");
 	advanced_layout->addWidget(windowOverlapKnob, 0, 3, 1, 1, Qt::AlignCenter);
 
 	// FFT zero padding
-	auto zeroPaddingKnob = new Knob(knobSmall_17, this);
+	auto zeroPaddingKnob = new Knob(KnobType::Small17, tr("Zero padding"), SMALL_FONT_SIZE, this);
 	zeroPaddingKnob->setModel(&controls->m_zeroPaddingModel);
-	zeroPaddingKnob->setLabel(tr("Zero padding"));
 	zeroPaddingKnob->setToolTip(tr("Increase to get smoother-looking spectrum. Warning: high CPU usage."));
 	zeroPaddingKnob->setHintText(tr("Processing buffer is"), tr(" steps larger than input block"));
 	advanced_layout->addWidget(zeroPaddingKnob, 1, 3, 1, 1, Qt::AlignCenter);
@@ -307,14 +301,14 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	// Advanced settings button
 	auto advancedButton = new PixmapButton(this, tr("Advanced settings"));
 	advancedButton->setToolTip(tr("Access advanced settings"));
-	auto advancedOnPixmap = new QPixmap(PLUGIN_NAME::getIconPixmap("advanced_on")
-											.scaled(advButtonSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
-	auto advancedOffPixmap = new QPixmap(PLUGIN_NAME::getIconPixmap("advanced_off")
-											 .scaled(advButtonSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
-	advancedOnPixmap->setDevicePixelRatio(devicePixelRatio());
-	advancedOffPixmap->setDevicePixelRatio(devicePixelRatio());
-	advancedButton->setActiveGraphic(*advancedOnPixmap);
-	advancedButton->setInactiveGraphic(*advancedOffPixmap);
+	static auto s_advancedOnPixmap = PLUGIN_NAME::getIconPixmap("advanced_on")
+											.scaled(advButtonSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+	static auto s_advancedOffPixmap = PLUGIN_NAME::getIconPixmap("advanced_off")
+											 .scaled(advButtonSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+	s_advancedOnPixmap.setDevicePixelRatio(devicePixelRatio());
+	s_advancedOffPixmap.setDevicePixelRatio(devicePixelRatio());
+	advancedButton->setActiveGraphic(s_advancedOnPixmap);
+	advancedButton->setInactiveGraphic(s_advancedOffPixmap);
 	advancedButton->setCheckable(true);
 	controls_layout->addStretch(0);
 	controls_layout->addWidget(advancedButton);
@@ -341,7 +335,6 @@ SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor)
 	m_waterfall = new SaWaterfallView(controls, processor, this);
 	display_splitter->addWidget(m_waterfall);
 	m_waterfall->setVisible(m_controls->m_waterfallModel.value());
-	connect(&controls->m_waterfallModel, &BoolModel::dataChanged, [=] {m_waterfall->updateVisibility();});
 }
 
 

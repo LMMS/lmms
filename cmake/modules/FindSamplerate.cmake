@@ -1,34 +1,35 @@
-# FindFFTW.cmake - Try to find FFTW3
-# Copyright (c) 2018 Lukas W <lukaswhl/at/gmail.com>
-# This file is MIT licensed.
-# See http://opensource.org/licenses/MIT
+# Copyright (c) 2023 Dominic Clark
+#
+# Redistribution and use is allowed according to the terms of the New BSD license.
+# For details see the accompanying COPYING-CMAKE-SCRIPTS file.
 
-find_package(PkgConfig QUIET)
-if(PKG_CONFIG_FOUND)
-	pkg_check_modules(SAMPLERATE_PKG samplerate)
-endif()
+include(ImportedTargetHelpers)
 
-find_path(SAMPLERATE_INCLUDE_DIR
-	NAMES samplerate.h
-	PATHS ${SAMPLERATE_PKG_INCLUDE_DIRS}
+find_package_config_mode_with_fallback(SampleRate SampleRate::samplerate
+	LIBRARY_NAMES "samplerate" "libsamplerate" "libsamplerate-0"
+	INCLUDE_NAMES "samplerate.h"
+	PKG_CONFIG samplerate
+	PREFIX Samplerate
 )
 
-set(SAMPLERATE_NAMES samplerate libsamplerate)
-if(Samplerate_FIND_VERSION_MAJOR)
-	list(APPEND SAMPLERATE_NAMES libsamplerate-${Samplerate_FIND_VERSION_MAJOR})
-else()
-	list(APPEND SAMPLERATE_NAMES libsamplerate-0)
-endif()
+determine_version_from_source(Samplerate_VERSION SampleRate::samplerate [[
+	#include <iostream>
+	#include <string_view>
+	#include <samplerate.h>
 
-find_library(SAMPLERATE_LIBRARY
-	NAMES ${SAMPLERATE_NAMES}
-	PATHS ${SAMPLERATE_PKG_LIBRARY_DIRS}
-)
+	auto main() -> int
+	{
+		// Version string has the format "name-version copyright"
+		const auto version = std::string_view{src_get_version()};
+		const auto begin = version.find('-') + 1;
+		const auto end = version.find(' ', begin);
+		std::cout << version.substr(begin, end - begin);
+	}
+]])
 
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(SAMPLERATE DEFAULT_MSG SAMPLERATE_LIBRARY SAMPLERATE_INCLUDE_DIR)
 
-mark_as_advanced(SAMPLERATE_INCLUDE_DIR SAMPLERATE_LIBRARY )
-
-set(SAMPLERATE_LIBRARIES ${SAMPLERATE_LIBRARY} )
-set(SAMPLERATE_INCLUDE_DIRS ${SAMPLERATE_INCLUDE_DIR})
+find_package_handle_standard_args(Samplerate
+	REQUIRED_VARS Samplerate_LIBRARY Samplerate_INCLUDE_DIRS
+	VERSION_VAR Samplerate_VERSION
+)

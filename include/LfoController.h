@@ -22,17 +22,15 @@
  *
  */
 
-#ifndef LFO_CONTROLLER_H
-#define LFO_CONTROLLER_H
+#ifndef LMMS_LFO_CONTROLLER_H
+#define LMMS_LFO_CONTROLLER_H
 
-#include <QWidget>
 
-#include "Model.h"
 #include "AutomatableModel.h"
 #include "Controller.h"
 #include "ControllerDialog.h"
+#include "SampleBuffer.h"
 #include "TempoSyncKnobModel.h"
-#include "Oscillator.h"
 
 namespace lmms
 {
@@ -40,8 +38,7 @@ namespace lmms
 namespace gui
 {
 
-class automatableButtonGroup;
-class LedCheckBox;
+class AutomatableButtonGroup;
 class PixmapButton;
 class Knob;
 class TempoSyncKnob;
@@ -51,7 +48,7 @@ class LfoControllerDialog;
 }
 
 
-class LfoController : public Controller 
+class LfoController : public Controller
 {
 	Q_OBJECT
 public:
@@ -86,7 +83,8 @@ protected:
 	sample_t (*m_sampleFunction)( const float );
 
 private:
-	SampleBuffer * m_userDefSampleBuffer;
+	float m_heldSample;
+	std::shared_ptr<const SampleBuffer> m_userDefSampleBuffer = SampleBuffer::emptyBuffer();
 
 protected slots:
 	void updatePhase();
@@ -119,8 +117,8 @@ protected:
 	Knob * m_amountKnob;
 	Knob * m_phaseKnob;
 	PixmapButton * m_userLfoBtn;
-	automatableButtonGroup * m_waveBtnGrp;
-	automatableButtonGroup * m_multiplierBtnGrp;
+	AutomatableButtonGroup * m_waveBtnGrp;
+	AutomatableButtonGroup * m_multiplierBtnGrp;
 
 
 private:
@@ -136,4 +134,4 @@ private slots:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_LFO_CONTROLLER_H

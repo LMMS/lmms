@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef MAINAPPLICATION_H
-#define MAINAPPLICATION_H
+#ifndef LMMS_GUI_MAIN_APPLICATION_H
+#define LMMS_GUI_MAIN_APPLICATION_H
 
 #include "lmmsconfig.h"
 
@@ -49,10 +49,14 @@ public:
 	MainApplication(int& argc, char** argv);
 	bool event(QEvent* event) override;
 #ifdef LMMS_BUILD_WIN32
-	bool winEventFilter(MSG* msg, long* result);
-	bool nativeEventFilter(const QByteArray& eventType, void* message,
-				long* result);
-#endif
+#if (QT_VERSION < QT_VERSION_CHECK(6,0,0))
+	using FilterResult = long;
+#else
+	using FilterResult = qintptr;
+#endif // QT6 check
+	bool win32EventFilter(MSG* msg, FilterResult* result);
+	bool nativeEventFilter(const QByteArray& eventType, void* message, FilterResult* result);
+#endif // LMMS_BUILD_WIN32
 	inline QString& queuedFile()
 	{
 	    return m_queuedFile;
@@ -64,4 +68,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif // MAINAPPLICATION_H
+#endif // LMMS_GUI_MAIN_APPLICATION_H

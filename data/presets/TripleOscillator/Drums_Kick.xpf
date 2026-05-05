@@ -16,7 +16,7 @@
       <arpeggiator arprange="1" arpmiss="0" arpmode="0" arptime_syncmode="0" arp-enabled="0" arpskip="0" arptime="100" arptime_denominator="4" arpgate="100" arp="0" arpcycle="0" arpdir="0" arptime_numerator="4"/>
       <midiport basevelocity="127" inputcontroller="0" fixedinputvelocity="-1" outputcontroller="0" inputchannel="0" fixedoutputvelocity="-1" outputchannel="1" outputprogram="1" readable="0" writable="0" fixedoutputnote="-1"/>
       <fxchain numofeffects="1" enabled="1">
-        <effect name="stereomatrix" autoquit_denominator="4" on="1" autoquit_numerator="4" wet="1" autoquit_syncmode="0" gate="0" autoquit="1">
+        <effect name="stereomatrix" autoquit_denominator="4" on="1" autoquit_numerator="4" wet="1" autoquit_syncmode="0" autoquit="1">
           <stereomatrixcontrols l-l="1" r-l="0" l-r="1" r-r="0"/>
           <key/>
         </effect>

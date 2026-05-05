@@ -26,23 +26,13 @@
 
 #include "DualFilterControlDialog.h"
 #include "DualFilterControls.h"
+#include "FontHelper.h"
 #include "Knob.h"
 #include "LedCheckBox.h"
 #include "ComboBox.h"
-#include "gui_templates.h"
 
 namespace lmms::gui
 {
-
-
-#define makeknob( name, x, y, model, label, hint, unit ) 	\
-	Knob * name = new Knob( knobBright_26, this); 			\
-	(name) -> move( x, y );									\
-	(name) ->setModel( &controls-> model );					\
-	(name) ->setLabel( label );							\
-	(name) ->setHintText( hint, unit );
-
-
 
 DualFilterControlDialog::DualFilterControlDialog( DualFilterControls* controls ) :
 	EffectControlDialog( controls )
@@ -53,19 +43,27 @@ DualFilterControlDialog::DualFilterControlDialog( DualFilterControls* controls )
 	setPalette( pal );
 	setFixedSize( 373, 109 );
 
-	makeknob( cut1Knob, 24, 26, m_cut1Model, tr( "FREQ" ), tr( "Cutoff frequency" ), "Hz" )
-	makeknob( res1Knob, 74, 26, m_res1Model, tr( "RESO" ), tr( "Resonance" ), "" )
-	makeknob( gain1Knob, 124, 26, m_gain1Model, tr( "GAIN" ), tr( "Gain" ), "%" )
-	makeknob( mixKnob, 173, 37, m_mixModel, tr( "MIX" ), tr( "Mix" ), "" )
-	makeknob( cut2Knob, 222, 26, m_cut2Model, tr( "FREQ" ), tr( "Cutoff frequency" ), "Hz" )
-	makeknob( res2Knob, 272, 26, m_res2Model, tr( "RESO" ), tr( "Resonance" ), "" )
-	makeknob( gain2Knob, 322, 26, m_gain2Model, tr( "GAIN" ), tr( "Gain" ), "%" )
+	auto makeKnob = [this](int x, int y, Model* model,
+		const QString& label, const QString& hint, const QString& unit, bool isVolumeKnob = false)
+	{
+		Knob* knob = isVolumeKnob
+			? new VolumeKnob(KnobType::Bright26, label, SMALL_FONT_SIZE, this)
+			: new Knob(KnobType::Bright26, label, SMALL_FONT_SIZE, this);
+		knob->move(x, y);
+		knob->setModel(model);
+		knob->setHintText(hint, unit);
+	};
 
-	gain1Knob-> setVolumeKnob( true );
-	gain2Knob-> setVolumeKnob( true );
+	makeKnob(24, 26, &controls->m_cut1Model, tr("FREQ"), tr("Cutoff frequency"), "Hz");
+	makeKnob(74, 26, &controls->m_res1Model, tr("RESO"), tr("Resonance"), "");
+	makeKnob(124, 26, &controls->m_gain1Model, tr("GAIN"), tr("Gain"), "%", true);
+	makeKnob(173, 37, &controls->m_mixModel, tr("MIX"), tr("Mix"), "");
+	makeKnob(222, 26, &controls->m_cut2Model, tr("FREQ"), tr("Cutoff frequency"), "Hz");
+	makeKnob(272, 26, &controls->m_res2Model, tr("RESO"), tr("Resonance"), "");
+	makeKnob(322, 26, &controls->m_gain2Model, tr("GAIN"), tr("Gain"), "%", true);
 
-	auto enabled1Toggle = new LedCheckBox("", this, tr("Filter 1 enabled"), LedCheckBox::Green);
-	auto enabled2Toggle = new LedCheckBox("", this, tr("Filter 2 enabled"), LedCheckBox::Green);
+	auto enabled1Toggle = new LedCheckBox("", this, tr("Filter 1 enabled"), LedCheckBox::LedColor::Green);
+	auto enabled2Toggle = new LedCheckBox("", this, tr("Filter 2 enabled"), LedCheckBox::LedColor::Green);
 
 	enabled1Toggle -> move( 12, 11 );
 	enabled1Toggle -> setModel( &controls -> m_enabled1Model );
@@ -76,12 +74,10 @@ DualFilterControlDialog::DualFilterControlDialog( DualFilterControls* controls )
 
 	auto m_filter1ComboBox = new ComboBox(this);
 	m_filter1ComboBox->setGeometry( 19, 70, 137, ComboBox::DEFAULT_HEIGHT );
-	m_filter1ComboBox->setFont( pointSize<8>( m_filter1ComboBox->font() ) );
 	m_filter1ComboBox->setModel( &controls->m_filter1Model );
 
 	auto m_filter2ComboBox = new ComboBox(this);
 	m_filter2ComboBox->setGeometry( 217, 70, 137, ComboBox::DEFAULT_HEIGHT );
-	m_filter2ComboBox->setFont( pointSize<8>( m_filter2ComboBox->font() ) );
 	m_filter2ComboBox->setModel( &controls->m_filter2Model );
 }
 

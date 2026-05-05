@@ -29,7 +29,6 @@
 #include "PatternTrack.h"
 #include "SampleBuffer.h"
 #include "SampleClip.h"
-#include "debug.h"
 
 
 namespace lmms
@@ -37,7 +36,7 @@ namespace lmms
 
 
 SampleRecordHandle::SampleRecordHandle( SampleClip* clip ) :
-	PlayHandle( TypeSamplePlayHandle ),
+	PlayHandle( Type::SamplePlayHandle ),
 	m_framesRecorded( 0 ),
 	m_minLength( clip->length() ),
 	m_track( clip->getTrack() ),
@@ -51,13 +50,8 @@ SampleRecordHandle::SampleRecordHandle( SampleClip* clip ) :
 
 SampleRecordHandle::~SampleRecordHandle()
 {
-	if( !m_buffers.empty() )
-	{
-		SampleBuffer* sb;
-		createSampleBuffer( &sb );
-		m_clip->setSampleBuffer( sb );
-	}
-	
+	if (!m_buffers.empty()) { m_clip->setSampleBuffer(createSampleBuffer()); }
+
 	while( !m_buffers.empty() )
 	{
 		delete[] m_buffers.front().first;
@@ -69,9 +63,9 @@ SampleRecordHandle::~SampleRecordHandle()
 
 
 
-void SampleRecordHandle::play( sampleFrame * /*_working_buffer*/ )
+void SampleRecordHandle::play( SampleFrame* /*_working_buffer*/ )
 {
-	const sampleFrame * recbuf = Engine::audioEngine()->inputBuffer();
+	const SampleFrame* recbuf = Engine::audioEngine()->inputBuffer();
 	const f_cnt_t frames = Engine::audioEngine()->inputBufferFrames();
 	writeBuffer( recbuf, frames );
 	m_framesRecorded += frames;
@@ -111,36 +105,30 @@ f_cnt_t SampleRecordHandle::framesRecorded() const
 
 
 
-void SampleRecordHandle::createSampleBuffer( SampleBuffer** sampleBuf )
+std::shared_ptr<const SampleBuffer> SampleRecordHandle::createSampleBuffer()
 {
 	const f_cnt_t frames = framesRecorded();
 	// create buffer to store all recorded buffers in
-	auto data = new sampleFrame[frames];
-	// make sure buffer is cleaned up properly at the end...
-	sampleFrame * data_ptr = data;
-
-
-	assert( data != nullptr );
+	auto bigBuffer = std::vector<SampleFrame>(frames);
 
 	// now copy all buffers into big buffer
-	for( bufferList::const_iterator it = m_buffers.begin(); it != m_buffers.end(); ++it )
+	auto framesCopied = 0;
+	for (const auto& [buf, numFrames] : m_buffers)
 	{
-		memcpy( data_ptr, ( *it ).first, ( *it ).second *
-							sizeof( sampleFrame ) );
-		data_ptr += ( *it ).second;
+		std::copy_n(buf, numFrames, bigBuffer.begin() + framesCopied);
+		framesCopied += numFrames;
 	}
+
 	// create according sample-buffer out of big buffer
-	*sampleBuf = new SampleBuffer( data, frames );
-	( *sampleBuf)->setSampleRate( Engine::audioEngine()->inputSampleRate() );
-	delete[] data;
+	return std::make_shared<const SampleBuffer>(std::move(bigBuffer), Engine::audioEngine()->inputSampleRate());
 }
 
 
 
 
-void SampleRecordHandle::writeBuffer( const sampleFrame * _ab, const f_cnt_t _frames )
+void SampleRecordHandle::writeBuffer( const SampleFrame* _ab, const f_cnt_t _frames )
 {
-	auto buf = new sampleFrame[_frames];
+	auto buf = new SampleFrame[_frames];
 	for( f_cnt_t frame = 0; frame < _frames; ++frame )
 	{
 		for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )

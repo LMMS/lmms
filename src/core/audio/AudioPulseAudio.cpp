@@ -22,8 +22,8 @@
  *
  */
 
+#include <QFormLayout>
 #include <QLineEdit>
-#include <QLabel>
 
 #include "AudioPulseAudio.h"
 
@@ -32,7 +32,6 @@
 #include "ConfigManager.h"
 #include "LcdSpinBox.h"
 #include "AudioEngine.h"
-#include "gui_templates.h"
 #include "Engine.h"
 
 namespace lmms
@@ -43,37 +42,21 @@ static void stream_write_callback(pa_stream *s, size_t length, void *userdata)
 	static_cast<AudioPulseAudio *>( userdata )->streamWriteCallback( s, length );
 }
 
-
-
-
-AudioPulseAudio::AudioPulseAudio( bool & _success_ful, AudioEngine*  _audioEngine ) :
-	AudioDevice( qBound<ch_cnt_t>(
-		DEFAULT_CHANNELS,
-		ConfigManager::inst()->value( "audiopa", "channels" ).toInt(),
-		SURROUND_CHANNELS ), _audioEngine ),
-	m_s( nullptr ),
-	m_quit( false ),
-	m_convertEndian( false )
+AudioPulseAudio::AudioPulseAudio(bool& _success_ful, AudioEngine* _audioEngine)
+	: AudioDevice(std::clamp<ch_cnt_t>(
+					  ConfigManager::inst()->value("audiopa", "channels").toInt(), DEFAULT_CHANNELS, DEFAULT_CHANNELS),
+		  _audioEngine)
+	, m_s(nullptr)
+	, m_latency(static_cast<double>(_audioEngine->framesPerAudioBuffer()) / sampleRate())
 {
 	_success_ful = false;
 
-	m_sampleSpec.format = PA_SAMPLE_S16LE;
+	m_sampleSpec.format = PA_SAMPLE_FLOAT32;
 	m_sampleSpec.rate = sampleRate();
 	m_sampleSpec.channels = channels();
 
 	_success_ful = true;
 }
-
-
-
-
-AudioPulseAudio::~AudioPulseAudio()
-{
-	stopProcessing();
-}
-
-
-
 
 QString AudioPulseAudio::probeDevice()
 {
@@ -92,38 +75,18 @@ QString AudioPulseAudio::probeDevice()
 
 
 
-void AudioPulseAudio::startProcessing()
+void AudioPulseAudio::startProcessingImpl()
 {
-	if( !isRunning() )
-	{
-		start( QThread::HighPriority );
-	}
+	start(QThread::HighPriority);
 }
 
 
 
 
-void AudioPulseAudio::stopProcessing()
+void AudioPulseAudio::stopProcessingImpl()
 {
-	m_quit = true;
 	stopProcessingThread( this );
 }
-
-
-
-
-void AudioPulseAudio::applyQualitySettings()
-{
-	if( hqAudio() )
-	{
-//		setSampleRate( engine::audioEngine()->processingSampleRate() );
-
-	}
-
-	AudioDevice::applyQualitySettings();
-}
-
-
 
 
 /* This routine is called whenever the stream state changes */
@@ -171,17 +134,14 @@ static void context_state_callback(pa_context *c, void *userdata)
 
 			buffer_attr.maxlength = (uint32_t)(-1);
 
-			// play silence in case of buffer underun instead of using default rewind
+			// play silence in case of buffer underrun instead of using default rewind
 			buffer_attr.prebuf = 0;
 
 			buffer_attr.minreq = (uint32_t)(-1);
 			buffer_attr.fragsize = (uint32_t)(-1);
 
-			double latency = (double)( Engine::audioEngine()->framesPerPeriod() ) / (double)_this->sampleRate();
-
 			// ask PulseAudio for the desired latency (which might not be approved)
-			buffer_attr.tlength = pa_usec_to_bytes( latency * PA_USEC_PER_MSEC,
-														&_this->m_sampleSpec );
+			buffer_attr.tlength = pa_usec_to_bytes(_this->m_latency * PA_USEC_PER_MSEC, &_this->m_sampleSpec);
 
 			pa_stream_connect_playback( _this->m_s, nullptr, &buffer_attr,
 										PA_STREAM_ADJUST_LATENCY,
@@ -235,23 +195,17 @@ void AudioPulseAudio::run()
 	if( m_connected )
 	{
 		int ret = 0;
-		m_quit = false;
-		while( m_quit == false
-			&& pa_mainloop_iterate( mainLoop, 1, &ret ) >= 0 )
-		{
-		}
+		while (AudioDevice::isRunning() && pa_mainloop_iterate(mainLoop, 1, &ret) >= 0) {}
 
 		pa_stream_disconnect( m_s );
 		pa_stream_unref( m_s );
 	}
 	else
 	{
-		const fpp_t fpp = audioEngine()->framesPerPeriod();
-		auto temp = new surroundSampleFrame[fpp];
-		while( getNextBuffer( temp ) )
+		while (AudioDevice::isRunning())
 		{
+			audioEngine()->renderNextPeriod();
 		}
-		delete[] temp;
 	}
 
 	pa_context_disconnect( context );
@@ -260,38 +214,26 @@ void AudioPulseAudio::run()
 	pa_mainloop_free( mainLoop );
 }
 
-
-
-
-void AudioPulseAudio::streamWriteCallback( pa_stream *s, size_t length )
+void AudioPulseAudio::streamWriteCallback(pa_stream*, size_t)
 {
-	const fpp_t fpp = audioEngine()->framesPerPeriod();
-	auto temp = new surroundSampleFrame[fpp];
-	auto pcmbuf = (int_sample_t*)pa_xmalloc(fpp * channels() * sizeof(int_sample_t));
+	auto buf = static_cast<void*>(nullptr);
+	auto maxBufSizeInBytes = audioEngine()->framesPerAudioBuffer() * channels() * sizeof(float);
 
-	size_t fd = 0;
-	while( fd < length/4 && m_quit == false )
+	if (pa_stream_begin_write(m_s, &buf, &maxBufSizeInBytes) != 0 || !buf) { return; }
+
+	const auto numSamples = maxBufSizeInBytes / sizeof(float);
+	const auto numFrames = numSamples / channels();
+
+	if (!AudioDevice::isRunning())
 	{
-		const fpp_t frames = getNextBuffer( temp );
-		if( !frames )
-		{
-			m_quit = true;
-			break;
-		}
-		int bytes = convertToS16( temp, frames,
-						audioEngine()->masterGain(),
-						pcmbuf,
-						m_convertEndian );
-		if( bytes > 0 )
-		{
-			pa_stream_write( m_s, pcmbuf, bytes, nullptr, 0,
-							PA_SEEK_RELATIVE );
-		}
-		fd += frames;
+		std::fill_n(static_cast<float*>(buf), numSamples, 0.f);
+	}
+	else
+	{
+		audioEngine()->renderNextBuffer({static_cast<float*>(buf), channels(), numFrames});
 	}
 
-	pa_xfree( pcmbuf );
-	delete[] temp;
+	pa_stream_write(m_s, buf, maxBufSizeInBytes, nullptr, 0, PA_SEEK_RELATIVE);
 }
 
 
@@ -312,24 +254,21 @@ void AudioPulseAudio::signalConnected( bool connected )
 AudioPulseAudio::setupWidget::setupWidget( QWidget * _parent ) :
 	AudioDeviceSetupWidget( AudioPulseAudio::name(), _parent )
 {
+	QFormLayout * form = new QFormLayout(this);
+
 	m_device = new QLineEdit( AudioPulseAudio::probeDevice(), this );
-	m_device->setGeometry( 10, 20, 160, 20 );
+	form->addRow(tr("Device"), m_device);
 
-	auto dev_lbl = new QLabel(tr("Device"), this);
-	dev_lbl->setFont( pointSize<7>( dev_lbl->font() ) );
-	dev_lbl->setGeometry( 10, 40, 160, 10 );
-
-	auto m = new gui::LcdSpinBoxModel(/* this */);
-	m->setRange( DEFAULT_CHANNELS, SURROUND_CHANNELS );
+	auto m = new gui::LcdSpinBoxModel();
+	m->setRange(DEFAULT_CHANNELS, DEFAULT_CHANNELS);
 	m->setStep( 2 );
 	m->setValue( ConfigManager::inst()->value( "audiopa",
-							"channels" ).toInt() );
+										 "channels" ).toInt() );
 
 	m_channels = new gui::LcdSpinBox( 1, this );
 	m_channels->setModel( m );
-	m_channels->setLabel( tr( "Channels" ) );
-	m_channels->move( 180, 20 );
 
+	form->addRow(tr("Channels"), m_channels);
 }
 
 

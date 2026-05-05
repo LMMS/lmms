@@ -22,9 +22,8 @@
  *
  */
 
-#ifndef MICROTUNER_CONFIG_H
-#define MICROTUNER_CONFIG_H
-
+#ifndef LMMS_GUI_MICROTUNER_CONFIG_H
+#define LMMS_GUI_MICROTUNER_CONFIG_H
 
 #include <QWidget>
 
@@ -60,9 +59,6 @@ public slots:
 	void updateScaleForm();
 	void updateKeymapForm();
 
-protected:
-	void closeEvent(QCloseEvent *ce) override;
-
 private slots:
 	bool loadScaleFromFile();
 	bool loadKeymapFromFile();
@@ -96,4 +92,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_MICROTUNER_CONFIG_H

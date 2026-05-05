@@ -16,7 +16,7 @@
       <arpeggiator arptime="100" arprange="1" arptime_denominator="4" syncmode="0" arpmode="0" arp-enabled="0" arp="0" arptime_numerator="4" arpdir="0" arpgate="100"/>
       <midiport inputcontroller="0" fixedoutputvelocity="-1" inputchannel="0" outputcontroller="0" writable="0" outputchannel="1" fixedinputvelocity="-1" fixedoutputnote="-1" outputprogram="1" basevelocity="63" readable="0"/>
       <fxchain numofeffects="2" enabled="1">
-        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" autoquit="8000" gate="0" name="ladspaeffect" wet="1" on="1">
+        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" autoquit="8000" name="ladspaeffect" wet="1" on="1">
           <ladspacontrols ports="10">
             <port04 data="174.825"/>
             <port05 data="8"/>
@@ -34,7 +34,7 @@
             <attribute value="VintageDelay" name="plugin"/>
           </key>
         </effect>
-        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" autoquit="1" gate="0" name="dualfilter" wet="1" on="1">
+        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" autoquit="1" name="dualfilter" wet="1" on="1">
           <DualFilterControls gain2="100" cut1="10" cut2="7000" mix="0" res1="0.01" res2="0.5" filter1="1" filter2="0" enabled1="1" enabled2="0" gain1="100"/>
           <key/>
         </effect>

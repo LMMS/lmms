@@ -22,7 +22,10 @@
  *
  */
 
+#include "VstEffectControls.h"
+
 #include <QAction>
+#include <QApplication>
 #include <QDomElement>
 #include <QGridLayout>
 #include <QMenu>
@@ -30,17 +33,13 @@
 #include <QScrollArea>
 
 #include "embed.h"
-#include "CustomTextKnob.h"
-#include "VstEffectControls.h"
+#include "GuiApplication.h"
+#include "LocaleHelper.h"
+#include "MainWindow.h"
+#include "SubWindow.h"
 #include "VstEffectControlDialog.h"
 #include "VstEffect.h"
 #include "VstPlugin.h"
-
-#include "LocaleHelper.h"
-#include "MainWindow.h"
-#include "GuiApplication.h"
-#include "SubWindow.h"
-#include <QApplication>
 
 namespace lmms
 {
@@ -50,7 +49,6 @@ VstEffectControls::VstEffectControls( VstEffect * _eff ) :
 	EffectControls( _eff ),
 	m_effect( _eff ),
 	m_subWindow( nullptr ),
-	knobFModel( nullptr ),
 	ctrHandle( nullptr ),
 	lastPosInMenu (0),
 	m_vstGuiVisible ( true )
@@ -83,16 +81,16 @@ void VstEffectControls::loadSettings( const QDomElement & _this )
 
 		const QMap<QString, QString> & dump = m_effect->m_plugin->parameterDump();
 		paramCount = dump.size();
-		char paramStr[35];
-		knobFModel = new FloatModel *[ paramCount ];
+		auto paramStr = std::array<char, 35>{};
+		knobFModel.resize(paramCount);
 		QStringList s_dumpValues;
 		for( int i = 0; i < paramCount; i++ )
 		{
-			sprintf( paramStr, "param%d", i );
-			s_dumpValues = dump[ paramStr ].split( ":" );
+			std::snprintf(paramStr.data(), paramStr.size(), "param%d", i);
+			s_dumpValues = dump[paramStr.data()].split(":");
 
 			knobFModel[i] = new FloatModel( 0.0f, 0.0f, 1.0f, 0.01f, this, QString::number(i) );
-			knobFModel[i]->loadSettings( _this, paramStr );
+			knobFModel[i]->loadSettings(_this, paramStr.data());
 
 			if( !( knobFModel[ i ]->isAutomated() ||
 						knobFModel[ i ]->controllerConnection() ) )
@@ -131,15 +129,15 @@ void VstEffectControls::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	if( m_effect->m_plugin != nullptr )
 	{
 		m_effect->m_plugin->saveSettings( _doc, _this );
-		if (knobFModel != nullptr) {
+		if (!knobFModel.empty()) {
 			const QMap<QString, QString> & dump = m_effect->m_plugin->parameterDump();
 			paramCount = dump.size();
-			char paramStr[35];
+			auto paramStr = std::array<char, 35>{};
 			for( int i = 0; i < paramCount; i++ )
 			{
 				if (knobFModel[i]->isAutomated() || knobFModel[i]->controllerConnection()) {
-					sprintf( paramStr, "param%d", i);
-					knobFModel[i]->saveSettings( _doc, _this, paramStr );
+					std::snprintf(paramStr.data(), paramStr.size(), "param%d", i);
+					knobFModel[i]->saveSettings(_doc, _this, paramStr.data());
 				}
 			}
 		}
@@ -173,7 +171,7 @@ void VstEffectControls::managePlugin()
 		auto tt = new gui::ManageVSTEffectView(m_effect, this);
 		ctrHandle = (QObject *)tt;
 	} else if (m_subWindow != nullptr) {
-		if (m_subWindow->widget()->isVisible() == false ) { 
+		if (m_subWindow->widget()->isVisible() == false ) {
 			m_scrollArea->show();
 			m_subWindow->show();
 		} else {
@@ -318,7 +316,7 @@ ManageVSTEffectView::ManageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 {
 	m_vi2 = m_vi;
 	widget = new QWidget();
-        m_vi->m_scrollArea = new QScrollArea( widget );
+	m_vi->m_scrollArea = new QScrollArea(widget);
 	l = new QGridLayout( widget );
 
 	m_vi->m_subWindow = getGUI()->mainWindow()->addWindowedWidget(nullptr, Qt::SubWindow |
@@ -363,39 +361,42 @@ ManageVSTEffectView::ManageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 	const QMap<QString, QString> & dump = m_effect->m_plugin->parameterDump();
 	m_vi->paramCount = dump.size();
 
-	vstKnobs = new CustomTextKnob *[ m_vi->paramCount ];
+	m_vstKnobs.reserve(m_vi->paramCount);
 
 	bool hasKnobModel = true;
-	if (m_vi->knobFModel == nullptr) {
-		m_vi->knobFModel = new FloatModel *[ m_vi->paramCount ];
+	if (m_vi->knobFModel.empty())
+	{
+		m_vi->knobFModel.resize(m_vi->paramCount);
 		hasKnobModel = false;
 	}
 
-	char paramStr[35];
+	auto paramStr = std::array<char, 35>{};
 	QStringList s_dumpValues;
 
 	for( int i = 0; i < m_vi->paramCount; i++ )
 	{
-		sprintf( paramStr, "param%d", i);
-		s_dumpValues = dump[ paramStr ].split( ":" );
+		std::snprintf(paramStr.data(), paramStr.size(), "param%d", i);
+		s_dumpValues = dump[paramStr.data()].split(":");
 
-		vstKnobs[ i ] = new CustomTextKnob( knobBright_26, widget, s_dumpValues.at( 1 ) );
-		vstKnobs[ i ]->setDescription( s_dumpValues.at( 1 ) + ":" );
-		vstKnobs[ i ]->setLabel( s_dumpValues.at( 1 ).left( 15 ) );
+		const auto& description = s_dumpValues.at(1);
+
+		auto knob = new VstPluginKnob{m_effect->m_plugin.get(), i, description, widget};
+		m_vstKnobs.push_back(knob);
 
 		if( !hasKnobModel )
 		{
-			sprintf( paramStr, "%d", i);
-			m_vi->knobFModel[ i ] = new FloatModel( LocaleHelper::toFloat(s_dumpValues.at(2)),
-					0.0f, 1.0f, 0.01f, _eff, paramStr );
+			std::snprintf(paramStr.data(), paramStr.size(), "%d", i);
+			m_vi->knobFModel[i] = new FloatModel(LocaleHelper::toFloat(s_dumpValues.at(2)),
+					0.0f, 1.0f, 0.01f, _eff, paramStr.data());
 		}
 
 		FloatModel * model = m_vi->knobFModel[i];
 		connect( model, &FloatModel::dataChanged, this,
 			[this, model]() { setParameter( model ); }, Qt::DirectConnection);
-		vstKnobs[ i ] ->setModel( model );
+		knob->setModel(model);
 	}
-	syncParameterText();
+	m_effect->m_plugin->loadParameterLabels();
+	m_effect->m_plugin->loadParameterDisplays();
 
 	int i = 0;
 	for( int lrow = 1; lrow < ( int( m_vi->paramCount / 10 ) + 1 ) + 1; lrow++ )
@@ -404,7 +405,7 @@ ManageVSTEffectView::ManageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 		{
 			if( i < m_vi->paramCount )
 			{
-				l->addWidget( vstKnobs[i], lrow, lcolumn, Qt::AlignCenter );
+				l->addWidget(m_vstKnobs[i], lrow, lcolumn, Qt::AlignCenter);
 			}
 			i++;
 		}
@@ -439,10 +440,9 @@ void ManageVSTEffectView::closeWindow()
 
 void ManageVSTEffectView::syncPlugin()
 {
-	char paramStr[35];
+	auto paramStr = std::array<char, 35>{};
 	QStringList s_dumpValues;
 	const QMap<QString, QString> & dump = m_effect->m_plugin->parameterDump();
-	float f_value;
 
 	for( int i = 0; i < m_vi2->paramCount; i++ )
 	{
@@ -451,14 +451,15 @@ void ManageVSTEffectView::syncPlugin()
 		if( !( m_vi2->knobFModel[ i ]->isAutomated() ||
 					m_vi2->knobFModel[ i ]->controllerConnection() ) )
 		{
-			sprintf( paramStr, "param%d", i );
-    			s_dumpValues = dump[ paramStr ].split( ":" );
-			f_value = LocaleHelper::toFloat(s_dumpValues.at(2));
-			m_vi2->knobFModel[ i ]->setAutomatedValue( f_value );
-			m_vi2->knobFModel[ i ]->setInitValue( f_value );
+			std::snprintf(paramStr.data(), paramStr.size(), "param%d", i);
+			s_dumpValues = dump[paramStr.data()].split(":");
+			float f_value = LocaleHelper::toFloat(s_dumpValues.at(2));
+			m_vi2->knobFModel[i]->setValue(f_value, true);
+			m_vi2->knobFModel[i]->setInitValue(f_value);
 		}
 	}
-	syncParameterText();
+	m_effect->m_plugin->loadParameterLabels();
+	m_effect->m_plugin->loadParameterDisplays();
 }
 
 
@@ -473,12 +474,12 @@ void ManageVSTEffectView::displayAutomatedOnly()
 		if( !( m_vi2->knobFModel[ i ]->isAutomated() ||
 					m_vi2->knobFModel[ i ]->controllerConnection() ) )
 		{
-			if( vstKnobs[ i ]->isVisible() == true  && isAuto )
+			if (m_vstKnobs[i]->isVisible() && isAuto)
 			{
-				vstKnobs[ i ]->hide();
+				m_vstKnobs[i]->hide();
 				m_displayAutomatedOnly->setText( "All" );
-			} else {	
-				vstKnobs[ i ]->show();
+			} else {
+				m_vstKnobs[i]->show();
 				m_displayAutomatedOnly->setText( "Automated" );
 			}
 		}
@@ -494,77 +495,33 @@ void ManageVSTEffectView::setParameter( Model * action )
 
 	if ( m_effect->m_plugin != nullptr ) {
 		m_effect->m_plugin->setParam( knobUNID, m_vi2->knobFModel[knobUNID]->value() );
-		syncParameterText();
 	}
 }
-
-void ManageVSTEffectView::syncParameterText()
-{
-	m_effect->m_plugin->loadParameterLabels();
-	m_effect->m_plugin->loadParameterDisplays();
-
-	QString paramLabelStr   = m_effect->m_plugin->allParameterLabels();
-	QString paramDisplayStr = m_effect->m_plugin->allParameterDisplays();
-
-	QStringList paramLabelList;
-	QStringList paramDisplayList;
-
-	for( int i = 0; i < paramLabelStr.size(); )
-	{
-		const int length = paramLabelStr[i].digitValue();
-		paramLabelList.append(paramLabelStr.mid(i + 1, length));
-		i += length + 1;
-	}
-
-	for( int i = 0; i < paramDisplayStr.size(); )
-	{
-		const int length = paramDisplayStr[i].digitValue();
-		paramDisplayList.append(paramDisplayStr.mid(i + 1, length));
-		i += length + 1;
-	}
-
-	for( int i = 0; i < paramLabelList.size(); ++i )
-	{
-		vstKnobs[i]->setValueText(paramDisplayList[i] + ' ' + paramLabelList[i]);
-	}
-}
-
-
 
 ManageVSTEffectView::~ManageVSTEffectView()
 {
-	if( m_vi2->knobFModel != nullptr )
-	{ 
+	if (!m_vi2->knobFModel.empty())
+	{
 		for( int i = 0; i < m_vi2->paramCount; i++ )
 		{
 			delete m_vi2->knobFModel[ i ];
-			delete vstKnobs[ i ];
+			delete m_vstKnobs[i];
 		}
 	}
 
-	if( vstKnobs != nullptr )
-	{
-		delete [] vstKnobs;
-		vstKnobs = nullptr;
-	}
+	m_vi2->knobFModel.clear();
 
-	if( m_vi2->knobFModel != nullptr )
-	{
-		delete [] m_vi2->knobFModel;
-		m_vi2->knobFModel = nullptr;
-	}
- 
 	if( m_vi2->m_scrollArea != nullptr )
 	{
 		delete m_vi2->m_scrollArea;
 		m_vi2->m_scrollArea = nullptr;
 	}
- 
+
 	if( m_vi2->m_subWindow != nullptr )
 	{
 		m_vi2->m_subWindow->setAttribute( Qt::WA_DeleteOnClose );
 		m_vi2->m_subWindow->close();
- 
+
 		if( m_vi2->m_subWindow != nullptr )
 		{
 			delete m_vi2->m_subWindow;

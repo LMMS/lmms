@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef TRACK_OPERATIONS_WIDGET_H
-#define TRACK_OPERATIONS_WIDGET_H
+#ifndef LMMS_GUI_TRACK_OPERATIONS_WIDGET_H
+#define LMMS_GUI_TRACK_OPERATIONS_WIDGET_H
 
 #include <QWidget>
 
@@ -32,7 +32,8 @@ class QPushButton;
 namespace lmms::gui
 {
 
-class PixmapButton;
+class AutomatableButton;
+class TrackGrip;
 class TrackView;
 
 class TrackOperationsWidget : public QWidget
@@ -42,6 +43,7 @@ public:
 	TrackOperationsWidget( TrackView * parent );
 	~TrackOperationsWidget() override = default;
 
+	TrackGrip* getTrackGrip() const { return m_trackGrip; }
 
 protected:
 	void mousePressEvent( QMouseEvent * me ) override;
@@ -65,9 +67,10 @@ private slots:
 private:
 	TrackView * m_trackView;
 
+	TrackGrip* m_trackGrip;
 	QPushButton * m_trackOps;
-	PixmapButton * m_muteBtn;
-	PixmapButton * m_soloBtn;
+	AutomatableButton* m_muteBtn;
+	AutomatableButton* m_soloBtn;
 
 
 	friend class TrackView;
@@ -80,4 +83,4 @@ signals:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_TRACK_OPERATIONS_WIDGET_H

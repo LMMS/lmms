@@ -52,24 +52,6 @@
         <automationtrack/>
       </track>
     </trackcontainer>
-    <track muted="0" type="6" name="Automation track" solo="0">
-      <automationtrack/>
-      <automationpattern tens="1" mute="0" prog="0" name="Numerator" pos="0" len="192">
-        <object id="4975896"/>
-      </automationpattern>
-      <automationpattern tens="1" mute="0" prog="0" name="Denominator" pos="0" len="192">
-        <object id="6613237"/>
-      </automationpattern>
-      <automationpattern tens="1" mute="0" prog="0" name="Tempo" pos="0" len="192">
-        <object id="6054005"/>
-      </automationpattern>
-      <automationpattern tens="1" mute="0" prog="0" name="Master volume" pos="0" len="192">
-        <object id="1345820"/>
-      </automationpattern>
-      <automationpattern tens="1" mute="0" prog="0" name="Master pitch" pos="0" len="192">
-        <object id="5865711"/>
-      </automationpattern>
-    </track>
     <mixer width="543" x="5" y="310" maximized="0" height="335" visible="1" minimized="0">
       <mixerchannel num="0" muted="0" volume="1" name="Master" soloed="0">
         <fxchain numofeffects="0" enabled="0"/>

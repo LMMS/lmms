@@ -1,7 +1,7 @@
 /*
  * Lv2FxControlDialog.h - Lv2FxControlDialog implementation
  *
- * Copyright (c) 2018-2020 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
+ * Copyright (c) 2018-2023 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -45,7 +45,8 @@ public:
 
 private:
 	Lv2FxControls *lv2Controls();
-	void modelChanged() override;
+	void modelChanged() final;
+	void hideEvent(QHideEvent *event) override;
 };
 
 

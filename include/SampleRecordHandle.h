@@ -22,12 +22,12 @@
  *
  */
 
-
-#ifndef SAMPLE_RECORD_HANDLE_H
-#define SAMPLE_RECORD_HANDLE_H
+#ifndef LMMS_SAMPLE_RECORD_HANDLE_H
+#define LMMS_SAMPLE_RECORD_HANDLE_H
 
 #include <QList>
 #include <QPair>
+#include <memory>
 
 #include "PlayHandle.h"
 #include "TimePos.h"
@@ -48,20 +48,20 @@ public:
 	SampleRecordHandle( SampleClip* clip );
 	~SampleRecordHandle() override;
 
-	void play( sampleFrame * _working_buffer ) override;
+	void play( SampleFrame* _working_buffer ) override;
 	bool isFinished() const override;
 
 	bool isFromTrack( const Track * _track ) const override;
 
 	f_cnt_t framesRecorded() const;
-	void createSampleBuffer( SampleBuffer * * _sample_buf );
+	std::shared_ptr<const SampleBuffer> createSampleBuffer();
 
 
 private:
-	virtual void writeBuffer( const sampleFrame * _ab,
+	virtual void writeBuffer( const SampleFrame* _ab,
 						const f_cnt_t _frames );
 
-	using bufferList = QList<QPair<sampleFrame*, f_cnt_t>>;
+	using bufferList = QList<QPair<SampleFrame*, f_cnt_t>>;
 	bufferList m_buffers;
 	f_cnt_t m_framesRecorded;
 	TimePos m_minLength;
@@ -75,4 +75,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_SAMPLE_RECORD_HANDLE_H

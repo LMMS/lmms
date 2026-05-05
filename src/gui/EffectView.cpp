@@ -23,16 +23,18 @@
  *
  */
 
+#include <QGraphicsOpacityEffect>
+#include <QLayout>
+#include <QMouseEvent>
 #include <QPushButton>
 #include <QPainter>
-#include <QLayout>
 
 #include "EffectView.h"
 #include "DummyEffect.h"
 #include "CaptionMenu.h"
 #include "embed.h"
 #include "GuiApplication.h"
-#include "gui_templates.h"
+#include "FontHelper.h"
 #include "Knob.h"
 #include "LedCheckBox.h"
 #include "MainWindow.h"
@@ -47,39 +49,30 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 	PluginView( _model, _parent ),
 	m_bg( embed::getIconPixmap( "effect_plugin" ) ),
 	m_subWindow( nullptr ),
-	m_controlView( nullptr )
+	m_controlView(nullptr),
+	m_dragging(false)
 {
-	setFixedSize( EffectView::DEFAULT_WIDTH, 60 );
+	setFixedSize(EffectView::DEFAULT_WIDTH, EffectView::DEFAULT_HEIGHT);
+	setFocusPolicy(Qt::StrongFocus);
 
 	// Disable effects that are of type "DummyEffect"
 	bool isEnabled = !dynamic_cast<DummyEffect *>( effect() );
-	m_bypass = new LedCheckBox( this, "", isEnabled ? LedCheckBox::Green : LedCheckBox::Red );
+	m_bypass = new LedCheckBox( this, "", isEnabled ? LedCheckBox::LedColor::Green : LedCheckBox::LedColor::Red );
 	m_bypass->move( 3, 3 );
 	m_bypass->setEnabled( isEnabled );
 
 	m_bypass->setToolTip(tr("On/Off"));
 
-
-	m_wetDry = new Knob( knobBright_26, this );
-	m_wetDry->setLabel( tr( "W/D" ) );
+	m_wetDry = new Knob(KnobType::Bright26, tr("W/D"), this, Knob::LabelRendering::LegacyFixedFontSize);
 	m_wetDry->move( 40 - m_wetDry->width() / 2, 5 );
 	m_wetDry->setEnabled( isEnabled );
 	m_wetDry->setHintText( tr( "Wet Level:" ), "" );
 
 
-	m_autoQuit = new TempoSyncKnob( knobBright_26, this );
-	m_autoQuit->setLabel( tr( "DECAY" ) );
+	m_autoQuit = new TempoSyncKnob(KnobType::Bright26, tr("DECAY"), this, Knob::LabelRendering::LegacyFixedFontSize);
 	m_autoQuit->move( 78 - m_autoQuit->width() / 2, 5 );
-	m_autoQuit->setEnabled( isEnabled && !effect()->m_autoQuitDisabled );
+	m_autoQuit->setEnabled(isEnabled && effect()->autoQuitEnabled());
 	m_autoQuit->setHintText( tr( "Time:" ), "ms" );
-
-
-	m_gate = new Knob( knobBright_26, this );
-	m_gate->setLabel( tr( "GATE" ) );
-	m_gate->move( 116 - m_gate->width() / 2, 5 );
-	m_gate->setEnabled( isEnabled && !effect()->m_autoQuitDisabled );
-	m_gate->setHintText( tr( "Gate:" ), "" );
-
 
 	setModel( _model );
 
@@ -87,36 +80,24 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 	{
 		auto ctls_btn = new QPushButton(tr("Controls"), this);
 		QFont f = ctls_btn->font();
-		ctls_btn->setFont( pointSize<8>( f ) );
+		ctls_btn->setFont(adjustedToPixelSize(f, DEFAULT_FONT_SIZE));
 		ctls_btn->setGeometry( 150, 14, 50, 20 );
+		ctls_btn->setFocusPolicy(Qt::NoFocus);
 		connect( ctls_btn, SIGNAL(clicked()),
 					this, SLOT(editControls()));
 
 		m_controlView = effect()->controls()->createView();
-		if( m_controlView )
+		if (m_controlView)
 		{
-			m_subWindow = getGUI()->mainWindow()->addWindowedWidget( m_controlView );
-
-			if ( !m_controlView->isResizable() )
-			{
-				m_subWindow->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
-				if (m_subWindow->layout())
-				{
-					m_subWindow->layout()->setSizeConstraint(QLayout::SetFixedSize);
-				}
-			}
-
-			Qt::WindowFlags flags = m_subWindow->windowFlags();
-			flags &= ~Qt::WindowMaximizeButtonHint;
-			m_subWindow->setWindowFlags( flags );
-
-			connect( m_controlView, SIGNAL(closed()),
-					this, SLOT(closeEffects()));
-
+			m_subWindow = getGUI()->mainWindow()->addWindowedWidget(m_controlView);
+			m_subWindow->setWindowFlag(Qt::WindowMaximizeButtonHint, false);
 			m_subWindow->hide();
 		}
 	}
-
+	
+	m_opacityEffect = new QGraphicsOpacityEffect(this);
+	m_opacityEffect->setOpacity(1);
+	setGraphicsEffect(m_opacityEffect);
 
 	//move above vst effect view creation
 	//setModel( _model );
@@ -137,11 +118,11 @@ void EffectView::editControls()
 {
 	if( m_subWindow )
 	{
-		if( !m_subWindow->isVisible() )
+		if (!m_controlView->isVisible())
 		{
 			m_subWindow->show();
 			m_subWindow->raise();
-			effect()->controls()->setViewVisible( true );
+			effect()->controls()->setViewVisible(true); // TODO is this even needed?
 		}
 		else
 		{
@@ -156,7 +137,7 @@ void EffectView::editControls()
 
 void EffectView::moveUp()
 {
-	emit moveUp( this );
+	emit movedUp(this);
 }
 
 
@@ -164,27 +145,16 @@ void EffectView::moveUp()
 
 void EffectView::moveDown()
 {
-	emit moveDown( this );
+	emit movedDown(this);
 }
 
 
 
 void EffectView::deletePlugin()
 {
-	emit deletePlugin( this );
+	emit deletedPlugin(this);
 }
 
-
-
-
-void EffectView::closeEffects()
-{
-	if( m_subWindow )
-	{
-		m_subWindow->hide();
-	}
-	effect()->controls()->setViewVisible( false );
-}
 
 
 
@@ -208,13 +178,50 @@ void EffectView::contextMenuEvent( QContextMenuEvent * )
 
 
 
+void EffectView::mousePressEvent(QMouseEvent* event)
+{
+	if (event->button() == Qt::LeftButton)
+	{
+		m_dragging = true;
+		m_opacityEffect->setOpacity(0.3);
+		QCursor c(Qt::SizeVerCursor);
+		QApplication::setOverrideCursor(c);
+		update();
+	}
+}
+
+void EffectView::mouseReleaseEvent(QMouseEvent* event)
+{
+	if (event->button() == Qt::LeftButton)
+	{
+		m_dragging = false;
+		m_opacityEffect->setOpacity(1);
+		QApplication::restoreOverrideCursor();
+		update();
+	}
+}
+
+void EffectView::mouseMoveEvent(QMouseEvent* event)
+{
+	if (!m_dragging) { return; }
+	if (event->pos().y() < 0)
+	{
+		moveUp();
+	}
+	else if (event->pos().y() > EffectView::DEFAULT_HEIGHT)
+	{
+		moveDown();
+	}
+}
+
+
 
 void EffectView::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
 	p.drawPixmap( 0, 0, m_bg );
 
-	QFont f = pointSizeF( font(), 7.5f );
+	QFont f = adjustedToPixelSize(font(), DEFAULT_FONT_SIZE);
 	f.setBold( true );
 	p.setFont( f );
 
@@ -234,7 +241,6 @@ void EffectView::modelChanged()
 	m_bypass->setModel( &effect()->m_enabledModel );
 	m_wetDry->setModel( &effect()->m_wetDryModel );
 	m_autoQuit->setModel( &effect()->m_autoQuitModel );
-	m_gate->setModel( &effect()->m_gateModel );
 }
 
 } // namespace lmms::gui

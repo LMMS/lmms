@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef TIME_DISPLAY_WIDGET_H
-#define TIME_DISPLAY_WIDGET_H
+#ifndef LMMS_GUI_TIME_DISPLAY_WIDGET_H
+#define LMMS_GUI_TIME_DISPLAY_WIDGET_H
 
 #include <QWidget>
 #include <QHBoxLayout>
@@ -51,13 +51,11 @@ private slots:
 
 
 private:
-	enum DisplayModes
+	enum class DisplayMode
 	{
 		MinutesSeconds,
-		BarsTicks,
-		DisplayModeCount
+		BarsTicks
 	};
-	using DisplayMode = DisplayModes;
 
 	void setDisplayMode( DisplayMode displayMode );
 
@@ -71,4 +69,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif // TIME_DISPLAY_WIDGET_H
+#endif // LMMS_GUI_TIME_DISPLAY_WIDGET_H

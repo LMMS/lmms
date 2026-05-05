@@ -33,6 +33,18 @@
 find_package(SDL2 CONFIG QUIET)
 
 if(TARGET SDL2::SDL2)
+	# SDL2::SDL2 under MinGW is an interface target for reasons, so we can't get
+	# the library location from it. Print minimal information and return early.
+	get_target_property(sdl2_target_type SDL2::SDL2 TYPE)
+	if(sdl2_target_type STREQUAL "INTERFACE_LIBRARY")
+		unset(sdl2_target_type)
+		if(NOT SDL2_FIND_QUIETLY)
+			message(STATUS "Found SDL2 (found version \"${SDL2_VERSION}\")")
+		endif()
+		return()
+	endif()
+	unset(sdl2_target_type)
+
 	# Extract details for find_package_handle_standard_args
 	get_target_property(SDL2_LIBRARY SDL2::SDL2 LOCATION)
 	get_target_property(SDL2_INCLUDE_DIR SDL2::SDL2 INTERFACE_INCLUDE_DIRECTORIES)

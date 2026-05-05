@@ -50,23 +50,6 @@
         <bbtco usestyle="1" muted="0" name="Beat/Baseline 0" pos="0" len="1536" color="4282417407"/>
       </track>
     </trackcontainer>
-    <track type="6" muted="0" name="Automation track" solo="0">
-      <automationtrack/>
-      <automationpattern prog="0" mute="0" name="Tempo" pos="0" tens="1" len="192">
-        <time pos="0" value="140"/>
-      </automationpattern>
-      <automationpattern prog="0" mute="0" name="Master volume" pos="0" tens="1" len="192">
-        <time pos="0" value="100"/>
-      </automationpattern>
-      <automationpattern prog="0" mute="0" name="Master pitch" pos="0" tens="1" len="192">
-        <time pos="0" value="0"/>
-      </automationpattern>
-      <automationpattern prog="0" mute="0" name="Numerator" pos="0" tens="1" len="192"/>
-      <automationpattern prog="0" mute="0" name="Denominator" pos="0" tens="1" len="192"/>
-      <automationpattern prog="0" mute="0" name="Tempo" pos="0" tens="1" len="192"/>
-      <automationpattern prog="0" mute="0" name="Master volume" pos="0" tens="1" len="192"/>
-      <automationpattern prog="0" mute="0" name="Master pitch" pos="0" tens="1" len="192"/>
-    </track>
     <mixer visible="1" width="647" height="332" x="9" y="441" maximized="0" minimized="0">
       <mixerchannel num="0" muted="0" volume="1" name="Master" soloed="0">
         <fxchain numofeffects="0" enabled="0"/>

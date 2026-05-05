@@ -23,9 +23,8 @@
  *
  */
 
-
-#ifndef LCD_FLOATSPINBOX_H
-#define LCD_FLOATSPINBOX_H
+#ifndef LMMS_GUI_LCD_FLOATSPINBOX_H
+#define LMMS_GUI_LCD_FLOATSPINBOX_H
 
 #include <QString>
 
@@ -50,6 +49,12 @@ public:
 	}
 
 	void setLabel(const QString &label) { m_label = label; }
+	
+	void setSeamless(bool left, bool right)
+	{
+		m_wholeDisplay.setSeamless(left, true);
+		m_fractionDisplay.setSeamless(true, right);
+	}
 
 public slots:
 	virtual void update();
@@ -85,4 +90,4 @@ using LcdFloatSpinBoxModel = FloatModel;
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_LCD_FLOATSPINBOX_H

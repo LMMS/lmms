@@ -16,15 +16,15 @@
       <arpeggiator arptime="100" arprange="1" arptime_denominator="4" syncmode="0" arpmode="0" arp-enabled="0" arp="0" arptime_numerator="4" arpdir="0" arpgate="100"/>
       <midiport inputcontroller="0" fixedoutputvelocity="-1" inputchannel="0" outputcontroller="0" writable="0" outputchannel="1" fixedinputvelocity="-1" fixedoutputnote="-1" outputprogram="1" basevelocity="63" readable="0"/>
       <fxchain numofeffects="3" enabled="1">
-        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" autoquit="1" gate="0" name="dualfilter" wet="1" on="1">
+        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" autoquit="1" name="dualfilter" wet="1" on="1">
           <DualFilterControls gain2="100" cut1="4262" cut2="1713" mix="0.17" res1="1.33" res2="5.92" filter1="0" filter2="13" enabled1="1" enabled2="1" gain1="100"/>
           <key/>
         </effect>
-        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" autoquit="1" gate="0" name="waveshaper" wet="0.54" on="1">
+        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" autoquit="1" name="waveshaper" wet="0.54" on="1">
           <waveshapercontrols clipInput="1" outputGain="1" waveShape="ehQhPGZmQzzCdX889uikPDPzzDwexfU8KVwPPX9dJD0ULD09N3xhPVUBjD1Oc649CZrRPfLn8D0LWwY+7ZYTPjW5ID592y0+xf06Pg0gSD5WQlU+nmRiPuaGbz4uqXw+u+WEPt92iz4DCJI+J5mYPkwqnz5QvKU+xU6sPjbFsj7TtLg+/nG9PoSUwD7QX8I+PnrDPgNhxD42QcU+aiHGPp4Bxz7S4cc+BcLIPjmiyT5tgso+oWLLPtRCzD4II80+PAPOPm/jzj6jw88+16PQPguE0T4+ZNI+ckTTPqYk1D7aBNU+DeXVPkHF1j51pdc+qYXYPtxl2T4QRto+RCbbPngG3D6r5tw+38bdPiqg3j6vS98+yoHfPiw/3z5ULd8+HzLgPuqJ4j6qtOU+kiTpPv2d7D5oF/A+05DzPj4K9z6og/o+E/39Pj+7AD/0dwI/qjQEP1/xBT8Vrgc/ymoJP38nCz815Aw/6qAOP59dED9VGhI/CtcTP+CTFT8kUhc/jBcZP/TxGj/V8xw/WCUfPyN3IT/8ySM/NQYmP9koKD8MPCo/nkksPwRWLj9OYjA/mG4yP+J6ND8rhzY/dZM4P7+fOj8QrDw/mLg+P33FQD9A0EI/Es1EP0ahRj+iKkg/eFRJPyUnSj/HwEo/JUBLP2i3Sz8qLUw/y6JMP2wYTT8Mjk0/rQNOP055Tj/v7k4/kGRPPzHaTz/ST1A/c8VQPxQ7UT+1sFE/ViZSP/ebUj+YEVM/OYdTP9r8Uz/kd1Q/bhpVPz02Vj9KF1g/pJ9aP7VOXT/gwV8/pPZhP54SZD/TKmY/3kFoP45Naj8PKGw/D4dtP7Mfbj/f5G0/UhRtP9v/az962Wo/ArFpP4mIaD8QYGc/lzdmPx4PZT+l5mM/LL5iP7OVYT86bWA/wURfP0kcXj/y9Vw/1eFbP7cSWz9+21o/dXpbP/ThXD8Jxl4/nNtgP5b8Yj+5HmU/20BnP/1iaT9EhGs/uJ5tP0ihbz8OdHE/GAtzP1hydD+0wXU/PQp3P+xReD+GmXk/FeB6P2YgfD/XSX0/FDp+P1zDfj8=" inputGain="1"/>
           <key/>
         </effect>
-        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" autoquit="1000" gate="0" name="ladspaeffect" wet="1" on="1">
+        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" autoquit="1000" name="ladspaeffect" wet="1" on="1">
           <ladspacontrols ports="10">
             <port04 data="140.4"/>
             <port05 data="16"/>

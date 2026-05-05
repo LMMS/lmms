@@ -33,10 +33,11 @@
 #include <QFileInfo>
 #include <QLocale>
 #include <QTemporaryFile>
+#include <QTimerEvent>
 
-#ifdef LMMS_BUILD_LINUX
+#if defined(LMMS_BUILD_LINUX) && (QT_VERSION < QT_VERSION_CHECK(6,0,0))
 #	include <QX11Info>
-#	include "X11EmbedContainer.h"
+#	include <X11EmbedContainer.h>
 #endif
 
 #include <QWindow>
@@ -49,12 +50,14 @@
 
 #include "AudioEngine.h"
 #include "ConfigManager.h"
+#include "FileDialog.h"
+#include "FontHelper.h"
 #include "GuiApplication.h"
 #include "LocaleHelper.h"
 #include "MainWindow.h"
 #include "PathUtil.h"
+#include "SimpleTextFloat.h"
 #include "Song.h"
-#include "FileDialog.h"
 
 #ifdef LMMS_BUILD_LINUX
 #	include <X11/Xlib.h>
@@ -216,18 +219,18 @@ void VstPlugin::tryLoad( const QString &remoteVstPluginExecutable )
 
 	lock();
 
-	VstHostLanguages hlang = LanguageEnglish;
+	VstHostLanguage hlang = VstHostLanguage::English;
 	switch( QLocale::system().language() )
 	{
-		case QLocale::French: hlang = LanguageFrench; break;
-		case QLocale::German: hlang = LanguageGerman; break;
-		case QLocale::Italian: hlang = LanguageItalian; break;
-		case QLocale::Japanese: hlang = LanguageJapanese; break;
-		case QLocale::Korean: hlang = LanguageKorean; break;
-		case QLocale::Spanish: hlang = LanguageSpanish; break;
+		case QLocale::French: hlang = VstHostLanguage::French; break;
+		case QLocale::German: hlang = VstHostLanguage::German; break;
+		case QLocale::Italian: hlang = VstHostLanguage::Italian; break;
+		case QLocale::Japanese: hlang = VstHostLanguage::Japanese; break;
+		case QLocale::Korean: hlang = VstHostLanguage::Korean; break;
+		case QLocale::Spanish: hlang = VstHostLanguage::Spanish; break;
 		default: break;
 	}
-	sendMessage( message( IdVstSetLanguage ).addInt( hlang ) );
+	sendMessage( message( IdVstSetLanguage ).addInt( static_cast<int>(hlang) ) );
 	sendMessage( message( IdVstLoadPlugin ).addString( QSTR_TO_STDSTR( m_plugin ) ) );
 
 	waitForInitDone();
@@ -338,7 +341,7 @@ void VstPlugin::updateSampleRate()
 {
 	lock();
 	sendMessage( message( IdSampleRateInformation ).
-			addInt( Engine::audioEngine()->processingSampleRate() ) );
+			addInt( Engine::audioEngine()->outputSampleRate() ) );
 	waitForMessage( IdInformationUpdated, true );
 	unlock();
 }
@@ -404,9 +407,8 @@ bool VstPlugin::processMessage( const message & _m )
 	{
 	case IdVstPluginWindowID:
 		m_pluginWindowID = _m.getInt();
-		if( m_embedMethod == "none"
-			&& ConfigManager::inst()->value(
-				"ui", "vstalwaysontop" ).toInt() )
+		if (m_embedMethod == "none" && !gui::GuiApplication::isWayland()
+			&& ConfigManager::inst()->value("ui", "vstalwaysontop").toInt())
 		{
 #ifdef LMMS_BUILD_WIN32
 			// We're changing the owner, not the parent,
@@ -416,7 +418,7 @@ bool VstPlugin::processMessage( const message & _m )
 					(LONG_PTR) gui::getGUI()->mainWindow()->winId() );
 #endif
 
-#ifdef LMMS_BUILD_LINUX
+#if defined(LMMS_BUILD_LINUX) && (QT_VERSION < QT_VERSION_CHECK(6,0,0))
 			XSetTransientForHint( QX11Info::display(),
 					m_pluginWindowID,
 					gui::getGUI()->mainWindow()->winId() );
@@ -457,12 +459,38 @@ bool VstPlugin::processMessage( const message & _m )
 			m_allProgramNames = _m.getQString();
 			break;
 
-		case IdVstParameterLabels:
-			m_allParameterLabels = _m.getQString();
+		case IdVstLoadAllParameterLabels:
+		{
+			const auto labels = _m.getQString();
+			m_allParameterLabels.clear();
+			for (int i = 0; i < labels.size();)
+			{
+				const int length = labels[i].digitValue();
+				m_allParameterLabels.push_back(labels.mid(i + 1, length));
+				i += length + 1;
+			}
+			break;
+		}
+
+		case IdVstLoadAllParameterDisplays:
+		{
+			const auto displays = _m.getQString();
+			m_allParameterDisplays.clear();
+			for (int i = 0; i < displays.size();)
+			{
+				const int length = displays[i].digitValue();
+				m_allParameterDisplays.push_back(displays.mid(i + 1, length));
+				i += length + 1;
+			}
+			break;
+		}
+
+		case IdVstUpdateParameterLabel:
+			m_allParameterLabels.at(static_cast<std::size_t>(_m.getInt(0))) = _m.getQString(1);
 			break;
 
-		case IdVstParameterDisplays:
-			m_allParameterDisplays = _m.getQString();
+		case IdVstUpdateParameterDisplay:
+			m_allParameterDisplays.at(static_cast<std::size_t>(_m.getInt(0))) = _m.getQString(1);
 			break;
 
 		case IdVstPluginUniqueID:
@@ -504,20 +532,14 @@ QWidget *VstPlugin::editor()
 
 void VstPlugin::openPreset()
 {
-
-	gui::FileDialog ofd( nullptr, tr( "Open Preset" ), "",
-		tr( "Vst Plugin Preset (*.fxp *.fxb)" ) );
-	ofd.setFileMode( gui::FileDialog::ExistingFiles );
-	if( ofd.exec () == QDialog::Accepted &&
-					!ofd.selectedFiles().isEmpty() )
+	gui::FileDialog ofd(nullptr, tr("Open Preset"), "", tr("VST Plugin Preset (*.fxp *.fxb)"));
+	ofd.setFileMode(gui::FileDialog::ExistingFiles);
+	if (ofd.exec() == QDialog::Accepted && !ofd.selectedFiles().isEmpty())
 	{
 		lock();
-		sendMessage( message( IdLoadPresetFile ).
-			addString(
-				QSTR_TO_STDSTR(
-					QDir::toNativeSeparators( ofd.selectedFiles()[0] ) ) )
-			);
-		waitForMessage( IdLoadPresetFile, true );
+		sendMessage(message(IdLoadPresetFile).addString(QSTR_TO_STDSTR(
+			QDir::toNativeSeparators(ofd.selectedFiles()[0]))));
+		waitForMessage(IdLoadPresetFile, true);
 		unlock();
 	}
 }
@@ -561,8 +583,8 @@ void VstPlugin::loadProgramNames()
 void VstPlugin::loadParameterLabels()
 {
 	lock();
-	sendMessage( message( IdVstParameterLabels ) );
-	waitForMessage( IdVstParameterLabels, true );
+	sendMessage(message(IdVstLoadAllParameterLabels));
+	waitForMessage(IdVstLoadAllParameterLabels, true);
 	unlock();
 }
 
@@ -572,8 +594,30 @@ void VstPlugin::loadParameterLabels()
 void VstPlugin::loadParameterDisplays()
 {
 	lock();
-	sendMessage( message( IdVstParameterDisplays ) );
-	waitForMessage( IdVstParameterDisplays, true );
+	sendMessage(message(IdVstLoadAllParameterDisplays));
+	waitForMessage(IdVstLoadAllParameterDisplays, true);
+	unlock();
+}
+
+
+
+
+void VstPlugin::updateParameterLabel(int index)
+{
+	lock();
+	sendMessage(message(IdVstUpdateParameterLabel).addInt(index));
+	waitForMessage(IdVstUpdateParameterLabel, true);
+	unlock();
+}
+
+
+
+
+void VstPlugin::updateParameterDisplay(int index)
+{
+	lock();
+	sendMessage(message(IdVstUpdateParameterDisplay).addInt(index));
+	waitForMessage(IdVstUpdateParameterDisplay, true);
 	unlock();
 }
 
@@ -585,32 +629,32 @@ void VstPlugin::savePreset()
 	QString presName = currentProgramName().isEmpty() ? tr(": default") : currentProgramName();
 	presName.replace("\"", "'"); // QFileDialog unable to handle double quotes properly
 
-	gui::FileDialog sfd( nullptr, tr( "Save Preset" ), presName.section(": ", 1, 1) + tr(".fxp"),
-		tr( "Vst Plugin Preset (*.fxp *.fxb)" ) );
+	gui::FileDialog sfd(nullptr, tr("Save Preset"), presName.section(": ", 1, 1) + tr(".fxp"),
+		tr("VST Plugin Preset (*.fxp *.fxb)"));
 
-	if( p_name != "" ) // remember last directory
+	if (p_name != "") // remember last directory
 	{
-		sfd.setDirectory( QFileInfo( p_name ).absolutePath() );
+		sfd.setDirectory(QFileInfo(p_name).absolutePath());
 	}
 
-	sfd.setAcceptMode( gui::FileDialog::AcceptSave );
-	sfd.setFileMode( gui::FileDialog::AnyFile );
-	if( sfd.exec () == QDialog::Accepted &&
-				!sfd.selectedFiles().isEmpty() && sfd.selectedFiles()[0] != "" )
+	sfd.setAcceptMode(gui::FileDialog::AcceptSave);
+	sfd.setFileMode(gui::FileDialog::AnyFile);
+	if (sfd.exec() == QDialog::Accepted && !sfd.selectedFiles().isEmpty() && sfd.selectedFiles()[0] != "")
 	{
 		QString fns = sfd.selectedFiles()[0];
 		p_name = fns;
 
 		if ((fns.toUpper().indexOf(tr(".FXP")) == -1) && (fns.toUpper().indexOf(tr(".FXB")) == -1))
+		{
 			fns = fns + tr(".fxb");
-		else fns = fns.left(fns.length() - 4) + (fns.right( 4 )).toLower();
+		}
+		else
+		{
+			fns = fns.left(fns.length() - 4) + (fns.right(4)).toLower();
+		}
 		lock();
-		sendMessage( message( IdSavePresetFile ).
-			addString(
-				QSTR_TO_STDSTR(
-					QDir::toNativeSeparators( fns ) ) )
-			);
-		waitForMessage( IdSavePresetFile, true );
+		sendMessage(message(IdSavePresetFile).addString(QSTR_TO_STDSTR(QDir::toNativeSeparators(fns))));
+		waitForMessage(IdSavePresetFile, true);
 		unlock();
 	}
 }
@@ -741,14 +785,12 @@ void VstPlugin::createUI( QWidget * parent )
 
 	QWidget* container = nullptr;
 
-#if QT_VERSION >= 0x050100
 	if (m_embedMethod == "qt" )
 	{
 		QWindow* vw = QWindow::fromWinId(m_pluginWindowID);
 		container = QWidget::createWindowContainer(vw, parent );
 		container->installEventFilter(this);
 	} else
-#endif
 
 #ifdef LMMS_BUILD_WIN32
 	if (m_embedMethod == "win32" )
@@ -757,7 +799,7 @@ void VstPlugin::createUI( QWidget * parent )
 		QHBoxLayout * l = new QHBoxLayout( helper );
 		QWidget * target = new QWidget( helper );
 		l->setSpacing( 0 );
-		l->setMargin( 0 );
+		l->setContentsMargins(0, 0, 0, 0);
 		l->addWidget( target );
 
 		// we've to call that for making sure, Qt created the windows
@@ -781,7 +823,7 @@ void VstPlugin::createUI( QWidget * parent )
 	} else
 #endif
 
-#ifdef LMMS_BUILD_LINUX
+#if defined(LMMS_BUILD_LINUX) && (QT_VERSION < QT_VERSION_CHECK(6,0,0))
 	if (m_embedMethod == "xembed" )
 	{
 		if (parent)
@@ -807,7 +849,6 @@ void VstPlugin::createUI( QWidget * parent )
 
 bool VstPlugin::eventFilter(QObject *obj, QEvent *event)
 {
-#if QT_VERSION >= 0x050100
 	if (embedMethod() == "qt" && obj == m_pluginWidget)
 	{
 		if (event->type() == QEvent::Show) {
@@ -815,7 +856,6 @@ bool VstPlugin::eventFilter(QObject *obj, QEvent *event)
 		}
 		qDebug() << obj << event;
 	}
-#endif
 	return false;
 }
 
@@ -824,5 +864,69 @@ QString VstPlugin::embedMethod() const
 	return m_embedMethod;
 }
 
+namespace gui {
 
+VstPluginKnob::VstPluginKnob(VstPlugin* plugin, int paramIndex, const QString& name, QWidget* parent)
+	: gui::Knob{gui::KnobType::Bright26, name.left(15), SMALL_FONT_SIZE, parent, name}
+	, m_plugin{plugin}
+	, m_paramIndex{paramIndex}
+{
+	assert(m_plugin != nullptr);
+	setDescription(name + ":");
+}
+
+void VstPluginKnob::timerEvent(QTimerEvent* event)
+{
+	if (event->timerId() != m_rateLimitTimerId) { return; }
+
+	if (textFloat().source() != static_cast<FloatModelEditorBase*>(this))
+	{
+		// This knob is no longer controlling the text float,
+		// so we don't need the timer to continue running.
+		killTimer(m_rateLimitTimerId);
+		m_rateLimitTimerId = 0;
+		return;
+	}
+
+	// Enough time has passed, so time for an update
+	m_updateNow = true;
+}
+
+auto VstPluginKnob::getCustomFloatingText() -> QString
+{
+	constexpr auto updatesPerSecond = 15;
+
+	if (m_rateLimitTimerId == 0)
+	{
+		// Use a timer to control the rate of text float updates.
+		// Otherwise the CPU will spike when the parameter emits a bunch of dataChanged()
+		// events in a short period of time - i.e. when the parameter's value changes rapidly.
+		m_rateLimitTimerId = startTimer(std::chrono::milliseconds{1000} / updatesPerSecond);
+	}
+
+	return getParameterText();
+}
+
+auto VstPluginKnob::getCustomFloatingTextUpdate() -> std::optional<QString>
+{
+	if (!m_updateNow) { return std::nullopt; }
+	m_updateNow = false;
+
+	return getParameterText();
+}
+
+auto VstPluginKnob::getParameterText() const -> QString
+{
+	m_plugin->updateParameterLabel(m_paramIndex);
+	m_plugin->updateParameterDisplay(m_paramIndex);
+
+	const auto& paramLabels = m_plugin->allParameterLabels();
+	const auto& paramDisplays = m_plugin->allParameterDisplays();
+	assert(paramLabels.size() == paramDisplays.size());
+
+	assert(m_paramIndex < paramLabels.size());
+	return paramDisplays[m_paramIndex] + ' ' + paramLabels[m_paramIndex];
+}
+
+} // namespace gui
 } // namespace lmms

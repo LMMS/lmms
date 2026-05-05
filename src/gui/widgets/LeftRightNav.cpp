@@ -33,29 +33,22 @@ namespace lmms::gui
 
 
 LeftRightNav::LeftRightNav(QWidget *parent)
- : QWidget(parent),
-   m_layout(this),
-   m_leftBtn(this, tr("Previous")),
-   m_rightBtn(this, tr("Next"))
+	: QWidget(parent)
+	, m_layout(this)
+	, m_leftBtn(this)
+	, m_rightBtn(this)
 {
 	m_layout.setContentsMargins(0, 0, 0, 0);
 	m_layout.setSpacing(2);
+
+	m_leftBtn.setObjectName("btn-stepper-left");
+	m_rightBtn.setObjectName("btn-stepper-right");
 
 	m_leftBtn.setCheckable(false);
 	m_rightBtn.setCheckable(false);
 
 	m_leftBtn.setCursor(Qt::PointingHandCursor);
 	m_rightBtn.setCursor(Qt::PointingHandCursor);
-
-	m_leftBtn.setActiveGraphic(embed::getIconPixmap(
-							"stepper-left-press"));
-	m_rightBtn.setActiveGraphic(embed::getIconPixmap(
-							"stepper-right-press" ));
-
-	m_leftBtn.setInactiveGraphic(embed::getIconPixmap(
-							"stepper-left" ));
-	m_rightBtn.setInactiveGraphic(embed::getIconPixmap(
-							"stepper-right"));
 
 	connect(&m_leftBtn, SIGNAL(clicked()), this,
 						SIGNAL(onNavLeft()));
@@ -65,10 +58,8 @@ LeftRightNav::LeftRightNav(QWidget *parent)
 	m_leftBtn.setToolTip(tr("Previous"));
 	m_rightBtn.setToolTip(tr("Next"));
 
-	m_leftBtn.setWindowTitle(tr("Previous"));
-	m_rightBtn.setWindowTitle(tr("Next"));
-
-	// AutomatableButton's right click menu (contains irrelevant options like copying and pasting values)
+	// The context menu contains irrelevant options for these buttons,
+	// such as copying and pasting values
 	m_leftBtn.setContextMenuPolicy(Qt::NoContextMenu);
 	m_rightBtn.setContextMenuPolicy(Qt::NoContextMenu);
 
@@ -76,14 +67,6 @@ LeftRightNav::LeftRightNav(QWidget *parent)
 	m_layout.addWidget(&m_rightBtn);
 }
 
-PixmapButton* LeftRightNav::getLeftBtn()
-{
-	return &m_leftBtn;
-}
-PixmapButton* LeftRightNav::getRightBtn()
-{
-	return &m_rightBtn;
-}
 
 void LeftRightNav::setShortcuts(const QKeySequence &leftShortcut, const QKeySequence &rightShortcut)
 {

@@ -36,7 +36,7 @@ Interval::Interval(float cents) :
 	m_denominator(0),
 	m_cents(cents)
 {
-	m_ratio = powf(2.f, m_cents / 1200.f);
+	m_ratio = std::exp2(m_cents / 1200.f);
 }
 
 Interval::Interval(uint32_t numerator, uint32_t denominator) :
@@ -68,7 +68,7 @@ void Interval::loadSettings(const QDomElement &element)
 	m_denominator = element.attribute("den", "0").toULong();
 	m_cents = element.attribute("cents", "0").toDouble();
 	if (m_denominator) {m_ratio = static_cast<float>(m_numerator) / m_denominator;}
-	else {m_ratio = powf(2.f, m_cents / 1200.f);}
+	else { m_ratio = std::exp2(m_cents / 1200.f); }
 }
 
 
@@ -116,7 +116,7 @@ void Scale::loadSettings(const QDomElement &element)
 	QDomNode node = element.firstChild();
 	m_intervals.clear();
 
-	for (int i = 0; !node.isNull(); i++)
+	while (!node.isNull())
 	{
 		Interval temp;
 		temp.restoreState(node.toElement());

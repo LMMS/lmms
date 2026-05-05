@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef AUTOMATION_NODE_H
-#define AUTOMATION_NODE_H
+#ifndef LMMS_AUTOMATION_NODE_H
+#define LMMS_AUTOMATION_NODE_H
 
 namespace lmms
 {
@@ -126,6 +126,22 @@ public:
 	}
 
 	/**
+	 * @brief Checks if the tangents from the node are locked
+	 */
+	inline const bool lockedTangents() const
+	{
+		return m_lockedTangents;
+	}
+
+	/**
+	 * @brief Locks or Unlocks the tangents from this node
+	 */
+	inline void setLockedTangents(bool b)
+	{
+		m_lockedTangents = b;
+	}
+
+	/**
 	 * @brief Sets the clip this node belongs to
 	 * @param AutomationClip* clip that m_clip will be
 	 * set to
@@ -152,8 +168,13 @@ private:
 	// outValue are equal, inTangent and outTangent are equal too.
 	float m_inTangent;
 	float m_outTangent;
+
+	// If the tangents were edited manually, this will be true. That way
+	// the tangents from this node will not be recalculated. It's set back
+	// to false if the tangents are reset.
+	bool m_lockedTangents;
 };
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_AUTOMATION_NODE_H

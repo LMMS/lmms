@@ -24,7 +24,7 @@ function(DEFINE_INSTALL_VAR)
         endif()
     else()
         if(VAR_GENERATOR_EXPRESSION)
-            cmake_policy(SET CMP0087 NEW)
+            cmake_policy(SET CMP0087 NEW) # install(CODE) and install(SCRIPT) support generator expressions.
         endif()
         install(CODE "set(\"${VAR_NAME}\" \"${VAR_CONTENT}\")")
     endif()

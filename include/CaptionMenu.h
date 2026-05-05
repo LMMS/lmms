@@ -22,9 +22,8 @@
  *
  */
 
-
-#ifndef CAPTION_MENU_H
-#define CAPTION_MENU_H
+#ifndef LMMS_GUI_CAPTION_MENU_H
+#define LMMS_GUI_CAPTION_MENU_H
 
 #include <QMenu>
 
@@ -47,4 +46,4 @@ public:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_CAPTION_MENU_H

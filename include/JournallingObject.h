@@ -22,12 +22,12 @@
  *
  */
 
-#ifndef JOURNALLING_OBJECT_H
-#define JOURNALLING_OBJECT_H
+#ifndef LMMS_JOURNALLING_OBJECT_H
+#define LMMS_JOURNALLING_OBJECT_H
 
 #include <QStack>
 
-#include "lmms_basics.h"
+#include "LmmsTypes.h"
 #include "SerializingObject.h"
 
 namespace lmms
@@ -103,5 +103,4 @@ private:
 
 } // namespace lmms
 
-#endif
-
+#endif // LMMS_JOURNALLING_OBJECT_H

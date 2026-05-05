@@ -47,7 +47,7 @@ LadspaPortDialog::LadspaPortDialog( const ladspa_key_t & _key )
 
 	auto vlayout = new QVBoxLayout(this);
 	vlayout->setSpacing( 0 );
-	vlayout->setMargin( 0 );
+	vlayout->setContentsMargins(0, 0, 0, 0);
 
 	int pc = manager->getPortCount( _key );
 
@@ -90,11 +90,11 @@ LadspaPortDialog::LadspaPortDialog( const ladspa_key_t & _key )
 		{
 			if( min != NOHINT )
 			{
-				min *= Engine::audioEngine()->processingSampleRate();
+				min *= Engine::audioEngine()->outputSampleRate();
 			}
 			if( max != NOHINT )
 			{
-				max *= Engine::audioEngine()->processingSampleRate();
+				max *= Engine::audioEngine()->outputSampleRate();
 			}
 		}
 

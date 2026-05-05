@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef AUDIO_OSS_H
-#define AUDIO_OSS_H
+#ifndef LMMS_AUDIO_OSS_H
+#define LMMS_AUDIO_OSS_H
 
 #include "lmmsconfig.h"
 
@@ -77,19 +77,15 @@ class setupWidget : public gui::AudioDeviceSetupWidget
 
 
 private:
-	void startProcessing() override;
-	void stopProcessing() override;
-	void applyQualitySettings() override;
+	void startProcessingImpl() override;
+	void stopProcessingImpl() override;
 	void run() override;
 
 	int m_audioFD;
-
-	bool m_convertEndian;
-
-} ;
+};
 
 } // namespace lmms
 
 #endif // LMMS_HAVE_OSS
 
-#endif
+#endif // LMMS_AUDIO_OSS_H

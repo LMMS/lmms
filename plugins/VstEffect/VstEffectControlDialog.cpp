@@ -33,7 +33,7 @@
 #include "PixmapButton.h"
 #include "embed.h"
 
-#include "gui_templates.h"
+#include "FontHelper.h"
 #include <QToolBar>
 #include <QLabel>
 
@@ -123,13 +123,9 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 		m_openPresetButton->setMinimumHeight( 16 );
 		m_openPresetButton->setMaximumHeight( 16 );
 
-		m_rolLPresetButton = new PixmapButton( this, "" );
-		m_rolLPresetButton->setCheckable( false );
-		m_rolLPresetButton->setCursor( Qt::PointingHandCursor );
-		m_rolLPresetButton->setActiveGraphic( embed::getIconPixmap(
-							"stepper-left-press" ) );
-		m_rolLPresetButton->setInactiveGraphic( embed::getIconPixmap(
-							"stepper-left" ) );
+		m_rolLPresetButton = new QPushButton(this);
+		m_rolLPresetButton->setObjectName("btn-stepper-left");
+		m_rolLPresetButton->setCursor(Qt::PointingHandCursor);
 		connect( m_rolLPresetButton, SIGNAL( clicked() ), _ctl,
 						SLOT( rolrPreset() ) );
 
@@ -140,18 +136,10 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 
 		m_rolLPresetButton->setShortcut( Qt::Key_Minus );
 
-		m_rolLPresetButton->setMinimumWidth( 16 );
-		m_rolLPresetButton->setMaximumWidth( 16 );
-		m_rolLPresetButton->setMinimumHeight( 16 );
-		m_rolLPresetButton->setMaximumHeight( 16 );
 
-		m_rolRPresetButton = new PixmapButton( this, "" );
-		m_rolRPresetButton->setCheckable( false );
-		m_rolRPresetButton->setCursor( Qt::PointingHandCursor );
-		m_rolRPresetButton->setActiveGraphic( embed::getIconPixmap(
-							"stepper-right-press" ) );
-		m_rolRPresetButton->setInactiveGraphic( embed::getIconPixmap(
-							"stepper-right" ) );
+		m_rolRPresetButton = new QPushButton(this);
+		m_rolRPresetButton->setObjectName("btn-stepper-right");
+		m_rolRPresetButton->setCursor(Qt::PointingHandCursor);
 		connect( m_rolRPresetButton, SIGNAL( clicked() ), _ctl,
 						SLOT( rollPreset() ) );
 
@@ -162,16 +150,10 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 
 		m_rolRPresetButton->setShortcut( Qt::Key_Plus );
 
-		m_rolRPresetButton->setMinimumWidth( 16 );
-		m_rolRPresetButton->setMaximumWidth( 16 );
-		m_rolRPresetButton->setMinimumHeight( 16 );
-		m_rolRPresetButton->setMaximumHeight( 16 );
 
- 		_ctl->m_selPresetButton = new QPushButton( tr( "" ), this );
-
-		_ctl->m_selPresetButton->setCheckable( false );
-		_ctl->m_selPresetButton->setCursor( Qt::PointingHandCursor );
-		_ctl->m_selPresetButton->setIcon( embed::getIconPixmap( "stepper-down" ) );
+		_ctl->m_selPresetButton = new QPushButton(this);
+		_ctl->m_selPresetButton->setObjectName("btn-stepper-down");
+		_ctl->m_selPresetButton->setCursor(Qt::PointingHandCursor);
 
 		auto menu = new QMenu;
 		connect( menu, SIGNAL( aboutToShow() ), _ctl, SLOT( updateMenu() ) );
@@ -236,7 +218,7 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 		tb->addWidget(space1);
 
 		tbLabel = new QLabel( tr( "Effect by: " ), this );
-		tbLabel->setFont( pointSize<7>( f ) );
+		tbLabel->setFont(adjustedToPixelSize(f, SMALL_FONT_SIZE));
 		tbLabel->setTextFormat(Qt::RichText);
 		tbLabel->setAlignment( Qt::AlignTop | Qt::AlignLeft );
 		tb->addWidget( tbLabel );

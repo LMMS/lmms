@@ -147,7 +147,7 @@ void Keymap::loadSettings(const QDomElement &element)
 	QDomNode node = element.firstChild();
 	m_map.clear();
 
-	for (int i = 0; !node.isNull(); i++)
+	while (!node.isNull())
 	{
 		m_map.push_back(node.toElement().attribute("value").toInt());
 		node = node.nextSibling();

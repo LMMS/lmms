@@ -22,9 +22,8 @@
  *
  */
 
-
-#ifndef FILEDIALOG_H
-#define FILEDIALOG_H
+#ifndef LMMS_GUI_FILE_DIALOG_H
+#define LMMS_GUI_FILE_DIALOG_H
 
 #include <QFileDialog>
 
@@ -51,10 +50,12 @@ public:
 									const QString &directory = QString(),
 									const QString &filter = QString(),
 									QString *selectedFilter = 0);
+	static QString openAudioFile(const QString& previousFile = "");
+	static QString openWaveformFile(const QString& previousFile = "");
 	void clearSelection();
 };
 
 
 } // namespace lmms::gui
 
-#endif // FILEDIALOG_H
+#endif // LMMS_GUI_FILE_DIALOG_H

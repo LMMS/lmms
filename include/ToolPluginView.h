@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef TOOL_PLUGIN_VIEW_H
-#define TOOL_PLUGIN_VIEW_H
+#ifndef LMMS_GUI_TOOL_PLUGIN_VIEW_H
+#define LMMS_GUI_TOOL_PLUGIN_VIEW_H
 
 #include "PluginView.h"
 
@@ -49,4 +49,4 @@ public:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_GUI_TOOL_PLUGIN_VIEW_H

@@ -23,6 +23,7 @@
  */
 
 #include <QDir>
+#include <QRegularExpression>
 
 #include "RenderManager.h"
 
@@ -33,17 +34,11 @@
 namespace lmms
 {
 
-
 RenderManager::RenderManager(
-		const AudioEngine::qualitySettings & qualitySettings,
-		const OutputSettings & outputSettings,
-		ProjectRenderer::ExportFileFormats fmt,
-		QString outputPath) :
-	m_qualitySettings(qualitySettings),
-	m_oldQualitySettings( Engine::audioEngine()->currentQualitySettings() ),
-	m_outputSettings(outputSettings),
-	m_format(fmt),
-	m_outputPath(outputPath)
+	const OutputSettings& outputSettings, ProjectRenderer::ExportFileFormat fmt, QString outputPath)
+	: m_outputSettings(outputSettings)
+	, m_format(fmt)
+	, m_outputPath(outputPath)
 {
 	Engine::audioEngine()->storeAudioDevice();
 }
@@ -51,7 +46,6 @@ RenderManager::RenderManager(
 RenderManager::~RenderManager()
 {
 	Engine::audioEngine()->restoreAudioDevice();  // Also deletes audio dev.
-	Engine::audioEngine()->changeQuality( m_oldQualitySettings );
 }
 
 void RenderManager::abortProcessing()
@@ -69,7 +63,7 @@ void RenderManager::renderNextTrack()
 {
 	m_activeRenderer.reset();
 
-	if( m_tracksToRender.isEmpty() )
+	if (m_tracksToRender.empty())
 	{
 		// nothing left to render
 		restoreMutedState();
@@ -97,29 +91,29 @@ void RenderManager::renderNextTrack()
 // Render the song into individual tracks
 void RenderManager::renderTracks()
 {
-	const TrackContainer::TrackList & tl = Engine::getSong()->tracks();
+	const TrackContainer::TrackList& tl = Engine::getSong()->tracks();
 
 	// find all currently unnmuted tracks -- we want to render these.
 	for (const auto& tk : tl)
 	{
-		Track::TrackTypes type = tk->type();
+		Track::Type type = tk->type();
 
 		// Don't render automation tracks
 		if ( tk->isMuted() == false &&
-				( type == Track::InstrumentTrack || type == Track::SampleTrack ) )
+				( type == Track::Type::Instrument || type == Track::Type::Sample ) )
 		{
 			m_unmuted.push_back(tk);
 		}
 	}
 
-	const TrackContainer::TrackList t2 = Engine::patternStore()->tracks();
+	const TrackContainer::TrackList& t2 = Engine::patternStore()->tracks();
 	for (const auto& tk : t2)
 	{
-		Track::TrackTypes type = tk->type();
+		Track::Type type = tk->type();
 
 		// Don't render automation tracks
 		if ( tk->isMuted() == false &&
-				( type == Track::InstrumentTrack || type == Track::SampleTrack ) )
+				( type == Track::Type::Instrument || type == Track::Type::Sample ) )
 		{
 			m_unmuted.push_back(tk);
 		}
@@ -140,11 +134,7 @@ void RenderManager::renderProject()
 
 void RenderManager::render(QString outputPath)
 {
-	m_activeRenderer = std::make_unique<ProjectRenderer>(
-			m_qualitySettings,
-			m_outputSettings,
-			m_format,
-			outputPath);
+	m_activeRenderer = std::make_unique<ProjectRenderer>(m_outputSettings, m_format, outputPath);
 
 	if( m_activeRenderer->isReady() )
 	{
@@ -169,7 +159,7 @@ void RenderManager::render(QString outputPath)
 // Unmute all tracks that were muted while rendering tracks
 void RenderManager::restoreMutedState()
 {
-	while( !m_unmuted.isEmpty() )
+	while (!m_unmuted.empty())
 	{
 		Track* restoreTrack = m_unmuted.back();
 		m_unmuted.pop_back();
@@ -182,7 +172,7 @@ QString RenderManager::pathForTrack(const Track *track, int num)
 {
 	QString extension = ProjectRenderer::getFileExtensionFromFormat( m_format );
 	QString name = track->name();
-	name = name.remove(QRegExp(FILENAME_FILTER));
+	name = name.remove(QRegularExpression(FILENAME_FILTER));
 	name = QString( "%1_%2%3" ).arg( num ).arg( name ).arg( extension );
 	return QDir(m_outputPath).filePath(name);
 }

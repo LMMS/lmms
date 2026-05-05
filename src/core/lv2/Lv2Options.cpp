@@ -94,6 +94,16 @@ void Lv2Options::initOption(LV2_URID key, uint32_t size, LV2_URID type,
 }
 
 
+
+
+void Lv2Options::clear()
+{
+	m_options.clear();
+	m_optionValues.clear();
+	m_optionByUrid.clear();
+}
+
+
 } // namespace lmms
 
 #endif // LMMS_HAVE_LV2

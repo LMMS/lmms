@@ -33,6 +33,7 @@
 #include <QPainter>
 #include <QString>
 
+#include "DeprecationHelper.h"
 #include "EffectControlDialog.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
@@ -54,6 +55,7 @@ SaWaterfallView::SaWaterfallView(SaControls *controls, SaProcessor *processor, Q
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
 	connect(getGUI()->mainWindow(), SIGNAL(periodicUpdate()), this, SLOT(periodicUpdate()));
+	connect(&controls->m_waterfallModel, &BoolModel::dataChanged, this, &SaWaterfallView::updateVisibility);
 
 	m_displayTop = 1;
 	m_displayBottom = height() -2;
@@ -213,17 +215,15 @@ float SaWaterfallView::yPixelToTime(float position, int height)
 std::vector<std::pair<float, std::string>> SaWaterfallView::makeTimeTics()
 {
 	std::vector<std::pair<float, std::string>> result;
-	float i;
 
 	// get time value of the last line
 	float limit = yPixelToTime(m_displayBottom, m_displayHeight);
 
 	// set increment to about 30 pixels (but min. 0.1 s)
-	float increment = std::round(10 * limit / (m_displayHeight / 30)) / 10;
-	if (increment < 0.1) {increment = 0.1;}
+	const float increment = std::max(std::round(10 * limit / (m_displayHeight / 30)) / 10, 0.1f);
 
 	// NOTE: labels positions are rounded to match the (rounded) label value
-	for (i = 0; i <= limit; i += increment)
+	for (float i = 0; i <= limit; i += increment)
 	{
 		if (i > 99)
 		{
@@ -325,18 +325,14 @@ void SaWaterfallView::drawCursor(QPainter &painter)
 
 
 // Handle mouse input: set new cursor position.
-// For some reason (a bug?), localPos() only returns integers. As a workaround
-// the fractional part is taken from windowPos() (which works correctly).
-void SaWaterfallView::mouseMoveEvent(QMouseEvent *event)
+void SaWaterfallView::mouseMoveEvent(QMouseEvent* event)
 {
-	m_cursor = QPointF(	event->localPos().x() - (event->windowPos().x() - (long)event->windowPos().x()),
-						event->localPos().y() - (event->windowPos().y() - (long)event->windowPos().y()));
+	m_cursor = positionF(event);
 }
 
-void SaWaterfallView::mousePressEvent(QMouseEvent *event)
+void SaWaterfallView::mousePressEvent(QMouseEvent* event)
 {
-	m_cursor = QPointF(	event->localPos().x() - (event->windowPos().x() - (long)event->windowPos().x()),
-						event->localPos().y() - (event->windowPos().y() - (long)event->windowPos().y()));
+	m_cursor = positionF(event);
 }
 
 

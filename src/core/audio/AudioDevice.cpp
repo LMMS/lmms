@@ -26,108 +26,36 @@
 
 #include "AudioDevice.h"
 #include "AudioEngine.h"
-#include "ConfigManager.h"
-#include "debug.h"
 
 namespace lmms
 {
 
-AudioDevice::AudioDevice( const ch_cnt_t _channels, AudioEngine*  _audioEngine ) :
-	m_supportsCapture( false ),
-	m_sampleRate( _audioEngine->processingSampleRate() ),
-	m_channels( _channels ),
-	m_audioEngine( _audioEngine ),
-	m_buffer( new surroundSampleFrame[audioEngine()->framesPerPeriod()] )
+AudioDevice::AudioDevice(const ch_cnt_t _channels, AudioEngine* _audioEngine)
+	: m_supportsCapture(false)
+	, m_sampleRate(_audioEngine->outputSampleRate())
+	, m_channels(_channels)
+	, m_audioEngine(_audioEngine)
 {
-	int error;
-	if( ( m_srcState = src_new(
-		audioEngine()->currentQualitySettings().libsrcInterpolation(),
-				SURROUND_CHANNELS, &error ) ) == nullptr )
-	{
-		printf( "Error: src_new() failed in audio_device.cpp!\n" );
-	}
 }
-
 
 
 
 AudioDevice::~AudioDevice()
 {
-	src_delete( m_srcState );
-	delete[] m_buffer;
-
-	m_devMutex.tryLock();
-	unlock();
+	assert(!isRunning() && "device should have been stopped before being destroyed");
 }
 
-
-
-
-void AudioDevice::processNextBuffer()
+void AudioDevice::startProcessing()
 {
-	const fpp_t frames = getNextBuffer( m_buffer );
-	if( frames )
-	{
-		writeBuffer( m_buffer, frames, audioEngine()->masterGain() );
-	}
-	else
-	{
-		m_inProcess = false;
-	}
+	m_running.test_and_set(std::memory_order_acquire);
+	startProcessingImpl();
 }
-
-
-
-
-fpp_t AudioDevice::getNextBuffer( surroundSampleFrame * _ab )
-{
-	fpp_t frames = audioEngine()->framesPerPeriod();
-	const surroundSampleFrame * b = audioEngine()->nextBuffer();
-	if( !b )
-	{
-		return 0;
-	}
-
-	// make sure, no other thread is accessing device
-	lock();
-
-	// resample if necessary
-	if( audioEngine()->processingSampleRate() != m_sampleRate )
-	{
-		frames = resample( b, frames, _ab, audioEngine()->processingSampleRate(), m_sampleRate );
-	}
-	else
-	{
-		memcpy( _ab, b, frames * sizeof( surroundSampleFrame ) );
-	}
-
-	// release lock
-	unlock();
-
-	if( audioEngine()->hasFifoWriter() )
-	{
-		delete[] b;
-	}
-
-	return frames;
-}
-
-
-
 
 void AudioDevice::stopProcessing()
 {
-	if( audioEngine()->hasFifoWriter() )
-	{
-		while( m_inProcess )
-		{
-			processNextBuffer();
-		}
-	}
+	m_running.clear(std::memory_order_release);
+	stopProcessingImpl();
 }
-
-
-
 
 void AudioDevice::stopProcessingThread( QThread * thread )
 {
@@ -144,86 +72,37 @@ void AudioDevice::stopProcessingThread( QThread * thread )
 
 
 
-
-void AudioDevice::applyQualitySettings()
-{
-	src_delete( m_srcState );
-
-	int error;
-	if( ( m_srcState = src_new(
-		audioEngine()->currentQualitySettings().libsrcInterpolation(),
-				SURROUND_CHANNELS, &error ) ) == nullptr )
-	{
-		printf( "Error: src_new() failed in audio_device.cpp!\n" );
-	}
-}
-
-
-
-
-void AudioDevice::registerPort( AudioPort * )
+void AudioDevice::registerPort(AudioBusHandle*)
 {
 }
 
 
 
 
-void AudioDevice::unregisterPort( AudioPort * _port )
+void AudioDevice::unregisterPort(AudioBusHandle*)
 {
 }
 
 
 
 
-void AudioDevice::renamePort( AudioPort * )
+void AudioDevice::renamePort(AudioBusHandle*)
 {
 }
 
-
-
-
-fpp_t AudioDevice::resample( const surroundSampleFrame * _src,
-						const fpp_t _frames,
-						surroundSampleFrame * _dst,
-						const sample_rate_t _src_sr,
-						const sample_rate_t _dst_sr )
-{
-	if( m_srcState == nullptr )
-	{
-		return _frames;
-	}
-	m_srcData.input_frames = _frames;
-	m_srcData.output_frames = _frames;
-	m_srcData.data_in = const_cast<float*>(_src[0].data());
-	m_srcData.data_out = _dst[0].data ();
-	m_srcData.src_ratio = (double) _dst_sr / _src_sr;
-	m_srcData.end_of_input = 0;
-	int error;
-	if( ( error = src_process( m_srcState, &m_srcData ) ) )
-	{
-		printf( "AudioDevice::resample(): error while resampling: %s\n",
-							src_strerror( error ) );
-	}
-	return static_cast<fpp_t>(m_srcData.output_frames_gen);
-}
-
-
-
-int AudioDevice::convertToS16( const surroundSampleFrame * _ab,
-								const fpp_t _frames,
-								const float _master_gain,
+int AudioDevice::convertToS16(const SampleFrame* _ab,
+								const f_cnt_t _frames,
 								int_sample_t * _output_buffer,
 								const bool _convert_endian )
 {
 	if( _convert_endian )
 	{
-		int_sample_t temp;
-		for( fpp_t frame = 0; frame < _frames; ++frame )
+		for( f_cnt_t frame = 0; frame < _frames; ++frame )
 		{
 			for( ch_cnt_t chnl = 0; chnl < channels(); ++chnl )
 			{
-				temp = static_cast<int_sample_t>( AudioEngine::clip( _ab[frame][chnl] * _master_gain ) * OUTPUT_SAMPLE_MULTIPLIER );
-				
+				auto temp = static_cast<int_sample_t>(AudioEngine::clip(_ab[frame][chnl]) * OUTPUT_SAMPLE_MULTIPLIER);
+
 				( _output_buffer + frame * channels() )[chnl] =
 						( temp & 0x00ff ) << 8 |
 						( temp & 0xff00 ) >> 8;
@@ -232,15 +111,12 @@ int AudioDevice::convertToS16( const surroundSampleFrame * _ab,
 	}
 	else
 	{
-		for( fpp_t frame = 0; frame < _frames; ++frame )
+		for( f_cnt_t frame = 0; frame < _frames; ++frame )
 		{
 			for( ch_cnt_t chnl = 0; chnl < channels(); ++chnl )
 			{
-				( _output_buffer + frame * channels() )[chnl] =
-						static_cast<int_sample_t>(
-						AudioEngine::clip( _ab[frame][chnl] *
-						_master_gain ) *
-						OUTPUT_SAMPLE_MULTIPLIER );
+				(_output_buffer + frame * channels())[chnl]
+					= static_cast<int_sample_t>(AudioEngine::clip(_ab[frame][chnl]) * OUTPUT_SAMPLE_MULTIPLIER);
 			}
 		}
 	}
@@ -251,21 +127,12 @@ int AudioDevice::convertToS16( const surroundSampleFrame * _ab,
 
 
 
-void AudioDevice::clearS16Buffer( int_sample_t * _outbuf, const fpp_t _frames )
+void AudioDevice::clearS16Buffer( int_sample_t * _outbuf, const f_cnt_t _frames )
 {
 
 	assert( _outbuf != nullptr );
 
 	memset( _outbuf, 0,  _frames * channels() * BYTES_PER_INT_SAMPLE );
 }
-
-
-
-
-bool AudioDevice::hqAudio() const
-{
-	return ConfigManager::inst()->value( "audioengine", "hqaudio" ).toInt();
-}
-
 
 } // namespace lmms

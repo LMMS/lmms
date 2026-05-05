@@ -17,7 +17,7 @@
       <chordcreator chordrange="1" chord-enabled="1" chord="0"/>
       <arpeggiator arp-enabled="0" arptime_denominator="1" arpcycle="0" arp="0" arpmiss="0" arpmode="0" arpskip="0" arptime="100" arprange="3" arptime_numerator="1" arpdir="0" arptime_syncmode="0" arpgate="100"/>
       <fxchain numofeffects="1" enabled="1">
-        <effect autoquit_numerator="4" autoquit_denominator="4" autoquit_syncmode="0" wet="1" autoquit="1" on="1" gate="0" name="ladspaeffect">
+        <effect autoquit_numerator="4" autoquit_denominator="4" autoquit_syncmode="0" wet="1" autoquit="1" on="1" name="ladspaeffect">
           <ladspacontrols link="1" ports="0"/>
           <key>
             <attribute value="dc_remove_1207" name="file"/>

@@ -70,16 +70,14 @@
 **
 ****************************************************************************/
 
-#ifndef CONTROLLAYOUT_H
-#define CONTROLLAYOUT_H
+#ifndef LMMS_GUI_CONTROL_LAYOUT_H
+#define LMMS_GUI_CONTROL_LAYOUT_H
 
 #include <QLayout>
 #include <QMultiMap>
 #include <QStyle>
 
 class QLayoutItem;
-class QRect;
-class QString;
 class QLineEdit;
 
 
@@ -97,6 +95,8 @@ namespace lmms::gui
 class ControlLayout : public QLayout
 {
 	Q_OBJECT
+
+	using ControlLayoutMap = QMap<QString, QLayoutItem*>;
 
 public:
 	explicit ControlLayout(QWidget *parent,
@@ -126,9 +126,9 @@ private slots:
 private:
 	int doLayout(const QRect &rect, bool testOnly) const;
 	int smartSpacing(QStyle::PixelMetric pm) const;
-	QMap<QString, QLayoutItem *>::const_iterator pairAt(int index) const;
+	ControlLayoutMap::const_iterator pairAt(int index) const;
 
-	QMultiMap<QString, QLayoutItem *> m_itemMap;
+	ControlLayoutMap m_itemMap;
 	int m_hSpace;
 	int m_vSpace;
 	// relevant dimension is width, as later, heightForWidth() will be called
@@ -141,4 +141,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif // CONTROLLAYOUT_H
+#endif // LMMS_GUI_CONTROL_LAYOUT_H

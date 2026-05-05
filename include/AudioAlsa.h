@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef AUDIO_ALSA_H
-#define AUDIO_ALSA_H
+#ifndef LMMS_AUDIO_ALSA_H
+#define LMMS_AUDIO_ALSA_H
 
 #include "lmmsconfig.h"
 
@@ -82,9 +82,8 @@ public:
 	static DeviceInfoCollection getAvailableDevices();
 
 private:
-	void startProcessing() override;
-	void stopProcessing() override;
-	void applyQualitySettings() override;
+	void startProcessingImpl() override;
+	void stopProcessingImpl() override;
 	void run() override;
 
 	int setHWParams( const ch_cnt_t _channels, snd_pcm_access_t _access );
@@ -99,13 +98,10 @@ private:
 
 	snd_pcm_hw_params_t * m_hwParams;
 	snd_pcm_sw_params_t * m_swParams;
-
-	bool m_convertEndian;
-
 } ;
 
 } // namespace lmms
 
 #endif // LMMS_HAVE_ALSA
 
-#endif
+#endif // LMMS_AUDIO_ALSA_H

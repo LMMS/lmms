@@ -1,7 +1,7 @@
 /*
  * Lv2FxControls.h - Lv2FxControls implementation
  *
- * Copyright (c) 2018-2020 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
+ * Copyright (c) 2018-2023 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -43,8 +43,11 @@ class Lv2FxControlDialog;
 class Lv2FxControls : public EffectControls, public Lv2ControlBase
 {
 	Q_OBJECT
+signals:
+	void modelChanged();
 public:
 	Lv2FxControls(Lv2Effect *effect, const QString &uri);
+	void reload();
 
 	void saveSettings(QDomDocument &_doc, QDomElement &_parent) override;
 	void loadSettings(const QDomElement &that) override;
@@ -60,8 +63,7 @@ private slots:
 	void changeControl();
 
 private:
-	DataFile::Types settingsType() override;
-	void setNameFromFile(const QString &name) override;
+	void onSampleRateChanged();
 
 	friend class gui::Lv2FxControlDialog;
 	friend class Lv2Effect;

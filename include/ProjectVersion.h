@@ -23,9 +23,8 @@
  *
  */
 
-
-#ifndef PROJECT_VERSION_H
-#define PROJECT_VERSION_H
+#ifndef LMMS_PROJECT_VERSION_H
+#define LMMS_PROJECT_VERSION_H
 
 #include <QString>
 #include <QStringList>
@@ -43,11 +42,11 @@ namespace lmms
 class ProjectVersion
 {
 public:
-	enum CompareType : int { None = 0, Major=1, Minor=2, Release=3, Stage=4, Build=5, All = std::numeric_limits<int>::max() };
+	enum class CompareType : int { None = 0, Major=1, Minor=2, Release=3, Stage=4, Build=5, All = std::numeric_limits<int>::max() };
 
 
-	ProjectVersion(QString version, CompareType c = All);
-	ProjectVersion(const char * version, CompareType c = All);
+	ProjectVersion(QString version, CompareType c = CompareType::All);
+	ProjectVersion(const char * version, CompareType c = CompareType::All);
 
 	const QString& getVersion() const { return m_version; }
 	int getMajor() const { return m_major; }
@@ -82,4 +81,4 @@ inline bool operator!=(const ProjectVersion & v1, const ProjectVersion & v2) { r
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_PROJECT_VERSION_H

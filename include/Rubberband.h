@@ -23,9 +23,8 @@
  *
  */
 
-
-#ifndef RUBBERBAND_H
-#define RUBBERBAND_H
+#ifndef LMMS_GUI_RUBBERBAND_H
+#define LMMS_GUI_RUBBERBAND_H
 
 #include <QRubberBand>
 #include <QVector>
@@ -94,5 +93,4 @@ private:
 
 } // namespace lmms::gui
 
-#endif
-
+#endif // LMMS_GUI_RUBBERBAND_H

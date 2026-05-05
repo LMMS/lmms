@@ -22,13 +22,13 @@
  *
  */
 
-#ifndef AUDIO_DEVICE_H
-#define AUDIO_DEVICE_H
+#ifndef LMMS_AUDIO_DEVICE_H
+#define LMMS_AUDIO_DEVICE_H
 
 #include <QMutex>
 #include <samplerate.h>
 
-#include "lmms_basics.h"
+#include "LmmsTypes.h"
 
 class QThread;
 
@@ -36,7 +36,8 @@ namespace lmms
 {
 
 class AudioEngine;
-class AudioPort;
+class AudioBusHandle;
+class SampleFrame;
 
 
 class AudioDevice
@@ -45,25 +46,13 @@ public:
 	AudioDevice( const ch_cnt_t _channels, AudioEngine* audioEngine );
 	virtual ~AudioDevice();
 
-	inline void lock()
-	{
-		m_devMutex.lock();
-	}
-
-	inline void unlock()
-	{
-		m_devMutex.unlock();
-	}
-
-
-	// if audio-driver supports ports, classes inherting AudioPort
+	// if audio-driver supports ports, classes inheriting AudioBusHandle
 	// (e.g. channel-tracks) can register themselves for making
 	// audio-driver able to collect their individual output and provide
 	// them at a specific port - currently only supported by JACK
-	virtual void registerPort( AudioPort * _port );
-	virtual void unregisterPort( AudioPort * _port );
-	virtual void renamePort( AudioPort * _port );
-
+	virtual void registerPort(AudioBusHandle* port);
+	virtual void unregisterPort(AudioBusHandle* port);
+	virtual void renamePort(AudioBusHandle* port);
 
 	inline bool supportsCapture() const
 	{
@@ -75,89 +64,42 @@ public:
 		return m_sampleRate;
 	}
 
-	ch_cnt_t channels() const
-	{
-		return m_channels;
-	}
+	void startProcessing();
 
-	void processNextBuffer();
+	void stopProcessing();
 
-	virtual void startProcessing()
-	{
-		m_inProcess = true;
-	}
-
-	virtual void stopProcessing();
-
-	virtual void applyQualitySettings();
-
-
+	bool isRunning() const { return m_running.test(std::memory_order_acquire); }
 
 protected:
-	// subclasses can re-implement this for being used in conjunction with
-	// processNextBuffer()
-	virtual void writeBuffer( const surroundSampleFrame * /* _buf*/,
-						const fpp_t /*_frames*/,
-						const float /*_master_gain*/ )
-	{
-	}
-
-	// called by according driver for fetching new sound-data
-	fpp_t getNextBuffer( surroundSampleFrame * _ab );
-
 	// convert a given audio-buffer to a buffer in signed 16-bit samples
 	// returns num of bytes in outbuf
-	int convertToS16( const surroundSampleFrame * _ab,
-						const fpp_t _frames,
-						const float _master_gain,
-						int_sample_t * _output_buffer,
-						const bool _convert_endian = false );
+	int convertToS16(const SampleFrame* _ab, const f_cnt_t _frames, int_sample_t* _output_buffer,
+		const bool _convert_endian = false);
 
 	// clear given signed-int-16-buffer
-	void clearS16Buffer( int_sample_t * _outbuf,
-							const fpp_t _frames );
+	void clearS16Buffer(int_sample_t* _outbuf, const f_cnt_t _frames);
 
-	// resample given buffer from samplerate _src_sr to samplerate _dst_sr
-	fpp_t resample( const surroundSampleFrame * _src,
-					const fpp_t _frames,
-					surroundSampleFrame * _dst,
-					const sample_rate_t _src_sr,
-					const sample_rate_t _dst_sr );
+	ch_cnt_t channels() const { return m_channels; }
 
-	inline void setSampleRate( const sample_rate_t _new_sr )
-	{
-		m_sampleRate = _new_sr;
-	}
+	AudioEngine* audioEngine() { return m_audioEngine; }
 
-	AudioEngine* audioEngine()
-	{
-		return m_audioEngine;
-	}
-
-	bool hqAudio() const;
+	void setSampleRate(const sample_rate_t _new_sr) { m_sampleRate = _new_sr; }
+	void setChannels(const ch_cnt_t channels) { m_channels = channels; }
 
 	static void stopProcessingThread( QThread * thread );
-
-
 protected:
 	bool m_supportsCapture;
 
-
 private:
+	virtual void startProcessingImpl() = 0;
+	virtual void stopProcessingImpl() = 0;
+
 	sample_rate_t m_sampleRate;
 	ch_cnt_t m_channels;
-	AudioEngine* m_audioEngine;
-	bool m_inProcess;
-
-	QMutex m_devMutex;
-
-	SRC_DATA m_srcData;
-	SRC_STATE * m_srcState;
-
-	surroundSampleFrame * m_buffer;
-
+	AudioEngine* m_audioEngine = nullptr;
+	std::atomic_flag m_running = ATOMIC_FLAG_INIT;
 };
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_AUDIO_DEVICE_H

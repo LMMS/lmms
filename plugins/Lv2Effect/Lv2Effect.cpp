@@ -1,7 +1,7 @@
 /*
  * Lv2Effect.cpp - implementation of LV2 effect
  *
- * Copyright (c) 2018-2020 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
+ * Copyright (c) 2018-2023 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -24,6 +24,7 @@
 
 #include "Lv2Effect.h"
 
+#include <QDebug>
 
 #include "Lv2SubPluginFeatures.h"
 
@@ -46,10 +47,10 @@ Plugin::Descriptor PLUGIN_EXPORT lv2effect_plugin_descriptor =
 		"plugin for using arbitrary LV2-effects inside LMMS."),
 	"Johannes Lorenz <jlsf2013$$$users.sourceforge.net, $$$=@>",
 	0x0100,
-	Plugin::Effect,
+	Plugin::Type::Effect,
 	new PluginPixmapLoader("logo"),
 	nullptr,
-	new Lv2SubPluginFeatures(Plugin::Effect)
+	new Lv2SubPluginFeatures(Plugin::Type::Effect)
 };
 
 }
@@ -67,10 +68,9 @@ Lv2Effect::Lv2Effect(Model* parent, const Descriptor::SubPluginFeatures::Key *ke
 
 
 
-bool Lv2Effect::processAudioBuffer(sampleFrame *buf, const fpp_t frames)
+Effect::ProcessStatus Lv2Effect::processImpl(SampleFrame* buf, const f_cnt_t frames)
 {
-	if (!isEnabled() || !isRunning()) { return false; }
-	Q_ASSERT(frames <= static_cast<fpp_t>(m_tmpOutputSmps.size()));
+	Q_ASSERT(frames <= static_cast<f_cnt_t>(m_tmpOutputSmps.size()));
 
 	m_controls.copyBuffersFromLmms(buf, frames);
 	m_controls.copyModelsFromLmms();
@@ -82,21 +82,16 @@ bool Lv2Effect::processAudioBuffer(sampleFrame *buf, const fpp_t frames)
 	m_controls.copyModelsToLmms();
 	m_controls.copyBuffersToLmms(m_tmpOutputSmps.data(), frames);
 
-	double outSum = .0;
 	bool corrupt = wetLevel() < 0; // #3261 - if w < 0, bash w := 0, d := 1
 	const float d = corrupt ? 1 : dryLevel();
 	const float w = corrupt ? 0 : wetLevel();
-	for(fpp_t f = 0; f < frames; ++f)
+	for(f_cnt_t f = 0; f < frames; ++f)
 	{
 		buf[f][0] = d * buf[f][0] + w * m_tmpOutputSmps[f][0];
 		buf[f][1] = d * buf[f][1] + w * m_tmpOutputSmps[f][1];
-		auto l = static_cast<double>(buf[f][0]);
-		auto r = static_cast<double>(buf[f][1]);
-		outSum += l*l + r*r;
 	}
-	checkGate(outSum / frames);
 
-	return isRunning();
+	return ProcessStatus::ContinueIfNotQuiet;
 }
 
 
@@ -109,9 +104,12 @@ extern "C"
 PLUGIN_EXPORT Plugin *lmms_plugin_main(Model *_parent, void *_data)
 {
 	using KeyType = Plugin::Descriptor::SubPluginFeatures::Key;
-	auto eff = new Lv2Effect(_parent, static_cast<const KeyType*>(_data));
-	if (!eff->isValid()) { delete eff; eff = nullptr; }
-	return eff;
+	try {
+		return new Lv2Effect(_parent, static_cast<const KeyType*>(_data));
+	} catch (const std::runtime_error& e) {
+		qCritical() << e.what();
+		return nullptr;
+	}
 }
 
 }
