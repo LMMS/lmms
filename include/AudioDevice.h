@@ -84,6 +84,11 @@ public:
 
 	virtual void stopProcessing();
 
+	virtual bool isProcessing()
+	{
+		return m_inProcess;
+	}
+
 protected:
 	// subclasses can re-implement this for being used in conjunction with
 	// processNextBuffer()

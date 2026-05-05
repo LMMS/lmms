@@ -22,6 +22,11 @@
  *
  */
 
+#include <algorithm>
+#include <cstdio>
+#include <cassert> 
+#include <vector>
+
 #include "AudioEngine.h"
 
 #include "MixHelpers.h"
@@ -60,15 +65,16 @@
 
 #include "BufferManager.h"
 
+#include "LocklessRingBuffer.h"
+
+
 namespace lmms
 {
 
 using LocklessListElement = LocklessList<PlayHandle*>::Element;
 
 static thread_local bool s_renderingThread = false;
-
-
-
+static const f_cnt_t FIXED_INPUT_BUFFER_CAPACITY = DEFAULT_BUFFER_SIZE * 100;
 
 AudioEngine::AudioEngine( bool renderOnly ) :
 	m_renderOnly( renderOnly ),
@@ -91,10 +97,7 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 {
 	for( int i = 0; i < 2; ++i )
 	{
-		m_inputBufferFrames[i] = 0;
-		m_inputBufferSize[i] = DEFAULT_BUFFER_SIZE * 100;
-		m_inputBuffer[i] = new SampleFrame[ DEFAULT_BUFFER_SIZE * 100 ];
-		zeroSampleFrames(m_inputBuffer[i], m_inputBufferSize[i]);
+		m_inputBuffer[i].reserve(FIXED_INPUT_BUFFER_CAPACITY);
 	}
 
 	// determine FIFO size and number of frames per period
@@ -137,16 +140,20 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 	m_outputBufferRead = std::make_unique<SampleFrame[]>(m_framesPerPeriod);
 	m_outputBufferWrite = std::make_unique<SampleFrame[]>(m_framesPerPeriod);
 
+	if (m_numWorkers < 0) { m_numWorkers = 0; }
 
-	for( int i = 0; i < m_numWorkers+1; ++i )
+	for (int i = 0; i < m_numWorkers + 1; ++i)
 	{
-		auto wt = new AudioEngineWorkerThread(this);
+		auto workerThread = new AudioEngineWorkerThread(this);
 		if( i < m_numWorkers )
 		{
-			wt->start( QThread::TimeCriticalPriority );
+			workerThread->start(QThread::TimeCriticalPriority);
 		}
-		m_workers.push_back( wt );
+		m_workers.push_back(workerThread);
 	}
+
+	m_inputAudioRingBuffer = std::make_unique<LocklessRingBuffer<SampleFrame>>(FIXED_INPUT_BUFFER_CAPACITY);
+	m_inputAudioRingBufferReader = std::make_unique<LocklessRingBufferReader<SampleFrame>>(*m_inputAudioRingBuffer);
 }
 
 
@@ -154,32 +161,68 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 
 AudioEngine::~AudioEngine()
 {
+	if (m_audioDev && m_audioDev->isProcessing())
+	{
+		stopProcessing();
+	}
+	else if (m_fifoWriter)
+	{
+		m_fifoWriter->finish();
+		m_fifoWriter->wait();
+		delete m_fifoWriter;
+		m_fifoWriter = nullptr;
+	}
+
 	for( int w = 0; w < m_numWorkers; ++w )
 	{
-		m_workers[w]->quit();
+		if (m_workers[w]) { m_workers[w]->quit(); }
 	}
 
 	AudioEngineWorkerThread::startAndWaitForJobs();
 
-	for( int w = 0; w < m_numWorkers; ++w )
+	for (int w = 0; w < m_numWorkers; ++w)
 	{
-		m_workers[w]->wait( 500 );
+		if (m_workers[w])
+		{
+			if (!m_workers[w]->wait(500))
+			{
+				fprintf(stderr, "AudioEngine: Worker thread %d did not finish gracefully after quit() and wait().\n", w);
+			}
+			delete m_workers[w];
+			m_workers[w] = nullptr;
+		}
 	}
 
-	while( m_fifo->available() )
+	if (m_numWorkers >= 0 && std::cmp_less(m_numWorkers, m_workers.size()) && m_workers[m_numWorkers])
 	{
-		delete[] m_fifo->read();
+		delete m_workers[m_numWorkers];
+		m_workers[m_numWorkers] = nullptr;
 	}
-	delete m_fifo;
+	m_workers.clear();
+
+	if (m_fifo)
+	{
+		while (m_fifo->available())
+		{
+			SampleFrame* bufToDelete = m_fifo->read();
+			if (bufToDelete) { delete[] bufToDelete; }
+		}
+		delete m_fifo;
+		m_fifo = nullptr;
+	}
 
 	delete m_midiClient;
+	m_midiClient = nullptr;
 	delete m_audioDev;
+	m_audioDev = nullptr;
 
-
-	for (const auto& input : m_inputBuffer)
+	if (m_oldAudioDev)
 	{
-		delete[] input;
+		delete m_oldAudioDev;
 	}
+	m_oldAudioDev = nullptr;
+
+	// Input buffers are std::vectors and clean up automatically
 }
 
 
@@ -249,38 +292,109 @@ bool AudioEngine::criticalXRuns() const
 
 
 
-void AudioEngine::pushInputFrames( SampleFrame* _ab, const f_cnt_t _frames )
+void AudioEngine::pushInputFrames(SampleFrame* inputAudioBlock, const f_cnt_t frameCount)
 {
-	requestChangeInModel();
+	if (!m_inputAudioRingBuffer || frameCount == 0) return;
 
-	f_cnt_t frames = m_inputBufferFrames[ m_inputBufferWrite ];
-	auto size = m_inputBufferSize[m_inputBufferWrite];
-	SampleFrame* buf = m_inputBuffer[ m_inputBufferWrite ];
+	std::size_t availableSpace = m_inputAudioRingBuffer->free();
 
-	if( frames + _frames > size )
+	if (availableSpace == 0)
 	{
-		size = std::max(size * 2, frames + _frames);
-		auto ab = new SampleFrame[size];
-		memcpy( ab, buf, frames * sizeof( SampleFrame ) );
-		delete [] buf;
-
-		m_inputBufferSize[ m_inputBufferWrite ] = size;
-		m_inputBuffer[ m_inputBufferWrite ] = ab;
-
-		buf = ab;
+		fprintf(stderr, "AudioEngine: Critical input ring buffer overflow, %u frames dropped.\n", static_cast<unsigned int>(frameCount));
+		return;
 	}
 
-	memcpy( &buf[ frames ], _ab, _frames * sizeof( SampleFrame ) );
-	m_inputBufferFrames[ m_inputBufferWrite ] += _frames;
+	size_t framesToWrite = frameCount;
+	if (availableSpace < frameCount)
+	{
+		framesToWrite = availableSpace;
+		fprintf(stderr, "AudioEngine: Partial input ring buffer overflow, %zu of %u frames will be written, %zu frames dropped.\n",
+				 framesToWrite, static_cast<unsigned int>(frameCount), frameCount - framesToWrite);
+	}
 
+	std::size_t framesWritten = m_inputAudioRingBuffer->write(inputAudioBlock, framesToWrite, false);
+
+	if (framesWritten < framesToWrite)
+	{
+		fprintf(stderr, "AudioEngine: Ring buffer write issue, %zu of %zu frames written (intended to write %zu).\n",
+				 framesWritten, frameCount, framesToWrite);
+	}
+}
+
+
+
+void AudioEngine::processBufferedInputFrames()
+{
+	if (!m_inputAudioRingBufferReader || !m_inputAudioRingBuffer) return;
+
+	std::size_t availableInRing = m_inputAudioRingBufferReader->read_space();
+	if (availableInRing == 0) return;
+
+	const std::size_t maxFramesPerCall = DEFAULT_BUFFER_SIZE * 2; 
+	std::size_t framesToProcess = std::min(availableInRing, maxFramesPerCall);
+
+	ringbuffer_reader_t<SampleFrame>::read_sequence_t sequence = m_inputAudioRingBufferReader->read_max(framesToProcess);
+	
+	std::size_t framesInSequence = sequence.size();
+
+	if (framesInSequence == 0) return;
+
+	requestChangeInModel();
+
+	auto& currentWriteBuf = m_inputBuffer[m_inputBufferWrite];
+	f_cnt_t currentWriteBufCapacity = currentWriteBuf.capacity();
+	f_cnt_t currentFramesInWriteBuf = currentWriteBuf.size();
+
+	f_cnt_t totalFramesSuccessfullyCopiedToMain = 0;
+
+	std::size_t len1 = sequence.first_half_size();
+	std::size_t len2 = sequence.second_half_size();
+
+	f_cnt_t spaceLeftInMainBuffer{(currentFramesInWriteBuf >= currentWriteBufCapacity)
+	? 0 : currentWriteBufCapacity - currentFramesInWriteBuf};
+
+	f_cnt_t framesWeCanActuallyCopy{static_cast<f_cnt_t>(framesInSequence) > spaceLeftInMainBuffer ?
+		spaceLeftInMainBuffer : static_cast<f_cnt_t>(framesInSequence)};
+
+	if (len1 > 0 && totalFramesSuccessfullyCopiedToMain < framesWeCanActuallyCopy)
+	{
+		f_cnt_t framesToCopyFromPart1 = std::min(static_cast<f_cnt_t>(len1),
+		framesWeCanActuallyCopy - totalFramesSuccessfullyCopiedToMain);
+		if (framesToCopyFromPart1 > 0)
+		{
+			currentWriteBuf.resize(currentFramesInWriteBuf + totalFramesSuccessfullyCopiedToMain + framesToCopyFromPart1);
+			memcpy(&currentWriteBuf[currentFramesInWriteBuf + totalFramesSuccessfullyCopiedToMain],
+				sequence.first_half_ptr(), framesToCopyFromPart1 * sizeof(SampleFrame));
+			totalFramesSuccessfullyCopiedToMain += framesToCopyFromPart1;
+		}
+	}
+
+	if (len2 > 0 && totalFramesSuccessfullyCopiedToMain < framesWeCanActuallyCopy)
+	{
+		f_cnt_t framesToCopyFromPart2 = std::min(static_cast<f_cnt_t>(len2),
+		framesWeCanActuallyCopy - totalFramesSuccessfullyCopiedToMain);
+		if (framesToCopyFromPart2 > 0)
+		{
+			currentWriteBuf.resize(currentFramesInWriteBuf + totalFramesSuccessfullyCopiedToMain + framesToCopyFromPart2);
+			memcpy(&currentWriteBuf[currentFramesInWriteBuf + totalFramesSuccessfullyCopiedToMain],
+				sequence.second_half_ptr(), framesToCopyFromPart2 * sizeof(SampleFrame));
+			totalFramesSuccessfullyCopiedToMain += framesToCopyFromPart2;
+		}
+	}
+	
+	
 	doneChangeInModel();
 }
+
+
 
 
 
 void AudioEngine::renderStageNoteSetup()
 {
 	AudioEngineProfiler::Probe profilerProbe(m_profiler, AudioEngineProfiler::DetailType::NoteSetup);
+
+	processBufferedInputFrames();
 
 	if( m_clearSignal )
 	{
@@ -295,7 +409,7 @@ void AudioEngine::renderStageNoteSetup()
 	while( it_rem != m_playHandlesToRemove.end() )
 	{
 		PlayHandleList::Iterator it = std::find( m_playHandles.begin(), m_playHandles.end(), *it_rem );
-
+		bool removedFromPlayHandles = false;
 		if( it != m_playHandles.end() )
 		{
 			if ((*it)->audioBusHandle()) { (*it)->audioBusHandle()->removePlayHandle(*it); }
@@ -303,11 +417,19 @@ void AudioEngine::renderStageNoteSetup()
 			{
 				NotePlayHandleManager::release((NotePlayHandle*)*it);
 			}
-			else delete *it;
-			m_playHandles.erase(it);
+			else { delete *it; }
+			it = m_playHandles.erase(it);
+			removedFromPlayHandles = true;
 		}
-
-		it_rem = m_playHandlesToRemove.erase( it_rem );
+		
+		if (removedFromPlayHandles)
+		{
+			it_rem = m_playHandlesToRemove.erase(it_rem); 
+		}
+		else
+		{
+			++it_rem;
+		}
 	}
 
 	swapBuffers();
@@ -422,7 +544,7 @@ void AudioEngine::swapBuffers()
 {
 	m_inputBufferWrite = (m_inputBufferWrite + 1) % 2;
 	m_inputBufferRead = (m_inputBufferRead + 1) % 2;
-	m_inputBufferFrames[m_inputBufferWrite] = 0;
+	m_inputBuffer[m_inputBufferWrite].clear();
 
 	std::swap(m_outputBufferRead, m_outputBufferWrite);
 	zeroSampleFrames(m_outputBufferWrite.get(), m_framesPerPeriod);
@@ -800,16 +922,16 @@ bool AudioEngine::isMidiDevNameValid(QString name)
 #endif
 
 #ifdef LMMS_BUILD_APPLE
-    if (name == MidiApple::name())
-    {
+	if (name == MidiApple::name())
+	{
 		return true;
-    }
+	}
 #endif
 
-    if (name == MidiDummy::name())
-    {
+	if (name == MidiDummy::name())
+	{
 		return true;
-    }
+	}
 
 	return false;
 }
@@ -1047,15 +1169,15 @@ MidiClient * AudioEngine::tryMidiClients()
 #endif
 
 #ifdef LMMS_BUILD_APPLE
-    printf( "trying midi apple...\n" );
-    if( client_name == MidiApple::name() || client_name == "" )
-    {
-        MidiApple * mapple = new MidiApple;
-        m_midiClientName = MidiApple::name();
-        printf( "Returning midi apple\n" );
-        return mapple;
-    }
-    printf( "midi apple didn't work: client_name=%s\n", client_name.toUtf8().constData());
+	printf( "trying midi apple...\n" );
+	if( client_name == MidiApple::name() || client_name == "" )
+	{
+		MidiApple * mapple = new MidiApple;
+		m_midiClientName = MidiApple::name();
+		printf( "Returning midi apple\n" );
+		return mapple;
+	}
+	printf( "midi apple didn't work: client_name=%s\n", client_name.toUtf8().constData());
 #endif
 
 	if(client_name != MidiDummy::name())
