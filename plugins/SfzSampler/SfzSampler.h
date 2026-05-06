@@ -39,6 +39,8 @@
 #include "SfzSamplePool.h"
 #include "SfzRegionManager.h"
 
+#include <thread>
+
 namespace lmms {
 
 class SfzSampler : public Instrument
@@ -59,7 +61,7 @@ public:
 
 	void loadFile(const QString& filePath) override;
 	//! This extra function for loading files is needed so that we can choose only to reset the CC knobs when the user is loading a new file, not a preset/project
-	void loadSfzFile(const QString& filePath);
+	void loadSfzFile(const QString& filePath, const bool resetCCKnobs);
 
 	QString nodeName() const override;
 	gui::PluginView* instantiateView(QWidget* parent) override;
@@ -102,7 +104,38 @@ private:
 	//! The path to the currently loaded SFZ file
 	QString m_sfzFilePath = "";
 
+
+	//! Helper thread for loading sample files so that the main thread isn't blocked
+	std::jthread m_sampleLoadingThread;
+
+	//! Unfortunately, dealing with multiple threads gets complicated.
+	//! There is the possibility that the audio thread could access the region/sample data while the main thread is loading a new SFZ file and the samples
+	//! We need some way to swap out the current region/samples with the new data without breaking real-time safety.
+	//! To do this, essentially we have temporary buffers which the main thread works on while loading the files. When it's done, it sets a flag
+	//! which tells the audio thread that it can swap out the temporary objects for the real objects, and continue processing the audio.
+
+	//! When a new SFZ file is being loaded and the regions/samples need to be swapped out, the main thread sets this flag to let the
+	//! audio thread know to move the data from the temporary variables into the real region/sample stores. The audio thread will set this back to false when it has finished swapping
+	std::atomic<bool> m_newSfzDataReady = false;
+	std::atomic<bool> m_justSwappedData = false; // And another flag so the main thread knows if it should be waiting for enough buffers to pass before loaidng another sfz file
+	//! Also have a flag for whether the sample loading thread is active or not, so that we don't accidentally try to start up a new sample loading thread while samples are already being loaded.
+	std::atomic<bool> m_currentlyLoadingSamples = false;
+	//! Temporary variables for the region and sample data, which the audio thread will swap with the real ones when m_newSfzDataReady is true
+	SfzRegionManager m_tempRegionManager;
+	SfzSamplePool m_tempSamplePool;
+	//! Counts the number of buffers which have been processed. This is used for determining how long it has been since the audio thread has swapped out the region/sample data
+	//! when loading a new SFZ file (Thanks to Lost Robot for the idea)
+	std::atomic<size_t> m_bufferCounter = 0;
+	//! The main thread will also save the buffer counter when m_newSfzDataReady was set so that it will know if enough buffers have passed that the audio thread can be guaranteed to have swapped the data already.
+	//! If the user tries to load another SFZ file within one or two buffers of a previous SFZ file being loaded, it will refuse, because the audio thread may still be swapping the data from the temporary objects
+	size_t m_bufferCounterWhenDataReady = 0;
+	//! Also another flag so that the main thread can communicate to the audio thread whether the midi CC knobs should be reset to the SFZ file's defaults. This isn't great, ideally it could be done only by the main thread, idk
+	std::atomic<bool> m_resetCCKnobs = false;
+
+	friend class SampleLoadingThread;
 	friend class gui::SfzSamplerView;
 };
+
 } // namespace lmms
+
 #endif // LMMS_SFZSAMPLER_H

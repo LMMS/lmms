@@ -29,8 +29,11 @@
 #include "SampleFrame.h"
 #include "SfzTrigger.h"
 #include "SfzOpcodeState.h"
+#include "SfzSampleBuffer.h"
 
 #include "BasicFilters.h"
+
+#include <memory>
 
 namespace lmms
 {
@@ -100,6 +103,9 @@ private:
 	
 	//! The region this sound originated from
 	const SfzRegion* m_region = nullptr;
+
+	//! A shared pointer to the sample object of the parent region
+	std::shared_ptr<const SfzSampleBuffer> m_sampleObject = nullptr;
 };
 
 

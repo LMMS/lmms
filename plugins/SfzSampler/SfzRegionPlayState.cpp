@@ -42,6 +42,7 @@ SfzRegionPlayState::SfzRegionPlayState(const SfzRegion* region, const SfzTrigger
 	, m_filter(m_lmmsSampleRate)
 	, m_trigger(trigger)
 	, m_region(region)
+	, m_sampleObject(region->sample())
 {
 	// Calculate the base pitch and amplitude
 	precomputeBaseValues();
@@ -101,8 +102,8 @@ void SfzRegionPlayState::precomputeBaseValues()
 	m_baseFreqRatio = std::exp2(pitch / 12.0f);
 
 	// Sample rate of sample (if we are using a sample, not a basic wave like *sine or *saw)
-	const float sampleSampleRate = m_region->sample() != nullptr
-		? m_region->sample()->sampleRate()
+	const float sampleSampleRate = m_sampleObject != nullptr
+		? m_sampleObject->sampleRate()
 		: m_lmmsSampleRate; // If we are using a basic wave instead of a sample, set it to LMMS's sample rate
 	// Play the sample faster/slower to match the correct sample rate
 	m_baseFreqRatio *= sampleSampleRate / m_lmmsSampleRate;
@@ -273,10 +274,10 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const fpp_t frames)
 		// Otherwise, if a basic wave shape is being used (like *sine, *saw, *silence, etc) use a function to generate the shape
 		float sampleLeftValue = 0.0f;
 		float sampleRightValue = 0.0f;
-		if (m_region->sample() != nullptr) // TODO: should this check be outside of the loop?
+		if (m_sampleObject != nullptr) // TODO: should this check be outside of the loop?
 		{
-			sampleLeftValue = m_region->sample()->at(m_sampleFrame, 0);
-			sampleRightValue = m_region->sample()->at(m_sampleFrame, 1);
+			sampleLeftValue = m_sampleObject->at(m_sampleFrame, 0);
+			sampleRightValue = m_sampleObject->at(m_sampleFrame, 1);
 		}
 		else
 		{
@@ -296,8 +297,8 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const fpp_t frames)
 		}
 		// Increment the frame count. If we are using a sample, make sure to stop at the end, but if we are using a basic wave like *sine or *saw, there's no need
 		const float frameIncrement = m_baseFreqRatio * pitchmodFreqRatio; // Apply the pitch modulation by speeding up/slowing down the playback
-		m_sampleFrame = m_region->sample() != nullptr
-			? std::min(static_cast<float>(m_region->sample()->size()), m_sampleFrame + frameIncrement)
+		m_sampleFrame = m_sampleObject != nullptr
+			? std::min(static_cast<float>(m_sampleObject->size()), m_sampleFrame + frameIncrement)
 			: m_sampleFrame + frameIncrement;
 		m_frameCount++;
 	}
@@ -310,7 +311,7 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const fpp_t frames)
 	}
 
 	// If loop_mode is one_shot, no noteOff signal will ever come to release it, so we need to manually deactivate when we reach the end of the sample
-	if (m_region->m_loop_mode.value() == LoopMode::OneShot && m_region->sample() != nullptr && m_sampleFrame >= m_region->sample()->size())
+	if (m_region->m_loop_mode.value() == LoopMode::OneShot && m_sampleObject != nullptr && m_sampleFrame >= m_sampleObject->size())
 	{
 		m_active = false; // TODO should this forcefully decative or just release?
 	}

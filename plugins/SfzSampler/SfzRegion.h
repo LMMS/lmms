@@ -58,13 +58,14 @@ public:
 	//! Returns true if successful
 	bool initializeSample(const QDir& parentDirectory, SfzSamplePool& samplePool);
 
-	const SfzSampleBuffer* sample() const { return m_sample; }
+	std::shared_ptr<const SfzSampleBuffer> sample() const { return m_sample; }
 	const SfzBasicWaves::Shape basicWaveShape() const { return m_basicWaveShape; }
 
 private:
 	//! Pointer to sample object to be played. The sample file path is defined in the `sample` opcode, but the data needs to be loaded first
 	//! The actual sample objects are stored in a shared pool, SfzSamplePool, so that if multiple of the same sample are loaded, they don't waste memory.
-	const SfzSampleBuffer* m_sample = nullptr;
+	//! This uses an std::shared_ptr so that the sample object doesn't get unexpectedly deleted in the middle of the audio processing while a new sfz file is being loaded.
+	std::shared_ptr<const SfzSampleBuffer> m_sample = nullptr;
 	//! However, if a basic wave keyword such as *sine, *saw, *triangle, etc is used, handle it separately (see SfzBasicWaves.h/.cpp)
 	SfzBasicWaves::Shape m_basicWaveShape = SfzBasicWaves::Shape::Silence;
 
