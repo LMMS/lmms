@@ -39,6 +39,9 @@
 #include "interpolation.h"
 #include "plugin_export.h"
 
+#include "GuiApplication.h"
+#include "MainWindow.h"
+
 namespace lmms
 {
 
@@ -67,6 +70,10 @@ SfzSampler::SfzSampler(InstrumentTrack* instrumentTrack)
 {
 	auto iph = new InstrumentPlayHandle(this, instrumentTrack);
 	Engine::audioEngine()->addPlayHandle(iph);
+
+	// When a user loads a new SFZ file, the main thread prepares the new data to be swapped out by the audio thread, but the main thread
+	// needs to delete the old data afterwards, so here we connect some kind of run-loop so that the main thread gets a chance to check
+	connect(lmms::gui::getGUI()->mainWindow(), SIGNAL(periodicUpdate()), this, SLOT(mainThreadUpdateAfterDataSwap())); // I really don't like this. Would it be better to use our own QTimer, not LMMS's gui's?
 
 	emit dataChanged();
 }
@@ -113,18 +120,20 @@ void SfzSampler::deleteNotePluginData(NotePlayHandle* handle)
 
 void SfzSampler::processTrigger(const SfzTrigger& trigger)
 {
+	if (m_regionManager == nullptr) { return; } // Before any SFZ file is loaded, m_regionManager is nullptr
+
 	// Notify the global state to update which keys are active, update midi CC values, etc
 	m_sfzGlobalState.processTrigger(trigger);
 
 	// Loop through all the regions to check if a new note should be played
 	// TODO can we get rid of this loop
-	for (auto* region : m_regionManager.allRegions())
+	for (auto* region : m_regionManager->allRegions())
 	{
 		// Notify the region of the event so that it can update cached CC modulations, keyswitch states, etc
 		region->processTrigger(m_sfzGlobalState, trigger);
 	}
 	
-	for (auto* region : m_regionManager.findPotentialMatchingRegions(trigger))
+	for (auto* region : m_regionManager->findPotentialMatchingRegions(trigger))
 	{
 		// If the trigger conditions are met, spawn a new sound
 		if (region->triggerConditionsMet(m_sfzGlobalState, trigger))
@@ -184,31 +193,8 @@ void SfzSampler::play(SampleFrame* workingBuffer)
 
 	// In the event that the user tries to load a new sfz file while the current one is playing, the region and sample data will be
 	// loaded into temporary member variables, and it's the job of the audio thread to swap them into place when the data is ready and it gets a chance
-	if (m_newSfzDataReady)
-	{
-		m_regionManager = std::move(m_tempRegionManager);
-		m_samplePool = std::move(m_tempSamplePool);
-		// And reset the voices, since they may have invalid pointers to old region objects
-		std::fill(m_voices.begin(), m_voices.end(), SfzRegionPlayState());
-		m_newSfzDataReady = false;
-		m_justSwappedData = true;
-		// Also set the midi CC knobs to match the defaults, or whatever the current InstrumentTrack midi CC knobs are
-		// TODO can this be moved to the main thread?
-		for (int i = 0; i < NumMidiCCs; ++i)
-		{
-			if (m_resetCCKnobs)
-			{
-				// Reset the instrument track's midi CC knobs to the defaults of the SFZ
-				m_parentTrack->midiCCModel(i)->setInitValue(m_sfzGlobalState.midiCCValue(i));
-				qDebug() << "Resetting lmms CC knob" << i << m_sfzGlobalState.midiCCValue(i);
-			}
-			qDebug() << "Resetting internal CC" << i << m_parentTrack->midiCCModel(i)->value();
-			// Sync the internal knobs to the LMMS knobs. TODO why does `setInitValue` not trigger this?
-			processTrigger(SfzTrigger::controlChangeEvent(0, i, m_parentTrack->midiCCModel(i)->value())); // TODO there may be a cleaner way to do this
-		}
-		qDebug() << "Audio thread: new data ready, swapped.";
-	}
-	// Increment the buffer counter so that the main thread knows when it's safe to touch the temp objects again
+	audioThreadHandleNewSfzData();
+	// Increment the buffer counter so that the main thread knows when it's safe to delete the old objects
 	m_bufferCounter++;
 }
 
@@ -235,15 +221,18 @@ void SfzSampler::loadFile(const QString& filePath)
 void SfzSampler::loadSfzFile(const QString& filePath, const bool resetCCKnobs)
 {
 	// If the sample loading thread is already running, don't let the user load another file.
-	if (m_currentlyLoadingSamples) { qDebug() << "main thread: Currently loading samples, can't right now."; return; }
-	// Or, if the new sample/region data was just swapped into place a couple buffers ago, return just to be safe
-	if (m_justSwappedData && m_bufferCounter <= m_bufferCounterWhenDataReady + 2) { qDebug() << "main thread: not enough buffers passed, not safe"; return; }
-	else if (m_justSwappedData)
+	if (m_currentlyLoadingSamples)
 	{
-		// If enough buffers have passed we assume the swap was successful, so reset the flag, and prep the internal CC values to match the knobs
-		m_justSwappedData = false;
+		qDebug() << "[SFZ Player] Requested to load new SFZ file while still loading samples from previous SFZ file. Ignoring.";
+		return;
 	}
-	// Set this variable so that when the audio thread is swapping data and reset the CC knobs, it knows whether to reset them to the SFZ file defaults or just to the current InstrumentTrack CC knob values
+	// Or, if the new sample/region data was just swapped into place a couple buffers ago, return just to be safe
+	if (m_justSwappedData && m_bufferCounter <= m_bufferCounterWhenDataReady + 2)
+	{
+		qDebug() << "[SFZ Player] Requested to load new SFZ file while new region/sample data from previous SFZ file have not yet been swapped into place. Ignoring.";
+		return;
+	}
+	// Set this variable so that after the audio thread swaps the data, the main thread remembers whether to reset the CC knobs to the SFZ file defaults or just to the current InstrumentTrack CC knob values
 	m_resetCCKnobs = resetCCKnobs;
 
 
@@ -262,12 +251,15 @@ void SfzSampler::loadSfzFile(const QString& filePath, const bool resetCCKnobs)
 
 	// Hand off the vector of regions to SfzRegionManager, which will sort them out to optimize trigger selection
 	// Don't immediately set m_regionManager, since the audio thread may still be accessing it; instead set the temporary object
-	m_tempRegionManager = SfzRegionManager(regions);
+	m_tempRegionManager = new SfzRegionManager(regions);
 
 	// The SfzParser generates all the SfzRegion objects, but it doesn't load any of the samples
 	// The sample filenames are stored in the regions as from the `sample` opcode, so we just need to load the files into memory to use them
 	// The samples are stored with relative paths with respect to the sfz file, so first find the parent directory:
 	QDir parentDirectory = QFileInfo(filePath).absoluteDir();
+
+	// Initialize a new sample pool for the new samples to be loaded in
+	m_tempSamplePool = new SfzSamplePool();
 
 	// Set the initial cc values based on any `set_ccN` opcodes in the <control> header
 	m_sfzGlobalState.initializeMidiCCValues(m_controlsConfig);
@@ -275,26 +267,61 @@ void SfzSampler::loadSfzFile(const QString& filePath, const bool resetCCKnobs)
 	m_sfzFilePath = filePath;
 	emit fileLoaded();
 
-	// To prevent the main gui thread from freezing while all the samples are loaded, start up a separate thread to handle everything
-	// This thread will send back a signal when each sample is loaded, along with a final signal when it's finished
+	// To prevent the main gui thread from freezing while all the samples are loaded, start up a separate thread to handle loading everything
+	// TODO: This thread will send back a signal when each sample is loaded, along with a final signal when it's finished
 	m_currentlyLoadingSamples = true;
 	m_sampleLoadingThread = std::jthread([this, parentDirectory](){
 		int i = 0;
-		for (auto* region : m_tempRegionManager.allRegions())
+		for (auto* region : m_tempRegionManager->allRegions())
 		{
-			qDebug() << "[SFZ Player] Loading sample" << i + 1 << "/" << m_tempRegionManager.allRegions().size() << region->m_sampleFile.value().value_or("N/A");
+			qDebug() << "[SFZ Player] Loading sample" << i + 1 << "/" << m_tempRegionManager->allRegions().size() << region->m_sampleFile.value().value_or("N/A");
 			// Initialize the sample into the temporary pool, so that it doesn't disturb the audio thread which may still be using the previous samples.
-			bool successfulLoadSample = region->initializeSample(parentDirectory, m_tempSamplePool); // TODO does this copy the sample pool object?
+			bool successfulLoadSample = region->initializeSample(parentDirectory, *m_tempSamplePool);
 			if (!successfulLoadSample) { qDebug() << "[SFZ Player] An error occured when loading a sample."; }
 			//emit sampleLoaded(i, m_tempRegionManager.allRegions().size(), region->m_sampleFile.value().value_or("N/A"));
 			i++;
 		}
-		qDebug() << "Loaded" << m_tempRegionManager.allRegions().size() << "regions and" << m_tempSamplePool.sampleCount() << "samples.";
+		qDebug() << "[SFZ Player] Loaded" << m_tempRegionManager->allRegions().size() << "regions and" << m_tempSamplePool->sampleCount() << "samples.";
 		// When the thread is done loading all the samples, set the flag to let the audio thread know it can swap the data
-		m_bufferCounterWhenDataReady = m_bufferCounter; // Save the current frame counter so the main thread knows when enough buffers have passed that it's safe to touch the temp objects again
+		m_bufferCounterWhenDataReady = m_bufferCounter; // Save the current frame counter so the main thread knows when enough buffers have passed that it can delete the old data
 		m_newSfzDataReady = true;
 		m_currentlyLoadingSamples = false; // TODO this doesn't seem thread safe, since there would be a brief moment in time where this is false but the thread is still active? Maybe it doesn't matter since jthread handles destruction more nicely.
 	});
+}
+
+void SfzSampler::audioThreadHandleNewSfzData()
+{
+	if (m_newSfzDataReady)
+	{
+		std::swap(m_regionManager, m_tempRegionManager);
+		std::swap(m_samplePool, m_tempSamplePool);
+		// And reset the active voices, since they may have invalid pointers to old region objects
+		std::fill_n(m_voices.begin(), m_maxActiveIndex + 1, SfzRegionPlayState());
+		m_newSfzDataReady = false;
+		m_justSwappedData = true;
+	}
+}
+
+void SfzSampler::mainThreadUpdateAfterDataSwap()
+{
+	if (m_justSwappedData && m_bufferCounter > m_bufferCounterWhenDataReady + 2)
+	{
+		m_justSwappedData = false;
+		// Now that the audio thread has swapped the data, delete the old sample pool and region manager pointers
+		if (m_tempRegionManager != nullptr) { delete m_tempRegionManager; } // these may be nullptr at first when no SFZ file has been loaded previously
+		if (m_tempSamplePool != nullptr) { delete m_tempSamplePool; }
+		// Also set the midi CC knobs to match the defaults, or whatever the current InstrumentTrack midi CC knobs are
+		for (int i = 0; i < NumMidiCCs; ++i)
+		{
+			if (m_resetCCKnobs)
+			{
+				// Reset the instrument track's midi CC knobs to the defaults of the SFZ
+				m_parentTrack->midiCCModel(i)->setInitValue(m_sfzGlobalState.midiCCValue(i));
+			}
+			// Sync the internal knobs to the LMMS knobs. TODO why does `setInitValue` not trigger this?
+			processTrigger(SfzTrigger::controlChangeEvent(0, i, m_parentTrack->midiCCModel(i)->value())); // TODO there may be a cleaner way to do this
+		}
+	}
 }
 
 

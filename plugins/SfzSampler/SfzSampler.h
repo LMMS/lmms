@@ -74,7 +74,7 @@ private:
 
 	//! Holds a list of all the SfzRegion objects, which have the configurations for each of the samples/regions: what keys/velocities/etc trigger it, the volume, filter, envelopes, etc
 	//! This object helps map triggers to lists of potentially matching regions, so that we don't have to loop over all the regions, checking every single one whether all conditions are matched before spawning a voice.
-	SfzRegionManager m_regionManager;
+	SfzRegionManager* m_regionManager = nullptr;
 
 	static constexpr int MAX_ACTIVE_SOUNDS = 128;
 	//! Array to store all active (and inactive) sound play-states across all regions
@@ -87,7 +87,7 @@ private:
 	void recalculateMaxActiveIndex();
 
 	//! So that the regions don't accidentally load the same sample multiple times, we store all the sames in one place and the regions ask it to load each sample/retrieve a pointer if it's already been loaded
-	SfzSamplePool m_samplePool;
+	SfzSamplePool* m_samplePool = nullptr;
 
 	//! Holds information about the total number of notes active, last switch keys pressed, etc
 	SfzGlobalState m_sfzGlobalState;
@@ -121,18 +121,23 @@ private:
 	//! Also have a flag for whether the sample loading thread is active or not, so that we don't accidentally try to start up a new sample loading thread while samples are already being loaded.
 	std::atomic<bool> m_currentlyLoadingSamples = false;
 	//! Temporary variables for the region and sample data, which the audio thread will swap with the real ones when m_newSfzDataReady is true
-	SfzRegionManager m_tempRegionManager;
-	SfzSamplePool m_tempSamplePool;
+	SfzRegionManager* m_tempRegionManager = nullptr;
+	SfzSamplePool* m_tempSamplePool = nullptr;
 	//! Counts the number of buffers which have been processed. This is used for determining how long it has been since the audio thread has swapped out the region/sample data
 	//! when loading a new SFZ file (Thanks to Lost Robot for the idea)
 	std::atomic<size_t> m_bufferCounter = 0;
 	//! The main thread will also save the buffer counter when m_newSfzDataReady was set so that it will know if enough buffers have passed that the audio thread can be guaranteed to have swapped the data already.
 	//! If the user tries to load another SFZ file within one or two buffers of a previous SFZ file being loaded, it will refuse, because the audio thread may still be swapping the data from the temporary objects
 	size_t m_bufferCounterWhenDataReady = 0;
-	//! Also another flag so that the main thread can communicate to the audio thread whether the midi CC knobs should be reset to the SFZ file's defaults. This isn't great, ideally it could be done only by the main thread, idk
-	std::atomic<bool> m_resetCCKnobs = false;
+	//! Also another flag just for the main thread so that it can remember whether the midi CC knobs should be reset to the SFZ file's defaults, since it has to wait until the audio thread has finished the swap.
+	bool m_resetCCKnobs = false;
 
-	friend class SampleLoadingThread;
+	//! A helper function for the audio thread to handle swapping the data
+	void audioThreadHandleNewSfzData();
+	//! A helper function for the main thread to delete the old data and update things like the CC knobs after the audio thread has swapped the data.
+private slots:
+	void mainThreadUpdateAfterDataSwap();
+
 	friend class gui::SfzSamplerView;
 };
 
