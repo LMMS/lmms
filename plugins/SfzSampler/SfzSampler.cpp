@@ -138,7 +138,6 @@ void SfzSampler::processTrigger(const SfzTrigger& trigger)
 		// If the trigger conditions are met, spawn a new sound
 		if (region->triggerConditionsMet(m_sfzGlobalState, trigger))
 		{
-			qDebug() << "Spawning sound!" << region->m_sampleFile.value().value_or("N/A");
 			// Loop through array to find open position
 			bool foundOpenPosition = false;
 			for (size_t i = 0; i <= m_voices.size(); ++i)
@@ -153,6 +152,8 @@ void SfzSampler::processTrigger(const SfzTrigger& trigger)
 					break;
 				}
 			}
+			// For fun, display the last played sample on the GUI
+			sendStatusInfo(QString("Last Played Sample: %1").arg(QFileInfo(region->m_sampleFile.value().value_or("N/A")).fileName()));
 			if (!foundOpenPosition) { qDebug() << "[SFZ Player] Could not find vacant position in m_voices buffer!"; }
 		}
 	}
@@ -265,23 +266,21 @@ void SfzSampler::loadSfzFile(const QString& filePath, const bool resetCCKnobs)
 	m_sfzGlobalState.initializeMidiCCValues(m_controlsConfig);
 
 	m_sfzFilePath = filePath;
-	emit fileLoaded();
 
 	// To prevent the main gui thread from freezing while all the samples are loaded, start up a separate thread to handle loading everything
-	// TODO: This thread will send back a signal when each sample is loaded, along with a final signal when it's finished
 	m_currentlyLoadingSamples = true;
 	m_sampleLoadingThread = std::jthread([this, parentDirectory](){
 		int i = 0;
 		for (auto* region : m_tempRegionManager->allRegions())
 		{
-			qDebug() << "[SFZ Player] Loading sample" << i + 1 << "/" << m_tempRegionManager->allRegions().size() << region->m_sampleFile.value().value_or("N/A");
+			// Update the GUI info text to notify the user as samples are loaded
+			sendStatusInfo(QString("Loading sample %1/%2 %3").arg(i+1).arg(m_tempRegionManager->allRegions().size()).arg(QFileInfo(region->m_sampleFile.value().value_or("N/A")).fileName()));
 			// Initialize the sample into the temporary pool, so that it doesn't disturb the audio thread which may still be using the previous samples.
 			bool successfulLoadSample = region->initializeSample(parentDirectory, *m_tempSamplePool);
-			if (!successfulLoadSample) { qDebug() << "[SFZ Player] An error occured when loading a sample."; }
-			//emit sampleLoaded(i, m_tempRegionManager.allRegions().size(), region->m_sampleFile.value().value_or("N/A"));
+			if (!successfulLoadSample) { qDebug() << "[SFZ Player] An error occured when loading a sample."; } // TODO organize this debug info
 			i++;
 		}
-		qDebug() << "[SFZ Player] Loaded" << m_tempRegionManager->allRegions().size() << "regions and" << m_tempSamplePool->sampleCount() << "samples.";
+		sendStatusInfo(QString("Loaded %1 regions and %2 samples.").arg(m_tempRegionManager->allRegions().size()).arg(m_tempSamplePool->sampleCount()));
 		// When the thread is done loading all the samples, set the flag to let the audio thread know it can swap the data
 		m_bufferCounterWhenDataReady = m_bufferCounter; // Save the current frame counter so the main thread knows when enough buffers have passed that it can delete the old data
 		m_newSfzDataReady = true;
@@ -321,6 +320,8 @@ void SfzSampler::mainThreadUpdateAfterDataSwap()
 			// Sync the internal knobs to the LMMS knobs. TODO why does `setInitValue` not trigger this?
 			processTrigger(SfzTrigger::controlChangeEvent(0, i, m_parentTrack->midiCCModel(i)->value())); // TODO there may be a cleaner way to do this
 		}
+		// Update the GUI
+		emit fileLoaded();
 	}
 }
 
@@ -348,5 +349,16 @@ gui::PluginView* SfzSampler::instantiateView(QWidget* parent)
 {
 	return new gui::SfzSamplerView(this, parent);
 }
+
+
+
+void SfzSampler::sendStatusInfo(const QString& text)
+{
+	// Print to console
+	qDebug() << "[SFZ Player]" << text;
+	// And send to GUI
+	emit statusInfo(text);
+}
+
 
 } // namespace lmms

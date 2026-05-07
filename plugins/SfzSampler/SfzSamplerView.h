@@ -49,6 +49,7 @@ public:
 
 public slots:
 	void onFileLoaded();
+	void updateStatusInfo(const QString& statusText);
 	void openFile();
 
 protected:
@@ -63,7 +64,10 @@ private:
 
 	SfzSampler* m_instrument;
 
+	QLabel* m_statusLabel;
+	QLabel* m_generalInfoLabel;
 	QLabel* m_switchKeysLabel;
+	QWidget* m_infoLabelsWidget;
 	QWidget* m_controlsWidget;
 	QGridLayout* m_knobLayout;
 };

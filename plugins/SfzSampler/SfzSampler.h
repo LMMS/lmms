@@ -68,6 +68,7 @@ public:
 
 signals:
 	void fileLoaded();
+	void statusInfo(const QString& statusText); // Pass info to the GUI to display things like current samples being loaded, last sample played, etc
 
 private:
 	void processTrigger(const SfzTrigger& trigger);
@@ -103,6 +104,9 @@ private:
 
 	//! The path to the currently loaded SFZ file
 	QString m_sfzFilePath = "";
+
+	//! Helper function for printing debug info/passing status info to the GUI
+	void sendStatusInfo(const QString& text);
 
 
 	//! Helper thread for loading sample files so that the main thread isn't blocked

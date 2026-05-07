@@ -57,7 +57,10 @@ namespace gui {
 SfzSamplerView::SfzSamplerView(SfzSampler* instrument, QWidget* parent)
 	: InstrumentView(instrument, parent)
 	, m_instrument(instrument)
+	, m_statusLabel(new QLabel(this))
+	, m_generalInfoLabel(new QLabel(this))
 	, m_switchKeysLabel(new QLabel(this))
+	, m_infoLabelsWidget(new QWidget(this))
 	, m_controlsWidget(new QWidget(this))
 	, m_knobLayout(new QGridLayout(m_controlsWidget))
 {
@@ -73,13 +76,22 @@ SfzSamplerView::SfzSamplerView(SfzSampler* instrument, QWidget* parent)
 	connect(openFileButton, &PixmapButton::clicked, this, &SfzSamplerView::openFile);
 	layout1->addWidget(openFileButton);
 
-	layout1->addWidget(m_switchKeysLabel);
+	layout1->addWidget(m_statusLabel);
+
+	layout1->addWidget(m_infoLabelsWidget);
+
+	auto layout2 = new QHBoxLayout(m_infoLabelsWidget);
+	layout2->setContentsMargins(0, 0, 0, 0);
+	layout2->addWidget(m_generalInfoLabel);
+	layout2->addWidget(m_switchKeysLabel);
 
 	layout1->addWidget(m_controlsWidget);
 
 
 	// Whenever a new SFZ file is loaded, set the default CC values
 	connect(m_instrument, &SfzSampler::fileLoaded, [this](){ onFileLoaded(); }); // this lambda is so bad, but it doesn't work as a slot for some reason
+
+	connect(m_instrument, &SfzSampler::statusInfo, [this](const QString& statusText){ updateStatusInfo(statusText); });
 
 	onFileLoaded();
 
@@ -138,6 +150,20 @@ void SfzSamplerView::onFileLoaded()
 	{
 		m_switchKeysLabel->setText("");
 	}
+
+	// Update general info
+	m_generalInfoLabel->setText(
+		QString("File: %1\nRegions: %2\nSamples: %3")
+			.arg(QFileInfo(m_instrument->m_sfzFilePath).fileName())
+			.arg(m_instrument->m_regionManager->allRegions().size())
+			.arg(m_instrument->m_samplePool->sampleCount())
+	);
+}
+
+void SfzSamplerView::updateStatusInfo(const QString& statusText)
+{
+	m_statusLabel->setText(statusText);
+	update(); // For some reason the gui doesn't always update if the user isn't interacting with it or panning the workspace view
 }
 
 
