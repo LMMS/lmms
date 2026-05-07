@@ -106,7 +106,8 @@ private:
 	QString m_sfzFilePath = "";
 
 	//! Helper function for printing debug info/passing status info to the GUI
-	void sendStatusInfo(const QString& text);
+	void setStatusInfo(const QString& text);
+	QString m_statusText = "";
 
 
 	//! Helper thread for loading sample files so that the main thread isn't blocked

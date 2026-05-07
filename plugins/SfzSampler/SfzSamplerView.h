@@ -49,7 +49,7 @@ public:
 
 public slots:
 	void onFileLoaded();
-	void updateStatusInfo(const QString& statusText);
+	void periodicUpdate();
 	void openFile();
 
 protected:

@@ -153,7 +153,7 @@ void SfzSampler::processTrigger(const SfzTrigger& trigger)
 				}
 			}
 			// For fun, display the last played sample on the GUI
-			sendStatusInfo(QString("Last Played Sample: %1").arg(QFileInfo(region->m_sampleFile.value().value_or("N/A")).fileName()));
+			setStatusInfo("Last Played Sample: " + QFileInfo(region->m_sampleFile.value().value_or("N/A")).fileName());
 			if (!foundOpenPosition) { qDebug() << "[SFZ Player] Could not find vacant position in m_voices buffer!"; }
 		}
 	}
@@ -274,13 +274,13 @@ void SfzSampler::loadSfzFile(const QString& filePath, const bool resetCCKnobs)
 		for (auto* region : m_tempRegionManager->allRegions())
 		{
 			// Update the GUI info text to notify the user as samples are loaded
-			sendStatusInfo(QString("Loading sample %1/%2 %3").arg(i+1).arg(m_tempRegionManager->allRegions().size()).arg(QFileInfo(region->m_sampleFile.value().value_or("N/A")).fileName()));
+			setStatusInfo(QString("Loading sample %1/%2 %3").arg(i+1).arg(m_tempRegionManager->allRegions().size()).arg(QFileInfo(region->m_sampleFile.value().value_or("N/A")).fileName()));
 			// Initialize the sample into the temporary pool, so that it doesn't disturb the audio thread which may still be using the previous samples.
 			bool successfulLoadSample = region->initializeSample(parentDirectory, *m_tempSamplePool);
 			if (!successfulLoadSample) { qDebug() << "[SFZ Player] An error occured when loading a sample."; } // TODO organize this debug info
 			i++;
 		}
-		sendStatusInfo(QString("Loaded %1 regions and %2 samples.").arg(m_tempRegionManager->allRegions().size()).arg(m_tempSamplePool->sampleCount()));
+		setStatusInfo(QString("Loaded %1 regions and %2 samples.").arg(m_tempRegionManager->allRegions().size()).arg(m_tempSamplePool->sampleCount()));
 		// When the thread is done loading all the samples, set the flag to let the audio thread know it can swap the data
 		m_bufferCounterWhenDataReady = m_bufferCounter; // Save the current frame counter so the main thread knows when enough buffers have passed that it can delete the old data
 		m_newSfzDataReady = true;
@@ -352,12 +352,13 @@ gui::PluginView* SfzSampler::instantiateView(QWidget* parent)
 
 
 
-void SfzSampler::sendStatusInfo(const QString& text)
+void SfzSampler::setStatusInfo(const QString& text)
 {
 	// Print to console
 	qDebug() << "[SFZ Player]" << text;
 	// And send to GUI
-	emit statusInfo(text);
+	// (Instead of actually sending a Qt signal, which seemed to cause off crashes, simply set a member variable and let the GUI read it when it wants)
+	m_statusText = text;
 }
 
 

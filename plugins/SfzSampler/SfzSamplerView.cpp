@@ -49,6 +49,8 @@
 #include "embed.h"
 #include "MidiEvent.h"
 #include "InstrumentTrack.h"
+#include "GuiApplication.h"
+#include "MainWindow.h"
 
 namespace lmms {
 
@@ -88,10 +90,11 @@ SfzSamplerView::SfzSamplerView(SfzSampler* instrument, QWidget* parent)
 	layout1->addWidget(m_controlsWidget);
 
 
-	// Whenever a new SFZ file is loaded, set the default CC values
+	// Whenever a new SFZ file is loaded, set the default CC values and update the info text
 	connect(m_instrument, &SfzSampler::fileLoaded, [this](){ onFileLoaded(); }); // this lambda is so bad, but it doesn't work as a slot for some reason
 
-	connect(m_instrument, &SfzSampler::statusInfo, [this](const QString& statusText){ updateStatusInfo(statusText); });
+	// Instead of sending a signal from the plugin every time a note is pressed (that seemed to cause odd crashes), simply update things periodically
+	connect(getGUI()->mainWindow(), SIGNAL(periodicUpdate()), this, SLOT(periodicUpdate()));
 
 	onFileLoaded();
 
@@ -152,18 +155,20 @@ void SfzSamplerView::onFileLoaded()
 	}
 
 	// Update general info
-	m_generalInfoLabel->setText(
-		QString("File: %1\nRegions: %2\nSamples: %3")
-			.arg(QFileInfo(m_instrument->m_sfzFilePath).fileName())
-			.arg(m_instrument->m_regionManager->allRegions().size())
-			.arg(m_instrument->m_samplePool->sampleCount())
-	);
+	if (m_instrument->m_regionManager != nullptr && m_instrument->m_samplePool != nullptr)
+	{
+		m_generalInfoLabel->setText(
+			QString("File: %1\nRegions: %2\nSamples: %3")
+				.arg(QFileInfo(m_instrument->m_sfzFilePath).fileName())
+				.arg(m_instrument->m_regionManager->allRegions().size())
+				.arg(m_instrument->m_samplePool->sampleCount())
+		);
+	}
 }
 
-void SfzSamplerView::updateStatusInfo(const QString& statusText)
+void SfzSamplerView::periodicUpdate()
 {
-	m_statusLabel->setText(statusText);
-	update(); // For some reason the gui doesn't always update if the user isn't interacting with it or panning the workspace view
+	m_statusLabel->setText(m_instrument->m_statusText);
 }
 
 
