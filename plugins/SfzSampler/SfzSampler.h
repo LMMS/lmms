@@ -49,6 +49,7 @@ class SfzSampler : public Instrument
 
 public:
 	SfzSampler(InstrumentTrack* instrumentTrack);
+	~SfzSampler();
 
 	void playNote(NotePlayHandle* handle, SampleFrame* workingBuffer) override;
 	void deleteNotePluginData(NotePlayHandle* handle) override;
@@ -111,7 +112,7 @@ private:
 
 
 	//! Helper thread for loading sample files so that the main thread isn't blocked
-	std::jthread m_sampleLoadingThread;
+	std::thread m_sampleLoadingThread;
 
 	//! Unfortunately, dealing with multiple threads gets complicated.
 	//! There is the possibility that the audio thread could access the region/sample data while the main thread is loading a new SFZ file and the samples

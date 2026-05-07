@@ -78,6 +78,11 @@ SfzSampler::SfzSampler(InstrumentTrack* instrumentTrack)
 	emit dataChanged();
 }
 
+SfzSampler::~SfzSampler()
+{
+	m_sampleLoadingThread.join(); // Make sure to finish the sample loading thread before the plugin exits, or else the program might terminate
+}
+
 
 
 bool SfzSampler::handleMidiEvent(const MidiEvent& event, const TimePos& time, f_cnt_t offset)
@@ -269,7 +274,8 @@ void SfzSampler::loadSfzFile(const QString& filePath, const bool resetCCKnobs)
 
 	// To prevent the main gui thread from freezing while all the samples are loaded, start up a separate thread to handle loading everything
 	m_currentlyLoadingSamples = true;
-	m_sampleLoadingThread = std::jthread([this, parentDirectory](){
+	if (m_sampleLoadingThread.joinable()) { m_sampleLoadingThread.join(); } // Reset the previous thread if it is active
+	m_sampleLoadingThread = std::thread([this, parentDirectory](){
 		int i = 0;
 		for (auto* region : m_tempRegionManager->allRegions())
 		{
@@ -284,7 +290,7 @@ void SfzSampler::loadSfzFile(const QString& filePath, const bool resetCCKnobs)
 		// When the thread is done loading all the samples, set the flag to let the audio thread know it can swap the data
 		m_bufferCounterWhenDataReady = m_bufferCounter; // Save the current frame counter so the main thread knows when enough buffers have passed that it can delete the old data
 		m_newSfzDataReady = true;
-		m_currentlyLoadingSamples = false; // TODO this doesn't seem thread safe, since there would be a brief moment in time where this is false but the thread is still active? Maybe it doesn't matter since jthread handles destruction more nicely.
+		m_currentlyLoadingSamples = false; // TODO this doesn't seem thread safe, since there would be a brief moment in time where this is false but the thread is still active?
 	});
 }
 
