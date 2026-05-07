@@ -38,6 +38,7 @@ namespace lmms
 //! Normal MIDI CC's range from 0 to 127. More advanced SFZ's go beyond that, but for now we cap it at 128. This should be extended in the future.
 constexpr const int NumMidiCCs = 128;
 
+
 /* Helper Functions */
 
 //! Helper function for converting strings like "A5" or "B#2" into integers representing keys on the midi keyboard.
@@ -59,7 +60,7 @@ struct BaseOpcode
 	//! Given a string like "pitch_keytrack=1200" which has been split into name/value as "pitch_keytrack", "1200", this function updates the internal value if the name matches.
 	virtual void parseFromString(const QString& opcodeName, const QString& opcodeValue, bool* parsed, bool* successful) = 0;
 };
-//! A base struct for all opcodes, just a name and a value.
+//! A base struct for all opcodes, just a name(s) and a value.
 template<typename T>
 struct Opcode : BaseOpcode
 {
@@ -70,7 +71,7 @@ struct Opcode : BaseOpcode
 	Opcode(QString name, T defaultValue) : m_opcodeNames({name}), m_value(defaultValue) {}
 	Opcode(std::vector<QString> names, T defaultValue) : m_opcodeNames(names), m_value(defaultValue) {}
 	virtual void setValue(const T& value) { m_value = value; }
-	virtual const T value() const { return m_value; }
+	virtual const T value() const { return m_value; } // TODO override operators instead
 
 	void parseFromString(const QString& opcodeName, const QString& opcodeValue, bool* parsed, bool* successful) override;
 };
@@ -78,7 +79,7 @@ struct Opcode : BaseOpcode
 //! Float/decimal opcodes (such as amplitude, panning, etc)
 using FloatOpcode = Opcode<float>;
 
-//! Some float opcodes may take on a null default value (filter cutoff)
+//! Some float opcodes may take on a null default value (like filter cutoff)
 using OptionalFloatOpcode = Opcode<std::optional<float>>;
 
 //! Integer opcodes (such as lovel, seq_length, seq_position, offset, etc)
@@ -125,7 +126,7 @@ struct EnvelopeOpcodes
 	ModulatableOpcode release;
 	// Depth is only used for pitcheg and fileg, not ampeg, but we have it here anyway
 	ModulatableOpcode depth;
-	// Velocity modulation amount
+	// Velocity modulation amount (TODO: not used yet)
 	FloatOpcode vel2delay;
 	FloatOpcode vel2attack;
 	FloatOpcode vel2hold;
@@ -162,7 +163,7 @@ struct EnvelopeOpcodes
 		release.updateCachedModulation(ccValues);
 		depth.updateCachedModulation(ccValues);
 	}
-	//! Helper function for parsing all these envelope generator opcodes, so that the code isn't duplicated for the amplitude, pitch, and filter envelopes
+	//! Helper function for parsing all these envelope generator opcodes
 	void parseEnvelopeGeneratorOpcode(const QString& opcode, const QString& value, bool* parsed, bool* successful);
 };
 
@@ -189,7 +190,7 @@ struct LfoOpcodes
 		freq.updateCachedModulation(ccValues);
 		depth.updateCachedModulation(ccValues);
 	}
-	//! Helper function for parsing these lfo generator opcodes, so that the code isn't duplicated for the amplitude, pitch, and filter lfos
+	//! Helper function for parsing these lfo generator opcodes
 	void parseLfoGeneratorOpcode(const QString& opcode, const QString& value, bool* parsed, bool* successful);
 };
 
@@ -198,7 +199,7 @@ struct LfoOpcodes
 
 // Specific Template specializations for Enum-like opcodes
 
-// Trigger Type
+
 enum class TriggerType
 {
 	Attack,

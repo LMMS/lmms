@@ -69,7 +69,6 @@ public:
 
 signals:
 	void fileLoaded();
-	void statusInfo(const QString& statusText); // Pass info to the GUI to display things like current samples being loaded, last sample played, etc
 
 private:
 	void processTrigger(const SfzTrigger& trigger);
@@ -85,7 +84,7 @@ private:
 	//! By always spawning new sounds at the lowest open index and keeping track of the maximum index which contains an actice sound,
 	//! you only need to loop through the first n elements and ignore the rest since you know they are inactive (Thanks to Lost Robot for the idea)
 	size_t m_maxActiveIndex = 0;
-	//! Helper function to figure out what the maximum active index is, in the event the maximum index deacticated
+	//! Helper function to figure out what the maximum active index is, in the event the maximum index deactivated
 	void recalculateMaxActiveIndex();
 
 	//! So that the regions don't accidentally load the same sample multiple times, we store all the sames in one place and the regions ask it to load each sample/retrieve a pointer if it's already been loaded

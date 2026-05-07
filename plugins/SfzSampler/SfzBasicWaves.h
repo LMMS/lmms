@@ -40,6 +40,7 @@ public:
 		Noise,
 		Silence
 	};
+	//! Returns the calculated value of the waveform shape at the given number of frames from the start, given the sample rate.
 	static const float generate(Shape shape, float sampleRate, int frame);
 
 private:

@@ -31,7 +31,7 @@ namespace lmms
 
 
 SfzRegionManager::SfzRegionManager(std::vector<SfzRegion>& regions)
-	: m_regions(regions)
+	: m_regions(regions) // TODO should this use std::move?
 {
 	qDebug() << "[SFZ Player] Constructing key/region lookup tables...";
 	// For each key, figure out what list of regions could include it, to make a kind of look-up table
@@ -41,7 +41,7 @@ SfzRegionManager::SfzRegionManager(std::vector<SfzRegion>& regions)
 		{
 			if (key >= region.m_lokey.value() && key <= region.m_hikey.value())
 			{
-				// Additionally sort by trigger type
+				// Additionally organize by trigger type
 				switch (region.m_trigger.value())
 				{
 				case TriggerType::Attack:
@@ -57,7 +57,7 @@ SfzRegionManager::SfzRegionManager(std::vector<SfzRegion>& regions)
 	}
 
 	// Unfortunately, it's more difficult to make lookup tables for midi CC events. Instead, just use a big vector with all the regions by default
-	// TODO or is it? there's probably a way. But currently we actually don't support cc events triggering regions, so technically this will never be used at the moment.
+	// TODO or is it? there's probably a way. But currently we actually don't support cc events triggering regions, so it's not as important at the moment.
 	for (auto& region : m_regions)
 	{
 		m_allRegions.push_back(&region);
@@ -79,8 +79,5 @@ const std::vector<SfzRegion*>& SfzRegionManager::findPotentialMatchingRegions(co
 	}
 	return m_allRegions; // This was added to prevent a warning, but I don't think it's necessary, since the switch covers all cases.
 }
-
-
-
 
 } // namespace lmms

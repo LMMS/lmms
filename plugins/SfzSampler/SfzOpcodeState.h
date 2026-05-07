@@ -48,13 +48,13 @@ public:
 	/***********************************************************************/
 	// SFZ OPCODE DEFINITIONS
 	/***********************************************************************/
+	// These are initailized with {opcode_name, default_value}, or if the opcode has multiple aliases, {{name1, name2, ...}, default_value}
 
 	//
 	// File Paths
 	//
 	StringOpcode m_sampleFile {"sample", std::nullopt};
 	StringOpcode m_default_path {"default_path", std::nullopt};
-
 
 	//
 	// Trigger Type
@@ -95,12 +95,10 @@ public:
 	FloatOpcode m_lorand {"lorand", 0.0f};
 	FloatOpcode m_hirand {"hirand", 1.0f};
 
-
 	//
 	// Sample playback
 	//
 	Opcode<int> m_offset {"offset", 0}; // sample play offset in frames
-
 	Opcode<LoopMode> m_loop_mode {"loop_mode", LoopMode::NoLoop};
 
 	//
@@ -108,7 +106,6 @@ public:
 	//
 	ModulatableOpcode m_delay {"delay", 0.0f}; // In seconds
 	FloatOpcode m_delay_random {"delay_random", 0.0f};
-
 
 	//
 	// Pitch
@@ -126,14 +123,12 @@ public:
 	FloatOpcode m_resonance {"resonance", 0.0f};
 	Opcode<int> m_fil_veltrack {"fil_veltrack", 0}; // in cents
 
-
 	//
 	// Amplitude
 	//
 	ModulatableOpcode m_amplitude {"amplitude", 100.0f}; // In percent
 	// Overall amplitute velocity modulation
 	FloatOpcode m_amp_veltrack {"amp_veltrack", 100.0f};
-
 
 	//
 	// Amplitude Envelope Generator (ampeg)
@@ -144,7 +139,6 @@ public:
 	// Amplitude LFO
 	//
 	LfoOpcodes m_amplfo {"amplfo"};
-
 
 	//
 	// Pitch Envelope Generator (pitcheg)
@@ -163,7 +157,6 @@ public:
 	// It seems that "gain" by itself isn't a real opcode, but gain_ccN and gain_onccN are... just to make the logic eaiser, I have gain as a normal alias.
 	ModulatableOpcode m_volume {{"volume", "gain", "group_volume"}, 0.0f}; // In decibals
 	ModulatableOpcode m_pan {"pan", 0.0f};
-
 
 	//
 	// Midi CC

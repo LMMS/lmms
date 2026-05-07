@@ -48,8 +48,8 @@ public:
 	SfzRegionPlayState() = default; // The default constructor is needed to initialize arrays of the object
 
 	//! Helper function to calculate the base pitch and amplitude so that it doesn't have to be done per-buffer.
-	// This is done once during the constructor, but it must also be done whenever a CC knob
-	// changes, since that could affect the base pitch/amp of the playback.
+	//! This is done once during the constructor, but it must also be done whenever a CC knob
+	//! changes, since that could affect the base pitch/amp of the playback.
 	void precomputeBaseValues();
 
 	//! Generates the next buffer of audio from this sound. If m_active is false, this function does nothing.
@@ -82,7 +82,7 @@ private:
 	//! Cache the rate the sample should be played (based on pitch and sample rate, compared to lmms's sample rate)
 	// rather than computing it per buffer/frame. This does not include the effect of the pitch env/lfo, since those are computed every frame
 	float m_baseFreqRatio = 0.0f;
-	//! Cache the base amplitude. The amplitude envelope/lfo will be applied on top of this.
+	//! Similarly cache the base amplitude. The amplitude envelope/lfo will be applied on top of this.
 	float m_baseAmplitudeLeft = 1.0f;
 	float m_baseAmplitudeRight = 1.0f;
 

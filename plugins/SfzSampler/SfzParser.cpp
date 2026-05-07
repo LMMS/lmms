@@ -51,7 +51,7 @@ bool SfzParser::parseSfzFile(const QString& filePath, std::vector<SfzRegion>& ou
 
 	// Before parsing the headers and opcodes, we need to hande #include and #define statements
 	// This amounts to recursively loading and copy/pasting the contents of the other files where the #include is, and find/replacing the #define words with their values
-	std::map<QString, QString> defineMap = {}; // Just a temporary helper variable so that the recursion branches have a persistance object to keep track of #defines
+	std::map<QString, QString> defineMap = {}; // Just a temporary helper variable so that the recursion branches have a persistant object to keep track of #defines
 	fileContents = recursiveHandleIncludeAndDefineStatements(parentDirectory, fileContents, defineMap);
 
 	qDebug().noquote() << "[SFZ Parser] DEBUG: Preprocessed SFZ file contents:\n" << fileContents; // testing
@@ -69,7 +69,7 @@ bool SfzParser::parseSfzFile(const QString& filePath, std::vector<SfzRegion>& ou
 		<region> ampeg_release=0.3 lokey=45 hikey=49
 	*/
 	// This would still be parsed into segments as "<region>", "ampeg_release=0.3", "lokey=45", and "hikey=49"
-	// According to the SFZ format website, there must never be a space on either side of the = for an opcode assignment. That makes things simpler
+	// According to the SFZ format website, there must never be a space on either side of the = for an opcode assignment (so something like "lokey = 45" would be invalid). That makes things simpler.
 	// However, there can be spaces in the value assigned to the opcode. For example, if your sample file name has spaces:
 	/*
 		<region> sample=Grand Piano G4 MP.wav key=49

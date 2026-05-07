@@ -33,6 +33,7 @@ namespace lmms
 template<>
 void FloatOpcode::parseFromString(const QString& opcodeName, const QString& opcodeValue, bool* parsed, bool* successful)
 {
+	// Check if the name matches one of this opcode's aliases
 	if (std::find(m_opcodeNames.begin(), m_opcodeNames.end(), opcodeName) == m_opcodeNames.end()) { return; }
 	m_value = opcodeValue.toFloat(successful);
 	*parsed = true;
@@ -52,7 +53,7 @@ void KeyOpcode::parseFromString(const QString& opcodeName, const QString& opcode
 {
 	if (std::find(m_opcodeNames.begin(), m_opcodeNames.end(), opcodeName) == m_opcodeNames.end()) { return; }
 	m_value = opcodeValue.toInt(successful);
-	// Integer opcodes can also define keys, which can be specified either by a key number of by a string like e4 or c#5
+	// Integer opcodes can also define keys, which can be specified either by a key number or by a string like e4 or c#5
 	if (!*successful) { m_value = stringToKeyNum(opcodeValue, successful); }
 	*parsed = true;
 }
@@ -63,7 +64,6 @@ void OptionalKeyOpcode::parseFromString(const QString& opcodeName, const QString
 {
 	if (std::find(m_opcodeNames.begin(), m_opcodeNames.end(), opcodeName) == m_opcodeNames.end()) { return; }
 	m_value = opcodeValue.toInt(successful);
-	// Integer opcodes can also define keys, which can be specified either by a key number of by a string like e4 or c#5
 	if (!*successful) { m_value = stringToKeyNum(opcodeValue, successful); }
 	*parsed = true;
 }
@@ -78,11 +78,11 @@ void StringOpcode::parseFromString(const QString& opcodeName, const QString& opc
 }
 
 // Modulatable Opcodes are a type of float opcode which can be adjusted based on different midi CC knob values
-// They have both an initial value defined by their opcodename=value
-// but also opcodename_oncc123=modulation_amount
+// They have both an initial value defined by their: opcodename=value
+// but also modulation defined by: opcodename_oncc123=modulation_amount
 // or opcodename_cc123=modulation_amount
 // or opcodenamecc123=modulation_amount
-// will make the value be increased proportional to modulation_amount when the midi CC knob 123 is turned up
+// which will make the value be increased proportional to modulation_amount when the midi CC knob 123 is turned up
 void ModulatableOpcode::parseFromString(const QString& opcodeName, const QString& opcodeValue, bool* parsed, bool* successful)
 {
 	for (QString alias : m_opcodeNames)
@@ -144,9 +144,6 @@ void EnvelopeOpcodes::parseEnvelopeGeneratorOpcode(const QString& opcode, const 
 // LFO Opcodes
 void LfoOpcodes::parseLfoGeneratorOpcode(const QString& opcode, const QString& value, bool* parsed, bool* successful)
 {
-	// Pass the opcode name/value to all of the bundled opcodes.
-	// If it matches one of them, that's great. If not, they will return and nothing will happen.
-	// TODO is this error handling with "successful" correct?
 	delay.parseFromString(opcode, value, parsed, successful);
 	fade.parseFromString(opcode, value, parsed, successful);
 	freq.parseFromString(opcode, value, parsed, successful);
@@ -156,7 +153,7 @@ void LfoOpcodes::parseLfoGeneratorOpcode(const QString& opcode, const QString& v
 
 
 //
-// Bespoke Enum-like Opcodes
+// Specialized Enum-like Opcodes
 //
 
 template<>

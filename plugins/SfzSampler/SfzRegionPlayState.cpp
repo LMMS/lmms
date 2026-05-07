@@ -30,7 +30,6 @@
 #include "Engine.h"
 #include "lmms_math.h"
 
-#include "MicroTimer.h"
 #include <QDebug>
 
 namespace lmms
@@ -44,7 +43,7 @@ SfzRegionPlayState::SfzRegionPlayState(const SfzRegion* region, const SfzTrigger
 	, m_region(region)
 	, m_sampleObject(region->sample())
 {
-	// Calculate the base pitch and amplitude
+	// Calculate the base pitch and amplitude so that we don't need to every buffer
 	precomputeBaseValues();
 	// Delay the start of the playback by the trigger offset
 	m_frameCount -= trigger.frameOffset();
@@ -90,7 +89,7 @@ void SfzRegionPlayState::precomputeBaseValues()
 	const float normalizedVelocity = m_trigger.velocity().value() / 127.0f;
 
 	// Compute the base pitch
-	// The pitch env/lfo will be applied on top of this, as they are calcualted per frame
+	// The pitch env/lfo will be applied on top of this, as those are calcualted per frame
 
 	// Calculate pitch difference relative to original sample
 	const float semitoneDifference = m_trigger.key().value() - m_region->m_pitch_keycenter.value();
@@ -101,7 +100,7 @@ void SfzRegionPlayState::precomputeBaseValues()
 		+ normalizedVelocity * m_region->m_pitch_veltrack.value() / 100.0f;
 	m_baseFreqRatio = std::exp2(pitch / 12.0f);
 
-	// Sample rate of sample (if we are using a sample, not a basic wave like *sine or *saw)
+	// Sample rate of sample
 	const float sampleSampleRate = m_sampleObject != nullptr
 		? m_sampleObject->sampleRate()
 		: m_lmmsSampleRate; // If we are using a basic wave instead of a sample, set it to LMMS's sample rate
@@ -258,6 +257,7 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const f_cnt_t frames)
 	// Now render the audio
 	for (f_cnt_t f = 0; f < frames; ++f)
 	{
+		// Compute the current envelope/lfo values
 		const float ampeg = envelopeGenerator(ampegDelayFrames, ampegAttackFrames, ampegHoldFrames, ampegDecayFrames, ampegSustain, ampegReleaseFrames);
 		const float amplfo = amplfoDepth != 0.0f // Only compute the amplitude lfo if the depth is nonzero
 			? dbfsToAmp(lfoGenerator(amplfoDelayFrames, amplfoFadeFrames, amplfoFreq) * amplfoDepth) // amplfo depth is in decibels, so convert to amplitude
@@ -331,7 +331,7 @@ void SfzRegionPlayState::processTrigger(const SfzTrigger& trigger)
 		if (trigger.key() == m_trigger.key())
 		{
 			m_released = true;
-			m_releaseFrame = m_frameCount; // testing
+			m_releaseFrame = m_frameCount;
 		}
 	}
 	// Since the base pitch and amplitude are precomputed in the constructor, they need to be re-computed if any of the CC modulations may have changed

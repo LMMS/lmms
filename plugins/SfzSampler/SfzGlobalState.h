@@ -83,7 +83,6 @@ private:
 
 	//! Stores the current value of all the midi CC knobs/controllers
 	//! Technically, floats should probably be used to allow for HDCC (high definition CC's) as used in ARIA, but for now dividing by 127 to get a float between 0 and 1 works fine.
-	//! std::optional is used so that sfz file can specify default cc values
 	std::array<int, NumMidiCCs> m_ccValues = {};
 };
 
