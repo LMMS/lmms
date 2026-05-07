@@ -113,6 +113,8 @@ private:
 
 	//! Helper thread for loading sample files so that the main thread isn't blocked
 	std::thread m_sampleLoadingThread;
+	//! The function which the sample loading thread uses to load all the samples
+	void sampleLoadingThreadFunction(const QDir& parentDirectory);
 
 	//! Unfortunately, dealing with multiple threads gets complicated.
 	//! There is the possibility that the audio thread could access the region/sample data while the main thread is loading a new SFZ file and the samples
