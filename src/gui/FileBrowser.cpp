@@ -717,6 +717,7 @@ QList<QAction*> FileBrowserTreeWidget::getContextActions(FileItem* file, bool so
 	case FileItem::FileType::SoundFont:
 	case FileItem::FileType::Patch:
 	case FileItem::FileType::VstPlugin:
+	case FileItem::FileType::SFZ:
 		fileCanBeInstrument = true;
 
 	case FileItem::FileType::Project:

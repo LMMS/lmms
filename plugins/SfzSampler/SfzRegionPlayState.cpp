@@ -201,7 +201,7 @@ float SfzRegionPlayState::lfoGenerator(const f_cnt_t delay, const f_cnt_t fade, 
 
 
 
-bool SfzRegionPlayState::play(SampleFrame* buffer, const fpp_t frames)
+bool SfzRegionPlayState::play(SampleFrame* buffer, const f_cnt_t frames)
 {
 	// If the sound is not active (note was released, off_by triggered, etc) then don't render any audio
 	if (!m_active) { return false; }

@@ -183,7 +183,7 @@ void SfzSampler::processTrigger(const SfzTrigger& trigger)
 
 void SfzSampler::play(SampleFrame* workingBuffer)
 {
-	const fpp_t frames = Engine::audioEngine()->framesPerPeriod();
+	const f_cnt_t frames = Engine::audioEngine()->framesPerPeriod();
 
 	// Render audio from each of the active voices
 	for (size_t i = 0; i <= m_maxActiveIndex; ++i)

@@ -54,7 +54,7 @@ public:
 
 	//! Generates the next buffer of audio from this sound. If m_active is false, this function does nothing.
 	//! Returns true if any sound was generated, false if the buffer is left untouched
-	bool play(SampleFrame* buffer, const fpp_t frames);
+	bool play(SampleFrame* buffer, const f_cnt_t frames);
 
 	//! Handle incoming event to decide whether to deactivate/release
 	void processTrigger(const SfzTrigger& trigger);
