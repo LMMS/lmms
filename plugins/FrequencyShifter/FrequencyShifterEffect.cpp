@@ -62,7 +62,7 @@ FrequencyShifterEffect::FrequencyShifterEffect(Model* parent, const Descriptor::
 	updateSampleRate();
 }
 
-Effect::ProcessStatus FrequencyShifterEffect::processImpl(SampleFrame* buf, const fpp_t frames)
+Effect::ProcessStatus FrequencyShifterEffect::processImpl(SampleFrame* buf, const f_cnt_t frames)
 {
 	constexpr float twoPi = std::numbers::pi_v<float> * 2.0f;
 

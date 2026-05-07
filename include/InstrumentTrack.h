@@ -67,7 +67,7 @@ public:
 	~InstrumentTrack() override;
 
 	// used by instrument
-	void processAudioBuffer( SampleFrame* _buf, const fpp_t _frames,
+	void processAudioBuffer( SampleFrame* _buf, const f_cnt_t _frames,
 							NotePlayHandle * _n );
 
 	MidiEvent applyMasterKey( const MidiEvent& event );
@@ -122,7 +122,7 @@ public:
 	}
 
 	// play everything in given frame-range - creates note-play-handles
-	bool play( const TimePos & _start, const fpp_t _frames,
+	bool play( const TimePos & _start, const f_cnt_t _frames,
 						const f_cnt_t _frame_base, int _clip_num = -1 ) override;
 	// create new view for me
 	gui::TrackView* createView( gui::TrackContainerView* tcv ) override;

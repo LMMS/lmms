@@ -114,7 +114,7 @@ void AudioBusHandle::doProcessing()
 		return;
 	}
 
-	const fpp_t fpp = Engine::audioEngine()->framesPerPeriod();
+	const f_cnt_t fpp = Engine::audioEngine()->framesPerPeriod();
 
 	// clear the buffer
 	m_buffer.silenceAllChannels();

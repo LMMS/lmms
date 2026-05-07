@@ -371,7 +371,7 @@ void TripleOscillator::playNote( NotePlayHandle * _n,
 	Oscillator * osc_l = static_cast<oscPtr *>( _n->m_pluginData )->oscLeft;
 	Oscillator * osc_r = static_cast<oscPtr *>( _n->m_pluginData )->oscRight;
 
-	const fpp_t frames = _n->framesLeftForCurrentPeriod();
+	const f_cnt_t frames = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();
 
 	osc_l->update( _working_buffer + offset, frames, 0 );
@@ -551,8 +551,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 		int knob_y = osc_y + i * osc_h;
 
 		// setup volume-knob
-		auto vk = new Knob(KnobType::Styled, this);
-		vk->setVolumeKnob( true );
+		auto vk = new VolumeKnob(KnobType::Styled, this);
 		vk->setFixedSize( 28, 35 );
 		vk->move( 6, knob_y );
 		vk->setHintText( tr( "Osc %1 volume:" ).arg(

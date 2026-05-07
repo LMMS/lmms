@@ -119,7 +119,7 @@ void SaProcessor::analyze(LocklessRingBuffer<SampleFrame> &ring_buffer)
 		if ((m_spectrumActive || m_waterfallActive) && !m_controls->m_pauseModel.value() && !m_reallocating)
 		{
 			const bool stereo = m_controls->m_stereoModel.value();
-			fpp_t in_frame = 0;
+			f_cnt_t in_frame = 0;
 			while (in_frame < frame_count)
 			{
 				// Lock data access to prevent reallocation from changing
