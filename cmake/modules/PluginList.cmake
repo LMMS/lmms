@@ -62,6 +62,7 @@ SET(LMMS_PLUGIN_LIST
 	ReverbSC
 	Sf2Player
 	Sfxr
+	Sid
 	SfzPlayer
 	SlewDistortion
 	SlicerT
