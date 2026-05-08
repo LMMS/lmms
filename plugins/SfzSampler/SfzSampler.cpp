@@ -220,6 +220,8 @@ void SfzSampler::recalculateMaxActiveIndex()
 void SfzSampler::loadFile(const QString& filePath)
 {
 	loadSfzFile(filePath, true); // Passing true to reset the InstrumentTrack's midi CC knobs to the SFZ file's defaults
+	// Set the instrument name to the filename
+	m_parentTrack->setName(PathUtil::cleanName(filePath));
 }
 
 
