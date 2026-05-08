@@ -48,14 +48,14 @@ float SfzSampleBuffer::at(const float index, const size_t channel) const
 {
 	if (index < 0 || index >= m_size) { return 0.0f; }
 
-	const size_t indexFloor = static_cast<size_t>(index);
+	const f_cnt_t indexFloor = static_cast<f_cnt_t>(index);
 
 	float frac = index - indexFloor;
 
-	size_t i0 = indexFloor == 0 ? 0 : indexFloor - 1;
-	size_t i1 = indexFloor;
-	size_t i2 = std::min(indexFloor + 1, m_size - 1);
-	size_t i3 = std::min(indexFloor + 2, m_size - 1);
+	f_cnt_t i0 = indexFloor == 0 ? 0 : indexFloor - 1;
+	f_cnt_t i1 = indexFloor;
+	f_cnt_t i2 = std::min(indexFloor + 1, m_size - 1);
+	f_cnt_t i3 = std::min(indexFloor + 2, m_size - 1);
 	
 	float v0 = m_data[i0][channel];
 	float v1 = m_data[i1][channel];
