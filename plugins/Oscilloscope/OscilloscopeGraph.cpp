@@ -28,8 +28,10 @@
 #include "GuiApplication.h"
 #include "MainWindow.h"
 
+#include <QApplication>
 #include <QPainter>
 #include <QSizePolicy>
+#include <QThread>
 #include <QWheelEvent>
 
 #include <functional>
