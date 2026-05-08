@@ -1,5 +1,5 @@
 /*
- * SfzSamplerView.cpp - GUI for SfzSampler
+ * SfzPlayerView.cpp - GUI for SfzPlayer
  *
  * Copyright (c) 2026 Keratin
  *
@@ -22,7 +22,7 @@
  *
  */
 
-#include "SfzSamplerView.h"
+#include "SfzPlayerView.h"
 
 #include <QDropEvent>
 #include <QPainter>
@@ -39,7 +39,7 @@
 #include "Knob.h"
 #include "LcdSpinBox.h"
 #include "PixmapButton.h"
-#include "SfzSampler.h"
+#include "SfzPlayer.h"
 #include "StringPairDrag.h"
 #include "Track.h"
 #include "embed.h"
@@ -56,7 +56,7 @@ namespace lmms {
 
 namespace gui {
 
-SfzSamplerView::SfzSamplerView(SfzSampler* instrument, QWidget* parent)
+SfzPlayerView::SfzPlayerView(SfzPlayer* instrument, QWidget* parent)
 	: InstrumentView(instrument, parent)
 	, m_instrument(instrument)
 	, m_statusLabel(new QLabel(this))
@@ -75,7 +75,7 @@ SfzSamplerView::SfzSamplerView(SfzSampler* instrument, QWidget* parent)
 	auto layout1 = new QVBoxLayout(this);
 
 	auto openFileButton = new QPushButton(embed::getIconPixmap("folder"), tr("Open SFZ File"), this);
-	connect(openFileButton, &PixmapButton::clicked, this, &SfzSamplerView::openFile);
+	connect(openFileButton, &PixmapButton::clicked, this, &SfzPlayerView::openFile);
 	layout1->addWidget(openFileButton);
 
 	layout1->addWidget(m_statusLabel);
@@ -91,7 +91,7 @@ SfzSamplerView::SfzSamplerView(SfzSampler* instrument, QWidget* parent)
 
 
 	// Whenever a new SFZ file is loaded, set the default CC values and update the info text
-	connect(m_instrument, &SfzSampler::fileLoaded, [this](){ onFileLoaded(); }); // this lambda is so bad, but it doesn't work as a slot for some reason
+	connect(m_instrument, &SfzPlayer::fileLoaded, [this](){ onFileLoaded(); }); // this lambda is so bad, but it doesn't work as a slot for some reason
 
 	// Instead of sending a signal from the plugin every time a note is pressed (that seemed to cause odd crashes), simply update things periodically
 	connect(getGUI()->mainWindow(), SIGNAL(periodicUpdate()), this, SLOT(periodicUpdate()));
@@ -102,7 +102,7 @@ SfzSamplerView::SfzSamplerView(SfzSampler* instrument, QWidget* parent)
 }
 
 
-void SfzSamplerView::onFileLoaded()
+void SfzPlayerView::onFileLoaded()
 {
 	// Remove any old knobs
 	delete m_controlsWidget;
@@ -166,13 +166,13 @@ void SfzSamplerView::onFileLoaded()
 	}
 }
 
-void SfzSamplerView::periodicUpdate()
+void SfzPlayerView::periodicUpdate()
 {
 	m_statusLabel->setText(m_instrument->m_statusText);
 }
 
 
-void SfzSamplerView::openFile()
+void SfzPlayerView::openFile()
 {
 	auto openFileDialog = FileDialog(nullptr, QObject::tr("Open SFZ File"));
 	auto dir = ConfigManager::inst()->userSamplesDir();
@@ -185,7 +185,7 @@ void SfzSamplerView::openFile()
 }
 
 
-void SfzSamplerView::dragEnterEvent(QDragEnterEvent* dee)
+void SfzPlayerView::dragEnterEvent(QDragEnterEvent* dee)
 {
 	QString value = StringPairDrag::decodeValue(dee);
 	if (value.endsWith(".sfz")) 
@@ -196,7 +196,7 @@ void SfzSamplerView::dragEnterEvent(QDragEnterEvent* dee)
 	dee->ignore();
 }
 
-void SfzSamplerView::dropEvent(QDropEvent* de)
+void SfzPlayerView::dropEvent(QDropEvent* de)
 {
 	QString value = StringPairDrag::decodeValue(de);
 	if (value.endsWith(".sfz")) 
@@ -208,11 +208,11 @@ void SfzSamplerView::dropEvent(QDropEvent* de)
 	de->ignore();
 }
 
-void SfzSamplerView::resizeEvent(QResizeEvent* re)
+void SfzPlayerView::resizeEvent(QResizeEvent* re)
 {
 }
 
-void SfzSamplerView::paintEvent(QPaintEvent* pe)
+void SfzPlayerView::paintEvent(QPaintEvent* pe)
 {
 	//QPainter brush(this);
 	//brush.fillRect(rect(), QColor(19, 19, 20));

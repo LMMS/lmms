@@ -1,5 +1,5 @@
 /*
- * SfzSamplerView.h - GUI for SfzSampler
+ * SfzPlayerView.h - GUI for SfzPlayer
  *
  * Copyright (c) 2026 Keratin
  *
@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef LMMS_GUI_SFZSAMPLER_VIEW_H
-#define LMMS_GUI_SFZSAMPLER_VIEW_H
+#ifndef LMMS_GUI_SFZPLAYER_VIEW_H
+#define LMMS_GUI_SFZPLAYER_VIEW_H
 
 #include "InstrumentView.h"
 
@@ -32,7 +32,7 @@ class QLabel;
 
 namespace lmms {
 
-class SfzSampler;
+class SfzPlayer;
 
 namespace gui {
 
@@ -40,12 +40,12 @@ namespace gui {
 //! This class is planned to be completely redone!
 //! In it's current form, it's simply a temporary GUI which shows the keyswitch info, the parameters, and a button to load a file.
 //! In the future, it would be great to have a much prettier and useful GUI
-class SfzSamplerView : public InstrumentView
+class SfzPlayerView : public InstrumentView
 {
 	Q_OBJECT
 
 public:
-	SfzSamplerView(SfzSampler* instrument, QWidget* parent);
+	SfzPlayerView(SfzPlayer* instrument, QWidget* parent);
 
 public slots:
 	void onFileLoaded();
@@ -62,7 +62,7 @@ protected:
 private:
 	bool isResizable() const override { return true; }
 
-	SfzSampler* m_instrument;
+	SfzPlayer* m_instrument;
 
 	QLabel* m_statusLabel;
 	QLabel* m_generalInfoLabel;
@@ -76,4 +76,4 @@ private:
 
 } // namespace lmms
 
-#endif // LMMS_GUI_SFZSAMPLER_VIEW_H
+#endif // LMMS_GUI_SFZPLAYER_VIEW_H

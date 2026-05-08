@@ -1,5 +1,5 @@
 /*
- * SfzSampler.cpp - Simple SFZ instrument player
+ * SfzPlayer.cpp - Simple SFZ instrument player
  *
  * Copyright (c) 2026 Keratin
  *
@@ -22,7 +22,7 @@
  *
  */
 
-#include "SfzSampler.h"
+#include "SfzPlayer.h"
 #include "SfzParser.h"
 
 #include <QDomElement>
@@ -33,7 +33,7 @@
 #include "InstrumentTrack.h"
 #include "PathUtil.h"
 #include "ConfigManager.h"
-#include "SfzSamplerView.h"
+#include "SfzPlayerView.h"
 #include "Song.h"
 #include "embed.h"
 #include "interpolation.h"
@@ -46,11 +46,11 @@ namespace lmms
 {
 
 extern "C" {
-Plugin::Descriptor PLUGIN_EXPORT sfzsampler_plugin_descriptor = {
+Plugin::Descriptor PLUGIN_EXPORT sfzplayer_plugin_descriptor = {
 	LMMS_STRINGIFY(PLUGIN_NAME),
-	"SfzSampler",
-	QT_TRANSLATE_NOOP("PluginBrowser", "Basic Slicer"),
-	"Daniel Kauss Serna <daniel.kauss.serna@gmail.com>",
+	"SFZ Player",
+	QT_TRANSLATE_NOOP("PluginBrowser", "Load .sfz Instrument Files"),
+	"Keratin <3",
 	0x0100,
 	Plugin::Type::Instrument,
 	new PluginPixmapLoader("logo"),
@@ -59,13 +59,13 @@ Plugin::Descriptor PLUGIN_EXPORT sfzsampler_plugin_descriptor = {
 };
 PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* m, void*)
 {
-	return new SfzSampler(static_cast<InstrumentTrack*>(m));
+	return new SfzPlayer(static_cast<InstrumentTrack*>(m));
 }
 } // end extern
 
 
-SfzSampler::SfzSampler(InstrumentTrack* instrumentTrack)
-	: Instrument(instrumentTrack, &sfzsampler_plugin_descriptor, nullptr, Flag::IsSingleStreamed)
+SfzPlayer::SfzPlayer(InstrumentTrack* instrumentTrack)
+	: Instrument(instrumentTrack, &sfzplayer_plugin_descriptor, nullptr, Flag::IsSingleStreamed)
 	, m_parentTrack(instrumentTrack)
 {
 	auto iph = new InstrumentPlayHandle(this, instrumentTrack);
@@ -78,7 +78,7 @@ SfzSampler::SfzSampler(InstrumentTrack* instrumentTrack)
 	emit dataChanged();
 }
 
-SfzSampler::~SfzSampler()
+SfzPlayer::~SfzPlayer()
 {
 	// Make sure to end the sample loading thread before the plugin exits, or else the program might forcefully terminate
 	if (m_sampleLoadingThread.joinable()) { m_sampleLoadingThread.join(); }
@@ -86,7 +86,7 @@ SfzSampler::~SfzSampler()
 
 
 
-bool SfzSampler::handleMidiEvent(const MidiEvent& event, const TimePos& time, f_cnt_t offset)
+bool SfzPlayer::handleMidiEvent(const MidiEvent& event, const TimePos& time, f_cnt_t offset)
 {
 	if (event.type() == MidiNoteOn)
 	{
@@ -111,18 +111,18 @@ bool SfzSampler::handleMidiEvent(const MidiEvent& event, const TimePos& time, f_
 	return false;
 }
 
-void SfzSampler::playNote(NotePlayHandle* handle, SampleFrame* workingBuffer)
+void SfzPlayer::playNote(NotePlayHandle* handle, SampleFrame* workingBuffer)
 {
 	// TODO: Currently this instrument only uses midi events as input, and a single audio buffer as output.
 	// It might be possible to split things up to use individual NotePlayHandles, but that is for another time.
 }
 
-void SfzSampler::deleteNotePluginData(NotePlayHandle* handle)
+void SfzPlayer::deleteNotePluginData(NotePlayHandle* handle)
 {
 }
 
 
-void SfzSampler::processTrigger(const SfzTrigger& trigger)
+void SfzPlayer::processTrigger(const SfzTrigger& trigger)
 {
 	if (m_regionManager == nullptr) { return; } // Before any SFZ file is loaded, m_regionManager is nullptr, so there's no regions to trigger.
 
@@ -180,7 +180,7 @@ void SfzSampler::processTrigger(const SfzTrigger& trigger)
 
 
 
-void SfzSampler::play(SampleFrame* workingBuffer)
+void SfzPlayer::play(SampleFrame* workingBuffer)
 {
 	const f_cnt_t frames = Engine::audioEngine()->framesPerPeriod();
 
@@ -205,7 +205,7 @@ void SfzSampler::play(SampleFrame* workingBuffer)
 
 
 
-void SfzSampler::recalculateMaxActiveIndex()
+void SfzPlayer::recalculateMaxActiveIndex()
 {
 	// Loop backward from the old max active index to find the next play state which is active
 	while (m_maxActiveIndex > 0)
@@ -217,7 +217,7 @@ void SfzSampler::recalculateMaxActiveIndex()
 
 
 
-void SfzSampler::loadFile(const QString& filePath)
+void SfzPlayer::loadFile(const QString& filePath)
 {
 	loadSfzFile(filePath, true); // Passing true to reset the InstrumentTrack's midi CC knobs to the SFZ file's defaults
 	// Set the instrument name to the filename
@@ -225,7 +225,7 @@ void SfzSampler::loadFile(const QString& filePath)
 }
 
 
-void SfzSampler::loadSfzFile(const QString& filePath, const bool resetCCKnobs)
+void SfzPlayer::loadSfzFile(const QString& filePath, const bool resetCCKnobs)
 {
 	// If the sample loading thread is already running, don't let the user load another file.
 	if (m_currentlyLoadingSamples)
@@ -276,10 +276,10 @@ void SfzSampler::loadSfzFile(const QString& filePath, const bool resetCCKnobs)
 	// To prevent the main gui thread from freezing while all the samples are loaded, start up a separate thread to handle loading everything
 	m_currentlyLoadingSamples = true;
 	if (m_sampleLoadingThread.joinable()) { m_sampleLoadingThread.join(); } // Reset the previous thread if it is active
-	m_sampleLoadingThread = std::thread(&SfzSampler::sampleLoadingThreadFunction, this, parentDirectory);
+	m_sampleLoadingThread = std::thread(&SfzPlayer::sampleLoadingThreadFunction, this, parentDirectory);
 }
 
-void SfzSampler::sampleLoadingThreadFunction(const QDir& parentDirectory)
+void SfzPlayer::sampleLoadingThreadFunction(const QDir& parentDirectory)
 {
 	int i = 0;
 	for (auto* region : m_tempRegionManager->allRegions())
@@ -298,7 +298,7 @@ void SfzSampler::sampleLoadingThreadFunction(const QDir& parentDirectory)
 	m_currentlyLoadingSamples = false; // TODO this doesn't seem thread safe, since there would be a brief moment in time where this is false but the thread is still active?
 }
 
-void SfzSampler::audioThreadHandleNewSfzData()
+void SfzPlayer::audioThreadHandleNewSfzData()
 {
 	if (m_newSfzDataReady)
 	{
@@ -312,7 +312,7 @@ void SfzSampler::audioThreadHandleNewSfzData()
 	}
 }
 
-void SfzSampler::mainThreadUpdateAfterDataSwap()
+void SfzPlayer::mainThreadUpdateAfterDataSwap()
 {
 	if (m_justSwappedData && m_bufferCounter > m_bufferCounterWhenDataReady + 2)
 	{
@@ -337,12 +337,12 @@ void SfzSampler::mainThreadUpdateAfterDataSwap()
 }
 
 
-void SfzSampler::saveSettings(QDomDocument& document, QDomElement& element)
+void SfzPlayer::saveSettings(QDomDocument& document, QDomElement& element)
 {
 	element.setAttribute("sfzfile", m_sfzFilePath);
 }
 
-void SfzSampler::loadSettings(const QDomElement& element)
+void SfzPlayer::loadSettings(const QDomElement& element)
 {
 	m_sfzFilePath = element.attribute("sfzfile");
 	if (!m_sfzFilePath.isEmpty())
@@ -351,19 +351,19 @@ void SfzSampler::loadSettings(const QDomElement& element)
 	} // TODO add error handling, if path doesn't exist
 }
 
-QString SfzSampler::nodeName() const
+QString SfzPlayer::nodeName() const
 {
-	return sfzsampler_plugin_descriptor.name;
+	return sfzplayer_plugin_descriptor.name;
 }
 
-gui::PluginView* SfzSampler::instantiateView(QWidget* parent)
+gui::PluginView* SfzPlayer::instantiateView(QWidget* parent)
 {
-	return new gui::SfzSamplerView(this, parent);
+	return new gui::SfzPlayerView(this, parent);
 }
 
 
 
-void SfzSampler::setStatusInfo(const QString& text)
+void SfzPlayer::setStatusInfo(const QString& text)
 {
 	// Print to console
 	qDebug().noquote() << "[SFZ Player]" << text;

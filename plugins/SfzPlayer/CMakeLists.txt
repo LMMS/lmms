@@ -1,10 +1,10 @@
 include(BuildPlugin)
 
-build_plugin(sfzsampler
-	SfzSampler.cpp
-	SfzSampler.h
-	SfzSamplerView.cpp
-	SfzSamplerView.h
+build_plugin(sfzplayer
+	SfzPlayer.cpp
+	SfzPlayer.h
+	SfzPlayerView.cpp
+	SfzPlayerView.h
 	SfzOpcodes.cpp
 	SfzOpcodes.h
 	SfzOpcodeState.cpp
@@ -29,8 +29,8 @@ build_plugin(sfzsampler
 	SfzBasicWaves.cpp
 	SfzBasicWaves.h
 	MOCFILES
-	SfzSampler.h
-	SfzSamplerView.h
+	SfzPlayer.h
+	SfzPlayerView.h
 	SfzOpcodes.h
 	SfzOpcodeState.h
 	SfzRegion.h

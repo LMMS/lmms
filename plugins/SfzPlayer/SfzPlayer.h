@@ -1,5 +1,5 @@
 /*
- * SfzSampler.h - Simple SFZ instrument player
+ * SfzPlayer.h - Simple SFZ instrument player
  *
  * Copyright (c) 2026 Keratin
  *
@@ -22,15 +22,15 @@
  *
  */
 
-#ifndef LMMS_SFZSAMPLER_H
-#define LMMS_SFZSAMPLER_H
+#ifndef LMMS_SFZPLAYER_H
+#define LMMS_SFZPLAYER_H
 
 #include "AutomatableModel.h"
 #include "ComboBoxModel.h"
 #include "Instrument.h"
 #include "Note.h"
 #include "Sample.h"
-#include "SfzSamplerView.h"
+#include "SfzPlayerView.h"
 #include "SfzParser.h"
 #include "SfzRegion.h"
 #include "SfzRegionPlayState.h"
@@ -43,13 +43,13 @@
 
 namespace lmms {
 
-class SfzSampler : public Instrument
+class SfzPlayer : public Instrument
 {
 	Q_OBJECT
 
 public:
-	SfzSampler(InstrumentTrack* instrumentTrack);
-	~SfzSampler();
+	SfzPlayer(InstrumentTrack* instrumentTrack);
+	~SfzPlayer();
 
 	void playNote(NotePlayHandle* handle, SampleFrame* workingBuffer) override;
 	void deleteNotePluginData(NotePlayHandle* handle) override;
@@ -145,9 +145,9 @@ private:
 private slots:
 	void mainThreadUpdateAfterDataSwap();
 
-	friend class gui::SfzSamplerView;
+	friend class gui::SfzPlayerView;
 };
 
 } // namespace lmms
 
-#endif // LMMS_SFZSAMPLER_H
+#endif // LMMS_SFZPLAYER_H
