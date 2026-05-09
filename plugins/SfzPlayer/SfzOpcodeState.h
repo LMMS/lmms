@@ -36,7 +36,7 @@ namespace lmms
 class SfzOpcodeState
 {
 public:
-	SfzOpcodeState(); // We need a constructor to initialize things like m_hicc
+	SfzOpcodeState(); // We need a constructor to initialize things like m_hicc, also to handle special opcode exceptions/defaults
 
 	//! Given an opcode assignment such as `lokey=45`, passing "m_lokey" and "45" to this function
 	//! will take those values and figure out if "lokey" is a valid opcode, and whether "45" is a valid value for it.

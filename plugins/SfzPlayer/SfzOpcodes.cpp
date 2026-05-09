@@ -97,6 +97,18 @@ void ModulatableOpcode::parseFromString(const QString& opcodeName, const QString
 			value_oncc.at(ccNumberFromOpcode(opcodeName)) = opcodeValue.toFloat(successful);
 			*parsed = true;
 		}
+		else if (opcodeName.startsWith(alias + "_curvecc"))
+		{
+			value_curvecc.at(ccNumberFromOpcode(opcodeName)) = opcodeValue.toInt(successful);
+			*parsed = true;
+		}
+		else if (opcodeName.startsWith(alias + "_mod"))
+		{
+			*parsed = true;
+			if (opcodeValue == "add") { modulationType = ModulationType::Add; }
+			else if (opcodeValue == "mult") { modulationType = ModulationType::Mult; }
+			else { qDebug() << "[SFZ Parser] Warning: Unknown Modulation Type:" << opcodeValue; *successful = false; }
+		}
 	}
 }
 
@@ -106,11 +118,52 @@ void ModulatableOpcode::parseFromString(const QString& opcodeName, const QString
 // Instead, the current modulation value is only calculated and cached each time a midi CC event is sent, which saves a lot of compute.
 void ModulatableOpcode::updateCachedModulation(const std::array<int, NumMidiCCs>& ccValues)
 {
-	cachedModulation = 0.0f;
+	// Reset the modulation amount and recompute it
+	// Depending on the modulation type, the initial modulation should be 0 for addition (add nothing) or 1 for multiplication (multiply by identity).
+	switch (modulationType.value_or(ModulationType::Add))
+	{
+	case ModulationType::Add:
+		cachedModulation = 0.0f;
+		break;
+	case ModulationType::Mult:
+		cachedModulation = 1.0f;
+		break;
+	}
+
 	// TODO this may be optimized if we only loop through the CC's which are actually used by the region
 	for (int i = 0; i < NumMidiCCs; ++i)
 	{
-		cachedModulation += value_oncc.at(i) * ccValues.at(i) / 128.0f;
+		if (value_oncc.at(i) == 0.0f) { continue; } // Skip unused CC's. This helps with the multiply modulation type, since multiplying by the default 0 values would not be great.
+		float scaledModulationValue = 0.0f;
+		switch (value_curvecc.at(i).value_or(0))
+		{
+		case CurveType::Default:
+			scaledModulationValue = value_oncc.at(i) * (ccValues.at(i) / 127.0f);
+			break;
+		case CurveType::Bipolar:
+			scaledModulationValue = value_oncc.at(i) * (2.0f * ccValues.at(i) / 127.0f - 1.0f);
+			break;
+		case CurveType::Inverted:
+			scaledModulationValue = value_oncc.at(i) * (1.0f - ccValues.at(i) / 127.0f);
+			break;
+		case CurveType::BipolarInverted:
+			scaledModulationValue = value_oncc.at(i) * (1.0f - 2.0f * ccValues.at(i) / 127.0f);
+			break;
+		default:
+			// Unknown/custom curve type. These have not yet been implemented, so default to Default
+			scaledModulationValue = value_oncc.at(i) * ccValues.at(i) / 127.0f;
+			break;
+		}
+		// Depending on the modulation type, add or multiply the modulation value.
+		switch (modulationType.value_or(ModulationType::Add))
+		{
+		case ModulationType::Add:
+			cachedModulation += scaledModulationValue;
+			break;
+		case ModulationType::Mult:
+			cachedModulation *= scaledModulationValue / 100; // Divide by 100, since most SFZ's seem to use percents
+			break;
+		}
 	}
 }
 

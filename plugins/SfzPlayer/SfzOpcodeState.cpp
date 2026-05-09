@@ -33,6 +33,19 @@ SfzOpcodeState::SfzOpcodeState()
 {
 	// Certain arrays need to be initialized here in the constructor, since doing it in the header file is difficult
 	m_hicc.fill(127);
+
+	// There are some special exceptions with some opcodes which need to be handled separately
+	// For example, when modulation the `pan` with `pan_oncc10`, according to the SFZ website, the curve type should default to bipolar [-1 to 1], instead of [0 to 1]
+	// Actually nevermind, it seems like some SFZ's assume it is the default 0-1 curve? Whatever, it's fine
+	/*if (m_pan.value_curvecc.at(10) == std::nullopt)
+	{
+		m_pan.value_curvecc.at(10) = CurveType::Bipolar;
+	}*/
+	// Also, apparantly `amplitude` modulation type defaults to multiplication, not addition
+	if (m_amplitude.modulationType == std::nullopt)
+	{
+		m_amplitude.modulationType = ModulatableOpcode::ModulationType::Mult;
+	}
 }
 
 

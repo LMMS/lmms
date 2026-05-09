@@ -156,9 +156,15 @@ void SfzPlayer::processTrigger(const SfzTrigger& trigger)
 					break;
 				}
 			}
-			if (!foundOpenPosition) { qDebug() << "[SFZ Player] Could not find vacant position in m_voices buffer!"; }
 			// For fun, display the last played sample on the GUI
-			setStatusInfo("Last Played Sample: " + QFileInfo(region->m_sampleFile.value().value_or("N/A")).fileName());
+			if (foundOpenPosition)
+			{
+				setStatusInfo("Last Played Sample: " + QFileInfo(region->m_sampleFile.value().value_or("N/A")).fileName());
+			}
+			else
+			{
+				setStatusInfo("Warning: Too many active voices. Could not find vacant position buffer. ");
+			}
 		}
 	}
 

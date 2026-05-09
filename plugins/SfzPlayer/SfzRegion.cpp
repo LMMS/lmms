@@ -103,7 +103,7 @@ void SfzRegion::processTrigger(SfzGlobalState& globalState, const SfzTrigger& tr
 	// Before spawning a sound, do some pre-calculation of the midi CC modulation amounts so that we don't have to do it every buffer
 	if (trigger.type() == SfzTrigger::Type::ControlChange)
 	{
-		recalculateTotalCCModulation(globalState);
+		recalculateTotalCCModulation(globalState); // TODO this can be optimized, perhaps by storing the modulations only per-opcode, rather than per-region-per-opcide
 	}
 }
 

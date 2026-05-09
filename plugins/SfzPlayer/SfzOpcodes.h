@@ -98,19 +98,44 @@ using StringOpcode = Opcode<std::optional<QString>>;
 struct ModulatableOpcode : FloatOpcode
 {
 	std::array<float, NumMidiCCs> value_oncc = {};
+	//! Additionally, each modulation can be mapped with a curve, such as to go from 0 to 1, -1 to 1, something nonlinear, etc, so here's a helper enum for that
+	std::array<std::optional<int>, NumMidiCCs> value_curvecc = {}; // This uses std::optional because some opcode curves are meant to default to certain values, (pan_curvecc7 defaults to bipolar), so we need a way to tell if it was set or not.
+	//! Also, I never knew this, but apparantly some opcodes can have different modulation types set with opcode_mod=add or opcode_mod=mult, for whether to add the modulation or multiply by it https://sfzformat.com/opcodes/_mod/
+	enum class ModulationType
+	{
+		Add,
+		Mult
+	};
+	std::optional<ModulationType> modulationType; // Once again using std::optional since some opcodes have different defaults, and we need to know if it was intentionally set or not so that we don't override it.
 	//! Store the current total midi CC modulation amounts for the different targets, just so that we don't
 	// have to recalculate them every buffer, instead only when a trigger occurs.
 	float cachedModulation = 0.0f;
 
 	ModulatableOpcode(QString name = "", float defaultValue = 0.0f) : FloatOpcode(name, defaultValue) {};
 	ModulatableOpcode(std::vector<QString> names = {}, float defaultValue = 0.0f) : FloatOpcode(names, defaultValue) {};
-	//! Redefine the value() function to return the sum of the base opcode value and whatever the modulation is currently
-	const float value() const override { return m_value + cachedModulation; }
+	//! Redefine the value() function to return the sum of the base opcode value and whatever the modulation is currently. Or, if the modultion type if multiplication, multiply the two.
+	const float value() const override
+	{
+		return (modulationType.value_or(ModulationType::Add) == ModulationType::Add)
+			? m_value + cachedModulation
+			: m_value * cachedModulation;
+	}
 	//! Helper function for parsing these kinds of opcodes, where you have both `opcode` and `opcode_onccN` where N is the midi cc number, so
 	// that the code isn't duplicated for every modulatable parameter.
 	void parseFromString(const QString& opcodeName, const QString& opcodeValue, bool* parsed, bool* successful) override;
 	//! Helper function to update the cached CC modulation amount every time a midi Control Change trigger occurs
 	void updateCachedModulation(const std::array<int, NumMidiCCs>& ccValues);
+};
+// Helper class for curve types. This may have to be reworked when custom <curve> headers are added
+enum CurveType
+{
+	Default = 0, // 0 to 1
+	Bipolar = 1, // -1 to 1
+	Inverted = 2, // 1 to 0
+	BipolarInverted = 3, // 1 to -1
+	//Concave = 4, // TODO not implemented yet
+	//XfinPowerCurve = 5, // TODO not implemented yet
+	//XfoutPowerCurve = 6, // TODO not implemented yet
 };
 
 // Things like amplitude, pitch, and filter freq envelopes and lfo's all have very similar parameters, so it makes sense to put

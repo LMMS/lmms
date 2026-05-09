@@ -78,6 +78,8 @@ SfzPlayerView::SfzPlayerView(SfzPlayer* instrument, QWidget* parent)
 	connect(openFileButton, &PixmapButton::clicked, this, &SfzPlayerView::openFile);
 	layout1->addWidget(openFileButton);
 
+	layout1->addWidget(new QLabel("This SFZ Player is in beta! Not all opcodes are supported yet.", this));
+
 	layout1->addWidget(m_statusLabel);
 
 	layout1->addWidget(m_infoLabelsWidget);
