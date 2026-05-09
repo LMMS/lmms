@@ -29,6 +29,7 @@
 #include "AudioEngine.h"
 #include "Engine.h"
 #include "lmms_math.h"
+#include "MicroTimer.h"
 
 #include <QDebug>
 
@@ -208,6 +209,14 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const f_cnt_t frames)
 	// If the initial m_frameCount is negative, that means the note hasn't started yet
 	if (m_frameCount < -static_cast<int>(frames)) { m_frameCount += frames; return false; } // If the note doesn't start in this buffer, don't play anything
 
+	/*
+	static int totalMicroseconds = 0;
+	static int totalSquaredMicroseconds = 0;
+	static int totalCalls = 0;
+	static int minElapsed = 10000000;
+	static int maxElapsed = 0;
+	MicroTimer profiler;*/
+
 	// Helper variable
 	const float normalizedVelocity = m_trigger.velocity().value() / 127.0f;
 
@@ -313,11 +322,15 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const f_cnt_t frames)
 		m_active = false;
 	}
 
-	// If loop_mode is one_shot, no noteOff signal will ever come to release it, so we need to manually deactivate when we reach the end of the sample
-	if (m_region->m_loop_mode.value() == LoopMode::OneShot && m_sampleObject != nullptr && m_sampleFrame >= m_sampleObject->size())
+	// If the end of the sample is reached and the region's loop mode does not loop, deactivate this voice.
+	if ((m_region->m_loop_mode.value() == LoopMode::OneShot || m_region->m_loop_mode.value() == LoopMode::NoLoop) && m_sampleObject != nullptr && m_sampleFrame >= m_sampleObject->size())
 	{
 		m_active = false; // TODO should this forcefully decative or just release?
 	}
+
+	//int elapsed = profiler.elapsed(); totalMicroseconds += elapsed; totalSquaredMicroseconds += elapsed * elapsed; totalCalls++; minElapsed = std::min(minElapsed, elapsed); maxElapsed = std::max(maxElapsed, elapsed);
+	//float mean = 1.0f * totalMicroseconds / totalCalls, variance = (1.0f * totalSquaredMicroseconds - 1.0f * totalMicroseconds * totalMicroseconds / totalCalls / totalCalls) / totalCalls;
+	//qDebug() << "SfzRegionPlayState::play profiler:" << elapsed << "Min:" << minElapsed << "Max:" << maxElapsed << "Total calls" << totalCalls << "Mean:" << mean << "Stdev:" << std::sqrt(variance) << "Stdev of mean:" << sqrt(variance / totalCalls);
 
 	return true;
 }
