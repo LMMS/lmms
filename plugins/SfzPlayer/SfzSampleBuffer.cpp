@@ -30,7 +30,7 @@ namespace lmms
 
 
 SfzSampleBuffer::SfzSampleBuffer(const SampleFrame* data, const f_cnt_t size, const float sampleRate)
-	: m_data(std::shared_ptr<float[][NUM_CHANNELS]>{new float[size][NUM_CHANNELS]})
+	: m_data(new float[size * NUM_CHANNELS])
 	, m_size(size)
 	, m_sampleRate(sampleRate)
 {
@@ -38,9 +38,14 @@ SfzSampleBuffer::SfzSampleBuffer(const SampleFrame* data, const f_cnt_t size, co
 	{
 		for (size_t channel = 0; channel < NUM_CHANNELS; ++channel)
 		{
-			m_data[f][channel] = data[f][channel];
+			m_data[f * NUM_CHANNELS + channel] = data[f][channel];
 		}
 	}
+}
+
+SfzSampleBuffer::~SfzSampleBuffer()
+{
+	delete[] m_data;
 }
 
 
@@ -57,10 +62,10 @@ float SfzSampleBuffer::at(const float index, const size_t channel) const
 	f_cnt_t i2 = std::min(indexFloor + 1, m_size - 1);
 	f_cnt_t i3 = std::min(indexFloor + 2, m_size - 1);
 	
-	float v0 = m_data[i0][channel];
-	float v1 = m_data[i1][channel];
-	float v2 = m_data[i2][channel];
-	float v3 = m_data[i3][channel];
+	float v0 = m_data[NUM_CHANNELS * i0 + channel];
+	float v1 = m_data[NUM_CHANNELS * i1 + channel];
+	float v2 = m_data[NUM_CHANNELS * i2 + channel];
+	float v3 = m_data[NUM_CHANNELS * i3 + channel];
 
 	return hermiteInterpolate(v0, v1, v2, v3, frac);
 }

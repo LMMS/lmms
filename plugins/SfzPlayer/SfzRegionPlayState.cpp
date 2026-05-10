@@ -215,7 +215,8 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const f_cnt_t frames)
 	static int totalCalls = 0;
 	static int minElapsed = 10000000;
 	static int maxElapsed = 0;
-	MicroTimer profiler;*/
+	MicroTimer profiler;
+	*/
 
 	// Helper variable
 	const float normalizedVelocity = m_trigger.velocity().value() / 127.0f;
@@ -271,7 +272,9 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const f_cnt_t frames)
 		const float amplfo = amplfoDepth != 0.0f // Only compute the amplitude lfo if the depth is nonzero
 			? dbfsToAmp(lfoGenerator(amplfoDelayFrames, amplfoFadeFrames, amplfoFreq) * amplfoDepth) // amplfo depth is in decibels, so convert to amplitude
 			: 1.0f;
-		const float pitcheg = envelopeGenerator(pitchegDelayFrames, pitchegAttackFrames, pitchegHoldFrames, pitchegDecayFrames, pitchegSustain, pitchegReleaseFrames) * pitchegDepth;
+		const float pitcheg = pitchegDepth != 0.0f // Only compute the pitch envelope if the depth is nonzero
+			? envelopeGenerator(pitchegDelayFrames, pitchegAttackFrames, pitchegHoldFrames, pitchegDecayFrames, pitchegSustain, pitchegReleaseFrames) * pitchegDepth
+			: 0.0f;
 		const float pitchlfo = pitchlfoDepth != 0.0f // Only compute the pitch lfo if the depth is nonzero
 			? lfoGenerator(pitchlfoDelayFrames, pitchlfoFadeFrames, pitchlfoFreq) * pitchlfoDepth
 			: 0.0f;

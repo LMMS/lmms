@@ -36,13 +36,13 @@ namespace lmms
 class SfzSamplePool
 {
 public:
-	std::shared_ptr<const SfzSampleBuffer> loadSample(const QString& path);
+	const SfzSampleBuffer* loadSample(const QString& path);
 
 	//! Returns the number of samples currently loaded in the pool
 	const int sampleCount() const { return m_samplePool.size(); }
 
 private:
-	std::map<QString, std::shared_ptr<SfzSampleBuffer>> m_samplePool;
+	std::map<QString, std::unique_ptr<SfzSampleBuffer>> m_samplePool;
 };
 
 } // namespace lmms

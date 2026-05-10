@@ -104,8 +104,8 @@ private:
 	//! The region this sound originated from
 	const SfzRegion* m_region = nullptr;
 
-	//! A shared pointer to the sample object of the parent region
-	std::shared_ptr<const SfzSampleBuffer> m_sampleObject = nullptr;
+	//! The sample object of the parent region
+	const SfzSampleBuffer* m_sampleObject = nullptr;
 };
 
 
