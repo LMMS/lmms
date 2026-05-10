@@ -82,6 +82,11 @@ SfzPlayer::~SfzPlayer()
 {
 	// Make sure to end the sample loading thread before the plugin exits, or else the program might forcefully terminate
 	if (m_sampleLoadingThread.joinable()) { m_sampleLoadingThread.join(); }
+
+	if (m_regionManager != nullptr) { delete m_regionManager; } // these may be nullptr at first when no SFZ file has been loaded previously
+	if (m_samplePool != nullptr) { delete m_samplePool; }
+	if (m_tempRegionManager != nullptr) { delete m_tempRegionManager; }
+	if (m_tempSamplePool != nullptr) { delete m_tempSamplePool; }
 }
 
 
@@ -324,8 +329,8 @@ void SfzPlayer::mainThreadUpdateAfterDataSwap()
 	{
 		m_justSwappedData = false;
 		// Now that the audio thread has swapped the data, delete the old sample pool and region manager pointers
-		if (m_tempRegionManager != nullptr) { delete m_tempRegionManager; } // these may be nullptr at first when no SFZ file has been loaded previously
-		if (m_tempSamplePool != nullptr) { delete m_tempSamplePool; }
+		if (m_tempRegionManager != nullptr) { delete m_tempRegionManager; m_tempRegionManager = nullptr; } // these may be nullptr at first when no SFZ file has been loaded previously
+		if (m_tempSamplePool != nullptr) { delete m_tempSamplePool; m_tempSamplePool = nullptr; }
 		// Also set the midi CC knobs to match the defaults, or whatever the current InstrumentTrack midi CC knobs are
 		for (int i = 0; i < NumMidiCCs; ++i)
 		{
