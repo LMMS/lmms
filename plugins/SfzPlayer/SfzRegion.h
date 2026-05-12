@@ -50,9 +50,6 @@ public:
 	//! TODO this method also increments the round robin counter, if applicable. Ideally I feel like this method should be const, but I'm not sure how to best organize it.
 	bool triggerConditionsMet(const SfzGlobalState& globalState, const SfzTrigger& trigger);
 
-	//! Updates cached CC modulations, and helps update keyswitch states
-	void processTrigger(SfzGlobalState& globalState, const SfzTrigger& trigger);
-
 	//! Load the sample file given by the `sample` opcode into m_sample.
 	//! The sample path is treated as relative to the path to the sfz file, so the parent directory is also needed
 	//! Returns true if successful

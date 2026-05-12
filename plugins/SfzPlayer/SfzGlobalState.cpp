@@ -38,44 +38,41 @@ void SfzGlobalState::processTrigger(const SfzTrigger& trigger)
 	}
 	else if (trigger.type() == SfzTrigger::Type::NoteOn)
 	{
-		m_activeKeys.at(trigger.key().value()) = true;
-		m_keyPressCounter++;
-		m_lastPlayedKeys.at(trigger.key().value()) = m_keyPressCounter;
+		if (m_lastPlayedSwitchKeys.contains(trigger.key().value()))
+		{
+			m_switchKeyPressCounter++;
+			m_lastPlayedSwitchKeys.at(trigger.key().value()) = m_switchKeyPressCounter;
+			m_pressedSwitchKeys.at(trigger.key().value()) = true;
+			m_lastPlayedSwitchKey = trigger.key().value();
+		}
 	}
 	else if (trigger.type() == SfzTrigger::Type::NoteOff)
 	{
-		m_activeKeys.at(trigger.key().value()) = false;
+		if (m_lastPlayedSwitchKeys.contains(trigger.key().value()))
+		{
+			m_pressedSwitchKeys.at(trigger.key().value()) = false;
+		}
 	}
 	// Update the current random value
 	m_rand = fastRand(1.0f);
 }
 
-void SfzGlobalState::switchKeyPressed(const int key)
+std::optional<int> SfzGlobalState::lastSwitchKeyPressedInRange(int lowKey, int highKey, const std::optional<int> defaultKey) const
 {
-	// Assuming the m_keyPressCounter was already updated in processTrigger
-	m_lastPlayedSwitchKeys.at(key) = m_keyPressCounter;
-}
-
-std::optional<int> SfzGlobalState::lastKeyPressedInRange(int lowKey, int highKey, const std::optional<int> defaultKey, bool switchKeysOnly) const
-{
-	auto& lastKeyPressArray = switchKeysOnly ? m_lastPlayedSwitchKeys : m_lastPlayedKeys;
-	// Some SFZs pass -1 as the lokey, so make sure to clamp it into the range 0-127 before accessing the array to prevent out of range errors
-	lowKey = std::max(lowKey, 0);
-	highKey = std::min(highKey, 127);
-	// If the range is invalid, return the default key.
-	if (lowKey > highKey) { return defaultKey; }
-
+	// The range might only include some of the switch keys
+	// If the last played switch key happens to fall in the range, that's awesome!
+	if (m_lastPlayedSwitchKey >= lowKey && m_lastPlayedSwitchKey <= highKey) { return m_lastPlayedSwitchKey; }
+	// Otherwise, we need to loop over the list of when each switch key was played and figure out which one was last played
 	std::optional<int> lastPlayedKey = std::nullopt;
 	std::optional<int> bestScore = std::nullopt;
-
-	for (int key = lowKey; key <= highKey; ++key)
+	for (const auto& [key, counter] : m_lastPlayedSwitchKeys)
 	{
-		if (lastKeyPressArray.at(key) == std::nullopt) { continue; } // This key has not been played yet
-	
-		if (bestScore == std::nullopt || lastKeyPressArray.at(key) > bestScore)
+		if (counter == std::nullopt) { continue; } // This key has not been played yet
+
+		if (bestScore == std::nullopt || counter > bestScore)
 		{
 			lastPlayedKey = key;
-			bestScore = lastKeyPressArray.at(key);
+			bestScore = counter;
 		}
 	}
 	// If no keys in the region have been played yet, return the default key
@@ -84,11 +81,20 @@ std::optional<int> SfzGlobalState::lastKeyPressedInRange(int lowKey, int highKey
 }
 
 
-void SfzGlobalState::initializeMidiCCValues(const SfzOpcodeState& controlsConfig)
+void SfzGlobalState::initializeMidiCCValues(const SfzControlsConfig& controlsConfig)
 {
 	for (int i = 0; i < NumMidiCCs; ++i)
 	{
 		m_ccValues.at(i) = controlsConfig.m_set_cc.at(i);
+	}
+}
+
+void SfzGlobalState::initializeSwitchKeysMap(const SfzControlsConfig& controlsConfig)
+{
+	for (const auto& [key, info] : controlsConfig.m_switchKeyInfo)
+	{
+		m_lastPlayedSwitchKeys[key] = std::nullopt;
+		m_pressedSwitchKeys[key] = false;
 	}
 }
 

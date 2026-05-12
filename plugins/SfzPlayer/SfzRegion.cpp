@@ -67,9 +67,8 @@ bool SfzRegion::triggerConditionsMet(const SfzGlobalState& globalState, const Sf
 		if (triggerVelocity > m_hivel.value() || triggerVelocity < m_lovel.value()) { return false; }
 
 		// If a keyswitch range was defined, ensure the last pressed valid switch key in that range matches the specified keyswitch for this region
-		// The argument `true` at the end signifies that only switch keys will be considered
 		// TODO add unit tests
-		if (m_sw_last.value() != std::nullopt && globalState.lastKeyPressedInRange(m_sw_lokey.value(), m_sw_hikey.value(), m_sw_default.value(), true) != m_sw_last.value()) { return false; }
+		if (m_sw_last.value() != std::nullopt && globalState.lastSwitchKeyPressedInRange(m_sw_lokey.value(), m_sw_hikey.value(), m_sw_default.value()) != m_sw_last.value()) { return false; }
 	}
 
 	// If the region uses lorand/hirand, the current random value stored in the global state (updated every trigger) is compared with the range
@@ -92,20 +91,6 @@ bool SfzRegion::triggerConditionsMet(const SfzGlobalState& globalState, const Sf
 	return true;
 }
 
-void SfzRegion::processTrigger(SfzGlobalState& globalState, const SfzTrigger& trigger)
-{
-	// Notify the global state whether a switch key has been pressed, so that it can correctly track when `sw_last` is met
-	if (trigger.type() == SfzTrigger::Type::NoteOn && m_sw_last.value() != std::nullopt && m_sw_last.value() == trigger.key().value())
-	{
-		globalState.switchKeyPressed(trigger.key().value()); // TODO this can probably be moved somewhere else so that it isn't done for every region (if you have 10000+ regions, it needs to be optimized)
-	}
-
-	// Before spawning a sound, do some pre-calculation of the midi CC modulation amounts so that we don't have to do it every buffer
-	if (trigger.type() == SfzTrigger::Type::ControlChange)
-	{
-		recalculateTotalCCModulation(globalState); // TODO this can be optimized, perhaps by storing the modulations only per-opcode, rather than per-region-per-opcide
-	}
-}
 
 void SfzRegion::recalculateTotalCCModulation(const SfzGlobalState& globalState)
 {

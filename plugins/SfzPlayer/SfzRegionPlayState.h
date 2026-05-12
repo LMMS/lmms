@@ -28,6 +28,7 @@
 
 #include "SampleFrame.h"
 #include "SfzTrigger.h"
+#include "SfzGlobalState.h"
 #include "SfzOpcodeState.h"
 #include "SfzSampleBuffer.h"
 
@@ -44,7 +45,8 @@ class SfzRegion;
 class SfzRegionPlayState
 {
 public:
-	SfzRegionPlayState(const SfzRegion* region, const SfzTrigger& trigger);
+	// I wish `region` could be const, but it's faster to have the voice update the region's cached modulation values than looping over all the regions elsewhere in the plugin, so for now it will have to be non-const.
+	SfzRegionPlayState(SfzRegion* region, const SfzTrigger& trigger, const SfzGlobalState& globalState);
 	SfzRegionPlayState() = default; // The default constructor is needed to initialize arrays of the object
 
 	//! Helper function to calculate the base pitch and amplitude so that it doesn't have to be done per-buffer.
@@ -57,7 +59,8 @@ public:
 	bool play(SampleFrame* buffer, const f_cnt_t frames);
 
 	//! Handle incoming event to decide whether to deactivate/release
-	void processTrigger(const SfzTrigger& trigger);
+	//! Also handles updating the parent region's precomputed modulation values whenever a midi CC event occurs
+	void processTrigger(const SfzTrigger& trigger, SfzGlobalState& globalState);
 
 	//! Returns whether this voice is done playing or not. If m_active is false, this voice object is avaiable to be overwritten and used as a new voice.
 	bool active() const { return m_active; }
@@ -102,7 +105,7 @@ private:
 	SfzTrigger m_trigger;
 	
 	//! The region this sound originated from
-	const SfzRegion* m_region = nullptr;
+	SfzRegion* m_region = nullptr;
 
 	//! The sample object of the parent region
 	const SfzSampleBuffer* m_sampleObject = nullptr;

@@ -88,7 +88,7 @@ private:
 	void recalculateMaxActiveIndex();
 
 	//! So that the regions don't accidentally load the same sample multiple times, we store all the sames in one place and the regions ask it to load each sample/retrieve a pointer if it's already been loaded
-	SfzSamplePool* m_samplePool = nullptr;
+	SfzSamplePool* m_samplePool = nullptr; // TODO use unique pointer or something
 
 	//! Holds information about the total number of notes active, last switch keys pressed, etc
 	SfzGlobalState m_sfzGlobalState;

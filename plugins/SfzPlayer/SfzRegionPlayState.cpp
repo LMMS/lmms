@@ -36,7 +36,7 @@
 namespace lmms
 {
 
-SfzRegionPlayState::SfzRegionPlayState(const SfzRegion* region, const SfzTrigger& trigger)
+SfzRegionPlayState::SfzRegionPlayState(SfzRegion* region, const SfzTrigger& trigger, const SfzGlobalState& globalState)
 	: m_active(true)
 	, m_lmmsSampleRate(Engine::audioEngine()->outputSampleRate())
 	, m_filter(m_lmmsSampleRate)
@@ -44,6 +44,8 @@ SfzRegionPlayState::SfzRegionPlayState(const SfzRegion* region, const SfzTrigger
 	, m_region(region)
 	, m_sampleObject(region->sample())
 {
+	// Make sure the parent region's modulations are up to date
+	m_region->recalculateTotalCCModulation(globalState);
 	// Calculate the base pitch and amplitude so that we don't need to every buffer
 	precomputeBaseValues();
 	// Delay the start of the playback by the trigger offset
@@ -339,7 +341,7 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const f_cnt_t frames)
 }
 
 
-void SfzRegionPlayState::processTrigger(const SfzTrigger& trigger)
+void SfzRegionPlayState::processTrigger(const SfzTrigger& trigger, SfzGlobalState& globalState)
 {
 	if (m_released) { return; } // If we already released, don't do anything
 
@@ -357,6 +359,7 @@ void SfzRegionPlayState::processTrigger(const SfzTrigger& trigger)
 	// For simplicity, if any CC trigger occurs, recompute everything
 	if (trigger.type() == SfzTrigger::Type::ControlChange)
 	{
+		m_region->recalculateTotalCCModulation(globalState);
 		precomputeBaseValues();
 	}
 }

@@ -131,16 +131,8 @@ void SfzPlayer::processTrigger(const SfzTrigger& trigger)
 {
 	if (m_regionManager == nullptr) { return; } // Before any SFZ file is loaded, m_regionManager is nullptr, so there's no regions to trigger.
 
-	// Notify the global state to update which keys are active, update midi CC values, etc
+	// Notify the global state to update which switch keys are active, update midi CC values, etc
 	m_sfzGlobalState.processTrigger(trigger);
-
-	// Loop through all the regions to check if a new note should be played
-	// TODO can we get rid of this loop
-	for (auto* region : m_regionManager->allRegions())
-	{
-		// Notify the region of the event so that it can update cached CC modulations, keyswitch states, etc
-		region->processTrigger(m_sfzGlobalState, trigger);
-	}
 	
 	for (auto* region : m_regionManager->findPotentialMatchingRegions(trigger))
 	{
@@ -154,7 +146,7 @@ void SfzPlayer::processTrigger(const SfzTrigger& trigger)
 				auto& regionPlayState = m_voices[i];
 				if (!regionPlayState.active())
 				{
-					regionPlayState = SfzRegionPlayState(region, trigger);
+					regionPlayState = SfzRegionPlayState(region, trigger, m_sfzGlobalState);
 					// If this new index is above the current max active index, update it
 					m_maxActiveIndex = std::max(m_maxActiveIndex, i);
 					foundOpenPosition = true;
@@ -180,7 +172,7 @@ void SfzPlayer::processTrigger(const SfzTrigger& trigger)
 
 		if (regionPlayState.active())
 		{
-			regionPlayState.processTrigger(trigger);
+			regionPlayState.processTrigger(trigger, m_sfzGlobalState);
 			// If this was the max active index and the trigger caused it to deactivate, figure out what the next active index is
 			if (!regionPlayState.active() && i == m_maxActiveIndex) { recalculateMaxActiveIndex(); }
 		}
@@ -269,6 +261,8 @@ void SfzPlayer::loadSfzFile(const QString& filePath, const bool resetCCKnobs)
 
 	// Set the initial cc values based on any `set_ccN` opcodes in the <control> header
 	m_sfzGlobalState.initializeMidiCCValues(m_controlsConfig);
+	// Setup a map for keeping track of which switch keys may be pressed. This is more efficient than having array with 128 element, since that takes much longer to loop over, and most keys are not switch keys
+	m_sfzGlobalState.initializeSwitchKeysMap(m_controlsConfig);
 
 	m_sfzFilePath = filePath;
 
