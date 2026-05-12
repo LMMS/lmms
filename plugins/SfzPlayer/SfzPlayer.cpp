@@ -352,7 +352,7 @@ void SfzPlayer::loadSettings(const QDomElement& element)
 	m_sfzFilePath = element.attribute("sfzfile");
 	if (!m_sfzFilePath.isEmpty())
 	{
-		loadSfzFile(m_sfzFilePath, true); // Passing false to leave the user-set midi CC knobs alone, since they were loaded by the InstrumentTrack and shouldn't be reset to the SFZ's defaults.
+		loadSfzFile(m_sfzFilePath, false); // Passing false to leave the user-set midi CC knobs alone, since they were loaded by the InstrumentTrack and shouldn't be reset to the SFZ's defaults.
 	} // TODO add error handling, if path doesn't exist
 }
 
