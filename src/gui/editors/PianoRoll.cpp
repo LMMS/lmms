@@ -3762,7 +3762,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			int pos_ticks = note->pos();
 			int note_width = len_ticks * m_ppb / TimePos::ticksPerBar();
 
-			int detuningLength = !note->detuning()->automationClip()->getTimeMap().isEmpty()
+			int detuningLength = note->detuning() != nullptr && !note->detuning()->automationClip()->getTimeMap().isEmpty()
 				? note->detuning()->automationClip()->getTimeMap().lastKey() * m_ppb / TimePos::ticksPerBar()
 				: note_width;
 
