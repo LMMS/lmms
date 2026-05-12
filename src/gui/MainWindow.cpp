@@ -1267,8 +1267,8 @@ bool MainWindow::eventFilter(QObject* watched, QEvent* event)
 			auto* fe = dynamic_cast<QFocusEvent*>(event);
 			switch (fe->reason())
 			{
-			case Qt::ActiveWindowFocusReason:
-			case Qt::PopupFocusReason:
+			case Qt::ActiveWindowFocusReason: [[fallthrough]];
+			case Qt::PopupFocusReason: [[fallthrough]];
 			case Qt::OtherFocusReason:
 				return true;
 			default:
