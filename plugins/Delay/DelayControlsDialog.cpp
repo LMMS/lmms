@@ -52,8 +52,9 @@ DelayControlsDialog::DelayControlsDialog( DelayControls *controls ) :
 
 	auto feedbackKnob = new VolumeKnob(KnobType::Bright26, tr("FDBK"), this, Knob::LabelRendering::LegacyFixedFontSize);
 	feedbackKnob->move( 11, 58 );
+	feedbackKnob->setZeroDbfsPoint(1.f);
 	feedbackKnob->setModel( &controls->m_feedbackModel);
-	feedbackKnob->setDescription(tr("Feedback amount:"));
+	feedbackKnob->setHintText(tr("Feedback amount:"), "");
 
 	auto lfoFreqKnob = new TempoSyncKnob(KnobType::Bright26, tr("RATE"), this, Knob::LabelRendering::LegacyFixedFontSize);
 	lfoFreqKnob->move( 11, 119 );

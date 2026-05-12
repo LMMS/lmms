@@ -554,7 +554,8 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 		auto vk = new VolumeKnob(KnobType::Styled, this);
 		vk->setFixedSize( 28, 35 );
 		vk->move( 6, knob_y );
-		vk->setDescription(tr("Osc %1 volume:").arg(i + 1));
+		vk->setHintText( tr( "Osc %1 volume:" ).arg(
+							 i+1 ), "%" );
 
 		// setup panning-knob
 		Knob * pk = new TripleOscKnob( this );

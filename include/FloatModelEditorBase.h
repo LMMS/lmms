@@ -148,6 +148,15 @@ protected:
 		return getDynamicFloatingText();
 	}
 
+	/**
+	 * @returns formatted floating text given dynamic text
+	 *          from @a getDynamicFloatingText() or @a getDynamicFloatingTextUpdate()
+	 *
+	 * The default format is:
+	 *     "[description] [dynamic text][unit]"
+	 */
+	virtual QString formatFloatingText(const QString& dynamicText) const;
+
 	void doConnections() override;
 
 	void showTextFloat(int msecBeforeDisplay, int msecDisplayTime, bool forceTextUpdate = false);

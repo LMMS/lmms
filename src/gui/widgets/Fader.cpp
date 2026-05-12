@@ -88,7 +88,7 @@ Fader::Fader(FloatModel* model, const QString& name, QWidget* parent, bool model
 	resize(minimumSize);
 	setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 	setModel(model);
-	setDescription(tr("Volume:"));
+	setHintText(tr("Volume:"), "%");
 
 	m_conversionFactor = 100.0;
 

@@ -236,34 +236,43 @@ private:
 };
 
 
+/**
+ * Volume knob specialization
+ *
+ * Notes:
+ * - The units displayed in the tooltip and the @a enterValue() dialog box are hardcoded to dBFS,
+ *   but units shown in the context menu must be set via @a setUnit(). Usually this should be "%".
+ * - The model is expected to be linearly scaled. (?)
+ * - The model's value of 0 must mean -inf dBFS and the
+ *   value @a zeroDbfsPoint() (whose default is 100) must mean 0 dBFS.
+ * - Models with both positive and negative values are allowed. A negative value is assumed to have
+ *   the same effect as its corresponding positive value, but with inverted phase.
+ *   See Flanger's feedback knob for an example.
+ */
 class LMMS_EXPORT VolumeKnob : public Knob
 {
 	Q_OBJECT
 
-	mapPropertyFromModel(float, volumeRatio, setVolumeRatio, m_volumeRatio);
-
 public:
-	VolumeKnob(const VolumeKnob&) = delete;
-	VolumeKnob(const Knob&) = delete;
-	VolumeKnob(VolumeKnob&&) = delete;
-	VolumeKnob(Knob&&) = delete;
+	using Knob::Knob;
 
-	template<typename... Args>
-	VolumeKnob(Args&&... args)
-		: Knob{std::forward<Args>(args)...}
+	void setModel(Model* model, bool isOldModelValid = true) override;
+
+	//! The value where the volume model is at 0 dBFS (default is 100)
+	auto zeroDbfsPoint() const -> float { return m_zeroDbfsPoint; }
+	void setZeroDbfsPoint(float zeroDbfsPoint)
 	{
-		AutomatableModelView::setUnit(" dBFS");
+		assert(zeroDbfsPoint > 0);
+		m_zeroDbfsPoint = zeroDbfsPoint;
 	}
-
-	//! Volume knobs are always dBFS
-	void setUnit(const QString& unit) override {}
 
 protected:
 	QString getDynamicFloatingText() override;
+	QString formatFloatingText(const QString& dynamicText) const;
 	void enterValue() override;
 
 private:
-	FloatModel m_volumeRatio{100.f, 0.f, 1000000.f};
+	float m_zeroDbfsPoint = 100.f;
 };
 
 

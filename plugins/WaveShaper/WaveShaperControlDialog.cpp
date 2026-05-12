@@ -61,16 +61,16 @@ WaveShaperControlDialog::WaveShaperControlDialog(
 	waveGraph -> setMaximumSize( 204, 205 );
 
 	auto inputKnob = new VolumeKnob(KnobType::Bright26, tr("INPUT"), SMALL_FONT_SIZE, this);
-	inputKnob->setVolumeRatio(1.0);
+	inputKnob->setZeroDbfsPoint(1.f);
 	inputKnob -> move( 26, 225 );
 	inputKnob->setModel( &_controls->m_inputModel );
-	inputKnob->setDescription(tr("Input gain:"));
+	inputKnob->setHintText( tr( "Input gain:" ) , "" );
 
 	auto outputKnob = new VolumeKnob(KnobType::Bright26, tr("OUTPUT"), SMALL_FONT_SIZE, this);
-	outputKnob->setVolumeRatio(1.0);
+	outputKnob->setZeroDbfsPoint(1.f);
 	outputKnob -> move( 76, 225 );
 	outputKnob->setModel( &_controls->m_outputModel );
-	outputKnob->setDescription(tr("Output gain:"));
+	outputKnob->setHintText( tr( "Output gain:" ), "" );
 
 	auto resetButton = new PixmapButton(this, tr("Reset wavegraph"));
 	resetButton -> move( 162, 221 );
