@@ -26,6 +26,7 @@
 
 #include <QDebug>
 #include <QRegularExpression>
+#include <cmath>
 
 namespace lmms
 {
@@ -298,11 +299,17 @@ int ccNumberFromOpcode(const QString& opcode)
 int stringToKeyNum(QString keyString, bool* successful)
 {
 	keyString = keyString.toLower();
-	// The last character is the octave number
-	int octave = QString(keyString.back()).toInt(successful);
-	if (!*successful) {qDebug() << "[SFZ Parser] Unable to parse key string, Invalid octave number:" << keyString; return -1; }
-	// The remaining characters at the start define the key
-	QString key = keyString.chopped(1);
+	// Match for a number at the end (potentially including a "-" at the start)
+	QRegularExpression octaveRE("(-)?\\d+$");
+	QRegularExpressionMatch octaveMatch = octaveRE.match(keyString);
+	if (!octaveMatch.hasMatch()) { qDebug() << "[SFZ Parser] Unable to parse octave from key string:" << keyString; return -1; }
+	int octave = octaveMatch.captured(0).toInt(successful);
+	// Match for the letters at the start (including #)
+	QRegularExpression keyRE("^[a-zA-Z#]+");
+	QRegularExpressionMatch keyMatch = keyRE.match(keyString);
+	if (!keyMatch.hasMatch()) { qDebug() << "[SFZ Parser] Unable to parse key from key string:" << keyString; return -1; }
+	QString key = keyMatch.captured(0);
+
 	int keyOffset = 0;
 
 	if (key == "c") { keyOffset = 0; } // C is 0 since that's where the octaves change
@@ -331,7 +338,7 @@ int stringToKeyNum(QString keyString, bool* successful)
 
 QString keyNumToString(int keyNum)
 {
-	QString octave = QString::number((keyNum - 24) / 12 + 1);
+	QString octave = QString::number(std::floor(static_cast<float>(keyNum - 24) / 12) + 1);
 	QString key = "";
 	switch (keyNum % 12)
 	{
