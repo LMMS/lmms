@@ -1924,7 +1924,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 				}
 
 				// clicked at the "tail" of the note?
-				if( pos_ticks * m_ppb / TimePos::ticksPerBar() >
+				if(x + m_currentPosition * m_ppb / TimePos::ticksPerBar() >
 						m_currentNote->endPos() * m_ppb / TimePos::ticksPerBar() - resizeGripWidth(m_currentNote->length())
 					&& m_currentNote->length() > 0 )
 				{
