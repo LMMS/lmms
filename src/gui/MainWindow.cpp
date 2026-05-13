@@ -88,6 +88,7 @@ MainWindow::MainWindow() :
 	m_session( SessionState::Normal )
 {
 	setAttribute( Qt::WA_DeleteOnClose );
+	setAttribute(Qt::WA_TranslucentBackground);
 
 	auto main_widget = new QWidget(this);
 	auto vbox = new QVBoxLayout(main_widget);
@@ -547,6 +548,7 @@ SubWindow* MainWindow::addWindowedWidget(QWidget *w, Qt::WindowFlags windowFlags
 	{
 		// TODO: somehow make this work on any setWidget
 		connect(w, &QWidget::destroyed, win, &SubWindow::deleteLater);
+		w->setAttribute(Qt::WA_TranslucentBackground);
 
 		if (w->sizeHint().isValid())
 		{
