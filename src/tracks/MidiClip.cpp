@@ -114,7 +114,7 @@ void MidiClip::init()
 {
 	connect(Engine::getSong(), &Song::timeSignatureChanged, this, &MidiClip::changeTimeSignature);
 	if (getTrack()->trackContainer() != Engine::patternStore())
-	{	
+	{
 		saveJournallingState(false);
 		updateLength();
 		restoreJournallingState();
