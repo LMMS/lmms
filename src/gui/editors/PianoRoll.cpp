@@ -109,7 +109,7 @@ const int PR_RIGHT_MARGIN = SCROLLBAR_SIZE;
 //! Width of area used for resizing (the grip at the end of a note)
 const int RESIZE_GRIP_WIDTH = 9;
 //! The maximum fraction of the note width that the resize grip is allowed to take up
-const float RESIZE_GRIP_MAX_WIDTH_FRACTION = 0.1;
+const float RESIZE_GRIP_MAX_WIDTH_FRACTION = 0.25;
 
 // width of line for setting volume/panning of note
 const int NOTE_EDIT_LINE_WIDTH = 3;
