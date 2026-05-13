@@ -371,6 +371,9 @@ private:
 	static const std::vector<float> m_zoomLevels;
 	static const std::vector<float> m_zoomYLevels;
 
+	//! Returns the width of the resize area in pixels. When zoomed in, this is a constant pixel value, but when zoomed far out, it is a fraction of the note width, to make it easier to move short notes.
+	int resizeGripWidth(tick_t noteLength) const;
+
 	MidiClip* m_midiClip;
 	NoteVector m_ghostNotes;
 
