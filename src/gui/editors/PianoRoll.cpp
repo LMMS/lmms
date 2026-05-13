@@ -1488,6 +1488,7 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 
 		case Qt::Key_Home:
 			m_timeLine->timeline()->setTicks(0);
+			Engine::getSong()->setPlayPos(0, Song::PlayMode::None);
 			ke->accept();
 			break;
 
@@ -3762,7 +3763,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			int pos_ticks = note->pos();
 			int note_width = len_ticks * m_ppb / TimePos::ticksPerBar();
 
-			int detuningLength = !note->detuning()->automationClip()->getTimeMap().isEmpty()
+			int detuningLength = note->detuning() != nullptr && !note->detuning()->automationClip()->getTimeMap().isEmpty()
 				? note->detuning()->automationClip()->getTimeMap().lastKey() * m_ppb / TimePos::ticksPerBar()
 				: note_width;
 
