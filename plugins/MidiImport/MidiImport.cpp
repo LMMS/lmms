@@ -405,7 +405,9 @@ bool MidiImport::readSMF(TrackContainer* tc)
 			}
 			else if (evt->is_note())
 			{
-				smfMidiChannel* ch = chs[evt->chan].create(tc, trackName);
+				// LMMS does not currently support specifying the channel of a single note
+				// To be safe, put the notes from different channels on separate tracks so that no information is lost
+				smfMidiChannel* ch = chs[evt->chan + 16 * t].create(tc, trackName);
 				auto noteEvt = dynamic_cast<Alg_note_ptr>(evt);
 				tick_t ticks = noteEvt->get_duration() * ticksPerBeat;
 				Note n(
@@ -419,7 +421,7 @@ bool MidiImport::readSMF(TrackContainer* tc)
 			}
 			else if (evt->is_update())
 			{
-				smfMidiChannel* ch = chs[evt->chan].create(tc, trackName);
+				smfMidiChannel* ch = chs[evt->chan + 16 * t].create(tc, trackName);
 
 				double time = evt->time*ticksPerBeat;
 				QString update(evt->get_attribute());
@@ -457,31 +459,36 @@ bool MidiImport::readSMF(TrackContainer* tc)
 					if (ccid <= 128)
 					{
 						double cc = evt->get_real_value();
-						AutomatableModel* objModel = nullptr;
+						// By default, set the knob in the CC rack of the instrument track
+						AutomatableModel* ccModel = (ccid >= 0 && ccid < 128)
+							? ch->it->midiCCModel(ccid)
+							: nullptr;
+						// Some CC knobs correspond to specific things like pitch and volume, so in that case, also set the lmms pitch/volume/etc knobs.
+						AutomatableModel* lmmsSpecificModel = nullptr;
 
 						switch (ccid)
 						{
 							case 0:
 								if (ch->isSF2 && ch->it_inst)
 								{
-									objModel = ch->it_inst->childModel("bank");
+									lmmsSpecificModel = ch->it_inst->childModel("bank");
 									printf("BANK SELECT %f %d\n", cc, static_cast<int>(cc * 127));
 									cc *= 127.0f;
 								}
 								break;
 
 							case 7:
-								objModel = ch->it->volumeModel();
+								lmmsSpecificModel = ch->it->volumeModel();
 								cc *= 100.0f;
 								break;
 
 							case 10:
-								objModel = ch->it->panningModel();
+								lmmsSpecificModel = ch->it->panningModel();
 								cc = cc * 200.f - 100.0f;
 								break;
 
 							case 128:
-								objModel = ch->it->pitchModel();
+								lmmsSpecificModel = ch->it->pitchModel();
 								cc = cc * 100.0f;
 								break;
 
@@ -490,23 +497,20 @@ bool MidiImport::readSMF(TrackContainer* tc)
 								break;
 						}
 
-						if (objModel)
+						if (time == 0)
 						{
-							if (time == 0 && objModel)
+							if (ccModel) { ccModel->setInitValue(cc * 127.0f); }
+							if (lmmsSpecificModel) { lmmsSpecificModel->setInitValue(cc); }
+						}
+						else
+						{
+							if (ccs[ccid].at == nullptr)
 							{
-								objModel->setInitValue(cc);
+								if (ccModel) { ccs[ccid].create(tc, trackName + " > " + ccModel->displayName()); }
+								if (lmmsSpecificModel) { ccs[ccid].create(tc, trackName + " > " + lmmsSpecificModel->displayName()); }
 							}
-							else
-							{
-								if (ccs[ccid].at == nullptr) {
-									ccs[ccid].create(tc, trackName + " > " +
-										// This is inside if (objModel), so objModel should never be nullptr
-										// (objModel != nullptr ? objModel->displayName() : QString("CC %1").arg(ccid))
-										objModel->displayName()
-									);
-								}
-								ccs[ccid].putValue(time, objModel, cc);
-							}
+							if (ccModel) { ccs[ccid].putValue(time, ccModel, cc * 127.0f); }
+							if (lmmsSpecificModel) { ccs[ccid].putValue(time, lmmsSpecificModel, cc); }
 						}
 					}
 				}
