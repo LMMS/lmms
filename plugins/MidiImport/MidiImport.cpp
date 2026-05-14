@@ -459,9 +459,9 @@ bool MidiImport::readSMF(TrackContainer* tc)
 					if (ccid <= 128)
 					{
 						double cc = evt->get_real_value();
-						// By default, set the knob in the CC rack of the instrument track
 						AutomatableModel* modelObject = nullptr;
-						// Some CC knobs correspond to specific things like pitch and volume, so in that case, also set the lmms pitch/volume/etc knobs.
+						// Some CC knobs correspond to specific things like pitch and volume, so in that case, set the lmms pitch/volume/etc knobs.
+						// Otherwise, set the knob in the instrument track CC rack
 						switch (ccid)
 						{
 							case 0:
