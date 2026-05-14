@@ -376,7 +376,7 @@ private:
 	 * @note When zoomed in, this is a constant pixel value, but when zoomed far out,
 	 * it is a fraction of the note width, to make it easier to move short notes.
 	 */
-	int resizeGripWidth(tick_t noteLength) const;
+	int resizeGripWidth(const Note& note) const;
 
 	MidiClip* m_midiClip;
 	NoteVector m_ghostNotes;

@@ -1925,7 +1925,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 
 				// clicked at the "tail" of the note?
 				if (x + m_currentPosition * m_ppb / TimePos::ticksPerBar() >
-						m_currentNote->endPos() * m_ppb / TimePos::ticksPerBar() - resizeGripWidth(m_currentNote->length())
+						m_currentNote->endPos() * m_ppb / TimePos::ticksPerBar() - resizeGripWidth(*m_currentNote)
 					&& m_currentNote->length() > 0 )
 				{
 					m_midiClip->addJournalCheckPoint();
@@ -2721,7 +2721,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 				int noteRightX = ( note->pos() + note->length() -
 					m_currentPosition) * m_ppb/TimePos::ticksPerBar();
 				// cursor at the "tail" of the note?
-				bool atTail = note->length() > 0 && x > noteRightX - resizeGripWidth(note->length());
+				bool atTail = note->length() > 0 && x > noteRightX - resizeGripWidth(*note);
 				Qt::CursorShape cursorShape = atTail ? Qt::SizeHorCursor :
 													Qt::SizeAllCursor;
 				setCursor( cursorShape );
@@ -3291,9 +3291,9 @@ void PianoRoll::dragNotes(int x, int y, bool alt, bool shift, bool ctrl)
 }
 
 
-int PianoRoll::resizeGripWidth(tick_t noteLength) const
+int PianoRoll::resizeGripWidth(const Note& note) const
 {
-	const int noteWidth = noteLength * m_ppb / TimePos::ticksPerBar();
+	const int noteWidth = note.length() * m_ppb / TimePos::ticksPerBar();
 	return std::min(RESIZE_GRIP_WIDTH, static_cast<int>(std::round(RESIZE_GRIP_MAX_WIDTH_FRACTION * noteWidth)));
 }
 
