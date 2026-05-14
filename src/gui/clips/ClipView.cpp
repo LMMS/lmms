@@ -57,9 +57,9 @@ namespace lmms::gui
 
 
 //! The default width of the resize grip in pixels
-const int RESIZE_GRIP_WIDTH = 8;
+constexpr int RESIZE_GRIP_WIDTH = 8;
 //! The maximum fraction of the clip width that the resize grip is allowed to take up
-const float RESIZE_GRIP_MAX_WIDTH_FRACTION = 0.1f;
+constexpr float RESIZE_GRIP_MAX_WIDTH_FRACTION = 0.1f;
 
 
 /*! A pointer for that text bubble used when moving segments, etc.
