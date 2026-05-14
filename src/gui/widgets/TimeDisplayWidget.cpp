@@ -57,6 +57,11 @@ TimeDisplayWidget::TimeDisplayWidget() :
 
 	connect( getGUI()->mainWindow(), SIGNAL(periodicUpdate()),
 					this, SLOT(updateTime()));
+
+	// positionJumped fires when the user moves the playhead while paused;
+	// periodicUpdate() alone would lag by up to one timer tick in that case.
+	connect(&Engine::getSong()->getTimeline(Song::PlayMode::None),
+		&Timeline::positionJumped, this, &TimeDisplayWidget::updateTime);
 }
 
 void TimeDisplayWidget::setDisplayMode( DisplayMode displayMode )
