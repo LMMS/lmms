@@ -460,57 +460,57 @@ bool MidiImport::readSMF(TrackContainer* tc)
 					{
 						double cc = evt->get_real_value();
 						// By default, set the knob in the CC rack of the instrument track
-						AutomatableModel* ccModel = (ccid >= 0 && ccid < 128)
-							? ch->it->midiCCModel(ccid)
-							: nullptr;
+						AutomatableModel* modelObject = nullptr;
 						// Some CC knobs correspond to specific things like pitch and volume, so in that case, also set the lmms pitch/volume/etc knobs.
-						AutomatableModel* lmmsSpecificModel = nullptr;
-
 						switch (ccid)
 						{
 							case 0:
 								if (ch->isSF2 && ch->it_inst)
 								{
-									lmmsSpecificModel = ch->it_inst->childModel("bank");
+									modelObject = ch->it_inst->childModel("bank");
 									printf("BANK SELECT %f %d\n", cc, static_cast<int>(cc * 127));
 									cc *= 127.0f;
 								}
 								break;
 
 							case 7:
-								lmmsSpecificModel = ch->it->volumeModel();
+								modelObject = ch->it->volumeModel();
 								cc *= 100.0f;
 								break;
 
 							case 10:
-								lmmsSpecificModel = ch->it->panningModel();
+								modelObject = ch->it->panningModel();
 								cc = cc * 200.f - 100.0f;
 								break;
 
 							case 128:
-								lmmsSpecificModel = ch->it->pitchModel();
+								modelObject = ch->it->pitchModel();
 								cc = cc * 100.0f;
 								break;
 
 							default:
-								//TODO: something useful for other CCs
+								if (ccid >= 0 && ccid < 128)
+								{
+									modelObject = ch->it->midiCCModel(ccid);
+									cc = cc * 127.0f;
+								}
 								break;
 						}
 
-						if (time == 0)
+						if (modelObject)
 						{
-							if (ccModel) { ccModel->setInitValue(cc * 127.0f); }
-							if (lmmsSpecificModel) { lmmsSpecificModel->setInitValue(cc); }
-						}
-						else
-						{
-							if (ccs[ccid].at == nullptr)
+							if (time == 0)
 							{
-								if (ccModel) { ccs[ccid].create(tc, trackName + " > " + ccModel->displayName()); }
-								if (lmmsSpecificModel) { ccs[ccid].create(tc, trackName + " > " + lmmsSpecificModel->displayName()); }
+								modelObject->setInitValue(cc);
 							}
-							if (ccModel) { ccs[ccid].putValue(time, ccModel, cc * 127.0f); }
-							if (lmmsSpecificModel) { ccs[ccid].putValue(time, lmmsSpecificModel, cc); }
+							else
+							{
+								if (ccs[ccid].at == nullptr)
+								{
+									ccs[ccid].create(tc, trackName + " > " + modelObject->displayName());
+								}
+								ccs[ccid].putValue(time, modelObject, cc);
+							}
 						}
 					}
 				}
