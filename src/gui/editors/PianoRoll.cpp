@@ -107,9 +107,9 @@ const int PR_RIGHT_MARGIN = SCROLLBAR_SIZE;
 
 
 //! Width of area used for resizing (the grip at the end of a note)
-const int RESIZE_GRIP_WIDTH = 9;
+constexpr int RESIZE_GRIP_WIDTH = 9;
 //! The maximum fraction of the note width that the resize grip is allowed to take up
-const float RESIZE_GRIP_MAX_WIDTH_FRACTION = 0.25;
+constexpr float RESIZE_GRIP_MAX_WIDTH_FRACTION = 0.25f;
 
 // width of line for setting volume/panning of note
 const int NOTE_EDIT_LINE_WIDTH = 3;
@@ -1924,7 +1924,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 				}
 
 				// clicked at the "tail" of the note?
-				if(x + m_currentPosition * m_ppb / TimePos::ticksPerBar() >
+				if (x + m_currentPosition * m_ppb / TimePos::ticksPerBar() >
 						m_currentNote->endPos() * m_ppb / TimePos::ticksPerBar() - resizeGripWidth(m_currentNote->length())
 					&& m_currentNote->length() > 0 )
 				{
