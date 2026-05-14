@@ -2604,15 +2604,15 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 
 			if( me->buttons() & Qt::LeftButton )
 			{
-				vol = qBound(MinVolume, static_cast<volume_t>(MinVolume
-					+ static_cast<float>(noteEditBottom() - pos.y())
+				vol = std::clamp(static_cast<volume_t>(MinVolume
+					+ static_cast<float>(noteEditBottom() -  std::min(noteEditBottom(), pos.y())) // TODO C++26: saturating_sub
 					/ static_cast<float>(noteEditBottom() - noteEditTop())
-					* (MaxVolume - MinVolume)), MaxVolume);
+					* (MaxVolume - MinVolume)), MinVolume, MaxVolume);
 
-				pan = qBound(PanningLeft, static_cast<panning_t>(PanningLeft
-					+ static_cast<float>(noteEditBottom() - pos.y())
+				pan = std::clamp(static_cast<panning_t>(PanningLeft
+					+ static_cast<float>(noteEditBottom() - std::min(noteEditBottom(), pos.y())) // TODO C++26: saturating_sub
 					/ static_cast<float>(noteEditBottom() - noteEditTop())
-					* (PanningRight - PanningLeft)), PanningRight);
+					* (PanningRight - PanningLeft)), PanningLeft, PanningRight);
 			}
 
 			if( m_noteEditMode == NoteEditMode::Volume )
