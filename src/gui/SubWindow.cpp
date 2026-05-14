@@ -169,7 +169,8 @@ void SubWindow::changeEvent( QEvent *event )
 
 void SubWindow::setVisible(bool visible)
 {
-	if (isDetached()) {
+	if (isDetached())
+	{
 		// When detached, top-level window is the child widget itself. (This is janky and is best changed at some point.)
 		// For that reason we forward show/hide to the child widget, and don't touch the hidden attached window frame.
 		widget()->setVisible(visible);
