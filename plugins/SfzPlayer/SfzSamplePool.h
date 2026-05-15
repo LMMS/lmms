@@ -28,7 +28,6 @@
 #include "SfzSampleBuffer.h"
 
 #include <QString>
-#include <memory>
 #include <map>
 
 namespace lmms
