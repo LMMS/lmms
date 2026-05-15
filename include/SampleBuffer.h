@@ -83,7 +83,7 @@ public:
 
 	static auto emptyBuffer() -> std::shared_ptr<const SampleBuffer>;
 
-	static std::shared_ptr<const SampleBuffer> fromFile(const QString& path);
+	static std::shared_ptr<const SampleBuffer> fromFile(const QString& path, const bool displayErrorWindow = true);
 	static std::shared_ptr<const SampleBuffer> fromBase64(
 		const QString& str, int sampleRate = Engine::audioEngine()->outputSampleRate());
 

@@ -36,7 +36,7 @@ const SfzSampleBuffer* SfzSamplePool::loadSample(const QString& path)
 	{
 		return m_samplePool.at(path).get();
 	}
-	else if (auto buffer = SampleBuffer::fromFile(path))
+	else if (auto buffer = SampleBuffer::fromFile(path, false))
 	{
 		m_samplePool.insert({path, std::make_unique<SfzSampleBuffer>(buffer->data(), buffer->size(), buffer->sampleRate())});
 		return m_samplePool.at(path).get();
