@@ -27,7 +27,6 @@
 
 #include "SfzOpcodes.h"
 #include <QString>
-#include <optional>
 #include <array>
 
 namespace lmms
@@ -73,8 +72,8 @@ public:
 	//
 	KeyOpcode m_sw_lokey {"sw_lokey", 0};
 	KeyOpcode m_sw_hikey {"sw_hikey", 127};
-	OptionalKeyOpcode m_sw_last {"sw_last", std::nullopt}; // The SFZ opcode spec says this should default to 0, but I don't think that's right?
-	OptionalKeyOpcode m_sw_default {"sw_default", std::nullopt};
+	KeyOpcode m_sw_last {"sw_last", std::nullopt}; // The SFZ opcode spec says this should default to 0, but I don't think that's right?
+	KeyOpcode m_sw_default {"sw_default", std::nullopt};
 	StringOpcode m_sw_label {"sw_label", std::nullopt};
 
 	//
@@ -119,7 +118,7 @@ public:
 	// Filter
 	//
 	Opcode<FilterType> m_fil_type {"fil_type", FilterType::Lowpass2Pole};
-	OptionalFloatOpcode m_cutoff {"cutoff", std::nullopt};
+	FloatOpcode m_cutoff {"cutoff", std::nullopt};
 	FloatOpcode m_resonance {"resonance", 0.0f};
 	Opcode<int> m_fil_veltrack {"fil_veltrack", 0}; // in cents
 

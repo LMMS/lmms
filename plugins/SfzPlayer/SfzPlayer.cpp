@@ -156,7 +156,7 @@ void SfzPlayer::processTrigger(const SfzTrigger& trigger)
 			// For fun, display the last played sample on the GUI
 			if (foundOpenPosition)
 			{
-				setStatusInfo("Last Played Sample: " + QFileInfo(region->m_sampleFile.value().value_or("N/A")).fileName());
+				setStatusInfo("Last Played Sample: " + QFileInfo(region->m_sampleFile.value_or("N/A")).fileName());
 			}
 			else
 			{
@@ -290,7 +290,7 @@ void SfzPlayer::sampleLoadingThreadFunction(const QDir& parentDirectory)
 	for (auto* region : m_tempRegionManager->allRegions())
 	{
 		// Update the GUI info text to notify the user as samples are loaded
-		setStatusInfo(QString("Loading sample %1/%2 %3").arg(i+1).arg(m_tempRegionManager->allRegions().size()).arg(QFileInfo(region->m_sampleFile.value().value_or("N/A")).fileName()));
+		setStatusInfo(QString("Loading sample %1/%2 %3").arg(i+1).arg(m_tempRegionManager->allRegions().size()).arg(QFileInfo(region->m_sampleFile.value_or("N/A")).fileName()));
 		// Initialize the sample into the temporary pool, so that it doesn't disturb the audio thread which may still be using the previous samples.
 		bool successfulLoadSample = region->initializeSample(parentDirectory, *m_tempSamplePool);
 		if (!successfulLoadSample) { qDebug() << "[SFZ Player] An error occured when loading a sample."; } // TODO organize this debug info

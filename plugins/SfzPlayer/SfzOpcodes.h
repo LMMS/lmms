@@ -60,18 +60,24 @@ struct BaseOpcode
 	//! Given a string like "pitch_keytrack=1200" which has been split into name/value as "pitch_keytrack", "1200", this function updates the internal value if the name matches.
 	virtual void parseFromString(const QString& opcodeName, const QString& opcodeValue, bool* parsed, bool* successful) = 0;
 };
-//! A base struct for all opcodes, just a name(s) and a value.
+//! A base struct for all opcodes, with the name(s) and the value
 template<typename T>
 struct Opcode : BaseOpcode
 {
 	// Using a vector here, since some opcodes have multiple aliases
 	std::vector<QString> m_opcodeNames;
-	T m_value;
+	//! Due to issues with the compiler not recognizing implicit conversion from Opcode<std::optional<type>> directly to "type", all opcodes use std::optional on the inside.
+	std::optional<T> m_value;
 
-	Opcode(QString name, T defaultValue) : m_opcodeNames({name}), m_value(defaultValue) {}
-	Opcode(std::vector<QString> names, T defaultValue) : m_opcodeNames(names), m_value(defaultValue) {}
-	virtual void setValue(const T& value) { m_value = value; }
-	virtual const T value() const { return m_value; } // TODO override operators instead
+	Opcode(QString name, std::optional<T> defaultValue) : m_opcodeNames({name}), m_value(defaultValue) {}
+	Opcode(std::vector<QString> names, std::optional<T> defaultValue) : m_opcodeNames(names), m_value(defaultValue) {}
+	// Redefining operators to make opcodes easy to work with
+	Opcode& operator =(const T value) { m_value = value; return *this; }
+	operator T() const { return m_value.value(); }
+	// This is not ideal, but here's a wrapper function which does the same thing as std::optional's value_or
+	const T value_or(const T alternative) const { return m_value.value_or(alternative); }
+	// Comparing the opcode to std::nullopt had issues, since the compiler did not want to do two implicit conversions(?) so here the comparision is expressly defined.
+	bool operator==(std::nullopt_t other) const { return m_value == std::nullopt; }
 
 	void parseFromString(const QString& opcodeName, const QString& opcodeValue, bool* parsed, bool* successful) override;
 };
@@ -79,20 +85,14 @@ struct Opcode : BaseOpcode
 //! Float/decimal opcodes (such as amplitude, panning, etc)
 using FloatOpcode = Opcode<float>;
 
-//! Some float opcodes may take on a null default value (like filter cutoff)
-using OptionalFloatOpcode = Opcode<std::optional<float>>;
-
 //! Integer opcodes (such as lovel, seq_length, seq_position, offset, etc)
 using IntOpcode = Opcode<int>;
 
 //! Key opcodes (such as lokey, hikey, pitch_keycenter, etc)
 using KeyOpcode = Opcode<int>;
 
-//! Some key opcodes (sw_last, sw_default) make sense to have null default values
-using OptionalKeyOpcode = Opcode<std::optional<int>>;
-
 //! String opcodes (such as sample file path)
-using StringOpcode = Opcode<std::optional<QString>>;
+using StringOpcode = Opcode<QString>;
 
 //! Many opcodes can be modulated by MIDI CC knobs, so each of them needs an array to store the modulation weights for each one.
 struct ModulatableOpcode : FloatOpcode
@@ -113,12 +113,12 @@ struct ModulatableOpcode : FloatOpcode
 
 	ModulatableOpcode(QString name = "", float defaultValue = 0.0f) : FloatOpcode(name, defaultValue) {};
 	ModulatableOpcode(std::vector<QString> names = {}, float defaultValue = 0.0f) : FloatOpcode(names, defaultValue) {};
-	//! Redefine the value() function to return the sum of the base opcode value and whatever the modulation is currently. Or, if the modultion type if multiplication, multiply the two.
-	const float value() const override
+	//! Redefine the value/conversion function to return the sum of the base opcode value and whatever the modulation is currently. Or, if the modultion type if multiplication, multiply the two.
+	operator float() const
 	{
 		return (modulationType.value_or(ModulationType::Add) == ModulationType::Add)
-			? m_value + cachedModulation
-			: m_value * cachedModulation;
+			? m_value.value() + cachedModulation
+			: m_value.value() * cachedModulation;
 	}
 	//! Helper function for parsing these kinds of opcodes, where you have both `opcode` and `opcode_onccN` where N is the midi cc number, so
 	// that the code isn't duplicated for every modulatable parameter.

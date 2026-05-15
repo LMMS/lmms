@@ -39,10 +39,10 @@ SfzRegionManager::SfzRegionManager(std::vector<SfzRegion>& regions)
 	{
 		for (auto& region : m_regions)
 		{
-			if (key >= region.m_lokey.value() && key <= region.m_hikey.value())
+			if (key >= region.m_lokey && key <= region.m_hikey)
 			{
 				// Additionally organize by trigger type
-				switch (region.m_trigger.value())
+				switch (region.m_trigger)
 				{
 				case TriggerType::Attack:
 					m_noteOnRegions.at(key).push_back(&region);

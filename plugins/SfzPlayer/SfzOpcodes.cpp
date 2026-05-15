@@ -40,31 +40,12 @@ void FloatOpcode::parseFromString(const QString& opcodeName, const QString& opco
 	*parsed = true;
 }
 
-// Same function but for optional floats
-template<>
-void OptionalFloatOpcode::parseFromString(const QString& opcodeName, const QString& opcodeValue, bool* parsed, bool* successful)
-{
-	if (std::find(m_opcodeNames.begin(), m_opcodeNames.end(), opcodeName) == m_opcodeNames.end()) { return; }
-	m_value = opcodeValue.toFloat(successful);
-	*parsed = true;
-}
-
 template<>
 void KeyOpcode::parseFromString(const QString& opcodeName, const QString& opcodeValue, bool* parsed, bool* successful)
 {
 	if (std::find(m_opcodeNames.begin(), m_opcodeNames.end(), opcodeName) == m_opcodeNames.end()) { return; }
 	m_value = opcodeValue.toInt(successful);
 	// Integer opcodes can also define keys, which can be specified either by a key number or by a string like e4 or c#5
-	if (!*successful) { m_value = stringToKeyNum(opcodeValue, successful); }
-	*parsed = true;
-}
-
-// Same function but for optional keys
-template<>
-void OptionalKeyOpcode::parseFromString(const QString& opcodeName, const QString& opcodeValue, bool* parsed, bool* successful)
-{
-	if (std::find(m_opcodeNames.begin(), m_opcodeNames.end(), opcodeName) == m_opcodeNames.end()) { return; }
-	m_value = opcodeValue.toInt(successful);
 	if (!*successful) { m_value = stringToKeyNum(opcodeValue, successful); }
 	*parsed = true;
 }

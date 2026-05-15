@@ -273,14 +273,14 @@ bool SfzParser::parseSfzFile(const QString& filePath, std::vector<SfzRegion>& ou
 	// make a list of them in the controlsConfig object for easy access
 	for (const auto& region : outputRegions)
 	{
-		if (region.m_sw_last.value() != std::nullopt)
+		if (region.m_sw_last != std::nullopt)
 		{
 			SfzControlsConfig::SwitchKeyInfo info;
-			info.sw_label = region.m_sw_label.value().value_or("");
-			info.sw_lokey = region.m_sw_lokey.value();
-			info.sw_hikey = region.m_sw_hikey.value();
-			info.sw_default = region.m_sw_default.value();
-			controlsConfig.m_switchKeyInfo.insert({region.m_sw_last.value().value(), info});
+			info.sw_label = region.m_sw_label.value_or("");
+			info.sw_lokey = region.m_sw_lokey;
+			info.sw_hikey = region.m_sw_hikey;
+			info.sw_default = region.m_sw_default.m_value; // Directly accessing m_value, since casting to std::optional is difficult; it always wants to cast to int or something, and crashes when it's std::nullopt?
+			controlsConfig.m_switchKeyInfo.insert({region.m_sw_last, info});
 		}
 	}
 

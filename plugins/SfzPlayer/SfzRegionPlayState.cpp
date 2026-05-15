@@ -51,15 +51,15 @@ SfzRegionPlayState::SfzRegionPlayState(SfzRegion* region, const SfzTrigger& trig
 	// Delay the start of the playback by the trigger offset
 	m_frameCount -= trigger.frameOffset();
 	// And by the delay opcode in seconds
-	m_frameCount -= region->m_delay.value() * m_lmmsSampleRate;
+	m_frameCount -= region->m_delay * m_lmmsSampleRate;
 	// And any random delay amount
-	m_frameCount -= fastRand(1.0f) * region->m_delay_random.value() * m_lmmsSampleRate;
+	m_frameCount -= fastRand(1.0f) * region->m_delay_random * m_lmmsSampleRate;
 
 	// Set initial sample start frame offset
-	m_sampleFrame += m_region->m_offset.value();
+	m_sampleFrame += m_region->m_offset;
 
 	// Setup the filter
-	switch (m_region->m_fil_type.value())
+	switch (m_region->m_fil_type)
 	{
 	// This is not correct! I'm using the default filters from BasicFilters, but I don't believe they necessarily match the 1 pole vs 2 pole specifications for sfz.
 	// For example, the default lowpass is a biquad, which I believe has 2 poles. For now I'm using it for both lowpass types, but it should probably be changed in the future.
@@ -95,12 +95,12 @@ void SfzRegionPlayState::precomputeBaseValues()
 	// The pitch env/lfo will be applied on top of this, as those are calcualted per frame
 
 	// Calculate pitch difference relative to original sample
-	const float semitoneDifference = m_trigger.key().value() - m_region->m_pitch_keycenter.value();
+	const float semitoneDifference = m_trigger.key().value() - m_region->m_pitch_keycenter;
 	// The base pitch depends on 1. the key offset, 2. the fine `tune` adjustment, 3. the velocity, if pitch_veltrack is nonzero
 	// These are all in cents, so divide by 100 to get semitones
-	const float pitch = semitoneDifference * m_region->m_pitch_keytrack.value() / 100.0f
-		+ m_region->m_tune.value() / 100.0f
-		+ normalizedVelocity * m_region->m_pitch_veltrack.value() / 100.0f;
+	const float pitch = semitoneDifference * m_region->m_pitch_keytrack / 100.0f
+		+ m_region->m_tune / 100.0f
+		+ normalizedVelocity * m_region->m_pitch_veltrack / 100.0f;
 	m_baseFreqRatio = std::exp2(pitch / 12.0f);
 
 	// Sample rate of sample
@@ -114,21 +114,21 @@ void SfzRegionPlayState::precomputeBaseValues()
 	// Compute the base amplitude
 
 	// Amplitude opcode
-	const float amplitude = m_region->m_amplitude.value() / 100.0f; // Amplitude is stored as a percent
+	const float amplitude = m_region->m_amplitude / 100.0f; // Amplitude is stored as a percent
 
 	// Amplitude due to velocity
 	// If amp_keytrack is 100, then 0 velocity = 0 amp, and 127 velocity = 1.0f amp (as expected)
 	// If amp_keytrack is -100, it's the reverse. If amp_keytrack is 0, the volume is not affected by the velocity.
 	// Essentially this means lerping between y = x, y = 1, and y = 1 - x, if you think of y being the amp and x being vel/127
-	const float ampVelocity = m_region->m_amp_veltrack.value() > 0
-		? (normalizedVelocity) * (m_region->m_amp_veltrack.value() / 100) + 1.0f * (1.0f - m_region->m_amp_veltrack.value() / 100)
-		: (1.0f - normalizedVelocity) * (m_region->m_amp_veltrack.value() / -100) + 1.0f * (1.0f - m_region->m_amp_veltrack.value() / -100);
+	const float ampVelocity = m_region->m_amp_veltrack > 0
+		? (normalizedVelocity) * (m_region->m_amp_veltrack / 100) + 1.0f * (1.0f - m_region->m_amp_veltrack / 100)
+		: (1.0f - normalizedVelocity) * (m_region->m_amp_veltrack / -100) + 1.0f * (1.0f - m_region->m_amp_veltrack / -100);
 
 	// Amplitude due to volume/gain
-	const float ampVolume = dbfsToAmp(m_region->m_volume.value());
+	const float ampVolume = dbfsToAmp(m_region->m_volume);
 
 	// Panning
-	const float pan = m_region->m_pan.value() / 100;
+	const float pan = m_region->m_pan / 100;
 	const float rightPanAmp = std::min(1.0f, 1.0f + pan);
 	const float leftPanAmp = std::min(1.0f, 1.0f - pan);
 
@@ -224,45 +224,45 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const f_cnt_t frames)
 	const float normalizedVelocity = m_trigger.velocity().value() / 127.0f;
 
 	// Amplitude Envelope Parameters
-	const f_cnt_t ampegDelayFrames = m_region->m_ampeg.delay.value() * m_lmmsSampleRate;
-	const f_cnt_t ampegAttackFrames = m_region->m_ampeg.attack.value() * m_lmmsSampleRate;
-	const f_cnt_t ampegHoldFrames = m_region->m_ampeg.hold.value() * m_lmmsSampleRate;
-	const f_cnt_t ampegDecayFrames = m_region->m_ampeg.decay.value() * m_lmmsSampleRate;
-	const float ampegSustain = m_region->m_ampeg.sustain.value() / 100.0f; // Sustain is stored in percent, so divide by 100 to get ratio
-	const f_cnt_t ampegReleaseFrames = m_region->m_ampeg.release.value() * m_lmmsSampleRate;
+	const f_cnt_t ampegDelayFrames = m_region->m_ampeg.delay * m_lmmsSampleRate;
+	const f_cnt_t ampegAttackFrames = m_region->m_ampeg.attack * m_lmmsSampleRate;
+	const f_cnt_t ampegHoldFrames = m_region->m_ampeg.hold * m_lmmsSampleRate;
+	const f_cnt_t ampegDecayFrames = m_region->m_ampeg.decay * m_lmmsSampleRate;
+	const float ampegSustain = m_region->m_ampeg.sustain / 100.0f; // Sustain is stored in percent, so divide by 100 to get ratio
+	const f_cnt_t ampegReleaseFrames = m_region->m_ampeg.release * m_lmmsSampleRate;
 
 	// Amplitude LFO parameters
-	const f_cnt_t amplfoDelayFrames = m_region->m_amplfo.delay.value() * m_lmmsSampleRate;
-	const f_cnt_t amplfoFadeFrames = m_region->m_amplfo.fade.value() * m_lmmsSampleRate;
-	const float amplfoFreq = m_region->m_amplfo.freq.value();
-	const float amplfoDepth = m_region->m_amplfo.depth.value();
+	const f_cnt_t amplfoDelayFrames = m_region->m_amplfo.delay * m_lmmsSampleRate;
+	const f_cnt_t amplfoFadeFrames = m_region->m_amplfo.fade * m_lmmsSampleRate;
+	const float amplfoFreq = m_region->m_amplfo.freq;
+	const float amplfoDepth = m_region->m_amplfo.depth;
 
 	// Pitch Envelope Parameters
-	const f_cnt_t pitchegDelayFrames = m_region->m_pitcheg.delay.value() * m_lmmsSampleRate;
-	const f_cnt_t pitchegAttackFrames = m_region->m_pitcheg.attack.value() * m_lmmsSampleRate;
-	const f_cnt_t pitchegHoldFrames = m_region->m_pitcheg.hold.value() * m_lmmsSampleRate;
-	const f_cnt_t pitchegDecayFrames = m_region->m_pitcheg.decay.value() * m_lmmsSampleRate;
-	const float pitchegSustain = m_region->m_pitcheg.sustain.value() / 100.0f; // Sustain is stored in percent, so divide by 100 to get ratio
-	const f_cnt_t pitchegReleaseFrames = m_region->m_pitcheg.release.value() * m_lmmsSampleRate;
-	const float pitchegDepth = m_region->m_pitcheg.depth.value();
+	const f_cnt_t pitchegDelayFrames = m_region->m_pitcheg.delay * m_lmmsSampleRate;
+	const f_cnt_t pitchegAttackFrames = m_region->m_pitcheg.attack * m_lmmsSampleRate;
+	const f_cnt_t pitchegHoldFrames = m_region->m_pitcheg.hold * m_lmmsSampleRate;
+	const f_cnt_t pitchegDecayFrames = m_region->m_pitcheg.decay * m_lmmsSampleRate;
+	const float pitchegSustain = m_region->m_pitcheg.sustain / 100.0f; // Sustain is stored in percent, so divide by 100 to get ratio
+	const f_cnt_t pitchegReleaseFrames = m_region->m_pitcheg.release * m_lmmsSampleRate;
+	const float pitchegDepth = m_region->m_pitcheg.depth;
 
 	// Pitch LFO parameters
-	const f_cnt_t pitchlfoDelayFrames = m_region->m_pitchlfo.delay.value() * m_lmmsSampleRate;
-	const f_cnt_t pitchlfoFadeFrames = m_region->m_pitchlfo.fade.value() * m_lmmsSampleRate;
-	const float pitchlfoFreq = m_region->m_pitchlfo.freq.value();
-	const float pitchlfoDepth = m_region->m_pitchlfo.depth.value();
+	const f_cnt_t pitchlfoDelayFrames = m_region->m_pitchlfo.delay * m_lmmsSampleRate;
+	const f_cnt_t pitchlfoFadeFrames = m_region->m_pitchlfo.fade * m_lmmsSampleRate;
+	const float pitchlfoFreq = m_region->m_pitchlfo.freq;
+	const float pitchlfoDepth = m_region->m_pitchlfo.depth;
 
 
 	// Filter
-	const bool filterEnabled = m_region->m_cutoff.value() != std::nullopt;
+	const bool filterEnabled = m_region->m_cutoff != std::nullopt;
 	// For performance, only update the cutoff frequency/resonance once per buffer
 	if (filterEnabled)
 	{
 		// The cutoff frequency is in hertz, but things like fil_veltrack are defined in cents, so we have to convert them TODO: are we sure it's cents? I saw 20000 being used in Metal GTX which is kind of high for cents (200 octaves?)
-		const float filterCutoffPitchOffset = normalizedVelocity * m_region->m_fil_veltrack.value();
-		const float filterCutoff = m_region->m_cutoff.value().value() + std::exp2(filterCutoffPitchOffset / 12.0f);
+		const float filterCutoffPitchOffset = normalizedVelocity * m_region->m_fil_veltrack;
+		const float filterCutoff = m_region->m_cutoff + std::exp2(filterCutoffPitchOffset / 12.0f);
 		// SFZ has the resonance given in decibals, which is not the same as the resonance passed to the filter, so we have to convert it
-		const float q = std::sqrt(2.0f) * dbfsToAmp(m_region->m_resonance.value()); // TODO is this equation correct? I'm sort of basing it off https://www.musicdsp.org/en/latest/Filters/180-cool-sounding-lowpass-with-decibel-measured-resonance.html but I'm not sure.
+		const float q = std::sqrt(2.0f) * dbfsToAmp(m_region->m_resonance); // TODO is this equation correct? I'm sort of basing it off https://www.musicdsp.org/en/latest/Filters/180-cool-sounding-lowpass-with-decibel-measured-resonance.html but I'm not sure.
 		m_filter.calcFilterCoeffs(filterCutoff, q);
 	}
 
@@ -328,7 +328,7 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const f_cnt_t frames)
 	}
 
 	// If the end of the sample is reached and the region's loop mode does not loop, deactivate this voice.
-	if ((m_region->m_loop_mode.value() == LoopMode::OneShot || m_region->m_loop_mode.value() == LoopMode::NoLoop) && m_sampleObject != nullptr && m_sampleFrame >= m_sampleObject->size())
+	if ((m_region->m_loop_mode == LoopMode::OneShot || m_region->m_loop_mode == LoopMode::NoLoop) && m_sampleObject != nullptr && m_sampleFrame >= m_sampleObject->size())
 	{
 		m_active = false; // TODO should this forcefully decative or just release?
 	}
@@ -347,7 +347,7 @@ void SfzRegionPlayState::processTrigger(const SfzTrigger& trigger, SfzGlobalStat
 
 	if (trigger.type() == SfzTrigger::Type::NoteOff)
 	{
-		if (m_region->m_loop_mode.value() == LoopMode::OneShot) { return; } // If one_shot looping is enabled, the whole sample will play regardless of if the note is released
+		if (m_region->m_loop_mode == LoopMode::OneShot) { return; } // If one_shot looping is enabled, the whole sample will play regardless of if the note is released
 
 		if (trigger.key() == m_trigger.key())
 		{
