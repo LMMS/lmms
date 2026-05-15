@@ -38,6 +38,7 @@ SET(LMMS_PLUGIN_LIST
 	DynamicsProcessor
 	Eq
 	Flanger
+	FrequencyShifter
 	GranularPitchShifter
 	HydrogenImport
 	LadspaBrowser
@@ -53,6 +54,7 @@ SET(LMMS_PLUGIN_LIST
 	Nes
 	OpulenZ
 	Organic
+	Oscilloscope
 	FreeBoy
 	Patman
 	PeakControllerEffect

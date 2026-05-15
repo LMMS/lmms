@@ -64,7 +64,7 @@ EqEffect::EqEffect( Model *parent, const Plugin::Descriptor::SubPluginFeatures::
 
 
 
-Effect::ProcessStatus EqEffect::processImpl(SampleFrame* buf, const fpp_t frames)
+Effect::ProcessStatus EqEffect::processImpl(SampleFrame* buf, const f_cnt_t frames)
 {
 	const int sampleRate = Engine::audioEngine()->outputSampleRate();
 
@@ -144,7 +144,7 @@ Effect::ProcessStatus EqEffect::processImpl(SampleFrame* buf, const fpp_t frames
 	m_eqControls.m_inProgress = true;
 	double outSum = 0.0;
 
-	for (fpp_t f = 0; f < frames; ++f)
+	for (f_cnt_t f = 0; f < frames; ++f)
 	{
 		outSum += buf[f][0] * buf[f][0] + buf[f][1] * buf[f][1];
 	}
@@ -166,7 +166,7 @@ Effect::ProcessStatus EqEffect::processImpl(SampleFrame* buf, const fpp_t frames
 	m_eqControls.m_inPeakR = m_eqControls.m_inPeakR < m_inPeak[1] ? m_inPeak[1] : m_eqControls.m_inPeakR;
 
 	float periodProgress = 0.0f; // percentage of period processed
-	for( fpp_t f = 0; f < frames; ++f)
+	for( f_cnt_t f = 0; f < frames; ++f)
 	{
 		periodProgress = (float)f / (float)(frames-1);
 		//wet dry buffer

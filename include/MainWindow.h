@@ -133,12 +133,7 @@ public:
 
 	void clearKeyModifiers();
 
-	// TODO Remove this function, since m_shift can get stuck down.
-	// [[deprecated]]
-	bool isShiftPressed()
-	{
-		return m_keyMods.m_shift;
-	}
+	bool isShiftPressed() const { return m_keyMods.m_shift; }
 
 	static void saveWidgetState( QWidget * _w, QDomElement & _de );
 	static void restoreWidgetState( QWidget * _w, const QDomElement & _de );
@@ -185,7 +180,6 @@ private slots:
 
 protected:
 	void closeEvent( QCloseEvent * _ce ) override;
-	void focusOutEvent( QFocusEvent * _fe ) override;
 	void keyPressEvent( QKeyEvent * _ke ) override;
 	void keyReleaseEvent( QKeyEvent * _ke ) override;
 	void timerEvent( QTimerEvent * _ev ) override;
