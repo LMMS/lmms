@@ -47,7 +47,7 @@ include(StaticDependencies)
 
 STRING(TOUPPER          "${CMAKE_PROJECT_NAME}" PROJECT_NAME_UCASE)
 
-SET(PROJECT_YEAR 2025)
+SET(PROJECT_YEAR 2026)
 
 SET(PROJECT_AUTHOR      "LMMS Developers")
 SET(PROJECT_URL         "https://lmms.io")
@@ -257,23 +257,12 @@ endif()
 find_package(Perl)
 
 if(WANT_LV2)
-	if(PKG_CONFIG_FOUND)
-		pkg_check_modules(LV2 lv2)
-	endif()
-
 	find_package(Lilv)
 	if(Lilv_FOUND)
-		set(LILV_LIBRARIES Lilv::lilv)
-	endif()
-
-	# Ensure both dependencies are found
-	if(NOT LV2_FOUND)
-		set(STATUS_LV2 "not found, install lv2 or set PKG_CONFIG_PATH appropriately")
-	elseif(NOT Lilv_FOUND)
-		set(STATUS_LV2 "not found, install lilv or set PKG_CONFIG_PATH appropriately")
-	else()
 		set(LMMS_HAVE_LV2 TRUE)
 		set(STATUS_LV2 "OK")
+	else()
+		set(STATUS_LV2 "not found, install lilv or set PKG_CONFIG_PATH appropriately")
 	endif()
 else()
 	set(STATUS_LV2 "not built as requested")
@@ -759,7 +748,6 @@ ADD_SUBDIRECTORY(src)
 ADD_SUBDIRECTORY(plugins)
 ADD_SUBDIRECTORY(tests)
 ADD_SUBDIRECTORY(data)
-ADD_SUBDIRECTORY(doc)
 
 # install tasks
 ADD_SUBDIRECTORY(cmake/install)

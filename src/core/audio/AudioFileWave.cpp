@@ -93,14 +93,14 @@ bool AudioFileWave::startEncoding()
 	return true;
 }
 
-void AudioFileWave::writeBuffer(const SampleFrame* _ab, const fpp_t _frames)
+void AudioFileWave::writeBuffer(const SampleFrame* _ab, const f_cnt_t _frames)
 {
 	OutputSettings::BitDepth bitDepth = getOutputSettings().getBitDepth();
 
 	if( bitDepth == OutputSettings::BitDepth::Depth32Bit || bitDepth == OutputSettings::BitDepth::Depth24Bit )
 	{
 		auto buf = new float[_frames * channels()];
-		for( fpp_t frame = 0; frame < _frames; ++frame )
+		for( f_cnt_t frame = 0; frame < _frames; ++frame )
 		{
 			for( ch_cnt_t chnl = 0; chnl < channels(); ++chnl )
 			{

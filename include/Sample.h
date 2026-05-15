@@ -69,11 +69,9 @@ public:
 
 	Sample() = default;
 
-	Sample(const QByteArray& base64, int sampleRate = Engine::audioEngine()->outputSampleRate());
 	Sample(const SampleFrame* data, size_t numFrames, int sampleRate = Engine::audioEngine()->outputSampleRate());
 	Sample(const Sample& other);
 	Sample(Sample&& other) noexcept;
-	explicit Sample(const QString& audioFile);
 	explicit Sample(std::shared_ptr<const SampleBuffer> buffer);
 
 	auto operator=(const Sample&) -> Sample&;

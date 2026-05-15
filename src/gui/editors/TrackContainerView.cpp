@@ -199,13 +199,11 @@ void TrackContainerView::moveTrackView( TrackView * trackView, int indexTo )
 	PatternTrack::swapPatternTracks( trackView->getTrack(),
 			m_trackViews[indexTo]->getTrack() );
 
+	m_tc->moveTrack(trackView->getTrack(), indexTo);
+
 	m_scrollLayout->removeWidget( trackView );
 	m_scrollLayout->insertWidget( indexTo, trackView );
 
-	Track * track = m_tc->m_tracks[indexFrom];
-
-	m_tc->m_tracks.erase(m_tc->m_tracks.begin() + indexFrom);
-	m_tc->m_tracks.insert(m_tc->m_tracks.begin() + indexTo, track);
 	m_trackViews.move( indexFrom, indexTo );
 
 	realignTracks();

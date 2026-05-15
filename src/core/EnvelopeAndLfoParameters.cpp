@@ -31,7 +31,6 @@
 #include "Engine.h"
 #include "Oscillator.h"
 #include "PathUtil.h"
-#include "SampleLoader.h"
 #include "Song.h"
 
 namespace lmms
@@ -207,7 +206,7 @@ EnvelopeAndLfoParameters::~EnvelopeAndLfoParameters()
 
 
 
-inline sample_t EnvelopeAndLfoParameters::lfoShapeSample( fpp_t _frame_offset )
+inline sample_t EnvelopeAndLfoParameters::lfoShapeSample( f_cnt_t _frame_offset )
 {
 	f_cnt_t frame = ( m_lfoFrame + _frame_offset ) % m_lfoOscillationFrames;
 	const float phase = frame / static_cast<float>(
@@ -247,8 +246,8 @@ inline sample_t EnvelopeAndLfoParameters::lfoShapeSample( fpp_t _frame_offset )
 
 void EnvelopeAndLfoParameters::updateLfoShapeData()
 {
-	const fpp_t frames = Engine::audioEngine()->framesPerPeriod();
-	for( fpp_t offset = 0; offset < frames; ++offset )
+	const f_cnt_t frames = Engine::audioEngine()->framesPerPeriod();
+	for( f_cnt_t offset = 0; offset < frames; ++offset )
 	{
 		m_lfoShapeData[offset] = lfoShapeSample( offset );
 	}
@@ -260,11 +259,11 @@ void EnvelopeAndLfoParameters::updateLfoShapeData()
 
 inline void EnvelopeAndLfoParameters::fillLfoLevel( float * _buf,
 							f_cnt_t _frame,
-							const fpp_t _frames )
+							const f_cnt_t _frames )
 {
 	if( m_lfoAmountIsZero || _frame <= m_lfoPredelayFrames )
 	{
-		for( fpp_t offset = 0; offset < _frames; ++offset )
+		for( f_cnt_t offset = 0; offset < _frames; ++offset )
 		{
 			*_buf++ = 0.0f;
 		}
@@ -277,7 +276,7 @@ inline void EnvelopeAndLfoParameters::fillLfoLevel( float * _buf,
 		updateLfoShapeData();
 	}
 
-	fpp_t offset = 0;
+	f_cnt_t offset = 0;
 	const float lafI = 1.0f / std::max(minimumFrames, m_lfoAttackFrames);
 	for( ; offset < _frames && _frame < m_lfoAttackFrames; ++offset,
 								++_frame )
@@ -295,13 +294,13 @@ inline void EnvelopeAndLfoParameters::fillLfoLevel( float * _buf,
 
 void EnvelopeAndLfoParameters::fillLevel( float * _buf, f_cnt_t _frame,
 						const f_cnt_t _release_begin,
-						const fpp_t _frames )
+						const f_cnt_t _frames )
 {
 	QMutexLocker m(&m_paramMutex);
 
 	fillLfoLevel( _buf, _frame, _frames );
 
-	for( fpp_t offset = 0; offset < _frames; ++offset, ++_buf, ++_frame )
+	for( f_cnt_t offset = 0; offset < _frames; ++offset, ++_buf, ++_frame )
 	{
 		float env_level;
 		if( _frame < _release_begin )
@@ -389,7 +388,7 @@ void EnvelopeAndLfoParameters::loadSettings( const QDomElement & _this )
 	{
 		if (QFileInfo(PathUtil::toAbsolute(userWaveFile)).exists())
 		{
-			m_userWave = gui::SampleLoader::createBufferFromFile(_this.attribute("userwavefile"));
+			m_userWave = SampleBuffer::fromFile(_this.attribute("userwavefile"));
 		}
 		else { Engine::getSong()->collectError(QString("%1: %2").arg(tr("Sample not found"), userWaveFile)); }  
 	}
