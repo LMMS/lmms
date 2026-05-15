@@ -33,7 +33,7 @@
 #include "SampleFrame.h"
 
 namespace lmms {
-class SampleDecoder
+class LMMS_EXPORT SampleDecoder
 {
 public:
 	struct Result
