@@ -29,12 +29,12 @@ namespace lmms
 {
 
 
-SfzSampleBuffer::SfzSampleBuffer(const SampleFrame* data, const f_cnt_t size, const float sampleRate)
-	: m_data(new float[size * NUM_CHANNELS])
-	, m_size(size)
+SfzSampleBuffer::SfzSampleBuffer(const std::vector<SampleFrame>& data, const float sampleRate)
+	: m_data(new float[data.size() * NUM_CHANNELS])
+	, m_size(data.size())
 	, m_sampleRate(sampleRate)
 {
-	for (f_cnt_t f = 0; f < size; ++f)
+	for (f_cnt_t f = 0; f < m_size; ++f)
 	{
 		for (size_t channel = 0; channel < NUM_CHANNELS; ++channel)
 		{

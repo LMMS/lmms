@@ -24,6 +24,10 @@
 
 #include "SfzSamplePool.h"
 #include "SampleBuffer.h"
+#include "PathUtil.h"
+#include "SampleDecoder.h"
+
+#include <QDebug>
 
 namespace lmms
 {
@@ -36,15 +40,24 @@ const SfzSampleBuffer* SfzSamplePool::loadSample(const QString& path)
 	{
 		return m_samplePool.at(path).get();
 	}
-	else if (auto buffer = SampleBuffer::fromFile(path))
+
+	// Copied from SampleBuffer.cpp
+	// This is done instead of calling SampleBuffer::fromFile, since that function creates a warning box/window which the user needs to close, every single time a sample fails to load.
+	// For an SFZ with thousands of samples, if one fails to load due to an invalid path, it's likely all will fail to load, and the user needs to close thousands or windows, or forcefully close lmms.
+	// Doing it manually here bypasses the gui.
+	const auto absolutePath = PathUtil::toAbsolute(path);
+	auto result = SampleDecoder::decode(absolutePath);
+
+	if (!result)
 	{
-		m_samplePool.insert({path, std::make_unique<SfzSampleBuffer>(buffer->data(), buffer->size(), buffer->sampleRate())});
-		return m_samplePool.at(path).get();
-	}
-	else
-	{
+		qWarning() << QObject::tr("Failed to load sample at path %1, the file may not exist, be corrupted, or is unsupported.").arg(absolutePath);
 		return nullptr;
 	}
+
+	auto& [data, sampleRate] = *result;
+
+	m_samplePool.insert({path, std::make_unique<SfzSampleBuffer>(std::move(data), sampleRate)});
+	return m_samplePool.at(path).get();
 }
 
 

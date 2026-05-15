@@ -26,7 +26,7 @@
 #define LMMS_SFZ_SAMPLE_BUFFER_H
 
 #include "SampleFrame.h"
-#include <memory>
+#include <vector>
 
 namespace lmms
 {
@@ -37,7 +37,7 @@ class SfzSampleBuffer
 {
 public:
 	SfzSampleBuffer() = default;
-	SfzSampleBuffer(const SampleFrame* data, const f_cnt_t size, const float sampleRate);
+	SfzSampleBuffer(const std::vector<SampleFrame>& data, const float sampleRate);
 	~SfzSampleBuffer();
 
 	//! Returns a hermite-interpolated value for the data at the given sample index and channel.

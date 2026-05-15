@@ -287,16 +287,28 @@ void SfzPlayer::loadSfzFile(const QString& filePath, const bool resetCCKnobs)
 void SfzPlayer::sampleLoadingThreadFunction(const QDir& parentDirectory)
 {
 	int i = 0;
+	int samplesFailedToLoad = 0;
 	for (auto* region : m_tempRegionManager->allRegions())
 	{
 		// Update the GUI info text to notify the user as samples are loaded
 		setStatusInfo(QString("Loading sample %1/%2 %3").arg(i+1).arg(m_tempRegionManager->allRegions().size()).arg(QFileInfo(region->m_sampleFile.value_or("N/A")).fileName()));
 		// Initialize the sample into the temporary pool, so that it doesn't disturb the audio thread which may still be using the previous samples.
 		bool successfulLoadSample = region->initializeSample(parentDirectory, *m_tempSamplePool);
-		if (!successfulLoadSample) { qDebug() << "[SFZ Player] An error occured when loading a sample."; } // TODO organize this debug info
+		if (!successfulLoadSample)
+		{
+			samplesFailedToLoad++;
+			setStatusInfo(QString("An error occured when loading sample %1").arg(QFileInfo(region->m_sampleFile.value_or("N/A")).fileName()));
+		}
 		i++;
 	}
-	setStatusInfo(QString("Loaded %1 regions and %2 samples.").arg(m_tempRegionManager->allRegions().size()).arg(m_tempSamplePool->sampleCount()));
+	if (samplesFailedToLoad == 0)
+	{
+		setStatusInfo(QString("Loaded %1 regions and %2 samples.").arg(m_tempRegionManager->allRegions().size()).arg(m_tempSamplePool->sampleCount()));
+	}
+	else
+	{
+		setStatusInfo(QString("Loaded %1 regions and %2 samples.\nWARNING: Failed to load %3 samples, see logs for details.").arg(m_tempRegionManager->allRegions().size()).arg(m_tempSamplePool->sampleCount()).arg(samplesFailedToLoad));
+	}
 	// When the thread is done loading all the samples, set the flag to let the audio thread know it can swap the data
 	m_bufferCounterWhenDataReady = m_bufferCounter; // Save the current frame counter so the main thread knows when enough buffers have passed that it can delete the old data
 	m_newSfzDataReady = true;
