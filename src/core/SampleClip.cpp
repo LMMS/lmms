@@ -38,7 +38,6 @@ namespace lmms
 
 SampleClip::SampleClip(Track* _track, Sample sample, bool isPlaying)
 	: Clip(_track)
-	, m_sampleTrack(_track)
 	, m_sample(std::move(sample))
 	, m_isPlaying(false)
 {
@@ -77,7 +76,6 @@ SampleClip::SampleClip(Track* track)
 
 SampleClip::SampleClip(const SampleClip& orig) :
 	Clip(orig),
-	m_sampleTrack(orig.m_sampleTrack),
 	m_sample(std::move(orig.m_sample)),
 	m_isPlaying(orig.m_isPlaying)
 {
@@ -230,9 +228,9 @@ void SampleClip::updateLength()
 	// If the clip has already been manually resized, don't automatically resize it.
 	if (getAutoResize())
 	{
-		if (m_sampleTrack->trackContainer() == Engine::patternStore())
+		if (getTrack()->trackContainer() == Engine::patternStore())
 		{
-			changeLength(TimePos::ticksPerBar() * Engine::patternStore()->lengthOfPattern(m_sampleTrack->getClipNum(this)));
+			changeLength(TimePos::ticksPerBar() * Engine::patternStore()->lengthOfPattern(getTrack()->getClipNum(this)));
 			return;
 		}
 		changeLength(sampleLength());

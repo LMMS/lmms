@@ -95,7 +95,6 @@ protected:
 	SampleClip( const SampleClip& orig );
 
 private:
-	Track* m_sampleTrack;
 	Sample m_sample;
 	BoolModel m_recordModel;
 	bool m_isPlaying;
