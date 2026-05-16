@@ -169,8 +169,22 @@ void SubWindow::changeEvent( QEvent *event )
 
 void SubWindow::setVisible(bool visible)
 {
-	if (isDetached() || visible) { widget()->setVisible(visible); }
-	if (!isDetached()) { QMdiSubWindow::setVisible(visible); }
+	if (isDetached())
+	{
+		// When detached, top-level window is the child widget itself. (This is janky and is best changed at some point.)
+		// For that reason we forward show/hide to the child widget, and don't touch the hidden attached window frame.
+		widget()->setVisible(visible);
+	}
+	else
+	{
+		// When attached, visibility of the actual window is controlled by SubWindow.
+		// SubWindow::hide() when it's already hidden still causes a size recalculation,
+		// if the child widget is hidden it does not get included into the layout, and maximum size is set to 0x0.
+		// There shouldn't be a reason to keep the child widget hidden when the subwindow is attached.
+		// see bug #8292
+		widget()->show();
+		QMdiSubWindow::setVisible(visible);
+	}
 }
 
 
