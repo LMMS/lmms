@@ -251,7 +251,7 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const f_cnt_t frames)
 	{
 		// The cutoff frequency is in hertz, but things like fil_veltrack are defined in cents, so we have to convert them TODO: are we sure it's cents? I saw 20000 being used in Metal GTX which is kind of high for cents (200 octaves?)
 		const float filterCutoffPitchOffset = normalizedVelocity * m_region->m_fil_veltrack;
-		const float filterCutoff = m_region->m_cutoff + std::exp2(filterCutoffPitchOffset / 12.0f);
+		const float filterCutoff = m_region->m_cutoff * std::exp2(filterCutoffPitchOffset / 1200.0f);
 		// SFZ has the resonance given in decibals, which is not the same as the resonance passed to the filter, so we have to convert it
 		const float q = std::sqrt(2.0f) * dbfsToAmp(m_region->m_resonance); // TODO is this equation correct? I'm sort of basing it off https://www.musicdsp.org/en/latest/Filters/180-cool-sounding-lowpass-with-decibel-measured-resonance.html but I'm not sure.
 		m_filter.calcFilterCoeffs(filterCutoff, q);
