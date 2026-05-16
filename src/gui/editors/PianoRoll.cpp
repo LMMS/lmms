@@ -2530,7 +2530,8 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 	}
 	else if (pos.y() > PR_TOP_MARGIN || m_action != Action::None)
 	{
-		bool edit_note = (pos.y() > noteEditTop())
+		bool edit_note = pos.y() > noteEditTop()
+			&& pos.y() <= noteEditBottom()
 			&& m_action != Action::SelectNotes;
 
 
@@ -2605,12 +2606,12 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 			if( me->buttons() & Qt::LeftButton )
 			{
 				vol = std::clamp(static_cast<volume_t>(MinVolume
-					+ static_cast<float>(noteEditBottom() -  std::min(noteEditBottom(), pos.y())) // TODO C++26: saturating_sub
+					+ static_cast<float>(noteEditBottom() - pos.y())
 					/ static_cast<float>(noteEditBottom() - noteEditTop())
 					* (MaxVolume - MinVolume)), MinVolume, MaxVolume);
 
 				pan = std::clamp(static_cast<panning_t>(PanningLeft
-					+ static_cast<float>(noteEditBottom() - std::min(noteEditBottom(), pos.y())) // TODO C++26: saturating_sub
+					+ static_cast<float>(noteEditBottom() - pos.y())
 					/ static_cast<float>(noteEditBottom() - noteEditTop())
 					* (PanningRight - PanningLeft)), PanningLeft, PanningRight);
 			}
