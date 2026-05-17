@@ -37,21 +37,6 @@
 namespace lmms
 {
 
-
-#define makeknob( name, x, y, hint, unit, oname ) 		\
-	name = new Knob( KnobType::Styled, this ); 				\
-	name ->move( x, y );								\
-	name ->setHintText( hint, unit );		\
-	name ->setObjectName( oname );						\
-	name ->setFixedSize( 19, 19 );
-
-#define maketsknob( name, x, y, hint, unit, oname ) 		\
-	name = new TempoSyncKnob( KnobType::Styled, this ); 				\
-	name ->move( x, y );								\
-	name ->setHintText( hint, unit );		\
-	name ->setObjectName( oname );						\
-	name ->setFixedSize( 19, 19 );
-
 #define A1ROW 26
 #define A2ROW 49
 #define B1ROW 72
@@ -324,6 +309,18 @@ protected slots:
 
 private:
 	void modelChanged() override;
+
+	template<class T = Knob>
+	auto makeKnob(int x, int y, const QString& hint, const QString& unit,
+		const QString& objName) -> T*
+	{
+		T* knob = new T(KnobType::Styled, this);
+		knob->move(x, y);
+		knob->setHintText(hint, unit);
+		knob->setObjectName(objName);
+		knob->setFixedSize(19, 19);
+		return knob;
+	};
 
 // knobs
 	Knob * a1_volKnob;

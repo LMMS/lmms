@@ -63,7 +63,7 @@ public:
 
 	inline void setDescription( const QString& desc )
 	{
-		m_description = desc;
+		m_description = desc.trimmed();
 	}
 
 	inline void setUnit( const QString& unit )

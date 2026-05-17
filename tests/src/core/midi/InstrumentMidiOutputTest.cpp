@@ -66,7 +66,7 @@ public:
 		// Using MidiSystemReset as a temporary value. The -1 key/velocity is what should be checked to make sure the event is invalid (i.e., no event was recieved.)
 		m_instrument->m_lastEvent = MidiEvent(MidiSystemReset, 0, -1, -1);
 		m_track->processInEvent(event, 0, 0);
-		Engine::audioEngine()->renderNextBuffer();
+		Engine::audioEngine()->renderNextPeriod();
 		return m_instrument->m_lastEvent;
 	}
 
