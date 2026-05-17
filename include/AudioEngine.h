@@ -289,8 +289,6 @@ public:
 	//! @copydoc renderNextBuffer(InterleavedBufferView<float>)
 	void renderNextBuffer(PlanarBufferView<float> dst) { renderNextBuffer<PlanarBufferView<float>>(dst); }
 
-	const SampleFrame* renderNextBuffer();
-
 	//! Block until a change in model can be done (i.e. wait for audio thread)
 	void requestChangeInModel();
 	void doneChangeInModel();
