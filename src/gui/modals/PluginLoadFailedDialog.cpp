@@ -4,6 +4,8 @@
 
 #include <QBoxLayout>
 #include <QDebug>
+#include <QDialog>
+#include <QDialogButtonBox>
 #include <QHeaderView>
 #include <QLabel>
 #include <QLayout>
@@ -33,14 +35,23 @@ PluginLoadFailedDialog::PluginLoadFailedDialog()
 	setModal(false);
 	setAttribute(Qt::WA_DeleteOnClose);
 	setLayout(new QVBoxLayout);
+
 	m_label = new QLabel{tr("<strong>The following plugin(s) failed to load:</strong>")};
 	layout()->addWidget(m_label);
+
 	m_table = new QTableWidget;
+	m_table->setEditTriggers(QAbstractItemView::NoEditTriggers); // Disable cell editing
+	m_table->setFocusPolicy(Qt::NoFocus);
+	m_table->setSelectionMode(QAbstractItemView::NoSelection); // Disable cell focus/selection
 	m_table->setColumnCount(2);
 	m_table->setHorizontalHeaderLabels({tr("Plugin name"), tr("Reason")});
 	m_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-	m_table->verticalHeader()->hide(); // Hides row numbers
+	m_table->verticalHeader()->hide(); // Hide row numbers
 	layout()->addWidget(m_table);
+
+	auto* dialogButtons = new QDialogButtonBox{QDialogButtonBox::Ok};
+	connect(dialogButtons, &QDialogButtonBox::accepted, this, &QDialog::accept);
+	layout()->addWidget(dialogButtons);
 }
 
 PluginLoadFailedDialog::~PluginLoadFailedDialog()
