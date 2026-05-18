@@ -50,7 +50,7 @@ public:
 	/// Export all unmuted tracks into individual file
 	void renderTracks(const QString& outputPath);
 
-	/// Export a a track into a single file
+	/// Export a track into a single file
 	void renderTrack(Track* track, const QString& outputPath);
 
 	void abortProcessing();
