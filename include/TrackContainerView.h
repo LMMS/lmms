@@ -156,7 +156,7 @@ public slots:
 
 	//! Creates a track view for @a t if one doesn't exist already.
 	//! Otherwise, the already existing track view for @a t is returned.
-	lmms::gui::TrackView* createTrackView(lmms::Track* _t);
+	lmms::gui::TrackView* createTrackView(lmms::Track* t);
 	void deleteTrackView( lmms::gui::TrackView * _tv );
 
 	void dropEvent( QDropEvent * _de ) override;
