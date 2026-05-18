@@ -365,8 +365,8 @@ void TrackOperationsWidget::updateMenu()
 	}
 
 	// TODO: Allow for exporting tracks inside patterns
-	if (!dynamic_cast<AutomationTrackView*>(this)
-		&& !dynamic_cast<PatternStore*>(m_trackView->getTrack()->trackContainer()))
+	if (!qobject_cast<AutomationTrackView*>(this)
+		&& !qobject_cast<PatternStore*>(m_trackView->getTrack()->trackContainer()))
 	{
 		toMenu->addAction(tr("Export this track"), this, &TrackOperationsWidget::exportTrack);
 	}

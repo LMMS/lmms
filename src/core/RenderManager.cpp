@@ -111,7 +111,7 @@ void RenderManager::renderTrack(Track* track, const QString& outputPath)
 
 	// TODO: Currently, only the song is exported (it will require changes and refactors in Song), but in the future we
 	// may want to generalize this function to work with any track container (e.g. the pattern store)
-	if (!dynamic_cast<Song*>(track->trackContainer()))
+	if (!qobject_cast<Song*>(track->trackContainer()))
 	{
 		qDebug("Can only export tracks from the song");
 		return;
