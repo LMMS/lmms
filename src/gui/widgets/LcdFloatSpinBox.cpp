@@ -191,6 +191,12 @@ void LcdFloatSpinBox::mouseReleaseEvent(QMouseEvent*)
 
 void LcdFloatSpinBox::wheelEvent(QWheelEvent *event)
 {
+	if (event->angleDelta().y() == 0)
+	{
+		event->ignore();
+		return;
+	}
+
 	// switch between integer and fractional step based on cursor position
 	if (event->position().toPoint().x() < m_wholeDisplay.width()) { m_intStep = true; }
 	else { m_intStep = false; }

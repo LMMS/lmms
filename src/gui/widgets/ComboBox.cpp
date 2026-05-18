@@ -210,6 +210,12 @@ void ComboBox::paintEvent( QPaintEvent * _pe )
 
 void ComboBox::wheelEvent( QWheelEvent* event )
 {
+	if (event->angleDelta().y() == 0)
+	{
+		event->ignore();
+		return;
+	}
+
 	if( model() )
 	{
 		const int direction = (event->angleDelta().y() < 0 ? 1 : -1) * (event->inverted() ? -1 : 1);

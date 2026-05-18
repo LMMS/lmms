@@ -580,6 +580,12 @@ void VolumeKnob::adjustByDecibelDelta(float dbDelta)
 
 void VolumeKnob::wheelEvent(QWheelEvent* we)
 {
+	if (we->angleDelta().y() == 0)
+	{
+		we->ignore();
+		return;
+	}
+
 	we->accept();
 	const int direction = (we->angleDelta().y() > 0 ? 1 : -1) * (we->inverted() ? -1 : 1);
 	adjustModelByDBDelta(determineAdjustmentDelta(we->modifiers()) * direction);

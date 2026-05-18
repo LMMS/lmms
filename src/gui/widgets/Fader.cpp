@@ -268,6 +268,12 @@ void Fader::mouseReleaseEvent(QMouseEvent* mouseEvent)
 
 void Fader::wheelEvent (QWheelEvent* ev)
 {
+	if (ev->angleDelta().y() == 0)
+	{
+		ev->ignore();
+		return;
+	}
+
 	const int direction = (ev->angleDelta().y() > 0 ? 1 : -1) * (ev->inverted() ? -1 : 1);
 
 	const float increment = determineAdjustmentDelta(ev->modifiers()) * direction;

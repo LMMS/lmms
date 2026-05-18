@@ -297,8 +297,17 @@ void FloatModelEditorBase::paintEvent(QPaintEvent *)
 
 void FloatModelEditorBase::wheelEvent(QWheelEvent * we)
 {
-	we->accept();
 	const int deltaY = we->angleDelta().y();
+	const int deltaX = we->angleDelta().x();
+	const auto modKeys = we->modifiers();
+
+	if (deltaY == 0 && (deltaX == 0 || modKeys != Qt::AltModifier))
+	{
+		we->ignore();
+		return;
+	}
+
+	we->accept();
 	float direction = deltaY > 0 ? 1 : -1;
 
 	auto * m = model();
@@ -310,7 +319,6 @@ void FloatModelEditorBase::wheelEvent(QWheelEvent * we)
 	// It might be modified if the user presses modifier keys. See below.
 	float numberOfStepsForFullSweep = 100.;
 
-	const auto modKeys = we->modifiers();
 	if (modKeys == Qt::ShiftModifier)
 	{
 		// The shift is intended to go through the values in very coarse steps as in:
