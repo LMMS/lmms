@@ -148,8 +148,7 @@ void RenderManager::render()
 	for (const auto& track : Engine::getSong()->tracks())
 	{
 		if (!track->isRenderable()) { continue; }
-		track->setMuted(
-			std::find(job.tracksToRender.begin(), job.tracksToRender.end(), track) == job.tracksToRender.end());
+		track->setMuted(std::ranges::find(job.tracksToRender, track) == job.tracksToRender.end());
 	}
 
 	// TODO: We shouldn't need to allocate a new ProjectRenderer each time... we might also want to remove
