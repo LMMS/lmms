@@ -219,8 +219,7 @@ void PatternEditor::updateMaxSteps()
 		auto clip = track->getClip(m_ps->currentPattern());
 		if (track->type() == Track::Type::Automation || track->type() == Track::Type::Sample)
 		{
-			// The length of automation and sample clips is updated here.
-			// "Why here ?" will you ask. The answer is: Because.
+			// The length of automation and sample clips is updated to match the pattern length.
 			clip->updateLength();
 		}
 		m_maxClipLength = std::max(m_maxClipLength, static_cast<tick_t>(clip->length()));
