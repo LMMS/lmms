@@ -175,7 +175,7 @@ void SubWindow::setVisible(bool visible)
 		// For that reason we forward show/hide to the child widget, and don't touch the hidden attached window frame.
 		widget()->setVisible(visible);
 	}
-	else
+	if (!isDetached())
 	{
 		// When attached, visibility of the actual window is controlled by SubWindow.
 		// Nevertheless, the subwindow contents still need to be visible, which is addressed above.
