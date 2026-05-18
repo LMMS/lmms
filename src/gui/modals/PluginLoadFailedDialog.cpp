@@ -1,6 +1,7 @@
 #include "PluginLoadFailedDialog.h"
 
 #include "GuiApplication.h"
+#include "MainWindow.h"
 
 #include <QBoxLayout>
 #include <QDebug>
@@ -30,7 +31,7 @@ void pluginLoadFailed(QString pluginName, QString error)
 namespace gui {
 
 PluginLoadFailedDialog::PluginLoadFailedDialog()
-	: QDialog{}
+	: QDialog{getGUI()->mainWindow()}
 {
 	setModal(false);
 	setAttribute(Qt::WA_DeleteOnClose);
