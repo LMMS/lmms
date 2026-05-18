@@ -82,7 +82,7 @@ private:
 
 	std::queue<RenderJob> m_renderJobQueue;
 	std::unordered_map<Track*, bool> m_muteStates;
-	int m_totalRenderJobs = 0;
+	std::size_t m_totalRenderJobs = 0;
 } ;
 
 
