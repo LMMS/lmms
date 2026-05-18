@@ -189,7 +189,7 @@ void Lv2Instrument::play(SampleFrame* buf)
 {
 	copyModelsFromLmms();
 
-	fpp_t fpp = Engine::audioEngine()->framesPerPeriod();
+	f_cnt_t fpp = Engine::audioEngine()->framesPerPeriod();
 
 	run(fpp);
 

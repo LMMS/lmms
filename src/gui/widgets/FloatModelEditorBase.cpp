@@ -3,6 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2023 Michael Gregorius
+ * Copyright (c) 2026 Dalton Messmer <messmer.dalton/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -28,6 +29,7 @@
 #include <QApplication>
 #include <QInputDialog>
 #include <QPainter>
+#include <QTimerEvent>
 
 #include "lmms_math.h"
 #include "DeprecationHelper.h"
@@ -50,8 +52,6 @@ SimpleTextFloat * FloatModelEditorBase::s_textFloat = nullptr;
 FloatModelEditorBase::FloatModelEditorBase(DirectionOfManipulation directionOfManipulation, QWidget * parent, const QString & name) :
 	QWidget(parent),
 	FloatModelView(new FloatModel(0, 0, 0, 1, nullptr, name, true), this),
-	m_volumeKnob(false),
-	m_volumeRatio(100.0, 0.0, 1000000.0),
 	m_buttonPressed(false),
 	m_directionOfManipulation(directionOfManipulation)
 {
@@ -76,16 +76,34 @@ void FloatModelEditorBase::initUi(const QString & name)
 
 void FloatModelEditorBase::showTextFloat(int msecBeforeDisplay, int msecDisplayTime)
 {
-	s_textFloat->setText(displayValue());
+	if (s_textFloat->source() != this)
+	{
+		s_textFloat->setText(m_description + ' ' + getCustomFloatingText() + m_unit);
+		s_textFloat->setSource(this);
+	}
+
 	s_textFloat->moveGlobal(this, QPoint(width() + 2, 0));
 	s_textFloat->showWithDelay(msecBeforeDisplay, msecDisplayTime);
+}
+
+
+void FloatModelEditorBase::showTextFloat()
+{
+	if (s_textFloat->source() != this)
+	{
+		s_textFloat->setText(m_description + ' ' + getCustomFloatingText() + m_unit);
+		s_textFloat->setSource(this);
+	}
+
+	s_textFloat->moveGlobal(this, QPoint(width() + 2, 0));
+	s_textFloat->show();
 }
 
 
 float FloatModelEditorBase::getValue(const QPoint & p)
 {
 	// Find out which direction/coordinate is relevant for this control
-	int const coordinate = m_directionOfManipulation == DirectionOfManipulation::Vertical ? p.y() : -p.x();
+	const int coordinate = m_directionOfManipulation == DirectionOfManipulation::Vertical ? p.y() : -p.x();
 
 	// knob value increase is linear to mouse movement
 	float value = .4f * coordinate;
@@ -172,11 +190,6 @@ void FloatModelEditorBase::mousePressEvent(QMouseEvent * me)
 		emit sliderPressed();
 
 		showTextFloat(0, 0);
-
-		s_textFloat->setText(displayValue());
-		s_textFloat->moveGlobal(this,
-				QPoint(width() + 2, 0));
-		s_textFloat->show();
 		m_buttonPressed = true;
 	}
 	else if (me->button() == Qt::LeftButton &&
@@ -205,8 +218,8 @@ void FloatModelEditorBase::mouseMoveEvent(QMouseEvent * me)
 		// original position for next time is current position
 		m_lastMousePos = pos;
 	}
-	s_textFloat->setText(displayValue());
-	s_textFloat->show();
+
+	showTextFloat();
 }
 
 
@@ -264,16 +277,16 @@ void FloatModelEditorBase::paintEvent(QPaintEvent *)
 {
 	QPainter p(this);
 
-	QColor const foreground(3, 94, 97);
+	const auto foreground = QColor{3, 94, 97};
 
-	auto const * mod = model();
-	auto const minValue = mod->minValue();
-	auto const maxValue = mod->maxValue();
-	auto const range = maxValue - minValue;
+	const auto* mod = model();
+	const auto minValue = mod->minValue();
+	const auto maxValue = mod->maxValue();
+	const auto range = maxValue - minValue;
 
 	// Compute the percentage
 	// min + x * (max - min) = v <=> x = (v - min) / (max - min)
-	auto const percentage = range == 0 ? 1. : (mod->value() - minValue) / range;
+	const auto percentage = range == 0 ? 1. : (mod->value() - minValue) / range;
 
 	QRect r = rect();
 	p.setPen(foreground);
@@ -289,15 +302,15 @@ void FloatModelEditorBase::wheelEvent(QWheelEvent * we)
 	float direction = deltaY > 0 ? 1 : -1;
 
 	auto * m = model();
-	float const step = m->step<float>();
-	float const range = m->range();
+	const float step = m->step<float>();
+	const float range = m->range();
 
 	// This is the default number of steps or mouse wheel events that it takes to sweep
 	// from the lowest value to the highest value.
 	// It might be modified if the user presses modifier keys. See below.
 	float numberOfStepsForFullSweep = 100.;
 
-	auto const modKeys = we->modifiers();
+	const auto modKeys = we->modifiers();
 	if (modKeys == Qt::ShiftModifier)
 	{
 		// The shift is intended to go through the values in very coarse steps as in:
@@ -319,7 +332,7 @@ void FloatModelEditorBase::wheelEvent(QWheelEvent * we)
 		// left and right. Account for this quirk.
 		if (deltaY == 0)
 		{
-			int const deltaX = we->angleDelta().x();
+			const int deltaX = we->angleDelta().x();
 			if (deltaX != 0)
 			{
 				direction = deltaX > 0 ? 1 : -1;
@@ -340,9 +353,7 @@ void FloatModelEditorBase::wheelEvent(QWheelEvent * we)
 	const int inc = direction * stepMult;
 	model()->incValue(inc);
 
-	s_textFloat->setText(displayValue());
-	s_textFloat->moveGlobal(this, QPoint(width() + 2, 0));
-	s_textFloat->showWithTimeout(1000);
+	showTextFloat(0, 1000);
 
 	emit sliderMoved(model()->value());
 }
@@ -377,45 +388,23 @@ void FloatModelEditorBase::setPosition(const QPoint & p)
 
 void FloatModelEditorBase::enterValue()
 {
-	bool ok;
-	float new_val;
-
-	if (isVolumeKnob())
-	{
-		auto const initalValue = model()->getRoundedValue() / 100.0;
-		auto const initialDbValue = initalValue > 0. ? ampToDbfs(initalValue) : -96;
-
-		new_val = QInputDialog::getDouble(
-			this, tr("Set value"),
-			tr("Please enter a new value between "
-					"-96.0 dBFS and 6.0 dBFS:"),
-				initialDbValue, -96.0, 6.0, model()->getDigitCount(), &ok);
-
-		if (new_val <= -96.0)
-		{
-			new_val = 0.0f;
-		}
-		else
-		{
-			new_val = dbfsToAmp(new_val) * 100.0;
-		}
-	}
-	else
-	{
-		new_val = QInputDialog::getDouble(
-				this, tr("Set value"),
-				tr("Please enter a new value between "
-						"%1 and %2:").
-						arg(model()->minValue()).
-						arg(model()->maxValue()),
-					model()->getRoundedValue(),
-					model()->minValue(),
-					model()->maxValue(), model()->getDigitCount(), &ok);
-	}
+	bool ok = false;
+	const float newVal = QInputDialog::getDouble(
+		this,
+		tr("Set value"),
+		tr("Please enter a new value between %1 and %2:")
+			.arg(model()->minValue())
+			.arg(model()->maxValue()),
+		model()->getRoundedValue(),
+		model()->minValue(),
+		model()->maxValue(),
+		model()->getDigitCount(),
+		&ok
+	);
 
 	if (ok)
 	{
-		model()->setValue(new_val);
+		model()->setValue(newVal);
 	}
 }
 
@@ -431,24 +420,24 @@ void FloatModelEditorBase::friendlyUpdate()
 		&& Controller::runningFrames() % (256 * 4) != 0)
 	{ return; }
 
+	// If this float model is currently controlling the TextFloat...
+	if (textFloat().source() == this)
+	{
+		// ...and if the text changed since last time...
+		if (auto updatedText = getCustomFloatingTextUpdate())
+		{
+			// ...then update the floating text
+			s_textFloat->setText(m_description + ' ' + std::move(*updatedText) + m_unit);
+		}
+	}
+
 	update();
 }
 
 
-QString FloatModelEditorBase::displayValue() const
+QString FloatModelEditorBase::getCustomFloatingText()
 {
-	if (isVolumeKnob())
-	{
-		auto const valueToVolumeRatio = model()->getRoundedValue() / volumeRatio();
-		return m_description.trimmed() + (
-			valueToVolumeRatio == 0.
-			? QString(" -∞ dBFS")
-			: QString(" %1 dBFS").arg(ampToDbfs(valueToVolumeRatio), 3, 'f', 2)
-		);
-	}
-
-	return m_description.trimmed() + QString(" %1").
-					arg(model()->getRoundedValue()) + m_unit;
+	return QString::number(model()->getRoundedValue());
 }
 
 

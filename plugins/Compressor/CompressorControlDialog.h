@@ -71,7 +71,6 @@ class CompressorControlDialog : public EffectControlDialog
 public:
 	CompressorControlDialog(CompressorControls* controls);
 
-	bool isResizable() const override {return true;}
 	QSize sizeHint() const override {return QSize(COMP_SCREEN_X, COMP_SCREEN_Y);}
 
 	// For theming purposes

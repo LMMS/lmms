@@ -61,7 +61,7 @@ GranularPitchShifterEffect::GranularPitchShifterEffect(Model* parent, const Desc
 }
 
 
-Effect::ProcessStatus GranularPitchShifterEffect::processImpl(SampleFrame* buf, const fpp_t frames)
+Effect::ProcessStatus GranularPitchShifterEffect::processImpl(SampleFrame* buf, const f_cnt_t frames)
 {
 	const float d = dryLevel();
 	const float w = wetLevel();
@@ -93,7 +93,7 @@ Effect::ProcessStatus GranularPitchShifterEffect::processImpl(SampleFrame* buf, 
 	const int sizeSamples = m_sampleRate / size;
 	const float waitMult = sizeSamples / (density * 2);
 
-	for (fpp_t f = 0; f < frames; ++f)
+	for (f_cnt_t f = 0; f < frames; ++f)
 	{
 		const double pitch = (pitchBuf ? pitchBuf->value(f) : m_granularpitchshifterControls.m_pitchModel.value()) * (1. / 12.);
 		const double pitchSpread = (pitchSpreadBuf ? pitchSpreadBuf->value(f) : m_granularpitchshifterControls.m_pitchSpreadModel.value()) * (1. / 24.);
@@ -277,6 +277,9 @@ void GranularPitchShifterEffect::changeSampleRate()
 	m_truePitch[1] = pitch + pitchSpread;
 	m_speed[0] = std::exp2(m_truePitch[0]);
 	m_speed[1] = std::exp2(m_truePitch[1]);
+
+	// "warm up" the plugin by spawning in all of the grains immediately
+	startRunning();
 }
 
 

@@ -47,7 +47,7 @@ public:
 			const Descriptor::SubPluginFeatures::Key * _key );
 	~LadspaEffect() override;
 
-	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
+	ProcessStatus processImpl(SampleFrame* buf, const f_cnt_t frames) override;
 
 	void setControl( int _control, LADSPA_Data _data );
 
