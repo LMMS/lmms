@@ -380,3 +380,4 @@ void PatternEditorWindow::stop()
 
 
 } // namespace lmms::gui
+
