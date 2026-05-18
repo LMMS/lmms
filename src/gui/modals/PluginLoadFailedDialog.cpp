@@ -43,6 +43,7 @@ PluginLoadFailedDialog::PluginLoadFailedDialog()
 	m_table->setEditTriggers(QAbstractItemView::NoEditTriggers); // Disable cell editing
 	m_table->setFocusPolicy(Qt::NoFocus);
 	m_table->setSelectionMode(QAbstractItemView::NoSelection); // Disable cell focus/selection
+	m_table->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel); // Smooth scroll
 	m_table->setColumnCount(2);
 	m_table->setHorizontalHeaderLabels({tr("Plugin name"), tr("Reason")});
 	m_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
