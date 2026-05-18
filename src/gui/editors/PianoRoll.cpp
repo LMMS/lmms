@@ -106,8 +106,10 @@ const int PR_TOP_MARGIN = 18;
 const int PR_RIGHT_MARGIN = SCROLLBAR_SIZE;
 
 
-// width of area used for resizing (the grip at the end of a note)
-const int RESIZE_AREA_WIDTH = 9;
+//! Width of area used for resizing (the grip at the end of a note)
+constexpr int RESIZE_GRIP_WIDTH = 9;
+//! The maximum fraction of the note width that the resize grip is allowed to take up
+constexpr float RESIZE_GRIP_MAX_WIDTH_FRACTION = 0.25f;
 
 // width of line for setting volume/panning of note
 const int NOTE_EDIT_LINE_WIDTH = 3;
@@ -1923,8 +1925,8 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 				}
 
 				// clicked at the "tail" of the note?
-				if( pos_ticks * m_ppb / TimePos::ticksPerBar() >
-						m_currentNote->endPos() * m_ppb / TimePos::ticksPerBar() - RESIZE_AREA_WIDTH
+				if (x + m_currentPosition * m_ppb / TimePos::ticksPerBar() >
+						m_currentNote->endPos() * m_ppb / TimePos::ticksPerBar() - resizeGripWidth(*m_currentNote)
 					&& m_currentNote->length() > 0 )
 				{
 					m_midiClip->addJournalCheckPoint();
@@ -2720,8 +2722,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 				int noteRightX = ( note->pos() + note->length() -
 					m_currentPosition) * m_ppb/TimePos::ticksPerBar();
 				// cursor at the "tail" of the note?
-				bool atTail = note->length() > 0 && x > noteRightX -
-							RESIZE_AREA_WIDTH;
+				bool atTail = note->length() > 0 && x > noteRightX - resizeGripWidth(*note);
 				Qt::CursorShape cursorShape = atTail ? Qt::SizeHorCursor :
 													Qt::SizeAllCursor;
 				setCursor( cursorShape );
@@ -3291,6 +3292,11 @@ void PianoRoll::dragNotes(int x, int y, bool alt, bool shift, bool ctrl)
 }
 
 
+int PianoRoll::resizeGripWidth(const Note& note) const
+{
+	const int noteWidth = note.length() * m_ppb / TimePos::ticksPerBar();
+	return std::min(RESIZE_GRIP_WIDTH, static_cast<int>(std::round(RESIZE_GRIP_MAX_WIDTH_FRACTION * noteWidth)));
+}
 
 
 void PianoRoll::paintEvent(QPaintEvent * pe )
