@@ -2530,6 +2530,9 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 	}
 	else if (pos.y() > PR_TOP_MARGIN || m_action != Action::None)
 	{
+		// TODO convert this into a proper separate action so that it doesn't require
+		// cursor to be within the bounds *while* dragging.
+		// See: https://github.com/LMMS/lmms/pull/8389#issuecomment-4486111452
 		bool edit_note = (pos.y() > noteEditTop())
 			&& m_action != Action::SelectNotes;
 
