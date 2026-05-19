@@ -648,6 +648,7 @@ bool SubWindow::eventFilter(QObject* obj, QEvent* event)
 
 		case QEvent::Show:
 			layout()->setSizeConstraint(QLayout::SetMinAndMaxSize);
+			resize(widget()->size().addMargins(decorationMargins())); // manually sync the sizes again
 			return QMdiSubWindow::eventFilter(obj, event);
 
 		default:
