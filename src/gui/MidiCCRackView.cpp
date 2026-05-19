@@ -39,67 +39,53 @@
 
 namespace lmms::gui {
 
-namespace {
-QString getMidiCCName(int cc)
+namespace
 {
-	switch (cc)
+	struct CCMapping {
+		int cc;
+		const char* name;
+	};
+
+	static const CCMapping s_ccMappings[] = {
+		{ MidiControllerBankSelect, QT_TRANSLATE_NOOP("MidiCCRackView", "Bank Select") },
+		{ MidiControllerModulationWheel, QT_TRANSLATE_NOOP("MidiCCRackView", "Modulation Wheel") },
+		{ MidiControllerBreathController, QT_TRANSLATE_NOOP("MidiCCRackView", "Breath Controller") },
+		{ MidiControllerFootController, QT_TRANSLATE_NOOP("MidiCCRackView", "Foot Controller") },
+		{ MidiControllerPortamentoTime, QT_TRANSLATE_NOOP("MidiCCRackView", "Portamento Time") },
+		{ MidiControllerDataEntry, QT_TRANSLATE_NOOP("MidiCCRackView", "Data Entry") },
+		{ MidiControllerMainVolume, QT_TRANSLATE_NOOP("MidiCCRackView", "Main Volume") },
+		{ MidiControllerBalance, QT_TRANSLATE_NOOP("MidiCCRackView", "Balance") },
+		{ MidiControllerPan, QT_TRANSLATE_NOOP("MidiCCRackView", "Pan") },
+		{ MidiControllerEffectControl1, QT_TRANSLATE_NOOP("MidiCCRackView", "Effect Control 1") },
+		{ MidiControllerEffectControl2, QT_TRANSLATE_NOOP("MidiCCRackView", "Effect Control 2") },
+		{ MidiControllerSustain, QT_TRANSLATE_NOOP("MidiCCRackView", "Sustain") },
+		{ MidiControllerPortamento, QT_TRANSLATE_NOOP("MidiCCRackView", "Portamento") },
+		{ MidiControllerSostenuto, QT_TRANSLATE_NOOP("MidiCCRackView", "Sostenuto") },
+		{ MidiControllerSoftPedal, QT_TRANSLATE_NOOP("MidiCCRackView", "Soft Pedal") },
+		{ MidiControllerLegatoFootswitch, QT_TRANSLATE_NOOP("MidiCCRackView", "Legato Footswitch") },
+		{ MidiControllerRegisteredParameterNumberLSB, QT_TRANSLATE_NOOP("MidiCCRackView", "Registered Parameter Number (LSB)") },
+		{ MidiControllerRegisteredParameterNumberMSB, QT_TRANSLATE_NOOP("MidiCCRackView", "Registered Parameter Number (MSB)") },
+		{ MidiControllerAllSoundOff, QT_TRANSLATE_NOOP("MidiCCRackView", "All Sound Off") },
+		{ MidiControllerResetAllControllers, QT_TRANSLATE_NOOP("MidiCCRackView", "Reset All Controllers") },
+		{ MidiControllerLocalControl, QT_TRANSLATE_NOOP("MidiCCRackView", "Local Control") },
+		{ MidiControllerAllNotesOff, QT_TRANSLATE_NOOP("MidiCCRackView", "All Notes Off") },
+		{ MidiControllerOmniOn, QT_TRANSLATE_NOOP("MidiCCRackView", "Omni On") },
+		{ MidiControllerOmniOff, QT_TRANSLATE_NOOP("MidiCCRackView", "Omni Off") },
+		{ MidiControllerMonoOn, QT_TRANSLATE_NOOP("MidiCCRackView", "Mono On") },
+		{ MidiControllerPolyOn, QT_TRANSLATE_NOOP("MidiCCRackView", "Poly On") }
+	};
+
+	QString getMidiCCName(int cc)
 	{
-	case MidiControllerBankSelect:
-		return MidiCCRackView::tr("Bank Select");
-	case MidiControllerModulationWheel:
-		return MidiCCRackView::tr("Modulation Wheel");
-	case MidiControllerBreathController:
-		return MidiCCRackView::tr("Breath Controller");
-	case MidiControllerFootController:
-		return MidiCCRackView::tr("Foot Controller");
-	case MidiControllerPortamentoTime:
-		return MidiCCRackView::tr("Portamento Time");
-	case MidiControllerDataEntry:
-		return MidiCCRackView::tr("Data Entry");
-	case MidiControllerMainVolume:
-		return MidiCCRackView::tr("Main Volume");
-	case MidiControllerBalance:
-		return MidiCCRackView::tr("Balance");
-	case MidiControllerPan:
-		return MidiCCRackView::tr("Pan");
-	case MidiControllerEffectControl1:
-		return MidiCCRackView::tr("Effect Control 1");
-	case MidiControllerEffectControl2:
-		return MidiCCRackView::tr("Effect Control 2");
-	case MidiControllerSustain:
-		return MidiCCRackView::tr("Sustain");
-	case MidiControllerPortamento:
-		return MidiCCRackView::tr("Portamento");
-	case MidiControllerSostenuto:
-		return MidiCCRackView::tr("Sostenuto");
-	case MidiControllerSoftPedal:
-		return MidiCCRackView::tr("Soft Pedal");
-	case MidiControllerLegatoFootswitch:
-		return MidiCCRackView::tr("Legato Footswitch");
-	case MidiControllerRegisteredParameterNumberLSB:
-		return MidiCCRackView::tr("Registered Parameter Number (LSB)");
-	case MidiControllerRegisteredParameterNumberMSB:
-		return MidiCCRackView::tr("Registered Parameter Number (MSB)");
-	case MidiControllerAllSoundOff:
-		return MidiCCRackView::tr("All Sound Off");
-	case MidiControllerResetAllControllers:
-		return MidiCCRackView::tr("Reset All Controllers");
-	case MidiControllerLocalControl:
-		return MidiCCRackView::tr("Local Control");
-	case MidiControllerAllNotesOff:
-		return MidiCCRackView::tr("All Notes Off");
-	case MidiControllerOmniOn:
-		return MidiCCRackView::tr("Omni On");
-	case MidiControllerOmniOff:
-		return MidiCCRackView::tr("Omni Off");
-	case MidiControllerMonoOn:
-		return MidiCCRackView::tr("Mono On");
-	case MidiControllerPolyOn:
-		return MidiCCRackView::tr("Poly On");
-	default:
+		for (const auto& mapping : s_ccMappings)
+		{
+			if (mapping.cc == cc)
+			{
+				return MidiCCRackView::tr(mapping.name);
+			}
+		}
 		return QString();
 	}
-}
 } // namespace
 
 MidiCCRackView::MidiCCRackView(InstrumentTrack* track)
