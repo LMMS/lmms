@@ -22,7 +22,6 @@
  *
  */
 
-
 #include "MidiCCRackView.h"
 
 #include <QGridLayout>
@@ -30,21 +29,82 @@
 #include <QVBoxLayout>
 #include <QWidget>
 
-#include "embed.h"
 #include "GroupBox.h"
 #include "GuiApplication.h"
 #include "InstrumentTrack.h"
 #include "Knob.h"
 #include "MainWindow.h"
 #include "SubWindow.h"
+#include "embed.h"
 
-namespace lmms::gui
+namespace lmms::gui {
+
+namespace {
+QString getMidiCCName(int cc)
 {
+	switch (cc)
+	{
+	case MidiControllerBankSelect:
+		return MidiCCRackView::tr("Bank Select");
+	case MidiControllerModulationWheel:
+		return MidiCCRackView::tr("Modulation Wheel");
+	case MidiControllerBreathController:
+		return MidiCCRackView::tr("Breath Controller");
+	case MidiControllerFootController:
+		return MidiCCRackView::tr("Foot Controller");
+	case MidiControllerPortamentoTime:
+		return MidiCCRackView::tr("Portamento Time");
+	case MidiControllerDataEntry:
+		return MidiCCRackView::tr("Data Entry");
+	case MidiControllerMainVolume:
+		return MidiCCRackView::tr("Main Volume");
+	case MidiControllerBalance:
+		return MidiCCRackView::tr("Balance");
+	case MidiControllerPan:
+		return MidiCCRackView::tr("Pan");
+	case MidiControllerEffectControl1:
+		return MidiCCRackView::tr("Effect Control 1");
+	case MidiControllerEffectControl2:
+		return MidiCCRackView::tr("Effect Control 2");
+	case MidiControllerSustain:
+		return MidiCCRackView::tr("Sustain");
+	case MidiControllerPortamento:
+		return MidiCCRackView::tr("Portamento");
+	case MidiControllerSostenuto:
+		return MidiCCRackView::tr("Sostenuto");
+	case MidiControllerSoftPedal:
+		return MidiCCRackView::tr("Soft Pedal");
+	case MidiControllerLegatoFootswitch:
+		return MidiCCRackView::tr("Legato Footswitch");
+	case MidiControllerRegisteredParameterNumberLSB:
+		return MidiCCRackView::tr("Registered Parameter Number (LSB)");
+	case MidiControllerRegisteredParameterNumberMSB:
+		return MidiCCRackView::tr("Registered Parameter Number (MSB)");
+	case MidiControllerAllSoundOff:
+		return MidiCCRackView::tr("All Sound Off");
+	case MidiControllerResetAllControllers:
+		return MidiCCRackView::tr("Reset All Controllers");
+	case MidiControllerLocalControl:
+		return MidiCCRackView::tr("Local Control");
+	case MidiControllerAllNotesOff:
+		return MidiCCRackView::tr("All Notes Off");
+	case MidiControllerOmniOn:
+		return MidiCCRackView::tr("Omni On");
+	case MidiControllerOmniOff:
+		return MidiCCRackView::tr("Omni Off");
+	case MidiControllerMonoOn:
+		return MidiCCRackView::tr("Mono On");
+	case MidiControllerPolyOn:
+		return MidiCCRackView::tr("Poly On");
+	default:
+		return QString();
+	}
+}
+} // namespace
 
-
-MidiCCRackView::MidiCCRackView(InstrumentTrack * track) :
-	QWidget(),
-	m_track(track)
+MidiCCRackView::MidiCCRackView(InstrumentTrack* track)
+	: QWidget()
+	, m_track(track)
 {
 	setWindowIcon(embed::getIconPixmap("midi_cc_rack"));
 	setWindowTitle(tr("MIDI CC Rack - %1").arg(m_track->name()));
@@ -90,8 +150,16 @@ MidiCCRackView::MidiCCRackView(InstrumentTrack * track) :
 	for (int i = 0; i < MidiControllerCount; ++i)
 	{
 		auto knob = new Knob(KnobType::Bright26, tr("CC %1").arg(i), this);
+
+		QString ccName = getMidiCCName(i);
+		if (!ccName.isEmpty()) { knob->setToolTip(tr("CC %1: %2").arg(i).arg(ccName)); }
+		else
+		{
+			knob->setToolTip(tr("CC %1").arg(i));
+		}
+
 		knob->setModel(m_track->m_midiCCModel[i].get());
-		knobsAreaLayout->addWidget(knob, i/4, i%4, Qt::AlignHCenter);
+		knobsAreaLayout->addWidget(knob, i / 4, i % 4, Qt::AlignHCenter);
 
 		// TODO It seems that this is not really used/needed?
 		m_controllerKnob[i] = knob;
@@ -102,8 +170,7 @@ MidiCCRackView::MidiCCRackView(InstrumentTrack * track) :
 	m_midiCCGroupBox->setModel(m_track->m_midiCCEnable.get());
 
 	// Connection to update the name of the track on the label
-	connect(m_track, SIGNAL(nameChanged()),
-		this, SLOT(renameWindow()));
+	connect(m_track, SIGNAL(nameChanged()), this, SLOT(renameWindow()));
 
 	// Adding everything to the main layout
 	mainLayout->addWidget(m_midiCCGroupBox);
@@ -111,7 +178,7 @@ MidiCCRackView::MidiCCRackView(InstrumentTrack * track) :
 
 MidiCCRackView::~MidiCCRackView()
 {
-	if(parentWidget())
+	if (parentWidget())
 	{
 		parentWidget()->hide();
 		parentWidget()->deleteLater();
@@ -123,13 +190,12 @@ void MidiCCRackView::renameWindow()
 	setWindowTitle(tr("MIDI CC Rack - %1").arg(m_track->name()));
 }
 
-void MidiCCRackView::saveSettings(QDomDocument & doc, QDomElement & parent)
+void MidiCCRackView::saveSettings(QDomDocument& doc, QDomElement& parent)
 {
 }
 
-void MidiCCRackView::loadSettings(const QDomElement &)
+void MidiCCRackView::loadSettings(const QDomElement&)
 {
 }
-
 
 } // namespace lmms::gui
