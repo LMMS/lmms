@@ -93,6 +93,11 @@ public:
 		return m_clipType;
 	}
 
+	bool isEmpty() override
+	{
+		return !m_notes.size();
+	}
+
 
 	// next/previous track based on position in the containing track
 	MidiClip * previousMidiClip() const;
