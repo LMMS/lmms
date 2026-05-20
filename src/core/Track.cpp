@@ -505,6 +505,23 @@ void Track::createClipsForPattern(int pattern)
 }
 
 
+bool Track::hiddenForPattern(int pattern)
+{
+	if (pattern >= m_clips.size())
+		return false;
+	return m_clips[pattern]->isHidden();
+}
+
+void Track::setVisibilityForPattern(bool hidden, int pattern)
+{
+	if (pattern < m_clips.size())
+	{
+		m_clips[pattern]->setHidden(hidden);
+		emit visibilityChanged();
+	}
+}
+
+
 
 
 /*! \brief Move all the clips after a certain time later by one bar.

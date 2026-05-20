@@ -49,6 +49,7 @@ class TrackView;
 class LMMS_EXPORT Clip : public Model, public JournallingObject
 {
 	Q_OBJECT
+	mapPropertyFromModel(bool,isHidden,setHidden,m_hiddenModel);
 	mapPropertyFromModel(bool,isMuted,setMuted,m_mutedModel);
 	mapPropertyFromModel(bool,isSolo,setSolo,m_soloModel);
 public:
@@ -171,6 +172,7 @@ private:
 	TimePos m_length;
 	TimePos m_startTimeOffset;
 
+	BoolModel m_hiddenModel;
 	BoolModel m_mutedModel;
 	BoolModel m_soloModel;
 	bool m_autoResize = true;

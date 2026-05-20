@@ -104,9 +104,12 @@ public:
 	// Currently instrument track and sample track supports it
 	virtual QMenu * createMixerMenu(QString title, QString newMixerLabel);
 
+	void setVisibleForThisPattern(bool hidden);
+
 
 public slots:
 	virtual bool close();
+	void visibilityChanged();
 
 
 protected:
