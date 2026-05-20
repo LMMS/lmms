@@ -191,6 +191,15 @@ void PatternEditor::resizeEvent(QResizeEvent* re)
 }
 
 
+void PatternEditor::showAllTracks()
+{
+	for (const auto& trackView : trackViews())
+	{
+		trackView->setVisibleForThisPattern(false);
+	}
+}
+
+
 void PatternEditor::updatePosition()
 {
 	//realignTracks();
@@ -322,6 +331,8 @@ PatternEditorWindow::PatternEditorWindow(PatternStore* ps) :
 						m_editor, SLOT(addSampleTrack()));
 	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("add_automation"), tr("Add automation-track"),
 						m_editor, SLOT(addAutomationTrack()));
+	trackAndStepActionsToolBar->addAction(embed::getIconPixmap(""), tr("Show all"),
+						m_editor, SLOT(showAllTracks()));
 
 	auto stretch = new QWidget(m_toolBar);
 	stretch->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
