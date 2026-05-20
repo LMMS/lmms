@@ -140,6 +140,7 @@ public:
 
 	bool hiddenForPattern(int pattern);
 	void setVisibilityForPattern(bool hidden, int pattern);
+	void hideForPatternIfEmpty(int pattern);
 
 	void insertBar( const TimePos & pos );
 	void removeBar( const TimePos & pos );

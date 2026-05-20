@@ -69,6 +69,7 @@ protected slots:
 	void dropEvent(QDropEvent * de ) override;
 	void resizeEvent(QResizeEvent* de) override;
 	void showAllTracks();
+	void hideEmptyTracks();
 	void updatePosition();
 	void updatePixelsPerBar();
 

@@ -199,6 +199,14 @@ void PatternEditor::showAllTracks()
 	}
 }
 
+void PatternEditor::hideEmptyTracks()
+{
+	for (const auto& trackView : trackViews())
+	{
+		trackView->hideIfEmpty();
+	}
+}
+
 
 void PatternEditor::updatePosition()
 {
@@ -333,6 +341,8 @@ PatternEditorWindow::PatternEditorWindow(PatternStore* ps) :
 						m_editor, SLOT(addAutomationTrack()));
 	trackAndStepActionsToolBar->addAction(embed::getIconPixmap(""), tr("Show all"),
 						m_editor, SLOT(showAllTracks()));
+	trackAndStepActionsToolBar->addAction(embed::getIconPixmap(""), tr("Hide empty"),
+						m_editor, SLOT(hideEmptyTracks()));
 
 	auto stretch = new QWidget(m_toolBar);
 	stretch->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);

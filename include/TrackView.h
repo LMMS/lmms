@@ -105,6 +105,7 @@ public:
 	virtual QMenu * createMixerMenu(QString title, QString newMixerLabel);
 
 	void setVisibleForThisPattern(bool hidden);
+	void hideIfEmpty();
 
 
 public slots:

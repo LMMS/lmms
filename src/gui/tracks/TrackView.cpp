@@ -443,7 +443,10 @@ void TrackView::setVisibleForThisPattern(bool hidden)
 {
 	m_track->setVisibilityForPattern(hidden, Engine::patternStore()->currentPattern());
 }
-
+void TrackView::hideIfEmpty()
+{
+	m_track->hideForPatternIfEmpty(Engine::patternStore()->currentPattern());
+}
 
 
 

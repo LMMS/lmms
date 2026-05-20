@@ -521,6 +521,17 @@ void Track::setVisibilityForPattern(bool hidden, int pattern)
 	}
 }
 
+void Track::hideForPatternIfEmpty(int pattern)
+{
+	if (pattern < m_clips.size())
+	{
+		if (m_clips[pattern]->isEmpty())
+		{
+			setVisibilityForPattern(true, pattern);
+		}
+	}
+}
+
 
 
 
