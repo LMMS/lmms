@@ -65,7 +65,7 @@ WaveShaperEffect::WaveShaperEffect( Model * _parent,
 
 
 
-Effect::ProcessStatus WaveShaperEffect::processImpl(SampleFrame* buf, const fpp_t frames)
+Effect::ProcessStatus WaveShaperEffect::processImpl(SampleFrame* buf, const f_cnt_t frames)
 {
 // variables for effect
 	int i = 0;
@@ -86,7 +86,7 @@ Effect::ProcessStatus WaveShaperEffect::processImpl(SampleFrame* buf, const fpp_
 	const float *inputPtr = inputBuffer ? &( inputBuffer->values()[ 0 ] ) : &input;
 	const float *outputPtr = outputBufer ? &( outputBufer->values()[ 0 ] ) : &output;
 
-	for (fpp_t f = 0; f < frames; ++f)
+	for (f_cnt_t f = 0; f < frames; ++f)
 	{
 		auto s = std::array{buf[f][0], buf[f][1]};
 

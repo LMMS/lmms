@@ -147,6 +147,8 @@ protected:
 	void keyReleaseEvent( QKeyEvent * ke ) override;
 	void hideEvent( QHideEvent * he ) override;
 	void focusOutEvent( QFocusEvent * fe ) override;
+	void scrollTo(const QModelIndex &index, ScrollHint hint = EnsureVisible) override;
+	void wheelEvent(QWheelEvent * event) override;
 
 
 private:
@@ -174,7 +176,7 @@ private slots:
 	void activateListItem(QTreeWidgetItem* item, int column);
 	void openInNewInstrumentTrack(FileItem* item, bool songEditor);
 	bool openInNewSampleTrack(FileItem* item);
-	void openInSlicerT(FileItem* item);
+	void openInSlicerT(FileItem* item, bool songEditor);
 	void sendToActiveInstrumentTrack(FileItem* item);
 	void updateDirectory(QTreeWidgetItem* item);
 } ;

@@ -24,17 +24,14 @@
 
 #include "Editor.h"
 
+#include <QAction>
+#include <QShortcut>
+
 #include "DeprecationHelper.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
 #include "Song.h"
-
 #include "embed.h"
-
-#include <QAction>
-#include <QShortcut>
-#include <QCloseEvent>
-
 
 namespace lmms::gui
 {
@@ -92,6 +89,7 @@ void Editor::toggleMaximize()
 }
 
 Editor::Editor(bool record, bool stepRecord) :
+	QMainWindow(),
 	m_toolBar(new DropToolBar(this)),
 	m_playAction(nullptr),
 	m_recordAction(nullptr),
@@ -141,22 +139,8 @@ QAction *Editor::playAction() const
 	return m_playAction;
 }
 
-void Editor::closeEvent(QCloseEvent * event)
+void Editor::keyPressEvent(QKeyEvent* ke)
 {
-	if( parentWidget() )
-	{
-		parentWidget()->hide();
-	}
-	else
-	{
-		hide();
-	}
-	getGUI()->mainWindow()->refocus();
-	event->ignore();
- }
-
- void Editor::keyPressEvent(QKeyEvent *ke)
- {
 	if (ke->key() == Qt::Key_Space)
 	{
 		if (ke->modifiers() & Qt::ShiftModifier)
@@ -170,7 +154,7 @@ void Editor::closeEvent(QCloseEvent * event)
 		return;
 	}
 	ke->ignore();
- }
+}
 
 DropToolBar::DropToolBar(QWidget* parent) : QToolBar(parent)
 {

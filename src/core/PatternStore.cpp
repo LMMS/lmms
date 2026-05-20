@@ -44,7 +44,7 @@ PatternStore::PatternStore() :
 
 
 
-bool PatternStore::play(TimePos start, fpp_t frames, f_cnt_t offset, int clipNum)
+bool PatternStore::play(TimePos start, f_cnt_t frames, f_cnt_t offset, int clipNum)
 {
 	bool notePlayed = false;
 

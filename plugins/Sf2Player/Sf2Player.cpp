@@ -783,7 +783,7 @@ void Sf2Instrument::noteOff( Sf2PluginData * n )
 
 void Sf2Instrument::play( SampleFrame* _working_buffer )
 {
-	const fpp_t frames = Engine::audioEngine()->framesPerPeriod();
+	const f_cnt_t frames = Engine::audioEngine()->framesPerPeriod();
 
 	// set midi pitch for this period
 	const int currentMidiPitch = instrumentTrack()->midiPitch();

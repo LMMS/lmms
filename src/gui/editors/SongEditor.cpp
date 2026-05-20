@@ -96,13 +96,11 @@ SongEditor::SongEditor( Song * song ) :
 {
 	// Set up timeline
 	m_timeLine = new TimeLineWidget(m_trackHeadWidth, 32, pixelsPerBar(),
-		m_song->getPlayPos(Song::PlayMode::Song),
 		m_song->getTimeline(Song::PlayMode::Song),
-		m_currentPosition, Song::PlayMode::Song, this
+		m_currentPosition, this
 	);
-	connect(this, &TrackContainerView::positionChanged, m_timeLine, &TimeLineWidget::updatePosition);
-	connect( m_timeLine, SIGNAL( positionChanged( const lmms::TimePos& ) ),
-			this, SLOT( updatePosition( const lmms::TimePos& ) ) );
+	connect(this, &TrackContainerView::positionChanged, m_timeLine, qOverload<>(&QWidget::update));
+	connect(m_timeLine->timeline(), &Timeline::positionChanged, this, &SongEditor::updatePosition);
 	connect( m_timeLine, SIGNAL(regionSelectedFromPixels(int,int)),
 			this, SLOT(selectRegionFromPixels(int,int)));
 	connect( m_timeLine, SIGNAL(selectionFinished()),
@@ -120,7 +118,10 @@ SongEditor::SongEditor( Song * song ) :
 	// When zoom changes, update position line
 	// But we must convert pixels per bar to a zoom factor where 1.0 is 100%
 	connect(this, &SongEditor::pixelsPerBarChanged, m_positionLine,
-		[this]() { m_positionLine->zoomChange(pixelsPerBar() / float(DEFAULT_PIXELS_PER_BAR)); });
+		[this]() {
+			m_positionLine->zoomChange(pixelsPerBar() / float(DEFAULT_PIXELS_PER_BAR));
+			updatePositionLine();
+		});
 
 	// Ensure loop markers snap to same increments as clips. Zoom & proportional
 	// snap changes are handled in zoomingChanged() and toggleProportionalSnap()
@@ -247,6 +248,7 @@ SongEditor::SongEditor( Song * song ) :
 	m_zoomingModel->setParent(this);
 	m_zoomingModel->setJournalling(false);
 	connect(m_zoomingModel, SIGNAL(dataChanged()), this, SLOT(zoomingChanged()));
+	m_zoomingModel->setInitValue(ConfigManager::inst()->value("ui","songeditorzoom",QString::number(calculateZoomSliderValue(DEFAULT_PIXELS_PER_BAR))).toInt());
 
 
 	// Set up snapping model
@@ -266,13 +268,17 @@ SongEditor::SongEditor( Song * song ) :
 			m_snappingModel->addItem(QString("1/%1 Bar").arg(1 / bars));
 		}
 	}
-	m_snappingModel->setInitValue( m_snappingModel->findText( "1/4 Bar" ) );
+	m_snappingModel->setInitValue(ConfigManager::inst()->value("ui", "songeditorsnap", QString::number(m_snappingModel->findText( "1/4 Bar" ))).toInt());
 
 	setFocusPolicy( Qt::StrongFocus );
 	setFocus();
 }
 
-
+SongEditor::~SongEditor()
+{
+	ConfigManager::inst()->setValue("ui", "songeditorzoom", QString::number(m_zoomingModel->value()));
+	ConfigManager::inst()->setValue("ui", "songeditorsnap", QString::number(m_snappingModel->value()));
+}
 
 
 void SongEditor::saveSettings( QDomDocument& doc, QDomElement& element )
@@ -329,6 +335,7 @@ void SongEditor::scrolled( int new_pos )
 {
 	update();
 	emit positionChanged(m_currentPosition = TimePos(new_pos));
+	updatePositionLine();
 }
 
 
@@ -472,23 +479,26 @@ void SongEditor::keyPressEvent( QKeyEvent * ke )
 	}
 	else if( ke->key() == Qt::Key_Left )
 	{
-		tick_t t = m_song->currentTick() - TimePos::ticksPerBar();
+		tick_t t = m_song->getPlayPos(Song::PlayMode::Song).getTicks() - TimePos::ticksPerBar();
 		if( t >= 0 )
 		{
 			m_song->setPlayPos( t, Song::PlayMode::Song );
+			if (!m_song->isPlaying()) { m_song->setPlayPos(t, Song::PlayMode::None); }
 		}
 	}
 	else if( ke->key() == Qt::Key_Right )
 	{
-		tick_t t = m_song->currentTick() + TimePos::ticksPerBar();
+		tick_t t = m_song->getPlayPos(Song::PlayMode::Song).getTicks() + TimePos::ticksPerBar();
 		if( t < MaxSongLength )
 		{
 			m_song->setPlayPos( t, Song::PlayMode::Song );
+			if (!m_song->isPlaying()) { m_song->setPlayPos(t, Song::PlayMode::None); }
 		}
 	}
 	else if( ke->key() == Qt::Key_Home )
 	{
 		m_song->setPlayPos( 0, Song::PlayMode::Song );
+		if (!m_song->isPlaying()) { m_song->setPlayPos(0, Song::PlayMode::None); }
 	}
 	else if( ke->key() == Qt::Key_Delete || ke->key() == Qt::Key_Backspace )
 	{
@@ -566,21 +576,6 @@ void SongEditor::wheelEvent( QWheelEvent * we )
 		return;
 	}
 	we->accept();
-}
-
-
-
-void SongEditor::closeEvent( QCloseEvent * ce )
-{
-	if( parentWidget() )
-	{
-		parentWidget()->hide();
-	}
-	else
-	{
-		hide();
-	}
-	ce->ignore();
 }
 
 
@@ -760,8 +755,9 @@ static inline void animateScroll( QScrollBar *scrollBar, int newVal, bool smooth
 
 
 
-void SongEditor::updatePosition( const TimePos & t )
+void SongEditor::updatePosition()
 {
+	const TimePos& t = m_timeLine->timeline()->pos();
 	const bool compactTrackButtons = ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt();
 	const auto widgetWidth = compactTrackButtons ? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT : DEFAULT_SETTINGS_WIDGET_WIDTH;
 	const auto trackOpWidth = compactTrackButtons ? TRACK_OP_WIDTH_COMPACT : TRACK_OP_WIDTH;
@@ -789,7 +785,18 @@ void SongEditor::updatePosition( const TimePos & t )
 		m_scrollBack = false;
 	}
 
-	const int x = m_timeLine->markerX(t);
+	updatePositionLine();
+}
+
+
+
+
+void SongEditor::updatePositionLine()
+{
+	const bool compactTrackButtons = ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt();
+	const auto widgetWidth = compactTrackButtons ? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT : DEFAULT_SETTINGS_WIDGET_WIDTH;
+	const auto trackOpWidth = compactTrackButtons ? TRACK_OP_WIDTH_COMPACT : TRACK_OP_WIDTH;
+	const int x = m_timeLine->markerX(m_timeLine->timeline()->pos());
 	if( x >= trackOpWidth + widgetWidth -1 )
 	{
 		m_positionLine->show();
@@ -800,14 +807,6 @@ void SongEditor::updatePosition( const TimePos & t )
 		m_positionLine->hide();
 	}
 
-	updatePositionLine();
-}
-
-
-
-
-void SongEditor::updatePositionLine()
-{
 	m_positionLine->setFixedHeight(totalHeightOfTracks());
 }
 
@@ -1098,6 +1097,8 @@ void SongEditorWindow::play()
 void SongEditorWindow::record()
 {
 	m_editor->m_song->record();
+	m_editor->m_timeLine->setRecording(true);
+	m_editor->m_positionLine->setRecording(true);
 }
 
 
@@ -1106,6 +1107,8 @@ void SongEditorWindow::record()
 void SongEditorWindow::recordAccompany()
 {
 	m_editor->m_song->playAndRecord();
+	m_editor->m_timeLine->setRecording(true);
+	m_editor->m_positionLine->setRecording(true);
 }
 
 
@@ -1115,6 +1118,8 @@ void SongEditorWindow::stop()
 {
 	m_editor->m_song->stop();
 	getGUI()->pianoRoll()->stopRecording();
+	m_editor->m_timeLine->setRecording(false);
+	m_editor->m_positionLine->setRecording(false);
 }
 
 

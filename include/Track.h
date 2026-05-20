@@ -99,7 +99,7 @@ public:
 		return m_type;
 	}
 
-	virtual bool play( const TimePos & start, const fpp_t frames,
+	virtual bool play( const TimePos & start, const f_cnt_t frames,
 						const f_cnt_t frameBase, int clipNum = -1 ) = 0;
 
 
