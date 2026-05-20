@@ -274,6 +274,7 @@ void SampleClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		_this.setAttribute( "pos", startPosition() );
 	}
 	_this.setAttribute( "len", length() );
+	_this.setAttribute( "hidden", isHidden() );
 	_this.setAttribute( "muted", isMuted() );
 	_this.setAttribute( "src", sampleFile() );
 	_this.setAttribute( "off", startTimeOffset() );
@@ -324,6 +325,7 @@ void SampleClip::loadSettings( const QDomElement & _this )
 		m_sample = Sample(std::move(buffer));
 	}
 	changeLength( _this.attribute( "len" ).toInt() );
+	setHidden( _this.attribute( "hidden" ).toInt() );
 	setMuted( _this.attribute( "muted" ).toInt() );
 	setStartTimeOffset( _this.attribute( "off" ).toInt() );
 	setAutoResize(_this.attribute("autoresize", "1").toInt());
