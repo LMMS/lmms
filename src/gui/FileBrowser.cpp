@@ -28,6 +28,8 @@
 #include <PathUtil.h>
 #include <QApplication>
 #include <QCheckBox>
+#include <QApplication>
+#include <QDesktopServices>
 #include <QHBoxLayout>
 #include <QHeaderView>
 #include <QLineEdit>
@@ -107,8 +109,7 @@ FileBrowser::FileBrowser(Type type, const QString& directories, const QString& f
 	m_filterEdit->setClearButtonEnabled(true);
 	m_filterEdit->addAction(embed::getIconPixmap("zoom"), QLineEdit::LeadingPosition);
 
-	connect(m_filterEdit, &QLineEdit::textEdited, this, &FileBrowser::onSearch);
-	connect(FileBrowserSearcher::instance(), &FileBrowserSearcher::searchComplete, this, &FileBrowser::buildSearchTree);
+	connect(m_filterEdit, &QLineEdit::textEdited, [this](const QString & filter) { filterAndExpandItems(filter); });
 
 	auto reload_btn = new QPushButton(embed::getIconPixmap("reload"), QString(), searchWidget);
 	reload_btn->setToolTip( tr( "Refresh list" ) );
@@ -122,10 +123,6 @@ FileBrowser::FileBrowser(Type type, const QString& directories, const QString& f
 
 	m_fileBrowserTreeWidget = new FileBrowserTreeWidget( contentParent() );
 	addContentWidget( m_fileBrowserTreeWidget );
-
-	m_searchTreeWidget = new FileBrowserTreeWidget(contentParent());
-	m_searchTreeWidget->hide();
-	addContentWidget(m_searchTreeWidget);
 
 	// Whenever the FileBrowser has focus, Ctrl+F should direct focus to its filter box.
 	auto filterFocusShortcut = new QShortcut(QKeySequence(QKeySequence::Find), this, SLOT(giveFocusToFilter()));
@@ -207,87 +204,6 @@ void FileBrowser::saveDirectoriesStates()
 void FileBrowser::restoreDirectoriesStates()
 {
 	expandItems(m_savedExpandedDirs);
-}
-
-void FileBrowser::buildSearchTree(QStringList matches, QString id)
-{
-	if (title() != id) { return; }
-
-	m_searchTreeWidget->clear();
-
-	const auto rootPaths = m_directories.split('*');
-	for (const auto& rootPath : rootPaths)
-	{
-		const auto rootPathDir = QDir{rootPath};
-		const auto absoluteRootPath = rootPathDir.absolutePath();
-
-		for (const auto& match : matches)
-		{
-			if (!match.startsWith(absoluteRootPath)) { continue; }
-
-			const auto childInfo = QFileInfo{match};
-			const auto childName = childInfo.fileName();
-			const auto parentPath = childInfo.dir().path();
-			auto childWidget = static_cast<QTreeWidgetItem*>(nullptr);
-
-			if (childInfo.isDir())
-			{
-				auto dirChildWidget = new Directory(childName, parentPath, m_filter);
-				dirChildWidget->update();
-				childWidget = dirChildWidget;
-			}
-			else if (childInfo.isFile()) { childWidget = new FileItem(childName, parentPath); }
-			else { continue; }
-
-			const auto relativeParentPath = rootPathDir.relativeFilePath(parentPath);
-			if (relativeParentPath == ".")
-			{
-				m_searchTreeWidget->addTopLevelItem(childWidget);
-				if (childInfo.isDir()) { m_searchTreeWidget->expandItem(childWidget); }
-				continue;
-			}
-
-			const auto grandParentPath = QFileInfo{parentPath}.dir().path();
-			const auto parentItems = m_searchTreeWidget->findItems(relativeParentPath, Qt::MatchExactly);
-
-			if (parentItems.isEmpty())
-			{
-				auto parentItem = new Directory(relativeParentPath, grandParentPath, m_filter);
-				parentItem->addChild(childWidget);
-				m_searchTreeWidget->addTopLevelItem(parentItem);
-				m_searchTreeWidget->expandItem(parentItem);
-			}
-			else { parentItems[0]->addChild(childWidget); }
-		}
-	}
-
-	toggleSearch(true);
-}
-
-	
-void FileBrowser::onSearch(const QString& filter)
-{
-	auto instance = FileBrowserSearcher::instance();
-	if (filter.isEmpty())
-	{
-		toggleSearch(false);
-		instance->cancel();
-		return;
-	}
-	instance->search({m_directories, filter, dirFilters(), m_filter.split(' '), title()});
-}
-
-void FileBrowser::toggleSearch(bool on)
-{
-	if (on)
-	{
-		m_searchTreeWidget->show();
-		m_fileBrowserTreeWidget->hide();
-		return;
-	}
-	
-	m_searchTreeWidget->hide();
-	m_fileBrowserTreeWidget->show();
 }
 
 bool FileBrowser::filterAndExpandItems(const QString & filter, QTreeWidgetItem * item)
