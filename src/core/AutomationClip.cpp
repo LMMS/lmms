@@ -197,9 +197,9 @@ void AutomationClip::updateLength()
 	// checks if it has been resized from either direction.
 	if (getAutoResize())
 	{
-		if ( m_autoTrack != nullptr && m_autoTrack->trackContainer() == Engine::patternStore() )
+		if (m_autoTrack != nullptr && m_autoTrack->trackContainer() == Engine::patternStore())
 		{
-			// If inside a pattern, the clip is always the lenght of it.
+			// If inside a pattern, the clip is always the length of it.
 			changeLength(TimePos::ticksPerBar() * Engine::patternStore()->lengthOfPattern(m_autoTrack->getClipNum(this)));
 			return;
 		}
