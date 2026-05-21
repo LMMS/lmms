@@ -505,14 +505,14 @@ void Track::createClipsForPattern(int pattern)
 }
 
 
-bool Track::hiddenForPattern(int pattern)
+bool Track::hiddenForPattern(size_t pattern)
 {
 	if (pattern >= m_clips.size())
 		return false;
 	return m_clips[pattern]->isHidden();
 }
 
-void Track::setVisibilityForPattern(bool hidden, int pattern)
+void Track::setVisibilityForPattern(bool hidden, size_t pattern)
 {
 	if (pattern < m_clips.size())
 	{
@@ -521,7 +521,7 @@ void Track::setVisibilityForPattern(bool hidden, int pattern)
 	}
 }
 
-void Track::hideForPatternIfEmpty(int pattern)
+void Track::hideForPatternIfEmpty(size_t pattern)
 {
 	if (pattern < m_clips.size())
 	{

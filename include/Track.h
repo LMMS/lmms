@@ -138,9 +138,9 @@ public:
 
 	void createClipsForPattern(int pattern);
 
-	bool hiddenForPattern(int pattern);
-	void setVisibilityForPattern(bool hidden, int pattern);
-	void hideForPatternIfEmpty(int pattern);
+	bool hiddenForPattern(size_t pattern);
+	void setVisibilityForPattern(bool hidden, size_t pattern);
+	void hideForPatternIfEmpty(size_t pattern);
 
 	void insertBar( const TimePos & pos );
 	void removeBar( const TimePos & pos );
