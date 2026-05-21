@@ -45,7 +45,6 @@ class QProgressBar;
 namespace lmms
 {
 
-class FileSearch;
 class InstrumentTrack;
 class PlayHandle;
 class TrackContainer;
