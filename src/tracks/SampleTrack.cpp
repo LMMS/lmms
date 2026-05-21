@@ -86,7 +86,7 @@ bool SampleTrack::play( const TimePos & _start, const f_cnt_t _frames,
 		{
 			setPlaying(false);
 		}
-		if(sClip->isPlaying())
+		if (sClip->isPlaying())
 		{
 			return false;
 		}
