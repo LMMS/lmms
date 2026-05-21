@@ -517,7 +517,6 @@ void Track::setVisibilityForPattern(bool hidden, size_t pattern)
 	if (pattern < m_clips.size())
 	{
 		m_clips[pattern]->setHidden(hidden);
-		emit visibilityChanged();
 	}
 }
 
@@ -527,7 +526,7 @@ void Track::hideForPatternIfEmpty(size_t pattern)
 	{
 		if (m_clips[pattern]->isEmpty())
 		{
-			setVisibilityForPattern(true, pattern);
+			m_clips[pattern]->setHidden(true);
 		}
 	}
 }
