@@ -27,10 +27,14 @@
 
 #include <QDir>
 #include <QMutex>
-#include <memory>
-
 #include "embed.h"
 
+#include "FileBrowserSearcher.h"
+#include <QProgressBar>
+
+#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
+	#include <QRecursiveMutex>
+#endif
 #include <QTreeWidget>
 
 #include "SideBarWidget.h"
@@ -77,9 +81,9 @@ public:
 
 	~FileBrowser() override = default;
 
-	static QStringList excludedPaths()
+	static QStringList directoryBlacklist()
 	{
-		static auto s_excludedPaths = QStringList{
+		static auto s_blacklist = QStringList{
 #ifdef LMMS_BUILD_LINUX
 			"/bin", "/boot", "/dev", "/etc", "/proc", "/run", "/sbin",
 			"/sys"
@@ -88,7 +92,7 @@ public:
 			"C:\\Windows"
 #endif
 		};
-		return s_excludedPaths;
+		return s_blacklist;
 	}
 
 	static QDir::Filters dirFilters() { return QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot | QDir::Hidden; }
@@ -107,10 +111,9 @@ private:
 	void saveDirectoriesStates();
 	void restoreDirectoriesStates();
 
-	void foundSearchMatch(FileSearch* search, const QString& match);
-	void searchCompleted(FileSearch* search);
+	void buildSearchTree();
 	void onSearch(const QString& filter);
-	void displaySearch(bool on);
+	void toggleSearch(bool on);
 
 	void addContentCheckBox();
 
@@ -120,7 +123,7 @@ private:
 	QLineEdit * m_filterEdit;
 	Type m_type;
 
-	std::shared_ptr<FileSearch> m_currentSearch;
+	std::shared_ptr<FileBrowserSearcher::SearchFuture> m_currentSearch;
 	QProgressBar* m_searchIndicator = nullptr;
 
 	QString m_directories; //!< Directories to search, split with '*'

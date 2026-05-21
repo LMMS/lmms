@@ -25,7 +25,6 @@ set(LMMS_SRCS
 	core/Engine.cpp
 	core/EnvelopeAndLfoParameters.cpp
 	core/fft_helpers.cpp
-	core/FileSearch.cpp
 	core/Mixer.cpp
 	core/ImportFilter.cpp
 	core/InlineAutomation.cpp
@@ -79,7 +78,6 @@ set(LMMS_SRCS
 	core/SerializingObject.cpp
 	core/Song.cpp
 	core/TempoSyncKnobModel.cpp
-	core/ThreadPool.cpp
 	core/Timeline.cpp
 	core/TimePos.cpp
 	core/ToolPlugin.cpp

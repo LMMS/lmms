@@ -31,9 +31,10 @@
 #include <QHBoxLayout>
 #include <QHeaderView>
 #include <QLineEdit>
+#include <QMenu>
+#include <QPushButton>
 #include <QMdiArea>
 #include <QMdiSubWindow>
-#include <QMenu>
 #include <QMessageBox>
 #include <QProgressBar>
 #include <QScrollBar>
@@ -42,13 +43,14 @@
 #include <QStringList>
 #include <cassert>
 
+#include "FileBrowser.h"
+#include "FileBrowserSearcher.h"
 #include "AudioEngine.h"
 #include "ConfigManager.h"
 #include "DataFile.h"
 #include "DeprecationHelper.h"
 #include "Engine.h"
 #include "FileRevealer.h"
-#include "FileSearch.h"
 #include "GuiApplication.h"
 #include "ImportFilter.h"
 #include "Instrument.h"
@@ -67,7 +69,6 @@
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "TextFloat.h"
-#include "ThreadPool.h"
 #include "Track.h"
 #include "embed.h"
 
@@ -125,6 +126,10 @@ FileBrowser::FileBrowser(Type type, const QString& directories, const QString& f
 	m_searchTreeWidget = new FileBrowserTreeWidget(contentParent());
 	m_searchTreeWidget->hide();
 	addContentWidget(m_searchTreeWidget);
+
+	auto searchTimer = new QTimer(this);
+	connect(searchTimer, &QTimer::timeout, this, &FileBrowser::buildSearchTree);
+	searchTimer->start(FileBrowserSearcher::MillisecondsPerMatch);
 
 	m_searchIndicator = new QProgressBar(this);
 	m_searchIndicator->setMinimum(0);
@@ -213,10 +218,20 @@ void FileBrowser::restoreDirectoriesStates()
 	expandItems(m_savedExpandedDirs);
 }
 
-void FileBrowser::foundSearchMatch(FileSearch* search, const QString& match)
+void FileBrowser::buildSearchTree()
 {
-	assert(search != nullptr);
-	if (m_currentSearch.get() != search) { return; }
+	if (!m_currentSearch) { return; }
+
+	const auto match = m_currentSearch->match();
+	using State = FileBrowserSearcher::SearchFuture::State;
+	if ((m_currentSearch->state() == State::Completed && match.isEmpty())
+		|| m_currentSearch->state() == State::Cancelled)
+	{
+		m_currentSearch = nullptr;
+		m_searchIndicator->setMaximum(100);
+		return;
+	}
+	else if (match.isEmpty()) { return; }
 
 	auto basePath = QString{};
 	for (const auto& path : m_directories.split('*'))
@@ -280,22 +295,13 @@ void FileBrowser::foundSearchMatch(FileSearch* search, const QString& match)
 	}
 }
 
-void FileBrowser::searchCompleted(FileSearch* search)
-{
-	assert(search != nullptr);
-	if (m_currentSearch.get() != search) { return; }
-
-	m_currentSearch.reset();
-	m_searchIndicator->setMaximum(100);
-}
-
+	
 void FileBrowser::onSearch(const QString& filter)
 {
-	if (m_currentSearch) { m_currentSearch->cancel(); }
-
 	if (filter.isEmpty())
 	{
-		displaySearch(false);
+		toggleSearch(false);
+		FileBrowserSearcher::instance()->cancel();
 		return;
 	}
 
@@ -305,21 +311,14 @@ void FileBrowser::onSearch(const QString& filter)
 	if (directories.isEmpty()) { return; }
 
 	m_searchTreeWidget->clear();
-	displaySearch(true);
+	toggleSearch(true);
 
 	auto browserExtensions = m_filter;
 	const auto searchExtensions = browserExtensions.remove("*.").split(' ');
-
-	auto search = std::make_shared<FileSearch>(
-		filter, directories, searchExtensions, excludedPaths(), dirFilters(), sortFlags());
-	connect(search.get(), &FileSearch::foundMatch, this, &FileBrowser::foundSearchMatch, Qt::QueuedConnection);
-	connect(search.get(), &FileSearch::searchCompleted, this, &FileBrowser::searchCompleted, Qt::QueuedConnection);
-
-	m_currentSearch = search;
-	ThreadPool::instance().enqueue([search] { (*search)(); });
+	m_currentSearch = FileBrowserSearcher::instance()->search(filter, directories, searchExtensions);
 }
 
-void FileBrowser::displaySearch(bool on)
+void FileBrowser::toggleSearch(bool on)
 {
 	if (on)
 	{
@@ -439,7 +438,7 @@ void FileBrowser::giveFocusToFilter()
 
 void FileBrowser::addItems(const QString & path )
 {
-	if (FileBrowser::excludedPaths().contains(path)) { return; }
+	if (FileBrowser::directoryBlacklist().contains(path)) { return; }
 
 	if( m_dirsAsItems )
 	{
@@ -456,7 +455,7 @@ void FileBrowser::addItems(const QString & path )
 		QDir::LocaleAware | QDir::DirsFirst | QDir::Name | QDir::IgnoreCase);
 	for (const auto& entry : entries)
 	{
-		if (FileBrowser::excludedPaths().contains(entry.absoluteFilePath())) { continue; }
+		if (FileBrowser::directoryBlacklist().contains(entry.absoluteFilePath())) { continue; }
 
 		QString fileName = entry.fileName();
 		if (entry.isHidden() && m_showHiddenContent && !m_showHiddenContent->isChecked()) continue;
@@ -1206,7 +1205,7 @@ void Directory::update()
 
 bool Directory::addItems(const QString& path)
 {
-	if (FileBrowser::excludedPaths().contains(path)) { return false; }
+	if (FileBrowser::directoryBlacklist().contains(path)) { return false; }
 
 	QDir thisDir(path);
 	if (!thisDir.isReadable()) { return false; }
@@ -1217,7 +1216,7 @@ bool Directory::addItems(const QString& path)
 		= thisDir.entryInfoList(m_filter.split(' '), FileBrowser::dirFilters(), FileBrowser::sortFlags());
 	for (const auto& entry : entries)
 	{
-		if (FileBrowser::excludedPaths().contains(entry.absoluteFilePath())) { continue; }
+		if (FileBrowser::directoryBlacklist().contains(entry.absoluteFilePath())) { continue; }
 
 		QString fileName = entry.fileName();
 		if (entry.isDir())
