@@ -2532,6 +2532,9 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 	}
 	else if (pos.y() > PR_TOP_MARGIN || m_action != Action::None)
 	{
+		// TODO convert this into a proper separate action so that it doesn't require
+		// cursor to be within the bounds *while* dragging.
+		// See: https://github.com/LMMS/lmms/pull/8389#issuecomment-4486111452
 		bool edit_note = (pos.y() > noteEditTop())
 			&& m_action != Action::SelectNotes;
 
@@ -2606,15 +2609,15 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 
 			if( me->buttons() & Qt::LeftButton )
 			{
-				vol = qBound(MinVolume, static_cast<volume_t>(MinVolume
-					+ static_cast<float>(noteEditBottom() - pos.y())
+				vol = std::clamp(static_cast<volume_t>(MinVolume
+					+ static_cast<float>(std::max(0, noteEditBottom() - pos.y()))
 					/ static_cast<float>(noteEditBottom() - noteEditTop())
-					* (MaxVolume - MinVolume)), MaxVolume);
+					* (MaxVolume - MinVolume)), MinVolume, MaxVolume);
 
-				pan = qBound(PanningLeft, static_cast<panning_t>(PanningLeft
-					+ static_cast<float>(noteEditBottom() - pos.y())
+				pan = std::clamp(static_cast<panning_t>(PanningLeft
+					+ static_cast<float>(std::max(0, noteEditBottom() - pos.y()))
 					/ static_cast<float>(noteEditBottom() - noteEditTop())
-					* (PanningRight - PanningLeft)), PanningRight);
+					* (PanningRight - PanningLeft)), PanningLeft, PanningRight);
 			}
 
 			if( m_noteEditMode == NoteEditMode::Volume )
