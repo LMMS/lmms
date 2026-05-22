@@ -37,7 +37,7 @@ PluginLoadFailedDialog::PluginLoadFailedDialog()
 	setAttribute(Qt::WA_DeleteOnClose);
 	setLayout(new QVBoxLayout);
 
-	m_label = new QLabel{tr("<strong>The following plugin(s) failed to load:</strong>")};
+	m_label = new QLabel{tr("<strong>The following plugins failed to load:</strong>")};
 	layout()->addWidget(m_label);
 
 	m_table = new QTableWidget;
