@@ -226,7 +226,7 @@ void GigInstrument::openFile( const QString & _gigFile, bool updateTrackName )
 
 	if( updateTrackName == true )
 	{
-		instrumentTrack()->setName(PathUtil::cleanName( _gigFile ) );
+		instrumentTrack()->setName(PathUtil::cleanName(_gigFile), true);
 		updatePatch();
 	}
 }

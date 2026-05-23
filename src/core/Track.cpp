@@ -167,6 +167,8 @@ Track* Track::clone()
 	QDomElement parent = doc.createElement("clonedtrack");
 	saveState(doc, parent);
 	Track* t = create(parent.firstChild().toElement(), m_trackContainer);
+	// giving different name to cloned track
+	t->setName(name(), true);
 
 	AutomationClip::resolveAllIDs();
 	return t;
@@ -246,8 +248,8 @@ void Track::loadTrack(const QDomElement& element, bool presetMode)
 							"settings-node!\n" );
 	}
 
-	setName( element.hasAttribute( "name" ) ? element.attribute( "name" ) :
-			element.firstChild().toElement().attribute( "name" ) );
+	setName(element.hasAttribute("name") ? element.attribute("name") :
+			element.firstChild().toElement().attribute("name"), false);
 
 	m_mutedModel.loadSettings( element, "muted" );
 	m_soloModel.loadSettings( element, "solo" );
@@ -652,11 +654,96 @@ BoolModel *Track::getMutedModel()
 	return &m_mutedModel;
 }
 
-void Track::setName(const QString& newName)
+QString Track::findUniqueName(const QString& sourceName) const
 {
-	if (m_name != newName)
+	QString output = sourceName;
+	QString sourceNameEnd = Track::getNameNumberEnding(sourceName, nullptr);
+
+	// if overflow, treat number as part of the name
+	// or if the number starts with a "0", because usually it is part of the name in that case
+	if (sourceNameEnd.size() >= 9 || (sourceNameEnd.size() > 1 && sourceNameEnd.startsWith("0")))
 	{
-		m_name = newName;
+		sourceNameEnd.clear();
+	}
+
+	size_t sourceNumberLength = sourceNameEnd.size();
+
+	// removing number from `sourceName`
+	if (sourceNumberLength > 0)
+	{
+		output.remove(output.size() - sourceNumberLength, sourceNumberLength);
+	}
+	
+	const TrackContainer::TrackList& trackList = m_trackContainer->tracks();
+	
+	//! will store the largest number found at the end of `sourceName` named tracks
+	size_t maxNameCounter = sourceNameEnd.toInt();
+	bool shouldIncrease = false;
+	
+	for (const Track* it : trackList)
+	{
+		if (it->name().startsWith(output))
+		{
+			const QString curNameEnd = Track::getNameNumberEnding(it->name());
+			size_t nameCount = (curNameEnd.size() > 1 && curNameEnd.startsWith("0")) ? 0 : curNameEnd.toInt();
+			if (maxNameCounter <= nameCount)
+			{
+				maxNameCounter = nameCount;
+				shouldIncrease = true;
+			}
+		}
+	}
+	
+	// if a name exists with a bigger number at the end
+	// return a name with that number + 1
+	if (shouldIncrease)
+	{
+		if (sourceNumberLength <= 0) { output = output + ' '; }
+		output = output + QString::number(maxNameCounter + 1);
+		return output;
+	}
+	return sourceName;
+}
+
+QString Track::getNameNumberEnding(const QString& name, bool* isSeparatedWithWhitespace)
+{
+	QString numberOutput = "";
+
+	//! `it` will point to where the numbers start in `name`
+	auto it = name.end();
+	size_t digitCount = 0;
+	while (it != name.begin())
+	{
+		it--;
+		if (it->isDigit() == false)
+		{
+			if (isSeparatedWithWhitespace != nullptr)
+			{
+				*isSeparatedWithWhitespace = *it == ' ';
+			}
+			// the last character was not a number
+			// increase `it` to account for this (and make it point to a digit)
+			it++;
+			break;
+		}
+		digitCount++;
+	}
+
+	if (digitCount > 0)
+	{
+		numberOutput.resize(digitCount);
+		std::copy(it, name.end(), numberOutput.begin());
+	}
+		
+	return numberOutput;
+}
+
+void Track::setName(const QString& newName, bool shouldCreateUnique)
+{
+	const QString changedName = shouldCreateUnique ? findUniqueName(newName) : newName;
+	if (m_name != changedName)
+	{
+		m_name = changedName;
 
 		if (auto song = Engine::getSong())
 		{
