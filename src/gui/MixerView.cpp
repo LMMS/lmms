@@ -134,6 +134,7 @@ MixerView::MixerView(Mixer* mixer) :
 	channelArea->setFrameStyle(QFrame::NoFrame);
 	channelArea->setMinimumWidth(mixerChannelSize.width() * 6);
 	channelArea->setWidgetResizable(true);
+	m_channelAreaScrollBar = channelArea->horizontalScrollBar();
 
 	int const scrollBarExtent = style()->pixelMetric(QStyle::PM_ScrollBarExtent);
 	channelArea->setMinimumHeight(mixerChannelSize.height() + scrollBarExtent);
@@ -478,6 +479,8 @@ void MixerView::keyPressEvent(QKeyEvent * e)
 		}
 	};
 
+	int overflow;
+
 	switch(e->key())
 	{
 		case Qt::Key_Delete:
@@ -493,6 +496,11 @@ void MixerView::keyPressEvent(QKeyEvent * e)
 				// select channel to the left
 				setCurrentMixerChannel(m_currentMixerChannel->channelIndex() - 1);
 			}
+			if ( ( overflow = m_channelAreaScrollBar->value() - m_currentMixerChannel->x() ) > 0 )
+			{
+				// scroll to the left if the current channel is going out of view
+				m_channelAreaScrollBar->setValue( m_channelAreaScrollBar->value() - overflow );
+			}
 			break;
 		case Qt::Key_Right:
 			if (e->modifiers() & Qt::AltModifier)
@@ -503,6 +511,11 @@ void MixerView::keyPressEvent(QKeyEvent * e)
 			{
 				// select channel to the right
 				setCurrentMixerChannel(m_currentMixerChannel->channelIndex() + 1);
+			}
+			if ( ( overflow = m_currentMixerChannel->x() + m_currentMixerChannel->width() - m_channelAreaScrollBar->value() - m_channelAreaScrollBar->pageStep() ) > 0 )
+			{
+				// scroll to the right if the current channel is going out of view
+				m_channelAreaScrollBar->setValue( m_channelAreaScrollBar->value() + overflow );
 			}
 			break;
 		case Qt::Key_Up:
@@ -527,6 +540,23 @@ void MixerView::keyPressEvent(QKeyEvent * e)
 		default:
 			e->ignore();
 			break;
+	}
+}
+
+
+
+void MixerView::wheelEvent(QWheelEvent* e)
+{
+	if (e->modifiers() & Qt::ShiftModifier)
+	{
+		if ( e->angleDelta().y() > 0 )
+		{
+			m_channelAreaScrollBar->setValue( m_channelAreaScrollBar->value() - m_currentMixerChannel->width() );
+		}
+		else
+		{
+			m_channelAreaScrollBar->setValue( m_channelAreaScrollBar->value() + m_currentMixerChannel->width() );
+		}
 	}
 }
 
