@@ -143,10 +143,10 @@ void PatchesDialog::setup( GigInstance * pSynth, int iChan,
 	int iBankDefault = -1;
 	int iProgDefault = -1;
 
-	gig::Instrument * pInstrument = m_pSynth->gig.GetFirstInstrument();
-
-	while( pInstrument )
+	for (size_t i = 0; i < m_pSynth->gig.CountInstruments(); ++i)
 	{
+		gig::Instrument * pInstrument = m_pSynth->gig.GetInstrument(i);
+
 		int iBank = pInstrument->MIDIBank;
 		int iProg = pInstrument->MIDIProgram;
 
@@ -165,8 +165,6 @@ void PatchesDialog::setup( GigInstance * pSynth, int iChan,
 				}
 			}
 		}
-
-		pInstrument = m_pSynth->gig.GetNextInstrument();
 	}
 
 	m_bankListView->setSortingEnabled( true );
@@ -341,10 +339,10 @@ void PatchesDialog::bankChanged()
 	m_progListView->clear();
 	QTreeWidgetItem * pProgItem = nullptr;
 
-	gig::Instrument * pInstrument = m_pSynth->gig.GetFirstInstrument();
-
-	while( pInstrument )
+	for (size_t i = 0; i < m_pSynth->gig.CountInstruments(); ++i)
 	{
+		gig::Instrument * pInstrument = m_pSynth->gig.GetInstrument(i);
+
 		QString name = QString::fromStdString( pInstrument->pInfo->Name );
 
 		if( name == "" )
@@ -365,8 +363,6 @@ void PatchesDialog::bankChanged()
 				pProgItem->setText( 1, name );
 			}
 		}
-
-		pInstrument = m_pSynth->gig.GetNextInstrument();
 	}
 
 	m_progListView->setSortingEnabled( true );
