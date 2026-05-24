@@ -2,6 +2,8 @@
 
 #include <QPainter>
 
+#include "DeprecationHelper.h"
+
 
 namespace lmms::gui
 {
@@ -61,6 +63,45 @@ void BarModelEditor::setTextColor(QColor const & textColor)
 {
 	m_textColor = textColor;
 }
+
+void BarModelEditor::setPositionAbsolute(const QPoint& p)
+{
+	auto* mod = model();
+	const auto minValue = mod->minValue();
+	const auto maxValue = mod->maxValue();
+	const auto range = maxValue - minValue;
+	if (range == 0) { return; }
+
+	QRect const r = rect();
+
+	const int margin = 3;
+	const QMargins margins(margin, margin, margin, margin);
+	const QRect valueRect = r.marginsRemoved(margins);
+
+	const float percentage = static_cast<float>(p.x() - valueRect.left()) / valueRect.width();
+	const float scaledValue = mod->scaledValue(percentage * range + minValue);
+	const auto step = mod->step<float>();
+	const float roundedValue = std::round(scaledValue / step) * step;
+	mod->setValue(roundedValue);
+}
+
+
+void BarModelEditor::mouseMoveEvent(QMouseEvent * me)
+{
+	const auto pos = position(me);
+
+	if (m_buttonPressed && pos != m_lastMousePos)
+	{
+		// knob position is changed depending on last mouse position
+		setPositionAbsolute(pos);
+		emit sliderMoved(model()->value());
+		// original position for next time is current position
+		m_lastMousePos = pos;
+	}
+
+	showTextFloat();
+}
+	
 
 void BarModelEditor::paintEvent(QPaintEvent *event)
 {

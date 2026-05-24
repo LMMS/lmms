@@ -44,6 +44,8 @@ public:
 
 	BarModelEditor(QString text, FloatModel * floatModel, QWidget * parent = nullptr);
 
+	void setPositionAbsolute(const QPoint& p);
+
 	// Define how the widget will behave in a layout
 	QSizePolicy sizePolicy() const;
 
@@ -62,6 +64,7 @@ public:
 
 protected:
 	void paintEvent(QPaintEvent *event) override;
+	void mouseMoveEvent(QMouseEvent* me) override;
 
 private:
 	QString const m_text;
