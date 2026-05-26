@@ -161,7 +161,6 @@ signals:
 	void destroyedClip();
 	void colorChanged();
 
-
 protected:
 	Clip(const Clip& other);
 
