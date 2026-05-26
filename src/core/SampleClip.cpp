@@ -27,6 +27,7 @@
 #include <QDomElement>
 #include <QFileInfo>
 
+#include "PatternStore.h"
 #include "PathUtil.h"
 #include "SampleClipView.h"
 #include "SampleTrack.h"
@@ -227,6 +228,11 @@ void SampleClip::updateLength()
 	// If the clip has already been manually resized, don't automatically resize it.
 	if (getAutoResize())
 	{
+		if (getTrack()->trackContainer() == Engine::patternStore())
+		{
+			changeLength(TimePos::ticksPerBar() * Engine::patternStore()->lengthOfPattern(getTrack()->getClipNum(this)));
+			return;
+		}
 		changeLength(sampleLength());
 		setStartTimeOffset(0);
 	}
