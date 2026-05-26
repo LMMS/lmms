@@ -63,7 +63,6 @@ InstrumentTrack::InstrumentTrack(TrackContainer* tc) :
 	m_audioBusHandle(tr("unnamed_track"), true, &m_volumeModel, &m_panningModel, &m_mutedModel),
 	m_pitchModel(0, MinPitchDefault, MaxPitchDefault, 1, this, tr("Pitch")),
 	m_pitchRangeModel(1, 1, 60, this, tr("Pitch range")),
-	m_mixerChannelModel(0, 0, 0, this, tr("Mixer channel")),
 	m_useMasterPitchModel(true, this, tr("Master pitch")),
 	m_instrument(nullptr),
 	m_soundShaping(this),
@@ -78,8 +77,6 @@ InstrumentTrack::InstrumentTrack(TrackContainer* tc) :
 	m_baseNoteModel.setInitValue( DefaultKey );
 	m_firstKeyModel.setInitValue(0);
 	m_lastKeyModel.setInitValue(NumKeys - 1);
-
-	m_mixerChannelModel.setRange( 0, Engine::mixer()->numChannels()-1, 1);
 
 	for( int i = 0; i < NumKeys; ++i )
 	{
@@ -671,9 +668,6 @@ void InstrumentTrack::updateMixerChannel()
 {
 	m_audioBusHandle.setNextMixerChannel(m_mixerChannelModel.value());
 }
-
-
-
 
 int InstrumentTrack::masterKey( int _midi_key ) const
 {
