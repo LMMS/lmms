@@ -93,6 +93,7 @@ private:
 namespace lmms::gui {
 class AudioPortAudioSetupWidget : public AudioDeviceSetupWidget
 {
+	Q_OBJECT
 public:
 	AudioPortAudioSetupWidget(QWidget* parent);
 

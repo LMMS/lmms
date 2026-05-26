@@ -54,6 +54,7 @@ public:
 
 	class setupWidget : public gui::AudioDeviceSetupWidget
 	{
+		Q_OBJECT
 	public:
 		setupWidget( QWidget * _parent );
 		~setupWidget() override = default;

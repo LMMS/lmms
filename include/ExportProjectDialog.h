@@ -43,6 +43,7 @@ namespace lmms::gui {
 
 class ExportProjectDialog : public QDialog
 {
+	Q_OBJECT
 public:
 	enum class Mode
 	{

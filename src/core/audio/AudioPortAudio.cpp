@@ -210,6 +210,7 @@ namespace lmms::gui {
 
 class AudioPortAudioSetupWidget::DeviceSelectorWidget : public QGroupBox
 {
+	Q_OBJECT
 public:
 	DeviceSelectorWidget(const QString& deviceLabel, Direction direction, QWidget* parent = nullptr)
 		: QGroupBox{parent}

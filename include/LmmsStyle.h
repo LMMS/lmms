@@ -36,6 +36,7 @@ namespace lmms::gui
 
 class LmmsStyle : public QProxyStyle
 {
+	Q_OBJECT
 public:
 	LmmsStyle();
 	~LmmsStyle() override = default;
