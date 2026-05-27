@@ -120,7 +120,7 @@ void MidiClipView::setGhostInAutomationEditor()
 	aEditor->setFocus();
 }
 
-void MidiClipView::resetName() { m_clip->setName(""); }
+void MidiClipView::resetName() { m_clip->setName(""); update(); }
 
 
 
@@ -131,6 +131,7 @@ void MidiClipView::changeName()
 	RenameDialog rename_dlg( s );
 	rename_dlg.exec();
 	m_clip->setName( s );
+	update();
 }
 
 
@@ -603,7 +604,7 @@ void MidiClipView::paintEvent( QPaintEvent * )
 	// Check whether we will paint a text box and compute its potential height
 	// This is needed so we can paint the notes underneath it.
 	bool const drawName = !m_clip->name().isEmpty();
-	bool const drawTextBox = !beatClip && drawName;
+	bool const drawTextBox = drawName && (!beatClip || m_clip->m_notes.empty());
 
 	// TODO Warning! This might cause problems if ClipView::paintTextLabel changes
 	int textBoxHeight = 0;
