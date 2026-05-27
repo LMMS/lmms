@@ -56,6 +56,15 @@ public:
 	//! Returns a const array of the current CC knob values
 	const std::array<int, NumMidiCCs> midiCCValues() const { return m_ccValues; }
 
+	//! Returns the ratio of the frequency of the last played NotePlayHandle on this key compared to the base freq of the key.
+	//! This is updated every buffer when a NotePlayHandle is active, and is useful for applying pitch bending and microtuning
+	const float nphKeyFreqRatio(const int key) const { return m_nphFreqRatios.at(key); }
+	//! Updates the current freq ratio of the key, given the current freq of the active NotePlayHandle
+	void updateNphFreq(const int key, const float freq);
+	// Similar functions for NotePlayHandle panning
+	const float nphKeyPanning(const int key) const { return m_nphPanning.at(key); }
+	void updateNphPanning(const int key, const float panning);
+
 	//! Returns the random value for the current trigger
 	const float rand() const { return m_rand; }
 
@@ -86,6 +95,11 @@ private:
 	//! Stores the current value of all the midi CC knobs/controllers
 	//! Technically, floats should probably be used to allow for HDCC (high definition CC's) as used in ARIA, but for now dividing by 127 to get a float between 0 and 1 works fine.
 	std::array<int, NumMidiCCs> m_ccValues = {};
+
+	//! Stores the current frequencies of active NotePlayHandles (one per key, so overlaping NPH's may not work correctly) as a ratio compared to the freq of the key
+	std::array<float, 128> m_nphFreqRatios = {};
+	//! Stores the current panning of active NotePlayHandles, per key.
+	std::array<float, 128> m_nphPanning = {};
 };
 
 

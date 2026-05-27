@@ -36,16 +36,17 @@
 namespace lmms
 {
 
-SfzRegionPlayState::SfzRegionPlayState(SfzRegion* region, const SfzTrigger& trigger, const SfzGlobalState& globalState)
+SfzRegionPlayState::SfzRegionPlayState(SfzRegion* region, const SfzTrigger& trigger, const SfzGlobalState* globalState)
 	: m_active(true)
 	, m_lmmsSampleRate(Engine::audioEngine()->outputSampleRate())
 	, m_filter(m_lmmsSampleRate)
 	, m_trigger(trigger)
 	, m_region(region)
+	, m_globalState(globalState)
 	, m_sampleObject(region->sample())
 {
 	// Make sure the parent region's modulations are up to date
-	m_region->recalculateTotalCCModulation(globalState);
+	m_region->recalculateTotalCCModulation(*m_globalState);
 	// Calculate the base pitch and amplitude so that we don't need to every buffer
 	precomputeBaseValues();
 	// Delay the start of the playback by the trigger offset
@@ -214,6 +215,13 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const f_cnt_t frames)
 	// Helper variable
 	const float normalizedVelocity = m_trigger.velocity().value() / 127.0f;
 
+	// Pitch difference due to pitchbending/microtuning. This is provided by the NotePlayHandle every buffer. The NPH might not have been the one which created this voice (SFZ is a midi based format and doesn't really work well with the NPH system of lmms), so we just get the freq of the last NPH on the same key as the event which triggered this voice.
+	const float notePlayHandleFreqRatio = m_globalState->nphKeyFreqRatio(m_trigger.key().value()); // TODO can this ever be 0.0f, like if the midi event is processed before the note play handle and it doesn't get set in time? I don't think so but I'm not 100% sure.
+	// Panning from the NotePlayHandle
+	const float notePlayHandlePanning = m_globalState->nphKeyPanning(m_trigger.key().value());
+	const float nphPanningLeftAmp = std::min(1.0f, 1.0f - notePlayHandlePanning / 100.0f);
+	const float nphPanningRightAmp = std::min(1.0f, 1.0f + notePlayHandlePanning / 100.0f);
+
 	// Amplitude Envelope Parameters
 	const f_cnt_t ampegDelayFrames = m_region->m_ampeg.delay * m_lmmsSampleRate;
 	const f_cnt_t ampegAttackFrames = m_region->m_ampeg.attack * m_lmmsSampleRate;
@@ -292,18 +300,18 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const f_cnt_t frames)
 
 		if (filterEnabled) // TODO does this if statement make it faster?
 		{
-			buffer[f][0] += m_filter.update(sampleLeftValue * m_baseAmplitudeLeft * ampeg * amplfo, 0);
-			buffer[f][1] += m_filter.update(sampleRightValue * m_baseAmplitudeRight * ampeg * amplfo, 1);
+			buffer[f][0] += m_filter.update(sampleLeftValue * m_baseAmplitudeLeft * nphPanningLeftAmp * ampeg * amplfo, 0);
+			buffer[f][1] += m_filter.update(sampleRightValue * m_baseAmplitudeRight * nphPanningRightAmp * ampeg * amplfo, 1);
 		}
 		else
 		{
-			buffer[f][0] += sampleLeftValue * m_baseAmplitudeLeft * ampeg * amplfo;
-			buffer[f][1] += sampleRightValue * m_baseAmplitudeRight * ampeg * amplfo;
+			buffer[f][0] += sampleLeftValue * m_baseAmplitudeLeft * nphPanningLeftAmp * ampeg * amplfo;
+			buffer[f][1] += sampleRightValue * m_baseAmplitudeRight * nphPanningRightAmp * ampeg * amplfo;
 		}
 		// Increment the frame count. If we are using a sample, make sure to stop at the end, but if we are using a basic wave like *sine or *saw, there's no need
 		if (m_frameCount >= 0) // Do not start playing the sample until we reach frame 0 (start of note), otherwise the sample frame will start moving even though it's not outputting any audio, causing the note to start partway through the sample (often with a discontinuity)
 		{
-			const float frameIncrement = m_baseFreqRatio * pitchmodFreqRatio; // Apply the pitch modulation by speeding up/slowing down the playback
+			const float frameIncrement = m_baseFreqRatio * notePlayHandleFreqRatio * pitchmodFreqRatio; // Apply the pitch modulation by speeding up/slowing down the playback
 			m_sampleFrame = m_sampleObject != nullptr
 				? std::min(static_cast<float>(m_sampleObject->size()), m_sampleFrame + frameIncrement)
 				: m_sampleFrame + frameIncrement;
@@ -328,7 +336,7 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const f_cnt_t frames)
 }
 
 
-void SfzRegionPlayState::processTrigger(const SfzTrigger& trigger, SfzGlobalState& globalState)
+void SfzRegionPlayState::processTrigger(const SfzTrigger& trigger)
 {
 	if (m_released) { return; } // If we already released, don't do anything
 
@@ -346,7 +354,7 @@ void SfzRegionPlayState::processTrigger(const SfzTrigger& trigger, SfzGlobalStat
 	// For simplicity, if any CC trigger occurs, recompute everything
 	if (trigger.type() == SfzTrigger::Type::ControlChange)
 	{
-		m_region->recalculateTotalCCModulation(globalState);
+		m_region->recalculateTotalCCModulation(*m_globalState);
 		precomputeBaseValues();
 	}
 }

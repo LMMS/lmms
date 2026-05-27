@@ -120,6 +120,11 @@ void SfzPlayer::playNote(NotePlayHandle* handle, SampleFrame* workingBuffer)
 {
 	// TODO: Currently this instrument only uses midi events as input, and a single audio buffer as output.
 	// It might be possible to split things up to use individual NotePlayHandles, but that is for another time.
+
+	// In order for pitch bending and microtuning to work, the exact freq of the NotePlayHandle needs to be conveyed to the voices
+	m_sfzGlobalState.updateNphFreq(handle->midiKey(), handle->frequency());
+	// Same thing for note panning in the piano roll
+	m_sfzGlobalState.updateNphPanning(handle->midiKey(), handle->getPanning());
 }
 
 void SfzPlayer::deleteNotePluginData(NotePlayHandle* handle)
@@ -146,7 +151,7 @@ void SfzPlayer::processTrigger(const SfzTrigger& trigger)
 				auto& regionPlayState = m_voices[i];
 				if (!regionPlayState.active())
 				{
-					regionPlayState = SfzRegionPlayState(region, trigger, m_sfzGlobalState);
+					regionPlayState = SfzRegionPlayState(region, trigger, &m_sfzGlobalState);
 					// If this new index is above the current max active index, update it
 					m_maxActiveIndex = std::max(m_maxActiveIndex, i);
 					foundOpenPosition = true;
@@ -172,7 +177,7 @@ void SfzPlayer::processTrigger(const SfzTrigger& trigger)
 
 		if (regionPlayState.active())
 		{
-			regionPlayState.processTrigger(trigger, m_sfzGlobalState);
+			regionPlayState.processTrigger(trigger);
 			// If this was the max active index and the trigger caused it to deactivate, figure out what the next active index is
 			if (!regionPlayState.active() && i == m_maxActiveIndex) { recalculateMaxActiveIndex(); }
 		}
