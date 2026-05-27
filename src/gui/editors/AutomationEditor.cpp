@@ -374,6 +374,8 @@ bool AutomationEditor::fineTuneValue(timeMap::iterator node, bool editingOutValu
 		node.value().setInValue(value);
 	}
 
+	// Notify listeners (e.g. PianoRoll) that clip data changed
+	emit m_clip->dataChanged();
 	Engine::getSong()->setModified();
 	return true;
 }
