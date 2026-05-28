@@ -434,9 +434,9 @@ public:
 
 
 
-	virtual void processBuffer( SampleFrame* buf, const fpp_t frames )
+	virtual void processBuffer( SampleFrame* buf, const f_cnt_t frames )
 	{
-		for ( fpp_t f = 0 ; f < frames ; ++f)
+		for ( f_cnt_t f = 0 ; f < frames ; ++f)
 		{
 			buf[f][0] = update( buf[f][0] , 0);
 			buf[f][1] = update( buf[f][1] , 1);

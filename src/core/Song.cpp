@@ -352,7 +352,7 @@ void Song::processNextBuffer()
 }
 
 
-void Song::processAutomations(const TrackList &tracklist, TimePos timeStart, fpp_t)
+void Song::processAutomations(const TrackList &tracklist, TimePos timeStart, f_cnt_t)
 {
 	AutomatedValueMap values;
 

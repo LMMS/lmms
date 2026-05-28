@@ -29,7 +29,6 @@
 
 #include "SerializingObject.h"
 
-
 class QPushButton;
 class QScrollArea;
 class QVBoxLayout;
@@ -44,7 +43,6 @@ namespace gui
 {
 
 class ControllerView;
-
 
 class ControllerRackView : public QWidget, public SerializingObject
 {
@@ -68,9 +66,6 @@ public slots:
 	void moveDown(ControllerView* view);
 	void addController(Controller* controller);
 	void removeController(Controller* controller);
-
-protected:
-	void closeEvent( QCloseEvent * _ce ) override;
 
 private slots:
 	void addController();

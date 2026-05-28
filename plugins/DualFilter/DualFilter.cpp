@@ -77,7 +77,7 @@ DualFilterEffect::~DualFilterEffect()
 
 
 
-Effect::ProcessStatus DualFilterEffect::processImpl(SampleFrame* buf, const fpp_t frames)
+Effect::ProcessStatus DualFilterEffect::processImpl(SampleFrame* buf, const f_cnt_t frames)
 {
 	const float d = dryLevel();
 	const float w = wetLevel();
@@ -132,7 +132,7 @@ Effect::ProcessStatus DualFilterEffect::processImpl(SampleFrame* buf, const fpp_
 
 
 	// buffer processing loop
-	for( fpp_t f = 0; f < frames; ++f )
+	for( f_cnt_t f = 0; f < frames; ++f )
 	{
 		// get mix amounts for wet signals of both filters
 		const float mix2 = ( ( *mixPtr + 1.0f ) * 0.5f );

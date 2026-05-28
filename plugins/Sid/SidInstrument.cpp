@@ -296,7 +296,7 @@ void SidInstrument::playNote( NotePlayHandle * _n,
 		sid->reset();
 		_n->m_pluginData = sid;
 	}
-	const fpp_t frames = _n->framesLeftForCurrentPeriod();
+	const f_cnt_t frames = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();
 
 	auto sid = static_cast<reSID::SID*>(_n->m_pluginData);

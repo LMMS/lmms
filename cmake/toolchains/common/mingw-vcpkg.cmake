@@ -1,0 +1,51 @@
+# Toolchain for cross-compiling Windows binaries from Linux using MinGW-w64 + vcpkg
+
+if(NOT DEFINED ENV{VCPKG_ROOT})
+	message(FATAL_ERROR "The VCPKG_ROOT environment variable must be set")
+	return()
+endif()
+
+if(NOT DEFINED VCPKG_INSTALLED_DIR)
+	set(VCPKG_INSTALLED_DIR "${CMAKE_BINARY_DIR}/vcpkg_installed")
+endif()
+
+if(NOT DEFINED VCPKG_TARGET_TRIPLET)
+	set(VCPKG_TARGET_TRIPLET "x64-mingw-static" CACHE STRING "Vcpkg target triplet" FORCE)
+endif()
+
+if(NOT DEFINED VCPKG_HOST_TRIPLET)
+	set(VCPKG_HOST_TRIPLET "x64-linux" CACHE STRING "Vcpkg host triplet" FORCE)
+endif()
+
+set(CMAKE_SYSTEM_NAME               Windows)
+set(CMAKE_SYSTEM_VERSION            1)
+
+set(TOOLCHAIN_PREFIX      ${CMAKE_SYSTEM_PROCESSOR}-w64-mingw32)
+set(CMAKE_C_COMPILER      ${TOOLCHAIN_PREFIX}-gcc)
+set(CMAKE_CXX_COMPILER    ${TOOLCHAIN_PREFIX}-g++)
+set(CMAKE_RC_COMPILER     ${TOOLCHAIN_PREFIX}-windres)
+
+# Check for vcpkg target packages first, then fall back on MinGW system packages and vcpkg host packages
+set(CMAKE_FIND_ROOT_PATH
+	"${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}"
+	"/usr/${TOOLCHAIN_PREFIX}"
+	"${VCPKG_INSTALLED_DIR}/${VCPKG_HOST_TRIPLET}"
+)
+
+set(ENV{PKG_CONFIG}       /usr/bin/${TOOLCHAIN_PREFIX}-pkg-config)
+
+if(WIN64)
+	set(TOOLCHAIN_PREFIX32   ${CMAKE_SYSTEM_PROCESSOR32}-w64-mingw32)
+	set(CMAKE_C_COMPILER32   ${TOOLCHAIN_PREFIX32}-gcc)
+	set(CMAKE_CXX_COMPILER32 ${TOOLCHAIN_PREFIX32}-g++)
+endif()
+
+# Search for programs in the build host directories
+set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+
+# Search for libraries/headers/packages in the target directories
+set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
+
+include($ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake)

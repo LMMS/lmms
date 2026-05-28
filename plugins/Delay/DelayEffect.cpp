@@ -81,7 +81,7 @@ DelayEffect::~DelayEffect()
 
 
 
-Effect::ProcessStatus DelayEffect::processImpl(SampleFrame* buf, const fpp_t frames)
+Effect::ProcessStatus DelayEffect::processImpl(SampleFrame* buf, const f_cnt_t frames)
 {
 	const float sr = Engine::audioEngine()->outputSampleRate();
 	const float d = dryLevel();
@@ -110,7 +110,7 @@ Effect::ProcessStatus DelayEffect::processImpl(SampleFrame* buf, const fpp_t fra
 		m_outGain = dbfsToAmp( m_delayControls.m_outGainModel.value() );
 	}
 
-	for (fpp_t f = 0; f < frames; ++f)
+	for (f_cnt_t f = 0; f < frames; ++f)
 	{
 		auto& currentFrame = buf[f];
 		const auto dryS = currentFrame;
