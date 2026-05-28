@@ -47,11 +47,11 @@ public:
 
 	void setVisibilityTimeOut(int msecs);
 
-	static TextFloat*  displayMessage(const QString & title,
-						const QString & msg,
-						const QPixmap & pixmap = QPixmap(),
+	static TextFloat*  displayMessage(const QString& title,
+						const QString& msg,
+						const QPixmap& pixmap = QPixmap(),
 						int timeout = 2000,
-						QWidget * parent = nullptr);
+						QWidget* parent = nullptr);
 
 	void moveGlobal(QWidget* w, const QPoint& offset);
 

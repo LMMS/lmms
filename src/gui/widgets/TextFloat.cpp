@@ -24,11 +24,11 @@
 
 #include "TextFloat.h"
 
-#include <QTimer>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QScreen>
+#include <QTimer>
 
 #include "GuiApplication.h"
 #include "MainWindow.h"
