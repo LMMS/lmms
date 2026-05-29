@@ -311,9 +311,9 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const f_cnt_t frames)
 		// Increment the frame count. If we are using a sample, make sure to stop at the end, but if we are using a basic wave like *sine or *saw, there's no need
 		if (m_frameCount >= 0) // Do not start playing the sample until we reach frame 0 (start of note), otherwise the sample frame will start moving even though it's not outputting any audio, causing the note to start partway through the sample (often with a discontinuity)
 		{
-			const float frameIncrement = m_baseFreqRatio * notePlayHandleFreqRatio * pitchmodFreqRatio; // Apply the pitch modulation by speeding up/slowing down the playback
+			const double frameIncrement = m_baseFreqRatio * notePlayHandleFreqRatio * pitchmodFreqRatio; // Apply the pitch modulation by speeding up/slowing down the playback
 			m_sampleFrame = m_sampleObject != nullptr
-				? std::min(static_cast<float>(m_sampleObject->size()), m_sampleFrame + frameIncrement)
+				? std::min(static_cast<double>(m_sampleObject->size()), m_sampleFrame + frameIncrement)
 				: m_sampleFrame + frameIncrement;
 		}
 		m_frameCount++;

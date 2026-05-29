@@ -94,8 +94,8 @@ private:
 	//! The frame at which the note was released, relative to the start of the note
 	int m_releaseFrame = 0;
 
-	//! Stores the current frame index being played in the region's sample. This is a float, since interpolation is done to change pitch/sample rate
-	float m_sampleFrame = 0;
+	//! Stores the current frame index being played in the region's sample. This is a decimal, since interpolation is done to change pitch/sample rate. Double is needed, since float did not provide enough precision and led to the pitch drifting up and down ever so slightly during playback.
+	double m_sampleFrame = 0.0;
 
 	//! Some SFZ's utilize filters (e.g, a lowpass which changes cutoff depending on velocity), so each voice needs to have a filter object
 	// TODO this assumes 2 channels--is that okay?
