@@ -109,7 +109,7 @@ void FloatModelEditorBase::showTextFloat(int msecBeforeDisplay, int msecDisplayT
 		else
 		{
 			// Using dynamic floating text
-			s_textFloat->setText(formatFloatingText(getDynamicFloatingText()));
+			s_textFloat->setText(getDynamicFloatingText(currentValueToText()));
 		}
 	}
 
@@ -535,10 +535,10 @@ void FloatModelEditorBase::friendlyUpdate()
 	if (floatingTextType() == FloatingTextType::Dynamic)
 	{
 		// ...and if the text changed since last time...
-		if (auto updatedText = getDynamicFloatingTextUpdate())
+		if (auto updatedText = currentValueToTextUpdate())
 		{
 			// ...then update the floating text
-			s_textFloat->setText(formatFloatingText(*updatedText));
+			s_textFloat->setText(getDynamicFloatingText(*updatedText));
 		}
 	}
 
@@ -546,15 +546,15 @@ void FloatModelEditorBase::friendlyUpdate()
 }
 
 
-QString FloatModelEditorBase::getDynamicFloatingText()
+QString FloatModelEditorBase::currentValueToText()
 {
 	return QString::number(model()->getRoundedValue());
 }
 
 
-QString FloatModelEditorBase::formatFloatingText(const QString& dynamicText) const
+QString FloatModelEditorBase::getDynamicFloatingText(const QString& currentValue) const
 {
-	return m_description + ' ' + dynamicText + m_unit;
+	return m_description + ' ' + currentValue + m_unit;
 }
 
 

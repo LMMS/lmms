@@ -545,7 +545,7 @@ void VolumeKnob::setModel(Model* model, bool isOldModelValid)
 	}
 }
 
-QString VolumeKnob::getDynamicFloatingText()
+QString VolumeKnob::currentValueToText()
 {
 	const auto* m = model();
 
@@ -556,7 +556,7 @@ QString VolumeKnob::getDynamicFloatingText()
 
 	// NOTE: The " dBFS" units are hardcoded here instead of being set by setUnit(),
 	//       allowing the model's context menu entries to display the correct units (usually "%").
-	//       This workaround should be removed after the parameter text refactor (#8379).
+	//       This workaround should be revisited after the parameter text refactor (#8379).
 	if (valueToVolumeRatio == 0.) { return QStringLiteral("-∞ dBFS"); }
 
 	if (roundedValue > 0)
@@ -569,10 +569,10 @@ QString VolumeKnob::getDynamicFloatingText()
 	}
 }
 
-QString VolumeKnob::formatFloatingText(const QString& dynamicText) const
+QString VolumeKnob::getDynamicFloatingText(const QString& currentValue) const
 {
-	// Don't include the unit yet - the " dBFS" unit is included in dynamicText currently
-	return m_description + ' ' + dynamicText;
+	// Don't include the unit - the " dBFS" unit is included in currentValue
+	return m_description + ' ' + currentValue;
 }
 
 void VolumeKnob::enterValue()

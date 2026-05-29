@@ -267,8 +267,8 @@ public:
 	}
 
 protected:
-	QString getDynamicFloatingText() override;
-	QString formatFloatingText(const QString& dynamicText) const;
+	QString currentValueToText() override;
+	QString getDynamicFloatingText(const QString& currentValue) const;
 	void enterValue() override;
 
 private:

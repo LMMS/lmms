@@ -62,17 +62,17 @@ public:
 	}
 
 	/**
-	 * Sets the tooltip displayed when the mouse hovers over the control.
+	 * @brief Sets the tooltip displayed when the mouse hovers over the control.
 	 *
-	 * Unlike the dynamic floating text from getDynamicFloatingText() which represents the
+	 * Unlike the dynamic floating text from @ref getDynamicFloatingText which represents the
 	 * current value of the model, this is static text intended to provide a helpful description
-	 * of the control. That is, it's just a traditional tooltip, though it uses SimpleTextFloat
+	 * of the control. That is, it's just a traditional tooltip, though it uses @ref SimpleTextFloat
 	 * rather than QWidget's own tooltip for consistency with the dynamic floating text.
 	 *
 	 * If no static tooltip is set (when this method is not called), dynamic floating text
 	 * is used in its place. See @ref InteractionType for more information.
 	 *
-	 * @param tip the static tooltip. If empty, neither a static nor dynamic tooltip will be
+	 * @param tip The static tooltip. If empty, neither a static nor dynamic tooltip will be
 	 *            displayed when the mouse hovers over the control.
 	 */
 	void setToolTip(const QString& tip)
@@ -85,7 +85,7 @@ public:
 	/**
 	 * Removes the static tooltip set by a previous call to setToolTip().
 	 * The dynamic floating text will be used in its place.
-	 * NOTE: This is currently unused.
+	 * @note This is currently unused.
 	 */
 	void unsetToolTip() { m_staticToolTip.reset(); }
 
@@ -116,46 +116,37 @@ protected:
 	virtual float getValue(const QPoint & p);
 
 	/**
-	 * This method is called just prior to displaying dynamic floating text
-	 * in order to set its value. If the getDynamicFloatingTextUpdate() method
+	 * @returns the current value of the model as a string
+	 *
+	 * @note This method is called just prior to displaying dynamic floating text
+	 * in order to set its value. If the @ref currentValueToTextUpdate method
 	 * is not overridden, this method is also called to periodically update
 	 * the floating text.
-	 *
-	 * Dynamic floating text is displayed in the following format:
-	 *     "[description] [dynamic text][unit]"
-	 *
-	 * This method controls only the "dynamic text" portion.
-	 * To modify the other portions, call setDescription() or setUnit().
 	 */
-	virtual QString getDynamicFloatingText();
+	virtual QString currentValueToText();
 
 	/**
-	 * This method is called periodically while dynamic floating text is visible
-	 * and the value of the float model is changing, allowing dynamic updates
+	 * @returns the current value of the model as a string, or std::nullopt to
+	 *          indicate the previous value should continue being used
+	 *
+	 * @note This method is called periodically while dynamic floating text is
+	 * visible and the value of the float model is changing, allowing dynamic updates
 	 * of the floating text.
-	 *
-	 * Dynamic floating text is displayed in the following format:
-	 *     "[description] [dynamic text][unit]"
-	 *
-	 * This method controls only the "dynamic text" portion.
-	 * To modify the other portions, call setDescription() or setUnit().
-	 *
-	 * @returns the up-to-date value for the dynamic floating text, or std::nullopt to
-	 *          indicate the previous floating text value should continue being used
 	 */
-	virtual std::optional<QString> getDynamicFloatingTextUpdate()
+	virtual std::optional<QString> currentValueToTextUpdate()
 	{
-		return getDynamicFloatingText();
+		return currentValueToText();
 	}
 
 	/**
-	 * @returns formatted floating text given dynamic text
-	 *          from @a getDynamicFloatingText() or @a getDynamicFloatingTextUpdate()
+	 * @brief Provides the text to be shown in dynamic floating text.
 	 *
-	 * The default format is:
-	 *     "[description] [dynamic text][unit]"
+	 * @param currentValue text from @ref currentValueToText or @ref currentValueToTextUpdate
+	 * @returns formatted text to display in dynamic floating text
+	 *
+	 * @note The default format is: "[description] [current value][unit]"
 	 */
-	virtual QString formatFloatingText(const QString& dynamicText) const;
+	virtual QString getDynamicFloatingText(const QString& currentValue) const;
 
 	void doConnections() override;
 
@@ -181,7 +172,7 @@ protected:
 		None,
 
 		//! The mouse is hovering over the control without any other interaction.
-		//! If a static tooltip is set (@see setToolTip), it will be displayed,
+		//! If a static tooltip is set (see @ref setToolTip), it will be displayed,
 		//! otherwise dynamic floating text will be displayed.
 		MouseHover,
 
