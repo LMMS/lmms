@@ -402,7 +402,7 @@ void ClipView::setColor(const std::optional<QColor>& color)
 int ClipView::resizeGripWidth() const
 {
 	const int clipWidth = m_clip->length() * pixelsPerBar() / TimePos::ticksPerBar();
-	return std::min(RESIZE_GRIP_WIDTH, static_cast<int>(std::round(RESIZE_GRIP_MAX_WIDTH_FRACTION * clipWidth)));
+	return std::clamp(static_cast<int>(std::round(RESIZE_GRIP_MAX_WIDTH_FRACTION * clipWidth)), 1, RESIZE_GRIP_WIDTH);
 }
 
 
@@ -498,7 +498,7 @@ void ClipView::updateCursor(QMouseEvent * me)
 
 	// If we are at the edges, use the resize cursor
 	if (!me->buttons() && m_clip->manuallyResizable() && !isSelected()
-		&& ((posX > width() - resizeGripWidth()) || (posX < resizeGripWidth())))
+		&& ((posX >= width() - resizeGripWidth()) || (posX < resizeGripWidth())))
 	{
 		setCursor(Qt::SizeHorCursor);
 	}
