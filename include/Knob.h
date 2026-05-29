@@ -162,6 +162,10 @@ public:
 	QColor textColor() const;
 	void setTextColor( const QColor & c );
 
+signals:
+    void outerColorChanged();
+    void textColorChanged();
+
 
 protected:
 	void paintEvent(QPaintEvent*) override;

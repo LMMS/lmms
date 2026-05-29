@@ -30,6 +30,8 @@
 #include <QList>
 #include <QMainWindow>
 #include <QMdiArea>
+#include <QPushButton>
+#include <QHBoxLayout>
 
 #include "ConfigManager.h"
 
@@ -174,6 +176,9 @@ public slots:
 
 	void autoSave();
 
+	void addWidgetToCenterBar( QWidget * _w );
+	void addSpacingToCenterBar( int _size );
+
 private slots:
 	void onExportProjectMidi();
 
@@ -197,26 +202,29 @@ private:
 	void handleSaveResult(QString const & filename, bool songSavedSuccessfully);
 	bool guiSaveProject();
 	bool guiSaveProjectAs( const QString & filename );
+	QHBoxLayout* m_centerBarLayout = nullptr;
 
-	class MovableQMdiArea : public QMdiArea
-	{
-	public:
-		MovableQMdiArea(QWidget* parent = nullptr);
-		~MovableQMdiArea() {}
-	protected:
-		void mousePressEvent(QMouseEvent* event) override;
-		void mouseMoveEvent(QMouseEvent* event) override;
-		void mouseReleaseEvent(QMouseEvent* event) override;
-	private:
-		bool m_isBeingMoved;
-		int m_lastX;
-		int m_lastY;
-	};
+	// class MovableQMdiArea : public QMdiArea
+	// {
+	// public:
+	// 	MovableQMdiArea(QWidget* parent = nullptr);
+	// 	~MovableQMdiArea() {}
+	// protected:
+	// 	void mousePressEvent(QMouseEvent* event) override;
+	// 	void mouseMoveEvent(QMouseEvent* event) override;
+	// 	void mouseReleaseEvent(QMouseEvent* event) override;
+	// private:
+	// 	bool m_isBeingMoved;
+	// 	int m_lastX;
+	// 	int m_lastY;
+	// };
 
-	MovableQMdiArea * m_workspace;
+	// MovableQMdiArea * m_workspace;
+	QMdiArea * m_workspace;
 
 	QWidget * m_toolBar;
 	QGridLayout * m_toolBarLayout;
+	QHBoxLayout * m_layout;
 
 	struct keyModifiers
 	{

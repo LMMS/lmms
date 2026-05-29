@@ -52,6 +52,7 @@ public:
 	void setPauseIcon(bool displayPauseIcon=true);
 	QAction *playAction() const;
 	static Editor* lastPlayedEditor() { return s_lastPlayedEditor; }
+	const QVector<DropToolBar*>& allToolBars() const { return m_allToolBars; }
 protected:
 	DropToolBar * addDropToolBarToTop(QString const & windowTitle);
 	DropToolBar * addDropToolBar(Qt::ToolBarArea whereToAdd, QString const & windowTitle);
@@ -87,8 +88,8 @@ protected:
 	Editor(bool record = false, bool record_step = false);
 	~Editor() override = default;
 
-
 	DropToolBar* m_toolBar;
+	QVector<DropToolBar*> m_allToolBars;
 
 	QAction* m_playAction;
 	QAction* m_recordAction;

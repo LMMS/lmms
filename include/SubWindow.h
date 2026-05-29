@@ -83,6 +83,9 @@ public slots:
 	void attach();
 	void setVisible(bool visible) override;
 
+	void showMaximized();
+    void showNormal();
+
 protected:
 	// hook the QWidget move/resize events to update the tracked geometry
 	void moveEvent(QMoveEvent* event) override;
@@ -91,9 +94,16 @@ protected:
 	void changeEvent(QEvent* event) override;
 	void showEvent(QShowEvent* e) override;
 	bool eventFilter(QObject* obj, QEvent* event) override;
+	bool isInTitleBar(const QPoint &pos) const;
+	bool event(QEvent *event) override;
+	void mousePressEvent(QMouseEvent *event) override;
+	void mouseMoveEvent(QMouseEvent *event) override;
+	void mouseDoubleClickEvent(QMouseEvent *event) override;
+	void mouseReleaseEvent(QMouseEvent *event) override;
 
 signals:
 	void focusLost();
+	void splitRequested(Qt::ArrowType direction);
 
 private:
 	const QSize m_buttonSize;
@@ -109,11 +119,20 @@ private:
 	QRect m_trackedNormalGeom;
 	QLabel * m_windowTitle;
 	QGraphicsDropShadowEffect * m_shadow;
+	QRect m_snapTarget = {};
 	bool m_hasFocus;
 	bool m_isDetachable;
+	bool m_isFakeMaximized = false;
+	bool m_blockNextMove = true;
+	SubWindow* m_pendingOther = nullptr;
+	QRect m_pendingOtherRect;
 
+	QList<SubWindow*> otherWindows() const;
+	SubWindow* windowAt(const QPoint &pos) const;
+	QRect computeSnapTarget(const QPoint &globalPos);
 	static void elideText( QLabel *label, QString text );
 	void adjustTitleBar();
+	void showSplitMenu(const QPoint &pos);
 
 private slots:
 	void focusChanged( QMdiSubWindow * subWindow );

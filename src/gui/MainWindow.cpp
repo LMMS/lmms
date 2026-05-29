@@ -75,6 +75,8 @@
 #include "lmmsversion.h"
 
 
+
+
 namespace lmms::gui
 {
 
@@ -155,7 +157,7 @@ MainWindow::MainWindow() :
 	sideBar->appendTab(new FileBrowser(FileBrowser::Type::Normal, root_paths.join("*"), FileItem::defaultFilters(), title,
 		embed::getIconPixmap("computer").transformed(QTransform().rotate(90)), splitter, dirs_as_items));
 
-	m_workspace = new MovableQMdiArea(splitter);
+	m_workspace = new QMdiArea(splitter);
 
 	// Load background
 	emit initProgress(tr("Loading background picture"));
@@ -198,6 +200,17 @@ MainWindow::MainWindow() :
 	m_toolBarLayout = new QGridLayout( m_toolBar/*, 2, 1*/ );
 	m_toolBarLayout->setContentsMargins(0, 0, 0, 0);
 	m_toolBarLayout->setSpacing( 0 );
+
+	auto bar = new QWidget(m_toolBar);
+	bar->setFixedHeight(52);
+	bar->setStyleSheet("background:#313131; border:1px solid #2C2C2C;");
+
+	m_layout = new QHBoxLayout(bar);
+	m_layout->setContentsMargins(8, 0, 8, 0);
+	m_layout->setSpacing(6);
+
+	// Add the bar to the toolbar layout
+	m_toolBarLayout->addWidget(bar, 0, 0, 1, -1, Qt::AlignCenter);
 
 	vbox->addWidget( m_toolBar );
 	vbox->addWidget( w );
@@ -275,22 +288,9 @@ void MainWindow::finalize()
 		return menu->addAction(embed::getIconPixmap(icon), text, this, slot, shortcut);
 #endif
 	};
-
 	// project-popup-menu
 	auto project_menu = new QMenu(this);
-	menuBar()->addMenu( project_menu )->setText( tr( "&File" ) );
-
-	addAction(project_menu, "project_new", tr("&New"),
-		QKeySequence::New, &MainWindow::createNewProject);
-
-	auto templates_menu = new TemplatesMenu( this );
-	project_menu->addMenu(templates_menu);
-
-	addAction(project_menu, "project_open", tr("&Open..."),
-		QKeySequence::Open, &MainWindow::openProject);
-
-	project_menu->addMenu(new RecentProjectsMenu(this));
-
+	
 	addAction(project_menu, "project_save", tr("&Save"),
 		QKeySequence::Save, &MainWindow::saveProject);
 
@@ -387,23 +387,6 @@ void MainWindow::finalize()
 	help_menu->addAction( embed::getIconPixmap( "icon_small" ), tr( "About" ),
 				  this, SLOT(aboutLMMS()));
 
-	// create tool-buttons
-	auto project_new = new ToolButton(
-		embed::getIconPixmap("project_new"), tr("Create new project"), this, SLOT(createNewProject()), m_toolBar);
-
-	auto project_new_from_template = new ToolButton(embed::getIconPixmap("project_new_from_template"),
-		tr("Create new project from template"), this, SLOT(emptySlot()), m_toolBar);
-	project_new_from_template->setMenu( templates_menu );
-	project_new_from_template->setPopupMode( ToolButton::InstantPopup );
-
-	auto project_open = new ToolButton(
-		embed::getIconPixmap("project_open"), tr("Open existing project"), this, SLOT(openProject()), m_toolBar);
-
-	auto project_open_recent = new ToolButton(embed::getIconPixmap("project_open_recent"),
-		tr("Recently opened projects"), this, SLOT(emptySlot()), m_toolBar);
-	project_open_recent->setMenu( new RecentProjectsMenu(this) );
-	project_open_recent->setPopupMode( ToolButton::InstantPopup );
-
 	auto project_save = new ToolButton(
 		embed::getIconPixmap("project_save"), tr("Save current project"), this, SLOT(saveProject()), m_toolBar);
 
@@ -417,15 +400,11 @@ void MainWindow::finalize()
 							m_toolBar );
 	m_metronomeToggle->setCheckable(true);
 	m_metronomeToggle->setChecked(Engine::getSong()->metronome().active());
+	getGUI()->mainWindow()->addWidgetToCenterBar( m_metronomeToggle );
 
-	m_toolBarLayout->setColumnMinimumWidth( 0, 5 );
-	m_toolBarLayout->addWidget( project_new, 0, 1 );
-	m_toolBarLayout->addWidget( project_new_from_template, 0, 2 );
-	m_toolBarLayout->addWidget( project_open, 0, 3 );
-	m_toolBarLayout->addWidget( project_open_recent, 0, 4 );
-	m_toolBarLayout->addWidget( project_save, 0, 5 );
-	m_toolBarLayout->addWidget( project_export, 0, 6 );
-	m_toolBarLayout->addWidget( m_metronomeToggle, 0, 7 );
+	m_toolBarLayout->setColumnMinimumWidth( 0, 1 );
+	m_toolBarLayout->addWidget( project_save, 0, 0 );
+	m_toolBarLayout->addWidget( project_export, 0, 1 );
 
 
 	// window-toolbar
@@ -457,13 +436,13 @@ void MainWindow::finalize()
 		tr("Show/hide project notes") + " (Ctrl+7)", this, SLOT(toggleProjectNotesWin()), m_toolBar);
 	project_notes_window->setShortcut(keySequence(Qt::CTRL, Qt::Key_7));
 
-	m_toolBarLayout->addWidget( song_editor_window, 1, 1 );
-	m_toolBarLayout->addWidget( pattern_editor_window, 1, 2 );
-	m_toolBarLayout->addWidget( piano_roll_window, 1, 3 );
-	m_toolBarLayout->addWidget( automation_editor_window, 1, 4 );
-	m_toolBarLayout->addWidget( mixer_window, 1, 5 );
-	m_toolBarLayout->addWidget( controllers_window, 1, 6 );
-	m_toolBarLayout->addWidget( project_notes_window, 1, 7 );
+	m_toolBarLayout->addWidget( song_editor_window, 1, 0 );
+	m_toolBarLayout->addWidget( pattern_editor_window, 1, 1 );
+	m_toolBarLayout->addWidget( piano_roll_window, 1, 2 );
+	m_toolBarLayout->addWidget( automation_editor_window, 1, 3 );
+	m_toolBarLayout->addWidget( mixer_window, 1, 4 );
+	m_toolBarLayout->addWidget( controllers_window, 1, 5 );
+	m_toolBarLayout->addWidget( project_notes_window, 1, 6 );
 	m_toolBarLayout->setColumnStretch( 100, 1 );
 
 	// setup-dialog opened before?
@@ -527,10 +506,26 @@ int MainWindow::addWidgetToToolBar( QWidget * _w, int _row, int _col )
 
 
 
+void MainWindow::addWidgetToCenterBar( QWidget * _w )
+{
+	m_layout->addWidget(_w);
+}
+
+
+
+
 void MainWindow::addSpacingToToolBar( int _size )
 {
 	m_toolBarLayout->setColumnMinimumWidth( m_toolBarLayout->columnCount() +
 								7, _size );
+}
+
+
+
+
+void MainWindow::addSpacingToCenterBar( int _size )
+{
+	m_layout->addSpacing(_size);
 }
 
 
@@ -1640,75 +1635,75 @@ void MainWindow::onProjectFileNameChanged()
 }
 
 
-MainWindow::MovableQMdiArea::MovableQMdiArea(QWidget* parent) :
-	QMdiArea(parent),
-	m_isBeingMoved(false),
-	m_lastX(0),
-	m_lastY(0)
-{}
+// MainWindow::MovableQMdiArea::MovableQMdiArea(QWidget* parent) :
+// 	QMdiArea(parent),
+// 	m_isBeingMoved(false),
+// 	m_lastX(0),
+// 	m_lastY(0)
+// {}
 
-void MainWindow::MovableQMdiArea::mousePressEvent(QMouseEvent* event)
-{
-	const auto pos = position(event);
-	m_lastX = pos.x();
-	m_lastY = pos.y();
-	m_isBeingMoved = true;
-	setCursor(Qt::ClosedHandCursor);
-}
+// void MainWindow::MovableQMdiArea::mousePressEvent(QMouseEvent* event)
+// {
+// 	const auto pos = position(event);
+// 	m_lastX = pos.x();
+// 	m_lastY = pos.y();
+// 	m_isBeingMoved = true;
+// 	setCursor(Qt::ClosedHandCursor);
+// }
 
-void MainWindow::MovableQMdiArea::mouseMoveEvent(QMouseEvent* event)
-{
-	if (m_isBeingMoved == false) { return; }
+// void MainWindow::MovableQMdiArea::mouseMoveEvent(QMouseEvent* event)
+// {
+// 	if (m_isBeingMoved == false) { return; }
 
-	int minXBoundary = window()->width() - 100;
-	int maxXBoundary = 100;
-	int minYBoundary = window()->height() - 100;
-	int maxYBoundary = 100;
+// 	int minXBoundary = window()->width() - 100;
+// 	int maxXBoundary = 100;
+// 	int minYBoundary = window()->height() - 100;
+// 	int maxYBoundary = 100;
 
-	int minX = minXBoundary;
-	int maxX = maxXBoundary;
-	int minY = minYBoundary;
-	int maxY = maxYBoundary;
+// 	int minX = minXBoundary;
+// 	int maxX = maxXBoundary;
+// 	int minY = minYBoundary;
+// 	int maxY = maxYBoundary;
 
-	auto subWindows = subWindowList();
-	for (auto* curWindow : subWindows)
-	{
-		if (curWindow->isVisible())
-		{
-			minX = std::min(minX, curWindow->x());
-			maxX = std::max(maxX, curWindow->x() + curWindow->width());
-			minY = std::min(minY, curWindow->y());
-			maxY = std::max(maxY, curWindow->y() + curWindow->height());
-		}
-	}
+// 	auto subWindows = subWindowList();
+// 	for (auto* curWindow : subWindows)
+// 	{
+// 		if (curWindow->isVisible())
+// 		{
+// 			minX = std::min(minX, curWindow->x());
+// 			maxX = std::max(maxX, curWindow->x() + curWindow->width());
+// 			minY = std::min(minY, curWindow->y());
+// 			maxY = std::max(maxY, curWindow->y() + curWindow->height());
+// 		}
+// 	}
 
-	const auto pos = position(event);
-	int scrollX = m_lastX - pos.x();
-	int scrollY = m_lastY - pos.y();
+// 	const auto pos = position(event);
+// 	int scrollX = m_lastX - pos.x();
+// 	int scrollY = m_lastY - pos.y();
 
-	scrollX = scrollX < 0 && minX >= minXBoundary ? 0 : scrollX;
-	scrollX = scrollX > 0 && maxX <= maxXBoundary ? 0 : scrollX;
-	scrollY = scrollY < 0 && minY >= minYBoundary ? 0 : scrollY;
-	scrollY = scrollY > 0 && maxY <= maxYBoundary ? 0 : scrollY;
+// 	scrollX = scrollX < 0 && minX >= minXBoundary ? 0 : scrollX;
+// 	scrollX = scrollX > 0 && maxX <= maxXBoundary ? 0 : scrollX;
+// 	scrollY = scrollY < 0 && minY >= minYBoundary ? 0 : scrollY;
+// 	scrollY = scrollY > 0 && maxY <= maxYBoundary ? 0 : scrollY;
 
-	for (auto* curWindow : subWindows)
-	{
-		// if widgets are maximized, then they shouldn't be moved
-		// moving a maximized window's normalGeometry is not implemented because of difficulties
-		if (curWindow->isMaximized() == false)
-		{
-			curWindow->move(curWindow->x() - scrollX, curWindow->y() - scrollY);
-		}
-	}
+// 	for (auto* curWindow : subWindows)
+// 	{
+// 		// if widgets are maximized, then they shouldn't be moved
+// 		// moving a maximized window's normalGeometry is not implemented because of difficulties
+// 		if (curWindow->isMaximized() == false)
+// 		{
+// 			curWindow->move(curWindow->x() - scrollX, curWindow->y() - scrollY);
+// 		}
+// 	}
 
-	m_lastX = pos.x();
-	m_lastY = pos.y();
-}
+// 	m_lastX = pos.x();
+// 	m_lastY = pos.y();
+// }
 
-void MainWindow::MovableQMdiArea::mouseReleaseEvent(QMouseEvent* event)
-{
-	setCursor(Qt::ArrowCursor);
-	m_isBeingMoved = false;
-}
+// void MainWindow::MovableQMdiArea::mouseReleaseEvent(QMouseEvent* event)
+// {
+// 	setCursor(Qt::ArrowCursor);
+// 	m_isBeingMoved = false;
+// }
 
 } // namespace lmms::gui
