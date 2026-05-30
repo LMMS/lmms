@@ -112,10 +112,7 @@ void AutomatableSlider::wheelEvent( QWheelEvent * _me )
 	m_showStatus = old_status;
 }
 
-void AutomatableSlider::mouseDoubleClickEvent(QMouseEvent*)
-{
-	enterValue();
-}
+void AutomatableSlider::mouseDoubleClickEvent(QMouseEvent*) { enterValue(); }
 
 void AutomatableSlider::enterValue()
 {
@@ -132,10 +129,7 @@ void AutomatableSlider::enterValue()
 		model()->maxValue(),
 		model()->step<int>(), &ok);
 
-	if (ok)
-	{
-		model()->setValue(newVal);
-	}
+	if (ok) { model()->setValue(newVal); }
 }
 
 
