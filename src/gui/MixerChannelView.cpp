@@ -33,7 +33,6 @@
 #include <QMenu>
 #include <QMessageBox>
 #include <QPainter>
-#include <QTimer>
 #include <QStackedWidget>
 #include <QVBoxLayout>
 
@@ -41,8 +40,6 @@
 #include "CaptionMenu.h"
 #include "ColorChooser.h"
 #include "ConfigManager.h"
-#include "Effect.h"
-#include "EffectView.h"
 #include "EffectRackView.h"
 #include "Fader.h"
 #include "FontHelper.h"
@@ -52,7 +49,6 @@
 #include "lmms_math.h"
 #include "Mixer.h"
 #include "MixerView.h"
-#include "MixHelpers.h"
 #include "PeakIndicator.h"
 #include "SendButtonIndicator.h"
 #include "Song.h"
