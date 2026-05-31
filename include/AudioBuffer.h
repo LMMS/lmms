@@ -347,11 +347,11 @@ public:
 	 * @returns true if sanitization occurred
 	 * @see MixHelpers::sanitizationEnabled
 	 */
-	bool sanitize(const ChannelFlags& channels, ch_cnt_t upperBound = MaxChannelsPerAudioBuffer);
+	auto sanitize(const ChannelFlags& channels, ch_cnt_t upperBound = MaxChannelsPerAudioBuffer) -> bool;
 
 	//! Sanitizes all channels. @see sanitize
 	//! @returns true if sanitization occurred
-	bool sanitizeAll();
+	auto sanitizeAll() -> bool;
 
 	/**
 	 * @brief Updates the silence status of the given channels, up to the upperBound index.
