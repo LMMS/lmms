@@ -124,7 +124,7 @@ bool Effect::processAudioBuffer(AudioBuffer& inOut)
 
 	// TODO: We may also want to try and reset the plugin, as it's internal state may be corrupted with infs/NaNs
 	// forever until then.
-	m_corrupted = inOut.sanitize(0b11);
+	m_corrupted.store(inOut.sanitize(0b11), std::memory_order_relaxed);
 
 	// Update silence status for track channels the processor wrote to
 	const bool silentOutput = inOut.updateSilenceFlags(0b11);
