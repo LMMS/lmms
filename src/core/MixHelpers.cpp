@@ -93,19 +93,6 @@ void setSanitizationEnabled(bool on)
 	santizationEnabled = on;
 }
 
-bool sanitize(std::span<sample_t> buffer)
-{
-	if (!sanitizationEnabled()) { return false; }
-
-	if (std::ranges::any_of(buffer, [](auto val) { return !std::isfinite(val); }))
-	{
-		std::ranges::fill(buffer, 0.f);
-		return true;
-	}
-
-	return false;
-}
-
 struct AddOp
 {
 	void operator()( SampleFrame& dst, const SampleFrame& src ) const

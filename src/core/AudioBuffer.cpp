@@ -213,9 +213,10 @@ bool AudioBuffer::sanitize(const ChannelFlags& channels, ch_cnt_t upperBound)
 		if (channels[ch])
 		{
 			// This channel needs to be sanitized
-			if (MixHelpers::sanitize(buffer(ch)))
+			if (std::ranges::any_of(buffer(ch), [](auto val) { return !std::isfinite(val); }))
 			{
 				// Inf/NaN detected and buffer cleared
+				std::ranges::fill(buffer(ch), 0.f);
 				m_silenceFlags[ch] = true;
 				changesMade = true;
 			}
@@ -238,9 +239,10 @@ bool AudioBuffer::sanitizeAll()
 	bool changesMade = false;
 	for (ch_cnt_t ch = 0; ch < totalChannels(); ++ch)
 	{
-		if (MixHelpers::sanitize(buffer(ch)))
+		if (std::ranges::any_of(buffer(ch), [](auto val) { return !std::isfinite(val); }))
 		{
 			// Inf/NaN detected and buffer cleared
+			std::ranges::fill(buffer(ch), 0.f);
 			m_silenceFlags[ch] = true;
 			changesMade = true;
 		}

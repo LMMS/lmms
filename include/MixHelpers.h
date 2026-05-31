@@ -40,20 +40,6 @@ bool isSilent( const SampleFrame* src, int frames );
 
 bool isSilent(std::span<sample_t> buffer);
 
-/**
- * @brief Sanitizes a buffer of infs/NaNs, zeroing the entire buffer if any is detected.
- *
- * Only performs sanitization when it is enabled.
- *
- * @note Zeroing out the entire buffer, rather than just the problematic samples, is done due to needing to mitigate
- * potentially loud, erroneous output before an inf or NaN occur.
- *
- * @returns true if inf or NaN was detected
- * @returns false when an inf or NaN was not dectected or sanitzation is disabled.
- * @see sanitizationEnabled()
- */
-bool sanitize(std::span<sample_t> buffer);
-
 //! @returns whether sanitzation is enabled.
 bool sanitizationEnabled();
 

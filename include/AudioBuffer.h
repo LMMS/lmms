@@ -338,11 +338,13 @@ public:
 	/**
 	 * @brief Sanitizes @a channels of any Inf/NaN values if sanitization is enabled.
 	 *
+	 * If any invalid values are detected within a channel, the entire channel buffer is filled with silence, and its
+	 * internal silence flag is set.
+	 *
 	 * @param channels channels to sanitize; 1 = selected, 0 = skip
 	 * @param upperBound any channel indexes at or above this are skipped
 	 *
 	 * @returns true if sanitization occurred
-	 *
 	 * @see MixHelpers::sanitizationEnabled
 	 */
 	bool sanitize(const ChannelFlags& channels, ch_cnt_t upperBound = MaxChannelsPerAudioBuffer);
