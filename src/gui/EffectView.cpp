@@ -246,9 +246,16 @@ void EffectView::modelChanged()
 
 void EffectView::update()
 {
-	m_bypass->setLedColor(effect()->isCorrupted() ? LedCheckBox::LedColor::Red : m_defaultLedColor);
-	m_bypass->setToolTip(
-		effect()->isCorrupted() ? tr("Plugin output corrupted. Affected channels have been muted.") : tr("On/Off"));
+	if (effect()->isCorrupted())
+	{
+		m_bypass->model()->setValue(0);
+		m_bypass->setToolTip(tr("Effect disabled: Plugin is outputting corrupted audio (inf/nan)."));
+	}
+	else
+	{
+		m_bypass->model()->setValue(effect()->isEnabled());
+		m_bypass->setToolTip(tr("On/Off"));
+	}
 }
 
 } // namespace lmms::gui
