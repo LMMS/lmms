@@ -51,13 +51,14 @@ public:
 	//! Returns the sample rate of the audio
 	float sampleRate() const { return m_sampleRate; }
 
-private:
 	static constexpr const size_t NUM_CHANNELS = 2;
+
+private:
 	//! The raw sample data is stored as a raw pointer to an interleaved array of floats in (number_of_samples)x(channels) format.
 	float* m_data = nullptr;
 
-	f_cnt_t m_size;
-	float m_sampleRate;
+	f_cnt_t m_size = 0;
+	float m_sampleRate = 0.0f;
 };
 
 } // namespace lmms

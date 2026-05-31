@@ -52,19 +52,20 @@ public:
 
 	//! Load the sample file given by the `sample` opcode into m_sample.
 	//! The sample path is treated as relative to the path to the sfz file, so the parent directory is also needed
+	//! Sets `sampleInPool` to true if it was able to find the sample previously loaded in the sample pool, or false if it needed to load it from disk.
 	//! Returns true if successful
-	bool initializeSample(const QDir& parentDirectory, SfzSamplePool& samplePool);
+	bool initializeSample(const QDir& parentDirectory, SfzSamplePool& samplePool, bool* sampleInPool);
 
-	//! Returns a shared pointer to the sample object for this region
-	const SfzSampleBuffer* sample() const { return m_sample; }
+	//! Returns a non-owning raw pointer to the sample object for this region
+	const SfzSampleBuffer* sample() const { return m_sample.get(); }
 	//! Returns the type of basic wave for this region, if it specified instead of a real sample.
 	//! If a sample was specified, this returns SfzBasicWaves::Shape::Silence by default.
 	const SfzBasicWaves::Shape basicWaveShape() const { return m_basicWaveShape; }
 
 private:
-	//! Pointer to sample object to be played. The sample file path is defined in the `sample` opcode, but the data needs to be loaded first
+	//! Shared pointer to sample object to be played. The sample file path is defined in the `sample` opcode, but the data needs to be loaded first
 	//! The actual sample objects are stored in a shared pool, SfzSamplePool, so that if multiple of the same sample are loaded, they don't waste memory.
-	const SfzSampleBuffer* m_sample = nullptr;
+	std::shared_ptr<const SfzSampleBuffer> m_sample;
 	//! However, if a basic wave keyword such as *sine, *saw, *triangle, etc is used, handle it separately (see SfzBasicWaves.h/.cpp)
 	SfzBasicWaves::Shape m_basicWaveShape = SfzBasicWaves::Shape::Silence;
 

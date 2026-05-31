@@ -66,6 +66,7 @@ private:
 
 	QLabel* m_statusLabel;
 	QLabel* m_generalInfoLabel;
+	QLabel* m_samplePoolLabel;
 	QLabel* m_switchKeysLabel;
 	QWidget* m_infoLabelsWidget;
 	QWidget* m_controlsWidget;

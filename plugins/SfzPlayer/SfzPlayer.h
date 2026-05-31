@@ -36,7 +36,6 @@
 #include "SfzRegionPlayState.h"
 #include "SfzGlobalState.h"
 #include "SfzControlsConfig.h"
-#include "SfzSamplePool.h"
 #include "SfzRegionManager.h"
 
 #include <thread>
@@ -87,14 +86,14 @@ private:
 	//! Helper function to figure out what the maximum active index is, in the event the maximum index deactivated
 	void recalculateMaxActiveIndex();
 
-	//! So that the regions don't accidentally load the same sample multiple times, we store all the sames in one place and the regions ask it to load each sample/retrieve a pointer if it's already been loaded
-	SfzSamplePool* m_samplePool = nullptr; // TODO use unique pointer or something
-
 	//! Holds information about the total number of notes active, last switch keys pressed, etc
 	SfzGlobalState m_sfzGlobalState;
 
 	//! Holds information about midi CC default values, labels, which CC's are actually used, etc
 	SfzControlsConfig m_controlsConfig;
+
+	//! Shared pointer of the current SfzSamplePool, shared across all instances of SfzPlayer. Holding this shared_ptr keeps the sample pool alive, since after the last SfzPlayer is deleted, the sample pool is deleted too.
+	std::shared_ptr<SfzSamplePool> m_samplePool;
 
 	//! Unfortunately, LMMS by default has the velocity of NoteOff events be 0. However, SFZ expects them to match the velocity of the corresponding NoteOn event.
 	//! To account for this, we store the velocity of the last NoteOn event for each key, and use that value when hanlding NoteOff events.
@@ -117,20 +116,19 @@ private:
 
 	//! Unfortunately, dealing with multiple threads gets complicated.
 	//! There is the possibility that the audio thread could access the region/sample data while the main thread is loading a new SFZ file and the samples
-	//! We need some way to swap out the current region/samples with the new data without breaking real-time safety.
+	//! We need some way to swap out the current regions with the new data without breaking real-time safety.
 	//! To do this, essentially we have temporary buffers which the main thread works on while loading the files. When it's done, it sets a flag
-	//! which tells the audio thread that it can swap out the temporary objects for the real objects, and continue processing the audio.
+	//! which tells the audio thread that it can swap out the temporary pointer for the real pointer, and continue processing the audio.
 
-	//! When a new SFZ file is being loaded and the regions/samples need to be swapped out, the main thread sets this flag to let the
-	//! audio thread know to move the data from the temporary variables into the real region/sample stores. The audio thread will set this back to false when it has finished swapping
+	//! When a new SFZ file is being loaded and the regions need to be swapped out, the main thread sets this flag to let the
+	//! audio thread know to move the data from the temporary pointer variable into the real region manager pointer variable. The audio thread will set this back to false when it has finished swapping
 	std::atomic<bool> m_newSfzDataReady = false;
 	std::atomic<bool> m_justSwappedData = false; // And another flag so the main thread knows if it should be waiting for enough buffers to pass before loaidng another sfz file
 	//! Also have a flag for whether the sample loading thread is active or not, so that we don't accidentally try to start up a new sample loading thread while samples are already being loaded.
 	std::atomic<bool> m_currentlyLoadingSamples = false;
-	//! Temporary variables for the region and sample data, which the audio thread will swap with the real ones when m_newSfzDataReady is true
+	//! Temporary variable for the region data, which the audio thread will swap with the current pointer when m_newSfzDataReady is true
 	SfzRegionManager* m_tempRegionManager = nullptr;
-	SfzSamplePool* m_tempSamplePool = nullptr;
-	//! Counts the number of buffers which have been processed. This is used for determining how long it has been since the audio thread has swapped out the region/sample data
+	//! Counts the number of buffers which have been processed. This is used for determining how long it has been since the audio thread has swapped out the region data
 	//! when loading a new SFZ file (Thanks to Lost Robot for the idea)
 	std::atomic<size_t> m_bufferCounter = 0;
 	//! The main thread will also save the buffer counter when m_newSfzDataReady was set so that it will know if enough buffers have passed that the audio thread can be guaranteed to have swapped the data already.

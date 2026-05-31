@@ -107,7 +107,7 @@ void SfzRegion::recalculateTotalCCModulation(const SfzGlobalState& globalState)
 }
 
 
-bool SfzRegion::initializeSample(const QDir& parentDirectory, SfzSamplePool& samplePool)
+bool SfzRegion::initializeSample(const QDir& parentDirectory, SfzSamplePool& samplePool, bool* sampleInPool)
 {
 	if (m_sampleFile == std::nullopt)
 	{
@@ -132,7 +132,7 @@ bool SfzRegion::initializeSample(const QDir& parentDirectory, SfzSamplePool& sam
 		QDir defaultDirectory = QDir(parentDirectory.absoluteFilePath(m_default_path.value_or(""))); // TODO
 		QString path = defaultDirectory.absoluteFilePath(m_sampleFile); // TODO
 		// The sample pool handles making sure the same sample isn't loaded twice, which would waste memory
-		m_sample = samplePool.loadSample(path);
+		m_sample = samplePool.loadSample(path, sampleInPool); // sampleInPool is passed so that we can tell the SfzPlayer if it actually needed to load it from disk or whether it was previously loaded and could be retrieved.
 
 		return m_sample != nullptr;
 	}
