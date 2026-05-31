@@ -62,7 +62,7 @@ public:
 		return castModel<Effect>();
 	}
 
-	void update();
+	void updateCorruptedState();
 
 	static constexpr int DEFAULT_WIDTH = 215;
 	static constexpr int DEFAULT_HEIGHT = 60;

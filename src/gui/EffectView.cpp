@@ -244,7 +244,7 @@ void EffectView::modelChanged()
 	m_autoQuit->setModel( &effect()->m_autoQuitModel );
 }
 
-void EffectView::update()
+void EffectView::updateCorruptedState()
 {
 	if (effect()->isCorrupted())
 	{

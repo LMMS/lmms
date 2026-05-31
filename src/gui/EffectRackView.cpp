@@ -78,7 +78,7 @@ EffectRackView::EffectRackView( EffectChain* model, QWidget* parent ) :
 	setModel( model );
 
 	auto updateTimer = new QTimer{this};
-	connect(updateTimer, &QTimer::timeout, this, &EffectRackView::updateEffects);
+	connect(updateTimer, &QTimer::timeout, this, &EffectRackView::updateCorruptedState);
 	updateTimer->start(1000);
 }
 
@@ -284,7 +284,7 @@ QSize EffectRackView::sizeHint() const
 	return QSize{EffectRackView::DEFAULT_WIDTH, 254 /* INSTRUMENT_HEIGHT */ - 4 - 1};
 }
 
-void EffectRackView::updateEffects()
+void EffectRackView::updateCorruptedState()
 {
 	if (fxChain()->isCorrupted())
 	{
@@ -299,7 +299,7 @@ void EffectRackView::updateEffects()
 
 	for (const auto& effectView : m_effectViews)
 	{
-		effectView->update();
+		effectView->updateCorruptedState();
 	}
 }
 
