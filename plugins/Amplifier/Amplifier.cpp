@@ -85,8 +85,6 @@ Effect::ProcessStatus AmplifierEffect::processImpl(SampleFrame* buf, const f_cnt
 		currentFrame = currentFrame * d + s * w;
 	}
 
-	buf[0][0] = std::nan("");
-
 	return ProcessStatus::ContinueIfNotQuiet;
 }
 
