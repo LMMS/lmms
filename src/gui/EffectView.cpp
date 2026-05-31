@@ -50,29 +50,28 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 	m_bg( embed::getIconPixmap( "effect_plugin" ) ),
 	m_subWindow( nullptr ),
 	m_controlView(nullptr),
-	m_dragging(false),
-	m_isEnabled(!dynamic_cast<DummyEffect*>(effect())),
-	m_defaultLedColor(m_isEnabled ? LedCheckBox::LedColor::Green : LedCheckBox::LedColor::Red )
+	m_dragging(false)
 {
 	setFixedSize(EffectView::DEFAULT_WIDTH, EffectView::DEFAULT_HEIGHT);
 	setFocusPolicy(Qt::StrongFocus);
 
 	// Disable effects that are of type "DummyEffect"
-	m_bypass = new LedCheckBox(this, "", m_defaultLedColor);
+	bool isEnabled = !dynamic_cast<DummyEffect *>( effect() );
+	m_bypass = new LedCheckBox( this, "", isEnabled ? LedCheckBox::LedColor::Green : LedCheckBox::LedColor::Red );
 	m_bypass->move( 3, 3 );
-	m_bypass->setEnabled(m_isEnabled);
+	m_bypass->setEnabled( isEnabled );
 
 	m_bypass->setToolTip(tr("On/Off"));
 
 	m_wetDry = new Knob(KnobType::Bright26, tr("W/D"), this, Knob::LabelRendering::LegacyFixedFontSize);
 	m_wetDry->move( 40 - m_wetDry->width() / 2, 5 );
-	m_wetDry->setEnabled(m_isEnabled);
+	m_wetDry->setEnabled( isEnabled );
 	m_wetDry->setHintText( tr( "Wet Level:" ), "" );
 
 
 	m_autoQuit = new TempoSyncKnob(KnobType::Bright26, tr("DECAY"), this, Knob::LabelRendering::LegacyFixedFontSize);
 	m_autoQuit->move( 78 - m_autoQuit->width() / 2, 5 );
-	m_autoQuit->setEnabled(m_isEnabled && effect()->autoQuitEnabled());
+	m_autoQuit->setEnabled(isEnabled && effect()->autoQuitEnabled());
 	m_autoQuit->setHintText( tr( "Time:" ), "ms" );
 
 	setModel( _model );

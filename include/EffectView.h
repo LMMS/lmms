@@ -97,8 +97,6 @@ private:
 	EffectControlDialog * m_controlView;
 	
 	bool m_dragging;
-	bool m_isEnabled;
-	LedCheckBox::LedColor m_defaultLedColor;
 	QGraphicsOpacityEffect* m_opacityEffect;
 
 } ;
