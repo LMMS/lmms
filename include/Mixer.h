@@ -30,7 +30,6 @@
 #include <optional>
 
 #include "AudioBuffer.h"
-#include "ConfigManager.h"
 #include "EffectChain.h"
 #include "JournallingObject.h"
 #include "Model.h"
