@@ -26,7 +26,6 @@
 #ifndef LMMS_EFFECT_CHAIN_H
 #define LMMS_EFFECT_CHAIN_H
 
-#include "ConfigManager.h"
 #include "Model.h"
 #include "SerializingObject.h"
 #include "AutomatableModel.h"
