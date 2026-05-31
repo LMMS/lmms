@@ -201,7 +201,7 @@ auto AudioBuffer::hasAnySignal() const -> bool
 	return !m_silenceFlags.all();
 }
 
-bool AudioBuffer::sanitize(const ChannelFlags& channels, ch_cnt_t upperBound)
+auto AudioBuffer::sanitize(const ChannelFlags& channels, ch_cnt_t upperBound) -> bool
 {
 	if (!MixHelpers::sanitizationEnabled()) { return false; }
 
@@ -232,7 +232,7 @@ bool AudioBuffer::sanitize(const ChannelFlags& channels, ch_cnt_t upperBound)
 	return changesMade;
 }
 
-bool AudioBuffer::sanitizeAll()
+auto AudioBuffer::sanitizeAll() -> bool
 {
 	if (!MixHelpers::sanitizationEnabled()) { return false; }
 
