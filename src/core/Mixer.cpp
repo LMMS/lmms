@@ -29,14 +29,12 @@
 #include "AudioEngine.h"
 #include "AudioEngineWorkerThread.h"
 #include "Mixer.h"
-#include "MixHelpers.h"
 #include "Song.h"
 
 #include "InstrumentTrack.h"
 #include "MixHelpers.h"
 #include "PatternStore.h"
 #include "SampleTrack.h"
-#include "Song.h"
 #include "TrackContainer.h" // For TrackContainer::TrackList typedef
 
 namespace lmms
