@@ -248,12 +248,12 @@ void EffectView::update()
 {
 	if (effect()->isCorrupted())
 	{
-		m_bypass->model()->setValue(0);
-		m_bypass->setToolTip(tr("Effect disabled: Plugin is outputting corrupted audio (inf/nan)."));
+		effect()->m_enabledModel.setValue(0);
+		m_bypass->setToolTip(tr("Effect bypassed: Plugin is outputting corrupted audio (inf/nan)."));
 	}
 	else
 	{
-		m_bypass->model()->setValue(effect()->isEnabled());
+		effect()->m_enabledModel.setValue(effect()->isEnabled());
 		m_bypass->setToolTip(tr("On/Off"));
 	}
 }
