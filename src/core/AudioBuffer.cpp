@@ -27,6 +27,7 @@
 #include "ConfigManager.h"
 #include "MixHelpers.h"
 #include "SharedMemory.h"
+#include "TracyProfiling.h"
 
 namespace lmms
 {
@@ -203,6 +204,7 @@ auto AudioBuffer::hasAnySignal() const -> bool
 
 void AudioBuffer::sanitize(const ChannelFlags& channels, ch_cnt_t upperBound)
 {
+	ZoneScoped;
 	if (!MixHelpers::useNaNHandler()) { return; }
 
 	bool changesMade = false;
@@ -225,12 +227,14 @@ void AudioBuffer::sanitize(const ChannelFlags& channels, ch_cnt_t upperBound)
 	if (changesMade && hasInterleavedBuffer() && (channels[0] || channels[1]))
 	{
 		// Keep the temporary interleaved buffer in sync
+		ZoneScopedN("Copy to interleaved buffer");
 		toInterleaved(groupBuffers(0), interleavedBuffer());
 	}
 }
 
 void AudioBuffer::sanitizeAll()
 {
+	ZoneScoped;
 	if (!MixHelpers::useNaNHandler()) { return; }
 
 	bool changesMade = false;
@@ -247,12 +251,15 @@ void AudioBuffer::sanitizeAll()
 	if (changesMade && hasInterleavedBuffer())
 	{
 		// Keep the temporary interleaved buffer in sync
+		ZoneScopedN("Copy to interleaved buffer");
 		toInterleaved(groupBuffers(0), interleavedBuffer());
 	}
 }
 
 auto AudioBuffer::updateSilenceFlags(const ChannelFlags& channels, ch_cnt_t upperBound) -> bool
 {
+	ZoneScoped;
+
 	assert(upperBound <= MaxChannelsPerAudioBuffer);
 
 	// Invariant: Any channel bits at or above `totalChannels()` must be marked silent
@@ -290,6 +297,8 @@ auto AudioBuffer::updateSilenceFlags(const ChannelFlags& channels, ch_cnt_t uppe
 
 auto AudioBuffer::updateAllSilenceFlags() -> bool
 {
+	ZoneScoped;
+
 	// Invariant: Any channel bits at or above `totalChannels()` must be marked silent
 	assert((~m_silenceFlags & createMask<true>(totalChannels())).none());
 
@@ -317,6 +326,8 @@ auto AudioBuffer::updateAllSilenceFlags() -> bool
 
 void AudioBuffer::silenceChannels(const ChannelFlags& channels, ch_cnt_t upperBound)
 {
+	ZoneScoped;
+
 	auto needSilenced = ~m_silenceFlags;
 	needSilenced &= channels;
 
@@ -332,6 +343,7 @@ void AudioBuffer::silenceChannels(const ChannelFlags& channels, ch_cnt_t upperBo
 	if (hasInterleavedBuffer() && (needSilenced[0] || needSilenced[1]))
 	{
 		// Keep the temporary interleaved buffer in sync
+		ZoneScopedN("Copy to interleaved buffer");
 		toInterleaved(groupBuffers(0), interleavedBuffer());
 	}
 
@@ -340,9 +352,10 @@ void AudioBuffer::silenceChannels(const ChannelFlags& channels, ch_cnt_t upperBo
 
 void AudioBuffer::silenceAllChannels()
 {
-	std::ranges::fill(m_sourceBuffer, 0);
-	std::ranges::fill(m_interleavedBuffer, 0);
+	ZoneScoped;
 
+	std::ranges::fill(m_sourceBuffer, 0.f);
+	std::ranges::fill(m_interleavedBuffer, 0.f);
 	m_silenceFlags.set();
 }
 

@@ -654,9 +654,10 @@ BoolModel *Track::getMutedModel()
 
 void Track::setName(const QString& newName)
 {
-	if (m_name != newName)
+	if (m_nameQString != newName)
 	{
-		m_name = newName;
+		m_nameQString = newName;
+		m_name = newName.toStdString();
 
 		if (auto song = Engine::getSong())
 		{

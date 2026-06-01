@@ -104,6 +104,7 @@ option(WANT_DEBUG_TSAN	"Enable ThreadSanitizer" OFF)
 option(WANT_DEBUG_MSAN	"Enable MemorySanitizer" OFF)
 option(WANT_DEBUG_UBSAN	"Enable UndefinedBehaviorSanitizer" OFF)
 option(WANT_DEBUG_GPROF	"Enable gprof profiler" OFF)
+option(WANT_DEBUG_TRACY	"Enable Tracy profiler" OFF)
 OPTION(BUNDLE_QT_TRANSLATIONS	"Install Qt translation files for LMMS" OFF)
 option(WANT_DEBUG_CPACK "Show detailed logs for packaging commands" OFF)
 option(WANT_CPACK_TARBALL "Request CPack to create a tarball instead of an installer" OFF)
@@ -709,7 +710,30 @@ if(WANT_DEBUG_GPROF)
 	add_link_options(-pg)
 	set(STATUS_GPROF "OK")
 else()
-	set(STATUS_GPROF "Disabled ${STATUS_GPROF}")
+	set(STATUS_GPROF "Disabled${STATUS_GPROF}")
+endif()
+
+# Tracy profiler
+if(WANT_DEBUG_TRACY)
+	include(FetchContent)
+
+	FetchContent_Declare(
+		tracy
+		GIT_REPOSITORY https://github.com/wolfpld/tracy.git
+		GIT_TAG 05cceee0df3b8d7c6fa87e9638af311dbabc63cb # v0.13.1
+		GIT_SHALLOW TRUE
+		GIT_PROGRESS TRUE
+	)
+	FetchContent_MakeAvailable(tracy)
+
+	if(TARGET TracyClient)
+		set(LMMS_DEBUG_TRACY TRUE)
+		set(STATUS_TRACY "Enabled")
+	else()
+		set(STATUS_TRACY "Error fetching dependency")
+	endif()
+else()
+	set(STATUS_TRACY "Disabled")
 endif()
 
 # add enabled sanitizers
@@ -880,6 +904,7 @@ MESSAGE(
 "* Debug using UBSanitizer           : ${STATUS_DEBUG_UBSAN}\n"
 "* Debug packaging commands          : ${STATUS_DEBUG_CPACK}\n"
 "* Profile using GNU profiler        : ${STATUS_GPROF}\n"
+"* Profile using Tracy profiler      : ${STATUS_TRACY}\n"
 "* Debug assertions                  : ${STATUS_ASSERTIONS}\n"
 "* Experimental Qt6 support          : ${STATUS_QT6}\n"
 )
