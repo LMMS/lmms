@@ -303,6 +303,7 @@ void EnvelopeAndLfoParameters::fillLevel( float * _buf, f_cnt_t _frame,
 
 	fillLfoLevel( _buf, _frame, _frames );
 
+	const bool controlEnvAmount = m_controlEnvAmountModel.value();
 	for( f_cnt_t offset = 0; offset < _frames; ++offset, ++_buf, ++_frame )
 	{
 		float env_level;
@@ -329,9 +330,9 @@ void EnvelopeAndLfoParameters::fillLevel( float * _buf, f_cnt_t _frame,
 		}
 
 		// at this point, *_buf is LFO level
-		*_buf = m_controlEnvAmountModel.value() ?
-			env_level * ( 0.5f + *_buf ) :
-			env_level + *_buf;
+		*_buf = controlEnvAmount
+			? env_level * (0.5f + *_buf)
+			: env_level + *_buf;
 	}
 }
 
