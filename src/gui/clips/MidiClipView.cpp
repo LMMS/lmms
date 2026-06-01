@@ -42,6 +42,7 @@
 #include "PianoRoll.h"
 #include "RenameDialog.h"
 #include "SongEditor.h"
+#include "TextFloat.h"
 #include "TrackContainerView.h"
 #include "TrackView.h"
 
@@ -104,11 +105,12 @@ void MidiClipView::openInPianoRoll()
 
 void MidiClipView::setGhostInPianoRoll()
 {
-	auto pRoll = getGUI()->pianoRoll();
-	pRoll->setGhostMidiClip(m_clip);
-	pRoll->parentWidget()->show();
-	pRoll->show();
-	pRoll->setFocus();
+	getGUI()->pianoRoll()->setGhostMidiClip(m_clip);
+	TextFloat::displayMessage(
+		tr("Ghost notes set"),
+		tr("Look inside Piano Roll if you dare!"),
+		embed::getIconPixmap("ghost_note", 24, 24),
+		3000);
 }
 
 void MidiClipView::setGhostInAutomationEditor()
