@@ -506,8 +506,8 @@ void ClipView::updateCursor(QMouseEvent * me)
 {
 	const auto posX = position(me).x();
 
-	// If we are at the edges, use the resize cursor (loop views are not allowed to be resized directly)
-	if (!me->buttons() && m_clip->manuallyResizable() && !isSelected() && !m_offset
+	// If we are at the edges, use the resize cursor
+	if (!me->buttons() && m_clip->manuallyResizable() && !isSelected() && (!m_offset || lastLoopView())
 		&& ((posX > width() - RESIZE_GRIP_WIDTH) || (posX < RESIZE_GRIP_WIDTH)))
 	{
 		setCursor(Qt::SizeHorCursor);
@@ -711,7 +711,8 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 
 				// Action::Move, Action::Resize and Action::ResizeLeft
 				// Action::Split action doesn't disable Clip journalling
-				if (m_action == Action::Move || m_action == Action::Resize || m_action == Action::ResizeLeft)
+				if (m_action == Action::Move || m_action == Action::Resize
+					|| m_action == Action::ResizeLeft || m_action == Action::ResizeLoop)
 				{
 					m_clip->setJournalling(false);
 				}
@@ -726,10 +727,17 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 				}
 				else if (pos.x() >= width() - RESIZE_GRIP_WIDTH)
 				{
-					m_action = Action::Resize;
+					if (pos.y() < height() / 2 || offset() > 0)
+					{
+						m_action = Action::ResizeLoop;
+					}
+					else if (offset() == 0)
+					{
+						m_action = Action::Resize;
+					}
 					setCursor( Qt::SizeHorCursor );
 				}
-				else if (pos.x() < RESIZE_GRIP_WIDTH)
+				else if (pos.x() < RESIZE_GRIP_WIDTH && offset() == 0)
 				{
 					m_action = Action::ResizeLeft;
 					setCursor( Qt::SizeHorCursor );
@@ -769,6 +777,13 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 							arg( m_clip->endPosition().getBar() + 1 ).
 							arg( m_clip->endPosition().getTicks() %
 									TimePos::ticksPerBar() ) );
+				}
+				else if( m_action == Action::ResizeLoop)
+				{
+					s_textFloat->setTitle(tr("Current length"));
+					s_textFloat->setText(tr("%1:%2").
+							arg(m_clip->loopLength().getBar()).
+							arg(m_clip->loopLength().getTicks() % TimePos::ticksPerBar()));
 				}
 				// s_textFloat->reparent( this );
 				// setup text-float as if Clip was already moved/resized
@@ -944,13 +959,35 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 			( *it )->movePosition( newPos + m_initialOffsets[index] );
 		}
 	}
-	else if( ( m_action == Action::Resize || m_action == Action::ResizeLeft ) && !m_offset ) // Loop views can't be resized directly
+	else if (m_action == Action::Resize || m_action == Action::ResizeLeft || m_action == Action::ResizeLoop)
 	{
 		const float snapSize = getGUI()->songEditor()->m_editor->getSnapSize();
 		// Length in ticks of one snap increment
 		const TimePos snapLength = TimePos( (int)(snapSize * TimePos::ticksPerBar()) );
 
-		if( m_action == Action::Resize )
+		if(m_action == Action::ResizeLoop)
+		{
+			// The clip's loop new length
+			TimePos l = static_cast<int>(offset() * m_clip->length() + pos.x() * TimePos::ticksPerBar() / ppb);
+
+			// If the user is holding alt, or pressed ctrl after beginning the drag, don't quantize
+			if (unquantizedModHeld(me))
+			{
+				m_clip->changeLoopLength(l);
+			}
+			else if (me->modifiers() & Qt::ShiftModifier)
+			{	// If shift is held, quantize clip's end position
+				TimePos end = TimePos(m_initialClipPos + l).quantize(snapSize);
+				m_clip->changeLoopLength(end - m_initialClipPos);
+			}
+			else
+			{	// Otherwise, resize in fixed increments
+				TimePos initialLength = m_initialClipEnd - m_initialClipPos;
+				TimePos offset = TimePos(l - initialLength).quantize(snapSize);
+				m_clip->changeLoopLength(initialLength + offset);
+			}
+		}
+		else if (m_action == Action::Resize)
 		{
 			// The clip's new length
 			TimePos l = static_cast<int>(pos.x() * TimePos::ticksPerBar() / ppb);
@@ -1091,7 +1128,8 @@ void ClipView::mouseReleaseEvent( QMouseEvent * me )
 	{
 		setSelected( !isSelected() );
 	}
-	else if( m_action == Action::Move || m_action == Action::Resize || m_action == Action::ResizeLeft )
+	else if( m_action == Action::Move || m_action == Action::Resize
+			|| m_action == Action::ResizeLeft || m_action == Action::ResizeLoop)
 	{
 		// TODO: Fix m_clip->setJournalling() consistency
 		m_clip->setJournalling( true );

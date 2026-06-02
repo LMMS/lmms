@@ -215,6 +215,7 @@ private:
 		MoveSelection,
 		Resize,
 		ResizeLeft,
+		ResizeLoop,
 		Split,
 		CopySelection,
 		ToggleSelected
