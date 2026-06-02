@@ -1272,13 +1272,16 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 
 				float absNoteHeight = static_cast<float>(note->key() - minKey) / (maxKey - minKey);
 				int graphHeight = grid_bottom - NOTE_HEIGHT - NOTE_MARGIN - TOP_MARGIN;
-				const int y = (graphHeight - graphHeight * absNoteHeight) + NOTE_HEIGHT / 2.0f + TOP_MARGIN;
+				const int actualNoteHeight = (yCoordOfLevel(0) - yCoordOfLevel(1)); // Using yCoordOfLevel to find the exact height of 1 semitone for use when detuning notes
+				const int y = detuningNote != nullptr
+							? yCoordOfLevel(note->key() - detuningNote->key()) - actualNoteHeight / 2.0f
+							: (graphHeight - graphHeight * absNoteHeight) + NOTE_HEIGHT / 2.0f + TOP_MARGIN;
 				const int x = xCoordOfTick(notePos);
 
 				if (note == detuningNote) {
-					p.fillRect(x, y, note_width, NOTE_HEIGHT, m_detuningNoteColor);
+					p.fillRect(x, y, note_width, detuningNote != nullptr ? actualNoteHeight : NOTE_HEIGHT, m_detuningNoteColor);
 				} else {
-					p.fillRect(x, y, note_width, NOTE_HEIGHT, m_ghostNoteColor);
+					p.fillRect(x, y, note_width, detuningNote != nullptr ? actualNoteHeight : NOTE_HEIGHT, m_ghostNoteColor);
 				}
 			}
 		}
