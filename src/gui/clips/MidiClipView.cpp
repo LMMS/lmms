@@ -66,19 +66,6 @@ MidiClipView::MidiClipView( MidiClip* clip, TrackView* parent, int offset ) :
 	update();
 
 	setStyle( QApplication::style() );
-
-	if (offset == 0 && clip->loopLength() > clip->length() - clip->startTimeOffset())
-	{
-		// We set the loop length to length so the lastLoopView() check in loop() returns the expected value
-		int loopLength = m_clip->loopLength();
-		m_clip->changeLoopLength(0);
-
-		while (m_clip->loopLength() < loopLength)
-		{
-			loop();
-		}
-		m_clip->changeLoopLength(loopLength);
-	}
 }
 
 

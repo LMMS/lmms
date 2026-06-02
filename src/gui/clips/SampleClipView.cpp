@@ -59,19 +59,6 @@ SampleClipView::SampleClipView( SampleClip * _clip, TrackView * _tv, int offset 
 	connect(m_clip, SIGNAL(wasReversed()), this, SLOT(update()));
 
 	setStyle( QApplication::style() );
-
-	if (offset == 0 && m_clip->loopLength() > m_clip->length() - m_clip->startTimeOffset())
-	{
-		// We set the loop length to length so the lastLoopView() check in loop() returns the expected value
-		int loopLength = m_clip->loopLength();
-		m_clip->changeLoopLength(0);
-
-		while (m_clip->loopLength() < loopLength)
-		{
-			loop();
-		}
-		m_clip->changeLoopLength(loopLength);
-	}
 }
 
 void SampleClipView::updateSample()

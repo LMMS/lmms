@@ -60,19 +60,6 @@ AutomationClipView::AutomationClipView( AutomationClip * _clip,
 	setToolTip(m_clip->name());
 	setStyle( QApplication::style() );
 	update();
-
-	if (offset == 0 && m_clip->loopLength() > m_clip->length() - m_clip->startTimeOffset())
-	{
-		// We set the loop length to length so the lastLoopView() check in loop() returns the expected value
-		int loopLenght = m_clip->loopLength();
-		m_clip->changeLoopLength(0);
-
-		while (m_clip->loopLength() < loopLenght)
-		{
-			loop();
-		}
-		m_clip->changeLoopLength(loopLenght);
-	}
 }
 
 
