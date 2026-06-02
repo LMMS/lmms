@@ -109,7 +109,7 @@ Clip::~Clip()
 
 void Clip::changeLoopLength(TimePos length)
 {
-	m_loopLength = std::max(m_length - m_startTimeOffset, length.getTicks());
+	m_loopLength = std::max(m_length, length);
 	emit lengthChanged();
 }
 
@@ -146,12 +146,15 @@ void Clip::movePosition( const TimePos & pos )
  *
  * \param _length The new length of the clip.
  */
-void Clip::changeLength( const TimePos & length )
+void Clip::changeLength(const TimePos & length)
 {
+	bool noLoop = m_length == m_loopLength;
+
 	m_length = length;
-	if (m_loopLength < m_length - m_startTimeOffset)
+
+	if (noLoop || m_loopLength < m_length)
 	{
-		m_loopLength = m_length - m_startTimeOffset;
+		m_loopLength = m_length;
 	}
 	Engine::getSong()->updateLength();
 	emit lengthChanged();

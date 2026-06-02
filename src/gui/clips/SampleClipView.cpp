@@ -396,19 +396,9 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 
 
 
-void SampleClipView::loop()
+void SampleClipView::createLoopView()
 {
-	// We don't create a loop if there's already one
-	if ( lastLoopView() )
-	{
-		SampleClipView* newLoop = new SampleClipView(m_clip, m_trackView, offset() + 1);
-		connect(this, SIGNAL(closing()), newLoop, SLOT(closeLoopViews()));
-		connect(this, SIGNAL(extandLoop()), newLoop, SLOT(loop()));
-	}
-	else
-	{
-		extandLoop();
-	}
+	new SampleClipView(m_clip, m_trackView, offset() + 1);
 }
 
 

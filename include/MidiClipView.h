@@ -83,7 +83,7 @@ protected slots:
 	void transposeSelection();
 	void clearNotesOutOfBounds();
 
-	virtual void loop();
+	virtual void createLoopView();
 
 
 protected:

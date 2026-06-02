@@ -63,7 +63,7 @@ protected:
 	void paintEvent( QPaintEvent * ) override;
 
 protected slots:
-	virtual void loop();
+	virtual void createLoopView();
 
 private:
 	SampleClip * m_clip;

@@ -86,6 +86,7 @@ ClipView::ClipView( Clip * clip,
 	m_initialClipEnd( TimePos(0) ),
 	m_clip( clip ),
 	m_offset( offset ),
+	m_haveChild(false),
 	m_action( Action::None ),
 	m_initialMousePos( QPoint( 0, 0 ) ),
 	m_initialMouseGlobalPos( QPoint( 0, 0 ) ),
@@ -131,11 +132,6 @@ ClipView::ClipView( Clip * clip,
 		// redraw if clip uses track color
 		if (!m_clip->color().has_value()) { update(); }
 	});
-
-	if (offset != 0)
-	{
-		clip->changeLoopLength(clip->loopLength() + clip->length() - clip->startTimeOffset());
-	}
 
 	m_trackView->getTrackContentWidget()->addClipView( this );
 	updateLength();
@@ -270,11 +266,11 @@ void ClipView::setNeedsUpdate( bool b )
  */
 bool ClipView::close()
 {
-	if (m_offset != 0)
+	if (m_offset != 0 && m_clip->loopLength() > m_clip->length() * offset())
 	{
-		m_clip->changeLoopLength(m_offset * (m_clip->length() - m_clip->startTimeOffset()));
+		m_clip->changeLoopLength(m_clip->length() * offset());
 	}
-	m_trackView->getTrackContentWidget()->removeClipView( this );
+	m_trackView->getTrackContentWidget()->removeClipView(this);
 	return QWidget::close();
 }
 
@@ -329,6 +325,19 @@ void ClipView::updateLength()
 	else
 	{
 		TimePos viewLength(std::min(m_clip->loopLength() - offset() * m_clip->length(), m_clip->length().getTicks()));
+		if (viewLength <= 0)
+		{
+			close();
+		}
+		if (m_clip->loopLength() - offset() * m_clip->length() <= m_clip->length())
+		{
+			m_haveChild = false;
+		}
+		else if (!m_haveChild)
+		{
+			m_haveChild = true;
+			createLoopView();
+		}
 		// this std::max function is needed for clips that do not start or end on the beat, otherwise, they "disappear" when zooming to min 
 		// 3 is the minimum width needed to make a clip visible
 		setFixedWidth(std::max(static_cast<int>(viewLength * pixelsPerBar() / TimePos::ticksPerBar() + 1), 3));
@@ -352,15 +361,6 @@ void ClipView::updatePosition()
 	// moving a Clip can result in change of song-length etc.,
 	// therefore we update the track-container
 	m_trackView->trackContainerView()->update();
-}
-
-void ClipView::closeLoopViews()
-{
-	if (m_offset != 0)
-	{
-		closing();
-		close();
-	}
 }
 
 void ClipView::selectColor()
@@ -811,8 +811,7 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 			m_action = Action::None;
 			setMarkerEnabled(false);
 			// Destroy the loop
-			closing();
-			update();
+			m_clip->changeLoopLength(0);
 		}
 	}
 	else if( me->button() == Qt::MiddleButton )
@@ -823,7 +822,6 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 		}
 		else if( !fixedClips() )
 		{
-			closing();
 			if (m_offset)
 			{
 				close();
@@ -1112,7 +1110,7 @@ void ClipView::mouseReleaseEvent( QMouseEvent * me )
 		}
 		setMarkerEnabled(false);
 		// Destroy loop
-		closing();
+		m_clip->changeLoopLength(0);
 	}
 
 	m_action = Action::None;
@@ -1541,5 +1539,13 @@ bool ClipView::splitClip(const TimePos pos)
 	m_clip->getTrack()->restoreJournallingState();
 	return true;
 }
+
+
+
+void ClipView::loop()
+{
+	m_clip->changeLoopLength(m_clip->loopLength() + m_clip->length());
+}
+
 
 } // namespace lmms::gui

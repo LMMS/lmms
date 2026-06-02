@@ -69,7 +69,7 @@ protected:
 	void dropEvent( QDropEvent * _de ) override;
 
 protected slots:
-	virtual void loop();
+	virtual void createLoopView();
 
 private:
 	AutomationClip * m_clip;

@@ -140,9 +140,6 @@ public slots:
 	void randomizeColor();
 	void resetColor();
 
-signals:
-	void closing();
-	void extandLoop();
 
 protected:
 	enum class ContextMenuAction
@@ -197,15 +194,15 @@ protected:
 		return m_offset == (m_clip->loopLength() - 1) / (m_clip->length() - m_clip->startTimeOffset());
 	}
 
+	/** Extend the loop by the length of the clip */
+	void loop();
+
 protected slots:
 	void updateLength();
 	void updatePosition();
-	void closeLoopViews();
 
-	/**
-	 * Create a new loop view
-	 */
-	virtual void loop()
+	/** Create a new loop view */
+	virtual void createLoopView()
 	{
 	};
 
@@ -227,6 +224,7 @@ private:
 
 	Clip * m_clip;
 	int m_offset; // Offset of the View from the Clip, in Clip's lengths (offset != 0 => loop view)
+	bool m_haveChild;
 	Action m_action;
 	QPoint m_initialMousePos;
 	QPoint m_initialMouseGlobalPos;
