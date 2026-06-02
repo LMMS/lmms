@@ -192,6 +192,8 @@ endif()
 find_package(Qt${QT_VERSION_MAJOR} ${LMMS_QT_MIN_VERSION} COMPONENTS Core Gui Widgets Xml Svg REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS LinguistTools QUIET)
 
+message(STATUS "Qt version: ${Qt${QT_VERSION_MAJOR}_VERSION}")
+
 include_directories(SYSTEM
 	${Qt${QT_VERSION_MAJOR}Core_INCLUDE_DIRS}
 	${Qt${QT_VERSION_MAJOR}Gui_INCLUDE_DIRS}
