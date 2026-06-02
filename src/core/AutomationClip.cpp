@@ -561,7 +561,7 @@ float AutomationClip::valueAt( const TimePos & _time ) const
 	}
 
 	TimePos loopOffset = 0;
-	while ( _time + loopOffset > length() - startTimeOffset() && -loopOffset < loopCount() * length() )
+	while ( _time + loopOffset > length() - startTimeOffset() && -loopOffset < loopLength() )
 	{
 		loopOffset -= length();
 	}
@@ -788,7 +788,7 @@ void AutomationClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 	_this.setAttribute( "pos", startPosition() );
 	_this.setAttribute( "len", length() );
-	_this.setAttribute( "loopcount", loopCount() );
+	_this.setAttribute( "looplen", loopLength() );
 	_this.setAttribute( "name", name() );
 	_this.setAttribute( "prog", QString::number( static_cast<int>(progressionType()) ) );
 	_this.setAttribute( "tens", QString::number( getTension() ) );
@@ -902,10 +902,9 @@ void AutomationClip::loadSettings( const QDomElement & _this )
 		changeLength( len );
 	}
 
-	int loopCount = _this.attribute("loopcount").toInt();
-	for (int i = 0; i < loopCount; ++i)
+	if (_this.hasAttribute("looplen"))
 	{
-		increaseLoopCount();
+		changeLoopLength(_this.attribute("looplen").toInt());
 	}
 
 	if (shouldGenerateTangents) { generateTangents(); }

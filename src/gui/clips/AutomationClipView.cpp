@@ -61,18 +61,17 @@ AutomationClipView::AutomationClipView( AutomationClip * _clip,
 	setStyle( QApplication::style() );
 	update();
 
-	if ( offset == 0 && m_clip->loopCount() > 0 )
+	if (offset == 0 && m_clip->loopLength() > m_clip->length() - m_clip->startTimeOffset())
 	{
-		int loopCount = m_clip->loopCount();
-		while ( m_clip->loopCount() > 0 )
-		{
-			// We set the loop count to 0 so the lastLoopView() check in loop() returns the expected value
-			m_clip->decreaseLoopCount();
-		}
-		while ( m_clip->loopCount() < loopCount )
+		// We set the loop length to length so the lastLoopView() check in loop() returns the expected value
+		int loopLenght = m_clip->loopLength();
+		m_clip->changeLoopLength(0);
+
+		while (m_clip->loopLength() < loopLenght)
 		{
 			loop();
 		}
+		m_clip->changeLoopLength(loopLenght);
 	}
 }
 
@@ -424,7 +423,7 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 		p.drawLine( 0, rect().bottom(), rect().right(), rect().bottom() );
 
 		// Last loop view gets a right border
-		if ( this->offset() == m_clip->loopCount() )
+		if (lastLoopView())
 		{
 			p.drawLine( rect().right(), 0, rect().right(), rect().bottom() );
 		}

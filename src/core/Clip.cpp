@@ -49,7 +49,7 @@ Clip::Clip( Track * track ) :
 	m_track( track ),
 	m_startPosition(),
 	m_length(),
-	m_loopCount(0),
+	m_loopLength(m_length),
 	m_mutedModel( false, this, tr( "Mute" ) ),
 	m_selectViewOnCreate{false}
 {
@@ -77,7 +77,7 @@ Clip::Clip(const Clip& other):
 	m_startPosition(other.m_startPosition),
 	m_length(other.m_length),
 	m_startTimeOffset(other.m_startTimeOffset),
-	m_loopCount(0),
+	m_loopLength(other.m_loopLength),
 	m_mutedModel(other.m_mutedModel.value(), this, tr( "Mute" )),
 	m_autoResize(other.m_autoResize),
 	m_selectViewOnCreate{other.m_selectViewOnCreate},
@@ -102,6 +102,15 @@ Clip::~Clip()
 	{
 		getTrack()->removeClip( this );
 	}
+}
+
+
+
+
+void Clip::changeLoopLength(TimePos length)
+{
+	m_loopLength = std::max(m_length - m_startTimeOffset, length.getTicks());
+	emit lengthChanged();
 }
 
 
@@ -140,6 +149,10 @@ void Clip::movePosition( const TimePos & pos )
 void Clip::changeLength( const TimePos & length )
 {
 	m_length = length;
+	if (m_loopLength < m_length - m_startTimeOffset)
+	{
+		m_loopLength = m_length - m_startTimeOffset;
+	}
 	Engine::getSong()->updateLength();
 	emit lengthChanged();
 }

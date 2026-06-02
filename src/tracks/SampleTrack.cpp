@@ -104,7 +104,7 @@ bool SampleTrack::play( const TimePos & _start, const fpp_t _frames,
 			Clip * clip = getClip( i );
 			auto sClip = dynamic_cast<SampleClip*>(clip);
 
-			for ( int loop = 0; loop <= sClip->loopCount(); loop++ )
+			for (int loop = 0; loop <= (sClip->loopLength() - 1) / (sClip->length() - sClip->startTimeOffset()); loop++)
 			{
 				TimePos loopOffset = loop * sClip->length();
 

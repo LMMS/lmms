@@ -134,7 +134,7 @@ ClipView::ClipView( Clip * clip,
 
 	if (offset != 0)
 	{
-		clip->increaseLoopCount();
+		clip->changeLoopLength(clip->loopLength() + clip->length() - clip->startTimeOffset());
 	}
 
 	m_trackView->getTrackContentWidget()->addClipView( this );
@@ -272,7 +272,7 @@ bool ClipView::close()
 {
 	if (m_offset != 0)
 	{
-		m_clip->decreaseLoopCount();
+		m_clip->changeLoopLength(m_offset * (m_clip->length() - m_clip->startTimeOffset()));
 	}
 	m_trackView->getTrackContentWidget()->removeClipView( this );
 	return QWidget::close();
@@ -328,9 +328,10 @@ void ClipView::updateLength()
 	}
 	else
 	{
+		TimePos viewLength(std::min(m_clip->loopLength() - offset() * m_clip->length(), m_clip->length().getTicks()));
 		// this std::max function is needed for clips that do not start or end on the beat, otherwise, they "disappear" when zooming to min 
 		// 3 is the minimum width needed to make a clip visible
-		setFixedWidth(std::max(static_cast<int>(m_clip->length() * pixelsPerBar() / TimePos::ticksPerBar() + 1), 3));
+		setFixedWidth(std::max(static_cast<int>(viewLength * pixelsPerBar() / TimePos::ticksPerBar() + 1), 3));
 	}
 	m_trackView->trackContainerView()->update();
 }

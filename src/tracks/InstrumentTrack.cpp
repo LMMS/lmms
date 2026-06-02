@@ -757,7 +757,7 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 		// get all notes from the given clip
 		const NoteVector & notes = c->notes();
 		
-		for ( int loop = 0; loop <= c->loopCount(); loop++ )
+		for ( int loop = 0; loop <= (c->loopLength() - 1) / (c->length() - c->startTimeOffset()); loop++ )
 		{
 			TimePos loopOffset = loop * c->length();
 

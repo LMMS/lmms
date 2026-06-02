@@ -459,7 +459,7 @@ void MidiClip::exportToXML(QDomDocument& doc, QDomElement& midiClipElement, bool
 	midiClipElement.setAttribute("muted", isMuted());
 	midiClipElement.setAttribute("steps", m_steps);
 	midiClipElement.setAttribute("len", length());
-	midiClipElement.setAttribute("loopcount", loopCount());
+	midiClipElement.setAttribute("looplen", loopLength());
 
 	// now save settings of all notes
 	for (auto& note : m_notes)
@@ -534,10 +534,9 @@ void MidiClip::loadSettings( const QDomElement & _this )
 		changeLength(len);
 	}
 
-	int loopCount = _this.attribute("loopcount").toInt();
-	for (int i = 0; i < loopCount; ++i)
+	if (_this.hasAttribute("looplen"))
 	{
-		increaseLoopCount();
+		changeLoopLength(_this.attribute("looplen").toInt());
 	}
 	
 	setAutoResize(_this.attribute("autoresize", "1").toInt());

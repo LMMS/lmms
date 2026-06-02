@@ -122,24 +122,13 @@ public:
 		return m_autoResize;
 	}
 
-	int loopCount() const 
+	TimePos loopLength() const 
 	{
-		return m_loopCount; 
+		return m_loopLength; 
 	}
 
-	// Increase/decrease loop count by one
-	// Note : does not create / close the corresponding view
-	virtual void increaseLoopCount() 
-	{ 
-		++m_loopCount; 
-	}
-	virtual void decreaseLoopCount() 
-	{ 
-		if (m_loopCount > 0) 
-		{
-			--m_loopCount; 
-		}
-	}
+	/*! Note : does not create / close the corresponding views */
+	void changeLoopLength(TimePos length);
 
 	auto color() const -> const std::optional<QColor>& { return m_color; }
 	void setColor(const std::optional<QColor>& color);
@@ -195,7 +184,7 @@ private:
 	TimePos m_startPosition;
 	TimePos m_length;
 	TimePos m_startTimeOffset;
-	int m_loopCount;
+	TimePos m_loopLength;
 
 	BoolModel m_mutedModel;
 	BoolModel m_soloModel;

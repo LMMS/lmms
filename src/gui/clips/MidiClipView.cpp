@@ -67,18 +67,17 @@ MidiClipView::MidiClipView( MidiClip* clip, TrackView* parent, int offset ) :
 
 	setStyle( QApplication::style() );
 
-	if ( offset == 0 && clip->loopCount() > 0 )
+	if (offset == 0 && clip->loopLength() > clip->length() - clip->startTimeOffset())
 	{
-		int loopCount = m_clip->loopCount();
-		while ( m_clip->loopCount() > 0 )
-		{
-			// We set the loop count to 0 so the lastLoopView() check in loop() returns the expected value
-			m_clip->decreaseLoopCount();
-		}
-		while ( m_clip->loopCount() < loopCount )
+		// We set the loop length to length so the lastLoopView() check in loop() returns the expected value
+		int loopLength = m_clip->loopLength();
+		m_clip->changeLoopLength(0);
+
+		while (m_clip->loopLength() < loopLength)
 		{
 			loop();
 		}
+		m_clip->changeLoopLength(loopLength);
 	}
 }
 
@@ -649,7 +648,8 @@ void MidiClipView::paintEvent( QPaintEvent * )
 	const int offset = m_clip->startTimeOffset();
 
 	// Length of one bar/beat in the [0,1] x [0,1] coordinate system
-	const float tickLength = 1.0f / m_clip->length();
+	const float tickLength = 1.0f / std::min(m_clip->loopLength() - this->offset() * m_clip->length(), 
+											m_clip->length().getTicks());
 
 	const int x_base = BORDER_WIDTH;
 
@@ -885,7 +885,7 @@ void MidiClipView::paintEvent( QPaintEvent * )
 			p.drawLine( 0, rect().bottom(), rect().right(), rect().bottom() );
 
 			// Last loop view gets a right border
-			if ( this->offset() == m_clip->loopCount() )
+			if (lastLoopView())
 			{
 				p.drawLine( rect().right(), 0, rect().right(), rect().bottom() );
 			}

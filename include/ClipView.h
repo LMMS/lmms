@@ -194,7 +194,7 @@ protected:
 
 	inline bool lastLoopView()
 	{
-		return m_offset == m_clip->loopCount();
+		return m_offset == (m_clip->loopLength() - 1) / (m_clip->length() - m_clip->startTimeOffset());
 	}
 
 protected slots:
