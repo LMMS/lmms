@@ -2,9 +2,9 @@ PROJECT_NAME           = @CMAKE_PROJECT_NAME@
 PROJECT_NUMBER         = @VERSION@
 PROJECT_BRIEF          = "Cross-platform music production software"
 
-# TODO 5166
-# PROJECT_LOGO           = 1
-# PROJECT_ICON           = 1
+# TODO 5166: Update these paths
+PROJECT_LOGO           = @CMAKE_SOURCE_DIR@/../cmake/linux/icons/scalable/apps/lmms.svg
+PROJECT_ICON           = @CMAKE_SOURCE_DIR@/../cmake/linux/icons/scalable/apps/lmms.svg
 
 OUTPUT_DIRECTORY       = doc/
 TIMESTAMP              = YES
@@ -43,6 +43,7 @@ EXCLUDE                = @CMAKE_SOURCE_DIR@/../src/3rdparty \
                          @CMAKE_SOURCE_DIR@/../plugins/ZynAddSubFx/zynaddsubfx
 USE_MDFILE_AS_MAINPAGE = @CMAKE_SOURCE_DIR@/../README.md
 GENERATE_TREEVIEW      = NO
+HTML_EXTRA_STYLESHEET  = @CMAKE_SOURCE_DIR@/extra.css
 USE_MATHJAX            = YES
 GENERATE_LATEX         = NO
 PREDEFINED             = LMMS_BUILD_LINUX= \
