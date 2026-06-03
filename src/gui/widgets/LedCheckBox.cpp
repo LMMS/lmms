@@ -105,7 +105,7 @@ void LedCheckBox::onTextUpdated()
 {
 	QFontMetrics const fm = fontMetrics();
 
-	int const width = m_ledOffPixmap.width() + 5 + horizontalAdvance(fm, text());
+	int const width = m_ledOffPixmap.width() + 5 + fm.horizontalAdvance(text());
 	int const height = m_legacyMode ? m_ledOffPixmap.height() : qMax(m_ledOffPixmap.height(), fm.height());
 
 	setFixedSize(width, height);

@@ -79,7 +79,7 @@ void TabWidget::addTab(QWidget* w, const QString& name, const char* pixmap, int 
 	}
 
 	// Tab's width when it is a text tab. This isn't correct for artwork tabs, but it's fixed later during the PaintEvent
-	int tab_width = horizontalAdvance(fontMetrics(), name) + 10;
+	int tab_width = fontMetrics().horizontalAdvance(name) + 10;
 
 	// Register new tab
 	widgetDesc d = {w, pixmap, name, tab_width};
@@ -128,7 +128,7 @@ int TabWidget::findTabAtPos(const QPoint& pos)
 
 	if (pos.y() > 1 && pos.y() < m_tabbarHeight - 1)
 	{
-		int cx = ((m_caption == "") ? 4 : 14) + horizontalAdvance(fontMetrics(), m_caption);
+		int cx = ((m_caption == "") ? 4 : 14) + fontMetrics().horizontalAdvance(m_caption);
 
 		for (widgetStack::iterator it = m_widgets.begin(); it != m_widgets.end(); ++it)
 		{
@@ -233,7 +233,7 @@ void TabWidget::paintEvent(QPaintEvent* pe)
 	}
 
 	// Calculate the tabs' x (tabs are painted next to the caption)
-	int tab_x_offset = m_caption.isEmpty() ? 4 : 14 + horizontalAdvance(fontMetrics(), m_caption);
+	int tab_x_offset = m_caption.isEmpty() ? 4 : 14 + fontMetrics().horizontalAdvance(m_caption);
 
 	// Compute tabs' width depending on the number of tabs (only applicable for artwork tabs)
 	widgetStack::iterator first = m_widgets.begin();
@@ -296,7 +296,7 @@ void TabWidget::paintEvent(QPaintEvent* pe)
 // Switch between tabs with mouse wheel
 void TabWidget::wheelEvent(QWheelEvent* we)
 {
-	if (position(we).y() > m_tabheight)
+	if (we->position().toPoint().y() > m_tabheight)
 	{
 		return;
 	}

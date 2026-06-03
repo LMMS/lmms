@@ -63,18 +63,10 @@ protected:
 		QString name = sourceModel()->data(nameIndex, Qt::DisplayRole).toString();
 		QString type = sourceModel()->data(typeIndex, Qt::DisplayRole).toString();
 
-		// TODO: cleanup once we drop Qt5 support 
-#if (QT_VERSION >= QT_VERSION_CHECK(5,12,0))
 		QRegularExpression nameRegularExpression(filterRegularExpression());
 		nameRegularExpression.setPatternOptions(QRegularExpression::CaseInsensitiveOption);
 		
 		bool nameFilterPassed = nameRegularExpression.match(name).capturedStart() != -1;
-#else 
-		QRegExp nameRegularExpression(filterRegExp());
-		nameRegularExpression.setCaseSensitivity(Qt::CaseInsensitive);
-
-		bool nameFilterPassed = nameRegularExpression.indexIn(name) != -1;
-#endif
 
 		bool typeFilterPassed = type.contains(m_effectTypeFilter, Qt::CaseInsensitive);
 

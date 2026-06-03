@@ -234,6 +234,8 @@ MainWindow::MainWindow() :
 	{
 		qApp->installEventFilter(this);
 	}
+
+	installEventFilter(this);
 }
 
 
@@ -329,15 +331,8 @@ void MainWindow::finalize()
 	m_redoAction = addAction(edit_menu, "edit_redo", tr("Redo"),
 		QKeySequence::Redo, &MainWindow::redo);
 
-	// Ensure that both (Ctrl+Y) and (Ctrl+Shift+Z) activate redo shortcut regardless of OS defaults
-	if (QKeySequence(QKeySequence::Redo) != keySequence(Qt::CTRL, Qt::Key_Y))
-	{
-		new QShortcut(keySequence(Qt::CTRL, Qt::Key_Y), this, SLOT(redo()));
-	}
-	if (QKeySequence(QKeySequence::Redo) != keySequence(Qt::CTRL, Qt::SHIFT, Qt::Key_Z))
-	{
-		new QShortcut(keySequence(Qt::CTRL, Qt::SHIFT, Qt::Key_Z), this, SLOT(redo()));
-	}
+	m_undoAction->setShortcutContext(Qt::ApplicationShortcut);
+	m_redoAction->setShortcutContext(Qt::ApplicationShortcut);
 
 	edit_menu->addSeparator();
 	edit_menu->addAction(embed::getIconPixmap("microtuner"), tr("Scales and keymaps"),
@@ -353,6 +348,7 @@ void MainWindow::finalize()
 		 this, SLOT(updateViewMenu()));
 	connect( m_viewMenu, SIGNAL(triggered(QAction*)), this,
 		SLOT(updateConfig(QAction*)));
+	updateViewMenu();
 
 
 	m_toolsMenu = new QMenu( this );
@@ -484,24 +480,19 @@ void MainWindow::finalize()
 	else if( Engine::audioEngine()->audioDevStartFailed() || !AudioEngine::isAudioDevNameValid(
 		ConfigManager::inst()->value( "audioengine", "audiodev" ) ) )
 	{
+		QMessageBox::critical(nullptr, "Audio device setup failed",
+			tr("Failed to setup audio device for playback. Try adjusting your audio device settings (e.g. the sample rate), then restart LMMS."));
+
 		// if so, offer the audio settings section of the setup dialog
 		SetupDialog sd( SetupDialog::ConfigTab::AudioSettings );
 		sd.exec();
 	}
 
 	// Add editor subwindows
-	for (QWidget* widget :  std::list<QWidget*>{
-			getGUI()->automationEditor(),
-			getGUI()->patternEditor(),
-			getGUI()->pianoRoll(),
-			getGUI()->songEditor()
-	})
-	{
-		QMdiSubWindow* window = addWindowedWidget(widget);
-		window->setWindowIcon(widget->windowIcon());
-		window->setAttribute(Qt::WA_DeleteOnClose, false);
-		window->resize(widget->sizeHint());
-	}
+	addWindowedWidget(getGUI()->automationEditor());
+	addWindowedWidget(getGUI()->patternEditor());
+	addWindowedWidget(getGUI()->pianoRoll());
+	addWindowedWidget(getGUI()->songEditor());
 
 	getGUI()->automationEditor()->parentWidget()->hide();
 	getGUI()->patternEditor()->parentWidget()->move(610, 5);
@@ -549,16 +540,32 @@ SubWindow* MainWindow::addWindowedWidget(QWidget *w, Qt::WindowFlags windowFlags
 {
 	// wrap the widget in our own *custom* window that patches some errors in QMdiSubWindow
 	auto win = new SubWindow(m_workspace->viewport(), windowFlags);
-	win->setAttribute(Qt::WA_DeleteOnClose);
+	connect(this, &MainWindow::detachAllSubWindows, win, &SubWindow::setDetached);
 	win->setWidget(w);
-	if (w && w->sizeHint().isValid()) {
-		auto titleBarHeight = win->titleBarHeight();
-		auto frameWidth = win->frameWidth();
-		QSize delta(2* frameWidth, titleBarHeight + frameWidth);
-		win->resize(delta + w->sizeHint());
+
+	if (w)
+	{
+		// TODO: somehow make this work on any setWidget
+		connect(w, &QWidget::destroyed, win, &SubWindow::deleteLater);
+
+		if (w->sizeHint().isValid())
+		{
+			auto titleBarHeight = win->titleBarHeight();
+			auto frameWidth = win->frameWidth();
+			QSize delta(2* frameWidth, titleBarHeight + frameWidth);
+			win->resize(delta + w->sizeHint());
+		}
 	}
+
 	m_workspace->addSubWindow(win);
 	return win;
+}
+
+
+
+void MainWindow::setAllSubWindowsDetached(bool detached)
+{
+	emit detachAllSubWindows(detached);
 }
 
 
@@ -656,74 +663,77 @@ void MainWindow::clearKeyModifiers()
 
 
 
-void MainWindow::saveWidgetState( QWidget * _w, QDomElement & _de )
+void MainWindow::saveWidgetState(QWidget* w, QDomElement& de)
 {
-	// If our widget is the main content of a window (e.g. piano roll, Mixer, etc),
-	// we really care about the position of the *window* - not the position of the widget within its window
-	if( _w->parentWidget() != nullptr &&
-			_w->parentWidget()->inherits( "QMdiSubWindow" ) )
+	// TODO: Only use one of these
+	auto win = qobject_cast<SubWindow*>(w);
+	if (!win)
 	{
-		_w = _w->parentWidget();
+		// Fall back on parent
+		win = qobject_cast<SubWindow*>(w->parentWidget());
+		if (!win)
+		{
+			// Still could not find the window - soft fail
+			return;
+		}
 	}
 
-	// If the widget is a SubWindow, then we can make use of the getTrueNormalGeometry() method that
-	// performs the same as normalGeometry, but isn't broken on X11 ( see https://bugreports.qt.io/browse/QTBUG-256 )
-	auto asSubWindow = qobject_cast<SubWindow*>(_w);
-	QRect normalGeom = asSubWindow != nullptr ? asSubWindow->getTrueNormalGeometry() : _w->normalGeometry();
+	de.setAttribute("visible", bool{win->widget() && win->widget()->isVisible()});
+	de.setAttribute("maximized", win->isMaximized());
 
-	bool visible = _w->isVisible();
-	_de.setAttribute( "visible", visible );
-	_de.setAttribute( "minimized", _w->isMinimized() );
-	_de.setAttribute( "maximized", _w->isMaximized() );
-
-	_de.setAttribute( "x", normalGeom.x() );
-	_de.setAttribute( "y", normalGeom.y() );
-
-	QSize sizeToStore = normalGeom.size();
-	_de.setAttribute( "width", sizeToStore.width() );
-	_de.setAttribute( "height", sizeToStore.height() );
+	QRect normalGeometry = win->getTrueNormalGeometry();
+	de.setAttribute("x", normalGeometry.x());
+	de.setAttribute("y", normalGeometry.y() );
+	de.setAttribute("width", normalGeometry.width());
+	de.setAttribute("height", normalGeometry.height());
 }
 
 
 
 
-void MainWindow::restoreWidgetState( QWidget * _w, const QDomElement & _de )
+void MainWindow::restoreWidgetState(QWidget* w, const QDomElement& de)
 {
-	QRect r( qMax( 1, _de.attribute( "x" ).toInt() ),
-			qMax( 1, _de.attribute( "y" ).toInt() ),
-			qMax( _w->sizeHint().width(), _de.attribute( "width" ).toInt() ),
-			qMax( _w->minimumHeight(), _de.attribute( "height" ).toInt() ) );
-	if( _de.hasAttribute( "visible" ) && !r.isNull() )
+	// TODO: Only use one of these
+	auto win = qobject_cast<SubWindow*>(w);
+	if (!win)
 	{
-		// If our widget is the main content of a window (e.g. piano roll, Mixer, etc),
-		// we really care about the position of the *window* - not the position of the widget within its window
-		if ( _w->parentWidget() != nullptr &&
-			_w->parentWidget()->inherits( "QMdiSubWindow" ) )
+		// Fall back on parent
+		win = qobject_cast<SubWindow*>(w->parentWidget());
+		if (!win)
 		{
-			_w = _w->parentWidget();
+			// Still could not find the window - soft fail
+			return;
 		}
-		// first restore the window, as attempting to resize a maximized window causes graphics glitching
-		_w->setWindowState( _w->windowState() & ~(Qt::WindowMaximized | Qt::WindowMinimized) );
+	}
 
-		// Check isEmpty() to work around corrupt project files with empty size
-		if ( ! r.size().isEmpty() ) {
-			_w->resize( r.size() );
-		}
-		_w->move( r.topLeft() );
+	const auto normalGeometry = QRect {
+		de.attribute("x").toInt(),
+		de.attribute("y").toInt(),
+		de.attribute("width").toInt(),
+		de.attribute("height").toInt()
+	};
+
+	if (normalGeometry.isValid())
+	{
+		// first restore the window, as attempting to resize a maximized window causes graphics glitching
+		win->setWindowState(win->windowState() & ~(Qt::WindowMaximized | Qt::WindowMinimized));
+
+		win->setGeometry(normalGeometry);
 
 		// set the window to its correct minimized/maximized/restored state
-		Qt::WindowStates flags = _w->windowState();
-		flags = _de.attribute( "minimized" ).toInt() ?
-				( flags | Qt::WindowMinimized ) :
-				( flags & ~Qt::WindowMinimized );
-		flags = _de.attribute( "maximized" ).toInt() ?
-				( flags | Qt::WindowMaximized ) :
-				( flags & ~Qt::WindowMaximized );
-		_w->setWindowState( flags );
+		Qt::WindowStates winState = win->windowState();
+		winState = de.attribute("maximized").toInt()
+			? (winState | Qt::WindowMaximized)
+			: (winState & ~Qt::WindowMaximized);
+		win->setWindowState(winState);
+	}
 
-		_w->setVisible( _de.attribute( "visible" ).toInt() );
+	if (const auto visible = de.attribute("visible"); !visible.isEmpty())
+	{
+		win->setVisible(visible.toInt());
 	}
 }
+
 
 
 
@@ -919,7 +929,9 @@ void MainWindow::help()
 
 void MainWindow::toggleWindow( QWidget *window, bool forceShow )
 {
-	QWidget *parent = window->parentWidget();
+	// All "windows" should be inside a SubWindow, because the use of activeSubWindow() depends on it
+	auto parent = dynamic_cast<QMdiSubWindow*>(window->parentWidget());
+	if (parent == nullptr) { return; }
 
 	if( forceShow ||
 		m_workspace->activeSubWindow() != parent ||
@@ -927,7 +939,8 @@ void MainWindow::toggleWindow( QWidget *window, bool forceShow )
 	{
 		parent->show();
 		window->show();
-		window->setFocus();
+		if (window->isEnabled()) { window->setFocus(); }
+		else { m_workspace->setActiveSubWindow(parent); }
 	}
 	else
 	{
@@ -1077,6 +1090,22 @@ void MainWindow::updateViewMenu()
 				tr( "Fullscreen" ) + "\tF11",
 				this, SLOT(toggleFullscreen())
 		);
+
+	m_viewMenu->addSeparator();
+
+	auto detachAllAction = m_viewMenu->addAction(embed::getIconPixmap("detach"),
+		tr("Detach all subwindows"),
+		this, [this](){ setAllSubWindowsDetached(true); },
+		QKeySequence{Qt::CTRL | Qt::SHIFT | Qt::Key_D}
+	);
+	auto attachAllAction = m_viewMenu->addAction(embed::getIconPixmap("detach"),
+		tr("Attach all subwindows"),
+		this, [this](){ setAllSubWindowsDetached(false); },
+		QKeySequence{Qt::CTRL | Qt::ALT | Qt::SHIFT | Qt::Key_D}
+	);
+
+	detachAllAction->setShortcutContext(Qt::ApplicationShortcut);
+	attachAllAction->setShortcutContext(Qt::ApplicationShortcut);
 
 	m_viewMenu->addSeparator();
 
@@ -1250,23 +1279,38 @@ void MainWindow::sessionCleanup()
 
 bool MainWindow::eventFilter(QObject* watched, QEvent* event)
 {
-	// For now this function is only used to globally block tooltips
-	// It must be installed to QApplication through installEventFilter
+	const auto isWinDeactivate = [](QEvent* event) -> bool
+	{
+		if (event->type() == QEvent::WindowDeactivate) { return true; }
+
+		if (event->type() == QEvent::FocusOut)
+		{
+			auto* fe = static_cast<QFocusEvent*>(event);
+			switch (fe->reason())
+			{
+			case Qt::ActiveWindowFocusReason: [[fallthrough]];
+			case Qt::PopupFocusReason: [[fallthrough]];
+			case Qt::OtherFocusReason:
+				return true;
+			default:
+				break;
+			}
+		}
+
+		return false;
+	};
+
+	// Clear modifiers when the window has been unfocused (install event filter on the window itself)
+	if (dynamic_cast<MainWindow*>(watched) != nullptr && isWinDeactivate(event))
+	{
+		clearKeyModifiers();
+		return QObject::eventFilter(watched, event);
+	}
+
+	// Block tooltips globally (install event filter on QApplication instance)
 	if (event->type() == QEvent::ToolTip) { return true; }
 
 	return QObject::eventFilter(watched, event);
-}
-
-
-
-
-void MainWindow::focusOutEvent( QFocusEvent * _fe )
-{
-	// TODO Remove this function, since it is apparently never actually called!
-	// when loosing focus we do not receive key-(release!)-events anymore,
-	// so we might miss release-events of one the modifiers we're watching!
-	clearKeyModifiers();
-	QMainWindow::leaveEvent( _fe );
 }
 
 
@@ -1502,7 +1546,9 @@ void MainWindow::exportProject(bool multiExport)
 			}
 		}
 
-		ExportProjectDialog epd( exportFileName, getGUI()->mainWindow(), multiExport );
+		ExportProjectDialog epd(exportFileName,
+			multiExport ? ExportProjectDialog::Mode::ExportTracks : ExportProjectDialog::Mode::ExportProject,
+			getGUI()->mainWindow());
 		epd.exec();
 	}
 }

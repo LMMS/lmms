@@ -29,12 +29,14 @@
 #include <QApplication>
 #include <QCheckBox>
 #include <QHBoxLayout>
+#include <QHeaderView>
 #include <QLineEdit>
 #include <QMdiArea>
 #include <QMdiSubWindow>
 #include <QMenu>
 #include <QMessageBox>
 #include <QProgressBar>
+#include <QScrollBar>
 #include <QPushButton>
 #include <QShortcut>
 #include <QStringList>
@@ -60,7 +62,6 @@
 #include "PresetPreviewPlayHandle.h"
 #include "Sample.h"
 #include "SampleClip.h"
-#include "SampleLoader.h"
 #include "SamplePlayHandle.h"
 #include "SampleTrack.h"
 #include "Song.h"
@@ -461,10 +462,12 @@ FileBrowserTreeWidget::FileBrowserTreeWidget(QWidget * parent ) :
 	m_mousePressed( false ),
 	m_pressPos(),
 	m_previewPlayHandle( nullptr )
-#if (QT_VERSION < QT_VERSION_CHECK(5,14,0))
-	,m_pphMutex(QMutex::Recursive)
-#endif
 {
+	setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+	setHorizontalScrollMode(ScrollPerPixel);
+	header()->setStretchLastSection(false);
+	header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+
 	setColumnCount( 1 );
 	headerItem()->setHidden( true );
 	setSortingEnabled( false );
@@ -475,14 +478,6 @@ FileBrowserTreeWidget::FileBrowserTreeWidget(QWidget * parent ) :
 				SLOT(updateDirectory(QTreeWidgetItem*)));
 	connect( this, SIGNAL(itemExpanded(QTreeWidgetItem*)),
 				SLOT(updateDirectory(QTreeWidgetItem*)));
-
-#if QT_VERSION < QT_VERSION_CHECK(5, 12, 2) && defined LMMS_BUILD_WIN32
-	// Set the font for the QTreeWidget to the Windows System font to make sure that
-	// truncated (elided) items use the same font as non-truncated items.
-	// This is a workaround for this qt bug, fixed in 5.12.2: https://bugreports.qt.io/browse/QTBUG-29232
-	// TODO: remove this when all builds use a recent enough version of qt.
-	setFont( GuiApplication::getWin32SystemFont() );
-#endif
 }
 
 
@@ -512,6 +507,28 @@ QList<QString> FileBrowserTreeWidget::expandedDirs( QTreeWidgetItem * item ) con
 	return dirs;
 }
 
+void FileBrowserTreeWidget::scrollTo(const QModelIndex &index, ScrollHint hint)
+{
+	// Overide scrollTo to ensure the horizontal scrollbar stay in place
+	int barPos = horizontalScrollBar()->value();
+	QTreeWidget::scrollTo(index, hint);
+	horizontalScrollBar()->setValue(barPos);
+}
+
+void FileBrowserTreeWidget::wheelEvent(QWheelEvent * event)
+{
+	// When shift is pressed, scroll horizontally instead of vertically
+	if (event->modifiers() & Qt::ShiftModifier)
+	{
+		horizontalScrollBar()->setValue(
+			horizontalScrollBar()->value() - event->angleDelta().y());
+		event->accept();
+	}
+	else
+	{
+		QTreeWidget::wheelEvent(event);
+	}
+}
 
 void FileBrowserTreeWidget::keyPressEvent(QKeyEvent * ke )
 {
@@ -611,6 +628,15 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 	contextMenu.addAction(header);
 	contextMenu.addSeparator();
 
+	const auto addActionsGroup = [&](QString name, QList<QAction*> actions) -> void {
+		if (actions.isEmpty()) { return; }
+
+		auto* action = new QAction(name, nullptr);
+		action->setDisabled(true);
+		contextMenu.addAction(action);
+		contextMenu.addActions(actions);
+	};
+
 	switch (item->type())
 	{
 	case TypeFileItem: {
@@ -618,12 +644,6 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 
 		contextMenu.addAction(QIcon(embed::getIconPixmap("folder")), tr("Show in %1").arg(fileManager),
 			[file] { FileRevealer::reveal(file->fullName()); });
-
-		if (file->isTrack())
-		{
-			contextMenu.addAction(
-				tr("Send to active instrument-track"), [file, this] { sendToActiveInstrumentTrack(file); });
-		}
 
 		const auto path = QFileInfo{file->fullName()}.absoluteFilePath();
 
@@ -640,19 +660,12 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 
 		if (file->isTrack())
 		{
-			contextMenu.addSeparator();
 			contextMenu.addAction(tr("Send to active instrument-track"), [&] { sendToActiveInstrumentTrack(file); });
 		}
 
-		auto songEditorHeader = new QAction(tr("Song Editor"), nullptr);
-		songEditorHeader->setDisabled(true);
-		contextMenu.addAction(songEditorHeader);
-		contextMenu.addActions(getContextActions(file, true));
+		addActionsGroup(tr("Song Editor"), getContextActions(file, true));
+		addActionsGroup(tr("Pattern Editor"), getContextActions(file, false));
 
-		auto patternEditorHeader = new QAction(tr("Pattern Editor"), nullptr);
-		patternEditorHeader->setDisabled(true);
-		contextMenu.addAction(patternEditorHeader);
-		contextMenu.addActions(getContextActions(file, false));
 		break;
 	}
 	case TypeDirectoryItem: {
@@ -679,11 +692,14 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent* e)
 	if (!contextMenu.isEmpty()) { contextMenu.exec(e->globalPos()); }
 }
 
-void FileBrowserTreeWidget::openInSlicerT(FileItem* item)
+void FileBrowserTreeWidget::openInSlicerT(FileItem* item, bool songEditor)
 {
-    TrackContainer* tc = Engine::getSong();
+	// Get the right TrackContainer. Ternary doesn't compile due to a type mismatch
+	// (similar to FileBrowserTreeWidget::openInNewInstrumentTrack)
+	TrackContainer* tc = Engine::getSong();
+	if (!songEditor) { tc = Engine::patternStore(); }
 
-    auto* track = dynamic_cast<InstrumentTrack*>(Track::create(Track::Type::Instrument, tc));
+	auto* track = dynamic_cast<InstrumentTrack*>(Track::create(Track::Type::Instrument, tc));
 
 	track->loadInstrument("slicert");
 	track->instrument()->loadFile(item->fullName());
@@ -694,15 +710,32 @@ QList<QAction*> FileBrowserTreeWidget::getContextActions(FileItem* file, bool so
 	QList<QAction*> result = QList<QAction*>();
 	const bool fileIsSample = file->type() == FileItem::FileType::Sample;
 
-	QString instrumentAction = fileIsSample ?
-		tr("Send to new AudioFileProcessor instance") :
-		tr("Send to new instrument track");
-	QString shortcutMod = songEditor ? "" : UI_CTRL_KEY + QString(" + ");
+	auto fileCanBeInstrument = false;
+	switch (file->type()) {
+	case FileItem::FileType::Preset:
+	case FileItem::FileType::Sample:
+	case FileItem::FileType::SoundFont:
+	case FileItem::FileType::Patch:
+	case FileItem::FileType::VstPlugin:
+		fileCanBeInstrument = true;
 
-	auto toInstrument = new QAction(instrumentAction + tr(" (%2Enter)").arg(shortcutMod));
-	connect(toInstrument, &QAction::triggered,
-		[=, this]{ openInNewInstrumentTrack(file, songEditor); });
-	result.append(toInstrument);
+	case FileItem::FileType::Project:
+	case FileItem::FileType::Midi:
+	case FileItem::FileType::Unknown:
+		break;
+	}
+
+	if (fileCanBeInstrument)
+	{
+		const auto instrumentAction = fileIsSample
+			? tr("Send to new AudioFileProcessor instance")
+			: tr("Send to new instrument track");
+		const auto shortcutMod = songEditor ? "" : UI_CTRL_KEY + QString(" + ");
+
+		auto* toInstrument = new QAction(instrumentAction + tr(" (%2Enter)").arg(shortcutMod));
+		connect(toInstrument, &QAction::triggered, [=, this] { openInNewInstrumentTrack(file, songEditor); });
+		result.append(toInstrument);
+	}
 
 	if (songEditor && fileIsSample)
 	{
@@ -716,7 +749,7 @@ QList<QAction*> FileBrowserTreeWidget::getContextActions(FileItem* file, bool so
 	{
 		auto openInSlicer = new QAction(tr("Send to new SlicerT instance"));
 		connect(openInSlicer, &QAction::triggered,
-			[=, this]{ openInSlicerT(file); });
+			[=, this]{ openInSlicerT(file, songEditor); });
 		result.append(openInSlicer);
 	}
 
@@ -778,7 +811,7 @@ void FileBrowserTreeWidget::previewFileItem(FileItem* file)
 			embed::getIconPixmap("sample_file", 24, 24), 0);
 		// TODO: this can be removed once we do this outside the event thread
 		qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-		if (auto buffer = SampleLoader::createBufferFromFile(fileName))
+		if (auto buffer = SampleBuffer::fromFile(fileName))
 		{
 			auto s = new SamplePlayHandle(new lmms::Sample{std::move(buffer)});
 			s->setDoneMayReturnTrue(false);

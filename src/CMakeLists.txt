@@ -158,7 +158,7 @@ if(LMMS_HAVE_LIBRT)
 endif()
 
 if(LMMS_HAVE_PORTAUDIO)
-	list(APPEND EXTRA_LIBRARIES portaudio)
+	list(APPEND EXTRA_LIBRARIES portaudio::portaudio)
 endif()
 
 if(LMMS_HAVE_MP3LAME)
@@ -167,6 +167,10 @@ endif()
 
 if(LMMS_HAVE_OGGVORBIS)
 	list(APPEND EXTRA_LIBRARIES Vorbis::vorbisenc Vorbis::vorbisfile)
+endif()
+
+if(LMMS_HAVE_LV2)
+	list(APPEND EXTRA_LIBRARIES Lilv::lilv)
 endif()
 
 SET(LMMS_REQUIRED_LIBS ${LMMS_REQUIRED_LIBS}
@@ -179,9 +183,7 @@ SET(LMMS_REQUIRED_LIBS ${LMMS_REQUIRED_LIBS}
 	${SNDIO_LIBRARIES}
 	${PULSEAUDIO_LIBRARIES}
 	${JACK_LIBRARIES}
-	${LV2_LIBRARIES}
 	${SUIL_LIBRARIES}
-	${LILV_LIBRARIES}
 	${FFTW3F_LIBRARIES}
 	SampleRate::samplerate
 	SndFile::sndfile

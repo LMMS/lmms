@@ -374,9 +374,8 @@ void MidiClipView::clearNotesOutOfBounds()
 	m_clip->getTrack()->addJournalCheckPoint();
 	m_clip->getTrack()->saveJournallingState(false);
 
-	auto newClip = new MidiClip(static_cast<InstrumentTrack*>(m_clip->getTrack()));
-	newClip->setAutoResize(m_clip->getAutoResize());
-	newClip->movePosition(m_clip->startPosition());
+	auto newClip = m_clip->clone();
+	newClip->clearNotes();
 
 	TimePos startBound = -m_clip->startTimeOffset();
 	TimePos endBound = m_clip->length() - m_clip->startTimeOffset();
@@ -394,6 +393,7 @@ void MidiClipView::clearNotesOutOfBounds()
 			newClip->addNote(newNote, false);
 		}
 	}
+	newClip->setStartTimeOffset(0);
 	newClip->changeLength(m_clip->length());
 	newClip->updateLength();
 
@@ -495,13 +495,14 @@ void MidiClipView::mouseDoubleClickEvent(QMouseEvent *_me)
 
 void MidiClipView::wheelEvent(QWheelEvent * we)
 {
+	const auto pos = we->position().toPoint();
 	if(m_clip->m_clipType == MidiClip::Type::BeatClip &&
 				(fixedClips() || pixelsPerBar() >= 96) &&
-				position(we).y() > height() - m_stepBtnOff.height())
+				pos.y() > height() - m_stepBtnOff.height())
 	{
 //	get the step number that was wheeled on and
 //	do calculations in floats to prevent rounding errors...
-		float tmp = ((float(position(we).x()) - BORDER_WIDTH) *
+		float tmp = ((float(pos.x()) - BORDER_WIDTH) *
 				float(m_clip -> m_steps)) / float(width() - BORDER_WIDTH*2);
 
 		int step = int( tmp );
@@ -532,10 +533,7 @@ void MidiClipView::wheelEvent(QWheelEvent * we)
 
 			Engine::getSong()->setModified();
 			update();
-			if( getGUI()->pianoRoll()->currentMidiClip() == m_clip )
-			{
-				getGUI()->pianoRoll()->update();
-			}
+			m_clip->updatePatternTrack();
 		}
 		we->accept();
 	}

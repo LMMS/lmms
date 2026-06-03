@@ -214,8 +214,8 @@ class XpressiveHelpView: public QTextEdit
 public:
 	static XpressiveHelpView* getInstance()
 	{
-		static XpressiveHelpView instance;
-		return &instance;
+		static XpressiveHelpView* instance = new XpressiveHelpView;
+		return instance;
 	}
 	static void finalize()
 	{
