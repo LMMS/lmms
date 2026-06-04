@@ -45,6 +45,19 @@ SfzRegion::SfzRegion(SfzOpcodeState opcodeState)
 	}
 }
 
+
+SfzRegion::SfzRegion(const SfzRegion& other)
+	: SfzOpcodeState(other)
+{
+	// Since atomic variables cannot be copied, reinitialize it
+	m_sample.store(other.m_sample.load());
+	// Copy all the other member variables as normal
+	m_basicWaveShape = other.m_basicWaveShape;
+	m_roundRobinCount = other.m_roundRobinCount;
+	m_lohiccDefinedCCNumbers = other.m_lohiccDefinedCCNumbers;
+}
+
+
 bool SfzRegion::triggerConditionsMet(const SfzGlobalState& globalState, const SfzTrigger& trigger)
 {
 	if (trigger.type() == SfzTrigger::Type::ControlChange) { return false; } // TODO. It is possible for midi CC's to trigger regions, such as using the sustain pedal or on_locc/on_hicc
@@ -134,7 +147,7 @@ bool SfzRegion::initializeSample(const QDir& parentDirectory, SfzSamplePool& sam
 		// The sample pool handles making sure the same sample isn't loaded twice, which would waste memory
 		m_sample = samplePool.loadSample(path, sampleInPool); // sampleInPool is passed so that we can tell the SfzPlayer if it actually needed to load it from disk or whether it was previously loaded and could be retrieved.
 
-		return m_sample != nullptr;
+		return m_sample.load() != nullptr;
 	}
 	return true;
 }

@@ -42,6 +42,7 @@ class SfzRegion : public SfzOpcodeState
 {
 public:
 	SfzRegion(SfzOpcodeState opcodeState);
+	SfzRegion(const SfzRegion& other); // A custom copy constructor is needed because atomic member variables have no default copy/move constructor
 
 	//! Returns true if the trigger event matches all of the requirements defined by the opcodes of this region
 	//! For example, if lokey=24 and hikey=29, and the trigger is a NoteOn event on key 26, then it will return true
@@ -57,7 +58,7 @@ public:
 	bool initializeSample(const QDir& parentDirectory, SfzSamplePool& samplePool, bool* sampleInPool);
 
 	//! Returns a non-owning raw pointer to the sample object for this region
-	const SfzSampleBuffer* sample() const { return m_sample.get(); }
+	const SfzSampleBuffer* sample() const { return m_sample.load().get(); }
 	//! Returns the type of basic wave for this region, if it specified instead of a real sample.
 	//! If a sample was specified, this returns SfzBasicWaves::Shape::Silence by default.
 	const SfzBasicWaves::Shape basicWaveShape() const { return m_basicWaveShape; }
@@ -65,7 +66,8 @@ public:
 private:
 	//! Shared pointer to sample object to be played. The sample file path is defined in the `sample` opcode, but the data needs to be loaded first
 	//! The actual sample objects are stored in a shared pool, SfzSamplePool, so that if multiple of the same sample are loaded, they don't waste memory.
-	std::shared_ptr<const SfzSampleBuffer> m_sample;
+	//! This is an atomic variable, since the user may have enabled the option to load samples as they play the notes, which means the sample pointer needs to be changed while the instrument is playing, which could potentially have issues with the different threads acessing the same pointer at once.
+	std::atomic<std::shared_ptr<const SfzSampleBuffer>> m_sample;
 	//! However, if a basic wave keyword such as *sine, *saw, *triangle, etc is used, handle it separately (see SfzBasicWaves.h/.cpp)
 	SfzBasicWaves::Shape m_basicWaveShape = SfzBasicWaves::Shape::Silence;
 

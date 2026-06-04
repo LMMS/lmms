@@ -38,6 +38,7 @@
 #include "InstrumentView.h"
 #include "Knob.h"
 #include "LcdSpinBox.h"
+#include "LedCheckBox.h"
 #include "PixmapButton.h"
 #include "SfzPlayer.h"
 #include "SfzSamplePool.h"
@@ -84,6 +85,10 @@ SfzPlayerView::SfzPlayerView(SfzPlayer* instrument, QWidget* parent)
 	layout1->addWidget(m_statusLabel);
 
 	layout1->addWidget(m_infoLabelsWidget);
+
+	LedCheckBox* preloadAllSamplesCheck = new LedCheckBox("Preload All Samples", this, tr("Preload All Samples"), LedCheckBox::LedColor::Green);
+	preloadAllSamplesCheck->setModel(&m_instrument->m_preloadAllSamplesModel);
+	layout1->addWidget(preloadAllSamplesCheck);
 
 	auto layout2 = new QHBoxLayout(m_infoLabelsWidget);
 	layout2->setContentsMargins(0, 0, 0, 0);

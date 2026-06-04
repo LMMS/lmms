@@ -68,6 +68,7 @@ SfzPlayer::SfzPlayer(InstrumentTrack* instrumentTrack)
 	: Instrument(instrumentTrack, &sfzplayer_plugin_descriptor, nullptr, Flag::IsSingleStreamed)
 	, m_samplePool(SfzSamplePool::instance())
 	, m_parentTrack(instrumentTrack)
+	, m_preloadAllSamplesModel(false, this, tr("Preload All Samples"))
 {
 	auto iph = new InstrumentPlayHandle(this, instrumentTrack);
 	Engine::audioEngine()->addPlayHandle(iph);
@@ -75,6 +76,9 @@ SfzPlayer::SfzPlayer(InstrumentTrack* instrumentTrack)
 	// When a user loads a new SFZ file, the main thread prepares the new data to be swapped out by the audio thread, but the main thread
 	// needs to delete the old data afterwards, so here we connect some kind of run-loop so that the main thread gets a chance to check after the audio thread acts
 	connect(lmms::gui::getGUI()->mainWindow(), SIGNAL(periodicUpdate()), this, SLOT(mainThreadUpdateAfterDataSwap())); // I really don't like this. Would it be better to use our own QTimer, not LMMS's gui's?
+
+	// If the user enables preloading all samples, load all the samples immediately
+	connect(&m_preloadAllSamplesModel, &BoolModel::dataChanged, [&](){ if (m_preloadAllSamplesModel.value()) { preloadAllSamples(); }});
 
 	emit dataChanged();
 }
@@ -138,12 +142,29 @@ void SfzPlayer::processTrigger(const SfzTrigger& trigger)
 
 	// Notify the global state to update which switch keys are active, update midi CC values, etc
 	m_sfzGlobalState.processTrigger(trigger);
+
+	bool preloadSamples = m_preloadAllSamplesModel.value(); // Cache this variable so that it isn't acessed every iteration
 	
 	for (auto* region : m_regionManager->findPotentialMatchingRegions(trigger))
 	{
 		// If the trigger conditions are met, spawn a new sound
 		if (region->triggerConditionsMet(m_sfzGlobalState, trigger))
 		{
+			// If samples are loaded when notes are pressed, check if this region has its sample loaded yet. If not, quickly load it before spawning the voice.
+			if (!preloadSamples && !region->sample())
+			{
+				setStatusInfo(QString("Loading sample %1").arg(QFileInfo(region->m_sampleFile.value_or("N/A")).fileName()));
+				bool sampleInPool = false;
+				bool successfulLoadSample = region->initializeSample(QFileInfo(m_sfzFilePath).absoluteDir(), *m_samplePool, &sampleInPool);
+				if (successfulLoadSample)
+				{
+					setStatusInfo((sampleInPool ? QString("Loaded sample %1 (already cached)") : QString("Loaded sample %1")).arg(QFileInfo(region->m_sampleFile.value_or("N/A")).fileName()));
+				}
+				else
+				{
+					setStatusInfo(QString("An error occured when loading sample %1").arg(QFileInfo(region->m_sampleFile.value_or("N/A")).fileName()));
+				}
+			}
 			// Loop through array to find open position
 			bool foundOpenPosition = false;
 			for (size_t i = 0; i <= m_voices.size(); ++i)
@@ -275,27 +296,35 @@ void SfzPlayer::loadSfzFile(const QString& filePath, const bool resetCCKnobs)
 	// Don't immediately set m_regionManager, since the audio thread may still be accessing it; instead set the temporary object
 	m_tempRegionManager = new SfzRegionManager(regions);
 
-	// The SfzParser generates all the SfzRegion objects, but it doesn't load any of the samples
-	// The sample filenames are stored in the regions as from the `sample` opcode, so we just need to load the files into memory to use them
-	// The samples are stored with relative paths with respect to the sfz file, so first find the parent directory:
-	QDir parentDirectory = QFileInfo(filePath).absoluteDir();
+	// Set the flag to let the audio thread know it can swap the data
+	m_bufferCounterWhenDataReady = m_bufferCounter; // Save the current frame counter so the main thread knows when enough buffers have passed that it can delete the old data
+	m_newSfzDataReady = true;
+}
 
+
+void SfzPlayer::preloadAllSamples()
+{
+	// (For some reason, when loading the settings of the "Preload All Samples" toggle, it sets the value, which triggers this function, so we need to check to make sure the regions have actually been initialized before continuing)
+	if (m_regionManager == nullptr) { return; }
 	// To prevent the main gui thread from freezing while all the samples are loaded, start up a separate thread to handle loading everything
 	m_currentlyLoadingSamples = true;
 	if (m_sampleLoadingThread.joinable()) { m_sampleLoadingThread.join(); } // Reset the previous thread if it is active
-	m_sampleLoadingThread = std::thread(&SfzPlayer::sampleLoadingThreadFunction, this, parentDirectory);
+	m_sampleLoadingThread = std::thread(&SfzPlayer::sampleLoadingThreadFunction, this);
 }
 
-void SfzPlayer::sampleLoadingThreadFunction(const QDir& parentDirectory)
+void SfzPlayer::sampleLoadingThreadFunction()
 {
+	// The samples are stored with relative paths with respect to the sfz file, so first find the parent directory:
+	QDir parentDirectory = QFileInfo(m_sfzFilePath).absoluteDir();
+
 	int i = 0; // Count the number of regions
 	int samplesLoadedFromDisk = 0; // Count the number of samples which had to be loaded from disk
 	int samplesAlreadyInPool = 0; // Count the number of samples which had previously been loaded into the pool and didn't need to be loaded from disk
 	int samplesFailedToLoad = 0; // Count the number of samples which couldn't be loaded (invalid path, etc)
-	for (auto* region : m_tempRegionManager->allRegions())
+	for (auto* region : m_regionManager->allRegions())
 	{
 		// Update the GUI info text to notify the user as samples are loaded
-		setStatusInfo(QString("Loading sample %1/%2 %3").arg(i+1).arg(m_tempRegionManager->allRegions().size()).arg(QFileInfo(region->m_sampleFile.value_or("N/A")).fileName()));
+		setStatusInfo(QString("Loading sample %1/%2 %3").arg(i+1).arg(m_regionManager->allRegions().size()).arg(QFileInfo(region->m_sampleFile.value_or("N/A")).fileName()));
 		// Initialize the sample into the temporary pool, so that it doesn't disturb the audio thread which may still be using the previous samples.
 		bool sampleInPool = false;
 		bool successfulLoadSample = region->initializeSample(parentDirectory, *m_samplePool, &sampleInPool);
@@ -313,15 +342,12 @@ void SfzPlayer::sampleLoadingThreadFunction(const QDir& parentDirectory)
 	}
 	if (samplesFailedToLoad == 0)
 	{
-		setStatusInfo(QString("Initialized %1 regions.\nLoaded %2 samples from disk.\nRetrieved %3 from sample pool.").arg(m_tempRegionManager->allRegions().size()).arg(samplesLoadedFromDisk).arg(samplesAlreadyInPool));
+		setStatusInfo(QString("Initialized %1 regions.\nLoaded %2 samples from disk.\nRetrieved %3 from sample pool.").arg(m_regionManager->allRegions().size()).arg(samplesLoadedFromDisk).arg(samplesAlreadyInPool));
 	}
 	else
 	{
-		setStatusInfo(QString("Initialized %1 regions.\nLoaded %2 samples from disk.\nRetrieved %3 from sample pool.\nWARNING: Failed to load %3 samples, see logs for details.").arg(m_tempRegionManager->allRegions().size()).arg(samplesLoadedFromDisk).arg(samplesAlreadyInPool).arg(samplesFailedToLoad));
+		setStatusInfo(QString("Initialized %1 regions.\nLoaded %2 samples from disk.\nRetrieved %3 from sample pool.\nWARNING: Failed to load %4 samples, see logs for details.").arg(m_tempRegionManager->allRegions().size()).arg(samplesLoadedFromDisk).arg(samplesAlreadyInPool).arg(samplesFailedToLoad));
 	}
-	// When the thread is done loading all the samples, set the flag to let the audio thread know it can swap the data
-	m_bufferCounterWhenDataReady = m_bufferCounter; // Save the current frame counter so the main thread knows when enough buffers have passed that it can delete the old data
-	m_newSfzDataReady = true;
 	m_currentlyLoadingSamples = false; // TODO this doesn't seem thread safe, since there would be a brief moment in time where this is false but the thread is still active?
 }
 
@@ -361,6 +387,16 @@ void SfzPlayer::mainThreadUpdateAfterDataSwap()
 		m_samplePool->clearExpiredWeakPtrs();
 		// Update the GUI
 		emit fileLoaded();
+
+		// Now load the samples
+		// The SfzParser generates all the SfzRegion objects, but it doesn't load any of the samples
+		// The sample filenames are stored in the regions as from the `sample` opcode, so we just need to load the files into memory to use them
+		// If the user had enabled loading all the samples at once up front, do that. Otherwise, they will be loaded whenever they are needed, in SfzPlayer::processTrigger()
+		if (m_preloadAllSamplesModel.value())
+		{
+			// This is fine to do while the audio thread is running, since the sample pointers in the region objects are atomic
+			preloadAllSamples();
+		}
 	}
 }
 
@@ -368,11 +404,13 @@ void SfzPlayer::mainThreadUpdateAfterDataSwap()
 void SfzPlayer::saveSettings(QDomDocument& document, QDomElement& element)
 {
 	element.setAttribute("sfzfile", m_sfzFilePath);
+	m_preloadAllSamplesModel.saveSettings(document, element, "preload_all_samples");
 }
 
 void SfzPlayer::loadSettings(const QDomElement& element)
 {
 	m_sfzFilePath = element.attribute("sfzfile");
+	m_preloadAllSamplesModel.loadSettings(element, "preload_all_samples");
 	if (!m_sfzFilePath.isEmpty())
 	{
 		loadSfzFile(m_sfzFilePath, false); // Passing false to leave the user-set midi CC knobs alone, since they were loaded by the InstrumentTrack and shouldn't be reset to the SFZ's defaults.

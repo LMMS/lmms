@@ -104,6 +104,9 @@ private:
 	//! The path to the currently loaded SFZ file
 	QString m_sfzFilePath = "";
 
+	//! Whether to load all the samples at once, or as the notes are played
+	BoolModel m_preloadAllSamplesModel;
+
 	//! Helper function for printing debug info/passing status info to the GUI
 	void setStatusInfo(const QString& text);
 	QString m_statusText = "";
@@ -112,7 +115,7 @@ private:
 	//! Helper thread for loading sample files so that the main thread isn't blocked
 	std::thread m_sampleLoadingThread;
 	//! The function which the sample loading thread uses to load all the samples
-	void sampleLoadingThreadFunction(const QDir& parentDirectory);
+	void sampleLoadingThreadFunction();
 
 	//! Unfortunately, dealing with multiple threads gets complicated.
 	//! There is the possibility that the audio thread could access the region/sample data while the main thread is loading a new SFZ file and the samples
@@ -142,6 +145,7 @@ private:
 	//! A helper function for the main thread to delete the old data and update things like the CC knobs after the audio thread has swapped the data.
 private slots:
 	void mainThreadUpdateAfterDataSwap();
+	void preloadAllSamples();
 
 	friend class gui::SfzPlayerView;
 };
