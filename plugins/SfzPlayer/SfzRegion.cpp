@@ -50,7 +50,7 @@ SfzRegion::SfzRegion(const SfzRegion& other)
 	: SfzOpcodeState(other)
 {
 	// Since atomic variables cannot be copied, reinitialize it
-	m_sample.store(other.m_sample.load());
+	m_samplePointer.store(other.m_samplePointer.load());
 	// Copy all the other member variables as normal
 	m_basicWaveShape = other.m_basicWaveShape;
 	m_roundRobinCount = other.m_roundRobinCount;
@@ -148,8 +148,9 @@ bool SfzRegion::initializeSample(const QDir& parentDirectory, SfzSamplePool& sam
 		if (!QFile::exists(path)) { return false; }
 		// The sample pool handles making sure the same sample isn't loaded twice, which would waste memory
 		m_sample = samplePool.loadSample(path, sampleInPool); // sampleInPool is passed so that we can tell the SfzPlayer if it actually needed to load it from disk or whether it was previously loaded and could be retrieved.
+		m_samplePointer = m_sample.get(); // Unfortunately, not all the builds support std::atomic<std::shared_ptr>, so we use both a shared_ptr (m_sample) and an atomic raw pointer (m_samplePointer).
 
-		return m_sample.load() != nullptr;
+		return m_samplePointer != nullptr;
 	}
 	return true;
 }

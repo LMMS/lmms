@@ -58,7 +58,7 @@ public:
 	bool initializeSample(const QDir& parentDirectory, SfzSamplePool& samplePool, bool* sampleInPool);
 
 	//! Returns a non-owning raw pointer to the sample object for this region
-	const SfzSampleBuffer* sample() const { return m_sample.load().get(); }
+	const SfzSampleBuffer* sample() const { return m_samplePointer; }
 	//! Returns the type of basic wave for this region, if it specified instead of a real sample.
 	//! If a sample was specified, this returns SfzBasicWaves::Shape::Silence by default.
 	const SfzBasicWaves::Shape basicWaveShape() const { return m_basicWaveShape; }
@@ -67,7 +67,8 @@ private:
 	//! Shared pointer to sample object to be played. The sample file path is defined in the `sample` opcode, but the data needs to be loaded first
 	//! The actual sample objects are stored in a shared pool, SfzSamplePool, so that if multiple of the same sample are loaded, they don't waste memory.
 	//! This is an atomic variable, since the user may have enabled the option to load samples as they play the notes, which means the sample pointer needs to be changed while the instrument is playing, which could potentially have issues with the different threads acessing the same pointer at once.
-	std::atomic<std::shared_ptr<const SfzSampleBuffer>> m_sample;
+	std::atomic<const SfzSampleBuffer*> m_samplePointer = nullptr;
+	std::shared_ptr<const SfzSampleBuffer> m_sample; // Unfortunately, not all the builds support std::atomic<std::shared_ptr>, so as a workaround, the shared pointer exists so that the sample garbage collection works, but the actual audio processing uses the raw pointer which is atomic.
 	//! However, if a basic wave keyword such as *sine, *saw, *triangle, etc is used, handle it separately (see SfzBasicWaves.h/.cpp)
 	SfzBasicWaves::Shape m_basicWaveShape = SfzBasicWaves::Shape::Silence;
 
