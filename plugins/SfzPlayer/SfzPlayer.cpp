@@ -163,6 +163,7 @@ void SfzPlayer::processTrigger(const SfzTrigger& trigger)
 				else
 				{
 					setStatusInfo(QString("An error occured when loading sample %1").arg(QFileInfo(region->m_sampleFile.value_or("N/A")).fileName()));
+					continue;
 				}
 			}
 			// Loop through array to find open position
@@ -346,7 +347,7 @@ void SfzPlayer::sampleLoadingThreadFunction()
 	}
 	else
 	{
-		setStatusInfo(QString("Initialized %1 regions.\nLoaded %2 samples from disk.\nRetrieved %3 from sample pool.\nWARNING: Failed to load %4 samples, see logs for details.").arg(m_tempRegionManager->allRegions().size()).arg(samplesLoadedFromDisk).arg(samplesAlreadyInPool).arg(samplesFailedToLoad));
+		setStatusInfo(QString("Initialized %1 regions.\nLoaded %2 samples from disk.\nRetrieved %3 from sample pool.\nWARNING: Failed to load %4 samples, see logs for details.").arg(m_regionManager->allRegions().size()).arg(samplesLoadedFromDisk).arg(samplesAlreadyInPool).arg(samplesFailedToLoad));
 	}
 	m_currentlyLoadingSamples = false; // TODO this doesn't seem thread safe, since there would be a brief moment in time where this is false but the thread is still active?
 }

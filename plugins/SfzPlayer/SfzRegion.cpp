@@ -144,6 +144,8 @@ bool SfzRegion::initializeSample(const QDir& parentDirectory, SfzSamplePool& sam
 		// If it's not a basic wave, load the real sample file.
 		QDir defaultDirectory = QDir(parentDirectory.absoluteFilePath(m_default_path.value_or(""))); // TODO
 		QString path = defaultDirectory.absoluteFilePath(m_sampleFile); // TODO
+		// Check if the file exists before calling the LMMS function to load it, since that will spawn a popup window if it can't load it, which could be hundreds of popups if its a large sfz
+		if (!QFile::exists(path)) { return false; }
 		// The sample pool handles making sure the same sample isn't loaded twice, which would waste memory
 		m_sample = samplePool.loadSample(path, sampleInPool); // sampleInPool is passed so that we can tell the SfzPlayer if it actually needed to load it from disk or whether it was previously loaded and could be retrieved.
 
