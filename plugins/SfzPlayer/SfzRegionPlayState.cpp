@@ -212,6 +212,10 @@ bool SfzRegionPlayState::play(SampleFrame* buffer, const f_cnt_t frames)
 	// If the initial m_frameCount is negative, that means the note hasn't started yet
 	if (m_frameCount < -static_cast<int>(frames)) { m_frameCount += frames; return false; } // If the note doesn't start in this buffer, don't play anything
 
+	// If no sample has been loaded yet (and no basic wave was specified), don't play anything, and end the note because no sound will ever come.
+	// This caused an odd bug where spamming keys which had NoteOff samples while the samples were being loaded would make the voices last forever (playing silence, but filling up the active voice array).
+	if (m_sampleObject == nullptr && m_region->basicWaveShape() == SfzBasicWaves::Shape::Silence) { m_active = false; return false; }
+
 	// Helper variable
 	const float normalizedVelocity = m_trigger.velocity().value() / 127.0f;
 

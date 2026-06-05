@@ -141,6 +141,8 @@ void SfzPlayer::processTrigger(const SfzTrigger& trigger)
 {
 	if (m_regionManager == nullptr) { return; } // Before any SFZ file is loaded, m_regionManager is nullptr, so there's no regions to trigger.
 
+	if (m_currentlyLoadingSamples) { return; } // There are some issues with setStatusInfo being called from multiple threads at once, so just to be safe, don't handle any note events while the samples thread is running.
+
 	// Notify the global state to update which switch keys are active, update midi CC values, etc
 	m_sfzGlobalState.processTrigger(trigger);
 
