@@ -757,7 +757,7 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 		// get all notes from the given clip
 		const NoteVector & notes = c->notes();
 		
-		for ( int loop = 0; loop <= (c->loopLength() - 1) / (c->length() - c->startTimeOffset()); loop++ )
+		for ( int loop = 0; loop <= (c->loopLength() - 1) / c->length(); loop++ )
 		{
 			TimePos loopOffset = loop * c->length();
 
@@ -782,7 +782,7 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 				}
 			}
 
-			while ( nit != notes.end() && (*nit)->pos() < c->length() - c->startTimeOffset() )
+			while (nit != notes.end() && (*nit)->pos() < c->length() - c->startTimeOffset() && (*nit)->pos() + loopOffset < c->loopLength() - c->startTimeOffset())
 			{
 				const auto currentNote = *nit;
 				// Skip any notes note not at the current time pos and not overlapping with the start.
