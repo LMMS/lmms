@@ -237,7 +237,9 @@ TimePos Clip::startTimeOffset() const
 
 void Clip::setStartTimeOffset( const TimePos &startTimeOffset )
 {
+	m_loopLength += startTimeOffset - m_startTimeOffset;
 	m_startTimeOffset = startTimeOffset;
+	emit lengthChanged();
 }
 
 void Clip::setColor(const std::optional<QColor>& color)

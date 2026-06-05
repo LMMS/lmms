@@ -191,7 +191,7 @@ protected:
 
 	inline bool lastLoopView()
 	{
-		return m_offset == (m_clip->loopLength() - 1) / (m_clip->length() - m_clip->startTimeOffset());
+		return m_offset == (m_clip->loopLength() - 1) / m_clip->length();
 	}
 
 	/** Extend the loop by the length of the clip */
