@@ -354,7 +354,7 @@ auto AudioBuffer::absPeakValue(ch_cnt_t channel) const -> float
 		return 0;
 	}
 
-	return std::ranges::max(buffer(channel), {}, static_cast<float(&)(float)>(std::abs));
+	return std::abs(std::ranges::max(buffer(channel), {}, static_cast<float(&)(float)>(std::abs)));
 }
 
 } // namespace lmms
