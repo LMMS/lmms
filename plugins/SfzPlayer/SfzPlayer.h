@@ -38,6 +38,8 @@
 #include "SfzControlsConfig.h"
 #include "SfzRegionManager.h"
 
+#include <future>
+
 namespace lmms {
 
 class SfzPlayer : public Instrument
