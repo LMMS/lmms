@@ -35,6 +35,7 @@
 #include "ConfigManager.h"
 #include "SfzPlayerView.h"
 #include "Song.h"
+#include "ThreadPool.h"
 #include "embed.h"
 #include "interpolation.h"
 #include "plugin_export.h"
@@ -86,7 +87,7 @@ SfzPlayer::SfzPlayer(InstrumentTrack* instrumentTrack)
 SfzPlayer::~SfzPlayer()
 {
 	// Make sure to end the sample loading thread before the plugin exits, or else the program might forcefully terminate
-	if (m_sampleLoadingThread.joinable()) { m_sampleLoadingThread.join(); }
+	if (m_sampleLoadingTask.valid()) { m_sampleLoadingTask.get(); }
 
 	// Deleting the region objects will also destroy their shared_ptrs to the sample objects, which will delete them if no other SfzPlayers are also using them.
 	if (m_regionManager != nullptr) { delete m_regionManager; } // these may be nullptr at first when no SFZ file has been loaded previously
@@ -309,8 +310,8 @@ void SfzPlayer::preloadAllSamples()
 	if (m_regionManager == nullptr) { return; }
 	// To prevent the main gui thread from freezing while all the samples are loaded, start up a separate thread to handle loading everything
 	m_currentlyLoadingSamples = true;
-	if (m_sampleLoadingThread.joinable()) { m_sampleLoadingThread.join(); } // Reset the previous thread if it is active
-	m_sampleLoadingThread = std::thread(&SfzPlayer::sampleLoadingThreadFunction, this);
+	if (m_sampleLoadingTask.valid()) { m_sampleLoadingTask.get(); } // Reset the previous thread if it is active
+	m_sampleLoadingTask = ThreadPool::instance().enqueue(&SfzPlayer::sampleLoadingThreadFunction, this);
 }
 
 void SfzPlayer::sampleLoadingThreadFunction()

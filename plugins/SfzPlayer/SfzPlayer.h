@@ -38,8 +38,6 @@
 #include "SfzControlsConfig.h"
 #include "SfzRegionManager.h"
 
-#include <thread>
-
 namespace lmms {
 
 class SfzPlayer : public Instrument
@@ -112,8 +110,8 @@ private:
 	QString m_statusText = "";
 
 
-	//! Helper thread for loading sample files so that the main thread isn't blocked
-	std::thread m_sampleLoadingThread;
+	//! Handle for helper thread task for loading sample files so that the main thread isn't blocked. This is done using ThreadPool::instance().enqueue(), which returns std::future, which is stored here
+	std::future<void> m_sampleLoadingTask;
 	//! The function which the sample loading thread uses to load all the samples
 	void sampleLoadingThreadFunction();
 
