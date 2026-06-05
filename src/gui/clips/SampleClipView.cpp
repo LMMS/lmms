@@ -385,7 +385,8 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 
 void SampleClipView::createLoopView()
 {
-	new SampleClipView(m_clip, m_trackView, offset() + 1);
+	SampleClipView* view = new SampleClipView(m_clip, m_trackView, offset() + 1);
+	connect(view, SIGNAL(closedWhileResizingLoop()), this, SLOT(resizeLoopAction()));
 }
 
 

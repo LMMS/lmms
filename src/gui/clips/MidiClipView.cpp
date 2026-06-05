@@ -965,7 +965,8 @@ bool MidiClipView::destructiveSplitClip(const TimePos pos)
 
 void MidiClipView::createLoopView()
 {
-	new MidiClipView(m_clip, m_trackView, offset() + 1);
+	MidiClipView* view = new MidiClipView(m_clip, m_trackView, offset() + 1);
+	connect(view, SIGNAL(closedWhileResizingLoop()), this, SLOT(resizeLoopAction()));
 }
 
 } // namespace lmms::gui

@@ -140,6 +140,9 @@ public slots:
 	void randomizeColor();
 	void resetColor();
 
+signals:
+	void closedWhileResizingLoop();
+
 
 protected:
 	enum class ContextMenuAction
@@ -200,6 +203,9 @@ protected:
 protected slots:
 	void updateLength();
 	void updatePosition();
+
+	/** Called by the following loop view when destroyed while resizing the loop */
+	void resizeLoopAction();
 
 	/** Create a new loop view */
 	virtual void createLoopView()

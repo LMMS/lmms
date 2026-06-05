@@ -489,7 +489,8 @@ void AutomationClipView::dropEvent( QDropEvent * _de )
 
 void AutomationClipView::createLoopView()
 {
-	new AutomationClipView(m_clip, m_trackView, offset() + 1);
+	AutomationClipView* view = new AutomationClipView(m_clip, m_trackView, offset() + 1);
+	connect(view, SIGNAL(closedWhileResizingLoop()), this, SLOT(resizeLoopAction()));
 }
 
 
