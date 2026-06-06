@@ -270,6 +270,11 @@ bool ClipView::close()
 	{
 		m_clip->changeLoopLength(m_clip->length() * offset());
 	}
+	if (m_action == Action::ResizeLoop)
+	{
+		releaseMouse();
+		emit closedWhileResizingLoop();
+	}
 	m_trackView->getTrackContentWidget()->removeClipView(this);
 	return QWidget::close();
 }
@@ -361,6 +366,25 @@ void ClipView::updatePosition()
 	// moving a Clip can result in change of song-length etc.,
 	// therefore we update the track-container
 	m_trackView->trackContainerView()->update();
+}
+
+void ClipView::resizeLoopAction()
+{
+	// If this view is the root, the loop is already fully erased
+	if (offset() > 0)
+	{
+		// Trigger a fake mousePressEvent
+		mousePressEvent(
+			new QMouseEvent(
+				QEvent::Type::MouseButtonPress,
+				QPointF(width(), 0),
+				Qt::MouseButton::LeftButton,
+				Qt::MouseButtons(0x00000001),
+				Qt::KeyboardModifier(0)
+			)
+		);
+		grabMouse();
+	} 
 }
 
 void ClipView::selectColor()
@@ -716,9 +740,6 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 				{
 					m_clip->setJournalling(false);
 				}
-
-				setInitialPos(pos);
-				setInitialOffsets();
 
 				if (!m_clip->manuallyResizable() && !knifeMode)
 				{	// Always move clips that can't be manually resized
@@ -1157,6 +1178,7 @@ void ClipView::mouseReleaseEvent( QMouseEvent * me )
 	s_textFloat->hide();
 	updateCursor(me);
 	selectableObject::mouseReleaseEvent( me );
+	releaseMouse();
 }
 
 
