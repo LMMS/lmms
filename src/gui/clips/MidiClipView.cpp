@@ -607,8 +607,8 @@ void MidiClipView::paintEvent( QPaintEvent * )
 			p.fillRect(rect(), current ? c.lighter( 65 ) : c.darker( 150 ));
 		}
 	}
-	// Draw hatching on loop views
-	paintHatching( p, c );
+	// Draw stripes on loop views
+	paintStripes( p, c );
 
 	// Check whether we will paint a text box and compute its potential height
 	// This is needed so we can paint the notes underneath it.

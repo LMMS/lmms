@@ -264,8 +264,8 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 			p.fillRect(rect(), c.darker( 150 ));
 		}
 	}
-	// Draw hatching on loop views
-	paintHatching( p, clipColor.darker( 150 ) );
+	// Draw stripes on loop views
+	paintStripes( p, clipColor.darker( 150 ) );
 
 	p.setPen(clipColor);
 

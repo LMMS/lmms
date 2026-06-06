@@ -269,8 +269,8 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 			p.fillRect( rect(), current ? c.lighter( 65 ) : c.darker( 150 ) );
 		}
 	}
-	// Draw hatching on loop views
-	paintHatching( p, c );
+	// Draw stripes on loop views
+	paintStripes( p, c );
 
 	// pixels per bar
 	const float ppb = fixedClips() ?

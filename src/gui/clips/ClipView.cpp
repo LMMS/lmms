@@ -100,6 +100,8 @@ ClipView::ClipView( Clip * clip,
 	m_patternClipBackground( 0, 0, 0 ),
 	m_gradient( true ),
 	m_markerColor(0, 0, 0),
+	m_loopStripeWidth(3),
+	m_loopStripeSpacing(12),
 	m_needsUpdate( true )
 {
 	if( s_textFloat == nullptr )
@@ -221,6 +223,12 @@ bool ClipView::gradient() const
 QColor ClipView::markerColor() const
 { return m_markerColor; }
 
+unsigned int ClipView::loopStripeWidth() const
+{ return m_loopStripeWidth; }
+
+unsigned int ClipView::loopStripeSpacing() const
+{ return m_loopStripeSpacing; }
+
 //! \brief CSS theming qproperty access method
 void ClipView::setMutedColor( const QColor & c )
 { m_mutedColor = QColor( c ); }
@@ -250,6 +258,12 @@ void ClipView::setGradient( const bool & b )
 
 void ClipView::setMarkerColor(const QColor & c)
 { m_markerColor = QColor(c); }
+
+void ClipView::setLoopStripeWidth(const unsigned int w)
+{ m_loopStripeWidth = w; }
+
+void ClipView::setLoopStripeSpacing(const unsigned int spacing)
+{ m_loopStripeSpacing = spacing; }
 
 // access needsUpdate member variable
 bool ClipView::needsUpdate()
@@ -644,11 +658,11 @@ void ClipView::paintTextLabel(QString const & text, QPainter & painter)
 	painter.drawText( textLeft, finalTextTop, elidedClipName );
 }
 
-void ClipView::paintHatching( QPainter & painter, QColor color )
+void ClipView::paintStripes( QPainter & painter, QColor color )
 {
 	if (m_offset == 0)
 	{
-		// Only paint hatching on the loop views
+		// Only paint stripes on the loop views
 		return;
 	}
 	painter.setPen(color);
@@ -656,10 +670,10 @@ void ClipView::paintHatching( QPainter & painter, QColor color )
 	// Change the pen's width in a rather painfull way
 	QPen previousPen = painter.pen();
 	QPen newPen(previousPen);
-	newPen.setWidth(2);
+	newPen.setWidth(m_loopStripeWidth);
 	painter.setPen(newPen);
 	
-	for (int x = -height(); x < width(); x += 10)
+	for (int x = -height(); x < width(); x += m_loopStripeSpacing)
 	{
 		int y1, y2;
 		y1 = 0;
