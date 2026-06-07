@@ -34,6 +34,7 @@
 #include "PatternStore.h"
 #include "SampleTrack.h"
 #include "TrackContainer.h" // For TrackContainer::TrackList typedef
+#include "TracyProfiling.h"
 
 namespace lmms
 {
@@ -83,8 +84,9 @@ MixerChannel::~MixerChannel()
 }
 
 
-inline void MixerChannel::processed()
+void MixerChannel::processed()
 {
+	ZoneScoped;
 	for( const MixerRoute * receiverRoute : m_sends )
 	{
 		if( receiverRoute->receiver()->m_muted == false )
@@ -96,6 +98,7 @@ inline void MixerChannel::processed()
 
 void MixerChannel::incrementDeps()
 {
+	ZoneScoped;
 	const auto i = m_dependenciesMet++ + 1;
 	if( i >= m_receives.size() && ! m_queued )
 	{
@@ -161,18 +164,23 @@ void MixerChannel::unmuteReceiverForSolo()
 
 void MixerChannel::doProcessing()
 {
+	ZoneScopedN("MixerChannel::doProcessing");
+
 	const f_cnt_t fpp = Engine::audioEngine()->framesPerPeriod();
 
 	if( m_muted == false )
 	{
+		ZoneScopedN("Processing");
 		for( MixerRoute * senderRoute : m_receives )
 		{
+			ZoneScoped;
 			MixerChannel * sender = senderRoute->sender();
 			FloatModel * sendModel = senderRoute->amount();
 			if( ! sendModel ) qFatal( "Error: no send model found from %d to %d", senderRoute->senderIndex(), m_channelIndex );
 
 			if (sender->m_buffer.hasAnySignal() || sender->m_stillRunning)
 			{
+				ZoneScopedN("Process sender route");
 				auto buffer = m_buffer.interleavedBuffer().asSampleFrames();
 
 				// figure out if we're getting sample-exact input
@@ -639,6 +647,8 @@ FloatModel * Mixer::channelSendModel( mix_ch_t fromChannel, mix_ch_t toChannel )
 
 void Mixer::mixToChannel(const AudioBuffer& buffer, mix_ch_t dest)
 {
+	ZoneScoped;
+
 	const auto channel = m_mixerChannels[dest];
 	if (!channel->m_muteModel.value())
 	{
@@ -658,6 +668,7 @@ void Mixer::mixToChannel(const AudioBuffer& buffer, mix_ch_t dest)
 
 void Mixer::prepareMasterMix()
 {
+	ZoneScoped;
 	m_mixerChannels[0]->m_buffer.silenceAllChannels();
 }
 
@@ -665,77 +676,91 @@ void Mixer::prepareMasterMix()
 
 void Mixer::masterMix( SampleFrame* _buf )
 {
+	ZoneScoped;
 	const int fpp = Engine::audioEngine()->framesPerPeriod();
 
-	// add the channels that have no dependencies (no incoming senders, ie.
-	// no receives) to the jobqueue. The channels that have receives get
-	// added when their senders get processed, which is detected by
-	// dependency counting.
-	// also instantly add all muted channels as they don't need to care
-	// about their senders, and can just increment the deps of their
-	// recipients right away.
-	AudioEngineWorkerThread::resetJobQueue( AudioEngineWorkerThread::JobQueue::OperationMode::Dynamic );
-	for( MixerChannel * ch : m_mixerChannels )
 	{
-		ch->m_muted = ch->m_muteModel.value();
-		if( ch->m_muted ) // instantly "process" muted channels
-		{
-			ch->processed();
-			ch->done();
-		}
-		else if( ch->m_receives.size() == 0 )
-		{
-			ch->m_queued = true;
-			AudioEngineWorkerThread::addJob( ch );
-		}
-	}
-	while (m_mixerChannels[0]->state() != ThreadableJob::ProcessingState::Done)
-	{
-		bool found = false;
+		ZoneScopedN("Add independent channels to job queue");
+
+		// add the channels that have no dependencies (no incoming senders, ie.
+		// no receives) to the jobqueue. The channels that have receives get
+		// added when their senders get processed, which is detected by
+		// dependency counting.
+		// also instantly add all muted channels as they don't need to care
+		// about their senders, and can just increment the deps of their
+		// recipients right away.
+		AudioEngineWorkerThread::resetJobQueue( AudioEngineWorkerThread::JobQueue::OperationMode::Dynamic );
 		for( MixerChannel * ch : m_mixerChannels )
 		{
-			const auto s = ch->state();
-			if (s == ThreadableJob::ProcessingState::Queued
-				|| s == ThreadableJob::ProcessingState::InProgress)
+			ZoneScoped;
+			ch->m_muted = ch->m_muteModel.value();
+			if( ch->m_muted ) // instantly "process" muted channels
 			{
-				found = true;
-				break;
+				ch->processed();
+				ch->done();
+			}
+			else if( ch->m_receives.size() == 0 )
+			{
+				ch->m_queued = true;
+				AudioEngineWorkerThread::addJob( ch );
 			}
 		}
-		if( !found )
-		{
-			break;
-		}
-		AudioEngineWorkerThread::startAndWaitForJobs();
 	}
 
-	auto buffer = m_mixerChannels[0]->m_buffer.interleavedBuffer().asSampleFrames();
-
-	// handle sample-exact data in master volume fader
-	ValueBuffer * volBuf = m_mixerChannels[0]->m_volumeModel.valueBuffer();
-
-	if( volBuf )
 	{
-		for( int f = 0; f < fpp; f++ )
+		ZoneScopedN("Process channels");
+
+		while (m_mixerChannels[0]->state() != ThreadableJob::ProcessingState::Done)
 		{
-			buffer[f][0] *= volBuf->values()[f];
-			buffer[f][1] *= volBuf->values()[f];
+			bool found = false;
+			for( MixerChannel * ch : m_mixerChannels )
+			{
+				const auto s = ch->state();
+				if (s == ThreadableJob::ProcessingState::Queued
+					|| s == ThreadableJob::ProcessingState::InProgress)
+				{
+					found = true;
+					break;
+				}
+			}
+			if( !found )
+			{
+				break;
+			}
+			AudioEngineWorkerThread::startAndWaitForJobs();
 		}
 	}
 
-	const float v = volBuf
-		? 1.0f
-		: m_mixerChannels[0]->m_volumeModel.value();
-	MixHelpers::addSanitizedMultiplied(_buf, buffer.data(), v, fpp);
-
-	// clear all channel buffers and
-	// reset channel process state
-	for( int i = 0; i < numChannels(); ++i)
 	{
-		m_mixerChannels[i]->m_buffer.silenceAllChannels();
-		m_mixerChannels[i]->reset();
-		m_mixerChannels[i]->m_queued = false;
-		m_mixerChannels[i]->m_dependenciesMet = 0;
+		ZoneScopedN("Post-processing");
+		auto buffer = m_mixerChannels[0]->m_buffer.interleavedBuffer().asSampleFrames();
+
+		// handle sample-exact data in master volume fader
+		ValueBuffer * volBuf = m_mixerChannels[0]->m_volumeModel.valueBuffer();
+
+		if( volBuf )
+		{
+			for( int f = 0; f < fpp; f++ )
+			{
+				buffer[f][0] *= volBuf->values()[f];
+				buffer[f][1] *= volBuf->values()[f];
+			}
+		}
+
+		const float v = volBuf
+			? 1.0f
+			: m_mixerChannels[0]->m_volumeModel.value();
+		MixHelpers::addSanitizedMultiplied(_buf, buffer.data(), v, fpp);
+
+		// clear all channel buffers and
+		// reset channel process state
+		for( int i = 0; i < numChannels(); ++i)
+		{
+			m_mixerChannels[i]->m_buffer.silenceAllChannels();
+			m_mixerChannels[i]->reset();
+			m_mixerChannels[i]->m_queued = false;
+			m_mixerChannels[i]->m_dependenciesMet = 0;
+		}
 	}
 }
 

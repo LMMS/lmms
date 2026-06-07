@@ -28,8 +28,10 @@
 #include <QThread>
 
 #include <atomic>
+#include <condition_variable>
+#include <optional>
 
-class QWaitCondition;
+#include "lmmsconfig.h"
 
 namespace lmms
 {
@@ -113,7 +115,14 @@ private:
 	void run() override;
 
 	static JobQueue globalJobQueue;
-	static QWaitCondition * queueReadyWaitCond;
+
+#ifdef LMMS_DEBUG_TRACY
+	// Tracy uses a std::mutex wrapper, so it requires std::condition_variable_any
+	static inline std::optional<std::condition_variable_any> queueReadyWaitCond{};
+#else
+	static inline std::optional<std::condition_variable> queueReadyWaitCond{};
+#endif
+
 	static QList<AudioEngineWorkerThread *> workerThreads;
 
 	volatile bool m_quit;

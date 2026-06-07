@@ -27,6 +27,7 @@
 
 #include <QStringList>
 #include <QMap>
+#include <string>
 
 #include "JournallingObject.h"
 #include "Model.h"
@@ -244,6 +245,9 @@ public:
 	//! Return display-name out of sub plugin or descriptor
 	QString displayName() const override;
 
+	//! Same as @ref displayName, but as a cached UTF-8 string
+	const std::string& displayNameUtf8() const;
+
 	//! Return logo out of sub plugin or descriptor
 	const PixmapLoader *logo() const;
 
@@ -302,6 +306,9 @@ private:
 	const Descriptor * m_descriptor;
 
 	Descriptor::SubPluginFeatures::Key m_key;
+
+	//! Cached UTF-8 display name
+	mutable std::string m_displayName;
 
 	// pointer to instantiation-function in plugin
 	using InstantiationHook = Plugin* (*)(Model*, void*);

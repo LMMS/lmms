@@ -31,6 +31,7 @@
 #include "InstrumentTrack.h"
 #include "Instrument.h"
 #include "Song.h"
+#include "TracyProfiling.h"
 #include "lmms_math.h"
 
 namespace lmms
@@ -185,6 +186,9 @@ int NotePlayHandle::midiKey() const
 
 void NotePlayHandle::play( SampleFrame* _working_buffer )
 {
+	ZoneScopedC(0xff7f50); // #ff7f50 (tracy::Color::Coral)
+	ZoneNameF("NotePlayHandle::play [%s]", m_instrumentTrack->displayNameUtf8().c_str());
+
 	if (m_muted)
 	{
 		return;
@@ -223,6 +227,7 @@ void NotePlayHandle::play( SampleFrame* _working_buffer )
 		&& m_totalFramesPlayed == 0 && !m_hasMidiNote
 		&& ( hasParent() || ! m_instrumentTrack->isArpeggioEnabled() ) )
 	{
+		ZoneScopedN("Process NoteOn event");
 		m_hasMidiNote = true;
 
 		const int baseVelocity = m_instrumentTrack->midiPort()->baseVelocity();
@@ -368,6 +373,7 @@ bool NotePlayHandle::isFromTrack( const Track * _track ) const
 
 void NotePlayHandle::noteOff( const f_cnt_t _s )
 {
+	ZoneScoped;
 	if( m_released )
 	{
 		return;
@@ -478,6 +484,7 @@ int NotePlayHandle::index() const
 
 ConstNotePlayHandleList NotePlayHandle::nphsOfInstrumentTrack( const InstrumentTrack * _it, bool _all_ph )
 {
+	ZoneScoped;
 	const PlayHandleList & playHandles = Engine::audioEngine()->playHandles();
 	ConstNotePlayHandleList cnphv;
 
@@ -519,6 +526,7 @@ bool NotePlayHandle::operator==( const NotePlayHandle & _nph ) const
 
 void NotePlayHandle::updateFrequency()
 {
+	ZoneScoped;
 	int masterPitch = m_instrumentTrack->m_useMasterPitchModel.value() ? Engine::getSong()->masterPitch() : 0;
 	int baseNote = m_instrumentTrack->baseNoteModel()->value();
 	float detune = m_baseDetuning->value();
@@ -632,11 +640,23 @@ NotePlayHandle * NotePlayHandleManager::acquire( InstrumentTrack* instrumentTrac
 				int midiEventChannel,
 				NotePlayHandle::Origin origin )
 {
-	// TODO: use some lockless data structures
-	s_mutex.lockForWrite();
-	if (s_availableIndex < 0) { extend(NPH_CACHE_INCREMENT); }
-	NotePlayHandle * nph = s_available[s_availableIndex--];
-	s_mutex.unlock();
+	ZoneScoped;
+
+	struct MutexWrapper
+	{
+		void lock() { s_mutex.lockForWrite(); }
+		void unlock() { s_mutex.unlock(); }
+	};
+
+	NotePlayHandle* nph;
+	{
+		// TODO: use some lockless data structures
+		TracyLockable(MutexWrapper, mutex);
+		std::lock_guard<LockableBase(MutexWrapper)> lock{mutex};
+
+		if (s_availableIndex < 0) { extend(NPH_CACHE_INCREMENT); }
+		nph = s_available[s_availableIndex--];
+	}
 
 	new( (void*)nph ) NotePlayHandle( instrumentTrack, offset, frames, noteToPlay, parent, midiEventChannel, origin );
 	return nph;
@@ -645,10 +665,22 @@ NotePlayHandle * NotePlayHandleManager::acquire( InstrumentTrack* instrumentTrac
 
 void NotePlayHandleManager::release( NotePlayHandle * nph )
 {
+	ZoneScoped;
+
+	struct MutexWrapper
+	{
+		void lock() { s_mutex.lockForRead(); }
+		void unlock() { s_mutex.unlock(); }
+	};
+
 	nph->NotePlayHandle::~NotePlayHandle();
-	s_mutex.lockForRead();
-	s_available[++s_availableIndex] = nph;
-	s_mutex.unlock();
+
+	{
+		TracyLockable(MutexWrapper, mutex);
+		std::lock_guard<LockableBase(MutexWrapper)> lock{mutex};
+
+		s_available[++s_availableIndex] = nph;
+	}
 }
 
 

@@ -33,7 +33,7 @@
 
 #include "ValueBuffer.h"
 #include "SampleFrame.h"
-
+#include "TracyProfiling.h"
 
 
 static bool s_NaNHandler;
@@ -43,6 +43,8 @@ namespace lmms::MixHelpers
 {
 
 namespace {
+
+[[maybe_unused]] constexpr std::uint32_t TracyColor = 0xeedd82; // #eedd82 (tracy::Color::LightGoldenrod)
 
 constexpr auto SilenceThreshold = 0.000001f; // -120 dBFS
 
@@ -71,6 +73,7 @@ inline void run(SampleFrame* dst, const sample_t* srcLeft, const sample_t* srcRi
 
 bool isSilent( const SampleFrame* src, int frames )
 {
+	ZoneScopedC(TracyColor);
 	for( int i = 0; i < frames; ++i )
 	{
 		if (std::abs(src[i][0]) >= SilenceThreshold || std::abs(src[i][1]) >= SilenceThreshold)
@@ -84,7 +87,8 @@ bool isSilent( const SampleFrame* src, int frames )
 
 bool isSilent(std::span<sample_t> buffer)
 {
-	return std::ranges::all_of(buffer, [&](const sample_t s) { return std::abs(s) < SilenceThreshold; });
+	ZoneScopedC(TracyColor);
+	return std::ranges::all_of(buffer, [](const sample_t s) { return std::abs(s) < SilenceThreshold; });
 }
 
 bool useNaNHandler()
@@ -99,6 +103,7 @@ void setNaNHandler( bool use )
 
 bool sanitize(std::span<sample_t> buffer)
 {
+	ZoneScopedC(TracyColor);
 	if (!useNaNHandler()) { return false; }
 
 	for (std::size_t f = 0; f < buffer.size(); ++f)
@@ -134,12 +139,14 @@ struct AddOp
 
 void add( SampleFrame* dst, const SampleFrame* src, int frames )
 {
+	ZoneScopedC(TracyColor);
 	run<>( dst, src, frames, AddOp() );
 }
 
 
 void add(PlanarBufferView<sample_t> dst, PlanarBufferView<const sample_t> src)
 {
+	ZoneScopedC(TracyColor);
 	assert(dst.channels() == src.channels());
 	assert(dst.frames() == src.frames());
 
@@ -172,6 +179,7 @@ struct AddMultipliedOp
 
 void addMultiplied( SampleFrame* dst, const SampleFrame* src, float coeffSrc, int frames )
 {
+	ZoneScopedC(TracyColor);
 	run<>( dst, src, frames, AddMultipliedOp(coeffSrc) );
 }
 
@@ -191,6 +199,7 @@ struct AddSwappedMultipliedOp
 
 void multiply(SampleFrame* dst, float coeff, int frames)
 {
+	ZoneScopedC(TracyColor);
 	for (int i = 0; i < frames; ++i)
 	{
 		dst[i] *= coeff;
@@ -199,12 +208,14 @@ void multiply(SampleFrame* dst, float coeff, int frames)
 
 void addSwappedMultiplied( SampleFrame* dst, const SampleFrame* src, float coeffSrc, int frames )
 {
+	ZoneScopedC(TracyColor);
 	run<>( dst, src, frames, AddSwappedMultipliedOp(coeffSrc) );
 }
 
 
 void addMultipliedByBuffer( SampleFrame* dst, const SampleFrame* src, float coeffSrc, ValueBuffer * coeffSrcBuf, int frames )
 {
+	ZoneScopedC(TracyColor);
 	for( int f = 0; f < frames; ++f )
 	{
 		dst[f][0] += src[f][0] * coeffSrc * coeffSrcBuf->values()[f];
@@ -214,6 +225,7 @@ void addMultipliedByBuffer( SampleFrame* dst, const SampleFrame* src, float coef
 
 void addMultipliedByBuffers( SampleFrame* dst, const SampleFrame* src, ValueBuffer * coeffSrcBuf1, ValueBuffer * coeffSrcBuf2, int frames )
 {
+	ZoneScopedC(TracyColor);
 	for( int f = 0; f < frames; ++f )
 	{
 		dst[f][0] += src[f][0] * coeffSrcBuf1->values()[f] * coeffSrcBuf2->values()[f];
@@ -224,6 +236,7 @@ void addMultipliedByBuffers( SampleFrame* dst, const SampleFrame* src, ValueBuff
 
 void addSanitizedMultipliedByBuffer( SampleFrame* dst, const SampleFrame* src, float coeffSrc, ValueBuffer * coeffSrcBuf, int frames )
 {
+	ZoneScopedC(TracyColor);
 	if ( !useNaNHandler() )
 	{
 		addMultipliedByBuffer( dst, src, coeffSrc, coeffSrcBuf,
@@ -240,6 +253,7 @@ void addSanitizedMultipliedByBuffer( SampleFrame* dst, const SampleFrame* src, f
 
 void addSanitizedMultipliedByBuffers( SampleFrame* dst, const SampleFrame* src, ValueBuffer * coeffSrcBuf1, ValueBuffer * coeffSrcBuf2, int frames )
 {
+	ZoneScopedC(TracyColor);
 	if ( !useNaNHandler() )
 	{
 		addMultipliedByBuffers( dst, src, coeffSrcBuf1, coeffSrcBuf2,
@@ -275,6 +289,7 @@ struct AddSanitizedMultipliedOp
 
 void addSanitizedMultiplied( SampleFrame* dst, const SampleFrame* src, float coeffSrc, int frames )
 {
+	ZoneScopedC(TracyColor);
 	if ( !useNaNHandler() )
 	{
 		addMultiplied( dst, src, coeffSrc, frames );
@@ -306,7 +321,7 @@ struct AddMultipliedStereoOp
 
 void addMultipliedStereo( SampleFrame* dst, const SampleFrame* src, float coeffSrcLeft, float coeffSrcRight, int frames )
 {
-
+	ZoneScopedC(TracyColor);
 	run<>( dst, src, frames, AddMultipliedStereoOp(coeffSrcLeft, coeffSrcRight) );
 }
 
@@ -334,6 +349,7 @@ struct MultiplyAndAddMultipliedOp
 
 void multiplyAndAddMultiplied( SampleFrame* dst, const SampleFrame* src, float coeffDst, float coeffSrc, int frames )
 {
+	ZoneScopedC(TracyColor);
 	run<>( dst, src, frames, MultiplyAndAddMultipliedOp(coeffDst, coeffSrc) );
 }
 
@@ -344,6 +360,7 @@ void multiplyAndAddMultipliedJoined( SampleFrame* dst,
 										const sample_t* srcRight,
 										float coeffDst, float coeffSrc, int frames )
 {
+	ZoneScopedC(TracyColor);
 	run<>( dst, srcLeft, srcRight, frames, MultiplyAndAddMultipliedOp(coeffDst, coeffSrc) );
 }
 

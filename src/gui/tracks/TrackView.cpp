@@ -359,7 +359,7 @@ void TrackView::mouseMoveEvent( QMouseEvent * me )
 
 	if( height() < DEFAULT_TRACK_HEIGHT )
 	{
-		setToolTip(m_track->m_name);
+		setToolTip(m_track->m_nameQString);
 	}
 }
 
