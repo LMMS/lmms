@@ -16,6 +16,7 @@ SET(LMMS_SRCS
 	gui/FileBrowser.cpp
 	gui/FileRevealer.cpp
 	gui/FileSearchJob.cpp
+	gui/GridView.cpp
 	gui/GuiApplication.cpp
 	gui/LadspaControlView.cpp
 	gui/LfoControllerDialog.cpp
@@ -129,6 +130,7 @@ SET(LMMS_SRCS
 	gui/widgets/TextFloat.cpp
 	gui/widgets/TimeDisplayWidget.cpp
 	gui/widgets/ToolButton.cpp
+	gui/widgets/VectorGraphView.cpp
 
 	PARENT_SCOPE
 )
