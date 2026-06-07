@@ -127,7 +127,7 @@ void AudioSndio::stopProcessingImpl()
 	stopProcessingThread( this );
 }
 
-void AudioSndio::run()
+void AudioSndio::run() noexcept LMMS_NONBLOCKING
 {
 	const auto framesPerAudioBuffer = audioEngine()->framesPerAudioBuffer();
 	auto buf = std::vector<float>(framesPerAudioBuffer * channels());

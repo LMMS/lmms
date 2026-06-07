@@ -357,7 +357,6 @@ private:
 	void renderStageEffects();
 	void renderStageMix();
 
-
 	void swapBuffers();
 
 	void clearInternal();

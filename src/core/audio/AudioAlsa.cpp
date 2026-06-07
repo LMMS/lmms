@@ -234,7 +234,7 @@ void AudioAlsa::stopProcessingImpl()
 	stopProcessingThread( this );
 }
 
-void AudioAlsa::run()
+void AudioAlsa::run() noexcept LMMS_NONBLOCKING
 {
 	const auto framesPerAudioBuffer = audioEngine()->framesPerAudioBuffer();
 	auto buf = std::vector<float>(framesPerAudioBuffer * channels());
