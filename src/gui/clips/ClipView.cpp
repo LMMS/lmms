@@ -348,7 +348,7 @@ void ClipView::updateLength()
 		{
 			close();
 		}
-		if (m_clip->loopLength() - offset() * m_clip->length() <= m_clip->length())
+		if (lastLoopView())
 		{
 			m_haveChild = false;
 		}
@@ -1021,116 +1021,123 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 				TimePos offset = TimePos(l - initialLength).quantize(snapSize);
 				m_clip->changeLoopLength(initialLength + offset);
 			}
+			s_textFloat->setTitle(tr("Current length"));
+			s_textFloat->setText(tr("%1:%2").
+					arg(m_clip->loopLength().getBar()).
+					arg(m_clip->loopLength().getTicks() % TimePos::ticksPerBar()));
 		}
-		else if (m_action == Action::Resize)
+		else 
 		{
-			// The clip's new length
-			TimePos l = static_cast<int>(pos.x() * TimePos::ticksPerBar() / ppb);
-
-			// If the user is holding alt, or pressed ctrl after beginning the drag, don't quantize
-			if ( unquantizedModHeld(me) )
-			{	// We want to preserve this adjusted offset,
-				// even if the user switches to snapping later
-				setInitialPos( m_initialMousePos );
-				// Don't resize to less than 1 tick
-				m_clip->changeLength( qMax<int>( 1, l ) );
-				m_clip->setAutoResize(false);
-			}
-			else if ( me->modifiers() & Qt::ShiftModifier )
-			{	// If shift is held, quantize clip's end position
-				TimePos end = TimePos( m_initialClipPos + l ).quantize( snapSize );
-				// The end position has to be after the clip's start
-				TimePos min = m_initialClipPos.quantize( snapSize );
-				if ( min <= m_initialClipPos ) min += snapLength;
-				m_clip->changeLength( qMax<int>(min - m_initialClipPos, end - m_initialClipPos) );
-				m_clip->setAutoResize(false);
-			}
-			else
-			{	// Otherwise, resize in fixed increments
-				TimePos initialLength = m_initialClipEnd - m_initialClipPos;
-				TimePos offset = TimePos( l - initialLength ).quantize( snapSize );
-				// Don't resize to less than 1 tick
-				auto min = TimePos(initialLength % snapLength);
-				if (min < 1) min += snapLength;
-				m_clip->changeLength( qMax<int>( min, initialLength + offset) );
-				m_clip->setAutoResize(false);
-			}
-		}
-		else
-		{
-			auto pClip = dynamic_cast<PatternClip*>(m_clip);
-
-			const int x = mapToParent(pos).x() - m_initialMousePos.x();
-
-			TimePos t = qMax( 0, (int)
-								m_trackView->trackContainerView()->currentPosition() +
-								static_cast<int>( x * TimePos::ticksPerBar() / ppb ) );
-
-			if (!isResizableBeforeStart())
+			if (m_action == Action::Resize)
 			{
-				t = std::max(t, static_cast<TimePos>(m_clip->startPosition() + m_clip->startTimeOffset()));
-			}
+				// The clip's new length
+				TimePos l = static_cast<int>(pos.x() * TimePos::ticksPerBar() / ppb);
 
-			if( unquantizedModHeld(me) )
-			{	// We want to preserve this adjusted offset,
-				// even if the user switches to snapping later
-				setInitialPos( m_initialMousePos );
-				//Don't resize to less than 1 tick
-				t = qMin<int>( m_initialClipEnd - 1, t);
-			}
-			else if( me->modifiers() & Qt::ShiftModifier )
-			{	// If shift is held, quantize clip's start position
-				// Don't let the start position move past the end position
-				TimePos max = m_initialClipEnd.quantize( snapSize );
-				if ( max >= m_initialClipEnd ) max -= snapLength;
-				t = qMin<int>( max, t.quantize( snapSize ) );
-			}
-			else
-			{	// Otherwise, resize in fixed increments
-				// Don't resize to less than 1 tick
-				TimePos initialLength = m_initialClipEnd - m_initialClipPos;
-				auto minLength = TimePos(initialLength % snapLength);
-				if (minLength < 1) minLength += snapLength;
-				TimePos offset = TimePos(t - m_initialClipPos).quantize( snapSize );
-				t = qMin<int>( m_initialClipEnd - minLength, m_initialClipPos + offset );
-			}
-
-			TimePos positionOffset = m_clip->startPosition() - t;
-			if (m_clip->length() + positionOffset >= 1)
-			{
-				m_clip->movePosition(t);
-				m_clip->changeLength(m_clip->length() + positionOffset);
-				if (pClip)
-				{
-					// Modulus the start time offset as we need it only for offsets
-					// inside the pattern length. This is done to prevent a value overflow.
-					// The start time offset may still become larger than the pattern length
-					// whenever the pattern length decreases without a clip resize following.
-					// To deal safely with it, always modulus before use.
-					tick_t patternLength = Engine::patternStore()->lengthOfPattern(pClip->patternIndex())
-							* TimePos::ticksPerBar();
-					TimePos position = (pClip->startTimeOffset() + positionOffset) % patternLength;
-					pClip->setStartTimeOffset(position);
+				// If the user is holding alt, or pressed ctrl after beginning the drag, don't quantize
+				if (unquantizedModHeld(me))
+				{	// We want to preserve this adjusted offset,
+					// even if the user switches to snapping later
+					setInitialPos(m_initialMousePos);
+					// Don't resize to less than 1 tick
+					m_clip->changeLength(qMax<int>(1, l));
+					m_clip->setAutoResize(false);
+				}
+				else if (me->modifiers() & Qt::ShiftModifier)
+				{	// If shift is held, quantize clip's end position
+					TimePos end = TimePos(m_initialClipPos + l).quantize(snapSize);
+					// The end position has to be after the clip's start
+					TimePos min = m_initialClipPos.quantize(snapSize);
+					if (min <= m_initialClipPos) min += snapLength;
+					m_clip->changeLength(qMax<int>(min - m_initialClipPos, end - m_initialClipPos));
+					m_clip->setAutoResize(false);
 				}
 				else
-				{
-					m_clip->setStartTimeOffset(m_clip->startTimeOffset() + positionOffset);
+				{	// Otherwise, resize in fixed increments
+					TimePos initialLength = m_initialClipEnd - m_initialClipPos;
+					TimePos offset = TimePos(l - initialLength).quantize(snapSize);
+					// Don't resize to less than 1 tick
+					auto min = TimePos(initialLength % snapLength);
+					if (min < 1) min += snapLength;
+					m_clip->changeLength(qMax<int>(min, initialLength + offset));
+					m_clip->setAutoResize(false);
 				}
-				m_clip->setAutoResize(false);
 			}
+			else
+			{
+				auto pClip = dynamic_cast<PatternClip*>(m_clip);
+
+				const int x = mapToParent(pos).x() - m_initialMousePos.x();
+
+				TimePos t = qMax(0, (int)
+								m_trackView->trackContainerView()->currentPosition() +
+								static_cast<int>(x * TimePos::ticksPerBar() / ppb ));
+
+				if (!isResizableBeforeStart())
+				{
+					t = std::max(t, static_cast<TimePos>(m_clip->startPosition() + m_clip->startTimeOffset()));
+				}
+
+				if(unquantizedModHeld(me))
+				{	// We want to preserve this adjusted offset,
+					// even if the user switches to snapping later
+					setInitialPos(m_initialMousePos);
+					//Don't resize to less than 1 tick
+					t = qMin<int>(m_initialClipEnd - 1, t);
+				}
+				else if(me->modifiers() & Qt::ShiftModifier)
+				{	// If shift is held, quantize clip's start position
+					// Don't let the start position move past the end position
+					TimePos max = m_initialClipEnd.quantize(snapSize);
+					if (max >= m_initialClipEnd) max -= snapLength;
+					t = qMin<int>(max, t.quantize(snapSize));
+				}
+				else
+				{	// Otherwise, resize in fixed increments
+					// Don't resize to less than 1 tick
+					TimePos initialLength = m_initialClipEnd - m_initialClipPos;
+					auto minLength = TimePos(initialLength % snapLength);
+					if (minLength < 1) minLength += snapLength;
+					TimePos offset = TimePos(t - m_initialClipPos).quantize(snapSize);
+					t = qMin<int>(m_initialClipEnd - minLength, m_initialClipPos + offset);
+				}
+
+				TimePos positionOffset = m_clip->startPosition() - t;
+				if (m_clip->length() + positionOffset >= 1)
+				{
+					m_clip->movePosition(t);
+					m_clip->changeLength(m_clip->length() + positionOffset);
+					if (pClip)
+					{
+						// Modulus the start time offset as we need it only for offsets
+						// inside the pattern length. This is done to prevent a value overflow.
+						// The start time offset may still become larger than the pattern length
+						// whenever the pattern length decreases without a clip resize following.
+						// To deal safely with it, always modulus before use.
+						tick_t patternLength = Engine::patternStore()->lengthOfPattern(pClip->patternIndex())
+								* TimePos::ticksPerBar();
+						TimePos position = (pClip->startTimeOffset() + positionOffset) % patternLength;
+						pClip->setStartTimeOffset(position);
+					}
+					else
+					{
+						m_clip->setStartTimeOffset(m_clip->startTimeOffset() + positionOffset);
+					}
+					m_clip->setAutoResize(false);
+				}
+			}
+			s_textFloat->setText(tr("%1:%2 (%3:%4 to %5:%6)").
+					arg(m_clip->length().getBar()).
+					arg(m_clip->length().getTicks() %
+						TimePos::ticksPerBar()).
+					arg(m_clip->startPosition().getBar() + 1).
+					arg(m_clip->startPosition().getTicks() %
+						TimePos::ticksPerBar() ).
+					arg(m_clip->endPosition().getBar() + 1).
+					arg(m_clip->endPosition().getTicks() %
+						TimePos::ticksPerBar()));
+			s_textFloat->moveGlobal(this, QPoint(width() + 2, height() + 2));
+			updatePosition();
 		}
-		s_textFloat->setText( tr( "%1:%2 (%3:%4 to %5:%6)" ).
-				arg( m_clip->length().getBar() ).
-				arg( m_clip->length().getTicks() %
-						TimePos::ticksPerBar() ).
-				arg( m_clip->startPosition().getBar() + 1 ).
-				arg( m_clip->startPosition().getTicks() %
-						TimePos::ticksPerBar() ).
-				arg( m_clip->endPosition().getBar() + 1 ).
-				arg( m_clip->endPosition().getTicks() %
-						TimePos::ticksPerBar() ) );
-		s_textFloat->moveGlobal( this, QPoint( width() + 2, height() + 2) );
-		updatePosition();
 	}
 	else if( m_action == Action::Split && m_offset == 0 )
 	{
