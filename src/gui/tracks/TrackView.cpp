@@ -39,6 +39,7 @@
 #include "DeprecationHelper.h"
 #include "Engine.h"
 #include "FadeButton.h"
+#include "PatternStore.h"
 #include "StringPairDrag.h"
 #include "Track.h"
 #include "TrackGrip.h"
@@ -95,6 +96,8 @@ TrackView::TrackView( Track * track, TrackContainerView * tcv ) :
 			this, SLOT(createClipView(lmms::Clip*)),
 			Qt::QueuedConnection );
 
+	connect(m_track, SIGNAL(visibilityChanged()), this, SLOT(visibilityChanged()));
+
 	connect( &m_track->m_mutedModel, SIGNAL(dataChanged()),
 			&m_trackContentWidget, SLOT(update()));
 
@@ -115,6 +118,7 @@ TrackView::TrackView( Track * track, TrackContainerView * tcv ) :
 	}
 
 	m_trackContainerView->addTrackView( this );
+	visibilityChanged();
 }
 
 
@@ -157,7 +161,7 @@ void TrackView::update()
 	{
 		m_trackContentWidget.changePosition();
 	}
-	QWidget::update();
+	visibilityChanged();
 }
 
 
@@ -435,11 +439,32 @@ void TrackView::createClipView( Clip * clip )
 
 
 
+void TrackView::setVisibleForThisPattern(bool hidden)
+{
+	m_track->setVisibilityForPattern(hidden, Engine::patternStore()->currentPattern());
+}
+void TrackView::hideIfEmpty()
+{
+	m_track->hideForPatternIfEmpty(Engine::patternStore()->currentPattern());
+}
+
+
 
 void TrackView::muteChanged()
 {
 	FadeButton * indicator = getActivityIndicator();
 	if (indicator) { setIndicatorMute(indicator, m_track->m_mutedModel.value()); }
+}
+
+
+void TrackView::visibilityChanged()
+{
+	PatternStore* ps = Engine::patternStore();
+	if (m_track->trackContainer() == ps)
+	{
+		setVisible(!m_track->hiddenForPattern(ps->currentPattern()));
+	}
+	QWidget::update();
 }
 
 

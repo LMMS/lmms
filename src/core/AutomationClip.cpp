@@ -791,6 +791,7 @@ void AutomationClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "name", name() );
 	_this.setAttribute( "prog", QString::number( static_cast<int>(progressionType()) ) );
 	_this.setAttribute( "tens", QString::number( getTension() ) );
+	_this.setAttribute( "hidden", QString::number( isHidden() ) );
 	_this.setAttribute( "mute", QString::number( isMuted() ) );
 	_this.setAttribute("off", startTimeOffset());
 	_this.setAttribute("autoresize", QString::number(getAutoResize()));
@@ -843,6 +844,7 @@ void AutomationClip::loadSettings( const QDomElement & _this )
 	setProgressionType( static_cast<ProgressionType>( _this.attribute(
 							"prog" ).toInt() ) );
 	setTension( _this.attribute( "tens" ) );
+	setHidden(_this.attribute( "hidden", QString::number( false ) ).toInt() );
 	setMuted(_this.attribute( "mute", QString::number( false ) ).toInt() );
 	setAutoResize(_this.attribute("autoresize", "1").toInt());
 	setStartTimeOffset(_this.attribute("off").toInt());

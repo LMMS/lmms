@@ -55,6 +55,8 @@ Clip::Clip( Track * track ) :
 	if( getTrack() )
 	{
 		getTrack()->addClip( this );
+		connect(&m_hiddenModel, SIGNAL(dataChanged()),
+				getTrack(), SIGNAL(visibilityChanged()));
 	}
 	setJournalling( false );
 	movePosition( 0 );
@@ -84,6 +86,8 @@ Clip::Clip(const Clip& other):
 	if (getTrack())
 	{
 		getTrack()->addClip(this);
+		connect(&m_hiddenModel, SIGNAL(dataChanged()),
+				getTrack(), SIGNAL(visibilityChanged()));
 	}
 }
 
