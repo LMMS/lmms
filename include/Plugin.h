@@ -272,10 +272,6 @@ public:
 	//! loaded/processed with the help of this plugin
 	virtual void loadFile( const QString & file );
 
-	//! Called if external source needs to change something but we cannot
-	//! reference the class header.  Should return null if not key not found.
-	virtual AutomatableModel* childModel( const QString & modelName );
-
 	//! Overload if the argument passed to the plugin is a subPluginKey
 	//! If you can not pass the key and are aware that it's stored in
 	//! Engine::pickDndPluginKey(), use this function, too
