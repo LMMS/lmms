@@ -46,26 +46,30 @@ void Editor::setPauseIcon(bool displayPauseIcon)
 		m_playAction->setIcon(embed::getIconPixmap("play"));
 }
 
-DropToolBar * Editor::addDropToolBarToTop(QString const & windowTitle)
+DropToolBar* Editor::addDropToolBarToTop(QString const & windowTitle)
 {
-	return addDropToolBar(Qt::TopToolBarArea, windowTitle);
+    DropToolBar* tb = addDropToolBar(Qt::TopToolBarArea, windowTitle);
+    m_allToolBars.append(tb);
+    return tb;
 }
 
-DropToolBar * Editor::addDropToolBar(Qt::ToolBarArea whereToAdd, QString const & windowTitle)
+DropToolBar* Editor::addDropToolBar(Qt::ToolBarArea whereToAdd, QString const & windowTitle)
 {
-	return addDropToolBar(this, whereToAdd, windowTitle);
+    return addDropToolBar(this, whereToAdd, windowTitle);
 }
 
-DropToolBar * Editor::addDropToolBar(QWidget * parent, Qt::ToolBarArea whereToAdd, QString const & windowTitle)
+DropToolBar* Editor::addDropToolBar(QWidget * parent, Qt::ToolBarArea whereToAdd, QString const & windowTitle)
 {
-	auto toolBar = new DropToolBar(parent);
-	addToolBar(whereToAdd, toolBar);
-	toolBar->setMovable(false);
-	toolBar->setFloatable(false);
-	toolBar->setContextMenuPolicy(Qt::PreventContextMenu);
-	toolBar->setWindowTitle(windowTitle);
+    auto toolBar = new DropToolBar(parent);
+    addToolBar(whereToAdd, toolBar);
 
-	return toolBar;
+    toolBar->setMovable(false);
+    toolBar->setFloatable(false);
+    toolBar->setContextMenuPolicy(Qt::PreventContextMenu);
+    toolBar->setWindowTitle(windowTitle);
+
+    m_allToolBars.append(toolBar);
+    return toolBar;
 }
 
 void Editor::togglePlayStop()

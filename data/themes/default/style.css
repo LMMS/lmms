@@ -611,9 +611,9 @@ QWidget#mainToolbar {
 /* smaller toolbars */
 
 QToolBar {
-	background: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1, stop:0 #434b57, stop:1 #22252c);
+	background: none; /* qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1, stop:0 #434b57, stop:1 #22252c); */
 	border: none;
-	padding: 2px;
+	padding: 0px;
 	spacing: 0;
 }
 
@@ -624,13 +624,42 @@ QToolBar::separator {
 
 /* all tool buttons */
 
-QToolButton, QToolButton::menu-button {
+lmms--gui--DropToolBar QToolButton {
 	margin: 1px;
+
+    font-size: 5px;
+    color: #fff;
+
+    icon-size: 16px;
+
+    min-width: 16px;
+    min-height: 16px;
+
+    max-width: 16px;
+    max-height: 16px;
+
+    width: 16px;
+    height: 16px;
+}
+
+QWidget#mainToolbar QToolButton,
+QWidget#mainToolbar QToolButton::menu-button {
+    margin: 1px;
+    padding: 2px;
+    border-top: 1px solid #778394;
+    border-bottom: 1px solid #1e2226;
+    border-radius: 2px;
+    background: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1, stop:0 #636c7a, stop:1 #343840);
+    font-size: 10px;
+    color: #fff;
+}
+
+
+QToolButton, QToolButton::menu-button {
+	margin: 2px;
 	padding: 2px 2px 2px 2px;
-	border-top: 1px solid #778394;
-	border-bottom: 1px solid #1e2226;
 	border-radius: 2px;
-	background: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1 stop:0 #636c7a, stop:1 #343840);
+	background: none;
 	font-size:10px;
 	color: #fff;
 }

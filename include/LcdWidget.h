@@ -42,10 +42,10 @@ class LMMS_EXPORT LcdWidget : public QWidget
 	Q_PROPERTY( QColor textShadowColor READ textShadowColor WRITE setTextShadowColor )
 	
 public:
-	explicit LcdWidget(QWidget* parent, const QString& name = QString(), bool leadingZero = false);
-	LcdWidget(int numDigits, QWidget* parent, const QString& name = QString(), bool leadingZero = false);
+	explicit LcdWidget(QWidget* parent, const QString& name = QString(), bool leadingZero = true);
+	LcdWidget(int numDigits, QWidget* parent, const QString& name = QString(), bool leadingZero = true);
 	LcdWidget(int numDigits, const QString& style, QWidget* parent, const QString& name = QString(),
-		bool leadingZero = false);
+		bool leadingZero = true);
 
 	void setValue(int value);
 	void setValue(float value);

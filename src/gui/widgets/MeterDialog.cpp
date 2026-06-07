@@ -40,9 +40,9 @@ MeterDialog::MeterDialog( QWidget * _parent, bool _simple ) :
 	QWidget( _parent ),
 	ModelView( nullptr, this )
 {
-	auto vlayout = new QVBoxLayout(this);
-	vlayout->setSpacing( 0 );
-	vlayout->setContentsMargins(0, 0, 0, 0);
+	auto hlayout = new QHBoxLayout(this);
+	hlayout->setSpacing( 0 );
+	hlayout->setContentsMargins(0, 0, 0, 0);
 
 	auto num = new QWidget(this);
 	auto num_layout = new QHBoxLayout(num);
@@ -73,7 +73,10 @@ MeterDialog::MeterDialog( QWidget * _parent, bool _simple ) :
 	m_denominator->setToolTip(tr("Meter denominator"));
 	if( _simple )
 	{
-		m_denominator->setLabel( tr( "TIME SIG" ) );
+		const auto label = tr( "TIME" );
+		const auto label2 = tr( "SIG" );
+		m_numerator->setLabel( label );
+		m_denominator->setLabel( label2 );
 	}
 
 	den_layout->addWidget( m_denominator );
@@ -87,12 +90,11 @@ MeterDialog::MeterDialog( QWidget * _parent, bool _simple ) :
 	}
 	den_layout->addStretch();
 
-
-	vlayout->addSpacing( _simple ? 1 : 3 );
-	vlayout->addWidget( num );
-	vlayout->addSpacing( 2 );
-	vlayout->addWidget( den );
-	vlayout->addStretch();
+	hlayout->addSpacing( _simple ? 1 : 3 );
+	hlayout->addWidget( num );
+	hlayout->addSpacing( 2 );
+	hlayout->addWidget( den );
+	hlayout->addStretch();
 }
 
 

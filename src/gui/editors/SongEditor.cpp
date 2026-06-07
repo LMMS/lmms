@@ -139,17 +139,17 @@ SongEditor::SongEditor( Song * song ) :
 	m_tempoSpinBox->setLabel( tr( "TEMPO" ) );
 	m_tempoSpinBox->setToolTip(tr("Tempo in BPM"));
 
-	int tempoSpinBoxCol = getGUI()->mainWindow()->addWidgetToToolBar( m_tempoSpinBox, 0 );
+	getGUI()->mainWindow()->addWidgetToCenterBar( m_tempoSpinBox);
 
-	getGUI()->mainWindow()->addWidgetToToolBar( new TimeDisplayWidget, 1, tempoSpinBoxCol );
+	getGUI()->mainWindow()->addWidgetToCenterBar( new TimeDisplayWidget);
 
-	getGUI()->mainWindow()->addSpacingToToolBar( 10 );
+	getGUI()->mainWindow()->addSpacingToCenterBar( 10 );
 
 	m_timeSigDisplay = new MeterDialog( this, true );
 	m_timeSigDisplay->setModel( &m_song->m_timeSigModel );
-	getGUI()->mainWindow()->addWidgetToToolBar( m_timeSigDisplay );
+	getGUI()->mainWindow()->addWidgetToCenterBar( m_timeSigDisplay );
 
-	getGUI()->mainWindow()->addSpacingToToolBar( 10 );
+	getGUI()->mainWindow()->addSpacingToCenterBar( 10 );
 
 	auto master_vol_lbl = new QLabel(tb);
 	master_vol_lbl->setPixmap( embed::getIconPixmap( "master_volume" ) );
@@ -177,11 +177,11 @@ SongEditor::SongEditor( Song * song ) :
 	m_mvsStatus->setTitle(tr("Master volume"));
 	m_mvsStatus->setPixmap(embed::getIconPixmap("master_volume"));
 
-	getGUI()->mainWindow()->addWidgetToToolBar( master_vol_lbl );
-	getGUI()->mainWindow()->addWidgetToToolBar( m_masterVolumeSlider );
+	getGUI()->mainWindow()->addWidgetToCenterBar( master_vol_lbl );
+	getGUI()->mainWindow()->addWidgetToCenterBar( m_masterVolumeSlider );
 
 
-	getGUI()->mainWindow()->addSpacingToToolBar( 10 );
+	getGUI()->mainWindow()->addSpacingToCenterBar( 10 );
 
 	auto master_pitch_lbl = new QLabel(tb);
 	master_pitch_lbl->setPixmap( embed::getIconPixmap( "master_pitch" ) );
@@ -208,10 +208,10 @@ SongEditor::SongEditor( Song * song ) :
 	m_mpsStatus->setTitle( tr( "Global transposition" ) );
 	m_mpsStatus->setPixmap( embed::getIconPixmap( "master_pitch" ) );
 
-	getGUI()->mainWindow()->addWidgetToToolBar( master_pitch_lbl );
-	getGUI()->mainWindow()->addWidgetToToolBar( m_masterPitchSlider );
+	getGUI()->mainWindow()->addWidgetToCenterBar( master_pitch_lbl );
+	getGUI()->mainWindow()->addWidgetToCenterBar( m_masterPitchSlider );
 
-	getGUI()->mainWindow()->addSpacingToToolBar( 10 );
+	getGUI()->mainWindow()->addSpacingToCenterBar( 10 );
 
 	// create widget for oscilloscope- and cpu-load-widget
 	auto vc_w = new QWidget(tb);
@@ -225,7 +225,7 @@ SongEditor::SongEditor( Song * song ) :
 	vcw_layout->addWidget( new CPULoadWidget( vc_w ) );
 	vcw_layout->addStretch();
 
-	getGUI()->mainWindow()->addWidgetToToolBar( vc_w );
+	getGUI()->mainWindow()->addWidgetToCenterBar( vc_w );
 
 	static_cast<QVBoxLayout *>( layout() )->insertWidget( 0, m_timeLine );
 
@@ -987,24 +987,24 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	connect(m_insertBarAction, SIGNAL(triggered()), song, SLOT(insertBar()));
 	connect(m_removeBarAction, SIGNAL(triggered()), song, SLOT(removeBar()));
 
-	DropToolBar *zoomToolBar = addDropToolBarToTop(tr("Zoom controls"));
+	// DropToolBar *zoomToolBar = addDropToolBarToTop(tr("Zoom controls"));
 
-	auto zoom_lbl = new QLabel(m_toolBar);
-	zoom_lbl->setPixmap( embed::getIconPixmap( "zoom" ) );
+	// auto zoom_lbl = new QLabel(m_toolBar);
+	// zoom_lbl->setPixmap( embed::getIconPixmap( "zoom" ) );
 
-	// Set slider zoom
-	m_zoomingSlider = new AutomatableSlider(m_toolBar, tr("Zoom"));
-	m_zoomingSlider->setModel(m_editor->m_zoomingModel);
-	m_zoomingSlider->setOrientation(Qt::Horizontal);
-	m_zoomingSlider->setPageStep(1);
-	m_zoomingSlider->setFocusPolicy(Qt::NoFocus);
-	m_zoomingSlider->setFixedSize(100, 26);
-	m_zoomingSlider->setToolTip(tr("Zoom"));
-	m_zoomingSlider->setContextMenuPolicy(Qt::NoContextMenu);
-	connect(m_editor->m_zoomingModel, SIGNAL(dataChanged()), this, SLOT(updateSnapLabel()));
+	// // Set slider zoom
+	// m_zoomingSlider = new AutomatableSlider(m_toolBar, tr("Zoom"));
+	// m_zoomingSlider->setModel(m_editor->m_zoomingModel);
+	// m_zoomingSlider->setOrientation(Qt::Horizontal);
+	// m_zoomingSlider->setPageStep(1);
+	// m_zoomingSlider->setFocusPolicy(Qt::NoFocus);
+	// m_zoomingSlider->setFixedSize(100, 26);
+	// m_zoomingSlider->setToolTip(tr("Zoom"));
+	// m_zoomingSlider->setContextMenuPolicy(Qt::NoContextMenu);
+	// connect(m_editor->m_zoomingModel, SIGNAL(dataChanged()), this, SLOT(updateSnapLabel()));
 
-	zoomToolBar->addWidget( zoom_lbl );
-	zoomToolBar->addWidget(m_zoomingSlider);
+	// zoomToolBar->addWidget( zoom_lbl );
+	// zoomToolBar->addWidget(m_zoomingSlider);
 
 	DropToolBar *snapToolBar = addDropToolBarToTop(tr("Snap controls"));
 	auto snap_lbl = new QLabel(m_toolBar);

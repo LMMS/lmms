@@ -78,7 +78,7 @@ TrackView::TrackView( Track * track, TrackContainerView * tcv ) :
 	auto layout = new QHBoxLayout(this);
 	layout->setContentsMargins(0, 0, 0, 0);
 	layout->setSpacing( 0 );
-	layout->addWidget( &m_trackOperationsWidget );
+	layout->addWidget( &m_trackOperationsWidget ); // here
 	layout->addWidget( &m_trackSettingsWidget );
 	layout->addWidget( &m_trackContentWidget, 1 );
 	setFixedHeight( m_track->getHeight() );

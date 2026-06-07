@@ -81,6 +81,13 @@ void Knob::initUi( const QString & _name )
 	setInnerRadius( 1.0f );
 	setOuterRadius( 10.0f );
 
+	if (property("outerColor").isValid()) {
+        m_lineActiveColor = m_outerColor;
+        m_arcActiveColor  = m_outerColor;
+        m_arcActiveColor.setAlpha(70);
+        return;
+    }
+
 	// This is a workaround to enable style sheets for knobs which are not styled knobs.
 	//
 	// It works as follows: the palette colors that are assigned as the line color previously
@@ -326,9 +333,13 @@ QColor Knob::outerColor() const
 
 
 
-void Knob::setOuterColor( const QColor & c )
+void Knob::setOuterColor( const QColor &c )
 {
-	m_outerColor = c;
+    if (m_outerColor == c)
+        return;
+
+    m_outerColor = c;
+    update();
 }
 
 
@@ -340,9 +351,13 @@ QColor Knob::textColor() const
 
 
 
-void Knob::setTextColor( const QColor & c )
+void Knob::setTextColor( const QColor &c )
 {
-	m_textColor = c;
+    if (m_textColor == c)
+        return;
+
+    m_textColor = c;
+    update();
 }
 
 
@@ -380,8 +395,16 @@ bool Knob::updateAngle()
 void Knob::drawKnob( QPainter * _p )
 {
 	bool enabled = this->isEnabled();
-	QColor currentArcColor = enabled ? m_arcActiveColor : m_arcInactiveColor;
-	QColor currentLineColor = enabled ? m_lineActiveColor : m_lineInactiveColor;
+	QColor currentArcColor;
+	QColor currentLineColor;
+
+	if (m_outerColor.isValid()) {
+		currentArcColor  = m_outerColor;
+		currentLineColor = m_outerColor;
+	} else {
+		currentArcColor  = enabled ? m_arcActiveColor  : m_arcInactiveColor;
+		currentLineColor = enabled ? m_lineActiveColor : m_lineInactiveColor;
+	}
 
 	if( updateAngle() == false && !m_cache.isNull() )
 	{

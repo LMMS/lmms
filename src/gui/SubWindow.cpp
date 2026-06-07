@@ -1,30 +1,30 @@
 /*
- * SubWindow.cpp - Implementation of QMdiSubWindow that correctly tracks
- *   the geometry that windows should be restored to.
- *   Workaround for https://bugreports.qt.io/browse/QTBUG-256
- *   This implementation adds a custom themed title bar to
- *   the subwindow.
- *
- * Copyright (c) 2015 Colin Wallace <wallace.colin.a@gmail.com>
- * Copyright (c) 2016 Steffen Baranowsky <baramgb@freenet.de>
- * This file is part of LMMS - https://lmms.io
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
- *
- * You should have received a copy of the GNU General Public
- * License along with this program (see COPYING); if not, write to the
- * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
- * Boston, MA 02110-1301 USA.
- *
- */
+* SubWindow.cpp - Implementation of QMdiSubWindow that correctly tracks
+*   the geometry that windows should be restored to.
+*   Workaround for https://bugreports.qt.io/browse/QTBUG-256
+*   This implementation adds a custom themed title bar to
+*   the subwindow.
+*
+* Copyright (c) 2015 Colin Wallace <wallace.colin.a@gmail.com>
+* Copyright (c) 2016 Steffen Baranowsky <baramgb@freenet.de>
+* This file is part of LMMS - https://lmms.io
+*
+* This program is free software; you can redistribute it and/or
+* modify it under the terms of the GNU General Public
+* License as published by the Free Software Foundation; either
+* version 2 of the License, or (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+* General Public License for more details.
+*
+* You should have received a copy of the GNU General Public
+* License along with this program (see COPYING); if not, write to the
+* Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+* Boston, MA 02110-1301 USA.
+*
+*/
 
 #include "SubWindow.h"
 
@@ -42,12 +42,91 @@
 #include <QStyleOption>
 #include <QStyleOptionTitleBar>
 #include <QWindow>
+#include <QMenu>
+#include <QAction>
+#include "Editor.h"
 
 #include "ConfigManager.h"
 #include "embed.h"
 
+
 namespace lmms::gui
 {
+
+
+
+
+void splitRequested(Qt::ArrowType direction)
+{
+	// This signal is emitted when the user right clicks the maximize button and chooses a split direction.
+}
+
+
+
+
+
+void SubWindow::showSplitMenu(const QPoint &pos)
+{
+    QMenu menu;
+
+    QAction *splitUp    = menu.addAction("Split up");
+    QAction *splitDown  = menu.addAction("Split down");
+    QAction *splitLeft  = menu.addAction("Split left");
+    QAction *splitRight = menu.addAction("Split right");
+
+    QAction *chosen = menu.exec(m_maximizeBtn->mapToGlobal(pos));
+    if (!chosen)
+        return;
+
+    if (chosen == splitUp) {
+        emit splitRequested(Qt::UpArrow);
+    } else if (chosen == splitDown) {
+        emit splitRequested(Qt::DownArrow);
+    } else if (chosen == splitLeft) {
+        emit splitRequested(Qt::LeftArrow);
+    } else if (chosen == splitRight) {
+        emit splitRequested(Qt::RightArrow);
+    }
+}
+
+
+
+
+void SubWindow::showMaximized()
+{
+    auto area = mdiArea();
+    if (!area)
+        return;
+
+    m_trackedNormalGeom = geometry();
+
+    m_isFakeMaximized = true;
+
+    QRect full = area->rect();
+    full.adjust(0, 0, -1, -1);
+
+    setGeometry(full);
+
+    adjustTitleBar();
+}
+    // Mark as "fake maximized"
+    // setWindowState(Qt::WindowMaximized);
+// }
+
+
+
+
+void SubWindow::showNormal()
+{
+    setGeometry(m_trackedNormalGeom);
+    m_isFakeMaximized = false;
+    adjustTitleBar();
+}
+    // setWindowState(Qt::WindowNoState);
+// }
+
+
+
 
 
 SubWindow::SubWindow(QWidget* parent, Qt::WindowFlags windowFlags)
@@ -80,10 +159,21 @@ SubWindow::SubWindow(QWidget* parent, Qt::WindowFlags windowFlags)
 	connect(m_closeBtn, &QPushButton::clicked, this, &QWidget::close);
 
 	m_maximizeBtn = createButton("maximize", tr("Maximize"));
-	connect(m_maximizeBtn, &QPushButton::clicked, this, &QWidget::showMaximized);
+	setWindowFlags((this->windowFlags()) & ~Qt::WindowMaximizeButtonHint);
+	connect(m_maximizeBtn, &QPushButton::clicked, this, &SubWindow::showMaximized);
 
 	m_restoreBtn = createButton("restore", tr("Restore"));
-	connect(m_restoreBtn, &QPushButton::clicked, this, &QWidget::showNormal);
+	connect(m_restoreBtn, &QPushButton::clicked, this, &SubWindow::showNormal);
+	// right click on the restore button should show the split menu
+	m_restoreBtn->setContextMenuPolicy(Qt::CustomContextMenu);
+	connect(
+		m_restoreBtn,
+		&QWidget::customContextMenuRequested,
+		this,
+		[this](const QPoint &pos) {
+			showSplitMenu(pos);
+		}
+	);
 
 	m_detachBtn = createButton("detach", tr("Detach"));
 	connect(m_detachBtn, &QPushButton::clicked, this, &SubWindow::detach);
@@ -93,7 +183,7 @@ SubWindow::SubWindow(QWidget* parent, Qt::WindowFlags windowFlags)
 	m_shadow->setColor( m_textShadowColor );
 	m_shadow->setXOffset( 1 );
 	m_shadow->setYOffset( 1 );
-
+	
 	m_windowTitle = new QLabel( this );
 	m_windowTitle->setFocusPolicy( Qt::NoFocus );
 	m_windowTitle->setAttribute( Qt::WA_TransparentForMouseEvents, true );
@@ -120,7 +210,7 @@ void SubWindow::paintEvent( QPaintEvent * )
 {
 	// Don't paint any of the other stuff if the sub window is maximized
 	// so that only its child content is painted.
-	if (isMaximized()) { return; }
+	// if (isMaximized()) { return; }
 
 	QPainter p( this );
 	QRect rect( 0, 0, width(), m_titleBarHeight );
@@ -128,9 +218,12 @@ void SubWindow::paintEvent( QPaintEvent * )
 	const bool isActive = windowState() & Qt::WindowActive;
 
 	p.fillRect( rect, isActive ? activeColor() : p.pen().brush() );
-
+	
 	// window border
 	p.setPen( borderColor() );
+
+	// top line
+	p.drawLine(0, 0, width(), 0);
 
 	// bottom, left, and right lines
 	p.drawLine( 0, height() - 1, width(), height() - 1 );
@@ -338,6 +431,9 @@ void SubWindow::detach()
 	widget()->move(pos);
 }
 
+
+
+
 void SubWindow::attach()
 {
 	if (!isDetached()) { return; }
@@ -385,10 +481,11 @@ void SubWindow::attach()
 
 
 
+
 int SubWindow::titleBarHeight() const
 {
 	QStyleOptionTitleBar so;
-	so.titleBarState = Qt::WindowActive; // kThemeStateActiv
+	so.titleBarState = Qt::WindowActive; // kThemeStateActive
 	so.titleBarFlags = Qt::Window;
 	return style()->pixelMetric(QStyle::PM_TitleBarHeight, &so, this);
 }
@@ -424,6 +521,254 @@ void SubWindow::updateTitleBar()
 }
 
 
+
+
+QList<SubWindow*> SubWindow::otherWindows() const
+{
+    QList<SubWindow*> list;
+    for (auto *w : mdiArea()->subWindowList())
+    {
+        if (w != this)
+            list.append(static_cast<SubWindow*>(w));
+    }
+    return list;
+}
+
+SubWindow* SubWindow::windowAt(const QPoint &pos) const
+{
+    for (auto *w : mdiArea()->subWindowList())
+    {
+        if (w != this && w->geometry().contains(pos))
+            return static_cast<SubWindow*>(w);
+    }
+    return nullptr;
+}
+
+
+
+
+QRect SubWindow::computeSnapTarget(const QPoint &globalPos)
+{
+    auto *area = mdiArea();
+    if (!area)
+        return {};
+
+    QRect areaRect = area->rect();
+    const int snap = 20;
+
+    int w = areaRect.width();
+    int h = areaRect.height();
+
+    bool left   = globalPos.x() <= snap;
+    bool right  = globalPos.x() >= w - snap;
+    bool top    = globalPos.y() <= snap;
+    bool bottom = globalPos.y() >= h - snap;
+
+    QRect leftZone(0, 0, w/2, h);
+    QRect rightZone(w/2, 0, w/2, h);
+    QRect topZone(0, 0, w, h/2);
+    QRect bottomZone(0, h/2, w, h/2);
+
+    if (left && top)    return QRect(0, 0, w/2, h/2);
+    if (right && top)   return QRect(w/2, 0, w/2, h/2);
+    if (left && bottom) return QRect(0, h/2, w/2, h/2);
+    if (right && bottom)return QRect(w/2, h/2, w/2, h/2);
+
+    QRect target;
+    if (left)  target = leftZone;
+    if (right) target = rightZone;
+    if (top)   target = topZone;
+    if (bottom)target = bottomZone;
+
+    if (target.isNull())
+        return {};
+
+    SubWindow *other = windowAt(globalPos);
+    if (!other)
+        return target;
+
+    QRect g = other->geometry();
+
+    bool otherLeft   = g.left() == 0;
+    bool otherRight  = g.right() == w - 1;
+    bool otherTop    = g.top() == 0;
+    bool otherBottom = g.bottom() == h - 1;
+
+	// double click to enlarge?
+	// bug with movement still
+	// if (otherTop || otherBottom)
+	// {
+	// 	int midX = g.left() + g.width() / 2;
+
+	// 	QRect leftRect(g.left(), g.top(), g.width(), g.height() / 2);
+	// 	QRect rightRect(g.left(), g.top() + g.height() / 2,
+	// 					g.width(), g.height() - g.height() / 2);
+
+	// 	if (globalPos.x() < midX)
+	// 	{
+	// 		m_pendingOther = other;
+	// 		m_pendingOtherRect = rightRect;
+	// 		return leftRect;
+	// 	}
+	// 	else
+	// 	{
+	// 		m_pendingOther = other;
+	// 		m_pendingOtherRect = leftRect;
+	// 		return rightRect;
+	// 	}
+	// }
+
+	// if (otherLeft || otherRight)
+	// {
+	// 	int midY = g.top() + g.height() / 2;
+
+	// 	QRect topRect(g.left(), g.top(), g.width() / 2, g.height());
+	// 	QRect bottomRect(g.left() + g.width() / 2, g.top(),
+	// 					g.width() - g.width() / 2, g.height());
+
+	// 	if (globalPos.y() < midY)
+	// 	{
+	// 		m_pendingOther = other;
+	// 		m_pendingOtherRect = bottomRect;
+	// 		return topRect;
+	// 	}
+	// 	else
+	// 	{
+	// 		m_pendingOther = other;
+	// 		m_pendingOtherRect = topRect;
+	// 		return bottomRect;
+	// 	}
+	// }
+
+    return target;
+}
+
+
+
+
+
+
+// to stop movement of the titlebar
+// bool SubWindow::isInTitleBar(const QPoint &pos) const
+// {
+//     QWidget *child = childAt(pos);
+
+//     if (child == m_closeBtn ||
+//         child == m_maximizeBtn ||
+//         child == m_restoreBtn ||
+//         child == m_detachBtn)
+//     {
+//         return false;
+//     }
+
+//     if (child == m_windowTitle)
+//         return false;
+
+//     return pos.y() < m_titleBarHeight;
+// }
+
+
+
+
+bool SubWindow::event(QEvent *event)
+{
+    if (m_isFakeMaximized)
+    {
+        if (event->type() == QEvent::ContextMenu)
+        {
+            event->accept();
+            return true;
+        }
+    }
+
+    return QMdiSubWindow::event(event);
+}
+
+
+
+
+void SubWindow::mousePressEvent(QMouseEvent *event)
+{
+    if (m_isFakeMaximized) // && isInTitleBar(event->pos()))
+    {
+        m_blockNextMove = true;
+        m_snapTarget = {};
+		event->accept();
+        return;
+    }
+
+    m_blockNextMove = false;
+	m_snapTarget = {};
+
+    QMdiSubWindow::mousePressEvent(event);
+}
+
+
+
+
+void SubWindow::mouseMoveEvent(QMouseEvent *event)
+{
+    if (m_blockNextMove)
+    {
+        event->accept();
+        return;
+    }
+
+    auto *area = mdiArea();
+    if (area)
+    {
+        // Convert mouse position to MDI-area coordinates
+        QPoint areaPos = area->mapFromGlobal(mapToGlobal(event->pos()));
+		m_snapTarget = computeSnapTarget(areaPos);
+    }
+
+    // Let the window move normally
+    QMdiSubWindow::mouseMoveEvent(event);
+}
+
+
+
+
+void SubWindow::mouseReleaseEvent(QMouseEvent *event)
+{
+	m_blockNextMove = false;
+
+    if (!m_snapTarget.isNull())
+    {
+        // Apply snap to this window
+        setGeometry(m_snapTarget);
+
+        // Apply paired snap to the other window
+        if (m_pendingOther)
+            m_pendingOther->setGeometry(m_pendingOtherRect);
+
+        // Clear pending state
+        m_pendingOther = nullptr;
+        m_pendingOtherRect = QRect();
+        m_snapTarget = QRect();
+    }
+
+    QMdiSubWindow::mouseReleaseEvent(event);
+}
+
+
+
+
+
+void SubWindow::mouseDoubleClickEvent(QMouseEvent *event)
+{
+    if (m_blockNextMove)
+    {
+        event->accept();
+        return;
+    }
+
+    QMdiSubWindow::mouseDoubleClickEvent(event);
+}
+
+
+
+
 /**
  * @brief SubWindow::moveEvent
  * 
@@ -433,14 +778,14 @@ void SubWindow::updateTitleBar()
  *  save the right position. look at: https://bugreports.qt.io/browse/QTBUG-256
  * @param event
  */
-void SubWindow::moveEvent( QMoveEvent * event )
+void SubWindow::moveEvent(QMoveEvent *event)
 {
-	QMdiSubWindow::moveEvent( event );
-	// if the window was moved and ISN'T minimized/maximized/fullscreen,
-	// then save the current position
-	if( !isMaximized() && !isMinimized() && !isFullScreen() )
+    // Normal behavior
+    QMdiSubWindow::moveEvent(event);
+
+	if (!m_isFakeMaximized && !isMinimized() && !isFullScreen())
 	{
-		m_trackedNormalGeom.moveTopLeft( event->pos() );
+		m_trackedNormalGeom.moveTopLeft(event->pos());
 	}
 }
 
@@ -459,15 +804,13 @@ void SubWindow::adjustTitleBar()
 {
 	// Don't show the title or any button if the sub window is maximized. Otherwise they
 	// might show up behind the actual maximized content of the child widget.
-	if (isMaximized())
-	{
-		m_closeBtn->hide();
-		m_maximizeBtn->hide();
-		m_restoreBtn->hide();
-		m_windowTitle->hide();
-
-		return;
-	}
+	// if (isMaximized())
+	// {
+		// m_closeBtn->hide();
+		// m_maximizeBtn->hide();
+		// m_restoreBtn->hide();
+		// m_windowTitle->hide();
+	// }
 
 	// The sub window is not maximized, i.e. the title must be shown
 	// as well as some buttons.
@@ -499,17 +842,27 @@ void SubWindow::adjustTitleBar()
 
 	// here we ask: is the Subwindow maximizable and
 	// then we set the buttons and show them if needed
-	if( windowFlags() & Qt::WindowMaximizeButtonHint )
-	{
-		buttonBarWidth = buttonBarWidth + m_buttonSize.width() + buttonGap;
+	// if( windowFlags() & Qt::WindowMaximizeButtonHint )
+	// {
+		// Always show maximize/restore support (custom maximize)
+		buttonBarWidth += m_buttonSize.width() + buttonGap;
+
 		m_maximizeBtn->move(buttonPos);
 		m_restoreBtn->move(buttonPos);
-		if (!isMaximized())
+
+		if (m_isFakeMaximized)
+		{
+			m_maximizeBtn->hide();
+			m_restoreBtn->show();
+		}
+		else
 		{
 			m_maximizeBtn->show();
-			buttonPos -= buttonStep;
+			m_restoreBtn->hide();
 		}
-	}
+
+		buttonPos -= buttonStep;
+	//}
 
 	// we're keeping the restore button around if we open projects
 	// from older versions that have saved minimized windows
@@ -529,7 +882,13 @@ void SubWindow::adjustTitleBar()
 	if( widget() )
 	{
 		// title QLabel adjustments
-		m_windowTitle->setAlignment( Qt::AlignHCenter );
+		m_windowTitle->setAlignment( Qt::AlignLeft );
+
+		// make title bold
+		QFont f = m_windowTitle->font();
+    	f.setBold(true);
+    	m_windowTitle->setFont(f);
+
 		m_windowTitle->setFixedWidth( widget()->width() - ( menuButtonSpace + buttonBarWidth ) );
 		m_windowTitle->move( menuButtonSpace,
 			( m_titleBarHeight / 2 ) - ( m_windowTitle->sizeHint().height() / 2 ) - 1 );
@@ -545,6 +904,37 @@ void SubWindow::adjustTitleBar()
 		elideText( m_windowTitle, widget()->windowTitle() );
 		m_windowTitle->setTextInteractionFlags( Qt::NoTextInteraction );
 		m_windowTitle->adjustSize();
+	}
+
+	QSet<QToolBar*> seen;
+	auto *editor = qobject_cast<Editor*>(widget());
+	if (editor)
+	{
+		QFontMetrics fm(m_windowTitle->font());
+		int titleWidth = fm.horizontalAdvance(widget()->windowTitle());
+
+		int iconWidth = m_buttonSize.width(); // LMMS uses button size for icon size
+		int iconPadding = 6; // LMMS draws icon at (3,3)
+
+		int x = iconPadding + iconWidth + 8 + titleWidth + 10;
+		int y = (m_titleBarHeight - 24) / 2;
+
+		for (auto *bar : editor->allToolBars())
+		{
+			if (seen.contains(bar))
+				continue;
+
+			seen.insert(bar);
+
+			bar->setParent(this);
+			bar->raise();
+			bar->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
+			bar->adjustSize();
+			bar->move(x, y);
+			bar->show();
+
+			x += bar->width() + 10;
+		}
 	}
 }
 
@@ -590,7 +980,7 @@ void SubWindow::resizeEvent( QResizeEvent * event )
 
 	// if the window was resized and ISN'T minimized/maximized/fullscreen,
 	// then save the current size
-	if( !isMaximized() && !isMinimized() && !isFullScreen() )
+	if( !m_isFakeMaximized && !isMinimized() && !isFullScreen() )
 	{
 		m_trackedNormalGeom.setSize( event->size() );
 	}

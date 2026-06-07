@@ -3605,7 +3605,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			x < width() + m_currentPosition * zoomFactor / timeSignature;
 			x += m_ppb, ++barCount)
 		{
-			if ((barCount + leftBars) % 2 != 0)
+			if ((barCount + leftBars) % 1 != 0)
 			{
 				p.fillRect(x - m_currentPosition * zoomFactor / timeSignature,
 					PR_TOP_MARGIN,
@@ -4169,19 +4169,33 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 		q = qBound( 0, q, m_quantizeModel.size() - 1 );
 		m_quantizeModel.setValue( q );
 	}
+	// else if( we->modifiers() & Qt::ControlModifier && we->modifiers() & Qt::ShiftModifier )
+	// {
+	// 	int l = m_noteLenModel.value();
+	// 	if(we->angleDelta().y() > 0)
+	// 	{
+	// 		l--;
+	// 	}
+	// 	else if(we->angleDelta().y() < 0)
+	// 	{
+	// 		l++;
+	// 	}
+	// 	l = qBound( 0, l, m_noteLenModel.size() - 1 );
+	// 	m_noteLenModel.setValue( l );
+	// }
 	else if( we->modifiers() & Qt::ControlModifier && we->modifiers() & Qt::ShiftModifier )
 	{
-		int l = m_noteLenModel.value();
-		if(we->angleDelta().y() > 0)
-		{
-			l--;
-		}
-		else if(we->angleDelta().y() < 0)
-		{
-			l++;
-		}
-		l = qBound( 0, l, m_noteLenModel.size() - 1 );
-		m_noteLenModel.setValue( l );
+		int z = m_zoomingYModel.value();
+
+		if (we->angleDelta().y() > 0)
+			z++;
+		else if (we->angleDelta().y() < 0)
+			z--;
+
+		z = qBound(0, z, m_zoomingYModel.size() - 1);
+
+		m_zoomingYModel.setValue(z);
+		return;
 	}
 	else if( we->modifiers() & Qt::ControlModifier )
 	{
@@ -5324,21 +5338,21 @@ PianoRollWindow::PianoRollWindow() :
 
 	DropToolBar *zoomAndNotesToolBar = addDropToolBarToTop( tr( "Zoom and note controls" ) );
 
-	auto zoom_lbl = new QLabel(m_toolBar);
-	zoom_lbl->setPixmap( embed::getIconPixmap( "zoom_x" ) );
+	// auto zoom_lbl = new QLabel(m_toolBar);
+	// zoom_lbl->setPixmap( embed::getIconPixmap( "zoom_x" ) );
 
-	m_zoomingComboBox = new ComboBox( m_toolBar );
-	m_zoomingComboBox->setModel( &m_editor->m_zoomingModel );
-	m_zoomingComboBox->setFixedSize( 64, ComboBox::DEFAULT_HEIGHT );
-	m_zoomingComboBox->setToolTip( tr( "Horizontal zooming") );
+	// m_zoomingComboBox = new ComboBox( m_toolBar );
+	// m_zoomingComboBox->setModel( &m_editor->m_zoomingModel );
+	// m_zoomingComboBox->setFixedSize( 64, ComboBox::DEFAULT_HEIGHT );
+	// m_zoomingComboBox->setToolTip( tr( "Horizontal zooming") );
 
-	auto zoom_y_lbl = new QLabel(m_toolBar);
-	zoom_y_lbl->setPixmap(embed::getIconPixmap("zoom_y"));
+	// auto zoom_y_lbl = new QLabel(m_toolBar);
+	// zoom_y_lbl->setPixmap(embed::getIconPixmap("zoom_y"));
 
-	m_zoomingYComboBox = new ComboBox(m_toolBar);
-	m_zoomingYComboBox->setModel(&m_editor->m_zoomingYModel);
-	m_zoomingYComboBox->setFixedSize(64, ComboBox::DEFAULT_HEIGHT);
-	m_zoomingYComboBox->setToolTip(tr("Vertical zooming"));
+	// m_zoomingYComboBox = new ComboBox(m_toolBar);
+	// m_zoomingYComboBox->setModel(&m_editor->m_zoomingYModel);
+	// m_zoomingYComboBox->setFixedSize(64, ComboBox::DEFAULT_HEIGHT);
+	// m_zoomingYComboBox->setToolTip(tr("Vertical zooming"));
 
 	// setup quantize-stuff
 	auto quantize_lbl = new QLabel(m_toolBar);
@@ -5401,21 +5415,21 @@ PianoRollWindow::PianoRollWindow() :
 
 	// Wrap label icons and comboboxes in a single widget so when
 	// the window is resized smaller in width it hides both
-	auto zoom_widget = new QWidget();
-	auto zoom_hbox = new QHBoxLayout();
-	zoom_hbox->setContentsMargins(0, 0, 0, 0);
-	zoom_hbox->addWidget(zoom_lbl);
-	zoom_hbox->addWidget(m_zoomingComboBox);
-	zoom_widget->setLayout(zoom_hbox);
-	zoomAndNotesToolBar->addWidget(zoom_widget);
+	// auto zoom_widget = new QWidget();
+	// auto zoom_hbox = new QHBoxLayout();
+	// zoom_hbox->setContentsMargins(0, 0, 0, 0);
+	// zoom_hbox->addWidget(zoom_lbl);
+	// zoom_hbox->addWidget(m_zoomingComboBox);
+	// zoom_widget->setLayout(zoom_hbox);
+	// zoomAndNotesToolBar->addWidget(zoom_widget);
 
-	auto zoomY_widget = new QWidget();
-	auto zoomY_hbox = new QHBoxLayout();
-	zoomY_hbox->setContentsMargins(0, 0, 0, 0);
-	zoomY_hbox->addWidget(zoom_y_lbl);
-	zoomY_hbox->addWidget(m_zoomingYComboBox);
-	zoomY_widget->setLayout(zoomY_hbox);
-	zoomAndNotesToolBar->addWidget(zoomY_widget);
+	// auto zoomY_widget = new QWidget();
+	// auto zoomY_hbox = new QHBoxLayout();
+	// zoomY_hbox->setContentsMargins(0, 0, 0, 0);
+	// zoomY_hbox->addWidget(zoom_y_lbl);
+	// zoomY_hbox->addWidget(m_zoomingYComboBox);
+	// zoomY_widget->setLayout(zoomY_hbox);
+	// zoomAndNotesToolBar->addWidget(zoomY_widget);
 
 	auto quantize_widget = new QWidget();
 	auto quantize_hbox = new QHBoxLayout();
