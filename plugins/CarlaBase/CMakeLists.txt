@@ -39,6 +39,9 @@ if(LMMS_HAVE_CARLA OR LMMS_HAVE_WEAKCARLA)
             EMBEDDED_RESOURCES artwork-patchbay.png artwork-rack.png
             EXPORT_BASE_NAME carlabase
             LINK SHARED)
+        if(CARLA_RESOURCES_DIR)
+                target_compile_definitions(carlabase PRIVATE LMMS_CARLA_RESOURCES_PATH="${CARLA_RESOURCES_DIR}")
+        endif()
         SET_TARGET_PROPERTIES(carlabase
                 PROPERTIES SKIP_BUILD_RPATH TRUE
                 BUILD_WITH_INSTALL_RPATH TRUE

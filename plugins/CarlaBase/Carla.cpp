@@ -162,6 +162,9 @@ CarlaInstrument::CarlaInstrument(InstrumentTrack* const instrumentTrack, const D
     fHost.uiParentId  = 0;
 
     // carla/resources contains PyQt scripts required for launch
+#if defined(LMMS_CARLA_RESOURCES_PATH)
+    QString resourcesPath = QStringLiteral(LMMS_CARLA_RESOURCES_PATH);
+#else
     QDir path(carla_get_library_folder());
 #if defined(CARLA_OS_LINUX)
     path.cdUp();
@@ -170,6 +173,7 @@ CarlaInstrument::CarlaInstrument(InstrumentTrack* const instrumentTrack, const D
 #else
     // parse prefix from dll filename
     QString resourcesPath = path.absolutePath() + "/resources";
+#endif
 #endif
     fHost.resourceDir            = strdup(resourcesPath.toUtf8().constData());
     fHost.get_buffer_size        = host_get_buffer_size;
@@ -878,20 +882,11 @@ CarlaParamsView::~CarlaParamsView()
 	// Close and delete m_paramsSubWindow
 	if (m_carlaInstrumentView->m_paramsSubWindow)
 	{
-		m_carlaInstrumentView->m_paramsSubWindow->setAttribute(Qt::WA_DeleteOnClose);
 		m_carlaInstrumentView->m_paramsSubWindow->close();
-
-		delete m_carlaInstrumentView->m_paramsSubWindow;
 		m_carlaInstrumentView->m_paramsSubWindow = nullptr;
 	}
 
 	m_carlaInstrumentView->m_paramsView = nullptr;
-
-	// Clear models
-	if (!m_carlaInstrument->m_paramModels.empty())
-	{
-		m_carlaInstrument->clearParamModels();
-	}
 }
 
 void CarlaParamsView::clearFilterText()
@@ -979,10 +974,9 @@ void CarlaParamsView::refreshKnobs()
 
 	// Clear max knob width per group
 	m_maxKnobWidthPerGroup.clear();
-	m_maxKnobWidthPerGroup.reserve(m_carlaInstrument->m_paramGroupCount);
-	for (uint8_t i = 0; i < m_carlaInstrument->m_paramGroupCount; i++)
+	for (uint8_t i = 0; i < m_carlaInstrument->m_paramGroupCount; ++i)
 	{
-		m_maxKnobWidthPerGroup[i] = 0;
+		m_maxKnobWidthPerGroup.append(0);
 	}
 
 	if (m_carlaInstrument->m_paramModels.empty()) { return; }
