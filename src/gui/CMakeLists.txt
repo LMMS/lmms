@@ -82,6 +82,7 @@ SET(LMMS_SRCS
 	gui/modals/EffectSelectDialog.cpp
 	gui/modals/ExportProjectDialog.cpp
 	gui/modals/FileDialog.cpp
+	gui/modals/PluginLoadFailedDialog.cpp
 	gui/modals/RenameDialog.cpp
 	gui/modals/SetupDialog.cpp
 	gui/modals/VersionedSaveDialog.cpp
