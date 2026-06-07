@@ -1103,6 +1103,17 @@ void RemoteVstPlugin::process( const SampleFrame* _in, SampleFrame* _out )
 		memset( m_outputs[i], 0, bufferSize() * sizeof( float ) );
 	}
 
+	const auto syncData = getVstSyncData();
+	if (syncData && syncData->bpm > 0)
+	{
+		m_currentSamplePos = syncData->ppqPos * syncData->sampleRate * 60.0 / syncData->bpm;
+	}
+	else
+	{
+		// Fallback if syncData is unavailable or bpm is invalid
+		m_currentSamplePos += bufferSize();
+	}
+
 #ifdef OLD_VST_SDK
 	if( m_plugin->flags & effFlagsCanReplacing )
 	{
@@ -1119,8 +1130,6 @@ void RemoteVstPlugin::process( const SampleFrame* _in, SampleFrame* _out )
 #endif
 
 	unlockShm();
-
-	m_currentSamplePos += bufferSize();
 }
 
 
