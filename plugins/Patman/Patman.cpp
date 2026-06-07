@@ -25,12 +25,14 @@
 
 #include "Patman.h"
 
-#include <QDragEnterEvent>
-#include <QPainter>
+#include <QDebug>
 #include <QDomElement>
+#include <QDragEnterEvent>
+#include <QMessageBox>
+#include <QPainter>
 
+#include "Clipboard.h"
 #include "ConfigManager.h"
-#include "endian_handling.h"
 #include "Engine.h"
 #include "FileDialog.h"
 #include "FontHelper.h"
@@ -40,7 +42,7 @@
 #include "PixmapButton.h"
 #include "Song.h"
 #include "StringPairDrag.h"
-#include "Clipboard.h"
+#include "endian_handling.h"
 
 #include "embed.h"
 
@@ -48,6 +50,26 @@
 
 namespace lmms
 {
+
+namespace
+{
+
+bool shouldRenameInstrumentTrack( InstrumentTrack* track, const QString& previousPatchFile )
+{
+	if (track->name().isEmpty())
+	{
+		return true;
+	}
+
+	if (previousPatchFile.isEmpty())
+	{
+		return false;
+	}
+
+	return track->name() == QFileInfo( previousPatchFile ).fileName();
+}
+
+}
 
 
 extern "C"
@@ -109,7 +131,7 @@ void PatmanInstrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 void PatmanInstrument::loadSettings( const QDomElement & _this )
 {
-	setFile( _this.attribute( "src" ), false );
+	setFile( _this.attribute( "src" ), false, false );
 	m_loopedModel.loadSettings( _this, "looped" );
 	m_tunedModel.loadSettings( _this, "tuned" );
 }
@@ -119,7 +141,7 @@ void PatmanInstrument::loadSettings( const QDomElement & _this )
 
 void PatmanInstrument::loadFile( const QString & _file )
 {
-	setFile( _file );
+	setFile( _file, true, false );
 }
 
 
@@ -136,8 +158,14 @@ QString PatmanInstrument::nodeName() const
 void PatmanInstrument::playNote( NotePlayHandle * _n,
 						SampleFrame* _working_buffer )
 {
-	if( m_patchFile == "" )
+	if( m_patchFile.isEmpty() )
 	{
+		return;
+	}
+
+	if( m_patchSamples.empty() )
+	{
+		qWarning() << "Patman: skipping note playback because patch has no loaded samples:" << m_patchFile;
 		return;
 	}
 
@@ -148,19 +176,23 @@ void PatmanInstrument::playNote( NotePlayHandle * _n,
 	{
 		selectSample( _n );
 	}
-	auto hdata = (handle_data*)_n->m_pluginData;
+	auto hdata = static_cast<handle_data*>(_n->m_pluginData);
 
 	float play_freq = hdata->tuned ? _n->frequency() :
 						hdata->sample->frequency();
 
-	if (hdata->sample->play(_working_buffer + offset, hdata->state, frames,
-			m_loopedModel.value() ? Sample::Loop::On : Sample::Loop::Off, DefaultBaseFreq / play_freq))
+	if (hdata->sample->play(
+		_working_buffer + offset,
+		hdata->state,
+		frames,
+		m_loopedModel.value() ? Sample::Loop::On : Sample::Loop::Off,
+		DefaultBaseFreq / play_freq))
 	{
 		applyRelease( _working_buffer, _n );
 	}
 	else
 	{
-		zeroSampleFrames(_working_buffer, frames + offset);
+		zeroSampleFrames( _working_buffer, frames + offset );
 	}
 }
 
@@ -169,7 +201,7 @@ void PatmanInstrument::playNote( NotePlayHandle * _n,
 
 void PatmanInstrument::deleteNotePluginData( NotePlayHandle * _n )
 {
-	auto hdata = (handle_data*)_n->m_pluginData;
+	auto hdata = static_cast<handle_data*>(_n->m_pluginData);
 	delete hdata->state;
 	delete hdata;
 }
@@ -177,31 +209,57 @@ void PatmanInstrument::deleteNotePluginData( NotePlayHandle * _n )
 
 
 
-void PatmanInstrument::setFile( const QString & _patch_file, bool _rename )
+void PatmanInstrument::setFile( const QString & _patch_file, bool _rename, bool showErrorDialog )
 {
-	if( _patch_file.size() <= 0 )
+	if( _patch_file.isEmpty() )
 	{
 		m_patchFile = QString();
 		return;
 	}
 
-	// is current instrument-track-name equal to previous-filename??
-	if( _rename &&
-		( instrumentTrack()->name() ==
-					QFileInfo( m_patchFile ).fileName() ||
-				   	m_patchFile == "" ) )
-	{
-		// then set it to new one
-		instrumentTrack()->setName( PathUtil::cleanName( _patch_file ) );
-	}
-	// else we don't touch the instrument-track-name, because the user
-	// named it self
+	const QString previousPatchFile = m_patchFile;
 
 	m_patchFile = PathUtil::toShortestRelative( _patch_file );
 	LoadError error = loadPatch( PathUtil::toAbsolute( _patch_file ) );
 	if( error != LoadError::OK )
 	{
-		printf("Load error\n");
+		m_patchFile = QString();
+		QString errorMessage;
+		switch( error )
+		{
+		case LoadError::Open:
+			errorMessage = tr( "Failed to open patch file." );
+			break;
+		case LoadError::NotGUS:
+			errorMessage = tr( "File is not a valid GUS patch." );
+			break;
+		case LoadError::Instruments:
+			errorMessage = tr( "Unsupported number of instruments." );
+			break;
+		case LoadError::Layers:
+			errorMessage = tr( "Unsupported number of layers." );
+			break;
+		case LoadError::IO:
+			errorMessage = tr( "I/O failure while reading patch." );
+			break;
+		default:
+			errorMessage = tr( "Unknown load error." );
+			break;
+		}
+
+		qWarning() << "Patman: load error for" << _patch_file
+			<< '-' << errorMessage;
+
+		if( showErrorDialog )
+		{
+			QMessageBox::warning( nullptr,
+				tr( "PatMan" ),
+				tr( "Unable to load patch file:\n%1" ).arg( errorMessage ) );
+		}
+	}
+	else if( _rename && shouldRenameInstrumentTrack( instrumentTrack(), previousPatchFile ) )
+	{
+		instrumentTrack()->setName( PathUtil::cleanName( _patch_file ) );
 	}
 
 	emit fileChanged();
@@ -475,7 +533,7 @@ PatmanView::PatmanView( Instrument * _instrument, QWidget * _parent ) :
 
 	if (m_pi->m_patchFile.isEmpty())
 	{
-		m_displayFilename = tr("No file selected");
+		m_displayFilename = tr( "No file selected" );
 	}
 	else
 	{
@@ -497,7 +555,7 @@ void PatmanView::openFile()
 	types << tr( "Patch-Files (*.pat)" );
 	ofd.setNameFilters( types );
 
-	if( m_pi->m_patchFile == "" )
+	if( m_pi->m_patchFile.isEmpty() )
 	{
 		if( QDir( "/usr/share/midi/freepats" ).exists() )
 		{
@@ -529,9 +587,9 @@ void PatmanView::openFile()
 	if( ofd.exec() == QDialog::Accepted && !ofd.selectedFiles().isEmpty() )
 	{
 		QString f = ofd.selectedFiles()[0];
-		if( f != "" )
+		if( !f.isEmpty() )
 		{
-			m_pi->setFile( f );
+			m_pi->setFile( f, true, true );
 			Engine::getSong()->setModified();
 		}
 	}
@@ -542,6 +600,13 @@ void PatmanView::openFile()
 
 void PatmanView::updateFilename()
 {
+	if( m_pi->m_patchFile.isEmpty() )
+	{
+		m_displayFilename = tr( "No file selected" );
+		update();
+		return;
+	}
+
  	m_displayFilename = "";
 	int idx = m_pi->m_patchFile.length();
 
@@ -600,7 +665,7 @@ void PatmanView::dropEvent( QDropEvent * _de )
 	QString value = StringPairDrag::decodeValue( _de );
 	if( type == "samplefile" )
 	{
-		m_pi->setFile( value );
+		m_pi->setFile( value, true, true );
 		_de->accept();
 		return;
 	}
