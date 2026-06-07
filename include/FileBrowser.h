@@ -27,14 +27,16 @@
 
 #include <QDir>
 #include <QMutex>
-
-#include "FileSearchJob.h"
 #include "embed.h"
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
+	#include <QRecursiveMutex>
+#endif
 #include <QTreeWidget>
 
+
 #include "SideBarWidget.h"
-#include "lmmsconfig.h"
+
 
 class QCheckBox;
 class QLineEdit;
@@ -52,7 +54,6 @@ namespace gui
 
 class FileBrowserTreeWidget;
 class FileItem;
-class FileSearchJob;
 
 class FileBrowser : public SideBarWidget
 {
@@ -77,12 +78,27 @@ public:
 
 	~FileBrowser() override = default;
 
+	static QStringList directoryBlacklist()
+	{
+		static auto s_blacklist = QStringList{
+#ifdef LMMS_BUILD_LINUX
+			"/bin", "/boot", "/dev", "/etc", "/proc", "/run", "/sbin",
+			"/sys"
+#endif
+#ifdef LMMS_BUILD_WIN32
+			"C:\\Windows"
+#endif
+		};
+		return s_blacklist;
+	}
+
 	static QDir::Filters dirFilters() { return QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot | QDir::Hidden; }
 	static QDir::SortFlags sortFlags() { return QDir::LocaleAware | QDir::DirsFirst | QDir::Name | QDir::IgnoreCase; }
 
 private slots:
 	void reloadTree();
 	void expandItems(const QList<QString>& expandedDirs, QTreeWidgetItem* item = nullptr);
+	bool filterAndExpandItems(const QString & filter, QTreeWidgetItem * item = nullptr);
 	void giveFocusToFilter();
 
 private:
@@ -93,21 +109,16 @@ private:
 	void saveDirectoriesStates();
 	void restoreDirectoriesStates();
 
+	void buildSearchTree(QStringList matches, QString id);
 	void onSearch(const QString& filter);
-	void onSearchMatch(const QString& path);
-	void onSearchStarted();
-	void onSearchFinished();
+	void toggleSearch(bool on);
 
 	void addContentCheckBox();
 
 	FileBrowserTreeWidget * m_fileBrowserTreeWidget;
-	FileBrowserTreeWidget * m_searchTreeWidget;
 
 	QLineEdit * m_filterEdit;
 	Type m_type;
-
-	QProgressBar* m_searchIndicator = nullptr;
-	FileSearchJob m_searchJob;
 
 	QString m_directories; //!< Directories to search, split with '*'
 	QString m_filter; //!< Filter as used in QDir::match()
@@ -126,6 +137,9 @@ private:
 	QList<QString> m_savedExpandedDirs;
 	QString m_previousFilterValue;
 } ;
+
+
+
 
 class FileBrowserTreeWidget : public QTreeWidget
 {
@@ -181,22 +195,18 @@ private slots:
 	void updateDirectory(QTreeWidgetItem* item);
 } ;
 
-class FileBrowserWidgetItem : public QTreeWidgetItem
-{
-public:
-	FileBrowserWidgetItem(const QStringList& strings, int type, QTreeWidget* parent = nullptr);
-	virtual QString fullName(QString path = QString{}) const = 0;
-};
 
 
-class Directory : public FileBrowserWidgetItem
+
+class Directory : public QTreeWidgetItem
 {
 public:
-	Directory(const QString& filename, const QString& path, const QString& filter);
+	Directory( const QString & filename, const QString & path,
+						const QString & filter );
 
 	void update();
 
-	QString fullName(QString path = QString{})  const override
+	inline QString fullName( QString path = QString() )
 	{
 		if( path.isEmpty() )
 		{
@@ -234,12 +244,13 @@ private:
 	QString m_filter;
 
 	int m_dirCount;
+
 } ;
 
 
 
 
-class FileItem : public FileBrowserWidgetItem
+class FileItem : public QTreeWidgetItem
 {
 public:
 	enum class FileType
@@ -268,7 +279,7 @@ public:
 							const QString & path );
 	FileItem( const QString & name, const QString & path );
 
-	QString fullName(QString path = QString{}) const override
+	QString fullName() const
 	{
 		return QFileInfo(m_path, text(0)).absoluteFilePath();
 	}
