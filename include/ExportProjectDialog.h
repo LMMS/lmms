@@ -44,15 +44,24 @@ namespace lmms::gui {
 class ExportProjectDialog : public QDialog
 {
 public:
+	static ExportProjectDialog* exportProjectDialog(const QString& path);
+	static ExportProjectDialog* exportTracksDialog(const QString& path);
+	static ExportProjectDialog* exportTrackDialog(const QString& path, Track* track);
+
+	//! @returns `true` if the exported track should be imported as a sample track, `false` otherwise
+	//! @note only applies when exporting a single track
+	bool importExportedTrack();
+
+private:
 	enum class Mode
 	{
 		ExportProject,
 		ExportTracks,
+		ExportTrack
 	};
 
-	ExportProjectDialog(const QString& path, Mode mode, QWidget* parent = nullptr);
+	ExportProjectDialog(const QString& path, Mode mode, Track* track = nullptr, QWidget* parent = nullptr);
 
-private:
 	void accept() override;
 	void reject() override;
 	void onFileFormatChanged(int index);
@@ -82,6 +91,7 @@ private:
 
 	QCheckBox* m_exportAsLoopBox = nullptr;
 	QCheckBox* m_exportBetweenLoopMarkersBox = nullptr;
+	QCheckBox* m_importExportedTrackBox = nullptr;
 	QLabel* m_loopRepeatLabel = nullptr;
 	QSpinBox* m_loopRepeatBox = nullptr;
 	QPushButton* m_startButton = nullptr;
@@ -90,6 +100,7 @@ private:
 
 	QString m_path;
 	Mode m_mode;
+	Track* m_track = nullptr;
 	std::unique_ptr<RenderManager> m_renderManager;
 };
 

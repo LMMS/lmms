@@ -53,6 +53,8 @@ public:
 	void saveTrackSpecificSettings(QDomDocument& doc, QDomElement& parent, bool presetMode) override;
 	void loadTrackSpecificSettings( const QDomElement & _this ) override;
 
+	bool isRenderable() override { return false; }
+
 private:
 	friend class AutomationTrackView;
 

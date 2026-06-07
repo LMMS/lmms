@@ -80,6 +80,8 @@ public:
 		m_disabledTracks.removeAll( _track );
 	}
 
+	bool isRenderable() override { return true; }
+
 protected:
 	inline QString nodeName() const override
 	{
