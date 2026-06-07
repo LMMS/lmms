@@ -173,7 +173,7 @@ static int getKeyOffsetFromKeyEvent( QKeyEvent * _ke )
 		case 27: return 31; // ]
 	}
 #endif // LMMS_BUILD_WIN32
-#if defined(LMMS_BUILD_LINUX) || defined(LMMS_BUILD_OPENBSD) || defined(LMMS_BUILD_FREEBSD)
+#if defined(LMMS_BUILD_LINUX) || defined(LMMS_BUILD_OPENBSD) || defined(LMMS_BUILD_FREEBSD) || defined(LMMS_BUILD_CYGWIN)
 	switch( k )
 	{
 		case 52: return 0; // Z  = C
