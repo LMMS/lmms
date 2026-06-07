@@ -1,5 +1,12 @@
-lmmsicon ICON cmake/nsis/icon.ico
-lmmsprojecticon ICON cmake/nsis/project.ico
+#ifndef LMMS_EXE_ICON
+#define LMMS_EXE_ICON "cmake/nsis/icon.ico"
+#endif
+#ifndef LMMS_PROJ_ICON
+#define LMMS_PROJ_ICON "cmake/nsis/project.ico"
+#endif
+
+lmmsicon ICON LMMS_EXE_ICON
+lmmsprojecticon ICON LMMS_PROJ_ICON
 #include <windows.h>
 
 VS_VERSION_INFO VERSIONINFO

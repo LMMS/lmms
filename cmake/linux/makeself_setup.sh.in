@@ -5,6 +5,13 @@ set -e
 
 DESTDIR="/opt/@CPACK_PROJECT_NAME@"
 BASHCOMPLETIONS="/usr/share/bash-completion/completions"
+
+# Use dedicated folder for "lmms-nightly", "lmms-alpha", etc
+# shellcheck disable=SC2157
+if [ -n "@CPACK_BRANDING_NEEDED@" ]; then
+	DESTDIR="/opt/@CPACK_PROJECT_NAME@-@CPACK_BRANDING_NEEDED@"
+fi
+
 if [ "$(id -u)" != "0" ]; then
 	# Prepend "$HOME" so we can install to a writable location
 	DESTDIR="${HOME}${DESTDIR}"
