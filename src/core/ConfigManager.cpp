@@ -24,6 +24,8 @@
 
 #include "ConfigManager.h"
 
+#include <filesystem>
+
 #include <QApplication>
 #include <QDir>
 #include <QDomElement>
@@ -37,6 +39,8 @@
 #include "PathUtil.h"
 #include "ProjectVersion.h"
 #include "lmmsversion.h"
+
+namespace fs = std::filesystem;
 
 namespace lmms
 {
@@ -98,6 +102,22 @@ ConfigManager::ConfigManager() :
 ConfigManager::~ConfigManager()
 {
 	saveConfigFile();
+}
+
+
+fs::path ConfigManager::configDir() const //!< for now this doesn't consider portable and dev installs
+{
+	constexpr auto appName = "lmms";
+#if defined(LMMS_BUILD_WIN32)
+	return fs::path{std::getenv("APPDATA")} / appName / "config";
+
+#elif defined(LMMS_BUILD_MACOS)
+	return fs::path{std::getenv("HOME")} / "Library" / "Application Support" / appName / "config";
+
+#else
+	if (char* xdgConfigDir = std::getenv("XDG_CONFIG_HOME")) { return fs::path{xdgConfigDir} / appName; }
+	else { return fs::path{std::getenv("HOME")} / ".config" / appName; }
+#endif
 }
 
 
@@ -707,8 +727,17 @@ void ConfigManager::initPortableWorkingDir()
 
 void ConfigManager::initInstalledWorkingDir()
 {
+	fs::create_directories(configDir());
+
 	m_workingDir = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/lmms/";
-	m_lmmsRcFile = QDir::home().absolutePath() +"/.lmmsrc.xml";
+	m_lmmsRcFile = QString::fromStdString(configDir() / "lmmsrc.xml");
+
+	// Copy <= 1.2.2 config if new one doesn't exist
+	if (!QFileInfo(m_lmmsRcFile).exists() && QFileInfo(QDir::home().absolutePath() + "/.lmmsrc.xml").exists())
+	{
+		QFile{QDir::home().absolutePath() + "/.lmmsrc.xml"}.copy(m_lmmsRcFile);
+	}
+
 	// Detect < 1.2.0 working directory as a courtesy
 	if ( QFileInfo( QDir::home().absolutePath() + "/lmms/projects/" ).exists() )
 		m_workingDir = QDir::home().absolutePath() + "/lmms/";
