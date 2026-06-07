@@ -354,7 +354,7 @@ void FloatModelEditorBase::wheelEvent(QWheelEvent * we)
 	else if (modKeys == Qt::AltModifier)
 	{
 		// The alt key enables even finer adjustments
-		numberOfStepsForFullSweep = 2000;
+		numberOfStepsForFullSweep = 10000;
 
 		// It seems that on some systems pressing Alt with mess with the directions,
 		// i.e. scrolling the mouse wheel is interpreted as pressing the mouse wheel
@@ -378,9 +378,16 @@ void FloatModelEditorBase::wheelEvent(QWheelEvent * we)
 	const float currentValue = model()->value();
 	const float valueOffset = range / numberOfStepsForFullSweep;
 	const float scaledValueOffset = model()->scaledValue(model()->inverseScaledValue(currentValue) + valueOffset) - currentValue;
-	const float stepMult = std::max(scaledValueOffset / step, 1.f);
-	const int inc = direction * stepMult;
-	model()->incValue(inc);
+	if (step != 0.0f)
+	{
+		const float stepMult = std::max(scaledValueOffset / step, 1.f);
+		const int inc = direction * stepMult;
+		model()->incValue(inc);
+	}
+	else
+	{
+		model()->addValue(direction * scaledValueOffset);
+	}
 
 	// Only force a text update for the 1st wheel event
 	showTextFloat(0, 1000, m_interaction != oldInteraction);
@@ -395,7 +402,9 @@ void FloatModelEditorBase::setPosition(const QPoint & p)
 	const float currentValue = model()->value();
 	const float scaledValueOffset = currentValue - model()->scaledValue(model()->inverseScaledValue(currentValue) - valueOffset);
 	const auto step = model()->step<float>();
-	const float roundedValue = std::round((currentValue - scaledValueOffset) / step) * step;
+	const float roundedValue = step != 0.0f
+    ? std::round((currentValue - scaledValueOffset) / step) * step
+    : currentValue - scaledValueOffset;
 
 	if (!approximatelyEqual(roundedValue, currentValue))
 	{
