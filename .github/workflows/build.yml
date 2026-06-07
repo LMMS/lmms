@@ -81,9 +81,9 @@ jobs:
         run: |
           cmake --build build --target package
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
-          name: linux
+          archive: false
           path: build/lmms-*.AppImage
       - name: Trim ccache and print statistics
         run: |
@@ -161,9 +161,9 @@ jobs:
         run: |
           cmake --build build --target package
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
-          name: linux-arm64
+          archive: false
           path: build/lmms-*.AppImage
       - name: Trim ccache and print statistics
         run: |
@@ -252,9 +252,9 @@ jobs:
         run: |
           cmake --build build --target package
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
-          name: macos-${{ matrix.arch }}
+          archive: false
           path: build/lmms-*.dmg
       - name: Trim ccache and print statistics
         run: |
@@ -334,9 +334,9 @@ jobs:
       - name: Package
         run: cmake --build build --target package
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
-          name: mingw64
+          archive: false
           path: build/lmms-*.exe
       - name: Trim ccache and print statistics
         run: |
@@ -419,9 +419,9 @@ jobs:
       - name: Package
         run: cmake --build build --target package
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
-          name: msvc-x64
+          archive: false
           path: build\lmms-*.exe
       - name: Trim ccache and print statistics
         run: |
@@ -484,9 +484,9 @@ jobs:
       - name: Package
         run: cmake --build build --target package
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
-          name: windows-arm64
+          archive: false
           path: build\lmms-*.exe
       - name: Trim ccache and print statistics
         run: |
