@@ -12,3 +12,4 @@
 Brewfile.lock.json
 /.cache/
 compile_commands.json
+.vscode/
