@@ -40,6 +40,7 @@ SampleClip::SampleClip(Track* _track, Sample sample, bool isPlaying):
 	Clip(_track),
 	m_sample(std::move(sample)),
 	m_isPlaying(false),
+	m_currentLoop(0),
 	m_startFrameOffset(0)
 {
 	saveJournallingState( false );
@@ -78,6 +79,7 @@ SampleClip::SampleClip(const SampleClip& orig) :
 	Clip(orig),
 	m_sample(std::move(orig.m_sample)),
 	m_isPlaying(orig.m_isPlaying),
+	m_currentLoop(0),
 	m_startFrameOffset(orig.m_startFrameOffset)
 {
 	saveJournallingState( false );
@@ -215,9 +217,24 @@ bool SampleClip::isPlaying() const
 
 
 
-void SampleClip::setIsPlaying(bool isPlaying)
+void SampleClip::setIsPlaying(bool isPlaying, int loop)
 {
-	m_isPlaying = isPlaying;
+	if (loop >= 0)
+	{
+		if (isPlaying)
+		{
+			m_isPlaying = true;
+			m_currentLoop = loop;
+		}
+		else if (loop == m_currentLoop)
+		{
+			m_isPlaying = false;
+		}
+	}
+	else
+	{
+		m_isPlaying = isPlaying;
+	}
 }
 
 
@@ -290,6 +307,7 @@ void SampleClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		_this.setAttribute( "pos", startPosition() );
 	}
 	_this.setAttribute( "len", length() );
+	_this.setAttribute("looplen", loopLength());
 	_this.setAttribute( "muted", isMuted() );
 	_this.setAttribute( "src", sampleFile() );
 	_this.setAttribute( "off", startTimeOffset() );
@@ -343,6 +361,11 @@ void SampleClip::loadSettings( const QDomElement & _this )
 	setMuted( _this.attribute( "muted" ).toInt() );
 	setStartTimeOffset( _this.attribute( "off" ).toInt() );
 	setAutoResize(_this.attribute("autoresize", "1").toInt());
+
+	if (_this.hasAttribute("looplen"))
+	{
+		changeLoopLength(_this.attribute("looplen").toInt());
+	}
 
 	if (_this.hasAttribute("color"))
 	{

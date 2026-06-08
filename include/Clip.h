@@ -100,6 +100,12 @@ public:
 
 	bool manuallyResizable() const;
 
+	// Returns whether the clip can be looped
+	virtual bool loopable() const
+	{
+		return false;
+	}
+
 	/*! \brief Set whether a clip has been resized yet by the user or the knife tool.
 	 *
 	 *  If a clip has been resized previously, it will not automatically 
@@ -115,6 +121,14 @@ public:
 	{
 		return m_autoResize;
 	}
+
+	TimePos loopLength() const 
+	{
+		return m_loopLength; 
+	}
+
+	/*! Note : does not create / close the corresponding views */
+	void changeLoopLength(TimePos length);
 
 	auto color() const -> const std::optional<QColor>& { return m_color; }
 	void setColor(const std::optional<QColor>& color);
@@ -170,6 +184,7 @@ private:
 	TimePos m_startPosition;
 	TimePos m_length;
 	TimePos m_startTimeOffset;
+	TimePos m_loopLength;
 
 	BoolModel m_mutedModel;
 	BoolModel m_soloModel;

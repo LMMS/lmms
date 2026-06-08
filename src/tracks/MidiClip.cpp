@@ -407,6 +407,16 @@ void MidiClip::splitNotesAlongLine(const NoteVector notes, TimePos pos1, int key
 
 
 
+bool MidiClip::loopable() const
+{
+	if (isInPattern()) {
+		return false;
+	}
+	return true;
+}
+
+
+
 void MidiClip::setType( Type _new_clip_type )
 {
 	if( _new_clip_type == Type::BeatClip ||
@@ -454,6 +464,7 @@ void MidiClip::exportToXML(QDomDocument& doc, QDomElement& midiClipElement, bool
 	midiClipElement.setAttribute("muted", isMuted());
 	midiClipElement.setAttribute("steps", m_steps);
 	midiClipElement.setAttribute("len", length());
+	midiClipElement.setAttribute("looplen", loopLength());
 
 	// now save settings of all notes
 	for (auto& note : m_notes)
@@ -526,6 +537,11 @@ void MidiClip::loadSettings( const QDomElement & _this )
 	else
 	{
 		changeLength(len);
+	}
+
+	if (_this.hasAttribute("looplen"))
+	{
+		changeLoopLength(_this.attribute("looplen").toInt());
 	}
 	
 	setAutoResize(_this.attribute("autoresize", "1").toInt());
