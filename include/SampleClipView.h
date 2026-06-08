@@ -43,7 +43,7 @@ class SampleClipView : public ClipView
 	Q_OBJECT
 
 public:
-	SampleClipView( SampleClip * _clip, TrackView * _tv, int offset = 0 );
+	SampleClipView(SampleClip* _clip, TrackView* _tv, int offset = 0);
 	~SampleClipView() override = default;
 
 public slots:

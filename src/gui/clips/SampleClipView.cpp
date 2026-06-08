@@ -44,8 +44,8 @@ namespace lmms::gui
 {
 
 
-SampleClipView::SampleClipView( SampleClip * _clip, TrackView * _tv, int offset ) :
-	ClipView( _clip, _tv, offset ),
+SampleClipView::SampleClipView(SampleClip* _clip, TrackView* _tv, int offset) :
+	ClipView(_clip, _tv, offset),
 	m_clip( _clip ),
 	m_paintPixmap(),
 	m_paintPixmapXPosition(0)
@@ -261,11 +261,11 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 		// Draw loop views with a slight color difference
 		else
 		{
-			p.fillRect(rect(), c.darker( 150 ));
+			p.fillRect(rect(), c.darker(150));
 		}
 	}
 	// Draw stripes on loop views
-	paintStripes( p, clipColor.darker( 150 ) );
+	paintStripes(p, clipColor.darker(150));
 
 	p.setPen(clipColor);
 
@@ -308,7 +308,7 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 		m_sampleThumbnail.visualize(param, p);
 	}
 
-	if ( this->offset() == 0 )
+	if (this->offset() == 0)
 	{
 		// Only draw the name on the first loop view, otherwise it would be drawn multiple times and look bad
 		QString name = PathUtil::cleanName(m_clip->m_sample.sampleFile());
@@ -318,36 +318,36 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	// disable antialiasing for borders, since its not needed
 	p.setRenderHint( QPainter::Antialiasing, false );
 
-	if ( this->offset() == 0 )
+	if (this->offset() == 0)
 	{
 		// inner border
-		p.setPen( c.lighter( 135 ) );
+		p.setPen(c.lighter(135 ));
 		p.drawRect(
 			-m_paintPixmapXPosition + 1,
 			1,
 			rect().right() - BORDER_WIDTH,
-			rect().bottom() - BORDER_WIDTH );
+			rect().bottom() - BORDER_WIDTH);
 
 		// outer border
-		p.setPen( c.darker( 200 ) );
+		p.setPen(c.darker(200));
 		p.drawRect(-m_paintPixmapXPosition, 0, rect().right(), rect().bottom());
 	}
 	// In case of a loop view, we don't draw inner border and don't draw borders between loop views
 	else
 	{
-		p.setPen( c.darker( 300 ) );
-		p.drawLine( 0, 0, rect().right(), 0 );
-		p.drawLine( 0, rect().bottom(), rect().right(), rect().bottom() );
+		p.setPen(c.darker(300));
+		p.drawLine(0, 0, rect().right(), 0);
+		p.drawLine(0, rect().bottom(), rect().right(), rect().bottom());
 
 		// Last loop view gets a right border
 		if (lastLoopView())
 		{
-			p.drawLine( rect().right(), 0, rect().right(), rect().bottom() );
+			p.drawLine(rect().right(), 0, rect().right(), rect().bottom());
 		}
 	}
 
 	// draw the 'muted' pixmap only if the clip was manually muted
-	if( m_clip->isMuted()  && this->offset() == 0 )
+	if(m_clip->isMuted() && this->offset() == 0)
 	{
 		const int spacing = BORDER_WIDTH;
 		const int size = 14;
@@ -355,7 +355,7 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 			embed::getIconPixmap( "muted", size, size ) );
 	}
 
-	if ( m_marker  && this->offset() == 0 )
+	if (m_marker && this->offset() == 0)
 	{
 		p.setPen(markerColor());
 		p.drawLine(m_markerPos, rect().bottom(), m_markerPos, rect().top());

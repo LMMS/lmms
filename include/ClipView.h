@@ -68,7 +68,7 @@ class ClipView : public selectableObject, public ModelView
 public:
 	const static int BORDER_WIDTH = 2;
 
-	ClipView(Clip * clip, TrackView * tv, int offset = 0);
+	ClipView(Clip* clip, TrackView * tv, int offset = 0);
 	~ClipView() override;
 
 	bool fixedClips();
@@ -194,7 +194,7 @@ protected:
 	DataFile createClipDataFiles(const QVector<ClipView *> & clips) const;
 
 	virtual void paintTextLabel(QString const & text, QPainter & painter);
-	void paintStripes( QPainter & painter, QColor color );
+	void paintStripes(QPainter& painter, QColor color);
 
 	auto hasCustomColor() const -> bool;
 

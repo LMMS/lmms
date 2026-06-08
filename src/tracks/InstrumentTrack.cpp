@@ -757,11 +757,11 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 		// get all notes from the given clip
 		const NoteVector & notes = c->notes();
 		
-		for ( int loop = 0; loop <= (c->loopLength() - 1) / c->length(); loop++ )
+		for (int loop = 0; loop <= (c->loopLength() - 1) / c->length(); loop++)
 		{
 			TimePos loopOffset = loop * c->length();
 
-			if ( cur_start < loopOffset - c->startTimeOffset() )
+			if (cur_start < loopOffset - c->startTimeOffset())
 			{
 				// we can skip all the loops that start after the current position
 				// this also avoid to loop notes starting before startTimeOffset
@@ -773,21 +773,23 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 			// very effective algorithm for playing notes that are
 			// posated within the current sample-frame
 
-			if( cur_start > 0 )
+			if(cur_start > 0)
 			{
 				// skip notes which end before start-bar
-				while( nit != notes.end() && ( *nit )->endPos() + loopOffset < cur_start )
+				while(nit != notes.end() && (*nit)->endPos() + loopOffset < cur_start)
 				{
 					++nit;
 				}
 			}
 
-			while (nit != notes.end() && (*nit)->pos() < c->length() - c->startTimeOffset() && (*nit)->pos() + loopOffset < c->loopLength() - c->startTimeOffset())
+			while (nit != notes.end() && (*nit)->pos() < c->length() - c->startTimeOffset()
+				&& (*nit)->pos() + loopOffset < c->loopLength() - c->startTimeOffset())
 			{
 				const auto currentNote = *nit;
 				// Skip any notes note not at the current time pos and not overlapping with the start.
 				if (!(currentNote->pos() + loopOffset == cur_start
-					|| (cur_start == -c->startTimeOffset() + loopOffset && (*nit)->pos() + loopOffset < cur_start && (*nit)->endPos() + loopOffset > cur_start)))
+					|| (cur_start == -c->startTimeOffset() + loopOffset && (*nit)->pos() + loopOffset < cur_start
+						&& (*nit)->endPos() + loopOffset > cur_start)))
 				{
 					++nit;
 					continue;
@@ -801,17 +803,17 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 					? 0
 					: (currentNote->endPos() + loopOffset - cur_start - noteOverlap) * frames_per_tick;
 
-				NotePlayHandle* notePlayHandle = NotePlayHandleManager::acquire( this, _offset, noteFrames, *currentNote );
+				NotePlayHandle* notePlayHandle = NotePlayHandleManager::acquire(this, _offset, noteFrames, *currentNote);
 				notePlayHandle->setPatternTrack(pattern_track);
 				// are we playing global song?
-				if( _clip_num < 0 )
+				if(_clip_num < 0)
 				{
 					// then set song-global offset of clip in order to
 					// properly perform the note detuning
-					notePlayHandle->setSongGlobalParentOffset( c->startPosition() + c->startTimeOffset());
+					notePlayHandle->setSongGlobalParentOffset(c->startPosition() + c->startTimeOffset());
 				}
 
-				Engine::audioEngine()->addPlayHandle( notePlayHandle );
+				Engine::audioEngine()->addPlayHandle(notePlayHandle);
 
 				played_a_note = true;
 				++nit;

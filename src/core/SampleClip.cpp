@@ -291,7 +291,7 @@ void SampleClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		_this.setAttribute( "pos", startPosition() );
 	}
 	_this.setAttribute( "len", length() );
-	_this.setAttribute( "looplen", loopLength() );
+	_this.setAttribute("looplen", loopLength());
 	_this.setAttribute( "muted", isMuted() );
 	_this.setAttribute( "src", sampleFile() );
 	_this.setAttribute( "off", startTimeOffset() );

@@ -44,7 +44,7 @@ class AutomationClipView : public ClipView
 
 
 public:
-	AutomationClipView( AutomationClip * _clip, TrackView * _parent, int offset = 0 );
+	AutomationClipView(AutomationClip* _clip, TrackView* _parent, int offset = 0);
 	~AutomationClipView() override = default;
 
 public slots:

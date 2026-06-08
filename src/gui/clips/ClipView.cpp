@@ -77,15 +77,15 @@ TextFloat * ClipView::s_textFloat = nullptr;
  * \param _clip The clip to be displayed
  * \param _tv  The track view that will contain the new object
  */
-ClipView::ClipView( Clip * clip,
-							TrackView * tv , int offset) :
+ClipView::ClipView(Clip* clip,
+							TrackView* tv , int offset) :
 	selectableObject( tv->getTrackContentWidget() ),
 	ModelView( nullptr, this ),
 	m_trackView( tv ),
 	m_initialClipPos( TimePos(0) ),
 	m_initialClipEnd( TimePos(0) ),
 	m_clip( clip ),
-	m_offset( offset ),
+	m_offset(offset),
 	m_haveChild(false),
 	m_action( Action::None ),
 	m_initialMousePos( QPoint( 0, 0 ) ),
@@ -658,7 +658,7 @@ void ClipView::paintTextLabel(QString const & text, QPainter & painter)
 	painter.drawText( textLeft, finalTextTop, elidedClipName );
 }
 
-void ClipView::paintStripes( QPainter & painter, QColor color )
+void ClipView::paintStripes(QPainter& painter, QColor color)
 {
 	if (m_offset == 0)
 	{
@@ -878,7 +878,7 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 			}
 			else
 			{
-				remove( active );
+				remove(active);
 			}
 		}
 	}
@@ -1139,7 +1139,7 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 			updatePosition();
 		}
 	}
-	else if( m_action == Action::Split && m_offset == 0 )
+	else if (m_action == Action::Split && m_offset == 0)
 	{
 		setCursor(Qt::SplitHCursor);
 		setMarkerPos(knifeMarkerPos(me));
@@ -1170,13 +1170,13 @@ void ClipView::mouseReleaseEvent( QMouseEvent * me )
 	{
 		setSelected( !isSelected() );
 	}
-	else if( m_action == Action::Move || m_action == Action::Resize
+	else if (m_action == Action::Move || m_action == Action::Resize
 			|| m_action == Action::ResizeLeft || m_action == Action::ResizeLoop)
 	{
 		// TODO: Fix m_clip->setJournalling() consistency
 		m_clip->setJournalling( true );
 	}
-	else if( m_action == Action::Split && m_offset == 0 )
+	else if (m_action == Action::Split && m_offset == 0)
 	{
 		const float ppb = m_trackView->trackContainerView()->pixelsPerBar();
 		const TimePos relPos = position(me).x() * TimePos::ticksPerBar() / ppb;
@@ -1261,9 +1261,10 @@ void ClipView::contextMenuEvent( QContextMenuEvent * cme )
 	if (m_clip->loopable())
 	{
 		contextMenu.addAction(
-			embed::getIconPixmap( "loop_points_on" ),
-			tr( "Add linked clone" ),
-			[this](){ contextMenuAction( ContextMenuAction::Loop ); } );
+			embed::getIconPixmap("loop_points_on"),
+			tr("Add a repetition"),
+			[this](){ contextMenuAction(ContextMenuAction::Loop); }
+		);
 	}
 
 	contextMenu.addSeparator();

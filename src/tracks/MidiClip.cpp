@@ -404,7 +404,7 @@ void MidiClip::splitNotesAlongLine(const NoteVector notes, TimePos pos1, int key
 
 bool MidiClip::loopable() const
 {
-	if ( isInPattern() ) {
+	if (isInPattern()) {
 		return false;
 	}
 	return true;

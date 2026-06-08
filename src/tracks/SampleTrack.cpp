@@ -108,18 +108,18 @@ bool SampleTrack::play( const TimePos & _start, const fpp_t _frames,
 			{
 				TimePos loopOffset = loop * sClip->length();
 
-				if ( _start - sClip->startPosition() < loopOffset )
+				if (_start - sClip->startPosition() < loopOffset)
 				{
 					// No need to check further loops, also avoid to loop the part left of startTimeOffset()
 					break;
 				}
 
-				if( _start >= sClip->startPosition() + loopOffset && _start < sClip->endPosition() + loopOffset )
+				if(_start >= sClip->startPosition() + loopOffset && _start < sClip->endPosition() + loopOffset)
 				{
-					if( sClip->isPlaying() == false && _start >= (sClip->startPosition() + sClip->startTimeOffset() + loopOffset) )
+					if(sClip->isPlaying() == false && _start >= (sClip->startPosition() + sClip->startTimeOffset() + loopOffset))
 					{
 						auto bufferFramesPerTick = Engine::framesPerTick(sClip->sample().sampleRate());
-						f_cnt_t sampleStart = bufferFramesPerTick * ( _start - sClip->startPosition() - sClip->startTimeOffset() - loopOffset );
+						f_cnt_t sampleStart = bufferFramesPerTick * (_start - sClip->startPosition() - sClip->startTimeOffset() - loopOffset);
 						f_cnt_t clipFrameLength = bufferFramesPerTick * std::min(
 							sClip->loopLength() - sClip->startTimeOffset() - loopOffset,
 							sClip->length() - sClip->startTimeOffset()
@@ -129,19 +129,19 @@ bool SampleTrack::play( const TimePos & _start, const fpp_t _frames,
 						//else we play the sample to the end but nothing more
 						f_cnt_t samplePlayLength = clipFrameLength > sampleBufferLength ? sampleBufferLength : clipFrameLength;
 						//we only play within the sampleBuffer limits
-						if( sampleStart < sampleBufferLength )
+						if(sampleStart < sampleBufferLength)
 						{
-							sClip->setSampleStartFrame( sampleStart );
-							sClip->setSamplePlayLength( samplePlayLength );
-							clips.push_back( sClip );
-							sClip->setIsPlaying( true, loop );
+							sClip->setSampleStartFrame(sampleStart);
+							sClip->setSamplePlayLength(samplePlayLength);
+							clips.push_back(sClip);
+							sClip->setIsPlaying(true, loop);
 							nowPlaying = true;
 						}
 					}
 				}
 				else
 				{
-					sClip->setIsPlaying( false, loop );
+					sClip->setIsPlaying(false, loop);
 				}
 				nowPlaying = nowPlaying || sClip->isPlaying();
 			}

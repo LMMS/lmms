@@ -46,9 +46,9 @@
 namespace lmms::gui
 {
 
-AutomationClipView::AutomationClipView( AutomationClip * _clip,
-						TrackView * _parent, int offset ) :
-	ClipView( _clip, _parent, offset ),
+AutomationClipView::AutomationClipView(AutomationClip * _clip,
+						TrackView * _parent, int offset) :
+	ClipView(_clip, _parent, offset),
 	m_clip( _clip ),
 	m_paintPixmap()
 {
@@ -259,18 +259,18 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 	}
 	else
 	{
-		if ( this->offset() == 0 )
+		if (this->offset() == 0)
 		{
-			p.fillRect( rect(), c );
+			p.fillRect(rect(), c);
 		}
 		// Draw loop views with a slight color difference
 		else
 		{
-			p.fillRect( rect(), current ? c.lighter( 65 ) : c.darker( 150 ) );
+			p.fillRect(rect(), current ? c.lighter( 65 ) : c.darker( 150 ));
 		}
 	}
 	// Draw stripes on loop views
-	paintStripes( p, c );
+	paintStripes(p, c);
 
 	// pixels per bar
 	const float ppb = fixedClips() ?
@@ -379,45 +379,45 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 	}
 
 	// recording icon for when recording automation
-	if( m_clip->isRecording() && this->offset() == 0 )
+	if (m_clip->isRecording() && this->offset() == 0)
 	{
 		static auto s_clipRec = embed::getIconPixmap("clip_rec");
 		p.drawPixmap(1, rect().bottom() - s_clipRec.height(), s_clipRec);
 	}
 
 	// clip name
-	if ( this->offset() == 0 )
+	if (this->offset() == 0)
 	{
 		paintTextLabel(m_clip->name(), p);
 	}
 
-	if ( this->offset() == 0 )
+	if (this->offset() == 0)
 	{
 		// inner border
-		p.setPen( c.lighter( current ? 160 : 130 ) );
-		p.drawRect( 1, 1, rect().right() - BORDER_WIDTH,
-			rect().bottom() - BORDER_WIDTH );
+		p.setPen(c.lighter(current ? 160 : 130));
+		p.drawRect(1, 1, rect().right() - BORDER_WIDTH,
+			rect().bottom() - BORDER_WIDTH);
 
 		// outer border
-		p.setPen( current ? c.lighter( 130 ) : c.darker( 300 ) );
-		p.drawRect( 0, 0, rect().right(), rect().bottom() );
+		p.setPen(current ? c.lighter(130) : c.darker(300));
+		p.drawRect(0, 0, rect().right(), rect().bottom());
 	}
 	// In case of a loop view, we don't draw inner border and don't draw borders between loop views
 	else
 	{
-		p.setPen( current ? c.lighter( 130 ) : c.darker( 300 ) );
-		p.drawLine( 0, 0, rect().right(), 0 );
-		p.drawLine( 0, rect().bottom(), rect().right(), rect().bottom() );
+		p.setPen(current ? c.lighter(130) : c.darker(300));
+		p.drawLine(0, 0, rect().right(), 0);
+		p.drawLine(0, rect().bottom(), rect().right(), rect().bottom());
 
 		// Last loop view gets a right border
 		if (lastLoopView())
 		{
-			p.drawLine( rect().right(), 0, rect().right(), rect().bottom() );
+			p.drawLine(rect().right(), 0, rect().right(), rect().bottom());
 		}
 	}
 
 	// draw the 'muted' pixmap only if the clip was manually muted
-	if( m_clip->isMuted() && this->offset() == 0 )
+	if(m_clip->isMuted() && this->offset() == 0)
 	{
 		const int spacing = BORDER_WIDTH;
 		const int size = 14;
