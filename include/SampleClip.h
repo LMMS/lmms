@@ -72,6 +72,7 @@ public:
 	TimePos sampleLength() const;
 	void setSampleStartFrame( f_cnt_t startFrame );
 	void setSamplePlayLength( f_cnt_t length );
+	void setStartTimeOffset(const TimePos& startTimeOffset) override;
 	gui::ClipView * createView( gui::TrackView * _tv ) override;
 
 	bool loopable() const override
@@ -94,6 +95,7 @@ public slots:
 	void toggleRecord();
 	void playbackPositionChanged();
 	void updateTrackClips();
+	void tempoChanged();
 
 protected:
 	SampleClip( const SampleClip& orig );
@@ -103,6 +105,7 @@ private:
 	BoolModel m_recordModel;
 	bool m_isPlaying;
 	int m_currentLoop;
+	int m_startFrameOffset;
 
 	friend class gui::SampleClipView;
 

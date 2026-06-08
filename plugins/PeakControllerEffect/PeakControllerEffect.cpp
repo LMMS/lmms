@@ -93,7 +93,7 @@ PeakControllerEffect::~PeakControllerEffect()
 }
 
 
-Effect::ProcessStatus PeakControllerEffect::processImpl(SampleFrame* buf, const fpp_t frames)
+Effect::ProcessStatus PeakControllerEffect::processImpl(SampleFrame* buf, const f_cnt_t frames)
 {
 	PeakControllerEffectControls & c = m_peakControls;
 

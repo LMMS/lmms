@@ -112,12 +112,13 @@ void MidiClip::resizeToFirstTrack()
 
 void MidiClip::init()
 {
-	connect( Engine::getSong(), SIGNAL(timeSignatureChanged(int,int)),
-				this, SLOT(changeTimeSignature()));
-	saveJournallingState( false );
-
-	updateLength();
-	restoreJournallingState();
+	connect(Engine::getSong(), &Song::timeSignatureChanged, this, &MidiClip::changeTimeSignature);
+	if (getTrack()->trackContainer() != Engine::patternStore())
+	{
+		saveJournallingState(false);
+		updateLength();
+		restoreJournallingState();
+	}
 }
 
 
@@ -128,7 +129,7 @@ void MidiClip::updateLength()
 	// If the clip hasn't already been manually resized, automatically resize it.
 	if (getAutoResize())
 	{
-		if (m_clipType == Type::BeatClip)
+		if (m_instrumentTrack->trackContainer()->type() == TrackContainer::Type::Pattern)
 		{
 			changeLength(beatClipLength());
 			updatePatternTrack();
@@ -384,6 +385,10 @@ void MidiClip::splitNotesAlongLine(const NoteVector notes, TimePos pos1, int key
 			auto newNote2 = Note{*note};
 			newNote2.setPos(keyIntercept);
 			newNote2.setLength(note->endPos() - keyIntercept);
+
+			// Select the short ends
+			if (newNote1.length() < newNote2.length()) { newNote1.setSelected(true); }
+			else { newNote2.setSelected(true); }
 
 			if (deleteShortEnds)
 			{
