@@ -13,5 +13,6 @@ if(LMMS_HAVE_GIG)
 		MOCFILES GigPlayer.h PatchesDialog.h
 		EMBEDDED_RESOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.png"
 	)
+	target_link_directories(gigplayer PRIVATE ${GIG_LIBRARY_DIRS})
 	target_link_libraries(gigplayer ${GIG_LIBRARIES} SampleRate::samplerate)
 endif(LMMS_HAVE_GIG)
