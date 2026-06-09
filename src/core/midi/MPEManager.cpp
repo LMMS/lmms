@@ -86,7 +86,7 @@ void MPEManager::sendMPEConfigSignals(MidiEventProcessor* proc)
 	// The channel of the message in this case determines whether it is for the Lower or Upper zone (0 = lower, 15 = upper)
 	proc->processOutEvent(MidiEvent(MidiControlChange, 0, MidiControllerRegisteredParameterNumberMSB, (MidiMPEConfigurationRPN >> 8) & 0x7F));
 	proc->processOutEvent(MidiEvent(MidiControlChange, 0, MidiControllerRegisteredParameterNumberLSB, MidiMPEConfigurationRPN & 0x7F));
-	proc->processOutEvent(MidiEvent(MidiControlChange, 0, MidiControllerDataEntry, m_numChannelsLowerZone - 1)); // Minus 1 because the number of channels is zero-indexed (0x0 to 0xF)
+	proc->processOutEvent(MidiEvent(MidiControlChange, 0, MidiControllerDataEntry, m_numChannelsLowerZone));
 	// Send null RPN signals to end the control change. This is not explicitly required by the MPE spec, but I heard it was good practice to prevent accidental signals from editing the last sent config
 	proc->processOutEvent(MidiEvent(MidiControlChange, 0, MidiControllerRegisteredParameterNumberMSB, (MidiNullFunctionNumberRPN >> 8) & 0x7F));
 	proc->processOutEvent(MidiEvent(MidiControlChange, 0, MidiControllerRegisteredParameterNumberLSB, MidiNullFunctionNumberRPN & 0x7F));
@@ -94,7 +94,7 @@ void MPEManager::sendMPEConfigSignals(MidiEventProcessor* proc)
 	// TODO section 2.2.1, if a sender intends to only use one zone, it should only send the config message for that one zone. This is not mandatory, but perhaps in the future we should implement that.
 	proc->processOutEvent(MidiEvent(MidiControlChange, 0xF, MidiControllerRegisteredParameterNumberMSB, (MidiMPEConfigurationRPN >> 8) & 0x7F));
 	proc->processOutEvent(MidiEvent(MidiControlChange, 0xF, MidiControllerRegisteredParameterNumberLSB, MidiMPEConfigurationRPN & 0x7F));
-	proc->processOutEvent(MidiEvent(MidiControlChange, 0xF, MidiControllerDataEntry, m_numChannelsUpperZone - 1)); // Minus 1 because the number of channels is zero-indexed (0x0 to 0xF)
+	proc->processOutEvent(MidiEvent(MidiControlChange, 0xF, MidiControllerDataEntry, m_numChannelsUpperZone));
 
 	proc->processOutEvent(MidiEvent(MidiControlChange, 0xF, MidiControllerRegisteredParameterNumberMSB, (MidiNullFunctionNumberRPN >> 8) & 0x7F));
 	proc->processOutEvent(MidiEvent(MidiControlChange, 0xF, MidiControllerRegisteredParameterNumberLSB, MidiNullFunctionNumberRPN & 0x7F));
