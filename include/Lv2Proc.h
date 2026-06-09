@@ -115,38 +115,35 @@ public:
 	/*
 		utils for the run thread
 	*/
-	//! Copy values from the LMMS core (connected models, MIDI events, ...) into
+
+	//! @brief Copy values from the LMMS core (connected models, MIDI events, ...) into
 	//! the respective ports
 	void copyModelsFromCore();
-	//! Bring values from all ports to the LMMS core
+
+	//! @brief Bring values from all ports to the LMMS core
 	void copyModelsToCore();
-	/**
-	 * Copy buffer passed by the core into our ports
-	 * @param buf buffer of sample frames, each sample frame is something like
-	 *   a `float[<number-of-procs> * <channels per proc>]` array.
-	 * @param firstChan The offset for @p buf where we have to read our
-	 *   first channel.
-	 *   This marks the first sample in each sample frame where we read from.
-	 *   If we are the 2nd of 2 mono procs, this can be greater than 0.
-	 * @param num Number of channels we must read from @param buf (starting at
-	 *   @p offset)
-	 */
-	void copyBuffersFromCore(const SampleFrame* buf,
-								unsigned firstChan, unsigned num, f_cnt_t frames);
-	/**
-	 * Copy our ports into buffers passed by the core
-	 * @param buf buffer of sample frames, each sample frame is something like
-	 *   a `float[<number-of-procs> * <channels per proc>]` array.
-	 * @param firstChan The offset for @p buf where we have to write our
-	 *   first channel.
-	 *   This marks the first sample in each sample frame where we write to.
-	 *   If we are the 2nd of 2 mono procs, this can be greater than 0.
-	 * @param num Number of channels we must write to @param buf (starting at
-	 *   @p offset)
-	 */
-	void copyBuffersToCore(SampleFrame* buf, unsigned firstChan, unsigned num,
-								f_cnt_t frames) const;
-	//! Run the Lv2 plugin instance for @param frames frames
+
+	//! @brief Copy buffer passed by the core into our ports
+	//! @param buf buffer of sample frames, each sample frame is something like a
+	//! `float[<number-of-procs> * <channels per proc>]` array.
+	//! @param firstChan The offset for @p buf where we have to read our first channel.
+	//! This marks the first sample in each sample frame where we read from.
+	//! If we are the 2nd of 2 mono procs, this can be greater than 0.
+	//! @param num Number of channels we must read from @p buf (starting at @p offset)
+	//! @param frames The length of @p buf
+	void copyBuffersFromCore(const SampleFrame* buf, unsigned firstChan, unsigned num, f_cnt_t frames);
+
+	//! @brief Copy our ports into buffers passed by the core
+	//! @param buf buffer of sample frames, each sample frame is something like a
+	//! `float[<number-of-procs> * <channels per proc>]` array.
+	//! @param firstChan The offset for @p buf where we have to write our first channel.
+	//! This marks the first sample in each sample frame where we write to.
+	//! If we are the 2nd of 2 mono procs, this can be greater than 0.
+	//! @param num Number of channels we must write to @p buf (starting at @p offset)
+	void copyBuffersToCore(SampleFrame* buf, unsigned firstChan, unsigned num, f_cnt_t frames) const;
+
+	//! @brief Run the Lv2 plugin instance for @p frames frames
+	//! @param frames The number of frames to run
 	void run(f_cnt_t frames);
 
 	void handleMidiInputEvent(const class MidiEvent &event,
