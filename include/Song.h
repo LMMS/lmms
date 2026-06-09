@@ -308,6 +308,11 @@ public:
 		return m_tempoModel;
 	}
 
+	IntModel* masterPitchModel()
+	{
+		return &m_masterPitchModel;
+	}
+
 	void exportProjectMidi(QString const & exportFileName) const;
 
 	inline void setLoadOnLaunch(bool value) { m_loadOnLaunch = value; }

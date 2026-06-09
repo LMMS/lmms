@@ -30,6 +30,7 @@
 #include "InstrumentSoundShaping.h"
 #include "InstrumentTrack.h"
 #include "Instrument.h"
+#include "MPEManager.h"
 #include "Song.h"
 #include "lmms_math.h"
 
@@ -51,7 +52,7 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 								const f_cnt_t _frames,
 								const Note& n,
 								NotePlayHandle *parent,
-								int midiEventChannel,
+								uint8_t midiEventChannel,
 								Origin origin ) :
 	PlayHandle( PlayHandle::Type::NotePlayHandle, _offset ),
 	Note(n),
@@ -72,12 +73,10 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 	m_muted( false ),
 	m_patternTrack( nullptr ),
 	m_origTempo( Engine::getSong()->getTempo() ),
-	m_origBaseNote( instrumentTrack->baseNote() ),
 	m_frequency( 0 ),
 	m_unpitchedFrequency( 0 ),
 	m_baseDetuning( nullptr ),
 	m_songGlobalParentOffset( 0 ),
-	m_midiChannel( midiEventChannel >= 0 ? midiEventChannel : instrumentTrack->midiPort()->realOutputChannel() ),
 	m_origin( origin ),
 	m_frequencyNeedsUpdate( false )
 {
@@ -116,6 +115,27 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 
 	setAudioBusHandle(instrumentTrack->audioBusHandle());
 
+	// Unless a specific output channel or MPE is enabled, the midi event channel will be used.
+	m_midiChannel = midiEventChannel;
+	assert(m_midiChannel >= 0 && m_midiChannel < 16);
+	// If a MIDI output channel is set and does not equal "--", use that channel instead for now.
+	if (m_instrumentTrack->midiPort()->isWritable() && m_instrumentTrack->midiPort()->outputChannel() != 0)
+	{
+		m_midiChannel = m_instrumentTrack->midiPort()->realOutputChannel();
+	}
+	// However, if MPE is enabled, override that and route to the best channel.
+	if (m_instrumentTrack->midiPort()->mpeEnabled())
+	{
+		// If findAvailableChannel returns std::nullopt, that means no channels are available, so use the default output channel.
+		m_midiChannel = m_instrumentTrack->midiPort()->mpeManager().findAvailableChannel().value_or(m_midiChannel);
+	}
+
+	// Notify MPE manager that a new note was created on this channel to update note counts
+	// Normally this would be done on the actual midi NoteOn event, but those are only sent
+	// once the processing starts, which is too late when trying to route chords.
+	// Note: This is called even if MPE is disabled, so that if it is suddenly enabled, the MPEManager will still have the correct knowledge about which notes are where.
+	m_instrumentTrack->midiPort()->mpeManager().noteOn(midiChannel());
+
 	unlock();
 }
 
@@ -140,11 +160,6 @@ NotePlayHandle::~NotePlayHandle()
 		m_instrumentTrack->deleteNotePluginData( this );
 	}
 
-	if( m_instrumentTrack->m_notes[key()] == this )
-	{
-		m_instrumentTrack->m_notes[key()] = nullptr;
-	}
-
 	m_subNotes.clear();
 
 	if( buffer() ) releaseBuffer();
@@ -161,7 +176,7 @@ void NotePlayHandle::setVolume( volume_t _volume )
 
 	const int baseVelocity = m_instrumentTrack->midiPort()->baseVelocity();
 
-	m_instrumentTrack->processOutEvent( MidiEvent( MidiKeyPressure, midiChannel(), midiKey(), midiVelocity( baseVelocity ) ) );
+	m_instrumentTrack->processOutEvent(MidiEvent(MidiKeyPressure, midiChannel(), key(), midiVelocity(baseVelocity)));
 }
 
 
@@ -174,10 +189,9 @@ void NotePlayHandle::setPanning( panning_t panning )
 
 
 
-
-int NotePlayHandle::midiKey() const
+int NotePlayHandle::physicalKey() const
 {
-	return key() - m_origBaseNote + instrumentTrack()->baseNote();
+	return key() - m_instrumentTrack->transposeAmount();
 }
 
 
@@ -202,8 +216,8 @@ void NotePlayHandle::play( SampleFrame* _working_buffer )
 	// Don't play the note if it falls outside of the user defined key range
 	// TODO: handle the range check by Microtuner, and if the key becomes "not mapped", save the current frequency
 	// so that the note release can finish playing using a valid frequency instead of a 1 Hz placeholder
-	if (key() < m_instrumentTrack->m_firstKeyModel.value() ||
-		key() > m_instrumentTrack->m_lastKeyModel.value())
+	if (physicalKey() < m_instrumentTrack->m_firstKeyModel.value() ||
+		physicalKey() > m_instrumentTrack->m_lastKeyModel.value())
 	{
 		// Release the note in case it started playing before going out of range
 		noteOff(0);
@@ -227,9 +241,15 @@ void NotePlayHandle::play( SampleFrame* _working_buffer )
 
 		const int baseVelocity = m_instrumentTrack->midiPort()->baseVelocity();
 
+		// According to the MPE specification (page 16, section 2.4), The initial pitch/pressure/timbre should be sent before the NoteOn event.
+		if (m_instrumentTrack->midiPort()->mpeEnabled())
+		{
+			sendMPEDetuning();
+		}
+
 		// send MidiNoteOn event
 		m_instrumentTrack->processOutEvent(
-			MidiEvent( MidiNoteOn, midiChannel(), midiKey(), midiVelocity( baseVelocity ) ),
+			MidiEvent(MidiNoteOn, midiChannel(), key(), midiVelocity(baseVelocity)),
 			TimePos::fromFrames( offset(), Engine::framesPerTick() ),
 			offset() );
 	}
@@ -392,7 +412,7 @@ void NotePlayHandle::noteOff( const f_cnt_t _s )
 
 		// send MidiNoteOff event
 		m_instrumentTrack->processOutEvent(
-				MidiEvent( MidiNoteOff, midiChannel(), midiKey(), 0 ),
+				MidiEvent(MidiNoteOff, midiChannel(), key(), 0),
 				TimePos::fromFrames( _s, Engine::framesPerTick() ),
 				_s );
 	}
@@ -406,6 +426,9 @@ void NotePlayHandle::noteOff( const f_cnt_t _s )
 			m_instrumentTrack->midiNoteOff( *this );
 		}
 	}
+
+	// Notify MPE Manager to update channel note counts
+	m_instrumentTrack->midiPort()->mpeManager().noteOff(midiChannel());
 }
 
 
@@ -508,7 +531,6 @@ bool NotePlayHandle::operator==( const NotePlayHandle & _nph ) const
 			m_totalFramesPlayed == _nph.m_totalFramesPlayed &&
 			m_released == _nph.m_released &&
 			m_hasParent == _nph.m_hasParent &&
-			m_origBaseNote == _nph.m_origBaseNote &&
 			m_muted == _nph.m_muted &&
 			m_midiChannel == _nph.m_midiChannel &&
 			m_origin == _nph.m_origin;
@@ -519,19 +541,15 @@ bool NotePlayHandle::operator==( const NotePlayHandle & _nph ) const
 
 void NotePlayHandle::updateFrequency()
 {
-	int masterPitch = m_instrumentTrack->m_useMasterPitchModel.value() ? Engine::getSong()->masterPitch() : 0;
-	int baseNote = m_instrumentTrack->baseNoteModel()->value();
 	float detune = m_baseDetuning->value();
 	float instrumentPitch = m_instrumentTrack->pitchModel()->value();
 
 	if (m_instrumentTrack->m_microtuner.enabled())
 	{
 		// custom key mapping and scale: get frequency from the microtuner
-		const auto transposedKey = key() + masterPitch;
-
-		if (m_instrumentTrack->isKeyMapped(transposedKey))
+		if (m_instrumentTrack->isKeyMapped(physicalKey()))
 		{
-			const auto frequency = m_instrumentTrack->m_microtuner.keyToFreq(transposedKey, baseNote);
+			const auto frequency = m_instrumentTrack->m_microtuner.keyToFreq(key(), DefaultBaseKey);
 			m_frequency = frequency * std::exp2((detune + instrumentPitch / 100) / 12.f);
 			m_unpitchedFrequency = frequency * std::exp2(detune / 12.f);
 		}
@@ -543,7 +561,7 @@ void NotePlayHandle::updateFrequency()
 	else
 	{
 		// default key mapping and 12-TET frequency computation with default 440 Hz base note frequency
-		const float pitch = (key() - baseNote + masterPitch + detune) / 12.0f;
+		const float pitch = (key() - DefaultBaseKey + detune) / 12.0f;
 		m_frequency = DefaultBaseFreq * std::exp2(pitch + instrumentPitch / (100 * 12.0f));
 		m_unpitchedFrequency = DefaultBaseFreq * std::exp2(pitch);
 	}
@@ -572,10 +590,25 @@ void NotePlayHandle::processTimePos(const TimePos& time, float pitchValue, bool 
 		{
 			m_baseDetuning->setValue(v);
 			updateFrequency();
+			if (m_instrumentTrack->midiPort()->mpeEnabled())
+			{
+				sendMPEDetuning();
+			}
 		}
 	}
 }
 
+
+void NotePlayHandle::sendMPEDetuning()
+{
+	const float v = m_baseDetuning->value();
+	const int pitchRange = m_instrumentTrack->midiPort()->mpePitchRange();
+	// MIDI sends the pitch bend value as a 14 bit unsigned integer, which means there are 2^14 = 16384 possible values (0 to 16383).
+	// The zero point is right in the middle, 2^13 = 8192
+	// This formula is also given on page 24, section C.3 of the MPE sepcification.
+	const int pitchBendValue = std::clamp(static_cast<int>(std::round(v * 8192 / pitchRange) + 8192), 0, 16383);
+	m_instrumentTrack->processOutEvent(MidiEvent(MidiPitchBend, midiChannel(), pitchBendValue));
+}
 
 
 
@@ -629,7 +662,7 @@ NotePlayHandle * NotePlayHandleManager::acquire( InstrumentTrack* instrumentTrac
 				const f_cnt_t frames,
 				const Note& noteToPlay,
 				NotePlayHandle* parent,
-				int midiEventChannel,
+				uint8_t midiEventChannel,
 				NotePlayHandle::Origin origin )
 {
 	// TODO: use some lockless data structures

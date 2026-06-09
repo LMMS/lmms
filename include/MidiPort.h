@@ -29,10 +29,13 @@
 #include <QString>
 #include <QList>
 #include <QMap>
+#include <stdexcept>
 
 #include "Midi.h"
 #include "TimePos.h"
 #include "AutomatableModel.h"
+#include "ComboBoxModel.h"
+#include "MPEManager.h"
 
 namespace lmms
 {
@@ -66,6 +69,8 @@ class MidiPort : public Model, public SerializingObject
 	mapPropertyFromModel(int,baseVelocity,setBaseVelocity,m_baseVelocityModel);
 	mapPropertyFromModel(bool,isReadable,setReadable,m_readableModel);
 	mapPropertyFromModel(bool,isWritable,setWritable,m_writableModel);
+	mapPropertyFromModel(bool, mpeEnabled, setMPEEnabled, m_MPEModel);
+	mapPropertyFromModel(int, mpePitchRange, setMPEPitchRange, m_MPEPitchRangeModel);
 public:
 	using Map = QMap<QString, bool>;
 
@@ -111,6 +116,40 @@ public:
 		return outputChannel() ? outputChannel() - 1 : 0;
 	}
 
+	//! Returns the current number of channels in the Lower MPE Zone, or 0 if there are no member channels or MPE is disabled
+	int mpeLowerZoneChannels() const
+	{
+		return mpeEnabled() && m_MPELowerZoneChannelsModel.value() > 1
+			? m_MPELowerZoneChannelsModel.value()
+			: 0;
+	}
+	//! Returns the current number of channels in the Upper MPE Zone, or 0 if there are no member channels or MPE is disabled
+	int mpeUpperZoneChannels() const
+	{
+		return mpeEnabled() && m_MPEUpperZoneChannelsModel.value() > 1
+			? m_MPEUpperZoneChannelsModel.value()
+			: 0;
+	}
+
+	// Returns the current active MPE zone (Lower or Upper)
+	MPEManager::Zone mpeActiveZone() const
+	{
+		switch (m_MPEZoneModel.value())
+		{
+			case 0:
+				return MPEManager::Zone::Lower;
+			case 1:
+				return MPEManager::Zone::Upper;
+			default:
+				throw std::invalid_argument("The value of m_MPEZoneModel is not 0 or 1, corresponding to an invalid MPE zone.");
+		}
+	}
+
+	MPEManager& mpeManager()
+	{
+		return m_mpeManager;
+	}
+
 	void processInEvent( const MidiEvent& event, const TimePos& time = TimePos() );
 	void processOutEvent( const MidiEvent& event, const TimePos& time = TimePos() );
 
@@ -150,11 +189,14 @@ private slots:
 	void updateReadablePorts();
 	void updateWritablePorts();
 	void updateOutputProgram();
+	void updateMPEConfiguration();
 
 
 private:
 	MidiClient* m_midiClient;
 	MidiEventProcessor* m_midiEventProcessor;
+
+	MPEManager m_mpeManager;
 
 	Mode m_mode;
 
@@ -170,6 +212,12 @@ private:
 	BoolModel m_readableModel;
 	BoolModel m_writableModel;
 
+	BoolModel m_MPEModel;
+	IntModel m_MPELowerZoneChannelsModel;
+	IntModel m_MPEUpperZoneChannelsModel;
+	IntModel m_MPEPitchRangeModel;
+	ComboBoxModel m_MPEZoneModel;
+
 	Map m_readablePorts;
 	Map m_writablePorts;
 
@@ -182,6 +230,7 @@ signals:
 	void readablePortsChanged();
 	void writablePortsChanged();
 	void modeChanged();
+	void mpeConfigurationChanged();
 
 } ;
 
