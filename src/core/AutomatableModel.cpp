@@ -401,29 +401,19 @@ void AutomatableModel::setStep( const float step )
 
 
 
-float AutomatableModel::fittedValue( float value ) const
+float AutomatableModel::fittedValue(float value) const
 {
 	value = std::clamp(value, m_minValue, m_maxValue);
 
-	if( m_step != 0 && m_hasStrictStepSize )
+	if (m_step != 0 && m_hasStrictStepSize)
 	{
-		value = nearbyintf( value / m_step ) * m_step;
+		value = std::round(value / m_step) * m_step;
 	}
 
-	roundAt( value, m_maxValue );
-	roundAt( value, m_minValue );
-	roundAt( value, 0.0f );
-
-	if( value < m_minValue )
-	{
-		return m_minValue;
-	}
-	else if( value > m_maxValue )
-	{
-		return m_maxValue;
-	}
-
-	return value;
+	roundAt(value, m_maxValue);
+	roundAt(value, m_minValue);
+	roundAt(value, 0.0f);
+	return std::clamp(value, m_minValue, m_maxValue);
 }
 
 

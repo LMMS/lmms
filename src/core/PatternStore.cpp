@@ -88,8 +88,9 @@ bar_t PatternStore::lengthOfPattern(int pattern) const
 	const TrackList & tl = tracks();
 	for (Track * t : tl)
 	{
-		// Don't create Clips here if they don't exist
-		if (pattern < t->numOfClips())
+		// Don't create Clips here if they don't exist, and only takes into account MIDI clips
+		// because the length of Automation / Sample clips is defined based on this method's output.
+		if (pattern < t->numOfClips() && t->type() == Track::Type::Instrument)
 		{
 			maxLength = std::max(maxLength, t->getClip(pattern)->length());
 		}
