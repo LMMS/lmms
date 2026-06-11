@@ -142,7 +142,12 @@ ENDIF()
 SET_DIRECTORY_PROPERTIES(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${LMMS_RCC_OUT} lmmsconfig.h lmms.1.gz")
 
 IF(LMMS_BUILD_WIN32)
-	SET(EXTRA_LIBRARIES "winmm")
+	IF(MSVC)
+		# Hardcoded for current environment due to find_library failure with Ninja
+		SET(EXTRA_LIBRARIES "C:/Program Files (x86)/Windows Kits/10/Lib/10.0.26100.0/um/x64/WinMM.Lib")
+	ELSE()
+		SET(EXTRA_LIBRARIES "winmm")
+	ENDIF()
 ENDIF()
 
 IF(LMMS_BUILD_APPLE)
@@ -218,3 +223,17 @@ IF(NOT WIN32 AND NOT LMMS_BUILD_APPLE)
 ENDIF()
 
 INSTALL(TARGETS lmms RUNTIME DESTINATION "${BIN_DIR}")
+
+IF(WIN32 AND NOT CMAKE_CROSSCOMPILING)
+	GET_TARGET_PROPERTY(QT_BIN_DIR Qt5::Core LOCATION)
+	GET_FILENAME_COMPONENT(QT_BIN_DIR "${QT_BIN_DIR}" DIRECTORY)
+	ADD_CUSTOM_COMMAND(TARGET lmms POST_BUILD
+		COMMAND "${QT_BIN_DIR}/windeployqt.exe"
+			--no-compiler-runtime
+			--no-translations
+			--no-opengl-sw
+			--no-system-d3d-compiler
+			"${CMAKE_BINARY_DIR}/lmms.exe"
+		COMMENT "Running windeployqt to bundle dependencies"
+	)
+ENDIF()

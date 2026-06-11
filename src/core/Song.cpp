@@ -129,6 +129,17 @@ Song::Song() :
 		};
 
 		connect(&m_timelines[i], &Timeline::positionJumped, this, onPositionJumped);
+
+		// Update VST sync position when the user changes position while not playing
+		connect(&m_timelines[i], &Timeline::positionJumped, this, [this, playMode = static_cast<PlayMode>(i)] {
+			if (!m_playing)
+			{
+				const auto& tl = getTimeline(playMode);
+				m_vstSyncController.setAbsolutePosition(
+					tl.ticks() + tl.frameOffset() / static_cast<double>(Engine::framesPerTick()));
+				m_vstSyncController.setPlaybackJumped(true);
+			}
+		});
 	}
 
 	// Inform VST plugins if the user moved the play head
@@ -574,6 +585,8 @@ void Song::playMidiClip( const MidiClip* midiClipToPlay, bool loop )
 		m_playing = true;
 		m_paused = false;
 	}
+
+	m_vstSyncController.setPlaybackState( true );
 
 	savePlayStartPosition();
 

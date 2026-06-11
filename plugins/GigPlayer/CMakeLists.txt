@@ -6,12 +6,13 @@ if(LMMS_HAVE_GIG)
 	# Required for not crashing loading files with libgig
 	add_compile_options("-fexceptions")
 
-	link_directories(${GIG_LIBRARY_DIRS})
-	link_libraries(${GIG_LIBRARIES})
+	# Use target_link_libraries instead for modern CMake
+
 	build_plugin(gigplayer
 		GigPlayer.cpp GigPlayer.h PatchesDialog.cpp PatchesDialog.h PatchesDialog.ui
 		MOCFILES GigPlayer.h PatchesDialog.h
 		EMBEDDED_RESOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.png"
 	)
-	target_link_libraries(gigplayer SampleRate::samplerate)
+	target_link_directories(gigplayer PRIVATE ${GIG_LIBRARY_DIRS})
+	target_link_libraries(gigplayer ${GIG_LIBRARIES} SampleRate::samplerate)
 endif(LMMS_HAVE_GIG)

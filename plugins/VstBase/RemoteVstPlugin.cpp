@@ -1120,7 +1120,12 @@ void RemoteVstPlugin::process( const SampleFrame* _in, SampleFrame* _out )
 
 	unlockShm();
 
-	m_currentSamplePos += bufferSize();
+	const auto syncData = __plugin->getVstSyncData();
+	if (syncData)
+	{
+		__plugin->m_currentSamplePos = syncData->ppqPos
+			* syncData->sampleRate * 60.0 / syncData->bpm;
+	}
 }
 
 
@@ -1876,7 +1881,6 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 			assert(syncData != nullptr);
 
 			memset( &_timeInfo, 0, sizeof( _timeInfo ) );
-			_timeInfo.samplePos = __plugin->m_currentSamplePos;
 			_timeInfo.sampleRate = syncData->sampleRate;
 			_timeInfo.flags = 0;
 			_timeInfo.tempo = syncData->bpm;
@@ -1907,8 +1911,15 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 					/ syncData->sampleRate;
 				_timeInfo.ppqPos = __plugin->m_sync.lastppqPos;
 			}
-//			_timeInfo.ppqPos = syncData->ppqPos;
+			else
+			{
+				_timeInfo.ppqPos = __plugin->m_sync.lastppqPos;
+			}
 			_timeInfo.flags |= kVstPpqPosValid;
+
+			// Derive samplePos from the computed ppqPos for consistency
+			_timeInfo.samplePos = _timeInfo.ppqPos
+				* syncData->sampleRate * 60.0 / syncData->bpm;
 
 			if (syncData->isPlaying)
 			{
