@@ -112,12 +112,13 @@ void MidiClip::resizeToFirstTrack()
 
 void MidiClip::init()
 {
-	connect( Engine::getSong(), SIGNAL(timeSignatureChanged(int,int)),
-				this, SLOT(changeTimeSignature()));
-	saveJournallingState( false );
-
-	updateLength();
-	restoreJournallingState();
+	connect(Engine::getSong(), &Song::timeSignatureChanged, this, &MidiClip::changeTimeSignature);
+	if (getTrack()->trackContainer() != Engine::patternStore())
+	{
+		saveJournallingState(false);
+		updateLength();
+		restoreJournallingState();
+	}
 }
 
 
@@ -128,7 +129,7 @@ void MidiClip::updateLength()
 	// If the clip hasn't already been manually resized, automatically resize it.
 	if (getAutoResize())
 	{
-		if (m_clipType == Type::BeatClip)
+		if (m_instrumentTrack->trackContainer()->type() == TrackContainer::Type::Pattern)
 		{
 			changeLength(beatClipLength());
 			updatePatternTrack();

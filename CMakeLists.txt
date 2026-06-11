@@ -373,7 +373,7 @@ IF(WANT_STK)
 		SET(STATUS_STK "OK")
 	ELSE(STK_FOUND)
 		SET(STK_INCLUDE_DIR "")
-		SET(STATUS_STK "not found, please install libstk0-dev (or similar) "
+		SET(STATUS_STK "not found, please install libstk-dev or libstk0-dev (or similar)"
 			"if you require the Mallets instrument")
 	ENDIF(STK_FOUND)
 ENDIF(WANT_STK)
@@ -757,7 +757,6 @@ ADD_SUBDIRECTORY(src)
 ADD_SUBDIRECTORY(plugins)
 ADD_SUBDIRECTORY(tests)
 ADD_SUBDIRECTORY(data)
-ADD_SUBDIRECTORY(doc)
 
 # install tasks
 ADD_SUBDIRECTORY(cmake/install)
