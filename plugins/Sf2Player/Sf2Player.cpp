@@ -266,7 +266,7 @@ void Sf2Instrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 void Sf2Instrument::loadSettings( const QDomElement & _this )
 {
 	QString src = _this.attribute("src");
-	if(!src.isEmpty())
+	if (!src.isEmpty())
 	{
 		openFile(src, false);
 		m_patchNum.loadSettings(_this, "patch");
