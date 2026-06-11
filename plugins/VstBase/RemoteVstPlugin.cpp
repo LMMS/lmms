@@ -1911,7 +1911,10 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 					/ syncData->sampleRate;
 				_timeInfo.ppqPos = __plugin->m_sync.lastppqPos;
 			}
-//			_timeInfo.ppqPos = syncData->ppqPos;
+			else
+			{
+				_timeInfo.ppqPos = __plugin->m_sync.lastppqPos;
+			}
 			_timeInfo.flags |= kVstPpqPosValid;
 
 			// Derive samplePos from the computed ppqPos for consistency
