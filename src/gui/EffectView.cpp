@@ -60,8 +60,12 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 	m_bypass = new LedCheckBox( this, "", isEnabled ? LedCheckBox::LedColor::Green : LedCheckBox::LedColor::Red );
 	m_bypass->move( 3, 3 );
 	m_bypass->setEnabled( isEnabled );
-
 	m_bypass->setToolTip(tr("On/Off"));
+
+	m_corruption = new LedCheckBox(this, "", LedCheckBox::LedColor::Red);
+	m_corruption->move(3, m_bypass->y() + m_bypass->height() + 3);
+	m_corruption->setEnabled(effect()->isCorrupted());
+	m_corruption->setDisabled(true);
 
 	m_wetDry = new Knob(KnobType::Bright26, tr("W/D"), this, Knob::LabelRendering::LegacyFixedFontSize);
 	m_wetDry->move( 40 - m_wetDry->width() / 2, 5 );
@@ -247,13 +251,13 @@ void EffectView::updateCorruptedState()
 {
 	if (effect()->isCorrupted())
 	{
-		effect()->m_enabledModel.setValue(0);
-		m_bypass->setToolTip(tr("Effect bypassed: Plugin is outputting corrupted audio (inf/nan)."));
+		m_corruption->setChecked(true);
+		m_corruption->setToolTip(tr("Audio corrupted: faulty audio has been muted"));
 	}
 	else
 	{
-		effect()->m_enabledModel.setValue(effect()->isEnabled());
-		m_bypass->setToolTip(tr("On/Off"));
+		m_corruption->setChecked(false);
+		m_corruption->setToolTip(tr("Will flash red when corrupted audio output is detected"));
 	}
 }
 
