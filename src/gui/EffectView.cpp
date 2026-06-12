@@ -255,7 +255,7 @@ void EffectView::updateCorruptedState()
 	if (effect()->isCorrupted())
 	{
 		m_corruption->setChecked(true);
-		m_corruption->setToolTip(tr("Audio corrupted: faulty audio has been muted"));
+		m_corruption->setToolTip(tr("Audio corrupted: faulty audio output has been muted"));
 	}
 	else
 	{
