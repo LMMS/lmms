@@ -62,10 +62,13 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 	m_bypass->setEnabled( isEnabled );
 	m_bypass->setToolTip(tr("On/Off"));
 
-	m_corruption = new LedCheckBox(this, "", LedCheckBox::LedColor::Red);
-	m_corruption->move(3, m_bypass->y() + m_bypass->height() + 3);
-	m_corruption->setEnabled(effect()->isCorrupted());
-	m_corruption->setDisabled(true);
+	if (Engine::audioEngine()->sanitizationEnabled())
+	{
+		m_corruption = new LedCheckBox(this, "", LedCheckBox::LedColor::Red);
+		m_corruption->move(3, m_bypass->y() + m_bypass->height() + 3);
+		m_corruption->setEnabled(effect()->isCorrupted());
+		m_corruption->setDisabled(true);
+	}
 
 	m_wetDry = new Knob(KnobType::Bright26, tr("W/D"), this, Knob::LabelRendering::LegacyFixedFontSize);
 	m_wetDry->move( 40 - m_wetDry->width() / 2, 5 );
