@@ -658,14 +658,8 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	const auto otherBox = new QGroupBox(tr("Other"), audio_w);
 	const auto otherBoxLayout = new QVBoxLayout{otherBox};
 
-	const auto mixSanitzationCheckbox = new QCheckBox{};
-	mixSanitzationCheckbox->setText(tr("Enable mix sanitization"));
-	mixSanitzationCheckbox->setChecked(m_mixSanitization);
-	otherBoxLayout->addWidget(mixSanitzationCheckbox);
-
-	connect(mixSanitzationCheckbox, &QCheckBox::stateChanged, [mixSanitzationCheckbox, this] {
-		m_mixSanitization = mixSanitzationCheckbox->isChecked();
-	});
+	addCheckBox(tr("Enable mix sanitization"), otherBox, otherBoxLayout, m_mixSanitization,
+		SLOT(toggleMixSanitization(bool)), true);
 
 	// Audio layout ordering.
 	audio_layout->addWidget(audioInterfaceBox);
@@ -1242,6 +1236,11 @@ void SetupDialog::toggleVSTAlwaysOnTop(bool enabled)
 void SetupDialog::toggleDisableAutoQuit(bool enabled)
 {
 	m_disableAutoQuit = enabled;
+}
+
+void SetupDialog::toggleMixSanitization(bool enabled)
+{
+	m_mixSanitization = enabled;
 }
 
 void SetupDialog::audioInterfaceChanged(const QString & iface)

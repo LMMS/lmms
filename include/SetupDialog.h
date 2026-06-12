@@ -99,6 +99,7 @@ private slots:
 	void vstEmbedMethodChanged();
 	void toggleVSTAlwaysOnTop(bool en);
 	void toggleDisableAutoQuit(bool enabled);
+	void toggleMixSanitization(bool enabled);
 
 	// Audio settings widget.
 	void audioInterfaceChanged(const QString & driver);
