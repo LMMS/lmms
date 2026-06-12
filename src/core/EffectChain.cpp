@@ -191,8 +191,6 @@ bool EffectChain::processAudioBuffer(AudioBuffer& buffer)
 		return false;
 	}
 
-	m_corrupted.store(buffer.sanitizeAll(), std::memory_order_relaxed);
-
 	bool moreEffects = false;
 	for (Effect* effect : m_effects)
 	{

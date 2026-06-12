@@ -67,7 +67,6 @@ public:
 
 	void clear();
 
-	bool isCorrupted() const { return m_corrupted.load(std::memory_order_relaxed); }
 	bool isEnabled() const { return m_enabledModel.value(); }
 
 private:
@@ -75,7 +74,6 @@ private:
 	EffectList m_effects;
 
 	BoolModel m_enabledModel;
-	std::atomic<bool> m_corrupted = false;
 
 
 	friend class gui::EffectRackView;

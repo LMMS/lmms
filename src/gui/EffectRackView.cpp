@@ -287,17 +287,6 @@ QSize EffectRackView::sizeHint() const
 
 void EffectRackView::updateCorruptedState()
 {
-	if (fxChain()->isCorrupted())
-	{
-		fxChain()->m_enabledModel.setValue(0);
-		m_effectsGroupBox->ledButton()->setToolTip(tr("Effect chain bypassed: Received corrupted audio (inf/nan)"));
-	}
-	else
-	{
-		fxChain()->m_enabledModel.setValue(fxChain()->isEnabled());
-		m_effectsGroupBox->ledButton()->setToolTip(tr("On/Off"));
-	}
-
 	for (const auto& effectView : m_effectViews)
 	{
 		effectView->updateCorruptedState();
