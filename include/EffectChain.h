@@ -67,7 +67,6 @@ public:
 
 	void clear();
 
-	bool isEnabled() const { return m_enabledModel.value(); }
 
 private:
 	using EffectList = std::vector<Effect*>;
