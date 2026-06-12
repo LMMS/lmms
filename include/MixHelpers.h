@@ -40,12 +40,6 @@ bool isSilent( const SampleFrame* src, int frames );
 
 bool isSilent(std::span<sample_t> buffer);
 
-//! @returns whether sanitzation is enabled.
-bool sanitizationEnabled();
-
-//! Enable or disable sanitization.
-void setSanitizationEnabled(bool on);
-
 /*! \brief Add samples from src to dst */
 void add( SampleFrame* dst, const SampleFrame* src, int frames );
 

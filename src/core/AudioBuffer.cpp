@@ -24,7 +24,9 @@
 
 #include "AudioBuffer.h"
 
+#include "AudioEngine.h"
 #include "ConfigManager.h"
+#include "Engine.h"
 #include "MixHelpers.h"
 #include "SharedMemory.h"
 
@@ -203,8 +205,6 @@ auto AudioBuffer::hasAnySignal() const -> bool
 
 auto AudioBuffer::sanitize(const ChannelFlags& channels, ch_cnt_t upperBound) -> bool
 {
-	if (!MixHelpers::sanitizationEnabled()) { return false; }
-
 	bool changesMade = false;
 
 	const auto totalChannels = std::min(upperBound, this->totalChannels());
@@ -234,8 +234,6 @@ auto AudioBuffer::sanitize(const ChannelFlags& channels, ch_cnt_t upperBound) ->
 
 auto AudioBuffer::sanitizeAll() -> bool
 {
-	if (!MixHelpers::sanitizationEnabled()) { return false; }
-
 	bool changesMade = false;
 	for (ch_cnt_t ch = 0; ch < totalChannels(); ++ch)
 	{

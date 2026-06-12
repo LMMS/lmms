@@ -230,7 +230,10 @@ void AudioBusHandle::doProcessing()
 		// so they stay in sync
 		toPlanar(buffer, m_buffer.groupBuffers(0));
 
-		m_buffer.sanitizeAll();
+		if (Engine::audioEngine()->sanitizationEnabled())
+		{
+			m_buffer.sanitizeAll();
+		}
 
 		// Update silence status of all channels for instrument output
 		m_buffer.updateAllSilenceFlags();

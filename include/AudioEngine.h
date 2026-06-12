@@ -270,6 +270,8 @@ public:
 	static bool isAudioDevNameValid(QString name);
 	static bool isMidiDevNameValid(QString name);
 
+	//! @returns true if sanitization of inf/nan values is enabled
+	bool sanitizationEnabled() { return m_sanitizationEnabled; }
 
 signals:
 	void qualitySettingsChanged();
@@ -366,6 +368,7 @@ private:
 	AudioEngineProfiler m_profiler;
 
 	bool m_clearSignal;
+	bool m_sanitizationEnabled;
 
 	std::recursive_mutex m_changeMutex;
 

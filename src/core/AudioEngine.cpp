@@ -87,7 +87,8 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 	m_oldAudioDev( nullptr ),
 	m_audioDevStartFailed( false ),
 	m_profiler(),
-	m_clearSignal(false)
+	m_clearSignal(false),
+	m_sanitizationEnabled(ConfigManager::inst()->value("audioengine", "sanitizemix", "1").toInt())
 {
 	for( int i = 0; i < 2; ++i )
 	{

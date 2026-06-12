@@ -1071,8 +1071,6 @@ void SetupDialog::accept()
 		it.value()->saveSettings();
 	}
 	ConfigManager::inst()->saveConfigFile();
-
-	MixHelpers::setSanitizationEnabled(m_mixSanitization);
 }
 
 

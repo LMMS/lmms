@@ -40,7 +40,6 @@ namespace lmms::MixHelpers
 namespace {
 
 constexpr auto SilenceThreshold = 0.000001f; // -120 dBFS
-auto santizationEnabled = false;
 
 /*! \brief Function for applying MIXOP on all sample frames */
 template<typename MIXOP>
@@ -81,16 +80,6 @@ bool isSilent( const SampleFrame* src, int frames )
 bool isSilent(std::span<sample_t> buffer)
 {
 	return std::ranges::all_of(buffer, [&](const sample_t s) { return std::abs(s) < SilenceThreshold; });
-}
-
-bool sanitizationEnabled()
-{
-	return santizationEnabled;
-}
-
-void setSanitizationEnabled(bool on)
-{
-	santizationEnabled = on;
 }
 
 struct AddOp
