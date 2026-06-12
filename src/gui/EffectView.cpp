@@ -66,7 +66,7 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 	{
 		m_corruption = new LedCheckBox(this, "", LedCheckBox::LedColor::Red);
 		m_corruption->move(3, m_bypass->y() + m_bypass->height() + 3);
-		m_corruption->setEnabled(effect()->isCorrupted());
+		m_corruption->setChecked(effect()->isCorrupted());
 		m_corruption->setDisabled(true);
 	}
 
