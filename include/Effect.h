@@ -78,7 +78,7 @@ public:
 		m_okay = _state;
 	}
 
-	//! @returns true if the effect's internal state is corrupted with inf/NaNs
+	//! @returns true if the processing outputted corrupted audio (infs/nans).
 	bool isCorrupted() const { return m_corrupted.load(std::memory_order_relaxed); }
 
 	//! "Awake" means the effect has not been put to sleep by auto-quit

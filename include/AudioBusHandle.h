@@ -81,7 +81,7 @@ public:
 	void addPlayHandle(PlayHandle* handle);
 	void removePlayHandle(PlayHandle* handle);
 
-	//! @returns true if the audio output has been recently corrupted (infs/nans in audio output)
+	//! @returns true if the processing outputted corrupted audio (infs/nans).
 	bool isCorrupted() const { return m_corrupted.load(std::memory_order_relaxed); }
 
 private:
