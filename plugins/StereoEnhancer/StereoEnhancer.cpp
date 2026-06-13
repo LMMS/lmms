@@ -82,13 +82,13 @@ StereoEnhancerEffect::~StereoEnhancerEffect()
 
 
 
-Effect::ProcessStatus StereoEnhancerEffect::processImpl(SampleFrame* buf, const fpp_t frames)
+Effect::ProcessStatus StereoEnhancerEffect::processImpl(SampleFrame* buf, const f_cnt_t frames)
 {
 	m_delayBufferCleared = false;
 	const float d = dryLevel();
 	const float w = wetLevel();
 
-	for (fpp_t f = 0; f < frames; ++f)
+	for (f_cnt_t f = 0; f < frames; ++f)
 	{
 
 		// copy samples into the delay buffer
