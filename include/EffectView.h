@@ -91,7 +91,7 @@ protected:
 private:
 	QPixmap m_bg;
 	LedCheckBox * m_bypass;
-	LedCheckBox* m_corruption;
+	LedCheckBox* m_corruptCheckBox;
 	Knob * m_wetDry;
 	TempoSyncKnob * m_autoQuit;
 	QMdiSubWindow * m_subWindow;

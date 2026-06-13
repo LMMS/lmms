@@ -64,10 +64,10 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 
 	if (Engine::audioEngine()->sanitizationEnabled())
 	{
-		m_corruption = new LedCheckBox(this, "", LedCheckBox::LedColor::Red);
-		m_corruption->move(3, m_bypass->y() + m_bypass->height() + 3);
-		m_corruption->setChecked(effect()->isCorrupted());
-		m_corruption->setDisabled(true);
+		m_corruptCheckBox = new LedCheckBox(this, "", LedCheckBox::LedColor::Red);
+		m_corruptCheckBox->move(3, m_bypass->y() + m_bypass->height() + 3);
+		m_corruptCheckBox->setChecked(effect()->isCorrupted());
+		m_corruptCheckBox->setDisabled(true);
 	}
 
 	m_wetDry = new Knob(KnobType::Bright26, tr("W/D"), this, Knob::LabelRendering::LegacyFixedFontSize);
@@ -254,13 +254,13 @@ void EffectView::updateCorruptedState()
 {
 	if (effect()->isCorrupted())
 	{
-		m_corruption->setChecked(true);
-		m_corruption->setToolTip(tr("Audio corrupted: faulty audio output has been muted"));
+		m_corruptCheckBox->setChecked(true);
+		m_corruptCheckBox->setToolTip(tr("Audio corrupted: faulty audio output has been muted"));
 	}
 	else
 	{
-		m_corruption->setChecked(false);
-		m_corruption->setToolTip(tr("Will flash red when corrupted audio output is detected"));
+		m_corruptCheckBox->setChecked(false);
+		m_corruptCheckBox->setToolTip(tr("Will flash red when corrupted audio output is detected"));
 	}
 }
 

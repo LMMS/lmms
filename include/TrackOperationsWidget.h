@@ -72,7 +72,7 @@ private:
 	QPushButton * m_trackOps;
 	AutomatableButton* m_muteBtn;
 	AutomatableButton* m_soloBtn;
-	LedCheckBox* m_corrupted;
+	LedCheckBox* m_corruptCheckBox;
 
 	friend class TrackView;
 

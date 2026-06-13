@@ -105,20 +105,20 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 
 	if (Engine::audioEngine()->sanitizationEnabled())
 	{
-		m_corrupted = new LedCheckBox(operationsWidget, QString{}, LedCheckBox::LedColor::Red);
-		m_corrupted->setDisabled(true);
+		m_corruptCheckBox = new LedCheckBox(operationsWidget, QString{}, LedCheckBox::LedColor::Red);
+		m_corruptCheckBox->setDisabled(true);
 
 		// TODO: Introduce common base class for Tracks that output audio (i.e., instrument, and sample tracks)
 		if (auto track = qobject_cast<InstrumentTrack*>(m_trackView->getTrack()))
 		{
-			m_corrupted->setChecked(track->audioBusHandle()->isCorrupted());
+			m_corruptCheckBox->setChecked(track->audioBusHandle()->isCorrupted());
 		}
 		else if (auto track = qobject_cast<SampleTrack*>(m_trackView->getTrack()))
 		{
-			m_corrupted->setChecked(track->audioBusHandle()->isCorrupted());
+			m_corruptCheckBox->setChecked(track->audioBusHandle()->isCorrupted());
 		}
 
-		operationsLayout->addWidget(m_corrupted);
+		operationsLayout->addWidget(m_corruptCheckBox);
 	}
 
 	operationsLayout->addWidget(m_trackOps);
