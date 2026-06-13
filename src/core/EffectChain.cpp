@@ -29,6 +29,7 @@
 #include <cassert>
 
 #include "AudioBuffer.h"
+#include "DataFile.h"
 #include "Effect.h"
 #include "DummyEffect.h"
 #include "MixHelpers.h"
@@ -119,7 +120,6 @@ void EffectChain::loadSettings( const QDomElement & _this )
 
 
 
-
 void EffectChain::appendEffect( Effect * _effect )
 {
 	Engine::audioEngine()->requestChangeInModel();
@@ -154,6 +154,15 @@ void EffectChain::removeEffect( Effect * _effect )
 	}
 
 	emit dataChanged();
+}
+
+
+
+void EffectChain::loadPreset(const QString& filePath)
+{
+	DataFile dataFile(filePath);
+	const QDomElement content = dataFile.content();
+	loadSettings(content);
 }
 
 

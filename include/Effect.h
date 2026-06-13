@@ -53,12 +53,12 @@ class LMMS_EXPORT Effect : public Plugin
 {
 	Q_OBJECT
 public:
-	Effect( const Plugin::Descriptor * _desc,
-			Model * _parent,
-			const Descriptor::SubPluginFeatures::Key * _key );
+	Effect(const Plugin::Descriptor* desc,
+		Model* parent,
+		const Descriptor::SubPluginFeatures::Key* key);
 
-	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
-	void loadSettings( const QDomElement & _this ) override;
+	void saveSettings(QDomDocument& doc, QDomElement& parent) override;
+	void loadSettings(const QDomElement& thisElement) override;
 
 	inline QString nodeName() const override
 	{
@@ -130,16 +130,18 @@ public:
 		return m_autoQuitEnabled;
 	}
 
-	EffectChain * effectChain() const
+	EffectChain* effectChain() const
 	{
 		return m_parent;
 	}
 
-	virtual EffectControls * controls() = 0;
+	virtual EffectControls* controls() = 0;
 
-	static Effect * instantiate( const QString & _plugin_name,
-				Model * _parent,
-				Descriptor::SubPluginFeatures::Key * _key );
+	static Effect* instantiate(const QString& pluginName,
+		Model* parent,
+		Descriptor::SubPluginFeatures::Key* key);
+
+	static Effect* createFromPreset(const QString& filePath, Model* parent);
 
 
 protected:
@@ -167,7 +169,7 @@ protected:
 	virtual void processBypassedImpl() {}
 
 
-	gui::PluginView* instantiateView( QWidget * ) override;
+	gui::PluginView* instantiateView(QWidget*) override;
 
 	void goToSleep()
 	{
@@ -192,7 +194,7 @@ private:
 	void handleAutoQuit(bool silentOutput);
 
 
-	EffectChain * m_parent;
+	EffectChain* m_parent;
 
 	bool m_okay;
 	bool m_noRun;
