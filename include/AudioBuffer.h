@@ -336,16 +336,15 @@ public:
 	auto hasAnySignal() const -> bool;
 
 	/**
-	 * @brief Sanitizes @a channels of any Inf/NaN values if sanitization is enabled.
+	 * @brief Sanitizes @a channels of any Inf/NaN by replacing them with zeros. 
 	 *
-	 * If any invalid values are detected within a channel, the entire channel buffer is filled with silence, and its
+	 * If any invalid values are detected within a channel, the entire channel buffer is silenced, and its
 	 * internal silence flag is set.
 	 *
 	 * @param channels channels to sanitize; 1 = selected, 0 = skip
 	 * @param upperBound any channel indexes at or above this are skipped
 	 *
 	 * @returns true if sanitization occurred
-	 * @see MixHelpers::sanitizationEnabled
 	 */
 	auto sanitize(const ChannelFlags& channels, ch_cnt_t upperBound = MaxChannelsPerAudioBuffer) -> bool;
 
