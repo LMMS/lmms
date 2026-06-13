@@ -243,6 +243,7 @@ private:
 	QList<PluginView *> m_tools;
 
 	QBasicTimer m_updateTimer;
+	QBasicTimer m_updateCorruptStateTimer;
 	QTimer m_autoSaveTimer;
 	int m_autoSaveInterval;
 
@@ -270,6 +271,7 @@ private slots:
 
 signals:
 	void periodicUpdate();
+	void corruptStateUpdate();
 	void initProgress(const QString &msg);
 
 } ;

@@ -68,6 +68,7 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 		m_corruptCheckBox->move(3, m_bypass->y() + m_bypass->height() + 3);
 		m_corruptCheckBox->setChecked(effect()->isCorrupted());
 		m_corruptCheckBox->setDisabled(true);
+		connect(getGUI()->mainWindow(), &MainWindow::corruptStateUpdate, this, &EffectView::updateCorruptedState);
 	}
 
 	m_wetDry = new Knob(KnobType::Bright26, tr("W/D"), this, Knob::LabelRendering::LegacyFixedFontSize);
@@ -101,7 +102,7 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 			m_subWindow->hide();
 		}
 	}
-	
+
 	m_opacityEffect = new QGraphicsOpacityEffect(this);
 	m_opacityEffect->setOpacity(1);
 	setGraphicsEffect(m_opacityEffect);

@@ -64,6 +64,7 @@ private slots:
 	void recordingOn();
 	void recordingOff();
 	void clearTrack();
+	void updateCorruptedState();
 
 private:
 	TrackView * m_trackView;

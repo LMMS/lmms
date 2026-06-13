@@ -78,12 +78,7 @@ EffectRackView::EffectRackView( EffectChain* model, QWidget* parent ) :
 
 	setModel( model );
 
-	if (Engine::audioEngine()->sanitizationEnabled())
-	{
-		const auto updateCorruptedStateTimer = new QTimer{this};
-		connect(updateCorruptedStateTimer, &QTimer::timeout, this, &EffectRackView::updateCorruptedState);
-		updateCorruptedStateTimer->start(1000);
-	}
+
 }
 
 

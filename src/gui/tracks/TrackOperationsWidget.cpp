@@ -38,6 +38,8 @@
 #include "ColorChooser.h"
 #include "ConfigManager.h"
 #include "DataFile.h"
+#include "GuiApplication.h"
+#include "MainWindow.h"
 #include "SampleTrack.h"
 #include "embed.h"
 #include "Engine.h"
@@ -107,18 +109,8 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 	{
 		m_corruptCheckBox = new LedCheckBox(operationsWidget, QString{}, LedCheckBox::LedColor::Red);
 		m_corruptCheckBox->setDisabled(true);
-
-		// TODO: Introduce common base class for Tracks that output audio (i.e., instrument, and sample tracks)
-		if (auto track = qobject_cast<InstrumentTrack*>(m_trackView->getTrack()))
-		{
-			m_corruptCheckBox->setChecked(track->audioBusHandle()->isCorrupted());
-		}
-		else if (auto track = qobject_cast<SampleTrack*>(m_trackView->getTrack()))
-		{
-			m_corruptCheckBox->setChecked(track->audioBusHandle()->isCorrupted());
-		}
-
 		operationsLayout->addWidget(m_corruptCheckBox);
+		connect(getGUI()->mainWindow(), &MainWindow::corruptStateUpdate, this, &TrackOperationsWidget::updateCorruptedState);
 	}
 
 	operationsLayout->addWidget(m_trackOps);
@@ -386,5 +378,30 @@ void TrackOperationsWidget::recordingOff()
 	toggleRecording( false );
 }
 
+void TrackOperationsWidget::updateCorruptedState()
+{
+	auto corrupted = false;
+
+	// TODO: Introduce common base class for Tracks that output audio (i.e., instrument, and sample tracks)
+	if (auto track = qobject_cast<InstrumentTrack*>(m_trackView->getTrack()))
+	{
+		corrupted = track->audioBusHandle()->isCorrupted();
+	}
+	else if (auto track = qobject_cast<SampleTrack*>(m_trackView->getTrack()))
+	{
+		corrupted = track->audioBusHandle()->isCorrupted();
+	}
+
+	if (corrupted)
+	{
+		m_corruptCheckBox->setChecked(true);
+		m_corruptCheckBox->setToolTip(tr("Audio corrupted: faulty audio output has been muted"));
+	}
+	else
+	{
+		m_corruptCheckBox->setChecked(false);
+		m_corruptCheckBox->setToolTip(tr("Will flash red when corrupted audio output is detected"));
+	}
+}
 
 } // namespace lmms::gui
