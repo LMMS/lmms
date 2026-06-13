@@ -1237,7 +1237,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 			{
 				int noteKey = note->key();
 
-				if (note->detuning()->automationClip() == m_clip) {
+				if (note->detuning() != nullptr && note->detuning()->automationClip() == m_clip) {
 					detuningOffset = note->pos();
 					detuningNote = note;
 				}
