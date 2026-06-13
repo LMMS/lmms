@@ -141,6 +141,7 @@ void TrackView::resizeEvent( QResizeEvent * re )
 		m_trackOperationsWidget.setFixedSize( TRACK_OP_WIDTH, height() - 1 );
 		m_trackSettingsWidget.setFixedSize( DEFAULT_SETTINGS_WIDGET_WIDTH, height() - 1 );
 	}
+
 	m_trackContentWidget.setFixedHeight( height() );
 }
 

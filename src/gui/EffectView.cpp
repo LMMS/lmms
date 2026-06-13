@@ -60,8 +60,16 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 	m_bypass = new LedCheckBox( this, "", isEnabled ? LedCheckBox::LedColor::Green : LedCheckBox::LedColor::Red );
 	m_bypass->move( 3, 3 );
 	m_bypass->setEnabled( isEnabled );
-
 	m_bypass->setToolTip(tr("On/Off"));
+
+	if (Engine::audioEngine()->sanitizationEnabled())
+	{
+		m_corruptCheckBox = new LedCheckBox(this, "", LedCheckBox::LedColor::Red);
+		m_corruptCheckBox->move(3, m_bypass->y() + m_bypass->height() + 3);
+		m_corruptCheckBox->setChecked(effect()->isCorrupted());
+		m_corruptCheckBox->setDisabled(true);
+		connect(getGUI()->mainWindow(), &MainWindow::corruptStateUpdate, this, &EffectView::updateCorruptedState);
+	}
 
 	m_wetDry = new Knob(KnobType::Bright26, tr("W/D"), this, Knob::LabelRendering::LegacyFixedFontSize);
 	m_wetDry->move( 40 - m_wetDry->width() / 2, 5 );
@@ -94,7 +102,7 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 			m_subWindow->hide();
 		}
 	}
-	
+
 	m_opacityEffect = new QGraphicsOpacityEffect(this);
 	m_opacityEffect->setOpacity(1);
 	setGraphicsEffect(m_opacityEffect);
@@ -241,6 +249,20 @@ void EffectView::modelChanged()
 	m_bypass->setModel( &effect()->m_enabledModel );
 	m_wetDry->setModel( &effect()->m_wetDryModel );
 	m_autoQuit->setModel( &effect()->m_autoQuitModel );
+}
+
+void EffectView::updateCorruptedState()
+{
+	if (effect()->isCorrupted())
+	{
+		m_corruptCheckBox->setChecked(true);
+		m_corruptCheckBox->setToolTip(tr("Audio corrupted: faulty audio output has been muted"));
+	}
+	else
+	{
+		m_corruptCheckBox->setChecked(false);
+		m_corruptCheckBox->setToolTip(tr("Will flash red when corrupted audio output is detected"));
+	}
 }
 
 } // namespace lmms::gui

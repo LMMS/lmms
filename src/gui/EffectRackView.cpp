@@ -28,6 +28,7 @@
 #include <QApplication>
 #include <QAction>
 #include <QPushButton>
+#include <QTimer>
 #include <QScrollArea>
 #include <QVBoxLayout>
 
@@ -48,6 +49,7 @@ EffectRackView::EffectRackView( EffectChain* model, QWidget* parent ) :
 	mainLayout->setContentsMargins(5, 5, 5, 5);
 
 	m_effectsGroupBox = new GroupBox( tr( "EFFECTS CHAIN" ) );
+	m_effectsGroupBox->ledButton()->setToolTip(tr("On/Off"));
 	mainLayout->addWidget( m_effectsGroupBox );
 
 	auto effectsLayout = new QVBoxLayout(m_effectsGroupBox);
@@ -75,6 +77,8 @@ EffectRackView::EffectRackView( EffectChain* model, QWidget* parent ) :
 	m_lastY = 0;
 
 	setModel( model );
+
+
 }
 
 
@@ -149,9 +153,6 @@ void EffectRackView::deletePlugin( EffectView* view )
 	e->deleteLater();
 	update();
 }
-
-
-
 
 void EffectRackView::update()
 {
@@ -282,7 +283,12 @@ QSize EffectRackView::sizeHint() const
 	return QSize{EffectRackView::DEFAULT_WIDTH, 254 /* INSTRUMENT_HEIGHT */ - 4 - 1};
 }
 
-
-
+void EffectRackView::updateCorruptedState()
+{
+	for (const auto& effectView : m_effectViews)
+	{
+		effectView->updateCorruptedState();
+	}
+}
 
 } // namespace lmms::gui
