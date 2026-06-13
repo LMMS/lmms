@@ -722,7 +722,7 @@ QList<QAction*> FileBrowserTreeWidget::getContextActions(FileItem* file, bool so
 
 	auto fileCanBeInstrument = false;
 	switch (file->type()) {
-	case FileItem::FileType::Preset:
+	case FileItem::FileType::InstrumentPreset:
 	case FileItem::FileType::Sample:
 	case FileItem::FileType::SoundFont:
 	case FileItem::FileType::Patch:
@@ -730,6 +730,8 @@ QList<QAction*> FileBrowserTreeWidget::getContextActions(FileItem* file, bool so
 		fileCanBeInstrument = true;
 
 	case FileItem::FileType::Project:
+	case FileItem::FileType::EffectPreset:
+	case FileItem::FileType::EffectChainPreset:
 	case FileItem::FileType::Midi:
 	case FileItem::FileType::Unknown:
 		break;
