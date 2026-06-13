@@ -142,15 +142,6 @@ void TrackView::resizeEvent( QResizeEvent * re )
 		m_trackSettingsWidget.setFixedSize( DEFAULT_SETTINGS_WIDGET_WIDTH, height() - 1 );
 	}
 
-	// Adds more space for the checkbox that indiciates to the user audio corruption
-	// TODO: We should be using layouts as the sizing and spacing may be inaccurate once we add more elements to the
-	// track view
-	if (Engine::audioEngine()->sanitizationEnabled())
-	{
-		m_trackOperationsWidget.setFixedWidth(m_trackOperationsWidget.width() + 20);
-		m_trackSettingsWidget.setFixedWidth(m_trackSettingsWidget.width() + 20);
-	}
-
 	m_trackContentWidget.setFixedHeight( height() );
 }
 
