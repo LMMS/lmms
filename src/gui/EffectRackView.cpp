@@ -283,12 +283,4 @@ QSize EffectRackView::sizeHint() const
 	return QSize{EffectRackView::DEFAULT_WIDTH, 254 /* INSTRUMENT_HEIGHT */ - 4 - 1};
 }
 
-void EffectRackView::updateCorruptedState()
-{
-	for (const auto& effectView : m_effectViews)
-	{
-		effectView->updateCorruptedState();
-	}
-}
-
 } // namespace lmms::gui
