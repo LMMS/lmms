@@ -146,7 +146,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	m_bufferSize(ConfigManager::inst()->value(
 			"audioengine", "framesperaudiobuffer").toInt()),
 	m_mixSanitization(ConfigManager::inst()->value(
-			"audioengine", "sanitizemix", "1").toInt()),
+			"audioengine", "sanitizemix", "0").toInt()),
 	m_sampleRate(ConfigManager::inst()->value(
 			"audioengine", "samplerate").toInt()),
 	m_midiAutoQuantize(ConfigManager::inst()->value(
