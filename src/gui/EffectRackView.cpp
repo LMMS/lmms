@@ -94,8 +94,8 @@ EffectRackView::EffectRackView( EffectChain* model, QWidget* parent ) :
 	loadPresetButton->setToolTip(tr("Load the effect chain from a preset file, overriding the current one"));
 
 	rowLayout->addWidget(addButton, 90);
-	rowLayout->addWidget(savePresetButton, 5);
 	rowLayout->addWidget(loadPresetButton, 5);
+	rowLayout->addWidget(savePresetButton, 5);
 
 	effectsLayout->addLayout(rowLayout);
 
