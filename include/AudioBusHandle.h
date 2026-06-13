@@ -81,6 +81,9 @@ public:
 	void addPlayHandle(PlayHandle* handle);
 	void removePlayHandle(PlayHandle* handle);
 
+	//! @returns true if the audio output has been recently corrupted (infs/nans in audio output)
+	bool isCorrupted() const { return m_corrupted.load(std::memory_order_relaxed); }
+
 private:
 	volatile bool m_bufferUsage;
 
@@ -99,6 +102,8 @@ private:
 	FloatModel* m_volumeModel;
 	FloatModel* m_panningModel;
 	BoolModel* m_mutedModel;
+	
+	std::atomic<bool> m_corrupted = false;
 
 	friend class AudioEngine;
 	friend class AudioEngineWorkerThread;

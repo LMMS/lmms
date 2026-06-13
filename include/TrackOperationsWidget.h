@@ -26,6 +26,7 @@
 #define LMMS_GUI_TRACK_OPERATIONS_WIDGET_H
 
 #include <QWidget>
+#include "LedCheckBox.h"
 
 class QPushButton;
 
@@ -71,7 +72,7 @@ private:
 	QPushButton * m_trackOps;
 	AutomatableButton* m_muteBtn;
 	AutomatableButton* m_soloBtn;
-
+	LedCheckBox* m_corrupted;
 
 	friend class TrackView;
 

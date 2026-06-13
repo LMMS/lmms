@@ -232,7 +232,7 @@ void AudioBusHandle::doProcessing()
 
 		if (Engine::audioEngine()->sanitizationEnabled())
 		{
-			m_buffer.sanitizeAll();
+			m_corrupted.store(m_buffer.sanitizeAll(), std::memory_order_relaxed);
 		}
 
 		// Update silence status of all channels for instrument output
