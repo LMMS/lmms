@@ -85,7 +85,7 @@ void MultitapEchoEffect::updateFilters( int begin, int end )
 }
 
 
-void MultitapEchoEffect::runFilter( SampleFrame* dst, SampleFrame* src, StereoOnePole & filter, const fpp_t frames )
+void MultitapEchoEffect::runFilter( SampleFrame* dst, SampleFrame* src, StereoOnePole & filter, const f_cnt_t frames )
 {
 	for (auto f = std::size_t{0}; f < frames; ++f)
 	{
@@ -95,7 +95,7 @@ void MultitapEchoEffect::runFilter( SampleFrame* dst, SampleFrame* src, StereoOn
 }
 
 
-Effect::ProcessStatus MultitapEchoEffect::processImpl(SampleFrame* buf, const fpp_t frames)
+Effect::ProcessStatus MultitapEchoEffect::processImpl(SampleFrame* buf, const f_cnt_t frames)
 {
 	const float d = dryLevel();
 	const float w = wetLevel();

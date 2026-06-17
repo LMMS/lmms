@@ -25,7 +25,7 @@
 #ifndef LMMS_MIX_HELPERS_H
 #define LMMS_MIX_HELPERS_H
 
-#include "LmmsTypes.h"
+#include "AudioBufferView.h"
 
 namespace lmms
 {
@@ -38,14 +38,27 @@ namespace MixHelpers
 
 bool isSilent( const SampleFrame* src, int frames );
 
+bool isSilent(std::span<sample_t> buffer);
+
 bool useNaNHandler();
 
 void setNaNHandler( bool use );
 
-bool sanitize( SampleFrame* src, int frames );
+/**
+ * @brief Sanitizes a buffer of infs/NaNs, zeroing the entire buffer if
+ *        any is detected.
+ *
+ * Only performs sanitization when the NaN handler is active.
+ *
+ * @returns true if inf or NaN was detected
+ */
+bool sanitize(std::span<sample_t> buffer);
 
 /*! \brief Add samples from src to dst */
 void add( SampleFrame* dst, const SampleFrame* src, int frames );
+
+/*! \brief Add samples from src to dst */
+void add(PlanarBufferView<sample_t> dst, PlanarBufferView<const sample_t> src);
 
 /*! \brief Multiply samples from `dst` by `coeff` */
 void multiply(SampleFrame* dst, float coeff, int frames);

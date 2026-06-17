@@ -102,7 +102,7 @@ void LOMMEffect::changeSampleRate()
 }
 
 
-Effect::ProcessStatus LOMMEffect::processImpl(SampleFrame* buf, const fpp_t frames)
+Effect::ProcessStatus LOMMEffect::processImpl(SampleFrame* buf, const f_cnt_t frames)
 {
 	if (m_needsUpdate || m_lommControls.m_split1Model.isValueChanged())
 	{
@@ -189,7 +189,7 @@ Effect::ProcessStatus LOMMEffect::processImpl(SampleFrame* buf, const fpp_t fram
 	const bool feedback = m_lommControls.m_feedbackModel.value() && !lookaheadEnable;
 	const bool lowSideUpwardSuppress = m_lommControls.m_lowSideUpwardSuppressModel.value() && midside;
 	
-	for (fpp_t f = 0; f < frames; ++f)
+	for (f_cnt_t f = 0; f < frames; ++f)
 	{
 		std::array<sample_t, 2> s = {buf[f][0], buf[f][1]};
 		

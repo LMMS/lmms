@@ -43,6 +43,7 @@
 #include <QStyleOption>
 #include <QToolButton>
 
+#include <algorithm>
 #include <cmath>
 #include <utility>
 
@@ -105,8 +106,10 @@ const int PR_TOP_MARGIN = 18;
 const int PR_RIGHT_MARGIN = SCROLLBAR_SIZE;
 
 
-// width of area used for resizing (the grip at the end of a note)
-const int RESIZE_AREA_WIDTH = 9;
+//! Width of area used for resizing (the grip at the end of a note)
+constexpr int RESIZE_GRIP_WIDTH = 9;
+//! The maximum fraction of the note width that the resize grip is allowed to take up
+constexpr float RESIZE_GRIP_MAX_WIDTH_FRACTION = 0.25f;
 
 // width of line for setting volume/panning of note
 const int NOTE_EDIT_LINE_WIDTH = 3;
@@ -320,7 +323,8 @@ PianoRoll::PianoRoll() :
 	{
 		m_zoomingModel.addItem(QString("%1%").arg(zoomLevel * 100));
 	}
-	m_zoomingModel.setValue( m_zoomingModel.findText( "100%" ) );
+	m_zoomingModel.setInitValue(ConfigManager::inst()->value("ui", "pianorollzoom", QString::number(m_zoomingModel.findText("100%"))).toInt());
+	zoomingChanged();
 	connect( &m_zoomingModel, SIGNAL(dataChanged()),
 					this, SLOT(zoomingChanged()));
 
@@ -329,7 +333,8 @@ PianoRoll::PianoRoll() :
 	{
 		m_zoomingYModel.addItem(QString("%1%").arg(zoomLevel * 100));
 	}
-	m_zoomingYModel.setValue(m_zoomingYModel.findText("100%"));
+	m_zoomingYModel.setInitValue(ConfigManager::inst()->value("ui", "pianorollzoomvertical", QString::number(m_zoomingModel.findText("100%"))).toInt());
+	zoomingYChanged();
 	connect(&m_zoomingYModel, SIGNAL(dataChanged()),
 					this, SLOT(zoomingYChanged()));
 
@@ -338,7 +343,7 @@ PianoRoll::PianoRoll() :
 	for (auto q : Quantizations) {
 		m_quantizeModel.addItem(QString("1/%1").arg(q));
 	}
-	m_quantizeModel.setValue( m_quantizeModel.findText( "1/16" ) );
+	m_quantizeModel.setInitValue(ConfigManager::inst()->value("ui", "pianorollquantization", QString::number(m_zoomingModel.findText("1/16"))).toInt());
 
 	connect( &m_quantizeModel, SIGNAL(dataChanged()),
 					this, SLOT(quantizeChanged()));
@@ -361,7 +366,7 @@ PianoRoll::PianoRoll() :
 		auto loader = std::make_unique<PixmapLoader>( "note_" + pixmaps[i+NUM_EVEN_LENGTHS] );
 		m_noteLenModel.addItem( "1/" + QString::number( (1 << i) * 3 ), std::move(loader) );
 	}
-	m_noteLenModel.setValue( 0 );
+	m_noteLenModel.setInitValue(ConfigManager::inst()->value("ui", "pianorollnotelength", "0").toInt());
 
 	// Note length change can cause a redraw if Q is set to lock
 	connect( &m_noteLenModel, SIGNAL(dataChanged()),
@@ -430,7 +435,7 @@ PianoRoll::PianoRoll() :
 	// Set up snap model
 	m_snapModel.addItem(tr("Nudge"));
 	m_snapModel.addItem(tr("Snap"));
-	m_snapModel.setValue(0);
+	m_snapModel.setInitValue(ConfigManager::inst()->value("ui", "pianorollsnap", "0").toInt());
 	changeSnapMode();
 	connect(&m_snapModel, SIGNAL(dataChanged()),
 		this, SLOT(changeSnapMode()));
@@ -441,6 +446,15 @@ PianoRoll::PianoRoll() :
 	connect(Engine::getSong(), SIGNAL(keymapListChanged(int)), this, SLOT(update()));
 }
 
+
+PianoRoll::~PianoRoll()
+{
+	ConfigManager::inst()->setValue("ui", "pianorollzoom", QString::number(m_zoomingModel.value()));
+	ConfigManager::inst()->setValue("ui", "pianorollzoomvertical", QString::number(m_zoomingYModel.value()));
+	ConfigManager::inst()->setValue("ui", "pianorollquantization", QString::number(m_quantizeModel.value()));
+	ConfigManager::inst()->setValue("ui", "pianorollnotelength", QString::number(m_noteLenModel.value()));
+	ConfigManager::inst()->setValue("ui", "pianorollsnap", QString::number(m_snapModel.value()));
+}
 
 
 void PianoRoll::reset()
@@ -1476,6 +1490,7 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 
 		case Qt::Key_Home:
 			m_timeLine->timeline()->setTicks(0);
+			Engine::getSong()->setPlayPos(0, Song::PlayMode::None);
 			ke->accept();
 			break;
 
@@ -1910,8 +1925,8 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 				}
 
 				// clicked at the "tail" of the note?
-				if( pos_ticks * m_ppb / TimePos::ticksPerBar() >
-						m_currentNote->endPos() * m_ppb / TimePos::ticksPerBar() - RESIZE_AREA_WIDTH
+				if (x + m_currentPosition * m_ppb / TimePos::ticksPerBar() >
+						m_currentNote->endPos() * m_ppb / TimePos::ticksPerBar() - resizeGripWidth(*m_currentNote)
 					&& m_currentNote->length() > 0 )
 				{
 					m_midiClip->addJournalCheckPoint();
@@ -2218,6 +2233,10 @@ void PianoRoll::setKnifeAction()
 		m_knifeDown = false;
 		setCursor(Qt::ArrowCursor);
 		update();
+
+		TextFloat::displayMessage(tr("Knife Tool"),
+			tr("Click and drag over notes to cut along a line\nHold Shift to automatically remove short ends"),
+			embed::getIconPixmap("edit_knife"), 4000);
 	}
 }
 
@@ -2513,6 +2532,9 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 	}
 	else if (pos.y() > PR_TOP_MARGIN || m_action != Action::None)
 	{
+		// TODO convert this into a proper separate action so that it doesn't require
+		// cursor to be within the bounds *while* dragging.
+		// See: https://github.com/LMMS/lmms/pull/8389#issuecomment-4486111452
 		bool edit_note = (pos.y() > noteEditTop())
 			&& m_action != Action::SelectNotes;
 
@@ -2587,15 +2609,15 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 
 			if( me->buttons() & Qt::LeftButton )
 			{
-				vol = qBound(MinVolume, static_cast<volume_t>(MinVolume
-					+ static_cast<float>(noteEditBottom() - pos.y())
+				vol = std::clamp(static_cast<volume_t>(MinVolume
+					+ static_cast<float>(std::max(0, noteEditBottom() - pos.y()))
 					/ static_cast<float>(noteEditBottom() - noteEditTop())
-					* (MaxVolume - MinVolume)), MaxVolume);
+					* (MaxVolume - MinVolume)), MinVolume, MaxVolume);
 
-				pan = qBound(PanningLeft, static_cast<panning_t>(PanningLeft
-					+ static_cast<float>(noteEditBottom() - pos.y())
+				pan = std::clamp(static_cast<panning_t>(PanningLeft
+					+ static_cast<float>(std::max(0, noteEditBottom() - pos.y()))
 					/ static_cast<float>(noteEditBottom() - noteEditTop())
-					* (PanningRight - PanningLeft)), PanningRight);
+					* (PanningRight - PanningLeft)), PanningLeft, PanningRight);
 			}
 
 			if( m_noteEditMode == NoteEditMode::Volume )
@@ -2703,8 +2725,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 				int noteRightX = ( note->pos() + note->length() -
 					m_currentPosition) * m_ppb/TimePos::ticksPerBar();
 				// cursor at the "tail" of the note?
-				bool atTail = note->length() > 0 && x > noteRightX -
-							RESIZE_AREA_WIDTH;
+				bool atTail = note->length() > 0 && x > noteRightX - resizeGripWidth(*note);
 				Qt::CursorShape cursorShape = atTail ? Qt::SizeHorCursor :
 													Qt::SizeAllCursor;
 				setCursor( cursorShape );
@@ -3274,6 +3295,11 @@ void PianoRoll::dragNotes(int x, int y, bool alt, bool shift, bool ctrl)
 }
 
 
+int PianoRoll::resizeGripWidth(const Note& note) const
+{
+	const int noteWidth = note.length() * m_ppb / TimePos::ticksPerBar();
+	return std::min(RESIZE_GRIP_WIDTH, static_cast<int>(std::round(RESIZE_GRIP_MAX_WIDTH_FRACTION * noteWidth)));
+}
 
 
 void PianoRoll::paintEvent(QPaintEvent * pe )
@@ -3746,7 +3772,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			int pos_ticks = note->pos();
 			int note_width = len_ticks * m_ppb / TimePos::ticksPerBar();
 
-			int detuningLength = !note->detuning()->automationClip()->getTimeMap().isEmpty()
+			int detuningLength = note->detuning() != nullptr && !note->detuning()->automationClip()->getTimeMap().isEmpty()
 				? note->detuning()->automationClip()->getTimeMap().lastKey() * m_ppb / TimePos::ticksPerBar()
 				: note_width;
 
@@ -4467,6 +4493,7 @@ void PianoRoll::finishRecordNote(const Note & n )
 						n1.quantizeLength(quantization());
 						n1.quantizePos(quantization());
 					}
+					n1.setLength(std::max(n1.length(), TimePos(1)));
 					m_midiClip->addNote(n1, false);
 					update();
 					m_recordingNotes.erase( it );
@@ -5603,6 +5630,10 @@ void PianoRollWindow::saveSettings( QDomDocument & doc, QDomElement & de )
 	de.setAttribute("stopbehaviour", static_cast<int>(
 		Engine::getSong()->getTimeline(Song::PlayMode::MidiClip).stopBehaviour()));
 
+	de.setAttribute("key", m_editor->m_keyModel.value());
+	de.setAttribute("chord", m_editor->m_chordModel.value());
+	de.setAttribute("scale", m_editor->m_scaleModel.value());
+
 	MainWindow::saveWidgetState( this, de );
 }
 
@@ -5612,12 +5643,16 @@ void PianoRollWindow::saveSettings( QDomDocument & doc, QDomElement & de )
 void PianoRollWindow::loadSettings( const QDomElement & de )
 {
 	m_editor->loadGhostNotes( de.firstChildElement("ghostnotes") );
-	m_editor->loadMarkedSemiTones(de.firstChildElement("markedSemiTones"));
 
 	MainWindow::restoreWidgetState( this, de );
 
 	Engine::getSong()->getTimeline(Song::PlayMode::MidiClip).setStopBehaviour(
 		static_cast<Timeline::StopBehaviour>(de.attribute("stopbehaviour").toInt()));
+
+	m_editor->m_keyModel.setInitValue(de.attribute("key").toInt());
+	m_editor->m_chordModel.setInitValue(de.attribute("chord").toInt());
+	m_editor->m_scaleModel.setInitValue(de.attribute("scale").toInt());
+	m_editor->loadMarkedSemiTones(de.firstChildElement("markedSemiTones"));
 
 	// update margins here because we're later in the startup process
 	// We can't earlier because everything is still starting with the
