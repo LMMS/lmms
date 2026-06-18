@@ -458,8 +458,7 @@ void TrackView::onTrackGripReleased()
 
 void TrackView::setIndicatorMute(FadeButton* indicator, bool muted)
 {
-	QPalette::ColorRole role = muted ? QPalette::Highlight : QPalette::BrightText;
-	indicator->setActiveColor(QApplication::palette().color(QPalette::Active, role));
+	indicator->setMuted(muted);
 }
 
 

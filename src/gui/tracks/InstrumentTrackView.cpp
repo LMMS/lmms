@@ -133,13 +133,7 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 	connect(midiRackAction, SIGNAL(triggered()),
 		this, SLOT(toggleMidiCCRack()));
 
-	m_activityIndicator = new FadeButton( QApplication::palette().color( QPalette::Active,
-							QPalette::Window),
-						QApplication::palette().color( QPalette::Active,
-							QPalette::BrightText ),
-						QApplication::palette().color( QPalette::Active,
-							QPalette::BrightText).darker(),
-						getTrackSettingsWidget() );
+	m_activityIndicator = new FadeButton(getTrackSettingsWidget());
 	m_activityIndicator->setFixedSize(8, 28);
 	m_activityIndicator->show();
 
@@ -164,6 +158,11 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 			 m_activityIndicator, SLOT(activate()));
 	connect( _it, SIGNAL(endNote()),
 	 		m_activityIndicator, SLOT(noteEnd()));
+
+	connect(getGUI()->mainWindow(), &MainWindow::corruptStateUpdate, this, [this] {
+		const auto corrupted = model()->audioBusHandle()->isCorrupted();
+		m_activityIndicator->setState(corrupted ? FadeButton::State::Corrupted : FadeButton::State::Normal);
+	});
 
 	setModel( _it );
 }

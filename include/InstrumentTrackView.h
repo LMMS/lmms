@@ -96,6 +96,9 @@ private slots:
 private:
 	static QPixmap determinePixmap(InstrumentTrack* instrumentTrack);
 
+signals:
+	void corruptStateUpdate(bool corrupt);
+
 private:
 	InstrumentTrackWindow * m_window;
 

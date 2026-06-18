@@ -32,6 +32,7 @@
 
 #include "ConfigManager.h"
 #include "DeprecationHelper.h"
+#include "MainWindow.h"
 #include "embed.h"
 #include "Engine.h"
 #include "FadeButton.h"
@@ -77,12 +78,7 @@ SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 	m_panningKnob->setHintText( tr( "Panning:" ), "%" );
 	m_panningKnob->show();
 
-	m_activityIndicator = new FadeButton(
-		QApplication::palette().color(QPalette::Active, QPalette::Window),
-		QApplication::palette().color(QPalette::Active, QPalette::BrightText),
-		QApplication::palette().color(QPalette::Active, QPalette::BrightText).darker(),
-		getTrackSettingsWidget()
-	);
+	m_activityIndicator = new FadeButton(getTrackSettingsWidget());
 	m_activityIndicator->setFixedSize(8, 28);
 	m_activityIndicator->show();
 
@@ -100,6 +96,11 @@ SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 	masterLayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
 	connect(_t, SIGNAL(playingChanged()), this, SLOT(updateIndicator()));
+
+	connect(getGUI()->mainWindow(), &MainWindow::corruptStateUpdate, this, [this] {
+		const auto corrupted = model()->audioBusHandle()->isCorrupted();
+		m_activityIndicator->setState(corrupted ? FadeButton::State::Corrupted : FadeButton::State::Normal);
+	});
 
 	setModel( _t );
 
