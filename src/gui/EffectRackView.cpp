@@ -150,6 +150,9 @@ void EffectRackView::deletePlugin( EffectView* view )
 	update();
 }
 
+
+
+
 void EffectRackView::update()
 {
 	QWidget * w = m_scrollArea->widget();
@@ -278,5 +281,8 @@ QSize EffectRackView::sizeHint() const
 	// Use the formula from InstrumentTrackWindow.cpp
 	return QSize{EffectRackView::DEFAULT_WIDTH, 254 /* INSTRUMENT_HEIGHT */ - 4 - 1};
 }
+
+
+
 
 } // namespace lmms::gui
