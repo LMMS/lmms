@@ -64,7 +64,7 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 
 	if (Engine::audioEngine()->sanitizationEnabled())
 	{
-		connect(getGUI()->mainWindow(), &MainWindow::corruptStateUpdate, this, &EffectView::updateCorruptedState);
+		connect(getGUI()->mainWindow(), &MainWindow::corruptStateUpdate, this, &EffectView::corruptStateUpdate);
 	}
 
 	m_wetDry = new Knob(KnobType::Bright26, tr("W/D"), this, Knob::LabelRendering::LegacyFixedFontSize);
@@ -247,7 +247,7 @@ void EffectView::modelChanged()
 	m_autoQuit->setModel( &effect()->m_autoQuitModel );
 }
 
-void EffectView::updateCorruptedState()
+void EffectView::corruptStateUpdate()
 {
 	// TODO: Have On/Off flash red on corrupted audio
 }

@@ -73,7 +73,7 @@ public slots:
 	void moveUp();
 	void moveDown();
 	void deletePlugin();
-	void updateCorruptedState();
+	void corruptStateUpdate();
 
 signals:
 	void movedUp(EffectView* view);
