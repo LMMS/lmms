@@ -64,10 +64,6 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 
 	if (Engine::audioEngine()->sanitizationEnabled())
 	{
-		m_corruptCheckBox = new LedCheckBox(this, "", LedCheckBox::LedColor::Red);
-		m_corruptCheckBox->move(3, m_bypass->y() + m_bypass->height() + 3);
-		m_corruptCheckBox->setChecked(effect()->isCorrupted());
-		m_corruptCheckBox->setDisabled(true);
 		connect(getGUI()->mainWindow(), &MainWindow::corruptStateUpdate, this, &EffectView::updateCorruptedState);
 	}
 
@@ -253,16 +249,7 @@ void EffectView::modelChanged()
 
 void EffectView::updateCorruptedState()
 {
-	if (effect()->isCorrupted())
-	{
-		m_corruptCheckBox->setChecked(true);
-		m_corruptCheckBox->setToolTip(tr("Audio corrupted: faulty audio output has been muted"));
-	}
-	else
-	{
-		m_corruptCheckBox->setChecked(false);
-		m_corruptCheckBox->setToolTip(tr("Will flash red when corrupted audio output is detected"));
-	}
+	// TODO: Have On/Off flash red on corrupted audio
 }
 
 } // namespace lmms::gui

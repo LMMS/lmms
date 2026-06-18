@@ -54,7 +54,7 @@ TrackGrip::TrackGrip(Track* track, QWidget* parent) :
 		s_releasedPixmap = new QPixmap(embed::getIconPixmap("track_op_grip"));
 	}
 
-	setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+	setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
 
 	setCursor(Qt::OpenHandCursor);
 

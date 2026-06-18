@@ -28,7 +28,6 @@
 #include <QApplication>
 #include <QAction>
 #include <QPushButton>
-#include <QTimer>
 #include <QScrollArea>
 #include <QVBoxLayout>
 
@@ -49,7 +48,6 @@ EffectRackView::EffectRackView( EffectChain* model, QWidget* parent ) :
 	mainLayout->setContentsMargins(5, 5, 5, 5);
 
 	m_effectsGroupBox = new GroupBox( tr( "EFFECTS CHAIN" ) );
-	m_effectsGroupBox->ledButton()->setToolTip(tr("On/Off"));
 	mainLayout->addWidget( m_effectsGroupBox );
 
 	auto effectsLayout = new QVBoxLayout(m_effectsGroupBox);

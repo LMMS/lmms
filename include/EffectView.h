@@ -27,7 +27,6 @@
 #define LMMS_GUI_EFFECT_VIEW_H
 
 #include "AutomatableModel.h"
-#include "LedCheckBox.h"
 #include "PluginView.h"
 #include "Effect.h"
 
@@ -62,8 +61,6 @@ public:
 		return castModel<Effect>();
 	}
 
-	void updateCorruptedState();
-
 	static constexpr int DEFAULT_WIDTH = 215;
 	static constexpr int DEFAULT_HEIGHT = 60;
 	
@@ -76,6 +73,7 @@ public slots:
 	void moveUp();
 	void moveDown();
 	void deletePlugin();
+	void updateCorruptedState();
 
 signals:
 	void movedUp(EffectView* view);
@@ -91,7 +89,6 @@ protected:
 private:
 	QPixmap m_bg;
 	LedCheckBox * m_bypass;
-	LedCheckBox* m_corruptCheckBox;
 	Knob * m_wetDry;
 	TempoSyncKnob * m_autoQuit;
 	QMdiSubWindow * m_subWindow;
