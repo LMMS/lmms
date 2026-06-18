@@ -92,12 +92,11 @@ private slots:
 	void createMixerLine();
 
 	void handleConfigChange(QString cls, QString attr, QString value);
+	
+	void corruptStateUpdate();
 
 private:
 	static QPixmap determinePixmap(InstrumentTrack* instrumentTrack);
-
-signals:
-	void corruptStateUpdate(bool corrupt);
 
 private:
 	InstrumentTrackWindow * m_window;

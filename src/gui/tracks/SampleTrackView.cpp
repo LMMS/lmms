@@ -96,11 +96,7 @@ SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 	masterLayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
 	connect(_t, SIGNAL(playingChanged()), this, SLOT(updateIndicator()));
-
-	connect(getGUI()->mainWindow(), &MainWindow::corruptStateUpdate, this, [this] {
-		const auto corrupted = model()->audioBusHandle()->isCorrupted();
-		m_activityIndicator->setState(corrupted ? FadeButton::State::Corrupted : FadeButton::State::Normal);
-	});
+	connect(getGUI()->mainWindow(), &MainWindow::corruptStateUpdate, this, &SampleTrackView::corruptStateUpdate);
 
 	setModel( _t );
 
@@ -249,6 +245,22 @@ void SampleTrackView::assignMixerLine(int channelIndex)
 	model()->mixerChannelModel()->setValue(channelIndex);
 
 	getGUI()->mixerView()->setCurrentMixerChannel(channelIndex);
+}
+
+void SampleTrackView::corruptStateUpdate()
+{
+	if (!Engine::audioEngine()->sanitizationEnabled()) { return; }
+
+	if (model()->audioBusHandle()->isCorrupted())
+	{
+		m_activityIndicator->setState(FadeButton::State::Corrupted);
+		m_activityIndicator->setToolTip(tr("Corrupted audio detected: muting affected channels"));
+	}
+	else
+	{
+		m_activityIndicator->setState(FadeButton::State::Normal);
+		m_activityIndicator->setToolTip(QString{});
+	}
 }
 
 

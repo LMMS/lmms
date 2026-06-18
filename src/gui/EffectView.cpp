@@ -62,20 +62,7 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 	m_bypass->setEnabled( isEnabled );
 	m_bypass->setToolTip(tr("On/Off"));
 
-	connect(getGUI()->mainWindow(), &MainWindow::corruptStateUpdate, this, [this, isEnabled] {
-		if (!Engine::audioEngine()->sanitizationEnabled() || !isEnabled) { return; }
-
-		if (effect()->isCorrupted())
-		{
-			m_bypass->setLedColor(LedCheckBox::LedColor::Red);
-			m_bypass->setToolTip(tr("Corrupted audio detected: muting affected channels"));
-		}
-		else
-		{
-			m_bypass->setLedColor(LedCheckBox::LedColor::Green);
-			m_bypass->setToolTip(tr("On/Off"));
-		}
-	});
+	connect(getGUI()->mainWindow(), &MainWindow::corruptStateUpdate, this, &EffectView::corruptStateUpdate);
 
 	m_wetDry = new Knob(KnobType::Bright26, tr("W/D"), this, Knob::LabelRendering::LegacyFixedFontSize);
 	m_wetDry->move( 40 - m_wetDry->width() / 2, 5 );
@@ -255,6 +242,22 @@ void EffectView::modelChanged()
 	m_bypass->setModel( &effect()->m_enabledModel );
 	m_wetDry->setModel( &effect()->m_wetDryModel );
 	m_autoQuit->setModel( &effect()->m_autoQuitModel );
+}
+
+void EffectView::corruptStateUpdate()
+{
+	if (!Engine::audioEngine()->sanitizationEnabled() || dynamic_cast<DummyEffect*>(effect())) { return; }
+
+	if (effect()->isCorrupted())
+	{
+		m_bypass->setLedColor(LedCheckBox::LedColor::Red);
+		m_bypass->setToolTip(tr("Corrupted audio detected: muting affected channels"));
+	}
+	else
+	{
+		m_bypass->setLedColor(LedCheckBox::LedColor::Green);
+		m_bypass->setToolTip(tr("On/Off"));
+	}
 }
 
 } // namespace lmms::gui
