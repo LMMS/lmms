@@ -658,7 +658,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	const auto otherBoxLayout = new QVBoxLayout{otherBox};
 
 	addCheckBox(tr("Enable mix sanitization"), otherBox, otherBoxLayout, m_mixSanitization,
-		SLOT(toggleMixSanitization(bool)), true);
+		SLOT(toggleMixSanitization(bool)), false);
 
 	// Audio layout ordering.
 	audio_layout->addWidget(audioInterfaceBox);
@@ -1240,6 +1240,7 @@ void SetupDialog::toggleDisableAutoQuit(bool enabled)
 void SetupDialog::toggleMixSanitization(bool enabled)
 {
 	m_mixSanitization = enabled;
+	Engine::audioEngine()->setSanitizationEnabled(m_mixSanitization);
 }
 
 void SetupDialog::audioInterfaceChanged(const QString & iface)
