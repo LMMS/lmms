@@ -33,7 +33,6 @@
 #include <QScrollArea>
 
 #include "AudioEngine.h"
-#include "MixHelpers.h"
 #include "embed.h"
 #include "Engine.h"
 #include "FileDialog.h"
