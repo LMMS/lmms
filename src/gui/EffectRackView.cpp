@@ -75,8 +75,6 @@ EffectRackView::EffectRackView( EffectChain* model, QWidget* parent ) :
 	m_lastY = 0;
 
 	setModel( model );
-
-
 }
 
 
