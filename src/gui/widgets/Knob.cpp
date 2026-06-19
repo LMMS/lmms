@@ -531,12 +531,6 @@ void Knob::changeEvent(QEvent * ev)
 	}
 }
 
-
-void VolumeKnob::setModel(Model* model, bool isOldModelValid)
-{
-	AutomatableModelView::setModel(model, isOldModelValid);
-}
-
 QString VolumeKnob::currentValueToText()
 {
 	const auto* m = model();
