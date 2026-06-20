@@ -659,11 +659,8 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 
 	const auto enableMixSanitizationCheckbox = addCheckBox(tr("Enable mix sanitization"), otherBox, otherBoxLayout,
 		m_mixSanitization, SLOT(toggleMixSanitization(bool)), false);
-	enableMixSanitizationCheckbox->setWhatsThis(
-		tr("Automatically detects and silences audio channels containing corrupted audio (i.e., NaNs and Infinities) "
-		   "caused by unstable plugins or tracks. Turning this on can prevent sudden loud bursts or other strange "
-		   "behavior, but may increase CPU usage. When corrupted audio is detected from an effect or track, the "
-		   "bypass button or activity indicator will flash red."));
+	enableMixSanitizationCheckbox->setToolTip(tr("Provides protection from any plugins or tracks that generate "
+												 "corrupted audio, but may negatively impact performance."));
 
 	// Audio layout ordering.
 	audio_layout->addWidget(audioInterfaceBox);
