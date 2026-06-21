@@ -26,6 +26,7 @@
 #include <algorithm>
 #include <assert.h>
 #include <array>
+#include <limits>
 
 using std::string;
 using std::vector;
@@ -35,6 +36,14 @@ namespace MidiFile
 {
 
 const int TICKSPERBEAT = 128;
+
+
+enum class MIDIFormat : uint16_t
+{
+	Type0 = 0,
+	Type1 = 1,
+	Type2 = 2,
+};
 
 
 int writeVarLength(uint32_t val, uint8_t *buffer)
@@ -87,12 +96,15 @@ int writeBigEndian2(uint16_t val, uint8_t *buf)
 class MIDIHeader
 {
 	// Class to encapsulate the MIDI header structure.
+	MIDIFormat format;
 	uint16_t numTracks;
 	uint16_t ticksPerBeat;
 	
 	public:
 	
-	MIDIHeader(uint16_t nTracks, uint16_t ticksPB=TICKSPERBEAT): numTracks(nTracks), ticksPerBeat(ticksPB) {}
+	MIDIHeader(uint16_t nTracks, MIDIFormat fileFormat = MIDIFormat::Type1,
+			uint16_t ticksPB = TICKSPERBEAT) :
+		format(fileFormat), numTracks(nTracks), ticksPerBeat(ticksPB) {}
 	
 	inline int writeToBuffer(uint8_t *buffer, int start=0) const
 	{
@@ -100,8 +112,8 @@ class MIDIHeader
 		buffer[start++] = 'M'; buffer[start++] = 'T'; buffer[start++] = 'h'; buffer[start++] = 'd';
 		// chunk size (6 bytes always)
 		buffer[start++] = 0; buffer[start++] = 0; buffer[start++] = 0; buffer[start++] = 0x06;
-		// format: 1 (multitrack)
-		buffer[start++] = 0; buffer[start++] = 0x01;
+		// format: Type 1 is a synchronous multitrack Standard MIDI File.
+		start += writeBigEndian2(static_cast<uint16_t>(format), buffer + start);
 		
 		start += writeBigEndian2(numTracks, buffer+start);
 		
@@ -195,6 +207,53 @@ struct Event
 		}
 		return size;
 	} // writeEventsToBuffer
+
+	inline void appendTo(vector<uint8_t>& buffer) const
+	{
+		std::array<uint8_t, 4> variableLength;
+		const auto appendVariableLength = [&buffer, &variableLength](uint32_t value)
+		{
+			const int length = writeVarLength(value, variableLength.data());
+			buffer.insert(buffer.end(), variableLength.begin(),
+				variableLength.begin() + length);
+		};
+
+		appendVariableLength(time);
+		switch (type)
+		{
+			case NOTE_ON:
+				buffer.push_back(0x9 << 4 | channel);
+				buffer.push_back(pitch);
+				buffer.push_back(volume);
+				break;
+			case NOTE_OFF:
+				buffer.push_back(0x8 << 4 | channel);
+				buffer.push_back(pitch);
+				buffer.push_back(volume);
+				break;
+			case TEMPO:
+			{
+				buffer.push_back(0xFF);
+				buffer.push_back(0x51);
+				buffer.push_back(0x03);
+
+				std::array<uint8_t, 4> fourbytes;
+				writeBigEndian4(static_cast<uint32_t>(60000000.0 / tempo), fourbytes.data());
+				buffer.insert(buffer.end(), fourbytes.begin() + 1, fourbytes.end());
+				break;
+			}
+			case PROG_CHANGE:
+				buffer.push_back(0xC << 4 | channel);
+				buffer.push_back(programNumber);
+				break;
+			case TRACK_NAME:
+				buffer.push_back(0xFF);
+				buffer.push_back(0x03);
+				appendVariableLength(static_cast<uint32_t>(trackName.size()));
+				buffer.insert(buffer.end(), trackName.begin(), trackName.end());
+				break;
+		}
+	}
 	
 	
 	// events are sorted by their time
@@ -224,16 +283,22 @@ class MIDITrack
 	
 	inline void addNote(uint8_t pitch, uint8_t volume, double time, double duration)
 	{
+		addNoteAtTick(pitch, volume,
+			static_cast<uint32_t>(time * TICKSPERBEAT),
+			static_cast<uint32_t>((time + duration) * TICKSPERBEAT));
+	}
+
+	inline void addNoteAtTick(uint8_t pitch, uint8_t volume,
+			uint32_t startTime, uint32_t endTime)
+	{
 		Event event; event.channel = channel;
 		event.volume = volume;
 		
-		event.type = Event::NOTE_ON; event.pitch = pitch; event.time= (uint32_t) (time * TICKSPERBEAT);
+		event.type = Event::NOTE_ON; event.pitch = pitch; event.time = startTime;
 		addEvent(event);
 		
-		event.type = Event::NOTE_OFF; event.pitch = pitch; event.time=(uint32_t) ((time+duration) * TICKSPERBEAT);
+		event.type = Event::NOTE_OFF; event.pitch = pitch; event.time = endTime;
 		addEvent(event);
-		
-		//printf("note: %d-%d\n", (uint32_t) time * TICKSPERBEAT, (uint32_t)((time+duration) * TICKSPERBEAT));
 	}
 	
 	inline void addName(const string &name, uint32_t time)
@@ -260,6 +325,40 @@ class MIDITrack
 		event.tempo = tempo;
 
 		addEvent(event);
+	}
+
+	inline vector<uint8_t> writeToVector() const
+	{
+		vector<Event> sortedEvents = events;
+		std::sort(sortedEvents.begin(), sortedEvents.end());
+
+		vector<uint8_t> eventBytes;
+		eventBytes.reserve(sortedEvents.size() * 4 + 4);
+		uint32_t timeLast = 0;
+		for (Event event : sortedEvents)
+		{
+			assert(event.time >= timeLast);
+			const uint32_t eventTime = event.time;
+			event.time -= timeLast;
+			timeLast = eventTime;
+			event.appendTo(eventBytes);
+		}
+
+		// End of track meta event.
+		eventBytes.insert(eventBytes.end(), {0x00, 0xFF, 0x2F, 0x00});
+		if (eventBytes.size() > std::numeric_limits<uint32_t>::max())
+		{
+			return {};
+		}
+
+		vector<uint8_t> trackBytes;
+		trackBytes.reserve(eventBytes.size() + 8);
+		trackBytes.insert(trackBytes.end(), {'M', 'T', 'r', 'k'});
+		std::array<uint8_t, 4> length;
+		writeBigEndian4(static_cast<uint32_t>(eventBytes.size()), length.data());
+		trackBytes.insert(trackBytes.end(), length.begin(), length.end());
+		trackBytes.insert(trackBytes.end(), eventBytes.begin(), eventBytes.end());
+		return trackBytes;
 	}
 	
 	inline int writeMIDIToBuffer(uint8_t *buffer, int start=0) const
@@ -307,18 +406,14 @@ class MIDITrack
 	
 	inline int writeToBuffer(uint8_t *buffer, int start=0) const
 	{
-		uint8_t eventsBuffer[MAX_TRACK_SIZE];
-		uint32_t events_size = writeMIDIToBuffer(eventsBuffer);
-		//printf(">> track %lu events took 0x%x bytes\n", events.size(), events_size);
-		
-		// chunk ID
-		buffer[start++] = 'M'; buffer[start++] = 'T'; buffer[start++] = 'r'; buffer[start++] = 'k';
-		// chunk size
-		start += writeBigEndian4(events_size, buffer+start);
-		// copy events data
-		memmove(buffer+start, eventsBuffer, events_size);
-		start += events_size;
-		return start;
+		const auto trackBytes = writeToVector();
+		if (trackBytes.empty() || start < 0 || start > MAX_TRACK_SIZE ||
+			trackBytes.size() > static_cast<size_t>(MAX_TRACK_SIZE - start))
+		{
+			return 0;
+		}
+		memmove(buffer + start, trackBytes.data(), trackBytes.size());
+		return start + static_cast<int>(trackBytes.size());
 	}
 };
 

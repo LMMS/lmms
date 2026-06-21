@@ -87,6 +87,7 @@ private:
 	void writeMidiClip(MidiNoteVector &midiClip, const QDomNode& n,
 				int base_pitch, double base_volume, int base_time);
 	void writeMidiClipToTrack(MTrack &mtrack, MidiNoteVector &nv);
+	void writeTempoTrack(MTrack &mtrack, int defaultTempo) const;
 	void writePatternClip(MidiNoteVector &src, MidiNoteVector &dst,
 				int len, int base, int start, int end);
 	void processPatternNotes(MidiNoteVector &nv, int cutPos);

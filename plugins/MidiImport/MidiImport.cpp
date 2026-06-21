@@ -195,7 +195,7 @@ public:
 	bool hasNotes = false;
 	QString trackName;
 
-	smfMidiChannel* create(TrackContainer* tc, QString tn)
+	smfMidiChannel* create(TrackContainer* tc, QString tn, int midiChannel)
 	{
 		if (!it) {
 			// Keep LMMS responsive
@@ -218,6 +218,12 @@ public:
 #endif
 			trackName = tn;
 			if (trackName != "") { it->setName(tn); }
+			if (midiChannel >= 0 && midiChannel < MidiChannelCount)
+			{
+				// Preserve the SMF channel so a later Type 1 export writes this
+				// instrument track back to the correct channel.
+				it->midiPort()->setOutputChannel(midiChannel + 1);
+			}
 			// General MIDI default
 			it->pitchRangeModel()->setInitValue(2);
 			// Create a default pattern
@@ -407,7 +413,7 @@ bool MidiImport::readSMF(TrackContainer* tc)
 			{
 				// LMMS does not currently support specifying the channel of a single note
 				// To be safe, put the notes from different channels on separate tracks so that no information is lost
-				smfMidiChannel* ch = chs[evt->chan + 16 * t].create(tc, trackName);
+				smfMidiChannel* ch = chs[evt->chan + 16 * t].create(tc, trackName, evt->chan);
 				auto noteEvt = dynamic_cast<Alg_note_ptr>(evt);
 				tick_t ticks = noteEvt->get_duration() * ticksPerBeat;
 				Note n(
@@ -421,7 +427,7 @@ bool MidiImport::readSMF(TrackContainer* tc)
 			}
 			else if (evt->is_update())
 			{
-				smfMidiChannel* ch = chs[evt->chan + 16 * t].create(tc, trackName);
+				smfMidiChannel* ch = chs[evt->chan + 16 * t].create(tc, trackName, evt->chan);
 
 				double time = evt->time*ticksPerBeat;
 				QString update(evt->get_attribute());

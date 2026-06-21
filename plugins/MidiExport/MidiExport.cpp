@@ -27,16 +27,42 @@
 
 #include "MidiExport.h"
 
+#include <iterator>
+#include <limits>
+#include <map>
+#include <set>
+
+#include <QDataStream>
+
+#include "AutomationClip.h"
+#include "Engine.h"
 #include "TrackContainer.h"
 #include "DataFile.h"
 #include "InstrumentTrack.h"
 #include "LocaleHelper.h"
 #include "PatternTrack.h"
+#include "Song.h"
+#include "TimePos.h"
 
 #include "plugin_export.h"
 
 namespace lmms
 {
+
+namespace
+{
+
+constexpr int LmmsTicksPerQuarterNote = DefaultTicksPerBar / 4;
+constexpr int TempoAutomationSamplePeriod = DefaultTicksPerBar / DefaultStepsPerBar;
+
+uint32_t lmmsTicksToMidiTicks(int ticks)
+{
+	const auto nonNegativeTicks = static_cast<uint64_t>(qMax(0, ticks));
+	return static_cast<uint32_t>(nonNegativeTicks * MidiFile::TICKSPERBEAT /
+		LmmsTicksPerQuarterNote);
+}
+
+} // namespace
 
 
 extern "C"
@@ -71,23 +97,60 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 			const TrackContainer::TrackList &patternStoreTracks,
 			int tempo, int masterPitch, const QString &filename)
 {
+	const auto countInstrumentTracks = [](const TrackContainer::TrackList& trackList)
+	{
+		return std::count_if(trackList.begin(), trackList.end(), [](const Track* track)
+		{
+			return track->type() == Track::Type::Instrument;
+		});
+	};
+
+	// Format 1 reserves track 0 for global events such as tempo changes.
+	const auto musicTrackCount = countInstrumentTracks(tracks) +
+		countInstrumentTracks(patternStoreTracks);
+	const auto totalTrackCount = musicTrackCount + 1;
+	if (totalTrackCount > std::numeric_limits<uint16_t>::max())
+	{
+		return false;
+	}
+
 	QFile f(filename);
-	f.open(QIODevice::WriteOnly);
+	if (!f.open(QIODevice::WriteOnly))
+	{
+		return false;
+	}
 	QDataStream midiout(&f);
 
 	QDomElement element;
 
+	auto headerBuffer = std::array<uint8_t, 14>{};
+	const auto writeTrack = [&midiout](const MTrack& track)
+	{
+		const auto bytes = track.writeToVector();
+		if (bytes.empty() || bytes.size() > std::numeric_limits<int>::max())
+		{
+			return false;
+		}
+		return midiout.writeRawData(reinterpret_cast<const char*>(bytes.data()),
+			static_cast<int>(bytes.size())) == static_cast<int>(bytes.size());
+	};
 
-	int nTracks = 0;
-	auto buffer = std::array<uint8_t, BUFFER_SIZE>{};
+	// MIDI Type 1 header followed by the conductor track.
+	MidiFile::MIDIHeader header(static_cast<uint16_t>(totalTrackCount),
+		MidiFile::MIDIFormat::Type1);
+	const int headerSize = header.writeToBuffer(headerBuffer.data());
+	if (midiout.writeRawData(reinterpret_cast<const char*>(headerBuffer.data()), headerSize) != headerSize)
+	{
+		return false;
+	}
 
-	for (const Track* track : tracks) if (track->type() == Track::Type::Instrument) nTracks++;
-	for (const Track* track : patternStoreTracks) if (track->type() == Track::Type::Instrument) nTracks++;
-
-	// midi header
-	MidiFile::MIDIHeader header(nTracks);
-	uint32_t size = header.writeToBuffer(buffer.data());
-	midiout.writeRawData((char *)buffer.data(), size);
+	MTrack tempoTrack;
+	tempoTrack.addName("Tempo Map", 0);
+	writeTempoTrack(tempoTrack, tempo);
+	if (!writeTrack(tempoTrack))
+	{
+		return false;
+	}
 
 	std::vector<std::vector<std::pair<int,int>>> plists;
 
@@ -99,12 +162,15 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 
 		if (track->type() == Track::Type::Instrument)
 		{
-
-			mtrack.addName(track->name().toStdString(), 0);
-			//mtrack.addProgramChange(0, 0);
-			mtrack.addTempo(tempo, 0);
-
 			auto instTrack = dynamic_cast<InstrumentTrack *>(track);
+			if (instTrack == nullptr)
+			{
+				return false;
+			}
+
+			mtrack.channel = static_cast<uint8_t>(instTrack->midiPort()->realOutputChannel());
+			mtrack.addName(track->name().toStdString(), 0);
+
 			element = instTrack->saveState(dataFile, dataFile.content());
 
 			int base_pitch = 0;
@@ -136,8 +202,10 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 			}
 			processPatternNotes(midiClip, INT_MAX);
 			writeMidiClipToTrack(mtrack, midiClip);
-			size = mtrack.writeToBuffer(buffer.data());
-			midiout.writeRawData((char *)buffer.data(), size);
+			if (!writeTrack(mtrack))
+			{
+				return false;
+			}
 		}
 
 		if (track->type() == Track::Type::Pattern)
@@ -175,12 +243,15 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 		std::vector<std::pair<int,int>> st;
 
 		if (track->type() != Track::Type::Instrument) continue;
-
-		mtrack.addName(track->name().toStdString(), 0);
-		//mtrack.addProgramChange(0, 0);
-		mtrack.addTempo(tempo, 0);
-
 		auto instTrack = dynamic_cast<InstrumentTrack *>(track);
+		if (instTrack == nullptr)
+		{
+			return false;
+		}
+
+		mtrack.channel = static_cast<uint8_t>(instTrack->midiPort()->realOutputChannel());
+		mtrack.addName(track->name().toStdString(), 0);
+
 		element = instTrack->saveState(dataFile, dataFile.content());
 
 		int base_pitch = 0;
@@ -202,6 +273,10 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 
 			if (n.nodeName() == "midiclip")
 			{
+				if (itr == plists.end())
+				{
+					break;
+				}
 				std::vector<std::pair<int,int>> &plist = *itr;
 
 				MidiNoteVector nv, midiClip;
@@ -251,11 +326,13 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 				++itr;
 			}
 		}
-		size = mtrack.writeToBuffer(buffer.data());
-		midiout.writeRawData((char *)buffer.data(), size);
+		if (!writeTrack(mtrack))
+		{
+			return false;
+		}
 	}
 
-	return true;
+	return midiout.status() == QDataStream::Ok;
 
 }
 
@@ -283,11 +360,102 @@ void MidiExport::writeMidiClip(MidiNoteVector &midiClip, const QDomNode& n,
 
 
 
+void MidiExport::writeTempoTrack(MTrack& mtrack, int defaultTempo) const
+{
+	std::set<int> changeTimes{0};
+	Song* song = Engine::getSong();
+
+	if (song != nullptr)
+	{
+		for (const AutomationClip* clip :
+			AutomationClip::clipsForModel(&song->tempoModel()))
+		{
+			// Pattern automation is repeated by PatternClip instances and needs
+			// expansion at each instance. Only Song automation has an absolute
+			// timeline suitable for this conductor track.
+			if (clip->isInPattern())
+			{
+				continue;
+			}
+
+			const int clipOffset = clip->startPosition().getTicks() +
+				clip->startTimeOffset().getTicks();
+			const auto& timeMap = clip->getTimeMap();
+			for (auto node = timeMap.cbegin(); node != timeMap.cend(); ++node)
+			{
+				const int nodeTime = clipOffset + node.key();
+				if (nodeTime >= 0)
+				{
+					changeTimes.insert(nodeTime);
+				}
+
+				// A Standard MIDI File stores tempo changes as discrete events.
+				// Sample non-discrete LMMS curves at sixteenth-note resolution.
+				const auto nextNode = std::next(node);
+				if (clip->progressionType() != AutomationClip::ProgressionType::Discrete &&
+					nextNode != timeMap.cend())
+				{
+					for (int sampleTime = node.key() + TempoAutomationSamplePeriod;
+						sampleTime < nextNode.key();
+						sampleTime += TempoAutomationSamplePeriod)
+					{
+						const int absoluteTime = clipOffset + sampleTime;
+						if (absoluteTime >= 0)
+						{
+							changeTimes.insert(absoluteTime);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	std::map<uint32_t, int> tempoEvents;
+	tempoEvents.emplace(0, qBound(static_cast<int>(MinTempo), defaultTempo,
+		static_cast<int>(MaxTempo)));
+
+	for (const int time : changeTimes)
+	{
+		int tempo = defaultTempo;
+		if (song != nullptr)
+		{
+			// At a discontinuity, MIDI needs the value immediately after the
+			// control point; LMMS exposes the control point's incoming value at
+			// its exact tick.
+			const int evaluationTime = time == std::numeric_limits<int>::max() ?
+				time : time + 1;
+			const auto values = song->automatedValuesAt(TimePos(evaluationTime));
+			const auto value = values.constFind(&song->tempoModel());
+			if (value != values.cend())
+			{
+				tempo = qRound(value.value());
+			}
+		}
+
+		tempoEvents[lmmsTicksToMidiTicks(time)] =
+			qBound(static_cast<int>(MinTempo), tempo, static_cast<int>(MaxTempo));
+	}
+
+	int lastTempo = -1;
+	for (const auto& [time, tempo] : tempoEvents)
+	{
+		if (tempo != lastTempo)
+		{
+			mtrack.addTempo(tempo, time);
+			lastTempo = tempo;
+		}
+	}
+}
+
+
+
 void MidiExport::writeMidiClipToTrack(MTrack &mtrack, MidiNoteVector &nv)
 {
 	for (const auto& note : nv)
 	{
-		mtrack.addNote(note.pitch, note.volume, note.time / 48.0, note.duration / 48.0);
+		mtrack.addNoteAtTick(note.pitch, note.volume,
+			lmmsTicksToMidiTicks(note.time),
+			lmmsTicksToMidiTicks(note.time + note.duration));
 	}
 }
 
