@@ -32,6 +32,7 @@
 #include "Engine.h"
 #include "Instrument.h"
 #include "InstrumentTrack.h"
+#include "TracyProfiling.h"
 
 namespace lmms
 {
@@ -109,6 +110,8 @@ void InstrumentSoundShaping::processAudioBuffer( SampleFrame* buffer,
 							const f_cnt_t frames,
 							NotePlayHandle* n )
 {
+	ZoneScopedN("Process sound shaping");
+
 	const f_cnt_t envTotalFrames = n->totalFramesPlayed();
 	f_cnt_t envReleaseBegin = envTotalFrames - n->releaseFramesDone() + n->framesBeforeRelease();
 
@@ -131,6 +134,8 @@ void InstrumentSoundShaping::processAudioBuffer( SampleFrame* buffer,
 
 	if( m_filterEnabledModel.value() )
 	{
+		ZoneScopedN("Process filter");
+
 		QVarLengthArray<float> cutBuffer(frames);
 		QVarLengthArray<float> resBuffer(frames);
 
@@ -226,6 +231,8 @@ void InstrumentSoundShaping::processAudioBuffer( SampleFrame* buffer,
 
 	if (volumeParameters.isUsed())
 	{
+		ZoneScopedN("Process volume envelope");
+
 		QVarLengthArray<float> volBuffer(frames);
 		volumeParameters.fillLevel(volBuffer.data(), envTotalFrames, envReleaseBegin, frames);
 

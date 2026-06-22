@@ -24,18 +24,19 @@
 
 #include "AudioEngine.h"
 
-#include "MixHelpers.h"
-
 #include "lmmsconfig.h"
 
-#include "AudioEngineWorkerThread.h"
 #include "AudioBusHandle.h"
+#include "AudioEngineWorkerThread.h"
+#include "BufferManager.h"
+#include "ConfigManager.h"
+#include "EnvelopeAndLfoParameters.h"
 #include "Hardware.h"
 #include "Mixer.h"
-#include "Song.h"
-#include "EnvelopeAndLfoParameters.h"
+#include "MixHelpers.h"
 #include "NotePlayHandle.h"
-#include "ConfigManager.h"
+#include "Song.h"
+#include "TracyProfiling.h"
 
 // platform-specific audio-interface-classes
 #include "AudioAlsa.h"
@@ -57,8 +58,6 @@
 #include "MidiWinMM.h"
 #include "MidiApple.h"
 #include "MidiDummy.h"
-
-#include "BufferManager.h"
 
 namespace lmms
 {
@@ -207,26 +206,30 @@ void AudioEngine::renderStageNoteSetup()
 		clearInternal();
 	}
 
-	// remove all play-handles that have to be deleted and delete
-	// them if they still exist...
-	// maybe this algorithm could be optimized...
-	ConstPlayHandleList::Iterator it_rem = m_playHandlesToRemove.begin();
-	while( it_rem != m_playHandlesToRemove.end() )
 	{
-		PlayHandleList::Iterator it = std::find( m_playHandles.begin(), m_playHandles.end(), *it_rem );
+		ZoneScopedN("Remove PlayHandles");
 
-		if( it != m_playHandles.end() )
+		// remove all play-handles that have to be deleted and delete
+		// them if they still exist...
+		// maybe this algorithm could be optimized...
+		ConstPlayHandleList::Iterator it_rem = m_playHandlesToRemove.begin();
+		while( it_rem != m_playHandlesToRemove.end() )
 		{
-			(*it)->audioBusHandle()->removePlayHandle(*it);
-			if((*it)->type() == PlayHandle::Type::NotePlayHandle)
-			{
-				NotePlayHandleManager::release((NotePlayHandle*)*it);
-			}
-			else delete *it;
-			m_playHandles.erase(it);
-		}
+			PlayHandleList::Iterator it = std::find( m_playHandles.begin(), m_playHandles.end(), *it_rem );
 
-		it_rem = m_playHandlesToRemove.erase( it_rem );
+			if( it != m_playHandles.end() )
+			{
+				(*it)->audioBusHandle()->removePlayHandle(*it);
+				if((*it)->type() == PlayHandle::Type::NotePlayHandle)
+				{
+					NotePlayHandleManager::release((NotePlayHandle*)*it);
+				}
+				else delete *it;
+				m_playHandles.erase(it);
+			}
+
+			it_rem = m_playHandlesToRemove.erase( it_rem );
+		}
 	}
 
 	swapBuffers();
@@ -254,7 +257,10 @@ void AudioEngine::renderStageInstruments()
 {
 	AudioEngineProfiler::Probe profilerProbe(m_profiler, AudioEngineProfiler::DetailType::Instruments);
 
-	AudioEngineWorkerThread::fillJobQueue(m_playHandles);
+	{
+		ZoneScopedN("Fill job queue");
+		AudioEngineWorkerThread::fillJobQueue(m_playHandles);
+	}
 	AudioEngineWorkerThread::startAndWaitForJobs();
 }
 
@@ -265,32 +271,39 @@ void AudioEngine::renderStageEffects()
 	AudioEngineProfiler::Probe profilerProbe(m_profiler, AudioEngineProfiler::DetailType::Effects);
 
 	// STAGE 2: process effects of all instrument- and sampletracks
-	AudioEngineWorkerThread::fillJobQueue(m_audioBusHandles);
+	{
+		ZoneScopedN("Fill job queue");
+		AudioEngineWorkerThread::fillJobQueue(m_audioBusHandles);
+	}
 	AudioEngineWorkerThread::startAndWaitForJobs();
 
-	// removed all play handles which are done
-	for( PlayHandleList::Iterator it = m_playHandles.begin();
-						it != m_playHandles.end(); )
 	{
-		if( ( *it )->affinityMatters() &&
-			( *it )->affinity() != QThread::currentThread() )
+		ZoneScopedN("Remove finished PlayHandles");
+
+		// removed all play handles which are done
+		for (PlayHandleList::Iterator it = m_playHandles.begin();
+			it != m_playHandles.end(); )
 		{
-			++it;
-			continue;
-		}
-		if( ( *it )->isFinished() )
-		{
-			(*it)->audioBusHandle()->removePlayHandle(*it);
-			if((*it)->type() == PlayHandle::Type::NotePlayHandle)
+			if( ( *it )->affinityMatters() &&
+				( *it )->affinity() != QThread::currentThread() )
 			{
-				NotePlayHandleManager::release((NotePlayHandle*)*it);
+				++it;
+				continue;
 			}
-			else delete *it;
-			it = m_playHandles.erase(it);
-		}
-		else
-		{
-			++it;
+			if( ( *it )->isFinished() )
+			{
+				(*it)->audioBusHandle()->removePlayHandle(*it);
+				if((*it)->type() == PlayHandle::Type::NotePlayHandle)
+				{
+					NotePlayHandleManager::release((NotePlayHandle*)*it);
+				}
+				else delete *it;
+				it = m_playHandles.erase(it);
+			}
+			else
+			{
+				++it;
+			}
 		}
 	}
 }
@@ -337,6 +350,8 @@ std::span<const SampleFrame> AudioEngine::renderNextPeriod()
 
 void AudioEngine::swapBuffers()
 {
+	ZoneScoped;
+
 	m_inputBufferWrite = (m_inputBufferWrite + 1) % 2;
 	m_inputBufferRead = (m_inputBufferRead + 1) % 2;
 	m_inputBufferFrames[m_inputBufferWrite] = 0;
@@ -371,6 +386,8 @@ void AudioEngine::clearNewPlayHandles()
 // all remaining notes etc. would be played until their end
 void AudioEngine::clearInternal()
 {
+	ZoneScoped;
+
 	// TODO: m_midiClient->noteOffAll();
 	for (auto ph : m_playHandles)
 	{
@@ -460,6 +477,8 @@ void AudioEngine::removeAudioBusHandle(AudioBusHandle* busHandle)
 
 bool AudioEngine::addPlayHandle( PlayHandle* handle )
 {
+	ZoneScoped;
+
 	// Only add play handles if we have the CPU capacity to process them.
 	// Instrument play handles are not added during playback, but when the
 	// associated instrument is created, so add those unconditionally.
@@ -482,6 +501,8 @@ bool AudioEngine::addPlayHandle( PlayHandle* handle )
 
 void AudioEngine::removePlayHandle(PlayHandle * ph)
 {
+	ZoneScoped;
+
 	requestChangeInModel();
 	// check thread affinity as we must not delete play-handles
 	// which were created in a thread different than the audio engine thread
@@ -540,6 +561,8 @@ void AudioEngine::removePlayHandle(PlayHandle * ph)
 
 void AudioEngine::removePlayHandlesOfTypes(Track * track, PlayHandle::Types types)
 {
+	ZoneScoped;
+
 	requestChangeInModel();
 	PlayHandleList::Iterator it = m_playHandles.begin();
 	while( it != m_playHandles.end() )

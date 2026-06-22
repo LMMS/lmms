@@ -25,19 +25,18 @@
 #include "AudioEngineWorkerThread.h"
 
 #include <QDebug>
-#include <QMutex>
-#include <QWaitCondition>
+#include <cstdio> // IWYU pragma: keep
+#include <mutex>
 
 #include "AudioEngine.h"
 #include "Hardware.h"
 #include "ThreadableJob.h"
-
+#include "TracyProfiling.h"
 
 namespace lmms
 {
 
 AudioEngineWorkerThread::JobQueue AudioEngineWorkerThread::globalJobQueue;
-QWaitCondition * AudioEngineWorkerThread::queueReadyWaitCond = nullptr;
 QList<AudioEngineWorkerThread *> AudioEngineWorkerThread::workerThreads;
 
 // implementation of internal JobQueue
@@ -110,9 +109,9 @@ AudioEngineWorkerThread::AudioEngineWorkerThread( AudioEngine* audioEngine ) :
 	m_quit( false )
 {
 	// initialize global static data
-	if( queueReadyWaitCond == nullptr )
+	if (!queueReadyWaitCond)
 	{
-		queueReadyWaitCond = new QWaitCondition;
+		queueReadyWaitCond.emplace();
 	}
 
 	// keep track of all instantiated worker threads - this is used for
@@ -145,12 +144,22 @@ void AudioEngineWorkerThread::quit()
 
 void AudioEngineWorkerThread::startAndWaitForJobs()
 {
-	queueReadyWaitCond->wakeAll();
-	// The last worker-thread is never started. Instead it's processed "inline"
-	// i.e. within the global AudioEngine thread. This way we can reduce latencies
-	// that otherwise would be caused by synchronizing with another thread.
-	globalJobQueue.run();
-	globalJobQueue.wait();
+	ZoneScoped;
+	{
+		ZoneScopedN("Notify all");
+		queueReadyWaitCond->notify_all();
+	}
+	{
+		// The last worker-thread is never started. Instead it's processed "inline"
+		// i.e. within the global AudioEngine thread. This way we can reduce latencies
+		// that otherwise would be caused by synchronizing with another thread.
+		ZoneScopedN("Run job queue");
+		globalJobQueue.run();
+	}
+	{
+		ZoneScopedN("Wait for job queue");
+		globalJobQueue.wait();
+	}
 }
 
 
@@ -160,13 +169,23 @@ void AudioEngineWorkerThread::run()
 {
 	disableDenormals();
 
-	QMutex m;
-	while( m_quit == false )
+#ifdef LMMS_DEBUG_TRACY
+	static auto id = std::atomic<int>{0};
+
+	// NOTE: The following is a memory leak, but it's recommended by Tracy's
+	//       documentation for dynamic names
+	char* name = new char[16]; // NOLINT
+	std::snprintf(name, 16, "Audio %i", id.fetch_add(1));
+	tracy::SetThreadNameWithHint(name, 1);
+#endif
+
+	TracyLockable(std::mutex, m);
+	while (m_quit == false)
 	{
-		m.lock();
-		queueReadyWaitCond->wait( &m );
+		std::unique_lock<LockableBase(std::mutex)> lock{m};
+		queueReadyWaitCond->wait(lock);
+
 		globalJobQueue.run();
-		m.unlock();
 	}
 }
 

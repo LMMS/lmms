@@ -32,6 +32,7 @@
 #include "Effect.h"
 #include "DummyEffect.h"
 #include "MixHelpers.h"
+#include "TracyProfiling.h"
 
 namespace lmms
 {
@@ -187,6 +188,8 @@ void EffectChain::moveUp( Effect * _effect )
 
 bool EffectChain::processAudioBuffer(AudioBuffer& buffer)
 {
+	ZoneScopedN("EffectChain::processAudioBuffer");
+
 	if( m_enabledModel.value() == false )
 	{
 		return false;

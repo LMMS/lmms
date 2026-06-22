@@ -41,6 +41,7 @@
 #include "PianoRoll.h"
 #include "Pitch.h"
 #include "Song.h"
+#include "TracyProfiling.h"
 
 namespace lmms
 {
@@ -223,6 +224,8 @@ InstrumentTrack::~InstrumentTrack()
 
 void InstrumentTrack::processAudioBuffer( SampleFrame* buf, const f_cnt_t frames, NotePlayHandle* n )
 {
+	ZoneScopedN("InstrumentTrack::processAudioBuffer");
+
 	// we must not play the sound if this InstrumentTrack is muted...
 	if( isMuted() || ( Engine::getSong()->playMode() != Song::PlayMode::MidiClip &&
 				n && n->isPatternTrackMuted() ) || ! m_instrument )
@@ -566,6 +569,8 @@ f_cnt_t InstrumentTrack::beatLen( NotePlayHandle * _n ) const
 
 void InstrumentTrack::playNote( NotePlayHandle* n, SampleFrame* workingBuffer )
 {
+	ZoneScopedN("InstrumentTrack::playNote");
+
 	// Note: under certain circumstances the working buffer is a nullptr.
 	// These cases are triggered in PlayHandle::doProcessing when the play method is called with a nullptr.
 	// TODO: Find out if we can skip processing at a higher level if the buffer is nullptr.
@@ -577,8 +582,11 @@ void InstrumentTrack::playNote( NotePlayHandle* n, SampleFrame* workingBuffer )
 
 	if( n->isMasterNote() == false && m_instrument != nullptr )
 	{
-		// all is done, so now lets play the note!
-		m_instrument->playNote( n, workingBuffer );
+		{
+			// all is done, so now lets play the note!
+			ZoneScopedN("Instrument::playNote");
+			m_instrument->playNote( n, workingBuffer );
+		}
 
 		// This is effectively the same as checking if workingBuffer is not a nullptr.
 		// Calling processAudioBuffer with a nullptr leads to crashes. Hence the check.
