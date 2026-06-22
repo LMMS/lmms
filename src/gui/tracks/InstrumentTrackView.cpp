@@ -417,8 +417,6 @@ QPixmap InstrumentTrackView::determinePixmap(InstrumentTrack* instrumentTrack)
 
 void InstrumentTrackView::corruptStateUpdate()
 {
-	if (!Engine::audioEngine()->sanitizationEnabled()) { return; }
-
 	if (model()->audioBusHandle()->isCorrupted())
 	{
 		m_activityIndicator->setState(FadeButton::State::Corrupted);

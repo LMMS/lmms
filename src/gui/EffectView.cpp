@@ -246,8 +246,6 @@ void EffectView::modelChanged()
 
 void EffectView::corruptStateUpdate()
 {
-	if (!Engine::audioEngine()->sanitizationEnabled() || dynamic_cast<DummyEffect*>(effect())) { return; }
-
 	if (effect()->isCorrupted())
 	{
 		m_bypass->setLedColor(LedCheckBox::LedColor::Red);
