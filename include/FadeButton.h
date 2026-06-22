@@ -42,7 +42,6 @@ public:
 	{
 		Normal,
 		Corrupted,
-		Count
 	};
 
 	/**
