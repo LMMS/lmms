@@ -246,6 +246,8 @@ void EffectView::modelChanged()
 
 void EffectView::corruptStateUpdate()
 {
+	if (dynamic_cast<DummyEffect*>(effect())) { return; }
+
 	if (effect()->isCorrupted())
 	{
 		m_bypass->setLedColor(LedCheckBox::LedColor::Red);
