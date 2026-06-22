@@ -84,12 +84,9 @@ public slots:
 	void activateOnce();
 	void noteEnd();
 
-
-protected:
-	void paintEvent( QPaintEvent * _pe ) override;
-
-
 private:
+	void paintEvent(QPaintEvent* pe) override;
+
 	State m_state = State::Normal;
 
 	QElapsedTimer m_stateTimer;
