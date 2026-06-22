@@ -42,7 +42,7 @@ FadeButton::FadeButton(const QColor& inactiveColor, const QColor& normalColor, c
 	, m_releaseTimer()
 	, m_inactiveColor(inactiveColor)
 	, m_normalColor(normalColor)
-	, m_coruptedColor(corruptedColor)
+	, m_corruptedColor(corruptedColor)
 	, m_mutedColor(mutedColor)
 	, m_holdColor(holdColor)
 	, activeNotes(0)
@@ -189,7 +189,7 @@ QColor FadeButton::activeColor() const
 	case State::Normal:
 		return m_normalColor;
 	case State::Corrupted:
-		return m_coruptedColor;
+		return m_corruptedColor;
 	default:
 		qWarning("Invalid active color");
 		return QColor{};

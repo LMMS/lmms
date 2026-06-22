@@ -98,7 +98,7 @@ private:
 
 	QColor m_inactiveColor;
 	QColor m_normalColor;
-	QColor m_coruptedColor;
+	QColor m_corruptedColor;
 	QColor m_mutedColor;
 	QColor m_holdColor;
 
