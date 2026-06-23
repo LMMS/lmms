@@ -154,29 +154,22 @@ void VersionedSaveDialog::decrementVersion()
 	selectFile( file );
 }
 
-// TODO: This function is confusing. When it returns true, it means that the file exists *and* the user wanted to
-// replace it. Since it seems like this function is meant for confirming if you can overwrite an existing file (if
-// there is one) using it for that purpose is incorrect, since overwrites should be allowed when the file does not
-// exist. That being said, if this function isn't for overwrite confirmation somehow, then I have no idea what its for.
-bool VersionedSaveDialog::fileExistsQuery( QString FileName, QString WindowTitle )
+bool VersionedSaveDialog::confirmOverwrite(const QString& fileName, const QString& windowTitle)
 {
-	bool fileExists = false;
-	if( QFile( FileName ).exists() )
+	if (!QFile{fileName}.exists())
 	{
-		QMessageBox mb;
-		mb.setWindowTitle( WindowTitle );
-		mb.setText( FileName + tr( " already exists. "
-			"Do you want to replace it?" ) );
-		mb.setIcon( QMessageBox::Warning );
-		mb.setStandardButtons(
-			QMessageBox::Yes | QMessageBox::No );
-
-		if( mb.exec() == QMessageBox::Yes )
-		{
-			fileExists = true;
-		}
+		return true;
 	}
-	return fileExists;
+
+	QMessageBox mb;
+	mb.setWindowTitle(windowTitle);
+	mb.setText(FileName
+		+ tr(" already exists. "
+			 "Do you want to replace it?"));
+	mb.setIcon(QMessageBox::Warning);
+	mb.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+
+	return mb.exec() == QMessageBox::Yes;
 }
 
 SaveOptionsWidget::SaveOptionsWidget(Song::SaveOptions &saveOptions) {

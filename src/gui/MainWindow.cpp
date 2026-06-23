@@ -832,8 +832,7 @@ bool MainWindow::saveProjectAs()
 			fname.remove( "." + suffix );
 			if( !sfd.selectedFiles()[0].endsWith( ".mpt" ) )
 			{
-				if( VersionedSaveDialog::fileExistsQuery( fname + ".mpt",
-						tr( "Save project template" ) ) )
+				if (VersionedSaveDialog::confirmOverwrite(fname + ".mpt", tr("Save project template")))
 				{
 					fname += ".mpt";
 				}
