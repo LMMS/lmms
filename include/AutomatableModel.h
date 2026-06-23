@@ -144,6 +144,7 @@ public:
 		return (std::round(v) != 0);
 	}
 
+	float oldValue() const { return m_oldValue; }
 
 	template<class T>
 	inline T value( int frameOffset = 0 ) const
