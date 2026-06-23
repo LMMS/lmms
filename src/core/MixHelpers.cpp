@@ -24,10 +24,6 @@
 
 #include "MixHelpers.h"
 
-#ifdef LMMS_DEBUG
-#include <iostream>
-#endif
-
 #include <algorithm>
 #include <cmath>
 
