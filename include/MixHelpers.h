@@ -36,9 +36,9 @@ class SampleFrame;
 namespace MixHelpers
 {
 
-bool isSilent( const SampleFrame* src, int frames );
+bool isSilent(const SampleFrame* src, int frames);
 
-bool isSilent(std::span<sample_t> buffer);
+bool isSilent(std::span<const sample_t> buffer);
 
 /*! \brief Add samples from src to dst */
 void add( SampleFrame* dst, const SampleFrame* src, int frames );
