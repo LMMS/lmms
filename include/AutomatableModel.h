@@ -314,6 +314,8 @@ public:
 		return m_useControllerValue;
 	}
 
+	static bool mustQuoteName(const QString& name);
+
 public slots:
 	virtual void reset();
 	void unlink();
@@ -353,8 +355,6 @@ private:
 		const Target* result = nullptr;
 		void visit(const Target& tar) { result = &tar; }
 	};
-
-	static bool mustQuoteName(const QString &name);
 
 	void saveSettings( QDomDocument& doc, QDomElement& element ) override
 	{
