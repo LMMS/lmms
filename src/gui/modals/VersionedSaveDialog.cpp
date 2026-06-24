@@ -154,22 +154,6 @@ void VersionedSaveDialog::decrementVersion()
 	selectFile( file );
 }
 
-bool VersionedSaveDialog::confirmOverwrite(const QString& fileName, const QString& windowTitle)
-{
-	if (!QFile{fileName}.exists())
-	{
-		return true;
-	}
-
-	QMessageBox mb;
-	mb.setWindowTitle(windowTitle);
-	mb.setText(tr("%1 already exists. Do you want to replace it?").arg(fileName));
-	mb.setIcon(QMessageBox::Warning);
-	mb.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-
-	return mb.exec() == QMessageBox::Yes;
-}
-
 SaveOptionsWidget::SaveOptionsWidget(Song::SaveOptions &saveOptions) {
 	auto *layout = new QVBoxLayout();
 
