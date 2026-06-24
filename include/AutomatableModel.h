@@ -25,9 +25,11 @@
 #ifndef LMMS_AUTOMATABLE_MODEL_H
 #define LMMS_AUTOMATABLE_MODEL_H
 
+#include <atomic>
 #include <cmath>
 #include <QMap>
 #include <QMutex>
+#include <QPointer>
 
 #include "JournallingObject.h"
 #include "Model.h"
@@ -92,6 +94,59 @@ public:
 	virtual void accept(ConstModelVisitor& v) const = 0;
 
 public:
+	//! Ref-counted handle that allows an @a AutomatableModel to efficiently
+	//! keep track of the number of automation connections
+	class Connection
+	{
+	public:
+		friend class AutomatableModel;
+
+		Connection() = default;
+
+		Connection(const Connection& other);
+		Connection(Connection&& other) noexcept;
+		auto operator=(const Connection& other) -> Connection&;
+		auto operator=(Connection&& other) noexcept -> Connection&;
+
+		~Connection();
+
+		auto model() const -> AutomatableModel* { return m_model; }
+
+		void disconnect();
+
+		explicit operator bool() const noexcept { return m_model != nullptr; }
+
+		friend auto operator<=>(const Connection& lhs, const Connection& rhs) noexcept
+		{
+			return lhs.m_model <=> rhs.m_model;
+		}
+
+		friend auto operator==(const Connection& lhs, const Connection& rhs) noexcept
+		{
+			return lhs.m_model == rhs.m_model;
+		}
+
+		friend auto operator<=>(const Connection& lhs, const AutomatableModel* rhs) noexcept
+		{
+			return lhs.m_model <=> rhs;
+		}
+
+		friend auto operator==(const Connection& lhs, const AutomatableModel* rhs) noexcept
+		{
+			return lhs.m_model == rhs;
+		}
+
+	private:
+		//! Only @a AutomatableModel can create @a Connection objects
+		explicit Connection(AutomatableModel* model);
+
+		void reset(AutomatableModel* model);
+
+		QPointer<AutomatableModel> m_model;
+	};
+
+	auto createAutomationConnection() -> Connection { return Connection{this}; }
+
 	/**
 	   @brief Return this class casted to Target
 	   @test AutomatableModelTest.cpp
@@ -117,7 +172,11 @@ public:
 		return vis.result;
 	}
 
-	bool isAutomated() const;
+	bool isAutomated() const
+	{
+		return m_totalAutomationConnections.load(std::memory_order::acquire) > 0;
+	}
+
 	bool isAutomatedOrControlled() const
 	{
 		return isAutomated() || m_controllerConnection != nullptr;
@@ -419,6 +478,8 @@ private:
 	QMutex m_valueBufferMutex;
 
 	bool m_useControllerValue;
+
+	std::atomic<std::int32_t> m_totalAutomationConnections = 0;
 
 signals:
 	void initValueChanged( float val );

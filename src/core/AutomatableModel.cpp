@@ -84,15 +84,66 @@ AutomatableModel::~AutomatableModel()
 	emit destroyed( id() );
 }
 
-
-
-
-bool AutomatableModel::isAutomated() const
+AutomatableModel::Connection::Connection(AutomatableModel* model)
 {
-	return AutomationClip::isAutomated( this );
+	reset(model);
 }
 
+AutomatableModel::Connection::Connection(const Connection& other)
+{
+	reset(other.m_model);
+}
 
+AutomatableModel::Connection::Connection(Connection&& other) noexcept
+	: m_model{std::exchange(other.m_model, nullptr)}
+{}
+
+auto AutomatableModel::Connection::operator=(const Connection& other) -> Connection&
+{
+	if (this != &other)
+	{
+		reset(other.m_model);
+	}
+	return *this;
+}
+
+auto AutomatableModel::Connection::operator=(Connection&& other) noexcept -> Connection&
+{
+	if (this != &other)
+	{
+		reset(std::exchange(other.m_model, nullptr));
+	}
+	return *this;
+}
+
+AutomatableModel::Connection::~Connection()
+{
+	disconnect();
+}
+
+void AutomatableModel::Connection::reset(AutomatableModel* model)
+{
+	// Disconnect
+	if (m_model)
+	{
+		[[maybe_unused]] auto num = m_model->m_totalAutomationConnections.fetch_sub(1, std::memory_order::release);
+		assert(num >= 0);
+	}
+
+	m_model = model;
+
+	// Connect
+	if (model)
+	{
+		[[maybe_unused]] auto num = model->m_totalAutomationConnections.fetch_add(1, std::memory_order::acquire);
+		assert(num >= 0);
+	}
+}
+
+void AutomatableModel::Connection::disconnect()
+{
+	reset(nullptr);
+}
 
 bool AutomatableModel::mustQuoteName(const QString& name)
 {

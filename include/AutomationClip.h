@@ -60,7 +60,7 @@ public:
 	} ;
 
 	using timeMap = QMap<int, AutomationNode>;
-	using objectVector = std::vector<QPointer<AutomatableModel>>;
+	using Connections = std::vector<AutomatableModel::Connection>;
 
 	using TimemapIterator = timeMap::const_iterator;
 
@@ -70,7 +70,7 @@ public:
 	bool addObject( AutomatableModel * _obj, bool _search_dup = true );
 
 	const AutomatableModel * firstObject() const;
-	const objectVector& objects() const;
+	const Connections& connections() const;
 
 	// progression-type stuff
 	inline ProgressionType progressionType() const
@@ -181,7 +181,6 @@ public:
 	gui::ClipView * createView( gui::TrackView * _tv ) override;
 
 
-	static bool isAutomated( const AutomatableModel * _m );
 	static AutomationClip * globalAutomationClip( AutomatableModel * _m );
 	static void resolveAllIDs();
 
@@ -229,7 +228,7 @@ private:
 
 	AutomationTrack * m_autoTrack;
 	std::vector<jo_id_t> m_idsToResolve;
-	objectVector m_objects;
+	Connections m_objects;
 	timeMap m_timeMap;	// actual values
 	timeMap m_oldTimeMap;	// old values for storing the values before setDragValue() is called.
 	float m_tension;

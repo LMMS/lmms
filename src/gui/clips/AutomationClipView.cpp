@@ -186,16 +186,16 @@ void AutomationClipView::constructContextMenu( QMenu * _cm )
 						tr( "Flip Horizontally (Visible)" ),
 						this, SLOT(flipX()));
 	
-	if (!m_clip->m_objects.empty())
+	if (!m_clip->connections().empty())
 	{
 		_cm->addSeparator();
-		auto m = new QMenu(tr("%1 Connections").arg(m_clip->m_objects.size()), _cm);
-		for (const auto& object : m_clip->m_objects)
+		auto m = new QMenu(tr("%1 Connections").arg(m_clip->connections().size()), _cm);
+		for (const auto& connection : m_clip->connections())
 		{
-			if (object)
+			if (connection)
 			{
-				a = new QAction(tr("Disconnect \"%1\"").arg(object->fullDisplayName()), m);
-				a->setData(object->id());
+				a = new QAction(tr("Disconnect \"%1\"").arg(connection.model()->fullDisplayName()), m);
+				a->setData(connection.model()->id());
 				m->addAction( a );
 			}
 		}

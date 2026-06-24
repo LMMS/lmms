@@ -89,6 +89,7 @@ bool AutomationClip::addObject( AutomatableModel * _obj, bool _search_dup )
 {
 	QMutexLocker m(&m_clipMutex);
 
+	assert(_obj != nullptr);
 	if (_search_dup && std::find(m_objects.begin(), m_objects.end(), _obj) != m_objects.end())
 	{
 		return false;
@@ -101,7 +102,7 @@ bool AutomationClip::addObject( AutomatableModel * _obj, bool _search_dup )
 		putValue( TimePos(0), _obj->inverseScaledValue( _obj->value<float>() ), false );
 	}
 
-	m_objects.push_back(_obj);
+	m_objects.push_back(_obj->createAutomationConnection());
 
 	connect( _obj, SIGNAL(destroyed(lmms::jo_id_t)),
 			this, SLOT(objectDestroyed(lmms::jo_id_t)),
@@ -153,7 +154,7 @@ const AutomatableModel * AutomationClip::firstObject() const
 	QMutexLocker m(&m_clipMutex);
 
 	AutomatableModel* model;
-	if (!m_objects.empty() && (model = m_objects.front()) != nullptr)
+	if (!m_objects.empty() && (model = m_objects.front().model()) != nullptr)
 	{
 		return model;
 	}
@@ -162,7 +163,7 @@ const AutomatableModel * AutomationClip::firstObject() const
 	return &fm;
 }
 
-const AutomationClip::objectVector& AutomationClip::objects() const
+const AutomationClip::Connections& AutomationClip::connections() const
 {
 	QMutexLocker m(&m_clipMutex);
 
@@ -818,7 +819,7 @@ void AutomationClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		if (object)
 		{
 			QDomElement element = _doc.createElement( "object" );
-			element.setAttribute("id", ProjectJournal::idToSave(object->id()));
+			element.setAttribute("id", ProjectJournal::idToSave(object.model()->id()));
 			_this.appendChild(element);
 		}
 	}
@@ -915,9 +916,9 @@ QString AutomationClip::name() const
 	{
 		return Clip::name();
 	}
-	if (!m_objects.empty() && m_objects.front() != nullptr)
+	if (!m_objects.empty() && m_objects.front().model() != nullptr)
 	{
-		return m_objects.front()->fullDisplayName();
+		return m_objects.front().model()->fullDisplayName();
 	}
 	return tr( "Drag a control while pressing <%1>" ).arg(UI_COPY_KEY);
 }
@@ -930,36 +931,6 @@ gui::ClipView * AutomationClip::createView( gui::TrackView * _tv )
 	QMutexLocker m(&m_clipMutex);
 
 	return new gui::AutomationClipView( this, _tv );
-}
-
-
-
-
-
-bool AutomationClip::isAutomated( const AutomatableModel * _m )
-{
-	auto l = combineAllTracks();
-	for (const auto track : l)
-	{
-		if (track->type() == Track::Type::Automation || track->type() == Track::Type::HiddenAutomation)
-		{
-			for (const auto& clip : track->getClips())
-			{
-				const auto a = dynamic_cast<const AutomationClip*>(clip);
-				if( a && a->hasAutomation() )
-				{
-					for (const auto& object : a->m_objects)
-					{
-						if (object == _m)
-						{
-							return true;
-						}
-					}
-				}
-			}
-		}
-	}
-	return false;
 }
 
 
@@ -1064,8 +1035,8 @@ void AutomationClip::objectDestroyed( jo_id_t _id )
 
 	for (auto objIt = m_objects.begin(); objIt != m_objects.end(); objIt++)
 	{
-		Q_ASSERT( !(*objIt).isNull() );
-		if( (*objIt)->id() == _id )
+		Q_ASSERT(objIt->model() != nullptr);
+		if (objIt->model()->id() == _id)
 		{
 			//Assign to objIt so that this loop work even break; is removed.
 			objIt = m_objects.erase( objIt );
@@ -1083,7 +1054,7 @@ void AutomationClip::cleanObjects()
 {
 	QMutexLocker m(&m_clipMutex);
 
-	for( objectVector::iterator it = m_objects.begin(); it != m_objects.end(); )
+	for (auto it = m_objects.begin(); it != m_objects.end(); )
 	{
 		if( *it )
 		{

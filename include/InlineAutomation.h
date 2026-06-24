@@ -44,7 +44,7 @@ public:
 		m_autoClip(_copy.m_autoClip->clone())
 	{
 		m_autoClip->clearObjects();
-		m_autoClip->addObject(this);
+		m_autoClip->addObject(this, false);
 	}
 
 	~InlineAutomation() override
@@ -60,8 +60,7 @@ public:
 			// Prevent saving inline automation if there's just one node at the beginning of
 			// the clip, which has a InValue equal to the value of model (which is going
 			// to be saved anyways) and no offset between the InValue and OutValue
-			AutomationClip::timeMap::const_iterator firstNode =
-				m_autoClip->getTimeMap().begin();
+			AutomationClip::timeMap::const_iterator firstNode = m_autoClip->getTimeMap().cbegin();
 
 			if (isAtInitValue()
 				&& m_autoClip->getTimeMap().size() == 1
@@ -83,7 +82,7 @@ public:
 		if( m_autoClip == nullptr )
 		{
 			m_autoClip = std::make_unique<AutomationClip>(nullptr);
-			m_autoClip->addObject( this );
+			m_autoClip->addObject(this, false);
 		}
 		return m_autoClip.get();
 	}
