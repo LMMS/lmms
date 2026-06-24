@@ -963,47 +963,6 @@ bool AutomationClip::isAutomated( const AutomatableModel * _m )
 }
 
 
-/**
- * @brief returns a list of all the automation clips that are connected to a specific model
- * @param _m the model we want to look for
- */
-std::vector<AutomationClip *> AutomationClip::clipsForModel(const AutomatableModel* _m)
-{
-	std::vector<AutomationClip *> clips;
-	auto l = combineAllTracks();
-
-	// go through all tracks...
-	for (const auto track : l)
-	{
-		// we want only automation tracks...
-		if (track->type() == Track::Type::Automation || track->type() == Track::Type::HiddenAutomation )
-		{
-			// go through all the clips...
-			for (const auto& trackClip : track->getClips())
-			{
-				auto a = dynamic_cast<AutomationClip*>(trackClip);
-				// check that the clip has automation
-				if( a && a->hasAutomation() )
-				{
-					// now check is the clip is connected to the model we want by going through all the connections
-					// of the clip
-					bool has_object = false;
-					for (const auto& object : a->m_objects)
-					{
-						if (object == _m)
-						{
-							has_object = true;
-						}
-					}
-					// if the clips is connected to the model, add it to the list
-					if (has_object) { clips.push_back(a); }
-				}
-			}
-		}
-	}
-	return clips;
-}
-
 
 
 AutomationClip * AutomationClip::globalAutomationClip(

@@ -182,7 +182,6 @@ public:
 
 
 	static bool isAutomated( const AutomatableModel * _m );
-	static std::vector<AutomationClip*> clipsForModel(const AutomatableModel* _m);
 	static AutomationClip * globalAutomationClip( AutomatableModel * _m );
 	static void resolveAllIDs();
 

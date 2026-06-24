@@ -655,64 +655,6 @@ void AutomatableModel::reset()
 
 
 
-float AutomatableModel::globalAutomationValueAt( const TimePos& time )
-{
-	// get clips that connect to this model
-	auto clips = AutomationClip::clipsForModel(this);
-	if (clips.empty())
-	{
-		// if no such clips exist, return current value
-		return m_value;
-	}
-	else
-	{
-		// of those clips:
-		// find the clips which overlap with the time position
-		std::vector<AutomationClip*> clipsInRange;
-		for (const auto& clip : clips)
-		{
-			int s = clip->startPosition();
-			int e = clip->endPosition();
-			if (s <= time && e >= time) { clipsInRange.push_back(clip); }
-		}
-
-		AutomationClip * latestClip = nullptr;
-
-		if (!clipsInRange.empty())
-		{
-			// if there are more than one overlapping clips, just use the first one because
-			// multiple clip behaviour is undefined anyway
-			latestClip = clipsInRange[0];
-		}
-		else
-		// if we find no clips at the exact time, we need to search for the last clip before time and use that
-		{
-			int latestPosition = 0;
-
-			for (const auto& clip : clips)
-			{
-				int e = clip->endPosition();
-				if (e <= time && e > latestPosition)
-				{
-					latestPosition = e;
-					latestClip = clip;
-				}
-			}
-		}
-
-		if( latestClip )
-		{
-			// scale/fit the value appropriately and return it
-			const float value = latestClip->valueAt(time - latestClip->startPosition() + latestClip->startTimeOffset());
-			const float scaled_value = scaledValue( value );
-			return fittedValue( scaled_value );
-		}
-		// if we still find no clip, the value at that time is undefined so
-		// just return current value as the best we can do
-		else return m_value;
-	}
-}
-
 void AutomatableModel::setUseControllerValue(bool b)
 {
 	if (b)
