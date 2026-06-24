@@ -62,7 +62,7 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 	m_bypass->setEnabled( isEnabled );
 	m_bypass->setToolTip(tr("On/Off"));
 
-	connect(getGUI()->mainWindow(), &MainWindow::corruptStateUpdate, this, &EffectView::corruptStateUpdate);
+	connect(getGUI()->mainWindow(), &MainWindow::periodicUpdate, this, &EffectView::corruptStateUpdate);
 
 	m_wetDry = new Knob(KnobType::Bright26, tr("W/D"), this, Knob::LabelRendering::LegacyFixedFontSize);
 	m_wetDry->move( 40 - m_wetDry->width() / 2, 5 );

@@ -96,7 +96,7 @@ SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 	masterLayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
 	connect(_t, SIGNAL(playingChanged()), this, SLOT(updateIndicator()));
-	connect(getGUI()->mainWindow(), &MainWindow::corruptStateUpdate, this, &SampleTrackView::corruptStateUpdate);
+	connect(getGUI()->mainWindow(), &MainWindow::periodicUpdate, this, &SampleTrackView::corruptStateUpdate);
 
 	setModel( _t );
 

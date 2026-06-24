@@ -204,7 +204,6 @@ MainWindow::MainWindow() :
 	setCentralWidget( main_widget );
 
 	m_updateTimer.start( 1000 / 60, this );  // 60 fps
-	m_updateCorruptStateTimer.start(1000, this);
 
 	if( ConfigManager::inst()->value( "ui", "enableautosave" ).toInt() )
 	{
@@ -1377,14 +1376,7 @@ void MainWindow::keyReleaseEvent( QKeyEvent * _ke )
 
 void MainWindow::timerEvent( QTimerEvent * _te)
 {
-	if (_te->timerId() == m_updateTimer.timerId())
-	{
-		emit periodicUpdate();
-	}
-	else if (_te->timerId() == m_updateCorruptStateTimer.timerId())
-	{
-		emit corruptStateUpdate();
-	}
+	emit periodicUpdate();
 }
 
 

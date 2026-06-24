@@ -158,7 +158,7 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 			 m_activityIndicator, SLOT(activate()));
 	connect( _it, SIGNAL(endNote()),
 	 		m_activityIndicator, SLOT(noteEnd()));
-	connect(getGUI()->mainWindow(), &MainWindow::corruptStateUpdate, this, &InstrumentTrackView::corruptStateUpdate);
+	connect(getGUI()->mainWindow(), &MainWindow::periodicUpdate, this, &InstrumentTrackView::corruptStateUpdate);
 
 	setModel( _it );
 }
