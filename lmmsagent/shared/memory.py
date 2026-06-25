@@ -14,7 +14,7 @@ class ProjectMemory:
 
     def _project_id(self, project_path: Optional[str]) -> str:
         key = (project_path or "untitled").encode("utf-8")
-        return hashlib.sha1(key).hexdigest()
+        return hashlib.sha1(key, usedforsecurity=False).hexdigest()
 
     def _project_dir(self, project_path: Optional[str]) -> Path:
         pid = self._project_id(project_path)

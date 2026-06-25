@@ -86,9 +86,10 @@ def main() -> int:
     if args.repeat < 1:
         raise SystemExit("--repeat must be >= 1")
 
-    ensure_silent_wav(Path("/tmp/loop.wav"))
-    ensure_silent_wav(Path("/tmp/kick.wav"))
-    ensure_silent_wav(Path("/tmp/vocal.wav"))
+    import tempfile
+    ensure_silent_wav(Path(tempfile.gettempdir()) / "loop.wav")
+    ensure_silent_wav(Path(tempfile.gettempdir()) / "kick.wav")
+    ensure_silent_wav(Path(tempfile.gettempdir()) / "vocal.wav")
 
     suite_path = Path(args.suite).expanduser().resolve()
     commands = load_commands(suite_path, selected_buckets=args.bucket)
