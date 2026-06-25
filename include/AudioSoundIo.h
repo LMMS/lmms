@@ -103,16 +103,11 @@ public:
 	} ;
 
 private:
-	virtual void startProcessing();
-	virtual void stopProcessing();
+	void startProcessingImpl() override;
+	void stopProcessingImpl() override;
 
 	SoundIo *m_soundio;
 	SoundIoOutStream *m_outstream;
-
-	SampleFrame* m_outBuf;
-	int m_outBufSize;
-	f_cnt_t m_outBufFramesTotal;
-	f_cnt_t m_outBufFrameIndex;
 
 	bool m_stopped;
 	bool m_outstreamStarted;
