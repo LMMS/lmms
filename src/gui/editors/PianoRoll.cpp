@@ -526,10 +526,9 @@ void PianoRoll::markSemiTone(SemiToneMarkerAction i, bool fromMenu)
 			break;
 		case SemiToneMarkerAction::MarkCurrentSemiTone:
 		{
-			QList<int>::iterator it = std::find( m_markedSemiTones.begin(), m_markedSemiTones.end(), key );
-			if( it != m_markedSemiTones.end() )
+			if (auto it = std::ranges::find(m_markedSemiTones, key); it != m_markedSemiTones.end())
 			{
-				m_markedSemiTones.erase( it );
+				m_markedSemiTones.erase(it);
 			}
 			else
 			{
@@ -544,11 +543,9 @@ void PianoRoll::markSemiTone(SemiToneMarkerAction i, bool fromMenu)
 			if ( m_markedSemiTones.contains(key) )
 			{
 				// lets erase all of the ones that match this by octave
-				QList<int>::iterator i;
 				for (int octave : aok)
 				{
-					i = std::find(m_markedSemiTones.begin(), m_markedSemiTones.end(), octave);
-					if (i != m_markedSemiTones.end())
+					if (auto i = std::ranges::find(m_markedSemiTones, octave); i != m_markedSemiTones.end())
 					{
 						m_markedSemiTones.erase(i);
 					}
@@ -669,8 +666,8 @@ void PianoRoll::glueNotes()
 		m_midiClip->addJournalCheckPoint();
 
 		// Sort notes on key and then pos.
-		std::sort(selectedNotes.begin(), selectedNotes.end(),
-			[](const Note * note, const Note * compareNote) -> bool
+		std::ranges::sort(selectedNotes,
+			[](const Note* note, const Note* compareNote)
 			{
 				if (note->key() == compareNote->key())
 				{
@@ -734,11 +731,11 @@ void PianoRoll::fitNoteLengths(bool fill)
 	}
 	else if (!fill)
 	{
-		std::sort(notes.begin(), notes.end(), Note::lessThan);
+		std::ranges::sort(notes, Note::lessThan);
 	}
 	if (fill)
 	{
-		std::sort(notes.begin(), notes.end(), [](Note* n1, Note* n2) { return n1->endPos() < n2->endPos(); });
+		std::ranges::sort(notes, {}, [](Note* n) { return n->endPos(); });
 	}
 
 	int length;
@@ -2979,7 +2976,7 @@ void PianoRoll::setupSelectedChords()
 		if (note->pos() >= maxTime && maxTime != -1)
 		{
 			// Sort the notes by key before adding the chord to the vector
-			std::sort(currentChord.begin(), currentChord.end(), [](Note* a, Note* b){ return a->key() < b->key(); });
+			std::ranges::sort(currentChord, {}, &Note::key);
 			m_selectedChords.push_back(currentChord);
 			currentChord.clear();
 			maxTime = note->endPos();
@@ -3032,7 +3029,7 @@ void PianoRoll::updateStrumPos(QMouseEvent* me, bool initial, bool warp)
 				// if this is the clicked note, calculate it's ratio up the chord
 				if (note == clickedNote && chord.size() > 1)
 				{
-					m_strumHeightRatio = 1.f * std::distance(chord.begin(), std::find(chord.begin(), chord.end(), clickedNote)) / (chord.size() - 1);
+					m_strumHeightRatio = 1.f * std::distance(chord.begin(), std::ranges::find(chord, clickedNote)) / (chord.size() - 1);
 				}
 			}
 		}
@@ -4116,11 +4113,8 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 					volume_t vol = qBound<int>( MinVolume, n->getVolume() + step, MaxVolume );
 					n->setVolume( vol );
 				}
-				bool allVolumesEqual = std::all_of( nv.begin(), nv.end(),
-					[nv](const Note *note)
-					{
-						return note->getVolume() == nv[0]->getVolume();
-					});
+				const bool allVolumesEqual = std::ranges::all_of(nv,
+					[nv](const Note* note) { return note->getVolume() == nv[0]->getVolume(); });
 				if ( allVolumesEqual )
 				{
 					// show the volume hover-text only if all notes have the
@@ -4137,11 +4131,8 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 					panning_t pan = qBound(PanningLeft, static_cast<panning_t>(n->getPanning() + step), PanningRight);
 					n->setPanning(pan);
 				}
-				bool allPansEqual = std::all_of( nv.begin(), nv.end(),
-					[nv](const Note *note)
-					{
-						return note->getPanning() == nv[0]->getPanning();
-					});
+				const bool allPansEqual = std::ranges::all_of(nv,
+					[nv](const Note* note) { return note->getPanning() == nv[0]->getPanning(); });
 				if ( allPansEqual )
 				{
 					// show the pan hover-text only if all notes have the same

@@ -35,6 +35,8 @@
 #include "SampleTrack.h"
 #include "TrackContainer.h" // For TrackContainer::TrackList typedef
 
+#include <algorithm>
+
 namespace lmms
 {
 
@@ -558,8 +560,7 @@ void Mixer::deleteChannelSend( MixerRoute * route )
 
 	auto removeFromMixerRoute = [route](MixerRouteVector& routeVec)
 	{
-		auto it = std::find(routeVec.begin(), routeVec.end(), route);
-		if (it != routeVec.end()) { routeVec.erase(it); }
+		if (auto it = std::ranges::find(routeVec, route); it != routeVec.end()) { routeVec.erase(it); }
 	};
 
 	// remove us from from's sends

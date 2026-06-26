@@ -24,6 +24,7 @@
 
 #include "ComboBoxModel.h"
 
+#include <algorithm>
 #include <cassert>
 
 namespace lmms
@@ -58,14 +59,9 @@ void ComboBoxModel::clear()
 
 int ComboBoxModel::findText( const QString& txt ) const
 {
-	for( auto it = m_items.begin(); it != m_items.end(); ++it )
-	{
-		if( ( *it ).first == txt )
-		{
-			return it - m_items.begin();
-		}
-	}
-	return -1; 
+	const auto it = std::ranges::find(m_items, txt, &Item::first);
+	if (it == m_items.end()) { return -1; }
+	return std::distance(m_items.begin(), it);
 }
 
 

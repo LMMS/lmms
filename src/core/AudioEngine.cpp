@@ -37,6 +37,8 @@
 #include "NotePlayHandle.h"
 #include "ConfigManager.h"
 
+#include <algorithm>
+
 // platform-specific audio-interface-classes
 #include "AudioAlsa.h"
 #include "AudioJack.h"
@@ -213,7 +215,7 @@ void AudioEngine::renderStageNoteSetup()
 	ConstPlayHandleList::Iterator it_rem = m_playHandlesToRemove.begin();
 	while( it_rem != m_playHandlesToRemove.end() )
 	{
-		PlayHandleList::Iterator it = std::find( m_playHandles.begin(), m_playHandles.end(), *it_rem );
+		auto it = std::ranges::find(m_playHandles, *it_rem);
 
 		if( it != m_playHandles.end() )
 		{
@@ -449,8 +451,7 @@ void AudioEngine::removeAudioBusHandle(AudioBusHandle* busHandle)
 {
 	requestChangeInModel();
 
-	auto it = std::find(m_audioBusHandles.begin(), m_audioBusHandles.end(), busHandle);
-	if (it != m_audioBusHandles.end())
+	if (auto it = std::ranges::find(m_audioBusHandles, busHandle); it != m_audioBusHandles.end())
 	{
 		m_audioBusHandles.erase(it);
 	}
@@ -510,8 +511,7 @@ void AudioEngine::removePlayHandle(PlayHandle * ph)
 			}
 		}
 		// Now check m_playHandles
-		PlayHandleList::Iterator it = std::find(m_playHandles.begin(), m_playHandles.end(), ph);
-		if (it != m_playHandles.end())
+		if (auto it = std::ranges::find(m_playHandles, ph); it != m_playHandles.end())
 		{
 			m_playHandles.erase(it);
 			removedFromList = true;

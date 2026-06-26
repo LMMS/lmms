@@ -27,6 +27,8 @@
 
 #include <QMutexLocker>
 
+#include <algorithm>
+
 #include "AudioDevice.h"
 #include "AudioEngine.h"
 #include "EffectChain.h"
@@ -259,8 +261,7 @@ void AudioBusHandle::addPlayHandle(PlayHandle* handle)
 void AudioBusHandle::removePlayHandle(PlayHandle* handle)
 {
 	QMutexLocker lockGuard(&m_playHandleLock);
-	PlayHandleList::Iterator it = std::find(m_playHandles.begin(), m_playHandles.end(), handle);
-	if (it != m_playHandles.end())
+	if (auto it = std::ranges::find(m_playHandles, handle); it != m_playHandles.end())
 	{
 		m_playHandles.erase(it);
 	}

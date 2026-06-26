@@ -34,6 +34,8 @@
 #include <QSlider>
 #include <QTimeLine>
 
+#include <algorithm>
+
 #include "ActionGroup.h"
 #include "AudioDevice.h"
 #include "AudioEngine.h"
@@ -304,10 +306,8 @@ float SongEditor::getSnapSize() const
 	{
 		// Finds the closest available snap size
 		const float optimalSize = snapSize * DEFAULT_PIXELS_PER_BAR / pixelsPerBar();
-		return *std::min_element(PROPORTIONAL_SNAP_SIZES.begin(), PROPORTIONAL_SNAP_SIZES.end(), [optimalSize](float a, float b)
-		{
-			return std::abs(a - optimalSize) < std::abs(b - optimalSize);
-		});
+		return *std::ranges::min_element(PROPORTIONAL_SNAP_SIZES, {},
+			[optimalSize](float v) { return std::abs(v - optimalSize); });
 	}
 
 	return snapSize;
@@ -901,8 +901,7 @@ int SongEditor::trackIndexFromSelectionPoint(int yPos)
 
 int SongEditor::indexOfTrackView(const TrackView *tv)
 {
-	return static_cast<int>(std::distance(trackViews().begin(),
-										  std::find(trackViews().begin(), trackViews().end(), tv)));
+	return static_cast<int>(std::distance(trackViews().begin(), std::ranges::find(trackViews(), tv)));
 }
 
 

@@ -248,9 +248,8 @@ void Lv2Manager::initPlugins()
 
 		std::vector<PluginIssue> issues;
 		Plugin::Type type = Lv2ControlBase::check(curPlug, issues);
-		std::sort(issues.begin(), issues.end());
-		auto last = std::unique(issues.begin(), issues.end());
-		issues.erase(last, issues.end());
+		std::ranges::sort(issues);
+		issues.erase(std::ranges::unique(issues).begin(), issues.end());
 		if (m_debug && issues.size())
 		{
 			qDebug() << "Lv2 plugin"
@@ -268,7 +267,7 @@ void Lv2Manager::initPlugins()
 		if(issues.empty()) { ++pluginsLoaded; }
 		else
 		{
-			if(std::any_of(issues.begin(), issues.end(),
+			if (std::ranges::any_of(issues,
 				[](const PluginIssue& iss) {
 				return iss.type() == PluginIssueType::Blocked; }))
 			{

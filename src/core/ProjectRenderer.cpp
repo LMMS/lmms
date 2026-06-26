@@ -218,7 +218,7 @@ void ProjectRenderer::updateConsoleProgress()
 	prog[cols] = 0;
 
 	const auto activity = "|/-\\";
-	std::fill(buf.begin(), buf.end(), 0);
+	std::ranges::fill(buf, 0);
 	std::snprintf(buf.data(), buf.size(), "\r|%s|    %3d%%   %c  ", prog.data(), m_progress,
 							activity[rot] );
 	rot = ( rot+1 ) % 4;
