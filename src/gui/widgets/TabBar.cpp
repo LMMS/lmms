@@ -98,10 +98,10 @@ TabButton * TabBar::addTab( QWidget * _w, const QString & _text, int _id,
 void TabBar::removeTab( int _id )
 {
 	// find tab-button and delete it
-	if( m_tabs.find( _id ) != m_tabs.end() )
+	if( m_tabs.contains( _id ) )
 	{
 		delete m_tabs[_id].first;
-		m_tabs.erase( m_tabs.find( _id ) );
+		m_tabs.remove( _id );
 	}
 }
 
@@ -143,7 +143,7 @@ int TabBar::activeTab()
 
 bool TabBar::tabState( int _id )
 {
-	if( m_tabs.find( _id ) == m_tabs.end() )
+	if( !m_tabs.contains( _id ) )
 	{
 		return( false );
 	}
@@ -155,7 +155,7 @@ bool TabBar::tabState( int _id )
 
 void TabBar::setTabState( int _id, bool _checked )
 {
-	if( m_tabs.find( _id ) != m_tabs.end() )
+	if( m_tabs.contains( _id ) )
 	{
 		m_tabs[_id].first->setChecked( _checked );
 	}
@@ -175,7 +175,7 @@ void TabBar::hideAll( int _exception )
 		}
 		it.value().second->hide();
 	}
-	if( m_tabs.find( _exception ) != m_tabs.end() )
+	if( m_tabs.contains( _exception ) )
 	{
 		if( tabState( _exception ) )
 		{

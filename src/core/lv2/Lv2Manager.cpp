@@ -320,7 +320,7 @@ void Lv2Manager::initPlugins()
 
 bool Lv2Manager::isFeatureSupported(const char *featName) const
 {
-	return m_supportedFeatureURIs.find(featName) != m_supportedFeatureURIs.end();
+	return m_supportedFeatureURIs.contains(featName);
 }
 
 
