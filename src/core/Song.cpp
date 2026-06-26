@@ -1168,9 +1168,8 @@ void Song::loadProject( const QString & fileName )
 	ControllerConnection::finalizeConnections();
 
 	// Remove dummy controllers that was added for correct connections
-	m_controllers.erase(std::remove_if(m_controllers.begin(), m_controllers.end(),
-		[](Controller* c){return c->type() == Controller::ControllerType::Dummy;}),
-		m_controllers.end());
+	std::erase_if(m_controllers,
+		[](Controller* c){return c->type() == Controller::ControllerType::Dummy;});
 
 	// resolve all IDs so that autoModels are automated
 	AutomationClip::resolveAllIDs();
