@@ -133,13 +133,7 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 	connect(midiRackAction, SIGNAL(triggered()),
 		this, SLOT(toggleMidiCCRack()));
 
-	m_activityIndicator = new FadeButton( QApplication::palette().color( QPalette::Active,
-							QPalette::Window),
-						QApplication::palette().color( QPalette::Active,
-							QPalette::BrightText ),
-						QApplication::palette().color( QPalette::Active,
-							QPalette::BrightText).darker(),
-						getTrackSettingsWidget() );
+	m_activityIndicator = new FadeButton(getTrackSettingsWidget());
 	m_activityIndicator->setFixedSize(8, 28);
 	m_activityIndicator->show();
 
@@ -164,6 +158,7 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 			 m_activityIndicator, SLOT(activate()));
 	connect( _it, SIGNAL(endNote()),
 	 		m_activityIndicator, SLOT(noteEnd()));
+	connect(getGUI()->mainWindow(), &MainWindow::periodicUpdate, this, &InstrumentTrackView::corruptStateUpdate);
 
 	setModel( _it );
 }
@@ -420,5 +415,18 @@ QPixmap InstrumentTrackView::determinePixmap(InstrumentTrack* instrumentTrack)
 	return embed::getIconPixmap("instrument_track");
 }
 
+void InstrumentTrackView::corruptStateUpdate()
+{
+	if (model()->audioBusHandle()->isCorrupted())
+	{
+		m_activityIndicator->setState(FadeButton::State::Corrupted);
+		m_activityIndicator->setToolTip(tr("Corrupted audio detected: muting affected channels"));
+	}
+	else
+	{
+		m_activityIndicator->setState(FadeButton::State::Normal);
+		m_activityIndicator->setToolTip(QString{});
+	}
+}
 
 } // namespace lmms::gui
