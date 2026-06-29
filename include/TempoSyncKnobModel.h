@@ -59,48 +59,46 @@ public:
 		Custom
 	} ;
 
-	TempoSyncKnobModel( const float _val, const float _min,
-				const float _max, const float _step,
-				const float _scale, Model * _parent,
-				const QString & _display_name = QString() );
+	TempoSyncKnobModel(const float val, const float min, const float max, const float step,
+					const float scale, Model* parent, const QString& displayName = QString());
 	~TempoSyncKnobModel() override = default;
 
-	void saveSettings( QDomDocument & _doc, QDomElement & _this, const QString& name ) override;
-	void loadSettings( const QDomElement & _this, const QString& name ) override;
+	void saveSettings(QDomDocument& doc, QDomElement& self, const QString& name) override;
+	void loadSettings(const QDomElement& self, const QString& name) override;
 
 	SyncMode syncMode() const
 	{
 		return m_tempoSyncMode;
 	}
 
-	void setSyncMode( SyncMode _new_mode );
+	void setSyncMode(SyncMode newMode);
 
 	float scale() const
 	{
 		return m_scale;
 	}
 
-	void setScale( float _new_scale );
+	void setScale(float newScale);
 
-	MeterModel & getCustomMeterModel() { return m_custom; }
-	MeterModel const & getCustomMeterModel() const { return m_custom; }
+	MeterModel& getCustomMeterModel() { return m_custom; }
+	MeterModel const& getCustomMeterModel() const { return m_custom; }
 
 signals:
-	void syncModeChanged( lmms::TempoSyncKnobModel::SyncMode _new_mode );
-	void scaleChanged( float _new_scale );
+	void syncModeChanged(lmms::TempoSyncKnobModel::SyncMode newMode);
+	void scaleChanged(float newScale);
 
 
 public slots:
 	inline void disableSync()
 	{
-		setTempoSync( SyncMode::None );
+		setTempoSync(SyncMode::None);
 	}
-	void setTempoSync( SyncMode _note_type );
-	void setTempoSync( QAction * _item );
+	void setTempoSync(SyncMode noteType);
+	void setTempoSync(QAction* item);
 
 
 protected slots:
-	void calculateTempoSyncTime( lmms::bpm_t _bpm );
+	void calculateTempoSyncTime(lmms::bpm_t bpm);
 	void updateCustom();
 
 
