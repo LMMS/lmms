@@ -1016,7 +1016,7 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 		}
 		else 
 		{
-			s_textFloat->moveGlobal(this, QPoint( width() + 2, height() + 2));
+			s_textFloat->moveGlobal(this, QPoint(width() + 2, height() + 2));
 		}
 	}
 	else if( m_action == Action::Split )
