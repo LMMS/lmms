@@ -24,6 +24,7 @@
  */
 
 #include "AudioSndio.h"
+#include "LmmsTypes.h"
 
 #ifdef LMMS_HAVE_SNDIO
 
@@ -130,12 +131,24 @@ void AudioSndio::stopProcessingImpl()
 void AudioSndio::run()
 {
 	const auto framesPerAudioBuffer = audioEngine()->framesPerAudioBuffer();
-	auto buf = std::vector<float>(framesPerAudioBuffer * channels());
+	const auto samplesPerAudioBuffer = framesPerAudioBuffer * channels();
+	auto fbuf = std::vector<sample_t>(samplesPerAudioBuffer);
+	auto ibuf = std::vector<int_sample_t>(samplesPerAudioBuffer);
 
 	while (AudioDevice::isRunning())
 	{
-		audioEngine()->renderNextBuffer({buf.data(), channels(), framesPerAudioBuffer});
-		sio_write(m_hdl, buf.data(), buf.size() * sizeof(float));
+		audioEngine()->renderNextBuffer({fbuf.data(), channels(), framesPerAudioBuffer});
+
+		// convertToS16() works on a SampleFrame buffer, but these are
+		// planar sample_t buffers
+		// There's also no need to convert endianness of the resulting
+		// int_sample_t since sndio was initialized with SIO_LE_NATIVE
+		for (auto i = 0u; i < samplesPerAudioBuffer; ++i)
+		{
+			ibuf[i] = static_cast<int_sample_t>(AudioEngine::clip(fbuf[i]) * OUTPUT_SAMPLE_MULTIPLIER);
+		}
+
+		sio_write(m_hdl, ibuf.data(), ibuf.size() * sizeof(int_sample_t));
 	}
 }
 
