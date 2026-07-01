@@ -24,7 +24,6 @@
  */
 
 #include "AudioSndio.h"
-#include "LmmsTypes.h"
 
 #ifdef LMMS_HAVE_SNDIO
 
@@ -69,7 +68,8 @@ AudioSndio::AudioSndio(bool& _success_ful, AudioEngine* _audioEngine)
 	sio_initpar(&m_par);
 
 	m_par.pchan = channels();
-	m_par.bits = 16;
+	m_par.bits = sizeof(int_sample_t) * 8;
+	m_par.sig = 1; // int_sample_t must be signed
 	m_par.le = SIO_LE_NATIVE;
 	m_par.rate = sampleRate();
 	m_par.round = audioEngine()->framesPerAudioBuffer();
@@ -139,10 +139,11 @@ void AudioSndio::run()
 	{
 		audioEngine()->renderNextBuffer({fbuf.data(), channels(), framesPerAudioBuffer});
 
-		// convertToS16() works on a SampleFrame buffer, but these are
-		// planar sample_t buffers
-		// There's also no need to convert endianness of the resulting
-		// int_sample_t since sndio was initialized with SIO_LE_NATIVE
+		// Sndio doesn't speak float, so convert samples to signed int.
+		// While convertToS16() exists, it is intentionally not used
+		// here. There is no need to convert endian-ness since sndio was
+		// initialized with SIO_LE_NATIVE, and there's no reason to
+		// also convert to SampleFrame.
 		for (auto i = 0u; i < samplesPerAudioBuffer; ++i)
 		{
 			ibuf[i] = static_cast<int_sample_t>(AudioEngine::clip(fbuf[i]) * OUTPUT_SAMPLE_MULTIPLIER);
