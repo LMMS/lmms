@@ -95,7 +95,6 @@ int maxChannels(const PaDeviceInfo* info, Direction direction)
 namespace lmms {
 AudioPortAudio::AudioPortAudio(bool& successful, AudioEngine* engine)
 	: AudioDevice(DEFAULT_CHANNELS, engine)
-	, m_outBuf(engine->framesPerPeriod())
 {
 	const auto numDevices = Pa_GetDeviceCount();
 	if (numDevices < 0)
@@ -179,12 +178,12 @@ AudioPortAudio::~AudioPortAudio()
 	Pa_CloseStream(m_paStream);
 }
 
-void AudioPortAudio::startProcessing()
+void AudioPortAudio::startProcessingImpl()
 {
 	Pa_StartStream(m_paStream);
 }
 
-void AudioPortAudio::stopProcessing()
+void AudioPortAudio::stopProcessingImpl()
 {
 	Pa_StopStream(m_paStream);
 }
@@ -193,29 +192,16 @@ int AudioPortAudio::processCallback(const void*, void* output, unsigned long fra
 	const PaStreamCallbackTimeInfo*, PaStreamCallbackFlags, void* userData)
 {
 	const auto device = static_cast<AudioPortAudio*>(userData);
+	const auto channels = device->channels();
+	const auto outputBuffer = reinterpret_cast<float*>(output);
 
-	const auto outputBuffer = static_cast<float*>(output);
-	for (auto frame = std::size_t{0}; frame < frameCount; ++frame)
+	if (!device->isRunning())
 	{
-		if (device->m_outBufPos == 0 && device->getNextBuffer(device->m_outBuf.data()) == 0)
-		{
-			std::fill(outputBuffer + frame * device->channels(), outputBuffer + frameCount * device->channels(), 0.f);
-			return paComplete;
-		}
-
-		if (device->channels() == 1)
-		{
-			outputBuffer[frame] = device->m_outBuf[device->m_outBufPos].average();
-		}
-		else
-		{
-			outputBuffer[frame * device->channels()] = device->m_outBuf[device->m_outBufPos][0];
-			outputBuffer[frame * device->channels() + 1] = device->m_outBuf[device->m_outBufPos][1];
-		}
-
-		device->m_outBufPos = (device->m_outBufPos + 1) % device->m_outBuf.size();
+		std::fill_n(outputBuffer, frameCount * channels, 0.f);
+		return paComplete;
 	}
 
+	device->audioEngine()->renderNextBuffer({outputBuffer, channels, frameCount});
 	return paContinue;
 }
 } // namespace lmms

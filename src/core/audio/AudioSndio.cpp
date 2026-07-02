@@ -41,12 +41,10 @@
 namespace lmms
 {
 
-AudioSndio::AudioSndio(bool & _success_ful, AudioEngine * _audioEngine) :
-	AudioDevice(std::clamp<ch_cnt_t>(
-		ConfigManager::inst()->value("audiosndio", "channels").toInt(),
-		DEFAULT_CHANNELS,
-		DEFAULT_CHANNELS), _audioEngine),
-	m_convertEndian ( false )
+AudioSndio::AudioSndio(bool& _success_ful, AudioEngine* _audioEngine)
+	: AudioDevice(std::clamp<ch_cnt_t>(ConfigManager::inst()->value("audiosndio", "channels").toInt(), DEFAULT_CHANNELS,
+					  DEFAULT_CHANNELS),
+		  _audioEngine)
 {
 	_success_ful = false;
 
@@ -70,16 +68,12 @@ AudioSndio::AudioSndio(bool & _success_ful, AudioEngine * _audioEngine) :
 	sio_initpar(&m_par);
 
 	m_par.pchan = channels();
-	m_par.bits = 16;
+	m_par.bits = sizeof(int_sample_t) * 8;
+	m_par.sig = 1; // int_sample_t must be signed
 	m_par.le = SIO_LE_NATIVE;
 	m_par.rate = sampleRate();
-	m_par.round = audioEngine()->framesPerPeriod();
+	m_par.round = audioEngine()->framesPerAudioBuffer();
 	m_par.appbufsz = m_par.round * 2;
-
-	if ( (isLittleEndian() && (m_par.le == 0)) ||
-	     (!isLittleEndian() && (m_par.le == 1))) {
-		m_convertEndian = true;
-	}
 
 	struct sio_par reqpar = m_par;
 
@@ -115,7 +109,6 @@ AudioSndio::AudioSndio(bool & _success_ful, AudioEngine * _audioEngine) :
 
 AudioSndio::~AudioSndio()
 {
-	stopProcessing();
 	if (m_hdl != nullptr)
 	{
 		sio_close( m_hdl );
@@ -124,42 +117,40 @@ AudioSndio::~AudioSndio()
 }
 
 
-void AudioSndio::startProcessing()
+void AudioSndio::startProcessingImpl()
 {
-	if( !isRunning() )
-	{
-		start( QThread::HighPriority );
-	}
+	start(QThread::HighPriority);
 }
 
 
-void AudioSndio::stopProcessing()
+void AudioSndio::stopProcessingImpl()
 {
 	stopProcessingThread( this );
 }
 
 void AudioSndio::run()
 {
-	SampleFrame* temp = new SampleFrame[audioEngine()->framesPerPeriod()];
-	int_sample_t * outbuf = new int_sample_t[audioEngine()->framesPerPeriod() * channels()];
+	const auto framesPerAudioBuffer = audioEngine()->framesPerAudioBuffer();
+	const auto samplesPerAudioBuffer = framesPerAudioBuffer * channels();
+	auto fbuf = std::vector<sample_t>(samplesPerAudioBuffer);
+	auto ibuf = std::vector<int_sample_t>(samplesPerAudioBuffer);
 
-	while( true )
+	while (AudioDevice::isRunning())
 	{
-		const f_cnt_t frames = getNextBuffer( temp );
-		if( !frames )
+		audioEngine()->renderNextBuffer({fbuf.data(), channels(), framesPerAudioBuffer});
+
+		// Sndio doesn't speak float, so convert samples to signed int.
+		// While convertToS16() exists, it is intentionally not used
+		// here. There is no need to convert endian-ness since sndio was
+		// initialized with SIO_LE_NATIVE, and there's no reason to
+		// also convert to SampleFrame.
+		for (auto i = 0u; i < samplesPerAudioBuffer; ++i)
 		{
-			break;
+			ibuf[i] = static_cast<int_sample_t>(AudioEngine::clip(fbuf[i]) * OUTPUT_SAMPLE_MULTIPLIER);
 		}
 
-		uint bytes = convertToS16(temp, frames, outbuf, m_convertEndian);
-		if( sio_write( m_hdl, outbuf, bytes ) != bytes )
-		{
-			break;
-		}
+		sio_write(m_hdl, ibuf.data(), ibuf.size() * sizeof(int_sample_t));
 	}
-
-	delete[] temp;
-	delete[] outbuf;
 }
 
 
