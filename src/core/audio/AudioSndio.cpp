@@ -68,7 +68,8 @@ AudioSndio::AudioSndio(bool& _success_ful, AudioEngine* _audioEngine)
 	sio_initpar(&m_par);
 
 	m_par.pchan = channels();
-	m_par.bits = 16;
+	m_par.bits = sizeof(int_sample_t) * 8;
+	m_par.sig = 1; // int_sample_t must be signed
 	m_par.le = SIO_LE_NATIVE;
 	m_par.rate = sampleRate();
 	m_par.round = audioEngine()->framesPerAudioBuffer();
@@ -130,12 +131,25 @@ void AudioSndio::stopProcessingImpl()
 void AudioSndio::run()
 {
 	const auto framesPerAudioBuffer = audioEngine()->framesPerAudioBuffer();
-	auto buf = std::vector<float>(framesPerAudioBuffer * channels());
+	const auto samplesPerAudioBuffer = framesPerAudioBuffer * channels();
+	auto fbuf = std::vector<sample_t>(samplesPerAudioBuffer);
+	auto ibuf = std::vector<int_sample_t>(samplesPerAudioBuffer);
 
 	while (AudioDevice::isRunning())
 	{
-		audioEngine()->renderNextBuffer({buf.data(), channels(), framesPerAudioBuffer});
-		sio_write(m_hdl, buf.data(), buf.size() * sizeof(float));
+		audioEngine()->renderNextBuffer({fbuf.data(), channels(), framesPerAudioBuffer});
+
+		// Sndio doesn't speak float, so convert samples to signed int.
+		// While convertToS16() exists, it is intentionally not used
+		// here. There is no need to convert endian-ness since sndio was
+		// initialized with SIO_LE_NATIVE, and there's no reason to
+		// also convert to SampleFrame.
+		for (auto i = 0u; i < samplesPerAudioBuffer; ++i)
+		{
+			ibuf[i] = static_cast<int_sample_t>(AudioEngine::clip(fbuf[i]) * OUTPUT_SAMPLE_MULTIPLIER);
+		}
+
+		sio_write(m_hdl, ibuf.data(), ibuf.size() * sizeof(int_sample_t));
 	}
 }
 
