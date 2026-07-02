@@ -1074,7 +1074,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 		else
 		{
 			int level = (int) m_bottomLevel;
-			int printable = qMax(1.0f, 5 * DEFAULT_Y_DELTA / m_y_delta);
+			auto printable = static_cast<int>(std::max(1.0f, 5 * DEFAULT_Y_DELTA / m_y_delta));
 			int module = level % printable;
 			if( module )
 			{
