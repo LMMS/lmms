@@ -549,13 +549,13 @@ void MixerView::wheelEvent(QWheelEvent* e)
 {
 	if (e->modifiers() & Qt::ShiftModifier)
 	{
-		if ( e->angleDelta().y() > 0 )
+		if (e->angleDelta().y() > 0)
 		{
-			m_channelAreaScrollBar->setValue( m_channelAreaScrollBar->value() - m_currentMixerChannel->width() );
+			m_channelAreaScrollBar->setValue(m_channelAreaScrollBar->value() - m_currentMixerChannel->width());
 		}
 		else
 		{
-			m_channelAreaScrollBar->setValue( m_channelAreaScrollBar->value() + m_currentMixerChannel->width() );
+			m_channelAreaScrollBar->setValue(m_channelAreaScrollBar->value() + m_currentMixerChannel->width());
 		}
 	}
 }
