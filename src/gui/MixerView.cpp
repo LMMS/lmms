@@ -512,10 +512,10 @@ void MixerView::keyPressEvent(QKeyEvent * e)
 				// select channel to the right
 				setCurrentMixerChannel(m_currentMixerChannel->channelIndex() + 1);
 			}
-			if ( ( overflow = m_currentMixerChannel->x() + m_currentMixerChannel->width() - m_channelAreaScrollBar->value() - m_channelAreaScrollBar->pageStep() ) > 0 )
+			if ((overflow = m_currentMixerChannel->x() + m_currentMixerChannel->width() - m_channelAreaScrollBar->value() - m_channelAreaScrollBar->pageStep()) > 0)
 			{
 				// scroll to the right if the current channel is going out of view
-				m_channelAreaScrollBar->setValue( m_channelAreaScrollBar->value() + overflow );
+				m_channelAreaScrollBar->setValue(m_channelAreaScrollBar->value() + overflow);
 			}
 			break;
 		case Qt::Key_Up:
