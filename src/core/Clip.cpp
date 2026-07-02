@@ -31,6 +31,8 @@
 #include "Engine.h"
 #include "GuiApplication.h"
 #include "Song.h"
+#include "Track.h"
+#include "TrackContainer.h"
 
 
 namespace lmms
@@ -75,7 +77,6 @@ Clip::Clip(const Clip& other):
 	m_length(other.m_length),
 	m_startTimeOffset(other.m_startTimeOffset),
 	m_mutedModel(other.m_mutedModel.value(), this, tr( "Mute" )),
-	m_resizable(other.m_resizable),
 	m_autoResize(other.m_autoResize),
 	m_selectViewOnCreate{other.m_selectViewOnCreate},
 	m_color(other.m_color)
@@ -173,6 +174,21 @@ void Clip::copyStateTo( Clip *src, Clip *dst )
 	}
 }
 
+bool Clip::hasTrackContainer() const
+{
+	return getTrack() != nullptr && getTrack()->trackContainer() != nullptr;
+}
+
+bool Clip::isInPattern() const
+{
+	return hasTrackContainer()
+		&& getTrack()->trackContainer()->type() == TrackContainer::Type::Pattern;
+}
+
+bool Clip::manuallyResizable() const
+{
+	return !isInPattern();
+}
 
 
 

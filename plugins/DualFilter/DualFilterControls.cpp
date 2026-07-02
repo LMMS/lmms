@@ -24,7 +24,6 @@
  */
 
 
-#include <QDomElement>
 
 #include "BasicFilters.h"
 #include "DualFilterControls.h"

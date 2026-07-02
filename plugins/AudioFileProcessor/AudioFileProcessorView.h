@@ -34,7 +34,7 @@ namespace lmms
 namespace gui
 {
 
-class automatableButtonGroup;
+class AutomatableButtonGroup;
 class Knob;
 class PixmapButton;
 class ComboBox;
@@ -73,7 +73,7 @@ private:
 
 	gui::PixmapButton* m_openAudioFileButton;
 	PixmapButton* m_reverseButton;
-	automatableButtonGroup* m_loopGroup;
+	AutomatableButtonGroup* m_loopGroup;
 	PixmapButton* m_stutterButton;
 	ComboBox* m_interpBox;
 } ;

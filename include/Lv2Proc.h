@@ -57,10 +57,6 @@ namespace Lv2Ports
 	struct Audio;
 	struct PortBase;
 	struct AtomSeq;
-
-	enum class Type;
-	enum class Flow;
-	enum class Vis;
 }
 
 
@@ -136,7 +132,7 @@ public:
 	 *   @p offset)
 	 */
 	void copyBuffersFromCore(const SampleFrame* buf,
-								unsigned firstChan, unsigned num, fpp_t frames);
+								unsigned firstChan, unsigned num, f_cnt_t frames);
 	/**
 	 * Copy our ports into buffers passed by the core
 	 * @param buf buffer of sample frames, each sample frame is something like
@@ -149,9 +145,9 @@ public:
 	 *   @p offset)
 	 */
 	void copyBuffersToCore(SampleFrame* buf, unsigned firstChan, unsigned num,
-								fpp_t frames) const;
+								f_cnt_t frames) const;
 	//! Run the Lv2 plugin instance for @param frames frames
-	void run(fpp_t frames);
+	void run(f_cnt_t frames);
 
 	void handleMidiInputEvent(const class MidiEvent &event,
 		const TimePos &time, f_cnt_t offset);

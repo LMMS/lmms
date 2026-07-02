@@ -27,6 +27,7 @@
 #define LMMS_BASE64_H
 
 #include <QByteArray>
+#include <QMetaType>
 #include <QString>
 #include <QVariant>
 
@@ -47,9 +48,10 @@ namespace lmms::base64
 		*_data = new T[*_size / sizeof(T)];
 		memcpy( *_data, data.constData(), *_size );
 	}
+
 	// for compatibility-code only
-	QVariant decode( const QString & _b64,
-			QVariant::Type _force_type = QVariant::Invalid );
+	QVariant decode(const QString& b64,
+		QMetaType::Type forceType = QMetaType::UnknownType);
 
 } // namespace lmms::base64
 

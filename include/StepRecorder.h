@@ -21,7 +21,6 @@
 #ifndef LMMS_STEP_RECORDER_H
 #define LMMS_STEP_RECORDER_H
 
-#include <QColor>
 #include <QElapsedTimer>
 #include <QTimer>
 #include <QObject>

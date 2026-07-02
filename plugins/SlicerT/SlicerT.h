@@ -25,41 +25,14 @@
 #ifndef LMMS_SLICERT_H
 #define LMMS_SLICERT_H
 
-#include <algorithm>
-#include <fftw3.h>
-#include <stdexcept>
-
 #include "AutomatableModel.h"
+#include "ComboBoxModel.h"
 #include "Instrument.h"
-#include "InstrumentView.h"
 #include "Note.h"
 #include "Sample.h"
-#include "SampleBuffer.h"
 #include "SlicerTView.h"
-#include "LmmsTypes.h"
 
 namespace lmms {
-
-class PlaybackState
-{
-public:
-	explicit PlaybackState(float startFrame)
-		: m_currentNoteDone(startFrame)
-		, m_resamplingState(src_new(SRC_LINEAR, DEFAULT_CHANNELS, nullptr))
-	{
-		if (!m_resamplingState) { throw std::runtime_error{"Failed to create sample rate converter object"}; }
-	}
-	~PlaybackState() noexcept { src_delete(m_resamplingState); }
-
-	float noteDone() const { return m_currentNoteDone; }
-	void setNoteDone(float newNoteDone) { m_currentNoteDone = newNoteDone; }
-
-	SRC_STATE* resamplingState() const { return m_resamplingState; }
-
-private:
-	float m_currentNoteDone;
-	SRC_STATE* m_resamplingState;
-};
 
 class SlicerT : public Instrument
 {
@@ -81,6 +54,7 @@ public:
 	void saveSettings(QDomDocument& document, QDomElement& element) override;
 	void loadSettings(const QDomElement& element) override;
 
+	void loadFile(const QString& file) override;
 	void findSlices();
 	void findBPM();
 

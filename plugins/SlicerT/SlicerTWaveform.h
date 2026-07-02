@@ -25,12 +25,8 @@
 #ifndef LMMS_GUI_SLICERT_WAVEFORM_H
 #define LMMS_GUI_SLICERT_WAVEFORM_H
 
-#include <QApplication>
 #include <QElapsedTimer>
-#include <QFontMetrics>
-#include <QInputDialog>
-#include <QMouseEvent>
-#include <QPainter>
+#include <QWidget>
 
 #include "SampleThumbnail.h"
 

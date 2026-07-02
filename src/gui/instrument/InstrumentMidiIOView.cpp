@@ -24,7 +24,6 @@
 
 #include <QToolButton>
 #include <QHBoxLayout>
-#include <QLabel>
 #include <QVBoxLayout>
 
 #include "InstrumentMidiIOView.h"

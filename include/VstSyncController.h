@@ -29,11 +29,10 @@
 #include <QObject>
 
 #include "SharedMemory.h"
-#include "VstSyncData.h"
+#include "VstSyncData.h"  // IWYU pragma: keep
 
 namespace lmms
 {
-
 
 class VstSyncController : public QObject
 {

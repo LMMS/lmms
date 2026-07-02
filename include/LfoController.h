@@ -25,9 +25,7 @@
 #ifndef LMMS_LFO_CONTROLLER_H
 #define LMMS_LFO_CONTROLLER_H
 
-#include <QWidget>
 
-#include "Model.h"
 #include "AutomatableModel.h"
 #include "Controller.h"
 #include "ControllerDialog.h"
@@ -40,8 +38,7 @@ namespace lmms
 namespace gui
 {
 
-class automatableButtonGroup;
-class LedCheckBox;
+class AutomatableButtonGroup;
 class PixmapButton;
 class Knob;
 class TempoSyncKnob;
@@ -120,8 +117,8 @@ protected:
 	Knob * m_amountKnob;
 	Knob * m_phaseKnob;
 	PixmapButton * m_userLfoBtn;
-	automatableButtonGroup * m_waveBtnGrp;
-	automatableButtonGroup * m_multiplierBtnGrp;
+	AutomatableButtonGroup * m_waveBtnGrp;
+	AutomatableButtonGroup * m_multiplierBtnGrp;
 
 
 private:

@@ -151,7 +151,7 @@ void LocalZynAddSubFx::loadXML( const std::string & _filename )
 	m_master->applyparameters();
 
 #ifdef LMMS_BUILD_WIN32
-	_wunlink(toWString(_filename).c_str());
+	_wunlink(toWString(_filename).get());
 #else
 	unlink( f );
 #endif

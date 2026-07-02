@@ -22,24 +22,31 @@
  *
  */
 
+// NOTE: The LMMS/zynaddsubfx repo contains a copy of this header.
+//       If you modify this file, consider modifying it there as well.
+
 #ifndef LMMS_IO_HELPER_H
 #define LMMS_IO_HELPER_H
 
-#include "lmmsconfig.h"
-
 #include <cstdio>
+#include <limits>
+#include <memory>
+#include <stdexcept>
+#include <string>
+#include <string_view>
 
 #ifdef _WIN32
-#include <windows.h>
+#	ifndef NOMINMAX
+#		define NOMINMAX
+#	endif
+#	include <windows.h>
 #endif
 
-#ifdef LMMS_BUILD_WIN32
-#include <io.h>
-#else
-#ifdef LMMS_HAVE_UNISTD_H
-#include <unistd.h>
+#if defined(_WIN32) && !defined(__WINE__)
+#	include <io.h>
+#elif __has_include(<unistd.h>)
+#	include <unistd.h>
 #endif
-#endif // LMMS_BUILD_WIN32
 
 namespace lmms
 {
@@ -47,43 +54,67 @@ namespace lmms
 
 #ifdef _WIN32
 
-inline std::wstring toWString(const std::string& s)
+/**
+ * UTF-8 to wide string conversion
+ * NOTE: Avoids using std::wstring because it does not work correctly with wineg++
+ */
+inline std::unique_ptr<wchar_t[]> toWString(std::string_view utf8)
 {
-	std::wstring ret;
-	int len = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, s.data(),
-			s.length(), nullptr, 0);
-	if (len == 0)
+	std::unique_ptr<wchar_t[]> ret;
+	if (utf8.empty())
 	{
+		ret = std::make_unique<wchar_t[]>(1);
 		return ret;
 	}
-	ret.resize(len);
-	MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, s.data(), s.length(), &ret[0], len);
+
+	if (utf8.length() > static_cast<std::size_t>(std::numeric_limits<int>::max()))
+	{
+		throw std::overflow_error{"toWString: input string is too long"};
+	}
+	const auto utf8Len = static_cast<int>(utf8.length());
+
+	int result = ::MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, utf8.data(), utf8Len, nullptr, 0);
+	if (result <= 0)
+	{
+		const DWORD error = ::GetLastError();
+		throw std::invalid_argument{"toWString: failed to get size of result string. error code: " + std::to_string(error)};
+	}
+
+	ret = std::make_unique<wchar_t[]>(result + 1); // includes null terminator
+	result = ::MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, utf8.data(), utf8Len, ret.get(), result);
+	if (result <= 0)
+	{
+		const DWORD error = ::GetLastError();
+		throw std::invalid_argument{"toWString: failed to convert. error code: " + std::to_string(error)};
+	}
+
 	return ret;
 }
 
-#endif
+#endif // _WIN32
 
-
-inline FILE* F_OPEN_UTF8(std::string const& fname, const char* mode){
-#ifdef LMMS_BUILD_WIN32
-	return _wfopen(toWString(fname).data(), toWString(mode).data());
+//! std::fopen wrapper that expects UTF-8 encoded `filename` and `mode`
+inline std::FILE* fopenUtf8(const std::string& filename, const char* mode)
+{
+#if defined(_WIN32) && !defined(__WINE__)
+	return _wfopen(toWString(filename).get(), toWString(mode).get());
 #else
-	return fopen(fname.data(), mode);
+	return std::fopen(filename.c_str(), mode);
 #endif
 }
 
-
-inline int fileToDescriptor(FILE* f, bool closeFile = true)
+//! Returns the POSIX file descriptor of the given FILE
+inline int fileToDescriptor(std::FILE* file, bool closeFile = true)
 {
-	if (f == nullptr) {return -1;}
+	if (file == nullptr) { return -1; }
 
-#ifdef LMMS_BUILD_WIN32
-	int fh = _dup(_fileno(f));
+#if defined(_WIN32) && !defined(__WINE__)
+	int fh = _dup(_fileno(file));
 #else
-	int fh = dup(fileno(f));
+	int fh = dup(fileno(file));
 #endif
 
-	if (closeFile) {fclose(f);}
+	if (closeFile) { std::fclose(file); }
 	return fh;
 }
 

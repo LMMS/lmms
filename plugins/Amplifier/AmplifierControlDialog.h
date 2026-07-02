@@ -32,12 +32,9 @@ namespace lmms
 {
 
 class AmplifierControls;
-class FloatModel;
 
 namespace gui
 {
-
-class Knob;
 
 class AmplifierControlDialog : public EffectControlDialog
 {

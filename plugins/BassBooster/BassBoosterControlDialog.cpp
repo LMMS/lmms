@@ -67,6 +67,7 @@ BassBoosterControlDialog::BassBoosterControlDialog( BassBoosterControls* control
 
 	tl->addLayout( l );
 	setLayout( tl );
+	tl->setSizeConstraint(QLayout::SetFixedSize);
 }
 
 

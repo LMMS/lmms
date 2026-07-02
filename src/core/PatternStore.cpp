@@ -38,19 +38,13 @@ PatternStore::PatternStore() :
 	TrackContainer(),
 	m_patternComboBoxModel(this)
 {
-	connect(&m_patternComboBoxModel, SIGNAL(dataChanged()),
-			this, SLOT(currentPatternChanged()));
-	// we *always* want to receive updates even in case pattern actually did
-	// not change upon setCurrentPattern()-call
-	connect(&m_patternComboBoxModel, SIGNAL(dataUnchanged()),
-			this, SLOT(currentPatternChanged()));
 	setType(Type::Pattern);
 }
 
 
 
 
-bool PatternStore::play(TimePos start, fpp_t frames, f_cnt_t offset, int clipNum)
+bool PatternStore::play(TimePos start, f_cnt_t frames, f_cnt_t offset, int clipNum)
 {
 	bool notePlayed = false;
 
@@ -94,8 +88,9 @@ bar_t PatternStore::lengthOfPattern(int pattern) const
 	const TrackList & tl = tracks();
 	for (Track * t : tl)
 	{
-		// Don't create Clips here if they don't exist
-		if (pattern < t->numOfClips())
+		// Don't create Clips here if they don't exist, and only takes into account MIDI clips
+		// because the length of Automation / Sample clips is defined based on this method's output.
+		if (pattern < t->numOfClips() && t->type() == Track::Type::Instrument)
 		{
 			maxLength = std::max(maxLength, t->getClip(pattern)->length());
 		}
@@ -152,6 +147,7 @@ void PatternStore::updatePatternTrack(Clip* clip)
 	{
 		t->dataChanged();
 	}
+	emit trackUpdated();
 }
 
 
@@ -207,22 +203,6 @@ void PatternStore::updateComboBox()
 		m_patternComboBoxModel.addItem(pt->name());
 	}
 	setCurrentPattern(curPattern);
-}
-
-
-
-
-void PatternStore::currentPatternChanged()
-{
-	// now update all track-labels (the current one has to become white, the others gray)
-	const TrackList& tl = Engine::getSong()->tracks();
-	for (Track * t : tl)
-	{
-		if (t->type() == Track::Type::Pattern)
-		{
-			t->dataChanged();
-		}
-	}
 }
 
 

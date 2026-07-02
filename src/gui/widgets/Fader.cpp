@@ -49,12 +49,12 @@
 #include <QInputDialog>
 #include <QMouseEvent>
 #include <QPainter>
-#include <QPainterPath>
+#include <QPainterPath>  // IWYU pragma: keep
 
 #include "lmms_math.h"
-#include "embed.h"
 #include "CaptionMenu.h"
 #include "ConfigManager.h"
+#include "DeprecationHelper.h"
 #include "KeyboardShortcuts.h"
 #include "SimpleTextFloat.h"
 
@@ -88,7 +88,7 @@ Fader::Fader(FloatModel* model, const QString& name, QWidget* parent, bool model
 	resize(minimumSize);
 	setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 	setModel(model);
-	setHintText("Volume:", "%");
+	setHintText(tr("Volume:"), "%");
 
 	m_conversionFactor = 100.0;
 
@@ -173,11 +173,12 @@ void Fader::contextMenuEvent(QContextMenuEvent* ev)
 
 void Fader::mouseMoveEvent(QMouseEvent* mouseEvent)
 {
-	const int localY = mouseEvent->y();
+	const int localY = position(mouseEvent).y();
 
 	setVolumeByLocalPixelValue(localY);
 
 	updateTextFloat();
+	s_textFloat->show();
 
 	mouseEvent->accept();
 }
@@ -187,6 +188,8 @@ void Fader::mouseMoveEvent(QMouseEvent* mouseEvent)
 
 void Fader::mousePressEvent(QMouseEvent* mouseEvent)
 {
+	const auto pos = position(mouseEvent);
+
 	if (mouseEvent->button() == Qt::LeftButton &&
 			!(mouseEvent->modifiers() & KBD_COPY_MODIFIER))
 	{
@@ -197,7 +200,7 @@ void Fader::mousePressEvent(QMouseEvent* mouseEvent)
 			thisModel->saveJournallingState(false);
 		}
 
-		const int localY = mouseEvent->y();
+		const int localY = pos.y();
 		const auto knobLowerPosY = calculateKnobPosYFromModel();
 		const auto knobUpperPosY = knobLowerPosY - m_knobSize.height();
 
@@ -494,6 +497,7 @@ void Fader::setPeak_R(float fPeak)
 // update tooltip showing value and adjust position while changing fader value
 void Fader::updateTextFloat()
 {
+	s_textFloat->setSource(this);
 	if (m_conversionFactor == 100.0)
 	{
 		s_textFloat->setText(getModelValueAsDbString());

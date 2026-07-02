@@ -73,16 +73,13 @@ public:
 	} ;
 
 private:
-	void startProcessing() override;
-	void stopProcessing() override;
+	void startProcessingImpl() override;
+	void stopProcessingImpl() override;
 	void run() override;
 
 	struct sio_hdl *m_hdl;
 	struct sio_par m_par;
-
-	bool m_convertEndian;
-} ;
-
+};
 
 } // namespace lmms
 

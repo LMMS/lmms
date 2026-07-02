@@ -41,14 +41,14 @@
 #include <QCursor>
 #include <QKeyEvent>
 #include <QPainter>
-#include <QPainterPath>
+#include <QPainterPath>  // IWYU pragma: keep
 #include <QVBoxLayout>
 
 #include "AutomatableModelView.h"
+#include "DeprecationHelper.h"
 #include "PianoView.h"
 #include "Piano.h"
 #include "CaptionMenu.h"
-#include "embed.h"
 #include "Engine.h"
 #include "FontHelper.h"
 #include "InstrumentTrack.h"
@@ -418,11 +418,13 @@ void PianoView::mousePressEvent(QMouseEvent *me)
 {
 	if (me->button() == Qt::LeftButton && m_piano != nullptr)
 	{
+		const auto pos = position(me);
+
 		// get pressed key
-		int key_num = getKeyFromMouse(me->pos());
-		if (me->pos().y() > PIANO_BASE)
+		int key_num = getKeyFromMouse(pos);
+		if (pos.y() > PIANO_BASE)
 		{
-			int y_diff = me->pos().y() - PIANO_BASE;
+			int y_diff = pos.y() - PIANO_BASE;
 			int velocity = static_cast<int>(
 				static_cast<float>(y_diff) / getKeyHeight(key_num) *
 				m_piano->instrumentTrack()->midiPort()->baseVelocity());
@@ -520,8 +522,10 @@ void PianoView::mouseMoveEvent( QMouseEvent * _me )
 		return;
 	}
 
-	int key_num = getKeyFromMouse( _me->pos() );
-	int y_diff = _me->pos().y() - PIANO_BASE;
+	const auto pos = position(_me);
+
+	int key_num = getKeyFromMouse(pos);
+	int y_diff = pos.y() - PIANO_BASE;
 	int velocity = (int)( (float) y_diff /
 		( Piano::isWhiteKey( key_num ) ?
 			PW_WHITE_KEY_HEIGHT : PW_BLACK_KEY_HEIGHT ) *
@@ -552,7 +556,7 @@ void PianoView::mouseMoveEvent( QMouseEvent * _me )
 		}
 		if( _me->buttons() & Qt::LeftButton )
 		{
-			if( _me->pos().y() > PIANO_BASE )
+			if (pos.y() > PIANO_BASE)
 			{
 				m_piano->midiEventProcessor()->processInEvent( MidiEvent( MidiNoteOn, -1, key_num, velocity ) );
 				m_piano->setKeyState( key_num, true );

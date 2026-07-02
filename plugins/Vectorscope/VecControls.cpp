@@ -24,7 +24,6 @@
 
 #include "VecControls.h"
 
-#include <QDomElement>
 
 #include "VecControlsDialog.h"
 #include "Vectorscope.h"

@@ -25,16 +25,19 @@
 #include "SlicerTView.h"
 
 #include <QDropEvent>
-#include <qpixmap.h>
-#include <qpushbutton.h>
+#include <QPainter>
+#include <QPushButton>
 
 #include "Clipboard.h"
+#include "ComboBox.h"
 #include "DataFile.h"
-#include "InstrumentTrack.h"
+#include "FileDialog.h"
 #include "InstrumentView.h"
+#include "Knob.h"
+#include "LcdSpinBox.h"
 #include "PixmapButton.h"
-#include "SampleLoader.h"
 #include "SlicerT.h"
+#include "SlicerTWaveform.h"
 #include "StringPairDrag.h"
 #include "Track.h"
 #include "embed.h"
@@ -155,7 +158,7 @@ void SlicerTView::exportMidi()
 
 void SlicerTView::openFiles()
 {
-	const auto audioFile = SampleLoader::openAudioFile();
+	const auto audioFile = FileDialog::openAudioFile();
 	if (audioFile.isEmpty()) { return; }
 	m_slicerTParent->updateFile(audioFile);
 }

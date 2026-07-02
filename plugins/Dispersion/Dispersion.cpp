@@ -24,6 +24,8 @@
 
 #include "Dispersion.h"
 
+#include <numbers>
+
 #include "embed.h"
 #include "plugin_export.h"
 
@@ -41,7 +43,7 @@ Plugin::Descriptor PLUGIN_EXPORT dispersion_plugin_descriptor =
 	"Lost Robot <r94231/at/gmail/dot/com>",
 	0x0100,
 	Plugin::Type::Effect,
-	new PluginPixmapLoader("logo"),
+	new PixmapLoader("lmms-plugin-logo"),
 	nullptr,
 	nullptr
 };
@@ -58,7 +60,7 @@ DispersionEffect::DispersionEffect(Model* parent, const Descriptor::SubPluginFea
 }
 
 
-Effect::ProcessStatus DispersionEffect::processImpl(SampleFrame* buf, const fpp_t frames)
+Effect::ProcessStatus DispersionEffect::processImpl(SampleFrame* buf, const f_cnt_t frames)
 {
 	const float d = dryLevel();
 	const float w = wetLevel();
@@ -96,7 +98,7 @@ Effect::ProcessStatus DispersionEffect::processImpl(SampleFrame* buf, const fpp_
 		m_feedbackVal[0] = m_feedbackVal[1] = 0;
 	}
 
-	for (fpp_t f = 0; f < frames; ++f)
+	for (f_cnt_t f = 0; f < frames; ++f)
 	{
 		std::array<sample_t, 2> s = { buf[f][0] + m_feedbackVal[0], buf[f][1] + m_feedbackVal[1] };
 		

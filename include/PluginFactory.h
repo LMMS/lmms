@@ -30,14 +30,13 @@
 #include <vector>
 
 #include <QFileInfo>
-#include <QHash>
 #include <QList>
 #include <QString>
 
 #include "lmms_export.h"
 #include "Plugin.h"
 
-class QLibrary;
+class QLibrary;  // IWYU pragma: keep
 
 namespace lmms
 {

@@ -34,11 +34,6 @@ namespace lmms
 
 class AmplifierEffect;
 
-namespace gui
-{
-class AmplifierControlDialog;
-}
-
 class AmplifierControls : public EffectControls
 {
 	Q_OBJECT

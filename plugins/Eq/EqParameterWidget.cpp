@@ -23,18 +23,15 @@
  *
  */
 
+
 #include "EqParameterWidget.h"
 
-#include <cmath>
 #include <QGraphicsScene>
 #include <QGraphicsView>
-#include <QPainter>
-#include <QPen>
 #include <QWidget>
 
 #include "AutomatableModel.h"
 #include "EqCurve.h"
-#include "EqParameterWidget.h"
 
 
 namespace lmms::gui

@@ -26,18 +26,14 @@
 #define LMMS_GUI_KNOB_H
 
 #include <memory>
-#include <QTextDocument>
 
 #include "FloatModelEditorBase.h"
 
 
-class QPixmap;
 
 namespace lmms::gui
 {
 
-
-class SimpleTextFloat;
 
 enum class KnobType
 {
@@ -136,7 +132,8 @@ public:
 	
 	Knob( const Knob& other ) = delete;
 
-	void setHtmlLabel( const QString &htmltxt );
+	const QString& getLabel() const;
+	void setLabel(const QString& txt);
 
 	void setTotalAngle( float angle );
 
@@ -167,8 +164,6 @@ public:
 
 
 protected:
-	void setLabel(const QString& txt);
-	
 	void paintEvent(QPaintEvent*) override;
 
 	void changeEvent(QEvent * ev) override;
@@ -216,8 +211,6 @@ private:
 
 	QString m_label;
 	bool m_fixedFontSizeLabelRendering = false;
-	bool m_isHtmlLabel;
-	QTextDocument* m_tdRenderer;
 
 	std::unique_ptr<QPixmap> m_knobPixmap;
 
@@ -241,6 +234,44 @@ private:
 
 	KnobType m_knobNum;
 };
+
+
+/**
+ * Volume knob specialization
+ *
+ * Notes:
+ * - The units displayed in the tooltip and the @a enterValue() dialog box are hardcoded to dBFS,
+ *   but units shown in the context menu must be set via @a setUnit(). Usually this should be "%".
+ * - The model's value of 0 must mean -inf dBFS and the
+ *   value @a zeroDbfsPoint() (whose default is 100) must mean 0 dBFS.
+ * - Models with both positive and negative values are allowed. A negative value is assumed to have
+ *   the same effect as its corresponding positive value, but with inverted phase.
+ *   See Flanger's feedback knob for an example.
+ */
+class LMMS_EXPORT VolumeKnob : public Knob
+{
+	Q_OBJECT
+
+public:
+	using Knob::Knob;
+
+	//! The value where the volume model is at 0 dBFS (default is 100)
+	auto zeroDbfsPoint() const -> float { return m_zeroDbfsPoint; }
+	void setZeroDbfsPoint(float zeroDbfsPoint)
+	{
+		assert(zeroDbfsPoint > 0);
+		m_zeroDbfsPoint = zeroDbfsPoint;
+	}
+
+protected:
+	QString currentValueToText() override;
+	QString getDynamicFloatingText(const QString& currentValue) const;
+	void enterValue() override;
+
+private:
+	float m_zeroDbfsPoint = 100.f;
+};
+
 
 } // namespace lmms::gui
 

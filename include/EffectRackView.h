@@ -32,7 +32,6 @@
 #include "ModelView.h"
 
 class QScrollArea;
-class QVBoxLayout;
 
 namespace lmms::gui
 {

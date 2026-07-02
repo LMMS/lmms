@@ -39,7 +39,6 @@
 #include "MidiClient.h"
 
 
-struct pollfd;
 
 
 namespace lmms

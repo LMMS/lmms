@@ -77,7 +77,7 @@ Oscillator::Oscillator(const IntModel *wave_shape_model,
 
 
 
-void Oscillator::update(SampleFrame* ab, const fpp_t frames, const ch_cnt_t chnl, bool modulator)
+void Oscillator::update(SampleFrame* ab, const f_cnt_t frames, const ch_cnt_t chnl, bool modulator)
 {
 	if (m_freq >= Engine::audioEngine()->outputSampleRate() / 2)
 	{
@@ -156,7 +156,7 @@ void Oscillator::generateSquareWaveTable(int bands, sample_t* table, int firstBa
 {
 	using namespace std::numbers;
 	// square waves only contain odd harmonics,
-	// at diffrent levels when compared to triangle waves
+	// at different levels when compared to triangle waves
 	// https://en.wikipedia.org/wiki/Square_wave
 	for (int i = 0; i < OscillatorConstants::WAVETABLE_LENGTH; i++)
 	{
@@ -322,7 +322,7 @@ void Oscillator::generateWaveTables()
 
 
 
-void Oscillator::updateNoSub( SampleFrame* _ab, const fpp_t _frames,
+void Oscillator::updateNoSub( SampleFrame* _ab, const f_cnt_t _frames,
 							const ch_cnt_t _chnl )
 {
 	switch( static_cast<WaveShape>(m_waveShapeModel->value()) )
@@ -358,7 +358,7 @@ void Oscillator::updateNoSub( SampleFrame* _ab, const fpp_t _frames,
 
 
 
-void Oscillator::updatePM( SampleFrame* _ab, const fpp_t _frames,
+void Oscillator::updatePM( SampleFrame* _ab, const f_cnt_t _frames,
 							const ch_cnt_t _chnl )
 {
 	switch( static_cast<WaveShape>(m_waveShapeModel->value()) )
@@ -394,7 +394,7 @@ void Oscillator::updatePM( SampleFrame* _ab, const fpp_t _frames,
 
 
 
-void Oscillator::updateAM( SampleFrame* _ab, const fpp_t _frames,
+void Oscillator::updateAM( SampleFrame* _ab, const f_cnt_t _frames,
 							const ch_cnt_t _chnl )
 {
 	switch( static_cast<WaveShape>(m_waveShapeModel->value()) )
@@ -430,7 +430,7 @@ void Oscillator::updateAM( SampleFrame* _ab, const fpp_t _frames,
 
 
 
-void Oscillator::updateMix( SampleFrame* _ab, const fpp_t _frames,
+void Oscillator::updateMix( SampleFrame* _ab, const f_cnt_t _frames,
 							const ch_cnt_t _chnl )
 {
 	switch( static_cast<WaveShape>(m_waveShapeModel->value()) )
@@ -466,7 +466,7 @@ void Oscillator::updateMix( SampleFrame* _ab, const fpp_t _frames,
 
 
 
-void Oscillator::updateSync( SampleFrame* _ab, const fpp_t _frames,
+void Oscillator::updateSync( SampleFrame* _ab, const f_cnt_t _frames,
 							const ch_cnt_t _chnl )
 {
 	switch( static_cast<WaveShape>(m_waveShapeModel->value()) )
@@ -502,7 +502,7 @@ void Oscillator::updateSync( SampleFrame* _ab, const fpp_t _frames,
 
 
 
-void Oscillator::updateFM( SampleFrame* _ab, const fpp_t _frames,
+void Oscillator::updateFM( SampleFrame* _ab, const f_cnt_t _frames,
 							const ch_cnt_t _chnl )
 {
 	switch( static_cast<WaveShape>(m_waveShapeModel->value()) )
@@ -564,7 +564,7 @@ inline bool Oscillator::syncOk( float _osc_coeff )
 
 
 
-float Oscillator::syncInit( SampleFrame* _ab, const fpp_t _frames,
+float Oscillator::syncInit( SampleFrame* _ab, const f_cnt_t _frames,
 						const ch_cnt_t _chnl )
 {
 	if( m_subOsc != nullptr )
@@ -580,13 +580,13 @@ float Oscillator::syncInit( SampleFrame* _ab, const fpp_t _frames,
 
 // if we have no sub-osc, we can't do any modulation... just get our samples
 template<Oscillator::WaveShape W>
-void Oscillator::updateNoSub( SampleFrame* _ab, const fpp_t _frames,
+void Oscillator::updateNoSub( SampleFrame* _ab, const f_cnt_t _frames,
 							const ch_cnt_t _chnl )
 {
 	recalcPhase();
 	const float osc_coeff = m_freq * m_detuning_div_samplerate;
 
-	for( fpp_t frame = 0; frame < _frames; ++frame )
+	for( f_cnt_t frame = 0; frame < _frames; ++frame )
 	{
 		_ab[frame][_chnl] = getSample<W>( m_phase ) * m_volume;
 		m_phase += osc_coeff;
@@ -598,14 +598,14 @@ void Oscillator::updateNoSub( SampleFrame* _ab, const fpp_t _frames,
 
 // do pm by using sub-osc as modulator
 template<Oscillator::WaveShape W>
-void Oscillator::updatePM( SampleFrame* _ab, const fpp_t _frames,
+void Oscillator::updatePM( SampleFrame* _ab, const f_cnt_t _frames,
 							const ch_cnt_t _chnl )
 {
 	m_subOsc->update( _ab, _frames, _chnl, true );
 	recalcPhase();
 	const float osc_coeff = m_freq * m_detuning_div_samplerate;
 
-	for( fpp_t frame = 0; frame < _frames; ++frame )
+	for( f_cnt_t frame = 0; frame < _frames; ++frame )
 	{
 		_ab[frame][_chnl] = getSample<W>( m_phase +
 					_ab[frame][_chnl] )
@@ -619,14 +619,14 @@ void Oscillator::updatePM( SampleFrame* _ab, const fpp_t _frames,
 
 // do am by using sub-osc as modulator
 template<Oscillator::WaveShape W>
-void Oscillator::updateAM( SampleFrame* _ab, const fpp_t _frames,
+void Oscillator::updateAM( SampleFrame* _ab, const f_cnt_t _frames,
 							const ch_cnt_t _chnl )
 {
 	m_subOsc->update( _ab, _frames, _chnl, false );
 	recalcPhase();
 	const float osc_coeff = m_freq * m_detuning_div_samplerate;
 
-	for( fpp_t frame = 0; frame < _frames; ++frame )
+	for( f_cnt_t frame = 0; frame < _frames; ++frame )
 	{
 		_ab[frame][_chnl] *= getSample<W>( m_phase ) * m_volume;
 		m_phase += osc_coeff;
@@ -638,14 +638,14 @@ void Oscillator::updateAM( SampleFrame* _ab, const fpp_t _frames,
 
 // do mix by using sub-osc as mix-sample
 template<Oscillator::WaveShape W>
-void Oscillator::updateMix( SampleFrame* _ab, const fpp_t _frames,
+void Oscillator::updateMix( SampleFrame* _ab, const f_cnt_t _frames,
 							const ch_cnt_t _chnl )
 {
 	m_subOsc->update( _ab, _frames, _chnl, false );
 	recalcPhase();
 	const float osc_coeff = m_freq * m_detuning_div_samplerate;
 
-	for( fpp_t frame = 0; frame < _frames; ++frame )
+	for( f_cnt_t frame = 0; frame < _frames; ++frame )
 	{
 		_ab[frame][_chnl] += getSample<W>( m_phase ) * m_volume;
 		m_phase += osc_coeff;
@@ -658,14 +658,14 @@ void Oscillator::updateMix( SampleFrame* _ab, const fpp_t _frames,
 // sync with sub-osc (every time sub-osc starts new period, we also start new
 // period)
 template<Oscillator::WaveShape W>
-void Oscillator::updateSync( SampleFrame* _ab, const fpp_t _frames,
+void Oscillator::updateSync( SampleFrame* _ab, const f_cnt_t _frames,
 							const ch_cnt_t _chnl )
 {
 	const float sub_osc_coeff = m_subOsc->syncInit( _ab, _frames, _chnl );
 	recalcPhase();
 	const float osc_coeff = m_freq * m_detuning_div_samplerate;
 
-	for( fpp_t frame = 0; frame < _frames ; ++frame )
+	for( f_cnt_t frame = 0; frame < _frames ; ++frame )
 	{
 		if( m_subOsc->syncOk( sub_osc_coeff ) )
 		{
@@ -681,7 +681,7 @@ void Oscillator::updateSync( SampleFrame* _ab, const fpp_t _frames,
 
 // do fm by using sub-osc as modulator
 template<Oscillator::WaveShape W>
-void Oscillator::updateFM( SampleFrame* _ab, const fpp_t _frames,
+void Oscillator::updateFM( SampleFrame* _ab, const f_cnt_t _frames,
 							const ch_cnt_t _chnl )
 {
 	m_subOsc->update( _ab, _frames, _chnl, true );
@@ -689,7 +689,7 @@ void Oscillator::updateFM( SampleFrame* _ab, const fpp_t _frames,
 	const float osc_coeff = m_freq * m_detuning_div_samplerate;
 	const float sampleRateCorrection = 44100.0f / Engine::audioEngine()->outputSampleRate();
 
-	for( fpp_t frame = 0; frame < _frames; ++frame )
+	for( f_cnt_t frame = 0; frame < _frames; ++frame )
 	{
 		m_phase += _ab[frame][_chnl] * sampleRateCorrection;
 		_ab[frame][_chnl] = getSample<W>( m_phase ) * m_volume;

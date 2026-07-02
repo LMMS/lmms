@@ -29,7 +29,6 @@
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "Sample.h"
-#include "SampleBuffer.h"
 #include "AutomatableModel.h"
 
 namespace lmms

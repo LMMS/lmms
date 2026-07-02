@@ -24,7 +24,6 @@
 
 #include "EqControls.h"
 
-#include <QDomElement>
 
 #include "EqControlsDialog.h"
 #include "EqEffect.h"

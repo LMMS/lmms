@@ -39,7 +39,7 @@ public:
 	AutomationTrack( TrackContainer* tc, bool _hidden = false );
 	~AutomationTrack() override = default;
 
-	bool play( const TimePos & _start, const fpp_t _frames,
+	bool play( const TimePos & _start, const f_cnt_t _frames,
 						const f_cnt_t _frame_base, int _clip_num = -1 ) override;
 
 	QString nodeName() const override

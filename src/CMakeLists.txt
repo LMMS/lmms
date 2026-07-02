@@ -10,7 +10,7 @@ foreach (_define_var ${_define_vars})
     endif()
 endforeach()
 
-# Format for readibility
+# Format for readability
 string(REPLACE ";" " " LMMS_BUILD_OPTIONS "${LMMS_BUILD_OPTIONS}")
 
 CONFIGURE_FILE("lmmsversion.h.in"       "${CMAKE_BINARY_DIR}/lmmsversion.h")
@@ -34,6 +34,12 @@ ADD_SUBDIRECTORY(gui)
 ADD_SUBDIRECTORY(tracks)
 
 LIST(APPEND LMMS_SRCS ${LMMS_COMMON_SRCS})
+
+IF(WANT_QT6)
+	QT6_WRAP_UI(LMMS_UI_OUT ${LMMS_UIS})
+ELSE()
+	QT5_WRAP_UI(LMMS_UI_OUT ${LMMS_UIS})
+ENDIF()
 
 INCLUDE_DIRECTORIES(
 	"${CMAKE_CURRENT_BINARY_DIR}"
@@ -114,6 +120,11 @@ TARGET_INCLUDE_DIRECTORIES(lmms
 )
 target_static_libraries(lmms PUBLIC lmmsobjs)
 
+# Enable updated C++ language standards
+IF(MSVC)
+	TARGET_COMPILE_OPTIONS(lmmsobjs PUBLIC "/Zc:__cplusplus" "/permissive-")
+ENDIF()
+
 # CMake doesn't define target_EXPORTS for OBJECT libraries.
 # See the documentation of DEFINE_SYMBOL for details.
 # Also add LMMS_STATIC_DEFINE for targets linking against it.
@@ -151,7 +162,7 @@ if(LMMS_HAVE_LIBRT)
 endif()
 
 if(LMMS_HAVE_PORTAUDIO)
-	list(APPEND EXTRA_LIBRARIES portaudio)
+	list(APPEND EXTRA_LIBRARIES portaudio::portaudio)
 endif()
 
 if(LMMS_HAVE_MP3LAME)
@@ -160,6 +171,10 @@ endif()
 
 if(LMMS_HAVE_OGGVORBIS)
 	list(APPEND EXTRA_LIBRARIES Vorbis::vorbisenc Vorbis::vorbisfile)
+endif()
+
+if(LMMS_HAVE_LV2)
+	list(APPEND EXTRA_LIBRARIES Lilv::lilv)
 endif()
 
 SET(LMMS_REQUIRED_LIBS ${LMMS_REQUIRED_LIBS}
@@ -172,9 +187,7 @@ SET(LMMS_REQUIRED_LIBS ${LMMS_REQUIRED_LIBS}
 	${SNDIO_LIBRARIES}
 	${PULSEAUDIO_LIBRARIES}
 	${JACK_LIBRARIES}
-	${LV2_LIBRARIES}
 	${SUIL_LIBRARIES}
-	${LILV_LIBRARIES}
 	${FFTW3F_LIBRARIES}
 	SampleRate::samplerate
 	SndFile::sndfile

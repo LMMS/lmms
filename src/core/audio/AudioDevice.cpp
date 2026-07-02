@@ -26,72 +26,36 @@
 
 #include "AudioDevice.h"
 #include "AudioEngine.h"
-#include "ConfigManager.h"
 
 namespace lmms
 {
 
-AudioDevice::AudioDevice( const ch_cnt_t _channels, AudioEngine*  _audioEngine ) :
-	m_supportsCapture( false ),
-	m_sampleRate( _audioEngine->outputSampleRate() ),
-	m_channels( _channels ),
-	m_audioEngine( _audioEngine ),
-	m_buffer(new SampleFrame[audioEngine()->framesPerPeriod()])
+AudioDevice::AudioDevice(const ch_cnt_t _channels, AudioEngine* _audioEngine)
+	: m_supportsCapture(false)
+	, m_sampleRate(_audioEngine->outputSampleRate())
+	, m_channels(_channels)
+	, m_audioEngine(_audioEngine)
 {
 }
-
 
 
 
 AudioDevice::~AudioDevice()
 {
-	delete[] m_buffer;
-	m_devMutex.tryLock();
-	unlock();
+	assert(!isRunning() && "device should have been stopped before being destroyed");
 }
 
-
-
-
-void AudioDevice::processNextBuffer()
+void AudioDevice::startProcessing()
 {
-	const fpp_t frames = getNextBuffer( m_buffer );
-	if (frames) { writeBuffer(m_buffer, frames); }
-	else
-	{
-		m_inProcess = false;
-	}
+	m_running.test_and_set(std::memory_order_acquire);
+	startProcessingImpl();
 }
-
-fpp_t AudioDevice::getNextBuffer(SampleFrame* _ab)
-{
-	fpp_t frames = audioEngine()->framesPerPeriod();
-	const SampleFrame* b = audioEngine()->nextBuffer();
-
-	if (!b) { return 0; }
-
-	memcpy(_ab, b, frames * sizeof(SampleFrame));
-
-	if (audioEngine()->hasFifoWriter()) { delete[] b; }
-	return frames;
-}
-
-
-
 
 void AudioDevice::stopProcessing()
 {
-	if( audioEngine()->hasFifoWriter() )
-	{
-		while( m_inProcess )
-		{
-			processNextBuffer();
-		}
-	}
+	m_running.clear(std::memory_order_release);
+	stopProcessingImpl();
 }
-
-
-
 
 void AudioDevice::stopProcessingThread( QThread * thread )
 {
@@ -127,13 +91,13 @@ void AudioDevice::renamePort(AudioBusHandle*)
 }
 
 int AudioDevice::convertToS16(const SampleFrame* _ab,
-								const fpp_t _frames,
+								const f_cnt_t _frames,
 								int_sample_t * _output_buffer,
 								const bool _convert_endian )
 {
 	if( _convert_endian )
 	{
-		for( fpp_t frame = 0; frame < _frames; ++frame )
+		for( f_cnt_t frame = 0; frame < _frames; ++frame )
 		{
 			for( ch_cnt_t chnl = 0; chnl < channels(); ++chnl )
 			{
@@ -147,7 +111,7 @@ int AudioDevice::convertToS16(const SampleFrame* _ab,
 	}
 	else
 	{
-		for( fpp_t frame = 0; frame < _frames; ++frame )
+		for( f_cnt_t frame = 0; frame < _frames; ++frame )
 		{
 			for( ch_cnt_t chnl = 0; chnl < channels(); ++chnl )
 			{
@@ -163,7 +127,7 @@ int AudioDevice::convertToS16(const SampleFrame* _ab,
 
 
 
-void AudioDevice::clearS16Buffer( int_sample_t * _outbuf, const fpp_t _frames )
+void AudioDevice::clearS16Buffer( int_sample_t * _outbuf, const f_cnt_t _frames )
 {
 
 	assert( _outbuf != nullptr );

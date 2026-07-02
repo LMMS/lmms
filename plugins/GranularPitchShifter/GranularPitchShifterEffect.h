@@ -30,7 +30,6 @@
 #include "Effect.h"
 #include "GranularPitchShifterControls.h"
 
-#include "BasicFilters.h"
 #include "interpolation.h"
 
 namespace lmms
@@ -51,7 +50,7 @@ public:
 	GranularPitchShifterEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
 	~GranularPitchShifterEffect() override = default;
 
-	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
+	ProcessStatus processImpl(SampleFrame* buf, const f_cnt_t frames) override;
 
 	EffectControls* controls() override
 	{

@@ -27,14 +27,18 @@
 #define LMMS_SAMPLE_THUMBNAIL_H
 
 #include <QDateTime>
-#include <QPainter>
 #include <QRect>
 #include <memory>
 
-#include "Sample.h"
 #include "lmms_export.h"
+#include "SampleBuffer.h"
+#include "SampleFrame.h"
+
+class QPainter;
 
 namespace lmms {
+
+class Sample;
 
 /**
    Allows for visualizing sample data.

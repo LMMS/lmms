@@ -27,24 +27,21 @@
 
 #include <QWidget>
 
-#include "AutomatableButton.h"
+#include "InstrumentTrack.h"
 #include "ModelView.h"
 #include "SerializingObject.h"
-#include "PluginView.h"
 
 class QLabel;
 class QLineEdit;
-class QWidget;
 class QMdiSubWindow;
 
 namespace lmms
 {
 
-class InstrumentTrack;
-
 namespace gui
 {
 
+class AutomatableButton;
 class EffectRackView;
 class MixerChannelLcdSpinBox;
 class InstrumentFunctionArpeggioView;
@@ -52,7 +49,6 @@ class InstrumentFunctionNoteStackingView;
 class InstrumentMidiIOView;
 class InstrumentTuningView;
 class InstrumentSoundShapingView;
-class InstrumentTrackShapingView;
 class InstrumentTrackView;
 class Knob;
 class LcdSpinBox;

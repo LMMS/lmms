@@ -26,7 +26,6 @@
 #ifndef _MIDI_EXPORT_H
 #define _MIDI_EXPORT_H
 
-#include <QString>
 
 #include "ExportFilter.h"
 #include "MidiFile.hpp"

@@ -38,7 +38,7 @@ class EnvelopeAndLfoParameters;
 namespace gui
 {
 
-class automatableButtonGroup;
+class AutomatableButtonGroup;
 class Knob;
 class LedCheckBox;
 class PixmapButton;
@@ -87,7 +87,7 @@ private:
 	TempoSyncKnob * m_lfoSpeedKnob;
 	Knob * m_lfoAmountKnob;
 	PixmapButton * m_userLfoBtn;
-	automatableButtonGroup * m_lfoWaveBtnGrp;
+	AutomatableButtonGroup * m_lfoWaveBtnGrp;
 
 	LedCheckBox * m_x100Cb;
 	LedCheckBox * m_controlEnvAmountCb;

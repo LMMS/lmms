@@ -23,7 +23,6 @@
  */
 
 
-#include <QDomElement>
 
 #include "StereoMatrixControls.h"
 #include "StereoMatrix.h"

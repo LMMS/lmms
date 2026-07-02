@@ -29,7 +29,7 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QPainter>
-#include <QPainterPath>
+#include <QPainterPath>  // IWYU pragma: keep
 #include <QStyleFactory>
 #include <QStyleOption>
 

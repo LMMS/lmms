@@ -25,7 +25,7 @@
 #include "ArrayVector.h"
 
 #include <QObject>
-#include <QtTest/QtTest>
+#include <QtTest>
 #include <array>
 #include <iterator>
 

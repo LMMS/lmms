@@ -29,6 +29,7 @@
 
 #include "VstSubPluginFeatures.h"
 #include "ConfigManager.h"
+#include "Effect.h"
 
 namespace lmms
 {

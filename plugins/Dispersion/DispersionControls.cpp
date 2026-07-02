@@ -26,7 +26,6 @@
 #include "DispersionControls.h"
 #include "Dispersion.h"
 
-#include <QDomElement>
 
 namespace lmms
 {

@@ -28,7 +28,6 @@
 #define _VST_SUBPLUGIN_FEATURES_H
 
 
-#include "Effect.h"
 #include "Plugin.h"
 
 namespace lmms

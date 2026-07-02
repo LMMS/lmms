@@ -39,7 +39,6 @@
 
 #include "MidiClient.h"
 
-class QLineEdit;
 
 namespace lmms
 {

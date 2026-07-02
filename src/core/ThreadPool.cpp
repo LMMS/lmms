@@ -24,8 +24,6 @@
 #include "ThreadPool.h"
 
 #include <cassert>
-#include <cstddef>
-#include <memory>
 
 namespace lmms {
 ThreadPool::ThreadPool(size_t numWorkers)
