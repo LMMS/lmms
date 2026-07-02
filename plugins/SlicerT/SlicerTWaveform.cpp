@@ -87,12 +87,12 @@ SlicerTWaveform::SlicerTWaveform(int totalWidth, int totalHeight, SlicerT* instr
 	m_editorWaveform.fill(s_waveformEditorBgColor);
 
 	connect(instrument, &SlicerT::isPlaying, this, &SlicerTWaveform::isPlaying);
-	connect(instrument, &SlicerT::dataChanged, this, &SlicerTWaveform::updateUI);
+	connect(instrument, &SlicerT::dataChanged, this, &SlicerTWaveform::sampleChanged);
 
 	m_emptySampleIcon = m_emptySampleIcon.createMaskFromColor(QColor(255, 255, 255), Qt::MaskMode::MaskOutColor);
 
 	m_updateTimer.start();
-	updateUI();
+	sampleChanged();
 }
 
 void SlicerTWaveform::resizeEvent(QResizeEvent* event)
@@ -118,8 +118,6 @@ void SlicerTWaveform::drawSeekerWaveform()
 	brush.setPen(s_waveformColor);
 
 	const auto& sample = m_slicerTParent->m_originalSample;
-
-	m_sampleThumbnail = SampleThumbnail{sample};
 
 	const auto param = SampleThumbnail::VisualizeParameters{
 		.sampleRect = m_seekerWaveform.rect(),
@@ -186,8 +184,6 @@ void SlicerTWaveform::drawEditorWaveform()
 	long zoomOffset = (m_editorHeight - m_zoomLevel * m_editorHeight) / 2;
 
 	const auto& sample = m_slicerTParent->m_originalSample;
-
-	m_sampleThumbnail = SampleThumbnail{sample};
 
 	const auto param = SampleThumbnail::VisualizeParameters{
 		.sampleRect = QRect(0, zoomOffset, m_editorWidth, static_cast<long>(m_zoomLevel * m_editorHeight)),
@@ -293,6 +289,13 @@ void SlicerTWaveform::updateUI()
 	drawSeeker();
 	drawEditor();
 	update();
+}
+
+// rebuilds the thumbnail, only needed when the sample itself changes
+void SlicerTWaveform::sampleChanged()
+{
+	m_sampleThumbnail = SampleThumbnail{m_slicerTParent->m_originalSample};
+	updateUI();
 }
 
 // updates the closest object and changes the cursor respectivly
@@ -459,20 +462,23 @@ void SlicerTWaveform::mouseDoubleClickEvent(QMouseEvent* me)
 	const auto pos = position(me);
 
 	if (me->button() != Qt::MouseButton::LeftButton || pos.y() < m_seekerHeight) { return; }
+	if (m_slicerTParent->m_originalSample.sampleSize() <= 1) { return; }
 
 	float normalizedClickEditor = static_cast<float>(pos.x()) / m_editorWidth;
 	float startFrame = m_seekerStart;
 	float endFrame = m_seekerEnd;
-	float slicePosition = startFrame + normalizedClickEditor * (endFrame - startFrame);
+	float slicePosition = std::clamp(startFrame + normalizedClickEditor * (endFrame - startFrame), 0.0f, 1.0f);
 
 	m_slicerTParent->m_slicePoints.insert(m_slicerTParent->m_slicePoints.begin(), slicePosition);
 	std::sort(m_slicerTParent->m_slicePoints.begin(), m_slicerTParent->m_slicePoints.end());
+
+	updateClosest(me);
 }
 
 void SlicerTWaveform::wheelEvent(QWheelEvent* we)
 {
 	m_zoomLevel += we->angleDelta().y() / 360.0f * s_zoomSensitivity;
-	m_zoomLevel = std::max(0.0f, m_zoomLevel);
+	m_zoomLevel = std::clamp(m_zoomLevel, s_minZoom, s_maxZoom);
 
 	updateUI();
 }

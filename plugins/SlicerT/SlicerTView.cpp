@@ -95,7 +95,7 @@ SlicerTView::SlicerTView(SlicerT* instrument, QWidget* parent)
 	m_midiExportButton = new QPushButton(this);
 	m_midiExportButton->setIcon(PLUGIN_NAME::getIconPixmap("copy_midi"));
 	m_midiExportButton->setToolTip(tr("Copy midi pattern to clipboard"));
-	connect(m_midiExportButton, &PixmapButton::clicked, this, &SlicerTView::exportMidi);
+	connect(m_midiExportButton, &QPushButton::clicked, this, &SlicerTView::exportMidi);
 
 	m_folderButton = new PixmapButton(this);
 	m_folderButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("folder_icon"));
@@ -106,7 +106,7 @@ SlicerTView::SlicerTView(SlicerT* instrument, QWidget* parent)
 	m_resetButton = new QPushButton(this);
 	m_resetButton->setIcon(PLUGIN_NAME::getIconPixmap("reset_slices"));
 	m_resetButton->setToolTip(tr("Reset slices"));
-	connect(m_resetButton, &PixmapButton::clicked, m_slicerTParent, &SlicerT::updateSlices);
+	connect(m_resetButton, &QPushButton::clicked, m_slicerTParent, &SlicerT::updateSlices);
 
 	update();
 }
@@ -274,7 +274,7 @@ void SlicerTView::paintEvent(QPaintEvent* pe)
 	brush.setPen(QColor(255, 255, 255, 180));
 	brush.setFont(QFont(brush.font().family(), 8, -1, false));
 	QString sampleName = m_slicerTParent->getSampleName();
-	if (sampleName == "") { sampleName = "No sample loaded"; }
+	if (sampleName.isEmpty()) { sampleName = tr("No sample loaded"); }
 
 	brush.drawText(5, boxTopY - s_sampleBoxHeight, width(), s_sampleBoxHeight, Qt::AlignLeft, sampleName);
 }
