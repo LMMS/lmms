@@ -60,7 +60,7 @@ public:
 	} ;
 
 	TempoSyncKnobModel(const float val, const float min, const float max, const float step,
-					const float scale, Model* parent, const QString& displayName = QString());
+		const float scale, Model* parent, const QString& displayName = QString());
 	~TempoSyncKnobModel() override = default;
 
 	void saveSettings(QDomDocument& doc, QDomElement& self, const QString& name) override;

@@ -36,17 +36,16 @@ namespace lmms
 {
 
 
-TempoSyncKnobModel::TempoSyncKnobModel(const float val, const float min, const float max, const float step,
-										const float scale, Model* parent, const QString& displayName)
+TempoSyncKnobModel::TempoSyncKnobModel(const float val, const float min, const float max,
+	const float step, const float scale, Model* parent, const QString& displayName)
 	: FloatModel{val, min, max, step, parent, displayName}
 	, m_tempoSyncMode{SyncMode::None}
 	, m_tempoLastSyncMode{SyncMode::None}
 	, m_scale{scale}
 	, m_custom{parent}
 {
-	connect(Engine::getSong(), SIGNAL(tempoChanged(lmms::bpm_t)),
-			this, SLOT(calculateTempoSyncTime(lmms::bpm_t)),
-			Qt::DirectConnection);
+	connect(Engine::getSong(), SIGNAL(tempoChanged(lmms::bpm_t)), this,
+		SLOT(calculateTempoSyncTime(lmms::bpm_t)), Qt::DirectConnection);
 }
 
 
@@ -79,7 +78,7 @@ void TempoSyncKnobModel::calculateTempoSyncTime(bpm_t bpm)
 		{
 			case SyncMode::Custom:
 				conversionFactor = static_cast<float>(m_custom.getDenominator())
-								/ static_cast<float>(m_custom.getNumerator());
+					/ static_cast<float>(m_custom.getNumerator());
 				break;
 			case SyncMode::DoubleWholeNote:
 				conversionFactor = 0.125;
@@ -126,7 +125,7 @@ void TempoSyncKnobModel::calculateTempoSyncTime(bpm_t bpm)
 
 void TempoSyncKnobModel::saveSettings(QDomDocument& doc, QDomElement& self, const QString& name)
 {
-	self.setAttribute(name + "_syncmode", (int) syncMode());
+	self.setAttribute(name + "_syncmode", static_cast<int>(syncMode()));
 	m_custom.saveSettings(doc, self, name);
 	FloatModel::saveSettings(doc, self, name);
 }
@@ -151,9 +150,7 @@ void TempoSyncKnobModel::setSyncMode(SyncMode newMode)
 		m_tempoSyncMode = newMode;
 		if (newMode == SyncMode::Custom)
 		{
-			connect(&m_custom, SIGNAL(dataChanged()),
-					this, SLOT(updateCustom()),
-					Qt::DirectConnection);
+			connect(&m_custom, SIGNAL(dataChanged()), this, SLOT(updateCustom()), Qt::DirectConnection);
 		}
 	}
 	calculateTempoSyncTime(Engine::getSong()->getTempo());
