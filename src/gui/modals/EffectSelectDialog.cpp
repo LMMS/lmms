@@ -286,9 +286,10 @@ void EffectSelectDialog::rowChanged(const QModelIndex& idx, const QModelIndex&)
 				"<p>%5%6</p>"
 			}.arg(
 				tr("<b>Name: </b>"), descriptor.displayName,
-				tr("<b>Description: </b>"), qApp->translate("PluginBrowser", descriptor.description).toHtmlEscaped(),
 				tr("<b>Author: </b>"), QString::fromUtf8(descriptor.author)
-					.replace("/dot/", ".").replace("/at/", "@").toHtmlEscaped()
+					.replace("/dot/", ".").replace("/at/", "@").toHtmlEscaped(),
+				tr("<b>Description: </b>"), qApp->translate("PluginBrowser", descriptor.description)
+					.toHtmlEscaped()
 			);
 		
 			auto label = new QLabel(labelText, m_descriptionWidget);
