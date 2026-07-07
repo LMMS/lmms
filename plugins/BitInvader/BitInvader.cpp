@@ -199,26 +199,26 @@ void BitInvader::playNote(NotePlayHandle* nph, SampleFrame* workingBuffer)
 	const auto phasePerSample = nph->frequency() / Engine::audioEngine()->outputSampleRate();
 	const f_cnt_t frames = nph->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = nph->noteOffset();
-
 	auto& note = *static_cast<BitInvaderIndex*>(nph->m_pluginData);
-	for (f_cnt_t frame = offset; frame < frames + offset; ++frame)
+
+	// Lerp between wavetable samples if interpolation enabled
+	for (f_cnt_t frame = offset; m_interpolation.value() && frame < frames + offset; ++frame)
 	{
-		note = std::fmod(
-			note + phasePerSample * wavetableLenReal,
-			wavetableLenReal
-		);
-		const auto idx = static_cast<std::size_t>(note);
-
-		const auto samp = m_interpolation.value()
-			? std::lerp(
-				wavetable[idx],
-				wavetable[(1 + idx) % m_graph.length()],
-				fraction(note)
-			)
-			: wavetable[idx];
-
+		note = std::fmod(note + phasePerSample * wavetableLenReal, wavetableLenReal);
+		const auto idx0 = static_cast<std::size_t>(note);
+		const auto idx1 = (1 + idx0) % m_graph.length();
+		const auto samp = std::lerp(wavetable[idx0], wavetable[idx1], fraction(note));
 		workingBuffer[frame] = SampleFrame(samp * m_normalizeFactor + m_normalizeOffset);
 	}
+
+	// Otherwise, sample nearest neighbor
+	for (f_cnt_t frame = offset; !m_interpolation.value() && frame < frames + offset; ++frame)
+	{
+		note = std::fmod(note + phasePerSample * wavetableLenReal, wavetableLenReal);
+		const auto samp = wavetable[static_cast<std::size_t>(note)];
+		workingBuffer[frame] = SampleFrame(samp * m_normalizeFactor + m_normalizeOffset);
+	}
+
 	applyRelease(workingBuffer, nph);
 }
 
