@@ -51,10 +51,7 @@ TempoSyncKnobModel::TempoSyncKnobModel(const float val, const float min, const f
 
 
 
-void TempoSyncKnobModel::setTempoSync(QAction* item)
-{
-	setTempoSync(static_cast<SyncMode>(item->data().toInt()));
-}
+void TempoSyncKnobModel::setTempoSync(QAction* item) { setTempoSync(static_cast<SyncMode>(item->data().toInt())); }
 
 
 
@@ -114,10 +111,7 @@ void TempoSyncKnobModel::calculateTempoSyncTime(bpm_t bpm)
 		emit syncModeChanged(m_tempoSyncMode);
 		m_tempoLastSyncMode = m_tempoSyncMode;
 	}
-	else if (m_tempoSyncMode == SyncMode::Custom)
-	{
-		emit syncModeChanged(m_tempoSyncMode);
-	}
+	else if (m_tempoSyncMode == SyncMode::Custom) { emit syncModeChanged(m_tempoSyncMode); }
 }
 
 
@@ -169,10 +163,7 @@ void TempoSyncKnobModel::setScale(float newScale)
 
 
 
-void TempoSyncKnobModel::updateCustom()
-{
-	setSyncMode(SyncMode::Custom);
-}
+void TempoSyncKnobModel::updateCustom() { setSyncMode(SyncMode::Custom); }
 
 
 } // namespace lmms

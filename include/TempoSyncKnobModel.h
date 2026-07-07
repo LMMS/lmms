@@ -33,12 +33,7 @@ class QAction;
 namespace lmms
 {
 
-namespace gui
-{
-
-class TempoSyncKnob;
-
-} // namespace gui
+namespace gui { class TempoSyncKnob; }
 
 
 class LMMS_EXPORT TempoSyncKnobModel : public FloatModel
@@ -66,17 +61,11 @@ public:
 	void saveSettings(QDomDocument& doc, QDomElement& self, const QString& name) override;
 	void loadSettings(const QDomElement& self, const QString& name) override;
 
-	SyncMode syncMode() const
-	{
-		return m_tempoSyncMode;
-	}
+	SyncMode syncMode() const { return m_tempoSyncMode; }
 
 	void setSyncMode(SyncMode newMode);
 
-	float scale() const
-	{
-		return m_scale;
-	}
+	float scale() const { return m_scale; }
 
 	void setScale(float newScale);
 
@@ -89,10 +78,7 @@ signals:
 
 
 public slots:
-	inline void disableSync()
-	{
-		setTempoSync(SyncMode::None);
-	}
+	inline void disableSync() { setTempoSync(SyncMode::None); }
 	void setTempoSync(SyncMode noteType);
 	void setTempoSync(QAction* item);
 
