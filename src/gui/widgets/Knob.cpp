@@ -24,12 +24,13 @@
 
 #include "Knob.h"
 
+#include <QInputDialog>
 #include <QPainter>
-#include <numbers>
 
 #include "DeprecationHelper.h"
 #include "embed.h"
 #include "FontHelper.h"
+#include "lmms_math.h"
 
 #include <algorithm>
 
@@ -530,6 +531,76 @@ void Knob::changeEvent(QEvent * ev)
 	}
 }
 
+QString VolumeKnob::currentValueToText()
+{
+	const auto* m = model();
+
+	// Using std::abs to support volume models that allow negative values.
+	// value == 0 is always assumed to be -inf.
+	const auto roundedValue = m->getRoundedValue();
+	const auto valueToVolumeRatio = std::abs(roundedValue) / m_zeroDbfsPoint;
+
+	// NOTE: The " dBFS" units are hardcoded here instead of being set by setUnit(),
+	//       allowing the model's context menu entries to display the correct units (usually "%").
+	//       This workaround should be revisited after the parameter text refactor (#8379).
+	if (valueToVolumeRatio == 0.) { return QStringLiteral("-∞ dBFS"); }
+
+	if (roundedValue > 0)
+	{
+		return QStringLiteral("%1 dBFS").arg(ampToDbfs(valueToVolumeRatio), 3, 'f', 2);
+	}
+	else
+	{
+		return QStringLiteral("%1 dBFS (inverted)").arg(ampToDbfs(valueToVolumeRatio), 3, 'f', 2);
+	}
+}
+
+QString VolumeKnob::getDynamicFloatingText(const QString& currentValue) const
+{
+	// Don't include the unit - the " dBFS" unit is included in currentValue
+	return m_description + ' ' + currentValue;
+}
+
+void VolumeKnob::enterValue()
+{
+	assert(m_zeroDbfsPoint > 0);
+
+	// Calculate the current value in dBFS
+	const auto roundedValue = model()->getRoundedValue();
+	const auto initalValue = std::abs(roundedValue) / m_zeroDbfsPoint;
+	const auto initialDbValue = initalValue > 0. ? ampToDbfs(initalValue) : -96;
+
+	// Calculate the upper bound in dBFS
+	const auto magnitude = roundedValue >= 0 ? model()->maxValue() : std::abs(model()->minValue());
+	const auto upperBound = ampToDbfs(magnitude / m_zeroDbfsPoint);
+
+	constexpr auto lowerBound = -96.0;
+
+	bool ok = false;
+	float newVal = QInputDialog::getDouble(
+		this,
+		tr("Set value"),
+		tr("Please enter a new value between %1 dBFS and %2 dBFS:")
+			.arg(lowerBound).arg(upperBound),
+		initialDbValue,
+		lowerBound,
+		upperBound,
+		model()->getDigitCount(),
+		&ok
+	);
+
+	if (!ok) { return; }
+
+	// Convert from dBFS back to amplitude
+	newVal = newVal <= lowerBound
+		? 0.0f
+		: dbfsToAmp(newVal) * m_zeroDbfsPoint;
+
+	// Support both positive and negative amplitudes
+	newVal = std::copysign(newVal, roundedValue);
+
+	model()->setValue(newVal);
+}
 
 void convertPixmapToGrayScale(QPixmap& pixMap)
 {

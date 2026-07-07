@@ -72,7 +72,6 @@ private:
 	AutomatableButton* m_muteBtn;
 	AutomatableButton* m_soloBtn;
 
-
 	friend class TrackView;
 
 signals:
