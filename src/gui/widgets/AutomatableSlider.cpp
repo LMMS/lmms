@@ -117,9 +117,7 @@ void AutomatableSlider::mouseDoubleClickEvent(QMouseEvent*) { enterValue(); }
 void AutomatableSlider::enterValue()
 {
 	bool ok;
-	int newVal;
-
-	newVal = QInputDialog::getInt(
+	const int newVal = QInputDialog::getInt(
 		this, tr("Set value"),
 		tr("Please enter a new value between %1 and %2:")
 			.arg(model()->minValue())
