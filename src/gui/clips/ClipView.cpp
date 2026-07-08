@@ -86,7 +86,7 @@ ClipView::ClipView(Clip* clip,
 	m_initialClipEnd( TimePos(0) ),
 	m_clip( clip ),
 	m_offset(offset),
-	m_haveChild(false),
+	m_haveChild(true),
 	m_action( Action::None ),
 	m_initialMousePos( QPoint( 0, 0 ) ),
 	m_initialMouseGlobalPos( QPoint( 0, 0 ) ),
@@ -137,6 +137,8 @@ ClipView::ClipView(Clip* clip,
 
 	m_trackView->getTrackContentWidget()->addClipView( this );
 	updateLength();
+	// No view have actually been created, we set the flag back to false
+	m_haveChild = false;
 	updatePosition();
 }
 
