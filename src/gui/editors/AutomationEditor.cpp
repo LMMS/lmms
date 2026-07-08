@@ -1840,8 +1840,15 @@ void AutomationEditor::updateYDelta()
 	}
 	else
 	{
-		int gridBottom = height() - SCROLLBAR_SIZE - 1;
-		m_y_delta = static_cast<float>(gridBottom - TOP_MARGIN) / (m_maxLevel - m_minLevel);
+		if (m_maxLevel - m_minLevel == 0)
+		{
+			m_y_delta = 0.0f;
+		}
+		else
+		{
+			int gridBottom = height() - SCROLLBAR_SIZE - 1;
+			m_y_delta = static_cast<float>(gridBottom - TOP_MARGIN) / (m_maxLevel - m_minLevel);
+		}
 	}
 }
 
