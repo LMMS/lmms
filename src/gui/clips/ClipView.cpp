@@ -1109,14 +1109,15 @@ void ClipView::contextMenuEvent( QContextMenuEvent * cme )
 		[this](){ contextMenuAction( ContextMenuAction::Copy ); } );
 
 	auto pasteAction = contextMenu.addAction(
- 		embed::getIconPixmap( "edit_paste" ),
- 		tr( "Paste" ),
- 		[this](){ contextMenuAction( ContextMenuAction::Paste ); } );
+		embed::getIconPixmap("edit_paste"),
+		tr("Paste"),
+		[this](){ contextMenuAction(ContextMenuAction::Paste); }
+	);
 
-  pasteAction->setEnabled(
-			Clipboard::hasFormat( Clipboard::MimeType::StringPair )
-			&& getTrackView()->getTrackContentWidget()->canPasteSelection(
-					m_clip->startPosition(), Clipboard::getMimeData() ) );
+	pasteAction->setEnabled(
+		Clipboard::hasFormat(Clipboard::MimeType::StringPair) && getTrackView()->getTrackContentWidget()
+			->canPasteSelection(m_clip->startPosition(), Clipboard::getMimeData())
+	);
 
 	contextMenu.addSeparator();
 
