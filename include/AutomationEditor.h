@@ -162,6 +162,8 @@ protected slots:
 	void zoomingXChanged();
 	void zoomingYChanged();
 
+	void updateYDelta();
+
 	/// Updates the clip's quantization using the current user selected value.
 	void setQuantization();
 
@@ -252,7 +254,7 @@ private:
 	tick_t m_drawLastTick;
 
 	int m_ppb;
-	int m_y_delta;
+	float m_y_delta;
 	bool m_y_auto;
 
 	// Time position (key) of automation node whose outValue is being dragged

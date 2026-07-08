@@ -1981,8 +1981,6 @@ PREDEFINED             = "LMMS_BUILD_LINUX=" \
                          "LMMS_HAVE_SOUNDCARD_H=" \
                          "LMMS_HAVE_FCNTL_H=" \
                          "LMMS_HAVE_SYS_IOCTL_H=" \
-                         "LMMS_HAVE_CTYPE_H=" \
-                         "LMMS_HAVE_STRING_H=" \
                          "LMMS_HAVE_PROCESS_H=" \
                          "LMMS_HAVE_LOCALE_H=" \
 
