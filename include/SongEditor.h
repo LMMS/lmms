@@ -65,7 +65,7 @@ public:
 	};
 
 	SongEditor( Song * song );
-	~SongEditor() override = default;
+	~SongEditor() override;
 
 	void saveSettings( QDomDocument& doc, QDomElement& element ) override;
 	void loadSettings( const QDomElement& element ) override;
@@ -94,7 +94,6 @@ public slots:
 	void selectAllClips( bool select );
 
 protected:
-	void closeEvent( QCloseEvent * ce ) override;
 	void mousePressEvent(QMouseEvent * me) override;
 	void mouseMoveEvent(QMouseEvent * me) override;
 	void mouseReleaseEvent(QMouseEvent * me) override;

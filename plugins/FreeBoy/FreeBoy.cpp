@@ -232,7 +232,7 @@ void FreeBoyInstrument::playNote(NotePlayHandle* nph, SampleFrame* workingBuffer
 {
 	const f_cnt_t tfp = nph->totalFramesPlayed();
 	const int samplerate = Engine::audioEngine()->outputSampleRate();
-	const fpp_t frames = nph->framesLeftForCurrentPeriod();
+	const f_cnt_t frames = nph->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = nph->noteOffset();
 
 	int data = 0;

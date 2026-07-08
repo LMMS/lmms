@@ -374,9 +374,8 @@ void MidiClipView::clearNotesOutOfBounds()
 	m_clip->getTrack()->addJournalCheckPoint();
 	m_clip->getTrack()->saveJournallingState(false);
 
-	auto newClip = new MidiClip(static_cast<InstrumentTrack*>(m_clip->getTrack()));
-	newClip->setAutoResize(m_clip->getAutoResize());
-	newClip->movePosition(m_clip->startPosition());
+	auto newClip = m_clip->clone();
+	newClip->clearNotes();
 
 	TimePos startBound = -m_clip->startTimeOffset();
 	TimePos endBound = m_clip->length() - m_clip->startTimeOffset();
@@ -394,6 +393,7 @@ void MidiClipView::clearNotesOutOfBounds()
 			newClip->addNote(newNote, false);
 		}
 	}
+	newClip->setStartTimeOffset(0);
 	newClip->changeLength(m_clip->length());
 	newClip->updateLength();
 

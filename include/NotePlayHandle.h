@@ -51,7 +51,7 @@ public:
 	std::unique_ptr<BasicFilters<>> m_filter;
 
 	// length of the declicking fade in
-	fpp_t m_fadeInLength;
+	f_cnt_t m_fadeInLength;
 
 	// specifies origin of NotePlayHandle
 	enum class Origin
@@ -122,7 +122,7 @@ public:
 	f_cnt_t framesLeft() const;
 
 	/*! Returns how many frames have to be rendered in current period */
-	fpp_t framesLeftForCurrentPeriod() const;
+	f_cnt_t framesLeftForCurrentPeriod() const;
 
 	/*! Returns whether the play handle plays on a certain track */
 	bool isFromTrack( const Track* _track ) const override;

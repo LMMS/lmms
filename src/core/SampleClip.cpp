@@ -27,6 +27,7 @@
 #include <QDomElement>
 #include <QFileInfo>
 
+#include "PatternStore.h"
 #include "PathUtil.h"
 #include "SampleClipView.h"
 #include "SampleTrack.h"
@@ -35,11 +36,12 @@
 namespace lmms
 {
 
-SampleClip::SampleClip(Track* _track, Sample sample, bool isPlaying)
-	: Clip(_track)
-	, m_sample(std::move(sample))
-	, m_isPlaying(false)
-	, m_currentLoop(0)
+SampleClip::SampleClip(Track* _track, Sample sample, bool isPlaying):
+	Clip(_track),
+	m_sample(std::move(sample)),
+	m_isPlaying(false),
+	m_currentLoop(0),
+	m_startFrameOffset(0)
 {
 	saveJournallingState( false );
 	setSampleFile( "" );
@@ -47,8 +49,7 @@ SampleClip::SampleClip(Track* _track, Sample sample, bool isPlaying)
 
 	// we need to receive bpm-change-events, because then we have to
 	// change length of this Clip
-	connect( Engine::getSong(), SIGNAL(tempoChanged(lmms::bpm_t)),
-					this, SLOT(updateLength()), Qt::DirectConnection );
+	connect(Engine::getSong(), &Song::tempoChanged, this, &SampleClip::tempoChanged, Qt::DirectConnection);
 	connect( Engine::getSong(), SIGNAL(timeSignatureChanged(int,int)),
 					this, SLOT(updateLength()));
 
@@ -78,7 +79,8 @@ SampleClip::SampleClip(const SampleClip& orig) :
 	Clip(orig),
 	m_sample(std::move(orig.m_sample)),
 	m_isPlaying(orig.m_isPlaying),
-	m_currentLoop(0)
+	m_currentLoop(0),
+	m_startFrameOffset(orig.m_startFrameOffset)
 {
 	saveJournallingState( false );
 	setSampleFile( "" );
@@ -86,8 +88,7 @@ SampleClip::SampleClip(const SampleClip& orig) :
 
 	// we need to receive bpm-change-events, because then we have to
 	// change length of this Clip
-	connect( Engine::getSong(), SIGNAL(tempoChanged(lmms::bpm_t)),
-					this, SLOT(updateLength()), Qt::DirectConnection );
+	connect(Engine::getSong(), &Song::tempoChanged, this, &SampleClip::tempoChanged, Qt::DirectConnection);
 	connect( Engine::getSong(), SIGNAL(timeSignatureChanged(int,int)),
 					this, SLOT(updateLength()));
 
@@ -244,16 +245,31 @@ void SampleClip::updateLength()
 	// If the clip has already been manually resized, don't automatically resize it.
 	if (getAutoResize())
 	{
+		if (getTrack()->trackContainer() == Engine::patternStore())
+		{
+			changeLength(TimePos::ticksPerBar() * Engine::patternStore()->lengthOfPattern(getTrack()->getClipNum(this)));
+			return;
+		}
 		changeLength(sampleLength());
 		setStartTimeOffset(0);
 	}
 
 	emit sampleChanged();
-
-	Engine::getSong()->setModified();
 }
 
 
+void SampleClip::tempoChanged()
+{
+	Clip::setStartTimeOffset(std::round(1.0f * m_startFrameOffset / Engine::framesPerTick()));
+	updateLength();
+	emit sampleChanged();
+}
+
+void SampleClip::setStartTimeOffset(const TimePos& startTimeOffset)
+{
+	m_startFrameOffset = startTimeOffset * Engine::framesPerTick();
+	Clip::setStartTimeOffset(startTimeOffset);
+}
 
 
 TimePos SampleClip::sampleLength() const
