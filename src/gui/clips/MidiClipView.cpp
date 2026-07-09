@@ -630,25 +630,19 @@ void MidiClipView::paintEvent( QPaintEvent * )
 	// Beat clip paint event (on BB Editor)
 	if (beatClip && displayPattern)
 	{
-		QPixmap stepon0;
-		QPixmap stepon200;
-		QPixmap stepoff;
-		QPixmap stepoffl;
-		QPixmap stephighlight;
 		const int steps = std::max(1, m_clip->m_steps);
 		const int w = width() - 2 * BORDER_WIDTH;
 
 		// scale step graphics to fit the beat clip length
-		stepon0
-			= m_stepBtnOn0.scaled(w / steps, m_stepBtnOn0.height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-		stepon200 = m_stepBtnOn200.scaled(
-			w / steps, m_stepBtnOn200.height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-		stepoff
-			= m_stepBtnOff.scaled(w / steps, m_stepBtnOff.height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-		stepoffl = m_stepBtnOffLight.scaled(
-			w / steps, m_stepBtnOffLight.height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-		stephighlight = m_stepBtnHighlight.scaled(
-			w / steps, m_stepBtnHighlight.height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+		const auto scalePx = [w, steps](const QPixmap& px) -> QPixmap
+		{
+			return px.scaled(w / steps, px.height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+		};
+		QPixmap stepon0 = scalePx(m_stepBtnOn0);
+		QPixmap stepon200 = scalePx(m_stepBtnOn200);
+		QPixmap stepoff = scalePx(m_stepBtnOff);
+		QPixmap stepoffl = scalePx(m_stepBtnOffLight);
+		QPixmap stephighlight = scalePx(m_stepBtnHighlight);
 
 		for (int it = 0; it < steps; it++)	// go through all the steps in the beat clip
 		{
