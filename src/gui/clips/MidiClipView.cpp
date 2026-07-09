@@ -566,27 +566,29 @@ void MidiClipView::paintEvent( QPaintEvent * )
 		m_paintPixmap = QPixmap(size());
 	}
 
+	// Compute pixels per bar
+	const int baseWidth = fixedClips()
+		? parentWidget()->width() - 2 * BORDER_WIDTH
+		: width() - BORDER_WIDTH;
+	const float pixelsPerBar = 1.0f * baseWidth / m_clip->length() * TimePos::ticksPerBar();
+	const bool drawLegacyBB = (pixelsPerBar >= 96 && m_legacySEPattern);
+
 	QPainter p( &m_paintPixmap );
 
-	QColor c;
 	bool const muted = m_clip->getTrack()->isMuted() || m_clip->isMuted();
 	bool current = getGUI()->pianoRoll()->currentMidiClip() == m_clip;
 	bool beatClip = m_clip->m_clipType == MidiClip::Type::BeatClip;
+	bool displayPattern = fixedClips() || drawLegacyBB;
 
-	if( beatClip )
-	{
-		// Do not paint PatternClips how we paint MidiClips
-		c = patternClipBackground();
-	}
-	else
-	{
-		c = getColorForDisplay( painter.background().color() );
-	}
+	// Do not paint PatternClips how we paint MidiClips
+	const QColor bgColor = (beatClip && displayPattern)
+		? patternClipBackground()
+		: getColorForDisplay(painter.background().color());
 
 	// invert the gradient for the background in the B&B editor
 	QLinearGradient lingrad( 0, 0, 0, height() );
-	lingrad.setColorAt( beatClip ? 0 : 1, c.darker( 300 ) );
-	lingrad.setColorAt( beatClip ? 1 : 0, c );
+	lingrad.setColorAt(beatClip ? 0 : 1, bgColor.darker(300));
+	lingrad.setColorAt(beatClip ? 1 : 0, bgColor);
 
 	// paint a black rectangle under the clip to prevent glitches with transparent backgrounds
 	p.fillRect( rect(), QColor( 0, 0, 0 ) );
@@ -597,7 +599,7 @@ void MidiClipView::paintEvent( QPaintEvent * )
 	}
 	else
 	{
-		p.fillRect( rect(), c );
+		p.fillRect(rect(), bgColor);
 	}
 
 	// Check whether we will paint a text box and compute its potential height
@@ -616,11 +618,6 @@ void MidiClipView::paintEvent( QPaintEvent * )
 		textBoxHeight = fontMetrics.height() + 2 * textTop;
 	}
 
-	// Compute pixels per bar
-	const int baseWidth = fixedClips() ? parentWidget()->width() - 2 * BORDER_WIDTH
-						: width() - BORDER_WIDTH;
-	const float pixelsPerBar = 1.0f * baseWidth / m_clip->length() * TimePos::ticksPerBar();
-
 	const int offset = m_clip->startTimeOffset();
 
 	// Length of one bar/beat in the [0,1] x [0,1] coordinate system
@@ -628,7 +625,6 @@ void MidiClipView::paintEvent( QPaintEvent * )
 
 	const int x_base = BORDER_WIDTH;
 
-	bool displayPattern = fixedClips() || (pixelsPerBar >= 96 && m_legacySEPattern);
 	NoteVector const & noteCollection = m_clip->m_notes;
 
 	// Beat clip paint event (on BB Editor)
@@ -765,10 +761,12 @@ void MidiClipView::paintEvent( QPaintEvent * )
 		p.scale(width(), height() - distanceToTop - 2 * notesBorder);
 
 		// set colour based on mute status
-		QColor noteFillColor = muted ? getMutedNoteFillColor().lighter(200)
-									 : (c.lightness() > 175 ? getNoteFillColor().darker(400) : getNoteFillColor());
-		QColor noteBorderColor = muted ? getMutedNoteBorderColor()
-									   : (hasCustomColor() ? c.lighter(200) : getNoteBorderColor());
+		QColor noteFillColor = muted
+			? getMutedNoteFillColor().lighter(200)
+			: (bgColor.lightness() > 175 ? getNoteFillColor().darker(400) : getNoteFillColor());
+		QColor noteBorderColor = muted
+			? getMutedNoteBorderColor()
+			: (hasCustomColor() ? bgColor.lighter(200) : getNoteBorderColor());
 
 		bool const drawAsLines = height() < 64;
 		if (drawAsLines)
@@ -819,7 +817,7 @@ void MidiClipView::paintEvent( QPaintEvent * )
 
 	// bar lines
 	const int lineSize = 3;
-	p.setPen( c.darker( 200 ) );
+	p.setPen(bgColor.darker(200));
 
 	for(float t = (offset % TimePos::ticksPerBar()) * pixelsPerBar / TimePos::ticksPerBar(); t < m_clip->length(); t += pixelsPerBar)
 	{
@@ -842,12 +840,12 @@ void MidiClipView::paintEvent( QPaintEvent * )
 	if( !( fixedClips() && beatClip ) )
 	{
 		// inner border
-		p.setPen( c.lighter( current ? 160 : 130 ) );
+		p.setPen(bgColor.lighter(current ? 160 : 130));
 		p.drawRect( 1, 1, rect().right() - BORDER_WIDTH,
 			rect().bottom() - BORDER_WIDTH );
 
 		// outer border
-		p.setPen( current ? c.lighter( 130 ) : c.darker( 300 ) );
+		p.setPen(current ? bgColor.lighter(130) : bgColor.darker(300));
 		p.drawRect( 0, 0, rect().right(), rect().bottom() );
 	}
 
