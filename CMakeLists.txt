@@ -110,6 +110,55 @@ option(WANT_CPACK_TARBALL "Request CPack to create a tarball instead of an insta
 option(WANT_QT6 "Build with experimental Qt6 support" OFF)
 
 
+# Microarchitecture level
+if(TARGET_ARCH)
+	if(TARGET_ARCH_LEVEL AND NOT TARGET_ARCH_LEVEL STREQUAL "custom")
+		message(WARNING "Ignoring TARGET_ARCH_LEVEL since TARGET_ARCH was set")
+	endif()
+
+	set(_default_target_arch_level "custom")
+	message(STATUS "Setting target microarchitecture level to 'custom'")
+	message(STATUS "Target microarchitecture: ${TARGET_ARCH}")
+elseif(TARGET_ARCH_LEVEL)
+	message(STATUS "Setting target microarchitecture level to '${TARGET_ARCH_LEVEL}'")
+else()
+	set(_default_target_arch_level "none")
+	message(STATUS "Setting target microarchitecture level to 'none' as none was specified")
+endif()
+
+if(NOT TARGET_ARCH_LEVEL)
+	set(TARGET_ARCH_LEVEL ${_default_target_arch_level} CACHE STRING "Choose the target microarchitecture level" FORCE)
+	# Accepted options:
+	# - "none":     No microarchitecture level is set. Uses the compiler default.
+	# - "official": Targets the baseline microarchitecture level of official LMMS releases (currently x86_64-v2).
+	# - "custom":   Targets the microarchitecture specified by TARGET_ARCH.
+	# - "native":   Targets the highest microarchitecture level supported by the build machine.
+	set_property(CACHE TARGET_ARCH_LEVEL PROPERTY STRINGS "none" "official" "custom" "native")
+endif()
+
+if(TARGET_ARCH_LEVEL STREQUAL "custom" OR TARGET_ARCH)
+	add_compile_options(${TARGET_ARCH})
+elseif(TARGET_ARCH_LEVEL STREQUAL "none")
+	# Do nothing, use the compiler default
+elseif(TARGET_ARCH_LEVEL STREQUAL "official")
+	# x86_64-v2
+	if(LMMS_HOST_X86_64)
+		if(MSVC)
+			add_compile_options(/ARCH:SSE4.2)
+		else()
+			add_compile_options(-march=x86-64-v2)
+		endif()
+	endif()
+	# TODO: Add ARM64
+elseif(TARGET_ARCH_LEVEL STREQUAL "native")
+	if(MSVC)
+		# TODO
+		message(FATAL_ERROR "MSVC builds do not support native architecture yet")
+	else()
+		add_compile_options(-march=native)
+	endif()
+endif()
+
 IF(LMMS_BUILD_APPLE)
 	# Fix linking on 10.14+. See issue #4762 on github
 	LINK_DIRECTORIES("${APPLE_PREFIX}/lib")
