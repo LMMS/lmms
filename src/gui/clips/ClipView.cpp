@@ -1402,26 +1402,35 @@ TimePos ClipView::quantizeSplitPos(TimePos midiPos)
 	else { return globalPos; }
 }
 
-QColor ClipView::getColorForDisplay(QColor defaultColor)
+QColor ClipView::getBlendedSelectedColor(QColor baseColor)
 {
-	// get the pure Clip color
-	auto clipColor = m_clip->color().value_or(m_clip->getTrack()->color().value_or(defaultColor));
+	const auto blendColor = selectedBlendColor();
 
+	// weights for both colors
+	const float wo = 0.4f;
+	const float wr = 1.0f - wo;
+
+	auto ret = baseColor;
+	ret.setRedF(blendColor.redF() * wo + baseColor.redF() * wr);
+	ret.setGreenF(blendColor.greenF() * wo + baseColor.greenF() * wr);
+	ret.setBlueF(blendColor.blueF() * wo + baseColor.blueF() * wr);
+	return ret;
+}
+
+QColor ClipView::getColor(QColor baseColor)
+{
 	bool muted = m_clip->getTrack()->isMuted() || m_clip->isMuted();
 
-	auto ret = clipColor;
+	auto ret = baseColor;
 	if (muted || empty()) { ret.setHsv(ret.hsvHue(), ret.hsvSaturation() / 3.5, ret.value() / 3); }
-	if (isSelected())
-	{
-		// blend a "selected" overlay color over the current color
-		const auto ovc = selectedBlendColor();
-		const float wo = 0.4f;
-		const float wr = 1.0f - wo;
-		ret.setBlueF(ovc.blueF() * wo + ret.blueF() * wr);
-		ret.setRedF(ovc.redF() * wo + ret.redF() * wr);
-		ret.setGreenF(ovc.greenF() * wo + ret.greenF() * wr);
-	}
+	if (isSelected()) { ret = getBlendedSelectedColor(ret); }
 	return ret;
+}
+
+QColor ClipView::getColorForDisplay(QColor defaultColor)
+{
+	auto clipColor = m_clip->color().value_or(m_clip->getTrack()->color().value_or(defaultColor));
+	return getColor(clipColor);
 }
 
 auto ClipView::hasCustomColor() const -> bool

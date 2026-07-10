@@ -124,7 +124,17 @@ public:
 
 	void toggleSelectedAutoResize();
 
-	//! Calculate the background color for this clip
+	//! Blend the selected "color mask" into a specific color.
+	QColor getBlendedSelectedColor(QColor baseColor);
+
+	//! @brief Calculate the "final" version of a specific color.
+	//!
+	//! Is affected by whether the clip is muted, empty and/or selected.
+	QColor getColor(QColor baseColor);
+
+	//! @brief Calculate the "final" primary color for this clip.
+	//!
+	//! Is affected by the clip's custom color, and whether it is muted, empty and/or selected.
 	QColor getColorForDisplay(QColor defaultColor);
 
 	void inline setMarkerPos(int x) { m_markerPos = x; }

@@ -232,43 +232,22 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 
 	QPainter p( &m_paintPixmap );
 
-	bool muted = m_clip->getTrack()->isMuted() || m_clip->isMuted();
-	bool selected = isSelected();
-
 	QLinearGradient lingrad(0, 0, 0, height());
-	QColor c = painter.background().color();
-	if (muted) { c = c.darker(150); }
-	if (selected) { c = c.darker(150); }
+	QColor bgColor = painter.background().color();
 
-	lingrad.setColorAt( 1, c.darker( 300 ) );
-	lingrad.setColorAt( 0, c );
+	lingrad.setColorAt(1, bgColor.darker(300));
+	lingrad.setColorAt(0, bgColor);
 
 	// paint a black rectangle under the clip to prevent glitches with transparent backgrounds
 	p.fillRect( rect(), QColor( 0, 0, 0 ) );
 
-	if( gradient() )
-	{
-		p.fillRect( rect(), lingrad );
-	}
-	else
-	{
-		p.fillRect( rect(), c );
-	}
+	if (gradient()) { p.fillRect(rect(), lingrad); }
+	else { p.fillRect(rect(), bgColor); }
 
 	auto clipColor = m_clip->color().value_or(m_clip->getTrack()->color().value_or(painter.pen().brush().color()));
 
-	p.setPen(clipColor);
-
-	if (muted)
-	{
-		QColor penColor = p.pen().brush().color();
-		penColor.setHsv(penColor.hsvHue(), penColor.hsvSaturation() / 4, penColor.value());
-		p.setPen(penColor.darker(250));
-	}
-	if (selected)
-	{
-		p.setPen(p.pen().brush().color().darker(150));
-	}
+	// color for the sample graph
+	p.setPen(getColorForDisplay(clipColor));
 
 	const int spacing = BORDER_WIDTH + 1;
 	const float ppb = fixedClips() ?
@@ -305,7 +284,7 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	p.setRenderHint( QPainter::Antialiasing, false );
 
 	// inner border
-	p.setPen( c.lighter( 135 ) );
+	p.setPen(bgColor.lighter(135));
 	p.drawRect(
 		-m_paintPixmapXPosition + 1,
 		1,
@@ -313,7 +292,7 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 		rect().bottom() - BORDER_WIDTH );
 
 	// outer border
-	p.setPen( c.darker( 200 ) );
+	p.setPen(bgColor.darker(200));
 	p.drawRect(-m_paintPixmapXPosition, 0, rect().right(), rect().bottom());
 
 	// draw the 'muted' pixmap only if the clip was manually muted
