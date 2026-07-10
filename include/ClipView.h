@@ -129,8 +129,8 @@ public:
 
 	//! @brief Calculate the "final" version of a specific color.
 	//!
-	//! Is affected by whether the clip is muted, empty and/or selected.
-	QColor getColor(QColor baseColor);
+	//! Is affected by whether the clip is muted, empty and/or selected, but only when their specific flags are not true.
+	QColor getColor(QColor baseColor, bool ignoreMuted = false, bool ignoreEmpty = false, bool ignoreSelected = false);
 
 	//! @brief Calculate the "final" primary color for this clip.
 	//!

@@ -1417,13 +1417,17 @@ QColor ClipView::getBlendedSelectedColor(QColor baseColor)
 	return ret;
 }
 
-QColor ClipView::getColor(QColor baseColor)
+QColor ClipView::getColor(QColor baseColor, bool ignoreMuted, bool ignoreEmpty, bool ignoreSelected)
 {
-	bool muted = m_clip->getTrack()->isMuted() || m_clip->isMuted();
-
 	auto ret = baseColor;
-	if (muted || empty()) { ret.setHsv(ret.hsvHue(), ret.hsvSaturation() / 3.5, ret.value() / 3); }
-	if (isSelected()) { ret = getBlendedSelectedColor(ret); }
+	const bool muted = m_clip->getTrack()->isMuted() || m_clip->isMuted();
+
+	if ((!ignoreMuted && muted) || (!ignoreEmpty && empty()))
+	{
+		ret.setHsv(ret.hsvHue(), ret.hsvSaturation() / 3.5, ret.value() / 3);
+	}
+	if (!ignoreSelected && isSelected()) { ret = getBlendedSelectedColor(ret); }
+
 	return ret;
 }
 

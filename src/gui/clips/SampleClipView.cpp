@@ -233,7 +233,9 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	QPainter p( &m_paintPixmap );
 
 	QLinearGradient lingrad(0, 0, 0, height());
-	QColor bgColor = painter.background().color();
+
+	// background color should only be affected by selection
+	QColor bgColor = getColor(painter.background().color(), true, true, false);
 
 	lingrad.setColorAt(1, bgColor.darker(300));
 	lingrad.setColorAt(0, bgColor);
