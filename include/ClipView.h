@@ -150,11 +150,6 @@ public slots:
 	void resetColor();
 
 protected:
-	//! @brief Whether the clip is empty
-	//
-	// Classes that inherit this one should override if they want to signal a clip is empty.
-	virtual bool empty() const;
-
 	enum class ContextMenuAction
 	{
 		Remove,

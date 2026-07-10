@@ -1422,7 +1422,7 @@ QColor ClipView::getColor(QColor baseColor, bool ignoreMuted, bool ignoreEmpty, 
 	auto ret = baseColor;
 	const bool muted = m_clip->getTrack()->isMuted() || m_clip->isMuted();
 
-	if ((!ignoreMuted && muted) || (!ignoreEmpty && empty()))
+	if ((!ignoreMuted && muted) || (!ignoreEmpty && m_clip->isEmpty()))
 	{
 		ret.setHsv(ret.hsvHue(), ret.hsvSaturation() / 3.5, ret.value() / 3);
 	}
@@ -1467,7 +1467,5 @@ bool ClipView::splitClip(const TimePos pos)
 	m_clip->getTrack()->restoreJournallingState();
 	return true;
 }
-
-bool ClipView::empty() const { return false; }
 
 } // namespace lmms::gui

@@ -112,8 +112,10 @@ public:
 		return m_instrumentTrack;
 	}
 
-	bool empty();
+	// TODO: does this need to be distinct from isEmpty()?
+	bool empty() const;
 
+	bool isEmpty() const override { return empty(); }
 
 	gui::ClipView * createView( gui::TrackView * _tv ) override;
 

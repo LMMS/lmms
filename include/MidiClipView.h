@@ -85,7 +85,6 @@ protected slots:
 
 
 protected:
-	bool empty() const override;
 	void constructContextMenu( QMenu * ) override;
 	void mousePressEvent( QMouseEvent * _me ) override;
 	void mouseDoubleClickEvent( QMouseEvent * _me ) override;

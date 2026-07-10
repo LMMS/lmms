@@ -648,7 +648,7 @@ void MidiClip::updatePatternTrack()
 
 
 
-bool MidiClip::empty()
+bool MidiClip::empty() const
 {
 	for (const auto& note : m_notes)
 	{
