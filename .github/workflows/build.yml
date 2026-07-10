@@ -12,7 +12,7 @@ jobs:
       CMAKE_OPTS: >-
         -DUSE_WERROR=ON
         -DCMAKE_BUILD_TYPE=RelWithDebInfo
-        -DTARGET_ARCH_LEVEL=official
+        -DTARGET_UARCH=official
         -DUSE_COMPILE_CACHE=ON
         -DWANT_DEBUG_CPACK=ON
       CCACHE_MAXSIZE: 0
@@ -102,7 +102,7 @@ jobs:
       CMAKE_OPTS: >-
         -DUSE_WERROR=ON
         -DCMAKE_BUILD_TYPE=RelWithDebInfo
-        -DTARGET_ARCH_LEVEL=official
+        -DTARGET_UARCH=official
         -DUSE_COMPILE_CACHE=ON
         -DWANT_DEBUG_CPACK=ON
       CCACHE_MAXSIZE: 0
@@ -195,7 +195,7 @@ jobs:
         -Werror=dev
         -DUSE_WERROR=ON
         -DCMAKE_BUILD_TYPE=RelWithDebInfo
-        -DTARGET_ARCH_LEVEL=official
+        -DTARGET_UARCH=official
         -DUSE_COMPILE_CACHE=ON
       CCACHE_MAXSIZE: 0
       CCACHE_NOCOMPRESS: 1
@@ -285,7 +285,7 @@ jobs:
         -Werror=dev
         -DUSE_WERROR=ON
         -DCMAKE_BUILD_TYPE=RelWithDebInfo
-        -DTARGET_ARCH_LEVEL=official
+        -DTARGET_UARCH=official
         -DUSE_COMPILE_CACHE=ON
       CCACHE_MAXSIZE: 0
       CCACHE_NOCOMPRESS: 1
@@ -405,7 +405,7 @@ jobs:
             --toolchain C:/vcpkg/scripts/buildsystems/vcpkg.cmake `
             -Werror=dev `
             -DCMAKE_BUILD_TYPE=RelWithDebInfo `
-            -DTARGET_ARCH_LEVEL=official `
+            -DTARGET_UARCH=official `
             -DWANT_QT6=ON `
             -DUSE_COMPILE_CACHE=ON `
             -DUSE_WERROR=ON `

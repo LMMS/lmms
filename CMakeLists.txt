@@ -115,37 +115,37 @@ option(WANT_CPACK_TARBALL "Request CPack to create a tarball instead of an insta
 option(WANT_QT6 "Build with experimental Qt6 support" OFF)
 
 
-# Microarchitecture level
-if(TARGET_ARCH)
-	if(TARGET_ARCH_LEVEL AND NOT TARGET_ARCH_LEVEL STREQUAL "custom")
-		message(WARNING "Ignoring TARGET_ARCH_LEVEL since TARGET_ARCH was set")
+# Set the target microarchitecture
+if(TARGET_UARCH_FLAGS)
+	if(TARGET_UARCH AND NOT TARGET_UARCH STREQUAL "custom")
+		message(WARNING "Ignoring TARGET_UARCH since TARGET_UARCH_FLAGS was set")
 	endif()
 
-	set(_default_target_arch_level "custom")
-	message(STATUS "Setting target microarchitecture level to 'custom'")
-	message(STATUS "Target microarchitecture: ${TARGET_ARCH}")
-elseif(TARGET_ARCH_LEVEL)
-	message(STATUS "Setting target microarchitecture level to '${TARGET_ARCH_LEVEL}'")
+	set(_default_target_uarch "custom")
+	message(STATUS "Setting target microarchitecture to 'custom'")
+	message(STATUS "Target microarchitecture flags: ${TARGET_UARCH_FLAGS}")
+elseif(TARGET_UARCH)
+	message(STATUS "Setting target microarchitecture to '${TARGET_UARCH}'")
 else()
-	set(_default_target_arch_level "native")
-	message(STATUS "Setting target microarchitecture level to 'native' as none was specified")
+	set(_default_target_uarch "native")
+	message(STATUS "Setting target microarchitecture to 'native' as none was specified")
 endif()
 
-if(NOT TARGET_ARCH_LEVEL)
-	set(TARGET_ARCH_LEVEL ${_default_target_arch_level} CACHE STRING "Choose the target microarchitecture level" FORCE)
+if(NOT TARGET_UARCH)
+	set(TARGET_UARCH ${_default_target_uarch} CACHE STRING "Choose the target microarchitecture" FORCE)
 	# Accepted options:
-	# - "none":     No microarchitecture level is set. Uses the compiler default.
-	# - "official": Targets the baseline microarchitecture level of official LMMS releases (currently x86_64-v2).
-	# - "custom":   Targets the microarchitecture specified by TARGET_ARCH.
+	# - "none":     No microarchitecture is set. Uses the compiler default.
+	# - "official": Targets the baseline microarchitecture of official LMMS releases (currently x86_64-v2).
+	# - "custom":   Targets the microarchitecture specified by TARGET_UARCH_FLAGS.
 	# - "native":   Targets the highest microarchitecture level supported by the build machine.
-	set_property(CACHE TARGET_ARCH_LEVEL PROPERTY STRINGS "none" "official" "custom" "native")
+	set_property(CACHE TARGET_UARCH PROPERTY STRINGS "none" "official" "custom" "native")
 endif()
 
-if(TARGET_ARCH_LEVEL STREQUAL "custom" OR TARGET_ARCH)
-	add_compile_options(${TARGET_ARCH})
-elseif(TARGET_ARCH_LEVEL STREQUAL "none")
+if(TARGET_UARCH STREQUAL "custom" OR TARGET_UARCH_FLAGS)
+	add_compile_options(${TARGET_UARCH_FLAGS})
+elseif(TARGET_UARCH STREQUAL "none")
 	# Do nothing, use the compiler default
-elseif(TARGET_ARCH_LEVEL STREQUAL "official")
+elseif(TARGET_UARCH STREQUAL "official")
 	# x86_64-v2
 	if(LMMS_HOST_X86_64)
 		if(MSVC)
@@ -155,7 +155,7 @@ elseif(TARGET_ARCH_LEVEL STREQUAL "official")
 		endif()
 	endif()
 	# TODO: Add ARM64
-elseif(TARGET_ARCH_LEVEL STREQUAL "native")
+elseif(TARGET_UARCH STREQUAL "native")
 	if(MSVC)
 		# TODO
 		message(WARNING "MSVC builds do not support native architecture yet")
