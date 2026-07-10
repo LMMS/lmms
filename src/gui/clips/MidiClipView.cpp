@@ -202,13 +202,13 @@ void MidiClipView::constructContextMenu( QMenu * _cm )
 					this, SLOT(openInPianoRoll()));
 
 	auto b = new QAction(embed::getIconPixmap("ghost_note"), tr("Set as ghost in piano-roll"), _cm);
-	if( m_clip->empty() ) { b->setEnabled( false ); }
+	if( m_clip->isEmpty() ) { b->setEnabled( false ); }
 	_cm->insertAction( _cm->actions()[1], b );
 	connect( b, SIGNAL(triggered(bool)),
 					this, SLOT(setGhostInPianoRoll()));
 
 	auto c = new QAction(embed::getIconPixmap("automation_ghost_note"), tr("Set as ghost in automation editor"), _cm);
-	if (m_clip->empty()) { c->setEnabled(false); }
+	if (m_clip->isEmpty()) { c->setEnabled(false); }
 	_cm->insertAction(_cm->actions()[2], c);
 	connect(c, &QAction::triggered, this, &MidiClipView::setGhostInAutomationEditor);
 
