@@ -926,5 +926,6 @@ bool MidiClipView::destructiveSplitClip(const TimePos pos)
 	return true;
 }
 
+bool MidiClipView::empty() const { return m_clip->m_notes.empty(); }
 
 } // namespace lmms::gui

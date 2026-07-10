@@ -55,6 +55,7 @@ class ClipView : public selectableObject, public ModelView
 // theming qproperties
 	Q_PROPERTY( QColor mutedColor READ mutedColor WRITE setMutedColor )
 	Q_PROPERTY( QColor mutedBackgroundColor READ mutedBackgroundColor WRITE setMutedBackgroundColor )
+	Q_PROPERTY(QColor selectedBlendColor READ selectedBlendColor WRITE setSelectedBlendColor)
 	Q_PROPERTY( QColor selectedColor READ selectedColor WRITE setSelectedColor )
 	Q_PROPERTY( QColor textColor READ textColor WRITE setTextColor )
 	Q_PROPERTY( QColor textBackgroundColor READ textBackgroundColor WRITE setTextBackgroundColor )
@@ -85,6 +86,7 @@ public:
 	QColor mutedColor() const;
 	QColor mutedBackgroundColor() const;
 	QColor selectedColor() const;
+	QColor selectedBlendColor() const;
 	QColor textColor() const;
 	QColor textBackgroundColor() const;
 	QColor textShadowColor() const;
@@ -94,6 +96,7 @@ public:
 	void setMutedColor( const QColor & c );
 	void setMutedBackgroundColor( const QColor & c );
 	void setSelectedColor( const QColor & c );
+	void setSelectedBlendColor(const QColor& c);
 	void setTextColor( const QColor & c );
 	void setTextBackgroundColor( const QColor & c );
 	void setTextShadowColor( const QColor & c );
@@ -121,7 +124,8 @@ public:
 
 	void toggleSelectedAutoResize();
 
-	QColor getColorForDisplay( QColor );
+	//! Calculate the background color for this clip
+	QColor getColorForDisplay(QColor defaultColor);
 
 	void inline setMarkerPos(int x) { m_markerPos = x; }
 	void inline setMarkerEnabled(bool e) { m_marker = e; }
@@ -136,6 +140,11 @@ public slots:
 	void resetColor();
 
 protected:
+	//! @brief Whether the clip is empty
+	//
+	// Classes that inherit this one should override if they want to signal a clip is empty.
+	virtual bool empty() const;
+
 	enum class ContextMenuAction
 	{
 		Remove,
@@ -213,6 +222,7 @@ private:
 	QColor m_mutedColor;
 	QColor m_mutedBackgroundColor;
 	QColor m_selectedColor;
+	QColor m_selectedBlendColor;
 	QColor m_textColor;
 	QColor m_textBackgroundColor;
 	QColor m_textShadowColor;
