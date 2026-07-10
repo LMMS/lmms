@@ -715,10 +715,10 @@ SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DLMMS_DEBUG")
 SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DLMMS_DEBUG")
 
 if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
-    add_compile_definitions(NDEBUG)
+	add_compile_definitions(NDEBUG)
 	SET(STATUS_ASSERTIONS "Disabled")
 else()
-    remove_definitions(-DNDEBUG)
+	remove_definitions(-DNDEBUG)
 	SET(STATUS_ASSERTIONS "Enabled")
 endif()
 
@@ -814,6 +814,11 @@ include(ErrorFlags)
 
 # use ccache
 include(CompileCache)
+
+# Set symbol visibility
+set(CMAKE_C_VISIBILITY_PRESET hidden)
+set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
 
 # make sub-directories
 ADD_SUBDIRECTORY(cmake)
