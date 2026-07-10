@@ -29,6 +29,11 @@ SET(LMMS_SOURCE_DIR ${CMAKE_SOURCE_DIR})
 # Import of windows.h breaks min()/max()
 ADD_DEFINITIONS(-DNOMINMAX)
 
+# Set symbol visibility
+set(CMAKE_C_VISIBILITY_PRESET hidden)
+set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+set(CMAKE_VISIBILITY_INLINES_HIDDEN ON)
+
 # CMAKE_CXX_IMPLICIT_INCLUDE_DIRECTORIES is not set correctly for MinGW until
 # CMake 3.14.1, so avoid specifying system include directories on affected
 # versions. Normal include directories are safe, since GCC ignores them if they
@@ -814,11 +819,6 @@ include(ErrorFlags)
 
 # use ccache
 include(CompileCache)
-
-# Set symbol visibility
-set(CMAKE_C_VISIBILITY_PRESET hidden)
-set(CMAKE_CXX_VISIBILITY_PRESET hidden)
-set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
 
 # make sub-directories
 ADD_SUBDIRECTORY(cmake)
