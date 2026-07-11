@@ -165,8 +165,11 @@ elseif(TARGET_UARCH STREQUAL "native")
 	endif()
 
 	if(MSVC)
-		# TODO
-		message(WARNING "MSVC builds do not support native architecture yet")
+		include(CheckCPUFeatures)
+		determine_msvc_native_arch(_arch_option)
+		if(NOT "${_arch_option}" STREQUAL "")
+			add_compile_options(${_arch_option})
+		endif()
 	else()
 		add_compile_options(-march=native -mtune=native)
 	endif()
