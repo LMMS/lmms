@@ -139,7 +139,7 @@ if(NOT TARGET_UARCH)
 	set(TARGET_UARCH ${_default_target_uarch} CACHE STRING "Choose the target microarchitecture" FORCE)
 	# Accepted options:
 	# - "none":     No microarchitecture is set. Uses the compiler default.
-	# - "official": Targets the baseline microarchitecture of official LMMS releases (currently x86_64-v2).
+	# - "official": Targets the baseline microarchitecture of official LMMS releases.
 	# - "custom":   Targets the microarchitecture specified by TARGET_UARCH_FLAGS.
 	# - "native":   Targets the highest microarchitecture level supported by the build machine.
 	set_property(CACHE TARGET_UARCH PROPERTY STRINGS "none" "official" "custom" "native")
@@ -150,15 +150,32 @@ if(TARGET_UARCH STREQUAL "custom" OR TARGET_UARCH_FLAGS)
 elseif(TARGET_UARCH STREQUAL "none")
 	# Do nothing, use the compiler default
 elseif(TARGET_UARCH STREQUAL "official")
-	# x86_64-v2
 	if(LMMS_HOST_X86_64)
 		if(MSVC)
+			# MSVC doesn't have /arch:x86-64-v2, but this is pretty close
 			add_compile_options(/arch:SSE4.2)
 		else()
 			add_compile_options(-march=x86-64-v2)
 		endif()
+	elseif(LMMS_HOST_ARM64)
+		if(LMMS_BUILD_WIN64)
+			# Using Windows 11 minimum requirements
+			# https://learn.microsoft.com/en-us/windows-hardware/design/minimum/minimum-hardware-requirements-overview
+			if(MSVC)
+				add_compile_options(/arch:armv8.1)
+			else()
+				add_compile_options(-march=armv8.1-a)
+			endif()
+		elseif(LMMS_BUILD_APPLE)
+			# Chosen for Apple M1 support
+			add_compile_options(-march=armv8.4-a)
+		else()
+			# Chosen for Raspberry Pi 4 support
+			add_compile_options(-march=armv8-a)
+		endif()
+	else()
+		message(WARNING "There are no official releases for the target architecture, so there is no official baseline microarchitecture")
 	endif()
-	# TODO: Add ARM64
 elseif(TARGET_UARCH STREQUAL "native")
 	if(CMAKE_CROSSCOMPILING)
 		message(FATAL_ERROR "Cannot target native microarchitecture while cross-compiling")
