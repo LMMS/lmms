@@ -446,6 +446,7 @@ jobs:
     env:
       CMAKE_OPTS: >-
         -DCMAKE_BUILD_TYPE=RelWithDebInfo
+        -DTARGET_UARCH=official
         -DUSE_COMPILE_CACHE=ON
         -DCPACK_NSIS_EXECUTABLE=/clang64/bin/makensis.exe
       CCACHE_MAXSIZE: 0
