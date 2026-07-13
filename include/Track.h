@@ -110,6 +110,9 @@ public:
 	virtual void saveTrackSpecificSettings(QDomDocument& doc, QDomElement& parent, bool presetMode) = 0;
 	virtual void loadTrackSpecificSettings( const QDomElement & element ) = 0;
 
+	//! @returns `true` if the track is renderable (i.e., it can be exported to audio), returns `false` otherwise
+	virtual bool isRenderable() = 0;
+
 	// Saving and loading of presets which do not necessarily contain all the track information
 	void savePreset(QDomDocument & doc, QDomElement & element);
 	void loadPreset(const QDomElement & element);
