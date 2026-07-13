@@ -98,6 +98,8 @@ auto Sample::operator=(Sample&& other) noexcept -> Sample&
 
 bool Sample::play(SampleFrame* dst, PlaybackState* state, size_t numFrames, Loop loop, double ratio) const
 {
+	if (!m_buffer || m_buffer->size() == 0) { return false; }
+
 	state->m_frameIndex = std::max<int>(m_startFrame, state->m_frameIndex);
 
 	const auto sampleRateRatio = static_cast<double>(Engine::audioEngine()->outputSampleRate()) / m_buffer->sampleRate();
