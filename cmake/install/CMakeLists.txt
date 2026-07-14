@@ -50,3 +50,7 @@ if(LMMS_HAVE_STK AND (LMMS_BUILD_WIN32 OR LMMS_BUILD_APPLE))
 	endif()
 endif()
 
+# Custom branding for macOS and Linux
+if(LMMS_BRANDING_NEEDED AND NOT LMMS_BUILD_WIN32)
+	install_branding()
+endif()

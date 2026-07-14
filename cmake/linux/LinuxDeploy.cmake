@@ -143,10 +143,45 @@ file(COPY "${CPACK_SOURCE_DIR}/cmake/linux/apprun-hooks" DESTINATION "${APP}")
 file(REMOVE "${APP}/apprun-hooks/README.md")
 
 # Prefer a hard-copy of .DirIcon over appimagetool's symlinking
-# 256x256 default for Cinnamon Desktop https://forums.linuxmint.com/viewtopic.php?p=2585952
+# AppImage icon: 256x256 default for Cinnamon Desktop https://forums.linuxmint.com/viewtopic.php?p=2585952
 file(COPY "${APP}/usr/share/icons/hicolor/256x256/apps/${lmms}.png" DESTINATION "${APP}")
 file(RENAME "${APP}/${lmms}.png" "${APP}/.DirIcon")
 file(COPY "${APP}/usr/share/icons/hicolor/256x256/apps/${lmms}.png" DESTINATION "${APP}")
+
+if(CPACK_BRANDING_NEEDED)
+	# Overwrite any branded files
+	file(GLOB branded_items "${CPACK_BRANDED_APP_DIR}/*")
+	foreach(item IN LISTS branded_items)
+		file(COPY "${item}" DESTINATION "${APP}")
+	endforeach()
+
+	# Fix desktop file
+	file(READ "${DESKTOP_FILE}" desktop_file_contents)
+	get_filename_component(usr_share_apps "${DESKTOP_FILE}" DIRECTORY)
+	# Name=LMMS --> Name=LMMS Nightly
+	string(REPLACE
+		"Name=${LMMS}"
+		"Name=${LMMS} ${CPACK_RELEASE_TYPE}"
+		desktop_file_contents
+		"${desktop_file_contents}"
+	)
+
+	# lmms.desktop --> lmms-nightly.desktop
+	set(desktop_file_new "${usr_share_apps}/lmms-${CPACK_BRANDING_NEEDED}.desktop")
+	file(WRITE "${desktop_file_new}" "${desktop_file_contents}")
+	file(REMOVE "${DESKTOP_FILE}")
+	set(DESKTOP_FILE "${desktop_file_new}")
+endif()
+
+# Build list of libraries to inform linuxdeploy about
+# e.g. --library=foo.so --library=bar.so
+file(GLOB LIBS "${APP}/usr/lib/${lmms}/*.so")
+
+# Inform linuxdeploy about LADSPA plugins; may depend on bundled fftw3f, etc.
+file(GLOB LADSPA "${APP}/usr/lib/${lmms}/ladspa/*.so")
+
+# Inform linuxdeploy about remote plugins
+file(GLOB REMOTE_PLUGINS "${APP}/usr/lib/${lmms}/*Remote*")
 
 # Inform linuxdeploy-plugin-qt about wayland plugin
 set(ENV{EXTRA_PLATFORM_PLUGINS} "libqwayland-generic.so")
