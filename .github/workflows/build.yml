@@ -11,7 +11,7 @@ jobs:
     env:
       CMAKE_OPTS: >-
         -DUSE_WERROR=ON
-        -DCMAKE_BUILD_TYPE=RelWithDebInfo
+        -DCMAKE_BUILD_TYPE=Release
         -DTARGET_UARCH=native
         -DUSE_COMPILE_CACHE=ON
         -DWANT_DEBUG_CPACK=ON
@@ -101,7 +101,7 @@ jobs:
     env:
       CMAKE_OPTS: >-
         -DUSE_WERROR=ON
-        -DCMAKE_BUILD_TYPE=RelWithDebInfo
+        -DCMAKE_BUILD_TYPE=Release
         -DTARGET_UARCH=native
         -DUSE_COMPILE_CACHE=ON
         -DWANT_DEBUG_CPACK=ON
@@ -194,7 +194,7 @@ jobs:
       CMAKE_OPTS: >-
         -Werror=dev
         -DUSE_WERROR=ON
-        -DCMAKE_BUILD_TYPE=RelWithDebInfo
+        -DCMAKE_BUILD_TYPE=Release
         -DTARGET_UARCH=native
         -DUSE_COMPILE_CACHE=ON
       CCACHE_MAXSIZE: 0
@@ -284,7 +284,7 @@ jobs:
       CMAKE_OPTS: >-
         -Werror=dev
         -DUSE_WERROR=ON
-        -DCMAKE_BUILD_TYPE=RelWithDebInfo
+        -DCMAKE_BUILD_TYPE=Release
         -DTARGET_UARCH=native
         -DUSE_COMPILE_CACHE=ON
       CCACHE_MAXSIZE: 0
@@ -404,7 +404,7 @@ jobs:
             -G Ninja `
             --toolchain C:/vcpkg/scripts/buildsystems/vcpkg.cmake `
             -Werror=dev `
-            -DCMAKE_BUILD_TYPE=RelWithDebInfo `
+            -DCMAKE_BUILD_TYPE=Release `
             -DTARGET_UARCH=native `
             -DWANT_QT6=ON `
             -DUSE_COMPILE_CACHE=ON `
@@ -445,7 +445,7 @@ jobs:
         shell: msys2 {0}
     env:
       CMAKE_OPTS: >-
-        -DCMAKE_BUILD_TYPE=RelWithDebInfo
+        -DCMAKE_BUILD_TYPE=Release
         -DTARGET_UARCH=native
         -DUSE_COMPILE_CACHE=ON
         -DCPACK_NSIS_EXECUTABLE=/clang64/bin/makensis.exe
