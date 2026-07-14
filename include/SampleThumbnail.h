@@ -143,6 +143,6 @@ private:
 	inline static std::unordered_map<SampleThumbnailEntry, std::shared_ptr<ThumbnailCache>, Hash> s_sampleThumbnailCacheMap;
 };
 
-} // namespace lmms
+} // namespace lmms::gui
 
 #endif // LMMS_SAMPLE_THUMBNAIL_H
