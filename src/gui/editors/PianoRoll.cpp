@@ -5240,7 +5240,7 @@ PianoRollWindow::PianoRollWindow() :
 	notesActionsToolBar->addAction( eraseAction );
 	notesActionsToolBar->addAction( selectAction );
 	notesActionsToolBar->addAction( pitchBendAction );
-	notesActionsToolBar->addAction( knifeAction );
+	notesActionsToolBar->addAction(knifeAction);
 	notesActionsToolBar->addSeparator();
 	notesActionsToolBar->addWidget(quantizeButton);
 
