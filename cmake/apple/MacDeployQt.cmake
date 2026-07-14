@@ -8,6 +8,7 @@
 # Variables must be prefixed with "CPACK_" to be visible here
 set(lmms "${CPACK_PROJECT_NAME}")
 set(APP "${CPACK_TEMPORARY_INSTALL_DIRECTORY}/${CPACK_PROJECT_NAME_UCASE}.app")
+set(VOLUME_NAME "${CPACK_PROJECT_NAME_UCASE} ${CPACK_PROJECT_VERSION}")
 
 # Toggle command echoing & verbosity
 # 0 = no output, 1 = error/warning, 2 = normal, 3 = debug
@@ -167,7 +168,9 @@ configure_file("${CPACK_CURRENT_SOURCE_DIR}/dmgbuild.py.in" "${CPACK_CURRENT_BIN
 
 execute_process(COMMAND "${DMGBUILD_BIN}"
 	-s "${CPACK_CURRENT_BINARY_DIR}/dmgbuild.py"
-	"${APPDMG_VOLUME_NAME}"
+	"${VOLUME_NAME}"
 	"${CPACK_BINARY_DIR}/${CPACK_PACKAGE_FILE_NAME}.dmg"
 	COMMAND_ECHO ${COMMAND_ECHO}
     COMMAND_ERROR_IS_FATAL ANY)
+
+message(STATUS "Successfully created ${CPACK_BINARY_DIR}/${CPACK_PACKAGE_FILE_NAME}.dmg")

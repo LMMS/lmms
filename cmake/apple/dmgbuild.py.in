@@ -1,4 +1,3 @@
-volume_name = "@APPDMG_VOLUME_NAME@"
 window_rect = ((100, 100), (700, 400))
 background = "@CPACK_SOURCE_DIR@/cmake/apple/background.png"
 icon_size = 128
