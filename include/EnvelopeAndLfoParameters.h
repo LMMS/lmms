@@ -97,7 +97,7 @@ public:
 
 	void fillLevel( float * _buf, f_cnt_t _frame,
 				const f_cnt_t _release_begin,
-				const fpp_t _frames );
+				const f_cnt_t _frames );
 
 	inline bool isUsed() const
 	{
@@ -150,7 +150,7 @@ public slots:
 
 
 protected:
-	void fillLfoLevel( float * _buf, f_cnt_t _frame, const fpp_t _frames );
+	void fillLfoLevel( float * _buf, f_cnt_t _frame, const f_cnt_t _frames );
 
 
 private:
@@ -202,7 +202,7 @@ private:
 
 	constexpr static auto NumLfoShapes = static_cast<std::size_t>(LfoShape::Count);
 
-	sample_t lfoShapeSample( fpp_t _frame_offset );
+	sample_t lfoShapeSample( f_cnt_t _frame_offset );
 	void updateLfoShapeData();
 
 

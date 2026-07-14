@@ -172,7 +172,7 @@ protected:
 	bool unquantizedModHeld( QMouseEvent * me );
 	TimePos quantizeSplitPos(TimePos);
 
-	float pixelsPerBar();
+	float pixelsPerBar() const;
 
 
 	DataFile createClipDataFiles(const QVector<ClipView *> & clips) const;
@@ -234,6 +234,13 @@ private:
 	TimePos draggedClipPos( QMouseEvent * me );
 	int knifeMarkerPos( QMouseEvent * me );
 	void setColor(const std::optional<QColor>& color);
+
+	/**
+	 * @returns the width of a note's resize area in pixels.
+	 * @note When zoomed in, this is a constant pixel value, but when zoomed far out,
+	 * it is a fraction of the clip width.
+	 */
+	int resizeGripWidth() const;
 	
 	//! Returns whether the user can left-resize this clip so that the start of the clip bounds is before the start of the clip content.
 	virtual bool isResizableBeforeStart() { return true; };

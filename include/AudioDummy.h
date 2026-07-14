@@ -78,12 +78,12 @@ public:
 
 
 private:
-	void startProcessing() override
+	void startProcessingImpl() override
 	{
 		start();
 	}
 
-	void stopProcessing() override
+	void stopProcessingImpl() override
 	{
 		stopProcessingThread( this );
 	}
@@ -91,18 +91,10 @@ private:
 	void run() override
 	{
 		MicroTimer timer;
-		while( true )
+		while (AudioDevice::isRunning())
 		{
 			timer.reset();
-			const SampleFrame* b = audioEngine()->nextBuffer();
-			if( !b )
-			{
-				break;
-			}
-			if( audioEngine()->hasFifoWriter() )
-			{
-				delete[] b;
-			}
+			audioEngine()->renderNextPeriod();
 
 			const int microseconds = static_cast<int>( audioEngine()->framesPerPeriod() * 1000000.0f / audioEngine()->outputSampleRate() - timer.elapsed() );
 			if( microseconds > 0 )

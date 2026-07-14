@@ -319,7 +319,7 @@ void GigInstrument::playNote( NotePlayHandle * _n, SampleFrame* )
 // the preferences)
 void GigInstrument::play( SampleFrame* _working_buffer )
 {
-	const fpp_t frames = Engine::audioEngine()->framesPerPeriod();
+	const f_cnt_t frames = Engine::audioEngine()->framesPerPeriod();
 	const auto rate = Engine::audioEngine()->outputSampleRate();
 
 	// Initialize to zeros
