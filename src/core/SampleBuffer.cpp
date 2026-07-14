@@ -40,7 +40,7 @@ SampleBuffer::SampleBuffer(std::vector<SampleFrame> data, sample_rate_t sampleRa
 	: m_frames(data.size())
 	, m_sampleRate(sampleRate)
 	, m_path(path)
-	, m_data(std::shared_ptr<SampleFrame[]>(data.data(), [v = std::move(data)](auto) {}))
+	, m_data(data.data(), [v = std::move(data)](auto) {})
 {
 }
 
