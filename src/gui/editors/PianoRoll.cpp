@@ -4544,11 +4544,7 @@ void PianoRoll::setEditMode(int mode)
 	}
 	else if (static_cast<EditMode>(mode) == EditMode::Knife)
 	{
-		TextFloat::displayMessage(tr("Knife Tool"),
-			tr("Click and drag over notes to cut along a line\nHold Shift to automatically remove short ends"),
-			embed::getIconPixmap("edit_knife"), 4000);
-		m_action = Action::Knife;
-		m_knifeDown = false;
+		setKnifeAction();
 	}
 	else
 	{
