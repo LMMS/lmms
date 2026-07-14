@@ -178,4 +178,4 @@ void SampleThumbnail::visualize(VisualizeParameters parameters, QPainter& painte
 	painter.restore();
 }
 
-} // namespace lmms
+} // namespace lmms::gui
