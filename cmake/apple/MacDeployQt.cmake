@@ -162,14 +162,12 @@ execute_process(COMMAND codesign --force --deep --sign - "${APP}"
 	COMMAND_ERROR_IS_FATAL ANY)
 
 # Create DMG
-# appdmg won't allow volume names > 27 char https://github.com/LinusU/node-alias/issues/7
-find_program(APPDMG_BIN appdmg REQUIRED)
-string(SUBSTRING "${CPACK_PROJECT_NAME_UCASE} ${CPACK_PROJECT_VERSION}" 0 27 APPDMG_VOLUME_NAME)
-# We'll configure this file twice (again in MacDeployQt.cmake once we know CPACK_TEMPORARY_INSTALL_DIRECTORY)
-configure_file("${CPACK_CURRENT_SOURCE_DIR}/appdmg.json.in" "${CPACK_CURRENT_BINARY_DIR}/appdmg.json" @ONLY)
+find_program(DMGBUILD_BIN dmgbuild REQUIRED)
+configure_file("${CPACK_CURRENT_SOURCE_DIR}/dmgbuild.py.in" "${CPACK_CURRENT_BINARY_DIR}/dmgbuild.py" @ONLY)
 
-execute_process(COMMAND "${APPDMG_BIN}"
-	"${CPACK_CURRENT_BINARY_DIR}/appdmg.json"
+execute_process(COMMAND "${DMGBUILD_BIN}"
+	-s "${CPACK_CURRENT_BINARY_DIR}/dmgbuild.py"
+	"${APPDMG_VOLUME_NAME}"
 	"${CPACK_BINARY_DIR}/${CPACK_PACKAGE_FILE_NAME}.dmg"
 	COMMAND_ECHO ${COMMAND_ECHO}
     COMMAND_ERROR_IS_FATAL ANY)
