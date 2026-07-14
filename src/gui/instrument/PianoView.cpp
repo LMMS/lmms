@@ -604,7 +604,7 @@ void PianoView::resizeEvent(QResizeEvent* event)
 
 
 // TODO: Replace the final subtract with initialising x to width / 2.
-int PianoView::getKeyX( int key_num ) const
+int PianoView::getKeyX( int _key_num ) const
 {
 	int k = m_startKey;
 	if( _key_num < m_startKey )

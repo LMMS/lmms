@@ -55,7 +55,7 @@ public:
 	//! @brief Creates a new clip for the given track @p track.
 	//! @param track The track that will contain the new object
 	Clip(Track* track);
-	~Clip() override; //!< @brief Destroys the given clip.
+	~Clip() override; //!< Destroys the given clip.
 
 	inline Track * getTrack() const
 	{
@@ -156,7 +156,7 @@ public:
 	virtual Clip* clone() = 0;
 
 public slots:
-	void toggleMute(); //!< @brief Mutes this Clip
+	void toggleMute(); //!< Mutes this Clip
 
 signals:
 	void lengthChanged();

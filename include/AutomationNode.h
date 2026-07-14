@@ -38,7 +38,7 @@ class AutomationClip;
 class AutomationNode
 {
 public:
-	AutomationNode(); //!< @brief Dummy constructor for the QMap
+	AutomationNode(); //!< Dummy constructor for the QMap
 	AutomationNode(AutomationClip* clip, float value, int pos);
 	AutomationNode(AutomationClip* clip, float inValue, float outValue, int pos);
 
@@ -117,7 +117,7 @@ public:
 	inline void setClip(AutomationClip* clip) { m_clip = clip; }
 
 private:
-	AutomationClip* m_clip; //!< @brief Clip that this node belongs to
+	AutomationClip* m_clip; //!< Clip that this node belongs to
 	int m_pos; //!< Time position of this node (matches the timeMap key)
 
 	// Values of this node

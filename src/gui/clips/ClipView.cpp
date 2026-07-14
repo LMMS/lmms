@@ -62,6 +62,7 @@ constexpr int RESIZE_GRIP_WIDTH = 8;
 //! @brief The maximum fraction of the clip width that the resize grip is allowed to take up
 constexpr float RESIZE_GRIP_MAX_WIDTH_FRACTION = 0.1f;
 
+TextFloat* ClipView::s_textFloat = nullptr;
 
 ClipView::ClipView( Clip * clip,
 							TrackView * tv ) :

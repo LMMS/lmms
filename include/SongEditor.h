@@ -159,14 +159,14 @@ private:
 	bool m_smoothScroll;
 
 	EditMode m_mode;
-	EditMode m_ctrlMode; // mode they were in before they hit ctrl
+	EditMode m_ctrlMode; //!< Mode they were in before they hit ctrl
 
 	QPoint m_origin;
 	QPoint m_scrollPos;
 	QPoint m_mousePos;
 	int m_rubberBandStartTrackview;
 	TimePos m_rubberbandStartTimePos;
-	int m_rubberbandPixelsPerBar; //!< pixels per bar when selection starts
+	int m_rubberbandPixelsPerBar; //!< Pixels per bar when selection starts
 	int m_trackHeadWidth;
 	bool m_selectRegion;
 

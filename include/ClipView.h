@@ -294,7 +294,7 @@ private:
 	//! beside the cursor as you move or resize elements of a track
 	//! about. This pointer keeps track of it, as you only ever need
 	//! one at a time.
-	static TextFloat* s_textFloat = nullptr;
+	static TextFloat* s_textFloat;
 
 	Clip * m_clip;
 	Action m_action;

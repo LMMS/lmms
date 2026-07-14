@@ -253,7 +253,7 @@ public:
 
 	//! @brief Automatically assign a midi controller to this track, based on the midiautoassign setting
 	//! @param assign Set to true to connect the midi device, set to false to disconnect
-	void autoAssignMidiDevice( bool );
+	void autoAssignMidiDevice(bool assign);
 
 	//! Returns a non-owning pointer to the model for the knob at the given index in the track's MIDI CC rack
 	FloatModel* midiCCModel(int index) const { return m_midiCCModel[index].get(); }

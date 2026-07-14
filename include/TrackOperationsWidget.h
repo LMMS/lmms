@@ -69,8 +69,8 @@ protected:
 
 
 private slots:
-	void cloneTrack(); //!< @brief Clone this track
-	void removeTrack(); //!< @brief Remove this track from the track list
+	void cloneTrack();  //!< Clone this track
+	void removeTrack(); //!< Remove this track from the track list
 
 	//! @brief Update the trackOperationsWidget context menu
 	//!
@@ -87,7 +87,7 @@ private slots:
 	void toggleRecording(bool on);
 	void recordingOn();
 	void recordingOff();
-	void clearTrack(); //!< @brief Clears all Clips from the track
+	void clearTrack(); //!< Clears all Clips from the track
 
 private:
 	TrackView * m_trackView;
