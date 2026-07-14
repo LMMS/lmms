@@ -35,7 +35,7 @@ namespace {
 	constexpr auto AggregationPerZoomStep = 10;
 }
 
-namespace lmms {
+namespace lmms::gui {
 
 SampleThumbnail::Thumbnail::Thumbnail(std::vector<Peak> peaks, double samplesPerPeak)
 	: m_peaks(std::move(peaks))

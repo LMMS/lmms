@@ -37,8 +37,10 @@
 class QPainter;
 
 namespace lmms {
-
 class Sample;
+}
+
+namespace lmms::gui {
 
 /**
    Allows for visualizing sample data.
