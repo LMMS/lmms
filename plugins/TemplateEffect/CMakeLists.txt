@@ -1,0 +1,3 @@
+INCLUDE(BuildPlugin)
+
+BUILD_PLUGIN(templateeffect TemplateEffect.cpp TemplateEffectControls.cpp TemplateEffectControlDialog.cpp MOCFILES TemplateEffectControls.h TemplateEffectControlDialog.h EMBEDDED_RESOURCES artwork.svg logo.svg)
