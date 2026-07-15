@@ -62,10 +62,6 @@ class ClipView : public selectableObject, public ModelView
 	Q_PROPERTY( QColor patternClipBackground READ patternClipBackground WRITE setPatternClipBackground )
 	Q_PROPERTY( bool gradient READ gradient WRITE setGradient )
 	Q_PROPERTY(QColor markerColor READ markerColor WRITE setMarkerColor)
-	// We have to use a QSize here because using QPoint isn't supported.
-	// width -> x, height -> y
-	Q_PROPERTY( QSize mouseHotspotHand MEMBER m_mouseHotspotHand )
-	Q_PROPERTY( QSize mouseHotspotKnife MEMBER m_mouseHotspotKnife )
 
 public:
 	const static int BORDER_WIDTH = 2;
@@ -176,7 +172,7 @@ protected:
 	bool unquantizedModHeld( QMouseEvent * me );
 	TimePos quantizeSplitPos(TimePos);
 
-	float pixelsPerBar();
+	float pixelsPerBar() const;
 
 
 	DataFile createClipDataFiles(const QVector<ClipView *> & clips) const;
@@ -223,11 +219,6 @@ private:
 	QColor m_patternClipBackground;
 	bool m_gradient;
 	QColor m_markerColor;
-	QSize m_mouseHotspotHand; // QSize must be used because QPoint
-	QSize m_mouseHotspotKnife; // isn't supported by property system
-	QCursor m_cursorHand;
-	QCursor m_cursorKnife;
-	bool m_cursorSetYet;
 
 	bool m_needsUpdate;
 	inline void setInitialPos( QPoint pos )
@@ -243,6 +234,13 @@ private:
 	TimePos draggedClipPos( QMouseEvent * me );
 	int knifeMarkerPos( QMouseEvent * me );
 	void setColor(const std::optional<QColor>& color);
+
+	/**
+	 * @returns the width of a note's resize area in pixels.
+	 * @note When zoomed in, this is a constant pixel value, but when zoomed far out,
+	 * it is a fraction of the clip width.
+	 */
+	int resizeGripWidth() const;
 	
 	//! Returns whether the user can left-resize this clip so that the start of the clip bounds is before the start of the clip content.
 	virtual bool isResizableBeforeStart() { return true; };

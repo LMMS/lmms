@@ -46,7 +46,7 @@ public:
 		m_periodTimer.reset();
 	}
 
-	void finishPeriod( sample_rate_t sampleRate, fpp_t framesPerPeriod );
+	void finishPeriod( sample_rate_t sampleRate, f_cnt_t framesPerPeriod );
 
 	int cpuLoad() const
 	{

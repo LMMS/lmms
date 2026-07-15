@@ -26,6 +26,7 @@
 #include "AutomatableSlider.h"
 
 #include <QMouseEvent>
+#include <QInputDialog>
 
 #include "CaptionMenu.h"
 
@@ -69,6 +70,13 @@ void AutomatableSlider::mousePressEvent( QMouseEvent * _me )
 	if( _me->button() == Qt::LeftButton &&
 	   ! ( _me->modifiers() & Qt::ControlModifier ) )
 	{
+		AutomatableModel* thisModel = model();
+		if (thisModel)
+		{
+			thisModel->addJournalCheckPoint();
+			thisModel->saveJournallingState(false);
+		}
+
 		m_showStatus = true;
 		QSlider::mousePressEvent( _me );
 	}
@@ -83,6 +91,12 @@ void AutomatableSlider::mousePressEvent( QMouseEvent * _me )
 
 void AutomatableSlider::mouseReleaseEvent( QMouseEvent * _me )
 {
+	AutomatableModel* thisModel = model();
+	if (thisModel)
+	{
+		thisModel->restoreJournallingState();
+	}
+
 	m_showStatus = false;
 	QSlider::mouseReleaseEvent( _me );
 }
@@ -98,7 +112,23 @@ void AutomatableSlider::wheelEvent( QWheelEvent * _me )
 	m_showStatus = old_status;
 }
 
+void AutomatableSlider::mouseDoubleClickEvent(QMouseEvent*) { enterValue(); }
 
+void AutomatableSlider::enterValue()
+{
+	bool ok;
+	const int newVal = QInputDialog::getInt(
+		this, tr("Set value"),
+		tr("Please enter a new value between %1 and %2:")
+			.arg(model()->minValue())
+			.arg(model()->maxValue()),
+		model()->value(),
+		model()->minValue(),
+		model()->maxValue(),
+		model()->step<int>(), &ok);
+
+	if (ok) { model()->setValue(newVal); }
+}
 
 
 void AutomatableSlider::modelChanged()

@@ -131,13 +131,8 @@ EffectSelectDialog::EffectSelectDialog(QWidget* parent) :
 	mainLayout->addLayout(leftSectionLayout);
 
 	m_filterEdit = new QLineEdit(this);
-	connect(m_filterEdit, &QLineEdit::textChanged, this, [this](const QString &text) {
-// TODO: Cleanup when we don't support Qt5 anymore
-#if (QT_VERSION >= QT_VERSION_CHECK(5,12,0))
+	connect(m_filterEdit, &QLineEdit::textChanged, this, [this](const QString& text) {
 		m_model.setFilterRegularExpression(QRegularExpression(text, QRegularExpression::CaseInsensitiveOption));
-#else
-		m_model.setFilterRegExp(QRegExp(text, Qt::CaseInsensitive));
-#endif
 	});
 	connect(m_filterEdit, &QLineEdit::textChanged, this, &EffectSelectDialog::updateSelection);
 	m_filterEdit->setFocus();
@@ -255,6 +250,7 @@ void EffectSelectDialog::rowChanged(const QModelIndex& idx, const QModelIndex&)
 		}
 
 		auto textualInfoWidget = new QWidget(m_descriptionWidget);
+		textualInfoWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 		hbox->addWidget(textualInfoWidget);
 
 		auto textWidgetLayout = new QVBoxLayout(textualInfoWidget);
@@ -282,14 +278,22 @@ void EffectSelectDialog::rowChanged(const QModelIndex& idx, const QModelIndex&)
 		}
 		else
 		{
-			auto label = new QLabel(m_descriptionWidget);
-			QString labelText = "<p><b>" + tr("Name") + ":</b> " + QString::fromUtf8(descriptor.displayName) + "</p>";
-			labelText += "<p><b>" + tr("Description") + ":</b> " + qApp->translate("PluginBrowser", descriptor.description) + "</p>";
-			labelText += "<p><b>" + tr("Author") + ":</b> " + QString::fromUtf8(descriptor.author) + "</p>";
-
-			label->setText(labelText);
+			// HACK: Markup inside translation strings due to RTL not being handled correctly.
+			// Move the markup out of the translation strings and into the QString template as soon as RTL layout works properly
+			auto labelText = QString{
+				"<p>%1%2</p>"
+				"<p>%3%4</p>"
+				"<p>%5%6</p>"
+			}.arg(
+				tr("<b>Name: </b>"), descriptor.displayName,
+				tr("<b>Author: </b>"), QString::fromUtf8(descriptor.author)
+					.replace("/dot/", ".").replace("/at/", "@").toHtmlEscaped(),
+				tr("<b>Description: </b>"), qApp->translate("PluginBrowser", descriptor.description)
+					.toHtmlEscaped()
+			);
+		
+			auto label = new QLabel(labelText, m_descriptionWidget);
 			label->setWordWrap(true);
-
 			textWidgetLayout->addWidget(label);
 		}
 

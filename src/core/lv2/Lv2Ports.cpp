@@ -262,7 +262,7 @@ std::vector<PluginIssue> Meta::get(const LilvPlugin *plugin,
 	if (hasProperty(LV2_PORT_PROPS__logarithmic))
 	{
 		// check min/max available
-		// we requre them anyways, but this will detect plugins that will
+		// we require them anyways, but this will detect plugins that will
 		// be non-Lv2-conforming
 		if(m_min == std::numeric_limits<decltype(m_min)>::lowest())
 		{
@@ -313,7 +313,7 @@ Audio::Audio(std::size_t bufferSize, bool isSidechain)
 
 
 void Audio::copyBuffersFromCore(const SampleFrame* lmmsBuf,
-	unsigned channel, fpp_t frames)
+	unsigned channel, f_cnt_t frames)
 {
 	for (std::size_t f = 0; f < static_cast<unsigned>(frames); ++f)
 	{
@@ -325,7 +325,7 @@ void Audio::copyBuffersFromCore(const SampleFrame* lmmsBuf,
 
 
 void Audio::averageWithBuffersFromCore(const SampleFrame* lmmsBuf,
-	unsigned channel, fpp_t frames)
+	unsigned channel, f_cnt_t frames)
 {
 	for (std::size_t f = 0; f < static_cast<unsigned>(frames); ++f)
 	{
@@ -337,7 +337,7 @@ void Audio::averageWithBuffersFromCore(const SampleFrame* lmmsBuf,
 
 
 void Audio::copyBuffersToCore(SampleFrame* lmmsBuf,
-	unsigned channel, fpp_t frames) const
+	unsigned channel, f_cnt_t frames) const
 {
 	for (std::size_t f = 0; f < static_cast<unsigned>(frames); ++f)
 	{

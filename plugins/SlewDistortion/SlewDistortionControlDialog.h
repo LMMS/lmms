@@ -68,8 +68,8 @@ class SlewDistortionHelpView : public QTextEdit
 public:
 	static SlewDistortionHelpView* getInstance()
 	{
-		static SlewDistortionHelpView instance;
-		return &instance;
+		static SlewDistortionHelpView* instance = new SlewDistortionHelpView;
+		return instance;
 	}
 
 private:

@@ -50,7 +50,7 @@ LedCheckBox::LedCheckBox( const QString & _text, QWidget * _parent,
 	m_text( _text ),
 	m_legacyMode(legacyMode)
 {
-	initUi( _color );
+	setLedColor(_color);
 }
 
 
@@ -86,11 +86,11 @@ void LedCheckBox::paintEvent( QPaintEvent * pe )
 
 
 
-void LedCheckBox::initUi( LedColor _color )
+void LedCheckBox::setLedColor(LedColor color)
 {
 	setCheckable( true );
 
-	m_ledOnPixmap = embed::getIconPixmap(names[static_cast<std::size_t>(_color)].toUtf8().constData());
+	m_ledOnPixmap = embed::getIconPixmap(names[static_cast<std::size_t>(color)].toUtf8().constData());
 	m_ledOffPixmap = embed::getIconPixmap("led_off");
 
 	if (m_legacyMode){ setFont(adjustedToPixelSize(font(), DEFAULT_FONT_SIZE)); }
@@ -105,7 +105,7 @@ void LedCheckBox::onTextUpdated()
 {
 	QFontMetrics const fm = fontMetrics();
 
-	int const width = m_ledOffPixmap.width() + 5 + horizontalAdvance(fm, text());
+	int const width = m_ledOffPixmap.width() + 5 + fm.horizontalAdvance(text());
 	int const height = m_legacyMode ? m_ledOffPixmap.height() : qMax(m_ledOffPixmap.height(), fm.height());
 
 	setFixedSize(width, height);

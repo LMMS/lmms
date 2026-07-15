@@ -43,6 +43,7 @@
 namespace lmms
 {
 
+
 // TODO C++23: Make constexpr since std::abs() will be constexpr
 inline bool approximatelyEqual(float x, float y) noexcept
 {
@@ -81,25 +82,111 @@ inline auto absFraction(std::floating_point auto x) noexcept
 	return x - std::floor(x);
 }
 
-inline auto fastRand() noexcept
+
+//! @brief Returns a pseudorandom integer within [0, 32768).
+//! @returns A pseudorandom integer greater than or equal to 0 and less than 32767.
+inline int fastRand() noexcept
 {
-	static unsigned long next = 1;
-	next = next * 1103515245 + 12345;
-	return next / 65536 % 32768;
+	thread_local unsigned long s_next = 1;
+	s_next = s_next * 1103515245 + 12345;
+	return s_next / 65536 % 32768;
 }
 
+
+//! @brief Returns a pseudorandom number within [0, @p upper) (exclusive upper bound).
+//! @returns A pseudorandom number greater than or equal to 0 and less @p upper.
 template<std::floating_point T>
-inline auto fastRand(T range) noexcept
+inline T fastRand(T upper) noexcept
 {
-	constexpr T FAST_RAND_RATIO = static_cast<T>(1.0 / 32767);
-	return fastRand() * range * FAST_RAND_RATIO;
+	constexpr auto FAST_RAND_RATIO = static_cast<T>(1.0 / 32768);
+	return fastRand() * upper * FAST_RAND_RATIO;
 }
 
-template<std::floating_point T>
-inline auto fastRand(T from, T to) noexcept
+
+//! @brief Returns a pseudorandom integer within [0, @p upper) (exclusive upper bound).
+//! @p upper may be negative, in which case the output range is (@p upper, 0].
+//! @returns A pseudorandom integer greater than or equal to 0 and less than @p upper.
+template<std::integral T>
+inline T fastRand(T upper) noexcept
 {
-	return from + fastRand(to - from);
+	constexpr float FAST_RAND_RATIO = 1.f / 32768;
+	return static_cast<T>(fastRand() * static_cast<float>(upper) * FAST_RAND_RATIO);
 }
+
+
+//! @brief Returns a pseudorandom integer within [@p from, @p to) (exclusive upper bound).
+//! @returns A pseudorandom integer greater than or equal to @p from and less than @p to.
+template<typename T> requires std::is_arithmetic_v<T>
+inline auto fastRand(T from, T to) noexcept { return from + fastRand(to - from); }
+
+
+//! @brief Returns a pseudorandom number within [0, @p upper] (inclusive upper bound).
+//! @returns A pseudorandom number greater than or equal to 0 and less than or equal to @p upper.
+template<std::floating_point T>
+inline T fastRandInc(T upper) noexcept
+{
+	constexpr auto FAST_RAND_RATIO = static_cast<T>(1.0 / 32767);
+	return fastRand() * upper * FAST_RAND_RATIO;
+}
+
+
+//! @brief Returns a pseudorandom integer within [0, @p upper] (inclusive upper bound).
+//! @returns A pseudorandom integer greater than or equal to 0 and less than or equal to @p upper.
+template<std::unsigned_integral T>
+inline T fastRandInc(T upper) noexcept
+{
+	// The integer specialization of this function is kind of weird, but it is
+	// necessary to prevent massive bias away from the maximum value.
+	// FAST_RAND_RATIO here is 1 greater than normal, so when multiplied by, it
+	// will result in a random float within [0, @p upper) instead of the usual
+	// [0, @p upper].
+	constexpr float FAST_RAND_RATIO = 1.f / 32768;
+	// Since the random float will be in a range that does not include @upper
+	// due to the above ratio, increase the upper bound by 1.
+	// All values greater than @p upper get rounded down to @p upper, making the
+	// chance of returning a value of @p upper the same as any other of the
+	// possible values.
+	// No need to copysign() unlike the signed_integral overload, since it will always be positive
+	return static_cast<T>(fastRand() * (upper + 1.f) * FAST_RAND_RATIO);
+}
+
+
+//! @brief Returns a pseudorandom integer within [0, @p upper] (inclusive upper bound).
+//! @p upper may be negative, in which case the output range is [@p upper, 0].
+//! @returns A pseudorandom integer greater than or equal to 0 and less than or equal to @p upper.
+template<std::signed_integral T>
+inline T fastRandInc(T upper) noexcept
+{
+	// The integer specialization of this function is kind of weird, but it is
+	// necessary to prevent massive bias away from the maximum value.
+	// FAST_RAND_RATIO here is 1 greater than normal, so when multiplied by, it
+	// will result in a random float within [0, @p upper) instead of the usual
+	// [0, @p upper].
+	constexpr float FAST_RAND_RATIO = 1.f / 32768;
+	// Since the random float will be in a range that does not include @upper
+	// due to the above ratio, increase the magnitude of the upper bound by 1.
+	// All values greater than @p upper get rounded down to @p upper, making the
+	// chance of returning a value of @p upper the same as any other of the
+	// possible values.
+	// HACK: Even on -O3, without this static_cast, it will convert @p upper to float twice for some reason
+	const auto fupper = static_cast<float>(upper);
+	const float r = fupper + std::copysign(1.f, fupper);
+	// Always round towards 0 (implicit truncation occurs during static_cast).
+	return static_cast<T>(fastRand() * r * FAST_RAND_RATIO);
+}
+
+
+//! @brief Returns a pseudorandom integer within [@p from, @p to] (inclusive upper bound).
+//! This function does not require the parameters to be in the proper order.
+//! fastRand(a, b) behaves identically to fastRand(b, a).
+//! @returns A pseudorandom integer greater than or equal to @p from and less than or equal to @p to.
+template<typename T> requires std::is_arithmetic_v<T>
+inline auto fastRandInc(T from, T to) noexcept { return from + fastRandInc(to - from); }
+
+
+//! @brief Returns true one in @p chance times at random.
+inline bool oneIn(unsigned chance) noexcept { return 0 == (fastRand() % chance); }
+
 
 //! Round `value` to `where` depending on step size
 template<class T>
@@ -180,25 +267,25 @@ inline float linearToLogScale(float min, float max, float value)
 	return std::isnan(result) ? 0 : result;
 }
 
+
 // TODO C++26: Make constexpr since std::exp() will be constexpr
-template<std::floating_point T>
+template<typename T> requires std::is_arithmetic_v<T>
 inline auto fastPow10f(T x)
 {
-	return std::exp(std::numbers::ln10_v<T> * x);
+	using F_T = std::conditional_t<std::is_floating_point_v<T>, T, float>;
+	return std::exp(std::numbers::ln10_v<F_T> * x);
 }
 
-// TODO C++26: Make constexpr since std::exp() will be constexpr
-inline auto fastPow10f(std::integral auto x)
-{
-	return std::exp(std::numbers::ln10_v<float> * x);
-}
 
 // TODO C++26: Make constexpr since std::log() will be constexpr
-inline auto fastLog10f(float x)
+template<typename T> requires std::is_arithmetic_v<T>
+inline auto fastLog10f(T x)
 {
-	constexpr auto inv_ln10 = static_cast<float>(1.0 / std::numbers::ln10);
+	using F_T = std::conditional_t<std::is_floating_point_v<T>, T, float>;
+	constexpr auto inv_ln10 = static_cast<F_T>(1.0 / std::numbers::ln10);
 	return std::log(x) * inv_ln10;
 }
+
 
 //! @brief Converts linear amplitude (>0-1.0) to dBFS scale. 
 //! @param amp Linear amplitude, where 1.0 = 0dBFS. ** Must be larger than zero! **

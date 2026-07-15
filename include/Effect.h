@@ -37,6 +37,7 @@
 namespace lmms
 {
 
+class AudioBuffer;
 class EffectChain;
 class EffectControls;
 
@@ -55,7 +56,6 @@ public:
 	Effect( const Plugin::Descriptor * _desc,
 			Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key );
-	~Effect() override;
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 	void loadSettings( const QDomElement & _this ) override;
@@ -66,7 +66,7 @@ public:
 	}
 
 	//! Returns true if audio was processed and should continue being processed
-	bool processAudioBuffer(SampleFrame* buf, const fpp_t frames);
+	bool processAudioBuffer(AudioBuffer& inOut);
 
 	inline bool isOkay() const
 	{
@@ -78,22 +78,13 @@ public:
 		m_okay = _state;
 	}
 
+	//! @returns true if the processing outputted corrupted audio (infs/nans).
+	bool isCorrupted() const { return m_corrupted.load(std::memory_order_relaxed); }
 
-	inline bool isRunning() const
+	//! "Awake" means the effect has not been put to sleep by auto-quit
+	bool isAwake() const
 	{
-		return m_running;
-	}
-
-	void startRunning()
-	{
-		m_quietBufferCount = 0;
-		m_running = true;
-	}
-
-	void stopRunning()
-	{
-		m_quietBufferCount = 0;
-		m_running = false;
+		return m_awake;
 	}
 
 	inline bool isEnabled() const
@@ -126,7 +117,12 @@ public:
 	{
 		m_noRun = _state;
 	}
-	
+
+	bool isProcessingAudio() const
+	{
+		return isEnabled() && isAwake() && isOkay() && !dontRun();
+	}
+
 	inline TempoSyncKnobModel* autoQuitModel()
 	{
 		return &m_autoQuitModel;
@@ -163,44 +159,32 @@ protected:
 	};
 
 	/**
-	 * The main audio processing method that runs when plugin is not asleep
+	 * The main audio processing method that runs when plugin is awake and running
 	 */
-	virtual ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) = 0;
+	virtual ProcessStatus processImpl(SampleFrame* buf, const f_cnt_t frames) = 0;
 
 	/**
-	 * Optional method that runs when plugin is sleeping (not enabled,
-	 * not running, not in the Okay state, or in the Don't Run state)
+	 * Optional method that runs instead of `processImpl` when an effect
+	 * is awake but not running.
 	 */
 	virtual void processBypassedImpl() {}
 
 
 	gui::PluginView* instantiateView( QWidget * ) override;
 
-	// some effects might not be capable of higher sample-rates so they can
-	// sample it down before processing and back after processing
-	inline void sampleDown( const SampleFrame* _src_buf,
-							SampleFrame* _dst_buf,
-							sample_rate_t _dst_sr )
+	void goToSleep()
 	{
-		resample( 0, _src_buf,
-				Engine::audioEngine()->outputSampleRate(),
-					_dst_buf, _dst_sr,
-					Engine::audioEngine()->framesPerPeriod() );
+		m_quietBufferCount = 0;
+		m_awake = false;
 	}
 
-	inline void sampleBack( const SampleFrame* _src_buf,
-							SampleFrame* _dst_buf,
-							sample_rate_t _src_sr )
+	void wakeUp()
 	{
-		resample( 1, _src_buf, _src_sr, _dst_buf,
-				Engine::audioEngine()->outputSampleRate(),
-			Engine::audioEngine()->framesPerPeriod() * _src_sr /
-				Engine::audioEngine()->outputSampleRate() );
+		m_quietBufferCount = 0;
+		m_awake = true;
 	}
-	void reinitSRC();
 
 	virtual void onEnabledChanged() {}
-
 
 private:
 	/**
@@ -208,18 +192,15 @@ private:
 	 * after "decay" ms of the output buffer remaining below the silence threshold, the effect is
 	 * turned off and won't be processed again until it receives new audio input.
 	 */
-	void handleAutoQuit(std::span<const SampleFrame> output);
+	void handleAutoQuit(bool silentOutput);
 
 
 	EffectChain * m_parent;
-	void resample( int _i, const SampleFrame* _src_buf,
-					sample_rate_t _src_sr,
-					SampleFrame* _dst_buf, sample_rate_t _dst_sr,
-					const f_cnt_t _frames );
 
 	bool m_okay;
 	bool m_noRun;
-	bool m_running;
+	bool m_awake;
+	std::atomic<bool> m_corrupted = false;
 
 	//! The number of consecutive periods where output buffers remain below the silence threshold
 	f_cnt_t m_quietBufferCount = 0;
@@ -229,10 +210,6 @@ private:
 	TempoSyncKnobModel m_autoQuitModel;
 
 	bool m_autoQuitEnabled = false;
-
-	SRC_DATA m_srcData[2];
-	SRC_STATE * m_srcState[2];
-
 
 	friend class gui::EffectView;
 	friend class EffectChain;

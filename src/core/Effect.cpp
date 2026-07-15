@@ -23,14 +23,15 @@
  *
  */
 
+#include "Effect.h"
+
 #include <QDomElement>
 
-#include "Effect.h"
+#include "AudioBuffer.h"
+#include "ConfigManager.h"
 #include "EffectChain.h"
 #include "EffectControls.h"
 #include "EffectView.h"
-
-#include "ConfigManager.h"
 #include "SampleFrame.h"
 
 namespace lmms
@@ -44,7 +45,7 @@ Effect::Effect( const Plugin::Descriptor * _desc,
 	m_parent( nullptr ),
 	m_okay( true ),
 	m_noRun( false ),
-	m_running( false ),
+	m_awake(false),
 	m_enabledModel( true, this, tr( "Effect enabled" ) ),
 	m_wetDryModel( 1.0f, -1.0f, 1.0f, 0.01f, this, tr( "Wet/Dry mix" ) ),
 	m_autoQuitModel( 1.0f, 1.0f, 8000.0f, 100.0f, 1.0f, this, tr( "Decay" ) ),
@@ -52,30 +53,10 @@ Effect::Effect( const Plugin::Descriptor * _desc,
 {
 	m_wetDryModel.setCenterValue(0);
 
-	m_srcState[0] = m_srcState[1] = nullptr;
-	reinitSRC();
-
 	// Call the virtual method onEnabledChanged so that effects can react to changes,
 	// e.g. by resetting state.
 	connect(&m_enabledModel, &BoolModel::dataChanged, [this] { onEnabledChanged(); });
 }
-
-
-
-
-Effect::~Effect()
-{
-	for (const auto& state : m_srcState)
-	{
-		if (state != nullptr)
-		{
-			src_delete(state);
-		}
-	}
-}
-
-
-
 
 void Effect::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
@@ -111,29 +92,57 @@ void Effect::loadSettings( const QDomElement & _this )
 
 
 
-bool Effect::processAudioBuffer(SampleFrame* buf, const fpp_t frames)
+bool Effect::processAudioBuffer(AudioBuffer& inOut)
 {
-	if (!isOkay() || dontRun() || !isEnabled() || !isRunning())
+	if (!isAwake())
 	{
+		if (!inOut.hasSignal(0b11))
+		{
+			// Sleeping plugins need to zero any track channels their output is routed to in order to
+			// prevent sudden track channel passthrough behavior when the plugin is put to sleep.
+			// Otherwise auto-quit could become audibly noticeable, which is not intended.
+
+			inOut.silenceChannels(0b11);
+
+			return false;
+		}
+
+		wakeUp();
+	}
+
+	if (!isProcessingAudio())
+	{
+		// Plugin is awake but not processing audio
 		processBypassedImpl();
 		return false;
 	}
 
-	const auto status = processImpl(buf, frames);
+	const auto status = processImpl(inOut.interleavedBuffer().asSampleFrames().data(), inOut.frames());
+
+	// Copy interleaved plugin output to planar
+	toPlanar(inOut.interleavedBuffer(), inOut.groupBuffers(0));
+
+	const auto sanitized = Engine::audioEngine()->sanitizationEnabled() ? inOut.sanitize(0b11) : false;
+	m_corrupted.store(sanitized, std::memory_order_relaxed);
+
+	// Update silence status for track channels the processor wrote to
+	const bool silentOutput = inOut.updateSilenceFlags(0b11);
+
 	switch (status)
 	{
 		case ProcessStatus::Continue:
 			break;
 		case ProcessStatus::ContinueIfNotQuiet:
-			handleAutoQuit({buf, frames});
+			handleAutoQuit(silentOutput);
 			break;
 		case ProcessStatus::Sleep:
+			goToSleep();
 			return false;
 		default:
 			break;
 	}
 
-	return isRunning();
+	return isAwake();
 }
 
 
@@ -162,55 +171,29 @@ Effect * Effect::instantiate( const QString& pluginName,
 
 
 
-void Effect::handleAutoQuit(std::span<const SampleFrame> output)
+void Effect::handleAutoQuit(bool silentOutput)
 {
 	if (!m_autoQuitEnabled)
 	{
 		return;
 	}
 
-	/*
-	 * In the past, the RMS was calculated then compared with a threshold of 10^(-10).
-	 * Now we use a different algorithm to determine whether a buffer is non-quiet, so
-	 * a new threshold is needed for the best compatibility. The following is how it's derived.
-	 *
-	 * Old method:
-	 * RMS = average (L^2 + R^2) across stereo buffer.
-	 * RMS threshold = 10^(-10)
-	 *
-	 * So for a single channel, it would be:
-	 * RMS/2 = average M^2 across single channel buffer.
-	 * RMS/2 threshold = 5^(-11)
-	 *
-	 * The new algorithm for determining whether a buffer is non-silent compares M with the threshold,
-	 * not M^2, so the square root of M^2's threshold should give us the most compatible threshold for
-	 * the new algorithm:
-	 *
-	 * (RMS/2)^0.5 = (5^(-11))^0.5 = 0.0001431 (approx.)
-	 *
-	 * In practice though, the exact value shouldn't really matter so long as it's sufficiently small.
-	 */
-	static constexpr auto threshold = 0.0001431f;
-
 	// Check whether we need to continue processing input. Restart the
 	// counter if the threshold has been exceeded.
 
-	for (const SampleFrame& frame : output)
+	if (silentOutput)
 	{
-		const auto abs = frame.abs();
-		if (abs.left() >= threshold || abs.right() >= threshold)
+		// The output buffer is quiet, so check if auto-quit should be activated yet
+		if (++m_quietBufferCount > timeout())
 		{
-			// The output buffer is not quiet
-			m_quietBufferCount = 0;
-			return;
+			// Activate auto-quit
+			goToSleep();
 		}
 	}
-
-	// The output buffer is quiet, so check if auto-quit should be activated yet
-	if (++m_quietBufferCount > timeout())
+	else
 	{
-		// Activate auto-quit
-		stopRunning();
+		// The output buffer is not quiet
+		m_quietBufferCount = 0;
 	}
 }
 
@@ -220,52 +203,6 @@ void Effect::handleAutoQuit(std::span<const SampleFrame> output)
 gui::PluginView * Effect::instantiateView( QWidget * _parent )
 {
 	return new gui::EffectView( this, _parent );
-}
-
-	
-
-
-void Effect::reinitSRC()
-{
-	for (auto& state : m_srcState)
-	{
-		if (state != nullptr)
-		{
-			src_delete(state);
-		}
-		int error;
-		const int currentInterpolation = Engine::audioEngine()->currentQualitySettings().libsrcInterpolation();
-		if((state = src_new(currentInterpolation, DEFAULT_CHANNELS, &error)) == nullptr)
-		{
-			qFatal( "Error: src_new() failed in effect.cpp!\n" );
-		}
-	}
-}
-
-
-
-
-void Effect::resample( int _i, const SampleFrame* _src_buf,
-							sample_rate_t _src_sr,
-				SampleFrame* _dst_buf, sample_rate_t _dst_sr,
-								f_cnt_t _frames )
-{
-	if( m_srcState[_i] == nullptr )
-	{
-		return;
-	}
-	m_srcData[_i].input_frames = _frames;
-	m_srcData[_i].output_frames = Engine::audioEngine()->framesPerPeriod();
-	m_srcData[_i].data_in = const_cast<float*>(_src_buf[0].data());
-	m_srcData[_i].data_out = _dst_buf[0].data ();
-	m_srcData[_i].src_ratio = (double) _dst_sr / _src_sr;
-	m_srcData[_i].end_of_input = 0;
-
-	if (int error = src_process(m_srcState[_i], &m_srcData[_i]))
-	{
-		qFatal( "Effect::resample(): error while resampling: %s\n",
-							src_strerror( error ) );
-	}
 }
 
 } // namespace lmms

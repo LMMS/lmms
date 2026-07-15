@@ -43,7 +43,7 @@ Plugin::Descriptor PLUGIN_EXPORT granularpitchshifter_plugin_descriptor =
 	"Lost Robot <r94231/at/gmail/dot/com>",
 	0x0100,
 	Plugin::Type::Effect,
-	new PluginPixmapLoader("logo"),
+	new PixmapLoader("lmms-plugin-logo"),
 	nullptr,
 	nullptr,
 } ;
@@ -61,7 +61,7 @@ GranularPitchShifterEffect::GranularPitchShifterEffect(Model* parent, const Desc
 }
 
 
-Effect::ProcessStatus GranularPitchShifterEffect::processImpl(SampleFrame* buf, const fpp_t frames)
+Effect::ProcessStatus GranularPitchShifterEffect::processImpl(SampleFrame* buf, const f_cnt_t frames)
 {
 	const float d = dryLevel();
 	const float w = wetLevel();
@@ -93,7 +93,7 @@ Effect::ProcessStatus GranularPitchShifterEffect::processImpl(SampleFrame* buf, 
 	const int sizeSamples = m_sampleRate / size;
 	const float waitMult = sizeSamples / (density * 2);
 
-	for (fpp_t f = 0; f < frames; ++f)
+	for (f_cnt_t f = 0; f < frames; ++f)
 	{
 		const double pitch = (pitchBuf ? pitchBuf->value(f) : m_granularpitchshifterControls.m_pitchModel.value()) * (1. / 12.);
 		const double pitchSpread = (pitchSpreadBuf ? pitchSpreadBuf->value(f) : m_granularpitchshifterControls.m_pitchSpreadModel.value()) * (1. / 24.);
@@ -156,7 +156,7 @@ Effect::ProcessStatus GranularPitchShifterEffect::processImpl(SampleFrame* buf, 
 		if (++m_timeSinceLastGrain >= m_nextWaitRandomization * waitMult)
 		{
 			m_timeSinceLastGrain = 0;
-			auto randThing = fastRand<double>(-1.0, +1.0);
+			auto randThing = fastRandInc<double>(-1.0, +1.0);
 			m_nextWaitRandomization = std::exp2(randThing * twitch);
 			double grainSpeed = 1. / std::exp2(randThing * jitter);
 

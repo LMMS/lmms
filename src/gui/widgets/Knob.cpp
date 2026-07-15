@@ -24,12 +24,13 @@
 
 #include "Knob.h"
 
+#include <QInputDialog>
 #include <QPainter>
-#include <numbers>
 
 #include "DeprecationHelper.h"
 #include "embed.h"
 #include "FontHelper.h"
+#include "lmms_math.h"
 
 #include <algorithm>
 
@@ -175,7 +176,7 @@ void Knob::updateFixedSize()
 		if (m_knobPixmap)
 		{
 			// In legacy mode only the width of the label is taken into account while the height is not
-			const int labelWidth = horizontalAdvance(QFontMetrics(adjustedToPixelSize(font(), SMALL_FONT_SIZE)), m_label);
+			const int labelWidth = QFontMetrics(adjustedToPixelSize(font(), SMALL_FONT_SIZE)).horizontalAdvance(m_label);
 			const int width = std::max(m_knobPixmap->width(), labelWidth);
 
 			// Legacy mode assumes that the label will fit into 10 pixels plus some of the pixmap area
@@ -196,7 +197,7 @@ void Knob::updateFixedSize()
 
 		auto fm = QFontMetrics(font());
 
-		const int width = std::max(pixmapSize.width(), horizontalAdvance(fm, m_label));
+		const int width = std::max(pixmapSize.width(), fm.horizontalAdvance(m_label));
 		const int height = pixmapSize.height() + fm.height();
 
 		setFixedSize(width, height);
@@ -491,7 +492,7 @@ void Knob::drawLabel(QPainter& p)
 			p.setFont(adjustedToPixelSize(p.font(), SMALL_FONT_SIZE));
 		}
 		auto fm = p.fontMetrics();
-		const auto x = (width() - horizontalAdvance(fm, m_label)) / 2;
+		const auto x = (width() - fm.horizontalAdvance(m_label)) / 2;
 		const auto descent = fixedFontSizeLabelRendering() ? 2 : fm.descent();
 		const auto y = height() - descent; 
 
@@ -530,6 +531,76 @@ void Knob::changeEvent(QEvent * ev)
 	}
 }
 
+QString VolumeKnob::currentValueToText()
+{
+	const auto* m = model();
+
+	// Using std::abs to support volume models that allow negative values.
+	// value == 0 is always assumed to be -inf.
+	const auto roundedValue = m->getRoundedValue();
+	const auto valueToVolumeRatio = std::abs(roundedValue) / m_zeroDbfsPoint;
+
+	// NOTE: The " dBFS" units are hardcoded here instead of being set by setUnit(),
+	//       allowing the model's context menu entries to display the correct units (usually "%").
+	//       This workaround should be revisited after the parameter text refactor (#8379).
+	if (valueToVolumeRatio == 0.) { return QStringLiteral("-∞ dBFS"); }
+
+	if (roundedValue > 0)
+	{
+		return QStringLiteral("%1 dBFS").arg(ampToDbfs(valueToVolumeRatio), 3, 'f', 2);
+	}
+	else
+	{
+		return QStringLiteral("%1 dBFS (inverted)").arg(ampToDbfs(valueToVolumeRatio), 3, 'f', 2);
+	}
+}
+
+QString VolumeKnob::getDynamicFloatingText(const QString& currentValue) const
+{
+	// Don't include the unit - the " dBFS" unit is included in currentValue
+	return m_description + ' ' + currentValue;
+}
+
+void VolumeKnob::enterValue()
+{
+	assert(m_zeroDbfsPoint > 0);
+
+	// Calculate the current value in dBFS
+	const auto roundedValue = model()->getRoundedValue();
+	const auto initalValue = std::abs(roundedValue) / m_zeroDbfsPoint;
+	const auto initialDbValue = initalValue > 0. ? ampToDbfs(initalValue) : -96;
+
+	// Calculate the upper bound in dBFS
+	const auto magnitude = roundedValue >= 0 ? model()->maxValue() : std::abs(model()->minValue());
+	const auto upperBound = ampToDbfs(magnitude / m_zeroDbfsPoint);
+
+	constexpr auto lowerBound = -96.0;
+
+	bool ok = false;
+	float newVal = QInputDialog::getDouble(
+		this,
+		tr("Set value"),
+		tr("Please enter a new value between %1 dBFS and %2 dBFS:")
+			.arg(lowerBound).arg(upperBound),
+		initialDbValue,
+		lowerBound,
+		upperBound,
+		model()->getDigitCount(),
+		&ok
+	);
+
+	if (!ok) { return; }
+
+	// Convert from dBFS back to amplitude
+	newVal = newVal <= lowerBound
+		? 0.0f
+		: dbfsToAmp(newVal) * m_zeroDbfsPoint;
+
+	// Support both positive and negative amplitudes
+	newVal = std::copysign(newVal, roundedValue);
+
+	model()->setValue(newVal);
+}
 
 void convertPixmapToGrayScale(QPixmap& pixMap)
 {

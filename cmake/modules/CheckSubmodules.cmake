@@ -7,7 +7,7 @@
 #       INCLUDE(CheckSubmodules)
 #
 # Options:
-#       SET(PLUGIN_LIST "ZynAddSubFx;...") # skips submodules for plugins not explicitely listed
+#       SET(PLUGIN_LIST "ZynAddSubFx;...") # skips submodules for plugins not explicitly listed
 #
 # Or via command line:       
 #       cmake -PLUGIN_LIST=foo;bar
@@ -43,7 +43,7 @@ SET(LANG_BACKUP "$ENV{LANG}")
 SET(ENV{LC_ALL} "C")
 SET(ENV{LANG} "en_US")
 
-# Submodule list pairs, unparsed (WARNING: Assumes alpha-numeric paths)
+# Submodule list pairs, unparsed (WARNING: Assumes alphanumeric paths)
 STRING(REGEX MATCHALL "path = [-0-9A-Za-z/]+" SUBMODULE_LIST_RAW ${SUBMODULE_DATA})
 STRING(REGEX MATCHALL "url = [.:%-0-9A-Za-z/]+" SUBMODULE_URL_RAW ${SUBMODULE_DATA})
 

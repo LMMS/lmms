@@ -210,9 +210,17 @@ void TrackContainer::removeTrack( Track * _track )
 		{
 			Engine::getSong()->setModified();
 		}
+		emit trackRemoved();
 	}
 }
 
+void TrackContainer::moveTrack(Track* track, int indexTo)
+{
+	m_tracks.erase(std::find(m_tracks.begin(), m_tracks.end(), track));
+	m_tracks.insert(m_tracks.begin() + indexTo, track);
+
+	emit trackMoved();
+}
 
 
 

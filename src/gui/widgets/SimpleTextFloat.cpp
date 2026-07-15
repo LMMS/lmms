@@ -39,7 +39,7 @@ SimpleTextFloat::SimpleTextFloat() :
 	QWidget(getGUI()->mainWindow(), Qt::ToolTip)
 {
 	QHBoxLayout * layout = new QHBoxLayout(this);
-	layout->setMargin(3);
+	layout->setContentsMargins(3, 3, 3, 3);
 	setLayout(layout);
 
 	m_textLabel = new QLabel(this);
@@ -76,8 +76,14 @@ void SimpleTextFloat::showWithDelay(int msecBeforeDisplay, int msecDisplayTime)
 	}
 }
 
+void SimpleTextFloat::show()
+{
+	QWidget::show();
+}
+
 void SimpleTextFloat::hide()
 {
+	m_source = nullptr;
 	m_showTimer->stop();
 	m_hideTimer->stop();
 	QWidget::hide();

@@ -204,19 +204,17 @@ public:
 		write( &_i, sizeof( _i ) );
 	}
 
-	inline std::string readString()
+	std::string readString()
 	{
+		std::string ret;
 		const int len = readInt();
-		if( len )
+		if (len > 0)
 		{
-			char * sc = new char[len + 1];
-			read( sc, len );
-			sc[len] = 0;
-			std::string s( sc );
-			delete[] sc;
-			return s;
+			ret.resize(static_cast<std::size_t>(len));
+			read(ret.data(), len);
+			ret[len] = '\0';
 		}
-		return std::string();
+		return ret;
 	}
 
 
@@ -248,20 +246,6 @@ public:
 
 
 private:
-	static inline void fastMemCpy( void * _dest, const void * _src,
-							const int _len )
-	{
-		// calling memcpy() for just an integer is obsolete overhead
-		if( _len == 4 )
-		{
-			*( (int32_t *) _dest ) = *( (int32_t *) _src );
-		}
-		else
-		{
-			memcpy( _dest, _src, _len );
-		}
-	}
-
 	void read( void * _buf, int _len )
 	{
 		if( isInvalid() )
@@ -279,7 +263,7 @@ private:
 #endif
 			lock();
 		}
-		fastMemCpy( _buf, m_data->data + m_data->startPtr, _len );
+		std::memcpy(_buf, m_data->data + m_data->startPtr, _len);
 		m_data->startPtr += _len;
 		// nothing left?
 		if( m_data->startPtr == m_data->endPtr )
@@ -315,7 +299,7 @@ private:
 #endif
 			lock();
 		}
-		fastMemCpy( m_data->data + m_data->endPtr, _buf, _len );
+		std::memcpy(m_data->data + m_data->endPtr, _buf, _len);
 		m_data->endPtr += _len;
 		unlock();
 	}
@@ -384,9 +368,10 @@ public:
 		{
 		}
 
-		inline message & addString( const std::string & _s )
+		template<class... Args>
+		message& addString(Args&&... args)
 		{
-			data.push_back( _s );
+			data.emplace_back(std::forward<Args>(args)...);
 			return *this;
 		}
 
@@ -494,19 +479,17 @@ public:
 		write( &_i, sizeof( _i ) );
 	}
 
-	inline std::string readString()
+	std::string readString()
 	{
+		std::string ret;
 		const int len = readInt();
-		if( len )
+		if (len > 0)
 		{
-			char * sc = new char[len + 1];
-			read( sc, len );
-			sc[len] = 0;
-			std::string s( sc );
-			delete[] sc;
-			return s;
+			ret.resize(static_cast<std::size_t>(len));
+			read(ret.data(), len);
+			ret[len] = '\0';
 		}
-		return std::string();
+		return ret;
 	}
 
 
