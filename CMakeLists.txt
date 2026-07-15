@@ -29,6 +29,11 @@ SET(LMMS_SOURCE_DIR ${CMAKE_SOURCE_DIR})
 # Import of windows.h breaks min()/max()
 ADD_DEFINITIONS(-DNOMINMAX)
 
+# Set symbol visibility
+set(CMAKE_C_VISIBILITY_PRESET hidden)
+set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+set(CMAKE_VISIBILITY_INLINES_HIDDEN ON)
+
 # CMAKE_CXX_IMPLICIT_INCLUDE_DIRECTORIES is not set correctly for MinGW until
 # CMake 3.14.1, so avoid specifying system include directories on affected
 # versions. Normal include directories are safe, since GCC ignores them if they
@@ -109,6 +114,83 @@ option(WANT_DEBUG_CPACK "Show detailed logs for packaging commands" OFF)
 option(WANT_CPACK_TARBALL "Request CPack to create a tarball instead of an installer" OFF)
 option(WANT_QT6 "Build with experimental Qt6 support" OFF)
 
+
+# Set the target microarchitecture
+if(TARGET_UARCH_FLAGS)
+	if(TARGET_UARCH AND NOT TARGET_UARCH STREQUAL "custom")
+		message(WARNING "Ignoring TARGET_UARCH since TARGET_UARCH_FLAGS was set")
+	endif()
+
+	set(_default_target_uarch "custom")
+	message(STATUS "Setting target microarchitecture to 'custom'")
+	message(STATUS "Target microarchitecture flags: ${TARGET_UARCH_FLAGS}")
+elseif(TARGET_UARCH)
+	message(STATUS "Setting target microarchitecture to '${TARGET_UARCH}'")
+else()
+	if(CMAKE_CROSSCOMPILING)
+		set(_default_target_uarch "none")
+	else()
+		set(_default_target_uarch "native")
+	endif()
+	message(STATUS "Setting target microarchitecture to '${_default_target_uarch}' as none was specified")
+endif()
+
+if(NOT TARGET_UARCH)
+	set(TARGET_UARCH ${_default_target_uarch} CACHE STRING "Choose the target microarchitecture" FORCE)
+	# Accepted options:
+	# - "none":     No microarchitecture is set. Uses the compiler default.
+	# - "official": Targets the baseline microarchitecture of official LMMS releases.
+	# - "custom":   Targets the microarchitecture specified by TARGET_UARCH_FLAGS.
+	# - "native":   Targets the highest microarchitecture level supported by the build machine.
+	set_property(CACHE TARGET_UARCH PROPERTY STRINGS "none" "official" "custom" "native")
+endif()
+
+if(TARGET_UARCH STREQUAL "custom" OR TARGET_UARCH_FLAGS)
+	add_compile_options(${TARGET_UARCH_FLAGS})
+elseif(TARGET_UARCH STREQUAL "none")
+	# Do nothing, use the compiler default
+elseif(TARGET_UARCH STREQUAL "official")
+	if(LMMS_HOST_X86_64)
+		if(MSVC)
+			# MSVC doesn't have /arch:x86-64-v2, but this is pretty close
+			add_compile_options(/arch:SSE4.2)
+		else()
+			add_compile_options(-march=x86-64-v2)
+		endif()
+	elseif(LMMS_HOST_ARM64)
+		if(LMMS_BUILD_WIN64)
+			# Using Windows 11 minimum requirements
+			# https://learn.microsoft.com/en-us/windows-hardware/design/minimum/minimum-hardware-requirements-overview
+			if(MSVC)
+				add_compile_options(/arch:armv8.1)
+			else()
+				add_compile_options(-march=armv8.1-a)
+			endif()
+		elseif(LMMS_BUILD_APPLE)
+			# Chosen for Apple M1 support
+			add_compile_options(-march=armv8.4-a)
+		else()
+			# Chosen for Raspberry Pi 4 support
+			add_compile_options(-march=armv8-a)
+		endif()
+	else()
+		message(WARNING "There are no official releases for the target architecture, so there is no official baseline microarchitecture")
+	endif()
+elseif(TARGET_UARCH STREQUAL "native")
+	if(CMAKE_CROSSCOMPILING)
+		message(FATAL_ERROR "Cannot target native microarchitecture while cross-compiling")
+	endif()
+
+	if(MSVC)
+		include(CheckCPUFeatures)
+		determine_msvc_native_arch(_arch_option)
+		if(NOT "${_arch_option}" STREQUAL "")
+			add_compile_options(${_arch_option})
+		endif()
+	else()
+		add_compile_options(-march=native -mtune=native)
+	endif()
+endif()
 
 IF(LMMS_BUILD_APPLE)
 	# Fix linking on 10.14+. See issue #4762 on github
@@ -666,10 +748,10 @@ SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DLMMS_DEBUG")
 SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DLMMS_DEBUG")
 
 if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
-    add_compile_definitions(NDEBUG)
+	add_compile_definitions(NDEBUG)
 	SET(STATUS_ASSERTIONS "Disabled")
 else()
-    remove_definitions(-DNDEBUG)
+	remove_definitions(-DNDEBUG)
 	SET(STATUS_ASSERTIONS "Enabled")
 endif()
 
