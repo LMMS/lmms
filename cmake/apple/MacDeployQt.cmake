@@ -113,6 +113,19 @@ file(GLOB LADSPA "${APP}/Contents/lib/${lmms}/ladspa/*.so")
 # Inform macdeployqt about remote plugins
 file(GLOB REMOTE_PLUGINS "${APP}/Contents/MacOS/*Remote*")
 
+# Bundle SDL3 if present per https://github.com/libsdl-org/sdl2-compat/issues/611
+# Note, we can't use find_package() from CPack due to missing add_library and friends :(
+# FIXME: Remove when SDL3 is default
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(SDL3 QUIET sdl3)
+if(SDL3_FOUND AND SDL3_LIBRARY_DIRS AND SDL3_LIBRARIES)
+	set(SDL3_RESOLVED_PATH "${SDL3_LIBRARY_DIRS}/lib${SDL3_LIBRARIES}.dylib")
+	if(EXISTS "${SDL3_RESOLVED_PATH}")
+		message(STATUS "Adding SDL3 via PkgConfig: ${SDL3_RESOLVED_PATH}")
+		list(APPEND LIBS "${SDL3_RESOLVED_PATH}")
+	endif()
+endif()
+
 # Collect, sort and dedupe all libraries
 list(APPEND LIBS ${LADSPA})
 list(APPEND LIBS ${REMOTE_PLUGINS})
