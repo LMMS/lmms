@@ -104,7 +104,7 @@ public:
 
 private:
 	f_cnt_t m_frames = 0;
-	sample_rate_t m_sampleRate = 0;
+	sample_rate_t m_sampleRate = 44100;
 	QString m_path;
 	inline static const auto emptyBuffer = std::make_shared<SampleFrame[]>(0);
 	std::shared_ptr<SampleFrame[]> m_data = emptyBuffer;
