@@ -808,6 +808,42 @@ void PianoRoll::reverseNotes()
 	Engine::getSong()->setModified();
 }
 
+void PianoRoll::duplicateNotesOver()
+{
+	if (!hasValidMidiClip()) { return; }
+
+	// Operate on selected notes (or all notes if none are selected)
+	NoteVector selectedNotes = getSelectedNotes();
+	if (selectedNotes.empty()) { selectedNotes = m_midiClip->notes(); }
+	if (selectedNotes.empty()) { return; }
+	m_midiClip->addJournalCheckPoint();
+
+	// Duplicate each note and select them
+	NoteVector newNotes;
+	for (Note* note : selectedNotes)
+	{
+		Note* newNote = m_midiClip->addNote(*note, false);
+		newNote->setSelected(true);
+		newNotes.push_back(newNote);
+	}
+
+	// Deselect original notes
+	for (Note* note : selectedNotes) { note->setSelected(false); }
+
+	// Shift new notes to be after original notes
+	// (newNotes.back() can be changed to m_midiClip->notes().back() if preferred)
+	TimePos offset = newNotes.back()->endPos() - newNotes.front()->pos();
+	for (Note* note : newNotes) { note->setPos(note->pos() + offset); }
+
+	// Flag/trigger updates
+	Engine::getSong()->setModified();
+	m_midiClip->rearrangeAllNotes();
+	m_midiClip->updateLength();
+	m_midiClip->dataChanged();
+	update();
+	getGUI()->songEditor()->update();
+}
+
 
 void PianoRoll::loadMarkedSemiTones(const QDomElement & de)
 {
@@ -5308,6 +5344,10 @@ PianoRollWindow::PianoRollWindow() :
 	connect(reverseAction, &QAction::triggered, [this](){ m_editor->reverseNotes(); });
 	reverseAction->setShortcut(keySequence(Qt::SHIFT, Qt::Key_R));
 
+	auto duplicateOverAction = new QAction(embed::getIconPixmap("edit_duplicate_over"), tr("Duplicate Over"), noteToolsButton);
+	connect(duplicateOverAction, &QAction::triggered, [this](){ m_editor->duplicateNotesOver(); });
+	duplicateOverAction->setShortcut(keySequence(Qt::CTRL, Qt::Key_D));
+
 	noteToolsButton->addAction(glueAction);
 	noteToolsButton->addAction(knifeAction);
 	noteToolsButton->addAction(strumAction);
@@ -5316,6 +5356,7 @@ PianoRollWindow::PianoRollWindow() :
 	noteToolsButton->addAction(minLengthAction);
 	noteToolsButton->addAction(maxLengthAction);
 	noteToolsButton->addAction(reverseAction);
+	noteToolsButton->addAction(duplicateOverAction);
 
 	notesActionsToolBar->addWidget(noteToolsButton);
 
