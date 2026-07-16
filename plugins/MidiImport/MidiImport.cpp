@@ -334,13 +334,13 @@ bool MidiImport::readSMF(TrackContainer* tc)
 		Alg_beats& beats = timeMap->beats;
 		for (int i = 0; i < beats.len - 1; ++i)
 		{
-			Alg_beat_ptr b = &(beats[i]);
+			Alg_beat *b = &(beats[i]);
 			double tempo = (beats[i + 1].beat - b->beat) / (beats[i + 1].time - beats[i].time);
 			tap->putValue(b->beat * ticksPerBeat, tempo * 60.0);
 		}
 		if (timeMap->last_tempo_flag)
 		{
-			Alg_beat_ptr b = &beats[beats.len - 1];
+			Alg_beat *b = &beats[beats.len - 1];
 			tap->putValue(b->beat * ticksPerBeat, timeMap->last_tempo * 60.0);
 		}
 	}
@@ -352,7 +352,7 @@ bool MidiImport::readSMF(TrackContainer* tc)
 	// Song events
 	for (int e = 0; e < seq->length(); ++e)
 	{
-		Alg_event_ptr evt = (*seq)[e];
+		Alg_event *evt = (*seq)[e];
 
 		if (evt->is_update())
 		{
@@ -365,7 +365,7 @@ bool MidiImport::readSMF(TrackContainer* tc)
 	for (int t = 0; t < seq->tracks(); ++t)
 	{
 		QString trackName = QString(tr("Track") + " %1").arg(t);
-		Alg_track_ptr trk = seq->track(t);
+		Alg_track *trk = seq->track(t);
 		pd.setValue(t + preTrackSteps);
 
 		for (auto& cc : ccs) { cc.clear(); }
@@ -373,7 +373,7 @@ bool MidiImport::readSMF(TrackContainer* tc)
 		// Now look at events
 		for (int e = 0; e < trk->length(); ++e)
 		{
-			Alg_event_ptr evt = (*trk)[e];
+			Alg_event *evt = (*trk)[e];
 
 			if (evt->chan == -1)
 			{
@@ -408,7 +408,7 @@ bool MidiImport::readSMF(TrackContainer* tc)
 				// LMMS does not currently support specifying the channel of a single note
 				// To be safe, put the notes from different channels on separate tracks so that no information is lost
 				smfMidiChannel* ch = chs[evt->chan + 16 * t].create(tc, trackName);
-				auto noteEvt = dynamic_cast<Alg_note_ptr>(evt);
+				auto noteEvt = static_cast<Alg_note*>(evt);
 				tick_t ticks = noteEvt->get_duration() * ticksPerBeat;
 				Note n(
 					ticks < 1 ? 1 : ticks,
