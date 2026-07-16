@@ -33,6 +33,7 @@
 #include "ComboBoxModel.h"
 #include "Editor.h"
 #include "JournallingObject.h"
+#include "MidiClip.h"
 #include "SampleClip.h"
 #include "TimePos.h"
 #include "LmmsTypes.h"
@@ -43,9 +44,6 @@ class QScrollBar;
 
 namespace lmms
 {
-
-class MidiClip;
-
 namespace gui
 {
 
@@ -232,7 +230,7 @@ private:
 	float m_bottomLevel;
 	float m_topLevel;
 
-	MidiClip* m_ghostNotes = nullptr;
+	QPointer<MidiClip> m_ghostNotes = nullptr; // QPointer to set to nullptr on deletion
 	QPointer<SampleClip> m_ghostSample = nullptr; // QPointer to set to nullptr on deletion
 	bool m_renderSample = false;
 
