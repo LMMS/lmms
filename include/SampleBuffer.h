@@ -44,10 +44,10 @@ namespace lmms {
  * It enforces shared ownership: copying a SampleBuffer increments a ref count for the shared audio data rather than
  * deep copying it.
  *
- * @warning This class is immutable. If you need a buffer for real-time
- * effect processing or mixing, use @ref AudioBuffer instead.
+ * @warning This class is immutable and is meant for accessing audio data from samples. If you need a buffer for
+ * real-time effect processing or mixing, use @ref AudioBuffer instead.
  *
- * @note Populated via static factory methods @ref fromFile() and @ref fromBase64().
+ * @invariant A SampleBuffer is always either empty or not empty.
  */
 class LMMS_EXPORT SampleBuffer
 {
@@ -71,19 +71,31 @@ public:
 	 */
 	auto toBase64() const -> QString;
 
-	/** @returns true if the buffer contains no audio data. */
+	/** @returns true if the buffer is empty, false otherwise. */
 	auto empty() const -> bool { return m_frames == 0; }
 
-	/** @returns direct access to the raw audio data. */
+	/** @returns direct access to the raw audio data.
+		@invariant If this buffer is empty, data() == nullptr
+		@invariant If this buffer is not empty, data() != nullptr
+	*/
 	auto data() const -> const SampleFrame* { return m_data.get(); }
 
-	/** @returns the file path associated with this buffer, if any. */
+	/** @returns the file path associated with this buffer, if any.
+		@invariant this function is guaranteed to give back a non empty string pointing to a valid path
+		when loaded successfully via @ref fromFile.
+	*/
 	auto path() const -> const QString& { return m_path; }
 
-	/** @returns the total number of audio frames. */
+	/** @returns the total number of audio frames.
+		@invariant If this buffer is empty, frames() == 0
+		@invariant If this buffer is not empty, frames() > 0
+	*/
 	auto frames() const -> f_cnt_t { return m_frames; }
 
-	/** @returns the original sample rate of the data. */
+	/** @returns the original sample rate of the data.
+		@invariant If this buffer is empty, sampleRate() == 0
+		@invariant If this buffer is not empty, sampleRate() > 0
+	*/
 	auto sampleRate() const -> sample_rate_t { return m_sampleRate; }
 
 	/**
@@ -103,11 +115,10 @@ public:
 	static std::optional<SampleBuffer> fromBase64(const QString& str, sample_rate_t sampleRate);
 
 private:
-	f_cnt_t m_frames = 0;
-	sample_rate_t m_sampleRate = 44100;
 	QString m_path;
-	inline static const auto emptyBuffer = std::make_shared<SampleFrame[]>(0);
-	std::shared_ptr<SampleFrame[]> m_data = emptyBuffer;
+	f_cnt_t m_frames = 0;
+	sample_rate_t m_sampleRate = 0;
+	std::shared_ptr<SampleFrame[]> m_data;
 };
 
 } // namespace lmms

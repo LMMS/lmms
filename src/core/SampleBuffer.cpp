@@ -37,11 +37,22 @@ namespace lmms {
 // Use aliasing constructor for std::shared_ptr to share ownership of a newly allocated vector without double
 // indirection when accessing samples (in the case of a vector in a shared pointer)
 SampleBuffer::SampleBuffer(std::vector<SampleFrame> data, sample_rate_t sampleRate, const QString& path)
-	: m_frames(data.size())
+	: m_path(path)
+	, m_frames(data.size())
 	, m_sampleRate(sampleRate)
-	, m_path(path)
 	, m_data(data.data(), [v = std::move(data)](auto) {})
 {
+	if (m_frames == 0)
+	{
+		assert(m_sampleRate == 0 && m_data == nullptr
+			&& "An empty buffer must have a sample rate of 0 and contain no audio data");
+	}
+
+	if (m_frames > 0)
+	{
+		assert(m_sampleRate > 0 && m_data != nullptr
+			&& "A non-empty buffer must have a sample rate greater than 0 and contain audio data");
+	}
 }
 
 QString SampleBuffer::toBase64() const

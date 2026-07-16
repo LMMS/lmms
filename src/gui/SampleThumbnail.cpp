@@ -72,6 +72,8 @@ SampleThumbnail::Thumbnail SampleThumbnail::Thumbnail::zoomOut(float factor) con
 SampleThumbnail::SampleThumbnail(const SampleBuffer& buffer)
 	: m_buffer(buffer)
 {
+	if (m_buffer.empty()) { return; }
+
 	auto entry = SampleThumbnailEntry{buffer.path(), QFileInfo{buffer.path()}.lastModified()};
 	if (!entry.filePath.isEmpty())
 	{
@@ -104,6 +106,8 @@ SampleThumbnail::SampleThumbnail(const SampleBuffer& buffer)
 
 void SampleThumbnail::visualize(VisualizeParameters parameters, QPainter& painter) const
 {
+	if (m_buffer.empty()) { return; }
+
 	const auto& sampleRect = parameters.sampleRect;
 	const auto& viewportRect = parameters.viewportRect.isNull() ? sampleRect : parameters.viewportRect;
 
