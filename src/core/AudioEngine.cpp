@@ -218,7 +218,7 @@ void AudioEngine::renderStageNoteSetup()
 
 		if( it != m_playHandles.end() )
 		{
-			(*it)->audioBusHandle()->removePlayHandle(*it);
+			if ((*it)->audioBusHandle()) { (*it)->audioBusHandle()->removePlayHandle(*it); }
 			if((*it)->type() == PlayHandle::Type::NotePlayHandle)
 			{
 				NotePlayHandleManager::release((NotePlayHandle*)*it);
@@ -281,7 +281,7 @@ void AudioEngine::renderStageEffects()
 		}
 		if( ( *it )->isFinished() )
 		{
-			(*it)->audioBusHandle()->removePlayHandle(*it);
+			if ((*it)->audioBusHandle()) { (*it)->audioBusHandle()->removePlayHandle(*it); }
 			if((*it)->type() == PlayHandle::Type::NotePlayHandle)
 			{
 				NotePlayHandleManager::release((NotePlayHandle*)*it);
@@ -444,6 +444,10 @@ void AudioEngine::restoreAudioDevice()
 }
 
 
+bool AudioEngine::captureDeviceAvailable() const
+{
+	return audioDev()->supportsCapture();
+}
 
 
 void AudioEngine::removeAudioBusHandle(AudioBusHandle* busHandle)
@@ -467,7 +471,7 @@ bool AudioEngine::addPlayHandle( PlayHandle* handle )
 	if (handle->type() == PlayHandle::Type::InstrumentPlayHandle || !criticalXRuns())
 	{
 		m_newPlayHandles.push( handle );
-		handle->audioBusHandle()->addPlayHandle(handle);
+		if (handle->audioBusHandle()) { handle->audioBusHandle()->addPlayHandle(handle); }
 		return true;
 	}
 
@@ -488,7 +492,7 @@ void AudioEngine::removePlayHandle(PlayHandle * ph)
 	// which were created in a thread different than the audio engine thread
 	if (ph->affinityMatters() && ph->affinity() == QThread::currentThread())
 	{
-		ph->audioBusHandle()->removePlayHandle(ph);
+		if (ph->audioBusHandle()) { ph->audioBusHandle()->removePlayHandle(ph); }
 		bool removedFromList = false;
 		// Check m_newPlayHandles first because doing it the other way around
 		// creates a race condition
@@ -547,7 +551,7 @@ void AudioEngine::removePlayHandlesOfTypes(Track * track, PlayHandle::Types type
 	{
 		if ((*it)->isFromTrack(track) && ((*it)->type() & types))
 		{
-			(*it)->audioBusHandle()->removePlayHandle(*it);
+			if ((*it)->audioBusHandle()) { (*it)->audioBusHandle()->removePlayHandle(*it); }
 			if((*it)->type() == PlayHandle::Type::NotePlayHandle)
 			{
 				NotePlayHandleManager::release((NotePlayHandle*)*it);

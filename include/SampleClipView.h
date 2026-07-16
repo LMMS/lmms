@@ -62,6 +62,7 @@ protected:
 	void mouseDoubleClickEvent( QMouseEvent * ) override;
 	void paintEvent( QPaintEvent * ) override;
 
+	bool recordingCapabilitiesAvailable() const;
 
 private:
 	SampleClip * m_clip;
