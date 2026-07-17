@@ -34,6 +34,7 @@ EXCLUDE                = @CMAKE_SOURCE_DIR@/../src/3rdparty \
                          @CMAKE_SOURCE_DIR@/../plugins/CarlaBase/carla \
                          @CMAKE_SOURCE_DIR@/../plugins/FreeBoy/game-music-emu \
                          @CMAKE_SOURCE_DIR@/../plugins/LadspaEffect/calf/veal \
+                         @CMAKE_SOURCE_DIR@/../plugins/LadspaEffect/caps \
                          @CMAKE_SOURCE_DIR@/../plugins/LadspaEffect/cmt/cmt \
                          @CMAKE_SOURCE_DIR@/../plugins/LadspaEffect/swh/ladspa \
                          @CMAKE_SOURCE_DIR@/../plugins/LadspaEffect/tap/tap-plugins \
