@@ -271,10 +271,22 @@ void TrackContentWidget::changePosition( const TimePos & newPos )
 	{
 		Clip* clip = clipView->getClip();
 
-		clip->changeLength( clip->length() );
+		/*
+		 * /!\ Msg for reviewers: /!\
+			* I am removing this line bc I don't understand its purpose and
+			* it is the source of a bug introduced by this PR's previous commits:
+				* Clip::changeLength is calling ClipView::updateLength (with the signal lengthChanged)
+				* BUT ClipView::updateLength is deleting the view object for loop views that are no
+				* longer necessary. If this happen, clipView become a dangling reference and a
+				* segmentation fault is raised at line 299.
+			* After some testing, I don't see any difference with and without this line. That being said,
+			* I believe it was writen for a reason, but it is hard to find the commit that introduced it.
+			* There might be a better way to solve the bug mentionned above with some code restructuring.
+		 */
+		// clip->changeLength( clip->length() );
 
-		const int ts = clip->startPosition();
-		const int te = clip->endPosition()-3;
+		const int ts = clip->startPosition() + clipView->offset() * clip->length();
+		const int te = clip->endPosition()-3 + clipView->offset() * clip->length();
 		if( ( ts >= begin && ts <= end ) ||
 			( te >= begin && te <= end ) ||
 			( ts <= begin && te >= end ) )
