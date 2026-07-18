@@ -29,6 +29,8 @@
 #include <QMenu>
 #include <QPainter>
 
+#include <algorithm>
+
 #include "AutomationClip.h"
 #include "Clipboard.h"
 #include "DataFile.h"
@@ -194,12 +196,9 @@ void TrackContentWidget::addClipView( ClipView * clipv )
  */
 void TrackContentWidget::removeClipView( ClipView * clipv )
 {
-	clipViewVector::iterator it = std::find( m_clipViews.begin(),
-						m_clipViews.end(),
-						clipv );
-	if( it != m_clipViews.end() )
+	if (auto it = std::ranges::find(m_clipViews, clipv); it != m_clipViews.end())
 	{
-		m_clipViews.erase( it );
+		m_clipViews.erase(it);
 		Engine::getSong()->setModified();
 	}
 }
@@ -384,10 +383,8 @@ bool TrackContentWidget::canPasteSelection( TimePos clipPos, const QMimeData* md
 
 	// Get the current track's index
 	const TrackContainer::TrackList& tracks = t->trackContainer()->tracks();
-	const auto currentTrackIt = std::find(tracks.begin(), tracks.end(), t);
+	const auto currentTrackIt = std::ranges::find(tracks, t);
 	const int currentTrackIndex = currentTrackIt != tracks.end() ? std::distance(tracks.begin(), currentTrackIt) : -1;
-
-	// Don't paste if we're on the same bar and allowSameBar is false
 	auto sourceTrackContainerId = metadata.attributeNode( "trackContainerId" ).value().toUInt();
 	if( !allowSameBar && sourceTrackContainerId == t->trackContainer()->id() &&
 			clipPos == grabbedClipBar && currentTrackIndex == initialTrackIndex )
@@ -483,7 +480,7 @@ bool TrackContentWidget::pasteSelection( TimePos clipPos, const QMimeData * md, 
 
 	// Snap the mouse position to the beginning of the dropped bar, in ticks
 	const TrackContainer::TrackList& tracks = getTrack()->trackContainer()->tracks();
-	const auto currentTrackIt = std::find(tracks.begin(), tracks.end(), getTrack());
+	const auto currentTrackIt = std::ranges::find(tracks, getTrack());
 	const int currentTrackIndex = currentTrackIt != tracks.end() ? std::distance(tracks.begin(), currentTrackIt) : -1;
 
 	bool wasSelection = m_trackView->trackContainerView()->rubberBand()->selectedObjects().count();

@@ -598,8 +598,7 @@ bool DataFile::hasLocalPlugins(QDomElement parent /* = QDomElement()*/, bool fir
 
 DataFile::Type DataFile::type( const QString& typeName )
 {
-	const auto it = std::find_if(s_types.begin(), s_types.end(),
-		[&typeName](const TypeDescStruct& type) { return type.m_name == typeName; });
+	const auto it = std::ranges::find(s_types, typeName, &TypeDescStruct::m_name);
 	if (it != s_types.end()) { return it->m_type; }
 
 	// compat code

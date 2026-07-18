@@ -288,23 +288,13 @@ void MidiClipView::mergeClips(QVector<ClipView*> clipvs)
 	track->saveJournallingState(false);
 
 	// Find the earliest position of all the selected ClipVs
-	const auto earliestClipV = std::min_element(clipvs.constBegin(), clipvs.constEnd(),
-		[](ClipView* a, ClipView* b)
-		{
-			return a->getClip()->startPosition() <
-				b->getClip()->startPosition();
-		}
-	);
+	const auto earliestClipV = std::ranges::min_element(clipvs, {},
+		[](ClipView* c) { return c->getClip()->startPosition(); });
 	const TimePos earliestPos = (*earliestClipV)->getClip()->startPosition();
 
 	// Find the latest position of all the selected ClipVs
-	const auto latestClipV = std::max_element(clipvs.constBegin(), clipvs.constEnd(),
-	[](ClipView* a, ClipView* b)
-	{
-		return a->getClip()->endPosition() <
-			b->getClip()->endPosition();
-	}
-	);
+	const auto latestClipV = std::ranges::max_element(clipvs, {},
+		[](ClipView* c) { return c->getClip()->endPosition(); });
 	const TimePos latestPos = (*latestClipV)->getClip()->endPosition();
 
 

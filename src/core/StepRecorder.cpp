@@ -22,6 +22,8 @@
 
 #include <QKeyEvent>
 
+#include <vector>
+
 #include "MidiClip.h"
 #include "StepRecorderWidget.h"
 #include "PianoRoll.h"
@@ -304,7 +306,7 @@ void StepRecorder::removeNotesReleasedForTooLong()
 		}
 	}
 
-	m_curStepNotes.erase(std::remove_if(m_curStepNotes.begin(), m_curStepNotes.end(), [](auto stepNote)
+	std::erase_if(m_curStepNotes, [](auto stepNote)
 	{
 		bool shouldRemove = stepNote->isReleased() && stepNote->timeSinceReleased() >= REMOVE_RELEASED_NOTE_TIME_THRESHOLD_MS;
 		if (shouldRemove)
@@ -313,7 +315,7 @@ void StepRecorder::removeNotesReleasedForTooLong()
 		}
 
 		return shouldRemove;
-	}), m_curStepNotes.end());
+	});
 
 	if(notesRemoved)
 	{
