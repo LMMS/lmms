@@ -38,14 +38,13 @@ namespace lmms {
 /**
  * @class SampleBuffer
  *
- * @brief A thread-safe, reference-counted container of immutable PCM audio data.
+ * @brief A shared container of immutable PCM audio data.
  *
- * SampleBuffer is designed for playback of audio files or Base64 assets possibly across multiple threads.
- * It enforces shared ownership: copying a SampleBuffer increments a ref count for the shared audio data rather than
- * deep copying it.
+ * SampleBuffer is meant to be used for storing audio from user samples or Base64 assets. It enforces shared
+ * ownership: copying a SampleBuffer increments a ref count for the shared audio data rather than deep copying it.
  *
- * @warning This class is immutable and is meant for accessing audio data from samples. If you need a buffer for
- * real-time effect processing or mixing, use @ref AudioBuffer instead.
+ * @warning This class is immutable. If you need a mutable buffer for
+ * realtime audio processing, use @ref AudioBuffer instead.
  *
  * @invariant A SampleBuffer is always either empty or not empty.
  */
