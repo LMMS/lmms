@@ -68,6 +68,10 @@
 		{
 			"name": "zlib",
 			"default-features": false
+		},
+		{
+			"name": "pkgconf",
+			"default-features": false
 		}
 	]
 }
