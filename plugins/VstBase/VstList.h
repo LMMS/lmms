@@ -17,7 +17,7 @@ class VSTBASE_EXPORT VstList
 public:
 	struct Metadata
 	{
-		using Checksum = std::bitset<128>; // md5
+		using Checksum = std::bitset<256>; // sha256
 
 		std::filesystem::path path;
 		Checksum file_checksum;

@@ -29,7 +29,7 @@ lmms::VstList::Metadata::Checksum checksum(fs::path filePath)
 	QFile file{filePath};
 #endif
 	if (!file.open(QFile::ReadOnly)) { return 0; }
-	QCryptographicHash hash{QCryptographicHash::Md5};
+	QCryptographicHash hash{QCryptographicHash::Sha256};
 	if (!hash.addData(&file)) { return 0; }
 
 	lmms::VstList::Metadata::Checksum out;
@@ -262,7 +262,7 @@ std::vector<VstList::Metadata> VstList::effectPlugins()
 }
 
 
-constexpr uint32_t CACHE_VER = 2; // increment this when changing the functions' output
+constexpr uint32_t CACHE_VER = 3; // increment this when changing the functions' output
 
 // `saveCache` and `loadCache` implementations should be kept in sync
 // All values should be dumped because cache existing for a file implies
