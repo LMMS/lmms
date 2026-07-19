@@ -22,7 +22,6 @@
  *
  */
 
-#include "SetupDialog.h"
 
 #include <QCheckBox>
 #include <QComboBox>
@@ -40,6 +39,7 @@
 #include "MainWindow.h"
 #include "MidiSetupWidget.h"
 #include "ProjectJournal.h"
+#include "SetupDialog.h"
 #include "TabBar.h"
 #include "TabButton.h"
 #include "TimeLineWidget.h"
