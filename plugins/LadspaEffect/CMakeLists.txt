@@ -3,6 +3,8 @@ INCLUDE(BuildPlugin)
 BUILD_PLUGIN(ladspaeffect LadspaEffect.cpp LadspaControls.cpp LadspaControlDialog.cpp LadspaMatrixControlDialog.cpp LadspaSubPluginFeatures.cpp LadspaWidgetFactory.cpp LadspaEffect.h LadspaControls.h LadspaControlDialog.h LadspaMatrixControlDialog.h LadspaSubPluginFeatures.h LadspaWidgetFactory.h MOCFILES LadspaEffect.h LadspaControls.h LadspaControlDialog.h LadspaMatrixControlDialog.h EMBEDDED_RESOURCES logo.png)
 
 SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/ladspa")
+set(CMAKE_C_VISIBILITY_PRESET default)
+set(CMAKE_CXX_VISIBILITY_PRESET default)
 
 IF(LMMS_HAVE_CAPS)
 ADD_SUBDIRECTORY(caps)
