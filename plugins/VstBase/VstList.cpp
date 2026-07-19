@@ -8,12 +8,14 @@
 #include <string>
 #include <vector>
 
-#include <QString>
-#include <QFile>
+#include <QCoreApplication>
 #include <QCryptographicHash>
+#include <QFile>
 #include <QStandardPaths>
+#include <QString>
 
 #include "ConfigManager.h"
+#include "GuiApplication.h"
 #include "lmmsconfig.h"
 
 namespace fs = std::filesystem;
@@ -159,6 +161,7 @@ void VstList::scanDirRecursive(fs::path dirPath, bool loadNewlyFound)
 			{
 				continue;
 			}
+			gui::getGUI()->displayInitProgress(QCoreApplication::translate("lmms::VstList", "Scanning VSTs: %1").arg(path.string()));
 
 			if (ConfigManager::inst()->value("app", "vstscanexec", "0").toInt()) {
 				// This is very slow and should be optimized more.
