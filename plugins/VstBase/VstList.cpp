@@ -72,34 +72,6 @@ namespace VstPaths
 	const fs::path Wine64 = toWinePath(Win64);
 }
 
-// enum to determine order of preference for VST dirs
-// int comparison is used so this isn't an enum class
-// 0 is most favorable
-enum VstPreferenceType
-{
-	NativeUser,
-	Native64,
-	Native32,
-	WineUser,
-	Wine64,
-	Wine32,
-};
-
-VstPreferenceType prefType(const lmms::VstList::Metadata& data)
-{
-#ifdef LMMS_BUILD_WIN32
-	if (isSubPath(data.path, VstPaths::Win64)) { return Native64; }
-	return NativeUser;
-#else
-	if      (isSubPath(data.path, VstPaths::Linux64)) { return Native64; }
-	else if (isSubPath(data.path, VstPaths::Linux32)) { return Native32; }
-	else if (!VstPaths::Wine64.empty() && isSubPath(data.path, VstPaths::Wine64))  { return Wine64; }
-	else if (data.path.extension() == ".dll") { return WineUser; }
-	return NativeUser;
-#endif
-}
-
-
 // helpers for cache I/O
 
 template<typename T>
@@ -242,20 +214,9 @@ void VstList::scanDirRecursive(fs::path dirPath, bool loadNewlyFound)
 				addPlugin({
 					path,
 					chksum,
-					Metadata::PluginType::Instrument,
-					"????",
-					name,
-					name,
+					Metadata::PluginType::Unknown,
 					"",
-				});
-				addPlugin({
-					path,
-					chksum,
-					Metadata::PluginType::Effect,
-					"????",
 					name,
-					name,
-					"",
 				});
 			}
 		}
@@ -265,10 +226,9 @@ void VstList::scanDirRecursive(fs::path dirPath, bool loadNewlyFound)
 
 void VstList::addPlugin(Metadata data)
 {
-	if (data.type != Metadata::PluginType::NotVst
-		&& (!m_plugins.contains(data.ID) || prefType(data) < prefType(m_plugins[data.ID])))
+	if (data.type != Metadata::PluginType::NotVst)
 	{
-		m_plugins.insert_or_assign(data.ID, data);
+		m_plugins.insert_or_assign(data.file_checksum, data);
 	}
 }
 
@@ -277,7 +237,10 @@ std::vector<VstList::Metadata> VstList::instrumentPlugins()
 {
 	std::vector<VstList::Metadata> out;
 	for (const auto& [_, data] : m_plugins
-		| std::views::filter([](const auto& elem){return elem.second.type == Metadata::PluginType::Instrument;}))
+		| std::views::filter([](const auto& elem){
+			return elem.second.type == Metadata::PluginType::Instrument
+				|| elem.second.type == Metadata::PluginType::Unknown;
+		}))
 	{
 		out.push_back(data);
 	}
@@ -288,7 +251,10 @@ std::vector<VstList::Metadata> VstList::effectPlugins()
 {
 	std::vector<VstList::Metadata> out;
 	for (const auto& [_, data] : m_plugins
-		| std::views::filter([](const auto& elem){return elem.second.type == Metadata::PluginType::Effect;}))
+		| std::views::filter([](const auto& elem){
+			return elem.second.type == Metadata::PluginType::Effect
+				|| elem.second.type == Metadata::PluginType::Unknown;
+		}))
 	{
 		out.push_back(data);
 	}

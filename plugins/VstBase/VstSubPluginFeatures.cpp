@@ -26,20 +26,33 @@
 
 #include "VstSubPluginFeatures.h"
 
+#include <QByteArray>
 #include <QDir>
 #include <QLabel>
 
 #include "VstList.h"
 #include "Plugin.h"
+#include "lmmsconfig.h"
 
 using AttributeMap = lmms::Plugin::Descriptor::SubPluginFeatures::Key::AttributeMap;
 
 namespace
 {
 
+// converts a bitset to base64 pretty much
+QString checksumToB64(lmms::VstList::Metadata::Checksum checksum)
+{
+	return QByteArray::fromRawData(reinterpret_cast<char*>(&checksum), sizeof checksum).toBase64();
+}
+
+lmms::VstList::Metadata::Checksum checksumFromB64(QString b64)
+{
+	return *reinterpret_cast<lmms::VstList::Metadata::Checksum*>(QByteArray::fromBase64(b64.toUtf8()).data());
+}
+
 inline lmms::VstList::Metadata& getMetadata(const lmms::Plugin::Descriptor::SubPluginFeatures::Key& key)
 {
-	return lmms::VstList::inst()->plugins()[key.attributes["id"].toStdString()];
+	return lmms::VstList::inst()->plugins()[checksumFromB64(key.attributes["checksum"])];
 }
 
 } // namespace
@@ -69,7 +82,7 @@ void VstSubPluginFeatures::listSubPluginKeys(const Plugin::Descriptor* desc, Key
 	{
 		AttributeMap am;
 		am["file"] = QString::fromStdString(data.path.string());
-		am["id"] = QString::fromStdString(data.ID);
+		am["checksum"] = checksumToB64(data.file_checksum);
 		keylist.push_back(Key(desc, QString::fromStdString(data.name), am));
 	}
 }
