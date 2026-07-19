@@ -138,9 +138,9 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	m_animateAFP(ConfigManager::inst()->value(
 			"ui", "animateafp", "1").toInt()),
 	m_vstEmbedMethod(ConfigManager::inst()->vstEmbedMethod()),
-	m_vstScanExec{ConfigManager::inst()->value("app", "vstscanexec", "0").toInt()},
 	m_vstAlwaysOnTop(ConfigManager::inst()->value(
 			"ui", "vstalwaysontop").toInt()),
+	m_vstScanExec(ConfigManager::inst()->value("app", "vstscanexec", "0").toInt()),
 	m_disableAutoQuit(ConfigManager::inst()->value(
 			"ui", "disableautoquit", "1").toInt()),
 	m_bufferSize(ConfigManager::inst()->value(
