@@ -58,12 +58,6 @@ fs::path toWinePath(const fs::path& winPath)
 	return {};
 }
 
-bool isSubPath(const fs::path& sub, const fs::path& base)
-{
-	auto rel = std::filesystem::relative(sub, base);
-	return !rel.empty() && *rel.begin() != "..";
-}
-
 namespace VstPaths
 {
 	const fs::path Win64 = "C:/Program Files/Steinberg/VstPlugins";
