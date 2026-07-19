@@ -199,7 +199,7 @@ void VstList::scanDirRecursive(fs::path dirPath, bool loadNewlyFound)
 				// This metadata is cheap and should not be stored in cache.
 
 				auto chksum = checksum(path);
-				std::string name = path.stem();
+				auto name = path.stem().string();
 
 				// We don't know if the plugin is an instrument or an effect, so we'll add it to both.
 				// This is yucky, at least in LMMS vst dir it ould be better to have an explicit way to
