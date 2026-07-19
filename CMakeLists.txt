@@ -29,6 +29,11 @@ SET(LMMS_SOURCE_DIR ${CMAKE_SOURCE_DIR})
 # Import of windows.h breaks min()/max()
 ADD_DEFINITIONS(-DNOMINMAX)
 
+# Set symbol visibility
+set(CMAKE_C_VISIBILITY_PRESET hidden)
+set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+set(CMAKE_VISIBILITY_INLINES_HIDDEN ON)
+
 # CMAKE_CXX_IMPLICIT_INCLUDE_DIRECTORIES is not set correctly for MinGW until
 # CMake 3.14.1, so avoid specifying system include directories on affected
 # versions. Normal include directories are safe, since GCC ignores them if they
@@ -110,6 +115,83 @@ option(WANT_CPACK_TARBALL "Request CPack to create a tarball instead of an insta
 option(WANT_QT6 "Build with experimental Qt6 support" OFF)
 
 
+# Set the target microarchitecture
+if(TARGET_UARCH_FLAGS)
+	if(TARGET_UARCH AND NOT TARGET_UARCH STREQUAL "custom")
+		message(WARNING "Ignoring TARGET_UARCH since TARGET_UARCH_FLAGS was set")
+	endif()
+
+	set(_default_target_uarch "custom")
+	message(STATUS "Setting target microarchitecture to 'custom'")
+	message(STATUS "Target microarchitecture flags: ${TARGET_UARCH_FLAGS}")
+elseif(TARGET_UARCH)
+	message(STATUS "Setting target microarchitecture to '${TARGET_UARCH}'")
+else()
+	if(CMAKE_CROSSCOMPILING)
+		set(_default_target_uarch "none")
+	else()
+		set(_default_target_uarch "native")
+	endif()
+	message(STATUS "Setting target microarchitecture to '${_default_target_uarch}' as none was specified")
+endif()
+
+if(NOT TARGET_UARCH)
+	set(TARGET_UARCH ${_default_target_uarch} CACHE STRING "Choose the target microarchitecture" FORCE)
+	# Accepted options:
+	# - "none":     No microarchitecture is set. Uses the compiler default.
+	# - "official": Targets the baseline microarchitecture of official LMMS releases.
+	# - "custom":   Targets the microarchitecture specified by TARGET_UARCH_FLAGS.
+	# - "native":   Targets the highest microarchitecture level supported by the build machine.
+	set_property(CACHE TARGET_UARCH PROPERTY STRINGS "none" "official" "custom" "native")
+endif()
+
+if(TARGET_UARCH STREQUAL "custom" OR TARGET_UARCH_FLAGS)
+	add_compile_options(${TARGET_UARCH_FLAGS})
+elseif(TARGET_UARCH STREQUAL "none")
+	# Do nothing, use the compiler default
+elseif(TARGET_UARCH STREQUAL "official")
+	if(LMMS_HOST_X86_64)
+		if(MSVC)
+			# MSVC doesn't have /arch:x86-64-v2, but this is pretty close
+			add_compile_options(/arch:SSE4.2)
+		else()
+			add_compile_options(-march=x86-64-v2)
+		endif()
+	elseif(LMMS_HOST_ARM64)
+		if(LMMS_BUILD_WIN64)
+			# Using Windows 11 minimum requirements
+			# https://learn.microsoft.com/en-us/windows-hardware/design/minimum/minimum-hardware-requirements-overview
+			if(MSVC)
+				add_compile_options(/arch:armv8.1)
+			else()
+				add_compile_options(-march=armv8.1-a)
+			endif()
+		elseif(LMMS_BUILD_APPLE)
+			# Chosen for Apple M1 support
+			add_compile_options(-march=armv8.4-a)
+		else()
+			# Chosen for Raspberry Pi 4 support
+			add_compile_options(-march=armv8-a)
+		endif()
+	else()
+		message(WARNING "There are no official releases for the target architecture, so there is no official baseline microarchitecture")
+	endif()
+elseif(TARGET_UARCH STREQUAL "native")
+	if(CMAKE_CROSSCOMPILING)
+		message(FATAL_ERROR "Cannot target native microarchitecture while cross-compiling")
+	endif()
+
+	if(MSVC)
+		include(CheckCPUFeatures)
+		determine_msvc_native_arch(_arch_option)
+		if(NOT "${_arch_option}" STREQUAL "")
+			add_compile_options(${_arch_option})
+		endif()
+	else()
+		add_compile_options(-march=native -mtune=native)
+	endif()
+endif()
+
 IF(LMMS_BUILD_APPLE)
 	# Fix linking on 10.14+. See issue #4762 on github
 	LINK_DIRECTORIES("${APPLE_PREFIX}/lib")
@@ -150,6 +232,32 @@ ELSE(LMMS_BUILD_WIN32)
 	SET(STATUS_WINMM "<not supported on this platform>")
 ENDIF(LMMS_BUILD_WIN32)
 
+IF(LMMS_BUILD_OPENBSD)
+	# “don't link deprecated ossaudio on OpenBSD”
+	# https://cvsweb.openbsd.org/checkout/ports/audio/lmms/patches/patch-CMakeLists_txt?rev=1.3
+	SET(WANT_OSS OFF)
+	SET(STATUS_OSS "<not supported on this platform>")
+	# LMMS finds SDL and compiles fine with it enabled, but it doesn't
+	# appear as an option when choosing an audio backend in settings for
+	# some reason. This might be fixable, but the OpenBSD ports
+	# maintainers have also explicitly disabled SDL since 2010-10-28.
+	# https://cvsweb.openbsd.org/checkout/ports/audio/lmms/Makefile?rev=1.1
+	SET(WANT_SDL OFF)
+	SET(STATUS_SDL "<not supported on this platform>")
+	# “explicitly disable pulseaudio in these ports so they won't pick
+	# it up when it becomes available.”
+	# https://cvsweb.openbsd.org/checkout/ports/audio/lmms/Makefile?rev=1.5
+	SET(WANT_PULSEAUDIO OFF)
+	SET(STATUS_PULSEAUDIO "<not supported on this platform>")
+	# OpenBSD does not and never will have WINE, which is necessary for
+	# Windows VST support.
+	# TODO: Is Linux VST support on OpenBSD possible?
+	SET(WANT_VST OFF)
+	SET(STATUS_VST "<not supported on this platform>")
+	SET(STATUS_VST_32 "<not supported on this platform>")
+	SET(STATUS_VST_64 "<not supported on this platform>")
+ENDIF()
+
 SET(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 CHECK_INCLUDE_FILES(pthread.h LMMS_HAVE_PTHREAD_H)
@@ -165,8 +273,6 @@ CHECK_INCLUDE_FILES(sys/soundcard.h LMMS_HAVE_SYS_SOUNDCARD_H)
 CHECK_INCLUDE_FILES(soundcard.h LMMS_HAVE_SOUNDCARD_H)
 CHECK_INCLUDE_FILES(fcntl.h LMMS_HAVE_FCNTL_H)
 CHECK_INCLUDE_FILES(sys/ioctl.h LMMS_HAVE_SYS_IOCTL_H)
-CHECK_INCLUDE_FILES(ctype.h LMMS_HAVE_CTYPE_H)
-CHECK_INCLUDE_FILES(string.h LMMS_HAVE_STRING_H)
 CHECK_INCLUDE_FILES(process.h LMMS_HAVE_PROCESS_H)
 CHECK_INCLUDE_FILES(locale.h LMMS_HAVE_LOCALE_H)
 
@@ -257,23 +363,12 @@ endif()
 find_package(Perl)
 
 if(WANT_LV2)
-	if(PKG_CONFIG_FOUND)
-		pkg_check_modules(LV2 lv2)
-	endif()
-
 	find_package(Lilv)
 	if(Lilv_FOUND)
-		set(LILV_LIBRARIES Lilv::lilv)
-	endif()
-
-	# Ensure both dependencies are found
-	if(NOT LV2_FOUND)
-		set(STATUS_LV2 "not found, install lv2 or set PKG_CONFIG_PATH appropriately")
-	elseif(NOT Lilv_FOUND)
-		set(STATUS_LV2 "not found, install lilv or set PKG_CONFIG_PATH appropriately")
-	else()
 		set(LMMS_HAVE_LV2 TRUE)
 		set(STATUS_LV2 "OK")
+	else()
+		set(STATUS_LV2 "not found, install lilv or set PKG_CONFIG_PATH appropriately")
 	endif()
 else()
 	set(STATUS_LV2 "not built as requested")
@@ -384,7 +479,7 @@ IF(WANT_STK)
 		SET(STATUS_STK "OK")
 	ELSE(STK_FOUND)
 		SET(STK_INCLUDE_DIR "")
-		SET(STATUS_STK "not found, please install libstk0-dev (or similar) "
+		SET(STATUS_STK "not found, please install libstk-dev or libstk0-dev (or similar)"
 			"if you require the Mallets instrument")
 	ENDIF(STK_FOUND)
 ENDIF(WANT_STK)
@@ -653,10 +748,10 @@ SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DLMMS_DEBUG")
 SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DLMMS_DEBUG")
 
 if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
-    add_compile_definitions(NDEBUG)
+	add_compile_definitions(NDEBUG)
 	SET(STATUS_ASSERTIONS "Disabled")
 else()
-    remove_definitions(-DNDEBUG)
+	remove_definitions(-DNDEBUG)
 	SET(STATUS_ASSERTIONS "Enabled")
 endif()
 
@@ -759,7 +854,6 @@ ADD_SUBDIRECTORY(src)
 ADD_SUBDIRECTORY(plugins)
 ADD_SUBDIRECTORY(tests)
 ADD_SUBDIRECTORY(data)
-ADD_SUBDIRECTORY(doc)
 
 # install tasks
 ADD_SUBDIRECTORY(cmake/install)

@@ -56,9 +56,10 @@ namespace lmms::gui
 {
 
 
-/*! The width of the resize grip in pixels
- */
-const int RESIZE_GRIP_WIDTH = 8;
+//! The default width of the resize grip in pixels
+constexpr int RESIZE_GRIP_WIDTH = 8;
+//! The maximum fraction of the clip width that the resize grip is allowed to take up
+constexpr float RESIZE_GRIP_MAX_WIDTH_FRACTION = 0.1f;
 
 
 /*! A pointer for that text bubble used when moving segments, etc.
@@ -397,6 +398,15 @@ void ClipView::setColor(const std::optional<QColor>& color)
 	Engine::getSong()->setModified();
 }
 
+
+int ClipView::resizeGripWidth() const
+{
+	const int clipWidth = m_clip->length() * pixelsPerBar() / TimePos::ticksPerBar();
+	return std::clamp(static_cast<int>(std::round(RESIZE_GRIP_MAX_WIDTH_FRACTION * clipWidth)), 1, RESIZE_GRIP_WIDTH);
+}
+
+
+
 /*! \brief Change the ClipView's display when something
  *  being dragged enters it.
  *
@@ -488,7 +498,7 @@ void ClipView::updateCursor(QMouseEvent * me)
 
 	// If we are at the edges, use the resize cursor
 	if (!me->buttons() && m_clip->manuallyResizable() && !isSelected()
-		&& ((posX > width() - RESIZE_GRIP_WIDTH) || (posX < RESIZE_GRIP_WIDTH)))
+		&& ((posX >= width() - resizeGripWidth()) || (posX < resizeGripWidth())))
 	{
 		setCursor(Qt::SizeHorCursor);
 	}
@@ -661,12 +671,12 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 					m_action = Action::Move;
 					setCursor( Qt::SizeAllCursor );
 				}
-				else if (pos.x() >= width() - RESIZE_GRIP_WIDTH)
+				else if (pos.x() >= width() - resizeGripWidth())
 				{
 					m_action = Action::Resize;
 					setCursor( Qt::SizeHorCursor );
 				}
-				else if (pos.x() < RESIZE_GRIP_WIDTH)
+				else if (pos.x() < resizeGripWidth())
 				{
 					m_action = Action::ResizeLeft;
 					setCursor( Qt::SizeHorCursor );
@@ -1098,10 +1108,16 @@ void ClipView::contextMenuEvent( QContextMenuEvent * cme )
 			: tr("Copy selection"),
 		[this](){ contextMenuAction( ContextMenuAction::Copy ); } );
 
-	contextMenu.addAction(
-		embed::getIconPixmap( "edit_paste" ),
-		tr( "Paste" ),
-		[this](){ contextMenuAction( ContextMenuAction::Paste ); } );
+	auto pasteAction = contextMenu.addAction(
+		embed::getIconPixmap("edit_paste"),
+		tr("Paste"),
+		[this](){ contextMenuAction(ContextMenuAction::Paste); }
+	);
+
+	pasteAction->setEnabled(
+		Clipboard::hasFormat(Clipboard::MimeType::StringPair) && getTrackView()->getTrackContentWidget()
+			->canPasteSelection(m_clip->startPosition(), Clipboard::getMimeData())
+	);
 
 	contextMenu.addSeparator();
 
@@ -1255,7 +1271,7 @@ void ClipView::toggleSelectedAutoResize()
  *
  * \return the number of pixels per bar.
  */
-float ClipView::pixelsPerBar()
+float ClipView::pixelsPerBar() const
 {
 	return m_trackView->trackContainerView()->pixelsPerBar();
 }
