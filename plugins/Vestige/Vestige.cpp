@@ -83,7 +83,7 @@ Plugin::Descriptor Q_DECL_EXPORT  vestige_plugin_descriptor =
 		"so",
 #	endif
 #endif
-	VstList::inst()->plugins().empty()
+	(!ConfigManager::inst()->value("app", "vstscanexec", "0").toInt() || VstList::inst()->plugins().empty())
 		? nullptr // makes Vestige appear as a plugin by itself
 		: new VstSubPluginFeatures(Plugin::Type::Instrument),
 } ;

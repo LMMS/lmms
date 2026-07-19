@@ -60,8 +60,8 @@ fs::path toWinePath(const fs::path& winPath)
 
 bool isSubPath(const fs::path& sub, const fs::path& base)
 {
-    auto rel = std::filesystem::relative(sub, base);
-    return !rel.empty() && *rel.begin() != "..";
+	auto rel = std::filesystem::relative(sub, base);
+	return !rel.empty() && *rel.begin() != "..";
 }
 
 namespace VstPaths
@@ -194,37 +194,79 @@ void VstList::scanDirRecursive(fs::path dirPath, bool loadNewlyFound)
 				continue;
 			}
 
-			VstPlugin plug{QString::fromStdString(path.string()), true};
-			if (plug.name().isEmpty()) // TODO: figure out a better way to check load fail
-			{
-				m_pluginsCache.emplace(path, Metadata {
+			if (ConfigManager::inst()->value("app", "vstscanexec", "0").toInt()) {
+				// This is very slow and should be optimized more.
+				// TODO: There's also room for async here but i don't have experience to implement it.
+				VstPlugin plug{QString::fromStdString(path.string()), true};
+				if (plug.name().isEmpty()) // TODO: figure out a better way to check load fail
+				{
+					m_pluginsCache.emplace(path, Metadata {
+							path,
+							checksum(path),
+							Metadata::PluginType::NotVst});
+					continue;
+				}
+				Metadata metadata = {
 					path,
 					checksum(path),
-					Metadata::PluginType::NotVst});
-				continue;
-			}
-			Metadata metadata = {
-				path,
-				checksum(path),
-				plug.isSynth()
+					plug.isSynth()
 					? Metadata::PluginType::Instrument
 					: Metadata::PluginType::Effect,
-				plug.uniqueID().toStdString(),
-				plug.name().toStdString(),
-				plug.productString().toStdString(),
-				plug.vendorString().toStdString()
-			};
-			m_pluginsCache.insert({path, metadata});
-			addPlugin(metadata);
+					plug.uniqueID().toStdString(),
+					plug.name().toStdString(),
+					plug.productString().toStdString(),
+					plug.vendorString().toStdString()
+				};
+
+				m_pluginsCache.insert({path, metadata});
+				addPlugin(metadata);
+			} else {
+				// Ideally this branch should never be reached. When handled properly, the consumer
+				// plugin should instead place a nullptr to turn itself into a standalone plugin,
+				// and then have a file picker dialog allowing to manually select a file.
+
+				// In future if the config value is still wanted it may be split into two -
+				// one that fully disables the scan and requires use of the file chooser,
+				// and one that disables *loading* the VSTs, but still populating the list.
+				// In that case this fallback would be wanted.
+
+				// This metadata is cheap and should not be stored in cache.
+
+				auto chksum = checksum(path);
+				std::string name = path.stem();
+
+				// We don't know if the plugin is an instrument or an effect, so we'll add it to both.
+				// This is yucky, at least in LMMS vst dir it ould be better to have an explicit way to
+				// categorize them. We don't get such luxury when dealing with system dirs though, but
+				// maybe they should be ignored in this mode anyway.
+				addPlugin({
+					path,
+					chksum,
+					Metadata::PluginType::Instrument,
+					"????",
+					name,
+					name,
+					"",
+				});
+				addPlugin({
+					path,
+					chksum,
+					Metadata::PluginType::Effect,
+					"????",
+					name,
+					name,
+					"",
+				});
+			}
 		}
 	}
 }
 
 
-void VstList::addPlugin(Metadata& data)
+void VstList::addPlugin(Metadata data)
 {
 	if (data.type != Metadata::PluginType::NotVst
-	    && (!m_plugins.contains(data.ID) || prefType(data) < prefType(m_plugins[data.ID])))
+		&& (!m_plugins.contains(data.ID) || prefType(data) < prefType(m_plugins[data.ID])))
 	{
 		m_plugins.insert_or_assign(data.ID, data);
 	}

@@ -98,6 +98,7 @@ private slots:
 	void toggleAnimateAFP(bool enabled);
 	void vstEmbedMethodChanged();
 	void toggleVSTAlwaysOnTop(bool en);
+	void toggleVstScanExec(bool enabled) { m_vstScanExec = enabled; };
 	void toggleDisableAutoQuit(bool enabled);
 	void toggleMixSanitization(bool enabled);
 
@@ -173,6 +174,7 @@ private:
 	QString m_vstEmbedMethod;
 	QCheckBox * m_vstAlwaysOnTopCheckBox;
 	bool m_vstAlwaysOnTop;
+	bool m_vstScanExec;
 	bool m_disableAutoQuit;
 
 	using AswMap = QMap<QString, AudioDeviceSetupWidget*>;

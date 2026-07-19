@@ -47,7 +47,7 @@ public:
 	std::unordered_map<std::string, Metadata>& plugins() {return m_plugins;}
 
 private:
-	void addPlugin(Metadata& data);
+	void addPlugin(Metadata data);
 
 	static VstList* s_inst;
 	std::unordered_map<std::filesystem::path, Metadata> m_pluginsCache;
