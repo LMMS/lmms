@@ -4,6 +4,10 @@ BUILD_PLUGIN(ladspaeffect LadspaEffect.cpp LadspaControls.cpp LadspaControlDialo
 
 SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/ladspa")
 
+# TODO: Plugins themselves should use __attribute__((visibility("default"))) to export "ladspa_descriptor"
+set(CMAKE_C_VISIBILITY_PRESET default)
+set(CMAKE_CXX_VISIBILITY_PRESET default)
+
 IF(LMMS_HAVE_CAPS)
 ADD_SUBDIRECTORY(caps)
 ENDIF()
