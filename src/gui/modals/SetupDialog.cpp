@@ -140,6 +140,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	m_vstEmbedMethod(ConfigManager::inst()->vstEmbedMethod()),
 	m_vstAlwaysOnTop(ConfigManager::inst()->value(
 			"ui", "vstalwaysontop").toInt()),
+	m_vstScanExec(ConfigManager::inst()->value("app", "vstscanexec", "0").toInt()),
 	m_disableAutoQuit(ConfigManager::inst()->value(
 			"ui", "disableautoquit", "1").toInt()),
 	m_bufferSize(ConfigManager::inst()->value(
@@ -469,6 +470,9 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	connect(m_vstEmbedComboBox, SIGNAL(currentIndexChanged(int)),
 			this, SLOT(vstEmbedMethodChanged()));
 	pluginsLayout->addWidget(m_vstEmbedComboBox);
+
+	addCheckBox(tr("Scan for VST plugins (experimental, first startup is slow)"), pluginsBox, pluginsLayout,
+		m_vstScanExec, SLOT(toggleVstScanExec(bool)), true);
 
 	m_vstAlwaysOnTopCheckBox = addCheckBox(tr("Keep plugin windows on top when not embedded"), pluginsBox, pluginsLayout,
 		m_vstAlwaysOnTop, SLOT(toggleVSTAlwaysOnTop(bool)), false);
@@ -1023,6 +1027,8 @@ void SetupDialog::accept()
 					QString::number(m_animateAFP));
 	ConfigManager::inst()->setValue("ui", "vstembedmethod",
 					m_vstEmbedComboBox->currentData().toString());
+	ConfigManager::inst()->setValue("app", "vstscanexec",
+					QString::number(m_vstScanExec));
 	ConfigManager::inst()->setValue("ui", "vstalwaysontop",
 					QString::number(m_vstAlwaysOnTop));
 	ConfigManager::inst()->setValue("ui", "disableautoquit",
