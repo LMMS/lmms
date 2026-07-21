@@ -130,10 +130,10 @@ public:
 	void setAudioDevice(AudioDevice* _dev, bool startNow);
 	void storeAudioDevice();
 	void restoreAudioDevice();
-	inline AudioDevice * audioDev()
-	{
-		return m_audioDev;
-	}
+	inline AudioDevice * audioDev() { return m_audioDev; }
+	inline const AudioDevice* audioDev() const { return m_audioDev; }
+
+	bool captureDeviceAvailable() const;
 
 
 	// audio-bus-handle-stuff

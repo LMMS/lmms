@@ -35,7 +35,6 @@
 #include <QTimeLine>
 
 #include "ActionGroup.h"
-#include "AudioDevice.h"
 #include "AudioEngine.h"
 #include "AutomatableSlider.h"
 #include "ClipView.h"
@@ -917,7 +916,7 @@ ComboBoxModel *SongEditor::snappingModel() const
 
 
 SongEditorWindow::SongEditorWindow(Song* song) :
-	Editor(Engine::audioEngine()->audioDev()->supportsCapture(), false),
+	Editor(false, true, false),
 	m_editor(new SongEditor(song)),
 	m_crtlAction( nullptr ),
 	m_snapSizeLabel( new QLabel( m_toolBar ) )
@@ -933,10 +932,8 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 
 	// Set up buttons
 	m_playAction->setToolTip(tr("Play song (Space)"));
-	m_recordAction->setToolTip(tr("Record samples from Audio-device"));
-	m_recordAccompanyAction->setToolTip(tr("Record samples from Audio-device while playing song or pattern track"));
+	m_recordAccompanyAction->setToolTip(tr("Record samples from Audio-device during playback"));
 	m_stopAction->setToolTip(tr( "Stop song (Space)" ));
-
 
 	// Track actions
 	DropToolBar *trackActionsToolBar = addDropToolBarToTop(tr("Track actions"));
@@ -1034,6 +1031,13 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 
 	connect(song, SIGNAL(projectLoaded()), this, SLOT(adjustUiAfterProjectLoad()));
 	connect(this, SIGNAL(resized()), m_editor, SLOT(updatePositionLine()));
+
+	// In case our current audio device does not support capture,
+	// disable the record buttons.
+	if (!Engine::audioEngine()->captureDeviceAvailable())
+	{
+		m_recordAccompanyAction->setToolTip(tr("Recording is unavailable: try connecting an input device or switching backend"));
+	}
 }
 
 QSize SongEditorWindow::sizeHint() const
@@ -1092,16 +1096,6 @@ void SongEditorWindow::play()
 		Engine::getSong()->togglePause();
 	}
 }
-
-
-void SongEditorWindow::record()
-{
-	m_editor->m_song->record();
-	m_editor->m_timeLine->setRecording(true);
-	m_editor->m_positionLine->setRecording(true);
-}
-
-
 
 
 void SongEditorWindow::recordAccompany()
