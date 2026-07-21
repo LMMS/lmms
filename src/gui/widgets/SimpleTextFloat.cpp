@@ -24,9 +24,10 @@
 
 #include "SimpleTextFloat.h"
 
-#include <QTimer>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QScreen>
+#include <QTimer>
 
 #include "GuiApplication.h"
 #include "MainWindow.h"
@@ -54,7 +55,7 @@ SimpleTextFloat::SimpleTextFloat() :
 	QObject::connect(m_hideTimer, &QTimer::timeout, this, &SimpleTextFloat::hide);
 }
 
-void SimpleTextFloat::setText(const QString & text)
+void SimpleTextFloat::setText(const QString& text)
 {
 	m_textLabel->setText(text);
 }
@@ -74,6 +75,20 @@ void SimpleTextFloat::showWithDelay(int msecBeforeDisplay, int msecDisplayTime)
 	{
 		m_hideTimer->start(msecBeforeDisplay + msecDisplayTime);
 	}
+}
+
+void SimpleTextFloat::moveGlobal(QWidget* w, const QPoint& offset)
+{
+	auto position = w->mapToGlobal(QPoint(0, 0)) + offset;
+
+	// Clamp position to screen before moving it there
+	auto screen = w->screen();
+	auto screenOrigin = screen->availableVirtualGeometry().topLeft();
+	auto screenSize = screen->availableVirtualGeometry().size();
+	position.setX(std::clamp(position.x(), screenOrigin.x() + 4, screenOrigin.x() + screenSize.width() - width() - 4));
+	position.setY(std::clamp(position.y(), screenOrigin.y() + 4, screenOrigin.y() + screenSize.height() - height() - 4));
+
+	move(position);
 }
 
 void SimpleTextFloat::show()

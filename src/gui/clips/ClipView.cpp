@@ -719,7 +719,20 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 				}
 				// s_textFloat->reparent( this );
 				// setup text-float as if Clip was already moved/resized
-				s_textFloat->moveGlobal( this, QPoint( width() + 2, height() + 2) );
+				switch (m_action) {
+					case Action::Move:
+						s_textFloat->moveGlobal(this, QPoint(pos.x(), height() + 2));
+						break;						
+					case Action::ResizeLeft:
+						s_textFloat->moveGlobal(this, QPoint(2, height() + 2));
+						break;
+					case Action::Resize:
+						s_textFloat->moveGlobal(this, QPoint(width() + 2, height() + 2));
+						break;
+					default:
+						break;
+				}
+				
 				if ( m_action != Action::Split) { s_textFloat->show(); }
 			}
 
@@ -851,7 +864,7 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 				arg( newPos.getBar() + 1 ).
 				arg( newPos.getTicks() %
 						TimePos::ticksPerBar() ) );
-		s_textFloat->moveGlobal( this, QPoint( width() + 2, height() + 2 ) );
+		s_textFloat->moveGlobal(this, QPoint(m_initialMousePos.x(), height() + 2));
 	}
 	else if( m_action == Action::MoveSelection )
 	{
@@ -996,7 +1009,15 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 				arg( m_clip->endPosition().getBar() + 1 ).
 				arg( m_clip->endPosition().getTicks() %
 						TimePos::ticksPerBar() ) );
-		s_textFloat->moveGlobal( this, QPoint( width() + 2, height() + 2) );
+		
+		if (m_action == Action::ResizeLeft) 
+		{
+			s_textFloat->moveGlobal(this, QPoint(2, height() + 2));
+		}
+		else 
+		{
+			s_textFloat->moveGlobal(this, QPoint(width() + 2, height() + 2));
+		}
 	}
 	else if( m_action == Action::Split )
 	{
