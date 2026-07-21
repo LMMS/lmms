@@ -43,8 +43,8 @@ public:
 		FloatModel(_copy.value(), _copy.minValue(), _copy.maxValue(), _copy.step<float>()),
 		m_autoClip(_copy.m_autoClip->clone())
 	{
-		m_autoClip->clearObjects();
-		m_autoClip->addObject(this, false);
+		m_autoClip->clearConnections();
+		m_autoClip->addConnection(this, false);
 	}
 
 	~InlineAutomation() override
@@ -82,7 +82,7 @@ public:
 		if( m_autoClip == nullptr )
 		{
 			m_autoClip = std::make_unique<AutomationClip>(nullptr);
-			m_autoClip->addObject(this, false);
+			m_autoClip->addConnection(this, false);
 		}
 		return m_autoClip.get();
 	}

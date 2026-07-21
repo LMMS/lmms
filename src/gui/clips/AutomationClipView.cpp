@@ -101,18 +101,15 @@ void AutomationClipView::changeName()
 
 
 
-void AutomationClipView::disconnectObject( QAction * _a )
+void AutomationClipView::disconnectModel(QAction* a)
 {
-	JournallingObject * j = Engine::projectJournal()->
-				journallingObject( _a->data().toInt() );
-	if( j && dynamic_cast<AutomatableModel *>( j ) )
+	auto model = dynamic_cast<AutomatableModel*>(Engine::projectJournal()->journallingObject(a->data().toInt()));
+	if (model != nullptr)
 	{
 		float oldMin = m_clip->getMin();
 		float oldMax = m_clip->getMax();
 
-		m_clip->m_objects.erase( std::find( m_clip->m_objects.begin(),
-					m_clip->m_objects.end(),
-				dynamic_cast<AutomatableModel *>( j ) ) );
+		m_clip->removeConnection(model);
 		update();
 
 		//If automation editor is opened, update its display after disconnection
@@ -121,8 +118,8 @@ void AutomationClipView::disconnectObject( QAction * _a )
 			getGUI()->automationEditor()->m_editor->updateAfterClipChange();
 		}
 
-		//if there is no more connection connected to the AutomationClip
-		if( m_clip->m_objects.size() == 0 )
+		//if there are no more models connected to the AutomationClip
+		if (m_clip->connections().empty())
 		{
 			//scale the points to fit the new min. and max. value
 			this->scaleTimemapToFit( oldMin, oldMax );
@@ -199,8 +196,7 @@ void AutomationClipView::constructContextMenu( QMenu * _cm )
 				m->addAction( a );
 			}
 		}
-		connect( m, SIGNAL(triggered(QAction*)),
-				this, SLOT(disconnectObject(QAction*)));
+		connect(m, &QMenu::triggered, this, &AutomationClipView::disconnectModel);
 		_cm->addMenu( m );
 	}
 }
@@ -268,8 +264,8 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 				/ (float) m_clip->length().getBar() :
 								pixelsPerBar();
 
-	const auto min = m_clip->firstObject()->minValue<float>();
-	const auto max = m_clip->firstObject()->maxValue<float>();
+	const auto min = m_clip->connectedModel().minValue<float>();
+	const auto max = m_clip->connectedModel().maxValue<float>();
 
 	const float y_scale = max - min;
 	const float h = ( height() - 2 * BORDER_WIDTH ) / y_scale;
@@ -431,7 +427,7 @@ void AutomationClipView::dropEvent( QDropEvent * _de )
 		auto mod = dynamic_cast<AutomatableModel*>(Engine::projectJournal()->journallingObject(val.toInt()));
 		if( mod != nullptr )
 		{
-			bool added = m_clip->addObject( mod );
+			bool added = m_clip->addConnection(mod);
 			if ( !added )
 			{
 				TextFloat::displayMessage( mod->displayName(),
@@ -475,8 +471,8 @@ void AutomationClipView::scaleTimemapToFit( float oldMin, float oldMax )
 	// only the inValue is being considered and the outValue is being reset to the inValue (so discrete jumps
 	// are discarded). Possibly later we will want discrete jumps to be maintained so we will need to upgrade
 	// the logic to account for them.
-	for( AutomationClip::timeMap::iterator it = m_clip->m_timeMap.begin();
-		it != m_clip->m_timeMap.end(); ++it )
+	AutomationClip::timeMap& tm = m_clip->getTimeMap();
+	for (auto it = tm.begin(); it != tm.end(); ++it)
 	{
 		// If the values are out of the previous range, fix them so they are
 		// between oldMin and oldMax.

@@ -218,9 +218,9 @@ void AutomationEditor::updateAfterClipChange()
 		return;
 	}
 
-	m_minLevel = m_clip->firstObject()->minValue<float>();
-	m_maxLevel = m_clip->firstObject()->maxValue<float>();
-	m_step = m_clip->firstObject()->step<float>();
+	m_minLevel = m_clip->connectedModel().minValue<float>();
+	m_maxLevel = m_clip->connectedModel().maxValue<float>();
+	m_step = m_clip->connectedModel().step<float>();
 	centerTopBottomScroll();
 
 	m_tensionModel->setValue( m_clip->getTension() );
@@ -349,8 +349,8 @@ bool AutomationEditor::fineTuneValue(timeMap::iterator node, bool editingOutValu
 		editingOutValue
 			? OUTVAL(node)
 			: INVAL(node),
-		m_clip->firstObject()->minValue<float>(),
-		m_clip->firstObject()->maxValue<float>(),
+		m_clip->connectedModel().minValue<float>(),
+		m_clip->connectedModel().maxValue<float>(),
 		3,
 		&ok
 	);
@@ -933,7 +933,7 @@ inline void AutomationEditor::drawCross( QPainter & p )
 	tt_pos.ry() -= 51;
 	tt_pos.rx() += 26;
 
-	float scaledLevel = m_clip->firstObject()->scaledValue( level );
+	float scaledLevel = m_clip->connectedModel().scaledValue(level);
 
 	// Limit the scaled-level tooltip to the grid
 	if( mouse_pos.x() >= 0 &&
@@ -1068,7 +1068,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 		auto level = std::array{m_minLevel, m_maxLevel};
 		for (int i = 0; i < 2; ++i)
 		{
-			const QString& label = m_clip->firstObject()->displayValue(level[i]);
+			const auto label = m_clip->connectedModel().displayValue(level[i]);
 			p.setPen(QApplication::palette().color(QPalette::Active, QPalette::Shadow));
 			p.drawText(1, y[i] - font_height + 1, VALUES_WIDTH - 10, 2 * font_height, text_flags, label);
 			p.setPen(fgColor);
@@ -1087,7 +1087,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 		}
 		for (; level <= m_topLevel; level += printable)
 		{
-			const QString& label = m_clip->firstObject()->displayValue(level);
+			const auto label = m_clip->connectedModel().displayValue(level);
 			int y = yCoordOfLevel(level);
 			p.setPen(QApplication::palette().color(QPalette::Active, QPalette::Shadow));
 			p.drawText(1, y - font_height + 1, VALUES_WIDTH - 10, 2 * font_height, text_flags, label);
@@ -2223,7 +2223,7 @@ void AutomationEditorWindow::dropEvent( QDropEvent *_de )
 		auto mod = dynamic_cast<AutomatableModel*>(Engine::projectJournal()->journallingObject(val.toInt()));
 		if (mod != nullptr)
 		{
-			bool added = m_editor->m_clip->addObject( mod );
+			bool added = m_editor->m_clip->addConnection(mod);
 			if ( !added )
 			{
 				TextFloat::displayMessage( mod->displayName(),
