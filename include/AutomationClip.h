@@ -180,6 +180,7 @@ public:
 
 	gui::ClipView * createView( gui::TrackView * _tv ) override;
 
+	bool isEmpty() const override { return m_timeMap.empty(); }
 
 	static bool isAutomated( const AutomatableModel * _m );
 	static std::vector<AutomationClip*> clipsForModel(const AutomatableModel* _m);

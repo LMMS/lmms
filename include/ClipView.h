@@ -55,6 +55,7 @@ class ClipView : public selectableObject, public ModelView
 // theming qproperties
 	Q_PROPERTY( QColor mutedColor READ mutedColor WRITE setMutedColor )
 	Q_PROPERTY( QColor mutedBackgroundColor READ mutedBackgroundColor WRITE setMutedBackgroundColor )
+	Q_PROPERTY(QColor selectedBlendColor READ selectedBlendColor WRITE setSelectedBlendColor)
 	Q_PROPERTY( QColor selectedColor READ selectedColor WRITE setSelectedColor )
 	Q_PROPERTY( QColor textColor READ textColor WRITE setTextColor )
 	Q_PROPERTY( QColor textBackgroundColor READ textBackgroundColor WRITE setTextBackgroundColor )
@@ -85,6 +86,7 @@ public:
 	QColor mutedColor() const;
 	QColor mutedBackgroundColor() const;
 	QColor selectedColor() const;
+	QColor selectedBlendColor() const;
 	QColor textColor() const;
 	QColor textBackgroundColor() const;
 	QColor textShadowColor() const;
@@ -94,6 +96,7 @@ public:
 	void setMutedColor( const QColor & c );
 	void setMutedBackgroundColor( const QColor & c );
 	void setSelectedColor( const QColor & c );
+	void setSelectedBlendColor(const QColor& c);
 	void setTextColor( const QColor & c );
 	void setTextBackgroundColor( const QColor & c );
 	void setTextShadowColor( const QColor & c );
@@ -121,7 +124,18 @@ public:
 
 	void toggleSelectedAutoResize();
 
-	QColor getColorForDisplay( QColor );
+	//! Blend the selected "color mask" into a specific color.
+	QColor getBlendedSelectedColor(QColor baseColor);
+
+	//! @brief Calculate the "final" version of a specific color.
+	//!
+	//! Is affected by whether the clip is muted, empty and/or selected, but only when their specific flags are not true.
+	QColor getColor(QColor baseColor, bool ignoreMuted = false, bool ignoreEmpty = false, bool ignoreSelected = false);
+
+	//! @brief Calculate the "final" primary color for this clip.
+	//!
+	//! Is affected by the clip's custom color, and whether it is muted, empty and/or selected.
+	QColor getColorForDisplay(QColor defaultColor);
 
 	void inline setMarkerPos(int x) { m_markerPos = x; }
 	void inline setMarkerEnabled(bool e) { m_marker = e; }
@@ -213,6 +227,7 @@ private:
 	QColor m_mutedColor;
 	QColor m_mutedBackgroundColor;
 	QColor m_selectedColor;
+	QColor m_selectedBlendColor;
 	QColor m_textColor;
 	QColor m_textBackgroundColor;
 	QColor m_textShadowColor;

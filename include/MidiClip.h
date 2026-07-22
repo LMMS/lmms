@@ -112,8 +112,7 @@ public:
 		return m_instrumentTrack;
 	}
 
-	bool empty();
-
+	bool isEmpty() const override;
 
 	gui::ClipView * createView( gui::TrackView * _tv ) override;
 

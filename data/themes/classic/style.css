@@ -790,6 +790,7 @@ lmms--gui--TrackContainerView QLabel
 lmms--gui--ClipView   {
 	qproperty-mutedColor: rgb( 128, 128, 128 );
 	qproperty-mutedBackgroundColor: rgb( 80, 80, 80 );
+	qproperty-selectedBlendColor: #003556;
 	qproperty-selectedColor: rgb( 0, 125, 255 );
 	qproperty-patternClipBackground: rgb( 80, 80, 80 );
 	qproperty-textColor: rgb( 255, 255, 255 );
