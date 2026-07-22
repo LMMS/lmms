@@ -109,6 +109,7 @@ public:
 	QVector<ClipView *> getClickedClips();
 
 	// Methods to remove, copy, cut, paste and mute a QVector of Clip views
+	DataFile createClipDataFiles(const QVector<ClipView *> & clips) const;
 	void copy( QVector<ClipView *> clipvs );
 	void cut( QVector<ClipView *> clipvs );
 	void paste();
@@ -175,7 +176,6 @@ protected:
 	float pixelsPerBar() const;
 
 
-	DataFile createClipDataFiles(const QVector<ClipView *> & clips) const;
 
 	virtual void paintTextLabel(QString const & text, QPainter & painter);
 
