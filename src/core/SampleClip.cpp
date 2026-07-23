@@ -138,11 +138,11 @@ bool SampleClip::hasSampleFileLoaded(const QString & filename) const
 	return m_sample.sampleFile() == filename;
 }
 
-void SampleClip::setSampleBuffer(std::shared_ptr<const SampleBuffer> sb)
+void SampleClip::setSampleBuffer(SampleBuffer buffer)
 {
 	{
 		const auto guard = Engine::audioEngine()->requestChangesGuard();
-		m_sample = Sample(std::move(sb));
+		m_sample = Sample(std::move(buffer));
 	}
 	updateLength();
 
@@ -157,8 +157,11 @@ void SampleClip::setSampleFile(const QString& sf)
 	setStartTimeOffset(0);
 	if (!sf.isEmpty())
 	{
-		m_sample = Sample(SampleBuffer::fromFile(sf));
-		updateLength();
+		if (auto buffer = SampleBuffer::fromFile(sf))
+		{
+			m_sample = Sample(std::move(buffer.value()));
+			updateLength();
+		}
 	}
 	else
 	{
@@ -335,8 +338,10 @@ void SampleClip::loadSettings( const QDomElement & _this )
 		auto sampleRate = _this.hasAttribute("sample_rate") ? _this.attribute("sample_rate").toInt() :
 			Engine::audioEngine()->outputSampleRate();
 
-		auto buffer = SampleBuffer::fromBase64(_this.attribute("data"), sampleRate);
-		m_sample = Sample(std::move(buffer));
+		if (auto buffer = SampleBuffer::fromBase64(_this.attribute("data"), sampleRate))
+		{
+			m_sample = Sample{std::move(buffer.value())};
+		}
 	}
 	changeLength( _this.attribute( "len" ).toInt() );
 	setMuted( _this.attribute( "muted" ).toInt() );

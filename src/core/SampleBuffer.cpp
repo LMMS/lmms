@@ -34,45 +34,39 @@
 
 namespace lmms {
 
-SampleBuffer::SampleBuffer(const SampleFrame* data, size_t numFrames, int sampleRate)
-	: m_data(data, data + numFrames)
+// Use aliasing constructor for std::shared_ptr to share ownership of a newly allocated vector without double
+// indirection when accessing samples (in the case of a vector in a shared pointer)
+SampleBuffer::SampleBuffer(std::vector<SampleFrame> data, sample_rate_t sampleRate, const QString& path)
+	: m_path(path)
+	, m_frames(data.size())
 	, m_sampleRate(sampleRate)
+	, m_data(data.data(), [v = std::move(data)](auto) {})
 {
-}
+	if (m_frames == 0)
+	{
+		assert(m_sampleRate == 0 && m_data == nullptr
+			&& "An empty buffer must have a sample rate of 0 and contain no audio data");
+	}
 
-SampleBuffer::SampleBuffer(std::vector<SampleFrame> data, int sampleRate, const QString& audioFile)
-	: m_data(std::move(data))
-	, m_audioFile(audioFile)
-	, m_sampleRate(sampleRate)
-{
-}
-
-void swap(SampleBuffer& first, SampleBuffer& second) noexcept
-{
-	using std::swap;
-	swap(first.m_data, second.m_data);
-	swap(first.m_audioFile, second.m_audioFile);
-	swap(first.m_sampleRate, second.m_sampleRate);
+	if (m_frames > 0)
+	{
+		assert(m_sampleRate > 0 && m_data != nullptr
+			&& "A non-empty buffer must have a sample rate greater than 0 and contain audio data");
+	}
 }
 
 QString SampleBuffer::toBase64() const
 {
 	// TODO: Replace with non-Qt equivalent
-	const auto data = reinterpret_cast<const char*>(m_data.data());
-	const auto size = static_cast<int>(m_data.size() * sizeof(SampleFrame));
-	const auto byteArray = QByteArray{data, size};
+	const auto data = reinterpret_cast<const char*>(m_data.get());
+	const auto size = static_cast<int>(m_frames * sizeof(SampleFrame));
+	const auto byteArray = QByteArray::fromRawData(data, size);
 	return byteArray.toBase64();
 }
 
-auto SampleBuffer::emptyBuffer() -> std::shared_ptr<const SampleBuffer>
+std::optional<SampleBuffer> SampleBuffer::fromFile(const QString& filePath)
 {
-	static auto s_buffer = std::make_shared<const SampleBuffer>();
-	return s_buffer;
-}
-
-std::shared_ptr<const SampleBuffer> SampleBuffer::fromFile(const QString& filePath)
-{
-	if (filePath.isEmpty()) { return SampleBuffer::emptyBuffer(); }
+	if (filePath.isEmpty()) { return std::nullopt; }
 
 	const auto absolutePath = PathUtil::toAbsolute(filePath);
 	const auto storedPath = PathUtil::toShortestRelative(filePath);
@@ -95,16 +89,16 @@ std::shared_ptr<const SampleBuffer> SampleBuffer::fromFile(const QString& filePa
 							  .arg(absolutePath);
 		}
 
-		return SampleBuffer::emptyBuffer();
+		return std::nullopt;
 	}
 
 	auto& [data, sampleRate] = *result;
-	return std::make_shared<SampleBuffer>(std::move(data), sampleRate, storedPath);
+	return SampleBuffer{std::move(data), sampleRate, storedPath};
 }
 
-std::shared_ptr<const SampleBuffer> SampleBuffer::fromBase64(const QString& str, int sampleRate)
+std::optional<SampleBuffer> SampleBuffer::fromBase64(const QString& str, sample_rate_t sampleRate)
 {
-	if (str.isEmpty()) { return SampleBuffer::emptyBuffer(); }
+	if (str.isEmpty()) { return std::nullopt; }
 
 	const auto bytes = QByteArray::fromBase64(str.toUtf8());
 
@@ -122,12 +116,12 @@ std::shared_ptr<const SampleBuffer> SampleBuffer::fromBase64(const QString& str,
 			qWarning() << QObject::tr("Failed to load Base64 sample, invalid size");
 		}
 
-		return SampleBuffer::emptyBuffer();
+		return std::nullopt;
 	}
 
 	auto data = std::vector<SampleFrame>(bytes.size() / sizeof(SampleFrame));
 	std::memcpy(reinterpret_cast<char*>(data.data()), bytes, bytes.size());
-	return std::make_shared<SampleBuffer>(std::move(data), sampleRate);
+	return SampleBuffer{std::move(data), sampleRate};
 }
 
 } // namespace lmms

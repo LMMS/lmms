@@ -91,7 +91,7 @@ auto decodeSampleSF(const QString& audioFile) -> std::optional<SampleDecoder::Re
 		}
 	}
 
-	return SampleDecoder::Result{std::move(result), static_cast<int>(sfInfo.samplerate)};
+	return SampleDecoder::Result{std::move(result), static_cast<sample_rate_t>(sfInfo.samplerate)};
 }
 
 auto decodeSampleDS(const QString& audioFile) -> std::optional<SampleDecoder::Result>
@@ -109,7 +109,7 @@ auto decodeSampleDS(const QString& audioFile) -> std::optional<SampleDecoder::Re
 	auto result = std::vector<SampleFrame>(frames);
 	src_short_to_float_array(data.get(), &result[0][0], frames * DEFAULT_CHANNELS);
 
-	return SampleDecoder::Result{std::move(result), static_cast<int>(engineRate)};
+	return SampleDecoder::Result{std::move(result), engineRate};
 }
 
 #ifdef LMMS_HAVE_OGGVORBIS
@@ -180,7 +180,7 @@ auto decodeSampleOggVorbis(const QString& audioFile) -> std::optional<SampleDeco
 	}
 
 	ov_clear(&vorbisFile);
-	return SampleDecoder::Result{std::move(result), static_cast<int>(sampleRate)};
+	return SampleDecoder::Result{std::move(result), static_cast<sample_rate_t>(sampleRate)};
 }
 #endif // LMMS_HAVE_OGGVORBIS
 } // namespace

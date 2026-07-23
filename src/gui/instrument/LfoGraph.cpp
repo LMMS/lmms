@@ -77,7 +77,7 @@ void LfoGraph::paintEvent(QPaintEvent*)
 	const f_cnt_t oscillationFrames = params->getLfoOscillationFrames();
 	const bool x100 = params->getX100Model().value();
 	const int lfoWaveModel = params->getLfoWaveModel().value();
-	const auto * userWave = params->getLfoUserWave().get();
+	const auto& userWave = params->getLfoUserWave();
 
 	const int margin = 3;
 	const int lfoGraphWidth = width() - margin; // subtract margin
@@ -128,7 +128,7 @@ void LfoGraph::paintEvent(QPaintEvent*)
 					value = m_randomGraph;
 					break;
 				case EnvelopeAndLfoParameters::LfoShape::UserDefinedWave:
-					value = Oscillator::userWaveSample(userWave, phase);
+					value = Oscillator::userWaveSample(&userWave, phase);
 					break;
 			}
 

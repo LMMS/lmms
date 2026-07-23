@@ -23,24 +23,16 @@
  */
 
 #include "Sample.h"
+#include "Engine.h"
 
 namespace lmms {
 
-Sample::Sample(const SampleFrame* data, size_t numFrames, int sampleRate)
-	: m_buffer(std::make_shared<SampleBuffer>(data, numFrames, sampleRate))
+Sample::Sample(SampleBuffer buffer)
+	: m_buffer(std::move(buffer))
 	, m_startFrame(0)
-	, m_endFrame(m_buffer->size())
+	, m_endFrame(m_buffer.frames())
 	, m_loopStartFrame(0)
-	, m_loopEndFrame(m_buffer->size())
-{
-}
-
-Sample::Sample(std::shared_ptr<const SampleBuffer> buffer)
-	: m_buffer(buffer)
-	, m_startFrame(0)
-	, m_endFrame(m_buffer->size())
-	, m_loopStartFrame(0)
-	, m_loopEndFrame(m_buffer->size())
+	, m_loopEndFrame(m_buffer.frames())
 {
 }
 
@@ -98,11 +90,11 @@ auto Sample::operator=(Sample&& other) noexcept -> Sample&
 
 bool Sample::play(SampleFrame* dst, PlaybackState* state, size_t numFrames, Loop loop, double ratio) const
 {
-	if (!m_buffer || m_buffer->empty()) { return false; }
+	if (m_buffer.empty()) { return false; }
 
 	state->m_frameIndex = std::max<int>(m_startFrame, state->m_frameIndex);
 
-	const auto sampleRateRatio = static_cast<double>(Engine::audioEngine()->outputSampleRate()) / m_buffer->sampleRate();
+	const auto sampleRateRatio = static_cast<double>(Engine::audioEngine()->outputSampleRate()) / m_buffer.sampleRate();
 	const auto freqRatio = frequency() / DefaultBaseFreq;
 	state->m_resampler.setRatio(sampleRateRatio * freqRatio * ratio);
 
@@ -165,10 +157,8 @@ f_cnt_t Sample::render(SampleFrame* dst, f_cnt_t size, PlaybackState* state, Loo
 			break;
 		}
 
-		const auto value
-			= m_buffer->data()[m_reversed ? m_buffer->size() - state->m_frameIndex - 1 : state->m_frameIndex]
-			* m_amplification;
-		dst[frame] = value;
+		const auto index = m_reversed ? m_buffer.frames() - state->m_frameIndex - 1 : state->m_frameIndex;
+		dst[frame] = m_buffer[index] * m_amplification;
 		state->m_backwards ? --state->m_frameIndex : ++state->m_frameIndex;
 	}
 
@@ -177,8 +167,10 @@ f_cnt_t Sample::render(SampleFrame* dst, f_cnt_t size, PlaybackState* state, Loo
 
 auto Sample::sampleDuration() const -> std::chrono::milliseconds
 {
+	if (m_buffer.empty()) { return std::chrono::milliseconds{0}; }
+
 	const auto numFrames = endFrame() - startFrame();
-	const auto duration = numFrames / static_cast<float>(m_buffer->sampleRate()) * 1000;
+	const auto duration = numFrames / static_cast<float>(m_buffer.sampleRate()) * 1000;
 	return std::chrono::milliseconds{static_cast<int>(duration)};
 }
 

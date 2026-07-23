@@ -44,11 +44,8 @@ SamplePlayHandle::SamplePlayHandle(Sample* sample, bool ownAudioBusHandle)
 	}
 }
 
-
-
-
-SamplePlayHandle::SamplePlayHandle( const QString& sampleFile ) :
-	SamplePlayHandle(new Sample(SampleBuffer::fromFile(sampleFile)), true)
+SamplePlayHandle::SamplePlayHandle(const QString& sampleFile)
+	: SamplePlayHandle(new Sample(SampleBuffer::fromFile(sampleFile).value_or(SampleBuffer{})), true)
 {
 }
 

@@ -73,7 +73,7 @@ public:
 	};
 
 	SampleThumbnail() = default;
-	SampleThumbnail(const Sample& sample);
+	SampleThumbnail(const SampleBuffer& buffer);
 	void visualize(VisualizeParameters parameters, QPainter& painter) const;
 
 private:
@@ -139,7 +139,7 @@ private:
 
 	using ThumbnailCache = std::vector<Thumbnail>;
 	std::shared_ptr<ThumbnailCache> m_thumbnailCache = std::make_shared<ThumbnailCache>();
-	std::shared_ptr<const SampleBuffer> m_buffer = SampleBuffer::emptyBuffer();
+	SampleBuffer m_buffer;
 	inline static std::unordered_map<SampleThumbnailEntry, std::shared_ptr<ThumbnailCache>, Hash> s_sampleThumbnailCacheMap;
 };
 

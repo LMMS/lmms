@@ -224,7 +224,7 @@ inline sample_t EnvelopeAndLfoParameters::lfoShapeSample( f_cnt_t _frame_offset 
 			shape_sample = Oscillator::sawSample( phase );
 			break;
 		case LfoShape::UserDefinedWave:
-			shape_sample = Oscillator::userWaveSample(m_userWave.get(), phase);
+			shape_sample = Oscillator::userWaveSample(&m_userWave, phase);
 			break;
 		case LfoShape::RandomWave:
 			if( frame == 0 )
@@ -352,7 +352,7 @@ void EnvelopeAndLfoParameters::saveSettings( QDomDocument & _doc,
 	m_lfoAmountModel.saveSettings( _doc, _parent, "lamt" );
 	m_x100Model.saveSettings( _doc, _parent, "x100" );
 	m_controlEnvAmountModel.saveSettings( _doc, _parent, "ctlenvamt" );
-	_parent.setAttribute("userwavefile", m_userWave->audioFile());
+	_parent.setAttribute("userwavefile", m_userWave.path());
 }
 
 
@@ -388,7 +388,10 @@ void EnvelopeAndLfoParameters::loadSettings( const QDomElement & _this )
 	{
 		if (QFileInfo(PathUtil::toAbsolute(userWaveFile)).exists())
 		{
-			m_userWave = SampleBuffer::fromFile(_this.attribute("userwavefile"));
+			if (auto buffer = SampleBuffer::fromFile(_this.attribute("userwavefile")))
+			{
+				m_userWave = std::move(buffer.value());
+			}
 		}
 		else { Engine::getSong()->collectError(QString("%1: %2").arg(tr("Sample not found"), userWaveFile)); }  
 	}

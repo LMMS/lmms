@@ -98,7 +98,7 @@ public:
 		m_useWaveTable = n;
 	}
 
-	void setUserWave(std::shared_ptr<const SampleBuffer> _wave)
+	void setUserWave(const SampleBuffer* _wave)
 	{
 		m_userWave = _wave;
 	}
@@ -167,8 +167,8 @@ public:
 
 	static sample_t userWaveSample(const SampleBuffer* buffer, const float sample)
 	{
-		if (buffer == nullptr || buffer->size() == 0) { return 0; }
-		const auto frames = buffer->size();
+		if (buffer == nullptr || buffer->frames() == 0) { return 0; }
+		const auto frames = buffer->frames();
 		const auto frame = absFraction(sample) * frames;
 		const auto f1 = static_cast<f_cnt_t>(frame);
 
@@ -250,7 +250,7 @@ private:
 	Oscillator * m_subOsc;
 	float m_phaseOffset;
 	float m_phase;
-	std::shared_ptr<const SampleBuffer> m_userWave = SampleBuffer::emptyBuffer();
+	const SampleBuffer* m_userWave;
 	std::shared_ptr<const OscillatorConstants::waveform_t> m_userAntiAliasWaveTable;
 	bool m_useWaveTable;
 	// There are many update*() variants; the modulator flag is stored as a member variable to avoid

@@ -823,7 +823,7 @@ inline sample_t Oscillator::getSample<Oscillator::WaveShape::UserDefined>(
 	}
 	else
 	{
-		return userWaveSample(m_userWave.get(), _sample);
+		return userWaveSample(m_userWave, _sample);
 	}
 }
 
