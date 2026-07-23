@@ -123,25 +123,17 @@ Song::Song() :
 	for (auto i = std::size_t{0}; i < static_cast<std::size_t>(PlayMode::Count); ++i)
 	{
 		const auto onPositionJumped = [this, playMode = static_cast<PlayMode>(i)] {
-			// Only emit the signal when the song is actually playing and the active timeline jumps
-			// This prevents LFOs from changing phase when the user drags the timeline while paused
-			if (m_playing && m_playMode == playMode) { emit playbackPositionJumped(); }
+			// Only emit the signal when the active timeline jumps
+			if (m_playMode != playMode) { return; }
 
-			// Update VST plugins with the new position so they stay in sync when skipping around,
-			// even when playback is paused.
-			if ((m_playing && m_playMode == playMode) || (!m_playing)) {
-				const auto& tl = m_timelines[static_cast<std::size_t>(playMode)];
-				m_vstSyncController.setAbsolutePosition(
-					tl.ticks() + tl.frameOffset() / static_cast<double>(Engine::framesPerTick())
-				);
-			}
+			emit playbackPositionJumped();
+
+			m_vstSyncController.setPlaybackJumped(true);
+			m_vstSyncController.setAbsolutePosition(getTimeline(playMode));
 		};
 
 		connect(&m_timelines[i], &Timeline::positionJumped, this, onPositionJumped);
 	}
-
-	// Inform VST plugins if the user moved the play head
-	connect(this, &Song::playbackPositionJumped, this, [this](){ m_vstSyncController.setPlaybackJumped(true); }, Qt::DirectConnection);
 }
 
 
@@ -306,8 +298,7 @@ void Song::processNextBuffer()
 			// Handle loop points, and inform VST plugins of the loop status
 			if (loopEnabled || (m_loopRenderRemaining > 1 && getPlayPos() >= timeline.loopBegin()))
 			{
-				m_vstSyncController.startCycle(
-					timeline.loopBegin().getTicks(), timeline.loopEnd().getTicks());
+				m_vstSyncController.startCycle(timeline.loopBegin().getTicks(), timeline.loopEnd().getTicks());
 
 				// Loop if necessary, and decrement the remaining loops if we did
 				if (enforceLoop(timeline.loopBegin(), timeline.loopEnd())
@@ -333,8 +324,7 @@ void Song::processNextBuffer()
 			// First frame of buffer: update VST sync position.
 			// This must be done after we've corrected the frame/tick count,
 			// but before actually playing any frames.
-			m_vstSyncController.setAbsolutePosition(getPlayPos().getTicks()
-				+ timeline.frameOffset() / static_cast<double>(framesPerTick));
+			m_vstSyncController.setAbsolutePosition(timeline);
 			m_vstSyncController.update();
 		}
 
@@ -694,10 +684,7 @@ void Song::stop()
 	getTimeline(PlayMode::None).setTicks(getPlayPos().getTicks());
 
 	m_vstSyncController.setPlaybackState( m_exporting );
-	m_vstSyncController.setAbsolutePosition(
-		getPlayPos().getTicks()
-		+ timeline.frameOffset()
-		/ (double) Engine::framesPerTick() );
+	m_vstSyncController.setAbsolutePosition(timeline);
 
 	// remove all note-play-handles that are active
 	Engine::audioEngine()->clear();

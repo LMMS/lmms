@@ -443,7 +443,7 @@ private:
 	bool m_loopMidiClip;
 
 	VstSyncController m_vstSyncController;
-    
+
 	int m_loopRenderCount;
 	int m_loopRenderRemaining;
 	TimePos m_exportSongBegin;

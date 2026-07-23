@@ -148,6 +148,9 @@ void LfoController::updateValueBuffer()
 
 void LfoController::updatePhase()
 {
+	// Only update the phase if the song is playing
+	if (!Engine::getSong()->isPlaying()) { return; }
+
 	m_currentPhase = ( Engine::getSong()->getFrames() ) / m_duration;
 	m_bufferLastUpdated = s_periods - 1;
 }
