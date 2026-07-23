@@ -207,8 +207,8 @@ void Xpressive::playNote(NotePlayHandle* nph, SampleFrame* working_buffer) {
 
 		auto init_expression_step1 = [this, nph](ExprFront* e) { //lambda function to init exprO1 and exprO2
 			//add the constants and the variables to the expression.
-			e->add_constant("key", nph->key());//the key that was pressed.
-			e->add_constant("bnote", nph->instrumentTrack()->baseNote()); // the base note
+			e->add_constant("key", nph->physicalKey()); // The physical key index that was pressed, prior to any transposition.
+			e->add_constant("bnote", DefaultBaseKey - nph->instrumentTrack()->transposeAmount()); // The base note, accounting for global transposition.
 			e->add_constant("srate", Engine::audioEngine()->outputSampleRate());// sample rate of the audio engine
 			e->add_constant("v", nph->getVolume() / 255.0); //volume of the note.
 			e->add_constant("tempo", Engine::getSong()->getTempo());//tempo of the song.
@@ -561,7 +561,7 @@ void XpressiveView::expressionChanged() {
 			expr.add_constant("key", key);
 			expr.add_constant("rel", 0);
 			expr.add_constant("trel", 0);
-			expr.add_constant("bnote",e->instrumentTrack()->baseNote());
+			expr.add_constant("bnote", DefaultBaseKey - e->instrumentTrack()->transposeAmount());
 			expr.add_constant("v", v);
 			expr.add_constant("tempo", Engine::getSong()->getTempo());
 			expr.add_constant("A1", e->parameterA1().value());

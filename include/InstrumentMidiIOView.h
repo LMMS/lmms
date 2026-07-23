@@ -40,6 +40,7 @@ class InstrumentTrack;
 namespace gui
 {
 
+class ComboBox;
 class GroupBox;
 class LcdSpinBox;
 class LedCheckBox;
@@ -67,6 +68,12 @@ private:
 	LcdSpinBox * m_outputProgramSpinBox;
 	LcdSpinBox * m_fixedOutputNoteSpinBox;
 	QToolButton * m_wpBtn;
+
+	GroupBox* m_MPEGroupBox;
+	LcdSpinBox* m_MPELowerZoneChannelsSpinBox;
+	LcdSpinBox* m_MPEUpperZoneChannelsSpinBox;
+	LcdSpinBox* m_MPEPitchRangeSpinBox;
+	ComboBox* m_MPEZoneComboBox;
 
 	LcdSpinBox* m_baseVelocitySpinBox;
 
