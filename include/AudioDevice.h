@@ -25,6 +25,8 @@
 #ifndef LMMS_AUDIO_DEVICE_H
 #define LMMS_AUDIO_DEVICE_H
 
+#include <span>
+
 #include <QMutex>
 #include <samplerate.h>
 
