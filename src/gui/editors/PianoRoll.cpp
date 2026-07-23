@@ -106,23 +106,26 @@ const int PR_TOP_MARGIN = 18;
 const int PR_RIGHT_MARGIN = SCROLLBAR_SIZE;
 
 
-//! Width of area used for resizing (the grip at the end of a note)
+//! @brief Width of area used for resizing (the grip at the end of a note)
 constexpr int RESIZE_GRIP_WIDTH = 9;
-//! The maximum fraction of the note width that the resize grip is allowed to take up
+
+//! @brief The maximum fraction of the note width that the resize grip is allowed to take up
 constexpr float RESIZE_GRIP_MAX_WIDTH_FRACTION = 0.25f;
 
-// width of line for setting volume/panning of note
-const int NOTE_EDIT_LINE_WIDTH = 3;
+//! @brief Width of line for setting volume/panning of note
+constexpr int NOTE_EDIT_LINE_WIDTH = 3;
 
-// key where to start
-const int INITIAL_START_KEY = Octave::Octave_4 + Key::C;
+//! @brief Key where to start
+constexpr int INITIAL_START_KEY = Octave::Octave_4 + Key::C;
 
-// number of each note to provide in quantization and note lengths
-const int NUM_EVEN_LENGTHS = 6;
-const int NUM_TRIPLET_LENGTHS = 5;
+//! @brief Number of each note to provide in quantization and note lengths
+constexpr int NUM_EVEN_LENGTHS = 6;
 
-// Radius of the automation node circles which appear when pitchbending a note
-const int DETUNING_HANDLE_RADIUS = 3;
+//! @brief Number of each note to provide in quantization and note lengths
+constexpr int NUM_TRIPLET_LENGTHS = 5;
+
+//! @brief Radius of the automation node circles which appear when pitchbending a note
+constexpr int DETUNING_HANDLE_RADIUS = 3;
 
 SimpleTextFloat * PianoRoll::s_textFloat = nullptr;
 

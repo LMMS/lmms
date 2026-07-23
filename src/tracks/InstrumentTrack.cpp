@@ -121,8 +121,6 @@ bool InstrumentTrack::keyRangeImport() const
 }
 
 
-/** \brief Check if there is a valid mapping for the given key and it is within defined of range.
- */
 bool InstrumentTrack::isKeyMapped(int key) const
 {
 	if (key < firstKey() || key > lastKey()) {return false;}
@@ -135,9 +133,6 @@ bool InstrumentTrack::isKeyMapped(int key) const
 }
 
 
-/** \brief Return first mapped key, based on currently selected keymap or user selection.
- *	\return Number ranging from 0 to NumKeys -1
- */
 int InstrumentTrack::firstKey() const
 {
 	if (keyRangeImport())
@@ -151,9 +146,6 @@ int InstrumentTrack::firstKey() const
 }
 
 
-/** \brief Return last mapped key, based on currently selected keymap or user selection.
- *	\return Number ranging from 0 to NumKeys -1
- */
 int InstrumentTrack::lastKey() const
 {
 	if (keyRangeImport())
@@ -167,9 +159,6 @@ int InstrumentTrack::lastKey() const
 }
 
 
-/** \brief Return base key number, based on currently selected keymap or user selection.
- *	\return Number ranging from 0 to NumKeys -1
- */
 int InstrumentTrack::baseNote() const
 {
 	int mp = m_useMasterPitchModel.value() ? Engine::getSong()->masterPitch() : 0;
@@ -185,9 +174,6 @@ int InstrumentTrack::baseNote() const
 }
 
 
-/** \brief Return frequency assigned to the base key, based on currently selected keymap.
- *	\return Frequency in Hz
- */
 float InstrumentTrack::baseFreq() const
 {
 	if (m_microtuner.enabled())
@@ -1072,10 +1058,6 @@ Instrument * InstrumentTrack::loadInstrument(const QString & _plugin_name,
 
 InstrumentTrack *InstrumentTrack::s_autoAssignedTrack = nullptr;
 
-/*! \brief Automatically assign a midi controller to this track, based on the midiautoassign setting
- *
- *  \param assign set to true to connect the midi device, set to false to disconnect
- */
 void InstrumentTrack::autoAssignMidiDevice(bool assign)
 {
 	if (assign)
