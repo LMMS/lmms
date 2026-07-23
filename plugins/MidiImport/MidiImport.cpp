@@ -334,13 +334,13 @@ bool MidiImport::readSMF(TrackContainer* tc)
 		Alg_beats& beats = timeMap->beats;
 		for (int i = 0; i < beats.len - 1; ++i)
 		{
-			Alg_beat *b = &(beats[i]);
+			Alg_beat* b = &(beats[i]);
 			double tempo = (beats[i + 1].beat - b->beat) / (beats[i + 1].time - beats[i].time);
 			tap->putValue(b->beat * ticksPerBeat, tempo * 60.0);
 		}
 		if (timeMap->last_tempo_flag)
 		{
-			Alg_beat *b = &beats[beats.len - 1];
+			Alg_beat* b = &beats[beats.len - 1];
 			tap->putValue(b->beat * ticksPerBeat, timeMap->last_tempo * 60.0);
 		}
 	}
@@ -352,7 +352,7 @@ bool MidiImport::readSMF(TrackContainer* tc)
 	// Song events
 	for (int e = 0; e < seq->length(); ++e)
 	{
-		Alg_event *evt = (*seq)[e];
+		Alg_event* evt = (*seq)[e];
 
 		if (evt->is_update())
 		{
@@ -365,7 +365,7 @@ bool MidiImport::readSMF(TrackContainer* tc)
 	for (int t = 0; t < seq->tracks(); ++t)
 	{
 		QString trackName = QString(tr("Track") + " %1").arg(t);
-		Alg_track *trk = seq->track(t);
+		Alg_track* trk = seq->track(t);
 		pd.setValue(t + preTrackSteps);
 
 		for (auto& cc : ccs) { cc.clear(); }
@@ -373,7 +373,7 @@ bool MidiImport::readSMF(TrackContainer* tc)
 		// Now look at events
 		for (int e = 0; e < trk->length(); ++e)
 		{
-			Alg_event *evt = (*trk)[e];
+			Alg_event* evt = (*trk)[e];
 
 			if (evt->chan == -1)
 			{

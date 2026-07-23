@@ -174,7 +174,7 @@ private:
 	QScrollBar * m_pianoScroll;
 	int m_startKey; //!< first key when drawing
 	int m_lastKey = -1; //!< previously pressed key
-	IntModel *m_movedNoteModel = nullptr; //!< note marker which is being moved
+	IntModel* m_movedNoteModel = nullptr; //!< note marker which is being moved
 
 private slots:
 	//! @brief Handle the scrolling on the piano display view

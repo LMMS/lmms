@@ -388,7 +388,7 @@ private:
 	//! @brief Rounds @p value to @p where if it is close to it
 	//! @param[out] value Will be modified to rounded value
 	//! @param[in] where The number to round @p value to, if it is near enough
-	template<class T> void roundAt(T &value, const T &where) const;
+	template<class T> void roundAt(T& value, const T& where) const;
 
 
 	ScaleType m_scaleType; //!< scale type, linear by default

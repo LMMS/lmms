@@ -1,14 +1,14 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 3.27)
+cmake_minimum_required(VERSION 3.27)
 
-PROJECT(lmms)
-SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/../cmake/modules" ${CMAKE_MODULE_PATH})
+project(lmms)
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/../cmake/modules" ${CMAKE_MODULE_PATH})
 
-FIND_PACKAGE(Doxygen REQUIRED)
-CONFIGURE_FILE(Doxyfile.in Doxyfile @ONLY)
-DOXYGEN_ADD_DOCS(doc
+find_package(Doxygen REQUIRED)
+configure_file(Doxyfile.in Doxyfile @ONLY)
+doxygen_add_docs(doc
 	USE_STAMP_FILE
 	WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
 	COMMENT "Generating HTML documentation with Doxygen"
 	CONFIG_FILE ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
 
-ADD_SUBDIRECTORY(bash-completion)
+add_subdirectory(bash-completion)
