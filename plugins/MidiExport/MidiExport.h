@@ -27,18 +27,18 @@
 #define _MIDI_EXPORT_H
 
 
+#include <cstdint>
+#include <vector>
+
 #include "ExportFilter.h"
-#include "MidiFile.hpp"
 #include "Note.h"
 
 class QDomNode;
+class Alg_seq;
 
 namespace lmms
 {
 
-
-const int BUFFER_SIZE = 50*1024;
-using MTrack = MidiFile::MIDITrack<BUFFER_SIZE>;
 
 struct MidiNote
 {
@@ -86,8 +86,9 @@ public:
 private:
 	void writeMidiClip(MidiNoteVector &midiClip, const QDomNode& n,
 				int base_pitch, double base_volume, int base_time);
-	void writeMidiClipToTrack(MTrack &mtrack, MidiNoteVector &nv);
-	void writeTempoTrack(MTrack &mtrack, int defaultTempo) const;
+	void writeMidiClipToTrack(Alg_seq& sequence, int trackIndex,
+				int channel, const MidiNoteVector& notes);
+	void writeTempoTrack(Alg_seq& sequence, int defaultTempo) const;
 	void writePatternClip(MidiNoteVector &src, MidiNoteVector &dst,
 				int len, int base, int start, int end);
 	void processPatternNotes(MidiNoteVector &nv, int cutPos);

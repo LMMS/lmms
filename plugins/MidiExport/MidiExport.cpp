@@ -27,13 +27,18 @@
 
 #include "MidiExport.h"
 
+#include <algorithm>
+#include <climits>
+#include <cmath>
 #include <iterator>
 #include <limits>
 #include <map>
 #include <set>
+#include <sstream>
 
-#include <QDataStream>
+#include <QFile>
 
+#include "allegro.h"
 #include "AutomationClip.h"
 #include "Engine.h"
 #include "TrackContainer.h"
@@ -55,11 +60,18 @@ namespace
 constexpr int LmmsTicksPerQuarterNote = DefaultTicksPerBar / 4;
 constexpr int TempoAutomationSamplePeriod = DefaultTicksPerBar / DefaultStepsPerBar;
 
-uint32_t lmmsTicksToMidiTicks(int ticks)
+double lmmsTicksToBeats(int ticks)
 {
-	const auto nonNegativeTicks = static_cast<uint64_t>(qMax(0, ticks));
-	return static_cast<uint32_t>(nonNegativeTicks * MidiFile::TICKSPERBEAT /
-		LmmsTicksPerQuarterNote);
+	return static_cast<double>(qMax(0, ticks)) / LmmsTicksPerQuarterNote;
+}
+
+void addTrackName(Alg_seq& sequence, int trackIndex, const QString& name)
+{
+	auto* event = sequence.create_update(0, -1, -1);
+	const auto encodedName = name.toUtf8();
+	event->set_string_value(trackIndex == 0 ? "seqnames" : "tracknames",
+		encodedName.constData());
+	sequence.add_event(event, trackIndex);
 }
 
 } // namespace
@@ -108,49 +120,25 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 	// Format 1 reserves track 0 for global events such as tempo changes.
 	const auto musicTrackCount = countInstrumentTracks(tracks) +
 		countInstrumentTracks(patternStoreTracks);
-	const auto totalTrackCount = musicTrackCount + 1;
-	if (totalTrackCount > std::numeric_limits<uint16_t>::max())
+	if (musicTrackCount >= std::numeric_limits<uint16_t>::max())
 	{
 		return false;
 	}
+	const int totalTrackCount = static_cast<int>(musicTrackCount + 1);
 
-	QFile f(filename);
-	if (!f.open(QIODevice::WriteOnly))
+	Alg_seq sequence;
+	sequence.convert_to_beats();
+	for (int trackIndex = 1; trackIndex < totalTrackCount; ++trackIndex)
 	{
-		return false;
+		sequence.add_track(trackIndex);
 	}
-	QDataStream midiout(&f);
 
 	QDomElement element;
+	int musicTrackIndex = 1;
 
-	auto headerBuffer = std::array<uint8_t, 14>{};
-	const auto writeTrack = [&midiout](const MTrack& track)
-	{
-		const auto bytes = track.writeToVector();
-		if (bytes.empty() || bytes.size() > std::numeric_limits<int>::max())
-		{
-			return false;
-		}
-		return midiout.writeRawData(reinterpret_cast<const char*>(bytes.data()),
-			static_cast<int>(bytes.size())) == static_cast<int>(bytes.size());
-	};
-
-	// MIDI Type 1 header followed by the conductor track.
-	MidiFile::MIDIHeader header(static_cast<uint16_t>(totalTrackCount),
-		MidiFile::MIDIFormat::Type1);
-	const int headerSize = header.writeToBuffer(headerBuffer.data());
-	if (midiout.writeRawData(reinterpret_cast<const char*>(headerBuffer.data()), headerSize) != headerSize)
-	{
-		return false;
-	}
-
-	MTrack tempoTrack;
-	tempoTrack.addName("Tempo Map", 0);
-	writeTempoTrack(tempoTrack, tempo);
-	if (!writeTrack(tempoTrack))
-	{
-		return false;
-	}
+	// Standard MIDI File type 1 reserves track 0 for global events.
+	addTrackName(sequence, 0, QStringLiteral("Tempo Map"));
+	writeTempoTrack(sequence, tempo);
 
 	std::vector<std::vector<std::pair<int,int>>> plists;
 
@@ -158,7 +146,6 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 	for (Track* track : tracks)
 	{
 		DataFile dataFile(DataFile::Type::SongProject);
-		MTrack mtrack;
 
 		if (track->type() == Track::Type::Instrument)
 		{
@@ -168,8 +155,8 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 				return false;
 			}
 
-			mtrack.channel = static_cast<uint8_t>(instTrack->midiPort()->realOutputChannel());
-			mtrack.addName(track->name().toStdString(), 0);
+			const int channel = instTrack->midiPort()->realOutputChannel();
+			addTrackName(sequence, musicTrackIndex, track->name());
 
 			element = instTrack->saveState(dataFile, dataFile.content());
 
@@ -201,11 +188,8 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 
 			}
 			processPatternNotes(midiClip, INT_MAX);
-			writeMidiClipToTrack(mtrack, midiClip);
-			if (!writeTrack(mtrack))
-			{
-				return false;
-			}
+			writeMidiClipToTrack(sequence, musicTrackIndex, channel, midiClip);
+			++musicTrackIndex;
 		}
 
 		if (track->type() == Track::Type::Pattern)
@@ -235,7 +219,6 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 	for (Track* track : patternStoreTracks)
 	{
 		DataFile dataFile(DataFile::Type::SongProject);
-		MTrack mtrack;
 
 		// begin at the first pattern track (first pattern)
 		auto itr = plists.begin();
@@ -249,8 +232,8 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 			return false;
 		}
 
-		mtrack.channel = static_cast<uint8_t>(instTrack->midiPort()->realOutputChannel());
-		mtrack.addName(track->name().toStdString(), 0);
+		const int channel = instTrack->midiPort()->realOutputChannel();
+		addTrackName(sequence, musicTrackIndex, track->name());
 
 		element = instTrack->saveState(dataFile, dataFile.content());
 
@@ -320,19 +303,31 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 				}
 
 				processPatternNotes(nv, pos);
-				writeMidiClipToTrack(mtrack, nv);
+				writeMidiClipToTrack(sequence, musicTrackIndex, channel, nv);
 
 				// next pattern track
 				++itr;
 			}
 		}
-		if (!writeTrack(mtrack))
-		{
-			return false;
-		}
+		++musicTrackIndex;
 	}
 
-	return midiout.status() == QDataStream::Ok;
+	std::ostringstream output(std::ios::out | std::ios::binary);
+	sequence.smf_write(output);
+	if (!output.good())
+	{
+		return false;
+	}
+
+	const std::string bytes = output.str();
+	QFile file(filename);
+	if (!file.open(QIODevice::WriteOnly))
+	{
+		return false;
+	}
+
+	return file.write(bytes.data(), static_cast<qint64>(bytes.size())) ==
+		static_cast<qint64>(bytes.size());
 
 }
 
@@ -360,7 +355,7 @@ void MidiExport::writeMidiClip(MidiNoteVector &midiClip, const QDomNode& n,
 
 
 
-void MidiExport::writeTempoTrack(MTrack& mtrack, int defaultTempo) const
+void MidiExport::writeTempoTrack(Alg_seq& sequence, int defaultTempo) const
 {
 	std::set<int> changeTimes{0};
 	Song* song = Engine::getSong();
@@ -410,7 +405,7 @@ void MidiExport::writeTempoTrack(MTrack& mtrack, int defaultTempo) const
 		}
 	}
 
-	std::map<uint32_t, int> tempoEvents;
+	std::map<int, int> tempoEvents;
 	tempoEvents.emplace(0, qBound(static_cast<int>(MinTempo), defaultTempo,
 		static_cast<int>(MaxTempo)));
 
@@ -432,7 +427,7 @@ void MidiExport::writeTempoTrack(MTrack& mtrack, int defaultTempo) const
 			}
 		}
 
-		tempoEvents[lmmsTicksToMidiTicks(time)] =
+		tempoEvents[time] =
 			qBound(static_cast<int>(MinTempo), tempo, static_cast<int>(MaxTempo));
 	}
 
@@ -441,7 +436,7 @@ void MidiExport::writeTempoTrack(MTrack& mtrack, int defaultTempo) const
 	{
 		if (tempo != lastTempo)
 		{
-			mtrack.addTempo(tempo, time);
+			sequence.insert_tempo(tempo, lmmsTicksToBeats(time));
 			lastTempo = tempo;
 		}
 	}
@@ -449,13 +444,22 @@ void MidiExport::writeTempoTrack(MTrack& mtrack, int defaultTempo) const
 
 
 
-void MidiExport::writeMidiClipToTrack(MTrack &mtrack, MidiNoteVector &nv)
+void MidiExport::writeMidiClipToTrack(Alg_seq& sequence, int trackIndex,
+			int channel, const MidiNoteVector& notes)
 {
-	for (const auto& note : nv)
+	for (const auto& note : notes)
 	{
-		mtrack.addNoteAtTick(note.pitch, note.volume,
-			lmmsTicksToMidiTicks(note.time),
-			lmmsTicksToMidiTicks(note.time + note.duration));
+		// A velocity-zero note-on is a note-off in MIDI and therefore silent.
+		if (note.volume == 0)
+		{
+			continue;
+		}
+
+		const double start = lmmsTicksToBeats(note.time);
+		const double end = lmmsTicksToBeats(note.time + note.duration);
+		auto* event = sequence.create_note(start, channel, note.pitch,
+			note.pitch, note.volume, qMax(0.0, end - start));
+		sequence.add_event(event, trackIndex);
 	}
 }
 

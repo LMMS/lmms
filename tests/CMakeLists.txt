@@ -8,12 +8,15 @@ set(LMMS_TESTS
 	src/core/AudioBufferTest.cpp
 	src/core/AutomatableModelTest.cpp
 	src/core/MathTest.cpp
-	src/core/MidiFileTest.cpp
 	src/core/ProjectVersionTest.cpp
 	src/core/RelativePathsTest.cpp
 	src/core/TimelineTest.cpp
 	src/tracks/AutomationTrackTest.cpp
 )
+
+if(TARGET PortSMF)
+	list(APPEND LMMS_TESTS src/core/PortSMFTest.cpp)
+endif()
 
 foreach(LMMS_TEST_SRC IN LISTS LMMS_TESTS)
 	# TODO CMake 3.20: Use cmake_path
@@ -24,16 +27,15 @@ foreach(LMMS_TEST_SRC IN LISTS LMMS_TESTS)
 
 	# TODO CMake 3.12: Propagate usage requirements by linking to lmmsobjs
 	target_include_directories(${LMMS_TEST_NAME} PRIVATE $<TARGET_PROPERTY:lmmsobjs,INCLUDE_DIRECTORIES>)
-	if(LMMS_TEST_NAME STREQUAL "MidiFileTest")
-		target_include_directories(${LMMS_TEST_NAME} PRIVATE
-			"${CMAKE_SOURCE_DIR}/plugins/MidiExport")
-	endif()
 
 	target_static_libraries("${LMMS_TEST_NAME}" PRIVATE lmmsobjs)
 	target_link_libraries(${LMMS_TEST_NAME} PRIVATE
 		${QT_LIBRARIES}
 		${QT_QTTEST_LIBRARY}
 	)
+	if(LMMS_TEST_NAME STREQUAL "PortSMFTest")
+		target_link_libraries(${LMMS_TEST_NAME} PRIVATE PortSMF)
+	endif()
 
 	target_compile_features(${LMMS_TEST_NAME} PRIVATE cxx_std_20)
 	target_compile_definitions(${LMMS_TEST_NAME} PRIVATE LMMS_TESTING)

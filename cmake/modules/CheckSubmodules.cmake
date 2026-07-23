@@ -76,6 +76,13 @@ FOREACH(_path ${SUBMODULE_LIST_RAW})
 			ENDIF()
 		ENDFOREACH()
 
+		# MIDI import and export share the PortSMF dependency, which remains
+		# located beneath the MidiImport source directory.
+		IF("${SUBMODULE_PATH}" STREQUAL "plugins/MidiImport/portsmf"
+			AND "MidiExport" IN_LIST PLUGIN_LIST)
+			SET(REMOVE_PLUGIN false)
+		ENDIF()
+
 		IF(REMOVE_PLUGIN)
 			LIST(APPEND SKIP_SUBMODULES "${SUBMODULE_PATH}")
 		ENDIF()
