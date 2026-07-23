@@ -2,6 +2,7 @@
  * endian_handling.h - handle endianness
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2026 Fawn <rubiefawn@proton.me>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -26,33 +27,28 @@
 #define LMMS_ENDIAN_HANDLING_H
 
 #include <cstdint>
-#include <QSysInfo>
-
+#include <bit>
 
 namespace lmms
 {
 
-
-inline bool isLittleEndian()
+constexpr std::int16_t swap16IfBE(std::int16_t i)
 {
-	return( QSysInfo::ByteOrder == QSysInfo::LittleEndian );
+	if constexpr (std::endian::native == std::endian::big)
+	{
+		return (i & 0x00ff) << 8 | (i & 0xff00) >> 8;
+	}
+	else { return i; }
 }
 
-
-inline int16_t swap16IfBE( int16_t i )
+constexpr std::int32_t swap32IfBE(std::int32_t i)
 {
-	return( isLittleEndian() ? i : ( ( i & 0xFF ) << 8) | ( ( i >> 8 ) & 0xFF ) );
+	if constexpr (std::endian::native == std::endian::big)
+	{
+		return (i & 0xff000000) >> 24 | (i & 0x00ff0000) >> 8 | (i & 0x0000ff00) << 8 | (i & 0x000000ff) << 24;
+	}
+	else { return i; }
 }
-
-
-inline int32_t swap32IfBE( int32_t i )
-{
-	return( isLittleEndian() ? i : ( ( i & 0xff000000 ) >> 24 ) |
-					( ( i & 0x00ff0000 ) >> 8 )  |
-					( ( i & 0x0000ff00 ) << 8 )  |
-					( ( i & 0x000000ff ) << 24 ) );
-}
-
 
 } // namespace lmms
 
