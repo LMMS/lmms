@@ -228,8 +228,6 @@ ELSE()
 ENDIF()
 
 IF(LMMS_BUILD_OPENBSD)
-	# “don't link deprecated ossaudio on OpenBSD”
-	# https://cvsweb.openbsd.org/checkout/ports/audio/lmms/patches/patch-CMakeLists_txt?rev=1.3
 	# LMMS finds SDL and compiles fine with it enabled, but it doesn't
 	# appear as an option when choosing an audio backend in settings for
 	# some reason. This might be fixable, but the OpenBSD ports
