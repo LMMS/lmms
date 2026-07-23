@@ -201,10 +201,8 @@ auto AudioBuffer::hasAnySignal() const -> bool
 	return !m_silenceFlags.all();
 }
 
-void AudioBuffer::sanitize(const ChannelFlags& channels, ch_cnt_t upperBound)
+auto AudioBuffer::sanitize(const ChannelFlags& channels, ch_cnt_t upperBound) -> bool
 {
-	if (!MixHelpers::useNaNHandler()) { return; }
-
 	bool changesMade = false;
 
 	const auto totalChannels = std::min(upperBound, this->totalChannels());
@@ -213,9 +211,10 @@ void AudioBuffer::sanitize(const ChannelFlags& channels, ch_cnt_t upperBound)
 		if (channels[ch])
 		{
 			// This channel needs to be sanitized
-			if (MixHelpers::sanitize(buffer(ch)))
+			if (std::ranges::any_of(buffer(ch), [](auto val) { return !std::isfinite(val); }))
 			{
 				// Inf/NaN detected and buffer cleared
+				std::ranges::fill(buffer(ch), 0.f);
 				m_silenceFlags[ch] = true;
 				changesMade = true;
 			}
@@ -227,18 +226,19 @@ void AudioBuffer::sanitize(const ChannelFlags& channels, ch_cnt_t upperBound)
 		// Keep the temporary interleaved buffer in sync
 		toInterleaved(groupBuffers(0), interleavedBuffer());
 	}
+
+	return changesMade;
 }
 
-void AudioBuffer::sanitizeAll()
+auto AudioBuffer::sanitizeAll() -> bool
 {
-	if (!MixHelpers::useNaNHandler()) { return; }
-
 	bool changesMade = false;
 	for (ch_cnt_t ch = 0; ch < totalChannels(); ++ch)
 	{
-		if (MixHelpers::sanitize(buffer(ch)))
+		if (std::ranges::any_of(buffer(ch), [](auto val) { return !std::isfinite(val); }))
 		{
 			// Inf/NaN detected and buffer cleared
+			std::ranges::fill(buffer(ch), 0.f);
 			m_silenceFlags[ch] = true;
 			changesMade = true;
 		}
@@ -249,6 +249,8 @@ void AudioBuffer::sanitizeAll()
 		// Keep the temporary interleaved buffer in sync
 		toInterleaved(groupBuffers(0), interleavedBuffer());
 	}
+
+	return changesMade;
 }
 
 auto AudioBuffer::updateSilenceFlags(const ChannelFlags& channels, ch_cnt_t upperBound) -> bool
@@ -354,7 +356,7 @@ auto AudioBuffer::absPeakValue(ch_cnt_t channel) const -> float
 		return 0;
 	}
 
-	return std::ranges::max(buffer(channel), {}, static_cast<float(&)(float)>(std::abs));
+	return std::abs(std::ranges::max(buffer(channel), {}, static_cast<float(&)(float)>(std::abs)));
 }
 
 } // namespace lmms

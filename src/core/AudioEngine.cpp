@@ -30,6 +30,7 @@
 
 #include "AudioEngineWorkerThread.h"
 #include "AudioBusHandle.h"
+#include "Hardware.h"
 #include "Mixer.h"
 #include "Song.h"
 #include "EnvelopeAndLfoParameters.h"
@@ -88,6 +89,7 @@ AudioEngine::AudioEngine(bool renderOnly)
 	, m_audioDevStartFailed(false)
 	, m_profiler()
 	, m_clearSignal(false)
+	, m_sanitizationEnabled(ConfigManager::inst()->value("audioengine", "sanitizemix", "1").toInt())
 {
 	for( int i = 0; i < 2; ++i )
 	{
@@ -677,7 +679,7 @@ bool AudioEngine::isMidiDevNameValid(QString name)
 	}
 #endif
 
-#ifdef LMMS_BUILD_WIN32
+#ifdef LMMS_HAVE_WINMM
 	if (name == MidiWinMM::name())
 	{
 		return true;
@@ -918,7 +920,7 @@ MidiClient * AudioEngine::tryMidiClients()
 	}
 #endif
 
-#ifdef LMMS_BUILD_WIN32
+#ifdef LMMS_HAVE_WINMM
 	if( client_name == MidiWinMM::name() || client_name == "" )
 	{
 		MidiWinMM * mwmm = new MidiWinMM;
