@@ -26,7 +26,6 @@
 
 #include <string>
 
-#include "SamplePlayHandle.h"
 #include "Song.h"
 #include "embed.h"
 #include "plugin_export.h"
@@ -46,6 +45,7 @@ PLUGIN_EXPORT Plugin* lmms_plugin_main(Model*, void*)
 
 TapTempo::TapTempo()
 	: ToolPlugin(&taptempo_plugin_descriptor, nullptr)
+	, m_intervals({})
 {
 	m_intervals.fill(std::chrono::milliseconds::zero());
 }
@@ -54,13 +54,15 @@ void TapTempo::tap(bool play)
 {
 	using namespace std::literals;
 
+	const auto& timeSig = Engine::getSong()->getTimeSigModel();
+
 	if (play)
 	{
-		const auto metronomeFile = m_beat == 0 ? "misc/metronome02.ogg" : "misc/metronome01.ogg";
-		Engine::audioEngine()->addPlayHandle(new SamplePlayHandle(metronomeFile));
+		const auto currentTick = m_beat * TimePos::ticksPerBeat(timeSig);
+		m_metronome.processTick(currentTick, TimePos::ticksPerBar(timeSig), timeSig.getNumerator());
 	}
 
-	m_beat = (m_beat + 1) % Engine::getSong()->getTimeSigModel().getNumerator();
+	m_beat = (m_beat + 1) % timeSig.getNumerator();
 
 	if (m_lastTap.time_since_epoch() == 0ms)
 	{
