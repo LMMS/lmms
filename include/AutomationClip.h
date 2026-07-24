@@ -60,17 +60,19 @@ public:
 	} ;
 
 	using timeMap = QMap<int, AutomationNode>;
-	using objectVector = std::vector<QPointer<AutomatableModel>>;
+	using Connections = std::vector<AutomatableModel::Connection>;
 
 	using TimemapIterator = timeMap::const_iterator;
 
 	AutomationClip( AutomationTrack * _auto_track );
 	~AutomationClip() override = default;
 
-	bool addObject( AutomatableModel * _obj, bool _search_dup = true );
+	bool addConnection(AutomatableModel* model, bool searchDuplicates = true);
+	void removeConnection(const AutomatableModel* model);
 
-	const AutomatableModel * firstObject() const;
-	const objectVector& objects() const;
+	//! @returns the first connection's model, or a dummy model if there are no connections
+	const AutomatableModel& connectedModel() const;
+	const Connections& connections() const;
 
 	// progression-type stuff
 	inline ProgressionType progressionType() const
@@ -115,6 +117,9 @@ public:
 	 */
 	void resetTangents(const int tick0, const int tick1);
 
+	void generateTangents();
+	void generateTangents(timeMap::iterator it, int numToGenerate);
+
 	void recordValue(TimePos time, float value);
 
 	TimePos setDragValue( const TimePos & time,
@@ -142,12 +147,12 @@ public:
 
 	inline float getMin() const
 	{
-		return firstObject()->minValue<float>();
+		return connectedModel().minValue<float>();
 	}
 
 	inline float getMax() const
 	{
-		return firstObject()->maxValue<float>();
+		return connectedModel().maxValue<float>();
 	}
 
 	inline bool hasAutomation() const
@@ -181,8 +186,6 @@ public:
 	gui::ClipView * createView( gui::TrackView * _tv ) override;
 
 
-	static bool isAutomated( const AutomatableModel * _m );
-	static std::vector<AutomationClip*> clipsForModel(const AutomatableModel* _m);
 	static AutomationClip * globalAutomationClip( AutomatableModel * _m );
 	static void resolveAllIDs();
 
@@ -197,11 +200,11 @@ public:
 		return new AutomationClip(*this);
 	}
 
-	void clearObjects() { m_objects.clear(); }
+	void clearConnections() { m_connections.clear(); }
 
 public slots:
 	void clear();
-	void objectDestroyed( lmms::jo_id_t );
+	void connectedModelDestroyed(lmms::jo_id_t id);
 	void flipY( int min, int max );
 	void flipY();
 	void flipX(int start = -1, int end = -1);
@@ -210,9 +213,7 @@ protected:
 	AutomationClip( const AutomationClip & _clip_to_copy );
 
 private:
-	void cleanObjects();
-	void generateTangents();
-	void generateTangents(timeMap::iterator it, int numToGenerate);
+	void cleanConnections();
 	float valueAt( timeMap::const_iterator v, int offset ) const;
 
 	/**
@@ -230,7 +231,7 @@ private:
 
 	AutomationTrack * m_autoTrack;
 	std::vector<jo_id_t> m_idsToResolve;
-	objectVector m_objects;
+	Connections m_connections;
 	timeMap m_timeMap;	// actual values
 	timeMap m_oldTimeMap;	// old values for storing the values before setDragValue() is called.
 	float m_tension;
@@ -251,12 +252,7 @@ private:
 
 	static const float DEFAULT_MIN_VALUE;
 	static const float DEFAULT_MAX_VALUE;
-
-	friend class gui::AutomationClipView;
-	friend class AutomationNode;
-	friend class gui::AutomationEditor;
-
-} ;
+};
 
 //Short-hand functions to access node values in an automation clip;
 // replacement for CPP macros with the same purpose; could be refactored

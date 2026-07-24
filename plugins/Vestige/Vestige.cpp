@@ -230,7 +230,7 @@ void VestigeInstrument::loadSettings( const QDomElement & _this )
 			knobFModel[i] = new FloatModel( 0.0f, 0.0f, 1.0f, 0.01f, this, QString::number(i) );
 			knobFModel[i]->loadSettings(_this, paramStr.data());
 
-			if( !( knobFModel[ i ]->isAutomated() || knobFModel[ i ]->controllerConnection() ) )
+			if (!knobFModel[i]->isAutomatedOrControlled())
 			{
 				knobFModel[ i ]->setValue(LocaleHelper::toFloat(s_dumpValues.at(2)));
 				knobFModel[ i ]->setInitValue(LocaleHelper::toFloat(s_dumpValues.at(2)));
@@ -287,7 +287,8 @@ void VestigeInstrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 			auto paramStr = std::array<char, 35>{};
 			for( int i = 0; i < paramCount; i++ )
 			{
-				if (knobFModel[i]->isAutomated() || knobFModel[i]->controllerConnection()) {
+				if (knobFModel[i]->isAutomatedOrControlled())
+				{
 					std::snprintf(paramStr.data(), paramStr.size(), "param%d", i);
 					knobFModel[i]->saveSettings(_doc, _this, paramStr.data());
 				}
@@ -1038,7 +1039,7 @@ void ManageVestigeInstrumentView::syncPlugin( void )
 	{
 		// only not automated knobs are synced from VST
 		// those auto-setted values are not jurnaled, tracked for undo / redo
-		if( !( m_vi->knobFModel[ i ]->isAutomated() || m_vi->knobFModel[ i ]->controllerConnection() ) )
+		if (!m_vi->knobFModel[i]->isAutomatedOrControlled())
 		{
 			std::snprintf(paramStr.data(), paramStr.size(), "param%d", i);
 			s_dumpValues = dump[paramStr.data()].split(":");
@@ -1060,8 +1061,7 @@ void ManageVestigeInstrumentView::displayAutomatedOnly( void )
 
 	for( int i = 0; i< m_vi->paramCount; i++ )
 	{
-
-		if( !( m_vi->knobFModel[ i ]->isAutomated() || m_vi->knobFModel[ i ]->controllerConnection() ) )
+		if (!m_vi->knobFModel[i]->isAutomatedOrControlled())
 		{
 			if (m_vstKnobs[i]->isVisible() && isAuto)
 			{

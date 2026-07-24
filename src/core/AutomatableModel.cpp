@@ -84,19 +84,70 @@ AutomatableModel::~AutomatableModel()
 	emit destroyed( id() );
 }
 
-
-
-
-bool AutomatableModel::isAutomated() const
+AutomatableModel::Connection::Connection(AutomatableModel* model)
 {
-	return AutomationClip::isAutomated( this );
+	reset(model);
 }
 
+AutomatableModel::Connection::Connection(const Connection& other)
+{
+	reset(other.m_model);
+}
 
+AutomatableModel::Connection::Connection(Connection&& other) noexcept
+	: m_model{std::exchange(other.m_model, nullptr)}
+{}
+
+auto AutomatableModel::Connection::operator=(const Connection& other) -> Connection&
+{
+	if (this != &other)
+	{
+		reset(other.m_model);
+	}
+	return *this;
+}
+
+auto AutomatableModel::Connection::operator=(Connection&& other) noexcept -> Connection&
+{
+	if (this != &other)
+	{
+		reset(std::exchange(other.m_model, nullptr));
+	}
+	return *this;
+}
+
+AutomatableModel::Connection::~Connection()
+{
+	disconnect();
+}
+
+void AutomatableModel::Connection::reset(AutomatableModel* model)
+{
+	// Disconnect
+	if (m_model)
+	{
+		[[maybe_unused]] auto num = m_model->m_totalAutomationConnections.fetch_sub(1, std::memory_order::release);
+		assert(num >= 0);
+	}
+
+	m_model = model;
+
+	// Connect
+	if (model)
+	{
+		[[maybe_unused]] auto num = model->m_totalAutomationConnections.fetch_add(1, std::memory_order::acquire);
+		assert(num >= 0);
+	}
+}
+
+void AutomatableModel::Connection::disconnect()
+{
+	reset(nullptr);
+}
 
 bool AutomatableModel::mustQuoteName(const QString& name)
 {
-	QRegularExpression reg("^[A-Za-z0-9._-]+$");
+	static const auto reg = QRegularExpression{"^[A-Za-z0-9._-]+$"};
 	return !reg.match(name).hasMatch();
 }
 
@@ -654,64 +705,6 @@ void AutomatableModel::reset()
 
 
 
-
-float AutomatableModel::globalAutomationValueAt( const TimePos& time )
-{
-	// get clips that connect to this model
-	auto clips = AutomationClip::clipsForModel(this);
-	if (clips.empty())
-	{
-		// if no such clips exist, return current value
-		return m_value;
-	}
-	else
-	{
-		// of those clips:
-		// find the clips which overlap with the time position
-		std::vector<AutomationClip*> clipsInRange;
-		for (const auto& clip : clips)
-		{
-			int s = clip->startPosition();
-			int e = clip->endPosition();
-			if (s <= time && e >= time) { clipsInRange.push_back(clip); }
-		}
-
-		AutomationClip * latestClip = nullptr;
-
-		if (!clipsInRange.empty())
-		{
-			// if there are more than one overlapping clips, just use the first one because
-			// multiple clip behaviour is undefined anyway
-			latestClip = clipsInRange[0];
-		}
-		else
-		// if we find no clips at the exact time, we need to search for the last clip before time and use that
-		{
-			int latestPosition = 0;
-
-			for (const auto& clip : clips)
-			{
-				int e = clip->endPosition();
-				if (e <= time && e > latestPosition)
-				{
-					latestPosition = e;
-					latestClip = clip;
-				}
-			}
-		}
-
-		if( latestClip )
-		{
-			// scale/fit the value appropriately and return it
-			const float value = latestClip->valueAt(time - latestClip->startPosition() + latestClip->startTimeOffset());
-			const float scaled_value = scaledValue( value );
-			return fittedValue( scaled_value );
-		}
-		// if we still find no clip, the value at that time is undefined so
-		// just return current value as the best we can do
-		else return m_value;
-	}
-}
 
 void AutomatableModel::setUseControllerValue(bool b)
 {
