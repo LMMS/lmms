@@ -68,6 +68,12 @@ public:
 		emit positionChanged();
 	}
 
+	//! @returns the current tick plus a fractional amount to account for the frame offset within the current tick
+	auto frameAdjustedTicks() const -> double
+	{
+		return m_pos.getTicks() + m_frameOffset / static_cast<double>(Engine::framesPerTick());
+	}
+
 	auto frameOffset() const -> float { return m_frameOffset; }
 	void setFrameOffset(const float frame) { m_frameOffset = frame; }
 
@@ -87,6 +93,13 @@ public:
 	void setStopBehaviour(StopBehaviour behaviour);
 
 	auto getElapsedSeconds() const -> double { return m_elapsedSeconds + frameOffset() / Engine::audioEngine()->outputSampleRate(); }
+
+	//! @returns the position measured in number of quarter notes (beats)
+	auto ppqPos() const -> double
+	{
+		constexpr auto ticksPerBeat = DefaultTicksPerBar / 4.0;
+		return frameAdjustedTicks() / ticksPerBeat;
+	}
 
 	auto nodeName() const -> QString override { return "timeline"; }
 
