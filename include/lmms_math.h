@@ -67,19 +67,17 @@ inline auto fraction(std::floating_point auto x) noexcept
 
 
 // TODO C++23: Make constexpr since std::floor() will be constexpr
-/*!
- * @brief Returns the wrapped fractional part of a float, a value between 0.0f and 1.0f.
- *
- * absFraction( 2.3) =>  0.3
- * absFraction(-2.3) =>  0.7
- *
- * Note that this not the same as the absolute value of the fraction (as the function name suggests).
- * If the result is interpreted as a phase of an oscillator, it makes that negative phases are
- * converted to positive phases.
- */
-inline auto absFraction(std::floating_point auto x) noexcept
+//! @brief Normalizes a phase, such that it is wrapped within [0, Period).
+//! This safely converts negative phases into an equivalent positive phase.
+//! @param x The phase to normalize.
+//! @tparam Period The exclusive upper bound of the range in which to wrap the phase.
+//! @returns A phase greater than or equal to 0 and less than Period.
+template<auto Period = 2 * std::numbers::pi_v<long double>, std::floating_point T>
+inline T normalizePhase(T x) noexcept
 {
-	return x - std::floor(x);
+	constexpr auto p = static_cast<T>(Period);
+	constexpr auto r = static_cast<T>(1.0 / Period);
+	return x - p * std::floor(x * r);
 }
 
 

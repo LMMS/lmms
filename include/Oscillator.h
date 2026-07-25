@@ -118,7 +118,7 @@ public:
 
 	static inline sample_t triangleSample( const float _sample )
 	{
-		const float ph = absFraction( _sample );
+		const float ph = normalizePhase<1>(_sample);
 		if( ph <= 0.25f )
 		{
 			return ph * 4.0f;
@@ -132,17 +132,17 @@ public:
 
 	static inline sample_t sawSample( const float _sample )
 	{
-		return -1.0f + absFraction( _sample ) * 2.0f;
+		return -1.0f + normalizePhase<1>(_sample) * 2.0f;
 	}
 
 	static inline sample_t squareSample( const float _sample )
 	{
-		return ( absFraction( _sample ) > 0.5f ) ? -1.0f : 1.0f;
+		return normalizePhase<1>(_sample) > 0.5f ? -1.0f : 1.0f;
 	}
 
 	static inline sample_t moogSawSample( const float _sample )
 	{
-		const float ph = absFraction( _sample );
+		const float ph = normalizePhase<1>(_sample);
 		if( ph < 0.5f )
 		{
 			return -1.0f + ph * 4.0f;
@@ -152,7 +152,7 @@ public:
 
 	static inline sample_t expSample( const float _sample )
 	{
-		float ph = absFraction( _sample );
+		float ph = normalizePhase<1>(_sample);
 		if( ph > 0.5f )
 		{
 			ph = 1.0f - ph;
@@ -169,7 +169,7 @@ public:
 	{
 		if (buffer == nullptr || buffer->size() == 0) { return 0; }
 		const auto frames = buffer->size();
-		const auto frame = absFraction(sample) * frames;
+		const auto frame = normalizePhase<1>(sample) * frames;
 		const auto f1 = static_cast<f_cnt_t>(frame);
 
 		return std::lerp(buffer->data()[f1][0], buffer->data()[(f1 + 1) % frames][0], fraction(frame));
@@ -185,7 +185,7 @@ public:
 	inline wtSampleControl getWtSampleControl(const float sample) const
 	{
 		wtSampleControl control;
-		control.frame = absFraction(sample) * OscillatorConstants::WAVETABLE_LENGTH;
+		control.frame = normalizePhase<1>(sample) * OscillatorConstants::WAVETABLE_LENGTH;
 		control.f1 = static_cast<f_cnt_t>(control.frame);
 		control.f2 = control.f1 < OscillatorConstants::WAVETABLE_LENGTH - 1 ?
 					control.f1 + 1 :

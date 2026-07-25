@@ -110,10 +110,10 @@ Effect::ProcessStatus FrequencyShifterEffect::processImpl(SampleFrame* buf, cons
 	const float glideCoeff = glide ? std::exp(-1.f / (glide * m_sampleRate)) : 0.f;
 
 	// we only bother with wrapping phases once per buffer
-	m_lfoPhase = std::fmod(m_lfoPhase, twoPi);
+	m_lfoPhase = normalizePhase(m_lfoPhase);
 	for (int ch = 0; ch < 2; ++ch)
 	{
-		m_phase[ch] = std::fmod(m_phase[ch], twoPi);
+		m_phase[ch] = normalizePhase(m_phase[ch]);
 	}
 
 	for (size_t i = 0; i < frames; ++i)

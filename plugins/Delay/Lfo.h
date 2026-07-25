@@ -25,8 +25,7 @@
 #ifndef LFO_H
 #define LFO_H
 
-#include <cmath>
-#include <numbers>
+#include "lmms_math.h"
 
 namespace lmms
 {
@@ -50,7 +49,7 @@ public:
 		m_frequency = frequency;
 		m_increment = m_frequency * m_twoPiOverSr;
 
-		m_phase = std::fmod(m_phase, 2 * std::numbers::pi_v<float>);
+		m_phase = normalizePhase(m_phase);
 	}
 
 
