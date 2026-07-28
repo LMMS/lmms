@@ -55,6 +55,12 @@ SampleTrack::SampleTrack(TrackContainer* tc) :
 	setName(tr("Sample track"));
 	m_panningModel.setCenterValue(DefaultPanning);
 	m_mixerChannelModel.setRange(0, Engine::mixer()->numChannels()-1, 1);
+	if (Engine::mixer() && Engine::mixer()->numChannels() > 0)
+	{
+		int ch = Engine::mixer()->createChannel();
+		m_mixerChannelModel.setRange(0, Engine::mixer()->numChannels()-1, 1);
+		m_mixerChannelModel.setValue(ch);
+	}
 
 	connect(&m_mixerChannelModel, SIGNAL(dataChanged()), this, SLOT(updateMixerChannel()));
 }

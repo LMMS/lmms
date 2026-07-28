@@ -136,6 +136,11 @@ void drawPath( QPainter *p, const QPainterPath &path,
 LmmsStyle::LmmsStyle() :
 	QProxyStyle()
 {
+	qApp->setAttribute(Qt::AA_UseHighDpiPixmaps, true);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0) && QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
+	qApp->setAttribute(Qt::AA_EnableHighDpiScaling, true);
+#endif
+
 	QFile file( "resources:style.css" );
 	file.open( QIODevice::ReadOnly );
 	qApp->setStyleSheet( file.readAll() );

@@ -1,31 +1,86 @@
 /********************
- * LMMS style sheet *
+ * LMMS Modern Dark Style Sheet *
  ********************/
+
+QMainWindow {
+	background-color: #1a1a1d;
+	color: #e0e0e0;
+}
+
+QDockWidget {
+	color: #e0e0e0;
+	titlebar-close-icon: url("resources:close.png");
+	titlebar-normal-icon: url("resources:restore.png");
+	border: 1px solid #2a2a2d;
+	background-color: #1e1e22;
+}
+
+QDockWidget::title {
+	text-align: left;
+	background: #252529;
+	padding: 5px 8px;
+	font-weight: bold;
+	color: #4a9eff;
+	border-bottom: 1px solid #333338;
+}
+
+QDockWidget::close-button, QDockWidget::float-button {
+	border: none;
+	background: transparent;
+	icon-size: 14px;
+}
+
+QDockWidget::close-button:hover, QDockWidget::float-button:hover {
+	background: #3a3a40;
+	border-radius: 3px;
+}
+
+QTabBar::tab {
+	background: #252529;
+	color: #aaaaaa;
+	padding: 6px 14px;
+	border-top-left-radius: 4px;
+	border-top-right-radius: 4px;
+	margin-right: 2px;
+}
+
+QTabBar::tab:selected {
+	background: #1e1e22;
+	color: #4a9eff;
+	border-bottom: 2px solid #4a9eff;
+	font-weight: bold;
+}
+
+QTabBar::tab:hover {
+	background: #2d2d32;
+	color: #ffffff;
+}
 
 /* most foreground text items */
 QLabel, QTreeWidget, QListWidget, QGroupBox, QMenuBar, QCheckBox {
-	color: #d1d8e4;
+	color: #e0e0e0;
 }
 
 QTreeView {
 	outline: none;
-	alternate-background-color: #111314;
+	background-color: #1a1a1d;
+	alternate-background-color: #222226;
+	color: #e0e0e0;
 }
 
 QTreeWidget::item {
-	padding: 1px;
+	padding: 2px;
 }
 
 QTreeWidget::item:hover,
 QTreeWidget::branch:hover {
-	background-color: #3C444E;
-	padding-left: 0px;
+	background-color: #2c2c34;
 }
 
 QTreeWidget::item:selected,
 QTreeWidget::branch:selected {
-	background-color: #17793b;
-	padding-left: 0px;
+	background-color: #4a9eff;
+	color: #ffffff;
 }
 
 QTreeView::branch:has-children:open {
@@ -37,7 +92,7 @@ QTreeView::branch:has-children:closed {
 }
 
 QMdiArea {
-	background-color: #111314;
+	background-color: #141416;
 }
 
 lmms--gui--FileBrowser QCheckBox

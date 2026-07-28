@@ -80,6 +80,12 @@ InstrumentTrack::InstrumentTrack(TrackContainer* tc) :
 	m_lastKeyModel.setInitValue(NumKeys - 1);
 
 	m_mixerChannelModel.setRange( 0, Engine::mixer()->numChannels()-1, 1);
+	if (Engine::mixer() && Engine::mixer()->numChannels() > 0)
+	{
+		int ch = Engine::mixer()->createChannel();
+		m_mixerChannelModel.setRange( 0, Engine::mixer()->numChannels()-1, 1);
+		m_mixerChannelModel.setValue(ch);
+	}
 
 	for( int i = 0; i < NumKeys; ++i )
 	{
