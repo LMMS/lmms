@@ -230,8 +230,9 @@ private:
 	float m_bottomLevel;
 	float m_topLevel;
 
-	QPointer<MidiClip> m_ghostNotes = nullptr; // QPointer to set to nullptr on deletion
-	QPointer<SampleClip> m_ghostSample = nullptr; // QPointer to set to nullptr on deletion
+	// QPointers to set to nullptr on deletion
+	QPointer<MidiClip> m_ghostNotes = nullptr; 
+	QPointer<SampleClip> m_ghostSample = nullptr;
 	bool m_renderSample = false;
 
 	void centerTopBottomScroll();
