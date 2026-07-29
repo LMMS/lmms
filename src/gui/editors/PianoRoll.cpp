@@ -309,8 +309,8 @@ PianoRoll::PianoRoll() :
 	// init scrollbars
 	m_leftRightScroll = new QScrollBar( Qt::Horizontal, this );
 	m_leftRightScroll->setSingleStep( 1 );
-	connect( m_leftRightScroll, SIGNAL(valueChanged(int)), this,
-						SLOT(horScrolled(int)));
+	connect(m_leftRightScroll, &QScrollBar::valueChanged, this, &PianoRoll::horScrolled);
+	connect(m_leftRightScroll, &QScrollBar::sliderReleased, this, &PianoRoll::updatePosition);
 
 	m_topBottomScroll = new QScrollBar( Qt::Vertical, this );
 	m_topBottomScroll->setSingleStep( 1 );
@@ -4838,8 +4838,11 @@ bool PianoRoll::deleteSelectedNotes()
 
 void PianoRoll::autoScroll( const TimePos & t )
 {
+	// Manual scrolling overrides autoscroll
+	if (m_leftRightScroll->isSliderDown()) { return; }
+
 	const int w = width() - m_whiteKeyWidth;
-	if (m_timeLine->autoScroll() == TimeLineWidget::AutoScrollState::Stepped) 
+	if (m_timeLine->autoScroll() == TimeLineWidget::AutoScrollState::Stepped)
 	{
 		if (t > m_currentPosition + w * TimePos::ticksPerBar() / m_ppb)
 		{
