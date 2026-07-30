@@ -39,6 +39,7 @@ namespace gui
 
 class AutomationTrackView : public TrackView
 {
+	Q_OBJECT
 public:
 	AutomationTrackView( AutomationTrack* at, TrackContainerView* tcv );
 	~AutomationTrackView() override = default;

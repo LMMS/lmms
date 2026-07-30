@@ -63,6 +63,7 @@ private slots:
 	void recordingOn();
 	void recordingOff();
 	void clearTrack();
+	void exportTrack();
 
 private:
 	TrackView * m_trackView;

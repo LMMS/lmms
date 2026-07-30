@@ -32,6 +32,7 @@
 #include <QPainter>
 
 #include "AutomationClip.h"
+#include "AutomationClipView.h"
 #include "Clipboard.h"
 #include "ColorChooser.h"
 #include "DataFile.h"
