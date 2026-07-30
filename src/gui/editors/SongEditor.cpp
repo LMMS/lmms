@@ -1116,6 +1116,7 @@ void SongEditorWindow::recordAccompany()
 
 void SongEditorWindow::stop()
 {
+	m_editor->m_scrollBack = true;
 	m_editor->m_song->stop();
 	getGUI()->pianoRoll()->stopRecording();
 	m_editor->m_timeLine->setRecording(false);

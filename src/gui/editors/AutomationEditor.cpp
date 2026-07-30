@@ -1692,10 +1692,10 @@ void AutomationEditor::play()
 
 void AutomationEditor::stop()
 {
-	if( !validClip() )
-	{
-		return;
-	}
+	if (!validClip()) { return; }
+
+	m_scrollBack = true;
+
 	if (m_clip->getTrack() && inPatternEditor())
 	{
 		Engine::patternStore()->stop();
@@ -1704,7 +1704,6 @@ void AutomationEditor::stop()
 	{
 		Engine::getSong()->stop();
 	}
-	m_scrollBack = true;
 }
 
 
