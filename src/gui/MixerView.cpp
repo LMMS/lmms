@@ -190,8 +190,6 @@ int MixerView::addNewChannel()
 
 	updateMixerChannel(newChannelIndex);
 
-	updateMaxChannelSelector();
-
 	return newChannelIndex;
 }
 
@@ -231,37 +229,7 @@ void MixerView::refreshDisplay()
 	{
 		updateMixerChannel(i);
 	}
-
-	updateMaxChannelSelector();
 }
-
-
-// update the and max. channel number for every instrument
-void MixerView::updateMaxChannelSelector()
-{
-	const TrackContainer::TrackList& songTracks = Engine::getSong()->tracks();
-	const TrackContainer::TrackList& patternStoreTracks = Engine::patternStore()->tracks();
-
-	for (const auto& trackList : {songTracks, patternStoreTracks})
-	{
-		for (const auto& track : trackList)
-		{
-			if (track->type() == Track::Type::Instrument)
-			{
-				auto inst = (InstrumentTrack*)track;
-				inst->mixerChannelModel()->setRange(0,
-					m_mixerChannelViews.size()-1,1);
-			}
-			else if (track->type() == Track::Type::Sample)
-			{
-				auto strk = (SampleTrack*)track;
-				strk->mixerChannelModel()->setRange(0,
-					m_mixerChannelViews.size()-1,1);
-			}
-		}
-	}
-}
-
 
 void MixerView::saveSettings(QDomDocument& doc, QDomElement& domElement)
 {
@@ -415,8 +383,6 @@ void MixerView::deleteChannel(int index)
 		selLine = m_mixerChannelViews.size() - 1;
 	}
 	setCurrentMixerChannel(selLine);
-
-	updateMaxChannelSelector();
 }
 
 void MixerView::deleteUnusedChannels()
