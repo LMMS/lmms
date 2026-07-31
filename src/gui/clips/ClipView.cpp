@@ -28,7 +28,9 @@
 #include <set>
 #include <cassert>
 
+#include <QDrag>
 #include <QMenu>
+#include <QMimeData>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QUuid>
@@ -533,10 +535,31 @@ void ClipView::dropEvent( QDropEvent * de )
 
 	if (type == INTERNAL_COPY_KEY)
 	{
+		auto parts = value.split('|');
+		if (parts.size() < 4) { return; }
+
+		QString token = parts[0];
+		std::vector<InternalClipData> clips;
+		TimePos grabbedClipPos;
+		int initialTrackIndex;
+		unsigned int trackContainerId;
+
+		if (!retrieveInternalCopy(token, clips,
+				grabbedClipPos, initialTrackIndex, trackContainerId))
+		{
+			return;
+		}
+		if (clips.empty()) { return; }
+
+		TimePos pos = m_clip->startPosition();
+		clips[0].clone->copyDataTo(m_clip);
+		m_clip->movePosition(pos);
+		AutomationClip::resolveAllIDs();
+		de->accept();
 		return;
 	}
 
-	// Copy state into existing clip
+	// Copy state into existing clip (XML path)
 	DataFile dataFile( value.toUtf8() );
 	TimePos pos = m_clip->startPosition();
 	QDomElement clips = dataFile.content().firstChildElement("clips");
@@ -956,7 +979,20 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 				128, 128,
 				Qt::KeepAspectRatio,
 				Qt::SmoothTransformation );
-			new StringPairDrag(INTERNAL_COPY_KEY, value, thumbnail, this);
+
+			auto* mime = new QMimeData();
+			mime->setData(Clipboard::mimeType(Clipboard::MimeType::StringPair),
+				(QString(INTERNAL_COPY_KEY) + ":" + value).toUtf8());
+			// Cross-instance fallback: include XML payload via Default MIME
+			DataFile xmlDataFile = createClipDataFiles(clipViews);
+			mime->setData(Clipboard::mimeType(Clipboard::MimeType::Default),
+				xmlDataFile.toString().toUtf8());
+
+			auto* drag = new QDrag(this);
+			drag->setMimeData(mime);
+			drag->setPixmap(thumbnail);
+			drag->exec(Qt::CopyAction, Qt::CopyAction);
+			delete drag;
 
 			clearInternalCopy(token);
 		}

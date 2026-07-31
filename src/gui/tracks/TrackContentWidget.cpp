@@ -488,8 +488,12 @@ bool TrackContentWidget::pasteSelection( TimePos clipPos, const QMimeData * md, 
 	if (type == ClipView::INTERNAL_COPY_KEY)
 	{
 		bool wasSelection = false;
-		return pasteInternalCopy(value.split('|'), clipPos,
-			getTrack(), wasSelection);
+		if (pasteInternalCopy(value.split('|'), clipPos,
+			getTrack(), wasSelection))
+		{
+			return true;
+		}
+		// Token not found (cross-instance) — fall through to XML path
 	}
 
 	return pasteXmlSelection(clipPos, md);
@@ -875,7 +879,17 @@ bool TrackContentWidget::pasteXmlSelection(TimePos clipPos, const QMimeData* md)
 	getTrack()->addJournalCheckPoint();
 
 	QString value = decodeValue(md);
-	DataFile dataFile(value.toUtf8());
+	QByteArray data = value.toUtf8();
+
+	// If the StringPair value isn't valid XML, fall back to the Default MIME
+	// type which carries the XML payload for cross-instance internal copies.
+	QByteArray defaultData = md->data(mimeType(MimeType::Default));
+	if (!defaultData.isEmpty())
+	{
+		data = defaultData;
+	}
+
+	DataFile dataFile(data);
 
 	QDomElement clipParent = dataFile.content().firstChildElement("clips");
 	QDomNodeList clipNodes = clipParent.childNodes();
