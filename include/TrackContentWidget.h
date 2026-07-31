@@ -160,6 +160,7 @@ private:
 		Track* t, bool allowSameBar) const;
 	bool pasteInternalCopy(const QStringList& valueParts, TimePos clipPos,
 		Track* t, bool& wasSelection);
+	bool pasteXmlSelection(TimePos clipPos, const QMimeData* md);
 
 	TrackView * m_trackView;
 
