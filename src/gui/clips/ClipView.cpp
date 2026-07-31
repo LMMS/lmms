@@ -28,9 +28,7 @@
 #include <set>
 #include <cassert>
 
-#include <QDrag>
 #include <QMenu>
-#include <QMimeData>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QUuid>
@@ -979,20 +977,7 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 				128, 128,
 				Qt::KeepAspectRatio,
 				Qt::SmoothTransformation );
-
-			auto* mime = new QMimeData();
-			mime->setData(Clipboard::mimeType(Clipboard::MimeType::StringPair),
-				(QString(INTERNAL_COPY_KEY) + ":" + value).toUtf8());
-			// Cross-instance fallback: include XML payload via Default MIME
-			DataFile xmlDataFile = createClipDataFiles(clipViews);
-			mime->setData(Clipboard::mimeType(Clipboard::MimeType::Default),
-				xmlDataFile.toString().toUtf8());
-
-			auto* drag = new QDrag(this);
-			drag->setMimeData(mime);
-			drag->setPixmap(thumbnail);
-			drag->exec(Qt::CopyAction, Qt::CopyAction);
-			delete drag;
+			new StringPairDrag(INTERNAL_COPY_KEY, value, thumbnail, this);
 
 			clearInternalCopy(token);
 		}

@@ -27,6 +27,7 @@
 #include <QElapsedTimer>
 
 #include "Clip.h"
+#include "ClipView.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
 #include "MidiClip.h"
@@ -411,6 +412,94 @@ private slots:
 		QVERIFY(!src.copyDataTo(nullptr));
 		QVERIFY(src.copyDataTo(&dst));
 		QCOMPARE(dst.notes().size(), (std::size_t)500);
+	}
+
+	void testInternalCopyBufferLifecycle()
+	{
+		using namespace lmms;
+		using namespace gui;
+
+		auto song = Engine::getSong();
+		InstrumentTrack track(song);
+
+		MidiClip src(&track);
+		src.setAutoResize(false);
+		src.addNote(Note(TimePos(0, 48), TimePos(0, 0), 60, 100, 0), false);
+		src.addNote(Note(TimePos(0, 48), TimePos(1, 0), 64, 80, 0), false);
+
+		std::vector<ClipView::InternalClipData> data;
+		ClipView::InternalClipData cd;
+		cd.clone.reset(src.clone());
+		track.removeClip(cd.clone.get());
+		cd.trackIndex = 0;
+		cd.trackType = static_cast<int>(Track::Type::Instrument);
+		data.push_back(std::move(cd));
+
+		QString token = ClipView::storeInternalCopy(
+			std::move(data), TimePos(0), 0, track.trackContainer()->id());
+
+		std::vector<ClipView::InternalClipData> retrieved;
+		TimePos grabbedClipPos;
+		int initialTrackIndex;
+		unsigned int trackContainerId;
+
+		QVERIFY(ClipView::retrieveInternalCopy(token, retrieved,
+			grabbedClipPos, initialTrackIndex, trackContainerId));
+		QCOMPARE(retrieved.size(), (std::size_t)1);
+		QCOMPARE(static_cast<MidiClip*>(retrieved[0].clone.get())->notes().size(),
+			(std::size_t)2);
+
+		QVERIFY(!ClipView::retrieveInternalCopy(token, retrieved,
+			grabbedClipPos, initialTrackIndex, trackContainerId));
+	}
+
+	void testInternalCopyBufferWrongToken()
+	{
+		using namespace lmms;
+		using namespace gui;
+
+		std::vector<ClipView::InternalClipData> out;
+		TimePos grabbedClipPos;
+		int initialTrackIndex;
+		unsigned int trackContainerId;
+
+		QVERIFY(!ClipView::retrieveInternalCopy("nonexistent_token", out,
+			grabbedClipPos, initialTrackIndex, trackContainerId));
+		QVERIFY(out.empty());
+	}
+
+	void testCopyDataToOverwrite()
+	{
+		using namespace lmms;
+
+		auto song = Engine::getSong();
+		InstrumentTrack track(song);
+
+		MidiClip src(&track);
+		src.setAutoResize(false);
+		src.addNote(Note(TimePos(0, 96), TimePos(0, 0), 62, 100, 0), false);
+		src.addNote(Note(TimePos(0, 96), TimePos(1, 0), 65, 100, 0), false);
+		src.setName("OverwriteSrc");
+		src.toggleMute();
+
+		MidiClip dst(&track);
+		dst.addNote(Note(TimePos(0, 48), TimePos(0, 0), 72, 50, 0), false);
+		dst.setName("OldDst");
+		dst.changeLength(TimePos(1, 0));
+
+		QCOMPARE(dst.notes().size(), (std::size_t)1);
+		TimePos dstPos = dst.startPosition();
+
+		std::unique_ptr<MidiClip> clone(static_cast<MidiClip*>(src.clone()));
+		track.removeClip(clone.get());
+		clone->copyDataTo(&dst);
+
+		dst.movePosition(dstPos);
+		QCOMPARE(dst.notes().size(), (std::size_t)2);
+		QCOMPARE(dst.name(), QString("OverwriteSrc"));
+		QVERIFY(dst.isMuted());
+		QCOMPARE(dst.notes()[0]->key(), 62);
+		QCOMPARE(dst.notes()[1]->key(), 65);
 	}
 };
 
