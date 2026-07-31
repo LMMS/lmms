@@ -144,6 +144,10 @@ public:
 	// Will copy the state of a clip to another clip
 	static void copyStateTo( Clip *src, Clip *dst );
 
+	// Directly copies this clip's data to another clip without XML serialization.
+	// Returns false if unsupported, in which case the caller falls back to XML.
+	virtual bool copyDataTo( Clip* dst ) const { return false; }
+
 	/**
 	* Creates a copy of this clip
 	* @return pointer to the new clip object
@@ -179,7 +183,7 @@ private:
 
 	std::optional<QColor> m_color;
 
-	friend class ClipView;
+		friend class gui::ClipView;
 
 } ;
 

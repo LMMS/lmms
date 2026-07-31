@@ -159,17 +159,31 @@ bool Clip::comparePosition(const Clip *a, const Clip *b)
  */
 void Clip::copyStateTo( Clip *src, Clip *dst )
 {
-	// If the node names match we copy the state
-	if( src->nodeName() == dst->nodeName() ){
-		QDomDocument doc;
-		QDomElement parent = doc.createElement( "StateCopy" );
-		src->saveState( doc, parent );
+	if( src->nodeName() != dst->nodeName() ) { return; }
 
-		const TimePos pos = dst->startPosition();
-		dst->restoreState( parent.firstChild().toElement() );
-		dst->movePosition( pos );
+	const TimePos pos = dst->startPosition();
 
+	if (src->copyDataTo(dst))
+	{
+		dst->movePosition(pos);
 		AutomationClip::resolveAllIDs();
+		if (gui::getGUI() != nullptr)
+		{
+			gui::getGUI()->automationEditor()->m_editor->updateAfterClipChange();
+		}
+		return;
+	}
+
+	QDomDocument doc;
+	QDomElement parent = doc.createElement("StateCopy");
+	src->saveState(doc, parent);
+
+	dst->restoreState(parent.firstChild().toElement());
+	dst->movePosition(pos);
+
+	AutomationClip::resolveAllIDs();
+	if (gui::getGUI() != nullptr)
+	{
 		gui::getGUI()->automationEditor()->m_editor->updateAfterClipChange();
 	}
 }

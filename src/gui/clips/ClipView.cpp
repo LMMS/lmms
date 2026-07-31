@@ -24,12 +24,14 @@
 
 #include "ClipView.h"
 
+#include <map>
 #include <set>
 #include <cassert>
 
 #include <QMenu>
 #include <QMouseEvent>
 #include <QPainter>
+#include <QUuid>
 
 #include "AutomationClip.h"
 #include "Clipboard.h"
@@ -56,6 +58,56 @@ namespace lmms::gui
 {
 
 
+namespace {
+
+struct InternalCopyData
+{
+	std::vector<ClipView::InternalClipData> clips;
+	TimePos grabbedClipPos;
+	int initialTrackIndex;
+	unsigned int trackContainerId;
+};
+
+std::map<QString, InternalCopyData> s_clipBuffer;
+
+} // anonymous namespace
+
+
+QString ClipView::storeInternalCopy(std::vector<InternalClipData>&& clips,
+	TimePos grabbedClipPos, int initialTrackIndex, unsigned int trackContainerId)
+{
+	auto token = QUuid::createUuid().toString(QUuid::WithoutBraces);
+	InternalCopyData data;
+	data.clips = std::move(clips);
+	data.grabbedClipPos = grabbedClipPos;
+	data.initialTrackIndex = initialTrackIndex;
+	data.trackContainerId = trackContainerId;
+	s_clipBuffer[token] = std::move(data);
+	return token;
+}
+
+bool ClipView::retrieveInternalCopy(const QString& token,
+	std::vector<InternalClipData>& out, TimePos& outGrabbedClipPos,
+	int& outInitialTrackIndex, unsigned int& outTrackContainerId)
+{
+	auto it = s_clipBuffer.find(token);
+	if (it == s_clipBuffer.end()) { return false; }
+
+	out = std::move(it->second.clips);
+	outGrabbedClipPos = it->second.grabbedClipPos;
+	outInitialTrackIndex = it->second.initialTrackIndex;
+	outTrackContainerId = it->second.trackContainerId;
+
+	s_clipBuffer.erase(it);
+	return true;
+}
+
+void ClipView::clearInternalCopy(const QString& token)
+{
+	s_clipBuffer.erase(token);
+}
+
+
 //! The default width of the resize grip in pixels
 constexpr int RESIZE_GRIP_WIDTH = 8;
 //! The maximum fraction of the clip width that the resize grip is allowed to take up
@@ -69,6 +121,8 @@ constexpr float RESIZE_GRIP_MAX_WIDTH_FRACTION = 0.1f;
  * This pointer keeps track of it, as you only ever need one at a time.
  */
 TextFloat * ClipView::s_textFloat = nullptr;
+
+const char* ClipView::INTERNAL_COPY_KEY = "clip_internal";
 
 
 /*! \brief Create a new ClipView
@@ -427,7 +481,8 @@ void ClipView::dragEnterEvent( QDragEnterEvent * dee )
 	else
 	{
 		StringPairDrag::processDragEnterEvent( dee, "clip_" +
-					QString::number( static_cast<int>(m_clip->getTrack()->type()) ) );
+					QString::number( static_cast<int>(m_clip->getTrack()->type()) )
+					+ "," + INTERNAL_COPY_KEY );
 	}
 }
 
@@ -448,8 +503,9 @@ void ClipView::dropEvent( QDropEvent * de )
 	QString type = StringPairDrag::decodeKey( de );
 	QString value = StringPairDrag::decodeValue( de );
 
-	// Track must be the same type to paste into
-	if( type != ( "clip_" + QString::number( static_cast<int>(m_clip->getTrack()->type()) ) ) )
+	// Track must be the same type to paste into, unless internal copy
+	if( type != ( "clip_" + QString::number( static_cast<int>(m_clip->getTrack()->type()) ) )
+		&& type != INTERNAL_COPY_KEY )
 	{
 		return;
 	}
@@ -471,6 +527,11 @@ void ClipView::dropEvent( QDropEvent * de )
 	QObject* qwSource = de->source();
 	if( qwSource != nullptr &&
 	    dynamic_cast<ClipView *>( qwSource ) == this )
+	{
+		return;
+	}
+
+	if (type == INTERNAL_COPY_KEY)
 	{
 		return;
 	}
@@ -569,6 +630,63 @@ DataFile ClipView::createClipDataFiles(
 
 	return dataFile;
 }
+
+
+std::vector<ClipView::InternalClipData> ClipView::cloneClipsForInternalCopy(
+	const QVector<ClipView*>& clipViews,
+	const std::vector<Track*>& tracks) const
+{
+	std::vector<InternalClipData> clipData;
+
+	for (const auto& cv : clipViews)
+	{
+		Track* clipTrack = cv->m_trackView->getTrack();
+		const auto trackIt = std::find(tracks.begin(), tracks.end(), clipTrack);
+		assert(trackIt != tracks.end());
+		int trackIdx = std::distance(tracks.begin(), trackIt);
+
+		auto* srcClip = cv->m_clip;
+		Track* savedTrack = srcClip->m_track;
+		srcClip->m_track = nullptr;
+
+		InternalClipData cd;
+		cd.clone.reset(srcClip->clone());
+		cd.trackIndex = trackIdx;
+		cd.trackType = static_cast<int>(clipTrack->type());
+		clipData.push_back(std::move(cd));
+
+		srcClip->m_track = savedTrack;
+	}
+
+	return clipData;
+}
+
+
+QString ClipView::buildInternalCopyMimeValue(const QString& token,
+	TimePos grabbedClipPos, int initialTrackIndex,
+	unsigned int tcId, const QVector<ClipView*>& clipViews,
+	const std::vector<Track*>& tracks)
+{
+	QString value = QString("%1|%2|%3|%4")
+		.arg(token)
+		.arg(grabbedClipPos.getTicks())
+		.arg(initialTrackIndex)
+		.arg(tcId);
+
+	for (const auto& cv : clipViews)
+	{
+		Track* clipTrack = cv->m_trackView->getTrack();
+		const auto trackIt = std::find(tracks.begin(), tracks.end(), clipTrack);
+		assert(trackIt != tracks.end());
+		int trackIdx = std::distance(tracks.begin(), trackIt);
+		value += QString("|%1,%2")
+			.arg(trackIdx)
+			.arg(static_cast<int>(clipTrack->type()));
+	}
+
+	return value;
+}
+
 
 void ClipView::paintTextLabel(QString const & text, QPainter & painter)
 {
@@ -819,17 +937,28 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 			// triggered once we go into drag.
 			m_action = Action::None;
 
-			// Write the Clips to the DataFile for copying
-			DataFile dataFile = createClipDataFiles( clipViews );
+			Track* sourceTrack = m_trackView->getTrack();
+			TrackContainer* tc = sourceTrack->trackContainer();
+			const TrackContainer::TrackList& tracks = tc->tracks();
+			const auto sourceIt = std::find(tracks.begin(), tracks.end(), sourceTrack);
+			assert(sourceIt != tracks.end());
+			int initialTrackIndex = std::distance(tracks.begin(), sourceIt);
+			TimePos grabbedClipPos = m_clip->startPosition();
 
-			// TODO -- thumbnail for all selected
+			std::vector<InternalClipData> clipData = cloneClipsForInternalCopy(clipViews, tracks);
+			QString token = storeInternalCopy(std::move(clipData), grabbedClipPos,
+				initialTrackIndex, tc->id());
+			QString value = buildInternalCopyMimeValue(
+				token, grabbedClipPos, initialTrackIndex, tc->id(),
+				clipViews, tracks);
+
 			QPixmap thumbnail = grab().scaled(
 				128, 128,
 				Qt::KeepAspectRatio,
 				Qt::SmoothTransformation );
-			new StringPairDrag( QString( "clip_%1" ).arg(
-								static_cast<int>(m_clip->getTrack()->type()) ),
-								dataFile.toString(), thumbnail, this );
+			new StringPairDrag(INTERNAL_COPY_KEY, value, thumbnail, this);
+
+			clearInternalCopy(token);
 		}
 	}
 

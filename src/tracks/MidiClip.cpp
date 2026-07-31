@@ -113,7 +113,7 @@ void MidiClip::resizeToFirstTrack()
 void MidiClip::init()
 {
 	connect(Engine::getSong(), &Song::timeSignatureChanged, this, &MidiClip::changeTimeSignature);
-	if (getTrack()->trackContainer() != Engine::patternStore())
+	if (getTrack() && getTrack()->trackContainer() != Engine::patternStore())
 	{
 		saveJournallingState(false);
 		updateLength();
@@ -272,6 +272,35 @@ void MidiClip::clearNotes()
 	checkType();
 	updateLength();
 	emit dataChanged();
+}
+
+
+bool MidiClip::copyDataTo(Clip* dstClip) const
+{
+	MidiClip* dst = dynamic_cast<MidiClip*>(dstClip);
+	if (!dst) { return false; }
+
+	dst->m_clipType = m_clipType;
+
+	dst->clearNotes();
+
+	for (const auto& note : m_notes)
+	{
+		dst->m_notes.push_back(note->clone());
+	}
+
+	dst->m_steps = m_steps;
+	dst->checkType();
+	dst->setName(name());
+	if (const auto& c = color()) { dst->setColor(*c); }
+	if (isMuted() != dst->isMuted()) { dst->toggleMute(); }
+	dst->changeLength(length());
+	dst->setAutoResize(getAutoResize());
+	dst->setStartTimeOffset(startTimeOffset());
+
+	emit dst->dataChanged();
+
+	return true;
 }
 
 

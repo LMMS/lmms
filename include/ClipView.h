@@ -25,7 +25,9 @@
 #ifndef LMMS_GUI_CLIP_VIEW_H
 #define LMMS_GUI_CLIP_VIEW_H
 
+#include <memory>
 #include <optional>
+#include <vector>
 
 #include <QVector>
 
@@ -177,6 +179,23 @@ protected:
 
 	DataFile createClipDataFiles(const QVector<ClipView *> & clips) const;
 
+public:
+	struct InternalClipData
+	{
+		std::unique_ptr<Clip> clone;
+		int trackIndex;
+		int trackType;
+	};
+
+	static const char* INTERNAL_COPY_KEY;
+
+	static QString storeInternalCopy(std::vector<InternalClipData>&& clips,
+		TimePos grabbedClipPos, int initialTrackIndex, unsigned int trackContainerId);
+	static bool retrieveInternalCopy(const QString& token,
+		std::vector<InternalClipData>& out, TimePos& outGrabbedClipPos,
+		int& outInitialTrackIndex, unsigned int& outTrackContainerId);
+	static void clearInternalCopy(const QString& token);
+
 	virtual void paintTextLabel(QString const & text, QPainter & painter);
 
 	auto hasCustomColor() const -> bool;
@@ -234,6 +253,15 @@ private:
 	TimePos draggedClipPos( QMouseEvent * me );
 	int knifeMarkerPos( QMouseEvent * me );
 	void setColor(const std::optional<QColor>& color);
+
+	std::vector<InternalClipData> cloneClipsForInternalCopy(
+		const QVector<ClipView*>& clipViews,
+		const std::vector<Track*>& tracks) const;
+
+	static QString buildInternalCopyMimeValue(const QString& token,
+		TimePos grabbedClipPos, int initialTrackIndex,
+		unsigned int tcId, const QVector<ClipView*>& clipViews,
+		const std::vector<Track*>& tracks);
 
 	/**
 	 * @returns the width of a note's resize area in pixels.
