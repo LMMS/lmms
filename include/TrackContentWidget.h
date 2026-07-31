@@ -156,6 +156,11 @@ private:
 	Track * getTrack();
 	TimePos getPosition( int mouseX );
 
+	bool canPasteInternalCopy(const QStringList& valueParts, TimePos clipPos,
+		Track* t, bool allowSameBar) const;
+	bool pasteInternalCopy(const QStringList& valueParts, TimePos clipPos,
+		Track* t, bool& wasSelection);
+
 	TrackView * m_trackView;
 
 	using clipViewVector = QVector<ClipView*>;

@@ -380,43 +380,7 @@ bool TrackContentWidget::canPasteSelection( TimePos clipPos, const QMimeData* md
 
 	if (type == ClipView::INTERNAL_COPY_KEY)
 	{
-		auto parts = value.split('|');
-		if (parts.size() < 4) { return false; }
-
-		TimePos grabbedClipPos(parts[1].toInt());
-		TimePos grabbedClipBar(TimePos(grabbedClipPos.getBar(), 0));
-		int initialTrackIndex = parts[2].toInt();
-		unsigned int sourceTCId = parts[3].toUInt();
-
-		const auto& tracks = t->trackContainer()->tracks();
-		const auto currentTrackIt = std::find(tracks.begin(), tracks.end(), t);
-		int currentTrackIndex = currentTrackIt != tracks.end()
-			? std::distance(tracks.begin(), currentTrackIt) : -1;
-
-		if (!allowSameBar && sourceTCId == t->trackContainer()->id()
-			&& clipPos == grabbedClipBar && currentTrackIndex == initialTrackIndex)
-		{
-			return false;
-		}
-
-		for (int i = 4; i < parts.size(); i++)
-		{
-			auto pair = parts[i].split(',');
-			int trackIndex = pair[0].toInt();
-			int trackTypeInt = pair[1].toInt();
-			int finalTrackIndex = trackIndex + currentTrackIndex - initialTrackIndex;
-
-			if (finalTrackIndex < 0 || static_cast<std::size_t>(finalTrackIndex) >= tracks.size())
-			{
-				return false;
-			}
-			if (static_cast<Track::Type>(trackTypeInt) != tracks.at(finalTrackIndex)->type())
-			{
-				return false;
-			}
-		}
-
-		return true;
+		return canPasteInternalCopy(value.split('|'), clipPos, t, allowSameBar);
 	}
 
 	// We can only paste into tracks of the same type
@@ -523,64 +487,9 @@ bool TrackContentWidget::pasteSelection( TimePos clipPos, const QMimeData * md, 
 
 	if (type == ClipView::INTERNAL_COPY_KEY)
 	{
-		auto parts = value.split('|');
-		if (parts.size() < 4) { return false; }
-
-		QString token = parts[0];
-		TimePos grabbedClipPos(parts[1].toInt());
-
-		std::vector<ClipView::InternalClipData> internalClips;
-		TimePos outGrabbedClipPos;
-		int initialTrackIndex;
-		unsigned int trackContainerId;
-
-		if (!ClipView::retrieveInternalCopy(token, internalClips,
-				outGrabbedClipPos, initialTrackIndex, trackContainerId))
-		{
-			return false;
-		}
-
-		const auto& tracks = getTrack()->trackContainer()->tracks();
-		const auto currentTrackIt = std::find(tracks.begin(), tracks.end(), getTrack());
-		int currentTrackIndex = currentTrackIt != tracks.end()
-			? std::distance(tracks.begin(), currentTrackIt) : -1;
-
-		getTrack()->addJournalCheckPoint();
-
-		bool wasSelection = m_trackView->trackContainerView()->rubberBand()->selectedObjects().count();
-		const QVector<selectableObject*> so =
-			m_trackView->trackContainerView()->selectedObjects();
-		for (const auto& obj : so) { obj->setSelected(false); }
-
-		float snapSize = getGUI()->songEditor()->m_editor->getSnapSize();
-		auto offset = TimePos(clipPos - outGrabbedClipPos);
-		offset -= TimePos::ticksPerBar() * snapSize / 2;
-		offset = offset.quantize(snapSize);
-
-		TimePos leftmostPos = outGrabbedClipPos;
-		for (const auto& ic : internalClips)
-		{
-			TimePos pos = ic.clone->startPosition();
-			if (pos < leftmostPos) { leftmostPos = pos; }
-		}
-		offset = std::max(offset.getTicks(), -leftmostPos.getTicks());
-
-		for (auto& ic : internalClips)
-		{
-			int finalTrackIndex = ic.trackIndex + (currentTrackIndex - initialTrackIndex);
-			Track* t = tracks.at(finalTrackIndex);
-
-			TimePos pos = ic.clone->startPosition() + offset;
-			TimePos shift = TimePos::ticksPerBar() * snapSize;
-			if (offset == 0 && initialTrackIndex == currentTrackIndex) { pos += shift; }
-
-			Clip* clip = t->createClip(pos);
-			ic.clone->copyDataTo(clip);
-			if (wasSelection) { clip->selectViewOnCreate(true); }
-		}
-
-		AutomationClip::resolveAllIDs();
-		return true;
+		bool wasSelection = false;
+		return pasteInternalCopy(value.split('|'), clipPos,
+			getTrack(), wasSelection);
 	}
 
 	getTrack()->addJournalCheckPoint();
@@ -929,5 +838,116 @@ void TrackContentWidget::setEmbossWidth(int c)
 //! \brief CSS theming qproperty access method
 void TrackContentWidget::setEmbossOffset(int c)
 { m_embossOffset = c; }
+
+
+bool TrackContentWidget::canPasteInternalCopy(const QStringList& parts,
+	TimePos clipPos, Track* t, bool allowSameBar) const
+{
+	if (parts.size() < 4) { return false; }
+
+	TimePos grabbedClipPos(parts[1].toInt());
+	TimePos grabbedClipBar(TimePos(grabbedClipPos.getBar(), 0));
+	int initialTrackIndex = parts[2].toInt();
+	unsigned int sourceTCId = parts[3].toUInt();
+
+	const auto& tracks = t->trackContainer()->tracks();
+	const auto currentTrackIt = std::find(tracks.begin(), tracks.end(), t);
+	int currentTrackIndex = currentTrackIt != tracks.end()
+		? std::distance(tracks.begin(), currentTrackIt) : -1;
+
+	if (!allowSameBar && sourceTCId == t->trackContainer()->id()
+		&& clipPos == grabbedClipBar && currentTrackIndex == initialTrackIndex)
+	{
+		return false;
+	}
+
+	for (int i = 4; i < parts.size(); i++)
+	{
+		auto pair = parts[i].split(',');
+		int trackIndex = pair[0].toInt();
+		int trackTypeInt = pair[1].toInt();
+		int finalTrackIndex = trackIndex + currentTrackIndex - initialTrackIndex;
+
+		if (finalTrackIndex < 0
+			|| static_cast<std::size_t>(finalTrackIndex) >= tracks.size())
+		{
+			return false;
+		}
+		if (static_cast<Track::Type>(trackTypeInt)
+			!= tracks.at(finalTrackIndex)->type())
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
+
+bool TrackContentWidget::pasteInternalCopy(const QStringList& parts,
+	TimePos clipPos, Track* t, bool& wasSelection)
+{
+	if (parts.size() < 4) { return false; }
+
+	QString token = parts[0];
+
+	std::vector<ClipView::InternalClipData> clips;
+	TimePos grabbedClipPos;
+	int initialTrackIndex;
+	unsigned int trackContainerId;
+
+	if (!ClipView::retrieveInternalCopy(token, clips,
+			grabbedClipPos, initialTrackIndex, trackContainerId))
+	{
+		return false;
+	}
+
+	const auto& tracks = t->trackContainer()->tracks();
+	const auto currentTrackIt = std::find(tracks.begin(), tracks.end(), t);
+	int currentTrackIndex = currentTrackIt != tracks.end()
+		? std::distance(tracks.begin(), currentTrackIt) : -1;
+
+	t->addJournalCheckPoint();
+
+	wasSelection = m_trackView->trackContainerView()->rubberBand()
+		->selectedObjects().count();
+	const QVector<selectableObject*> so =
+		m_trackView->trackContainerView()->selectedObjects();
+	for (const auto& obj : so) { obj->setSelected(false); }
+
+	float snapSize = getGUI()->songEditor()->m_editor->getSnapSize();
+	auto offset = TimePos(clipPos - grabbedClipPos);
+	offset -= TimePos::ticksPerBar() * snapSize / 2;
+	offset = offset.quantize(snapSize);
+
+	TimePos leftmostPos = grabbedClipPos;
+	for (const auto& ic : clips)
+	{
+		TimePos pos = ic.clone->startPosition();
+		if (pos < leftmostPos) { leftmostPos = pos; }
+	}
+	offset = std::max(offset.getTicks(), -leftmostPos.getTicks());
+
+	for (auto& ic : clips)
+	{
+		int finalTrackIndex = ic.trackIndex
+			+ (currentTrackIndex - initialTrackIndex);
+		Track* target = tracks.at(finalTrackIndex);
+
+		TimePos pos = ic.clone->startPosition() + offset;
+		TimePos shift = TimePos::ticksPerBar() * snapSize;
+		if (offset == 0 && initialTrackIndex == currentTrackIndex)
+		{
+			pos += shift;
+		}
+
+		Clip* clip = target->createClip(pos);
+		ic.clone->copyDataTo(clip);
+		if (wasSelection) { clip->selectViewOnCreate(true); }
+	}
+
+	AutomationClip::resolveAllIDs();
+	return true;
+}
 
 } // namespace lmms::gui
