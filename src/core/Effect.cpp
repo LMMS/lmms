@@ -26,21 +26,43 @@
 #include "Effect.h"
 
 #include <QDomElement>
+#include <map>
 
 #include "AudioBuffer.h"
 #include "ConfigManager.h"
 #include "EffectChain.h"
 #include "EffectControls.h"
 #include "EffectView.h"
-#include "SampleFrame.h"
+#include "plugins/ZynAddSubFx/zynaddsubfx/src/Effects/Effect.h"
 
 namespace lmms
 {
 
 
+const std::map<Effect::EffectType, QString> effectTypeNameMap = {
+	{Effect::EffectType::Filter, "Filter"},
+	{Effect::EffectType::EQ, "EQ"},
+	{Effect::EffectType::Distortion, "Distortion"},
+	{Effect::EffectType::Compressor, "Compressor"},
+	{Effect::EffectType::Reverb, "Reverb"},
+	{Effect::EffectType::Delay, "Delay"},
+	{Effect::EffectType::Flanger, "Flanger"},
+	{Effect::EffectType::Chorus, "Chorus"},
+	{Effect::EffectType::Phaser, "Phaser"},
+	{Effect::EffectType::Bitcrush, "Bitcrush"},
+	{Effect::EffectType::Vocoder, "Vocoder"},
+	{Effect::EffectType::Amplifier, "Amplifier"},
+	{Effect::EffectType::Stereo, "Stereo"},
+	{Effect::EffectType::Analyzer, "Analyzer"},
+	{Effect::EffectType::PitchShift, "Pitch shift"},
+	{Effect::EffectType::Other, "Other"},
+};
+
+
 Effect::Effect( const Plugin::Descriptor * _desc,
 			Model * _parent,
-			const Descriptor::SubPluginFeatures::Key * _key ) :
+			const Descriptor::SubPluginFeatures::Key * _key,
+			Effect::EffectType effectType) :
 	Plugin( _desc, _parent, _key ),
 	m_parent( nullptr ),
 	m_okay( true ),
@@ -52,6 +74,7 @@ Effect::Effect( const Plugin::Descriptor * _desc,
 	m_autoQuitEnabled(ConfigManager::inst()->value("ui", "disableautoquit", "1").toInt() == 0)
 {
 	m_wetDryModel.setCenterValue(0);
+	m_effectType = effectType;
 
 	// Call the virtual method onEnabledChanged so that effects can react to changes,
 	// e.g. by resetting state.
@@ -89,6 +112,12 @@ void Effect::loadSettings( const QDomElement & _this )
 	}
 }
 
+QString Effect::effectTypeName() const 
+{
+	return effectTypeNameMap.find(m_effectType) != effectTypeNameMap.end() 
+		? effectTypeNameMap.at(m_effectType) 
+		: effectTypeNameMap.at(Effect::EffectType::Other);
+}
 
 
 

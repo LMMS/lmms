@@ -24,6 +24,7 @@
  */
 
 
+#include "Effect.h"
 #include "Song.h"
 #include "PresetPreviewPlayHandle.h"
 #include "PeakController.h"
@@ -65,7 +66,7 @@ Plugin::Descriptor PLUGIN_EXPORT peakcontrollereffect_plugin_descriptor =
 PeakControllerEffect::PeakControllerEffect(
 			Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key ) :
-	Effect( &peakcontrollereffect_plugin_descriptor, _parent, _key ),
+	Effect( &peakcontrollereffect_plugin_descriptor, _parent, _key, Effect::EffectType::Other ),
 	m_effectId(fastRand()),
 	m_peakControls( this ),
 	m_lastSample( 0 ),

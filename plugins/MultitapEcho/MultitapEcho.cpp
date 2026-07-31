@@ -24,6 +24,7 @@
  */
 
 #include "MultitapEcho.h"
+#include "Effect.h"
 #include "embed.h"
 #include "LmmsTypes.h"
 #include "lmms_math.h"
@@ -53,7 +54,7 @@ Plugin::Descriptor PLUGIN_EXPORT multitapecho_plugin_descriptor =
 
 
 MultitapEchoEffect::MultitapEchoEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key ) :
-	Effect( &multitapecho_plugin_descriptor, parent, key ),
+	Effect( &multitapecho_plugin_descriptor, parent, key, Effect::EffectType::Delay),
 	m_stages( 1 ),
 	m_controls( this ),
 	m_buffer( 16100.0f ),

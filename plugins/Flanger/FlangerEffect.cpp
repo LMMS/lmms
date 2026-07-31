@@ -26,6 +26,7 @@
 
 #include <numbers>
 
+#include "Effect.h"
 #include "Engine.h"
 #include "MonoDelay.h"
 #include "QuadratureLfo.h"
@@ -58,7 +59,7 @@ Plugin::Descriptor PLUGIN_EXPORT flanger_plugin_descriptor =
 
 
 FlangerEffect::FlangerEffect( Model *parent, const Plugin::Descriptor::SubPluginFeatures::Key *key ) :
-	Effect( &flanger_plugin_descriptor, parent, key ),
+	Effect( &flanger_plugin_descriptor, parent, key, Effect::EffectType::Flanger ),
 	m_flangerControls( this )
 {
 	m_lfo = new QuadratureLfo( Engine::audioEngine()->outputSampleRate() );

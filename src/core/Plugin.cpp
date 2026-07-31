@@ -27,6 +27,7 @@
 #include <QDomElement>
 #include <QLibrary>
 #include <QMessageBox>
+#include <qobject.h>
 
 #include "embed.h"
 #include "Engine.h"
@@ -87,9 +88,6 @@ QString use_this_or(QString this_param, QString or_param)
 	return this_param.isNull() ? or_param : this_param;
 }
 
-
-
-
 QString Plugin::displayName() const
 {
 	return Model::displayName().isEmpty() // currently always empty
@@ -125,8 +123,6 @@ QString Plugin::Descriptor::SubPluginFeatures::Key::additionalFileExtensions() c
 }
 
 
-
-
 QString Plugin::Descriptor::SubPluginFeatures::Key::displayName() const
 {
 	Q_ASSERT(isValid());
@@ -137,9 +133,6 @@ QString Plugin::Descriptor::SubPluginFeatures::Key::displayName() const
 		// get from plugin
 		: desc->displayName;
 }
-
-
-
 
 const PixmapLoader* Plugin::Descriptor::SubPluginFeatures::Key::logo() const
 {

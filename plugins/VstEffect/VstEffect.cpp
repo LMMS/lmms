@@ -25,6 +25,7 @@
 
 #include "VstEffect.h"
 
+#include "Effect.h"
 #include "GuiApplication.h"
 #include "Song.h"
 #include "TextFloat.h"
@@ -60,7 +61,7 @@ Plugin::Descriptor PLUGIN_EXPORT vsteffect_plugin_descriptor =
 
 VstEffect::VstEffect( Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key ) :
-	Effect( &vsteffect_plugin_descriptor, _parent, _key ),
+	Effect( &vsteffect_plugin_descriptor, _parent, _key, Effect::EffectType::Other ),
 	m_pluginMutex(),
 	m_key( *_key ),
 	m_vstControls( this )

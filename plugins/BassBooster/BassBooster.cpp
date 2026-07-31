@@ -52,7 +52,7 @@ Plugin::Descriptor PLUGIN_EXPORT bassbooster_plugin_descriptor =
 
 
 BassBoosterEffect::BassBoosterEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key ) :
-	Effect( &bassbooster_plugin_descriptor, parent, key ),
+	Effect( &bassbooster_plugin_descriptor, parent, key, Effect::EffectType::EQ ),
 	m_frequencyChangeNeeded( false ),
 	m_bbFX( DspEffectLibrary::FastBassBoost( 70.0f, 1.0f, 2.8f ) ),
 	m_bbControls( this )

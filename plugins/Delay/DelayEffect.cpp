@@ -23,6 +23,7 @@
  */
 
 #include "DelayEffect.h"
+#include "Effect.h"
 #include "Engine.h"
 #include "embed.h"
 #include "Lfo.h"
@@ -54,7 +55,7 @@ Plugin::Descriptor PLUGIN_EXPORT delay_plugin_descriptor =
 
 
 DelayEffect::DelayEffect( Model* parent, const Plugin::Descriptor::SubPluginFeatures::Key* key ) :
-	Effect( &delay_plugin_descriptor, parent, key ),
+	Effect( &delay_plugin_descriptor, parent, key, Effect::EffectType::Delay ),
 	m_delayControls( this )
 {
 	m_delay = 0;

@@ -25,6 +25,7 @@
 
 #include "StereoMatrix.h"
 
+#include "Effect.h"
 #include "embed.h"
 #include "plugin_export.h"
 
@@ -56,7 +57,7 @@ Plugin::Descriptor PLUGIN_EXPORT stereomatrix_plugin_descriptor =
 StereoMatrixEffect::StereoMatrixEffect(
 			Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key ) :
-	Effect( &stereomatrix_plugin_descriptor, _parent, _key ),
+	Effect( &stereomatrix_plugin_descriptor, _parent, _key, Effect::EffectType::Stereo),
 	m_smControls( this )
 {
 }

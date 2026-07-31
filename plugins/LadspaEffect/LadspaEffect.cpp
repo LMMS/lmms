@@ -30,6 +30,7 @@
 #include "LadspaEffect.h"
 #include "DataFile.h"
 #include "AudioEngine.h"
+#include "Effect.h"
 #include "Ladspa2LMMS.h"
 #include "LadspaBase.h"
 #include "LadspaControl.h"
@@ -67,7 +68,7 @@ Plugin::Descriptor PLUGIN_EXPORT ladspaeffect_plugin_descriptor =
 }
 
 LadspaEffect::LadspaEffect(Model* _parent, const Descriptor::SubPluginFeatures::Key* _key)
-	: Effect(&ladspaeffect_plugin_descriptor, _parent, _key)
+	: Effect(&ladspaeffect_plugin_descriptor, _parent, _key, Effect::EffectType::Other)
 	, m_controls(nullptr)
 	, m_key(LadspaSubPluginFeatures::subPluginKeyToLadspaKey(_key))
 {

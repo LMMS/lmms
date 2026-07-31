@@ -24,6 +24,7 @@
 
 #include "Vectorscope.h"
 
+#include "Effect.h"
 #include "embed.h"
 #include "plugin_export.h"
 
@@ -48,7 +49,7 @@ extern "C" {
 
 
 Vectorscope::Vectorscope(Model *parent, const Plugin::Descriptor::SubPluginFeatures::Key *key) :
-	Effect(&vectorscope_plugin_descriptor, parent, key),
+	Effect(&vectorscope_plugin_descriptor, parent, key, Effect::EffectType::Analyzer),
 	m_controls(this),
 	// Buffer is sized to cover 4* the current maximum LMMS audio buffer size,
 	// so that it has some reserve space in case GUI thresd is busy.

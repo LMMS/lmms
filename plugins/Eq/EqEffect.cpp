@@ -24,6 +24,7 @@
 
 #include "EqEffect.h"
 
+#include "Effect.h"
 #include "Engine.h"
 #include "lmms_math.h"
 
@@ -54,7 +55,7 @@ Plugin::Descriptor PLUGIN_EXPORT eq_plugin_descriptor =
 
 
 EqEffect::EqEffect( Model *parent, const Plugin::Descriptor::SubPluginFeatures::Key *key) :
-	Effect( &eq_plugin_descriptor, parent, key ),
+	Effect( &eq_plugin_descriptor, parent, key, Effect::EffectType::EQ),
 	m_eqControls( this ),
 	m_inGain( 1.0 ),
 	m_outGain( 1.0 )

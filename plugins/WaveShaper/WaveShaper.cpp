@@ -57,7 +57,7 @@ Plugin::Descriptor PLUGIN_EXPORT waveshaper_plugin_descriptor =
 
 WaveShaperEffect::WaveShaperEffect( Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key ) :
-	Effect( &waveshaper_plugin_descriptor, _parent, _key ),
+	Effect( &waveshaper_plugin_descriptor, _parent, _key, Effect::EffectType::Distortion ),
 	m_wsControls( this )
 {
 }

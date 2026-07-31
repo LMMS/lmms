@@ -26,6 +26,7 @@
  */
 
 #include "Analyzer.h"
+#include "Effect.h"
 
 #ifdef SA_DEBUG
 	#include <chrono>
@@ -57,7 +58,7 @@ extern "C" {
 
 
 Analyzer::Analyzer(Model *parent, const Plugin::Descriptor::SubPluginFeatures::Key *key) :
-	Effect(&analyzer_plugin_descriptor, parent, key),
+	Effect(&analyzer_plugin_descriptor, parent, key, Effect::EffectType::Analyzer),
 	m_processor(&m_controls),
 	m_controls(this),
 	m_processorThread(m_processor, m_inputBuffer),
