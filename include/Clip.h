@@ -183,7 +183,7 @@ private:
 
 	std::optional<QColor> m_color;
 
-		friend class gui::ClipView;
+	friend class gui::ClipView;
 
 } ;
 
