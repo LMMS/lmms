@@ -28,6 +28,7 @@
 #include "EffectChain.h"
 #include "embed.h"
 #include "PluginFactory.h"
+#include "EffectCategory.h"
 
 #include <QApplication>
 #include <QDialogButtonBox>
@@ -79,7 +80,8 @@ EffectSelectDialog::EffectSelectDialog(QWidget* parent) :
 
 	// Fill the source model
 	m_sourceModel.setHorizontalHeaderItem(0, new QStandardItem(tr("Name")));
-	m_sourceModel.setHorizontalHeaderItem(1, new QStandardItem(tr("Type")));
+	m_sourceModel.setHorizontalHeaderItem(1, new QStandardItem(tr("Category")));
+	m_sourceModel.setHorizontalHeaderItem(2, new QStandardItem(tr("Type")));
 	int row = 0;
 	for (EffectKeyList::ConstIterator it = m_effectKeys.begin(); it != m_effectKeys.end(); ++it)
 	{
@@ -96,7 +98,8 @@ EffectSelectDialog::EffectSelectDialog(QWidget* parent) :
 			type = "LMMS";
 		}
 		m_sourceModel.setItem(row, 0, new QStandardItem(name));
-		m_sourceModel.setItem(row, 1, new QStandardItem(type));
+		m_sourceModel.setItem(row, 1, new QStandardItem(getEffectCategory()->getCategoryName(name)));
+		m_sourceModel.setItem(row, 2, new QStandardItem(type));
 		++row;
 	}
 

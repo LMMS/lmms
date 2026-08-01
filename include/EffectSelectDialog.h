@@ -58,7 +58,7 @@ protected:
 	bool filterAcceptsRow(int source_row, const QModelIndex& source_parent) const override
 	{
 		QModelIndex nameIndex = sourceModel()->index(source_row, 0, source_parent);
-		QModelIndex typeIndex = sourceModel()->index(source_row, 1, source_parent);
+		QModelIndex typeIndex = sourceModel()->index(source_row, 2, source_parent);
 
 		QString name = sourceModel()->data(nameIndex, Qt::DisplayRole).toString();
 		QString type = sourceModel()->data(typeIndex, Qt::DisplayRole).toString();
