@@ -234,6 +234,7 @@ public:
 	// typedef a list so we can easily work with list of plugin descriptors
 	using DescriptorList = QList<Descriptor*>;
 
+	//! Constructor of a plugin
 	//! @param key Sub plugins must pass a key here, optional otherwise.
 	//!   See the key() function
 	Plugin(const Descriptor * descriptor, Model * parent,

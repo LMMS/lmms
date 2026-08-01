@@ -24,7 +24,6 @@
 
 #include "SlewDistortion.h"
 
-#include "Effect.h"
 #include "embed.h"
 #include "plugin_export.h"
 
@@ -49,7 +48,7 @@ Plugin::Descriptor PLUGIN_EXPORT slewdistortion_plugin_descriptor =
 
 
 SlewDistortion::SlewDistortion(Model* parent, const Descriptor::SubPluginFeatures::Key* key) :
-	Effect(&slewdistortion_plugin_descriptor, parent, key, Effect::EffectType::Distortion),
+	Effect(&slewdistortion_plugin_descriptor, parent, key),
 	m_sampleRate(Engine::audioEngine()->outputSampleRate()),
 	m_lp(m_sampleRate),
 	m_hp(m_sampleRate),

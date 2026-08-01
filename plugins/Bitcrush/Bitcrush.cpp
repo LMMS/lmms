@@ -24,7 +24,6 @@
  */
 
 #include "Bitcrush.h"
-#include "Effect.h"
 #include "lmms_math.h"
 #include "embed.h"
 #include "plugin_export.h"
@@ -59,7 +58,7 @@ Plugin::Descriptor PLUGIN_EXPORT bitcrush_plugin_descriptor =
 }
 
 BitcrushEffect::BitcrushEffect( Model * parent, const Descriptor::SubPluginFeatures::Key * key ) :
-	Effect( &bitcrush_plugin_descriptor, parent, key, Effect::EffectType::Bitcrush ),
+	Effect( &bitcrush_plugin_descriptor, parent, key ),
 	m_controls( this ),
 	m_sampleRate( Engine::audioEngine()->outputSampleRate() ),
 	m_filter( m_sampleRate )

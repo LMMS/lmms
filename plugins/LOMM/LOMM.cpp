@@ -24,7 +24,6 @@
 
 #include "LOMM.h"
 
-#include "Effect.h"
 #include "lmms_math.h"
 #include "embed.h"
 #include "plugin_export.h"
@@ -50,7 +49,7 @@ extern "C"
 
 
 LOMMEffect::LOMMEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key) :
-	Effect(&lomm_plugin_descriptor, parent, key, Effect::EffectType::Distortion),
+	Effect(&lomm_plugin_descriptor, parent, key),
 	m_lommControls(this),
 	m_sampleRate(Engine::audioEngine()->outputSampleRate()),
 	m_lp1(m_sampleRate),

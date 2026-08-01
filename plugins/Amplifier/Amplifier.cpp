@@ -25,7 +25,6 @@
 
 #include "Amplifier.h"
 
-#include "Effect.h"
 #include "embed.h"
 #include "plugin_export.h"
 
@@ -52,7 +51,7 @@ Plugin::Descriptor PLUGIN_EXPORT amplifier_plugin_descriptor =
 
 
 AmplifierEffect::AmplifierEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key) :
-	Effect(&amplifier_plugin_descriptor, parent, key, Effect::EffectType::Amplifier),
+	Effect(&amplifier_plugin_descriptor, parent, key),
 	m_ampControls(this)
 {
 }

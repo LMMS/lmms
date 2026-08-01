@@ -22,7 +22,6 @@
 
 #include "ReverbSC.h"
 
-#include "Effect.h"
 #include "embed.h"
 #include "lmms_math.h"
 #include "plugin_export.h"
@@ -50,7 +49,7 @@ Plugin::Descriptor PLUGIN_EXPORT reverbsc_plugin_descriptor =
 }
 
 ReverbSCEffect::ReverbSCEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key ) :
-	Effect( &reverbsc_plugin_descriptor, parent, key, Effect::EffectType::Reverb ),
+	Effect( &reverbsc_plugin_descriptor, parent, key ),
 	m_reverbSCControls( this )
 {
 	sp_create(&sp);

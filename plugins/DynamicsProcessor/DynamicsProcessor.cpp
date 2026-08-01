@@ -28,7 +28,6 @@
 
 #include <cmath>
 
-#include "Effect.h"
 #include "lmms_math.h"
 #include "RmsHelper.h"
 
@@ -63,7 +62,7 @@ const double DNF_LOG = -1.0;
 
 DynProcEffect::DynProcEffect( Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key ) :
-	Effect( &dynamicsprocessor_plugin_descriptor, _parent, _key, Effect::EffectType::Distortion ),
+	Effect( &dynamicsprocessor_plugin_descriptor, _parent, _key ),
 	m_dpControls( this )
 {
 	m_currentPeak[0] = m_currentPeak[1] = DYN_NOISE_FLOOR;

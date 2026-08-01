@@ -53,36 +53,12 @@ class LMMS_EXPORT Effect : public Plugin
 {
 	Q_OBJECT
 public:
-	enum class EffectType
-	{
-		Filter,
-		EQ,
-		Distortion,
-		Compressor,
-		Reverb,
-		Delay,
-		Flanger,
-		Chorus,
-		Phaser,
-		Bitcrush,
-		Vocoder,
-		Amplifier,
-		Stereo,
-		Analyzer,
-		PitchShift,
-		Other
-	};
-
 	Effect( const Plugin::Descriptor * _desc,
 			Model * _parent,
-			const Descriptor::SubPluginFeatures::Key * _key,
-			EffectType effectType);
-	
+			const Descriptor::SubPluginFeatures::Key * _key );
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 	void loadSettings( const QDomElement & _this ) override;
-
-	QString effectTypeName() const;
 
 	inline QString nodeName() const override
 	{
@@ -234,8 +210,6 @@ private:
 	TempoSyncKnobModel m_autoQuitModel;
 
 	bool m_autoQuitEnabled = false;
-
-	EffectType m_effectType;
 
 	friend class gui::EffectView;
 	friend class EffectChain;

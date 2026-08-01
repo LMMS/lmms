@@ -24,7 +24,6 @@
 
 #include "Oscilloscope.h"
 
-#include "Effect.h"
 #include "embed.h"
 #include "plugin_export.h"
 
@@ -54,7 +53,7 @@ PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* parent, void* data)
 
 
 Oscilloscope::Oscilloscope(Model* parent, const Descriptor::SubPluginFeatures::Key* key) :
-	Effect(&oscilloscope_plugin_descriptor, parent, key, Effect::EffectType::Analyzer),
+	Effect(&oscilloscope_plugin_descriptor, parent, key),
 	m_controls(this),
 	m_inputBuffer(InputBufferSize)
 {

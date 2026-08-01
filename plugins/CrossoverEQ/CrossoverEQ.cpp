@@ -25,7 +25,6 @@
  */
  
 #include "CrossoverEQ.h"
-#include "Effect.h"
 #include "lmms_math.h"
 #include "embed.h"
 #include "plugin_export.h"
@@ -54,7 +53,7 @@ Plugin::Descriptor PLUGIN_EXPORT crossovereq_plugin_descriptor =
 
 
 CrossoverEQEffect::CrossoverEQEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key ) :
-	Effect( &crossovereq_plugin_descriptor, parent, key, Effect::EffectType::EQ ),
+	Effect( &crossovereq_plugin_descriptor, parent, key ),
 	m_controls( this ),
 	m_sampleRate( Engine::audioEngine()->outputSampleRate() ),
 	m_lp1( m_sampleRate ),

@@ -26,7 +26,6 @@
 
 #include <numbers>
 
-#include "Effect.h"
 #include "embed.h"
 #include "plugin_export.h"
 
@@ -53,7 +52,7 @@ Plugin::Descriptor PLUGIN_EXPORT dispersion_plugin_descriptor =
 
 
 DispersionEffect::DispersionEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key) :
-	Effect(&dispersion_plugin_descriptor, parent, key, Effect::EffectType::Filter),
+	Effect(&dispersion_plugin_descriptor, parent, key),
 	m_dispersionControls(this),
 	m_sampleRate(Engine::audioEngine()->outputSampleRate()),
 	m_amountVal(0)

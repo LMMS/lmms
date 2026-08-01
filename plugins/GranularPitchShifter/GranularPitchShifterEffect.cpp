@@ -25,7 +25,6 @@
 #include "GranularPitchShifterEffect.h"
 
 #include <cmath>
-#include "Effect.h"
 #include "embed.h"
 #include "lmms_math.h"
 #include "plugin_export.h"
@@ -52,7 +51,7 @@ Plugin::Descriptor PLUGIN_EXPORT granularpitchshifter_plugin_descriptor =
 
 
 GranularPitchShifterEffect::GranularPitchShifterEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key) :
-	Effect(&granularpitchshifter_plugin_descriptor, parent, key, Effect::EffectType::PitchShift),
+	Effect(&granularpitchshifter_plugin_descriptor, parent, key),
 	m_granularpitchshifterControls(this),
 	m_prefilter({PrefilterLowpass(), PrefilterLowpass()})
 {

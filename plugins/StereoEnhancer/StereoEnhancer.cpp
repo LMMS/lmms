@@ -25,7 +25,6 @@
 
 #include "StereoEnhancer.h"
 
-#include "Effect.h"
 #include "embed.h"
 #include "plugin_export.h"
 
@@ -57,7 +56,7 @@ Plugin::Descriptor PLUGIN_EXPORT stereoenhancer_plugin_descriptor =
 StereoEnhancerEffect::StereoEnhancerEffect(
 			Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key ) :
-	Effect( &stereoenhancer_plugin_descriptor, _parent, _key, Effect::EffectType::Stereo ),
+	Effect( &stereoenhancer_plugin_descriptor, _parent, _key ),
 	m_seFX( DspEffectLibrary::StereoEnhancer( 0.0f ) ),
 	m_delayBuffer( new SampleFrame[DEFAULT_BUFFER_SIZE] ),
 	m_currFrame( 0 ),

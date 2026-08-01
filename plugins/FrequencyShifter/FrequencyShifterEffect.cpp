@@ -23,7 +23,6 @@
 
 #include "FrequencyShifterEffect.h"
 
-#include "Effect.h"
 #include "embed.h"
 #include "plugin_export.h"
 
@@ -55,7 +54,7 @@ PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* parent, void* data)
 }// extern "C"
 
 FrequencyShifterEffect::FrequencyShifterEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key) :
-	Effect(&frequencyshifter_plugin_descriptor, parent, key, Effect::EffectType::PitchShift),
+	Effect(&frequencyshifter_plugin_descriptor, parent, key),
 	m_controls(this)
 {
 	connect(Engine::audioEngine(), &AudioEngine::sampleRateChanged,

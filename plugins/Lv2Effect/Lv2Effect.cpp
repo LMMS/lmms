@@ -26,7 +26,6 @@
 
 #include <QDebug>
 
-#include "Effect.h"
 #include "Lv2SubPluginFeatures.h"
 
 #include "embed.h"
@@ -60,7 +59,7 @@ Plugin::Descriptor PLUGIN_EXPORT lv2effect_plugin_descriptor =
 
 
 Lv2Effect::Lv2Effect(Model* parent, const Descriptor::SubPluginFeatures::Key *key) :
-	Effect(&lv2effect_plugin_descriptor, parent, key, Effect::EffectType::Other),
+	Effect(&lv2effect_plugin_descriptor, parent, key),
 	m_controls(this, key->attributes["uri"]),
 	m_tmpOutputSmps(Engine::audioEngine()->framesPerPeriod())
 {

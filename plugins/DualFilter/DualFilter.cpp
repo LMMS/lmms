@@ -25,7 +25,6 @@
 
 #include "DualFilter.h"
 
-#include "Effect.h"
 #include "embed.h"
 #include "BasicFilters.h"
 #include "plugin_export.h"
@@ -55,7 +54,7 @@ Plugin::Descriptor PLUGIN_EXPORT dualfilter_plugin_descriptor =
 
 
 DualFilterEffect::DualFilterEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key ) :
-	Effect( &dualfilter_plugin_descriptor, parent, key, Effect::EffectType::Filter ),
+	Effect( &dualfilter_plugin_descriptor, parent, key ),
 	m_dfControls( this )
 {
 	m_filter1 = new BasicFilters<2>( Engine::audioEngine()->outputSampleRate() );

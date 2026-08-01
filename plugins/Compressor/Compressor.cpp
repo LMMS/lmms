@@ -27,7 +27,6 @@
 #include <cmath>
 #include <numbers>
 
-#include "Effect.h"
 #include "embed.h"
 #include "lmms_math.h"
 #include "plugin_export.h"
@@ -56,7 +55,7 @@ Plugin::Descriptor PLUGIN_EXPORT compressor_plugin_descriptor =
 
 
 CompressorEffect::CompressorEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key) :
-	Effect(&compressor_plugin_descriptor, parent, key, Effect::EffectType::Compressor),
+	Effect(&compressor_plugin_descriptor, parent, key),
 	m_compressorControls(this)
 {
 	m_sampleRate = Engine::audioEngine()->outputSampleRate();
