@@ -28,7 +28,9 @@
 #include <set>
 #include <cassert>
 
+#include <QDrag>
 #include <QMenu>
+#include <QMimeData>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QUuid>
@@ -69,6 +71,66 @@ struct InternalCopyData
 };
 
 std::map<QString, InternalCopyData> s_clipBuffer;
+
+
+// LazyMimeData lazily generates the XML payload on first read. Same-instance
+// receivers use the StringPair path and never trigger XML serialization.
+// Cross-instance receivers will invoke retrieveData() which generates XML
+// on-demand via createClipDataFiles().
+class LazyMimeData : public QMimeData
+{
+public:
+	LazyMimeData(const ClipView& cv, const QVector<ClipView*>& clipViews,
+		const QString& internalValue)
+		: m_cv(cv)
+		, m_clipViews(clipViews)
+	{
+		using namespace Clipboard;
+		setData(mimeType(MimeType::StringPair),
+			(QString(ClipView::INTERNAL_COPY_KEY) + ":"
+			 + internalValue).toUtf8());
+	}
+
+	bool hasFormat(const QString& mimeType) const override
+	{
+		using namespace Clipboard;
+		if (mimeType == Clipboard::mimeType(MimeType::Default))
+		{
+			return true;
+		}
+		return QMimeData::hasFormat(mimeType);
+	}
+
+	QStringList formats() const override
+	{
+		using namespace Clipboard;
+		QStringList fmts = QMimeData::formats();
+		fmts.append(Clipboard::mimeType(MimeType::Default));
+		return fmts;
+	}
+
+	QVariant retrieveData(const QString& mimeType,
+		QVariant::Type type) const override
+	{
+		using namespace Clipboard;
+		if (mimeType == Clipboard::mimeType(MimeType::Default))
+		{
+			if (m_xmlCache.isEmpty())
+			{
+				DataFile dataFile =
+					m_cv.createClipDataFiles(m_clipViews);
+				m_xmlCache = dataFile.toString().toUtf8();
+			}
+			return QVariant(m_xmlCache);
+		}
+		return QMimeData::retrieveData(mimeType, type);
+	}
+
+private:
+	const ClipView& m_cv;
+	QVector<ClipView*> m_clipViews;
+	mutable QByteArray m_xmlCache;
+};
 
 } // anonymous namespace
 
@@ -503,7 +565,6 @@ void ClipView::dropEvent( QDropEvent * de )
 	QString type = StringPairDrag::decodeKey( de );
 	QString value = StringPairDrag::decodeValue( de );
 
-	// Track must be the same type to paste into, unless internal copy
 	if( type != ( "clip_" + QString::number( static_cast<int>(m_clip->getTrack()->type()) ) )
 		&& type != INTERNAL_COPY_KEY )
 	{
@@ -542,18 +603,37 @@ void ClipView::dropEvent( QDropEvent * de )
 		int initialTrackIndex;
 		unsigned int trackContainerId;
 
-		if (!retrieveInternalCopy(token, clips,
-				grabbedClipPos, initialTrackIndex, trackContainerId))
+		if (retrieveInternalCopy(token, clips,
+				grabbedClipPos, initialTrackIndex, trackContainerId)
+			&& !clips.empty())
 		{
+			TimePos pos = m_clip->startPosition();
+			clips[0].clone->copyDataTo(m_clip);
+			m_clip->movePosition(pos);
+			AutomationClip::resolveAllIDs();
+			de->accept();
 			return;
 		}
-		if (clips.empty()) { return; }
 
-		TimePos pos = m_clip->startPosition();
-		clips[0].clone->copyDataTo(m_clip);
-		m_clip->movePosition(pos);
-		AutomationClip::resolveAllIDs();
-		de->accept();
+		// Token not found (cross-instance): try XML from Default MIME
+		QByteArray xml = de->mimeData()->data(
+			Clipboard::mimeType(Clipboard::MimeType::Default));
+		if (!xml.isEmpty())
+		{
+			DataFile dataFile(xml);
+			QDomElement clipParent = dataFile.content()
+				.firstChildElement("clips");
+			QDomElement clipElement = clipParent
+				.firstChildElement().firstChildElement();
+			if (clipElement.nodeName() == m_clip->nodeName())
+			{
+				TimePos pos = m_clip->startPosition();
+				m_clip->restoreState(clipElement);
+				m_clip->movePosition(pos);
+				AutomationClip::resolveAllIDs();
+				de->accept();
+			}
+		}
 		return;
 	}
 
@@ -659,6 +739,15 @@ std::vector<ClipView::InternalClipData> ClipView::cloneClipsForInternalCopy(
 {
 	std::vector<InternalClipData> clipData;
 
+	struct TrackGuard
+	{
+		Clip* clip;
+		Track* saved;
+		TrackGuard(Clip* c) : clip(c), saved(c->m_track)
+		{ clip->m_track = nullptr; }
+		~TrackGuard() { clip->m_track = saved; }
+	};
+
 	for (const auto& cv : clipViews)
 	{
 		Track* clipTrack = cv->m_trackView->getTrack();
@@ -666,17 +755,13 @@ std::vector<ClipView::InternalClipData> ClipView::cloneClipsForInternalCopy(
 		assert(trackIt != tracks.end());
 		int trackIdx = std::distance(tracks.begin(), trackIt);
 
-		auto* srcClip = cv->m_clip;
-		Track* savedTrack = srcClip->m_track;
-		srcClip->m_track = nullptr;
+		TrackGuard guard(cv->m_clip);
 
 		InternalClipData cd;
-		cd.clone.reset(srcClip->clone());
+		cd.clone.reset(cv->m_clip->clone());
 		cd.trackIndex = trackIdx;
 		cd.trackType = static_cast<int>(clipTrack->type());
 		clipData.push_back(std::move(cd));
-
-		srcClip->m_track = savedTrack;
 	}
 
 	return clipData;
@@ -977,7 +1062,13 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 				128, 128,
 				Qt::KeepAspectRatio,
 				Qt::SmoothTransformation );
-			new StringPairDrag(INTERNAL_COPY_KEY, value, thumbnail, this);
+
+			auto* mime = new LazyMimeData(*this, clipViews, value);
+			auto* drag = new QDrag(this);
+			drag->setMimeData(mime);
+			drag->setPixmap(thumbnail);
+			drag->exec(Qt::CopyAction, Qt::CopyAction);
+			delete drag;
 
 			clearInternalCopy(token);
 		}

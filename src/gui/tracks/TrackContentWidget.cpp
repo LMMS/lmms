@@ -488,8 +488,12 @@ bool TrackContentWidget::pasteSelection( TimePos clipPos, const QMimeData * md, 
 	if (type == ClipView::INTERNAL_COPY_KEY)
 	{
 		bool wasSelection = false;
-		return pasteInternalCopy(value.split('|'), clipPos,
-			getTrack(), wasSelection);
+		if (pasteInternalCopy(value.split('|'), clipPos,
+			getTrack(), wasSelection))
+		{
+			return true;
+		}
+		// Token not found (cross-instance) — fall through to XML path
 	}
 
 	return pasteXmlSelection(clipPos, md);
@@ -833,7 +837,7 @@ bool TrackContentWidget::pasteInternalCopy(const QStringList& parts,
 	for (const auto& obj : so) { obj->setSelected(false); }
 
 	float snapSize = getGUI()->songEditor()->m_editor->getSnapSize();
-	auto offset = TimePos(clipPos - grabbedClipPos);
+	TimePos offset(clipPos - grabbedClipPos);
 	offset -= TimePos::ticksPerBar() * snapSize / 2;
 	offset = offset.quantize(snapSize);
 
@@ -875,7 +879,15 @@ bool TrackContentWidget::pasteXmlSelection(TimePos clipPos, const QMimeData* md)
 	getTrack()->addJournalCheckPoint();
 
 	QString value = decodeValue(md);
-	DataFile dataFile(value.toUtf8());
+	QByteArray data = value.toUtf8();
+
+	QByteArray defaultData = md->data(mimeType(MimeType::Default));
+	if (!defaultData.isEmpty())
+	{
+		data = defaultData;
+	}
+
+	DataFile dataFile(data);
 
 	QDomElement clipParent = dataFile.content().firstChildElement("clips");
 	QDomNodeList clipNodes = clipParent.childNodes();
@@ -899,7 +911,7 @@ bool TrackContentWidget::pasteXmlSelection(TimePos clipPos, const QMimeData* md)
 	for (const auto& obj : so) { obj->setSelected(false); }
 
 	float snapSize = getGUI()->songEditor()->m_editor->getSnapSize();
-	auto offset = TimePos(clipPos - grabbedClipPos);
+	TimePos offset(clipPos - grabbedClipPos);
 	offset -= TimePos::ticksPerBar() * snapSize / 2;
 	offset = offset.quantize(snapSize);
 

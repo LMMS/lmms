@@ -24,9 +24,14 @@
 
 #include <QtTest>
 
+#include <QDomDocument>
 #include <QElapsedTimer>
+#include <QMimeData>
 
+#include "AutomationClip.h"
+#include "AutomationTrack.h"
 #include "Clip.h"
+#include "Clipboard.h"
 #include "ClipView.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
@@ -500,6 +505,121 @@ private slots:
 		QVERIFY(dst.isMuted());
 		QCOMPARE(dst.notes()[0]->key(), 62);
 		QCOMPARE(dst.notes()[1]->key(), 65);
+	}
+
+	void testLazyMimeRetrieve()
+	{
+		using namespace lmms;
+
+		auto song = Engine::getSong();
+		InstrumentTrack track(song);
+
+		MidiClip src(&track);
+		src.setAutoResize(false);
+		src.setName("LazyClip");
+		src.addNote(Note(TimePos(0, 48), TimePos(0, 0), 62, 100, 0), false);
+
+		int serializations = 0;
+		const QString kType = Clipboard::mimeType(
+			Clipboard::MimeType::Default);
+
+		class TestMime : public QMimeData
+		{
+		public:
+			TestMime(int& count, const MidiClip& clip,
+				const QString& type)
+				: m_serCount(count), m_src(clip), m_type(type) {}
+
+			bool hasFormat(const QString& mimeType) const override
+			{
+				if (mimeType == m_type) { return true; }
+				return QMimeData::hasFormat(mimeType);
+			}
+
+			QStringList formats() const override
+			{
+				QStringList fmts = QMimeData::formats();
+				fmts.append(m_type);
+				return fmts;
+			}
+
+			QVariant retrieveData(const QString& mimeType,
+				QVariant::Type type) const override
+			{
+				if (mimeType == m_type)
+				{
+					if (m_cached.isEmpty())
+					{
+						m_cached = m_src.name().toUtf8();
+						m_serCount++;
+					}
+					return QVariant(m_cached);
+				}
+				return QMimeData::retrieveData(mimeType, type);
+			}
+
+			const MidiClip& m_src;
+			int& m_serCount;
+			mutable QByteArray m_cached;
+			const QString& m_type;
+		};
+
+		TestMime mime(serializations, src, kType);
+		QCOMPARE(serializations, 0);
+
+		QVERIFY(mime.hasFormat(kType));
+		QVERIFY(mime.formats().contains(kType));
+
+		QByteArray d1 = mime.data(kType);
+		QCOMPARE(serializations, 1);
+		QCOMPARE(QString::fromUtf8(d1), QString("LazyClip"));
+
+		QByteArray d2 = mime.data(kType);
+		QCOMPARE(serializations, 1);
+		QCOMPARE(d2, d1);
+	}
+
+	void testPositionPreservedAfterRestore()
+	{
+		using namespace lmms;
+
+		auto song = Engine::getSong();
+		InstrumentTrack track(song);
+
+		MidiClip src(&track);
+		src.setAutoResize(false);
+		src.addNote(Note(TimePos(0, 48), TimePos(0, 0), 60), false);
+
+		MidiClip dst(&track);
+		TimePos savedPos(TimePos(8, 0));
+		dst.movePosition(savedPos);
+
+		QDomDocument doc;
+		QDomElement parent = doc.createElement("StateCopy");
+		src.saveState(doc, parent);
+
+		dst.restoreState(parent.firstChildElement());
+		QVERIFY(dst.startPosition() != savedPos);
+		dst.movePosition(savedPos);
+		QCOMPARE(dst.startPosition(), savedPos);
+		QCOMPARE(dst.notes().size(), (std::size_t)1);
+	}
+
+	void testCopyDataToWrongClipType()
+	{
+		using namespace lmms;
+
+		auto song = Engine::getSong();
+		InstrumentTrack track(song);
+
+		MidiClip src(&track);
+		src.addNote(Note(TimePos(0, 48)), false);
+
+		QVERIFY(!src.copyDataTo(nullptr));
+
+		AutomationTrack aTrack(song);
+		AutomationClip aClip(&aTrack);
+		QVERIFY(!src.copyDataTo(&aClip));
 	}
 };
 

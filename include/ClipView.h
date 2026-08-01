@@ -177,8 +177,6 @@ protected:
 	float pixelsPerBar() const;
 
 
-	DataFile createClipDataFiles(const QVector<ClipView *> & clips) const;
-
 public:
 	struct InternalClipData
 	{
@@ -188,6 +186,8 @@ public:
 	};
 
 	static const char* INTERNAL_COPY_KEY;
+
+	DataFile createClipDataFiles(const QVector<ClipView *> & clips) const;
 
 	static QString storeInternalCopy(std::vector<InternalClipData>&& clips,
 		TimePos grabbedClipPos, int initialTrackIndex, unsigned int trackContainerId);
