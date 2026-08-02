@@ -202,7 +202,6 @@ protected slots:
 	void updateSnapLabel();
 
 signals:
-	void playTriggered();
 	void resized();
 
 private:

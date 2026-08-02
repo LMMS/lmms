@@ -1036,11 +1036,6 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 
 	connect(song, SIGNAL(projectLoaded()), this, SLOT(adjustUiAfterProjectLoad()));
 	connect(this, SIGNAL(resized()), m_editor, SLOT(updatePositionLine()));
-
-	// Unsuspend autoscroll when timeline jumps
-	connect(&Engine::getSong()->getTimeline(Song::PlayMode::Song), &Timeline::positionJumped, this, [this]() {
-		m_editor->m_autoscrollSuspended = false;
-	});
 }
 
 QSize SongEditorWindow::sizeHint() const
@@ -1091,7 +1086,6 @@ void SongEditorWindow::play()
 {
 	m_editor->m_autoscrollSuspended = false;
 
-	emit playTriggered();
 	if( Engine::getSong()->playMode() != Song::PlayMode::Song )
 	{
 		Engine::getSong()->playSong();

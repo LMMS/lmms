@@ -444,11 +444,6 @@ PianoRoll::PianoRoll() :
 
 	// trigger a redraw if keymap definitions change (different keys may become disabled)
 	connect(Engine::getSong(), SIGNAL(keymapListChanged(int)), this, SLOT(update()));
-
-	// Unsuspend autoscroll when timeline jumps
-	connect(&Engine::getSong()->getTimeline(Song::PlayMode::MidiClip), &Timeline::positionJumped, this, [this]() {
-		m_autoscrollSuspended = false;
-	});
 }
 
 
