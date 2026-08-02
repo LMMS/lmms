@@ -129,6 +129,7 @@ private:
 	Song * m_song;
 
 	QScrollBar * m_leftRightScroll;
+	bool m_autoscrollSuspended = false;
 
 	void adjustLeftRightScoll(int value);
 

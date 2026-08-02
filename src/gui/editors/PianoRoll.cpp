@@ -444,6 +444,11 @@ PianoRoll::PianoRoll() :
 
 	// trigger a redraw if keymap definitions change (different keys may become disabled)
 	connect(Engine::getSong(), SIGNAL(keymapListChanged(int)), this, SLOT(update()));
+
+	// Unsuspend autoscroll when timeline jumps
+	connect(&Engine::getSong()->getTimeline(Song::PlayMode::MidiClip), &Timeline::positionJumped, this, [this]() {
+		m_autoscrollSuspended = false;
+	});
 }
 
 
@@ -459,6 +464,7 @@ PianoRoll::~PianoRoll()
 
 void PianoRoll::reset()
 {
+	m_autoscrollSuspended = false;
 	m_lastNoteVolume = DefaultVolume;
 	m_lastNotePanning = DefaultPanning;
 	clearGhostClip();
@@ -1425,6 +1431,7 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 				else
 				{
 					// scroll
+					m_autoscrollSuspended = true;
 					m_leftRightScroll->setValue( m_leftRightScroll->value() +
 						direction * cm_scrollAmtHoriz );
 
@@ -4055,6 +4062,7 @@ void PianoRoll::resizeEvent(QResizeEvent* re)
 
 void PianoRoll::adjustLeftRightScoll(int value)
 {
+	m_autoscrollSuspended = true;
 	m_leftRightScroll->setValue(m_leftRightScroll->value() -
 							value * 0.3f / m_zoomLevels[m_zoomingModel.value()]);
 }
@@ -4185,6 +4193,7 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 	}
 	else if( we->modifiers() & Qt::ControlModifier )
 	{
+		m_autoscrollSuspended = true;
 		int z = m_zoomingModel.value();
 		if(we->angleDelta().y() > 0)
 		{
@@ -4317,6 +4326,8 @@ Song::PlayMode PianoRoll::desiredPlayModeForAccompany() const
 
 void PianoRoll::play()
 {
+	m_autoscrollSuspended = false;
+
 	if( ! hasValidMidiClip() )
 	{
 		return;
@@ -4360,6 +4371,8 @@ void PianoRoll::record()
 
 void PianoRoll::recordAccompany()
 {
+	m_autoscrollSuspended = false;
+
 	if( Engine::getSong()->isPlaying() )
 	{
 		stop();
@@ -4422,6 +4435,7 @@ bool PianoRoll::toggleStepRecording()
 void PianoRoll::stop()
 {
 	m_scrollBack = true;
+	m_autoscrollSuspended = false;
 
 	Engine::getSong()->stop();
 	m_recording = false;
@@ -4840,7 +4854,7 @@ bool PianoRoll::deleteSelectedNotes()
 void PianoRoll::autoScroll( const TimePos & t )
 {
 	// Manual scrolling overrides autoscroll
-	if (m_leftRightScroll->isSliderDown()) { return; }
+	if (m_leftRightScroll->isSliderDown() || m_autoscrollSuspended) { return; }
 
 	const int w = width() - m_whiteKeyWidth;
 	if (m_timeLine->autoScroll() == TimeLineWidget::AutoScrollState::Stepped)

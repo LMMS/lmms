@@ -531,6 +531,7 @@ void SongEditor::keyPressEvent( QKeyEvent * ke )
 
 void SongEditor::adjustLeftRightScoll(int value)
 {
+	m_autoscrollSuspended = true;
 	m_leftRightScroll->setValue(m_leftRightScroll->value()
 						- value * DEFAULT_PIXELS_PER_BAR / pixelsPerBar());
 }
@@ -552,6 +553,7 @@ void SongEditor::wheelEvent( QWheelEvent * we )
 		m_zoomingModel->incValue(step * direction);
 
 		// scroll to zooming around cursor's tick
+		m_autoscrollSuspended = true;
 		int newTick = static_cast<int>(x / pixelsPerBar() * TimePos::ticksPerBar());
 		m_leftRightScroll->setValue(m_leftRightScroll->value() + tick - newTick);
 
@@ -763,7 +765,7 @@ void SongEditor::updatePosition()
 	const auto trackOpWidth = compactTrackButtons ? TRACK_OP_WIDTH_COMPACT : TRACK_OP_WIDTH;
 
 	if (((m_song->isPlaying() && m_song->m_playMode == Song::PlayMode::Song) || m_scrollBack)
-		&& !m_leftRightScroll->isSliderDown()) // Manual scrolling overrides autoscroll
+		&& !m_leftRightScroll->isSliderDown() && !m_autoscrollSuspended) // Manual scrolling overrides autoscroll
 	{
 		m_smoothScroll = ConfigManager::inst()->value( "ui", "smoothscroll" ).toInt();
 		const int w = width() - widgetWidth
@@ -1034,6 +1036,11 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 
 	connect(song, SIGNAL(projectLoaded()), this, SLOT(adjustUiAfterProjectLoad()));
 	connect(this, SIGNAL(resized()), m_editor, SLOT(updatePositionLine()));
+
+	// Unsuspend autoscroll when timeline jumps
+	connect(&Engine::getSong()->getTimeline(Song::PlayMode::Song), &Timeline::positionJumped, this, [this]() {
+		m_editor->m_autoscrollSuspended = false;
+	});
 }
 
 QSize SongEditorWindow::sizeHint() const
@@ -1082,6 +1089,8 @@ void SongEditorWindow::changeEvent(QEvent *event)
 
 void SongEditorWindow::play()
 {
+	m_editor->m_autoscrollSuspended = false;
+
 	emit playTriggered();
 	if( Engine::getSong()->playMode() != Song::PlayMode::Song )
 	{
@@ -1106,6 +1115,7 @@ void SongEditorWindow::record()
 
 void SongEditorWindow::recordAccompany()
 {
+	m_editor->m_autoscrollSuspended = false;
 	m_editor->m_song->playAndRecord();
 	m_editor->m_timeLine->setRecording(true);
 	m_editor->m_positionLine->setRecording(true);
@@ -1116,6 +1126,7 @@ void SongEditorWindow::recordAccompany()
 
 void SongEditorWindow::stop()
 {
+	m_editor->m_autoscrollSuspended = false;
 	m_editor->m_scrollBack = true;
 	m_editor->m_song->stop();
 	getGUI()->pianoRoll()->stopRecording();
