@@ -858,21 +858,6 @@ ADD_SUBDIRECTORY(data)
 # install tasks
 ADD_SUBDIRECTORY(cmake/install)
 
-FIND_PACKAGE(UnixCommands)
-IF(GZIP)
-	ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_BINARY_DIR}/lmms.1.gz"
-					COMMAND ${GZIP} -c ${CMAKE_SOURCE_DIR}/doc/lmms.1 > ${CMAKE_BINARY_DIR}/lmms.1.gz
-					DEPENDS "${CMAKE_SOURCE_DIR}/doc/lmms.1"
-					COMMENT "Generating lmms.1.gz"
-					VERBATIM)
-
-
-	ADD_CUSTOM_TARGET(manpage ALL
-					DEPENDS "${CMAKE_BINARY_DIR}/lmms.1.gz")
-ELSEIF(UNIX)
-	MESSAGE(FATAL_ERROR "Can't find gzip required for generating lmms.1.gz")
-ENDIF()
-
 # install headers
 
 IF(LMMS_BUILD_LINUX)
@@ -888,7 +873,7 @@ ENDIF(LMMS_BUILD_LINUX)
 #
 ADD_CUSTOM_TARGET(distclean
 			COMMAND make clean
-			COMMAND rm -rf `find -name cmake_install.cmake` `find -name Makefile` `find -type d -name CMakeFiles` CMakeCache.txt lmmsconfig.h lmms.1.gz)
+			COMMAND rm -rf `find -name cmake_install.cmake` `find -name Makefile` `find -type d -name CMakeFiles` CMakeCache.txt lmmsconfig.h)
 
 #
 # add tarball-target
