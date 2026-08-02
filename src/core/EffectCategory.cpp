@@ -27,7 +27,8 @@
 
 namespace lmms {
 
-const std::map<QString, QString> lmmsEffects = {
+const std::map<QString, QString> lmmsEffects = 
+{
 	{"Amplifier", "Amplifier"},
 	{"BassBooster", "Equalization"},
 	{"Bitcrush", "Bitcrush"},
@@ -54,7 +55,8 @@ const std::map<QString, QString> lmmsEffects = {
 	{"Waveshaper Effect", "Distortion"}
 };
 
-const std::map<QString, QString> ladspaEffects = {
+const std::map<QString, QString> ladspaEffects = 
+{
 	{"4 x 4 pole allpass", "Filter"},
 	{"AM pitchshifter", "Pitch"},
 	{"Aliasing", "Distortion"},
@@ -270,11 +272,10 @@ const std::map<QString, QString> ladspaEffects = {
 	{"Wave shaper", "Distortion"},
 	{"z-1", "Delay"},
 };
+const QString defaultCategory = "Other";
 
 std::unique_ptr<EffectCategory> EffectCategory::s_instance;
 QList<QString>* m_categories;
-
-QString defaultCategory = "Other";
 
 EffectCategory* EffectCategory::instance()
 {
@@ -295,11 +296,14 @@ QString EffectCategory::getCategoryName(QString effectName)
 
 QStringList* EffectCategory::getCategories() 
 {
-	if(m_categories == nullptr || m_categories->isEmpty()) {
+	if(m_categories == nullptr || m_categories->isEmpty()) 
+	{
 		m_categories = getCategoriesFromMap(lmmsEffects);
 		QStringList* ladspaCategories = getCategoriesFromMap(ladspaEffects);
-		foreach(QString category, *ladspaCategories) {
-			if(! m_categories->contains(category)){
+		foreach(QString category, *ladspaCategories) 
+		{
+			if(! m_categories->contains(category)) 
+			{
 				m_categories->append(category);
 			}
 		}
@@ -311,8 +315,10 @@ QStringList* EffectCategory::getCategories()
 QStringList* EffectCategory::getCategoriesFromMap(std::map<QString,QString> map)
 {
 	auto* categories = new QStringList();
-	for(auto & it : map){
-		if(! categories->contains(it.second)){
+	for(auto & it : map) 
+	{
+		if(! categories->contains(it.second)) 
+		{
 			categories->append(it.second);
 		}
 	}

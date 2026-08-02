@@ -28,7 +28,8 @@
 #include <qobject.h>
 
 #include "lmms_export.h"
-namespace lmms {
+namespace lmms 
+{
 
 class LMMS_EXPORT EffectCategory
 {

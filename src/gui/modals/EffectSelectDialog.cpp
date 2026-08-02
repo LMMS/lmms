@@ -49,7 +49,8 @@
 #include "PluginFactory.h"
 #include "embed.h"
 
-namespace lmms::gui {
+namespace lmms::gui 
+{
 
 EffectSelectDialog::EffectSelectDialog(QWidget* parent)
 	: QDialog(parent)
@@ -321,10 +322,12 @@ QHBoxLayout* EffectSelectDialog::buildTypeFilterLayout()
 	auto* buttonFilter = new QComboBox();
 	QStringList labels = {tr("All"), "LMMS", "LADSPA", "LV2", "VST"};
 	buttonFilter->addItems(labels);
-	connect(buttonFilter, &QComboBox::textActivated, this, [this](QString value) {
-		m_model.setEffectTypeFilter(value == tr("All") ? "" : value);
-		updateSelection();
-	});
+	connect(buttonFilter, &QComboBox::textActivated, this, [this](QString value) 
+		{
+			m_model.setEffectTypeFilter(value == tr("All") ? "" : value);
+			updateSelection();
+		}
+	);
 	auto* layout = new QHBoxLayout();
 	layout->addWidget(label);
 	layout->addWidget(buttonFilter);
@@ -339,10 +342,12 @@ QHBoxLayout* EffectSelectDialog::buildCategoryFilterLayout()
 	QStringList labels = *categories;
 	labels.push_front(tr("All"));
 	buttonFilter->addItems(labels);
-	connect(buttonFilter, &QComboBox::textActivated, this, [this](QString value) {
-		m_model.setEffectCategoryFilter(value == tr("All") ? "" : value);
-		updateSelection();
-	});
+	connect(buttonFilter, &QComboBox::textActivated, this, [this](QString value) 
+		{
+			m_model.setEffectCategoryFilter(value == tr("All") ? "" : value);
+			updateSelection();
+		}
+	);
 	auto* layout = new QHBoxLayout();
 	layout->addWidget(label);
 	layout->addWidget(buttonFilter);
