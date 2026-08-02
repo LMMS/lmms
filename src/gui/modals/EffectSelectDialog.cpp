@@ -322,7 +322,7 @@ QHBoxLayout* EffectSelectDialog::buildTypeFilterLayout()
 	QStringList labels = {tr("All"), "LMMS", "LADSPA", "LV2", "VST"};
 	buttonFilter->addItems(labels);
 	connect(buttonFilter, &QComboBox::textActivated, this, [this](QString value) {
-		m_model.setEffectTypeFilter(value == "All" ? "" : value);
+		m_model.setEffectTypeFilter(value == tr("All") ? "" : value);
 		updateSelection();
 	});
 	auto* layout = new QHBoxLayout();
@@ -340,7 +340,7 @@ QHBoxLayout* EffectSelectDialog::buildCategoryFilterLayout()
 	labels.push_front(tr("All"));
 	buttonFilter->addItems(labels);
 	connect(buttonFilter, &QComboBox::textActivated, this, [this](QString value) {
-		m_model.setEffectCategoryFilter(value == "All" ? "" : value);
+		m_model.setEffectCategoryFilter(value == tr("All") ? "" : value);
 		updateSelection();
 	});
 	auto* layout = new QHBoxLayout();
