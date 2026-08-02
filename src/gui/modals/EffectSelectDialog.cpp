@@ -24,11 +24,6 @@
  */
 
 #include "EffectSelectDialog.h"
-#include "DummyEffect.h"
-#include "EffectChain.h"
-#include "embed.h"
-#include "PluginFactory.h"
-#include "EffectCategory.h"
 
 #include <QApplication>
 #include <QDialogButtonBox>
@@ -43,34 +38,39 @@
 #include <QScrollArea>
 #include <QTableView>
 #include <QVBoxLayout>
+#include <qboxlayout.h>
+#include <qcombobox.h>
+#include <qlabel.h>
+#include <qlist.h>
 
+#include "DummyEffect.h"
+#include "EffectCategory.h"
+#include "EffectChain.h"
+#include "PluginFactory.h"
+#include "embed.h"
 
-namespace lmms::gui
-{
+namespace lmms::gui {
 
-EffectSelectDialog::EffectSelectDialog(QWidget* parent) :
-	QDialog(parent),
-	m_effectKeys(),
-	m_currentSelection(),
-	m_sourceModel(),
-	m_model(),
-	m_descriptionWidget(nullptr),
-	m_pluginList(new QTableView(this)),
-	m_scrollArea(new QScrollArea(this))
+EffectSelectDialog::EffectSelectDialog(QWidget* parent)
+	: QDialog(parent)
+	, m_effectKeys()
+	, m_currentSelection()
+	, m_sourceModel()
+	, m_model()
+	, m_descriptionWidget(nullptr)
+	, m_pluginList(new QTableView(this))
+	, m_scrollArea(new QScrollArea(this))
 {
 	setWindowTitle(tr("Add effect"));
 	resize(640, 480);
-	
+
 	setWindowIcon(embed::getIconPixmap("setup_audio"));
 
 	// Query effects
 	EffectKeyList subPluginEffectKeys;
 	for (const auto desc : getPluginFactory()->descriptors(Plugin::Type::Effect))
 	{
-		if (desc->subPluginFeatures)
-		{
-			desc->subPluginFeatures->listSubPluginKeys(desc, subPluginEffectKeys);
-		}
+		if (desc->subPluginFeatures) { desc->subPluginFeatures->listSubPluginKeys(desc, subPluginEffectKeys); }
 		else
 		{
 			m_effectKeys << EffectKey(desc, desc->name);
@@ -109,30 +109,6 @@ EffectSelectDialog::EffectSelectDialog(QWidget* parent) :
 
 	QHBoxLayout* mainLayout = new QHBoxLayout(this);
 
-	QVBoxLayout* leftSectionLayout = new QVBoxLayout();
-
-	QStringList buttonLabels = { tr("All"), "LMMS", "LADSPA", "LV2", "VST" };
-	QStringList buttonSearchString = { "", "LMMS", "LADSPA", "LV2", "VST" };
-
-	for (int i = 0; i < buttonLabels.size(); ++i)
-	{
-		const QString& label = buttonLabels[i];
-		const QString& searchString = buttonSearchString[i];
-
-		QPushButton* button = new QPushButton(label, this);
-		button->setFixedSize(50, 50);
-		button->setFocusPolicy(Qt::NoFocus);
-		leftSectionLayout->addWidget(button);
-
-		connect(button, &QPushButton::clicked, this, [this, searchString] {
-			m_model.setEffectTypeFilter(searchString);
-			updateSelection();
-		});
-	}
-
-	leftSectionLayout->addStretch();// Add stretch to the button layout to push buttons to the top
-	mainLayout->addLayout(leftSectionLayout);
-
 	m_filterEdit = new QLineEdit(this);
 	connect(m_filterEdit, &QLineEdit::textChanged, this, [this](const QString& text) {
 		m_model.setFilterRegularExpression(QRegularExpression(text, QRegularExpression::CaseInsensitiveOption));
@@ -149,7 +125,7 @@ EffectSelectDialog::EffectSelectDialog(QWidget* parent) :
 	m_pluginList->setSelectionBehavior(QAbstractItemView::SelectRows);
 	m_pluginList->setSelectionMode(QAbstractItemView::SingleSelection);
 	m_pluginList->setSortingEnabled(true);
-	m_pluginList->sortByColumn(0, Qt::AscendingOrder);  // Initial sort by column 0 (Name)
+	m_pluginList->sortByColumn(0, Qt::AscendingOrder); // Initial sort by column 0 (Name)
 	m_pluginList->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 	m_pluginList->verticalHeader()->hide();
 	m_pluginList->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
@@ -173,6 +149,7 @@ EffectSelectDialog::EffectSelectDialog(QWidget* parent) :
 
 	QVBoxLayout* rightSectionLayout = new QVBoxLayout();
 	rightSectionLayout->addWidget(m_filterEdit);
+	rightSectionLayout->addLayout(buildFiltersLayout());
 	rightSectionLayout->addWidget(m_pluginList);
 	rightSectionLayout->addWidget(m_scrollArea);
 	rightSectionLayout->addWidget(buttonBox);
@@ -182,19 +159,16 @@ EffectSelectDialog::EffectSelectDialog(QWidget* parent) :
 
 	auto selectionModel = new QItemSelectionModel(&m_model);
 	m_pluginList->setSelectionModel(selectionModel);
-	connect(selectionModel, &QItemSelectionModel::currentRowChanged,
-			this, &EffectSelectDialog::rowChanged);
+	connect(selectionModel, &QItemSelectionModel::currentRowChanged, this, &EffectSelectDialog::rowChanged);
 
-	connect(m_pluginList, &QTableView::doubleClicked,
-			this, &EffectSelectDialog::acceptSelection);
-	
+	connect(m_pluginList, &QTableView::doubleClicked, this, &EffectSelectDialog::acceptSelection);
+
 	setModal(true);
 	installEventFilter(this);
 
 	updateSelection();
 	show();
 }
-
 
 Effect* EffectSelectDialog::instantiateSelectedPlugin(EffectChain* parent)
 {
@@ -203,19 +177,13 @@ Effect* EffectSelectDialog::instantiateSelectedPlugin(EffectChain* parent)
 	{
 		result = Effect::instantiate(m_currentSelection.desc->name, parent, &m_currentSelection);
 	}
-	if (!result)
-	{
-		result = new DummyEffect(parent, QDomElement());
-	}
+	if (!result) { result = new DummyEffect(parent, QDomElement()); }
 	return result;
 }
 
 void EffectSelectDialog::acceptSelection()
 {
-	if (m_currentSelection.isValid())
-	{
-		accept();
-	}
+	if (m_currentSelection.isValid()) { accept(); }
 }
 
 void EffectSelectDialog::rowChanged(const QModelIndex& idx, const QModelIndex&)
@@ -267,8 +235,7 @@ void EffectSelectDialog::rowChanged(const QModelIndex& idx, const QModelIndex&)
 			subLayout->setContentsMargins(0, 0, 0, 0);
 			subLayout->setSpacing(8);
 
-			m_currentSelection.desc->subPluginFeatures->
-				fillDescriptionWidget(subWidget, &m_currentSelection);
+			m_currentSelection.desc->subPluginFeatures->fillDescriptionWidget(subWidget, &m_currentSelection);
 			for (QWidget* w : subWidget->findChildren<QWidget*>())
 			{
 				if (w->parent() == subWidget)
@@ -282,19 +249,19 @@ void EffectSelectDialog::rowChanged(const QModelIndex& idx, const QModelIndex&)
 		else
 		{
 			// HACK: Markup inside translation strings due to RTL not being handled correctly.
-			// Move the markup out of the translation strings and into the QString template as soon as RTL layout works properly
-			auto labelText = QString{
-				"<p>%1%2</p>"
-				"<p>%3%4</p>"
-				"<p>%5%6</p>"
-			}.arg(
-				tr("<b>Name: </b>"), descriptor.displayName,
-				tr("<b>Author: </b>"), QString::fromUtf8(descriptor.author)
-					.replace("/dot/", ".").replace("/at/", "@").toHtmlEscaped(),
-				tr("<b>Description: </b>"), qApp->translate("PluginBrowser", descriptor.description)
-					.toHtmlEscaped()
-			);
-		
+			// Move the markup out of the translation strings and into the QString template as soon as RTL layout works
+			// properly
+			auto labelText = QString{"<p>%1%2</p>"
+									 "<p>%3%4</p>"
+									 "<p>%5%6</p>"}
+								 .arg(tr("<b>Name: </b>"), descriptor.displayName, tr("<b>Author: </b>"),
+									 QString::fromUtf8(descriptor.author)
+										 .replace("/dot/", ".")
+										 .replace("/at/", "@")
+										 .toHtmlEscaped(),
+									 tr("<b>Description: </b>"),
+									 qApp->translate("PluginBrowser", descriptor.description).toHtmlEscaped());
+
 			auto label = new QLabel(labelText, m_descriptionWidget);
 			label->setWordWrap(true);
 			textWidgetLayout->addWidget(label);
@@ -311,17 +278,17 @@ void EffectSelectDialog::updateSelection()
 	if (m_pluginList->selectionModel()->selection().size() <= 0)
 	{
 		// Then select our first item
-		m_pluginList->selectionModel()->
-			select(m_model.index(0, 0), QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
+		m_pluginList->selectionModel()->select(
+			m_model.index(0, 0), QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
 		rowChanged(m_model.index(0, 0), QModelIndex());
 	}
 }
 
-bool EffectSelectDialog::eventFilter(QObject *obj, QEvent *event)
+bool EffectSelectDialog::eventFilter(QObject* obj, QEvent* event)
 {
 	if (obj == this && event->type() == QEvent::KeyPress)
 	{
-		QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
+		QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
 		if (keyEvent->key() == Qt::Key_Up || keyEvent->key() == Qt::Key_Down)
 		{
 			QItemSelectionModel* selectionModel = m_pluginList->selectionModel();
@@ -329,7 +296,7 @@ bool EffectSelectDialog::eventFilter(QObject *obj, QEvent *event)
 			int newRow = (keyEvent->key() == Qt::Key_Up) ? currentRow - 1 : currentRow + 1;
 			int rowCount = m_pluginList->model()->rowCount();
 			newRow = qBound(0, newRow, rowCount - 1);
-			
+
 			selectionModel->setCurrentIndex(m_pluginList->model()->index(newRow, 0),
 				QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
 			m_pluginList->scrollTo(m_pluginList->model()->index(newRow, 0));
@@ -340,4 +307,45 @@ bool EffectSelectDialog::eventFilter(QObject *obj, QEvent *event)
 	return QDialog::eventFilter(obj, event);
 }
 
+QHBoxLayout* EffectSelectDialog::buildFiltersLayout()
+{
+	auto* layout = new QHBoxLayout();
+	layout->addLayout(buildTypeFilterLayout());
+	layout->addLayout(buildCategoryFilterLayout());
+	return layout;
+}
+
+QHBoxLayout* EffectSelectDialog::buildTypeFilterLayout()
+{
+	auto* label = new QLabel(tr("Type"));
+	auto* buttonFilter = new QComboBox();
+	QStringList labels = {tr("All"), "LMMS", "LADSPA", "LV2", "VST"};
+	buttonFilter->addItems(labels);
+	connect(buttonFilter, &QComboBox::textActivated, this, [this](QString value) {
+		m_model.setEffectTypeFilter(value == "All" ? "" : value);
+		updateSelection();
+	});
+	auto* layout = new QHBoxLayout();
+	layout->addWidget(label);
+	layout->addWidget(buttonFilter);
+	return layout;
+}
+
+QHBoxLayout* EffectSelectDialog::buildCategoryFilterLayout()
+{
+	auto* label = new QLabel(tr("Category"));
+	auto* buttonFilter = new QComboBox();
+	QStringList* categories = getEffectCategory()->getCategories();
+	QStringList labels = *categories;
+	labels.push_front(tr("All"));
+	buttonFilter->addItems(labels);
+	connect(buttonFilter, &QComboBox::textActivated, this, [this](QString value) {
+		m_model.setEffectCategoryFilter(value == "All" ? "" : value);
+		updateSelection();
+	});
+	auto* layout = new QHBoxLayout();
+	layout->addWidget(label);
+	layout->addWidget(buttonFilter);
+	return layout;
+}
 } // namespace lmms::gui

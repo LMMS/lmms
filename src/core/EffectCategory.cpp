@@ -22,18 +22,37 @@
 
 #include "EffectCategory.h"
 
+#include <qlist.h>
 #include <qobject.h>
 
 namespace lmms {
 
-const std::map<QString, QString> lmmsEffects = {{"Amplifier", "Amplifier"}, {"BassBooster", "Equalization"},
-	{"Bitcrush", "Bitcrush"}, {"Compressor", "Compressor"}, {"Crossover Equalizer", "Equalization"}, {"Delay", "Delay"},
-	{"Dispersion", "Filter"}, {"Dual Filter", "Filter"}, {"Dynamics Processor", "Distortion"},
-	{"Equalizer", "Equalization"}, {"Flanger", "Flanger"}, {"Frequency Shifter", "Pitch"},
-	{"Granular Pitch Shifter", "Pitch"}, {"LOMM", "Distortion"}, {"Multitap Echo", "Delay"}, {"Oscilloscope", "Tool"},
-	{"Peak Controller", "Automation"}, {"ReverbSC", "Reverb"}, {"Slew Distortion", "Distortion"},
-	{"Spectrum Analyzer", "Tool"}, {"Stereo Matrix", "Stereo"}, {"StereoEnhancer Effect", "Stereo"},
-	{"Vectorscope", "Tool"}, {"Waveshaper Effect", "Distortion"}};
+const std::map<QString, QString> lmmsEffects = {
+	{"Amplifier", "Amplifier"},
+	{"BassBooster", "Equalization"},
+	{"Bitcrush", "Bitcrush"},
+	{"Compressor", "Compressor"},
+	{"Crossover Equalizer", "Equalization"},
+	{"Delay", "Delay"},
+	{"Dispersion", "Filter"},
+	{"Dual Filter", "Filter"},
+	{"Dynamics Processor", "Distortion"},
+	{"Equalizer", "Equalization"},
+	{"Flanger", "Flanger"},
+	{"Frequency Shifter", "Pitch"},
+	{"Granular Pitch Shifter", "Pitch"},
+	{"LOMM", "Distortion"},
+	{"Multitap Echo", "Delay"},
+	{"Oscilloscope", "Tool"},
+	{"Peak Controller", "Automation"},
+	{"ReverbSC", "Reverb"},
+	{"Slew Distortion", "Distortion"},
+	{"Spectrum Analyzer", "Tool"},
+	{"Stereo Matrix", "Stereo"},
+	{"StereoEnhancer Effect", "Stereo"},
+	{"Vectorscope", "Tool"},
+	{"Waveshaper Effect", "Distortion"}
+};
 
 const std::map<QString, QString> ladspaEffects = {
 	{"4 x 4 pole allpass", "Filter"},
@@ -253,6 +272,7 @@ const std::map<QString, QString> ladspaEffects = {
 };
 
 std::unique_ptr<EffectCategory> EffectCategory::s_instance;
+QList<QString>* m_categories;
 
 QString defaultCategory = "Other";
 
@@ -271,6 +291,32 @@ QString EffectCategory::getCategoryName(QString effectName)
 	if (lmmsEffects.find(effectName) != lmmsEffects.end()) { return lmmsEffects.at(effectName); }
 	if (ladspaEffects.find(effectName) != ladspaEffects.end()) { return ladspaEffects.at(effectName); }
 	return defaultCategory;
+}
+
+QStringList* EffectCategory::getCategories() 
+{
+	if(m_categories == nullptr || m_categories->isEmpty()) {
+		m_categories = getCategoriesFromMap(lmmsEffects);
+		QStringList* ladspaCategories = getCategoriesFromMap(ladspaEffects);
+		foreach(QString category, *ladspaCategories) {
+			if(! m_categories->contains(category)){
+				m_categories->append(category);
+			}
+		}
+	}
+	m_categories->sort();
+	return m_categories;
+}
+
+QStringList* EffectCategory::getCategoriesFromMap(std::map<QString,QString> map)
+{
+	auto* categories = new QStringList();
+	for(auto & it : map){
+		if(! categories->contains(it.second)){
+			categories->append(it.second);
+		}
+	}
+	return categories;
 }
 
 } // namespace lmms
