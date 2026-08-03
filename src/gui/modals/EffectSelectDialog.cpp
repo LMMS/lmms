@@ -335,8 +335,8 @@ QHBoxLayout* EffectSelectDialog::buildCategoryFilterLayout()
 {
 	auto* label = new QLabel(tr("Category"));
 	auto* buttonFilter = new QComboBox();
-	QStringList* categories = getEffectCategory()->getCategories();
-	QStringList labels = *categories;
+	QStringList categories = getEffectCategory()->getCategories();
+	QStringList labels = categories;
 	labels.push_front(tr("All"));
 	buttonFilter->addItems(labels);
 	connect(buttonFilter, &QComboBox::textActivated, this, [this](QString value) 
@@ -349,4 +349,5 @@ QHBoxLayout* EffectSelectDialog::buildCategoryFilterLayout()
 	layout->addWidget(buttonFilter);
 	return layout;
 }
+
 } // namespace lmms::gui

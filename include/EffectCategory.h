@@ -35,14 +35,15 @@ class LMMS_EXPORT EffectCategory
 public:
 	static EffectCategory* instance();
 	QString getCategoryName(QString effectName);
-	QStringList* getCategories();
+	QStringList getCategories();
 private:
 	static std::unique_ptr<EffectCategory> s_instance;
-	QStringList* m_categories;
-	QStringList* getCategoriesFromMap(std::map<QString, QString> map);
+	QStringList m_categories;
+	QStringList getCategoriesFromMap(std::map<QString, QString> map);
 };
 
 // Short-hand function
 LMMS_EXPORT EffectCategory* getEffectCategory();
-}
+
+} // namespace lmms
 #endif // LMMS_EFFECT_CATEGORY_H

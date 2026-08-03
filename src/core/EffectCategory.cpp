@@ -23,6 +23,7 @@
 #include "EffectCategory.h"
 
 #include <QList>
+#include <qlist.h>
 
 namespace lmms {
 
@@ -274,7 +275,7 @@ const std::map<QString, QString> ladspaEffects =
 const QString defaultCategory = "Other";
 
 std::unique_ptr<EffectCategory> EffectCategory::s_instance;
-QList<QString>* m_categories;
+QStringList m_categories;
 
 EffectCategory* EffectCategory::instance()
 {
@@ -297,25 +298,25 @@ QString EffectCategory::getCategoryName(QString effectName)
 	return defaultCategory;
 }
 
-QStringList* EffectCategory::getCategories() 
+QStringList EffectCategory::getCategories() 
 {
-	if (m_categories == nullptr || m_categories->isEmpty()) 
+	if (m_categories.isEmpty()) 
 	{
 		m_categories = getCategoriesFromMap(lmmsEffects);
-		QStringList ladspaCategories = *getCategoriesFromMap(ladspaEffects);
+		QStringList ladspaCategories = getCategoriesFromMap(ladspaEffects);
 		for (const QString& category : ladspaCategories) 
 		{
-			if (!m_categories->contains(category)) 
+			if (!m_categories.contains(category)) 
 			{
-				m_categories->append(category);
+				m_categories.append(category);
 			}
 		}
 	}
-	m_categories->sort();
+	m_categories.sort();
 	return m_categories;
 }
 
-QStringList* EffectCategory::getCategoriesFromMap(std::map<QString, QString> map)
+QStringList EffectCategory::getCategoriesFromMap(std::map<QString, QString> map)
 {
 	auto* categories = new QStringList();
 	for (auto& it : map) 
@@ -325,7 +326,7 @@ QStringList* EffectCategory::getCategoriesFromMap(std::map<QString, QString> map
 			categories->append(it.second);
 		}
 	}
-	return categories;
+	return *categories;
 }
 
 } // namespace lmms
