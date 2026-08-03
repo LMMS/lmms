@@ -31,7 +31,7 @@
 #include <QRegularExpression>
 #include <QSortFilterProxyModel>
 #include <QStandardItemModel>
-#include <qboxlayout.h>
+#include <QHBoxLayout>
 
 class QScrollArea;
 class QTableView;

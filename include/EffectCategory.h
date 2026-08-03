@@ -23,9 +23,8 @@
 #ifndef LMMS_EFFECT_CATEGORY_H
 #define LMMS_EFFECT_CATEGORY_H
 
-#include <qlabel.h>
-#include <qlist.h>
-#include <qobject.h>
+#include <QLabel>
+#include <QList>
 
 #include "lmms_export.h"
 namespace lmms 
@@ -40,10 +39,10 @@ public:
 private:
 	static std::unique_ptr<EffectCategory> s_instance;
 	QStringList* m_categories;
-	QStringList* getCategoriesFromMap(std::map<QString,QString> map);
+	QStringList* getCategoriesFromMap(std::map<QString, QString> map);
 };
 
 // Short-hand function
 LMMS_EXPORT EffectCategory* getEffectCategory();
-} // namespace lmms
+}
 #endif // LMMS_EFFECT_CATEGORY_H

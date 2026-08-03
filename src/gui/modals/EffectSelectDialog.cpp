@@ -38,10 +38,9 @@
 #include <QScrollArea>
 #include <QTableView>
 #include <QVBoxLayout>
-#include <qboxlayout.h>
-#include <qcombobox.h>
-#include <qlabel.h>
-#include <qlist.h>
+#include <QComboBox>
+#include <QLabel>
+#include <QList>
 
 #include "DummyEffect.h"
 #include "EffectCategory.h"
@@ -250,19 +249,18 @@ void EffectSelectDialog::rowChanged(const QModelIndex& idx, const QModelIndex&)
 		else
 		{
 			// HACK: Markup inside translation strings due to RTL not being handled correctly.
-			// Move the markup out of the translation strings and into the QString template as soon as RTL layout works
-			// properly
-			auto labelText = QString{"<p>%1%2</p>"
-									 "<p>%3%4</p>"
-									 "<p>%5%6</p>"}
-								 .arg(tr("<b>Name: </b>"), descriptor.displayName, tr("<b>Author: </b>"),
-									 QString::fromUtf8(descriptor.author)
-										 .replace("/dot/", ".")
-										 .replace("/at/", "@")
-										 .toHtmlEscaped(),
-									 tr("<b>Description: </b>"),
-									 qApp->translate("PluginBrowser", descriptor.description).toHtmlEscaped());
-
+			// Move the markup out of the translation strings and into the QString template as soon as RTL layout works properly
+			auto labelText = QString{
+				"<p>%1%2</p>"
+				"<p>%3%4</p>"
+				"<p>%5%6</p>"
+			}.arg(
+				tr("<b>Name: </b>"), descriptor.displayName,
+				tr("<b>Author: </b>"), QString::fromUtf8(descriptor.author)
+					.replace("/dot/", ".").replace("/at/", "@").toHtmlEscaped(),
+				tr("<b>Description: </b>"), qApp->translate("PluginBrowser", descriptor.description)
+					.toHtmlEscaped()
+			);
 			auto label = new QLabel(labelText, m_descriptionWidget);
 			label->setWordWrap(true);
 			textWidgetLayout->addWidget(label);
@@ -323,11 +321,10 @@ QHBoxLayout* EffectSelectDialog::buildTypeFilterLayout()
 	QStringList labels = {tr("All"), "LMMS", "LADSPA", "LV2", "VST"};
 	buttonFilter->addItems(labels);
 	connect(buttonFilter, &QComboBox::textActivated, this, [this](QString value) 
-		{
-			m_model.setEffectTypeFilter(value == tr("All") ? "" : value);
-			updateSelection();
-		}
-	);
+	{
+		m_model.setEffectTypeFilter(value == tr("All") ? "" : value);
+		updateSelection();
+	});
 	auto* layout = new QHBoxLayout();
 	layout->addWidget(label);
 	layout->addWidget(buttonFilter);
@@ -343,11 +340,10 @@ QHBoxLayout* EffectSelectDialog::buildCategoryFilterLayout()
 	labels.push_front(tr("All"));
 	buttonFilter->addItems(labels);
 	connect(buttonFilter, &QComboBox::textActivated, this, [this](QString value) 
-		{
-			m_model.setEffectCategoryFilter(value == tr("All") ? "" : value);
-			updateSelection();
-		}
-	);
+	{
+		m_model.setEffectCategoryFilter(value == tr("All") ? "" : value);
+		updateSelection();
+	});
 	auto* layout = new QHBoxLayout();
 	layout->addWidget(label);
 	layout->addWidget(buttonFilter);

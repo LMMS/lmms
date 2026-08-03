@@ -22,8 +22,7 @@
 
 #include "EffectCategory.h"
 
-#include <qlist.h>
-#include <qobject.h>
+#include <QList>
 
 namespace lmms {
 
@@ -279,13 +278,17 @@ QList<QString>* m_categories;
 
 EffectCategory* EffectCategory::instance()
 {
-	if (s_instance == nullptr) { s_instance = std::make_unique<EffectCategory>(); }
-
+	if (s_instance == nullptr) 
+	{
+		s_instance = std::make_unique<EffectCategory>(); 
+	}
 	return s_instance.get();
 }
 
 EffectCategory* getEffectCategory()
-{ return EffectCategory::instance(); }
+{
+	return EffectCategory::instance(); 
+}
 
 QString EffectCategory::getCategoryName(QString effectName)
 {
@@ -296,13 +299,13 @@ QString EffectCategory::getCategoryName(QString effectName)
 
 QStringList* EffectCategory::getCategories() 
 {
-	if(m_categories == nullptr || m_categories->isEmpty()) 
+	if (m_categories == nullptr || m_categories->isEmpty()) 
 	{
 		m_categories = getCategoriesFromMap(lmmsEffects);
-		QStringList* ladspaCategories = getCategoriesFromMap(ladspaEffects);
-		foreach(QString category, *ladspaCategories) 
+		QStringList ladspaCategories = *getCategoriesFromMap(ladspaEffects);
+		for (const QString& category : ladspaCategories) 
 		{
-			if(! m_categories->contains(category)) 
+			if (!m_categories->contains(category)) 
 			{
 				m_categories->append(category);
 			}
@@ -312,12 +315,12 @@ QStringList* EffectCategory::getCategories()
 	return m_categories;
 }
 
-QStringList* EffectCategory::getCategoriesFromMap(std::map<QString,QString> map)
+QStringList* EffectCategory::getCategoriesFromMap(std::map<QString, QString> map)
 {
 	auto* categories = new QStringList();
-	for(auto & it : map) 
+	for (auto& it : map) 
 	{
-		if(! categories->contains(it.second)) 
+		if (!categories->contains(it.second)) 
 		{
 			categories->append(it.second);
 		}
