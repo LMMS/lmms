@@ -165,7 +165,11 @@ void SampleThumbnail::visualize(VisualizeParameters parameters, QPainter& painte
 	{
 		if (useOriginalBuffer && drawOriginalBuffer)
 		{
-			const auto value = m_buffer->data()->data()[i];
+			const auto value = (
+				parameters.waveType == Type::RIGHT ? m_buffer->data()[i][0] :
+				parameters.waveType == Type::LEFT  ? m_buffer->data()[i][1] :
+				(m_buffer->data()[i][0] + m_buffer->data()[i][1]) / 2
+			);
 			painter.drawPoint(x, renderRect.center().y() - value * yScale);
 			continue;
 		}
@@ -179,16 +183,40 @@ void SampleThumbnail::visualize(VisualizeParameters parameters, QPainter& painte
 
 			if (useOriginalBuffer)
 			{
-				const auto flatBuffer = m_buffer->data()->data();
-				const auto [min, max] = std::minmax_element(flatBuffer + beginIndex, flatBuffer + endIndex);
-				minPeak = *min;
-				maxPeak = *max;
+				const auto frameBuffer = m_buffer->data();
+
+				if (parameters.waveType == RIGHT)
+				{
+					const auto [min, max] = std::minmax_element(frameBuffer + beginIndex, frameBuffer + endIndex,
+						[](const SampleFrame& a, const SampleFrame& b){ return a.right() < b.right(); }
+					);
+					minPeak = min->right();
+					maxPeak = max->right();
+				}
+				else if (parameters.waveType == LEFT)
+				{
+					const auto [min, max] = std::minmax_element(frameBuffer + beginIndex, frameBuffer + endIndex,
+						[](const SampleFrame& a, const SampleFrame& b){ return a.left() < b.left(); }
+					);
+					minPeak = min->left();
+					maxPeak = max->left();
+				}
+				else
+				{
+					const auto flatBuffer = frameBuffer->data();
+					const auto [min, max] = std::minmax_element(flatBuffer + (2 * beginIndex), flatBuffer + (2 * endIndex));
+					minPeak = *min;
+					maxPeak = *max;
+				}
 			}
 			else
 			{
-				const auto beginAggregationAt = finerThumbnail->data() + beginIndex;
-				const auto endAggregationAt = finerThumbnail->data() + endIndex;
-				const auto peak = std::accumulate(beginAggregationAt, endAggregationAt, Thumbnail::Peak{});
+				const Thumbnail::Peak* peaks = (
+					parameters.waveType == Type::RIGHT ? finerThumbnail->right() :
+					parameters.waveType == Type::LEFT  ? finerThumbnail->left() :
+					finerThumbnail->mono()
+				);
+				const auto peak = std::accumulate(peaks + beginIndex, peaks + endIndex, Thumbnail::Peak{});
 				minPeak = peak.min;
 				maxPeak = peak.max;
 			}
