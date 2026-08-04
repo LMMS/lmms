@@ -42,7 +42,7 @@ class TrackGrip : public QWidget
 {
 	Q_OBJECT
 public:
-	TrackGrip(TrackView* trackView, QWidget* parent = 0);
+	TrackGrip(TrackView* trackView, QWidget* parent = nullptr);
 	~TrackGrip() override = default;
 
 signals:
