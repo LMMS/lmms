@@ -87,6 +87,7 @@ private slots:
 	void toggleOpenLastProject(bool enabled);
 	void detachBehaviorChanged();
 	void loopMarkerModeChanged();
+	void stereoChannelsPolicyChanged();
 	void setLanguage(int lang);
 
 	// Performance settings widget.
@@ -153,6 +154,8 @@ private:
 	QComboBox* m_detachBehaviorComboBox;
 	QString m_loopMarkerMode;
 	QComboBox* m_loopMarkerComboBox;
+	QString m_stereoChannelsPolicy;
+	QComboBox* m_stereoChannelsComboBox;
 	QString m_autoScroll;
 	QComboBox* m_autoScrollComboBox;
 	QString m_lang;
