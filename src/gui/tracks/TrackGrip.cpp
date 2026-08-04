@@ -68,12 +68,19 @@ TrackGrip::TrackGrip(TrackView* trackView, QWidget* parent) :
 void TrackGrip::mousePressEvent(QMouseEvent* m)
 {
 	// Allow the user to Ctrl-drag copy the track if it is not a pattern track
-	if (m->button() == Qt::LeftButton && m->modifiers() & KBD_COPY_MODIFIER && m_trackView->getTrack()->type() != Track::Type::Pattern)
+	if (m->button() == Qt::LeftButton
+		&& m->modifiers() & KBD_COPY_MODIFIER
+		&& m_trackView->getTrack()->type() != Track::Type::Pattern)
 	{
 		m->accept();
 		DataFile dataFile(DataFile::Type::DragNDropData);
 		m_trackView->getTrack()->saveState(dataFile, dataFile.content());
-		new StringPairDrag(QString("track_%1").arg(static_cast<int>(m_trackView->getTrack()->type())), dataFile.toString(), m_trackView->getTrackSettingsWidget()->grab(), this);
+		new StringPairDrag(
+			QString("track_%1").arg(static_cast<int>(m_trackView->getTrack()->type())),
+			dataFile.toString(),
+			m_trackView->getTrackSettingsWidget()->grab(),
+			this
+		);
 	}
 	else
 	{
