@@ -46,6 +46,8 @@ constexpr const char* LMMS_BUILDCONF_PLATFORM = "FreeBSD";
 constexpr const char* LMMS_BUILDCONF_PLATFORM = "win32";
 #elif defined(LMMS_BUILD_HAIKU)
 constexpr const char* LMMS_BUILDCONF_PLATFORM = "Haiku";
+#elif defined(LMMS_BUILD_CYGWIN)
+constexpr const char* LMMS_BUILDCONF_PLATFORM = "Cygwin";
 #else
 constexpr const char* LMMS_BUILDCONF_PLATFORM = "unknown platform";
 #endif

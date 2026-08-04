@@ -1665,7 +1665,7 @@ QWidget * MonstroView::setupOperatorsView( QWidget * _parent )
 	auto view = new QWidget(_parent);
 	view-> setFixedSize( 250, 250 );
 
-	auto makeTinyLed = [=, this](int x, int y, const QString& tooltip) -> PixmapButton* {
+	auto makeTinyLed = [=](int x, int y, const QString& tooltip) -> PixmapButton* {
 		auto pb = new PixmapButton(view, nullptr);
 		pb->setCheckable(true);
 		pb->move(x, y);
