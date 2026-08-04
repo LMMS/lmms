@@ -1023,6 +1023,7 @@ void SetupDialog::accept()
 					QString::number(m_openLastProject));
 	ConfigManager::inst()->setValue("ui", "detachbehavior", m_detachBehavior);
 	ConfigManager::inst()->setValue("app", "loopmarkermode", m_loopMarkerMode);
+	ConfigManager::inst()->setValue("app", "stereochannelspolicy", m_stereoChannelsPolicy);
 	ConfigManager::inst()->setValue("app", "language", m_lang);
 	ConfigManager::inst()->setValue("ui", "autoscroll", m_autoScroll);
 	ConfigManager::inst()->setValue("ui", "saveinterval",
