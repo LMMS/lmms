@@ -243,8 +243,7 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 	QPainter p( &m_paintPixmap );
 
 	QLinearGradient lingrad( 0, 0, 0, height() );
-	QColor c = getColorForDisplay( painter.background().color() );
-	bool muted = m_clip->getTrack()->isMuted() || m_clip->isMuted();
+	QColor c = getColorForDisplay(painter.background().color());
 	bool current = getGUI()->automationEditor()->currentClip() == m_clip;
 
 	lingrad.setColorAt( 1, c.darker( 300 ) );
@@ -280,9 +279,7 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 	p.scale( 1.0f, -h );
 
 	QLinearGradient lin2grad( 0, min, 0, max );
-	QColor col;
-
-	col = !muted ? painter.pen().brush().color() : mutedColor();
+	QColor col = painter.pen().brush().color();
 
 	lin2grad.setColorAt( 1, col.lighter( 150 ) );
 	lin2grad.setColorAt( 0.5, col );

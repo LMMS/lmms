@@ -87,6 +87,8 @@ public:
 		return new SampleClip(*this);
 	}
 
+	bool isEmpty() const override { return m_sample.sampleSize() == 0; }
+
 public slots:
 	void setSampleFile(const QString& sf);
 	void toggleRecord();
