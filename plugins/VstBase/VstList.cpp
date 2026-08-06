@@ -161,7 +161,12 @@ void VstList::scanDirRecursive(fs::path dirPath, bool loadNewlyFound)
 			{
 				continue;
 			}
+
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+			gui::getGUI()->displayInitProgress(QCoreApplication::translate("lmms::VstList", "Scanning VSTs: %1").arg(QString::fromStdString(path.string())));
+#else
 			gui::getGUI()->displayInitProgress(QCoreApplication::translate("lmms::VstList", "Scanning VSTs: %1").arg(path.string()));
+#endif
 
 			if (ConfigManager::inst()->value("app", "vstscanexec", "0").toInt()) {
 				// This is very slow and should be optimized more.
