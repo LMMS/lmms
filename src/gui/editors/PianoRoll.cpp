@@ -333,7 +333,7 @@ PianoRoll::PianoRoll() :
 	{
 		m_zoomingYModel.addItem(QString("%1%").arg(zoomLevel * 100));
 	}
-	m_zoomingYModel.setInitValue(ConfigManager::inst()->value("ui", "pianorollzoomvertical", QString::number(m_zoomingModel.findText("100%"))).toInt());
+	m_zoomingYModel.setInitValue(ConfigManager::inst()->value("ui", "pianorollzoomvertical", QString::number(m_zoomingYModel.findText("100%"))).toInt());
 	zoomingYChanged();
 	connect(&m_zoomingYModel, SIGNAL(dataChanged()),
 					this, SLOT(zoomingYChanged()));
@@ -343,7 +343,7 @@ PianoRoll::PianoRoll() :
 	for (auto q : Quantizations) {
 		m_quantizeModel.addItem(QString("1/%1").arg(q));
 	}
-	m_quantizeModel.setInitValue(ConfigManager::inst()->value("ui", "pianorollquantization", QString::number(m_zoomingModel.findText("1/16"))).toInt());
+	m_quantizeModel.setInitValue(ConfigManager::inst()->value("ui", "pianorollquantization", QString::number(m_quantizeModel.findText("1/16"))).toInt());
 
 	connect( &m_quantizeModel, SIGNAL(dataChanged()),
 					this, SLOT(quantizeChanged()));
