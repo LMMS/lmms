@@ -266,7 +266,7 @@ std::vector<VstList::Metadata> VstList::effectPlugins()
 
 constexpr uint32_t CACHE_VER = 3; // increment this when changing the functions' output
 
-// `saveCache` and `loadCache` implementations should be kept in sync
+// `saveCache` and `loadCache` implementations should be kept in sync.
 // All values should be dumped because cache existing for a file implies
 // the dll shouldn't be queried for new information. That also means the cache has to be rejeced
 // if it's from an old version entirely to fill new information.
