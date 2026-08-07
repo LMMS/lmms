@@ -162,7 +162,7 @@ void VstList::scanDirRecursive(fs::path dirPath, bool loadNewlyFound)
 				continue;
 			}
 
-#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+#if QT_VERSION < QT_VERSION_CHECK(6,9,0)
 			gui::getGUI()->displayInitProgress(QCoreApplication::translate("lmms::VstList", "Scanning VSTs: %1").arg(QString::fromStdString(path.string())));
 #else
 			gui::getGUI()->displayInitProgress(QCoreApplication::translate("lmms::VstList", "Scanning VSTs: %1").arg(path.string()));
