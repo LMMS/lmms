@@ -79,7 +79,7 @@ class setupWidget : public gui::AudioDeviceSetupWidget
 private:
 	void startProcessingImpl() override;
 	void stopProcessingImpl() override;
-	void run() override;
+	void run() noexcept override;
 
 	int m_audioFD;
 };

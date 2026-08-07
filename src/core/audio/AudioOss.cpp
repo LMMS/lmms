@@ -219,7 +219,7 @@ void AudioOss::stopProcessingImpl()
 	stopProcessingThread( this );
 }
 
-void AudioOss::run()
+void AudioOss::run() noexcept LMMS_NONBLOCKING
 {
 	auto buf = std::vector<float>(audioEngine()->framesPerAudioBuffer() * channels());
 	auto pcmBuf = std::vector<int16_t>(buf.size());

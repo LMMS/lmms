@@ -116,8 +116,8 @@ private:
 
 	int processCallback(jack_nframes_t nframes);
 
-	static int staticProcessCallback(jack_nframes_t nframes, void* udata);
-	static void shutdownCallback(void* _udata);
+	static int staticProcessCallback(jack_nframes_t nframes, void* udata) noexcept;
+	static void shutdownCallback(void* _udata) noexcept;
 
 	jack_client_t* m_client;
 

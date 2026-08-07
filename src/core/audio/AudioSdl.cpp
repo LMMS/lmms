@@ -152,7 +152,7 @@ void AudioSdl::stopProcessingImpl()
 	}
 }
 
-void AudioSdl::sdlAudioCallback( void * _udata, Uint8 * _buf, int _len )
+void AudioSdl::sdlAudioCallback(void* _udata, Uint8* _buf, int _len) noexcept LMMS_NONBLOCKING
 {
 	auto _this = static_cast<AudioSdl*>(_udata);
 
@@ -174,7 +174,8 @@ void AudioSdl::sdlAudioCallback( Uint8 * _buf, int _len )
 	audioEngine()->renderNextBuffer({reinterpret_cast<float*>(_buf), channels(), frameCount});
 }
 
-void AudioSdl::sdlInputAudioCallback(void *_udata, Uint8 *_buf, int _len) {
+void AudioSdl::sdlInputAudioCallback(void* _udata, Uint8* _buf, int _len) noexcept LMMS_NONBLOCKING
+{
 	auto _this = static_cast<AudioSdl*>(_udata);
 
 	_this->sdlInputAudioCallback( _buf, _len );
