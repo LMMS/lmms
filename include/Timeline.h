@@ -95,11 +95,7 @@ public:
 	auto getElapsedSeconds() const -> double { return m_elapsedSeconds + frameOffset() / Engine::audioEngine()->outputSampleRate(); }
 
 	//! @returns the position measured in number of quarter notes (beats)
-	auto ppqPos() const -> double
-	{
-		constexpr auto ticksPerBeat = DefaultTicksPerBar / 4.0;
-		return frameAdjustedTicks() / ticksPerBeat;
-	}
+	auto ppqPos() const -> double { return frameAdjustedTicks() / DefaultTicksPerBeat; }
 
 	auto nodeName() const -> QString override { return "timeline"; }
 

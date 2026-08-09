@@ -109,11 +109,9 @@ void VstSyncController::startCycle(tick_t startTick, tick_t endTick)
 {
 	if (!m_syncData) { return; }
 
-	constexpr auto ticksPerBeat = DefaultTicksPerBar / 4.f;
-
 	m_syncData->isCycle = true;
-	m_syncData->cycleStart = startTick / ticksPerBeat;
-	m_syncData->cycleEnd = endTick / ticksPerBeat;
+	m_syncData->cycleStart = startTick / static_cast<float>(DefaultTicksPerBeat);
+	m_syncData->cycleEnd = endTick / static_cast<float>(DefaultTicksPerBeat);
 }
 
 
