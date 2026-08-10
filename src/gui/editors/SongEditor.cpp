@@ -30,6 +30,7 @@
 #include <QKeyEvent>
 #include <QLabel>
 #include <QMdiArea>
+#include <QMimeData>
 #include <QScrollBar>
 #include <QSlider>
 #include <QTimeLine>
@@ -39,9 +40,11 @@
 #include "AudioEngine.h"
 #include "AutomatableSlider.h"
 #include "ClipView.h"
+#include "Clipboard.h"
 #include "ComboBox.h"
 #include "ConfigManager.h"
 #include "CPULoadWidget.h"
+#include "DataFile.h"
 #include "DeprecationHelper.h"
 #include "embed.h"
 #include "GuiApplication.h"
@@ -520,6 +523,217 @@ void SongEditor::keyPressEvent( QKeyEvent * ke )
 	else if (ke->key() == Qt::Key_0 && ke->modifiers() & Qt::ControlModifier)
 	{
 		m_zoomingModel->reset();
+	}
+	else if (ke->key() == Qt::Key_C && ke->modifiers() & Qt::ControlModifier)
+	{
+		QVector<ClipView*> so;
+    	for (auto* obj : selectedObjects())
+    	{
+        	if (auto* clipv = dynamic_cast<ClipView*>(obj))
+        	{
+            	so.append(clipv);
+        	}
+    	}
+
+    	if (so.isEmpty()) { return; }
+
+		std::sort(so.begin(), so.end(), [](ClipView* a, ClipView* b)
+    	{
+        	return a->getClip()->startPosition() < b->getClip()->startPosition();
+    	});
+
+		so.first()->copy(so);
+
+		TextFloat::displayMessage(
+        	tr("Clipboard"),
+        	tr("%n clip(s) copied", "", so.size()),
+        	embed::getIconPixmap("edit_copy"),
+        	3000);
+	}
+	else if (ke->key() == Qt::Key_V && ke->modifiers() & Qt::ControlModifier)
+	{
+		using namespace Clipboard;
+		if (!hasFormat(MimeType::StringPair))
+		{
+			TextFloat::displayMessage(
+        		tr("Clipboard"),
+        		tr("No clips to paste"),
+        		embed::getIconPixmap("cancel"),
+        		3000);
+			return;
+		}
+
+		const QMimeData* md = getMimeData();
+
+		QString type = decodeKey(md);
+
+		const QPoint mouse = mapFromGlobal(QCursor::pos());
+		const int mouseX = mouse.x() - m_trackHeadWidth;
+		const TrackView* tv = trackViewAt(contentWidget()->mapFromParent(mouse).y());
+
+		const bool pasteAtCursor = tv && mouseX >= 0;
+		const TimePos pastePos = pasteAtCursor
+    		? TimePos(currentPosition() + mouseX * TimePos::ticksPerBar() / static_cast<int>(pixelsPerBar()))
+    		: TimePos(m_song->getPlayPos(Song::PlayMode::Song));
+
+		TrackView* target = nullptr;
+    	for (TrackView* v : trackViews())
+    	{
+        	if (type != "clip_" + QString::number(static_cast<int>(v->getTrack()->type()))) { continue; }
+        	if (v == tv) { target = v; break; }
+        	if (!target) { target = v; }
+    	}
+
+    	if (!target)
+		{
+			TextFloat::displayMessage(
+        		tr("Clipboard"),
+        		tr("Cannot paste here"),
+        		embed::getIconPixmap("cancel"),
+        		3000);
+			return;
+		}
+
+		QString value = decodeValue(md);
+		DataFile dataFile(value.toUtf8());
+		int clipCount = dataFile.content()
+    		.firstChildElement("clips")
+    		.childNodes().length();
+
+		auto* tcw = target->getTrackContentWidget();
+		if (tcw->canPasteSelection(pastePos, md, true))
+		{
+    		tcw->pasteSelection(pastePos, md, true);
+			TextFloat::displayMessage(
+    			tr("Clipboard"),
+    			pasteAtCursor
+        			? tr("%n clip(s) pasted at cursor", "", clipCount)
+        			: tr("%n clip(s) pasted at playhead", "", clipCount),
+    			embed::getIconPixmap("edit_paste"),
+    			3000);
+		}
+		else
+		{
+			TextFloat::displayMessage(
+        		tr("Clipboard"),
+        		tr("Cannot paste here"),
+        		embed::getIconPixmap("cancel"),
+        		3000);
+		}
+	}
+	else if (ke->key() == Qt::Key_X && ke->modifiers() & Qt::ControlModifier)
+	{
+		QVector<ClipView*> so;
+    	for (auto* obj : selectedObjects())
+    	{
+        	if (auto* clipv = dynamic_cast<ClipView*>(obj))
+        	{
+            	so.append(clipv);
+        	}
+    	}
+
+    	if (so.isEmpty()) {
+			TextFloat::displayMessage(
+        		tr("Clipboard"),
+        		tr("No clips selected"),
+        		embed::getIconPixmap("cancel"),
+        		3000);
+			return;
+		}
+
+		std::sort(so.begin(), so.end(), [](ClipView* a, ClipView* b)
+    	{
+        	return a->getClip()->startPosition() < b->getClip()->startPosition();
+    	});
+
+		so.first()->copy(so);
+
+		for (auto* clipv : so)
+    	{
+			clipv->remove();
+    	}
+
+		TextFloat::displayMessage(
+        	tr("Clipboard"),
+        	tr("%n clip(s) copied", "", so.size()),
+        	embed::getIconPixmap("edit_copy"),
+        	3000);
+	}
+	else if (ke->key() == Qt::Key_D && ke->modifiers() & Qt::ControlModifier)
+	{
+		using namespace Clipboard;
+
+		QVector<ClipView*> so;
+    	for (auto* obj : selectedObjects())
+    	{
+        	if (auto* clipv = dynamic_cast<ClipView*>(obj))
+        	{
+            	so.append(clipv);
+        	}
+    	}
+
+		if (so.isEmpty()) {
+			TextFloat::displayMessage(
+        		tr("Clipboard"),
+        		tr("No clips selected"),
+        		embed::getIconPixmap("cancel"),
+        		3000);
+			return;
+		}
+
+		std::sort(so.begin(), so.end(), [](ClipView* a, ClipView* b)
+    	{
+        	return a->getClip()->startPosition() < b->getClip()->startPosition();
+    	});
+
+		ClipView* anchor = so.first();
+
+		DataFile dataFile = anchor->createClipDataFiles(so);
+		const QString key = "clip_" + QString::number(
+        	static_cast<int>(anchor->getClip()->getTrack()->type()));
+
+		QMimeData md;
+    	md.setData(mimeType(MimeType::StringPair),
+            (key + ":" + dataFile.toString()).toUtf8());
+
+		TrackView* target = nullptr;
+		const TimePos pastePos = so.last()->getClip()->endPosition();
+
+		target = anchor->getTrackView();
+		if (!target)
+		{
+			TextFloat::displayMessage(
+        		tr("Clipboard"),
+        		tr("Cannot paste here"),
+        		embed::getIconPixmap("cancel"),
+        		3000);
+			return;
+		}
+
+		auto* tcw = target->getTrackContentWidget();
+		if (!tcw)
+		{
+			TextFloat::displayMessage(
+        		tr("Clipboard"),
+        		tr("Cannot paste here"),
+        		embed::getIconPixmap("cancel"),
+        		3000);
+			return;
+		}
+
+		int clipCount = dataFile.content()
+    		.firstChildElement("clips")
+    		.childNodes().length();
+
+		if (tcw->canPasteSelection(pastePos, &md, true))
+		{
+			tcw->pasteSelection(pastePos, &md, true);
+			TextFloat::displayMessage(
+    			tr("Clipboard"),
+        		tr("%n clip(s) pasted at cursor", "", clipCount),
+    			embed::getIconPixmap("edit_paste"),
+    			3000);
+		}
 	}
 	else
 	{
