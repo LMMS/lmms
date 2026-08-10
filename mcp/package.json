@@ -1,0 +1,31 @@
+{
+  "name": "lmms-mcp",
+  "version": "0.1.0",
+  "description": "MCP server for the LMMS digital audio workstation codebase: source search, symbol lookup, build info, plugin catalog, GitHub issues/PRs, and guided development prompts.",
+  "type": "module",
+  "private": true,
+  "license": "GPL-3.0-or-later",
+  "engines": {
+    "node": ">=20.11"
+  },
+  "bin": {
+    "lmms-mcp": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "zod": "^3.25.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.9.0",
+    "vitest": "^4.1.0"
+  }
+}

@@ -1,0 +1,3 @@
+Fixture install notes:
+cmake -S . -B build
+cmake --build build
