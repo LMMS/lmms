@@ -329,6 +329,8 @@ public:
 
 	QSize sizeHint() const override;
 
+	bool hasValidClip();
+
 public slots:
 	void clearCurrentClip();
 
