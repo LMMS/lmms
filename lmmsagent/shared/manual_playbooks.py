@@ -24,6 +24,9 @@ class Playbook:
     steps: List[PlaybookStep]
 
 
+# Playbooks execute real AgentControl v2 tool sequences (TOOL_CONTRACT_V2.md
+# section 2). Tool names are snake_case; AgentControl dispatch normalizes them
+# by lowercasing + stripping non-alphanumerics (create_send -> createsend).
 PLAYBOOKS: List[Playbook] = [
     Playbook(
         id="compose_from_score_sheet",
@@ -34,16 +37,6 @@ PLAYBOOKS: List[Playbook] = [
         ),
         keywords=["score", "sheet", "compose", "melody", "song from score", "beginner song"],
         steps=[
-            PlaybookStep(
-                title="Compatibility note",
-                action="guide_note",
-                args={
-                    "note": (
-                        "Validate defaults first: check tempo, time signature, and which tracks are auto-created in your LMMS build."
-                    )
-                },
-                confidence=0.99,
-            ),
             PlaybookStep(
                 title="Set working tempo",
                 action="set_tempo",
@@ -59,31 +52,50 @@ PLAYBOOKS: List[Playbook] = [
             PlaybookStep(
                 title="Create an instrument track",
                 action="create_track",
-                args={"type": "instrument"},
+                args={"type": "instrument", "name": "Lead"},
                 confidence=0.93,
             ),
             PlaybookStep(
                 title="Load Triple Oscillator",
                 action="load_instrument",
-                args={"plugin": "tripleoscillator"},
+                args={"plugin": "tripleoscillator", "track": "Lead"},
                 confidence=0.92,
                 requires_snapshot=True,
             ),
             PlaybookStep(
                 title="Create first pattern clip",
                 action="create_pattern",
-                args={"tick": 0, "name": "Melody A"},
+                args={"name": "Melody A"},
                 confidence=0.86,
             ),
             PlaybookStep(
-                title="Enter notes",
-                action="guide_note",
+                title="Enter melody notes",
+                action="add_notes",
                 args={
-                    "note": (
-                        "Open Piano Roll and enter notes measure-by-measure. Use 1/4 note length first, then refine 1/8 notes."
-                    )
+                    "track": "Lead",
+                    "notes": [
+                        {"key": 60, "pos": 0, "length": 96, "velocity": 100},
+                        {"key": 62, "pos": 96, "length": 96, "velocity": 100},
+                        {"key": 64, "pos": 192, "length": 96, "velocity": 100},
+                        {"key": 65, "pos": 288, "length": 96, "velocity": 100},
+                        {"key": 67, "pos": 384, "length": 192, "velocity": 110},
+                        {"key": 65, "pos": 576, "length": 96, "velocity": 100},
+                        {"key": 64, "pos": 672, "length": 96, "velocity": 100},
+                    ],
                 },
-                confidence=0.94,
+                confidence=0.9,
+            ),
+            PlaybookStep(
+                title="Quantize to 1/16 grid",
+                action="quantize_clip",
+                args={"track": "Lead", "resolution": 16},
+                confidence=0.92,
+            ),
+            PlaybookStep(
+                title="Place the pattern in the arrangement",
+                action="create_clip",
+                args={"track": "Lead", "tick": 0, "name": "Melody A"},
+                confidence=0.88,
             ),
         ],
     ),
@@ -95,34 +107,46 @@ PLAYBOOKS: List[Playbook] = [
         keywords=["rhythm", "drums", "beat", "bassline", "bb editor", "groove"],
         steps=[
             PlaybookStep(
-                title="Open Beat+Bassline editor",
-                action="guide_note",
-                args={"note": "Open Beat+Bassline Editor from toolbar/window menu."},
-                confidence=0.95,
-            ),
-            PlaybookStep(
                 title="Create sample track for drums",
                 action="create_track",
-                args={"type": "sample", "name": "Drum One-shot"},
+                args={"type": "sample", "name": "Drums"},
                 confidence=0.9,
             ),
             PlaybookStep(
-                title="Load drum sample",
-                action="guide_note",
-                args={
-                    "note": (
-                        "From My Samples -> Drums, audition sounds and load kick/snare/hat samples onto tracks."
-                    )
-                },
-                confidence=0.9,
+                title="Create drum pattern",
+                action="create_pattern",
+                args={"name": "Drums"},
+                confidence=0.91,
             ),
             PlaybookStep(
-                title="Program 4/4 skeleton",
-                action="guide_note",
-                args={
-                    "note": "Start with hits on steps 1, 5, 9, 13 (four beats), then add syncopation."
-                },
-                confidence=0.9,
+                title="Add kick rhythm",
+                action="add_rhythm",
+                args={"drum": "kick", "pattern": [0, 4, 8, 12]},
+                confidence=0.93,
+            ),
+            PlaybookStep(
+                title="Add snare backbeat",
+                action="add_rhythm",
+                args={"drum": "snare", "pattern": [4, 12]},
+                confidence=0.93,
+            ),
+            PlaybookStep(
+                title="Add hi-hat eighths",
+                action="add_rhythm",
+                args={"drum": "hihat", "pattern": [0, 2, 4, 6, 8, 10, 12, 14]},
+                confidence=0.93,
+            ),
+            PlaybookStep(
+                title="Accent the snare backbeat",
+                action="set_step_velocity",
+                args={"track": "Drums", "step": 12, "velocity": 125},
+                confidence=0.86,
+            ),
+            PlaybookStep(
+                title="Place the pattern in the arrangement",
+                action="create_clip",
+                args={"track": "Drums", "tick": 0, "name": "Drums"},
+                confidence=0.88,
             ),
         ],
     ),
@@ -131,7 +155,7 @@ PLAYBOOKS: List[Playbook] = [
         title="Create beginner automation contrast",
         manual_section="Automation Editor + Song-global automation",
         caution="Song-global automation behavior differs by version; prefer automation track for reversible edits.",
-        keywords=["automation", "volume automation", "fade", "lfo", "controller"],
+        keywords=["automation", "volume automation", "fade", "volume"],
         steps=[
             PlaybookStep(
                 title="Snapshot before automation",
@@ -140,27 +164,25 @@ PLAYBOOKS: List[Playbook] = [
                 confidence=0.97,
             ),
             PlaybookStep(
-                title="Create automation track",
-                action="create_track",
-                args={"type": "automation", "name": "Volume Automation"},
-                confidence=0.92,
+                title="Create automation clip on Lead volume",
+                action="create_automation",
+                args={"address": "track:Lead.volume", "name": "Volume Automation"},
+                confidence=0.9,
             ),
             PlaybookStep(
-                title="Link target control",
-                action="guide_note",
+                title="Draw fade-in curve over 4 bars",
+                action="automate",
                 args={
-                    "note": (
-                        "Ctrl-drag the target knob (for example track volume) onto automation track timeline to create linked automation clip."
-                    )
+                    "address": "track:Lead.volume",
+                    "ticks": [0, 192, 384, 576, 768],
+                    "values": [0.15, 0.4, 0.6, 0.85, 1.0],
                 },
                 confidence=0.92,
             ),
             PlaybookStep(
-                title="Draw step curve",
-                action="guide_note",
-                args={
-                    "note": "Draw low level for first 2 measures, higher level for later measures to create distance contrast."
-                },
+                title="Verify the automation nodes",
+                action="read_automation",
+                args={"address": "track:Lead.volume"},
                 confidence=0.9,
             ),
         ],
@@ -186,14 +208,24 @@ PLAYBOOKS: List[Playbook] = [
                 requires_snapshot=True,
             ),
             PlaybookStep(
-                title="Clone original clip",
-                action="guide_note",
+                title="Select a contrasting patch",
+                action="set_sf2_patch",
+                args={"track": "Secondary Voice", "patch": 1},
+                confidence=0.85,
+            ),
+            PlaybookStep(
+                title="Write the second voice part",
+                action="add_notes",
                 args={
-                    "note": (
-                        "Copy original melody clip to Secondary Voice track, then delete non-relevant notes from each track."
-                    )
+                    "track": "Secondary Voice",
+                    "notes": [
+                        {"key": 55, "pos": 0, "length": 192, "velocity": 95},
+                        {"key": 52, "pos": 192, "length": 192, "velocity": 95},
+                        {"key": 57, "pos": 384, "length": 192, "velocity": 95},
+                        {"key": 59, "pos": 576, "length": 192, "velocity": 95},
+                    ],
                 },
-                confidence=0.9,
+                confidence=0.88,
             ),
         ],
     ),
@@ -211,22 +243,29 @@ PLAYBOOKS: List[Playbook] = [
                 confidence=0.93,
             ),
             PlaybookStep(
-                title="Resolve and load sample",
-                action="guide_note",
-                args={
-                    "note": "Use load sample command with an actual file path, or browse My Samples and drag-drop onto track."
-                },
+                title="Load a bundled waveform sample",
+                action="load_sample",
+                args={"sample_path": "data/samples/waveforms/saw1.flac"},
+                confidence=0.9,
+                requires_snapshot=True,
+            ),
+            PlaybookStep(
+                title="Enable sample looping",
+                action="set_sample_loop",
+                args={"track": "Sample Source", "mode": "on", "loop_start": 0, "loop_end": 44100},
+                confidence=0.88,
+            ),
+            PlaybookStep(
+                title="Set sample pitch",
+                action="set_sample_pitch",
+                args={"track": "Sample Source", "semitones": 0},
                 confidence=0.9,
             ),
             PlaybookStep(
-                title="Choose melodic vs percussion usage",
-                action="guide_note",
-                args={
-                    "note": (
-                        "For melodic use, map pitch in instrument workflow; for percussion, keep one-shot timing in Song/BB editor."
-                    )
-                },
-                confidence=0.88,
+                title="Set sample amplification",
+                action="set_sample_amp",
+                args={"track": "Sample Source", "value": 0.8},
+                confidence=0.89,
             ),
         ],
     ),
@@ -239,25 +278,27 @@ PLAYBOOKS: List[Playbook] = [
         steps=[
             PlaybookStep(
                 title="Save project first",
-                action="guide_note",
-                args={"note": "Save project before export to avoid losing last-minute edits."},
+                action="save_project",
+                args={},
                 confidence=0.98,
             ),
             PlaybookStep(
-                title="Open export dialog",
-                action="guide_note",
-                args={"note": "Use File -> Export (Ctrl+E), choose output format and destination."},
-                confidence=0.98,
+                title="Render a loop-range preview",
+                action="render_preview",
+                args={"begin_tick": 0, "end_tick": 768},
+                confidence=0.93,
             ),
             PlaybookStep(
-                title="Select quality settings",
-                action="guide_note",
-                args={
-                    "note": (
-                        "Pick sample rate/bitrate by balancing quality vs file size; validate with a quick re-import listen pass."
-                    )
-                },
+                title="Render full song to wav",
+                action="render_song",
+                args={"path": "export/song.wav", "format": "wav", "sample_rate": 44100, "bit_depth": 16},
                 confidence=0.94,
+            ),
+            PlaybookStep(
+                title="Poll render progress",
+                action="get_render_progress",
+                args={},
+                confidence=0.92,
             ),
         ],
     ),
@@ -281,6 +322,12 @@ PLAYBOOKS: List[Playbook] = [
                 confidence=0.97,
             ),
             PlaybookStep(
+                title="Describe the full song structure",
+                action="describe_song",
+                args={},
+                confidence=0.95,
+            ),
+            PlaybookStep(
                 title="Open Song Editor for arrangement pass",
                 action="open_tool",
                 args={"name": "song editor"},
@@ -291,16 +338,6 @@ PLAYBOOKS: List[Playbook] = [
                 action="open_tool",
                 args={"name": "mixer"},
                 confidence=0.94,
-            ),
-            PlaybookStep(
-                title="Manual pass checklist",
-                action="guide_note",
-                args={
-                    "note": (
-                        "Do one pass each for arrangement, sound design, and levels. After each pass, render 20-30s preview and compare."
-                    )
-                },
-                confidence=0.93,
             ),
         ],
     ),
@@ -325,25 +362,34 @@ PLAYBOOKS: List[Playbook] = [
                 requires_snapshot=True,
             ),
             PlaybookStep(
-                title="Resolve and load source sample",
-                action="guide_note",
-                args={
-                    "note": (
-                        "Load your sample into the sampler, set a sensible root key, then test pitch across at least one octave."
-                    )
-                },
+                title="Load the source sample into the sampler",
+                action="load_sample",
+                args={"sample_path": "data/samples/waveforms/saw1.flac"},
                 confidence=0.9,
+            ),
+            PlaybookStep(
+                title="Set the base note (root key)",
+                action="set_track_base_note",
+                args={"track": "Sample Instrument", "key": 60},
+                confidence=0.88,
             ),
             PlaybookStep(
                 title="Create pattern for melodic test",
                 action="create_pattern",
-                args={"tick": 0, "name": "Sample Melody Test"},
+                args={"name": "Sample Melody Test"},
                 confidence=0.85,
             ),
             PlaybookStep(
                 title="Write a short phrase",
-                action="guide_note",
-                args={"note": "Open Piano Roll and write a 1-2 bar phrase to validate tuning and envelope behavior."},
+                action="add_notes",
+                args={
+                    "track": "Sample Instrument",
+                    "notes": [
+                        {"key": 60, "pos": 0, "length": 96, "velocity": 100},
+                        {"key": 62, "pos": 96, "length": 96, "velocity": 100},
+                        {"key": 64, "pos": 192, "length": 192, "velocity": 100},
+                    ],
+                },
                 confidence=0.9,
             ),
         ],
@@ -362,10 +408,11 @@ PLAYBOOKS: List[Playbook] = [
                 confidence=0.94,
             ),
             PlaybookStep(
-                title="Load percussion sample",
-                action="guide_note",
-                args={"note": "Load a short one-shot with clean transient (kick/snare/hat/clap)."},
+                title="Load a short one-shot sample",
+                action="load_sample",
+                args={"sample_path": "data/samples/waveforms/impulse.flac"},
                 confidence=0.91,
+                requires_snapshot=True,
             ),
             PlaybookStep(
                 title="Program basic rhythm",
@@ -374,10 +421,10 @@ PLAYBOOKS: List[Playbook] = [
                 confidence=0.82,
             ),
             PlaybookStep(
-                title="Refine groove manually",
-                action="guide_note",
-                args={"note": "Adjust velocity/timing accents by ear to avoid robotic repetition."},
-                confidence=0.88,
+                title="Accent the downbeat",
+                action="set_step_velocity",
+                args={"track": "Percussion Sample", "step": 0, "velocity": 120},
+                confidence=0.86,
             ),
         ],
     ),
@@ -401,26 +448,28 @@ PLAYBOOKS: List[Playbook] = [
                 confidence=0.97,
             ),
             PlaybookStep(
-                title="Insert controller-capable effect",
-                action="guide_note",
-                args={
-                    "note": (
-                        "Insert a gain/volume-capable effect on target channel, then prepare a controller source for ducking signal."
-                    )
-                },
-                confidence=0.86,
+                title="Create a sidechain bus channel",
+                action="create_channel",
+                args={"name": "Sidechain Bus"},
+                confidence=0.92,
             ),
             PlaybookStep(
-                title="Link controller to volume",
-                action="guide_note",
-                args={"note": "Link controller output to target gain/volume parameter and tune depth/release by ear."},
+                title="Create a send from the kick to the bus",
+                action="create_send",
+                args={"from": "Kick", "to": "Sidechain Bus", "amount": 0.5},
+                confidence=0.9,
+            ),
+            PlaybookStep(
+                title="Trim the send amount",
+                action="set_send_amount",
+                args={"from": "Kick", "to": "Sidechain Bus", "amount": 0.6},
                 confidence=0.88,
             ),
             PlaybookStep(
-                title="Rollback path reminder",
-                action="guide_note",
-                args={"note": "If routing gets messy, run rollback_to_snapshot using the last snapshot id."},
-                confidence=0.99,
+                title="Balance the bus level",
+                action="set_channel_volume",
+                args={"channel": "Sidechain Bus", "value": 0.8},
+                confidence=0.9,
             ),
         ],
     ),
@@ -438,15 +487,21 @@ PLAYBOOKS: List[Playbook] = [
                 confidence=0.95,
             ),
             PlaybookStep(
-                title="Prepare target track",
-                action="guide_note",
-                args={"note": "Pick one target control first (filter cutoff, pan, or volume) to keep modulation predictable."},
+                title="Create an LFO controller",
+                action="create_controller",
+                args={"type": "lfo", "name": "Filter LFO"},
                 confidence=0.92,
             ),
             PlaybookStep(
-                title="Add LFO and bind target",
-                action="guide_note",
-                args={"note": "Create LFO controller, link it to target control, then tune speed/depth in small increments."},
+                title="Tune LFO wave, speed, and amount",
+                action="set_lfo_controller",
+                args={"controller": "Filter LFO", "wave": "sine", "speed": 0.5, "amount": 0.3},
+                confidence=0.9,
+            ),
+            PlaybookStep(
+                title="Bind LFO to filter cutoff",
+                action="connect_controller",
+                args={"controller": "Filter LFO", "address": "track:Lead.filter.cutoff"},
                 confidence=0.9,
             ),
             PlaybookStep(
@@ -454,6 +509,238 @@ PLAYBOOKS: List[Playbook] = [
                 action="create_snapshot",
                 args={"label": "after_lfo_modulation"},
                 confidence=0.95,
+            ),
+        ],
+    ),
+    Playbook(
+        id="four_on_the_floor",
+        title="Program a four-on-the-floor kick groove",
+        manual_section="Beat+Bassline Editor -> Creating Beats (four on the floor)",
+        caution="Use a clean kick one-shot; load your own sample to replace the bundled impulse.",
+        keywords=["four on the floor", "4/4 kick", "house beat", "kick groove", "dance beat"],
+        steps=[
+            PlaybookStep(
+                title="Create a kick sample track",
+                action="create_track",
+                args={"type": "sample", "name": "Kick"},
+                confidence=0.93,
+            ),
+            PlaybookStep(
+                title="Load a kick one-shot",
+                action="load_sample",
+                args={"sample_path": "data/samples/waveforms/impulse.flac"},
+                confidence=0.9,
+                requires_snapshot=True,
+            ),
+            PlaybookStep(
+                title="Create the groove pattern",
+                action="create_pattern",
+                args={"name": "Four on the Floor"},
+                confidence=0.9,
+            ),
+            PlaybookStep(
+                title="Place a kick on every beat",
+                action="add_rhythm",
+                args={"drum": "kick", "pattern": [0, 4, 8, 12]},
+                confidence=0.94,
+            ),
+            PlaybookStep(
+                title="Clone a variation pattern",
+                action="clone_pattern",
+                args={"pattern": "Four on the Floor", "name": "Four on the Floor Var"},
+                confidence=0.88,
+            ),
+            PlaybookStep(
+                title="Place the pattern in the arrangement",
+                action="create_clip",
+                args={"track": "Kick", "tick": 0, "name": "Four on the Floor"},
+                confidence=0.88,
+            ),
+        ],
+    ),
+    Playbook(
+        id="filter_sweep",
+        title="Build a filter sweep with automation",
+        manual_section="Automation Editor -> Filter sweep",
+        caution="Cutoff address is track:Lead.filter.cutoff; rename the track or adjust address if needed.",
+        keywords=["filter sweep", "cutoff automation", "sweep", "open the filter", "wobble"],
+        steps=[
+            PlaybookStep(
+                title="Snapshot before the sweep",
+                action="create_snapshot",
+                args={"label": "before_filter_sweep"},
+                confidence=0.97,
+            ),
+            PlaybookStep(
+                title="Set an initial closed lowpass",
+                action="set_filter",
+                args={"track": "Lead", "type": "lowpass", "cutoff": 0.15, "resonance": 0.4},
+                confidence=0.9,
+            ),
+            PlaybookStep(
+                title="Create automation on filter cutoff",
+                action="create_automation",
+                args={"address": "track:Lead.filter.cutoff", "name": "Filter Sweep"},
+                confidence=0.91,
+            ),
+            PlaybookStep(
+                title="Draw the sweep curve over 4 bars",
+                action="automate",
+                args={
+                    "address": "track:Lead.filter.cutoff",
+                    "ticks": [0, 192, 384, 576, 768],
+                    "values": [0.05, 0.2, 0.5, 0.8, 1.0],
+                },
+                confidence=0.92,
+            ),
+            PlaybookStep(
+                title="Verify the curve",
+                action="read_automation",
+                args={"address": "track:Lead.filter.cutoff"},
+                confidence=0.9,
+            ),
+        ],
+    ),
+    Playbook(
+        id="sidechain_ducking",
+        title="Sidechain ducking with a peak controller",
+        manual_section="Controller Rack -> Peak Controller (sidechain ducking)",
+        caution="Peak metering needs the core patch; get_peak_levels returns not_available otherwise.",
+        keywords=["sidechain ducking", "duck the bass", "pump with the kick", "peak controller"],
+        steps=[
+            PlaybookStep(
+                title="Create safety snapshot",
+                action="create_snapshot",
+                args={"label": "before_ducking"},
+                confidence=0.98,
+            ),
+            PlaybookStep(
+                title="Create a peak controller on the kick",
+                action="create_controller",
+                args={"type": "peak", "name": "Kick Peak"},
+                confidence=0.92,
+            ),
+            PlaybookStep(
+                title="Connect the peak controller to the bass volume",
+                action="connect_controller",
+                args={"controller": "Kick Peak", "address": "track:Bass.volume"},
+                confidence=0.9,
+            ),
+            PlaybookStep(
+                title="Confirm the peak signal is live",
+                action="get_peak_levels",
+                args={"channel": "Kick"},
+                confidence=0.87,
+            ),
+        ],
+    ),
+    Playbook(
+        id="render_stems",
+        title="Render stems (per-track export)",
+        manual_section="Editing and Composing Songs -> Exporting the Song (per-track)",
+        caution="render_tracks exports each track to its own file; directory is created if missing.",
+        keywords=["render stems", "export stems", "per track export", "stems", "separate tracks"],
+        steps=[
+            PlaybookStep(
+                title="Save project first",
+                action="save_project",
+                args={},
+                confidence=0.98,
+            ),
+            PlaybookStep(
+                title="Render each track to its own stem file",
+                action="render_tracks",
+                args={"dir": "export/stems", "prefix": "stem", "format": "wav", "sample_rate": 44100, "bit_depth": 24},
+                confidence=0.92,
+            ),
+            PlaybookStep(
+                title="Poll render progress",
+                action="get_render_progress",
+                args={},
+                confidence=0.91,
+            ),
+        ],
+    ),
+    Playbook(
+        id="load_soundfont",
+        title="Load a soundfont (SF2) instrument",
+        manual_section="Instrument Plugins -> Sf2 Player",
+        caution=(
+            "Point load_instrument_preset at your own .sf2 (for example data/presets/sf2/gm.sf2); "
+            "no soundfont ships in this repo."
+        ),
+        keywords=["soundfont", "sf2", "load sf2", "gm bank", "sf2 player"],
+        steps=[
+            PlaybookStep(
+                title="Create an instrument track for the soundfont",
+                action="create_track",
+                args={"type": "instrument", "name": "Soundfont"},
+                confidence=0.93,
+            ),
+            PlaybookStep(
+                title="Load the Sf2 Player instrument",
+                action="load_instrument",
+                args={"plugin": "sf2player", "track": "Soundfont"},
+                confidence=0.88,
+                requires_snapshot=True,
+            ),
+            PlaybookStep(
+                title="Load the soundfont file",
+                action="load_instrument_preset",
+                args={"track": "Soundfont", "path": "data/presets/sf2/gm.sf2"},
+                confidence=0.85,
+            ),
+            PlaybookStep(
+                title="Select a patch from the bank",
+                action="set_sf2_patch",
+                args={"track": "Soundfont", "bank": 0, "patch": 0},
+                confidence=0.87,
+            ),
+            PlaybookStep(
+                title="Describe the loaded instrument",
+                action="describe_instrument",
+                args={"track": "Soundfont"},
+                confidence=0.9,
+            ),
+        ],
+    ),
+    Playbook(
+        id="vst_setup",
+        title="Set up a VST instrument track",
+        manual_section="Instrument Plugins -> VST (Vestige)",
+        caution="Vestige must find the VST; program and param indices depend on the specific plugin.",
+        keywords=["vst", "vestige", "vst plugin", "vst setup", "plugin instrument"],
+        steps=[
+            PlaybookStep(
+                title="Create an instrument track for the VST",
+                action="create_track",
+                args={"type": "instrument", "name": "VST Track"},
+                confidence=0.93,
+            ),
+            PlaybookStep(
+                title="Load the Vestige VST host",
+                action="load_instrument",
+                args={"plugin": "vestige", "track": "VST Track"},
+                confidence=0.88,
+                requires_snapshot=True,
+            ),
+            PlaybookStep(
+                title="Select program 0",
+                action="set_vst_program",
+                args={"track": "VST Track", "program": 0},
+                confidence=0.86,
+            ),
+            PlaybookStep(
+                title="Set a VST parameter by index",
+                action="set_vst_param",
+                args={"track": "VST Track", "param": 0, "value": 0.5},
+                confidence=0.85,
+            ),
+            PlaybookStep(
+                title="Describe the VST parameter tree",
+                action="describe_instrument",
+                args={"track": "VST Track"},
+                confidence=0.9,
             ),
         ],
     ),

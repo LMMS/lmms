@@ -1,6 +1,6 @@
 {
-  "version": "2.0",
-  "description": "Golden scenarios for hybrid LMMS voice command interpretation and safety gating.",
+  "version": "3.0",
+  "description": "Golden scenarios for hybrid LMMS voice command interpretation and safety gating, aligned with command_manifest.v3.json (v2 tool surface).",
   "cases": [
     {
       "utterance": "hey lmms open splicer",
@@ -21,9 +21,9 @@
       "needs_confirmation": false
     },
     {
-      "utterance": "hey lmms divide into transient segments",
-      "expected_intent": "slicer.split.transient",
-      "expected_command": "divide into transient segments",
+      "utterance": "hey lmms render the song to wav",
+      "expected_intent": "project.render",
+      "expected_command": "render song to wav",
       "needs_confirmation": false
     },
     {
@@ -36,17 +36,18 @@
     },
     {
       "utterance": "hey lmms remove effect reverb from bass",
-      "expected_intent": "mixer.effect.remove",
-      "needs_confirmation": true
+      "expected_intent": "effect.remove",
+      "expected_command": "remove effect reverb",
+      "needs_confirmation": false
     },
     {
       "utterance": "ambient chatter without wake phrase open slicer",
       "expected_outcome": "ignored_no_wake"
     },
     {
-      "utterance": "hey lmms raise tempo to 150",
-      "expected_intent": "tempo.set",
-      "expected_command": "set tempo to 150",
+      "utterance": "hey lmms set the loop from bar 1 to bar 4",
+      "expected_intent": "project.loop",
+      "expected_command": "set loop from bar 1 to bar 4",
       "needs_confirmation": false
     },
     {
@@ -59,6 +60,222 @@
       "utterance": "hey lmms stop playback",
       "expected_intent": "transport.stop",
       "expected_command": "stop",
+      "needs_confirmation": false
+    },
+    {
+      "utterance": "hey lmms create a new project",
+      "expected_intent": "project.new",
+      "expected_command": "new project",
+      "needs_confirmation": true
+    },
+    {
+      "utterance": "hey lmms save the project as my song.mmp",
+      "expected_intent": "project.save_as",
+      "expected_command": "save project as my song.mmp",
+      "needs_confirmation": false
+    },
+    {
+      "utterance": "hey lmms delete the bass track",
+      "expected_intent": "track.delete",
+      "expected_command": "delete track bass",
+      "needs_confirmation": true
+    },
+    {
+      "utterance": "hey lmms clone the lead track",
+      "expected_intent": "track.clone",
+      "expected_command": "clone track lead",
+      "needs_confirmation": false
+    },
+    {
+      "utterance": "hey lmms route the lead to mixer channel 3",
+      "expected_intent": "track.route",
+      "expected_command": "route track lead to mixer channel 3",
+      "needs_confirmation": false
+    },
+    {
+      "utterance": "hey lmms move the lead clip to bar 3",
+      "expected_intent": "clip.move",
+      "expected_command": "move clip lead to bar 3",
+      "needs_confirmation": false
+    },
+    {
+      "utterance": "hey lmms split the bass clip at bar 2",
+      "expected_intent": "clip.split",
+      "expected_command": "split clip bass at bar 2",
+      "needs_confirmation": false
+    },
+    {
+      "utterance": "hey lmms quantize the piano clip to 16ths",
+      "expected_intent": "note.quantize",
+      "expected_command": "quantize the clip to 16ths",
+      "needs_confirmation": false
+    },
+    {
+      "utterance": "hey lmms add a c major chord",
+      "expected_intent": "note.chord",
+      "expected_command": "add a c major chord",
+      "needs_confirmation": false
+    },
+    {
+      "utterance": "hey lmms arpeggiate the chord",
+      "expected_intent": "note.arpeggio",
+      "expected_command": "arpeggiate the chord",
+      "needs_confirmation": false
+    },
+    {
+      "utterance": "hey lmms humanize the bass line",
+      "expected_intent": "note.humanize",
+      "expected_command": "humanize the bass line",
+      "needs_confirmation": false
+    },
+    {
+      "utterance": "hey lmms clear the piano clip",
+      "expected_intent": "note.clear",
+      "expected_command": "clear the piano clip",
+      "needs_confirmation": true
+    },
+    {
+      "utterance": "hey lmms add a four on the floor kick pattern",
+      "expected_intent": "pattern.rhythm",
+      "expected_command": "add four on the floor kick pattern",
+      "needs_confirmation": false
+    },
+    {
+      "utterance": "hey lmms select pattern 2",
+      "expected_intent": "pattern.select",
+      "expected_command": "select pattern 2",
+      "needs_confirmation": false
+    },
+    {
+      "utterance": "hey lmms program steps 0 4 8 12 on the drums",
+      "expected_intent": "pattern.steps",
+      "expected_command": "set steps 0 4 8 12",
+      "needs_confirmation": false
+    },
+    {
+      "utterance": "hey lmms loop the kick sample",
+      "expected_intent": "sample.loop",
+      "expected_command": "loop the kick sample",
+      "needs_confirmation": false
+    },
+    {
+      "utterance": "hey lmms pitch the sample up 12 semitones",
+      "expected_intent": "sample.pitch",
+      "expected_command": "pitch the sample up 12 semitones",
+      "needs_confirmation": false
+    },
+    {
+      "utterance": "hey lmms load the daft punk lead preset",
+      "expected_intent": "instrument.preset",
+      "expected_command": "load the daft punk lead preset",
+      "needs_confirmation": false
+    },
+    {
+      "utterance": "hey lmms set the cutoff on the bass",
+      "expected_intent": "instrument.param",
+      "expected_command": "set cutoff on the bass",
+      "needs_confirmation": false
+    },
+    {
+      "utterance": "hey lmms give the bass a long attack",
+      "expected_intent": "sound.envelope",
+      "expected_command": "set envelope long attack on bass",
+      "needs_confirmation": false
+    },
+    {
+      "utterance": "hey lmms add a lowpass filter to the lead",
+      "expected_intent": "sound.filter",
+      "expected_command": "set filter lowpass on lead",
+      "needs_confirmation": false
+    },
+    {
+      "utterance": "hey lmms make the bass wobble with an lfo",
+      "expected_intent": "sound.lfo",
+      "expected_command": "set lfo wobble on bass",
+      "needs_confirmation": false
+    },
+    {
+      "utterance": "hey lmms increase the reverb wet dry to 30 percent",
+      "expected_intent": "effect.param",
+      "expected_command": "set effect param reverb wet dry 30 percent",
+      "needs_confirmation": false
+    },
+    {
+      "utterance": "hey lmms create a send from the bass to the reverb bus",
+      "expected_intent": "mixer.send",
+      "expected_command": "create send from bass to reverb bus",
+      "needs_confirmation": false
+    },
+    {
+      "utterance": "hey lmms make the kick duck the bass with a peak controller",
+      "expected_intent": "mixer.duck",
+      "expected_command": "create peak controller and duck the bass",
+      "needs_confirmation": false
+    },
+    {
+      "utterance": "hey lmms create a new fx channel",
+      "expected_intent": "mixer.channel",
+      "expected_command": "create new fx channel",
+      "needs_confirmation": false
+    },
+    {
+      "utterance": "hey lmms automate the filter cutoff up over 4 bars",
+      "expected_intent": "automation.draw",
+      "expected_command": "automate filter cutoff up over 4 bars",
+      "needs_confirmation": false
+    },
+    {
+      "utterance": "hey lmms create global automation for master volume",
+      "expected_intent": "automation.global",
+      "expected_command": "global automate master volume",
+      "needs_confirmation": true
+    },
+    {
+      "utterance": "hey lmms create an automation track for the cutoff",
+      "expected_intent": "automation.create",
+      "expected_command": "create automation for cutoff",
+      "needs_confirmation": false
+    },
+    {
+      "utterance": "hey lmms add an lfo controller and link it to the cutoff",
+      "expected_intent": "controller.lfo",
+      "expected_command": "create lfo controller and link to cutoff",
+      "needs_confirmation": false
+    },
+    {
+      "utterance": "hey lmms connect the lfo controller to the pan",
+      "expected_intent": "controller.connect",
+      "expected_command": "connect lfo controller to pan",
+      "needs_confirmation": false
+    },
+    {
+      "utterance": "hey lmms export stems to a folder",
+      "expected_intent": "project.render_tracks",
+      "expected_command": "export stems",
+      "needs_confirmation": false
+    },
+    {
+      "utterance": "hey lmms render a preview of the loop",
+      "expected_intent": "project.render_preview",
+      "expected_command": "render preview of the loop",
+      "needs_confirmation": false
+    },
+    {
+      "utterance": "hey lmms arm the midi recording",
+      "expected_intent": "record.arm",
+      "expected_command": "arm midi recording",
+      "needs_confirmation": false
+    },
+    {
+      "utterance": "hey lmms start recording",
+      "expected_intent": "record.start",
+      "expected_command": "start recording",
+      "needs_confirmation": false
+    },
+    {
+      "utterance": "hey lmms stop recording",
+      "expected_intent": "record.stop",
+      "expected_command": "stop recording",
       "needs_confirmation": false
     }
   ]

@@ -1,20 +1,23 @@
 {
   "name": "lmms-mcp",
   "version": "0.1.0",
-  "description": "MCP server for the LMMS digital audio workstation codebase: source search, symbol lookup, build info, plugin catalog, GitHub issues/PRs, and guided development prompts.",
+  "description": "MCP servers for LMMS: a read-only coding assistant for the LMMS codebase (search, symbols, build, plugins, GitHub) and lmms-operator, which lets another LLM operate a running LMMS (tracks, instruments, effects, patterns, transport) over the AgentControl tool server.",
   "type": "module",
   "private": true,
   "license": "GPL-3.0-or-later",
   "engines": {
-    "node": ">=20.11"
+    "node": ">=22.0.0"
   },
   "bin": {
-    "lmms-mcp": "./dist/index.js"
+    "lmms-mcp": "./dist/index.js",
+    "lmms-operator-mcp": "./dist/operator-index.js"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "start": "node dist/index.js",
+    "start:operator": "node dist/operator-index.js",
     "dev": "tsx src/index.ts",
+    "dev:operator": "tsx src/operator-index.ts",
     "test": "vitest run",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },

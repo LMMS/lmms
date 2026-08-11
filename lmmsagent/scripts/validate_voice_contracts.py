@@ -8,7 +8,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 INTEGRATION_DIR = ROOT / "integrations" / "lmms" / "AgentControl"
-MANIFEST = INTEGRATION_DIR / "command_manifest.v2.json"
+MANIFEST_V3 = INTEGRATION_DIR / "command_manifest.v3.json"
+MANIFEST_V2 = INTEGRATION_DIR / "command_manifest.v2.json"
+MANIFEST = MANIFEST_V3 if MANIFEST_V3.exists() else MANIFEST_V2
 MANIFEST_SCHEMA = INTEGRATION_DIR / "command_manifest.schema.json"
 LLM_SCHEMA = INTEGRATION_DIR / "llm_interpretation.schema.json"
 GOLDEN = ROOT / "evals" / "voice_golden_scenarios.v2.json"
@@ -26,8 +28,8 @@ def fail(message: str) -> None:
 
 def validate_manifest(manifest: dict) -> None:
     version = str(manifest.get("version", "")).strip()
-    if not version.startswith("2."):
-        fail(f"manifest version must start with '2.' but got '{version}'")
+    if not (version.startswith("2.") or version.startswith("3.")):
+        fail(f"manifest version must start with '2.' or '3.' but got '{version}'")
 
     intents = manifest.get("intents")
     if not isinstance(intents, list) or not intents:
@@ -35,6 +37,7 @@ def validate_manifest(manifest: dict) -> None:
 
     intent_names: set[str] = set()
     capability_names: set[str] = set()
+    capability_duplicates: list[str] = []
 
     for idx, item in enumerate(intents):
         where = f"intents[{idx}]"
@@ -60,8 +63,11 @@ def validate_manifest(manifest: dict) -> None:
         if not capability:
             fail(f"{where}.capability_flag is required")
         if capability in capability_names:
-            fail(f"duplicate capability_flag '{capability}'")
+            capability_duplicates.append(capability)
         capability_names.add(capability)
+
+    for capability in capability_duplicates:
+        print(f"WARNING: capability_flag '{capability}' reused across intents (expected in v3)")
 
         policy = item.get("confirmation_policy")
         if not isinstance(policy, dict):

@@ -68,6 +68,8 @@ public:
 	// Used by controllerConnectionDialog to copy
 	void subscribeReadablePorts( const MidiPort::Map & _map );
 
+	MidiPort * midiPort() { return &m_midiPort; }
+
 
 public slots:
 	gui::ControllerDialog* createDialog( QWidget * _parent ) override;

@@ -246,11 +246,20 @@ const QList<IntentProfile>& intentProfiles()
 	QString manifestPath = qEnvironmentVariable( "LMMS_COMMAND_MANIFEST" ).trimmed();
 	if( manifestPath.isEmpty() )
 	{
-		const QString localRelative = QStringLiteral( "lmmsagent/integrations/lmms/AgentControl/command_manifest.v2.json" );
+		const QString localRelative = QStringLiteral( "lmmsagent/integrations/lmms/AgentControl/command_manifest.v3.json" );
 		const QString cwdRelative = QDir::current().absoluteFilePath( localRelative );
 		if( QFileInfo::exists( cwdRelative ) )
 		{
 			manifestPath = cwdRelative;
+		}
+		else
+		{
+			const QString v2Relative = QStringLiteral( "lmmsagent/integrations/lmms/AgentControl/command_manifest.v2.json" );
+			const QString v2Path = QDir::current().absoluteFilePath( v2Relative );
+			if( QFileInfo::exists( v2Path ) )
+			{
+				manifestPath = v2Path;
+			}
 		}
 	}
 
@@ -2711,10 +2720,6 @@ QJsonObject AgentControlService::dispatchTool( const QString& toolName, const QJ
 		ok = removeEffectFromTrack( effectName, trackName, message, error );
 		result = QJsonObject{ { "message", message } };
 	}
-	else if( tool == "seteffectparam" )
-	{
-		return errorResponse( "not_implemented", tr( "set_effect_param is not implemented yet" ) );
-	}
 	else if( tool == "opentool" )
 	{
 		QString message;
@@ -2807,7 +2812,8 @@ QJsonObject AgentControlService::dispatchTool( const QString& toolName, const QJ
 	}
 	else
 	{
-		return errorResponse( "unknown_tool", tr( "Unknown tool: %1" ).arg( toolName ) );
+		// v2 tool surface (see lmmsagent/docs/TOOL_CONTRACT_V2.md)
+		return dispatchV2Tool( tool, args );
 	}
 
 	if( !ok )

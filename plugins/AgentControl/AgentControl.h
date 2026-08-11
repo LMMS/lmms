@@ -10,7 +10,27 @@
 #include <QList>
 #include <QSet>
 #include <QStringList>
+#include <QTimer>
 
+#include <atomic>
+#include <memory>
+#include <mutex>
+#include <optional>
+
+#include "AutomationClip.h"
+#include "Controller.h"
+#include "EnvelopeAndLfoParameters.h"
+#include "InstrumentFunctions.h"
+#include "InstrumentSoundShaping.h"
+#include "Metronome.h"
+#include "MidiEventProcessor.h"
+#include "MidiPort.h"
+#include "Mixer.h"
+#include "Note.h"
+#include "PatternStore.h"
+#include "RenderManager.h"
+#include "Sample.h"
+#include "TimePos.h"
 #include "Track.h"
 #include "ToolPlugin.h"
 
@@ -21,7 +41,9 @@ namespace lmms
 {
 
 class EffectChain;
+class EffectControls;
 class InstrumentTrack;
+class MidiClip;
 class SampleTrack;
 namespace gui
 {
@@ -47,6 +69,7 @@ private slots:
 	void onNewConnection();
 	void onSocketReady();
 	void onSocketClosed();
+	void drainCaptureQueue();
 
 private:
 	struct Snapshot
@@ -55,6 +78,38 @@ private:
 		QString label;
 		QJsonObject state;
 		int actionCounter = 0;
+	};
+
+	// ---- v2: MIDI note capture ---------------------------------------------
+	struct CapturedEvent
+	{
+		quint8 type = 0;    // MidiEvent::EventType
+		quint8 key = 0;
+		quint8 velocity = 0;
+		qint64 ms = 0;      // monotonic timestamp relative to capture start
+	};
+
+	class CaptureProcessor : public MidiEventProcessor
+	{
+	public:
+		explicit CaptureProcessor(AgentControlService* service) : m_service(service) {}
+		void processInEvent(const MidiEvent& event, const TimePos& time, f_cnt_t offset) override;
+		void processOutEvent(const MidiEvent& event, const TimePos& time, f_cnt_t offset) override {}
+	private:
+		AgentControlService* m_service;
+	};
+
+	// ---- v2: render state ---------------------------------------------------
+	struct RenderJob
+	{
+		QString id;
+		RenderManager* manager = nullptr;
+		QString outputPath;
+		int progress = 0;
+		bool done = false;
+		bool cancelled = false;
+		bool restoreExportSettings = false;
+		QString error;
 	};
 
 	AgentControlService();
@@ -177,6 +232,59 @@ private:
 	QString canonicalPath(const QString& path) const;
 	QString joinTokens(const QStringList& tokens, int startIndex) const;
 	QString normalizeName(const QString& text) const;
+
+	// ---- v2 tool surface -----------------------------------------------------
+
+	QJsonObject dispatchV2Tool( const QString& tool, const QJsonObject& args );
+
+	// domain dispatch entries (one per translation unit)
+	std::optional<QJsonObject> dispatchProjectTool( const QString& tool, const QJsonObject& args );
+	std::optional<QJsonObject> dispatchArrangementTool( const QString& tool, const QJsonObject& args );
+	std::optional<QJsonObject> dispatchNoteTool( const QString& tool, const QJsonObject& args );
+	std::optional<QJsonObject> dispatchPatternTool( const QString& tool, const QJsonObject& args );
+	std::optional<QJsonObject> dispatchSampleTool( const QString& tool, const QJsonObject& args );
+	std::optional<QJsonObject> dispatchInstrumentTool( const QString& tool, const QJsonObject& args );
+	std::optional<QJsonObject> dispatchSoundTool( const QString& tool, const QJsonObject& args );
+	std::optional<QJsonObject> dispatchEffectTool( const QString& tool, const QJsonObject& args );
+	std::optional<QJsonObject> dispatchMixerTool( const QString& tool, const QJsonObject& args );
+	std::optional<QJsonObject> dispatchAutomationTool( const QString& tool, const QJsonObject& args );
+	std::optional<QJsonObject> dispatchControllerTool( const QString& tool, const QJsonObject& args );
+	std::optional<QJsonObject> dispatchRenderTool( const QString& tool, const QJsonObject& args );
+	std::optional<QJsonObject> dispatchRecordTool( const QString& tool, const QJsonObject& args );
+	std::optional<QJsonObject> dispatchMiscTool( const QString& tool, const QJsonObject& args );
+
+	// shared v2 helpers
+	AutomatableModel* resolveModelAddress( const QString& address, QString& canonicalAddress, QString& error ) const;
+	AutomatableModel* modelForTrackPath( InstrumentTrack* track, const QStringList& path, QString& error ) const;
+	QJsonObject describeModel( AutomatableModel* model, const QString& address );
+	QJsonObject describeModelsForTrack( InstrumentTrack* track, const QString& trackName );
+	MixerChannel* resolveMixerChannelRef( const QString& ref, QString& error ) const;
+	Effect* findEffectInChain( EffectChain* chain, const QString& effectName ) const;
+	AutomatableModel* findParamByName( EffectControls* controls, const QString& paramName ) const;
+	MidiClip* resolveMidiClip( const QJsonObject& args, QString& error ) const;
+	AutomationClip* resolveAutomationClipRef( const QString& clipRef, QString& error ) const;
+	QString automationClipRef( AutomationClip* clip ) const;
+	InstrumentTrack* resolveInstrumentTrackOrLast( const QJsonObject& args, QString& error ) const;
+	SampleTrack* resolveSampleTrackOrLast( const QJsonObject& args, QString& error ) const;
+	bool setModelValue( AutomatableModel* model, double value, QString& error );
+	TimePos timePosFromArgs( const QJsonObject& args, bool& ok ) const;
+	bool startRender( const OutputSettings& settings, const QString& outputPath,
+		bool tracksMode, RenderJob& job, QString& error );
+
+	// v2 state members
+	RenderJob m_renderJob;
+	CaptureProcessor m_captureProcessor{ this };
+	std::unique_ptr<MidiPort> m_capturePort;
+	std::mutex m_captureMutex;
+	QVector<CapturedEvent> m_captureQueue;
+	bool m_captureActive = false;
+	qint64 m_captureStartMs = 0;
+	TimePos m_captureStartPos;
+	InstrumentTrack* m_captureTrack = nullptr;
+	int m_captureClipIndex = -1;
+	int m_captureQuantize = 0;
+	QHash<int, tick_t> m_capturePendingNotes;
+	QTimer m_captureDrainTimer;
 
 	QTcpServer m_server;
 	QSet<QTcpSocket*> m_clients;

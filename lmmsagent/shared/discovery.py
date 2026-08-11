@@ -4,9 +4,25 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from .tool_client import ToolClient
+from .tool_client import ToolClient, ToolClientError
 
 AUDIO_EXTS = {".wav", ".aiff", ".aif", ".flac", ".ogg", ".mp3"}
+PRESET_EXTS = {".xiz", ".sf2", ".pat", ".xp"}
+PROJECT_EXTS = {".mmp", ".mmpz"}
+
+# Static render format knowledge (TOOL_CONTRACT_V2.md 2.12).
+RENDER_FORMATS = [
+    {"id": "render:wav", "type": "render_format", "display_name": "WAV", "canonical_name": "wav",
+     "aliases": ["wave", "pcm"], "tags": ["render", "uncompressed", "44100", "48000", "16bit", "24bit", "32bit"]},
+    {"id": "render:flac", "type": "render_format", "display_name": "FLAC", "canonical_name": "flac",
+     "aliases": ["lossless"], "tags": ["render", "lossless", "44100", "48000", "16bit", "24bit"]},
+    {"id": "render:ogg", "type": "render_format", "display_name": "OGG Vorbis", "canonical_name": "ogg",
+     "aliases": ["vorbis"], "tags": ["render", "lossy", "bitrate"]},
+    {"id": "render:mp3", "type": "render_format", "display_name": "MP3", "canonical_name": "mp3",
+     "aliases": ["mpeg"], "tags": ["render", "lossy", "bitrate", "mp3"]},
+]
+
+DEFAULT_DATA_ROOT = str(Path(__file__).resolve().parents[2] / "data")
 
 
 @dataclass
@@ -34,10 +50,18 @@ class Asset:
 
 
 class DiscoveryIndex:
-    def __init__(self, tool_client: ToolClient, sample_roots: Optional[List[str]] = None) -> None:
+    def __init__(
+        self,
+        tool_client: ToolClient,
+        sample_roots: Optional[List[str]] = None,
+        data_roots: Optional[List[str]] = None,
+    ) -> None:
         self.tool_client = tool_client
         self.sample_roots = sample_roots or []
+        self.data_roots = data_roots if data_roots is not None else [DEFAULT_DATA_ROOT]
         self._assets: List[Asset] = []
+        for fmt in RENDER_FORMATS:
+            self._add_asset(Asset(**fmt, source="contract"))
 
     @staticmethod
     def _norm(value: str) -> str:
@@ -78,10 +102,11 @@ class DiscoveryIndex:
         self._assets.append(asset)
 
     def index_plugins(self) -> Dict[str, int]:
-        self._assets = [a for a in self._assets if a.type == "sample"]
-        instruments = self.tool_client.call_tool("list_instruments")["result"].get("installed", [])
-        effects = self.tool_client.call_tool("list_effects")["result"].get("installed", [])
-        tools = self.tool_client.call_tool("list_tool_windows")["result"].get("tools", [])
+        managed = {"instrument_plugin", "effect_plugin", "tool_window"}
+        self._assets = [a for a in self._assets if a.type not in managed]
+        instruments = self._safe_list("list_instruments", "installed")
+        effects = self._safe_list("list_effects", "installed")
+        tools = self._safe_list("list_tool_windows", "tools")
 
         for item in instruments:
             name = item.get("name", "")
@@ -128,7 +153,7 @@ class DiscoveryIndex:
                 )
             )
 
-        windows = self.tool_client.call_tool("list_tool_windows")["result"].get("windows", [])
+        windows = self._safe_list("list_tool_windows", "windows")
         for window_name in windows:
             self._add_asset(
                 Asset(
@@ -152,7 +177,7 @@ class DiscoveryIndex:
         self._assets = [a for a in self._assets if a.type != "sample"]
 
         added = 0
-        project_audio = self.tool_client.call_tool("search_project_audio", {"query": ""})["result"].get("matches", [])
+        project_audio = self._safe_list("search_project_audio", "matches", args={"query": ""})
         for idx, item in enumerate(project_audio):
             sample_path = item.get("sample_path")
             if not sample_path:
@@ -207,6 +232,134 @@ class DiscoveryIndex:
 
         return {"samples": added}
 
+    def index_mixer_channels(self) -> Dict[str, int]:
+        self._assets = [a for a in self._assets if a.type != "mixer_channel"]
+        channels = self._safe_list("list_mixer_channels", "channels")
+        for idx, item in enumerate(channels):
+            if not isinstance(item, dict):
+                continue
+            name = str(item.get("name") or f"Channel {item.get('index', idx)}")
+            self._add_asset(
+                Asset(
+                    id=f"mixer:{self._norm(name)}",
+                    type="mixer_channel",
+                    display_name=name,
+                    canonical_name=name,
+                    aliases=[str(item.get("index", ""))],
+                    tags=["mixer", "channel"],
+                    source="plugin",
+                )
+            )
+        return {"mixer_channels": len(channels)}
+
+    def index_patterns(self) -> Dict[str, int]:
+        self._assets = [a for a in self._assets if a.type != "pattern"]
+        patterns = self._safe_list("list_patterns", "patterns")
+        for idx, item in enumerate(patterns):
+            if not isinstance(item, dict):
+                continue
+            name = str(item.get("name") or f"Pattern {idx}")
+            self._add_asset(
+                Asset(
+                    id=f"pattern:{self._norm(name)}",
+                    type="pattern",
+                    display_name=name,
+                    canonical_name=name,
+                    aliases=[],
+                    tags=["pattern", "bb"],
+                    source="plugin",
+                )
+            )
+        return {"patterns": len(patterns)}
+
+    def index_controllers(self) -> Dict[str, int]:
+        self._assets = [a for a in self._assets if a.type != "controller"]
+        controllers = self._safe_list("describe_controllers", "controllers")
+        for idx, item in enumerate(controllers):
+            if not isinstance(item, dict):
+                continue
+            name = str(item.get("name") or item.get("id") or f"Controller {idx}")
+            controller_type = str(item.get("type") or "lfo")
+            self._add_asset(
+                Asset(
+                    id=f"controller:{self._norm(name)}",
+                    type="controller",
+                    display_name=name,
+                    canonical_name=name,
+                    aliases=[str(item.get("id", ""))],
+                    tags=["controller", controller_type],
+                    source="plugin",
+                )
+            )
+        return {"controllers": len(controllers)}
+
+    def index_automation(self) -> Dict[str, int]:
+        self._assets = [a for a in self._assets if a.type != "automation"]
+        clips = self._safe_list("list_automation", "clips")
+        for idx, item in enumerate(clips):
+            if not isinstance(item, dict):
+                continue
+            clip_id = str(item.get("id") or f"auto:{idx}")
+            address = str(item.get("address") or "")
+            self._add_asset(
+                Asset(
+                    id=f"automation:{self._norm(clip_id)}",
+                    type="automation",
+                    display_name=clip_id,
+                    canonical_name=clip_id,
+                    aliases=[address] if address else [],
+                    tags=["automation", "clip"],
+                    source="plugin",
+                )
+            )
+        return {"automation_clips": len(clips)}
+
+    def index_presets_projects(self) -> Dict[str, int]:
+        self._assets = [a for a in self._assets if a.type not in {"preset", "project"}]
+        added = 0
+        for root in self.data_roots:
+            if not root:
+                continue
+            root_path = Path(root).expanduser()
+            if not root_path.exists() or not root_path.is_dir():
+                continue
+            for path in root_path.rglob("*"):
+                if not path.is_file():
+                    continue
+                suffix = path.suffix.lower()
+                if suffix in PRESET_EXTS:
+                    relative = path.relative_to(root_path)
+                    bank = str(relative.parent) if str(relative.parent) != "." else ""
+                    self._add_asset(
+                        Asset(
+                            id=f"preset:{self._norm(str(relative))}",
+                            type="preset",
+                            display_name=path.stem,
+                            canonical_name=path.stem,
+                            aliases=[bank, path.name],
+                            tags=["preset", suffix.lstrip(".")] + ([bank] if bank else []),
+                            path=str(path),
+                            source="data_library",
+                        )
+                    )
+                    added += 1
+                elif suffix in PROJECT_EXTS:
+                    relative = path.relative_to(root_path)
+                    self._add_asset(
+                        Asset(
+                            id=f"project:{self._norm(str(relative))}",
+                            type="project",
+                            display_name=path.stem,
+                            canonical_name=path.stem,
+                            aliases=[path.name],
+                            tags=["project", suffix.lstrip(".")],
+                            path=str(path),
+                            source="data_library",
+                        )
+                    )
+                    added += 1
+        return {"presets_and_projects": added}
+
     def search_assets(
         self,
         query: str,
@@ -241,8 +394,12 @@ class DiscoveryIndex:
         matches = self.search_assets(query, asset_type="sample", limit=3)
         return matches[0] if matches else None
 
+    def resolve_preset(self, query: str) -> Optional[Dict[str, Any]]:
+        matches = self.search_assets(query, asset_type="preset", limit=3)
+        return matches[0] if matches else None
+
     def resolve_track_reference(self, query: str) -> Optional[Dict[str, Any]]:
-        tracks = self.tool_client.call_tool("list_tracks")["result"].get("tracks", [])
+        tracks = self._safe_list("list_tracks", "tracks")
         if not tracks:
             return None
         wanted = self._norm(query)
@@ -251,9 +408,38 @@ class DiscoveryIndex:
             return exact
         return next((t for t in tracks if wanted in self._norm(t.get("name", ""))), None)
 
+    def list_mixer_channels(self) -> List[Dict[str, Any]]:
+        return self._safe_list("list_mixer_channels", "channels")
+
+    def list_patterns(self) -> List[Dict[str, Any]]:
+        return self._safe_list("list_patterns", "patterns")
+
+    def describe_controllers(self) -> List[Dict[str, Any]]:
+        return self._safe_list("describe_controllers", "controllers")
+
+    def list_automation(self) -> List[Dict[str, Any]]:
+        return self._safe_list("list_automation", "clips")
+
+    def _safe_list(self, tool: str, key: str, args: Optional[Dict[str, Any]] = None) -> List[Any]:
+        """Live tool call that degrades to [] while the C++ surface is still landing."""
+        try:
+            payload = self.tool_client.call_tool(tool, args)
+        except ToolClientError:
+            return []
+        result = payload.get("result", {})
+        if not isinstance(result, dict):
+            return []
+        value = result.get(key, [])
+        return value if isinstance(value, list) else []
+
     def refresh(self, project_path: Optional[str] = None) -> Dict[str, Any]:
         return {
             "plugins": self.index_plugins(),
             "samples": self.index_samples(project_path=project_path),
+            "mixer_channels": self.index_mixer_channels(),
+            "patterns": self.index_patterns(),
+            "controllers": self.index_controllers(),
+            "automation": self.index_automation(),
+            "presets_and_projects": self.index_presets_projects(),
             "asset_count": len(self._assets),
         }

@@ -1,17 +1,28 @@
 {
-  "version": "v1",
+  "version": "v2",
   "buckets": {
     "atomic": [
       "set tempo to 120",
       "show mixer",
       "add effect reverb",
-      "import /tmp/loop.wav"
+      "import /tmp/loop.wav",
+      "render song to wav",
+      "create a send from bass to reverb bus",
+      "automate the cutoff over 4 bars",
+      "quantize the piano clip",
+      "list mixer channels",
+      "add a c major chord",
+      "loop the kick sample"
     ],
     "compositional": [
       "create sample track and load sample /tmp/kick.wav",
       "load instrument triple oscillator and add effect compressor",
       "import audio /tmp/vocal.wav and open slicer",
-      "create instrument track and rename track to Bass Layer"
+      "create instrument track and rename track to Bass Layer",
+      "create a kick pattern and add hihats",
+      "create an lfo controller and link it to the cutoff",
+      "route the lead to mixer channel 3 and set channel volume to 80 percent",
+      "create a filter sweep on the lead and render stems"
     ],
     "creative_constrained": [
       "make this bass darker",

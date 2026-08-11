@@ -106,6 +106,14 @@ void ProjectNotes::setText( const QString & _text )
 
 
 
+QString ProjectNotes::text() const
+{
+	return m_edit->toPlainText();
+}
+
+
+
+
 void ProjectNotes::setupActions()
 {
 	QToolBar * tb = addToolBar( tr( "Edit Actions" ) );

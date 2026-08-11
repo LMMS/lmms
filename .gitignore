@@ -1,4 +1,5 @@
 /build/
+/build-agent/
 /target/
 .*.sw?
 .DS_Store

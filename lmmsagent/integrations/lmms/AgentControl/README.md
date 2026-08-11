@@ -43,10 +43,10 @@ Response envelope:
 }
 ```
 
-## Voice Command Contracts (v2)
+## Voice Command Contracts (v3)
 
 - Command manifest schema: `/Users/saksham/grp/docs/lmmsagent/lmms/lmmsagent/integrations/lmms/AgentControl/command_manifest.schema.json`
-- Default command manifest: `/Users/saksham/grp/docs/lmmsagent/lmms/lmmsagent/integrations/lmms/AgentControl/command_manifest.v2.json`
+- Default command manifest: `/Users/saksham/grp/docs/lmmsagent/lmms/lmmsagent/integrations/lmms/AgentControl/command_manifest.v3.json` (canonical; v2 kept for compatibility)
 - LLM parse schema: `/Users/saksham/grp/docs/lmmsagent/lmms/lmmsagent/integrations/lmms/AgentControl/llm_interpretation.schema.json`
 
 `AgentControl` loads the default manifest at runtime when available from the current working tree path, or from `LMMS_COMMAND_MANIFEST` when explicitly set.

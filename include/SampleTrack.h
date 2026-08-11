@@ -91,6 +91,16 @@ public slots:
 	void setPlayingClips( bool isPlaying );
 	void updateMixerChannel();
 
+	FloatModel * volumeModel()
+	{
+		return &m_volumeModel;
+	}
+
+	FloatModel * panningModel()
+	{
+		return &m_panningModel;
+	}
+
 private:
 	FloatModel m_volumeModel;
 	FloatModel m_panningModel;

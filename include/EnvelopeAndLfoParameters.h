@@ -126,11 +126,17 @@ public:
 
 	// Envelope
 	const FloatModel& getPredelayModel() const { return m_predelayModel; }
+	FloatModel& getPredelayModel() { return m_predelayModel; }
 	const FloatModel& getAttackModel() const { return m_attackModel; }
+	FloatModel& getAttackModel() { return m_attackModel; }
 	const FloatModel& getHoldModel() const { return m_holdModel; }
+	FloatModel& getHoldModel() { return m_holdModel; }
 	const FloatModel& getDecayModel() const { return m_decayModel; }
+	FloatModel& getDecayModel() { return m_decayModel; }
 	const FloatModel& getSustainModel() const { return m_sustainModel; }
+	FloatModel& getSustainModel() { return m_sustainModel; }
 	const FloatModel& getReleaseModel() const { return m_releaseModel; }
+	FloatModel& getReleaseModel() { return m_releaseModel; }
 	const FloatModel& getAmountModel() const { return m_amountModel; }
 	FloatModel& getAmountModel() { return m_amountModel; }
 
@@ -143,8 +149,13 @@ public:
 	const FloatModel& getLfoAmountModel() const { return m_lfoAmountModel; }
 	FloatModel& getLfoAmountModel() { return m_lfoAmountModel; }
 	const TempoSyncKnobModel& getLfoSpeedModel() const { return m_lfoSpeedModel; }
+	TempoSyncKnobModel& getLfoSpeedModel() { return m_lfoSpeedModel; }
 	const BoolModel& getX100Model() const { return m_x100Model; }
+	BoolModel& getX100Model() { return m_x100Model; }
 	const IntModel& getLfoWaveModel() const { return m_lfoWaveModel; }
+	IntModel& getLfoWaveModel() { return m_lfoWaveModel; }
+	FloatModel& getLfoPredelayModel() { return m_lfoPredelayModel; }
+	FloatModel& getLfoAttackModel() { return m_lfoAttackModel; }
 	std::shared_ptr<const SampleBuffer> getLfoUserWave() const { return m_userWave; }
 
 public slots:

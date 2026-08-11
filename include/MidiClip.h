@@ -114,6 +114,17 @@ public:
 
 	bool empty();
 
+	void setClipType( Type _new_clip_type )
+	{
+		setType( _new_clip_type );
+	}
+
+	void setStepsPerBar( int steps )
+	{
+		m_steps = qMax( 1, steps );
+		emit dataChanged();
+	}
+
 
 	gui::ClipView * createView( gui::TrackView * _tv ) override;
 

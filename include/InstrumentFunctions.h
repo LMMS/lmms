@@ -62,6 +62,10 @@ public:
 	InstrumentFunctionNoteStacking( Model * _parent );
 	~InstrumentFunctionNoteStacking() override = default;
 
+	BoolModel & chordsEnabledModel() { return m_chordsEnabledModel; }
+	ComboBoxModel & chordsModel() { return m_chordsModel; }
+	FloatModel & chordRangeModel() { return m_chordRangeModel; }
+
 	void processNote( NotePlayHandle* n );
 
 
@@ -188,6 +192,18 @@ public:
 
 	InstrumentFunctionArpeggio( Model * _parent );
 	~InstrumentFunctionArpeggio() override = default;
+
+	BoolModel & arpEnabledModel() { return m_arpEnabledModel; }
+	ComboBoxModel & arpModel() { return m_arpModel; }
+	FloatModel & arpRangeModel() { return m_arpRangeModel; }
+	FloatModel & arpRepeatsModel() { return m_arpRepeatsModel; }
+	FloatModel & arpCycleModel() { return m_arpCycleModel; }
+	FloatModel & arpSkipModel() { return m_arpSkipModel; }
+	FloatModel & arpMissModel() { return m_arpMissModel; }
+	TempoSyncKnobModel & arpTimeModel() { return m_arpTimeModel; }
+	FloatModel & arpGateModel() { return m_arpGateModel; }
+	ComboBoxModel & arpDirectionModel() { return m_arpDirectionModel; }
+	ComboBoxModel & arpModeModel() { return m_arpModeModel; }
 
 	void processNote( NotePlayHandle* n );
 

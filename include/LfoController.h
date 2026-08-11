@@ -60,6 +60,13 @@ public:
 	void loadSettings( const QDomElement & _this ) override;
 	QString nodeName() const override;
 
+	FloatModel * baseModel() { return &m_baseModel; }
+	TempoSyncKnobModel * speedModel() { return &m_speedModel; }
+	FloatModel * amountModel() { return &m_amountModel; }
+	FloatModel * phaseModel() { return &m_phaseModel; }
+	IntModel * waveModel() { return &m_waveModel; }
+	IntModel * multiplierModel() { return &m_multiplierModel; }
+
 
 public slots:
 	gui::ControllerDialog * createDialog( QWidget * _parent ) override;

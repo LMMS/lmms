@@ -47,6 +47,7 @@ public:
 
 	void clear();
 	void setText( const QString & _text );
+	QString text() const;
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 	void loadSettings( const QDomElement & _this ) override;

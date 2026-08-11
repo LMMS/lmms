@@ -7,7 +7,7 @@ from typing import Any, Callable, Dict, List, Optional
 
 from .discovery import DiscoveryIndex
 from .memory import ProjectMemory
-from .planner import Planner
+from .planner import CONFIRM_GATED_ACTIONS, Planner
 from .tool_client import ToolClient, ToolClientError
 
 
@@ -49,7 +49,19 @@ class Orchestrator:
             context["resolved_track"] = resolved
             return {"ok": True, "result": resolved}
 
+        if action == "resolve_preset":
+            resolved = self.discovery.resolve_preset(args.get("query", ""))
+            if not resolved:
+                raise ToolClientError(f"could_not_resolve_preset: {args.get('query', '')}")
+            context["resolved_preset"] = resolved
+            return {"ok": True, "result": resolved}
+
         runtime_args = dict(args)
+        if action == "load_instrument_preset" and not runtime_args.get("path"):
+            resolved_preset = context.get("resolved_preset")
+            if isinstance(resolved_preset, dict):
+                runtime_args["path"] = resolved_preset.get("path")
+
         if action in {"load_sample", "import_audio"} and not runtime_args.get("sample_path"):
             resolved = context.get("resolved_sample")
             if isinstance(resolved, dict):
@@ -218,7 +230,10 @@ class Orchestrator:
                         return aborted
 
                 snapshot_id = None
-                if step.requires_snapshot and step.action not in {"create_snapshot", "rollback_to_snapshot"}:
+                if (
+                    (step.requires_snapshot or step.action in CONFIRM_GATED_ACTIONS)
+                    and step.action not in {"create_snapshot", "rollback_to_snapshot"}
+                ):
                     snap_started = time.monotonic()
                     snapshot_resp = self.tool_client.call_tool("create_snapshot", {"label": f"pre_{step.action}"})
                     add_stage_timing("snapshot_calls", int((time.monotonic() - snap_started) * 1000))
