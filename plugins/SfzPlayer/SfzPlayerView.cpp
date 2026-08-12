@@ -184,8 +184,16 @@ void SfzPlayerView::periodicUpdate()
 void SfzPlayerView::openFile()
 {
 	auto openFileDialog = FileDialog(nullptr, QObject::tr("Open SFZ File"));
-	auto dir = ConfigManager::inst()->userSamplesDir();
-	openFileDialog.setDirectory(dir);
+	if(m_instrument->m_sfzFilePath != "")
+	{
+		QString path = PathUtil::toAbsolute(m_instrument->m_sfzFilePath);
+		openFileDialog.setDirectory(QFileInfo(path).absolutePath());
+		openFileDialog.selectFile(QFileInfo(path).fileName());
+	}
+	else
+	{
+		openFileDialog.setDirectory(ConfigManager::inst()->sfzDir());
+	}
 	if (openFileDialog.exec() == QDialog::Accepted)
 	{
 		if (openFileDialog.selectedFiles().isEmpty()) { return; }
