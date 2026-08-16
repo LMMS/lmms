@@ -1091,6 +1091,7 @@ void InstrumentTrack::autoAssignMidiDevice(bool assign)
 	if ( Engine::audioEngine()->midiClient()->isRaw() && device != "none" )
 	{
 		m_midiPort.setReadable( assign );
+		m_hasAutoMidiDev = assign;
 		return;
 	}
 
