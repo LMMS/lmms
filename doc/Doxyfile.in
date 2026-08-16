@@ -1970,10 +1970,8 @@ PREDEFINED             = "LMMS_BUILD_LINUX=" \
                          "LMMS_DEBUG_FPE=" \
                          "LMMS_HAVE_PTHREAD_H=" \
                          "LMMS_HAVE_UNISTD_H=" \
-                         "LMMS_HAVE_SYS_TYPES_H=" \
                          "LMMS_HAVE_SYS_IPC_H=" \
                          "LMMS_HAVE_SEMAPHORE_H=" \
-                         "LMMS_HAVE_SYS_TIME_H=" \
                          "LMMS_HAVE_SYS_TIMES_H=" \
                          "LMMS_HAVE_SYS_PRCTL_H=" \
                          "LMMS_HAVE_SCHED_H=" \
@@ -1982,7 +1980,6 @@ PREDEFINED             = "LMMS_BUILD_LINUX=" \
                          "LMMS_HAVE_FCNTL_H=" \
                          "LMMS_HAVE_SYS_IOCTL_H=" \
                          "LMMS_HAVE_PROCESS_H=" \
-                         "LMMS_HAVE_LOCALE_H=" \
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
 # tag can be used to specify a list of macro names that should be expanded. The

@@ -43,10 +43,8 @@
 
 #cmakedefine LMMS_HAVE_PTHREAD_H
 #cmakedefine LMMS_HAVE_UNISTD_H
-#cmakedefine LMMS_HAVE_SYS_TYPES_H
 #cmakedefine LMMS_HAVE_SYS_IPC_H
 #cmakedefine LMMS_HAVE_SEMAPHORE_H
-#cmakedefine LMMS_HAVE_SYS_TIME_H
 #cmakedefine LMMS_HAVE_SYS_TIMES_H
 #cmakedefine LMMS_HAVE_SYS_PRCTL_H
 #cmakedefine LMMS_HAVE_SCHED_H
@@ -55,4 +53,3 @@
 #cmakedefine LMMS_HAVE_FCNTL_H
 #cmakedefine LMMS_HAVE_SYS_IOCTL_H
 #cmakedefine LMMS_HAVE_PROCESS_H
-#cmakedefine LMMS_HAVE_LOCALE_H
