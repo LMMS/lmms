@@ -25,7 +25,9 @@
 #ifndef LMMS_SERIALIZING_OBJECT_H
 #define LMMS_SERIALIZING_OBJECT_H
 
+#include <QMap>
 #include <QString>
+#include <QStringList>
 
 #include "lmms_export.h"
 
@@ -54,6 +56,8 @@ public:
 	virtual QString nodeName() const = 0;
 
 	void setHook( SerializingObjectHook * _hook );
+	/** Returns a hook-owned attribute restored before the hook was available. */
+	QString deferredHookAttribute(const QString& name) const;
 
 	SerializingObjectHook* hook()
 	{
@@ -62,6 +66,9 @@ public:
 
 
 protected:
+	/** Defers these serialized attributes until a late-created hook attaches. */
+	void setHookAttributeNames(const QStringList& names);
+
 	// to be implemented by sub-objects
 	virtual void saveSettings( QDomDocument& doc, QDomElement& element ) = 0;
 	virtual void loadSettings( const QDomElement& element ) = 0;
@@ -69,6 +76,8 @@ protected:
 
 private:
 	SerializingObjectHook * m_hook;
+	QStringList m_hookAttributeNames;
+	QMap<QString, QString> m_deferredHookAttributes;
 
 } ;
 
