@@ -51,14 +51,6 @@ public:
 	TrackGrip* getTrackGrip() const { return m_trackGrip; }
 
 protected:
-	//! @brief Respond to trackOperationsWidget mouse events
-	//!
-	//! If it's the left mouse button, and Ctrl is held down, and we're not a Pattern Editor track, then start a new
-	//! drag event to copy this track. Otherwise, ignore all other events.
-	//!
-	//! @param me The mouse event to respond to.
-	void mousePressEvent( QMouseEvent * me ) override;
-
 	//! @brief Repaint the trackOperationsWidget
 	//!
 	//! Only things that's done for now is to paint the background with the brush of the window from the palette.

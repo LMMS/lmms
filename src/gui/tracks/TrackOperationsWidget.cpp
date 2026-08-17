@@ -37,7 +37,6 @@
 #include "AutomationTrackView.h"
 #include "ColorChooser.h"
 #include "ConfigManager.h"
-#include "DataFile.h"
 #include "embed.h"
 #include "Engine.h"
 #include "InstrumentTrackView.h"
@@ -71,7 +70,7 @@ TrackOperationsWidget::TrackOperationsWidget(TrackView* parent)
 	layout->setSpacing(0);
 	layout->setAlignment(Qt::AlignTop);
 
-	m_trackGrip = new TrackGrip(m_trackView->getTrack(), this);
+	m_trackGrip = new TrackGrip(m_trackView, this);
 	layout->addWidget(m_trackGrip);
 
 	// This widget holds the gear icon and the mute and solo
@@ -111,26 +110,6 @@ TrackOperationsWidget::TrackOperationsWidget(TrackView* parent)
 			this, SLOT(update()));
 
 	connect(m_trackView->getTrack(), SIGNAL(colorChanged()), this, SLOT(update()));
-}
-
-
-void TrackOperationsWidget::mousePressEvent( QMouseEvent * me )
-{
-	if (me->button() == Qt::LeftButton && me->modifiers() & KBD_COPY_MODIFIER &&
-		m_trackView->getTrack()->type() != Track::Type::Pattern)
-	{
-		DataFile dataFile( DataFile::Type::DragNDropData );
-		m_trackView->getTrack()->saveState( dataFile, dataFile.content() );
-		new StringPairDrag( QString( "track_%1" ).arg(
-					static_cast<int>(m_trackView->getTrack()->type()) ),
-			dataFile.toString(), m_trackView->getTrackSettingsWidget()->grab(),
-									this );
-	}
-	else if( me->button() == Qt::LeftButton )
-	{
-		// track-widget (parent-widget) initiates track-move
-		me->ignore();
-	}
 }
 
 
