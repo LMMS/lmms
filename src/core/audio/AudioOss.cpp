@@ -30,7 +30,6 @@
 #include <QFormLayout>
 #include <QLineEdit>
 
-#include "endian_handling.h"
 #include "LcdSpinBox.h"
 #include "AudioEngine.h"
 
