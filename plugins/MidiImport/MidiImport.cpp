@@ -47,7 +47,7 @@
 
 #include "plugin_export.h"
 
-#include "portsmf/include/allegro.h"
+#include "allegro.h"
 
 namespace
 {
