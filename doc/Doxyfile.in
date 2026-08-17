@@ -7,6 +7,7 @@ PROJECT_LOGO           = @CMAKE_SOURCE_DIR@/../cmake/linux/icons/scalable/apps/l
 PROJECT_ICON           = @CMAKE_SOURCE_DIR@/../cmake/linux/icons/scalable/apps/lmms.svg
 
 OUTPUT_DIRECTORY       = doc/
+STRIP_FROM_PATH        = ../
 TIMESTAMP              = YES
 EXTRACT_ALL            = YES
 EXTRACT_PRIVATE        = YES
