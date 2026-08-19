@@ -113,6 +113,7 @@ OPTION(BUNDLE_QT_TRANSLATIONS	"Install Qt translation files for LMMS" OFF)
 option(WANT_DEBUG_CPACK "Show detailed logs for packaging commands" OFF)
 option(WANT_CPACK_TARBALL "Request CPack to create a tarball instead of an installer" OFF)
 option(WANT_QT6 "Build with experimental Qt6 support" OFF)
+option(WANT_IPO "Build with interprocedural optimization (IPO/LTO)" ON)
 
 
 # Set the target microarchitecture
@@ -742,9 +743,22 @@ SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DLMMS_DEBUG")
 
 if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
 	add_compile_definitions(NDEBUG)
+	if(WANT_IPO)
+		include(CheckIPOSupported)
+		check_ipo_supported(RESULT _result OUTPUT _output)
+		if(_result)
+			set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
+			set(STATUS_IPO "Enabled")
+		else()
+			set(STATUS_IPO "Unsupported: ${_output}")
+		endif()
+	else()
+		set(STATUS_IPO "Disabled")
+	endif()
 	SET(STATUS_ASSERTIONS "Disabled")
 else()
 	remove_definitions(-DNDEBUG)
+	set(STATUS_IPO "Disabled (Debug build)")
 	SET(STATUS_ASSERTIONS "Enabled")
 endif()
 
@@ -971,16 +985,17 @@ MESSAGE(
 
 MESSAGE(
 "Developer options\n"
-"-----------------------------------------\n"
-"* Debug FP exceptions               : ${STATUS_DEBUG_FPE}\n"
-"* Debug using AddressSanitizer      : ${STATUS_DEBUG_ASAN}\n"
-"* Debug using ThreadSanitizer       : ${STATUS_DEBUG_TSAN}\n"
-"* Debug using MemorySanitizer       : ${STATUS_DEBUG_MSAN}\n"
-"* Debug using UBSanitizer           : ${STATUS_DEBUG_UBSAN}\n"
-"* Debug packaging commands          : ${STATUS_DEBUG_CPACK}\n"
-"* Profile using GNU profiler        : ${STATUS_GPROF}\n"
-"* Debug assertions                  : ${STATUS_ASSERTIONS}\n"
-"* Experimental Qt6 support          : ${STATUS_QT6}\n"
+"-----------------\n"
+"* Debug FP exceptions                    : ${STATUS_DEBUG_FPE}\n"
+"* Debug using AddressSanitizer           : ${STATUS_DEBUG_ASAN}\n"
+"* Debug using ThreadSanitizer            : ${STATUS_DEBUG_TSAN}\n"
+"* Debug using MemorySanitizer            : ${STATUS_DEBUG_MSAN}\n"
+"* Debug using UBSanitizer                : ${STATUS_DEBUG_UBSAN}\n"
+"* Debug packaging commands               : ${STATUS_DEBUG_CPACK}\n"
+"* Profile using GNU profiler             : ${STATUS_GPROF}\n"
+"* Debug assertions                       : ${STATUS_ASSERTIONS}\n"
+"* Experimental Qt6 support               : ${STATUS_QT6}\n"
+"* Interprocedural optimization (IPO/LTO) : ${STATUS_IPO}\n"
 )
 
 MESSAGE(
