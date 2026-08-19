@@ -92,12 +92,12 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <translation>OSS (Open Sound System)</translation>
     </message>
     <message>
-        <location filename="../../include/AudioPortAudio.h" line="83"/>
+        <location filename="../../include/AudioPortAudio.h" line="79"/>
         <source>PortAudio</source>
         <translation>PortAudio</translation>
     </message>
     <message>
-        <location filename="../../include/AudioPulseAudio.h" line="59"/>
+        <location filename="../../include/AudioPulseAudio.h" line="58"/>
         <source>PulseAudio</source>
         <translation>PulseAudio</translation>
     </message>
@@ -117,614 +117,481 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <translation>soundio</translation>
     </message>
     <message>
-        <location filename="../../src/core/audio/AudioSdl.cpp" line="226"/>
+        <location filename="../../src/core/audio/AudioSdl.cpp" line="190"/>
         <source>[System Default]</source>
         <translation>[ຄ່າເລີ່ມຕົ້ນຂອງລະບົບ]</translation>
     </message>
 </context>
 <context>
-    <name>ExportProjectDialog</name>
-    <message>
-        <location filename="../../src/gui/modals/export_project.ui" line="26"/>
-        <source>Export project</source>
-        <translation>ສົ່ງອອກໂຄງການ (Export)</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/export_project.ui" line="32"/>
-        <source>Export as loop (remove extra bar)</source>
-        <translation>ສົ່ງອອກເປັນ Loop (ລົບຫ້ອງທີ່ເກີນອອກ)</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/export_project.ui" line="39"/>
-        <source>Export between loop markers</source>
-        <translation>ສົ່ງອອກລະຫວ່າງຈຸດໝາຍ Loop</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/export_project.ui" line="61"/>
-        <source>Render Looped Section:</source>
-        <translation>ປະມວນຜົນສ່ວນທີ່ວົນ Loop:</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/export_project.ui" line="68"/>
-        <source> time(s)</source>
-        <translation> ຄັ້ງ</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/export_project.ui" line="89"/>
-        <source>File format settings</source>
-        <translation>ຕັ້ງຄ່າຮູບແບບໄຟລ໌</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/export_project.ui" line="95"/>
-        <source>File format:</source>
-        <translation>ຮູບແບບໄຟລ໌:</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/export_project.ui" line="120"/>
-        <source>Sampling rate:</source>
-        <translation>ອັດຕາ Sampling:</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/export_project.ui" line="148"/>
-        <source>Bit depth:</source>
-        <translation>ຄວາມລະອຽດບິດ (Bit depth):</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/export_project.ui" line="159"/>
-        <source>16 Bit integer</source>
-        <translation>16 Bit integer</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/export_project.ui" line="164"/>
-        <source>24 Bit integer</source>
-        <translation>24 Bit integer</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/export_project.ui" line="169"/>
-        <source>32 Bit float</source>
-        <translation>32 Bit float</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/export_project.ui" line="195"/>
-        <source>Stereo mode:</source>
-        <translation>ໂໝດສະເຕຣິໂອ:</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/export_project.ui" line="206"/>
-        <source>Mono</source>
-        <translation>ໂມໂນ</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/export_project.ui" line="211"/>
-        <source>Stereo</source>
-        <translation>ສະເຕຣິໂອ</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/export_project.ui" line="216"/>
-        <source>Joint stereo</source>
-        <translation>Joint stereo</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/export_project.ui" line="242"/>
-        <source>Compression level:</source>
-        <translation>ລະດັບການບີບອັດ:</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/export_project.ui" line="274"/>
-        <source>Bitrate:</source>
-        <translation>Bitrate:</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/export_project.ui" line="285"/>
-        <source>64 KBit/s</source>
-        <translation>64 KBit/s</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/export_project.ui" line="290"/>
-        <source>128 KBit/s</source>
-        <translation>128 KBit/s</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/export_project.ui" line="295"/>
-        <source>160 KBit/s</source>
-        <translation>160 KBit/s</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/export_project.ui" line="300"/>
-        <source>192 KBit/s</source>
-        <translation>192 KBit/s</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/export_project.ui" line="305"/>
-        <source>256 KBit/s</source>
-        <translation>256 KBit/s</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/export_project.ui" line="310"/>
-        <source>320 KBit/s</source>
-        <translation>320 KBit/s</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/export_project.ui" line="354"/>
-        <source>Start</source>
-        <translation>ເລີ່ມຕົ້ນ</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/export_project.ui" line="361"/>
-        <source>Cancel</source>
-        <translation>ຍົກເລີກ</translation>
-    </message>
-</context>
-<context>
     <name>InstrumentFunctionNoteStacking</name>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="43"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="44"/>
         <source>octave</source>
         <translation>octave (ຂັ້ນຄູ່ແປດ)</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="44"/>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="116"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="45"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="117"/>
         <source>Major</source>
         <translation>Major (ເມເຈີ)</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="45"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="46"/>
         <source>Majb5</source>
         <translation>Majb5</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="46"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="47"/>
         <source>minor</source>
         <translation>minor (ໄມເນີ)</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="47"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="48"/>
         <source>minb5</source>
         <translation>minb5</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="48"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="49"/>
         <source>sus2</source>
         <translation>sus2</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="49"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="50"/>
         <source>sus4</source>
         <translation>sus4</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="50"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="51"/>
         <source>aug</source>
         <translation>aug</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="51"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="52"/>
         <source>augsus4</source>
         <translation>augsus4</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="52"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="53"/>
         <source>tri</source>
         <translation>tri</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="54"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="55"/>
         <source>6</source>
         <translation>6</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="55"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="56"/>
         <source>6sus4</source>
         <translation>6sus4</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="56"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="57"/>
         <source>6add9</source>
         <translation>6add9</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="57"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="58"/>
         <source>m6</source>
         <translation>m6</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="58"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="59"/>
         <source>m6add9</source>
         <translation>m6add9</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="60"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="61"/>
         <source>7</source>
         <translation>7</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="61"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="62"/>
         <source>7sus4</source>
         <translation>7sus4</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="62"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="63"/>
         <source>7#5</source>
         <translation>7#5</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="63"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="64"/>
         <source>7b5</source>
         <translation>7b5</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="64"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="65"/>
         <source>7#9</source>
         <translation>7#9</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="65"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="66"/>
         <source>7b9</source>
         <translation>7b9</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="66"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="67"/>
         <source>7#5#9</source>
         <translation>7#5#9</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="67"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="68"/>
         <source>7#5b9</source>
         <translation>7#5b9</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="68"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="69"/>
         <source>7b5b9</source>
         <translation>7b5b9</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="69"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="70"/>
         <source>7add11</source>
         <translation>7add11</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="70"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="71"/>
         <source>7add13</source>
         <translation>7add13</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="71"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="72"/>
         <source>7#11</source>
         <translation>7#11</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="72"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="73"/>
         <source>Maj7</source>
         <translation>Maj7</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="73"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="74"/>
         <source>Maj7b5</source>
         <translation>Maj7b5</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="74"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="75"/>
         <source>Maj7#5</source>
         <translation>Maj7#5</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="75"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="76"/>
         <source>Maj7#11</source>
         <translation>Maj7#11</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="76"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="77"/>
         <source>Maj7add13</source>
         <translation>Maj7add13</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="77"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="78"/>
         <source>m7</source>
         <translation>m7</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="78"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="79"/>
         <source>m7b5</source>
         <translation>m7b5</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="79"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="80"/>
         <source>m7b9</source>
         <translation>m7b9</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="80"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="81"/>
         <source>m7add11</source>
         <translation>m7add11</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="81"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="82"/>
         <source>m7add13</source>
         <translation>m7add13</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="82"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="83"/>
         <source>m-Maj7</source>
         <translation>m-Maj7</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="83"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="84"/>
         <source>m-Maj7add11</source>
         <translation>m-Maj7add11</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="84"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="85"/>
         <source>m-Maj7add13</source>
         <translation>m-Maj7add13</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="86"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="87"/>
         <source>9</source>
         <translation>9</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="87"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="88"/>
         <source>9sus4</source>
         <translation>9sus4</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="88"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="89"/>
         <source>add9</source>
         <translation>add9</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="89"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="90"/>
         <source>9#5</source>
         <translation>9#5</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="90"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="91"/>
         <source>9b5</source>
         <translation>9b5</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="91"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="92"/>
         <source>9#11</source>
         <translation>9#11</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="92"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="93"/>
         <source>9b13</source>
         <translation>9b13</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="93"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="94"/>
         <source>Maj9</source>
         <translation>Maj9</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="94"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="95"/>
         <source>Maj9sus4</source>
         <translation>Maj9sus4</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="95"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="96"/>
         <source>Maj9#5</source>
         <translation>Maj9#5</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="96"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="97"/>
         <source>Maj9#11</source>
         <translation>Maj9#11</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="97"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="98"/>
         <source>m9</source>
         <translation>m9</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="98"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="99"/>
         <source>madd9</source>
         <translation>madd9</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="99"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="100"/>
         <source>m9b5</source>
         <translation>m9b5</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="100"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="101"/>
         <source>m9-Maj7</source>
         <translation>m9-Maj7</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="102"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="103"/>
         <source>11</source>
         <translation>11</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="103"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="104"/>
         <source>11b9</source>
         <translation>11b9</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="104"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="105"/>
         <source>Maj11</source>
         <translation>Maj11</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="105"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="106"/>
         <source>m11</source>
         <translation>m11</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="106"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="107"/>
         <source>m-Maj11</source>
         <translation>m-Maj11</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="108"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="109"/>
         <source>13</source>
         <translation>13</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="109"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="110"/>
         <source>13#9</source>
         <translation>13#9</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="110"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="111"/>
         <source>13b9</source>
         <translation>13b9</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="111"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="112"/>
         <source>13b5b9</source>
         <translation>13b5b9</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="112"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="113"/>
         <source>Maj13</source>
         <translation>Maj13</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="113"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="114"/>
         <source>m13</source>
         <translation>m13</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="114"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="115"/>
         <source>m-Maj13</source>
         <translation>m-Maj13</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="117"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="118"/>
         <source>Harmonic minor</source>
         <translation>Harmonic minor (ຮາໂມນິກ ໄມເນີ)</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="118"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="119"/>
         <source>Melodic minor</source>
         <translation>Melodic minor (ເມໂລດິກ ໄມເນີ)</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="119"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="120"/>
         <source>Whole tone</source>
         <translation>Whole tone (ໂຮລໂທນ)</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="120"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="121"/>
         <source>Diminished</source>
         <translation>Diminished (ດິມິນິດ)</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="121"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="122"/>
         <source>Major pentatonic</source>
         <translation>Major pentatonic (ເມເຈີ ເພັນທາໂທນິກ)</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="122"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="123"/>
         <source>Minor pentatonic</source>
         <translation>Minor pentatonic (ໄມເນີ ເພັນທາໂທນິກ)</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="123"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="124"/>
         <source>Jap in sen</source>
         <translation>Jap in sen</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="124"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="125"/>
         <source>Major bebop</source>
         <translation>Major bebop</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="125"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="126"/>
         <source>Dominant bebop</source>
         <translation>Dominant bebop</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="126"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="127"/>
         <source>Blues</source>
         <translation>Blues (ບລູສ໌)</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="127"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="128"/>
         <source>Arabic</source>
         <translation>Arabic (ອາຣັບ)</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="128"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="129"/>
         <source>Enigmatic</source>
         <translation>Enigmatic</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="129"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="130"/>
         <source>Neopolitan</source>
         <translation>Neopolitan</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="130"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="131"/>
         <source>Neopolitan minor</source>
         <translation>Neopolitan minor</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="131"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="132"/>
         <source>Hungarian minor</source>
         <translation>Hungarian minor</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="132"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="133"/>
         <source>Dorian</source>
         <translation>Dorian (ໂດຣຽນ)</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="133"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="134"/>
         <source>Phrygian</source>
         <translation>Phrygian (ຟຣິດຈຽນ)</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="134"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="135"/>
         <source>Lydian</source>
         <translation>Lydian (ລີດຽນ)</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="135"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="136"/>
         <source>Mixolydian</source>
         <translation>Mixolydian (ມິກໂຊລີດຽນ)</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="136"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="137"/>
         <source>Aeolian</source>
         <translation>Aeolian (ເອໂອລຽນ)</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="137"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="138"/>
         <source>Locrian</source>
         <translation>Locrian (ໂລຄຣຽນ)</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="138"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="139"/>
         <source>Minor</source>
         <translation>Minor (ໄມເນີ)</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="139"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="140"/>
         <source>Chromatic</source>
         <translation>Chromatic (ໂຄຣມາຕິກ)</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="140"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="141"/>
         <source>Half-Whole Diminished</source>
         <translation>Half-Whole Diminished</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="142"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="143"/>
         <source>5</source>
         <translation>5</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="143"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="144"/>
         <source>Phrygian dominant</source>
         <translation>Phrygian dominant</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="144"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="145"/>
         <source>Persian</source>
         <translation>Persian (ເປີເຊຍ)</translation>
     </message>
@@ -782,43 +649,41 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <location filename="../../plugins/GigPlayer/PatchesDialog.ui" line="67"/>
-        <location filename="../../plugins/Sf2Player/PatchesDialog.ui" line="67"/>
+        <location filename="../../plugins/Sf2Player/PatchesDialog.ui" line="71"/>
         <source>Bank selector</source>
         <translation>ຕົວເລືອກ Bank</translation>
     </message>
     <message>
         <location filename="../../plugins/GigPlayer/PatchesDialog.ui" line="92"/>
-        <location filename="../../plugins/Sf2Player/PatchesDialog.ui" line="92"/>
+        <location filename="../../plugins/Sf2Player/PatchesDialog.ui" line="96"/>
         <source>Bank</source>
         <translation>Bank</translation>
     </message>
     <message>
         <location filename="../../plugins/GigPlayer/PatchesDialog.ui" line="98"/>
-        <location filename="../../plugins/Sf2Player/PatchesDialog.ui" line="98"/>
+        <location filename="../../plugins/Sf2Player/PatchesDialog.ui" line="102"/>
         <source>Program selector</source>
         <translation>ຕົວເລືອກໂປຣແກຣມ</translation>
     </message>
     <message>
         <location filename="../../plugins/GigPlayer/PatchesDialog.ui" line="123"/>
-        <location filename="../../plugins/Sf2Player/PatchesDialog.ui" line="123"/>
         <source>Patch</source>
         <translation>Patch</translation>
     </message>
     <message>
         <location filename="../../plugins/GigPlayer/PatchesDialog.ui" line="128"/>
-        <location filename="../../plugins/Sf2Player/PatchesDialog.ui" line="128"/>
         <source>Name</source>
         <translation>ຊື່</translation>
     </message>
     <message>
         <location filename="../../plugins/GigPlayer/PatchesDialog.ui" line="173"/>
-        <location filename="../../plugins/Sf2Player/PatchesDialog.ui" line="173"/>
+        <location filename="../../plugins/Sf2Player/PatchesDialog.ui" line="146"/>
         <source>OK</source>
         <translation>ຕົກລົງ</translation>
     </message>
     <message>
         <location filename="../../plugins/GigPlayer/PatchesDialog.ui" line="192"/>
-        <location filename="../../plugins/Sf2Player/PatchesDialog.ui" line="192"/>
+        <location filename="../../plugins/Sf2Player/PatchesDialog.ui" line="165"/>
         <source>Cancel</source>
         <translation>ຍົກເລີກ</translation>
     </message>
@@ -836,7 +701,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <translation>ປລັກອິນຂະຫຍາຍສຽງ (Amplifier)</translation>
     </message>
     <message>
-        <location filename="../../plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="49"/>
+        <location filename="../../plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="48"/>
         <source>Simple sampler with various settings for using samples (e.g. drums) in an instrument-track</source>
         <translation>Sampler ແບບງ່າຍດາຍພ້ອມການຕັ້ງຄ່າຕ່າງໆ ສຳລັບການໃຊ້ສຽງຕົວຢ່າງ (ເຊັ່ນ: ກອງ) ໃນແທຣັກເຄື່ອງດົນຕີ</translation>
     </message>
@@ -931,7 +796,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <translation>ປລັກອິນສຳລັບໃຊ້ເອັບເຟັກ LADSPA ພາຍໃນ LMMS.</translation>
     </message>
     <message>
-        <location filename="../../plugins/Lb302/Lb302.cpp" line="86"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="69"/>
         <source>Incomplete monophonic imitation TB-303</source>
         <translation>ການຈຳລອງ TB-303 ແບບ Monophonic</translation>
     </message>
@@ -971,7 +836,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <translation>Synthesizer ແບບເຄື່ອງ NES</translation>
     </message>
     <message>
-        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="71"/>
+        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="72"/>
         <source>2-operator FM Synth</source>
         <translation>2-operator FM Synth</translation>
     </message>
@@ -1001,7 +866,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <translation>ເຄື່ອງຫຼິ້ນສຳລັບໄຟລ໌ SoundFont</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sfxr/Sfxr.cpp" line="66"/>
+        <location filename="../../plugins/Sfxr/Sfxr.cpp" line="55"/>
         <source>LMMS port of sfxr</source>
         <translation>sfxr ເວີຊັນ LMMS</translation>
     </message>
@@ -1043,7 +908,7 @@ This chip was used in the Commodore 64 computer.</source>
         <translation>ເຄື່ອງສະແດງພາບສະໜາມສຽງ Stereo.</translation>
     </message>
     <message>
-        <location filename="../../plugins/Vestige/Vestige.cpp" line="76"/>
+        <location filename="../../plugins/Vestige/Vestige.cpp" line="69"/>
         <source>VST-host for using VST(i)-plugins within LMMS</source>
         <translation>VST-host ສຳລັບການໃຊ້ VST(i)-plugins ພາຍໃນ LMMS</translation>
     </message>
@@ -1083,6 +948,11 @@ This chip was used in the Commodore 64 computer.</source>
         <translation>All-pass filter ທີ່ຮອງຮັບ order ສູງ.</translation>
     </message>
     <message>
+        <location filename="../../plugins/FrequencyShifter/FrequencyShifterEffect.cpp" line="42"/>
+        <source>A frequency shifter (not a pitch shifter) and barberpole phaser plugin</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
         <location filename="../../plugins/GranularPitchShifter/GranularPitchShifterEffect.cpp" line="42"/>
         <source>Granular pitch shifter</source>
         <translation>Granular pitch shifter</translation>
@@ -1093,12 +963,17 @@ This chip was used in the Commodore 64 computer.</source>
         <translation>ປລັກອິນ multiband compression ແບບ Upwards/downwards.</translation>
     </message>
     <message>
+        <location filename="../../plugins/Oscilloscope/Oscilloscope.cpp" line="39"/>
+        <source>Oscilloscope plugin to display the incoming audio waveform</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
         <location filename="../../plugins/SlewDistortion/SlewDistortion.cpp" line="39"/>
         <source>A 2-band distortion and slew rate limiter plugin.</source>
         <translation>ປລັກອິນ distortion ແລະ slew rate limiter ແບບ 2 ແບນ.</translation>
     </message>
     <message>
-        <location filename="../../plugins/SlicerT/SlicerT.cpp" line="47"/>
+        <location filename="../../plugins/SlicerT/SlicerT.cpp" line="46"/>
         <source>Basic Slicer</source>
         <translation>Slicer ພື້ນຖານ</translation>
     </message>
@@ -1116,7 +991,7 @@ This chip was used in the Commodore 64 computer.</source>
         <translation>ບໍ່ພົບປລັກອິນ.</translation>
     </message>
     <message>
-        <location filename="../../src/core/PluginFactory.cpp" line="192"/>
+        <location filename="../../src/core/PluginFactory.cpp" line="188"/>
         <source>LMMS plugin %1 does not have a plugin descriptor named %2!</source>
         <translation>ປລັກອິນ LMMS %1 ບໍ່ມີ descriptor ຊື່ %2!</translation>
     </message>
@@ -1176,14 +1051,40 @@ This chip was used in the Commodore 64 computer.</source>
         <translation>%1 (ບໍ່ຮອງຮັບ)</translation>
     </message>
     <message>
-        <location filename="../../src/core/DataFile.cpp" line="2061"/>
+        <location filename="../../src/core/DataFile.cpp" line="2064"/>
         <source>LADSPA plugins</source>
         <translation>ປລັກອິນ LADSPA</translation>
     </message>
     <message>
-        <location filename="../../src/core/DataFile.cpp" line="2062"/>
+        <location filename="../../src/core/DataFile.cpp" line="2065"/>
         <source>The project contains %1 LADSPA plugin(s) which might have not been restored correctly! Please check the project.</source>
         <translation>ໂຄງການນີ້ມີປລັກອິນ LADSPA %1 ຕົວ ທີ່ອາດຈະບໍ່ໄດ້ຮັບການກູ້ຄືນຢ່າງຖືກຕ້ອງ! ກະລຸນາກວດສອບໂຄງການ.</translation>
+    </message>
+    <message>
+        <location filename="../../src/core/SampleBuffer.cpp" line="88"/>
+        <location filename="../../src/core/SampleBuffer.cpp" line="118"/>
+        <source>Failed to load sample</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../../src/core/SampleBuffer.cpp" line="89"/>
+        <source>The sample may be corrupted or unsupported.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../../src/core/SampleBuffer.cpp" line="93"/>
+        <source>Failed to load sample at path %1, the file may not exist, be corrupted, or is unsupported.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../../src/core/SampleBuffer.cpp" line="118"/>
+        <source>The sample size is invalid.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../../src/core/SampleBuffer.cpp" line="122"/>
+        <source>Failed to load Base64 sample, invalid size</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/core/lv2/Lv2SubPluginFeatures.cpp" line="159"/>
@@ -1220,89 +1121,74 @@ This chip was used in the Commodore 64 computer.</source>
         <source>failed to load description</source>
         <translation>ບໍ່ສາມາດໂຫຼດຄຳອະທິບາຍໄດ້</translation>
     </message>
-    <message>
-        <location filename="../../src/gui/SampleLoader.cpp" line="40"/>
-        <source>Open audio file</source>
-        <translation>ເປີດໄຟລ໌ສຽງ</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/SampleLoader.cpp" line="122"/>
-        <source>Error loading sample</source>
-        <translation>ເກີດຂໍ້ຜິດພາດໃນການໂຫຼດຕົວຢ່າງສຽງ</translation>
-    </message>
 </context>
 <context>
     <name>QWidget</name>
     <message>
-        <location filename="../../plugins/LadspaEffect/LadspaSubPluginFeatures.cpp" line="67"/>
         <location filename="../../plugins/VstEffect/VstSubPluginFeatures.cpp" line="49"/>
         <source>Name: </source>
         <translation>ຊື່: </translation>
-    </message>
-    <message>
-        <location filename="../../plugins/LadspaEffect/LadspaSubPluginFeatures.cpp" line="78"/>
-        <source>Maker: </source>
-        <translation>ຜູ້ສ້າງ: </translation>
-    </message>
-    <message>
-        <location filename="../../plugins/LadspaEffect/LadspaSubPluginFeatures.cpp" line="93"/>
-        <source>Copyright: </source>
-        <translation>ລິຂະສິດ: </translation>
-    </message>
-    <message>
-        <location filename="../../plugins/LadspaEffect/LadspaSubPluginFeatures.cpp" line="103"/>
-        <source>Requires Real Time: </source>
-        <translation>ຕ້ອງການ Real Time: </translation>
-    </message>
-    <message>
-        <location filename="../../plugins/LadspaEffect/LadspaSubPluginFeatures.cpp" line="105"/>
-        <location filename="../../plugins/LadspaEffect/LadspaSubPluginFeatures.cpp" line="111"/>
-        <location filename="../../plugins/LadspaEffect/LadspaSubPluginFeatures.cpp" line="117"/>
-        <source>Yes</source>
-        <translation>ແມ່ນ</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/LadspaEffect/LadspaSubPluginFeatures.cpp" line="106"/>
-        <location filename="../../plugins/LadspaEffect/LadspaSubPluginFeatures.cpp" line="112"/>
-        <location filename="../../plugins/LadspaEffect/LadspaSubPluginFeatures.cpp" line="118"/>
-        <source>No</source>
-        <translation>ບໍ່</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/LadspaEffect/LadspaSubPluginFeatures.cpp" line="109"/>
-        <source>Real Time Capable: </source>
-        <translation>ຮອງຮັບ Real Time: </translation>
-    </message>
-    <message>
-        <location filename="../../plugins/LadspaEffect/LadspaSubPluginFeatures.cpp" line="115"/>
-        <source>In Place Broken: </source>
-        <translation>In Place Broken: </translation>
-    </message>
-    <message>
-        <location filename="../../plugins/LadspaEffect/LadspaSubPluginFeatures.cpp" line="121"/>
-        <source>Channels In: </source>
-        <translation>ຊ່ອງສັນຍານເຂົ້າ: </translation>
-    </message>
-    <message>
-        <location filename="../../plugins/LadspaEffect/LadspaSubPluginFeatures.cpp" line="125"/>
-        <source>Channels Out: </source>
-        <translation>ຊ່ອງສັນຍານອອກ: </translation>
-    </message>
-    <message>
-        <location filename="../../plugins/LadspaEffect/LadspaSubPluginFeatures.cpp" line="70"/>
-        <source>File: %1</source>
-        <translation>ໄຟລ໌: %1</translation>
     </message>
     <message>
         <location filename="../../plugins/VstEffect/VstSubPluginFeatures.cpp" line="50"/>
         <source>File: </source>
         <translation>ໄຟລ໌: </translation>
     </message>
+    <message>
+        <location filename="../../plugins/LadspaEffect/LadspaSubPluginFeatures.cpp" line="76"/>
+        <source>&lt;b&gt;Name: &lt;/b&gt;</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../../plugins/LadspaEffect/LadspaSubPluginFeatures.cpp" line="77"/>
+        <source>&lt;b&gt;File: &lt;/b&gt;</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../../plugins/LadspaEffect/LadspaSubPluginFeatures.cpp" line="78"/>
+        <source>&lt;b&gt;Author: &lt;/b&gt;</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../../plugins/LadspaEffect/LadspaSubPluginFeatures.cpp" line="79"/>
+        <source>&lt;b&gt;Copyright: &lt;/b&gt;</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../../plugins/LadspaEffect/LadspaSubPluginFeatures.cpp" line="80"/>
+        <source>&lt;b&gt;Channels: &lt;/b&gt;</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../../plugins/LadspaEffect/LadspaSubPluginFeatures.cpp" line="80"/>
+        <source>%1 in, %2 out</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../../plugins/LadspaEffect/LadspaSubPluginFeatures.cpp" line="86"/>
+        <source>&lt;b&gt;Real-time Dependency: &lt;/b&gt;</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../../plugins/LadspaEffect/LadspaSubPluginFeatures.cpp" line="87"/>
+        <source>This plugin has a real-time dependency (e.g. listens to a MIDI device) so its output must not be cached or subject to significant latency.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../../plugins/LadspaEffect/LadspaSubPluginFeatures.cpp" line="95"/>
+        <source>&lt;b&gt;Not Real-time Capable: &lt;/b&gt;</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../../plugins/LadspaEffect/LadspaSubPluginFeatures.cpp" line="96"/>
+        <source>This plugin is not suitable for use in a &amp;lsquo;hard real-time&amp;rsquo; environment.</source>
+        <translation type="unfinished"/>
+    </message>
 </context>
 <context>
     <name>VstPlugin</name>
     <message>
-        <location filename="../../plugins/Vestige/Vestige.cpp" line="376"/>
+        <location filename="../../plugins/Vestige/Vestige.cpp" line="370"/>
         <location filename="../../plugins/VstEffect/VstEffect.cpp" line="125"/>
         <source>The VST plugin %1 could not be loaded.</source>
         <translation>ບໍ່ສາມາດໂຫຼດ VST plugin %1 ໄດ້.</translation>
@@ -1344,62 +1230,62 @@ This chip was used in the Commodore 64 computer.</source>
 <context>
     <name>lmms::AudioFileProcessor</name>
     <message>
-        <location filename="../../plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="72"/>
+        <location filename="../../plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="71"/>
         <source>Amplify</source>
         <translation>ຂະຫຍາຍສຽງ (Amplify)</translation>
     </message>
     <message>
-        <location filename="../../plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="73"/>
+        <location filename="../../plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="72"/>
         <source>Start of sample</source>
         <translation>ຈຸດເລີ່ມຕົ້ນຂອງ Sample</translation>
     </message>
     <message>
-        <location filename="../../plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="74"/>
+        <location filename="../../plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="73"/>
         <source>End of sample</source>
         <translation>ຈຸດສິ້ນສຸດຂອງ Sample</translation>
     </message>
     <message>
-        <location filename="../../plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="75"/>
+        <location filename="../../plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="74"/>
         <source>Loopback point</source>
         <translation>ຈຸດ Loopback</translation>
     </message>
     <message>
-        <location filename="../../plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="76"/>
+        <location filename="../../plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="75"/>
         <source>Reverse sample</source>
         <translation>ກັບດ້ານ Sample (Reverse)</translation>
     </message>
     <message>
-        <location filename="../../plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="77"/>
+        <location filename="../../plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="76"/>
         <source>Loop mode</source>
         <translation>ໂໝດ Loop</translation>
     </message>
     <message>
-        <location filename="../../plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="78"/>
+        <location filename="../../plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="77"/>
         <source>Stutter</source>
         <translation>Stutter (ສຽງກະຕຸກ)</translation>
     </message>
     <message>
-        <location filename="../../plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="79"/>
+        <location filename="../../plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="78"/>
         <source>Interpolation mode</source>
         <translation>ໂໝດ Interpolation</translation>
     </message>
     <message>
-        <location filename="../../plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="97"/>
+        <location filename="../../plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="96"/>
         <source>None</source>
         <translation>ບໍ່ມີ</translation>
     </message>
     <message>
-        <location filename="../../plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="98"/>
+        <location filename="../../plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="97"/>
         <source>Linear</source>
         <translation>Linear</translation>
     </message>
     <message>
-        <location filename="../../plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="99"/>
+        <location filename="../../plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="98"/>
         <source>Sinc</source>
         <translation>Sinc</translation>
     </message>
     <message>
-        <location filename="../../plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="224"/>
+        <location filename="../../plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="223"/>
         <source>Sample not found</source>
         <translation>ບໍ່ພົບ Sample</translation>
     </message>
@@ -1407,27 +1293,27 @@ This chip was used in the Commodore 64 computer.</source>
 <context>
     <name>lmms::AudioJack</name>
     <message>
-        <location filename="../../src/core/audio/AudioJack.cpp" line="152"/>
+        <location filename="../../src/core/audio/AudioJack.cpp" line="141"/>
         <source>JACK client restarted</source>
         <translation>JACK client ເລີ່ມຕົ້ນໃໝ່</translation>
     </message>
     <message>
-        <location filename="../../src/core/audio/AudioJack.cpp" line="153"/>
+        <location filename="../../src/core/audio/AudioJack.cpp" line="142"/>
         <source>LMMS was kicked by JACK for some reason. Therefore the JACK backend of LMMS has been restarted. You will have to make manual connections again.</source>
         <translation>LMMS ຖືກຕັດອອກຈາກ JACK ດ້ວຍເຫດຜົນບາງຢ່າງ. ດັ່ງນັ້ນລະບົບ JACK backend ຂອງ LMMS ຈຶ່ງໄດ້ເລີ່ມຕົ້ນໃໝ່. ທ່ານຈະຕ້ອງເຊື່ອມຕໍ່ສາຍສັນຍານໃໝ່ດ້ວຍຕົນເອງ.</translation>
     </message>
     <message>
-        <location filename="../../src/core/audio/AudioJack.cpp" line="160"/>
+        <location filename="../../src/core/audio/AudioJack.cpp" line="149"/>
         <source>JACK server down</source>
         <translation>JACK server ຢຸດເຮັດວຽກ</translation>
     </message>
     <message>
-        <location filename="../../src/core/audio/AudioJack.cpp" line="161"/>
+        <location filename="../../src/core/audio/AudioJack.cpp" line="150"/>
         <source>The JACK server seems to have been shutdown and starting a new instance failed. Therefore LMMS is unable to proceed. You should save your project and restart JACK and LMMS.</source>
         <translation>ເຊີບເວີ JACK ເບິ່ງຄືວ່າຈະປິດລົງ ແລະ ການເລີ່ມຕົ້ນໃໝ່ລົ້ມເຫຼວ. ດັ່ງນັ້ນ LMMS ຈຶ່ງບໍ່ສາມາດດຳເນີນການຕໍ່ໄດ້. ທ່ານຄວນບັນທຶກໂຄງການຂອງທ່ານ ແລະ ເລີ່ມ JACK ກັບ LMMS ໃໝ່.</translation>
     </message>
     <message>
-        <location filename="../../src/core/audio/AudioJack.cpp" line="520"/>
+        <location filename="../../src/core/audio/AudioJack.cpp" line="480"/>
         <source>Client name</source>
         <translation>ຊື່ Client</translation>
     </message>
@@ -1435,38 +1321,25 @@ This chip was used in the Commodore 64 computer.</source>
 <context>
     <name>lmms::AudioOss</name>
     <message>
-        <location filename="../../src/core/audio/AudioOss.cpp" line="289"/>
+        <location filename="../../src/core/audio/AudioOss.cpp" line="251"/>
         <source>Device</source>
         <translation>ອຸປະກອນ</translation>
     </message>
     <message>
-        <location filename="../../src/core/audio/AudioOss.cpp" line="300"/>
+        <location filename="../../src/core/audio/AudioOss.cpp" line="262"/>
         <source>Channels</source>
         <translation>ຊ່ອງສັນຍານ</translation>
     </message>
 </context>
 <context>
-    <name>lmms::AudioPortAudio::setupWidget</name>
-    <message>
-        <location filename="../../src/core/audio/AudioPortAudio.cpp" line="379"/>
-        <source>Backend</source>
-        <translation>Backend</translation>
-    </message>
-    <message>
-        <location filename="../../src/core/audio/AudioPortAudio.cpp" line="382"/>
-        <source>Device</source>
-        <translation>ອຸປະກອນ</translation>
-    </message>
-</context>
-<context>
     <name>lmms::AudioPulseAudio</name>
     <message>
-        <location filename="../../src/core/audio/AudioPulseAudio.cpp" line="298"/>
+        <location filename="../../src/core/audio/AudioPulseAudio.cpp" line="260"/>
         <source>Device</source>
         <translation>ອຸປະກອນ</translation>
     </message>
     <message>
-        <location filename="../../src/core/audio/AudioPulseAudio.cpp" line="309"/>
+        <location filename="../../src/core/audio/AudioPulseAudio.cpp" line="271"/>
         <source>Channels</source>
         <translation>ຊ່ອງສັນຍານ</translation>
     </message>
@@ -1474,12 +1347,12 @@ This chip was used in the Commodore 64 computer.</source>
 <context>
     <name>lmms::AudioSdl::setupWidget</name>
     <message>
-        <location filename="../../src/core/audio/AudioSdl.cpp" line="238"/>
+        <location filename="../../src/core/audio/AudioSdl.cpp" line="202"/>
         <source>Playback device</source>
         <translation>ອຸປະກອນການຫຼິ້ນ</translation>
     </message>
     <message>
-        <location filename="../../src/core/audio/AudioSdl.cpp" line="244"/>
+        <location filename="../../src/core/audio/AudioSdl.cpp" line="208"/>
         <source>Input device</source>
         <translation>ອຸປະກອນນຳເຂົ້າ</translation>
     </message>
@@ -1487,12 +1360,12 @@ This chip was used in the Commodore 64 computer.</source>
 <context>
     <name>lmms::AudioSndio</name>
     <message>
-        <location filename="../../src/core/audio/AudioSndio.cpp" line="172"/>
+        <location filename="../../src/core/audio/AudioSndio.cpp" line="163"/>
         <source>Device</source>
         <translation>ອຸປະກອນ</translation>
     </message>
     <message>
-        <location filename="../../src/core/audio/AudioSndio.cpp" line="183"/>
+        <location filename="../../src/core/audio/AudioSndio.cpp" line="174"/>
         <source>Channels</source>
         <translation>ຊ່ອງສັນຍານ</translation>
     </message>
@@ -1500,12 +1373,12 @@ This chip was used in the Commodore 64 computer.</source>
 <context>
     <name>lmms::AudioSoundIo::setupWidget</name>
     <message>
-        <location filename="../../src/core/audio/AudioSoundIo.cpp" line="441"/>
+        <location filename="../../src/core/audio/AudioSoundIo.cpp" line="410"/>
         <source>Backend</source>
         <translation>Backend</translation>
     </message>
     <message>
-        <location filename="../../src/core/audio/AudioSoundIo.cpp" line="444"/>
+        <location filename="../../src/core/audio/AudioSoundIo.cpp" line="413"/>
         <source>Device</source>
         <translation>ອຸປະກອນ</translation>
     </message>
@@ -1533,42 +1406,32 @@ This chip was used in the Commodore 64 computer.</source>
         <translation>ວາງຄ່າ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomatableModelView.cpp" line="88"/>
-        <source>Edit song-global automation</source>
-        <translation>ແກ້ໄຂ song-global automation</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/AutomatableModelView.cpp" line="93"/>
-        <source>Remove song-global automation</source>
-        <translation>ລົບ song-global automation</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/AutomatableModelView.cpp" line="102"/>
+        <location filename="../../src/gui/AutomatableModelView.cpp" line="90"/>
         <source>Remove all linked controls</source>
         <translation>ລົບຕົວຄວບຄຸມທີ່ເຊື່ອມໂຍງທັງໝົດ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomatableModelView.cpp" line="113"/>
+        <location filename="../../src/gui/AutomatableModelView.cpp" line="101"/>
         <source>Connected to %1</source>
         <translation>ເຊື່ອມຕໍ່ກັບ %1</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomatableModelView.cpp" line="117"/>
+        <location filename="../../src/gui/AutomatableModelView.cpp" line="105"/>
         <source>Connected to controller</source>
         <translation>ເຊື່ອມຕໍ່ກັບຕົວຄວບຄຸມແລ້ວ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomatableModelView.cpp" line="123"/>
+        <location filename="../../src/gui/AutomatableModelView.cpp" line="111"/>
         <source>Edit connection...</source>
         <translation>ແກ້ໄຂການເຊື່ອມຕໍ່...</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomatableModelView.cpp" line="126"/>
+        <location filename="../../src/gui/AutomatableModelView.cpp" line="114"/>
         <source>Remove connection</source>
         <translation>ລົບການເຊື່ອມຕໍ່</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomatableModelView.cpp" line="132"/>
+        <location filename="../../src/gui/AutomatableModelView.cpp" line="120"/>
         <source>Connect to controller...</source>
         <translation>ເຊື່ອມຕໍ່ກັບຕົວຄວບຄຸມ...</translation>
     </message>
@@ -1576,7 +1439,7 @@ This chip was used in the Commodore 64 computer.</source>
 <context>
     <name>lmms::AutomationClip</name>
     <message>
-        <location filename="../../src/core/AutomationClip.cpp" line="914"/>
+        <location filename="../../src/core/AutomationClip.cpp" line="922"/>
         <source>Drag a control while pressing &lt;%1&gt;</source>
         <translation>ລາກປຸ່ມຄວບຄຸມຂະນະກົດ &lt;%1&gt;</translation>
     </message>
@@ -2126,17 +1989,17 @@ This chip was used in the Commodore 64 computer.</source>
 <context>
     <name>lmms::Effect</name>
     <message>
-        <location filename="../../src/core/Effect.cpp" line="48"/>
+        <location filename="../../src/core/Effect.cpp" line="49"/>
         <source>Effect enabled</source>
         <translation>ເປີດໃຊ້ເອັບເຟັກ</translation>
     </message>
     <message>
-        <location filename="../../src/core/Effect.cpp" line="49"/>
+        <location filename="../../src/core/Effect.cpp" line="50"/>
         <source>Wet/Dry mix</source>
         <translation>ອັດຕາປະສົມ ສົດ/ແຫ້ງ (Wet/Dry)</translation>
     </message>
     <message>
-        <location filename="../../src/core/Effect.cpp" line="50"/>
+        <location filename="../../src/core/Effect.cpp" line="51"/>
         <source>Decay</source>
         <translation>ການເສື່ອມ (Decay)</translation>
     </message>
@@ -2175,77 +2038,77 @@ This chip was used in the Commodore 64 computer.</source>
 <context>
     <name>lmms::EnvelopeAndLfoParameters</name>
     <message>
-        <location filename="../../src/core/EnvelopeAndLfoParameters.cpp" line="100"/>
+        <location filename="../../src/core/EnvelopeAndLfoParameters.cpp" line="99"/>
         <source>Env pre-delay</source>
         <translation>Env ໜ່ວງເວລາເລີ່ມ</translation>
     </message>
     <message>
-        <location filename="../../src/core/EnvelopeAndLfoParameters.cpp" line="101"/>
+        <location filename="../../src/core/EnvelopeAndLfoParameters.cpp" line="100"/>
         <source>Env attack</source>
         <translation>Env ການເລີ່ມ (Attack)</translation>
     </message>
     <message>
-        <location filename="../../src/core/EnvelopeAndLfoParameters.cpp" line="102"/>
+        <location filename="../../src/core/EnvelopeAndLfoParameters.cpp" line="101"/>
         <source>Env hold</source>
         <translation>Env ການຄ້າງ (Hold)</translation>
     </message>
     <message>
-        <location filename="../../src/core/EnvelopeAndLfoParameters.cpp" line="103"/>
+        <location filename="../../src/core/EnvelopeAndLfoParameters.cpp" line="102"/>
         <source>Env decay</source>
         <translation>Env ການເສື່ອມ (Decay)</translation>
     </message>
     <message>
-        <location filename="../../src/core/EnvelopeAndLfoParameters.cpp" line="104"/>
+        <location filename="../../src/core/EnvelopeAndLfoParameters.cpp" line="103"/>
         <source>Env sustain</source>
         <translation>Env ການແຊ່ (Sustain)</translation>
     </message>
     <message>
-        <location filename="../../src/core/EnvelopeAndLfoParameters.cpp" line="105"/>
+        <location filename="../../src/core/EnvelopeAndLfoParameters.cpp" line="104"/>
         <source>Env release</source>
         <translation>Env ການປ່ອຍ (Release)</translation>
     </message>
     <message>
-        <location filename="../../src/core/EnvelopeAndLfoParameters.cpp" line="106"/>
+        <location filename="../../src/core/EnvelopeAndLfoParameters.cpp" line="105"/>
         <source>Env mod amount</source>
         <translation>Env ປະລິມານການປັບຄ່າ</translation>
     </message>
     <message>
-        <location filename="../../src/core/EnvelopeAndLfoParameters.cpp" line="114"/>
+        <location filename="../../src/core/EnvelopeAndLfoParameters.cpp" line="113"/>
         <source>LFO pre-delay</source>
         <translation>LFO ໜ່ວງເວລາເລີ່ມ</translation>
     </message>
     <message>
-        <location filename="../../src/core/EnvelopeAndLfoParameters.cpp" line="115"/>
+        <location filename="../../src/core/EnvelopeAndLfoParameters.cpp" line="114"/>
         <source>LFO attack</source>
         <translation>LFO ການເລີ່ມ (Attack)</translation>
     </message>
     <message>
-        <location filename="../../src/core/EnvelopeAndLfoParameters.cpp" line="118"/>
+        <location filename="../../src/core/EnvelopeAndLfoParameters.cpp" line="117"/>
         <source>LFO frequency</source>
         <translation>LFO ຄວາມຖີ່</translation>
     </message>
     <message>
-        <location filename="../../src/core/EnvelopeAndLfoParameters.cpp" line="119"/>
+        <location filename="../../src/core/EnvelopeAndLfoParameters.cpp" line="118"/>
         <source>LFO mod amount</source>
         <translation>LFO ປະລິມານການປັບຄ່າ</translation>
     </message>
     <message>
-        <location filename="../../src/core/EnvelopeAndLfoParameters.cpp" line="120"/>
+        <location filename="../../src/core/EnvelopeAndLfoParameters.cpp" line="119"/>
         <source>LFO wave shape</source>
         <translation>LFO ຮູບຮ່າງຄື້ນ</translation>
     </message>
     <message>
-        <location filename="../../src/core/EnvelopeAndLfoParameters.cpp" line="121"/>
+        <location filename="../../src/core/EnvelopeAndLfoParameters.cpp" line="120"/>
         <source>LFO frequency x 100</source>
         <translation>LFO ຄວາມຖີ່ x 100</translation>
     </message>
     <message>
-        <location filename="../../src/core/EnvelopeAndLfoParameters.cpp" line="122"/>
+        <location filename="../../src/core/EnvelopeAndLfoParameters.cpp" line="121"/>
         <source>Modulate env amount</source>
         <translation>ປັບປ່ຽນປະລິມານ Env</translation>
     </message>
     <message>
-        <location filename="../../src/core/EnvelopeAndLfoParameters.cpp" line="394"/>
+        <location filename="../../src/core/EnvelopeAndLfoParameters.cpp" line="393"/>
         <source>Sample not found</source>
         <translation>ບໍ່ພົບຕົວຢ່າງສຽງ</translation>
     </message>
@@ -2748,97 +2611,97 @@ This chip was used in the Commodore 64 computer.</source>
 <context>
     <name>lmms::InstrumentFunctionArpeggio</name>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="302"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="303"/>
         <source>Arpeggio</source>
         <translation>ອາຣ໌ເພຈິໂອ (Arpeggio)</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="304"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="305"/>
         <source>Arpeggio type</source>
         <translation>ປະເພດອາຣ໌ເພຈິໂອ</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="305"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="306"/>
         <source>Arpeggio range</source>
         <translation>ຊ່ວງອາຣ໌ເພຈິໂອ</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="306"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="307"/>
         <source>Note repeats</source>
         <translation>ການທວນໂນດ</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="307"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="308"/>
         <source>Cycle steps</source>
         <translation>ຂັ້ນຂອງຮອບວຽນ</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="308"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="309"/>
         <source>Skip rate</source>
         <translation>ອັດຕາການຂ້າມ</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="309"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="310"/>
         <source>Miss rate</source>
         <translation>ອັດຕາການພາດ</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="310"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="311"/>
         <source>Arpeggio time</source>
         <translation>ເວລາອາຣ໌ເພຈິໂອ</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="311"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="312"/>
         <source>Arpeggio gate</source>
         <translation>ປະຕູສຽງອາຣ໌ເພຈິໂອ</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="312"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="313"/>
         <source>Arpeggio direction</source>
         <translation>ທິດທາງອາຣ໌ເພຈິໂອ</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="313"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="314"/>
         <source>Arpeggio mode</source>
         <translation>ໂໝດອາຣ໌ເພຈິໂອ</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="321"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="322"/>
         <source>Up</source>
         <translation>ຂຶ້ນ</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="322"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="323"/>
         <source>Down</source>
         <translation>ລົງ</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="323"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="324"/>
         <source>Up and down</source>
         <translation>ຂຶ້ນ ແລະ ລົງ</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="324"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="325"/>
         <source>Down and up</source>
         <translation>ລົງ ແລະ ຂຶ້ນ</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="325"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="326"/>
         <source>Random</source>
         <translation>ສຸ່ມ</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="328"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="329"/>
         <source>Free</source>
         <translation>ອິດສະຫຼະ</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="329"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="330"/>
         <source>Sort</source>
         <translation>ລຽງລຳດັບ</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="330"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="331"/>
         <source>Sync</source>
         <translation>ຊິງຄ໌ (Sync)</translation>
     </message>
@@ -2846,17 +2709,17 @@ This chip was used in the Commodore 64 computer.</source>
 <context>
     <name>lmms::InstrumentFunctionNoteStacking</name>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="211"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="212"/>
         <source>Chords</source>
         <translation>ຄອດ (Chords)</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="213"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="214"/>
         <source>Chord type</source>
         <translation>ປະເພດຄອດ</translation>
     </message>
     <message>
-        <location filename="../../src/core/InstrumentFunctions.cpp" line="214"/>
+        <location filename="../../src/core/InstrumentFunctions.cpp" line="215"/>
         <source>Chord range</source>
         <translation>ຊ່ວງຄອດ</translation>
     </message>
@@ -3008,7 +2871,7 @@ This chip was used in the Commodore 64 computer.</source>
 <context>
     <name>lmms::InstrumentTrack</name>
     <message>
-        <location filename="../../plugins/Vestige/Vestige.cpp" line="345"/>
+        <location filename="../../plugins/Vestige/Vestige.cpp" line="339"/>
         <location filename="../../src/tracks/InstrumentTrack.cpp" line="106"/>
         <source>Default preset</source>
         <translation>ຄ່າທີ່ຕັ້ງໄວ້ເບື້ອງຕົ້ນ</translation>
@@ -3418,57 +3281,57 @@ This chip was used in the Commodore 64 computer.</source>
 <context>
     <name>lmms::Lb302Synth</name>
     <message>
-        <location filename="../../plugins/Lb302/Lb302.cpp" line="284"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="218"/>
         <source>VCF Cutoff Frequency</source>
         <translation>ຄວາມຖີ່ຕັດ VCF</translation>
     </message>
     <message>
-        <location filename="../../plugins/Lb302/Lb302.cpp" line="285"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="219"/>
         <source>VCF Resonance</source>
         <translation>ເຣໂຊແນນ VCF</translation>
     </message>
     <message>
-        <location filename="../../plugins/Lb302/Lb302.cpp" line="286"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="220"/>
         <source>VCF Envelope Mod</source>
         <translation>VCF Envelope Mod</translation>
     </message>
     <message>
-        <location filename="../../plugins/Lb302/Lb302.cpp" line="287"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="221"/>
         <source>VCF Envelope Decay</source>
         <translation>VCF Envelope Decay</translation>
     </message>
     <message>
-        <location filename="../../plugins/Lb302/Lb302.cpp" line="288"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="222"/>
         <source>Distortion</source>
         <translation>ສຽງແຕກ (Distortion)</translation>
     </message>
     <message>
-        <location filename="../../plugins/Lb302/Lb302.cpp" line="289"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="223"/>
         <source>Waveform</source>
         <translation>ຮູບແບບຄື້ນ (Waveform)</translation>
     </message>
     <message>
-        <location filename="../../plugins/Lb302/Lb302.cpp" line="290"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="224"/>
         <source>Slide Decay</source>
         <translation>ການເສື່ອມຂອງ Slide</translation>
     </message>
     <message>
-        <location filename="../../plugins/Lb302/Lb302.cpp" line="291"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="225"/>
         <source>Slide</source>
         <translation>Slide</translation>
     </message>
     <message>
-        <location filename="../../plugins/Lb302/Lb302.cpp" line="292"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="226"/>
         <source>Accent</source>
         <translation>Accent</translation>
     </message>
     <message>
-        <location filename="../../plugins/Lb302/Lb302.cpp" line="293"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="227"/>
         <source>Dead</source>
         <translation>Dead</translation>
     </message>
     <message>
-        <location filename="../../plugins/Lb302/Lb302.cpp" line="294"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="228"/>
         <source>24dB/oct Filter</source>
         <translation>ຟິວເຕີ 24dB/oct</translation>
     </message>
@@ -3476,42 +3339,42 @@ This chip was used in the Commodore 64 computer.</source>
 <context>
     <name>lmms::LfoController</name>
     <message>
-        <location filename="../../src/core/LfoController.cpp" line="42"/>
+        <location filename="../../src/core/LfoController.cpp" line="41"/>
         <source>LFO Controller</source>
         <translation>ຕົວຄວບຄຸມ LFO</translation>
     </message>
     <message>
-        <location filename="../../src/core/LfoController.cpp" line="43"/>
+        <location filename="../../src/core/LfoController.cpp" line="42"/>
         <source>Base value</source>
         <translation>ຄ່າພື້ນຖານ</translation>
     </message>
     <message>
-        <location filename="../../src/core/LfoController.cpp" line="44"/>
+        <location filename="../../src/core/LfoController.cpp" line="43"/>
         <source>Oscillator speed</source>
         <translation>ຄວາມໄວຕົວສ້າງຄື້ນ</translation>
     </message>
     <message>
-        <location filename="../../src/core/LfoController.cpp" line="45"/>
+        <location filename="../../src/core/LfoController.cpp" line="44"/>
         <source>Oscillator amount</source>
         <translation>ປະລິມານຕົວສ້າງຄື້ນ</translation>
     </message>
     <message>
-        <location filename="../../src/core/LfoController.cpp" line="46"/>
+        <location filename="../../src/core/LfoController.cpp" line="45"/>
         <source>Oscillator phase</source>
         <translation>ເຟສຕົວສ້າງຄື້ນ</translation>
     </message>
     <message>
-        <location filename="../../src/core/LfoController.cpp" line="48"/>
+        <location filename="../../src/core/LfoController.cpp" line="47"/>
         <source>Oscillator waveform</source>
         <translation>ຮູບແບບຄື້ນຂອງຕົວສ້າງຄື້ນ</translation>
     </message>
     <message>
-        <location filename="../../src/core/LfoController.cpp" line="49"/>
+        <location filename="../../src/core/LfoController.cpp" line="48"/>
         <source>Frequency Multiplier</source>
         <translation>ຕົວຄູນຄວາມຖີ່</translation>
     </message>
     <message>
-        <location filename="../../src/core/LfoController.cpp" line="249"/>
+        <location filename="../../src/core/LfoController.cpp" line="248"/>
         <source>Sample not found</source>
         <translation>ບໍ່ພົບຕົວຢ່າງສຽງ</translation>
     </message>
@@ -3849,29 +3712,29 @@ This chip was used in the Commodore 64 computer.</source>
 <context>
     <name>lmms::Mixer</name>
     <message>
-        <location filename="../../src/core/Mixer.cpp" line="764"/>
+        <location filename="../../src/core/Mixer.cpp" line="766"/>
         <source>Master</source>
         <translation>Master</translation>
     </message>
     <message>
-        <location filename="../../src/core/Mixer.cpp" line="764"/>
-        <location filename="../../src/core/Mixer.cpp" line="886"/>
+        <location filename="../../src/core/Mixer.cpp" line="766"/>
         <location filename="../../src/core/Mixer.cpp" line="888"/>
+        <location filename="../../src/core/Mixer.cpp" line="890"/>
         <source>Channel %1</source>
         <translation>ຊ່ອງ %1</translation>
     </message>
     <message>
-        <location filename="../../src/core/Mixer.cpp" line="765"/>
+        <location filename="../../src/core/Mixer.cpp" line="767"/>
         <source>Volume</source>
         <translation>ຄວາມແຮງສຽງ</translation>
     </message>
     <message>
-        <location filename="../../src/core/Mixer.cpp" line="766"/>
+        <location filename="../../src/core/Mixer.cpp" line="768"/>
         <source>Mute</source>
         <translation>ປິດສຽງ</translation>
     </message>
     <message>
-        <location filename="../../src/core/Mixer.cpp" line="767"/>
+        <location filename="../../src/core/Mixer.cpp" line="769"/>
         <source>Solo</source>
         <translation>ຫຼິ້ນດ່ຽວ (Solo)</translation>
     </message>
@@ -3879,8 +3742,8 @@ This chip was used in the Commodore 64 computer.</source>
 <context>
     <name>lmms::MixerRoute</name>
     <message>
-        <location filename="../../src/core/Mixer.cpp" line="46"/>
-        <location filename="../../src/core/Mixer.cpp" line="56"/>
+        <location filename="../../src/core/Mixer.cpp" line="48"/>
+        <location filename="../../src/core/Mixer.cpp" line="58"/>
         <source>Amount to send from channel %1 to channel %2</source>
         <translation>ປະລິມານທີ່ຈະສົ່ງຈາກຊ່ອງ %1 ໄປຍັງຊ່ອງ %2</translation>
     </message>
@@ -4363,120 +4226,120 @@ This chip was used in the Commodore 64 computer.</source>
         <translation>Osc 3 - Sub LFO 2</translation>
     </message>
     <message>
-        <location filename="../../plugins/Monstro/Monstro.h" line="325"/>
-        <location filename="../../plugins/Monstro/Monstro.h" line="343"/>
+        <location filename="../../plugins/Monstro/Monstro.h" line="299"/>
+        <location filename="../../plugins/Monstro/Monstro.h" line="317"/>
         <source>Sine wave</source>
         <translation>ຄື້ນ Sine</translation>
     </message>
     <message>
-        <location filename="../../plugins/Monstro/Monstro.h" line="326"/>
+        <location filename="../../plugins/Monstro/Monstro.h" line="300"/>
         <source>Bandlimited Triangle wave</source>
         <translation>ຄື້ນສາມຫຼ່ຽມແບບຈຳກັດແຖບ</translation>
     </message>
     <message>
-        <location filename="../../plugins/Monstro/Monstro.h" line="327"/>
+        <location filename="../../plugins/Monstro/Monstro.h" line="301"/>
         <source>Bandlimited Saw wave</source>
         <translation>ຄື້ນແຂ້ວເລື່ອຍແບບຈຳກັດແຖບ</translation>
     </message>
     <message>
-        <location filename="../../plugins/Monstro/Monstro.h" line="328"/>
+        <location filename="../../plugins/Monstro/Monstro.h" line="302"/>
         <source>Bandlimited Ramp wave</source>
         <translation>ຄື້ນ Ramp ແບບຈຳກັດແຖບ</translation>
     </message>
     <message>
-        <location filename="../../plugins/Monstro/Monstro.h" line="329"/>
+        <location filename="../../plugins/Monstro/Monstro.h" line="303"/>
         <source>Bandlimited Square wave</source>
         <translation>ຄື້ນສີ່ຫຼ່ຽມແບບຈຳກັດແຖບ</translation>
     </message>
     <message>
-        <location filename="../../plugins/Monstro/Monstro.h" line="330"/>
+        <location filename="../../plugins/Monstro/Monstro.h" line="304"/>
         <source>Bandlimited Moog saw wave</source>
         <translation>ຄື້ນແຂ້ວເລື່ອຍ Moog ແບບຈຳກັດແຖບ</translation>
     </message>
     <message>
-        <location filename="../../plugins/Monstro/Monstro.h" line="331"/>
-        <location filename="../../plugins/Monstro/Monstro.h" line="349"/>
+        <location filename="../../plugins/Monstro/Monstro.h" line="305"/>
+        <location filename="../../plugins/Monstro/Monstro.h" line="323"/>
         <source>Soft square wave</source>
         <translation>ຄື້ນສີ່ຫຼ່ຽມແບບນຸ່ມ</translation>
     </message>
     <message>
-        <location filename="../../plugins/Monstro/Monstro.h" line="332"/>
+        <location filename="../../plugins/Monstro/Monstro.h" line="306"/>
         <source>Absolute sine wave</source>
         <translation>ຄື້ນ Sine ແບບ Absolute</translation>
     </message>
     <message>
-        <location filename="../../plugins/Monstro/Monstro.h" line="333"/>
-        <location filename="../../plugins/Monstro/Monstro.h" line="351"/>
+        <location filename="../../plugins/Monstro/Monstro.h" line="307"/>
+        <location filename="../../plugins/Monstro/Monstro.h" line="325"/>
         <source>Exponential wave</source>
         <translation>ຄື້ນ Exponential</translation>
     </message>
     <message>
-        <location filename="../../plugins/Monstro/Monstro.h" line="334"/>
+        <location filename="../../plugins/Monstro/Monstro.h" line="308"/>
         <source>White noise</source>
         <translation>ສຽງລົບກວນສີຂາວ (White noise)</translation>
     </message>
     <message>
-        <location filename="../../plugins/Monstro/Monstro.h" line="335"/>
+        <location filename="../../plugins/Monstro/Monstro.h" line="309"/>
         <source>Digital Triangle wave</source>
         <translation>ຄື້ນສາມຫຼ່ຽມ Digital</translation>
     </message>
     <message>
-        <location filename="../../plugins/Monstro/Monstro.h" line="336"/>
+        <location filename="../../plugins/Monstro/Monstro.h" line="310"/>
         <source>Digital Saw wave</source>
         <translation>ຄື້ນແຂ້ວເລື່ອຍ Digital</translation>
     </message>
     <message>
-        <location filename="../../plugins/Monstro/Monstro.h" line="337"/>
+        <location filename="../../plugins/Monstro/Monstro.h" line="311"/>
         <source>Digital Ramp wave</source>
         <translation>ຄື້ນ Ramp Digital</translation>
     </message>
     <message>
-        <location filename="../../plugins/Monstro/Monstro.h" line="338"/>
+        <location filename="../../plugins/Monstro/Monstro.h" line="312"/>
         <source>Digital Square wave</source>
         <translation>ຄື້ນສີ່ຫຼ່ຽມ Digital</translation>
     </message>
     <message>
-        <location filename="../../plugins/Monstro/Monstro.h" line="339"/>
+        <location filename="../../plugins/Monstro/Monstro.h" line="313"/>
         <source>Digital Moog saw wave</source>
         <translation>ຄື້ນແຂ້ວເລື່ອຍ Moog Digital</translation>
     </message>
     <message>
-        <location filename="../../plugins/Monstro/Monstro.h" line="344"/>
+        <location filename="../../plugins/Monstro/Monstro.h" line="318"/>
         <source>Triangle wave</source>
         <translation>ຄື້ນສາມຫຼ່ຽມ</translation>
     </message>
     <message>
-        <location filename="../../plugins/Monstro/Monstro.h" line="345"/>
+        <location filename="../../plugins/Monstro/Monstro.h" line="319"/>
         <source>Saw wave</source>
         <translation>ຄື້ນແຂ້ວເລື່ອຍ</translation>
     </message>
     <message>
-        <location filename="../../plugins/Monstro/Monstro.h" line="346"/>
+        <location filename="../../plugins/Monstro/Monstro.h" line="320"/>
         <source>Ramp wave</source>
         <translation>ຄື້ນ Ramp</translation>
     </message>
     <message>
-        <location filename="../../plugins/Monstro/Monstro.h" line="347"/>
+        <location filename="../../plugins/Monstro/Monstro.h" line="321"/>
         <source>Square wave</source>
         <translation>ຄື້ນສີ່ຫຼ່ຽມ</translation>
     </message>
     <message>
-        <location filename="../../plugins/Monstro/Monstro.h" line="348"/>
+        <location filename="../../plugins/Monstro/Monstro.h" line="322"/>
         <source>Moog saw wave</source>
         <translation>ຄື້ນແຂ້ວເລື່ອຍ Moog</translation>
     </message>
     <message>
-        <location filename="../../plugins/Monstro/Monstro.h" line="350"/>
+        <location filename="../../plugins/Monstro/Monstro.h" line="324"/>
         <source>Abs. sine wave</source>
         <translation>ຄື້ນ Abs. sine</translation>
     </message>
     <message>
-        <location filename="../../plugins/Monstro/Monstro.h" line="352"/>
+        <location filename="../../plugins/Monstro/Monstro.h" line="326"/>
         <source>Random</source>
         <translation>ສຸ່ມ</translation>
     </message>
     <message>
-        <location filename="../../plugins/Monstro/Monstro.h" line="353"/>
+        <location filename="../../plugins/Monstro/Monstro.h" line="327"/>
         <source>Random smooth</source>
         <translation>ສຸ່ມແບບກ້ຽງ</translation>
     </message>
@@ -4662,147 +4525,147 @@ This chip was used in the Commodore 64 computer.</source>
 <context>
     <name>lmms::OpulenzInstrument</name>
     <message>
-        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="98"/>
+        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="99"/>
         <source>Patch</source>
         <translation>ຊຸດສຽງ</translation>
     </message>
     <message>
-        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="99"/>
+        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="100"/>
         <source>Op 1 attack</source>
         <translation>Op 1 ເວລາເລີ່ມ (Attack)</translation>
     </message>
     <message>
-        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="100"/>
+        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="101"/>
         <source>Op 1 decay</source>
         <translation>Op 1 ເວລາຈາງ (Decay)</translation>
     </message>
     <message>
-        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="101"/>
+        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="102"/>
         <source>Op 1 sustain</source>
         <translation>Op 1 ລະດັບແຊ່ (Sustain)</translation>
     </message>
     <message>
-        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="102"/>
+        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="103"/>
         <source>Op 1 release</source>
         <translation>Op 1 ເວລາປ່ອຍ (Release)</translation>
     </message>
     <message>
-        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="103"/>
+        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="104"/>
         <source>Op 1 level</source>
         <translation>Op 1 ລະດັບ</translation>
     </message>
     <message>
-        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="104"/>
+        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="105"/>
         <source>Op 1 level scaling</source>
         <translation>Op 1 ການປັບຂະໜາດລະດັບ</translation>
     </message>
     <message>
-        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="105"/>
+        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="106"/>
         <source>Op 1 frequency multiplier</source>
         <translation>Op 1 ຕົວຄູນຄວາມຖີ່</translation>
     </message>
     <message>
-        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="106"/>
+        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="107"/>
         <source>Op 1 feedback</source>
         <translation>Op 1 ສຽງຍ້ອນກັບ</translation>
     </message>
     <message>
-        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="107"/>
+        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="108"/>
         <source>Op 1 key scaling rate</source>
         <translation>Op 1 ອັດຕາການປັບຂະໜາດຄີ</translation>
     </message>
     <message>
-        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="108"/>
+        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="109"/>
         <source>Op 1 percussive envelope</source>
         <translation>Op 1 ເອັນເວໂລບເຄື່ອງເຄາະ</translation>
     </message>
     <message>
-        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="109"/>
+        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="110"/>
         <source>Op 1 tremolo</source>
         <translation>Op 1 ເທຣໂມໂລ (ສຽງສັ່ນ)</translation>
     </message>
     <message>
-        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="110"/>
+        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="111"/>
         <source>Op 1 vibrato</source>
         <translation>Op 1 ວິບຣາໂຕ (ສຽງສັ່ນພລິ້ວ)</translation>
     </message>
     <message>
-        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="115"/>
+        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="116"/>
         <source>Op 1 waveform</source>
         <translation>Op 1 ຮູບຮ່າງຄື້ນ</translation>
     </message>
     <message>
-        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="118"/>
+        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="119"/>
         <source>Op 2 attack</source>
         <translation>Op 2 ເວລາເລີ່ມ (Attack)</translation>
     </message>
     <message>
-        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="119"/>
+        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="120"/>
         <source>Op 2 decay</source>
         <translation>Op 2 ເວລາຈາງ (Decay)</translation>
     </message>
     <message>
-        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="120"/>
+        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="121"/>
         <source>Op 2 sustain</source>
         <translation>Op 2 ລະດັບແຊ່ (Sustain)</translation>
     </message>
     <message>
-        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="121"/>
+        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="122"/>
         <source>Op 2 release</source>
         <translation>Op 2 ເວລາປ່ອຍ (Release)</translation>
     </message>
     <message>
-        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="122"/>
+        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="123"/>
         <source>Op 2 level</source>
         <translation>Op 2 ລະດັບ</translation>
     </message>
     <message>
-        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="123"/>
+        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="124"/>
         <source>Op 2 level scaling</source>
         <translation>Op 2 ການປັບຂະໜາດລະດັບ</translation>
     </message>
     <message>
-        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="124"/>
+        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="125"/>
         <source>Op 2 frequency multiplier</source>
         <translation>Op 2 ຕົວຄູນຄວາມຖີ່</translation>
     </message>
     <message>
-        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="125"/>
+        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="126"/>
         <source>Op 2 key scaling rate</source>
         <translation>Op 2 ອັດຕາການປັບຂະໜາດຄີ</translation>
     </message>
     <message>
-        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="126"/>
+        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="127"/>
         <source>Op 2 percussive envelope</source>
         <translation>Op 2 ເອັນເວໂລບເຄື່ອງເຄາະ</translation>
     </message>
     <message>
-        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="127"/>
+        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="128"/>
         <source>Op 2 tremolo</source>
         <translation>Op 2 ເທຣໂມໂລ (ສຽງສັ່ນ)</translation>
     </message>
     <message>
-        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="128"/>
+        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="129"/>
         <source>Op 2 vibrato</source>
         <translation>Op 2 ວິບຣາໂຕ (ສຽງສັ່ນພລິ້ວ)</translation>
     </message>
     <message>
-        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="133"/>
+        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="134"/>
         <source>Op 2 waveform</source>
         <translation>Op 2 ຮູບຮ່າງຄື້ນ</translation>
     </message>
     <message>
-        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="135"/>
+        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="136"/>
         <source>FM</source>
         <translation>FM</translation>
     </message>
     <message>
-        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="136"/>
+        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="137"/>
         <source>Vibrato depth</source>
         <translation>ຄວາມເລິກຂອງວິບຣາໂຕ</translation>
     </message>
     <message>
-        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="137"/>
+        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="138"/>
         <source>Tremolo depth</source>
         <translation>ຄວາມເລິກຂອງເທຣໂມໂລ</translation>
     </message>
@@ -4823,29 +4686,29 @@ This chip was used in the Commodore 64 computer.</source>
 <context>
     <name>lmms::OscillatorObject</name>
     <message>
-        <location filename="../../plugins/Organic/Organic.cpp" line="557"/>
+        <location filename="../../plugins/Organic/Organic.cpp" line="537"/>
         <source>Osc %1 waveform</source>
         <translation>ຮູບຮ່າງຄື້ນ Osc %1</translation>
     </message>
     <message>
-        <location filename="../../plugins/Organic/Organic.cpp" line="559"/>
+        <location filename="../../plugins/Organic/Organic.cpp" line="539"/>
         <source>Osc %1 harmonic</source>
         <translation>ຮາໂມນິກ Osc %1</translation>
     </message>
     <message>
-        <location filename="../../plugins/Organic/Organic.cpp" line="561"/>
+        <location filename="../../plugins/Organic/Organic.cpp" line="541"/>
         <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="74"/>
         <source>Osc %1 volume</source>
         <translation>ລະດັບສຽງ Osc %1</translation>
     </message>
     <message>
-        <location filename="../../plugins/Organic/Organic.cpp" line="563"/>
+        <location filename="../../plugins/Organic/Organic.cpp" line="543"/>
         <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="76"/>
         <source>Osc %1 panning</source>
         <translation>ການແພນ Osc %1</translation>
     </message>
     <message>
-        <location filename="../../plugins/Organic/Organic.cpp" line="565"/>
+        <location filename="../../plugins/Organic/Organic.cpp" line="545"/>
         <source>Osc %1 stereo detuning</source>
         <translation>ການປັບສຽງພ້ຽນສະເຕີຣິໂອ Osc %1</translation>
     </message>
@@ -4886,6 +4749,34 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
 </context>
 <context>
+    <name>lmms::OscilloscopeControls</name>
+    <message>
+        <location filename="../../plugins/Oscilloscope/OscilloscopeControls.cpp" line="36"/>
+        <source>Amplitude</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../../plugins/Oscilloscope/OscilloscopeControls.cpp" line="37"/>
+        <source>Length</source>
+        <translation>ຄວາມຍາວ</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/Oscilloscope/OscilloscopeControls.cpp" line="38"/>
+        <source>Phase</source>
+        <translation>ເຟສ</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/Oscilloscope/OscilloscopeControls.cpp" line="39"/>
+        <source>Pause</source>
+        <translation>ຢຸດຊົ່ວຄາວ</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/Oscilloscope/OscilloscopeControls.cpp" line="40"/>
+        <source>Stereo</source>
+        <translation>Stereo</translation>
+    </message>
+</context>
+<context>
     <name>lmms::PatternTrack</name>
     <message>
         <location filename="../../src/tracks/PatternTrack.cpp" line="49"/>
@@ -4919,42 +4810,42 @@ This chip was used in the Commodore 64 computer.</source>
 <context>
     <name>lmms::PeakControllerEffectControls</name>
     <message>
-        <location filename="../../plugins/PeakControllerEffect/PeakControllerEffectControls.cpp" line="41"/>
+        <location filename="../../plugins/PeakControllerEffect/PeakControllerEffectControls.cpp" line="42"/>
         <source>Base value</source>
         <translation>ຄ່າພື້ນຖານ</translation>
     </message>
     <message>
-        <location filename="../../plugins/PeakControllerEffect/PeakControllerEffectControls.cpp" line="42"/>
+        <location filename="../../plugins/PeakControllerEffect/PeakControllerEffectControls.cpp" line="43"/>
         <source>Modulation amount</source>
         <translation>ຈຳນວນການໂມດູເລດ</translation>
     </message>
     <message>
-        <location filename="../../plugins/PeakControllerEffect/PeakControllerEffectControls.cpp" line="43"/>
+        <location filename="../../plugins/PeakControllerEffect/PeakControllerEffectControls.cpp" line="44"/>
         <source>Attack</source>
         <translation>ແອັດແທັກ (Attack)</translation>
     </message>
     <message>
-        <location filename="../../plugins/PeakControllerEffect/PeakControllerEffectControls.cpp" line="44"/>
+        <location filename="../../plugins/PeakControllerEffect/PeakControllerEffectControls.cpp" line="45"/>
         <source>Release</source>
         <translation>ຣີລີສ (Release)</translation>
     </message>
     <message>
-        <location filename="../../plugins/PeakControllerEffect/PeakControllerEffectControls.cpp" line="45"/>
+        <location filename="../../plugins/PeakControllerEffect/PeakControllerEffectControls.cpp" line="46"/>
         <source>Treshold</source>
         <translation>ເກນ (Threshold)</translation>
     </message>
     <message>
-        <location filename="../../plugins/PeakControllerEffect/PeakControllerEffectControls.cpp" line="46"/>
+        <location filename="../../plugins/PeakControllerEffect/PeakControllerEffectControls.cpp" line="47"/>
         <source>Mute output</source>
         <translation>ປິດສຽງຂາອອກ</translation>
     </message>
     <message>
-        <location filename="../../plugins/PeakControllerEffect/PeakControllerEffectControls.cpp" line="47"/>
+        <location filename="../../plugins/PeakControllerEffect/PeakControllerEffectControls.cpp" line="48"/>
         <source>Absolute value</source>
         <translation>ຄ່າສຳບູນ (Absolute value)</translation>
     </message>
     <message>
-        <location filename="../../plugins/PeakControllerEffect/PeakControllerEffectControls.cpp" line="48"/>
+        <location filename="../../plugins/PeakControllerEffect/PeakControllerEffectControls.cpp" line="49"/>
         <source>Amount multiplicator</source>
         <translation>ຕົວຄູນຈຳນວນ</translation>
     </message>
@@ -5187,7 +5078,7 @@ Reason: &quot;%2&quot;</source>
 <context>
     <name>lmms::SampleClip</name>
     <message>
-        <location filename="../../src/core/SampleClip.cpp" line="316"/>
+        <location filename="../../src/core/SampleClip.cpp" line="330"/>
         <source>Sample not found</source>
         <translation>ບໍ່ພົບຕົວຢ່າງສຽງ</translation>
     </message>
@@ -5300,7 +5191,7 @@ Reason: &quot;%2&quot;</source>
 <context>
     <name>lmms::SfxrInstrument</name>
     <message>
-        <location filename="../../plugins/Sfxr/Sfxr.cpp" line="354"/>
+        <location filename="../../plugins/Sfxr/Sfxr.cpp" line="345"/>
         <source>Wave</source>
         <translation>ຄື້ນ</translation>
     </message>
@@ -5564,38 +5455,32 @@ Reason: &quot;%2&quot;</source>
 <context>
     <name>lmms::SlicerT</name>
     <message>
-        <location filename="../../plugins/SlicerT/SlicerT.cpp" line="61"/>
+        <location filename="../../plugins/SlicerT/SlicerT.cpp" line="60"/>
         <source>Note threshold</source>
         <translation>ເກນໂນດ</translation>
     </message>
     <message>
-        <location filename="../../plugins/SlicerT/SlicerT.cpp" line="62"/>
+        <location filename="../../plugins/SlicerT/SlicerT.cpp" line="61"/>
         <source>FadeOut</source>
         <translation>ເຟດເອົາ (FadeOut)</translation>
     </message>
     <message>
-        <location filename="../../plugins/SlicerT/SlicerT.cpp" line="63"/>
+        <location filename="../../plugins/SlicerT/SlicerT.cpp" line="62"/>
         <source>Original bpm</source>
         <translation>BPM ດັ້ງເດີມ</translation>
     </message>
     <message>
-        <location filename="../../plugins/SlicerT/SlicerT.cpp" line="64"/>
+        <location filename="../../plugins/SlicerT/SlicerT.cpp" line="63"/>
         <source>Slice snap</source>
         <translation>ສະແນບການຊອຍ (Slice snap)</translation>
     </message>
     <message>
-        <location filename="../../plugins/SlicerT/SlicerT.cpp" line="65"/>
+        <location filename="../../plugins/SlicerT/SlicerT.cpp" line="64"/>
         <source>BPM sync</source>
         <translation>ຊິງຄ໌ BPM</translation>
     </message>
     <message>
-        <location filename="../../plugins/SlicerT/SlicerT.cpp" line="340"/>
-        <location filename="../../plugins/SlicerT/SlicerT.cpp" line="376"/>
-        <source>slice_%1</source>
-        <translation>slice_%1</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/SlicerT/SlicerT.cpp" line="360"/>
+        <location filename="../../plugins/SlicerT/SlicerT.cpp" line="359"/>
         <source>Sample not found: %1</source>
         <translation>ບໍ່ພົບຕົວຢ່າງສຽງ: %1</translation>
     </message>
@@ -5618,32 +5503,32 @@ Reason: &quot;%2&quot;</source>
         <translation>ລະດັບສຽງສູງຕໍ່າຫຼັກ (Master pitch)</translation>
     </message>
     <message>
-        <location filename="../../src/core/Song.cpp" line="1052"/>
+        <location filename="../../src/core/Song.cpp" line="1040"/>
         <source>Aborting project load</source>
         <translation>ຍົກເລີກການໂຫຼດໂປຣເຈັກ</translation>
     </message>
     <message>
-        <location filename="../../src/core/Song.cpp" line="1053"/>
+        <location filename="../../src/core/Song.cpp" line="1041"/>
         <source>Project file contains local paths to plugins, which could be used to run malicious code.</source>
         <translation>ໄຟລ໌ໂປຣເຈັກມີເສັ້ນທາງທ້ອງຖິ່ນໄປຫາປັກອິນ, ເຊິ່ງອາດຈະຖືກໃຊ້ເພື່ອແລ່ນໂຄ້ດທີ່ເປັນອັນຕະລາຍໄດ້.</translation>
     </message>
     <message>
-        <location filename="../../src/core/Song.cpp" line="1058"/>
+        <location filename="../../src/core/Song.cpp" line="1046"/>
         <source>Can&apos;t load project: Project file contains local paths to plugins.</source>
         <translation>ບໍ່ສາມາດໂຫຼດໂປຣເຈັກໄດ້: ໄຟລ໌ໂປຣເຈັກມີເສັ້ນທາງທ້ອງຖິ່ນໄປຫາປັກອິນ.</translation>
     </message>
     <message>
-        <location filename="../../src/core/Song.cpp" line="1214"/>
+        <location filename="../../src/core/Song.cpp" line="1198"/>
         <source>LMMS Error report</source>
         <translation>ລາຍງານຂໍ້ຜິດພາດ LMMS</translation>
     </message>
     <message>
-        <location filename="../../src/core/Song.cpp" line="1511"/>
+        <location filename="../../src/core/Song.cpp" line="1491"/>
         <source> (repeated %1 times)</source>
         <translation> (ຊ້ຳກັນ %1 ຄັ້ງ)</translation>
     </message>
     <message>
-        <location filename="../../src/core/Song.cpp" line="1518"/>
+        <location filename="../../src/core/Song.cpp" line="1498"/>
         <source>The following errors occurred while loading: </source>
         <translation>ເກີດຂໍ້ຜິດພາດຕໍ່ໄປນີ້ຂະນະໂຫຼດ: </translation>
     </message>
@@ -5780,12 +5665,12 @@ Please make sure you have read-permission to the file and the directory containi
 <context>
     <name>lmms::VestigeInstrument</name>
     <message>
-        <location filename="../../plugins/Vestige/Vestige.cpp" line="364"/>
+        <location filename="../../plugins/Vestige/Vestige.cpp" line="358"/>
         <source>Loading plugin</source>
         <translation>ກຳລັງໂຫຼດປັກອິນ</translation>
     </message>
     <message>
-        <location filename="../../plugins/Vestige/Vestige.cpp" line="365"/>
+        <location filename="../../plugins/Vestige/Vestige.cpp" line="359"/>
         <source>Please wait while loading the VST plugin...</source>
         <translation>ກະລຸນາລໍຖ້າຂະນະໂຫຼດປັກອິນ VST...</translation>
     </message>
@@ -5904,43 +5789,43 @@ Please make sure you have read-permission to the file and the directory containi
 <context>
     <name>lmms::VstPlugin</name>
     <message>
-        <location filename="../../plugins/VstBase/VstPlugin.cpp" line="506"/>
+        <location filename="../../plugins/VstBase/VstPlugin.cpp" line="535"/>
         <source>Open Preset</source>
         <translation>ເປີດພຣີເຊັດ</translation>
     </message>
     <message>
-        <location filename="../../plugins/VstBase/VstPlugin.cpp" line="506"/>
-        <location filename="../../plugins/VstBase/VstPlugin.cpp" line="582"/>
+        <location filename="../../plugins/VstBase/VstPlugin.cpp" line="535"/>
+        <location filename="../../plugins/VstBase/VstPlugin.cpp" line="633"/>
         <source>VST Plugin Preset (*.fxp *.fxb)</source>
         <translation>ພຣີເຊັດ VST Plugin (*.fxp *.fxb)</translation>
     </message>
     <message>
-        <location filename="../../plugins/VstBase/VstPlugin.cpp" line="578"/>
+        <location filename="../../plugins/VstBase/VstPlugin.cpp" line="629"/>
         <source>: default</source>
         <translation>: ຄ່າເລີ່ມຕົ້ນ</translation>
     </message>
     <message>
-        <location filename="../../plugins/VstBase/VstPlugin.cpp" line="581"/>
+        <location filename="../../plugins/VstBase/VstPlugin.cpp" line="632"/>
         <source>Save Preset</source>
         <translation>ບັນທຶກພຣີເຊັດ</translation>
     </message>
     <message>
-        <location filename="../../plugins/VstBase/VstPlugin.cpp" line="581"/>
+        <location filename="../../plugins/VstBase/VstPlugin.cpp" line="632"/>
         <source>.fxp</source>
         <translation>.fxp</translation>
     </message>
     <message>
-        <location filename="../../plugins/VstBase/VstPlugin.cpp" line="596"/>
+        <location filename="../../plugins/VstBase/VstPlugin.cpp" line="647"/>
         <source>.FXP</source>
         <translation>.FXP</translation>
     </message>
     <message>
-        <location filename="../../plugins/VstBase/VstPlugin.cpp" line="596"/>
+        <location filename="../../plugins/VstBase/VstPlugin.cpp" line="647"/>
         <source>.FXB</source>
         <translation>.FXB</translation>
     </message>
     <message>
-        <location filename="../../plugins/VstBase/VstPlugin.cpp" line="598"/>
+        <location filename="../../plugins/VstBase/VstPlugin.cpp" line="649"/>
         <source>.fxb</source>
         <translation>.fxb</translation>
     </message>
@@ -6205,7 +6090,7 @@ Please make sure you have read-permission to the file and the directory containi
 <context>
     <name>lmms::graphModel</name>
     <message>
-        <location filename="../../src/gui/widgets/Graph.cpp" line="462"/>
+        <location filename="../../src/gui/widgets/Graph.cpp" line="467"/>
         <source>Graph</source>
         <translation>ກຣາຟ</translation>
     </message>
@@ -6213,42 +6098,42 @@ Please make sure you have read-permission to the file and the directory containi
 <context>
     <name>lmms::gui::AmplifierControlDialog</name>
     <message>
-        <location filename="../../plugins/Amplifier/AmplifierControlDialog.cpp" line="56"/>
+        <location filename="../../plugins/Amplifier/AmplifierControlDialog.cpp" line="57"/>
         <source>VOL</source>
         <translation>VOL</translation>
     </message>
     <message>
-        <location filename="../../plugins/Amplifier/AmplifierControlDialog.cpp" line="56"/>
+        <location filename="../../plugins/Amplifier/AmplifierControlDialog.cpp" line="57"/>
         <source>Volume:</source>
         <translation>ລະດັບສຽງ:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Amplifier/AmplifierControlDialog.cpp" line="57"/>
+        <location filename="../../plugins/Amplifier/AmplifierControlDialog.cpp" line="58"/>
         <source>PAN</source>
         <translation>PAN</translation>
     </message>
     <message>
-        <location filename="../../plugins/Amplifier/AmplifierControlDialog.cpp" line="57"/>
+        <location filename="../../plugins/Amplifier/AmplifierControlDialog.cpp" line="58"/>
         <source>Panning:</source>
         <translation>ການແພນສຽງ:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Amplifier/AmplifierControlDialog.cpp" line="58"/>
+        <location filename="../../plugins/Amplifier/AmplifierControlDialog.cpp" line="59"/>
         <source>LEFT</source>
         <translation>ຊ້າຍ</translation>
     </message>
     <message>
-        <location filename="../../plugins/Amplifier/AmplifierControlDialog.cpp" line="58"/>
+        <location filename="../../plugins/Amplifier/AmplifierControlDialog.cpp" line="59"/>
         <source>Left gain:</source>
         <translation>ອັດຕາຂະຫຍາຍຊ້າຍ:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Amplifier/AmplifierControlDialog.cpp" line="59"/>
+        <location filename="../../plugins/Amplifier/AmplifierControlDialog.cpp" line="60"/>
         <source>RIGHT</source>
         <translation>ຂວາ</translation>
     </message>
     <message>
-        <location filename="../../plugins/Amplifier/AmplifierControlDialog.cpp" line="59"/>
+        <location filename="../../plugins/Amplifier/AmplifierControlDialog.cpp" line="60"/>
         <source>Right gain:</source>
         <translation>ອັດຕາຂະຫຍາຍຂວາ:</translation>
     </message>
@@ -6299,22 +6184,22 @@ Please make sure you have read-permission to the file and the directory containi
         <translation>ຫຼິ້ນຕົວຢ່າງສຽງຕໍ່ເນື່ອງຂ້າມໂນດ</translation>
     </message>
     <message>
-        <location filename="../../plugins/AudioFileProcessor/AudioFileProcessorView.cpp" line="120"/>
+        <location filename="../../plugins/AudioFileProcessor/AudioFileProcessorView.cpp" line="119"/>
         <source>Amplify:</source>
         <translation>ຂະຫຍາຍສຽງ:</translation>
     </message>
     <message>
-        <location filename="../../plugins/AudioFileProcessor/AudioFileProcessorView.cpp" line="124"/>
+        <location filename="../../plugins/AudioFileProcessor/AudioFileProcessorView.cpp" line="123"/>
         <source>Start point:</source>
         <translation>ຈຸດເລີ່ມຕົ້ນ:</translation>
     </message>
     <message>
-        <location filename="../../plugins/AudioFileProcessor/AudioFileProcessorView.cpp" line="128"/>
+        <location filename="../../plugins/AudioFileProcessor/AudioFileProcessorView.cpp" line="127"/>
         <source>End point:</source>
         <translation>ຈຸດສິ້ນສຸດ:</translation>
     </message>
     <message>
-        <location filename="../../plugins/AudioFileProcessor/AudioFileProcessorView.cpp" line="132"/>
+        <location filename="../../plugins/AudioFileProcessor/AudioFileProcessorView.cpp" line="131"/>
         <source>Loopback point:</source>
         <translation>ຈຸດວົນກັບ:</translation>
     </message>
@@ -6322,9 +6207,48 @@ Please make sure you have read-permission to the file and the directory containi
 <context>
     <name>lmms::gui::AudioFileProcessorWaveView</name>
     <message>
-        <location filename="../../plugins/AudioFileProcessor/AudioFileProcessorWaveView.cpp" line="304"/>
+        <location filename="../../plugins/AudioFileProcessor/AudioFileProcessorWaveView.cpp" line="310"/>
         <source>Sample length:</source>
         <translation>ຄວາມຍາວຂອງຕົວຢ່າງສຽງ:</translation>
+    </message>
+</context>
+<context>
+    <name>lmms::gui::AudioPortAudioSetupWidget</name>
+    <message>
+        <location filename="../../src/core/audio/AudioPortAudio.cpp" line="276"/>
+        <source>Input device</source>
+        <translation>ອຸປະກອນນຳເຂົ້າ</translation>
+    </message>
+    <message>
+        <location filename="../../src/core/audio/AudioPortAudio.cpp" line="277"/>
+        <source>Output device</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../../src/core/audio/AudioPortAudio.cpp" line="284"/>
+        <source>Backend</source>
+        <translation>Backend</translation>
+    </message>
+</context>
+<context>
+    <name>lmms::gui::AudioPortAudioSetupWidget::DeviceSelectorWidget</name>
+    <message>
+        <location filename="../../src/core/audio/AudioPortAudio.cpp" line="224"/>
+        <source>Channels</source>
+        <translation>ຊ່ອງສັນຍານ</translation>
+    </message>
+</context>
+<context>
+    <name>lmms::gui::AutomatableSlider</name>
+    <message>
+        <location filename="../../src/gui/widgets/AutomatableSlider.cpp" line="121"/>
+        <source>Set value</source>
+        <translation>ຕັ້ງຄ່າ</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/widgets/AutomatableSlider.cpp" line="122"/>
+        <source>Please enter a new value between %1 and %2:</source>
+        <translation>ກະລຸນາປ້ອນຄ່າໃໝ່ລະຫວ່າງ %1 ຫາ %2:</translation>
     </message>
 </context>
 <context>
@@ -6375,7 +6299,7 @@ Please make sure you have read-permission to the file and the directory containi
         <translation>ຕັດການເຊື່ອມຕໍ່ &quot;%1&quot;</translation>
     </message>
     <message>
-        <location filename="../../src/gui/clips/AutomationClipView.cpp" line="436"/>
+        <location filename="../../src/gui/clips/AutomationClipView.cpp" line="438"/>
         <source>Model is already connected to this clip.</source>
         <translation>ໂມເດວໄດ້ເຊື່ອມຕໍ່ກັບຄລິບນີ້ແລ້ວ.</translation>
     </message>
@@ -6383,147 +6307,147 @@ Please make sure you have read-permission to the file and the directory containi
 <context>
     <name>lmms::gui::AutomationEditor</name>
     <message>
-        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="356"/>
+        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="345"/>
         <source>Edit Value</source>
         <translation>ແກ້ໄຂຄ່າ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="358"/>
+        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="347"/>
         <source>New outValue</source>
         <translation>ຄ່າອອກ (outValue) ໃໝ່</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="359"/>
+        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="348"/>
         <source>New inValue</source>
         <translation>ຄ່າເຂົ້າ (inValue) ໃໝ່</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="1416"/>
-        <source>Please open an automation clip by double-clicking on it!</source>
-        <translation>ກະລຸນາເປີດຄລິບອັດຕະໂນມັດໂດຍການດັບເບິ້ນຄລິກໃສ່ມັນ!</translation>
+        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="1057"/>
+        <source>Double-click on an automation clip in Song Editor to open it here</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>lmms::gui::AutomationEditorWindow</name>
     <message>
-        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2054"/>
+        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2025"/>
         <source>Play/pause current clip (Space)</source>
         <translation>ຫຼິ້ນ/ຢຸດຊົ່ວຄາວ ຄລິບປັດຈຸບັນ (Space)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2056"/>
+        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2027"/>
         <source>Stop playing of current clip (Space)</source>
         <translation>ຢຸດຫຼິ້ນຄລິບປັດຈຸບັນ (Space)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2059"/>
+        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2030"/>
         <source>Edit actions</source>
         <translation>ການກະທຳການແກ້ໄຂ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2062"/>
+        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2033"/>
         <source>Draw mode (Shift+D)</source>
         <translation>ໂໝດແຕ້ມ (Shift+D)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2066"/>
+        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2038"/>
         <source>Erase mode (Shift+E)</source>
         <translation>ໂໝດລຶບ (Shift+E)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2069"/>
+        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2041"/>
         <source>Draw outValues mode (Shift+C)</source>
         <translation>ໂໝດແຕ້ມຄ່າອອກ (Shift+C)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2072"/>
+        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2044"/>
         <source>Edit tangents mode (Shift+T)</source>
         <translation>ໂໝດແກ້ໄຂເສັ້ນສຳຜັດ (Shift+T)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2076"/>
+        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2048"/>
         <source>Flip vertically</source>
         <translation>ພິກທາງຕັ້ງ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2077"/>
+        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2049"/>
         <source>Flip horizontally</source>
         <translation>ພິກທາງນອນ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2089"/>
+        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2061"/>
         <source>Interpolation controls</source>
         <translation>ຄວບຄຸມການເຊື່ອມຕໍ່ຈຸດ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2094"/>
+        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2066"/>
         <source>Discrete progression</source>
         <translation>ການເຊື່ອມຕໍ່ແບບຂັ້ນ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2098"/>
+        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2070"/>
         <source>Linear progression</source>
         <translation>ການເຊື່ອມຕໍ່ແບບເສັ້ນຊື່</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2100"/>
+        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2072"/>
         <source>Cubic Hermite progression</source>
         <translation>ການເຊື່ອມຕໍ່ແບບ Cubic Hermite</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2107"/>
+        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2079"/>
         <source>Tension value for spline</source>
         <translation>ຄ່າຄວາມຕຶງສຳລັບເສັ້ນໂຄ້ງ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2116"/>
+        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2088"/>
         <source>Tension: </source>
         <translation>ຄວາມຕຶງ: </translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2124"/>
+        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2096"/>
         <source>Zoom controls</source>
         <translation>ຄວບຄຸມການຊູມ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2131"/>
+        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2103"/>
         <source>Horizontal zooming</source>
         <translation>ຊູມທາງນອນ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2149"/>
+        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2121"/>
         <source>Vertical zooming</source>
         <translation>ຊູມທາງຕັ້ງ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2170"/>
+        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2142"/>
         <source>Quantization controls</source>
         <translation>ຄວບຄຸມການ Quantization</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2177"/>
+        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2149"/>
         <source>Quantization</source>
         <translation>Quantization</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2186"/>
+        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2158"/>
         <source>Clear ghost notes</source>
         <translation>ລຶບໂນດເງົາ (Ghost notes)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2218"/>
-        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2334"/>
+        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2190"/>
+        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2306"/>
         <source>Automation Editor - no clip</source>
         <translation>ໂຕແກ້ໄຂອັດຕະໂນມັດ - ບໍ່ມີຄລິບ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2222"/>
-        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2338"/>
+        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2194"/>
+        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2310"/>
         <source>Automation Editor - %1</source>
         <translation>ໂຕແກ້ໄຂອັດຕະໂນມັດ - %1</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2275"/>
+        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2247"/>
         <source>Model is already connected to this clip.</source>
         <translation>ໂມເດວໄດ້ເຊື່ອມຕໍ່ກັບຄລິບນີ້ແລ້ວ.</translation>
     </message>
@@ -6794,7 +6718,7 @@ Please make sure you have read-permission to the file and the directory containi
         <translation>ສະແດງສະເພາະປຸ່ມທີ່ມີການເຊື່ອມຕໍ່.</translation>
     </message>
     <message>
-        <location filename="../../plugins/CarlaBase/Carla.cpp" line="870"/>
+        <location filename="../../plugins/CarlaBase/Carla.cpp" line="859"/>
         <source> - Parameters</source>
         <translation> - ພາຣາມິເຕີ</translation>
     </message>
@@ -6802,120 +6726,120 @@ Please make sure you have read-permission to the file and the directory containi
 <context>
     <name>lmms::gui::ClipView</name>
     <message>
-        <location filename="../../src/gui/clips/ClipView.cpp" line="697"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="700"/>
         <source>Current position</source>
         <translation>ຕຳແໜ່ງປັດຈຸບັນ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/clips/ClipView.cpp" line="705"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="708"/>
         <source>Current length</source>
         <translation>ຄວາມຍາວປັດຈຸບັນ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/clips/ClipView.cpp" line="706"/>
-        <location filename="../../src/gui/clips/ClipView.cpp" line="985"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="709"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="989"/>
         <source>%1:%2 (%3:%4 to %5:%6)</source>
         <translation>%1:%2 (%3:%4 ຫາ %5:%6)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/clips/ClipView.cpp" line="727"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="730"/>
         <source>Press &lt;%1&gt; and drag to make a copy.</source>
         <translation>ກົດ &lt;%1&gt; ແລະ ລາກເພື່ອສຳເນົາ.</translation>
     </message>
     <message>
-        <location filename="../../src/gui/clips/ClipView.cpp" line="732"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="735"/>
         <source>Press &lt;%1&gt; or &lt;Alt&gt; for unquantized splitting.
 Press &lt;Shift&gt; for destructive splitting.</source>
         <translation>ກົດ &lt;%1&gt; ຫຼື &lt;Alt&gt; ເພື່ອຕັດແບບບໍ່ເຂົ້າຈັງຫວະ (unquantized).
 ກົດ &lt;Shift&gt; ເພື່ອຕັດຂາດ.</translation>
     </message>
     <message>
-        <location filename="../../src/gui/clips/ClipView.cpp" line="733"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="736"/>
         <source>Press &lt;%1&gt; or &lt;Alt&gt; for unquantized splitting.</source>
         <translation>ກົດ &lt;%1&gt; ຫຼື &lt;Alt&gt; ເພື່ອຕັດແບບບໍ່ເຂົ້າຈັງຫວະ (unquantized).</translation>
     </message>
     <message>
-        <location filename="../../src/gui/clips/ClipView.cpp" line="737"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="740"/>
         <source>Press &lt;%1&gt; or &lt;Alt&gt; for unquantized resizing.</source>
         <translation>ກົດ &lt;%1&gt; ຫຼື &lt;Alt&gt; ເພື່ອປັບຂະໜາດແບບບໍ່ເຂົ້າຈັງຫວະ.</translation>
     </message>
     <message>
-        <location filename="../../src/gui/clips/ClipView.cpp" line="739"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="742"/>
         <source>Hint</source>
         <translation>ຄຳແນະນຳ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/clips/ClipView.cpp" line="1086"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="1090"/>
         <source>Delete (middle mousebutton)</source>
         <translation>ລຶບ (ປຸ່ມເມົາສ໌ກາງ)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/clips/ClipView.cpp" line="1087"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="1091"/>
         <source>Delete selection (middle mousebutton)</source>
         <translation>ລຶບທີ່ເລືອກ (ປຸ່ມເມົາສ໌ກາງ)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/clips/ClipView.cpp" line="1095"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="1099"/>
         <source>Cut</source>
         <translation>ຕັດ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/clips/ClipView.cpp" line="1096"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="1100"/>
         <source>Cut selection</source>
         <translation>ຕັດທີ່ເລືອກ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/clips/ClipView.cpp" line="1103"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="1107"/>
         <source>Copy</source>
         <translation>ສຳເນົາ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/clips/ClipView.cpp" line="1104"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="1108"/>
         <source>Copy selection</source>
         <translation>ສຳເນົາທີ່ເລືອກ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/clips/ClipView.cpp" line="1109"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="1113"/>
         <source>Paste</source>
         <translation>ວາງ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/clips/ClipView.cpp" line="1117"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="1127"/>
         <source>Mute/unmute (&lt;%1&gt; + middle click)</source>
         <translation>ປິດ/ເປີດສຽງ (&lt;%1&gt; + ຄລິກເມົາສ໌ກາງ)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/clips/ClipView.cpp" line="1118"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="1128"/>
         <source>Mute/unmute selection (&lt;%1&gt; + middle click)</source>
         <translation>ປິດ/ເປີດສຽງທີ່ເລືອກ (&lt;%1&gt; + ຄລິກເມົາສ໌ກາງ)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/clips/ClipView.cpp" line="1123"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="1133"/>
         <source>Clip color</source>
         <translation>ສີຂອງຄລິບ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/clips/ClipView.cpp" line="1125"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="1135"/>
         <source>Change</source>
         <translation>ປ່ຽນ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/clips/ClipView.cpp" line="1126"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="1136"/>
         <source>Reset</source>
         <translation>ຄືນຄ່າ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/clips/ClipView.cpp" line="1127"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="1137"/>
         <source>Pick random</source>
         <translation>ສຸ່ມເລືອກ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/clips/ClipView.cpp" line="1132"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="1142"/>
         <source>Disable auto-resize</source>
         <translation>ປິດການປັບຂະໜາດອັດຕະໂນມັດ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/clips/ClipView.cpp" line="1132"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="1142"/>
         <source>Enable auto-resize</source>
         <translation>ເປີດການປັບຂະໜາດອັດຕະໂນມັດ</translation>
     </message>
@@ -7375,42 +7299,42 @@ Press &lt;Shift&gt; for destructive splitting.</source>
 <context>
     <name>lmms::gui::ControllerView</name>
     <message>
-        <location filename="../../src/gui/ControllerView.cpp" line="70"/>
+        <location filename="../../src/gui/ControllerView.cpp" line="69"/>
         <source>Controls</source>
         <translation>ການຄວບຄຸມ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/ControllerView.cpp" line="147"/>
+        <location filename="../../src/gui/ControllerView.cpp" line="128"/>
         <source>Rename controller</source>
         <translation>ປ່ຽນຊື່ຕົວຄວບຄຸມ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/ControllerView.cpp" line="148"/>
+        <location filename="../../src/gui/ControllerView.cpp" line="129"/>
         <source>Enter the new name for this controller</source>
         <translation>ໃສ່ຊື່ໃໝ່ສຳລັບຕົວຄວບຄຸມນີ້</translation>
     </message>
     <message>
-        <location filename="../../src/gui/ControllerView.cpp" line="155"/>
+        <location filename="../../src/gui/ControllerView.cpp" line="136"/>
         <source>LFO</source>
         <translation>LFO</translation>
     </message>
     <message>
-        <location filename="../../src/gui/ControllerView.cpp" line="179"/>
+        <location filename="../../src/gui/ControllerView.cpp" line="160"/>
         <source>Move &amp;up</source>
         <translation>ຍ້າຍ&amp;ຂຶ້ນ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/ControllerView.cpp" line="180"/>
+        <location filename="../../src/gui/ControllerView.cpp" line="161"/>
         <source>Move &amp;down</source>
         <translation>ຍ້າຍ&amp;ລົງ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/ControllerView.cpp" line="183"/>
+        <location filename="../../src/gui/ControllerView.cpp" line="164"/>
         <source>&amp;Remove this controller</source>
         <translation>&amp;ລຶບຕົວຄວບຄຸມນີ້</translation>
     </message>
     <message>
-        <location filename="../../src/gui/ControllerView.cpp" line="184"/>
+        <location filename="../../src/gui/ControllerView.cpp" line="165"/>
         <source>Re&amp;name this controller</source>
         <translation>&amp;ປ່ຽນຊື່ຕົວຄວບຄຸມນີ້</translation>
     </message>
@@ -7476,14 +7400,14 @@ Press &lt;Shift&gt; for destructive splitting.</source>
 <context>
     <name>lmms::gui::DelayControlsDialog</name>
     <message>
-        <location filename="../../plugins/Delay/DelayControlsDialog.cpp" line="47"/>
+        <location filename="../../plugins/Delay/DelayControlsDialog.cpp" line="48"/>
         <source>DELAY</source>
         <translation>DELAY</translation>
     </message>
     <message>
         <location filename="../../plugins/Delay/DelayControlsDialog.cpp" line="51"/>
-        <source>Delay time</source>
-        <translation>ເວລາ Delay</translation>
+        <source>Delay time:</source>
+        <translation>ເວລາໜ່ວງ:</translation>
     </message>
     <message>
         <location filename="../../plugins/Delay/DelayControlsDialog.cpp" line="53"/>
@@ -7492,8 +7416,8 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     </message>
     <message>
         <location filename="../../plugins/Delay/DelayControlsDialog.cpp" line="57"/>
-        <source>Feedback amount</source>
-        <translation>ຈຳນວນ Feedback</translation>
+        <source>Feedback amount:</source>
+        <translation>ຈຳນວນສຽງສະທ້ອນກັບ:</translation>
     </message>
     <message>
         <location filename="../../plugins/Delay/DelayControlsDialog.cpp" line="59"/>
@@ -7501,95 +7425,95 @@ Press &lt;Shift&gt; for destructive splitting.</source>
         <translation>RATE</translation>
     </message>
     <message>
-        <location filename="../../plugins/Delay/DelayControlsDialog.cpp" line="63"/>
-        <source>LFO frequency</source>
-        <translation>ຄວາມຖີ່ LFO</translation>
+        <location filename="../../plugins/Delay/DelayControlsDialog.cpp" line="62"/>
+        <source>LFO frequency:</source>
+        <translation>ຄວາມຖີ່ LFO:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Delay/DelayControlsDialog.cpp" line="65"/>
+        <location filename="../../plugins/Delay/DelayControlsDialog.cpp" line="64"/>
         <source>AMNT</source>
         <translation>AMNT</translation>
     </message>
     <message>
-        <location filename="../../plugins/Delay/DelayControlsDialog.cpp" line="69"/>
-        <source>LFO amount</source>
-        <translation>ຈຳນວນ LFO</translation>
+        <location filename="../../plugins/Delay/DelayControlsDialog.cpp" line="67"/>
+        <source>LFO amount:</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/Delay/DelayControlsDialog.cpp" line="72"/>
+        <location filename="../../plugins/Delay/DelayControlsDialog.cpp" line="70"/>
         <source>Out gain</source>
         <translation>ອັດຕາຂະຫຍາຍຂາອອກ</translation>
     </message>
     <message>
-        <location filename="../../plugins/Delay/DelayControlsDialog.cpp" line="76"/>
-        <source>Gain</source>
-        <translation>ອັດຕາຂະຫຍາຍ</translation>
+        <location filename="../../plugins/Delay/DelayControlsDialog.cpp" line="74"/>
+        <source>Gain:</source>
+        <translation>Gain:</translation>
     </message>
 </context>
 <context>
     <name>lmms::gui::DispersionControlDialog</name>
     <message>
-        <location filename="../../plugins/Dispersion/DispersionControlDialog.cpp" line="49"/>
+        <location filename="../../plugins/Dispersion/DispersionControlDialog.cpp" line="50"/>
         <source>AMOUNT</source>
         <translation>AMOUNT</translation>
     </message>
     <message>
-        <location filename="../../plugins/Dispersion/DispersionControlDialog.cpp" line="50"/>
+        <location filename="../../plugins/Dispersion/DispersionControlDialog.cpp" line="51"/>
         <source>Number of all-pass filters</source>
         <translation>ຈຳນວນຂອງ all-pass filters</translation>
     </message>
     <message>
-        <location filename="../../plugins/Dispersion/DispersionControlDialog.cpp" line="53"/>
+        <location filename="../../plugins/Dispersion/DispersionControlDialog.cpp" line="54"/>
         <source>FREQ</source>
         <translation>FREQ</translation>
     </message>
     <message>
-        <location filename="../../plugins/Dispersion/DispersionControlDialog.cpp" line="55"/>
+        <location filename="../../plugins/Dispersion/DispersionControlDialog.cpp" line="56"/>
         <source>Frequency:</source>
         <translation>ຄວາມຖີ່:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Dispersion/DispersionControlDialog.cpp" line="55"/>
+        <location filename="../../plugins/Dispersion/DispersionControlDialog.cpp" line="56"/>
         <source>Hz</source>
         <translation>Hz</translation>
     </message>
     <message>
-        <location filename="../../plugins/Dispersion/DispersionControlDialog.cpp" line="58"/>
+        <location filename="../../plugins/Dispersion/DispersionControlDialog.cpp" line="59"/>
         <source>RESO</source>
         <translation>RESO</translation>
     </message>
     <message>
-        <location filename="../../plugins/Dispersion/DispersionControlDialog.cpp" line="60"/>
+        <location filename="../../plugins/Dispersion/DispersionControlDialog.cpp" line="61"/>
         <source>Resonance:</source>
         <translation>ຄວາມກ້ອງ (Resonance):</translation>
     </message>
     <message>
-        <location filename="../../plugins/Dispersion/DispersionControlDialog.cpp" line="60"/>
+        <location filename="../../plugins/Dispersion/DispersionControlDialog.cpp" line="61"/>
         <source>octaves</source>
         <translation>octaves</translation>
     </message>
     <message>
-        <location filename="../../plugins/Dispersion/DispersionControlDialog.cpp" line="63"/>
+        <location filename="../../plugins/Dispersion/DispersionControlDialog.cpp" line="64"/>
         <source>FEED</source>
         <translation>FEED</translation>
     </message>
     <message>
-        <location filename="../../plugins/Dispersion/DispersionControlDialog.cpp" line="65"/>
+        <location filename="../../plugins/Dispersion/DispersionControlDialog.cpp" line="66"/>
         <source>Feedback:</source>
         <translation>Feedback:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Dispersion/DispersionControlDialog.cpp" line="68"/>
+        <location filename="../../plugins/Dispersion/DispersionControlDialog.cpp" line="69"/>
         <source>DC Offset Removal</source>
         <translation>ການລຶບຄ່າບ່ຽງເບນ DC</translation>
     </message>
     <message>
-        <location filename="../../plugins/Dispersion/DispersionControlDialog.cpp" line="70"/>
+        <location filename="../../plugins/Dispersion/DispersionControlDialog.cpp" line="71"/>
         <source>DC</source>
         <translation>DC</translation>
     </message>
     <message>
-        <location filename="../../plugins/Dispersion/DispersionControlDialog.cpp" line="72"/>
+        <location filename="../../plugins/Dispersion/DispersionControlDialog.cpp" line="73"/>
         <source>Remove DC Offset</source>
         <translation>ລຶບຄ່າບ່ຽງເບນ DC</translation>
     </message>
@@ -7597,68 +7521,68 @@ Press &lt;Shift&gt; for destructive splitting.</source>
 <context>
     <name>lmms::gui::DualFilterControlDialog</name>
     <message>
-        <location filename="../../plugins/DualFilter/DualFilterControlDialog.cpp" line="55"/>
-        <location filename="../../plugins/DualFilter/DualFilterControlDialog.cpp" line="59"/>
+        <location filename="../../plugins/DualFilter/DualFilterControlDialog.cpp" line="57"/>
+        <location filename="../../plugins/DualFilter/DualFilterControlDialog.cpp" line="61"/>
         <source>FREQ</source>
         <translation>FREQ</translation>
     </message>
     <message>
-        <location filename="../../plugins/DualFilter/DualFilterControlDialog.cpp" line="55"/>
-        <location filename="../../plugins/DualFilter/DualFilterControlDialog.cpp" line="59"/>
+        <location filename="../../plugins/DualFilter/DualFilterControlDialog.cpp" line="57"/>
+        <location filename="../../plugins/DualFilter/DualFilterControlDialog.cpp" line="61"/>
         <source>Cutoff frequency</source>
         <translation>ຄວາມຖີ່ Cutoff</translation>
     </message>
     <message>
-        <location filename="../../plugins/DualFilter/DualFilterControlDialog.cpp" line="56"/>
-        <location filename="../../plugins/DualFilter/DualFilterControlDialog.cpp" line="60"/>
+        <location filename="../../plugins/DualFilter/DualFilterControlDialog.cpp" line="58"/>
+        <location filename="../../plugins/DualFilter/DualFilterControlDialog.cpp" line="62"/>
         <source>RESO</source>
         <translation>RESO</translation>
     </message>
     <message>
-        <location filename="../../plugins/DualFilter/DualFilterControlDialog.cpp" line="56"/>
-        <location filename="../../plugins/DualFilter/DualFilterControlDialog.cpp" line="60"/>
+        <location filename="../../plugins/DualFilter/DualFilterControlDialog.cpp" line="58"/>
+        <location filename="../../plugins/DualFilter/DualFilterControlDialog.cpp" line="62"/>
         <source>Resonance</source>
         <translation>ຄວາມກ້ອງ (Resonance)</translation>
     </message>
     <message>
-        <location filename="../../plugins/DualFilter/DualFilterControlDialog.cpp" line="57"/>
-        <location filename="../../plugins/DualFilter/DualFilterControlDialog.cpp" line="61"/>
+        <location filename="../../plugins/DualFilter/DualFilterControlDialog.cpp" line="59"/>
+        <location filename="../../plugins/DualFilter/DualFilterControlDialog.cpp" line="63"/>
         <source>GAIN</source>
         <translation>GAIN</translation>
     </message>
     <message>
-        <location filename="../../plugins/DualFilter/DualFilterControlDialog.cpp" line="57"/>
-        <location filename="../../plugins/DualFilter/DualFilterControlDialog.cpp" line="61"/>
+        <location filename="../../plugins/DualFilter/DualFilterControlDialog.cpp" line="59"/>
+        <location filename="../../plugins/DualFilter/DualFilterControlDialog.cpp" line="63"/>
         <source>Gain</source>
         <translation>ອັດຕາຂະຫຍາຍ</translation>
     </message>
     <message>
-        <location filename="../../plugins/DualFilter/DualFilterControlDialog.cpp" line="58"/>
+        <location filename="../../plugins/DualFilter/DualFilterControlDialog.cpp" line="60"/>
         <source>MIX</source>
         <translation>MIX</translation>
     </message>
     <message>
-        <location filename="../../plugins/DualFilter/DualFilterControlDialog.cpp" line="58"/>
+        <location filename="../../plugins/DualFilter/DualFilterControlDialog.cpp" line="60"/>
         <source>Mix</source>
         <translation>ປະສົມ</translation>
     </message>
     <message>
-        <location filename="../../plugins/DualFilter/DualFilterControlDialog.cpp" line="66"/>
+        <location filename="../../plugins/DualFilter/DualFilterControlDialog.cpp" line="65"/>
         <source>Filter 1 enabled</source>
         <translation>ເປີດໃຊ້ງານ Filter 1</translation>
     </message>
     <message>
-        <location filename="../../plugins/DualFilter/DualFilterControlDialog.cpp" line="67"/>
+        <location filename="../../plugins/DualFilter/DualFilterControlDialog.cpp" line="66"/>
         <source>Filter 2 enabled</source>
         <translation>ເປີດໃຊ້ງານ Filter 2</translation>
     </message>
     <message>
-        <location filename="../../plugins/DualFilter/DualFilterControlDialog.cpp" line="71"/>
+        <location filename="../../plugins/DualFilter/DualFilterControlDialog.cpp" line="70"/>
         <source>Enable/disable filter 1</source>
         <translation>ເປີດ/ປິດ filter 1</translation>
     </message>
     <message>
-        <location filename="../../plugins/DualFilter/DualFilterControlDialog.cpp" line="74"/>
+        <location filename="../../plugins/DualFilter/DualFilterControlDialog.cpp" line="73"/>
         <source>Enable/disable filter 2</source>
         <translation>ເປີດ/ປິດ filter 2</translation>
     </message>
@@ -7671,91 +7595,91 @@ Press &lt;Shift&gt; for destructive splitting.</source>
         <translation>INPUT</translation>
     </message>
     <message>
-        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="67"/>
+        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="66"/>
         <source>Input gain:</source>
         <translation>ອັດຕາຂະຫຍາຍຂາເຂົ້າ:</translation>
     </message>
     <message>
-        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="69"/>
+        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="68"/>
         <source>OUTPUT</source>
         <translation>OUTPUT</translation>
     </message>
     <message>
-        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="74"/>
+        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="72"/>
         <source>Output gain:</source>
         <translation>ອັດຕາຂະຫຍາຍຂາອອກ:</translation>
     </message>
     <message>
-        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="76"/>
+        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="74"/>
         <source>ATTACK</source>
         <translation>ATTACK</translation>
     </message>
     <message>
-        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="79"/>
+        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="77"/>
         <source>Peak attack time:</source>
         <translation>ເວລາ Peak attack:</translation>
     </message>
     <message>
-        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="81"/>
+        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="79"/>
         <source>RELEASE</source>
         <translation>RELEASE</translation>
     </message>
     <message>
-        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="84"/>
+        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="82"/>
         <source>Peak release time:</source>
         <translation>ເວລາ Peak release:</translation>
     </message>
     <message>
-        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="88"/>
-        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="93"/>
+        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="86"/>
+        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="91"/>
         <source>Reset wavegraph</source>
         <translation>ຣີເຊັດກຣາຟຄື້ນ</translation>
     </message>
     <message>
-        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="95"/>
-        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="100"/>
+        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="93"/>
+        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="98"/>
         <source>Smooth wavegraph</source>
         <translation>ເຮັດໃຫ້ກຣາຟຄື້ນລຽບ</translation>
     </message>
     <message>
-        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="102"/>
-        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="107"/>
+        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="100"/>
+        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="105"/>
         <source>Increase wavegraph amplitude by 1 dB</source>
         <translation>ເພີ່ມຄວາມສູງຄື້ນກຣາຟຂຶ້ນ 1 dB</translation>
     </message>
     <message>
-        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="109"/>
-        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="114"/>
+        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="107"/>
+        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="112"/>
         <source>Decrease wavegraph amplitude by 1 dB</source>
         <translation>ຫຼຸດຄວາມສູງຄື້ນກຣາຟລົງ 1 dB</translation>
     </message>
     <message>
-        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="117"/>
+        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="115"/>
         <source>Stereo mode: maximum</source>
         <translation>ໂໝດສະເຕີຣິໂອ: ສູງສຸດ</translation>
     </message>
     <message>
-        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="122"/>
+        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="120"/>
         <source>Process based on the maximum of both stereo channels</source>
         <translation>ປະມວນຜົນໂດຍອີງໃສ່ຄ່າສູງສຸດຂອງທັງສອງຊ່ອງສະເຕີຣິໂອ</translation>
     </message>
     <message>
-        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="124"/>
+        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="122"/>
         <source>Stereo mode: average</source>
         <translation>ໂໝດສະເຕີຣິໂອ: ສະເລ່ຍ</translation>
     </message>
     <message>
-        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="129"/>
+        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="127"/>
         <source>Process based on the average of both stereo channels</source>
         <translation>ປະມວນຜົນໂດຍອີງໃສ່ຄ່າສະເລ່ຍຂອງທັງສອງຊ່ອງສະເຕີຣິໂອ</translation>
     </message>
     <message>
-        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="131"/>
+        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="129"/>
         <source>Stereo mode: unlinked</source>
         <translation>ໂໝດສະເຕີຣິໂອ: ບໍ່ເຊື່ອມຕໍ່</translation>
     </message>
     <message>
-        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="136"/>
+        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="134"/>
         <source>Process each stereo channel independently</source>
         <translation>ປະມວນຜົນແຕ່ລະຊ່ອງສະເຕີຣິໂອຢ່າງອິດສະຫຼະ</translation>
     </message>
@@ -7763,32 +7687,32 @@ Press &lt;Shift&gt; for destructive splitting.</source>
 <context>
     <name>lmms::gui::Editor</name>
     <message>
-        <location filename="../../src/gui/editors/Editor.cpp" line="102"/>
+        <location filename="../../src/gui/editors/Editor.cpp" line="100"/>
         <source>Transport controls</source>
         <translation>ຄວບຄຸມການຫຼິ້ນ (Transport)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/Editor.cpp" line="110"/>
+        <location filename="../../src/gui/editors/Editor.cpp" line="108"/>
         <source>Play (Space)</source>
         <translation>ຫຼິ້ນ (Space)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/Editor.cpp" line="111"/>
+        <location filename="../../src/gui/editors/Editor.cpp" line="109"/>
         <source>Stop (Space)</source>
         <translation>ຢຸດ (Space)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/Editor.cpp" line="113"/>
+        <location filename="../../src/gui/editors/Editor.cpp" line="111"/>
         <source>Record</source>
         <translation>ບັນທຶກ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/Editor.cpp" line="114"/>
+        <location filename="../../src/gui/editors/Editor.cpp" line="112"/>
         <source>Record while playing</source>
         <translation>ບັນທຶກຂະນະຫຼິ້ນ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/Editor.cpp" line="115"/>
+        <location filename="../../src/gui/editors/Editor.cpp" line="113"/>
         <source>Toggle Step Recording</source>
         <translation>ເປີດ/ປິດ Step Recording</translation>
     </message>
@@ -7815,7 +7739,6 @@ Press &lt;Shift&gt; for destructive splitting.</source>
     </message>
     <message>
         <location filename="../../src/gui/modals/EffectSelectDialog.cpp" line="81"/>
-        <location filename="../../src/gui/modals/EffectSelectDialog.cpp" line="286"/>
         <source>Name</source>
         <translation>ຊື່</translation>
     </message>
@@ -7830,184 +7753,195 @@ Press &lt;Shift&gt; for destructive splitting.</source>
         <translation>ທັງໝົດ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/EffectSelectDialog.cpp" line="145"/>
+        <location filename="../../src/gui/modals/EffectSelectDialog.cpp" line="140"/>
         <source>Search</source>
         <translation>ຄົ້ນຫາ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/EffectSelectDialog.cpp" line="287"/>
-        <source>Description</source>
-        <translation>ລາຍລະອຽດ</translation>
+        <location filename="../../src/gui/modals/EffectSelectDialog.cpp" line="288"/>
+        <source>&lt;b&gt;Name: &lt;/b&gt;</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/modals/EffectSelectDialog.cpp" line="288"/>
-        <source>Author</source>
-        <translation>ຜູ້ສ້າງ</translation>
+        <location filename="../../src/gui/modals/EffectSelectDialog.cpp" line="289"/>
+        <source>&lt;b&gt;Author: &lt;/b&gt;</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/EffectSelectDialog.cpp" line="291"/>
+        <source>&lt;b&gt;Description: &lt;/b&gt;</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>lmms::gui::EffectView</name>
     <message>
-        <location filename="../../src/gui/EffectView.cpp" line="64"/>
+        <location filename="../../src/gui/EffectView.cpp" line="63"/>
+        <location filename="../../src/gui/EffectView.cpp" line="259"/>
         <source>On/Off</source>
         <translation>ເປີດ/ປິດ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/EffectView.cpp" line="66"/>
+        <location filename="../../src/gui/EffectView.cpp" line="67"/>
         <source>W/D</source>
         <translation>W/D</translation>
     </message>
     <message>
-        <location filename="../../src/gui/EffectView.cpp" line="69"/>
+        <location filename="../../src/gui/EffectView.cpp" line="70"/>
         <source>Wet Level:</source>
         <translation>ລະດັບ Wet:</translation>
     </message>
     <message>
-        <location filename="../../src/gui/EffectView.cpp" line="72"/>
+        <location filename="../../src/gui/EffectView.cpp" line="73"/>
         <source>DECAY</source>
         <translation>DECAY</translation>
     </message>
     <message>
-        <location filename="../../src/gui/EffectView.cpp" line="75"/>
+        <location filename="../../src/gui/EffectView.cpp" line="76"/>
         <source>Time:</source>
         <translation>ເວລາ:</translation>
     </message>
     <message>
-        <location filename="../../src/gui/EffectView.cpp" line="81"/>
+        <location filename="../../src/gui/EffectView.cpp" line="82"/>
         <source>Controls</source>
         <translation>ການຄວບຄຸມ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/EffectView.cpp" line="192"/>
+        <location filename="../../src/gui/EffectView.cpp" line="166"/>
         <source>Move &amp;up</source>
         <translation>ຍ້າຍ&amp;ຂຶ້ນ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/EffectView.cpp" line="195"/>
+        <location filename="../../src/gui/EffectView.cpp" line="169"/>
         <source>Move &amp;down</source>
         <translation>ຍ້າຍ&amp;ລົງ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/EffectView.cpp" line="199"/>
+        <location filename="../../src/gui/EffectView.cpp" line="173"/>
         <source>&amp;Remove this plugin</source>
         <translation>&amp;ລຶບປລັກອິນນີ້</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/EffectView.cpp" line="254"/>
+        <source>Corrupted audio detected: muting affected channels</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>lmms::gui::EnvelopeAndLfoView</name>
     <message>
-        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="90"/>
-        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="176"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="89"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="175"/>
         <source>AMT</source>
         <translation>AMT</translation>
     </message>
     <message>
-        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="90"/>
-        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="176"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="89"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="175"/>
         <source>Modulation amount:</source>
         <translation>ຈຳນວນ Modulation:</translation>
     </message>
     <message>
-        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="96"/>
-        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="166"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="95"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="165"/>
         <source>DEL</source>
         <translation>DEL</translation>
     </message>
     <message>
-        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="96"/>
-        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="166"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="95"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="165"/>
         <source>Pre-delay:</source>
         <translation>ເວລາໜ່ວງ (Pre-delay):</translation>
     </message>
     <message>
-        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="99"/>
-        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="169"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="98"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="168"/>
         <source>ATT</source>
         <translation>ATT</translation>
     </message>
     <message>
-        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="99"/>
-        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="169"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="98"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="168"/>
         <source>Attack:</source>
         <translation>ເວລາເລີ່ມ (Attack):</translation>
     </message>
     <message>
-        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="102"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="101"/>
         <source>HOLD</source>
         <translation>HOLD</translation>
     </message>
     <message>
-        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="102"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="101"/>
         <source>Hold:</source>
         <translation>ຄ້າງໄວ້ (Hold):</translation>
     </message>
     <message>
-        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="105"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="104"/>
         <source>DEC</source>
         <translation>DEC</translation>
     </message>
     <message>
-        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="105"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="104"/>
         <source>Decay:</source>
         <translation>ເວລາຜ່ອນ (Decay):</translation>
     </message>
     <message>
-        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="108"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="107"/>
         <source>SUST</source>
         <translation>SUST</translation>
     </message>
     <message>
-        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="108"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="107"/>
         <source>Sustain:</source>
         <translation>ລະດັບສຽງຄົງທີ່ (Sustain):</translation>
     </message>
     <message>
-        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="111"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="110"/>
         <source>REL</source>
         <translation>REL</translation>
     </message>
     <message>
-        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="111"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="110"/>
         <source>Release:</source>
         <translation>ເວລາປ່ອຍ (Release):</translation>
     </message>
     <message>
-        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="172"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="171"/>
         <source>SPD</source>
         <translation>SPD</translation>
     </message>
     <message>
-        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="173"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="172"/>
         <source>Frequency:</source>
         <translation>ຄວາມຖີ່:</translation>
     </message>
     <message>
-        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="182"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="181"/>
         <source>FREQ x 100</source>
         <translation>FREQ x 100</translation>
     </message>
     <message>
-        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="183"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="182"/>
         <source>Multiply LFO frequency by 100</source>
         <translation>ຄູນຄວາມຖີ່ LFO ດ້ວຍ 100</translation>
     </message>
     <message>
-        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="186"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="185"/>
         <source>MOD ENV AMOUNT</source>
         <translation>MOD ENV AMOUNT</translation>
     </message>
     <message>
-        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="187"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="186"/>
         <source>Control envelope amount by this LFO</source>
         <translation>ຄວບຄຸມຈຳນວນ envelope ດ້ວຍ LFO ນີ້</translation>
     </message>
     <message>
-        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="275"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="274"/>
         <source>Hint</source>
         <translation>ຄຳແນະນຳ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="276"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="275"/>
         <source>Drag and drop a sample into this window.</source>
         <translation>ລາກ ແລະ ວາງຕົວຢ່າງສຽງໃສ່ໜ້າຕ່າງນີ້.</translation>
     </message>
@@ -8110,32 +8044,32 @@ Press &lt;Shift&gt; for destructive splitting.</source>
         <translation>ອັດຕາຂະຫຍາຍຂາອອກ</translation>
     </message>
     <message>
-        <location filename="../../plugins/Eq/EqControlsDialog.cpp" line="112"/>
+        <location filename="../../plugins/Eq/EqControlsDialog.cpp" line="111"/>
         <source>Bandwidth: </source>
         <translation>ແບນວິດ: </translation>
     </message>
     <message>
-        <location filename="../../plugins/Eq/EqControlsDialog.cpp" line="112"/>
+        <location filename="../../plugins/Eq/EqControlsDialog.cpp" line="111"/>
         <source> Octave</source>
         <translation> Octave</translation>
     </message>
     <message>
-        <location filename="../../plugins/Eq/EqControlsDialog.cpp" line="113"/>
+        <location filename="../../plugins/Eq/EqControlsDialog.cpp" line="112"/>
         <source>Resonance: </source>
         <translation>ເຣໂຊແນນ (Resonance): </translation>
     </message>
     <message>
-        <location filename="../../plugins/Eq/EqControlsDialog.cpp" line="119"/>
+        <location filename="../../plugins/Eq/EqControlsDialog.cpp" line="117"/>
         <source>Frequency:</source>
         <translation>ຄວາມຖີ່:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Eq/EqControlsDialog.cpp" line="201"/>
+        <location filename="../../plugins/Eq/EqControlsDialog.cpp" line="199"/>
         <source>LP group</source>
         <translation>ກຸ່ມ LP</translation>
     </message>
     <message>
-        <location filename="../../plugins/Eq/EqControlsDialog.cpp" line="207"/>
+        <location filename="../../plugins/Eq/EqControlsDialog.cpp" line="205"/>
         <source>HP group</source>
         <translation>ກຸ່ມ HP</translation>
     </message>
@@ -8174,37 +8108,123 @@ Please make sure you have write permission to the file and the directory contain
 ກະລຸນາກວດສອບວ່າເຈົ້າມີສິດຂຽນໄຟລ໌ ແລະ ໂຟນເດີທີ່ບັນຈຸໄຟລ໌ນັ້ນ ແລ້ວລອງໃໝ່ອີກຄັ້ງ!</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/ExportProjectDialog.cpp" line="47"/>
-        <source>Export project to %1</source>
-        <translation>ສົ່ງອອກໂຄງການໄປຍັງ %1</translation>
+        <location filename="../../src/gui/modals/ExportProjectDialog.cpp" line="56"/>
+        <source>File format:</source>
+        <translation>ຮູບແບບໄຟລ໌:</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/ExportProjectDialog.cpp" line="87"/>
-        <source>( Fastest - biggest )</source>
-        <translation>( ໄວສຸດ - ໃຫຍ່ສຸດ )</translation>
+        <location filename="../../src/gui/modals/ExportProjectDialog.cpp" line="58"/>
+        <source>Sampling rate:</source>
+        <translation>ອັດຕາ Sampling:</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/ExportProjectDialog.cpp" line="88"/>
-        <source>( Slowest - smallest )</source>
-        <translation>( ຊ້າສຸດ - ນ້ອຍສຸດ )</translation>
+        <location filename="../../src/gui/modals/ExportProjectDialog.cpp" line="60"/>
+        <source>Bit rate:</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/modals/ExportProjectDialog.cpp" line="103"/>
-        <source>%1 Hz</source>
-        <translation>%1 Hz</translation>
+        <location filename="../../src/gui/modals/ExportProjectDialog.cpp" line="62"/>
+        <source>Bit depth:</source>
+        <translation>ຄວາມລະອຽດບິດ (Bit depth):</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/ExportProjectDialog.cpp" line="260"/>
-        <source>Error</source>
-        <translation>ຜິດພາດ</translation>
+        <location filename="../../src/gui/modals/ExportProjectDialog.cpp" line="66"/>
+        <source>Compression level:</source>
+        <translation>ລະດັບການບີບອັດ:</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/ExportProjectDialog.cpp" line="261"/>
-        <source>Error while determining file-encoder device. Please try to choose a different output format.</source>
-        <translation>ເກີດຂໍ້ຜິດພາດໃນຂະນະກຳນົດອຸປະກອນເຂົ້າລະຫັດໄຟລ໌. ກະລຸນາລອງເລືອກຮູບແບບຂາອອກອື່ນ.</translation>
+        <location filename="../../src/gui/modals/ExportProjectDialog.cpp" line="68"/>
+        <source>File format settings</source>
+        <translation>ຕັ້ງຄ່າຮູບແບບໄຟລ໌</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/ExportProjectDialog.cpp" line="292"/>
+        <location filename="../../src/gui/modals/ExportProjectDialog.cpp" line="70"/>
+        <source>Export as loop (remove extra bar)</source>
+        <translation>ສົ່ງອອກເປັນ Loop (ລົບຫ້ອງທີ່ເກີນອອກ)</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/ExportProjectDialog.cpp" line="71"/>
+        <source>Export between loop markers</source>
+        <translation>ສົ່ງອອກລະຫວ່າງຈຸດໝາຍ Loop</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/ExportProjectDialog.cpp" line="72"/>
+        <source>Render looped section:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/ExportProjectDialog.cpp" line="74"/>
+        <source>Start</source>
+        <translation>ເລີ່ມຕົ້ນ</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/ExportProjectDialog.cpp" line="75"/>
+        <source>Cancel</source>
+        <translation>ຍົກເລີກ</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/ExportProjectDialog.cpp" line="80"/>
+        <source>Export project</source>
+        <translation>ສົ່ງອອກໂຄງການ (Export)</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/ExportProjectDialog.cpp" line="90"/>
+        <location filename="../../src/gui/modals/ExportProjectDialog.cpp" line="96"/>
+        <source>%1 %2</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/ExportProjectDialog.cpp" line="105"/>
+        <source>16 Bit integer</source>
+        <translation>16 Bit integer</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/ExportProjectDialog.cpp" line="108"/>
+        <source>24 Bit integer</source>
+        <translation>24 Bit integer</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/ExportProjectDialog.cpp" line="111"/>
+        <source>32 Bit float</source>
+        <translation>32 Bit float</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/ExportProjectDialog.cpp" line="124"/>
+        <source>Mono</source>
+        <translation>ໂມໂນ</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/ExportProjectDialog.cpp" line="127"/>
+        <source>Stereo</source>
+        <translation>Stereo</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/ExportProjectDialog.cpp" line="130"/>
+        <source>Joint stereo</source>
+        <translation>Joint stereo</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/ExportProjectDialog.cpp" line="144"/>
+        <source>%1 (Fastest, biggest)</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/ExportProjectDialog.cpp" line="147"/>
+        <source>%1 (Slowest, smallest)</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/ExportProjectDialog.cpp" line="160"/>
+        <source>Export settings</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/ExportProjectDialog.cpp" line="183"/>
+        <source> time(s)</source>
+        <translation> ຄັ້ງ</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/ExportProjectDialog.cpp" line="293"/>
         <source>Rendering: %1%</source>
         <translation>ກຳລັງປະມວນຜົນ: %1%</translation>
     </message>
@@ -8212,25 +8232,30 @@ Please make sure you have write permission to the file and the directory contain
 <context>
     <name>lmms::gui::Fader</name>
     <message>
-        <location filename="../../src/gui/widgets/Fader.cpp" line="136"/>
-        <location filename="../../src/gui/widgets/Fader.cpp" line="151"/>
-        <source>Set value</source>
-        <translation>ກຳນົດຄ່າ</translation>
+        <location filename="../../src/gui/widgets/Fader.cpp" line="91"/>
+        <source>Volume:</source>
+        <translation>ລະດັບສຽງ:</translation>
     </message>
     <message>
         <location filename="../../src/gui/widgets/Fader.cpp" line="137"/>
         <location filename="../../src/gui/widgets/Fader.cpp" line="152"/>
+        <source>Set value</source>
+        <translation>ກຳນົດຄ່າ</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/widgets/Fader.cpp" line="138"/>
+        <location filename="../../src/gui/widgets/Fader.cpp" line="153"/>
         <source>Please enter a new value between %1 and %2:</source>
         <translation>ກະລຸນາປ້ອນຄ່າໃໝ່ລະຫວ່າງ %1 ແລະ %2:</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/Fader.cpp" line="515"/>
+        <location filename="../../src/gui/widgets/Fader.cpp" line="520"/>
         <source>Volume: %1 dB</source>
         <translation>ລະດັບສຽງ: %1 dB</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/Fader.cpp" line="522"/>
-        <location filename="../../src/gui/widgets/Fader.cpp" line="530"/>
+        <location filename="../../src/gui/widgets/Fader.cpp" line="527"/>
+        <location filename="../../src/gui/widgets/Fader.cpp" line="535"/>
         <source>-inf</source>
         <translation>-inf</translation>
     </message>
@@ -8238,32 +8263,32 @@ Please make sure you have write permission to the file and the directory contain
 <context>
     <name>lmms::gui::FileBrowser</name>
     <message>
-        <location filename="../../src/gui/FileBrowser.cpp" line="92"/>
+        <location filename="../../src/gui/FileBrowser.cpp" line="94"/>
         <source>Browser</source>
         <translation>ຕົວທ່ອງເບິ່ງ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/FileBrowser.cpp" line="104"/>
+        <location filename="../../src/gui/FileBrowser.cpp" line="106"/>
         <source>Search</source>
         <translation>ຄົ້ນຫາ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/FileBrowser.cpp" line="114"/>
+        <location filename="../../src/gui/FileBrowser.cpp" line="116"/>
         <source>Refresh list</source>
         <translation>ໂຫຼດລາຍຊື່ຄືນໃໝ່</translation>
     </message>
     <message>
-        <location filename="../../src/gui/FileBrowser.cpp" line="185"/>
+        <location filename="../../src/gui/FileBrowser.cpp" line="193"/>
         <source>User content</source>
         <translation>ເນື້ອຫາຂອງຜູ້ໃຊ້</translation>
     </message>
     <message>
-        <location filename="../../src/gui/FileBrowser.cpp" line="190"/>
+        <location filename="../../src/gui/FileBrowser.cpp" line="198"/>
         <source>Factory content</source>
         <translation>ເນື້ອຫາຈາກໂຮງງານ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/FileBrowser.cpp" line="194"/>
+        <location filename="../../src/gui/FileBrowser.cpp" line="202"/>
         <source>Hidden content</source>
         <translation>ເນື້ອຫາທີ່ເຊື່ອງໄວ້</translation>
     </message>
@@ -8271,113 +8296,112 @@ Please make sure you have write permission to the file and the directory contain
 <context>
     <name>lmms::gui::FileBrowserTreeWidget</name>
     <message>
-        <location filename="../../src/gui/FileBrowser.cpp" line="585"/>
+        <location filename="../../src/gui/FileBrowser.cpp" line="609"/>
         <source>Finder</source>
         <translation>Finder</translation>
     </message>
     <message>
-        <location filename="../../src/gui/FileBrowser.cpp" line="587"/>
+        <location filename="../../src/gui/FileBrowser.cpp" line="611"/>
         <source>Explorer</source>
         <translation>Explorer</translation>
     </message>
     <message>
-        <location filename="../../src/gui/FileBrowser.cpp" line="589"/>
+        <location filename="../../src/gui/FileBrowser.cpp" line="613"/>
         <source>file manager</source>
         <translation>ຕົວຈັດການໄຟລ໌</translation>
     </message>
     <message>
-        <location filename="../../src/gui/FileBrowser.cpp" line="612"/>
+        <location filename="../../src/gui/FileBrowser.cpp" line="645"/>
         <source>Show in %1</source>
         <translation>ສະແດງໃນ %1</translation>
     </message>
     <message>
-        <location filename="../../src/gui/FileBrowser.cpp" line="618"/>
-        <location filename="../../src/gui/FileBrowser.cpp" line="637"/>
-        <source>Send to active instrument-track</source>
-        <translation>ສົ່ງໄປຍັງແທຣັກເຄື່ອງດົນຕີທີ່ໃຊ້ຢູ່</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/FileBrowser.cpp" line="626"/>
+        <location filename="../../src/gui/FileBrowser.cpp" line="653"/>
         <source>Remove favorite file</source>
         <translation>ລຶບໄຟລ໌ທີ່ມັກອອກ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/FileBrowser.cpp" line="631"/>
+        <location filename="../../src/gui/FileBrowser.cpp" line="658"/>
         <source>Add favorite file</source>
         <translation>ເພີ່ມໄຟລ໌ທີ່ມັກ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/FileBrowser.cpp" line="640"/>
+        <location filename="../../src/gui/FileBrowser.cpp" line="663"/>
+        <source>Send to active instrument-track</source>
+        <translation>ສົ່ງໄປຍັງແທຣັກເຄື່ອງດົນຕີທີ່ໃຊ້ຢູ່</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/FileBrowser.cpp" line="666"/>
         <source>Song Editor</source>
         <translation>ຕົວແກ້ໄຂເພງ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/FileBrowser.cpp" line="645"/>
+        <location filename="../../src/gui/FileBrowser.cpp" line="667"/>
         <source>Pattern Editor</source>
         <translation>ຕົວແກ້ໄຂແພັດເທີນ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/FileBrowser.cpp" line="655"/>
+        <location filename="../../src/gui/FileBrowser.cpp" line="675"/>
         <source>Open in %1</source>
         <translation>ເປີດໃນ %1</translation>
     </message>
     <message>
-        <location filename="../../src/gui/FileBrowser.cpp" line="661"/>
+        <location filename="../../src/gui/FileBrowser.cpp" line="681"/>
         <source>Remove favorite folder</source>
         <translation>ລຶບໂຟນເດີທີ່ມັກອອກ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/FileBrowser.cpp" line="665"/>
+        <location filename="../../src/gui/FileBrowser.cpp" line="685"/>
         <source>Add favorite folder</source>
         <translation>ເພີ່ມໂຟນເດີທີ່ມັກ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/FileBrowser.cpp" line="691"/>
+        <location filename="../../src/gui/FileBrowser.cpp" line="731"/>
         <source>Send to new AudioFileProcessor instance</source>
         <translation>ສົ່ງໄປຍັງ AudioFileProcessor ໂຕໃໝ່</translation>
     </message>
     <message>
-        <location filename="../../src/gui/FileBrowser.cpp" line="692"/>
+        <location filename="../../src/gui/FileBrowser.cpp" line="732"/>
         <source>Send to new instrument track</source>
         <translation>ສົ່ງໄປຍັງແທຣັກເຄື່ອງດົນຕີໃໝ່</translation>
     </message>
     <message>
-        <location filename="../../src/gui/FileBrowser.cpp" line="695"/>
+        <location filename="../../src/gui/FileBrowser.cpp" line="735"/>
         <source> (%2Enter)</source>
         <translation> (%2Enter)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/FileBrowser.cpp" line="702"/>
+        <location filename="../../src/gui/FileBrowser.cpp" line="742"/>
         <source>Send to new sample track (Shift + Enter)</source>
         <translation>ສົ່ງໄປຍັງແທຣັກຕົວຢ່າງສຽງໃໝ່ (Shift + Enter)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/FileBrowser.cpp" line="710"/>
+        <location filename="../../src/gui/FileBrowser.cpp" line="750"/>
         <source>Send to new SlicerT instance</source>
         <translation>ສົ່ງໄປຍັງ SlicerT ໂຕໃໝ່</translation>
     </message>
     <message>
-        <location filename="../../src/gui/FileBrowser.cpp" line="767"/>
+        <location filename="../../src/gui/FileBrowser.cpp" line="809"/>
         <source>Loading sample</source>
         <translation>ກຳລັງໂຫຼດຕົວຢ່າງສຽງ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/FileBrowser.cpp" line="768"/>
+        <location filename="../../src/gui/FileBrowser.cpp" line="810"/>
         <source>Please wait, loading sample for preview...</source>
         <translation>ກະລຸນາລໍຖ້າ, ກຳລັງໂຫຼດຕົວຢ່າງສຽງເພື່ອເບິ່ງຕົວຢ່າງ...</translation>
     </message>
     <message>
-        <location filename="../../src/gui/FileBrowser.cpp" line="798"/>
+        <location filename="../../src/gui/FileBrowser.cpp" line="840"/>
         <source>Error</source>
         <translation>ຜິດພາດ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/FileBrowser.cpp" line="799"/>
+        <location filename="../../src/gui/FileBrowser.cpp" line="841"/>
         <source>%1 does not appear to be a valid %2 file</source>
         <translation>%1 ເບິ່ງຄືວ່າບໍ່ແມ່ນໄຟລ໌ %2 ທີ່ຖືກຕ້ອງ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/FileBrowser.cpp" line="1091"/>
+        <location filename="../../src/gui/FileBrowser.cpp" line="1131"/>
         <source>--- Factory files ---</source>
         <translation>--- ໄຟລ໌ຈາກໂຮງງານ ---</translation>
     </message>
@@ -8385,17 +8409,22 @@ Please make sure you have write permission to the file and the directory contain
 <context>
     <name>lmms::gui::FileDialog</name>
     <message>
-        <location filename="../../src/gui/SampleLoader.cpp" line="58"/>
+        <location filename="../../src/gui/modals/FileDialog.cpp" line="149"/>
+        <source>Open audio file</source>
+        <translation>ເປີດໄຟລ໌ສຽງ</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/FileDialog.cpp" line="167"/>
         <source>%1 files</source>
         <translation>ໄຟລ໌ %1</translation>
     </message>
     <message>
-        <location filename="../../src/gui/SampleLoader.cpp" line="62"/>
+        <location filename="../../src/gui/modals/FileDialog.cpp" line="171"/>
         <source>All audio files</source>
         <translation>ໄຟລ໌ສຽງທັງໝົດ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/SampleLoader.cpp" line="64"/>
+        <location filename="../../src/gui/modals/FileDialog.cpp" line="173"/>
         <source>Other files</source>
         <translation>ໄຟລ໌ອື່ນໆ</translation>
     </message>
@@ -8403,7 +8432,7 @@ Please make sure you have write permission to the file and the directory contain
 <context>
     <name>lmms::gui::FlangerControlsDialog</name>
     <message>
-        <location filename="../../plugins/Flanger/FlangerControlsDialog.cpp" line="50"/>
+        <location filename="../../plugins/Flanger/FlangerControlsDialog.cpp" line="51"/>
         <source>DELAY</source>
         <translation>DELAY</translation>
     </message>
@@ -8418,52 +8447,52 @@ Please make sure you have write permission to the file and the directory contain
         <translation>RATE</translation>
     </message>
     <message>
-        <location filename="../../plugins/Flanger/FlangerControlsDialog.cpp" line="58"/>
+        <location filename="../../plugins/Flanger/FlangerControlsDialog.cpp" line="57"/>
         <source>Period:</source>
         <translation>ໄລຍະເວລາ:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Flanger/FlangerControlsDialog.cpp" line="60"/>
+        <location filename="../../plugins/Flanger/FlangerControlsDialog.cpp" line="59"/>
         <source>AMNT</source>
         <translation>AMNT</translation>
     </message>
     <message>
-        <location filename="../../plugins/Flanger/FlangerControlsDialog.cpp" line="63"/>
+        <location filename="../../plugins/Flanger/FlangerControlsDialog.cpp" line="61"/>
         <source>Amount:</source>
         <translation>ຈຳນວນ:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Flanger/FlangerControlsDialog.cpp" line="65"/>
+        <location filename="../../plugins/Flanger/FlangerControlsDialog.cpp" line="63"/>
         <source>PHASE</source>
         <translation>PHASE</translation>
     </message>
     <message>
-        <location filename="../../plugins/Flanger/FlangerControlsDialog.cpp" line="68"/>
+        <location filename="../../plugins/Flanger/FlangerControlsDialog.cpp" line="65"/>
         <source>Phase:</source>
         <translation>ເຟສ:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Flanger/FlangerControlsDialog.cpp" line="70"/>
+        <location filename="../../plugins/Flanger/FlangerControlsDialog.cpp" line="67"/>
         <source>FDBK</source>
         <translation>FDBK</translation>
     </message>
     <message>
-        <location filename="../../plugins/Flanger/FlangerControlsDialog.cpp" line="73"/>
+        <location filename="../../plugins/Flanger/FlangerControlsDialog.cpp" line="70"/>
         <source>Feedback amount:</source>
         <translation>ຈຳນວນສຽງສະທ້ອນກັບ:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Flanger/FlangerControlsDialog.cpp" line="75"/>
+        <location filename="../../plugins/Flanger/FlangerControlsDialog.cpp" line="72"/>
         <source>NOISE</source>
         <translation>NOISE</translation>
     </message>
     <message>
-        <location filename="../../plugins/Flanger/FlangerControlsDialog.cpp" line="78"/>
+        <location filename="../../plugins/Flanger/FlangerControlsDialog.cpp" line="75"/>
         <source>White noise amount:</source>
         <translation>ຈຳນວນສຽງລົບກວນ (White noise):</translation>
     </message>
     <message>
-        <location filename="../../plugins/Flanger/FlangerControlsDialog.cpp" line="87"/>
+        <location filename="../../plugins/Flanger/FlangerControlsDialog.cpp" line="84"/>
         <source>Invert</source>
         <translation>ກັບດ້ານ</translation>
     </message>
@@ -8471,28 +8500,22 @@ Please make sure you have write permission to the file and the directory contain
 <context>
     <name>lmms::gui::FloatModelEditorBase</name>
     <message>
-        <location filename="../../src/gui/widgets/FloatModelEditorBase.cpp" line="114"/>
+        <location filename="../../src/gui/widgets/FloatModelEditorBase.cpp" line="157"/>
         <source>Set linear</source>
         <translation>ກຳນົດເປັນເສັ້ນຊື່ (Linear)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/FloatModelEditorBase.cpp" line="114"/>
+        <location filename="../../src/gui/widgets/FloatModelEditorBase.cpp" line="157"/>
         <source>Set logarithmic</source>
         <translation>ກຳນົດເປັນໂລກາຣິດ (Logarithmic)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/FloatModelEditorBase.cpp" line="385"/>
-        <location filename="../../src/gui/widgets/FloatModelEditorBase.cpp" line="402"/>
+        <location filename="../../src/gui/widgets/FloatModelEditorBase.cpp" line="505"/>
         <source>Set value</source>
         <translation>ກຳນົດຄ່າ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/FloatModelEditorBase.cpp" line="386"/>
-        <source>Please enter a new value between -96.0 dBFS and 6.0 dBFS:</source>
-        <translation>ກະລຸນາປ້ອນຄ່າໃໝ່ລະຫວ່າງ -96.0 dBFS ແລະ 6.0 dBFS:</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/widgets/FloatModelEditorBase.cpp" line="403"/>
+        <location filename="../../src/gui/widgets/FloatModelEditorBase.cpp" line="506"/>
         <source>Please enter a new value between %1 and %2:</source>
         <translation>ກະລຸນາປ້ອນຄ່າໃໝ່ລະຫວ່າງ %1 ແລະ %2:</translation>
     </message>
@@ -8688,6 +8711,82 @@ Please make sure you have write permission to the file and the directory contain
         <location filename="../../plugins/FreeBoy/FreeBoy.cpp" line="669"/>
         <source>Wave pattern graph</source>
         <translation>ກຣາບຮູບແບບຄື້ນ</translation>
+    </message>
+</context>
+<context>
+    <name>lmms::gui::FrequencyShifterControlDialog</name>
+    <message>
+        <location filename="../../plugins/FrequencyShifter/FrequencyShifterControlDialog.cpp" line="90"/>
+        <source>Frequency Shift</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../../plugins/FrequencyShifter/FrequencyShifterControlDialog.cpp" line="121"/>
+        <source>Send</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../../plugins/FrequencyShifter/FrequencyShifterControlDialog.cpp" line="124"/>
+        <source>Route: Send</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../../plugins/FrequencyShifter/FrequencyShifterControlDialog.cpp" line="128"/>
+        <source>Pass</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../../plugins/FrequencyShifter/FrequencyShifterControlDialog.cpp" line="131"/>
+        <source>Route: Pass</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../../plugins/FrequencyShifter/FrequencyShifterControlDialog.cpp" line="135"/>
+        <source>Mute</source>
+        <translation>ປິດສຽງ</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/FrequencyShifter/FrequencyShifterControlDialog.cpp" line="138"/>
+        <source>Route: Mute</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../../plugins/FrequencyShifter/FrequencyShifterControlDialog.cpp" line="148"/>
+        <source>Reset Shifter</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../../plugins/FrequencyShifter/FrequencyShifterControlDialog.cpp" line="151"/>
+        <source>Reset the shifter&apos;s oscillator phases to 0 (automatable)</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../../plugins/FrequencyShifter/FrequencyShifterControlDialog.cpp" line="156"/>
+        <source>Reset LFO</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../../plugins/FrequencyShifter/FrequencyShifterControlDialog.cpp" line="159"/>
+        <source>Reset the LFO phase to 0 (automatable)</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../../plugins/FrequencyShifter/FrequencyShifterControlDialog.cpp" line="168"/>
+        <source>Open help window</source>
+        <translation>ເປີດໜ້າຕ່າງຊ່ວຍເຫຼືອ</translation>
+    </message>
+</context>
+<context>
+    <name>lmms::gui::FrequencyShifterHelpView</name>
+    <message>
+        <location filename="../../plugins/FrequencyShifter/FrequencyShifterControlDialog.cpp" line="178"/>
+        <source>&lt;div style=&apos;text-align: center;&apos;&gt;&lt;b&gt;Frequency Shifter&lt;/b&gt;&lt;br&gt;&lt;br&gt;Plugin by Lost Robot&lt;br&gt;GUI by Haeleon&lt;br&gt;&lt;/div&gt;&lt;h3&gt;Overview:&lt;/h3&gt;Frequency Shifter is &lt;b&gt;not&lt;/b&gt; a pitch shifter.&lt;br&gt;&lt;br&gt;While &amp;quot;frequency&amp;quot; refers to Hz, &amp;quot;pitch&amp;quot; refers to octaves, semitones, cents, etc. &lt;br&gt;So, pitch shifting impacts all partials in the audio multiplicatively, while frequency shifting impacts it additively.&lt;br&gt;For example: If you have frequencies 100, 200, and 300 Hz, a pitch shift upward by 1.2x would result in 120, 240, and 360 Hz. Meanwhile, a frequency shift upward by 20 Hz would result in 120, 220, and 320 Hz.&lt;br&gt;Notice that a pitch shifter preserves the harmonic relationships between these frequencies, while frequency shifting destroys them entirely, resulting in an inharmonic timbre.&lt;br&gt;&lt;br&gt;A frequency shifter can also be used as a &amp;quot;barberpole phaser&amp;quot;. This is similar to other phasers, but unlike those, it can audibly move upward or downward infinitely, similar to a Shepard tone.&lt;br&gt;To achieve this, simply set the frequency shift amount to your desired phaser rate, and set the Mix to 50%. The resulting phase cancellation will filter the audio.&lt;br&gt;You may also achieve this by simply increasing the delay feedback, and keeping the delay length very low.&lt;br&gt;&lt;br&gt;This frequency shifter sports a unique &amp;quot;anti-reflect&amp;quot; algorithm which eliminates all frequencies aliasing through Nyquist and 0 Hz.&lt;br&gt;&lt;br&gt;This plugin may also be used as a ring modulator via the RING parameter. Ring modulation is the result of frequency shifting the audio upward and downward by the same amount in parallel.&lt;br&gt;&lt;br&gt;&lt;h3&gt;Shifter:&lt;/h3&gt;&lt;b&gt;Mix&lt;/b&gt; - Blends between the wet and dry signals.&lt;br&gt;&lt;b&gt;Frequency Shift&lt;/b&gt; - The amount of frequency shifting, in Hz.&lt;br&gt;&lt;b&gt;Spread&lt;/b&gt; - Offsets the frequency shift amount in opposite directions for the left and right channels.&lt;br&gt;Even very small amounts will add a lot of stereo width to the signal.&lt;br&gt;&lt;b&gt;Phase&lt;/b&gt; - Gives you manual control over the phase of the frequency shifter&apos;s internal oscillators.&lt;br&gt;When using the frequency shifter as a barberpole phaser, it is recommended to set the frequency shift amount to 0 and automate this Phase parameter.&lt;br&gt;&lt;b&gt;Ring&lt;/b&gt; - Blends in ring modulation, instead of just frequency shifting.&lt;br&gt;&lt;b&gt;Harm&lt;/b&gt; - Distorts the frequency shifter&apos;s internal sine oscillators. This brings them much closer to a smoothed square shape.&lt;br&gt;&lt;b&gt;Tone&lt;/b&gt; - A basic 1-pole lowpass on the frequency shifter&apos;s output, helpful for taming harsh high frequencies.&lt;br&gt;&lt;b&gt;Glide&lt;/b&gt; - Lowpass filters any frequency shift and phase parameter movements, so they move slowly over time rather than snapping to their target value instantly.&lt;br&gt;&lt;b&gt;Reset&lt;/b&gt; - Instantly resets the phases of the frequency shifter&apos;s internal oscillators. This is automatable.&lt;br&gt;&lt;b&gt;Anti-reflect&lt;/b&gt; - Magic.&lt;br&gt;It removes all aliased frequencies through Nyquist and through 0 Hz. This is done via clean and CPU-efficient math tricks, not oversampling.&lt;br&gt;&lt;br&gt;&lt;h3&gt;LFO:&lt;/h3&gt;This modulates the frequency shift amount. Audio-rate modulation is fully supported.&lt;br&gt;&lt;br&gt;&lt;b&gt;Amount&lt;/b&gt; - The amplitude of the LFO.&lt;br&gt;&lt;b&gt;Rate&lt;/b&gt; - LFO rate, in Hz.&lt;br&gt;&lt;b&gt;Stereo Phase&lt;/b&gt; - Offsets the phase of the LFO&apos;s right channel, making things stereo.&lt;br&gt;&lt;b&gt;Reset&lt;/b&gt; - Instantly resets the phases of the LFO&apos;s oscillators. This is automatable.&lt;br&gt;&lt;br&gt;&lt;h3&gt;Routing:&lt;/h3&gt;&lt;b&gt;Send&lt;/b&gt; - Sends the frequency shifter output into the delay.&lt;br&gt;&lt;b&gt;Pass&lt;/b&gt; - The audio input bypasses the frequency shifter, and is sent to both the delay and the output. The frequency shifter is now located inside of the delay line. Use this if you want the frequency shifter to only impact the echoes.&lt;br&gt;&lt;b&gt;Mute&lt;/b&gt; - Like &amp;quot;Pass&amp;quot; routing, except the input signal isn&apos;t sent to the output, so all you hear is the output from the delay line.&lt;br&gt;&lt;br&gt;&lt;h3&gt;Delay:&lt;/h3&gt;&lt;b&gt;Length&lt;/b&gt; - Delay time in milliseconds.&lt;br&gt;&lt;b&gt;Fine&lt;/b&gt; - Identical to delay Length, but with a smaller knob range. This is helpful when using the feedback to cause comb filtering, giving you access to a unique phaser/flanger hybrid.&lt;br&gt;&lt;b&gt;Feedback&lt;/b&gt; - Feeds the output of the delay back into the input of the frequency shifter.&lt;br&gt;The delay&apos;s feedback path has very gentle saturation at high amplitudes, so the plugin can&apos;t break from high feedback values.&lt;br&gt;&lt;b&gt;Damping&lt;/b&gt; - A 1-pole lowpass filter in the feedback loop, so high frequencies fade out sooner than low frequencies.&lt;br&gt;&lt;b&gt;Glide&lt;/b&gt; - Lowpass filters any delay length changes, so they move slowly over time rather than snapping to their target value instantly.&lt;br&gt;&lt;b&gt;Help&lt;/b&gt; - Instantly spawns a kiwano in a randomized location on the planet. 30 second cooldown.&lt;br&gt;</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../../plugins/FrequencyShifter/FrequencyShifterControlDialog.cpp" line="247"/>
+        <source>Frequency Shifter Help</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -9126,200 +9225,205 @@ Please make sure you have write permission to the file and the directory contain
 <context>
     <name>lmms::gui::InstrumentTrackView</name>
     <message>
-        <location filename="../../src/gui/tracks/InstrumentTrackView.cpp" line="81"/>
+        <location filename="../../src/gui/tracks/InstrumentTrackView.cpp" line="85"/>
         <source>Mixer channel</source>
         <translation>ຊ່ອງມິກເຊີ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/tracks/InstrumentTrackView.cpp" line="84"/>
+        <location filename="../../src/gui/tracks/InstrumentTrackView.cpp" line="88"/>
         <source>VOL</source>
         <translation>VOL</translation>
     </message>
     <message>
-        <location filename="../../src/gui/tracks/InstrumentTrackView.cpp" line="87"/>
+        <location filename="../../src/gui/tracks/InstrumentTrackView.cpp" line="90"/>
         <source>Volume:</source>
         <translation>ລະດັບສຽງ:</translation>
     </message>
     <message>
-        <location filename="../../src/gui/tracks/InstrumentTrackView.cpp" line="90"/>
+        <location filename="../../src/gui/tracks/InstrumentTrackView.cpp" line="93"/>
         <source>PAN</source>
         <translation>PAN</translation>
     </message>
     <message>
-        <location filename="../../src/gui/tracks/InstrumentTrackView.cpp" line="90"/>
+        <location filename="../../src/gui/tracks/InstrumentTrackView.cpp" line="93"/>
         <source>Panning</source>
         <translation>ການແພນສຽງ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/tracks/InstrumentTrackView.cpp" line="92"/>
+        <location filename="../../src/gui/tracks/InstrumentTrackView.cpp" line="95"/>
         <source>Panning:</source>
         <translation>ການແພນສຽງ:</translation>
     </message>
     <message>
-        <location filename="../../src/gui/tracks/InstrumentTrackView.cpp" line="95"/>
+        <location filename="../../src/gui/tracks/InstrumentTrackView.cpp" line="98"/>
         <source>MIDI</source>
         <translation>MIDI</translation>
     </message>
     <message>
-        <location filename="../../src/gui/tracks/InstrumentTrackView.cpp" line="127"/>
+        <location filename="../../src/gui/tracks/InstrumentTrackView.cpp" line="130"/>
         <source>Input</source>
         <translation>ຂາເຂົ້າ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/tracks/InstrumentTrackView.cpp" line="128"/>
+        <location filename="../../src/gui/tracks/InstrumentTrackView.cpp" line="131"/>
         <source>Output</source>
         <translation>ຂາອອກ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/tracks/InstrumentTrackView.cpp" line="130"/>
+        <location filename="../../src/gui/tracks/InstrumentTrackView.cpp" line="133"/>
         <source>Open/Close MIDI CC Rack</source>
         <translation>ເປີດ/ປິດ MIDI CC Rack</translation>
     </message>
     <message>
-        <location filename="../../src/gui/tracks/InstrumentTrackView.cpp" line="389"/>
+        <location filename="../../src/gui/tracks/InstrumentTrackView.cpp" line="399"/>
         <source>%1: %2</source>
         <translation>%1: %2</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/tracks/InstrumentTrackView.cpp" line="436"/>
+        <source>Corrupted audio detected: muting affected channels</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>lmms::gui::InstrumentTrackWindow</name>
     <message>
-        <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="149"/>
+        <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="138"/>
         <source>Mute</source>
         <translation>ປິດສຽງ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="153"/>
+        <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="142"/>
         <source>Mute this instrument</source>
         <translation>ປິດສຽງເຄື່ອງດົນຕີນີ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="156"/>
+        <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="145"/>
         <source>Solo</source>
         <translation>ຫຼິ້ນດ່ຽວ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="160"/>
+        <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="149"/>
         <source>Solo this instrument</source>
         <translation>ຫຼິ້ນດ່ຽວເຄື່ອງດົນຕີນີ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="166"/>
+        <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="155"/>
         <source>Volume</source>
         <translation>ລະດັບສຽງ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="168"/>
+        <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="156"/>
         <source>Volume:</source>
         <translation>ລະດັບສຽງ:</translation>
     </message>
     <message>
-        <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="173"/>
+        <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="161"/>
         <source>VOL</source>
         <translation>VOL</translation>
     </message>
     <message>
-        <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="179"/>
+        <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="167"/>
         <source>Panning</source>
         <translation>ການແພນສຽງ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="180"/>
+        <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="168"/>
         <source>Panning:</source>
         <translation>ການແພນສຽງ:</translation>
     </message>
     <message>
-        <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="185"/>
+        <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="173"/>
         <source>PAN</source>
         <translation>PAN</translation>
     </message>
     <message>
-        <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="193"/>
+        <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="181"/>
         <source>Pitch</source>
         <translation>ລະດັບສຽງ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="194"/>
+        <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="182"/>
         <source>Pitch:</source>
         <translation>ລະດັບສຽງ (Pitch):</translation>
     </message>
     <message>
-        <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="194"/>
+        <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="182"/>
         <source>cents</source>
         <translation>cents</translation>
     </message>
     <message>
-        <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="199"/>
+        <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="187"/>
         <source>PITCH</source>
         <translation>PITCH</translation>
     </message>
     <message>
-        <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="205"/>
+        <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="193"/>
         <source>Pitch range (semitones)</source>
         <translation>ໄລຍະລະດັບສຽງ (semitones)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="210"/>
+        <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="198"/>
         <source>RANGE</source>
         <translation>RANGE</translation>
     </message>
     <message>
-        <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="218"/>
+        <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="206"/>
         <source>Mixer channel</source>
         <translation>ຊ່ອງມິກເຊີ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="223"/>
+        <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="211"/>
         <source>CHAN</source>
         <translation>CHAN</translation>
     </message>
     <message>
-        <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="233"/>
+        <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="221"/>
         <source>Save current instrument track settings in a preset file</source>
         <translation>ບັນທຶກການຕັ້ງຄ່າແທຣັກເຄື່ອງດົນຕີປັດຈຸບັນໃສ່ໃນໄຟລ໌ Preset</translation>
     </message>
     <message>
-        <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="237"/>
+        <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="225"/>
         <source>SAVE</source>
         <translation>ບັນທຶກ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="276"/>
+        <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="264"/>
         <source>Envelope, filter &amp; LFO</source>
         <translation>Envelope, filter &amp; LFO</translation>
     </message>
     <message>
-        <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="277"/>
+        <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="265"/>
         <source>Chord stacking &amp; arpeggio</source>
         <translation>Chord stacking &amp; arpeggio</translation>
     </message>
     <message>
-        <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="278"/>
+        <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="266"/>
         <source>Effects</source>
         <translation>ເອັບເຟັກ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="279"/>
+        <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="267"/>
         <source>MIDI</source>
         <translation>MIDI</translation>
     </message>
     <message>
-        <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="280"/>
+        <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="268"/>
         <source>Tuning and transposition</source>
         <translation>ການປັບຈູນ ແລະ ການປ່ຽນຄີ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="420"/>
+        <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="407"/>
         <source>Save preset</source>
         <translation>ບັນທຶກ Preset</translation>
     </message>
     <message>
-        <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="420"/>
+        <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="407"/>
         <source>XML preset file (*.xpf)</source>
         <translation>ໄຟລ໌ XML preset (*.xpf)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="480"/>
+        <location filename="../../src/gui/instrument/InstrumentTrackWindow.cpp" line="467"/>
         <source>Plugin</source>
         <translation>ປັກອິນ</translation>
     </message>
@@ -9919,7 +10023,7 @@ Please make sure you have write permission to the file and the directory contain
         <translation>ບໍ່ຮູ້ຈັກ</translation>
     </message>
     <message>
-        <location filename="../../plugins/LadspaBrowser/LadspaBrowser.cpp" line="170"/>
+        <location filename="../../plugins/LadspaBrowser/LadspaBrowser.cpp" line="165"/>
         <source>Type:</source>
         <translation>ປະເພດ:</translation>
     </message>
@@ -10020,22 +10124,22 @@ Please make sure you have write permission to the file and the directory contain
 <context>
     <name>lmms::gui::LadspaMatrixControlDialog</name>
     <message>
-        <location filename="../../plugins/LadspaEffect/LadspaMatrixControlDialog.cpp" line="69"/>
+        <location filename="../../plugins/LadspaEffect/LadspaMatrixControlDialog.cpp" line="70"/>
         <source>Link Channels</source>
         <translation>ເຊື່ອມຕໍ່ຊ່ອງສຽງ</translation>
     </message>
     <message>
-        <location filename="../../plugins/LadspaEffect/LadspaMatrixControlDialog.cpp" line="111"/>
+        <location filename="../../plugins/LadspaEffect/LadspaMatrixControlDialog.cpp" line="107"/>
         <source>Link</source>
         <translation>ເຊື່ອມຕໍ່</translation>
     </message>
     <message>
-        <location filename="../../plugins/LadspaEffect/LadspaMatrixControlDialog.cpp" line="135"/>
+        <location filename="../../plugins/LadspaEffect/LadspaMatrixControlDialog.cpp" line="131"/>
         <source>Channel %1</source>
         <translation>ຊ່ອງສຽງ %1</translation>
     </message>
     <message>
-        <location filename="../../plugins/LadspaEffect/LadspaMatrixControlDialog.cpp" line="155"/>
+        <location filename="../../plugins/LadspaEffect/LadspaMatrixControlDialog.cpp" line="151"/>
         <source>Link channels</source>
         <translation>ເຊື່ອມຕໍ່ຊ່ອງສຽງ</translation>
     </message>
@@ -10127,166 +10231,166 @@ Please make sure you have write permission to the file and the directory contain
 <context>
     <name>lmms::gui::Lb302SynthView</name>
     <message>
-        <location filename="../../plugins/Lb302/Lb302.cpp" line="834"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="630"/>
         <source>Cutoff Freq:</source>
         <translation>ຄວາມຖີ່ຕັດ:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Lb302/Lb302.cpp" line="838"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="634"/>
         <source>Resonance:</source>
         <translation>ສຽງກ້ອງ:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Lb302/Lb302.cpp" line="842"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="638"/>
         <source>Env Mod:</source>
         <translation>ການປັບແຕ່ງ Env:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Lb302/Lb302.cpp" line="846"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="642"/>
         <source>Decay:</source>
         <translation>ການຫຼຸດລົງ:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Lb302/Lb302.cpp" line="861"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="656"/>
         <source>303-es-que, 24dB/octave, 3 pole filter</source>
         <translation>ຄ້າຍກັບ 303, 24dB/octave, ຕົວກອງ 3 pole</translation>
     </message>
     <message>
-        <location filename="../../plugins/Lb302/Lb302.cpp" line="866"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="660"/>
         <source>Slide Decay:</source>
         <translation>ການຫຼຸດລົງແບບສະໄລດ໌:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Lb302/Lb302.cpp" line="870"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="664"/>
         <source>DIST:</source>
         <translation>DIST:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Lb302/Lb302.cpp" line="877"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="671"/>
         <source>Saw wave</source>
         <translation>ຄື້ນແຂ້ວເລື່ອຍ</translation>
     </message>
     <message>
-        <location filename="../../plugins/Lb302/Lb302.cpp" line="884"/>
-        <source>Click here for a saw-wave.</source>
-        <translation>ຄິກບ່ອນນີ້ສຳລັບຄື້ນແຂ້ວເລື່ອຍ.</translation>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="675"/>
+        <source>Click here for a sawtooth wave.</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/Lb302/Lb302.cpp" line="886"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="678"/>
         <source>Triangle wave</source>
         <translation>ຄື້ນສາມຫຼ່ຽມ</translation>
     </message>
     <message>
-        <location filename="../../plugins/Lb302/Lb302.cpp" line="893"/>
-        <source>Click here for a triangle-wave.</source>
-        <translation>ຄິກບ່ອນນີ້ສຳລັບຄື້ນສາມຫຼ່ຽມ.</translation>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="682"/>
+        <source>Click here for a triangle wave.</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/Lb302/Lb302.cpp" line="895"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="685"/>
         <source>Square wave</source>
         <translation>ຄື້ນສີ່ຫຼ່ຽມ</translation>
     </message>
     <message>
-        <location filename="../../plugins/Lb302/Lb302.cpp" line="902"/>
-        <source>Click here for a square-wave.</source>
-        <translation>ຄິກບ່ອນນີ້ສຳລັບຄື້ນສີ່ຫຼ່ຽມ.</translation>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="689"/>
+        <source>Click here for a square wave.</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/Lb302/Lb302.cpp" line="904"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="692"/>
         <source>Rounded square wave</source>
         <translation>ຄື້ນສີ່ຫຼ່ຽມມົນ</translation>
     </message>
     <message>
-        <location filename="../../plugins/Lb302/Lb302.cpp" line="911"/>
-        <source>Click here for a square-wave with a rounded end.</source>
-        <translation>ຄິກບ່ອນນີ້ສຳລັບຄື້ນສີ່ຫຼ່ຽມທີ່ມີປາຍມົນ.</translation>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="696"/>
+        <source>Click here for a square wave with a rounded end.</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/Lb302/Lb302.cpp" line="913"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="699"/>
         <source>Moog wave</source>
         <translation>ຄື້ນ Moog</translation>
     </message>
     <message>
-        <location filename="../../plugins/Lb302/Lb302.cpp" line="920"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="703"/>
         <source>Click here for a moog-like wave.</source>
         <translation>ຄິກບ່ອນນີ້ສຳລັບຄື້ນແບບ Moog.</translation>
     </message>
     <message>
-        <location filename="../../plugins/Lb302/Lb302.cpp" line="922"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="706"/>
         <source>Sine wave</source>
         <translation>ຄື້ນຊາຍ (Sine)</translation>
     </message>
     <message>
-        <location filename="../../plugins/Lb302/Lb302.cpp" line="929"/>
-        <source>Click for a sine-wave.</source>
-        <translation>ຄິກສຳລັບຄື້ນຊາຍ (Sine).</translation>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="710"/>
+        <source>Click for a sine wave.</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/Lb302/Lb302.cpp" line="931"/>
-        <location filename="../../plugins/Lb302/Lb302.cpp" line="940"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="713"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="720"/>
         <source>White noise wave</source>
         <translation>ຄື້ນສຽງລົບກວນຂາວ</translation>
     </message>
     <message>
-        <location filename="../../plugins/Lb302/Lb302.cpp" line="938"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="717"/>
         <source>Click here for an exponential wave.</source>
         <translation>ຄິກບ່ອນນີ້ສຳລັບຄື້ນເອັກສະໂປເນັນຊຽນ.</translation>
     </message>
     <message>
-        <location filename="../../plugins/Lb302/Lb302.cpp" line="947"/>
-        <source>Click here for white-noise.</source>
-        <translation>ຄິກບ່ອນນີ້ສຳລັບສຽງລົບກວນຂາວ.</translation>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="724"/>
+        <source>Click here for white noise.</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/Lb302/Lb302.cpp" line="949"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="727"/>
         <source>Bandlimited saw wave</source>
         <translation>ຄື້ນແຂ້ວເລື່ອຍແບບຈຳກັດແຖບ</translation>
     </message>
     <message>
-        <location filename="../../plugins/Lb302/Lb302.cpp" line="956"/>
-        <source>Click here for bandlimited saw wave.</source>
-        <translation>ຄິກບ່ອນນີ້ສຳລັບຄື້ນແຂ້ວເລື່ອຍແບບຈຳກັດແຖບ.</translation>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="731"/>
+        <source>Click here for bandlimited sawtooth wave.</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/Lb302/Lb302.cpp" line="958"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="734"/>
         <source>Bandlimited square wave</source>
         <translation>ຄື້ນສີ່ຫຼ່ຽມແບບຈຳກັດແຖບ</translation>
     </message>
     <message>
-        <location filename="../../plugins/Lb302/Lb302.cpp" line="965"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="738"/>
         <source>Click here for bandlimited square wave.</source>
         <translation>ຄິກບ່ອນນີ້ສຳລັບຄື້ນສີ່ຫຼ່ຽມແບບຈຳກັດແຖບ.</translation>
     </message>
     <message>
-        <location filename="../../plugins/Lb302/Lb302.cpp" line="967"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="741"/>
         <source>Bandlimited triangle wave</source>
         <translation>ຄື້ນສາມຫຼ່ຽມແບບຈຳກັດແຖບ</translation>
     </message>
     <message>
-        <location filename="../../plugins/Lb302/Lb302.cpp" line="974"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="745"/>
         <source>Click here for bandlimited triangle wave.</source>
         <translation>ຄິກບ່ອນນີ້ສຳລັບຄື້ນສາມຫຼ່ຽມແບບຈຳກັດແຖບ.</translation>
     </message>
     <message>
-        <location filename="../../plugins/Lb302/Lb302.cpp" line="976"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="748"/>
         <source>Bandlimited moog saw wave</source>
         <translation>ຄື້ນແຂ້ວເລື່ອຍ Moog ແບບຈຳກັດແຖບ</translation>
     </message>
     <message>
-        <location filename="../../plugins/Lb302/Lb302.cpp" line="983"/>
-        <source>Click here for bandlimited moog saw wave.</source>
-        <translation>ຄິກບ່ອນນີ້ສຳລັບຄື້ນແຂ້ວເລື່ອຍ Moog ແບບຈຳກັດແຖບ.</translation>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="752"/>
+        <source>Click here for bandlimited moog-like wave.</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>lmms::gui::LcdFloatSpinBox</name>
     <message>
-        <location filename="../../src/gui/widgets/LcdFloatSpinBox.cpp" line="213"/>
+        <location filename="../../src/gui/widgets/LcdFloatSpinBox.cpp" line="216"/>
         <source>Set value</source>
         <translation>ຕັ້ງຄ່າ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/LcdFloatSpinBox.cpp" line="214"/>
+        <location filename="../../src/gui/widgets/LcdFloatSpinBox.cpp" line="217"/>
         <source>Please enter a new value between %1 and %2:</source>
         <translation>ກະລຸນາປ້ອນຄ່າໃໝ່ລະຫວ່າງ %1 ແລະ %2:</translation>
     </message>
@@ -10294,12 +10398,12 @@ Please make sure you have write permission to the file and the directory contain
 <context>
     <name>lmms::gui::LcdSpinBox</name>
     <message>
-        <location filename="../../src/gui/widgets/LcdSpinBox.cpp" line="162"/>
+        <location filename="../../src/gui/widgets/LcdSpinBox.cpp" line="166"/>
         <source>Set value</source>
         <translation>ຕັ້ງຄ່າ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/LcdSpinBox.cpp" line="163"/>
+        <location filename="../../src/gui/widgets/LcdSpinBox.cpp" line="167"/>
         <source>Please enter a new value between %1 and %2:</source>
         <translation>ກະລຸນາປ້ອນຄ່າໃໝ່ລະຫວ່າງ %1 ແລະ %2:</translation>
     </message>
@@ -10307,26 +10411,22 @@ Please make sure you have write permission to the file and the directory contain
 <context>
     <name>lmms::gui::LeftRightNav</name>
     <message>
-        <location filename="../../src/gui/widgets/LeftRightNav.cpp" line="38"/>
-        <location filename="../../src/gui/widgets/LeftRightNav.cpp" line="65"/>
-        <location filename="../../src/gui/widgets/LeftRightNav.cpp" line="68"/>
+        <location filename="../../src/gui/widgets/LeftRightNav.cpp" line="58"/>
         <source>Previous</source>
         <translation>ກ່ອນໜ້າ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/LeftRightNav.cpp" line="39"/>
-        <location filename="../../src/gui/widgets/LeftRightNav.cpp" line="66"/>
-        <location filename="../../src/gui/widgets/LeftRightNav.cpp" line="69"/>
+        <location filename="../../src/gui/widgets/LeftRightNav.cpp" line="59"/>
         <source>Next</source>
         <translation>ຕໍ່ໄປ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/LeftRightNav.cpp" line="93"/>
+        <location filename="../../src/gui/widgets/LeftRightNav.cpp" line="76"/>
         <source>Previous (%1)</source>
         <translation>ກ່ອນໜ້າ (%1)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/LeftRightNav.cpp" line="94"/>
+        <location filename="../../src/gui/widgets/LeftRightNav.cpp" line="77"/>
         <source>Next (%1)</source>
         <translation>ຕໍ່ໄປ (%1)</translation>
     </message>
@@ -10465,22 +10565,22 @@ Double click to pick a file.</source>
 <context>
     <name>lmms::gui::MainWindow</name>
     <message>
-        <location filename="../../src/core/ConfigManager.cpp" line="540"/>
+        <location filename="../../src/core/ConfigManager.cpp" line="541"/>
         <source>Configuration file</source>
         <translation>ໄຟລ໌ການຕັ້ງຄ່າ</translation>
     </message>
     <message>
-        <location filename="../../src/core/ConfigManager.cpp" line="541"/>
+        <location filename="../../src/core/ConfigManager.cpp" line="542"/>
         <source>Error while parsing configuration file at line %1:%2: %3</source>
         <translation>ເກີດຂໍ້ຜິດພາດໃນການວິເຄາະໄຟລ໌ການຕັ້ງຄ່າຢູ່ແຖວ %1:%2: %3</translation>
     </message>
     <message>
-        <location filename="../../src/core/ConfigManager.cpp" line="679"/>
+        <location filename="../../src/core/ConfigManager.cpp" line="680"/>
         <source>Could not open file</source>
         <translation>ບໍ່ສາມາດເປີດໄຟລ໌ໄດ້</translation>
     </message>
     <message>
-        <location filename="../../src/core/ConfigManager.cpp" line="680"/>
+        <location filename="../../src/core/ConfigManager.cpp" line="681"/>
         <source>Could not open file %1 for writing.
 Please make sure you have write permission to the file and the directory containing the file and try again!</source>
         <translation>ບໍ່ສາມາດເປີດໄຟລ໌ %1 ເພື່ອຂຽນໄດ້.
@@ -10574,47 +10674,47 @@ Please make sure you have write permission to the file and the directory contain
         <translation>ກຳລັງໂຫຼດຮູບພື້ນຫຼັງ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="270"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="281"/>
         <source>&amp;File</source>
         <translation>&amp;ໄຟລ໌</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="272"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="283"/>
         <source>&amp;New</source>
         <translation>&amp;ໃໝ່</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="280"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="289"/>
         <source>&amp;Open...</source>
         <translation>&amp;ເປີດ...</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="287"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="294"/>
         <source>&amp;Save</source>
         <translation>&amp;ບັນທຶກ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="291"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="297"/>
         <source>Save &amp;As...</source>
         <translation>ບັນທຶກ &amp;ເປັນ...</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="295"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="300"/>
         <source>Save as New &amp;Version</source>
         <translation>ບັນທຶກເປັນ &amp;ເວີຊັນໃໝ່</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="300"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="303"/>
         <source>Save as default template</source>
         <translation>ບັນທຶກເປັນແມ່ແບບເລີ່ມຕົ້ນ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="305"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="308"/>
         <source>Import...</source>
         <translation>ນຳເຂົ້າ...</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="309"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="311"/>
         <source>E&amp;xport...</source>
         <translation>ສົ່ງ&amp;ອອກ...</translation>
     </message>
@@ -10624,321 +10724,336 @@ Please make sure you have write permission to the file and the directory contain
         <translation>ສົ່ງອອກ &amp;ແທຣັກ...</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="320"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="317"/>
         <source>Export &amp;MIDI...</source>
         <translation>ສົ່ງອອກ &amp;MIDI...</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="326"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="322"/>
         <source>&amp;Quit</source>
         <translation>&amp;ອອກ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="331"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="326"/>
         <source>&amp;Edit</source>
         <translation>&amp;ແກ້ໄຂ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="333"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="328"/>
         <source>Undo</source>
         <translation>ກັບຄືນ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="337"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="331"/>
         <source>Redo</source>
         <translation>ເຮັດຊ້ຳ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="351"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="338"/>
         <source>Scales and keymaps</source>
         <translation>ບັນໄດສຽງ ແລະ ແຜນຜັງຄີ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="353"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="340"/>
         <source>Settings</source>
         <translation>ການຕັ້ງຄ່າ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="359"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="346"/>
         <source>&amp;View</source>
         <translation>&amp;ມຸມມອງ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="375"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="363"/>
         <source>&amp;Tools</source>
         <translation>&amp;ເຄື່ອງມື</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="383"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="371"/>
         <source>&amp;Help</source>
         <translation>&amp;ຊ່ວຍເຫຼືອ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="388"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="376"/>
         <source>Online Help</source>
         <translation>ຊ່ວຍເຫຼືອອອນລາຍ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="394"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="382"/>
         <source>Help</source>
         <translation>ຊ່ວຍເຫຼືອ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="399"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="387"/>
         <source>About</source>
         <translation>ກ່ຽວກັບ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="404"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="392"/>
         <source>Create new project</source>
         <translation>ສ້າງໂປຣເຈັກໃໝ່</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="407"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="395"/>
         <source>Create new project from template</source>
         <translation>ສ້າງໂປຣເຈັກໃໝ່ຈາກແມ່ແບບ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="412"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="400"/>
         <source>Open existing project</source>
         <translation>ເປີດໂປຣເຈັກທີ່ມີຢູ່</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="415"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="403"/>
         <source>Recently opened projects</source>
         <translation>ໂປຣເຈັກທີ່ເປີດລ່າສຸດ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="420"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="408"/>
         <source>Save current project</source>
         <translation>ບັນທຶກໂປຣເຈັກປັດຈຸບັນ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="423"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="411"/>
         <source>Export current project</source>
         <translation>ສົ່ງອອກໂປຣເຈັກປັດຈຸບັນ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="427"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="415"/>
         <source>Metronome</source>
         <translation>ເຄື່ອງໃຫ້ຈັງຫວະ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="444"/>
-        <location filename="../../src/gui/MainWindow.cpp" line="1049"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="432"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="1046"/>
         <source>Song Editor</source>
         <translation>ຕົວແກ້ໄຂເພງ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="449"/>
-        <location filename="../../src/gui/MainWindow.cpp" line="1053"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="437"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="1050"/>
         <source>Pattern Editor</source>
         <translation>ຕົວແກ້ໄຂຮູບແບບ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="453"/>
-        <location filename="../../src/gui/MainWindow.cpp" line="1057"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="441"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="1054"/>
         <source>Piano Roll</source>
         <translation>ປຽໂນໂຣລ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="457"/>
-        <location filename="../../src/gui/MainWindow.cpp" line="1061"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="445"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="1058"/>
         <source>Automation Editor</source>
         <translation>ຕົວແກ້ໄຂການເຮັດວຽກອັດຕະໂນມັດ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="461"/>
-        <location filename="../../src/gui/MainWindow.cpp" line="1066"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="449"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="1063"/>
         <source>Mixer</source>
         <translation>ມິກເຊີ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="465"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="453"/>
         <source>Show/hide controller rack</source>
         <translation>ສະແດງ/ເຊື່ອງຊັ້ນວາງຕົວຄວບຄຸມ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="469"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="457"/>
         <source>Show/hide project notes</source>
         <translation>ສະແດງ/ເຊື່ອງບັນທຶກໂປຣເຈັກ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="575"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="484"/>
+        <source>Failed to setup audio device for playback. Try adjusting your audio device settings (e.g. the sample rate), then restart LMMS.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../../src/gui/MainWindow.cpp" line="574"/>
         <source>Untitled</source>
         <translation>ບໍ່ມີຊື່</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="590"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="589"/>
         <source>Recover session. Please save your work!</source>
         <translation>ກູ້ຄືນເຊສຊັນ. ກະລຸນາບັນທຶກວຽກຂອງທ່ານ!</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="593"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="592"/>
         <source>LMMS %1</source>
         <translation>LMMS %1</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="612"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="611"/>
         <source>Recovered project not saved</source>
         <translation>ໂປຣເຈັກທີ່ກູ້ຄືນຍັງບໍ່ທັນໄດ້ບັນທຶກ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="613"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="612"/>
         <source>This project was recovered from the previous session. It is currently unsaved and will be lost if you don&apos;t save it. Do you want to save it now?</source>
         <translation>ໂປຣເຈັກນີ້ຖືກກູ້ຄືນມາຈາກເຊສຊັນກ່ອນໜ້າ. ມັນຍັງບໍ່ທັນໄດ້ຖືກບັນທຶກ ແລະ ຈະສູນຫາຍຖ້າເຈົ້າບໍ່ບັນທຶກມັນ. ເຈົ້າຕ້ອງການບັນທຶກມັນຕອນນີ້ບໍ່?</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="618"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="617"/>
         <source>Project not saved</source>
         <translation>ໂປຣເຈັກບໍ່ໄດ້ຖືກບັນທຶກ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="619"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="618"/>
         <source>The current project was modified since last saving. Do you want to save it now?</source>
         <translation>ໂປຣເຈັກປັດຈຸບັນມີການແກ້ໄຂຕັ້ງແຕ່ການບັນທຶກຄັ້ງລ່າສຸດ. ເຈົ້າຕ້ອງການບັນທຶກມັນຕອນນີ້ບໍ່?</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="755"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="749"/>
         <source>Open Project</source>
         <translation>ເປີດໂປຣເຈັກ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="755"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="749"/>
         <source>LMMS (*.mmp *.mmpz)</source>
         <translation>LMMS (*.mmp *.mmpz)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="798"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="792"/>
         <source>Save Project</source>
         <translation>ບັນທຶກໂປຣເຈັກ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="799"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="793"/>
         <source>LMMS Project</source>
         <translation>ໂປຣເຈັກ LMMS</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="800"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="794"/>
         <source>LMMS Project Template</source>
         <translation>ແມ່ແບບໂປຣເຈັກ LMMS</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="830"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="824"/>
         <source>Save project template</source>
         <translation>ບັນທຶກແມ່ແບບໂປຣເຈັກ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="878"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="872"/>
         <source>Overwrite default template?</source>
         <translation>ຂຽນທັບແມ່ແບບເລີ່ມຕົ້ນບໍ່?</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="879"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="873"/>
         <source>This will overwrite your current default template.</source>
         <translation>ສິ່ງນີ້ຈະຂຽນທັບແມ່ແບບເລີ່ມຕົ້ນປັດຈຸບັນຂອງທ່ານ.</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="912"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="906"/>
         <source>Help not available</source>
         <translation>ບໍ່ມີຄວາມຊ່ວຍເຫຼືອ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="913"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="907"/>
         <source>Currently there's no help available in LMMS.
 Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
         <translation>ປະຈຸບັນບໍ່ມີຄວາມຊ່ວຍເຫຼືອໃນ LMMS.
 ກະລຸນາເຂົ້າໄປທີ່ http://lmms.sf.net/wiki ສຳລັບເອກະສານກ່ຽວກັບ LMMS.</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="1070"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="1067"/>
         <source>Controller Rack</source>
         <translation>ຊັ້ນວາງຕົວຄວບຄຸມ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="1074"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="1071"/>
         <source>Project Notes</source>
         <translation>ບັນທຶກໂປຣເຈັກ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="1081"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="1078"/>
         <source>Fullscreen</source>
         <translation>ເຕັມໜ້າຈໍ</translation>
     </message>
     <message>
+        <location filename="../../src/gui/MainWindow.cpp" line="1085"/>
+        <source>Detach all subwindows</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
         <location filename="../../src/gui/MainWindow.cpp" line="1090"/>
+        <source>Attach all subwindows</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../../src/gui/MainWindow.cpp" line="1103"/>
         <source>Smooth scroll</source>
         <translation>ການເລື່ອນແບບກ້ຽງ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="1104"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="1117"/>
         <source>Enable note labels in piano roll</source>
         <translation>ເປີດໃຊ້ປ້າຍຊື່ໂນດໃນປຽໂນໂຣລ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="1398"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="1426"/>
         <source>MIDI File (*.mid)</source>
         <translation>ໄຟລ໌ MIDI (*.mid)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="1410"/>
-        <location filename="../../src/gui/MainWindow.cpp" line="1467"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="1438"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="1495"/>
         <source>untitled</source>
         <translation>ບໍ່ມີຊື່</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="1414"/>
-        <location filename="../../src/gui/MainWindow.cpp" line="1470"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="1442"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="1498"/>
         <source>Select file for project-export...</source>
         <translation>ເລືອກໄຟລ໌ສຳລັບການສົ່ງອອກໂປຣເຈັກ...</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="1439"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="1467"/>
         <source>Select directory for writing exported tracks...</source>
         <translation>ເລືອກໄດເລກະທໍລີສຳລັບຂຽນແທຣັກທີ່ສົ່ງອອກ...</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="1501"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="1529"/>
         <source>Save project</source>
         <translation>ບັນທຶກໂປຣເຈັກ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="1518"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="1548"/>
         <source>Project saved</source>
         <translation>ບັນທຶກໂປຣເຈັກແລ້ວ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="1518"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="1548"/>
         <source>The project %1 is now saved.</source>
         <translation>ໂປຣເຈັກ %1 ຖືກບັນທຶກແລ້ວ.</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="1525"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="1555"/>
         <source>Project NOT saved.</source>
         <translation>ໂປຣເຈັກບໍ່ໄດ້ຖືກບັນທຶກ.</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="1525"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="1555"/>
         <source>The project %1 was not saved!</source>
         <translation>ໂປຣເຈັກ %1 ບໍ່ໄດ້ຖືກບັນທຶກ!</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="1564"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="1594"/>
         <source>Import file</source>
         <translation>ນຳເຂົ້າໄຟລ໌</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="1566"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="1596"/>
         <source>MIDI sequences</source>
         <translation>ລຳດັບ MIDI</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="1568"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="1598"/>
         <source>Hydrogen projects</source>
         <translation>ໂປຣເຈັກ Hydrogen</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MainWindow.cpp" line="1570"/>
+        <location filename="../../src/gui/MainWindow.cpp" line="1600"/>
         <source>All file types</source>
         <translation>ປະເພດໄຟລ໌ທັງໝົດ</translation>
     </message>
@@ -11104,23 +11219,23 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
 <context>
     <name>lmms::gui::ManageVSTEffectView</name>
     <message>
-        <location filename="../../plugins/VstEffect/VstEffectControls.cpp" line="338"/>
+        <location filename="../../plugins/VstEffect/VstEffectControls.cpp" line="327"/>
         <source> - VST parameter control</source>
         <translation> - ການຄວບຄຸມພາຣາມິເຕີ VST</translation>
     </message>
     <message>
-        <location filename="../../plugins/VstEffect/VstEffectControls.cpp" line="347"/>
+        <location filename="../../plugins/VstEffect/VstEffectControls.cpp" line="336"/>
         <source>VST sync</source>
         <translation>ການຊິງຄ໌ VST</translation>
     </message>
     <message>
-        <location filename="../../plugins/VstEffect/VstEffectControls.cpp" line="353"/>
-        <location filename="../../plugins/VstEffect/VstEffectControls.cpp" line="479"/>
+        <location filename="../../plugins/VstEffect/VstEffectControls.cpp" line="342"/>
+        <location filename="../../plugins/VstEffect/VstEffectControls.cpp" line="469"/>
         <source>Automated</source>
         <translation>ອັດຕະໂນມັດ</translation>
     </message>
     <message>
-        <location filename="../../plugins/VstEffect/VstEffectControls.cpp" line="360"/>
+        <location filename="../../plugins/VstEffect/VstEffectControls.cpp" line="349"/>
         <source>    Close    </source>
         <translation>    ປິດ    </translation>
     </message>
@@ -11128,24 +11243,24 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
 <context>
     <name>lmms::gui::ManageVestigeInstrumentView</name>
     <message>
-        <location filename="../../plugins/Vestige/Vestige.cpp" line="948"/>
-        <location filename="../../plugins/Vestige/Vestige.cpp" line="1238"/>
+        <location filename="../../plugins/Vestige/Vestige.cpp" line="919"/>
+        <location filename="../../plugins/Vestige/Vestige.cpp" line="1174"/>
         <source> - VST plugin control</source>
         <translation> - ການຄວບຄຸມປລັກອິນ VST</translation>
     </message>
     <message>
-        <location filename="../../plugins/Vestige/Vestige.cpp" line="957"/>
+        <location filename="../../plugins/Vestige/Vestige.cpp" line="928"/>
         <source>VST Sync</source>
         <translation>ການຊິງຄ໌ VST</translation>
     </message>
     <message>
-        <location filename="../../plugins/Vestige/Vestige.cpp" line="963"/>
-        <location filename="../../plugins/Vestige/Vestige.cpp" line="1087"/>
+        <location filename="../../plugins/Vestige/Vestige.cpp" line="934"/>
+        <location filename="../../plugins/Vestige/Vestige.cpp" line="1059"/>
         <source>Automated</source>
         <translation>ອັດຕະໂນມັດ</translation>
     </message>
     <message>
-        <location filename="../../plugins/Vestige/Vestige.cpp" line="970"/>
+        <location filename="../../plugins/Vestige/Vestige.cpp" line="941"/>
         <source>    Close    </source>
         <translation>    ປິດ    </translation>
     </message>
@@ -11194,74 +11309,74 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     </message>
     <message>
         <location filename="../../src/gui/MicrotunerConfig.cpp" line="61"/>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="159"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="149"/>
         <source>First key</source>
         <translation>ຄີທຳອິດ</translation>
     </message>
     <message>
         <location filename="../../src/gui/MicrotunerConfig.cpp" line="62"/>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="165"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="155"/>
         <source>Last key</source>
         <translation>ຄີສຸດທ້າຍ</translation>
     </message>
     <message>
         <location filename="../../src/gui/MicrotunerConfig.cpp" line="63"/>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="171"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="161"/>
         <source>Middle key</source>
         <translation>ຄີກາງ</translation>
     </message>
     <message>
         <location filename="../../src/gui/MicrotunerConfig.cpp" line="64"/>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="177"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="167"/>
         <source>Base key</source>
         <translation>ຄີພື້ນຖານ</translation>
     </message>
     <message>
         <location filename="../../src/gui/MicrotunerConfig.cpp" line="65"/>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="183"/>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="186"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="173"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="176"/>
         <source>Base note frequency</source>
         <translation>ຄວາມຖີ່ໂນດພື້ນຖານ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="78"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="68"/>
         <source>Microtuner Configuration</source>
         <translation>ການຕັ້ງຄ່າ Microtuner</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="87"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="77"/>
         <source>Scale slot to edit:</source>
         <translation>ຊ່ອງບັນໄດສຽງທີ່ຈະແກ້ໄຂ:</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="100"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="90"/>
         <source>Scale description. Cannot start with &quot;!&quot; and cannot contain a newline character.</source>
         <translation>ລາຍລະອຽດບັນໄດສຽງ. ບໍ່ສາມາດເລີ່ມຕົ້ນດ້ວຍ &quot;!&quot; ແລະ ບໍ່ສາມາດມີຕົວອັກສອນຂຶ້ນແຖວໃໝ່.</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="103"/>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="141"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="93"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="131"/>
         <source>Load</source>
         <translation>ໂຫຼດ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="104"/>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="142"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="94"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="132"/>
         <source>Save</source>
         <translation>ບັນທຶກ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="105"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="95"/>
         <source>Load scale definition from a file.</source>
         <translation>ໂຫຼດນິຍາມບັນໄດສຽງຈາກໄຟລ໌.</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="106"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="96"/>
         <source>Save scale definition to a file.</source>
         <translation>ບັນທຶກນິຍາມບັນໄດສຽງລົງໄຟລ໌.</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="114"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="104"/>
         <source>Enter intervals on separate lines. Numbers containing a decimal point are treated as cents.
 Other inputs are treated as integer ratios and must be in the form of 'a/b' or 'a'.
 Unity (0.0 cents or ratio 1/1) is always present as a hidden first value; do not enter it manually.</source>
@@ -11270,37 +11385,37 @@ Unity (0.0 cents or ratio 1/1) is always present as a hidden first value; do not
 ຄວາມເປັນເອກະພາບ (0.0 ເຊັນ ຫຼື ອັດຕາສ່ວນ 1/1) ມີຢູ່ສະເໝີເປັນຄ່າທຳອິດທີ່ເຊື່ອງໄວ້; ຢ່າປ້ອນມັນດ້ວຍຕົນເອງ.</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="117"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="107"/>
         <source>Apply scale changes</source>
         <translation>ນຳໃຊ້ການປ່ຽນແປງບັນໄດສຽງ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="118"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="108"/>
         <source>Verify and apply changes made to the selected scale. To use the scale, select it in the settings of a supported instrument.</source>
         <translation>ກວດສອບ ແລະ ນຳໃຊ້ການປ່ຽນແປງທີ່ເຮັດກັບບັນໄດສຽງທີ່ເລືອກ. ເພື່ອໃຊ້ບັນໄດສຽງ, ເລືອກມັນໃນການຕັ້ງຄ່າຂອງເຄື່ອງດົນຕີທີ່ຮອງຮັບ.</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="125"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="115"/>
         <source>Keymap slot to edit:</source>
         <translation>ຊ່ອງແຜນຜັງຄີທີ່ຈະແກ້ໄຂ:</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="138"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="128"/>
         <source>Keymap description. Cannot start with &quot;!&quot; and cannot contain a newline character.</source>
         <translation>ລາຍລະອຽດແຜນຜັງຄີ. ບໍ່ສາມາດເລີ່ມຕົ້ນດ້ວຍ &quot;!&quot; ແລະ ບໍ່ສາມາດມີຕົວອັກສອນຂຶ້ນແຖວໃໝ່.</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="143"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="133"/>
         <source>Load key mapping definition from a file.</source>
         <translation>ໂຫຼດນິຍາມການແຜນຜັງຄີຈາກໄຟລ໌.</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="144"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="134"/>
         <source>Save key mapping definition to a file.</source>
         <translation>ບັນທຶກນິຍາມການແຜນຜັງຄີລົງໄຟລ໌.</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="152"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="142"/>
         <source>Enter key mappings on separate lines. Each line assigns a scale degree to a MIDI key,
 starting with the middle key and continuing in sequence.
 The pattern repeats for keys outside of the explicit keymap range.
@@ -11313,191 +11428,191 @@ Enter &apos;x&apos; if you wish to leave the key disabled / not mapped.</source>
 ປ້ອນ &apos;x&apos; ຖ້າທ່ານຕ້ອງການປິດການໃຊ້ງານຄີ / ບໍ່ແຜນຜັງ.</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="160"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="150"/>
         <source>FIRST</source>
         <translation>ທຳອິດ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="161"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="151"/>
         <source>First MIDI key that will be mapped</source>
         <translation>ຄີ MIDI ທຳອິດທີ່ຈະຖືກແຜນຜັງ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="166"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="156"/>
         <source>LAST</source>
         <translation>ສຸດທ້າຍ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="167"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="157"/>
         <source>Last MIDI key that will be mapped</source>
         <translation>ຄີ MIDI ສຸດທ້າຍທີ່ຈະຖືກແຜນຜັງ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="172"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="162"/>
         <source>MIDDLE</source>
         <translation>ກາງ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="173"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="163"/>
         <source>First line in the keymap refers to this MIDI key</source>
         <translation>ແຖວທຳອິດໃນແຜນຜັງຄີໝາຍເຖິງຄີ MIDI ນີ້</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="178"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="168"/>
         <source>BASE N.</source>
         <translation>ໂນດພື້ນຖານ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="179"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="169"/>
         <source>Base note frequency will be assigned to this MIDI key</source>
         <translation>ຄວາມຖີ່ໂນດພື້ນຖານຈະຖືກກຳນົດໃຫ້ກັບຄີ MIDI ນີ້</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="184"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="174"/>
         <source>BASE NOTE FREQ</source>
         <translation>ຄວາມຖີ່ໂນດພື້ນຖານ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="189"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="179"/>
         <source>Apply keymap changes</source>
         <translation>ນຳໃຊ້ການປ່ຽນແປງແຜນຜັງຄີ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="190"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="180"/>
         <source>Verify and apply changes made to the selected key mapping. To use the mapping, select it in the settings of a supported instrument.</source>
         <translation>ກວດສອບ ແລະ ນຳໃຊ້ການປ່ຽນແປງທີ່ເຮັດກັບການແຜນຜັງຄີທີ່ເລືອກ. ເພື່ອໃຊ້ການແຜນຜັງ, ເລືອກມັນໃນການຕັ້ງຄ່າຂອງເຄື່ອງດົນຕີທີ່ຮອງຮັບ.</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="328"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="315"/>
         <source>Scale parsing error</source>
         <translation>ຂໍ້ຜິດພາດໃນການວິເຄາະບັນໄດສຽງ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="332"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="319"/>
         <source>Scale name cannot start with an exclamation mark</source>
         <translation>ຊື່ບັນໄດສຽງບໍ່ສາມາດເລີ່ມຕົ້ນດ້ວຍເຄື່ອງໝາຍທ້ວງ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="333"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="320"/>
         <source>Scale name cannot contain a new-line character</source>
         <translation>ຊື່ບັນໄດສຽງບໍ່ສາມາດມີຕົວອັກສອນຂຶ້ນແຖວໃໝ່</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="350"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="333"/>
         <source>Interval defined in cents cannot be converted to a number</source>
         <translation>ໄລຍະຫ່າງທີ່ກຳນົດເປັນເຊັນບໍ່ສາມາດແປງເປັນຕົວເລກໄດ້</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="357"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="340"/>
         <source>Numerator of an interval defined as a ratio cannot be converted to a number</source>
         <translation>ຕົວເສດຂອງໄລຍະຫ່າງທີ່ກຳນົດເປັນອັດຕາສ່ວນບໍ່ສາມາດແປງເປັນຕົວເລກໄດ້</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="362"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="345"/>
         <source>Denominator of an interval defined as a ratio cannot be converted to a number</source>
         <translation>ຕົວສ່ວນຂອງໄລຍະຫ່າງທີ່ກຳນົດເປັນອັດຕາສ່ວນບໍ່ສາມາດແປງເປັນຕົວເລກໄດ້</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="363"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="346"/>
         <source>Interval defined as a ratio cannot be negative</source>
         <translation>ໄລຍະຫ່າງທີ່ກຳນົດເປັນອັດຕາສ່ວນບໍ່ສາມາດເປັນລົບໄດ້</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="376"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="359"/>
         <source>Keymap parsing error</source>
         <translation>ຂໍ້ຜິດພາດໃນການວິເຄາະແຜນຜັງຄີ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="380"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="363"/>
         <source>Keymap name cannot start with an exclamation mark</source>
         <translation>ຊື່ແຜນຜັງຄີບໍ່ສາມາດເລີ່ມຕົ້ນດ້ວຍເຄື່ອງໝາຍທ້ວງ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="381"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="364"/>
         <source>Keymap name cannot contain a new-line character</source>
         <translation>ຊື່ແຜນຜັງຄີບໍ່ສາມາດມີຕົວອັກສອນຂຶ້ນແຖວໃໝ່</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="399"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="378"/>
         <source>Scale degree cannot be converted to a whole number</source>
         <translation>ລະດັບບັນໄດສຽງບໍ່ສາມາດແປງເປັນຈຳນວນຖ້ວນໄດ້</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="400"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="379"/>
         <source>Scale degree cannot be negative</source>
         <translation>ລະດັບບັນໄດສຽງບໍ່ສາມາດເປັນລົບໄດ້</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="497"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="468"/>
         <source>Invalid keymap</source>
         <translation>ແຜນຜັງຄີບໍ່ຖືກຕ້ອງ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="497"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="468"/>
         <source>Base key is not mapped to any scale degree. No sound will be produced as there is no way to assign reference frequency to any note.</source>
         <translation>ຄີພື້ນຖານບໍ່ໄດ້ຖືກແຜນຜັງໃສ່ລະດັບບັນໄດສຽງໃດໆ. ຈະບໍ່ມີສຽງເກີດຂຶ້ນເນື່ອງຈາກບໍ່ມີວິທີກຳນົດຄວາມຖີ່ອ້າງອີງໃຫ້ກັບໂນດໃດໆ.</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="509"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="480"/>
         <source>Open scale</source>
         <translation>ເປີດບັນໄດສຽງ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="509"/>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="593"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="480"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="564"/>
         <source>Scala scale definition (*.scl)</source>
         <translation>ນິຍາມບັນໄດສຽງ Scala (*.scl)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="514"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="485"/>
         <source>Scale load failure</source>
         <translation>ການໂຫຼດບັນໄດສຽງລົ້ມເຫຼວ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="514"/>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="549"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="485"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="520"/>
         <source>Unable to open selected file.</source>
         <translation>ບໍ່ສາມາດເປີດໄຟລ໌ທີ່ເລືອກໄດ້.</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="544"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="515"/>
         <source>Open keymap</source>
         <translation>ເປີດແຜນຜັງຄີ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="544"/>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="629"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="515"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="600"/>
         <source>Scala keymap definition (*.kbm)</source>
         <translation>ນິຍາມແຜນຜັງຄີ Scala (*.kbm)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="549"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="520"/>
         <source>Keymap load failure</source>
         <translation>ການໂຫຼດແຜນຜັງຄີລົ້ມເຫຼວ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="593"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="564"/>
         <source>Save scale</source>
         <translation>ບັນທຶກບັນໄດສຽງ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="599"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="570"/>
         <source>Scale save failure</source>
         <translation>ການບັນທຶກບັນໄດສຽງລົ້ມເຫຼວ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="599"/>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="635"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="570"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="606"/>
         <source>Unable to open selected file for writing.</source>
         <translation>ບໍ່ສາມາດເປີດໄຟລ໌ທີ່ເລືອກເພື່ອຂຽນໄດ້.</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="629"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="600"/>
         <source>Save keymap</source>
         <translation>ບັນທຶກແຜນຜັງຄີ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="635"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="606"/>
         <source>Keymap save failure</source>
         <translation>ການບັນທຶກແຜນຜັງຄີລົ້ມເຫຼວ</translation>
     </message>
@@ -11506,17 +11621,17 @@ Enter &apos;x&apos; if you wish to leave the key disabled / not mapped.</source>
     <name>lmms::gui::MidiCCRackView</name>
     <message>
         <location filename="../../src/gui/MidiCCRackView.cpp" line="50"/>
-        <location filename="../../src/gui/MidiCCRackView.cpp" line="124"/>
+        <location filename="../../src/gui/MidiCCRackView.cpp" line="123"/>
         <source>MIDI CC Rack - %1</source>
         <translation>MIDI CC Rack - %1</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MidiCCRackView.cpp" line="70"/>
+        <location filename="../../src/gui/MidiCCRackView.cpp" line="69"/>
         <source>MIDI CC Knobs:</source>
         <translation>ປຸ່ມໝຸນ MIDI CC:</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MidiCCRackView.cpp" line="93"/>
+        <location filename="../../src/gui/MidiCCRackView.cpp" line="92"/>
         <source>CC %1</source>
         <translation>CC %1</translation>
     </message>
@@ -11624,82 +11739,82 @@ Enter &apos;x&apos; if you wish to leave the key disabled / not mapped.</source>
 <context>
     <name>lmms::gui::MixerChannelView</name>
     <message>
-        <location filename="../../src/gui/MixerChannelView.cpp" line="87"/>
+        <location filename="../../src/gui/MixerChannelView.cpp" line="88"/>
         <source>Channel send amount</source>
         <translation>ຈຳນວນການສົ່ງຊ່ອງ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MixerChannelView.cpp" line="119"/>
+        <location filename="../../src/gui/MixerChannelView.cpp" line="120"/>
         <source>Mute</source>
         <translation>ປິດສຽງ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MixerChannelView.cpp" line="123"/>
+        <location filename="../../src/gui/MixerChannelView.cpp" line="122"/>
         <source>Mute this channel</source>
         <translation>ປິດສຽງຊ່ອງນີ້</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MixerChannelView.cpp" line="125"/>
+        <location filename="../../src/gui/MixerChannelView.cpp" line="126"/>
         <source>Solo</source>
         <translation>ຫຼິ້ນດ່ຽວ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MixerChannelView.cpp" line="129"/>
+        <location filename="../../src/gui/MixerChannelView.cpp" line="128"/>
         <source>Solo this channel</source>
         <translation>ຫຼິ້ນດ່ຽວຊ່ອງນີ້</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MixerChannelView.cpp" line="137"/>
+        <location filename="../../src/gui/MixerChannelView.cpp" line="138"/>
         <source>Fader %1</source>
         <translation>ຕົວເລື່ອນ %1</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MixerChannelView.cpp" line="169"/>
+        <location filename="../../src/gui/MixerChannelView.cpp" line="170"/>
         <source>Move &amp;left</source>
         <translation>ຍ້າຍໄປ&amp;ຊ້າຍ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MixerChannelView.cpp" line="170"/>
+        <location filename="../../src/gui/MixerChannelView.cpp" line="171"/>
         <source>Move &amp;right</source>
         <translation>ຍ້າຍໄປ&amp;ຂວາ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MixerChannelView.cpp" line="173"/>
+        <location filename="../../src/gui/MixerChannelView.cpp" line="174"/>
         <source>Rename &amp;channel</source>
         <translation>ປ່ຽນຊື່&amp;ຊ່ອງ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MixerChannelView.cpp" line="179"/>
+        <location filename="../../src/gui/MixerChannelView.cpp" line="180"/>
         <source>R&amp;emove channel</source>
         <translation>ລຶ&amp;ບຊ່ອງ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MixerChannelView.cpp" line="184"/>
+        <location filename="../../src/gui/MixerChannelView.cpp" line="185"/>
         <source>Remove &amp;unused channels</source>
         <translation>ລຶບຊ່ອງທີ່&amp;ບໍ່ໄດ້ໃຊ້</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MixerChannelView.cpp" line="187"/>
+        <location filename="../../src/gui/MixerChannelView.cpp" line="188"/>
         <source>Color</source>
         <translation>ສີ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MixerChannelView.cpp" line="189"/>
+        <location filename="../../src/gui/MixerChannelView.cpp" line="190"/>
         <source>Change</source>
         <translation>ປ່ຽນ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MixerChannelView.cpp" line="190"/>
+        <location filename="../../src/gui/MixerChannelView.cpp" line="191"/>
         <source>Reset</source>
         <translation>ຣີເຊັດ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MixerChannelView.cpp" line="191"/>
+        <location filename="../../src/gui/MixerChannelView.cpp" line="192"/>
         <source>Pick random</source>
         <translation>ເລືອກແບບສຸ່ມ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MixerChannelView.cpp" line="339"/>
+        <location filename="../../src/gui/MixerChannelView.cpp" line="334"/>
         <source>This Mixer Channel is being used.
 Are you sure you want to remove this channel?
 
@@ -11710,12 +11825,12 @@ Warning: This operation can not be undone.</source>
 ຄຳເຕືອນ: ການດຳເນີນການນີ້ບໍ່ສາມາດຍົກເລີກໄດ້.</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MixerChannelView.cpp" line="343"/>
+        <location filename="../../src/gui/MixerChannelView.cpp" line="338"/>
         <source>Confirm removal</source>
         <translation>ຢືນຢັນການລຶບ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MixerChannelView.cpp" line="344"/>
+        <location filename="../../src/gui/MixerChannelView.cpp" line="339"/>
         <source>Don&apos;t ask again</source>
         <translation>ບໍ່ຕ້ອງຖາມອີກ</translation>
     </message>
@@ -11723,7 +11838,7 @@ Warning: This operation can not be undone.</source>
 <context>
     <name>lmms::gui::MixerView</name>
     <message>
-        <location filename="../../src/gui/MixerView.cpp" line="82"/>
+        <location filename="../../src/gui/MixerView.cpp" line="72"/>
         <source>Mixer</source>
         <translation>ມິກເຊີ</translation>
     </message>
@@ -11741,230 +11856,230 @@ Warning: This operation can not be undone.</source>
         <translation>ມຸມມອງເມທຣິກ</translation>
     </message>
     <message>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1668"/>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1681"/>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1696"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1678"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1689"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1702"/>
         <source>Volume</source>
         <translation>ລະດັບສຽງ</translation>
     </message>
     <message>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1669"/>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1682"/>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1697"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1679"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1690"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1703"/>
         <source>Panning</source>
         <translation>ການແພນສຽງ</translation>
     </message>
     <message>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1670"/>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1683"/>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1698"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1680"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1691"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1704"/>
         <source>Coarse detune</source>
         <translation>ການປັບສຽງພ້ຽນແບບຫຍາບ</translation>
     </message>
     <message>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1670"/>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1683"/>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1698"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1680"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1691"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1704"/>
         <source> semitones</source>
         <translation> ເຄິ່ງສຽງ</translation>
     </message>
     <message>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1671"/>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1684"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1681"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1692"/>
         <source>Fine tune left</source>
         <translation>ປັບສຽງລະອຽດຊ້າຍ</translation>
     </message>
     <message>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1671"/>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1672"/>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1684"/>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1685"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1681"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1682"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1692"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1693"/>
         <source> cents</source>
         <translation> ເຊັນ</translation>
     </message>
     <message>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1672"/>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1685"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1682"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1693"/>
         <source>Fine tune right</source>
         <translation>ປັບສຽງລະອຽດຂວາ</translation>
     </message>
     <message>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1673"/>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1686"/>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1699"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1683"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1694"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1705"/>
         <source>Stereo phase offset</source>
         <translation>ໄລຍະເຟສສະເຕີລິໂອ</translation>
     </message>
     <message>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1673"/>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1686"/>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1699"/>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1718"/>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1725"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1683"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1694"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1705"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1722"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1729"/>
         <source> deg</source>
         <translation> ອົງສາ</translation>
     </message>
     <message>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1674"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1684"/>
         <source>Pulse width</source>
         <translation>ຄວາມກວ້າງຂອງພັລສ໌</translation>
     </message>
     <message>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1678"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1686"/>
         <source>Send sync on pulse rise</source>
         <translation>ສົ່ງ sync ເມື່ອພັລສ໌ຂຶ້ນ</translation>
     </message>
     <message>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1679"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1687"/>
         <source>Send sync on pulse fall</source>
         <translation>ສົ່ງ sync ເມື່ອພັລສ໌ລົງ</translation>
     </message>
     <message>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1693"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1699"/>
         <source>Hard sync oscillator 2</source>
         <translation>Hard sync ຕົວສ້າງຄື້ນ 2</translation>
     </message>
     <message>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1694"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1700"/>
         <source>Reverse sync oscillator 2</source>
         <translation>Reverse sync ຕົວສ້າງຄື້ນ 2</translation>
     </message>
     <message>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1700"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1706"/>
         <source>Sub-osc mix</source>
         <translation>Sub-osc mix</translation>
     </message>
     <message>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1710"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1714"/>
         <source>Hard sync oscillator 3</source>
         <translation>Hard sync ຕົວສ້າງຄື້ນ 3</translation>
     </message>
     <message>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1711"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1715"/>
         <source>Reverse sync oscillator 3</source>
         <translation>Reverse sync ຕົວສ້າງຄື້ນ 3</translation>
     </message>
     <message>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1716"/>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1723"/>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1728"/>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1737"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1720"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1727"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1732"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1741"/>
         <source>Attack</source>
         <translation>Attack</translation>
     </message>
     <message>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1717"/>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1724"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1721"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1728"/>
         <source>Rate</source>
         <translation>ອັດຕາ</translation>
     </message>
     <message>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1718"/>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1725"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1722"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1729"/>
         <source>Phase</source>
         <translation>ເຟສ</translation>
     </message>
     <message>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1727"/>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1736"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1731"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1740"/>
         <source>Pre-delay</source>
         <translation>Pre-delay</translation>
     </message>
     <message>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1729"/>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1738"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1733"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1742"/>
         <source>Hold</source>
         <translation>Hold</translation>
     </message>
     <message>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1730"/>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1739"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1734"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1743"/>
         <source>Decay</source>
         <translation>Decay</translation>
     </message>
     <message>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1732"/>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1740"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1736"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1744"/>
         <source>Sustain</source>
         <translation>Sustain</translation>
     </message>
     <message>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1733"/>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1741"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1737"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1745"/>
         <source>Release</source>
         <translation>Release</translation>
     </message>
     <message>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1734"/>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1742"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1738"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1746"/>
         <source>Slope</source>
         <translation>Slope</translation>
     </message>
     <message>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1749"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1753"/>
         <source>Mix osc 2 with osc 3</source>
         <translation>ປະສົມ osc 2 ກັບ osc 3</translation>
     </message>
     <message>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1755"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1759"/>
         <source>Modulate amplitude of osc 3 by osc 2</source>
         <translation>ປັບແຕ່ງແອມພລິຈູດຂອງ osc 3 ດ້ວຍ osc 2</translation>
     </message>
     <message>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1761"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1765"/>
         <source>Modulate frequency of osc 3 by osc 2</source>
         <translation>ປັບແຕ່ງຄວາມຖີ່ຂອງ osc 3 ດ້ວຍ osc 2</translation>
     </message>
     <message>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1767"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1771"/>
         <source>Modulate phase of osc 3 by osc 2</source>
         <translation>ປັບແຕ່ງເຟສຂອງ osc 3 ດ້ວຍ osc 2</translation>
     </message>
     <message>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1788"/>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1789"/>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1790"/>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1791"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1792"/>
         <location filename="../../plugins/Monstro/Monstro.cpp" line="1793"/>
         <location filename="../../plugins/Monstro/Monstro.cpp" line="1794"/>
         <location filename="../../plugins/Monstro/Monstro.cpp" line="1795"/>
         <location filename="../../plugins/Monstro/Monstro.cpp" line="1796"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1797"/>
         <location filename="../../plugins/Monstro/Monstro.cpp" line="1798"/>
         <location filename="../../plugins/Monstro/Monstro.cpp" line="1799"/>
         <location filename="../../plugins/Monstro/Monstro.cpp" line="1800"/>
         <location filename="../../plugins/Monstro/Monstro.cpp" line="1801"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1802"/>
         <location filename="../../plugins/Monstro/Monstro.cpp" line="1803"/>
         <location filename="../../plugins/Monstro/Monstro.cpp" line="1804"/>
         <location filename="../../plugins/Monstro/Monstro.cpp" line="1805"/>
         <location filename="../../plugins/Monstro/Monstro.cpp" line="1806"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1807"/>
         <location filename="../../plugins/Monstro/Monstro.cpp" line="1808"/>
         <location filename="../../plugins/Monstro/Monstro.cpp" line="1809"/>
         <location filename="../../plugins/Monstro/Monstro.cpp" line="1810"/>
         <location filename="../../plugins/Monstro/Monstro.cpp" line="1811"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1812"/>
         <location filename="../../plugins/Monstro/Monstro.cpp" line="1813"/>
         <location filename="../../plugins/Monstro/Monstro.cpp" line="1814"/>
         <location filename="../../plugins/Monstro/Monstro.cpp" line="1815"/>
         <location filename="../../plugins/Monstro/Monstro.cpp" line="1816"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1817"/>
         <location filename="../../plugins/Monstro/Monstro.cpp" line="1818"/>
         <location filename="../../plugins/Monstro/Monstro.cpp" line="1819"/>
         <location filename="../../plugins/Monstro/Monstro.cpp" line="1820"/>
         <location filename="../../plugins/Monstro/Monstro.cpp" line="1821"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1822"/>
         <location filename="../../plugins/Monstro/Monstro.cpp" line="1823"/>
         <location filename="../../plugins/Monstro/Monstro.cpp" line="1824"/>
         <location filename="../../plugins/Monstro/Monstro.cpp" line="1825"/>
         <location filename="../../plugins/Monstro/Monstro.cpp" line="1826"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1827"/>
         <location filename="../../plugins/Monstro/Monstro.cpp" line="1828"/>
         <location filename="../../plugins/Monstro/Monstro.cpp" line="1829"/>
         <location filename="../../plugins/Monstro/Monstro.cpp" line="1830"/>
         <location filename="../../plugins/Monstro/Monstro.cpp" line="1831"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1832"/>
         <location filename="../../plugins/Monstro/Monstro.cpp" line="1833"/>
         <location filename="../../plugins/Monstro/Monstro.cpp" line="1834"/>
         <location filename="../../plugins/Monstro/Monstro.cpp" line="1835"/>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1836"/>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1838"/>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1839"/>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1840"/>
-        <location filename="../../plugins/Monstro/Monstro.cpp" line="1841"/>
         <source>Modulation amount</source>
         <translation>ຈຳນວນການປັບແຕ່ງ</translation>
     </message>
@@ -12171,26 +12286,26 @@ Warning: This operation can not be undone.</source>
 <context>
     <name>lmms::gui::OpulenzInstrumentView</name>
     <message>
-        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="789"/>
-        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="791"/>
+        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="801"/>
+        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="803"/>
         <source>Attack</source>
         <translation>Attack</translation>
     </message>
     <message>
-        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="793"/>
-        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="795"/>
+        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="805"/>
+        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="807"/>
         <source>Decay</source>
         <translation>Decay</translation>
     </message>
     <message>
-        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="797"/>
-        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="799"/>
+        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="809"/>
+        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="811"/>
         <source>Release</source>
         <translation>Release</translation>
     </message>
     <message>
-        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="801"/>
-        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="803"/>
+        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="813"/>
+        <location filename="../../plugins/OpulenZ/OpulenZ.cpp" line="815"/>
         <source>Frequency multiplier</source>
         <translation>ຕົວຄູນຄວາມຖີ່</translation>
     </message>
@@ -12198,48 +12313,48 @@ Warning: This operation can not be undone.</source>
 <context>
     <name>lmms::gui::OrganicInstrumentView</name>
     <message>
-        <location filename="../../plugins/Organic/Organic.cpp" line="429"/>
+        <location filename="../../plugins/Organic/Organic.cpp" line="411"/>
         <source>Distortion:</source>
         <translation>ສຽງແຕກ (Distortion):</translation>
     </message>
     <message>
-        <location filename="../../plugins/Organic/Organic.cpp" line="437"/>
+        <location filename="../../plugins/Organic/Organic.cpp" line="418"/>
         <source>Volume:</source>
         <translation>ລະດັບສຽງ:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Organic/Organic.cpp" line="441"/>
+        <location filename="../../plugins/Organic/Organic.cpp" line="422"/>
         <source>Randomise</source>
         <translation>ສຸ່ມ</translation>
     </message>
     <message>
-        <location filename="../../plugins/Organic/Organic.cpp" line="498"/>
-        <location filename="../../plugins/Organic/Organic.cpp" line="544"/>
+        <location filename="../../plugins/Organic/Organic.cpp" line="479"/>
+        <location filename="../../plugins/Organic/Organic.cpp" line="524"/>
         <source>Osc %1 waveform:</source>
         <translation>ຮູບຄື້ນ Osc %1:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Organic/Organic.cpp" line="505"/>
+        <location filename="../../plugins/Organic/Organic.cpp" line="485"/>
         <source>Osc %1 volume:</source>
         <translation>ລະດັບສຽງ Osc %1:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Organic/Organic.cpp" line="511"/>
+        <location filename="../../plugins/Organic/Organic.cpp" line="491"/>
         <source>Osc %1 panning:</source>
         <translation>Panning ຂອງ Osc %1:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Organic/Organic.cpp" line="517"/>
+        <location filename="../../plugins/Organic/Organic.cpp" line="497"/>
         <source>Osc %1 stereo detuning</source>
         <translation>ປັບສຽງພ້ຽນ Stereo Osc %1</translation>
     </message>
     <message>
-        <location filename="../../plugins/Organic/Organic.cpp" line="519"/>
+        <location filename="../../plugins/Organic/Organic.cpp" line="499"/>
         <source>cents</source>
         <translation>cents</translation>
     </message>
     <message>
-        <location filename="../../plugins/Organic/Organic.cpp" line="542"/>
+        <location filename="../../plugins/Organic/Organic.cpp" line="522"/>
         <source>Osc %1 harmonic:</source>
         <translation>Osc %1 Harmonic:</translation>
     </message>
@@ -12255,6 +12370,53 @@ Warning: This operation can not be undone.</source>
         <location filename="../../src/gui/widgets/Oscilloscope.cpp" line="205"/>
         <source>Click to enable</source>
         <translation>ຄລິກເພື່ອເປີດໃຊ້ງານ</translation>
+    </message>
+</context>
+<context>
+    <name>lmms::gui::OscilloscopeControlDialog</name>
+    <message>
+        <location filename="../../plugins/Oscilloscope/OscilloscopeControlDialog.cpp" line="56"/>
+        <location filename="../../plugins/Oscilloscope/OscilloscopeControlDialog.cpp" line="57"/>
+        <source>Pause</source>
+        <translation>ຢຸດຊົ່ວຄາວ</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/Oscilloscope/OscilloscopeControlDialog.cpp" line="64"/>
+        <source>Stereo</source>
+        <translation>Stereo</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/Oscilloscope/OscilloscopeControlDialog.cpp" line="68"/>
+        <source>Window Size</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../../plugins/Oscilloscope/OscilloscopeControlDialog.cpp" line="73"/>
+        <source>Offset</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../../plugins/Oscilloscope/OscilloscopeControlDialog.cpp" line="77"/>
+        <source>Scale</source>
+        <translation>Scale</translation>
+    </message>
+</context>
+<context>
+    <name>lmms::gui::PatchesDialog</name>
+    <message>
+        <location filename="../../plugins/Sf2Player/PatchesDialog.cpp" line="93"/>
+        <source>Patch</source>
+        <translation>ຊຸດສຽງ</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/Sf2Player/PatchesDialog.cpp" line="93"/>
+        <source>Name</source>
+        <translation>ຊື່</translation>
+    </message>
+    <message>
+        <location filename="../../plugins/Sf2Player/PatchesDialog.cpp" line="125"/>
+        <source>Search</source>
+        <translation>ຄົ້ນຫາ</translation>
     </message>
 </context>
 <context>
@@ -12303,17 +12465,17 @@ Warning: This operation can not be undone.</source>
 <context>
     <name>lmms::gui::PatternClipView</name>
     <message>
-        <location filename="../../src/gui/clips/PatternClipView.cpp" line="57"/>
+        <location filename="../../src/gui/clips/PatternClipView.cpp" line="65"/>
         <source>Open in Pattern Editor</source>
         <translation>ເປີດໃນ Pattern Editor</translation>
     </message>
     <message>
-        <location filename="../../src/gui/clips/PatternClipView.cpp" line="63"/>
+        <location filename="../../src/gui/clips/PatternClipView.cpp" line="71"/>
         <source>Reset name</source>
         <translation>ຣີເຊັດຊື່</translation>
     </message>
     <message>
-        <location filename="../../src/gui/clips/PatternClipView.cpp" line="66"/>
+        <location filename="../../src/gui/clips/PatternClipView.cpp" line="74"/>
         <source>Change name</source>
         <translation>ປ່ຽນຊື່</translation>
     </message>
@@ -12321,62 +12483,62 @@ Warning: This operation can not be undone.</source>
 <context>
     <name>lmms::gui::PatternEditorWindow</name>
     <message>
-        <location filename="../../src/gui/editors/PatternEditor.cpp" line="282"/>
+        <location filename="../../src/gui/editors/PatternEditor.cpp" line="283"/>
         <source>Pattern Editor</source>
         <translation>Pattern Editor</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PatternEditor.cpp" line="300"/>
+        <location filename="../../src/gui/editors/PatternEditor.cpp" line="301"/>
         <source>Play/pause current pattern (Space)</source>
         <translation>ຫຼິ້ນ/ຢຸດ Pattern ປັດຈຸບັນ (Space)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PatternEditor.cpp" line="301"/>
+        <location filename="../../src/gui/editors/PatternEditor.cpp" line="302"/>
         <source>Stop playback of current pattern (Space)</source>
         <translation>ຢຸດການຫຼິ້ນ Pattern ປັດຈຸບັນ (Space)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PatternEditor.cpp" line="305"/>
+        <location filename="../../src/gui/editors/PatternEditor.cpp" line="306"/>
         <source>Pattern selector</source>
         <translation>ຕົວເລືອກ Pattern</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PatternEditor.cpp" line="315"/>
+        <location filename="../../src/gui/editors/PatternEditor.cpp" line="316"/>
         <source>Track and step actions</source>
         <translation>ການຈັດການແທຣັກ ແລະ ຂັ້ນຈັງຫວະ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PatternEditor.cpp" line="318"/>
+        <location filename="../../src/gui/editors/PatternEditor.cpp" line="319"/>
         <source>New pattern</source>
         <translation>Pattern ໃໝ່</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PatternEditor.cpp" line="320"/>
+        <location filename="../../src/gui/editors/PatternEditor.cpp" line="321"/>
         <source>Clone pattern</source>
         <translation>ສຳເນົາ Pattern</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PatternEditor.cpp" line="322"/>
+        <location filename="../../src/gui/editors/PatternEditor.cpp" line="323"/>
         <source>Add sample-track</source>
         <translation>ເພີ່ມ Sample-track</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PatternEditor.cpp" line="324"/>
+        <location filename="../../src/gui/editors/PatternEditor.cpp" line="325"/>
         <source>Add automation-track</source>
         <translation>ເພີ່ມ Automation-track</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PatternEditor.cpp" line="333"/>
+        <location filename="../../src/gui/editors/PatternEditor.cpp" line="334"/>
         <source>Remove steps</source>
         <translation>ລົບຂັ້ນຈັງຫວະ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PatternEditor.cpp" line="335"/>
+        <location filename="../../src/gui/editors/PatternEditor.cpp" line="336"/>
         <source>Add steps</source>
         <translation>ເພີ່ມຂັ້ນຈັງຫວະ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PatternEditor.cpp" line="337"/>
+        <location filename="../../src/gui/editors/PatternEditor.cpp" line="338"/>
         <source>Clone Steps</source>
         <translation>ສຳເນົາຂັ້ນຈັງຫວະ</translation>
     </message>
@@ -12478,108 +12640,130 @@ Warning: This operation can not be undone.</source>
 <context>
     <name>lmms::gui::PianoRoll</name>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="221"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="227"/>
         <source>Note Velocity</source>
         <translation>ນຳ້ໜັກສຽງຕົວໂນດ (Velocity)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="222"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="228"/>
         <source>Note Panning</source>
         <translation>Panning ຂອງຕົວໂນດ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="235"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="241"/>
         <source>Mark/unmark current semitone</source>
         <translation>ໝາຍ/ເລີກໝາຍ Semitone ປັດຈຸບັນ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="236"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="242"/>
         <source>Mark/unmark all corresponding octave semitones</source>
         <translation>ໝາຍ/ເລີກໝາຍ Semitone ໃນທຸກ Octave ທີ່ກ່ຽວຂ້ອງ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="237"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="243"/>
         <source>Mark current scale</source>
         <translation>ໝາຍ Scale ປັດຈຸບັນ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="238"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="244"/>
         <source>Mark current chord</source>
         <translation>ໝາຍຄອດ (Chord) ປັດຈຸບັນ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="239"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="245"/>
         <source>Unmark all</source>
         <translation>ເລີກໝາຍທັງໝົດ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="240"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="246"/>
         <source>Select all notes on this key</source>
         <translation>ເລືອກຕົວໂນດທັງໝົດໃນຄີນີ້</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="335"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="342"/>
         <source>Note lock</source>
         <translation>ລັອກຕົວໂນດ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="345"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="352"/>
         <source>Last note</source>
         <translation>ໂນດລ່າສຸດ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="369"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="376"/>
         <source>No key</source>
         <translation>ບໍ່ມີຄີ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="382"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="389"/>
         <source>No scale</source>
         <translation>ບໍ່ມີ Scale</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="399"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="406"/>
         <source>No chord</source>
         <translation>ບໍ່ມີຄອດ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="429"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="436"/>
         <source>Nudge</source>
         <translation>ຍັບ (Nudge)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="430"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="437"/>
         <source>Snap</source>
         <translation>ດູດຕິດ (Snap)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="464"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="480"/>
         <source>Velocity: %1%</source>
         <translation>Velocity: %1%</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="473"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="489"/>
         <source>Panning: %1% left</source>
         <translation>Panning: %1% ຊ້າຍ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="477"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="493"/>
         <source>Panning: %1% right</source>
         <translation>Panning: %1% ຂວາ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="481"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="497"/>
         <source>Panning: center</source>
         <translation>Panning: ເຄິ່ງກາງ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="3727"/>
-        <source>Please open a clip by double-clicking on it!</source>
-        <translation>ກະລຸນາເປີດຄລິບໂດຍການດັບເບິນຄລິກທີ່ມັນ!</translation>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="2237"/>
+        <source>Knife Tool</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="4408"/>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="4427"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="2238"/>
+        <source>Click and drag over notes to cut along a line
+Hold Shift to automatically remove short ends</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="3329"/>
+        <source>Double-click on an instrument clip in Song Editor to open it here</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="4541"/>
+        <source>Pitch Bending</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="4542"/>
+        <source>Click and drag on a note or selection to edit its detuning curve
+Shift-click to open the note in Automation Editor</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="4642"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="4661"/>
         <source>Please enter a new value between %1 and %2:</source>
         <translation>ກະລຸນາປ້ອນຄ່າໃໝ່ລະຫວ່າງ %1 ຫາ %2:</translation>
     </message>
@@ -12587,256 +12771,256 @@ Warning: This operation can not be undone.</source>
 <context>
     <name>lmms::gui::PianoRollWindow</name>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="4888"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5181"/>
         <source>Play/pause current clip (Space)</source>
         <translation>ຫຼິ້ນ/ຢຸດ ຄລິບປັດຈຸບັນ (Space)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="4889"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5182"/>
         <source>Record notes from MIDI-device/channel-piano</source>
         <translation>ບັນທຶກໂນດຈາກອຸປະກອນ MIDI/channel-piano</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="4890"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5183"/>
         <source>Record notes from MIDI-device/channel-piano while playing song or pattern track</source>
         <translation>ບັນທຶກໂນດຈາກອຸປະກອນ MIDI ຂະນະຫຼິ້ນເພງ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="4891"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5184"/>
         <source>Record notes from MIDI-device/channel-piano, one step at the time</source>
         <translation>ບັນທຶກໂນດຈາກອຸປະກອນ MIDI ເທື່ອລະຂັ້ນ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="4892"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5185"/>
         <source>Stop playing of current clip (Space)</source>
         <translation>ຢຸດການຫຼິ້ນຄລິບປັດຈຸບັນ (Space)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="4894"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5187"/>
         <source>Edit actions</source>
         <translation>ແກ້ໄຂຄຳສັ່ງ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="4898"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5191"/>
         <source>Draw mode (Shift+D)</source>
         <translation>ໂໝດຂີດຂຽນ (Shift+D)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="4899"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5192"/>
         <source>Erase mode (Shift+E)</source>
         <translation>ໂໝດລຶບ (Shift+E)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="4900"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5193"/>
         <source>Select mode (Shift+S)</source>
         <translation>ໂໝດເລືອກ (Shift+S)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="4901"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5194"/>
         <source>Pitch Bend mode (Shift+T)</source>
         <translation>ໂໝດ Pitch Bend (Shift+T)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="4916"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5209"/>
         <source>Quantize</source>
         <translation>ຈັດຈັງຫວະ (Quantize)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="4917"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5210"/>
         <source>Quantize positions</source>
         <translation>ຈັດຕຳແໜ່ງຈັງຫວະ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="4918"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5211"/>
         <source>Quantize lengths</source>
         <translation>ຈັດຄວາມຍາວຈັງຫວະ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="4938"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5231"/>
         <source>File actions</source>
         <translation>ຈັດການໄຟລ໌</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="4946"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5239"/>
         <source>Import clip</source>
         <translation>ນຳເຂົ້າຄລິບ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="4948"/>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5415"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5241"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5773"/>
         <source>Export clip</source>
         <translation>ສົ່ງອອກຄລິບ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="4959"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5252"/>
         <source>Copy paste controls</source>
         <translation>ຄຳສັ່ງ ສຳເນົາ/ວາງ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="4961"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5254"/>
         <source>Cut (%1+X)</source>
         <translation>ຕັດ (%1+X)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="4963"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5256"/>
         <source>Copy (%1+C)</source>
         <translation>ສຳເນົາ (%1+C)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="4965"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5258"/>
         <source>Paste (%1+V)</source>
         <translation>ວາງ (%1+V)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="4980"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5273"/>
         <source>Timeline controls</source>
         <translation>ຄວບຄຸມ Timeline</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="4988"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5281"/>
         <source>Glue</source>
         <translation>ເຊື່ອມຕໍ່ (Glue)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="4992"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5285"/>
         <source>Knife</source>
         <translation>ມີດຕັດ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="4996"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5289"/>
         <source>Strum</source>
         <translation>Strum</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5000"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5293"/>
         <source>Fill</source>
         <translation>ຕື່ມໃສ່</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5004"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5297"/>
         <source>Cut overlaps</source>
         <translation>ຕັດສ່ວນທີ່ທັບຊ້ອນ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5008"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5301"/>
         <source>Min length as last</source>
         <translation>ຄວາມຍາວຕຳ່ສຸດເທົ່າກັບອັນລ່າສຸດ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5011"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5304"/>
         <source>Max length as last</source>
         <translation>ຄວາມຍາວສູງສຸດເທົ່າກັບອັນລ່າສຸດ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5014"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5307"/>
         <source>Reverse Notes</source>
         <translation>ກັບດ້ານຕົວໂນດ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5032"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5325"/>
         <source>Zoom and note controls</source>
         <translation>ການຊູມ ແລະ ຕົວໂນດ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5040"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5333"/>
         <source>Horizontal zooming</source>
         <translation>ຊູມລວງນອນ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5048"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5341"/>
         <source>Vertical zooming</source>
         <translation>ຊູມລວງຕັ້ງ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5057"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5350"/>
         <source>Quantization</source>
         <translation>ການຈັດຈັງຫວະ (Quantization)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5066"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5359"/>
         <source>Note length</source>
         <translation>ຄວາມຍາວໂນດ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5072"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5365"/>
         <source>Key</source>
         <translation>ຄີ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5081"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5374"/>
         <source>Scale</source>
         <translation>Scale</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5090"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5383"/>
         <source>Chord</source>
         <translation>ຄອດ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5099"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5392"/>
         <source>Snap mode</source>
         <translation>ໂໝດດູດຕິດ (Snap)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5104"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5397"/>
         <source>Clear ghost notes</source>
         <translation>ລຶບ Ghost notes</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5213"/>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5392"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5506"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5750"/>
         <source>Piano-Roll - %1</source>
         <translation>Piano-Roll - %1</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5220"/>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5397"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5513"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5755"/>
         <source>Piano-Roll - no clip</source>
         <translation>Piano-Roll - ບໍ່ມີຄລິບ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5416"/>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5477"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5774"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5835"/>
         <source>XML clip file (*.xpt *.xptz)</source>
         <translation>ໄຟລ໌ຄລິບ XML (*.xpt *.xptz)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5422"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5780"/>
         <source>Export only selected notes</source>
         <translation>ສົ່ງອອກສະເພາະໂນດທີ່ເລືອກ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5450"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5808"/>
         <source>Export clip success</source>
         <translation>ສົ່ງອອກຄລິບສຳເລັດ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5451"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5809"/>
         <source>Clip saved to %1</source>
         <translation>ບັນທຶກຄລິບໄວ້ທີ່ %1</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5466"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5824"/>
         <source>Import clip.</source>
         <translation>ນຳເຂົ້າຄລິບ.</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5467"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5825"/>
         <source>You are about to import a clip, this will overwrite your current clip. Do you want to continue?</source>
         <translation>ເຈົ້າກຳລັງຈະນຳເຂົ້າຄລິບ, ສິ່ງນີ້ຈະຂຽນທັບຄລິບປັດຈຸບັນ. ຕ້ອງການສືບຕໍ່ບໍ່?</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5476"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5834"/>
         <source>Open clip</source>
         <translation>ເປີດຄລິບ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5496"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5854"/>
         <source>Import clip success</source>
         <translation>ນຳເຂົ້າຄລິບສຳເລັດ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5497"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5855"/>
         <source>Imported clip %1!</source>
         <translation>ນຳເຂົ້າຄລິບ %1 ແລ້ວ!</translation>
     </message>
@@ -12844,17 +13028,17 @@ Warning: This operation can not be undone.</source>
 <context>
     <name>lmms::gui::PianoView</name>
     <message>
-        <location filename="../../src/gui/instrument/PianoView.cpp" line="780"/>
+        <location filename="../../src/gui/instrument/PianoView.cpp" line="787"/>
         <source>Base note</source>
         <translation>Base note</translation>
     </message>
     <message>
-        <location filename="../../src/gui/instrument/PianoView.cpp" line="785"/>
+        <location filename="../../src/gui/instrument/PianoView.cpp" line="792"/>
         <source>First note</source>
         <translation>ໂນດທຳອິດ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/instrument/PianoView.cpp" line="790"/>
+        <location filename="../../src/gui/instrument/PianoView.cpp" line="797"/>
         <source>Last note</source>
         <translation>ໂນດສຸດທ້າຍ</translation>
     </message>
@@ -12885,7 +13069,7 @@ Warning: This operation can not be undone.</source>
 <context>
     <name>lmms::gui::PluginDescWidget</name>
     <message>
-        <location filename="../../src/gui/PluginBrowser.cpp" line="299"/>
+        <location filename="../../src/gui/PluginBrowser.cpp" line="301"/>
         <source>Send to new instrument track</source>
         <translation>ສົ່ງໄປຍັງແທຣັກເຄື່ອງດົນຕີໃໝ່</translation>
     </message>
@@ -12963,77 +13147,77 @@ Warning: This operation can not be undone.</source>
         <translation>ຈັດຮູບແບບ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/ProjectNotes.cpp" line="167"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="169"/>
         <source>&amp;Bold</source>
         <translation>&amp;ໂຕເຂັ້ມ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/ProjectNotes.cpp" line="168"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="170"/>
         <source>%1+B</source>
         <translation>%1+B</translation>
     </message>
     <message>
-        <location filename="../../src/gui/ProjectNotes.cpp" line="174"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="176"/>
         <source>&amp;Italic</source>
         <translation>&amp;ໂຕອຽງ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/ProjectNotes.cpp" line="175"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="177"/>
         <source>%1+I</source>
         <translation>%1+I</translation>
     </message>
     <message>
-        <location filename="../../src/gui/ProjectNotes.cpp" line="182"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="184"/>
         <source>&amp;Underline</source>
         <translation>&amp;ຂີດກ້ອງ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/ProjectNotes.cpp" line="183"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="185"/>
         <source>%1+U</source>
         <translation>%1+U</translation>
     </message>
     <message>
-        <location filename="../../src/gui/ProjectNotes.cpp" line="193"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="195"/>
         <source>&amp;Left</source>
         <translation>&amp;ຊ້າຍ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/ProjectNotes.cpp" line="194"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="196"/>
         <source>%1+L</source>
         <translation>%1+L</translation>
     </message>
     <message>
-        <location filename="../../src/gui/ProjectNotes.cpp" line="200"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="202"/>
         <source>C&amp;enter</source>
         <translation>&amp;ເຄິ່ງກາງ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/ProjectNotes.cpp" line="202"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="204"/>
         <source>%1+E</source>
         <translation>%1+E</translation>
     </message>
     <message>
-        <location filename="../../src/gui/ProjectNotes.cpp" line="207"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="209"/>
         <source>&amp;Right</source>
         <translation>&amp;ຂວາ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/ProjectNotes.cpp" line="209"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="211"/>
         <source>%1+R</source>
         <translation>%1+R</translation>
     </message>
     <message>
-        <location filename="../../src/gui/ProjectNotes.cpp" line="215"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="217"/>
         <source>&amp;Justify</source>
         <translation>&amp;ເຕັມແຖວ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/ProjectNotes.cpp" line="216"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="218"/>
         <source>%1+J</source>
         <translation>%1+J</translation>
     </message>
     <message>
-        <location filename="../../src/gui/ProjectNotes.cpp" line="223"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="225"/>
         <source>&amp;Color...</source>
         <translation>&amp;ສີ...</translation>
     </message>
@@ -13057,42 +13241,42 @@ Warning: This operation can not be undone.</source>
 <context>
     <name>lmms::gui::ReverbSCControlDialog</name>
     <message>
-        <location filename="../../plugins/ReverbSC/ReverbSCControlDialog.cpp" line="48"/>
+        <location filename="../../plugins/ReverbSC/ReverbSCControlDialog.cpp" line="49"/>
         <source>Input</source>
         <translation>Input</translation>
     </message>
     <message>
-        <location filename="../../plugins/ReverbSC/ReverbSCControlDialog.cpp" line="50"/>
+        <location filename="../../plugins/ReverbSC/ReverbSCControlDialog.cpp" line="51"/>
         <source>Input gain:</source>
         <translation>Gain ຂາເຂົ້າ:</translation>
     </message>
     <message>
-        <location filename="../../plugins/ReverbSC/ReverbSCControlDialog.cpp" line="52"/>
+        <location filename="../../plugins/ReverbSC/ReverbSCControlDialog.cpp" line="53"/>
         <source>Size</source>
         <translation>ຂະໜາດ</translation>
     </message>
     <message>
-        <location filename="../../plugins/ReverbSC/ReverbSCControlDialog.cpp" line="54"/>
+        <location filename="../../plugins/ReverbSC/ReverbSCControlDialog.cpp" line="55"/>
         <source>Size:</source>
         <translation>ຂະໜາດ:</translation>
     </message>
     <message>
-        <location filename="../../plugins/ReverbSC/ReverbSCControlDialog.cpp" line="56"/>
+        <location filename="../../plugins/ReverbSC/ReverbSCControlDialog.cpp" line="57"/>
         <source>Color</source>
         <translation>ສີສັນ</translation>
     </message>
     <message>
-        <location filename="../../plugins/ReverbSC/ReverbSCControlDialog.cpp" line="58"/>
+        <location filename="../../plugins/ReverbSC/ReverbSCControlDialog.cpp" line="59"/>
         <source>Color:</source>
         <translation>ສີສັນ:</translation>
     </message>
     <message>
-        <location filename="../../plugins/ReverbSC/ReverbSCControlDialog.cpp" line="60"/>
+        <location filename="../../plugins/ReverbSC/ReverbSCControlDialog.cpp" line="61"/>
         <source>Output</source>
         <translation>Output</translation>
     </message>
     <message>
-        <location filename="../../plugins/ReverbSC/ReverbSCControlDialog.cpp" line="62"/>
+        <location filename="../../plugins/ReverbSC/ReverbSCControlDialog.cpp" line="63"/>
         <source>Output gain:</source>
         <translation>Gain ຂາອອກ:</translation>
     </message>
@@ -13360,105 +13544,110 @@ Warning: This operation can not be undone.</source>
 <context>
     <name>lmms::gui::SampleTrackView</name>
     <message>
-        <location filename="../../src/gui/tracks/SampleTrackView.cpp" line="66"/>
+        <location filename="../../src/gui/tracks/SampleTrackView.cpp" line="68"/>
         <source>Mixer channel</source>
         <translation>Mixer channel</translation>
     </message>
     <message>
-        <location filename="../../src/gui/tracks/SampleTrackView.cpp" line="69"/>
+        <location filename="../../src/gui/tracks/SampleTrackView.cpp" line="71"/>
         <source>VOL</source>
         <translation>VOL</translation>
     </message>
     <message>
-        <location filename="../../src/gui/tracks/SampleTrackView.cpp" line="69"/>
+        <location filename="../../src/gui/tracks/SampleTrackView.cpp" line="71"/>
         <source>Track volume</source>
         <translation>ລະດັບສຽງແທຣັກ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/tracks/SampleTrackView.cpp" line="72"/>
-        <source>Channel volume:</source>
-        <translation>ລະດັບສຽງ Channel:</translation>
+        <location filename="../../src/gui/tracks/SampleTrackView.cpp" line="73"/>
+        <source>Volume:</source>
+        <translation>ລະດັບສຽງ:</translation>
     </message>
     <message>
-        <location filename="../../src/gui/tracks/SampleTrackView.cpp" line="75"/>
+        <location filename="../../src/gui/tracks/SampleTrackView.cpp" line="76"/>
         <source>PAN</source>
         <translation>PAN</translation>
     </message>
     <message>
-        <location filename="../../src/gui/tracks/SampleTrackView.cpp" line="75"/>
+        <location filename="../../src/gui/tracks/SampleTrackView.cpp" line="76"/>
         <source>Panning</source>
         <translation>Panning</translation>
     </message>
     <message>
-        <location filename="../../src/gui/tracks/SampleTrackView.cpp" line="77"/>
+        <location filename="../../src/gui/tracks/SampleTrackView.cpp" line="78"/>
         <source>Panning:</source>
         <translation>Panning:</translation>
     </message>
     <message>
-        <location filename="../../src/gui/tracks/SampleTrackView.cpp" line="159"/>
+        <location filename="../../src/gui/tracks/SampleTrackView.cpp" line="156"/>
         <source>%1: %2</source>
         <translation>%1: %2</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/tracks/SampleTrackView.cpp" line="255"/>
+        <source>Corrupted audio detected: muting affected channels</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>lmms::gui::SampleTrackWindow</name>
     <message>
-        <location filename="../../src/gui/SampleTrackWindow.cpp" line="104"/>
+        <location filename="../../src/gui/SampleTrackWindow.cpp" line="94"/>
         <source>Mute</source>
         <translation>ປິດສຽງ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/SampleTrackWindow.cpp" line="108"/>
+        <location filename="../../src/gui/SampleTrackWindow.cpp" line="98"/>
         <source>Mute this sample track</source>
         <translation>ປິດສຽງ Sample track ນີ້</translation>
     </message>
     <message>
-        <location filename="../../src/gui/SampleTrackWindow.cpp" line="111"/>
+        <location filename="../../src/gui/SampleTrackWindow.cpp" line="101"/>
         <source>Solo</source>
         <translation>Solo</translation>
     </message>
     <message>
-        <location filename="../../src/gui/SampleTrackWindow.cpp" line="115"/>
+        <location filename="../../src/gui/SampleTrackWindow.cpp" line="105"/>
         <source>Solo this sample track</source>
         <translation>Solo Sample track ນີ້</translation>
     </message>
     <message>
-        <location filename="../../src/gui/SampleTrackWindow.cpp" line="121"/>
+        <location filename="../../src/gui/SampleTrackWindow.cpp" line="111"/>
         <source>Sample volume</source>
         <translation>ລະດັບສຽງ Sample</translation>
     </message>
     <message>
-        <location filename="../../src/gui/SampleTrackWindow.cpp" line="123"/>
+        <location filename="../../src/gui/SampleTrackWindow.cpp" line="112"/>
         <source>Volume:</source>
         <translation>ລະດັບສຽງ:</translation>
     </message>
     <message>
-        <location filename="../../src/gui/SampleTrackWindow.cpp" line="128"/>
+        <location filename="../../src/gui/SampleTrackWindow.cpp" line="117"/>
         <source>VOL</source>
         <translation>VOL</translation>
     </message>
     <message>
-        <location filename="../../src/gui/SampleTrackWindow.cpp" line="134"/>
+        <location filename="../../src/gui/SampleTrackWindow.cpp" line="123"/>
         <source>Panning</source>
         <translation>Panning</translation>
     </message>
     <message>
-        <location filename="../../src/gui/SampleTrackWindow.cpp" line="135"/>
+        <location filename="../../src/gui/SampleTrackWindow.cpp" line="124"/>
         <source>Panning:</source>
         <translation>Panning:</translation>
     </message>
     <message>
-        <location filename="../../src/gui/SampleTrackWindow.cpp" line="140"/>
+        <location filename="../../src/gui/SampleTrackWindow.cpp" line="129"/>
         <source>PAN</source>
         <translation>PAN</translation>
     </message>
     <message>
-        <location filename="../../src/gui/SampleTrackWindow.cpp" line="149"/>
+        <location filename="../../src/gui/SampleTrackWindow.cpp" line="138"/>
         <source>Mixer channel</source>
         <translation>Mixer channel</translation>
     </message>
     <message>
-        <location filename="../../src/gui/SampleTrackWindow.cpp" line="154"/>
+        <location filename="../../src/gui/SampleTrackWindow.cpp" line="143"/>
         <source>CHAN</source>
         <translation>CHAN</translation>
     </message>
@@ -13479,394 +13668,445 @@ Warning: This operation can not be undone.</source>
 <context>
     <name>lmms::gui::SetupDialog</name>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="162"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="165"/>
         <source>Settings</source>
         <translation>ການຕັ້ງຄ່າ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="197"/>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="872"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="200"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="898"/>
         <source>General</source>
         <translation>ທົ່ວໄປ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="232"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="235"/>
         <source>Graphical user interface (GUI)</source>
         <translation>ໜ້າຕ່າງຜູ້ໃຊ້ງານ (GUI)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="235"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="238"/>
         <source>Enable tooltips</source>
         <translation>ເປີດໃຊ້ Tooltips</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="237"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="240"/>
         <source>Enable master oscilloscope by default</source>
         <translation>ເປີດໃຊ້ Master oscilloscope ເປັນຄ່າເລີ່ມຕົ້ນ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="239"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="242"/>
         <source>Enable all note labels in piano roll</source>
         <translation>ສະແດງຊື່ໂນດທັງໝົດໃນ Piano roll</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="241"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="244"/>
         <source>Show fader ticks</source>
         <translation>ສະແດງຂີດ Fader</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="243"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="246"/>
         <source>Enable compact track buttons</source>
         <translation>ເປີດໃຊ້ປຸ່ມແທຣັກແບບກະທັດຮັດ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="245"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="248"/>
         <source>Enable one instrument-track-window mode</source>
         <translation>ເປີດໃຊ້ໂໝດໜ້າຕ່າງເຄື່ອງດົນຕີດຽວ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="247"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="250"/>
         <source>Show sidebar on the right-hand side</source>
         <translation>ສະແດງແຖບຂ້າງທາງຂວາ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="249"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="252"/>
         <source>Let sample previews continue when mouse is released</source>
         <translation>ໃຫ້ສຽງຕົວຢ່າງຫຼິ້ນຕໍ່ເມື່ອປ່ອຍເມົາສ໌</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="251"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="254"/>
         <source>Mute automation tracks during solo</source>
         <translation>ປິດສຽງ Automation tracks ເມື່ອ Solo</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="253"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="256"/>
         <source>Show warning when deleting tracks</source>
         <translation>ແຈ້ງເຕືອນເມື່ອລົບແທຣັກ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="255"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="258"/>
         <source>Show warning when deleting a mixer channel that is in use</source>
         <translation>ແຈ້ງເຕືອນເມື່ອລົບ Mixer channel ທີ່ກຳລັງໃຊ້ຢູ່</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="260"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="263"/>
+        <source>Attach and show when closed</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="264"/>
+        <source>Attach and hide when closed</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="265"/>
+        <source>Always detached</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="271"/>
+        <source>Detached window behavior</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="276"/>
         <source>Dual-button</source>
         <translation>Dual-button</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="261"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="277"/>
         <source>Grab closest</source>
         <translation>ຈັບອັນທີ່ໃກ້ສຸດ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="262"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="278"/>
         <source>Handles</source>
         <translation>ຈຸດຈັບ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="268"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="284"/>
         <source>Loop edit mode</source>
         <translation>ໂໝດແກ້ໄຂ Loop</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="276"/>
-        <source>Projects</source>
-        <translation>ໂປຣເຈັກ</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="279"/>
-        <source>Compress project files by default</source>
-        <translation>ບີບອັດໄຟລ໌ໂປຣເຈັກເປັນຄ່າເລີ່ມຕົ້ນ</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="281"/>
-        <source>Create a backup file when saving a project</source>
-        <translation>ສ້າງໄຟລ໌ສຳຮອງເມື່ອບັນທຶກໂປຣເຈັກ</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="283"/>
-        <source>Reopen last project on startup</source>
-        <translation>ເປີດໂປຣເຈັກລ່າສຸດເມື່ອເລີ່ມໂປຣແກຣມ</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="291"/>
-        <source>Language</source>
-        <translation>ພາສາ</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="365"/>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="875"/>
-        <source>Performance</source>
-        <translation>ປະສິດທິພາບ</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="369"/>
-        <source>Autosave</source>
-        <translation>ບັນທຶກອັດຕະໂນມັດ</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="397"/>
-        <source>Enable autosave</source>
-        <translation>ເປີດໃຊ້ບັນທຶກອັດຕະໂນມັດ</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="400"/>
-        <source>Allow autosave while playing</source>
-        <translation>ອະນຸຍາດໃຫ້ບັນທຶກອັດຕະໂນມັດຂະນະຫຼິ້ນ</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="408"/>
-        <source>User interface (UI) effects vs. performance</source>
-        <translation>ເອັບເຟັກ UI ທຽບກັບ ປະສິດທິພາບ</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="411"/>
-        <source>Smooth scroll in song editor</source>
-        <translation>ການເລື່ອນແບບກ້ຽງນວນໃນ Song editor</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="413"/>
-        <source>Display playback cursor in AudioFileProcessor</source>
-        <translation>ສະແດງເຄີເຊີການຫຼິ້ນໃນ AudioFileProcessor</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="418"/>
-        <source>Plugins</source>
-        <translation>ປັກອິນ</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="422"/>
-        <source>VST plugins embedding:</source>
-        <translation>ການຝັງປັກອິນ VST:</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="428"/>
-        <source>No embedding</source>
-        <translation>ບໍ່ມີການຝັງ</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="431"/>
-        <source>Embed using Qt API</source>
-        <translation>ຝັງໂດຍໃຊ້ Qt API</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="435"/>
-        <source>Embed using native Win32 API</source>
-        <translation>ຝັງໂດຍໃຊ້ Win32 API</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="439"/>
-        <source>Embed using XEmbed protocol</source>
-        <translation>ຝັງໂດຍໃຊ້ XEmbed</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="446"/>
-        <source>Keep plugin windows on top when not embedded</source>
-        <translation>ໃຫ້ໜ້າຕ່າງປັກອິນຢູ່ເທິງສຸດສະເໝີເມື່ອບໍ່ໄດ້ຝັງ</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="449"/>
-        <source>Keep effects running even without input</source>
-        <translation>ໃຫ້ເອັບເຟັກເຮັດວຽກເຖິງແມ່ນວ່າບໍ່ມີ Input</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="467"/>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="878"/>
-        <source>Audio</source>
-        <translation>ສຽງ</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="470"/>
-        <source>Audio interface</source>
-        <translation>Audio Interface</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="562"/>
-        <source>Sample rate</source>
-        <translation>Sample rate</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="587"/>
-        <source>Sample rate: %1</source>
-        <translation>Sample rate: %1</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="601"/>
-        <source>Buffer size</source>
-        <translation>ຂະໜາດ Buffer</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="623"/>
-        <source>Reset to default value</source>
-        <translation>ຣີເຊັດເປັນຄ່າເລີ່ມຕົ້ນ</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="652"/>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="881"/>
-        <source>MIDI</source>
-        <translation>MIDI</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="655"/>
-        <source>MIDI interface</source>
-        <translation>MIDI Interface</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="733"/>
-        <source>Automatically assign MIDI controller to selected track</source>
-        <translation>ກຳນົດ MIDI Controller ໃຫ້ແທຣັກທີ່ເລືອກໂດຍອັດຕະໂນມັດ</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="754"/>
-        <source>Behavior when recording</source>
-        <translation>ພຶດຕິກຳເມື່ອບັນທຶກ</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="757"/>
-        <source>Auto-quantize notes in Piano Roll</source>
-        <translation>Quantize ໂນດໃນ Piano Roll ອັດຕະໂນມັດ</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="761"/>
-        <source>If enabled, notes will be automatically quantized when recording them from a MIDI controller. If disabled, they are always recorded at the highest possible resolution.</source>
-        <translation>ຖ້າເປີດໃຊ້, ໂນດຈະຖືກ Quantize ອັດຕະໂນມັດເມື່ອບັນທຶກຈາກ MIDI Controller. ຖ້າປິດ, ມັນຈະບັນທຶກດ້ວຍຄວາມລະອຽດສູງສຸດ.</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="780"/>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="884"/>
-        <source>Paths</source>
-        <translation>ທີ່ຢູ່ໄຟລ໌ (Paths)</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="817"/>
-        <source>LMMS working directory</source>
-        <translation>ໂຟນເດີເຮັດວຽກຂອງ LMMS</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="821"/>
-        <source>VST plugins directory</source>
-        <translation>ໂຟນເດີປັກອິນ VST</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="825"/>
-        <source>LADSPA plugins directories</source>
-        <translation>ໂຟນເດີປັກອິນ LADSPA</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="829"/>
-        <source>SF2 directory</source>
-        <translation>ໂຟນເດີ SF2</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="834"/>
-        <source>Default SF2</source>
-        <translation>SF2 ເລີ່ມຕົ້ນ</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="839"/>
-        <source>GIG directory</source>
-        <translation>ໂຟນເດີ GIG</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="843"/>
-        <source>Theme directory</source>
-        <translation>ໂຟນເດີ Theme</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="847"/>
-        <source>Background artwork</source>
-        <translation>ຮູບພື້ນຫຼັງ</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="904"/>
-        <source>Some changes require restarting.</source>
-        <translation>ບາງການປ່ຽນແປງຕ້ອງໄດ້ເລີ່ມໂປຣແກຣມໃໝ່.</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="908"/>
-        <source>OK</source>
-        <translation>ຕົກລົງ</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="913"/>
-        <source>Cancel</source>
-        <translation>ຍົກເລີກ</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="1147"/>
-        <source>minutes</source>
-        <translation>ນາທີ</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="1147"/>
-        <source>minute</source>
-        <translation>ນາທີ</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="1149"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="288"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="1183"/>
         <source>Disabled</source>
         <translation>ປິດໃຊ້ງານ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="1151"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="289"/>
+        <source>Stepped (Scroll once the playhead goes out of view)</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="290"/>
+        <source>Continuous (Scroll constantly to keep the playhead in the center)</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="295"/>
+        <source>Default Autoscroll Mode</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="303"/>
+        <source>Projects</source>
+        <translation>ໂປຣເຈັກ</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="306"/>
+        <source>Compress project files by default</source>
+        <translation>ບີບອັດໄຟລ໌ໂປຣເຈັກເປັນຄ່າເລີ່ມຕົ້ນ</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="308"/>
+        <source>Create a backup file when saving a project</source>
+        <translation>ສ້າງໄຟລ໌ສຳຮອງເມື່ອບັນທຶກໂປຣເຈັກ</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="310"/>
+        <source>Reopen last project on startup</source>
+        <translation>ເປີດໂປຣເຈັກລ່າສຸດເມື່ອເລີ່ມໂປຣແກຣມ</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="318"/>
+        <source>Language</source>
+        <translation>ພາສາ</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="392"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="901"/>
+        <source>Performance</source>
+        <translation>ປະສິດທິພາບ</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="396"/>
+        <source>Autosave</source>
+        <translation>ບັນທຶກອັດຕະໂນມັດ</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="424"/>
+        <source>Enable autosave</source>
+        <translation>ເປີດໃຊ້ບັນທຶກອັດຕະໂນມັດ</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="427"/>
+        <source>Allow autosave while playing</source>
+        <translation>ອະນຸຍາດໃຫ້ບັນທຶກອັດຕະໂນມັດຂະນະຫຼິ້ນ</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="435"/>
+        <source>User interface (UI) effects vs. performance</source>
+        <translation>ເອັບເຟັກ UI ທຽບກັບ ປະສິດທິພາບ</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="438"/>
+        <source>Smooth scroll in song editor</source>
+        <translation>ການເລື່ອນແບບກ້ຽງນວນໃນ Song editor</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="440"/>
+        <source>Display playback cursor in AudioFileProcessor</source>
+        <translation>ສະແດງເຄີເຊີການຫຼິ້ນໃນ AudioFileProcessor</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="445"/>
+        <source>Plugins</source>
+        <translation>ປັກອິນ</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="449"/>
+        <source>VST plugins embedding:</source>
+        <translation>ການຝັງປັກອິນ VST:</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="455"/>
+        <source>No embedding</source>
+        <translation>ບໍ່ມີການຝັງ</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="458"/>
+        <source>Embed using Qt API</source>
+        <translation>ຝັງໂດຍໃຊ້ Qt API</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="462"/>
+        <source>Embed using native Win32 API</source>
+        <translation>ຝັງໂດຍໃຊ້ Win32 API</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="466"/>
+        <source>Embed using XEmbed protocol</source>
+        <translation>ຝັງໂດຍໃຊ້ XEmbed</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="473"/>
+        <source>Keep plugin windows on top when not embedded</source>
+        <translation>ໃຫ້ໜ້າຕ່າງປັກອິນຢູ່ເທິງສຸດສະເໝີເມື່ອບໍ່ໄດ້ຝັງ</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="476"/>
+        <source>Keep effects running even without input</source>
+        <translation>ໃຫ້ເອັບເຟັກເຮັດວຽກເຖິງແມ່ນວ່າບໍ່ມີ Input</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="494"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="904"/>
+        <source>Audio</source>
+        <translation>ສຽງ</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="497"/>
+        <source>Audio interface</source>
+        <translation>Audio Interface</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="582"/>
+        <source>Sample rate</source>
+        <translation>Sample rate</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="607"/>
+        <source>Sample rate: %1</source>
+        <translation>Sample rate: %1</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="621"/>
+        <source>Buffer size</source>
+        <translation>ຂະໜາດ Buffer</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="643"/>
+        <source>Reset to default value</source>
+        <translation>ຣີເຊັດເປັນຄ່າເລີ່ມຕົ້ນ</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="657"/>
+        <source>Other</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="660"/>
+        <source>Enable mix sanitization</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="662"/>
+        <source>Provides protection from any plugins or tracks that generate corrupted audio, but may negatively impact performance.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="680"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="907"/>
+        <source>MIDI</source>
+        <translation>MIDI</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="683"/>
+        <source>MIDI interface</source>
+        <translation>MIDI Interface</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="759"/>
+        <source>Automatically assign MIDI controller to selected track</source>
+        <translation>ກຳນົດ MIDI Controller ໃຫ້ແທຣັກທີ່ເລືອກໂດຍອັດຕະໂນມັດ</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="780"/>
+        <source>Behavior when recording</source>
+        <translation>ພຶດຕິກຳເມື່ອບັນທຶກ</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="783"/>
+        <source>Auto-quantize notes in Piano Roll</source>
+        <translation>Quantize ໂນດໃນ Piano Roll ອັດຕະໂນມັດ</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="787"/>
+        <source>If enabled, notes will be automatically quantized when recording them from a MIDI controller. If disabled, they are always recorded at the highest possible resolution.</source>
+        <translation>ຖ້າເປີດໃຊ້, ໂນດຈະຖືກ Quantize ອັດຕະໂນມັດເມື່ອບັນທຶກຈາກ MIDI Controller. ຖ້າປິດ, ມັນຈະບັນທຶກດ້ວຍຄວາມລະອຽດສູງສຸດ.</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="806"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="910"/>
+        <source>Paths</source>
+        <translation>ທີ່ຢູ່ໄຟລ໌ (Paths)</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="843"/>
+        <source>LMMS working directory</source>
+        <translation>ໂຟນເດີເຮັດວຽກຂອງ LMMS</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="847"/>
+        <source>VST plugins directory</source>
+        <translation>ໂຟນເດີປັກອິນ VST</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="851"/>
+        <source>LADSPA plugins directories</source>
+        <translation>ໂຟນເດີປັກອິນ LADSPA</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="855"/>
+        <source>SF2 directory</source>
+        <translation>ໂຟນເດີ SF2</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="860"/>
+        <source>Default SF2</source>
+        <translation>SF2 ເລີ່ມຕົ້ນ</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="865"/>
+        <source>GIG directory</source>
+        <translation>ໂຟນເດີ GIG</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="869"/>
+        <source>Theme directory</source>
+        <translation>ໂຟນເດີ Theme</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="873"/>
+        <source>Background artwork</source>
+        <translation>ຮູບພື້ນຫຼັງ</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="930"/>
+        <source>Some changes require restarting.</source>
+        <translation>ບາງການປ່ຽນແປງຕ້ອງໄດ້ເລີ່ມໂປຣແກຣມໃໝ່.</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="934"/>
+        <source>OK</source>
+        <translation>ຕົກລົງ</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="939"/>
+        <source>Cancel</source>
+        <translation>ຍົກເລີກ</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="1181"/>
+        <source>minutes</source>
+        <translation>ນາທີ</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="1181"/>
+        <source>minute</source>
+        <translation>ນາທີ</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="1185"/>
         <source>Autosave interval: %1</source>
         <translation>ໄລຍະເວລາບັນທຶກອັດຕະໂນມັດ: %1</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="1229"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="1269"/>
         <source>The currently selected value is not a power of 2 (32, 64, 128, 256). Some plugins may not be available.</source>
         <translation>ຄ່າທີ່ເລືອກບໍ່ແມ່ນເລກຍົກກຳລັງ 2 (32, 64, 128...). ບາງປັກອິນອາດຈະໃຊ້ບໍ່ໄດ້.</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="1234"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="1274"/>
         <source>The currently selected value is less than or equal to 32. Some plugins may not be available.</source>
         <translation>ຄ່າທີ່ເລືອກໜ້ອຍກວ່າ ຫຼື ເທົ່າກັບ 32. ບາງປັກອິນອາດຈະໃຊ້ບໍ່ໄດ້.</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="1265"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="1305"/>
         <source>Frames: %1
 Latency: %2 ms</source>
         <translation>Frames: %1
 Latency: %2 ms</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="1301"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="1341"/>
         <source>Choose the LMMS working directory</source>
         <translation>ເລືອກໂຟນເດີເຮັດວຽກຂອງ LMMS</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="1318"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="1358"/>
         <source>Choose your VST plugins directory</source>
         <translation>ເລືອກໂຟນເດີປັກອິນ VST ຂອງທ່ານ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="1335"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="1375"/>
         <source>Choose your LADSPA plugins directory</source>
         <translation>ເລືອກໂຟນເດີປັກອິນ LADSPA ຂອງທ່ານ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="1360"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="1400"/>
         <source>Choose your SF2 directory</source>
         <translation>ເລືອກໂຟນເດີ SF2 ຂອງທ່ານ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="1378"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="1418"/>
         <source>Choose your default SF2</source>
         <translation>ເລືອກ SF2 ເລີ່ມຕົ້ນຂອງທ່ານ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="1399"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="1439"/>
         <source>Choose your GIG directory</source>
         <translation>ເລືອກໂຟນເດີ GIG ຂອງທ່ານ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="1416"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="1456"/>
         <source>Choose your theme directory</source>
         <translation>ເລືອກໂຟນເດີ Theme ຂອງທ່ານ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="1450"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="1490"/>
         <source>Choose your background picture</source>
         <translation>ເລືອກຮູບພື້ນຫຼັງຂອງທ່ານ</translation>
     </message>
@@ -13944,126 +14184,126 @@ Latency: %2 ms</translation>
 <context>
     <name>lmms::gui::SidInstrumentView</name>
     <message>
-        <location filename="../../plugins/Sid/SidInstrument.cpp" line="484"/>
+        <location filename="../../plugins/Sid/SidInstrument.cpp" line="477"/>
         <source>Volume:</source>
         <translation>ລະດັບສຽງ:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sid/SidInstrument.cpp" line="488"/>
+        <location filename="../../plugins/Sid/SidInstrument.cpp" line="481"/>
         <source>Resonance:</source>
         <translation>Resonance:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sid/SidInstrument.cpp" line="492"/>
-        <location filename="../../plugins/Sid/SidInstrument.cpp" line="679"/>
+        <location filename="../../plugins/Sid/SidInstrument.cpp" line="485"/>
+        <location filename="../../plugins/Sid/SidInstrument.cpp" line="672"/>
         <source>Cutoff frequency:</source>
         <translation>Cutoff frequency:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sid/SidInstrument.cpp" line="499"/>
+        <location filename="../../plugins/Sid/SidInstrument.cpp" line="492"/>
         <source>High-pass filter </source>
         <translation>High-pass filter </translation>
     </message>
     <message>
-        <location filename="../../plugins/Sid/SidInstrument.cpp" line="505"/>
+        <location filename="../../plugins/Sid/SidInstrument.cpp" line="498"/>
         <source>Band-pass filter </source>
         <translation>Band-pass filter </translation>
     </message>
     <message>
-        <location filename="../../plugins/Sid/SidInstrument.cpp" line="511"/>
+        <location filename="../../plugins/Sid/SidInstrument.cpp" line="504"/>
         <source>Low-pass filter </source>
         <translation>Low-pass filter </translation>
     </message>
     <message>
-        <location filename="../../plugins/Sid/SidInstrument.cpp" line="523"/>
+        <location filename="../../plugins/Sid/SidInstrument.cpp" line="516"/>
         <source>Voice 3 off </source>
         <translation>ປິດ Voice 3 </translation>
     </message>
     <message>
-        <location filename="../../plugins/Sid/SidInstrument.cpp" line="529"/>
+        <location filename="../../plugins/Sid/SidInstrument.cpp" line="522"/>
         <source>MOS6581 SID </source>
         <translation>MOS6581 SID </translation>
     </message>
     <message>
-        <location filename="../../plugins/Sid/SidInstrument.cpp" line="535"/>
+        <location filename="../../plugins/Sid/SidInstrument.cpp" line="528"/>
         <source>MOS8580 SID </source>
         <translation>MOS8580 SID </translation>
     </message>
     <message>
-        <location filename="../../plugins/Sid/SidInstrument.cpp" line="544"/>
-        <location filename="../../plugins/Sid/SidInstrument.cpp" line="654"/>
+        <location filename="../../plugins/Sid/SidInstrument.cpp" line="537"/>
+        <location filename="../../plugins/Sid/SidInstrument.cpp" line="647"/>
         <source>Attack:</source>
         <translation>Attack:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sid/SidInstrument.cpp" line="548"/>
-        <location filename="../../plugins/Sid/SidInstrument.cpp" line="660"/>
+        <location filename="../../plugins/Sid/SidInstrument.cpp" line="541"/>
+        <location filename="../../plugins/Sid/SidInstrument.cpp" line="653"/>
         <source>Decay:</source>
         <translation>Decay:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sid/SidInstrument.cpp" line="552"/>
+        <location filename="../../plugins/Sid/SidInstrument.cpp" line="545"/>
         <source>Sustain:</source>
         <translation>Sustain:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sid/SidInstrument.cpp" line="556"/>
-        <location filename="../../plugins/Sid/SidInstrument.cpp" line="666"/>
+        <location filename="../../plugins/Sid/SidInstrument.cpp" line="549"/>
+        <location filename="../../plugins/Sid/SidInstrument.cpp" line="659"/>
         <source>Release:</source>
         <translation>Release:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sid/SidInstrument.cpp" line="560"/>
+        <location filename="../../plugins/Sid/SidInstrument.cpp" line="553"/>
         <source>Pulse Width:</source>
         <translation>Pulse Width:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sid/SidInstrument.cpp" line="564"/>
+        <location filename="../../plugins/Sid/SidInstrument.cpp" line="557"/>
         <source>Coarse:</source>
         <translation>Coarse:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sid/SidInstrument.cpp" line="573"/>
+        <location filename="../../plugins/Sid/SidInstrument.cpp" line="566"/>
         <source>Pulse wave</source>
         <translation>ຄື້ນ Pulse</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sid/SidInstrument.cpp" line="581"/>
+        <location filename="../../plugins/Sid/SidInstrument.cpp" line="574"/>
         <source>Triangle wave</source>
         <translation>ຄື້ນ Triangle</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sid/SidInstrument.cpp" line="589"/>
+        <location filename="../../plugins/Sid/SidInstrument.cpp" line="582"/>
         <source>Saw wave</source>
         <translation>ຄື້ນ Saw</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sid/SidInstrument.cpp" line="597"/>
+        <location filename="../../plugins/Sid/SidInstrument.cpp" line="590"/>
         <source>Noise</source>
         <translation>Noise</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sid/SidInstrument.cpp" line="613"/>
+        <location filename="../../plugins/Sid/SidInstrument.cpp" line="606"/>
         <source>Sync</source>
         <translation>Sync</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sid/SidInstrument.cpp" line="622"/>
+        <location filename="../../plugins/Sid/SidInstrument.cpp" line="615"/>
         <source>Ring modulation</source>
         <translation>Ring modulation</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sid/SidInstrument.cpp" line="631"/>
+        <location filename="../../plugins/Sid/SidInstrument.cpp" line="624"/>
         <source>Filtered</source>
         <translation>ຜ່ານ Filter</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sid/SidInstrument.cpp" line="640"/>
+        <location filename="../../plugins/Sid/SidInstrument.cpp" line="633"/>
         <source>Test</source>
         <translation>ທົດສອບ</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sid/SidInstrument.cpp" line="672"/>
+        <location filename="../../plugins/Sid/SidInstrument.cpp" line="665"/>
         <source>Pulse width:</source>
         <translation>Pulse width:</translation>
     </message>
@@ -14329,7 +14569,7 @@ Latency: %2 ms</translation>
 <context>
     <name>lmms::gui::SlicerTWaveform</name>
     <message>
-        <location filename="../../plugins/SlicerT/SlicerTWaveform.cpp" line="218"/>
+        <location filename="../../plugins/SlicerT/SlicerTWaveform.cpp" line="219"/>
         <source>Click to load sample</source>
         <translation>ຄລິກເພື່ອໂຫຼດ sample</translation>
     </message>
@@ -14337,92 +14577,92 @@ Latency: %2 ms</translation>
 <context>
     <name>lmms::gui::SongEditor</name>
     <message>
-        <location filename="../../src/core/DataFile.cpp" line="166"/>
+        <location filename="../../src/core/DataFile.cpp" line="169"/>
         <source>Could not open file</source>
         <translation>ບໍ່ສາມາດເປີດໄຟລ໌ໄດ້</translation>
     </message>
     <message>
-        <location filename="../../src/core/DataFile.cpp" line="167"/>
+        <location filename="../../src/core/DataFile.cpp" line="170"/>
         <source>Could not open file %1. You probably have no permissions to read this file.
  Please make sure to have at least read permissions to the file and try again.</source>
         <translation>ບໍ່ສາມາດເປີດໄຟລ໌ %1 ໄດ້. ເຈົ້າອາດຈະບໍ່ມີສິດທິໃນການອ່ານໄຟລ໌ນີ້.
  ກະລຸນາກວດສອບໃຫ້ແນ່ໃຈວ່າມີສິດທິອ່ານໄຟລ໌ ແລະ ລອງໃໝ່ອີກຄັ້ງ.</translation>
     </message>
     <message>
-        <location filename="../../src/core/DataFile.cpp" line="356"/>
+        <location filename="../../src/core/DataFile.cpp" line="359"/>
         <source>Operation denied</source>
         <translation>ການດຳເນີນການຖືກປະຕິເສດ</translation>
     </message>
     <message>
-        <location filename="../../src/core/DataFile.cpp" line="357"/>
+        <location filename="../../src/core/DataFile.cpp" line="360"/>
         <source>A bundle folder with that name already exists on the selected path. Can&apos;t overwrite a project bundle. Please select a different name.</source>
         <translation>ໂຟນເດີ bundle ທີ່ມີຊື່ນັ້ນມີຢູ່ແລ້ວໃນເສັ້ນທາງທີ່ເລືອກ. ບໍ່ສາມາດຂຽນທັບ project bundle ໄດ້. ກະລຸນາເລືອກຊື່ອື່ນ.</translation>
     </message>
     <message>
-        <location filename="../../src/core/DataFile.cpp" line="367"/>
-        <location filename="../../src/core/DataFile.cpp" line="375"/>
-        <location filename="../../src/core/DataFile.cpp" line="383"/>
+        <location filename="../../src/core/DataFile.cpp" line="370"/>
+        <location filename="../../src/core/DataFile.cpp" line="378"/>
+        <location filename="../../src/core/DataFile.cpp" line="386"/>
         <source>Error</source>
         <translation>ຜິດພາດ</translation>
     </message>
     <message>
-        <location filename="../../src/core/DataFile.cpp" line="368"/>
+        <location filename="../../src/core/DataFile.cpp" line="371"/>
         <source>Couldn&apos;t create bundle folder.</source>
         <translation>ບໍ່ສາມາດສ້າງໂຟນເດີ bundle ໄດ້.</translation>
     </message>
     <message>
-        <location filename="../../src/core/DataFile.cpp" line="376"/>
+        <location filename="../../src/core/DataFile.cpp" line="379"/>
         <source>Couldn&apos;t create resources folder.</source>
         <translation>ບໍ່ສາມາດສ້າງໂຟນເດີ resources ໄດ້.</translation>
     </message>
     <message>
-        <location filename="../../src/core/DataFile.cpp" line="384"/>
+        <location filename="../../src/core/DataFile.cpp" line="387"/>
         <source>Failed to copy resources.</source>
         <translation>ການສຳເນົາ resources ລົ້ມເຫຼວ.</translation>
     </message>
     <message>
-        <location filename="../../src/core/DataFile.cpp" line="393"/>
-        <location filename="../../src/core/DataFile.cpp" line="417"/>
+        <location filename="../../src/core/DataFile.cpp" line="396"/>
+        <location filename="../../src/core/DataFile.cpp" line="420"/>
         <source>Could not write file</source>
         <translation>ບໍ່ສາມາດຂຽນໄຟລ໌ໄດ້</translation>
     </message>
     <message>
-        <location filename="../../src/core/DataFile.cpp" line="394"/>
+        <location filename="../../src/core/DataFile.cpp" line="397"/>
         <source>Could not open %1 for writing. You probably are not permitted to write to this file. Please make sure you have write-access to the file and try again.</source>
         <translation>ບໍ່ສາມາດເປີດ %1 ເພື່ອຂຽນໄດ້. ເຈົ້າອາດຈະບໍ່ໄດ້ຮັບອະນຸຍາດໃຫ້ຂຽນໃສ່ໄຟລ໌ນີ້. ກະລຸນາກວດສອບວ່າເຈົ້າມີສິດທິຂຽນໄຟລ໌ ແລະ ລອງໃໝ່ອີກຄັ້ງ.</translation>
     </message>
     <message>
-        <location filename="../../src/core/DataFile.cpp" line="418"/>
+        <location filename="../../src/core/DataFile.cpp" line="421"/>
         <source>An unknown error has occurred and the file could not be saved.</source>
         <translation>ເກີດຂໍ້ຜິດພາດທີ່ບໍ່ຮູ້ຈັກ ແລະ ບໍ່ສາມາດບັນທຶກໄຟລ໌ໄດ້.</translation>
     </message>
     <message>
-        <location filename="../../src/core/DataFile.cpp" line="2146"/>
+        <location filename="../../src/core/DataFile.cpp" line="2151"/>
         <source>Error in file</source>
         <translation>ຂໍ້ຜິດພາດໃນໄຟລ໌</translation>
     </message>
     <message>
-        <location filename="../../src/core/DataFile.cpp" line="2147"/>
+        <location filename="../../src/core/DataFile.cpp" line="2152"/>
         <source>The file %1 seems to contain errors and therefore can&apos;t be loaded.</source>
         <translation>ໄຟລ໌ %1 ເບິ່ງຄືວ່າມີຂໍ້ຜິດພາດ ແລະ ດັ່ງນັ້ນຈຶ່ງບໍ່ສາມາດໂຫຼດໄດ້.</translation>
     </message>
     <message>
-        <location filename="../../src/core/DataFile.cpp" line="2187"/>
+        <location filename="../../src/core/DataFile.cpp" line="2192"/>
         <source>template</source>
         <translation>ແມ່ແບບ (template)</translation>
     </message>
     <message>
-        <location filename="../../src/core/DataFile.cpp" line="2187"/>
+        <location filename="../../src/core/DataFile.cpp" line="2192"/>
         <source>project</source>
         <translation>ໂປຣເຈັກ</translation>
     </message>
     <message>
-        <location filename="../../src/core/DataFile.cpp" line="2190"/>
+        <location filename="../../src/core/DataFile.cpp" line="2195"/>
         <source>Version difference</source>
         <translation>ຄວາມແຕກຕ່າງຂອງເວີຊັນ</translation>
     </message>
     <message>
-        <location filename="../../src/core/DataFile.cpp" line="2191"/>
+        <location filename="../../src/core/DataFile.cpp" line="2196"/>
         <source>This %1 was created with LMMS %2</source>
         <translation>%1 ນີ້ຖືກສ້າງຂຶ້ນດ້ວຍ LMMS %2</translation>
     </message>
@@ -14432,51 +14672,51 @@ Latency: %2 ms</translation>
         <translation>ຂຍາຍ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="136"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="137"/>
         <source>Tempo</source>
         <translation>ຄວາມໄວຈັງຫວະ (Tempo)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="138"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="139"/>
         <source>TEMPO</source>
         <translation>TEMPO</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="139"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="140"/>
         <source>Tempo in BPM</source>
         <translation>ຄວາມໄວຈັງຫວະໃນໜ່ວຍ BPM</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="157"/>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="164"/>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="176"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="158"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="165"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="177"/>
         <source>Master volume</source>
         <translation>ລະດັບສຽງຫຼັກ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="189"/>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="196"/>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="207"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="190"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="197"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="208"/>
         <source>Global transposition</source>
         <translation>ການປ່ຽນຄີ (Transposition) ໂດຍລວມ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="316"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="322"/>
         <source>1/%1 Bar</source>
         <translation>1/%1 ຫ້ອງ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="320"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="326"/>
         <source>%1 Bars</source>
         <translation>%1 ຫ້ອງ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="664"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="662"/>
         <source>Value: %1%</source>
         <translation>ຄ່າ: %1%</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="706"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="704"/>
         <source>Value: %1 keys</source>
         <translation>ຄ່າ: %1 ຄີ</translation>
     </message>
@@ -14484,119 +14724,119 @@ Latency: %2 ms</translation>
 <context>
     <name>lmms::gui::SongEditorWindow</name>
     <message>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="923"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="925"/>
         <source>Song-Editor</source>
         <translation>ຕົວແກ້ໄຂເພງ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="933"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="935"/>
         <source>Play song (Space)</source>
         <translation>ຫຼິ້ນເພງ (Space)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="934"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="936"/>
         <source>Record samples from Audio-device</source>
         <translation>ບັນທຶກຕົວຢ່າງສຽງຈາກອຸປະກອນສຽງ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="935"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="937"/>
         <source>Record samples from Audio-device while playing song or pattern track</source>
         <translation>ບັນທຶກຕົວຢ່າງສຽງຈາກອຸປະກອນສຽງ ຂະນະທີ່ຫຼິ້ນເພງ ຫຼື ແທຣັກແພັດເທີນ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="936"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="938"/>
         <source>Stop song (Space)</source>
         <translation>ຢຸດເພງ (Space)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="940"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="942"/>
         <source>Track actions</source>
         <translation>ການກະທຳກັບແທຣັກ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="943"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="945"/>
         <source>Add pattern-track</source>
         <translation>ເພີ່ມແທຣັກແພັດເທີນ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="946"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="948"/>
         <source>Add sample-track</source>
         <translation>ເພີ່ມແທຣັກຕົວຢ່າງສຽງ (sample)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="949"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="951"/>
         <source>Add automation-track</source>
         <translation>ເພີ່ມແທຣັກ automation</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="961"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="963"/>
         <source>Edit actions</source>
         <translation>ການແກ້ໄຂ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="964"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="966"/>
         <source>Draw mode</source>
         <translation>ໂໝດແຕ້ມ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="965"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="967"/>
         <source>Knife mode (split clips)</source>
         <translation>ໂໝດມີດ (ຕັດຄລິບ)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="966"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="968"/>
         <source>Edit mode (select and move)</source>
         <translation>ໂໝດແກ້ໄຂ (ເລືອກ ແລະ ຍ້າຍ)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="977"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="979"/>
         <source>Timeline controls</source>
         <translation>ການຄວບຄຸມທາມລາຍ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="980"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="982"/>
         <source>Bar insert controls</source>
         <translation>ການຄວບຄຸມການແຊກຫ້ອງ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="981"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="983"/>
         <source>Insert bar</source>
         <translation>ແຊກຫ້ອງ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="982"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="984"/>
         <source>Remove bar</source>
         <translation>ລຶບຫ້ອງ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="988"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="990"/>
         <source>Zoom controls</source>
         <translation>ການຄວບຄຸມການຂຍາຍ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="994"/>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="1000"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="996"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="1002"/>
         <source>Zoom</source>
         <translation>ຂຍາຍ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="1007"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="1009"/>
         <source>Snap controls</source>
         <translation>ການຄວບຄຸມການ Snap (ຍຶດຕິດ)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="1015"/>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="1050"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="1017"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="1052"/>
         <source>Clip snapping size</source>
         <translation>ຂະໜາດການ Snap ຂອງຄລິບ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="1019"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="1021"/>
         <source>Toggle proportional snap on/off</source>
         <translation>ເປີດ/ປິດ ການ snap ຕາມອັດຕາສ່ວນ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="1046"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="1048"/>
         <source>Base snapping size</source>
         <translation>ຂະໜາດການ Snap ພື້ນຖານ</translation>
     </message>
@@ -14617,12 +14857,12 @@ Latency: %2 ms</translation>
 <context>
     <name>lmms::gui::StereoEnhancerControlDialog</name>
     <message>
-        <location filename="../../plugins/StereoEnhancer/StereoEnhancerControlDialog.cpp" line="43"/>
+        <location filename="../../plugins/StereoEnhancer/StereoEnhancerControlDialog.cpp" line="44"/>
         <source>WIDTH</source>
         <translation>ຄວາມກວ້າງ</translation>
     </message>
     <message>
-        <location filename="../../plugins/StereoEnhancer/StereoEnhancerControlDialog.cpp" line="45"/>
+        <location filename="../../plugins/StereoEnhancer/StereoEnhancerControlDialog.cpp" line="46"/>
         <source>Width:</source>
         <translation>ຄວາມກວ້າງ:</translation>
     </message>
@@ -14653,43 +14893,43 @@ Latency: %2 ms</translation>
 <context>
     <name>lmms::gui::SubWindow</name>
     <message>
-        <location filename="../../src/gui/SubWindow.cpp" line="61"/>
+        <location filename="../../src/gui/SubWindow.cpp" line="79"/>
         <source>Close</source>
         <translation>ປິດ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/SubWindow.cpp" line="64"/>
+        <location filename="../../src/gui/SubWindow.cpp" line="82"/>
         <source>Maximize</source>
         <translation>ຂຍາຍເຕັມ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/SubWindow.cpp" line="67"/>
+        <location filename="../../src/gui/SubWindow.cpp" line="85"/>
         <source>Restore</source>
         <translation>ຄືນຄ່າ</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/SubWindow.cpp" line="88"/>
+        <source>Detach</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>lmms::gui::TapTempoView</name>
     <message>
-        <location filename="../../plugins/TapTempo/TapTempoView.cpp" line="54"/>
-        <source>0</source>
-        <translation>0</translation>
-    </message>
-    <message>
         <location filename="../../plugins/TapTempo/TapTempoView.cpp" line="56"/>
-        <location filename="../../plugins/TapTempo/TapTempoView.cpp" line="59"/>
-        <source>Precision</source>
-        <translation>ຄວາມແມ່ນຍໍາ</translation>
+        <location filename="../../plugins/TapTempo/TapTempoView.cpp" line="139"/>
+        <source>Tap to begin</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/TapTempo/TapTempoView.cpp" line="58"/>
+        <location filename="../../plugins/TapTempo/TapTempoView.cpp" line="59"/>
         <source>Display in high precision</source>
         <translation>ສະແດງດ້ວຍຄວາມແມ່ນຍໍາສູງ</translation>
     </message>
     <message>
-        <location filename="../../plugins/TapTempo/TapTempoView.cpp" line="61"/>
-        <source>0.0 ms</source>
-        <translation>0.0 ms</translation>
+        <location filename="../../plugins/TapTempo/TapTempoView.cpp" line="60"/>
+        <source>Precision</source>
+        <translation>ຄວາມແມ່ນຍໍາ</translation>
     </message>
     <message>
         <location filename="../../plugins/TapTempo/TapTempoView.cpp" line="63"/>
@@ -14702,24 +14942,31 @@ Latency: %2 ms</translation>
         <translation>ປິດສຽງ</translation>
     </message>
     <message>
-        <location filename="../../plugins/TapTempo/TapTempoView.cpp" line="68"/>
+        <location filename="../../plugins/TapTempo/TapTempoView.cpp" line="67"/>
         <source>BPM in milliseconds</source>
         <translation>BPM ໃນໜ່ວຍມິນລິວິນາທີ</translation>
     </message>
     <message>
-        <location filename="../../plugins/TapTempo/TapTempoView.cpp" line="69"/>
+        <location filename="../../plugins/TapTempo/TapTempoView.cpp" line="68"/>
+        <location filename="../../plugins/TapTempo/TapTempoView.cpp" line="140"/>
         <source>0 ms</source>
         <translation>0 ms</translation>
     </message>
     <message>
-        <location filename="../../plugins/TapTempo/TapTempoView.cpp" line="73"/>
+        <location filename="../../plugins/TapTempo/TapTempoView.cpp" line="71"/>
         <source>Frequency of BPM</source>
         <translation>ຄວາມຖີ່ຂອງ BPM</translation>
     </message>
     <message>
-        <location filename="../../plugins/TapTempo/TapTempoView.cpp" line="74"/>
-        <source>0.0000 hz</source>
-        <translation>0.0000 hz</translation>
+        <location filename="../../plugins/TapTempo/TapTempoView.cpp" line="72"/>
+        <location filename="../../plugins/TapTempo/TapTempoView.cpp" line="141"/>
+        <source>0.0000 Hz</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../../plugins/TapTempo/TapTempoView.cpp" line="75"/>
+        <source>Reset counter and sidebar information</source>
+        <translation>ຣີເຊັດຕົວນັບ ແລະ ຂໍ້ມູນແຖບດ້ານຂ້າງ</translation>
     </message>
     <message>
         <location filename="../../plugins/TapTempo/TapTempoView.cpp" line="76"/>
@@ -14727,9 +14974,9 @@ Latency: %2 ms</translation>
         <translation>ຣີເຊັດ</translation>
     </message>
     <message>
-        <location filename="../../plugins/TapTempo/TapTempoView.cpp" line="78"/>
-        <source>Reset counter and sidebar information</source>
-        <translation>ຣີເຊັດຕົວນັບ ແລະ ຂໍ້ມູນແຖບດ້ານຂ້າງ</translation>
+        <location filename="../../plugins/TapTempo/TapTempoView.cpp" line="79"/>
+        <source>Sync with project tempo</source>
+        <translation>Sync ກັບຄວາມໄວຈັງຫວະໂປຣເຈັກ</translation>
     </message>
     <message>
         <location filename="../../plugins/TapTempo/TapTempoView.cpp" line="80"/>
@@ -14737,19 +14984,14 @@ Latency: %2 ms</translation>
         <translation>Sync</translation>
     </message>
     <message>
-        <location filename="../../plugins/TapTempo/TapTempoView.cpp" line="82"/>
-        <source>Sync with project tempo</source>
-        <translation>Sync ກັບຄວາມໄວຈັງຫວະໂປຣເຈັກ</translation>
-    </message>
-    <message>
-        <location filename="../../plugins/TapTempo/TapTempoView.cpp" line="150"/>
+        <location filename="../../plugins/TapTempo/TapTempoView.cpp" line="133"/>
         <source>%1 ms</source>
         <translation>%1 ms</translation>
     </message>
     <message>
-        <location filename="../../plugins/TapTempo/TapTempoView.cpp" line="151"/>
-        <source>%1 hz</source>
-        <translation>%1 hz</translation>
+        <location filename="../../plugins/TapTempo/TapTempoView.cpp" line="134"/>
+        <source>%1 Hz</source>
+        <translation>%1 Hz</translation>
     </message>
 </context>
 <context>
@@ -15009,82 +15251,82 @@ Latency: %2 ms</translation>
 <context>
     <name>lmms::gui::TimeLineWidget</name>
     <message>
-        <location filename="../../src/gui/editors/TimeLineWidget.cpp" line="88"/>
+        <location filename="../../src/gui/editors/TimeLineWidget.cpp" line="84"/>
         <source>Auto scrolling</source>
         <translation>ການເລື່ອນອັດຕະໂນມັດ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/TimeLineWidget.cpp" line="89"/>
+        <location filename="../../src/gui/editors/TimeLineWidget.cpp" line="85"/>
         <source>Stepped auto scrolling</source>
         <translation>ການເລື່ອນອັດຕະໂນມັດແບບເປັນຂັ້ນ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/TimeLineWidget.cpp" line="90"/>
+        <location filename="../../src/gui/editors/TimeLineWidget.cpp" line="86"/>
         <source>Continuous auto scrolling</source>
         <translation>ການເລື່ອນອັດຕະໂນມັດແບບຕໍ່ເນື່ອງ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/TimeLineWidget.cpp" line="91"/>
+        <location filename="../../src/gui/editors/TimeLineWidget.cpp" line="87"/>
         <source>Auto scrolling disabled</source>
         <translation>ປິດການເລື່ອນອັດຕະໂນມັດ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/TimeLineWidget.cpp" line="96"/>
+        <location filename="../../src/gui/editors/TimeLineWidget.cpp" line="93"/>
         <source>Loop points</source>
         <translation>ຈຸດວົນຮອບ (Loop points)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/TimeLineWidget.cpp" line="106"/>
+        <location filename="../../src/gui/editors/TimeLineWidget.cpp" line="103"/>
         <source>After stopping go back to beginning</source>
         <translation>ຫຼັງຈາກຢຸດ ໃຫ້ກັບໄປທີ່ຈຸດເລີ່ມຕົ້ນ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/TimeLineWidget.cpp" line="109"/>
+        <location filename="../../src/gui/editors/TimeLineWidget.cpp" line="106"/>
         <source>After stopping go back to position at which playing was started</source>
         <translation>ຫຼັງຈາກຢຸດ ໃຫ້ກັບໄປທີ່ຕຳແໜ່ງທີ່ເລີ່ມຫຼິ້ນ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/TimeLineWidget.cpp" line="113"/>
+        <location filename="../../src/gui/editors/TimeLineWidget.cpp" line="110"/>
         <source>After stopping keep position</source>
         <translation>ຫຼັງຈາກຢຸດ ໃຫ້ຢູ່ຕຳແໜ່ງເດີມ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/TimeLineWidget.cpp" line="315"/>
+        <location filename="../../src/gui/editors/TimeLineWidget.cpp" line="312"/>
         <source>Hint</source>
         <translation>ຄຳແນະນຳ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/TimeLineWidget.cpp" line="316"/>
+        <location filename="../../src/gui/editors/TimeLineWidget.cpp" line="313"/>
         <source>Press &lt;%1&gt; to disable magnetic loop points.</source>
         <translation>ກົດ &lt;%1&gt; ເພື່ອປິດການໃຊ້ງານຈຸດວົນຮອບແບບແມ່ເຫຼັກ.</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/TimeLineWidget.cpp" line="420"/>
+        <location filename="../../src/gui/editors/TimeLineWidget.cpp" line="416"/>
         <source>Set loop begin here</source>
         <translation>ຕັ້ງຈຸດເລີ່ມວົນຮອບບ່ອນນີ້</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/TimeLineWidget.cpp" line="428"/>
+        <location filename="../../src/gui/editors/TimeLineWidget.cpp" line="424"/>
         <source>Set loop end here</source>
         <translation>ຕັ້ງຈຸດສິ້ນສຸດວົນຮອບບ່ອນນີ້</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/TimeLineWidget.cpp" line="439"/>
+        <location filename="../../src/gui/editors/TimeLineWidget.cpp" line="435"/>
         <source>Loop edit mode (hold shift)</source>
         <translation>ໂໝດແກ້ໄຂ Loop (ກົດ shift ຄ້າງໄວ້)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/TimeLineWidget.cpp" line="448"/>
+        <location filename="../../src/gui/editors/TimeLineWidget.cpp" line="444"/>
         <source>Dual-button</source>
         <translation>ປຸ່ມຄູ່</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/TimeLineWidget.cpp" line="449"/>
+        <location filename="../../src/gui/editors/TimeLineWidget.cpp" line="445"/>
         <source>Grab closest</source>
         <translation>ຈັບຈຸດທີ່ໃກ້ທີ່ສຸດ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/TimeLineWidget.cpp" line="450"/>
+        <location filename="../../src/gui/editors/TimeLineWidget.cpp" line="446"/>
         <source>Handles</source>
         <translation>ຕົວຈັບ</translation>
     </message>
@@ -15092,7 +15334,7 @@ Latency: %2 ms</translation>
 <context>
     <name>lmms::gui::TrackContentWidget</name>
     <message>
-        <location filename="../../src/gui/tracks/TrackContentWidget.cpp" line="696"/>
+        <location filename="../../src/gui/tracks/TrackContentWidget.cpp" line="701"/>
         <source>Paste</source>
         <translation>ວາງ</translation>
     </message>
@@ -15110,89 +15352,89 @@ Latency: %2 ms</translation>
         <translation>ການກະທຳ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="94"/>
-        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="96"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="95"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="97"/>
         <source>Mute</source>
         <translation>ປິດສຽງ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="98"/>
-        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="100"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="99"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="101"/>
         <source>Solo</source>
         <translation>Solo</translation>
     </message>
     <message>
-        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="171"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="143"/>
         <source>After removing a track, it can not be recovered. Are you sure you want to remove track &quot;%1&quot;?</source>
         <translation>ຫຼັງຈາກລຶບແທຣັກ, ມັນຈະບໍ່ສາມາດກູ້ຄືນໄດ້. ເຈົ້າແນ່ໃຈບໍ່ວ່າຕ້ອງການລຶບແທຣັກ &quot;%1&quot;?</translation>
     </message>
     <message>
-        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="174"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="146"/>
         <source>Confirm removal</source>
         <translation>ຢືນຢັນການລຶບ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="175"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="147"/>
         <source>Don&apos;t ask again</source>
         <translation>ບໍ່ຕ້ອງຖາມອີກ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="298"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="276"/>
         <source>Clone this track</source>
         <translation>ສຳເນົາແທຣັກນີ້</translation>
     </message>
     <message>
-        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="301"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="279"/>
         <source>Remove this track</source>
         <translation>ລຶບແທຣັກນີ້</translation>
     </message>
     <message>
-        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="306"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="284"/>
         <source>Clear this track</source>
         <translation>ລ້າງແທຣັກນີ້</translation>
     </message>
     <message>
-        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="308"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="286"/>
         <source>Channel %1: %2</source>
         <translation>ຊ່ອງ %1: %2</translation>
     </message>
     <message>
-        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="308"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="286"/>
         <source>Assign to new Mixer Channel</source>
         <translation>ກຳນົດໄປຍັງ Mixer Channel ໃໝ່</translation>
     </message>
     <message>
-        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="320"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="298"/>
         <source>Turn all recording on</source>
         <translation>ເປີດການບັນທຶກທັງໝົດ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="321"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="299"/>
         <source>Turn all recording off</source>
         <translation>ປິດການບັນທຶກທັງໝົດ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="326"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="304"/>
         <source>Track color</source>
         <translation>ສີຂອງແທຣັກ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="328"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="306"/>
         <source>Change</source>
         <translation>ປ່ຽນ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="329"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="307"/>
         <source>Reset</source>
         <translation>ຣີເຊັດ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="330"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="308"/>
         <source>Pick random</source>
         <translation>ສຸ່ມເລືອກ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="332"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="310"/>
         <source>Reset clip colors</source>
         <translation>ຣີເຊັດສີຂອງຄລິບ</translation>
     </message>
@@ -15250,99 +15492,99 @@ Latency: %2 ms</translation>
         <translation>Modulate ຄວາມຖີ່ຂອງອອດຊິລເລເຕີ 2 ດ້ວຍອອດຊິລເລເຕີ 3</translation>
     </message>
     <message>
-        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="558"/>
+        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="557"/>
         <source>Osc %1 volume:</source>
         <translation>ລະດັບສຽງ Osc %1:</translation>
     </message>
     <message>
-        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="564"/>
+        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="563"/>
         <source>Osc %1 panning:</source>
         <translation>Osc %1 panning:</translation>
     </message>
     <message>
-        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="569"/>
+        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="568"/>
         <source>Osc %1 coarse detuning:</source>
         <translation>Osc %1 ປັບສຽງແບບຫຍາບ (coarse detuning):</translation>
     </message>
     <message>
-        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="570"/>
+        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="569"/>
         <source>semitones</source>
         <translation>semitones</translation>
     </message>
     <message>
-        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="575"/>
+        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="574"/>
         <source>Osc %1 fine detuning left:</source>
         <translation>Osc %1 ປັບສຽງລະອຽດ (fine detuning) ຊ້າຍ:</translation>
     </message>
     <message>
-        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="577"/>
-        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="584"/>
+        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="576"/>
+        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="583"/>
         <source>cents</source>
         <translation>cents</translation>
     </message>
     <message>
-        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="582"/>
+        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="581"/>
         <source>Osc %1 fine detuning right:</source>
         <translation>Osc %1 ປັບສຽງລະອຽດ (fine detuning) ຂວາ:</translation>
     </message>
     <message>
-        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="589"/>
+        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="588"/>
         <source>Osc %1 phase-offset:</source>
         <translation>Osc %1 phase-offset:</translation>
     </message>
     <message>
-        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="591"/>
-        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="598"/>
+        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="590"/>
+        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="597"/>
         <source>degrees</source>
         <translation>ອົງສາ</translation>
     </message>
     <message>
-        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="596"/>
+        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="595"/>
         <source>Osc %1 stereo phase-detuning:</source>
         <translation>Osc %1 stereo phase-detuning:</translation>
     </message>
     <message>
-        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="609"/>
+        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="608"/>
         <source>Sine wave</source>
         <translation>ຮູບຄື່ນຊາຍ (Sine wave)</translation>
     </message>
     <message>
-        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="618"/>
+        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="617"/>
         <source>Triangle wave</source>
         <translation>ຮູບຄື່ນສາມຫຼ່ຽມ (Triangle wave)</translation>
     </message>
     <message>
-        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="627"/>
+        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="626"/>
         <source>Saw wave</source>
         <translation>ຮູບຄື່ນແຂ້ວເລື່ອຍ (Saw wave)</translation>
     </message>
     <message>
-        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="636"/>
+        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="635"/>
         <source>Square wave</source>
         <translation>ຮູບຄື່ນສີ່ຫຼ່ຽມ (Square wave)</translation>
     </message>
     <message>
-        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="645"/>
+        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="644"/>
         <source>Moog-like saw wave</source>
         <translation>ຮູບຄື່ນແຂ້ວເລື່ອຍແບບ Moog</translation>
     </message>
     <message>
-        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="654"/>
+        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="653"/>
         <source>Exponential wave</source>
         <translation>ຮູບຄື່ນ Exponential</translation>
     </message>
     <message>
-        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="663"/>
+        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="662"/>
         <source>White noise</source>
         <translation>ສຽງລົບກວນສີຂາວ (White noise)</translation>
     </message>
     <message>
-        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="671"/>
+        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="670"/>
         <source>User-defined wave</source>
         <translation>ຮູບຄື່ນທີ່ກຳນົດເອງ</translation>
     </message>
     <message>
-        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="680"/>
+        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="679"/>
         <source>Use alias-free wavetable oscillators.</source>
         <translation>ໃຊ້ wavetable oscillators ທີ່ບໍ່ມີ alias.</translation>
     </message>
@@ -15409,83 +15651,83 @@ Latency: %2 ms</translation>
 <context>
     <name>lmms::gui::VestigeInstrumentView</name>
     <message>
-        <location filename="../../plugins/Vestige/Vestige.cpp" line="507"/>
-        <location filename="../../plugins/Vestige/Vestige.cpp" line="672"/>
+        <location filename="../../plugins/Vestige/Vestige.cpp" line="501"/>
+        <location filename="../../plugins/Vestige/Vestige.cpp" line="657"/>
         <source>Open VST plugin</source>
         <translation>ເປີດປລັກອິນ VST</translation>
     </message>
     <message>
-        <location filename="../../plugins/Vestige/Vestige.cpp" line="519"/>
+        <location filename="../../plugins/Vestige/Vestige.cpp" line="513"/>
         <source>Control VST plugin from LMMS host</source>
         <translation>ຄວບຄຸມປລັກອິນ VST ຈາກໂຮສ LMMS</translation>
     </message>
     <message>
-        <location filename="../../plugins/Vestige/Vestige.cpp" line="532"/>
+        <location filename="../../plugins/Vestige/Vestige.cpp" line="526"/>
         <source>Open VST plugin preset</source>
         <translation>ເປີດພຣີເຊັດ (preset) ຂອງປລັກອິນ VST</translation>
     </message>
     <message>
-        <location filename="../../plugins/Vestige/Vestige.cpp" line="545"/>
+        <location filename="../../plugins/Vestige/Vestige.cpp" line="535"/>
         <source>Previous (-)</source>
         <translation>ກ່ອນໜ້າ (-)</translation>
     </message>
     <message>
-        <location filename="../../plugins/Vestige/Vestige.cpp" line="560"/>
+        <location filename="../../plugins/Vestige/Vestige.cpp" line="550"/>
         <source>Save preset</source>
         <translation>ບັນທຶກພຣີເຊັດ</translation>
     </message>
     <message>
-        <location filename="../../plugins/Vestige/Vestige.cpp" line="573"/>
+        <location filename="../../plugins/Vestige/Vestige.cpp" line="559"/>
         <source>Next (+)</source>
         <translation>ຖັດໄປ (+)</translation>
     </message>
     <message>
-        <location filename="../../plugins/Vestige/Vestige.cpp" line="590"/>
+        <location filename="../../plugins/Vestige/Vestige.cpp" line="575"/>
         <source>Show/hide GUI</source>
         <translation>ສະແດງ/ເຊື່ອງ GUI</translation>
     </message>
     <message>
-        <location filename="../../plugins/Vestige/Vestige.cpp" line="597"/>
+        <location filename="../../plugins/Vestige/Vestige.cpp" line="582"/>
         <source>Turn off all notes</source>
         <translation>ປິດໂນດທັງໝົດ</translation>
     </message>
     <message>
-        <location filename="../../plugins/Vestige/Vestige.cpp" line="677"/>
+        <location filename="../../plugins/Vestige/Vestige.cpp" line="662"/>
         <source>VST2 files (*.dll)</source>
         <translation>ໄຟລ໌ VST2 (*.dll)</translation>
     </message>
     <message>
-        <location filename="../../plugins/Vestige/Vestige.cpp" line="680"/>
+        <location filename="../../plugins/Vestige/Vestige.cpp" line="665"/>
         <source>All VST files (*.dll *.so)</source>
         <translation>ໄຟລ໌ VST ທັງໝົດ (*.dll *.so)</translation>
     </message>
     <message>
-        <location filename="../../plugins/Vestige/Vestige.cpp" line="681"/>
+        <location filename="../../plugins/Vestige/Vestige.cpp" line="666"/>
         <source>Windows VST2 files (*.dll)</source>
         <translation>ໄຟລ໌ Windows VST2 (*.dll)</translation>
     </message>
     <message>
-        <location filename="../../plugins/Vestige/Vestige.cpp" line="683"/>
+        <location filename="../../plugins/Vestige/Vestige.cpp" line="668"/>
         <source>LinuxVST files (*.so)</source>
         <translation>ໄຟລ໌ LinuxVST (*.so)</translation>
     </message>
     <message>
-        <location filename="../../plugins/Vestige/Vestige.cpp" line="888"/>
+        <location filename="../../plugins/Vestige/Vestige.cpp" line="873"/>
         <source>No VST plugin loaded</source>
         <translation>ບໍ່ມີປລັກອິນ VST ຖືກໂຫຼດ</translation>
     </message>
     <message>
-        <location filename="../../plugins/Vestige/Vestige.cpp" line="896"/>
+        <location filename="../../plugins/Vestige/Vestige.cpp" line="881"/>
         <source>Preset</source>
         <translation>Preset</translation>
     </message>
     <message>
-        <location filename="../../plugins/Vestige/Vestige.cpp" line="904"/>
+        <location filename="../../plugins/Vestige/Vestige.cpp" line="889"/>
         <source>by </source>
         <translation>ໂດຍ </translation>
     </message>
     <message>
-        <location filename="../../plugins/Vestige/Vestige.cpp" line="913"/>
+        <location filename="../../plugins/Vestige/Vestige.cpp" line="898"/>
         <source> - VST plugin control</source>
         <translation> - ການຄວບຄຸມປລັກອິນ VST</translation>
     </message>
@@ -15499,158 +15741,171 @@ Latency: %2 ms</translation>
     </message>
     <message>
         <location filename="../../plugins/Vibed/Vibed.cpp" line="282"/>
-        <location filename="../../plugins/Vibed/Vibed.cpp" line="393"/>
+        <location filename="../../plugins/Vibed/Vibed.cpp" line="392"/>
         <source>Smooth waveform</source>
         <translation>ເຮັດໃຫ້ waveform ລຽບນຽນ</translation>
     </message>
     <message>
         <location filename="../../plugins/Vibed/Vibed.cpp" line="283"/>
-        <location filename="../../plugins/Vibed/Vibed.cpp" line="400"/>
+        <location filename="../../plugins/Vibed/Vibed.cpp" line="399"/>
         <source>Normalize waveform</source>
         <translation>Normalize waveform</translation>
     </message>
     <message>
         <location filename="../../plugins/Vibed/Vibed.cpp" line="284"/>
-        <location filename="../../plugins/Vibed/Vibed.cpp" line="406"/>
+        <location filename="../../plugins/Vibed/Vibed.cpp" line="405"/>
         <source>Sine wave</source>
         <translation>ຮູບຄື່ນຊາຍ (Sine wave)</translation>
     </message>
     <message>
         <location filename="../../plugins/Vibed/Vibed.cpp" line="285"/>
-        <location filename="../../plugins/Vibed/Vibed.cpp" line="412"/>
+        <location filename="../../plugins/Vibed/Vibed.cpp" line="411"/>
         <source>Triangle wave</source>
         <translation>ຮູບຄື່ນສາມຫຼ່ຽມ (Triangle wave)</translation>
     </message>
     <message>
         <location filename="../../plugins/Vibed/Vibed.cpp" line="286"/>
-        <location filename="../../plugins/Vibed/Vibed.cpp" line="418"/>
+        <location filename="../../plugins/Vibed/Vibed.cpp" line="417"/>
         <source>Saw wave</source>
         <translation>ຮູບຄື່ນແຂ້ວເລື່ອຍ (Saw wave)</translation>
     </message>
     <message>
         <location filename="../../plugins/Vibed/Vibed.cpp" line="287"/>
-        <location filename="../../plugins/Vibed/Vibed.cpp" line="424"/>
+        <location filename="../../plugins/Vibed/Vibed.cpp" line="423"/>
         <source>Square wave</source>
         <translation>ຮູບຄື່ນສີ່ຫຼ່ຽມ (Square wave)</translation>
     </message>
     <message>
         <location filename="../../plugins/Vibed/Vibed.cpp" line="288"/>
-        <location filename="../../plugins/Vibed/Vibed.cpp" line="430"/>
+        <location filename="../../plugins/Vibed/Vibed.cpp" line="429"/>
         <source>White noise</source>
         <translation>ສຽງລົບກວນສີຂາວ (White noise)</translation>
     </message>
     <message>
         <location filename="../../plugins/Vibed/Vibed.cpp" line="289"/>
-        <location filename="../../plugins/Vibed/Vibed.cpp" line="436"/>
+        <location filename="../../plugins/Vibed/Vibed.cpp" line="435"/>
         <source>User-defined wave</source>
         <translation>ຮູບຄື່ນທີ່ກຳນົດເອງ</translation>
     </message>
     <message>
-        <location filename="../../plugins/Vibed/Vibed.cpp" line="298"/>
+        <location filename="../../plugins/Vibed/Vibed.cpp" line="297"/>
         <source>String volume:</source>
         <translation>ລະດັບສຽງສາຍ (String):</translation>
     </message>
     <message>
-        <location filename="../../plugins/Vibed/Vibed.cpp" line="301"/>
+        <location filename="../../plugins/Vibed/Vibed.cpp" line="300"/>
         <source>String stiffness:</source>
         <translation>ຄວາມແຂງຂອງສາຍ:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Vibed/Vibed.cpp" line="304"/>
+        <location filename="../../plugins/Vibed/Vibed.cpp" line="303"/>
         <source>Pick position:</source>
         <translation>ຕຳແໜ່ງການດີດ:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Vibed/Vibed.cpp" line="307"/>
+        <location filename="../../plugins/Vibed/Vibed.cpp" line="306"/>
         <source>Pickup position:</source>
         <translation>ຕຳແໜ່ງ Pickup:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Vibed/Vibed.cpp" line="310"/>
+        <location filename="../../plugins/Vibed/Vibed.cpp" line="309"/>
         <source>String panning:</source>
         <translation>String panning:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Vibed/Vibed.cpp" line="313"/>
+        <location filename="../../plugins/Vibed/Vibed.cpp" line="312"/>
         <source>String detune:</source>
         <translation>String detune:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Vibed/Vibed.cpp" line="316"/>
+        <location filename="../../plugins/Vibed/Vibed.cpp" line="315"/>
         <source>String fuzziness:</source>
         <translation>ຄວາມບໍ່ຊັດເຈນຂອງສາຍ:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Vibed/Vibed.cpp" line="319"/>
+        <location filename="../../plugins/Vibed/Vibed.cpp" line="318"/>
         <source>String length:</source>
         <translation>ຄວາມຍາວຂອງສາຍ:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Vibed/Vibed.cpp" line="321"/>
+        <location filename="../../plugins/Vibed/Vibed.cpp" line="320"/>
         <source>Impulse Editor</source>
         <translation>ຕົວແກ້ໄຂ Impulse</translation>
     </message>
     <message>
-        <location filename="../../plugins/Vibed/Vibed.cpp" line="327"/>
+        <location filename="../../plugins/Vibed/Vibed.cpp" line="326"/>
         <source>Impulse</source>
         <translation>Impulse</translation>
     </message>
     <message>
-        <location filename="../../plugins/Vibed/Vibed.cpp" line="330"/>
+        <location filename="../../plugins/Vibed/Vibed.cpp" line="329"/>
         <source>Enable/disable string</source>
         <translation>ເປີດ/ປິດ ສາຍ</translation>
     </message>
     <message>
-        <location filename="../../plugins/Vibed/Vibed.cpp" line="356"/>
+        <location filename="../../plugins/Vibed/Vibed.cpp" line="355"/>
         <source>Octave</source>
         <translation>Octave</translation>
     </message>
     <message>
-        <location filename="../../plugins/Vibed/Vibed.cpp" line="383"/>
+        <location filename="../../plugins/Vibed/Vibed.cpp" line="382"/>
         <source>String</source>
         <translation>ສາຍ (String)</translation>
     </message>
 </context>
 <context>
+    <name>lmms::gui::VolumeKnob</name>
+    <message>
+        <location filename="../../src/gui/widgets/Knob.cpp" line="582"/>
+        <source>Set value</source>
+        <translation>ຕັ້ງຄ່າ</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/widgets/Knob.cpp" line="583"/>
+        <source>Please enter a new value between %1 dBFS and %2 dBFS:</source>
+        <translation type="unfinished"/>
+    </message>
+</context>
+<context>
     <name>lmms::gui::VstEffectControlDialog</name>
     <message>
-        <location filename="../../plugins/VstEffect/VstEffectControlDialog.cpp" line="86"/>
+        <location filename="../../plugins/VstEffect/VstEffectControlDialog.cpp" line="76"/>
         <source>Show/hide</source>
         <translation>ສະແດງ/ເຊື່ອງ</translation>
     </message>
     <message>
-        <location filename="../../plugins/VstEffect/VstEffectControlDialog.cpp" line="113"/>
+        <location filename="../../plugins/VstEffect/VstEffectControlDialog.cpp" line="103"/>
         <source>Control VST plugin from LMMS host</source>
         <translation>ຄວບຄຸມປລັກອິນ VST ຈາກໂຮສ LMMS</translation>
     </message>
     <message>
-        <location filename="../../plugins/VstEffect/VstEffectControlDialog.cpp" line="129"/>
+        <location filename="../../plugins/VstEffect/VstEffectControlDialog.cpp" line="119"/>
         <source>Open VST plugin preset</source>
         <translation>ເປີດພຣີເຊັດ (preset) ຂອງປລັກອິນ VST</translation>
     </message>
     <message>
-        <location filename="../../plugins/VstEffect/VstEffectControlDialog.cpp" line="149"/>
+        <location filename="../../plugins/VstEffect/VstEffectControlDialog.cpp" line="135"/>
         <source>Previous (-)</source>
         <translation>ກ່ອນໜ້າ (-)</translation>
     </message>
     <message>
-        <location filename="../../plugins/VstEffect/VstEffectControlDialog.cpp" line="171"/>
+        <location filename="../../plugins/VstEffect/VstEffectControlDialog.cpp" line="149"/>
         <source>Next (+)</source>
         <translation>ຖັດໄປ (+)</translation>
     </message>
     <message>
-        <location filename="../../plugins/VstEffect/VstEffectControlDialog.cpp" line="205"/>
+        <location filename="../../plugins/VstEffect/VstEffectControlDialog.cpp" line="177"/>
         <source>Save preset</source>
         <translation>ບັນທຶກພຣີເຊັດ</translation>
     </message>
     <message>
-        <location filename="../../plugins/VstEffect/VstEffectControlDialog.cpp" line="248"/>
-        <location filename="../../plugins/VstEffect/VstEffectControlDialog.cpp" line="263"/>
+        <location filename="../../plugins/VstEffect/VstEffectControlDialog.cpp" line="220"/>
+        <location filename="../../plugins/VstEffect/VstEffectControlDialog.cpp" line="235"/>
         <source>Effect by: </source>
         <translation>ເອັບເຟັກໂດຍ: </translation>
     </message>
     <message>
-        <location filename="../../plugins/VstEffect/VstEffectControlDialog.cpp" line="264"/>
+        <location filename="../../plugins/VstEffect/VstEffectControlDialog.cpp" line="236"/>
         <source>&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;br /&gt;</source>
         <translation>&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;br /&gt;</translation>
     </message>
@@ -15740,142 +15995,142 @@ Latency: %2 ms</translation>
         <translation>Crosstalk</translation>
     </message>
     <message>
-        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="737"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="731"/>
         <source>Select oscillator A1</source>
         <translation>ເລືອກອອດຊິລເລເຕີ A1</translation>
     </message>
     <message>
-        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="743"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="737"/>
         <source>Select oscillator A2</source>
         <translation>ເລືອກອອດຊິລເລເຕີ A2</translation>
     </message>
     <message>
-        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="749"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="743"/>
         <source>Select oscillator B1</source>
         <translation>ເລືອກອອດຊິລເລເຕີ B1</translation>
     </message>
     <message>
-        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="755"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="749"/>
         <source>Select oscillator B2</source>
         <translation>ເລືອກອອດຊິລເລເຕີ B2</translation>
     </message>
     <message>
-        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="770"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="764"/>
         <source>Mix output of A2 to A1</source>
         <translation>ປະສົມ output ຂອງ A2 ໃສ່ A1</translation>
     </message>
     <message>
-        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="776"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="770"/>
         <source>Modulate amplitude of A1 by output of A2</source>
         <translation>Modulate ແອມພລິຈູດຂອງ A1 ດ້ວຍ output ຂອງ A2</translation>
     </message>
     <message>
-        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="782"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="776"/>
         <source>Ring modulate A1 and A2</source>
         <translation>Ring modulate A1 ແລະ A2</translation>
     </message>
     <message>
-        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="788"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="782"/>
         <source>Modulate phase of A1 by output of A2</source>
         <translation>Modulate ເຟສຂອງ A1 ດ້ວຍ output ຂອງ A2</translation>
     </message>
     <message>
-        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="801"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="795"/>
         <source>Mix output of B2 to B1</source>
         <translation>ປະສົມ output ຂອງ B2 ໃສ່ B1</translation>
     </message>
     <message>
-        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="807"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="801"/>
         <source>Modulate amplitude of B1 by output of B2</source>
         <translation>Modulate ແອມພລິຈູດຂອງ B1 ດ້ວຍ output ຂອງ B2</translation>
     </message>
     <message>
-        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="813"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="807"/>
         <source>Ring modulate B1 and B2</source>
         <translation>Ring modulate B1 ແລະ B2</translation>
     </message>
     <message>
-        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="819"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="813"/>
         <source>Modulate phase of B1 by output of B2</source>
         <translation>Modulate ເຟສຂອງ B1 ດ້ວຍ output ຂອງ B2</translation>
     </message>
     <message>
-        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="836"/>
-        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="844"/>
-        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="852"/>
-        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="860"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="830"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="838"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="846"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="854"/>
         <source>Draw your own waveform here by dragging your mouse on this graph.</source>
         <translation>ແຕ້ມຮູບຄື່ນຂອງເຈົ້າເອງບ່ອນນີ້ ໂດຍການລາກເມົາສ໌ເທິງກຣາຟນີ້.</translation>
     </message>
     <message>
-        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="867"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="861"/>
         <source>Load waveform</source>
         <translation>ໂຫຼດ waveform</translation>
     </message>
     <message>
-        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="871"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="865"/>
         <source>Load a waveform from a sample file</source>
         <translation>ໂຫຼດ waveform ຈາກໄຟລ໌ sample</translation>
     </message>
     <message>
-        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="873"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="867"/>
         <source>Phase left</source>
         <translation>Phase ຊ້າຍ</translation>
     </message>
     <message>
-        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="877"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="871"/>
         <source>Shift phase by -15 degrees</source>
         <translation>ເລື່ອນ phase ໄປ -15 ອົງສາ</translation>
     </message>
     <message>
-        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="879"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="873"/>
         <source>Phase right</source>
         <translation>Phase ຂວາ</translation>
     </message>
     <message>
-        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="883"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="877"/>
         <source>Shift phase by +15 degrees</source>
         <translation>ເລື່ອນ phase ໄປ +15 ອົງສາ</translation>
     </message>
     <message>
-        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="885"/>
-        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="889"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="879"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="883"/>
         <source>Normalize</source>
         <translation>Normalize</translation>
     </message>
     <message>
-        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="892"/>
-        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="896"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="886"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="890"/>
         <source>Invert</source>
         <translation>ກັບດ້ານ (Invert)</translation>
     </message>
     <message>
-        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="898"/>
-        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="902"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="892"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="896"/>
         <source>Smooth</source>
         <translation>ເຮັດໃຫ້ລຽບ (Smooth)</translation>
     </message>
     <message>
-        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="906"/>
-        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="910"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="900"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="904"/>
         <source>Sine wave</source>
         <translation>ຮູບຄື່ນຊາຍ (Sine wave)</translation>
     </message>
     <message>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="906"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="910"/>
         <location filename="../../plugins/Watsyn/Watsyn.cpp" line="912"/>
-        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="916"/>
-        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="918"/>
         <source>Triangle wave</source>
         <translation>ຮູບຄື່ນສາມຫຼ່ຽມ (Triangle wave)</translation>
     </message>
     <message>
-        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="922"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="916"/>
         <source>Saw wave</source>
         <translation>ຮູບຄື່ນແຂ້ວເລື່ອຍ (Saw wave)</translation>
     </message>
     <message>
-        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="924"/>
-        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="928"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="918"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="922"/>
         <source>Square wave</source>
         <translation>ຮູບຄື່ນສີ່ຫຼ່ຽມ (Square wave)</translation>
     </message>
@@ -15888,51 +16143,51 @@ Latency: %2 ms</translation>
         <translation>INPUT</translation>
     </message>
     <message>
-        <location filename="../../plugins/WaveShaper/WaveShaperControlDialog.cpp" line="68"/>
+        <location filename="../../plugins/WaveShaper/WaveShaperControlDialog.cpp" line="67"/>
         <source>Input gain:</source>
         <translation>Input gain:</translation>
     </message>
     <message>
-        <location filename="../../plugins/WaveShaper/WaveShaperControlDialog.cpp" line="70"/>
+        <location filename="../../plugins/WaveShaper/WaveShaperControlDialog.cpp" line="69"/>
         <source>OUTPUT</source>
         <translation>OUTPUT</translation>
     </message>
     <message>
-        <location filename="../../plugins/WaveShaper/WaveShaperControlDialog.cpp" line="75"/>
+        <location filename="../../plugins/WaveShaper/WaveShaperControlDialog.cpp" line="73"/>
         <source>Output gain:</source>
         <translation>Output gain:</translation>
     </message>
     <message>
-        <location filename="../../plugins/WaveShaper/WaveShaperControlDialog.cpp" line="77"/>
-        <location filename="../../plugins/WaveShaper/WaveShaperControlDialog.cpp" line="82"/>
+        <location filename="../../plugins/WaveShaper/WaveShaperControlDialog.cpp" line="75"/>
+        <location filename="../../plugins/WaveShaper/WaveShaperControlDialog.cpp" line="80"/>
         <source>Reset wavegraph</source>
         <translation>ຣີເຊັດ wavegraph</translation>
     </message>
     <message>
-        <location filename="../../plugins/WaveShaper/WaveShaperControlDialog.cpp" line="84"/>
-        <location filename="../../plugins/WaveShaper/WaveShaperControlDialog.cpp" line="89"/>
+        <location filename="../../plugins/WaveShaper/WaveShaperControlDialog.cpp" line="82"/>
+        <location filename="../../plugins/WaveShaper/WaveShaperControlDialog.cpp" line="87"/>
         <source>Smooth wavegraph</source>
         <translation>ເຮັດໃຫ້ wavegraph ລຽບ</translation>
     </message>
     <message>
-        <location filename="../../plugins/WaveShaper/WaveShaperControlDialog.cpp" line="91"/>
-        <location filename="../../plugins/WaveShaper/WaveShaperControlDialog.cpp" line="96"/>
+        <location filename="../../plugins/WaveShaper/WaveShaperControlDialog.cpp" line="89"/>
+        <location filename="../../plugins/WaveShaper/WaveShaperControlDialog.cpp" line="94"/>
         <source>Increase wavegraph amplitude by 1 dB</source>
         <translation>ເພີ່ມແອມພລິຈູດ wavegraph ຂຶ້ນ 1 dB</translation>
     </message>
     <message>
-        <location filename="../../plugins/WaveShaper/WaveShaperControlDialog.cpp" line="98"/>
-        <location filename="../../plugins/WaveShaper/WaveShaperControlDialog.cpp" line="103"/>
+        <location filename="../../plugins/WaveShaper/WaveShaperControlDialog.cpp" line="96"/>
+        <location filename="../../plugins/WaveShaper/WaveShaperControlDialog.cpp" line="101"/>
         <source>Decrease wavegraph amplitude by 1 dB</source>
         <translation>ຫຼຸດແອມພລິຈູດ wavegraph ລົງ 1 dB</translation>
     </message>
     <message>
-        <location filename="../../plugins/WaveShaper/WaveShaperControlDialog.cpp" line="105"/>
+        <location filename="../../plugins/WaveShaper/WaveShaperControlDialog.cpp" line="103"/>
         <source>Clip input</source>
         <translation>Clip input</translation>
     </message>
     <message>
-        <location filename="../../plugins/WaveShaper/WaveShaperControlDialog.cpp" line="108"/>
+        <location filename="../../plugins/WaveShaper/WaveShaperControlDialog.cpp" line="106"/>
         <source>Clip input signal to 0 dB</source>
         <translation>Clip ສັນຍານ input ໄວ້ທີ່ 0 dB</translation>
     </message>
