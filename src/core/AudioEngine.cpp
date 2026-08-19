@@ -43,7 +43,6 @@
 #include "AudioOss.h"
 #include "AudioSndio.h"
 #include "AudioPortAudio.h"
-#include "AudioSoundIo.h"
 #include "AudioPulseAudio.h"
 #include "AudioSdl.h"
 #include "AudioDummy.h"
@@ -634,13 +633,6 @@ bool AudioEngine::isAudioDevNameValid(QString name)
 #endif
 
 
-#ifdef LMMS_HAVE_SOUNDIO
-	if (name == AudioSoundIo::name())
-	{
-		return true;
-	}
-#endif
-
 	if (name == AudioDummy::name())
 	{
 		return true;
@@ -803,20 +795,6 @@ AudioDevice * AudioEngine::tryAudioDevices()
 		if( success_ful )
 		{
 			m_audioDevName = AudioPortAudio::name();
-			return dev;
-		}
-		delete dev;
-	}
-#endif
-
-
-#ifdef LMMS_HAVE_SOUNDIO
-	if( dev_name == AudioSoundIo::name() || dev_name == "" )
-	{
-		dev = new AudioSoundIo( success_ful, this );
-		if( success_ful )
-		{
-			m_audioDevName = AudioSoundIo::name();
 			return dev;
 		}
 		delete dev;

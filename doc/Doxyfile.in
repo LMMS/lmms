@@ -1959,7 +1959,6 @@ PREDEFINED             = "LMMS_BUILD_LINUX=" \
                          "LMMS_HAVE_OSS=" \
                          "LMMS_HAVE_SNDIO=" \
                          "LMMS_HAVE_PORTAUDIO=" \
-                         "LMMS_HAVE_SOUNDIO=" \
                          "LMMS_HAVE_PULSEAUDIO=" \
                          "LMMS_HAVE_SDL=" \
                          "LMMS_HAVE_STK=" \
