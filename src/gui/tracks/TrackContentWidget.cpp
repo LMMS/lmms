@@ -79,10 +79,6 @@ TrackContentWidget::TrackContentWidget( TrackView * parent ) :
 {
 	setAcceptDrops( true );
 
-	connect( parent->trackContainerView(),
-			SIGNAL( positionChanged( const lmms::TimePos& ) ),
-			this, SLOT( changePosition( const lmms::TimePos& ) ) );
-
 	// Update background if snap size changes
 	connect(getGUI()->songEditor()->m_editor->snappingModel(), &Model::dataChanged,
 			this, &TrackContentWidget::updateBackground);
