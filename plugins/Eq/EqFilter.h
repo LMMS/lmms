@@ -119,15 +119,14 @@ public:
 	}
 
 
-	///
-	/// \brief update
-	/// filters using two BiQuads, then crossfades,
-	///  depending on on percentage of period processes
-	/// \param in
-	/// \param ch
-	/// \param frameProgress percentage of frame processed
-	/// \return
-	///
+	//! @brief Update filters using two BiQuads, then crossfade
+	//!
+	//! Update filters using two BiQuads, then crossfade depending on
+	//! percentage of period processes
+	//!
+	//! @param in Input sample
+	//! @param ch Which channel of the biquad to update
+	//! @param frameProgress percentage of frame processed
 	inline float update( float in, ch_cnt_t ch, float frameProgress)
 	{
 		float initailF =  m_biQuadFrameInitial.update( in, ch );
