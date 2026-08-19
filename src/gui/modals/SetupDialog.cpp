@@ -121,6 +121,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 			"app", "openlastproject").toInt()),
 	m_detachBehavior{ConfigManager::inst()->value("ui", "detachbehavior", "show")},
 	m_loopMarkerMode{ConfigManager::inst()->value("app", "loopmarkermode", "dual")},
+	m_stereoChannelsPolicy{ConfigManager::inst()->value("app", "stereochannelspolicy", "height")},
 	m_autoScroll(ConfigManager::inst()->value("ui", "autoscroll", "stepped")),
 	m_lang(ConfigManager::inst()->value(
 			"app", "language")),
@@ -283,6 +284,19 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 
 	guiGroupLayout->addWidget(new QLabel{tr("Loop edit mode"), guiGroupBox});
 	guiGroupLayout->addWidget(m_loopMarkerComboBox);
+
+	m_stereoChannelsComboBox = new QComboBox{guiGroupBox};
+
+	m_stereoChannelsComboBox->addItem(tr("Depending on track height"), "height");
+	m_stereoChannelsComboBox->addItem(tr("Always"), "always");
+	m_stereoChannelsComboBox->addItem(tr("Never"), "never");
+
+	m_stereoChannelsComboBox->setCurrentIndex(m_stereoChannelsComboBox->findData(m_stereoChannelsPolicy));
+	connect(m_stereoChannelsComboBox, qOverload<int>(&QComboBox::currentIndexChanged),
+		this, &SetupDialog::stereoChannelsPolicyChanged);
+
+	guiGroupLayout->addWidget(new QLabel{tr("Show samples stereo channels"), guiGroupBox});
+	guiGroupLayout->addWidget(m_stereoChannelsComboBox);
 
 	m_autoScrollComboBox = new QComboBox{guiGroupBox};
 	m_autoScrollComboBox->addItem(tr("Disabled"), TimeLineWidget::AutoScrollDisabledString);
@@ -1009,6 +1023,7 @@ void SetupDialog::accept()
 					QString::number(m_openLastProject));
 	ConfigManager::inst()->setValue("ui", "detachbehavior", m_detachBehavior);
 	ConfigManager::inst()->setValue("app", "loopmarkermode", m_loopMarkerMode);
+	ConfigManager::inst()->setValue("app", "stereochannelspolicy", m_stereoChannelsPolicy);
 	ConfigManager::inst()->setValue("app", "language", m_lang);
 	ConfigManager::inst()->setValue("ui", "autoscroll", m_autoScroll);
 	ConfigManager::inst()->setValue("ui", "saveinterval",
@@ -1157,6 +1172,12 @@ void SetupDialog::detachBehaviorChanged()
 void SetupDialog::loopMarkerModeChanged()
 {
 	m_loopMarkerMode = m_loopMarkerComboBox->currentData().toString();
+}
+
+
+void SetupDialog::stereoChannelsPolicyChanged()
+{
+	m_stereoChannelsPolicy = m_stereoChannelsComboBox->currentData().toString();
 }
 
 

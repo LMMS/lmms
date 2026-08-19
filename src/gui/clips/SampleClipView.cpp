@@ -26,17 +26,20 @@
 
 #include <QApplication>
 #include <QMenu>
+#include <QObject>
 #include <QPainter>
 
+#include "AutomationEditor.h"
+#include "ConfigManager.h"
+#include "embed.h"
 #include "FileDialog.h"
 #include "GuiApplication.h"
-#include "AutomationEditor.h"
-#include "embed.h"
 #include "PathUtil.h"
 #include "SampleClip.h"
 #include "SampleThumbnail.h"
 #include "Song.h"
 #include "StringPairDrag.h"
+#include "Track.h"
 #include "TrackContainerView.h"
 #include "TrackView.h"
 
@@ -284,18 +287,34 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 
 	const auto& sample = m_clip->m_sample;
 
-	const auto sampleRextX = static_cast<int>(offsetStart) - m_paintPixmapXPosition;
+	const auto sampleRectX = static_cast<int>(offsetStart) - m_paintPixmapXPosition;
 
 	if (sample.sampleSize() > 0)
 	{
-		const auto param = SampleThumbnail::VisualizeParameters{
-			.sampleRect = QRect(sampleRextX, spacing, sampleLength, height() - spacing),
+		auto param = SampleThumbnail::VisualizeParameters{
 			.viewportRect = viewPortRect,
 			.amplification = sample.amplification(),
 			.reversed = sample.reversed()
 		};
+		const QString policy = ConfigManager::inst()->value("app", "stereochannelspolicy", "height");
+		if (policy == "never" || (policy == "height" && height() < DEFAULT_TRACK_HEIGHT * 2))
+		{
+			param.sampleRect = QRect(sampleRectX, spacing, sampleLength, height() - spacing);
+			param.waveType = SampleThumbnail::Type::MONO;
+			m_sampleThumbnail.visualize(param, p);
+		}
+		else
+		{
+			const int halfHeight = height() / 2;
 
-		m_sampleThumbnail.visualize(param, p);
+			param.sampleRect = QRect(sampleRectX, spacing, sampleLength, halfHeight - spacing);
+			param.waveType = SampleThumbnail::Type::LEFT;
+			m_sampleThumbnail.visualize(param, p);
+
+			param.sampleRect = QRect(sampleRectX, halfHeight + spacing, sampleLength, height() - spacing);
+			param.waveType = SampleThumbnail::Type::RIGHT;
+			m_sampleThumbnail.visualize(param, p);
+		}
 	}
 
 	QString name = PathUtil::cleanName(m_clip->m_sample.sampleFile());

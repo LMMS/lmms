@@ -25,10 +25,14 @@
 
 #include "SampleThumbnail.h"
 
+#include <algorithm>
+#include <cassert>
 #include <QFileInfo>
 #include <QPainter>
 
 #include "Sample.h"
+#include "SampleBuffer.h"
+#include "SampleFrame.h"
 
 namespace {
 	constexpr auto MaxSampleThumbnailCacheSize = 32;
@@ -37,22 +41,39 @@ namespace {
 
 namespace lmms::gui {
 
-SampleThumbnail::Thumbnail::Thumbnail(std::vector<Peak> peaks, double samplesPerPeak)
-	: m_peaks(std::move(peaks))
+SampleThumbnail::Thumbnail::Thumbnail(std::vector<Peak> right_peaks, std::vector<Peak> left_peaks, double samplesPerPeak)
+	: m_mono_peaks(right_peaks.size())
+	, m_right_peaks(std::move(right_peaks))
+	, m_left_peaks(std::move(left_peaks))
 	, m_samplesPerPeak(samplesPerPeak)
 {
+	assert(m_right_peaks.size() == m_left_peaks.size() && "Stereo peaks arrays lengths don't match");
+
+	for (size_t i = 0; i < m_right_peaks.size(); i++)
+	{
+		m_mono_peaks[i] = m_right_peaks[i] + m_left_peaks[i];
+	}
 }
 
-SampleThumbnail::Thumbnail::Thumbnail(const float* buffer, size_t size, size_t width)
-	: m_peaks(width)
-	, m_samplesPerPeak(std::max(static_cast<double>(size) / width, 1.0))
+SampleThumbnail::Thumbnail::Thumbnail(const SampleBuffer* buffer, size_t width)
+	: m_mono_peaks(width)
+	, m_right_peaks(width)
+	, m_left_peaks(width)
+	, m_samplesPerPeak(std::max(static_cast<double>(buffer->size()) / width, 1.0))
 {
 	for (auto peakIndex = std::size_t{0}; peakIndex < width; ++peakIndex)
 	{
-		const auto beginSample = buffer + static_cast<size_t>(std::floor(peakIndex * m_samplesPerPeak));
-		const auto endSample = buffer + static_cast<size_t>(std::ceil((peakIndex + 1) * m_samplesPerPeak));
-		const auto [min, max] = std::minmax_element(beginSample, endSample);
-		m_peaks[peakIndex] = Peak{*min, *max};
+		const auto beginSample = buffer->data() + static_cast<size_t>(std::floor(peakIndex * m_samplesPerPeak));
+		const auto endSample = buffer->data() + static_cast<size_t>(std::ceil((peakIndex + 1) * m_samplesPerPeak));
+		const auto [right_min, right_max] = std::minmax_element(beginSample, endSample,
+			[](const SampleFrame& a, const SampleFrame& b){ return a.right() < b.right();}
+		);
+		const auto [left_min, left_max] = std::minmax_element(beginSample, endSample,
+			[](const SampleFrame& a, const SampleFrame& b){ return a.left() < b.left();}
+		);
+		m_right_peaks[peakIndex] = Peak{right_min->right(), right_max->right()};
+		m_left_peaks[peakIndex] = Peak{left_min->left(), left_max->left()};
+		m_mono_peaks[peakIndex] = m_right_peaks[peakIndex] + m_left_peaks[peakIndex];
 	}
 }
 
@@ -60,15 +81,20 @@ SampleThumbnail::Thumbnail SampleThumbnail::Thumbnail::zoomOut(float factor) con
 {
 	assert(factor >= 1 && "Invalid zoom out factor");
 
-	auto peaks = std::vector<Peak>(m_peaks.size() / factor);
-	for (auto peakIndex = std::size_t{0}; peakIndex < peaks.size(); ++peakIndex)
-	{
-		const auto beginAggregationAt = m_peaks.begin() + static_cast<size_t>(std::floor(peakIndex * factor));
-		const auto endAggregationAt = m_peaks.begin() + static_cast<size_t>(std::ceil((peakIndex + 1) * factor));
-		peaks[peakIndex] = std::accumulate(beginAggregationAt, endAggregationAt, Peak{});
-	}
+	auto right_peaks = std::vector<Peak>(m_right_peaks.size() / factor);
+	auto left_peaks = std::vector<Peak>(m_left_peaks.size() / factor);
 
-	return Thumbnail{std::move(peaks), m_samplesPerPeak * factor};
+	for (auto peakIndex = std::size_t{0}; peakIndex < right_peaks.size(); ++peakIndex)
+	{
+		const auto beginRightAggregationAt = m_right_peaks.begin() + static_cast<size_t>(std::floor(peakIndex * factor));
+		const auto endRightAggregationAt = m_right_peaks.begin() + static_cast<size_t>(std::ceil((peakIndex + 1) * factor));
+		right_peaks[peakIndex] = std::accumulate(beginRightAggregationAt, endRightAggregationAt, Peak{});
+
+		const auto beginLeftAggregationAt = m_left_peaks.begin() + static_cast<size_t>(std::floor(peakIndex * factor));
+		const auto endLeftAggregationAt = m_left_peaks.begin() + static_cast<size_t>(std::ceil((peakIndex + 1) * factor));
+		left_peaks[peakIndex] = std::accumulate(beginLeftAggregationAt, endLeftAggregationAt, Peak{});
+	}
+	return Thumbnail{std::move(right_peaks), std::move(left_peaks), m_samplesPerPeak * factor};
 }
 
 SampleThumbnail::SampleThumbnail(const Sample& sample)
@@ -94,9 +120,7 @@ SampleThumbnail::SampleThumbnail(const Sample& sample)
 		s_sampleThumbnailCacheMap[std::move(entry)] = m_thumbnailCache;
 	}
 
-	const auto flatBuffer = m_buffer->data()->data();
-	const auto flatBufferSize = m_buffer->size() * DEFAULT_CHANNELS;
-	m_thumbnailCache->emplace_back(flatBuffer, flatBufferSize, flatBufferSize / AggregationPerZoomStep);
+	m_thumbnailCache->emplace_back(m_buffer.get(), m_buffer->size() / AggregationPerZoomStep);
 
 	while (m_thumbnailCache->back().width() >= AggregationPerZoomStep)
 	{
@@ -141,7 +165,11 @@ void SampleThumbnail::visualize(VisualizeParameters parameters, QPainter& painte
 	{
 		if (useOriginalBuffer && drawOriginalBuffer)
 		{
-			const auto value = m_buffer->data()->data()[i];
+			const auto value = (
+				parameters.waveType == Type::RIGHT ? m_buffer->data()[i][0] :
+				parameters.waveType == Type::LEFT  ? m_buffer->data()[i][1] :
+				(m_buffer->data()[i][0] + m_buffer->data()[i][1]) / 2
+			);
 			painter.drawPoint(x, renderRect.center().y() - value * yScale);
 			continue;
 		}
@@ -155,16 +183,40 @@ void SampleThumbnail::visualize(VisualizeParameters parameters, QPainter& painte
 
 			if (useOriginalBuffer)
 			{
-				const auto flatBuffer = m_buffer->data()->data();
-				const auto [min, max] = std::minmax_element(flatBuffer + beginIndex, flatBuffer + endIndex);
-				minPeak = *min;
-				maxPeak = *max;
+				const auto frameBuffer = m_buffer->data();
+
+				if (parameters.waveType == RIGHT)
+				{
+					const auto [min, max] = std::minmax_element(frameBuffer + beginIndex, frameBuffer + endIndex,
+						[](const SampleFrame& a, const SampleFrame& b){ return a.right() < b.right(); }
+					);
+					minPeak = min->right();
+					maxPeak = max->right();
+				}
+				else if (parameters.waveType == LEFT)
+				{
+					const auto [min, max] = std::minmax_element(frameBuffer + beginIndex, frameBuffer + endIndex,
+						[](const SampleFrame& a, const SampleFrame& b){ return a.left() < b.left(); }
+					);
+					minPeak = min->left();
+					maxPeak = max->left();
+				}
+				else
+				{
+					const auto flatBuffer = frameBuffer->data();
+					const auto [min, max] = std::minmax_element(flatBuffer + (2 * beginIndex), flatBuffer + (2 * endIndex));
+					minPeak = *min;
+					maxPeak = *max;
+				}
 			}
 			else
 			{
-				const auto beginAggregationAt = finerThumbnail->data() + beginIndex;
-				const auto endAggregationAt = finerThumbnail->data() + endIndex;
-				const auto peak = std::accumulate(beginAggregationAt, endAggregationAt, Thumbnail::Peak{});
+				const Thumbnail::Peak* peaks = (
+					parameters.waveType == Type::RIGHT ? finerThumbnail->right() :
+					parameters.waveType == Type::LEFT  ? finerThumbnail->left() :
+					finerThumbnail->mono()
+				);
+				const auto peak = std::accumulate(peaks + beginIndex, peaks + endIndex, Thumbnail::Peak{});
 				minPeak = peak.min;
 				maxPeak = peak.max;
 			}

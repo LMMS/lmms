@@ -56,6 +56,8 @@ namespace lmms::gui {
 class LMMS_EXPORT SampleThumbnail
 {
 public:
+	enum Type { MONO, LEFT, RIGHT };
+
 	struct VisualizeParameters
 	{
 		QRect sampleRect; //!< A rectangle that covers the entire range of samples.
@@ -70,6 +72,8 @@ public:
 		float sampleEnd = 1.0f; //!< Where the sample ends for drawing.
 
 		bool reversed = false; //!< Determines if the waveform is drawn in reverse or not.
+
+		Type waveType = Type::MONO; //!< Determines which stereo channel is drawn
 	};
 
 	SampleThumbnail() = default;
@@ -104,20 +108,22 @@ private:
 		};
 
 		Thumbnail() = default;
-		Thumbnail(std::vector<Peak> peaks, double samplesPerPeak);
-		Thumbnail(const float* buffer, size_t size, size_t width);
+		Thumbnail(std::vector<Peak> right_peaks, std::vector<Peak> left_peaks, double samplesPerPeak);
+		Thumbnail(const SampleBuffer* buffer, size_t width);
 
 		Thumbnail zoomOut(float factor) const;
 
-		Peak* data() { return m_peaks.data(); }
-		Peak& operator[](size_t index) { return m_peaks[index]; }
-		const Peak& operator[](size_t index) const { return m_peaks[index]; }
+		Peak* mono() { return m_mono_peaks.data(); }
+		Peak* right() { return m_right_peaks.data(); }
+		Peak* left() { return m_left_peaks.data(); }
 
-		int width() const { return m_peaks.size(); }
+		int width() const { return m_mono_peaks.size(); }
 		double samplesPerPeak() const { return m_samplesPerPeak; }
 
 	private:
-		std::vector<Peak> m_peaks;
+		std::vector<Peak> m_mono_peaks;
+		std::vector<Peak> m_right_peaks;
+		std::vector<Peak> m_left_peaks;
 		double m_samplesPerPeak = 0.0;
 	};
 
