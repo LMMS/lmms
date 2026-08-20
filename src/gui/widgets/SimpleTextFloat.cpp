@@ -24,9 +24,11 @@
 
 #include "SimpleTextFloat.h"
 
-#include <QTimer>
+#include <QGuiApplication>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QScreen>
+#include <QTimer>
 
 #include "GuiApplication.h"
 #include "MainWindow.h"
@@ -54,7 +56,7 @@ SimpleTextFloat::SimpleTextFloat() :
 	QObject::connect(m_hideTimer, &QTimer::timeout, this, &SimpleTextFloat::hide);
 }
 
-void SimpleTextFloat::setText(const QString & text)
+void SimpleTextFloat::setText(const QString& text)
 {
 	m_textLabel->setText(text);
 }
@@ -74,6 +76,28 @@ void SimpleTextFloat::showWithDelay(int msecBeforeDisplay, int msecDisplayTime)
 	{
 		m_hideTimer->start(msecBeforeDisplay + msecDisplayTime);
 	}
+}
+
+void SimpleTextFloat::moveGlobal(QWidget* w, const QPoint& offset)
+{
+	auto position = w->mapToGlobal(QPoint(0, 0)) + offset;
+
+	// Find the screen the new position is in
+	const QScreen* screen = QGuiApplication::screenAt(position);
+	if (screen == nullptr)
+	{
+		// Fallback to the text float's current screen if the position's out of any screen bounds
+		screen = w->screen();
+	}
+
+	// Then clamp position to screen before moving it there
+	auto const screenOrigin = screen->availableGeometry().topLeft();
+	auto const screenSize = screen->availableGeometry().size();
+
+	position.setX(std::clamp(position.x(), screenOrigin.x() + 4, screenOrigin.x() + screenSize.width() - width() - 4));
+	position.setY(std::clamp(position.y(), screenOrigin.y() + 4, screenOrigin.y() + screenSize.height() - height() - 4));
+
+	move(position);
 }
 
 void SimpleTextFloat::show()
