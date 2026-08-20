@@ -24,6 +24,7 @@
 
 #include "SimpleTextFloat.h"
 
+#include <QGuiApplication>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QScreen>
@@ -81,10 +82,18 @@ void SimpleTextFloat::moveGlobal(QWidget* w, const QPoint& offset)
 {
 	auto position = w->mapToGlobal(QPoint(0, 0)) + offset;
 
-	// Clamp position to screen before moving it there
-	auto screen = w->screen();
-	auto screenOrigin = screen->availableVirtualGeometry().topLeft();
-	auto screenSize = screen->availableVirtualGeometry().size();
+	// Find the screen the new position is in
+	const QScreen* screen = QGuiApplication::screenAt(position);
+	if (screen == nullptr)
+	{
+		// Fallback to the text float's current screen if the position's out of any screen bounds
+		screen = w->screen();
+	}
+
+	// Then clamp position to screen before moving it there
+	auto const screenOrigin = screen->availableGeometry().topLeft();
+	auto const screenSize = screen->availableGeometry().size();
+
 	position.setX(std::clamp(position.x(), screenOrigin.x() + 4, screenOrigin.x() + screenSize.width() - width() - 4));
 	position.setY(std::clamp(position.y(), screenOrigin.y() + 4, screenOrigin.y() + screenSize.height() - height() - 4));
 
