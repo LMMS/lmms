@@ -32,6 +32,8 @@
 #include <QDomElement>
 #include <QVariant>
 
+#include <algorithm>
+
 #include "AutomationClip.h"
 #include "AutomationTrack.h"
 #include "ConfigManager.h"
@@ -356,10 +358,10 @@ Clip * Track::addClip( Clip * clip )
  */
 void Track::removeClip( Clip * clip )
 {
-	clipVector::iterator it = std::find( m_clips.begin(), m_clips.end(), clip );
-	if( it != m_clips.end() )
+	auto it = std::ranges::find(m_clips, clip);
+	if (it != m_clips.end())
 	{
-		m_clips.erase( it );
+		m_clips.erase(it);
 		if( Engine::getSong() )
 		{
 			Engine::getSong()->updateLength();
@@ -426,8 +428,8 @@ auto Track::getClip(std::size_t clipNum) -> Clip*
 int Track::getClipNum( const Clip * clip )
 {
 //	for( int i = 0; i < getTrackContentWidget()->numOfClips(); ++i )
-	clipVector::iterator it = std::find( m_clips.begin(), m_clips.end(), clip );
-	if( it != m_clips.end() )
+	auto it = std::ranges::find(m_clips, clip);
+	if (it != m_clips.end())
 	{
 /*		if( getClip( i ) == _clip )
 		{

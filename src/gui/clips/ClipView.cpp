@@ -27,6 +27,8 @@
 #include <set>
 #include <cassert>
 
+#include <algorithm>
+
 #include <QMenu>
 #include <QMouseEvent>
 #include <QPainter>
@@ -535,7 +537,7 @@ DataFile ClipView::createClipDataFiles(
 	{
 		// Insert into the dom under the "clips" element
 		Track* clipTrack = clipView->m_trackView->getTrack();
-		const auto trackIt = std::find(tc->tracks().begin(), tc->tracks().end(), clipTrack);
+		const auto trackIt = std::ranges::find(tc->tracks(), clipTrack);
 		assert(trackIt != tc->tracks().end());
 		int trackIndex = std::distance(tc->tracks().begin(), trackIt);
 		QDomElement clipElement = dataFile.createElement("clip");
@@ -550,7 +552,7 @@ DataFile ClipView::createClipDataFiles(
 
 	// Add extra metadata needed for calculations later
 
-	const auto initialTrackIt = std::find(tc->tracks().begin(), tc->tracks().end(), t);
+	const auto initialTrackIt = std::ranges::find(tc->tracks(), t);
 	if (initialTrackIt == tc->tracks().end())
 	{
 		printf("Failed to find selected track in the TrackContainer.\n");

@@ -27,6 +27,8 @@
 #include <QDirIterator>
 #include <QRegularExpression>
 
+#include <algorithm>
+
 #include "ThreadPool.h"
 
 namespace lmms::gui {
@@ -86,7 +88,7 @@ void FileSearchJob::runSearch(Task task)
 		{
 			const auto fileInfo = QFileInfo{dirIt.next()};
 			const auto fileName = fileInfo.fileName();
-			const auto containsToken = std::all_of(tokens.begin(), tokens.end(),
+			const auto containsToken = std::ranges::all_of(tokens,
 				[&](const auto& token) { return fileName.contains(token, Qt::CaseInsensitive); });
 
 			const auto validDir = fileInfo.isDir() && containsToken;

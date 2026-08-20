@@ -28,6 +28,8 @@
 #include <QPushButton>
 #include <QMessageBox>
 
+#include <algorithm>
+
 #include "AudioEngine.h"
 #include "ControllerConnectionDialog.h"
 #include "ControllerConnection.h"
@@ -259,7 +261,7 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 			else
 			{
 				auto& controllers = Engine::getSong()->controllers();
-				auto it = std::find(controllers.begin(), controllers.end(), cc->getController());
+				auto it = std::ranges::find(controllers, cc->getController());
 
 				if (it != controllers.end())
 				{
