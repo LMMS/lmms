@@ -25,6 +25,7 @@
 #ifndef LMMS_GUI_MIXER_VIEW_H
 #define LMMS_GUI_MIXER_VIEW_H
 
+#include <QScrollBar>
 #include <QWidget>
 
 #include "MixerChannelView.h"
@@ -54,6 +55,7 @@ class LMMS_EXPORT MixerView
 public:
 	MixerView(Mixer* mixer);
 	void keyPressEvent(QKeyEvent* e) override;
+	void wheelEvent(QWheelEvent* e) override;
 
 	void saveSettings(QDomDocument& doc, QDomElement& domElement) override;
 	void loadSettings(const QDomElement& domElement) override;
@@ -119,6 +121,7 @@ private:
 	QScrollArea* channelArea;
 	QHBoxLayout* chLayout;
 	QWidget* m_channelAreaWidget;
+	QScrollBar* m_channelAreaScrollBar;
 	QStackedLayout* m_racksLayout;
 	QWidget* m_racksWidget;
 	Mixer* m_mixer;
