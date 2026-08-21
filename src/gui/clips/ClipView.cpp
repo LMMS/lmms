@@ -48,6 +48,7 @@
 #include "SongEditor.h"
 #include "StringPairDrag.h"
 #include "TextFloat.h"
+#include "Track.h"
 #include "TrackContainer.h"
 #include "TrackContainerView.h"
 #include "TrackView.h"
@@ -1238,8 +1239,14 @@ void ClipView::paste()
 
 	TrackContentWidget *tcw = getTrackView()->getTrackContentWidget();
 
-	if( tcw->pasteSelection( clipPos, getMimeData() ) )
+	if (tcw->pasteSelection(clipPos, getMimeData()))
 	{
+		Track* t = m_trackView->getTrack();
+		if (t->trackContainer() == Engine::patternStore())
+		{
+			// We swap index with the new clip so it is located in the rigth pattern
+			t->swapPositionOfClips(Engine::patternStore()->currentPattern(), t->numOfClips() - 1);
+		}
 		// If we succeed on the paste we delete the Clip we pasted on
 		remove();
 	}
