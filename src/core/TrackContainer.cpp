@@ -311,9 +311,9 @@ AutomatedValueMap TrackContainer::automatedValuesFromTracks(const TrackList &tra
 			}
 			float value = p->valueAt(relTime);
 
-			for (AutomatableModel* model : p->objects())
+			for (const auto& connection : p->connections())
 			{
-				valueMap[model] = value;
+				valueMap[connection.model()] = value;
 			}
 		}
 		else if (auto* pattern = dynamic_cast<PatternClip*>(clip))

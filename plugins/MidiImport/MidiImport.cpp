@@ -171,7 +171,7 @@ public:
 		{
 			TimePos pPos = TimePos(time.getBar(), 0);
 			ap = dynamic_cast<AutomationClip*>(at->createClip(pPos));
-			ap->addObject(objModel);
+			ap->addConnection(objModel);
 		}
 
 		lastPos = time;
@@ -298,10 +298,10 @@ bool MidiImport::readSMF(TrackContainer* tc)
 	dt->setName(tr("MIDI Time Signature Denominator"));
 	auto timeSigNumeratorPat = new AutomationClip(nt);
 	timeSigNumeratorPat->setDisplayName(tr("Numerator"));
-	timeSigNumeratorPat->addObject(&timeSigMM.numeratorModel());
+	timeSigNumeratorPat->addConnection(&timeSigMM.numeratorModel());
 	auto timeSigDenominatorPat = new AutomationClip(dt);
 	timeSigDenominatorPat->setDisplayName(tr("Denominator"));
-	timeSigDenominatorPat->addObject(&timeSigMM.denominatorModel());
+	timeSigDenominatorPat->addConnection(&timeSigMM.denominatorModel());
 
 	// TODO: adjust these to Time.Sig changes
 	double beatsPerBar = 4;
@@ -326,7 +326,7 @@ bool MidiImport::readSMF(TrackContainer* tc)
 	tt->setName(tr("Tempo"));
 	auto tap = new AutomationClip(tt);
 	tap->setDisplayName(tr("Tempo"));
-	tap->addObject(&Engine::getSong()->tempoModel());
+	tap->addConnection(&Engine::getSong()->tempoModel());
 	if (tap)
 	{
 		tap->clear();
