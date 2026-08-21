@@ -113,7 +113,7 @@ OPTION(BUNDLE_QT_TRANSLATIONS	"Install Qt translation files for LMMS" OFF)
 option(WANT_DEBUG_CPACK "Show detailed logs for packaging commands" OFF)
 option(WANT_CPACK_TARBALL "Request CPack to create a tarball instead of an installer" OFF)
 option(WANT_QT6 "Build with experimental Qt6 support" OFF)
-option(WANT_IPO "Build with interprocedural optimization (IPO/LTO)" ON)
+option(WANT_IPO "Build with interprocedural optimization (IPO/LTO)" OFF)
 
 
 # Set the target microarchitecture
@@ -204,10 +204,17 @@ IF(LMMS_BUILD_APPLE)
 
 	# Disabled because there's currently a lot of "undefined symbols" errors
 	set(WANT_IPO OFF)
+	set(STATUS_IPO "Not supported by this compiler")
 ELSE(LMMS_BUILD_APPLE)
 	SET(STATUS_APPLEMIDI "<not supported on this platform>")
 ENDIF(LMMS_BUILD_APPLE)
 
+if(MINGW)
+	# IPO/LTO is buggy in MinGW
+	# See: https://sourceforge.net/p/mingw-w64/bugs/829/
+	set(WANT_IPO OFF)
+	set(STATUS_IPO "Not supported by this compiler")
+endif()
 
 IF(LMMS_BUILD_WIN32 OR LMMS_BUILD_CYGWIN)
 	SET(WANT_ALSA OFF)
@@ -755,13 +762,15 @@ if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
 		else()
 			set(STATUS_IPO "Unsupported: ${_output}")
 		endif()
-	else()
+	elseif(NOT STATUS_IPO)
 		set(STATUS_IPO "Disabled")
 	endif()
 	set(STATUS_ASSERTIONS "Disabled")
 else()
 	remove_definitions(-DNDEBUG)
-	set(STATUS_IPO "Disabled (Debug build)")
+	if(NOT STATUS_IPO)
+		set(STATUS_IPO "Disabled (Debug build)")
+	endif()
 	set(STATUS_ASSERTIONS "Enabled")
 endif()
 
