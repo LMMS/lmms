@@ -122,6 +122,8 @@ public:
 		return new MidiClip(*this);
 	}
 
+	bool copyDataTo(Clip* dst) const override;
+
 
 	using Model::dataChanged;
 

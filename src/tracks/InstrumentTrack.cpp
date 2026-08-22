@@ -208,6 +208,9 @@ InstrumentTrack::~InstrumentTrack()
 	if (m_hasAutoMidiDev)
 	{
 		autoAssignMidiDevice(false);
+	}
+	if (s_autoAssignedTrack == this)
+	{
 		s_autoAssignedTrack = nullptr;
 	}
 
