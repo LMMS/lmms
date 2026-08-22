@@ -46,7 +46,7 @@ std::size_t writeToByteSeq(
 		case MidiNoteOn:
 			if (ev.velocity() > 0)
 			{
-				if (ev.key() < 0 || ev.key() > MidiMaxKey)
+				if (ev.key() < 0 || ev.key() >= MidiKeyCount)
 					break;
 
 				data[1] = ev.key();
@@ -66,7 +66,7 @@ std::size_t writeToByteSeq(
 			}
 
 		case MidiNoteOff:
-			if (ev.key() < 0 || ev.key() > MidiMaxKey)
+			if (ev.key() < 0 || ev.key() >= MidiKeyCount)
 				break;
 			data[1] = ev.key();
 			data[2] = ev.velocity(); // release time

@@ -29,6 +29,7 @@
 #include "InstrumentMidiIOView.h"
 #include "MidiPortMenu.h"
 #include "AudioEngine.h"
+#include "ComboBox.h"
 #include "Engine.h"
 #include "embed.h"
 #include "GroupBox.h"
@@ -116,12 +117,12 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 	midiOutputLayout->addWidget( m_fixedOutputNoteSpinBox );
 	midiOutputLayout->addStretch();
 
-	connect( m_midiOutputGroupBox->ledButton(), SIGNAL(toggled(bool)),
-		m_fixedOutputVelocitySpinBox, SLOT(setEnabled(bool)));
-	connect( m_midiOutputGroupBox->ledButton(), SIGNAL(toggled(bool)),
-			m_outputProgramSpinBox, SLOT(setEnabled(bool)));
-	connect( m_midiOutputGroupBox->ledButton(), SIGNAL(toggled(bool)),
-		m_fixedOutputNoteSpinBox, SLOT(setEnabled(bool)));
+	connect(m_midiOutputGroupBox->ledButton(), &PixmapButton::toggled,
+		m_fixedOutputVelocitySpinBox, &LcdSpinBox::setEnabled);
+	connect(m_midiOutputGroupBox->ledButton(), &PixmapButton::toggled,
+		m_outputProgramSpinBox, &LcdSpinBox::setEnabled);
+	connect(m_midiOutputGroupBox->ledButton(), &PixmapButton::toggled,
+		m_fixedOutputNoteSpinBox, &LcdSpinBox::setEnabled);
 
 	if( !Engine::audioEngine()->midiClient()->isRaw() )
 	{
@@ -141,6 +142,41 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 		midiOutputLayout->insertSpacing( 0, 4 );
 		midiOutputLayout->insertWidget( 0, m_wpBtn );
 	}
+
+
+
+	m_MPEGroupBox = new GroupBox(tr("ENABLE MPE"));
+	m_MPEGroupBox->ledButton()->setToolTip(tr("MIDI Polyphonic Expression (MPE) automatically routes incoming notes to separate MIDI channels to allow per-note pitch bending/pressure/timbre control"));
+	layout->addWidget(m_MPEGroupBox);
+
+	auto mpeLayout = new QHBoxLayout(m_MPEGroupBox);
+	mpeLayout->setContentsMargins(8, 18, 8, 8);
+	mpeLayout->setSpacing(4);
+
+	m_MPELowerZoneChannelsSpinBox = new LcdSpinBox(2, m_MPEGroupBox);
+	m_MPELowerZoneChannelsSpinBox->addTextForValue(1, "--");
+	m_MPELowerZoneChannelsSpinBox->setLabel(tr("LOWER"));
+	m_MPELowerZoneChannelsSpinBox->setToolTip(tr("Number of channels to use for the upper zone, counting from 0"));
+	mpeLayout->addWidget( m_MPELowerZoneChannelsSpinBox );
+
+	m_MPEUpperZoneChannelsSpinBox = new LcdSpinBox(2, m_MPEGroupBox);
+	m_MPEUpperZoneChannelsSpinBox->addTextForValue(1, "--");
+	m_MPEUpperZoneChannelsSpinBox->setLabel(tr("UPPER"));
+	m_MPEUpperZoneChannelsSpinBox->setToolTip(tr("Number of channels to use for the upper zone, counting back from 16"));
+	mpeLayout->addWidget(m_MPEUpperZoneChannelsSpinBox);
+
+	m_MPEPitchRangeSpinBox = new LcdSpinBox(2, m_MPEGroupBox);
+	m_MPEPitchRangeSpinBox->setLabel(tr("RANGE"));
+	m_MPEPitchRangeSpinBox->setToolTip(tr("Pitch bend range for all member channels, in semitones"));
+	mpeLayout->addWidget(m_MPEPitchRangeSpinBox);
+
+	m_MPEZoneComboBox = new ComboBox(m_MPEGroupBox);
+	m_MPEZoneComboBox->setFixedSize(64, ComboBox::DEFAULT_HEIGHT);
+	m_MPEZoneComboBox->setToolTip(tr("Zone selection"));
+	mpeLayout->addWidget(m_MPEZoneComboBox);
+
+	mpeLayout->addStretch();
+
 
 	auto baseVelocityGroupBox = new GroupBox(tr("VELOCITY MAPPING"));
 	baseVelocityGroupBox->setLedButtonShown(false);
@@ -175,6 +211,12 @@ void InstrumentMidiIOView::modelChanged()
 	m_fixedOutputVelocitySpinBox->setModel( &mp->m_fixedOutputVelocityModel );
 	m_fixedOutputNoteSpinBox->setModel( &mp->m_fixedOutputNoteModel );
 	m_outputProgramSpinBox->setModel( &mp->m_outputProgramModel );
+
+	m_MPEGroupBox->setModel(&mp->m_MPEModel);
+	m_MPELowerZoneChannelsSpinBox->setModel(&mp->m_MPELowerZoneChannelsModel);
+	m_MPEUpperZoneChannelsSpinBox->setModel(&mp->m_MPEUpperZoneChannelsModel);
+	m_MPEPitchRangeSpinBox->setModel(&mp->m_MPEPitchRangeModel);
+	m_MPEZoneComboBox->setModel(&mp->m_MPEZoneModel);
 
 	m_baseVelocitySpinBox->setModel( &mp->m_baseVelocityModel );
 
