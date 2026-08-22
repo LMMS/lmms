@@ -62,11 +62,13 @@ class ClipView : public selectableObject, public ModelView
 	Q_PROPERTY( QColor patternClipBackground READ patternClipBackground WRITE setPatternClipBackground )
 	Q_PROPERTY( bool gradient READ gradient WRITE setGradient )
 	Q_PROPERTY(QColor markerColor READ markerColor WRITE setMarkerColor)
+	Q_PROPERTY(unsigned int loopStripeWidth READ loopStripeWidth WRITE setLoopStripeWidth)
+	Q_PROPERTY(unsigned int loopStripeSpacing READ loopStripeSpacing WRITE setLoopStripeSpacing)
 
 public:
 	const static int BORDER_WIDTH = 2;
 
-	ClipView( Clip * clip, TrackView * tv );
+	ClipView(Clip* clip, TrackView * tv, int offset = 0);
 	~ClipView() override;
 
 	bool fixedClips();
@@ -81,6 +83,11 @@ public:
 		return m_trackView;
 	}
 
+	inline int offset() const
+	{
+		return m_offset;
+	}
+
 	// qproperty access func
 	QColor mutedColor() const;
 	QColor mutedBackgroundColor() const;
@@ -90,6 +97,8 @@ public:
 	QColor textShadowColor() const;
 	QColor patternClipBackground() const;
 	QColor markerColor() const;
+	unsigned int loopStripeWidth() const;
+	unsigned int loopStripeSpacing() const;
 	bool gradient() const;
 	void setMutedColor( const QColor & c );
 	void setMutedBackgroundColor( const QColor & c );
@@ -100,6 +109,8 @@ public:
 	void setPatternClipBackground(const QColor& c);
 	void setGradient( const bool & b );
 	void setMarkerColor(const QColor& c);
+	void setLoopStripeWidth(const unsigned int w);
+	void setLoopStripeSpacing(const unsigned int spacing);
 
 	// access needsUpdate member variable
 	bool needsUpdate();
@@ -135,6 +146,10 @@ public slots:
 	void randomizeColor();
 	void resetColor();
 
+signals:
+	void closedWhileResizingLoop();
+
+
 protected:
 	enum class ContextMenuAction
 	{
@@ -142,7 +157,8 @@ protected:
 		Cut,
 		Copy,
 		Paste,
-		Mute
+		Mute,
+		Loop
 	};
 
 	TrackView * m_trackView;
@@ -178,12 +194,29 @@ protected:
 	DataFile createClipDataFiles(const QVector<ClipView *> & clips) const;
 
 	virtual void paintTextLabel(QString const & text, QPainter & painter);
+	void paintStripes(QPainter& painter, QColor color);
 
 	auto hasCustomColor() const -> bool;
+
+	inline bool lastLoopView()
+	{
+		return m_offset == (m_clip->loopLength() - 1) / m_clip->length();
+	}
+
+	/** Extend the loop by the length of the clip */
+	void loop();
 
 protected slots:
 	void updateLength();
 	void updatePosition();
+
+	/** Called by the following loop view when destroyed while resizing the loop */
+	void resizeLoopAction();
+
+	/** Create a new loop view */
+	virtual void createLoopView()
+	{
+	};
 
 
 private:
@@ -194,6 +227,7 @@ private:
 		MoveSelection,
 		Resize,
 		ResizeLeft,
+		ResizeLoop,
 		Split,
 		CopySelection,
 		ToggleSelected
@@ -202,6 +236,8 @@ private:
 	static TextFloat * s_textFloat;
 
 	Clip * m_clip;
+	int m_offset; // Offset of the View from the Clip, in Clip's lengths (offset != 0 => loop view)
+	bool m_haveChild;
 	Action m_action;
 	QPoint m_initialMousePos;
 	QPoint m_initialMouseGlobalPos;
@@ -219,6 +255,8 @@ private:
 	QColor m_patternClipBackground;
 	bool m_gradient;
 	QColor m_markerColor;
+	unsigned int m_loopStripeWidth;
+	unsigned int m_loopStripeSpacing;
 
 	bool m_needsUpdate;
 	inline void setInitialPos( QPoint pos )

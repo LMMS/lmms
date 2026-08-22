@@ -78,14 +78,16 @@ TextFloat * ClipView::s_textFloat = nullptr;
  * \param _clip The clip to be displayed
  * \param _tv  The track view that will contain the new object
  */
-ClipView::ClipView( Clip * clip,
-							TrackView * tv ) :
+ClipView::ClipView(Clip* clip,
+							TrackView* tv , int offset) :
 	selectableObject( tv->getTrackContentWidget() ),
 	ModelView( nullptr, this ),
 	m_trackView( tv ),
 	m_initialClipPos( TimePos(0) ),
 	m_initialClipEnd( TimePos(0) ),
 	m_clip( clip ),
+	m_offset(offset),
+	m_haveChild(true),
 	m_action( Action::None ),
 	m_initialMousePos( QPoint( 0, 0 ) ),
 	m_initialMouseGlobalPos( QPoint( 0, 0 ) ),
@@ -99,6 +101,8 @@ ClipView::ClipView( Clip * clip,
 	m_patternClipBackground( 0, 0, 0 ),
 	m_gradient( true ),
 	m_markerColor(0, 0, 0),
+	m_loopStripeWidth(3),
+	m_loopStripeSpacing(12),
 	m_needsUpdate( true )
 {
 	if( s_textFloat == nullptr )
@@ -134,6 +138,8 @@ ClipView::ClipView( Clip * clip,
 
 	m_trackView->getTrackContentWidget()->addClipView( this );
 	updateLength();
+	// No view have actually been created, we set the flag back to false
+	m_haveChild = false;
 	updatePosition();
 }
 
@@ -220,6 +226,12 @@ bool ClipView::gradient() const
 QColor ClipView::markerColor() const
 { return m_markerColor; }
 
+unsigned int ClipView::loopStripeWidth() const
+{ return m_loopStripeWidth; }
+
+unsigned int ClipView::loopStripeSpacing() const
+{ return m_loopStripeSpacing; }
+
 //! \brief CSS theming qproperty access method
 void ClipView::setMutedColor( const QColor & c )
 { m_mutedColor = QColor( c ); }
@@ -250,6 +262,12 @@ void ClipView::setGradient( const bool & b )
 void ClipView::setMarkerColor(const QColor & c)
 { m_markerColor = QColor(c); }
 
+void ClipView::setLoopStripeWidth(const unsigned int w)
+{ m_loopStripeWidth = w; }
+
+void ClipView::setLoopStripeSpacing(const unsigned int spacing)
+{ m_loopStripeSpacing = spacing; }
+
 // access needsUpdate member variable
 bool ClipView::needsUpdate()
 { return m_needsUpdate; }
@@ -265,7 +283,16 @@ void ClipView::setNeedsUpdate( bool b )
  */
 bool ClipView::close()
 {
-	m_trackView->getTrackContentWidget()->removeClipView( this );
+	if (m_offset != 0 && m_clip->loopLength() > m_clip->length() * offset())
+	{
+		m_clip->changeLoopLength(m_clip->length() * offset());
+	}
+	if (m_action == Action::ResizeLoop)
+	{
+		releaseMouse();
+		emit closedWhileResizingLoop();
+	}
+	m_trackView->getTrackContentWidget()->removeClipView(this);
 	return QWidget::close();
 }
 
@@ -319,9 +346,23 @@ void ClipView::updateLength()
 	}
 	else
 	{
+		TimePos viewLength(std::min(m_clip->loopLength() - offset() * m_clip->length(), m_clip->length().getTicks()));
+		if (viewLength <= 0)
+		{
+			close();
+		}
+		if (lastLoopView())
+		{
+			m_haveChild = false;
+		}
+		else if (!m_haveChild)
+		{
+			m_haveChild = true;
+			createLoopView();
+		}
 		// this std::max function is needed for clips that do not start or end on the beat, otherwise, they "disappear" when zooming to min 
 		// 3 is the minimum width needed to make a clip visible
-		setFixedWidth(std::max(static_cast<int>(m_clip->length() * pixelsPerBar() / TimePos::ticksPerBar() + 1), 3));
+		setFixedWidth(std::max(static_cast<int>(viewLength * pixelsPerBar() / TimePos::ticksPerBar() + 1), 3));
 	}
 	m_trackView->trackContainerView()->update();
 }
@@ -342,6 +383,25 @@ void ClipView::updatePosition()
 	// moving a Clip can result in change of song-length etc.,
 	// therefore we update the track-container
 	m_trackView->trackContainerView()->update();
+}
+
+void ClipView::resizeLoopAction()
+{
+	// If this view is the root, the loop is already fully erased
+	if (offset() > 0)
+	{
+		// Trigger a fake mousePressEvent
+		mousePressEvent(
+			new QMouseEvent(
+				QEvent::Type::MouseButtonPress,
+				QPointF(width(), 0),
+				Qt::MouseButton::LeftButton,
+				Qt::MouseButtons(0x00000001),
+				Qt::KeyboardModifier(0)
+			)
+		);
+		grabMouse();
+	} 
 }
 
 void ClipView::selectColor()
@@ -497,7 +557,7 @@ void ClipView::updateCursor(QMouseEvent * me)
 	const auto posX = position(me).x();
 
 	// If we are at the edges, use the resize cursor
-	if (!me->buttons() && m_clip->manuallyResizable() && !isSelected()
+	if (!me->buttons() && m_clip->manuallyResizable() && !isSelected() && (!m_offset || lastLoopView())
 		&& ((posX >= width() - resizeGripWidth()) || (posX < resizeGripWidth())))
 	{
 		setCursor(Qt::SizeHorCursor);
@@ -505,7 +565,14 @@ void ClipView::updateCursor(QMouseEvent * me)
 	// If we are in the middle on knife mode, use the knife cursor
 	else if (m_trackView->trackContainerView()->knifeMode() && !isSelected())
 	{
-		setCursor(Qt::SplitHCursor);
+		if (m_offset == 0)
+		{
+			setCursor(Qt::SplitHCursor);
+		}
+		else // Knife mode have no effect on loop views, we use the Forbidden cursor
+		{
+			setCursor(Qt::ForbiddenCursor);
+		}
 	}
 	// If we are in the middle in any other mode, use the hand cursor
 	else { setCursor(Qt::PointingHandCursor); }
@@ -603,6 +670,42 @@ void ClipView::paintTextLabel(QString const & text, QPainter & painter)
 	painter.drawText( textLeft, finalTextTop, elidedClipName );
 }
 
+void ClipView::paintStripes(QPainter& painter, QColor color)
+{
+	if (m_offset == 0)
+	{
+		// Only paint stripes on the loop views
+		return;
+	}
+	painter.setPen(color);
+
+	// Change the pen's width in a rather painfull way
+	QPen previousPen = painter.pen();
+	QPen newPen(previousPen);
+	newPen.setWidth(m_loopStripeWidth);
+	painter.setPen(newPen);
+	
+	for (int x = -height(); x < width(); x += m_loopStripeSpacing)
+	{
+		int y1, y2;
+		y1 = 0;
+		if (x < 0)
+		{
+			y1 = -x;
+		}
+		y2 = height();
+		if (x + height() > width())
+		{
+			y2 = height() - (x + height() - width());
+		}
+		if (y1 < height() && y2 > 0)
+		{
+			painter.drawLine(std::max( 0, x ), y1, std::min( width(), x + height() ), y2);
+		}
+	}
+	painter.setPen(previousPen);
+}
+
 /*! \brief Handle a mouse press on this ClipView.
  *
  *  Handles the various ways in which a ClipView can be
@@ -658,13 +761,11 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 
 				// Action::Move, Action::Resize and Action::ResizeLeft
 				// Action::Split action doesn't disable Clip journalling
-				if (m_action == Action::Move || m_action == Action::Resize || m_action == Action::ResizeLeft)
+				if (m_action == Action::Move || m_action == Action::Resize
+					|| m_action == Action::ResizeLeft || m_action == Action::ResizeLoop)
 				{
 					m_clip->setJournalling(false);
 				}
-
-				setInitialPos(pos);
-				setInitialOffsets();
 
 				if (!m_clip->manuallyResizable() && !knifeMode)
 				{	// Always move clips that can't be manually resized
@@ -673,10 +774,17 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 				}
 				else if (pos.x() >= width() - resizeGripWidth())
 				{
-					m_action = Action::Resize;
+					if (pos.y() < height() / 2 || offset() > 0)
+					{
+						m_action = Action::ResizeLoop;
+					}
+					else if (offset() == 0)
+					{
+						m_action = Action::Resize;
+					}
 					setCursor( Qt::SizeHorCursor );
 				}
-				else if (pos.x() < resizeGripWidth())
+				else if (pos.x() < resizeGripWidth() && offset() == 0)
 				{
 					m_action = Action::ResizeLeft;
 					setCursor( Qt::SizeHorCursor );
@@ -717,6 +825,13 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 							arg( m_clip->endPosition().getTicks() %
 									TimePos::ticksPerBar() ) );
 				}
+				else if( m_action == Action::ResizeLoop)
+				{
+					s_textFloat->setTitle(tr("Current length"));
+					s_textFloat->setText(tr("%1:%2").
+							arg(m_clip->loopLength().getBar()).
+							arg(m_clip->loopLength().getTicks() % TimePos::ticksPerBar()));
+				}
 				// s_textFloat->reparent( this );
 				// setup text-float as if Clip was already moved/resized
 				s_textFloat->moveGlobal( this, QPoint( width() + 2, height() + 2) );
@@ -729,7 +844,7 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 			{
 				hint = tr("Press <%1> and drag to make a copy.");
 			}
-			else if (m_action == Action::Split)
+			else if (m_action == Action::Split && m_offset == 0)
 			{
 				hint = dynamic_cast<MidiClipView*>(this)
 					? tr("Press <%1> or <Alt> for unquantized splitting.\nPress <Shift> for destructive splitting.")
@@ -753,11 +868,12 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 		{
 			remove( active );
 		}
-		if (m_action == Action::Split)
+		if (m_action == Action::Split && m_offset == 0)
 		{
 			m_action = Action::None;
 			setMarkerEnabled(false);
-			update();
+			// Destroy the loop
+			m_clip->changeLoopLength(0);
 		}
 	}
 	else if( me->button() == Qt::MiddleButton )
@@ -768,7 +884,14 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 		}
 		else if( !fixedClips() )
 		{
-			remove( active );
+			if (m_offset)
+			{
+				close();
+			}
+			else
+			{
+				remove(active);
+			}
 		}
 	}
 }
@@ -883,122 +1006,152 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 			( *it )->movePosition( newPos + m_initialOffsets[index] );
 		}
 	}
-	else if( m_action == Action::Resize || m_action == Action::ResizeLeft )
+	else if (m_action == Action::Resize || m_action == Action::ResizeLeft || m_action == Action::ResizeLoop)
 	{
 		const float snapSize = getGUI()->songEditor()->m_editor->getSnapSize();
 		// Length in ticks of one snap increment
 		const TimePos snapLength = TimePos( (int)(snapSize * TimePos::ticksPerBar()) );
 
-		if( m_action == Action::Resize )
+		if(m_action == Action::ResizeLoop)
 		{
-			// The clip's new length
-			TimePos l = static_cast<int>(pos.x() * TimePos::ticksPerBar() / ppb);
+			// The clip's loop new length
+			TimePos l = static_cast<int>(offset() * m_clip->length() + pos.x() * TimePos::ticksPerBar() / ppb);
 
 			// If the user is holding alt, or pressed ctrl after beginning the drag, don't quantize
-			if ( unquantizedModHeld(me) )
-			{	// We want to preserve this adjusted offset,
-				// even if the user switches to snapping later
-				setInitialPos( m_initialMousePos );
-				// Don't resize to less than 1 tick
-				m_clip->changeLength( qMax<int>( 1, l ) );
-				m_clip->setAutoResize(false);
+			if (unquantizedModHeld(me))
+			{
+				m_clip->changeLoopLength(l);
 			}
-			else if ( me->modifiers() & Qt::ShiftModifier )
+			else if (me->modifiers() & Qt::ShiftModifier)
 			{	// If shift is held, quantize clip's end position
-				TimePos end = TimePos( m_initialClipPos + l ).quantize( snapSize );
-				// The end position has to be after the clip's start
-				TimePos min = m_initialClipPos.quantize( snapSize );
-				if ( min <= m_initialClipPos ) min += snapLength;
-				m_clip->changeLength( qMax<int>(min - m_initialClipPos, end - m_initialClipPos) );
-				m_clip->setAutoResize(false);
+				TimePos end = TimePos(m_initialClipPos + l).quantize(snapSize);
+				m_clip->changeLoopLength(end - m_initialClipPos);
 			}
 			else
 			{	// Otherwise, resize in fixed increments
 				TimePos initialLength = m_initialClipEnd - m_initialClipPos;
-				TimePos offset = TimePos( l - initialLength ).quantize( snapSize );
-				// Don't resize to less than 1 tick
-				auto min = TimePos(initialLength % snapLength);
-				if (min < 1) min += snapLength;
-				m_clip->changeLength( qMax<int>( min, initialLength + offset) );
-				m_clip->setAutoResize(false);
+				TimePos offset = TimePos(l - initialLength).quantize(snapSize);
+				m_clip->changeLoopLength(initialLength + offset);
 			}
+			s_textFloat->setTitle(tr("Current length"));
+			s_textFloat->setText(tr("%1:%2").
+					arg(m_clip->loopLength().getBar()).
+					arg(m_clip->loopLength().getTicks() % TimePos::ticksPerBar()));
 		}
-		else
+		else 
 		{
-			auto pClip = dynamic_cast<PatternClip*>(m_clip);
-
-			const int x = mapToParent(pos).x() - m_initialMousePos.x();
-
-			TimePos t = qMax( 0, (int)
-								m_trackView->trackContainerView()->currentPosition() +
-								static_cast<int>( x * TimePos::ticksPerBar() / ppb ) );
-
-			if (!isResizableBeforeStart())
+			if (m_action == Action::Resize)
 			{
-				t = std::max(t, static_cast<TimePos>(m_clip->startPosition() + m_clip->startTimeOffset()));
-			}
+				// The clip's new length
+				TimePos l = static_cast<int>(pos.x() * TimePos::ticksPerBar() / ppb);
 
-			if( unquantizedModHeld(me) )
-			{	// We want to preserve this adjusted offset,
-				// even if the user switches to snapping later
-				setInitialPos( m_initialMousePos );
-				//Don't resize to less than 1 tick
-				t = qMin<int>( m_initialClipEnd - 1, t);
-			}
-			else if( me->modifiers() & Qt::ShiftModifier )
-			{	// If shift is held, quantize clip's start position
-				// Don't let the start position move past the end position
-				TimePos max = m_initialClipEnd.quantize( snapSize );
-				if ( max >= m_initialClipEnd ) max -= snapLength;
-				t = qMin<int>( max, t.quantize( snapSize ) );
-			}
-			else
-			{	// Otherwise, resize in fixed increments
-				// Don't resize to less than 1 tick
-				TimePos initialLength = m_initialClipEnd - m_initialClipPos;
-				auto minLength = TimePos(initialLength % snapLength);
-				if (minLength < 1) minLength += snapLength;
-				TimePos offset = TimePos(t - m_initialClipPos).quantize( snapSize );
-				t = qMin<int>( m_initialClipEnd - minLength, m_initialClipPos + offset );
-			}
-
-			TimePos positionOffset = m_clip->startPosition() - t;
-			if (m_clip->length() + positionOffset >= 1)
-			{
-				m_clip->movePosition(t);
-				m_clip->changeLength(m_clip->length() + positionOffset);
-				if (pClip)
-				{
-					// Modulus the start time offset as we need it only for offsets
-					// inside the pattern length. This is done to prevent a value overflow.
-					// The start time offset may still become larger than the pattern length
-					// whenever the pattern length decreases without a clip resize following.
-					// To deal safely with it, always modulus before use.
-					tick_t patternLength = Engine::patternStore()->lengthOfPattern(pClip->patternIndex())
-							* TimePos::ticksPerBar();
-					TimePos position = (pClip->startTimeOffset() + positionOffset) % patternLength;
-					pClip->setStartTimeOffset(position);
+				// If the user is holding alt, or pressed ctrl after beginning the drag, don't quantize
+				if (unquantizedModHeld(me))
+				{	// We want to preserve this adjusted offset,
+					// even if the user switches to snapping later
+					setInitialPos(m_initialMousePos);
+					// Don't resize to less than 1 tick
+					m_clip->changeLength(qMax<int>(1, l));
+					m_clip->setAutoResize(false);
+				}
+				else if (me->modifiers() & Qt::ShiftModifier)
+				{	// If shift is held, quantize clip's end position
+					TimePos end = TimePos(m_initialClipPos + l).quantize(snapSize);
+					// The end position has to be after the clip's start
+					TimePos min = m_initialClipPos.quantize(snapSize);
+					if (min <= m_initialClipPos) min += snapLength;
+					m_clip->changeLength(qMax<int>(min - m_initialClipPos, end - m_initialClipPos));
+					m_clip->setAutoResize(false);
 				}
 				else
-				{
-					m_clip->setStartTimeOffset(m_clip->startTimeOffset() + positionOffset);
+				{	// Otherwise, resize in fixed increments
+					TimePos initialLength = m_initialClipEnd - m_initialClipPos;
+					TimePos offset = TimePos(l - initialLength).quantize(snapSize);
+					// Don't resize to less than 1 tick
+					auto min = TimePos(initialLength % snapLength);
+					if (min < 1) min += snapLength;
+					m_clip->changeLength(qMax<int>(min, initialLength + offset));
+					m_clip->setAutoResize(false);
 				}
-				m_clip->setAutoResize(false);
 			}
+			else
+			{
+				auto pClip = dynamic_cast<PatternClip*>(m_clip);
+
+				const int x = mapToParent(pos).x() - m_initialMousePos.x();
+
+				TimePos t = qMax(0, (int)
+								m_trackView->trackContainerView()->currentPosition() +
+								static_cast<int>(x * TimePos::ticksPerBar() / ppb ));
+
+				if (!isResizableBeforeStart())
+				{
+					t = std::max(t, static_cast<TimePos>(m_clip->startPosition() + m_clip->startTimeOffset()));
+				}
+
+				if(unquantizedModHeld(me))
+				{	// We want to preserve this adjusted offset,
+					// even if the user switches to snapping later
+					setInitialPos(m_initialMousePos);
+					//Don't resize to less than 1 tick
+					t = qMin<int>(m_initialClipEnd - 1, t);
+				}
+				else if(me->modifiers() & Qt::ShiftModifier)
+				{	// If shift is held, quantize clip's start position
+					// Don't let the start position move past the end position
+					TimePos max = m_initialClipEnd.quantize(snapSize);
+					if (max >= m_initialClipEnd) max -= snapLength;
+					t = qMin<int>(max, t.quantize(snapSize));
+				}
+				else
+				{	// Otherwise, resize in fixed increments
+					// Don't resize to less than 1 tick
+					TimePos initialLength = m_initialClipEnd - m_initialClipPos;
+					auto minLength = TimePos(initialLength % snapLength);
+					if (minLength < 1) minLength += snapLength;
+					TimePos offset = TimePos(t - m_initialClipPos).quantize(snapSize);
+					t = qMin<int>(m_initialClipEnd - minLength, m_initialClipPos + offset);
+				}
+
+				TimePos positionOffset = m_clip->startPosition() - t;
+				if (m_clip->length() + positionOffset >= 1)
+				{
+					m_clip->movePosition(t);
+					m_clip->changeLength(m_clip->length() + positionOffset);
+					if (pClip)
+					{
+						// Modulus the start time offset as we need it only for offsets
+						// inside the pattern length. This is done to prevent a value overflow.
+						// The start time offset may still become larger than the pattern length
+						// whenever the pattern length decreases without a clip resize following.
+						// To deal safely with it, always modulus before use.
+						tick_t patternLength = Engine::patternStore()->lengthOfPattern(pClip->patternIndex())
+								* TimePos::ticksPerBar();
+						TimePos position = (pClip->startTimeOffset() + positionOffset) % patternLength;
+						pClip->setStartTimeOffset(position);
+					}
+					else
+					{
+						m_clip->setStartTimeOffset(m_clip->startTimeOffset() + positionOffset);
+					}
+					m_clip->setAutoResize(false);
+				}
+			}
+			s_textFloat->setText(tr("%1:%2 (%3:%4 to %5:%6)").
+					arg(m_clip->length().getBar()).
+					arg(m_clip->length().getTicks() %
+						TimePos::ticksPerBar()).
+					arg(m_clip->startPosition().getBar() + 1).
+					arg(m_clip->startPosition().getTicks() %
+						TimePos::ticksPerBar() ).
+					arg(m_clip->endPosition().getBar() + 1).
+					arg(m_clip->endPosition().getTicks() %
+						TimePos::ticksPerBar()));
+			s_textFloat->moveGlobal(this, QPoint(width() + 2, height() + 2));
+			updatePosition();
 		}
-		s_textFloat->setText( tr( "%1:%2 (%3:%4 to %5:%6)" ).
-				arg( m_clip->length().getBar() ).
-				arg( m_clip->length().getTicks() %
-						TimePos::ticksPerBar() ).
-				arg( m_clip->startPosition().getBar() + 1 ).
-				arg( m_clip->startPosition().getTicks() %
-						TimePos::ticksPerBar() ).
-				arg( m_clip->endPosition().getBar() + 1 ).
-				arg( m_clip->endPosition().getTicks() %
-						TimePos::ticksPerBar() ) );
-		s_textFloat->moveGlobal( this, QPoint( width() + 2, height() + 2) );
 	}
-	else if( m_action == Action::Split )
+	else if (m_action == Action::Split && m_offset == 0)
 	{
 		setCursor(Qt::SplitHCursor);
 		setMarkerPos(knifeMarkerPos(me));
@@ -1029,12 +1182,13 @@ void ClipView::mouseReleaseEvent( QMouseEvent * me )
 	{
 		setSelected( !isSelected() );
 	}
-	else if( m_action == Action::Move || m_action == Action::Resize || m_action == Action::ResizeLeft )
+	else if (m_action == Action::Move || m_action == Action::Resize
+			|| m_action == Action::ResizeLeft || m_action == Action::ResizeLoop)
 	{
 		// TODO: Fix m_clip->setJournalling() consistency
 		m_clip->setJournalling( true );
 	}
-	else if( m_action == Action::Split )
+	else if (m_action == Action::Split && m_offset == 0)
 	{
 		const float ppb = m_trackView->trackContainerView()->pixelsPerBar();
 		const TimePos relPos = position(me).x() * TimePos::ticksPerBar() / ppb;
@@ -1047,6 +1201,8 @@ void ClipView::mouseReleaseEvent( QMouseEvent * me )
 			splitClip(unquantizedModHeld(me) ? relPos : quantizeSplitPos(relPos));
 		}
 		setMarkerEnabled(false);
+		// Destroy loop
+		m_clip->changeLoopLength(0);
 	}
 
 	m_action = Action::None;
@@ -1055,6 +1211,7 @@ void ClipView::mouseReleaseEvent( QMouseEvent * me )
 	s_textFloat->hide();
 	updateCursor(me);
 	selectableObject::mouseReleaseEvent( me );
+	releaseMouse();
 }
 
 
@@ -1119,6 +1276,15 @@ void ClipView::contextMenuEvent( QContextMenuEvent * cme )
 			->canPasteSelection(m_clip->startPosition(), Clipboard::getMimeData())
 	);
 
+	if (m_clip->loopable())
+	{
+		contextMenu.addAction(
+			embed::getIconPixmap("loop_points_on"),
+			tr("Add a repetition"),
+			[this](){ contextMenuAction(ContextMenuAction::Loop); }
+		);
+	}
+
 	contextMenu.addSeparator();
 
 	contextMenu.addAction(
@@ -1170,6 +1336,9 @@ void ClipView::contextMenuAction( ContextMenuAction action )
 			break;
 		case ContextMenuAction::Mute:
 			toggleMute( active );
+			break;
+		case ContextMenuAction::Loop:
+			loop();
 			break;
 	}
 }
@@ -1470,5 +1639,13 @@ bool ClipView::splitClip(const TimePos pos)
 	m_clip->getTrack()->restoreJournallingState();
 	return true;
 }
+
+
+
+void ClipView::loop()
+{
+	m_clip->changeLoopLength(m_clip->loopLength() + m_clip->length());
+}
+
 
 } // namespace lmms::gui
