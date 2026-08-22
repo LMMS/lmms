@@ -235,11 +235,11 @@ SongEditor::SongEditor( Song * song ) :
 	m_leftRightScroll->setSingleStep(1);
 	m_leftRightScroll->setPageStep(20 * TimePos::ticksPerBar());
 	static_cast<QVBoxLayout *>( layout() )->addWidget( m_leftRightScroll );
-	connect( m_leftRightScroll, SIGNAL(valueChanged(int)),
-					this, SLOT(scrolled(int)));
-	connect( m_song, SIGNAL(lengthChanged(int)),
-			this, SLOT(updateScrollBar(int)));
-	connect(m_leftRightScroll, SIGNAL(valueChanged(int)),this, SLOT(updateRubberband()));
+	connect(m_leftRightScroll, &QScrollBar::valueChanged, this, &SongEditor::scrolled);
+	connect(m_leftRightScroll, &QScrollBar::valueChanged, this, &SongEditor::updateRubberband);
+	connect(m_leftRightScroll, &QScrollBar::sliderReleased, this, &SongEditor::updatePosition);
+	connect(m_song, &Song::lengthChanged, this, &SongEditor::updateScrollBar);
+
 	connect(contentWidget()->verticalScrollBar(), SIGNAL(valueChanged(int)),this, SLOT(updateRubberband()));
 	connect(m_timeLine, SIGNAL(selectionFinished()), this, SLOT(stopSelectRegion()));
 
@@ -531,6 +531,7 @@ void SongEditor::keyPressEvent( QKeyEvent * ke )
 
 void SongEditor::adjustLeftRightScoll(int value)
 {
+	m_autoscrollSuspended = true;
 	m_leftRightScroll->setValue(m_leftRightScroll->value()
 						- value * DEFAULT_PIXELS_PER_BAR / pixelsPerBar());
 }
@@ -552,6 +553,7 @@ void SongEditor::wheelEvent( QWheelEvent * we )
 		m_zoomingModel->incValue(step * direction);
 
 		// scroll to zooming around cursor's tick
+		m_autoscrollSuspended = true;
 		int newTick = static_cast<int>(x / pixelsPerBar() * TimePos::ticksPerBar());
 		m_leftRightScroll->setValue(m_leftRightScroll->value() + tick - newTick);
 
@@ -762,8 +764,8 @@ void SongEditor::updatePosition()
 	const auto widgetWidth = compactTrackButtons ? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT : DEFAULT_SETTINGS_WIDGET_WIDTH;
 	const auto trackOpWidth = compactTrackButtons ? TRACK_OP_WIDTH_COMPACT : TRACK_OP_WIDTH;
 
-	if ((m_song->isPlaying() && m_song->m_playMode == Song::PlayMode::Song)
-							|| m_scrollBack)
+	if (((m_song->isPlaying() && m_song->m_playMode == Song::PlayMode::Song) || m_scrollBack)
+		&& !m_leftRightScroll->isSliderDown() && !m_autoscrollSuspended) // Manual scrolling overrides autoscroll
 	{
 		m_smoothScroll = ConfigManager::inst()->value( "ui", "smoothscroll" ).toInt();
 		const int w = width() - widgetWidth
@@ -1082,7 +1084,8 @@ void SongEditorWindow::changeEvent(QEvent *event)
 
 void SongEditorWindow::play()
 {
-	emit playTriggered();
+	m_editor->m_autoscrollSuspended = false;
+
 	if( Engine::getSong()->playMode() != Song::PlayMode::Song )
 	{
 		Engine::getSong()->playSong();
@@ -1106,6 +1109,7 @@ void SongEditorWindow::record()
 
 void SongEditorWindow::recordAccompany()
 {
+	m_editor->m_autoscrollSuspended = false;
 	m_editor->m_song->playAndRecord();
 	m_editor->m_timeLine->setRecording(true);
 	m_editor->m_positionLine->setRecording(true);
@@ -1116,6 +1120,8 @@ void SongEditorWindow::recordAccompany()
 
 void SongEditorWindow::stop()
 {
+	m_editor->m_autoscrollSuspended = false;
+	m_editor->m_scrollBack = true;
 	m_editor->m_song->stop();
 	getGUI()->pianoRoll()->stopRecording();
 	m_editor->m_timeLine->setRecording(false);
