@@ -38,3 +38,21 @@ ENDIF()
 # Generate ringbuffer configuration headers
 configure_file(ringbuffer/src/ringbuffer-config.h.in  ringbuffer-config.h)
 configure_file(ringbuffer/src/ringbuffer-version.h.in ringbuffer-version.h)
+
+IF("MidiImport" IN_LIST PLUGIN_LIST OR "MidiExport" IN_LIST PLUGIN_LIST)
+	# PortSMF defaults to a shared library and inherits BUILD_TESTING from LMMS.
+	# LMMS links it into two plugin modules and relies on PortSMF's upstream tests.
+	SET(BUILD_SHARED_LIBS OFF)
+	SET(BUILD_TESTING OFF)
+	SET(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
+	ADD_SUBDIRECTORY(portsmf EXCLUDE_FROM_ALL)
+	SET_TARGET_PROPERTIES(PortSMF PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
+	IF(NOT MSVC)
+		# PortSMF raises these warnings, which will prevent compilation with -Werror.
+		TARGET_COMPILE_OPTIONS(PortSMF PRIVATE
+			-Wno-error=unknown-pragmas
+			-Wno-error=maybe-uninitialized
+			-Wno-error=restrict)
+	ENDIF()
+ENDIF()
