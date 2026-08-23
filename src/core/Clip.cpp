@@ -137,6 +137,8 @@ void Clip::movePosition( const TimePos & pos )
  */
 void Clip::changeLength( const TimePos & length )
 {
+	if (m_length == length) { return; }
+
 	m_length = length;
 	Engine::getSong()->updateLength();
 	emit lengthChanged();
