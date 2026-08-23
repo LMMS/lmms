@@ -49,8 +49,7 @@ SampleClip::SampleClip(Track* _track, Sample sample, bool isPlaying):
 	// we need to receive bpm-change-events, because then we have to
 	// change length of this Clip
 	connect(Engine::getSong(), &Song::tempoChanged, this, &SampleClip::tempoChanged, Qt::DirectConnection);
-	connect( Engine::getSong(), SIGNAL(timeSignatureChanged(int,int)),
-					this, SLOT(updateLength()));
+	connect(Engine::getSong(), &Song::timeSignatureChanged, this, &SampleClip::updateLength);
 
 	//playbutton clicked or space key / on Export Song set isPlaying to false
 	connect( Engine::getSong(), SIGNAL(playbackStateChanged()),

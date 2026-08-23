@@ -737,14 +737,7 @@ float FloatModel::getRoundedValue() const
 
 int FloatModel::getDigitCount() const
 {
-	auto steptemp = step<float>();
-	int digits = 0;
-	while ( steptemp < 1 )
-	{
-		steptemp = steptemp * 10.0f;
-		digits++;
-	}
-	return digits;
+	return static_cast<int>(std::ceil(-std::log10(step<float>())));
 }
 
 

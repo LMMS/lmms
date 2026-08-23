@@ -80,6 +80,8 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 	connect(ConfigManager::inst(), SIGNAL(valueChanged(QString,QString,QString)),
 			this, SLOT(handleConfigChange(QString,QString,QString)));
 
+	connect(_it, &InstrumentTrack::instrumentChanged, this, &InstrumentTrackView::onInstrumentChanged);
+
 	m_mixerChannelNumber = new MixerChannelLcdSpinBox(2, getTrackSettingsWidget(), tr("Mixer channel"), this);
 	m_mixerChannelNumber->show();
 
@@ -161,6 +163,8 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 	connect(getGUI()->mainWindow(), &MainWindow::periodicUpdate, this, &InstrumentTrackView::corruptStateUpdate);
 
 	setModel( _it );
+
+	onInstrumentChanged();
 }
 
 
@@ -289,6 +293,15 @@ void InstrumentTrackView::dropEvent( QDropEvent * _de )
 {
 	getInstrumentTrackWindow()->dropEvent( _de );
 	TrackView::dropEvent( _de );
+}
+
+
+
+
+void InstrumentTrackView::onInstrumentChanged()
+{
+	// Check if an instrument has been loaded, if not disable the track label button to prevent opening an empty instrument window.
+	m_tlb->setEnabled(model()->m_instrument != nullptr);
 }
 
 
