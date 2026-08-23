@@ -211,20 +211,7 @@ public:
 		m_masterGain = mo;
 	}
 
-
-	static inline sample_t clip(const sample_t s)
-	{
-		if (s > 1.0f)
-		{
-			return 1.0f;
-		}
-		else if (s < -1.0f)
-		{
-			return -1.0f;
-		}
-		return s;
-	}
-
+	static constexpr sample_t clip(sample_t s) { return std::clamp(s, sample_t{-1}, sample_t{+1}); }
 
 	bool criticalXRuns() const;
 

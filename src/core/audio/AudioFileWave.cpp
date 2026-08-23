@@ -24,7 +24,6 @@
  */
 
 #include "AudioFileWave.h"
-#include "endian_handling.h"
 #include "AudioEngine.h"
 
 
@@ -112,11 +111,9 @@ void AudioFileWave::writeBuffer(const SampleFrame* _ab, const f_cnt_t _frames)
 	}
 	else
 	{
-		auto buf = new int_sample_t[_frames * channels()];
-		convertToS16(_ab, _frames, buf, !isLittleEndian());
-
-		sf_writef_short( m_sf, buf, _frames );
-		delete[] buf;
+		auto buf = std::vector<int_sample_t>(_frames * channels());
+		toInt16le(std::span{_ab, _frames}, std::span{buf});
+		sf_writef_short(m_sf, static_cast<short*>(buf.data()), _frames);
 	}
 }
 
