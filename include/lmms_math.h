@@ -323,31 +323,6 @@ inline float safeDbfsToAmp(float dbfs)
 }
 
 
-// TODO C++20: use std::formatted_size
-// @brief Calculate number of digits which LcdSpinBox would show for a given number
-inline int numDigitsAsInt(float f)
-{
-	// use rounding:
-	// LcdSpinBox sometimes uses std::round(), sometimes cast rounding
-	// we use rounding to be on the "safe side"
-	int asInt = static_cast<int>(std::round(f));
-	int digits = 1; // always at least 1
-	if(asInt < 0)
-	{
-		++digits;
-		asInt = -asInt;
-	}
-	// "asInt" is positive from now
-	int power = 1;
-	for (int i = 1; i < 10; ++i)
-	{
-		power *= 10;
-		if (asInt >= power) { ++digits; } // 2 digits for >=10, 3 for >=100
-		else { break; }
-	}
-	return digits;
-}
-
 template <typename T>
 class LinearMap
 {
