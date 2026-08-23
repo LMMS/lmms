@@ -79,10 +79,6 @@ TrackContentWidget::TrackContentWidget( TrackView * parent ) :
 {
 	setAcceptDrops( true );
 
-	connect( parent->trackContainerView(),
-			SIGNAL( positionChanged( const lmms::TimePos& ) ),
-			this, SLOT( changePosition( const lmms::TimePos& ) ) );
-
 	// Update background if snap size changes
 	connect(getGUI()->songEditor()->m_editor->snappingModel(), &Model::dataChanged,
 			this, &TrackContentWidget::updateBackground);
@@ -256,45 +252,24 @@ void TrackContentWidget::changePosition( const TimePos & newPos )
 		return;
 	}
 
-	TimePos pos = newPos;
-	if( pos < 0 )
-	{
-		pos = m_trackView->trackContainerView()->currentPosition();
-	}
-
-	const int begin = pos;
-	const int end = endPosition( pos );
+	const TimePos begin = newPos < 0 ? m_trackView->trackContainerView()->currentPosition() : newPos;
 	const float ppb = m_trackView->trackContainerView()->pixelsPerBar();
 
-	setUpdatesEnabled( false );
-	for (const auto& clipView : m_clipViews)
+	setUpdatesEnabled(false);
+	for (ClipView* clipView : m_clipViews)
 	{
 		Clip* clip = clipView->getClip();
 
-		clip->changeLength( clip->length() );
-
-		const int ts = clip->startPosition();
-		const int te = clip->endPosition()-3;
-		if( ( ts >= begin && ts <= end ) ||
-			( te >= begin && te <= end ) ||
-			( ts <= begin && te >= end ) )
+		const auto xPos = static_cast<int>((clip->startPosition() - begin) * ppb / TimePos::ticksPerBar());
+		clipView->move(xPos, clipView->y());
+		if (!clipView->isVisible())
 		{
-			clipView->move(static_cast<int>((ts - begin) * ppb / TimePos::ticksPerBar()), clipView->y());
-			if (!clipView->isVisible())
-			{
-				clipView->show();
-			}
-		}
-		else
-		{
-			clipView->move(-clipView->width() - 10, clipView->y());
+			clipView->show();
 		}
 	}
-	setUpdatesEnabled( true );
+	setUpdatesEnabled(true);
 
-	// redraw background
 	updateBackground();
-//	update();
 }
 
 
