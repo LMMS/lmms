@@ -125,7 +125,20 @@ auto getIconPixmap(std::string_view name, int width, int height, const char* con
 auto getText(std::string_view name) -> QString
 {
 	const auto resource = QResource{":/" + QString::fromUtf8(name.data(), name.size())};
-	return QString::fromUtf8(resource.uncompressedData());
+	if (!resource.isValid())
+	{
+		qWarning().nospace() << "Error loading text resource '"
+			<< QString::fromUtf8(name.data(), name.size()) << "'";
+		return {};
+	}
+	const auto data = resource.uncompressedData();
+	if (data.isNull())
+	{
+		qWarning().nospace() << "Error reading text resource '"
+			<< QString::fromUtf8(name.data(), name.size()) << "'";
+		return {};
+	}
+	return QString::fromUtf8(data);
 }
 
 } // namespace lmms::embed

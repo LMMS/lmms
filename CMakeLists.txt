@@ -771,18 +771,37 @@ LIST(SORT LMMS_INCLUDES)
 # Get list of all committers from git history, ordered by number of commits.
 # The CONTRIBUTORS file is used by AboutDialog. This information can be provided
 # with -DCONTRIBUTORS=/path/to/CONTRIBUTORS instead. For instance, to generate
-# this file for version 1.1.3, the command is:
-# 	git shortlog -sne v1.1.3 | cut -c8-
-FIND_PACKAGE(Git)
-IF(GIT_FOUND AND NOT CONTRIBUTORS)
-	SET(CONTRIBUTORS "${CMAKE_BINARY_DIR}/CONTRIBUTORS")
-	EXECUTE_PROCESS(
-		COMMAND "${GIT_EXECUTABLE}" shortlog -sne
-		COMMAND cut -c8-
-		OUTPUT_FILE "${CONTRIBUTORS}"
-		WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-		TIMEOUT 1)
-ENDIF()
+# this file for version 1.2.2, the command is:
+#   git shortlog -sne v1.2.2 | cut -c8-
+if(NOT CONTRIBUTORS)
+	set(CONTRIBUTORS "${CMAKE_BINARY_DIR}/CONTRIBUTORS")
+	find_package(Git)
+	if(Git_FOUND)
+		# See https://stackoverflow.com/a/73086566/8704745
+		message(STATUS "Using Git to generate the CONTRIBUTORS file")
+		execute_process(
+			COMMAND "${GIT_EXECUTABLE}" log
+			COMMAND "${GIT_EXECUTABLE}" shortlog -sne
+			OUTPUT_VARIABLE _contributors
+			WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+			RESULT_VARIABLE _result
+			ERROR_VARIABLE _error
+			TIMEOUT 5
+		)
+		if(_result EQUAL 0)
+			string(REGEX REPLACE "[0-9\t ]+([^\r\n]+)" "\\1" _contributors "${_contributors}")
+			file(WRITE "${CONTRIBUTORS}" "${_contributors}")
+		else()
+			message(WARNING "Failed to generate the CONTRIBUTORS file, so copying doc/CONTRIBUTORS instead\n${_error}")
+			file(COPY "${CMAKE_SOURCE_DIR}/doc/CONTRIBUTORS" DESTINATION "${CMAKE_BINARY_DIR}")
+		endif()
+	else()
+		message(WARNING "Git was not found, so we'll copy doc/CONTRIBUTORS instead of generating it")
+		file(COPY "${CMAKE_SOURCE_DIR}/doc/CONTRIBUTORS" DESTINATION "${CMAKE_BINARY_DIR}")
+	endif()
+else()
+	message(STATUS "A CONTRIBUTORS file was provided, so we'll use that instead of generating it")
+endif()
 
 # we somehow have to make LMMS-binary depend on MOC-files
 ADD_FILE_DEPENDENCIES("${CMAKE_BINARY_DIR}/lmmsconfig.h")
