@@ -24,6 +24,8 @@
 
 #include "FeatureDetection.h"
 
+#include "versioninfo.h"
+
 #if defined(LMMS_HOST_X86_64) && defined(_MSC_VER)
 // See: https://learn.microsoft.com/en-us/cpp/intrinsics/cpuid-cpuidex?view=msvc-170
 #include <intrin.h>
@@ -91,6 +93,53 @@ auto FeatureDetection::determineRuntimeCpuFeatures() noexcept -> std::uint32_t
 	// TODO: ARM64 feature detection
 
 	return result;
+}
+
+auto FeatureDetection::formattedCpuFeatures(std::uint32_t features) -> std::string
+{
+	auto str = '[' + std::string{LMMS_BUILDCONF_MACHINE} + "] ";
+
+#if defined(LMMS_HOST_X86_64)
+	if ((LMMS_CPU_FEATURE_X86_64_V1 & features) == LMMS_CPU_FEATURE_X86_64_V1)
+	{
+		str += "x86_64-v1, ";
+	}
+	if ((LMMS_CPU_FEATURE_SSE4_2 & features) == LMMS_CPU_FEATURE_SSE4_2)
+	{
+		str += "SSE3, SSSE3, SSE4.1, SSE4.2, ";
+	}
+	if ((LMMS_CPU_FEATURE_AVX & features) == LMMS_CPU_FEATURE_AVX)
+	{
+		str += "AVX, ";
+	}
+	if ((LMMS_CPU_FEATURE_AVX2 & features) == LMMS_CPU_FEATURE_AVX2)
+	{
+		str += "AVX2, ";
+	}
+	if ((LMMS_CPU_FEATURE_AVX512F & features) == LMMS_CPU_FEATURE_AVX512F)
+	{
+		str += "AVX512F, ";
+	}
+#elif defined(LMMS_HOST_ARM64)
+	if ((LMMS_CPU_FEATURE_NEON & features) == LMMS_CPU_FEATURE_NEON)
+	{
+		str += "NEON, ";
+	}
+	if ((LMMS_CPU_FEATURE_SVE & features) == LMMS_CPU_FEATURE_SVE)
+	{
+		str += "SVE, ";
+	}
+	if ((LMMS_CPU_FEATURE_SVE2 & features) == LMMS_CPU_FEATURE_SVE2)
+	{
+		str += "SVE2, ";
+	}
+#else
+	str += "???";
+#endif
+
+	if (str.ends_with(", ")) { str.erase(str.size() - 2); }
+
+	return str;
 }
 
 } // namespace lmms

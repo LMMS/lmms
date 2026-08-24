@@ -61,6 +61,7 @@
 #include "NotePlayHandle.h"
 #include "embed.h"
 #include "Engine.h"
+#include "FeatureDetection.h"
 #include "GuiApplication.h"
 #include "Hardware.h"
 #include "ImportFilter.h"
@@ -292,6 +293,15 @@ int main( int argc, char * * argv )
 			// fullscreen mode (default, no -geometry given).
 			fullscreen = false;
 		}
+	}
+
+	if (!FeatureDetection::isCurrentCpuSupported())
+	{
+		auto msg = std::string{"ERROR: This CPU is unsupported.\n"};
+		msg += "Required: " + FeatureDetection::formattedCpuFeatures() + '\n';
+		msg += "  Actual: " + FeatureDetection::formattedCpuFeatures(FeatureDetection::runtimeCpuFeatures()) + '\n';
+		fprintf(stderr, "%s", msg.c_str());
+		return EXIT_FAILURE;
 	}
 
 #ifdef LMMS_DEBUG_FPE

@@ -47,7 +47,7 @@
 //! CMOV, CMPXCHG8B (CX8), FPU, FXSR, MMX, OSFXSR, SCE, SSE, SSE2
 //! @note x86_64-v1 is the baseline for all x86_64 CPUs, so this feature is unconditionally present.
 #	define LMMS_CPU_FEATURE_X86_64_V1 (1u << 0)
-//! x86-64-v1 + SSE, SSE2, SSE3, SSSE3, SSE4.1, and SSE4.2
+//! x86-64-v1 + SSE3, SSSE3, SSE4.1, and SSE4.2
 #	define LMMS_CPU_FEATURE_SSE4_2    ((1u << 1) | LMMS_CPU_FEATURE_X86_64_V1)
 #	define LMMS_CPU_FEATURE_AVX       (1u << 2)
 #	define LMMS_CPU_FEATURE_AVX2      ((1u << 3) | LMMS_CPU_FEATURE_AVX)
@@ -151,6 +151,9 @@ public:
 	{
 		return (runtimeCpuFeatures() & LMMS_TARGET_CPU_FEATURES) == LMMS_TARGET_CPU_FEATURES;
 	}
+
+	//! @returns a display string for the given CPU features
+	static auto formattedCpuFeatures(std::uint32_t features = LMMS_TARGET_CPU_FEATURES) -> std::string;
 
 private:
 	static auto determineRuntimeCpuFeatures() noexcept -> std::uint32_t;
