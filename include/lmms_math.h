@@ -34,11 +34,9 @@
 #include <numbers>
 #include <concepts>
 
+#include "FeatureDetection.h"
+#include "LmmsCommonMacros.h"
 #include "lmms_constants.h"
-
-#ifdef __SSE2__
-#include <emmintrin.h>
-#endif
 
 namespace lmms
 {
@@ -222,7 +220,7 @@ constexpr T sign(T val) noexcept
 
 
 //! if val >= 0.0f, returns sqrt(val), else: -sqrt(-val)
-inline float sqrt_neg(float val) 
+inline float sqrt_neg(float val)
 {
 	return std::sqrt(std::abs(val)) * sign(val);
 }
@@ -373,9 +371,13 @@ private:
 	T m_b;
 };
 
-#ifdef __SSE2__
+namespace simd {
+
+#if LMMS_CPU_SUPPORTS(LMMS_CPU_FEATURE_X86_64_V1)
+
 // exp approximation for SSE2: https://stackoverflow.com/a/47025627/5759631
 // Maximum relative error of 1.72863156e-3 on [-87.33654, 88.72283]
+LMMS_ALWAYS_INLINE
 inline __m128 fastExp(__m128 x)
 {
 	__m128 f, p, r;
@@ -402,6 +404,7 @@ inline __m128 fastExp(__m128 x)
 
 // Lost Robot's SSE2 adaptation of Kari's vectorized log approximation: https://stackoverflow.com/a/65537754/5759631
 // Maximum relative error of 7.922410e-4 on [1.0279774e-38f, 3.4028235e+38f]
+LMMS_ALWAYS_INLINE
 inline __m128 fastLog(__m128 a)
 {
 	__m128i aInt = _mm_castps_si128(a);
@@ -420,30 +423,54 @@ inline __m128 fastLog(__m128 a)
 	return r;
 }
 
-inline __m128 sse2Abs(__m128 x)
+LMMS_ALWAYS_INLINE
+inline __m128 abs(__m128 x)
 {
-	return _mm_and_ps(x, _mm_castsi128_ps(_mm_set1_epi32(0x7fffffff)));// clear sign bit
+	return _mm_and_ps(x, _mm_castsi128_ps(_mm_set1_epi32(0x7fffffff))); // clear sign bit
 }
 
-inline __m128 sse2Floor(__m128 x)
+LMMS_ALWAYS_INLINE
+inline __m256 abs256(__m256 x)
 {
+	return _mm256_and_ps(x, _mm256_castsi256_ps(_mm256_set1_epi32(0x7fffffff))); // clear sign bit
+}
+
+LMMS_ALWAYS_INLINE
+inline __m512 abs512(__m512 x)
+{
+	return _mm512_and_ps(x, _mm512_castsi512_ps(_mm512_set1_epi32(0x7fffffff))); // clear sign bit
+}
+
+LMMS_ALWAYS_INLINE
+inline __m128 floor(__m128 x)
+{
+#if LMMS_CPU_SUPPORTS(LMMS_CPU_FEATURE_SSE4_2)
+	return _mm_floor_ps(x);
+#else
 	__m128 t = _mm_cvtepi32_ps(_mm_cvttps_epi32(x)); // trunc toward 0
 	__m128 needs_correction = _mm_cmplt_ps(x, t); // checks if x < trunc
 	return _mm_sub_ps(t, _mm_and_ps(needs_correction, _mm_set1_ps(1.0f)));
+#endif
 }
 
-inline __m128 sse2Round(__m128 x)
+LMMS_ALWAYS_INLINE
+inline __m128 round(__m128 x)
 {
-	__m128 sign_mask = _mm_cmplt_ps(x, _mm_setzero_ps());// checks if x < 0
-	__m128 bias_pos = _mm_set1_ps(0.5f);
-	__m128 bias_neg = _mm_set1_ps(-0.5f);
-	__m128 bias = _mm_or_ps(_mm_and_ps(sign_mask, bias_neg), _mm_andnot_ps(sign_mask, bias_pos));
+#if LMMS_CPU_SUPPORTS(LMMS_CPU_FEATURE_SSE4_2)
+	return _mm_round_ps(x, _MM_FROUND_TO_NEAREST_INT | _MM_FROUND_NO_EXC);
+#else
+	__m128 signMask = _mm_cmplt_ps(x, _mm_setzero_ps()); // checks if x < 0
+	__m128 biasPos = _mm_set1_ps(0.5f);
+	__m128 biasNeg = _mm_set1_ps(-0.5f);
+	__m128 bias = _mm_or_ps(_mm_and_ps(signMask, biasNeg), _mm_andnot_ps(signMask, biasPos));
 	__m128 y = _mm_add_ps(x, bias);
 	return _mm_cvtepi32_ps(_mm_cvttps_epi32(y));
+#endif
 }
 
-#endif // __SSE2__
+#endif // x86_64
 
+} // namespace simd
 } // namespace lmms
 
 #endif // LMMS_MATH_H
