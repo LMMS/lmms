@@ -200,6 +200,8 @@ QColor ClipView::mutedBackgroundColor() const
 QColor ClipView::selectedColor() const
 { return m_selectedColor; }
 
+QColor ClipView::selectedBlendColor() const { return m_selectedBlendColor; }
+
 QColor ClipView::textColor() const
 { return m_textColor; }
 
@@ -229,6 +231,8 @@ void ClipView::setMutedBackgroundColor( const QColor & c )
 
 void ClipView::setSelectedColor( const QColor & c )
 { m_selectedColor = QColor( c ); }
+
+void ClipView::setSelectedBlendColor(const QColor& c) { m_selectedBlendColor = QColor(c); }
 
 void ClipView::setTextColor( const QColor & c )
 { m_textColor = QColor( c ); }
@@ -1398,46 +1402,39 @@ TimePos ClipView::quantizeSplitPos(TimePos midiPos)
 	else { return globalPos; }
 }
 
-
-
-
-// Return the color that the Clip's background should be
-QColor ClipView::getColorForDisplay( QColor defaultColor )
+QColor ClipView::getBlendedSelectedColor(QColor baseColor)
 {
-	// Get the pure Clip color
+	const auto blendColor = selectedBlendColor();
+
+	// weights for both colors
+	const float wo = 0.4f;
+	const float wr = 1.0f - wo;
+
+	auto ret = baseColor;
+	ret.setRedF(blendColor.redF() * wo + baseColor.redF() * wr);
+	ret.setGreenF(blendColor.greenF() * wo + baseColor.greenF() * wr);
+	ret.setBlueF(blendColor.blueF() * wo + baseColor.blueF() * wr);
+	return ret;
+}
+
+QColor ClipView::getColor(QColor baseColor, bool ignoreMuted, bool ignoreEmpty, bool ignoreSelected)
+{
+	auto ret = baseColor;
+	const bool muted = m_clip->getTrack()->isMuted() || m_clip->isMuted();
+
+	if ((!ignoreMuted && muted) || (!ignoreEmpty && m_clip->isEmpty()))
+	{
+		ret.setHsv(ret.hsvHue(), ret.hsvSaturation() / 3.5, ret.value() / 3);
+	}
+	if (!ignoreSelected && isSelected()) { ret = getBlendedSelectedColor(ret); }
+
+	return ret;
+}
+
+QColor ClipView::getColorForDisplay(QColor defaultColor)
+{
 	auto clipColor = m_clip->color().value_or(m_clip->getTrack()->color().value_or(defaultColor));
-
-	// Set variables
-	QColor c, mutedCustomColor;
-	bool muted = m_clip->getTrack()->isMuted() || m_clip->isMuted();
-	mutedCustomColor = clipColor;
-	mutedCustomColor.setHsv( mutedCustomColor.hsvHue(), mutedCustomColor.hsvSaturation() / 4, mutedCustomColor.value() );
-
-	// Change the pure color by state: selected, muted, colored, normal
-	if( isSelected() )
-	{
-		c = hasCustomColor()
-			? ( muted
-				? mutedCustomColor.darker( 350 )
-				: clipColor.darker( 150 ) )
-			: selectedColor();
-	}
-	else
-	{
-		if( muted )
-		{
-			c = hasCustomColor()
-				? mutedCustomColor.darker( 250 )
-				: mutedBackgroundColor();
-		}
-		else
-		{
-			c = clipColor;
-		}
-	}
-
-	// Return color to caller
-	return c;
+	return getColor(clipColor);
 }
 
 auto ClipView::hasCustomColor() const -> bool
