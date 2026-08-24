@@ -31,6 +31,22 @@ namespace lmms
 #define LMMS_STRINGIFY(s) LMMS_STR(s) // a macro used to stringify the plugin name
 #define LMMS_STR(PN) #PN
 
+#if defined(__GNUC__) || defined(__clang__)
+#	define LMMS_RESTRICT __restrict__
+#elif defined(_MSC_VER)
+#	define LMMS_RESTRICT __restrict
+#else
+#	define LMMS_RESTRICT
+#endif
+
+#if defined(__GNUC__) || defined(__clang__)
+#	define LMMS_ALWAYS_INLINE [[gnu::always_inline]]
+#elif defined(_MSC_VER)
+#	define LMMS_ALWAYS_INLINE [[msvc::forceinline]]
+#else
+#	define LMMS_ALWAYS_INLINE
+#endif
+
 } // namespace lmms
 
 #endif // LMMS_COMMON_MACROS_H
