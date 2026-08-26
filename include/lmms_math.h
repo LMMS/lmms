@@ -426,24 +426,14 @@ LMMS_INLINE __m128 abs(__m128 x)
 	return _mm_and_ps(x, _mm_castsi128_ps(_mm_set1_epi32(0x7fffffff))); // clear sign bit
 }
 
-LMMS_INLINE __m256 abs256(__m256 x)
-{
-	return _mm256_and_ps(x, _mm256_castsi256_ps(_mm256_set1_epi32(0x7fffffff))); // clear sign bit
-}
-
-LMMS_INLINE __m512 abs512(__m512 x)
-{
-	return _mm512_and_ps(x, _mm512_castsi512_ps(_mm512_set1_epi32(0x7fffffff))); // clear sign bit
-}
-
 LMMS_INLINE __m128 floor(__m128 x)
 {
 #if LMMS_CPU_SUPPORTS(LMMS_CPU_FEATURE_SSE4_2)
 	return _mm_floor_ps(x);
 #else
 	__m128 t = _mm_cvtepi32_ps(_mm_cvttps_epi32(x)); // trunc toward 0
-	__m128 needs_correction = _mm_cmplt_ps(x, t); // checks if x < trunc
-	return _mm_sub_ps(t, _mm_and_ps(needs_correction, _mm_set1_ps(1.0f)));
+	__m128 needsCorrection = _mm_cmplt_ps(x, t); // checks if x < trunc
+	return _mm_sub_ps(t, _mm_and_ps(needsCorrection, _mm_set1_ps(1.0f)));
 #endif
 }
 

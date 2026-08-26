@@ -149,13 +149,14 @@ class SimdDispatcher
 {
 	using FuncRef = decltype(targets)::FuncRef;
 	using Ret = decltype(targets)::Ret;
+	static constexpr bool NoExcept = decltype(targets)::NoExcept;
 	FuncRef m_resolvedTarget;
 public:
 	SimdDispatcher() : m_resolvedTarget{resolve()} {}
 
 	template<class... Args>
 		requires (std::is_invocable_v<FuncRef, Args...>)
-	LMMS_INLINE auto operator()(Args&&... args) const noexcept(FuncRef) -> Ret
+	LMMS_INLINE auto operator()(Args&&... args) const noexcept(NoExcept) -> Ret
 	{
 		if constexpr (std::is_void_v<Ret>)
 		{
@@ -184,7 +185,7 @@ private:
 			if (targets.neon)    { return LMMS_CPU_FEATURE_NEON; }
 #endif
 			return LMMS_CPU_FEATURE_NONE;
-		};
+		}();
 
 		switch (FeatureDetection::runtimeCpuFeatures() & highestDispatchTarget)
 		{
