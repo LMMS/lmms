@@ -70,7 +70,7 @@ static thread_local bool s_renderingThread = false;
 AudioEngine::AudioEngine(bool renderOnly)
 	: m_renderOnly(renderOnly)
 	, m_framesPerAudioBuffer(std::clamp(
-		  static_cast<f_cnt_t>(ConfigManager::inst()->value("audioengine", "framesperaudiobuffer").toULongLong()),
+		  static_cast<f_cnt_t>(ConfigManager::inst()->value("audioengine", "framesperaudiobuffer", "256").toUInt()),
 		  MINIMUM_BUFFER_SIZE, MAXIMUM_BUFFER_SIZE))
 	, m_framesPerPeriod(std::min(m_framesPerAudioBuffer, DEFAULT_BUFFER_SIZE))
 	, m_baseSampleRate(
