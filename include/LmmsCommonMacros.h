@@ -39,12 +39,12 @@ namespace lmms
 #	define LMMS_RESTRICT
 #endif
 
-#if defined(__GNUC__) || defined(__clang__)
-#	define LMMS_ALWAYS_INLINE [[gnu::always_inline]]
+#if (defined(__GNUC__) || defined(__clang__)) && !defined(__OPTIMIZE__)
+#	define LMMS_INLINE inline __attribute__((always_inline))
 #elif defined(_MSC_VER)
-#	define LMMS_ALWAYS_INLINE [[msvc::forceinline]]
+#	define LMMS_INLINE inline __forceinline
 #else
-#	define LMMS_ALWAYS_INLINE
+#	define LMMS_INLINE inline
 #endif
 
 } // namespace lmms

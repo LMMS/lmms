@@ -29,6 +29,7 @@
 //       but only the features that we actually want to use and support compile-time
 //       or runtime dispatch on. Feel free to add additional CPU features here as needed.
 
+#include "LmmsCommonMacros.h"
 #include "lmmsconfig.h"
 #include "lmms_export.h"
 
@@ -49,8 +50,11 @@
 #	define LMMS_CPU_FEATURE_X86_64_V1 (1u << 0)
 //! x86-64-v1 + SSE3, SSSE3, SSE4.1, and SSE4.2
 #	define LMMS_CPU_FEATURE_SSE4_2    ((1u << 1) | LMMS_CPU_FEATURE_X86_64_V1)
-#	define LMMS_CPU_FEATURE_AVX       (1u << 2)
+//! x86-64-v1 + SSE3, SSSE3, SSE4.1, SSE4.2, and AVX
+#	define LMMS_CPU_FEATURE_AVX       ((1u << 2) | LMMS_CPU_FEATURE_SSE4_2)
+//! x86-64-v1 + SSE3, SSSE3, SSE4.1, SSE4.2, AVX, and AVX2
 #	define LMMS_CPU_FEATURE_AVX2      ((1u << 3) | LMMS_CPU_FEATURE_AVX)
+//! x86-64-v1 + SSE3, SSSE3, SSE4.1, SSE4.2, AVX, AVX2, and AVX512F
 #	define LMMS_CPU_FEATURE_AVX512F   ((1u << 4) | LMMS_CPU_FEATURE_AVX2)
 #else
 #	define LMMS_CPU_FEATURE_X86_64_V1 LMMS_CPU_FEATURE_INVALID
@@ -69,6 +73,15 @@
 #	define LMMS_CPU_FEATURE_NEON      LMMS_CPU_FEATURE_INVALID
 #	define LMMS_CPU_FEATURE_SVE       LMMS_CPU_FEATURE_INVALID
 #	define LMMS_CPU_FEATURE_SVE2      LMMS_CPU_FEATURE_INVALID
+#endif
+
+#if defined(DOXYGEN)
+//! A mask for extracting only the SIMD flags in the @a LMMS_CPU_FEATURE_* flags
+#	define LMMS_CPU_FEATURE_SIMD_MASK
+#elif defined(LMMS_HOST_X86_64)
+#	define LMMS_CPU_FEATURE_SIMD_MASK ((1u << 5) - 1u)
+#elif defined(LMMS_HOST_ARM64)
+#	define LMMS_CPU_FEATURE_SIMD_MASK ((1u << 3) - 1u)
 #endif
 
 ///////////////////////////////////////////
@@ -136,9 +149,9 @@ class LMMS_EXPORT FeatureDetection
 public:
 	//! @returns @a LMMS_CPU_FEATURE_* flags indicating all CPU features detected at runtime
 	//! @note Feature detection runs only during the first function call and results are cached for subsequent calls.
-	static auto runtimeCpuFeatures() noexcept -> std::uint32_t
+	static LMMS_INLINE auto runtimeCpuFeatures() noexcept -> std::uint32_t
 	{
-		if (m_cachedFeatures != LMMS_CPU_FEATURE_INVALID) { return m_cachedFeatures; }
+		if (m_cachedFeatures != LMMS_CPU_FEATURE_INVALID) [[likely]] { return m_cachedFeatures; }
 		m_cachedFeatures = determineRuntimeCpuFeatures();
 		return m_cachedFeatures;
 	}

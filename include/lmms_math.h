@@ -377,8 +377,7 @@ namespace simd {
 
 // exp approximation for SSE2: https://stackoverflow.com/a/47025627/5759631
 // Maximum relative error of 1.72863156e-3 on [-87.33654, 88.72283]
-LMMS_ALWAYS_INLINE
-inline __m128 fastExp(__m128 x)
+LMMS_INLINE __m128 fastExp(__m128 x)
 {
 	__m128 f, p, r;
 	__m128i t, j;
@@ -404,8 +403,7 @@ inline __m128 fastExp(__m128 x)
 
 // Lost Robot's SSE2 adaptation of Kari's vectorized log approximation: https://stackoverflow.com/a/65537754/5759631
 // Maximum relative error of 7.922410e-4 on [1.0279774e-38f, 3.4028235e+38f]
-LMMS_ALWAYS_INLINE
-inline __m128 fastLog(__m128 a)
+LMMS_INLINE __m128 fastLog(__m128 a)
 {
 	__m128i aInt = _mm_castps_si128(a);
 	__m128i e = _mm_sub_epi32(aInt, _mm_set1_epi32(0x3f2aaaab));
@@ -423,26 +421,22 @@ inline __m128 fastLog(__m128 a)
 	return r;
 }
 
-LMMS_ALWAYS_INLINE
-inline __m128 abs(__m128 x)
+LMMS_INLINE __m128 abs(__m128 x)
 {
 	return _mm_and_ps(x, _mm_castsi128_ps(_mm_set1_epi32(0x7fffffff))); // clear sign bit
 }
 
-LMMS_ALWAYS_INLINE
-inline __m256 abs256(__m256 x)
+LMMS_INLINE __m256 abs256(__m256 x)
 {
 	return _mm256_and_ps(x, _mm256_castsi256_ps(_mm256_set1_epi32(0x7fffffff))); // clear sign bit
 }
 
-LMMS_ALWAYS_INLINE
-inline __m512 abs512(__m512 x)
+LMMS_INLINE __m512 abs512(__m512 x)
 {
 	return _mm512_and_ps(x, _mm512_castsi512_ps(_mm512_set1_epi32(0x7fffffff))); // clear sign bit
 }
 
-LMMS_ALWAYS_INLINE
-inline __m128 floor(__m128 x)
+LMMS_INLINE __m128 floor(__m128 x)
 {
 #if LMMS_CPU_SUPPORTS(LMMS_CPU_FEATURE_SSE4_2)
 	return _mm_floor_ps(x);
@@ -453,8 +447,7 @@ inline __m128 floor(__m128 x)
 #endif
 }
 
-LMMS_ALWAYS_INLINE
-inline __m128 round(__m128 x)
+LMMS_INLINE __m128 round(__m128 x)
 {
 #if LMMS_CPU_SUPPORTS(LMMS_CPU_FEATURE_SSE4_2)
 	return _mm_round_ps(x, _MM_FROUND_TO_NEAREST_INT | _MM_FROUND_NO_EXC);
