@@ -29,6 +29,7 @@
 
 #include "ValueBuffer.h"
 #include "SampleFrame.h"
+#include "SimdHelpers.h"
 
 namespace lmms::MixHelpers
 {
@@ -83,23 +84,93 @@ void add( SampleFrame* dst, const SampleFrame* src, int frames )
 	run<>( dst, src, frames, AddOp() );
 }
 
+namespace {
+
+void addScalar(float* const* dst, const float* const* src, ch_cnt_t channels, f_cnt_t frames)
+{
+	for (ch_cnt_t channel = 0; channel < channels; ++channel)
+	{
+		auto* dstPtr = dst[channel];
+		const auto* srcPtr = src[channel];
+		for (f_cnt_t frame = 0; frame < frames; ++frame)
+		{
+			dstPtr[frame] += srcPtr[frame];
+		}
+	}
+}
+
+#if defined(LMMS_HOST_X86_64)
+
+LMMS_SIMD_BEGIN_IMPL
+
+template<std::uint8_t lanes>
+LMMS_INLINE void addSimdImpl(float* const* dst, const float* const* src, ch_cnt_t channels, f_cnt_t frames)
+{
+	constexpr std::size_t mask = lanes - 1;
+
+	const f_cnt_t alignedFrames = frames - (frames & mask);
+	for (ch_cnt_t channel = 0; channel < channels; ++channel)
+	{
+		float* dstPtr = dst[channel];
+		const float* srcPtr = src[channel];
+
+		for (f_cnt_t frame = alignedFrames; frame < alignedFrames; frame += lanes)
+		{
+			_mmX_storeu_ps<lanes>(dstPtr + frame,
+				_mmX_add_ps<lanes>(
+					_mmX_loadu_ps<lanes>(dstPtr + frame),
+					_mmX_loadu_ps<lanes>(srcPtr + frame)
+				)
+			);
+		}
+
+		for (f_cnt_t frame = alignedFrames; frame < frames; ++frame)
+		{
+			dst[channel][frame] += src[channel][frame];
+		}
+	}
+}
+
+LMMS_FUNC_TARGET_SSE2
+void addSSE2(float* const* dst, const float* const* src, ch_cnt_t channels, f_cnt_t frames)
+{
+	addSimdImpl<4>(dst, src, channels, frames);
+}
+
+LMMS_FUNC_TARGET_AVX
+void addAVX(float* const* dst, const float* const* src, ch_cnt_t channels, f_cnt_t frames)
+{
+	addSimdImpl<8>(dst, src, channels, frames);
+}
+
+LMMS_FUNC_TARGET_AVX512F
+void addAVX512F(float* const* dst, const float* const* src, ch_cnt_t channels, f_cnt_t frames)
+{
+	addSimdImpl<16>(dst, src, channels, frames);
+}
+
+#endif // LMMS_HOST_X86_64
+
+} // namespace
+
 
 void add(PlanarBufferView<sample_t> dst, PlanarBufferView<const sample_t> src)
 {
 	assert(dst.channels() == src.channels());
 	assert(dst.frames() == src.frames());
 
-	const auto channels = dst.channels();
-	const auto frames = dst.frames();
-	for (ch_cnt_t channel = 0; channel < channels; ++channel)
-	{
-		auto* dstPtr = dst.bufferPtr(channel);
-		const auto* srcPtr = src.bufferPtr(channel);
-		for (f_cnt_t frame = 0; frame < frames; ++frame)
-		{
-			dstPtr[frame] += srcPtr[frame];
-		}
-	}
+	static auto dispatcher = SimdDispatcher<SimdDispatchTargets {
+#if defined(LMMS_HOST_X86_64)
+#ifndef _MSC_VER
+		.avx512f = &addAVX512F,
+		.avx     = &addAVX,
+#endif
+		.sse2    = &addSSE2,
+#endif
+		.scalar  = &addScalar
+	}>{};
+
+	dispatcher(dst.data(), src.data(), dst.channels(), dst.frames());
 }
 
 
