@@ -153,7 +153,8 @@ void add(PlanarBufferView<sample_t> dst, PlanarBufferView<const sample_t> src)
 	assert(dst.frames() == src.frames());
 
 	static auto dispatcher = SimdDispatcher {
-			SimdDispatchConfig {
+			// TODO: Can use CTAD after we upgrade to MSVC 19.51 which fixes a conformance bug
+			SimdDispatchConfig<true, void, float* const*, const float* const*, ch_cnt_t, f_cnt_t> {
 #if defined(LMMS_HOST_X86_64) && !defined(_MSC_VER)
 			.avx512f = addSimd<16>,
 			.avx     = addSimd<8>,

@@ -179,6 +179,6 @@ private:
 //! Checks if the specified CPU features are supported due to the compile-time microarchitecture target
 //! or if support is detected on the current CPU at runtime.
 #define LMMS_RUNTIME_CPU_SUPPORTS(features) \
-	(LMMS_CPU_SUPPORTS((features)) || ((features) & FeatureDetection::fastRuntimeCpuFeatures()) == (features))
+	(LMMS_CPU_SUPPORTS((features)) || ((features) & ::lmms::FeatureDetection::fastRuntimeCpuFeatures()) == (features))
 
 #endif // LMMS_FEATURE_DETECTION_H
