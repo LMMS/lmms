@@ -132,62 +132,72 @@ struct SimdDispatchTargets
 	Func scalar  = nullptr;
 };
 
-namespace detail {
-
-template<class T>
-struct IsSimdDispatchTargets { static constexpr bool value = false; };
-
+//! This class exists as a way to guarantee the highest implemented dispatch target
+//! is calculated at compile-time rather than runtime as well as allow a more
+//! ergonomic way of constructing the @a SimdDispatcher.
 template<bool ne, class R, class... A>
-struct IsSimdDispatchTargets<SimdDispatchTargets<ne, R, A...>> { static constexpr bool value = true; };
+class SimdDispatcherArg
+{
+public:
+	SimdDispatcherArg() = delete;
+	consteval SimdDispatcherArg(SimdDispatchTargets<ne, R, A...> targets)
+		: m_targets{targets}
+		, m_highestImplementedTarget{getHighestImplementedTarget()}
+	{}
 
-} // namespace detail
+	auto targets() const -> const SimdDispatchTargets<ne, R, A...>& { return m_targets; }
+	auto highestImplementedTarget() const -> std::uint32_t { return m_highestImplementedTarget; }
+
+private:
+	consteval auto getHighestImplementedTarget() -> std::uint32_t
+	{
+#if defined(LMMS_HOST_X86_64)
+			if (m_targets.avx512f) { return LMMS_CPU_FEATURE_AVX512F; }
+			if (m_targets.avx2)    { return LMMS_CPU_FEATURE_AVX2; }
+			if (m_targets.avx)     { return LMMS_CPU_FEATURE_AVX; }
+			if (m_targets.sse4_2)  { return LMMS_CPU_FEATURE_SSE4_2; }
+			if (m_targets.sse2)    { return LMMS_CPU_FEATURE_X86_64_V1; }
+#elif defined(LMMS_HOST_ARM64)
+			if (m_targets.sve2)    { return LMMS_CPU_FEATURE_SVE2; }
+			if (m_targets.sve)     { return LMMS_CPU_FEATURE_SVE; }
+			if (m_targets.neon)    { return LMMS_CPU_FEATURE_NEON; }
+#endif
+			return LMMS_CPU_FEATURE_NONE;
+	}
+
+	SimdDispatchTargets<ne, R, A...> m_targets;
+	std::uint32_t m_highestImplementedTarget;
+};
 
 //! A runtime dispatcher for SIMD functions
-template<auto targets> // TODO C++26: Use a variable-template template-parameter
-	requires (detail::IsSimdDispatchTargets<decltype(targets)>::value)
+template<bool ne, class R, class... A>
 class SimdDispatcher
 {
-	using FuncRef = decltype(targets)::FuncRef;
-	using Ret = decltype(targets)::Ret;
-	static constexpr bool NoExcept = decltype(targets)::NoExcept;
+	using FuncRef = R(&)(A...) noexcept(ne);
 	FuncRef m_resolvedTarget;
 public:
-	SimdDispatcher() : m_resolvedTarget{resolve()} {}
+	explicit SimdDispatcher(const SimdDispatcherArg<ne, R, A...>& arg)
+		: m_resolvedTarget{resolve(arg)}
+	{}
 
-	template<class... Args>
-		requires (std::is_invocable_v<FuncRef, Args...>)
-	LMMS_INLINE auto operator()(Args&&... args) const noexcept(NoExcept) -> Ret
+	LMMS_INLINE auto operator()(A&&... args) const noexcept(ne) -> R
+		requires (std::is_invocable_v<FuncRef, A...>)
 	{
-		if constexpr (std::is_void_v<Ret>)
+		if constexpr (std::is_void_v<R>)
 		{
-			m_resolvedTarget(std::forward<Args>(args)...);
-			return;
+			m_resolvedTarget(std::forward<A>(args)...);
 		}
 		else
 		{
-			return m_resolvedTarget(std::forward<Args>(args)...);
+			return m_resolvedTarget(std::forward<A>(args)...);
 		}
 	}
 
 private:
-	LMMS_INLINE auto resolve() -> FuncRef
+	auto resolve(const SimdDispatcherArg<ne, R, A...>& arg) -> FuncRef
 	{
-		constexpr auto highestDispatchTarget = [&]() -> std::uint32_t {
-#if defined(LMMS_HOST_X86_64)
-			if (targets.avx512f) { return LMMS_CPU_FEATURE_AVX512F; }
-			if (targets.avx2)    { return LMMS_CPU_FEATURE_AVX2; }
-			if (targets.avx)     { return LMMS_CPU_FEATURE_AVX; }
-			if (targets.sse4_2)  { return LMMS_CPU_FEATURE_SSE4_2; }
-			if (targets.sse2)    { return LMMS_CPU_FEATURE_X86_64_V1; }
-#elif defined(LMMS_HOST_ARM64)
-			if (targets.sve2)    { return LMMS_CPU_FEATURE_SVE2; }
-			if (targets.sve)     { return LMMS_CPU_FEATURE_SVE; }
-			if (targets.neon)    { return LMMS_CPU_FEATURE_NEON; }
-#endif
-			return LMMS_CPU_FEATURE_NONE;
-		}();
-
-		switch (FeatureDetection::runtimeCpuFeatures() & highestDispatchTarget)
+		const auto& targets = arg.targets();
+		switch (FeatureDetection::runtimeCpuFeatures() & arg.highestImplementedTarget())
 		{
 #if defined(LMMS_HOST_X86_64)
 			case LMMS_CPU_FEATURE_AVX512F:
@@ -226,6 +236,9 @@ private:
 		throw std::logic_error{"SIMD dispatcher could not resolve a target"};
 	}
 };
+
+template<bool ne, class R, class... A>
+SimdDispatcher(SimdDispatchTargets<ne, R, A...>) -> SimdDispatcher<ne, R, A...>;
 
 } // namespace lmms
 

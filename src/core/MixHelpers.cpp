@@ -156,16 +156,18 @@ void add(PlanarBufferView<sample_t> dst, PlanarBufferView<const sample_t> src)
 	assert(dst.channels() == src.channels());
 	assert(dst.frames() == src.frames());
 
-	static auto dispatcher = SimdDispatcher<SimdDispatchTargets {
+	static auto dispatcher = SimdDispatcher {
+			SimdDispatchTargets {
 #if defined(LMMS_HOST_X86_64)
 #ifndef _MSC_VER
-		.avx512f = &addSimd<16>,
-		.avx     = &addSimd<8>,
+			.avx512f = &addSimd<16>,
+			.avx     = &addSimd<8>,
 #endif
-		.sse2    = &addSimd<4>,
+			.sse2    = &addSimd<4>,
 #endif
-		.scalar  = &addScalar
-	}>{};
+			.scalar  = &addScalar
+		}
+	};
 
 	dispatcher(dst.data(), src.data(), dst.channels(), dst.frames());
 }
