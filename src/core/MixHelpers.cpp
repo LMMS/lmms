@@ -86,12 +86,13 @@ void add( SampleFrame* dst, const SampleFrame* src, int frames )
 
 namespace {
 
-void addScalar(float* const* dst, const float* const* src, ch_cnt_t channels, f_cnt_t frames)
+void addScalar(float* const* LMMS_RESTRICT dst, const float* const* LMMS_RESTRICT src,
+	ch_cnt_t channels, f_cnt_t frames)
 {
 	for (ch_cnt_t channel = 0; channel < channels; ++channel)
 	{
-		auto* dstPtr = dst[channel];
-		const auto* srcPtr = src[channel];
+		float* const dstPtr = dst[channel];
+		const float* const srcPtr = src[channel];
 		for (f_cnt_t frame = 0; frame < frames; ++frame)
 		{
 			dstPtr[frame] += srcPtr[frame];
@@ -104,17 +105,18 @@ void addScalar(float* const* dst, const float* const* src, ch_cnt_t channels, f_
 LMMS_SIMD_BEGIN_IMPL
 
 template<std::uint8_t lanes>
-LMMS_INLINE void addSimdImpl(float* const* dst, const float* const* src, ch_cnt_t channels, f_cnt_t frames)
+void addSimd(float* const* LMMS_RESTRICT dst, const float* const* LMMS_RESTRICT src,
+	ch_cnt_t channels, f_cnt_t frames)
 {
 	constexpr std::size_t mask = lanes - 1;
 
 	const f_cnt_t alignedFrames = frames - (frames & mask);
 	for (ch_cnt_t channel = 0; channel < channels; ++channel)
 	{
-		float* dstPtr = dst[channel];
-		const float* srcPtr = src[channel];
+		float* const dstPtr = dst[channel];
+		const float* const srcPtr = src[channel];
 
-		for (f_cnt_t frame = alignedFrames; frame < alignedFrames; frame += lanes)
+		for (f_cnt_t frame = 0; frame < alignedFrames; frame += lanes)
 		{
 			_mmX_storeu_ps<lanes>(dstPtr + frame,
 				_mmX_add_ps<lanes>(
@@ -126,33 +128,28 @@ LMMS_INLINE void addSimdImpl(float* const* dst, const float* const* src, ch_cnt_
 
 		for (f_cnt_t frame = alignedFrames; frame < frames; ++frame)
 		{
-			dst[channel][frame] += src[channel][frame];
+			dstPtr[frame] += srcPtr[frame];
 		}
 	}
 }
 
-LMMS_FUNC_TARGET_SSE2
-void addSSE2(float* const* dst, const float* const* src, ch_cnt_t channels, f_cnt_t frames)
-{
-	addSimdImpl<4>(dst, src, channels, frames);
-}
+template LMMS_FUNC_TARGET_SSE2
+void addSimd<4>(float* const* LMMS_RESTRICT dst, const float* const* LMMS_RESTRICT src,
+	ch_cnt_t channels, f_cnt_t frames);
 
-LMMS_FUNC_TARGET_AVX
-void addAVX(float* const* dst, const float* const* src, ch_cnt_t channels, f_cnt_t frames)
-{
-	addSimdImpl<8>(dst, src, channels, frames);
-}
+template LMMS_FUNC_TARGET_AVX
+void addSimd<8>(float* const* LMMS_RESTRICT dst, const float* const* LMMS_RESTRICT src,
+	ch_cnt_t channels, f_cnt_t frames);
 
-LMMS_FUNC_TARGET_AVX512F
-void addAVX512F(float* const* dst, const float* const* src, ch_cnt_t channels, f_cnt_t frames)
-{
-	addSimdImpl<16>(dst, src, channels, frames);
-}
+template LMMS_FUNC_TARGET_AVX512F
+void addSimd<16>(float* const* LMMS_RESTRICT dst, const float* const* LMMS_RESTRICT src,
+	ch_cnt_t channels, f_cnt_t frames);
+
+LMMS_SIMD_END_IMPL
 
 #endif // LMMS_HOST_X86_64
 
 } // namespace
-
 
 void add(PlanarBufferView<sample_t> dst, PlanarBufferView<const sample_t> src)
 {
@@ -162,10 +159,10 @@ void add(PlanarBufferView<sample_t> dst, PlanarBufferView<const sample_t> src)
 	static auto dispatcher = SimdDispatcher<SimdDispatchTargets {
 #if defined(LMMS_HOST_X86_64)
 #ifndef _MSC_VER
-		.avx512f = &addAVX512F,
-		.avx     = &addAVX,
+		.avx512f = &addSimd<16>,
+		.avx     = &addSimd<8>,
 #endif
-		.sse2    = &addSSE2,
+		.sse2    = &addSimd<4>,
 #endif
 		.scalar  = &addScalar
 	}>{};
