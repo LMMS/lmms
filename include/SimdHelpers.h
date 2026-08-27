@@ -110,25 +110,23 @@ LMMS_DEFINE_SIMD_GENERIC(_mmX_add_ps, _mm_add_ps, _mm256_add_ps, _mm512_add_ps)
 template<bool ne, class R, class... A>
 struct SimdDispatchConfig
 {
-	using Ret = R;
-	using Func = R(*)(A...) noexcept(ne);
-	using FuncRef = R(&)(A...) noexcept(ne);
-	static constexpr bool NoExcept = ne;
+	using Target = auto(*)(A...) noexcept(ne) -> R;
+	using TargetRef = auto(&)(A...) noexcept(ne) -> R;
 
 #if defined(LMMS_HOST_X86_64)
-	Func avx512f = nullptr;
-	Func avx2    = nullptr;
-	Func avx     = nullptr;
-	Func sse4_2  = nullptr;
-	Func sse2    = nullptr;
+	Target avx512f = nullptr;
+	Target avx2    = nullptr;
+	Target avx     = nullptr;
+	Target sse4_2  = nullptr;
+	Target sse2    = nullptr;
 #elif defined(LMMS_HOST_ARM64)
-	Func sve2    = nullptr;
-	Func sve     = nullptr;
-	Func neon    = nullptr;
+	Target sve2    = nullptr;
+	Target sve     = nullptr;
+	Target neon    = nullptr;
 #endif
 
 	//! Non-SIMD fallback (required)
-	FuncRef scalar;
+	TargetRef scalar;
 
 	//! If true, then when XYZ SIMD instructions are unconditionally available (via -march or /arch)
 	//! assume the compiler does a better job auto-vectorizing the @a scalar target than
@@ -142,39 +140,143 @@ struct SimdDispatchConfig
 
 namespace detail {
 
-//! This class exists as a way to guarantee the highest implemented dispatch target
-//! is calculated at compile-time rather than runtime as well as allow a more
-//! ergonomic way of constructing the @a SimdDispatcher.
+//! This consteval class exists as a way to move all possible work in resolving the
+//! dispatch target from runtime to compile-time
 template<bool ne, class R, class... A>
-class SimdDispatcherArg
+class SimdDispatchResolver
 {
 public:
-	SimdDispatcherArg() = delete;
-	consteval SimdDispatcherArg(SimdDispatchConfig<ne, R, A...> config)
-		: m_config{config}
-		, m_highestImplementedTarget{getHighestImplementedTarget()}
+	SimdDispatchResolver() = delete;
+	consteval SimdDispatchResolver(SimdDispatchConfig<ne, R, A...> config)
+		: m_resolver{getResolver(config)}
+		, m_config{config}
+		, m_highestImplementedTarget{getHighestImplementedTarget(config)}
 	{}
 
-	consteval auto config() const -> const SimdDispatchConfig<ne, R, A...>& { return m_config; }
-	consteval auto highestImplementedTarget() const -> std::uint32_t { return m_highestImplementedTarget; }
+	using TargetRef = auto(&)(A...) noexcept(ne) -> R;
+	LMMS_INLINE auto operator()() const noexcept -> TargetRef { return (this->*m_resolver)(); }
 
 private:
-	consteval auto getHighestImplementedTarget() -> std::uint32_t
+	using ResolverFunc = auto(SimdDispatchResolver::*)() const noexcept -> TargetRef;
+	consteval static auto getResolver(const SimdDispatchConfig<ne, R, A...>& config) -> ResolverFunc
+	{
+#if defined(LMMS_DISABLE_DYNAMIC_DISPATCH)
+		return &SimdDispatchResolver::resolveDisabled;
+#else
+		if (!config.enableDynamicDispatch) { return &SimdDispatchResolver::resolveDisabled; }
+		return config.preferAutoVectorization
+			? &SimdDispatchResolver::resolvePreferAutoVectorization
+			: &SimdDispatchResolver::resolvePreferManual;
+#endif
+	}
+
+	auto resolveDisabled() const noexcept -> TargetRef
+	{
+		return m_config.scalar;
+	}
+
+	auto resolvePreferManual() const noexcept -> TargetRef
+	{
+		switch (FeatureDetection::fastRuntimeCpuFeatures() & m_highestImplementedTarget)
+		{
+#if defined(LMMS_HOST_X86_64)
+			case LMMS_CPU_FEATURE_AVX512F:   if (m_config.avx512f) { return *m_config.avx512f; } [[fallthrough]];
+			case LMMS_CPU_FEATURE_AVX2:      if (m_config.avx2)    { return *m_config.avx2; }    [[fallthrough]];
+			case LMMS_CPU_FEATURE_AVX:       if (m_config.avx)     { return *m_config.avx; }     [[fallthrough]];
+			case LMMS_CPU_FEATURE_SSE4_2:    if (m_config.sse4_2)  { return *m_config.sse4_2; }  [[fallthrough]];
+			case LMMS_CPU_FEATURE_X86_64_V1: if (m_config.sse2)    { return *m_config.sse2; }    [[fallthrough]];
+#elif defined(LMMS_HOST_ARM64)
+			case LMMS_CPU_FEATURE_SVE2:      if (m_config.sve2)    { return *m_config.sve2; }    [[fallthrough]];
+			case LMMS_CPU_FEATURE_SVE:       if (m_config.sve)     { return *m_config.sve; }     [[fallthrough]];
+			case LMMS_CPU_FEATURE_NEON:      if (m_config.neon)    { return *m_config.neon; }    [[fallthrough]];
+#endif
+			case LMMS_CPU_FEATURE_NONE: [[fallthrough]];
+			default: break;
+		}
+
+		return m_config.scalar;
+	}
+
+	auto resolvePreferAutoVectorization() const noexcept -> TargetRef
+	{
+		switch (FeatureDetection::fastRuntimeCpuFeatures() & m_highestImplementedTarget)
+		{
+#if defined(LMMS_HOST_X86_64)
+			case LMMS_CPU_FEATURE_AVX512F:
+#	if LMMS_CPU_SUPPORTS(LMMS_CPU_FEATURE_AVX512F)
+				return m_config.scalar;
+#	else
+				if (m_config.avx512f) { return *m_config.avx512f; } [[fallthrough]];
+#	endif
+			case LMMS_CPU_FEATURE_AVX2:
+#	if LMMS_CPU_SUPPORTS(LMMS_CPU_FEATURE_AVX2)
+				return m_config.scalar;
+#	else
+				if (m_config.avx2)    { return *m_config.avx2; }    [[fallthrough]];
+#	endif
+			case LMMS_CPU_FEATURE_AVX:
+#	if LMMS_CPU_SUPPORTS(LMMS_CPU_FEATURE_AVX)
+				return m_config.scalar;
+#	else
+				if (m_config.avx)     { return *m_config.avx; }     [[fallthrough]];
+#	endif
+			case LMMS_CPU_FEATURE_SSE4_2:
+#	if LMMS_CPU_SUPPORTS(LMMS_CPU_FEATURE_SSE4_2)
+				return m_config.scalar;
+#	else
+				if (m_config.sse4_2)  { return *m_config.sse4_2; }  [[fallthrough]];
+#	endif
+			case LMMS_CPU_FEATURE_X86_64_V1:
+#	if LMMS_CPU_SUPPORTS(LMMS_CPU_FEATURE_X86_64_V1)
+				return m_config.scalar;
+#	else
+				if (m_config.sse2)    { return *m_config.sse2; }    [[fallthrough]];
+#	endif
+#elif defined(LMMS_HOST_ARM64)
+			case LMMS_CPU_FEATURE_SVE2:
+#	if LMMS_CPU_SUPPORTS(LMMS_CPU_FEATURE_SVE2)
+				return m_config.scalar;
+#	else
+				if (m_config.sve2) { return *m_config.sve2; } [[fallthrough]];
+#	endif
+			case LMMS_CPU_FEATURE_SVE:
+#	if LMMS_CPU_SUPPORTS(LMMS_CPU_FEATURE_SVE)
+				return m_config.scalar;
+#	else
+				if (m_config.sve)  { return *m_config.sve; }  [[fallthrough]];
+#	endif
+			case LMMS_CPU_FEATURE_NEON:
+#	if LMMS_CPU_SUPPORTS(LMMS_CPU_FEATURE_NEON)
+				return m_config.scalar;
+#	else
+				if (m_config.neon) { return *m_config.neon; } [[fallthrough]];
+#	endif
+#endif
+			case LMMS_CPU_FEATURE_NONE: [[fallthrough]];
+			default: break;
+		}
+
+		return m_config.scalar;
+	}
+
+	consteval static auto getHighestImplementedTarget(const SimdDispatchConfig<ne, R, A...>& config)
+		-> std::uint32_t
 	{
 #if defined(LMMS_HOST_X86_64)
-			if (m_config.avx512f) { return LMMS_CPU_FEATURE_AVX512F; }
-			if (m_config.avx2)    { return LMMS_CPU_FEATURE_AVX2; }
-			if (m_config.avx)     { return LMMS_CPU_FEATURE_AVX; }
-			if (m_config.sse4_2)  { return LMMS_CPU_FEATURE_SSE4_2; }
-			if (m_config.sse2)    { return LMMS_CPU_FEATURE_X86_64_V1; }
+			if (config.avx512f) { return LMMS_CPU_FEATURE_AVX512F; }
+			if (config.avx2)    { return LMMS_CPU_FEATURE_AVX2; }
+			if (config.avx)     { return LMMS_CPU_FEATURE_AVX; }
+			if (config.sse4_2)  { return LMMS_CPU_FEATURE_SSE4_2; }
+			if (config.sse2)    { return LMMS_CPU_FEATURE_X86_64_V1; }
 #elif defined(LMMS_HOST_ARM64)
-			if (m_config.sve2)    { return LMMS_CPU_FEATURE_SVE2; }
-			if (m_config.sve)     { return LMMS_CPU_FEATURE_SVE; }
-			if (m_config.neon)    { return LMMS_CPU_FEATURE_NEON; }
+			if (config.sve2)    { return LMMS_CPU_FEATURE_SVE2; }
+			if (config.sve)     { return LMMS_CPU_FEATURE_SVE; }
+			if (config.neon)    { return LMMS_CPU_FEATURE_NEON; }
 #endif
 			return LMMS_CPU_FEATURE_NONE;
 	}
 
+	ResolverFunc m_resolver;
 	SimdDispatchConfig<ne, R, A...> m_config;
 	std::uint32_t m_highestImplementedTarget;
 };
@@ -185,15 +287,14 @@ private:
 template<bool ne, class R, class... A>
 class SimdDispatcher
 {
-	using FuncRef = R(&)(A...) noexcept(ne);
-	FuncRef m_resolvedTarget;
+	using TargetRef = auto(&)(A...) noexcept(ne) -> R;
+	TargetRef m_resolvedTarget;
 public:
-	explicit SimdDispatcher(const detail::SimdDispatcherArg<ne, R, A...>& arg)
-		: m_resolvedTarget{resolve(arg)}
+	explicit SimdDispatcher(const detail::SimdDispatchResolver<ne, R, A...>& resolver)
+		: m_resolvedTarget{resolver()}
 	{}
 
 	LMMS_INLINE auto operator()(A&&... args) const noexcept(ne) -> R
-		requires (std::is_invocable_v<FuncRef, A...>)
 	{
 		if constexpr (std::is_void_v<R>)
 		{
@@ -203,106 +304,6 @@ public:
 		{
 			return m_resolvedTarget(std::forward<A>(args)...);
 		}
-	}
-
-private:
-	auto resolve(const detail::SimdDispatcherArg<ne, R, A...>& arg) const noexcept -> FuncRef
-	{
-#if defined(LMMS_DISABLE_DYNAMIC_DISPATCH)
-		return arg.config().scalar;
-#else
-		// TODO: Move the resolver selection to SimdDispatcherArg where it can be done at compile-time
-		if (!arg.config().enableDynamicDispatch) { return arg.config().scalar; }
-		return arg.config().preferAutoVectorization
-			? resolvePreferAutoVectorization()
-			: resolvePreferManual();
-#endif
-	}
-
-	auto resolvePreferManual(const detail::SimdDispatcherArg<ne, R, A...>& arg) const noexcept -> FuncRef
-	{
-		const auto& config = arg.config();
-		switch (FeatureDetection::fastRuntimeCpuFeatures() & arg.highestImplementedTarget())
-		{
-#if defined(LMMS_HOST_X86_64)
-			case LMMS_CPU_FEATURE_AVX512F:   if (config.avx512f) { return *config.avx512f; } [[fallthrough]];
-			case LMMS_CPU_FEATURE_AVX2:      if (config.avx2)    { return *config.avx2; }    [[fallthrough]];
-			case LMMS_CPU_FEATURE_AVX:       if (config.avx)     { return *config.avx; }     [[fallthrough]];
-			case LMMS_CPU_FEATURE_SSE4_2:    if (config.sse4_2)  { return *config.sse4_2; }  [[fallthrough]];
-			case LMMS_CPU_FEATURE_X86_64_V1: if (config.sse2)    { return *config.sse2; }    [[fallthrough]];
-#elif defined(LMMS_HOST_ARM64)
-			case LMMS_CPU_FEATURE_SVE2:      if (config.sve2)    { return *config.sve2; }    [[fallthrough]];
-			case LMMS_CPU_FEATURE_SVE:       if (config.sve)     { return *config.sve; }     [[fallthrough]];
-			case LMMS_CPU_FEATURE_NEON:      if (config.neon)    { return *config.neon; }    [[fallthrough]];
-#endif
-			case LMMS_CPU_FEATURE_NONE: [[fallthrough]];
-			default: break;
-		}
-
-		return config.scalar;
-	}
-
-	auto resolvePreferAutoVectorization(const detail::SimdDispatcherArg<ne, R, A...>& arg) const noexcept -> FuncRef
-	{
-		const auto& config = arg.config();
-		switch (FeatureDetection::fastRuntimeCpuFeatures() & arg.highestImplementedTarget())
-		{
-#if defined(LMMS_HOST_X86_64)
-			case LMMS_CPU_FEATURE_AVX512F:
-#	if LMMS_CPU_SUPPORTS(LMMS_CPU_FEATURE_AVX512F)
-				return config.scalar;
-#	else
-				if (config.avx512f) { return *config.avx512f; } [[fallthrough]];
-#	endif
-			case LMMS_CPU_FEATURE_AVX2:
-#	if LMMS_CPU_SUPPORTS(LMMS_CPU_FEATURE_AVX2)
-				return config.scalar;
-#	else
-				if (config.avx2)    { return *config.avx2; }    [[fallthrough]];
-#	endif
-			case LMMS_CPU_FEATURE_AVX:
-#	if LMMS_CPU_SUPPORTS(LMMS_CPU_FEATURE_AVX)
-				return config.scalar;
-#	else
-				if (config.avx)     { return *config.avx; }     [[fallthrough]];
-#	endif
-			case LMMS_CPU_FEATURE_SSE4_2:
-#	if LMMS_CPU_SUPPORTS(LMMS_CPU_FEATURE_SSE4_2)
-				return config.scalar;
-#	else
-				if (config.sse4_2)  { return *config.sse4_2; }  [[fallthrough]];
-#	endif
-			case LMMS_CPU_FEATURE_X86_64_V1:
-#	if LMMS_CPU_SUPPORTS(LMMS_CPU_FEATURE_X86_64_V1)
-				return config.scalar;
-#	else
-				if (config.sse2)    { return *config.sse2; }    [[fallthrough]];
-#	endif
-#elif defined(LMMS_HOST_ARM64)
-			case LMMS_CPU_FEATURE_SVE2:
-#	if LMMS_CPU_SUPPORTS(LMMS_CPU_FEATURE_SVE2)
-				return config.scalar;
-#	else
-				if (config.sve2) { return *config.sve2; } [[fallthrough]];
-#	endif
-			case LMMS_CPU_FEATURE_SVE:
-#	if LMMS_CPU_SUPPORTS(LMMS_CPU_FEATURE_SVE)
-				return config.scalar;
-#	else
-				if (config.sve)  { return *config.sve; }  [[fallthrough]];
-#	endif
-			case LMMS_CPU_FEATURE_NEON:
-#	if LMMS_CPU_SUPPORTS(LMMS_CPU_FEATURE_NEON)
-				return config.scalar;
-#	else
-				if (config.neon) { return *config.neon; } [[fallthrough]];
-#	endif
-#endif
-			case LMMS_CPU_FEATURE_NONE: [[fallthrough]];
-			default: break;
-		}
-
-		return config.scalar;
 	}
 };
 
