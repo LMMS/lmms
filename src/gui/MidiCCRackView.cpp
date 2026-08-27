@@ -22,7 +22,6 @@
  *
  */
 
-
 #include "MidiCCRackView.h"
 
 #include <QGridLayout>
@@ -30,21 +29,68 @@
 #include <QVBoxLayout>
 #include <QWidget>
 
-#include "embed.h"
 #include "GroupBox.h"
 #include "GuiApplication.h"
 #include "InstrumentTrack.h"
 #include "Knob.h"
 #include "MainWindow.h"
 #include "SubWindow.h"
+#include "embed.h"
 
-namespace lmms::gui
+namespace lmms::gui {
+
+namespace
 {
+	struct CCMapping {
+		int cc;
+		const char* name;
+	};
 
+	static const CCMapping s_ccMappings[] = {
+		{ MidiControllerBankSelect, QT_TRANSLATE_NOOP("MidiCCRackView", "Bank Select") },
+		{ MidiControllerModulationWheel, QT_TRANSLATE_NOOP("MidiCCRackView", "Modulation Wheel") },
+		{ MidiControllerBreathController, QT_TRANSLATE_NOOP("MidiCCRackView", "Breath Controller") },
+		{ MidiControllerFootController, QT_TRANSLATE_NOOP("MidiCCRackView", "Foot Controller") },
+		{ MidiControllerPortamentoTime, QT_TRANSLATE_NOOP("MidiCCRackView", "Portamento Time") },
+		{ MidiControllerDataEntry, QT_TRANSLATE_NOOP("MidiCCRackView", "Data Entry") },
+		{ MidiControllerMainVolume, QT_TRANSLATE_NOOP("MidiCCRackView", "Main Volume") },
+		{ MidiControllerBalance, QT_TRANSLATE_NOOP("MidiCCRackView", "Balance") },
+		{ MidiControllerPan, QT_TRANSLATE_NOOP("MidiCCRackView", "Pan") },
+		{ MidiControllerEffectControl1, QT_TRANSLATE_NOOP("MidiCCRackView", "Effect Control 1") },
+		{ MidiControllerEffectControl2, QT_TRANSLATE_NOOP("MidiCCRackView", "Effect Control 2") },
+		{ MidiControllerSustain, QT_TRANSLATE_NOOP("MidiCCRackView", "Sustain") },
+		{ MidiControllerPortamento, QT_TRANSLATE_NOOP("MidiCCRackView", "Portamento") },
+		{ MidiControllerSostenuto, QT_TRANSLATE_NOOP("MidiCCRackView", "Sostenuto") },
+		{ MidiControllerSoftPedal, QT_TRANSLATE_NOOP("MidiCCRackView", "Soft Pedal") },
+		{ MidiControllerLegatoFootswitch, QT_TRANSLATE_NOOP("MidiCCRackView", "Legato Footswitch") },
+		{ MidiControllerRegisteredParameterNumberLSB, QT_TRANSLATE_NOOP("MidiCCRackView", "Registered Parameter Number (LSB)") },
+		{ MidiControllerRegisteredParameterNumberMSB, QT_TRANSLATE_NOOP("MidiCCRackView", "Registered Parameter Number (MSB)") },
+		{ MidiControllerAllSoundOff, QT_TRANSLATE_NOOP("MidiCCRackView", "All Sound Off") },
+		{ MidiControllerResetAllControllers, QT_TRANSLATE_NOOP("MidiCCRackView", "Reset All Controllers") },
+		{ MidiControllerLocalControl, QT_TRANSLATE_NOOP("MidiCCRackView", "Local Control") },
+		{ MidiControllerAllNotesOff, QT_TRANSLATE_NOOP("MidiCCRackView", "All Notes Off") },
+		{ MidiControllerOmniOn, QT_TRANSLATE_NOOP("MidiCCRackView", "Omni On") },
+		{ MidiControllerOmniOff, QT_TRANSLATE_NOOP("MidiCCRackView", "Omni Off") },
+		{ MidiControllerMonoOn, QT_TRANSLATE_NOOP("MidiCCRackView", "Mono On") },
+		{ MidiControllerPolyOn, QT_TRANSLATE_NOOP("MidiCCRackView", "Poly On") }
+	};
 
-MidiCCRackView::MidiCCRackView(InstrumentTrack * track) :
-	QWidget(),
-	m_track(track)
+	QString getMidiCCName(int cc)
+	{
+		for (const auto& mapping : s_ccMappings)
+		{
+			if (mapping.cc == cc)
+			{
+				return MidiCCRackView::tr(mapping.name);
+			}
+		}
+		return QString();
+	}
+} // namespace
+
+MidiCCRackView::MidiCCRackView(InstrumentTrack* track)
+	: QWidget()
+	, m_track(track)
 {
 	setWindowIcon(embed::getIconPixmap("midi_cc_rack"));
 	setWindowTitle(tr("MIDI CC Rack - %1").arg(m_track->name()));
@@ -90,8 +136,16 @@ MidiCCRackView::MidiCCRackView(InstrumentTrack * track) :
 	for (int i = 0; i < MidiControllerCount; ++i)
 	{
 		auto knob = new Knob(KnobType::Bright26, tr("CC %1").arg(i), this);
+
+		QString ccName = getMidiCCName(i);
+		if (!ccName.isEmpty()) { knob->setToolTip(tr("CC %1: %2").arg(i).arg(ccName)); }
+		else
+		{
+			knob->setToolTip(tr("CC %1").arg(i));
+		}
+
 		knob->setModel(m_track->m_midiCCModel[i].get());
-		knobsAreaLayout->addWidget(knob, i/4, i%4, Qt::AlignHCenter);
+		knobsAreaLayout->addWidget(knob, i / 4, i % 4, Qt::AlignHCenter);
 
 		// TODO It seems that this is not really used/needed?
 		m_controllerKnob[i] = knob;
@@ -102,8 +156,7 @@ MidiCCRackView::MidiCCRackView(InstrumentTrack * track) :
 	m_midiCCGroupBox->setModel(m_track->m_midiCCEnable.get());
 
 	// Connection to update the name of the track on the label
-	connect(m_track, SIGNAL(nameChanged()),
-		this, SLOT(renameWindow()));
+	connect(m_track, SIGNAL(nameChanged()), this, SLOT(renameWindow()));
 
 	// Adding everything to the main layout
 	mainLayout->addWidget(m_midiCCGroupBox);
@@ -111,7 +164,7 @@ MidiCCRackView::MidiCCRackView(InstrumentTrack * track) :
 
 MidiCCRackView::~MidiCCRackView()
 {
-	if(parentWidget())
+	if (parentWidget())
 	{
 		parentWidget()->hide();
 		parentWidget()->deleteLater();
@@ -123,13 +176,12 @@ void MidiCCRackView::renameWindow()
 	setWindowTitle(tr("MIDI CC Rack - %1").arg(m_track->name()));
 }
 
-void MidiCCRackView::saveSettings(QDomDocument & doc, QDomElement & parent)
+void MidiCCRackView::saveSettings(QDomDocument& doc, QDomElement& parent)
 {
 }
 
-void MidiCCRackView::loadSettings(const QDomElement &)
+void MidiCCRackView::loadSettings(const QDomElement&)
 {
 }
-
 
 } // namespace lmms::gui
