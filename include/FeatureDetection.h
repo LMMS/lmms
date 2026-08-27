@@ -33,6 +33,7 @@
 #include "lmmsconfig.h"
 #include "lmms_export.h"
 
+#include <cassert>
 #include <cstdint>
 #include <string>
 
@@ -143,6 +144,14 @@ public:
 		return m_cachedFeatures;
 	}
 
+	//! @brief A faster version of @ref runtimeCpuFeatures which simply returns the cached value
+	//! @warning Do not call until after @ref runtimeCpuFeatures has been called once
+	static LMMS_INLINE auto fastRuntimeCpuFeatures() noexcept -> std::uint32_t
+	{
+		assert(m_cachedFeatures != LMMS_CPU_FEATURE_INVALID);
+		return m_cachedFeatures;
+	}
+
 	//! @brief Checks whether the current CPU meets the baseline CPU requirements for this particular LMMS build
 	//!
 	//! This function could, for example, allow an LMMS build that targets a CPU with AVX512 instructions
@@ -170,6 +179,6 @@ private:
 //! Checks if the specified CPU features are supported due to the compile-time microarchitecture target
 //! or if support is detected on the current CPU at runtime.
 #define LMMS_RUNTIME_CPU_SUPPORTS(features) \
-	(LMMS_CPU_SUPPORTS((features)) || ((features) & FeatureDetection::runtimeCpuFeatures()) == (features))
+	(LMMS_CPU_SUPPORTS((features)) || ((features) & FeatureDetection::fastRuntimeCpuFeatures()) == (features))
 
 #endif // LMMS_FEATURE_DETECTION_H
