@@ -87,7 +87,7 @@ void add( SampleFrame* dst, const SampleFrame* src, int frames )
 namespace {
 
 void addScalar(float* const* LMMS_RESTRICT dst, const float* const* LMMS_RESTRICT src,
-	ch_cnt_t channels, f_cnt_t frames) noexcept
+	ch_cnt_t channels, f_cnt_t frames)
 {
 	for (ch_cnt_t channel = 0; channel < channels; ++channel)
 	{
@@ -106,7 +106,7 @@ LMMS_SIMD_BEGIN_IMPL
 
 template<std::uint8_t lanes>
 void addSimd(float* const* LMMS_RESTRICT dst, const float* const* LMMS_RESTRICT src,
-	ch_cnt_t channels, f_cnt_t frames) noexcept
+	ch_cnt_t channels, f_cnt_t frames)
 {
 	constexpr std::size_t mask = lanes - 1;
 
@@ -135,11 +135,11 @@ void addSimd(float* const* LMMS_RESTRICT dst, const float* const* LMMS_RESTRICT 
 
 template LMMS_FUNC_TARGET_AVX
 void addSimd<8>(float* const* LMMS_RESTRICT dst, const float* const* LMMS_RESTRICT src,
-	ch_cnt_t channels, f_cnt_t frames) noexcept;
+	ch_cnt_t channels, f_cnt_t frames);
 
 template LMMS_FUNC_TARGET_AVX512F
 void addSimd<16>(float* const* LMMS_RESTRICT dst, const float* const* LMMS_RESTRICT src,
-	ch_cnt_t channels, f_cnt_t frames) noexcept;
+	ch_cnt_t channels, f_cnt_t frames);
 
 LMMS_SIMD_END_IMPL
 
@@ -153,8 +153,8 @@ void add(PlanarBufferView<sample_t> dst, PlanarBufferView<const sample_t> src)
 	assert(dst.frames() == src.frames());
 
 	static auto dispatcher = SimdDispatcher {
-			// TODO: Can use CTAD after we upgrade to MSVC 19.51 which fixes a conformance bug
-			SimdDispatchConfig<true, void, float* const*, const float* const*, ch_cnt_t, f_cnt_t> {
+			// TODO: Can use CTAD and noexcept functions after we upgrade to MSVC 19.51 which fixes a conformance bug
+			SimdDispatchConfig<false, void, float* const*, const float* const*, ch_cnt_t, f_cnt_t> {
 #if defined(LMMS_HOST_X86_64) && !defined(_MSC_VER)
 			.avx512f = addSimd<16>,
 			.avx     = addSimd<8>,
