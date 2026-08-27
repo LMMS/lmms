@@ -57,6 +57,10 @@ auto FeatureDetection::determineRuntimeCpuFeatures() noexcept -> std::uint32_t
 			&& (regs[2] & (1 << 20))) // SSE4.2
 		{
 			result |= LMMS_CPU_FEATURE_SSE4_2;
+			if (regs[2] & (1 << 28))  // AVX
+			{
+				result |= LMMS_CPU_FEATURE_AVX;
+			}
 		}
 		else
 		{
@@ -64,7 +68,7 @@ auto FeatureDetection::determineRuntimeCpuFeatures() noexcept -> std::uint32_t
 		}
 	}
 
-	if (regs[2] & (1 << 28)) { result |= LMMS_CPU_FEATURE_AVX; }
+	if (!(result & LMMS_CPU_FEATURE_AVX)) { return result; }
 
 #if defined(_MSC_VER)
 	__cpuidex(regs, /* eax */ 7, /* ecx */ 0);
@@ -74,18 +78,15 @@ auto FeatureDetection::determineRuntimeCpuFeatures() noexcept -> std::uint32_t
 		: "a" (7), "c" (0));
 #endif
 
-	if (result & LMMS_CPU_FEATURE_AVX)
+	if (regs[1] & (1 << 5)) // AVX2
 	{
-		if (regs[1] & (1 << 5)) // AVX2
+		if (regs[1] & (1 << 16)) // AVX512F
 		{
-			if (regs[1] & (1 << 16)) // AVX512F
-			{
-				result |= LMMS_CPU_FEATURE_AVX512F;
-			}
-			else
-			{
-				result |= LMMS_CPU_FEATURE_AVX2;
-			}
+			result |= LMMS_CPU_FEATURE_AVX512F;
+		}
+		else
+		{
+			result |= LMMS_CPU_FEATURE_AVX2;
 		}
 	}
 #endif // x86_64

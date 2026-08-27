@@ -136,7 +136,7 @@
 #	else
 #		define LMMS_TARGET_CPU_FEATURES LMMS_CPU_FEATURE_NONE
 #	endif
-else
+#else
 	// Other processor
 #	define LMMS_TARGET_CPU_FEATURES LMMS_CPU_FEATURE_NONE
 #endif
