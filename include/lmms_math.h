@@ -34,9 +34,9 @@
 #include <numbers>
 #include <concepts>
 
-#include "FeatureDetection.h"
 #include "LmmsCommonMacros.h"
 #include "lmms_constants.h"
+#include "SimdHelpers.h"
 
 namespace lmms
 {

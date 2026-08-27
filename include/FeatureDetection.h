@@ -98,44 +98,31 @@
 //! @see LMMS_CPU_SUPPORTS
 #	define LMMS_TARGET_CPU_FEATURES
 #elif defined(LMMS_HOST_X86_64)
-#	include <immintrin.h>
-#	if defined(_MSC_VER)
-		// See: https://learn.microsoft.com/en-us/cpp/intrinsics/check-isa-arch-support?view=msvc-170
-#		include <isa_availability.h>
-#		if __check_arch_support(__IA_SUPPORT_SSE42, 0)
-#			define LMMS_TARGET_SSE_LEVEL LMMS_CPU_FEATURE_SSE4_2
-#		else
-#			define LMMS_TARGET_SSE_LEVEL LMMS_CPU_FEATURE_X86_64_V1
-#		endif
-#	else
-#		if defined(__SSE4_2__) && defined(__SSE4_1__) && defined(__SSSE3__) && defined(__SSE3__)
-#			define LMMS_TARGET_SSE_LEVEL LMMS_CPU_FEATURE_SSE4_2
-#		else
-#			define LMMS_TARGET_SSE_LEVEL LMMS_CPU_FEATURE_X86_64_V1
-#		endif
-#	endif
-	// See: https://learn.microsoft.com/en-us/cpp/preprocessor/predefined-macros?view=msvc-170
 #	if defined(__AVX512F__)
-#		define LMMS_TARGET_AVX_LEVEL LMMS_CPU_FEATURE_AVX512F
+#		define LMMS_TARGET_CPU_SIMD_FEATURES LMMS_CPU_FEATURE_AVX512F
 #	elif defined(__AVX2__)
-#		define LMMS_TARGET_AVX_LEVEL LMMS_CPU_FEATURE_AVX2
+#		define LMMS_TARGET_CPU_SIMD_FEATURES LMMS_CPU_FEATURE_AVX2
 #	elif defined(__AVX__)
-#		define LMMS_TARGET_AVX_LEVEL LMMS_CPU_FEATURE_AVX
+#		define LMMS_TARGET_CPU_SIMD_FEATURES LMMS_CPU_FEATURE_AVX
+#	elif defined(__SSE4_2__)
+		// NOTE: MSVC doesn't define __SSE4_2__, so we define it ourselves at /arch:SSE4.2 or higher
+#		define LMMS_TARGET_CPU_SIMD_FEATURES LMMS_CPU_FEATURE_SSE4_2
 #	else
-#		define LMMS_TARGET_AVX_LEVEL LMMS_CPU_FEATURE_NONE
+#		define LMMS_TARGET_CPU_SIMD_FEATURES LMMS_CPU_FEATURE_X86_64_V1
 #	endif
-#	define LMMS_TARGET_CPU_FEATURES (LMMS_TARGET_SSE_LEVEL | LMMS_TARGET_AVX_LEVEL)
+#	define LMMS_TARGET_CPU_FEATURES LMMS_TARGET_CPU_SIMD_FEATURES
 #elif defined(LMMS_HOST_ARM64)
 	// TODO: Add support for MSVC
 #	if defined(__ARM_FEATURE_SVE2)
-#		define LMMS_TARGET_CPU_FEATURES LMMS_CPU_FEATURE_SVE2
+#		define LMMS_TARGET_CPU_SIMD_FEATURES LMMS_CPU_FEATURE_SVE2
 #	elif defined(__ARM_FEATURE_SVE)
-#		define LMMS_TARGET_CPU_FEATURES LMMS_CPU_FEATURE_SVE
+#		define LMMS_TARGET_CPU_SIMD_FEATURES LMMS_CPU_FEATURE_SVE
 #	elif defined(__ARM_NEON) || defined(__ARM_NEON__)
-#		define LMMS_TARGET_CPU_FEATURES LMMS_CPU_FEATURE_NEON
+#		define LMMS_TARGET_CPU_SIMD_FEATURES LMMS_CPU_FEATURE_NEON
 #	else
-#		define LMMS_TARGET_CPU_FEATURES LMMS_CPU_FEATURE_NONE
+#		define LMMS_TARGET_CPU_SIMD_FEATURES LMMS_CPU_FEATURE_NONE
 #	endif
+#	define LMMS_TARGET_CPU_FEATURES LMMS_TARGET_CPU_SIMD_FEATURES
 #else
 	// Other processor
 #	define LMMS_TARGET_CPU_FEATURES LMMS_CPU_FEATURE_NONE
