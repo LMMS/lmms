@@ -27,27 +27,37 @@
 #include "versioninfo.h"
 
 #if defined(LMMS_HOST_X86_64) && defined(_MSC_VER)
-// See: https://learn.microsoft.com/en-us/cpp/intrinsics/cpuid-cpuidex?view=msvc-170
-#include <intrin.h>
+#	include <intrin.h> // __cpuid, __cpuidex
+#elif defined(LMMS_HOST_ARM64)
+#	if defined(LMMS_BUILD_WIN64)
+#		include <Windows.h> // IsProcessorFeaturePresent
+#	elif defined(LMMS_BUILD_LINUX) || defined(LMMS_BUILD_OPENBSD) || defined(LMMS_BUILD_FREEBSD)
+#		include <sys/auxv.h> // getauxval on Linux; elf_aux_info on OpenBSD/FreeBSD
+#	endif
+	// TODO: macOS Apple Silicon / Intel
 #endif
 
 namespace lmms {
 
 auto FeatureDetection::determineRuntimeCpuFeatures() noexcept -> std::uint32_t
 {
+	// NOTE: There is no implementation for non-x86_64 or non-arm64 architectures.
+	//       Nor is there an implementation for macOS on x86_64/arm64 or Haiku on arm64.
+	//       Platforms without an implementation will return LMMS_CPU_FEATURE_NONE.
+
 	auto result = std::uint32_t{LMMS_CPU_FEATURE_NONE};
 
 #if defined(LMMS_HOST_X86_64)
 	// eax, ebx, ecx, edx registers
 	int regs[4] = {}; // NOLINT
 
-#if defined(_MSC_VER)
+#	if defined(_MSC_VER)
 	__cpuid(regs, /* eax */ 1);
-#else
+#	else
 	asm volatile("cpuid"
 		: "=a" (regs[0]), "=b" (regs[1]), "=c" (regs[2]), "=d" (regs[3])
 		: "a" (1), "c" (0));
-#endif
+#	endif
 
 	if ((regs[3] & (1 << 25)) && (regs[3] & (1 << 26))) // SSE + SSE2
 	{
@@ -70,13 +80,13 @@ auto FeatureDetection::determineRuntimeCpuFeatures() noexcept -> std::uint32_t
 
 	if (!(result & LMMS_CPU_FEATURE_AVX)) { return result; }
 
-#if defined(_MSC_VER)
+#	if defined(_MSC_VER)
 	__cpuidex(regs, /* eax */ 7, /* ecx */ 0);
-#else
+#	else
 	asm volatile("cpuid"
 		: "=a" (regs[0]), "=b" (regs[1]), "=c" (regs[2]), "=d" (regs[3])
 		: "a" (7), "c" (0));
-#endif
+#	endif
 
 	if (regs[1] & (1 << 5)) // AVX2
 	{
@@ -89,9 +99,54 @@ auto FeatureDetection::determineRuntimeCpuFeatures() noexcept -> std::uint32_t
 			result |= LMMS_CPU_FEATURE_AVX2;
 		}
 	}
-#endif // x86_64
+#elif defined(LMMS_HOST_ARM64)
+#if defined(LMMS_BUILD_WIN64)
+	if (IsProcessorFeaturePresent(PF_ARM_V8_INSTRUCTIONS_AVAILABLE) != 0)
+	{
+		result |= LMMS_CPU_FEATURE_NEON; // NEON is a standard feature in ARMv8-A
+#	if defined(PF_ARM_SVE_INSTRUCTIONS_AVAILABLE)
+			if (IsProcessorFeaturePresent(PF_ARM_SVE_INSTRUCTIONS_AVAILABLE) != 0)
+			{
+				result |= LMMS_CPU_FEATURE_SVE;
+#		if defined(PF_ARM_SVE2_INSTRUCTIONS_AVAILABLE)
+				if (IsProcessorFeaturePresent(PF_ARM_SVE2_INSTRUCTIONS_AVAILABLE) != 0)
+				{
+					result |= LMMS_CPU_FEATURE_SVE2;
+				}
+#		endif
+			}
+#	endif
+	}
+#elif defined(LMMS_BUILD_LINUX) || defined(LMMS_BUILD_OPENBSD) || defined(LMMS_BUILD_FREEBSD)
+	// hwcap1/hwcap2 are individually zeroed if an error occurred
+	auto getHWCAP = [](unsigned long& hwcap1, unsigned long& hwcap2) {
+#	if defined(LMMS_BUILD_LINUX)
+		hwcap1 = getauxval(AT_HWCAP);
+		hwcap2 = getauxval(AT_HWCAP2);
+#	else // OpenBSD/FreeBSD
+		if (elf_aux_info(AT_HWCAP, &hwcap1, sizeof(hwcap1)) != 0) { hwcap1 = 0; }
+		if (elf_aux_info(AT_HWCAP2, &hwcap2, sizeof(hwcap2)) != 0) { hwcap2 = 0; }
+#	endif
+	};
 
-	// TODO: ARM64 feature detection
+	unsigned long hwcap1 = 0;
+	unsigned long hwcap2 = 0;
+	getHWCAP(hwcap1, hwcap2);
+
+	if (hwcap1 & HWCAP_ASIMD) // Advanced SIMD / NEON
+	{
+		result |= LMMS_CPU_FEATURE_NEON;
+		if (hwcap1 & HWCAP_SVE)
+		{
+			result |= LMMS_CPU_FEATURE_SVE;
+			if (hwcap2 & HWCAP2_SVE2)
+			{
+				result |= LMMS_CPU_FEATURE_SVE2;
+			}
+		}
+	}
+#endif // arm64 OS
+#endif // architecture
 
 	return result;
 }
