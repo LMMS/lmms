@@ -28,13 +28,14 @@
 
 #if defined(LMMS_HOST_X86_64) && defined(_MSC_VER)
 #	include <intrin.h> // __cpuid, __cpuidex
+#elif defined(LMMS_BUILD_APPLE)
+#	include <sys/sysctl.h> // sysctlbyname
 #elif defined(LMMS_HOST_ARM64)
 #	if defined(LMMS_BUILD_WIN64)
 #		include <Windows.h> // IsProcessorFeaturePresent
 #	elif defined(LMMS_BUILD_LINUX) || defined(LMMS_BUILD_OPENBSD) || defined(LMMS_BUILD_FREEBSD)
 #		include <sys/auxv.h> // getauxval on Linux; elf_aux_info on OpenBSD/FreeBSD
 #	endif
-	// TODO: macOS Apple Silicon / Intel
 #endif
 
 namespace lmms {
@@ -42,10 +43,20 @@ namespace lmms {
 auto FeatureDetection::determineRuntimeCpuFeatures() noexcept -> std::uint32_t
 {
 	// NOTE: There is no implementation for non-x86_64 or non-arm64 architectures.
-	//       Nor is there an implementation for macOS on x86_64/arm64 or Haiku on arm64.
+	//       Nor is there an implementation for Haiku on arm64.
 	//       Platforms without an implementation will return LMMS_CPU_FEATURE_NONE.
 
 	auto result = std::uint32_t{LMMS_CPU_FEATURE_NONE};
+
+#if defined(LMMS_BUILD_APPLE)
+	// Helper for macOS on both Intel and Apple Silicon
+	const auto getSysCtlByName = [](const char* name) -> bool {
+		int enabled = 0;
+		std::size_t enabledLen = sizeof(enabled);
+		const int fail = sysctlbyname(name, &enabled, &enabledLen, nullptr, 0);
+		return fail == 0 ? enabled : false;
+	};
+#endif
 
 #if defined(LMMS_HOST_X86_64)
 	// eax, ebx, ecx, edx registers
@@ -90,7 +101,13 @@ auto FeatureDetection::determineRuntimeCpuFeatures() noexcept -> std::uint32_t
 
 	if (regs[1] & (1 << 5)) // AVX2
 	{
+#	if defined(LMMS_BUILD_APPLE)
+		// AVX512 support is "On-demand" and must be queried with sysctlbyname instead
+		// https://github.com/apple/darwin-xnu/blob/8f02f2a044b9bb1ad951987ef5bab20ec9486310/osfmk/i386/fpu.c#L173-L199
+		if (getSysCtlByName("hw.optional.avx512f"))
+#	else
 		if (regs[1] & (1 << 16)) // AVX512F
+#	endif
 		{
 			result |= LMMS_CPU_FEATURE_AVX512F;
 		}
@@ -116,6 +133,14 @@ auto FeatureDetection::determineRuntimeCpuFeatures() noexcept -> std::uint32_t
 #		endif
 			}
 #	endif
+	}
+#elif defined(LMMS_BUILD_APPLE)
+	if (getSysCtlByName("hw.optional.AdvSIMD")
+		|| getSysCtlByName("hw.optional.arm.AdvSIMD")
+		|| getSysCtlByName("hw.optional.neon"))
+	{
+		result |= LMMS_CPU_FEATURE_NEON;
+		// TODO: Find a way to check for SVE/SVE2 on macOS
 	}
 #elif defined(LMMS_BUILD_LINUX) || defined(LMMS_BUILD_OPENBSD) || defined(LMMS_BUILD_FREEBSD)
 	// hwcap1/hwcap2 are individually zeroed if an error occurred
