@@ -141,6 +141,14 @@ endif()
 
 if(TARGET_UARCH STREQUAL "custom" OR TARGET_UARCH_FLAGS)
 	add_compile_options(${TARGET_UARCH_FLAGS})
+
+	# Workaround for MSVC's lack of an __SSE4_2__ preprocessor macro
+	if(MSVC AND LMMS_HOST_X86_64)
+		if("${TARGET_UARCH_FLAGS}" MATCHES "/arch:" AND "${TARGET_UARCH_FLAGS}" NOT MATCHES "/arch:SSE2")
+			# All valid /arch options on x86_64 are SSE4.2 or higher aside from /arch:SSE2 (the default)
+			add_compile_definitions(__SSE4_2__=1)
+		endif()
+	endif()
 elseif(TARGET_UARCH STREQUAL "none")
 	# Do nothing, use the compiler default
 elseif(TARGET_UARCH STREQUAL "official")
