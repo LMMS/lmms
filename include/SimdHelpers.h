@@ -107,11 +107,11 @@ LMMS_DEFINE_SIMD_GENERIC(_mmX_add_ps, _mm_add_ps, _mm256_add_ps, _mm512_add_ps)
 #endif // LMMS_HOST_X86_64
 
 //! A collection of different SIMD-enabled functions for runtime dispatch + dispatch settings
-template<bool ne, class R, class... A>
+template<bool ne, class Ret, class... Args>
 struct SimdDispatchConfig
 {
-	using Target = auto(*)(A...) noexcept(ne) -> R;
-	using TargetRef = auto(&)(A...) noexcept(ne) -> R;
+	using Target = auto(*)(Args...) noexcept(ne) -> Ret;
+	using TargetRef = auto(&)(Args...) noexcept(ne) -> Ret;
 
 #if defined(LMMS_HOST_X86_64)
 	Target avx512f = nullptr;
@@ -142,23 +142,23 @@ namespace detail {
 
 //! This consteval class exists as a way to move all possible work in resolving the
 //! dispatch target from runtime to compile-time
-template<bool ne, class R, class... A>
+template<bool ne, class Ret, class... Args>
 class SimdDispatchResolver
 {
 public:
 	SimdDispatchResolver() = delete;
-	consteval SimdDispatchResolver(SimdDispatchConfig<ne, R, A...> config)
+	consteval SimdDispatchResolver(SimdDispatchConfig<ne, Ret, Args...> config)
 		: m_resolver{getResolver(config)}
 		, m_config{config}
 		, m_highestImplementedTarget{getHighestImplementedTarget(config)}
 	{}
 
-	using TargetRef = auto(&)(A...) noexcept(ne) -> R;
+	using TargetRef = auto(&)(Args...) noexcept(ne) -> Ret;
 	LMMS_INLINE auto operator()() const noexcept -> TargetRef { return (this->*m_resolver)(); }
 
 private:
 	using ResolverFunc = auto(SimdDispatchResolver::*)() const noexcept -> TargetRef;
-	consteval static auto getResolver(const SimdDispatchConfig<ne, R, A...>& config) -> ResolverFunc
+	consteval static auto getResolver(const SimdDispatchConfig<ne, Ret, Args...>& config) -> ResolverFunc
 	{
 #if defined(LMMS_DISABLE_DYNAMIC_DISPATCH)
 		return &SimdDispatchResolver::resolveDisabled;
@@ -259,7 +259,7 @@ private:
 		return m_config.scalar;
 	}
 
-	consteval static auto getHighestImplementedTarget(const SimdDispatchConfig<ne, R, A...>& config)
+	consteval static auto getHighestImplementedTarget(const SimdDispatchConfig<ne, Ret, Args...>& config)
 		-> std::uint32_t
 	{
 #if defined(LMMS_HOST_X86_64)
@@ -277,38 +277,38 @@ private:
 	}
 
 	ResolverFunc m_resolver;
-	SimdDispatchConfig<ne, R, A...> m_config;
+	SimdDispatchConfig<ne, Ret, Args...> m_config;
 	std::uint32_t m_highestImplementedTarget;
 };
 
 } // namespace detail
 
 //! A runtime dispatcher for SIMD functions
-template<bool ne, class R, class... A>
+template<bool ne, class Ret, class... Args>
 class SimdDispatcher
 {
-	using TargetRef = auto(&)(A...) noexcept(ne) -> R;
+	using TargetRef = auto(&)(Args...) noexcept(ne) -> Ret;
 	TargetRef m_resolvedTarget;
 public:
-	explicit SimdDispatcher(const detail::SimdDispatchResolver<ne, R, A...>& resolver)
+	explicit SimdDispatcher(const detail::SimdDispatchResolver<ne, Ret, Args...>& resolver)
 		: m_resolvedTarget{resolver()}
 	{}
 
-	LMMS_INLINE auto operator()(A&&... args) const noexcept(ne) -> R
+	LMMS_INLINE auto operator()(Args... args) const noexcept(ne) -> Ret
 	{
-		if constexpr (std::is_void_v<R>)
+		if constexpr (std::is_void_v<Ret>)
 		{
-			m_resolvedTarget(std::forward<A>(args)...);
+			m_resolvedTarget(std::forward<Args>(args)...);
 		}
 		else
 		{
-			return m_resolvedTarget(std::forward<A>(args)...);
+			return m_resolvedTarget(std::forward<Args>(args)...);
 		}
 	}
 };
 
-template<bool ne, class R, class... A>
-SimdDispatcher(SimdDispatchConfig<ne, R, A...>) -> SimdDispatcher<ne, R, A...>;
+template<bool ne, class Ret, class... Args>
+SimdDispatcher(SimdDispatchConfig<ne, Ret, Args...>) -> SimdDispatcher<ne, Ret, Args...>;
 
 } // namespace lmms
 
