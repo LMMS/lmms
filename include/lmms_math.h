@@ -34,7 +34,6 @@
 #include <numbers>
 #include <concepts>
 
-#include "LmmsCommonMacros.h"
 #include "lmms_constants.h"
 #include "SimdHelpers.h"
 

@@ -46,16 +46,16 @@
 
 // x86_64 features
 #if defined(LMMS_HOST_X86_64) || defined(DOXYGEN)
-//! CMOV, CMPXCHG8B (CX8), FPU, FXSR, MMX, OSFXSR, SCE, SSE, SSE2
-//! @note x86_64-v1 is the baseline for all x86_64 CPUs, so this feature is unconditionally present.
+	//! CMOV, CMPXCHG8B (CX8), FPU, FXSR, MMX, OSFXSR, SCE, SSE, SSE2
+	//! @note x86_64-v1 is the baseline for all x86_64 CPUs, so this feature is unconditionally present.
 #	define LMMS_CPU_FEATURE_X86_64_V1 (1u << 0)
-//! x86-64-v1 + SSE3, SSSE3, SSE4.1, and SSE4.2
+	//! x86-64-v1 + SSE3, SSSE3, SSE4.1, and SSE4.2
 #	define LMMS_CPU_FEATURE_SSE4_2    ((1u << 1) | LMMS_CPU_FEATURE_X86_64_V1)
-//! x86-64-v1 + SSE3, SSSE3, SSE4.1, SSE4.2, and AVX
+	//! x86-64-v1 + SSE3, SSSE3, SSE4.1, SSE4.2, and AVX
 #	define LMMS_CPU_FEATURE_AVX       ((1u << 2) | LMMS_CPU_FEATURE_SSE4_2)
-//! x86-64-v1 + SSE3, SSSE3, SSE4.1, SSE4.2, AVX, and AVX2
+	//! x86-64-v1 + SSE3, SSSE3, SSE4.1, SSE4.2, AVX, and AVX2
 #	define LMMS_CPU_FEATURE_AVX2      ((1u << 3) | LMMS_CPU_FEATURE_AVX)
-//! x86-64-v1 + SSE3, SSSE3, SSE4.1, SSE4.2, AVX, AVX2, and AVX512F
+	//! x86-64-v1 + SSE3, SSSE3, SSE4.1, SSE4.2, AVX, AVX2, and AVX512F
 #	define LMMS_CPU_FEATURE_AVX512F   ((1u << 4) | LMMS_CPU_FEATURE_AVX2)
 #else
 #	define LMMS_CPU_FEATURE_X86_64_V1 LMMS_CPU_FEATURE_INVALID
@@ -77,12 +77,14 @@
 #endif
 
 #if defined(DOXYGEN)
-//! A mask for extracting only the SIMD flags in the @a LMMS_CPU_FEATURE_* flags
+	//! A mask for extracting only the SIMD flags in the @a LMMS_CPU_FEATURE_* flags
 #	define LMMS_CPU_FEATURE_SIMD_MASK
 #elif defined(LMMS_HOST_X86_64)
 #	define LMMS_CPU_FEATURE_SIMD_MASK ((1u << 5) - 1u)
 #elif defined(LMMS_HOST_ARM64)
 #	define LMMS_CPU_FEATURE_SIMD_MASK ((1u << 3) - 1u)
+#else
+#	define LMMS_CPU_FEATURE_SIMD_MASK (0u)
 #endif
 
 ///////////////////////////////////////////
@@ -90,13 +92,13 @@
 ///////////////////////////////////////////
 
 #if defined(DOXYGEN)
-//! @brief Contains @a LMMS_CPU_FEATURE_* flags indicating which features are unconditionally present
-//!        on the target microarchitecture.
-//!
-//! More efficient code paths can be conditionally enabled at compile-time based on the value
-//! of this macro. The value is affected by the @a TARGET_UARCH config option.
-//!
-//! @see LMMS_CPU_SUPPORTS
+	//! @brief Contains @a LMMS_CPU_FEATURE_* flags indicating which features are unconditionally present
+	//!        on the target microarchitecture.
+	//!
+	//! More efficient code paths can be conditionally enabled at compile-time based on the value
+	//! of this macro. The value is affected by the @a TARGET_UARCH config option.
+	//!
+	//! @see LMMS_CPU_SUPPORTS
 #	define LMMS_TARGET_CPU_FEATURES
 #elif defined(LMMS_HOST_X86_64)
 #	if defined(__AVX512F__)

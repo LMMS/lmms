@@ -143,8 +143,8 @@ auto FeatureDetection::determineRuntimeCpuFeatures() noexcept -> std::uint32_t
 		// TODO: Find a way to check for SVE/SVE2 on macOS
 	}
 #elif defined(LMMS_BUILD_LINUX) || defined(LMMS_BUILD_OPENBSD) || defined(LMMS_BUILD_FREEBSD)
-	// hwcap1/hwcap2 are individually zeroed if an error occurred
-	auto getHWCAP = [](unsigned long& hwcap1, unsigned long& hwcap2) {
+	// hwcap1/hwcap2 are individually zeroed if an error occurs
+	const auto getHWCAP = [](unsigned long& hwcap1, unsigned long& hwcap2) {
 #	if defined(LMMS_BUILD_LINUX)
 		hwcap1 = getauxval(AT_HWCAP);
 		hwcap2 = getauxval(AT_HWCAP2);
