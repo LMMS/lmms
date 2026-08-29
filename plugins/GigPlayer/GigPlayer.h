@@ -141,7 +141,7 @@ public:
 	ADSR();
 	ADSR( gig::DimensionRegion * region, int sampleRate );
 	void keyup(); // We will begin releasing starting now
-	bool done(); // Is this sample done playing?
+	bool done() const; // Is this sample done playing?
 	float value(); // What's the current amplitude
 	void inc( f_cnt_t num ); // Increment internal positions by num
 } ;

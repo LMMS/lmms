@@ -337,9 +337,8 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 		return;
 	}
 
-	// TODO: C++20 std::erase_if
-	// Process and remove if complete
-	m_notes.erase(std::remove_if(m_notes.begin(), m_notes.end(),
+	// Process notes
+	std::for_each(m_notes.begin(), m_notes.end(),
 		[&](GigNote& gigNote) {
 			// Process notes in the KeyUp state, adding release samples if desired
 			if (gigNote.state == GigState::KeyUp)
@@ -364,25 +363,22 @@ void GigInstrument::play( SampleFrame* _working_buffer )
 				addSamples(gigNote, false);
 			}
 
-			// TODO: C++20 std::erase_if
 			// Delete ended samples
-			gigNote.samples.erase(std::remove_if(gigNote.samples.begin(), gigNote.samples.end(),
-				[&](GigSample& sample) {
-					if (sample.adsr.done()) { return true; }
-					if (sample.sample == nullptr) { return true; }
-					if (gigNote.isRelease && sample.pos >= (sample.sample->SamplesTotal - 1))
-					{
-						return true;
-					}
-					return false;
-				}),
-				gigNote.samples.end()
+			std::erase_if(gigNote.samples,
+				[&](const GigSample& sample) {
+					return sample.adsr.done()
+						|| sample.sample == nullptr
+						|| (gigNote.isRelease && sample.pos >= sample.sample->SamplesTotal - 1);
+				}
 			);
+		}
+	);
 
-			// Delete ended notes (either in the completed state or all the samples ended)
+	// Delete ended notes (either in the completed state or all the samples ended)
+	std::erase_if(m_notes,
+		[](const GigNote& gigNote) {
 			return gigNote.state == GigState::Completed || gigNote.samples.empty();
-		}),
-		m_notes.end()
+		}
 	);
 
 	// Fill buffer with portions of the note samples
@@ -1137,7 +1133,7 @@ void ADSR::keyup()
 
 
 // Can we delete the sample now?
-bool ADSR::done()
+bool ADSR::done() const
 {
 	return isDone;
 }
