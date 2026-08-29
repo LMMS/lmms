@@ -6,7 +6,7 @@
 
 include(ImportedTargetHelpers)
 
-find_package_config_mode_with_fallback(gig libgig::libgig
+find_package_config_mode_with_fallback(libgig libgig::libgig
 	LIBRARY_NAMES "gig"
 	INCLUDE_NAMES "libgig/gig.h"
 	PKG_CONFIG gig
