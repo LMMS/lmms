@@ -218,7 +218,7 @@ public:
 	bool isRelease; // Whether this is a release sample, changes when we delete it
 	GigState state;
 	float frequency;
-	std::vector<GigSample> samples;
+	std::list<GigSample> samples;
 
 	// Used to determine which note should be released on key up
 	//
