@@ -27,6 +27,7 @@
 		},
 		{
 			"name": "libgig",
+			"platform": "windows & !mingw",
 			"default-features": false
 		},
 		{
