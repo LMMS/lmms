@@ -1,12 +1,13 @@
 #ifndef LMMS_VERSION_INFO_H
 #define LMMS_VERSION_INFO_H
 
-#include "lmms_basics.h"
+#include "LmmsCommonMacros.h"
+#include "lmmsconfig.h"
 
-#if defined(__GNUC__)
-constexpr const char* LMMS_BUILDCONF_COMPILER_VERSION = "GCC " __VERSION__;
-#elif defined(__clang__)
+#if defined(__clang__)
 constexpr const char* LMMS_BUILDCONF_COMPILER_VERSION = "Clang " __clang_version__;
+#elif defined(__GNUC__)
+constexpr const char* LMMS_BUILDCONF_COMPILER_VERSION = "GCC " __VERSION__;
 #elif defined(_MSC_VER)
 constexpr const char* LMMS_BUILDCONF_COMPILER_VERSION = "MSVC " LMMS_STRINGIFY(_MSC_FULL_VER);
 #else
@@ -45,6 +46,8 @@ constexpr const char* LMMS_BUILDCONF_PLATFORM = "FreeBSD";
 constexpr const char* LMMS_BUILDCONF_PLATFORM = "win32";
 #elif defined(LMMS_BUILD_HAIKU)
 constexpr const char* LMMS_BUILDCONF_PLATFORM = "Haiku";
+#elif defined(LMMS_BUILD_CYGWIN)
+constexpr const char* LMMS_BUILDCONF_PLATFORM = "Cygwin";
 #else
 constexpr const char* LMMS_BUILDCONF_PLATFORM = "unknown platform";
 #endif

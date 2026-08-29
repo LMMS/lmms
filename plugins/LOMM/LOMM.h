@@ -30,7 +30,6 @@
 #include "Effect.h"
 
 #include "BasicFilters.h"
-#include "lmms_math.h"
 
 namespace lmms
 {
@@ -46,7 +45,7 @@ public:
 	LOMMEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
 	~LOMMEffect() override = default;
 
-	ProcessStatus processImpl(SampleFrame* buf, const fpp_t frames) override;
+	ProcessStatus processImpl(SampleFrame* buf, const f_cnt_t frames) override;
 
 	EffectControls* controls() override
 	{
@@ -55,7 +54,7 @@ public:
 	
 	inline float msToCoeff(float ms)
 	{
-		return (ms == 0) ? 0 : exp(m_coeffPrecalc / ms);
+		return (ms == 0) ? 0 : std::exp(m_coeffPrecalc / ms);
 	}
 
 private slots:

@@ -22,6 +22,10 @@
 			]
 		},
 		{
+			"name": "libflac",
+			"default-features": false
+		},
+		{
 			"name": "libgig",
 			"default-features": false
 		},
@@ -51,10 +55,6 @@
 		},
 		{
 			"name": "lilv",
-			"default-features": false
-		},
-		{
-			"name": "lv2",
 			"default-features": false
 		},
 		{

@@ -21,7 +21,7 @@
                 <arpeggiator arp="0" arptime_numerator="1" arptime_denominator="1" arprange="1" arpmode="0" arptime="100" arpdir="0" arpgate="100" syncmode="0" arp-enabled="0"/>
                 <midiport outputchannel="1" outputcontroller="0" basevelocity="127" outputprogram="1" fixedinputvelocity="-1" fixedoutputvelocity="-1" fixedoutputnote="-1" inputchannel="0" inputcontroller="0" readable="0" writable="0"/>
                 <fxchain enabled="1" numofeffects="1">
-                  <effect autoquit="1" gate="0" autoquit_denominator="4" wet="1" name="ladspaeffect" on="1" autoquit_numerator="4" syncmode="0">
+                  <effect autoquit="1" autoquit_denominator="4" wet="1" name="ladspaeffect" on="1" autoquit_numerator="4" syncmode="0">
                     <ladspacontrols ports="4">
                       <port02 data="0.50197"/>
                       <port03 data="0.3745"/>
@@ -94,7 +94,7 @@
                 <arpeggiator arp="0" arptime_numerator="1" arptime_denominator="1" arprange="1" arpmode="0" arptime="100" arpdir="0" arpgate="100" syncmode="0" arp-enabled="0"/>
                 <midiport outputchannel="1" outputcontroller="0" basevelocity="127" outputprogram="1" fixedinputvelocity="-1" fixedoutputvelocity="-1" fixedoutputnote="-1" inputchannel="0" inputcontroller="0" readable="0" writable="0"/>
                 <fxchain enabled="1" numofeffects="1">
-                  <effect autoquit="1" gate="0" autoquit_denominator="4" wet="1" name="ladspaeffect" on="1" autoquit_numerator="4" syncmode="0">
+                  <effect autoquit="1" autoquit_denominator="4" wet="1" name="ladspaeffect" on="1" autoquit_numerator="4" syncmode="0">
                     <ladspacontrols ports="4">
                       <port02 data="0.23359"/>
                       <port03 data="0.53928"/>
@@ -317,7 +317,7 @@
                 <arpeggiator arp="0" arptime_numerator="1" arptime_denominator="1" arprange="1" arpmode="0" arptime="100" arpdir="0" arpgate="100" syncmode="0" arp-enabled="0"/>
                 <midiport outputchannel="1" outputcontroller="0" basevelocity="127" outputprogram="1" fixedinputvelocity="-1" fixedoutputvelocity="-1" fixedoutputnote="-1" inputchannel="0" inputcontroller="0" readable="0" writable="0"/>
                 <fxchain enabled="1" numofeffects="1">
-                  <effect autoquit="1" gate="0" autoquit_denominator="4" wet="1" name="ladspaeffect" on="1" autoquit_numerator="4" syncmode="0">
+                  <effect autoquit="1" autoquit_denominator="4" wet="1" name="ladspaeffect" on="1" autoquit_numerator="4" syncmode="0">
                     <ladspacontrols ports="5">
                       <port00 data="1900.01"/>
                       <port01 data="44.2125"/>

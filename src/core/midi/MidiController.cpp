@@ -23,7 +23,6 @@
  *
  */
 
-#include <QDomElement>
 
 #include "AudioEngine.h"
 #include "MidiController.h"

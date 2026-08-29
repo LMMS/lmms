@@ -24,23 +24,24 @@
 
 #include "TrackOperationsWidget.h"
 
-#include <QBoxLayout>
+#include <QCheckBox>
+#include <QHBoxLayout>
 #include <QMenu>
 #include <QMessageBox>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QPushButton>
-#include <QCheckBox>
 
+#include "AutomatableButton.h"
 #include "AutomationClip.h"
 #include "AutomationTrackView.h"
 #include "ColorChooser.h"
 #include "ConfigManager.h"
-#include "DataFile.h"
 #include "embed.h"
 #include "Engine.h"
 #include "InstrumentTrackView.h"
-#include "PixmapButton.h"
+#include "lmms_math.h"
+#include "KeyboardShortcuts.h"
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "Track.h"
@@ -75,81 +76,36 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 	layout->setSpacing(0);
 	layout->setAlignment(Qt::AlignTop);
 
-	m_trackGrip = new TrackGrip(m_trackView->getTrack(), this);
+	m_trackGrip = new TrackGrip(m_trackView, this);
 	layout->addWidget(m_trackGrip);
 
 	// This widget holds the gear icon and the mute and solo
 	// buttons in a layout.
 	auto operationsWidget = new QWidget(this);
 	auto operationsLayout = new QHBoxLayout(operationsWidget);
-	operationsLayout->setContentsMargins(0, 0, 0, 0);
-	operationsLayout->setSpacing(0);
+	operationsLayout->setContentsMargins(2, 6, 0, 6);
+	operationsLayout->setSpacing(2);
 
 	m_trackOps = new QPushButton(operationsWidget);
 	m_trackOps->setFocusPolicy( Qt::NoFocus );
 	m_trackOps->setMenu( toMenu );
 	m_trackOps->setToolTip(tr("Actions"));
+	m_trackOps->setCursor(Qt::PointingHandCursor);
 
-	// This helper lambda wraps a PixmapButton in a QWidget. This is necessary due to some strange effect where the
-	// PixmapButtons are resized to a size that's larger than their minimum/fixed size when the method "show" is called
-	// in "TrackContainerView::realignTracks". Specifically, with the default theme the buttons are resized from
-	// (16, 14) to (26, 26). This then makes them behave not as expected in layouts.
-	// The resizing is not done for QWidgets. Therefore we wrap the PixmapButton in a QWidget which is set to a
-	// fixed size that will be able to show the active and inactive pixmap. We can then use the QWidget in layouts
-	// without any disturbances.
-	//
-	// The resizing only seems to affect the track view hierarchy and is triggered by Qt's internal mechanisms.
-	// For example the buttons in the mixer view do not seem to be affected.
-	// If you want to debug this simply override "PixmapButton::resizeEvent" and trigger a break point in there.
-	auto buildPixmapButtonWrappedInWidget = [](QWidget* parent, const QString& toolTip,
-		std::string_view activeGraphic, std::string_view inactiveGraphic, PixmapButton*& pixmapButton)
-	{
-		const auto activePixmap = embed::getIconPixmap(activeGraphic);
-		const auto inactivePixmap = embed::getIconPixmap(inactiveGraphic);
+	m_muteBtn = new AutomatableButton(operationsWidget, tr("Mute"));
+	m_muteBtn->setCheckable(true);
+	m_muteBtn->setToolTip(tr("Mute"));
+	m_muteBtn->setObjectName("btn-mute");
+	m_soloBtn = new AutomatableButton(operationsWidget, tr("Solo"));
+	m_soloBtn->setCheckable(true);
+	m_soloBtn->setToolTip(tr("Solo"));
+	m_soloBtn->setObjectName("btn-solo");
 
-		auto necessarySize = activePixmap.size().expandedTo(inactivePixmap.size());
+	operationsLayout->addWidget(m_trackOps);
+	operationsLayout->addWidget(m_muteBtn);
+	operationsLayout->addWidget(m_soloBtn);
 
-		auto wrapperWidget = new QWidget(parent);
-		wrapperWidget->setFixedSize(necessarySize);
-
-		auto button = new PixmapButton(wrapperWidget, toolTip);
-		button->setCheckable(true);
-		button->setActiveGraphic(activePixmap);
-		button->setInactiveGraphic(inactivePixmap);
-		button->setToolTip(toolTip);
-
-		pixmapButton = button;
-
-		return wrapperWidget;
-	};
-
-	auto muteWidget = buildPixmapButtonWrappedInWidget(operationsWidget, tr("Mute"), "led_off", "led_green", m_muteBtn);
-	auto soloWidget = buildPixmapButtonWrappedInWidget(operationsWidget, tr("Solo"), "led_red", "led_off", m_soloBtn);
-
-	operationsLayout->addWidget(m_trackOps, Qt::AlignCenter);
-	operationsLayout->addSpacing(5);
-
-	if( ConfigManager::inst()->value( "ui",
-					  "compacttrackbuttons" ).toInt() )
-	{
-		auto vlayout = new QVBoxLayout();
-		vlayout->setContentsMargins(0, 0, 0, 0);
-		vlayout->setSpacing(0);
-		vlayout->addStretch(1);
-		vlayout->addWidget(muteWidget);
-		vlayout->addWidget(soloWidget);
-		vlayout->addStretch(1);
-		operationsLayout->addLayout(vlayout);
-	}
-	else
-	{
-		operationsLayout->addWidget(muteWidget, Qt::AlignCenter);
-		operationsLayout->addWidget(soloWidget, Qt::AlignCenter);
-	}
-
-	operationsLayout->addStretch(1);
-
-	layout->addWidget(operationsWidget, 0, Qt::AlignTop);
+	layout->addWidget(operationsWidget, 0, Qt::AlignTop | Qt::AlignLeading);
 
 	connect( this, SIGNAL(trackRemovalScheduled(lmms::gui::TrackView*)),
 			m_trackView->trackContainerView(),
@@ -161,43 +117,6 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 
 	connect(m_trackView->getTrack(), SIGNAL(colorChanged()), this, SLOT(update()));
 }
-
-
-
-
-
-
-
-/*! \brief Respond to trackOperationsWidget mouse events
- *
- *  If it's the left mouse button, and Ctrl is held down, and we're
- *  not a Pattern Editor track, then start a new drag event to
- *  copy this track.
- *
- *  Otherwise, ignore all other events.
- *
- *  \param me The mouse event to respond to.
- */
-void TrackOperationsWidget::mousePressEvent( QMouseEvent * me )
-{
-	if( me->button() == Qt::LeftButton &&
-		me->modifiers() & Qt::ControlModifier &&
-			m_trackView->getTrack()->type() != Track::Type::Pattern)
-	{
-		DataFile dataFile( DataFile::Type::DragNDropData );
-		m_trackView->getTrack()->saveState( dataFile, dataFile.content() );
-		new StringPairDrag( QString( "track_%1" ).arg(
-					static_cast<int>(m_trackView->getTrack()->type()) ),
-			dataFile.toString(), m_trackView->getTrackSettingsWidget()->grab(),
-									this );
-	}
-	else if( me->button() == Qt::LeftButton )
-	{
-		// track-widget (parent-widget) initiates track-move
-		me->ignore();
-	}
-}
-
 
 
 
@@ -227,12 +146,18 @@ bool TrackOperationsWidget::confirmRemoval()
 	QString messageTitleRemoveTrack = tr("Confirm removal");
 	QString askAgainText = tr("Don't ask again");
 	auto askAgainCheckBox = new QCheckBox(askAgainText, nullptr);
-	connect(askAgainCheckBox, &QCheckBox::stateChanged, [](int state){
+	auto onCheckedStateChanged = [](auto state){
 		// Invert button state, if it's checked we *shouldn't* ask again
-		ConfigManager::inst()->setValue("ui", "trackdeletionwarning", state ? "0" : "1");
-	});
+		ConfigManager::inst()->setValue("ui", "trackdeletionwarning", state != Qt::Unchecked ? "0" : "1");
+	};
 
-	QMessageBox mb(this);
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
+	connect(askAgainCheckBox, &QCheckBox::checkStateChanged, onCheckedStateChanged);
+#else
+	connect(askAgainCheckBox, &QCheckBox::stateChanged, onCheckedStateChanged);
+#endif
+
+	QMessageBox mb;
 	mb.setText(messageRemoveTrack);
 	mb.setWindowTitle(messageTitleRemoveTrack);
 	mb.setIcon(QMessageBox::Warning);
@@ -241,16 +166,8 @@ bool TrackOperationsWidget::confirmRemoval()
 	mb.setCheckBox(askAgainCheckBox);
 	mb.setDefaultButton(QMessageBox::Cancel);
 
-	int answer = mb.exec();
-
-	if( answer == QMessageBox::Ok )
-	{
-		return true;
-	}
-	return false;
+	return mb.exec() == QMessageBox::Ok;
 }
-
-
 
 /*! \brief Clone this track
  *
@@ -289,7 +206,6 @@ void TrackOperationsWidget::clearTrack()
 }
 
 
-
 /*! \brief Remove this track from the track list
  *
  */
@@ -325,7 +241,7 @@ void TrackOperationsWidget::resetTrackColor()
 
 void TrackOperationsWidget::randomizeTrackColor()
 {
-	QColor buffer = ColorChooser::getPalette( ColorChooser::Palette::Track )[ rand() % 48 ];
+	QColor buffer = ColorChooser::getPalette(ColorChooser::Palette::Track)[fastRand(48)];
 	auto track = m_trackView->getTrack();
 	track->addJournalCheckPoint();
 	track->setColor(buffer);
@@ -342,6 +258,7 @@ void TrackOperationsWidget::resetClipColors()
 	}
 	Engine::getSong()->setModified();
 }
+
 
 /*! \brief Update the trackOperationsWidget context menu
  *
@@ -407,7 +324,6 @@ void TrackOperationsWidget::toggleRecording( bool on )
 		atv->update();
 	}
 }
-
 
 
 void TrackOperationsWidget::recordingOn()

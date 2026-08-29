@@ -210,9 +210,17 @@ void TrackContainer::removeTrack( Track * _track )
 		{
 			Engine::getSong()->setModified();
 		}
+		emit trackRemoved();
 	}
 }
 
+void TrackContainer::moveTrack(Track* track, int indexTo)
+{
+	m_tracks.erase(std::find(m_tracks.begin(), m_tracks.end(), track));
+	m_tracks.insert(m_tracks.begin() + indexTo, track);
+
+	emit trackMoved();
+}
 
 
 
@@ -297,9 +305,9 @@ AutomatedValueMap TrackContainer::automatedValuesFromTracks(const TrackList &tra
 			if (! p->hasAutomation()) {
 				continue;
 			}
-			TimePos relTime = time - p->startPosition();
-			if (! p->getAutoResize()) {
-				relTime = std::min(relTime, p->length());
+			TimePos relTime = time - p->startPosition() - p->startTimeOffset();
+			if (!p->isInPattern()) {
+				relTime = std::min(static_cast<int>(relTime), p->length() - p->startTimeOffset());
 			}
 			float value = p->valueAt(relTime);
 

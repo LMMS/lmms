@@ -25,7 +25,7 @@
 #ifndef MONODELAY_H
 #define MONODELAY_H
 
-#include "lmms_basics.h"
+#include "LmmsTypes.h"
 
 namespace lmms
 {

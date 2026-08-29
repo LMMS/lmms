@@ -22,9 +22,8 @@
  *
 */
 
-
-#ifndef SIMPLE_TEXT_FLOAT_H
-#define SIMPLE_TEXT_FLOAT_H
+#ifndef LMMS_GUI_SIMPLE_TEXT_FLOAT_H
+#define LMMS_GUI_SIMPLE_TEXT_FLOAT_H
 
 #include <QWidget>
 
@@ -47,21 +46,34 @@ public:
 
 	void showWithDelay(int msecBeforeDisplay, int msecDisplayTime);
 
-	void setVisibilityTimeOut(int msecs);
+	void showWithTimeout(int msec)
+	{
+		showWithDelay(0, msec);
+	}
 
 	void moveGlobal(QWidget * w, const QPoint & offset)
 	{
 		move(w->mapToGlobal(QPoint(0, 0)) + offset);
 	}
 
+	void show();
 	void hide();
+
+	//! @returns which object is currently controlling this text float (if known)
+	const QObject* source() const { return m_source; }
+
+	//! Sets which object is currently controlling this text float
+	void setSource(const QObject* source) { m_source = source; }
 
 private:
 	QLabel * m_textLabel;
 	QTimer * m_showTimer;
 	QTimer * m_hideTimer;
+
+	//! Which object is currently controlling this text float
+	const QObject* m_source = nullptr;
 };
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_GUI_SIMPLE_TEXT_FLOAT_H

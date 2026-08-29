@@ -25,14 +25,10 @@
 #include <QMouseEvent>
 #include <QPainter>
 
-#ifndef __USE_XOPEN
-#define __USE_XOPEN
-#endif
-
 #include "GroupBox.h"
+#include "DeprecationHelper.h"
 #include "embed.h"
 #include "FontHelper.h"
-
 
 namespace lmms::gui
 {
@@ -86,7 +82,9 @@ void GroupBox::setLedButtonShown(bool value)
 
 void GroupBox::mousePressEvent( QMouseEvent * _me )
 {
-	if (ledButtonShown() && _me->y() > 1 && _me->y() < 13 && _me->button() == Qt::LeftButton)
+	const auto pos = position(_me);
+
+	if (ledButtonShown() && pos.y() > 1 && pos.y() < 13 && _me->button() == Qt::LeftButton)
 	{
 		model()->setValue(!model()->value());
 	}

@@ -25,7 +25,6 @@
 #include "SampleDecoder.h"
 
 #include <QFile>
-#include <QFileInfo>
 #include <QString>
 #include <memory>
 #include <sndfile.h>
@@ -37,7 +36,7 @@
 #include "AudioEngine.h"
 #include "DrumSynth.h"
 #include "Engine.h"
-#include "lmms_basics.h"
+#include "LmmsTypes.h"
 
 namespace lmms {
 

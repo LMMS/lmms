@@ -25,7 +25,6 @@
 
 #include "TimePos.h"
 
-#include <cassert>
 #include "MeterModel.h"
 
 namespace lmms
@@ -53,7 +52,7 @@ TimePos::TimePos( const tick_t ticks ) :
 {
 }
 
-TimePos TimePos::quantize(float bars) const
+TimePos TimePos::quantize(float bars, bool forceRoundDown) const
 {
 	//The intervals we should snap to, our new position should be a factor of this
 	int interval = s_ticksPerBar * bars;
@@ -65,7 +64,7 @@ TimePos TimePos::quantize(float bars) const
 	// Ternary expression is making sure that the snap happens in the direction to
 	// the right even if m_ticks is negative and the offset is exactly half-way
 	// More details on issue #5840 and PR #5847
-	int snapUp = ((2 * offset) == -interval)
+	int snapUp = forceRoundDown || ((2 * offset) == -interval)
 		? 0
 		: (2 * offset) / interval;
 

@@ -84,7 +84,7 @@ void StepRecorder::notePressed(const Note & n)
 	{
 		m_isStepInProgress = true;
 
-		//move curser one step forwards
+		//move cursor one step forwards
 		stepForwards();
 	}
 
@@ -115,7 +115,7 @@ void StepRecorder::noteReleased(const Note & n)
 			m_updateReleasedTimer.start(REMOVE_RELEASED_NOTE_TIME_THRESHOLD_MS);
 		}
 
-		//check if all note are released, apply notes to clips (or dimiss if length is zero) and prepare to record next step
+		//check if all note are released, apply notes to clips (or dismiss if length is zero) and prepare to record next step
 		if(allCurStepNotesReleased())
 		{
 			if(m_curStepLength > 0)
@@ -292,7 +292,7 @@ void StepRecorder::removeNotesReleasedForTooLong()
 	{
 		if (stepNote->isReleased())
 		{
-			const int timeSinceReleased = stepNote->timeSinceReleased(); // capture value to avoid wraparound when calculting nextTimout
+			const int timeSinceReleased = stepNote->timeSinceReleased(); // capture value to avoid wraparound when calculating nextTimout
 			if (timeSinceReleased >= REMOVE_RELEASED_NOTE_TIME_THRESHOLD_MS)
 			{
 				notesRemoved = true;
@@ -326,7 +326,7 @@ void StepRecorder::removeNotesReleasedForTooLong()
 	}
 	else
 	{
-		// no released note found for next timout, stop timer
+		// no released note found for next timeout, stop timer
 		m_updateReleasedTimer.stop();
 	}
 }

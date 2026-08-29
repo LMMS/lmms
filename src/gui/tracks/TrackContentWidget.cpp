@@ -32,6 +32,7 @@
 #include "AutomationClip.h"
 #include "Clipboard.h"
 #include "DataFile.h"
+#include "DeprecationHelper.h"
 #include "Engine.h"
 #include "GuiApplication.h"
 #include "PatternEditor.h"
@@ -77,10 +78,6 @@ TrackContentWidget::TrackContentWidget( TrackView * parent ) :
 	m_embossOffset(0)
 {
 	setAcceptDrops( true );
-
-	connect( parent->trackContainerView(),
-			SIGNAL( positionChanged( const lmms::TimePos& ) ),
-			this, SLOT( changePosition( const lmms::TimePos& ) ) );
 
 	// Update background if snap size changes
 	connect(getGUI()->songEditor()->m_editor->snappingModel(), &Model::dataChanged,
@@ -140,7 +137,7 @@ void TrackContentWidget::updateBackground()
 
 	// draw coarse grid
 	pmp.setPen( QPen( coarseGridColor(), coarseGridWidth() ) );
-	for (float x = 0; x < w * 2; x += ppb * coarseGridResolution)
+	for (float x = 0; x <= w * 2; x += ppb * coarseGridResolution)
 	{
 		pmp.drawLine( QLineF( x, 0.0, x, h ) );
 	}
@@ -222,7 +219,7 @@ void TrackContentWidget::update()
 
 
 
-// resposible for moving track-content-widgets to appropriate position after
+// responsible for moving track-content-widgets to appropriate position after
 // change of visible viewport
 /*! \brief Move the trackContentWidget to a new place in time
  *
@@ -255,45 +252,24 @@ void TrackContentWidget::changePosition( const TimePos & newPos )
 		return;
 	}
 
-	TimePos pos = newPos;
-	if( pos < 0 )
-	{
-		pos = m_trackView->trackContainerView()->currentPosition();
-	}
-
-	const int begin = pos;
-	const int end = endPosition( pos );
+	const TimePos begin = newPos < 0 ? m_trackView->trackContainerView()->currentPosition() : newPos;
 	const float ppb = m_trackView->trackContainerView()->pixelsPerBar();
 
-	setUpdatesEnabled( false );
-	for (const auto& clipView : m_clipViews)
+	setUpdatesEnabled(false);
+	for (ClipView* clipView : m_clipViews)
 	{
 		Clip* clip = clipView->getClip();
 
-		clip->changeLength( clip->length() );
-
-		const int ts = clip->startPosition();
-		const int te = clip->endPosition()-3;
-		if( ( ts >= begin && ts <= end ) ||
-			( te >= begin && te <= end ) ||
-			( ts <= begin && te >= end ) )
+		const auto xPos = static_cast<int>((clip->startPosition() - begin) * ppb / TimePos::ticksPerBar());
+		clipView->move(xPos, clipView->y());
+		if (!clipView->isVisible())
 		{
-			clipView->move(static_cast<int>((ts - begin) * ppb / TimePos::ticksPerBar()), clipView->y());
-			if (!clipView->isVisible())
-			{
-				clipView->show();
-			}
-		}
-		else
-		{
-			clipView->move(-clipView->width() - 10, clipView->y());
+			clipView->show();
 		}
 	}
-	setUpdatesEnabled( true );
+	setUpdatesEnabled(true);
 
-	// redraw background
 	updateBackground();
-//	update();
 }
 
 
@@ -321,7 +297,7 @@ TimePos TrackContentWidget::getPosition( int mouseX )
  */
 void TrackContentWidget::dragEnterEvent( QDragEnterEvent * dee )
 {
-	TimePos clipPos = getPosition( dee->pos().x() );
+	TimePos clipPos = getPosition(position(dee).x());
 	if( canPasteSelection( clipPos, dee ) == false )
 	{
 		dee->ignore();
@@ -557,7 +533,9 @@ bool TrackContentWidget::pasteSelection( TimePos clipPos, const QMimeData * md, 
  */
 void TrackContentWidget::dropEvent( QDropEvent * de )
 {
-	TimePos clipPos = TimePos( getPosition( de->pos().x() ) );
+	const auto pos = position(de);
+
+	TimePos clipPos = TimePos(getPosition(pos.x()));
 	if( pasteSelection( clipPos, de ) == true )
 	{
 		de->accept();
@@ -573,6 +551,8 @@ void TrackContentWidget::dropEvent( QDropEvent * de )
  */
 void TrackContentWidget::mousePressEvent( QMouseEvent * me )
 {
+	const auto pos = position(me);
+
 	// Enable box select if control is held when clicking an empty space
 	// (If we had clicked a Clip it would have intercepted the mouse event)
 	if( me->modifiers() & Qt::ControlModifier ){
@@ -598,9 +578,9 @@ void TrackContentWidget::mousePressEvent( QMouseEvent * me )
 			so.at( i )->setSelected( false);
 		}
 		getTrack()->addJournalCheckPoint();
-		const TimePos pos = getPosition( me->x() ).getBar() *
-						TimePos::ticksPerBar();
-		getTrack()->createClip(pos);
+		const float snapSize = getGUI()->songEditor()->m_editor->getSnapSize();
+		const TimePos timePos = TimePos(getPosition(pos.x())).quantize(snapSize, true);
+		getTrack()->createClip(timePos);
 	}
 }
 
@@ -643,7 +623,7 @@ void TrackContentWidget::paintEvent( QPaintEvent * pe )
  */
 void TrackContentWidget::resizeEvent( QResizeEvent * resizeEvent )
 {
-	// Update backgroud
+	// Update background
 	updateBackground();
 	// Force redraw
 	QWidget::resizeEvent( resizeEvent );

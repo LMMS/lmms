@@ -24,15 +24,17 @@
 
 #include "AudioFileProcessorWaveView.h"
 
+#include "Sample.h"
 #include "ConfigManager.h"
+#include "DeprecationHelper.h"
+#include "SampleThumbnail.h"
 #include "FontHelper.h"
-#include "SampleWaveform.h"
+
 
 #include <QPainter>
 #include <QMouseEvent>
 
 #include <algorithm>
-
 
 namespace lmms
 {
@@ -81,7 +83,8 @@ AudioFileProcessorWaveView::AudioFileProcessorWaveView(QWidget* parent, int w, i
 	m_isDragging(false),
 	m_reversed(false),
 	m_framesPlayed(0),
-	m_animation(ConfigManager::inst()->value("ui", "animateafp").toInt())
+	m_animation(ConfigManager::inst()->value("ui", "animateafp").toInt()),
+	m_sampleThumbnail(*buf)
 {
 	setFixedSize(w, h);
 	setMouseTracking(true);
@@ -113,10 +116,12 @@ void AudioFileProcessorWaveView::leaveEvent(QEvent * e)
 
 void AudioFileProcessorWaveView::mousePressEvent(QMouseEvent * me)
 {
-	m_isDragging = true;
-	m_draggingLastPoint = me->pos();
+	const auto pos = position(me);
 
-	const int x = me->x();
+	m_isDragging = true;
+	m_draggingLastPoint = pos;
+
+	const int x = pos.x();
 
 	const int start_dist =		qAbs(m_startFrameX - x);
 	const int end_dist = 		qAbs(m_endFrameX - x);
@@ -154,7 +159,9 @@ void AudioFileProcessorWaveView::mouseMoveEvent(QMouseEvent * me)
 		return;
 	}
 
-	const int step = me->x() - m_draggingLastPoint.x();
+	const auto pos = position(me);
+
+	const int step = pos.x() - m_draggingLastPoint.x();
 	switch(m_draggingType)
 	{
 		case DraggingType::SampleStart:
@@ -170,12 +177,12 @@ void AudioFileProcessorWaveView::mouseMoveEvent(QMouseEvent * me)
 			slide(step);
 			break;
 		case DraggingType::ZoomWave:
-			zoom(me->y() < m_draggingLastPoint.y());
+			zoom(pos.y() < m_draggingLastPoint.y());
 			break;
 		case DraggingType::Wave:
 		default:
-			if (qAbs(me->y() - m_draggingLastPoint.y())
-				< 2 * qAbs(me->x() - m_draggingLastPoint.x()))
+			if (qAbs(pos.y() - m_draggingLastPoint.y())
+				< 2 * qAbs(pos.x() - m_draggingLastPoint.x()))
 			{
 				m_draggingType = DraggingType::SlideWave;
 			}
@@ -185,7 +192,7 @@ void AudioFileProcessorWaveView::mouseMoveEvent(QMouseEvent * me)
 			}
 	}
 
-	m_draggingLastPoint = me->pos();
+	m_draggingLastPoint = pos;
 	update();
 }
 
@@ -338,13 +345,18 @@ void AudioFileProcessorWaveView::updateGraph()
 	m_graph.fill(Qt::transparent);
 	QPainter p(&m_graph);
 	p.setPen(QColor(255, 255, 255));
-	
-	const auto dataOffset = m_reversed ? m_sample->sampleSize() - m_to : m_from;
 
-	const auto rect = QRect{0, 0, m_graph.width(), m_graph.height()};
-	const auto waveform = SampleWaveform::Parameters{
-		m_sample->data() + dataOffset, static_cast<size_t>(range()), m_sample->amplification(), m_sample->reversed()};
-	SampleWaveform::visualize(waveform, p, rect);
+	m_sampleThumbnail = SampleThumbnail{*m_sample};
+
+	const auto param = SampleThumbnail::VisualizeParameters{
+		.sampleRect = m_graph.rect(),
+		.amplification = m_sample->amplification(),
+		.sampleStart = static_cast<float>(m_from) / m_sample->sampleSize(),
+		.sampleEnd = static_cast<float>(m_to) / m_sample->sampleSize(),
+		.reversed = m_sample->reversed(),
+	};
+
+	m_sampleThumbnail.visualize(param, p);
 }
 
 void AudioFileProcessorWaveView::zoom(const bool out)
@@ -477,20 +489,30 @@ void AudioFileProcessorWaveView::reverse()
 	m_reversed = ! m_reversed;
 }
 
-void AudioFileProcessorWaveView::updateCursor(QMouseEvent * me)
+void AudioFileProcessorWaveView::updateCursor(const QMouseEvent* me)
 {
 	bool const waveIsDragged = m_isDragging && (m_draggingType == DraggingType::Wave);
-	bool const pointerCloseToStartEndOrLoop = (me != nullptr) &&
-			(isCloseTo(me->x(), m_startFrameX) ||
-			  isCloseTo(me->x(), m_endFrameX) ||
-			  isCloseTo(me->x(), m_loopFrameX));
 
-	if (!m_isDragging && pointerCloseToStartEndOrLoop)
+	if (!m_isDragging && pointerCloseToStartEndOrLoop(me))
+	{
 		setCursor(Qt::SizeHorCursor);
+	}
 	else if (waveIsDragged)
+	{
 		setCursor(Qt::ClosedHandCursor);
+	}
 	else
+	{
 		setCursor(Qt::OpenHandCursor);
+	}
+}
+
+bool AudioFileProcessorWaveView::pointerCloseToStartEndOrLoop(const QMouseEvent* me) const
+{
+	if (!me) { return false; }
+
+	const QPoint pos = position(me);
+	return isCloseTo(pos.x(), m_startFrameX) || isCloseTo(pos.x(), m_endFrameX) || isCloseTo(pos.x(), m_loopFrameX);
 }
 
 void AudioFileProcessorWaveView::configureKnobRelationsAndWaveViews()

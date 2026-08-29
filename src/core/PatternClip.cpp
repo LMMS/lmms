@@ -45,7 +45,6 @@ PatternClip::PatternClip(Track* track) :
 		changeLength( TimePos( t, 0 ) );
 		restoreJournallingState();
 	}
-	setAutoResize( false );
 }
 
 void PatternClip::saveSettings(QDomDocument& doc, QDomElement& element)
@@ -62,6 +61,7 @@ void PatternClip::saveSettings(QDomDocument& doc, QDomElement& element)
 	element.setAttribute( "len", length() );
 	element.setAttribute("off", startTimeOffset());
 	element.setAttribute( "muted", isMuted() );
+	element.setAttribute("autoresize", QString::number(getAutoResize()));
 	if (const auto& c = color())
 	{
 		element.setAttribute("color", c->name());
@@ -79,6 +79,7 @@ void PatternClip::loadSettings(const QDomElement& element)
 		movePosition( element.attribute( "pos" ).toInt() );
 	}
 	changeLength( element.attribute( "len" ).toInt() );
+	setAutoResize(element.attribute("autoresize", "1").toInt());
 	setStartTimeOffset(element.attribute("off").toInt());
 	if (static_cast<bool>(element.attribute("muted").toInt()) != isMuted())
 	{

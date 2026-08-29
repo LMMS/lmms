@@ -68,9 +68,9 @@ Lv2Effect::Lv2Effect(Model* parent, const Descriptor::SubPluginFeatures::Key *ke
 
 
 
-Effect::ProcessStatus Lv2Effect::processImpl(SampleFrame* buf, const fpp_t frames)
+Effect::ProcessStatus Lv2Effect::processImpl(SampleFrame* buf, const f_cnt_t frames)
 {
-	Q_ASSERT(frames <= static_cast<fpp_t>(m_tmpOutputSmps.size()));
+	Q_ASSERT(frames <= static_cast<f_cnt_t>(m_tmpOutputSmps.size()));
 
 	m_controls.copyBuffersFromLmms(buf, frames);
 	m_controls.copyModelsFromLmms();
@@ -85,7 +85,7 @@ Effect::ProcessStatus Lv2Effect::processImpl(SampleFrame* buf, const fpp_t frame
 	bool corrupt = wetLevel() < 0; // #3261 - if w < 0, bash w := 0, d := 1
 	const float d = corrupt ? 1 : dryLevel();
 	const float w = corrupt ? 0 : wetLevel();
-	for(fpp_t f = 0; f < frames; ++f)
+	for(f_cnt_t f = 0; f < frames; ++f)
 	{
 		buf[f][0] = d * buf[f][0] + w * m_tmpOutputSmps[f][0];
 		buf[f][1] = d * buf[f][1] + w * m_tmpOutputSmps[f][1];

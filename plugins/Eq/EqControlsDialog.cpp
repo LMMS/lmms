@@ -107,14 +107,12 @@ EqControlsDialog::EqControlsDialog( EqControls *controls ) :
 	{
 		auto resKnob = new Knob(KnobType::Bright26, this);
 		resKnob->move( distance, 440 );
-		resKnob->setVolumeKnob(false);
 		resKnob->setModel( m_parameterWidget->getBandModels( i )->res );
 		if(i > 1 && i < 6) { resKnob->setHintText( tr( "Bandwidth: " ) , tr( " Octave" ) ); }
 		else { resKnob->setHintText(tr("Resonance: "), ""); }
 
 		auto freqKnob = new Knob(KnobType::Bright26, this);
 		freqKnob->move( distance, 396 );
-		freqKnob->setVolumeKnob( false );
 		freqKnob->setModel( m_parameterWidget->getBandModels( i )->freq );
 		freqKnob->setHintText( tr( "Frequency:" ), "Hz" );
 
@@ -198,13 +196,13 @@ EqControlsDialog::EqControlsDialog( EqControls *controls ) :
 	QObject::connect( m_parameterWidget->getBandModels( 7 )->lp24 , SIGNAL ( dataChanged() ), m_parameterWidget, SLOT( updateHandle()));
 	QObject::connect( m_parameterWidget->getBandModels( 7 )->lp48 , SIGNAL ( dataChanged() ), m_parameterWidget, SLOT( updateHandle()));
 
-	auto lpBtnGrp = new automatableButtonGroup(this, tr("LP group"));
+	auto lpBtnGrp = new AutomatableButtonGroup(this, tr("LP group"));
 	lpBtnGrp->addButton( lp12Button );
 	lpBtnGrp->addButton( lp24Button );
 	lpBtnGrp->addButton( lp48Button );
 	lpBtnGrp->setModel(&m_controls->m_lpTypeModel);
 
-	auto hpBtnGrp = new automatableButtonGroup(this, tr("HP group"));
+	auto hpBtnGrp = new AutomatableButtonGroup(this, tr("HP group"));
 	hpBtnGrp->addButton( hp12Button );
 	hpBtnGrp->addButton( hp24Button );
 	hpBtnGrp->addButton( hp48Button );

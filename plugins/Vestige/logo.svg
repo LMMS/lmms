@@ -1,0 +1,38 @@
+<svg version="1.1" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<defs>
+		<radialGradient id="radialGradient2" cx="2.5083" cy="24.216" r="11.242" gradientTransform="matrix(1.2473 -.0055965 .0031537 .70286 -1.2221 7.0454)" gradientUnits="userSpaceOnUse">
+			<stop stop-color="#fff01f" offset="0"/>
+			<stop stop-color="#fdc80f" offset=".33088"/>
+			<stop stop-color="#fb000a" offset="1"/>
+		</radialGradient>
+		<radialGradient id="radialGradient5" cx="23.105" cy="23.813" r="12.058" gradientTransform="matrix(-1.4205 1.9619e-8 0 -.67084 76.795 40.026)" gradientUnits="userSpaceOnUse">
+			<stop stop-color="#abe923" offset="0"/>
+			<stop stop-color="#5dbe2b" offset=".33132"/>
+			<stop stop-color="#109334" offset="1"/>
+		</radialGradient>
+		<filter id="filter23" x="-.039988" y="-.060026" width="1.08" height="1.1201" color-interpolation-filters="sRGB">
+			<feGaussianBlur stdDeviation="0.40007812"/>
+		</filter>
+		<filter id="filter1" x="-.039999" y="-.060003" width="1.08" height="1.12" color-interpolation-filters="sRGB">
+			<feGaussianBlur stdDeviation="0.39992188"/>
+		</filter>
+	</defs>
+	<g>
+		<path transform="translate(.013415 -.055595)" d="m1.9827 24.052 7.9922-7.9922h16.02v3.9922l-6.0039-1e-6v8.0156h6.0039v3.9883h-16.008z" fill="#404040" filter="url(#filter23)" opacity=".75" style="mix-blend-mode:normal"/>
+		<path transform="translate(.013415 -.055595)" d="m21.987 22.064h6.0078v-6.0048h9.9961l7.9922 7.9922-8.0039 8.0039h-9.9844v-5.9917h-6.0078z" fill="#404040" filter="url(#filter1)" opacity=".75" style="mix-blend-mode:normal"/>
+		<path transform="translate(.013415 -.055595)" d="m1.9827 24.052 7.9922-7.9922h16.02v3.9922l-6.0039-1e-6v8.0156h6.0039v3.9883h-16.008z" fill="url(#radialGradient2)"/>
+		<path transform="translate(.013415 -.055595)" d="m21.987 22.064h6.0078v-6.0048h9.9961l7.9922 7.9922-8.0039 8.0039h-9.9844v-5.9917h-6.0078z" fill="url(#radialGradient5)"/>
+	</g>
+	<metadata>
+		<rdf:RDF>
+			<cc:Work rdf:about="">
+				<cc:license rdf:resource="http://creativecommons.org/publicdomain/zero/1.0/"/>
+			</cc:Work>
+			<cc:License rdf:about="http://creativecommons.org/publicdomain/zero/1.0/">
+				<cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction"/>
+				<cc:permits rdf:resource="http://creativecommons.org/ns#Distribution"/>
+				<cc:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks"/>
+			</cc:License>
+		</rdf:RDF>
+	</metadata>
+</svg>

@@ -34,17 +34,11 @@
 namespace lmms
 {
 
-
 RenderManager::RenderManager(
-		const AudioEngine::qualitySettings & qualitySettings,
-		const OutputSettings & outputSettings,
-		ProjectRenderer::ExportFileFormat fmt,
-		QString outputPath) :
-	m_qualitySettings(qualitySettings),
-	m_oldQualitySettings( Engine::audioEngine()->currentQualitySettings() ),
-	m_outputSettings(outputSettings),
-	m_format(fmt),
-	m_outputPath(outputPath)
+	const OutputSettings& outputSettings, ProjectRenderer::ExportFileFormat fmt, QString outputPath)
+	: m_outputSettings(outputSettings)
+	, m_format(fmt)
+	, m_outputPath(outputPath)
 {
 	Engine::audioEngine()->storeAudioDevice();
 }
@@ -52,7 +46,6 @@ RenderManager::RenderManager(
 RenderManager::~RenderManager()
 {
 	Engine::audioEngine()->restoreAudioDevice();  // Also deletes audio dev.
-	Engine::audioEngine()->changeQuality( m_oldQualitySettings );
 }
 
 void RenderManager::abortProcessing()
@@ -141,11 +134,7 @@ void RenderManager::renderProject()
 
 void RenderManager::render(QString outputPath)
 {
-	m_activeRenderer = std::make_unique<ProjectRenderer>(
-			m_qualitySettings,
-			m_outputSettings,
-			m_format,
-			outputPath);
+	m_activeRenderer = std::make_unique<ProjectRenderer>(m_outputSettings, m_format, outputPath);
 
 	if( m_activeRenderer->isReady() )
 	{

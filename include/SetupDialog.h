@@ -30,7 +30,6 @@
 
 #include "AudioDevice.h"
 #include "AudioDeviceSetupWidget.h"
-#include "lmmsconfig.h"
 #include "MidiClient.h"
 #include "MidiSetupWidget.h"
 
@@ -72,10 +71,10 @@ protected slots:
 
 private slots:
 	// General settings widget.
-	void toggleDisplaydBFS(bool enabled);
 	void toggleTooltips(bool enabled);
 	void toggleDisplayWaveform(bool enabled);
 	void toggleNoteLabels(bool enabled);
+	void toggleShowFaderTicks(bool enabled);
 	void toggleCompactTrackButtons(bool enabled);
 	void toggleOneInstrumentTrackWindow(bool enabled);
 	void toggleSideBarOnRight(bool enabled);
@@ -86,6 +85,7 @@ private slots:
 	void toggleMMPZ(bool enabled);
 	void toggleDisableBackup(bool enabled);
 	void toggleOpenLastProject(bool enabled);
+	void detachBehaviorChanged();
 	void loopMarkerModeChanged();
 	void setLanguage(int lang);
 
@@ -99,6 +99,7 @@ private slots:
 	void vstEmbedMethodChanged();
 	void toggleVSTAlwaysOnTop(bool en);
 	void toggleDisableAutoQuit(bool enabled);
+	void toggleMixSanitization(bool enabled);
 
 	// Audio settings widget.
 	void audioInterfaceChanged(const QString & driver);
@@ -134,10 +135,10 @@ private:
 	TabBar * m_tabBar;
 
 	// General settings widgets.
-	bool m_displaydBFS;
 	bool m_tooltips;
 	bool m_displayWaveform;
 	bool m_printNoteLabels;
+	bool m_showFaderTicks;
 	bool m_compactTrackButtons;
 	bool m_oneInstrumentTrackWindow;
 	bool m_sideBarOnRight;
@@ -148,8 +149,12 @@ private:
 	bool m_MMPZ;
 	bool m_disableBackup;
 	bool m_openLastProject;
+	QString m_detachBehavior;
+	QComboBox* m_detachBehaviorComboBox;
 	QString m_loopMarkerMode;
 	QComboBox* m_loopMarkerComboBox;
+	QString m_autoScroll;
+	QComboBox* m_autoScrollComboBox;
 	QString m_lang;
 	QStringList m_languages;
 
@@ -178,11 +183,13 @@ private:
 	QComboBox * m_audioInterfaces;
 	AswMap m_audioIfaceSetupWidgets;
 	trMap m_audioIfaceNames;
-	bool m_NaNHandler;
 	int m_bufferSize;
 	QSlider * m_bufferSizeSlider;
 	QLabel * m_bufferSizeLbl;
 	QLabel * m_bufferSizeWarnLbl;
+	bool m_mixSanitization;
+	int m_sampleRate;
+	QSlider* m_sampleRateSlider;
 
 	// MIDI settings widgets.
 	QComboBox * m_midiInterfaces;

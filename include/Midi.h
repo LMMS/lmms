@@ -25,8 +25,6 @@
 #ifndef LMMS_MIDI_H
 #define LMMS_MIDI_H
 
-#include "lmms_basics.h"
-
 
 namespace lmms
 {

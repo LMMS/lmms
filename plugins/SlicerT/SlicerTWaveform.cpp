@@ -25,9 +25,12 @@
 #include "SlicerTWaveform.h"
 
 #include <QBitmap>
-#include <qpainterpath.h>
+#include <QMouseEvent>
+#include <QPainter>
+#include <QPainterPath>
 
-#include "SampleWaveform.h"
+#include "DeprecationHelper.h"
+#include "SampleThumbnail.h"
 #include "SlicerT.h"
 #include "SlicerTView.h"
 #include "embed.h"
@@ -115,10 +118,19 @@ void SlicerTWaveform::drawSeekerWaveform()
 	brush.setPen(s_waveformColor);
 
 	const auto& sample = m_slicerTParent->m_originalSample;
-	const auto waveform
-		= SampleWaveform::Parameters{sample.data(), sample.sampleSize(), sample.amplification(), sample.reversed()};
-	const auto rect = QRect(0, 0, m_seekerWaveform.width(), m_seekerWaveform.height());
-	SampleWaveform::visualize(waveform, brush, rect);
+
+	m_sampleThumbnail = SampleThumbnail{sample};
+
+	const auto param = SampleThumbnail::VisualizeParameters{
+		.sampleRect = m_seekerWaveform.rect(),
+		.amplification = sample.amplification(),
+		.sampleStart = static_cast<float>(sample.startFrame()) / sample.sampleSize(),
+		.sampleEnd = static_cast<float>(sample.endFrame()) / sample.sampleSize(),
+		.reversed = sample.reversed()
+	};
+
+	m_sampleThumbnail.visualize(param, brush);
+
 
 	// increase brightness in inner color
 	QBitmap innerMask = m_seekerWaveform.createMaskFromColor(s_waveformMaskColor, Qt::MaskMode::MaskOutColor);
@@ -171,13 +183,21 @@ void SlicerTWaveform::drawEditorWaveform()
 	size_t endFrame = m_seekerEnd * m_slicerTParent->m_originalSample.sampleSize();
 
 	brush.setPen(s_waveformColor);
-	float zoomOffset = (m_editorHeight - m_zoomLevel * m_editorHeight) / 2;
+	long zoomOffset = (m_editorHeight - m_zoomLevel * m_editorHeight) / 2;
 
 	const auto& sample = m_slicerTParent->m_originalSample;
-	const auto waveform = SampleWaveform::Parameters{
-		sample.data() + startFrame, endFrame - startFrame, sample.amplification(), sample.reversed()};
-	const auto rect = QRect(0, zoomOffset, m_editorWidth, m_zoomLevel * m_editorHeight);
-	SampleWaveform::visualize(waveform, brush, rect);
+
+	m_sampleThumbnail = SampleThumbnail{sample};
+
+	const auto param = SampleThumbnail::VisualizeParameters{
+		.sampleRect = QRect(0, zoomOffset, m_editorWidth, static_cast<long>(m_zoomLevel * m_editorHeight)),
+		.amplification = sample.amplification(),
+		.sampleStart = static_cast<float>(startFrame) / sample.sampleSize(),
+		.sampleEnd = static_cast<float>(endFrame) / sample.sampleSize(),
+		.reversed = sample.reversed(),
+	};
+
+	m_sampleThumbnail.visualize(param, brush);
 
 	// increase brightness in inner color
 	QBitmap innerMask = m_editorWaveform.createMaskFromColor(s_waveformMaskColor, Qt::MaskMode::MaskOutColor);
@@ -278,13 +298,15 @@ void SlicerTWaveform::updateUI()
 // updates the closest object and changes the cursor respectivly
 void SlicerTWaveform::updateClosest(QMouseEvent* me)
 {
-	float normalizedClickSeeker = static_cast<float>(me->x() - s_seekerHorMargin) / m_seekerWidth;
-	float normalizedClickEditor = static_cast<float>(me->x()) / m_editorWidth;
+	const auto pos = position(me);
+
+	float normalizedClickSeeker = static_cast<float>(pos.x() - s_seekerHorMargin) / m_seekerWidth;
+	float normalizedClickEditor = static_cast<float>(pos.x()) / m_editorWidth;
 
 	m_closestObject = UIObjects::Nothing;
 	m_closestSlice = -1;
 
-	if (me->y() < m_seekerHeight)
+	if (pos.y() < m_seekerHeight)
 	{
 		if (std::abs(normalizedClickSeeker - m_seekerStart) < s_distanceForClick)
 		{
@@ -339,6 +361,8 @@ void SlicerTWaveform::updateCursor()
 // handles deletion, reset and middles seeker
 void SlicerTWaveform::mousePressEvent(QMouseEvent* me)
 {
+	const auto pos = position(me);
+
 	switch (me->button())
 	{
 	case Qt::MouseButton::MiddleButton:
@@ -350,7 +374,7 @@ void SlicerTWaveform::mousePressEvent(QMouseEvent* me)
 	case Qt::MouseButton::LeftButton:
 		if (m_slicerTParent->m_originalSample.sampleSize() <= 1) { static_cast<SlicerTView*>(parent())->openFiles(); }
 		// update seeker middle for correct movement
-		m_seekerMiddle = static_cast<float>(me->x() - s_seekerHorMargin) / m_seekerWidth;
+		m_seekerMiddle = static_cast<float>(pos.x() - s_seekerHorMargin) / m_seekerWidth;
 		break;
 	case Qt::MouseButton::RightButton:
 		if (m_slicerTParent->m_slicePoints.size() > 2 && m_closestObject == UIObjects::SlicePoint)
@@ -381,8 +405,10 @@ void SlicerTWaveform::mouseMoveEvent(QMouseEvent* me)
 		return;
 	}
 
-	float normalizedClickSeeker = static_cast<float>(me->x() - s_seekerHorMargin) / m_seekerWidth;
-	float normalizedClickEditor = static_cast<float>(me->x()) / m_editorWidth;
+	const auto pos = position(me);
+
+	float normalizedClickSeeker = static_cast<float>(pos.x() - s_seekerHorMargin) / m_seekerWidth;
+	float normalizedClickEditor = static_cast<float>(pos.x()) / m_editorWidth;
 
 	float distStart = m_seekerStart - m_seekerMiddle;
 	float distEnd = m_seekerEnd - m_seekerMiddle;
@@ -430,9 +456,11 @@ void SlicerTWaveform::mouseMoveEvent(QMouseEvent* me)
 
 void SlicerTWaveform::mouseDoubleClickEvent(QMouseEvent* me)
 {
-	if (me->button() != Qt::MouseButton::LeftButton || me->y() < m_seekerHeight) { return; }
+	const auto pos = position(me);
 
-	float normalizedClickEditor = static_cast<float>(me->x()) / m_editorWidth;
+	if (me->button() != Qt::MouseButton::LeftButton || pos.y() < m_seekerHeight) { return; }
+
+	float normalizedClickEditor = static_cast<float>(pos.x()) / m_editorWidth;
 	float startFrame = m_seekerStart;
 	float endFrame = m_seekerEnd;
 	float slicePosition = startFrame + normalizedClickEditor * (endFrame - startFrame);

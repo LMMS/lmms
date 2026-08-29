@@ -41,7 +41,7 @@
 #include "carlabase_export.h"
 #include <CarlaDefines.h>
 #if CARLA_VERSION_HEX >= 0x010911
-    #include <CarlaNativePlugin.h>
+    #include <CarlaNativePlugin.h>  // IWYU pragma: keep
 #else
     #include <CarlaBackend.h>
     #include <CarlaNative.h>
@@ -65,7 +65,7 @@ class QCompleter;
 class QGridLayout;
 class QHBoxLayout;
 class QLineEdit;
-class QStringListModel;
+class QStringListModel;  // IWYU pragma: keep
 class QScrollArea;
 
 

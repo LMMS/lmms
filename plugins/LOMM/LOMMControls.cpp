@@ -26,7 +26,6 @@
 #include "LOMMControls.h"
 #include "LOMM.h"
 
-#include <QDomElement>
 #include <QMessageBox>
 
 namespace lmms

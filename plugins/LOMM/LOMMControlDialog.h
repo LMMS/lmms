@@ -27,16 +27,10 @@
 
 #include "EffectControlDialog.h"
 
-#include <QMouseEvent>
-#include <QPainter>
 
 #include "embed.h"
-#include "GuiApplication.h"
 #include "Knob.h"
 #include "LcdFloatSpinBox.h"
-#include "LcdSpinBox.h"
-#include "LedCheckBox.h"
-#include "MainWindow.h"
 #include "PixmapButton.h"
 
 namespace lmms

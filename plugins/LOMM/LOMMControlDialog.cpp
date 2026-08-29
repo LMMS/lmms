@@ -23,9 +23,15 @@
  */
 
 
-#include "LOMM.h"
 #include "LOMMControlDialog.h"
+
+#include <QMouseEvent>
+#include <QPainter>
+
+#include "GuiApplication.h"
+#include "LOMM.h"
 #include "LOMMControls.h"
+#include "MainWindow.h"
 
 
 namespace lmms::gui
@@ -47,24 +53,24 @@ LOMMControlDialog::LOMMControlDialog(LOMMControls* controls) :
 	createKnob(KnobType::Bright26, this, 363, 220, &controls->m_outVolModel, tr("Output Volume:"), " dB", tr("Output volume"));
 	createKnob(KnobType::Bright26, this, 10, 179, &controls->m_upwardModel, tr("Upward Depth:"), "", tr("Upward compression amount for all bands"));
 	createKnob(KnobType::Bright26, this, 363, 179, &controls->m_downwardModel, tr("Downward Depth:"), "", tr("Downward compression amount for all bands"));
-	
+
 	createLcdFloatSpinBox(5, 2, "11green", tr("High/Mid Crossover"), this, 352, 76, &controls->m_split1Model, tr("High/Mid Crossover"));
 	createLcdFloatSpinBox(5, 2, "11green", tr("Mid/Low Crossover"), this, 352, 156, &controls->m_split2Model, tr("Mid/Low Crossover"));
-	
+
 	createPixmapButton(tr("High/mid band split"), this, 369, 104, &controls->m_split1EnabledModel, "crossover_led_green", "crossover_led_off", tr("High/mid band split"));
 	createPixmapButton(tr("Mid/low band split"), this, 369, 126, &controls->m_split2EnabledModel, "crossover_led_green", "crossover_led_off", tr("Mid/low band split"));
-	
+
 	createPixmapButton(tr("Enable High Band"), this, 143, 66, &controls->m_band1EnabledModel, "high_band_active", "high_band_inactive", tr("Enable High Band"));
 	createPixmapButton(tr("Enable Mid Band"), this, 143, 146, &controls->m_band2EnabledModel, "mid_band_active", "mid_band_inactive", tr("Enable Mid Band"));
 	createPixmapButton(tr("Enable Low Band"), this, 143, 226, &controls->m_band3EnabledModel, "low_band_active", "low_band_inactive", tr("Enable Low Band"));
-	
+
 	createKnob(KnobType::Bright26, this, 53, 43, &controls->m_inHighModel, tr("High Input Volume:"), " dB", tr("Input volume for high band"));
 	createKnob(KnobType::Bright26, this, 53, 123, &controls->m_inMidModel, tr("Mid Input Volume:"), " dB", tr("Input volume for mid band"));
 	createKnob(KnobType::Bright26, this, 53, 203, &controls->m_inLowModel, tr("Low Input Volume:"), " dB", tr("Input volume for low band"));
 	createKnob(KnobType::Bright26, this, 320, 43, &controls->m_outHighModel, tr("High Output Volume:"), " dB", tr("Output volume for high band"));
 	createKnob(KnobType::Bright26, this, 320, 123, &controls->m_outMidModel, tr("Mid Output Volume:"), " dB", tr("Output volume for mid band"));
 	createKnob(KnobType::Bright26, this, 320, 203, &controls->m_outLowModel, tr("Low Output Volume:"), " dB", tr("Output volume for low band"));
-	
+
 	createLcdFloatSpinBox(3, 3, "11green", tr("Above Threshold High"), this, 300, 13, &controls->m_aThreshHModel, tr("Downward compression threshold for high band"));
 	createLcdFloatSpinBox(3, 3, "11green", tr("Above Threshold Mid"), this, 300, 93, &controls->m_aThreshMModel, tr("Downward compression threshold for mid band"));
 	createLcdFloatSpinBox(3, 3, "11green", tr("Above Threshold Low"), this, 300, 173, &controls->m_aThreshLModel, tr("Downward compression threshold for low band"));
@@ -78,27 +84,27 @@ LOMMControlDialog::LOMMControlDialog(LOMMControls* controls) :
 	createLcdFloatSpinBox(2, 2, "11green", tr("Below Ratio High"), this, 87, 44, &controls->m_bRatioHModel, tr("Upward compression ratio for high band"));
 	createLcdFloatSpinBox(2, 2, "11green", tr("Below Ratio Mid"), this, 87, 124, &controls->m_bRatioMModel, tr("Upward compression ratio for mid band"));
 	createLcdFloatSpinBox(2, 2, "11green", tr("Below Ratio Low"), this, 87, 204, &controls->m_bRatioLModel, tr("Upward compression ratio for low band"));
-	
+
 	createKnob(KnobType::Small17, this, 120, 61, &controls->m_atkHModel, tr("Attack High:"), " ms", tr("Attack time for high band"));
 	createKnob(KnobType::Small17, this, 120, 141, &controls->m_atkMModel, tr("Attack Mid:"), " ms", tr("Attack time for mid band"));
 	createKnob(KnobType::Small17, this, 120, 221, &controls->m_atkLModel, tr("Attack Low:"), " ms", tr("Attack time for low band"));
 	createKnob(KnobType::Small17, this, 261, 61, &controls->m_relHModel, tr("Release High:"), " ms", tr("Release time for high band"));
 	createKnob(KnobType::Small17, this, 261, 141, &controls->m_relMModel, tr("Release Mid:"), " ms", tr("Release time for mid band"));
 	createKnob(KnobType::Small17, this, 261, 221, &controls->m_relLModel, tr("Release Low:"), " ms", tr("Release time for low band"));
-	
+
 	createKnob(KnobType::Small17, this, 380, 42, &controls->m_rmsTimeModel, tr("RMS Time:"), " ms", tr("RMS size for sidechain signal (set to 0 for Peak mode)"));
 	createKnob(KnobType::Small17, this, 356, 42, &controls->m_kneeModel, tr("Knee:"), " dB", tr("Knee size for all compressors"));
 	createKnob(KnobType::Small17, this, 24, 146, &controls->m_rangeModel, tr("Range:"), " dB", tr("Maximum gain increase for all bands"));
 	createKnob(KnobType::Small17, this, 13, 114, &controls->m_balanceModel, tr("Balance:"), " dB", tr("Bias input volume towards one channel"));
-	
+
 	createPixmapButton(tr("Scale output volume with Depth"), this, 51, 0, &controls->m_depthScalingModel, "depthScaling_active", "depthScaling_inactive",
 						tr("Scale output volume with Depth parameter"));
 	createPixmapButton(tr("Stereo Link"), this, 52, 237, &controls->m_stereoLinkModel, "stereoLink_active", "stereoLink_inactive",
 						tr("Apply same gain change to both channels"));
-	
+
 	createKnob(KnobType::Small17, this, 24, 80, &controls->m_autoTimeModel, tr("Auto Time:"), "", tr("Speed up attack and release times when transients occur"));
 	createKnob(KnobType::Bright26, this, 363, 4, &controls->m_mixModel, tr("Mix:"), "", tr("Wet/Dry of all bands"));
-	
+
 	m_feedbackButton = createPixmapButton(tr("Feedback"), this, 317, 238, &controls->m_feedbackModel, "feedback_active", "feedback_inactive",
 										tr("Use output as sidechain signal instead of input"));
 	createPixmapButton(tr("Mid/Side"), this, 285, 238, &controls->m_midsideModel, "midside_active", "midside_inactive", tr("Compress mid/side channels instead of left/right"));
@@ -107,14 +113,15 @@ LOMMControlDialog::LOMMControlDialog(LOMMControls* controls) :
 	createPixmapButton(tr("Lookahead"), this, 147, 0, &controls->m_lookaheadEnableModel, "lookahead_active", "lookahead_inactive",
 						tr(("Enable lookahead with fixed " + std::to_string(int(LOMM_MAX_LOOKAHEAD)) + " ms latency").c_str()));
 	createLcdFloatSpinBox(2, 2, "11green", tr("Lookahead"), this, 214, 2, &controls->m_lookaheadModel, tr("Lookahead length"));
-	
+
 	PixmapButton* initButton = createPixmapButton(tr("Clear all parameters"), this, 84, 237, nullptr, "init_active", "init_inactive", tr("Clear all parameters"));
-	
+	initButton->setCheckable(false);
+
 	connect(initButton, SIGNAL(clicked()), m_controls, SLOT(resetAllParameters()));
 	connect(&controls->m_lookaheadEnableModel, SIGNAL(dataChanged()), this, SLOT(updateFeedbackVisibility()));
 	connect(&controls->m_midsideModel, SIGNAL(dataChanged()), this, SLOT(updateLowSideUpwardSuppressVisibility()));
 	connect(getGUI()->mainWindow(), SIGNAL(periodicUpdate()), this, SLOT(updateDisplay()));
-	
+
 	emit updateFeedbackVisibility();
 	emit updateLowSideUpwardSuppressVisibility();
 }
@@ -161,7 +168,7 @@ void LOMMControlDialog::paintEvent(QPaintEvent *event)
 		p.fillRect(LOMM_DISPLAY_X, LOMM_DISPLAY_Y[2 * i], thresholdsX[i + 3] - LOMM_DISPLAY_X, LOMM_DISPLAY_Y[2 * i + 1] + LOMM_DISPLAY_HEIGHT - LOMM_DISPLAY_Y[2 * i], bColor);
 		p.drawLine(thresholdsX[i + 3], LOMM_DISPLAY_Y[2 * i], thresholdsX[i + 3], LOMM_DISPLAY_Y[2 * i + 1] + LOMM_DISPLAY_HEIGHT);
 	}
-	
+
 	QPen inputPen(QColor(200, 200, 200, 80), 1);
 	QPen outputPen(QColor(255, 255, 255, 255), 1);
 	for (int i = 0; i < 3; ++i) {
@@ -239,10 +246,10 @@ void LOMMControlDialog::mouseMoveEvent(QMouseEvent * event)
 		const float distance = event->pos().x() - m_lastMousePos.x();
 		float dbDistance = distance * LOMM_DISPLAY_DB_PER_PIXEL;
 		m_lastMousePos = event->pos();
-		
+
 		FloatModel* aModel[] = {&m_controls->m_aThreshHModel, &m_controls->m_aThreshMModel, &m_controls->m_aThreshLModel};
 		FloatModel* bModel[] = {&m_controls->m_bThreshHModel, &m_controls->m_bThreshMModel, &m_controls->m_bThreshLModel};
-		
+
 		float bVal = bModel[m_bandDrag]->value();
 		float aVal = aModel[m_bandDrag]->value();
 		if (m_dragType == 0)

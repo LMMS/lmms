@@ -14,7 +14,7 @@
       <midiport inports="80:0 CS46XX:CS46XX" inputchannel="0" outputchannel="1" send="0" receive="1"/>
       <chordcreator chorddisabled="0" arptime="100" arprange="1" arpsyncmode="0" arpmode="0" chord="0" chordrange="2" arp="0" arp-enabled="0" chord-enabled="1" arpdisabled="1" arpdir="0" arpgate="100"/>
       <fxchain enabled="1" numofeffects="1">
-        <effect name="ladspaeffect" on="1" autoquit="1" autoquit_denominator="4" autoquit_numerator="4" wet="1" autoquit_syncmode="0" gate="0">
+        <effect name="ladspaeffect" on="1" autoquit="1" autoquit_denominator="4" autoquit_numerator="4" wet="1" autoquit_syncmode="0">
           <ladspacontrols ports="0" link="1"/>
           <key>
             <attribute name="file" value="dc_remove_1207"/>

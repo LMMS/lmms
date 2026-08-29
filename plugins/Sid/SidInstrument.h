@@ -35,12 +35,12 @@ namespace lmms
 {
 
 
-class NotePlayHandle;
+class NotePlayHandle;  // IWYU pragma: keep
 
 namespace gui
 {
 class Knob;
-class automatableButtonGroup;
+class AutomatableButtonGroup;
 class SidInstrumentView;
 class PixmapButton;
 }
@@ -154,8 +154,8 @@ public:
 private:
 	void modelChanged() override;
 	
-	automatableButtonGroup * m_passBtnGrp;
-	automatableButtonGroup * m_sidTypeBtnGrp;
+	AutomatableButtonGroup * m_passBtnGrp;
+	AutomatableButtonGroup * m_sidTypeBtnGrp;
 
 	struct voiceKnobs
 	{
@@ -165,7 +165,7 @@ private:
 					Knob * r,
 					Knob * pw,
 					Knob * crs,
-					automatableButtonGroup * wfbg,
+					AutomatableButtonGroup * wfbg,
 					PixmapButton * syncb,
 					PixmapButton * ringb,
 					PixmapButton * filterb,
@@ -190,7 +190,7 @@ private:
 		Knob * m_relKnob;
 		Knob * m_pwKnob;
 		Knob * m_crsKnob;
-		automatableButtonGroup * m_waveFormBtnGrp;
+		AutomatableButtonGroup * m_waveFormBtnGrp;
 		PixmapButton * m_syncButton;
 		PixmapButton * m_ringModButton;
 		PixmapButton * m_filterButton;

@@ -29,8 +29,8 @@
 #include <QFileInfo>
 
 #include "AudioEngine.h"
+#include "Oscillator.h"
 #include "PathUtil.h"
-#include "SampleLoader.h"
 #include "Song.h"
 
 namespace lmms
@@ -65,8 +65,8 @@ LfoController::LfoController( Model * _parent ) :
 
 	connect( Engine::getSong(), SIGNAL(playbackStateChanged()),
 			this, SLOT(updatePhase()));
-	connect( Engine::getSong(), SIGNAL(playbackPositionChanged()),
-			this, SLOT(updatePhase()));
+	connect(Engine::getSong(), &Song::playbackPositionJumped,
+			this, &LfoController::updatePhase);
 
 	updateDuration();
 }
@@ -243,7 +243,7 @@ void LfoController::loadSettings( const QDomElement & _this )
 	{
 		if (QFileInfo(PathUtil::toAbsolute(userWaveFile)).exists())
 		{
-			m_userDefSampleBuffer = gui::SampleLoader::createBufferFromFile(_this.attribute("userwavefile"));
+			m_userDefSampleBuffer = SampleBuffer::fromFile(_this.attribute("userwavefile"));
 		}
 		else { Engine::getSong()->collectError(QString("%1: %2").arg(tr("Sample not found"), userWaveFile)); }
 	}

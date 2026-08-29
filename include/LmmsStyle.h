@@ -26,6 +26,7 @@
 #ifndef LMMS_GUI_LMMS_STYLE_H
 #define LMMS_GUI_LMMS_STYLE_H
 
+#include <QFileSystemWatcher>
 #include <QProxyStyle>
 
 
@@ -60,6 +61,7 @@ public:
 private:
 	QImage colorizeXpm( const char * const * xpm, const QBrush& fill ) const;
 	void hoverColors( bool sunken, bool hover, bool active, QColor& color, QColor& blend ) const;
+	QFileSystemWatcher m_styleReloader;
 };
 
 

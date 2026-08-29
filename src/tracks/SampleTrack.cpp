@@ -22,14 +22,14 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
+
 #include "SampleTrack.h"
 
 #include <QDomElement>
 
 #include "EffectChain.h"
 #include "Mixer.h"
-#include "panning_constants.h"
+#include "panning.h"
 #include "PatternStore.h"
 #include "PatternTrack.h"
 #include "SampleClip.h"
@@ -49,7 +49,7 @@ SampleTrack::SampleTrack(TrackContainer* tc) :
 	m_volumeModel(DefaultVolume, MinVolume, MaxVolume, 0.1f, this, tr("Volume")),
 	m_panningModel(DefaultPanning, PanningLeft, PanningRight, 0.1f, this, tr("Panning")),
 	m_mixerChannelModel(0, 0, 0, this, tr("Mixer channel")),
-	m_audioPort(tr("Sample track"), true, &m_volumeModel, &m_panningModel, &m_mutedModel),
+	m_audioBusHandle(tr("Sample track"), true, &m_volumeModel, &m_panningModel, &m_mutedModel),
 	m_isPlaying(false)
 {
 	setName(tr("Sample track"));
@@ -70,10 +70,9 @@ SampleTrack::~SampleTrack()
 
 
 
-bool SampleTrack::play( const TimePos & _start, const fpp_t _frames,
+bool SampleTrack::play( const TimePos & _start, const f_cnt_t _frames,
 					const f_cnt_t _offset, int _clip_num )
 {
-	m_audioPort.effects()->startRunning();
 	bool played_a_note = false; // will be return variable
 
 
@@ -81,18 +80,24 @@ bool SampleTrack::play( const TimePos & _start, const fpp_t _frames,
 	class PatternTrack * pattern_track = nullptr;
 	if( _clip_num >= 0 )
 	{
-		if (_start > getClip(_clip_num)->length())
+		auto sClip = dynamic_cast<SampleClip*>(getClip(_clip_num));
+
+		if (_start > sClip->length())
 		{
 			setPlaying(false);
 		}
-		if( _start != 0 )
+		if (sClip->isPlaying())
 		{
 			return false;
 		}
-		clips.push_back( getClip( _clip_num ) );
+		clips.push_back(sClip);
 		if (trackContainer() == Engine::patternStore())
 		{
+			auto bufferFramesPerTick = Engine::framesPerTick(sClip->sample().sampleRate());
+			f_cnt_t sampleStart = bufferFramesPerTick * _start;
 			pattern_track = PatternTrack::findPatternTrack(_clip_num);
+			sClip->setSampleStartFrame(sampleStart);
+			sClip->setIsPlaying(true);
 			setPlaying(true);
 		}
 	}
@@ -153,7 +158,6 @@ bool SampleTrack::play( const TimePos & _start, const fpp_t _frames,
 			else
 			{
 				auto smpHandle = new SamplePlayHandle(st);
-				smpHandle->setVolumeModel( &m_volumeModel );
 				smpHandle->setPatternTrack(pattern_track);
 				handle = smpHandle;
 			}
@@ -188,36 +192,36 @@ Clip * SampleTrack::createClip(const TimePos & pos)
 
 
 
-void SampleTrack::saveTrackSpecificSettings(QDomDocument& _doc, QDomElement& _this, bool presetMode)
+void SampleTrack::saveTrackSpecificSettings(QDomDocument& doc, QDomElement& thisElem, bool /*presetMode*/)
 {
-	m_audioPort.effects()->saveState( _doc, _this );
-	m_volumeModel.saveSettings( _doc, _this, "vol" );
-	m_panningModel.saveSettings( _doc, _this, "pan" );
-	m_mixerChannelModel.saveSettings( _doc, _this, "mixch" );
+	m_audioBusHandle.effects()->saveState(doc, thisElem);
+	m_volumeModel.saveSettings(doc, thisElem, "vol");
+	m_panningModel.saveSettings(doc, thisElem, "pan");
+	m_mixerChannelModel.saveSettings(doc, thisElem, "mixch");
 }
 
 
 
 
-void SampleTrack::loadTrackSpecificSettings( const QDomElement & _this )
+void SampleTrack::loadTrackSpecificSettings(const QDomElement & thisElem)
 {
-	QDomNode node = _this.firstChild();
-	m_audioPort.effects()->clear();
-	while( !node.isNull() )
+	QDomNode node = thisElem.firstChild();
+	m_audioBusHandle.effects()->clear();
+	while(!node.isNull())
 	{
-		if( node.isElement() )
+		if (node.isElement())
 		{
-			if( m_audioPort.effects()->nodeName() == node.nodeName() )
+			if (m_audioBusHandle.effects()->nodeName() == node.nodeName())
 			{
-				m_audioPort.effects()->restoreState( node.toElement() );
+				m_audioBusHandle.effects()->restoreState(node.toElement());
 			}
 		}
 		node = node.nextSibling();
 	}
-	m_volumeModel.loadSettings( _this, "vol" );
-	m_panningModel.loadSettings( _this, "pan" );
-	m_mixerChannelModel.setRange( 0, Engine::mixer()->numChannels() - 1 );
-	m_mixerChannelModel.loadSettings( _this, "mixch" );
+	m_volumeModel.loadSettings(thisElem, "vol");
+	m_panningModel.loadSettings(thisElem, "pan");
+	m_mixerChannelModel.setRange(0, Engine::mixer()->numChannels() - 1);
+	m_mixerChannelModel.loadSettings(thisElem, "mixch");
 }
 
 
@@ -247,7 +251,7 @@ void SampleTrack::setPlayingClips( bool isPlaying )
 
 void SampleTrack::updateMixerChannel()
 {
-	m_audioPort.setNextMixerChannel( m_mixerChannelModel.value() );
+	m_audioBusHandle.setNextMixerChannel(m_mixerChannelModel.value());
 }
 
 

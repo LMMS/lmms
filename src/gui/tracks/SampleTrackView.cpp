@@ -25,18 +25,25 @@
 #include "SampleTrackView.h"
 
 #include <QApplication>
+#include <QHBoxLayout>
 #include <QMenu>
+#include <QSpacerItem>
+#include <QVBoxLayout>
 
 #include "ConfigManager.h"
+#include "DeprecationHelper.h"
+#include "MainWindow.h"
 #include "embed.h"
 #include "Engine.h"
 #include "FadeButton.h"
 #include "Mixer.h"
+#include "MixerChannelLcdSpinBox.h"
 #include "MixerView.h"
 #include "GuiApplication.h"
 #include "Knob.h"
 #include "SampleClip.h"
 #include "SampleTrackWindow.h"
+#include "SongEditor.h"
 #include "StringPairDrag.h"
 #include "TrackContainerView.h"
 #include "TrackLabelButton.h"
@@ -61,28 +68,17 @@ SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 	m_mixerChannelNumber = new MixerChannelLcdSpinBox(2, getTrackSettingsWidget(), tr("Mixer channel"), this);
 	m_mixerChannelNumber->show();
 
-	m_volumeKnob = new Knob( KnobType::Small17, getTrackSettingsWidget(),
-						    tr( "Track volume" ) );
-	m_volumeKnob->setVolumeKnob( true );
+	m_volumeKnob = new VolumeKnob(KnobType::Small17, tr("VOL"), getTrackSettingsWidget(), Knob::LabelRendering::LegacyFixedFontSize, tr("Track volume"));
 	m_volumeKnob->setModel( &_t->m_volumeModel );
-	m_volumeKnob->setHintText( tr( "Channel volume:" ), "%" );
-
-	m_volumeKnob->setLabel( tr( "VOL" ) );
+	m_volumeKnob->setHintText(tr("Volume:"), "%");
 	m_volumeKnob->show();
 
-	m_panningKnob = new Knob( KnobType::Small17, getTrackSettingsWidget(),
-							tr( "Panning" ) );
+	m_panningKnob = new Knob(KnobType::Small17, tr("PAN"), getTrackSettingsWidget(), Knob::LabelRendering::LegacyFixedFontSize, tr("Panning"));
 	m_panningKnob->setModel( &_t->m_panningModel );
 	m_panningKnob->setHintText( tr( "Panning:" ), "%" );
-	m_panningKnob->setLabel( tr( "PAN" ) );
 	m_panningKnob->show();
 
-	m_activityIndicator = new FadeButton(
-		QApplication::palette().color(QPalette::Active, QPalette::Window),
-		QApplication::palette().color(QPalette::Active, QPalette::BrightText),
-		QApplication::palette().color(QPalette::Active, QPalette::BrightText).darker(),
-		getTrackSettingsWidget()
-	);
+	m_activityIndicator = new FadeButton(getTrackSettingsWidget());
 	m_activityIndicator->setFixedSize(8, 28);
 	m_activityIndicator->show();
 
@@ -100,6 +96,7 @@ SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 	masterLayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
 	connect(_t, SIGNAL(playingChanged()), this, SLOT(updateIndicator()));
+	connect(getGUI()->mainWindow(), &MainWindow::periodicUpdate, this, &SampleTrackView::corruptStateUpdate);
 
 	setModel( _t );
 
@@ -155,8 +152,8 @@ QMenu * SampleTrackView::createMixerMenu(QString title, QString newMixerLabel)
 
 		if (currentChannel != mixerChannel)
 		{
-			const auto index = currentChannel->m_channelIndex;
-			QString label = tr("%1: %2").arg(currentChannel->m_channelIndex).arg(currentChannel->m_name);
+			const auto index = currentChannel->index();
+			QString label = tr("%1: %2").arg(index).arg(currentChannel->m_name);
 			mixerMenu->addAction(label, [this, index](){
 				assignMixerLine(index);
 			});
@@ -207,15 +204,17 @@ void SampleTrackView::dropEvent(QDropEvent *de)
 				? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT
 				: DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH;
 
-		int xPos = de->pos().x() < trackHeadWidth
+		const int deX = position(de).x();
+		int xPos = deX < trackHeadWidth
 				? trackHeadWidth
-				: de->pos().x();
+				: deX;
 
+		const float snapSize = getGUI()->songEditor()->m_editor->getSnapSize();
 		TimePos clipPos = trackContainerView()->fixedClips()
 				? TimePos(0)
 				: TimePos(((xPos - trackHeadWidth) / trackContainerView()->pixelsPerBar()
 							* TimePos::ticksPerBar()) + trackContainerView()->currentPosition()
-						).quantize(1.0);
+						).quantize(snapSize, true);
 
 		auto sClip = static_cast<SampleClip*>(getTrack()->createClip(clipPos));
 		if (sClip) { sClip->setSampleFile(value); }
@@ -246,6 +245,20 @@ void SampleTrackView::assignMixerLine(int channelIndex)
 	model()->mixerChannelModel()->setValue(channelIndex);
 
 	getGUI()->mixerView()->setCurrentMixerChannel(channelIndex);
+}
+
+void SampleTrackView::corruptStateUpdate()
+{
+	if (model()->audioBusHandle()->isCorrupted())
+	{
+		m_activityIndicator->setState(FadeButton::State::Corrupted);
+		m_activityIndicator->setToolTip(tr("Corrupted audio detected: muting affected channels"));
+	}
+	else
+	{
+		m_activityIndicator->setState(FadeButton::State::Normal);
+		m_activityIndicator->setToolTip(QString{});
+	}
 }
 
 

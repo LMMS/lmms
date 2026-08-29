@@ -4,44 +4,24 @@
 #include <math.h>
 #include "base.h"
 
-int sp_create(sp_data **spp)
-{
-    *spp = (sp_data *) malloc(sizeof(sp_data));
-    sp_data *sp = *spp;
-    sprintf(sp->filename, "test.wav");
-    sp->nchan = 1;
-    SPFLOAT *out = malloc(sizeof(SPFLOAT) * sp->nchan);
-    *out = 0;
-    sp->out = out;
-    sp->sr = 44100;
-    sp->len = 5 * sp->sr;
-    sp->pos = 0;
-    sp->rand = 0;
-    return 0;
-}
+int sp_create(sp_data **spp) { return sp_createn(spp, 1); }
 
 int sp_createn(sp_data **spp, int nchan)
 {
-    *spp = (sp_data *) malloc(sizeof(sp_data));
-    sp_data *sp = *spp;
-    sprintf(sp->filename, "test.wav");
-    sp->nchan = nchan;
-    SPFLOAT *out = malloc(sizeof(SPFLOAT) * sp->nchan);
-    *out = 0;
-    sp->out = out;
-    sp->sr = 44100;
-    sp->len = 5 * sp->sr;
-    sp->pos = 0;
-    sp->rand = 0;
-    return 0;
+	const uint32_t sr = 44100; // TODO C23: constexpr auto
+	const unsigned long len_seconds = 5; // TODO C23: constexpr auto
+	*spp = malloc(sizeof(sp_data));
+	**spp = (sp_data){ .out = calloc(nchan, sizeof(float)), .sr = sr,
+		.nchan = nchan, .len = len_seconds * sr, .pos = 0,
+		.filename = "test.wav", .rand = 0 };
+	return 0;
 }
 
 int sp_destroy(sp_data **spp)
 {
-    sp_data *sp = *spp;
-    free(sp->out);
-    free(*spp);
-    return 0;
+	free((*spp)->out);
+	free(*spp);
+	return 0;
 }
 
 #ifndef NO_LIBSNDFILE
@@ -61,7 +41,7 @@ int sp_process(sp_data *sp, void *ud, void (*callback)(sp_data *, void *))
         sf[0] = sf_open(sp->filename, SFM_WRITE, &info);
     } else {
         for(chan = 0; chan < sp->nchan; chan++) {
-            sprintf(tmp, "%02d_%s", chan, sp->filename);
+            snprintf(tmp, sizeof(tmp), "%02d_%s", chan, sp->filename);
             sf[chan] = sf_open(tmp, SFM_WRITE, &info);
         }
     }

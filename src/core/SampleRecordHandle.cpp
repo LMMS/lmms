@@ -29,7 +29,6 @@
 #include "PatternTrack.h"
 #include "SampleBuffer.h"
 #include "SampleClip.h"
-#include "debug.h"
 
 
 namespace lmms

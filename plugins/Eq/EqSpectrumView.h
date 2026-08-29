@@ -27,7 +27,7 @@
 #include <QWidget>
 
 #include "fft_helpers.h"
-#include "lmms_basics.h"
+#include "LmmsTypes.h"
 
 namespace lmms
 {
@@ -45,7 +45,7 @@ public:
 	bool getInProgress();
 	void clear();
 
-	void analyze( SampleFrame* buf, const fpp_t frames );
+	void analyze( SampleFrame* buf, const f_cnt_t frames );
 
 	float getEnergy() const;
 	int getSampleRate() const;
