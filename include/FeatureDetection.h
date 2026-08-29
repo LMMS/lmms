@@ -41,8 +41,9 @@
 // CPU feature flags //
 ///////////////////////
 
-#define LMMS_CPU_FEATURE_NONE    0u
-#define LMMS_CPU_FEATURE_INVALID 0x80000000u
+#define LMMS_CPU_FEATURE_NONE        0u
+#define LMMS_CPU_FEATURE_UNSUPPORTED 0x40000000u
+#define LMMS_CPU_FEATURE_INVALID     0x80000000u
 
 // x86_64 features
 #if defined(LMMS_HOST_X86_64) || defined(DOXYGEN)
@@ -137,7 +138,9 @@ namespace lmms {
 class LMMS_EXPORT FeatureDetection
 {
 public:
-	//! @returns @a LMMS_CPU_FEATURE_* flags indicating all CPU features detected at runtime
+	//! @returns @a LMMS_CPU_FEATURE_* flags indicating all CPU features detected at runtime,
+	//!          or @a LMMS_CPU_FEATURE_UNSUPPORTED if the current platform does not support feature detection.
+	//! @note No assumptions are made based on compile-time target architecture - this is purely runtime detection.
 	//! @note Feature detection runs only during the first function call and results are cached for subsequent calls.
 	static LMMS_INLINE auto runtimeCpuFeatures() noexcept -> std::uint32_t
 	{
@@ -156,12 +159,12 @@ public:
 
 	//! @brief Checks whether the current CPU meets the baseline CPU requirements for this particular LMMS build
 	//!
-	//! This function could, for example, allow an LMMS build that targets a CPU with AVX512 instructions
-	//! to exit gracefully when attempting to run on an old CPU without those instructions.
-	static auto isCurrentCpuSupported() noexcept -> bool
-	{
-		return (runtimeCpuFeatures() & LMMS_TARGET_CPU_FEATURES) == LMMS_TARGET_CPU_FEATURES;
-	}
+	//! @note This function could, for example, allow an LMMS build that targets a CPU with AVX512F instructions
+	//!       exit gracefully when attempting to run on an old CPU without those instructions.
+	//! @warning There may be false positives where this function returns true, falsely indicating runtime support.
+	//!          This is because LMMS may have been compiled with an -march or /arch flag that targets features
+	//!          we don't check for. Or the architecture/OS may lack a feature detection implementation altogether.
+	static auto isCurrentCpuSupported() noexcept -> bool;
 
 	//! @returns a display string for the given CPU features
 	static auto formattedCpuFeatures(std::uint32_t features = LMMS_TARGET_CPU_FEATURES) -> std::string;

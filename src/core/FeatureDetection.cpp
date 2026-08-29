@@ -44,7 +44,7 @@ auto FeatureDetection::determineRuntimeCpuFeatures() noexcept -> std::uint32_t
 {
 	// NOTE: There is no implementation for non-x86_64 or non-arm64 architectures.
 	//       Nor is there an implementation for Haiku on arm64.
-	//       Platforms without an implementation will return LMMS_CPU_FEATURE_NONE.
+	//       Platforms without an implementation will return LMMS_CPU_FEATURE_UNSUPPORTED.
 
 	auto result = std::uint32_t{LMMS_CPU_FEATURE_NONE};
 
@@ -170,10 +170,37 @@ auto FeatureDetection::determineRuntimeCpuFeatures() noexcept -> std::uint32_t
 			}
 		}
 	}
+#else
+	// This OS does not support feature detection on arm64
+	result = LMMS_CPU_FEATURE_UNSUPPORTED;
 #endif // arm64 OS
+#else
+	// This architecture does not support feature detection
+	result = LMMS_CPU_FEATURE_UNSUPPORTED;
 #endif // architecture
 
 	return result;
+}
+
+auto FeatureDetection::isCurrentCpuSupported() noexcept -> bool
+{
+#if defined(LMMS_HOST_ARM64) && defined(LMMS_BUILD_APPLE)
+	// macOS on Apple Silicon has partial feature detection support - it cannot detect SVE/SVE2 at runtime.
+	// We'll assume SVE/SVE2 are supported to allow TARGET_UARCH=native builds to run.
+	// TODO: Remove this if/when SVE/SVE2 detection is implemented.
+	const auto assumedFeatures = runtimeCpuFeatures() | LMMS_CPU_FEATURE_SVE | LMMS_CPU_FEATURE_SVE2;
+	return (assumedFeatures & LMMS_TARGET_CPU_FEATURES) == LMMS_TARGET_CPU_FEATURES;
+#else
+	const auto features = runtimeCpuFeatures();
+	if (features == LMMS_CPU_FEATURE_UNSUPPORTED)
+	{
+		// When an architecture or OS lacks support for runtime feature detection, assume any
+		// required features are implemented.
+		return true;
+	}
+
+	return (features & LMMS_TARGET_CPU_FEATURES) == LMMS_TARGET_CPU_FEATURES;
+#endif
 }
 
 auto FeatureDetection::formattedCpuFeatures(std::uint32_t features) -> std::string
