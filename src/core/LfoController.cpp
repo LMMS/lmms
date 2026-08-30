@@ -148,6 +148,10 @@ void LfoController::updateValueBuffer()
 
 void LfoController::updatePhase()
 {
+	// Only update the phase if the song is playing
+	// This prevents LFOs from changing phase when the user drags the timeline while paused
+	if (!Engine::getSong()->isPlaying()) { return; }
+
 	m_currentPhase = ( Engine::getSong()->getFrames() ) / m_duration;
 	m_bufferLastUpdated = s_periods - 1;
 }
