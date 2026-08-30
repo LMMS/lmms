@@ -1216,6 +1216,13 @@ bool Song::saveProjectFile(const QString & filename, bool withResources)
 {
 	using gui::getGUI;
 
+	// ensure property order in file is consistent across saves
+#if QT_VERSION < QT_VERSION_CHECK(6, 6, 0)
+	qSetGlobalQHashSeed(0);
+#else
+	QHashSeed::setDeterministicGlobalSeed();
+#endif
+
 	DataFile dataFile( DataFile::Type::SongProject );
 	m_savingProject = true;
 
@@ -1243,7 +1250,16 @@ bool Song::saveProjectFile(const QString & filename, bool withResources)
 
 	m_savingProject = false;
 
-	return dataFile.writeFile(filename, withResources);
+	bool writeStatus = dataFile.writeFile(filename, withResources);
+
+	// revert to a randomized global seed for Qt
+#if QT_VERSION < QT_VERSION_CHECK(6, 6, 0)
+	qSetGlobalQHashSeed(-1);
+#else
+	QHashSeed::resetRandomGlobalSeed();
+#endif
+
+	return writeStatus;
 }
 
 
