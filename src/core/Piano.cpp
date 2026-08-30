@@ -67,24 +67,26 @@ Piano::Piano(InstrumentTrack* track) :
 	m_instrumentTrack(track),
 	m_midiEvProc(track)        /*!< the InstrumentTrack Model */
 {
+	connect(m_instrumentTrack, &InstrumentTrack::transposeChanged, this, &Piano::dataChanged);
 }
 
-/*! \brief Turn a key on or off
- *
- *  \param key the key number to change
- *  \param state the state to set the key to
- */
-void Piano::setKeyState(int key, bool state)
+
+void Piano::processInEvent(const MidiEvent& event, const TimePos& time, f_cnt_t offset)
 {
-	if (isValidKey(key))
-	{
-		m_pressedKeys[key] = state;
+	const int key = event.key();
+	if (!isValidKey(key)) { return; }
 
-		emit dataChanged();
-	}
+	if (event.type() == MidiNoteOn) { m_pressedKeys[key] = true; }
+	else if (event.type() == MidiNoteOff) { m_pressedKeys[key] = false; }
+
+	emit dataChanged();
 }
 
-
+bool Piano::isKeyPressed(int key) const
+{
+	int transposedKey = key + m_instrumentTrack->transposeAmount();
+	return isValidKey(transposedKey) && m_pressedKeys[transposedKey];
+}
 
 
 /*! \brief Handle a note being pressed on our keyboard display
@@ -99,8 +101,7 @@ void Piano::handleKeyPress(int key, int midiVelocity)
 	}
 	if (isValidKey(key))
 	{
-		m_midiEvProc->processInEvent(MidiEvent(MidiNoteOn, -1, key, midiVelocity));
-		m_pressedKeys[key] = true;
+		m_midiEvProc->processInEvent(MidiEvent(MidiNoteOn, 0, key, midiVelocity));
 	}
 }
 
@@ -116,8 +117,7 @@ void Piano::handleKeyRelease(int key)
 {
 	if (isValidKey(key))
 	{
-		m_midiEvProc->processInEvent(MidiEvent(MidiNoteOff, -1, key, 0));
-		m_pressedKeys[key] = false;
+		m_midiEvProc->processInEvent(MidiEvent(MidiNoteOff, 0, key, 0));
 	}
 }
 

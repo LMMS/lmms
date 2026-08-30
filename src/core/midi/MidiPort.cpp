@@ -32,6 +32,7 @@
 #include "Note.h"
 #include "Song.h"
 #include "MidiController.h"
+#include "InstrumentTrack.h"
 
 
 namespace lmms
@@ -54,21 +55,31 @@ MidiPort::MidiPort( const QString& name,
 	m_midiEventProcessor( eventProcessor ),
 	m_mode( mode ),
 	m_inputChannelModel( 0, 0, MidiChannelCount, this, tr( "Input channel" ) ),
-	m_outputChannelModel( 1, 0, MidiChannelCount, this, tr( "Output channel" ) ),
+	m_outputChannelModel(0, 0, MidiChannelCount, this, tr("Output channel")),
 	m_inputControllerModel(MidiController::NONE, MidiController::NONE, MidiControllerCount - 1, this, tr( "Input controller" )),
 	m_outputControllerModel(MidiController::NONE, MidiController::NONE, MidiControllerCount - 1, this, tr( "Output controller" )),
 	m_fixedInputVelocityModel( -1, -1, MidiMaxVelocity, this, tr( "Fixed input velocity" ) ),
 	m_fixedOutputVelocityModel( -1, -1, MidiMaxVelocity, this, tr( "Fixed output velocity" ) ),
-	m_fixedOutputNoteModel( -1, -1, MidiMaxKey, this, tr( "Fixed output note" ) ),
+	m_fixedOutputNoteModel( -1, -1, MidiKeyCount - 1, this, tr( "Fixed output note" ) ),
 	m_outputProgramModel( 1, 1, MidiProgramCount, this, tr( "Output MIDI program" ) ),
 	m_baseVelocityModel( MidiMaxVelocity/2, 1, MidiMaxVelocity, this, tr( "Base velocity" ) ),
 	m_readableModel( false, this, tr( "Receive MIDI-events" ) ),
-	m_writableModel( false, this, tr( "Send MIDI-events" ) )
+	m_writableModel( false, this, tr( "Send MIDI-events" ) ),
+	m_MPEModel(false, this, tr("Send MPE Config Message and route note events across multiple channels")),
+	m_MPELowerZoneChannelsModel(16, 1, MidiChannelCount, this, tr("Number of channels used for MPE Lower Zone")),
+	m_MPEUpperZoneChannelsModel(1, 1, MidiChannelCount, this, tr("Number of channels used for MPE Upper Zone")),
+	m_MPEPitchRangeModel(48, 0, 96, this, tr( "Semitone pitch bend range for member channels (both MPE zones)")),
+	m_MPEZoneModel()
 {
 	m_midiClient->addPort( this );
 
 	m_readableModel.setValue( m_mode == Mode::Input || m_mode == Mode::Duplex );
 	m_writableModel.setValue( m_mode == Mode::Output || m_mode == Mode::Duplex );
+
+	m_MPEZoneModel.addItem("Lower");
+	m_MPEZoneModel.addItem("Upper");
+	// Default to Lower Zone
+	m_MPEZoneModel.setValue(0);
 
 	connect( &m_readableModel, SIGNAL(dataChanged()),
 			this, SLOT(updateMidiPortMode()), Qt::DirectConnection );
@@ -76,6 +87,24 @@ MidiPort::MidiPort( const QString& name,
 			this, SLOT(updateMidiPortMode()), Qt::DirectConnection );
 	connect( &m_outputProgramModel, SIGNAL(dataChanged()),
 			this, SLOT(updateOutputProgram()), Qt::DirectConnection );
+	connect(&m_MPEModel, &AutomatableModel::dataChanged, this, &MidiPort::updateMPEConfiguration, Qt::DirectConnection);
+	connect(&m_MPEPitchRangeModel, &AutomatableModel::dataChanged, this, &MidiPort::updateMPEConfiguration, Qt::DirectConnection);
+	connect(&m_MPEZoneModel, &AutomatableModel::dataChanged, this, &MidiPort::updateMPEConfiguration, Qt::DirectConnection);
+	// Ensure the zones do not overlap
+	connect(&m_MPEUpperZoneChannelsModel, &AutomatableModel::dataChanged, this, [&](){
+		if (m_MPELowerZoneChannelsModel.value() > 16 - m_MPEUpperZoneChannelsModel.value())
+		{
+			m_MPELowerZoneChannelsModel.setValue(std::clamp(16 - m_MPEUpperZoneChannelsModel.value(), 1, 16));
+		}
+		updateMPEConfiguration();
+	});
+	connect(&m_MPELowerZoneChannelsModel, &AutomatableModel::dataChanged, this, [&](){
+		if (m_MPEUpperZoneChannelsModel.value() > 16 - m_MPELowerZoneChannelsModel.value())
+		{
+			m_MPEUpperZoneChannelsModel.setValue(std::clamp(16 - m_MPELowerZoneChannelsModel.value(), 1, 16));
+		}
+		updateMPEConfiguration();
+	});
 
 
 	// when using with non-raw-clients we can provide buttons showing
@@ -196,6 +225,11 @@ void MidiPort::saveSettings( QDomDocument& doc, QDomElement& thisElement )
 	m_baseVelocityModel.saveSettings( doc, thisElement, "basevelocity" );
 	m_readableModel.saveSettings( doc, thisElement, "readable" );
 	m_writableModel.saveSettings( doc, thisElement, "writable" );
+	m_MPEModel.saveSettings(doc, thisElement, "mpe");
+	m_MPELowerZoneChannelsModel.saveSettings(doc, thisElement, "mpelowerchannels");
+	m_MPEUpperZoneChannelsModel.saveSettings(doc, thisElement, "mpeupperchannels");
+	m_MPEPitchRangeModel.saveSettings(doc, thisElement, "mpepitchrange");
+	m_MPEZoneModel.saveSettings(doc, thisElement, "mpezone");
 
 	if( isInputEnabled() )
 	{
@@ -250,6 +284,13 @@ void MidiPort::loadSettings( const QDomElement& thisElement )
 	m_baseVelocityModel.loadSettings( thisElement, "basevelocity" );
 	m_readableModel.loadSettings( thisElement, "readable" );
 	m_writableModel.loadSettings( thisElement, "writable" );
+	m_MPEModel.loadSettings(thisElement, "mpe");
+	m_MPELowerZoneChannelsModel.loadSettings(thisElement, "mpelowerchannels");
+	m_MPEUpperZoneChannelsModel.loadSettings(thisElement, "mpeupperchannels");
+	m_MPEPitchRangeModel.loadSettings(thisElement, "mpepitchrange");
+	m_MPEZoneModel.loadSettings(thisElement, "mpezone");
+
+	updateMPEConfiguration();
 
 	// restore connections
 
@@ -428,6 +469,16 @@ void MidiPort::updateOutputProgram()
 	processOutEvent( MidiEvent( MidiProgramChange, realOutputChannel(), outputProgram()-1 ) );
 }
 
+
+
+void MidiPort::updateMPEConfiguration()
+{
+	m_mpeManager.config(mpeLowerZoneChannels(), mpeUpperZoneChannels(), mpePitchRange(), mpeActiveZone());
+	m_mpeManager.sendMPEConfigSignals(m_midiEventProcessor);
+	// Let the track know to resend the master pitch knob/range, since the channel may have changed if MPE is enabled/disabled
+	// (MPE master pitch bends are always sent on manager channels, either channel 0 or 15. However, when MPE is disabled, the track sends it on the normal output channel, which may not be 0)
+	emit mpeConfigurationChanged();
+}
 
 
 
