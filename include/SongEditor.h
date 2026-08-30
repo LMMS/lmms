@@ -129,6 +129,7 @@ private:
 	Song * m_song;
 
 	QScrollBar * m_leftRightScroll;
+	bool m_autoscrollSuspended = false;
 
 	void adjustLeftRightScoll(int value);
 
@@ -201,7 +202,6 @@ protected slots:
 	void updateSnapLabel();
 
 signals:
-	void playTriggered();
 	void resized();
 
 private:
