@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+
+<svg
+  width="128"
+  height="128"
+  xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink">
+	<defs>
+		<filter id="blur">
+			<feGaussianBlur in="SourceGraphic" stdDeviation="2"/>
+		</filter>
+		<path id="text" d="
+			M 41 36
+			L 10 36
+			L 10 64
+			L 41 64
+			L 41 91
+			L 10 91
+			
+			M 79 36
+			L 48 36
+			L 48 91
+			M 48 64
+			L 79 64
+			
+			M 86 36
+			L 117 36
+			L 86 91
+			L 117 91
+		"/>
+	</defs>
+	<use href="#text" style="stroke:#8395ff; stroke-width:3; stroke-linecap:round;" fill="none" filter="url(#blur)"/>
+	<use href="#text" style="stroke:#91e8e9; stroke-width:3; stroke-linecap:round;" fill="none"/>
+</svg>
