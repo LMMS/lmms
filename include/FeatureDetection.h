@@ -116,12 +116,12 @@
 #	endif
 #	define LMMS_TARGET_CPU_FEATURES LMMS_TARGET_CPU_SIMD_FEATURES
 #elif defined(LMMS_HOST_ARM64)
-	// TODO: Add support for MSVC
+	// TODO: Add compile-time SVE/SVE2 detection for MSVC
 #	if defined(__ARM_FEATURE_SVE2)
 #		define LMMS_TARGET_CPU_SIMD_FEATURES LMMS_CPU_FEATURE_SVE2
 #	elif defined(__ARM_FEATURE_SVE)
 #		define LMMS_TARGET_CPU_SIMD_FEATURES LMMS_CPU_FEATURE_SVE
-#	elif defined(__ARM_NEON) || defined(__ARM_NEON__)
+#	elif defined(__ARM_NEON) || defined(__ARM_NEON__) || (defined(__ARM_ARCH) && __ARM_ARCH >= 8)
 #		define LMMS_TARGET_CPU_SIMD_FEATURES LMMS_CPU_FEATURE_NEON
 #	else
 #		define LMMS_TARGET_CPU_SIMD_FEATURES LMMS_CPU_FEATURE_NONE
