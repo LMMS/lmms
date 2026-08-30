@@ -140,7 +140,16 @@ auto FeatureDetection::determineRuntimeCpuFeatures() noexcept -> std::uint32_t
 		|| getSysCtlByName("hw.optional.neon"))
 	{
 		result |= LMMS_CPU_FEATURE_NEON;
-		// TODO: Find a way to check for SVE/SVE2 on macOS
+		// NOTE: Not even Apple's latest release M-series chip (Apple M5) supports SVE/SVE2 yet,
+		//       but the following detection code should work if/when support is added
+		if (getSysCtlByName("hw.optional.arm.FEAT_SVE"))
+		{
+			result |= LMMS_CPU_FEATURE_SVE;
+			if (getSysCtlByName("hw.optional.arm.FEAT_SVE2"))
+			{
+				result |= LMMS_CPU_FEATURE_SVE2;
+			}
+		}
 	}
 #elif defined(LMMS_BUILD_LINUX) || defined(LMMS_BUILD_OPENBSD) || defined(LMMS_BUILD_FREEBSD)
 	// hwcap1/hwcap2 are individually zeroed if an error occurs
@@ -184,13 +193,6 @@ auto FeatureDetection::determineRuntimeCpuFeatures() noexcept -> std::uint32_t
 
 auto FeatureDetection::isCurrentCpuSupported() noexcept -> bool
 {
-#if defined(LMMS_HOST_ARM64) && defined(LMMS_BUILD_APPLE)
-	// macOS on Apple Silicon has partial feature detection support - it cannot detect SVE/SVE2 at runtime.
-	// We'll assume SVE/SVE2 are supported to allow TARGET_UARCH=native builds to run.
-	// TODO: Remove this if/when SVE/SVE2 detection is implemented.
-	const auto assumedFeatures = runtimeCpuFeatures() | LMMS_CPU_FEATURE_SVE | LMMS_CPU_FEATURE_SVE2;
-	return (assumedFeatures & LMMS_TARGET_CPU_FEATURES) == LMMS_TARGET_CPU_FEATURES;
-#else
 	const auto features = runtimeCpuFeatures();
 	if (features == LMMS_CPU_FEATURE_UNSUPPORTED)
 	{
@@ -200,7 +202,6 @@ auto FeatureDetection::isCurrentCpuSupported() noexcept -> bool
 	}
 
 	return (features & LMMS_TARGET_CPU_FEATURES) == LMMS_TARGET_CPU_FEATURES;
-#endif
 }
 
 auto FeatureDetection::formattedCpuFeatures(std::uint32_t features) -> std::string
