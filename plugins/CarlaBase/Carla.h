@@ -89,13 +89,6 @@ public:
 	{
 	}
 
-	// From AutomatableModel.h, it's private there.
-	inline static bool mustQuoteName(const QString &name)
-	{
-		QRegularExpression reg("^[A-Za-z0-9._-]+$");
-		return !reg.match(name).hasMatch();
-	}
-
 	inline void loadSettings(const QDomElement& element, const QString& name = QString("value")) override
 	{
 		AutomatableModel::loadSettings(element, name);

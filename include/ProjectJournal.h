@@ -89,13 +89,10 @@ public:
 
 	void clearJournal();
 	void stopAllJournalling();
-	JournallingObject * journallingObject( const jo_id_t _id )
+	JournallingObject* journallingObject(const jo_id_t id) const
 	{
-		if( m_joIDs.contains( _id ) )
-		{
-			return m_joIDs[_id];
-		}
-		return nullptr;
+		const auto it = m_joIDs.constFind(id);
+		return it != m_joIDs.cend() ? *it : nullptr;
 	}
 
 

@@ -48,7 +48,7 @@ const float AutomationClip::DEFAULT_MAX_VALUE = 1;
 AutomationClip::AutomationClip( AutomationTrack * _auto_track ) :
 	Clip( _auto_track ),
 	m_autoTrack( _auto_track ),
-	m_objects(),
+	m_connections(),
 	m_tension( 1.0 ),
 	m_progressionType( ProgressionType::Discrete ),
 	m_dragging( false ),
@@ -64,7 +64,7 @@ AutomationClip::AutomationClip( AutomationTrack * _auto_track ) :
 AutomationClip::AutomationClip( const AutomationClip & _clip_to_copy ) :
 	Clip(_clip_to_copy),
 	m_autoTrack( _clip_to_copy.m_autoTrack ),
-	m_objects( _clip_to_copy.m_objects ),
+	m_connections(_clip_to_copy.m_connections),
 	m_tension( _clip_to_copy.m_tension ),
 	m_progressionType(_clip_to_copy.m_progressionType),
 	m_dragging(false),
@@ -85,31 +85,40 @@ AutomationClip::AutomationClip( const AutomationClip & _clip_to_copy ) :
 	}
 }
 
-bool AutomationClip::addObject( AutomatableModel * _obj, bool _search_dup )
+bool AutomationClip::addConnection(AutomatableModel* model, bool searchForDuplicates)
 {
 	QMutexLocker m(&m_clipMutex);
 
-	if (_search_dup && std::find(m_objects.begin(), m_objects.end(), _obj) != m_objects.end())
+	assert(model != nullptr);
+	if (searchForDuplicates && std::find(m_connections.begin(), m_connections.end(), model) != m_connections.end())
 	{
 		return false;
 	}
 
 	// the automation track is unconnected and there is nothing in the track
-	if (m_objects.empty() && hasAutomation() == false)
+	if (m_connections.empty() && hasAutomation() == false)
 	{
 		// then initialize first value
-		putValue( TimePos(0), _obj->inverseScaledValue( _obj->value<float>() ), false );
+		putValue(TimePos(0), model->inverseScaledValue(model->value<float>()), false);
 	}
 
-	m_objects.push_back(_obj);
+	m_connections.push_back(model->createAutomationConnection());
 
-	connect( _obj, SIGNAL(destroyed(lmms::jo_id_t)),
-			this, SLOT(objectDestroyed(lmms::jo_id_t)),
-						Qt::DirectConnection );
+	connect(model, &AutomatableModel::destroyed,
+		this, &AutomationClip::connectedModelDestroyed,
+		Qt::DirectConnection);
 
 	emit dataChanged();
 
 	return true;
+}
+
+
+
+
+void AutomationClip::removeConnection(const AutomatableModel* model)
+{
+	std::erase(m_connections, model);
 }
 
 
@@ -148,25 +157,25 @@ void AutomationClip::setTension( QString _new_tension )
 
 
 
-const AutomatableModel * AutomationClip::firstObject() const
+const AutomatableModel& AutomationClip::connectedModel() const
 {
 	QMutexLocker m(&m_clipMutex);
 
 	AutomatableModel* model;
-	if (!m_objects.empty() && (model = m_objects.front()) != nullptr)
+	if (!m_connections.empty() && (model = m_connections.front().model()) != nullptr)
 	{
-		return model;
+		return *model;
 	}
 
 	static FloatModel fm(0, DEFAULT_MIN_VALUE, DEFAULT_MAX_VALUE, 0.001f);
-	return &fm;
+	return fm;
 }
 
-const AutomationClip::objectVector& AutomationClip::objects() const
+const AutomationClip::Connections& AutomationClip::connections() const
 {
 	QMutexLocker m(&m_clipMutex);
 
-	return m_objects;
+	return m_connections;
 }
 
 
@@ -231,7 +240,7 @@ TimePos AutomationClip::putValue(
 {
 	QMutexLocker m(&m_clipMutex);
 
-	cleanObjects();
+	cleanConnections();
 
 	TimePos newTime = quantPos ? Note::quantized(time, quantization()) : time;
 	newTime = std::max(TimePos(0), newTime);
@@ -287,7 +296,7 @@ TimePos AutomationClip::putValues(
 {
 	QMutexLocker m(&m_clipMutex);
 
-	cleanObjects();
+	cleanConnections();
 
 	TimePos newTime = quantPos ? Note::quantized(time, quantization()) : time;
 	newTime = std::max(TimePos(0), newTime);
@@ -327,7 +336,7 @@ void AutomationClip::removeNode(const TimePos & time)
 {
 	QMutexLocker m(&m_clipMutex);
 
-	cleanObjects();
+	cleanConnections();
 
 	m_timeMap.remove( time );
 	timeMap::iterator it = m_timeMap.lowerBound(time);
@@ -769,11 +778,9 @@ void AutomationClip::flipX(int start, int end)
 		tempMap[end] = AutomationNode(this, valueAt(start), valueAt(end), end);
 	}
 
-	m_timeMap.clear();
+	m_timeMap = std::move(tempMap);
 
-	m_timeMap = tempMap;
-
-	cleanObjects();
+	cleanConnections();
 
 	generateTangents();
 	emit dataChanged();
@@ -813,12 +820,12 @@ void AutomationClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		_this.appendChild( element );
 	}
 
-	for (const auto& object : m_objects)
+	for (const auto& connection : m_connections)
 	{
-		if (object)
+		if (connection)
 		{
 			QDomElement element = _doc.createElement( "object" );
-			element.setAttribute("id", ProjectJournal::idToSave(object->id()));
+			element.setAttribute("id", ProjectJournal::idToSave(connection.model()->id()));
 			_this.appendChild(element);
 		}
 	}
@@ -915,9 +922,9 @@ QString AutomationClip::name() const
 	{
 		return Clip::name();
 	}
-	if (!m_objects.empty() && m_objects.front() != nullptr)
+	if (!m_connections.empty() && m_connections.front().model() != nullptr)
 	{
-		return m_objects.front()->fullDisplayName();
+		return m_connections.front().model()->fullDisplayName();
 	}
 	return tr( "Drag a control while pressing <%1>" ).arg(UI_COPY_KEY);
 }
@@ -935,77 +942,6 @@ gui::ClipView * AutomationClip::createView( gui::TrackView * _tv )
 
 
 
-
-bool AutomationClip::isAutomated( const AutomatableModel * _m )
-{
-	auto l = combineAllTracks();
-	for (const auto track : l)
-	{
-		if (track->type() == Track::Type::Automation || track->type() == Track::Type::HiddenAutomation)
-		{
-			for (const auto& clip : track->getClips())
-			{
-				const auto a = dynamic_cast<const AutomationClip*>(clip);
-				if( a && a->hasAutomation() )
-				{
-					for (const auto& object : a->m_objects)
-					{
-						if (object == _m)
-						{
-							return true;
-						}
-					}
-				}
-			}
-		}
-	}
-	return false;
-}
-
-
-/**
- * @brief returns a list of all the automation clips that are connected to a specific model
- * @param _m the model we want to look for
- */
-std::vector<AutomationClip *> AutomationClip::clipsForModel(const AutomatableModel* _m)
-{
-	std::vector<AutomationClip *> clips;
-	auto l = combineAllTracks();
-
-	// go through all tracks...
-	for (const auto track : l)
-	{
-		// we want only automation tracks...
-		if (track->type() == Track::Type::Automation || track->type() == Track::Type::HiddenAutomation )
-		{
-			// go through all the clips...
-			for (const auto& trackClip : track->getClips())
-			{
-				auto a = dynamic_cast<AutomationClip*>(trackClip);
-				// check that the clip has automation
-				if( a && a->hasAutomation() )
-				{
-					// now check is the clip is connected to the model we want by going through all the connections
-					// of the clip
-					bool has_object = false;
-					for (const auto& object : a->m_objects)
-					{
-						if (object == _m)
-						{
-							has_object = true;
-						}
-					}
-					// if the clips is connected to the model, add it to the list
-					if (has_object) { clips.push_back(a); }
-				}
-			}
-		}
-	}
-	return clips;
-}
-
-
-
 AutomationClip * AutomationClip::globalAutomationClip(
 							AutomatableModel * _m )
 {
@@ -1015,15 +951,15 @@ AutomationClip * AutomationClip::globalAutomationClip(
 		auto a = dynamic_cast<AutomationClip*>(clip);
 		if( a )
 		{
-			for (const auto& object : a->m_objects)
+			for (const auto& connection : a->m_connections)
 			{
-				if (object == _m) { return a; }
+				if (connection == _m) { return a; }
 			}
 		}
 	}
 
 	auto a = new AutomationClip(t);
-	a->addObject( _m, false );
+	a->addConnection(_m, false);
 	return a;
 }
 
@@ -1047,7 +983,7 @@ void AutomationClip::resolveAllIDs()
 						JournallingObject* o = Engine::projectJournal()->journallingObject(id);
 						if( o && dynamic_cast<AutomatableModel *>( o ) )
 						{
-							a->addObject( dynamic_cast<AutomatableModel *>( o ), false );
+							a->addConnection(dynamic_cast<AutomatableModel*>(o), false);
 						}
 						else
 						{
@@ -1056,7 +992,7 @@ void AutomationClip::resolveAllIDs()
 							o = Engine::projectJournal()->journallingObject(ProjectJournal::idFromSave(id));
 							if( o && dynamic_cast<AutomatableModel *>( o ) )
 							{
-								a->addObject( dynamic_cast<AutomatableModel *>( o ), false );
+								a->addConnection(dynamic_cast<AutomatableModel*>(o), false);
 							}
 							else
 							{
@@ -1065,7 +1001,7 @@ void AutomationClip::resolveAllIDs()
 								o = Engine::projectJournal()->journallingObject(ProjectJournal::idToSave(id));
 								if( o && dynamic_cast<AutomatableModel *>( o ) )
 								{
-									a->addObject( dynamic_cast<AutomatableModel *>( o ), false );
+									a->addConnection(dynamic_cast<AutomatableModel*>(o), false);
 								}
 							}
 						}
@@ -1093,7 +1029,7 @@ void AutomationClip::clear()
 
 
 
-void AutomationClip::objectDestroyed( jo_id_t _id )
+void AutomationClip::connectedModelDestroyed(jo_id_t id)
 {
 	QMutexLocker m(&m_clipMutex);
 
@@ -1101,18 +1037,12 @@ void AutomationClip::objectDestroyed( jo_id_t _id )
 	// when switching samplerate) and real deletions because in the latter
 	// case we had to remove ourselves if we're the global automation
 	// clip of the destroyed object
-	m_idsToResolve.push_back(_id);
+	m_idsToResolve.push_back(id);
 
-	for (auto objIt = m_objects.begin(); objIt != m_objects.end(); objIt++)
-	{
-		Q_ASSERT( !(*objIt).isNull() );
-		if( (*objIt)->id() == _id )
-		{
-			//Assign to objIt so that this loop work even break; is removed.
-			objIt = m_objects.erase( objIt );
-			break;
-		}
-	}
+	std::erase_if(m_connections, [id](const AutomatableModel::Connection& conn) {
+		assert(conn.model() != nullptr);
+		return conn.model()->id() == id;
+	});
 
 	emit dataChanged();
 }
@@ -1120,19 +1050,19 @@ void AutomationClip::objectDestroyed( jo_id_t _id )
 
 
 
-void AutomationClip::cleanObjects()
+void AutomationClip::cleanConnections()
 {
 	QMutexLocker m(&m_clipMutex);
 
-	for( objectVector::iterator it = m_objects.begin(); it != m_objects.end(); )
+	for (auto it = m_connections.begin(); it != m_connections.end(); )
 	{
-		if( *it )
+		if (it->model() != nullptr)
 		{
 			++it;
 		}
 		else
 		{
-			it = m_objects.erase( it );
+			it = m_connections.erase(it);
 		}
 	}
 }

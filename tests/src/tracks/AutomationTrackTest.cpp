@@ -99,17 +99,17 @@ private slots:
 		c1.putValue(0, 0.0, false);
 		c1.putValue(10, 1.0, false);
 		c1.movePosition(0);
-		c1.addObject(&model);
+		c1.addConnection(&model);
 
 		AutomationClip c2(&track);
 		c2.setProgressionType(AutomationClip::ProgressionType::Linear);
 		c2.putValue(0, 0.0, false);
 		c2.putValue(100, 1.0, false);
 		c2.movePosition(100);
-		c2.addObject(&model);
+		c2.addConnection(&model);
 
 		AutomationClip c3(&track);
-		c3.addObject(&model);
+		c3.addConnection(&model);
 		//XXX: Why is this even necessary?
 		c3.clear();
 
@@ -132,7 +132,7 @@ private slots:
 
 		AutomationClip c(&track);
 		c.setProgressionType(AutomationClip::ProgressionType::Linear);
-		c.addObject(&model);
+		c.addConnection(&model);
 
 		c.putValue(0, 0.0, false);
 		c.putValue(100, 1.0, false);
@@ -191,7 +191,7 @@ private slots:
 		c1->setProgressionType(AutomationClip::ProgressionType::Linear);
 		c1->putValue(0, 0.0, false);
 		c1->putValue(10, 1.0, false);
-		c1->addObject(&model);
+		c1->addConnection(&model);
 
 		QCOMPARE(patternStore->automatedValuesAt( 0, patternTrack.patternIndex())[&model], 0.0f);
 		QCOMPARE(patternStore->automatedValuesAt( 5, patternTrack.patternIndex())[&model], 0.5f);
@@ -229,8 +229,8 @@ private slots:
 		FloatModel model;
 		globalClip.setProgressionType(AutomationClip::ProgressionType::Discrete);
 		localClip.setProgressionType(AutomationClip::ProgressionType::Discrete);
-		globalClip.addObject(&model);
-		localClip.addObject(&model);
+		globalClip.addConnection(&model);
+		localClip.addConnection(&model);
 		globalClip.putValue(0, 100.0f, false);
 		localClip.putValue(0, 50.0f, false);
 
