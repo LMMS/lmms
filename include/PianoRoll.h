@@ -246,6 +246,8 @@ protected slots:
 	void fitNoteLengths(bool fill);
 	void reverseNotes();
 	void constrainNoteLengths(bool constrainMax);
+	//! Duplicates selected (or all) notes and places them right after last original note
+	void duplicateNotesOver();
 
 	void changeSnapMode();
 
