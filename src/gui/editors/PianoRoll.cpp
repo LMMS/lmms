@@ -5301,7 +5301,6 @@ PianoRollWindow::PianoRollWindow() :
 	glueAction->setShortcut(keySequence(Qt::SHIFT, Qt::Key_G));
 
 
-
 	auto strumAction = new QAction(embed::getIconPixmap("arp_free"), tr("Strum"), noteToolsButton);
 	connect(strumAction, &QAction::triggered, m_editor, &PianoRoll::setStrumAction);
 	strumAction->setShortcut(keySequence(Qt::SHIFT, Qt::Key_J));
