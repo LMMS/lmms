@@ -136,7 +136,7 @@ OscillatorObject::OscillatorObject( Model * _parent, int _idx ) :
 
 void OscillatorObject::oscUserDefWaveDblClick()
 {
-	auto af = gui::FileDialog::openWaveformFile();
+	auto af = gui::FileDialog::openWaveformFile(m_sampleBuffer->audioFile());
 	if( af != "" )
 	{
 		m_sampleBuffer = SampleBuffer::fromFile(af);
