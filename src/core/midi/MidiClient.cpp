@@ -27,6 +27,8 @@
 
 #include <array>
 
+#include <algorithm>
+
 #include "MidiPort.h"
 
 namespace lmms
@@ -73,10 +75,9 @@ void MidiClient::removePort( MidiPort* port )
 		return;
 	}
 
-	auto it = std::find(m_midiPorts.begin(), m_midiPorts.end(), port);
-	if( it != m_midiPorts.end() )
+	if (auto it = std::ranges::find(m_midiPorts, port); it != m_midiPorts.end())
 	{
-		m_midiPorts.erase( it );
+		m_midiPorts.erase(it);
 	}
 }
 

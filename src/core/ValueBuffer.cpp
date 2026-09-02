@@ -13,7 +13,7 @@ ValueBuffer::ValueBuffer(int length)
 
 void ValueBuffer::fill(float value)
 {
-	std::fill(begin(), end(), value);
+	std::ranges::fill(*this, value);
 }
 
 float ValueBuffer::value(int offset) const

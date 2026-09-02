@@ -207,7 +207,7 @@ std::size_t Lv2ControlBase::controlCount() const {
 
 bool Lv2ControlBase::hasNoteInput() const
 {
-	return std::any_of(m_procs.begin(), m_procs.end(),
+	return std::ranges::any_of(m_procs,
 		[](const auto& c) { return c->hasNoteInput(); });
 }
 
