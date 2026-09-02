@@ -149,10 +149,6 @@ IF(LMMS_BUILD_APPLE)
 	SET(EXTRA_LIBRARIES "-framework CoreMIDI -framework CoreFoundation")
 ENDIF()
 
-if(LMMS_HAVE_OSS AND LMMS_BUILD_OPENBSD)
-    SET(EXTRA_LIBRARIES "-lossaudio")
-endif()
-
 IF(LMMS_BUILD_HAIKU)
 	SET(EXTRA_LIBRARIES "-lnetwork")
 ENDIF()

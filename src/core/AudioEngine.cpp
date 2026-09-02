@@ -40,7 +40,6 @@
 // platform-specific audio-interface-classes
 #include "AudioAlsa.h"
 #include "AudioJack.h"
-#include "AudioOss.h"
 #include "AudioSndio.h"
 #include "AudioPortAudio.h"
 #include "AudioSoundIo.h"
@@ -52,7 +51,6 @@
 #include "MidiAlsaRaw.h"
 #include "MidiAlsaSeq.h"
 #include "MidiJack.h"
-#include "MidiOss.h"
 #include "MidiSndio.h"
 #include "MidiWinMM.h"
 #include "MidiApple.h"
@@ -604,14 +602,6 @@ bool AudioEngine::isAudioDevNameValid(QString name)
 	}
 #endif
 
-
-#ifdef LMMS_HAVE_OSS
-	if (name == AudioOss::name())
-	{
-		return true;
-	}
-#endif
-
 #ifdef LMMS_HAVE_SNDIO
 	if (name == AudioSndio::name())
 	{
@@ -661,13 +651,6 @@ bool AudioEngine::isMidiDevNameValid(QString name)
 
 #ifdef LMMS_HAVE_JACK
 	if (name == MidiJack::name())
-	{
-		return true;
-	}
-#endif
-
-#ifdef LMMS_HAVE_OSS
-	if (name == MidiOss::name())
 	{
 		return true;
 	}
@@ -749,20 +732,6 @@ AudioDevice * AudioEngine::tryAudioDevices()
 		if( success_ful )
 		{
 			m_audioDevName = AudioPulseAudio::name();
-			return dev;
-		}
-		delete dev;
-	}
-#endif
-
-
-#ifdef LMMS_HAVE_OSS
-	if( dev_name == AudioOss::name() || dev_name == "" )
-	{
-		dev = new AudioOss( success_ful, this );
-		if( success_ful )
-		{
-			m_audioDevName = AudioOss::name();
 			return dev;
 		}
 		delete dev;
@@ -892,19 +861,6 @@ MidiClient * AudioEngine::tryMidiClients()
 			return mjack;
 		}
 		delete mjack;
-	}
-#endif
-
-#ifdef LMMS_HAVE_OSS
-	if( client_name == MidiOss::name() || client_name == "" )
-	{
-		auto moss = new MidiOss;
-		if( moss->isRunning() )
-		{
-			m_midiClientName = MidiOss::name();
-			return moss;
-		}
-		delete moss;
 	}
 #endif
 
