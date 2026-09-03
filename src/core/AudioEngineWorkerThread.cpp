@@ -166,14 +166,12 @@ void AudioEngineWorkerThread::run()
 #ifdef LMMS_DEBUG_TRACY
 	static auto id = std::atomic<int>{0};
 
-	// NOTE: The following is a memory leak, but it's recommended by Tracy's
-	//       documentation for dynamic names
-	char* name = new char[16]; // NOLINT
-	std::snprintf(name, 16, "Audio %i", id.fetch_add(1));
-	tracy::SetThreadNameWithHint(name, 1);
+	thread_local auto name = std::array<char, 16>();
+	std::snprintf(name.data(), name.size(), "Audio %i", id.fetch_add(1));
+	tracy::SetThreadNameWithHint(name.data(), 1);
 #endif
 
-	while (m_quit == false)
+	while (!m_quit)
 	{
 		std::unique_lock<LockableBase(std::mutex)> lock{queueReadyMutex};
 		queueReadyWaitCond.wait(lock);
