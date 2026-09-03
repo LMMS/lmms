@@ -25,19 +25,18 @@
 #include "AudioEngineWorkerThread.h"
 
 #include <QDebug>
-#include <QMutex>
-#include <QWaitCondition>
+#include <cstdio> // IWYU pragma: keep
+#include <mutex>
 
 #include "AudioEngine.h"
 #include "Hardware.h"
 #include "ThreadableJob.h"
-
+#include "TracyProfiling.h"
 
 namespace lmms
 {
 
 AudioEngineWorkerThread::JobQueue AudioEngineWorkerThread::globalJobQueue;
-QWaitCondition * AudioEngineWorkerThread::queueReadyWaitCond = nullptr;
 QList<AudioEngineWorkerThread *> AudioEngineWorkerThread::workerThreads;
 
 // implementation of internal JobQueue
@@ -109,12 +108,6 @@ AudioEngineWorkerThread::AudioEngineWorkerThread( AudioEngine* audioEngine ) :
 	QThread( audioEngine ),
 	m_quit( false )
 {
-	// initialize global static data
-	if( queueReadyWaitCond == nullptr )
-	{
-		queueReadyWaitCond = new QWaitCondition;
-	}
-
 	// keep track of all instantiated worker threads - this is used for
 	// processing the last worker thread "inline", see comments in
 	// AudioEngineWorkerThread::startAndWaitForJobs() for details
@@ -145,12 +138,22 @@ void AudioEngineWorkerThread::quit()
 
 void AudioEngineWorkerThread::startAndWaitForJobs()
 {
-	queueReadyWaitCond->wakeAll();
-	// The last worker-thread is never started. Instead it's processed "inline"
-	// i.e. within the global AudioEngine thread. This way we can reduce latencies
-	// that otherwise would be caused by synchronizing with another thread.
-	globalJobQueue.run();
-	globalJobQueue.wait();
+	ZoneScoped;
+	{
+		ZoneScopedN("Notify all");
+		queueReadyWaitCond.notify_all();
+	}
+	{
+		// The last worker-thread is never started. Instead it's processed "inline"
+		// i.e. within the global AudioEngine thread. This way we can reduce latencies
+		// that otherwise would be caused by synchronizing with another thread.
+		ZoneScopedN("Run job queue");
+		globalJobQueue.run();
+	}
+	{
+		ZoneScopedN("Wait for job queue");
+		globalJobQueue.wait();
+	}
 }
 
 
@@ -160,13 +163,20 @@ void AudioEngineWorkerThread::run()
 {
 	disableDenormals();
 
-	QMutex m;
-	while( m_quit == false )
+#ifdef LMMS_DEBUG_TRACY
+	static auto id = std::atomic<int>{0};
+
+	thread_local auto name = std::array<char, 16>();
+	std::snprintf(name.data(), name.size(), "Audio %i", id.fetch_add(1));
+	tracy::SetThreadNameWithHint(name.data(), 1);
+#endif
+
+	while (!m_quit)
 	{
-		m.lock();
-		queueReadyWaitCond->wait( &m );
+		std::unique_lock<LockableBase(std::mutex)> lock{queueReadyMutex};
+		queueReadyWaitCond.wait(lock);
+
 		globalJobQueue.run();
-		m.unlock();
 	}
 }
 

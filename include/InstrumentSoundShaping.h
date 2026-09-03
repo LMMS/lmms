@@ -69,6 +69,7 @@ public:
 	f_cnt_t envFrames( const bool _only_vol = false ) const;
 	f_cnt_t releaseFrames() const;
 
+	// TODO: Remove? (dead code)
 	float volumeLevel( NotePlayHandle * _n, const f_cnt_t _frame );
 
 
