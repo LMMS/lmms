@@ -173,10 +173,9 @@ void AudioEngineWorkerThread::run()
 	tracy::SetThreadNameWithHint(name, 1);
 #endif
 
-	TracyLockable(std::mutex, m);
 	while (m_quit == false)
 	{
-		std::unique_lock<LockableBase(std::mutex)> lock{m};
+		std::unique_lock<LockableBase(std::mutex)> lock{queueReadyMutex};
 		queueReadyWaitCond.wait(lock);
 
 		globalJobQueue.run();
