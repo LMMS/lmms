@@ -108,12 +108,6 @@ AudioEngineWorkerThread::AudioEngineWorkerThread( AudioEngine* audioEngine ) :
 	QThread( audioEngine ),
 	m_quit( false )
 {
-	// initialize global static data
-	if (!queueReadyWaitCond)
-	{
-		queueReadyWaitCond.emplace();
-	}
-
 	// keep track of all instantiated worker threads - this is used for
 	// processing the last worker thread "inline", see comments in
 	// AudioEngineWorkerThread::startAndWaitForJobs() for details
@@ -147,7 +141,7 @@ void AudioEngineWorkerThread::startAndWaitForJobs()
 	ZoneScoped;
 	{
 		ZoneScopedN("Notify all");
-		queueReadyWaitCond->notify_all();
+		queueReadyWaitCond.notify_all();
 	}
 	{
 		// The last worker-thread is never started. Instead it's processed "inline"
@@ -183,7 +177,7 @@ void AudioEngineWorkerThread::run()
 	while (m_quit == false)
 	{
 		std::unique_lock<LockableBase(std::mutex)> lock{m};
-		queueReadyWaitCond->wait(lock);
+		queueReadyWaitCond.wait(lock);
 
 		globalJobQueue.run();
 	}

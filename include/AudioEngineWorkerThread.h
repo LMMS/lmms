@@ -29,7 +29,6 @@
 
 #include <atomic>
 #include <condition_variable>
-#include <optional>
 
 #include "lmmsconfig.h"
 
@@ -118,15 +117,15 @@ private:
 
 #ifdef LMMS_DEBUG_TRACY
 	// Tracy uses a std::mutex wrapper, so it requires std::condition_variable_any
-	static inline std::optional<std::condition_variable_any> queueReadyWaitCond{};
+	static inline std::condition_variable_any queueReadyWaitCond{};
 #else
-	static inline std::optional<std::condition_variable> queueReadyWaitCond{};
+	static inline std::condition_variable queueReadyWaitCond{};
 #endif
 
 	static QList<AudioEngineWorkerThread *> workerThreads;
 
-	volatile bool m_quit;
-} ;
+	std::atomic<bool> m_quit = false;
+};
 
 } // namespace lmms
 
