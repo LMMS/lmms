@@ -56,14 +56,15 @@ public:
 		Bar, //!< draw thick bars
 	};
 
-	/**
-	 * @brief Constructor
-	 * @param _width Pixel width of widget
-	 * @param _height Pixel height of widget
-	 */
-	Graph( QWidget * _parent, Style _style = Style::Linear,
-		int _width = 132,
-		int _height = 104
+	//! @param parent The parent QWidget
+	//! @param style The @ref Style to display this Graph with
+	//! @param width Pixel width of widget
+	//! @param height Pixel height of widget
+	Graph(
+		QWidget* parent,
+		Style style = Style::Linear,
+		int width = 132,
+		int height = 104
 	);
 	~Graph() override = default;
 
@@ -134,14 +135,13 @@ class LMMS_EXPORT graphModel : public Model
 {
 	Q_OBJECT
 public:
-	/**
-	 * @brief Constructor
-	 * @param _min Minimum y value to display
-	 * @param _max Maximum y value to display
-	 * @param _size Number of samples (e.g. x value)
-	 * @param _step Step size on y axis where values snap to, or 0.0f
-	 *   for "no snapping"
-	 */
+	//! @param _min Minimum y value to display
+	//! @param _max Maximum y value to display
+	//! @param _size Number of samples (e.g. x value)
+	//! @param _step Step size on y axis where values snap to, or 0.0f
+	//! for "no snapping"
+	// TODO: @param _parent
+	// TODO: @param _default_constructed
 	graphModel( float _min,
 			float _max,
 			int _size,

@@ -38,10 +38,17 @@ class TabWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	//! @param resizable If true, the widget resizes to fit the size of all tabs
-	//!   If false, all child widget will be cut down to the TabWidget's size
-	TabWidget(const QString& caption, QWidget* parent,
-				bool usePixmap = false, bool resizable = false);
+	//! @param caption Text describing the tab group as a whole
+	//! @param parent The parent widget
+	//! @param usePixmap Whether to enable use of pixmap icons in tabs
+	//! @param resizable If true, the widget resizes to fit the size of all tabs.
+	//! If false, all child widget will be cut down to the TabWidget's size.
+	TabWidget(
+		const QString& caption,
+		QWidget* parent,
+		bool usePixmap = false,
+		bool resizable = false
+	);
 	~TabWidget() override = default;
 
 	void addTab(QWidget* w, const QString& name, const char* pixmap = nullptr, int idx = -1);

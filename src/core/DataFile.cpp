@@ -527,20 +527,6 @@ bool DataFile::copyResources(const QString& resourcesDir)
 
 
 
-/**
- * @brief This recursive method will go through all XML nodes of the DataFile
- *        and check whether any of them have local paths. If they are not on
- *        our list of elements that can have local paths we return true,
- *        indicating that we potentially have plugins with local paths that
- *        would be a security issue. The Song class can then abort loading
- *        this project.
- * @param parent The parent node being iterated. When called
- *        without arguments, this will be an empty element that will be
- *        ignored (since the second parameter will be true).
- * @param firstCall Defaults to true, and indicates to this recursive
- *        method whether this is the first call. If it is it will use the
- *        root element as the parent.
- */
 bool DataFile::hasLocalPlugins(QDomElement parent /* = QDomElement()*/, bool firstCall /* = true*/) const
 {
 	// If this is the first iteration of the recursion we use the root element
@@ -1804,11 +1790,6 @@ void DataFile::upgrade_fixCMTDelays()
 }
 
 
-/** \brief Note range has been extended to match MIDI specification
- *
- * The non-standard note range previously affected all MIDI-based instruments
- * except OpulenZ, and made them sound an octave lower than they should (#1857).
- */
 void DataFile::upgrade_extendedNoteRange()
 {
 	auto root = documentElement();
@@ -1818,11 +1799,6 @@ void DataFile::upgrade_extendedNoteRange()
 }
 
 
-/** \brief TripleOscillator switched to using high-quality, alias-free oscillators by default
- *
- * Older projects were made without this feature and would sound differently if loaded
- * with the new default setting. This upgrade routine preserves their old behavior.
- */
 void DataFile::upgrade_defaultTripleOscillatorHQ()
 {
 	QDomNodeList tripleoscillators = elementsByTagName("tripleoscillator");
@@ -2011,8 +1987,6 @@ void DataFile::upgrade_loopsRename()
 	mapSrcAttributeInElementsWithResources(namesToNamesWithBPMsMap);
 }
 
-//! Update MIDI CC indexes, so that they are counted from 0. Older releases of LMMS
-//! count the CCs from 1.
 void DataFile::upgrade_midiCCIndexing()
 {
 	static constexpr std::array attributesToUpdate{"inputcontroller", "outputcontroller"};
