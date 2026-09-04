@@ -70,11 +70,12 @@ static thread_local bool s_renderingThread = false;
 AudioEngine::AudioEngine(bool renderOnly)
 	: m_renderOnly(renderOnly)
 	, m_framesPerAudioBuffer(std::clamp(
-		  static_cast<f_cnt_t>(ConfigManager::inst()->value("audioengine", "framesperaudiobuffer").toULongLong()),
-		  MINIMUM_BUFFER_SIZE, MAXIMUM_BUFFER_SIZE))
+		static_cast<f_cnt_t>(ConfigManager::inst()->value("audioengine", "framesperaudiobuffer",
+		QString::number(DEFAULT_BUFFER_SIZE)).toUInt()),
+		MINIMUM_BUFFER_SIZE, MAXIMUM_BUFFER_SIZE))
 	, m_framesPerPeriod(std::min(m_framesPerAudioBuffer, DEFAULT_BUFFER_SIZE))
 	, m_baseSampleRate(
-		  std::max(ConfigManager::inst()->value("audioengine", "samplerate").toInt(), SUPPORTED_SAMPLERATES.front()))
+		std::max(ConfigManager::inst()->value("audioengine", "samplerate").toInt(), SUPPORTED_SAMPLERATES.front()))
 	, m_inputBufferRead(0)
 	, m_inputBufferWrite(1)
 	, m_outputBufferRead(nullptr)
@@ -89,6 +90,7 @@ AudioEngine::AudioEngine(bool renderOnly)
 	, m_audioDevStartFailed(false)
 	, m_profiler()
 	, m_clearSignal(false)
+	, m_sanitizationEnabled(ConfigManager::inst()->value("audioengine", "sanitizemix", "1").toInt())
 {
 	for( int i = 0; i < 2; ++i )
 	{
@@ -678,7 +680,7 @@ bool AudioEngine::isMidiDevNameValid(QString name)
 	}
 #endif
 
-#ifdef LMMS_BUILD_WIN32
+#ifdef LMMS_HAVE_WINMM
 	if (name == MidiWinMM::name())
 	{
 		return true;
@@ -919,7 +921,7 @@ MidiClient * AudioEngine::tryMidiClients()
 	}
 #endif
 
-#ifdef LMMS_BUILD_WIN32
+#ifdef LMMS_HAVE_WINMM
 	if( client_name == MidiWinMM::name() || client_name == "" )
 	{
 		MidiWinMM * mwmm = new MidiWinMM;

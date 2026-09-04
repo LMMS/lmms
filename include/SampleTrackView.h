@@ -85,6 +85,7 @@ protected:
 private slots:
 	void assignMixerLine( int channelIndex );
 	void createMixerLine();
+	void corruptStateUpdate();
 
 
 private:

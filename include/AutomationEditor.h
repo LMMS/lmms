@@ -33,6 +33,7 @@
 #include "ComboBoxModel.h"
 #include "Editor.h"
 #include "JournallingObject.h"
+#include "MidiClip.h"
 #include "SampleClip.h"
 #include "TimePos.h"
 #include "LmmsTypes.h"
@@ -43,9 +44,6 @@ class QScrollBar;
 
 namespace lmms
 {
-
-class MidiClip;
-
 namespace gui
 {
 
@@ -162,6 +160,8 @@ protected slots:
 	void zoomingXChanged();
 	void zoomingYChanged();
 
+	void updateYDelta();
+
 	/// Updates the clip's quantization using the current user selected value.
 	void setQuantization();
 
@@ -230,8 +230,9 @@ private:
 	float m_bottomLevel;
 	float m_topLevel;
 
-	MidiClip* m_ghostNotes = nullptr;
-	QPointer<SampleClip> m_ghostSample = nullptr; // QPointer to set to nullptr on deletion
+	// QPointers to set to nullptr on deletion
+	QPointer<MidiClip> m_ghostNotes = nullptr; 
+	QPointer<SampleClip> m_ghostSample = nullptr;
 	bool m_renderSample = false;
 
 	void centerTopBottomScroll();
@@ -252,7 +253,7 @@ private:
 	tick_t m_drawLastTick;
 
 	int m_ppb;
-	int m_y_delta;
+	float m_y_delta;
 	bool m_y_auto;
 
 	// Time position (key) of automation node whose outValue is being dragged
