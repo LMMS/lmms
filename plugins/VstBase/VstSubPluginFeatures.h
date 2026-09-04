@@ -29,23 +29,26 @@
 
 
 #include "Plugin.h"
+#include "vstbase_export.h"
 
 namespace lmms
 {
 
 
-class VstSubPluginFeatures : public Plugin::Descriptor::SubPluginFeatures
+class VSTBASE_EXPORT VstSubPluginFeatures : public Plugin::Descriptor::SubPluginFeatures
 {
 public:
-	VstSubPluginFeatures( Plugin::Type _type );
+	VstSubPluginFeatures(Plugin::Type type);
 
-	void fillDescriptionWidget( QWidget * _parent,
-											const Key * _key ) const override;
+	void fillDescriptionWidget(QWidget* parent, const Key* key) const override;
 
-	void listSubPluginKeys( const Plugin::Descriptor * _desc,
-											KeyList & _kl ) const override;
+	void listSubPluginKeys(const Plugin::Descriptor* desc, KeyList& key) const override;
+
+	QString displayName(const Key& key) const override;
+	QString description(const Key& key) const override;
+
 private:
-	void addPluginsFromDir(QStringList* filenames,  QString path) const;
+	Plugin::Type m_pluginType;
 } ;
 
 
