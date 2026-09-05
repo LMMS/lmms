@@ -158,7 +158,7 @@ using SweepOsc = KickerOsc<DspEffectLibrary::MonoToStereoAdaptor<DistFX>>;
 void KickerInstrument::playNote( NotePlayHandle * _n,
 						SampleFrame* _working_buffer )
 {
-	const fpp_t frames = _n->framesLeftForCurrentPeriod();
+	const f_cnt_t frames = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();
 	const float decfr = m_decayModel.value() * Engine::audioEngine()->outputSampleRate() / 1000.0f;
 	const f_cnt_t tfp = _n->totalFramesPlayed();
@@ -193,11 +193,11 @@ void KickerInstrument::playNote( NotePlayHandle * _n,
 
 		// This can be considered the current release frame in the "global" context of the release.
 		// We need it with the desired number of release frames to compute the linear decay.
-		fpp_t currentReleaseFrame = _n->releaseFramesDone();
+		f_cnt_t currentReleaseFrame = _n->releaseFramesDone();
 
 		// Start applying the release at the correct frame
 		const float framesBeforeRelease = _n->framesBeforeRelease();
-		for (fpp_t f = framesBeforeRelease; f < frames; ++f, ++currentReleaseFrame)
+		for (f_cnt_t f = framesBeforeRelease; f < frames; ++f, ++currentReleaseFrame)
 		{
 			const bool releaseStillActive = currentReleaseFrame < desired;
 			const float attenuation = releaseStillActive ? (1.0f - (currentReleaseFrame / desired)) : 0.f;

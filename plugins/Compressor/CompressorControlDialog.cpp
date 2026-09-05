@@ -195,7 +195,7 @@ CompressorControlDialog::CompressorControlDialog(CompressorControls* controls) :
 	peakButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("peak_unsel"));
 	peakButton->setToolTip(tr("Use absolute value of the input"));
 
-	rmsPeakGroup = new automatableButtonGroup(this);
+	rmsPeakGroup = new AutomatableButtonGroup(this);
 	rmsPeakGroup->addButton(rmsButton);
 	rmsPeakGroup->addButton(peakButton);
 	rmsPeakGroup->setModel(&controls->m_peakmodeModel);
@@ -210,7 +210,7 @@ CompressorControlDialog::CompressorControlDialog(CompressorControls* controls) :
 	midSideButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("midside_unsel"));
 	midSideButton->setToolTip(tr("Compress mid and side audio"));
 
-	leftRightMidSideGroup = new automatableButtonGroup(this);
+	leftRightMidSideGroup = new AutomatableButtonGroup(this);
 	leftRightMidSideGroup->addButton(leftRightButton);
 	leftRightMidSideGroup->addButton(midSideButton);
 	leftRightMidSideGroup->setModel(&controls->m_midsideModel);
@@ -225,7 +225,7 @@ CompressorControlDialog::CompressorControlDialog(CompressorControls* controls) :
 	limitButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("limiter_unsel"));
 	limitButton->setToolTip(tr("Set Ratio to infinity (is not guaranteed to limit audio volume)"));
 
-	compressLimitGroup = new automatableButtonGroup(this);
+	compressLimitGroup = new AutomatableButtonGroup(this);
 	compressLimitGroup->addButton(compressButton);
 	compressLimitGroup->addButton(limitButton);
 	compressLimitGroup->setModel(&controls->m_limiterModel);
@@ -255,7 +255,7 @@ CompressorControlDialog::CompressorControlDialog(CompressorControls* controls) :
 	blendButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("blend_unsel"));
 	blendButton->setToolTip(tr("Blend between stereo linking modes"));
 
-	stereoLinkGroup = new automatableButtonGroup(this);
+	stereoLinkGroup = new AutomatableButtonGroup(this);
 	stereoLinkGroup->addButton(unlinkedButton);
 	stereoLinkGroup->addButton(maximumButton);
 	stereoLinkGroup->addButton(averageButton);
@@ -377,7 +377,7 @@ void CompressorControlDialog::updateDisplay()
 		return;
 	}
 
-	if (!m_controls->m_effect->isEnabled() || !m_controls->m_effect->isRunning())
+	if (!m_controls->m_effect->isProcessingAudio())
 	{
 		m_controls->m_effect->m_displayPeak[0] = COMP_NOISE_FLOOR;
 		m_controls->m_effect->m_displayPeak[1] = COMP_NOISE_FLOOR;
@@ -616,7 +616,7 @@ void CompressorControlDialog::paintEvent(QPaintEvent *event)
 	m_p.setOpacity(0.25);
 	m_p.drawPixmap(0, 0, m_kneePixmap);
 	m_p.setOpacity(1);
-	if (m_controls->m_effect->isEnabled() && m_controls->m_effect->isRunning())
+	if (m_controls->m_effect->isProcessingAudio())
 	{
 		m_p.drawPixmap(0, 0, m_kneePixmap2);
 	}

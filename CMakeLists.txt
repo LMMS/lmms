@@ -29,6 +29,11 @@ SET(LMMS_SOURCE_DIR ${CMAKE_SOURCE_DIR})
 # Import of windows.h breaks min()/max()
 ADD_DEFINITIONS(-DNOMINMAX)
 
+# Set symbol visibility
+set(CMAKE_C_VISIBILITY_PRESET hidden)
+set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+set(CMAKE_VISIBILITY_INLINES_HIDDEN ON)
+
 # CMAKE_CXX_IMPLICIT_INCLUDE_DIRECTORIES is not set correctly for MinGW until
 # CMake 3.14.1, so avoid specifying system include directories on affected
 # versions. Normal include directories are safe, since GCC ignores them if they
@@ -47,7 +52,7 @@ include(StaticDependencies)
 
 STRING(TOUPPER          "${CMAKE_PROJECT_NAME}" PROJECT_NAME_UCASE)
 
-SET(PROJECT_YEAR 2025)
+SET(PROJECT_YEAR 2026)
 
 SET(PROJECT_AUTHOR      "LMMS Developers")
 SET(PROJECT_URL         "https://lmms.io")
@@ -107,7 +112,81 @@ option(WANT_DEBUG_GPROF	"Enable gprof profiler" OFF)
 OPTION(BUNDLE_QT_TRANSLATIONS	"Install Qt translation files for LMMS" OFF)
 option(WANT_DEBUG_CPACK "Show detailed logs for packaging commands" OFF)
 option(WANT_CPACK_TARBALL "Request CPack to create a tarball instead of an installer" OFF)
+option(WANT_QT6 "Build with experimental Qt6 support" OFF)
 
+
+# Set the target microarchitecture
+if(TARGET_UARCH_FLAGS)
+	if(TARGET_UARCH AND NOT TARGET_UARCH STREQUAL "custom")
+		message(WARNING "Ignoring TARGET_UARCH since TARGET_UARCH_FLAGS was set")
+	endif()
+
+	set(_default_target_uarch "custom")
+	message(STATUS "Setting target microarchitecture to 'custom'")
+	message(STATUS "Target microarchitecture flags: ${TARGET_UARCH_FLAGS}")
+elseif(TARGET_UARCH)
+	message(STATUS "Setting target microarchitecture to '${TARGET_UARCH}'")
+else()
+	set(_default_target_uarch "none")
+	message(STATUS "Setting target microarchitecture to 'none' since TARGET_UARCH was not set")
+endif()
+
+if(NOT TARGET_UARCH)
+	set(TARGET_UARCH ${_default_target_uarch} CACHE STRING "Choose the target microarchitecture" FORCE)
+	# Accepted options:
+	# - "none":     No microarchitecture is set. Uses the compiler default.
+	# - "official": Targets the baseline microarchitecture of official LMMS releases.
+	# - "custom":   Targets the microarchitecture specified by TARGET_UARCH_FLAGS.
+	# - "native":   Targets the highest microarchitecture level supported by the build machine.
+	set_property(CACHE TARGET_UARCH PROPERTY STRINGS "none" "official" "custom" "native")
+endif()
+
+if(TARGET_UARCH STREQUAL "custom" OR TARGET_UARCH_FLAGS)
+	add_compile_options(${TARGET_UARCH_FLAGS})
+elseif(TARGET_UARCH STREQUAL "none")
+	# Do nothing, use the compiler default
+elseif(TARGET_UARCH STREQUAL "official")
+	if(LMMS_HOST_X86_64)
+		if(MSVC)
+			# MSVC doesn't have /arch:x86-64-v2, but this is pretty close
+			add_compile_options(/arch:SSE4.2)
+		else()
+			add_compile_options(-march=x86-64-v2)
+		endif()
+	elseif(LMMS_HOST_ARM64)
+		if(LMMS_BUILD_WIN64)
+			# Using Windows 11 minimum requirements
+			# https://learn.microsoft.com/en-us/windows-hardware/design/minimum/minimum-hardware-requirements-overview
+			if(MSVC)
+				add_compile_options(/arch:armv8.1)
+			else()
+				add_compile_options(-march=armv8.1-a)
+			endif()
+		elseif(LMMS_BUILD_APPLE)
+			# Chosen for Apple M1 support
+			add_compile_options(-march=armv8.4-a)
+		else()
+			# Chosen for Raspberry Pi 4 support
+			add_compile_options(-march=armv8-a)
+		endif()
+	else()
+		message(WARNING "There are no official releases for the target architecture, so there is no official baseline microarchitecture")
+	endif()
+elseif(TARGET_UARCH STREQUAL "native")
+	if(CMAKE_CROSSCOMPILING)
+		message(FATAL_ERROR "Cannot target native microarchitecture while cross-compiling")
+	endif()
+
+	if(MSVC)
+		include(CheckCPUFeatures)
+		determine_msvc_native_arch(_arch_option)
+		if(NOT "${_arch_option}" STREQUAL "")
+			add_compile_options(${_arch_option})
+		endif()
+	else()
+		add_compile_options(-march=native -mtune=native)
+	endif()
+endif()
 
 IF(LMMS_BUILD_APPLE)
 	# Fix linking on 10.14+. See issue #4762 on github
@@ -126,7 +205,7 @@ ELSE(LMMS_BUILD_APPLE)
 ENDIF(LMMS_BUILD_APPLE)
 
 
-IF(LMMS_BUILD_WIN32)
+IF(LMMS_BUILD_WIN32 OR LMMS_BUILD_CYGWIN)
 	SET(WANT_ALSA OFF)
 	SET(WANT_OSS OFF)
 	SET(WANT_PULSEAUDIO OFF)
@@ -145,18 +224,42 @@ IF(LMMS_BUILD_WIN32)
 	SET(STATUS_SNDIO "<not supported on this platform>")
 	SET(STATUS_WINMM "OK")
 	SET(STATUS_APPLEMIDI "<not supported on this platform>")
-ELSE(LMMS_BUILD_WIN32)
+ELSE()
 	SET(STATUS_WINMM "<not supported on this platform>")
-ENDIF(LMMS_BUILD_WIN32)
+ENDIF()
+
+IF(LMMS_BUILD_OPENBSD)
+	# “don't link deprecated ossaudio on OpenBSD”
+	# https://cvsweb.openbsd.org/checkout/ports/audio/lmms/patches/patch-CMakeLists_txt?rev=1.3
+	SET(WANT_OSS OFF)
+	SET(STATUS_OSS "<not supported on this platform>")
+	# LMMS finds SDL and compiles fine with it enabled, but it doesn't
+	# appear as an option when choosing an audio backend in settings for
+	# some reason. This might be fixable, but the OpenBSD ports
+	# maintainers have also explicitly disabled SDL since 2010-10-28.
+	# https://cvsweb.openbsd.org/checkout/ports/audio/lmms/Makefile?rev=1.1
+	SET(WANT_SDL OFF)
+	SET(STATUS_SDL "<not supported on this platform>")
+	# “explicitly disable pulseaudio in these ports so they won't pick
+	# it up when it becomes available.”
+	# https://cvsweb.openbsd.org/checkout/ports/audio/lmms/Makefile?rev=1.5
+	SET(WANT_PULSEAUDIO OFF)
+	SET(STATUS_PULSEAUDIO "<not supported on this platform>")
+	# OpenBSD does not and never will have WINE, which is necessary for
+	# Windows VST support.
+	# TODO: Is Linux VST support on OpenBSD possible?
+	SET(WANT_VST OFF)
+	SET(STATUS_VST "<not supported on this platform>")
+	SET(STATUS_VST_32 "<not supported on this platform>")
+	SET(STATUS_VST_64 "<not supported on this platform>")
+ENDIF()
 
 SET(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 CHECK_INCLUDE_FILES(pthread.h LMMS_HAVE_PTHREAD_H)
 CHECK_INCLUDE_FILES(semaphore.h LMMS_HAVE_SEMAPHORE_H)
 CHECK_INCLUDE_FILES(unistd.h LMMS_HAVE_UNISTD_H)
-CHECK_INCLUDE_FILES(sys/types.h LMMS_HAVE_SYS_TYPES_H)
 CHECK_INCLUDE_FILES(sys/ipc.h LMMS_HAVE_SYS_IPC_H)
-CHECK_INCLUDE_FILES(sys/time.h LMMS_HAVE_SYS_TIME_H)
 CHECK_INCLUDE_FILES(sys/times.h LMMS_HAVE_SYS_TIMES_H)
 CHECK_INCLUDE_FILES(sys/prctl.h LMMS_HAVE_SYS_PRCTL_H)
 CHECK_INCLUDE_FILES(sched.h LMMS_HAVE_SCHED_H)
@@ -164,41 +267,52 @@ CHECK_INCLUDE_FILES(sys/soundcard.h LMMS_HAVE_SYS_SOUNDCARD_H)
 CHECK_INCLUDE_FILES(soundcard.h LMMS_HAVE_SOUNDCARD_H)
 CHECK_INCLUDE_FILES(fcntl.h LMMS_HAVE_FCNTL_H)
 CHECK_INCLUDE_FILES(sys/ioctl.h LMMS_HAVE_SYS_IOCTL_H)
-CHECK_INCLUDE_FILES(ctype.h LMMS_HAVE_CTYPE_H)
-CHECK_INCLUDE_FILES(string.h LMMS_HAVE_STRING_H)
 CHECK_INCLUDE_FILES(process.h LMMS_HAVE_PROCESS_H)
-CHECK_INCLUDE_FILES(locale.h LMMS_HAVE_LOCALE_H)
 
 include(CheckLibraryExists)
 check_library_exists(rt shm_open "" LMMS_HAVE_LIBRT)
 
 LIST(APPEND CMAKE_PREFIX_PATH "${CMAKE_INSTALL_PREFIX}")
 
-FIND_PACKAGE(Qt5 5.9.0 COMPONENTS Core Gui Widgets Xml Svg REQUIRED)
-FIND_PACKAGE(Qt5 COMPONENTS LinguistTools QUIET)
+if(WANT_QT6)
+	set(QT_VERSION_MAJOR 6)
+	if(MSVC)
+		set(LMMS_QT_MIN_VERSION 6.8.0)
+	else()
+		set(LMMS_QT_MIN_VERSION 6.0.0)
+	endif()
+	set(STATUS_QT6 "Enabled")
+else()
+	set(QT_VERSION_MAJOR 5)
+	set(LMMS_QT_MIN_VERSION 5.15.0)
+	set(STATUS_QT6 "Disabled")
+endif()
+
+find_package(Qt${QT_VERSION_MAJOR} ${LMMS_QT_MIN_VERSION} COMPONENTS Core Gui Widgets Xml Svg REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS LinguistTools QUIET)
 
 include_directories(SYSTEM
-	${Qt5Core_INCLUDE_DIRS}
-	${Qt5Gui_INCLUDE_DIRS}
-	${Qt5Widgets_INCLUDE_DIRS}
-	${Qt5Xml_INCLUDE_DIRS}
+	${Qt${QT_VERSION_MAJOR}Core_INCLUDE_DIRS}
+	${Qt${QT_VERSION_MAJOR}Gui_INCLUDE_DIRS}
+	${Qt${QT_VERSION_MAJOR}Widgets_INCLUDE_DIRS}
+	${Qt${QT_VERSION_MAJOR}Xml_INCLUDE_DIRS}
 )
 
-SET(QT_LIBRARIES
-	Qt5::Core
-	Qt5::Gui
-	Qt5::Widgets
-	Qt5::Xml
-	Qt5::Svg
+set(QT_LIBRARIES
+	Qt${QT_VERSION_MAJOR}::Core
+	Qt${QT_VERSION_MAJOR}::Gui
+	Qt${QT_VERSION_MAJOR}::Widgets
+	Qt${QT_VERSION_MAJOR}::Xml
+	Qt${QT_VERSION_MAJOR}::Svg
 )
 
-IF(LMMS_BUILD_LINUX AND WANT_VST)
+IF(LMMS_BUILD_LINUX AND WANT_VST AND NOT WANT_QT6)
     FIND_PACKAGE(Qt5 COMPONENTS X11Extras REQUIRED)
     LIST(APPEND QT_LIBRARIES Qt5::X11Extras)
 ENDIF()
 
-# Resolve Qt5::qmake to full path for use in packaging scripts
-GET_TARGET_PROPERTY(QT_QMAKE_EXECUTABLE "${Qt5Core_QMAKE_EXECUTABLE}" IMPORTED_LOCATION)
+# Resolve qmake to full path for use in packaging scripts
+get_target_property(QT_QMAKE_EXECUTABLE Qt${QT_VERSION_MAJOR}::qmake IMPORTED_LOCATION)
 
 # Find the location of Qt translation files
 execute_process(COMMAND ${QT_QMAKE_EXECUTABLE} -query QT_INSTALL_TRANSLATIONS
@@ -211,8 +325,8 @@ IF(EXISTS "${QT_TRANSLATIONS_DIR}")
 	ADD_DEFINITIONS("-DQT_TRANSLATIONS_DIR=\"${QT_TRANSLATIONS_DIR}\"")
 ENDIF()
 
-FIND_PACKAGE(Qt5Test)
-SET(QT_QTTEST_LIBRARY Qt5::Test)
+FIND_PACKAGE(Qt${QT_VERSION_MAJOR}Test)
+SET(QT_QTTEST_LIBRARY Qt${QT_VERSION_MAJOR}::Test)
 
 # check for libsndfile
 FIND_PACKAGE(SndFile REQUIRED)
@@ -242,23 +356,12 @@ endif()
 find_package(Perl)
 
 if(WANT_LV2)
-	if(PKG_CONFIG_FOUND)
-		pkg_check_modules(LV2 lv2)
-	endif()
-
 	find_package(Lilv)
 	if(Lilv_FOUND)
-		set(LILV_LIBRARIES Lilv::lilv)
-	endif()
-
-	# Ensure both dependencies are found
-	if(NOT LV2_FOUND)
-		set(STATUS_LV2 "not found, install lv2 or set PKG_CONFIG_PATH appropriately")
-	elseif(NOT Lilv_FOUND)
-		set(STATUS_LV2 "not found, install lilv or set PKG_CONFIG_PATH appropriately")
-	else()
 		set(LMMS_HAVE_LV2 TRUE)
 		set(STATUS_LV2 "OK")
+	else()
+		set(STATUS_LV2 "not found, install lilv or set PKG_CONFIG_PATH appropriately")
 	endif()
 else()
 	set(STATUS_LV2 "not built as requested")
@@ -369,7 +472,7 @@ IF(WANT_STK)
 		SET(STATUS_STK "OK")
 	ELSE(STK_FOUND)
 		SET(STK_INCLUDE_DIR "")
-		SET(STATUS_STK "not found, please install libstk0-dev (or similar) "
+		SET(STATUS_STK "not found, please install libstk-dev or libstk0-dev (or similar)"
 			"if you require the Mallets instrument")
 	ENDIF(STK_FOUND)
 ENDIF(WANT_STK)
@@ -596,6 +699,9 @@ if(WANT_VST)
 	else()
 		set(STATUS_VST "No hosts selected and available")
 	endif()
+	if(WINE_ASLR_ENABLED)
+		set(STATUS_VST_64 "${STATUS_VST_64}\n\tWARNING: You are using wine ${WINE_VERSION} which cannot disable ASLR, please consider upgrading to wine 10.14 or higher.  ASLR may cause crashes with older VSTs.")
+	endif()
 endif()
 
 IF(WANT_DEBUG_FPE)
@@ -635,10 +741,10 @@ SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DLMMS_DEBUG")
 SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DLMMS_DEBUG")
 
 if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
-    add_compile_definitions(NDEBUG)
+	add_compile_definitions(NDEBUG)
 	SET(STATUS_ASSERTIONS "Disabled")
 else()
-    remove_definitions(-DNDEBUG)
+	remove_definitions(-DNDEBUG)
 	SET(STATUS_ASSERTIONS "Enabled")
 endif()
 
@@ -665,18 +771,37 @@ LIST(SORT LMMS_INCLUDES)
 # Get list of all committers from git history, ordered by number of commits.
 # The CONTRIBUTORS file is used by AboutDialog. This information can be provided
 # with -DCONTRIBUTORS=/path/to/CONTRIBUTORS instead. For instance, to generate
-# this file for version 1.1.3, the command is:
-# 	git shortlog -sne v1.1.3 | cut -c8-
-FIND_PACKAGE(Git)
-IF(GIT_FOUND AND NOT CONTRIBUTORS)
-	SET(CONTRIBUTORS "${CMAKE_BINARY_DIR}/CONTRIBUTORS")
-	EXECUTE_PROCESS(
-		COMMAND "${GIT_EXECUTABLE}" shortlog -sne
-		COMMAND cut -c8-
-		OUTPUT_FILE "${CONTRIBUTORS}"
-		WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-		TIMEOUT 1)
-ENDIF()
+# this file for version 1.2.2, the command is:
+#   git shortlog -sne v1.2.2 | cut -c8-
+if(NOT CONTRIBUTORS)
+	set(CONTRIBUTORS "${CMAKE_BINARY_DIR}/CONTRIBUTORS")
+	find_package(Git)
+	if(Git_FOUND)
+		# See https://stackoverflow.com/a/73086566/8704745
+		message(STATUS "Using Git to generate the CONTRIBUTORS file")
+		execute_process(
+			COMMAND "${GIT_EXECUTABLE}" log
+			COMMAND "${GIT_EXECUTABLE}" shortlog -sne
+			OUTPUT_VARIABLE _contributors
+			WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+			RESULT_VARIABLE _result
+			ERROR_VARIABLE _error
+			TIMEOUT 5
+		)
+		if(_result EQUAL 0)
+			string(REGEX REPLACE "[0-9\t ]+([^\r\n]+)" "\\1" _contributors "${_contributors}")
+			file(WRITE "${CONTRIBUTORS}" "${_contributors}")
+		else()
+			message(WARNING "Failed to generate the CONTRIBUTORS file, so copying doc/CONTRIBUTORS instead\n${_error}")
+			file(COPY "${CMAKE_SOURCE_DIR}/doc/CONTRIBUTORS" DESTINATION "${CMAKE_BINARY_DIR}")
+		endif()
+	else()
+		message(WARNING "Git was not found, so we'll copy doc/CONTRIBUTORS instead of generating it")
+		file(COPY "${CMAKE_SOURCE_DIR}/doc/CONTRIBUTORS" DESTINATION "${CMAKE_BINARY_DIR}")
+	endif()
+else()
+	message(STATUS "A CONTRIBUTORS file was provided, so we'll use that instead of generating it")
+endif()
 
 # we somehow have to make LMMS-binary depend on MOC-files
 ADD_FILE_DEPENDENCIES("${CMAKE_BINARY_DIR}/lmmsconfig.h")
@@ -741,25 +866,9 @@ ADD_SUBDIRECTORY(src)
 ADD_SUBDIRECTORY(plugins)
 ADD_SUBDIRECTORY(tests)
 ADD_SUBDIRECTORY(data)
-ADD_SUBDIRECTORY(doc)
 
 # install tasks
 ADD_SUBDIRECTORY(cmake/install)
-
-FIND_PACKAGE(UnixCommands)
-IF(GZIP)
-	ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_BINARY_DIR}/lmms.1.gz"
-					COMMAND ${GZIP} -c ${CMAKE_SOURCE_DIR}/doc/lmms.1 > ${CMAKE_BINARY_DIR}/lmms.1.gz
-					DEPENDS "${CMAKE_SOURCE_DIR}/doc/lmms.1"
-					COMMENT "Generating lmms.1.gz"
-					VERBATIM)
-
-
-	ADD_CUSTOM_TARGET(manpage ALL
-					DEPENDS "${CMAKE_BINARY_DIR}/lmms.1.gz")
-ELSEIF(UNIX)
-	MESSAGE(FATAL_ERROR "Can't find gzip required for generating lmms.1.gz")
-ENDIF()
 
 # install headers
 
@@ -776,7 +885,7 @@ ENDIF(LMMS_BUILD_LINUX)
 #
 ADD_CUSTOM_TARGET(distclean
 			COMMAND make clean
-			COMMAND rm -rf `find -name cmake_install.cmake` `find -name Makefile` `find -type d -name CMakeFiles` CMakeCache.txt lmmsconfig.h lmms.1.gz)
+			COMMAND rm -rf `find -name cmake_install.cmake` `find -name Makefile` `find -type d -name CMakeFiles` CMakeCache.txt lmmsconfig.h)
 
 #
 # add tarball-target
@@ -875,6 +984,7 @@ MESSAGE(
 "* Debug packaging commands          : ${STATUS_DEBUG_CPACK}\n"
 "* Profile using GNU profiler        : ${STATUS_GPROF}\n"
 "* Debug assertions                  : ${STATUS_ASSERTIONS}\n"
+"* Experimental Qt6 support          : ${STATUS_QT6}\n"
 )
 
 MESSAGE(

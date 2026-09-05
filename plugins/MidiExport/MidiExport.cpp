@@ -27,7 +27,6 @@
 
 #include "MidiExport.h"
 
-#include "Engine.h"
 #include "TrackContainer.h"
 #include "DataFile.h"
 #include "InstrumentTrack.h"

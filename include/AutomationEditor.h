@@ -26,7 +26,6 @@
 #ifndef LMMS_GUI_AUTOMATION_EDITOR_H
 #define LMMS_GUI_AUTOMATION_EDITOR_H
 
-#include <QPushButton>
 #include <QWidget>
 #include <array>
 
@@ -40,20 +39,16 @@
 #include "LmmsTypes.h"
 #include "SampleThumbnail.h"
 
-class QPainter;
-class QPixmap;
+class QPushButton;
 class QScrollBar;
 
 namespace lmms
 {
-
-class NotePlayHandle;
-
 namespace gui
 {
 
-class Knob;
 class ComboBox;
+class Knob;
 class TimeLineWidget;
 
 
@@ -160,10 +155,12 @@ protected slots:
 	void setProgressionType(int type);
 	void setTension();
 
-	void updatePosition( const lmms::TimePos & t );
+	void updatePosition();
 
 	void zoomingXChanged();
 	void zoomingYChanged();
+
+	void updateYDelta();
 
 	/// Updates the clip's quantization using the current user selected value.
 	void setQuantization();
@@ -233,8 +230,9 @@ private:
 	float m_bottomLevel;
 	float m_topLevel;
 
-	MidiClip* m_ghostNotes = nullptr;
-	QPointer<SampleClip> m_ghostSample = nullptr; // QPointer to set to nullptr on deletion
+	// QPointers to set to nullptr on deletion
+	QPointer<MidiClip> m_ghostNotes = nullptr; 
+	QPointer<SampleClip> m_ghostSample = nullptr;
 	bool m_renderSample = false;
 
 	void centerTopBottomScroll();
@@ -255,7 +253,7 @@ private:
 	tick_t m_drawLastTick;
 
 	int m_ppb;
-	int m_y_delta;
+	float m_y_delta;
 	bool m_y_auto;
 
 	// Time position (key) of automation node whose outValue is being dragged
@@ -301,7 +299,6 @@ private:
 
 signals:
 	void currentClipChanged();
-	void positionChanged( const lmms::TimePos & );
 } ;
 
 
@@ -350,7 +347,7 @@ private slots:
 	void setProgressionType(int progType);
 	/**
 	 * @brief The Edit Tangent edit mode should only be available for
-	 * Cubic Hermite progressions, so this method is responsable for disabling it
+	 * Cubic Hermite progressions, so this method is responsible for disabling it
 	 * for other edit modes and reenabling it when it changes back to the Edit Tangent
 	 * mode.
 	 */

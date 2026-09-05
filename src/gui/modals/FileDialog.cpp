@@ -30,6 +30,8 @@
 #include <QStringList>
 
 #include "ConfigManager.h"
+#include "PathUtil.h"
+#include "SampleDecoder.h"
 #include "FileDialog.h"
 
 namespace lmms::gui
@@ -40,10 +42,7 @@ FileDialog::FileDialog( QWidget *parent, const QString &caption,
 					   const QString &directory, const QString &filter ) :
 	QFileDialog( parent, caption, directory, filter )
 {
-#if QT_VERSION > 0x050200
 	setOption( QFileDialog::DontUseCustomDirectoryIcons );
-#endif
-
 	setOption( QFileDialog::DontUseNativeDialog );
 
 #ifdef LMMS_BUILD_LINUX
@@ -143,6 +142,58 @@ void FileDialog::clearSelection()
 	auto view = findChild<QListView*>();
 	Q_ASSERT( view );
 	view->clearSelection();
+}
+
+QString FileDialog::openAudioFile(const QString& previousFile)
+{
+	auto openFileDialog = FileDialog(nullptr, tr("Open audio file"));
+	auto dir = !previousFile.isEmpty() ? QFileInfo(PathUtil::toAbsolute(previousFile)).absolutePath() : ConfigManager::inst()->userSamplesDir();
+
+	// change dir to position of previously opened file
+	openFileDialog.setDirectory(dir);
+	openFileDialog.setFileMode(QFileDialog::ExistingFiles);
+
+	// set filters
+	auto fileTypes = QStringList{};
+	auto allFileTypes = QStringList{};
+	auto nameFilters = QStringList{};
+	const auto& supportedAudioTypes = SampleDecoder::supportedAudioTypes();
+
+	for (const auto& audioType : supportedAudioTypes)
+	{
+		const auto name = QString::fromStdString(audioType.name);
+		const auto extension = QString::fromStdString(audioType.extension);
+		const auto displayExtension = QString{"*.%1"}.arg(extension);
+		fileTypes.append(QString{"%1 (%2)"}.arg(tr("%1 files").arg(name), displayExtension));
+		allFileTypes.append(displayExtension);
+	}
+
+	nameFilters.append(QString{"%1 (%2)"}.arg(tr("All audio files"), allFileTypes.join(" ")));
+	nameFilters.append(fileTypes);
+	nameFilters.append(QString("%1 (*)").arg(tr("Other files")));
+
+	openFileDialog.setNameFilters(nameFilters);
+
+	if (!previousFile.isEmpty())
+	{
+		// select previously opened file
+		openFileDialog.selectFile(QFileInfo{previousFile}.fileName());
+	}
+
+	if (openFileDialog.exec() == QDialog::Accepted)
+	{
+		if (openFileDialog.selectedFiles().isEmpty()) { return ""; }
+
+		return PathUtil::toShortestRelative(openFileDialog.selectedFiles()[0]);
+	}
+
+	return "";
+}
+
+QString FileDialog::openWaveformFile(const QString& previousFile)
+{
+	return openAudioFile(
+		previousFile.isEmpty() ? ConfigManager::inst()->factorySamplesDir() + "waveforms/10saw.flac" : previousFile);
 }
 
 

@@ -1,5 +1,5 @@
 /*
- * Note.h - declaration of class note which contains all informations about a
+ * Note.h - declaration of class note which contains all information about a
  *          note + definitions of several constants and enums
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
@@ -41,6 +41,7 @@ namespace lmms
 
 
 class DetuningHelper;
+class AutomationClip;
 
 
 enum class Key : int
@@ -123,6 +124,13 @@ public:
 	Type type() const { return m_type; }
 	inline void setType(Type t) { m_type = t; }
 
+	//! Types of per-note automation. Currently only detuning/pitch bending is supported.
+	enum class ParameterType
+	{
+		Detuning = 0
+	};
+	AutomationClip* parameterCurve(ParameterType paramType);
+
 	// used by GUI
 	inline void setSelected( const bool selected ) { m_selected = selected; }
 	inline void setOldKey( const int oldKey ) { m_oldKey = oldKey; }
@@ -148,7 +156,7 @@ public:
 
 	static inline bool lessThan( const Note * lhs, const Note * rhs )
 	{
-		// function to compare two notes - must be called explictly when
+		// function to compare two notes - must be called explicitly when
 		// using qSort
 		if( (int)( *lhs ).pos() < (int)( *rhs ).pos() )
 		{

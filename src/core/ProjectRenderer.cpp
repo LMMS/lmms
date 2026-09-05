@@ -75,18 +75,12 @@ const std::array<ProjectRenderer::FileEncodeDevice, 5> ProjectRenderer::fileEnco
 
 } ;
 
-
-
-
-ProjectRenderer::ProjectRenderer( const AudioEngine::qualitySettings & qualitySettings,
-					const OutputSettings & outputSettings,
-					ExportFileFormat exportFileFormat,
-					const QString & outputFilename ) :
-	QThread( Engine::audioEngine() ),
-	m_fileDev( nullptr ),
-	m_qualitySettings( qualitySettings ),
-	m_progress( 0 ),
-	m_abort( false )
+ProjectRenderer::ProjectRenderer(
+	const OutputSettings& outputSettings, ExportFileFormat exportFileFormat, const QString& outputFilename)
+	: QThread(Engine::audioEngine())
+	, m_fileDev(nullptr)
+	, m_progress(0)
+	, m_abort(false)
 {
 	AudioFileDeviceInstantiaton audioEncoderFactory = fileEncodeDevices[static_cast<std::size_t>(exportFileFormat)].m_getDevInst;
 
@@ -145,7 +139,7 @@ void ProjectRenderer::startProcessing()
 	{
 		// Have to do audio engine stuff with GUI-thread affinity in order to
 		// make slots connected to sampleRateChanged()-signals being called immediately.
-		Engine::audioEngine()->setAudioDevice( m_fileDev, m_qualitySettings, false, false );
+		Engine::audioEngine()->setAudioDevice(m_fileDev, false);
 
 		start(
 #ifndef LMMS_BUILD_WIN32
@@ -163,17 +157,19 @@ void ProjectRenderer::run()
 
 	Engine::getSong()->startExport();
 	// Skip first empty buffer.
-	Engine::audioEngine()->nextBuffer();
+	Engine::audioEngine()->renderNextPeriod();
 
 	m_progress = 0;
 
 	// Now start processing
-	Engine::audioEngine()->startProcessing(false);
+	Engine::audioEngine()->startProcessing();
 
 	// Continually track and emit progress percentage to listeners.
 	while (!Engine::getSong()->isExportDone() && !m_abort)
 	{
-		m_fileDev->processNextBuffer();
+		const auto buffer = Engine::audioEngine()->renderNextPeriod();
+		m_fileDev->writeBuffer(buffer.data(), buffer.size());
+
 		const int nprog = Engine::getSong()->getExportProgress();
 		if (m_progress != nprog)
 		{

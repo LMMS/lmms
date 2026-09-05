@@ -113,6 +113,22 @@ file(GLOB LADSPA "${APP}/Contents/lib/${lmms}/ladspa/*.so")
 # Inform macdeployqt about remote plugins
 file(GLOB REMOTE_PLUGINS "${APP}/Contents/MacOS/*Remote*")
 
+# Bundle SDL3 if present per https://github.com/libsdl-org/sdl2-compat/issues/611
+# Note, we can't use find_package() from CPack due to missing add_library and friends :(
+# FIXME: Remove when SDL3 is default
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(SDL3 QUIET sdl3)
+if(SDL3_FOUND AND SDL3_LIBRARY_DIRS AND SDL3_LIBRARIES)
+	set(SDL3_FILE_NAME "lib${SDL3_LIBRARIES}.dylib")
+	set(SDL3_RESOLVED_PATH "${SDL3_LIBRARY_DIRS}/${SDL3_FILE_NAME}")
+	if(EXISTS "${SDL3_RESOLVED_PATH}")
+		set(SDL3_BUNDLE_PATH "${APP}/Contents/Frameworks/${SDL3_FILE_NAME}")
+		message(STATUS "Adding SDL3 via PkgConfig: ${SDL3_RESOLVED_PATH} --> ${SDL3_BUNDLE_PATH}")
+		file(COPY "${SDL3_RESOLVED_PATH}" DESTINATION "${APP}/Contents/Frameworks/" FOLLOW_SYMLINK_CHAIN)
+		list(APPEND LIBS "${SDL3_BUNDLE_PATH}")
+	endif()
+endif()
+
 # Collect, sort and dedupe all libraries
 list(APPEND LIBS ${LADSPA})
 list(APPEND LIBS ${REMOTE_PLUGINS})
@@ -162,14 +178,14 @@ execute_process(COMMAND codesign --force --deep --sign - "${APP}"
 	COMMAND_ERROR_IS_FATAL ANY)
 
 # Create DMG
-# appdmg won't allow volume names > 27 char https://github.com/LinusU/node-alias/issues/7
-find_program(APPDMG_BIN appdmg REQUIRED)
-string(SUBSTRING "${CPACK_PROJECT_NAME_UCASE} ${CPACK_PROJECT_VERSION}" 0 27 APPDMG_VOLUME_NAME)
-# We'll configure this file twice (again in MacDeployQt.cmake once we know CPACK_TEMPORARY_INSTALL_DIRECTORY)
-configure_file("${CPACK_CURRENT_SOURCE_DIR}/appdmg.json.in" "${CPACK_CURRENT_BINARY_DIR}/appdmg.json" @ONLY)
+find_program(DMGBUILD_BIN dmgbuild REQUIRED)
+configure_file("${CPACK_CURRENT_SOURCE_DIR}/dmgbuild.py.in" "${CPACK_CURRENT_BINARY_DIR}/dmgbuild.py" @ONLY)
 
-execute_process(COMMAND "${APPDMG_BIN}"
-	"${CPACK_CURRENT_BINARY_DIR}/appdmg.json"
+execute_process(COMMAND "${DMGBUILD_BIN}"
+	-s "${CPACK_CURRENT_BINARY_DIR}/dmgbuild.py"
+	"${CPACK_PROJECT_NAME_UCASE} ${CPACK_PROJECT_VERSION}"
 	"${CPACK_BINARY_DIR}/${CPACK_PACKAGE_FILE_NAME}.dmg"
 	COMMAND_ECHO ${COMMAND_ECHO}
-    COMMAND_ERROR_IS_FATAL ANY)
+	COMMAND_ERROR_IS_FATAL ANY)
+
+message(STATUS "Successfully created ${CPACK_BINARY_DIR}/${CPACK_PACKAGE_FILE_NAME}.dmg")

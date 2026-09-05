@@ -34,7 +34,8 @@ PositionLine::PositionLine(QWidget* parent, Song::PlayMode playMode) :
 	QWidget(parent),
 	m_playMode(playMode),
 	m_hasTailGradient(false),
-	m_lineColor(0, 0, 0, 0)
+	m_lineColor(0, 0, 0, 0),
+	m_recordingColor(255, 71, 87)
 {
 	resize(8, height());
 
@@ -42,10 +43,19 @@ PositionLine::PositionLine(QWidget* parent, Song::PlayMode playMode) :
 	setAttribute(Qt::WA_TransparentForMouseEvents);
 }
 
+void PositionLine::setRecording(bool recording)
+{
+	if (m_isRecording != recording)
+	{
+		m_isRecording = recording;
+		update();
+	}
+}
+
 void PositionLine::paintEvent(QPaintEvent* pe)
 {
 	QPainter p(this);
-	auto c = QColor(m_lineColor);
+	auto c = !m_isRecording ? m_lineColor : m_recordingColor;
 
 	// If width is 1, we don't need a gradient
 	if (width() == 1)

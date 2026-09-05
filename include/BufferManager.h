@@ -37,12 +37,12 @@ class SampleFrame;
 class LMMS_EXPORT BufferManager
 {
 public:
-	static void init( fpp_t fpp );
+	static void init( f_cnt_t fpp );
 	static SampleFrame* acquire();
 	static void release( SampleFrame* buf );
 
 private:
-	static fpp_t s_framesPerPeriod;
+	static f_cnt_t s_framesPerPeriod;
 };
 
 

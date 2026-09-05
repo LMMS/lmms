@@ -30,6 +30,7 @@
 #include <QString>
 #include <QMutex>
 
+#include "AudioBuffer.h"
 #include "PlayHandle.h"
 
 namespace lmms
@@ -58,8 +59,6 @@ public:
 		BoolModel* mutedModel = nullptr);
 	virtual ~AudioBusHandle();
 
-	SampleFrame* buffer() { return m_buffer; }
-
 	// indicate whether JACK & Co should provide output-buffer at ext. port
 	bool extOutputEnabled() const { return m_extOutputEnabled; }
 	void setExtOutputEnabled(bool enabled);
@@ -82,10 +81,13 @@ public:
 	void addPlayHandle(PlayHandle* handle);
 	void removePlayHandle(PlayHandle* handle);
 
+	//! @returns true if the processing outputted corrupted audio (infs/nans).
+	bool isCorrupted() const { return m_corrupted.load(std::memory_order_relaxed); }
+
 private:
 	volatile bool m_bufferUsage;
 
-	SampleFrame* const m_buffer;
+	AudioBuffer m_buffer;
 
 	bool m_extOutputEnabled;
 	mix_ch_t m_nextMixerChannel;
@@ -100,6 +102,8 @@ private:
 	FloatModel* m_volumeModel;
 	FloatModel* m_panningModel;
 	BoolModel* m_mutedModel;
+	
+	std::atomic<bool> m_corrupted = false;
 
 	friend class AudioEngine;
 	friend class AudioEngineWorkerThread;

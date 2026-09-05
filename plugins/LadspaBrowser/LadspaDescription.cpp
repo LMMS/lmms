@@ -30,10 +30,9 @@
 #include <QScrollArea>
 #include <QVBoxLayout>
 
-#include "AudioDevice.h"
-#include "AudioEngine.h"
 #include "Engine.h"
 #include "Ladspa2LMMS.h"
+#include "lmms_constants.h"
 
 
 namespace lmms::gui

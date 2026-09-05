@@ -28,7 +28,6 @@
 #include "AutomatableButton.h"
 
 
-class QPixmap;
 
 
 namespace lmms::gui
@@ -60,6 +59,7 @@ public:
 	}
 
 	void setText( const QString& s );
+	void setLedColor(LedColor color);
 
 	Q_PROPERTY( QString text READ text WRITE setText )
 
@@ -75,7 +75,6 @@ private:
 
 	bool m_legacyMode;
 	
-	void initUi( LedColor _color ); //!< to be called by ctors
 
 	void onTextUpdated(); //!< to be called when you updated @a m_text
 	void paintLegacy(QPaintEvent * p);

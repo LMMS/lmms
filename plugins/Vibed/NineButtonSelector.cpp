@@ -26,12 +26,13 @@
 #include "NineButtonSelector.h"
 
 #include "CaptionMenu.h"
+#include "PixmapButton.h"
 
 namespace lmms::gui
 {
 
 
-NineButtonSelector::NineButtonSelector(std::array<QPixmap, 18> onOffIcons, int defaultButton, int x, int y, QWidget* parent) :
+NineButtonSelector::NineButtonSelector(const std::array<QPixmap, 18>& onOffIcons, int defaultButton, int x, int y, QWidget* parent) :
 	QWidget{parent},
 	IntModelView{new NineButtonSelectorModel{defaultButton, 0, 8, nullptr, QString{}, true}, this}
 {
@@ -40,17 +41,17 @@ NineButtonSelector::NineButtonSelector(std::array<QPixmap, 18> onOffIcons, int d
 
 	for (int i = 0; i < 9; ++i)
 	{
-		m_buttons[i] = std::make_unique<PixmapButton>(this, nullptr);
+		m_buttons[i] = new PixmapButton(this);
 		const int buttonX = 1 + (i % 3) * 17;
 		const int buttonY = 1 + (i / 3) * 17;
 		m_buttons[i]->move(buttonX, buttonY);
 		m_buttons[i]->setActiveGraphic(onOffIcons[i * 2]);
 		m_buttons[i]->setInactiveGraphic(onOffIcons[(i * 2) + 1]);
 		m_buttons[i]->setChecked(false);
-		connect(m_buttons[i].get(), &PixmapButton::clicked, this, [=, this](){ buttonClicked(i); });
+		connect(m_buttons[i], &PixmapButton::clicked, this, [=, this](){ buttonClicked(i); });
 	}
 
-	m_lastBtn = m_buttons[defaultButton].get();
+	m_lastBtn = m_buttons[defaultButton];
 	m_lastBtn->setChecked(true);
 }
 
@@ -75,7 +76,7 @@ void NineButtonSelector::updateButton(int newButton)
 	m_lastBtn->setChecked(false);
 	m_lastBtn->update();
 
-	m_lastBtn = m_buttons[newButton].get();
+	m_lastBtn = m_buttons[newButton];
 	m_lastBtn->setChecked(true);
 	m_lastBtn->update();
 

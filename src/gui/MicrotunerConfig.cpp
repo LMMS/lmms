@@ -64,16 +64,6 @@ MicrotunerConfig::MicrotunerConfig() :
 	m_baseKeyModel(DefaultBaseKey, 0, NumKeys - 1, nullptr, tr("Base key")),
 	m_baseFreqModel(DefaultBaseFreq, 0.1f, 9999.999f, 0.001f, nullptr, tr("Base note frequency"))
 {
-#if QT_VERSION < 0x50C00
-	// Workaround for a bug in Qt versions below 5.12,
-	// where argument-dependent-lookup fails for QFlags operators
-	// declared inside a namepsace.
-	// This affects the Q_DECLARE_OPERATORS_FOR_FLAGS macro in Instrument.h
-	// See also: https://codereview.qt-project.org/c/qt/qtbase/+/225348
-
-	using ::operator|;
-#endif
-
 	setWindowIcon(embed::getIconPixmap("microtuner"));
 	setWindowTitle(tr("Microtuner Configuration"));
 
@@ -202,13 +192,10 @@ MicrotunerConfig::MicrotunerConfig() :
 	this->setLayout(microtunerLayout);
 
 	// Add to the main window and setup fixed size etc.
-	QMdiSubWindow *subWin = getGUI()->mainWindow()->addWindowedWidget(this);
-
+	SubWindow* subWin = getGUI()->mainWindow()->addWindowedWidget(this);
 	subWin->setAttribute(Qt::WA_DeleteOnClose, false);
-	subWin->setMinimumWidth(300);
-	subWin->setMinimumHeight(300);
-	subWin->setMaximumWidth(500);
-	subWin->setMaximumHeight(700);
+	setMinimumSize(300, 300);
+	setMaximumSize(500, 700);
 	subWin->hide();
 
 	// No maximize button
@@ -333,11 +320,7 @@ bool MicrotunerConfig::validateScaleForm()
 	if (name.contains('\n')) {fail(tr("Scale name cannot contain a new-line character")); return false;}
 
 	// check intervals
-	#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
-		QStringList input = m_scaleTextEdit->toPlainText().split('\n', Qt::SkipEmptyParts);
-	#else
-		QStringList input = m_scaleTextEdit->toPlainText().split('\n', QString::SkipEmptyParts);
-	#endif
+	QStringList input = m_scaleTextEdit->toPlainText().split('\n', Qt::SkipEmptyParts);
 	for (auto &line: input)
 	{
 		if (line.isEmpty()) {continue;}
@@ -381,11 +364,7 @@ bool MicrotunerConfig::validateKeymapForm()
 	if (name.contains('\n')) {fail(tr("Keymap name cannot contain a new-line character")); return false;}
 
 	// check key mappings
-	#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
-		QStringList input = m_keymapTextEdit->toPlainText().split('\n', Qt::SkipEmptyParts);
-	#else
-		QStringList input = m_keymapTextEdit->toPlainText().split('\n', QString::SkipEmptyParts);
-	#endif
+	QStringList input = m_keymapTextEdit->toPlainText().split('\n', Qt::SkipEmptyParts);
 	for (auto &line: input)
 	{
 		if (line.isEmpty()) {continue;}
@@ -415,11 +394,7 @@ bool MicrotunerConfig::applyScale()
 	std::vector<Interval> newIntervals;
 	newIntervals.emplace_back(1, 1);
 
-#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
 	QStringList input = m_scaleTextEdit->toPlainText().split('\n', Qt::SkipEmptyParts);
-#else
-	QStringList input = m_scaleTextEdit->toPlainText().split('\n', QString::SkipEmptyParts);
-#endif
 	for (auto &line: input)
 	{
 		if (line.isEmpty()) {continue;}
@@ -461,11 +436,7 @@ bool MicrotunerConfig::applyKeymap()
 
 	std::vector<int> newMap;
 
-#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
 	QStringList input = m_keymapTextEdit->toPlainText().split('\n', Qt::SkipEmptyParts);
-#else
-	QStringList input = m_keymapTextEdit->toPlainText().split('\n', QString::SkipEmptyParts);
-#endif
 	for (auto &line: input)
 	{
 		if (line.isEmpty()) {continue;}
@@ -560,7 +531,7 @@ bool MicrotunerConfig::loadKeymapFromFile()
 		QString line = stream.readLine();
 		if (line != "" && line[0] == '!')
 		{
-			if (line.length() > 1 && line[1] == '!' && i == -7)		// LMMS extension: double "!" occuring before any
+			if (line.length() > 1 && line[1] == '!' && i == -7)		// LMMS extension: double "!" occurring before any
 			{														// value is loaded marks a description field.
 				m_keymapNameEdit->setText(line.mid(2));
 			}
@@ -677,14 +648,6 @@ void MicrotunerConfig::saveSettings(QDomDocument &document, QDomElement &element
 void MicrotunerConfig::loadSettings(const QDomElement &element)
 {
 	MainWindow::restoreWidgetState(this, element);
-}
-
-
-void MicrotunerConfig::closeEvent(QCloseEvent *ce)
-{
-	if (parentWidget()) {parentWidget()->hide();}
-	else {hide();}
-	ce->ignore();
 }
 
 

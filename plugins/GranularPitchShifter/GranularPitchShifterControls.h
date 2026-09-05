@@ -25,6 +25,7 @@
 #ifndef LMMS_GRANULAR_PITCH_SHIFTER_CONTROL_DIALOG_H
 #define LMMS_GRANULAR_PITCH_SHIFTER_CONTROL_DIALOG_H
 
+#include "ComboBoxModel.h"
 #include "EffectControls.h"
 #include "GranularPitchShifterControlDialog.h"
 
@@ -32,11 +33,6 @@ namespace lmms
 {
 
 class GranularPitchShifterEffect;
-
-namespace gui
-{
-class GranularPitchShifterControlDialog;
-}
 
 class GranularPitchShifterControls : public EffectControls
 {

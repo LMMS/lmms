@@ -38,7 +38,7 @@ AudioEngineProfiler::AudioEngineProfiler() :
 
 
 
-void AudioEngineProfiler::finishPeriod( sample_rate_t sampleRate, fpp_t framesPerPeriod )
+void AudioEngineProfiler::finishPeriod( sample_rate_t sampleRate, f_cnt_t framesPerPeriod )
 {
 	// Time taken to process all data and fill the audio buffer.
 	const unsigned int periodElapsed = m_periodTimer.elapsed();

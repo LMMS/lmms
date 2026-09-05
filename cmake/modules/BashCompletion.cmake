@@ -39,7 +39,7 @@ endif()
 set(BASHCOMP_USER_PATH "share/${PROJECT_NAME}/bash-completion/completions")
 
 macro(BASHCOMP_INSTALL SCRIPT_NAME)
-	# Note:  When running from CPack, message(...) will be supressed unless WARNING
+	# Note:  When running from CPack, message(...) will be suppressed unless WARNING
 	if(WIN32)
 		message(STATUS "Bash completion is not supported on this platform.")
 	else()

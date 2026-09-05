@@ -40,7 +40,7 @@ class LinkedModelGroups;
 namespace gui
 {
 
-class Control;
+class Control;  // IWYU pragma: keep
 
 /**
 	@file LinkedModelGroupViews.h

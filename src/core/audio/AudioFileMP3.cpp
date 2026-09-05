@@ -55,7 +55,7 @@ AudioFileMP3::~AudioFileMP3()
 	tearDownEncoder();
 }
 
-void AudioFileMP3::writeBuffer(const SampleFrame* _buf, const fpp_t _frames)
+void AudioFileMP3::writeBuffer(const SampleFrame* _buf, const f_cnt_t _frames)
 {
 	if (_frames < 1)
 	{
@@ -63,7 +63,7 @@ void AudioFileMP3::writeBuffer(const SampleFrame* _buf, const fpp_t _frames)
 	}
 
 	std::vector<float> interleavedDataBuffer(_frames * 2);
-	for (fpp_t i = 0; i < _frames; ++i)
+	for (f_cnt_t i = 0; i < _frames; ++i)
 	{
 		interleavedDataBuffer[2*i] = _buf[i][0];
 		interleavedDataBuffer[2*i + 1] = _buf[i][1];
@@ -117,6 +117,7 @@ bool AudioFileMP3::initEncoder()
 
 	lame_set_VBR(m_lame, vbr_off);
 	lame_set_brate(m_lame, bitRate);
+	lame_set_in_samplerate(m_lame, static_cast<int>(getOutputSettings().getSampleRate()));
 
 	// Add a comment
 	id3tag_init(m_lame);

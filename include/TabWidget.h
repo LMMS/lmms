@@ -48,7 +48,7 @@ public:
 
 	void setActiveTab(int idx);
 
-	int findTabAtPos(const QPoint* pos);
+	int findTabAtPos(const QPoint& pos);
 
 	inline int activeTab() const
 	{

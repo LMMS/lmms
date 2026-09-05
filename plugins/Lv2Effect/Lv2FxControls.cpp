@@ -24,7 +24,6 @@
 
 #include "Lv2FxControls.h"
 
-#include <QDomElement>
 
 #include "Engine.h"
 #include "Lv2Effect.h"

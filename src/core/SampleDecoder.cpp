@@ -25,7 +25,6 @@
 #include "SampleDecoder.h"
 
 #include <QFile>
-#include <QFileInfo>
 #include <QString>
 #include <memory>
 #include <sndfile.h>

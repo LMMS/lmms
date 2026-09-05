@@ -27,13 +27,12 @@
 
 #include <string_view>
 
-#include <QBoxLayout>
 #include <QSizePolicy>
+#include <QVBoxLayout>
 
 #include "EnvelopeGraph.h"
 #include "LfoGraph.h"
 #include "EnvelopeAndLfoParameters.h"
-#include "SampleLoader.h"
 #include "Knob.h"
 #include "LedCheckBox.h"
 #include "DataFile.h"
@@ -54,7 +53,7 @@ EnvelopeAndLfoView::EnvelopeAndLfoView(QWidget * parent) :
 	ModelView(nullptr, this),
 	m_params(nullptr)
 {
-	// Helper lambdas for consistent repeated buiding of certain widgets
+	// Helper lambdas for consistent repeated building of certain widgets
 	auto buildKnob = [&](const QString& label, const QString& hintText)
 	{
 		auto knob = new Knob(KnobType::Bright26, label, this, Knob::LabelRendering::LegacyFixedFontSize);
@@ -149,7 +148,7 @@ EnvelopeAndLfoView::EnvelopeAndLfoView(QWidget * parent) :
 	typesLayout->addWidget(random_lfo_btn);
 	typesLayout->addWidget(m_userLfoBtn);
 
-	m_lfoWaveBtnGrp = new automatableButtonGroup(this);
+	m_lfoWaveBtnGrp = new AutomatableButtonGroup(this);
 	m_lfoWaveBtnGrp->addButton(sin_lfo_btn);
 	m_lfoWaveBtnGrp->addButton(triangle_lfo_btn);
 	m_lfoWaveBtnGrp->addButton(saw_lfo_btn);
@@ -242,7 +241,7 @@ void EnvelopeAndLfoView::dropEvent( QDropEvent * _de )
 	QString value = StringPairDrag::decodeValue( _de );
 	if( type == "samplefile" )
 	{
-		m_params->m_userWave = SampleLoader::createBufferFromFile(value);
+		m_params->m_userWave = SampleBuffer::fromFile(value);
 		m_userLfoBtn->model()->setValue( true );
 		m_params->m_lfoWaveModel.setValue(static_cast<int>(EnvelopeAndLfoParameters::LfoShape::UserDefinedWave));
 		_de->accept();
@@ -254,7 +253,7 @@ void EnvelopeAndLfoView::dropEvent( QDropEvent * _de )
 		auto file = dataFile.content().
 					firstChildElement().firstChildElement().
 					firstChildElement().attribute("src");
-		m_params->m_userWave = SampleLoader::createBufferFromFile(file);
+		m_params->m_userWave = SampleBuffer::fromFile(file);
 		m_userLfoBtn->model()->setValue( true );
 		m_params->m_lfoWaveModel.setValue(static_cast<int>(EnvelopeAndLfoParameters::LfoShape::UserDefinedWave));
 		_de->accept();

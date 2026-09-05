@@ -26,14 +26,13 @@
 #define LMMS_GUI_TRACK_OPERATIONS_WIDGET_H
 
 #include <QWidget>
-#include "AutomatableButton.h"
 
 class QPushButton;
 
 namespace lmms::gui
 {
 
-class PixmapButton;
+class AutomatableButton;
 class TrackGrip;
 class TrackView;
 
@@ -47,7 +46,6 @@ public:
 	TrackGrip* getTrackGrip() const { return m_trackGrip; }
 
 protected:
-	void mousePressEvent( QMouseEvent * me ) override;
 	void paintEvent( QPaintEvent * pe ) override;
 	bool confirmRemoval();
 
@@ -72,7 +70,6 @@ private:
 	QPushButton * m_trackOps;
 	AutomatableButton* m_muteBtn;
 	AutomatableButton* m_soloBtn;
-
 
 	friend class TrackView;
 

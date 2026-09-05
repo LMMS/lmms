@@ -20,7 +20,6 @@
  *
  */
 
-#include <cmath>
 #include "ReverbSC.h"
 
 #include "embed.h"
@@ -42,7 +41,7 @@ Plugin::Descriptor PLUGIN_EXPORT reverbsc_plugin_descriptor =
 	"Paul Batchelor",
 	0x0123,
 	Plugin::Type::Effect,
-	new PluginPixmapLoader( "logo" ),
+	new PixmapLoader("lmms-plugin-logo"),
 	nullptr,
 	nullptr,
 } ;
@@ -74,7 +73,7 @@ ReverbSCEffect::~ReverbSCEffect()
 	sp_destroy(&sp);
 }
 
-Effect::ProcessStatus ReverbSCEffect::processImpl(SampleFrame* buf, const fpp_t frames)
+Effect::ProcessStatus ReverbSCEffect::processImpl(SampleFrame* buf, const f_cnt_t frames)
 {
 	const float d = dryLevel();
 	const float w = wetLevel();
@@ -87,14 +86,14 @@ Effect::ProcessStatus ReverbSCEffect::processImpl(SampleFrame* buf, const fpp_t 
 	ValueBuffer * colorBuf = m_reverbSCControls.m_colorModel.valueBuffer();
 	ValueBuffer * outGainBuf = m_reverbSCControls.m_outputGainModel.valueBuffer();
 
-	for( fpp_t f = 0; f < frames; ++f )
+	for( f_cnt_t f = 0; f < frames; ++f )
 	{
 		auto s = std::array{buf[f][0], buf[f][1]};
 
-		const auto inGain = static_cast<SPFLOAT>(fastPow10f(
-			(inGainBuf ? inGainBuf->values()[f] : m_reverbSCControls.m_inputGainModel.value()) / 20.f));
-		const auto outGain = static_cast<SPFLOAT>(fastPow10f(
-			(outGainBuf ? outGainBuf->values()[f] : m_reverbSCControls.m_outputGainModel.value()) / 20.f));
+		const auto inGain = fastPow10f<SPFLOAT>(
+			(inGainBuf ? inGainBuf->values()[f] : m_reverbSCControls.m_inputGainModel.value()) / 20.f);
+		const auto outGain = fastPow10f<SPFLOAT>(
+			(outGainBuf ? outGainBuf->values()[f] : m_reverbSCControls.m_outputGainModel.value()) / 20.f);
 
 		s[0] *= inGain;
 		s[1] *= inGain;

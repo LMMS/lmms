@@ -156,9 +156,8 @@ TrackView * TrackContainerView::addTrackView( TrackView * _tv )
 {
 	m_trackViews.push_back( _tv );
 	m_scrollLayout->addWidget( _tv );
-	connect( this, SIGNAL( positionChanged( const lmms::TimePos& ) ),
-				_tv->getTrackContentWidget(),
-				SLOT( changePosition( const lmms::TimePos& ) ) );
+	connect(this, &TrackContainerView::positionChanged,
+		_tv->getTrackContentWidget(), &TrackContentWidget::changePosition);
 	realignTracks();
 	return( _tv );
 }
@@ -173,7 +172,7 @@ void TrackContainerView::removeTrackView( TrackView * _tv )
 	{
 		m_trackViews.removeAt( index );
 
-		disconnect( _tv );
+		disconnect(_tv->getTrackContentWidget());
 		m_scrollLayout->removeWidget( _tv );
 
 		realignTracks();
@@ -199,13 +198,11 @@ void TrackContainerView::moveTrackView( TrackView * trackView, int indexTo )
 	PatternTrack::swapPatternTracks( trackView->getTrack(),
 			m_trackViews[indexTo]->getTrack() );
 
+	m_tc->moveTrack(trackView->getTrack(), indexTo);
+
 	m_scrollLayout->removeWidget( trackView );
 	m_scrollLayout->insertWidget( indexTo, trackView );
 
-	Track * track = m_tc->m_tracks[indexFrom];
-
-	m_tc->m_tracks.erase(m_tc->m_tracks.begin() + indexFrom);
-	m_tc->m_tracks.insert(m_tc->m_tracks.begin() + indexTo, track);
 	m_trackViews.move( indexFrom, indexTo );
 
 	realignTracks();

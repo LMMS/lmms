@@ -24,24 +24,24 @@
 
 #include "TrackOperationsWidget.h"
 
-#include <QBoxLayout>
+#include <QCheckBox>
+#include <QHBoxLayout>
 #include <QMenu>
 #include <QMessageBox>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QPushButton>
-#include <QCheckBox>
 
+#include "AutomatableButton.h"
 #include "AutomationClip.h"
 #include "AutomationTrackView.h"
 #include "ColorChooser.h"
 #include "ConfigManager.h"
-#include "DataFile.h"
 #include "embed.h"
 #include "Engine.h"
 #include "InstrumentTrackView.h"
+#include "lmms_math.h"
 #include "KeyboardShortcuts.h"
-#include "PixmapButton.h"
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "Track.h"
@@ -76,7 +76,7 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 	layout->setSpacing(0);
 	layout->setAlignment(Qt::AlignTop);
 
-	m_trackGrip = new TrackGrip(m_trackView->getTrack(), this);
+	m_trackGrip = new TrackGrip(m_trackView, this);
 	layout->addWidget(m_trackGrip);
 
 	// This widget holds the gear icon and the mute and solo
@@ -90,6 +90,7 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 	m_trackOps->setFocusPolicy( Qt::NoFocus );
 	m_trackOps->setMenu( toMenu );
 	m_trackOps->setToolTip(tr("Actions"));
+	m_trackOps->setCursor(Qt::PointingHandCursor);
 
 	m_muteBtn = new AutomatableButton(operationsWidget, tr("Mute"));
 	m_muteBtn->setCheckable(true);
@@ -118,35 +119,6 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 }
 
 
-/*! \brief Respond to trackOperationsWidget mouse events
- *
- *  If it's the left mouse button, and Ctrl is held down, and we're
- *  not a Pattern Editor track, then start a new drag event to
- *  copy this track.
- *
- *  Otherwise, ignore all other events.
- *
- *  \param me The mouse event to respond to.
- */
-void TrackOperationsWidget::mousePressEvent( QMouseEvent * me )
-{
-	if (me->button() == Qt::LeftButton && me->modifiers() & KBD_COPY_MODIFIER &&
-		m_trackView->getTrack()->type() != Track::Type::Pattern)
-	{
-		DataFile dataFile( DataFile::Type::DragNDropData );
-		m_trackView->getTrack()->saveState( dataFile, dataFile.content() );
-		new StringPairDrag( QString( "track_%1" ).arg(
-					static_cast<int>(m_trackView->getTrack()->type()) ),
-			dataFile.toString(), m_trackView->getTrackSettingsWidget()->grab(),
-									this );
-	}
-	else if( me->button() == Qt::LeftButton )
-	{
-		// track-widget (parent-widget) initiates track-move
-		me->ignore();
-	}
-}
-
 
 /*!
  * \brief Repaint the trackOperationsWidget
@@ -174,10 +146,16 @@ bool TrackOperationsWidget::confirmRemoval()
 	QString messageTitleRemoveTrack = tr("Confirm removal");
 	QString askAgainText = tr("Don't ask again");
 	auto askAgainCheckBox = new QCheckBox(askAgainText, nullptr);
-	connect(askAgainCheckBox, &QCheckBox::stateChanged, [](int state){
+	auto onCheckedStateChanged = [](auto state){
 		// Invert button state, if it's checked we *shouldn't* ask again
-		ConfigManager::inst()->setValue("ui", "trackdeletionwarning", state ? "0" : "1");
-	});
+		ConfigManager::inst()->setValue("ui", "trackdeletionwarning", state != Qt::Unchecked ? "0" : "1");
+	};
+
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
+	connect(askAgainCheckBox, &QCheckBox::checkStateChanged, onCheckedStateChanged);
+#else
+	connect(askAgainCheckBox, &QCheckBox::stateChanged, onCheckedStateChanged);
+#endif
 
 	QMessageBox mb;
 	mb.setText(messageRemoveTrack);
@@ -263,7 +241,7 @@ void TrackOperationsWidget::resetTrackColor()
 
 void TrackOperationsWidget::randomizeTrackColor()
 {
-	QColor buffer = ColorChooser::getPalette( ColorChooser::Palette::Track )[ rand() % 48 ];
+	QColor buffer = ColorChooser::getPalette(ColorChooser::Palette::Track)[fastRand(48)];
 	auto track = m_trackView->getTrack();
 	track->addJournalCheckPoint();
 	track->setColor(buffer);

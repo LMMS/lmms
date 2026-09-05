@@ -1,5 +1,5 @@
 /*
- * endian_handling.h - handle endianess
+ * endian_handling.h - handle endianness
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *

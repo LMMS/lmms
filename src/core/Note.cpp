@@ -49,10 +49,6 @@ Note::Note( const TimePos & length, const TimePos & pos,
 	m_pos(pos),
 	m_detuning(std::move(detuning))
 {
-	if (!detuning)
-	{
-		createDetuning();
-	}
 }
 
 
@@ -97,7 +93,10 @@ Note& Note::operator=(const Note& note)
 Note* Note::clone() const
 {
 	Note* newNote = new Note(*this);
-	newNote->m_detuning = std::make_shared<DetuningHelper>(*newNote->m_detuning);
+	if (newNote->m_detuning != nullptr)
+	{
+		newNote->m_detuning = std::make_shared<DetuningHelper>(*newNote->m_detuning);
+	}
 	return newNote;
 }
 
@@ -224,7 +223,20 @@ void Note::loadSettings( const QDomElement & _this )
 }
 
 
-
+AutomationClip* Note::parameterCurve(ParameterType paramType)
+{
+	switch (paramType)
+	{
+	// TODO: In the future, more per-note parameters which can be automated are planned. Perhaps velocity, panning, and/or some other plugin-specific parameter.
+	case ParameterType::Detuning:
+		if (detuning() != nullptr)
+		{
+			return detuning()->automationClip();
+		}
+	default:
+		return nullptr;
+	}
+}
 
 
 void Note::createDetuning()

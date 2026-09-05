@@ -76,14 +76,14 @@ EqAnalyser::~EqAnalyser()
 
 
 
-void EqAnalyser::analyze( SampleFrame* buf, const fpp_t frames )
+void EqAnalyser::analyze( SampleFrame* buf, const f_cnt_t frames )
 {
 	//only analyse if the view is visible
 	if ( m_active )
 	{
 		m_inProgress=true;
 		const int FFT_BUFFER_SIZE = 2048;
-		fpp_t f = 0;
+		f_cnt_t f = 0;
 		if( frames > FFT_BUFFER_SIZE )
 		{
 			m_framesFilledUp = 0;

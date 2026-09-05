@@ -24,17 +24,14 @@
 
 #include "Editor.h"
 
+#include <QAction>
+#include <QShortcut>
+
 #include "DeprecationHelper.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
 #include "Song.h"
-
 #include "embed.h"
-
-#include <QAction>
-#include <QShortcut>
-#include <QCloseEvent>
-
 
 namespace lmms::gui
 {
@@ -73,6 +70,7 @@ DropToolBar * Editor::addDropToolBar(QWidget * parent, Qt::ToolBarArea whereToAd
 
 void Editor::togglePlayStop()
 {
+	s_lastPlayedEditor = this;
 	if (Engine::getSong()->isPlaying())
 		stop();
 	else
@@ -81,6 +79,7 @@ void Editor::togglePlayStop()
 
 void Editor::togglePause()
 {
+	s_lastPlayedEditor = this;
 	Engine::getSong()->togglePause();
 }
 
@@ -90,6 +89,7 @@ void Editor::toggleMaximize()
 }
 
 Editor::Editor(bool record, bool recordAccompany, bool recordStep) :
+	QMainWindow(),
 	m_toolBar(new DropToolBar(this)),
 	m_playAction(nullptr),
 	m_recordAction(nullptr),
@@ -127,8 +127,7 @@ Editor::Editor(bool record, bool recordAccompany, bool recordStep) :
 	createButton(m_stopAction, "stop", tr("Stop (Space)"), SLOT(stop()), "stopButton");
 
 	// Setup shortcuts for actions
-	new QShortcut(QKeySequence(combine(Qt::SHIFT, Qt::Key_Space)), this, SLOT(togglePause()));
-	new QShortcut(QKeySequence(combine(Qt::SHIFT, Qt::Key_F11)), this, SLOT(toggleMaximize()));
+	new QShortcut(keySequence(Qt::SHIFT, Qt::Key_F11), this, SLOT(toggleMaximize()));
 }
 
 QAction *Editor::playAction() const
@@ -136,29 +135,22 @@ QAction *Editor::playAction() const
 	return m_playAction;
 }
 
-void Editor::closeEvent(QCloseEvent * event)
+void Editor::keyPressEvent(QKeyEvent* ke)
 {
-	if( parentWidget() )
-	{
-		parentWidget()->hide();
-	}
-	else
-	{
-		hide();
-	}
-	getGUI()->mainWindow()->refocus();
-	event->ignore();
- }
-
- void Editor::keyPressEvent(QKeyEvent *ke)
- {
 	if (ke->key() == Qt::Key_Space)
 	{
-		togglePlayStop();
+		if (ke->modifiers() & Qt::ShiftModifier)
+		{
+			togglePause();
+		}
+		else
+		{
+			togglePlayStop();
+		}
 		return;
 	}
 	ke->ignore();
- }
+}
 
 DropToolBar::DropToolBar(QWidget* parent) : QToolBar(parent)
 {

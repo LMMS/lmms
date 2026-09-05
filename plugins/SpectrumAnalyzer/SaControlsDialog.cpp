@@ -26,6 +26,7 @@
 
 #include <QGridLayout>
 #include <QLabel>
+#include <QPainterPath>
 #include <QSizePolicy>
 #include <QSplitter>
 #include <QWidget>

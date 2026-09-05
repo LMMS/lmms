@@ -770,7 +770,7 @@ public:
 		{
 			// [ 0 - 0.5 ]
 			const float f = std::clamp(_freq, minFreq(), 20000.0f) * m_sampleRatio;
-			// (Empirical tunning)
+			// (Empirical tuning)
 			m_p = ( 3.6f - 3.2f * f ) * f;
 			m_k = 2.0f * m_p - 1;
 			m_r = _q * std::exp((1 - m_p) * 1.386249f);

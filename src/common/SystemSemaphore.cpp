@@ -23,7 +23,7 @@
 
 #include "SystemSemaphore.h"
 
-#include <limits>
+#include <limits>  // IWYU pragma: keep
 #include <system_error>
 #include <type_traits>
 #include <utility>
