@@ -18,6 +18,7 @@ jobs:
       CCACHE_MAXSIZE: 0
       CCACHE_NOCOMPRESS: 1
       MAKEFLAGS: -j2
+      DEBIAN_FRONTEND: noninteractive
     steps:
       - name: Configure git
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
@@ -41,7 +42,7 @@ jobs:
           sudo gpg --dearmor -o /etc/apt/keyrings/winehq-archive.key -
           sudo wget -NP /etc/apt/sources.list.d/ \
           https://dl.winehq.org/wine-builds/ubuntu/dists/$(lsb_release -cs)/winehq-$(lsb_release -cs).sources
-      - name: Install packages
+      - name: Install system packages
         run: |
           sudo apt-get update -y
           sudo apt-get install -y --no-install-recommends \
@@ -49,6 +50,14 @@ jobs:
           sudo apt-get install -y --install-recommends g++-multilib gcc-multilib winehq-devel wine-devel-dev
           sudo apt-get install -y --install-recommends \
             $(xargs < .github/workflows/deps-ubuntu-24.04-fltk.txt)
+      - name: Cache vcpkg dependencies
+        id: cache-deps
+        uses: actions/cache@v3
+        with:
+          key: vcpkg-linux-x86_64-${{ hashFiles('vcpkg.json') }}
+          restore-keys: |
+            vcpkg-linux-x86_64-
+          path: build/vcpkg_installed
       - name: Cache ccache data
         uses: actions/cache@v3
         with:
@@ -67,11 +76,17 @@ jobs:
           sudo cmake --install fltk/build --prefix /usr
       - name: Configure
         run: |
+          export VCPKG_ROOT=${VCPKG_INSTALLATION_ROOT}
+          echo "VCPKG_ROOT=${VCPKG_ROOT}" >> "$GITHUB_ENV"
           ccache --zero-stats
-          source /opt/qt5*/bin/qt5*-env.sh || true
           cmake -S . \
                 -B build \
+                --toolchain "${VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake" \
+                -DVCPKG_MANIFEST_INSTALL="${{ env.should_install_manifest }}" \
                 $CMAKE_OPTS
+        env:
+          should_install_manifest:
+            ${{ steps.cache-deps.outputs.cache-hit == 'true' && 'NO' || 'YES' }}
       - name: Build
         run: cmake --build build
       - name: Run tests
@@ -109,6 +124,7 @@ jobs:
       CCACHE_NOCOMPRESS: 1
       MAKEFLAGS: -j2
       DEBIAN_FRONTEND: noninteractive
+      VCPKG_OVERLAY_TRIPLETS: cmake/vcpkg-triplets
     steps:
       - name: Configure git
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
@@ -131,6 +147,14 @@ jobs:
             $(xargs < .github/workflows/deps-ubuntu-24.04-gcc.txt)
           sudo apt-get install -y --install-recommends \
             $(xargs < .github/workflows/deps-ubuntu-24.04-fltk.txt)
+      - name: Cache vcpkg dependencies
+        id: cache-deps
+        uses: actions/cache@v3
+        with:
+          key: vcpkg-linux-arm64-${{ hashFiles('vcpkg.json') }}
+          restore-keys: |
+            vcpkg-linux-arm64-
+          path: build/vcpkg_installed
       - name: Cache ccache data
         uses: actions/cache@v3
         with:
@@ -149,10 +173,17 @@ jobs:
           sudo cmake --install fltk/build --prefix /usr
       - name: Configure
         run: |
+          export VCPKG_ROOT=${VCPKG_INSTALLATION_ROOT}
+          echo "VCPKG_ROOT=${VCPKG_ROOT}" >> "$GITHUB_ENV"
           ccache --zero-stats
           cmake -S . \
                 -B build \
+                --toolchain "${VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake" \
+                -DVCPKG_MANIFEST_INSTALL="${{ env.should_install_manifest }}" \
                 $CMAKE_OPTS
+        env:
+          should_install_manifest:
+            ${{ steps.cache-deps.outputs.cache-hit == 'true' && 'NO' || 'YES' }}
       - name: Build
         run: cmake --build build
       - name: Run tests
