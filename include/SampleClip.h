@@ -82,6 +82,11 @@ public:
 	void setIsPlaying(bool isPlaying);
 	void setSampleBuffer(std::shared_ptr<const SampleBuffer> sb);
 
+	bool isEmpty() override
+	{
+		return !m_sample.sampleSize();
+	}
+
 	SampleClip* clone() override
 	{
 		return new SampleClip(*this);

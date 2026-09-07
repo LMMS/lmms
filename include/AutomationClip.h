@@ -103,6 +103,11 @@ public:
 		const bool ignoreSurroundingPoints = true
 	);
 
+	bool isEmpty() override
+	{
+		return m_timeMap.empty();
+	}
+
 	void removeNode(const TimePos & time);
 	void removeNodes(const int tick0, const int tick1);
 

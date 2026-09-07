@@ -42,6 +42,7 @@
 #include "InstrumentTrackView.h"
 #include "lmms_math.h"
 #include "KeyboardShortcuts.h"
+#include "PatternStore.h"
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "Track.h"
@@ -206,6 +207,12 @@ void TrackOperationsWidget::clearTrack()
 }
 
 
+void TrackOperationsWidget::hideTrack()
+{
+	m_trackView->setVisibleForThisPattern(true);
+}
+
+
 /*! \brief Remove this track from the track list
  *
  */
@@ -282,6 +289,10 @@ void TrackOperationsWidget::updateMenu()
 	if( ! m_trackView->trackContainerView()->fixedClips() )
 	{
 		toMenu->addAction( tr( "Clear this track" ), this, SLOT(clearTrack()));
+	}
+	if (m_trackView->getTrack()->trackContainer() == Engine::patternStore())
+	{
+		toMenu->addAction(tr( "Hide this track for current pattern" ), this, SLOT(hideTrack()));
 	}
 	if (QMenu *mixerMenu = m_trackView->createMixerMenu(tr("Channel %1: %2"), tr("Assign to new Mixer Channel")))
 	{

@@ -138,6 +138,9 @@ public:
 
 	void createClipsForPattern(int pattern);
 
+	bool hiddenForPattern(size_t pattern);
+	void setVisibilityForPattern(bool hidden, size_t pattern);
+	void hideForPatternIfEmpty(size_t pattern);
 
 	void insertBar( const TimePos & pos );
 	void removeBar( const TimePos & pos );
@@ -238,6 +241,7 @@ signals:
 	void nameChanged();
 	void clipAdded( lmms::Clip * );
 	void colorChanged();
+	void visibilityChanged();
 } ;
 
 

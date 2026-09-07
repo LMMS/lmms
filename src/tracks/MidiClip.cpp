@@ -451,6 +451,7 @@ void MidiClip::exportToXML(QDomDocument& doc, QDomElement& midiClipElement, bool
 	{
 		midiClipElement.setAttribute("pos", startPosition());
 	}
+	midiClipElement.setAttribute("hidden", isHidden());
 	midiClipElement.setAttribute("muted", isMuted());
 	midiClipElement.setAttribute("steps", m_steps);
 	midiClipElement.setAttribute("len", length());
@@ -489,6 +490,8 @@ void MidiClip::loadSettings( const QDomElement & _this )
 	{
 		movePosition( _this.attribute( "pos" ).toInt() );
 	}
+	setHidden(static_cast<bool>(_this.attribute("hidden").toInt()));
+	
 	if (static_cast<bool>(_this.attribute("muted").toInt()) != isMuted())
 	{
 		toggleMute();
