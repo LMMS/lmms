@@ -132,17 +132,13 @@ void addSimd(float* const* LMMS_RESTRICT dst, const float* const* LMMS_RESTRICT 
 	}
 }
 
-#if LMMS_SIMD_CAN_DISPATCH_FOR(LMMS_CPU_FEATURE_AVX)
 template LMMS_SIMD_DISPATCH_FOR_AVX
 void addSimd<8>(float* const* LMMS_RESTRICT dst, const float* const* LMMS_RESTRICT src,
 	ch_cnt_t channels, f_cnt_t frames) noexcept;
-#endif
 
-#if LMMS_SIMD_CAN_DISPATCH_FOR(LMMS_CPU_FEATURE_AVX512F)
 template LMMS_SIMD_DISPATCH_FOR_AVX512F
 void addSimd<16>(float* const* LMMS_RESTRICT dst, const float* const* LMMS_RESTRICT src,
 	ch_cnt_t channels, f_cnt_t frames) noexcept;
-#endif
 
 LMMS_SIMD_END_DISPATCH_TARGET_IMPL
 #endif // LMMS_HOST_X86_64
@@ -156,10 +152,8 @@ void add(PlanarBufferView<sample_t> dst, PlanarBufferView<const sample_t> src)
 
 	static auto dispatcher = SimdDispatcher {
 			SimdDispatchConfig {
-#if LMMS_SIMD_CAN_DISPATCH_FOR(LMMS_CPU_FEATURE_AVX512F)
+#if defined(LMMS_HOST_X86_64)
 			.avx512f = addSimd<16>,
-#endif
-#if LMMS_SIMD_CAN_DISPATCH_FOR(LMMS_CPU_FEATURE_AVX)
 			.avx     = addSimd<8>,
 #endif
 			.scalar  = addScalar,

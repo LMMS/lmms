@@ -33,37 +33,24 @@
 // Macros for creating dynamic dispatch targets //
 //////////////////////////////////////////////////
 
-//! Only compilers that support __attribute__((target(""))) (i.e. GCC/Clang) are capable of
-//! dispatching to a SIMD target higher than what the rest of LMMS is compiled for.
-//!
-//! That is, Clang/GCC support dynamic dispatch to targets higher than TARGET_UARCH, but
-//! MSVC can only dispatch to targets already supported by TARGET_UARCH. Despite the limitations
-//! of MSVC, dynamic dispatch can still be used to, for example, dispatch to a hand-written
-//! function that uses AVX intrinsics when compiling with /arch:AVX rather than dispatching to
-//! the default scalar target which may not be as performant even with auto-vectorization.
+// NOTE: MSVC does not need the following macros because it allows using any SIMD intrinsics within any
+//       function regardless of whether they are compatible with the /arch compiler flag. GCC and Clang
+//       force programmers to use the "target" attribute to explicitly opt-in, which is safer.
 
 #if defined(DOXYGEN)
 	//! Marks the start of dynamic dispatch target implementations
 #	define LMMS_SIMD_BEGIN_DISPATCH_TARGET_IMPL
 	//! Marks the end of dynamic dispatch target implementations
 #	define LMMS_SIMD_END_DISPATCH_TARGET_IMPL
-	//! @brief Whether it's possible to write a dynamic dispatch implementation targeting a SIMD feature
-	//! @note This is always possible with Clang/GCC, but for other compilers (i.e. MSVC) it depends
-	//!       on the TARGET_UARCH option the LMMS build was configured with.
-#	define LMMS_SIMD_CAN_DISPATCH_FOR(feature)
 #elif defined(__GNUC__) || defined(__clang__)
 #	define LMMS_SIMD_BEGIN_DISPATCH_TARGET_IMPL \
 		_Pragma("GCC diagnostic push") \
 		_Pragma("GCC diagnostic ignored \"-Wpsabi\"")
 #	define LMMS_SIMD_END_DISPATCH_TARGET_IMPL \
 		_Pragma("GCC diagnostic pop")
-#	define LMMS_SIMD_CAN_DISPATCH_FOR(feature) \
-		(((feature) & LMMS_CPU_FEATURE_SIMD_MASK) != 0u)
 #else
 #	define LMMS_SIMD_BEGIN_DISPATCH_TARGET_IMPL
 #	define LMMS_SIMD_END_DISPATCH_TARGET_IMPL
-#	define LMMS_SIMD_CAN_DISPATCH_FOR(feature) \
-		(((feature) & LMMS_CPU_FEATURE_SIMD_MASK) != 0u && LMMS_CPU_SUPPORTS(feature))
 #endif
 
 #if defined(LMMS_HOST_X86_64)
@@ -75,21 +62,11 @@
 #		define LMMS_SIMD_DISPATCH_FOR_AVX2    __attribute__((target("avx2")))
 #		define LMMS_SIMD_DISPATCH_FOR_AVX512F __attribute__((target("avx512f")))
 #	else
-#		if LMMS_SIMD_CAN_DISPATCH_FOR(LMMS_CPU_FEATURE_X86_64_V1)
-#			define LMMS_SIMD_DISPATCH_FOR_SSE2
-#		endif
-#		if LMMS_SIMD_CAN_DISPATCH_FOR(LMMS_CPU_FEATURE_SSE4_2)
-#			define LMMS_SIMD_DISPATCH_FOR_SSE4_2
-#		endif
-#		if LMMS_SIMD_CAN_DISPATCH_FOR(LMMS_CPU_FEATURE_AVX)
-#			define LMMS_SIMD_DISPATCH_FOR_AVX
-#		endif
-#		if LMMS_SIMD_CAN_DISPATCH_FOR(LMMS_CPU_FEATURE_AVX2)
-#			define LMMS_SIMD_DISPATCH_FOR_AVX2
-#		endif
-#		if LMMS_SIMD_CAN_DISPATCH_FOR(LMMS_CPU_FEATURE_AVX512F)
-#			define LMMS_SIMD_DISPATCH_FOR_AVX512F
-#		endif
+#		define LMMS_SIMD_DISPATCH_FOR_SSE2
+#		define LMMS_SIMD_DISPATCH_FOR_SSE4_2
+#		define LMMS_SIMD_DISPATCH_FOR_AVX
+#		define LMMS_SIMD_DISPATCH_FOR_AVX2
+#		define LMMS_SIMD_DISPATCH_FOR_AVX512F
 #	endif
 #elif defined(LMMS_HOST_ARM64)
 #	include <arm_neon.h>
@@ -99,15 +76,9 @@
 #		define LMMS_SIMD_DISPATCH_FOR_SVE     __attribute__((target("+sve")))
 #		define LMMS_SIMD_DISPATCH_FOR_SVE2    __attribute__((target("+sve2")))
 #	else
-#		if LMMS_SIMD_CAN_DISPATCH_FOR(LMMS_CPU_FEATURE_NEON)
-#			define LMMS_SIMD_DISPATCH_FOR_NEON
-#		endif
-#		if LMMS_SIMD_CAN_DISPATCH_FOR(LMMS_CPU_FEATURE_SVE)
-#			define LMMS_SIMD_DISPATCH_FOR_SVE
-#		endif
-#		if LMMS_SIMD_CAN_DISPATCH_FOR(LMMS_CPU_FEATURE_SVE2)
-#			define LMMS_SIMD_DISPATCH_FOR_SVE2
-#		endif
+#		define LMMS_SIMD_DISPATCH_FOR_NEON
+#		define LMMS_SIMD_DISPATCH_FOR_SVE
+#		define LMMS_SIMD_DISPATCH_FOR_SVE2
 #	endif
 #endif
 
