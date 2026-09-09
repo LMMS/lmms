@@ -79,6 +79,15 @@ public:
 
 	static QString probeDevice();
 
+	//! @brief Creates a list of all available devices.
+	//!
+	//! Uses the hints API of ALSA to collect all devices. This also includes plug devices. The reason to collect these
+	//! and not the raw hardware devices (e.g. hw:0,0) is that hardware devices often have a very limited number of
+	//! supported formats, etc. Plugs on the other hand are software components that map all types of formats and inputs
+	//! to the hardware and therefore they are much more flexible and more what we want.
+	//!
+	//! @see Further helpful info at [http://jan.newmarch.name/LinuxSound/Sampled/Alsa](https://web.archive.org/web/20211204221331/http://jan.newmarch.name/LinuxSound/Sampled/Alsa/).
+	//! @return A collection of devices found on the system.
 	static DeviceInfoCollection getAvailableDevices();
 
 private:

@@ -265,7 +265,7 @@ public:
 
 protected:
 	QString currentValueToText() override;
-	QString getDynamicFloatingText(const QString& currentValue) const;
+	QString getDynamicFloatingText(const QString& currentValue) const override;
 	void enterValue() override;
 
 private:

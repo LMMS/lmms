@@ -1,0 +1,9 @@
+window_rect = ((100, 100), (700, 400))
+background = "@CPACK_SOURCE_DIR@/cmake/apple/background.png"
+icon_size = 128
+files = [ "@CPACK_TEMPORARY_INSTALL_DIRECTORY@/@CPACK_PROJECT_NAME_UCASE@.app" ]
+symlinks = { 'Applications': '/Applications' }
+icon_locations = {
+    "@CPACK_PROJECT_NAME_UCASE@.app": (139, 200),
+    'Applications': (568, 200)
+}

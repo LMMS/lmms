@@ -59,8 +59,17 @@ public:
 	float getBaseFreq() const {return m_baseFreq;}
 
 	std::size_t getSize() const {return m_map.size();}
+
+	//! @brief Return scale degree for a given key, based on current map and first/middle/last notes
+	//! @param key MIDI key to be mapped
+	//! @return Scale degree defined by the mapping on success, -1 if key isn't mapped
 	int getDegree(int key) const;
+
+	//! @brief Return octave offset for a given key, based on current map and the middle note
+	//! @param key MIDI key to be mapped
+	//! @return Octave offset defined by the mapping on success, 0 if key isn't mapped
 	int getOctave(int key) const;
+
 	const std::vector<int> &getMap() const {return m_map;}
 
 	void saveSettings(QDomDocument &doc, QDomElement &element) override;
