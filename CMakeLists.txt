@@ -583,21 +583,17 @@ ELSE()
 	SET(STATUS_ZYN "not found, please install fltk")
 ENDIF()
 
-# check for Fluidsynth
-IF(WANT_SF2)
-	find_package(FluidSynth 1.1.7)
+# check for FluidSynth
+if(WANT_SF2)
+	find_package(FluidSynth 2.2.0)
 	if(FluidSynth_FOUND)
-		SET(LMMS_HAVE_FLUIDSYNTH TRUE)
-		if(FluidSynth_VERSION_STRING VERSION_GREATER_EQUAL 2)
-			set(STATUS_FLUIDSYNTH "OK")
-		else()
-			set(STATUS_FLUIDSYNTH "OK (FluidSynth version < 2: per-note panning unsupported)")
-		endif()
+		set(LMMS_HAVE_FLUIDSYNTH TRUE)
+		set(STATUS_FLUIDSYNTH "OK")
 	else()
-		SET(STATUS_FLUIDSYNTH "not found, libfluidsynth-dev (or similar)"
+		set(STATUS_FLUIDSYNTH "not found, libfluidsynth-dev (or similar)"
 			"is highly recommended")
 	endif()
-ENDIF(WANT_SF2)
+endif()
 
 # check for libgig
 If(WANT_GIG)

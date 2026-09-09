@@ -42,7 +42,6 @@
 #include "PathUtil.h"
 #include "PixmapButton.h"
 #include "Song.h"
-#include "fluidsynthshims.h"
 
 #include "PatchesDialog.h"
 #include "LcdSpinBox.h"
@@ -50,10 +49,15 @@
 #include "embed.h"
 #include "plugin_export.h"
 
-#define FLUIDSYNTH_VERSION_HEX ((FLUIDSYNTH_VERSION_MAJOR << 16) \
-	| (FLUIDSYNTH_VERSION_MINOR << 8) \
-	| FLUIDSYNTH_VERSION_MICRO)
-#define USE_NEW_EFFECT_API (FLUIDSYNTH_VERSION_HEX >= 0x020200)
+#define FLUID_REVERB_DEFAULT_ROOMSIZE 0.2f
+#define FLUID_REVERB_DEFAULT_DAMP 0.0f
+#define FLUID_REVERB_DEFAULT_WIDTH 0.5f
+#define FLUID_REVERB_DEFAULT_LEVEL 0.9f
+
+#define FLUID_CHORUS_DEFAULT_N 3
+#define FLUID_CHORUS_DEFAULT_LEVEL 2.0f
+#define FLUID_CHORUS_DEFAULT_SPEED 0.3f
+#define FLUID_CHORUS_DEFAULT_DEPTH 8.0f
 
 namespace lmms
 {
@@ -150,13 +154,10 @@ Sf2Instrument::Sf2Instrument( InstrumentTrack * _instrument_track ) :
 	m_chorusSpeed(FLUID_CHORUS_DEFAULT_SPEED, 0.29f, 5.f, 0.01f, this, tr("Chorus speed")),
 	m_chorusDepth(FLUID_CHORUS_DEFAULT_DEPTH, 0, 46.f, 0.05f, this, tr("Chorus depth"))
 {
-
-
-#if QT_VERSION_CHECK(FLUIDSYNTH_VERSION_MAJOR, FLUIDSYNTH_VERSION_MINOR, FLUIDSYNTH_VERSION_MICRO) >= QT_VERSION_CHECK(1,1,9)
 	// Deactivate all audio drivers in fluidsynth
-	const char *none[] = { nullptr };
-	fluid_audio_driver_register( none );
-#endif
+	const char* none[] = { nullptr };
+	fluid_audio_driver_register(none);
+
 	m_settings = new_fluid_settings();
 
 	//fluid_settings_setint( m_settings, (char *) "audio.period-size", engine::audioEngine()->framesPerPeriod() );
@@ -164,9 +165,8 @@ Sf2Instrument::Sf2Instrument( InstrumentTrack * _instrument_track ) :
 	// This sets up m_synth and updates reverb/chorus/gain
 	reloadSynth();
 
-#if FLUIDSYNTH_VERSION_MAJOR >= 2
 	// Get the default values from the setting
-	double settingVal;
+	double settingVal = 0;
 
 	fluid_settings_getnum_default(m_settings, "synth.reverb.room-size", &settingVal);
 	m_reverbRoomSize.setInitValue(settingVal);
@@ -185,7 +185,6 @@ Sf2Instrument::Sf2Instrument( InstrumentTrack * _instrument_track ) :
 	m_chorusSpeed.setInitValue(settingVal);
 	fluid_settings_getnum_default(m_settings, "synth.chorus.depth", &settingVal);
 	m_chorusDepth.setInitValue(settingVal);
-#endif
 
 	// FIXME: there's no good way to tell if we're loading a preset or an empty instrument
 	// We rely on instantiate() to load the default soundfont for new instruments,
@@ -317,14 +316,10 @@ void Sf2Instrument::loadFile( const QString & _file )
 #endif
 
 			fluid_sfont_iteration_start( pSoundFont );
-#if FLUIDSYNTH_VERSION_MAJOR < 2
-			fluid_preset_t preset;
-			fluid_preset_t *pCurPreset = &preset;
-#else
-			fluid_preset_t *pCurPreset = nullptr;
-#endif
+			fluid_preset_t* pCurPreset = nullptr;
 
-			if ( ( pCurPreset = fluid_sfont_iteration_next_wrapper( pSoundFont, pCurPreset ) ) ) {
+			if ((pCurPreset = fluid_sfont_iteration_next(pSoundFont)))
+			{
 				iBank = fluid_preset_get_banknum( pCurPreset );
 				iProg = fluid_preset_get_num( pCurPreset );
 
@@ -388,16 +383,7 @@ void Sf2Instrument::openFile( const QString & _sf2File, bool updateTrackName )
 {
 	emit fileLoading();
 
-#if defined(LMMS_BUILD_WIN32) && FLUIDSYNTH_VERSION_HEX < 0x020200
-	// Prior to FluidSynth 2.2, FluidSynth expects Windows file paths to be encoded using the active code page
-	// See: https://www.fluidsynth.org/api/group__soundfont__management.html#ga0ba0bc9d4a19c789f9969cd22d22bf66
-	const auto filePath = PathUtil::toAbsolute(_sf2File).toLocal8Bit().toStdString();
-#else
-	// In FluidSynth 2.2 and later, FluidSynth expects Windows file paths to be UTF-8 encoded.
-	// Other platforms use whatever encoding fopen() accepts, which we assume is UTF-8.
 	const auto filePath = PathUtil::toAbsolute(_sf2File).toStdString();
-#endif
-
 	QString relativePath = PathUtil::toShortestRelative( _sf2File );
 
 	// free the soundfont if one is selected
@@ -477,13 +463,9 @@ QString Sf2Instrument::getCurrentPatchName()
 						m_synth, fluid_sfont_get_id(pSoundFont) );
 #endif
 			fluid_sfont_iteration_start( pSoundFont );
-#if FLUIDSYNTH_VERSION_MAJOR < 2
-			fluid_preset_t preset;
-			fluid_preset_t *pCurPreset = &preset;
-#else
-			fluid_preset_t *pCurPreset = nullptr;
-#endif
-			while ((pCurPreset = fluid_sfont_iteration_next_wrapper(pSoundFont, pCurPreset)))
+			fluid_preset_t* pCurPreset = nullptr;
+
+			while ((pCurPreset = fluid_sfont_iteration_next(pSoundFont)))
 			{
 				int iBank = fluid_preset_get_banknum( pCurPreset );
 #ifdef CONFIG_FLUID_BANK_OFFSET
@@ -511,49 +493,29 @@ void Sf2Instrument::updateGain()
 
 void Sf2Instrument::updateReverbOn()
 {
-#if USE_NEW_EFFECT_API
 	fluid_synth_reverb_on(m_synth, -1, m_reverbOn.value() ? 1 : 0);
-#else
-	fluid_synth_set_reverb_on(m_synth, m_reverbOn.value() ? 1 : 0);
-#endif
 }
 
 void Sf2Instrument::updateReverb()
 {
-#if USE_NEW_EFFECT_API
 	fluid_synth_set_reverb_group_roomsize(m_synth, -1, m_reverbRoomSize.value());
 	fluid_synth_set_reverb_group_damp(m_synth, -1, m_reverbDamping.value());
 	fluid_synth_set_reverb_group_width(m_synth, -1, m_reverbWidth.value());
 	fluid_synth_set_reverb_group_level(m_synth, -1, m_reverbLevel.value());
-#else
-	fluid_synth_set_reverb(m_synth, m_reverbRoomSize.value(),
-			m_reverbDamping.value(), m_reverbWidth.value(),
-			m_reverbLevel.value());
-#endif
 }
 
 void Sf2Instrument::updateChorusOn()
 {
-#if USE_NEW_EFFECT_API
 	fluid_synth_chorus_on(m_synth, -1, m_chorusOn.value() ? 1 : 0);
-#else
-	fluid_synth_set_chorus_on(m_synth, m_chorusOn.value() ? 1 : 0);
-#endif
 }
 
 void Sf2Instrument::updateChorus()
 {
-#if USE_NEW_EFFECT_API
 	fluid_synth_set_chorus_group_nr(m_synth, -1, static_cast<int>(m_chorusNum.value()));
 	fluid_synth_set_chorus_group_level(m_synth, -1, m_chorusLevel.value());
 	fluid_synth_set_chorus_group_speed(m_synth, -1, m_chorusSpeed.value());
 	fluid_synth_set_chorus_group_depth(m_synth, -1, m_chorusDepth.value());
 	fluid_synth_set_chorus_group_type(m_synth, -1, FLUID_CHORUS_MOD_SINE);
-#else
-	fluid_synth_set_chorus(m_synth, static_cast<int>(m_chorusNum.value()),
-			m_chorusLevel.value(), m_chorusSpeed.value(),
-			m_chorusDepth.value(), FLUID_CHORUS_MOD_SINE);
-#endif
 }
 
 void Sf2Instrument::updateTuning()
@@ -747,7 +709,6 @@ void Sf2Instrument::noteOn( Sf2PluginData * n )
 		}
 	}
 
-#if FLUIDSYNTH_VERSION_MAJOR >= 2
 	// Smallest balance value that results in full attenuation of one channel.
 	// Corresponds to internal FluidSynth macro `FLUID_CB_AMP_SIZE`.
 	constexpr static auto maxBalance = 1441.f;
@@ -765,7 +726,6 @@ void Sf2Instrument::noteOn( Sf2PluginData * n )
 			fluid_voice_update_param(voice.get(), GEN_CUSTOM_BALANCE);
 		}
 	}
-#endif
 
 	m_synthMutex.unlock();
 
