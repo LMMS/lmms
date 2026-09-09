@@ -50,6 +50,11 @@
 #include "embed.h"
 #include "plugin_export.h"
 
+#define FLUIDSYNTH_VERSION_HEX ((FLUIDSYNTH_VERSION_MAJOR << 16) \
+	| (FLUIDSYNTH_VERSION_MINOR << 8) \
+	| FLUIDSYNTH_VERSION_MICRO)
+#define USE_NEW_EFFECT_API (FLUIDSYNTH_VERSION_HEX >= 0x020200)
+
 namespace lmms
 {
 
@@ -383,8 +388,16 @@ void Sf2Instrument::openFile( const QString & _sf2File, bool updateTrackName )
 {
 	emit fileLoading();
 
-	// Used for loading file
-	char * sf2Ascii = qstrdup( qPrintable( PathUtil::toAbsolute( _sf2File ) ) );
+#if defined(LMMS_BUILD_WIN32) && FLUIDSYNTH_VERSION_HEX < 0x020200
+	// Prior to FluidSynth 2.2, FluidSynth expects Windows file paths to be encoded using the active code page
+	// See: https://www.fluidsynth.org/api/group__soundfont__management.html#ga0ba0bc9d4a19c789f9969cd22d22bf66
+	const auto filePath = PathUtil::toAbsolute(_sf2File).toLocal8Bit().toStdString();
+#else
+	// In FluidSynth 2.2 and later, FluidSynth expects Windows file paths to be UTF-8 encoded.
+	// Other platforms use whatever encoding fopen() accepts, which we assume is UTF-8.
+	const auto filePath = PathUtil::toAbsolute(_sf2File).toStdString();
+#endif
+
 	QString relativePath = PathUtil::toShortestRelative( _sf2File );
 
 	// free the soundfont if one is selected
@@ -393,9 +406,9 @@ void Sf2Instrument::openFile( const QString & _sf2File, bool updateTrackName )
 	m_synthMutex.lock();
 
 	bool loaded = false;
-	if (fluid_is_soundfont(sf2Ascii))
+	if (fluid_is_soundfont(filePath.c_str()))
 	{
-		m_fontId = fluid_synth_sfload(m_synth, sf2Ascii, true);
+		m_fontId = fluid_synth_sfload(m_synth, filePath.c_str(), true);
 
 		if (fluid_synth_sfcount(m_synth) > 0)
 		{
@@ -422,8 +435,6 @@ void Sf2Instrument::openFile( const QString & _sf2File, bool updateTrackName )
 
 		emit fileChanged();
 	}
-
-	delete[] sf2Ascii;
 
 	if( updateTrackName || instrumentTrack()->displayName() == displayName() )
 	{
@@ -497,11 +508,6 @@ void Sf2Instrument::updateGain()
 {
 	fluid_synth_set_gain( m_synth, m_gain.value() );
 }
-
-#define FLUIDSYNTH_VERSION_HEX ((FLUIDSYNTH_VERSION_MAJOR << 16) \
-	| (FLUIDSYNTH_VERSION_MINOR << 8) \
-	| FLUIDSYNTH_VERSION_MICRO)
-#define USE_NEW_EFFECT_API (FLUIDSYNTH_VERSION_HEX >= 0x020200)
 
 void Sf2Instrument::updateReverbOn()
 {
