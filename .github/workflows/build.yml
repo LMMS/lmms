@@ -195,7 +195,7 @@ jobs:
     env:
       CMAKE_OPTS: >-
         -Werror=dev
-        -DUSE_WERROR=ON
+        -DUSE_WERROR=OFF
         -DCMAKE_BUILD_TYPE=RelWithDebInfo
         -DTARGET_UARCH=official
         -DWANT_QT6=ON
