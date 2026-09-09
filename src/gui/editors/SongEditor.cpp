@@ -43,6 +43,7 @@
 #include "ConfigManager.h"
 #include "CPULoadWidget.h"
 #include "DeprecationHelper.h"
+#include "DpiHelper.h"
 #include "embed.h"
 #include "GuiApplication.h"
 #include "LcdSpinBox.h"
@@ -160,7 +161,7 @@ SongEditor::SongEditor( Song * song ) :
 	m_masterVolumeSlider->setOrientation( Qt::Vertical );
 	m_masterVolumeSlider->setPageStep( 1 );
 	m_masterVolumeSlider->setTickPosition( QSlider::TicksLeft );
-	m_masterVolumeSlider->setFixedSize( 26, 60 );
+	m_masterVolumeSlider->setFixedSize(scaledPixels(26), scaledPixels(60));
 	m_masterVolumeSlider->setTickInterval( 50 );
 	m_masterVolumeSlider->setToolTip(tr("Master volume"));
 
@@ -185,14 +186,14 @@ SongEditor::SongEditor( Song * song ) :
 
 	auto master_pitch_lbl = new QLabel(tb);
 	master_pitch_lbl->setPixmap( embed::getIconPixmap( "master_pitch" ) );
-	master_pitch_lbl->setFixedHeight( 64 );
+	master_pitch_lbl->setFixedHeight(scaledPixels(64));
 
 	m_masterPitchSlider = new AutomatableSlider( tb, tr( "Global transposition" ) );
 	m_masterPitchSlider->setModel( &m_song->m_masterPitchModel );
 	m_masterPitchSlider->setOrientation( Qt::Vertical );
 	m_masterPitchSlider->setPageStep( 1 );
 	m_masterPitchSlider->setTickPosition( QSlider::TicksLeft );
-	m_masterPitchSlider->setFixedSize( 26, 60 );
+	m_masterPitchSlider->setFixedSize(scaledPixels(26), scaledPixels(60));
 	m_masterPitchSlider->setTickInterval( 12 );
 	m_masterPitchSlider->setToolTip(tr("Global transposition"));
 	connect( m_masterPitchSlider, SIGNAL(logicValueChanged(int)), this,

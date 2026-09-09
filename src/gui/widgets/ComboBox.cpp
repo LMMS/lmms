@@ -32,6 +32,7 @@
 #include <QScreen>
 
 #include "CaptionMenu.h"
+#include "DpiHelper.h"
 #include "FontHelper.h"
 #include "DeprecationHelper.h"
 
@@ -46,7 +47,7 @@ ComboBox::ComboBox( QWidget * _parent, const QString & _name ) :
 	m_menu( this ),
 	m_pressed( false )
 {
-	setFixedHeight( ComboBox::DEFAULT_HEIGHT );
+	setFixedHeight(scaledPixels(ComboBox::DEFAULT_HEIGHT));
 
 	setFont(adjustedToPixelSize(font(), DEFAULT_FONT_SIZE));
 

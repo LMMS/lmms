@@ -32,6 +32,7 @@
 #include "TrackContainer.h"
 #include "AudioEngine.h"
 #include "DataFile.h"
+#include "DpiHelper.h"
 #include "MainWindow.h"
 #include "FileBrowser.h"
 #include "ImportFilter.h"
@@ -485,7 +486,7 @@ unsigned int TrackContainerView::totalHeightOfTracks() const
 	unsigned int heightSum = 0;
 	for (auto & trackView : m_trackViews)
 	{
-		heightSum += trackView->getTrack()->getHeight();
+		heightSum += scaledPixels(trackView->getTrack()->getHeight());
 	}
 	return heightSum;
 }

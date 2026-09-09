@@ -39,6 +39,7 @@
 #include "AutomationEditor.h"
 #include "ControllerRackView.h"
 #include "DeprecationHelper.h"
+#include "DpiHelper.h"
 #include "embed.h"
 #include "Engine.h"
 #include "ExportProjectDialog.h"
@@ -191,7 +192,7 @@ MainWindow::MainWindow() :
 	// create global-toolbar at the top of our window
 	m_toolBar = new QWidget( main_widget );
 	m_toolBar->setObjectName( "mainToolbar" );
-	m_toolBar->setFixedHeight( 64 );
+	m_toolBar->setFixedHeight(scaledPixels(64));
 	m_toolBar->move( 0, 0 );
 
 	// add layout for organizing quite complex toolbar-layouting
