@@ -88,15 +88,29 @@ void PatternClip::loadSettings(const QDomElement& element)
 	
 	if (element.hasAttribute("color"))
 	{
-		if (!element.hasAttribute("usestyle"))
+		const auto parseColor = [](const QString& raw) -> QColor
 		{
-			// for colors saved in 1.3-onwards
-			setColor(QColor{element.attribute("color")});
-		}
-		else if (element.attribute("usestyle").toUInt() == 0)
+			// first attempt - parse color from string (usually a hex color string)
+			const auto att1 = QColor{raw};
+			if (att1.isValid()) { return att1; }
+
+			// the rest of this function is trying to parse an uint, and then a color from that
+			bool ok = false;
+			const auto asUint = raw.toUInt(&ok);
+			if (!ok) { return QColor{}; } // return "invalid color"
+
+			// hopefully the value here should be valid
+			return QColor{asUint};
+		};
+
+		// Pre-1.3 projects used to sometimes have a "usestyle" attribute in pattern clips.
+		//
+		// We can only load the color if it does not exist, or its value is zero.
+		//
+		// TODO: explain properly what "usestyle" used to be in old versions
+		if (!element.hasAttribute("usestyle") || element.attribute("usestyle").toUInt() == 0)
 		{
-			// for colors saved before 1.3
-			setColor(QColor{element.attribute("color").toUInt()});
+			setColor(parseColor(element.attribute("color")));
 		}
 	}
 }
