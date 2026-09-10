@@ -39,4 +39,9 @@ EffectControlDialog::EffectControlDialog(EffectControls* controls)
 	setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 }
 
+void EffectControlDialog::modelChanged()
+{
+	setWindowTitle(m_effectControls->effect()->displayName());
+}
+
 } // namespace lmms::gui
