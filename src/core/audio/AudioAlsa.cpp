@@ -27,7 +27,6 @@
 
 #ifdef LMMS_HAVE_ALSA
 
-#include "endian_handling.h"
 #include "AudioEngine.h"
 #include "ConfigManager.h"
 

@@ -25,6 +25,8 @@
 #ifndef LMMS_AUDIO_DEVICE_H
 #define LMMS_AUDIO_DEVICE_H
 
+#include <span>
+
 #include <QMutex>
 #include <samplerate.h>
 
@@ -71,13 +73,19 @@ public:
 	bool isRunning() const { return m_running.test(std::memory_order_acquire); }
 
 protected:
-	// convert a given audio-buffer to a buffer in signed 16-bit samples
-	// returns num of bytes in outbuf
-	int convertToS16(const SampleFrame* _ab, const f_cnt_t _frames, int_sample_t* _output_buffer,
-		const bool _convert_endian = false);
+	//! @brief Converts an interleaved @ref sample_t audio buffer to an interleaved little-endian @ref int_sample_t
+	//! buffer.
+	//!
+	//! @param[in] src The origin audio buffer
+	//! @param[out] dst The destination audio buffer. As there is no @ref int_sample_t equivalent of @ref SampleFrame,
+	//! this span must be exactly twice the length of @p src, as a @ref SampleFrame contains two @ref sample_t.
+	void toInt16le(std::span<const SampleFrame>&& src, std::span<int_sample_t>&& dst);
 
-	// clear given signed-int-16-buffer
-	void clearS16Buffer(int_sample_t* _outbuf, const f_cnt_t _frames);
+	//! @brief Converts a @ref sample_t audio buffer to a @ref int_sample_t buffer.
+	//!
+	//! @param[in] src The origin audio buffer
+	//! @param[out] dst The destination audio buffer.
+	void toInt16(std::span<const sample_t>&& src, std::span<int_sample_t>&& dst);
 
 	ch_cnt_t channels() const { return m_channels; }
 
