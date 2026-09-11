@@ -44,6 +44,7 @@ namespace lmms
 {
 
 class AutomationTrack;
+class ControlSurfaceMCU;
 class Keymap;
 class MidiClip;
 class Scale;
@@ -326,6 +327,9 @@ public:
 
 	Metronome& metronome() { return m_metronome; }
 
+	/// Set a DAW MCU surface control.
+	void setControlSurfaceMCU();
+
 public slots:
 	void playSong();
 	void record();
@@ -452,6 +456,7 @@ private:
 	TimePos m_exportSongEnd;
 	TimePos m_exportEffectiveLength;
 
+	std::shared_ptr<ControlSurfaceMCU> m_mcu_controller = nullptr;
 	std::shared_ptr<Scale> m_scales[MaxScaleCount];
 	std::shared_ptr<Keymap> m_keymaps[MaxKeymapCount];
 
