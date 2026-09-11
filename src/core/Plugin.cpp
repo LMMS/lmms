@@ -35,6 +35,7 @@
 #include "AutomatableModel.h"
 #include "Song.h"
 #include "PluginFactory.h"
+#include "PluginLoadFailedDialog.h"
 
 namespace lmms
 {
@@ -213,14 +214,7 @@ Plugin * Plugin::instantiate(const QString& pluginName, Model * parent,
 	Plugin* inst;
 	if( pi.isNull() )
 	{
-		if (gui::getGUI() != nullptr)
-		{
-			QMessageBox::information( nullptr,
-				tr( "Plugin not found" ),
-				tr( "The plugin \"%1\" wasn't found or could not be loaded!\nReason: \"%2\"" ).
-						arg( pluginName ).arg( getPluginFactory()->errorString(pluginName) ),
-				QMessageBox::Ok | QMessageBox::Default );
-		}
+		pluginLoadFailed(pluginName, getPluginFactory()->errorString(pluginName));
 		inst = new DummyPlugin();
 	}
 	else
@@ -235,13 +229,7 @@ Plugin * Plugin::instantiate(const QString& pluginName, Model * parent,
 		}
 		else
 		{
-			if (gui::getGUI() != nullptr)
-			{
-				QMessageBox::information( nullptr,
-					tr( "Error while loading plugin" ),
-					tr( "Failed to load plugin \"%1\"!").arg( pluginName ),
-					QMessageBox::Ok | QMessageBox::Default );
-			}
+			pluginLoadFailed(pluginName, tr("Unable to find an entry point"));
 			inst = new DummyPlugin();
 		}
 	}
