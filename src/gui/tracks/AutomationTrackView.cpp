@@ -75,11 +75,14 @@ void AutomationTrackView::dropEvent( QDropEvent * _de )
 				pos.setTicks( 0 );
 			}
 
-			Clip * clip = getTrack()->createClip( pos );
-			auto autoClip = dynamic_cast<AutomationClip*>(clip);
-			autoClip->addObject( mod );
+				Clip * clip = getTrack()->createClip( pos );
+				auto autoClip = dynamic_cast<AutomationClip*>(clip);
+				if (autoClip != nullptr)
+				{
+					autoClip->addObject( mod );
+				}
+			}
 		}
-	}
 
 	update();
 }
