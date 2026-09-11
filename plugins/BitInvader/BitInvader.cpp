@@ -24,6 +24,7 @@
 
 #include <cmath>
 #include <QDomElement>
+#include <QVBoxLayout>
 
 #include "BitInvader.h"
 #include "AudioEngine.h"
@@ -312,26 +313,16 @@ BitInvaderView::BitInvaderView( Instrument * _instrument,
 	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap(
 								"artwork" ) );
 	setPalette( pal );
+
+	const auto evilYellow = QColor{224, 250, 21};
+	m_graph = new Graph(this, Graph::Style::Nearest, 200, 144);
+	m_graph->setGraphColor(evilYellow);
+	m_graph->move(25, 54);
+	m_graph->setToolTip(tr("Draw your own waveform here by dragging your mouse on this graph."));
 	
 	m_sampleLengthKnob = new Knob( KnobType::Dark28, this );
 	m_sampleLengthKnob->move( 6, 201 );
 	m_sampleLengthKnob->setHintText( tr( "Sample length" ), "" );
-
-	m_graph = new Graph( this, Graph::Style::Nearest, 204, 134 );
-	m_graph->move(23,59);	// 55,120 - 2px border
-	m_graph->setAutoFillBackground( true );
-	m_graph->setGraphColor( QColor( 255, 255, 255 ) );
-
-	m_graph->setToolTip(tr("Draw your own waveform here "
-				"by dragging your mouse on this graph."
-	));
-
-
-	pal = QPalette();
-	pal.setBrush( backgroundRole(), 
-			PLUGIN_NAME::getIconPixmap("wavegraph") );
-	m_graph->setPalette( pal );
-
 
 	m_sinWaveBtn = new PixmapButton( this, tr( "Sine wave" ) );
 	m_sinWaveBtn->move( 131, 205 );
