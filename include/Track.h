@@ -264,8 +264,10 @@ public:
 	
 	BoolModel* getMutedModel();
 
+	//! returns a name that isn't used by any track and conatins `sourceName`
+	QString findUniqueName(const QString& sourceName) const;
 public slots:
-	virtual void setName(const QString& newName);
+	virtual void setName(const QString& newName, bool shouldCreateUnique);
 
 	void setMutedBeforeSolo(const bool muted)
 	{
@@ -302,6 +304,9 @@ private:
 	//! @param presetMode Indicates if a preset or a full track is loaded
 	//! @todo Load the track height.
 	void loadTrack(const QDomElement& element, bool presetMode);
+
+	//! returns the number characters at the end of a string
+	static QString getNameNumberEnding(const QString& name, bool* isSeparatedWithWhiteSpace = nullptr);
 
 private:
 	TrackContainer* m_trackContainer;

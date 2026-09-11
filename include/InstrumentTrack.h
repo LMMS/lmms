@@ -103,7 +103,7 @@ public:
 	void deleteNotePluginData( NotePlayHandle * _n );
 
 	// name-stuff
-	void setName( const QString & _new_name ) override;
+	void setName(const QString& newName, bool shouldCreateUnique) override;
 
 	// translate given key of a note-event to absolute key (i.e.
 	// add global master-pitch and base-note of this instrument track)
