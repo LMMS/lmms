@@ -113,7 +113,7 @@ void LfoController::updateValueBuffer()
 		{
 		case Oscillator::WaveShape::WhiteNoise:
 		{
-			if (absFraction(phase) < absFraction(phasePrev))
+			if (normalizePhase<1>(phase) < normalizePhase<1>(phasePrev))
 			{
 				// Resample when phase period has completed
 				m_heldSample = m_sampleFunction(phase);
@@ -142,7 +142,7 @@ void LfoController::updateValueBuffer()
 		amountPtr += amountInc;
 	}
 
-	m_currentPhase = absFraction(phase - m_phaseOffset);
+	m_currentPhase = normalizePhase<1>(phase - m_phaseOffset);
 	m_bufferLastUpdated = s_periods;
 }
 
