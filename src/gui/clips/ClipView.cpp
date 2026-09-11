@@ -27,6 +27,7 @@
 #include <set>
 #include <cassert>
 
+#include <QBrush>
 #include <QMenu>
 #include <QMouseEvent>
 #include <QPainter>
@@ -677,33 +678,19 @@ void ClipView::paintStripes(QPainter& painter, QColor color)
 		// Only paint stripes on the loop views
 		return;
 	}
-	painter.setPen(color);
+	unsigned int tileWidth = m_loopStripeSpacing + m_loopStripeWidth;
+	QPixmap tile(tileWidth * 3, tileWidth * 3);
+	tile.fill(Qt::transparent);
 
-	// Change the pen's width in a rather painfull way
-	QPen previousPen = painter.pen();
-	QPen newPen(previousPen);
-	newPen.setWidth(m_loopStripeWidth);
-	painter.setPen(newPen);
-	
-	for (int x = -height(); x < width(); x += m_loopStripeSpacing)
-	{
-		int y1, y2;
-		y1 = 0;
-		if (x < 0)
-		{
-			y1 = -x;
-		}
-		y2 = height();
-		if (x + height() > width())
-		{
-			y2 = height() - (x + height() - width());
-		}
-		if (y1 < height() && y2 > 0)
-		{
-			painter.drawLine(std::max( 0, x ), y1, std::min( width(), x + height() ), y2);
-		}
-	}
-	painter.setPen(previousPen);
+	QPainter p(&tile);
+	p.setPen(QPen(color, m_loopStripeWidth));
+	p.drawLine(0, tileWidth, tileWidth * 2, tileWidth * 3);
+	p.drawLine(0, 0, tileWidth * 3, tileWidth * 3);
+	p.drawLine(tileWidth, 0, tileWidth * 3, tileWidth * 2);
+	p.end();
+
+	painter.setBrush(QBrush(tile.copy(tileWidth, tileWidth, tileWidth, tileWidth)));
+	painter.drawRect(rect());
 }
 
 /*! \brief Handle a mouse press on this ClipView.
