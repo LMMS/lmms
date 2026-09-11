@@ -81,18 +81,18 @@ EffectSelectDialog::EffectSelectDialog(QWidget* parent) :
 	m_sourceModel.setHorizontalHeaderItem(0, new QStandardItem(tr("Name")));
 	m_sourceModel.setHorizontalHeaderItem(1, new QStandardItem(tr("Type")));
 	int row = 0;
-	for (EffectKeyList::ConstIterator it = m_effectKeys.begin(); it != m_effectKeys.end(); ++it)
+	for (const auto& key : m_effectKeys)
 	{
 		QString name;
 		QString type;
-		if (it->desc->subPluginFeatures)
+		if (key.desc->subPluginFeatures)
 		{
-			name = it->displayName();
-			type = it->desc->displayName;
+			name = key.displayName();
+			type = key.desc->displayName;
 		}
 		else
 		{
-			name = it->desc->displayName;
+			name = key.desc->displayName;
 			type = "LMMS";
 		}
 		m_sourceModel.setItem(row, 0, new QStandardItem(name));

@@ -350,14 +350,13 @@ void ConfigManager::removeFavoriteItem(const QString& item)
 bool ConfigManager::isFavoriteItem(const QString& item)
 {
 	const auto& items = favoriteItems();
-	const auto it = std::find_if(items.begin(), items.end(),
+	return std::ranges::any_of(items,
 		[&](const auto& favoriteItem) { return QFileInfo{item} == QFileInfo{favoriteItem}; });
-	return it != items.end();
 }
 
 QString ConfigManager::value(const QString& cls, const QString& attribute, const QString& defaultVal) const
 {
-	if (m_settings.find(cls) != m_settings.end())
+	if (m_settings.contains(cls))
 	{
 		for (const auto& setting : m_settings[cls])
 		{

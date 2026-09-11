@@ -26,6 +26,7 @@
 
 #include <QFile>
 #include <QString>
+#include <algorithm>
 #include <memory>
 #include <sndfile.h>
 
@@ -204,17 +205,16 @@ auto SampleDecoder::supportedAudioTypes() -> const std::vector<AudioType>&
 			sfFormatInfo.format = simple;
 			sf_command(nullptr, SFC_GET_SIMPLE_FORMAT, &sfFormatInfo, sizeof(sfFormatInfo));
 
-			auto it = std::find_if(types.begin(), types.end(),
-				[&](const AudioType& type) { return sfFormatInfo.extension == type.extension; });
+			auto it = std::ranges::find(types, sfFormatInfo.extension, &AudioType::extension);
 			if (it != types.end()) { continue; }
 
 			auto name = std::string{sfFormatInfo.extension};
-			std::transform(name.begin(), name.end(), name.begin(), [](unsigned char ch) { return std::toupper(ch); });
+			std::ranges::transform(name, name.begin(), [](unsigned char ch) { return std::toupper(ch); });
 
 			types.push_back(AudioType{std::move(name), sfFormatInfo.extension});
 		}
 
-		std::sort(types.begin(), types.end(), [&](const AudioType& a, const AudioType& b) { return a.name < b.name; });
+		std::ranges::sort(types, {}, &AudioType::name);
 		return types;
 	}();
 	return s_audioTypes;

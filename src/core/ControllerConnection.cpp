@@ -27,6 +27,7 @@
 #include <QDomElement>
 #include <QObject>
 
+#include <algorithm>
 
 #include "Song.h"
 #include "ControllerConnection.h"
@@ -77,8 +78,7 @@ ControllerConnection::~ControllerConnection()
 		m_controller->removeConnection( this );
 	}
 
-	auto it = std::find(s_connections.begin(), s_connections.end(), this);
-	if (it != s_connections.end()) { s_connections.erase(it); };
+	if (auto it = std::ranges::find(s_connections, this); it != s_connections.end()) { s_connections.erase(it); }
 
 	if( m_ownsController )
 	{
@@ -189,8 +189,7 @@ void ControllerConnection::saveSettings( QDomDocument & _doc, QDomElement & _thi
 		else
 		{
 			const auto& controllers = Engine::getSong()->controllers();
-			const auto it = std::find(controllers.begin(), controllers.end(), m_controller);
-			if (it != controllers.end())
+			if (const auto it = std::ranges::find(controllers, m_controller); it != controllers.end())
 			{
 				const int id = std::distance(controllers.begin(), it);
 				_this.setAttribute("id", id);
