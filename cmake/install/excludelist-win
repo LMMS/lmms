@@ -16,6 +16,7 @@ ole32.dll
 OLEAUT32.dll
 OPENGL32.DLL
 SHELL32.dll
+SHLWAPI.dll
 USER32.dll
 userenv.dll
 UxTheme.dll

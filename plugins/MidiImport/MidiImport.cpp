@@ -334,13 +334,13 @@ bool MidiImport::readSMF(TrackContainer* tc)
 		Alg_beats& beats = timeMap->beats;
 		for (int i = 0; i < beats.len - 1; ++i)
 		{
-			Alg_beat_ptr b = &(beats[i]);
+			Alg_beat* b = &(beats[i]);
 			double tempo = (beats[i + 1].beat - b->beat) / (beats[i + 1].time - beats[i].time);
 			tap->putValue(b->beat * ticksPerBeat, tempo * 60.0);
 		}
 		if (timeMap->last_tempo_flag)
 		{
-			Alg_beat_ptr b = &beats[beats.len - 1];
+			Alg_beat* b = &beats[beats.len - 1];
 			tap->putValue(b->beat * ticksPerBeat, timeMap->last_tempo * 60.0);
 		}
 	}
@@ -352,7 +352,7 @@ bool MidiImport::readSMF(TrackContainer* tc)
 	// Song events
 	for (int e = 0; e < seq->length(); ++e)
 	{
-		Alg_event_ptr evt = (*seq)[e];
+		Alg_event* evt = (*seq)[e];
 
 		if (evt->is_update())
 		{
@@ -365,7 +365,7 @@ bool MidiImport::readSMF(TrackContainer* tc)
 	for (int t = 0; t < seq->tracks(); ++t)
 	{
 		QString trackName = QString(tr("Track") + " %1").arg(t);
-		Alg_track_ptr trk = seq->track(t);
+		Alg_track* trk = seq->track(t);
 		pd.setValue(t + preTrackSteps);
 
 		for (auto& cc : ccs) { cc.clear(); }
@@ -373,7 +373,7 @@ bool MidiImport::readSMF(TrackContainer* tc)
 		// Now look at events
 		for (int e = 0; e < trk->length(); ++e)
 		{
-			Alg_event_ptr evt = (*trk)[e];
+			Alg_event* evt = (*trk)[e];
 
 			if (evt->chan == -1)
 			{
@@ -405,8 +405,10 @@ bool MidiImport::readSMF(TrackContainer* tc)
 			}
 			else if (evt->is_note())
 			{
-				smfMidiChannel* ch = chs[evt->chan].create(tc, trackName);
-				auto noteEvt = dynamic_cast<Alg_note_ptr>(evt);
+				// LMMS does not currently support specifying the channel of a single note
+				// To be safe, put the notes from different channels on separate tracks so that no information is lost
+				smfMidiChannel* ch = chs[evt->chan + 16 * t].create(tc, trackName);
+				auto noteEvt = static_cast<Alg_note*>(evt);
 				tick_t ticks = noteEvt->get_duration() * ticksPerBeat;
 				Note n(
 					ticks < 1 ? 1 : ticks,
@@ -419,7 +421,7 @@ bool MidiImport::readSMF(TrackContainer* tc)
 			}
 			else if (evt->is_update())
 			{
-				smfMidiChannel* ch = chs[evt->chan].create(tc, trackName);
+				smfMidiChannel* ch = chs[evt->chan + 16 * t].create(tc, trackName);
 
 				double time = evt->time*ticksPerBeat;
 				QString update(evt->get_attribute());
@@ -457,55 +459,57 @@ bool MidiImport::readSMF(TrackContainer* tc)
 					if (ccid <= 128)
 					{
 						double cc = evt->get_real_value();
-						AutomatableModel* objModel = nullptr;
-
+						AutomatableModel* modelObject = nullptr;
+						// Some CC knobs correspond to specific things like pitch and volume, so in that case, set the lmms pitch/volume/etc knobs.
+						// Otherwise, set the knob in the instrument track CC rack
 						switch (ccid)
 						{
 							case 0:
 								if (ch->isSF2 && ch->it_inst)
 								{
-									objModel = ch->it_inst->childModel("bank");
+									modelObject = ch->it_inst->childModel("bank");
 									printf("BANK SELECT %f %d\n", cc, static_cast<int>(cc * 127));
 									cc *= 127.0f;
 								}
 								break;
 
 							case 7:
-								objModel = ch->it->volumeModel();
+								modelObject = ch->it->volumeModel();
 								cc *= 100.0f;
 								break;
 
 							case 10:
-								objModel = ch->it->panningModel();
+								modelObject = ch->it->panningModel();
 								cc = cc * 200.f - 100.0f;
 								break;
 
 							case 128:
-								objModel = ch->it->pitchModel();
+								modelObject = ch->it->pitchModel();
 								cc = cc * 100.0f;
 								break;
 
 							default:
-								//TODO: something useful for other CCs
+								if (ccid >= 0 && ccid < 128)
+								{
+									modelObject = ch->it->midiCCModel(ccid);
+									cc = cc * 127.0f;
+								}
 								break;
 						}
 
-						if (objModel)
+						if (modelObject)
 						{
-							if (time == 0 && objModel)
+							if (time == 0)
 							{
-								objModel->setInitValue(cc);
+								modelObject->setInitValue(cc);
 							}
 							else
 							{
-								if (ccs[ccid].at == nullptr) {
-									ccs[ccid].create(tc, trackName + " > " +
-										// This is inside if (objModel), so objModel should never be nullptr
-										// (objModel != nullptr ? objModel->displayName() : QString("CC %1").arg(ccid))
-										objModel->displayName()
-									);
+								if (ccs[ccid].at == nullptr)
+								{
+									ccs[ccid].create(tc, trackName + " > " + modelObject->displayName());
 								}
-								ccs[ccid].putValue(time, objModel, cc);
+								ccs[ccid].putValue(time, modelObject, cc);
 							}
 						}
 					}

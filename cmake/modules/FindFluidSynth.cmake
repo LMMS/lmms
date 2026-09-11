@@ -32,6 +32,11 @@ if(FluidSynth_INCLUDE_DIR AND FluidSynth_LIBRARY)
 		INTERFACE_INCLUDE_DIRECTORIES "${FluidSynth_INCLUDE_DIR}"
 	)
 
+	if(MINGW)
+		# Workaround for fluidsynth on MinGW
+		target_link_libraries(fluidsynth INTERFACE ws2_32)
+	endif()
+
 	if(VCPKG_INSTALLED_DIR)
 		include(ImportedTargetHelpers)
 		get_vcpkg_library_configs(FluidSynth_IMPLIB_RELEASE FluidSynth_IMPLIB_DEBUG "${FluidSynth_LIBRARY}")

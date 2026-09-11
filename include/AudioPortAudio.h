@@ -76,20 +76,17 @@ public:
 	AudioPortAudio& operator=(const AudioPortAudio&) = delete;
 	AudioPortAudio& operator=(AudioPortAudio&&) = delete;
 
-	void startProcessing() override;
-	void stopProcessing() override;
-
 	static auto name() -> QString { return QT_TRANSLATE_NOOP("AudioDeviceSetupWidget", "PortAudio"); }
 
 private:
+	void startProcessingImpl() override;
+	void stopProcessingImpl() override;
+
 	static int processCallback(const void* input, void* output, unsigned long frameCount,
 		const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags, void* userData);
 
 	detail::PortAudioInitializationGuard m_initGuard;
-
 	PaStream* m_paStream = nullptr;
-	std::vector<SampleFrame> m_outBuf;
-	std::size_t m_outBufPos = 0;
 };
 } // namespace lmms
 

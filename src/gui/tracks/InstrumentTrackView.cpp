@@ -80,11 +80,12 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 	connect(ConfigManager::inst(), SIGNAL(valueChanged(QString,QString,QString)),
 			this, SLOT(handleConfigChange(QString,QString,QString)));
 
+	connect(_it, &InstrumentTrack::instrumentChanged, this, &InstrumentTrackView::onInstrumentChanged);
+
 	m_mixerChannelNumber = new MixerChannelLcdSpinBox(2, getTrackSettingsWidget(), tr("Mixer channel"), this);
 	m_mixerChannelNumber->show();
 
-	m_volumeKnob = new Knob(KnobType::Small17, tr("VOL"), getTrackSettingsWidget(), Knob::LabelRendering::LegacyFixedFontSize, tr("VOL"));
-	m_volumeKnob->setVolumeKnob( true );
+	m_volumeKnob = new VolumeKnob(KnobType::Small17, tr("VOL"), getTrackSettingsWidget(), Knob::LabelRendering::LegacyFixedFontSize, tr("VOL"));
 	m_volumeKnob->setModel( &_it->m_volumeModel );
 	m_volumeKnob->setHintText( tr( "Volume:" ), "%" );
 	m_volumeKnob->show();
@@ -134,13 +135,7 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 	connect(midiRackAction, SIGNAL(triggered()),
 		this, SLOT(toggleMidiCCRack()));
 
-	m_activityIndicator = new FadeButton( QApplication::palette().color( QPalette::Active,
-							QPalette::Window),
-						QApplication::palette().color( QPalette::Active,
-							QPalette::BrightText ),
-						QApplication::palette().color( QPalette::Active,
-							QPalette::BrightText).darker(),
-						getTrackSettingsWidget() );
+	m_activityIndicator = new FadeButton(getTrackSettingsWidget());
 	m_activityIndicator->setFixedSize(8, 28);
 	m_activityIndicator->show();
 
@@ -165,8 +160,11 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 			 m_activityIndicator, SLOT(activate()));
 	connect( _it, SIGNAL(endNote()),
 	 		m_activityIndicator, SLOT(noteEnd()));
+	connect(getGUI()->mainWindow(), &MainWindow::periodicUpdate, this, &InstrumentTrackView::corruptStateUpdate);
 
 	setModel( _it );
+
+	onInstrumentChanged();
 }
 
 
@@ -227,7 +225,6 @@ InstrumentTrackWindow* InstrumentTrackView::topLevelInstrumentTrackWindow()
 
 
 
-/*! \brief Create and assign a new mixer Channel for this track */
 void InstrumentTrackView::createMixerLine()
 {
 	int channelIndex = getGUI()->mixerView()->addNewChannel();
@@ -242,7 +239,6 @@ void InstrumentTrackView::createMixerLine()
 
 
 
-/*! \brief Assign a specific mixer Channel for this track */
 void InstrumentTrackView::assignMixerLine(int channelIndex)
 {
 	model()->mixerChannelModel()->setValue( channelIndex );
@@ -295,6 +291,15 @@ void InstrumentTrackView::dropEvent( QDropEvent * _de )
 {
 	getInstrumentTrackWindow()->dropEvent( _de );
 	TrackView::dropEvent( _de );
+}
+
+
+
+
+void InstrumentTrackView::onInstrumentChanged()
+{
+	// Check if an instrument has been loaded, if not disable the track label button to prevent opening an empty instrument window.
+	m_tlb->setEnabled(model()->m_instrument != nullptr);
 }
 
 
@@ -421,5 +426,18 @@ QPixmap InstrumentTrackView::determinePixmap(InstrumentTrack* instrumentTrack)
 	return embed::getIconPixmap("instrument_track");
 }
 
+void InstrumentTrackView::corruptStateUpdate()
+{
+	if (model()->audioBusHandle()->isCorrupted())
+	{
+		m_activityIndicator->setState(FadeButton::State::Corrupted);
+		m_activityIndicator->setToolTip(tr("Corrupted audio detected: muting affected channels"));
+	}
+	else
+	{
+		m_activityIndicator->setState(FadeButton::State::Normal);
+		m_activityIndicator->setToolTip(QString{});
+	}
+}
 
 } // namespace lmms::gui

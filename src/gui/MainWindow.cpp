@@ -234,6 +234,8 @@ MainWindow::MainWindow() :
 	{
 		qApp->installEventFilter(this);
 	}
+
+	installEventFilter(this);
 }
 
 
@@ -686,9 +688,6 @@ void MainWindow::saveWidgetState(QWidget* w, QDomElement& de)
 	de.setAttribute("height", normalGeometry.height());
 }
 
-
-
-
 void MainWindow::restoreWidgetState(QWidget* w, const QDomElement& de)
 {
 	// TODO: Only use one of these
@@ -697,43 +696,34 @@ void MainWindow::restoreWidgetState(QWidget* w, const QDomElement& de)
 	{
 		// Fall back on parent
 		win = qobject_cast<SubWindow*>(w->parentWidget());
-		if (!win)
-		{
-			// Still could not find the window - soft fail
-			return;
-		}
+
+		// Still could not find the window - soft fail
+		if (!win) { return; }
 	}
 
-	const auto normalGeometry = QRect {
+	const auto normalGeometry = QRect{
 		de.attribute("x").toInt(),
 		de.attribute("y").toInt(),
 		de.attribute("width").toInt(),
-		de.attribute("height").toInt()
+		de.attribute("height").toInt(),
 	};
 
-	if (normalGeometry.isValid())
-	{
-		// first restore the window, as attempting to resize a maximized window causes graphics glitching
-		win->setWindowState(win->windowState() & ~(Qt::WindowMaximized | Qt::WindowMinimized));
+	// First restore the window, as attempting to resize a maximized window can cause graphical glitches.
+	win->setWindowState(win->windowState() & ~(Qt::WindowMaximized | Qt::WindowMinimized));
 
-		win->setGeometry(normalGeometry);
+	// Then resize it. `QWidget::setGeometry` adjusts the size if it is invalid / under the minimum size.
+	win->setGeometry(normalGeometry);
 
-		// set the window to its correct minimized/maximized/restored state
-		Qt::WindowStates winState = win->windowState();
-		winState = de.attribute("maximized").toInt()
-			? (winState | Qt::WindowMaximized)
-			: (winState & ~Qt::WindowMaximized);
-		win->setWindowState(winState);
-	}
+	// Set the window to its correct "maximized?" state.
+	auto winState = win->windowState();
+	winState.setFlag(Qt::WindowMaximized, de.attribute("maximized").toInt());
+	win->setWindowState(winState);
 
 	if (const auto visible = de.attribute("visible"); !visible.isEmpty())
 	{
 		win->setVisible(visible.toInt());
 	}
 }
-
-
-
 
 void MainWindow::emptySlot()
 {
@@ -1277,23 +1267,38 @@ void MainWindow::sessionCleanup()
 
 bool MainWindow::eventFilter(QObject* watched, QEvent* event)
 {
-	// For now this function is only used to globally block tooltips
-	// It must be installed to QApplication through installEventFilter
+	const auto isWinDeactivate = [](QEvent* event) -> bool
+	{
+		if (event->type() == QEvent::WindowDeactivate) { return true; }
+
+		if (event->type() == QEvent::FocusOut)
+		{
+			auto* fe = static_cast<QFocusEvent*>(event);
+			switch (fe->reason())
+			{
+			case Qt::ActiveWindowFocusReason: [[fallthrough]];
+			case Qt::PopupFocusReason: [[fallthrough]];
+			case Qt::OtherFocusReason:
+				return true;
+			default:
+				break;
+			}
+		}
+
+		return false;
+	};
+
+	// Clear modifiers when the window has been unfocused (install event filter on the window itself)
+	if (dynamic_cast<MainWindow*>(watched) != nullptr && isWinDeactivate(event))
+	{
+		clearKeyModifiers();
+		return QObject::eventFilter(watched, event);
+	}
+
+	// Block tooltips globally (install event filter on QApplication instance)
 	if (event->type() == QEvent::ToolTip) { return true; }
 
 	return QObject::eventFilter(watched, event);
-}
-
-
-
-
-void MainWindow::focusOutEvent( QFocusEvent * _fe )
-{
-	// TODO Remove this function, since it is apparently never actually called!
-	// when loosing focus we do not receive key-(release!)-events anymore,
-	// so we might miss release-events of one the modifiers we're watching!
-	clearKeyModifiers();
-	QMainWindow::leaveEvent( _fe );
 }
 
 

@@ -2,7 +2,7 @@
  * Oscilloscope.cpp
  *
  * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -77,8 +77,8 @@ void Oscilloscope::updateAudioBuffer(const SampleFrame* buffer)
 {
 	if( !Engine::getSong()->isExporting() )
 	{
-		const f_cnt_t fpp = Engine::audioEngine()->framesPerPeriod();
-		memcpy(m_buffer, buffer, sizeof(SampleFrame) * fpp);
+		const f_cnt_t frames = Engine::audioEngine()->framesPerPeriod();
+		memcpy(m_buffer, buffer, sizeof(SampleFrame) * frames);
 	}
 }
 

@@ -1,20 +1,14 @@
-FIND_PACKAGE(Doxygen)
+cmake_minimum_required(VERSION 3.27)
 
-if(DOXYGEN_FOUND)
-	set(INPUTDIRS 
-		"\"${CMAKE_CURRENT_SOURCE_DIR}../src/core\"
-		\"${CMAKE_CURRENT_SOURCE_DIR}../src/gui\"
-		\"${CMAKE_CURRENT_SOURCE_DIR}../src/tracks\"
-		\"${CMAKE_CURRENT_SOURCE_DIR}../include\"
-		\"${CMAKE_CURRENT_SOURCE_DIR}../plugins\"")
-	CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
+project(lmms)
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/../cmake/modules" ${CMAKE_MODULE_PATH})
 
-	ADD_CUSTOM_TARGET(doc
-		COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
-		WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-		COMMENT "Generating API documentation with Doxygen"
-		SOURCES Doxyfile.in)
-endif(DOXYGEN_FOUND)
+find_package(Doxygen REQUIRED)
+configure_file(Doxyfile.in Doxyfile @ONLY)
+doxygen_add_docs(doc
+	USE_STAMP_FILE
+	WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+	COMMENT "Generating HTML documentation with Doxygen"
+	CONFIG_FILE ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
 
-ADD_SUBDIRECTORY(bash-completion)
-
+add_subdirectory(bash-completion)

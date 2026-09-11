@@ -1,0 +1,43 @@
+html {
+	--font-family-emoji: "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+	--font-family-normal: system-ui, -apple-system, ui-sans-serif, sans-serif, var(--font-family-emoji);
+	--font-family-monospace: "Cascadia Code", SFMono-Regular, "SF Mono", "JetBrains Mono", "Ubuntu Sans Mono", Menlo, "Liberation Mono", ui-monospace, monospace, var(--font-family-emoji);
+	--font-family-nav: var(--font-family-normal);
+	--font-family-title: var(--font-family-normal);
+	--font-family-toc: var(--font-family-normal);
+	--font-family-search: var(--font-family-normal);
+	--font-family-icon: var(--font-family-normal);
+	--font-family-tooltip: var(--font-family-normal);
+}
+
+@media (prefers-color-scheme: dark) {
+	html:not(.light-mode) {
+		--font-family-emoji: "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+		--font-family-normal: system-ui, -apple-system, ui-sans-serif, sans-serif, var(--font-family-emoji);
+		--font-family-monospace: "Cascadia Code", SFMono-Regular, "SF Mono", "JetBrains Mono", "Ubuntu Sans Mono", Menlo, "Liberation Mono", ui-monospace, monospace, var(--font-family-emoji);
+		--font-family-nav: var(--font-family-normal);
+		--font-family-title: var(--font-family-normal);
+		--font-family-toc: var(--font-family-normal);
+		--font-family-search: var(--font-family-normal);
+		--font-family-icon: var(--font-family-normal);
+		--font-family-tooltip: var(--font-family-normal);
+	}
+}
+
+#projectlogo {
+	vertical-align: middle;
+	&>img { max-height: 44px } /* 2 * 22px to match height of title & brief */
+}
+
+code.param, table.params td.paramname {
+	color: var(--memdef-param-name-color);
+	background-color: var(--fragment-background-color);
+}
+
+code.param, span.tt, table.params td.paramname {
+	font: normal normal 95%/pow(sqrt(2), -0.5) var(--font-family-monospace);
+	vertical-align: baseline;
+	display: inline-block;
+	border-radius: calc(pow(sqrt(2), -3.0) * 1rem);
+	padding: calc(pow(sqrt(2), -4.0) * 1rem) calc(pow(sqrt(2), -3.5) * 1rem);
+}

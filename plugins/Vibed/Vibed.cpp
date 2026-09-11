@@ -293,9 +293,8 @@ VibedView::VibedView(Instrument* instrument, QWidget* parent) :
 	pal.setBrush(backgroundRole(), PLUGIN_NAME::getIconPixmap("artwork"));
 	setPalette(pal);
 
-	m_volumeKnob.setVolumeKnob(true);
 	m_volumeKnob.move(103, 142);
-	m_volumeKnob.setHintText(tr("String volume:"), "");
+	m_volumeKnob.setHintText(tr("String volume:"), "%");
 
 	m_stiffnessKnob.move(129, 142);
 	m_stiffnessKnob.setHintText(tr("String stiffness:"), "");
