@@ -28,6 +28,7 @@
 
 #include "Sample.h"
 #include "PlayHandle.h"
+#include "AutomatableModel.h"
 
 namespace lmms
 {
@@ -80,6 +81,7 @@ private:
 	PatternTrack* m_patternTrack = nullptr;
 	bool m_doneMayReturnTrue = true;
 	bool m_ownAudioBusHandle = false;
+	FloatModel m_previewVolumeModel;
 } ;
 
 

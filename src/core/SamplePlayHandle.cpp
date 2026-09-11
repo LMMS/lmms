@@ -37,10 +37,11 @@ SamplePlayHandle::SamplePlayHandle(Sample* sample, bool ownAudioBusHandle)
 	: PlayHandle(Type::SamplePlayHandle)
 	, m_sample(sample)
 	, m_ownAudioBusHandle(ownAudioBusHandle)
+	, m_previewVolumeModel(DefaultVolume, MinVolume, MaxVolume, 0.1f, nullptr, "Preview volume")
 {
 	if (ownAudioBusHandle)
 	{
-		setAudioBusHandle(new AudioBusHandle("SamplePlayHandle", false));
+		setAudioBusHandle(new AudioBusHandle("SamplePlayHandle", false, &m_previewVolumeModel));
 	}
 }
 
