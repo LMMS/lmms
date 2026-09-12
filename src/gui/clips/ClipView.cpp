@@ -65,14 +65,6 @@ constexpr float RESIZE_GRIP_MAX_WIDTH_FRACTION = 0.1f;
 
 TextFloat* ClipView::s_textFloat = nullptr;
 
-/*! A pointer for that text bubble used when moving segments, etc.
- *
- * In a number of situations, LMMS displays a floating text bubble
- * beside the cursor as you move or resize elements of a track about.
- * This pointer keeps track of it, as you only ever need one at a time.
- */
-TextFloat * ClipView::s_textFloat = nullptr;
-
 
 ClipView::ClipView(Clip* clip,
 							TrackView* tv , int offset) :
