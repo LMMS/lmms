@@ -244,19 +244,6 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
 </context>
 <context>
-    <name>AudioOss</name>
-    <message>
-        <location filename="../../src/core/audio/AudioOss.cpp" line="330"/>
-        <source>Device</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/core/audio/AudioOss.cpp" line="342"/>
-        <source>Channels</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>AudioPortAudio::setupWidget</name>
     <message>
         <location filename="../../src/core/audio/AudioPortAudio.cpp" line="415"/>
