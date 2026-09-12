@@ -38,12 +38,6 @@
 namespace lmms
 {
 
-/*! \brief Create a new Clip
- *
- *  Creates a new clip for the given track.
- *
- * \param _track The track that will contain the new object
- */
 Clip::Clip( Track * track ) :
 	Model( track ),
 	m_track( track ),
@@ -64,12 +58,6 @@ Clip::Clip( Track * track ) :
 }
 
 
-/*! \brief Copy a Clip
- *
- *  Creates a duplicate clip of the one provided.
- *
- * \param other The clip object which will be copied.
- */
 Clip::Clip(const Clip& other):
 	Model(other.m_track),
 	m_track(other.m_track),
@@ -89,11 +77,7 @@ Clip::Clip(const Clip& other):
 	}
 }
 
-/*! \brief Destroy a Clip
- *
- *  Destroys the given clip.
- *
- */
+
 Clip::~Clip()
 {
 	emit destroyedClip();
@@ -116,13 +100,6 @@ void Clip::changeLoopLength(TimePos length)
 
 
 
-/*! \brief Move this Clip's position in time
- *
- *  If the clip has moved, update its position.  We
- *  also add a journal entry for undo and update the display.
- *
- * \param _pos The new position of the clip.
- */
 void Clip::movePosition( const TimePos & pos )
 {
 	TimePos newPos = std::max(0, pos.getTicks());
@@ -148,6 +125,7 @@ void Clip::movePosition( const TimePos & pos )
  */
 void Clip::changeLength(const TimePos & length)
 {
+	if (m_length == length) { return; }
 	bool noLoop = m_length == m_loopLength;
 
 	m_length = length;
@@ -161,20 +139,12 @@ void Clip::changeLength(const TimePos & length)
 }
 
 
-
-
 bool Clip::comparePosition(const Clip *a, const Clip *b)
 {
 	return a->startPosition() < b->startPosition();
 }
 
 
-
-
-/*! \brief Copies the state of a Clip to another Clip
- *
- *  This method copies the state of a Clip to another Clip
- */
 void Clip::copyStateTo( Clip *src, Clip *dst )
 {
 	// If the node names match we copy the state
@@ -209,15 +179,6 @@ bool Clip::manuallyResizable() const
 }
 
 
-
-/*! \brief Mutes this Clip
- *
- *  Restore the previous state of this clip. This will
- *  restore the position or the length of the clip
- *  depending on what was changed.
- *
- * \param _je The journal entry to undo
- */
 void Clip::toggleMute()
 {
 	m_mutedModel.setValue( !m_mutedModel.value() );
@@ -225,14 +186,10 @@ void Clip::toggleMute()
 }
 
 
-
-
 TimePos Clip::startTimeOffset() const
 {
 	return m_startTimeOffset;
 }
-
-
 
 
 void Clip::setStartTimeOffset( const TimePos &startTimeOffset )

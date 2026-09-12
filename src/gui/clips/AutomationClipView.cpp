@@ -496,9 +496,6 @@ void AutomationClipView::createLoopView()
 
 
 
-/**
- * @brief Preserves the auto points over different scale
- */
 void AutomationClipView::scaleTimemapToFit( float oldMin, float oldMax )
 {
 	float newMin = m_clip->getMin();
