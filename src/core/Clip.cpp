@@ -114,15 +114,6 @@ void Clip::movePosition( const TimePos & pos )
 }
 
 
-
-
-/*! \brief Change the length of this Clip
- *
- *  If the clip's length has changed, update it.  We
- *  also add a journal entry for undo and update the display.
- *
- * \param _length The new length of the clip.
- */
 void Clip::changeLength(const TimePos & length)
 {
 	if (m_length == length) { return; }

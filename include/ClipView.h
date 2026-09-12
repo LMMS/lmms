@@ -268,7 +268,7 @@ protected:
 	//! @brief Create a DataFile suitable for copying multiple clips.
 	//!
 	//!	Clips in the vector are written to the "clips" node in the DataFile. The ClipView's initial mouse position is
-	//! written to the "initialMouseX" node in the DataFile.  When droppedm_loopStripeWidth on a track, this is used to create copies of
+	//! written to the "initialMouseX" node in the DataFile.  When dropped on a track, this is used to create copies of
 	//! the Clips.
 	//!
 	//! @param clips The trackContectObjects to save in a DataFile
