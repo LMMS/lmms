@@ -91,6 +91,11 @@ public:
 		return m_trackView;
 	}
 
+	inline int offset() const
+	{
+		return m_offset;
+	}
+
 	// qproperty access functions, to be inherited & used by Clipviews
 	QColor mutedColor() const { return m_mutedColor; }
 	QColor mutedBackgroundColor() const { return m_mutedBackgroundColor; }
@@ -113,7 +118,7 @@ public:
 	void setGradient(const bool& b) { m_gradient = b; }
 	void setMarkerColor(const QColor& c) { m_markerColor = QColor(c); }
 	void setLoopStripeWidth(const unsigned int w) { m_loopStripeWidth = w; }
-	void setLoopStripeSpacing(const unsigned int spacing); { m_loopStripeSpacing = spacing; }
+	void setLoopStripeSpacing(const unsigned int spacing) { m_loopStripeSpacing = spacing; }
 
 	bool needsUpdate() const { return m_needsUpdate; }
 	void setNeedsUpdate(bool b) { m_needsUpdate = b; }
