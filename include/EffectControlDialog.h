@@ -46,8 +46,6 @@ public:
 
 protected:
 	EffectControls* m_effectControls;
-
-	void modelChanged() override;
 };
 
 } // namespace gui

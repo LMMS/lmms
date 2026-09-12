@@ -242,7 +242,6 @@ void EffectView::modelChanged()
 	m_bypass->setModel( &effect()->m_enabledModel );
 	m_wetDry->setModel( &effect()->m_wetDryModel );
 	m_autoQuit->setModel( &effect()->m_autoQuitModel );
-	update();
 }
 
 void EffectView::corruptStateUpdate()
