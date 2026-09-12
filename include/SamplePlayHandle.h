@@ -28,7 +28,6 @@
 
 #include "Sample.h"
 #include "PlayHandle.h"
-#include "AutomatableModel.h"
 
 namespace lmms
 {
@@ -37,12 +36,13 @@ namespace lmms
 class PatternTrack;
 class SampleClip;
 class Track;
+class FloatModel;
 
 
 class LMMS_EXPORT SamplePlayHandle : public PlayHandle
 {
 public:
-	SamplePlayHandle(Sample* sample, bool ownAudioBusHandle = true);
+	SamplePlayHandle(Sample* sample, bool ownAudioBusHandle = true, FloatModel* volumeModel = nullptr);
 	SamplePlayHandle( const QString& sampleFile );
 	SamplePlayHandle( SampleClip* clip );
 	~SamplePlayHandle() override;
@@ -81,7 +81,6 @@ private:
 	PatternTrack* m_patternTrack = nullptr;
 	bool m_doneMayReturnTrue = true;
 	bool m_ownAudioBusHandle = false;
-	FloatModel m_previewVolumeModel;
 } ;
 
 

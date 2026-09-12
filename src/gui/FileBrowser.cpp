@@ -48,6 +48,7 @@
 #include "DeprecationHelper.h"
 #include "Engine.h"
 #include "FileBrowser.h"
+#include "Mixer.h"
 #include "FileRevealer.h"
 #include "GuiApplication.h"
 #include "ImportFilter.h"
@@ -813,7 +814,8 @@ void FileBrowserTreeWidget::previewFileItem(FileItem* file)
 		qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 		if (auto buffer = SampleBuffer::fromFile(fileName))
 		{
-			auto s = new SamplePlayHandle(new lmms::Sample{std::move(buffer)});
+			FloatModel* masterVolume = &Engine::mixer()->mixerChannel(0)->m_volumeModel;
+			auto s = new SamplePlayHandle(new lmms::Sample{std::move(buffer)}, true, masterVolume);
 			s->setDoneMayReturnTrue(false);
 			newPPH = s;
 		}

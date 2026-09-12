@@ -33,15 +33,14 @@
 namespace lmms
 {
 
-SamplePlayHandle::SamplePlayHandle(Sample* sample, bool ownAudioBusHandle)
+SamplePlayHandle::SamplePlayHandle(Sample* sample, bool ownAudioBusHandle, FloatModel* volumeModel)
 	: PlayHandle(Type::SamplePlayHandle)
 	, m_sample(sample)
 	, m_ownAudioBusHandle(ownAudioBusHandle)
-	, m_previewVolumeModel(DefaultVolume, MinVolume, MaxVolume, 0.1f, nullptr, "Preview volume")
 {
 	if (ownAudioBusHandle)
 	{
-		setAudioBusHandle(new AudioBusHandle("SamplePlayHandle", false, &m_previewVolumeModel));
+		setAudioBusHandle(new AudioBusHandle("SamplePlayHandle", false, volumeModel));
 	}
 }
 
@@ -49,7 +48,7 @@ SamplePlayHandle::SamplePlayHandle(Sample* sample, bool ownAudioBusHandle)
 
 
 SamplePlayHandle::SamplePlayHandle( const QString& sampleFile ) :
-	SamplePlayHandle(new Sample(SampleBuffer::fromFile(sampleFile)), true)
+	SamplePlayHandle(new Sample(SampleBuffer::fromFile(sampleFile)), true, nullptr)
 {
 }
 
@@ -57,7 +56,7 @@ SamplePlayHandle::SamplePlayHandle( const QString& sampleFile ) :
 
 
 SamplePlayHandle::SamplePlayHandle( SampleClip* clip ) :
-	SamplePlayHandle(&clip->sample(), false)
+	SamplePlayHandle(&clip->sample(), false, nullptr)
 {
 	m_track = clip->getTrack();
 	setAudioBusHandle(((SampleTrack *)clip->getTrack())->audioBusHandle());
