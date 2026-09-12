@@ -689,8 +689,7 @@ void ClipView::paintStripes(QPainter& painter, QColor color)
 	p.drawLine(tileWidth, 0, tileWidth * 3, tileWidth * 2);
 	p.end();
 
-	painter.setBrush(QBrush(tile.copy(tileWidth, tileWidth, tileWidth, tileWidth)));
-	painter.drawRect(rect());
+	painter.fillRect(rect(), QBrush(tile.copy(tileWidth, tileWidth, tileWidth, tileWidth)));
 }
 
 /*! \brief Handle a mouse press on this ClipView.
