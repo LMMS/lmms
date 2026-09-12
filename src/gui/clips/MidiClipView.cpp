@@ -551,20 +551,6 @@ static int computeNoteRange(int minKey, int maxKey)
 
 void MidiClipView::paintEvent( QPaintEvent * )
 {
-	// Slightly better implementation of QColor::lighter that doesn't die when the value is zero.
-	const auto lighterX = [](QColor c, int factor)
-	{
-		double h, s, v, a;
-		c.getHsvF(&h, &s, &v, &a);
-
-		v = std::max(0.1, v) * static_cast<float>(factor) / 100.0;
-		v = std::clamp(v, 0.0, 1.0);
-
-		QColor ret;
-		ret.setHsvF(h, s, v, a);
-		return ret;
-	};
-
 	QPainter painter( this );
 
 	if( !needsUpdate() )
@@ -770,11 +756,11 @@ void MidiClipView::paintEvent( QPaintEvent * )
 
 		// set colour based on mute status
 		QColor noteFillColor = muted
-			? lighterX(getMutedNoteFillColor(), 200)
+			? lighter(getMutedNoteFillColor(), 200)
 			: (bgColor.lightness() > 175 ? getNoteFillColor().darker(400) : getNoteFillColor());
 		QColor noteBorderColor = muted
 			? getMutedNoteBorderColor()
-			: (hasCustomColor() ? lighterX(bgColor, 200) : getNoteBorderColor());
+			: (hasCustomColor() ? lighter(bgColor, 200) : getNoteBorderColor());
 
 		bool const drawAsLines = height() < 64;
 		if (drawAsLines)
@@ -848,11 +834,11 @@ void MidiClipView::paintEvent( QPaintEvent * )
 	if (!(fixedClips() && beatClip))
 	{
 		// inner border
-		p.setPen(lighterX(bgColor, current ? 160 : 130));
+		p.setPen(lighter(bgColor, current ? 160 : 130));
 		p.drawRect(1, 1, rect().right() - BORDER_WIDTH, rect().bottom() - BORDER_WIDTH);
 
 		// outer border
-		p.setPen(current ? lighterX(bgColor, 130) : bgColor.darker(300));
+		p.setPen(current ? lighter(bgColor, 130) : bgColor.darker(300));
 		p.drawRect(0, 0, rect().right(), rect().bottom());
 	}
 

@@ -286,7 +286,7 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	p.setRenderHint( QPainter::Antialiasing, false );
 
 	// inner border
-	p.setPen(bgColor.lighter(135));
+	p.setPen(lighter(bgColor, 135));
 	p.drawRect(
 		-m_paintPixmapXPosition + 1,
 		1,

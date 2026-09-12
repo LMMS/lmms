@@ -288,6 +288,15 @@ protected slots:
 	//! has changed the track view's length.
 	void updatePosition();
 
+	//! @brief Makes the color lighter by modifying its HSV value.
+	//!
+	//! This is a slightly better implementation of `QColor::lighter` that doesn't malfunction when the value
+	//! is zero.
+	//!
+	//! @param src The source color
+	//! @param factor The factor to multiply, multiplied by 100 (e.g. factor=150 means 50% lighter).
+	QColor lighter(QColor src, int factor);
+
 private:
 	enum class Action
 	{
@@ -384,8 +393,7 @@ private:
 	//! @brief Chooses the correct cursor to be displayed on the widget
 	//! @param me The QMouseEvent that is triggering the cursor change
 	void updateCursor(QMouseEvent* me);
-} ;
-
+};
 
 } // namespace gui
 

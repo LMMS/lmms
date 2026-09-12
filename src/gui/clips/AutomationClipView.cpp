@@ -281,7 +281,7 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 	QLinearGradient lin2grad( 0, min, 0, max );
 	QColor col = painter.pen().brush().color();
 
-	lin2grad.setColorAt( 1, col.lighter( 150 ) );
+	lin2grad.setColorAt(1, lighter(col, 150));
 	lin2grad.setColorAt( 0.5, col );
 	lin2grad.setColorAt( 0, col.darker( 150 ) );
 
@@ -376,12 +376,12 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 	paintTextLabel(m_clip->name(), p);
 
 	// inner border
-	p.setPen( c.lighter( current ? 160 : 130 ) );
+	p.setPen(lighter(c, current ? 160 : 130));
 	p.drawRect( 1, 1, rect().right() - BORDER_WIDTH,
 		rect().bottom() - BORDER_WIDTH );
 
 	// outer border
-	p.setPen( current? c.lighter( 130 ) : c.darker( 300 ) );
+	p.setPen(current ? lighter(c, 130) : c.darker(300));
 	p.drawRect( 0, 0, rect().right(), rect().bottom() );
 
 	// draw the 'muted' pixmap only if the clip was manually muted

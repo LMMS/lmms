@@ -1247,4 +1247,17 @@ bool ClipView::splitClip(const TimePos pos)
 	return true;
 }
 
+QColor ClipView::lighter(const QColor src, const int factor)
+{
+	double h, s, v, a;
+	src.getHsvF(&h, &s, &v, &a);
+
+	v = std::max(0.1, v) * static_cast<float>(factor) / 100.0;
+	v = std::clamp(v, 0.0, 1.0);
+
+	QColor ret;
+	ret.setHsvF(h, s, v, a);
+	return ret;
+}
+
 } // namespace lmms::gui
