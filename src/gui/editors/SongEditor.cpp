@@ -104,6 +104,7 @@ SongEditor::SongEditor( Song * song ) :
 	connect( m_timeLine, SIGNAL(selectionFinished()),
 			 this, SLOT(stopRubberBand()));
 	connect(this, &TrackContainerView::trackHeadWidthChanged, m_timeLine, [this](int width){ m_timeLine->setXOffset(width); });
+	connect(this, &TrackContainerView::trackHeadWidthChanged, this, &SongEditor::updatePositionLine);
 
 	// when tracks realign, adjust height of position line
 	connect(this, &TrackContainerView::tracksRealigned, this, &SongEditor::updatePositionLine);
