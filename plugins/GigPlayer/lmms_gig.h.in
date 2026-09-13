@@ -1,0 +1,12 @@
+// todo: remove if gig > 4.1 is guaranteed everywhere
+
+#define GIG_VERSION_MAJOR @GIG_VERSION_MAJOR@
+#define GIG_VERSION_MINOR @GIG_VERSION_MINOR@
+#define GIG_VERSION_PATCH @GIG_VERSION_PATCH@
+#cmakedefine GIG_VERSION_REVISION @GIG_VERSION_REVISION@
+
+#if GIG_VERSION_MAJOR < 4 || (GIG_VERSION_MAJOR == 4 && GIG_VERSION_MINOR == 0)
+namespace gig {
+	typedef unsigned long file_offset_t;
+}
+#endif

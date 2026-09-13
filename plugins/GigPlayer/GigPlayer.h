@@ -40,9 +40,14 @@
 #include "Knob.h"
 #include "LcdSpinBox.h"
 #include "SampleFrame.h"
-#include "gig.h"
 
+#include <libgig/gig.h>
+#include <vector>
+#include <list>
 
+#ifndef _MSC_VER
+#include "lmms_gig.h" // version specific typedef disabled on msvc
+#endif
 class QLabel;
 
 
@@ -136,7 +141,7 @@ public:
 	ADSR();
 	ADSR( gig::DimensionRegion * region, int sampleRate );
 	void keyup(); // We will begin releasing starting now
-	bool done(); // Is this sample done playing?
+	bool done() const; // Is this sample done playing?
 	float value(); // What's the current amplitude
 	void inc( f_cnt_t num ); // Increment internal positions by num
 } ;
@@ -163,12 +168,12 @@ public:
 	ADSR adsr;
 
 	// The position in sample
-	f_cnt_t pos;
+	gig::file_offset_t pos;
 
 	// Whether to change the pitch of the samples, e.g. if there's only one
 	// sample per octave and you want that sample pitch shifted for the rest of
 	// the notes in the octave, this will be true
-	bool pitchtrack;
+	//bool pitchtrack;
 
 	// Used to convert sample rates
 	AudioResampler m_resampler;
@@ -213,7 +218,7 @@ public:
 	bool isRelease; // Whether this is a release sample, changes when we delete it
 	GigState state;
 	float frequency;
-	std::vector<GigSample> samples;
+	std::list<GigSample> samples;
 
 	// Used to determine which note should be released on key up
 	//
@@ -291,7 +296,7 @@ private:
 	QMutex m_notesMutex;
 
 	// List of all the currently playing notes
-	QList<GigNote> m_notes;
+	std::list<GigNote> m_notes;
 
 	// Used when determining which samples to use
 	uint32_t m_RandomSeed;
@@ -309,9 +314,7 @@ private:
 	Dimension getDimensions( gig::Region * pRegion, int velocity, bool release );
 
 	// Load sample data from the Gig file, looping the sample where needed
-	void loadSample( GigSample& sample, SampleFrame* sampleData, f_cnt_t samples );
-	f_cnt_t getLoopedIndex( f_cnt_t index, f_cnt_t startf, f_cnt_t endf ) const;
-	f_cnt_t getPingPongIndex( f_cnt_t index, f_cnt_t startf, f_cnt_t endf ) const;
+	void loadSample(GigSample& sample, SampleFrame* sampleData, gig::file_offset_t samples);
 
 	// Add the desired samples to the note, either normal samples or release
 	// samples
