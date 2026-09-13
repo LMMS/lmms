@@ -788,11 +788,8 @@ void SongEditor::updatePosition()
 
 void SongEditor::updatePositionLine()
 {
-	const bool compactTrackButtons = ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt();
-	const auto widgetWidth = compactTrackButtons ? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT : DEFAULT_SETTINGS_WIDGET_WIDTH;
-	const auto trackOpWidth = compactTrackButtons ? TRACK_OP_WIDTH_COMPACT : TRACK_OP_WIDTH;
 	const int x = m_timeLine->markerX(m_timeLine->timeline()->pos());
-	if(x >= getTrackHeadWidth() - 1)
+	if (x >= getTrackHeadWidth() - 1)
 	{
 		m_positionLine->show();
 		m_positionLine->move( x-( m_positionLine->width() - 1 ), m_timeLine->height() );
