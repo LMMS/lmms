@@ -87,11 +87,6 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../include/AudioOss.h" line="58"/>
-        <source>OSS (Open Sound System)</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
         <location filename="../../include/AudioPortAudio.h" line="79"/>
         <source>PortAudio</source>
         <translation type="unfinished"/>
@@ -109,11 +104,6 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <message>
         <location filename="../../include/AudioSndio.h" line="59"/>
         <source>sndio</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../../include/AudioSoundIo.h" line="69"/>
-        <source>soundio</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -624,11 +614,6 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../include/MidiOss.h" line="54"/>
-        <source>OSS Raw-MIDI (Open Sound System)</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
         <location filename="../../include/MidiSndio.h" line="55"/>
         <source>sndio MIDI</source>
         <translation type="unfinished"/>
@@ -861,7 +846,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <translation>Algoritem odjeka je ustvaril Sean Costello</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="64"/>
+        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="73"/>
         <source>Player for SoundFont files</source>
         <translation>Predvajalnik za SoundFont datoteke</translation>
     </message>
@@ -1051,12 +1036,12 @@ Ta čipa sta bila uporabljane v računalniku Commodore 64.</translation>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/core/DataFile.cpp" line="2064"/>
+        <location filename="../../src/core/DataFile.cpp" line="2038"/>
         <source>LADSPA plugins</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/core/DataFile.cpp" line="2065"/>
+        <location filename="../../src/core/DataFile.cpp" line="2039"/>
         <source>The project contains %1 LADSPA plugin(s) which might have not been restored correctly! Please check the project.</source>
         <translation type="unfinished"/>
     </message>
@@ -1319,19 +1304,6 @@ Ta čipa sta bila uporabljane v računalniku Commodore 64.</translation>
     </message>
 </context>
 <context>
-    <name>lmms::AudioOss</name>
-    <message>
-        <location filename="../../src/core/audio/AudioOss.cpp" line="251"/>
-        <source>Device</source>
-        <translation>Naprava</translation>
-    </message>
-    <message>
-        <location filename="../../src/core/audio/AudioOss.cpp" line="262"/>
-        <source>Channels</source>
-        <translation>Kanali</translation>
-    </message>
-</context>
-<context>
     <name>lmms::AudioPulseAudio</name>
     <message>
         <location filename="../../src/core/audio/AudioPulseAudio.cpp" line="260"/>
@@ -1368,19 +1340,6 @@ Ta čipa sta bila uporabljane v računalniku Commodore 64.</translation>
         <location filename="../../src/core/audio/AudioSndio.cpp" line="174"/>
         <source>Channels</source>
         <translation>Kanali</translation>
-    </message>
-</context>
-<context>
-    <name>lmms::AudioSoundIo::setupWidget</name>
-    <message>
-        <location filename="../../src/core/audio/AudioSoundIo.cpp" line="410"/>
-        <source>Backend</source>
-        <translation>Zaledje</translation>
-    </message>
-    <message>
-        <location filename="../../src/core/audio/AudioSoundIo.cpp" line="413"/>
-        <source>Device</source>
-        <translation>Naprava</translation>
     </message>
 </context>
 <context>
@@ -1439,7 +1398,7 @@ Ta čipa sta bila uporabljane v računalniku Commodore 64.</translation>
 <context>
     <name>lmms::AutomationClip</name>
     <message>
-        <location filename="../../src/core/AutomationClip.cpp" line="922"/>
+        <location filename="../../src/core/AutomationClip.cpp" line="879"/>
         <source>Drag a control while pressing &lt;%1&gt;</source>
         <translation>Povlecite kontrolo in zraven držite &lt;%1&gt;</translation>
     </message>
@@ -1539,8 +1498,8 @@ Ta čipa sta bila uporabljane v računalniku Commodore 64.</translation>
 <context>
     <name>lmms::Clip</name>
     <message>
-        <location filename="../../src/core/Clip.cpp" line="52"/>
-        <location filename="../../src/core/Clip.cpp" line="79"/>
+        <location filename="../../src/core/Clip.cpp" line="46"/>
+        <location filename="../../src/core/Clip.cpp" line="67"/>
         <source>Mute</source>
         <translation>Utišaj</translation>
     </message>
@@ -5118,72 +5077,72 @@ Razlog: &quot;%2&quot;</translation>
 <context>
     <name>lmms::Sf2Instrument</name>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="134"/>
+        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="143"/>
         <source>Bank</source>
         <translation>Tabela</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="135"/>
+        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="144"/>
         <source>Patch</source>
         <translation>Program</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="136"/>
+        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="145"/>
         <source>Gain</source>
         <translation>Jakost</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="137"/>
+        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="146"/>
         <source>Reverb</source>
         <translation>Odjek</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="138"/>
+        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="147"/>
         <source>Reverb room size</source>
         <translation>Velikost prostora odjeka</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="139"/>
+        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="148"/>
         <source>Reverb damping</source>
         <translation>Dušenje odjeka</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="140"/>
+        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="149"/>
         <source>Reverb width</source>
         <translation>Širina odjeka</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="141"/>
+        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="150"/>
         <source>Reverb level</source>
         <translation>Nivo odjeka</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="142"/>
+        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="151"/>
         <source>Chorus</source>
         <translation>Kor</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="143"/>
+        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="152"/>
         <source>Chorus voices</source>
         <translation>Glasovi kora</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="144"/>
+        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="153"/>
         <source>Chorus level</source>
         <translation>Nivo kora</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="145"/>
+        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="154"/>
         <source>Chorus speed</source>
         <translation>Hitrost kora</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="146"/>
+        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="155"/>
         <source>Chorus depth</source>
         <translation>Globina kora</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="406"/>
+        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="409"/>
         <source>A soundfont %1 could not be loaded.</source>
         <translation>Soundfont %1 ni bilo mogoče naložiti</translation>
     </message>
@@ -5567,12 +5526,12 @@ Razlog: &quot;%2&quot;</translation>
 <context>
     <name>lmms::Track</name>
     <message>
-        <location filename="../../src/core/Track.cpp" line="64"/>
+        <location filename="../../src/core/Track.cpp" line="54"/>
         <source>Mute</source>
         <translation>Utišaj</translation>
     </message>
     <message>
-        <location filename="../../src/core/Track.cpp" line="65"/>
+        <location filename="../../src/core/Track.cpp" line="55"/>
         <source>Solo</source>
         <translation>Solo</translation>
     </message>
@@ -6330,124 +6289,124 @@ Prepričajte se, da imate pravico za branje te datoteke in njeno mapo ter poskus
 <context>
     <name>lmms::gui::AutomationEditorWindow</name>
     <message>
-        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2025"/>
+        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2013"/>
         <source>Play/pause current clip (Space)</source>
         <translation>Predvajanje/premor trenutnega izseka (preslednica)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2027"/>
+        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2015"/>
         <source>Stop playing of current clip (Space)</source>
         <translation>Zaustavi predvajanje trenutnega izseka (preslednica)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2030"/>
+        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2018"/>
         <source>Edit actions</source>
         <translation>Urejanje dejanj</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2033"/>
+        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2021"/>
         <source>Draw mode (Shift+D)</source>
         <translation>Način risanja (Sshift+D)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2038"/>
+        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2026"/>
         <source>Erase mode (Shift+E)</source>
         <translation>Način brisanja (Shift+E)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2041"/>
+        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2029"/>
         <source>Draw outValues mode (Shift+C)</source>
         <translation>Način risanja izhodnih outValues vrednosti (Shift+C)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2044"/>
+        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2032"/>
         <source>Edit tangents mode (Shift+T)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2048"/>
+        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2036"/>
         <source>Flip vertically</source>
         <translation>Zrcali navpično</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2049"/>
+        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2037"/>
         <source>Flip horizontally</source>
         <translation>Zrcali vodoravno</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2061"/>
+        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2049"/>
         <source>Interpolation controls</source>
         <translation>Nadzor nad interpolacijo</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2066"/>
+        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2054"/>
         <source>Discrete progression</source>
         <translation>Diskretno napredovanje</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2070"/>
+        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2058"/>
         <source>Linear progression</source>
         <translation>Linearno napredovanje</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2072"/>
+        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2060"/>
         <source>Cubic Hermite progression</source>
         <translation>Kubični Hermit napredovanje</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2079"/>
+        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2067"/>
         <source>Tension value for spline</source>
         <translation>Vrednost napetosti za zlepek</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2088"/>
+        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2076"/>
         <source>Tension: </source>
         <translation>Napetost:</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2096"/>
+        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2084"/>
         <source>Zoom controls</source>
         <translation>Nadzor povečave</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2103"/>
+        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2091"/>
         <source>Horizontal zooming</source>
         <translation>Vodoravna povečava</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2121"/>
+        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2109"/>
         <source>Vertical zooming</source>
         <translation>NAvpična povečava</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2142"/>
+        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2130"/>
         <source>Quantization controls</source>
         <translation>Nadzor nad kvantizacijo</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2149"/>
+        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2137"/>
         <source>Quantization</source>
         <translation>Kvantizacija</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2158"/>
+        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2146"/>
         <source>Clear ghost notes</source>
         <translation>Počisti zakrite note</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2190"/>
-        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2306"/>
+        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2178"/>
+        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2294"/>
         <source>Automation Editor - no clip</source>
         <translation>Urejevalnik avtomatizacije - brez izseka</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2194"/>
-        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2310"/>
+        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2182"/>
+        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2298"/>
         <source>Automation Editor - %1</source>
         <translation>Urejevalnik avtomatizacije - %1</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2247"/>
+        <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2235"/>
         <source>Model is already connected to this clip.</source>
         <translation>Model je že povezan s tem izsekom</translation>
     </message>
@@ -6726,119 +6685,119 @@ Prepričajte se, da imate pravico za branje te datoteke in njeno mapo ter poskus
 <context>
     <name>lmms::gui::ClipView</name>
     <message>
-        <location filename="../../src/gui/clips/ClipView.cpp" line="700"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="525"/>
         <source>Current position</source>
         <translation>Trenutni položaj</translation>
     </message>
     <message>
-        <location filename="../../src/gui/clips/ClipView.cpp" line="708"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="533"/>
         <source>Current length</source>
         <translation>Trenutna dolžina</translation>
     </message>
     <message>
-        <location filename="../../src/gui/clips/ClipView.cpp" line="709"/>
-        <location filename="../../src/gui/clips/ClipView.cpp" line="989"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="534"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="801"/>
         <source>%1:%2 (%3:%4 to %5:%6)</source>
         <translation>%1:%2 (%3:%4 do %5:%6)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/clips/ClipView.cpp" line="730"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="555"/>
         <source>Press &lt;%1&gt; and drag to make a copy.</source>
         <translation>Pritisnite &lt;%1&gt; in vlečite, da ustvarite kopijo.</translation>
     </message>
     <message>
-        <location filename="../../src/gui/clips/ClipView.cpp" line="735"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="560"/>
         <source>Press &lt;%1&gt; or &lt;Alt&gt; for unquantized splitting.
 Press &lt;Shift&gt; for destructive splitting.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/clips/ClipView.cpp" line="736"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="561"/>
         <source>Press &lt;%1&gt; or &lt;Alt&gt; for unquantized splitting.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/clips/ClipView.cpp" line="740"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="565"/>
         <source>Press &lt;%1&gt; or &lt;Alt&gt; for unquantized resizing.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/clips/ClipView.cpp" line="742"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="567"/>
         <source>Hint</source>
         <translation>Namig</translation>
     </message>
     <message>
-        <location filename="../../src/gui/clips/ClipView.cpp" line="1090"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="888"/>
         <source>Delete (middle mousebutton)</source>
         <translation>Izbriši (srednja tipka miške)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/clips/ClipView.cpp" line="1091"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="889"/>
         <source>Delete selection (middle mousebutton)</source>
         <translation>Izbriši označeno (srednja tipka miške)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/clips/ClipView.cpp" line="1099"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="897"/>
         <source>Cut</source>
         <translation>Izreži</translation>
     </message>
     <message>
-        <location filename="../../src/gui/clips/ClipView.cpp" line="1100"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="898"/>
         <source>Cut selection</source>
         <translation>Izreži označeno</translation>
     </message>
     <message>
-        <location filename="../../src/gui/clips/ClipView.cpp" line="1107"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="905"/>
         <source>Copy</source>
         <translation>Kopiraj</translation>
     </message>
     <message>
-        <location filename="../../src/gui/clips/ClipView.cpp" line="1108"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="906"/>
         <source>Copy selection</source>
         <translation>Kopiraj označeno</translation>
     </message>
     <message>
-        <location filename="../../src/gui/clips/ClipView.cpp" line="1113"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="911"/>
         <source>Paste</source>
         <translation>Prilepi</translation>
     </message>
     <message>
-        <location filename="../../src/gui/clips/ClipView.cpp" line="1127"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="925"/>
         <source>Mute/unmute (&lt;%1&gt; + middle click)</source>
         <translation>Utišaj/zvok (&lt;%1&gt;+ srednji klik)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/clips/ClipView.cpp" line="1128"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="926"/>
         <source>Mute/unmute selection (&lt;%1&gt; + middle click)</source>
         <translation>Utišaj/zvok označeno (&lt;%1&gt;+ srednji klik)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/clips/ClipView.cpp" line="1133"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="931"/>
         <source>Clip color</source>
         <translation>Barva matrike</translation>
     </message>
     <message>
-        <location filename="../../src/gui/clips/ClipView.cpp" line="1135"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="933"/>
         <source>Change</source>
         <translation>Spremeni</translation>
     </message>
     <message>
-        <location filename="../../src/gui/clips/ClipView.cpp" line="1136"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="934"/>
         <source>Reset</source>
         <translation>Ponastavi</translation>
     </message>
     <message>
-        <location filename="../../src/gui/clips/ClipView.cpp" line="1137"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="935"/>
         <source>Pick random</source>
         <translation>Izberi naključno</translation>
     </message>
     <message>
-        <location filename="../../src/gui/clips/ClipView.cpp" line="1142"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="940"/>
         <source>Disable auto-resize</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/clips/ClipView.cpp" line="1142"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="940"/>
         <source>Enable auto-resize</source>
         <translation type="unfinished"/>
     </message>
@@ -9274,12 +9233,12 @@ Prepričajte se, da imate pravico za zapisovanje v to datoteko in njeno mapo ter
         <translation>Odpri/Zapri MIDI CC regal</translation>
     </message>
     <message>
-        <location filename="../../src/gui/tracks/InstrumentTrackView.cpp" line="399"/>
+        <location filename="../../src/gui/tracks/InstrumentTrackView.cpp" line="397"/>
         <source>%1: %2</source>
         <translation>%1: %2</translation>
     </message>
     <message>
-        <location filename="../../src/gui/tracks/InstrumentTrackView.cpp" line="436"/>
+        <location filename="../../src/gui/tracks/InstrumentTrackView.cpp" line="434"/>
         <source>Corrupted audio detected: muting affected channels</source>
         <translation type="unfinished"/>
     </message>
@@ -11482,136 +11441,136 @@ Vnesite &apos;x&apos;, če želite pustiti tipko nedodeljeno/ nemapirano.</trans
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="315"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="297"/>
         <source>Scale parsing error</source>
         <translation>Napaka pri razčlenjevanju lestvice</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="319"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="301"/>
         <source>Scale name cannot start with an exclamation mark</source>
         <translation>Ime lestvice se ne more začeti s klicajem</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="320"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="302"/>
         <source>Scale name cannot contain a new-line character</source>
         <translation>Ime lestvice ne more vsebovati znaka za novo vrstico</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="333"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="315"/>
         <source>Interval defined in cents cannot be converted to a number</source>
         <translation>Interval definiran v stotnjah ne more biti pretovrjen v številko</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="340"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="322"/>
         <source>Numerator of an interval defined as a ratio cannot be converted to a number</source>
         <translation>Števec intervala, ki je definiran kot razmerje, ne more biti pretvorjen v številko</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="345"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="327"/>
         <source>Denominator of an interval defined as a ratio cannot be converted to a number</source>
         <translation>Imenovalec intervala, ki je definiran kot razmerje, ne more biti pretvorjen v številko</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="346"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="328"/>
         <source>Interval defined as a ratio cannot be negative</source>
         <translation>Interval, ki je definiran kot razmerje, ne more biti negativno</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="359"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="337"/>
         <source>Keymap parsing error</source>
         <translation>Napaka pri razčlenjevanju mape tipk</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="363"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="341"/>
         <source>Keymap name cannot start with an exclamation mark</source>
         <translation>Ime mape tipk  se ne more začeti s klicajem</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="364"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="342"/>
         <source>Keymap name cannot contain a new-line character</source>
         <translation>Ime mape tipk ne more vsebovati znaka za novo vrstico</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="378"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="356"/>
         <source>Scale degree cannot be converted to a whole number</source>
         <translation>Stopnja lestvice ne more biti pretovrjena v celo število</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="379"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="357"/>
         <source>Scale degree cannot be negative</source>
         <translation>Stopnja lestvice ne more biti negativna</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="468"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="438"/>
         <source>Invalid keymap</source>
         <translation>Napačna mapa tipk</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="468"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="438"/>
         <source>Base key is not mapped to any scale degree. No sound will be produced as there is no way to assign reference frequency to any note.</source>
         <translation>Osnovna tipka ni pripisana stopnji lestvice. Zvok ne bo ustvarjen, ker notam ni možno pripisati referenčne frekvence.</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="480"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="446"/>
         <source>Open scale</source>
         <translation>Odpri lestvico</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="480"/>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="564"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="446"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="522"/>
         <source>Scala scale definition (*.scl)</source>
         <translation>Scala definicija lestvice (*.scl)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="485"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="451"/>
         <source>Scale load failure</source>
         <translation>Napak pri nalaganju lestvice</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="485"/>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="520"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="451"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="482"/>
         <source>Unable to open selected file.</source>
         <translation>Izbrane datoteke ni mogoče odpreti.</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="515"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="477"/>
         <source>Open keymap</source>
         <translation>Odpri mapo tipk</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="515"/>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="600"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="477"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="554"/>
         <source>Scala keymap definition (*.kbm)</source>
         <translation>Scala definicija mape tipk (*.kbm)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="520"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="482"/>
         <source>Keymap load failure</source>
         <translation>Napak pri nalaganju mape tipk</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="564"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="522"/>
         <source>Save scale</source>
         <translation>Shrani lestvico</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="570"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="528"/>
         <source>Scale save failure</source>
         <translation>Napaka pri shranjevanju lestvice</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="570"/>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="606"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="528"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="560"/>
         <source>Unable to open selected file for writing.</source>
         <translation>Izbrane datoteke ni mogoče odpreti za zapisovanje.</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="600"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="554"/>
         <source>Save keymap</source>
         <translation>Shrani mapo tipk</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MicrotunerConfig.cpp" line="606"/>
+        <location filename="../../src/gui/MicrotunerConfig.cpp" line="560"/>
         <source>Keymap save failure</source>
         <translation>Napaka pri shranjevanju mape tipk</translation>
     </message>
@@ -12403,17 +12362,17 @@ Opozorilo: Tega dejanja ni mogoče razveljaviti.</translation>
 <context>
     <name>lmms::gui::PatchesDialog</name>
     <message>
-        <location filename="../../plugins/Sf2Player/PatchesDialog.cpp" line="93"/>
+        <location filename="../../plugins/Sf2Player/PatchesDialog.cpp" line="92"/>
         <source>Patch</source>
         <translation>Program</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/PatchesDialog.cpp" line="93"/>
+        <location filename="../../plugins/Sf2Player/PatchesDialog.cpp" line="92"/>
         <source>Name</source>
         <translation>Ime</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/PatchesDialog.cpp" line="125"/>
+        <location filename="../../plugins/Sf2Player/PatchesDialog.cpp" line="124"/>
         <source>Search</source>
         <translation>iskanje</translation>
     </message>
@@ -12639,130 +12598,130 @@ Opozorilo: Tega dejanja ni mogoče razveljaviti.</translation>
 <context>
     <name>lmms::gui::PianoRoll</name>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="227"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="230"/>
         <source>Note Velocity</source>
         <translation>Hitrost note</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="228"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="231"/>
         <source>Note Panning</source>
         <translation>Panorama note</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="241"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="244"/>
         <source>Mark/unmark current semitone</source>
         <translation>Označi/odznači trenutni polton</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="242"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="245"/>
         <source>Mark/unmark all corresponding octave semitones</source>
         <translation>Označi/odznači vse pripadajoče poltone oktave</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="243"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="246"/>
         <source>Mark current scale</source>
         <translation>Označi trenutno lestvico</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="244"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="247"/>
         <source>Mark current chord</source>
         <translation>Označi trenutni akord</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="245"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="248"/>
         <source>Unmark all</source>
         <translation>Odznači vse</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="246"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="249"/>
         <source>Select all notes on this key</source>
         <translation>Izberi vse note tega ključa</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="342"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="345"/>
         <source>Note lock</source>
         <translation>Zaklep note</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="352"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="355"/>
         <source>Last note</source>
         <translation>Zadnja nota</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="376"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="379"/>
         <source>No key</source>
         <translation>Ni ključa</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="389"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="392"/>
         <source>No scale</source>
         <translation>Ni lestivce</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="406"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="409"/>
         <source>No chord</source>
         <translation>Ni akorda</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="436"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="439"/>
         <source>Nudge</source>
         <translation>Potisni</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="437"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="440"/>
         <source>Snap</source>
         <translation>Preskok</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="480"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="483"/>
         <source>Velocity: %1%</source>
         <translation>Hitrost: %1%</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="489"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="492"/>
         <source>Panning: %1% left</source>
         <translation>Panorama: %1% levo</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="493"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="496"/>
         <source>Panning: %1% right</source>
         <translation>Panorama: %1% desno</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="497"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="500"/>
         <source>Panning: center</source>
         <translation>Panorama: sredina</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="2237"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="2240"/>
         <source>Knife Tool</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="2238"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="2241"/>
         <source>Click and drag over notes to cut along a line
 Hold Shift to automatically remove short ends</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="3329"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="3332"/>
         <source>Double-click on an instrument clip in Song Editor to open it here</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="4541"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="4544"/>
         <source>Pitch Bending</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="4542"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="4545"/>
         <source>Click and drag on a note or selection to edit its detuning curve
 Shift-click to open the note in Automation Editor</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="4642"/>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="4661"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="4645"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="4664"/>
         <source>Please enter a new value between %1 and %2:</source>
         <translation>Vnesite novo vrednost med %1 in %2:</translation>
     </message>
@@ -12770,256 +12729,256 @@ Shift-click to open the note in Automation Editor</source>
 <context>
     <name>lmms::gui::PianoRollWindow</name>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5181"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5184"/>
         <source>Play/pause current clip (Space)</source>
         <translation>Predvajanje/premor trenutnega izseka (preslednica)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5182"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5185"/>
         <source>Record notes from MIDI-device/channel-piano</source>
         <translation>Snemaj note z MIDI naprave/kanala-pianina</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5183"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5186"/>
         <source>Record notes from MIDI-device/channel-piano while playing song or pattern track</source>
         <translation>Snema note z MIDI naprave/kanala-pianina medtem ko predvaja skladbo ali stezo z matriko</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5184"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5187"/>
         <source>Record notes from MIDI-device/channel-piano, one step at the time</source>
         <translation>Snema note z MIDI naprave/kanala-pianina, korak po koraku</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5185"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5188"/>
         <source>Stop playing of current clip (Space)</source>
         <translation>Zaustavi predvajanje trenutnega izseka (preslednica)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5187"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5190"/>
         <source>Edit actions</source>
         <translation>Uredi dejanja</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5191"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5194"/>
         <source>Draw mode (Shift+D)</source>
         <translation>Način risanja (shift+D)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5192"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5195"/>
         <source>Erase mode (Shift+E)</source>
         <translation>Način brisanja (Shift+E)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5193"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5196"/>
         <source>Select mode (Shift+S)</source>
         <translation>Način izbire (Shift+S)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5194"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5197"/>
         <source>Pitch Bend mode (Shift+T)</source>
         <translation>Način pregibanja višine (Shift+T)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5209"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5212"/>
         <source>Quantize</source>
         <translation>Kvantizacija</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5210"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5213"/>
         <source>Quantize positions</source>
         <translation>Kvantizacija položajev</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5211"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5214"/>
         <source>Quantize lengths</source>
         <translation>Kvantizacija dolžin</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5231"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5234"/>
         <source>File actions</source>
         <translation>Dejanja datoteke</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5239"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5242"/>
         <source>Import clip</source>
         <translation>Uvozi izsek</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5241"/>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5773"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5244"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5776"/>
         <source>Export clip</source>
         <translation>Izvozi izsek</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5252"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5255"/>
         <source>Copy paste controls</source>
         <translation>Nadzor kopiranja/lepljenja</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5254"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5257"/>
         <source>Cut (%1+X)</source>
         <translation>Izreži (%1+X)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5256"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5259"/>
         <source>Copy (%1+C)</source>
         <translation>Kopiraj (%1+C)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5258"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5261"/>
         <source>Paste (%1+V)</source>
         <translation>Prilepi (%1+V)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5273"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5276"/>
         <source>Timeline controls</source>
         <translation>Nadzor časovnice</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5281"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5284"/>
         <source>Glue</source>
         <translation>Lepljenje</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5285"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5288"/>
         <source>Knife</source>
         <translation>Nož</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5289"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5292"/>
         <source>Strum</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5293"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5296"/>
         <source>Fill</source>
         <translation>Zapolni</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5297"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5300"/>
         <source>Cut overlaps</source>
         <translation>Izreži prekrito</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5301"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5304"/>
         <source>Min length as last</source>
         <translation>Minimalna dolžina vsaj</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5304"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5307"/>
         <source>Max length as last</source>
         <translation>Maksimalna dolžina vsaj</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5307"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5310"/>
         <source>Reverse Notes</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5325"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5328"/>
         <source>Zoom and note controls</source>
         <translation>Nadzor povečave in not</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5333"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5336"/>
         <source>Horizontal zooming</source>
         <translation>Vodoravna povečava</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5341"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5344"/>
         <source>Vertical zooming</source>
         <translation>Navpična povečava</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5350"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5353"/>
         <source>Quantization</source>
         <translation>Kvantizacija</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5359"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5362"/>
         <source>Note length</source>
         <translation>Dolžina note</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5365"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5368"/>
         <source>Key</source>
         <translation>Ključ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5374"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5377"/>
         <source>Scale</source>
         <translation>Skala</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5383"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5386"/>
         <source>Chord</source>
         <translation>Akord</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5392"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5395"/>
         <source>Snap mode</source>
         <translation>Način preskoka</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5397"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5400"/>
         <source>Clear ghost notes</source>
         <translation>Počisti zakrite note</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5506"/>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5750"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5509"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5753"/>
         <source>Piano-Roll - %1</source>
         <translation>Pianino-rolca - %1</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5513"/>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5755"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5516"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5758"/>
         <source>Piano-Roll - no clip</source>
         <translation>Pianino-rolca - brez izseka</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5774"/>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5835"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5777"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5838"/>
         <source>XML clip file (*.xpt *.xptz)</source>
         <translation>XML izsek (*.xpt *.xptz)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5780"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5783"/>
         <source>Export only selected notes</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5808"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5811"/>
         <source>Export clip success</source>
         <translation>Uspešno izvožen izsek</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5809"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5812"/>
         <source>Clip saved to %1</source>
         <translation>Izsek shranjen v %1</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5824"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5827"/>
         <source>Import clip.</source>
         <translation>Uvozi izsek.</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5825"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5828"/>
         <source>You are about to import a clip, this will overwrite your current clip. Do you want to continue?</source>
         <translation>Uvozili boste izsek, kar bo prepisalo trenuten izsek. Želite nadaljevati?</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5834"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5837"/>
         <source>Open clip</source>
         <translation>Odpri izsek</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5854"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5857"/>
         <source>Import clip success</source>
         <translation>Uspešno uvožen izsek</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5855"/>
+        <location filename="../../src/gui/editors/PianoRoll.cpp" line="5858"/>
         <source>Imported clip %1!</source>
         <translation>Uvožen izsek %1!</translation>
     </message>
@@ -13027,17 +12986,17 @@ Shift-click to open the note in Automation Editor</source>
 <context>
     <name>lmms::gui::PianoView</name>
     <message>
-        <location filename="../../src/gui/instrument/PianoView.cpp" line="787"/>
+        <location filename="../../src/gui/instrument/PianoView.cpp" line="669"/>
         <source>Base note</source>
         <translation>Osnovna nota</translation>
     </message>
     <message>
-        <location filename="../../src/gui/instrument/PianoView.cpp" line="792"/>
+        <location filename="../../src/gui/instrument/PianoView.cpp" line="674"/>
         <source>First note</source>
         <translation>Prva nota</translation>
     </message>
     <message>
-        <location filename="../../src/gui/instrument/PianoView.cpp" line="797"/>
+        <location filename="../../src/gui/instrument/PianoView.cpp" line="679"/>
         <source>Last note</source>
         <translation>Zadnja nota</translation>
     </message>
@@ -13583,7 +13542,7 @@ Shift-click to open the note in Automation Editor</source>
         <translation>%1: %2</translation>
     </message>
     <message>
-        <location filename="../../src/gui/tracks/SampleTrackView.cpp" line="255"/>
+        <location filename="../../src/gui/tracks/SampleTrackView.cpp" line="253"/>
         <source>Corrupted audio detected: muting affected channels</source>
         <translation type="unfinished"/>
     </message>
@@ -13667,445 +13626,445 @@ Shift-click to open the note in Automation Editor</source>
 <context>
     <name>lmms::gui::SetupDialog</name>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="165"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="162"/>
         <source>Settings</source>
         <translation>Nastavitve</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="200"/>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="898"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="197"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="880"/>
         <source>General</source>
         <translation>Splošno</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="235"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="232"/>
         <source>Graphical user interface (GUI)</source>
         <translation>Grafični vmesnik (GUI)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="238"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="235"/>
         <source>Enable tooltips</source>
         <translation>Vklopi namige za orodja</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="240"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="237"/>
         <source>Enable master oscilloscope by default</source>
         <translation>Privzeto vklopi glavni osciloskop</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="242"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="239"/>
         <source>Enable all note labels in piano roll</source>
         <translation>Vklopi vse oznake not v klavirskem črtovju</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="244"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="241"/>
         <source>Show fader ticks</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="246"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="243"/>
         <source>Enable compact track buttons</source>
         <translation>Vklopi kompaktne gumbe orodne vrstice</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="248"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="245"/>
         <source>Enable one instrument-track-window mode</source>
         <translation>Vklopi okenski način ena instrumentalna steza</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="250"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="247"/>
         <source>Show sidebar on the right-hand side</source>
         <translation>Prikaži stranski pano na desni strani</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="252"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="249"/>
         <source>Let sample previews continue when mouse is released</source>
         <translation>Predogledi vzorcev naj se nadaljujejo, ko je miška spuščena</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="254"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="251"/>
         <source>Mute automation tracks during solo</source>
         <translation>Utišaj avotmatizacijske steze, ko je izbran solo</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="256"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="253"/>
         <source>Show warning when deleting tracks</source>
         <translation>Ob brisanju stez prikaži opozorilo</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="258"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="255"/>
         <source>Show warning when deleting a mixer channel that is in use</source>
         <translation>Prikaži opozorilo ob brisanju mešalnega kanala, ki je v rabi</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="263"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="260"/>
         <source>Attach and show when closed</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="264"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="261"/>
         <source>Attach and hide when closed</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="265"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="262"/>
         <source>Always detached</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="271"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="268"/>
         <source>Detached window behavior</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="276"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="273"/>
         <source>Dual-button</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="277"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="274"/>
         <source>Grab closest</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="278"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="275"/>
         <source>Handles</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="284"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="281"/>
         <source>Loop edit mode</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="288"/>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="1183"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="285"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="1165"/>
         <source>Disabled</source>
         <translation>Onemogočeno</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="289"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="286"/>
         <source>Stepped (Scroll once the playhead goes out of view)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="290"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="287"/>
         <source>Continuous (Scroll constantly to keep the playhead in the center)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="295"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="292"/>
         <source>Default Autoscroll Mode</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="303"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="300"/>
         <source>Projects</source>
         <translation>Projekti</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="306"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="303"/>
         <source>Compress project files by default</source>
         <translation>Privzeto stiskanje projektnih datotek</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="308"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="305"/>
         <source>Create a backup file when saving a project</source>
         <translation>Ustvari varnostno kopijo ob shranjevanju projekta</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="310"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="307"/>
         <source>Reopen last project on startup</source>
         <translation>Ob zagonu odpri zadnji projekt</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="318"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="315"/>
         <source>Language</source>
         <translation>Jezik</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="392"/>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="901"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="389"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="883"/>
         <source>Performance</source>
         <translation>Zmogljivost</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="396"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="393"/>
         <source>Autosave</source>
         <translation>Samodejno shranjevanje</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="424"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="421"/>
         <source>Enable autosave</source>
         <translation>Vklopi samodejno shranjevanje</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="427"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="424"/>
         <source>Allow autosave while playing</source>
         <translation>Dovoli samodejno shranjevanje med predvajanjem</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="435"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="432"/>
         <source>User interface (UI) effects vs. performance</source>
         <translation>Učinki uporabniškega vmesnika (UI) vs. zmogljivost</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="438"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="435"/>
         <source>Smooth scroll in song editor</source>
         <translation>Mehko drsenje v urejevalniku skladbe</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="440"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="437"/>
         <source>Display playback cursor in AudioFileProcessor</source>
         <translation>Prikaži predvajalni kurzor v AudioFileProcessor</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="445"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="442"/>
         <source>Plugins</source>
         <translation>Vtičniki</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="449"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="446"/>
         <source>VST plugins embedding:</source>
         <translation>Vdelava VST vtičnikov</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="455"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="452"/>
         <source>No embedding</source>
         <translation>Brez vdelave</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="458"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="455"/>
         <source>Embed using Qt API</source>
         <translation>Vdelaj z uporabo Qt API</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="462"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="459"/>
         <source>Embed using native Win32 API</source>
         <translation>Vdelaj z uporabo Win32 API</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="466"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="463"/>
         <source>Embed using XEmbed protocol</source>
         <translation>Vdelaj z uporabo XEmbed protokola</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="473"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="470"/>
         <source>Keep plugin windows on top when not embedded</source>
         <translation>Obdrži okna vtičnika na vrhu, kadar niso vgrajena</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="476"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="473"/>
         <source>Keep effects running even without input</source>
         <translation>Učinki naj se izvajajo, četudi ni vhoda</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="494"/>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="904"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="491"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="886"/>
         <source>Audio</source>
         <translation>Zvok</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="497"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="494"/>
         <source>Audio interface</source>
         <translation>Zvočni vmesnik</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="582"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="569"/>
         <source>Sample rate</source>
         <translation>Frekvenca vzorčenja</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="607"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="594"/>
         <source>Sample rate: %1</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="621"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="608"/>
         <source>Buffer size</source>
         <translation>Velikost medpomnilnika</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="643"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="630"/>
         <source>Reset to default value</source>
         <translation>Ponastavi na privzeto vrednost</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="657"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="644"/>
         <source>Other</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="660"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="647"/>
         <source>Enable mix sanitization</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="662"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="649"/>
         <source>Provides protection from any plugins or tracks that generate corrupted audio, but may negatively impact performance.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="680"/>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="907"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="667"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="889"/>
         <source>MIDI</source>
         <translation>MIDI</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="683"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="670"/>
         <source>MIDI interface</source>
         <translation>MIDI vmesnik</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="759"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="741"/>
         <source>Automatically assign MIDI controller to selected track</source>
         <translation>Samodejno določi MIDi kontroler izbrani stezi</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="780"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="762"/>
         <source>Behavior when recording</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="783"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="765"/>
         <source>Auto-quantize notes in Piano Roll</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="787"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="769"/>
         <source>If enabled, notes will be automatically quantized when recording them from a MIDI controller. If disabled, they are always recorded at the highest possible resolution.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="806"/>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="910"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="788"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="892"/>
         <source>Paths</source>
         <translation>Poti</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="843"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="825"/>
         <source>LMMS working directory</source>
         <translation>LMMS delovna mapa</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="847"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="829"/>
         <source>VST plugins directory</source>
         <translation>Mapa z VST vtičniki</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="851"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="833"/>
         <source>LADSPA plugins directories</source>
         <translation>Mape LADSPA vtičnikov</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="855"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="837"/>
         <source>SF2 directory</source>
         <translation>SF2 mapa</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="860"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="842"/>
         <source>Default SF2</source>
         <translation>Privzeti SF2</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="865"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="847"/>
         <source>GIG directory</source>
         <translation>GIG mapa</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="869"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="851"/>
         <source>Theme directory</source>
         <translation>Mapa s temami</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="873"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="855"/>
         <source>Background artwork</source>
         <translation>Grafike za ozadje</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="930"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="912"/>
         <source>Some changes require restarting.</source>
         <translation>Določene spremembe zahtevajo ponoven zagon.</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="934"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="916"/>
         <source>OK</source>
         <translation>V redu</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="939"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="921"/>
         <source>Cancel</source>
         <translation>Prekini</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="1181"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="1163"/>
         <source>minutes</source>
         <translation>minut</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="1181"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="1163"/>
         <source>minute</source>
         <translation>minuta</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="1185"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="1167"/>
         <source>Autosave interval: %1</source>
         <translation>Interval samodejnega shranjevanja: %1</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="1269"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="1251"/>
         <source>The currently selected value is not a power of 2 (32, 64, 128, 256). Some plugins may not be available.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="1274"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="1256"/>
         <source>The currently selected value is less than or equal to 32. Some plugins may not be available.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="1305"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="1287"/>
         <source>Frames: %1
 Latency: %2 ms</source>
         <translation>Okvirjev: %1
 Latenca: %2 ms</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="1341"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="1323"/>
         <source>Choose the LMMS working directory</source>
         <translation>Izberite LMMS delovno mapo</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="1358"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="1340"/>
         <source>Choose your VST plugins directory</source>
         <translation>Izberite mapo z VST vtičniki</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="1375"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="1357"/>
         <source>Choose your LADSPA plugins directory</source>
         <translation>Izberite mapo z LADSPA vtičniki</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="1400"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="1382"/>
         <source>Choose your SF2 directory</source>
         <translation>Izberite SF2 mapo</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="1418"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="1400"/>
         <source>Choose your default SF2</source>
         <translation>Izberite privzeti SF2</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="1439"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="1421"/>
         <source>Choose your GIG directory</source>
         <translation>Izberite GIG mapo</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="1456"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="1438"/>
         <source>Choose your theme directory</source>
         <translation>Izberite mapo s temami</translation>
     </message>
     <message>
-        <location filename="../../src/gui/modals/SetupDialog.cpp" line="1490"/>
+        <location filename="../../src/gui/modals/SetupDialog.cpp" line="1472"/>
         <source>Choose your background picture</source>
         <translation>Izberite sliko za ozadje</translation>
     </message>
@@ -14113,69 +14072,69 @@ Latenca: %2 ms</translation>
 <context>
     <name>lmms::gui::Sf2InstrumentView</name>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="973"/>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1182"/>
+        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="943"/>
+        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1152"/>
         <source>Open SoundFont file</source>
         <translation>Odpri SoundFont datoteko</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="985"/>
+        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="955"/>
         <source>Choose patch</source>
         <translation>Izberi program</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1019"/>
+        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="989"/>
         <source>Gain:</source>
         <translation>Jakost:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1032"/>
+        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1002"/>
         <source>Apply reverb (if supported)</source>
         <translation>Uporabi odjek (če je podprt)</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1036"/>
+        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1006"/>
         <source>Room size:</source>
         <translation>Velikost prostora:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1040"/>
+        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1010"/>
         <source>Damping:</source>
         <translation>Dušenje:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1044"/>
+        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1014"/>
         <source>Width:</source>
         <translation>Širina:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1048"/>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1075"/>
+        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1018"/>
+        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1045"/>
         <source>Level:</source>
         <translation>Nivo:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1068"/>
+        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1038"/>
         <source>Apply chorus (if supported)</source>
         <translation>Uporabi zbor (če je podprt)</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1071"/>
+        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1041"/>
         <source>Voices:</source>
         <translation>Glasovi:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1079"/>
+        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1049"/>
         <source>Speed:</source>
         <translation>Hitrost:</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1083"/>
+        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1053"/>
         <source>Depth:</source>
         <translation>Globina</translation>
     </message>
     <message>
-        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1186"/>
+        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1156"/>
         <source>SoundFont Files (*.sf2 *.sf3)</source>
         <translation>SoundFont datoteke (*.sf2 *.sf3)</translation>
     </message>
@@ -14636,32 +14595,32 @@ Poskrbite, da boste imeli vsaj bralne pravice in poskusite znova.</translation>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/core/DataFile.cpp" line="2151"/>
+        <location filename="../../src/core/DataFile.cpp" line="2125"/>
         <source>Error in file</source>
         <translation>Napaka v datoteki</translation>
     </message>
     <message>
-        <location filename="../../src/core/DataFile.cpp" line="2152"/>
+        <location filename="../../src/core/DataFile.cpp" line="2126"/>
         <source>The file %1 seems to contain errors and therefore can&apos;t be loaded.</source>
         <translation>Datoteka %1 vsebuje napake in je ni mogoče naložiti.</translation>
     </message>
     <message>
-        <location filename="../../src/core/DataFile.cpp" line="2192"/>
+        <location filename="../../src/core/DataFile.cpp" line="2166"/>
         <source>template</source>
         <translation>predloga</translation>
     </message>
     <message>
-        <location filename="../../src/core/DataFile.cpp" line="2192"/>
+        <location filename="../../src/core/DataFile.cpp" line="2166"/>
         <source>project</source>
         <translation>projekt</translation>
     </message>
     <message>
-        <location filename="../../src/core/DataFile.cpp" line="2195"/>
+        <location filename="../../src/core/DataFile.cpp" line="2169"/>
         <source>Version difference</source>
         <translation>Razlika različic</translation>
     </message>
     <message>
-        <location filename="../../src/core/DataFile.cpp" line="2196"/>
+        <location filename="../../src/core/DataFile.cpp" line="2170"/>
         <source>This %1 was created with LMMS %2</source>
         <translation>%1 je ustvarjen z LMMS %2</translation>
     </message>
@@ -14700,22 +14659,22 @@ Poskrbite, da boste imeli vsaj bralne pravice in poskusite znova.</translation>
         <translation>Globalno transponiranje</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="322"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="321"/>
         <source>1/%1 Bar</source>
         <translation>1/%1 takt</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="326"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="325"/>
         <source>%1 Bars</source>
         <translation>%1 taktov</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="662"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="661"/>
         <source>Value: %1%</source>
         <translation>Vrednost: %1%</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="704"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="703"/>
         <source>Value: %1 keys</source>
         <translation>Vrednost: %1% ključev</translation>
     </message>
@@ -14723,119 +14682,119 @@ Poskrbite, da boste imeli vsaj bralne pravice in poskusite znova.</translation>
 <context>
     <name>lmms::gui::SongEditorWindow</name>
     <message>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="925"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="922"/>
         <source>Song-Editor</source>
         <translation>Urejevalnik skladbe</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="935"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="932"/>
         <source>Play song (Space)</source>
         <translation>Predvajaj skladbo (preslednica)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="936"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="933"/>
         <source>Record samples from Audio-device</source>
         <translation>Snemaj vzorce iz zvočne naprave</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="937"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="934"/>
         <source>Record samples from Audio-device while playing song or pattern track</source>
         <translation>Snemanje vzorcev iz zvočne naprave med predvajanjem skladbe ali steze z matriko</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="938"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="935"/>
         <source>Stop song (Space)</source>
         <translation>Zaustavi skladbo (preslednica)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="942"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="939"/>
         <source>Track actions</source>
         <translation>Dejanja steze</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="945"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="942"/>
         <source>Add pattern-track</source>
         <translation>Dodaj stezo z matriko</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="948"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="945"/>
         <source>Add sample-track</source>
         <translation>Dodaj stezo za vzorce</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="951"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="948"/>
         <source>Add automation-track</source>
         <translation>Dodaj stezo za avtomatizacijo</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="963"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="960"/>
         <source>Edit actions</source>
         <translation>Uredi dejanja</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="966"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="963"/>
         <source>Draw mode</source>
         <translation>Način risanja</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="967"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="964"/>
         <source>Knife mode (split clips)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="968"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="965"/>
         <source>Edit mode (select and move)</source>
         <translation>Način urejanja (izberi in premakni)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="979"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="976"/>
         <source>Timeline controls</source>
         <translation>Nadzor časovnice</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="982"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="979"/>
         <source>Bar insert controls</source>
         <translation>Kontrole za vstavljanje takta</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="983"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="980"/>
         <source>Insert bar</source>
         <translation>Vstavi takt</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="984"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="981"/>
         <source>Remove bar</source>
         <translation>Odstrani takt</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="990"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="987"/>
         <source>Zoom controls</source>
         <translation>Nadzor povečave</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="996"/>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="1002"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="993"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="999"/>
         <source>Zoom</source>
         <translation>Povečava</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="1009"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="1006"/>
         <source>Snap controls</source>
         <translation>Nadzor preskoka</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="1017"/>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="1052"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="1014"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="1049"/>
         <source>Clip snapping size</source>
         <translation>Velikost preskoka izseka</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="1021"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="1018"/>
         <source>Toggle proportional snap on/off</source>
         <translation>Preklopi proporcionalni preskok</translation>
     </message>
     <message>
-        <location filename="../../src/gui/editors/SongEditor.cpp" line="1048"/>
+        <location filename="../../src/gui/editors/SongEditor.cpp" line="1045"/>
         <source>Base snapping size</source>
         <translation>Osnovna velikost preskoka</translation>
     </message>
@@ -15333,7 +15292,7 @@ Poskrbite, da boste imeli vsaj bralne pravice in poskusite znova.</translation>
 <context>
     <name>lmms::gui::TrackContentWidget</name>
     <message>
-        <location filename="../../src/gui/tracks/TrackContentWidget.cpp" line="701"/>
+        <location filename="../../src/gui/tracks/TrackContentWidget.cpp" line="604"/>
         <source>Paste</source>
         <translation>Prilepi</translation>
     </message>
@@ -15341,99 +15300,99 @@ Poskrbite, da boste imeli vsaj bralne pravice in poskusite znova.</translation>
 <context>
     <name>lmms::gui::TrackOperationsWidget</name>
     <message>
-        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="65"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="59"/>
         <source>Press &lt;%1&gt; while clicking on move-grip to begin a new drag&apos;n&apos;drop action.</source>
         <translation>Pritisnite &lt;%1&gt;, ko kliknete na oprijem za premikanje, da začnete postopek vleči in spusti.</translation>
     </message>
     <message>
-        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="92"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="86"/>
         <source>Actions</source>
         <translation>Dejanja</translation>
     </message>
     <message>
-        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="95"/>
-        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="97"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="89"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="91"/>
         <source>Mute</source>
         <translation>Utišaj</translation>
     </message>
     <message>
-        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="99"/>
-        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="101"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="93"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="95"/>
         <source>Solo</source>
         <translation>Solo</translation>
     </message>
     <message>
-        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="143"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="129"/>
         <source>After removing a track, it can not be recovered. Are you sure you want to remove track &quot;%1&quot;?</source>
         <translation>Če stezo odstranite, je ni mogoče povrniti. Ali res želite odstraniti stezo &quot;%1&quot;?</translation>
     </message>
     <message>
-        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="146"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="132"/>
         <source>Confirm removal</source>
         <translation>Potrdi odstranitev</translation>
     </message>
     <message>
-        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="147"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="133"/>
         <source>Don&apos;t ask again</source>
         <translation>Tega več ne sprašuj</translation>
     </message>
     <message>
-        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="276"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="248"/>
         <source>Clone this track</source>
         <translation>Kloniraj to stezo</translation>
     </message>
     <message>
-        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="279"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="251"/>
         <source>Remove this track</source>
         <translation>Odstrani to stezo</translation>
     </message>
     <message>
-        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="284"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="256"/>
         <source>Clear this track</source>
         <translation>Počisti to stezo</translation>
     </message>
     <message>
-        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="286"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="258"/>
         <source>Channel %1: %2</source>
         <translation>Kanal %1: %2</translation>
     </message>
     <message>
-        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="286"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="258"/>
         <source>Assign to new Mixer Channel</source>
         <translation>Dodeli novemu mešalnemu kanalu</translation>
     </message>
     <message>
-        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="298"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="270"/>
         <source>Turn all recording on</source>
         <translation>Vklopi snemanje vseh</translation>
     </message>
     <message>
-        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="299"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="271"/>
         <source>Turn all recording off</source>
         <translation>Izklopi snemanje vseh</translation>
     </message>
     <message>
-        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="304"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="276"/>
         <source>Track color</source>
         <translation>Barva steze</translation>
     </message>
     <message>
-        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="306"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="278"/>
         <source>Change</source>
         <translation>Spremeni</translation>
     </message>
     <message>
-        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="307"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="279"/>
         <source>Reset</source>
         <translation>Ponastavi</translation>
     </message>
     <message>
-        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="308"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="280"/>
         <source>Pick random</source>
         <translation>Izberi naključno</translation>
     </message>
     <message>
-        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="310"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="282"/>
         <source>Reset clip colors</source>
         <translation>Ponastavi barve izsekov</translation>
     </message>
@@ -15898,13 +15857,13 @@ Poskrbite, da boste imeli vsaj bralne pravice in poskusite znova.</translation>
         <translation>Shrani predlogo</translation>
     </message>
     <message>
-        <location filename="../../plugins/VstEffect/VstEffectControlDialog.cpp" line="220"/>
-        <location filename="../../plugins/VstEffect/VstEffectControlDialog.cpp" line="235"/>
+        <location filename="../../plugins/VstEffect/VstEffectControlDialog.cpp" line="221"/>
+        <location filename="../../plugins/VstEffect/VstEffectControlDialog.cpp" line="236"/>
         <source>Effect by: </source>
         <translation>Učinek od:</translation>
     </message>
     <message>
-        <location filename="../../plugins/VstEffect/VstEffectControlDialog.cpp" line="236"/>
+        <location filename="../../plugins/VstEffect/VstEffectControlDialog.cpp" line="237"/>
         <source>&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;br /&gt;</source>
         <translation>&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;br /&gt;</translation>
     </message>
