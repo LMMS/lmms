@@ -52,15 +52,9 @@
 namespace lmms::gui
 {
 
-/*! \brief Create a new trackOperationsWidget
- *
- * The trackOperationsWidget is the grip and the mute button of a track.
- *
- * \param parent the trackView to contain this widget
- */
-TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
-	QWidget( parent ),             /*!< The parent widget */
-	m_trackView( parent )          /*!< The parent track view */
+TrackOperationsWidget::TrackOperationsWidget(TrackView* parent)
+	: QWidget(parent)
+	, m_trackView(parent)
 {
 	setToolTip(tr("Press <%1> while clicking on move-grip "
 				"to begin a new drag'n'drop action." ).arg(UI_CTRL_KEY) );
@@ -119,13 +113,6 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 }
 
 
-
-/*!
- * \brief Repaint the trackOperationsWidget
- *
- * Only things that's done for now is to paint the background
- * with the brush of the window from the palette.
- */
 void TrackOperationsWidget::paintEvent(QPaintEvent*)
 {
 	QPainter p( this );
@@ -134,7 +121,6 @@ void TrackOperationsWidget::paintEvent(QPaintEvent*)
 }
 
 
-/*! \brief Show a message box warning the user that this track is about to be closed */
 bool TrackOperationsWidget::confirmRemoval()
 {
 	bool needConfirm = ConfigManager::inst()->value("ui", "trackdeletionwarning", "1").toInt();
@@ -169,9 +155,7 @@ bool TrackOperationsWidget::confirmRemoval()
 	return mb.exec() == QMessageBox::Ok;
 }
 
-/*! \brief Clone this track
- *
- */
+
 void TrackOperationsWidget::cloneTrack()
 {
 	TrackContainerView *tcView = m_trackView->trackContainerView();
@@ -195,7 +179,6 @@ void TrackOperationsWidget::cloneTrack()
 }
 
 
-/*! \brief Clear this track - clears all Clips from the track */
 void TrackOperationsWidget::clearTrack()
 {
 	Track * t = m_trackView->getTrack();
@@ -206,9 +189,6 @@ void TrackOperationsWidget::clearTrack()
 }
 
 
-/*! \brief Remove this track from the track list
- *
- */
 void TrackOperationsWidget::removeTrack()
 {
 	if (confirmRemoval())
@@ -260,14 +240,6 @@ void TrackOperationsWidget::resetClipColors()
 }
 
 
-/*! \brief Update the trackOperationsWidget context menu
- *
- *  For all track types, we have the Clone and Remove options.
- *  For instrument-tracks we also offer the MIDI-control-menu
- *  For automation tracks, extra options: turn on/off recording
- *  on all Clips (same should be added for sample tracks when
- *  sampletrack recording is implemented)
- */
 void TrackOperationsWidget::updateMenu()
 {
 	QMenu * toMenu = m_trackOps->menu();

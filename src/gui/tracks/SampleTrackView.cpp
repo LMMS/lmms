@@ -224,7 +224,6 @@ void SampleTrackView::dropEvent(QDropEvent *de)
 
 
 
-/*! \brief Create and assign a new mixer Channel for this track */
 void SampleTrackView::createMixerLine()
 {
 	int channelIndex = getGUI()->mixerView()->addNewChannel();
@@ -239,7 +238,6 @@ void SampleTrackView::createMixerLine()
 
 
 
-/*! \brief Assign a specific mixer Channel for this track */
 void SampleTrackView::assignMixerLine(int channelIndex)
 {
 	model()->mixerChannelModel()->setValue(channelIndex);

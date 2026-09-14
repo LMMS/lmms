@@ -50,12 +50,10 @@
 #include "AudioAlsaSetupWidget.h"
 #include "AudioDummy.h"
 #include "AudioJack.h"
-#include "AudioOss.h"
 #include "AudioPortAudio.h"
 #include "AudioPulseAudio.h"
 #include "AudioSdl.h"
 #include "AudioSndio.h"
-#include "AudioSoundIo.h"
 
 // Platform-specific midi-interface classes.
 #include "MidiAlsaRaw.h"
@@ -63,7 +61,6 @@
 #include "MidiApple.h"
 #include "MidiDummy.h"
 #include "MidiJack.h"
-#include "MidiOss.h"
 #include "MidiSndio.h"
 #include "MidiWinMM.h"
 
@@ -143,7 +140,7 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 	m_disableAutoQuit(ConfigManager::inst()->value(
 			"ui", "disableautoquit", "1").toInt()),
 	m_bufferSize(ConfigManager::inst()->value(
-			"audioengine", "framesperaudiobuffer").toInt()),
+			"audioengine", "framesperaudiobuffer", QString::number(DEFAULT_BUFFER_SIZE)).toInt()),
 	m_mixSanitization(ConfigManager::inst()->value(
 			"audioengine", "sanitizemix", "1").toInt()),
 	m_sampleRate(ConfigManager::inst()->value(
@@ -527,19 +524,9 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 			new AudioPortAudioSetupWidget(as_w);
 #endif
 
-#ifdef LMMS_HAVE_SOUNDIO
-	m_audioIfaceSetupWidgets[AudioSoundIo::name()] =
-			new AudioSoundIo::setupWidget(as_w);
-#endif
-
 #ifdef LMMS_HAVE_SDL
 	m_audioIfaceSetupWidgets[AudioSdl::name()] =
 			new AudioSdl::setupWidget(as_w);
-#endif
-
-#ifdef LMMS_HAVE_OSS
-	m_audioIfaceSetupWidgets[AudioOss::name()] =
-			new AudioOss::setupWidget(as_w);
 #endif
 
 #ifdef LMMS_HAVE_SNDIO
@@ -703,11 +690,6 @@ SetupDialog::SetupDialog(ConfigTab tab_to_open) :
 #ifdef LMMS_HAVE_JACK
 	m_midiIfaceSetupWidgets[MidiJack::name()] =
 			MidiSetupWidget::create<MidiJack>(ms_w);
-#endif
-
-#ifdef LMMS_HAVE_OSS
-	m_midiIfaceSetupWidgets[MidiOss::name()] =
-			MidiSetupWidget::create<MidiOss>(ms_w);
 #endif
 
 #ifdef LMMS_HAVE_SNDIO

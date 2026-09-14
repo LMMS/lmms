@@ -34,20 +34,16 @@
 namespace lmms
 {
 
-/**
-	Write MIDI event into byte sequence.
-
-	Conforming to http://lv2plug.in/ns/ext/midi#MidiEvent
-
-	@param data Pointer to the target buffer for the byte sequence. Must
-		point to existing memory with at least 3 bytes size.
-	@param bufsize Available size of the target buffer.
-	@return Used size of the target buffer, or 0 if the MidiEvent could not
-		be converted.
-*/
-std::size_t LMMS_EXPORT writeToByteSeq( const class MidiEvent& ev,
-										uint8_t* data, std::size_t bufsize );
-
+//! @brief Write MIDI event into byte sequence.
+//!
+//! Conforming to http://lv2plug.in/ns/ext/midi#MidiEvent
+//!
+//! @param ev The MIDI event to write
+//! @param data Pointer to the target buffer for the byte sequence. Must point to existing memory with at least 3 bytes
+//! size.
+//! @param bufsize Available size of the target buffer.
+//! @return Used size of the target buffer, or 0 if the MidiEvent could not be converted.
+std::size_t LMMS_EXPORT writeToByteSeq(const class MidiEvent& ev, uint8_t* data, std::size_t bufsize);
 
 } // namespace lmms
 

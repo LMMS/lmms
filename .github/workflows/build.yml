@@ -185,17 +185,20 @@ jobs:
           - arch: x86_64
             os: macos-15-intel
             xcode: "16.4"
+            macosx_deployment_target: 10.15
           - arch: arm64
             os: macos-15
             xcode: "16.4"
+            macosx_deployment_target: 11.0
     name: macos-${{ matrix.arch }}
     runs-on: ${{ matrix.os }}
     env:
       CMAKE_OPTS: >-
         -Werror=dev
-        -DUSE_WERROR=ON
+        -DUSE_WERROR=OFF
         -DCMAKE_BUILD_TYPE=RelWithDebInfo
         -DTARGET_UARCH=official
+        -DWANT_QT6=ON
         -DUSE_COMPILE_CACHE=ON
       CCACHE_MAXSIZE: 0
       CCACHE_NOCOMPRESS: 1
@@ -238,13 +241,12 @@ jobs:
       - name: Configure
         run: |
           ccache --zero-stats
-          source .github/workflows/macos-env.sh
           mkdir build
           cmake -S . \
                 -B build \
                 -DCMAKE_OSX_ARCHITECTURES=${{ matrix.arch }} \
-                $CMAKE_OPTS \
-                -DUSE_WERROR=OFF
+                -DCMAKE_OSX_DEPLOYMENT_TARGET=${{ matrix.macosx_deployment_target }} \
+                $CMAKE_OPTS
       - name: Build
         run: cmake --build build
       - name: Run tests
@@ -447,6 +449,7 @@ jobs:
       CMAKE_OPTS: >-
         -DCMAKE_BUILD_TYPE=RelWithDebInfo
         -DTARGET_UARCH=official
+        -DWANT_QT6=ON
         -DUSE_COMPILE_CACHE=ON
         -DCPACK_NSIS_EXECUTABLE=/clang64/bin/makensis.exe
       CCACHE_MAXSIZE: 0
