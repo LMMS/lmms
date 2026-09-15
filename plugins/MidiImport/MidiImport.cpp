@@ -444,10 +444,18 @@ bool MidiImport::readSMF(TrackContainer* tc)
 						auto& pc = pcs[evt->chan];
 						AutomatableModel* objModel = ch->it_inst->childModel("patch");
 						assert(objModel != nullptr);
-						if (pc.at == nullptr) {
-							pc.create(tc, trackName + " > " + objModel->displayName());
+						if (time == 0)
+						{
+							objModel->setInitValue(prog);
 						}
-						pc.putValue(time, objModel, prog);
+						else
+						{
+							if (!pc.at)
+							{
+								pc.create(tc, trackName + " > " + objModel->displayName());
+							}
+							pc.putValue(time, objModel, prog);
+						}
 					}
 					else
 					{
